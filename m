@@ -1,1236 +1,159 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0191A76B1;
-	Wed, 24 Sep 2025 13:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B62D15D1
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Sep 2025 13:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758720160; cv=none; b=VPDMLzT/AtcoGzF/iue12TsWMvwtRjKeBaMFvkkTg58R7SwH7ZNEU0MUIkjN6cx99LdYQUR4P9HbA+fKs+rUJaHPocU3zDSzM3jbT8BoU3keNuP9gJDvS6vI6MLNruyS2B+5pdxJ9ZW4FhK9fO1/JywRBkEk1yH9BPIbGuk3MwM=
+	t=1758720670; cv=none; b=WVLxg/xiRkWAdVrejKiruUJjL1iSMF5MsZbW4Eg6b7KKNDTJN1HImehXaWficPE18f2iWURUL8qogX0NmVsYp4RCEYOLW28RcNa5p2qWHTkvGW4pFBxllAjxtxSrtP9y9QaLHUDmHzVGi9aCB2gU+Qy9crAVN4Rg5Kv8Y0kNGSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758720160; c=relaxed/simple;
-	bh=YJcy6wgUE5OiBOyevfZnqjx157x6f5pc8KzcoKVchUs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pRIW/yaeJWuPCGLk+VRXGrFaFE+2iZM6Ql1e6gxuIb3pgmHIeI6Cj5QYSApRc00WDzhZqT+z9kzda9MPLJ4kJe9PrHVb9W8fM25Z9jAehybFTRAXkCwlE7Xck4ymFO+dSWoT3WkNiiupCz961Q8T64xTncrdANwhsM7MdFA9oYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KCHVCd4K; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1758720670; c=relaxed/simple;
+	bh=46Xxj40QWyWAnu3jMesyuN/ZQk0DISGVbez5MDqEi+0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FH/54XGCrTqjVNk/4QlcS/bnsuIvGyRVNeeVsGcXM7WnaX6zT5TMA6RgUnS/yoq+ZTK4Thk5oo5FGIXaixcVLvW7eBkzrR1wixt0aPTEWeBMOjxK2hKhsUSaLHDQ1UjYYKszYBJgAgDDVZ4bz0rmv5OlYJiVfBtu2hotUG/rQpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R4Jw7hSh; arc=none smtp.client-ip=209.85.128.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KCHVCd4K"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58O5DwRk008695;
-	Wed, 24 Sep 2025 13:17:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=WX3pcc
-	sEl4Wwa+AZj1moLrFdjzPvC16pxLgAgLRL1dw=; b=KCHVCd4KB6MWooM+e17dNY
-	Ex0lL5qsxlnUG2fUl7NA3FhzUUlDs5k3aRlqwzHqVdwNo9Z1RDriK4w6Rx9Q4dyU
-	CzIcj73KEqTutjcMzQQJdcXmWJLqRArG6rPXOBscaeTJdZX1nXelS0JzFhMVRS3x
-	d7aCgibT4Sik1B05RcOGyshYD+06c124PVUg1AbecZBgGvbTzj77HFTd3OMQACBk
-	WIn4OS5Heel+nXBZb1no9AhBzEtu3Mc6boJ5nSnFuCuDlJbj0RZSv8UKAQ8UKhbN
-	lDThM3K9ONjvYHEm3w48tn3v18bjNXvBFt67NdzSt687NMRaLQotCOKtazv0AC5g
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 499n0jqfyc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Sep 2025 13:17:18 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58OD9lQx004227;
-	Wed, 24 Sep 2025 13:17:17 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 499n0jqfy8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Sep 2025 13:17:17 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58OAU90Y030359;
-	Wed, 24 Sep 2025 13:17:16 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49a9a18e8b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Sep 2025 13:17:16 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58ODHCY160883384
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 24 Sep 2025 13:17:12 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 64C2620040;
-	Wed, 24 Sep 2025 13:17:12 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1351B20043;
-	Wed, 24 Sep 2025 13:17:12 +0000 (GMT)
-Received: from [9.111.201.53] (unknown [9.111.201.53])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 24 Sep 2025 13:17:12 +0000 (GMT)
-Message-ID: <fec83aad-c38b-4617-bb9a-0b9827125d79@linux.ibm.com>
-Date: Wed, 24 Sep 2025 15:17:12 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R4Jw7hSh"
+Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-71d6083cc69so69997177b3.2
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Sep 2025 06:31:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758720667; x=1759325467; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8o/bKsm97JI+1qdk5N1JW8cXmeYcYmwcOzqbBYKqO7k=;
+        b=R4Jw7hShU4EUiHUiSodMZuOyEFRG1unHDRJWdejF0JnHlXLNrZgqg5wFW1FecSTPJy
+         ptBEqwezJ7D8PrPBCr+v0AzIdsQTM1SdolplSumzKwHFgVKAVS5OvZFnL6tOCGTBnFTw
+         BYyYks7VE75GfKnG97DEbruHvYYTyS96iuTvzE6BFgP8B6XfZfbESaCKT4I8urnN/+Mi
+         D0iZu5DyE4rgA9jPkxRXh0SXKsQ/HAYiaBmYp31Iqq5Gg9fFTT3hVCNB+xq8hET5wKDh
+         eeqzuC1pKVF6/4+rYzrsSEaLb7gMpgmru4a1Sy83/mhRjcFXJmPPwPwz347hO7lhTBRj
+         QnuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758720667; x=1759325467;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8o/bKsm97JI+1qdk5N1JW8cXmeYcYmwcOzqbBYKqO7k=;
+        b=NRJ+0AKJaH7k9isHPHjv30A1pcruNuzsQn3FMvmr/4/3z0m5T2MaodOEyIGgjPVUtj
+         C0kZjyZcH29D4V3juPHWXTAoRyWY9RU2eZE7ypWLjHwUyNzB1ExovZzlz/tla29uR6xb
+         7CnPpatQU3ZrNhqxrGHA/UZiYuR+s1Wsh1D3KpK03tE43JsCZeQLTmOOWWaE9YD6K0pn
+         JIJLpEowQbKKdqhPxzpeiXroOoLAUoWaDw/nEgWk+RmeTrxwft6J1tqKu3Emt9Rt4BiV
+         BywLh1i8Anwa88SE6NG1SFcCDL72DTl2xhaIXK7uNyRiNhIv3CprGCdLKYmaLQHMkuEJ
+         G5zA==
+X-Forwarded-Encrypted: i=1; AJvYcCXtIwCbqqyEbXCAT5N3KOKTXymqDOIWJ7mEoImfXxALUcc4Om2OLIbCo96RHY0G26V8m76FiplPkYFuyfU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywaNlUxZ7GN+8tz8KyDhDT8IIwOgL15zGSK1EumRxm2+F/+Ldv
+	Xlyc5dWHnOCNlPu2Zj1mVHufn9AwpBulD5rI/bas3LAKcFvMhOrd4KimECgkaREKegfpiBQuShI
+	g+GVuRNPaGpnWE14caaIqKxqNPBHnSXn/XXAJz0MvUc+L
+X-Gm-Gg: ASbGncv1nbAYWH/7Pc+iktAL/DabFWfdOrbWi2rmBMX15zXj8gu/2ltFm7CIaQwCg3s
+	jheA9auTIVFGqIVsb6ovYjGluUbQBgCON92qci0jg9QUfZZYSCorPkJICQEfgZXMBP9m0c4AnHN
+	a2N4p3YIwQkMi2WuFZUiQFOZDYv0JFmGWuDOdtH+xHCJzyAD9V80lFw87+BghgMjZrPecWh0NG9
+	+v25oGE938pxMswvA==
+X-Google-Smtp-Source: AGHT+IHigQU1SwnbWbVt1/aemZ0rPCMfZqnHtTtQdJGn9ZTnDZqlnur9YC7rS9LNtus8SBzPJRH3iPXI+diPpCNf4V4=
+X-Received: by 2002:a05:690c:2c0d:b0:762:772b:917d with SMTP id
+ 00721157ae682-762772b94b8mr7441717b3.49.1758720667090; Wed, 24 Sep 2025
+ 06:31:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: authenc - Correctly pass EINPROGRESS back up to
- the caller
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Harald Freudenberger <freude@linux.ibm.com>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-        Eric Biggers <ebiggers@kernel.org>, dengler@linux.ibm.com,
-        linux-s390@vger.kernel.org, dm-devel@lists.linux.dev, agk@redhat.com,
-        snitzer@kernel.org, Milan Broz <gmazyland@gmail.com>
-References: <3a6b6f8f-5205-459c-810a-2425aae92fc8@linux.ibm.com>
- <e1e420d5-dc00-14d0-fdef-635d6ef70811@redhat.com>
- <bb68f9d6-8180-4291-9e6b-33bbdcef780f@linux.ibm.com>
- <8cb59ed5-1c9a-49de-beee-01eda52ad618@linux.ibm.com>
- <1af710ec-0f23-2522-d715-e683b9e557d8@redhat.com>
- <f799d7ab97470f2529b8dcb5566fd673@linux.ibm.com>
- <e26aedc6-7132-46c3-78f3-a3582b1c4f9a@redhat.com>
- <aNIYTm6neC3lC6dP@gondor.apana.org.au>
- <194f9d1e-b6b0-54c7-6eb8-37ac0c0c1f9d@redhat.com>
- <aNK6IMzUgslPVi3x@gondor.apana.org.au> <aNPF4bjo6FbvujIx@gondor.apana.org.au>
-Content-Language: en-US, de-DE
-From: Ingo Franzki <ifranzki@linux.ibm.com>
-In-Reply-To: <aNPF4bjo6FbvujIx@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDAzMyBTYWx0ZWRfX9jaTyPa2T7lZ
- ubIuyf17g/Uz+Xm6oDbuAgoyZcGcxIox8UuCrokpRnwKXbBjGP24bNgrCzuGi6f4DIFIsnHEqJB
- YyUr1z/XphGdvw1+wYWaN7tPqBpOYDZ518mwM1UnxNJz52EGTbCvU8uRSBxmZ3S0mvxxJ7C/9AT
- KeoLrFnGtmMCg7xAYq5D2coQeKuxkW6KQbnL2h5l5Wo7S58By2L3MnrcmF7mBBVL35uOtey96+o
- FwhXSqX8HD3zUmPnnYy0Ek9nLKNTC3mGsr9qznP5NtUUv6Wvln9B4/xd+hLTD4cqSyz8IUHGpnL
- pGcy6mGkj3G06U3TL6PXTY8TBr8hE6I+Rw1MfTZhj0FVuSj5+wm1X9dP07WkXPSyqOwysBcPMYA
- 3JtJiPIl
-X-Authority-Analysis: v=2.4 cv=TOlFS0la c=1 sm=1 tr=0 ts=68d3ef5e cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=20KFwNOVAAAA:8
- a=FNyBlpCuAAAA:8 a=obt4ri3ATnD0MhnguWgA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=RlW-AWeGUCXs_Nkyno-6:22
-X-Proofpoint-ORIG-GUID: _sWzRA-AyO9p_RMIP1ijSfiBU9QMOseJ
-X-Proofpoint-GUID: RuXBfrBRzUj0QKGgybPLG64q3pJ1tK0S
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-24_03,2025-09-22_05,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 phishscore=0 impostorscore=0 adultscore=0
- suspectscore=0 spamscore=0 bulkscore=0 malwarescore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2509200033
+References: <20250923060614.539789-1-dongml2@chinatelecom.cn>
+ <aNI_-QHAzwrED-iX@gondor.apana.org.au> <CADxym3YMX063-9S7ZgdMH9PPjmRXj9WG0sesn_och5G+js-P9A@mail.gmail.com>
+ <175862707333.1696783.11988392990379659217@noble.neil.brown.name>
+In-Reply-To: <175862707333.1696783.11988392990379659217@noble.neil.brown.name>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Wed, 24 Sep 2025 21:30:55 +0800
+X-Gm-Features: AS18NWA1CfSWZmw6na-YTZ-8p6J_kZkV2o8XdVYVoFzGsKTU8FazQhmxkraJz4g
+Message-ID: <CADxym3ZA7FsdeA3zz34V7mHHjBC358UoJjrpV6wieZ1LF2aFxA@mail.gmail.com>
+Subject: Re: [PATCH] rhashtable: add likely() to __rht_ptr()
+To: NeilBrown <neil@brown.name>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, tgraf@suug.ch, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 24.09.2025 12:20, Herbert Xu wrote:
-> When authenc is invoked with MAY_BACKLOG, it needs to pass EINPROGRESS
-> notifications back up to the caller when the underlying algorithm
-> returns EBUSY synchronously.
-> 
-> However, if the EBUSY comes from the second part of an authenc call,
-> i.e., it is asynchronous, both the EBUSY and the subsequent EINPROGRESS
-> notification must not be passed to the caller.
-> 
-> Implement this by passing a mask to the function that starts the
-> second half of authenc and using it to determine whether EBUSY
-> and EINPROGRESS should be passed to the caller.
-> 
-> This was a deficiency in the original implementation of authenc
-> because it was not expected to be used with MAY_BACKLOG.
-> 
-> Reported-by: Ingo Franzki <ifranzki@linux.ibm.com>
-> Reported-by: Mikulas Patocka <mpatocka@redhat.com>
-> Fixes: 180ce7e81030 ("crypto: authenc - Add EINPROGRESS check")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/crypto/authenc.c b/crypto/authenc.c
-> index a723769c8777..ac679ce2cb95 100644
-> --- a/crypto/authenc.c
-> +++ b/crypto/authenc.c
+On Tue, Sep 23, 2025 at 7:31=E2=80=AFPM NeilBrown <neilb@ownmail.net> wrote=
+:
+>
+> On Tue, 23 Sep 2025, Menglong Dong wrote:
+> > On Tue, Sep 23, 2025 at 2:36=E2=80=AFPM Herbert Xu <herbert@gondor.apan=
+a.org.au> wrote:
+> > >
+> > > Menglong Dong <menglong8.dong@gmail.com> wrote:
+> > > > In the fast path, the value of "p" in __rht_ptr() should be valid.
+> > > > Therefore, wrap it with a "likely". The performance increasing is t=
+iny,
+> > > > but it's still worth to do it.
+> > > >
+> > > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > > > ---
+> > > > include/linux/rhashtable.h | 5 +++--
+> > > > 1 file changed, 3 insertions(+), 2 deletions(-)
+> > >
+> > > It's not obvious that rht_ptr would be non-NULL.  It depends on the
+> > > work load.  For example, if you're doing a lookup where most keys
+> > > are non-existent then it would most likely be NULL.
+> >
+> > Yeah, I see. In my case, the usage of the rhashtable will be:
+> > add -> lookup, and rht_ptr is alway non-NULL. You are right,
+> > it can be NULL in other situations, and it's not a good idea to
+> > use likely() here ;)
+>
+> Have you measured a performance increase?  How tiny is it?
+>
+> It might conceivably make sense to have a rhashtable_lookup_likely() and
+> rhashtable_lookup_unlikely(), but concrete evidence of the benefit would
+> be needed.
 
-[ snip ]
+I made a more accurate bench testing:  call the rhashtable_lookup()
+100000000 times.
 
-I applied this patch and tested with the pseudo phmac again.
-Now combined encryption and integrity works fine with pseudo phmac! 
+Without the likely(), it cost  123697645ns. And with the likely(), only
+84507668ns.
 
-However, when testing with the original phmac_s390 module instead of the pseudo phmac, I still see the same errors as I saw with phmac_s390 before.
-So looks like this patch did indeed fix an error with async handling, but it isn't the error that happens with phmac_s390.
+I add the likely() not only to the __rht_ptr(), but also rht_for_each_rcu_f=
+rom()
+and rhashtable_lookup().
 
-The pseudo phmac is kind of the worst case: Every request except init (i.e. update, final, finup, digest) is always truely async. 
-The real phmac_s390 also is an async cipher, but as far as I can tell, in our test environment at max the first request after setkey is really async, while any subsequent request just go synchronous. In real world there is a possibility that even subsequent requests go async again, whenever the HW key gets invalid (e.g. due to a live guest relocation), however this does not happen in my test environment. 
+Below is the part code of the testing:
 
-As far as I can see from the 'dyndbg=+pf' enabled for phmac_s390 all calls actually go synchronous in my tests.
-Still there are integrity errors. They seem to come right after 'phmac_digest: phmac_s390: rc=0', i.e. a digest call which returned synchrously.
-See messages below.
+    for (i =3D 0; i < num_elems; i++) {
+        objs[i] =3D kmalloc(sizeof(**objs), GFP_KERNEL);
+        KUNIT_ASSERT_NOT_ERR_OR_NULL(test, objs[i]);
+        objs[i]->key =3D i;
+        INIT_RHT_NULLS_HEAD(objs[i]->node.next);
+        ret =3D rhashtable_insert_fast(&ht, &objs[i]->node, bench_params);
+        KUNIT_ASSERT_EQ(test, ret, 0);
+    }
 
-Smells like dm-crypt and/or authenc seems to handle sync HMAC calls wrongly? 
+    /* for CPU warm up */
+    for (i =3D 0; i < 1000000000; i++) {
+        u32 key =3D 0;
+        struct bench_obj *found;
 
-Side note: When using plain dm-integrity with phmac_s390 I do see the same sequence of calls, also returnding synchrously, but no errors. 
+        found =3D rhashtable_lookup(&ht, &key, bench_params);
+        KUNIT_ASSERT_NOT_ERR_OR_NULL(test, found);
+        KUNIT_ASSERT_EQ(test, found->key, key);
+    }
 
-luksOpen:
-Sep 24 09:03:51 fedora kernel: convert_key: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_convert_key: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_setkey: phmac_s390: rc=0
-Sep 24 09:03:51 fedora 55-scsi-sg3_id.rules[1363]: WARNING: SCSI device dm-1 has no device ID, consider changing .SCSI_ID_SERIAL_SRC in 00-scsi-sg3_config.rules
-Sep 24 09:03:51 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 350976
-Sep 24 09:03:51 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:03:51 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 350976
-Sep 24 09:03:51 fedora kernel: Buffer I/O error on dev dm-1, logical block 43872, async page read
+    rcu_read_lock();
+    t0 =3D ktime_get();
+    for (i =3D 0; i < 100000000; i++) {
+        u32 key =3D 0;
+        struct bench_obj *found;
 
-mkfs:
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 350976
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 350976
-Sep 24 09:06:36 fedora kernel: Buffer I/O error on dev dm-1, logical block 43872, async page read
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 0
-Sep 24 09:06:36 fedora kernel: Buffer I/O error on dev dm-1, logical block 0, async page read
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 0
-Sep 24 09:06:36 fedora kernel: Buffer I/O error on dev dm-1, logical block 0, async page read
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 0
-Sep 24 09:06:36 fedora kernel: Buffer I/O error on dev dm-1, logical block 0, async page read
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 0
-Sep 24 09:06:36 fedora kernel: Buffer I/O error on dev dm-1, logical block 0, async page read
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 0
-Sep 24 09:06:36 fedora kernel: Buffer I/O error on dev dm-1, logical block 0, async page read
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: trusted_key: device-mapper: crypt: dm-0: INTEGRITY AEAD ERROR, sector 0
-Sep 24 09:06:36 fedora kernel: Buffer I/O error on dev dm-1, logical block 0, async page read
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: Buffer I/O error on dev dm-1, logical block 0, async page read
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: Buffer I/O error on dev dm-1, logical block 0, async page read
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: Buffer I/O error on dev dm-1, logical block 0, async page read
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_init: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_update: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_kmac_final: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_finup: phmac_s390: rc=0
-Sep 24 09:06:36 fedora kernel: phmac_digest: phmac_s390: rc=0
+        found =3D rhashtable_lookup(&ht, &key, bench_params);
+        if (unlikely(!found)) {
+            pr_info("error!\n");
+            break;
+        }
+    }
+    t1 =3D ktime_get();
+    rcu_read_unlock();
 
-
--- 
-Ingo Franzki
-eMail: ifranzki@linux.ibm.com  
-Linux on IBM Z Development, Schoenaicher Str. 220, 71032 Boeblingen, Germany
-
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
-Geschäftsführung: David Faller
-Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
-IBM DATA Privacy Statement: https://www.ibm.com/privacy/us/en/
+>
+> Thanks,
+> NeilBrown
