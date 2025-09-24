@@ -1,95 +1,87 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AD724A044
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Sep 2025 20:17:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C470B255F24;
+	Wed, 24 Sep 2025 20:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758745052; cv=none; b=oXq/R6ZM29GHmgmWMNPR+wMk6k2iM89vOqqNj/x47PVot9obK7e4YjjvcGUJ8IDPsv11a6sDRPuJx6M8vUpEx651vWi91hxJvffgBCjVOZohU90mc004j3Mmb0beyY4vUm9eAdBOZNhCZ7N2z0kaAqknK6HchsXmeyninZFBspI=
+	t=1758745155; cv=none; b=hZYompBr/X0qegvAm6DplfrOa3k+fTsPUTqXtWW4OJr+ElTLXofcTowi5Hx2DdOevBTmo4BrK7NWaMQRgMtZjgYlbv83x5hlXDcUFi/khgJr8zto0RyKgp4fNYpQjXosDdydo1bkbeOP+HHerZUKgTDZ4MIzGaQd8fTAphkdB4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758745052; c=relaxed/simple;
-	bh=11LSxohVQLtgYPqV705IwGyhWZ5zTC5qes4PC/XU5NE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dktzVDxqoyiQUEwwhoABibJa3cZwYD0cXJwWwBIJsHNVwQl8MszYycdRLnv6Q/ZLvR/ntlFZ54ySggmlR4kZpUubzjk8HFSrOF7lO75SjLRePswPj4kvEe1c35qNwEaBWA4h0Iizy53ktbLnaqEGlSS4PujvZ2iDJg3EBmWtYZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=TdtAsioL; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1758745155; c=relaxed/simple;
+	bh=jZiHAeS9wfJ8LDvIn+UDSFRTPDaQwzheaa0cN8KeOAg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t/lG1/zkr2daY0Zpr71U1h8YxMP1dqTaOnjJIAwVkZIP/jG9P4z6yXRtIPVg2BTQT/8gtrgRdfUC4S35d20owiQiBk6uxMyAhPRi/xrtTljQskSvjnt4ZuT3+2NtmR/QzCxiUAHZJoj9SgkikpIoPInYp3sEakdXnEu0KligoE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6VldB6q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="TdtAsioL"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-631df7b2dffso374527a12.1
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Sep 2025 13:17:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1758745048; x=1759349848; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=KxL1IkdhPFqi7CXmsjucqEYlGYsVkwBpOGWKm6mx5yk=;
-        b=TdtAsioLFIvvZ4aD55iuZbLfLlQZ6W4tQTsSymUPQM4a8e5z9/LCH3w6UmgjE87dL/
-         7TVp+wsHsEf72FTTaQY699p2GGlsyZWXbUjGVEIJy7wnREtnDnyWor9BNLdfIr5cwWZE
-         1DfNfOIKzbER8eiWaRJpg9l9kAtb7/rcVvXms=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758745048; x=1759349848;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KxL1IkdhPFqi7CXmsjucqEYlGYsVkwBpOGWKm6mx5yk=;
-        b=g3nyMme4EEVUIQTyRIKwhdCIvL2iSkv11dgrRYqzRvs/iBeCdIHmaSfn9wqqUEznA3
-         Vn9DEKeT13LjAA7Pa1u11enxLtpAphY5v4ubFqtAcq9AfoHkZQonb1xKLeXnbjr5uzqG
-         pIF+6QbsL8j7+oemAcv7XeLx2dlwNyrABF8NMuypIemtPDQbgyQ6+TH0dYlacCrQH2BX
-         OsPuS/DkJj5xHB9wCmhMVaMpukYJEOn/F7xbLlT7g7HTPNfM1k1G6x2sAdY9+w4HN4rg
-         wdDD6aHoFuwuuinFtV7cqeoDKWrBlKN6Aqo8Vj3HJFRzUwSWeMBSVcOsjNWhpAnMF+aY
-         b5NQ==
-X-Gm-Message-State: AOJu0Yx845cQFwSCskwRY5ykOVUQSDeZ9cHDVHolupFmHbynGIVjAJAO
-	1ceNlk4FhR4jPcfRs+ReOY5Rog3vN9dxrGGTTaYFa0UIMZKZPSmbhg++ZIv+nfYJ0H4tmQWw7f5
-	VmEL7VNg=
-X-Gm-Gg: ASbGncvjnoGQbqIsd0oWWFp+2fJyd5XIpJF3fShSRc2cSkbYRj+yzt2C1UQzxUWvN/b
-	WdQ9hEZDUpWaBH4Luylz94Vore0puivqa6iPrDXMA/gc44YSR8dpXpJ/7qy0lWYq31N+PCOdeDq
-	0Xqe6vrIUmFQm+HtvdxXNJv0aICCW4Uvmu735sceQlTDG0FcxsbPuCzxG2Yp1KYxeKtiR0XYDsJ
-	Axvtztl+7+mMAAepAHDk1Vffp1BzeqQDxqxsq/1s+06z2+keBHQz2muygUvunEAveaT9DHC8IXn
-	aYc780vBReAvbIvYShVygjSn7GAiXVwXlPai4ME+Cb+nckwqrIG3HUkvUNx1mQYgEp7K2ZFYSh0
-	1CXlK7sm8hq+9xYlLB9uvtxX4VW0wGyQxNlIk6mE+LX2XCbkM6SQ88N7+gY2vZlupOHWkH7at
-X-Google-Smtp-Source: AGHT+IFOeSHGblJbrnSB2Sgk9Evre3zbUC0q7R4dgSf7MPSa3DiKJ4nxDExh0NNgbx3xxxJLdTJ+Aw==
-X-Received: by 2002:a05:6402:234d:b0:634:54f3:2fbb with SMTP id 4fb4d7f45d1cf-634a292cddcmr125467a12.3.1758745048201;
-        Wed, 24 Sep 2025 13:17:28 -0700 (PDT)
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com. [209.85.218.52])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-634a3ae305csm20513a12.30.2025.09.24.13.17.27
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Sep 2025 13:17:27 -0700 (PDT)
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b07e3a77b72so225307166b.0
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Sep 2025 13:17:27 -0700 (PDT)
-X-Received: by 2002:a17:907:7e8e:b0:b07:d815:296a with SMTP id
- a640c23a62f3a-b354ae9a113mr13555466b.12.1758745046911; Wed, 24 Sep 2025
- 13:17:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k6VldB6q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E99E2C4CEE7;
+	Wed, 24 Sep 2025 20:19:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758745153;
+	bh=jZiHAeS9wfJ8LDvIn+UDSFRTPDaQwzheaa0cN8KeOAg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=k6VldB6qG8PkecMuamZhlxpe84Ll79/+Cbs3ubtzWVCS8U+8FQHDUZRFNveAGjbQ0
+	 m4YsLwBOE7lsVqyqxx6wXo9BApIUuxjaV4V2yskuJBPEfOTvDDo1bacHdwKNXl/q6/
+	 3SCTaGl1YLH3CSTw1Uu4fPw4NlN3RxJfsdf3b2l8SYBGgKkfK4Bs8au3G17LNuceHQ
+	 tQZFDm/KdBxLjkQX/auMsVKfIs32fOa8bA9ILUDvfy8Le8QDdF669tDC/0He/Dvad+
+	 pyHj/MiCoIGMKjx96wDUmSgv0e0bkeqGrm3h6Blrhvt+O/u111ew+lGxlAahMViEUU
+	 OVWygTUo8KhWw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-kernel@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] crypto: af_alg - Fix incorrect boolean values in af_alg_ctx
+Date: Wed, 24 Sep 2025 13:18:22 -0700
+Message-ID: <20250924201822.9138-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250924192641.850903-1-ebiggers@kernel.org> <CAHk-=wieFY6__aPLEz_2mv-GG6-Utw9NQOLDzi4TF93xFAnCoQ@mail.gmail.com>
- <20250924201347.GA4511@quark>
-In-Reply-To: <20250924201347.GA4511@quark>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 24 Sep 2025 13:17:10 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjk5rMWnVt6K_3BSQ=_uEKNaYBs=FZH_fMLKqp9E4G8kg@mail.gmail.com>
-X-Gm-Features: AS18NWB-TOLqbEIGYHOdjx4mWxKWbwYfZ2s88AY8lnF0tIKXxGgu95ZpuJakE_Y
-Message-ID: <CAHk-=wjk5rMWnVt6K_3BSQ=_uEKNaYBs=FZH_fMLKqp9E4G8kg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: af_alg - Fix incorrect boolean values in af_alg_ctx
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, 24 Sept 2025 at 13:13, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> I do think the idea of trying to re-pack the structure as part of a bug
-> fix is a bit misguided, though.
+Commit 1b34cbbf4f01 ("crypto: af_alg - Disallow concurrent writes in
+af_alg_sendmsg") changed some fields from bool to 1-bit bitfields of
+type u32.  However, some assignments to these fields, specifically
+'more' and 'merge', assign values greater than 1.  These relied on C's
+implicit conversion to bool, such that zero becomes false and nonzero
+becomes true.  With a 1-bit bitfields of type u32 instead, mod 2 of the
+value is taken instead, resulting in 0 being assigned in some cases when
+1 was intended.  Fix this by restoring the bool type.
 
-Well, now it's done, so let's not change it even *more*, when a
-one-liner should fix it.
+Fixes: 1b34cbbf4f01 ("crypto: af_alg - Disallow concurrent writes in af_alg_sendmsg")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
 
-I do agree that clearly the original fix was clearly buggy, but unless
-it's reverted entirely I'd rather go for "minimal one-liner fix on top
-of buggy fix", particularly since the end result is then better...
+v2: keep the bitfields and just change the type, as suggested by Linus
 
-             Linus
+ include/crypto/if_alg.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index 0c70f3a555750..107b797c33ecf 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -150,11 +150,11 @@ struct af_alg_ctx {
+ 	struct crypto_wait wait;
+ 
+ 	size_t used;
+ 	atomic_t rcvused;
+ 
+-	u32		more:1,
++	bool		more:1,
+ 			merge:1,
+ 			enc:1,
+ 			write:1,
+ 			init:1;
+ 
+
+base-commit: cec1e6e5d1ab33403b809f79cd20d6aff124ccfe
+-- 
+2.51.0
+
