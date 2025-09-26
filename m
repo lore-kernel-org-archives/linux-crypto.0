@@ -1,199 +1,112 @@
-Received: from mail-yw1-f193.google.com (mail-yw1-f193.google.com [209.85.128.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6526825FA05
-	for <linux-crypto@vger.kernel.org>; Fri, 26 Sep 2025 06:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88897283FEF;
+	Fri, 26 Sep 2025 08:18:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758866660; cv=none; b=aCPFgqpdmEMARe66Bh8Q9hu/xtGaDic8ial3W/1OkIjWnu603qC0Rsdst3X8kTyELZcwre6ngcf4KE06kiUAhn2yZk5YZQo8le3l0x4Kv3i3qNDg9We9S/qBiLhbbVcnHaAt+yAclJfCic7RjN4PniqVv8XTk3zR9K4KrPSU8y0=
+	t=1758874701; cv=none; b=WvRTTQZB51eZEZRq2jHj2cteIs3zGculIPKcVVeSDTQ5z8LB8ynjHjT+SHDuMQRuu8A3QFtP0IBiTKVmyiU45qw/2QlHqBNvOBsUas9+dZm7aCIBIxOc/fINQ0TLhQPkInDNE2wMrTcSaE8f86Un55WcaxhpPQbq9C4JG+fBeUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758866660; c=relaxed/simple;
-	bh=15IRCIhsbMtksIEBPAtWUBg1v6M0alPNiSjplbzX2Zk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o9ur7ZpP3L98UFLQHJG/ycYwwgnG6t5koDjEIgqfzNzl7MedoAsEEhmNd1NQMx0Oy9vAB3NssDvYSZFgTkV+yAuxF/+MCbZl4GWNtPaJjgrtGUBJ02FXbqfnmHCj4kml03hJNTyeNyXl2iGJU6PaCq54v6nTVTgEmuIxc+Vso6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AK8ABTI0; arc=none smtp.client-ip=209.85.128.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758874701; c=relaxed/simple;
+	bh=Xzm8T0bRW6q4AqDEvNaK0inUym9e7MVN9JxLC4RTnW0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PRanLGnEgmVkHdP8lRTkKhNJzO2iwXxSQrNCug2MUmZ8nx09+g+1hvWnEGc8aj1ipW/OswQAvaSg0XPungxiWIeARJi6KL/CcVollICvwIiVlUH3gpQnnB1HIz+WVLn04xxhYKo+SfsYCYbaDnjtmdzzXVoCVtNoqiE/FneI11I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=NpXX9Lbm; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AK8ABTI0"
-Received: by mail-yw1-f193.google.com with SMTP id 00721157ae682-71d60157747so18117427b3.0
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Sep 2025 23:04:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758866655; x=1759471455; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7H/gn2bXgyEZpagQYajtzENYtfpKhUj6jXIrNVLa+ts=;
-        b=AK8ABTI0wUNBOMsWuY+DWkYWxgRNplY47xmI16NgCx2uRMD3E+AP1zYjRKlBnQNjOH
-         048Xh7VQOUmuLm6giqSTKqJBfcPtic8YDZLXAeP2QcLTpffZF1AiNgQ+CpXv4vshKN/y
-         qu7ie863tX/N3BJ2SiQUOd0emtnIKMgglfM92kXqcgC721U7ijfjikL9c3BN7wlqxVKT
-         Kv71P7fD991OREWO/W+MtOmWVHpqdn6ctRpJ9iiex/V4F4s0MahFEPhtn5lFJrGXAB5+
-         9M50Xd+F3ZeOj6gRTh9DKK0ELqrEe+6CENBRZG08VKlovqJVd5A6jouIWQYObOyCuhgO
-         UqWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758866655; x=1759471455;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7H/gn2bXgyEZpagQYajtzENYtfpKhUj6jXIrNVLa+ts=;
-        b=wzUK57HNbB9hVotgMT/iidrzVWV2z8o88A8B/9CJl66zkzSXC7Z6fXo4dbsWeMBHij
-         akhWjdbwNGEQXeEIHyf5yDHzv5UIeLO8R96+SKkhddxYw11QQMPqYvvS5qJ4PtQZy2D9
-         B6csBJceC6skauNxkujW9E7h13RfYdt9A/GhdyttkfeZzjMB39/glrTbzeNShpZQiFhu
-         WPvRc66j2Vvo929/Q8qEHeZ9+rS7wno3ucNIVCt05br2xYoN3nqeA0IbNGoETURAai2V
-         z/J2GoJ8etQqcQBXHWfNZlPaRoPrlxjJ1vhkm29UDbA3lMBgSIakjatnskwD50WLd6a3
-         j4Fw==
-X-Forwarded-Encrypted: i=1; AJvYcCVsfxvWFVudtiw88rNuP7Rbef9kpTtAyoo9XzFvXjSTAeYVj9Gv/ZvO2YlSeugurT94BIl8RkDom+GxEDw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/DTUPWScXyCtn1+6dyUw7Z3ClAC0drYJVGb6K0r420Ixf4mxa
-	95MQLBeCyZhOhjn1GI/Sik6xbvrM/CL3eBIy61BOhY+UL7ygRP4T7DcwXoksmmPBD9JYJN3J+PM
-	hNyFu7mdG/WAZHjfVrTQghFw94w5sebk=
-X-Gm-Gg: ASbGncu1KQWc0E0RH+azO0s2lZ+YSngIKIs+R9FaObIpy371Seuygs0m8689wCZdUjv
-	2qgNhSykV+Kf/BpCH1pISFaitNmzhStw6sOiGyxb0LMIE3q+EddMtCjMw3e/4B5fjdO4gPQUI+n
-	+WttSo32gcCMtASamoKUkjUzH0DW9wBQSRF9ImzEAQYbYpe1V/rE/gv3P3WzDYNph4YSkff6c5q
-	zojDc4=
-X-Google-Smtp-Source: AGHT+IFLKqa96SN32ucZyftcaFR3mfhPDDNAMHzDSvk2jt4uz+Ewxi9Sy+yvSExYS1gIFclZKPr1gm/c12BhL0elJOc=
-X-Received: by 2002:a05:690e:88:b0:635:4ed0:5714 with SMTP id
- 956f58d0204a3-6361a8203fcmr3880524d50.46.1758866654962; Thu, 25 Sep 2025
- 23:04:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="NpXX9Lbm"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:MIME-Version:References:Message-ID:Subject:Cc:To:
+	From:Date:cc:to:subject:message-id:date:from:reply-to;
+	bh=1KdawEbxh8nTznkFv3CxiwTcE4T4DRA48BqbQCeDtLw=; b=NpXX9LbmhPLHH8O8SQhR2fEev8
+	akRNIlc8c/bA5uU5PlKZSftXpABDi5vd9lf9dzyMjB3cEr+lPqBIuFuGaQyiBsH+fuQnWkZUmOI2G
+	ZSeCLEbYaTaioT2BF2uC+acNy+cDz/FbugPQGu1aDNpXdRC1W17yKthwIJLM9gbxVfKkM/FNwap1g
+	mrYObvFNnWXZm/ek5W+p2NLu9rNCLavKqWybAGZBBKsfreRR+oLvuijx7Hg8orXB3cFrtCtOjAaaK
+	x6/eCiIz/O/V+ZJDz2RGtcXjb1V1YZEcUahi+DmVOAPWxcv3qtRIdo+2C2KnOQL6LqEp49dNWObUD
+	MptZA+ew==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1v23eS-008SQJ-0H;
+	Fri, 26 Sep 2025 16:18:01 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Sep 2025 16:18:00 +0800
+Date: Fri, 26 Sep 2025 16:18:00 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Saeed Mirzamohammadi <saeed.mirzamohammadi@oracle.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	smueller@chronox.de, vegard.nossum@oracle.com
+Subject: Re: [PATCH] crypto: pcrypt - Fix recursive instantiation by using
+ proper instance naming
+Message-ID: <aNZMOL-58r0NEteg@gondor.apana.org.au>
+References: <20250925223125.515570-1-saeed.mirzamohammadi@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250923060614.539789-1-dongml2@chinatelecom.cn>
- <aNI_-QHAzwrED-iX@gondor.apana.org.au> <CADxym3YMX063-9S7ZgdMH9PPjmRXj9WG0sesn_och5G+js-P9A@mail.gmail.com>
- <175862707333.1696783.11988392990379659217@noble.neil.brown.name>
- <CADxym3ZA7FsdeA3zz34V7mHHjBC358UoJjrpV6wieZ1LF2aFxA@mail.gmail.com> <175884658630.1696783.7712739490823387474@noble.neil.brown.name>
-In-Reply-To: <175884658630.1696783.7712739490823387474@noble.neil.brown.name>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Fri, 26 Sep 2025 14:04:04 +0800
-X-Gm-Features: AS18NWD-s8rMNpkwFnMzAuRNTEnbQ9ytZZMmmUUayZWUbFpKwJunKSpvUDw_lL0
-Message-ID: <CADxym3bFCuiDWtpEVVSpEt9wmO_6cigCjz8385Ty2h0F8_4sWw@mail.gmail.com>
-Subject: Re: [PATCH] rhashtable: add likely() to __rht_ptr()
-To: NeilBrown <neil@brown.name>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, tgraf@suug.ch, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250925223125.515570-1-saeed.mirzamohammadi@oracle.com>
 
-On Fri, Sep 26, 2025 at 8:29=E2=80=AFAM NeilBrown <neilb@ownmail.net> wrote=
-:
->
-> On Wed, 24 Sep 2025, Menglong Dong wrote:
-> > On Tue, Sep 23, 2025 at 7:31=E2=80=AFPM NeilBrown <neilb@ownmail.net> w=
-rote:
-> > >
-> > > On Tue, 23 Sep 2025, Menglong Dong wrote:
-> > > > On Tue, Sep 23, 2025 at 2:36=E2=80=AFPM Herbert Xu <herbert@gondor.=
-apana.org.au> wrote:
-> > > > >
-> > > > > Menglong Dong <menglong8.dong@gmail.com> wrote:
-> > > > > > In the fast path, the value of "p" in __rht_ptr() should be val=
-id.
-> > > > > > Therefore, wrap it with a "likely". The performance increasing =
-is tiny,
-> > > > > > but it's still worth to do it.
-> > > > > >
-> > > > > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> > > > > > ---
-> > > > > > include/linux/rhashtable.h | 5 +++--
-> > > > > > 1 file changed, 3 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > It's not obvious that rht_ptr would be non-NULL.  It depends on t=
-he
-> > > > > work load.  For example, if you're doing a lookup where most keys
-> > > > > are non-existent then it would most likely be NULL.
-> > > >
-> > > > Yeah, I see. In my case, the usage of the rhashtable will be:
-> > > > add -> lookup, and rht_ptr is alway non-NULL. You are right,
-> > > > it can be NULL in other situations, and it's not a good idea to
-> > > > use likely() here ;)
-> > >
-> > > Have you measured a performance increase?  How tiny is it?
-> > >
-> > > It might conceivably make sense to have a rhashtable_lookup_likely() =
-and
-> > > rhashtable_lookup_unlikely(), but concrete evidence of the benefit wo=
-uld
-> > > be needed.
-> >
-> > I made a more accurate bench testing:  call the rhashtable_lookup()
-> > 100000000 times.
-> >
-> > Without the likely(), it cost  123697645ns. And with the likely(), only
-> > 84507668ns.
->
-> a 30% speedup is impressive, even though it is a micro-benchmark.
->
-> >
-> > I add the likely() not only to the __rht_ptr(), but also rht_for_each_r=
-cu_from()
-> > and rhashtable_lookup().
->
-> I suggest you create a patch which adds rhashtable_lookup_likely(),
-> __rhashtable_lookup_likely(), rht_for_each_rcu_from_likely(),
-> rht_ptr_rcu_likely() etc.
-> So that no existing code changes, but the new function uses likely
-> everywhere that you think is important.
+On Thu, Sep 25, 2025 at 03:31:24PM -0700, Saeed Mirzamohammadi wrote:
+> The pcrypt template recursively instantiates itself because it copies
+> the child algorithm's cra_name directly, causing naming collisions with
+> the larval instance. When aead_register_instance() fails with -EEXIST,
+> the larval wait mechanism re-runs the lookup and finds the pcrypt instance
+> instead of the real child algorithm, leading to pcrypt(pcrypt(...))
+> recursion.
+> 
+> Fix by using crypto_inst_setname() instead of memcpy, ensuring pcrypt
+> instances are named "pcrypt(<child>)" rather than reusing the child's name.
+> This eliminates the naming collision that triggers the re-lookup mechanism.
+> 
+> Also apply the same fix to cryptd for consistency, even though it doesn't
+> exhibit the same recursion issue.
+> 
+> To reproduce:
+> python -c "import socket; socket.socket(socket.AF_ALG,
+> socket.SOCK_SEQPACKET, 0).bind(('aead', 'pcrypt(ccm(aes))'))"
+> ...
+> OSError: [Errno 36] File name too long
+> 
+> Before the patch (/proc/crypto):
+> name  : ccm(aes)
+> driver: pcrypt(pcrypt(...(pcrypt(ccm_base(ctr-aes-aesni,cbcmac(aes-aesni))))...))
+> [and 9 other ccm(aes) instances.]
+> 
+> After the patch (/proc/crypto):
+> name  : pcrypt(ccm(aes))
+> driver: pcrypt(ccm_base(ctr-aes-aesni,cbcmac(aes-aesni)))
+> 
+> Fixes: 5068c7a883d1 ("crypto: pcrypt - Add pcrypt crypto parallelization wrapper")
+> Fixes: 4e0958d19bd8 ("crypto: cryptd - Add support for skcipher")
+> Reported-by: Vegard Nossum <vegard.nossum@oracle.com>
+> Closes: https://lore.kernel.org/linux-crypto/4c0e7a68-254e-4f71-a903-952415c609d9@oracle.com
+> Signed-off-by: Saeed Mirzamohammadi <saeed.mirzamohammadi@oracle.com>
+> ---
+>  crypto/cryptd.c | 9 ++++-----
+>  crypto/pcrypt.c | 8 ++++----
+>  2 files changed, 8 insertions(+), 9 deletions(-)
 
-OK, sounds great! I'll send such a patch.
+The algorithm name must stay the same because the whole point of
+pcrypt (and cryptd) is to wrap around the underlying algorithm
+without turning it into a new algorithm.
 
->
-> I had a bit of a look at callers of rhashtable_lookup().  Some return
-> -EEXIST if they find something. Other return -ENOENT if they don't.
-> Using rhasthable_lookup_likely() for those that return -ENOENT probably
-> makes sense.
+The problem here is that the Crypto API only supports two types
+of names, algorithm names and driver names.  Your python code
+was using a mixture of the two, which creates a name that can
+never be fulfilled by the Crypto API.  If you substituted the
+name pcrypt(ccm(aes)) with pcrypt(ccm_base(ctr-aes-aesni,cbcmac(aes-aesni)))
+then it should work.
 
-I'll do it.
+Ideally we should support such mixed names so I'm happy to consider
+any patches implementing that.
 
-Thanks!
-Menglong Dong
-
->
-> Thanks,
-> NeilBrown
->
->
-> >
-> > Below is the part code of the testing:
-> >
-> >     for (i =3D 0; i < num_elems; i++) {
-> >         objs[i] =3D kmalloc(sizeof(**objs), GFP_KERNEL);
-> >         KUNIT_ASSERT_NOT_ERR_OR_NULL(test, objs[i]);
-> >         objs[i]->key =3D i;
-> >         INIT_RHT_NULLS_HEAD(objs[i]->node.next);
-> >         ret =3D rhashtable_insert_fast(&ht, &objs[i]->node, bench_param=
-s);
-> >         KUNIT_ASSERT_EQ(test, ret, 0);
-> >     }
-> >
-> >     /* for CPU warm up */
-> >     for (i =3D 0; i < 1000000000; i++) {
-> >         u32 key =3D 0;
-> >         struct bench_obj *found;
-> >
-> >         found =3D rhashtable_lookup(&ht, &key, bench_params);
-> >         KUNIT_ASSERT_NOT_ERR_OR_NULL(test, found);
-> >         KUNIT_ASSERT_EQ(test, found->key, key);
-> >     }
-> >
-> >     rcu_read_lock();
-> >     t0 =3D ktime_get();
-> >     for (i =3D 0; i < 100000000; i++) {
-> >         u32 key =3D 0;
-> >         struct bench_obj *found;
-> >
-> >         found =3D rhashtable_lookup(&ht, &key, bench_params);
-> >         if (unlikely(!found)) {
-> >             pr_info("error!\n");
-> >             break;
-> >         }
-> >     }
-> >     t1 =3D ktime_get();
-> >     rcu_read_unlock();
-> >
-> > >
-> > > Thanks,
-> > > NeilBrown
-> >
->
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
