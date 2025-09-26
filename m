@@ -1,78 +1,58 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0FC1E7C2D
-	for <linux-crypto@vger.kernel.org>; Fri, 26 Sep 2025 14:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AB92FFF95
+	for <linux-crypto@vger.kernel.org>; Fri, 26 Sep 2025 14:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758896404; cv=none; b=HEhouzDL3ZFupgEcDw19P68zzBSws/SlivHurOpWrbtta6KZZpGY7yH4SOVTW1RE1f65x40pqkdkJlKDPWHRqO24A6uqmSseLkQmzCLRmXuz2lyrSMbBO4Y+1D747U2ZWOB37tVI4OIfFSypoE65OfppcLrGh/GG/nfxLIsfcsM=
+	t=1758896415; cv=none; b=HhpJ8VBYErnUAhsRUuTcdXyH88rubyS5bQ1CaCMmw4xKRm8+O7cUvOgMt7xUDKBH91XQGENd83cqpHdjEtVgyGlznyBQWicdLsbv6ofhLXCakedgL8b92lVa3wtxOA7R5gVgqJaeanCWTMvKUG6e/ditDmk8f/PiDXEythd/E9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758896404; c=relaxed/simple;
-	bh=ARuS5KH/F933Wnax/FjqCl4fc22eqJ2I+ltqgwS3sKo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HF+w3GIwrgaECxJlqPmhNi3v6WKthfeYsDPBzaycfCKkMmQjuXHTfbMmL04ZjWkuUskIsnkkLhTi/+qBL1zmOME+2DdH6B2EYC67ORHVPw+IiGG5mA3zitckyy973uAC8lOQmpZSfJtMKqIEpu54e1hUpvnUlceUOOG1DwcyCDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=CzTGnpU4; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1758896415; c=relaxed/simple;
+	bh=PPiN8pq1LdwYIaUYStL8/OXBtkNaRwfRrT8tXpg2uJY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SjjzZ4alqV//MAny6XgW8Pue2xBfYXNdRAlhufdfi9ho2sqUifsRjaEHhFU66JxsVU2FyjaR7oFTbi0jznkcReXsOusyr/L7a0XKzKqZliBUmdNoo44sjVn8605DYKVVS0q/wCvULDLDd1F81FidntW9nVkC8YT2LRkHVX5w7+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DWpHeRPc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="CzTGnpU4"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7800ff158d5so1509263b3a.1
-        for <linux-crypto@vger.kernel.org>; Fri, 26 Sep 2025 07:20:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1758896402; x=1759501202; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3ps8JtDckkfcNbW7faGkRx3OkbwRbBWeAhm9VgsFGC0=;
-        b=CzTGnpU4yKMwqBem8PTrSH5CxAdzV65WNmcbkYmengqpD0q0uespcUIEAvB8vaHRif
-         3kOmCkBAF8Vg1sUi5NIwRBGu7r317NTPLvvJCjRgpiYk8yKdVJcv4GJgt6W9dq4S8zWL
-         7P7lJzHGyv8mnP3XtJ86WT2/OKLB4VL0j8f+o=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758896402; x=1759501202;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3ps8JtDckkfcNbW7faGkRx3OkbwRbBWeAhm9VgsFGC0=;
-        b=t0EOSzGksTP8blhIba0Oe/9S1NBoiGzkDRulJsa4I57lybRStPNS58FYH5TLu3X1N+
-         x5WAYB8ZHx7cwYeJzXe9YsPxaNecREuDqmUTtf2t1zO71iXKFsk+W1oAGI/t9e0yIArN
-         6K+izNEQjxqwAeNAjLaTWjzYLnW3t9emuxPnGc+2kYrHEPNUA4Q9rXzI6bepPZv09rzy
-         +zKdwF3tA3hUrxstKjATk3n+X3cQXu3TlkB9QQ1kIdJ0X/geOElg1nS5Vc0xK2YtCuMA
-         3AVNiymzey3chBENKmVSW0PJ/q1pmBhiIP0XT1IrNmka5WMb2vW8DF8a1qRNpoXzSyO4
-         oYbw==
-X-Gm-Message-State: AOJu0YxhleBJYHlpkupmdaVrzGMMwg9JFG+yjfD4adlk63oudbFv69Ot
-	/yhjoRibAZHi9rmoHZsxkat7upDxqqkjD805tK/SpLD6wqE+saB9tswdYkKluo8cCeJncjJHbgn
-	/ldxc
-X-Gm-Gg: ASbGnctG3g7YsbTYhNKKkDITRjwR7zXgfpzdMVjSjBnCobYoAXEcKTmeBC4XSbW9RgG
-	E5IFhDGMnYLtGUd9K+akeYJVpZQMkCyNGZQWhcikeznXBlZ8eBW2YnPX/VkZxDxKMKScv7crFcz
-	85MLdmoSlV8OsPZuUUz5ycozPbG1v1OBhdrqd0trMgvBShyDNM9PJ59YF8O+TVWGcf2aa/0HP6F
-	+nLnWrfleRlG+XDaaTCaE5JwDaIeWsap5BHEsfgIFfoDO7J/N4vBhtdlyA4SovdFc0ZdV9k0In1
-	436Xbz3FsDESwf+xP17kZUJcP4TsZqa6mayet4hGs1OnZXKlBBFvc60hP8IENqfFEea9OmN2Ypd
-	xArhIDzcHNxafwiS8luNiMGLQmxroyjcoyAf5EnukTsnedlyP/sIVfhI6
-X-Google-Smtp-Source: AGHT+IHWGorcKfFgmNv40cfOGQ6cE5tvRV4xJh8wItLftbLmZ0tLF0ee1ykpyKG1zlkZ8Lcob1S43A==
-X-Received: by 2002:a05:6a00:4b44:b0:77c:6621:6168 with SMTP id d2e1a72fcca58-780fcf080bcmr6965285b3a.30.1758896401633;
-        Fri, 26 Sep 2025 07:20:01 -0700 (PDT)
-Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7810238ca1esm4624845b3a.11.2025.09.26.07.19.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Sep 2025 07:20:01 -0700 (PDT)
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-To: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	robh@kernel.org
-Cc: krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	Ruud.Derwig@synopsys.com,
-	manjunath.hadli@vayavyalabs.com,
-	adityak@vayavyalabs.com,
-	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Subject: [PATCH v5 4/4] Add SPAcc Kconfig and Makefile
-Date: Fri, 26 Sep 2025 19:49:04 +0530
-Message-Id: <20250926141904.38919-5-pavitrakumarm@vayavyalabs.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250926141904.38919-1-pavitrakumarm@vayavyalabs.com>
-References: <20250926141904.38919-1-pavitrakumarm@vayavyalabs.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DWpHeRPc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758896412;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FZkVHZZVz949SgHPOq8NTiY1Q1JoUahrY4S3yaDuUdI=;
+	b=DWpHeRPcBxsqadfrmQsBpg1YXWPie1W0ZQBogz4bOA2tQH+gmEyANiU4Z70N0mdd8JcmPu
+	FcOcWojgVodnPQE8OBHXiKQKX1c5M/QytmMBXt1ELQa2nWczK4qyiCIKmqQZ4PoMidoXZ8
+	sRzfVOnDukvSL7CMlWCn898dTyVcUxE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-688-D6_-F7m8NpCF8nW-yHeeVQ-1; Fri,
+ 26 Sep 2025 10:20:07 -0400
+X-MC-Unique: D6_-F7m8NpCF8nW-yHeeVQ-1
+X-Mimecast-MFC-AGG-ID: D6_-F7m8NpCF8nW-yHeeVQ_1758896406
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CEDB8180028E;
+	Fri, 26 Sep 2025 14:20:05 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.155])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2C8AB19560AB;
+	Fri, 26 Sep 2025 14:20:02 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: 
+Cc: David Howells <dhowells@redhat.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Stephan Mueller <smueller@chronox.de>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/8] crypto, lib/crypto: Add SHAKE128/256 support and move SHA3 to lib/crypto
+Date: Fri, 26 Sep 2025 15:19:43 +0100
+Message-ID: <20250926141959.1272455-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -80,186 +60,140 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Add Makefile and Kconfig for SPAcc driver.
+Hi Eric, Herbert,
 
-Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
-Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
----
- drivers/crypto/Kconfig            |   1 +
- drivers/crypto/Makefile           |   1 +
- drivers/crypto/dwc-spacc/Kconfig  | 114 ++++++++++++++++++++++++++++++
- drivers/crypto/dwc-spacc/Makefile |  16 +++++
- 4 files changed, 132 insertions(+)
- create mode 100644 drivers/crypto/dwc-spacc/Kconfig
- create mode 100644 drivers/crypto/dwc-spacc/Makefile
+Here's a set of patches does the following:
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 657035cfe940..ada04311c370 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -780,6 +780,7 @@ config CRYPTO_DEV_BCM_SPU
- 	  ahash, and aead algorithms with the kernel cryptographic API.
- 
- source "drivers/crypto/stm32/Kconfig"
-+source "drivers/crypto/dwc-spacc/Kconfig"
- 
- config CRYPTO_DEV_SAFEXCEL
- 	tristate "Inside Secure's SafeXcel cryptographic engine driver"
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 170e10b18f9b..e0d5e1301232 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -43,6 +43,7 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
- obj-y += inside-secure/
- obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
- obj-y += xilinx/
-+obj-y += dwc-spacc/
- obj-y += hisilicon/
- obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
- obj-y += intel/
-diff --git a/drivers/crypto/dwc-spacc/Kconfig b/drivers/crypto/dwc-spacc/Kconfig
-new file mode 100644
-index 000000000000..4eb2eef56053
---- /dev/null
-+++ b/drivers/crypto/dwc-spacc/Kconfig
-@@ -0,0 +1,114 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+config CRYPTO_DEV_SPACC
-+	tristate "Support for dw_spacc Security Protocol Accelerator"
-+	depends on HAS_DMA
-+	default n
-+
-+	help
-+	  This enables support for SPAcc Hardware Accelerator.
-+
-+config CRYPTO_DEV_SPACC_CIPHER
-+	bool "Enable CIPHER functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	select CRYPTO_SKCIPHER
-+	select CRYPTO_LIB_DES
-+	select CRYPTO_AES
-+	select CRYPTO_CBC
-+	select CRYPTO_ECB
-+	select CRYPTO_CTR
-+	select CRYPTO_XTS
-+	select CRYPTO_CTS
-+	select CRYPTO_OFB
-+	select CRYPTO_CFB
-+	select CRYPTO_SM4_GENERIC
-+	select CRYPTO_CHACHA20
-+
-+	help
-+	  Say y to enable Cipher functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_HASH
-+	bool "Enable HASH functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	select CRYPTO_HASH
-+	select CRYPTO_SHA1
-+	select CRYPTO_MD5
-+	select CRYPTO_SHA256
-+	select CRYPTO_SHA512
-+	select CRYPTO_HMAC
-+	select CRYPTO_SM3
-+	select CRYPTO_CMAC
-+	select CRYPTO_MICHAEL_MIC
-+	select CRYPTO_XCBC
-+	select CRYPTO_AES
-+	select CRYPTO_SM4_GENERIC
-+
-+	help
-+	  Say y to enable Hash functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_AEAD
-+	bool "Enable AEAD functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	select CRYPTO_AEAD
-+	select CRYPTO_AUTHENC
-+	select CRYPTO_AES
-+	select CRYPTO_SM4_GENERIC
-+	select CRYPTO_CHACHAPOLY1305
-+	select CRYPTO_GCM
-+	select CRYPTO_CCM
-+
-+	help
-+	  Say y to enable AEAD functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_AUTODETECT
-+	bool "Enable Autodetect functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	help
-+	  Say y to enable Autodetect functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_DEBUG_TRACE_IO
-+	bool "Enable Trace MMIO reads/writes stats"
-+	depends on CRYPTO_DEV_SPACC
-+	default n
-+	help
-+	  Say y to enable Trace MMIO reads/writes stats.
-+	  To Debug and trace IO register read/write oprations.
-+
-+config CRYPTO_DEV_SPACC_DEBUG_TRACE_DDT
-+	bool "Enable Trace DDT entries stats"
-+	default n
-+	depends on CRYPTO_DEV_SPACC
-+	help
-+	  Say y to enable Enable DDT entry stats.
-+	  To Debug and trace DDT opration
-+
-+config CRYPTO_DEV_SPACC_SECURE_MODE
-+	bool "Enable Spacc secure mode stats"
-+	default n
-+	depends on CRYPTO_DEV_SPACC
-+	help
-+	  Say y to enable SPAcc secure modes stats.
-+
-+config CRYPTO_DEV_SPACC_PRIORITY
-+	int "VSPACC priority value"
-+	depends on CRYPTO_DEV_SPACC
-+	range 0 15
-+	default 1
-+	help
-+	  Default arbitration priority weight for this Virtual SPAcc instance.
-+	  Hardware resets this to 1. Higher values means higher priority.
-+
-+config CRYPTO_DEV_SPACC_INTERNAL_COUNTER
-+	int "SPAcc internal counter value"
-+	depends on CRYPTO_DEV_SPACC
-+	range 100000 1048575
-+	default 100000
-+	help
-+	  This value configures a hardware watchdog counter in the SPAcc engine.
-+	  The counter starts ticking when a completed cryptographic job is
-+	  sitting in the STATUS FIFO. If the job remains unprocessed for the
-+	  configured duration, an interrupt is triggered to ensure it is serviced.
-diff --git a/drivers/crypto/dwc-spacc/Makefile b/drivers/crypto/dwc-spacc/Makefile
-new file mode 100644
-index 000000000000..bf46c8e13a31
---- /dev/null
-+++ b/drivers/crypto/dwc-spacc/Makefile
-@@ -0,0 +1,16 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_CRYPTO_DEV_SPACC) += snps-spacc.o
-+snps-spacc-objs = spacc_hal.o spacc_core.o \
-+spacc_manager.o spacc_interrupt.o spacc_device.o
-+
-+ifeq ($(CONFIG_CRYPTO_DEV_SPACC_HASH),y)
-+snps-spacc-objs += spacc_ahash.o
-+endif
-+
-+ifeq ($(CONFIG_CRYPTO_DEV_SPACC_CIPHER),y)
-+snps-spacc-objs += spacc_skcipher.o
-+endif
-+
-+ifeq ($(CONFIG_CRYPTO_DEV_SPACC_AEAD),y)
-+snps-spacc-objs += spacc_aead.o
-+endif
--- 
-2.25.1
+ (1) Renames s390 and arm64 sha3_* functions to avoid name collisions.
+
+ (2) Copies the core of SHA3 support from crypto/ to lib/crypto/.
+
+ (3) Simplifies the internal code to maintain the buffer in little endian
+     form, thereby simplifying the update and extraction code which don't
+     then need to worry about this.  Instead, the state buffer is
+     byteswapped before and after.
+
+ (4) Moves the Iota transform into the function with the rest of the
+     transforms.
+
+ (5) Adds SHAKE128 and SHAKE256 support (needed for ML-DSA).
+
+ (6) Adds a kunit test for SHA3 in lib/crypto/tests/.
+
+ (7) Adds proper API documentation for SHA3.
+
+ (8) Makes crypto/sha3_generic.c use lib/crypto/sha3.  This necessitates a
+     slight enlargement of the context buffers which might affect optimised
+     assembly/hardware drivers.
+
+Note that only the generic code is moved across; the asm-optimised stuff is
+not touched as I'm not familiar with that.
+
+I have done what Eric required and made a separate wrapper struct and set
+of wrapper functions for each algorithm, though I think this is excessively
+bureaucratic as this multiplies the API load by 7 (and maybe 9 in the
+future[*]).
+
+[*] The Kyber algorithm also uses CSHAKE variants in the SHA3 family - and
+    NIST mentions some other variants too.
+
+This does, however, cause a problem for what I need to do as the ML-DSA
+prehash is dynamically selectable by certificate OID, so I have to add
+SHAKE128/256 support to the crypto shash API too - though hopefully it will
+only require an output of 16 or 32 bytes respectively for the prehash case
+and won't require multiple squeezing.
+
+This is based on Eric's libcrypto-next branch.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-pqc
+
+David
+
+Changes
+=======
+ver #3)
+ - Renamed conflicting arm64 functions.
+ - Made a separate wrapper API for each algorithm in the family.
+ - Removed sha3_init(), sha3_reinit() and sha3_final().
+ - Removed sha3_ctx::digest_size.
+ - Renamed sha3_ctx::partial to sha3_ctx::absorb_offset.
+ - Refer to the output of SHAKE* as "output" not "digest".
+ - Moved the Iota transform into the one-round function.
+ - Made sha3_update() warn if called after sha3_squeeze().
+ - Simplified the module-load test to not do update after squeeze.
+ - Added Return: and Context: kdoc statements and expanded the kdoc
+   headers.
+ - Added an API description document.
+ - Overhauled the kunit tests.
+   - Only have one kunit test.
+   - Only call the general hash tester on one algo.
+   - Add separate simple cursory checks for the other algos.
+   - Add resqueezing tests.
+   - Add some NIST example tests.
+ - Changed crypto/sha3_generic to use this
+ - Added SHAKE128/256 to crypto/sha3_generic and crypto/testmgr
+ - Folded struct sha3_state into struct sha3_ctx.
+
+ver #2)
+  - Simplify the endianness handling.
+  - Rename sha3_final() to sha3_squeeze() and don't clear the context at the
+    end as it's permitted to continue calling sha3_final() to extract
+    continuations of the digest (needed by ML-DSA).
+  - Don't reapply the end marker to the hash state in continuation
+    sha3_squeeze() unless sha3_update() gets called again (needed by
+    ML-DSA).
+  - Give sha3_squeeze() the amount of digest to produce as a parameter
+    rather than using ctx->digest_size and don't return the amount digested.
+  - Reimplement sha3_final() as a wrapper around sha3_squeeze() that
+    extracts ctx->digest_size amount of digest and then zeroes out the
+    context.  The latter is necessary to avoid upsetting
+    hash-test-template.h.
+  - Provide a sha3_reinit() function to clear the state, but to leave the
+    parameters that indicate the hash properties unaffected, allowing for
+    reuse.
+  - Provide a sha3_set_digestsize() function to change the size of the
+    digest to be extracted by sha3_final().  sha3_squeeze() takes a
+    parameter for this instead.
+  - Don't pass the digest size as a parameter to shake128/256_init() but
+    rather default to 128/256 bits as per the function name.
+  - Provide a sha3_clear() function to zero out the context.
+
+David Howells (8):
+  s390/sha3: Rename conflicting functions
+  arm64/sha3: Rename conflicting functions
+  lib/crypto: Add SHA3-224, SHA3-256, SHA3-384, SHA-512, SHAKE128,
+    SHAKE256
+  lib/crypto: Move the SHA3 Iota transform into the single round
+    function
+  lib/crypto: Add SHA3 kunit tests
+  crypto/sha3: Use lib/crypto/sha3
+  crypto/sha3: Add SHAKE128/256 support
+  crypto: SHAKE tests
+
+ Documentation/crypto/index.rst      |   1 +
+ Documentation/crypto/sha3.rst       | 241 +++++++++++++
+ arch/arm64/crypto/sha3-ce-glue.c    |  47 +--
+ arch/s390/crypto/sha3_256_s390.c    |  26 +-
+ arch/s390/crypto/sha3_512_s390.c    |  26 +-
+ crypto/sha3_generic.c               | 233 +++---------
+ crypto/testmgr.c                    |  14 +
+ crypto/testmgr.h                    |  59 ++++
+ include/crypto/sha3.h               | 467 +++++++++++++++++++++++-
+ lib/crypto/Kconfig                  |   7 +
+ lib/crypto/Makefile                 |   6 +
+ lib/crypto/sha3.c                   | 529 ++++++++++++++++++++++++++++
+ lib/crypto/tests/Kconfig            |  12 +
+ lib/crypto/tests/Makefile           |   1 +
+ lib/crypto/tests/sha3_kunit.c       | 338 ++++++++++++++++++
+ lib/crypto/tests/sha3_testvecs.h    | 231 ++++++++++++
+ scripts/crypto/gen-hash-testvecs.py |   8 +-
+ 17 files changed, 2012 insertions(+), 234 deletions(-)
+ create mode 100644 Documentation/crypto/sha3.rst
+ create mode 100644 lib/crypto/sha3.c
+ create mode 100644 lib/crypto/tests/sha3_kunit.c
+ create mode 100644 lib/crypto/tests/sha3_testvecs.h
 
