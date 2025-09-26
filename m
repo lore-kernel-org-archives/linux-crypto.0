@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33351FFC59
-	for <linux-crypto@vger.kernel.org>; Fri, 26 Sep 2025 14:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F03430504B
+	for <linux-crypto@vger.kernel.org>; Fri, 26 Sep 2025 14:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758896439; cv=none; b=lXKNNCDRaN4fM5rsm9Usubq5US+dzcG6HnxxpzNjP5sZEk75NdHl094QHgcExfVWyIpshwvq2SEA8cfTZBfqS6F5uT1esBlV21HZq5qoHhGzMD+hMLv2eD7RNfo2gamfFyB/ejq/F/uL2sLpfyYKh5es0b8U8gc420Colq6NHDw=
+	t=1758896450; cv=none; b=OBBRo1Ihk0N7SKT160Pwko6tIhZfvpi0TNGfrfVU2LHT398iaSuMH/N7YDS9XzIbj5b6x3Uj3ou+WcnuJfCpl4+ruhXxSjjkG3sThUKRasohFA8BxMOO3gAowNBznH8SuiNOEwv6wrkJrvo6cOCzxk0rPSzQNKdcvosiaA0wlEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758896439; c=relaxed/simple;
-	bh=gEmtJX2boAjTH7pg8qkCqbmv3qDYkIFzPpRG4+BI1pQ=;
+	s=arc-20240116; t=1758896450; c=relaxed/simple;
+	bh=ySiSiNeZc9FNWHxIUaJv0xF7RkGpsemiZKhULj53bSc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zwa/CBPHnRK4b2ji/eC6nZ5jU6pX+f28iELlAObdPTw/OD+XU6NgCGG6a7Jxd3pDfTRJTIim/u/0cFecACeVIkbguPGMKTyal5hKw+HoX61faHeUoqLKZZ94irEEKjjYmUG42tCiPCSnstSrJc9VNcnwk3FWPI1o70dd4GoSJMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b8uS5AFo; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=auLjWq9hBmQTEHOrfD4/nobPmlIgVuUYHEjzGpQsjmORcs/evG7QKXrXrYmik9DxFBw025JW9SXHBWwGdRrRN07UWKPx883CdfYvCx50qzbH8k4jxsDYqp0ZWN9if6F0vGTxoTeco9XutWChdY8MzCVxgyY8sDhrADyA9WiZzl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LP9POOsM; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b8uS5AFo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LP9POOsM"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758896436;
+	s=mimecast20190719; t=1758896447;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=niM2zll9qN3FE5+Kw/1evuO7pOFd4rYAY/Rez06/6Qk=;
-	b=b8uS5AFo9ob5fiCO/SN6NtzIOpaJHzc9tzL182btN1ZgzCJrRcDmz1VCXYtwkM52pDf/Qp
-	j8hKsHdRKjiF1D1MMVeqWTBNdzzqQZdQQOYz1sTyvQmypeVkEOeKZISmnMaSvJMJi1bSKW
-	bnk2ekPovAPn32dnt9Ua6mKi90lKcEI=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+	bh=4KUnTBzsGr+xU5+H4r3Ghz1bUcQIQV9Qsi5HH5seaJo=;
+	b=LP9POOsMI4GJ1GqRaP7r1E9YP6/xBf0YC8OLMUkf6DTOZTFK6r6MunNw6N3yIC3LqwPBO6
+	DmOwoiw6HOfeGX94+BUw+newDAr7V3uIv1j3yye2gJJaekJHPx39dKd6zWPnivW6U0SOfE
+	tzIMwUa4vzAYr09/+7AxxB12GQ4dHn4=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-639-KJlWO5JEMZSaBvAxBZjHyg-1; Fri,
- 26 Sep 2025 10:20:34 -0400
-X-MC-Unique: KJlWO5JEMZSaBvAxBZjHyg-1
-X-Mimecast-MFC-AGG-ID: KJlWO5JEMZSaBvAxBZjHyg_1758896433
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-482-TIP_uSxTMn2bVX1ho6DLow-1; Fri,
+ 26 Sep 2025 10:20:42 -0400
+X-MC-Unique: TIP_uSxTMn2bVX1ho6DLow-1
+X-Mimecast-MFC-AGG-ID: TIP_uSxTMn2bVX1ho6DLow_1758896440
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1BFEE1800295;
-	Fri, 26 Sep 2025 14:20:33 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C3BFC1800378;
+	Fri, 26 Sep 2025 14:20:40 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.155])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 843B919560A2;
-	Fri, 26 Sep 2025 14:20:30 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 86FC1180141C;
+	Fri, 26 Sep 2025 14:20:38 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: 
 Cc: David Howells <dhowells@redhat.com>,
@@ -52,9 +52,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Stephan Mueller <smueller@chronox.de>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 6/8] crypto/sha3: Use lib/crypto/sha3
-Date: Fri, 26 Sep 2025 15:19:49 +0100
-Message-ID: <20250926141959.1272455-7-dhowells@redhat.com>
+Subject: [PATCH v3 8/8] crypto: SHAKE tests
+Date: Fri, 26 Sep 2025 15:19:51 +0100
+Message-ID: <20250926141959.1272455-9-dhowells@redhat.com>
 In-Reply-To: <20250926141959.1272455-1-dhowells@redhat.com>
 References: <20250926141959.1272455-1-dhowells@redhat.com>
 Precedence: bulk
@@ -64,540 +64,146 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Switch crypto/sha3_generic.c to use lib/crypto/sha3.  Note that this makes
-use of the internal general API rather implementing a separate set of
-init/update/finup handlers for each algorithm.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Eric Biggers <ebiggers@kernel.org>
-cc: Jason A. Donenfeld <Jason@zx2c4.com>
-cc: Ard Biesheuvel <ardb@kernel.org>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: Stephan Mueller <smueller@chronox.de>
-cc: linux-crypto@vger.kernel.org
 ---
- Documentation/crypto/sha3.rst    |   8 +-
- arch/arm64/crypto/sha3-ce-glue.c |  25 ++--
- crypto/sha3_generic.c            | 201 +++----------------------------
- include/crypto/sha3.h            |   6 +-
- lib/crypto/sha3.c                |  35 +++---
- 5 files changed, 52 insertions(+), 223 deletions(-)
+ crypto/sha3_generic.c | 14 ++++++++--
+ crypto/testmgr.c      | 14 ++++++++++
+ crypto/testmgr.h      | 59 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 85 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/crypto/sha3.rst b/Documentation/crypto/sha3.rst
-index ae4902895882..82c9abe45614 100644
---- a/Documentation/crypto/sha3.rst
-+++ b/Documentation/crypto/sha3.rst
-@@ -157,7 +157,7 @@ further algorithms or APIs as the engine in the same in all cases.  The
- algorithm APIs all wrap the common context structure::
- 
- 	struct sha3_ctx {
--		struct sha3_state	state;
-+		u64			st[SHA3_STATE_SIZE / 8];
- 		u8			block_size;
- 		u8			padding;
- 		u8			absorb_offset;
-@@ -165,13 +165,9 @@ algorithm APIs all wrap the common context structure::
- 		bool			end_marked;
- 	};
- 
--	struct sha3_state {
--		u64			st[SHA3_STATE_SIZE / 8];
--	};
--
- The fields are as follows:
- 
-- * ``state.st``
-+ * ``st``
- 
-    An array of 25 64-bit state buckets that are used to hold the mathematical
-    state of the Keccak engine.  Data is XOR'd onto part of this, the engine is
-diff --git a/arch/arm64/crypto/sha3-ce-glue.c b/arch/arm64/crypto/sha3-ce-glue.c
-index 426d8044535a..f6cdff4cd103 100644
---- a/arch/arm64/crypto/sha3-ce-glue.c
-+++ b/arch/arm64/crypto/sha3-ce-glue.c
-@@ -28,13 +28,18 @@ MODULE_ALIAS_CRYPTO("sha3-256");
- MODULE_ALIAS_CRYPTO("sha3-384");
- MODULE_ALIAS_CRYPTO("sha3-512");
- 
-+static struct sha3_ctx *crypto_sha3_desc(struct shash_desc *desc)
-+{
-+	return shash_desc_ctx(desc);
-+}
-+
- asmlinkage int sha3_ce_transform(u64 *st, const u8 *data, int blocks,
- 				 int md_len);
- 
- static int arm64_sha3_update(struct shash_desc *desc, const u8 *data,
- 		       unsigned int len)
- {
--	struct sha3_state *sctx = shash_desc_ctx(desc);
-+	struct sha3_ctx *ctx = crypto_sha3_desc(desc);
- 	struct crypto_shash *tfm = desc->tfm;
- 	unsigned int bs, ds;
- 	int blocks;
-@@ -47,7 +52,7 @@ static int arm64_sha3_update(struct shash_desc *desc, const u8 *data,
- 		int rem;
- 
- 		kernel_neon_begin();
--		rem = sha3_ce_transform(sctx->st, data, blocks, ds);
-+		rem = sha3_ce_transform(ctx->state.st, data, blocks, ds);
- 		kernel_neon_end();
- 		data += (blocks - rem) * bs;
- 		blocks = rem;
-@@ -58,7 +63,7 @@ static int arm64_sha3_update(struct shash_desc *desc, const u8 *data,
- static int arm64_sha3_finup(struct shash_desc *desc, const u8 *src, unsigned int len,
- 			    u8 *out)
- {
--	struct sha3_state *sctx = shash_desc_ctx(desc);
-+	struct sha3_ctx *ctx = crypto_sha3_desc(desc);
- 	struct crypto_shash *tfm = desc->tfm;
- 	__le64 *digest = (__le64 *)out;
- 	u8 block[SHA3_224_BLOCK_SIZE];
-@@ -74,15 +79,15 @@ static int arm64_sha3_finup(struct shash_desc *desc, const u8 *src, unsigned int
- 	block[bs - 1] |= 0x80;
- 
- 	kernel_neon_begin();
--	sha3_ce_transform(sctx->st, block, 1, ds);
-+	sha3_ce_transform(sctx->state.st, block, 1, ds);
- 	kernel_neon_end();
- 	memzero_explicit(block , sizeof(block));
- 
- 	for (i = 0; i < ds / 8; i++)
--		put_unaligned_le64(sctx->st[i], digest++);
-+		put_unaligned_le64(sctx->state.st[i], digest++);
- 
- 	if (ds & 4)
--		put_unaligned_le32(sctx->st[i], (__le32 *)digest);
-+		put_unaligned_le32(sctx->state.st[i], (__le32 *)digest);
- 
- 	return 0;
- }
-@@ -92,7 +97,7 @@ static struct shash_alg algs[] = { {
- 	.init			= crypto_sha3_init,
- 	.update			= arm64_sha3_update,
- 	.finup			= arm64_sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
-+	.descsize		= sizeof(struct sha3_ctx),
- 	.base.cra_name		= "sha3-224",
- 	.base.cra_driver_name	= "sha3-224-ce",
- 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
-@@ -104,7 +109,7 @@ static struct shash_alg algs[] = { {
- 	.init			= crypto_sha3_init,
- 	.update			= arm64_sha3_update,
- 	.finup			= arm64_sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
-+	.descsize		= sizeof(struct sha3_ctx),
- 	.base.cra_name		= "sha3-256",
- 	.base.cra_driver_name	= "sha3-256-ce",
- 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
-@@ -116,7 +121,7 @@ static struct shash_alg algs[] = { {
- 	.init			= crypto_sha3_init,
- 	.update			= arm64_sha3_update,
- 	.finup			= arm64_sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
-+	.descsize		= sizeof(struct sha3_ctx),
- 	.base.cra_name		= "sha3-384",
- 	.base.cra_driver_name	= "sha3-384-ce",
- 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
-@@ -128,7 +133,7 @@ static struct shash_alg algs[] = { {
- 	.init			= crypto_sha3_init,
- 	.update			= arm64_sha3_update,
- 	.finup			= arm64_sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
-+	.descsize		= sizeof(struct sha3_ctx),
- 	.base.cra_name		= "sha3-512",
- 	.base.cra_driver_name	= "sha3-512-ce",
- 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
 diff --git a/crypto/sha3_generic.c b/crypto/sha3_generic.c
-index 41d1e506e6de..6917a1aeb8e5 100644
+index 4fae066ec3f5..61ba1cf6eadb 100644
 --- a/crypto/sha3_generic.c
 +++ b/crypto/sha3_generic.c
-@@ -13,156 +13,19 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/string.h>
--#include <linux/unaligned.h>
- 
--/*
-- * On some 32-bit architectures (h8300), GCC ends up using
-- * over 1 KB of stack if we inline the round calculation into the loop
-- * in keccakf(). On the other hand, on 64-bit architectures with plenty
-- * of [64-bit wide] general purpose registers, not inlining it severely
-- * hurts performance. So let's use 64-bitness as a heuristic to decide
-- * whether to inline or not.
-- */
--#ifdef CONFIG_64BIT
--#define SHA3_INLINE	inline
--#else
--#define SHA3_INLINE	noinline
--#endif
--
--#define KECCAK_ROUNDS 24
--
--static const u64 keccakf_rndc[24] = {
--	0x0000000000000001ULL, 0x0000000000008082ULL, 0x800000000000808aULL,
--	0x8000000080008000ULL, 0x000000000000808bULL, 0x0000000080000001ULL,
--	0x8000000080008081ULL, 0x8000000000008009ULL, 0x000000000000008aULL,
--	0x0000000000000088ULL, 0x0000000080008009ULL, 0x000000008000000aULL,
--	0x000000008000808bULL, 0x800000000000008bULL, 0x8000000000008089ULL,
--	0x8000000000008003ULL, 0x8000000000008002ULL, 0x8000000000000080ULL,
--	0x000000000000800aULL, 0x800000008000000aULL, 0x8000000080008081ULL,
--	0x8000000000008080ULL, 0x0000000080000001ULL, 0x8000000080008008ULL
--};
--
--/* update the state with given number of rounds */
--
--static SHA3_INLINE void keccakf_round(u64 st[25])
--{
--	u64 t[5], tt, bc[5];
--
--	/* Theta */
--	bc[0] = st[0] ^ st[5] ^ st[10] ^ st[15] ^ st[20];
--	bc[1] = st[1] ^ st[6] ^ st[11] ^ st[16] ^ st[21];
--	bc[2] = st[2] ^ st[7] ^ st[12] ^ st[17] ^ st[22];
--	bc[3] = st[3] ^ st[8] ^ st[13] ^ st[18] ^ st[23];
--	bc[4] = st[4] ^ st[9] ^ st[14] ^ st[19] ^ st[24];
--
--	t[0] = bc[4] ^ rol64(bc[1], 1);
--	t[1] = bc[0] ^ rol64(bc[2], 1);
--	t[2] = bc[1] ^ rol64(bc[3], 1);
--	t[3] = bc[2] ^ rol64(bc[4], 1);
--	t[4] = bc[3] ^ rol64(bc[0], 1);
--
--	st[0] ^= t[0];
--
--	/* Rho Pi */
--	tt = st[1];
--	st[ 1] = rol64(st[ 6] ^ t[1], 44);
--	st[ 6] = rol64(st[ 9] ^ t[4], 20);
--	st[ 9] = rol64(st[22] ^ t[2], 61);
--	st[22] = rol64(st[14] ^ t[4], 39);
--	st[14] = rol64(st[20] ^ t[0], 18);
--	st[20] = rol64(st[ 2] ^ t[2], 62);
--	st[ 2] = rol64(st[12] ^ t[2], 43);
--	st[12] = rol64(st[13] ^ t[3], 25);
--	st[13] = rol64(st[19] ^ t[4],  8);
--	st[19] = rol64(st[23] ^ t[3], 56);
--	st[23] = rol64(st[15] ^ t[0], 41);
--	st[15] = rol64(st[ 4] ^ t[4], 27);
--	st[ 4] = rol64(st[24] ^ t[4], 14);
--	st[24] = rol64(st[21] ^ t[1],  2);
--	st[21] = rol64(st[ 8] ^ t[3], 55);
--	st[ 8] = rol64(st[16] ^ t[1], 45);
--	st[16] = rol64(st[ 5] ^ t[0], 36);
--	st[ 5] = rol64(st[ 3] ^ t[3], 28);
--	st[ 3] = rol64(st[18] ^ t[3], 21);
--	st[18] = rol64(st[17] ^ t[2], 15);
--	st[17] = rol64(st[11] ^ t[1], 10);
--	st[11] = rol64(st[ 7] ^ t[2],  6);
--	st[ 7] = rol64(st[10] ^ t[0],  3);
--	st[10] = rol64(    tt ^ t[1],  1);
--
--	/* Chi */
--	bc[ 0] = ~st[ 1] & st[ 2];
--	bc[ 1] = ~st[ 2] & st[ 3];
--	bc[ 2] = ~st[ 3] & st[ 4];
--	bc[ 3] = ~st[ 4] & st[ 0];
--	bc[ 4] = ~st[ 0] & st[ 1];
--	st[ 0] ^= bc[ 0];
--	st[ 1] ^= bc[ 1];
--	st[ 2] ^= bc[ 2];
--	st[ 3] ^= bc[ 3];
--	st[ 4] ^= bc[ 4];
--
--	bc[ 0] = ~st[ 6] & st[ 7];
--	bc[ 1] = ~st[ 7] & st[ 8];
--	bc[ 2] = ~st[ 8] & st[ 9];
--	bc[ 3] = ~st[ 9] & st[ 5];
--	bc[ 4] = ~st[ 5] & st[ 6];
--	st[ 5] ^= bc[ 0];
--	st[ 6] ^= bc[ 1];
--	st[ 7] ^= bc[ 2];
--	st[ 8] ^= bc[ 3];
--	st[ 9] ^= bc[ 4];
--
--	bc[ 0] = ~st[11] & st[12];
--	bc[ 1] = ~st[12] & st[13];
--	bc[ 2] = ~st[13] & st[14];
--	bc[ 3] = ~st[14] & st[10];
--	bc[ 4] = ~st[10] & st[11];
--	st[10] ^= bc[ 0];
--	st[11] ^= bc[ 1];
--	st[12] ^= bc[ 2];
--	st[13] ^= bc[ 3];
--	st[14] ^= bc[ 4];
--
--	bc[ 0] = ~st[16] & st[17];
--	bc[ 1] = ~st[17] & st[18];
--	bc[ 2] = ~st[18] & st[19];
--	bc[ 3] = ~st[19] & st[15];
--	bc[ 4] = ~st[15] & st[16];
--	st[15] ^= bc[ 0];
--	st[16] ^= bc[ 1];
--	st[17] ^= bc[ 2];
--	st[18] ^= bc[ 3];
--	st[19] ^= bc[ 4];
--
--	bc[ 0] = ~st[21] & st[22];
--	bc[ 1] = ~st[22] & st[23];
--	bc[ 2] = ~st[23] & st[24];
--	bc[ 3] = ~st[24] & st[20];
--	bc[ 4] = ~st[20] & st[21];
--	st[20] ^= bc[ 0];
--	st[21] ^= bc[ 1];
--	st[22] ^= bc[ 2];
--	st[23] ^= bc[ 3];
--	st[24] ^= bc[ 4];
--}
--
--static void keccakf(u64 st[25])
-+static struct sha3_ctx *crypto_sha3_desc(struct shash_desc *desc)
- {
--	int round;
--
--	for (round = 0; round < KECCAK_ROUNDS; round++) {
--		keccakf_round(st);
--		/* Iota */
--		st[0] ^= keccakf_rndc[round];
--	}
-+	return shash_desc_ctx(desc);
- }
- 
- int crypto_sha3_init(struct shash_desc *desc)
- {
--	struct sha3_state *sctx = shash_desc_ctx(desc);
-+	struct sha3_ctx *ctx = crypto_sha3_desc(desc);
- 
--	memset(sctx->st, 0, sizeof(sctx->st));
-+	memset(ctx, 0, sizeof(*ctx));
-+	ctx->block_size = crypto_shash_blocksize(desc->tfm);
-+	ctx->padding = 0x06;
- 	return 0;
+@@ -30,6 +30,16 @@ int crypto_sha3_init(struct shash_desc *desc)
  }
  EXPORT_SYMBOL(crypto_sha3_init);
-@@ -170,51 +33,21 @@ EXPORT_SYMBOL(crypto_sha3_init);
+ 
++static int crypto_shake_init(struct shash_desc *desc)
++{
++	struct sha3_ctx *ctx = crypto_sha3_desc(desc);
++
++	memset(ctx, 0, sizeof(*ctx));
++	ctx->block_size = crypto_shash_blocksize(desc->tfm);
++	ctx->padding = 0x1f;
++	return 0;
++}
++
  static int crypto_sha3_update(struct shash_desc *desc, const u8 *data,
  			      unsigned int len)
  {
--	unsigned int rsiz = crypto_shash_blocksize(desc->tfm);
--	struct sha3_state *sctx = shash_desc_ctx(desc);
--	unsigned int rsizw = rsiz / 8;
--
--	do {
--		int i;
-+	struct sha3_ctx *ctx = crypto_sha3_desc(desc);
- 
--		for (i = 0; i < rsizw; i++)
--			sctx->st[i] ^= get_unaligned_le64(data + 8 * i);
--		keccakf(sctx->st);
--
--		data += rsiz;
--		len -= rsiz;
--	} while (len >= rsiz);
-+	sha3_update(ctx, data, len);
- 	return len;
- }
- 
- static int crypto_sha3_finup(struct shash_desc *desc, const u8 *src,
- 			     unsigned int len, u8 *out)
- {
--	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
--	unsigned int rsiz = crypto_shash_blocksize(desc->tfm);
--	struct sha3_state *sctx = shash_desc_ctx(desc);
--	__le64 block[SHA3_224_BLOCK_SIZE / 8] = {};
--	__le64 *digest = (__le64 *)out;
--	unsigned int rsizw = rsiz / 8;
--	u8 *p;
--	int i;
--
--	p = memcpy(block, src, len);
--	p[len++] = 0x06;
--	p[rsiz - 1] |= 0x80;
--
--	for (i = 0; i < rsizw; i++)
--		sctx->st[i] ^= le64_to_cpu(block[i]);
--	memzero_explicit(block, sizeof(block));
--
--	keccakf(sctx->st);
--
--	for (i = 0; i < digest_size / 8; i++)
--		put_unaligned_le64(sctx->st[i], digest++);
--
--	if (digest_size & 4)
--		put_unaligned_le32(sctx->st[i], (__le32 *)digest);
-+	struct sha3_ctx *ctx = crypto_sha3_desc(desc);
- 
-+	if (len && src)
-+		sha3_update(ctx, src, len);
-+	sha3_squeeze(ctx, out, crypto_shash_digestsize(desc->tfm));
-+	sha3_clear(ctx);
- 	return 0;
- }
- 
-@@ -223,7 +56,7 @@ static struct shash_alg algs[] = { {
- 	.init			= crypto_sha3_init,
+@@ -97,7 +107,7 @@ static struct shash_alg algs[] = { {
+ 	.base.cra_module	= THIS_MODULE,
+ }, {
+ 	.digestsize		= SHAKE128_DEFAULT_SIZE,
+-	.init			= crypto_sha3_init,
++	.init			= crypto_shake_init,
  	.update			= crypto_sha3_update,
  	.finup			= crypto_sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
-+	.descsize		= sizeof(struct sha3_ctx),
- 	.base.cra_name		= "sha3-224",
- 	.base.cra_driver_name	= "sha3-224-generic",
- 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
-@@ -234,7 +67,7 @@ static struct shash_alg algs[] = { {
- 	.init			= crypto_sha3_init,
+ 	.descsize		= sizeof(struct sha3_ctx),
+@@ -108,7 +118,7 @@ static struct shash_alg algs[] = { {
+ 	.base.cra_module	= THIS_MODULE,
+ }, {
+ 	.digestsize		= SHAKE256_DEFAULT_SIZE,
+-	.init			= crypto_sha3_init,
++	.init			= crypto_shake_init,
  	.update			= crypto_sha3_update,
  	.finup			= crypto_sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
-+	.descsize		= sizeof(struct sha3_ctx),
- 	.base.cra_name		= "sha3-256",
- 	.base.cra_driver_name	= "sha3-256-generic",
- 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
-@@ -245,7 +78,7 @@ static struct shash_alg algs[] = { {
- 	.init			= crypto_sha3_init,
- 	.update			= crypto_sha3_update,
- 	.finup			= crypto_sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
-+	.descsize		= sizeof(struct sha3_ctx),
- 	.base.cra_name		= "sha3-384",
- 	.base.cra_driver_name	= "sha3-384-generic",
- 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
-@@ -256,7 +89,7 @@ static struct shash_alg algs[] = { {
- 	.init			= crypto_sha3_init,
- 	.update			= crypto_sha3_update,
- 	.finup			= crypto_sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
-+	.descsize		= sizeof(struct sha3_ctx),
- 	.base.cra_name		= "sha3-512",
- 	.base.cra_driver_name	= "sha3-512-generic",
- 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
-diff --git a/include/crypto/sha3.h b/include/crypto/sha3.h
-index 41bc211afa0b..183261995fa1 100644
---- a/include/crypto/sha3.h
-+++ b/include/crypto/sha3.h
-@@ -38,10 +38,6 @@
+ 	.descsize		= sizeof(struct sha3_ctx),
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 9dca41e7ee73..988bda74371e 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -5511,6 +5511,20 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.hash = __VECS(sha512_tv_template)
+ 		}
++	}, {
++		.alg = "shake128",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = __VECS(shake128_tv_template)
++		}
++	}, {
++		.alg = "shake256",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = __VECS(shake256_tv_template)
++		}
+ 	}, {
+ 		.alg = "sm3",
+ 		.test = alg_test_hash,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 268231227282..c0eca7f72aa0 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -4690,6 +4690,65 @@ static const struct hash_testvec sha3_512_tv_template[] = {
+ };
  
- struct shash_desc;
  
--struct sha3_state {
--	u64		st[SHA3_STATE_SIZE / 8];
--};
--
++/* From: https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines/example-values */
++static const struct hash_testvec shake128_tv_template[] = {
++	{
++		.plaintext = "",
++		.psize	= 0,
++		.digest	=
++		"\x7f\x9c\x2b\xa4\xe8\x8f\x82\x7d\x61\x60\x45\x50\x76\x05\x85\x3e",
++	}, {
++		.plaintext =
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3",
++		.psize	= 200,
++		.digest	=
++		"\x13\x1a\xb8\xd2\xb5\x94\x94\x6b\x9c\x81\x33\x3f\x9b\xb6\xe0\xce",
++	}
++};
++
++/* From: https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines/example-values */
++static const struct hash_testvec shake256_tv_template[] = {
++	{
++		.plaintext = "",
++		.psize	= 0,
++		.digest	=
++		"\x46\xb9\xdd\x2b\x0b\xa8\x8d\x13\x23\x3b\x3f\xeb\x74\x3e\xeb\x24"
++		"\x3f\xcd\x52\xea\x62\xb8\x1b\x82\xb5\x0c\x27\x64\x6e\xd5\x76\x2f"
++	}, {
++		.plaintext =
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3"
++		"\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3",
++		.psize	= 200,
++		.digest	=
++		"\xcd\x8a\x92\x0e\xd1\x41\xaa\x04\x07\xa2\x2d\x59\x28\x86\x52\xe9"
++		"\xd9\xf1\xa7\xee\x0c\x1e\x7c\x1c\xa6\x99\x42\x4d\xa8\x4a\x90\x4d",
++	}
++};
++
++
  /*
-  * The SHA3 context structure and state buffer.
-  *
-@@ -52,7 +48,7 @@ struct sha3_state {
-  * byteswap step is a no-op.
+  * MD5 test vectors from RFC1321
   */
- struct sha3_ctx {
--	struct sha3_state	state;
-+	u64			st[SHA3_STATE_SIZE / 8];
- 	u8			block_size;	/* Block size in bytes */
- 	u8			padding;	/* Padding byte */
- 	u8			absorb_offset;	/* Next state byte to absorb into */
-diff --git a/lib/crypto/sha3.c b/lib/crypto/sha3.c
-index 227d45bd9680..398669c4d7ca 100644
---- a/lib/crypto/sha3.c
-+++ b/lib/crypto/sha3.c
-@@ -48,10 +48,10 @@ static const u64 sha3_keccakf_rndc[24] = {
- /*
-  * Perform a single round of Keccak mixing.
-  */
--static SHA3_INLINE void sha3_keccakf_one_round_generic(struct sha3_state *state,
-+static SHA3_INLINE void sha3_keccakf_one_round_generic(struct sha3_ctx *ctx,
- 						       int round)
- {
--	u64 *st = state->st;
-+	u64 *st = ctx->st;
- 	u64 t[5], tt, bc[5];
- 
- 	/* Theta */
-@@ -153,13 +153,13 @@ static SHA3_INLINE void sha3_keccakf_one_round_generic(struct sha3_state *state,
- 	st[24] ^= bc[ 4];
- 
- 	/* Iota */
--	state->st[0] ^= sha3_keccakf_rndc[round];
-+	ctx->st[0] ^= sha3_keccakf_rndc[round];
- }
- 
--static void sha3_keccakf_rounds_generic(struct sha3_state *state)
-+static void sha3_keccakf_rounds_generic(struct sha3_ctx *ctx)
- {
- 	for (int round = 0; round < SHA3_KECCAK_ROUNDS; round++)
--		sha3_keccakf_one_round_generic(state, round);
-+		sha3_keccakf_one_round_generic(ctx, round);
- }
- 
- /*
-@@ -167,25 +167,24 @@ static void sha3_keccakf_rounds_generic(struct sha3_state *state)
-  * machine for the duration of the Keccak mixing function.  Note that these
-  * loops are no-ops on LE machines and will be optimised away.
-  */
--static void sha3_keccakf_generic(struct sha3_state *state)
-+static void sha3_keccakf_generic(struct sha3_ctx *ctx)
- {
--	for (int  i = 0; i < ARRAY_SIZE(state->st); i++)
--		cpu_to_le64s(&state->st[i]);
-+	for (int  i = 0; i < ARRAY_SIZE(ctx->st); i++)
-+		cpu_to_le64s(&ctx->st[i]);
- 
--	sha3_keccakf_rounds_generic(state);
-+	sha3_keccakf_rounds_generic(ctx);
- 
--	for (int  i = 0; i < ARRAY_SIZE(state->st); i++)
--		le64_to_cpus(&state->st[i]);
-+	for (int  i = 0; i < ARRAY_SIZE(ctx->st); i++)
-+		le64_to_cpus(&ctx->st[i]);
- }
- 
- static void sha3_absorb_block_generic(struct sha3_ctx *ctx, const u8 *data)
- {
--	struct sha3_state *state = &ctx->state;
- 	unsigned int bsize = ctx->block_size;
- 
- 	for (int i = 0; i < bsize / 8; i++)
--		state->st[i] ^= get_unaligned((u64 *)(data + 8 * i));
--	sha3_keccakf_generic(state);
-+		ctx->st[i] ^= get_unaligned((u64 *)(data + 8 * i));
-+	sha3_keccakf_generic(ctx);
- }
- 
- /*
-@@ -214,7 +213,7 @@ static void sha3_absorb_blocks_generic(struct sha3_ctx *ctx,
- static void sha3_absorb_xorle(struct sha3_ctx *ctx, const u8 *data,
- 			      unsigned int partial, unsigned int len)
- {
--	u8 *buf = (u8 *)ctx->state.st;
-+	u8 *buf = (u8 *)ctx->st;
- 
- 	buf += partial;
- 	for (int i = 0; i < len; i++)
-@@ -245,7 +244,7 @@ void sha3_update(struct sha3_ctx *ctx, const u8 *data, unsigned int len)
- 		sha3_absorb_xorle(ctx, data, absorb_offset, bsize - absorb_offset);
- 		len  -= bsize - absorb_offset;
- 		data += bsize - absorb_offset;
--		sha3_keccakf(&ctx->state);
-+		sha3_keccakf(ctx);
- 		ctx->absorb_offset = 0;
- 	}
- 
-@@ -286,7 +285,7 @@ void sha3_squeeze(struct sha3_ctx *ctx, u8 *out, size_t out_size)
- {
- 	unsigned int squeeze_offset = ctx->squeeze_offset;
- 	unsigned int bsize = ctx->block_size;
--	u8 *p = (u8 *)ctx->state.st, end_marker = 0x80;
-+	u8 *p = (u8 *)ctx->st, end_marker = 0x80;
- 
- 	if (!ctx->end_marked) {
- 		sha3_absorb_xorle(ctx, &ctx->padding, ctx->absorb_offset, 1);
-@@ -296,7 +295,7 @@ void sha3_squeeze(struct sha3_ctx *ctx, u8 *out, size_t out_size)
- 
- 	for (;;) {
- 		if (squeeze_offset == 0)
--			sha3_keccakf(&ctx->state);
-+			sha3_keccakf(ctx);
- 
- 		unsigned int part = umin(out_size, bsize - squeeze_offset);
- 
 
