@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E99283CA7;
-	Fri, 26 Sep 2025 03:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D0428466A;
+	Fri, 26 Sep 2025 03:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758857724; cv=none; b=S2jkyxBF6qFzNeOhEpgbPGOh46jBqST7GGmKu3xFCkKrbtUaGv4/Q2rAu9B/QEyzBJcXhBcqMKn4f3NYeBhKEwXsbWdNVGy3YmPkYi3POh7pm7833fBIgavnBcMMiuFCU4ofBwMWqOQmYHx9o5PYdr0CkzB91k34x5z5ie2j5DU=
+	t=1758857725; cv=none; b=OUSFmhsHw55C1WHcTKRRRVUjdWvKlp4Dtyn4OVZQmIIhtlvmTjc/ZfKQonHbJ326TRgACvcQZxziaOJ0de7mq6jnVtiKBX4+LAmTHlCIMSoPonfChV3x7I/23wmzslLiJXdtUeSWIrHoomWXo/Kb3JjCOwvVC5zpWxCifiIOozo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758857724; c=relaxed/simple;
-	bh=2jjGz92VWP6NF7MEg84WWTreqEFFwrPZBW5/7GBPLbg=;
+	s=arc-20240116; t=1758857725; c=relaxed/simple;
+	bh=01Lb8LwYMfR+RTbgHusuGCF48WnuBxBCxoCOmtG+hkw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GfL5c+co4X7HFlcRUo2fcROWsOgOHwyR8Ovwdxh4/NfOC5Syo8AlOnGlpXQ1Oo7Bb2m/k352b4CKcdS5bpDFHpJ33FfpExnJkx9NK/NTyWWBYQ4nOpHStm3D1Oo+mcS0sI9G/3++V6JY3h9kCvAy60FSoDKpbYLaV0QAP03S6HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Km525Uo1; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version; b=L11OQnVI9xYs7DDHoS4ql1jctNDxk/Irtcec0Yrv8+LoJzCle3lFjTlSmF+hBHZrKshVEyABVngsXIS0s99Ytir+qLs+U3YfXoooev55gfQlQwEEgszJvqb2L5md/x6sfJ+MyGJUdrg+qKbJYqlKcDiuH8vCq4cNE3PQvThqpKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kAUZBk6X; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Km525Uo1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kAUZBk6X"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758857722; x=1790393722;
+  t=1758857723; x=1790393723;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2jjGz92VWP6NF7MEg84WWTreqEFFwrPZBW5/7GBPLbg=;
-  b=Km525Uo1wuvWAmRR5u2E6qW4b7YgrOlAqUiF1dnHWs4K2eeCP8SjN78r
-   5W8G3rBDnznj957NkeX9wWlDDf00+unwqIJYLZas46A846iKzEbU/iqWj
-   EZwDPPZvdQ52YDuOu1ZoKXswhqIfN7eFdwYMXIM0QmwtBwFIL5Llt3epH
-   x7xf2+0txlPQo+pdc6zGvRMghSyWGqM73ieVmKZH/HIjmjQ2BRFzfKkeq
-   UhytasyZI+jqaHWCK1SqQ2O32QJ0adzY8FNjITeTURqjt42Eq7SvDxIvb
-   zg1QYus8XfYGqnAvOxGRHUOmu6mGE52RVdTBJ4lYtB3A6NOgahCFggyCj
-   g==;
-X-CSE-ConnectionGUID: LY41BFcUQd6bN7Fr8J54OQ==
-X-CSE-MsgGUID: fp6NZCVASlWX4y980PAc2w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11564"; a="63819658"
+  bh=01Lb8LwYMfR+RTbgHusuGCF48WnuBxBCxoCOmtG+hkw=;
+  b=kAUZBk6XY7WUgJD1FjGxGOQALDxZqyCUagShlBf/LL5w033NOF4EZ6Fk
+   5k9MAETZrQ2m+I772WfFb+0dC7rAW6dqCfazV+l9iHp2t5IFmsBnghc0h
+   VFySYA1R2h/r2QpWWqa40/z7U2vmMNEyGAvLI5YutTKdmj0H3nmUMumvp
+   peYNBokamMTyGzdllA94S5H+B1aBLzgpvtxfcFbHI5srkTkKhlOdDvY34
+   ubmHKnSGMuAaiNj/nSxkPF0L2Naawdtr9iyABBRpV7ymJxov6AaJHPAZE
+   h96h1aEx5MbThs5Ip2kAavSMgeDhIY+LalVDiETHUO5QOwhJJJOPk5NSs
+   A==;
+X-CSE-ConnectionGUID: pIuYXRXjTuOZopv0NZSPIw==
+X-CSE-MsgGUID: RJhXN9eKSSKj7khNyqwFiA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11564"; a="63819672"
 X-IronPort-AV: E=Sophos;i="6.18,294,1751266800"; 
-   d="scan'208";a="63819658"
+   d="scan'208";a="63819672"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
   by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 20:35:07 -0700
-X-CSE-ConnectionGUID: c0bOvcQGQX+dEcSCyb0UBw==
-X-CSE-MsgGUID: eyUfyWhnTnOLmHZ5RSOtoA==
+X-CSE-ConnectionGUID: RCx4hUprT/ulKFB3pSElZw==
+X-CSE-MsgGUID: 5/k0k+9YSQmn9BNskB7LKA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,294,1751266800"; 
-   d="scan'208";a="214636609"
+   d="scan'208";a="214636612"
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
   by orviesa001.jf.intel.com with ESMTP; 25 Sep 2025 20:35:06 -0700
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
@@ -70,9 +70,9 @@ To: linux-kernel@vger.kernel.org,
 Cc: wajdi.k.feghali@intel.com,
 	vinodh.gopal@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v12 19/23] crypto: acomp - Add crypto_acomp_batch_size() to get an algorithm's batch-size.
-Date: Thu, 25 Sep 2025 20:34:58 -0700
-Message-Id: <20250926033502.7486-20-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v12 20/23] mm: zswap: Per-CPU acomp_ctx resources exist from pool creation to deletion.
+Date: Thu, 25 Sep 2025 20:34:59 -0700
+Message-Id: <20250926033502.7486-21-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20250926033502.7486-1-kanchana.p.sridhar@intel.com>
 References: <20250926033502.7486-1-kanchana.p.sridhar@intel.com>
@@ -84,157 +84,460 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This commit adds a @batch_size data member to:
+This patch simplifies the zswap_pool's per-CPU acomp_ctx resource
+management. Similar to the per-CPU acomp_ctx itself, the per-CPU
+acomp_ctx's resources' (acomp, req, buffer) lifetime will also be from
+pool creation to pool deletion. These resources will persist through CPU
+hotplug operations. The zswap_cpu_comp_dead() teardown callback has been
+deleted from the call to
+cpuhp_setup_state_multi(CPUHP_MM_ZSWP_POOL_PREPARE). As a result, CPU
+offline hotplug operations will be no-ops as far as the acomp_ctx
+resources are concerned.
 
-  struct acomp_alg
-  struct crypto_acomp
+This commit refactors the code from zswap_cpu_comp_dead() into a
+new function acomp_ctx_dealloc() that preserves the IS_ERR_OR_NULL()
+checks on acomp_ctx, req and acomp from the existing mainline
+implementation of zswap_cpu_comp_dead(). acomp_ctx_dealloc() is called
+to clean up acomp_ctx resources from all these procedures:
 
-A crypto_acomp compression algorithm that supports batching of
-compressions and decompressions must provide a @batch_size greater than
-one, representing the maximum batch-size that the compressor supports,
-so that kernel users of crypto_acomp, such as zswap, can allocate
-resources for submitting multiple compress/decompress jobs that can be
-batched, and invoke batching of [de]compressions.
+1) zswap_cpu_comp_prepare() when an error is encountered,
+2) zswap_pool_create() when an error is encountered, and
+3) from zswap_pool_destroy().
 
-A new helper function acomp_has_async_batching() can be invoked to query
-if a crypto_acomp has defined a @batch_size.
+The main benefit of using the CPU hotplug multi state instance startup
+callback to allocate the acomp_ctx resources is that it prevents the
+cores from being offlined until the multi state instance addition call
+returns.
 
-The new crypto_acomp_batch_size() API uses this helper function to return
-the batch-size for compressors that have registered a @batch_size. If the
-algorithm does not define a @batch_size, a default of "1" is returned.
+  From Documentation/core-api/cpu_hotplug.rst:
 
-zswap can invoke crypto_acomp_batch_size() to query the maximum number
-of requests that can be batch [de]compressed. Based on this, zswap
-can use the minimum of any zswap-specific upper limits for batch-size
-and the compressor's max @batch_size, to allocate batching resources.
+    "The node list add/remove operations and the callback invocations are
+     serialized against CPU hotplug operations."
 
-The IAA acomp_algs Fixed ("deflate-iaa") and Dynamic
-("deflate-iaa-dynamic") register @batch_size as
-IAA_CRYPTO_MAX_BATCH_SIZE.
+Furthermore, zswap_[de]compress() cannot contend with
+zswap_cpu_comp_prepare() because:
 
-This enables zswap to compress/decompress pages in parallel in the IAA
-hardware accelerator to improve swapout/swapin performance and memory
-savings.
+  - During pool creation/deletion, the pool is not in the zswap_pools
+    list.
+
+  - During CPU hot[un]plug, the CPU is not yet online, as Yosry pointed
+    out. zswap_cpu_comp_prepare() will be executed on a control CPU,
+    since CPUHP_MM_ZSWP_POOL_PREPARE is in the PREPARE section of "enum
+    cpuhp_state". Thanks Yosry for sharing this observation!
+
+  In both these cases, any recursions into zswap reclaim from
+  zswap_cpu_comp_prepare() will be handled by the old pool.
+
+The above two observations enable the following simplifications:
+
+ 1) zswap_cpu_comp_prepare(): CPU cannot be offlined. Reclaim cannot use
+    the pool. Considerations for mutex init/locking and handling
+    subsequent CPU hotplug online-offlines:
+
+    Should we lock the mutex of current CPU's acomp_ctx from start to
+    end? It doesn't seem like this is required. The CPU hotplug
+    operations acquire a "cpuhp_state_mutex" before proceeding, hence
+    they are serialized against CPU hotplug operations.
+
+    If the process gets migrated while zswap_cpu_comp_prepare() is
+    running, it will complete on the new CPU. In case of failures, we
+    pass the acomp_ctx pointer obtained at the start of
+    zswap_cpu_comp_prepare() to acomp_ctx_dealloc(), which again, can
+    only undergo migration. There appear to be no contention scenarios
+    that might cause inconsistent values of acomp_ctx's members. Hence,
+    it seems there is no need for mutex_lock(&acomp_ctx->mutex) in
+    zswap_cpu_comp_prepare().
+
+    Since the pool is not yet on zswap_pools list, we don't need to
+    initialize the per-CPU acomp_ctx mutex in zswap_pool_create(). This
+    has been restored to occur in zswap_cpu_comp_prepare().
+
+    zswap_cpu_comp_prepare() checks upfront if acomp_ctx->acomp is
+    valid. If so, it returns success. This should handle any CPU
+    hotplug online-offline transitions after pool creation is done.
+
+ 2) CPU offline vis-a-vis zswap ops: Let's suppose the process is
+    migrated to another CPU before the current CPU is dysfunctional. If
+    zswap_[de]compress() holds the acomp_ctx->mutex lock of the offlined
+    CPU, that mutex will be released once it completes on the new
+    CPU. Since there is no teardown callback, there is no possibility of
+    UAF.
+
+ 3) Pool creation/deletion and process migration to another CPU:
+
+    - During pool creation/deletion, the pool is not in the zswap_pools
+      list. Hence it cannot contend with zswap ops on that CPU. However,
+      the process can get migrated.
+
+      Pool creation --> zswap_cpu_comp_prepare()
+                                --> process migrated:
+                                    * CPU offline: no-op.
+                                    * zswap_cpu_comp_prepare() continues
+                                      to run on the new CPU to finish
+                                      allocating acomp_ctx resources for
+                                      the offlined CPU.
+
+      Pool deletion --> acomp_ctx_dealloc()
+                                --> process migrated:
+                                    * CPU offline: no-op.
+                                    * acomp_ctx_dealloc() continues
+                                      to run on the new CPU to finish
+                                      de-allocating acomp_ctx resources
+                                      for the offlined CPU.
+
+ 4) Pool deletion vis-a-vis CPU onlining:
+    To prevent possibility of race conditions between
+    acomp_ctx_dealloc() freeing the acomp_ctx resources and the initial
+    check for a valid acomp_ctx->acomp in zswap_cpu_comp_prepare(), we
+    need to delete the multi state instance right after it is added, in
+    zswap_pool_create().
+
+ Summary of changes based on the above:
+ --------------------------------------
+ 1) Zero-initialization of pool->acomp_ctx in zswap_pool_create() to
+    simplify and share common code for different error handling/cleanup
+    related to the acomp_ctx.
+
+ 2) Remove the node list instance right after node list add function
+    call in zswap_pool_create(). This prevents race conditions between
+    CPU onlining after initial pool creation, and acomp_ctx_dealloc()
+    freeing the acomp_ctx resources.
+
+ 3) zswap_pool_destroy() will call acomp_ctx_dealloc() to de-allocate
+    the per-CPU acomp_ctx resources.
+
+ 4) Changes to zswap_cpu_comp_prepare():
+
+    a) Check if acomp_ctx->acomp is valid at the beginning and return,
+       because the acomp_ctx is already initialized.
+    b) Move the mutex_init to happen in this procedure, before it
+       returns.
+    c) All error conditions handled by calling acomp_ctx_dealloc().
+
+ 5) New procedure acomp_ctx_dealloc() for common error/cleanup code.
+
+ 6) No more multi state instance teardown callback. CPU offlining is a
+    no-op as far as acomp_ctx resources are concerned.
+
+ 7) Delete acomp_ctx_get_cpu_lock()/acomp_ctx_put_unlock(). Directly
+    call mutex_lock(&acomp_ctx->mutex)/mutex_unlock(&acomp_ctx->mutex)
+    in zswap_[de]compress().
+
+The per-CPU memory cost of not deleting the acomp_ctx resources upon CPU
+offlining, and only deleting them when the pool is destroyed, is as
+follows, on x86_64:
+
+    IAA with 8 dst buffers for batching:    64.34 KB
+    Software compressors with 1 dst buffer:  8.28 KB
 
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 ---
- crypto/acompress.c                         |  1 +
- drivers/crypto/intel/iaa/iaa_crypto_main.c |  2 ++
- include/crypto/acompress.h                 | 27 ++++++++++++++++++++++
- include/crypto/internal/acompress.h        |  3 +++
- 4 files changed, 33 insertions(+)
+ mm/zswap.c | 194 +++++++++++++++++++++++++----------------------------
+ 1 file changed, 93 insertions(+), 101 deletions(-)
 
-diff --git a/crypto/acompress.c b/crypto/acompress.c
-index be28cbfd22e3..a1bdfa21e688 100644
---- a/crypto/acompress.c
-+++ b/crypto/acompress.c
-@@ -105,6 +105,7 @@ static int crypto_acomp_init_tfm(struct crypto_tfm *tfm)
+diff --git a/mm/zswap.c b/mm/zswap.c
+index c1af782e54ec..27665eaa3f89 100644
+--- a/mm/zswap.c
++++ b/mm/zswap.c
+@@ -242,6 +242,30 @@ static inline struct xarray *swap_zswap_tree(swp_entry_t swp)
+ **********************************/
+ static void __zswap_pool_empty(struct percpu_ref *ref);
  
- 	acomp->compress = alg->compress;
- 	acomp->decompress = alg->decompress;
-+	acomp->batch_size = alg->batch_size;
- 	acomp->reqsize = alg->base.cra_reqsize;
++/*
++ * The per-cpu pool->acomp_ctx is zero-initialized on allocation. This makes
++ * it easy for different error conditions/cleanup related to the acomp_ctx
++ * to be handled by acomp_ctx_dealloc():
++ * - Errors during zswap_cpu_comp_prepare().
++ * - Partial success/error of cpuhp_state_add_instance() call in
++ *   zswap_pool_create(). Only some cores could have executed
++ *   zswap_cpu_comp_prepare(), not others.
++ * - Cleanup acomp_ctx resources on all cores in zswap_pool_destroy().
++ */
++static void acomp_ctx_dealloc(struct crypto_acomp_ctx *acomp_ctx)
++{
++	if (IS_ERR_OR_NULL(acomp_ctx))
++		return;
++
++	if (!IS_ERR_OR_NULL(acomp_ctx->req))
++		acomp_request_free(acomp_ctx->req);
++
++	if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
++		crypto_free_acomp(acomp_ctx->acomp);
++
++	kfree(acomp_ctx->buffer);
++}
++
+ static struct zswap_pool *zswap_pool_create(char *compressor)
+ {
+ 	struct zswap_pool *pool;
+@@ -263,19 +287,43 @@ static struct zswap_pool *zswap_pool_create(char *compressor)
  
- 	acomp->base.exit = crypto_acomp_exit_tfm;
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index cbe3a2457253..2fa38176034d 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -2777,6 +2777,7 @@ static struct acomp_alg iaa_acomp_fixed_deflate = {
- 	.init			= iaa_comp_init_fixed,
- 	.compress		= iaa_comp_acompress_main,
- 	.decompress		= iaa_comp_adecompress_main,
-+	.batch_size		= IAA_CRYPTO_MAX_BATCH_SIZE,
- 	.base			= {
- 		.cra_name		= "deflate",
- 		.cra_driver_name	= "deflate-iaa",
-@@ -2802,6 +2803,7 @@ static struct acomp_alg iaa_acomp_dynamic_deflate = {
- 	.init			= iaa_comp_init_dynamic,
- 	.compress		= iaa_comp_acompress_main,
- 	.decompress		= iaa_comp_adecompress_main,
-+	.batch_size		= IAA_CRYPTO_MAX_BATCH_SIZE,
- 	.base			= {
- 		.cra_name		= "deflate",
- 		.cra_driver_name	= "deflate-iaa-dynamic",
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-index 0f1334168f1b..e94046529e46 100644
---- a/include/crypto/acompress.h
-+++ b/include/crypto/acompress.h
-@@ -108,6 +108,8 @@ struct acomp_req {
-  *
-  * @compress:		Function performs a compress operation
-  * @decompress:		Function performs a de-compress operation
-+ * @batch_size:		Maximum batch-size for batching compress/decompress
-+ *			operations.
-  * @reqsize:		Context size for (de)compression requests
-  * @fb:			Synchronous fallback tfm
-  * @base:		Common crypto API algorithm data structure
-@@ -115,6 +117,7 @@ struct acomp_req {
- struct crypto_acomp {
- 	int (*compress)(struct acomp_req *req);
- 	int (*decompress)(struct acomp_req *req);
-+	unsigned int batch_size;
- 	unsigned int reqsize;
- 	struct crypto_tfm base;
- };
-@@ -205,6 +208,13 @@ static inline bool acomp_is_async(struct crypto_acomp *tfm)
- 	       CRYPTO_ALG_ASYNC;
+ 	strscpy(pool->tfm_name, compressor, sizeof(pool->tfm_name));
+ 
+-	pool->acomp_ctx = alloc_percpu(*pool->acomp_ctx);
++	/* Many things rely on the zero-initialization. */
++	pool->acomp_ctx = alloc_percpu_gfp(*pool->acomp_ctx,
++					   GFP_KERNEL | __GFP_ZERO);
+ 	if (!pool->acomp_ctx) {
+ 		pr_err("percpu alloc failed\n");
+ 		goto error;
+ 	}
+ 
+-	for_each_possible_cpu(cpu)
+-		mutex_init(&per_cpu_ptr(pool->acomp_ctx, cpu)->mutex);
+-
++	/*
++	 * This is serialized against CPU hotplug operations. Hence, cores
++	 * cannot be offlined until this finishes.
++	 * In case of errors, we need to goto "ref_fail" instead of "error"
++	 * because there is no teardown callback registered anymore, for
++	 * cpuhp_state_add_instance() to de-allocate resources as it rolls back
++	 * state on cores before the CPU on which error was encountered.
++	 */
+ 	ret = cpuhp_state_add_instance(CPUHP_MM_ZSWP_POOL_PREPARE,
+ 				       &pool->node);
++
++	/*
++	 * We only needed the multi state instance add operation to invoke the
++	 * startup callback for all cores without cores getting offlined. Since
++	 * the acomp_ctx resources will now only be de-allocated when the pool
++	 * is destroyed, we can safely remove the multi state instance. This
++	 * minimizes (but does not eliminate) the possibility of
++	 * zswap_cpu_comp_prepare() being invoked again due to a CPU
++	 * offline-online transition. Removing the instance also prevents race
++	 * conditions between CPU onlining after initial pool creation, and
++	 * acomp_ctx_dealloc() freeing the acomp_ctx resources.
++	 * Note that we delete the instance before checking the error status of
++	 * the node list add operation because we want the instance removal even
++	 * in case of errors in the former.
++	 */
++	cpuhp_state_remove_instance(CPUHP_MM_ZSWP_POOL_PREPARE, &pool->node);
++
+ 	if (ret)
+-		goto error;
++		goto ref_fail;
+ 
+ 	/* being the current pool takes 1 ref; this func expects the
+ 	 * caller to always add the new pool as the current pool
+@@ -291,7 +339,8 @@ static struct zswap_pool *zswap_pool_create(char *compressor)
+ 	return pool;
+ 
+ ref_fail:
+-	cpuhp_state_remove_instance(CPUHP_MM_ZSWP_POOL_PREPARE, &pool->node);
++	for_each_possible_cpu(cpu)
++		acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu));
+ error:
+ 	if (pool->acomp_ctx)
+ 		free_percpu(pool->acomp_ctx);
+@@ -322,9 +371,13 @@ static struct zswap_pool *__zswap_pool_create_fallback(void)
+ 
+ static void zswap_pool_destroy(struct zswap_pool *pool)
+ {
++	int cpu;
++
+ 	zswap_pool_debug("destroying", pool);
+ 
+-	cpuhp_state_remove_instance(CPUHP_MM_ZSWP_POOL_PREPARE, &pool->node);
++	for_each_possible_cpu(cpu)
++		acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu));
++
+ 	free_percpu(pool->acomp_ctx);
+ 
+ 	zs_destroy_pool(pool->zs_pool);
+@@ -736,39 +789,39 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+ {
+ 	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
+ 	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
+-	struct crypto_acomp *acomp = NULL;
+-	struct acomp_req *req = NULL;
+-	u8 *buffer = NULL;
+-	int ret;
++	int ret = -ENOMEM;
+ 
+-	buffer = kmalloc_node(PAGE_SIZE, GFP_KERNEL, cpu_to_node(cpu));
+-	if (!buffer) {
+-		ret = -ENOMEM;
+-		goto fail;
+-	}
++	/*
++	 * The per-CPU pool->acomp_ctx is zero-initialized on allocation.
++	 * Even though we delete the multi state instance right after successful
++	 * addition of the instance in zswap_pool_create(), we cannot eliminate
++	 * the possibility of the CPU going through offline-online transitions.
++	 * If this does happen, we check if the acomp_ctx has already been
++	 * initialized, and return.
++	 */
++	if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
++		return 0;
+ 
+-	acomp = crypto_alloc_acomp_node(pool->tfm_name, 0, 0, cpu_to_node(cpu));
+-	if (IS_ERR(acomp)) {
++	acomp_ctx->buffer = kmalloc_node(PAGE_SIZE, GFP_KERNEL, cpu_to_node(cpu));
++	if (!acomp_ctx->buffer)
++		return ret;
++
++	acomp_ctx->acomp = crypto_alloc_acomp_node(pool->tfm_name, 0, 0, cpu_to_node(cpu));
++	if (IS_ERR(acomp_ctx->acomp)) {
+ 		pr_err("could not alloc crypto acomp %s : %ld\n",
+-				pool->tfm_name, PTR_ERR(acomp));
+-		ret = PTR_ERR(acomp);
++				pool->tfm_name, PTR_ERR(acomp_ctx->acomp));
++		ret = PTR_ERR(acomp_ctx->acomp);
+ 		goto fail;
+ 	}
++	acomp_ctx->is_sleepable = acomp_is_async(acomp_ctx->acomp);
+ 
+-	req = acomp_request_alloc(acomp);
+-	if (!req) {
++	acomp_ctx->req = acomp_request_alloc(acomp_ctx->acomp);
++	if (!acomp_ctx->req) {
+ 		pr_err("could not alloc crypto acomp_request %s\n",
+ 		       pool->tfm_name);
+-		ret = -ENOMEM;
+ 		goto fail;
+ 	}
+ 
+-	/*
+-	 * Only hold the mutex after completing allocations, otherwise we may
+-	 * recurse into zswap through reclaim and attempt to hold the mutex
+-	 * again resulting in a deadlock.
+-	 */
+-	mutex_lock(&acomp_ctx->mutex);
+ 	crypto_init_wait(&acomp_ctx->wait);
+ 
+ 	/*
+@@ -776,81 +829,17 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+ 	 * crypto_wait_req(); if the backend of acomp is scomp, the callback
+ 	 * won't be called, crypto_wait_req() will return without blocking.
+ 	 */
+-	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++	acomp_request_set_callback(acomp_ctx->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 				   crypto_req_done, &acomp_ctx->wait);
+ 
+-	acomp_ctx->buffer = buffer;
+-	acomp_ctx->acomp = acomp;
+-	acomp_ctx->is_sleepable = acomp_is_async(acomp);
+-	acomp_ctx->req = req;
+-	mutex_unlock(&acomp_ctx->mutex);
++	mutex_init(&acomp_ctx->mutex);
+ 	return 0;
+ 
+ fail:
+-	if (acomp)
+-		crypto_free_acomp(acomp);
+-	kfree(buffer);
++	acomp_ctx_dealloc(acomp_ctx);
+ 	return ret;
  }
  
-+static inline bool acomp_has_async_batching(struct crypto_acomp *tfm)
-+{
-+	return (acomp_is_async(tfm) &&
-+		(crypto_comp_alg_common(tfm)->base.cra_flags & CRYPTO_ALG_TYPE_ACOMPRESS) &&
-+		(tfm->batch_size > 1));
-+}
-+
- static inline struct crypto_acomp *crypto_acomp_reqtfm(struct acomp_req *req)
+-static int zswap_cpu_comp_dead(unsigned int cpu, struct hlist_node *node)
+-{
+-	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
+-	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
+-	struct acomp_req *req;
+-	struct crypto_acomp *acomp;
+-	u8 *buffer;
+-
+-	if (IS_ERR_OR_NULL(acomp_ctx))
+-		return 0;
+-
+-	mutex_lock(&acomp_ctx->mutex);
+-	req = acomp_ctx->req;
+-	acomp = acomp_ctx->acomp;
+-	buffer = acomp_ctx->buffer;
+-	acomp_ctx->req = NULL;
+-	acomp_ctx->acomp = NULL;
+-	acomp_ctx->buffer = NULL;
+-	mutex_unlock(&acomp_ctx->mutex);
+-
+-	/*
+-	 * Do the actual freeing after releasing the mutex to avoid subtle
+-	 * locking dependencies causing deadlocks.
+-	 */
+-	if (!IS_ERR_OR_NULL(req))
+-		acomp_request_free(req);
+-	if (!IS_ERR_OR_NULL(acomp))
+-		crypto_free_acomp(acomp);
+-	kfree(buffer);
+-
+-	return 0;
+-}
+-
+-static struct crypto_acomp_ctx *acomp_ctx_get_cpu_lock(struct zswap_pool *pool)
+-{
+-	struct crypto_acomp_ctx *acomp_ctx;
+-
+-	for (;;) {
+-		acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
+-		mutex_lock(&acomp_ctx->mutex);
+-		if (likely(acomp_ctx->req))
+-			return acomp_ctx;
+-		/*
+-		 * It is possible that we were migrated to a different CPU after
+-		 * getting the per-CPU ctx but before the mutex was acquired. If
+-		 * the old CPU got offlined, zswap_cpu_comp_dead() could have
+-		 * already freed ctx->req (among other things) and set it to
+-		 * NULL. Just try again on the new CPU that we ended up on.
+-		 */
+-		mutex_unlock(&acomp_ctx->mutex);
+-	}
+-}
+-
+-static void acomp_ctx_put_unlock(struct crypto_acomp_ctx *acomp_ctx)
+-{
+-	mutex_unlock(&acomp_ctx->mutex);
+-}
+-
+ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
+ 			   struct zswap_pool *pool)
  {
- 	return __crypto_acomp_tfm(req->base.tfm);
-@@ -578,6 +588,23 @@ int crypto_acomp_compress(struct acomp_req *req);
-  */
- int crypto_acomp_decompress(struct acomp_req *req);
+@@ -863,7 +852,9 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
+ 	u8 *dst;
+ 	bool mapped = false;
  
-+/**
-+ * crypto_acomp_batch_size() -- Get the algorithm's batch size
-+ *
-+ * Function returns the algorithm's batch size for batching operations
-+ *
-+ * @tfm:	ACOMPRESS tfm handle allocated with crypto_alloc_acomp()
-+ *
-+ * Return:	crypto_acomp's batch size.
-+ */
-+static inline unsigned int crypto_acomp_batch_size(struct crypto_acomp *tfm)
-+{
-+	if (acomp_has_async_batching(tfm))
-+		return tfm->batch_size;
+-	acomp_ctx = acomp_ctx_get_cpu_lock(pool);
++	acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
++	mutex_lock(&acomp_ctx->mutex);
 +
-+	return 1;
-+}
-+
- static inline struct acomp_req *acomp_request_on_stack_init(
- 	char *buf, struct crypto_acomp *tfm)
- {
-diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
-index 2d97440028ff..e451e0ae3b9b 100644
---- a/include/crypto/internal/acompress.h
-+++ b/include/crypto/internal/acompress.h
-@@ -28,6 +28,8 @@
-  *
-  * @compress:	Function performs a compress operation
-  * @decompress:	Function performs a de-compress operation
-+ * @batch_size:	Maximum batch-size for batching compress/decompress
-+ *		operations.
-  * @init:	Initialize the cryptographic transformation object.
-  *		This function is used to initialize the cryptographic
-  *		transformation object. This function is called only once at
-@@ -46,6 +48,7 @@
- struct acomp_alg {
- 	int (*compress)(struct acomp_req *req);
- 	int (*decompress)(struct acomp_req *req);
-+	unsigned int batch_size;
- 	int (*init)(struct crypto_acomp *tfm);
- 	void (*exit)(struct crypto_acomp *tfm);
+ 	dst = acomp_ctx->buffer;
+ 	sg_init_table(&input, 1);
+ 	sg_set_page(&input, page, PAGE_SIZE, 0);
+@@ -927,7 +918,7 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
+ 	else if (alloc_ret)
+ 		zswap_reject_alloc_fail++;
+ 
+-	acomp_ctx_put_unlock(acomp_ctx);
++	mutex_unlock(&acomp_ctx->mutex);
+ 	return comp_ret == 0 && alloc_ret == 0;
+ }
+ 
+@@ -939,7 +930,8 @@ static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
+ 	int decomp_ret = 0, dlen = PAGE_SIZE;
+ 	u8 *src, *obj;
+ 
+-	acomp_ctx = acomp_ctx_get_cpu_lock(pool);
++	acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
++	mutex_lock(&acomp_ctx->mutex);
+ 	obj = zs_obj_read_begin(pool->zs_pool, entry->handle, acomp_ctx->buffer);
+ 
+ 	/* zswap entries of length PAGE_SIZE are not compressed. */
+@@ -970,7 +962,7 @@ static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
+ 
+ read_done:
+ 	zs_obj_read_end(pool->zs_pool, entry->handle, obj);
+-	acomp_ctx_put_unlock(acomp_ctx);
++	mutex_unlock(&acomp_ctx->mutex);
+ 
+ 	if (!decomp_ret && dlen == PAGE_SIZE)
+ 		return true;
+@@ -1796,7 +1788,7 @@ static int zswap_setup(void)
+ 	ret = cpuhp_setup_state_multi(CPUHP_MM_ZSWP_POOL_PREPARE,
+ 				      "mm/zswap_pool:prepare",
+ 				      zswap_cpu_comp_prepare,
+-				      zswap_cpu_comp_dead);
++				      NULL);
+ 	if (ret)
+ 		goto hp_fail;
  
 -- 
 2.27.0
