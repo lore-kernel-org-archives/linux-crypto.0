@@ -1,51 +1,39 @@
-Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741DB2AD25;
-	Sat, 27 Sep 2025 11:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 494C11FA859;
+	Sat, 27 Sep 2025 19:53:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758973731; cv=none; b=VIVeBy8guqLqHHiFEwGhlMRGAfUs28sgd9c9KkcJInZ4/3d69Xuwb5ZNk+gF/DoM/yspYtyarlre+Ns47YFmmz9rrl5xMKYVagEZp/E6X1Ra6PZ7qG167SKYkPvTO3j6bW4ZziUyhSSpPWahhY+9wOLtV/GpEPItCwUToEr+dyc=
+	t=1759002781; cv=none; b=gvulO8o8sNXPBdNDRYflPYxJQzQE7P4+TtKzEcr3Eo9ByPWMHVidI+IUTjetIyTSdJVcmsls0KkQMQOtt8g4z0NxQb/Ey2pCmNydCDZB+DHZlrcOfMlFR9229xNzqg0IfX+SDJ09q65Zxi86Kv0c6hLhS19EuT+ykPvihvWs8DI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758973731; c=relaxed/simple;
-	bh=cjJHS/zkt0CU7rTn0fUKN9KkeAaEWmLa0/FIB9UVcVc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gln31vQljQQBXA3MWKDf7q6tmWzavK7d33ZVX1dD16B9Rronr4f/aqpNj7/WzKvCYLAdq8PyBBV2kZCLldqrXqCcgzX/CdVdePGSSUxyj9LfXEI6itkV208wpeK7ZuMFDrVm/I6enpx3Cv1NrKJ8N5OLLHRe5+SxjpPzI3ZrZGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kael-k.io; spf=pass smtp.mailfrom=kael-k.io; dkim=pass (2048-bit key) header.d=kael-k.io header.i=@kael-k.io header.b=a5Co6tQp; arc=none smtp.client-ip=80.241.56.161
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kael-k.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kael-k.io
+	s=arc-20240116; t=1759002781; c=relaxed/simple;
+	bh=eCos0g0v+ia8yCfPb3Au3oRgY4b9F0p0qfg//K2yklA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=cQ62FP4uErXZa5GWr53EpYzMnr0roxH/c1d6dKztYiq6URYXAN43h+fmbUEfpazMPH4xtslray/R4+a0aaqAuzyPWbOKMFBSe5Xj6g18Rqd5xGlh10GW4PDmVRhukZ86PUoE41N2zc/q0pNdWbSQnkeAq2qJAjeSaOXKJdTP+BY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XcEIghCl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kael-k.io header.i=@kael-k.io header.b="a5Co6tQp"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4cYm1n3Ykrz9shx;
-	Sat, 27 Sep 2025 13:48:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kael-k.io; s=MBO0001;
-	t=1758973725;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nZpHKe82XIjZTyoR1Mn5EXgvHGihkX0jvH66zAs3RPI=;
-	b=a5Co6tQpKCTN2d3PQnUL5T5CLBw2H2MSZqJUFtSpFiM59eMyb0mGQVApnMGjljzpca0CDq
-	MSm+oH37FXU+X0KwOH52EMwROyky5IBZEaUNftw52muTqHgegVEjv6hlc8wgS4fcK1n2Yy
-	cCfLAX51nYdIUPK+EaPpCGDTF2ra11XwChDU2OpH1otrjfrX7EV5K3P+TT4NeKJpcnAH4F
-	DBKeFv5HOs12grUpEp6GehtBtYlR+8CLZ7yvBzt8MsZ8aUj1xSoksZD7/fNPojdqdKFazv
-	Vmn9+Y1yvoYOOZenj05BEoFPu8tRP/x18qcS5znEF3PSSAsib646QlW7nwEZhA==
-Date: Sat, 27 Sep 2025 13:48:22 +0200
-From: Kael D'Alcamo <dev@kael-k.io>
-To: Rob Herring <robh@kernel.org>
-Cc: Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH v2 0/2] dt-bindings: rng: sparc_sun_oracle_rng:
- convert to DT
-Message-ID: <f6jhixs6xfwg4mk2bm4pvexfxgtu52ic5yubzyxxo57wvhyg2n@fjbzpum4zoum>
-References: <uprke6fujhmckymlpy6oskecol4awhqyroqlg25tprmhnkeyy6@ztozdrlmeotp>
- <20250924141247.69323-2-dev@kael-k.io>
- <20250926205301.GA1448549-robh@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XcEIghCl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4874DC4CEE7;
+	Sat, 27 Sep 2025 19:53:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759002780;
+	bh=eCos0g0v+ia8yCfPb3Au3oRgY4b9F0p0qfg//K2yklA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=XcEIghCl0BVy4Bhd08GRn6zbexY3AudujSwd5EjO1NNgrdtTFcITHpsd4PsKPkmvI
+	 CKJ9s9RUN6UUiKk/zImnOt6HjifOfbC1bHF5vrf8aZH/Szu2nflseINbGoLGwK8DlS
+	 xclniy3nRskdHqYpcnHZekmSxGNlyRzkaoSOS9WL6Czeq46sigPPASY3zRNIbgGJRS
+	 n1FdXj3qXb0vV2OcH9T9hjpEMY8rsD6Eyf6zNvyGA1rIrwW8irgpiy5YxSbVZVOB5t
+	 gi3ZngKmfuazZqbl8fpcleO8szgrDVQ9Wjc3HscYXPyHGj5gsYDPvDrB/pLdpRQpvs
+	 MwEB9Ip6kpRZw==
+Date: Sat, 27 Sep 2025 12:52:57 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kunit-dev@googlegroups.com, Ard Biesheuvel <ardb@kernel.org>,
+	Rakuram Eswaran <rakuram.e96@gmail.com>
+Subject: [GIT PULL] CRC updates for 6.18
+Message-ID: <20250927195257.GA9798@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,28 +42,54 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250926205301.GA1448549-robh@kernel.org>
 
-On 2025-09-26 15:53:01, Rob Herring wrote:
-> On Wed, Sep 24, 2025 at 04:09:18PM +0200, Kael D'Alcamo wrote:
-> > Changelog v1 -> v2:
-> > * updated vendor-list by loosening the regex for names without prefixs
-> > * removed extra example in DT binding
-> > * updated DT binding filename
-> > * updated DT binding title
-> > 
-> > Kael D'Alcamo (2):
-> >   dt-bindings: rng: sparc_sun_oracle_rng: convert to DT schema
-> >   dt-bindings: vendor-prefixes: updated regex for properties without a
-> >     prefix
-> 
-> The reported failure is because you need to reverse the order of the 
-> patches. Normally Herbert would take it, but I went ahead and applied it 
-> reversing the order.
->
-I'm glad to read that, thanks you for the feedbacks.
-> 
-> Thanks,
-> Rob
+The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
 
-Kael
+  Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/crc-for-linus
+
+for you to fetch changes up to 136d029662cdde77d3e4db5c07de655f35f0239f:
+
+  Documentation/staging: Fix typo and incorrect citation in crc32.rst (2025-08-20 23:53:32 -0400)
+
+----------------------------------------------------------------
+
+Update crc_kunit to test the CRC functions in softirq and hardirq
+contexts, similar to what the lib/crypto/ KUnit tests do. Move the
+helper function needed to do this into a common header.
+
+This is useful mainly to test fallback code paths for when
+FPU/SIMD/vector registers are unusable.
+
+----------------------------------------------------------------
+Eric Biggers (4):
+      kunit, lib/crypto: Move run_irq_test() to common header
+      lib/crc: crc_kunit: Test CRC computation in interrupt contexts
+      lib/crc: Use underlying functions instead of crypto_simd_usable()
+      lib/crc: Drop inline from all *_mod_init_arch() functions
+
+Rakuram Eswaran (1):
+      Documentation/staging: Fix typo and incorrect citation in crc32.rst
+
+ Documentation/staging/crc32.rst       |   4 +-
+ include/kunit/run-in-irq-context.h    | 129 ++++++++++++++++++++++++++++++++++
+ lib/crc/arm/crc-t10dif.h              |   8 +--
+ lib/crc/arm/crc32.h                   |   8 +--
+ lib/crc/arm64/crc-t10dif.h            |   8 +--
+ lib/crc/arm64/crc32.h                 |  11 +--
+ lib/crc/loongarch/crc32.h             |   2 +-
+ lib/crc/mips/crc32.h                  |   2 +-
+ lib/crc/powerpc/crc-t10dif.h          |   7 +-
+ lib/crc/powerpc/crc32.h               |   7 +-
+ lib/crc/sparc/crc32.h                 |   2 +-
+ lib/crc/tests/crc_kunit.c             |  62 +++++++++++++---
+ lib/crc/x86/crc-pclmul-template.h     |   3 +-
+ lib/crc/x86/crc-t10dif.h              |   2 +-
+ lib/crc/x86/crc32.h                   |   4 +-
+ lib/crc/x86/crc64.h                   |   2 +-
+ lib/crypto/tests/hash-test-template.h | 123 ++------------------------------
+ 17 files changed, 219 insertions(+), 165 deletions(-)
+ create mode 100644 include/kunit/run-in-irq-context.h
