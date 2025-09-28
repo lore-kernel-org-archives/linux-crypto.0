@@ -1,46 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D8A27602C;
-	Sun, 28 Sep 2025 03:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E389827602C;
+	Sun, 28 Sep 2025 03:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759031972; cv=none; b=Ii0FTGG0XCHawOxtUs+r2ljsB6sjngAf94vqLqDpWSyu5hGCbq5vd2aoLQC3tcDWVyYUS099F8ZIp6wNrnKzLZu9PhXKWf1vqgTcCBWR23sFO0RLRAayShQ2edaxfpC6nsK3B+jn30gIRp1t7lL1DusYDt8G0rhcK3RH8NSzWLU=
+	t=1759031994; cv=none; b=QgZqiMl6c1tUVBq6huHT3umIXfz1Mv5jG5RSwFskrKzirVW3jPHVSWwo1DWF9jgsI5R1jDfzjgu45+ReHabVF2qtaJngK6BXgMbig+AAw7rMJmn1pW4GG3He4tsDTqti0cilWCCjbtmQLoQQORkE44A4XfPRqd3A4qy2fIA0gts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759031972; c=relaxed/simple;
-	bh=7XFEMioG5ClehkbqbHkXS1QqdDe1+Oqjb8NFmVdgzNw=;
+	s=arc-20240116; t=1759031994; c=relaxed/simple;
+	bh=vzjOspmjJPzC7R9MBh3FkcIH6t03smFNIGFp5E4/2hc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O+HMwKUXGgJWYLv+3LKDpnVbhDoZ5njTyARkFAPOu5v/3AjuSYep9YI2K1TygjVT/cRlDI0uMnmp4IQJeGL/Ei8HYzJEjlJZRiLlU+eSB9BoJGhD55vgOzga+IgxlquFizfK8aBPXhTifmUwVHpdKzLqs+mZyQtizLyMP/EmcNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=VWYaqpx7; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=Iaq/lmb53YF4j8SZYrnDaxyHzCa2U4iP3SUB0M35MFKWHckOvSKipbxiElWAEsgynTkVpCX+Q3yNvP3liNSc3sRkNvRY+jc089m36DRbm5L3uwFT1uJTurMq31LCsYA+x1yLhCBTEsMWx68046QrJxTJOOEpmRN0iIXVSEuRAgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Apq5YTNL; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="VWYaqpx7"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Apq5YTNL"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:MIME-Version:References:Message-ID:Subject:Cc:To:
 	From:Date:cc:to:subject:message-id:date:from:reply-to;
-	bh=Xlt0Bidng/p/ihVyyOOmlOnS/3IpMJU9FC0UPLnOohc=; b=VWYaqpx7L3p4i1SGWj4LKtJ+0J
-	EFGNpomQUaMBnULNJxHojMJn4QvbXikxqYiQVKHtgUHsHrAjWM04v66LSn3cdlLb1F3V8m8UbPEol
-	KLZzLE6T0ku2xX+d2Q6rwINMbTtTM67ax2I/XNA3wa27K5I8JweFz3FmUuHB2C3i6rNd3iGIRCbMb
-	whf8sMIM63ZwX/aIm3c8X3vYlwYbuPkWk0bkSTwXbB34znSmt2IO/LpELjIrZLaTlr6ackBLtL7Tr
-	HP69MKxoymTLc6TvccURpC7YH6H446YoaP/ZHDYO2WJQLH7WGpNT9q7cf1voRJ3ywYI1ob+ZJ7CBP
-	puz6igiQ==;
+	bh=KURZhtPJ4MMnUbopcJ6PisqOLs8wVV3eFlGgFKFAdRE=; b=Apq5YTNLGSsCXBD/IqPm8A5h2P
+	eXDorf5tuYyVb+qKFi+1sxmEJDeHvytCNf1s+b+1k7xB8i0Q/TyJmq0jMq1ryT3xlOemhrllOeiNZ
+	n1w7RXxtv1VSLAB6INPQKrfzFCS1fA4r3kvSbgt515tMz2aT9zajnRMfkLGIC1vASgQG8qABQQcgl
+	ryrSeE6ldD68p3W7La8Gm1gqLzM7krV7b3XQlslxXszNx6l+kcYkp9sxm6UICRJgWZLnRkH8te3tr
+	yMb9e1NCnlKUNhU3XHaiR2G18TkghG+uWqYU05NPam3RRKJ7I5WJbm8BqVuHul7ndk59TKThURkD2
+	NkRhHtGA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v2iZK-008qWK-16;
-	Sun, 28 Sep 2025 11:59:27 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 28 Sep 2025 11:59:26 +0800
-Date: Sun, 28 Sep 2025 11:59:26 +0800
+	id 1v2iZX-008qWb-1Z;
+	Sun, 28 Sep 2025 11:59:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 28 Sep 2025 11:59:39 +0800
+Date: Sun, 28 Sep 2025 11:59:39 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Crypto <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH] crypto: Add explicit title heading to API docs
-Message-ID: <aNiynvf85p9v97Vq@gondor.apana.org.au>
-References: <20250920001650.10474-2-bagasdotme@gmail.com>
+To: Kael D'Alcamo <dev@kael-k.io>
+Cc: Olivia Mackall <olivia@selenic.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: rng: hisi-rng: convert to DT schema
+Message-ID: <aNiyq8AmsRG2xcWe@gondor.apana.org.au>
+References: <20250921161139.99047-1-dev@kael-k.io>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,24 +48,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250920001650.10474-2-bagasdotme@gmail.com>
+In-Reply-To: <20250921161139.99047-1-dev@kael-k.io>
 
-On Sat, Sep 20, 2025 at 07:16:51AM +0700, Bagas Sanjaya wrote:
-> Documentation for crypto programming interfaces lack explicit title.
-> As such, all its sections become entries in the toctree index.
+On Sun, Sep 21, 2025 at 06:11:34PM +0200, Kael D'Alcamo wrote:
+> Convert the Devicetree binding documentation for hisilicon,hip04-rng
+> and hisilicon,hip05-rng from plain text to YAML.
 > 
-> Add the title heading to tidy up toctree.
-> 
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> Signed-off-by: Kael D'Alcamo <dev@kael-k.io>
 > ---
->  Documentation/crypto/api-aead.rst     | 3 +++
->  Documentation/crypto/api-akcipher.rst | 3 +++
->  Documentation/crypto/api-digest.rst   | 3 +++
->  Documentation/crypto/api-kpp.rst      | 3 +++
->  Documentation/crypto/api-rng.rst      | 3 +++
->  Documentation/crypto/api-sig.rst      | 3 +++
->  Documentation/crypto/api-skcipher.rst | 3 +++
->  7 files changed, 21 insertions(+)
+>  .../devicetree/bindings/rng/hisi-rng.txt      | 12 -------
+>  .../devicetree/bindings/rng/hisi-rng.yaml     | 32 +++++++++++++++++++
+>  2 files changed, 32 insertions(+), 12 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.txt
+>  create mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.yaml
 
 Patch applied.  Thanks.
 -- 
