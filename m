@@ -1,152 +1,191 @@
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231B435950;
-	Mon, 29 Sep 2025 03:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F421D2BF3DB
+	for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 07:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759117312; cv=none; b=gNTOXIDcWFV/p07gL8CeAN3ZePGnAMle4+BBwYm+uUCMILHxIb1Jm/nN6ryfH2jBEkB87yLAZTFIsEZCKJjxIrslJZxqvtDNd+zrq6h16eVmQxsIgv1C4DluPl0G4EZEpven8Qz/9C+54H+IiU2cAKpWZP66m9P4omLdPxLVsUk=
+	t=1759131839; cv=none; b=qs6kZk2kWPg9gUDGN6yqcahDeS0atnozWtAPyphYfhcJuKRqUBIYMVzde1gtBgbvQeclrldw8sKkXNRVtgE5oUpqDpTmvPKz5OTjB+Y7lvFGwoUUIj6ThC1hgj49Ov0jadeVzVUJzXkNni+ETkfBnP47hcNTcmYOVQ6GAmuPfA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759117312; c=relaxed/simple;
-	bh=RI2ipaHB29egjGOrvmIxSfS8MvurjHVJ7zwPYtv3sZA=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=gmXOkbEJ4thIhhMhFaWu8n6vZ+4VdkzW+AyC2OZ1O9ps3HkyI1mogXy1J/b9SKEleqEYz2io+69k8O67rRKDuSJw5dHpzphUiZCHb789oWI12RgN+zlK4et2mYgiXTImN84uiYKyr5HWOKB4kRKfcfqCc9F83MzqQlAix+kINa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=kP7NE0Vd; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=B/Y8KrTe; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1759131839; c=relaxed/simple;
+	bh=VXI1szOjiKjEL8zYBGVQtWD6/5ILKOW18W82tAcfKjA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=O2WbKg0IPuTPVxrBcBvMqvRRM7RRJKv4+6LwCYO9rYQ9rCtQNEwQBVEoTKr1MKOCElCrqWVlzDLL2hhGlBnnxgoTe7xr00ZCybO0C6qxC1dMMecIaEb344JJnvjcYEFM+vei3FGSy4FgsB2c2pZU/ctGMw0bM9MbPh3YJj/s3wQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=SOzTMCuF; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="kP7NE0Vd";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="B/Y8KrTe"
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 283131400076;
-	Sun, 28 Sep 2025 23:41:48 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Sun, 28 Sep 2025 23:41:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
-	1759117308; x=1759203708; bh=yjtaEvshITSwrEdSYBlewMXUbBwlvgxkvSi
-	tYOUauSA=; b=kP7NE0VdDlIq/miDmk7Sj3YNDTtpRmp6XEmCHJf+j8m27c6d8/A
-	69lT5AQ97tBOR5nOOWxX2nmFL/Z8UKzC5T7CwOyfmMG4lRauBX9Z+dN294tZIVuc
-	+F4X3AeB6T/TUJs2GnI49gxbNVbdcb+J5jwiLxJT8WDnji9xqejGAxgoqVdDSgLd
-	Ud6Zo6gZqRwgXQ25em/lNGTcJ5Bd/m56NEkWZ0Zxxnuka3ajUBCdEGM76QjSN7Fy
-	mEPlQVRFjjvaUgWKrc7Hl4WPuVife3LfO2RZ5MIr0L2oZ4HyFsDUBGPW/T91bESI
-	CCxQdlfK6uMJQ6dYtCZQKL0xnfcsdGL8qTw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1759117308; x=
-	1759203708; bh=yjtaEvshITSwrEdSYBlewMXUbBwlvgxkvSitYOUauSA=; b=B
-	/Y8KrTeF8avUW/ph5EyAR++W6vbVymD/EwK1xQaMRJJD+sb10AUYtH3zjLWUwy9V
-	CZBsa9wLrmT5HXzye3P+GIY10x8VhQiMwD3ZyvhrhPAXIO3Ng8WFK1TQAxOK/+dJ
-	bECV2k6vyr6UWsjggdP3fqXXyCl0m4F6nId0RPtGRFa46xvwpe/vo0NMJ+MgUTvd
-	2qPBIqiDnj9yM+r++05ZHA123OCbS/Yk6vRGT0gsLlyTSTgjqwlPsDwvUpt1rZL7
-	jJkbBtOtiaXZ0dnDwRFr4zU5E+UHhkPNGf3L5kwFs8jsaGbVtpEFjUdDVVwt03e5
-	9zq2VYB33UXcK/GLpz8RQ==
-X-ME-Sender: <xms:-v_ZaMJ8lPT8o_it_22s0icuNX3dX0ZX6CaNAbqRexy650xrHVpyXg>
-    <xme:-v_ZaOZu9ciUvExU7IDingF4TVT4o1x0GyzGuUZqPhv6XHdhCEF49cXuTVwhh0dL_
-    k2ZdKQ9zJgWTtu4utEE3fpAr5r1_Ofq4X6vnunWtAjVpmwGLg>
-X-ME-Received: <xmr:-v_ZaO-3bq1MbsftNHI9_wQxojEjF83CPrdBN8crfz2bHbqRrZ6f4iT8NfVzpBg1bg2Tyr4rx0ewVp-55geNcMkyMXKmlJd-a31pjf65QQsw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdejieeliecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpegtgfgghffvvefujghffffkrhesthejredttddtjeenucfhrhhomheppfgvihhluehr
-    ohifnhcuoehnvghilhgssehofihnmhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpe
-    duteefhfduveehvdefueefvdffkeevkefgtdefgffgkeehjeeghfetiefhgffgleenucev
-    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnvghilhgsse
-    hofihnmhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohguvgepshhmthhpohhu
-    thdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehtghhrrghfsehsuhhughdrtghhpdhrtghpthhtohepjhhirg
-    hnghdrsghirghosehlihhnuhigrdguvghvpdhrtghpthhtohephhgvrhgsvghrthesghho
-    nhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehmvghnghhlohhnghekrd
-    guohhnghesghhmrghilhdrtghomh
-X-ME-Proxy: <xmx:-v_ZaPZ4aLIheUqbRt6q6xJWDJKErBHbFvKpoO2JYe6R1njzPMzHTg>
-    <xmx:-v_ZaCNZpfGv098yuLx2epYtA_38XPxvqwIDR3FaoX_SV8X1rsFSng>
-    <xmx:-v_ZaLDFDUonA674eAlrVdyUnJ0F_XjCQKO7p6z_5stjcAMWLEwN4w>
-    <xmx:-v_ZaJKnkzmMILrG71zFkZZRRjnTMplaY3ucK0fj_HfDIiX3hWTneA>
-    <xmx:_P_ZaDrFGbhOd__Tb7qZYXvD9O4nYE758VQABCFEpXDYDMmNM4McY3XB>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 28 Sep 2025 23:41:44 -0400 (EDT)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="SOzTMCuF"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-279e2554c8fso44271015ad.2
+        for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 00:43:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1759131836; x=1759736636; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zkzwN7LTL6uCgBrStY6yDcslORDO/lWty4C23MUHWAI=;
+        b=SOzTMCuFxKjZRIgr6MqrE9n03uWTDOmWiEUiSUQ97Uae1YoaJLyeVxMg2vU9SXBOq0
+         +aedJHA5WdaDNsbL+/qnItG6YS1kf/uAB34zLIUxPRu3aRPfisButG8QFt0vqVGr4e1H
+         i+JWRqP7UhUR4SROAlfmqe/rFqL8lfx1nDC64=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759131836; x=1759736636;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zkzwN7LTL6uCgBrStY6yDcslORDO/lWty4C23MUHWAI=;
+        b=e1T746doAS29w6iAzK+zWnJOsWoWZiuO36j8S3OkG5tiWMNGEXWrQ+rxEIhB0nL2aw
+         6qf7oay/ttZVZUTCJNYl1kOts4bgTwynL4AVT8AUwsmSdulBANenPpBes01UJQtgMM7k
+         jV92JNIv5S65NPjQIMehM6Z9OlyyD5Pk2Q7GCyr6GiftEQ7B9ay+34ASLMwjkR+CayN2
+         Xv/l0kv6EOQD5sMlZQ2/dGZKbVOAVj8rHL33/JJMhTV364mINW2+3Mh2rLFzybJp8wHf
+         3ONOF6Xw1YZkex1s6JQWO5zLUFl+hdJVasa7zeIlJ59qoROmr2otLjvdQEr5U6hQbPlA
+         seJw==
+X-Gm-Message-State: AOJu0YzhqvGgScK5LZXfW/YEci7gBKkKkNup7OJj6W3+EOWmGYkqeo94
+	LgkQ5sw9GlYwUYv1Cwtrwq9GFYO9Kru6wHuLe4W/Ys6fDrc7T4cWiH7oKGIgGYk2uqtMFVx1Lau
+	gf0EQBPk=
+X-Gm-Gg: ASbGncsloaAxAB0w5cqS8W3U2REf1qxJi4/dymbW7Xlb4M69WSTHBLs8rj1EL8iS5hq
+	UlBhs3tQTK5OojIwXNWZ/BXZjY08UXD7moAM0T0SCP1z8nv/jHOe/orwAAKFbSuOCygRDHRaPl7
+	5kdjxR+iE7tLvj+i7mSJbF0U3czmwJdw8dMCu2e+oo2Fscb1alOHViSpQqcfb5Rvb2qCADLWeMb
+	elOvEh2uanxRD1RX6QHVdeK3QuUXPrsp5CtWhgC4uzXApf0UsXjBfVu1tlx0TGVXU/+TRb6ui9u
+	DP9eu4MfZE7m3eBJu8nAzEmwbJ5GOUq/yvKJNS+oxfJWjY4lnO4c/eckiV9pMJ6Ugqoeqx1v1yO
+	5+uJnFI4tB+Khj+vtAw9eyGqh9J3X1NajyYimx5UU/PNqS4M87JsUcdkO
+X-Google-Smtp-Source: AGHT+IH5ltnVhI8p9SWMfpRx11EhtJiGOK7ftW/7FfXvSgTjSgVPvPELvNXl5zpk2IS2lmwtKYpJEQ==
+X-Received: by 2002:a17:902:e5c7:b0:24b:1589:5054 with SMTP id d9443c01a7336-27ed4a29670mr159434275ad.23.1759131836048;
+        Mon, 29 Sep 2025 00:43:56 -0700 (PDT)
+Received: from localhost.localdomain ([103.108.57.9])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-27ed69bc273sm121341105ad.124.2025.09.29.00.43.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Sep 2025 00:43:55 -0700 (PDT)
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+To: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	herbert@gondor.apana.org.au,
+	robh@kernel.org
+Cc: krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com,
+	adityak@vayavyalabs.com,
+	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH v6 0/4] Add SPAcc Crypto Driver
+Date: Mon, 29 Sep 2025 13:13:30 +0530
+Message-Id: <20250929074334.118413-1-pavitrakumarm@vayavyalabs.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Menglong Dong" <menglong8.dong@gmail.com>
-Cc: herbert@gondor.apana.org.au, tgraf@suug.ch, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, jiang.biao@linux.dev
-Subject: Re: [PATCH] rhashtable: use likely/unlikely for rhashtable lookup
-In-reply-to: <20250928061950.34531-1-dongml2@chinatelecom.cn>
-References: <20250928061950.34531-1-dongml2@chinatelecom.cn>
-Date: Mon, 29 Sep 2025 13:41:41 +1000
-Message-id: <175911730161.1696783.8081419303155421417@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+Content-Transfer-Encoding: 8bit
 
-On Sun, 28 Sep 2025, Menglong Dong wrote:
-> Sometimes, the result of the rhashtable_lookup() is expected to be found
-> or not found. Therefore, we can use likely() or unlikely() for such cases.
-> 
-> Following new functions are introduced, which will use likely or unlikely
-> during the lookup:
-> 
->  rhashtable_lookup_likely
->  rhashtable_lookup_unlikely
->  rhltable_lookup_likely
->  rhltable_lookup_unlikely
-> 
-> A micro-benchmark is made for these new functions: lookup a existed entry
-> repeatedly for 100000000 times, and rhashtable_lookup_likely() gets ~30%
-> speedup.
+Add the driver for SPAcc(Security Protocol Accelerator), which is a             
+crypto acceleration IP from Synopsys. The SPAcc supports multiple ciphers,      
+hashes and AEAD algorithms with various modes. The driver currently supports    
+below                                                                           
+                                                                                
+hash:                                                                           
+- cmac(aes)                                                                     
+- xcbc(aes)                                                                     
+- cmac(sm4)                                                                     
+- xcbc(sm4)                                                                     
+- hmac(md5)                                                                     
+- md5                                                                           
+- hmac(sha1)                                                                    
+- sha1                                                                          
+- sha224
+- sha256                                                                        
+- sha384                                                                        
+- sha512                                                                        
+- hmac(sha224)                                                                  
+- hmac(sha256)                                                                  
+- hmac(sha384)                                                                  
+- hmac(sha512)                                                                  
+- sha3-224                                                                      
+- sha3-256                                                                      
+- sha3-384                                                                      
+- sha3-512                                                                      
+- hmac(sm3)                                                                     
+- sm3                                                                           
+- michael_mic                                              
 
-I generally like this patch - it seems well structured and leaves the
-code easy to maintain.
+Pavitrakumar Managutte (4):
+  dt-bindings: crypto: Document support for SPAcc
+  Add SPAcc ahash support
+  Add SPAcc AUTODETECT Support
+  Add SPAcc Kconfig and Makefile
 
-I think you have made a good case for rhashtable_lookup_likely() and it
-seems sensible to optimise that case.
+changelog:
+  v1->v2 changes:
+    - Added local_bh_disable() and local_bh_enable() for the below calls.
+      a. for ciphers skcipher_request_complete()
+      b. for aead aead_request_complete()
+      c. for hash ahash_request_complete()
+    - dt-bindings updates
+      a. removed snps,vspacc-priority and made it into config option
+      b. renamed snps,spacc-wdtimer to snps,spacc-internal-counter
+      c. Added description to all properties
+    - Updated corresponding dt-binding changes to code 
 
-I'm less sure of rhashtable_lookup_unlikely() - you have provided no
-measurements for that.
+  v2->v3 changes:
+    - cra_init and cra_exit replaced with init_tfm and exit_tfm for hashes.
+    - removed mutex_lock/unlock for spacc_skcipher_fallback call
+    - dt-bindings updates
+     a. updated SOC related information
+     b. renamed compatible string as per SOC
+   - Updated corresponding dt-binding changes to code 
 
-In general we expect an rhashtable to be between 33% and 75% full.  The
-inevitable hash collisions will mean that the number of used slots in
-the bucket table will be a little less that this.  But let's assume 50%
-of the buckets are in use at any time on average.
+  v3->v4 changes:
+   - removed snps,vspacc-id from the dt-bindings 
+   - removed mutex_lock from ciphers
+   - replaced magic numbers with macros
+   - removed sw_fb variable from struct mode_tab and associated code from the
+     hashes
+   - polling code is replaced by wait_event_interruptible
 
-If you are using rhashtable_lookup_likely() you expect to find the
-target so you expect the bucket to not be empty, so it is reasonable to
-tell the compiler that it is "likely" that the pointer isn't NULL.
+  v4->v5 changes:
+   - Updated to register with the crypto-engine
+   - Used semaphore to manage SPAcc device hardware context pool
+   - This patchset supports Hashes only 
+   - Dropping the support for Ciphers and AEADs in this patchset 
+   - Added Reviewed-by tag on the Device tree patch since it was reviewed on 
+     v4 patch by Krzysztof Kozlowski and Rob Herring (Arm)
 
-However if you don't expect to find the target, that DOESN'T mean you
-expect the bucket to be empty - it could have another item it in.  All
-you can really say is that the probability of an empty bucket matches
-the degree of utilisation of the table - so about 50% as discussed
-above.
+  v5->v6 changes:
+   - Removed CRYPTO_DEV_SPACC_CIPHER and CRYPTO_DEV_SPACC_AEAD Kconfig options,
+     since the cipher and aead support is not part of this patchset
+   - Dropped spacc_skcipher.o and spacc_aead.o from Makefile to fix build errors
+     reported by kerenel test robot
+   - Added Reported-by and Closes tags as suggested
 
-So I don't think it is reasonable to ever tell the compiler that an
-bucket being empty is "likely".  You also use "likely()" for deciding
-whether or not to subtract the key offset from the address before
-returning a pointer.  This is a valid thing to tell the compiler, but we
-would need numbers to confirm whether or not it was worth adding to the
-API.
+ .../bindings/crypto/snps,dwc-spacc.yaml       |   50 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/dwc-spacc/Kconfig              |   80 +
+ drivers/crypto/dwc-spacc/Makefile             |    8 +
+ drivers/crypto/dwc-spacc/spacc_ahash.c        |  980 +++++++
+ drivers/crypto/dwc-spacc/spacc_core.c         | 2394 +++++++++++++++++
+ drivers/crypto/dwc-spacc/spacc_core.h         |  830 ++++++
+ drivers/crypto/dwc-spacc/spacc_device.c       |  283 ++
+ drivers/crypto/dwc-spacc/spacc_device.h       |  233 ++
+ drivers/crypto/dwc-spacc/spacc_hal.c          |  374 +++
+ drivers/crypto/dwc-spacc/spacc_hal.h          |  114 +
+ drivers/crypto/dwc-spacc/spacc_interrupt.c    |  328 +++
+ drivers/crypto/dwc-spacc/spacc_manager.c      |  613 +++++
+ 14 files changed, 6289 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+ create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+ create mode 100644 drivers/crypto/dwc-spacc/Makefile
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
 
-If, however, you could provide numbers showing that in an rhashtable
-with lots of entries, a lookup for a non-existing key was faster with
-the rhashtable_lookup_unlikely() code, then I would find that
-interesting and worth pursuing.
 
-In general it would be interesting to know the number for both
-successful lookups and unsuccessful lookups across all three proposed
-lookup versions.  I don't know how helpful it would be, but I would find
-it interesting...
+base-commit: 166c83f7789ed02dc1f25bc7bed4a1beb25343aa
+-- 
+2.25.1
 
-Thanks,
-NeilBrown
