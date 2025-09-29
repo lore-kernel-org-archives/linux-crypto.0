@@ -1,226 +1,155 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03FA42C11F8
-	for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 07:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824B9275AFE
+	for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 08:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759131867; cv=none; b=baBkhFXdVcS8M7EigOh7QolZBdoU1lw+cERyTYseoOBK+q2yJbQ+O6vq1Y9fWcgOrTPJwns7r32cjCNtVtufR4V6IuT+DcixXP3+54XBa6RW7aieVm8Li6Q72neAt+MOcQ+GiOi9Maevqd9q7FH6nV72K+SWlosCoj4zeMaVuzY=
+	t=1759135505; cv=none; b=eJ+Q+Niujg2ZK6F5H8UTdTO/OaCzdIOXGYFS50EQNw89ue5azuL6TRuEGHvX2kFZEZ3wiCnTtcmew3e289z4/Cm545EGR+zGo4tcdQCQ9I1AeqsvN9Hkq++qn0xqjCYasKCy/TiA89Ilvsbk0glt0M0bXcnXV4CkOZWSqbxQ4gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759131867; c=relaxed/simple;
-	bh=aFzi4qxJ7rQHCA8ko/DkWYKE6oWKyST/QbF/RY7wiNo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sLyGZejqchoMRlic63Xeyb805b22kBK/EA24xKAtjRgO1kBr2mToGuu3Zm5Jqj04ejBSMbSV5Cwzvus9TL0SyhoyacC/tGR6ZOMn9Uqoow8DtCP5U2PUCWLDSnJ0vFcsk/xT/UxS74TjgnXqytLq8Q/WmSpEnq9r3Iti26YBZVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=cSLuAtth; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1759135505; c=relaxed/simple;
+	bh=X75ObHJZr1Ef5aDV2F1f9MYR+RaTFrZG0VaxFYaJTtA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OvIGzTkeYG7XbM/tnFBjiqL1bq/GUxoiolEJkWWkvebnF4IJH8VXXyMFRKsCXgZUuJPBO6IRnk9dH+m4im66TCESYISLuKJi7eWqitmUCqWVlV9u2O0hmTfjZIdov+Y9YhxKRwygM1DRfTY2zEZYK1+sVQKFUHsREVhtn1cGUbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nF4jrYDH; arc=none smtp.client-ip=209.85.128.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="cSLuAtth"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2697899a202so38193985ad.0
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 00:44:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nF4jrYDH"
+Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-71d5fb5e34cso59185877b3.0
+        for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 01:45:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1759131865; x=1759736665; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1759135501; x=1759740301; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5y/BDQo5bgkRnqVMmNG7pEhS6NIpKO/OpfTCmrBefHs=;
-        b=cSLuAtthEvqDOOjTxExFXLoMFd+t2j/INGJ+Ocqv/EfmYNwomVxtmVTvdcZEeE0wSi
-         1N7ArRkvla3kGcf7FZ45qnWSOu0ZQmebCWFitSIdAGxETdjxRdnpDw7YMpeu7Xv5SZ9X
-         7W0t27IgnCO+aXxCKOkcE8uyohHQmLzDY1hys=
+        bh=JP8IQIErWyVyQbQCHDd0KKmnOzs9hqCQnTWShHnXfyA=;
+        b=nF4jrYDHYPpYw5ga/XFlhep4Zp6CCMkdaMOmCupi0ovTPYRVmjtzrrr2laGR0X3L4y
+         tDcWr/wzUkXUJxmqkJtNmm+R1cJAVhD3Mk/aHHYMF6D2f4MFztDzDK/2h/C+e/UCNX+U
+         8v2X/RYGFcioFRJXXfafqznEunb/qpjZE7HafC8Mfs8BEC5/lEMJMUUBuj6aW/j79r+N
+         EhJfwpxYu4Lxzq36pf6jxzXxuPzfusTG1KpRJE4xeOdj9AhVOiAbVEJZuI+svjr/txn8
+         ezfM6wUoOz9+4Luta0nnjIhaCgl/thkiVbvNFiCQiwnS8Sp28viDzGjD0Tsj91ITglrt
+         bM3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759131865; x=1759736665;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1759135501; x=1759740301;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5y/BDQo5bgkRnqVMmNG7pEhS6NIpKO/OpfTCmrBefHs=;
-        b=Nv5ef49G9j6dnn7zR8+GzmAGMkkwvo5VUUtdlFQ9KcTojeUseAa7k0FxpHplg7k1hn
-         DqfnlQOmc+USKshbVbJa5U9zXRdbhIEDl3kZCNCCarpNdKXWL8t6cv8C+Tvcr10tUFje
-         Vm5FIWTL9x8ZKHVI6TW/wCco/W8Yt8WpAZAkmLAK2RvJjQ/CJ/JsXN1JCKtd+zaoye4D
-         gLrqF30s4AS1l4Y+k6BFDjoMsppZr0GuA0qlpHLjdTiJLukca0etO5fQVx6Dte5G5cgL
-         2M0cvS+1Pd1IalMX+KhdixIUwLW+8kAxolElx6XBe1zLR3lHCBQcpw1Pbiu+1RuXSNMA
-         TYFQ==
-X-Gm-Message-State: AOJu0YxUnuPzpwUUMZic2KFEH2OPJlLTUvm1gXmgwsoVZqmJcu4H7N7R
-	0S2crwltjN7QUruCJ/Ra7AX6kae1ZA8vNfly8iPqZXvBYBcX3nc5GztqzhvcqEDPG12T33YKN3Y
-	XldKEyrI=
-X-Gm-Gg: ASbGnctFx/P38S927FkfOW4P1Co/HqgeQCeevPTqU+L9XBbu3fomu4vFJ1wq8znmqcr
-	Wsqnmse7bKXmgpxPj6BW4PSu3VMU5oznCN2ixSVz1NCiQnuLsgfvtfbOqDlTMrTzxMuXRRgTbDj
-	5l6lY1R7K7lLNg5qAHHNIph5b0nI7HOX0Wiq9EnCY/GyyQc2iPZ7M5KMLfVh9aNgOQQLHTnRYIx
-	mMZ9cdIKRwqA+gjfNhvA/PUrutB9lu0AKCtmpRP8xMVubdnkOPoi6Bx+dNtST/WGJg/09f0wG7F
-	+yW0P/6bLQJdIEd9pFQ6MugfIW2S5zMLqGPc/80J5xMpimQqUznHrwfvr+ldvlG73yUDmUm4+Qd
-	PA+qiouZrnKZNP7qJerVUxRJ+vjpuh2WeagGMgdagPLxvN9Md7sh819FS
-X-Google-Smtp-Source: AGHT+IEDdXtz5qjT/GbVC2bSEbaweaSIC51I+exSyhQsqO8wXjylseRoO6Bbj4eZSqZG/Dc28Q2KUQ==
-X-Received: by 2002:a17:902:ce01:b0:267:c1ae:8f04 with SMTP id d9443c01a7336-27ed700e02bmr142895605ad.20.1759131865012;
-        Mon, 29 Sep 2025 00:44:25 -0700 (PDT)
-Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-27ed69bc273sm121341105ad.124.2025.09.29.00.44.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 00:44:24 -0700 (PDT)
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-To: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	robh@kernel.org
-Cc: krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	Ruud.Derwig@synopsys.com,
-	manjunath.hadli@vayavyalabs.com,
-	adityak@vayavyalabs.com,
-	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH v6 4/4] Add SPAcc Kconfig and Makefile
-Date: Mon, 29 Sep 2025 13:13:34 +0530
-Message-Id: <20250929074334.118413-5-pavitrakumarm@vayavyalabs.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250929074334.118413-1-pavitrakumarm@vayavyalabs.com>
-References: <20250929074334.118413-1-pavitrakumarm@vayavyalabs.com>
+        bh=JP8IQIErWyVyQbQCHDd0KKmnOzs9hqCQnTWShHnXfyA=;
+        b=laSxhCiqs1ZoJqS4hpDgTsv8+zNxM9rMUxUbC8WwhxM8KDse+w9AbnK4HCAk5ipGnB
+         zZ3l4hhYb68x+JgWctId1VUV4vO+NMUbIIPsufOj1txdJjq9pE7r6pezMmskdpePlG4e
+         4wVW+dX5ruuJ9LO5vdXIln7nyqAs3f65MpGniugi5rC+CKpOiMv13NBa6cruKQPjzoMT
+         hz8f9zW2xVzhR4VgWLNFBQwVPZcYwpvTi3ZoTjYH1F6sb6emSDE4U9ccp+S+b2kUqRvG
+         QjC36hR2xQ0s1/If79uH4TcI91eRwc7DdgA7fFnheB723NqYW+W91V9rXvzAF5Vo/5T4
+         QItQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWBQGae8vZ1ToS258tDrAIoHtHd92ZEVdXwBkpcXlWCNZUpjHUTxEw/yZmG/QsQs+iwpPnkAEBMrF9UmAM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7lEiZJgBarAH3VQ3Bnq0rCZWup/aqaAUX9bh6+2NE15aFg7uw
+	pryDQS6UwapDU1aPC0xVJlCLdVrOJn5VOFbv7ozoaXaaQkEmK1KHWFm0MUjhzII7Uk+2UaV0jm5
+	oOG/dH9Gf+ljL8E56FZHg4T0Z01HnfW4=
+X-Gm-Gg: ASbGnctiduX401WqHs8QN0tZY5W3MJhp4mflPmOhzdczj2B0KsxJAcfQAekc1Nscs8+
+	XD/rT7dnuitrPDq3jpHcamZul7efNCAcq2YxZBjajLIzg1MEoHIhkNxbl7xKNO48RH1K+OWF+2g
+	N7n2bk0pXJoILiSTU0Y/OFqkq+4DGO8SVDbq9AIt8qnMoHFIkbdMi76g4XWM6uwe1tB1kAySfTH
+	dIT3342RNNQON641w==
+X-Google-Smtp-Source: AGHT+IFxYtBs5xRDiUYvTaJKzeNeG/IYt0ldkmoGNhRwvsol4gj4zN4L1p96bEyvoXGcb6J+7ZYjL3MG/05LU6Ra36M=
+X-Received: by 2002:a53:7e05:0:b0:635:34f5:51a4 with SMTP id
+ 956f58d0204a3-636dddb3f9cmr6667956d50.13.1759135501484; Mon, 29 Sep 2025
+ 01:45:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250928061950.34531-1-dongml2@chinatelecom.cn> <175911730161.1696783.8081419303155421417@noble.neil.brown.name>
+In-Reply-To: <175911730161.1696783.8081419303155421417@noble.neil.brown.name>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Mon, 29 Sep 2025 16:44:50 +0800
+X-Gm-Features: AS18NWAWEWKS_kXuZX19DMBkYVbBkJRhoGuXBBDUCeDDp3ILgruju3i5YpW8Vlw
+Message-ID: <CADxym3bHM3ykp6nSCNT_8fCVAGk04c1qgoFeAQbrCURSHk3NDg@mail.gmail.com>
+Subject: Re: [PATCH] rhashtable: use likely/unlikely for rhashtable lookup
+To: NeilBrown <neil@brown.name>
+Cc: herbert@gondor.apana.org.au, tgraf@suug.ch, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, jiang.biao@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add Makefile and Kconfig for SPAcc driver.
+On Mon, Sep 29, 2025 at 11:41=E2=80=AFAM NeilBrown <neilb@ownmail.net> wrot=
+e:
+>
+> On Sun, 28 Sep 2025, Menglong Dong wrote:
+> > Sometimes, the result of the rhashtable_lookup() is expected to be foun=
+d
+> > or not found. Therefore, we can use likely() or unlikely() for such cas=
+es.
+> >
+> > Following new functions are introduced, which will use likely or unlike=
+ly
+> > during the lookup:
+> >
+> >  rhashtable_lookup_likely
+> >  rhashtable_lookup_unlikely
+> >  rhltable_lookup_likely
+> >  rhltable_lookup_unlikely
+> >
+> > A micro-benchmark is made for these new functions: lookup a existed ent=
+ry
+> > repeatedly for 100000000 times, and rhashtable_lookup_likely() gets ~30=
+%
+> > speedup.
+>
+> I generally like this patch - it seems well structured and leaves the
+> code easy to maintain.
+>
+> I think you have made a good case for rhashtable_lookup_likely() and it
+> seems sensible to optimise that case.
+>
+> I'm less sure of rhashtable_lookup_unlikely() - you have provided no
+> measurements for that.
+>
+> In general we expect an rhashtable to be between 33% and 75% full.  The
+> inevitable hash collisions will mean that the number of used slots in
+> the bucket table will be a little less that this.  But let's assume 50%
+> of the buckets are in use at any time on average.
+>
+> If you are using rhashtable_lookup_likely() you expect to find the
+> target so you expect the bucket to not be empty, so it is reasonable to
+> tell the compiler that it is "likely" that the pointer isn't NULL.
+>
+> However if you don't expect to find the target, that DOESN'T mean you
+> expect the bucket to be empty - it could have another item it in.  All
+> you can really say is that the probability of an empty bucket matches
+> the degree of utilisation of the table - so about 50% as discussed
+> above.
+>
+> So I don't think it is reasonable to ever tell the compiler that an
+> bucket being empty is "likely".  You also use "likely()" for deciding
+> whether or not to subtract the key offset from the address before
+> returning a pointer.  This is a valid thing to tell the compiler, but we
+> would need numbers to confirm whether or not it was worth adding to the
+> API.
+>
+> If, however, you could provide numbers showing that in an rhashtable
+> with lots of entries, a lookup for a non-existing key was faster with
+> the rhashtable_lookup_unlikely() code, then I would find that
+> interesting and worth pursuing.
 
-Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202509271802.8KQP38Ht-lkp@intel.com/
-Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
----
- drivers/crypto/Kconfig            |  1 +
- drivers/crypto/Makefile           |  1 +
- drivers/crypto/dwc-spacc/Kconfig  | 80 +++++++++++++++++++++++++++++++
- drivers/crypto/dwc-spacc/Makefile |  8 ++++
- 4 files changed, 90 insertions(+)
- create mode 100644 drivers/crypto/dwc-spacc/Kconfig
- create mode 100644 drivers/crypto/dwc-spacc/Makefile
+Ah, you are right, I wasn't aware of this part. I think it makes no sense
+to use unlikely() if the possibility of hitting the budget is ~50%. The onl=
+y
+thing that may matter is the using of unlikely() in rhashtable_lookup()
+before returning the pointer.
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 657035cfe940..ada04311c370 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -780,6 +780,7 @@ config CRYPTO_DEV_BCM_SPU
- 	  ahash, and aead algorithms with the kernel cryptographic API.
- 
- source "drivers/crypto/stm32/Kconfig"
-+source "drivers/crypto/dwc-spacc/Kconfig"
- 
- config CRYPTO_DEV_SAFEXCEL
- 	tristate "Inside Secure's SafeXcel cryptographic engine driver"
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 170e10b18f9b..e0d5e1301232 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -43,6 +43,7 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
- obj-y += inside-secure/
- obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
- obj-y += xilinx/
-+obj-y += dwc-spacc/
- obj-y += hisilicon/
- obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
- obj-y += intel/
-diff --git a/drivers/crypto/dwc-spacc/Kconfig b/drivers/crypto/dwc-spacc/Kconfig
-new file mode 100644
-index 000000000000..736b332c9c94
---- /dev/null
-+++ b/drivers/crypto/dwc-spacc/Kconfig
-@@ -0,0 +1,80 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+config CRYPTO_DEV_SPACC
-+	tristate "Support for dwc_spacc Security Protocol Accelerator"
-+	depends on HAS_DMA
-+	default n
-+
-+	help
-+	  This enables support for SPAcc Hardware Accelerator.
-+
-+config CRYPTO_DEV_SPACC_HASH
-+	bool "Enable HASH functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	select CRYPTO_HASH
-+	select CRYPTO_SHA1
-+	select CRYPTO_MD5
-+	select CRYPTO_SHA256
-+	select CRYPTO_SHA512
-+	select CRYPTO_HMAC
-+	select CRYPTO_SM3
-+	select CRYPTO_CMAC
-+	select CRYPTO_MICHAEL_MIC
-+	select CRYPTO_XCBC
-+	select CRYPTO_AES
-+	select CRYPTO_SM4_GENERIC
-+	select CRYPTO_ENGINE
-+
-+	help
-+	  Say y to enable Hash functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_AUTODETECT
-+	bool "Enable Autodetect functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	help
-+	  Say y to enable Autodetect functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_DEBUG_TRACE_IO
-+	bool "Enable Trace MMIO reads/writes stats"
-+	depends on CRYPTO_DEV_SPACC
-+	default n
-+	help
-+	  Say y to enable Trace MMIO reads/writes stats.
-+	  To Debug and trace IO register read/write oprations.
-+
-+config CRYPTO_DEV_SPACC_DEBUG_TRACE_DDT
-+	bool "Enable Trace DDT entries stats"
-+	default n
-+	depends on CRYPTO_DEV_SPACC
-+	help
-+	  Say y to enable Enable DDT entry stats.
-+	  To Debug and trace DDT opration
-+
-+config CRYPTO_DEV_SPACC_SECURE_MODE
-+	bool "Enable Spacc secure mode stats"
-+	default n
-+	depends on CRYPTO_DEV_SPACC
-+	help
-+	  Say y to enable SPAcc secure modes stats.
-+
-+config CRYPTO_DEV_SPACC_PRIORITY
-+	int "VSPACC priority value"
-+	depends on CRYPTO_DEV_SPACC
-+	range 0 15
-+	default 1
-+	help
-+	  Default arbitration priority weight for this Virtual SPAcc instance.
-+	  Hardware resets this to 1. Higher values means higher priority.
-+
-+config CRYPTO_DEV_SPACC_INTERNAL_COUNTER
-+	int "SPAcc internal counter value"
-+	depends on CRYPTO_DEV_SPACC
-+	range 100000 1048575
-+	default 100000
-+	help
-+	  This value configures a hardware watchdog counter in the SPAcc engine.
-+	  The counter starts ticking when a completed cryptographic job is
-+	  sitting in the STATUS FIFO. If the job remains unprocessed for the
-+	  configured duration, an interrupt is triggered to ensure it is serviced.
-diff --git a/drivers/crypto/dwc-spacc/Makefile b/drivers/crypto/dwc-spacc/Makefile
-new file mode 100644
-index 000000000000..45d0166dfc8f
---- /dev/null
-+++ b/drivers/crypto/dwc-spacc/Makefile
-@@ -0,0 +1,8 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_CRYPTO_DEV_SPACC) += snps-spacc.o
-+snps-spacc-objs = spacc_hal.o spacc_core.o \
-+spacc_manager.o spacc_interrupt.o spacc_device.o
-+
-+ifeq ($(CONFIG_CRYPTO_DEV_SPACC_HASH),y)
-+snps-spacc-objs += spacc_ahash.o
-+endif
--- 
-2.25.1
+I'll do a bench testing on that part, and I'll remove the unlikely version
+directly in the next version if it doesn't help.
 
+Thanks a lot!
+Menglong Dong
+
+>
+> In general it would be interesting to know the number for both
+> successful lookups and unsuccessful lookups across all three proposed
+> lookup versions.  I don't know how helpful it would be, but I would find
+> it interesting...
+>
+> Thanks,
+> NeilBrown
