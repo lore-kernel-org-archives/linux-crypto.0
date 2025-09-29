@@ -1,40 +1,40 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A892FB61D;
-	Mon, 29 Sep 2025 10:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74AE92FB963;
+	Mon, 29 Sep 2025 10:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759141019; cv=none; b=e4WWkqIa1jEDx8R3L1v58U3vKqBGUwal28TOJv01yrHRKpmGC3sjk0oVTJ+fimqu6mEt8eEAz0WhqxmOFYJ5swuFfHPxwt+jx+XWy8btnIMSUAYLhN7/i6W5mvl1PMYZ8cV1MRaVUKKdxd3eVWehEKEoRTEcaUOlqMWPh2G+pko=
+	t=1759141020; cv=none; b=WVnNjKCbnF7zexNCvb6wGcoMA8uq3X2cHoEd8E3WFYw1+E4QHnYOmA0X9ppwAYAm1a6y/841w07KpDf+rr+j0YmmDnW1ay23M0eHK0L0J+DRWftrudrKglbN57o98Da0LMnsKf04LV0gDQ8Rs2V02mD8fk4z79ZTKpZ4CjBC4JI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759141019; c=relaxed/simple;
+	s=arc-20240116; t=1759141020; c=relaxed/simple;
 	bh=gFFRfxU0C4D89u0f4bM0By/gaq3tBosyxmopf1mr5K0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=twpW4OSVcxD5nDDckk2XyDOEoG8J7m3ZIOblFsIlCrV0ZjWNeRZsZ/2KUjrxgEI8VK242hXuauq/8sGA1CjKnZ6EM40ME5jyc1Q3jfMybJVVFR8DRcvJRCvVYzPR+rC7OPLnWXJGYqA4P1bb0QPWoGF+prPKYFFchjpi120mHWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=h34c09nJ; arc=none smtp.client-ip=148.251.105.195
+	 In-Reply-To:Content-Type; b=ba6an36dbKpMVpupIuWFAx93lfNl8Vrce6mfIyl+VHLLmHGSoyT25PvYMRhBjtJA9AZh+FBMjq9EvBOZuvV69L9zdke5Z1LYWBpCbPdeK4qnS6U6gAcvR80VIOaDgq/9RRpxpVVJbD7jDhCg5zJUVxWqA5mTjV8HOqNnx7/yzW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=WUC9/Ngk; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="h34c09nJ"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="WUC9/Ngk"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1759141015;
+	s=mail; t=1759141016;
 	bh=gFFRfxU0C4D89u0f4bM0By/gaq3tBosyxmopf1mr5K0=;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=h34c09nJnODV8gvef0KmprNLPW3Zw3bVD3YAxen9qwBKeVY8tmInOKqqP9ecxW3bD
-	 qfIJFLAQQUMer4lcfscKlfJQ4jtWBwvCXeknCjY9kHj+8PGlqQZR85UkVpc3GCXXfU
-	 er27tuwf8YfMdPcZ0fsMcjyalysTZlq5BzLGgOP2a/usa5Srp934Jw3qxMBcjKaGJx
-	 G5sSKkmQXyImv3XcR//ErA4gx3f44M+l91Q0wA7ZfW8pSkJMLDY1M/2PpNWnb9oP3g
-	 HDHUFe4WrZ9s78gSuOUiMmJgobh4VPgx//jpQRzJraSfhQlv8Wq7ClobVcBqGwjWdt
-	 q4c1BE7rIDYAg==
+	b=WUC9/Ngkd/07HEYXLlEz5Yi8hfBjhKsC56RBiI1T79cwtzQl3n2eAdJtoeDBH81tx
+	 X13ajlzJrgwkByssvOjhrwIYh5WHSGtGWr9GIJ7G89KUEoDn2GeWdhGEWJ1x2wYD9H
+	 kloSZSqhs3xnujYQmwsRIhN2+lR6y1hxVAulKUFER2QVWXd22+Efk4zHvYMf4QO9sY
+	 C5uufMLLl0is97pZZOE5J+40teVdC6mtumDIT19WLo5JZ8N8cERaVtR7hSml5AQOwO
+	 11c62ZNviRXlS6gYLVdPyY1reA2kxy9SQeJkncIoz/AsegSWqps2+Q10QmKhyu3QLx
+	 RShiy6FC+eB/Q==
 Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 83A2A17E108C;
-	Mon, 29 Sep 2025 12:16:54 +0200 (CEST)
-Message-ID: <d02f8264-e437-43d8-8d4a-215f2154ea15@collabora.com>
-Date: Mon, 29 Sep 2025 12:16:54 +0200
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id A7EA017E12E4;
+	Mon, 29 Sep 2025 12:16:55 +0200 (CEST)
+Message-ID: <8780b731-950a-490a-9dd9-7ec916e3f992@collabora.com>
+Date: Mon, 29 Sep 2025 12:16:55 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,8 +42,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/4] dt-bindings: crypto: Add support for Airoha AN7583
- SoC
+Subject: Re: [PATCH v3 2/4] dt-bindings: watchdog: airoha: Add support for
+ Airoha AN7583 SoC
 To: Christian Marangi <ansuelsmth@gmail.com>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
  <conor+dt@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
@@ -55,10 +55,10 @@ To: Christian Marangi <ansuelsmth@gmail.com>, Rob Herring <robh@kernel.org>,
  linux-crypto@vger.kernel.org, linux-watchdog@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 References: <20250925164038.13987-1-ansuelsmth@gmail.com>
- <20250925164038.13987-2-ansuelsmth@gmail.com>
+ <20250925164038.13987-3-ansuelsmth@gmail.com>
 From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 Content-Language: en-US
-In-Reply-To: <20250925164038.13987-2-ansuelsmth@gmail.com>
+In-Reply-To: <20250925164038.13987-3-ansuelsmth@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
