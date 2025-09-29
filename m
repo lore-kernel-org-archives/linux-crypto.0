@@ -1,89 +1,51 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E5E305E24
-	for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 11:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1633A72614;
+	Mon, 29 Sep 2025 19:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759146577; cv=none; b=spCoPiG2TyiXR112VXTbOSoPbo1NCpGhr7o49B32S3wuJm98G1/LeOtN3d4+XIiVmrQtHJtDHlLuXxT1w8GVLlMqgkWxTp2naX6SlJnq6QpkFBLGoRT5WyqsSttG5qHfz+FCCinQ2O3n5V72o2X6TwH9oNn0u2sPtYaZgcnqz/k=
+	t=1759174083; cv=none; b=tasm1jvdi1UNXWD5Ny8aBCUvNnX3P7fMZuPiicr/J6OR+tKkYehpSEf7/0NwA+jYDV9arVLc8Gy0hC/zEDYnFOLJkg+WEMwJJlfikgzIW5RPWWFFPv8csS/29rsohVAJQZWb4/ZLtP56BDC/TpIbRH6IlfAMdUwU+8sXEeDRmL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759146577; c=relaxed/simple;
-	bh=Hjg7O/VP84/J9e7RtIca3ORI/sXxn52fxB421eoIakc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=slMwyuFJ0aGW49Fldu6QX5Sg7HQTVvhj1WXhvCQIlNsIzKauXdJumRpZPS+ywYIWQ/jJwVRWJS0FblN7OSDH09FSgWnt61kLJilEmPjF6P7Cy68l8b9Vly3oJcTpgNR6qbljlBAxX98kSUg77UfrTv36OE27TmIqK7gy0DghRYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nkj9hPhs; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1759174083; c=relaxed/simple;
+	bh=oaGTFnx38NxkPsnynmtWkqJ3cT3BV/CcfvpZyK46Lg0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ywtlxk0q02a0BBpA6hqvHz/lpVyBDXsmOo7pbgXtb5Kcmh7Rr6bkj9AOslcrBWppnFKG0t3DuIeekta6XoK+FqRcnm2fknkuXyUDycCY4Y5D7x5fn4YKncWpyM3mBE2YuGEtrdDTcMZUBaTMkIQVD/fySqFRyQc4ohVYJxnzDSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ii1NB8sZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nkj9hPhs"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-46e37d10f3eso32945635e9.0
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 04:49:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759146574; x=1759751374; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JNXwjySoMWBRZ4GYpoJmH4Y5RPTmMIKD3TMc/fbCEec=;
-        b=Nkj9hPhsaVU7H8Lc9qQKpJuvGEgx/EU874W4J9UrpEWjnxokyPG9j2xHkRTCAdBO6/
-         4c+tiKo94S5c0O8MBZBeZOoIwQ60BKHzJMroGGWl2IgLbFJTFT61ENmrQl+WRkCEMBaS
-         0jGl6x8wcEoTlrqaykVoyZDpKrjveCAYSa+frXIsnMHPBnzVhwa1vktp0OCaJlrEWbB3
-         XQdrCG7pWwJBJJb+G+umzfRksACkLQB38annLTsCdxUIQdPK9Q1Doa7bnpuzguX2JUAN
-         XGxGTu4mjMd+x0NpED6c4xqVeM1RYfdNKD5VCa6Fc1O2CKLylQt/xEB+aV4KYU/KY9+N
-         eMnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759146574; x=1759751374;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JNXwjySoMWBRZ4GYpoJmH4Y5RPTmMIKD3TMc/fbCEec=;
-        b=UE3G/HSkpOpI2muPDQCbVVo4qJpvYjeR+Jy1LnpqzUUi+HdkC1b76pVdmvO+H8cIVQ
-         MB+g57/GMygsBgGFZq/Hl1nos1mCaDBVpQcSCzOvIGxuCjjvJfTok4tZn0t5RLfMdJz4
-         QTydEhh+I3lfSlqBrdrvP7ItqF+0Y8aR3WEw8PayvXdxX8szVV7kc8rpmQlQE+TTRbrK
-         8Vp1mdBeIhHLLmXbhuZ5v006Hw1wVkqbUvaYxhdBU/NtxaMGRavvHIW17BTa6oet9W91
-         yx582MSOzrpT+x4vtl2IUYMD4cbFYRFFzViz+v/RZ+E2B/qjhmcJUA8ik4Td2+gbqUvS
-         6RnA==
-X-Forwarded-Encrypted: i=1; AJvYcCW5L6nN8Ze2MJtkHiasLDvZ0Dk2LL0QciJatWfXoA4VSh+iA3MFRF2y+obiF9vzNhaHHQtFlWNMOWo3C9E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLty6uck2KjcCf8SvtgjIngqrVkIyvEEgpCEzketzNhACmhjuH
-	qxY4fXedE80VJtJteJfGDQty5X3H/MHZ+cuLkqBAXItcDbsCMw5qNxSQ
-X-Gm-Gg: ASbGncuuiB1MOXoCIVnVW7RcFyg0FbdxTZofWxx0AtISYCK2zzrG7clZn0hWillPSOc
-	WcU85N1kYMR4oecRJOYntfKX3Q6LxF3BR0Pq3Bx0a4hV7kUxdY2i5d0Lp64uPPzf2Ce8IvGwpKv
-	k14cgZHmyaucJOXeS/Qoeip757LJYQya4/Q84rWbOq6h5WwsZC/s6TCwMcvj4JFKrh8uk/cWHJc
-	ETF/TNe9rOrS/0ti9TT0gBPtfs4CRZNk/hEqVPdAUy5HFREV2XaAOEkF7YtTAVk9AB5iv03Smag
-	BHUEjMRZr4rFFwYV3qBKAtLKgaYdlpjK9h190Yklis1kjN9Pk8+4GqCWlS3K9B3By9+okwsUoEp
-	0yCOOPcJ/UPVeMujgfyY2FlWikc6X7aTpuFCAaFt4N/1QGxrnacVUmjE2tvhmpnMZiwnSOoIqQn
-	zJwTSyzA==
-X-Google-Smtp-Source: AGHT+IHhYHgkfdxkZZncQx9k1whr6EHsQE6KaOfz7zeB9aghhqbCsKWiT9BDf9MZkeyuwud6rhMSzA==
-X-Received: by 2002:a05:600c:4fc6:b0:46e:487e:33c1 with SMTP id 5b1f17b1804b1-46e487e3768mr61020195e9.7.1759146573699;
-        Mon, 29 Sep 2025 04:49:33 -0700 (PDT)
-Received: from Ansuel-XPS24 (host-95-249-236-54.retail.telecomitalia.it. [95.249.236.54])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-46e56f77956sm10030835e9.20.2025.09.29.04.49.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 04:49:33 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Felix Fietkau <nbd@nbd.name>,
-	John Crispin <john@phrozen.org>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ii1NB8sZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC8BAC4CEF4;
+	Mon, 29 Sep 2025 19:28:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759174082;
+	bh=oaGTFnx38NxkPsnynmtWkqJ3cT3BV/CcfvpZyK46Lg0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ii1NB8sZF8bt6GUOjrt68rDuwzi88ccbXGNSfI7j4tSUk0cMzyYpv9CoY6Mw+zKkw
+	 9LvTChQ5ItJ7bRx33EskVHIu4q4VMNPPalRXhFsL9ylhGK83aNmALCDdwne5rRqWRh
+	 vRu3VNxpjEYSYtzaaK8UnBzf6LtRUBhbaoXERsvj5aUeNYVZktcLuy1GeWsc2tf06L
+	 KAeBmDB0y1QuQhzdMRCon16pUVyjFarE4zVF9qSyXRhjJDrEms6T6OzOhlaF2zor6d
+	 L0qP5d6hQQL8NVZcXpXfroFtiRtEklCBo7+NnqQv1qi/G4QJEEvayNgCiFBEzcmAx3
+	 Xuul6S2EJrmvQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: bpf@vger.kernel.org,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
 	linux-crypto@vger.kernel.org,
-	linux-watchdog@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH v4 4/4] arm64: dts: Add Airoha AN7583 SoC and AN7583 Evaluation Board
-Date: Mon, 29 Sep 2025 13:49:15 +0200
-Message-ID: <20250929114917.5501-5-ansuelsmth@gmail.com>
+	Ard Biesheuvel <ardb@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH bpf-next] selftests/bpf: Add test for libbpf_sha256()
+Date: Mon, 29 Sep 2025 12:27:21 -0700
+Message-ID: <20250929192721.144640-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250929114917.5501-1-ansuelsmth@gmail.com>
-References: <20250929114917.5501-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -92,344 +54,78 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce Airoha AN7583 SoC initial DTSI and AN7583 Evaluation Board
-DTS and add the required entry in the Makefile.
+Test that libbpf_sha256() calculates SHA-256 digests correctly.
 
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Tested with:
+    make -C tools/testing/selftests/bpf/
+    ./tools/testing/selftests/bpf/test_progs -t sha256 -v
+
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/arm64/boot/dts/airoha/Makefile       |   1 +
- arch/arm64/boot/dts/airoha/an7583-evb.dts |  22 ++
- arch/arm64/boot/dts/airoha/an7583.dtsi    | 283 ++++++++++++++++++++++
- 3 files changed, 306 insertions(+)
- create mode 100644 arch/arm64/boot/dts/airoha/an7583-evb.dts
- create mode 100644 arch/arm64/boot/dts/airoha/an7583.dtsi
+ .../testing/selftests/bpf/prog_tests/sha256.c | 52 +++++++++++++++++++
+ 1 file changed, 52 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sha256.c
 
-diff --git a/arch/arm64/boot/dts/airoha/Makefile b/arch/arm64/boot/dts/airoha/Makefile
-index ebea112ce1d7..b43138671ee2 100644
---- a/arch/arm64/boot/dts/airoha/Makefile
-+++ b/arch/arm64/boot/dts/airoha/Makefile
-@@ -1,2 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+dtb-$(CONFIG_ARCH_AIROHA) += an7583-evb.dtb
- dtb-$(CONFIG_ARCH_AIROHA) += en7581-evb.dtb
-diff --git a/arch/arm64/boot/dts/airoha/an7583-evb.dts b/arch/arm64/boot/dts/airoha/an7583-evb.dts
+diff --git a/tools/testing/selftests/bpf/prog_tests/sha256.c b/tools/testing/selftests/bpf/prog_tests/sha256.c
 new file mode 100644
-index 000000000000..910ceaa6af42
+index 0000000000000..604a0b1423d55
 --- /dev/null
-+++ b/arch/arm64/boot/dts/airoha/an7583-evb.dts
-@@ -0,0 +1,22 @@
-+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+/dts-v1/;
++++ b/tools/testing/selftests/bpf/prog_tests/sha256.c
+@@ -0,0 +1,52 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright 2025 Google LLC */
 +
-+#include "an7583.dtsi"
++#include <test_progs.h>
++#include "bpf/libbpf_internal.h"
 +
-+/ {
-+	model = "Airoha AN7583 Evaluation Board";
-+	compatible = "airoha,an7583-evb", "airoha,an7583";
++#define MAX_LEN 4096
 +
-+	aliases {
-+		serial0 = &uart1;
++/* Test libbpf_sha256() for all lengths from 0 to MAX_LEN inclusively. */
++void test_sha256(void)
++{
++	/*
++	 * The correctness of this value was verified by running this test with
++	 * libbpf_sha256() replaced by OpenSSL's SHA256().
++	 */
++	static const __u8 expected_digest_of_digests[SHA256_DIGEST_LENGTH] = {
++		0x62, 0x30, 0x0e, 0x1d, 0xea, 0x7f, 0xc4, 0x74,
++		0xfd, 0x8e, 0x64, 0x0b, 0xd8, 0x5f, 0xea, 0x04,
++		0xf3, 0xef, 0x77, 0x42, 0xc2, 0x01, 0xb8, 0x90,
++		0x6e, 0x19, 0x91, 0x1b, 0xca, 0xb3, 0x28, 0x42,
 +	};
++	__u64 seed = 0;
++	__u8 *data = NULL, *digests = NULL;
++	__u8 digest_of_digests[SHA256_DIGEST_LENGTH];
++	size_t i;
 +
-+	chosen {
-+		stdout-path = "serial0:115200n8";
-+	};
++	data = malloc(MAX_LEN);
++	if (!ASSERT_OK_PTR(data, "malloc"))
++		goto out;
++	digests = malloc((MAX_LEN + 1) * SHA256_DIGEST_LENGTH);
++	if (!ASSERT_OK_PTR(digests, "malloc"))
++		goto out;
 +
-+	memory@80000000 {
-+		device_type = "memory";
-+		reg = <0x0 0x80000000 0x2 0x00000000>;
-+	};
-+};
-diff --git a/arch/arm64/boot/dts/airoha/an7583.dtsi b/arch/arm64/boot/dts/airoha/an7583.dtsi
-new file mode 100644
-index 000000000000..945b69365747
---- /dev/null
-+++ b/arch/arm64/boot/dts/airoha/an7583.dtsi
-@@ -0,0 +1,283 @@
-+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++	/* Generate MAX_LEN bytes of "random" data deterministically. */
++	for (i = 0; i < MAX_LEN; i++) {
++		seed = (seed * 25214903917 + 11) & ((1ULL << 48) - 1);
++		data[i] = (__u8)(seed >> 16);
++	}
 +
-+#include <dt-bindings/interrupt-controller/irq.h>
-+#include <dt-bindings/interrupt-controller/arm-gic.h>
++	/* Calculate a digest for each length 0 through MAX_LEN inclusively. */
++	for (i = 0; i <= MAX_LEN; i++)
++		libbpf_sha256(data, i, &digests[i * SHA256_DIGEST_LENGTH]);
 +
-+/ {
-+	interrupt-parent = <&gic>;
-+	#address-cells = <2>;
-+	#size-cells = <2>;
-+
-+	cpus {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		cpu-map {
-+			cluster0 {
-+				core0 {
-+					cpu = <&cpu0>;
-+				};
-+
-+				core1 {
-+					cpu = <&cpu1>;
-+				};
-+			};
-+		};
-+
-+		cpu0: cpu@0 {
-+			device_type = "cpu";
-+			compatible = "arm,cortex-a53";
-+			reg = <0x0>;
-+			operating-points-v2 = <&cpu_opp_table>;
-+			enable-method = "psci";
-+			clocks = <&cpufreq>;
-+			clock-names = "cpu";
-+			power-domains = <&cpufreq>;
-+			power-domain-names = "perf";
-+			next-level-cache = <&l2>;
-+			#cooling-cells = <2>;
-+		};
-+
-+		cpu1: cpu@1 {
-+			device_type = "cpu";
-+			compatible = "arm,cortex-a53";
-+			reg = <0x1>;
-+			operating-points-v2 = <&cpu_opp_table>;
-+			enable-method = "psci";
-+			clocks = <&cpufreq>;
-+			clock-names = "cpu";
-+			power-domains = <&cpufreq>;
-+			power-domain-names = "perf";
-+			next-level-cache = <&l2>;
-+			#cooling-cells = <2>;
-+		};
-+
-+		l2: l2-cache {
-+			compatible = "cache";
-+			cache-size = <0x80000>;
-+			cache-line-size = <64>;
-+			cache-level = <2>;
-+			cache-unified;
-+		};
-+	};
-+
-+	psci {
-+		compatible = "arm,psci-1.0";
-+		method = "smc";
-+	};
-+
-+	cpufreq: cpufreq {
-+		compatible = "airoha,en7581-cpufreq";
-+
-+		operating-points-v2 = <&smcc_opp_table>;
-+
-+		#power-domain-cells = <0>;
-+		#clock-cells = <0>;
-+	};
-+
-+	cpu_opp_table: opp-table-cpu {
-+		compatible = "operating-points-v2";
-+		opp-shared;
-+
-+		opp-500000000 {
-+			opp-hz = /bits/ 64 <500000000>;
-+			required-opps = <&smcc_opp0>;
-+		};
-+
-+		opp-550000000 {
-+			opp-hz = /bits/ 64 <550000000>;
-+			required-opps = <&smcc_opp1>;
-+		};
-+
-+		opp-600000000 {
-+			opp-hz = /bits/ 64 <600000000>;
-+			required-opps = <&smcc_opp2>;
-+		};
-+
-+		opp-650000000 {
-+			opp-hz = /bits/ 64 <650000000>;
-+			required-opps = <&smcc_opp3>;
-+		};
-+
-+		opp-7000000000 {
-+			opp-hz = /bits/ 64 <700000000>;
-+			required-opps = <&smcc_opp4>;
-+		};
-+
-+		opp-7500000000 {
-+			opp-hz = /bits/ 64 <750000000>;
-+			required-opps = <&smcc_opp5>;
-+		};
-+
-+		opp-8000000000 {
-+			opp-hz = /bits/ 64 <800000000>;
-+			required-opps = <&smcc_opp6>;
-+		};
-+
-+		opp-8500000000 {
-+			opp-hz = /bits/ 64 <850000000>;
-+			required-opps = <&smcc_opp7>;
-+		};
-+
-+		opp-9000000000 {
-+			opp-hz = /bits/ 64 <900000000>;
-+			required-opps = <&smcc_opp8>;
-+		};
-+
-+		opp-9500000000 {
-+			opp-hz = /bits/ 64 <950000000>;
-+			required-opps = <&smcc_opp9>;
-+		};
-+
-+		opp-10000000000 {
-+			opp-hz = /bits/ 64 <1000000000>;
-+			required-opps = <&smcc_opp10>;
-+		};
-+
-+		opp-10500000000 {
-+			opp-hz = /bits/ 64 <1050000000>;
-+			required-opps = <&smcc_opp11>;
-+		};
-+
-+		opp-11000000000 {
-+			opp-hz = /bits/ 64 <1100000000>;
-+			required-opps = <&smcc_opp12>;
-+		};
-+
-+		opp-11500000000 {
-+			opp-hz = /bits/ 64 <1150000000>;
-+			required-opps = <&smcc_opp13>;
-+		};
-+
-+		opp-12000000000 {
-+			opp-hz = /bits/ 64 <1200000000>;
-+			required-opps = <&smcc_opp14>;
-+		};
-+	};
-+
-+	smcc_opp_table: opp-table-smcc {
-+		compatible = "operating-points-v2";
-+
-+		smcc_opp0: opp-0 {
-+			opp-level = <0>;
-+		};
-+
-+		smcc_opp1: opp-1 {
-+			opp-level = <1>;
-+		};
-+
-+		smcc_opp2: opp-2 {
-+			opp-level = <2>;
-+		};
-+
-+		smcc_opp3: opp-3 {
-+			opp-level = <3>;
-+		};
-+
-+		smcc_opp4: opp-4 {
-+			opp-level = <4>;
-+		};
-+
-+		smcc_opp5: opp-5 {
-+			opp-level = <5>;
-+		};
-+
-+		smcc_opp6: opp-6 {
-+			opp-level = <6>;
-+		};
-+
-+		smcc_opp7: opp-7 {
-+			opp-level = <7>;
-+		};
-+
-+		smcc_opp8: opp-8 {
-+			opp-level = <8>;
-+		};
-+
-+		smcc_opp9: opp-9 {
-+			opp-level = <9>;
-+		};
-+
-+		smcc_opp10: opp-10 {
-+			opp-level = <10>;
-+		};
-+
-+		smcc_opp11: opp-11 {
-+			opp-level = <11>;
-+		};
-+
-+		smcc_opp12: opp-12 {
-+			opp-level = <12>;
-+		};
-+
-+		smcc_opp13: opp-13 {
-+			opp-level = <13>;
-+		};
-+
-+		smcc_opp14: opp-14 {
-+			opp-level = <14>;
-+		};
-+	};
-+
-+	timer {
-+		compatible = "arm,armv8-timer";
-+		interrupt-parent = <&gic>;
-+		interrupts = <GIC_PPI 13 IRQ_TYPE_LEVEL_LOW>,
-+			     <GIC_PPI 14 IRQ_TYPE_LEVEL_LOW>,
-+			     <GIC_PPI 11 IRQ_TYPE_LEVEL_LOW>,
-+			     <GIC_PPI 10 IRQ_TYPE_LEVEL_LOW>;
-+	};
-+
-+	sys_hclk: clk-oscillator-100mhz {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <100000000>;
-+		clock-output-names = "sys_hclk";
-+	};
-+
-+	soc {
-+		compatible = "simple-bus";
-+		#address-cells = <2>;
-+		#size-cells = <2>;
-+		ranges;
-+
-+		gic: interrupt-controller@9000000 {
-+			compatible = "arm,gic-v3";
-+			interrupt-controller;
-+			#interrupt-cells = <3>;
-+			#address-cells = <1>;
-+			#size-cells = <1>;
-+			reg = <0x0 0x09000000 0x0 0x20000>,
-+			      <0x0 0x09080000 0x0 0x80000>,
-+			      <0x0 0x09400000 0x0 0x2000>,
-+			      <0x0 0x09500000 0x0 0x2000>,
-+			      <0x0 0x09600000 0x0 0x20000>;
-+			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_LOW>;
-+		};
-+
-+		crypto@1e004000 {
-+			compatible = "airoha,an7583-eip93", "airoha,en7581-eip93",
-+				     "inside-secure,safexcel-eip93ies";
-+			reg = <0x0 0x1fb70000 0x0 0x1000>;
-+
-+			interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
-+		};
-+
-+		uart1: serial@1fbf0000 {
-+			compatible = "ns16550";
-+			reg = <0x0 0x1fbf0000 0x0 0x30>;
-+			reg-io-width = <4>;
-+			reg-shift = <2>;
-+			interrupts = <GIC_SPI 18 IRQ_TYPE_LEVEL_HIGH>;
-+			clock-frequency = <1843200>;
-+		};
-+
-+		watchdog@1fbf0100 {
-+			compatible = "airoha,an7583-wdt", "airoha,en7581-wdt";
-+			reg = <0x0 0x1fbf0100 0x0 0x38>;
-+
-+			clocks = <&sys_hclk>;
-+			clock-names = "bus";
-+		};
-+	};
-+};
++	/* Calculate and verify the digest of all the digests. */
++	libbpf_sha256(digests, (MAX_LEN + 1) * SHA256_DIGEST_LENGTH,
++		      digest_of_digests);
++	ASSERT_MEMEQ(digest_of_digests, expected_digest_of_digests,
++		     SHA256_DIGEST_LENGTH, "digest_of_digests");
++out:
++	free(data);
++	free(digests);
++}
+
+base-commit: 4ef77dd584cfd915526328f516fec59e3a54d66e
 -- 
 2.51.0
 
