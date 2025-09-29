@@ -1,63 +1,64 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815F3304BB4
-	for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 11:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD7B305071
+	for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 11:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759146570; cv=none; b=sHSfeYybqB2vg+fuYgbNT1gA9tNn5W38EsbwIbK0KGTtcAH6AOSZai7CXzRfg0ocuTLs8VLyfVLQD0kccXiZkiirw2ildfStHHj4mmOAAqi6HqdtVwla9Wy5zTloUY8allufd2GTfGgcyZ/90ZBjzKuOnuqzi5/q5UBjCwDB/uM=
+	t=1759146572; cv=none; b=Lm0oZYSrO3Qha2tOVInO47TKAKLx6+tM/VjHBFJiKHgbP7y477MbiWD9HPPPjKCW6rQanOMaJoT4m/A7kQJMMSCA/wCi04zldFDDhZRkVovfl/WscbStJFQFPx+FcQ8rdtI6PIInG/k8Q1hpHaxQn8Q8CCzJWAlOuu+CTx1d1yY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759146570; c=relaxed/simple;
-	bh=/3d+DNZ4lwjm+XshHn87ADcx87J0m4/hD0vp82cIobE=;
+	s=arc-20240116; t=1759146572; c=relaxed/simple;
+	bh=aZdTsMD9fgmVcy1PAS22fMuqSv0ykQeoRdnEip9V1nc=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VisMEfpJvFhi/DWOh6MGVDrNSLaDFej5L5yGRYIY2tl6sSyY6or1ISBseHwDIuaMPmPdMQxG8kig23vJPId7fresKdKLwwCWnXsCTLk8hUwMCBr4p6lgVyJ6oLniLi9zQChPkCGVjaTzxpGUYIcer0ELHrhf/tRRcDVlfS9Dahs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U3yj2FzA; arc=none smtp.client-ip=209.85.128.46
+	 MIME-Version; b=QCGl5czM6rJSFHwJBj9fowq8LdQ0OHal1QaBTRpf6zWRXGmN9S1TSOLKUqzaRHYrmxdb8XIWiCE9dkPNQgvYL93L1P5HUC05QgejGPW27mIGYKHtnr57ddQsxpA36wEbJjeOj5LRRVhuYOPTv34hoPaGn5r6WrD9/hrl8N21swI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IS7fUf7Y; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U3yj2FzA"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-46e37d10ed2so43575885e9.2
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 04:49:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IS7fUf7Y"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-46e425de753so15940485e9.1
+        for <linux-crypto@vger.kernel.org>; Mon, 29 Sep 2025 04:49:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759146567; x=1759751367; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1759146569; x=1759751369; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=eYKIS6AUB4jbN6LRMHpfAVlAKJeZBTFDpfK2oWN9FEQ=;
-        b=U3yj2FzAbuZabJWr30ta6Vu6V0YKyL7onfjk7bUGso4t/c/EReg+D1o5KlwsyK1C/U
-         mrwvK8dBP5xy+I4H6akbQRoOtbVOrSyOrpyXXE7lGbmKhZMJXJKgIvVYWvnrwFHVjaFO
-         tmxoiO2vuX2XcbkKsO5KuGJivrWuM7TqmeXevvV0LSUwKqoLfZIvAkIrf4rZ2xxBcPPI
-         730fAOBM6BCtQZkAv+5Rp8amAfbXoVczRblU+0sghTdqd00jVs06M5Wp4LOvV9avCFLL
-         DQhLLx0IfMbebSiaieEFPO42UqT2BPM4/epx69XBW/BI5qgVf1xQnDndssv0NHBd25vo
-         ZPMg==
+        bh=0mIMwirLGWfi6Q5dJnPwjrLRkS6cp6VZXhnc2huda+M=;
+        b=IS7fUf7Y8AGuLsc9ycTAdf04Ov29bBf3aBLYx96o59VOzBW6bd+csHnACC1gpT5/ln
+         cI/Ohh8FO2lQ6CW1js6/fJZbHaQHBqMm4wGA3RG6XUqI6nzYHl1zX5N6eYzerr6pjrg4
+         xXZ+f7t+DN5wQvjIyopLu8SkyHhHBPidHR8cQkPqKBICXyqUlku/9AFPh0UfGCIU3bkR
+         yv93seR3A1sHE/UmSsFA3XbUxqugdu7MOvUMDel7qonm6xmluQxFo6r+jOHw1j7yzF5e
+         ly1/ixsqxS45aPKIESJ5d+ZWpyg1ANTPorogtBXmkVbfntNiPXmKlijJIMkxkFTMOC+v
+         30wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759146567; x=1759751367;
+        d=1e100.net; s=20230601; t=1759146569; x=1759751369;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eYKIS6AUB4jbN6LRMHpfAVlAKJeZBTFDpfK2oWN9FEQ=;
-        b=SNGRpyAnpIEBHkEeUedjfdETgj4Zp5XAr9v8Rod+Gc0HScCQRx89j3AnsX6TLEqCSu
-         TeYplzI7DTCcQxP/ElxbVL10HAzZIbSUoSwZVd1hl9BGblINUlzxWr6VzXwgU31gMG0T
-         HwU/58JRxpPv70BGlbxfAhd6xTyGAl8dB2VnYIDOZtjnhQN/XyWrJSmkSa3P6v4FB/Fa
-         bLyp0TJxkKl5J6/UDNK/yjxsiHD0iXzVK/CSK5E5NXoU8YngzRmGAVu0x4rF47jcHAH4
-         l56JZiwrMeUbdjtudcL3rTE6uAVa0mMhhWLPS/kEuLASrzHXywDZoEsrtGisT3o1NOTO
-         luKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXHH9NMi+FVZ6U6MLVv7mfh5th3+KvmDxZ1gkJg51vUCmtGR8SjJMGGpKf6nRH4qn6WzqwC2CCoWDeRg/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqQvZSD/fRtsqVxsrEBLUJ+yJkwL3MoTL7YQ2MmRjRyVo4/sma
-	qKMMUpF6NqMLWBEQZW3OT8lph7KCwZKF1VgtOoVKTr1flYqqHpNgyHJU
-X-Gm-Gg: ASbGncsI/ZOo7unszt80+qiB4rBTzg36nztffsi1p0ulgB31qjsIj44VB1N2yDJ/aXz
-	2Ygey570NAR63Jrh9oZb+Guq73VghRuRdKgUJzD6RfJpj9Y3+yJj2+XDb+ntotM4cFqzOKnWqHr
-	D2kkVhVRiza8Q11lDjFudi20XuU9+PM9AUbUb64glCyXMYnJTv9vGQm0fu9Q6Se4jWtwaFm2q1a
-	OGYT9IwQo/6bE929Y6oHzRnMmNKUPb5YrpeBC0upl4w93kZiq8keGSbrKps5SbZUba+eBjrD4qI
-	5OZ8nnbTHiu3xTSt5WhKBYOH/34V0vreJL54cIziip5rQhsTb5WSsincLuFcVX5SkCb6DWqZkXI
-	INUhwpmWnoLAXwq0NTDamoWc2E81s9x7tiRp+tXtu9Gzq4mhFqVdsAn/dCcZFfJvFIcPVOAg=
-X-Google-Smtp-Source: AGHT+IGuqXMPmewneHZfTKdYco1M53FvKmmiliFcGFMcT7OaxUtdD6+QR3/I0y4H9RP2qzHFLrfHpg==
-X-Received: by 2002:a05:600c:468a:b0:46e:4705:4958 with SMTP id 5b1f17b1804b1-46e47054a6fmr69438625e9.30.1759146566851;
-        Mon, 29 Sep 2025 04:49:26 -0700 (PDT)
+        bh=0mIMwirLGWfi6Q5dJnPwjrLRkS6cp6VZXhnc2huda+M=;
+        b=GOWEdHUOxDJGCErSAzXahJ3ccFoAxCqBvXKEFyhoHj1IMg442pr1QjIxX2QfKe0In5
+         P2hOH81KLWnNZM0lPcSsVYj/cPRzJW74WkdSh4OBtEpNyPT6+hqYCceaTXG7liB7YY0B
+         GXgNVPl6CKq0lYvvAy3M8/ZCiTn+lCA5EdHMzzLwkTs3j3hCS5b3B9fRX4kRRKSKY89n
+         oYAQ7IjZfkGX0XQP0R0v4FH2mtDVIhpeBz7zZJtL4CbQAtzWXojlWXc6SiSQf1EoNs5X
+         YMaOx+tzv6C5XnYUgyraXrDR64Zc6EGJcq4jsCzXBEzkpq33xgWbo5xOM7tqnuli07YI
+         YtRw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0RLCaxAkxgGbnTydm+/ZRrgvnon5uAuzuQT02PRBDi+aB5bC4dCmxVnuYM52P96R/mBty+9MxJyNWSlc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjLyrlZlbd7UZTbn5fwXpgsg6a1x4bsFHPTMq/jbd8gE/PVs2I
+	l3mOL241QbSpGauT8By8LMqrFXWjQWwZVabYKl5zAh5tdgYWz6PLIxwb
+X-Gm-Gg: ASbGnct/rtDbNfT0ESX/L/hnhrh1uTx1swozv0Ywwd8KlvgfZeGQqg61Dx+TBOO9Ozu
+	zJ58/HFNRQkynYa5PEqYIrAXKGyt6bAwbQHM6oVeESJjns/mohaX+mexev9uyUlXeBVszuHIQHt
+	i7aqXcysbCbwYbjbE+Vk49eJB2FnKvZi8lK1AVB+biSwuO/Dx/TAcZgQ7+MExNW0g23bauSFNty
+	trWEcq/C/ToNwENqVa0uC2UDYlO3U54IhcAsncabYDBiIa4S1XSfxxOCAfuEgmbdQrW07Oq1p7q
+	yQHf4IqO/E7XFIMaM3EetwhoAHKrMDHx1ru1Y9Rv+9BBiiR4DwizXrq0sI8mCCRWilz6l0dfiKr
+	I5xoZBUKZv8nRsQWg8mA+FEvBgJqMQFVPgJFeDXNyYdTak8YRlJ3D8CYSGNw40IIvX4xdS5fWy5
+	Fk+wrzDg==
+X-Google-Smtp-Source: AGHT+IHHeeXxNQFuhvyiL0e2I2I/uphT8IlYRgLGojEB+ic7yYz9UM+mWAZxKobXSmkeRjFhavSFKQ==
+X-Received: by 2002:a05:600c:19d0:b0:468:9e79:bee0 with SMTP id 5b1f17b1804b1-46e3292ea3emr151179445e9.0.1759146569045;
+        Mon, 29 Sep 2025 04:49:29 -0700 (PDT)
 Received: from Ansuel-XPS24 (host-95-249-236-54.retail.telecomitalia.it. [95.249.236.54])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-46e56f77956sm10030835e9.20.2025.09.29.04.49.23
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-46e56f77956sm10030835e9.20.2025.09.29.04.49.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 04:49:25 -0700 (PDT)
+        Mon, 29 Sep 2025 04:49:28 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
@@ -77,9 +78,9 @@ To: Rob Herring <robh@kernel.org>,
 	linux-watchdog@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH v4 1/4] dt-bindings: crypto: Add support for Airoha AN7583 SoC
-Date: Mon, 29 Sep 2025 13:49:12 +0200
-Message-ID: <20250929114917.5501-2-ansuelsmth@gmail.com>
+Subject: [PATCH v4 2/4] dt-bindings: watchdog: airoha: Add support for Airoha AN7583 SoC
+Date: Mon, 29 Sep 2025 13:49:13 +0200
+Message-ID: <20250929114917.5501-3-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250929114917.5501-1-ansuelsmth@gmail.com>
 References: <20250929114917.5501-1-ansuelsmth@gmail.com>
@@ -98,24 +99,26 @@ ones.
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 ---
- .../bindings/crypto/inside-secure,safexcel-eip93.yaml         | 4 ++++
- 1 file changed, 4 insertions(+)
+ .../devicetree/bindings/watchdog/airoha,en7581-wdt.yaml     | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
-index 997bf9717f9e..2269d78a4a80 100644
---- a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
-+++ b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
-@@ -30,6 +30,10 @@ description: |
+diff --git a/Documentation/devicetree/bindings/watchdog/airoha,en7581-wdt.yaml b/Documentation/devicetree/bindings/watchdog/airoha,en7581-wdt.yaml
+index 6bbab3cb28e5..6259478bdae5 100644
+--- a/Documentation/devicetree/bindings/watchdog/airoha,en7581-wdt.yaml
++++ b/Documentation/devicetree/bindings/watchdog/airoha,en7581-wdt.yaml
+@@ -14,7 +14,11 @@ allOf:
+ 
  properties:
    compatible:
-     oneOf:
+-    const: airoha,en7581-wdt
++    oneOf:
 +      - items:
-+          - const: airoha,an7583-eip93
-+          - const: airoha,en7581-eip93
-+          - const: inside-secure,safexcel-eip93ies
-       - items:
-           - const: airoha,en7581-eip93
-           - const: inside-secure,safexcel-eip93ies
++          - const: airoha,an7583-wdt
++          - const: airoha,en7581-wdt
++      - const: airoha,en7581-wdt
+ 
+   reg:
+     maxItems: 1
 -- 
 2.51.0
 
