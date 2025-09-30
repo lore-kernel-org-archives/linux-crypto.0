@@ -1,213 +1,337 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDCA244693;
-	Tue, 30 Sep 2025 08:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759221297; cv=fail; b=jx043hxVOdxsMGu+qly04bMdoFLJkkryZIUnoWnjnHCID4k2RO7WVvrbDEUO5GR9h90aMjUwr4McsQWvmKHGqk/86rcwLG+PLwm9dlQJt/TuE9wOmtTJalmoXaenoAaPXFDg5Ryl1yR3rwuesNRu5L965DbstDRO/t7eitXQHQE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759221297; c=relaxed/simple;
-	bh=PZyqanzW88J1s43tCvkubGkPM/CKgcoiYhfAJi9uOiw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=qdHjlvQCbnmqY1vsoM/HN67i+ByOJ1F6+Spo8MM5sip1iviALNFAlhUsRkdtmsj9nOg80GDjkwuTTQZ0CF3ByFiLZsme7y9aJgwo+MR+0Y4nt4h38du3iaxHAR9tFTUd/9IyJwTz18uHU/dWRyjC9UFLYM34La6H0xrpxGtwQhk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BRE7EA9q; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336E02F6181;
+	Tue, 30 Sep 2025 09:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759225260; cv=none; b=R57ABdp33aHuYucNwv6nMQmiiFMkqzAiO0mQmoCnAfegAbQJL43mIoEqzr6K0xdHP9bESBeVqxo2dG7EJlk3W/cmf0v46KPkIqH1GFS2S9FJY7fl2GBGrYc0FBMyS1n/S9IRAG7mr+ZrewJFzW8jSHj0H/WgxAHjNpAAAfkh5N8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759225260; c=relaxed/simple;
+	bh=b7g7RSLzy7kFzm44PB9WdugyZqlBSDqpyCcGJOAYX3U=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ul8fr3UYxtSiS4IFdnWPNu9fELkbwB21E+PGwQOEXs+C5Ml3ew0OJI7lWWRi10C7Qy07h3gY3p/tafYTFNw92Brn6npVcQACtwZsjr9KoCstmCkINVMVKuNk4F3Ajhnah4CGPL1zjwfDEXkVfTWATk/xXOTHifGU71eljOclLxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=EhPCB8dn; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BRE7EA9q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759221295; x=1790757295;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=PZyqanzW88J1s43tCvkubGkPM/CKgcoiYhfAJi9uOiw=;
-  b=BRE7EA9qGtj0Skm48Pur6vjJfRBWCCDK3aGL93Jua8j0yQMEfMiU31ny
-   Ao/Za0q1HLyfNSY59X+WyU3V6eDGbCMdu7xnI8NoWZv+NhlfOHNQ4FDLi
-   WPaY3L97aKHneg1MBcQXl2M5O7c6FIXM543knVX1pavbEILd3fAcQl2ss
-   rAUK2yHoHHYpv/DE0NZR4oqWGtF2tkYQIbqO/gJm1wO2FXUwr2rznFC4s
-   N0ja9was3Wh+DxZ9gJnOHkIlUKOiotgk0EddSWHQbbaAh79cjG8mKCzhm
-   +tT9Jc0Fp2erfCwrst/u7MZGz65066Dju8YpEN6CUm73kKlNXf0Jl5scZ
-   Q==;
-X-CSE-ConnectionGUID: 4ijaFveZSEKeJ+0J0lUcUw==
-X-CSE-MsgGUID: 9HVqlSCnS+msCu/sp5HLaA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11568"; a="61579782"
-X-IronPort-AV: E=Sophos;i="6.18,303,1751266800"; 
-   d="scan'208";a="61579782"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2025 01:34:54 -0700
-X-CSE-ConnectionGUID: z/DsuvRTTxus8y9c+p8haA==
-X-CSE-MsgGUID: 7kjtCR5nTMa1rl/yed9jcg==
-X-ExtLoop1: 1
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2025 01:34:54 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 30 Sep 2025 01:34:53 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Tue, 30 Sep 2025 01:34:53 -0700
-Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.31) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 30 Sep 2025 01:34:53 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a4pw7z2gGO4cOfOwzzF5SoHBtrHWJRCJZb2o+aAhEPEV0koi92rGUInZqRLl0jZeoBu2Mzcqrn4a8dpx0d8Y+4r0wzmDa/Dmk2KkXrAcBlHJ3dElBXdlgD5/qS6F+Bzf8BW5PM6vtLCe/RJAXk328BiRNHGcyEJgxGqVBBy8VRkqO59TZjqRw0q83dRbl1OMf4yWKG08JogC/bp7hlPWaiP9pyWDkYfXbQ4St5uhJQkJL1sizOwEvtG0+v3vm9D7KyNV71YjAK/1njWl6o678buO5RtzU1cOjHb7ECny1nr+w2omcParf1sanJEGgKU9W6aZahpsqCtOFpi94Kl1pw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TLm4wdNB4UvHh76YjrAzpxH2lME624LdSHxJpF9bwok=;
- b=YNp/Rsm4DSHZqkdFBZmEUsxaBdRhGQAyVb+PsqyGMVgyiq6OoZ+mMWE26S9IeV9vlGM7476LEBxUZu9zLJ4reyQYiW533bGkxTmCDb0Ezh44ORBA9m7vIoNx1MRlp4nGmlkJn/kJAKrzqLOdQhjof5BYNx4LjguFdpatJxwPZh4P70wi5piDzvPJ0kcn0dVzdLVuhPETcZ3XdPkj5fzH/14et9YRxPNYsxXp29DHV4SWL6feTb85c4HTVJZSNMsenXA0s243x7HUxYRUsEaM37UYEpfTdY2BBxX/LVB2Cea6rv90fZNcGhw2WW6u3qjqjyVyv4T4GzFlQDEz7EFRvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB5295.namprd11.prod.outlook.com (2603:10b6:5:392::14)
- by SA1PR11MB7037.namprd11.prod.outlook.com (2603:10b6:806:2ba::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.17; Tue, 30 Sep
- 2025 08:34:47 +0000
-Received: from DM4PR11MB5295.namprd11.prod.outlook.com
- ([fe80::769a:177e:10f2:f283]) by DM4PR11MB5295.namprd11.prod.outlook.com
- ([fe80::769a:177e:10f2:f283%4]) with mapi id 15.20.9160.015; Tue, 30 Sep 2025
- 08:34:46 +0000
-Date: Tue, 30 Sep 2025 09:34:37 +0100
-From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Han Xu <han.xu@nxp.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"terrelln@fb.com" <terrelln@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
-	Richard Weinberger <richard@nod.at>, "chengzhihao1@huawei.com"
-	<chengzhihao1@huawei.com>, Miquel Raynal <miquel.raynal@bootlin.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, open list
-	<linux-kernel@vger.kernel.org>, "open list:MEMORY TECHNOLOGY DEVICES (MTD)"
-	<linux-mtd@lists.infradead.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>
-Subject: Re: [PATCH] crypto: zstd - Fix compression bug caused by truncation
-Message-ID: <aNuWHekFas2g7a5b@t21-qat.iind.intel.com>
-References: <GV1PR04MB9071B5AC95DBD48B67FACF44971BA@GV1PR04MB9071.eurprd04.prod.outlook.com>
- <aNuQAr79Hdky3WII@gondor.apana.org.au>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aNuQAr79Hdky3WII@gondor.apana.org.au>
-X-ClientProxiedBy: MA5PR01CA0030.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:178::14) To DM4PR11MB5295.namprd11.prod.outlook.com
- (2603:10b6:5:392::14)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="EhPCB8dn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=MIME-Version:Message-ID:Subject:To:From:Date:cc:to:subject:
+	message-id:date:from:in-reply-to:references:reply-to;
+	bh=iVCaX1h7yN0LNDSuboANUoMrHK/lziH1ljvIM40VJyI=; b=EhPCB8dnYscgHzv3+0ENcOI2gO
+	5hi/FOnoxYFpkQYKNAgEUQq1BdXrohWh2WVsSoznuKChk7JKAoNrfVcEHROIz1lo0fnAn5iJKjKNK
+	aGcMGba7f+wfr1/cWMmkwpac2UsY8famfaFZ4EWlZWXT4BhlT8l5kPsf1vTksBE6AbtTrPhRdss3J
+	xgz9SzhBh2FRSHytAYorSgv2n2dR/HVTLdQQK6ih0OxmY4cUCzqJHDA5OCUU87d7kH/QA+7eViczk
+	WSZbnrwG6Zm4PwiK5+NwQRQqhuImsGZhBSPyGp7ctKMWUuJ1myBTFxg67K5AwwVfdMOQMMIj/tGnr
+	WnPrMARA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1v3Wql-009Pak-11;
+	Tue, 30 Sep 2025 17:40:48 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 30 Sep 2025 17:40:47 +0800
+Date: Tue, 30 Sep 2025 17:40:47 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Update for 6.18
+Message-ID: <aNuln6SQ_VIISMPi@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB5295:EE_|SA1PR11MB7037:EE_
-X-MS-Office365-Filtering-Correlation-Id: bc8e5a89-0ede-4bae-af36-08ddfffc367b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?I9doXAatH6Uz1lBoZwBs3WFmyWhq2vcn3RXdx371Dywu6PTNH+hOlRBuX5BJ?=
- =?us-ascii?Q?wMAjUi9LLY14dI4dWQylBIyV9KJ29SG4Eem+XQGDp7ytaspjt3ouKmmFGJdW?=
- =?us-ascii?Q?oJIA9f8Umgf9RCYoyTjj/jdbqh4ZScYTcbcm2wGa0GNDj+Gz06rGCupTwQ0/?=
- =?us-ascii?Q?JjTsGsJQvLHkAql3oggzomFq9MUFYCWX9n5nEyFSwFLJP5oAvRcKNrqWYx25?=
- =?us-ascii?Q?M7Oo9K1C6yVi0YRGF71xiG8PYDDXxZcVyF5LkNDAM2dAocXpjPkDQMZFxbS2?=
- =?us-ascii?Q?aFPDw9FYpMLILeFRWhm40OvoqkUsOIgg7PLdOhgWaIhVHmFBNPKsE1AsKVu9?=
- =?us-ascii?Q?XDkQ60n363wHjn4P/AmmKCMGIxQEj+M7jug+a1BW2jw/aONxvXXyFTx3SKil?=
- =?us-ascii?Q?0A8rJj+va4HLOVnYVvS6CrYj/6UwM2joXKw+qzPS97uubRSZDz8fDBQesIBz?=
- =?us-ascii?Q?75yrbg3+AAXD/09hPjAnPDHridp4WYmPQfCgPe5SRihD2S7XmS3DSryarRwx?=
- =?us-ascii?Q?qtm6zYH3oBFJYgq5Ii/wtye4b8GBYEC8F8Dkj+FCIm2Wtj92pHd61pu9hG5L?=
- =?us-ascii?Q?+2EN/9+Ln0iDWoHToui4tAWx45nNObJuiFM5Qd7XD9GuB4LjdFtb54n18tQ0?=
- =?us-ascii?Q?+7yLm5VbfzsEP3CPnoeHV4lS4rG3SBDcB0cVHIF0qOu5NVGkYIbstE2VBZPV?=
- =?us-ascii?Q?9jOxvc5RvGfk+Cyp7cMdiZzA53wo3Q9GNLivLqaj65MHDGOh22C18Q2gM5SR?=
- =?us-ascii?Q?6v9mK0+3Sge9FZEWMy1/9liqRWY3Jd9NygJ9/JU/9wwS/v2I6iyPoSH7i6xc?=
- =?us-ascii?Q?gRS5oRWDAe30ld7+9UYL+9nCR+W8iv0VpsxW8vbt3fsriEZotxxqEchPzibf?=
- =?us-ascii?Q?yFpldSqYRjwPvcEu73bSZd/MWsuR6EwEb65gpVRh+sLVCnq9rpqXG/bPDcmn?=
- =?us-ascii?Q?SAlpDB/gBThJ8VQbXf8NMugC84sbRNYYuOEl0DXJCSc4xIYwUx3kI702jomP?=
- =?us-ascii?Q?T28kTpJECRmnynjFb4S8F1mp3s6PfW7/CGSU9IqGuv8wcX+5YLUxJSZvjyLL?=
- =?us-ascii?Q?6sE5lQzvmQjFiWkJIDQSSvCVuPrJf8055LeeqhexXMDg/mqsEdLXD57BmbAB?=
- =?us-ascii?Q?UXaNYvuuVtYnrQLlk5ITZevUzu4cGk4xsA+oHtg9e6F1iI9QKpf/qMIRvBw4?=
- =?us-ascii?Q?BsQUm90hLH//ntRkqAPXK6/BJNa0F7rCxpOObS45cHas9vyNNm5fOLEJ6YoF?=
- =?us-ascii?Q?eUMcliNoRWsv0stlgwaW115v1ly4EV65MrY+EdC+XNKgPuGiuK+ldrDW284X?=
- =?us-ascii?Q?c9Jcl+CdLvCA0bM57QfqERHzGZfKS+JqNdialokuQc9v9IDpTdoJG/nOa663?=
- =?us-ascii?Q?VDhwFhDNNCOcJ/W8/dwPdHgpjySoVq6J4ioCd3S6qXU3/t6xfQ=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5295.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?87zrqCPO7H7sMal2EmN+97uNShpP14EES3yJlxr9H3iIwx9FmmVyxKYozJub?=
- =?us-ascii?Q?CHx2a4e1TvTjcQy9gkaRXf1oo+2ulhwEcjI4kY5bbStFR2unWJdQRbOpNttg?=
- =?us-ascii?Q?aDmY5VDmryZz2dsLka+sRh8XNWXaLC8wxLrz80vslkhe1AAoOLbbAhftOJD+?=
- =?us-ascii?Q?h7pOmR/3fnmuhwv1xrwrt9ZsevDwT7Y29OoXq1s0D5GAEBASN5UNdL36FaPJ?=
- =?us-ascii?Q?JU2ba13+AQkg30rl4aKKHQfTc4XitmnVGgKTndpRjuiHhrG0o4J8+CeOrHd+?=
- =?us-ascii?Q?2V74IZee/XxgYWY7+e/4lb3Ek3uo8OYtnpEPsSQfG93IgfBGUGhkV/gIKUTB?=
- =?us-ascii?Q?Y/GW2EP/7LRGp9Zh2D33NQFDdtLLc81Lxm3Q9LRC1w/I3cK6IHif1JcAhx/b?=
- =?us-ascii?Q?da2Bk6OZ27kFBgXRwwSRLeF18D2vd9/aioD2a5X/WH+o8+2eDDmhqExvIzlo?=
- =?us-ascii?Q?Tadk5azrI0a1IeoymvU/NH1NSJCZCf/xKIWt3ro+xgnB2mqFkkZBf+m7SD/W?=
- =?us-ascii?Q?/2gKGcwp3ObjaUHIkmn/sojnjsSlrQDjemeHXX+nH+07WORCeXmoDDh8XNyU?=
- =?us-ascii?Q?/iJe0UsNIJq0Vh20LwPTO93Q9m5+PnD9y5WIsqsLK67ctqg3wSMK2k5rQdZe?=
- =?us-ascii?Q?Xivrnz6kyPNyFPYzetVFunPqr5GvkNU68E61fI/YEqq8plDJ6ReqwtIawMfK?=
- =?us-ascii?Q?fWZEOBgPfj3eFst1xNbgdMt+TnSLQjQV6atwu3Mkc1KyGjuAn4kUNN39zP0R?=
- =?us-ascii?Q?hgVko48J5GE7M7o5MRnnSqWVE+FjITj/P8IUngBwtoXt3MHVOVaJ/NyWxOvw?=
- =?us-ascii?Q?msOlAVCf0wDokOV8CsblKELKxwHUsgjClCPzSmoJRDcDknY97d9pqC1btixb?=
- =?us-ascii?Q?pHH8GGpJuEYTjCADTRePOMg31idqlrlz9Uar4k0AMZUe60xQdy2Kx0ifzzE3?=
- =?us-ascii?Q?BGPiCqLqEQXh1heIjJIW/zNH171wqLunqjeAbvsN+uVgsiPQwq2NTI5iOG6h?=
- =?us-ascii?Q?7OT63RcP02JuNF7FgEloNtPZ4kmUb5jIMy+v0qhm0qMh8j2i9V7dt9gH4sm4?=
- =?us-ascii?Q?SIAhk9couOXnY27d2l+A+NE2yf9KaJYOzhkk882CTmidv0RcNbTGMbgArX9Y?=
- =?us-ascii?Q?dUf9Fku/f5yp5k47ceTLQIuaCV2ptw3OlZEUaxPl7YDjAAXk1QUDBmvdg2EN?=
- =?us-ascii?Q?u2dREQbcMC0242nuEG3/nNvvVNljA5plQPWrXU6+N2y3vAOLzhdvSD2poLkN?=
- =?us-ascii?Q?jLhTuyPS5kfSvZPS0LYMHjBMOX3PWKi6euc4X27sA6QZyeS5NGFE9v/ccxSj?=
- =?us-ascii?Q?0Oe1LfAAIiT4aUjITBPdokyEyC2wdR/PBYk6EnSmZ95ZEAoEQKYlfYmj9dtZ?=
- =?us-ascii?Q?uWWWUsbCtXPtIn/+bIiuYRo2PlFl08YxXKjFnIfXTFNlEQA65gmOhI4MwsMw?=
- =?us-ascii?Q?DU/oKdAaKI+XEWFdBCqLrxZMrbyGeSxnY5iY6Iu5CRKhuxZ1wZuT/e8LVnE4?=
- =?us-ascii?Q?DVfQvPWF0NpP6NU+zj98HpIaV4PjbRsIlbgf2EMrl9K9ehicXthX+Sy6MTqO?=
- =?us-ascii?Q?7ZzVazJkK/suyNc0PkoUwU3vRt9dJluQiuJTTXzznCUSxdZ5qHLWKhyechnQ?=
- =?us-ascii?Q?sWYy+ANKN67+FfRYBk+F638=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc8e5a89-0ede-4bae-af36-08ddfffc367b
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5295.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2025 08:34:46.8642
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SfQHpC6D4D+Urlsz4rPC8t0AwYfpRRbKHIrvH0kR5L+C+GNzHzDdN2FRzAm3hONDdJWpY1ojWf2zX7vwnTW9MMM1x66WK/5FTNqufSAFNS9tNw+fimQIE7I6tZksAuRk
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7037
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Tue, Sep 30, 2025 at 04:08:34PM +0800, Herbert Xu wrote:
-> On Mon, Sep 29, 2025 at 11:51:36PM +0000, Han Xu wrote:
-> > Hi Suman,
-> > 
-> > The patch f5ad93ffb5411 "crypto: zstd - convert to acomp"
-> > leads to the following kernel dump during UBIFS write back.
-> 
-> Thanks for the detailed report and instructions!
-> 
-> Please let me know if you still get the crash with this patch:
+Hi Linus:
 
-Thank you Herbert. It fixes the issue.
+The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
 
-> 
-> ---8<---
-> Use size_t for the return value of zstd_compress_cctx as otherwise
-> negative errors will be truncated to a positive value.
-> 
-> Reported-by: Han Xu <han.xu@nxp.com>
-> Fixes: f5ad93ffb541 ("crypto: zstd - convert to acomp")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/crypto/zstd.c b/crypto/zstd.c
-> index c2a19cb0879d..ac318d333b68 100644
-> --- a/crypto/zstd.c
-> +++ b/crypto/zstd.c
-> @@ -83,7 +83,7 @@ static void zstd_exit(struct crypto_acomp *acomp_tfm)
->  static int zstd_compress_one(struct acomp_req *req, struct zstd_ctx *ctx,
->  			     const void *src, void *dst, unsigned int *dlen)
->  {
-> -	unsigned int out_len;
-> +	size_t out_len;
->  
->  	ctx->cctx = zstd_init_cctx(ctx->wksp, ctx->wksp_size);
->  	if (!ctx->cctx)
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+  Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.18-p1
+
+for you to fetch changes up to 166c83f7789ed02dc1f25bc7bed4a1beb25343aa:
+
+  dt-bindings: rng: hisi-rng: convert to DT schema (2025-09-28 11:54:48 +0800)
+
+----------------------------------------------------------------
+This update includes the following changes:
+
+Drivers:
+
+- Add ciphertext hiding support to ccp.
+- Add hashjoin, gather and UDMA data move features to hisilicon.
+- Add lz4 and lz77_only to hisilicon.
+- Add xilinx hwrng driver.
+- Add ti driver with ecb/cbc aes support.
+- Add ring buffer idle and command queue telemetry for GEN6 in qat.
+
+Others:
+
+- Use rcu_dereference_all to stop false alarms in rhashtable.
+- Fix CPU number wraparound in padata.
+----------------------------------------------------------------
+
+Arnd Bergmann (1):
+      hwrng: nomadik - add ARM_AMBA dependency
+
+Ashish Kalra (5):
+      crypto: ccp - New bit-field definitions for SNP_PLATFORM_STATUS command
+      crypto: ccp - Cache SEV platform status and platform state
+      crypto: ccp - Add support for SNP_FEATURE_INFO command
+      crypto: ccp - Introduce new API interface to indicate SEV-SNP Ciphertext hiding feature
+      crypto: ccp - Add support to enable CipherTextHiding on SNP_INIT_EX
+
+Bagas Sanjaya (1):
+      crypto: doc - Add explicit title heading to API docs
+
+Chenghai Huang (5):
+      crypto: hisilicon/zip - remove unnecessary validation for high-performance mode configurations
+      crypto: hisilicon - re-enable address prefetch after device resuming
+      crypto: hisilicon/zip - enable literal length in stream mode compression
+      crypto: hisilicon/zip - add lz4 and lz77_only to algorithm sysfs
+      crypto: hisilicon/qm - set NULL to qm->debug.qm_diff_regs
+
+Colin Ian King (1):
+      crypto: stm32 - Fix spelling mistake "STMicrolectronics" -> "STMicroelectronics"
+
+Dan Moulding (1):
+      crypto: comp - Use same definition of context alloc and free ops
+
+David Sterba (1):
+      lib/lzo: add unlikely hints to overrun checks
+
+Edward Adam Davis (1):
+      crypto: jitter - Mark intermediary memory as clean
+
+Eric Biggers (3):
+      crypto: arm64/aes - use SHA-256 library instead of crypto_shash
+      crypto: qat - Use library to prepare HMAC keys
+      crypto: chelsio - Use library to prepare HMAC keys
+
+Fan Wu (1):
+      KEYS: X.509: Fix Basic Constraints CA flag parsing
+
+Gaurav Jain (1):
+      crypto: caam - double the entropy delay interval for retry
+
+Harsh Jain (1):
+      crypto: xilinx - Add TRNG driver for Versal
+
+Herbert Xu (5):
+      crypto: hash - Make HASH_MAX_DESCSIZE a bit more obvious
+      crypto: hisilicon/sec2 - Fix false-positive warning of uninitialised qp_ctx
+      crypto: ti - Enable compile testing for dthev2
+      rhashtable: Use rcu_dereference_all and rcu_dereference_all_check
+      crypto: qat - Return pointer directly in adf_ctl_alloc_resources
+
+Kael D'Alcamo (1):
+      dt-bindings: rng: hisi-rng: convert to DT schema
+
+Liao Yuanhong (3):
+      crypto: jh7110 - Remove the use of dev_err_probe()
+      crypto: tegra - Remove the use of dev_err_probe()
+      hwrng: cn10k - Remove the use of dev_err_probe()
+
+Marco Crivellari (3):
+      crypto: cryptd - WQ_PERCPU added to alloc_workqueue users
+      padata: replace use of system_unbound_wq with system_dfl_wq
+      padata: WQ_PERCPU added to alloc_workqueue users
+
+Menglong Dong (1):
+      rhashtable: Use __always_inline instead of inline
+
+Michael Roth (1):
+      crypto: ccp - Fix checks for SNP_VLEK_LOAD input buffer length
+
+Mounika Botcha (1):
+      dt-bindings: crypto: Add node for True Random Number Generator
+
+Nishanth Menon (1):
+      hwrng: ks-sa - fix division by zero in ks_sa_rng_init
+
+Ovidiu Panait (9):
+      crypto: sun8i-ce - remove channel timeout field
+      crypto: sun8i-ce - remove boilerplate in sun8i_ce_hash_digest()
+      crypto: sun8i-ce - remove unnecessary __maybe_unused annotations
+      crypto: sun8i-ce - add a new function for dumping task descriptors
+      crypto: sun8i-ce - move bounce_iv and backup_iv to request context
+      crypto: sun8i-ce - fold sun8i_ce_cipher_run() into sun8i_ce_cipher_do_one()
+      crypto: sun8i-ce - pass task descriptor to cipher prepare/unprepare
+      crypto: sun8i-ce - save hash buffers and dma info to request context
+      crytpo: sun8i-ce - factor out prepare/unprepare from sun8i_ce_hash_run()
+
+Qianfeng Rong (6):
+      crypto: ccp - Remove redundant __GFP_ZERO
+      crypto: qat - use kcalloc() in qat_uclo_map_objs_from_mof()
+      crypto: hisilicon - use kcalloc() instead of kzalloc()
+      crypto: ccp - Use int type to store negative error codes
+      crypto: hisilicon/sec - Use int type to store negative error codes
+      crypto: tegra - Use int type to store negative error codes
+
+Ryo Takakura (1):
+      crypto: omap - convert from tasklet to BH workqueue
+
+T Pratham (2):
+      dt-bindings: crypto: Add binding for TI DTHE V2
+      crypto: ti - Add driver for DTHE V2 AES Engine (ECB, CBC)
+
+Thomas Fourier (4):
+      crypto: keembay - Add missing check after sg_nents_for_len()
+      crypto: rockchip - Fix dma_unmap_sg() nents value
+      crypto: atmel - Fix dma_unmap_sg() direction
+      crypto: aspeed - Fix dma_unmap_sg() direction
+
+Thorsten Blum (3):
+      crypto: octeontx2 - Call strscpy() with correct size argument
+      crypto: qat - Replace kzalloc() + copy_from_user() with memdup_user()
+      crypto: anubis - simplify return statement in anubis_mod_init
+
+Vijay Sundar Selvamani (2):
+      crypto: qat - add ring buffer idle telemetry counter for GEN6
+      crypto: qat - add command queue telemetry counters for GEN6
+
+Weili Qian (6):
+      crypto: hisilicon - check the sva module status while enabling or disabling address prefetch
+      crypto: hisilicon/qm - request reserved interrupt for virtual function
+      crypto: hisilicon/qm - invalidate queues in use
+      crypto: hisilicon/qm - mask axi error before memory init
+      crypto: hisilicon - enable error reporting again
+      crypto: hisilicon/qm - clear all VF configurations in the hardware
+
+Xiao Liang (1):
+      padata: Reset next CPU when reorder sequence wraps around
+
+Xichao Zhao (1):
+      hwrng: timeriomem - Use us_to_ktime() where appropriate
+
+Yunseong Kim (2):
+      crypto: ccp - Fix typo in psp_populate_hsti function name
+      crypto: ccp - Fix incorrect payload size calculation in psp_poulate_hsti()
+
+Zhang Enpei (1):
+      crypto: caam - switch to use devm_kmemdup_array()
+
+Zhushuai Yin (2):
+      crypto: hisilicon/qm - check whether the input function and PF are on the same device
+      crypto: hisilicon/zip - add hashjoin, gather, and UDMA data move features
+
+ .../ABI/testing/debugfs-driver-qat_telemetry       |  27 ++
+ Documentation/crypto/api-aead.rst                  |   3 +
+ Documentation/crypto/api-akcipher.rst              |   3 +
+ Documentation/crypto/api-digest.rst                |   3 +
+ Documentation/crypto/api-kpp.rst                   |   3 +
+ Documentation/crypto/api-rng.rst                   |   3 +
+ Documentation/crypto/api-sig.rst                   |   3 +
+ Documentation/crypto/api-skcipher.rst              |   3 +
+ .../bindings/crypto/ti,am62l-dthev2.yaml           |  50 +++
+ .../bindings/crypto/xlnx,versal-trng.yaml          |  35 ++
+ Documentation/devicetree/bindings/rng/hisi-rng.txt |  12 -
+ .../devicetree/bindings/rng/hisi-rng.yaml          |  32 ++
+ MAINTAINERS                                        |  13 +
+ arch/arm64/crypto/Kconfig                          |   1 +
+ arch/arm64/crypto/aes-glue.c                       |  21 +-
+ arch/s390/crypto/sha.h                             |   8 +-
+ crypto/842.c                                       |   6 +-
+ crypto/anubis.c                                    |   5 +-
+ crypto/asymmetric_keys/x509_cert_parser.c          |  16 +-
+ crypto/cryptd.c                                    |   3 +-
+ crypto/jitterentropy-kcapi.c                       |   1 +
+ crypto/lz4.c                                       |   6 +-
+ crypto/lz4hc.c                                     |   6 +-
+ crypto/lzo-rle.c                                   |   6 +-
+ crypto/lzo.c                                       |   6 +-
+ drivers/char/hw_random/Kconfig                     |   1 +
+ drivers/char/hw_random/cn10k-rng.c                 |   2 +-
+ drivers/char/hw_random/ks-sa-rng.c                 |   4 +
+ drivers/char/hw_random/timeriomem-rng.c            |   2 +-
+ drivers/crypto/Kconfig                             |  13 +
+ drivers/crypto/Makefile                            |   1 +
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c    |  85 ++---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c  |  35 +-
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c  | 147 ++++----
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c  |   1 -
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c  |   1 -
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h       |  27 +-
+ drivers/crypto/aspeed/aspeed-hace-crypto.c         |   2 +-
+ drivers/crypto/atmel-tdes.c                        |   2 +-
+ drivers/crypto/caam/ctrl.c                         |  10 +-
+ drivers/crypto/ccp/hsti.c                          |   8 +-
+ drivers/crypto/ccp/sev-dev.c                       | 131 ++++++-
+ drivers/crypto/ccp/sev-dev.h                       |   6 +-
+ drivers/crypto/chelsio/Kconfig                     |   6 +-
+ drivers/crypto/chelsio/chcr_algo.c                 | 255 +++----------
+ drivers/crypto/chelsio/chcr_crypto.h               |   1 -
+ drivers/crypto/hisilicon/debugfs.c                 |   1 +
+ drivers/crypto/hisilicon/hpre/hpre_main.c          | 199 +++++++---
+ drivers/crypto/hisilicon/qm.c                      | 218 ++++++++---
+ drivers/crypto/hisilicon/sec/sec_drv.c             |   3 +-
+ drivers/crypto/hisilicon/sec2/sec_crypto.c         |   8 +-
+ drivers/crypto/hisilicon/sec2/sec_main.c           | 229 ++++++++----
+ drivers/crypto/hisilicon/zip/dae_main.c            |  19 +-
+ drivers/crypto/hisilicon/zip/zip_main.c            | 242 ++++++++----
+ .../crypto/intel/keembay/keembay-ocs-hcu-core.c    |   5 +-
+ drivers/crypto/intel/qat/Kconfig                   |   7 +-
+ drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c  |  40 +-
+ drivers/crypto/intel/qat/qat_common/adf_gen6_tl.c  | 112 ++++++
+ .../crypto/intel/qat/qat_common/adf_telemetry.c    |  19 +
+ .../crypto/intel/qat/qat_common/adf_telemetry.h    |   5 +
+ .../crypto/intel/qat/qat_common/adf_tl_debugfs.c   |  52 +++
+ .../crypto/intel/qat/qat_common/adf_tl_debugfs.h   |   5 +
+ drivers/crypto/intel/qat/qat_common/qat_algs.c     | 195 +++-------
+ drivers/crypto/intel/qat/qat_common/qat_uclo.c     |   2 +-
+ .../crypto/marvell/octeontx2/otx2_cptpf_ucode.c    |   2 +-
+ drivers/crypto/nx/nx-common-powernv.c              |   6 +-
+ drivers/crypto/nx/nx-common-pseries.c              |   6 +-
+ drivers/crypto/omap-aes.c                          |  15 +-
+ drivers/crypto/omap-aes.h                          |   2 +-
+ drivers/crypto/omap-des.c                          |  17 +-
+ drivers/crypto/omap-sham.c                         |  15 +-
+ drivers/crypto/rockchip/rk3288_crypto_ahash.c      |   2 +-
+ drivers/crypto/starfive/jh7110-aes.c               |  12 +-
+ drivers/crypto/starfive/jh7110-hash.c              |   3 +-
+ drivers/crypto/stm32/stm32-cryp.c                  |   2 +-
+ drivers/crypto/tegra/tegra-se-hash.c               |   3 +-
+ drivers/crypto/tegra/tegra-se-main.c               |   2 +-
+ drivers/crypto/ti/Kconfig                          |  14 +
+ drivers/crypto/ti/Makefile                         |   3 +
+ drivers/crypto/ti/dthev2-aes.c                     | 411 +++++++++++++++++++++
+ drivers/crypto/ti/dthev2-common.c                  | 217 +++++++++++
+ drivers/crypto/ti/dthev2-common.h                  | 101 +++++
+ drivers/crypto/xilinx/Makefile                     |   1 +
+ drivers/crypto/xilinx/xilinx-trng.c                | 405 ++++++++++++++++++++
+ include/crypto/hash.h                              |  16 +-
+ include/crypto/internal/scompress.h                |  11 +-
+ include/linux/hisi_acc_qm.h                        |  22 +-
+ include/linux/psp-sev.h                            |  44 ++-
+ include/linux/rcupdate.h                           |  26 ++
+ include/linux/rhashtable.h                         |  56 +--
+ include/uapi/linux/psp-sev.h                       |  10 +-
+ include/uapi/misc/uacce/hisi_qm.h                  |   1 +
+ kernel/padata.c                                    |  15 +-
+ lib/lzo/lzo1x_compress.c                           |   2 +-
+ lib/lzo/lzo1x_decompress_safe.c                    |   6 +-
+ 95 files changed, 2865 insertions(+), 959 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/ti,am62l-dthev2.yaml
+ create mode 100644 Documentation/devicetree/bindings/crypto/xlnx,versal-trng.yaml
+ delete mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.yaml
+ create mode 100644 drivers/crypto/ti/Kconfig
+ create mode 100644 drivers/crypto/ti/Makefile
+ create mode 100644 drivers/crypto/ti/dthev2-aes.c
+ create mode 100644 drivers/crypto/ti/dthev2-common.c
+ create mode 100644 drivers/crypto/ti/dthev2-common.h
+ create mode 100644 drivers/crypto/xilinx/xilinx-trng.c
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
