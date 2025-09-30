@@ -1,97 +1,169 @@
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B46218AD1;
-	Tue, 30 Sep 2025 10:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E1B2FAC05
+	for <linux-crypto@vger.kernel.org>; Tue, 30 Sep 2025 13:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759227937; cv=none; b=pmYTR2zFhU+Dguqm9YPyCD04F4lVy44VCdYDjWE4/bpXcQmBCFWqqZ/ZGSomD5l42wZUoD9YQzqcCWw5mxf9/JwGReIlNrVdVnA5JbuyeJQoOteFiFn9JD0r7Oja+vrTi8RMzETfycdQ+5c8oLvXBbWzOWsgIQeBF9/Nx6EtMcU=
+	t=1759239146; cv=none; b=oOK1eSm0A5OvdWFg3IOiqDhbmxJg1hS3raLdxIlYZPRfSEOWOI9WpPl7v9jmtvQ5hlCRwI3ODF1nkAgmp1W9AcAZEJhZdo7RYWexhGsrOApiUCs9xMliomTp2tQLheQM+tom05RZPemzz214JI56Zd0lgeYBbba/2ZDb/vx7awM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759227937; c=relaxed/simple;
-	bh=m8kgpN8y2+dD1fGt/wKhPjGmqbehchW0ol6unVjQYp8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A3hmiMLv6h4aC8MTZWzjx3x+0I6QQQOXCwt3DKGR27cg0yANFoKL3R0roGHne5XdiC9G9NHNH++/0qhMAJjoEmaKGvfYqu+yKhc2VLIe7lSXJucQ0hk8Xj67fWu7kz+CbQeH/xhneTZ/xt7jPDsVVXXVLBUg66kl4vzTa8vPdLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=MoIqBabH; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1759239146; c=relaxed/simple;
+	bh=hjiUvhTEcdI+Yx6XNweoKsC0rD2vJbqkmRgwKnlMcNo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hA4ynjoNVwEnBqkpDeguuEA1H4tVYtBiaMLElkx8vHzMmDKwRZHVeuBcTkr65ghOfmtfavRyYBGGMyVpFgx30sECnf5+gRC4a8DfxrkbjPc8jy9EdCwYNz6xzUCePhrnqO5PgQL6g1CU3tfabPD7yE9gwN3caeK7fhqskKjSmVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=nuFUKD1C; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ACxfrnUx; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=nuFUKD1C; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ACxfrnUx; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="MoIqBabH"
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58UAPNjZ2435439;
-	Tue, 30 Sep 2025 05:25:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1759227923;
-	bh=BJDek7EWLI0i+nKCSFQ3tgTixnlCvzxcxxZ3hVY8jMk=;
-	h=From:To:CC:Subject:Date;
-	b=MoIqBabHq+Rv0CiBC9Ddiebcqvf79Y8gaT4zZVqTo1JscPQTO7OKCfU5oLXnPw47R
-	 PEm3uWmhmFj2aeQrsCilTAidXZVLEnYC3jUdwK3nTG4PNBclHCp+6G3isAP9HToug1
-	 e5T1LQ7knWgVTeEa6lTipckQxvCS1zTX3DjivC6c=
-Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58UAPNrS3043076
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Tue, 30 Sep 2025 05:25:23 -0500
-Received: from DLEE209.ent.ti.com (157.170.170.98) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Tue, 30
- Sep 2025 05:25:23 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE209.ent.ti.com
- (157.170.170.98) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Tue, 30 Sep 2025 05:25:23 -0500
-Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [10.24.69.191])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58UAPLAJ3028303;
-	Tue, 30 Sep 2025 05:25:22 -0500
-From: T Pratham <t-pratham@ti.com>
-To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC: Kamlesh Gurudasani <kamlesh@ti.com>, Manorit Chawdhry <m-chawdhry@ti.com>,
-        Shiva Tripathi <s-tripathi1@ti.com>,
-        Kavitha Malarvizhi
-	<k-malarvizhi@ti.com>,
-        Vishal Mahaveer <vishalm@ti.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: ti - Add CRYPTO_ALG_ASYNC flag to DTHEv2 AES algos
-Date: Tue, 30 Sep 2025 15:40:26 +0530
-Message-ID: <20250930102423.2895282-1-t-pratham@ti.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="nuFUKD1C";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ACxfrnUx";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="nuFUKD1C";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ACxfrnUx"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id A1C101F83B;
+	Tue, 30 Sep 2025 13:32:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1759239141;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1Getj9FPGP+Bzf+xHlVzE0JepEsiLzYSmV09bhXiYYc=;
+	b=nuFUKD1CYq3mTKKtqgyBgPKg0MVwK/5bUyIcBe57nupAzoexJH80GY286eDGMtYXtkzZLh
+	Zrfm9m0yoEOwhBaIJHHY5Ci6bEXXuwxx/Q83UIFXFtIHb8TeFrCk3+HKsFQSLlUl+mmjfP
+	BYAAT2/3dXr1IB05GIVdYatN3yexyMg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1759239141;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1Getj9FPGP+Bzf+xHlVzE0JepEsiLzYSmV09bhXiYYc=;
+	b=ACxfrnUxl0GN76Oc7ofUgkni/+dUC7XTFaNWYMXz+O+5ULF5MNqfsxB8irEf4jE32o1Wv0
+	xGs/b/4YTZgZnlCg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1759239141;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1Getj9FPGP+Bzf+xHlVzE0JepEsiLzYSmV09bhXiYYc=;
+	b=nuFUKD1CYq3mTKKtqgyBgPKg0MVwK/5bUyIcBe57nupAzoexJH80GY286eDGMtYXtkzZLh
+	Zrfm9m0yoEOwhBaIJHHY5Ci6bEXXuwxx/Q83UIFXFtIHb8TeFrCk3+HKsFQSLlUl+mmjfP
+	BYAAT2/3dXr1IB05GIVdYatN3yexyMg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1759239141;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1Getj9FPGP+Bzf+xHlVzE0JepEsiLzYSmV09bhXiYYc=;
+	b=ACxfrnUxl0GN76Oc7ofUgkni/+dUC7XTFaNWYMXz+O+5ULF5MNqfsxB8irEf4jE32o1Wv0
+	xGs/b/4YTZgZnlCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 805961342D;
+	Tue, 30 Sep 2025 13:32:21 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id me4xH+Xb22hRRQAAD6G6ig
+	(envelope-from <dsterba@suse.cz>); Tue, 30 Sep 2025 13:32:21 +0000
+Date: Tue, 30 Sep 2025 15:32:20 +0200
+From: David Sterba <dsterba@suse.cz>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Han Xu <han.xu@nxp.com>,
+	"suman.kumar.chakraborty@intel.com" <suman.kumar.chakraborty@intel.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"terrelln@fb.com" <terrelln@fb.com>,
+	"dsterba@suse.com" <dsterba@suse.com>,
+	Richard Weinberger <richard@nod.at>,
+	"chengzhihao1@huawei.com" <chengzhihao1@huawei.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:MEMORY TECHNOLOGY DEVICES (MTD)" <linux-mtd@lists.infradead.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>
+Subject: Re: [PATCH] crypto: zstd - Fix compression bug caused by truncation
+Message-ID: <20250930133220.GB4052@suse.cz>
+Reply-To: dsterba@suse.cz
+References: <GV1PR04MB9071B5AC95DBD48B67FACF44971BA@GV1PR04MB9071.eurprd04.prod.outlook.com>
+ <aNuQAr79Hdky3WII@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aNuQAr79Hdky3WII@gondor.apana.org.au>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	HAS_REPLYTO(0.30)[dsterba@suse.cz];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:replyto,suse.cz:mid,imap1.dmz-prg2.suse.org:helo];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[]
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
 
-Add CRYPTO_ALG_ASYNC flag to DTHEv2 AES-ECB and AES-CBC algorithms so as
-to properly indicate driver capabilities.
+On Tue, Sep 30, 2025 at 04:08:34PM +0800, Herbert Xu wrote:
+> On Mon, Sep 29, 2025 at 11:51:36PM +0000, Han Xu wrote:
+> > Hi Suman,
+> > 
+> > The patch f5ad93ffb5411 "crypto: zstd - convert to acomp"
+> > leads to the following kernel dump during UBIFS write back.
+> 
+> Thanks for the detailed report and instructions!
+> 
+> Please let me know if you still get the crash with this patch:
+> 
+> ---8<---
+> Use size_t for the return value of zstd_compress_cctx as otherwise
+> negative errors will be truncated to a positive value.
+> 
+> Reported-by: Han Xu <han.xu@nxp.com>
+> Fixes: f5ad93ffb541 ("crypto: zstd - convert to acomp")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: T Pratham <t-pratham@ti.com>
----
- drivers/crypto/ti/dthev2-aes.c | 2 ++
- 1 file changed, 2 insertions(+)
+Reviewed-by: David Sterba <dsterba@suse.com>
 
-diff --git a/drivers/crypto/ti/dthev2-aes.c b/drivers/crypto/ti/dthev2-aes.c
-index 0431a36d8c4a4..3547c41fa4ed3 100644
---- a/drivers/crypto/ti/dthev2-aes.c
-+++ b/drivers/crypto/ti/dthev2-aes.c
-@@ -367,6 +367,7 @@ static struct skcipher_engine_alg cipher_algs[] = {
- 			.cra_driver_name	= "ecb-aes-dthev2",
- 			.cra_priority		= 299,
- 			.cra_flags		= CRYPTO_ALG_TYPE_SKCIPHER |
-+						  CRYPTO_ALG_ASYNC |
- 						  CRYPTO_ALG_KERN_DRIVER_ONLY,
- 			.cra_alignmask		= AES_BLOCK_SIZE - 1,
- 			.cra_blocksize		= AES_BLOCK_SIZE,
-@@ -389,6 +390,7 @@ static struct skcipher_engine_alg cipher_algs[] = {
- 			.cra_driver_name	= "cbc-aes-dthev2",
- 			.cra_priority		= 299,
- 			.cra_flags		= CRYPTO_ALG_TYPE_SKCIPHER |
-+						  CRYPTO_ALG_ASYNC |
- 						  CRYPTO_ALG_KERN_DRIVER_ONLY,
- 			.cra_alignmask		= AES_BLOCK_SIZE - 1,
- 			.cra_blocksize		= AES_BLOCK_SIZE,
--- 
-2.43.0
-
+> 
+> diff --git a/crypto/zstd.c b/crypto/zstd.c
+> index c2a19cb0879d..ac318d333b68 100644
+> --- a/crypto/zstd.c
+> +++ b/crypto/zstd.c
+> @@ -83,7 +83,7 @@ static void zstd_exit(struct crypto_acomp *acomp_tfm)
+>  static int zstd_compress_one(struct acomp_req *req, struct zstd_ctx *ctx,
+>  			     const void *src, void *dst, unsigned int *dlen)
+>  {
+> -	unsigned int out_len;
+> +	size_t out_len;
+>  
+>  	ctx->cctx = zstd_init_cctx(ctx->wksp, ctx->wksp_size);
+>  	if (!ctx->cctx)
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
