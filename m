@@ -1,114 +1,93 @@
-Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2762765FB
-	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 07:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B2921254D
+	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 13:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759305509; cv=none; b=qmmcJUOJalv5JhsGyZlFguFPthFCS2RLu9m/043l+xRfI5SegAS4BA2yVaX5JY9BiQNN5YP/PLJdX9gp1uCErAf0T2AfntYkjHH9JyBDgbd54zSchv9LsPW2hrYGdUQ98Y/9wJWawbO2rpg7joed3KsXnHxfNpoRKmtLIhISDVQ=
+	t=1759323769; cv=none; b=hqf6evnsuZu2ir06Da8KdoCsnQvirsLZEiT0ATMiRf9rmssqGmSnNG+HP8iKYyki1PpigIhSfPrXoSgvW9PI2fUvDSRiRmhZsC/J56E/QVml/PhCczHNYbkhXqOI4cMFV/hPz//HfxZUNgkhqLuz9OxOOj9j47zfrVVZg2QVULE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759305509; c=relaxed/simple;
-	bh=N2I1H/EgePZbtvBo25uP3wJB4pP+Q3rAkJ0WZH591WI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SLbQL6el/G71EN8EYC8K4TYw0n0YtnMUJ4dFRZWKKNccsz0b4ASBPBc0G4yTgBoJMfp22YtNk9W9/jDlDmRFblaS+q4czar5xH1iANWFfq1Fs3s/dFjzCAq+b0M7GqPcDcR1/2RZX8LvKu6TsOg8jpmkVwMGjs5hqU/dhyBliIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TNlXwBQ5; arc=none smtp.client-ip=209.85.215.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1759323769; c=relaxed/simple;
+	bh=XSb4lZeUC11vVHC3qAE1HO8lVhiaodyHM4xbnI8Dum0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=NKWU1z9hgz1tTTjQ8yKNrX9jSrIXIz9NPv6Gt33c5yuDv1RqR0RneQ6BiaLSP5BeamDNkwb+JCj+papwM21QzRXEdPC9GYgopvJh85O1zJTNp/RE5SjdvqFhfwMqTH5wMlUilTyI4ERCWZlcRsVslHBvd9CjjA7MEVqEKO9tSXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ftLtiyZy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNlXwBQ5"
-Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-b556284db11so6645778a12.0
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Oct 2025 00:58:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759305507; x=1759910307; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DnIZ0TeoMvk9CCEY2SlnV7jnxp2bLVOIPlczZP3SYN8=;
-        b=TNlXwBQ563KTLHRxyvkdiTAlr+jU/r6+RC+t34TPgvF8pu98+G+jWHyTSBwNVrIhh+
-         0f2qyJYyR+HZ60l5rwfSABH1T9Kj6KyzLJnHpeDw6ukCQwovDhrFqSu4+eBqGl5tuo98
-         UmC0voXBVTUo1Chd0Dize5mJ++KdWmkd7mfhZdc+w+t5fd69ntHALQLVeOAvBzkO3YGo
-         ior5vqLbV1QVmWr/njikCXIH3QA+UsuNLdhTTLkGqte/zUKQXTI7zJrXjSK69vNvdPGw
-         FfE7B9hgX032B4ToyT29/61PWL11KR1D+tNHcECfgdHQiCC5OmqyEIp3ouWafZGm8WoF
-         gAYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759305507; x=1759910307;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DnIZ0TeoMvk9CCEY2SlnV7jnxp2bLVOIPlczZP3SYN8=;
-        b=UINvSokbRmGLmTylGTVfIvUCuZXUmR3kgmpyGu6jfUkenas7g8ZwIqQeRbIOMCweKt
-         kt8WSf/05oYhNw8iEEF3gFypGfJuSKii7PnMQVLe1PLqtcFegblftL1xMNDO3puHylyb
-         fMa1A2NIuB7nHaAp5i3EEK+nXSbYD+lL/zbi9mDAyOOkCx7bLHetsAUsXo262qJskPxC
-         pk/pddzP9dhcJpCm1yP6/p63iYuQHqtko2DsjoAkS2NKXp9e6cIW9QMCc4jYjCLqGMqN
-         +4BZBubtTKvbdyjD4PnLDA89+87XQ7Bpgs+bmoi/CGs2c6ZV1wDi8rvQgo4zS3MdqZ5t
-         Pi6A==
-X-Gm-Message-State: AOJu0YyQ/lPEhQyrdOF2ooyFwkRoZ0a6Da/Ayiid4YEHO6pDWto7GWX3
-	HSBcFOv0dohV6G57DcZkOhTo9iRNcfxn7i4GTO1kXtlgnp3P5Rdqh78f
-X-Gm-Gg: ASbGnctdzwqPWLJQvaiy1gBnbOBpXbm9lujm6HCNl/gzjLJ4ZJgQhfzchu+zwz/SScZ
-	01oL151tnoMIyWg0iAgP7qjFbClc7kQitbND80NVVX+jQTO/VtVXz24RcRxwMTkciyAXMmt+JsA
-	odlOiVQTSw2Gi/P/2dRiA+/QEduiqk0rZjtg4NGwOdm3qLXroG++hLj2P3TYWh179rymL2iQ6qZ
-	2sv/jyuRzxV28n+WugXjn0Ua3b6sH6qJRSsDSRIMgI3Jrb5CQ/hsxR9OQIDztL+fTGzWtXy3yUk
-	0IVnr+2pyZYssWCGLoGS9MUVHGUdvw58DyJG7aOLDOo3DjEUmDCGBkqWJUR0lvrWapSgFTnlBEV
-	+q4+7QJRQWMkt9SQ9AiTvfaRHunDcag==
-X-Google-Smtp-Source: AGHT+IEgSy3v/uPt+4KvsdPnlOkJBed4MJ2OgBhCzYLrYHtZnwDHH0pn2KL1G/JaRiDosOce0dljsw==
-X-Received: by 2002:a17:903:40cc:b0:267:d0fa:5f75 with SMTP id d9443c01a7336-28e7f16795emr32870995ad.1.1759305507128;
-        Wed, 01 Oct 2025 00:58:27 -0700 (PDT)
-Received: from archlinux ([2a09:bac6:d739:1232::1d0:a6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-27ed66cfdcfsm180806485ad.26.2025.10.01.00.58.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Oct 2025 00:58:26 -0700 (PDT)
-From: kfatyuip@gmail.com
-To: thomas.lendacky@amd.com,
-	john.allen@amd.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kieran Moy <kfatyuip@gmail.com>
-Subject: [PATCH] crypto: ccp/sfs - Use DIV_ROUND_UP for set_memory_uc() size calculation
-Date: Wed,  1 Oct 2025 15:58:20 +0800
-Message-ID: <20251001075820.185748-1-kfatyuip@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ftLtiyZy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759323767;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R/MIPDCJJz06RLWC3Ge5JUdjwlfnix7uDu/4qpsMWEc=;
+	b=ftLtiyZyhvei6SguTKF8c25h9Fn4tSDk5GG4wg+59gcVFdUpIyzbb1Gh15YADag0WFTBsh
+	JjjXzNHViVPzFXPUn/ZIWJpsIv1R/NG/405bibvBQsumS576t/xPzXwMyEF6opeznB5jge
+	BnxVdOZVDdMdBNYWqacwTyAtomUBSaU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-35-E1P6B0rRPhqORjnVVtMhAg-1; Wed,
+ 01 Oct 2025 09:02:39 -0400
+X-MC-Unique: E1P6B0rRPhqORjnVVtMhAg-1
+X-Mimecast-MFC-AGG-ID: E1P6B0rRPhqORjnVVtMhAg_1759323756
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 45FCD18011CD;
+	Wed,  1 Oct 2025 13:02:30 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.24])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 68CC330003BE;
+	Wed,  1 Oct 2025 13:02:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20250926211415.GC2163@sol>
+References: <20250926211415.GC2163@sol> <20250926141959.1272455-1-dhowells@redhat.com> <20250926141959.1272455-8-dhowells@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 7/8] crypto/sha3: Add SHAKE128/256 support
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2284487.1759323746.1@warthog.procyon.org.uk>
+Date: Wed, 01 Oct 2025 14:02:26 +0100
+Message-ID: <2284488.1759323746@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-From: Kieran Moy <kfatyuip@gmail.com>
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-The SFS driver allocates a 2MB command buffer using snp_alloc_hv_fixed_pages(),
-but set_memory_uc() is called with SFS_NUM_PAGES_CMDBUF which assumes 4KB pages.
-This mismatch could lead to incomplete cache attribute updates on the buffer if
-the payload size is not strictly page-aligned.
+> I recommend holding off on this part until you have a try at using the
+> SHAKE library API directly.  The dispatch to different algorithms could
+> be done in the calling code.  This patch would also limit the ML-DSA
+> code to fixed-size SHAKE outputs; is that really going to be enough?
 
-Switch to using DIV_ROUND_UP(SFS_MAX_PAYLOAD_SIZE, PAGE_SIZE) to calculate the
-number of pages required for the attribute update. This approach follows kernel
-coding best practices, improves code robustness, and ensures that all buffer
-regions are properly covered regardless of current or future PAGE_SIZE values.
+Actually, ML-DSA also allows SHA2 hashes for the prehash, so if I use
+crypto_shash for that, then I maintain the flexibility through that.
 
-Using DIV_ROUND_UP is also consistent with Linux kernel style for page counting,
-which avoids hidden bugs in case the payload size ever changes and is not a
-multiple of PAGE_SIZE, or if the kernel is built with a non-default page size.
+> When there's only a small number of supported algorithms, just doing the
+> dispatch in the calling code tends to be simpler than using
+> crypto_shash.  For example, see the recent conversion of fs/verity/ to
+> use the SHA-2 library API instead of crypto_shash.
 
-Signed-off-by: Kieran Moy <kfatyuip@gmail.com>
----
- drivers/crypto/ccp/sfs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+That's reinventing the wheel.  Why have crypto_shash at all if we're going to
+encourage people to ignore that and use a union and an enum/ops table.
 
-diff --git a/drivers/crypto/ccp/sfs.c b/drivers/crypto/ccp/sfs.c
-index 2f4beaafe7ec..3397895160c0 100644
---- a/drivers/crypto/ccp/sfs.c
-+++ b/drivers/crypto/ccp/sfs.c
-@@ -277,7 +277,8 @@ int sfs_dev_init(struct psp_device *psp)
- 	/*
- 	* SFS command buffer must be mapped as non-cacheable.
- 	*/
--	ret = set_memory_uc((unsigned long)sfs_dev->command_buf, SFS_NUM_PAGES_CMDBUF);
-+	ret = set_memory_uc((unsigned long)sfs_dev->command_buf,
-+			   DIV_ROUND_UP(SFS_MAX_PAYLOAD_SIZE, PAGE_SIZE));
- 	if (ret) {
- 		dev_dbg(dev, "Set memory uc failed\n");
- 		goto cleanup_cmd_buf;
--- 
-2.51.0
+Is the goal to get rid of crypto/ entirely and use lib/crypto/ instead?  Not
+that I wouldn't mind a better crypto offloading API - the one we have kind of
+sucks, especially for offloading to async crypto h/w (sorry Herbert;-)).
+
+David
+
