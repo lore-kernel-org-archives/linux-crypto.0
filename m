@@ -1,58 +1,43 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04EF149C7B
-	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 15:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45F326D4F7;
+	Wed,  1 Oct 2025 16:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759332803; cv=none; b=k/vDaSq/l0b0D5QPAenAHv/hYRO+y1ILs/UPBjvFUFhsGqOICpMpZq6f8EZBRO9glK3DyLSSERQsFiLnfOvL3kUl8ybP/yNMkChbHWCFscv2wuZ4HLTd0O+Flla1IfqQ45IWP78VvHWS6byRdPWagZxDxo3/FSpLYIR/HSOsb/k=
+	t=1759334758; cv=none; b=N8Zk4iy02Ob/IjFauSFBi6fmPyEcnXpoiPvMD+4FsHspiFF1zxI93EkLm+QGReBoh3tgPYtztqvDJTKFjA5E1T+26vL1qJ9bdZE1hhcgHUSwHf+BYMZKDvi4y0n9MOBb0ElU3e/hJycaY1iHOdk0wFA3vZK5j2M1GKGB8HEYlD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759332803; c=relaxed/simple;
-	bh=AfoyVEJO7r2iQqFi0MOuWt9rNW8EZPCQFxiYfZkw08Q=;
+	s=arc-20240116; t=1759334758; c=relaxed/simple;
+	bh=8YEuuHbQcB0ssAKQlRVDg0rxT1MUBfh3vVk/ixUFwL4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q5Je8qoM/Vf2Fc1F+DBhuia7EIFXZXn1un8ezWZKpltt8SV/YbIyDdJu4Nn4GuLnB8cUro/hiy63b16kUS2WW0Z52y1shnN+a3m1eYagbmzkY3DhA/Zwj9mqqwSKF7+IcmjwcoAMTD8lV9rWzzZbSAe+1DBEb/XXgw/jvn23QZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fVaCowwg; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=on1q9WjFeiIY4W66dlxyH6ezpGWwalg9Qgs9SSoCy2TPkmpVktdPBymWguXbniQywSMoCOGI5Rlm9umbhcc9mW3mDFrgLpwf13Huwsg5v94XgjyLFgZEvwpaLNQ+jgPS92In4IXOtjXodyBmT4uhsbKGB1RgSFmbDYzSuy/fp2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HNXxHjaO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fVaCowwg"
-Date: Wed, 1 Oct 2025 15:33:09 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759332798;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0Yv0CwkielXUFY13Tke9yDHu46iA3m89ltKb+trU33A=;
-	b=fVaCowwgrrW4wG/jzU1zmwNJvtpZ07/RFYUBwwSe7afqIXdgVgQ6tU9Dg2PNGvbgbNN7Lk
-	Rj1UQFZNqlWPIqjrPgfeiO1Pl4SDn+QbT9yuD1DHae6U0TMP/nBSeq//qx3HWFpK2iYLsC
-	SvEgMc2jmmmwjAWhsAAvOYVu+W2Y/Gk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org" <hannes@cmpxchg.org>, 
-	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
-	"sj@kernel.org" <sj@kernel.org>, "kasong@tencent.com" <kasong@tencent.com>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com" <clabbe@baylibre.com>, 
-	"ardb@kernel.org" <ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
-	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>, "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, 
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v12 20/23] mm: zswap: Per-CPU acomp_ctx resources exist
- from pool creation to deletion.
-Message-ID: <6frwacvukeaqrmtja43ab3nkldkrupczmhelrgjljvtk5eh4km@4pebysubl3dl>
-References: <20250926033502.7486-1-kanchana.p.sridhar@intel.com>
- <20250926033502.7486-21-kanchana.p.sridhar@intel.com>
- <j4o53f24yeegzrj7aj2mbu5c2xyqksnb6uz2fjkwgi3dbbtqsw@cwatjnrsgbco>
- <SA3PR11MB81201CE73D6CCF274BB2265FC91AA@SA3PR11MB8120.namprd11.prod.outlook.com>
- <7gnj6tcuvqg7vxqu4otqznvtdhus3agtxkorwy3nm2zobkd7vn@hqanfuyklt7u>
- <SA3PR11MB81209CF02417CED3C0459504C91AA@SA3PR11MB8120.namprd11.prod.outlook.com>
- <6xb7feds424kfld4udwmbtccftwnnx6vmbpvmjcwlionfdlmuj@vz4uzh6tog5g>
- <SA3PR11MB8120D4BDA8A6980A4BC5447FC91AA@SA3PR11MB8120.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HNXxHjaO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8540CC4CEF1;
+	Wed,  1 Oct 2025 16:05:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759334757;
+	bh=8YEuuHbQcB0ssAKQlRVDg0rxT1MUBfh3vVk/ixUFwL4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HNXxHjaO2WbwSqpkdb3qAyu7qY0EFDi/4NueZ5cklrzoa0o0xPtGf2OtzwSlTEh11
+	 RgRe/N7b9ppLzRa9CL1tUcqRirYKLf1tD91p+/xs48/eLfTlDwSlVuBi9XJjT11TwD
+	 6PYUtWqsCtZWwxql3rS5OqDRRGYea4ESLcoKkKrAm5pYsSh6D/341gWS1eubSW3Eoy
+	 xTI2T1BJ6w0ljn0ZpWP6V1vPgdloe/EIHYLUqJ68Dg7BBfaQIyYOiUwb6dlq649TYx
+	 ccDO/Sn1FxI3yZROTHMgN8OllNrIcHyEhMQ6L/z5Y5CscLNBm5yrcNHOrClESZgn7N
+	 D0sl7fI/RvbbA==
+Date: Wed, 1 Oct 2025 09:04:35 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 5/8] lib/crypto: Add SHA3 kunit tests
+Message-ID: <20251001160435.GC1592@sol>
+References: <20250926141959.1272455-1-dhowells@redhat.com>
+ <20250926141959.1272455-6-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,187 +46,152 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SA3PR11MB8120D4BDA8A6980A4BC5447FC91AA@SA3PR11MB8120.namprd11.prod.outlook.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20250926141959.1272455-6-dhowells@redhat.com>
 
-On Tue, Sep 30, 2025 at 09:56:33PM +0000, Sridhar, Kanchana P wrote:
-> 
-> > -----Original Message-----
-> > From: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > Sent: Tuesday, September 30, 2025 2:20 PM
-> > To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
-> > Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> > hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
-> > usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
-> > ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
-> > senozhatsky@chromium.org; sj@kernel.org; kasong@tencent.com; linux-
-> > crypto@vger.kernel.org; herbert@gondor.apana.org.au;
-> > davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
-> > ebiggers@google.com; surenb@google.com; Accardi, Kristen C
-> > <kristen.c.accardi@intel.com>; Gomes, Vinicius <vinicius.gomes@intel.com>;
-> > Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
-> > <vinodh.gopal@intel.com>
-> > Subject: Re: [PATCH v12 20/23] mm: zswap: Per-CPU acomp_ctx resources
-> > exist from pool creation to deletion.
-> > 
-> > > > > > >  static struct zswap_pool *zswap_pool_create(char *compressor)
-> > > > > > >  {
-> > > > > > >  	struct zswap_pool *pool;
-> > > > > > > @@ -263,19 +287,43 @@ static struct zswap_pool
-> > > > > > *zswap_pool_create(char *compressor)
-> > > > > > >
-> > > > > > >  	strscpy(pool->tfm_name, compressor, sizeof(pool-
-> > >tfm_name));
-> > > > > > >
-> > > > > > > -	pool->acomp_ctx = alloc_percpu(*pool->acomp_ctx);
-> > > > > > > +	/* Many things rely on the zero-initialization. */
-> > > > > > > +	pool->acomp_ctx = alloc_percpu_gfp(*pool->acomp_ctx,
-> > > > > > > +					   GFP_KERNEL |
-> > __GFP_ZERO);
-> > > > > > >  	if (!pool->acomp_ctx) {
-> > > > > > >  		pr_err("percpu alloc failed\n");
-> > > > > > >  		goto error;
-> > > > > > >  	}
-> > > > > > >
-> > > > > > > -	for_each_possible_cpu(cpu)
-> > > > > > > -		mutex_init(&per_cpu_ptr(pool->acomp_ctx, cpu)-
-> > >mutex);
-> > > > > > > -
-> > > > > > > +	/*
-> > > > > > > +	 * This is serialized against CPU hotplug operations. Hence,
-> > cores
-> > > > > > > +	 * cannot be offlined until this finishes.
-> > > > > > > +	 * In case of errors, we need to goto "ref_fail" instead of
-> > "error"
-> > > > > > > +	 * because there is no teardown callback registered anymore,
-> > for
-> > > > > > > +	 * cpuhp_state_add_instance() to de-allocate resources as it
-> > rolls
-> > > > > > back
-> > > > > > > +	 * state on cores before the CPU on which error was
-> > encountered.
-> > > > > > > +	 */
-> > > > > > >  	ret =
-> > > > > > cpuhp_state_add_instance(CPUHP_MM_ZSWP_POOL_PREPARE,
-> > > > > > >  				       &pool->node);
-> > > > > > > +
-> > > > > > > +	/*
-> > > > > > > +	 * We only needed the multi state instance add operation to
-> > invoke
-> > > > > > the
-> > > > > > > +	 * startup callback for all cores without cores getting offlined.
-> > Since
-> > > > > > > +	 * the acomp_ctx resources will now only be de-allocated
-> > when the
-> > > > > > pool
-> > > > > > > +	 * is destroyed, we can safely remove the multi state
-> > instance. This
-> > > > > > > +	 * minimizes (but does not eliminate) the possibility of
-> > > > > > > +	 * zswap_cpu_comp_prepare() being invoked again due to a
-> > CPU
-> > > > > > > +	 * offline-online transition. Removing the instance also
-> > prevents race
-> > > > > > > +	 * conditions between CPU onlining after initial pool creation,
-> > and
-> > > > > > > +	 * acomp_ctx_dealloc() freeing the acomp_ctx resources.
-> > > > > > > +	 * Note that we delete the instance before checking the error
-> > status
-> > > > > > of
-> > > > > > > +	 * the node list add operation because we want the instance
-> > removal
-> > > > > > even
-> > > > > > > +	 * in case of errors in the former.
-> > > > > > > +	 */
-> > > > > > > +
-> > 	cpuhp_state_remove_instance(CPUHP_MM_ZSWP_POOL_PREPARE,
-> > > > > > &pool->node);
-> > > > > > > +
-> > > > > >
-> > > > > > I don't understand what's wrong with the current flow? We call
-> > > > > > cpuhp_state_remove_instance() in pool deletion before freeing up the
-> > > > > > per-CPU resources. Why is this not enough?
-> > > > >
-> > > > > This is because with the changes proposed in this commit, the multi
-> > state
-> > > > > add instance is used during pool creation as a way to create acomp_ctx
-> > > > > resources correctly with just the offline/online state transitions
-> > guaranteed
-> > > > > by CPU hotplug, without needing additional mutex locking as in the
-> > > > mainline.
-> > > > > In other words, the consistency wrt safely creating/deleting acomp_ctx
-> > > > > resources with the changes being proposed is accomplished by the
-> > hotplug
-> > > > > state transitions guarantee. Stated differently, the hotplug framework
-> > > > > helps enforce the new design during pool creation without relying on the
-> > > > > mutex and subsequent simplifications during zswap_[de]compress()
-> > > > > proposed in this commit.
-> > > > >
-> > > > > Once this is done, deleting the CPU hotplug state seems cleaner, and
-> > > > reflects
-> > > > > the change in policy of the resources' lifetime. It also prevents race
-> > > > conditions
-> > > > > between zswap_cpu_comp_prepare() and acomp_ctx_dealloc() called
-> > from
-> > > > > zswap_pool_destroy().
-> > > >
-> > > > How is a race with zswap_cpu_comp_prepare() possible if we call
-> > > > cpuhp_state_remove_instance() before acomp_ctx_dealloc() in the pool
-> > > > deletion path?
-> > >
-> > > Good point. I agree, calling cpuhp_state_remove_instance() before
-> > > acomp_ctx_dealloc() will not cause a race. However, if we consider the
-> > > time from pool creation to deletion: if there is an online-offline-online
-> > > transition, can zswap_cpu_comp_prepare() race with the call to
-> > > cpuhp_state_remove_instance()? If so, wouldn't this cause unpredictable
-> > > behavior?
-> > 
-> > How will this race happen?
-> > 
-> > cpuhp_state_remove_instance() is called while a pool is being destroyed,
-> > while zswap_cpu_comp_prepare() while the pool is being created or during
-> > CPU onlining.
-> > 
-> > The former cannot race, and the latter should be synchronized by hotplug
-> > code.
-> > 
-> > >
-> > > I agree, this can occur even with the code in this commit, but there is
-> > > less risk of things going wrong because we remove the CPU hotplug
-> > > instance before the pool is added to zswap_pools.
-> > >
-> > > Further, removing the CPU hotplug instance directly codifies the
-> > > intent of this commit, i.e., to use this as a facilitator and manage memory
-> > > allotted to acomp_ctx, but not to manage those resources' lifetime
-> > > thereafter.
-> > >
-> > > Do you see any advantage of keeping the call to
-> > cpuhp_state_remove_instance()
-> > > occur before acomp_ctx_dealloc() in zswap_pool_destroy()? Please let me
-> > know
-> > > if I am missing something.
-> > 
-> > What about more CPUs going online? Without the hotplug instance we don't
-> > get per-CPU resources for those. We are not using the hotplug mechanism
-> > just to facilitate per-CPU resource allocation, we use it to
-> > automatically allocate resources for newly onlined CPUs without having
-> > to preallocate for all possible CPUs.
-> 
-> This is an excellent point! It makes sense, I will move the call to
-> cpuhp_state_remove_instance() to be before the call to
-> acomp_ctx_dealloc() in zswap_pool_destroy(). Thanks for catching this.
-> 
-> > 
-> > Also, this makes the code more difficult to reason about, and is an
-> > unncessary change from the current behavior.
-> 
-> Ok.
-> 
-> > 
-> > The only change needed is to drop the teardown callback and do the
-> > freeing in the pool destruction path instead.
-> 
-> Just to summarize: besides moving the call to cpuhp_state_remove_instance()
-> to zswap_pool_destroy() and more concise comments/commit logs, are there
-> other changes to be made in patch 20?
+On Fri, Sep 26, 2025 at 03:19:48PM +0100, David Howells wrote:
+> +config CRYPTO_LIB_SHA3_KUNIT_TEST
+> +	tristate "KUnit tests for SHA-3" if !KUNIT_ALL_TESTS
+> +	depends on KUNIT
+> +	default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
+> +	select CRYPTO_LIB_BENCHMARK_VISIBLE
+> +	select CRYPTO_LIB_SHA3
+> +	help
+> +	  KUnit tests for the SHA3 cryptographic hash functions, including
+> +	  SHA3-224, SHA3-256, SHA3-386, SHA3-512, SHAKE128 and SHAKE256.  Note
 
-I don't believe so. Thanks!
+SHA3-386 => SHA3-384
+
+> +	  that whilst the SHAKE* hash functions can support arbitrary-length
+> +	  digests, these tests only check the nominal digest sizes for now.
+
+Arbitrary-length output support needs to be tested.  It looks like it is
+now, and you just forgot to update this help text?
+
+> +static const u8 test_sha3_sample[] =
+> +	"The quick red fox jumped over the lazy brown dog!\n"
+> +	"The quick red fox jumped over the lazy brown dog!\n"
+> +	"The quick red fox jumped over the lazy brown dog!\n"
+> +	"The quick red fox jumped over the lazy brown dog!\n";
+> +
+> +static const u8 test_sha3_224[8 + SHA3_224_DIGEST_SIZE + 8] = {
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
+> +	0xd6, 0xe8, 0xd8, 0x80, 0xfa, 0x42, 0x80, 0x70,
+> +	0x7e, 0x7f, 0xd7, 0xd2, 0xd7, 0x7a, 0x35, 0x65,
+> +	0xf0, 0x0b, 0x4f, 0x9f, 0x2a, 0x33, 0xca, 0x0a,
+> +	0xef, 0xa6, 0x4c, 0xb8,
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
+> +};
+> +
+> +static const u8 test_sha3_256[8 + SHA3_256_DIGEST_SIZE + 8] = {
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
+> +	0xdb, 0x3b, 0xb0, 0xb8, 0x8d, 0x15, 0x78, 0xe5,
+> +	0x78, 0x76, 0x8e, 0x39, 0x7e, 0x89, 0x86, 0xb9,
+> +	0x14, 0x3a, 0x1e, 0xe7, 0x96, 0x7c, 0xf3, 0x25,
+> +	0x70, 0xbd, 0xc3, 0xa9, 0xae, 0x63, 0x71, 0x1d,
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
+> +};
+> +
+> +static const u8 test_sha3_384[8 + SHA3_384_DIGEST_SIZE + 8] = {
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
+> +	0x2d, 0x4b, 0x29, 0x85, 0x19, 0x94, 0xaa, 0x31,
+> +	0x9b, 0x04, 0x9d, 0x6e, 0x79, 0x66, 0xc7, 0x56,
+> +	0x8a, 0x2e, 0x99, 0x84, 0x06, 0xcf, 0x10, 0x2d,
+> +	0xec, 0xf0, 0x03, 0x04, 0x1f, 0xd5, 0x99, 0x63,
+> +	0x2f, 0xc3, 0x2b, 0x0d, 0xd9, 0x45, 0xf7, 0xbb,
+> +	0x0a, 0xc3, 0x46, 0xab, 0xfe, 0x4d, 0x94, 0xc2,
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
+> +};
+> +
+> +static const u8 test_sha3_512[8 + SHA3_512_DIGEST_SIZE + 8] = {
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
+> +	0xdd, 0x71, 0x3b, 0x44, 0xb6, 0x6c, 0xd7, 0x78,
+> +	0xe7, 0x93, 0xa1, 0x4c, 0xd7, 0x24, 0x16, 0xf1,
+> +	0xfd, 0xa2, 0x82, 0x4e, 0xed, 0x59, 0xe9, 0x83,
+> +	0x15, 0x38, 0x89, 0x7d, 0x39, 0x17, 0x0c, 0xb2,
+> +	0xcf, 0x12, 0x80, 0x78, 0xa1, 0x78, 0x41, 0xeb,
+> +	0xed, 0x21, 0x4c, 0xa4, 0x4a, 0x5f, 0x30, 0x1a,
+> +	0x70, 0x98, 0x4f, 0x14, 0xa2, 0xd1, 0x64, 0x1b,
+> +	0xc2, 0x0a, 0xff, 0x3b, 0xe8, 0x26, 0x41, 0x8f,
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
+> +};
+> +
+> +static const u8 test_shake128[8 + SHAKE128_DEFAULT_SIZE + 8] = {
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
+> +	0x41, 0xd6, 0xb8, 0x9c, 0xf8, 0xe8, 0x54, 0xf2,
+> +	0x5c, 0xde, 0x51, 0x12, 0xaf, 0x9e, 0x0d, 0x91,
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
+> +};
+> +
+> +static const u8 test_shake256[8 + SHAKE256_DEFAULT_SIZE + 8] = {
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
+> +	0xab, 0x06, 0xd4, 0xf9, 0x8b, 0xfd, 0xb2, 0xc4,
+> +	0xfe, 0xf1, 0xcc, 0xe2, 0x40, 0x45, 0xdd, 0x15,
+> +	0xcb, 0xdd, 0x02, 0x8d, 0xb7, 0x9f, 0x1e, 0x67,
+> +	0xd6, 0x7f, 0x98, 0x5e, 0x1b, 0x19, 0xf8, 0x01,
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
+> +};
+
+If these expected outputs are from an external source, then that source
+needs to be documented.  If they aren't, then the way in which they were
+generated needs to be easily reproducible and documented, e.g. by adding
+support for generating them to gen-hash-testvecs.py.
+
+> +MODULE_DESCRIPTION("KUnit tests and benchmark for SHA3-256");
+
+SHA3-256 => SHA3
+
+> diff --git a/lib/crypto/tests/sha3_testvecs.h b/lib/crypto/tests/sha3_testvecs.h
+> new file mode 100644
+> index 000000000000..9c4c403cc6e0
+> --- /dev/null
+> +++ b/lib/crypto/tests/sha3_testvecs.h
+> @@ -0,0 +1,231 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/* This file was generated by: ./scripts/crypto/gen-hash-testvecs.py sha3-256 */
+
+If that's the case, then running "./scripts/crypto/gen-hash-testvecs.py
+sha3-256 > lib/crypto/tests/sha3_testvecs.h" should reproduce this file
+exactly.  But it doesn't, so you must have manually edited this file.
+
+It should match exactly.  That can be done by tweaking
+gen-hash-testvecs.py to use the correct *_DIGEST_SIZE constant and
+skipping the HMAC test if sha3-256 is requested.
+
+> diff --git a/scripts/crypto/gen-hash-testvecs.py b/scripts/crypto/gen-hash-testvecs.py
+> index fc063f2ee95f..a5b0abd8dabe 100755
+> --- a/scripts/crypto/gen-hash-testvecs.py
+> +++ b/scripts/crypto/gen-hash-testvecs.py
+> @@ -61,6 +61,10 @@ def hash_update(ctx, data):
+>      ctx.update(data)
+>  
+>  def hash_final(ctx):
+> +    if ctx.name == "shake_128":
+> +        return ctx.digest(16)
+> +    if ctx.name == "shake_256":
+> +        return ctx.digest(32)
+
+This addition is unnecessary.
+
+>      return ctx.digest()
+>  
+>  def compute_hash(alg, data):
+> @@ -122,7 +126,7 @@ def gen_hmac_testvecs(alg):
+>          ctx.update(mac)
+>      print_static_u8_array_definition(
+>              f'hmac_testvec_consolidated[{alg.upper()}_DIGEST_SIZE]',
+> -            ctx.digest())
+> +            hash_final(ctx))
+>  
+>  BLAKE2S_KEY_SIZE = 32
+>  BLAKE2S_HASH_SIZE = 32
+> @@ -164,5 +168,5 @@ if alg == 'blake2s':
+>      gen_additional_blake2s_testvecs()
+>  elif alg == 'poly1305':
+>      gen_additional_poly1305_testvecs()
+> -else:
+> +elif alg != 'shake128' and alg != 'shake256':
+>      gen_hmac_testvecs(alg)
+
+Likewise.  Except it really needs to be 'sha3-256', as I mentioned.
+
+- Eric
