@@ -1,44 +1,61 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F09521579F;
-	Wed,  1 Oct 2025 16:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF732C029B
+	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 16:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759335868; cv=none; b=nf5zN+bItdb57T4ekAD2lRozcbkdR8sEbK99OFmXGDHpMBG5s018HMMlsbVz6y2UakHvICfIm6hjJin2XD5Y0KGd4cDTQamVBX19hwbgTetxFBjedXoqu+gA+tgiP3x9vz5uBYr8aco0BOPkaBNeyUyJbCDx/FYxQsVAeZZMRZg=
+	t=1759337113; cv=none; b=J5HGljClFBJBId7VcDMCO4YnTJ3T2m4PIaZOy9FRQIMxqyZPjkUOMUPe6AEYDCnWXGgOE+CgBAHIWOFDydNpyYKDbNxU28pfJEcL+kqArhkyc43b/L6LLLmJl226JvLnrqCBOjDCiAN3f/HrpAO8A6xXWMGuxsLTunHU6YDPtN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759335868; c=relaxed/simple;
-	bh=01AGB1gdjYvOKf0TM/UPBA1tCLQ+5X4VqqcP/0Bwqw4=;
+	s=arc-20240116; t=1759337113; c=relaxed/simple;
+	bh=K7YWwtRoXyrnO3YXAJ6rlkNgEypHfVsTVv9EU7Z16Qs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hFEjxiFLSjawreA1+qRn4GZoPJ168JJ2x3rboSm909P0BzR1Kj/OsZisap1C5kvvb6CXh138oa+gkp4Tu/TSUAPUDb5PGtRkztnuPKnqOwhtUmm6xMd2dCySWOhQkuczIjOyIm47Hl+nCBsVonfE86GfFUjfniZcib0GBTnSyrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZL/3jqA2; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZL/3jqA2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A004DC4CEF5;
-	Wed,  1 Oct 2025 16:24:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759335868;
-	bh=01AGB1gdjYvOKf0TM/UPBA1tCLQ+5X4VqqcP/0Bwqw4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZL/3jqA2aka2NqH6Al6isbHvtsnXOZebLu5d8qM8TlwC3ikLyeh7111BkaVlk628A
-	 bSm3KRucyThqtk3VGqnBxFrQ21ZSvqWUHl+xyczKdXMJxZBTs4zarSAr8at2+SQ5t+
-	 f/RCqcYbpVyQtqGGyx17D7582WQ2wwc+3n4VgFSvs5SdgTG58HPd7OUqYBeqPCWLpK
-	 eUIRZWQ0/aFD9H0EUS5oL7m0L7U6retsnfr56hHam3lI3kZzG1RexJHhCyb/yp/Evv
-	 y3ZfJLOT2nMhShedooEm2ntvSUKqjS2tO/gw8AJX9tkUcZATE+sCYyQ+hbgxYLojJ5
-	 tSH7b/U64cHdw==
-Date: Wed, 1 Oct 2025 09:23:05 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: gregkh@linuxfoundation.org, sashal@kernel.org, stable@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-team@meta.com,
-	Michael van der Westhuizen <rmikey@meta.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=MRPSkFsibwW3jIOf0GfHX57zzcXAttdY/13rK6LEYMwMa1RmjGUbmT8jMk+R9dQsz1To+yVHI5RYqKUoU41iXQR+UxC/iFi2IvdtT06c0zieIdtGWSfnFRZzjGg+jlB6e14C8vdZHdRJFDJX6cWHgqK41L0Gujdc0dVW19WKvYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b3d50882cc2so15965066b.2
+        for <linux-crypto@vger.kernel.org>; Wed, 01 Oct 2025 09:45:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759337110; x=1759941910;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8RpMi9Th+Po7AoazGbT2yu6utd+ZudWSIE+dBXn6AEw=;
+        b=HsZ/byAD6v5qoNnHdL53uEA5xxKfN/egp10JFVt/DzC4mNVsyORIFv5/Y36kQrzRUi
+         qKGz3CMezRx7vJ2zy8iUqF6K+3ZY24PQ27q4dOHSLRbkibyA3+E74suMHnWTL6vGQ5y5
+         pomKcYlzUXNOeuKGaNTBA7RKYa0Dt4jdSmmquF+7r/g0sPEeQWaSgWN9FrloQqYLTgvM
+         /YuG88lwq5A+wZxrLShk0ZjZfWQngPWch1dcme3h8RsKwxSEDTotHoFMCG72IAtgD46r
+         CcJq4uHnLOqT4dTbTDoD6uOaBX7/9BteBhDmH59c3lxL9E5GIHFDV1IFo52mLh43517b
+         scyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6GiDCcBxaCuVuT7FQP0uz7unPmxlY0qnICNt92LX42dk38ulxelw2mxOr06c/rMTJou7eAiGPJKoMRyw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCXHfN74uHN0BTNFe4HsY1w1CPc7X0OJ26aV6Nq7lXe/FGMEKk
+	1QhjSjcfErL/UBs5UyqFKVzPUBspL9iT6ZHOevPEj/s0K4X+QGwMJ88b
+X-Gm-Gg: ASbGnctwyPR8f1Zv9kYeoZnEOIRVOX0/gsPpbFeYGmuPrl4Cty5d9acMALr2CX4bmkB
+	DqlXPUxkV36K7UT4FLak92NJ2005eLWd5M6/l5fL2loGTu6seUv9z6IH8UH+LHDqQhI5rtdC7PJ
+	Jw3STjbdofXKhTTorS+YmWFpZJ5UY/uzxRqzpzAg7PT1GeDmN1+iJYJ7hhk4nG9y/7BYFrLqlHb
+	Kc98Pn60AAErzlRnXynKPgrF8nADbeNoB7c8UKDo9z3ln/eeXCnp60a275KzmlN3NgHDYF8ENrw
+	rNETzNaGzteIxbmGEkAyVGu6QEvzkiD4NAmYWAhOf7jruVugiLkxHwTlYnMXpqMiBhwDzgn0iK6
+	BbQJgUaJ5bD8dpUtLm+DSADkgF4wuescblZefiQ==
+X-Google-Smtp-Source: AGHT+IFaatL0zRpXljYvk9pU9uM41+0gFgUFUB28SfXW6ic2vlnE+OWGmtK1CqAf9k3bMM7SwTnkww==
+X-Received: by 2002:a17:907:1c95:b0:b3c:31c2:b57d with SMTP id a640c23a62f3a-b46e99531a7mr534332566b.55.1759337109937;
+        Wed, 01 Oct 2025 09:45:09 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:74::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b486a178610sm1548866b.92.2025.10.01.09.45.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Oct 2025 09:45:09 -0700 (PDT)
+Date: Wed, 1 Oct 2025 09:45:07 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: gregkh@linuxfoundation.org, sashal@kernel.org, stable@vger.kernel.org, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel-team@meta.com, Michael van der Westhuizen <rmikey@meta.com>, 
 	Tobias Fleig <tfleig@meta.com>
 Subject: Re: [PATCH] stable: crypto: sha256 - fix crash at kexec
-Message-ID: <20251001162305.GE1592@sol>
+Message-ID: <jm3bk53sqkqv6eg7rekzhn6bgld5byhkmksdjyxmrkifku2dmc@w7xnklqsrpee>
 References: <20251001-stable_crash-v1-1-3071c0bd795e@debian.org>
+ <20251001162305.GE1592@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,107 +64,29 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251001-stable_crash-v1-1-3071c0bd795e@debian.org>
+In-Reply-To: <20251001162305.GE1592@sol>
 
-On Wed, Oct 01, 2025 at 09:07:07AM -0700, Breno Leitao wrote:
-> Loading a large (~2.1G) files with kexec crashes the host with when
-> running:
-> 
->   # kexec --load kernel --initrd initrd_with_2G_or_more
-> 
->   UBSAN: signed-integer-overflow in ./include/crypto/sha256_base.h:64:19
->   34152083 * 64 cannot be represented in type 'int'
->   ...
->   BUG: unable to handle page fault for address: ff9fffff83b624c0
->   sha256_update (lib/crypto/sha256.c:137)
->   crypto_sha256_update (crypto/sha256_generic.c:40)
->   kexec_calculate_store_digests (kernel/kexec_file.c:769)
->   __se_sys_kexec_file_load (kernel/kexec_file.c:397 kernel/kexec_file.c:332)
->   ...
-> 
-> (Line numbers based on commit da274362a7bd9 ("Linux 6.12.49")
-> 
-> This is not happening upstream (v6.16+), given that `block` type was
-> upgraded from "int" to "size_t" in commit 74a43a2cf5e8 ("crypto:
-> lib/sha256 - Move partial block handling out")
-> 
-> Upgrade the block type similar to the commit above, avoiding hitting the
-> overflow.
-> 
-> This patch is only suitable for the stable tree, and before 6.16, which
-> got commit 74a43a2cf5e8 ("crypto: lib/sha256 - Move partial block
-> handling out")
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> Fixes: 11b8d5ef9138 ("crypto: sha256 - implement base layer for SHA-256") # not after v6.16
-> Reported-by: Michael van der Westhuizen <rmikey@meta.com>
-> Reported-by: Tobias Fleig <tfleig@meta.com>
-> ---
->  include/crypto/sha256_base.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/crypto/sha256_base.h b/include/crypto/sha256_base.h
-> index e0418818d63c8..fa63af10102b2 100644
-> --- a/include/crypto/sha256_base.h
-> +++ b/include/crypto/sha256_base.h
-> @@ -44,7 +44,7 @@ static inline int lib_sha256_base_do_update(struct sha256_state *sctx,
->  	sctx->count += len;
->  
->  	if (unlikely((partial + len) >= SHA256_BLOCK_SIZE)) {
-> -		int blocks;
-> +		size_t blocks;
->  
->  		if (partial) {
->  			int p = SHA256_BLOCK_SIZE - partial;
-> 
-> ---
+Hello Eric,
 
-This looks fine, but technically 'unsigned int' would be more
-appropriate here, given the context.  If we look at the whole function
-in 6.12, we can see that it took an 'unsigned int' length:
+On Wed, Oct 01, 2025 at 09:23:05AM -0700, Eric Biggers wrote:
 
- static inline int lib_sha256_base_do_update(struct sha256_state *sctx,
- 					    const u8 *data,
- 					    unsigned int len,
- 					    sha256_block_fn *block_fn)
- {
- 	unsigned int partial = sctx->count % SHA256_BLOCK_SIZE;
- 
- 	sctx->count += len;
- 
- 	if (unlikely((partial + len) >= SHA256_BLOCK_SIZE)) {
--		int blocks;
-+		size_t blocks;
- 
- 		if (partial) {
- 			int p = SHA256_BLOCK_SIZE - partial;
- 
- 			memcpy(sctx->buf + partial, data, p);
- 			data += p;
- 			len -= p;
- 
- 			block_fn(sctx, sctx->buf, 1);
- 		}
- 
- 		blocks = len / SHA256_BLOCK_SIZE;
- 		len %= SHA256_BLOCK_SIZE;
- 
- 		if (blocks) {
- 			block_fn(sctx, data, blocks);
- 			data += blocks * SHA256_BLOCK_SIZE;
- 		}
- 		partial = 0;
- 	}
- 	if (len)
- 		memcpy(sctx->buf + partial, data, len);
- 
- 	return 0;
- }
+> This looks fine, but technically 'unsigned int' would be more
+> appropriate here, given the context.  If we look at the whole function
+> in 6.12, we can see that it took an 'unsigned int' length:
 
-This also suggests that files with lengths greater than UINT_MAX are
-still broken.  Is that okay?
+Ack. Do you want me to send a v2 with `unsigned int` instead?
 
-Anyway, I'm glad that I fixed all these functions to use size_t lengths
-in newer kernels...
+> This also suggests that files with lengths greater than UINT_MAX are
+> still broken.  Is that okay?
 
-- Eric
+I've tested it but kexec fails to load it, so, it seems we are safe
+here:
+
+	# kexec --load kernel --initrd foo 
+	kexec_file_load failed: File too large
+
+> Anyway, I'm glad that I fixed all these functions to use size_t lengths
+> in newer kernels...
+
+Thanks for that!
+--breno
