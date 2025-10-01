@@ -1,61 +1,46 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF732C029B
-	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 16:45:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2211E28C2D2;
+	Wed,  1 Oct 2025 16:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759337113; cv=none; b=J5HGljClFBJBId7VcDMCO4YnTJ3T2m4PIaZOy9FRQIMxqyZPjkUOMUPe6AEYDCnWXGgOE+CgBAHIWOFDydNpyYKDbNxU28pfJEcL+kqArhkyc43b/L6LLLmJl226JvLnrqCBOjDCiAN3f/HrpAO8A6xXWMGuxsLTunHU6YDPtN8=
+	t=1759337778; cv=none; b=hurL9hF2evD8dTVSOEvhWySIXsp0zkVxIvlmZz/UV1e01adA3VI1kOozow16FdZ1wrW8Vp5w1msUS2LW+9duI20RSB3KCMvTdN0Cpzvl26dvxdX85n32yNaMa9Z8XVqcN40B5IMtDIxv2/dAMiZSwrV0+2sHOOjSGSXlqIAO1hQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759337113; c=relaxed/simple;
-	bh=K7YWwtRoXyrnO3YXAJ6rlkNgEypHfVsTVv9EU7Z16Qs=;
+	s=arc-20240116; t=1759337778; c=relaxed/simple;
+	bh=rpAjRFYNrwr9P/dKBIUH+iBTuw2t7D7elVjJUZZ01v8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MRPSkFsibwW3jIOf0GfHX57zzcXAttdY/13rK6LEYMwMa1RmjGUbmT8jMk+R9dQsz1To+yVHI5RYqKUoU41iXQR+UxC/iFi2IvdtT06c0zieIdtGWSfnFRZzjGg+jlB6e14C8vdZHdRJFDJX6cWHgqK41L0Gujdc0dVW19WKvYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b3d50882cc2so15965066b.2
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Oct 2025 09:45:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759337110; x=1759941910;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8RpMi9Th+Po7AoazGbT2yu6utd+ZudWSIE+dBXn6AEw=;
-        b=HsZ/byAD6v5qoNnHdL53uEA5xxKfN/egp10JFVt/DzC4mNVsyORIFv5/Y36kQrzRUi
-         qKGz3CMezRx7vJ2zy8iUqF6K+3ZY24PQ27q4dOHSLRbkibyA3+E74suMHnWTL6vGQ5y5
-         pomKcYlzUXNOeuKGaNTBA7RKYa0Dt4jdSmmquF+7r/g0sPEeQWaSgWN9FrloQqYLTgvM
-         /YuG88lwq5A+wZxrLShk0ZjZfWQngPWch1dcme3h8RsKwxSEDTotHoFMCG72IAtgD46r
-         CcJq4uHnLOqT4dTbTDoD6uOaBX7/9BteBhDmH59c3lxL9E5GIHFDV1IFo52mLh43517b
-         scyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX6GiDCcBxaCuVuT7FQP0uz7unPmxlY0qnICNt92LX42dk38ulxelw2mxOr06c/rMTJou7eAiGPJKoMRyw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCXHfN74uHN0BTNFe4HsY1w1CPc7X0OJ26aV6Nq7lXe/FGMEKk
-	1QhjSjcfErL/UBs5UyqFKVzPUBspL9iT6ZHOevPEj/s0K4X+QGwMJ88b
-X-Gm-Gg: ASbGnctwyPR8f1Zv9kYeoZnEOIRVOX0/gsPpbFeYGmuPrl4Cty5d9acMALr2CX4bmkB
-	DqlXPUxkV36K7UT4FLak92NJ2005eLWd5M6/l5fL2loGTu6seUv9z6IH8UH+LHDqQhI5rtdC7PJ
-	Jw3STjbdofXKhTTorS+YmWFpZJ5UY/uzxRqzpzAg7PT1GeDmN1+iJYJ7hhk4nG9y/7BYFrLqlHb
-	Kc98Pn60AAErzlRnXynKPgrF8nADbeNoB7c8UKDo9z3ln/eeXCnp60a275KzmlN3NgHDYF8ENrw
-	rNETzNaGzteIxbmGEkAyVGu6QEvzkiD4NAmYWAhOf7jruVugiLkxHwTlYnMXpqMiBhwDzgn0iK6
-	BbQJgUaJ5bD8dpUtLm+DSADkgF4wuescblZefiQ==
-X-Google-Smtp-Source: AGHT+IFaatL0zRpXljYvk9pU9uM41+0gFgUFUB28SfXW6ic2vlnE+OWGmtK1CqAf9k3bMM7SwTnkww==
-X-Received: by 2002:a17:907:1c95:b0:b3c:31c2:b57d with SMTP id a640c23a62f3a-b46e99531a7mr534332566b.55.1759337109937;
-        Wed, 01 Oct 2025 09:45:09 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:74::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b486a178610sm1548866b.92.2025.10.01.09.45.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Oct 2025 09:45:09 -0700 (PDT)
-Date: Wed, 1 Oct 2025 09:45:07 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: gregkh@linuxfoundation.org, sashal@kernel.org, stable@vger.kernel.org, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel-team@meta.com, Michael van der Westhuizen <rmikey@meta.com>, 
+	 Content-Type:Content-Disposition:In-Reply-To; b=ap+XAwrDOe4xnA4JvclmUf6SkqLv6At5uyTzGDdCh/m/hVkeMzW1siUJwqziQ0kdRulmjQzwrnI9F71Fq1UFdwJO4OXMjZmR0G29t7JmUEIiw2MEjJoANZPn9CO/VgqcNaBjagLrhfi0yaUq+SHSamambAGFMEdRH/4yzvUbWRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=duBNrr3X; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="duBNrr3X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A2B7C4CEF1;
+	Wed,  1 Oct 2025 16:56:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759337777;
+	bh=rpAjRFYNrwr9P/dKBIUH+iBTuw2t7D7elVjJUZZ01v8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=duBNrr3XK8WrXfwmvxSXZ0ToUjddax8jwkZwV0dgy6wn5pepDK4VMbIxGXUO8n1GJ
+	 GhcibkDUtSS7tx1S9lSSswSUS+nJ0vnNPn9kV6kyROkhzmLVOlpZcWaJILkCk1HAPU
+	 TRvFS5MumXBQ4CT8VTM5UmGyThr86gevB65Cb0+F0fTenbOFDItaGIyjuDGL45eLhY
+	 zqz1AnJXMzmjR7gy39lRUK+h7tgU3z7o9FF0f6mf/t+YycM75lvfP1Dr70/mLt82sF
+	 zmYvfVPB0HTNj3bfG/gG3fAzqlN54UHvGT91Jfk43ckvH7v1h3fm1qKcn1035l+Fly
+	 l2CX2mRMcjG4g==
+Date: Wed, 1 Oct 2025 09:54:55 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: gregkh@linuxfoundation.org, sashal@kernel.org, stable@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-team@meta.com,
+	Michael van der Westhuizen <rmikey@meta.com>,
 	Tobias Fleig <tfleig@meta.com>
 Subject: Re: [PATCH] stable: crypto: sha256 - fix crash at kexec
-Message-ID: <jm3bk53sqkqv6eg7rekzhn6bgld5byhkmksdjyxmrkifku2dmc@w7xnklqsrpee>
+Message-ID: <20251001165455.GF1592@sol>
 References: <20251001-stable_crash-v1-1-3071c0bd795e@debian.org>
  <20251001162305.GE1592@sol>
+ <jm3bk53sqkqv6eg7rekzhn6bgld5byhkmksdjyxmrkifku2dmc@w7xnklqsrpee>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -64,29 +49,24 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251001162305.GE1592@sol>
+In-Reply-To: <jm3bk53sqkqv6eg7rekzhn6bgld5byhkmksdjyxmrkifku2dmc@w7xnklqsrpee>
 
-Hello Eric,
+On Wed, Oct 01, 2025 at 09:45:07AM -0700, Breno Leitao wrote:
+> Hello Eric,
+> 
+> On Wed, Oct 01, 2025 at 09:23:05AM -0700, Eric Biggers wrote:
+> 
+> > This looks fine, but technically 'unsigned int' would be more
+> > appropriate here, given the context.  If we look at the whole function
+> > in 6.12, we can see that it took an 'unsigned int' length:
+> 
+> Ack. Do you want me to send a v2 with `unsigned int` instead?
+> 
 
-On Wed, Oct 01, 2025 at 09:23:05AM -0700, Eric Biggers wrote:
+Sure.  Could you also make it clear which kernel version(s) you are
+expecting the patch to be applied to?  Is it everything 5.4 through
+6.15?  It looks like this bug actually got exposed by f4da7afe07523f
+("kexec_file: increase maximum file size to 4G") in 6.0.  But
+backporting to older versions should be fine too, if it applies to them.
 
-> This looks fine, but technically 'unsigned int' would be more
-> appropriate here, given the context.  If we look at the whole function
-> in 6.12, we can see that it took an 'unsigned int' length:
-
-Ack. Do you want me to send a v2 with `unsigned int` instead?
-
-> This also suggests that files with lengths greater than UINT_MAX are
-> still broken.  Is that okay?
-
-I've tested it but kexec fails to load it, so, it seems we are safe
-here:
-
-	# kexec --load kernel --initrd foo 
-	kexec_file_load failed: File too large
-
-> Anyway, I'm glad that I fixed all these functions to use size_t lengths
-> in newer kernels...
-
-Thanks for that!
---breno
+- Eric
