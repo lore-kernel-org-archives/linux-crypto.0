@@ -1,54 +1,54 @@
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA07C30FF25
-	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 21:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADC23101BC
+	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 21:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759352640; cv=none; b=FGTvQ19TK3+pX+sw0gW/xi+6d8kfg5QvZtenQXlr0QnS5F2v6+OY8oU7djOL81BUs0lRSZ+icMRzrE/v2Z+vB264O/ROQS196QT0n8jBbRWg1zWKo0ugZF84pFxo0KmlH4Vk44cIrOCCUs6n03+wTDu7J4QgqOOIN7eVj4FykqM=
+	t=1759352641; cv=none; b=IqNOc29hxLjNOf4YDo7yH7uR6cxIEiPMcApf3iyZnJKFPK2MnS6YcA0wZBJ7t6wKK3hD1iutIbOQGEHivgInucwOe4WyBAvov5Rp2Ny0LRlHgr5CJMyBfUup5ACdChKuepxtcCc0G1Sc1adkWtimkWD/UM64GbR5anUAX/UFahg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759352640; c=relaxed/simple;
-	bh=nadp2g4HyADqc9HwrCLpsPTlFfrdWtCsrrf5SqzqoPY=;
+	s=arc-20240116; t=1759352641; c=relaxed/simple;
+	bh=G71rjTtZIaGIXR3UGbv3E5LniLfYD2qy9Arh2X+LvNw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ivZOqwOb4Sk4NhoW37lUO0wipGpjWFucTSMJRm5trDVsKyYhYtMQgk+EnWo44DZmnstLhLzqjPtMlT/DPIjlxyIooENfQ7AtCYmMqsB0CTsstGfiW3FmJdJWcZe88pbHFwqk6iuCuXLjTxUrZTs7cr1W3podG+HJho8EbS7/QdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jVV2aSE7; arc=none smtp.client-ip=209.85.218.73
+	 To:Cc:Content-Type; b=eW2cgjVXsm1jIBaYIDSRZH7JvHJZ2SYS32b/4TA/TujCFOj6X27o2HZBPVWsSEOV4QDTYZ7IEZ5S6sbf2h1wi96yS1VzQozj8EL8One8/H8h19X8CGmX2ctgHCEy6/MvoUdyTD4/pcsTF91EIT9+yjZFN3Pzz7ybdpreHHj2dQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c1+HtXub; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jVV2aSE7"
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-aff0df4c4abso45839466b.1
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Oct 2025 14:03:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c1+HtXub"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3ece0fd841cso78700f8f.0
+        for <linux-crypto@vger.kernel.org>; Wed, 01 Oct 2025 14:03:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759352637; x=1759957437; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759352638; x=1759957438; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nLN5jr5EZSwszf+F9TmirI7MwTEPAK5WzBEEPFGFb+c=;
-        b=jVV2aSE7+z4M1GA169jDvqZznvrLuakEEvE8JVEaB6RCO3PdIH7227PyVGfWkLduwi
-         mplg5J3t9n/s2OWHnCHjARQPfkM3iZEcjbOUWIcOWGgRhjiaKUxHf0MtUuf0I0L0WcxZ
-         2l5Ybx1H14BNAR70nfGjxDnhUuI6hKtN/ppOpyfZz8/f/Qitp2VVIg8mgWYapEplfCsQ
-         JdP0jaK3q+tbxS3yeqbgowHqqtbDWeqDj/NEp7uGQ+Jr7N+lnMYvtWCBqJbjw1jC7NGd
-         4BMXjaHRnNVN/0y0D+lIDtPhPl1jm4KIhz/nCBEB/CtFgXl1T90k0TIKEs9PhxdtBQHN
-         4ABg==
+        bh=4j20MEC8Ax3r4R1mIrlpRXC+UmhNM+andOU7drpFlJg=;
+        b=c1+HtXub1tsW6Ro/L61pROfXURB4H1hVBy/UvsvtwubqYow8d4Jywu4xt6S29GXX/C
+         52xPUQ1o7dxEfXlf8FU8XGM6UFfTI2e52i90Ur6MAuHGq/Q317Z9ewr212k+1bkX8Ljk
+         GdWjmj1rsJuUGEgcZmJmk1Fkd4dvpri6tZY5xXQYcPMzGAT37il9C+4RWej+QSe5WV5X
+         Bi644UlA4m8QQtP4/1icEOc2VCvSH9QoIL0jHUZn0O3eL7oIryyguz/thA9d7L2MmwDZ
+         0TBSqoJa7PqNuOZhrB/maL7kQUmpmZgNXxWqwnO3HXbHiFYV8DtgumHMF++1c4wMhheD
+         Kxdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759352637; x=1759957437;
+        d=1e100.net; s=20230601; t=1759352638; x=1759957438;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nLN5jr5EZSwszf+F9TmirI7MwTEPAK5WzBEEPFGFb+c=;
-        b=NQamaZxFj9OCp0YAUqr3rJd1riMxnFqzYGWJ74lZYDCsY+t3UJq/PdDpFr3aPj7/AV
-         +RVMBYFjEpkTK/NGifM1cOn3tP30qDycVE8DRBQKz8YnRU2Vr2sGIXt2pDp9ADRj5fMf
-         s2iFvnVglwHq4UkcaZUEwYsUWRucbfCHjuKfD7gHsxPcIJniOLkUmkcj8rEqzPUyfzNz
-         ULlKnZS8cRO7A2WkjrHKPa0JPufVJ6pK/bMIjvNaCSgPI0rO5gcjDe46Q0jfVddnwrs7
-         +mDcCyOmUYfVKgEoW3tqTmVeeBlWpI/VwVX0yPSgZfdxrZnAX+Z5hPLpGop/0bIBm86i
-         JrUA==
-X-Gm-Message-State: AOJu0YyUVEnTdzc/S0sytq8uvLlrb8TJxuRic0oIRM99uGeTyh3KbY+O
-	L+I4+TOR1Up0eD5wQ/VXb3743lxJI4siWJS7NnEnDee4UwfuW/OhbDs1XJAAH9lV89mk3iIsyg=
+        bh=4j20MEC8Ax3r4R1mIrlpRXC+UmhNM+andOU7drpFlJg=;
+        b=R5S+wkpK5gyVRZvVP0NbMPGZDJK+AnD9NOTD6dcvX8k4MErINTTX8X0sEy0VCpPtB2
+         /EmG4KZ8Gk5MHPZR4P2RuM5ROeg98FPY1kP1ZHQzTdjOA3UnMgGV/Jn5m9koATtElMpO
+         hJMDX2R8CgtLDazLkjfCTie/zqfveidrhzpQd47gkbqMS5OYgc4dCXgLO7CGcYPZuO0i
+         j8ZbSHhv8Y7Y1Px3yKINeyJQi67O+eFuXnZyaHOvvqMBOzGur7seaeuTFXV0YFq9/C81
+         L/rDI4my7S1USbvTSRiAdtgFnkV4+kAMW3zCOWyqahTxcQWi/fdIPD594uIMFyNAdCOs
+         jsFQ==
+X-Gm-Message-State: AOJu0Yy1V6vFcLtlFXbadBThPMyliNmS2ZEAFAeV9ZnbygVw7ilIsRF5
+	s3KtDrkQWf8fC6oHxDzE0zGeajTyIOWn/oD+3R1TbusNAL6Lnn3q0DbV6TGWnfdhjiUSAOk6QA=
 	=
-X-Google-Smtp-Source: AGHT+IE/5dzsYm+uKsCA7BqxixvVFjLG0cblUGfuQzl+SHoar/yQvT4DNAxneFAQwNCEwxJSwxiGrNJ9
-X-Received: from ejbgx6.prod.google.com ([2002:a17:906:f1c6:b0:b3d:b7b8:e443])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:724a:b0:b41:abc9:613c
- with SMTP id a640c23a62f3a-b46e97621d3mr576098566b.51.1759352637265; Wed, 01
- Oct 2025 14:03:57 -0700 (PDT)
-Date: Wed,  1 Oct 2025 23:02:07 +0200
+X-Google-Smtp-Source: AGHT+IEuG1RbtJ6FiwIucAXGOGuLO6+jN3odMsNV/hZ3o58B9bsNzZE7dpr8nZZ7AG2wrt76ICGCYLz6
+X-Received: from wmph10.prod.google.com ([2002:a05:600c:498a:b0:46e:3d73:fc5f])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:220b:b0:402:71e6:5e00
+ with SMTP id ffacd0b85a97d-425577ed455mr3244884f8f.7.1759352638294; Wed, 01
+ Oct 2025 14:03:58 -0700 (PDT)
+Date: Wed,  1 Oct 2025 23:02:08 +0200
 In-Reply-To: <20251001210201.838686-22-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -58,14 +58,15 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251001210201.838686-22-ardb+git@google.com>
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3184; i=ardb@kernel.org;
- h=from:subject; bh=gbq7vX1V656Kd5zOXbjYzxNSx5HVr+W5CHBw6KSs3yM=;
- b=owGbwMvMwCVmkMcZplerG8N4Wi2JIePutAd/TfvXOrnNLdzMmuP5wDbmqvKCn8Y7b23smLTMO
- eYwY+nPjlIWBjEuBlkxRRaB2X/f7Tw9UarWeZYszBxWJpAhDFycAjCRK48Y/ldUdS5R2rJRRfXS
- RDOpUsODP9J6kjct2vbf13Ji73OtackM/0vYOs/H38s/k8jeMbdyy6Hvl1ee9mG9fkrdSVhmk13 dZVYA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=923; i=ardb@kernel.org;
+ h=from:subject; bh=cfu0++gxesQ+j0mFCsE0nnO6ije/EROXIJJwVNT18uY=;
+ b=owGbwMvMwCVmkMcZplerG8N4Wi2JIePutMcBulsb9Sf4Rn696XB38WaDfWe15F4pq8cpdulUF
+ insmBLQUcrCIMbFICumyCIw+++7nacnStU6z5KFmcPKBDKEgYtTACYiF8zwT73e6+Ks9K/+Zebd
+ R+6sq/m6USFAcL2p+MU135V7PqktCmRk+LXMZ/6d0FIN7xxPpoX/jt5W3mGrLFV3wuGL08ZXstw XeQE=
 X-Mailer: git-send-email 2.51.0.618.g983fd99d29-goog
-Message-ID: <20251001210201.838686-27-ardb+git@google.com>
-Subject: [PATCH v2 05/20] raid6: Move to more abstract 'ksimd' guard API
+Message-ID: <20251001210201.838686-28-ardb+git@google.com>
+Subject: [PATCH v2 06/20] crypto/arm64: aes-ce-ccm - Avoid pointless yield of
+ the NEON unit
 From: Ard Biesheuvel <ardb+git@google.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -78,103 +79,33 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Ard Biesheuvel <ardb@kernel.org>
 
-Move away from calling kernel_neon_begin() and kernel_neon_end()
-directly, and instead, use the newly introduced scoped_ksimd() API. This
-permits arm64 to modify the kernel mode NEON API without affecting code
-that is shared between ARM and arm64.
+Kernel mode NEON sections are now preemptible on arm64, and so there is
+no need to yield it explicitly in order to prevent scheduling latency
+spikes.
 
+Reviewed-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- lib/raid6/neon.c       | 17 +++++++----------
- lib/raid6/recov_neon.c | 15 ++++++---------
- 2 files changed, 13 insertions(+), 19 deletions(-)
+ arch/arm64/crypto/aes-ce-ccm-glue.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/lib/raid6/neon.c b/lib/raid6/neon.c
-index 0a2e76035ea9..6d9474ce6da9 100644
---- a/lib/raid6/neon.c
-+++ b/lib/raid6/neon.c
-@@ -8,10 +8,9 @@
- #include <linux/raid/pq.h>
+diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
+index 2d791d51891b..2eb4e76cabc3 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-glue.c
++++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
+@@ -114,11 +114,8 @@ static u32 ce_aes_ccm_auth_data(u8 mac[], u8 const in[], u32 abytes,
+ 			in += adv;
+ 			abytes -= adv;
  
- #ifdef __KERNEL__
--#include <asm/neon.h>
-+#include <asm/simd.h>
- #else
--#define kernel_neon_begin()
--#define kernel_neon_end()
-+#define scoped_ksimd()
- #define cpu_has_neon()		(1)
- #endif
+-			if (unlikely(rem)) {
+-				kernel_neon_end();
+-				kernel_neon_begin();
++			if (unlikely(rem))
+ 				macp = 0;
+-			}
+ 		} else {
+ 			u32 l = min(AES_BLOCK_SIZE - macp, abytes);
  
-@@ -32,10 +31,9 @@
- 	{								\
- 		void raid6_neon ## _n  ## _gen_syndrome_real(int,	\
- 						unsigned long, void**);	\
--		kernel_neon_begin();					\
--		raid6_neon ## _n ## _gen_syndrome_real(disks,		\
-+		scoped_ksimd()						\
-+			raid6_neon ## _n ## _gen_syndrome_real(disks,	\
- 					(unsigned long)bytes, ptrs);	\
--		kernel_neon_end();					\
- 	}								\
- 	static void raid6_neon ## _n ## _xor_syndrome(int disks,	\
- 					int start, int stop, 		\
-@@ -43,10 +41,9 @@
- 	{								\
- 		void raid6_neon ## _n  ## _xor_syndrome_real(int,	\
- 				int, int, unsigned long, void**);	\
--		kernel_neon_begin();					\
--		raid6_neon ## _n ## _xor_syndrome_real(disks,		\
--			start, stop, (unsigned long)bytes, ptrs);	\
--		kernel_neon_end();					\
-+		scoped_ksimd()						\
-+			raid6_neon ## _n ## _xor_syndrome_real(disks,	\
-+				start, stop, (unsigned long)bytes, ptrs);\
- 	}								\
- 	struct raid6_calls const raid6_neonx ## _n = {			\
- 		raid6_neon ## _n ## _gen_syndrome,			\
-diff --git a/lib/raid6/recov_neon.c b/lib/raid6/recov_neon.c
-index 70e1404c1512..9d99aeabd31a 100644
---- a/lib/raid6/recov_neon.c
-+++ b/lib/raid6/recov_neon.c
-@@ -7,11 +7,10 @@
- #include <linux/raid/pq.h>
- 
- #ifdef __KERNEL__
--#include <asm/neon.h>
-+#include <asm/simd.h>
- #include "neon.h"
- #else
--#define kernel_neon_begin()
--#define kernel_neon_end()
-+#define scoped_ksimd()
- #define cpu_has_neon()		(1)
- #endif
- 
-@@ -55,9 +54,8 @@ static void raid6_2data_recov_neon(int disks, size_t bytes, int faila,
- 	qmul  = raid6_vgfmul[raid6_gfinv[raid6_gfexp[faila] ^
- 					 raid6_gfexp[failb]]];
- 
--	kernel_neon_begin();
--	__raid6_2data_recov_neon(bytes, p, q, dp, dq, pbmul, qmul);
--	kernel_neon_end();
-+	scoped_ksimd()
-+		__raid6_2data_recov_neon(bytes, p, q, dp, dq, pbmul, qmul);
- }
- 
- static void raid6_datap_recov_neon(int disks, size_t bytes, int faila,
-@@ -86,9 +84,8 @@ static void raid6_datap_recov_neon(int disks, size_t bytes, int faila,
- 	/* Now, pick the proper data tables */
- 	qmul = raid6_vgfmul[raid6_gfinv[raid6_gfexp[faila]]];
- 
--	kernel_neon_begin();
--	__raid6_datap_recov_neon(bytes, p, q, dq, qmul);
--	kernel_neon_end();
-+	scoped_ksimd()
-+		__raid6_datap_recov_neon(bytes, p, q, dq, qmul);
- }
- 
- const struct raid6_recov_calls raid6_recov_neon = {
 -- 
 2.51.0.618.g983fd99d29-goog
 
