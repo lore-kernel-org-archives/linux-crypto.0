@@ -1,111 +1,79 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AC23128D0
-	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 22:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC1722B594;
+	Wed,  1 Oct 2025 23:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759359586; cv=none; b=oza0mUq2eWrJf6JdWcF5d2v9x0/3wmOzITgQVeigdA5CIlo2CVTTM+bmf7If89iu76XOPbBiKQC8tVQOayezCDvP2VImcOi2t3EzGpoa9b0ll7Dolh3l8HU0KQtv6pJ87QAQLNQPMGg1UCZTukLzy84mrKA4Rcd56+SdZAyEjGU=
+	t=1759360214; cv=none; b=QK6nkbhejqWQOT2WXHUjZwGjYCncGRFu8fE5V+hfwYyWCCjm6Q3PVyghA1h85ce8jGlESpEDTofuUzMTm5BjdyK6xdZWAqRBnq/FtMmUrg0OdXuxbZ4C8SwYN2wpxkg5XQ7wEQ+xKhgPsH6oXqWwObbMuR2SRrrh16qUsRaqEgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759359586; c=relaxed/simple;
-	bh=/jEZePi63ifb7LawHxT3yfaud/22p+YbYH+kfCQsEVI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e/h+53ihYzA02UnCtnZ+TplnHJGHicWiinKLELTHCODJZoBZE6sFHsXmSTQqkMnlgfW6ZJtjELf3kzjHVw2YwHmij8ZUnYPzFMHVdyZsZ+Kh+yRsO1m1inlB/z4S9uG9BCDvYELvJfVywmOJZ9prD5cOGVp2ATt8sy6n6qaHjwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ekLhcHnG; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1759360214; c=relaxed/simple;
+	bh=B3HRz/KTZKMuWnZ9hNBFnBaZDPuY8XrrLTdRe2xAai8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pMcX9/tYewPZ3rAiiHkn4Z+kxcOFyVfoSZRbhg3svxmqSiG2R5wboAaaJqtkdrZZaAe4yNRgEllQESuRhXuL/cX50yRkw2VgynVAuas/8RtLOAnSqAPKAQevVv2iYNt/6M7G6N9o8w1hG+T+QkdIutN2Ch+ZiJPiaQeVz6rOzlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fDw2W8Xp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ekLhcHnG"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3ee15505cdeso270328f8f.0
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Oct 2025 15:59:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759359583; x=1759964383; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I2LJjpzKHNhkNbLIhRR6OhIR28zGFHZ3AsWw8V3scZQ=;
-        b=ekLhcHnGgRaFHZPl+8I7CNhiukr6E77fHqYw6yBYvktrkZjIp6Eo7+zMaNHy+nDuUh
-         1mocxv7sRgM+nZshpSXYbQgZ/HsTjAfJHrsDSN2yq8e81U8jyIdVSkXvmJsKL7h1S3MV
-         zdT7BCmG+hAsa2HbXnJtcX0a9HCoxlz0mXh6STsOY79IahfWfSIv4oofaPUmCbdYeHir
-         K+GO3vJ5w5Jrx1Py7Br0wAN/pHTPp4csiBO9PfQNsXXJ+M9h1RB3RppYBZdHkamuxQ1r
-         G7bsW3OR+/VqWoaBvkb3vPjWGCCiFP1+I7/GLj125sOHmKMyvOr8KYU9/rGqjogWSJ5z
-         CWFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759359583; x=1759964383;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I2LJjpzKHNhkNbLIhRR6OhIR28zGFHZ3AsWw8V3scZQ=;
-        b=iocsBchcGUS8uo86dOoKz7KlGHQdbRc0zz9QPJN+DjABY+U34xBapJWhyChMic3Cbp
-         rLsJW6YrUb3sUm1HRldkLEC+ah3WlXBMihvbJa+iu3TxlLp2ZibzrDAwuA5fh81pCQHE
-         AB5Kuf9gqguEXjKRZxLMhydFXEDwcYRxysCTrfP4TWwQNq6H31UV2TuNKQQPldn2Ntnm
-         1Geoe71S1BPZQZJl2VW7t6COA7kLD4N9Uq3FUCunMNgbiqZSGt3geIvAne7Razg0Lzyy
-         pbVTaUgeE1uXSF7vsiVhE2KZlkMJhc0olzTh7zhKUOXX4xHGRalkGbH4er/SjaMAzxPL
-         6HFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUtoFdOGNKykYzp5BlC32ecDjwyF85vJhpojrQCaL6Rxw80ZViPRPOyTydS8JuZ68n0XF1Ml85FrWkL9X0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXajYrYvnfgKoahwnB125gMpgUIlttV06g+iXASt1WmWiQInCs
-	PTkiOF2TIWlgQK3GS6i3ebziDy1AjGjiqlwLpjyU8Vpi0bsCV7YacsscuzjI0MhLgXJ1ANJQVOJ
-	ElmtFggmUVpXuKkXd1NdbYBq9A1vIbJy4+4P7
-X-Gm-Gg: ASbGncs45ttmpvK+yJL0Z9mZc5Ba5UoIMNCurzl/Bpb+BQA7wyU2xNQXOfNcEGkn8uG
-	agVx/hKlZOcWfF6bVsKs0HhDYZD3FDY1TGiSBqmWe9R2LdAAJFrlR9T0iO2IQILvwcyWo3HWaTZ
-	RthvnJDDIUPLPcOxBZk+t9IK5o31+a+XTwbb7hYl/rEZPo8Cx94Q2LHvZWc6pz2Er2kCIdqN7ih
-	1f8DEzUdX6zoPoW60opW3+d1xYhoArRqP6GHpMCo3keQDYF9M02HeZrcSsO
-X-Google-Smtp-Source: AGHT+IFIthqNLIzsiiVqfIC/794k1c4r4WbSgF7mi39Ywx1WhaF8XPcDvawxyxt3Hv5pgCvoq9HKGrKtaTz9avnQwoo=
-X-Received: by 2002:a05:6000:26c8:b0:3ec:dd27:dfa3 with SMTP id
- ffacd0b85a97d-4255d2b70c7mr906497f8f.25.1759359582571; Wed, 01 Oct 2025
- 15:59:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fDw2W8Xp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDA24C4CEF1;
+	Wed,  1 Oct 2025 23:10:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759360213;
+	bh=B3HRz/KTZKMuWnZ9hNBFnBaZDPuY8XrrLTdRe2xAai8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fDw2W8Xp5Ta8+91AAyaPxsdvIORwvF8Obx6omjOwd4UIX2e4gxT0fGR5g5O/8MXAb
+	 TsMmJHXPE0aGV0VVGaLmQWh76b57nqD2zZMpiT8+o76vP5NnZVJsSVCkp7yAE7noCN
+	 gbDFXe7yY+VXZ3MhkFbFmRTpONERI87tZztR7x/ugV9V/tothtHdkoY0qXrFJY2T7U
+	 OymupCp933xZn0cSv+kOA97wAPxW4fnTYpqhBH21wC1bSR+CRiBEmqXBMKKCsZqQTZ
+	 T7Ffv+Ej7V1Zsfl0WxijhNUO3ZPa5uxi6VaxGS/33PiS1YLr1mlcRycfE4cLEBuCpW
+	 G04d6QW21RwWg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BC639EF947;
+	Wed,  1 Oct 2025 23:10:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250929194648.145585-1-ebiggers@kernel.org>
-In-Reply-To: <20250929194648.145585-1-ebiggers@kernel.org>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 1 Oct 2025 15:59:31 -0700
-X-Gm-Features: AS18NWDraC0eOVPTbkYt3tRMCpa8HC5n2XCxn7eFZFOdN6cdM4zLD1NKkPUHBCk
-Message-ID: <CAADnVQKKQEjZjz21e_639XkttoT4NvXYxUb8oTQ4X7hZKYLduQ@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1 code
- instead of AF_ALG
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next] selftests/bpf: Add test for libbpf_sha256()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175936020626.2655520.13016987725533835451.git-patchwork-notify@kernel.org>
+Date: Wed, 01 Oct 2025 23:10:06 +0000
+References: <20250929192721.144640-1-ebiggers@kernel.org>
+In-Reply-To: <20250929192721.144640-1-ebiggers@kernel.org>
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: Network Development <netdev@vger.kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
-	bpf <bpf@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Ard Biesheuvel <ardb@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: bpf@vger.kernel.org, andrii@kernel.org, eddyz87@gmail.com, ast@kernel.org,
+ daniel@iogearbox.net, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+ linux-crypto@vger.kernel.org, ardb@kernel.org
 
-On Mon, Sep 29, 2025 at 12:48=E2=80=AFPM Eric Biggers <ebiggers@kernel.org>=
- wrote:
->
-> Add a basic SHA-1 implementation to lib/, and make lib/bpf_legacy.c use
-> it to calculate SHA-1 digests instead of the previous AF_ALG-based code.
->
-> This eliminates the dependency on AF_ALG, specifically the kernel config
-> options CONFIG_CRYPTO_USER_API_HASH and CONFIG_CRYPTO_SHA1.
->
-> Over the years AF_ALG has been very problematic, and it is also not
-> supported on all kernels.  Escalating to the kernel's privileged
-> execution context merely to calculate software algorithms, which can be
-> done in userspace instead, is not something that should have ever been
-> supported.  Even on kernels that support it, the syscall overhead of
-> AF_ALG means that it is often slower than userspace code.
+Hello:
 
-Help me understand the crusade against AF_ALG.
-Do you want to deprecate AF_ALG altogether or when it's used for
-sha-s like sha1 and sha256 ?
+This patch was applied to bpf/bpf.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-I thought the main advantage of going through the kernel is that
-the kernel might have an optimized implementation for a specific
-architecture, while the open coded C version is generic.
-The cost of syscall and copies in/out is small compared
-to actual math, especially since compilers might not be smart enough
-to use single asm insn for rol32() C function.
+On Mon, 29 Sep 2025 12:27:21 -0700 you wrote:
+> Test that libbpf_sha256() calculates SHA-256 digests correctly.
+> 
+> Tested with:
+>     make -C tools/testing/selftests/bpf/
+>     ./tools/testing/selftests/bpf/test_progs -t sha256 -v
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> 
+> [...]
 
-sha1/256 are simple enough in plain C, but other crypto/hash
-could be complex and the kernel may have HW acceleration for them.
-CONFIG_CRYPTO_USER_API_HASH has been there forever and plenty
-of projects have code to use that. Like qemu, stress-ng, ruby.
-python and rust have standard binding for af_alg too.
-If the kernel has optimized and/or hw accelerated crypto, I see an appeal
-to alway use AF_ALG when it's available.
+Here is the summary with links:
+  - [bpf-next] selftests/bpf: Add test for libbpf_sha256()
+    https://git.kernel.org/bpf/bpf/c/f09f57c74677
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
