@@ -1,54 +1,54 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A434D31282B
-	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 21:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEBF0313276
+	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 21:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759352653; cv=none; b=O1lStFwnWbyLZXnNUaZeKdKdLpqBZoxbds0HZhj8MA8q+H2cQqlDIMKd97F/9PsfG9bNkw7F6ONpPM6j63HnH4ufMYX9fYFJfZrQgSNQU2DffcQPcpfpV6SLfakojadcH+KM4kW8SVZ9aQuyIzu2hI5CyBpMhYWPlAwQwuAQWiE=
+	t=1759352655; cv=none; b=pldFKCS+dBV7uyh+IN3zqfRA3UOCJduFB/9K4Ig6IB0DX2JcjJiMH4sok0fvJgtUbHXQ0/8cc3FesurVhbeDbfHxTdSotvYUQ35tfq+kHQMmmWW16WlCc14iyg8lV2kPBLb+ponfIVEMSyp8+1nsOdsHnjY51fftfRXw1HDI8co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759352653; c=relaxed/simple;
-	bh=ZgELTmYgz5fIxY25szP3ldagosc57h1+aL7duMm8keQ=;
+	s=arc-20240116; t=1759352655; c=relaxed/simple;
+	bh=jNAe/V4zNi6LpOPWatt40NoZhMnHLRvmHGAaaO4Ly1s=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KTYe+epunlUjG/yYYYkygax2GkqtDSSVQknhIvc3E7umP1kJTHK9D4Z85HNPEVpSiwPK8DgyMvTGRF/5EOoHc1YQISdJpldoka1RJc8EVqL3Q92kz8vnBXcYoM4wfcglrFyOa2GSWJfxILZDVzTFi/2OHmcNHZpPC/EVYngBxfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AqV4lIUV; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=ioOEKeFWUX+vSeuCiMj0LMdqWHl6mmGU0AsKMUHLMv5BhqCQMSf8tTxbhqr18cuMxIUUeu9Z9QPjaFeyDJ4TQ9Lqk0loFiC1qGSmq1ixAEkUbVSKo7PpU4VIpk1uEynsMz1rcg5RA/j8t2T5LLBaDwRRF8WDEYomPzUavdvoI8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KP/r1dsr; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AqV4lIUV"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3f93db57449so103496f8f.2
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Oct 2025 14:04:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KP/r1dsr"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-46e25f5ed85so1295745e9.3
+        for <linux-crypto@vger.kernel.org>; Wed, 01 Oct 2025 14:04:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759352650; x=1759957450; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759352651; x=1759957451; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AGpAD7So2A8Y91ye2lz/R4t8i6WlG+BPLoLmcvlg798=;
-        b=AqV4lIUV0SLUhZYRWXSW4BndnhYOU63hd9R7TZC6FZvmtEj9iLQmUwwt3ApyYeENEL
-         EHusT6kaccNoC8cZCSNlla52JvAJM2sDD4S+694q6PiR8eznuPdw2BSF2I7rZZ4JEMfE
-         KQf7c8oP91ZSDs3aCBf7WNfFJzw+xAsaidMuoAwA3JNiYH3Z0lEsNrKjM/zFPaE6y5ur
-         FreJBY4p9PTTpSOMNwgK1iLNflvagS4Vo20J8qbMGcBDn7ChnFYetl9HYnJVyqL5meLX
-         j5ccSg+kbSFatYFZl7tB6b03KiNmdNiJ5rv2XYkS8NFNsUywuk8YqItRqKJgpbiAo/1z
-         oxiA==
+        bh=NhER74UBpIhoIb7wn4zkF28t+zv1ftYCaNbghO5GaF0=;
+        b=KP/r1dsryPzrDFOHsD3a8VegYS59PvdVwxOHHDFaHBi+Xe5isVSAHmWemHxR5ph1db
+         F3dBd6fiNpqOL42WlD7XUqT0iUe6jnE2MHoZaILPK921Ql1nH20yhnJEXQ83MSVpy0tS
+         pqIk9MrlnPswG/mgETtk1ke+j716WHlRh5ybBW1MIMuvAIsCcVczLTKZtDPlY8OcEKuk
+         aeHSGbENAZCWz33JFlSI5eC+JSrk0Ippp4ryh1h4RRoM8ZPXeKol76ZArw6M5zjC2NCn
+         AsJUxs0SYXgWmZWuAkOHiE9uSDaOPNLf32tkgYgTHW9aIobxuR7q3+ma5Np5yeR7XlU4
+         q8Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759352650; x=1759957450;
+        d=1e100.net; s=20230601; t=1759352651; x=1759957451;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AGpAD7So2A8Y91ye2lz/R4t8i6WlG+BPLoLmcvlg798=;
-        b=JIb2cJwMSCl9rZNXHU5tDlWvD4Np9tqYSbAuAiSQm1X1Pnv1jfHQBTPRpmpIBytSWC
-         0Km+NxVqcCVgv9orrEBK2QF3mGwA6LZ89fzMUyibGKqvPDXtPCEuSGOmdOI8Vuot61cz
-         Sp+xVy5M24yKYK1pmPHCpiSXLXwqIbVapIVh+nvXRNGCkDnPDrHBMMbygIQc6B1njVyT
-         9oscuYi//n9MzqVBKr4nypSvr+KSWvgyj/xXcaPcnN6zhl7PNsDdlsPh+dir4KxwM2/Y
-         4O8JcaoFLFcgD5jHbWnAa8OXCG71H6Rl99sev04/YhyVVLYENUjvDPv7nTmebMCRG+7s
-         zfqw==
-X-Gm-Message-State: AOJu0YwrYc7J3TwCTHaICjyk62YLjE9+zCvZ7/yjUEdOwurXq0BsBtP2
-	YJ19n3u4jzPboloLMBDfa5WOM61JPhHRfPUvyjctLFKPcQtG23fIkcETxjxQka6xDMi2ubbZAA=
+        bh=NhER74UBpIhoIb7wn4zkF28t+zv1ftYCaNbghO5GaF0=;
+        b=qiuosXj2Jht2EKLz6nqwmyrAN5GNeXO3YnU/ubZueeMsxw1dR0ZVQfBFrbfNJN56Bt
+         oWv5kvm+7+2XsmYl1fhUfpAYuzEf4QYj7EV9iAj4PASPQTWdH3GJBwLe5se3OqrHVoF2
+         r7uFCM9G7zHIV/Bwd5G7mX0C6cPKpzRWlg+qrG3YLDN0d+dlI0XW6Bkcp8MSBijBE4WC
+         NhkJPisGp+EDE9dJZcXKVGYrWbgFw4Y6qQnpcxRfk6daedSCp8ujOZPaY37jnNcLNlYO
+         ceeY1huu5YbQPqxaBSBLYzAohOZQeYrmSZRirPE0kfcvrhggwbQFNiW7RLZMgg2l8KgN
+         xiEA==
+X-Gm-Message-State: AOJu0YxT5et6/Ssk5Ts5snnx6PJRqdj2Ulzp1rxQ6lmImaKIbj0m/O2g
+	BiJ2aGidNXBzCyjUkjspgpxmieoo6xRhfJ9cmjo7jIawZ3kiXPScVg8l8maE7KEmly5LyB3XIQ=
 	=
-X-Google-Smtp-Source: AGHT+IHWWReVgSgZUQEq8XT+L+cxH1DIu/oJIKEaKdRtIQPT1yPlkOb9ch5vfT9GQM1XrYkcIG8pVP20
-X-Received: from wrxg11.prod.google.com ([2002:a05:6000:118b:b0:403:1719:fe2])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:5f53:0:b0:3ee:1296:d9e8
- with SMTP id ffacd0b85a97d-425577f057cmr3436647f8f.17.1759352650072; Wed, 01
- Oct 2025 14:04:10 -0700 (PDT)
-Date: Wed,  1 Oct 2025 23:02:18 +0200
+X-Google-Smtp-Source: AGHT+IHOlHJXU9hXA0ZmAXl6mlRNCJKkb1Gcp+5ssLGIRuoPhjvb1Emmd8X4cPDWubbLQ9YjO7PB9gsQ
+X-Received: from wmcq27.prod.google.com ([2002:a05:600c:c11b:b0:46e:1f26:9212])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:6692:b0:46e:502c:8d6a
+ with SMTP id 5b1f17b1804b1-46e64641e65mr29454385e9.25.1759352651235; Wed, 01
+ Oct 2025 14:04:11 -0700 (PDT)
+Date: Wed,  1 Oct 2025 23:02:19 +0200
 In-Reply-To: <20251001210201.838686-22-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -58,14 +58,14 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251001210201.838686-22-ardb+git@google.com>
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1156; i=ardb@kernel.org;
- h=from:subject; bh=oFEUnftgBXE3h0R5t48zlJmEk3FO4wNTPpQmOq7/RvQ=;
- b=owGbwMvMwCVmkMcZplerG8N4Wi2JIePudD65SYn5avG5Dcvubcq+/Oeqwd7/dv8Lvh7dE+bzK
- E5H5/bpjlIWBjEuBlkxRRaB2X/f7Tw9UarWeZYszBxWJpAhDFycAjARkQRGhu9nlry9Ll7B9c5p
- S3eg+lWV5s/JX2a+vP7s0xz5d3LhTPsZ/kplbDI8nSli739/azmz6Vbd0ilZXGuOBjtYvLxl614 7jwEA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2860; i=ardb@kernel.org;
+ h=from:subject; bh=nxbcY1qMUcCM5Jp3a99oXHHwAeI3LF7dd8KEKxZdHZ4=;
+ b=owGbwMvMwCVmkMcZplerG8N4Wi2JIePudKH2XdeuGB133c2V2KjV5uU9u09ni9zLgvJw7qCF0
+ 9Z8LXjSUcrCIMbFICumyCIw+++7nacnStU6z5KFmcPKBDKEgYtTACaS0M7I8OxoakasXPVCVm6x
+ mvWzfBYxuO7SO7rQoEMsbF7GoxkqCxj+cNsr7Pt+bLaWpqps/7OPbIU9G7oT7rhfTTy33L9yhcN 5XgA=
 X-Mailer: git-send-email 2.51.0.618.g983fd99d29-goog
-Message-ID: <20251001210201.838686-38-ardb+git@google.com>
-Subject: [PATCH v2 16/20] crypto/arm64: sha3 - Switch to 'ksimd' scoped guard API
+Message-ID: <20251001210201.838686-39-ardb+git@google.com>
+Subject: [PATCH v2 17/20] crypto/arm64: sm3 - Switch to 'ksimd' scoped guard API
 From: Ard Biesheuvel <ardb+git@google.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -80,37 +80,95 @@ From: Ard Biesheuvel <ardb@kernel.org>
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/arm64/crypto/sha3-ce-glue.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ arch/arm64/crypto/sm3-ce-glue.c   | 15 ++++++++-------
+ arch/arm64/crypto/sm3-neon-glue.c | 16 ++++++----------
+ 2 files changed, 14 insertions(+), 17 deletions(-)
 
-diff --git a/arch/arm64/crypto/sha3-ce-glue.c b/arch/arm64/crypto/sha3-ce-glue.c
-index b4f1001046c9..22732760edd3 100644
---- a/arch/arm64/crypto/sha3-ce-glue.c
-+++ b/arch/arm64/crypto/sha3-ce-glue.c
-@@ -46,9 +46,8 @@ static int sha3_update(struct shash_desc *desc, const u8 *data,
- 	do {
- 		int rem;
+diff --git a/arch/arm64/crypto/sm3-ce-glue.c b/arch/arm64/crypto/sm3-ce-glue.c
+index eac6f5fa0abe..24c1fcfae072 100644
+--- a/arch/arm64/crypto/sm3-ce-glue.c
++++ b/arch/arm64/crypto/sm3-ce-glue.c
+@@ -5,7 +5,6 @@
+  * Copyright (C) 2018 Linaro Ltd <ard.biesheuvel@linaro.org>
+  */
  
--		kernel_neon_begin();
--		rem = sha3_ce_transform(sctx->st, data, blocks, ds);
--		kernel_neon_end();
-+		scoped_ksimd()
-+			rem = sha3_ce_transform(sctx->st, data, blocks, ds);
- 		data += (blocks - rem) * bs;
- 		blocks = rem;
- 	} while (blocks);
-@@ -73,9 +72,8 @@ static int sha3_finup(struct shash_desc *desc, const u8 *src, unsigned int len,
- 	memset(block + len, 0, bs - len);
- 	block[bs - 1] |= 0x80;
+-#include <asm/neon.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/sm3.h>
+ #include <crypto/sm3_base.h>
+@@ -13,6 +12,8 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ 
++#include <asm/simd.h>
++
+ MODULE_DESCRIPTION("SM3 secure hash using ARMv8 Crypto Extensions");
+ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+ MODULE_LICENSE("GPL v2");
+@@ -25,18 +26,18 @@ static int sm3_ce_update(struct shash_desc *desc, const u8 *data,
+ {
+ 	int remain;
  
 -	kernel_neon_begin();
--	sha3_ce_transform(sctx->st, block, 1, ds);
+-	remain = sm3_base_do_update_blocks(desc, data, len, sm3_ce_transform);
+-	kernel_neon_end();
++	scoped_ksimd() {
++		remain = sm3_base_do_update_blocks(desc, data, len, sm3_ce_transform);
++	}
+ 	return remain;
+ }
+ 
+ static int sm3_ce_finup(struct shash_desc *desc, const u8 *data,
+ 			unsigned int len, u8 *out)
+ {
+-	kernel_neon_begin();
+-	sm3_base_do_finup(desc, data, len, sm3_ce_transform);
+-	kernel_neon_end();
++	scoped_ksimd() {
++		sm3_base_do_finup(desc, data, len, sm3_ce_transform);
++	}
+ 	return sm3_base_finish(desc, out);
+ }
+ 
+diff --git a/arch/arm64/crypto/sm3-neon-glue.c b/arch/arm64/crypto/sm3-neon-glue.c
+index 6c4611a503a3..15f30cc24f32 100644
+--- a/arch/arm64/crypto/sm3-neon-glue.c
++++ b/arch/arm64/crypto/sm3-neon-glue.c
+@@ -5,7 +5,7 @@
+  * Copyright (C) 2022 Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+  */
+ 
+-#include <asm/neon.h>
++#include <asm/simd.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/sm3.h>
+ #include <crypto/sm3_base.h>
+@@ -20,20 +20,16 @@ asmlinkage void sm3_neon_transform(struct sm3_state *sst, u8 const *src,
+ static int sm3_neon_update(struct shash_desc *desc, const u8 *data,
+ 			   unsigned int len)
+ {
+-	int remain;
+-
+-	kernel_neon_begin();
+-	remain = sm3_base_do_update_blocks(desc, data, len, sm3_neon_transform);
+-	kernel_neon_end();
+-	return remain;
++	scoped_ksimd()
++		return sm3_base_do_update_blocks(desc, data, len,
++						 sm3_neon_transform);
+ }
+ 
+ static int sm3_neon_finup(struct shash_desc *desc, const u8 *data,
+ 			  unsigned int len, u8 *out)
+ {
+-	kernel_neon_begin();
+-	sm3_base_do_finup(desc, data, len, sm3_neon_transform);
 -	kernel_neon_end();
 +	scoped_ksimd()
-+		sha3_ce_transform(sctx->st, block, 1, ds);
- 	memzero_explicit(block , sizeof(block));
++		sm3_base_do_finup(desc, data, len, sm3_neon_transform);
+ 	return sm3_base_finish(desc, out);
+ }
  
- 	for (i = 0; i < ds / 8; i++)
 -- 
 2.51.0.618.g983fd99d29-goog
 
