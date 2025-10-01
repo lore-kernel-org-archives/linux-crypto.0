@@ -1,61 +1,71 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010068.outbound.protection.outlook.com [52.101.56.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C055312C544
-	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 13:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759324868; cv=none; b=bvINLeDgkiwUEzm0SKyIz9meENjGXEJHmP8IwahASgd9EQ4OgpUBf7Go/00Mv3fWtttD+oDzGxA4pVfnotMg5TcAifW7QgM3nmXVapsjOBs9chP7ZPifVLkFaBta2yJoXLgc4E4yik26gwjDYfOlOn6xTMpCnnLN1O6y7zdYgPo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759324868; c=relaxed/simple;
-	bh=RstHuA3cBklkJUkifPKThJkJ8whdV1GDYeMseAVOck4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jlJTX7ziXjtoy+VBGlO/B1b1J613DAS6bnUhBv5G4vdI2Qi49Nnor+pzxGzfYthp0r1KrEiIMctaM2U9l0hQ5ppFjG8e30YGZuEiEgsQgDYfma45gM3gECTYPHuPzLDq/DlowG3Fy0nxeCv1+W8uO8/PH18wWgRF+kwY/KxZx4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cT6Cu5bI; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113FA302761;
+	Wed,  1 Oct 2025 14:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759329891; cv=fail; b=mGIxrbgSCDQbQqTDROu+00G7q5IacM3AHhKfGt3cWGIkzwePQWk89l3a/lwcDReh03i/XoVc+Umx/xADLMMbaFZFegKY0nDmR9nDVqR/HhI8nhvVT8ynAQC4QNKhWe/6eRoQPg/ST+Q1M2u88Bnv6JkyVJdGcB4rThUryjxNS+A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759329891; c=relaxed/simple;
+	bh=5MwQSCuMtQCGs1Qdsju+0pnBBzYDXy1r0FyEMZFP49c=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MqBQrATflP4413gVFRZ0EoikzUvVUPUSj72le33x6l9+gPy/0M32dY5T4nVZvuGStgGtPwi5Hx6pj1zM2okj3ezVaTrFxul0AbqC7VnbonzAM0J+xbb9ooQTX/LX8jr6LfIOKcxSL7Yi79BWg9OklpnKtcUbYpwt1pkOoGHMjf4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pB5+vFy+; arc=fail smtp.client-ip=52.101.56.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cT6Cu5bI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759324864;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ctX6GLC+tbbwUuPLuR9eoCXRO610reOy2EsWFsPbfBk=;
-	b=cT6Cu5bIhn96I3NDwaGTSyrSGSqWvAoliPizxx3S5o+ngOm/PI5AvxMfJXXOcMcYmpJ429
-	1oXDMKtfT46LNE628l2iDqUZ2c8c7iexBGYVBEF0NMjefIvIRdbFBKunEtR7D7alHZx+q6
-	VVE49Zh5XoW/oSuHp3uLTACStpny6Sc=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-422-D7qztJXnPC-DAKumwUHtrw-1; Wed,
- 01 Oct 2025 09:09:17 -0400
-X-MC-Unique: D7qztJXnPC-DAKumwUHtrw-1
-X-Mimecast-MFC-AGG-ID: D7qztJXnPC-DAKumwUHtrw_1759324156
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 02F321956053;
-	Wed,  1 Oct 2025 13:09:16 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.24])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A1A5519560B4;
-	Wed,  1 Oct 2025 13:09:13 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: David Howells <dhowells@redhat.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 5/5] lib/crypto: Add SHA3 kunit tests
-Date: Wed,  1 Oct 2025 14:08:44 +0100
-Message-ID: <20251001130846.2284946-6-dhowells@redhat.com>
-In-Reply-To: <20251001130846.2284946-1-dhowells@redhat.com>
-References: <20251001130846.2284946-1-dhowells@redhat.com>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pB5+vFy+"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ClwpIgUiakctVBrWcoOV1Wg+s7Imgwrr06sdXTANQBFaoi4NWyCAUeuNe3ZiUrhzH0YPsVClCxehdqyQQFOsmQrKtc2AP4/62TBKlN52/cI954K1TZyuNkk12biagdt8fPLzQFyjErA9lzxx9zEt5HAgYKw3aur8Ta2QAH3tljsJFVm5FBoWbUzFftY2nyCn+HNEVPjVsc0JX6nWuv1yIcl9I8kLXAJKQBCEJjSHHmy/t8RJnHLmrYEyLI6nSvHp8hRfpS7km4Kv4Ae59ZYhlmSRTrfR0xGVbzgVYhTW0zBC1qHJJSLapjqOKdGfe8Ca3C4xv/6Z1W5guPzrp/zXcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=t52gg9TijEzuOXsUMPXK5lYGU4Ypd2S+Qedq+NdBIAM=;
+ b=OZwspI2Bo0GLGZKLRyYIryQGl6ClofZOQKZ+32ptk9Qt3a5pdxW/GGea8OXp+PIW+mseu/MBbebXt1yAruwUYGQGzP3P3ltC5BzLz7q6asb3T7s4tUDE/543K3CkRDc74Mjecg0i0nzTZhXcLBEhK+RnOfw7mLFL0vKuBtwcWrjrP9d0hK3ZjdgnROJuVruGnKn7ielOLyIef2y4ciWxP2gWpbd5TJ/rOZOOz1gA7n41O8YCch6yHP1P56AOG99wFatD4nwjkzAOSmSCOJGZrFTD5nfCz6r4ryHHQJOr63IFWEqxuuaoOy3DS8O994uehahD2qTs18xt9I0C+MKbJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gmail.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=t52gg9TijEzuOXsUMPXK5lYGU4Ypd2S+Qedq+NdBIAM=;
+ b=pB5+vFy+1CD0JLdpkm+TIdBsLnCiaGLIywoE6TI6yPdaZdBN03+FYVup4EwLAJkH1PNh7SqmB4HwaUqOhbLkAtEqoKUEvxrwfZI4eujK52kCPwsUV9R13mfHb7G4NypQ6bkkE8oDJtpju2xmwbFvzvjDTlSbPvZimvNS2sYMMms=
+Received: from SJ0PR03CA0059.namprd03.prod.outlook.com (2603:10b6:a03:33e::34)
+ by SA1PR12MB8742.namprd12.prod.outlook.com (2603:10b6:806:373::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.18; Wed, 1 Oct
+ 2025 14:44:43 +0000
+Received: from SJ1PEPF00001CE1.namprd05.prod.outlook.com
+ (2603:10b6:a03:33e:cafe::fa) by SJ0PR03CA0059.outlook.office365.com
+ (2603:10b6:a03:33e::34) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9182.15 via Frontend Transport; Wed,
+ 1 Oct 2025 14:44:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SJ1PEPF00001CE1.mail.protection.outlook.com (10.167.242.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9182.15 via Frontend Transport; Wed, 1 Oct 2025 14:44:42 +0000
+Received: from purico-ed09host.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 1 Oct
+ 2025 07:44:41 -0700
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <kfatyuip@gmail.com>
+CC: <davem@davemloft.net>, <herbert@gondor.apana.org.au>,
+	<john.allen@amd.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <thomas.lendacky@amd.com>
+Subject: Re: [PATCH] crypto: ccp/sfs - Use DIV_ROUND_UP for set_memory_uc() size calculation
+Date: Wed, 1 Oct 2025 14:44:31 +0000
+Message-ID: <20251001144431.247305-1-Ashish.Kalra@amd.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251001075820.185748-1-kfatyuip@gmail.com>
+References: <20251001075820.185748-1-kfatyuip@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -63,684 +73,102 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE1:EE_|SA1PR12MB8742:EE_
+X-MS-Office365-Filtering-Correlation-Id: c981e84b-6a84-4b4c-a467-08de00f90ea4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?+7ZRPKVc9lwWkup/3E5VDECGrBLqMhosFlqdZNsNOyHGODI2Ot4S+sl3id36?=
+ =?us-ascii?Q?bzMDyMaiSLhhJb4arRLIWqjyJA6Jki/kDEuy26VNJ0QcazNg++HQ3djLjloK?=
+ =?us-ascii?Q?2/+hjdfVRHbU5P+qoReOiWYm1ZyrIhuWEhuIr6YargHJC3Pu8l2APDrRyobV?=
+ =?us-ascii?Q?wa95gLHiZTl44SqjAtFs0D3feOH6j2h+KAHEgupCLJ+qMxp8Fq4cmSDXh366?=
+ =?us-ascii?Q?ax4H1XIImgHXjigOhm3meYzvBmZjAO3M9r+DRu2sD4Nda+ZNPjH8m+GUISCX?=
+ =?us-ascii?Q?FqKubZvGPFqCEGiVFyVZdS0kHOicYH1EJzeR0+5+SxNQ0WJmxcfkjWuS+pqZ?=
+ =?us-ascii?Q?/naGizNoKca/xgAJARRLG5MD/zALhmu5SzffWksTmAZSWq+055FEypAPZuMZ?=
+ =?us-ascii?Q?v9wV/IbfXmOEZ+0aWHhJdj6GHvyVl6UNZmVQfAIoyxYIYNBr7MfOOOWllan5?=
+ =?us-ascii?Q?RHWJqdXzLl5ENSSw63Seq3BvileKO9mkrIHo03BWrIhRg+jVJUs1/9wOJ++L?=
+ =?us-ascii?Q?8OOiWeGAmOKMFYL2oXLeCK15yCPv5kLFCO1bEufxHfAUwPB3otVK6eFzozB2?=
+ =?us-ascii?Q?qmf3HUgdFOvDtuTJHkxesyZ5rl85/rCsF3ZWSZx1uevcTkJdYZ2P8EgVG1nc?=
+ =?us-ascii?Q?QQKhrtpcmQQbSjOu8q7yVr+uPLVk1lVoPnW3OVCLOCKapk7xJW9VlJroBkOK?=
+ =?us-ascii?Q?BxJpI/nw5r1fc41M74AselIoHWc4TYxpnuQEc+npC1ZcraAU2mNNbSNLOpmC?=
+ =?us-ascii?Q?Lr/xYOlwAuOJAuh9gb/n5ZdC82P1tsltKT+yNFl9ARUj5oPfx8VTLUZBLS65?=
+ =?us-ascii?Q?qnbfQleaoONaGR7WyuaQMAOPptRRtFCokOSowjcvbzlfUOofbCENnvMoXmA7?=
+ =?us-ascii?Q?Ta002ItuyeR68NJ4QVNtRb0WOTmvtvReUBfhi6JOtlbFWPtVhkfNoTQxO7Ea?=
+ =?us-ascii?Q?HAA86ECjcaDCGykevxr5/CuLzvQQIXmjzshwjO0GI/w7olc3lh9TqhPNsjMQ?=
+ =?us-ascii?Q?AN+waIN4UwLeU51PRS6OTdOOQYDIzfCPYWjuSCcNjU5YR/k3JS9Awyb2Z4wU?=
+ =?us-ascii?Q?UF3VWh8ZYLB4CFVkIl4EzyrgoPBtH36viYamhOfcpqE+lowxNiuYwC2FvSA7?=
+ =?us-ascii?Q?2SzhHLmEL1dqwKpeRo4tls15JNlbh0JC9YQmx+f7RJ+wIyzKAqto7SB8hBRx?=
+ =?us-ascii?Q?To/fRNgGAjNKMQkpoiiXUsP24etInNOLUdYKqyqeoYqsicelXAzpeAJuS/V5?=
+ =?us-ascii?Q?Vdj8GFKUpLJSf2ut7QrxiUYxnvNz4v/zctFa0QRjpFlJoreyVyEBfSBSrtqJ?=
+ =?us-ascii?Q?ZUszUTFPswBaSHsZy1VKEY0sjGj4PZzHMeVIbeUIljj85KO9gqKx/hPiJu5B?=
+ =?us-ascii?Q?zywO9Nilu2JuQwdr1IyMJGXE9LPyBQ9lJqt4df0WM+8bMnQbnc4H2qRwMbuP?=
+ =?us-ascii?Q?lgigSxE3bPWPOC2bZC1Q8bpV2g5trPhV+mHyVI0QqqXxuyhPpCo/bntdqZYJ?=
+ =?us-ascii?Q?0wEgdWxNADCvzawPE/AR94XxuPnndSDKx58Q/NXCenWrkYqy51rcr8YY1Gh/?=
+ =?us-ascii?Q?mrU0TaRedVOmAqWm62I=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2025 14:44:42.4379
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c981e84b-6a84-4b4c-a467-08de00f90ea4
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CE1.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8742
 
-Add a SHA3 kunit test, providing the following:
+>From: Kieran Moy <kfatyuip@gmail.com>
 
- (*) A simple test of each of SHA3-224, SHA3-256, SHA3-384, SHA-512,
-     SHAKE128 and SHAKE256.
+>The SFS driver allocates a 2MB command buffer using snp_alloc_hv_fixed_pages(),
+>but set_memory_uc() is called with SFS_NUM_PAGES_CMDBUF which assumes 4KB pages.
+>This mismatch could lead to incomplete cache attribute updates on the buffer if
+>the payload size is not strictly page-aligned.
 
- (*) NIST 0- and 1600-bit test vectors for SHAKE128 and SHAKE256.
+>Switch to using DIV_ROUND_UP(SFS_MAX_PAYLOAD_SIZE, PAGE_SIZE) to calculate the
+>number of pages required for the attribute update. This approach follows kernel
+>coding best practices, improves code robustness, and ensures that all buffer
+>regions are properly covered regardless of current or future PAGE_SIZE values.
 
- (*) Output tiling (multiple squeezing) tests for SHAKE256.
+>Using DIV_ROUND_UP is also consistent with Linux kernel style for page counting,
+>which avoids hidden bugs in case the payload size ever changes and is not a
+>multiple of PAGE_SIZE, or if the kernel is built with a non-default page size.
 
- (*) Standard hash template test for SHA3-256.
+>Signed-off-by: Kieran Moy <kfatyuip@gmail.com>
+>---
+> drivers/crypto/ccp/sfs.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
- (*) Standard benchmark test for SHA3-256.
+>diff --git a/drivers/crypto/ccp/sfs.c b/drivers/crypto/ccp/sfs.c
+>index 2f4beaafe7ec..3397895160c0 100644
+>--- a/drivers/crypto/ccp/sfs.c
+>+++ b/drivers/crypto/ccp/sfs.c
+>@@ -277,7 +277,8 @@ int sfs_dev_init(struct psp_device *psp)
+> 	/*
+> 	* SFS command buffer must be mapped as non-cacheable.
+> 	*/
+>-	ret = set_memory_uc((unsigned long)sfs_dev->command_buf, SFS_NUM_PAGES_CMDBUF);
+>+	ret = set_memory_uc((unsigned long)sfs_dev->command_buf,
+>+			   DIV_ROUND_UP(SFS_MAX_PAYLOAD_SIZE, PAGE_SIZE));
 
-gen-hash-testvecs.py is also modified to be able to generate SHAKE hashes
-because Python's hashlib requires the output digest size supplying for
-those two algorithms as they produce arbitrary length digests.
+I am not sure, i find the maths quite straightforward: 
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Eric Biggers <ebiggers@kernel.org>
-cc: Jason A. Donenfeld <Jason@zx2c4.com>
-cc: Ard Biesheuvel <ardb@kernel.org>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: Stephan Mueller <smueller@chronox.de>
-cc: linux-crypto@vger.kernel.org
----
- lib/crypto/tests/Kconfig            |  12 +
- lib/crypto/tests/Makefile           |   1 +
- lib/crypto/tests/sha3_kunit.c       | 338 ++++++++++++++++++++++++++++
- lib/crypto/tests/sha3_testvecs.h    | 231 +++++++++++++++++++
- scripts/crypto/gen-hash-testvecs.py |   8 +-
- 5 files changed, 588 insertions(+), 2 deletions(-)
- create mode 100644 lib/crypto/tests/sha3_kunit.c
- create mode 100644 lib/crypto/tests/sha3_testvecs.h
+The command buffer is allocated using snp_alloc_hv_fixed_pages() or alloc_pages() using
+an order of 9, which should be allocating 512 pages and returning a 2MB aligned address 
+and then set_memory_uc() is (SFS_MAX_PAYLOAD_SIZE / PAGE_SIZE) which computes 512 pages.
+Also the payload size here is page-aligned and is a constant.
 
-diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index 578af717e13a..becc781352b1 100644
---- a/lib/crypto/tests/Kconfig
-+++ b/lib/crypto/tests/Kconfig
-@@ -72,6 +72,18 @@ config CRYPTO_LIB_SHA512_KUNIT_TEST
- 	  KUnit tests for the SHA-384 and SHA-512 cryptographic hash functions
- 	  and their corresponding HMACs.
- 
-+config CRYPTO_LIB_SHA3_KUNIT_TEST
-+	tristate "KUnit tests for SHA-3" if !KUNIT_ALL_TESTS
-+	depends on KUNIT
-+	default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
-+	select CRYPTO_LIB_BENCHMARK_VISIBLE
-+	select CRYPTO_LIB_SHA3
-+	help
-+	  KUnit tests for the SHA3 cryptographic hash functions, including
-+	  SHA3-224, SHA3-256, SHA3-386, SHA3-512, SHAKE128 and SHAKE256.  Note
-+	  that whilst the SHAKE* hash functions can support arbitrary-length
-+	  digests, these tests only check the nominal digest sizes for now.
-+
- config CRYPTO_LIB_BENCHMARK_VISIBLE
- 	bool
- 
-diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
-index a71fad19922b..9c61b29ac4ca 100644
---- a/lib/crypto/tests/Makefile
-+++ b/lib/crypto/tests/Makefile
-@@ -7,3 +7,4 @@ obj-$(CONFIG_CRYPTO_LIB_POLY1305_KUNIT_TEST) += poly1305_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_SHA1_KUNIT_TEST) += sha1_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_SHA256_KUNIT_TEST) += sha224_kunit.o sha256_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_SHA512_KUNIT_TEST) += sha384_kunit.o sha512_kunit.o
-+obj-$(CONFIG_CRYPTO_LIB_SHA3_KUNIT_TEST) += sha3_kunit.o
-diff --git a/lib/crypto/tests/sha3_kunit.c b/lib/crypto/tests/sha3_kunit.c
-new file mode 100644
-index 000000000000..ed31cf37018d
---- /dev/null
-+++ b/lib/crypto/tests/sha3_kunit.c
-@@ -0,0 +1,338 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Copyright (C) 2025 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
-+#include <crypto/sha3.h>
-+#include "sha3_testvecs.h"
-+
-+#define HASH		sha3_256
-+#define HASH_CTX	sha3_256_ctx
-+#define HASH_SIZE	SHA3_256_DIGEST_SIZE
-+#define HASH_INIT	sha3_256_init
-+#define HASH_UPDATE	sha3_256_update
-+#define HASH_FINAL	sha3_256_final
-+#include "hash-test-template.h"
-+
-+static const u8 test_sha3_sample[] =
-+	"The quick red fox jumped over the lazy brown dog!\n"
-+	"The quick red fox jumped over the lazy brown dog!\n"
-+	"The quick red fox jumped over the lazy brown dog!\n"
-+	"The quick red fox jumped over the lazy brown dog!\n";
-+
-+static const u8 test_sha3_224[8 + SHA3_224_DIGEST_SIZE + 8] = {
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-+	0xd6, 0xe8, 0xd8, 0x80, 0xfa, 0x42, 0x80, 0x70,
-+	0x7e, 0x7f, 0xd7, 0xd2, 0xd7, 0x7a, 0x35, 0x65,
-+	0xf0, 0x0b, 0x4f, 0x9f, 0x2a, 0x33, 0xca, 0x0a,
-+	0xef, 0xa6, 0x4c, 0xb8,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-+};
-+
-+static const u8 test_sha3_256[8 + SHA3_256_DIGEST_SIZE + 8] = {
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-+	0xdb, 0x3b, 0xb0, 0xb8, 0x8d, 0x15, 0x78, 0xe5,
-+	0x78, 0x76, 0x8e, 0x39, 0x7e, 0x89, 0x86, 0xb9,
-+	0x14, 0x3a, 0x1e, 0xe7, 0x96, 0x7c, 0xf3, 0x25,
-+	0x70, 0xbd, 0xc3, 0xa9, 0xae, 0x63, 0x71, 0x1d,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-+};
-+
-+static const u8 test_sha3_384[8 + SHA3_384_DIGEST_SIZE + 8] = {
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-+	0x2d, 0x4b, 0x29, 0x85, 0x19, 0x94, 0xaa, 0x31,
-+	0x9b, 0x04, 0x9d, 0x6e, 0x79, 0x66, 0xc7, 0x56,
-+	0x8a, 0x2e, 0x99, 0x84, 0x06, 0xcf, 0x10, 0x2d,
-+	0xec, 0xf0, 0x03, 0x04, 0x1f, 0xd5, 0x99, 0x63,
-+	0x2f, 0xc3, 0x2b, 0x0d, 0xd9, 0x45, 0xf7, 0xbb,
-+	0x0a, 0xc3, 0x46, 0xab, 0xfe, 0x4d, 0x94, 0xc2,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-+};
-+
-+static const u8 test_sha3_512[8 + SHA3_512_DIGEST_SIZE + 8] = {
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-+	0xdd, 0x71, 0x3b, 0x44, 0xb6, 0x6c, 0xd7, 0x78,
-+	0xe7, 0x93, 0xa1, 0x4c, 0xd7, 0x24, 0x16, 0xf1,
-+	0xfd, 0xa2, 0x82, 0x4e, 0xed, 0x59, 0xe9, 0x83,
-+	0x15, 0x38, 0x89, 0x7d, 0x39, 0x17, 0x0c, 0xb2,
-+	0xcf, 0x12, 0x80, 0x78, 0xa1, 0x78, 0x41, 0xeb,
-+	0xed, 0x21, 0x4c, 0xa4, 0x4a, 0x5f, 0x30, 0x1a,
-+	0x70, 0x98, 0x4f, 0x14, 0xa2, 0xd1, 0x64, 0x1b,
-+	0xc2, 0x0a, 0xff, 0x3b, 0xe8, 0x26, 0x41, 0x8f,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-+};
-+
-+static const u8 test_shake128[8 + SHAKE128_DEFAULT_SIZE + 8] = {
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-+	0x41, 0xd6, 0xb8, 0x9c, 0xf8, 0xe8, 0x54, 0xf2,
-+	0x5c, 0xde, 0x51, 0x12, 0xaf, 0x9e, 0x0d, 0x91,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-+};
-+
-+static const u8 test_shake256[8 + SHAKE256_DEFAULT_SIZE + 8] = {
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-+	0xab, 0x06, 0xd4, 0xf9, 0x8b, 0xfd, 0xb2, 0xc4,
-+	0xfe, 0xf1, 0xcc, 0xe2, 0x40, 0x45, 0xdd, 0x15,
-+	0xcb, 0xdd, 0x02, 0x8d, 0xb7, 0x9f, 0x1e, 0x67,
-+	0xd6, 0x7f, 0x98, 0x5e, 0x1b, 0x19, 0xf8, 0x01,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-+};
-+
-+static void test_sha3_224_basic(struct kunit *test)
-+{
-+	u8 out[8 + SHA3_224_DIGEST_SIZE + 8];
-+
-+	BUILD_BUG_ON(sizeof(out) != sizeof(test_sha3_224));
-+
-+	memset(out, 0, sizeof(out));
-+	sha3_224(test_sha3_sample, sizeof(test_sha3_sample) - 1, out + 8);
-+
-+	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_sha3_224, sizeof(test_sha3_224),
-+			       "SHA3-224 gives wrong output");
-+}
-+
-+static void test_sha3_256_basic(struct kunit *test)
-+{
-+	u8 out[8 + SHA3_256_DIGEST_SIZE + 8];
-+
-+	BUILD_BUG_ON(sizeof(out) != sizeof(test_sha3_256));
-+
-+	memset(out, 0, sizeof(out));
-+	sha3_256(test_sha3_sample, sizeof(test_sha3_sample) - 1, out + 8);
-+
-+	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_sha3_256, sizeof(test_sha3_256),
-+			       "SHA3-256 gives wrong output");
-+}
-+
-+static void test_sha3_384_basic(struct kunit *test)
-+{
-+	u8 out[8 + SHA3_384_DIGEST_SIZE + 8];
-+
-+	BUILD_BUG_ON(sizeof(out) != sizeof(test_sha3_384));
-+
-+	memset(out, 0, sizeof(out));
-+	sha3_384(test_sha3_sample, sizeof(test_sha3_sample) - 1, out + 8);
-+
-+	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_sha3_384, sizeof(test_sha3_384),
-+			       "SHA3-384 gives wrong output");
-+}
-+
-+static void test_sha3_512_basic(struct kunit *test)
-+{
-+	u8 out[8 + SHA3_512_DIGEST_SIZE + 8];
-+
-+	BUILD_BUG_ON(sizeof(out) != sizeof(test_sha3_512));
-+
-+	memset(out, 0, sizeof(out));
-+	sha3_512(test_sha3_sample, sizeof(test_sha3_sample) - 1, out + 8);
-+
-+	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_sha3_512, sizeof(test_sha3_512),
-+			       "SHA3-512 gives wrong output");
-+}
-+
-+static void test_shake128_basic(struct kunit *test)
-+{
-+	u8 out[8 + SHAKE128_DEFAULT_SIZE + 8];
-+
-+	BUILD_BUG_ON(sizeof(out) != sizeof(test_shake128));
-+
-+	memset(out, 0, sizeof(out));
-+	shake128(test_sha3_sample, sizeof(test_sha3_sample) - 1,
-+		 out + 8, sizeof(out) - 16);
-+
-+	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake128, sizeof(test_shake128),
-+			       "SHAKE128 gives wrong output");
-+}
-+
-+static void test_shake256_basic(struct kunit *test)
-+{
-+	u8 out[8 + SHAKE256_DEFAULT_SIZE + 8];
-+
-+	BUILD_BUG_ON(sizeof(out) != sizeof(test_shake256));
-+
-+	memset(out, 0, sizeof(out));
-+	shake256(test_sha3_sample, sizeof(test_sha3_sample) - 1,
-+		 out + 8, sizeof(out) - 16);
-+
-+	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake256, sizeof(test_shake256),
-+			       "SHAKE256 gives wrong output");
-+}
-+
-+/*
-+ * Usable NIST tests.
-+ *
-+ * From: https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines/example-values
-+ */
-+static const u8 test_nist_1600_sample[] = {
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
-+	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3
-+};
-+
-+static const u8 test_shake128_nist_0[] = {
-+	0x7f, 0x9c, 0x2b, 0xa4, 0xe8, 0x8f, 0x82, 0x7d,
-+	0x61, 0x60, 0x45, 0x50, 0x76, 0x05, 0x85, 0x3e
-+};
-+
-+static const u8 test_shake128_nist_1600[] = {
-+	0x13, 0x1a, 0xb8, 0xd2, 0xb5, 0x94, 0x94, 0x6b,
-+	0x9c, 0x81, 0x33, 0x3f, 0x9b, 0xb6, 0xe0, 0xce,
-+};
-+
-+static const u8 test_shake256_nist_0[] = {
-+	0x46, 0xb9, 0xdd, 0x2b, 0x0b, 0xa8, 0x8d, 0x13,
-+	0x23, 0x3b, 0x3f, 0xeb, 0x74, 0x3e, 0xeb, 0x24,
-+	0x3f, 0xcd, 0x52, 0xea, 0x62, 0xb8, 0x1b, 0x82,
-+	0xb5, 0x0c, 0x27, 0x64, 0x6e, 0xd5, 0x76, 0x2f
-+};
-+
-+static const u8 test_shake256_nist_1600[] = {
-+	0xcd, 0x8a, 0x92, 0x0e, 0xd1, 0x41, 0xaa, 0x04,
-+	0x07, 0xa2, 0x2d, 0x59, 0x28, 0x86, 0x52, 0xe9,
-+	0xd9, 0xf1, 0xa7, 0xee, 0x0c, 0x1e, 0x7c, 0x1c,
-+	0xa6, 0x99, 0x42, 0x4d, 0xa8, 0x4a, 0x90, 0x4d,
-+};
-+
-+static void test_shake128_nist(struct kunit *test)
-+{
-+	u8 out[SHAKE128_DEFAULT_SIZE];
-+
-+	shake128("", 0, out, sizeof(out));
-+	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake128_nist_0, sizeof(out),
-+			       "SHAKE128 gives wrong output for NIST.0");
-+
-+	shake128(test_nist_1600_sample, sizeof(test_nist_1600_sample),
-+		 out, sizeof(out));
-+	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake128_nist_1600, sizeof(out),
-+			       "SHAKE128 gives wrong output for NIST.1600");
-+}
-+
-+static void test_shake256_nist(struct kunit *test)
-+{
-+	u8 out[SHAKE256_DEFAULT_SIZE];
-+
-+	shake256("", 0, out, sizeof(out));
-+	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake256_nist_0, sizeof(out),
-+			       "SHAKE256 gives wrong output for NIST.0");
-+
-+	shake256(test_nist_1600_sample, sizeof(test_nist_1600_sample),
-+		 out, sizeof(out));
-+	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake256_nist_1600, sizeof(out),
-+			       "SHAKE256 gives wrong output for NIST.1600");
-+}
-+
-+/*
-+ * Output tiling test of SHAKE256; equal output tiles barring the last.  A
-+ * series of squeezings of the same context should, if laid end-to-end, match a
-+ * single squeezing of the combined size.
-+ */
-+static void test_shake256_tiling(struct kunit *test)
-+{
-+	struct shake256_ctx ctx;
-+	u8 out[8 + SHA3_512_DIGEST_SIZE + 8];
-+
-+	for (int tile_size = 1; tile_size < SHAKE256_DEFAULT_SIZE; tile_size++) {
-+		int left = SHAKE256_DEFAULT_SIZE;
-+		u8 *p = out + 8;
-+
-+		memset(out, 0, sizeof(out));
-+		shake256_init(&ctx);
-+		shake256_update(&ctx, test_sha3_sample, sizeof(test_sha3_sample) - 1);
-+		while (left > 0) {
-+			int part = umin(tile_size, left);
-+
-+			shake256_squeeze(&ctx, p, part);
-+			p += part;
-+			left -= part;
-+		}
-+
-+		KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake256, sizeof(test_shake256),
-+				       "SHAKE tile %u gives wrong output", tile_size);
-+	}
-+}
-+
-+/*
-+ * Output tiling test of SHAKE256; output tiles getting gradually smaller and
-+ * then cycling round to medium sized ones.  A series of squeezings of the same
-+ * context should, if laid end-to-end, match a single squeezing of the combined
-+ * size.
-+ */
-+static void test_shake256_tiling2(struct kunit *test)
-+{
-+	struct shake256_ctx ctx;
-+	u8 out[8 + SHA3_512_DIGEST_SIZE + 8];
-+
-+	for (int first_tile_size = 3;
-+	     first_tile_size < SHAKE256_DEFAULT_SIZE;
-+	     first_tile_size++) {
-+		int tile_size = first_tile_size;
-+		int left = SHAKE256_DEFAULT_SIZE;
-+		u8 *p = out + 8;
-+
-+		memset(out, 0, sizeof(out));
-+		shake256_init(&ctx);
-+		shake256_update(&ctx, test_sha3_sample, sizeof(test_sha3_sample) - 1);
-+		while (left > 0) {
-+			int part = umin(tile_size, left);
-+
-+			shake256_squeeze(&ctx, p, part);
-+			p += part;
-+			left -= part;
-+			tile_size--;
-+			if (tile_size < 1)
-+				tile_size = 5;
-+		}
-+
-+		KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake256, sizeof(test_shake256),
-+				       "SHAKE tile %u gives wrong output", tile_size);
-+	}
-+}
-+
-+static struct kunit_case hash_test_cases[] = {
-+	KUNIT_CASE(test_sha3_224_basic),
-+	KUNIT_CASE(test_sha3_256_basic),
-+	KUNIT_CASE(test_sha3_384_basic),
-+	KUNIT_CASE(test_sha3_512_basic),
-+	KUNIT_CASE(test_shake128_basic),
-+	KUNIT_CASE(test_shake256_basic),
-+	KUNIT_CASE(test_shake128_nist),
-+	KUNIT_CASE(test_shake256_nist),
-+	KUNIT_CASE(test_shake256_tiling),
-+	KUNIT_CASE(test_shake256_tiling2),
-+	HASH_KUNIT_CASES,
-+	KUNIT_CASE(benchmark_hash),
-+	{},
-+};
-+
-+static struct kunit_suite hash_test_suite = {
-+	.name = "sha3",
-+	.test_cases = hash_test_cases,
-+	.suite_init = hash_suite_init,
-+	.suite_exit = hash_suite_exit,
-+};
-+kunit_test_suite(hash_test_suite);
-+
-+MODULE_DESCRIPTION("KUnit tests and benchmark for SHA3-256");
-+MODULE_LICENSE("GPL");
-diff --git a/lib/crypto/tests/sha3_testvecs.h b/lib/crypto/tests/sha3_testvecs.h
-new file mode 100644
-index 000000000000..9c4c403cc6e0
---- /dev/null
-+++ b/lib/crypto/tests/sha3_testvecs.h
-@@ -0,0 +1,231 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/* This file was generated by: ./scripts/crypto/gen-hash-testvecs.py sha3-256 */
-+
-+static const struct {
-+	size_t data_len;
-+	u8 digest[SHA3_256_DIGEST_SIZE];
-+} hash_testvecs[] = {
-+	{
-+		.data_len = 0,
-+		.digest = {
-+			0xa7, 0xff, 0xc6, 0xf8, 0xbf, 0x1e, 0xd7, 0x66,
-+			0x51, 0xc1, 0x47, 0x56, 0xa0, 0x61, 0xd6, 0x62,
-+			0xf5, 0x80, 0xff, 0x4d, 0xe4, 0x3b, 0x49, 0xfa,
-+			0x82, 0xd8, 0x0a, 0x4b, 0x80, 0xf8, 0x43, 0x4a,
-+		},
-+	},
-+	{
-+		.data_len = 1,
-+		.digest = {
-+			0x11, 0x03, 0xe7, 0x84, 0x51, 0x50, 0x86, 0x35,
-+			0x71, 0x8a, 0x70, 0xe3, 0xc4, 0x26, 0x7b, 0x21,
-+			0x02, 0x13, 0xa0, 0x81, 0xe8, 0xe6, 0x14, 0x25,
-+			0x07, 0x34, 0xe5, 0xc5, 0x40, 0x06, 0xf2, 0x8b,
-+		},
-+	},
-+	{
-+		.data_len = 2,
-+		.digest = {
-+			0x2f, 0x6f, 0x6d, 0x47, 0x48, 0x52, 0x11, 0xb9,
-+			0xe4, 0x3d, 0xc8, 0x71, 0xcf, 0xb2, 0xee, 0xae,
-+			0x5b, 0xf4, 0x12, 0x84, 0x5b, 0x1c, 0xec, 0x6c,
-+			0xc1, 0x66, 0x88, 0xaa, 0xc3, 0x40, 0xbd, 0x7e,
-+		},
-+	},
-+	{
-+		.data_len = 3,
-+		.digest = {
-+			0xec, 0x02, 0xe8, 0x81, 0x4f, 0x84, 0x41, 0x69,
-+			0x06, 0xd8, 0xdc, 0x1d, 0x01, 0x78, 0xd7, 0xcb,
-+			0x39, 0xdf, 0xd3, 0x12, 0x1c, 0x99, 0xfd, 0xf3,
-+			0x5c, 0x83, 0xc9, 0xc2, 0x7a, 0x7b, 0x6a, 0x05,
-+		},
-+	},
-+	{
-+		.data_len = 16,
-+		.digest = {
-+			0xff, 0x6f, 0xc3, 0x41, 0xc3, 0x5f, 0x34, 0x6d,
-+			0xa7, 0xdf, 0x3e, 0xc2, 0x8b, 0x29, 0xb6, 0xf1,
-+			0xf8, 0x67, 0xfd, 0xcd, 0xb1, 0x9f, 0x38, 0x08,
-+			0x1d, 0x8d, 0xd9, 0xc2, 0x43, 0x66, 0x18, 0x6c,
-+		},
-+	},
-+	{
-+		.data_len = 32,
-+		.digest = {
-+			0xe4, 0xb1, 0x06, 0x17, 0xf8, 0x8b, 0x91, 0x95,
-+			0xe7, 0x57, 0x66, 0xac, 0x08, 0xb2, 0x03, 0x3e,
-+			0xf7, 0x84, 0x1f, 0xe3, 0x25, 0xa3, 0x11, 0xd2,
-+			0x11, 0xa4, 0x78, 0x74, 0x2a, 0x43, 0x20, 0xa5,
-+		},
-+	},
-+	{
-+		.data_len = 48,
-+		.digest = {
-+			0xeb, 0x57, 0x5f, 0x20, 0xa3, 0x6b, 0xc7, 0xb4,
-+			0x66, 0x2a, 0xa0, 0x30, 0x3b, 0x52, 0x00, 0xc9,
-+			0xce, 0x6a, 0xd8, 0x1e, 0xbe, 0xed, 0xa1, 0xd1,
-+			0xbe, 0x63, 0xc7, 0xe1, 0xe2, 0x66, 0x67, 0x0c,
-+		},
-+	},
-+	{
-+		.data_len = 49,
-+		.digest = {
-+			0xf0, 0x67, 0xad, 0x66, 0xbe, 0xec, 0x5a, 0xfd,
-+			0x29, 0xd2, 0x4f, 0x1d, 0xb2, 0x24, 0xb8, 0x90,
-+			0x05, 0x28, 0x0e, 0x66, 0x67, 0x74, 0x2d, 0xee,
-+			0x66, 0x25, 0x11, 0xd1, 0x76, 0xa2, 0xfc, 0x3a,
-+		},
-+	},
-+	{
-+		.data_len = 63,
-+		.digest = {
-+			0x57, 0x56, 0x21, 0xb3, 0x2d, 0x2d, 0xe1, 0x9d,
-+			0xbf, 0x2c, 0x82, 0xa8, 0xad, 0x7e, 0x6c, 0x46,
-+			0xfb, 0x30, 0xeb, 0xce, 0xcf, 0xed, 0x2d, 0x65,
-+			0xe7, 0xe4, 0x96, 0x69, 0xe0, 0x48, 0xd2, 0xb6,
-+		},
-+	},
-+	{
-+		.data_len = 64,
-+		.digest = {
-+			0x7b, 0xba, 0x67, 0x15, 0xe5, 0x21, 0xc4, 0x69,
-+			0xd3, 0xef, 0x5c, 0x97, 0x9f, 0x5b, 0xba, 0x9c,
-+			0xfa, 0x55, 0x64, 0xec, 0xb5, 0x37, 0x53, 0x1b,
-+			0x3f, 0x4c, 0x0a, 0xed, 0x51, 0x98, 0x2b, 0x52,
-+		},
-+	},
-+	{
-+		.data_len = 65,
-+		.digest = {
-+			0x44, 0xb6, 0x6b, 0x83, 0x09, 0x83, 0x55, 0x83,
-+			0xde, 0x1f, 0xcc, 0x33, 0xef, 0xdc, 0x05, 0xbb,
-+			0x3b, 0x63, 0x76, 0x45, 0xe4, 0x8e, 0x14, 0x7a,
-+			0x2d, 0xae, 0x90, 0xce, 0x68, 0xc3, 0xa4, 0xf2,
-+		},
-+	},
-+	{
-+		.data_len = 127,
-+		.digest = {
-+			0x50, 0x3e, 0x99, 0x4e, 0x28, 0x2b, 0xc9, 0xf4,
-+			0xf5, 0xeb, 0x2b, 0x16, 0x04, 0x2d, 0xf5, 0xbe,
-+			0xc0, 0x91, 0x41, 0x2a, 0x8e, 0x69, 0x5e, 0x39,
-+			0x53, 0x2c, 0xc1, 0x18, 0xa5, 0xeb, 0xd8, 0xda,
-+		},
-+	},
-+	{
-+		.data_len = 128,
-+		.digest = {
-+			0x90, 0x0b, 0xa6, 0x92, 0x84, 0x30, 0xaf, 0xee,
-+			0x38, 0x59, 0x83, 0x83, 0xe9, 0xfe, 0xab, 0x86,
-+			0x79, 0x1b, 0xcd, 0xe7, 0x0a, 0x0f, 0x58, 0x53,
-+			0x36, 0xab, 0x12, 0xe1, 0x5c, 0x97, 0xc1, 0xfb,
-+		},
-+	},
-+	{
-+		.data_len = 129,
-+		.digest = {
-+			0x2b, 0x52, 0x1e, 0x54, 0xbe, 0x38, 0x4c, 0x3e,
-+			0x73, 0x37, 0x18, 0xf5, 0x25, 0x2c, 0xc8, 0xc7,
-+			0xda, 0x7e, 0xb6, 0x47, 0x9d, 0xf4, 0x46, 0xce,
-+			0xfa, 0x80, 0x20, 0x6b, 0xbd, 0xfd, 0x2a, 0xd8,
-+		},
-+	},
-+	{
-+		.data_len = 256,
-+		.digest = {
-+			0x45, 0xf0, 0xf5, 0x9b, 0xd9, 0x91, 0x26, 0xd5,
-+			0x91, 0x3b, 0xf8, 0x87, 0x8b, 0x34, 0x02, 0x31,
-+			0x64, 0xab, 0xf4, 0x1c, 0x6e, 0x34, 0x72, 0xdf,
-+			0x32, 0x6d, 0xe5, 0xd2, 0x67, 0x5e, 0x86, 0x93,
-+		},
-+	},
-+	{
-+		.data_len = 511,
-+		.digest = {
-+			0xb3, 0xaf, 0x71, 0x64, 0xfa, 0xd4, 0xf1, 0x07,
-+			0x38, 0xef, 0x04, 0x8e, 0x89, 0xf4, 0x02, 0xd2,
-+			0xa5, 0xaf, 0x3b, 0xf5, 0x67, 0x56, 0xcf, 0xa9,
-+			0x8e, 0x43, 0xf5, 0xb5, 0xe3, 0x91, 0x8e, 0xe7,
-+		},
-+	},
-+	{
-+		.data_len = 513,
-+		.digest = {
-+			0x51, 0xac, 0x0a, 0x65, 0xb7, 0x96, 0x20, 0xcf,
-+			0x88, 0xf6, 0x97, 0x35, 0x89, 0x0d, 0x31, 0x0f,
-+			0xbe, 0x17, 0xbe, 0x62, 0x03, 0x67, 0xc0, 0xee,
-+			0x4f, 0xc1, 0xe3, 0x7f, 0x6f, 0xab, 0xac, 0xb4,
-+		},
-+	},
-+	{
-+		.data_len = 1000,
-+		.digest = {
-+			0x7e, 0xea, 0xa8, 0xd7, 0xde, 0x20, 0x1b, 0x58,
-+			0x24, 0xd8, 0x26, 0x40, 0x36, 0x5f, 0x3f, 0xaa,
-+			0xe5, 0x5a, 0xea, 0x98, 0x58, 0xd4, 0xd6, 0xfc,
-+			0x20, 0x4c, 0x5c, 0x4f, 0xaf, 0x56, 0xc7, 0xc3,
-+		},
-+	},
-+	{
-+		.data_len = 3333,
-+		.digest = {
-+			0x61, 0xb1, 0xb1, 0x3e, 0x0e, 0x7e, 0x90, 0x3d,
-+			0x31, 0x54, 0xbd, 0xc9, 0x0d, 0x53, 0x62, 0xf1,
-+			0xcd, 0x18, 0x80, 0xf9, 0x91, 0x75, 0x41, 0xb3,
-+			0x51, 0x39, 0x57, 0xa7, 0xa8, 0x1e, 0xfb, 0xc9,
-+		},
-+	},
-+	{
-+		.data_len = 4096,
-+		.digest = {
-+			0xab, 0x29, 0xda, 0x10, 0xc4, 0x11, 0x2d, 0x5c,
-+			0xd1, 0xce, 0x1c, 0x95, 0xfa, 0xc6, 0xc7, 0xb0,
-+			0x1b, 0xd1, 0xdc, 0x6f, 0xa0, 0x9d, 0x1b, 0x23,
-+			0xfb, 0x6e, 0x90, 0x97, 0xd0, 0x75, 0x44, 0x7a,
-+		},
-+	},
-+	{
-+		.data_len = 4128,
-+		.digest = {
-+			0x02, 0x45, 0x95, 0xf4, 0x19, 0xb5, 0x93, 0x29,
-+			0x90, 0xf2, 0x63, 0x3f, 0x89, 0xe8, 0xa5, 0x31,
-+			0x76, 0xf2, 0x89, 0x79, 0x66, 0xd3, 0x96, 0xdf,
-+			0x33, 0xd1, 0xa6, 0x17, 0x73, 0xb1, 0xd0, 0x45,
-+		},
-+	},
-+	{
-+		.data_len = 4160,
-+		.digest = {
-+			0xd1, 0x8e, 0x22, 0xea, 0x44, 0x87, 0x6e, 0x9d,
-+			0xfb, 0x36, 0x02, 0x20, 0x63, 0xb7, 0x69, 0x45,
-+			0x25, 0x41, 0x69, 0xe0, 0x9b, 0x87, 0xcf, 0xa3,
-+			0x51, 0xbb, 0xfc, 0x8d, 0xf7, 0x29, 0xa7, 0xea,
-+		},
-+	},
-+	{
-+		.data_len = 4224,
-+		.digest = {
-+			0x11, 0x86, 0x7d, 0x84, 0xf9, 0x8c, 0x6e, 0xc4,
-+			0x64, 0x36, 0xc6, 0xf3, 0x42, 0x92, 0x31, 0x2b,
-+			0x1e, 0x12, 0xe6, 0x4d, 0xbe, 0xfa, 0x77, 0x3f,
-+			0x89, 0x41, 0x33, 0x58, 0x1c, 0x98, 0x16, 0x0a,
-+		},
-+	},
-+	{
-+		.data_len = 16384,
-+		.digest = {
-+			0xb2, 0xba, 0x0c, 0x8c, 0x9d, 0xbb, 0x1e, 0xb0,
-+			0x03, 0xb5, 0xdf, 0x4f, 0xf5, 0x35, 0xdb, 0xec,
-+			0x60, 0xf2, 0x5b, 0xb6, 0xd0, 0x49, 0xd3, 0xed,
-+			0x55, 0xc0, 0x7a, 0xd7, 0xaf, 0xa1, 0xea, 0x53,
-+		},
-+	},
-+};
-+
-+static const u8 hash_testvec_consolidated[SHA3_256_DIGEST_SIZE] = {
-+	0x3b, 0x33, 0x67, 0xf8, 0xea, 0x92, 0x78, 0x62,
-+	0xdd, 0xbe, 0x72, 0x15, 0xbd, 0x6f, 0xfa, 0xe5,
-+	0x5e, 0xab, 0x9f, 0xb1, 0xe4, 0x23, 0x7c, 0x2c,
-+	0x80, 0xcf, 0x09, 0x75, 0xf8, 0xe2, 0xfa, 0x30,
-+};
-diff --git a/scripts/crypto/gen-hash-testvecs.py b/scripts/crypto/gen-hash-testvecs.py
-index fc063f2ee95f..a5b0abd8dabe 100755
---- a/scripts/crypto/gen-hash-testvecs.py
-+++ b/scripts/crypto/gen-hash-testvecs.py
-@@ -61,6 +61,10 @@ def hash_update(ctx, data):
-     ctx.update(data)
- 
- def hash_final(ctx):
-+    if ctx.name == "shake_128":
-+        return ctx.digest(16)
-+    if ctx.name == "shake_256":
-+        return ctx.digest(32)
-     return ctx.digest()
- 
- def compute_hash(alg, data):
-@@ -122,7 +126,7 @@ def gen_hmac_testvecs(alg):
-         ctx.update(mac)
-     print_static_u8_array_definition(
-             f'hmac_testvec_consolidated[{alg.upper()}_DIGEST_SIZE]',
--            ctx.digest())
-+            hash_final(ctx))
- 
- BLAKE2S_KEY_SIZE = 32
- BLAKE2S_HASH_SIZE = 32
-@@ -164,5 +168,5 @@ if alg == 'blake2s':
-     gen_additional_blake2s_testvecs()
- elif alg == 'poly1305':
-     gen_additional_poly1305_testvecs()
--else:
-+elif alg != 'shake128' and alg != 'shake256':
-     gen_hmac_testvecs(alg)
+Thanks,
+Ashish
 
+> 	if (ret) {
+> 		dev_dbg(dev, "Set memory uc failed\n");
+> 		goto cleanup_cmd_buf;
