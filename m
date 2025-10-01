@@ -1,197 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45F326D4F7;
-	Wed,  1 Oct 2025 16:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979A226D4F7
+	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 16:07:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759334758; cv=none; b=N8Zk4iy02Ob/IjFauSFBi6fmPyEcnXpoiPvMD+4FsHspiFF1zxI93EkLm+QGReBoh3tgPYtztqvDJTKFjA5E1T+26vL1qJ9bdZE1hhcgHUSwHf+BYMZKDvi4y0n9MOBb0ElU3e/hJycaY1iHOdk0wFA3vZK5j2M1GKGB8HEYlD0=
+	t=1759334835; cv=none; b=dSxCCrKiEuwjzRUaAIs5HeNRlQaxeVx+lJJawNixJvyW39LgG6vvA2lf6wlloU01g4p2JHa5KPpBVeMIpuzRne4LGMnJ9lj7oCyzxb1bDWvjifm02s2Impt6NQ+U3TcsSVaI+JsFGExlCHhV9OCvoC4dUvc+8ltSdUVGA8O7lB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759334758; c=relaxed/simple;
-	bh=8YEuuHbQcB0ssAKQlRVDg0rxT1MUBfh3vVk/ixUFwL4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=on1q9WjFeiIY4W66dlxyH6ezpGWwalg9Qgs9SSoCy2TPkmpVktdPBymWguXbniQywSMoCOGI5Rlm9umbhcc9mW3mDFrgLpwf13Huwsg5v94XgjyLFgZEvwpaLNQ+jgPS92In4IXOtjXodyBmT4uhsbKGB1RgSFmbDYzSuy/fp2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HNXxHjaO; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HNXxHjaO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8540CC4CEF1;
-	Wed,  1 Oct 2025 16:05:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759334757;
-	bh=8YEuuHbQcB0ssAKQlRVDg0rxT1MUBfh3vVk/ixUFwL4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HNXxHjaO2WbwSqpkdb3qAyu7qY0EFDi/4NueZ5cklrzoa0o0xPtGf2OtzwSlTEh11
-	 RgRe/N7b9ppLzRa9CL1tUcqRirYKLf1tD91p+/xs48/eLfTlDwSlVuBi9XJjT11TwD
-	 6PYUtWqsCtZWwxql3rS5OqDRRGYea4ESLcoKkKrAm5pYsSh6D/341gWS1eubSW3Eoy
-	 xTI2T1BJ6w0ljn0ZpWP6V1vPgdloe/EIHYLUqJ68Dg7BBfaQIyYOiUwb6dlq649TYx
-	 ccDO/Sn1FxI3yZROTHMgN8OllNrIcHyEhMQ6L/z5Y5CscLNBm5yrcNHOrClESZgn7N
-	 D0sl7fI/RvbbA==
-Date: Wed, 1 Oct 2025 09:04:35 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 5/8] lib/crypto: Add SHA3 kunit tests
-Message-ID: <20251001160435.GC1592@sol>
-References: <20250926141959.1272455-1-dhowells@redhat.com>
- <20250926141959.1272455-6-dhowells@redhat.com>
+	s=arc-20240116; t=1759334835; c=relaxed/simple;
+	bh=yGthKrJgjptv1SsVBgVQ+xaQq3apEw2V386nO3JE0tA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=CW3x3QKRRHQw042pdwLiGq1QpYusw32raT+N7MNaiw1GYqc8i93VKmvCZz0f6dM0kOYKAOdEGYW86/r88p6gtM7rEFt1SzYWmFVlWPu+P9rYRVAzIErcrAB0Aq/kwp4b5vJeC1BIihzLlJHIYmAinq83/4IkOfmns8pU3bbvidU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b3dbf11fa9eso11847766b.0
+        for <linux-crypto@vger.kernel.org>; Wed, 01 Oct 2025 09:07:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759334832; x=1759939632;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5F/ZlmahY4v9ng57M3b3RixWviloAxPsx1h4/uNyS2w=;
+        b=W7ZGX9CsZP2RGe2ZJ+kgpeIhevG0qfh8gUhHAbMCGKIC8whKM/TDZBIcTdqbhR/I+p
+         2kDJAAgpppnUm9f2ipQe3SOCxaBeAjF5C4bIRfHLpTRuWeIPm/DDTGFOUScsXe10NS9W
+         IESPIqzYrztGFi85ISzL351hcFsTBdyYHKF6CTdKLMeStq9nNh3yYqOnfbCx5MmhXYlW
+         DbbJtNM9u/xiMwWe3gCyXqbWuUYy8gJAlY++1m2QtAI4BPYkAO92ai4bxmYqzz38Bz6x
+         WTSJ7T3ybubL0nAq+VZIhHB70GtKMVfCr/sLfmx0z0CY1B85VqWewYFdVbHv8Y3Lig1j
+         uZhw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/O0/JKN2a8KA4Mg3Yr33X3vhpY/RqYyeiZy2jDyH7oy37Ri+EvBIpmCLcE7h9FqQSmDJcahdZAcBMDFY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEDXi8cT5u/YMc3HgIM7tavdCKZkb5tRrOP3ZSNrn03killco9
+	mhsmV7aDyNzwoxMVX0/COpdf51SFi3VfpwjYbRoIllhxP01pGFJDb1jJnL5hmA==
+X-Gm-Gg: ASbGncvXR9SfCxULcPPhOY0rnfim7h+F6iOxLJ3fEpVPuqGTB9Usa/Sf7kAD2N2jqLC
+	5s0ZF96cxrzMl8FDPB7GA5cKC5kemZxpgTxr1JswXKT3zpBe28RlvyeBcgGae1zHAw36Gzn414F
+	pmTM8+t9V4iGy02GsTOihrWp9eLWuycNR3ciE8O0fthKV0ZnzvWKm9vAoV6HhrOyO8ZLBKbFRQd
+	9XS5H/1i7nPChN+qH7rtyzmoSLOARiNlnVRqE895en1UWN2rPr6V+YlETvOkYEK+ZXVjHsouO6S
+	kHZl2PxiZ8uMMWKtmgR1SvC991pIlBPF9/yf3pbixAY6g2z20Z4hvbAL0Nc8Kwcx0nKrljzpicq
+	gbV2imU8vZr8LE4lkoxrbEFcYctJ3+MMnKVI1
+X-Google-Smtp-Source: AGHT+IGU2oV2XoghFFNjXpeXFR8ZpMH3QCRErktbMJOKfZuJaKAV1DQAvKt87juoFqsJakAyIPoG8w==
+X-Received: by 2002:a17:907:7212:b0:b43:b7ec:b891 with SMTP id a640c23a62f3a-b46e3ae19e4mr491578466b.28.1759334831631;
+        Wed, 01 Oct 2025 09:07:11 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:7::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6376b3b8df3sm51976a12.13.2025.10.01.09.07.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Oct 2025 09:07:11 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Date: Wed, 01 Oct 2025 09:07:07 -0700
+Subject: [PATCH] stable: crypto: sha256 - fix crash at kexec
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250926141959.1272455-6-dhowells@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251001-stable_crash-v1-1-3071c0bd795e@debian.org>
+X-B4-Tracking: v=1; b=H4sIAKpR3WgC/x3MQQqDMBAF0KsMf20gk+omVymlJHaiAyVKRkSQ3
+ L3Qd4B3w6SpGCLdaHKq6VYRiQfCvKa6iNMPIiH4MLH37OxI+SvvuSVbXQk8cU7Fj4+MgbA3KXr
+ 9u+er9x9vAtTRXgAAAA==
+X-Change-ID: 20251001-stable_crash-f2151baf043b
+To: gregkh@linuxfoundation.org, sashal@kernel.org
+Cc: stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, Ard Biesheuvel <ardb@kernel.org>, 
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kernel-team@meta.com, Breno Leitao <leitao@debian.org>, 
+ Michael van der Westhuizen <rmikey@meta.com>, 
+ Tobias Fleig <tfleig@meta.com>
+X-Mailer: b4 0.15-dev-dd21f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2044; i=leitao@debian.org;
+ h=from:subject:message-id; bh=yGthKrJgjptv1SsVBgVQ+xaQq3apEw2V386nO3JE0tA=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBo3VGuPtPcA/FbB8X5L3sATv/wd4PcV5twNu9J+
+ 9M1P703yCSJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaN1RrgAKCRA1o5Of/Hh3
+ bYx/D/4oyRu9MKW9AfBVPio3fDNu8pXycH+g5imDGXWy45s4UXL9Ncnb/lNfMBFFL44hC8uAB/Y
+ bycLfU3OJLP40P3WwHV+tXrT0cSU2N5Zwy2x21twyp59R/G6EkXhRQdXsAf8vTMuQAPXcZV0BLg
+ Ok7fk1Jwsc4QD835ibz1CzTegXZtyye0LoCCbF2kuJHY0C82L2SsoVfsCf2K7SLc2vlWZCWMEOX
+ zE7u8Q7Z7RJbA2nllYagJWW+byq3R2bO/f0gdbNhU9AtfkqgW5tAg8kNZb4cCYBqtbfgPANc6Nk
+ eHRz6xvX2EZlABpCZfbxccm+km7nVlj+1jIS8zd5DCJKEup/wLEO31r7gYZ+N3h+RE8KidBKbp/
+ DV/90DK0MoU2wFb+GT7rz+yRhBNmasapS4rocrCkCD0oWs0zPhmWScBnF1D2SbNvAunTFVBQDnn
+ DdiKCFho3CfON96LAkZzpgEPbkIjW8ZzjA0nxNJ6Ts3TvZRatgNpt4qYxDSh6SurunNgYanK2Kv
+ tzPEsvGghgTVWjMa5ViHlWTIEsVqSR3vzmIWXi0RyK3ZuEq0EwRfxdWgqNuCP4xwJAuUoE/w738
+ 024vq5PU3sfeOEcbA6wv9IIAKH7+wpVurdwQk5BgV9KoL36qQYRkW4ampOy0jJS8YZuF9YYJh83
+ xSEprJRPwLiyb/A==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On Fri, Sep 26, 2025 at 03:19:48PM +0100, David Howells wrote:
-> +config CRYPTO_LIB_SHA3_KUNIT_TEST
-> +	tristate "KUnit tests for SHA-3" if !KUNIT_ALL_TESTS
-> +	depends on KUNIT
-> +	default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
-> +	select CRYPTO_LIB_BENCHMARK_VISIBLE
-> +	select CRYPTO_LIB_SHA3
-> +	help
-> +	  KUnit tests for the SHA3 cryptographic hash functions, including
-> +	  SHA3-224, SHA3-256, SHA3-386, SHA3-512, SHAKE128 and SHAKE256.  Note
+Loading a large (~2.1G) files with kexec crashes the host with when
+running:
 
-SHA3-386 => SHA3-384
+  # kexec --load kernel --initrd initrd_with_2G_or_more
 
-> +	  that whilst the SHAKE* hash functions can support arbitrary-length
-> +	  digests, these tests only check the nominal digest sizes for now.
+  UBSAN: signed-integer-overflow in ./include/crypto/sha256_base.h:64:19
+  34152083 * 64 cannot be represented in type 'int'
+  ...
+  BUG: unable to handle page fault for address: ff9fffff83b624c0
+  sha256_update (lib/crypto/sha256.c:137)
+  crypto_sha256_update (crypto/sha256_generic.c:40)
+  kexec_calculate_store_digests (kernel/kexec_file.c:769)
+  __se_sys_kexec_file_load (kernel/kexec_file.c:397 kernel/kexec_file.c:332)
+  ...
 
-Arbitrary-length output support needs to be tested.  It looks like it is
-now, and you just forgot to update this help text?
+(Line numbers based on commit da274362a7bd9 ("Linux 6.12.49")
 
-> +static const u8 test_sha3_sample[] =
-> +	"The quick red fox jumped over the lazy brown dog!\n"
-> +	"The quick red fox jumped over the lazy brown dog!\n"
-> +	"The quick red fox jumped over the lazy brown dog!\n"
-> +	"The quick red fox jumped over the lazy brown dog!\n";
-> +
-> +static const u8 test_sha3_224[8 + SHA3_224_DIGEST_SIZE + 8] = {
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-> +	0xd6, 0xe8, 0xd8, 0x80, 0xfa, 0x42, 0x80, 0x70,
-> +	0x7e, 0x7f, 0xd7, 0xd2, 0xd7, 0x7a, 0x35, 0x65,
-> +	0xf0, 0x0b, 0x4f, 0x9f, 0x2a, 0x33, 0xca, 0x0a,
-> +	0xef, 0xa6, 0x4c, 0xb8,
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-> +};
-> +
-> +static const u8 test_sha3_256[8 + SHA3_256_DIGEST_SIZE + 8] = {
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-> +	0xdb, 0x3b, 0xb0, 0xb8, 0x8d, 0x15, 0x78, 0xe5,
-> +	0x78, 0x76, 0x8e, 0x39, 0x7e, 0x89, 0x86, 0xb9,
-> +	0x14, 0x3a, 0x1e, 0xe7, 0x96, 0x7c, 0xf3, 0x25,
-> +	0x70, 0xbd, 0xc3, 0xa9, 0xae, 0x63, 0x71, 0x1d,
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-> +};
-> +
-> +static const u8 test_sha3_384[8 + SHA3_384_DIGEST_SIZE + 8] = {
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-> +	0x2d, 0x4b, 0x29, 0x85, 0x19, 0x94, 0xaa, 0x31,
-> +	0x9b, 0x04, 0x9d, 0x6e, 0x79, 0x66, 0xc7, 0x56,
-> +	0x8a, 0x2e, 0x99, 0x84, 0x06, 0xcf, 0x10, 0x2d,
-> +	0xec, 0xf0, 0x03, 0x04, 0x1f, 0xd5, 0x99, 0x63,
-> +	0x2f, 0xc3, 0x2b, 0x0d, 0xd9, 0x45, 0xf7, 0xbb,
-> +	0x0a, 0xc3, 0x46, 0xab, 0xfe, 0x4d, 0x94, 0xc2,
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-> +};
-> +
-> +static const u8 test_sha3_512[8 + SHA3_512_DIGEST_SIZE + 8] = {
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-> +	0xdd, 0x71, 0x3b, 0x44, 0xb6, 0x6c, 0xd7, 0x78,
-> +	0xe7, 0x93, 0xa1, 0x4c, 0xd7, 0x24, 0x16, 0xf1,
-> +	0xfd, 0xa2, 0x82, 0x4e, 0xed, 0x59, 0xe9, 0x83,
-> +	0x15, 0x38, 0x89, 0x7d, 0x39, 0x17, 0x0c, 0xb2,
-> +	0xcf, 0x12, 0x80, 0x78, 0xa1, 0x78, 0x41, 0xeb,
-> +	0xed, 0x21, 0x4c, 0xa4, 0x4a, 0x5f, 0x30, 0x1a,
-> +	0x70, 0x98, 0x4f, 0x14, 0xa2, 0xd1, 0x64, 0x1b,
-> +	0xc2, 0x0a, 0xff, 0x3b, 0xe8, 0x26, 0x41, 0x8f,
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-> +};
-> +
-> +static const u8 test_shake128[8 + SHAKE128_DEFAULT_SIZE + 8] = {
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-> +	0x41, 0xd6, 0xb8, 0x9c, 0xf8, 0xe8, 0x54, 0xf2,
-> +	0x5c, 0xde, 0x51, 0x12, 0xaf, 0x9e, 0x0d, 0x91,
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-> +};
-> +
-> +static const u8 test_shake256[8 + SHAKE256_DEFAULT_SIZE + 8] = {
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
-> +	0xab, 0x06, 0xd4, 0xf9, 0x8b, 0xfd, 0xb2, 0xc4,
-> +	0xfe, 0xf1, 0xcc, 0xe2, 0x40, 0x45, 0xdd, 0x15,
-> +	0xcb, 0xdd, 0x02, 0x8d, 0xb7, 0x9f, 0x1e, 0x67,
-> +	0xd6, 0x7f, 0x98, 0x5e, 0x1b, 0x19, 0xf8, 0x01,
-> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
-> +};
+This is not happening upstream (v6.16+), given that `block` type was
+upgraded from "int" to "size_t" in commit 74a43a2cf5e8 ("crypto:
+lib/sha256 - Move partial block handling out")
 
-If these expected outputs are from an external source, then that source
-needs to be documented.  If they aren't, then the way in which they were
-generated needs to be easily reproducible and documented, e.g. by adding
-support for generating them to gen-hash-testvecs.py.
+Upgrade the block type similar to the commit above, avoiding hitting the
+overflow.
 
-> +MODULE_DESCRIPTION("KUnit tests and benchmark for SHA3-256");
+This patch is only suitable for the stable tree, and before 6.16, which
+got commit 74a43a2cf5e8 ("crypto: lib/sha256 - Move partial block
+handling out")
 
-SHA3-256 => SHA3
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Fixes: 11b8d5ef9138 ("crypto: sha256 - implement base layer for SHA-256") # not after v6.16
+Reported-by: Michael van der Westhuizen <rmikey@meta.com>
+Reported-by: Tobias Fleig <tfleig@meta.com>
+---
+ include/crypto/sha256_base.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> diff --git a/lib/crypto/tests/sha3_testvecs.h b/lib/crypto/tests/sha3_testvecs.h
-> new file mode 100644
-> index 000000000000..9c4c403cc6e0
-> --- /dev/null
-> +++ b/lib/crypto/tests/sha3_testvecs.h
-> @@ -0,0 +1,231 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/* This file was generated by: ./scripts/crypto/gen-hash-testvecs.py sha3-256 */
+diff --git a/include/crypto/sha256_base.h b/include/crypto/sha256_base.h
+index e0418818d63c8..fa63af10102b2 100644
+--- a/include/crypto/sha256_base.h
++++ b/include/crypto/sha256_base.h
+@@ -44,7 +44,7 @@ static inline int lib_sha256_base_do_update(struct sha256_state *sctx,
+ 	sctx->count += len;
+ 
+ 	if (unlikely((partial + len) >= SHA256_BLOCK_SIZE)) {
+-		int blocks;
++		size_t blocks;
+ 
+ 		if (partial) {
+ 			int p = SHA256_BLOCK_SIZE - partial;
 
-If that's the case, then running "./scripts/crypto/gen-hash-testvecs.py
-sha3-256 > lib/crypto/tests/sha3_testvecs.h" should reproduce this file
-exactly.  But it doesn't, so you must have manually edited this file.
+---
+base-commit: da274362a7bd9ab3a6e46d15945029145ebce672
+change-id: 20251001-stable_crash-f2151baf043b
 
-It should match exactly.  That can be done by tweaking
-gen-hash-testvecs.py to use the correct *_DIGEST_SIZE constant and
-skipping the HMAC test if sha3-256 is requested.
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
-> diff --git a/scripts/crypto/gen-hash-testvecs.py b/scripts/crypto/gen-hash-testvecs.py
-> index fc063f2ee95f..a5b0abd8dabe 100755
-> --- a/scripts/crypto/gen-hash-testvecs.py
-> +++ b/scripts/crypto/gen-hash-testvecs.py
-> @@ -61,6 +61,10 @@ def hash_update(ctx, data):
->      ctx.update(data)
->  
->  def hash_final(ctx):
-> +    if ctx.name == "shake_128":
-> +        return ctx.digest(16)
-> +    if ctx.name == "shake_256":
-> +        return ctx.digest(32)
-
-This addition is unnecessary.
-
->      return ctx.digest()
->  
->  def compute_hash(alg, data):
-> @@ -122,7 +126,7 @@ def gen_hmac_testvecs(alg):
->          ctx.update(mac)
->      print_static_u8_array_definition(
->              f'hmac_testvec_consolidated[{alg.upper()}_DIGEST_SIZE]',
-> -            ctx.digest())
-> +            hash_final(ctx))
->  
->  BLAKE2S_KEY_SIZE = 32
->  BLAKE2S_HASH_SIZE = 32
-> @@ -164,5 +168,5 @@ if alg == 'blake2s':
->      gen_additional_blake2s_testvecs()
->  elif alg == 'poly1305':
->      gen_additional_poly1305_testvecs()
-> -else:
-> +elif alg != 'shake128' and alg != 'shake256':
->      gen_hmac_testvecs(alg)
-
-Likewise.  Except it really needs to be 'sha3-256', as I mentioned.
-
-- Eric
