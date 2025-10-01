@@ -1,54 +1,54 @@
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B4430EF81
-	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 21:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6ED30F92C
+	for <linux-crypto@vger.kernel.org>; Wed,  1 Oct 2025 21:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759352636; cv=none; b=QRY0AqGU4oLVgCtJwMRme1z2uM1m3+GrIF8gb5itY3/+GeDw4mrlhdbBKIxa+imijDglf0lni3YgCxQ0y8WVSDQ16ymYh+m/UKzcAIsUeym61XIsNc4IxcdxFnpCDf+1bfix70/pLXJ/8XySL+wl3nWe6AN7V03MSZpZ4cm2lHw=
+	t=1759352638; cv=none; b=O5d7IIDL3RDWQ8LD2POk6XaHXfLXFS47/LQG0+FW62Kvrh4JuqLz0nfd/tC15qNSV0udk6VvP2kWrO9ktTpdNGhBDen6RhaAonHlbiaO+Pf/OYayG0I+Z0GrYxdv6tLFR3N779QbsamDIkOj609lVJQpvdB8/3ZNEZqycsJriMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759352636; c=relaxed/simple;
-	bh=CcSQX2utR81UxJpArQsfhwlVVaWfbrFwN0ei3ceAlxE=;
+	s=arc-20240116; t=1759352638; c=relaxed/simple;
+	bh=GXeASNEqmczwPiXD+TO0rYwiXLFqmUMdsycyCVMnj/0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XoP4KwJ8k38KCCFkTU4awW7kriNZXelf528hpZ8x+RDe+1ZJ/Ufs0mdBwklpdKMmLW/MW5/XbM6uQtXKO5//g7FjjHzPHiMvh2CV9DAegM1F8PWZFId/izZFLv1cxjOXX1zyVnUzGrCLyfEhqRYzBtyX9atxnbmNUr+9I//j1Ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CuEOYH/p; arc=none smtp.client-ip=209.85.218.74
+	 To:Cc:Content-Type; b=nxyKP+ww4f+W++Oq0GsnSEKgRjs/d7jpdU9PNUuR776hrD4vJqkrCSJVchIjhSIXCIvdm/QM7hedqTYGKeLpeInIuRO+eJrKpgmX75h2FAyRvo3bXhJNfGK1kvSrOUvWHDEnp0pU1RWen1edSM3ctqbVnr0/l9Kto7FjY2/IclU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2PjoT70L; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CuEOYH/p"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b479e43ad46so24696166b.2
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Oct 2025 14:03:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2PjoT70L"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-46e4c8fa2b1so814585e9.0
+        for <linux-crypto@vger.kernel.org>; Wed, 01 Oct 2025 14:03:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759352633; x=1759957433; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759352635; x=1759957435; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UYBWVcMrL+XqSLPgxbyO6R+Pmodg0fLAvWpUbIMCypQ=;
-        b=CuEOYH/p6U+1yrP2pJY7YE0I00HIXk9lxXF0ss5ginJ4/1VvcPk21DRUkQ40FQsVMf
-         BW8cDvnkbvUioGf0pXs7NUPLIjqlUQsiprgXNOt5BclDCl7eGLoAm11CemuqRrlbQv/P
-         OQDIbjdhe+pFk39addXymvJ+OQLZelObTzmXc1g2kf4aAD+8wsUKEzog+c11X8kS8GpP
-         nif25nfnP3OixGI24GsvEYoxMFGvs8rCNQ+02cjzGUFygBmrYhK6HV+smPtOg+1thShf
-         rMlE8weLt8Pemb+TTXh6pRdREOX8dOL4yz8r6gYeswfqEj25JNwaDnQar9n2Scq3SQJm
-         pNZw==
+        bh=1FhWp47bs3reBDPv5Eo8/YKbhWPmlo11aWHsEN7F2Pk=;
+        b=2PjoT70LGH0JnD3OlTa6+NIZvy1+Z5je/qye5U2evkAqywldrBCg2kP1HyQ+gP7bhQ
+         93o3ZzHlcItKJkflVq3yOabrJAzJe92bQfZVdQyMQo6VDnbDduNFjdBT1riXObdNR69J
+         0hmvLxvhchOGvbrgy6NjxtzzMpKWw6GqRd/seIsV8gZZNfmJgzMaJ6uvqLVd6PrkxGaD
+         Ea/0RWO7Poh5/hoPZJD/ve5Ugo8qNcWYyHwAKqLbxvYXSNfdXHo+uCUGaU8naoRxyBnw
+         suFQI5qmmvIZRtpykZictYcBDFfKDt3EWjMo/qeInmXbk8bjOMdAsy6VvYYxE2jtS1Xz
+         fxiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759352633; x=1759957433;
+        d=1e100.net; s=20230601; t=1759352635; x=1759957435;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UYBWVcMrL+XqSLPgxbyO6R+Pmodg0fLAvWpUbIMCypQ=;
-        b=Z1pu4aqeK7S0WlMCmcolgmvYpf2zmiPnI0ci+FlL1STo7OGTmZ3zSwmOVO1NYDcZ1v
-         UU29/rohxoY71bhT49LvADh/GUGtwEk1d7m/LeZqKsg4qy3n103zyUGIpZn5ffpQYQHe
-         fDAKnLadMcybw1rqgoc/fSGppcDwZQmJI+gk+ctCryxpguOYt+zyVGDh/MekQSiKVa/M
-         1BKLCL6QTLab+rcsyQhWaXekOPJrS+r9OU1IaupseHnq3s2palUBXQqbU+K0A0QCl3Pc
-         ss+IEqAHikgLY9zdu67d4yb/ezK5J1JhMuzhTG+g/VxdnmaPIXhEL4IJBRAI8PTO2E1B
-         HsQg==
-X-Gm-Message-State: AOJu0YwLH5lFsfw6z86vnLgZIBN4Xo+g9homTA7u5YRCMo3K93C/8F4T
-	OHnIkKcf7/GQ0AmViJfoIjZFbTt+4anV+C1/JnZ51wmqZRfEJSQxZmiEAzaSTOEM/KqXw929Cw=
+        bh=1FhWp47bs3reBDPv5Eo8/YKbhWPmlo11aWHsEN7F2Pk=;
+        b=XOgNZ6fYB6EwJRFNqAe18jkCCPCjtfsYq81fmTANh+dO8NK6ra0h1SwwV7n0nOKAAg
+         U9rtlFbUXBs66zxctdt9xzbB5I1g5W0XTzfE8TzjlKv1kAw9NpDyxalfE25ycQk4pPdR
+         8yAyIkJgAT3EWcsimSsannAULVaueI0yAD0f1l3gobOop6EDrOuoej62clf/9U8wgbue
+         JLFU3B9GLaEJ3tzVtAD7SXhYmp5G8/0rN9p6qH5QarWfg0cljHmMAEnC6fKdhWn2jRdr
+         ItmTYDzBJ1+YnLJEOVIFzwdJyaXo9d2JIaCRNC/e5HAXVGPELqOrq/4WTLIdA+l41GFT
+         yzsg==
+X-Gm-Message-State: AOJu0Yymf08flvzxFE0ZEKRIV5QoMeLbCz6cAh4RM62DdFOhL7f3J/QK
+	Nf5J9937iHkUQsDMOHqZk4dobXxPovJK1L85uPXhnTwk3GqCp/v0lofc5TPqVPfbQkMhIjyzXA=
 	=
-X-Google-Smtp-Source: AGHT+IHMlqwMCs9Npi3jOeY+LiGowC4953WrKZ9yJK8uSZJrjaUNV6KEIrxdClpYRueyTEYTFhCkPyP5
-X-Received: from ejbwq1.prod.google.com ([2002:a17:907:641:b0:b3f:5a00:1605])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:3f8a:b0:b04:3dc7:7d80
- with SMTP id a640c23a62f3a-b46e585ad3bmr632727366b.18.1759352633431; Wed, 01
- Oct 2025 14:03:53 -0700 (PDT)
-Date: Wed,  1 Oct 2025 23:02:04 +0200
+X-Google-Smtp-Source: AGHT+IFI3zKtjw3viIN28FavI/x8N6Vmi9ld+eUE+6cV0FsK7qbWev2ZSe6+tyHLFwzSdNJeSUW5izog
+X-Received: from wmpb25.prod.google.com ([2002:a05:600c:4a99:b0:46e:2f1b:4ceb])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:198b:b0:45f:29ed:2cff
+ with SMTP id 5b1f17b1804b1-46e613dd3femr38614835e9.35.1759352634802; Wed, 01
+ Oct 2025 14:03:54 -0700 (PDT)
+Date: Wed,  1 Oct 2025 23:02:05 +0200
 In-Reply-To: <20251001210201.838686-22-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -58,14 +58,14 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251001210201.838686-22-ardb+git@google.com>
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1430; i=ardb@kernel.org;
- h=from:subject; bh=zW/Ll9u+2fAT/Va1/PfNMYyKFzy2uIhE96GfLDmS5ew=;
- b=kA0DAAoWMG4JVi59LVwByyZiAGjdltPIlHC+BqQZgjT+Q/Oqs9tM4IdV3oG7ERBq2+2gSCD9a
- 4h1BAAWCgAdFiEEEJv97rnLkRp9Q5odMG4JVi59LVwFAmjdltMACgkQMG4JVi59LVyPtwD/fjev
- K07ta1hTMaGo/CMNU/2cOZDAmzhu/3WAashGtlsA/joiQcKT/3M+Pd4404SNOcFD27Upbf7uPzp TSe/KAyMB
+X-Developer-Signature: v=1; a=openpgp-sha256; l=982; i=ardb@kernel.org;
+ h=from:subject; bh=o8h5bq3OJmsWnm3lH4s7jaZZXCXhEjYAKa43aK/6n5k=;
+ b=owGbwMvMwCVmkMcZplerG8N4Wi2JIePutOs8NmwfJZcsl/9bfHnC3QmpN39NV4vzcFjwbPfeO
+ t3Zis5KHaUsDGJcDLJiiiwCs/++23l6olSt8yxZmDmsTCBDGLg4BWAiMzIZGX7UiG1UelXjuaJP
+ p+dWpvAZjY/Rm7RvvhI8tKggf5JM6BmG/1Wqi6y/rcu5rndMTeJ40MRrHqvufL95KeRz6py6z7d PufICAA==
 X-Mailer: git-send-email 2.51.0.618.g983fd99d29-goog
-Message-ID: <20251001210201.838686-24-ardb+git@google.com>
-Subject: [PATCH v2 02/20] arm64/simd: Add scoped guard API for kernel mode SIMD
+Message-ID: <20251001210201.838686-25-ardb+git@google.com>
+Subject: [PATCH v2 03/20] ARM/simd: Add scoped guard API for kernel mode SIMD
 From: Ard Biesheuvel <ardb+git@google.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -78,50 +78,40 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Ard Biesheuvel <ardb@kernel.org>
 
-Encapsulate kernel_neon_begin() and kernel_neon_end() using a 'ksimd'
-cleanup guard. This hides the prototype of those functions, allowing
-them to be changed for arm64 but not ARM, without breaking code that is
-shared between those architectures (RAID6, AEGIS-128)
-
-It probably makes sense to expose this API more widely across
-architectures, as it affords more flexibility to the arch code to
-plumb it in, while imposing more rigid rules regarding the start/end
-bookends appearing in matched pairs.
+Implement the ksimd scoped guard API so that it can be used by code that
+supports both ARM and arm64.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/arm64/include/asm/simd.h | 7 +++++++
+ arch/arm/include/asm/simd.h | 7 +++++++
  1 file changed, 7 insertions(+)
 
-diff --git a/arch/arm64/include/asm/simd.h b/arch/arm64/include/asm/simd.h
-index 8e86c9e70e48..d9f83c478736 100644
---- a/arch/arm64/include/asm/simd.h
-+++ b/arch/arm64/include/asm/simd.h
-@@ -6,12 +6,15 @@
- #ifndef __ASM_SIMD_H
- #define __ASM_SIMD_H
+diff --git a/arch/arm/include/asm/simd.h b/arch/arm/include/asm/simd.h
+index be08a8da046f..8549fa8b7253 100644
+--- a/arch/arm/include/asm/simd.h
++++ b/arch/arm/include/asm/simd.h
+@@ -2,14 +2,21 @@
+ #ifndef _ASM_SIMD_H
+ #define _ASM_SIMD_H
  
 +#include <linux/cleanup.h>
- #include <linux/compiler.h>
- #include <linux/irqflags.h>
- #include <linux/percpu.h>
+ #include <linux/compiler_attributes.h>
  #include <linux/preempt.h>
  #include <linux/types.h>
  
 +#include <asm/neon.h>
 +
- #ifdef CONFIG_KERNEL_MODE_NEON
- 
- /*
-@@ -40,4 +43,8 @@ static __must_check inline bool may_use_simd(void) {
- 
- #endif /* ! CONFIG_KERNEL_MODE_NEON */
+ static __must_check inline bool may_use_simd(void)
+ {
+ 	return IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && !in_hardirq()
+ 	       && !irqs_disabled();
+ }
  
 +DEFINE_LOCK_GUARD_0(ksimd, kernel_neon_begin(), kernel_neon_end())
 +
 +#define scoped_ksimd()	scoped_guard(ksimd)
 +
- #endif
+ #endif	/* _ASM_SIMD_H */
 -- 
 2.51.0.618.g983fd99d29-goog
 
