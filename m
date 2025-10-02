@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5643C266B40;
-	Thu,  2 Oct 2025 16:17:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75EF524467E;
+	Thu,  2 Oct 2025 16:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759421872; cv=none; b=EEkkKDNcTpCRaAbLH8hm7xeJDGxWobGqX7IKvAUK6F8NtrUmZpoQ4IfVFqU5jZjCUPyDOd51TwsliSvP/MLyFy2RQ5lb6SfudPpmuyUkfVms82peTzUNdbb6+n0fV9E6PO7oXRL0/4ssIJJQQht49aAlvXfp8b74By3plXmVyyo=
+	t=1759421895; cv=none; b=ODHCs6I3exg1sQxf5l/xvUUqNRhi+vcsWzgARByoRnn+dyifFnP9rTlJnEEftUbJKA6hqZv7ZnxPZByJGgYiu2Bj27qGX4DeM58l8Y3TvBj3p/ZHM/AnJx4ejhF7GiMMZDWC29v91/U7sdL6fe6q1vEdW+hDkFMBjuhFBLND8X0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759421872; c=relaxed/simple;
-	bh=TdGO/UgXtuKgeNJ7B5QwoIhZurKp1jniMNAKLD4x55M=;
+	s=arc-20240116; t=1759421895; c=relaxed/simple;
+	bh=haU7UA3i4VxOH2x3gB+UMfWD8mNozTHeaUCvV8ZhUxQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RZER8nUK7LL+sRDnW89QrBUh3N13KqKF7uARBLke3gCJlHZyHpT5iN8IEyF/zUvm0H9o3Bpxl4oJJDTXW0wKCRSUWpOGTTQ+aF0LeTNxdlkTIV/oXSaa6iiIs/LtIIn2KmIY3RyHY9ccDkKCienlqhVD0AkxFWhLRv2K+2IuTWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ezcaU6dP; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=i+y/Du2wWnwyZn4pqXKkboq9W1GH1ASqWo046ncOinbaGIxYQl525pYmQVumoGfjUIb91NZJI1dji1kE8RMQqT7d7fT4xEYXz/48MSacX12PEhjH4auB3CJ/ItRMsAJBS95xVKQuCMcsCVNzp+B8em+9eVs4shR2kNSwpoB1eA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mBmlw+YW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ezcaU6dP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85CEAC4CEFF;
-	Thu,  2 Oct 2025 16:17:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mBmlw+YW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDDC0C4CEF4;
+	Thu,  2 Oct 2025 16:18:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759421871;
-	bh=TdGO/UgXtuKgeNJ7B5QwoIhZurKp1jniMNAKLD4x55M=;
+	s=k20201202; t=1759421895;
+	bh=haU7UA3i4VxOH2x3gB+UMfWD8mNozTHeaUCvV8ZhUxQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ezcaU6dPQ9zoGc2Ek4Pyu0FH07Ntmutca4epdD7cs59WmG/tidw58Tc2basWIBj9/
-	 TVErReFMSpFvAg8uR4RCYlnANxcCniV4w6iGNMRwhmFfXUORgJkaU+6u7gTFtQFWHw
-	 ZxL2MFcz8gUmv6ryA1WJO84PCDDYdI3b1pF0jPaTdee5z4QAWxpEP1n9Yql/DnwhJF
-	 jg7J1aORbcefgJFEQEJp0T4foCxIwbecMeucJQXsWx9JG057NDvmgvSk3tKUrQIHc7
-	 qaLP3DDoPk60HWnbtIOm1oktLbrhGLooVMDM3FJyho6F10Xp3DfbaUJHfbbacwH/6v
-	 cQePe2piMaKKA==
-Date: Thu, 2 Oct 2025 09:17:50 -0700
+	b=mBmlw+YWycUFfd6+awCdzyisCKm2spoUtagB+p9j/yRzbVr/hhvDwBU/QAPohipeV
+	 msMFYutoNwZkH2eh/72ISHoSdFbauACTHfh0ZI+kSuPCseSVrpTWw3EPBLOSdswDon
+	 E9oo9Uc2zygnGmelyniEKiDwLM/UccJGeuLmpwBW+Uzgcr16ToY7ptR0r8JxGGb1ih
+	 +iUUdzgAWCUmBY/F892FlqueGw+hCN6CnIEUrYpzKId3//HeLkbWfwvyKYHYdXo9as
+	 +PT6HHOjsGtuTmyQRmG8rCnye6L5V1XBCSN6dvssFqFbC4P3sLle3yRgAdjVVkTqLz
+	 fx5KB23rMjLog==
+Date: Thu, 2 Oct 2025 09:18:14 -0700
 From: Kees Cook <kees@kernel.org>
 To: Ard Biesheuvel <ardb+git@google.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
@@ -36,11 +36,11 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
 	Mark Rutland <mark.rutland@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Mark Brown <broonie@kernel.org>, Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH v2 02/20] arm64/simd: Add scoped guard API for kernel
- mode SIMD
-Message-ID: <202510020917.8BFF293824@keescook>
+Subject: Re: [PATCH v2 03/20] ARM/simd: Add scoped guard API for kernel mode
+ SIMD
+Message-ID: <202510020918.AEFA1A195@keescook>
 References: <20251001210201.838686-22-ardb+git@google.com>
- <20251001210201.838686-24-ardb+git@google.com>
+ <20251001210201.838686-25-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,20 +49,13 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251001210201.838686-24-ardb+git@google.com>
+In-Reply-To: <20251001210201.838686-25-ardb+git@google.com>
 
-On Wed, Oct 01, 2025 at 11:02:04PM +0200, Ard Biesheuvel wrote:
+On Wed, Oct 01, 2025 at 11:02:05PM +0200, Ard Biesheuvel wrote:
 > From: Ard Biesheuvel <ardb@kernel.org>
 > 
-> Encapsulate kernel_neon_begin() and kernel_neon_end() using a 'ksimd'
-> cleanup guard. This hides the prototype of those functions, allowing
-> them to be changed for arm64 but not ARM, without breaking code that is
-> shared between those architectures (RAID6, AEGIS-128)
-> 
-> It probably makes sense to expose this API more widely across
-> architectures, as it affords more flexibility to the arch code to
-> plumb it in, while imposing more rigid rules regarding the start/end
-> bookends appearing in matched pairs.
+> Implement the ksimd scoped guard API so that it can be used by code that
+> supports both ARM and arm64.
 > 
 > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 
