@@ -1,95 +1,127 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B2D1922FB;
-	Thu,  2 Oct 2025 16:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63AA17A586;
+	Thu,  2 Oct 2025 16:28:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759422214; cv=none; b=dXPVzCStN7d5I1Zg9jqIUOmVl6P3MfoqEd8li+Xb3r+OqtJx/g08x4PeFBgTikpFVX08AiQpwNq+MPfgVWYA0ed2EuzZY4e7PZhlCTuAxMFtc3plQPYTIgV6iN4b0zsNfsAAbBHWeVawDYLqU3mE1uMWvC3iyJGf4LBtimEXM7w=
+	t=1759422508; cv=none; b=K0dpxB/dC8N2S0JT3ryJu7C7woPkpxJkbGezJA/AUDG/OOHswqKUTD05jj3r13rgXlE9Erqrqv0s9gbvzNeaK6VHvst1UcKC5l9SL+RPLfZJOXRZ/X89wUqCrmOS16URpbsdlM0k2a4fODD3OywV9J6tf7Jv5IH6CuEK4rYVFZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759422214; c=relaxed/simple;
-	bh=PmYyJOnUFog0AL2FCuG4NNJEsZpxpTJfKkWtHasPM2c=;
+	s=arc-20240116; t=1759422508; c=relaxed/simple;
+	bh=S9bOtCwZhxV5bHAKlwTwXZBpoxyAsQjgOk5wu3tLpiA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jpzg/A3zUVEEOEqC9ZEH78sISaymp3FwJtSxQyPoAWGs6k0cZISEOfqdXZrcywHfmBM73FWGYEbcqmU7hlRafyTlIswLYrdhKwiYNB9WDm97MF6zFrSaTV7ChdvjyqrA5C6oMPUUOMciqua55kJLaJJGiD7tVj1+o8oArHVYqiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hAiwO6pQ; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=QsXzC7yd/HewxJqDIO2l3tVHpWK4X970ZnL3gz3QKti+LYZwonaewSc6Vzf8haVmJKMY8yT4d+auGH9QV3Np/gcFQbHpJHzXh+4ILkgY0CPP8PKbFgtCMbDY1jhp2z5uqdCU09u8bRN+jF1dgdIvS5o9gdFK8USoqlPBV/R7Ae0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nUbOvZYz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hAiwO6pQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6E49C4CEF4;
-	Thu,  2 Oct 2025 16:23:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nUbOvZYz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07F07C4CEF4;
+	Thu,  2 Oct 2025 16:28:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759422213;
-	bh=PmYyJOnUFog0AL2FCuG4NNJEsZpxpTJfKkWtHasPM2c=;
+	s=k20201202; t=1759422508;
+	bh=S9bOtCwZhxV5bHAKlwTwXZBpoxyAsQjgOk5wu3tLpiA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hAiwO6pQ72bAJ1RaRtddkhRyk/vpHK6scNS/SS9/YBZKmjoFI0L2R+wn8n3xQTj1w
-	 6Fe6YiaqtqVAzmBgLfzcCoTSZnZ0j/SAeOqnpVUwn1ycavDACFyh3J1kOdmCYOnJi2
-	 8kcw+S5ntsUVxVNypxwQ2xAEet8UWAdPE5xqcQo/JREnAQvY++nap8heu6pXJNI7fI
-	 1jlQdpx4X1sqr19cHFqtSYRf67g3MGwjm3DlMaH2mR2VdbqsXhp9LDNw7jjtF0AAu9
-	 IOMu/L2l7xR7fImaz6EfwTc/KeMHoPX8Z7wSbqV3AxXtTyloKwUciUrG47qqBZOeJP
-	 20o9yMnAitcTg==
-Date: Thu, 2 Oct 2025 17:23:28 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-	linux@armlinux.org.uk, Ard Biesheuvel <ardb@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Kees Cook <keescook@chromium.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Eric Biggers <ebiggers@kernel.org>, stable@vger.kernel.org
-Subject: Re: [PATCH v2 01/20] arm64: Revert support for generic kernel mode
- FPU
-Message-ID: <94214ee4-3eec-4151-a5a7-9d5e030fbca3@sirena.org.uk>
-References: <20251001210201.838686-22-ardb+git@google.com>
- <20251001210201.838686-23-ardb+git@google.com>
+	b=nUbOvZYz/QG6XCHUJ7ZmT6C8NVBYhrnYsoxCx+p8xsn+/q3u/qNt6LCpk3U16IvR2
+	 RdkU1VN/DPBNUb11cWostG00rcieThuuUaXjF6ClvI0CdMFZhNdhWo9Ez7eYsgUiDL
+	 IntRXCtLNC1Fij4uLAHyam9q3jYt5J15ateIU3VtiRDs3w5O3+pfdnErUhgY58uImt
+	 9pbKwAV7BffGfe18pVhQIC8CMXOnHCaF+pxADtEFJQ6Q/MBd/ezXx1YOeyNcCwl7ZD
+	 2FH+h3LN/bWPgLiCHhnGKsjO/ySx46NyuVg6zwVdPWBmHF05Li+7xs8wAHKqhLue22
+	 GYbduYN1monIQ==
+Date: Thu, 2 Oct 2025 09:27:05 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/8] crypto, lib/crypto: Add SHAKE128/256 support and
+ move SHA3 to lib/crypto
+Message-ID: <20251002162705.GB1697@sol>
+References: <20251001152826.GB1592@sol>
+ <20250926141959.1272455-1-dhowells@redhat.com>
+ <20250926195958.GA2163@sol>
+ <2636609.1759410884@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nWWZ4oGleevaWtf9"
-Content-Disposition: inline
-In-Reply-To: <20251001210201.838686-23-ardb+git@google.com>
-X-Cookie: idleness, n.:
-
-
---nWWZ4oGleevaWtf9
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <2636609.1759410884@warthog.procyon.org.uk>
 
-On Wed, Oct 01, 2025 at 11:02:03PM +0200, Ard Biesheuvel wrote:
+On Thu, Oct 02, 2025 at 02:14:44PM +0100, David Howells wrote:
+> Eric Biggers <ebiggers@kernel.org> wrote:
+> 
+> > Have you had a chance to read this reply?
+> 
+> I have.
+> 
+> You held up your implementation of sha256 and sha224 as an example of how it
+> perhaps should be implemented:
+> 
+> 	It would be worth considering separating the APIs for the different
+> 	algorithms that are part of SHA-3, similar to what I did with SHA-224
+> 	and SHA-256.
+> 
+> so I have followed that.  That defines a type for each, so I'll leave it at
+> that.
 
-> However, dropping that flag allows the compiler to use FPU and SIMD
-> registers in other ways too, and for this reason, arm64 only permits
-> doing so in strictly controlled contexts, i.e., isolated compilation
-> units that get called from inside a kernel_neon_begin() and
-> kernel_neon_end() pair.
+In v3, you were pretty clear that you don't like the six-types solution:
 
-> The users of the generic kernel mode FPU API lack such strict checks,
-> and this may result in userland FP/SIMD state to get corrupted, given
-> that touching FP/SIMD registers outside of a kernel_neon_begin/end pair
-> does not fault, but silently operates on the userland state without
-> preserving it.
+    I have done what Eric required and made a separate wrapper struct
+    and set of wrapper functions for each algorithm, though I think this
+    is excessively bureaucratic as this multiplies the API load by 7
+    (and maybe 9 in the future[*]).
 
-Oh dear, that's nasty - I didn't see the patch when it was going in:
+    [*] The Kyber algorithm also uses CSHAKE variants in the SHA3 family - and
+        NIST mentions some other variants too.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+    This does, however, cause a problem for what I need to do as the
+    ML-DSA prehash is dynamically selectable by certificate OID, so I
+    have to add SHAKE128/256 support to the crypto shash API too -
+    though hopefully it will only require an output of 16 or 32 bytes
+    respectively for the prehash case and won't require multiple
+    squeezing.
 
---nWWZ4oGleevaWtf9
-Content-Type: application/pgp-signature; name="signature.asc"
+So, I listened.  And I realized that we can address my concern about the
+digest vs. XOF confusion using just two types.
 
------BEGIN PGP SIGNATURE-----
+And I explained I didn't intend to require that we fully split the API
+into all six variants, and apologized for not being clear.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjepv8ACgkQJNaLcl1U
-h9AjmAf/SiFHTDNbN3rXmWdsvNAunPrL+9aRBs9j/mZfqVYq9uzKNhwIxj8s45I4
-yWhSDWUvwP8YaauMEyjic7CObKYZqqDWU/EiN2nIXazkkxLJbHepxoOdtl570UeE
-O9tTJ4GxAuFO0tAzCJZccVjlmBPw8mjZQFNnoisDLZtoPkeAHeX+luSpKrtRW485
-i8koP3kVvjSSKEzKFAl5EzXO8rytkbgGoHCJEC5VCowgQjYMPfF2q/9pqkrtO6FZ
-MzlGkKZpEAfFDanLklqtkCzVZVX1kWB9FLK9l7ivkr8Fm/zJcXtqJAJGcaW6ysAW
-FeV20Z2gHM1Mv6ApBwu+USi75HVx+w==
-=Z2EE
------END PGP SIGNATURE-----
+Remember, we haven't done a SHA-3 library API before.  We're both
+learning as we go...
 
---nWWZ4oGleevaWtf9--
+If you've now changed your mind and strongly prefer six types, I can
+tolerate that too.  But I want to make sure you actually want that, and
+aren't choosing it just to try to prove a point or something.
+
+> > All I'm really requesting is that we don't create footguns, like the
+> > following that the API in the v2 patch permitted:
+> 
+> The way you did a separate type for each removed one more footgun - and
+> arguably a more important one - as the *type* enforces[1] the output buffer
+> size and the sha3_*_final() function has the same sized-array as the
+> convenience wrappers.
+> 
+> It also eliminates the need to store the digest size as this is only needed at
+> the final step for the digest variant algorithms.
+> 
+> David
+> 
+> [1] Inasmuch as this is effective in C.
+
+Well, that "Inasmuch as this is effective in C" disclaimer is really
+important, because it means it doesn't actually work properly.
+
+Effectively, array bounds in function parameters are for humans, not the
+compiler.
+
+Which is still useful, but probably not to the extent that we should
+have all those extra functions and types, vs. just documenting that
+sha3_final() produces output of length matching the init function that
+was called.  (As I mentioned, the BLAKE2s API does something similar.)
+
+- Eric
