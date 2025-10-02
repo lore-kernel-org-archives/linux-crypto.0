@@ -1,45 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65ACD17A586;
-	Thu,  2 Oct 2025 16:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5643C266B40;
+	Thu,  2 Oct 2025 16:17:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759421355; cv=none; b=gAQTtg3ImwEEVOrb6LkkbzNv74ZiDfxLPmsWbT6V11f83oPvC2YDJZFgnBaPIRqX+M1zEUQ8VMtgRhFPvxm0rfKTtrKBDuoWPFzqabmGMQjyNBB63yFeG0ruWuB1MeVZHN4f5TxFDrspdCkhfRkIYvzW02n9qY73jEK54cgr0rE=
+	t=1759421872; cv=none; b=EEkkKDNcTpCRaAbLH8hm7xeJDGxWobGqX7IKvAUK6F8NtrUmZpoQ4IfVFqU5jZjCUPyDOd51TwsliSvP/MLyFy2RQ5lb6SfudPpmuyUkfVms82peTzUNdbb6+n0fV9E6PO7oXRL0/4ssIJJQQht49aAlvXfp8b74By3plXmVyyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759421355; c=relaxed/simple;
-	bh=xrpQZHO3iI+KPMeFcf7bviH6GVHikFXA0GPqGdBZ8ks=;
+	s=arc-20240116; t=1759421872; c=relaxed/simple;
+	bh=TdGO/UgXtuKgeNJ7B5QwoIhZurKp1jniMNAKLD4x55M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X8b545zqq0zP4ayxpTLbJ9hL9cO6ojqp1hUMV9+gZOYc6XE7GucySO5OunxnZIJBTjmfE3jKCVtQFx/+9oojC9t1x+99prqKb7PrzlDqcOnLN567L08Tt9l2y7X04bwo8lXC0RRKD9p5ZeK7vHWOjUXCIIlrwlFKaExXE5imhb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UN64/055; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=RZER8nUK7LL+sRDnW89QrBUh3N13KqKF7uARBLke3gCJlHZyHpT5iN8IEyF/zUvm0H9o3Bpxl4oJJDTXW0wKCRSUWpOGTTQ+aF0LeTNxdlkTIV/oXSaa6iiIs/LtIIn2KmIY3RyHY9ccDkKCienlqhVD0AkxFWhLRv2K+2IuTWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ezcaU6dP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UN64/055"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7765C4CEF4;
-	Thu,  2 Oct 2025 16:09:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ezcaU6dP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85CEAC4CEFF;
+	Thu,  2 Oct 2025 16:17:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759421354;
-	bh=xrpQZHO3iI+KPMeFcf7bviH6GVHikFXA0GPqGdBZ8ks=;
+	s=k20201202; t=1759421871;
+	bh=TdGO/UgXtuKgeNJ7B5QwoIhZurKp1jniMNAKLD4x55M=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UN64/055mJnSv3/yUQ+UES7WSqhgevBRTzm6cbDLq2+hPBHNjdPW8BlnYw1joqaEM
-	 Rmkj08FwmJPeF51eSSN4t8ImTVQOCUudH54sBc+u+pt9ChCvkLtSEGInWDrYXIG0da
-	 gNaiVh5wGpYdXyMXLAZ7JRQ7bBMJPLbLo8m0v16edtHhZ+fYidkbW21lrcit5V2ixJ
-	 uj+gkrOwpLisRptFEvFPhwc4xYWNxDcPpUhLzlqq9GyIzl21Y/g4EtiI+mEiLoqmZO
-	 cW4fh9gP1Rfs36x44OBIHfmDAHvmAbPkVMr0zN4ezxetS6xZl/a0q6npu+Xo8bTxGk
-	 AohSlfrYnfkWQ==
-Date: Thu, 2 Oct 2025 09:07:51 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 5/8] lib/crypto: Add SHA3 kunit tests
-Message-ID: <20251002160751.GA1697@sol>
-References: <20251001160435.GC1592@sol>
- <20250926141959.1272455-1-dhowells@redhat.com>
- <20250926141959.1272455-6-dhowells@redhat.com>
- <2636465.1759410347@warthog.procyon.org.uk>
+	b=ezcaU6dPQ9zoGc2Ek4Pyu0FH07Ntmutca4epdD7cs59WmG/tidw58Tc2basWIBj9/
+	 TVErReFMSpFvAg8uR4RCYlnANxcCniV4w6iGNMRwhmFfXUORgJkaU+6u7gTFtQFWHw
+	 ZxL2MFcz8gUmv6ryA1WJO84PCDDYdI3b1pF0jPaTdee5z4QAWxpEP1n9Yql/DnwhJF
+	 jg7J1aORbcefgJFEQEJp0T4foCxIwbecMeucJQXsWx9JG057NDvmgvSk3tKUrQIHc7
+	 qaLP3DDoPk60HWnbtIOm1oktLbrhGLooVMDM3FJyho6F10Xp3DfbaUJHfbbacwH/6v
+	 cQePe2piMaKKA==
+Date: Thu, 2 Oct 2025 09:17:50 -0700
+From: Kees Cook <kees@kernel.org>
+To: Ard Biesheuvel <ardb+git@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
+	linux@armlinux.org.uk, Ard Biesheuvel <ardb@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Brown <broonie@kernel.org>, Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH v2 02/20] arm64/simd: Add scoped guard API for kernel
+ mode SIMD
+Message-ID: <202510020917.8BFF293824@keescook>
+References: <20251001210201.838686-22-ardb+git@google.com>
+ <20251001210201.838686-24-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,51 +49,24 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2636465.1759410347@warthog.procyon.org.uk>
+In-Reply-To: <20251001210201.838686-24-ardb+git@google.com>
 
-On Thu, Oct 02, 2025 at 02:05:47PM +0100, David Howells wrote:
-> Eric Biggers <ebiggers@kernel.org> wrote:
+On Wed, Oct 01, 2025 at 11:02:04PM +0200, Ard Biesheuvel wrote:
+> From: Ard Biesheuvel <ardb@kernel.org>
 > 
-> > SHA3-386 => SHA3-384
+> Encapsulate kernel_neon_begin() and kernel_neon_end() using a 'ksimd'
+> cleanup guard. This hides the prototype of those functions, allowing
+> them to be changed for arm64 but not ARM, without breaking code that is
+> shared between those architectures (RAID6, AEGIS-128)
 > 
-> Hah.  Possibly I'm too practised at writing "386".
+> It probably makes sense to expose this API more widely across
+> architectures, as it affords more flexibility to the arch code to
+> plumb it in, while imposing more rigid rules regarding the start/end
+> bookends appearing in matched pairs.
 > 
-> > If these expected outputs are from an external source, then that source
-> > needs to be documented.  If they aren't, then the way in which they were
-> > generated needs to be easily reproducible and documented, e.g. by adding
-> > support for generating them to gen-hash-testvecs.py.
-> 
-> I generated them with openssl.  I'll add a note in the code.
-> 
-> > If that's the case, then running "./scripts/crypto/gen-hash-testvecs.py
-> > sha3-256 > lib/crypto/tests/sha3_testvecs.h" should reproduce this file
-> > exactly.  But it doesn't, so you must have manually edited this file.
-> > 
-> > It should match exactly.  That can be done by tweaking
-> > gen-hash-testvecs.py to use the correct *_DIGEST_SIZE constant and
-> > skipping the HMAC test if sha3-256 is requested.
-> 
-> gen-hash-testvecs.py doesn't know how to handle dashes in the algo name and
-> they end up coming in the output as "SHA3-256_DIGEST_SIZE".
-> 
-> It also generated an HMAC thing despite sha3-256 not having HMAC support, so I
-> just trimmed that off.
-> 
-> Anyway, I can modify the gen script to deal with both of those.
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 
-Yes, that's what I'm asking for.
+Reviewed-by: Kees Cook <kees@kernel.org>
 
-> > >  def hash_final(ctx):
-> > > +    if ctx.name == "shake_128":
-> > > +        return ctx.digest(16)
-> > > +    if ctx.name == "shake_256":
-> > > +        return ctx.digest(32)
-> > 
-> > This addition is unnecessary.
-> 
-> Well, you can't generate SHAKE128 or SHAKE256 without it as the digest()
-> method has a mandatory parameter for XOF algorithms.  This fixes that.
-
-I know, but the script is never actually used with SHAKE128 or SHAKE256.
-
-- Eric
+-- 
+Kees Cook
