@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7B0299AB5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FCC229A31C;
 	Thu,  2 Oct 2025 02:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759372447; cv=none; b=VcuDbXXiCEUVaQDF+QggxsF6nezGdtLQ1jADXk551JetSCCsbziDT1mvjiqdIQWMlQiChZnquQuphbRvLSTMXvjoEyLodMxoUknG0X6kZ7TZ1/c2bC6zLVx7no3wuvgZSrTR1WCbVGtAmEh1gyWe6/MNxhxL3px1Q9DeWVcs5Ys=
+	t=1759372447; cv=none; b=Ofs5JMQCulSokN7zwp4LzdeCwgsY6kmyNmU/IXNavIYBRMukDsSiS4jdiovqXt85XNU1wq4S2WKBpj8gjWJdnTsA5wqkWGnU22uVO1cgY1PfI0+uM5F2e4c/KwGV2xSrCrG1YuyEk+BqRdX7wm12YB4gzwdf9pLpLcklKb7bTyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1759372447; c=relaxed/simple;
-	bh=6DWpnf3bNtDRR7n325DwUu9lzxzMM6/DywrQc7FkP/o=;
+	bh=+d3VJKli1Zg9RVaDLx6/DDOQvw9ia2VIYtFw3Nj/zNs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A4Uqf5873GbLLzelngNO6sDJkUsz5Ii6gx517YVVFIZoVUCgj9bLO63oQH1xXWICgNYZLUvDR0ueZ2JMvZEgbZaeLuVksNdVXi0X+JAAogdTlqQ2KRuQ+sSansb3k7alPJgLbVOkNCIlNRFohINUpiqQDkFlb0JyJMV2FYa81/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O92lb1Cq; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=CNWidJVp943NptjatFrISGTccO+yJMLauMNlpe8W3J8koEeHWjfxV0G8ehj0S5hpO/3LNaKXlgexEYPslN9UtYcmpQINVFmkvTmo1CnniQQ0XPGigDtiaY0Qeoq/le7Kkva2TWfLLBuObWrF82ioIJPNVorwjAtq/cSxE4oMI28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GADYoweq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O92lb1Cq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4F02C4CEF1;
-	Thu,  2 Oct 2025 02:34:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GADYoweq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42BD7C4CEFC;
+	Thu,  2 Oct 2025 02:34:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1759372447;
-	bh=6DWpnf3bNtDRR7n325DwUu9lzxzMM6/DywrQc7FkP/o=;
+	bh=+d3VJKli1Zg9RVaDLx6/DDOQvw9ia2VIYtFw3Nj/zNs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=O92lb1Cqcu6Wzn8/3DevXpbKaTHATydmPzpoWLTp382+ndBOj4p/nS/wBBx9u/ffe
-	 303j1248OSCnCVJPTFBw39lRbEhlkc+QCEzfXlsnhQ0cQ0mBdIfsOrk5zinHP42o4/
-	 bdtN63MCjc1smjNPX+0IJnwPLDlNT5dX+DlARmyGHqUL+POJc3Y/Mu0REnQDIETdS9
-	 YB1KWfEioxlmD8FeggJZ8XCCNBUiFQe3hRHOAV/7UB7hQJuKTy1VjHxl2tbmyBXyy8
-	 Q2zPz34M7vQ3YH1wvsO0cfMiGImTzPr9ex7LQqp89iFk55p14d0IBetLn588vduiDN
-	 G/tZ9YxcjzDYg==
+	b=GADYoweqWSzjYmKNowR+k+OF3wHRV2jvKCzw9YIOUNUeGFKBaUPpXdRrgrkcSUYO7
+	 ku89I+IyY91QcvUJrybLbHbESCUvtIi7x6C8N+7umP8N38v0Uy1nUV7hirLKmE85rq
+	 z1XokO5y9jhce9PXpJdGXdwRSQ84OatU8UgaE8tkO2/Ch2QZOPI5cSU4QLut39U8uo
+	 PQ0uzsIm1LR9yCZhniFWDTNxaJMfhlUphN4xuHmMWe4zXVhVyuCnecB+8FwrBn6mmJ
+	 nLE6zcnL524oCpnmwFwSl1q6HfKJXXx0SsUI2Ox8S/Wa60sKDoG0jRI4P4iXkDTJx/
+	 am6ywL7K9AAeA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -33,9 +33,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 6/8] crypto: x86/aes-gcm - revise some comments in AVX512 code
-Date: Wed,  1 Oct 2025 19:31:15 -0700
-Message-ID: <20251002023117.37504-7-ebiggers@kernel.org>
+Subject: [PATCH 7/8] crypto: x86/aes-gcm - optimize AVX512 precomputation of H^2 from H^1
+Date: Wed,  1 Oct 2025 19:31:16 -0700
+Message-ID: <20251002023117.37504-8-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251002023117.37504-1-ebiggers@kernel.org>
 References: <20251002023117.37504-1-ebiggers@kernel.org>
@@ -47,82 +47,59 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-- Fix some references to field names in struct aes_gcm_key_vaes_avx512.
+Squaring in GF(2^128) requires fewer instructions than a generic
+multiplication in GF(2^128).  Take advantage of this when computing H^2
+from H^1 in aes_gcm_precompute_vaes_avx512().
 
-- Remove the mention of the counter having to start at 2.  The assembly
-  code doesn't actually assume that it does.
-
-Note that these changes improve consistency with aes-gcm-vaes-avx2.S.
+Note that aes_gcm_precompute_vaes_avx2() already uses this optimization.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/x86/crypto/aes-gcm-vaes-avx512.S | 27 +++++++++++----------------
- 1 file changed, 11 insertions(+), 16 deletions(-)
+ arch/x86/crypto/aes-gcm-vaes-avx512.S | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/crypto/aes-gcm-vaes-avx512.S b/arch/x86/crypto/aes-gcm-vaes-avx512.S
-index 81a8a027cff8e..3cf0945a25170 100644
+index 3cf0945a25170..5c8301d275c66 100644
 --- a/arch/x86/crypto/aes-gcm-vaes-avx512.S
 +++ b/arch/x86/crypto/aes-gcm-vaes-avx512.S
-@@ -260,16 +260,12 @@
+@@ -258,10 +258,23 @@
+ 	vpclmulqdq	$0x01, \mi, \gfpoly, \t0
+ 	vpshufd		$0x4e, \mi, \mi
  	vpternlogd	$0x96, \t0, \mi, \hi
  .endm
  
++// This is a specialized version of _ghash_mul that computes \a * \a, i.e. it
++// squares \a.  It skips computing MI = (a_L * a_H) + (a_H * a_L) = 0.
++.macro	_ghash_square	a, dst, gfpoly, t0, t1
++	vpclmulqdq	$0x00, \a, \a, \t0	  // LO = a_L * a_L
++	vpclmulqdq	$0x11, \a, \a, \dst	  // HI = a_H * a_H
++	vpclmulqdq	$0x01, \t0, \gfpoly, \t1  // LO_L*(x^63 + x^62 + x^57)
++	vpshufd		$0x4e, \t0, \t0		  // Swap halves of LO
++	vpxord		\t0, \t1, \t1		  // Fold LO into MI
++	vpclmulqdq	$0x01, \t1, \gfpoly, \t0  // MI_L*(x^63 + x^62 + x^57)
++	vpshufd		$0x4e, \t1, \t1		  // Swap halves of MI
++	vpternlogd	$0x96, \t0, \t1, \dst	  // Fold MI into HI
++.endm
++
  // void aes_gcm_precompute_vaes_avx512(struct aes_gcm_key_vaes_avx512 *key);
  //
--// Given the expanded AES key |key->aes_key|, this function derives the GHASH
--// subkey and initializes |key->ghash_key_powers| with powers of it.
--//
--// The number of key powers initialized is NUM_H_POWERS, and they are stored in
--// the order H^NUM_H_POWERS to H^1.  The zeroized padding blocks after the key
--// powers themselves are also initialized.
-+// Given the expanded AES key |key->base.aes_key|, derive the GHASH subkey and
-+// initialize |key->h_powers| and |key->padding|.
+ // Given the expanded AES key |key->base.aes_key|, derive the GHASH subkey and
+ // initialize |key->h_powers| and |key->padding|.
  SYM_FUNC_START(aes_gcm_precompute_vaes_avx512)
+@@ -335,12 +348,11 @@ SYM_FUNC_START(aes_gcm_precompute_vaes_avx512)
+ 	// Note that as with H^1, all higher key powers also need an extra
+ 	// factor of x^-1 (or x using the natural interpretation).  Nothing
+ 	// special needs to be done to make this happen, though: H^1 * H^1 would
+ 	// end up with two factors of x^-1, but the multiplication consumes one.
+ 	// So the product H^2 ends up with the desired one factor of x^-1.
+-	_ghash_mul	H_CUR_XMM, H_CUR_XMM, H_INC_XMM, GFPOLY_XMM, \
+-			%xmm0, %xmm1, %xmm2
++	_ghash_square	H_CUR_XMM, H_INC_XMM, GFPOLY_XMM, %xmm0, %xmm1
  
- 	// Function arguments
- 	.set	KEY,		%rdi
+ 	// Create H_CUR_YMM = [H^2, H^1] and H_INC_YMM = [H^2, H^2].
+ 	vinserti128	$1, H_CUR_XMM, H_INC_YMM, H_CUR_YMM
+ 	vinserti128	$1, H_INC_XMM, H_INC_YMM, H_INC_YMM
  
-@@ -467,14 +463,13 @@ SYM_FUNC_END(aes_gcm_precompute_vaes_avx512)
- //				       u8 ghash_acc[16],
- //				       const u8 *aad, int aadlen);
- //
- // This function processes the AAD (Additional Authenticated Data) in GCM.
- // Using the key |key|, it updates the GHASH accumulator |ghash_acc| with the
--// data given by |aad| and |aadlen|.  |key->ghash_key_powers| must have been
--// initialized.  On the first call, |ghash_acc| must be all zeroes.  |aadlen|
--// must be a multiple of 16, except on the last call where it can be any length.
--// The caller must do any buffering needed to ensure this.
-+// data given by |aad| and |aadlen|.  On the first call, |ghash_acc| must be all
-+// zeroes.  |aadlen| must be a multiple of 16, except on the last call where it
-+// can be any length.  The caller must do any buffering needed to ensure this.
- //
- // AES-GCM is almost always used with small amounts of AAD, less than 32 bytes.
- // Therefore, for AAD processing we currently only provide this implementation
- // which uses 256-bit vectors (ymm registers) and only has a 1x-wide loop.  This
- // keeps the code size down, and it enables some micro-optimizations, e.g. using
-@@ -620,16 +615,16 @@ SYM_FUNC_END(aes_gcm_aad_update_vaes_avx512)
- //
- // |datalen| must be a multiple of 16, except on the last call where it can be
- // any length.  The caller must do any buffering needed to ensure this.  Both
- // in-place and out-of-place en/decryption are supported.
- //
--// |le_ctr| must give the current counter in little-endian format.  For a new
--// message, the low word of the counter must be 2.  This function loads the
--// counter from |le_ctr| and increments the loaded counter as needed, but it
--// does *not* store the updated counter back to |le_ctr|.  The caller must
--// update |le_ctr| if any more data segments follow.  Internally, only the low
--// 32-bit word of the counter is incremented, following the GCM standard.
-+// |le_ctr| must give the current counter in little-endian format.  This
-+// function loads the counter from |le_ctr| and increments the loaded counter as
-+// needed, but it does *not* store the updated counter back to |le_ctr|.  The
-+// caller must update |le_ctr| if any more data segments follow.  Internally,
-+// only the low 32-bit word of the counter is incremented, following the GCM
-+// standard.
- .macro	_aes_gcm_update	enc
- 
- 	// Function arguments
- 	.set	KEY,		%rdi
- 	.set	LE_CTR_PTR,	%rsi
 -- 
 2.51.0
 
