@@ -1,194 +1,217 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB3C23A989;
-	Thu,  2 Oct 2025 17:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D481236A70;
+	Thu,  2 Oct 2025 17:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759425874; cv=none; b=K4/3Y+7g1tZiv7PJWQKGM5NAvst4w6TN1TFEpXb0+kGx7aqnFuXUOALQdHyVj0RmwsqZofXyuiwIavufO89sd0vJt4X+dyeZQcOPGOmv5p4LiRpF26DGog3+J2rN2KlztiJPBOP1c7LifCOdV4qTNSp0ZEZbnxi0h+0cdQzMzcU=
+	t=1759426675; cv=none; b=cQ/B5KFKdfi4PzqrIf6xxLMSTD3nOUYlvbqy9J3xAwYJ4V+lmgX0EEVqUwCTmTbGJSly23yC8to5q5KyTkDEZIOgLTwVw0i/oLEGBRHyvvzK+WkMViB54L3Qp3ygd4MEpih70npbUeCK0NpJ9uh9p3o8Asa46j4cXq5llWEZKCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759425874; c=relaxed/simple;
-	bh=OMRJNrpLvAxA249vBZ/bEhXZq23hs6Dl0++C6N1Jv28=;
+	s=arc-20240116; t=1759426675; c=relaxed/simple;
+	bh=o2a6H88/BZxrnf0y+8hUKNtDsH9D/7ZzhhKPMH9mUOw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lRjbBAff5zY55VWAje35h02jovnvlJD6yWatCy/IX1VPC2MNHA+IXNF4d7xcAJ1mxe96IZ6r4WRZy/WsdSmsdBrc2Vxy79cmTL0v0UAqzF4znXdQeNbAhttUrId/Wj8WZgSC4ZaWWY58P+D9/inDVq2o15w46LQB6LWwuZXvOlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PJxUnZ/h; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=nTnc889AEkCQeZnz4E5Tnm2xQzV7up4veiIyodN2R7v4rkmcfWeTk63iDTglT2KHmp3jGVffM2W87YQRD3+01RObSioW+S+BAt0OCQ0XSOcNdvGNLWtg6qcQFKWabJWK6AGd4noO63ohmZBjtJKy5CT6OaXEjimtHo95avLjM14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uWOT/loD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PJxUnZ/h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C0CBC4CEF4;
-	Thu,  2 Oct 2025 17:24:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uWOT/loD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D57B6C4CEF5;
+	Thu,  2 Oct 2025 17:37:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759425873;
-	bh=OMRJNrpLvAxA249vBZ/bEhXZq23hs6Dl0++C6N1Jv28=;
+	s=k20201202; t=1759426674;
+	bh=o2a6H88/BZxrnf0y+8hUKNtDsH9D/7ZzhhKPMH9mUOw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PJxUnZ/hsGfSMdxSw4DluZMMdmgPLoB0yyEVgXWK+6xwqbjq8vykr7/3JUWLML/FE
-	 8bCVgBTjZh6Sy8yuLHdKP9+Bn94wSc5ttQWSlwnBmnPXB3xxmKmWk4AC+n8gd7AYXz
-	 6Jk2X7uO5PEbpgf0HX9JEytPfGKDnH1f05YJVyirsEOs94WDMRPgDMqlFhlghb29Lx
-	 IpPG1aG2BPbqrXJLNrDomPbTCh4inzxdlbrGsukh1DYco9IDd+3Dw6rJvcXd+69dek
-	 n4FgucUECGIQGo+0QyDlludX1PG6GXGJzryiNukhkCec6rlYvdpo25Qy/u44oOw3ci
-	 4AHlJp8q1p5Ew==
-Date: Thu, 2 Oct 2025 10:23:10 -0700
+	b=uWOT/loD+5wO7CMcjca1y0so15p5X9BUQn+Aj9+8+jEjQ7qwfFj34zO5IT13IEa8v
+	 Z/GqAzSLVJKCg2sjK2eEmE5a6hQhQv/6TmvxO6kDpLwqSBc6yB+RGLKnZ4YjUJ1X8K
+	 SVt2ZGagEqV5unK3g9czT6h5ys3t1vJFTPjHoeakpSbAQ7B3Qe/lLlI89Ifj0i9Af1
+	 yaHbad6DuMdyhUdCfoPL/492TjhCAqvuQBPj/YN6U4FjhV3rBvp5cAM4i9/vb2BE3H
+	 zJ6gxl5wFQ8WrMNL1Qq636w1S7IPpoejQKuErLbYmMVPtw3tmhWO+8M8FMe8QOhVUJ
+	 dxqvzR0G3oLGw==
+Date: Thu, 2 Oct 2025 10:36:30 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Vegard Nossum <vegard.nossum@oracle.com>
-Cc: Jiri Slaby <jirislaby@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Network Development <netdev@vger.kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	bpf <bpf@vger.kernel.org>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-Subject: Re: 6.17 crashes in ipv6 code when booted fips=1 [was: [GIT PULL]
- Crypto Update for 6.17]
-Message-ID: <20251002172310.GC1697@sol>
-References: <aIirh_7k4SWzE-bF@gondor.apana.org.au>
- <05b7ef65-37bb-4391-9ec9-c382d51bae4d@kernel.org>
- <aN5GO1YLO_yXbMNH@gondor.apana.org.au>
- <562363e8-ea90-4458-9f97-1b1cb433c863@kernel.org>
- <8bb5a196-7d55-4bdb-b890-709f918abad0@kernel.org>
- <1a71398e-637f-4aa5-b4c6-0d3502a62a0c@kernel.org>
- <f31dbb22-0add-481c-aee0-e337a7731f8e@oracle.com>
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1
+ code instead of AF_ALG
+Message-ID: <20251002173630.GD1697@sol>
+References: <20250929194648.145585-1-ebiggers@kernel.org>
+ <CAADnVQKKQEjZjz21e_639XkttoT4NvXYxUb8oTQ4X7hZKYLduQ@mail.gmail.com>
+ <20251001233304.GB2760@quark>
+ <CAADnVQL=zs-n1s-0emSuDmpfnU7QzMFo+92D3b4tqa3sG+uiQw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <f31dbb22-0add-481c-aee0-e337a7731f8e@oracle.com>
+In-Reply-To: <CAADnVQL=zs-n1s-0emSuDmpfnU7QzMFo+92D3b4tqa3sG+uiQw@mail.gmail.com>
 
-On Thu, Oct 02, 2025 at 01:30:43PM +0200, Vegard Nossum wrote:
+On Thu, Oct 02, 2025 at 10:12:12AM -0700, Alexei Starovoitov wrote:
+> On Wed, Oct 1, 2025 at 4:33â€¯PM Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > On Wed, Oct 01, 2025 at 03:59:31PM -0700, Alexei Starovoitov wrote:
+> > > On Mon, Sep 29, 2025 at 12:48â€¯PM Eric Biggers <ebiggers@kernel.org> wrote:
+> > > >
+> > > > Add a basic SHA-1 implementation to lib/, and make lib/bpf_legacy.c use
+> > > > it to calculate SHA-1 digests instead of the previous AF_ALG-based code.
+> > > >
+> > > > This eliminates the dependency on AF_ALG, specifically the kernel config
+> > > > options CONFIG_CRYPTO_USER_API_HASH and CONFIG_CRYPTO_SHA1.
+> > > >
+> > > > Over the years AF_ALG has been very problematic, and it is also not
+> > > > supported on all kernels.  Escalating to the kernel's privileged
+> > > > execution context merely to calculate software algorithms, which can be
+> > > > done in userspace instead, is not something that should have ever been
+> > > > supported.  Even on kernels that support it, the syscall overhead of
+> > > > AF_ALG means that it is often slower than userspace code.
+> > >
+> > > Help me understand the crusade against AF_ALG.
+> > > Do you want to deprecate AF_ALG altogether or when it's used for
+> > > sha-s like sha1 and sha256 ?
+> >
+> > Altogether, when possible.  AF_ALG has been (and continues to be)
+> > incredibly problematic, for both security and maintainability.
 > 
-> On 02/10/2025 12:57, Jiri Slaby wrote:
-> > On 02. 10. 25, 12:13, Jiri Slaby wrote:
-> > > On 02. 10. 25, 12:05, Jiri Slaby wrote:
-> > > > On 02. 10. 25, 11:30, Herbert Xu wrote:
-> > > > > On Thu, Oct 02, 2025 at 10:10:41AM +0200, Jiri Slaby wrote:
-> > > > > > On 29. 07. 25, 13:07, Herbert Xu wrote:
-> > > > > > > Vegard Nossum (1):
-> > > > > > >         crypto: testmgr - desupport SHA-1 for FIPS 140
-> > > > > > 
-> > > > > > Booting 6.17 with fips=1 crashes with this commit -- see below.
-> > > > > > 
-> > > > > > The crash is different being on 6.17 (below) and on the commit --
-> > > > > > 9d50a25eeb05c45fef46120f4527885a14c84fb2.
-> > > > > > 
-> > > > > > 6.17 minus that one makes it work again.
-> > > > > > 
-> > > > > > Any ideas?
-> > > > > 
-> > > > > The purpose of the above commit is to remove the SHA1 algorithm
-> > > > > if you boot with fips=1.  As net/ipv6/seg6_hmac.c depends on the
-> > > > > sha1 algorithm, it will obviously fail if SHA1 isn't there.
-> > > > 
-> > > > Ok, but I don't immediately see what is one supposed to do to
-> > > > boot 6.17 distro (openSUSE) kernel with fips=1 then?
-> 
-> First off, I just want to acknowledge that my commit to disable SHA-1
-> when booting with fips=1 is technically regressing userspace as well as
-> this specific ipv6 code.
-> 
-> However, fips=1 has a very specific use case, which is FIPS compliance.
-> Now, SHA-1 has been deprecated since 2011 but not yet fully retired
-> until 2030.
-> 
-> The purpose of the commit is to actually begin the transition as is
-> encouraged by NIST and prevent any new FIPS certifications from expiring
-> early, which would be the outcome for any FIPS certifications initiated
-> after December 31 this year. I think this is in line with the spirit of
-> using and supporting fips=1 to begin with, in the sense that if you
-> don't care about using SHA-1 then you probably don't care about fips=1
-> to start with either.
-> 
-> If you really want to continue using SHA-1 in FIPS mode with 6.17 then I
-> would suggest reverting my patch downstream as the straightforward fix.
-> 
-> > > Now I do, in the context you write, I see inet6_init()'s fail path
-> > > is broken. The two backtraces show:
-> > > [    2.381371][    T1]  ip6_mr_cleanup+0x43/0x50
-> > > [    2.382321][    T1]  inet6_init+0x365/0x3d0
-> > > 
-> > > and
-> > > 
-> > > [    2.420857][    T1]  proto_unregister+0x93/0x100
-> > > [    2.420857][    T1]  inet6_init+0x3a2/0x3d0
-> > > 
-> > > I am looking what exactly, but this is rather for netdev@
-> > 
-> > More functions from the fail path are not ready to unroll and resurrect
-> > from the failure.
-> > 
-> > Anyway, cherry-picking this -next commit onto 6.17 works as well (the
-> > code uses now crypto_lib's sha1, not crypto's):
-> > commit 095928e7d80186c524013a5b5d54889fa2ec1eaa
-> > Author: Eric Biggers <ebiggers@kernel.org>
-> > Date:   Sat Aug 23 21:36:43 2025 -0400
-> > 
-> >      ipv6: sr: Use HMAC-SHA1 and HMAC-SHA256 library functions
-> > 
-> > 
-> > I don't know what to do next -- should it be put into 6.17 stable later
-> > and we are done?
-> 
-> I'd like to raise a general question about FIPS compliance here,
-> especially to Eric and the crypto folks: If SHA-1/SHA-256/HMAC is being
-> made available outside of the crypto API and code around the kernel is
-> making direct use of it
+> Could you provide an example of a security issue with AF_ALG ?
+> Not challenging the statement. Mainly curious what is going
+> to understand it better and pass the message.
 
-lib/ has had SHA-1 support since 2005.  The recent changes just made the
-SHA-1 API more comprehensive and more widely used in the kernel.
+It's a gold mine for attackers looking to exploit the kernel.  Here are
+some examples from the CVE list when searching for "AF_ALG":
 
-> then this seems to completely subvert the
-> purpose of CONFIG_CRYPTO_FIPS/fips=1 since it essentially makes the
-> kernel non-compliant even when booting with fips=1.
-> 
-> Is this expected? Should it be documented?
+https://nvd.nist.gov/vuln/detail/CVE-2025-38079
 
-If calling code would like to choose not to use or allow a particular
-crypto algorithm when fips_enabled=1, it's free to do so.  
+    In the Linux kernel, the following vulnerability has been resolved:
+    crypto: algif_hash - fix double free in hash_accept If accept(2) is
+    called on socket type algif_hash with MSG_MORE flag set and
+    crypto_ahash_import fails, sk2 is freed. However, it is also freed
+    in af_alg_release, leading to slab-use-after-free error.
 
-That's far more flexible than the crypto/ approach, which has
-historically been problematic since it breaks things unnecessarily.  The
-caller can actually do something that makes sense for it, including:
+https://nvd.nist.gov/vuln/detail/CVE-2025-37808
 
-- Deciding whether FIPS requirements even apply to it in the first
-  place.  (Considering that it may or may not be implementing something
-  that would be considered a "security function" by FIPS.)
+    In the Linux kernel, the following vulnerability has been resolved:
+    crypto: null - Use spin lock instead of mutex As the null algorithm
+    may be freed in softirq context through af_alg, use spin locks
+    instead of mutexes to protect the default null algorithm. 
 
-- Targeting the disablement to the correct, narrow area.  (Not something
-  overly-broad like the entire IPv6 stack, or entire TPM support.)
+https://nvd.nist.gov/vuln/detail/CVE-2024-26824
 
-So: if the people doing FIPS certifications of the whole kernel make a
-determination that fips_enabled=1 kernels must not support IPv6 Segment
-Routing with HMAC-SHA1 authentication, then they're welcome to send a
-patch that makes seg6_genl_sethmac() reject SEG6_HMAC_ALGO_SHA1 if
-fips_enabled.  And that would actually correctly disable the SHA-1
-support only, rather than disabling the entire IPv6 stack...
+    In the Linux kernel, the following vulnerability has been resolved:
+    crypto: algif_hash - Remove bogus SGL free on zero-length error path
+    When a zero-length message is hashed by algif_hash, and an error is
+    triggered, it tries to free an SG list that was never allocated in
+    the first place. Fix this by not freeing the SG list on the
+    zero-length error path.
 
-Still, for many years lib/ has had APIs for SHA-1 and various
-non-FIPS-approved crypto algorithms.  These are used even when
-fips_enabled=1.  So, if this was actually important, one would think
-these cases would have addressed already.  This is one of the reasons
-why I haven't been worrying about adding these checks myself.
+https://nvd.nist.gov/vuln/detail/CVE-2022-48781
 
-It's really up to someone who cares (if anyone does) to send patches.
+    In the Linux kernel, the following vulnerability has been resolved:
+    crypto: af_alg - get rid of alg_memory_allocated
+    alg_memory_allocated does not seem to be really used. alg_proto does
+    have a .memory_allocated field, but no corresponding .sysctl_mem.
+    This means sk_has_account() returns true, but all
+    sk_prot_mem_limits() users will trigger a NULL dereference
 
-> FIPS also has a bunch of requirements around algorithm testing, for
-> example that every algorithm shall pass tests before it can be used.
-> lib/crypto/ has kunit tests, but there is no interaction with
-> CONFIG_CRYPTO_FIPS or fips=1 as far as I can tell, and no enforcement
-> mechanism. This seems like a bad thing for all the distros that are
-> currently certifying their kernels for FIPS.
+https://nvd.nist.gov/vuln/detail/CVE-2019-8912
 
-As I've said in another thread
-(https://lore.kernel.org/linux-crypto/20250917184856.GA2560@quark/,
-https://lore.kernel.org/linux-crypto/20250918155327.GA1422@quark/),
-small patches that add FIPS pre-operational self-tests would generally
-be fine, if they are shown to actually be needed and are narrowly scoped
-to what is actually needed.  These would be different from and much
-simpler than the KUnit tests, which are the real tests.
+    n the Linux kernel through 4.20.11, af_alg_release() in
+    crypto/af_alg.c neglects to set a NULL value for a certain structure
+    member, which leads to a use-after-free in sockfs_setattr.
 
-But again, it's up to someone who cares to send patches.  And again,
-lib/ has had SHA-1 since 2005, so this isn't actually new.
+https://nvd.nist.gov/vuln/detail/CVE-2018-14619
+
+    A flaw was found in the crypto subsystem of the Linux kernel before
+    version kernel-4.15-rc4. The "null skcipher" was being dropped when
+    each af_alg_ctx was freed instead of when the aead_tfm was freed.
+    This can cause the null skcipher to be freed while it is still in
+    use leading to a local user being able to crash the system or
+    possibly escalate privileges. 
+
+https://nvd.nist.gov/vuln/detail/CVE-2017-18075
+
+    crypto/pcrypt.c in the Linux kernel before 4.14.13 mishandles
+    freeing instances, allowing a local user able to access the
+    AF_ALG-based AEAD interface (CONFIG_CRYPTO_USER_API_AEAD) and pcrypt
+    (CONFIG_CRYPTO_PCRYPT) to cause a denial of service (kfree of an
+    incorrect pointer) or possibly have unspecified other impact by
+    executing a crafted sequence of system calls. 
+
+https://nvd.nist.gov/vuln/detail/CVE-2017-17806
+
+    The HMAC implementation (crypto/hmac.c) in the Linux kernel before
+    4.14.8 does not validate that the underlying cryptographic hash
+    algorithm is unkeyed, allowing a local attacker able to use the
+    AF_ALG-based hash interface (CONFIG_CRYPTO_USER_API_HASH) and the
+    SHA-3 hash algorithm (CONFIG_CRYPTO_SHA3) to cause a kernel stack
+    buffer overflow by executing a crafted sequence of system calls that
+    encounter a missing SHA-3 initialization.
+
+https://nvd.nist.gov/vuln/detail/CVE-2017-17805
+
+    The Salsa20 encryption algorithm in the Linux kernel before 4.14.8
+    does not correctly handle zero-length inputs, allowing a local
+    attacker able to use the AF_ALG-based skcipher interface
+    (CONFIG_CRYPTO_USER_API_SKCIPHER) to cause a denial of service
+    (uninitialized-memory free and kernel crash) or have unspecified
+    other impact by executing a crafted sequence of system calls that
+    use the blkcipher_walk API. Both the generic implementation
+    (crypto/salsa20_generic.c) and x86 implementation
+    (arch/x86/crypto/salsa20_glue.c) of Salsa20 were vulnerable. 
+
+https://nvd.nist.gov/vuln/detail/CVE-2016-10147
+
+    crypto/mcryptd.c in the Linux kernel before 4.8.15 allows local
+    users to cause a denial of service (NULL pointer dereference and
+    system crash) by using an AF_ALG socket with an incompatible
+    algorithm, as demonstrated by mcryptd(md5).
+
+https://nvd.nist.gov/vuln/detail/CVE-2015-8970
+
+    crypto/algif_skcipher.c in the Linux kernel before 4.4.2 does not
+    verify that a setkey operation has been performed on an AF_ALG
+    socket before an accept system call is processed, which allows local
+    users to cause a denial of service (NULL pointer dereference and
+    system crash) via a crafted application that does not supply a key,
+    related to the lrw_crypt function in crypto/lrw.c.
+
+https://nvd.nist.gov/vuln/detail/CVE-2015-3331
+
+    The __driver_rfc4106_decrypt function in
+    arch/x86/crypto/aesni-intel_glue.c in the Linux kernel before 3.19.3
+    does not properly determine the memory locations used for encrypted
+    data, which allows context-dependent attackers to cause a denial of
+    service (buffer overflow and system crash) or possibly execute
+    arbitrary code by triggering a crypto API call, as demonstrated by
+    use of a libkcapi test program with an AF_ALG(aead) socket.
+
+https://nvd.nist.gov/vuln/detail/CVE-2014-9644
+
+    The Crypto API in the Linux kernel before 3.18.5 allows local users
+    to load arbitrary kernel modules via a bind system call for an
+    AF_ALG socket with a parenthesized module template expression in the
+    salg_name field, as demonstrated by the vfat(aes) expression, a
+    different vulnerability than CVE-2013-7421.
+
+https://nvd.nist.gov/vuln/detail/CVE-2013-7421
+
+    The Crypto API in the Linux kernel before 3.18.5 allows local users
+    to load arbitrary kernel modules via a bind system call for an
+    AF_ALG socket with a module name in the salg_name field, a different
+    vulnerability than CVE-2014-9644.
+
+https://nvd.nist.gov/vuln/detail/CVE-2011-4081
+
+    crypto/ghash-generic.c in the Linux kernel before 3.1 allows local
+    users to cause a denial of service (NULL pointer dereference and
+    OOPS) or possibly have unspecified other impact by triggering a
+    failed or missing ghash_setkey function call, followed by a (1)
+    ghash_update function call or (2) ghash_final function call, as
+    demonstrated by a write operation on an AF_ALG socket.
 
 - Eric
