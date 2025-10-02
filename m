@@ -1,112 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281213594A;
-	Wed,  1 Oct 2025 23:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97724280017;
+	Thu,  2 Oct 2025 02:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759361590; cv=none; b=tkAEegDCMto6RfyIYxtCpeIgoCRkGnay2h7twQ+ZcmD48/I4BlOpSXwB2Z63Uqy+Y+CqGnBYAgv5MWQAKdDJcEMAb7W8ba0Ytkczp03HSNdULQG098lOWmtXVoTLRkOwxElVMOILrMrbkkXYG8YMIGaDk/3nQaKLEo0nn5gVhf0=
+	t=1759372445; cv=none; b=Sx/XfWUn3p94aSkoZo2hP+aHtas1EWUE8AZcMCwVsyWX59V86cL+iIViGTwjuXpt6sXWnbeJJnBeOCI2xS3n2NJEpv1OIsUjAmUXbWEd9h5dF1OBzubrh8Usc/GPpoBvoGEOHw8qgUUmhosxH4tbIPDxzxTbjs1T5E+iXFZWVQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759361590; c=relaxed/simple;
-	bh=nxjPZTH2cboLxbGeiqKY+KyNbeP3fDF19+MMfWultYc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JkmtjCT90EPvVu20QjeS1BbVEQQlFF6X/xaIFY5Wd3V5fxOXcUCrzt5f5PYthO9d+lq78jwAGUVHx2SQifESI8bAtktn49Sa7GSREQShniXftvgsHAlzkNRsADxWZwZkbuJUt2ZDwOnmQBWaSUW17NxGZEH8L6ZkZi16hrItmFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rT9TYikp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759372445; c=relaxed/simple;
+	bh=rYlyz2EO1lm/dDN/Uwd0y3EdKskV/DbFPcfgcms6Wjk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a9m8f+oAXjXMVJjX0MFcXkvMLOovYKDztOpm6mjgzMxWLxTbXrWyOthhia6MFEFm6HAl+cvCnnjesrRbqIE49UBUhem1CRO26C5Rw8aWjzSF1ryxtTM7nS7zDHMGCiUvBk2fNYzojgcfSGFNRaTzGx15A8BcWnAUSfsHx/1mZLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TT/x4VJD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rT9TYikp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CC82C4CEF1;
-	Wed,  1 Oct 2025 23:33:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TT/x4VJD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2AC1C4CEF1;
+	Thu,  2 Oct 2025 02:34:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759361586;
-	bh=nxjPZTH2cboLxbGeiqKY+KyNbeP3fDF19+MMfWultYc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rT9TYikpnEFDxMjYQQWZZR4Ir7wV22Zs3w1t2MoF5lCYuLy0mDTXYoILShTNUw29l
-	 PcHuvYLkLYMsPhNIk+e0JnttkxbVrIZGQ3LdD1uWusS0T/GoBS0tf14P17U6mlVtSp
-	 8I/LP2CmDq9VamgT9bWizCFm8SjA0BO9OFvmwDg+1mYgO97iOrsWtjCFhnfohycu8i
-	 hgGj9jrwi2gTjMJzIhPFtPacaH23qhoglsaWQ+gx8tW1CP727a0almdHSjbkJKgSVE
-	 Y84DV0bR0qpFjrdUvhyhMvf8UrVhR0EEakpqUs+QiQo+RaKtcC/HFayf9tks4B0SNG
-	 /BC1RlTkDKawA==
-Date: Wed, 1 Oct 2025 16:33:04 -0700
+	s=k20201202; t=1759372445;
+	bh=rYlyz2EO1lm/dDN/Uwd0y3EdKskV/DbFPcfgcms6Wjk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TT/x4VJDn3JJbvvP6GWigs5N45VRFYXgmIWsk/gKhVHMagV9T9bo66MtqYrDOc1Ja
+	 bUQ1dFKeRF7S3dLfrBHM23t+dZS5jRzO8vDbXyOMuVEEhK0eu6Wj3cYHiepjZ/T/qd
+	 1Z8g8sTFSyxwDF75rrAjX+8NYFZMU0XuunTNYn3AigReJzNh5owj6OGS/Wa0DRzmRh
+	 orloUGgY+qfxWmU5T9vAp6Sm0MZK4YrYL9ThExX7jew92ow7AA0RaAITflb6qXWt2T
+	 fp8ldfQ+ZU+em1ezIZkQysI3h9Ec8HZnVOMt6rfKKHmEA3qKejJmxnVA3fmqRsCou4
+	 YDE11rNS1lvfA==
 From: Eric Biggers <ebiggers@kernel.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Network Development <netdev@vger.kernel.org>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	bpf <bpf@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1
- code instead of AF_ALG
-Message-ID: <20251001233304.GB2760@quark>
-References: <20250929194648.145585-1-ebiggers@kernel.org>
- <CAADnVQKKQEjZjz21e_639XkttoT4NvXYxUb8oTQ4X7hZKYLduQ@mail.gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	x86@kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 0/8] VAES+AVX2 optimized implementation of AES-GCM
+Date: Wed,  1 Oct 2025 19:31:09 -0700
+Message-ID: <20251002023117.37504-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQKKQEjZjz21e_639XkttoT4NvXYxUb8oTQ4X7hZKYLduQ@mail.gmail.com>
 
-On Wed, Oct 01, 2025 at 03:59:31PM -0700, Alexei Starovoitov wrote:
-> On Mon, Sep 29, 2025 at 12:48 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > Add a basic SHA-1 implementation to lib/, and make lib/bpf_legacy.c use
-> > it to calculate SHA-1 digests instead of the previous AF_ALG-based code.
-> >
-> > This eliminates the dependency on AF_ALG, specifically the kernel config
-> > options CONFIG_CRYPTO_USER_API_HASH and CONFIG_CRYPTO_SHA1.
-> >
-> > Over the years AF_ALG has been very problematic, and it is also not
-> > supported on all kernels.  Escalating to the kernel's privileged
-> > execution context merely to calculate software algorithms, which can be
-> > done in userspace instead, is not something that should have ever been
-> > supported.  Even on kernels that support it, the syscall overhead of
-> > AF_ALG means that it is often slower than userspace code.
-> 
-> Help me understand the crusade against AF_ALG.
-> Do you want to deprecate AF_ALG altogether or when it's used for
-> sha-s like sha1 and sha256 ?
+This patchset replaces the 256-bit vector implementation of AES-GCM for
+x86_64 with one that requires AVX2 rather than AVX512.  This greatly
+improves AES-GCM performance on CPUs that have VAES but not AVX512, for
+example by up to 74% on AMD Zen 3.  For more details, see patch 1.
 
-Altogether, when possible.  AF_ALG has been (and continues to be)
-incredibly problematic, for both security and maintainability.
+This patchset also renames the 512-bit vector implementation of AES-GCM
+for x86_64 to be named after AVX512 rather than AVX10/512, then adds
+some additional optimizations to it.
 
-> I thought the main advantage of going through the kernel is that
-> the kernel might have an optimized implementation for a specific
-> architecture, while the open coded C version is generic.
-> The cost of syscall and copies in/out is small compared
-> to actual math, especially since compilers might not be smart enough
-> to use single asm insn for rol32() C function.
+This patchset applies to next-20250929 and is targeting 6.19.  Herbert,
+I'd prefer to just apply this myself.  But let me know if you'd prefer
+to take it instead (considering that AES-GCM hasn't been librarified
+yet).  Either way, there's no hurry, since this is targeting 6.19.
 
-Not for small amounts of data, since syscalls are expensive these days.
+Eric Biggers (8):
+  crypto: x86/aes-gcm - add VAES+AVX2 optimized code
+  crypto: x86/aes-gcm - remove VAES+AVX10/256 optimized code
+  crypto: x86/aes-gcm - rename avx10 and avx10_512 to avx512
+  crypto: x86/aes-gcm - clean up AVX512 code to assume 512-bit vectors
+  crypto: x86/aes-gcm - reorder AVX512 precompute and aad_update
+    functions
+  crypto: x86/aes-gcm - revise some comments in AVX512 code
+  crypto: x86/aes-gcm - optimize AVX512 precomputation of H^2 from H^1
+  crypto: x86/aes-gcm - optimize long AAD processing with AVX512
 
-(Aren't BPF programs usually fairly small?)
+ arch/x86/crypto/Makefile                      |    5 +-
+ arch/x86/crypto/aes-gcm-aesni-x86_64.S        |   12 +-
+ arch/x86/crypto/aes-gcm-vaes-avx2.S           | 1150 +++++++++++++++++
+ ...m-avx10-x86_64.S => aes-gcm-vaes-avx512.S} |  722 +++++------
+ arch/x86/crypto/aesni-intel_glue.c            |  264 ++--
+ 5 files changed, 1667 insertions(+), 486 deletions(-)
+ create mode 100644 arch/x86/crypto/aes-gcm-vaes-avx2.S
+ rename arch/x86/crypto/{aes-gcm-avx10-x86_64.S => aes-gcm-vaes-avx512.S} (69%)
 
-BTW, both gcc and clang reliably lower rol32() to a single instruction.
+base-commit: 3b9b1f8df454caa453c7fb07689064edb2eda90a
+-- 
+2.51.0
 
-> sha1/256 are simple enough in plain C, but other crypto/hash
-> could be complex and the kernel may have HW acceleration for them.
-> CONFIG_CRYPTO_USER_API_HASH has been there forever and plenty
-> of projects have code to use that. Like qemu, stress-ng, ruby.
-> python and rust have standard binding for af_alg too.
-> If the kernel has optimized and/or hw accelerated crypto, I see an appeal
-> to alway use AF_ALG when it's available.
-
-Well, userspace programs that want accelerated crypto routines without
-incorporating them themselves should just use a userspace library that
-has them.  It's not hard.
-
-But iproute2 should be fine with just the generic C code.
-
-As for why AF_ALG support keeps showing up in different programs, it's
-mainly just a misunderstanding.  But I think you're also overestimating
-how often it's used.  Your 5 examples were 4 bindings (not users), and 1
-user where it's disabled by default.
-
-There are Linux systems where it's only iproute2 that's blocking
-CONFIG_CRYPTO_USER_API_HASH from being disabled.  This patch is really
-valuable on such systems.
-
-- Eric
