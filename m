@@ -1,45 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE38C2FF170;
-	Thu,  2 Oct 2025 09:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4478E30505A;
+	Thu,  2 Oct 2025 09:49:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759398346; cv=none; b=SmwrH1Qdvmm0ASkNm7QYvHCMxPArOYnbdZ3u2ADURevtA0ClzlPmgt6fGL1TTnthuW8jecYjZQwute1xJT3w9smM6rYFA9hl4D4eOtiz63TLbn6KxW+Pabvy9wDkk2E4SE77jsr0vOcD3wnurWxe8Coi7W4NVWgxFa4ubw9t03g=
+	t=1759398593; cv=none; b=BFOouZYeOwmnrkR/JFE1bmvfXhBgKDz9hnGX+6PtVUZz3bTJEaBMbB7h1lmUnvLFAK8jNd335YEVSajeHXokogcGvrImz9e9qtVeMB80cX0m/DGc+B0NxwmutfF3q7lvTmxdO5Ezhmxv+CUf2QUGWaLM9+iUHWHKEQeAbV1bKY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759398346; c=relaxed/simple;
-	bh=7jUmaaufXtarhLrR+/Hd8NlSQdOWErxotzH6yX85L0k=;
+	s=arc-20240116; t=1759398593; c=relaxed/simple;
+	bh=To+yaYHmSu4iZS7XnhTFFY3y09t7YDgDX6wBnMBqsPg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gK8YWR507PPOvKqkdkkZFRFKyzE/y+GkZe8cR05/LrwpHu3tyoF02XDM6aDFx+ZupVBXuw0SowO40vaioxzGVCiGQzQyHGFbzaUUwGSSfihiYvaqoRwqxBQWMg823EeiXIqctTxNKVGgVrtY1tSVZxcANVmX76YyOOSNcfpRDiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=E0GS3y7W; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=YTGr3Xlgq8vGXcCUkkB0obLElHpAtZ6eqJXKhNjDauFikMypwMRj1fs2CEqRT4qkAWzZDkudMF7NTp7i4+zszZ9/LuToNyk20DsRElejBOhBxHncY9jaREcBPquR0PFmfQayPSdxo3CVat2ezAB480MIEKXGArElihH/yUWBeeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=BvflF1Xy; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="E0GS3y7W"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="BvflF1Xy"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:MIME-Version:References:
 	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
-	reply-to; bh=4jtXLdMURoMb2915FzMhIunTyPKQ2o/QHygtZYlc+E0=; b=E0GS3y7WLzrYLMWQ
-	IkXyEbUPu+PQDuXnClfNFUamC2/zNiHjIC4IPKLTtTIu9/+JZKUJeIEaQQSsCVUPSHVqs4rbeNYJ0
-	GlJE2KNgHhARM1JM4ncfOvUHurCZ34B18aNecdfkg8waUFxtdK/oXMOOcEkJkkb9fWAUc1WLx4Qly
-	ZJSLjgtLWWkaJnnH8ZUWlerDU7MLyEZWOq0wFRCbN5i3gHYGL+EuOipMECAazKGqttotD/gBh1VOo
-	AMwDZXIFT0j/rty3NTc4fNFDvo1FeffsWWdvkYx9D63hZlTt5X7/kzzPLzl2YG6/3UmEMcKvN8XAm
-	M0HwLOaiRCSyTIchhQ==;
+	reply-to; bh=3W0P4bDWNFT8Gbxvk4ZY9whuakawwnE85T7bVAcIOJA=; b=BvflF1XyYU+xeQIC
+	8a6CJyBc0k6UY6olP2p5HSF/Zq4dplOUEfYFzx6h7XSX68qpjxik+4SEXKleVQzn1C2TxCBio1t1r
+	vYO1OUfZUeDz/RQi+RD8bgacyl6mpTWBqd30fZHt5G2jCsHoy3N2vY5PFZ8yM8ROeTzqwrUvkY0TJ
+	76n1jyqeP+bl/0jnhZHbPp0Drfvn0Jk54wAnEI+yB4hqIUMk/mGmaYO0FkFNd9unKNiieV30FGV1v
+	pbNAIaDF+BIS18rbmClSAVhwodBAuag2aDiDtoWDSWA91JzdeUMYNmRYUQErYRci+5jv8NV8hxV/K
+	wJHJXAiDX7ph8NDAkw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v4FsZ-009zIE-1R;
-	Thu, 02 Oct 2025 17:45:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Oct 2025 17:45:39 +0800
-Date: Thu, 2 Oct 2025 17:45:39 +0800
+	id 1v4FwV-009zLy-22;
+	Thu, 02 Oct 2025 17:49:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Oct 2025 17:49:43 +0800
+Date: Thu, 2 Oct 2025 17:49:43 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Dave Sun <sunyiqixm@gmail.com>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Elena Petrova <lenaptr@google.com>,
-	Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
-	Eric Biggers <ebiggers@google.com>
-Subject: [PATCH] crypto: rng - Ensure set_ent is always present
-Message-ID: <aN5JwxZFeAnZXA8n@gondor.apana.org.au>
-References: <20250930032824.690214-1-sunyiqixm@gmail.com>
+To: T Pratham <t-pratham@ti.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Kamlesh Gurudasani <kamlesh@ti.com>,
+	Manorit Chawdhry <m-chawdhry@ti.com>,
+	Shiva Tripathi <s-tripathi1@ti.com>,
+	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
+	Vishal Mahaveer <vishalm@ti.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: ti - Add CRYPTO_ALG_ASYNC flag to DTHEv2 AES
+ algos
+Message-ID: <aN5Kt3iKmjqYgmPg@gondor.apana.org.au>
+References: <20250930102423.2895282-1-t-pratham@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,60 +52,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250930032824.690214-1-sunyiqixm@gmail.com>
+In-Reply-To: <20250930102423.2895282-1-t-pratham@ti.com>
 
-On Tue, Sep 30, 2025 at 11:28:24AM +0800, Dave Sun wrote:
-> When CONFIG_CRYPTO_USER_API_RNG_CAVP is enable,
-> algif_type_rng->setentropy = rng_setentropy.
-> If we setsockopt on a af_alg socket binding a rng
-> algorithm with ALG_SET_DRBG_ENTROPY opt, kernel will
-> run to ->set_ent in rng_setentropy.
+On Tue, Sep 30, 2025 at 03:40:26PM +0530, T Pratham wrote:
+> Add CRYPTO_ALG_ASYNC flag to DTHEv2 AES-ECB and AES-CBC algorithms so as
+> to properly indicate driver capabilities.
 > 
-> Since struct rng_alg like jent_alg dose not set set_ent
-> which default value is 0, null-ptr-dereference will happen.
-> 
-> Check ->set_ent before call it.
-> 
-> Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
+> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: T Pratham <t-pratham@ti.com>
 > ---
->  crypto/algif_rng.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  drivers/crypto/ti/dthev2-aes.c | 2 ++
+>  1 file changed, 2 insertions(+)
 
-Thanks for the report.  I'd prefer to make set_ent always present:
-
----8<---
-Ensure that set_ent is always set since only drbg provides it.
-
-Fixes: 77ebdabe8de7 ("crypto: af_alg - add extra parameters for DRBG interface")
-Reported-by: Yiqi Sun <sunyiqixm@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/rng.c b/crypto/rng.c
-index b8ae6ebc091d..ee1768c5a400 100644
---- a/crypto/rng.c
-+++ b/crypto/rng.c
-@@ -168,6 +168,11 @@ int crypto_del_default_rng(void)
- EXPORT_SYMBOL_GPL(crypto_del_default_rng);
- #endif
- 
-+static void rng_default_set_ent(struct crypto_rng *tfm, const u8 *data,
-+				unsigned int len)
-+{
-+}
-+
- int crypto_register_rng(struct rng_alg *alg)
- {
- 	struct crypto_alg *base = &alg->base;
-@@ -179,6 +184,9 @@ int crypto_register_rng(struct rng_alg *alg)
- 	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
- 	base->cra_flags |= CRYPTO_ALG_TYPE_RNG;
- 
-+	if (!alg->set_ent)
-+		alg->set_ent = rng_default_set_ent;
-+
- 	return crypto_register_alg(base);
- }
- EXPORT_SYMBOL_GPL(crypto_register_rng);
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
