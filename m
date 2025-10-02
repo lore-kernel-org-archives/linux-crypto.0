@@ -1,285 +1,254 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D712BE058;
-	Thu,  2 Oct 2025 02:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B686F28CF52;
+	Thu,  2 Oct 2025 08:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759372448; cv=none; b=WmcwOyn2ZXP5MyMpnA1/UvYCz8bKgajiSoRPo+6UlPHF4YqcasxTFMaFjQo+xVY8nnkoK+1njhmcVIbx6CL1oTuquLjHaiCYtYSD1SWo7LByK9uUgmvmP9WBKnV1lTVqXPsMSCvFc9E+y7OyaBkgkcM1HrfLXchSF+wGlBZvPiA=
+	t=1759392645; cv=none; b=bir8MY1/MAxvEmXbdX17R/92jWVIpiyMxHP5khG2nfPoURZ04hQTgYaLFssJMeQKw7fH0Q1edP44z1KtZ9dx+MDePAx+DMvca1vTf9SelZa2v/jrg0IkR2llClZ14BDIaHikuYL9QiDJbC1j35XjOZ2ttJCMAifDbT8UMQymF7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759372448; c=relaxed/simple;
-	bh=7fZrYKmSuv6IY2eFxUYmZ5k9sEMnqtAn/61vVHPtZ1o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QiaviQ8cQwVy3O0VzGZmSgW4iE7vnZ/QCe+8AJ8EH4MVkYVTgk8YN8v+lUDmzlfZGR3tBRp1ze8r9Do0LsSF/cuM6r9tWGJ5EqBK/x/lAV7sKMm2ENhmz6Iyd+qH8B8Zzv+qxUMMk3gaGprmRDgi/QeYscL8Mgf9vrPN9jMvv8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X5Pmg2OZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759392645; c=relaxed/simple;
+	bh=+sOoGBJhQxY4YX6a9+4TOzchiFsRWAb250NSCUDSCPQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=JxLY5DSbulfErvr1ZZCEYb2qZcaBKCKfpBwVl+EUkq3+Qc0ZUn8oMh5BPgnF5LgDGbcBGhzy78PRRX7VmxozptcP0ZXncKV+Ngf10q/neEQwBdxmDm+4uMvB33h45w6b2bf9GLmsyt9ef1WxkkByATy71IDlBAykcVI+iCXU2Go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kq3PE81f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X5Pmg2OZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94E08C4CEFA;
-	Thu,  2 Oct 2025 02:34:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kq3PE81f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3392C4CEF4;
+	Thu,  2 Oct 2025 08:10:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759372447;
-	bh=7fZrYKmSuv6IY2eFxUYmZ5k9sEMnqtAn/61vVHPtZ1o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=X5Pmg2OZ0q8AfjeSoxHS4IpnTuONnoTWDi3XxLp+pUYTS3e0ysa4XPs+WkesFJbxf
-	 SQ2EN2X7zyGm9wfv9IxW5xymCo00cHen+v1C9Mj5kCa5e42yi6i9XevX6iDoAtlTGb
-	 5I/v5FeMbvLcVSfntdkx3gfCAhPVYvxXSMdNwdh+w4l4MMxw4P1I596OuAtwTAvxjL
-	 44+FWdB4KLME1HKQ0x7kQUeG0oUEaGB0x7JdMX6chAPJLOU68ZdOzxlTIcf/i7a43j
-	 4pp51zrq/1vkNf8cZRTZG5toL1yICv2e/nLow48MQ7ENfeXOFI290Q8WqnhIkFrgz3
-	 P6k5BBFy70kaw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 8/8] crypto: x86/aes-gcm - optimize long AAD processing with AVX512
-Date: Wed,  1 Oct 2025 19:31:17 -0700
-Message-ID: <20251002023117.37504-9-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251002023117.37504-1-ebiggers@kernel.org>
-References: <20251002023117.37504-1-ebiggers@kernel.org>
+	s=k20201202; t=1759392645;
+	bh=+sOoGBJhQxY4YX6a9+4TOzchiFsRWAb250NSCUDSCPQ=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=kq3PE81fcc4P9IGWMWGJAw6x/5NgaTzA04AvXlXtjWkhkf1jLwr2gjTLksFpfl+wg
+	 xP2CRJgym0weYMEXvg7XGgBVycBq9aC0NPhOhLw5bbz1AA8OmTp431w6R51OmmTvmO
+	 pbUgeQ1LvTqhqTipGpdadQdhgjVHNQBS8Lud66+JUD2XmALf7RP9INxkK9o0EkeS2a
+	 G7hlyQmbTlgcAgy6gTT7vPFP576ztOmCgGHnHrrsOSVB4oFQiQot/YQaffoKs2k3Je
+	 YuNnTo3s8p2R+MKShBAk3nOEw4ngMK1aIgg8bPd6hrko2FsX7smuJRcQPF89hJye2k
+	 5Li+RIcY1cAfA==
+Message-ID: <05b7ef65-37bb-4391-9ec9-c382d51bae4d@kernel.org>
+Date: Thu, 2 Oct 2025 10:10:41 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] Crypto Update for 6.17
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ Vegard Nossum <vegard.nossum@oracle.com>
+References: <aIirh_7k4SWzE-bF@gondor.apana.org.au>
+Content-Language: en-US
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <aIirh_7k4SWzE-bF@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Improve the performance of aes_gcm_aad_update_vaes_avx512() on large AAD
-(additional authenticated data) lengths by 4-8 times by making it use up
-to 512-bit vectors and a 4-vector-wide loop.  Previously, it used only
-256-bit vectors and a 1-vector-wide loop.
+On 29. 07. 25, 13:07, Herbert Xu wrote:
+> Vegard Nossum (1):
+>        crypto: testmgr - desupport SHA-1 for FIPS 140
 
-Originally, I assumed that the case of large AADLEN was unimportant.
-When reviewing the users of BoringSSL's AES-GCM code, I found that some
-callers use BoringSSL's AES-GCM API to just compute GMAC, using large
-amounts of AAD with zero bytes en/decrypted.  Thus, I included a similar
-optimization in the BoringSSL port of this code.  I believe it's wise to
-include this optimization in the kernel port too for similar reasons,
-and to align it more closely with the BoringSSL port.
+Booting 6.17 with fips=1 crashes with this commit -- see below.
 
-Another reason this function originally used 256-bit vectors was so that
-separate *_avx10_256 and *_avx10_512 versions of it wouldn't be needed.
-However, that's no longer applicable.
+The crash is different being on 6.17 (below) and on the commit -- 
+9d50a25eeb05c45fef46120f4527885a14c84fb2.
 
-To avoid a slight performance regression in the common case of AADLEN <=
-16, also add a fast path for that case which uses 128-bit vectors.  In
-fact, this case actually gets slightly faster too, since it saves a
-couple instructions over the original 256-bit code.
+6.17 minus that one makes it work again.
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- arch/x86/crypto/aes-gcm-vaes-avx512.S | 146 +++++++++++++++++---------
- 1 file changed, 99 insertions(+), 47 deletions(-)
+Any ideas?
 
-diff --git a/arch/x86/crypto/aes-gcm-vaes-avx512.S b/arch/x86/crypto/aes-gcm-vaes-avx512.S
-index 5c8301d275c66..06b71314d65cc 100644
---- a/arch/x86/crypto/aes-gcm-vaes-avx512.S
-+++ b/arch/x86/crypto/aes-gcm-vaes-avx512.S
-@@ -469,88 +469,142 @@ SYM_FUNC_END(aes_gcm_precompute_vaes_avx512)
- 	_horizontal_xor	GHASH_ACC, GHASH_ACC_XMM, GHASH_ACC_XMM, \
- 			GHASHDATA0_XMM, GHASHDATA1_XMM, GHASHDATA2_XMM
- .endif
- .endm
- 
-+// Update GHASH with four vectors of data blocks.  See _ghash_step_4x for full
-+// explanation.
-+.macro	_ghash_4x
-+.irp i, 0,1,2,3,4,5,6,7,8,9
-+	_ghash_step_4x	\i
-+.endr
-+.endm
-+
- // void aes_gcm_aad_update_vaes_avx512(const struct aes_gcm_key_vaes_avx512 *key,
- //				       u8 ghash_acc[16],
- //				       const u8 *aad, int aadlen);
- //
- // This function processes the AAD (Additional Authenticated Data) in GCM.
- // Using the key |key|, it updates the GHASH accumulator |ghash_acc| with the
- // data given by |aad| and |aadlen|.  On the first call, |ghash_acc| must be all
- // zeroes.  |aadlen| must be a multiple of 16, except on the last call where it
- // can be any length.  The caller must do any buffering needed to ensure this.
- //
--// AES-GCM is almost always used with small amounts of AAD, less than 32 bytes.
--// Therefore, for AAD processing we currently only provide this implementation
--// which uses 256-bit vectors (ymm registers) and only has a 1x-wide loop.  This
--// keeps the code size down, and it enables some micro-optimizations, e.g. using
--// VEX-coded instructions instead of EVEX-coded to save some instruction bytes.
--// To optimize for large amounts of AAD, we could implement a 4x-wide loop and
--// provide a version using 512-bit vectors, but that doesn't seem to be useful.
-+// This handles large amounts of AAD efficiently, while also keeping overhead
-+// low for small amounts which is the common case.  TLS and IPsec use less than
-+// one block of AAD, but (uncommonly) other use cases may use much more.
- SYM_FUNC_START(aes_gcm_aad_update_vaes_avx512)
- 
- 	// Function arguments
- 	.set	KEY,		%rdi
- 	.set	GHASH_ACC_PTR,	%rsi
- 	.set	AAD,		%rdx
- 	.set	AADLEN,		%ecx
- 	.set	AADLEN64,	%rcx	// Zero-extend AADLEN before using!
- 
- 	// Additional local variables.
--	// %rax, %ymm0-%ymm3, and %k1 are used as temporary registers.
--	.set	BSWAP_MASK,	%ymm4
--	.set	GFPOLY,		%ymm5
--	.set	GHASH_ACC,	%ymm6
--	.set	GHASH_ACC_XMM,	%xmm6
--	.set	H_POW1,		%ymm7
--
--	// Load some constants.
--	vbroadcasti128	.Lbswap_mask(%rip), BSWAP_MASK
--	vbroadcasti128	.Lgfpoly(%rip), GFPOLY
-+	// %rax and %k1 are used as temporary registers.
-+	.set	GHASHDATA0,	%zmm0
-+	.set	GHASHDATA0_XMM,	%xmm0
-+	.set	GHASHDATA1,	%zmm1
-+	.set	GHASHDATA1_XMM,	%xmm1
-+	.set	GHASHDATA2,	%zmm2
-+	.set	GHASHDATA2_XMM,	%xmm2
-+	.set	GHASHDATA3,	%zmm3
-+	.set	BSWAP_MASK,	%zmm4
-+	.set	BSWAP_MASK_XMM,	%xmm4
-+	.set	GHASH_ACC,	%zmm5
-+	.set	GHASH_ACC_XMM,	%xmm5
-+	.set	H_POW4,		%zmm6
-+	.set	H_POW3,		%zmm7
-+	.set	H_POW2,		%zmm8
-+	.set	H_POW1,		%zmm9
-+	.set	H_POW1_XMM,	%xmm9
-+	.set	GFPOLY,		%zmm10
-+	.set	GFPOLY_XMM,	%xmm10
-+	.set	GHASHTMP0,	%zmm11
-+	.set	GHASHTMP1,	%zmm12
-+	.set	GHASHTMP2,	%zmm13
- 
- 	// Load the GHASH accumulator.
- 	vmovdqu		(GHASH_ACC_PTR), GHASH_ACC_XMM
- 
--	// Update GHASH with 32 bytes of AAD at a time.
--	//
--	// Pre-subtracting 32 from AADLEN saves an instruction from the loop and
--	// also ensures that at least one write always occurs to AADLEN,
--	// zero-extending it and allowing AADLEN64 to be used later.
--	sub		$32, AADLEN
-+	// Check for the common case of AADLEN <= 16, as well as AADLEN == 0.
-+	cmp		$16, AADLEN
-+	jg		.Laad_more_than_16bytes
-+	test		AADLEN, AADLEN
-+	jz		.Laad_done
-+
-+	// Fast path: update GHASH with 1 <= AADLEN <= 16 bytes of AAD.
-+	vmovdqu		.Lbswap_mask(%rip), BSWAP_MASK_XMM
-+	vmovdqu		.Lgfpoly(%rip), GFPOLY_XMM
-+	mov		$-1, %eax
-+	bzhi		AADLEN, %eax, %eax
-+	kmovd		%eax, %k1
-+	vmovdqu8	(AAD), GHASHDATA0_XMM{%k1}{z}
-+	vmovdqu		OFFSETOFEND_H_POWERS-16(KEY), H_POW1_XMM
-+	vpshufb		BSWAP_MASK_XMM, GHASHDATA0_XMM, GHASHDATA0_XMM
-+	vpxor		GHASHDATA0_XMM, GHASH_ACC_XMM, GHASH_ACC_XMM
-+	_ghash_mul	H_POW1_XMM, GHASH_ACC_XMM, GHASH_ACC_XMM, GFPOLY_XMM, \
-+			GHASHDATA0_XMM, GHASHDATA1_XMM, GHASHDATA2_XMM
-+	jmp		.Laad_done
-+
-+.Laad_more_than_16bytes:
-+	vbroadcasti32x4	.Lbswap_mask(%rip), BSWAP_MASK
-+	vbroadcasti32x4	.Lgfpoly(%rip), GFPOLY
-+
-+	// If AADLEN >= 256, update GHASH with 256 bytes of AAD at a time.
-+	sub		$256, AADLEN
-+	jl		.Laad_loop_4x_done
-+	vmovdqu8	OFFSETOFEND_H_POWERS-4*64(KEY), H_POW4
-+	vmovdqu8	OFFSETOFEND_H_POWERS-3*64(KEY), H_POW3
-+	vmovdqu8	OFFSETOFEND_H_POWERS-2*64(KEY), H_POW2
-+	vmovdqu8	OFFSETOFEND_H_POWERS-1*64(KEY), H_POW1
-+.Laad_loop_4x:
-+	vmovdqu8	0*64(AAD), GHASHDATA0
-+	vmovdqu8	1*64(AAD), GHASHDATA1
-+	vmovdqu8	2*64(AAD), GHASHDATA2
-+	vmovdqu8	3*64(AAD), GHASHDATA3
-+	_ghash_4x
-+	add		$256, AAD
-+	sub		$256, AADLEN
-+	jge		.Laad_loop_4x
-+.Laad_loop_4x_done:
-+
-+	// If AADLEN >= 64, update GHASH with 64 bytes of AAD at a time.
-+	add		$192, AADLEN
- 	jl		.Laad_loop_1x_done
--	vmovdqu8	OFFSETOFEND_H_POWERS-32(KEY), H_POW1	// [H^2, H^1]
-+	vmovdqu8	OFFSETOFEND_H_POWERS-1*64(KEY), H_POW1
- .Laad_loop_1x:
--	vmovdqu		(AAD), %ymm0
--	vpshufb		BSWAP_MASK, %ymm0, %ymm0
--	vpxor		%ymm0, GHASH_ACC, GHASH_ACC
-+	vmovdqu8	(AAD), GHASHDATA0
-+	vpshufb		BSWAP_MASK, GHASHDATA0, GHASHDATA0
-+	vpxord		GHASHDATA0, GHASH_ACC, GHASH_ACC
- 	_ghash_mul	H_POW1, GHASH_ACC, GHASH_ACC, GFPOLY, \
--			%ymm0, %ymm1, %ymm2
--	vextracti128	$1, GHASH_ACC, %xmm0
--	vpxor		%xmm0, GHASH_ACC_XMM, GHASH_ACC_XMM
--	add		$32, AAD
--	sub		$32, AADLEN
-+			GHASHDATA0, GHASHDATA1, GHASHDATA2
-+	_horizontal_xor GHASH_ACC, GHASH_ACC_XMM, GHASH_ACC_XMM, \
-+			GHASHDATA0_XMM, GHASHDATA1_XMM, GHASHDATA2_XMM
-+	add		$64, AAD
-+	sub		$64, AADLEN
- 	jge		.Laad_loop_1x
- .Laad_loop_1x_done:
--	add		$32, AADLEN
--	jz		.Laad_done
- 
--	// Update GHASH with the remaining 1 <= AADLEN < 32 bytes of AAD.
--	mov		$-1, %eax
--	bzhi		AADLEN, %eax, %eax
--	kmovd		%eax, %k1
--	vmovdqu8	(AAD), %ymm0{%k1}{z}
-+	// Update GHASH with the remaining 0 <= AADLEN < 64 bytes of AAD.
-+	add		$64, AADLEN
-+	jz		.Laad_done
-+	mov		$-1, %rax
-+	bzhi		AADLEN64, %rax, %rax
-+	kmovq		%rax, %k1
-+	vmovdqu8	(AAD), GHASHDATA0{%k1}{z}
- 	neg		AADLEN64
- 	and		$~15, AADLEN64  // -round_up(AADLEN, 16)
- 	vmovdqu8	OFFSETOFEND_H_POWERS(KEY,AADLEN64), H_POW1
--	vpshufb		BSWAP_MASK, %ymm0, %ymm0
--	vpxor		%ymm0, GHASH_ACC, GHASH_ACC
-+	vpshufb		BSWAP_MASK, GHASHDATA0, GHASHDATA0
-+	vpxord		GHASHDATA0, GHASH_ACC, GHASH_ACC
- 	_ghash_mul	H_POW1, GHASH_ACC, GHASH_ACC, GFPOLY, \
--			%ymm0, %ymm1, %ymm2
--	vextracti128	$1, GHASH_ACC, %xmm0
--	vpxor		%xmm0, GHASH_ACC_XMM, GHASH_ACC_XMM
-+			GHASHDATA0, GHASHDATA1, GHASHDATA2
-+	_horizontal_xor GHASH_ACC, GHASH_ACC_XMM, GHASH_ACC_XMM, \
-+			GHASHDATA0_XMM, GHASHDATA1_XMM, GHASHDATA2_XMM
- 
- .Laad_done:
- 	// Store the updated GHASH accumulator back to memory.
- 	vmovdqu		GHASH_ACC_XMM, (GHASH_ACC_PTR)
- 
-@@ -842,13 +896,11 @@ SYM_FUNC_END(aes_gcm_aad_update_vaes_avx512)
- 	jge		.Lcrypt_loop_4x\@
- 
- .if \enc
- .Lghash_last_ciphertext_4x\@:
- 	// Update GHASH with the last set of ciphertext blocks.
--.irp i, 0,1,2,3,4,5,6,7,8,9
--	_ghash_step_4x	\i
--.endr
-+	_ghash_4x
- .endif
- 
- .Lcrypt_loop_4x_done\@:
- 
- 	// Undo the extra subtraction by 256 and check whether data remains.
+> [    1.186784][    T1] IPv6: Attempt to unregister permanent protocol 6
+> [    1.188236][    T1] IPv6: Attempt to unregister permanent protocol 136
+> [    1.189648][    T1] IPv6: Attempt to unregister permanent protocol 17
+> [    2.351181][    T1] ------------[ cut here ]------------
+> [    2.352257][    T1] WARNING: CPU: 10 PID: 1 at net/ipv6/ip6mr.c:409 ip6mr_free_table+0x28/0x60
+> [    2.353536][    T1] Modules linked in:
+> [    2.354113][    T1] CPU: 10 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.17.0-46-default #1 PREEMPT(voluntary) openSUSE Tumbleweed (unreleased)  b731e69de5611aa08621e4f613e2c88e3aba29e6
+> [    2.356567][    T1] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS unknown 02/02/2022
+> [    2.357843][    T1] RIP: 0010:ip6mr_free_table+0x28/0x60
+> [    2.358654][    T1] Code: 90 90 0f 1f 44 00 00 53 48 89 fb e8 a2 11 0d 00 48 8b 43 10 8b 90 6c 01 00 00 85 d2 74 0e 48 8b 80 98 00 00 00 48 85 c0 74 02 <0f> 0b 48 8d 7b 38 e8 4d 65 33 ff 48 89 df be 0f 00 00 00 e8 80 fc
+> [    2.361528][    T1] RSP: 0018:ffffcd1bc001fce8 EFLAGS: 00010286
+> [    2.362458][    T1] RAX: ffffffff93f32e00 RBX: ffff8b6b05c9b000 RCX: ffff8b6b00898000
+> [    2.363625][    T1] RDX: 0000000000000002 RSI: 00000000e843c2fc RDI: ffff8b6b05c9b000
+> [    2.364785][    T1] RBP: ffffffff9566c2f0 R08: 0000000037609dba R09: 0000000000000075
+> [    2.365982][    T1] R10: ffffcd1bc001fd30 R11: ffff8b6b00898fd8 R12: dead000000000122
+> [    2.367157][    T1] R13: dead000000000100 R14: ffffffff9566b4c0 R15: ffffcd1bc001fdb8
+> [    2.368332][    T1] FS:  0000000000000000(0000) GS:ffff8b6daf9a8000(0000) knlGS:0000000000000000
+> [    2.369690][    T1] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    2.371077][    T1] CR2: 0000000000000000 CR3: 0000000047c54000 CR4: 0000000000750ef0
+> [    2.372611][    T1] PKRU: 55555554
+> [    2.373452][    T1] Call Trace:
+> [    2.374252][    T1]  <TASK>
+> [    2.375019][    T1]  ip6mr_rules_exit+0x80/0xe0
+> [    2.376021][    T1]  ip6mr_net_exit_batch+0x2b/0x50
+> [    2.377077][    T1]  ops_undo_list+0x10a/0x3b0
+> [    2.378090][    T1]  ? __pfx_inet6_init+0x10/0x10
+> [    2.379102][    T1]  unregister_pernet_operations+0xdd/0x170
+> [    2.380279][    T1]  unregister_pernet_subsys+0x21/0x30
+> [    2.381371][    T1]  ip6_mr_cleanup+0x43/0x50
+> [    2.382321][    T1]  inet6_init+0x365/0x3d0
+> [    2.383263][    T1]  do_one_initcall+0x58/0x390
+> [    2.384256][    T1]  kernel_init_freeable+0x2a7/0x320
+> [    2.385316][    T1]  ? __pfx_kernel_init+0x10/0x10
+> [    2.386343][    T1]  kernel_init+0x1a/0x140
+> [    2.387275][    T1]  ret_from_fork+0x28b/0x2c0
+> [    2.388242][    T1]  ? __pfx_kernel_init+0x10/0x10
+> [    2.389236][    T1]  ret_from_fork_asm+0x1a/0x30
+> [    2.390213][    T1]  </TASK>
+> [    2.390963][    T1] irq event stamp: 137165
+> [    2.392123][    T1] hardirqs last  enabled at (137177): [<ffffffff91c079ee>] __up_console_sem+0x5e/0x70
+> [    2.394179][    T1] hardirqs last disabled at (137188): [<ffffffff91c079d3>] __up_console_sem+0x43/0x70
+> [    2.395868][    T1] softirqs last  enabled at (137088): [<ffffffff91b442e8>] __irq_exit_rcu+0xd8/0x100
+> [    2.397531][    T1] softirqs last disabled at (137071): [<ffffffff91b442e8>] __irq_exit_rcu+0xd8/0x100
+> [    2.399171][    T1] ---[ end trace 0000000000000000 ]---
+> [    2.407972][    T1] NET: Unregistered PF_INET6 protocol family
+> [    2.419868][    T1] =============================================================================
+> [    2.420857][    T1] BUG RAWv6 (Tainted: G        W          ): Objects remaining on __kmem_cache_shutdown()
+> [    2.420857][    T1] -----------------------------------------------------------------------------
+> [    2.420857][    T1] 
+> [    2.420857][    T1] Object 0x00000000394ddb07 @offset=0
+> [    2.420857][    T1] Object 0x000000005b94be2d @offset=1856
+> [    2.420857][    T1] Object 0x0000000067ad0f1b @offset=3712
+> [    2.420857][    T1] Object 0x00000000c82c6c1d @offset=7424
+> [    2.420857][    T1] Object 0x000000009feb574d @offset=9280
+> [    2.420857][    T1] Object 0x00000000876e99c8 @offset=11136
+> [    2.420857][    T1] Object 0x000000000aae5823 @offset=12992
+> [    2.420857][    T1] Object 0x000000009a4d1547 @offset=14848
+> [    2.420857][    T1] Object 0x000000003343b806 @offset=16704
+> [    2.420857][    T1] Object 0x000000004cc8a8a9 @offset=18560
+> [    2.420857][    T1] Object 0x00000000125f35fd @offset=20416
+> [    2.420857][    T1] Object 0x000000007903e512 @offset=22272
+> [    2.420857][    T1] Object 0x00000000705f6e50 @offset=24128
+> [    2.420857][    T1] Object 0x00000000c222f065 @offset=25984
+> [    2.420857][    T1] Object 0x0000000020b63684 @offset=27840
+> [    2.420857][    T1] Object 0x00000000a2f1493f @offset=29696
+> [    2.420857][    T1] Slab 0x0000000070ef76ad objects=17 used=16 fp=0x000000005ed43c1e flags=0x17ffffc0000240(workingset|head|node=0|zone=2|lastcpupid=0x1fffff)
+> [    2.420857][    T1] Disabling lock debugging due to kernel taint
+> [    2.420857][    T1] ------------[ cut here ]------------
+> [    2.420857][    T1] WARNING: CPU: 2 PID: 1 at mm/slub.c:1176 __slab_err+0x19/0x20
+> [    2.420857][    T1] Modules linked in:
+> [    2.420857][    T1] CPU: 2 UID: 0 PID: 1 Comm: swapper/0 Tainted: G    B   W           6.17.0-46-default #1 PREEMPT(voluntary) openSUSE Tumbleweed (unreleased)  b731e69de5611aa08621e4f613e2c88e3aba29e6
+> [    2.420857][    T1] Tainted: [B]=BAD_PAGE, [W]=WARN
+> [    2.420857][    T1] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS unknown 02/02/2022
+> [    2.420857][    T1] RIP: 0010:__slab_err+0x19/0x20
+> [    2.420857][    T1] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 e8 76 ff ff ff be 01 00 00 00 bf 05 00 00 00 e8 87 6e 11 00 <0f> 0b e9 eb 0a ee ff 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
+> [    2.420857][    T1] RSP: 0018:ffffcd1bc001fd40 EFLAGS: 00010082
+> [    2.420857][    T1] RAX: 0000000000000000 RBX: ffff8b6b08968380 RCX: 0000000000000243
+> [    2.420857][    T1] RDX: 0000000000000005 RSI: ffffcd1bc001fbe8 RDI: 0000000000000003
+> [    2.420857][    T1] RBP: fffffb7904234e00 R08: 0000000000000000 R09: 00000000ffff7fff
+> [    2.420857][    T1] R10: ffffffff95472540 R11: ffffcd1bc001fbe0 R12: dead000000000100
+> [    2.420857][    T1] R13: ffffcd1bc001fd78 R14: fffffb7904234800 R15: ffff8b6b08d20000
+> [    2.420857][    T1] FS:  0000000000000000(0000) GS:ffff8b6daf5a8000(0000) knlGS:0000000000000000
+> [    2.420857][    T1] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    2.420857][    T1] CR2: 0000000000000000 CR3: 0000000047c54000 CR4: 0000000000750ef0
+> [    2.420857][    T1] PKRU: 55555554
+> [    2.420857][    T1] Call Trace:
+> [    2.420857][    T1]  <TASK>
+> [    2.420857][    T1]  __kmem_cache_shutdown.cold+0x13c/0x146
+> [    2.420857][    T1]  ? __pfx_inet6_init+0x10/0x10
+> [    2.420857][    T1]  kmem_cache_destroy+0x41/0x150
+> [    2.420857][    T1]  proto_unregister+0x93/0x100
+> [    2.420857][    T1]  inet6_init+0x3a2/0x3d0
+> [    2.420857][    T1]  do_one_initcall+0x58/0x390
+> [    2.420857][    T1]  kernel_init_freeable+0x2a7/0x320
+> [    2.420857][    T1]  ? __pfx_kernel_init+0x10/0x10
+> [    2.420857][    T1]  kernel_init+0x1a/0x140
+> [    2.420857][    T1]  ret_from_fork+0x28b/0x2c0
+> [    2.420857][    T1]  ? __pfx_kernel_init+0x10/0x10
+> [    2.420857][    T1]  ret_from_fork_asm+0x1a/0x30
+> [    2.420857][    T1]  </TASK>
+> [    2.420857][    T1] irq event stamp: 137776
+> [    2.420857][    T1] hardirqs last  enabled at (137775): [<ffffffff92a10b78>] _raw_spin_unlock_irq+0x28/0x50
+> [    2.420857][    T1] hardirqs last disabled at (137776): [<ffffffff92a10893>] _raw_spin_lock_irq+0x53/0x60
+> [    2.420857][    T1] softirqs last  enabled at (137566): [<ffffffff928b455e>] inet6_unregister_protosw+0x5e/0x70
+> [    2.420857][    T1] softirqs last disabled at (137564): [<ffffffff928b4523>] inet6_unregister_protosw+0x23/0x70
+> [    2.420857][    T1] ---[ end trace 0000000000000000 ]---
+> [    2.507939][    T1] ------------[ cut here ]------------
+> [    2.508959][    T1] kmem_cache_destroy RAWv6: Slab cache still has objects when called from proto_unregister+0x93/0x100
+> [    2.508977][    T1] WARNING: CPU: 2 PID: 1 at mm/slab_common.c:525 kmem_cache_destroy+0x140/0x150
+> [    2.512301][    T1] Modules linked in:
+> [    2.513125][    T1] CPU: 2 UID: 0 PID: 1 Comm: swapper/0 Tainted: G    B   W           6.17.0-46-default #1 PREEMPT(voluntary) openSUSE Tumbleweed (unreleased)  b731e69de5611aa08621e4f613e2c88e3aba29e6
+> [    2.516258][    T1] Tainted: [B]=BAD_PAGE, [W]=WARN
+> [    2.517234][    T1] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS unknown 02/02/2022
+> [    2.518767][    T1] RIP: 0010:kmem_cache_destroy+0x140/0x150
+> [    2.519829][    T1] Code: 00 85 ed 74 92 eb b1 e8 7e 04 db ff eb 8f 48 8b 53 60 48 8b 4c 24 10 48 c7 c6 f0 af c9 92 48 c7 c7 08 ad 2c 93 e8 e0 62 cb ff <0f> 0b e9 04 ff ff ff e9 2f 03 a8 ff 0f 1f 40 00 90 90 90 90 90 90
+> [    2.523085][    T1] RSP: 0018:ffffcd1bc001fdc8 EFLAGS: 00010246
+> [    2.524197][    T1] RAX: 0000000000000000 RBX: ffff8b6b01e7f000 RCX: 000000000000026b
+> [    2.525560][    T1] RDX: 0000000000000000 RSI: ffffcd1bc001fc78 RDI: 0000000000000003
+> [    2.526955][    T1] RBP: 0000000000000001 R08: 0000000000000000 R09: 00000000ffff7fff
+> [    2.528313][    T1] R10: ffffffff95472540 R11: ffffcd1bc001fc70 R12: ffffffff9456bac0
+> [    2.529683][    T1] R13: ffffffff9478ace8 R14: 0000000000000000 R15: 0000000000000000
+> [    2.531041][    T1] FS:  0000000000000000(0000) GS:ffff8b6daf5a8000(0000) knlGS:0000000000000000
+> [    2.532563][    T1] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    2.535367][    T1] CR2: 0000000000000000 CR3: 0000000047c54000 CR4: 0000000000750ef0
+> [    2.538374][    T1] PKRU: 55555554
+> [    2.539338][    T1] Call Trace:
+> [    2.540142][    T1]  <TASK>
+> [    2.540897][    T1]  proto_unregister+0x93/0x100
+> [    2.541851][    T1]  inet6_init+0x3a2/0x3d0
+> [    2.542726][    T1]  do_one_initcall+0x58/0x390
+> [    2.543618][    T1]  kernel_init_freeable+0x2a7/0x320
+> [    2.544589][    T1]  ? __pfx_kernel_init+0x10/0x10
+> [    2.545598][    T1]  kernel_init+0x1a/0x140
+> [    2.546414][    T1]  ret_from_fork+0x28b/0x2c0
+> [    2.547277][    T1]  ? __pfx_kernel_init+0x10/0x10
+> [    2.548230][    T1]  ret_from_fork_asm+0x1a/0x30
+> [    2.549174][    T1]  </TASK>
+> [    2.549849][    T1] irq event stamp: 137776
+> [    2.550694][    T1] hardirqs last  enabled at (137775): [<ffffffff92a10b78>] _raw_spin_unlock_irq+0x28/0x50
+> [    2.552309][    T1] hardirqs last disabled at (137776): [<ffffffff92a10893>] _raw_spin_lock_irq+0x53/0x60
+> [    2.553923][    T1] softirqs last  enabled at (137566): [<ffffffff928b455e>] inet6_unregister_protosw+0x5e/0x70
+> [    2.555624][    T1] softirqs last disabled at (137564): [<ffffffff928b4523>] inet6_unregister_protosw+0x23/0x70
+> [    2.557300][    T1] ---[ end trace 0000000000000000 ]---
+> [    2.591591][    T1] IPI shorthand broadcast: enabled
+thanks,
 -- 
-2.51.0
-
+js
+suse labs
