@@ -1,109 +1,302 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE46224AED
-	for <linux-crypto@vger.kernel.org>; Mon,  6 Oct 2025 17:11:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D01323F42D;
+	Mon,  6 Oct 2025 17:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759770699; cv=none; b=m4Ivj2/oe8IIuaWNIPm/NBDfRmyDcGVhU8cdatTsfTdccVLU5prb5RSpPHzHiIJLgPiSwzbdVBaLVruX00qj9SlN0RoRK8YLvdUi1PqpcLOKkp/o08vfbYg5qMKN+RnErXt99/58vdzTksGSkpG9VwjDoHM+MalO4pqzYmz5XjE=
+	t=1759771714; cv=none; b=APDqGNzkTI0FLMD0HiHxH+jAWf7TGRh4+AMyHc3M+3BvywoDr5+pKBolc7rNLydvvZICTnUA/eBZvHL7PGoyvqX9aVvxemXjG5eokO8flZy0bIhtpiGwuO+DamSNybraWcC5InLCpKnH2QLY3etgafkgkrz45s4LOKShyU9eYI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759770699; c=relaxed/simple;
-	bh=zKkTa7ZhmrpRX4yKjc3XCfiejGSkZfXEDNwW1ZmtDtg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GQLIZi6smmv8ACzF1gh/l2pLUe6g1NNu6bn6SKpjwDqSH+MNOTFrpgZ/F1TBmsUczwHM+3qjaeDEOHa/JwsCZ3Q4vNRTEQYKmQNjpis1lOkWNW8fuKnWFT472BIiz4+zSAMn7svX7IdJCyTpIEKCNMJR0Gcn7L6ubrcYXuB9VFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=TiDnrW6Q; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1759771714; c=relaxed/simple;
+	bh=KB/lwlRx83OoSAfOSb1yEtbijWQHkZuthuV9r/J09w8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dr5IwuWNKgq/MJ4bn+2Qk8VwpdbEBQwC1gsIZN1losdL9CWqY3qT/3g/aOR/ExS+Ghhq9DZSRjRaqJhBmYaVcXeujwlBV4mm0kFiuelyzUn8twRmfct0X8oHihyWYSOtkXi/T4B5PS3CdyNfLiMg9aOMTmKcOtul2kX1qasciB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PiWkv+HH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="TiDnrW6Q"
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6398ff5fbd3so2878991a12.2
-        for <linux-crypto@vger.kernel.org>; Mon, 06 Oct 2025 10:11:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1759770695; x=1760375495; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ON0py5Pr4Nz6NW5O8PJrqmYAOhtAM3BBfWdJdJiOtZI=;
-        b=TiDnrW6QvlhwnSPoxSED1SuuJn97AsMAKc7Y+MemQZrE8j0+XkIUqYGbNOMO0FYGMd
-         7h7c7SUpotegdcQ2W9cP9mA9+TiX7TNnca+VNTcEN+dyAxkvYs7DCIUQy4+2igSV2xPB
-         fCs90GCCEZnd1UPiYmNkkPCSFiBcD96i8SB4c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759770695; x=1760375495;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ON0py5Pr4Nz6NW5O8PJrqmYAOhtAM3BBfWdJdJiOtZI=;
-        b=KnxLpoXtcWoGZ6fiVWU+s0/Bg6BdSXwkGXCVcsojmPULq6ySNf7xfIsPXEliy/Gh/4
-         RU0vO+/voUu3aBtAIJvtl1HOGzJsv43z9JTETmxq6s8vz1ILkoI0xHThjL0vOse0xQdq
-         dBqOCXAVCxggZZmuxT35U9qbKUmxYNo3ZjlPgv0r33ycPC7dW39UiImwkNDCaME1j1eW
-         MS1legmKVQ//1Vp9QYXzdSrt5jSsXbGjZSLFUNmL7DT2hdmS033OCgnRrWtfFzcUoYQl
-         CJU78wp77bPyp1xlE2q2FE5jRfL7EpNoKO0G4BVU7d+H8kRwctkAJuhNSQHwqD8k9Omy
-         GLzw==
-X-Forwarded-Encrypted: i=1; AJvYcCWEaAulbWcd4busf9/3PD3MeDi5IFjASHU9/vrQ8/vQSxLbjkNSMWsjVd6ePcsbMcgpTcnPhnHwZ+rM8B0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyO4awo5zuGztq59WqDK4EQXvgwS7H40Rsytaa5ovLRtN6txJCd
-	xrKKiBWNY+zh8De7EPphEcXRIIpNtIDfWinj/uEtrYe1+uCB0tcEkPU/rdfLQ+3c/UX4QRw4sSc
-	ED1TRAxg=
-X-Gm-Gg: ASbGncuS4OZox47hxDmfsV/R+9ptSwzSbAgiMwIyNwTKtExC5J167C5QR6fezxCYu/I
-	PPXLcD+UpfMd7nWQid1O5kumjGz0VE8+sZXo0W0rbC1yM3PdOBfCH79gX6q4wnqnOwwfQ4Nba39
-	PQfcqYN1el9gKHDCpiImO2M5wUsGFCFMjPxXCERwiBF8S4/73CV3k3PG/J2W1S5HgWYgEEP8Gs6
-	/tRnPGL/YkW1f7iw+ll0rtJQEYWIh1nFxMtADIj0p99Zv/H25EFtsuJ0Wov9scrhBnGVuh8Yxuv
-	LpdHiAUTWEksGV3FgnfOdcLRRlZwgPwpRRCLuErfzaS6u7Gif7jYQSAVRVZjnmMg4cTRLtdDVw9
-	4IL02GjWNYY4Q5b+t9MJVsHYm2Ho1gNvSWRW/64QsnD1I+m+SNJAYwgT8VI8fEJ7iePRveDni24
-	mijeSUTy3NG/TKSO/udabYbZqb8t7gmdQ=
-X-Google-Smtp-Source: AGHT+IGFJBBW50H/kf0F8n/V+Yw8Ozf6XuW4aHhScEEP/jqQSe/KRiG1818gBQEV4KUVYpYrqNM2Eg==
-X-Received: by 2002:a17:907:9692:b0:b45:a84e:8b88 with SMTP id a640c23a62f3a-b49c4498b98mr1444149466b.58.1759770695015;
-        Mon, 06 Oct 2025 10:11:35 -0700 (PDT)
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b4869c4fd92sm1178163266b.74.2025.10.06.10.11.32
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Oct 2025 10:11:32 -0700 (PDT)
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6349e3578adso9356501a12.1
-        for <linux-crypto@vger.kernel.org>; Mon, 06 Oct 2025 10:11:32 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCX4V9ECvr5c405ymssAfDjDjiJiHSvc36p0948QNqw7buKqECdF1E7RxoKMmZxfnKB/BmwVvbJBXThqqNI=@vger.kernel.org
-X-Received: by 2002:a05:6402:788:b0:636:7b44:f793 with SMTP id
- 4fb4d7f45d1cf-63939c42c3dmr10575986a12.36.1759770691962; Mon, 06 Oct 2025
- 10:11:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PiWkv+HH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 879DEC4CEF5;
+	Mon,  6 Oct 2025 17:28:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759771713;
+	bh=KB/lwlRx83OoSAfOSb1yEtbijWQHkZuthuV9r/J09w8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PiWkv+HHxSV3/ip+v3eFaX8RYKNvo7t+NTYSTBnxHDFF++GmlVZyd5tyd2jK1WaSA
+	 CJ6IYPQgSEbtVOjelVkIQRp05ZR68+u0uT/13ZFOcGePSfBhwvVplYDooaMUQM/334
+	 9w2L8T74uWY3iMeomE5cHclFm4PdTuW8SAypP2OE3P/euGTzBFGi1qyJkubxrKPZ4p
+	 lh+N6kLOQEivLdaq+Hk7sp3BxGZndik5j2ltFlDx/obMlDIwTP1KBzrQNvqd9JWSxU
+	 y1bi8vdh09q2d/x11WCpVI50MNf6dvF48N6hrer62ZLv51c8nBtbSz2xmoD8E+2rfZ
+	 Wm3gNVKhExr4A==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Vegard Nossum <vegard.nossum@oracle.com>,
+	Joachim Vandersmissen <git@jvdsn.com>,
+	David Howells <dhowells@redhat.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: Add FIPS pre-operational self-test for SHA algorithms
+Date: Mon,  6 Oct 2025 10:26:12 -0700
+Message-ID: <20251006172612.75240-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aIirh_7k4SWzE-bF@gondor.apana.org.au> <05b7ef65-37bb-4391-9ec9-c382d51bae4d@kernel.org>
- <aN5GO1YLO_yXbMNH@gondor.apana.org.au> <562363e8-ea90-4458-9f97-1b1cb433c863@kernel.org>
- <8bb5a196-7d55-4bdb-b890-709f918abad0@kernel.org> <1a71398e-637f-4aa5-b4c6-0d3502a62a0c@kernel.org>
- <f31dbb22-0add-481c-aee0-e337a7731f8e@oracle.com> <20251002172310.GC1697@sol>
- <2981dc1d-287f-44fc-9f6f-a9357fb62dbf@oracle.com> <CAHk-=wjcXn+uPu8h554YFyZqfkoF=K4+tFFtXHsWNzqftShdbQ@mail.gmail.com>
- <3b1ff093-2578-4186-969a-3c70530e57b7@oracle.com>
-In-Reply-To: <3b1ff093-2578-4186-969a-3c70530e57b7@oracle.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 6 Oct 2025 10:11:15 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whzJ1Bcx5Yi5JC57pLsJYuApTwpC=WjNi28GLUv7HPCOQ@mail.gmail.com>
-X-Gm-Features: AS18NWCXa0wSJ6_VpJSDmpZcgomwitAo1Hggc1PbqkhjmqP5uTQVk83I_Ms3YkQ
-Message-ID: <CAHk-=whzJ1Bcx5Yi5JC57pLsJYuApTwpC=WjNi28GLUv7HPCOQ@mail.gmail.com>
-Subject: Re: 6.17 crashes in ipv6 code when booted fips=1 [was: [GIT PULL]
- Crypto Update for 6.17]
-To: Vegard Nossum <vegard.nossum@oracle.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, netdev@vger.kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, "Theodore Ts'o" <tytso@mit.edu>, "nstange@suse.de" <nstange@suse.de>, 
-	"Wang, Jay" <wanjay@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 6 Oct 2025 at 09:32, Vegard Nossum <vegard.nossum@oracle.com> wrote:
->
-> Okay, so I get that we don't like fips=1 around here (I'm not a
-> particularly big fan myself), but what's with the snark? fips=1 exists
-> in mainline and obviously has users. I'm just trying to make sure it
-> remains useful and usable.
+Add FIPS pre-operational self-tests for all SHA-1 and SHA-2 algorithms.
+Following the "Implementation Guidance for FIPS 140-3" document, to
+achieve this it's sufficient to just test a single test vector for each
+of HMAC-SHA1, HMAC-SHA256, and HMAC-SHA512.
 
-It literally caused non-bootable machines because of that allegedly
-"remains useful and usable" because it changed something that never
-failed to failing. That's how this thread started.
+Link: https://lore.kernel.org/linux-crypto/20250917184856.GA2560@quark/
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
 
-So that's why the snark. I think you are deluding yourself and others
-if you call that "useful and usable".
+Since there seemed to be more interest in complaining that these are
+missing than actually writing a patch, I decided to just do it.
 
-           Linus
+ lib/crypto/fips.h                   | 38 +++++++++++++++++++++++++++++
+ lib/crypto/sha1.c                   | 19 ++++++++++++++-
+ lib/crypto/sha256.c                 | 19 ++++++++++++++-
+ lib/crypto/sha512.c                 | 19 ++++++++++++++-
+ scripts/crypto/gen-fips-testvecs.py | 33 +++++++++++++++++++++++++
+ 5 files changed, 125 insertions(+), 3 deletions(-)
+ create mode 100644 lib/crypto/fips.h
+ create mode 100755 scripts/crypto/gen-fips-testvecs.py
+
+diff --git a/lib/crypto/fips.h b/lib/crypto/fips.h
+new file mode 100644
+index 0000000000000..78a1bdd33a151
+--- /dev/null
++++ b/lib/crypto/fips.h
+@@ -0,0 +1,38 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* This file was generated by: gen-fips-testvecs.py */
++
++#include <linux/fips.h>
++
++static const u8 fips_test_data[] __initconst __maybe_unused = {
++	0x66, 0x69, 0x70, 0x73, 0x20, 0x74, 0x65, 0x73,
++	0x74, 0x20, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00,
++};
++
++static const u8 fips_test_key[] __initconst __maybe_unused = {
++	0x66, 0x69, 0x70, 0x73, 0x20, 0x74, 0x65, 0x73,
++	0x74, 0x20, 0x6b, 0x65, 0x79, 0x00, 0x00, 0x00,
++};
++
++static const u8 fips_test_hmac_sha1_value[] __initconst __maybe_unused = {
++	0x29, 0xa9, 0x88, 0xb8, 0x5c, 0xb4, 0xaf, 0x4b,
++	0x97, 0x2a, 0xee, 0x87, 0x5b, 0x0a, 0x02, 0x55,
++	0x99, 0xbf, 0x86, 0x78,
++};
++
++static const u8 fips_test_hmac_sha256_value[] __initconst __maybe_unused = {
++	0x59, 0x25, 0x85, 0xcc, 0x40, 0xe9, 0x64, 0x2f,
++	0xe9, 0xbf, 0x82, 0xb7, 0xd3, 0x15, 0x3d, 0x43,
++	0x22, 0x0b, 0x4c, 0x00, 0x90, 0x14, 0x25, 0xcf,
++	0x9e, 0x13, 0x2b, 0xc2, 0x30, 0xe6, 0xe8, 0x93,
++};
++
++static const u8 fips_test_hmac_sha512_value[] __initconst __maybe_unused = {
++	0x6b, 0xea, 0x5d, 0x27, 0x49, 0x5b, 0x3f, 0xea,
++	0xde, 0x2d, 0xfa, 0x32, 0x75, 0xdb, 0x77, 0xc8,
++	0x26, 0xe9, 0x4e, 0x95, 0x4d, 0xad, 0x88, 0x02,
++	0x87, 0xf9, 0x52, 0x0a, 0xd1, 0x92, 0x80, 0x1d,
++	0x92, 0x7e, 0x3c, 0xbd, 0xb1, 0x3c, 0x49, 0x98,
++	0x44, 0x9c, 0x8f, 0xee, 0x3f, 0x02, 0x71, 0x51,
++	0x57, 0x0b, 0x15, 0x38, 0x95, 0xd8, 0xa3, 0x81,
++	0xba, 0xb3, 0x15, 0x37, 0x5c, 0x6d, 0x57, 0x2b,
++};
+diff --git a/lib/crypto/sha1.c b/lib/crypto/sha1.c
+index 5904e4ae85d24..001059cb0fce4 100644
+--- a/lib/crypto/sha1.c
++++ b/lib/crypto/sha1.c
+@@ -10,10 +10,11 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+ #include <linux/wordpart.h>
++#include "fips.h"
+ 
+ static const struct sha1_block_state sha1_iv = {
+ 	.h = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
+ };
+ 
+@@ -328,14 +329,30 @@ void hmac_sha1_usingrawkey(const u8 *raw_key, size_t raw_key_len,
+ 	hmac_sha1_update(&ctx, data, data_len);
+ 	hmac_sha1_final(&ctx, out);
+ }
+ EXPORT_SYMBOL_GPL(hmac_sha1_usingrawkey);
+ 
+-#ifdef sha1_mod_init_arch
++#if defined(sha1_mod_init_arch) || defined(CONFIG_CRYPTO_FIPS)
+ static int __init sha1_mod_init(void)
+ {
++#ifdef sha1_mod_init_arch
+ 	sha1_mod_init_arch();
++#endif
++	if (fips_enabled) {
++		/*
++		 * FIPS pre-operational self-test.  As per the FIPS
++		 * Implementation Guidance, testing HMAC-SHA1 satisfies the test
++		 * requirement for SHA-1 too.
++		 */
++		u8 mac[SHA1_DIGEST_SIZE];
++
++		hmac_sha1_usingrawkey(fips_test_key, sizeof(fips_test_key),
++				      fips_test_data, sizeof(fips_test_data),
++				      mac);
++		if (memcmp(fips_test_hmac_sha1_value, mac, sizeof(mac)) != 0)
++			panic("sha1: FIPS pre-operational self-test failed\n");
++	}
+ 	return 0;
+ }
+ subsys_initcall(sha1_mod_init);
+ 
+ static void __exit sha1_mod_exit(void)
+diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
+index 8fa15165d23e8..6b3cf105147ff 100644
+--- a/lib/crypto/sha256.c
++++ b/lib/crypto/sha256.c
+@@ -15,10 +15,11 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+ #include <linux/wordpart.h>
++#include "fips.h"
+ 
+ static const struct sha256_block_state sha224_iv = {
+ 	.h = {
+ 		SHA224_H0, SHA224_H1, SHA224_H2, SHA224_H3,
+ 		SHA224_H4, SHA224_H5, SHA224_H6, SHA224_H7,
+@@ -416,14 +417,30 @@ void hmac_sha256_usingrawkey(const u8 *raw_key, size_t raw_key_len,
+ 	hmac_sha256_final(&ctx, out);
+ }
+ EXPORT_SYMBOL_GPL(hmac_sha256_usingrawkey);
+ #endif /* !__DISABLE_EXPORTS */
+ 
+-#ifdef sha256_mod_init_arch
++#if defined(sha256_mod_init_arch) || defined(CONFIG_CRYPTO_FIPS)
+ static int __init sha256_mod_init(void)
+ {
++#ifdef sha256_mod_init_arch
+ 	sha256_mod_init_arch();
++#endif
++	if (fips_enabled) {
++		/*
++		 * FIPS pre-operational self-test.  As per the FIPS
++		 * Implementation Guidance, testing HMAC-SHA256 satisfies the
++		 * test requirement for SHA-224, SHA-256, and HMAC-SHA224 too.
++		 */
++		u8 mac[SHA256_DIGEST_SIZE];
++
++		hmac_sha256_usingrawkey(fips_test_key, sizeof(fips_test_key),
++					fips_test_data, sizeof(fips_test_data),
++					mac);
++		if (memcmp(fips_test_hmac_sha256_value, mac, sizeof(mac)) != 0)
++			panic("sha256: FIPS pre-operational self-test failed\n");
++	}
+ 	return 0;
+ }
+ subsys_initcall(sha256_mod_init);
+ 
+ static void __exit sha256_mod_exit(void)
+diff --git a/lib/crypto/sha512.c b/lib/crypto/sha512.c
+index d8062188be98a..65447083c0456 100644
+--- a/lib/crypto/sha512.c
++++ b/lib/crypto/sha512.c
+@@ -15,10 +15,11 @@
+ #include <linux/module.h>
+ #include <linux/overflow.h>
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+ #include <linux/wordpart.h>
++#include "fips.h"
+ 
+ static const struct sha512_block_state sha384_iv = {
+ 	.h = {
+ 		SHA384_H0, SHA384_H1, SHA384_H2, SHA384_H3,
+ 		SHA384_H4, SHA384_H5, SHA384_H6, SHA384_H7,
+@@ -403,14 +404,30 @@ void hmac_sha512_usingrawkey(const u8 *raw_key, size_t raw_key_len,
+ 	hmac_sha512_update(&ctx, data, data_len);
+ 	hmac_sha512_final(&ctx, out);
+ }
+ EXPORT_SYMBOL_GPL(hmac_sha512_usingrawkey);
+ 
+-#ifdef sha512_mod_init_arch
++#if defined(sha512_mod_init_arch) || defined(CONFIG_CRYPTO_FIPS)
+ static int __init sha512_mod_init(void)
+ {
++#ifdef sha512_mod_init_arch
+ 	sha512_mod_init_arch();
++#endif
++	if (fips_enabled) {
++		/*
++		 * FIPS pre-operational self-test.  As per the FIPS
++		 * Implementation Guidance, testing HMAC-SHA512 satisfies the
++		 * test requirement for SHA-384, SHA-512, and HMAC-SHA384 too.
++		 */
++		u8 mac[SHA512_DIGEST_SIZE];
++
++		hmac_sha512_usingrawkey(fips_test_key, sizeof(fips_test_key),
++					fips_test_data, sizeof(fips_test_data),
++					mac);
++		if (memcmp(fips_test_hmac_sha512_value, mac, sizeof(mac)) != 0)
++			panic("sha512: FIPS pre-operational self-test failed\n");
++	}
+ 	return 0;
+ }
+ subsys_initcall(sha512_mod_init);
+ 
+ static void __exit sha512_mod_exit(void)
+diff --git a/scripts/crypto/gen-fips-testvecs.py b/scripts/crypto/gen-fips-testvecs.py
+new file mode 100755
+index 0000000000000..26e12397bceb2
+--- /dev/null
++++ b/scripts/crypto/gen-fips-testvecs.py
+@@ -0,0 +1,33 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++# Script that generates lib/crypto/fips.h
++#
++# Copyright 2025 Google LLC
++
++import hmac
++
++fips_test_data = b"fips test data\0\0"
++fips_test_key = b"fips test key\0\0\0"
++
++def print_static_u8_array_definition(name, value):
++    print('')
++    print(f'static const u8 {name}[] __initconst __maybe_unused = {{')
++    for i in range(0, len(value), 8):
++        line = '\t' + ''.join(f'0x{b:02x}, ' for b in value[i:i+8])
++        print(f'{line.rstrip()}')
++    print('};')
++
++print('/* SPDX-License-Identifier: GPL-2.0-or-later */')
++print(f'/* This file was generated by: gen-fips-testvecs.py */')
++print()
++print('#include <linux/fips.h>')
++
++print_static_u8_array_definition("fips_test_data", fips_test_data)
++print_static_u8_array_definition("fips_test_key", fips_test_key)
++
++for alg in 'sha1', 'sha256', 'sha512':
++    ctx = hmac.new(fips_test_key, digestmod=alg)
++    ctx.update(fips_test_data)
++    print_static_u8_array_definition(f'fips_test_hmac_{alg}_value', ctx.digest())
++
+
+base-commit: e5f0a698b34ed76002dc5cff3804a61c80233a7a
+-- 
+2.51.0
+
