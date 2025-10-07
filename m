@@ -1,79 +1,59 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F2823BCF3
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Oct 2025 06:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31170189BB0;
+	Tue,  7 Oct 2025 14:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759819867; cv=none; b=I9gga8k7lnkhgowM3pkkRlAXulKsZWD+xFxRd2QeQY1Hk1ifR8Tha5PI8rdDoCeuDVEgpFfXza7DCFhTxbk98eZDidD7bJAHFw2M+sWyGjBJ1bfSOArb8lHIvytXUQH9RZ/aqZHZWq76oKhUjALbmwr56o+OnLFKUsbBjcg4IAM=
+	t=1759846780; cv=none; b=iwwbcu2PrW0fmKIRrAW5BeqeeWUgwjbK3EZRjw53ImUxxDttcnRX7VCmcypgdG7pm63BBzwASQEOOIBkYjcbckL6iaPZBcDPFwrhMZUWY1hKZZFnRuXrvgoDUme8D23cK/na7qWZGSMmV7la1+srt9OVqqy30qByfvEhynPBiR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759819867; c=relaxed/simple;
-	bh=PzPp5lh4w9MAIVL6Y3lW3zsso39XiIKfrNvEK/RYtJ0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GH6OlBS3dkcnLGpxqJmLWH/S8nKuDa3shY7M6zuyr5U28SmXvIFKxcxr5q1Xx3nmSjdY7PIaRkzcRCgyGs2To3kq5G2lEguRx6AuiGed5G5Gc/QtBajYhm71tublFNypr2atnR/XQEdL7FRQYzmRlbfEufk7gZxi5luoly5IuGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=Iow1UycH; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1759846780; c=relaxed/simple;
+	bh=CQPcQZEASX+8lu3nBu6CjRRon21/AdfPWUtGb7+8Vps=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YMiv+QoZuvzvaABfrtVMI5r55tUC1Ldxi1jjkHDxc8x8jhAkn8pGUjoz9AsvbaguDk4gnB8cXj8JfDmIEDlfhFa/e2Qm4v/cAjTt40Zwuoy/Hkc4ifb64s7py9eerocwX46ga7R1KofKvO+U7KOklItERNjXPJ3sbsfSPmoP7zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=qCZoxs9o; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="Iow1UycH"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b62e7221351so2879377a12.1
-        for <linux-crypto@vger.kernel.org>; Mon, 06 Oct 2025 23:51:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1759819865; x=1760424665; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x1JvAAk4cJnEamYn3QhmqYlNG1sfQI/VEnnjVQb6AzA=;
-        b=Iow1UycHOMUL7jid1e8QJpV9hAgyKrlOJG2uLUTuAE1wFcKcxSWeFOJoU/J+9WJap9
-         usSaINIKdj630BrR+KKDxO1r6HrtNYDvN+QCdC/nwFJOjZuJDVAp58mcaZREK6cYPXsy
-         GzSWHEJzCVCc/pAv9innZT4mIYounYQZFOJ1k=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759819865; x=1760424665;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x1JvAAk4cJnEamYn3QhmqYlNG1sfQI/VEnnjVQb6AzA=;
-        b=AMAR7qGBN2lYnepK/+v/aQGv6ApHhmk2b2AN1pNZWiVqy2d1CXenyRIkm9wLt0xP6Z
-         VAwebV0hzPwbBYHGnghsru/3SvKqQr5sn/+C67tM0UbMKSLoPJw1srTiOqLGFJ9/oqcl
-         /G2QKeQXDM4aMmtfJVIiuidf86wsBPuABtp6xEsqjbHR8XLCbELpaF09kXLCONSmjYBK
-         rPx5+ejZnTC38NzBVo8OL7Qijs3uy//+j8jRjv4K9Lzd9zlBXbQQbtPx4vm9soKER3J9
-         BVJLA0f8WSZRANyanYK/w0I+7qFL283K2ZVZifyJXC10j0+pyCmh4fiSnE+v4I1dWmHr
-         mydg==
-X-Gm-Message-State: AOJu0Yxp/qHGhg0bjaEoQcEA2G5xYboA+EXh5/lZFmOCdoQEx1t2Z5NM
-	jexVOozOqdyb6wHi1eLpCxYUVBNQ9FY6kKyeAmeZKSZ+n1lh1oiWVGuD0BeCkI+cSgH/7HscfSf
-	dwuVwQQY=
-X-Gm-Gg: ASbGncu9oZZU+icdQ+uyXFD/Sh5gKHCMU3eNr8U9Os966ddmIrp1U2YQywVkZcE/jQF
-	2z39UT268EHH7NKIRdS8dvoxLl9KY6uceHdar7CHrLaeMvQartlrvzHS7f61t06GEKvnarMEVnU
-	6GeURZRau3VxV5tlQ3NyWj9Mh98vWxjCGB0a93/D+gRS/W3pTBKe7Kqyb8pxAkpjL4smjP1ZfBx
-	ieDewKu+mTel/9pNz3v+ZBUVGkphn3wLc0JNu8Gu5fQvxWdga81CS6q8xXpNxH5uSGFvtRwLedE
-	EHczNug+kRV90tk7fQO0ivi+InWpZJvoQ8rKLDo2Y9BmkoaM9Wd/tevM5fdmRRpVwHSkXwID7Wu
-	n+SnvHGNxra9kTy2CgVoFAl4J0MFe9OiiQpPIjXtliXkwBxQfY0Cs0+ailyiFwmbKLDe23Q==
-X-Google-Smtp-Source: AGHT+IH/Mv8ei/4xdbbFNwnpkB2DI8J/Gdq1XPNmETcnbdutsxPo4WAgyfoB4/wa01Wc9l2mpIRYkA==
-X-Received: by 2002:a17:903:196b:b0:271:479d:3de3 with SMTP id d9443c01a7336-28e9a5609bfmr187778975ad.12.1759819864927;
-        Mon, 06 Oct 2025 23:51:04 -0700 (PDT)
-Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-28e8d111905sm153287745ad.24.2025.10.06.23.51.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Oct 2025 23:51:04 -0700 (PDT)
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-To: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	robh@kernel.org
-Cc: krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	Ruud.Derwig@synopsys.com,
-	manjunath.hadli@vayavyalabs.com,
-	adityak@vayavyalabs.com,
-	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH v7 4/4] Add SPAcc Kconfig and Makefile
-Date: Tue,  7 Oct 2025 12:20:20 +0530
-Message-Id: <20251007065020.495008-5-pavitrakumarm@vayavyalabs.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251007065020.495008-1-pavitrakumarm@vayavyalabs.com>
-References: <20251007065020.495008-1-pavitrakumarm@vayavyalabs.com>
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="qCZoxs9o"
+Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 597EJQxM3839955;
+	Tue, 7 Oct 2025 09:19:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1759846766;
+	bh=jLhm0wjkT3Ix64UN23GOIgK9LAgdlOztBdjVxrwqHz4=;
+	h=From:To:CC:Subject:Date;
+	b=qCZoxs9omyQHyUSAMXPJ+La3C2pkfkd1SrTiKvDAFd9TLyszqk3W6G3LX+gmtHe1R
+	 FQVquVEnqVpGWLEG79egcv+q3l/sL5kY8jo5rbay3KbZwktMQD1BC1EZLnwVd40AKz
+	 1EFUKSq6w6ORcPINY2r52m08Ry1lfWZwwFMU4ep0=
+Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
+	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 597EJQdM3032191
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Tue, 7 Oct 2025 09:19:26 -0500
+Received: from DFLE201.ent.ti.com (10.64.6.59) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Tue, 7
+ Oct 2025 09:19:25 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE201.ent.ti.com
+ (10.64.6.59) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Tue, 7 Oct 2025 09:19:25 -0500
+Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [10.24.69.191])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 597EJOCR1003759;
+	Tue, 7 Oct 2025 09:19:24 -0500
+From: T Pratham <t-pratham@ti.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>
+CC: T Pratham <t-pratham@ti.com>, Manorit Chawdhry <m-chawdhry@ti.com>,
+        Kamlesh Gurudasani <kamlesh@ti.com>,
+        Shiva Tripathi <s-tripathi1@ti.com>,
+        Kavitha Malarvizhi <k-malarvizhi@ti.com>,
+        Vishal Mahaveer <vishalm@ti.com>, Praneeth Bajjuri <praneeth@ti.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] crypto: api - fix reqsize handling for skciphers and aeads
+Date: Tue, 7 Oct 2025 19:27:51 +0530
+Message-ID: <20251007141852.726540-1-t-pratham@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -81,146 +61,77 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Add Makefile and Kconfig for SPAcc driver.
+Commit afddce13ce81d ("crypto: api - Add reqsize to crypto_alg")
+introduced cra_reqsize field in crypto_alg struct to replace type
+specific reqsize fields. It looks like this was introduced specifically
+for ahash and acomp from the commit description as subsequent commits
+add necessary changes in these alg frameworks.
 
-Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202510040852.qK4TiL4k-lkp@intel.com/
-Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+However, this is being recommended for use in all crypto algs [1]
+instead of setting reqsize using crypto_*_set_reqsize(). Using
+cra_reqsize in skcipher and aead algorithms, hence, causes memory
+corruptions and crashes as the underlying functions in the algorithm
+framework have not been updated to set the reqsize properly from
+cra_reqsize. [2]
+
+Add proper set_reqsize calls in the skcipher and aead init functions to
+properly initialize reqsize for these algorithms in the framework.
+
+[1]: https://lore.kernel.org/linux-crypto/aCL8BxpHr5OpT04k@gondor.apana.org.au/
+[2]: https://gist.github.com/Pratham-T/24247446f1faf4b7843e4014d5089f6b
+
+Fixes: afddce13ce81d ("crypto: api - Add reqsize to crypto_alg")
+Signed-off-by: T Pratham <t-pratham@ti.com>
 ---
- drivers/crypto/Kconfig            |  1 +
- drivers/crypto/Makefile           |  1 +
- drivers/crypto/dwc-spacc/Kconfig  | 80 +++++++++++++++++++++++++++++++
- drivers/crypto/dwc-spacc/Makefile |  8 ++++
- 4 files changed, 90 insertions(+)
- create mode 100644 drivers/crypto/dwc-spacc/Kconfig
- create mode 100644 drivers/crypto/dwc-spacc/Makefile
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 657035cfe940..ada04311c370 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -780,6 +780,7 @@ config CRYPTO_DEV_BCM_SPU
- 	  ahash, and aead algorithms with the kernel cryptographic API.
+Found this while developing TI DTHEv2 crypto driver. I narrowed that
+these crashes in [2] are due to some upstream change and not my code as
+the same driver is working fine in our internal 6.12 LTS version (with
+daily CI builds not showing any regression from crypto subsystem). The
+*only* change is replacing crypto_skcipher_set_reqsize() with
+cra_reqsize in algorithms as this patch was introduced after 6.12.
+
+Now, these crashes were not caught earlier because [3] split the
+in-kernel self-tests into two configs (CRYPTO_SELFTESTS and
+CRYPTO_SELFTESTS_FULL) which went unnoticed in my local development flow
+and the CRYPTO_SELFTESTS_FULL config was not enabled till recently. [2]
+shows after applying this patch, the driver passes all selftests
+succssfully with CRYPTO_SELFTESTS_FULL=y.
+
+[3]: https://lore.kernel.org/linux-crypto/20250612174709.26990-1-ebiggers@kernel.org/
+---
+ crypto/aead.c     | 1 +
+ crypto/skcipher.c | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/crypto/aead.c b/crypto/aead.c
+index 5d14b775036ee..51ab3af691af2 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -120,6 +120,7 @@ static int crypto_aead_init_tfm(struct crypto_tfm *tfm)
+ 	struct aead_alg *alg = crypto_aead_alg(aead);
  
- source "drivers/crypto/stm32/Kconfig"
-+source "drivers/crypto/dwc-spacc/Kconfig"
+ 	crypto_aead_set_flags(aead, CRYPTO_TFM_NEED_KEY);
++	crypto_aead_set_reqsize(aead, crypto_tfm_alg_reqsize(tfm));
  
- config CRYPTO_DEV_SAFEXCEL
- 	tristate "Inside Secure's SafeXcel cryptographic engine driver"
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 170e10b18f9b..e0d5e1301232 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -43,6 +43,7 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
- obj-y += inside-secure/
- obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
- obj-y += xilinx/
-+obj-y += dwc-spacc/
- obj-y += hisilicon/
- obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
- obj-y += intel/
-diff --git a/drivers/crypto/dwc-spacc/Kconfig b/drivers/crypto/dwc-spacc/Kconfig
-new file mode 100644
-index 000000000000..e254a1bf9cbf
---- /dev/null
-+++ b/drivers/crypto/dwc-spacc/Kconfig
-@@ -0,0 +1,80 @@
-+# SPDX-License-Identifier: GPL-2.0-only
+ 	aead->authsize = alg->maxauthsize;
+ 
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index de5fc91bba267..8fa5d9686d085 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -294,6 +294,8 @@ static int crypto_skcipher_init_tfm(struct crypto_tfm *tfm)
+ 		return crypto_init_lskcipher_ops_sg(tfm);
+ 	}
+ 
++	crypto_skcipher_set_reqsize(skcipher, crypto_tfm_alg_reqsize(tfm));
 +
-+config CRYPTO_DEV_SPACC
-+	tristate "Support for dwc_spacc Security Protocol Accelerator"
-+	depends on HAS_DMA
-+	select CRYPTO_ENGINE
-+	default n
-+
-+	help
-+	  This enables support for SPAcc Hardware Accelerator.
-+
-+config CRYPTO_DEV_SPACC_HASH
-+	bool "Enable HASH functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	select CRYPTO_HASH
-+	select CRYPTO_SHA1
-+	select CRYPTO_MD5
-+	select CRYPTO_SHA256
-+	select CRYPTO_SHA512
-+	select CRYPTO_HMAC
-+	select CRYPTO_SM3
-+	select CRYPTO_CMAC
-+	select CRYPTO_MICHAEL_MIC
-+	select CRYPTO_XCBC
-+	select CRYPTO_AES
-+	select CRYPTO_SM4_GENERIC
-+
-+	help
-+	  Say y to enable Hash functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_AUTODETECT
-+	bool "Enable Autodetect functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	help
-+	  Say y to enable Autodetect functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_DEBUG_TRACE_IO
-+	bool "Enable Trace MMIO reads/writes stats"
-+	depends on CRYPTO_DEV_SPACC
-+	default n
-+	help
-+	  Say y to enable Trace MMIO reads/writes stats.
-+	  To Debug and trace IO register read/write oprations.
-+
-+config CRYPTO_DEV_SPACC_DEBUG_TRACE_DDT
-+	bool "Enable Trace DDT entries stats"
-+	default n
-+	depends on CRYPTO_DEV_SPACC
-+	help
-+	  Say y to enable Enable DDT entry stats.
-+	  To Debug and trace DDT opration
-+
-+config CRYPTO_DEV_SPACC_SECURE_MODE
-+	bool "Enable Spacc secure mode stats"
-+	default n
-+	depends on CRYPTO_DEV_SPACC
-+	help
-+	  Say y to enable SPAcc secure modes stats.
-+
-+config CRYPTO_DEV_SPACC_PRIORITY
-+	int "VSPACC priority value"
-+	depends on CRYPTO_DEV_SPACC
-+	range 0 15
-+	default 1
-+	help
-+	  Default arbitration priority weight for this Virtual SPAcc instance.
-+	  Hardware resets this to 1. Higher values means higher priority.
-+
-+config CRYPTO_DEV_SPACC_INTERNAL_COUNTER
-+	int "SPAcc internal counter value"
-+	depends on CRYPTO_DEV_SPACC
-+	range 100000 1048575
-+	default 100000
-+	help
-+	  This value configures a hardware watchdog counter in the SPAcc engine.
-+	  The counter starts ticking when a completed cryptographic job is
-+	  sitting in the STATUS FIFO. If the job remains unprocessed for the
-+	  configured duration, an interrupt is triggered to ensure it is serviced.
-diff --git a/drivers/crypto/dwc-spacc/Makefile b/drivers/crypto/dwc-spacc/Makefile
-new file mode 100644
-index 000000000000..45d0166dfc8f
---- /dev/null
-+++ b/drivers/crypto/dwc-spacc/Makefile
-@@ -0,0 +1,8 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_CRYPTO_DEV_SPACC) += snps-spacc.o
-+snps-spacc-objs = spacc_hal.o spacc_core.o \
-+spacc_manager.o spacc_interrupt.o spacc_device.o
-+
-+ifeq ($(CONFIG_CRYPTO_DEV_SPACC_HASH),y)
-+snps-spacc-objs += spacc_ahash.o
-+endif
+ 	if (alg->exit)
+ 		skcipher->base.exit = crypto_skcipher_exit_tfm;
+ 
 -- 
-2.25.1
+2.43.0
 
