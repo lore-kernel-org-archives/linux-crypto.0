@@ -1,191 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DE92E7BBC
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Oct 2025 17:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9CF2E92D0
+	for <linux-crypto@vger.kernel.org>; Tue,  7 Oct 2025 18:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759859541; cv=none; b=P06X3BSjZbmMC/E22yIo4f6eFFv+fZhtQ1Pts+VByOC+C8WBhBkPbnna/7gLc7OxapR+d37e63VaWEMbfIXeBExNgbBhgU4jIyIZn3fw0qqdKbmDAOEoY9abxwWianDZNZyq9ZzXjCJg1QGbjP2fVOaQklzWRpxTjEilbVmb0XM=
+	t=1759863179; cv=none; b=DHBjyuqF9c2BgdjQX9r5P17CDW2VXf1kvFwaylIIhw1Z7uS8fAoWeG0fprx2RekvQ+35wP4Lne+k4w7xRPdqtgm+P2aHLuWpoSStyyJHeDTcEU8cV90kWb7GP8N/X5pHbXBqWOq2v5luklAgLaT0AdpDB24HLMTtmrHQN1yMpes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759859541; c=relaxed/simple;
-	bh=1dzITc0msTixzwZngkIAM0+kMjxc7Sjk7Svpl/USKvE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kIUDaFM38UtVrkZiMNRrdA7VqJ2OziN3vG+I5+hi7tRfwH3PTFvrFefEid/Dj170OkoldhNIxPST9wk8b66PW5DcGJmSaOluwdP9BrQQUZ56+Y8sy8YuHganRvmb/AuWhkVDdWqsgewC65rFlWWlipGfB1QbtPbG+/1+dG1RaHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FiN4Z1Fz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759863179; c=relaxed/simple;
+	bh=4m44Ymet5W/5/uIvPoZ02pG/bxDo49W6g7xko/lB0ec=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=G/pIMR8zmOtDC2klkE4nht3XrOV25fQero1zOKwfIR8gnhy410m3lvulfM176qmn1VQU/ofIw9MtXCnPmWQQ/Hxj4ctJwC4YGTkEj2+0w7onTnjXYrYq/j/yj6UdlrqIu+8YxV1jiDev4Wtmvdzt3MsP6ODeT+9Zs393Wb63kbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c/qh2+xB; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FiN4Z1Fz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5235DC4CEFF
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Oct 2025 17:52:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759859541;
-	bh=1dzITc0msTixzwZngkIAM0+kMjxc7Sjk7Svpl/USKvE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=FiN4Z1FzegMnpIdXu/henNP7ZUJcNBLMMmrHvvzP5C+mGOTUN6+kclR+Lx00tijfF
-	 t/d/YbuqpvH4lv85TMLYPoFTYdU4D4rGAD2SgXtz/zsirQzF3NpkGKM+aQmd65Gncd
-	 /pEKD2T9lve8GELdYQ3xAiYRTz+HMMQmwYziX5LxhfUSrpm4oiZ+poyg41hxLfSXVs
-	 /6wdbN3FVdrE6tGfxJ5EX8UJzjhDz8XX9RqcsKXDDWszJ/4HDNHxGN2Oo9aAexdlpz
-	 Jx53c+jF+IKMnXS277WPVGzb8P3hYdQnODqh+7wqjIjoNXABLLw/3gtRGP7arGAFyj
-	 7nwIc6Wy9b1IA==
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-368348d30e0so61069851fa.1
-        for <linux-crypto@vger.kernel.org>; Tue, 07 Oct 2025 10:52:21 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxIKJaE319IErnVtpj+x1U+vJUVMH+B8fOu19qN5N660KWRq4zP
-	bBFHnlGPAewOa45YtVplXxSz+lWHBWEBY4CJ9DwuxMLe/Xk85j0geEEaQhrcpAAQxQemLDXLHtH
-	l9Smuh63CI2WGKUD8UOuxVdnhJGOT6ew=
-X-Google-Smtp-Source: AGHT+IGmT4ZXu0FIyWwOvLIp9E5AG1zHlsLdLMdm3sCt/oKNhuNYMmRFgZ+17usOiWCpsTsbb2hliWIukTOoogfQj3c=
-X-Received: by 2002:a2e:be0c:0:b0:36e:9e8f:ba4d with SMTP id
- 38308e7fff4ca-37609d40fc1mr773271fa.14.1759859539625; Tue, 07 Oct 2025
- 10:52:19 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c/qh2+xB"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1759863174;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZtvehMqki1j4i5SsYl1BCYkhBIs55uGz0PHlwImo8Q8=;
+	b=c/qh2+xBTtl8IoDIk0w0aI+8c2xsh2E0v+wvBTDpOp4D64cYgx30VjaN7TN6veXH+qNYno
+	BlPURXDUGeeaZ1FR/Xr0KveaqhGgBQi4iYtl0NbstkD5Vu2cltee6YeE1TlvAZWq2VA7yF
+	6YH68CK+VEwsl9j8ZHwRxUwqPFoTbbc=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: David Howells <dhowells@redhat.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] crypto: asymmetric_keys - simplify asymmetric_key_hex_to_key_id
+Date: Tue,  7 Oct 2025 20:52:21 +0200
+Message-ID: <20251007185220.234611-3-thorsten.blum@linux.dev>
+In-Reply-To: <20251007185220.234611-2-thorsten.blum@linux.dev>
+References: <20251007185220.234611-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251006172612.75240-1-ebiggers@kernel.org> <CAMj1kXFTbP9dGQmk9F-WFyoL_LjtfXHMCnGT0WUQwMnrn7DHCw@mail.gmail.com>
- <20251007011142.GA77681@sol>
-In-Reply-To: <20251007011142.GA77681@sol>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 7 Oct 2025 10:52:06 -0700
-X-Gmail-Original-Message-ID: <CAMj1kXFFCgAqefvDLgCzU_wtSAS-aPzRLMBt1qPNw2hcXtQiGQ@mail.gmail.com>
-X-Gm-Features: AS18NWDbe0Y3rDs4kMdLZ1kGNB-J3m7IwGG8MiiQtstVfSyZemTGskbaT0Ajn5g
-Message-ID: <CAMj1kXFFCgAqefvDLgCzU_wtSAS-aPzRLMBt1qPNw2hcXtQiGQ@mail.gmail.com>
-Subject: Re: [PATCH] lib/crypto: Add FIPS pre-operational self-test for SHA algorithms
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, Vegard Nossum <vegard.nossum@oracle.com>, 
-	Joachim Vandersmissen <git@jvdsn.com>, David Howells <dhowells@redhat.com>, 
-	Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 6 Oct 2025 at 18:13, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Tue, Oct 07, 2025 at 01:53:25AM +0200, Ard Biesheuvel wrote:
-> > On Mon, 6 Oct 2025 at 19:28, Eric Biggers <ebiggers@kernel.org> wrote:
-> > >
-> > > Add FIPS pre-operational self-tests for all SHA-1 and SHA-2 algorithms.
-> > > Following the "Implementation Guidance for FIPS 140-3" document, to
-> > > achieve this it's sufficient to just test a single test vector for each
-> > > of HMAC-SHA1, HMAC-SHA256, and HMAC-SHA512.
-> > >
-> > > Link: https://lore.kernel.org/linux-crypto/20250917184856.GA2560@quark/
-> > > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> > > ---
-> > >
-> > > Since there seemed to be more interest in complaining that these are
-> > > missing than actually writing a patch, I decided to just do it.
-> > >
-> > >  lib/crypto/fips.h                   | 38 +++++++++++++++++++++++++++++
-> > >  lib/crypto/sha1.c                   | 19 ++++++++++++++-
-> > >  lib/crypto/sha256.c                 | 19 ++++++++++++++-
-> > >  lib/crypto/sha512.c                 | 19 ++++++++++++++-
-> > >  scripts/crypto/gen-fips-testvecs.py | 33 +++++++++++++++++++++++++
-> > >  5 files changed, 125 insertions(+), 3 deletions(-)
-> > >  create mode 100644 lib/crypto/fips.h
-> > >  create mode 100755 scripts/crypto/gen-fips-testvecs.py
-> > >
-> > > diff --git a/lib/crypto/fips.h b/lib/crypto/fips.h
-> > > new file mode 100644
-> > > index 0000000000000..78a1bdd33a151
-> > > --- /dev/null
-> > > +++ b/lib/crypto/fips.h
-> > > @@ -0,0 +1,38 @@
-> > > +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> > > +/* This file was generated by: gen-fips-testvecs.py */
-> > > +
-> > > +#include <linux/fips.h>
-> > > +
-> > > +static const u8 fips_test_data[] __initconst __maybe_unused = {
-> > > +       0x66, 0x69, 0x70, 0x73, 0x20, 0x74, 0x65, 0x73,
-> > > +       0x74, 0x20, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00,
-> > > +};
-> > > +
-> > > +static const u8 fips_test_key[] __initconst __maybe_unused = {
-> > > +       0x66, 0x69, 0x70, 0x73, 0x20, 0x74, 0x65, 0x73,
-> > > +       0x74, 0x20, 0x6b, 0x65, 0x79, 0x00, 0x00, 0x00,
-> > > +};
-> > > +
-> > > +static const u8 fips_test_hmac_sha1_value[] __initconst __maybe_unused = {
-> > > +       0x29, 0xa9, 0x88, 0xb8, 0x5c, 0xb4, 0xaf, 0x4b,
-> > > +       0x97, 0x2a, 0xee, 0x87, 0x5b, 0x0a, 0x02, 0x55,
-> > > +       0x99, 0xbf, 0x86, 0x78,
-> > > +};
-> > > +
-> > > +static const u8 fips_test_hmac_sha256_value[] __initconst __maybe_unused = {
-> > > +       0x59, 0x25, 0x85, 0xcc, 0x40, 0xe9, 0x64, 0x2f,
-> > > +       0xe9, 0xbf, 0x82, 0xb7, 0xd3, 0x15, 0x3d, 0x43,
-> > > +       0x22, 0x0b, 0x4c, 0x00, 0x90, 0x14, 0x25, 0xcf,
-> > > +       0x9e, 0x13, 0x2b, 0xc2, 0x30, 0xe6, 0xe8, 0x93,
-> > > +};
-> > > +
-> > > +static const u8 fips_test_hmac_sha512_value[] __initconst __maybe_unused = {
-> > > +       0x6b, 0xea, 0x5d, 0x27, 0x49, 0x5b, 0x3f, 0xea,
-> > > +       0xde, 0x2d, 0xfa, 0x32, 0x75, 0xdb, 0x77, 0xc8,
-> > > +       0x26, 0xe9, 0x4e, 0x95, 0x4d, 0xad, 0x88, 0x02,
-> > > +       0x87, 0xf9, 0x52, 0x0a, 0xd1, 0x92, 0x80, 0x1d,
-> > > +       0x92, 0x7e, 0x3c, 0xbd, 0xb1, 0x3c, 0x49, 0x98,
-> > > +       0x44, 0x9c, 0x8f, 0xee, 0x3f, 0x02, 0x71, 0x51,
-> > > +       0x57, 0x0b, 0x15, 0x38, 0x95, 0xd8, 0xa3, 0x81,
-> > > +       0xba, 0xb3, 0x15, 0x37, 0x5c, 0x6d, 0x57, 0x2b,
-> > > +};
-> > > diff --git a/lib/crypto/sha1.c b/lib/crypto/sha1.c
-> > > index 5904e4ae85d24..001059cb0fce4 100644
-> > > --- a/lib/crypto/sha1.c
-> > > +++ b/lib/crypto/sha1.c
-> > > @@ -10,10 +10,11 @@
-> > >  #include <linux/kernel.h>
-> > >  #include <linux/module.h>
-> > >  #include <linux/string.h>
-> > >  #include <linux/unaligned.h>
-> > >  #include <linux/wordpart.h>
-> > > +#include "fips.h"
-> > >
-> > >  static const struct sha1_block_state sha1_iv = {
-> > >         .h = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
-> > >  };
-> > >
-> > > @@ -328,14 +329,30 @@ void hmac_sha1_usingrawkey(const u8 *raw_key, size_t raw_key_len,
-> > >         hmac_sha1_update(&ctx, data, data_len);
-> > >         hmac_sha1_final(&ctx, out);
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(hmac_sha1_usingrawkey);
-> > >
-> > > -#ifdef sha1_mod_init_arch
-> > > +#if defined(sha1_mod_init_arch) || defined(CONFIG_CRYPTO_FIPS)
-> > >  static int __init sha1_mod_init(void)
-> > >  {
-> > > +#ifdef sha1_mod_init_arch
-> > >         sha1_mod_init_arch();
-> > > +#endif
-> > > +       if (fips_enabled) {
-> > > +               /*
-> > > +                * FIPS pre-operational self-test.  As per the FIPS
-> > > +                * Implementation Guidance, testing HMAC-SHA1 satisfies the test
-> > > +                * requirement for SHA-1 too.
-> > > +                */
-> > > +               u8 mac[SHA1_DIGEST_SIZE];
-> > > +
-> > > +               hmac_sha1_usingrawkey(fips_test_key, sizeof(fips_test_key),
-> > > +                                     fips_test_data, sizeof(fips_test_data),
-> > > +                                     mac);
-> > > +               if (memcmp(fips_test_hmac_sha1_value, mac, sizeof(mac)) != 0)
-> > > +                       panic("sha1: FIPS pre-operational self-test failed\n");
-> > > +       }
-> > >         return 0;
-> > >  }
-> > >  subsys_initcall(sha1_mod_init);
-> > >
-> >
-> > In the builtin case, couldn't this execute only after the first calls
-> > into the library? That would mean it does not quite fit the
-> > requirements of the pre-operational selftest.
->
-> Only if other builtin code in the kernel actually calls it before
-> subsys_initcall, i.e. during very early boot long before userspace
-> starts.  Such calls can occur only from within the FIPS module (i.e. the
-> kernel) itself, so arbitrary external users need not be considered here.
->
+Use struct_size() to calculate the number of bytes to allocate for the
+asymmetric key id.  Add a local variable to store the hex data length
+instead of recalculating it.
 
-Good point. We should probably document this, i.e., the fact that this
-is before storage and network etc are even accessible and so panicking
-at that point is sufficient even in the presence of even earlier
-callers.
+The variable 'ret', whose name implies a return variable, is only used
+to temporarily store the result of __asymmetric_key_hex_to_key_id(). Use
+the result directly and remove the local variable.
+
+No functional changes.
+
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ crypto/asymmetric_keys/asymmetric_type.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index aea925c88973..b73b8b983bfa 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -228,7 +228,7 @@ struct asymmetric_key_id *asymmetric_key_hex_to_key_id(const char *id)
+ {
+ 	struct asymmetric_key_id *match_id;
+ 	size_t asciihexlen;
+-	int ret;
++	size_t hexlen;
+ 
+ 	if (!*id)
+ 		return ERR_PTR(-EINVAL);
+@@ -236,12 +236,11 @@ struct asymmetric_key_id *asymmetric_key_hex_to_key_id(const char *id)
+ 	if (asciihexlen & 1)
+ 		return ERR_PTR(-EINVAL);
+ 
+-	match_id = kmalloc(sizeof(struct asymmetric_key_id) + asciihexlen / 2,
+-			   GFP_KERNEL);
++	hexlen = asciihexlen / 2;
++	match_id = kmalloc(struct_size(match_id, data, hexlen), GFP_KERNEL);
+ 	if (!match_id)
+ 		return ERR_PTR(-ENOMEM);
+-	ret = __asymmetric_key_hex_to_key_id(id, match_id, asciihexlen / 2);
+-	if (ret < 0) {
++	if (__asymmetric_key_hex_to_key_id(id, match_id, hexlen) < 0) {
+ 		kfree(match_id);
+ 		return ERR_PTR(-EINVAL);
+ 	}
+-- 
+2.51.0
+
