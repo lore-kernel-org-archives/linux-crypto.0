@@ -1,131 +1,90 @@
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBF425A642;
-	Wed,  8 Oct 2025 10:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141C91F12E9
+	for <linux-crypto@vger.kernel.org>; Wed,  8 Oct 2025 12:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759917995; cv=none; b=KZ1JROKUVm8RmNpqiNHmuVjCmcP+FIg9n9Kl3hnYX0K5eON7HdRLBaoQcYW42cdUqP5KUC28bi0sPPMrajtTFUsQoDUilFisscm+uZRhfuToqp4GacpUQprGvm33NMdKT7twhWWN7sqV7qEA2Z1fSRlGYqGZvxG6NUR/e7a5oKs=
+	t=1759925651; cv=none; b=Bw7ghWiuoOUhr6bwMNs8qNMBfLgMsiPJZm5OgFmrv2GCIwzhV++GzU1LmxBVGgocEdoN1W8q9Jhz4hjZmHsXQKvdv13KzM/9o5pImDO015AWX2L3rkRQXMY017L9cHz62x1o+nHDXOx9BgMzhNOXtDhDv/chAikdAJiA4jC7ZbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759917995; c=relaxed/simple;
-	bh=IpTDSGi+U/6yVHzaqXgawVr4MhzhK/8BtNKXbNFOBhs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OpeTveXr9CdevKfY6zY3JAWKZVhowfRs++6Ga2ogP6WhKx7FxZAhCyJ8MqXsvIjpdqhLnHZmhexEYbDozRU7kySEszDsjXq8s1tZUXplLgncVZPFS5F1iMgqVB1+P17NC5jF9UeU8G8vj/J2wgVkATcVgUdW9kxGBKo1c09CjMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=SUUYx/if; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1759925651; c=relaxed/simple;
+	bh=/FJgVIhyEdN2o1Z6gxhSpN/SUCrOw+mDyn0/IXLBcvE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FbM79zj8gIHZJcwNryhxI1mAkv+UQdZIP5q/B+b+Z/s5bmTJfUaEX+nHNSfDLzMarKBbBmKbhVYlTbwNiSojR3bQlw2JQ53JLiKpRs8hs1sNd5lfjMjmzkE3ImrPhAywGH+b2/HTZ3GBxyJVBz7Php+2n/Iqo+ySw4hQpX8zu+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=TDMFBW9j; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="SUUYx/if"
-Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 598A6SR3275495;
-	Wed, 8 Oct 2025 05:06:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1759917988;
-	bh=/wsiKhWmVlt+wgkqRbRt+n5+sDIrvDvxgkpWZ7Y3ItA=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=SUUYx/ifSLvyXXJD8NCFTRu4gAsCQ2uizJFCNAJL2BQyRbO0w9NPUGBWz/7qRJZxw
-	 aoFiM6JaWbsxjh/wri738fEexvC9fS57YbgOJq2K4pWWqewP1GdcaD2YbNpYLKS8GV
-	 aX2kB/0vx+fY00xvq56dawusupXuPpOYKotIGfcU=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 598A6SZF1378273
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 8 Oct 2025 05:06:28 -0500
-Received: from DFLE201.ent.ti.com (10.64.6.59) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 8
- Oct 2025 05:06:27 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE201.ent.ti.com
- (10.64.6.59) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Wed, 8 Oct 2025 05:06:28 -0500
-Received: from [10.24.69.191] (pratham-workstation-pc.dhcp.ti.com [10.24.69.191])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 598A6OZi2606900;
-	Wed, 8 Oct 2025 05:06:25 -0500
-Message-ID: <ae7bafa8-600b-4d4d-9937-1084cbc7e0f4@ti.com>
-Date: Wed, 8 Oct 2025 15:36:24 +0530
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="TDMFBW9j"
+Received: from trampoline.thunk.org (pool-173-48-102-192.bstnma.fios.verizon.net [173.48.102.192])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 598CDGF0026282
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 8 Oct 2025 08:13:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1759925615; bh=kwti+J23zAyIXFnhzpTdkk/4xOFi3nZKWO5T9JLhw6Q=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=TDMFBW9jTsNS5yFyaJQgzdFDDay8k+jhDgMmVCLoZBppHe68wgRLt1068J6N/+wi/
+	 UhbE3Lwg3GJkFk0dOxpHTrojoyofUYgS2mnBufSQJbeb9oEmqnl2oZh7kLR//Mnphg
+	 FvZbpMSqQ3foGKPVSccMCwejQLYSZ7JxEnPbZMG3RI5zyQpKKf1EAXMIEl5NJFI6O6
+	 EIkj7qIoZdEVOiLK/7qifURmYmCs7FAK61n+ENsVDnhVXNZR8ZuHW8hNyy87dzIefu
+	 BcoYZQZTfErKqNhJNPJY7X0vWvLAJ9eSNSD8ERP8WUsPEcf810vB3kIiRGJc4ehwAa
+	 zLzn3vWM3LKDQ==
+Received: by trampoline.thunk.org (Postfix, from userid 15806)
+	id 9DFC02E00D9; Wed, 08 Oct 2025 08:13:16 -0400 (EDT)
+Date: Wed, 8 Oct 2025 08:13:16 -0400
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Simo Sorce <simo@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+        Vegard Nossum <vegard.nossum@oracle.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        "nstange@suse.de" <nstange@suse.de>, "Wang, Jay" <wanjay@amazon.com>
+Subject: Re: 6.17 crashes in ipv6 code when booted fips=1 [was: [GIT PULL]
+ Crypto Update for 6.17]
+Message-ID: <20251008121316.GJ386127@mit.edu>
+References: <1a71398e-637f-4aa5-b4c6-0d3502a62a0c@kernel.org>
+ <f31dbb22-0add-481c-aee0-e337a7731f8e@oracle.com>
+ <20251002172310.GC1697@sol>
+ <2981dc1d-287f-44fc-9f6f-a9357fb62dbf@oracle.com>
+ <CAHk-=wjcXn+uPu8h554YFyZqfkoF=K4+tFFtXHsWNzqftShdbQ@mail.gmail.com>
+ <3b1ff093-2578-4186-969a-3c70530e57b7@oracle.com>
+ <CAHk-=whzJ1Bcx5Yi5JC57pLsJYuApTwpC=WjNi28GLUv7HPCOQ@mail.gmail.com>
+ <e1dc974a-eb36-4090-8d5f-debcb546ccb7@oracle.com>
+ <20251006192622.GA1546808@google.com>
+ <0acd44b257938b927515034dd3954e2d36fc65ac.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: api - fix reqsize handling for skciphers and
- aeads
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Manorit Chawdhry
-	<m-chawdhry@ti.com>,
-        Kamlesh Gurudasani <kamlesh@ti.com>,
-        Shiva Tripathi
-	<s-tripathi1@ti.com>,
-        Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-        Vishal
- Mahaveer <vishalm@ti.com>, Praneeth Bajjuri <praneeth@ti.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20251007141852.726540-1-t-pratham@ti.com>
- <aOYdodeILYU2_Pjq@gondor.apana.org.au>
-Content-Language: en-US
-From: T Pratham <t-pratham@ti.com>
-In-Reply-To: <aOYdodeILYU2_Pjq@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0acd44b257938b927515034dd3954e2d36fc65ac.camel@redhat.com>
 
-On 08/10/25 13:45, Herbert Xu wrote:
-> On Tue, Oct 07, 2025 at 07:27:51PM +0530, T Pratham wrote:
->> Commit afddce13ce81d ("crypto: api - Add reqsize to crypto_alg")
->> introduced cra_reqsize field in crypto_alg struct to replace type
->> specific reqsize fields. It looks like this was introduced specifically
->> for ahash and acomp from the commit description as subsequent commits
->> add necessary changes in these alg frameworks.
->>
->> However, this is being recommended for use in all crypto algs [1]
->> instead of setting reqsize using crypto_*_set_reqsize(). Using
->> cra_reqsize in skcipher and aead algorithms, hence, causes memory
->> corruptions and crashes as the underlying functions in the algorithm
->> framework have not been updated to set the reqsize properly from
->> cra_reqsize. [2]
->>
->> Add proper set_reqsize calls in the skcipher and aead init functions to
->> properly initialize reqsize for these algorithms in the framework.
->>
->> [1]: https://lore.kernel.org/linux-crypto/aCL8BxpHr5OpT04k@gondor.apana.org.au/
->> [2]: https://gist.github.com/Pratham-T/24247446f1faf4b7843e4014d5089f6b
->>
->> Fixes: afddce13ce81d ("crypto: api - Add reqsize to crypto_alg")
->> Signed-off-by: T Pratham <t-pratham@ti.com>
->> ---
->>
->> Found this while developing TI DTHEv2 crypto driver. I narrowed that
->> these crashes in [2] are due to some upstream change and not my code as
->> the same driver is working fine in our internal 6.12 LTS version (with
->> daily CI builds not showing any regression from crypto subsystem). The
->> *only* change is replacing crypto_skcipher_set_reqsize() with
->> cra_reqsize in algorithms as this patch was introduced after 6.12.
->>
->> Now, these crashes were not caught earlier because [3] split the
->> in-kernel self-tests into two configs (CRYPTO_SELFTESTS and
->> CRYPTO_SELFTESTS_FULL) which went unnoticed in my local development flow
->> and the CRYPTO_SELFTESTS_FULL config was not enabled till recently. [2]
->> shows after applying this patch, the driver passes all selftests
->> succssfully with CRYPTO_SELFTESTS_FULL=y.
->>
->> [3]: https://lore.kernel.org/linux-crypto/20250612174709.26990-1-ebiggers@kernel.org/
->> ---
->>  crypto/aead.c     | 1 +
->>  crypto/skcipher.c | 2 ++
->>  2 files changed, 3 insertions(+)
-> 
-> Thanks.  I've applied the skcipher part of your patch.
-> 
-> Please repost the AEAD part as a separate patch.
-> 
-> Cheers,
+On Mon, Oct 06, 2025 at 03:45:46PM -0400, Simo Sorce wrote:
+> Note: this may change going forward, but I am confident that as issues
+> arise people will propose upstream patches to keep it as close as
+> possible within acceptable parameters for upstream behavior.
 
-Sent.
-https://lore.kernel.org/linux-crypto/20251008100117.808195-1-t-pratham@ti.com/T/#u
+What I'm curious about is what falls within the acceptable parameters
+of *distro* behavior.  If NIST-certified labs really insist that
+certifying requires making the kernel completely unsupportable from a
+commercial perspective, at what point will *distros* decide to give it
+up as a bad idea, or to have a completely different binary kernel
+package that only crazy customers would be willing to use?
 
--- 
-Regards
-T Pratham <t-pratham@ti.com>
+If there is something beyond hard-disabling CONFIG_CRYPTO_SHA1 which
+all distributions could agree with --- what would that set of patches
+look like, and would it be evenly vaguely upstream acceptable.  It
+could even hidden behind CONFIG_BROKEN.  :-)
+
+						- Ted
+						
