@@ -1,91 +1,192 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAB326CE3F
-	for <linux-crypto@vger.kernel.org>; Wed,  8 Oct 2025 12:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71835221DB1
+	for <linux-crypto@vger.kernel.org>; Wed,  8 Oct 2025 15:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759927479; cv=none; b=mHISW3qevq9fzu6sxyJOp32dv6SHf8Q0495COw7Pl5IfVF3rK5DNsOB5ZWAD6joC6aYNVkuFmbJmPZh8R4t4NmJZf716XDwZf1/Uyymlt+IZcB4qrZL6zOfjPwxzo86psedklIb5XTwbwJeHBrGksDvu1K8BEDQiCEN48+qKn7A=
+	t=1759938408; cv=none; b=odqUT/kel+ObZ1BAcoxoAXMx3zsRrwJ7MLReh++uxLoW+frTyuHy78bWYiGAxK8WJn2JYqkti34F2fgVGZ910xjDtug/LJv8d3HGuDjumpMfo1BF85HAwTBIWtMJPPGxb2WtDI9HmrpkBtgU+EYmqZM34j3F7DtsTxBAqu8H9Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759927479; c=relaxed/simple;
-	bh=N31ilv74oly5MwZpmaMuwEenXmb62MTdPxYq3RqSmIA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VfTPJqmz0KnxLCRLGZVWNMCS+SMUVh2vV2C3y1hy6jnm3sc3oQRKJBJB45qje5Nb45eCIf0mlBIfUwFK66/5KzxfvQz9iXLKD+yMeg3dnnF5c3hwlwMhIbLf44nQ2zkX4g3myU096duFzmLmyvSkLvkkA2NIahbxqMKseaUHQL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqQieQZR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759938408; c=relaxed/simple;
+	bh=eYljyxwuI+sEYQ4DBbDW0JEyR8r3lwsS/SwNly4bZAw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=I3iK41b3MxOManqdCQI9h9eJs89NeH8u1PyxkorCfTFy22ZjrszCiYt00ljZtZj1ZWwa9/uApOPtWnP/gPE3XX+C8C76geZMaJHzBEwb3KKfU3PT1B1ZOsBqlqYoZg1eDTQyupCbGG0c7L0yvE5+fi1wNF+J//3MYQ1XCtL7ruA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TaJiHCY6; arc=none smtp.client-ip=209.85.221.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqQieQZR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 659EAC16AAE
-	for <linux-crypto@vger.kernel.org>; Wed,  8 Oct 2025 12:44:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759927479;
-	bh=N31ilv74oly5MwZpmaMuwEenXmb62MTdPxYq3RqSmIA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=aqQieQZR3vwxlStqo6iOnZZELag0xnqfCqNBsbDX3546Y4eKN3ZTJ1grDd7Gp2MKt
-	 LuRzdtmFmH5PCT6bSeA3wb3Yhyu/LZ1CUlZmGxT9tlAFPhtehcNOx+LeyBY54+UV8g
-	 zRYRGt2eTGJNopitgAcobC87SgArwTUUtVdrfd10dPmT1XMOaUabpFmXyp0dTdahUH
-	 M/WStRHaNOHBHXO2R/m1VRe4LBLMElhSSAO+J0Y2NQFuuJaRByy+j7qZdcXy2gMHuc
-	 F0/nGHKc+HnovDn3Gi3VervfYb9rN6yd6xvuH7Wfr3k3Qy6qaV0e8YqR86LY6Its9N
-	 //Dc23NlkmS/w==
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-579363a4602so8247433e87.0
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Oct 2025 05:44:39 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUoDmtkHYCcAC4vweUQ966VIz27YILktw2MigkLFQTMPSAG3uB8g4/WKUkwHDf5rENyBPPrIAvGd8uAjXs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9mD84HI9hO0T6jjIOYcmeUWwU3KXDPFE6TxAzFeQBzwV3ibGP
-	MjWcfVJK5dgOcbznHmKL10JPNzW0TGm/a9bKboVztrVuueg+SxPvX+7oa+Pl7+LdRGoMvAWN1qE
-	ZwU02ZAQ3WTSh9AlQvzzZl4QNV8Bb8jU=
-X-Google-Smtp-Source: AGHT+IFb/9iVZyCeacRA4eV5KNX9g58E3Jlitn31uEFl4qngdAtE1ZMjpaLTq+Y+xAVeNotQ9Yk5di84F5oEAA9lL/Y=
-X-Received: by 2002:a05:6512:138e:b0:579:f4b3:bd2d with SMTP id
- 2adb3069b0e04-5906de92179mr905583e87.57.1759927477667; Wed, 08 Oct 2025
- 05:44:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TaJiHCY6"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-40fd1b17d2bso30576f8f.1
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Oct 2025 08:46:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759938405; x=1760543205; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wmLD0z7TTnPR9XvYGkCWmhX+K+BenlBYSASZKFMhffQ=;
+        b=TaJiHCY6pemf0LFD7VU0mJLyASz7yOO4nfgshw5x39q/xDqzFZ+20/Tp0n+EeiS1Ub
+         u71/nivkG2sC4lIqfpQIFvh5WHwd0FlgF1iumnC15Y0VtathiEi44/Jrz6/uKal4LFuE
+         3qxfleOB4QK9tbxxbCxvo5eJo7RV3i837srvjgu3sM0AkzG1T34cV7aCW3UB7+5xrvQT
+         d4mWJRcvpOsITnPPn260p058u0C4fROBEfgyqLMn2DxlE2Qa6k4Ec3CNcf6e5VvC9rs9
+         rY/XSkUh1hn9HPwEytUPnDUWi3eeMBwu7wbkEVHUQRW1T25RWsMvKG3E9/MfLZ3M2En4
+         h6FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759938405; x=1760543205;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wmLD0z7TTnPR9XvYGkCWmhX+K+BenlBYSASZKFMhffQ=;
+        b=S3JI9WyVDDBDWk6hLY7eWqiYwKl8Z+b87gKSvZlCR8bObDI7Ae8o7Hd6s+y3RPpsUB
+         xFxnYcuREHDtUg5tfQirRTh0yWOs2HTqklaLvZoGfygDa1bgakXf+z1SAQQutGFa9rys
+         7RdgIYxVTYjoUOmEQjGb7Xta+CpbzwdkqPEid/9Mu6HNLpqWU9MdRm30I7nD71WYQJLR
+         KGXif8+X6YwistjL/arYVOz4ZZNI02iEGsDzmrWgkWEdA+d/xByV6ScFff1x0/Kz0l/S
+         +/Nofp7vs4/BiVNWfJ28pEDzE7htARTm86z2lPeC5T1MrdrKWcxT92lBYxfOg55whOO1
+         isrw==
+X-Forwarded-Encrypted: i=1; AJvYcCVqLHJfH0uZ0ceK41FxbQ4TXqrrGpRdo88l+QX/ZzzpHlBHsynnJ5MBg7S/V72e4fxWpwwcQGBdXSwgp/M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSLzWBEopjyN0MF9mBpx5HWK02N/bMqmyzJZH8L7IGZPzpyjD7
+	SymSowFfYlJ/TFdyo6s/A2Xu4z+X1+dN57Oekp7Lmt3up4YOzSSn4JF2WvZXm76OtVnCWmSsiw=
+	=
+X-Google-Smtp-Source: AGHT+IEt8nUcjBjxcOiz44sFz9PXJ/AXhgR8lEUeC1XvfiF6QMnIgBcNlVH+mEjJkP1BeJHVT50cUdMM
+X-Received: from wmvw6.prod.google.com ([2002:a05:600d:42c6:b0:46f:aa50:d703])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:1a8b:b0:425:8bd1:fbb4
+ with SMTP id ffacd0b85a97d-4266e7df95cmr2665651f8f.50.1759938404873; Wed, 08
+ Oct 2025 08:46:44 -0700 (PDT)
+Date: Wed,  8 Oct 2025 17:45:34 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251001210201.838686-22-ardb+git@google.com> <20251001210201.838686-23-ardb+git@google.com>
- <94214ee4-3eec-4151-a5a7-9d5e030fbca3@sirena.org.uk>
-In-Reply-To: <94214ee4-3eec-4151-a5a7-9d5e030fbca3@sirena.org.uk>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 8 Oct 2025 05:44:25 -0700
-X-Gmail-Original-Message-ID: <CAMj1kXEfw4RnY4wg6JBz01Hoa7r2amdJnj-eD-Kt0D+r6kAEtA@mail.gmail.com>
-X-Gm-Features: AS18NWAvgP-PCFNPrGtZ5EtJZD86tidAj6ogMQQ_6DyA-DVZJAXzTHykQTP7Ti8
-Message-ID: <CAMj1kXEfw4RnY4wg6JBz01Hoa7r2amdJnj-eD-Kt0D+r6kAEtA@mail.gmail.com>
-Subject: Re: [PATCH v2 01/20] arm64: Revert support for generic kernel mode FPU
-To: Mark Brown <broonie@kernel.org>
-Cc: Ard Biesheuvel <ardb+git@google.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	herbert@gondor.apana.org.au, linux@armlinux.org.uk, 
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Eric Biggers <ebiggers@kernel.org>, stable@vger.kernel.org
+Mime-Version: 1.0
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5474; i=ardb@kernel.org;
+ h=from:subject; bh=LjOVrXxuH78jPv7wKv3YJ7SsGzEQCTxGhw6lFU8BtRY=;
+ b=owGbwMvMwCVmkMcZplerG8N4Wi2JIeNZu7zCPe21jfOED3k1nLNQCJywP8dNuDXL8HLf/FnGI
+ spG+406SlkYxLgYZMUUWQRm/3238/REqVrnWbIwc1iZQIYwcHEKwESktBkZLp6++6JM65F7daoV
+ s/Sn1sm5D8VK260PhC88PEfm6ox38xn+8HRwbb3GsW5TfZm/sb5G+evvX+fF3DE/s7fjdpKtw04 9JgA=
+X-Mailer: git-send-email 2.51.0.710.ga91ca5db03-goog
+Message-ID: <20251008154533.3089255-23-ardb+git@google.com>
+Subject: [PATCH v3 00/21] arm64: Move kernel mode FPSIMD buffer to the stack
+From: Ard Biesheuvel <ardb+git@google.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	herbert@gondor.apana.org.au, ebiggers@kernel.org, 
+	Ard Biesheuvel <ardb@kernel.org>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Mark Brown <broonie@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 2 Oct 2025 at 09:23, Mark Brown <broonie@kernel.org> wrote:
->
-> On Wed, Oct 01, 2025 at 11:02:03PM +0200, Ard Biesheuvel wrote:
->
-> > However, dropping that flag allows the compiler to use FPU and SIMD
-> > registers in other ways too, and for this reason, arm64 only permits
-> > doing so in strictly controlled contexts, i.e., isolated compilation
-> > units that get called from inside a kernel_neon_begin() and
-> > kernel_neon_end() pair.
->
-> > The users of the generic kernel mode FPU API lack such strict checks,
-> > and this may result in userland FP/SIMD state to get corrupted, given
-> > that touching FP/SIMD registers outside of a kernel_neon_begin/end pair
-> > does not fault, but silently operates on the userland state without
-> > preserving it.
->
-> Oh dear, that's nasty - I didn't see the patch when it was going in:
->
+From: Ard Biesheuvel <ardb@kernel.org>
 
-Actually, there is a check, it just wasn't wired up correctly by the
-amdgpu driver, due to the fact that it wraps kernel_fpu_begin()/end()
-calls into its own API, which are therefore always made from a
-compilation unit where it is supported.
+Move the buffer for preserving/restoring the kernel mode FPSIMD state on a
+context switch out of struct thread_struct, and onto the stack, so that
+the memory cost is not imposed needlessly on all tasks in the system.
 
-The trick is to #include <linux/fpu.h> into the definition of their
-own wrapper API, so that using /that/ from FP/SIMD code also triggers
-a build error.
+Changes since v2:
+- Fix generic kernel mode FPU api instead of removing it.
 
-So I'll drop this patch.
+- Rebase onto v6.18-rc0 and fix the fallout
+
+- Prefer WARN() over BUG() in kernel_neon_begin/end
+
+- Avoid unnecessary cmpxchg() calls
+
+- When invoked in softirq context, use the caller provided buffer rather
+  than the one stored in the task struct - this permits callers from
+  task context (including users of the generic kernel mode FPU api) to
+  pass NULL as the buffer when running with preemption disabled.
+
+- Add acks from Kees and Eric; Mark's was dropped along with the patch
+  in question.
+
+- Fix new occurrence of kernel_neon_begin/end in Mellanox driver.
+
+Changes since v1:
+- Add a patch reverting the arm64 support for the generic
+  kernel_fpu_begin()/end() API, which is problematic on arm64.
+
+- Introduce a new 'ksimd' scoped guard that encapsulates the calls the
+  kernel_neon_begin() and kernel_neon_end() at a higher level of
+  abstraction. This makes it straight-forward to plumb in the stack
+  buffer without complicating the callers.
+
+- Move all kernel mode NEON users on arm64 (and some on ARM) over to the
+  new API.
+
+- Add Mark's ack to patches #6 - #8
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>
+
+Ard Biesheuvel (21):
+  crypto/arm64: aes-ce-ccm - Avoid pointless yield of the NEON unit
+  crypto/arm64: sm4-ce-ccm - Avoid pointless yield of the NEON unit
+  crypto/arm64: sm4-ce-gcm - Avoid pointless yield of the NEON unit
+  arm64/simd: Add scoped guard API for kernel mode SIMD
+  ARM/simd: Add scoped guard API for kernel mode SIMD
+  crypto: aegis128-neon - Move to more abstract 'ksimd' guard API
+  raid6: Move to more abstract 'ksimd' guard API
+  lib/crc: Switch ARM and arm64 to 'ksimd' scoped guard API
+  lib/crypto: Switch ARM and arm64 to 'ksimd' scoped guard API
+  crypto/arm64: aes-ccm - Switch to 'ksimd' scoped guard API
+  crypto/arm64: aes-blk - Switch to 'ksimd' scoped guard API
+  crypto/arm64: aes-gcm - Switch to 'ksimd' scoped guard API
+  crypto/arm64: nhpoly1305 - Switch to 'ksimd' scoped guard API
+  crypto/arm64: polyval - Switch to 'ksimd' scoped guard API
+  crypto/arm64: sha3 - Switch to 'ksimd' scoped guard API
+  crypto/arm64: sm3 - Switch to 'ksimd' scoped guard API
+  crypto/arm64: sm4 - Switch to 'ksimd' scoped guard API
+  arm64/xorblocks:  Switch to 'ksimd' scoped guard API
+  net/mlx5: Switch to more abstract scoped ksimd guard API on arm64
+  arm64/fpu: Enforce task-context only for generic kernel mode FPU
+  arm64/fpsimd: Allocate kernel mode FP/SIMD buffers on the stack
+
+ arch/arm/include/asm/simd.h                  |   7 +
+ arch/arm64/crypto/aes-ce-ccm-glue.c          | 116 +++++------
+ arch/arm64/crypto/aes-ce-glue.c              |  87 ++++----
+ arch/arm64/crypto/aes-glue.c                 | 139 ++++++-------
+ arch/arm64/crypto/aes-neonbs-glue.c          | 150 +++++++-------
+ arch/arm64/crypto/ghash-ce-glue.c            |  27 ++-
+ arch/arm64/crypto/nhpoly1305-neon-glue.c     |   5 +-
+ arch/arm64/crypto/polyval-ce-glue.c          |  12 +-
+ arch/arm64/crypto/sha3-ce-glue.c             |  10 +-
+ arch/arm64/crypto/sm3-ce-glue.c              |  15 +-
+ arch/arm64/crypto/sm3-neon-glue.c            |  16 +-
+ arch/arm64/crypto/sm4-ce-ccm-glue.c          |  49 ++---
+ arch/arm64/crypto/sm4-ce-cipher-glue.c       |  10 +-
+ arch/arm64/crypto/sm4-ce-gcm-glue.c          |  62 ++----
+ arch/arm64/crypto/sm4-ce-glue.c              | 214 +++++++++-----------
+ arch/arm64/crypto/sm4-neon-glue.c            |  25 +--
+ arch/arm64/include/asm/fpu.h                 |  16 +-
+ arch/arm64/include/asm/neon.h                |   4 +-
+ arch/arm64/include/asm/processor.h           |   2 +-
+ arch/arm64/include/asm/simd.h                |  10 +
+ arch/arm64/include/asm/xor.h                 |  22 +-
+ arch/arm64/kernel/fpsimd.c                   |  44 ++--
+ crypto/aegis128-neon.c                       |  33 ++-
+ drivers/net/ethernet/mellanox/mlx5/core/wc.c |  19 +-
+ lib/crc/arm/crc-t10dif.h                     |  16 +-
+ lib/crc/arm/crc32.h                          |  11 +-
+ lib/crc/arm64/crc-t10dif.h                   |  16 +-
+ lib/crc/arm64/crc32.h                        |  16 +-
+ lib/crypto/arm/chacha.h                      |   6 +-
+ lib/crypto/arm/poly1305.h                    |   6 +-
+ lib/crypto/arm/sha1.h                        |  13 +-
+ lib/crypto/arm/sha256.h                      |  12 +-
+ lib/crypto/arm/sha512.h                      |   6 +-
+ lib/crypto/arm64/chacha.h                    |  11 +-
+ lib/crypto/arm64/poly1305.h                  |   6 +-
+ lib/crypto/arm64/sha1.h                      |   7 +-
+ lib/crypto/arm64/sha256.h                    |  19 +-
+ lib/crypto/arm64/sha512.h                    |   8 +-
+ lib/raid6/neon.c                             |  17 +-
+ lib/raid6/recov_neon.c                       |  15 +-
+ 40 files changed, 587 insertions(+), 692 deletions(-)
+
+
+base-commit: 0d97f2067c166eb495771fede9f7b73999c67f66
+-- 
+2.51.0.710.ga91ca5db03-goog
+
