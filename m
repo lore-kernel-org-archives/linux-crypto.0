@@ -1,90 +1,91 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141C91F12E9
-	for <linux-crypto@vger.kernel.org>; Wed,  8 Oct 2025 12:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAB326CE3F
+	for <linux-crypto@vger.kernel.org>; Wed,  8 Oct 2025 12:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759925651; cv=none; b=Bw7ghWiuoOUhr6bwMNs8qNMBfLgMsiPJZm5OgFmrv2GCIwzhV++GzU1LmxBVGgocEdoN1W8q9Jhz4hjZmHsXQKvdv13KzM/9o5pImDO015AWX2L3rkRQXMY017L9cHz62x1o+nHDXOx9BgMzhNOXtDhDv/chAikdAJiA4jC7ZbI=
+	t=1759927479; cv=none; b=mHISW3qevq9fzu6sxyJOp32dv6SHf8Q0495COw7Pl5IfVF3rK5DNsOB5ZWAD6joC6aYNVkuFmbJmPZh8R4t4NmJZf716XDwZf1/Uyymlt+IZcB4qrZL6zOfjPwxzo86psedklIb5XTwbwJeHBrGksDvu1K8BEDQiCEN48+qKn7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759925651; c=relaxed/simple;
-	bh=/FJgVIhyEdN2o1Z6gxhSpN/SUCrOw+mDyn0/IXLBcvE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FbM79zj8gIHZJcwNryhxI1mAkv+UQdZIP5q/B+b+Z/s5bmTJfUaEX+nHNSfDLzMarKBbBmKbhVYlTbwNiSojR3bQlw2JQ53JLiKpRs8hs1sNd5lfjMjmzkE3ImrPhAywGH+b2/HTZ3GBxyJVBz7Php+2n/Iqo+ySw4hQpX8zu+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=TDMFBW9j; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+	s=arc-20240116; t=1759927479; c=relaxed/simple;
+	bh=N31ilv74oly5MwZpmaMuwEenXmb62MTdPxYq3RqSmIA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VfTPJqmz0KnxLCRLGZVWNMCS+SMUVh2vV2C3y1hy6jnm3sc3oQRKJBJB45qje5Nb45eCIf0mlBIfUwFK66/5KzxfvQz9iXLKD+yMeg3dnnF5c3hwlwMhIbLf44nQ2zkX4g3myU096duFzmLmyvSkLvkkA2NIahbxqMKseaUHQL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqQieQZR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="TDMFBW9j"
-Received: from trampoline.thunk.org (pool-173-48-102-192.bstnma.fios.verizon.net [173.48.102.192])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 598CDGF0026282
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 8 Oct 2025 08:13:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1759925615; bh=kwti+J23zAyIXFnhzpTdkk/4xOFi3nZKWO5T9JLhw6Q=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=TDMFBW9jTsNS5yFyaJQgzdFDDay8k+jhDgMmVCLoZBppHe68wgRLt1068J6N/+wi/
-	 UhbE3Lwg3GJkFk0dOxpHTrojoyofUYgS2mnBufSQJbeb9oEmqnl2oZh7kLR//Mnphg
-	 FvZbpMSqQ3foGKPVSccMCwejQLYSZ7JxEnPbZMG3RI5zyQpKKf1EAXMIEl5NJFI6O6
-	 EIkj7qIoZdEVOiLK/7qifURmYmCs7FAK61n+ENsVDnhVXNZR8ZuHW8hNyy87dzIefu
-	 BcoYZQZTfErKqNhJNPJY7X0vWvLAJ9eSNSD8ERP8WUsPEcf810vB3kIiRGJc4ehwAa
-	 zLzn3vWM3LKDQ==
-Received: by trampoline.thunk.org (Postfix, from userid 15806)
-	id 9DFC02E00D9; Wed, 08 Oct 2025 08:13:16 -0400 (EDT)
-Date: Wed, 8 Oct 2025 08:13:16 -0400
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Simo Sorce <simo@redhat.com>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-        Vegard Nossum <vegard.nossum@oracle.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        "nstange@suse.de" <nstange@suse.de>, "Wang, Jay" <wanjay@amazon.com>
-Subject: Re: 6.17 crashes in ipv6 code when booted fips=1 [was: [GIT PULL]
- Crypto Update for 6.17]
-Message-ID: <20251008121316.GJ386127@mit.edu>
-References: <1a71398e-637f-4aa5-b4c6-0d3502a62a0c@kernel.org>
- <f31dbb22-0add-481c-aee0-e337a7731f8e@oracle.com>
- <20251002172310.GC1697@sol>
- <2981dc1d-287f-44fc-9f6f-a9357fb62dbf@oracle.com>
- <CAHk-=wjcXn+uPu8h554YFyZqfkoF=K4+tFFtXHsWNzqftShdbQ@mail.gmail.com>
- <3b1ff093-2578-4186-969a-3c70530e57b7@oracle.com>
- <CAHk-=whzJ1Bcx5Yi5JC57pLsJYuApTwpC=WjNi28GLUv7HPCOQ@mail.gmail.com>
- <e1dc974a-eb36-4090-8d5f-debcb546ccb7@oracle.com>
- <20251006192622.GA1546808@google.com>
- <0acd44b257938b927515034dd3954e2d36fc65ac.camel@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqQieQZR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 659EAC16AAE
+	for <linux-crypto@vger.kernel.org>; Wed,  8 Oct 2025 12:44:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759927479;
+	bh=N31ilv74oly5MwZpmaMuwEenXmb62MTdPxYq3RqSmIA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=aqQieQZR3vwxlStqo6iOnZZELag0xnqfCqNBsbDX3546Y4eKN3ZTJ1grDd7Gp2MKt
+	 LuRzdtmFmH5PCT6bSeA3wb3Yhyu/LZ1CUlZmGxT9tlAFPhtehcNOx+LeyBY54+UV8g
+	 zRYRGt2eTGJNopitgAcobC87SgArwTUUtVdrfd10dPmT1XMOaUabpFmXyp0dTdahUH
+	 M/WStRHaNOHBHXO2R/m1VRe4LBLMElhSSAO+J0Y2NQFuuJaRByy+j7qZdcXy2gMHuc
+	 F0/nGHKc+HnovDn3Gi3VervfYb9rN6yd6xvuH7Wfr3k3Qy6qaV0e8YqR86LY6Its9N
+	 //Dc23NlkmS/w==
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-579363a4602so8247433e87.0
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Oct 2025 05:44:39 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUoDmtkHYCcAC4vweUQ966VIz27YILktw2MigkLFQTMPSAG3uB8g4/WKUkwHDf5rENyBPPrIAvGd8uAjXs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9mD84HI9hO0T6jjIOYcmeUWwU3KXDPFE6TxAzFeQBzwV3ibGP
+	MjWcfVJK5dgOcbznHmKL10JPNzW0TGm/a9bKboVztrVuueg+SxPvX+7oa+Pl7+LdRGoMvAWN1qE
+	ZwU02ZAQ3WTSh9AlQvzzZl4QNV8Bb8jU=
+X-Google-Smtp-Source: AGHT+IFb/9iVZyCeacRA4eV5KNX9g58E3Jlitn31uEFl4qngdAtE1ZMjpaLTq+Y+xAVeNotQ9Yk5di84F5oEAA9lL/Y=
+X-Received: by 2002:a05:6512:138e:b0:579:f4b3:bd2d with SMTP id
+ 2adb3069b0e04-5906de92179mr905583e87.57.1759927477667; Wed, 08 Oct 2025
+ 05:44:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0acd44b257938b927515034dd3954e2d36fc65ac.camel@redhat.com>
+References: <20251001210201.838686-22-ardb+git@google.com> <20251001210201.838686-23-ardb+git@google.com>
+ <94214ee4-3eec-4151-a5a7-9d5e030fbca3@sirena.org.uk>
+In-Reply-To: <94214ee4-3eec-4151-a5a7-9d5e030fbca3@sirena.org.uk>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Wed, 8 Oct 2025 05:44:25 -0700
+X-Gmail-Original-Message-ID: <CAMj1kXEfw4RnY4wg6JBz01Hoa7r2amdJnj-eD-Kt0D+r6kAEtA@mail.gmail.com>
+X-Gm-Features: AS18NWAvgP-PCFNPrGtZ5EtJZD86tidAj6ogMQQ_6DyA-DVZJAXzTHykQTP7Ti8
+Message-ID: <CAMj1kXEfw4RnY4wg6JBz01Hoa7r2amdJnj-eD-Kt0D+r6kAEtA@mail.gmail.com>
+Subject: Re: [PATCH v2 01/20] arm64: Revert support for generic kernel mode FPU
+To: Mark Brown <broonie@kernel.org>
+Cc: Ard Biesheuvel <ardb+git@google.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	herbert@gondor.apana.org.au, linux@armlinux.org.uk, 
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Eric Biggers <ebiggers@kernel.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Oct 06, 2025 at 03:45:46PM -0400, Simo Sorce wrote:
-> Note: this may change going forward, but I am confident that as issues
-> arise people will propose upstream patches to keep it as close as
-> possible within acceptable parameters for upstream behavior.
+On Thu, 2 Oct 2025 at 09:23, Mark Brown <broonie@kernel.org> wrote:
+>
+> On Wed, Oct 01, 2025 at 11:02:03PM +0200, Ard Biesheuvel wrote:
+>
+> > However, dropping that flag allows the compiler to use FPU and SIMD
+> > registers in other ways too, and for this reason, arm64 only permits
+> > doing so in strictly controlled contexts, i.e., isolated compilation
+> > units that get called from inside a kernel_neon_begin() and
+> > kernel_neon_end() pair.
+>
+> > The users of the generic kernel mode FPU API lack such strict checks,
+> > and this may result in userland FP/SIMD state to get corrupted, given
+> > that touching FP/SIMD registers outside of a kernel_neon_begin/end pair
+> > does not fault, but silently operates on the userland state without
+> > preserving it.
+>
+> Oh dear, that's nasty - I didn't see the patch when it was going in:
+>
 
-What I'm curious about is what falls within the acceptable parameters
-of *distro* behavior.  If NIST-certified labs really insist that
-certifying requires making the kernel completely unsupportable from a
-commercial perspective, at what point will *distros* decide to give it
-up as a bad idea, or to have a completely different binary kernel
-package that only crazy customers would be willing to use?
+Actually, there is a check, it just wasn't wired up correctly by the
+amdgpu driver, due to the fact that it wraps kernel_fpu_begin()/end()
+calls into its own API, which are therefore always made from a
+compilation unit where it is supported.
 
-If there is something beyond hard-disabling CONFIG_CRYPTO_SHA1 which
-all distributions could agree with --- what would that set of patches
-look like, and would it be evenly vaguely upstream acceptable.  It
-could even hidden behind CONFIG_BROKEN.  :-)
+The trick is to #include <linux/fpu.h> into the definition of their
+own wrapper API, so that using /that/ from FP/SIMD code also triggers
+a build error.
 
-						- Ted
-						
+So I'll drop this patch.
