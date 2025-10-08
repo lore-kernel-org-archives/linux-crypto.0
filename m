@@ -1,55 +1,55 @@
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B6F2FB618
-	for <linux-crypto@vger.kernel.org>; Wed,  8 Oct 2025 15:47:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A239A2FB0A0
+	for <linux-crypto@vger.kernel.org>; Wed,  8 Oct 2025 15:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759938422; cv=none; b=I9rS8AxSZALAq3Gbg7c+HH8U+pCJJKubZwumKckTjZbd/akm9fiYPxN1lsisYiWz7yuaz/8BXVcnErk05QH6vqPflH/CQFpzx1hYLe5+iTGYV5pFZnu16VoWz3+/MrJgNBfP1PgQcBQBijighNNqNoQMo1xo8FbW3Vmy3bB7xTI=
+	t=1759938423; cv=none; b=MK3SmGLp+QPDUwxNu6PNSgclnroyVeLrpq3VmXLDF/C8X07WwP2WIhMk+LTnBCB3+R0JR4uO9psDODIlRAX9ouf90KiAp5BwtM5KQkXmsjAvvAd8WZPIHvKKx5Llqo1mCvIh1+1fEvxcVl1dyVGGK1CSuNsp13IsuJ31xSg7M7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759938422; c=relaxed/simple;
-	bh=qCZByrWzrmyH3UqPPmysPCtXP60NqDPuaPfmddQNwAA=;
+	s=arc-20240116; t=1759938423; c=relaxed/simple;
+	bh=8/2or9yCCRuAQ3rBPtjIaQu4DThn+Ww7LOmUhgaq6a4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Uqy6L3EfZMNFzqjtbmCk7OM39tS+AU17PYNDFLkbVTP/qeeA7yd6H7Fb/ai62o6FIbr5e6fXlseo6BMsXCHCELrD/vKlQuZzcLE/37suPELLZlJppkjyId6LYrIxe3s3/8ymirfGQ6l3ZQ5tWvEDQCvgFG3A+zhz1FLjWSmoFFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jsL5e5A6; arc=none smtp.client-ip=209.85.208.74
+	 To:Cc:Content-Type; b=Uru+noT2I4pBaFy4pE9AKfN4LT5NEPPbogjKA7k6mc0w/AU2AcG3P5sf1ZeGJEV/Fgp/1/AvI/VeQYXARIAp1EOpt6Y6kzd+7RLAQmhBzxk9+7aanNWqN0tV1JhaTl3hs6ocA0/wfHFugy3Mtgt887MzLCTQvHpHss0U0SXbXFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bFc2Hgb0; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jsL5e5A6"
-Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-6394afe514eso6335186a12.1
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Oct 2025 08:47:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bFc2Hgb0"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-46e45899798so29370725e9.3
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Oct 2025 08:47:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759938419; x=1760543219; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759938420; x=1760543220; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v0Zu7n3LaOo+I8CYEuQkDSSyekyMvHu55FmTnZPR1Fs=;
-        b=jsL5e5A625yqUhXudNynVVwIpRANnyLusCkB+HGpAEYqnxOAQncddEDMQ5yUSJNcjW
-         AnjgzN8d/m5nneQLiZdjPMnKJuQtdQW4v6FfDjtODvhBXylBuNWcoJc+GZhwH/QnS2j3
-         W7r8g44MiUu0gT0SbOxPbjUJivjJ9m6JF6CfXgVwZ5apl+lwBonrCGkkH9r17l38OKeR
-         H28RoqDNqv+ILtNo5l/ixHmVdccNUnY4sUbfleUyHJJkYXaHJrwxfOFhyM5NwJrDmsJz
-         OnSzB9WNax9MHtjb8Z3CXzIa/t8Dj5VfA5cd6ojDkXoqbII6woVnXYWvIFZXb5Huv12j
-         6Www==
+        bh=Ez+4eKtd+5d+DlN9/UyWopIVxOEbKik+aYqVxPQpTVQ=;
+        b=bFc2Hgb0zvoq3jKqzFnDT6qW3Z69YmMOD1oVa9V7rqYs3VrG2vTBqWSrl0K8bp8S0U
+         mqMXzhi5oH96/7ZNHvtJG/+Trimhcnok9gXL6ZCqi1dyXOZ49By+cXIT05TsEKORmwWX
+         OvHxHSeHw72xKPDfFgZjzRS2uv7qCsCKcMo0bb/nsTsxDjFkcBFoDG4XNQuP+4y46Iei
+         Rb2pWyjzt9ztizAwnkZ0iemkNunZx1Mn0cJiNa3pe1Kok4+1/NFXpn4ynjd85RpJUP1r
+         SDaKEpLbbjvuNx59BGg+By+y16iUco1GRyDS14kJyxdGOYIO8DbMcOeFRDUk6TrP39bH
+         fz7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759938419; x=1760543219;
+        d=1e100.net; s=20230601; t=1759938420; x=1760543220;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v0Zu7n3LaOo+I8CYEuQkDSSyekyMvHu55FmTnZPR1Fs=;
-        b=pvkQS9KRPiBLnSPZeAzC1NFl2UJQQXMeMBA92vrE4Ik1JEg9xw7jFKGQivh3dkZ+uT
-         UydL9KVBTQR4MuafUSANloA45RhwO/d4X+r+8LPYS7qs0WxnWs4XKhflmHUxWL8zxrKu
-         WfGWI4g4uLQsiDEdFV4IAdhE8XuinTzVXnxL05wwwGH7Y1fLxq4OPYYtVLQV/po1SuUJ
-         eMu7xCTYs9Fs89brKg+XEsNf53ZLCPD0ZGJVgGDNeyzkzIcnHc6X8cY9O+M4Fz3waHjc
-         tYZtofOiTVymjS7GokjgjMPCV4homWT5gEwPzFYvJb3KYRYz7Z++v/y/9x3ksAJ/FzK9
-         hZNA==
-X-Forwarded-Encrypted: i=1; AJvYcCVsGnOnH56pGoY0BJBhmKkKckba3bvNndHa+ZubCmkh6RMiOvdGUQzqAR76YbHBMxSLw6tQ9/FsCSEXrYE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNjev8AcoMu0dfLeqTeNCfMBaoklr0+GN8whhcOLXaOs0ux+eM
-	XTVQ7y6MudSKIndyXVd6+UzLR6lmurdHuEQHho2Q00PrbEqlt8o5F3QpQpDoLmyrSVneMXszGA=
+        bh=Ez+4eKtd+5d+DlN9/UyWopIVxOEbKik+aYqVxPQpTVQ=;
+        b=bBwoUdWSc+NDOPsByqj1M5ob6nMau8S8j87WBtRRdz/iyLjqVFvlM5p0MaSKvh8WpP
+         MlareuRmrj8An+NLMIToaFihcQqMB9BLMhLSg6sUGeQiMAOm7qY+E0CG18XxZCjzYuN3
+         Bksp4+ZZgBsfAthIcU/z97xqFiOeqPPD0GQWp1CYJyQ7BOPuq76bxGhlBhSumO8jEyl3
+         dvLA0nmMOKua9sVFQKjqKnsqMcJ3OdtWY4BF5Vvyp9S5NnvJ1Pgjk47YZ2GYdNouOl6n
+         GmP1QS3Mfaag3+GmEUVWGLgkCi3FzOewF4pVX4DDVGT7VoZzD3OFY88Ac0u+lfDPFmRq
+         tDAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXq/Y5G2f5QrEe8OBmAWCCOBMs/0U++GbSnP+gTJ2zLNoFlhVRb6cNws/qqLxIwN9NHWBb8E9lz9XTdSEY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxV9zeOjIj5EfZf0oDIf0FMLdxg+mLBP5OdH5niJDPngoakc8hJ
+	FMfa6UJl7esoyQ+b22MzXhhjDV5EovFTeI8bTZeuSZ12sQ+gLWWMu7/6yQu39S6h2QT0ofEmsg=
 	=
-X-Google-Smtp-Source: AGHT+IGav2hs8j+BD8Ez6wtFb9ryWmg+5Cqi/FdQRo4iR29OSB6a6/a1XkaaR/BdhniWetTsV5AzKnAF
-X-Received: from edg11.prod.google.com ([2002:a05:6402:23cb:b0:633:88ce:6ba1])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:1ed0:b0:639:e469:8ad1
- with SMTP id 4fb4d7f45d1cf-639e469a2e6mr1875949a12.20.1759938418627; Wed, 08
- Oct 2025 08:46:58 -0700 (PDT)
-Date: Wed,  8 Oct 2025 17:45:46 +0200
+X-Google-Smtp-Source: AGHT+IGTYM4Pf/38/W7UXSGOfa/Cz0TebUDvS0+woKJDjAs0iBAdrVv8aCM0ALs/qJZsRftZYcTgSa7a
+X-Received: from wmvx6.prod.google.com ([2002:a05:600d:42e6:b0:46e:6a75:2910])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:c162:b0:46e:4a60:ea2c
+ with SMTP id 5b1f17b1804b1-46fa9b17e57mr26033895e9.37.1759938419976; Wed, 08
+ Oct 2025 08:46:59 -0700 (PDT)
+Date: Wed,  8 Oct 2025 17:45:47 +0200
 In-Reply-To: <20251008154533.3089255-23-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -59,14 +59,14 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251008154533.3089255-23-ardb+git@google.com>
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2613; i=ardb@kernel.org;
- h=from:subject; bh=5MqfiBK+zzoh8ZIeemHCwImcnXO2p3OW2OkltAZA92c=;
- b=owGbwMvMwCVmkMcZplerG8N4Wi2JIeNZu6PQv0s/3R6FHTWrvdppvE8hc+vPH+tbHDdp7mpvM
- V4evbWxo5SFQYyLQVZMkUVg9t93O09PlKp1niULM4eVCWQIAxenAEwkezEjw0qBPKbzws7Ls/O1
- ouV3v2yt4VpzsfVj3Rr2CQcy7kcG6DD8s28KWpu+NjTuYv5NwwkVnJz71GZnX1lqLbpLJixgrcQ EFgA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1189; i=ardb@kernel.org;
+ h=from:subject; bh=8sN9JxLWvPrUJL2U51Eh+5qEYXWcAYa7eZ5mEETt20c=;
+ b=owGbwMvMwCVmkMcZplerG8N4Wi2JIeNZu/PzMHauZxLCKuERrRdfzF5wf7kDA39FxuHFVmtm5
+ k9ZGbCyo5SFQYyLQVZMkUVg9t93O09PlKp1niULM4eVCWQIAxenAEzkiCIjw9wiF2ODjCNqLeKT
+ 1y57HJa2ecbP6MIlHaFB7NPv73o48RIjw6d9u7u+haqfKfBVlgpP4bO+/M9SaGnMwn/JDUovz4U dZAIA
 X-Mailer: git-send-email 2.51.0.710.ga91ca5db03-goog
-Message-ID: <20251008154533.3089255-35-ardb+git@google.com>
-Subject: [PATCH v3 12/21] crypto/arm64: aes-gcm - Switch to 'ksimd' scoped
+Message-ID: <20251008154533.3089255-36-ardb+git@google.com>
+Subject: [PATCH v3 13/21] crypto/arm64: nhpoly1305 - Switch to 'ksimd' scoped
  guard API
 From: Ard Biesheuvel <ardb+git@google.com>
 To: linux-arm-kernel@lists.infradead.org
@@ -86,75 +86,25 @@ bytes to the size of struct task_struct.
 Reviewed-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/arm64/crypto/ghash-ce-glue.c | 27 ++++++++++----------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+ arch/arm64/crypto/nhpoly1305-neon-glue.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-index 4995b6e22335..7951557a285a 100644
---- a/arch/arm64/crypto/ghash-ce-glue.c
-+++ b/arch/arm64/crypto/ghash-ce-glue.c
-@@ -5,7 +5,6 @@
-  * Copyright (C) 2014 - 2018 Linaro Ltd. <ard.biesheuvel@linaro.org>
-  */
- 
--#include <asm/neon.h>
- #include <crypto/aes.h>
- #include <crypto/b128ops.h>
- #include <crypto/gcm.h>
-@@ -22,6 +21,8 @@
- #include <linux/string.h>
- #include <linux/unaligned.h>
- 
-+#include <asm/simd.h>
-+
- MODULE_DESCRIPTION("GHASH and AES-GCM using ARMv8 Crypto Extensions");
- MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
- MODULE_LICENSE("GPL v2");
-@@ -74,9 +75,8 @@ void ghash_do_simd_update(int blocks, u64 dg[], const char *src,
- 					      u64 const h[][2],
- 					      const char *head))
- {
--	kernel_neon_begin();
--	simd_update(blocks, dg, src, key->h, head);
--	kernel_neon_end();
-+	scoped_ksimd()
-+		simd_update(blocks, dg, src, key->h, head);
- }
- 
- /* avoid hogging the CPU for too long */
-@@ -329,11 +329,10 @@ static int gcm_encrypt(struct aead_request *req, char *iv, int assoclen)
- 			tag = NULL;
- 		}
+diff --git a/arch/arm64/crypto/nhpoly1305-neon-glue.c b/arch/arm64/crypto/nhpoly1305-neon-glue.c
+index e4a0b463f080..013de6ac569a 100644
+--- a/arch/arm64/crypto/nhpoly1305-neon-glue.c
++++ b/arch/arm64/crypto/nhpoly1305-neon-glue.c
+@@ -25,9 +25,8 @@ static int nhpoly1305_neon_update(struct shash_desc *desc,
+ 	do {
+ 		unsigned int n = min_t(unsigned int, srclen, SZ_4K);
  
 -		kernel_neon_begin();
--		pmull_gcm_encrypt(nbytes, dst, src, ctx->ghash_key.h,
--				  dg, iv, ctx->aes_key.key_enc, nrounds,
--				  tag);
+-		crypto_nhpoly1305_update_helper(desc, src, n, nh_neon);
 -		kernel_neon_end();
 +		scoped_ksimd()
-+			pmull_gcm_encrypt(nbytes, dst, src, ctx->ghash_key.h,
-+					  dg, iv, ctx->aes_key.key_enc, nrounds,
-+					  tag);
- 
- 		if (unlikely(!nbytes))
- 			break;
-@@ -399,11 +398,11 @@ static int gcm_decrypt(struct aead_request *req, char *iv, int assoclen)
- 			tag = NULL;
- 		}
- 
--		kernel_neon_begin();
--		ret = pmull_gcm_decrypt(nbytes, dst, src, ctx->ghash_key.h,
--					dg, iv, ctx->aes_key.key_enc,
--					nrounds, tag, otag, authsize);
--		kernel_neon_end();
-+		scoped_ksimd()
-+			ret = pmull_gcm_decrypt(nbytes, dst, src,
-+						ctx->ghash_key.h,
-+						dg, iv, ctx->aes_key.key_enc,
-+						nrounds, tag, otag, authsize);
- 
- 		if (unlikely(!nbytes))
- 			break;
++			crypto_nhpoly1305_update_helper(desc, src, n, nh_neon);
+ 		src += n;
+ 		srclen -= n;
+ 	} while (srclen);
 -- 
 2.51.0.710.ga91ca5db03-goog
 
