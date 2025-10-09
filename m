@@ -1,73 +1,33 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7CBF2C11DB
-	for <linux-crypto@vger.kernel.org>; Thu,  9 Oct 2025 10:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5D52DCC05;
+	Thu,  9 Oct 2025 10:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760005849; cv=none; b=f1UY7ae787O1JLedQdPLPSCIISxuxHN1pITn8OC6/uL7XLT5GM7N0N/rMrraRTrcbzXlW0fregufGvwfHGCGFkVKc10j7ydtPeuArcso0SQiWDVY7buOP02NAC2hfCAJTRKsrunuxl6sxAf5b7JjRJ/TxkSzjQwFiNVtQHN657c=
+	t=1760007089; cv=none; b=YtG9xgDGZlYVNsGUOPGDr0JGHFwBMsBl1r68xAYnpgO2ZgXExlws8Gk8f/3yGjbXhlL0ck7pxLv79KIvkQpNRoUvNuN8CpBB+EJ+L3EtHWTdXIq/NVaK6TzgDiDp1asEZNrDpbT62yaIg+f0goDuVrHx2spqBgt2/c4TX1TR2I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760005849; c=relaxed/simple;
-	bh=pQkhHLuqz5FI6wkHW0gvcTQusPJLmVYgUYJXA/pKqVY=;
+	s=arc-20240116; t=1760007089; c=relaxed/simple;
+	bh=t8Unjk53qMCxbfkVUrOXszok33kPkGXwPY5zH2soo+o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eq0KOsoBXlLdvsshHFiCwfjDI7+papnFzNxkXC7LGLd1rXP4RK4HSFltZV0w/WultFtfedTqFXtJWyUxYLJQ2Nq8uZ5j1uEfrriE8edqjMnggfnoxAo1JuUFcxl9OMMdgHKnMgSDUl/xDngNEjqYQxuoz/OdNfOixOsf0S8R3dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QhNlqUuE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 In-Reply-To:Content-Type; b=j9cyGk9+iTBPdN1kGEyqdEkm2keJDuTHrb+iLyywox1lhYduLI++MpDjDGHkyy/EBgAW1sCM5g8y7JrzzZxJXhDugCD2iuu9KfxdhzLm0vtKvwvN69xA04qmx2tffsm1TFxFkJiVsdi2uJNAApf+WBxYaDvLq6IxqhcKlqsV36g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qWwCcAR2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QhNlqUuE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760005835;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=5kNnaE3wosVbbZxnmP0sVKpcafEUi286yAMPQXV2QSw=;
-	b=QhNlqUuEsZntvTKx/8um0mOXPrBTaocXHhJUBiXc0eBjqWRq2yTGClJBkTGOc2yp7VwzTy
-	QjsteWnmZaTPA0KvttQcbt9UdhQhB5/iu4v2IN3rowl2TpF4BlKjApsiN7jS1ukF677+wu
-	UOH+Qgx/PilnAElVViX2pOLP3CclQVw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-XQ31GnagNASMfqQESUGr1Q-1; Thu, 09 Oct 2025 06:30:34 -0400
-X-MC-Unique: XQ31GnagNASMfqQESUGr1Q-1
-X-Mimecast-MFC-AGG-ID: XQ31GnagNASMfqQESUGr1Q_1760005833
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e3e177893so4602615e9.2
-        for <linux-crypto@vger.kernel.org>; Thu, 09 Oct 2025 03:30:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760005833; x=1760610633;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5kNnaE3wosVbbZxnmP0sVKpcafEUi286yAMPQXV2QSw=;
-        b=XyVn5VM2vzbdjduHCQnIZXOxT2pE+pgyOOU0eL/vrGCjaQkwV4t5qn7KZ3vdXdhNr3
-         DzwhRpLIsF2DPrW4J1PxyyX34AGXN+fTtUM3sE02nkY4ngSSMg8zvsQdHC9aeTfgz7W2
-         VZtpdQhr0ec0OV3zMIvRf0mJoq48GoRWx1MHVP33D0m6vie8YeoxjmDVplxlSpZslmoY
-         KQQJaG5dIWznNy8lrdOS88VR8QxHH3GZLrHnwvsd8FLJpzaI7E1C13eQKeI/YtShM3fI
-         f0NXCGO9uzdWatUmizjPYWVkN0tHaAmfDW/cngSzeMd2KhF5cTjNiGT2LoKuffw4I6W/
-         TiTA==
-X-Forwarded-Encrypted: i=1; AJvYcCW9HkaQpqYV3DqZXp0CGoB1srtzEdAUqrhhL8njp4OG9UWNtNDEEUXMTa7DRw7vGKGv1JKY8w2iriBtHKw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzU4RgiIpXYGZzVtkVDp9QCroo07E9+bt0yryzw2A4eBM4QVixM
-	MLNIUiSKgNdYNnZRBnVAddVD8ZJz9xJnmJk8Aw6huSyVeDViqOqrydjlR4T783tSUGdL18Bw7+d
-	X+uhP/3cBysL8CK2QZa5U6D32eetnR78n7+xp+p/E/k1c6MUsDciPvm7uQSFpc9A9ew==
-X-Gm-Gg: ASbGncuV53uF8DU1vlf3AoDEq7pf258zGGm6LH5o61HuMbhzMZjHaXYaBM5m5PZ9jUm
-	evFHiCdSHZvbZTMhexXFtpLl7Ajv4uAthTfCbE3w4GGIw2WYLA4rphzod4OPQ47H2X+Z16Dmzkm
-	Bd9WT7m59MAzjlxy+bTmz+MApvQrpkxVs6tPB7hhRhxgQLMZBE77El3jYt3wMy5YhWjz8ol6bTx
-	Ndxe47ECvb0Tn3LpNCf7w5ZoM9CSso2X3UPsCnPd7DpqLB7VL6UZAqZ5OQqOa7MeyZjVjToFAE0
-	LcWC4EVQiipMoAd3tjIMIWfdJIzlFW9L7S9is/PnFQU2tCuM6ZDMg/6tSNMgjhe8qxcQTTCtT8m
-	r2jg6bkhf
-X-Received: by 2002:a05:600c:8b22:b0:46e:4882:94c7 with SMTP id 5b1f17b1804b1-46fa9b02c6amr45782575e9.28.1760005833122;
-        Thu, 09 Oct 2025 03:30:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFU6FTiIKoa0UkBC9Zx589zDahv6+GU8nNOKIx+xH1kxdPK8/6eRVsJOlUDPEfHImp4fkFddw==
-X-Received: by 2002:a05:600c:8b22:b0:46e:4882:94c7 with SMTP id 5b1f17b1804b1-46fa9b02c6amr45781975e9.28.1760005832588;
-        Thu, 09 Oct 2025 03:30:32 -0700 (PDT)
-Received: from [192.168.3.141] (tmo-083-189.customers.d1-online.com. [80.187.83.189])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fab3cc939sm34647705e9.1.2025.10.09.03.30.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Oct 2025 03:30:32 -0700 (PDT)
-Message-ID: <7d82cf5e-f60c-4295-9566-c40f6897fce7@redhat.com>
-Date: Thu, 9 Oct 2025 12:30:27 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qWwCcAR2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2158C4CEF9;
+	Thu,  9 Oct 2025 10:51:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760007089;
+	bh=t8Unjk53qMCxbfkVUrOXszok33kPkGXwPY5zH2soo+o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qWwCcAR2gVYFod8OQwR9bNZchJjoLoaayE8q0zTVkuIM5nyo2Hb1CrIVDaWITDsW+
+	 0+6wfUVNVYsTs3gxcvfDUX61CaxPeKymHHDCTfO0Fb4DB+r8W8VBd0gaRU3j1VlD7x
+	 CXEs6WljC1AZyUOQTJ+HokjVVnC736E9bPpXLAmmzobPlZXn9Hh4uTDG9m1QIB8Q+p
+	 77kmzxeSNryVrou3VZrDUge6XrT6L+2tf7wfM4iQamc4nb8LzT63dp4Sl5xHCFYFlL
+	 5SYgOnpO2KltMHT3StcBdk4Y+NsYIgtG2anhUARKiZKCJQ5olNPJly4YNrcCHRlvCs
+	 r8a8Q6+O3escA==
+Message-ID: <36759154-4e7b-4cc9-b50f-ffb51a0b8aaf@kernel.org>
+Date: Thu, 9 Oct 2025 19:51:22 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -75,191 +35,77 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 06/35] mm/page_alloc: reject unreasonable
- folio/compound page sizes in alloc_contig_range_noprof()
-To: Balbir Singh <balbirs@nvidia.com>, linux-kernel@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
- Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
- Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
- Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
- Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
- Zi Yan <ziy@nvidia.com>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-7-david@redhat.com>
- <fa2e262c-d732-48e3-9c59-6ed7c684572c@nvidia.com>
- <5a5013ca-e976-4622-b881-290eb0d78b44@redhat.com>
- <a04d8499-85ad-40b4-8173-dcc81a5a71bf@nvidia.com>
-From: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH] dt-bindings: crypto: qcom,inline-crypto-engine: Document
+ the kaanapali ICE
+To: Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ aiqun.yu@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com,
+ trilok.soni@oss.qualcomm.com, yijie.yang@oss.qualcomm.com,
+ Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
+References: <20250924-knp-ice-v1-1-1adfc2d9e83c@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <a04d8499-85ad-40b4-8173-dcc81a5a71bf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250924-knp-ice-v1-1-1adfc2d9e83c@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 09.10.25 12:25, Balbir Singh wrote:
-> On 10/9/25 17:12, David Hildenbrand wrote:
->> On 09.10.25 06:21, Balbir Singh wrote:
->>> On 8/22/25 06:06, David Hildenbrand wrote:
->>>> Let's reject them early, which in turn makes folio_alloc_gigantic() reject
->>>> them properly.
->>>>
->>>> To avoid converting from order to nr_pages, let's just add MAX_FOLIO_ORDER
->>>> and calculate MAX_FOLIO_NR_PAGES based on that.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>    include/linux/mm.h | 6 ++++--
->>>>    mm/page_alloc.c    | 5 ++++-
->>>>    2 files changed, 8 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/include/linux/mm.h b/include/linux/mm.h
->>>> index 00c8a54127d37..77737cbf2216a 100644
->>>> --- a/include/linux/mm.h
->>>> +++ b/include/linux/mm.h
->>>> @@ -2055,11 +2055,13 @@ static inline long folio_nr_pages(const struct folio *folio)
->>>>      /* Only hugetlbfs can allocate folios larger than MAX_ORDER */
->>>>    #ifdef CONFIG_ARCH_HAS_GIGANTIC_PAGE
->>>> -#define MAX_FOLIO_NR_PAGES    (1UL << PUD_ORDER)
->>>> +#define MAX_FOLIO_ORDER        PUD_ORDER
->>>
->>> Do we need to check for CONTIG_ALLOC as well with CONFIG_ARCH_HAS_GIGANTIC_PAGE?
->>>
->>
->> I don't think so, can you elaborate?
->>
+On 25/09/2025 08:29, Jingyi Wang wrote:
+> From: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
 > 
-> The only way to allocate a gigantic page is to use CMA, IIRC, which is covered by CONTIG_ALLOC
-
-As we are discussing as part of v2 right now, there is the way to just 
-obtain them from memblock during boot.
-
+> Document the Inline Crypto Engine (ICE) on the kaanapali platform.
 > 
->>>>    #else
->>>> -#define MAX_FOLIO_NR_PAGES    MAX_ORDER_NR_PAGES
->>>> +#define MAX_FOLIO_ORDER        MAX_PAGE_ORDER
->>>>    #endif
->>>>    +#define MAX_FOLIO_NR_PAGES    (1UL << MAX_FOLIO_ORDER)
->>>> +
->>>>    /*
->>>>     * compound_nr() returns the number of pages in this potentially compound
->>>>     * page.  compound_nr() can be called on a tail page, and is defined to
->>>> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
->>>> index ca9e6b9633f79..1e6ae4c395b30 100644
->>>> --- a/mm/page_alloc.c
->>>> +++ b/mm/page_alloc.c
->>>> @@ -6833,6 +6833,7 @@ static int __alloc_contig_verify_gfp_mask(gfp_t gfp_mask, gfp_t *gfp_cc_mask)
->>>>    int alloc_contig_range_noprof(unsigned long start, unsigned long end,
->>>>                      acr_flags_t alloc_flags, gfp_t gfp_mask)
->>>>    {
->>>> +    const unsigned int order = ilog2(end - start);
->>>
->>> Do we need a VM_WARN_ON(end < start)?
->>
->> I don't think so.
->>
-> 
-> end - start being < 0, completely breaks ilog2. But we would error out because ilog2 > MAX_FOLIO_ORDER, so we should fine
+> Signed-off-by: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
+> Signed-off-by: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
 
-Right, and if we have code that buggy that does it, it probably 
-shouldn't be our responsibility to sanity check that :)
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-It would have been completely buggy before this patch.
-
-> 
->>>
->>>>        unsigned long outer_start, outer_end;
->>>>        int ret = 0;
->>>>    @@ -6850,6 +6851,9 @@ int alloc_contig_range_noprof(unsigned long start, unsigned long end,
->>>>                            PB_ISOLATE_MODE_CMA_ALLOC :
->>>>                            PB_ISOLATE_MODE_OTHER;
->>>>    +    if (WARN_ON_ONCE((gfp_mask & __GFP_COMP) && order > MAX_FOLIO_ORDER))
->>>> +        return -EINVAL;
->>>> +
->>>>        gfp_mask = current_gfp_context(gfp_mask);
->>>>        if (__alloc_contig_verify_gfp_mask(gfp_mask, (gfp_t *)&cc.gfp_mask))
->>>>            return -EINVAL;
->>>> @@ -6947,7 +6951,6 @@ int alloc_contig_range_noprof(unsigned long start, unsigned long end,
->>>>                free_contig_range(end, outer_end - end);
->>>>        } else if (start == outer_start && end == outer_end && is_power_of_2(end - start)) {
->>>>            struct page *head = pfn_to_page(start);
->>>> -        int order = ilog2(end - start);
->>>>              check_new_pages(head, order);
->>>>            prep_new_page(head, order, gfp_mask, 0);
->>>
->>> Acked-by: Balbir Singh <balbirs@nvidia.com>
->>
->> Thanks for the review, but note that this is already upstream.
->>
-> 
-> Sorry, this showed up in my updated mm thread and I ended up reviewing it, please ignore if it's upstream
-
-I'm happy for any review (better in reply to v2), because any bug caught 
-early is good!
-
-
--- 
-Cheers
-
-David / dhildenb
-
+Best regards,
+Krzysztof
