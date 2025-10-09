@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E6A2D193B;
-	Thu,  9 Oct 2025 08:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A23C2737F3;
+	Thu,  9 Oct 2025 08:24:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759998120; cv=none; b=uzyOWyPpp6e2hANM6wT4wHh4NBwpO/BcMEFHnqQ/OizBJwoo/WLluYcixuE1HtA8RYggCEIm5M4qz9KalwH0fT4NKT9s6RA1lvX4q9kPx1TiOVCWYMYsfJ1QTN/eyWeK4qpW44yapQhGRTVABXcUy3LNUoHjR+unWUxMWnuHCnQ=
+	t=1759998279; cv=none; b=ZRafVQWJAr1IG6T3B3XWnA0334lheM/3HPAxkyUWnB7Q6RxJctMvdDUG1ne3XBQNrc84yoIK4KhlN6hp1k3tPB5fdrVOzcfvdhd4xm1gLgrf2U1KDAWt8CvS3+sy+a2mSGTI+LnToz0p5xBt5upFqN65R1AdL4hHoWyzBeFSzMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759998120; c=relaxed/simple;
-	bh=4o4f4b9jGIALmhnIUgVo9+yTcuO4ovJIPMUl+7uakZQ=;
+	s=arc-20240116; t=1759998279; c=relaxed/simple;
+	bh=IR/gJwZhczBTMD2l2Qm09Q1IiAI6onVSNlncXOq8wqs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mvjopq/I0GsEgTAxdyC8u+Op+0dZeJzQ4DGVFe6UlQdpnOBCBJ0BS0RwQdBssOdnb2poqbvfO5kI77jqJIU7jPjEDi4AJDbzMXbXsDWe5Z6ayWbdpf8Yank4TKUeNMdZQreysoIueS4IEM3VptiSqWs5ByNuNZqrcn2hwOXgcic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bHqJT8aq; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=f6nrqayjmLqtvnDFYeET3VvyZUDZvvMtYuGNv6a2ctCN5JvsWzjSxz5fbb2gf7XUFlZjNkyC4PMdWINp0frtNjO06afBZZ2ugflpI5pJlIGsZk+aoQpboo4xBjxBW9SGb6Vi/4UQchkCCSx+uJ2o895IJ8cDPAWtQjL7avN/XjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z4TZyFPY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bHqJT8aq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE6D5C4CEF7;
-	Thu,  9 Oct 2025 08:21:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z4TZyFPY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4D89C4CEF7;
+	Thu,  9 Oct 2025 08:24:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759998120;
-	bh=4o4f4b9jGIALmhnIUgVo9+yTcuO4ovJIPMUl+7uakZQ=;
+	s=k20201202; t=1759998278;
+	bh=IR/gJwZhczBTMD2l2Qm09Q1IiAI6onVSNlncXOq8wqs=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bHqJT8aq2BdCW/2GB2QPMbMfk1a58aAZZmWasdyCN7bCchilMXcYCeEZOOLCPBZai
-	 +e8vJEmSshijctgUn3TFXBjdFTatfyFGj56hgWek6lxRyTMhrNI22OfTPLeL4zjU1e
-	 7K7zttdaGTeZJ9a2YQNl4RTqKQEPOCubdLqiD1ly5jV0cS9K9jHq3uJrISksRqfJYY
-	 En+7fFOhF839OclJhxPymYxn2G2IpQDvHYhrgazSsk/V6Shf5+RsfmjqE9dIpRPktb
-	 rHZKTTxFSWCYN42KZKB2DYale9km11Z/h7w09/v3PerPhGPK4zWAlTU90TbVm9eEtH
-	 3fTWM2mYYnGdg==
-Message-ID: <3087bab4-3eea-485a-a6e6-de14ebf2825c@kernel.org>
-Date: Thu, 9 Oct 2025 17:21:52 +0900
+	b=Z4TZyFPYpVzIsWgwaUODnzzBqe0w78fJIS9+twW5wrhBcgfdGeX1F6UZQwu4dNAR9
+	 HGsUksMsMxUw/CONkNyTMI20N/DgR3LkS+RG0yg0rNB5PpbPOp8HY9rY2M+N0pziMp
+	 9VYvFXkV/tgubMIzRFpd2XPM21dIK7375E2XOAh3766zfbtzVml4EOhYR7GloIHkSJ
+	 14N1LpUF0n03eetKyI18wjt9VO4L5Nm5KdpQc6HbqJQvwhLUe8FTL40U3/7Ut68r8Z
+	 agsEov6zAM1NcS1hrJ1QSHPFOeFQY1sbhEN+vdd9y3fFjdb9tsRCuqkw/jEW+2m89m
+	 FsgdAtFkCwGIg==
+Message-ID: <7184d170-0e96-4aff-83c1-8ab2ada4569e@kernel.org>
+Date: Thu, 9 Oct 2025 17:24:28 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,8 +35,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] dt-bindings: crypto: ice: add freq-table-hz property
- to ICE schema
+Subject: Re: [PATCH 4/5] arm64: dts: qcom: qcs615: add ufs and emmc inline
+ crypto engine nodes
 To: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>,
  Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
@@ -48,7 +48,7 @@ Cc: linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org
 References: <20251009-add-separate-ice-ufs-and-emmc-device-nodes-for-qcs615-platform-v1-0-2a34d8d03c72@oss.qualcomm.com>
- <20251009-add-separate-ice-ufs-and-emmc-device-nodes-for-qcs615-platform-v1-2-2a34d8d03c72@oss.qualcomm.com>
+ <20251009-add-separate-ice-ufs-and-emmc-device-nodes-for-qcs615-platform-v1-4-2a34d8d03c72@oss.qualcomm.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -94,26 +94,21 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20251009-add-separate-ice-ufs-and-emmc-device-nodes-for-qcs615-platform-v1-2-2a34d8d03c72@oss.qualcomm.com>
+In-Reply-To: <20251009-add-separate-ice-ufs-and-emmc-device-nodes-for-qcs615-platform-v1-4-2a34d8d03c72@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 09/10/2025 15:18, Abhinaba Rakshit wrote:
-> Introduce the 'freq-table-hz' property to specify the minimum and maximum
-> frequencies supported by the Inline Crypto Engine (ICE) clock.
-> 
-> This property is added to the ICE device node because the ICE clock is
-> managed independently by the ICE driver and requires frequency information
-> to be available in the device tree for the proper configuration.
+> Add separate ICE nodes for eMMC and UFS for QCS615 platform.
 > 
 > Signed-off-by: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
 > ---
->  .../devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml       | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  arch/arm64/boot/dts/qcom/sm6150.dtsi | 51 +++++++++++++++++++++---------------
+>  1 file changed, 30 insertions(+), 21 deletions(-)
 
-This duplicates opp-table. Use OPPs instead.
 
-Also, minimum and maximum frequencies are defined by compatible, no?
+This is non-bisectable - breaks ICE on users.
+
 
 Best regards,
 Krzysztof
