@@ -1,108 +1,86 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE670280CC8
-	for <linux-crypto@vger.kernel.org>; Fri, 10 Oct 2025 14:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C96180604
+	for <linux-crypto@vger.kernel.org>; Fri, 10 Oct 2025 18:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760105238; cv=none; b=GuuGJXVDwxpsZ4ZVSRb9EjhLuPWSDD7TSpPcjrCR4lrM1ZT0gbvBKmAl2/D+GAbhutAIbO2QYL4SuysjEXUu0sLOqJeU1lARObRscdv20gxmEw35DPpN8TI/pBPpfMbsF1lF0ejFGs6IPRFTKnEh84WCnyj8oRwJO2pMaxEUTgk=
+	t=1760120516; cv=none; b=NSV63IRFAZP4o+QFwAi3KGKuLELH//J3ShHLa4sKu1ZNtGiUZjvikVzpYE7yNl2Pz0fUSKi6T088Zd9uQzpGqKrM21gXjv3Cnn7uFqqSEhzT32jIaJOwgkDhi5qkvl1+wyCO85wVs0CnK6P7LtbNCxnnrwc8v6V0yPFtoxRFujs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760105238; c=relaxed/simple;
-	bh=EpvvbYbzvU6zmy28zGsL/hrDErMFtA16oSibI9TggNs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C0ls0AhATYZkAyPchs9lkrVM24ITK0HEOTDfLP2RBbDi4V+HKVZX0rYpfxK/y8WBCoAaxmF9e6lqJeQqCaXedHdojVcQ27K0Mb0lOpRXGIUCOFQYxhjzStEVcYpXR5QNiyc6EcdtpMQQcs/g6ucKncUezVXAEiiNnS4E6hFxWuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lZLZwCgd; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1760120516; c=relaxed/simple;
+	bh=B74xUW6B1dkzhI1p0wyaWpMe4jQ6pt6RZTrVVE+n/hg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y3MLU8tLsZ4QCpz/1e84FZL4hTEAG/0lAYHLRviyKGn9n5wFz0kwN2j3SKhHpOKglOV84ozQ1bc1azbAGwE7vKQadJxyFQ2Nr8MuOJ8NE5RDkDntFeB9g6JXwxS72l337yflPlkztZnQyAQ9A5aPxFLR2jIZ2JYnlkd0//ASkww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pw1oXBdh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lZLZwCgd"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-46e42deffa8so19212985e9.0
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Oct 2025 07:07:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1760105234; x=1760710034; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Enu1DPq85k1M2WpWSEeI3rs72YHXo8vk1sE+FawP+Qo=;
-        b=lZLZwCgdincZK8sEABhFZMr0j9WNDZ4uPN4WK/DvAn026vQAcW5o5YK5QHcF+wiBrI
-         Uwgzn4TlduPRKm8j+0sjSq6AekZY32zPs3MgWugCxV+hkGBcbmGMXX44ghV0MC94LGKg
-         NEJGxN3jnKHXtYaMhTa7VXCcasAtY21Wtm1pxv3wTmsXBI07CIRi4vkhW91WWuY9wlKw
-         VLixueMZgw/NoUkB9d0Ey21l1zSp0G3D5/dXM68c1d2Seq7no5ONZ/MU7kLzl8AB2YRl
-         bm4eKyarbpUi4HpQV/rEoP8QJpT9jz9A8FMynLzG6YTkPjUzUAdQnUh3opbL6Bm2wWJ1
-         3AiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760105234; x=1760710034;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Enu1DPq85k1M2WpWSEeI3rs72YHXo8vk1sE+FawP+Qo=;
-        b=PXCzETXWP28oNblpRv1+hr63lgY5rqTi2QUzPtRCbaIQJUH2kRCWKiQavTypX6NYiq
-         aLiz9GeBdu6BOinJ9Syu8VNnYPZbq+nAixuIwswER5i1TPCRadLIPASn7uLCTeLCsfbZ
-         H+cazofKSja7FtPIGbkFy1HVl2G9knhXuWi/CQKPqMxew/t/2vqOh/40MkHybTafU8sx
-         pOIXLzQvnZe3ie1pZT0ZckBsJlKSvaJEbfy+L8mMvlD8xZqPY5KQ8yPGJOhzbINUfD6G
-         FmE7Y933RclAPQKOpjwWo047GgqQFinR6xlYkq9F6FPfCAch0ZUE2B1J89Vwjc6MdzB+
-         0hfA==
-X-Forwarded-Encrypted: i=1; AJvYcCXo9IbvGi+GRmDyxcbPAK2+vl9k/FF7TtmdRLTKgKisi54E/Ek6a0bi+zapTl7djJrrqDCdze9QCPnOKt0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqV4FoCGNL/PVuSKrqpbwhCGE8WWt2u1KzYsRp+IC+sJRLMg1u
-	EeTt5JgWmUuZwuOMHySqK/BXKr1qdjC6us0ebciwJGB+63LgpucOCX5Co0MFBfm4F4Q=
-X-Gm-Gg: ASbGncvF+U5TapLNZUNMqQEcFig5mpITv6Jo0Q1yJCno6SzON7yXrCA7W1n5rAER6Y9
-	1V1OFTuhmEvIWm3A1ai2VY8d7Y8hrDPaALBSPNUuGZDAygQKGUvIx2mVDGkT0X9MHNiWPXEoxv+
-	nyZdknNQbGg6aDw5pLWxzOY2c76phA+7R1Vrkjaki8Z/TpEoWcYWcTt+dXjCXZfWRLrpCTKmHU9
-	l+mo084IuftFbtfFfgTZrL8pe6sOLdOMJSmiJTS/K+zDGNZ9FlOgcGEu5C7g+7pYz4Btxr+Z64V
-	2GKO3fWIL7AymLHkIb3lj/wRhvogme5TlOIumYsnA5oz4iFoixDkJOIAnQAqL3LP4qYSmPWyPJK
-	D3xS38Vaenw2tHepV8JkC3KVOraRThrixQD7KcJ0iO2Zz2N8nl9KsLvJrAug1REI=
-X-Google-Smtp-Source: AGHT+IFolS4C8hT0Zmg7bmr6SzhI/cPbFJ3OA3Pjp2+/sYyehoF+n9CTxeFrReeZKbRbn30lJJ9YTw==
-X-Received: by 2002:a05:600c:138a:b0:45f:2ed1:d1c5 with SMTP id 5b1f17b1804b1-46fa9b171f2mr80864615e9.36.1760105234051;
-        Fri, 10 Oct 2025 07:07:14 -0700 (PDT)
-Received: from [192.168.0.36] ([82.76.24.202])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce583335sm4343474f8f.18.2025.10.10.07.07.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Oct 2025 07:07:13 -0700 (PDT)
-Message-ID: <f033a8eb-df80-4f71-a941-09ba209f5901@linaro.org>
-Date: Fri, 10 Oct 2025 17:07:12 +0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pw1oXBdh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BE52C116C6
+	for <linux-crypto@vger.kernel.org>; Fri, 10 Oct 2025 18:21:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760120516;
+	bh=B74xUW6B1dkzhI1p0wyaWpMe4jQ6pt6RZTrVVE+n/hg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=pw1oXBdhDMg3RbVffCJtsi7vKkpq3kFBOxxNHUiaKiA3EQqbZQWUicH2jXaTEEUTw
+	 e/nu08y6LZFc5SCH0bOX6fJoKqfxShdTqTPi4GN88lY1VbxMm1iWeQcn59RRfssf9k
+	 lSy3VpdDxRWMXOkubU9gnAS2KZplHtDcT0oarHpTqBCpHJAcMpGBeJH42EltJ7Z2LS
+	 f5bI8zsm05fpKanuw7tvi/rsJSsaxtqpw0f1JGSxAHuUufTFWaaAq0mPGSkWCkilQD
+	 zSBDSIeFoB6P8+sZkTq/BfzyAHkhfqWb9XZzslNpcCqnA1SC+Q27btMs6/7Oth46qp
+	 n13CbkwwSGrxw==
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-57d8ff3944dso2615985e87.3
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Oct 2025 11:21:56 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yxhq1EEl9KtifqhpuRBHatn9OenbaPfNPFaLfDUjtYp7FEVym2V
+	66I14OkZo1Rzbq/thiMbXnnSvsd0rA97rcJ/ZxLQ7b+uoyXvmHoYipEX70Ao0XsSrrKvuSeBVC3
+	+GkGe6uIzSOjuA8xTdF82Xdsa70QnAyo=
+X-Google-Smtp-Source: AGHT+IGfeZluMSTknZ3xz2Mf8yQbyEFIabg7WQ/7AB1mUCwma+kzJsj5Fc5fGNDkd6pAk2KfgzN85CyXSI22l/zaoXs=
+X-Received: by 2002:a05:6512:3c87:b0:58b:23e:5ec with SMTP id
+ 2adb3069b0e04-5906d8e5b43mr3597112e87.26.1760120514446; Fri, 10 Oct 2025
+ 11:21:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: crypto: qcom,inline-crypto-engine: Document
- the kaanapali ICE
-To: Krzysztof Kozlowski <krzk@kernel.org>,
- Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- aiqun.yu@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com,
- trilok.soni@oss.qualcomm.com, yijie.yang@oss.qualcomm.com,
- Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
-References: <20250924-knp-ice-v1-1-1adfc2d9e83c@oss.qualcomm.com>
- <36759154-4e7b-4cc9-b50f-ffb51a0b8aaf@kernel.org>
-From: Eugen Hristev <eugen.hristev@linaro.org>
-Content-Language: en-US
-In-Reply-To: <36759154-4e7b-4cc9-b50f-ffb51a0b8aaf@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251002023117.37504-1-ebiggers@kernel.org>
+In-Reply-To: <20251002023117.37504-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 10 Oct 2025 11:21:41 -0700
+X-Gmail-Original-Message-ID: <CAMj1kXH8WRJ+J2a1i2f-E+=MWS88wn22kNfurU50c2sZYQheAw@mail.gmail.com>
+X-Gm-Features: AS18NWAWDlu-lTrQ_E1KPxGYn3u8Sqw2cqubqbNlW_mUVHVVTKJI4UHXX4wmhcE
+Message-ID: <CAMj1kXH8WRJ+J2a1i2f-E+=MWS88wn22kNfurU50c2sZYQheAw@mail.gmail.com>
+Subject: Re: [PATCH 0/8] VAES+AVX2 optimized implementation of AES-GCM
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"
 
+On Wed, 1 Oct 2025 at 19:34, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> This patchset replaces the 256-bit vector implementation of AES-GCM for
+> x86_64 with one that requires AVX2 rather than AVX512.  This greatly
+> improves AES-GCM performance on CPUs that have VAES but not AVX512, for
+> example by up to 74% on AMD Zen 3.  For more details, see patch 1.
+>
+> This patchset also renames the 512-bit vector implementation of AES-GCM
+> for x86_64 to be named after AVX512 rather than AVX10/512, then adds
+> some additional optimizations to it.
+>
+> This patchset applies to next-20250929 and is targeting 6.19.  Herbert,
+> I'd prefer to just apply this myself.  But let me know if you'd prefer
+> to take it instead (considering that AES-GCM hasn't been librarified
+> yet).  Either way, there's no hurry, since this is targeting 6.19.
+>
+> Eric Biggers (8):
+>   crypto: x86/aes-gcm - add VAES+AVX2 optimized code
+>   crypto: x86/aes-gcm - remove VAES+AVX10/256 optimized code
+>   crypto: x86/aes-gcm - rename avx10 and avx10_512 to avx512
+>   crypto: x86/aes-gcm - clean up AVX512 code to assume 512-bit vectors
+>   crypto: x86/aes-gcm - reorder AVX512 precompute and aad_update
+>     functions
+>   crypto: x86/aes-gcm - revise some comments in AVX512 code
+>   crypto: x86/aes-gcm - optimize AVX512 precomputation of H^2 from H^1
+>   crypto: x86/aes-gcm - optimize long AAD processing with AVX512
+>
 
-
-On 10/9/25 13:51, Krzysztof Kozlowski wrote:
-> On 25/09/2025 08:29, Jingyi Wang wrote:
->> From: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
->>
->> Document the Inline Crypto Engine (ICE) on the kaanapali platform.
->>
->> Signed-off-by: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
->> Signed-off-by: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
-> 
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
-> Best regards,
-> Krzysztof
-> 
-
-Reviewed-by: Eugen Hristev <eugen.hristev@linaro.org>
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Tested-by: Ard Biesheuvel <ardb@kernel.org>
