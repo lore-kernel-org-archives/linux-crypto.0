@@ -1,41 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F6725743E;
-	Sat, 11 Oct 2025 18:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E036B1A08BC;
+	Sat, 11 Oct 2025 18:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760206341; cv=none; b=Q6AKoaI4cbDZ7GILnDCawjWOi4Tl/1MyTSG2bXPiujoMtuKZESqJQwjBNwHda9CjTL0iRnulravz+btX2NRz1T7+GrUboXnSMtQ2MbpKbcAPTu6PjH9QLT4+O/kcFWiCLlIZqh6rXIH0PuD7hpJXai+mMUkC/Wj496RWaM2suJY=
+	t=1760208842; cv=none; b=KSi5on3hXEhghV+WTxOgHpi69Hi7EZ4QRYg0QvIXxMY04BhA+dcXU2z5mYieH1ES45XuAqA+GyCoQnirV6iQDhFkPRmnV79C9oX5+sq9ayC8vUt3s3kstw4Kt6dWHTLsM8oi9rK9yE47OVRShHaJEApfAZYFe4dbFq7KT9m/iUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760206341; c=relaxed/simple;
-	bh=BMEM84Vsl+AZjQZHYwCJyliKbPqM1CAEDf4jo/Gn5jE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uthuFQO3nDqrsWvZ+AS+R92zwwBVXBwHa5e90VYUZ6OAHnH08f/4HiYpBEU23MyDuTrLoeICOMzej3+Pq5zNX3iMZ9ZviWKYvrlAnHRSMsTqu8YSv0ltpF1u/BJfZpFdAiHKnd1Wofi+ZE2yzp35icLg5OPl9VU7rfupLEHA8Tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jd8oV4KP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760208842; c=relaxed/simple;
+	bh=ZDHerQX1xzL1R2lvg6yrBKlxguHuXZpw14dmUVI4wBM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YUwbsTfAKtrVcv0h8VFuh67mPESYx8a2GdVujjLqgOZ4KfmvNnyl4Eq/Aclqz6QUweRiGG9sYXuDRF3zCiCpzqNBgiUzuCQtAU2koRieDD3ap8+aaUbXVRkSVP5ClBQhkK4wYf/KNNnnIbKXZCucJ9NrhhcpmrpChE9Dk8mPOAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=osDNwxFA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jd8oV4KP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10347C4CEF4;
-	Sat, 11 Oct 2025 18:12:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="osDNwxFA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04CD2C4CEF4;
+	Sat, 11 Oct 2025 18:53:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760206341;
-	bh=BMEM84Vsl+AZjQZHYwCJyliKbPqM1CAEDf4jo/Gn5jE=;
+	s=k20201202; t=1760208840;
+	bh=ZDHerQX1xzL1R2lvg6yrBKlxguHuXZpw14dmUVI4wBM=;
 	h=From:To:Cc:Subject:Date:From;
-	b=Jd8oV4KPkTksQdoXdaaD11OYDhydZLvqylFwIw7GbKdfMsU2yLUIJa3SdLBb6iA1V
-	 9s8W28UtU+Yj6+4P5IE19DUvO1giC1w13ZJI36fLlOrkKNKhrE47RzqhtCQgn+kTzY
-	 MpXsE3sUqFu/1TpMleoOLJOqMtV9jI3b2DNGYEwp3AcvIy1ZXQMAp9n9hIS3WHJ5QJ
-	 vxQN6pzmpaI/lPGCfEvn8+3R2RrLcgo+Iosb/9C6ybUGuT2f3xO99nh8owPm2EoS5y
-	 rCSliSo8WXdyO1tpxnjjbUhMyF02OkYEdQiTUSLvwCJ7YQzpcAN3s7Ru76DAd8pBeX
-	 mM55WQlJ6u7bQ==
+	b=osDNwxFAFMiGvx62KgNYcodsPWDwltx447QUq1o1X7a8m2+lZn2gSm2CaKX4ZWO0+
+	 et4pWJJCk/NSNrtkYQUX6W4GngpXY/rmE43GP7tiXucdorOGPkTtEVJkZeX6z5hiXI
+	 mqc6JDMth65LBw9ggRLeAMglXQO2yXHYPxElaZ10s6wa8j7BIyyEQUvuZNkSZ6md1T
+	 EGJA458qkk+A9kdxNGkpdadFCJK2dzIq3rMgZLwCXGUN1Rhve9ENzPDCzJQn60spou
+	 sorcvqCRdwu5IMoTsnBK8FKNtmHUn8DwYKCEkSx4Xkb2DpPJ+s8LhQ8GG8IJYcH+Ak
+	 rNV+81APhprtA==
 From: Eric Biggers <ebiggers@kernel.org>
-To: dm-devel@lists.linux.dev,
-	Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>
-Cc: linux-crypto@vger.kernel.org,
+To: linux-nfs@vger.kernel.org,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>
+Cc: NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] dm-crypt: Use MD5 library instead of crypto_shash
-Date: Sat, 11 Oct 2025 11:10:42 -0700
-Message-ID: <20251011181042.81455-1-ebiggers@kernel.org>
+Subject: [PATCH] nfsd: Use MD5 library instead of crypto_shash
+Date: Sat, 11 Oct 2025 11:52:25 -0700
+Message-ID: <20251011185225.155625-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -45,254 +48,273 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The lmk IV mode, which dm-crypt supports for Loop-AES compatibility,
-involves an MD5 computation.  Update its implementation to use the MD5
-library API instead of crypto_shash.  This has many benefits, such as:
+Update NFSD's support for "legacy client tracking" (which uses MD5) to
+use the MD5 library instead of crypto_shash.  This has several benefits:
 
 - Simpler code.  Notably, much of the error-handling code is no longer
   needed, since the library functions can't fail.
 
-- Reduced stack usage.  crypt_iv_lmk_one() now allocates only 112 bytes
-  on the stack instead of 520 bytes.
+- Improved performance due to reduced overhead.  A microbenchmark of
+  nfs4_make_rec_clidname() shows a speedup from 1455 cycles to 425.
 
-- The library functions are strongly typed, preventing bugs like
-  https://lore.kernel.org/r/f1625ddc-e82e-4b77-80c2-dc8e45b54848@gmail.com
+- The MD5 code can now safely be built as a loadable module when nfsd is
+  built as a loadable module.  (Previously, nfsd forced the MD5 code to
+  built-in, presumably to work around the unreliablity of the name-based
+  loading.)  Thus, select MD5 from the tristate option NFSD if
+  NFSD_LEGACY_CLIENT_TRACKING, instead of from the bool option NFSD_V4.
 
-- Slightly improved performance, as the library provides direct access
-  to the MD5 code without unnecessary overhead such as indirect calls.
-
-To preserve the existing behavior of lmk support being disabled when the
-kernel is booted with "fips=1", make crypt_iv_lmk_ctr() check
-fips_enabled itself.  Previously it relied on crypto_alloc_shash("md5")
-failing.  (I don't know for sure that lmk *actually* needs to be
-disallowed in FIPS mode; this just preserves the existing behavior.)
+To preserve the existing behavior of legacy client tracking support
+being disabled when the kernel is booted with "fips=1", make
+nfsd4_legacy_tracking_init() return an error if fips_enabled.  I don't
+know if this is truly needed, but it preserves the existing behavior.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- drivers/md/Kconfig    |  1 +
- drivers/md/dm-crypt.c | 76 ++++++++++++-------------------------------
- 2 files changed, 22 insertions(+), 55 deletions(-)
+ fs/nfsd/Kconfig       |  3 +-
+ fs/nfsd/nfs4recover.c | 82 ++++++++-----------------------------------
+ 2 files changed, 16 insertions(+), 69 deletions(-)
 
-diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-index 104aa53550905..dcd232a2ca244 100644
---- a/drivers/md/Kconfig
-+++ b/drivers/md/Kconfig
-@@ -297,10 +297,11 @@ config DM_CRYPT
- 	depends on (TRUSTED_KEYS || TRUSTED_KEYS=n)
+diff --git a/fs/nfsd/Kconfig b/fs/nfsd/Kconfig
+index e134dce45e350..380a4caa33a73 100644
+--- a/fs/nfsd/Kconfig
++++ b/fs/nfsd/Kconfig
+@@ -3,10 +3,11 @@ config NFSD
+ 	tristate "NFS server support"
+ 	depends on INET
+ 	depends on FILE_LOCKING
+ 	depends on FSNOTIFY
  	select CRC32
- 	select CRYPTO
- 	select CRYPTO_CBC
- 	select CRYPTO_ESSIV
-+	select CRYPTO_LIB_MD5 # needed by lmk IV mode
++	select CRYPTO_LIB_MD5 if NFSD_LEGACY_CLIENT_TRACKING
+ 	select CRYPTO_LIB_SHA256 if NFSD_V4
+ 	select LOCKD
+ 	select SUNRPC
+ 	select EXPORTFS
+ 	select NFS_COMMON
+@@ -75,12 +76,10 @@ config NFSD_V3_ACL
+ config NFSD_V4
+ 	bool "NFS server support for NFS version 4"
+ 	depends on NFSD && PROC_FS
+ 	select FS_POSIX_ACL
+ 	select RPCSEC_GSS_KRB5
+-	select CRYPTO
+-	select CRYPTO_MD5
+ 	select GRACE_PERIOD
+ 	select NFS_V4_2_SSC_HELPER if NFS_V4_2
  	help
- 	  This device-mapper target allows you to create a device that
- 	  transparently encrypts the data on it. You'll need to activate
- 	  the ciphers you're going to use in the cryptoapi configuration.
+ 	  This option enables support in your system's NFS server for
+ 	  version 4 of the NFS protocol (RFC 3530).
+diff --git a/fs/nfsd/nfs4recover.c b/fs/nfsd/nfs4recover.c
+index e2b9472e5c78c..dbc0aecef95e3 100644
+--- a/fs/nfsd/nfs4recover.c
++++ b/fs/nfsd/nfs4recover.c
+@@ -30,13 +30,14 @@
+ *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
  
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 5ef43231fe77f..04a553529dc27 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -19,10 +19,11 @@
- #include <linux/blk-integrity.h>
- #include <linux/crc32.h>
- #include <linux/mempool.h>
- #include <linux/slab.h>
- #include <linux/crypto.h>
+-#include <crypto/hash.h>
++#include <crypto/md5.h>
+ #include <crypto/sha2.h>
+ #include <linux/file.h>
 +#include <linux/fips.h>
- #include <linux/workqueue.h>
- #include <linux/kthread.h>
- #include <linux/backing-dev.h>
- #include <linux/atomic.h>
- #include <linux/scatterlist.h>
-@@ -118,11 +119,10 @@ struct iv_benbi_private {
- 	int shift;
- };
- 
- #define LMK_SEED_SIZE 64 /* hash + 0 */
- struct iv_lmk_private {
--	struct crypto_shash *hash_tfm;
- 	u8 *seed;
- };
- 
- #define TCW_WHITENING_SIZE 16
- struct iv_tcw_private {
-@@ -463,14 +463,10 @@ static int crypt_iv_null_gen(struct crypt_config *cc, u8 *iv,
- 
- static void crypt_iv_lmk_dtr(struct crypt_config *cc)
+ #include <linux/slab.h>
+ #include <linux/namei.h>
+ #include <linux/sched.h>
+ #include <linux/fs.h>
+ #include <linux/module.h>
+@@ -90,61 +91,22 @@ static void
+ nfs4_reset_creds(const struct cred *original)
  {
- 	struct iv_lmk_private *lmk = &cc->iv_gen_private.lmk;
- 
--	if (lmk->hash_tfm && !IS_ERR(lmk->hash_tfm))
--		crypto_free_shash(lmk->hash_tfm);
--	lmk->hash_tfm = NULL;
--
- 	kfree_sensitive(lmk->seed);
- 	lmk->seed = NULL;
+ 	put_cred(revert_creds(original));
  }
  
- static int crypt_iv_lmk_ctr(struct crypt_config *cc, struct dm_target *ti,
-@@ -481,26 +477,24 @@ static int crypt_iv_lmk_ctr(struct crypt_config *cc, struct dm_target *ti,
- 	if (cc->sector_size != (1 << SECTOR_SHIFT)) {
- 		ti->error = "Unsupported sector size for LMK";
+-static int
++static void
+ nfs4_make_rec_clidname(char dname[HEXDIR_LEN], const struct xdr_netobj *clname)
+ {
+ 	u8 digest[MD5_DIGEST_SIZE];
+-	struct crypto_shash *tfm;
+-	int status;
+ 
+ 	dprintk("NFSD: nfs4_make_rec_clidname for %.*s\n",
+ 			clname->len, clname->data);
+-	tfm = crypto_alloc_shash("md5", 0, 0);
+-	if (IS_ERR(tfm)) {
+-		status = PTR_ERR(tfm);
+-		goto out_no_tfm;
+-	}
+ 
+-	status = crypto_shash_tfm_digest(tfm, clname->data, clname->len,
+-					 digest);
+-	if (status)
+-		goto out;
++	md5(clname->data, clname->len, digest);
+ 
+ 	static_assert(HEXDIR_LEN == 2 * MD5_DIGEST_SIZE + 1);
+ 	sprintf(dname, "%*phN", MD5_DIGEST_SIZE, digest);
+-
+-	status = 0;
+-out:
+-	crypto_free_shash(tfm);
+-out_no_tfm:
+-	return status;
+-}
+-
+-/*
+- * If we had an error generating the recdir name for the legacy tracker
+- * then warn the admin. If the error doesn't appear to be transient,
+- * then disable recovery tracking.
+- */
+-static void
+-legacy_recdir_name_error(struct nfs4_client *clp, int error)
+-{
+-	printk(KERN_ERR "NFSD: unable to generate recoverydir "
+-			"name (%d).\n", error);
+-
+-	/*
+-	 * if the algorithm just doesn't exist, then disable the recovery
+-	 * tracker altogether. The crypto libs will generally return this if
+-	 * FIPS is enabled as well.
+-	 */
+-	if (error == -ENOENT) {
+-		printk(KERN_ERR "NFSD: disabling legacy clientid tracking. "
+-			"Reboot recovery will not function correctly!\n");
+-		nfsd4_client_tracking_exit(clp->net);
+-	}
+ }
+ 
+ static void
+ __nfsd4_create_reclaim_record_grace(struct nfs4_client *clp,
+ 		const char *dname, int len, struct nfsd_net *nn)
+@@ -180,13 +142,11 @@ nfsd4_create_clid_dir(struct nfs4_client *clp)
+ 	if (test_and_set_bit(NFSD4_CLIENT_STABLE, &clp->cl_flags))
+ 		return;
+ 	if (!nn->rec_file)
+ 		return;
+ 
+-	status = nfs4_make_rec_clidname(dname, &clp->cl_name);
+-	if (status)
+-		return legacy_recdir_name_error(clp, status);
++	nfs4_make_rec_clidname(dname, &clp->cl_name);
+ 
+ 	status = nfs4_save_creds(&original_cred);
+ 	if (status < 0)
+ 		return;
+ 
+@@ -374,13 +334,11 @@ nfsd4_remove_clid_dir(struct nfs4_client *clp)
+ 	struct nfsd_net *nn = net_generic(clp->net, nfsd_net_id);
+ 
+ 	if (!nn->rec_file || !test_bit(NFSD4_CLIENT_STABLE, &clp->cl_flags))
+ 		return;
+ 
+-	status = nfs4_make_rec_clidname(dname, &clp->cl_name);
+-	if (status)
+-		return legacy_recdir_name_error(clp, status);
++	nfs4_make_rec_clidname(dname, &clp->cl_name);
+ 
+ 	status = mnt_want_write_file(nn->rec_file);
+ 	if (status)
+ 		goto out;
+ 	clear_bit(NFSD4_CLIENT_STABLE, &clp->cl_flags);
+@@ -601,10 +559,15 @@ nfsd4_legacy_tracking_init(struct net *net)
+ 	if (net != &init_net) {
+ 		pr_warn("NFSD: attempt to initialize legacy client tracking in a container ignored.\n");
  		return -EINVAL;
  	}
  
--	lmk->hash_tfm = crypto_alloc_shash("md5", 0,
--					   CRYPTO_ALG_ALLOCATES_MEMORY);
--	if (IS_ERR(lmk->hash_tfm)) {
--		ti->error = "Error initializing LMK hash";
--		return PTR_ERR(lmk->hash_tfm);
 +	if (fips_enabled) {
-+		ti->error = "LMK support is disabled due to FIPS";
-+		/* ... because it uses MD5. */
++		pr_warn("NFSD: legacy client tracking is disabled due to FIPS\n");
 +		return -EINVAL;
- 	}
++	}
++
+ 	status = nfs4_legacy_state_init(net);
+ 	if (status)
+ 		return status;
  
- 	/* No seed in LMK version 2 */
- 	if (cc->key_parts == cc->tfms_count) {
- 		lmk->seed = NULL;
- 		return 0;
- 	}
- 
- 	lmk->seed = kzalloc(LMK_SEED_SIZE, GFP_KERNEL);
- 	if (!lmk->seed) {
--		crypt_iv_lmk_dtr(cc);
- 		ti->error = "Error kmallocing seed storage in LMK";
- 		return -ENOMEM;
- 	}
- 
- 	return 0;
-@@ -512,11 +506,11 @@ static int crypt_iv_lmk_init(struct crypt_config *cc)
- 	int subkey_size = cc->key_size / cc->key_parts;
- 
- 	/* LMK seed is on the position of LMK_KEYS + 1 key */
- 	if (lmk->seed)
- 		memcpy(lmk->seed, cc->key + (cc->tfms_count * subkey_size),
--		       crypto_shash_digestsize(lmk->hash_tfm));
-+		       MD5_DIGEST_SIZE);
- 
- 	return 0;
+ 	status = nfsd4_load_reboot_recovery_data(net);
+@@ -657,25 +620,20 @@ nfs4_recoverydir(void)
  }
  
- static int crypt_iv_lmk_wipe(struct crypt_config *cc)
-@@ -527,99 +521,71 @@ static int crypt_iv_lmk_wipe(struct crypt_config *cc)
- 		memset(lmk->seed, 0, LMK_SEED_SIZE);
- 
- 	return 0;
- }
- 
--static int crypt_iv_lmk_one(struct crypt_config *cc, u8 *iv,
--			    struct dm_crypt_request *dmreq,
--			    u8 *data)
-+static void crypt_iv_lmk_one(struct crypt_config *cc, u8 *iv,
-+			     struct dm_crypt_request *dmreq, u8 *data)
+ static int
+ nfsd4_check_legacy_client(struct nfs4_client *clp)
  {
- 	struct iv_lmk_private *lmk = &cc->iv_gen_private.lmk;
--	SHASH_DESC_ON_STACK(desc, lmk->hash_tfm);
--	union {
--		struct md5_state md5state;
--		u8 state[CRYPTO_MD5_STATESIZE];
--	} u;
-+	struct md5_ctx ctx;
- 	__le32 buf[4];
--	int i, r;
+-	int status;
+ 	char dname[HEXDIR_LEN];
+ 	struct nfs4_client_reclaim *crp;
+ 	struct nfsd_net *nn = net_generic(clp->net, nfsd_net_id);
+ 	struct xdr_netobj name;
  
--	desc->tfm = lmk->hash_tfm;
--
--	r = crypto_shash_init(desc);
--	if (r)
--		return r;
-+	md5_init(&ctx);
+ 	/* did we already find that this client is stable? */
+ 	if (test_bit(NFSD4_CLIENT_STABLE, &clp->cl_flags))
+ 		return 0;
  
--	if (lmk->seed) {
--		r = crypto_shash_update(desc, lmk->seed, LMK_SEED_SIZE);
--		if (r)
--			return r;
+-	status = nfs4_make_rec_clidname(dname, &clp->cl_name);
+-	if (status) {
+-		legacy_recdir_name_error(clp, status);
+-		return status;
 -	}
-+	if (lmk->seed)
-+		md5_update(&ctx, lmk->seed, LMK_SEED_SIZE);
++	nfs4_make_rec_clidname(dname, &clp->cl_name);
  
- 	/* Sector is always 512B, block size 16, add data of blocks 1-31 */
--	r = crypto_shash_update(desc, data + 16, 16 * 31);
--	if (r)
--		return r;
-+	md5_update(&ctx, data + 16, 16 * 31);
+ 	/* look for it in the reclaim hashtable otherwise */
+ 	name.data = kmemdup(dname, HEXDIR_LEN, GFP_KERNEL);
+ 	if (!name.data) {
+ 		dprintk("%s: failed to allocate memory for name.data!\n",
+@@ -1264,17 +1222,14 @@ nfsd4_cld_check(struct nfs4_client *clp)
+ 	if (crp)
+ 		goto found;
  
- 	/* Sector is cropped to 56 bits here */
- 	buf[0] = cpu_to_le32(dmreq->iv_sector & 0xFFFFFFFF);
- 	buf[1] = cpu_to_le32((((u64)dmreq->iv_sector >> 32) & 0x00FFFFFF) | 0x80000000);
- 	buf[2] = cpu_to_le32(4024);
- 	buf[3] = 0;
--	r = crypto_shash_update(desc, (u8 *)buf, sizeof(buf));
--	if (r)
--		return r;
-+	md5_update(&ctx, (u8 *)buf, sizeof(buf));
+ #ifdef CONFIG_NFSD_LEGACY_CLIENT_TRACKING
+ 	if (nn->cld_net->cn_has_legacy) {
+-		int status;
+ 		char dname[HEXDIR_LEN];
+ 		struct xdr_netobj name;
  
- 	/* No MD5 padding here */
--	r = crypto_shash_export(desc, &u.md5state);
--	if (r)
--		return r;
--
--	for (i = 0; i < MD5_HASH_WORDS; i++)
--		__cpu_to_le32s(&u.md5state.hash[i]);
--	memcpy(iv, &u.md5state.hash, cc->iv_size);
--
--	return 0;
-+	cpu_to_le32_array(ctx.state.h, ARRAY_SIZE(ctx.state.h));
-+	memcpy(iv, ctx.state.h, cc->iv_size);
+-		status = nfs4_make_rec_clidname(dname, &clp->cl_name);
+-		if (status)
+-			return -ENOENT;
++		nfs4_make_rec_clidname(dname, &clp->cl_name);
+ 
+ 		name.data = kmemdup(dname, HEXDIR_LEN, GFP_KERNEL);
+ 		if (!name.data) {
+ 			dprintk("%s: failed to allocate memory for name.data!\n",
+ 				__func__);
+@@ -1315,15 +1270,12 @@ nfsd4_cld_check_v2(struct nfs4_client *clp)
+ 
+ #ifdef CONFIG_NFSD_LEGACY_CLIENT_TRACKING
+ 	if (cn->cn_has_legacy) {
+ 		struct xdr_netobj name;
+ 		char dname[HEXDIR_LEN];
+-		int status;
+ 
+-		status = nfs4_make_rec_clidname(dname, &clp->cl_name);
+-		if (status)
+-			return -ENOENT;
++		nfs4_make_rec_clidname(dname, &clp->cl_name);
+ 
+ 		name.data = kmemdup(dname, HEXDIR_LEN, GFP_KERNEL);
+ 		if (!name.data) {
+ 			dprintk("%s: failed to allocate memory for name.data\n",
+ 					__func__);
+@@ -1692,15 +1644,11 @@ nfsd4_cltrack_legacy_recdir(const struct xdr_netobj *name)
+ 		/* just return nothing if output will be truncated */
+ 		kfree(result);
+ 		return NULL;
+ 	}
+ 
+-	copied = nfs4_make_rec_clidname(result + copied, name);
+-	if (copied) {
+-		kfree(result);
+-		return NULL;
+-	}
++	nfs4_make_rec_clidname(result + copied, name);
+ 
+ 	return result;
  }
  
- static int crypt_iv_lmk_gen(struct crypt_config *cc, u8 *iv,
- 			    struct dm_crypt_request *dmreq)
- {
- 	struct scatterlist *sg;
- 	u8 *src;
--	int r = 0;
- 
- 	if (bio_data_dir(dmreq->ctx->bio_in) == WRITE) {
- 		sg = crypt_get_sg_data(cc, dmreq->sg_in);
- 		src = kmap_local_page(sg_page(sg));
--		r = crypt_iv_lmk_one(cc, iv, dmreq, src + sg->offset);
-+		crypt_iv_lmk_one(cc, iv, dmreq, src + sg->offset);
- 		kunmap_local(src);
- 	} else
- 		memset(iv, 0, cc->iv_size);
--
--	return r;
-+	return 0;
- }
- 
- static int crypt_iv_lmk_post(struct crypt_config *cc, u8 *iv,
- 			     struct dm_crypt_request *dmreq)
- {
- 	struct scatterlist *sg;
- 	u8 *dst;
--	int r;
- 
- 	if (bio_data_dir(dmreq->ctx->bio_in) == WRITE)
- 		return 0;
- 
- 	sg = crypt_get_sg_data(cc, dmreq->sg_out);
- 	dst = kmap_local_page(sg_page(sg));
--	r = crypt_iv_lmk_one(cc, iv, dmreq, dst + sg->offset);
-+	crypt_iv_lmk_one(cc, iv, dmreq, dst + sg->offset);
- 
- 	/* Tweak the first block of plaintext sector */
--	if (!r)
--		crypto_xor(dst + sg->offset, iv, cc->iv_size);
-+	crypto_xor(dst + sg->offset, iv, cc->iv_size);
- 
- 	kunmap_local(dst);
--	return r;
-+	return 0;
- }
- 
- static void crypt_iv_tcw_dtr(struct crypt_config *cc)
- {
- 	struct iv_tcw_private *tcw = &cc->iv_gen_private.tcw;
+ static char *
 
-base-commit: 8bd9238e511d02831022ff0270865c54ccc482d6
+base-commit: 0739473694c4878513031006829f1030ec850bc2
 -- 
 2.51.0
 
