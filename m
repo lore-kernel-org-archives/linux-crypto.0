@@ -1,223 +1,298 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18171D5ABA
-	for <linux-crypto@vger.kernel.org>; Sat, 11 Oct 2025 14:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F6725743E;
+	Sat, 11 Oct 2025 18:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760194389; cv=none; b=iosDUOZEl0Gp6SDc9VokpwdNPsfcS3LRRFcFWmzTRJCOYDWELaDMaQzZbZd08ZkD25N9WgYNSI+tZ/pLNTqaInNq5JVfOBo4PQil+knGFtMB5CHoOjFlYS9A1sSaMt9ZeL590ViEhVmHJQoQ5+eqNhiB/SYp47NKC6w1DD6YP9Q=
+	t=1760206341; cv=none; b=Q6AKoaI4cbDZ7GILnDCawjWOi4Tl/1MyTSG2bXPiujoMtuKZESqJQwjBNwHda9CjTL0iRnulravz+btX2NRz1T7+GrUboXnSMtQ2MbpKbcAPTu6PjH9QLT4+O/kcFWiCLlIZqh6rXIH0PuD7hpJXai+mMUkC/Wj496RWaM2suJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760194389; c=relaxed/simple;
-	bh=2o6Y4QMJ3kwR1b61kfI6whELDPLh1xqPYbhOWSGGHiI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZMjmRKezZlTsUMK4vAWtNQeCBWZsx7dFGJWszwQEyX4++pWn6bRttV6rojS9tVcL/t+clln7ykRLyUE9IJmj4+5rEK1a7tAg4MaFA/JZT+c+mw0bx4Er2UCwlbu0MiECTUKgqbTokcFpueQhuPe9ywiVyUsM2QtcIpj+UxU1y/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F0bJ6elz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760206341; c=relaxed/simple;
+	bh=BMEM84Vsl+AZjQZHYwCJyliKbPqM1CAEDf4jo/Gn5jE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uthuFQO3nDqrsWvZ+AS+R92zwwBVXBwHa5e90VYUZ6OAHnH08f/4HiYpBEU23MyDuTrLoeICOMzej3+Pq5zNX3iMZ9ZviWKYvrlAnHRSMsTqu8YSv0ltpF1u/BJfZpFdAiHKnd1Wofi+ZE2yzp35icLg5OPl9VU7rfupLEHA8Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jd8oV4KP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F0bJ6elz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73D74C4CEF8
-	for <linux-crypto@vger.kernel.org>; Sat, 11 Oct 2025 14:53:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jd8oV4KP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10347C4CEF4;
+	Sat, 11 Oct 2025 18:12:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760194389;
-	bh=2o6Y4QMJ3kwR1b61kfI6whELDPLh1xqPYbhOWSGGHiI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=F0bJ6elzU6UqeDjG9Kkz9AGHwQhI7yEQaKN51HdqSnWX4wO/BMRc3XP6R/suT6KIj
-	 1nUjMx27Hx6Egu/ysr/jyYcddXj/otGIXXT13NZ19AWCmzECst+JWdVrOehX3XvT/S
-	 YE3BtNMMDN7SVgKpc6j/13St7awvl/DefYfNgu3pLLqEjERtgQZpG8AYOFzZmlKde2
-	 ityQXYqSKRhn5ZQJwD4lmtR5S3hhUxED1s/kkuX3lfN5TZvMa+gtCk395BicBA7mgY
-	 iH0KT69qi5LD0xKnxJPovAsgecWB45niSfRU+6cUe+To8WXeEfj1R2IH1CupxrR//a
-	 8t/4FbYnfaiNw==
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5818de29d15so3568782e87.2
-        for <linux-crypto@vger.kernel.org>; Sat, 11 Oct 2025 07:53:09 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUO5q6xrf4jpb3gr8/Q7cyY7q0UTiC6lUcYQdtIkFtC+g6nlwq/8djXdqbJq8ajJGs5wdMwNPb4fbXUJDk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOLMjzemV9dq79xv3PRtPY62XDIz4ssXxDJ5/sSVSFOWSJDauS
-	KOt9G8z3K5zLqGTyOlzkcLkxmj4wLdSjb4FG4BlUXDHcyLyoYI48r4z0YGNW7usPTmA87Xbwsuo
-	ozWlwxmTb+cswJ1XQU0/ltujCICv3sEo=
-X-Google-Smtp-Source: AGHT+IHd5tWMLT5Jd4S2AgeDrABowzME9iw/I95pcSe82Sob1tRy3izojgxncoXwecsm4I+jk8GvAwtA52c5jB+Jez4=
-X-Received: by 2002:a05:6512:159c:b0:55b:8afb:e644 with SMTP id
- 2adb3069b0e04-5906dd6fb34mr4724115e87.31.1760194387810; Sat, 11 Oct 2025
- 07:53:07 -0700 (PDT)
+	s=k20201202; t=1760206341;
+	bh=BMEM84Vsl+AZjQZHYwCJyliKbPqM1CAEDf4jo/Gn5jE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Jd8oV4KPkTksQdoXdaaD11OYDhydZLvqylFwIw7GbKdfMsU2yLUIJa3SdLBb6iA1V
+	 9s8W28UtU+Yj6+4P5IE19DUvO1giC1w13ZJI36fLlOrkKNKhrE47RzqhtCQgn+kTzY
+	 MpXsE3sUqFu/1TpMleoOLJOqMtV9jI3b2DNGYEwp3AcvIy1ZXQMAp9n9hIS3WHJ5QJ
+	 vxQN6pzmpaI/lPGCfEvn8+3R2RrLcgo+Iosb/9C6ybUGuT2f3xO99nh8owPm2EoS5y
+	 rCSliSo8WXdyO1tpxnjjbUhMyF02OkYEdQiTUSLvwCJ7YQzpcAN3s7Ru76DAd8pBeX
+	 mM55WQlJ6u7bQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: dm-devel@lists.linux.dev,
+	Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] dm-crypt: Use MD5 library instead of crypto_shash
+Date: Sat, 11 Oct 2025 11:10:42 -0700
+Message-ID: <20251011181042.81455-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <68ea2595.a70a0220.b3ac9.0006.GAE@google.com>
-In-Reply-To: <68ea2595.a70a0220.b3ac9.0006.GAE@google.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Sat, 11 Oct 2025 07:52:55 -0700
-X-Gmail-Original-Message-ID: <CAMj1kXErR15QWWZXFXjmXgRrxG0Fj_Qjk7OQzbUU+oR7g27RLw@mail.gmail.com>
-X-Gm-Features: AS18NWBD8rnIAn6CYsNx800gL6dJWf7ONo_MN0mDMcLg4nt9U0znDH1flp3bTyc
-Message-ID: <CAMj1kXErR15QWWZXFXjmXgRrxG0Fj_Qjk7OQzbUU+oR7g27RLw@mail.gmail.com>
-Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in aes_encrypt (6)
-To: syzbot <syzbot+22bff16a8f91d65e2e58@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-#syz set subsystems: ext4, fscrypt
+The lmk IV mode, which dm-crypt supports for Loop-AES compatibility,
+involves an MD5 computation.  Update its implementation to use the MD5
+library API instead of crypto_shash.  This has many benefits, such as:
 
-On Sat, 11 Oct 2025 at 02:38, syzbot
-<syzbot+22bff16a8f91d65e2e58@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    917167ed1211 Merge tag 'xtensa-20251010' of https://github..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=10f55304580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3b820eb4c6dd8482
-> dashboard link: https://syzkaller.appspot.com/bug?extid=22bff16a8f91d65e2e58
-> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-> userspace arch: i386
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/f8b165efe52b/disk-917167ed.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/01b56300cdc7/vmlinux-917167ed.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/6c32d21e8075/bzImage-917167ed.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+22bff16a8f91d65e2e58@syzkaller.appspotmail.com
->
-> EXT4-fs error (device loop5): ext4_orphan_get:1418: comm syz.5.10451: bad orphan inode 131083
-> EXT4-fs (loop5): mounted filesystem 00000000-0000-0000-0000-000000000000 r/w without journal. Quota mode: none.
-> =====================================================
-> BUG: KMSAN: uninit-value in subshift lib/crypto/aes.c:150 [inline]
-> BUG: KMSAN: uninit-value in aes_encrypt+0x1239/0x1960 lib/crypto/aes.c:283
->  subshift lib/crypto/aes.c:150 [inline]
->  aes_encrypt+0x1239/0x1960 lib/crypto/aes.c:283
->  aesti_encrypt+0x7d/0xf0 crypto/aes_ti.c:31
->  crypto_ecb_crypt crypto/ecb.c:23 [inline]
->  crypto_ecb_encrypt2+0x13f/0x300 crypto/ecb.c:40
->  crypto_lskcipher_crypt_sg+0x3a9/0x930 crypto/lskcipher.c:188
->  crypto_lskcipher_encrypt_sg+0x8b/0xc0 crypto/lskcipher.c:207
->  crypto_skcipher_encrypt+0x111/0x1e0 crypto/skcipher.c:194
->  xts_encrypt+0x2e1/0x570 crypto/xts.c:269
->  crypto_skcipher_encrypt+0x187/0x1e0 crypto/skcipher.c:195
->  fscrypt_crypt_data_unit+0x38e/0x590 fs/crypto/crypto.c:139
->  fscrypt_encrypt_pagecache_blocks+0x430/0x900 fs/crypto/crypto.c:197
->  ext4_bio_write_folio+0x1383/0x30d0 fs/ext4/page-io.c:552
->  mpage_submit_folio fs/ext4/inode.c:2080 [inline]
->  mpage_process_page_bufs+0xf1b/0x13e0 fs/ext4/inode.c:2191
->  mpage_prepare_extent_to_map+0x1792/0x2a10 fs/ext4/inode.c:2736
->  ext4_do_writepages+0x11b6/0x8020 fs/ext4/inode.c:2877
->  ext4_writepages+0x338/0x870 fs/ext4/inode.c:3025
->  do_writepages+0x3ef/0x860 mm/page-writeback.c:2604
->  filemap_fdatawrite_wbc mm/filemap.c:389 [inline]
->  __filemap_fdatawrite_range mm/filemap.c:422 [inline]
->  file_write_and_wait_range+0x6f0/0x7d0 mm/filemap.c:797
->  generic_buffers_fsync_noflush+0x79/0x3c0 fs/buffer.c:609
->  ext4_fsync_nojournal fs/ext4/fsync.c:88 [inline]
->  ext4_sync_file+0x587/0x12f0 fs/ext4/fsync.c:147
->  vfs_fsync_range+0x1a1/0x240 fs/sync.c:187
->  generic_write_sync include/linux/fs.h:3046 [inline]
->  ext4_buffered_write_iter+0xae9/0xce0 fs/ext4/file.c:305
->  ext4_file_write_iter+0x2a2/0x3d90 fs/ext4/file.c:-1
->  do_iter_readv_writev+0x9de/0xc20 fs/read_write.c:-1
->  vfs_writev+0x52a/0x1500 fs/read_write.c:1057
->  do_pwritev fs/read_write.c:1153 [inline]
->  __do_compat_sys_pwritev2 fs/read_write.c:1298 [inline]
->  __se_compat_sys_pwritev2 fs/read_write.c:1290 [inline]
->  __ia32_compat_sys_pwritev2+0x43d/0x6b0 fs/read_write.c:1290
->  ia32_sys_call+0x1810/0x4310 arch/x86/include/generated/asm/syscalls_32.h:380
->  do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
->  __do_fast_syscall_32+0xb0/0x150 arch/x86/entry/syscall_32.c:306
->  do_fast_syscall_32+0x38/0x80 arch/x86/entry/syscall_32.c:331
->  do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:369
->  entry_SYSENTER_compat_after_hwframe+0x84/0x8e
->
-> Uninit was stored to memory at:
->  le128_xor include/crypto/b128ops.h:69 [inline]
->  xts_xor_tweak+0x566/0xbd0 crypto/xts.c:123
->  xts_xor_tweak_pre crypto/xts.c:135 [inline]
->  xts_encrypt+0x278/0x570 crypto/xts.c:268
->  crypto_skcipher_encrypt+0x187/0x1e0 crypto/skcipher.c:195
->  fscrypt_crypt_data_unit+0x38e/0x590 fs/crypto/crypto.c:139
->  fscrypt_encrypt_pagecache_blocks+0x430/0x900 fs/crypto/crypto.c:197
->  ext4_bio_write_folio+0x1383/0x30d0 fs/ext4/page-io.c:552
->  mpage_submit_folio fs/ext4/inode.c:2080 [inline]
->  mpage_process_page_bufs+0xf1b/0x13e0 fs/ext4/inode.c:2191
->  mpage_prepare_extent_to_map+0x1792/0x2a10 fs/ext4/inode.c:2736
->  ext4_do_writepages+0x11b6/0x8020 fs/ext4/inode.c:2877
->  ext4_writepages+0x338/0x870 fs/ext4/inode.c:3025
->  do_writepages+0x3ef/0x860 mm/page-writeback.c:2604
->  filemap_fdatawrite_wbc mm/filemap.c:389 [inline]
->  __filemap_fdatawrite_range mm/filemap.c:422 [inline]
->  file_write_and_wait_range+0x6f0/0x7d0 mm/filemap.c:797
->  generic_buffers_fsync_noflush+0x79/0x3c0 fs/buffer.c:609
->  ext4_fsync_nojournal fs/ext4/fsync.c:88 [inline]
->  ext4_sync_file+0x587/0x12f0 fs/ext4/fsync.c:147
->  vfs_fsync_range+0x1a1/0x240 fs/sync.c:187
->  generic_write_sync include/linux/fs.h:3046 [inline]
->  ext4_buffered_write_iter+0xae9/0xce0 fs/ext4/file.c:305
->  ext4_file_write_iter+0x2a2/0x3d90 fs/ext4/file.c:-1
->  do_iter_readv_writev+0x9de/0xc20 fs/read_write.c:-1
->  vfs_writev+0x52a/0x1500 fs/read_write.c:1057
->  do_pwritev fs/read_write.c:1153 [inline]
->  __do_compat_sys_pwritev2 fs/read_write.c:1298 [inline]
->  __se_compat_sys_pwritev2 fs/read_write.c:1290 [inline]
->  __ia32_compat_sys_pwritev2+0x43d/0x6b0 fs/read_write.c:1290
->  ia32_sys_call+0x1810/0x4310 arch/x86/include/generated/asm/syscalls_32.h:380
->  do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
->  __do_fast_syscall_32+0xb0/0x150 arch/x86/entry/syscall_32.c:306
->  do_fast_syscall_32+0x38/0x80 arch/x86/entry/syscall_32.c:331
->  do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:369
->  entry_SYSENTER_compat_after_hwframe+0x84/0x8e
->
-> Uninit was created at:
->  __alloc_frozen_pages_noprof+0x689/0xf00 mm/page_alloc.c:5206
->  alloc_pages_mpol+0x328/0x860 mm/mempolicy.c:2416
->  alloc_frozen_pages_noprof mm/mempolicy.c:2487 [inline]
->  alloc_pages_noprof mm/mempolicy.c:2507 [inline]
->  folio_alloc_noprof+0x109/0x360 mm/mempolicy.c:2517
->  filemap_alloc_folio_noprof+0x9d/0x420 mm/filemap.c:1020
->  __filemap_get_folio+0xb45/0x1930 mm/filemap.c:2012
->  write_begin_get_folio include/linux/pagemap.h:784 [inline]
->  ext4_write_begin+0x6d9/0x2d70 fs/ext4/inode.c:1318
->  generic_perform_write+0x362/0x1050 mm/filemap.c:4242
->  ext4_buffered_write_iter+0x61a/0xce0 fs/ext4/file.c:299
->  ext4_file_write_iter+0x2a2/0x3d90 fs/ext4/file.c:-1
->  do_iter_readv_writev+0x9de/0xc20 fs/read_write.c:-1
->  vfs_writev+0x52a/0x1500 fs/read_write.c:1057
->  do_pwritev fs/read_write.c:1153 [inline]
->  __do_compat_sys_pwritev2 fs/read_write.c:1298 [inline]
->  __se_compat_sys_pwritev2 fs/read_write.c:1290 [inline]
->  __ia32_compat_sys_pwritev2+0x43d/0x6b0 fs/read_write.c:1290
->  ia32_sys_call+0x1810/0x4310 arch/x86/include/generated/asm/syscalls_32.h:380
->  do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
->  __do_fast_syscall_32+0xb0/0x150 arch/x86/entry/syscall_32.c:306
->  do_fast_syscall_32+0x38/0x80 arch/x86/entry/syscall_32.c:331
->  do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:369
->  entry_SYSENTER_compat_after_hwframe+0x84/0x8e
->
-> CPU: 1 UID: 0 PID: 8113 Comm: syz.5.10451 Tainted: G        W           syzkaller #0 PREEMPT(none)
-> Tainted: [W]=WARN
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-> =====================================================
->
->
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
->
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
->
-> If you want to undo deduplication, reply with:
-> #syz undup
->
+- Simpler code.  Notably, much of the error-handling code is no longer
+  needed, since the library functions can't fail.
+
+- Reduced stack usage.  crypt_iv_lmk_one() now allocates only 112 bytes
+  on the stack instead of 520 bytes.
+
+- The library functions are strongly typed, preventing bugs like
+  https://lore.kernel.org/r/f1625ddc-e82e-4b77-80c2-dc8e45b54848@gmail.com
+
+- Slightly improved performance, as the library provides direct access
+  to the MD5 code without unnecessary overhead such as indirect calls.
+
+To preserve the existing behavior of lmk support being disabled when the
+kernel is booted with "fips=1", make crypt_iv_lmk_ctr() check
+fips_enabled itself.  Previously it relied on crypto_alloc_shash("md5")
+failing.  (I don't know for sure that lmk *actually* needs to be
+disallowed in FIPS mode; this just preserves the existing behavior.)
+
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ drivers/md/Kconfig    |  1 +
+ drivers/md/dm-crypt.c | 76 ++++++++++++-------------------------------
+ 2 files changed, 22 insertions(+), 55 deletions(-)
+
+diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
+index 104aa53550905..dcd232a2ca244 100644
+--- a/drivers/md/Kconfig
++++ b/drivers/md/Kconfig
+@@ -297,10 +297,11 @@ config DM_CRYPT
+ 	depends on (TRUSTED_KEYS || TRUSTED_KEYS=n)
+ 	select CRC32
+ 	select CRYPTO
+ 	select CRYPTO_CBC
+ 	select CRYPTO_ESSIV
++	select CRYPTO_LIB_MD5 # needed by lmk IV mode
+ 	help
+ 	  This device-mapper target allows you to create a device that
+ 	  transparently encrypts the data on it. You'll need to activate
+ 	  the ciphers you're going to use in the cryptoapi configuration.
+ 
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 5ef43231fe77f..04a553529dc27 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -19,10 +19,11 @@
+ #include <linux/blk-integrity.h>
+ #include <linux/crc32.h>
+ #include <linux/mempool.h>
+ #include <linux/slab.h>
+ #include <linux/crypto.h>
++#include <linux/fips.h>
+ #include <linux/workqueue.h>
+ #include <linux/kthread.h>
+ #include <linux/backing-dev.h>
+ #include <linux/atomic.h>
+ #include <linux/scatterlist.h>
+@@ -118,11 +119,10 @@ struct iv_benbi_private {
+ 	int shift;
+ };
+ 
+ #define LMK_SEED_SIZE 64 /* hash + 0 */
+ struct iv_lmk_private {
+-	struct crypto_shash *hash_tfm;
+ 	u8 *seed;
+ };
+ 
+ #define TCW_WHITENING_SIZE 16
+ struct iv_tcw_private {
+@@ -463,14 +463,10 @@ static int crypt_iv_null_gen(struct crypt_config *cc, u8 *iv,
+ 
+ static void crypt_iv_lmk_dtr(struct crypt_config *cc)
+ {
+ 	struct iv_lmk_private *lmk = &cc->iv_gen_private.lmk;
+ 
+-	if (lmk->hash_tfm && !IS_ERR(lmk->hash_tfm))
+-		crypto_free_shash(lmk->hash_tfm);
+-	lmk->hash_tfm = NULL;
+-
+ 	kfree_sensitive(lmk->seed);
+ 	lmk->seed = NULL;
+ }
+ 
+ static int crypt_iv_lmk_ctr(struct crypt_config *cc, struct dm_target *ti,
+@@ -481,26 +477,24 @@ static int crypt_iv_lmk_ctr(struct crypt_config *cc, struct dm_target *ti,
+ 	if (cc->sector_size != (1 << SECTOR_SHIFT)) {
+ 		ti->error = "Unsupported sector size for LMK";
+ 		return -EINVAL;
+ 	}
+ 
+-	lmk->hash_tfm = crypto_alloc_shash("md5", 0,
+-					   CRYPTO_ALG_ALLOCATES_MEMORY);
+-	if (IS_ERR(lmk->hash_tfm)) {
+-		ti->error = "Error initializing LMK hash";
+-		return PTR_ERR(lmk->hash_tfm);
++	if (fips_enabled) {
++		ti->error = "LMK support is disabled due to FIPS";
++		/* ... because it uses MD5. */
++		return -EINVAL;
+ 	}
+ 
+ 	/* No seed in LMK version 2 */
+ 	if (cc->key_parts == cc->tfms_count) {
+ 		lmk->seed = NULL;
+ 		return 0;
+ 	}
+ 
+ 	lmk->seed = kzalloc(LMK_SEED_SIZE, GFP_KERNEL);
+ 	if (!lmk->seed) {
+-		crypt_iv_lmk_dtr(cc);
+ 		ti->error = "Error kmallocing seed storage in LMK";
+ 		return -ENOMEM;
+ 	}
+ 
+ 	return 0;
+@@ -512,11 +506,11 @@ static int crypt_iv_lmk_init(struct crypt_config *cc)
+ 	int subkey_size = cc->key_size / cc->key_parts;
+ 
+ 	/* LMK seed is on the position of LMK_KEYS + 1 key */
+ 	if (lmk->seed)
+ 		memcpy(lmk->seed, cc->key + (cc->tfms_count * subkey_size),
+-		       crypto_shash_digestsize(lmk->hash_tfm));
++		       MD5_DIGEST_SIZE);
+ 
+ 	return 0;
+ }
+ 
+ static int crypt_iv_lmk_wipe(struct crypt_config *cc)
+@@ -527,99 +521,71 @@ static int crypt_iv_lmk_wipe(struct crypt_config *cc)
+ 		memset(lmk->seed, 0, LMK_SEED_SIZE);
+ 
+ 	return 0;
+ }
+ 
+-static int crypt_iv_lmk_one(struct crypt_config *cc, u8 *iv,
+-			    struct dm_crypt_request *dmreq,
+-			    u8 *data)
++static void crypt_iv_lmk_one(struct crypt_config *cc, u8 *iv,
++			     struct dm_crypt_request *dmreq, u8 *data)
+ {
+ 	struct iv_lmk_private *lmk = &cc->iv_gen_private.lmk;
+-	SHASH_DESC_ON_STACK(desc, lmk->hash_tfm);
+-	union {
+-		struct md5_state md5state;
+-		u8 state[CRYPTO_MD5_STATESIZE];
+-	} u;
++	struct md5_ctx ctx;
+ 	__le32 buf[4];
+-	int i, r;
+ 
+-	desc->tfm = lmk->hash_tfm;
+-
+-	r = crypto_shash_init(desc);
+-	if (r)
+-		return r;
++	md5_init(&ctx);
+ 
+-	if (lmk->seed) {
+-		r = crypto_shash_update(desc, lmk->seed, LMK_SEED_SIZE);
+-		if (r)
+-			return r;
+-	}
++	if (lmk->seed)
++		md5_update(&ctx, lmk->seed, LMK_SEED_SIZE);
+ 
+ 	/* Sector is always 512B, block size 16, add data of blocks 1-31 */
+-	r = crypto_shash_update(desc, data + 16, 16 * 31);
+-	if (r)
+-		return r;
++	md5_update(&ctx, data + 16, 16 * 31);
+ 
+ 	/* Sector is cropped to 56 bits here */
+ 	buf[0] = cpu_to_le32(dmreq->iv_sector & 0xFFFFFFFF);
+ 	buf[1] = cpu_to_le32((((u64)dmreq->iv_sector >> 32) & 0x00FFFFFF) | 0x80000000);
+ 	buf[2] = cpu_to_le32(4024);
+ 	buf[3] = 0;
+-	r = crypto_shash_update(desc, (u8 *)buf, sizeof(buf));
+-	if (r)
+-		return r;
++	md5_update(&ctx, (u8 *)buf, sizeof(buf));
+ 
+ 	/* No MD5 padding here */
+-	r = crypto_shash_export(desc, &u.md5state);
+-	if (r)
+-		return r;
+-
+-	for (i = 0; i < MD5_HASH_WORDS; i++)
+-		__cpu_to_le32s(&u.md5state.hash[i]);
+-	memcpy(iv, &u.md5state.hash, cc->iv_size);
+-
+-	return 0;
++	cpu_to_le32_array(ctx.state.h, ARRAY_SIZE(ctx.state.h));
++	memcpy(iv, ctx.state.h, cc->iv_size);
+ }
+ 
+ static int crypt_iv_lmk_gen(struct crypt_config *cc, u8 *iv,
+ 			    struct dm_crypt_request *dmreq)
+ {
+ 	struct scatterlist *sg;
+ 	u8 *src;
+-	int r = 0;
+ 
+ 	if (bio_data_dir(dmreq->ctx->bio_in) == WRITE) {
+ 		sg = crypt_get_sg_data(cc, dmreq->sg_in);
+ 		src = kmap_local_page(sg_page(sg));
+-		r = crypt_iv_lmk_one(cc, iv, dmreq, src + sg->offset);
++		crypt_iv_lmk_one(cc, iv, dmreq, src + sg->offset);
+ 		kunmap_local(src);
+ 	} else
+ 		memset(iv, 0, cc->iv_size);
+-
+-	return r;
++	return 0;
+ }
+ 
+ static int crypt_iv_lmk_post(struct crypt_config *cc, u8 *iv,
+ 			     struct dm_crypt_request *dmreq)
+ {
+ 	struct scatterlist *sg;
+ 	u8 *dst;
+-	int r;
+ 
+ 	if (bio_data_dir(dmreq->ctx->bio_in) == WRITE)
+ 		return 0;
+ 
+ 	sg = crypt_get_sg_data(cc, dmreq->sg_out);
+ 	dst = kmap_local_page(sg_page(sg));
+-	r = crypt_iv_lmk_one(cc, iv, dmreq, dst + sg->offset);
++	crypt_iv_lmk_one(cc, iv, dmreq, dst + sg->offset);
+ 
+ 	/* Tweak the first block of plaintext sector */
+-	if (!r)
+-		crypto_xor(dst + sg->offset, iv, cc->iv_size);
++	crypto_xor(dst + sg->offset, iv, cc->iv_size);
+ 
+ 	kunmap_local(dst);
+-	return r;
++	return 0;
+ }
+ 
+ static void crypt_iv_tcw_dtr(struct crypt_config *cc)
+ {
+ 	struct iv_tcw_private *tcw = &cc->iv_gen_private.tcw;
+
+base-commit: 8bd9238e511d02831022ff0270865c54ccc482d6
+-- 
+2.51.0
+
