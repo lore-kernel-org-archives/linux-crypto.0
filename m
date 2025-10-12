@@ -1,116 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF532B2D7;
-	Sun, 12 Oct 2025 03:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804EF1BD9F0;
+	Sun, 12 Oct 2025 07:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760238543; cv=none; b=ZCs85uaBVdzoL8VDxXhQT40pUIyf0AKO3krluERRd7RiCoRlKZ/ec+ql9dZZ6M3vlf1VI6fWnbMB/8niBOu7gohMq3VF4tYH+4RyFXnufg02y4hrpmC3520nJH7yc8Y+9EKH4U93IG/O9u5Sxem90VSP0PYxIB/4IivI3g/lB/c=
+	t=1760254729; cv=none; b=SpXnyZMEjJWrBakCw0JrVhkirVzj8m4UdeEZ4hQ9X+4wzd2fHsxMl/ECGuEmxXi/oRTTIdHa8pLv/5qKBkE/l8JvLNohkpHLP1PA563MNaI5vRGuypebE7whYya/9PiXnq2PPaTJMJjgw2Og53rv9SP63xws90pZF2Li4FfK+RM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760238543; c=relaxed/simple;
-	bh=S/HR+Xd9sr9GlCbnKOs44IVbH8l2IniCyJKnoK/8JeY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YfNfVVZ3oavndXx0EbYVKkBR5p8JItTX6PfZBQ5JkWalajCscxvO2miAP1ODiE2xsa4127JLaHOHGDfir1EKa4y5OkQa5upkNHW9t8qmaHPgw3Le4KdA86dG4Lu6+dSOxobwIZLe1VAZrjLl0YTouAIKu1ac3Z6MRhjeDTEjp0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WsYufddM; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WsYufddM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39FDFC4CEE7;
-	Sun, 12 Oct 2025 03:08:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760238542;
-	bh=S/HR+Xd9sr9GlCbnKOs44IVbH8l2IniCyJKnoK/8JeY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WsYufddM7INh801LEc3qFr07oSdD0rxydscGDtYiWI0sx2vWM5aEnuQObZLevV76b
-	 7V5BQiMkivivM9CkcVIA78ial3U9repU8XwlQUMC8Andf6nhHF742bEUSUsc3Rut4C
-	 Ap7KyRQRUzLNKtPJtoZ4E5WVazdI6nN1qmG3dg0ei2OFcXH6hDfWuuv3bzfwXMuiXt
-	 ORBHos3g5/5Y60GSoQ1Wao4qtmiVPKRWyWqO6LWydQfsrviODIIlS1zsJtZBCk55+g
-	 ZVIh4Q+gYAfvCgxW4RzVLlujMvylmiLDlUKJzwgcaTin769gzJoS6teVGUTDbevN+F
-	 tKDX+AS81t4KQ==
-Message-ID: <b3551b42-9d63-4173-9c14-356db4ec6639@kernel.org>
-Date: Sun, 12 Oct 2025 05:08:54 +0200
+	s=arc-20240116; t=1760254729; c=relaxed/simple;
+	bh=B6TTQY2b105FO3hvPVhRwnkmJUx6GedqVg3l81uMnnE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hzMPnDuuAhBWlzwi7d/CLrBAECIpVTLhIkLKwBYmj8SQ4/HGW1Gtwjws9d1/QmFRzAZSEz8sjcMzss0GMoLF/miEL2S/DWiAuTsv8tvW3Cv6wNDCmARvoju0DWyP+0aRq6U/ukJ4DLwTdohBjvHc2lqWIYkOrvUHcQm2AUrLsQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id AB6DD2C048AF;
+	Sun, 12 Oct 2025 09:38:44 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 97ADB4A12; Sun, 12 Oct 2025 09:38:44 +0200 (CEST)
+Date: Sun, 12 Oct 2025 09:38:44 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: David Howells <dhowells@redhat.com>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] crypto: asymmetric_keys - prevent overflow in
+ asymmetric_key_generate_id
+Message-ID: <aOtbBJtU2NixkYuE@wunner.de>
+References: <20251007185220.234611-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] dt-bindings: crypto: qcom-qce: Document the kaanapli
- crypto engine
-To: Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
- Thara Gopinath <thara.gopinath@gmail.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- aiqun.yu@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com,
- trilok.soni@oss.qualcomm.com, yijie.yang@oss.qualcomm.com,
- Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
-References: <20250924-knp-crypto-v1-0-49af17a231b7@oss.qualcomm.com>
- <20250924-knp-crypto-v1-2-49af17a231b7@oss.qualcomm.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250924-knp-crypto-v1-2-49af17a231b7@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251007185220.234611-2-thorsten.blum@linux.dev>
 
-On 25/09/2025 01:38, Jingyi Wang wrote:
-> From: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
-> 
-> Document the crypto engine on the kaanapali platform.
-> 
-> Signed-off-by: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
-> Signed-off-by: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
-> ---
+On Tue, Oct 07, 2025 at 08:52:20PM +0200, Thorsten Blum wrote:
+> +++ b/crypto/asymmetric_keys/asymmetric_type.c
+> @@ -141,12 +142,13 @@ struct asymmetric_key_id *asymmetric_key_generate_id(const void *val_1,
+>  						     size_t len_2)
+>  {
+>  	struct asymmetric_key_id *kid;
+> +	size_t len;
+>  
+> -	kid = kmalloc(sizeof(struct asymmetric_key_id) + len_1 + len_2,
+> -		      GFP_KERNEL);
+> +	len = size_add(len_1, len_2);
+> +	kid = kmalloc(struct_size(kid, data, len), GFP_KERNEL);
+>  	if (!kid)
+>  		return ERR_PTR(-ENOMEM);
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+This should error out on overflow, rather than continuing with a
+SIZE_MAX length.  So how about using check_add_overflow() instead
+of size_add() and returning -EOVERFLOW if that returns true?
 
-Best regards,
-Krzysztof
+asymmetric_key_generate_id() is invoked, among other things, with
+the raw serial number from the X.509 certificate, which is an
+ASN.1 INTEGER, which can be arbitrarily large.  (You may want to
+mention that in the commit message.)  So checking for overflows
+does seem to make sense to guard against maliciously crafted
+certificates.
+
+Thanks,
+
+Lukas
