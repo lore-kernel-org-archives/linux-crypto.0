@@ -1,210 +1,117 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF0E2153D2;
-	Sun, 12 Oct 2025 01:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFE62B2D7;
+	Sun, 12 Oct 2025 03:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760234389; cv=none; b=deETar3eQD5kzUN6zrWKJ8S42uj79BJpAbcYFeh/H+blQoaYmNHYp+b4Fa+BQTmv+NZqHkxxXyUSG109P6aJc/edJiKc7lK0SfJvd5fE5Bsmx4QQzWPb6HAARq2Jk8eRTlveXR2EUBrRpmQaIjYknjXyE7LnsnI/Mkuuzc3E4yM=
+	t=1760238508; cv=none; b=gh5+ULsxL+Sd/heks8r8NUOqHvKlGo5UK1MtvbZkLeg5gYaF6WysZD4HTRklzIVfKKrOJh57elXRNArc6SW7zYGJWSI2Qx5cWpFqkI9umBV3zvD/jkAoO9LL21IuUy5rL4LETDVLNJAAqKDcjVfiqQNYjBEJUf1QK2S4ofn5/AM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760234389; c=relaxed/simple;
-	bh=HHm6pOVf3sXBU3OQBSM5qr/7AHVRHIgZ/gieJ/a5ZQ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W8HaENpLJevaonIFa01OMYCABY44TE9mCri0daA+sFCdlm+WBkXM93yvKL3gk0YViTw7bRvopyTBRfwIUYHePHsHfyS9c0nIdNaXfvlITi4/XcHpvsTUAQSLrOdUL/px0MyW2r0zEXQ5hoIcgu+h4uSJOd4KSaMxH7/V+XrGOuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqhjxUsc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760238508; c=relaxed/simple;
+	bh=a0B/3/IMMDde1Kgn4DWqCPNin7xvdApoB+bc1/3Ktts=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eWmjGRWXfUiGyUzdD7RzsS72RoMOz7nb+pXC01Gtp6ZfhvTpDMb0Pyj8ZtK5rR/TyzOvDIKXsVj6b4JZhBOf58oeEdAgWdrH4hqAx7BRdPj0lwOAPbDX+bogX3bDPdyrJdVRJONbmt14N24l2D8feOULPBGwjGrGJPUJ0ezv+eU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TrwPM09L; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqhjxUsc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B89E8C4AF0B;
-	Sun, 12 Oct 2025 01:59:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TrwPM09L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4F49C4CEE7;
+	Sun, 12 Oct 2025 03:08:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760234388;
-	bh=HHm6pOVf3sXBU3OQBSM5qr/7AHVRHIgZ/gieJ/a5ZQ4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aqhjxUsc4ywtaQlokdKDqKbCRA5CyYQm1lk/0pTxq/nIpBi+mwzgy3Y6jNeXHi+3y
-	 R05NLQYxEcZL34GbgR9WR4jmvXWDuCn1TCmsovkVweYiSfchAVj2eJN6ZeyTHJ6+xr
-	 Nixkr9LHao9w/RLuZjErdz3jExn6wTh0LeusFucQezfCgk5Z5L+QVmzuOzx/dYjuT+
-	 +jVCW3bqMSy2WgTIFG5T9CEfp/lnihyjgsrw9xW1E9QQ4rIwfgdQjjhzUQ5Fq8dM2S
-	 Xbh843sXNlUHPkVrxOUWFAHJdWlD1E72vRvRTKIUFvYhCaP018ICZUtayILJy+W/52
-	 8MA9HG46EHj6w==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-cifs@vger.kernel.org,
-	Steve French <sfrench@samba.org>
-Cc: samba-technical@lists.samba.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 7/8] smb: client: Remove obsolete crypto_shash allocations
-Date: Sat, 11 Oct 2025 18:57:37 -0700
-Message-ID: <20251012015738.244315-8-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251012015738.244315-1-ebiggers@kernel.org>
-References: <20251012015738.244315-1-ebiggers@kernel.org>
+	s=k20201202; t=1760238508;
+	bh=a0B/3/IMMDde1Kgn4DWqCPNin7xvdApoB+bc1/3Ktts=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=TrwPM09LyhM7rIYOocDrpSDTQWqhMsNqfMh1gfJWBAdDHdKgYMSv5h4QGjqfezDJS
+	 CIqfhmMVFnlHf/KPrDH3Q2NMzVIQhPHr1PwBUbv0On897qGRCdLiTIOK951rEwzc1v
+	 ztoeObsMmipRchZxu3U07hsuSP44IlQ47eNCqMjgfCyPi652HP/oD4Kj7FZPeQpNYZ
+	 Yof3rc24fgaoEJeGzs/g38HvSnFYsfz9HcMFgqWStBfPk3Rt5OJk879aVgQi9QQyEt
+	 kUAUoeyhbKjGPmOjopkz/X8RtRVjbAPYGuTSekz1yZLYFIGpsbdsTwu8BA8xf48dwt
+	 1kCIdF7S/+++w==
+Message-ID: <aeed33fa-8659-4141-86ea-5b75541989b7@kernel.org>
+Date: Sun, 12 Oct 2025 05:08:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] dt-bindings: crypto: qcom,prng: Document kaanapali
+ RNG
+To: Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+ Thara Gopinath <thara.gopinath@gmail.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ aiqun.yu@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com,
+ trilok.soni@oss.qualcomm.com, yijie.yang@oss.qualcomm.com,
+ Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
+References: <20250924-knp-crypto-v1-0-49af17a231b7@oss.qualcomm.com>
+ <20250924-knp-crypto-v1-1-49af17a231b7@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250924-knp-crypto-v1-1-49af17a231b7@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Now that the SMB client accesses MD5, HMAC-MD5, HMAC-SHA256, and SHA-512
-only via the library API and not via crypto_shash, allocating
-crypto_shash objects for these algorithms is no longer necessary.
-Remove all these allocations, their corresponding kconfig selections,
-and their corresponding module soft dependencies.
+On 25/09/2025 01:38, Jingyi Wang wrote:
+> From: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
+> 
+> Document kaanapali compatible for the True Random Number Generator.
+> 
+> Signed-off-by: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
+> Signed-off-by: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- fs/smb/client/Kconfig         |  4 ----
- fs/smb/client/cifsencrypt.c   |  3 ---
- fs/smb/client/cifsfs.c        |  4 ----
- fs/smb/client/cifsglob.h      |  3 ---
- fs/smb/client/smb2transport.c | 35 ++---------------------------------
- 5 files changed, 2 insertions(+), 47 deletions(-)
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
-index f5a980bdfc939..17bd368574e94 100644
---- a/fs/smb/client/Kconfig
-+++ b/fs/smb/client/Kconfig
-@@ -3,15 +3,11 @@ config CIFS
- 	tristate "SMB3 and CIFS support (advanced network filesystem)"
- 	depends on INET
- 	select NLS
- 	select NLS_UCS2_UTILS
- 	select CRYPTO
--	select CRYPTO_MD5
--	select CRYPTO_SHA256
--	select CRYPTO_SHA512
- 	select CRYPTO_CMAC
--	select CRYPTO_HMAC
- 	select CRYPTO_AEAD2
- 	select CRYPTO_CCM
- 	select CRYPTO_GCM
- 	select CRYPTO_ECB
- 	select CRYPTO_AES
-diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
-index bbcf3b05c19ab..801824825ecf2 100644
---- a/fs/smb/client/cifsencrypt.c
-+++ b/fs/smb/client/cifsencrypt.c
-@@ -691,13 +691,10 @@ calc_seckey(struct cifs_ses *ses)
- 
- void
- cifs_crypto_secmech_release(struct TCP_Server_Info *server)
- {
- 	cifs_free_hash(&server->secmech.aes_cmac);
--	cifs_free_hash(&server->secmech.hmacsha256);
--	cifs_free_hash(&server->secmech.md5);
--	cifs_free_hash(&server->secmech.sha512);
- 
- 	if (server->secmech.enc) {
- 		crypto_free_aead(server->secmech.enc);
- 		server->secmech.enc = NULL;
- 	}
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 05b1fa76e8ccf..4f959f1e08d23 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -2137,17 +2137,13 @@ MODULE_LICENSE("GPL");	/* combination of LGPL + GPL source behaves as GPL */
- MODULE_DESCRIPTION
- 	("VFS to access SMB3 servers e.g. Samba, Macs, Azure and Windows (and "
- 	"also older servers complying with the SNIA CIFS Specification)");
- MODULE_VERSION(CIFS_VERSION);
- MODULE_SOFTDEP("ecb");
--MODULE_SOFTDEP("hmac");
--MODULE_SOFTDEP("md5");
- MODULE_SOFTDEP("nls");
- MODULE_SOFTDEP("aes");
- MODULE_SOFTDEP("cmac");
--MODULE_SOFTDEP("sha256");
--MODULE_SOFTDEP("sha512");
- MODULE_SOFTDEP("aead2");
- MODULE_SOFTDEP("ccm");
- MODULE_SOFTDEP("gcm");
- module_init(init_cifs)
- module_exit(exit_cifs)
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 8f6f567d7474f..8932aa612db4a 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -219,13 +219,10 @@ struct session_key {
- 	char *response;
- };
- 
- /* crypto hashing related structure/fields, not specific to a sec mech */
- struct cifs_secmech {
--	struct shash_desc *md5; /* md5 hash function, for CIFS/SMB1 signatures */
--	struct shash_desc *hmacsha256; /* hmac-sha256 hash function, for SMB2 signatures */
--	struct shash_desc *sha512; /* sha512 hash function, for SMB3.1.1 preauth hash */
- 	struct shash_desc *aes_cmac; /* block-cipher based MAC function, for SMB3 signatures */
- 
- 	struct crypto_aead *enc; /* smb3 encryption AEAD TFM (AES-CCM and AES-GCM) */
- 	struct crypto_aead *dec; /* smb3 decryption AEAD TFM (AES-CCM and AES-GCM) */
- };
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index 89258accc2203..cd689bc27bfdc 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -29,53 +29,22 @@
- 
- static int
- smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
- {
- 	struct cifs_secmech *p = &server->secmech;
--	int rc;
--
--	rc = cifs_alloc_hash("hmac(sha256)", &p->hmacsha256);
--	if (rc)
--		goto err;
--
--	rc = cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
--	if (rc)
--		goto err;
- 
--	return 0;
--err:
--	cifs_free_hash(&p->hmacsha256);
--	return rc;
-+	return cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
- }
- 
- int
- smb311_crypto_shash_allocate(struct TCP_Server_Info *server)
- {
- 	struct cifs_secmech *p = &server->secmech;
--	int rc = 0;
- 
--	rc = cifs_alloc_hash("hmac(sha256)", &p->hmacsha256);
--	if (rc)
--		return rc;
--
--	rc = cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
--	if (rc)
--		goto err;
--
--	rc = cifs_alloc_hash("sha512", &p->sha512);
--	if (rc)
--		goto err;
--
--	return 0;
--
--err:
--	cifs_free_hash(&p->aes_cmac);
--	cifs_free_hash(&p->hmacsha256);
--	return rc;
-+	return cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
- }
- 
--
- static
- int smb3_get_sign_key(__u64 ses_id, struct TCP_Server_Info *server, u8 *key)
- {
- 	struct cifs_chan *chan;
- 	struct TCP_Server_Info *pserver;
--- 
-2.51.0
-
+Best regards,
+Krzysztof
