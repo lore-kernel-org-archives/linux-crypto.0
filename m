@@ -1,364 +1,114 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7627302CB0
-	for <linux-crypto@vger.kernel.org>; Mon, 13 Oct 2025 10:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07F319E81F
+	for <linux-crypto@vger.kernel.org>; Mon, 13 Oct 2025 11:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760352438; cv=none; b=cIVlXVI8s9ZtTRHc4sgulKo/0Qq5tQeSuGt8dhxNSpCwTzOT8hfk8WKknlqqakxqLJMJG8DJ5gQ7n2JtNmFrOhkqJ4p036JsM8QPTrWCm9HR/9srM2yE4qcGQ89zhK/YU4clHO06YJRDivhCnNJ9DOUihrV4VG3TE6piKl5zDFk=
+	t=1760355667; cv=none; b=W4qbTM38gDq7dkWcymJ2/hTQWGjo8G3H4Dx7qJOA11pBfMeB7LeYBJMfm5piUTLSsN3Gp8A4Gx9k4bUpYfzg9HFzBuXV6ONpmRweVxNtJ3yhl14n5MG0lKQBD+1gr8azkNAqnuKfasTHvcS19dEnFJUsl3D+jXcBttdyyco5uAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760352438; c=relaxed/simple;
-	bh=gA8bxpzXimzb54QzB2Y7mbFZjhMeRaVdNxwhzfiamcc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fuY4/p9j/zMKU7esvSYtohgaOWeGx2w5Xlnlc1X1t4I0FoI8JR7oC8i3UTLIi09/QJYcNvhadh/5SOFbnqdsoCyvbpY3NO5LtwuKLMbvCF7YV0wF9JbcKpLMc7F/WJKqmxvJ5KRD/AXj8aCZg5qAsH4MZN+v1w8pvKwc5AIuYOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=anKggMKe; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1760355667; c=relaxed/simple;
+	bh=YIhRZUMEmVTbbTq0qn+Wub1X6vQ1RDEZasIjBykI58w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a/RhjbN6vJnDgp3T6lSNALvtisEWUML4D5UpeFfLTwdNT6Ej2LDCo841FRP83yF53px9t9N3X9hPz6AXz6LR7UejPF+Fi9fHGMKu5CJWHU76uAqHFZ931QhstpVb6N4BS0Ex2m38f5HzLmF5Gk27CvJ+FjfaHao7s39Plud156k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qc8+Kz2T; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="anKggMKe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760352427;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qc8+Kz2T"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760355649;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QdhIzPNclHC5KxVipZI/m9MoIOqoEgSAZQcCWFA6mvM=;
-	b=anKggMKeyis8scRvzxq4AoNnlxLzEOhctNbJxqCKJZxmCNfE7f90ntUk9pZfVX1KIW9gSv
-	qDqJC5LviBV4j+l+INzdkdcZszcJIGTvAcyb1BYimzAfYJD1U0hk2UQroqQFmq5+yJoOOA
-	KL6CKUdY414MapZPVcaj5y1IKTrlgHY=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-68-DWM-IO-2P4mVBgX2LZtp4w-1; Mon,
- 13 Oct 2025 06:47:02 -0400
-X-MC-Unique: DWM-IO-2P4mVBgX2LZtp4w-1
-X-Mimecast-MFC-AGG-ID: DWM-IO-2P4mVBgX2LZtp4w_1760352421
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB5941800372;
-	Mon, 13 Oct 2025 10:47:00 +0000 (UTC)
-Received: from aion.redhat.com (unknown [10.22.80.4])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0AB6E180141C;
-	Mon, 13 Oct 2025 10:47:00 +0000 (UTC)
-Received: by aion.redhat.com (Postfix, from userid 1000)
-	id 586194B1B7D; Mon, 13 Oct 2025 06:46:58 -0400 (EDT)
-Date: Mon, 13 Oct 2025 06:46:58 -0400
-From: Scott Mayhew <smayhew@redhat.com>
-To: Chuck Lever <chuck.lever@oracle.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Jeff Layton <jlayton@kernel.org>,
-	NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nfs@vger.kernel.org
-Subject: Re: [PATCH] nfsd: Use MD5 library instead of crypto_shash
-Message-ID: <aOzYoh6hgXRGvTWV@aion>
-References: <20251011185225.155625-1-ebiggers@kernel.org>
- <5f405581-e7e2-4e77-8044-0496db85aa27@oracle.com>
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9Vu1Cpg8he0xK6peV8K87vsvIV7h3hjSS/e58iVfYGw=;
+	b=Qc8+Kz2T30hBKGXDUI1IEyKZjPYMLuHrMVsW+fT91ZmxlTBt5XAQwDixGEB93hgAMNWgv3
+	Q5V5RqAJgV77UHBzBNCt1XukA6yChd9OWYdsWYUDds28caojAKkyg48ZKDeOowHwamd2ge
+	LN2kcm+nPyldBiMBG8+Y6lzwbZaolEI=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: David Howells <dhowells@redhat.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Vivek Goyal <vgoyal@redhat.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3] crypto: asymmetric_keys - prevent overflow in asymmetric_key_generate_id
+Date: Mon, 13 Oct 2025 13:40:10 +0200
+Message-ID: <20251013114010.28983-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5f405581-e7e2-4e77-8044-0496db85aa27@oracle.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sun, 12 Oct 2025, Chuck Lever wrote:
+Use check_add_overflow() to guard against potential integer overflows
+when adding the binary blob lengths and the size of an asymmetric_key_id
+structure and return ERR_PTR(-EOVERFLOW) accordingly. This prevents a
+possible buffer overflow when copying data from potentially malicious
+X.509 certificate fields that can be arbitrarily large, such as ASN.1
+INTEGER serial numbers, issuer names, etc.
 
-> On 10/11/25 2:52 PM, Eric Biggers wrote:
-> > Update NFSD's support for "legacy client tracking" (which uses MD5) to
-> > use the MD5 library instead of crypto_shash.  This has several benefits:
-> > 
-> > - Simpler code.  Notably, much of the error-handling code is no longer
-> >   needed, since the library functions can't fail.
-> > 
-> > - Improved performance due to reduced overhead.  A microbenchmark of
-> >   nfs4_make_rec_clidname() shows a speedup from 1455 cycles to 425.
-> > 
-> > - The MD5 code can now safely be built as a loadable module when nfsd is
-> >   built as a loadable module.  (Previously, nfsd forced the MD5 code to
-> >   built-in, presumably to work around the unreliablity of the name-based
-> >   loading.)  Thus, select MD5 from the tristate option NFSD if
-> >   NFSD_LEGACY_CLIENT_TRACKING, instead of from the bool option NFSD_V4.
-> > 
-> > To preserve the existing behavior of legacy client tracking support
-> > being disabled when the kernel is booted with "fips=1", make
-> > nfsd4_legacy_tracking_init() return an error if fips_enabled.  I don't
-> > know if this is truly needed, but it preserves the existing behavior.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> 
-> No objection, but let's cross our t's and dot our i's. Scott, when you
-> have recovered from bake-a-thon, can you have a look at this one?
-> 
-> Thanks!
+Fixes: 7901c1a8effb ("KEYS: Implement binary asymmetric key ID handling")
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+Changes in v3:
+- Also use check_add_overflow() for adding the struct size itself as
+  suggested by Lukas
+- Drop struct_size()
+- Update patch description
+- Drop patch 2/2
+- Link to v2: https://lore.kernel.org/lkml/20251012203841.60230-1-thorsten.blum@linux.dev/
 
-Looks fine to me.
+Changes in v2:
+- Use check_add_overflow() and error out as suggested by Lukas
+- Update patch description
+- Add Fixes: tag and @stable for backporting
+- Link to v1: https://lore.kernel.org/lkml/20251007185220.234611-2-thorsten.blum@linux.dev/
+---
+ crypto/asymmetric_keys/asymmetric_type.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-Reviewed-by: Scott Mayhew <smayhew@redhat.com>
-
-I agree with Jeff - it would be nice to just remove the legacy tracking.
-I'm guessing it's still used in smaller/embedded setups?  RHEL and Fedora
-haven't had it enabled for years.  Looking at a few other distros... it's
-not enabled in OpenSUSE Leap or Tumbleweed.  It's not enabled in Debian
-Sid (but it is enabled in Trixie).
-
--Scott
-> 
-> 
-> > ---
-> >  fs/nfsd/Kconfig       |  3 +-
-> >  fs/nfsd/nfs4recover.c | 82 ++++++++-----------------------------------
-> >  2 files changed, 16 insertions(+), 69 deletions(-)
-> > 
-> > diff --git a/fs/nfsd/Kconfig b/fs/nfsd/Kconfig
-> > index e134dce45e350..380a4caa33a73 100644
-> > --- a/fs/nfsd/Kconfig
-> > +++ b/fs/nfsd/Kconfig
-> > @@ -3,10 +3,11 @@ config NFSD
-> >  	tristate "NFS server support"
-> >  	depends on INET
-> >  	depends on FILE_LOCKING
-> >  	depends on FSNOTIFY
-> >  	select CRC32
-> > +	select CRYPTO_LIB_MD5 if NFSD_LEGACY_CLIENT_TRACKING
-> >  	select CRYPTO_LIB_SHA256 if NFSD_V4
-> >  	select LOCKD
-> >  	select SUNRPC
-> >  	select EXPORTFS
-> >  	select NFS_COMMON
-> > @@ -75,12 +76,10 @@ config NFSD_V3_ACL
-> >  config NFSD_V4
-> >  	bool "NFS server support for NFS version 4"
-> >  	depends on NFSD && PROC_FS
-> >  	select FS_POSIX_ACL
-> >  	select RPCSEC_GSS_KRB5
-> > -	select CRYPTO
-> > -	select CRYPTO_MD5
-> >  	select GRACE_PERIOD
-> >  	select NFS_V4_2_SSC_HELPER if NFS_V4_2
-> >  	help
-> >  	  This option enables support in your system's NFS server for
-> >  	  version 4 of the NFS protocol (RFC 3530).
-> > diff --git a/fs/nfsd/nfs4recover.c b/fs/nfsd/nfs4recover.c
-> > index e2b9472e5c78c..dbc0aecef95e3 100644
-> > --- a/fs/nfsd/nfs4recover.c
-> > +++ b/fs/nfsd/nfs4recover.c
-> > @@ -30,13 +30,14 @@
-> >  *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-> >  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-> >  *
-> >  */
-> >  
-> > -#include <crypto/hash.h>
-> > +#include <crypto/md5.h>
-> >  #include <crypto/sha2.h>
-> >  #include <linux/file.h>
-> > +#include <linux/fips.h>
-> >  #include <linux/slab.h>
-> >  #include <linux/namei.h>
-> >  #include <linux/sched.h>
-> >  #include <linux/fs.h>
-> >  #include <linux/module.h>
-> > @@ -90,61 +91,22 @@ static void
-> >  nfs4_reset_creds(const struct cred *original)
-> >  {
-> >  	put_cred(revert_creds(original));
-> >  }
-> >  
-> > -static int
-> > +static void
-> >  nfs4_make_rec_clidname(char dname[HEXDIR_LEN], const struct xdr_netobj *clname)
-> >  {
-> >  	u8 digest[MD5_DIGEST_SIZE];
-> > -	struct crypto_shash *tfm;
-> > -	int status;
-> >  
-> >  	dprintk("NFSD: nfs4_make_rec_clidname for %.*s\n",
-> >  			clname->len, clname->data);
-> > -	tfm = crypto_alloc_shash("md5", 0, 0);
-> > -	if (IS_ERR(tfm)) {
-> > -		status = PTR_ERR(tfm);
-> > -		goto out_no_tfm;
-> > -	}
-> >  
-> > -	status = crypto_shash_tfm_digest(tfm, clname->data, clname->len,
-> > -					 digest);
-> > -	if (status)
-> > -		goto out;
-> > +	md5(clname->data, clname->len, digest);
-> >  
-> >  	static_assert(HEXDIR_LEN == 2 * MD5_DIGEST_SIZE + 1);
-> >  	sprintf(dname, "%*phN", MD5_DIGEST_SIZE, digest);
-> > -
-> > -	status = 0;
-> > -out:
-> > -	crypto_free_shash(tfm);
-> > -out_no_tfm:
-> > -	return status;
-> > -}
-> > -
-> > -/*
-> > - * If we had an error generating the recdir name for the legacy tracker
-> > - * then warn the admin. If the error doesn't appear to be transient,
-> > - * then disable recovery tracking.
-> > - */
-> > -static void
-> > -legacy_recdir_name_error(struct nfs4_client *clp, int error)
-> > -{
-> > -	printk(KERN_ERR "NFSD: unable to generate recoverydir "
-> > -			"name (%d).\n", error);
-> > -
-> > -	/*
-> > -	 * if the algorithm just doesn't exist, then disable the recovery
-> > -	 * tracker altogether. The crypto libs will generally return this if
-> > -	 * FIPS is enabled as well.
-> > -	 */
-> > -	if (error == -ENOENT) {
-> > -		printk(KERN_ERR "NFSD: disabling legacy clientid tracking. "
-> > -			"Reboot recovery will not function correctly!\n");
-> > -		nfsd4_client_tracking_exit(clp->net);
-> > -	}
-> >  }
-> >  
-> >  static void
-> >  __nfsd4_create_reclaim_record_grace(struct nfs4_client *clp,
-> >  		const char *dname, int len, struct nfsd_net *nn)
-> > @@ -180,13 +142,11 @@ nfsd4_create_clid_dir(struct nfs4_client *clp)
-> >  	if (test_and_set_bit(NFSD4_CLIENT_STABLE, &clp->cl_flags))
-> >  		return;
-> >  	if (!nn->rec_file)
-> >  		return;
-> >  
-> > -	status = nfs4_make_rec_clidname(dname, &clp->cl_name);
-> > -	if (status)
-> > -		return legacy_recdir_name_error(clp, status);
-> > +	nfs4_make_rec_clidname(dname, &clp->cl_name);
-> >  
-> >  	status = nfs4_save_creds(&original_cred);
-> >  	if (status < 0)
-> >  		return;
-> >  
-> > @@ -374,13 +334,11 @@ nfsd4_remove_clid_dir(struct nfs4_client *clp)
-> >  	struct nfsd_net *nn = net_generic(clp->net, nfsd_net_id);
-> >  
-> >  	if (!nn->rec_file || !test_bit(NFSD4_CLIENT_STABLE, &clp->cl_flags))
-> >  		return;
-> >  
-> > -	status = nfs4_make_rec_clidname(dname, &clp->cl_name);
-> > -	if (status)
-> > -		return legacy_recdir_name_error(clp, status);
-> > +	nfs4_make_rec_clidname(dname, &clp->cl_name);
-> >  
-> >  	status = mnt_want_write_file(nn->rec_file);
-> >  	if (status)
-> >  		goto out;
-> >  	clear_bit(NFSD4_CLIENT_STABLE, &clp->cl_flags);
-> > @@ -601,10 +559,15 @@ nfsd4_legacy_tracking_init(struct net *net)
-> >  	if (net != &init_net) {
-> >  		pr_warn("NFSD: attempt to initialize legacy client tracking in a container ignored.\n");
-> >  		return -EINVAL;
-> >  	}
-> >  
-> > +	if (fips_enabled) {
-> > +		pr_warn("NFSD: legacy client tracking is disabled due to FIPS\n");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> >  	status = nfs4_legacy_state_init(net);
-> >  	if (status)
-> >  		return status;
-> >  
-> >  	status = nfsd4_load_reboot_recovery_data(net);
-> > @@ -657,25 +620,20 @@ nfs4_recoverydir(void)
-> >  }
-> >  
-> >  static int
-> >  nfsd4_check_legacy_client(struct nfs4_client *clp)
-> >  {
-> > -	int status;
-> >  	char dname[HEXDIR_LEN];
-> >  	struct nfs4_client_reclaim *crp;
-> >  	struct nfsd_net *nn = net_generic(clp->net, nfsd_net_id);
-> >  	struct xdr_netobj name;
-> >  
-> >  	/* did we already find that this client is stable? */
-> >  	if (test_bit(NFSD4_CLIENT_STABLE, &clp->cl_flags))
-> >  		return 0;
-> >  
-> > -	status = nfs4_make_rec_clidname(dname, &clp->cl_name);
-> > -	if (status) {
-> > -		legacy_recdir_name_error(clp, status);
-> > -		return status;
-> > -	}
-> > +	nfs4_make_rec_clidname(dname, &clp->cl_name);
-> >  
-> >  	/* look for it in the reclaim hashtable otherwise */
-> >  	name.data = kmemdup(dname, HEXDIR_LEN, GFP_KERNEL);
-> >  	if (!name.data) {
-> >  		dprintk("%s: failed to allocate memory for name.data!\n",
-> > @@ -1264,17 +1222,14 @@ nfsd4_cld_check(struct nfs4_client *clp)
-> >  	if (crp)
-> >  		goto found;
-> >  
-> >  #ifdef CONFIG_NFSD_LEGACY_CLIENT_TRACKING
-> >  	if (nn->cld_net->cn_has_legacy) {
-> > -		int status;
-> >  		char dname[HEXDIR_LEN];
-> >  		struct xdr_netobj name;
-> >  
-> > -		status = nfs4_make_rec_clidname(dname, &clp->cl_name);
-> > -		if (status)
-> > -			return -ENOENT;
-> > +		nfs4_make_rec_clidname(dname, &clp->cl_name);
-> >  
-> >  		name.data = kmemdup(dname, HEXDIR_LEN, GFP_KERNEL);
-> >  		if (!name.data) {
-> >  			dprintk("%s: failed to allocate memory for name.data!\n",
-> >  				__func__);
-> > @@ -1315,15 +1270,12 @@ nfsd4_cld_check_v2(struct nfs4_client *clp)
-> >  
-> >  #ifdef CONFIG_NFSD_LEGACY_CLIENT_TRACKING
-> >  	if (cn->cn_has_legacy) {
-> >  		struct xdr_netobj name;
-> >  		char dname[HEXDIR_LEN];
-> > -		int status;
-> >  
-> > -		status = nfs4_make_rec_clidname(dname, &clp->cl_name);
-> > -		if (status)
-> > -			return -ENOENT;
-> > +		nfs4_make_rec_clidname(dname, &clp->cl_name);
-> >  
-> >  		name.data = kmemdup(dname, HEXDIR_LEN, GFP_KERNEL);
-> >  		if (!name.data) {
-> >  			dprintk("%s: failed to allocate memory for name.data\n",
-> >  					__func__);
-> > @@ -1692,15 +1644,11 @@ nfsd4_cltrack_legacy_recdir(const struct xdr_netobj *name)
-> >  		/* just return nothing if output will be truncated */
-> >  		kfree(result);
-> >  		return NULL;
-> >  	}
-> >  
-> > -	copied = nfs4_make_rec_clidname(result + copied, name);
-> > -	if (copied) {
-> > -		kfree(result);
-> > -		return NULL;
-> > -	}
-> > +	nfs4_make_rec_clidname(result + copied, name);
-> >  
-> >  	return result;
-> >  }
-> >  
-> >  static char *
-> > 
-> > base-commit: 0739473694c4878513031006829f1030ec850bc2
-> 
-> 
-> -- 
-> Chuck Lever
-> 
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index ba2d9d1ea235..348966ea2175 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -11,6 +11,7 @@
+ #include <crypto/public_key.h>
+ #include <linux/seq_file.h>
+ #include <linux/module.h>
++#include <linux/overflow.h>
+ #include <linux/slab.h>
+ #include <linux/ctype.h>
+ #include <keys/system_keyring.h>
+@@ -141,12 +142,17 @@ struct asymmetric_key_id *asymmetric_key_generate_id(const void *val_1,
+ 						     size_t len_2)
+ {
+ 	struct asymmetric_key_id *kid;
+-
+-	kid = kmalloc(sizeof(struct asymmetric_key_id) + len_1 + len_2,
+-		      GFP_KERNEL);
++	size_t kid_sz;
++	size_t len;
++
++	if (check_add_overflow(len_1, len_2, &len))
++		return ERR_PTR(-EOVERFLOW);
++	if (check_add_overflow(sizeof(struct asymmetric_key_id), len, &kid_sz))
++		return ERR_PTR(-EOVERFLOW);
++	kid = kmalloc(kid_sz, GFP_KERNEL);
+ 	if (!kid)
+ 		return ERR_PTR(-ENOMEM);
+-	kid->len = len_1 + len_2;
++	kid->len = len;
+ 	memcpy(kid->data, val_1, len_1);
+ 	memcpy(kid->data + len_1, val_2, len_2);
+ 	return kid;
+-- 
+2.51.0
 
