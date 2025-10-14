@@ -1,137 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A863236437
-	for <linux-crypto@vger.kernel.org>; Tue, 14 Oct 2025 17:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6195F2AC17
+	for <linux-crypto@vger.kernel.org>; Tue, 14 Oct 2025 17:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760463095; cv=none; b=o84h1oWNTHnxE4xT22nyUrZBerGUK1VU3mZQGRRMqTNDpyhPJWdxxD4pzQaTWlttk7Wz8G+CfdGDkDaiwThMFUpWM3cxumpWwTiPaBkzYOqNTypqmZrYwXYmYKoh8iqVBXrh62b389NV28gMKu0EeJDbQPkfR9Ib8EnTbBU7MnU=
+	t=1760463125; cv=none; b=K06wDGlGImK0Z9o1VlfbdLq87+jUrAKBoylG+jKG+PgDkwZv19cOkrigHcQYuAoH+uHbk+4ifgxAeQC0tcHas535+RgHM7F+oX7dez9hwszTjp/aKRacxMUmXYuk/RZbLSQUOeTiEP/5Goq6wszxR5jkQcFJaLb4SmSLBn0n688=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760463095; c=relaxed/simple;
-	bh=w2ZipmYwgkbaTg68x7OQeqPVm2Eb58COLIrMJa33KKs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mpJWDlt8a5gaorzB+skxHGr2sZxElQuf66m21HyRdCVwPGQ2zgjsR0Tcae/3kFvYOn8KY5u4sgxUY7xy0Yg1vX/Mu9IH75xuXa6F+0Y7s0orzMJFpR1bKtf3o/R0xnkE1kZswohOKRZjdnQIdQJLk13IYhNLJBKW7KlpDwO7VIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=geF00ipo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760463125; c=relaxed/simple;
+	bh=LTlYi3i6eNU03tc4w3oX10zBywcL6FMioa91R3cLGSo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=i9DBNWaN2LtKtmFqTF4LxFRDzHtW/gNOXmBK3WcZBPSP3FbiOD3L3xJzJ65Wz8846QvMsmUswMeS599TuBWugeZt57BhuBmqmMMCI3Vlcjh7uhg1nZcmdfBtAFsW1uetF7A7Z7VShlXpzJPe4bXthwh2fleFdufQ/WLnDazAJiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=yCEDpFQG; arc=none smtp.client-ip=198.37.111.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="geF00ipo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF3E6C4CEE7;
-	Tue, 14 Oct 2025 17:31:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760463094;
-	bh=w2ZipmYwgkbaTg68x7OQeqPVm2Eb58COLIrMJa33KKs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=geF00ipoJc0GOHCdZDQtx7sRUrX8C3iiwbCsv79LWq+J8E3+DqF89bGD5S3oV7KKb
-	 wwNJQnjtr/SlxD9HR+WbFXJc80dm1NpL1VH/jsnN8g8ERn0f+1/QCgLNgsjmU+AL8A
-	 2XQkGkt5RoZrmPQQSkCfcMVzUNAoLXdS0OlLGC+0/Tw5RJ2pcFSQwYV5qYcVwytBwB
-	 OdbtknA/nLqghPborICRasGbKlmK0+xH+OhqJV+DY8qsy6gQER4EeXOHu4u9iXOy70
-	 o3VsQp0V78xK4QXVHNpodWmzsNNiMHfk+cCLAfuahmR2+UTeWzUYn0qMKU19/PVkhu
-	 IWqIBzf9JXcvg==
-Date: Tue, 14 Oct 2025 10:30:02 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-crypto@vger.kernel.org
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="yCEDpFQG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1760463122;
+	bh=LTlYi3i6eNU03tc4w3oX10zBywcL6FMioa91R3cLGSo=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=yCEDpFQGWPgFgEkMVP8dzcCCnZi9VPMssdQwmOQlv+x49eHHLy6gIIuYCkra9mMOT
+	 Kuf89Ro/mLev+kgNj8zL1DtAT8gERxnDjZkuom3/pb/jcJpZ0w9xM39L1FaY5wy9GN
+	 vqoqMGUn4bxdoV8ORZoThN29NyRDCcW7hWDvmOno=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 21FB51C021F;
+	Tue, 14 Oct 2025 13:32:02 -0400 (EDT)
+Message-ID: <607ba12f2700e4a5bca9e403dd4c215d7cb6e078.camel@HansenPartnership.com>
 Subject: Re: Adding algorithm agility to the crypto library functions
-Message-ID: <20251014173002.GB1544@sol>
-References: <d4449ec09cf103bf3d937f78a13720dcae93fb4e.camel@HansenPartnership.com>
- <20251014165541.GA1544@sol>
- <CAMj1kXHzGm53xL4zn-2fYpae2ayxL_GneWfHGunCXdtx6E1H4w@mail.gmail.com>
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org
+Date: Tue, 14 Oct 2025 13:32:01 -0400
+In-Reply-To: <CAMj1kXHzGm53xL4zn-2fYpae2ayxL_GneWfHGunCXdtx6E1H4w@mail.gmail.com>
+References: 
+	<d4449ec09cf103bf3d937f78a13720dcae93fb4e.camel@HansenPartnership.com>
+	 <20251014165541.GA1544@sol>
+	 <CAMj1kXHzGm53xL4zn-2fYpae2ayxL_GneWfHGunCXdtx6E1H4w@mail.gmail.com>
+Autocrypt: addr=James.Bottomley@HansenPartnership.com;
+ prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXHzGm53xL4zn-2fYpae2ayxL_GneWfHGunCXdtx6E1H4w@mail.gmail.com>
 
-On Tue, Oct 14, 2025 at 07:08:39PM +0200, Ard Biesheuvel wrote:
-> On Tue, 14 Oct 2025 at 18:57, Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> ...
-> > > because the user has no input on the hmac hash algorithm so, although
-> > > the TPM specifies it to be agile, we can simply choose sha256.
-> > > However, we have plans to use what are called policy sessions, which
-> > > have require the same hash as the user supplied object used for its
-> > > name (essentially a hash chosen by the user).  In a TPM these hashes
-> > > can be any of the family sha1 sha256, sha384 sha512 plus a few esoteric
-> > > ones like sm3.  So the question becomes: to avoid going back to open
-> > > coding the hmac and using the shash API, is there a way of adding hash
-> > > agility to the library algorithms?  I suppose I could also do this
-> > > inside our hmac code using a large set of switch statements, but that
-> > > would be a bit gross.
-> > >
-> > > If no-one's planning to do this I can take a stab ... it would probably
-> > > still be a bunch of switch statements, but not in my code ...
-> >
-> > This isn't the job of lib/crypto/.
-> >
-> > If a caller would like to support a certain set of algorithms, it should
-> > just write the 'if' or 'switch' statement itself.
-> >
-> > The nice thing about that is that it results in the minimum number of
-> > branches and the minimum stack usage for the possible set of algorithms
-> > at that particular call site.  (Compare to crypto_shash which always
-> > uses indirect calls and always uses almost 400 bytes for each
-> > SHASH_DESC_ON_STACK().  SHASH_DESC_ON_STACK() has to be sized for the
-> > worst possible case among every hash algorithm in existence, regardless
-> > of whether the caller is actually using it or not.)
-> >
-> 
-> I agree with this in principle, but couldn't we provide /some/ level
-> of support in the library so that users don't have to do it, and end
-> up breaking things, either functionally or in terms of security? The
-> fact that you yourself have already implemented this in 3+ places
-> suggests that there may be many other occurrences of this pattern in
-> the future.
-> 
-> I agree that adding a generic hash API that takes a char[] algo_name
-> and supports every flavor of hash that we happen to implement is a bad
-> idea. But perhaps there is some middle ground here, with a build-time
-> constant mask representing the algorithms that are actually supported
-> at the call site, so that the compiler can prune the bits we don't
-> need? I'm asking for the sake of discussion here, though - I don't
-> have a use case myself where this is needed.
+On Tue, 2025-10-14 at 19:08 +0200, Ard Biesheuvel wrote:
+[...]
+> On Tue, 14 Oct 2025 at 18:57, Eric Biggers <ebiggers@kernel.org>
+> wrote:
+>=20
+> > But I have to wonder, do you really need to add support for all
+> > these hash algorithms?=C2=A0 Adding SHA-1 and SM3 support, really?
 
-Right, it would be theoretically possible to have something like:
+I'm OK with not supporting sha1 because it's deprecated (although there
+is no known preimage attack that would work for TPM policies).  I'm
+also happy saying we'll reject sm3 objects unless someone wants to
+patch it into lib/crypto.  But ...
 
-    static inline void hash(u32 supported_algos_bitmask, u32 algo,
-                            const u8 *data, size_t len, u8 *out)
-    {
-            if ((supported_algos_bitmask & (1 << HASH_ALGO_SHA256)) &&
-                algo == HASH_ALGO_SHA256)
-                    sha256(data, len, out);
-            else if ((supported_algos_bitmask & (1 << HASH_ALGO_SHA512)) &&
-                    algo == HASH_ALGO_SHA512)
-                    sha512(data, len, out);
-            ... and so on
-    }
+> > What stops you from just saying that the kernel supports SHA-256
+> > for these user supplied objects, and that's it?
 
-And then something similar for init/update/final.  They'd have to take
-in some sort of generic context type, which the caller would ensure is
-sized to the maximum size needed by any supported algorithm.
+NIST is deprecating sha-256 for Post Quantum so it's a time limited
+choice before we have to do agile anyway.
 
-I'm not sure I like this, though.  Just having the callers do it seems a
-lot more straightforward.  (And again, crypto_shash remains an option
-too.)
-
-Of course, we should also keep in mind that usually in-kernel users only
-want a single algorithm in the first place.  So this entire discussion
-is about the less common case.
-
-> > But I have to wonder, do you really need to add support for all these
-> > hash algorithms?  Adding SHA-1 and SM3 support, really?
-> >
-> > What stops you from just saying that the kernel supports SHA-256 for
-> > these user supplied objects, and that's it?
-> >
-> > Getting kernel developers to think carefully about what set of crypto
-> > algorithms they'd like to support in their features, rather than punting
-> > the problem to a generic crypto layer that supports all sorts of
-> > insecure and esoteric options, isn't necessarily a bad thing...
-> >
-> 
+> > Getting kernel developers to think carefully about what set of
+> > crypto algorithms they'd like to support in their features, rather
+> > than punting the problem to a generic crypto layer that supports
+> > all sorts of insecure and esoteric options, isn't necessarily a bad
+> > thing...
+>=20
 > Yeah, that's a good point too.
 
-- Eric
+Well it's a tradeoff between supporting objects created outside the
+kernel by a process we have no control over and trying to be good about
+algorithm hygiene.  The question we'll get asked in the trouble tickets
+is why won't the kernel process an object my TPM created.  I'm happy
+saying because sha1 is deprecated or if you want sm3 support you need
+to write it but I think we have to support at least the viable sha2
+variants.
+
+Regards,
+
+James
+
+
