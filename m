@@ -1,105 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA14F2BDC3E;
-	Tue, 14 Oct 2025 06:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD25130EF6F
+	for <linux-crypto@vger.kernel.org>; Tue, 14 Oct 2025 07:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760422150; cv=none; b=XGKtLPg2ifGDHvo6G73izKMf1daeKbXET4LdUKS6tU10wO8YE4sSjDHFxeX/NIkaoaQI36EuMQ25EWx8ioQQdZgUqrQUPF2Hy8QZYj99nqYxDchdictcjLJkIHqkybXq/e/C9nhZbVVvBhyCx8udtsSVxwy2rjKmq4eFvXoQybQ=
+	t=1760428574; cv=none; b=Ocs85/PDb8g0afGv11d/R6lwHWO1CH7P9lBAsc4zztt0KJcNzxkquRZ1idx9DkKqeQf8XKHHLmJvHQZqwB9lJVqOVEfmelv+Ace79XHVYVFlVvvfPffqGLMdTPrksjks5eojfcpfZ6uk+Xn4XzmoO40Zt4Z+XL7BTx1YKAylw9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760422150; c=relaxed/simple;
-	bh=bw2rjJak5ibp1HP9mzPAfpKK+w4tEZn4HwIaBKC9xNU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hT9CCAKJPc7PAUkaXMwLjCmVtA95AWWgUcSGUcLpycuRXjNsXd8Ex4dks6vUJikjGg+p4Jvj7tTCdRLl62w8/r7kG+Pzj0RhMOgtkfFhrba1SBLFjRNcsPZw1CYAb87j4BjVvKkTFbSlOVs0R8a1KrbXXdoLEF216Rxj0LGTy8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNQaCvdw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760428574; c=relaxed/simple;
+	bh=Fg0KefGTsKQ+6tIoTbH22ID1I91XIBFCEl0WxK9MFcc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kFvaraScKShktQF3hhHDCWOHdPmpuE/cnk2yseZFs+3KmhL7qySuuBUaLNPX9kTyeYRiBo6qinQOqA3K1/FbdXdTMeut1pHd7flRIpkG+CMTn3CApB3cB7afULbdQv8NYJKnxnApO1hoSz4KTY8RoZjds+S6QJpob9tQ3Z5K7ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T99IveZq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNQaCvdw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 975BFC4CEE7;
-	Tue, 14 Oct 2025 06:09:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T99IveZq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57E8BC19421
+	for <linux-crypto@vger.kernel.org>; Tue, 14 Oct 2025 07:56:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760422149;
-	bh=bw2rjJak5ibp1HP9mzPAfpKK+w4tEZn4HwIaBKC9xNU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hNQaCvdw+dAbqIb6yGCfHP2L4Qw8xFoYjYIz/1TFurOmzBOXsypefaakwaDGPwHMi
-	 50XVA5+MUxV0cv5yGdqyXhlA98lZ6rhZJCCk7ok07B29cTeqLo4Bbx1GjavR8IJII+
-	 Wg+1CCMYmwx8VbfvFT3mzfTP/xvACHDBqEvjJUIE+TvHop0lT1Rd/wNv3SJIXb0TCY
-	 u0K1vsubzgub6AOY7ZnOQZq3FgLKETgDJlKbSoluRwj2Am5OvMwghmpUXuBsLL0vja
-	 UQ90+u4oPLAysqvj/dLrJ85EaIQ17mf3ocTnyK9yzD+hpgcgz+BApHP81c9gDZgrJq
-	 4RuBSN+MzBCQQ==
-Date: Mon, 13 Oct 2025 23:07:37 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>,
-	samba-technical@lists.samba.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>
-Subject: Re: [PATCH 0/8] smb: client: More crypto library conversions
-Message-ID: <20251014060737.GD2763@sol>
-References: <20251012015738.244315-1-ebiggers@kernel.org>
- <ihoaj3ymhuesevdb7k2kg2a2axdkishrrrjr2teigelhkxmt4s@do2n6pkdmaas>
+	s=k20201202; t=1760428574;
+	bh=Fg0KefGTsKQ+6tIoTbH22ID1I91XIBFCEl0WxK9MFcc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=T99IveZqabiGk8YjtsAxJ6lSipFDYQPWaqciK6JCKaFYL558faaQOsQ7E2FuDGnYv
+	 nkaVLgbk10VDYhreW1ITRQHvlLFBRA/mDTMpzWqWbpllMmNE2I0CbM2Hof7ZbIZoId
+	 +SV5Cp41Jqg2zO808MuJdS2N31a1TJAuNC6NcS7kZRjdjGqa6ucrgkBSlMb6qV+q2y
+	 J2z3s/aYtWpXuG27L29f4i/PaIZ1L5aIXLpXpO9ybDADLcPerfqlybJHJuxYzwvbQp
+	 61OGMxAVfZBT0ANxwUD5uAHj9QztVPC15XnXGqPBxwh0sKDmYj1eGlej+gPo9uLQO/
+	 QJmBHRSrL//xw==
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-3c715955a8cso3515266fac.0
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Oct 2025 00:56:14 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXqWCPyhjzLpjduAyvRVbIXCL87aYzUGatn1AIyD+KmVmFKJMFc1QIb0MbJSmg7dswGQDyqyBqgOlRNHn4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKI9GBTj+IIdAiEcpwa9I0d8gxRrKmNWxAa3udiWvXPie2O15c
+	pL50M4rjIf97I6uhn2ZE9pF3wtKm7BKI/9IOuIL9UCG5fZcgQqFqi8d1ycacPO9So4bM03vabPI
+	AT0Di5dbZ/j8Ai6Suvc1pObT/BTKkn0I=
+X-Google-Smtp-Source: AGHT+IHSAc+OjR5octuQQvvDHv3jPU8iyCGUYA7/pNJhyWG1qYoOvFxiMuATOX0mdFk9ovT5xLnZy85PcJh9GvaQrNo=
+X-Received: by 2002:a05:6871:808:b0:3a6:6753:3991 with SMTP id
+ 586e51a60fabf-3be69f05f7dmr11716752fac.5.1760428573630; Tue, 14 Oct 2025
+ 00:56:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ihoaj3ymhuesevdb7k2kg2a2axdkishrrrjr2teigelhkxmt4s@do2n6pkdmaas>
+References: <20251012015738.244315-1-ebiggers@kernel.org>
+In-Reply-To: <20251012015738.244315-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 14 Oct 2025 09:55:59 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHGnR942BG9W=hA6GPDa2FZML+OkiO5eExTm=NcezuqLw@mail.gmail.com>
+X-Gm-Features: AS18NWCCRGT7ibQWh6pBgwwwcADLeSZR6NuenFNpC5OdGVDW56i3wIEZwrUnews
+Message-ID: <CAMj1kXHGnR942BG9W=hA6GPDa2FZML+OkiO5eExTm=NcezuqLw@mail.gmail.com>
+Subject: Re: [PATCH 0/8] smb: client: More crypto library conversions
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>, 
+	samba-technical@lists.samba.org, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Oct 13, 2025 at 11:44:37AM -0300, Enzo Matsumiya wrote:
-> Hi Eric,
-> 
-> On 10/11, Eric Biggers wrote:
-> > This series converts fs/smb/client/ to access SHA-512, HMAC-SHA256, MD5,
-> > and HMAC-MD5 using the library APIs instead of crypto_shash.
-> > 
-> > This simplifies the code significantly.  It also slightly improves
-> > performance, as it eliminates unnecessary overhead.
-> > 
-> > Tested with Samba with all SMB versions, with mfsymlinks in the mount
-> > options, 'server min protocol = NT1' and 'server signing = required' in
-> > smb.conf, and doing a simple file data and symlink verification test.
-> > That seems to cover all the modified code paths.
-> > 
-> > However, with SMB 1.0 I get "CIFS: VFS: SMB signature verification
-> > returned error = -13", regardless of whether this series is applied or
-> > not.  Presumably, testing that case requires some other setting I
-> > couldn't find.
-> > 
-> > Regardless, these are straightforward conversions and all the actual
-> > crypto is exactly the same as before, as far as I can tell.
-> 
-> I think the overall series looks good and do a great cleanup.
-> 
-> Just a minor nit about fips_enabled: since it's now being handled
-> explicitly (rather than an error on cifs_alloc_hash() currently), I
-> think it makes sense to move the check to mount code path when
-> 'sectype == NTLMv2' (I don't particularly care about SMB1, but
-> something similar can be done for 'smb1 && sign' cases I guess).
+On Sun, 12 Oct 2025 at 03:59, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> This series converts fs/smb/client/ to access SHA-512, HMAC-SHA256, MD5,
+> and HMAC-MD5 using the library APIs instead of crypto_shash.
+>
+> This simplifies the code significantly.  It also slightly improves
+> performance, as it eliminates unnecessary overhead.
+>
+> Tested with Samba with all SMB versions, with mfsymlinks in the mount
+> options, 'server min protocol = NT1' and 'server signing = required' in
+> smb.conf, and doing a simple file data and symlink verification test.
+> That seems to cover all the modified code paths.
+>
+> However, with SMB 1.0 I get "CIFS: VFS: SMB signature verification
+> returned error = -13", regardless of whether this series is applied or
+> not.  Presumably, testing that case requires some other setting I
+> couldn't find.
+>
+> Regardless, these are straightforward conversions and all the actual
+> crypto is exactly the same as before, as far as I can tell.
+>
+> Eric Biggers (8):
+>   smb: client: Use SHA-512 library for SMB3.1.1 preauth hash
+>   smb: client: Use HMAC-SHA256 library for key generation
+>   smb: client: Use HMAC-SHA256 library for SMB2 signature calculation
+>   smb: client: Use MD5 library for M-F symlink hashing
+>   smb: client: Use MD5 library for SMB1 signature calculation
+>   smb: client: Use HMAC-MD5 library for NTLMv2
+>   smb: client: Remove obsolete crypto_shash allocations
+>   smb: client: Consolidate cmac(aes) shash allocation
+>
 
-For MD5 message signing and NTLMv2, this series keeps the fips_enabled
-checks where they were before.  That is, they're inserted where the
-calls to cifs_alloc_hash() were before.  I think moving them to earlier
-locations is best done in later patches, as it's not obvious (at least
-to me) exactly how to do that.
-
-I spent a while reading the code again, and this is what I came up with:
-
-- For MD5 message signing: cifs_enable_signing() is probably the right
-  place to disallow it.  However, it's called regardless of the signing
-  algorithm.  So it needs a parameter passed in that tells it that the
-  signing algorithm will be MD5 (or equivalently the dialect is SMB1).
-
-- For NTLMv2: select_sec() and SMB2_select_sec() are where the
-  authentication protocol is selected and are probably the right places
-  to disallow NTLMv2 and RawNTLMSSP.  However, those are two places, not
-  one.  We'd have to remember to put the fips_enabled check in both.
-
-The nice thing about keeping the fips_enabled checks next to the actual
-uses of the algorithms is that it ensures they stay in sync.  So maybe
-we should just stay with that here.
-
-- Eric
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
