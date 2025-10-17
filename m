@@ -1,83 +1,51 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F071F30C60A
-	for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 05:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064A4334686;
+	Fri, 17 Oct 2025 05:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760677945; cv=none; b=M7Stvept8wBW20tHfqyTXE+sKmOqC2XtQwZtc37YVY/JwiRUtNo+6iNXenkN1IBwAzxM11UvNyFV31S4LdCStr3QVzqIRjh98Wma4uAdUaEkiF/cb+kCsW05NLj+4RBcEb1YS87sL1YFc4y2dGxN17NGQm/WvfO2EUWl69OOy/w=
+	t=1760679693; cv=none; b=aTzReagqkwtqNg8EZGwvromskFH+4bipHtVe7LQozBrdgyRvfrzw85STTk+TXvWJmEkQ1diuDDmJRx4Wy3n2btH+JNKZEhzfFSu4r/JRi2im54UFMWban2ZE/KHvyc7WdsjpjAaDoDweZG6l0OMifoTuAkrjhNTUEfhTxP/+9CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760677945; c=relaxed/simple;
-	bh=5HmFIvuXl7rh6yAE6mxlyEZLV01rbipPhieZ9YQXOVI=;
+	s=arc-20240116; t=1760679693; c=relaxed/simple;
+	bh=K6TvAM+nJKwPC0wU+6UlduZNEOmfeDCgZeysu2km0cA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gR0NeRk/4BogWP4icQyfnw7s7nQtXwJWXolQ4clVLH8ZKOXSVripZSUvd5Z3k+rKwv4sJGthPW+0WCTQAkXEI5UAWpSFLW0uEoET1w8+rElQzLD3/His4aE1MHU6zECiiFdFhI6IxM1SAS1EmMgigFfk/mYNr1jrZzjc93rGx3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=M9mLMLbe; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=rdFekmtHYAYRiD1ZZj0/PUNpLp+QyFAUNEdZjsK6MArZfM1QD3Y84xBYo9P5o8cuciM4DPtlaY3xe40UeQnBso1k6GMGvAoeKdCt7MFpX844ChKA9obpvbbuDBSzUa2JhzDjXT9UT0wDsV/UkwuPcc4pii2anRvAtkYIFJMtslU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ORY0w2BI; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="M9mLMLbe"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-33b8a8aa73bso1409885a91.0
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Oct 2025 22:12:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1760677943; x=1761282743; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zx7gecJVM0B3tgHO4gvhQyUHfVpL0ObYiuUhv4Yc1KY=;
-        b=M9mLMLbeWr7xnOX6OthqV/rw/MZ5y8YS8emPZAruZ6BM8cZTzhRLIIXG90XdF0wVlC
-         Ez9aRG4953PI9U3TmLIwFV/cy6RGXZeZffa8BdpXucOqyTUS9KVDSME1H46Z1K938Lx+
-         LtNwUOoENUf9Ftj/uDXgq0CYnfPsmupvVb6QE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760677943; x=1761282743;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zx7gecJVM0B3tgHO4gvhQyUHfVpL0ObYiuUhv4Yc1KY=;
-        b=q8Bz2+EZWBDJpPM7ehL70B3XcJaHRaeWx2X0+/B9siowWL9NqXgjaFxrwrbDgq85ea
-         y8nbN+6Fo6/YmLahRmRWjbmyGV2vFRjMEU49u9xESlo6r1VQmjaTyA6l5o94uSQmmif3
-         GmEPczEAlnbzAUSXV0XfkgH/6SvNgsCqSIMClETqMlMznXYKvj79HoalyE+hpeVU7tqY
-         Wx2kVzf7SgcKA9INhAHsQyaTWuUVRJ3i4275WtKJZndnghibdPLF7dPEtbKO0ei0hR+B
-         zqjT2R94M9WmmD4I9zAmnSpNeTyZw5UUlRn084CRTXcpzT7sKpCBqLGNuQ0W9lBMElsg
-         /X/g==
-X-Forwarded-Encrypted: i=1; AJvYcCVlM/eBcPTNam2WaQ/YvnmiquQ5Q22upZDx99NncMei7h3+cWSGLczb0XfDGzb4kFDR8hvTYjk4dEnNta8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvzArA0b2A3cam8ntXVa7raGbk9yCqxBhhr/k1ad38vBMg7H/9
-	o6CIwhZVvtimlqGiJQYODJtt2v2zTrcTXhaYZRS44EkVK1azSeq8wcIR0d13fRH0MA==
-X-Gm-Gg: ASbGncvtQeDbtDf+LU3tVm3N7P4pXAImqAWbX/vQd+m6xzJOx/RlOqDxiBtlJpYBsdH
-	LVcMw3Txrf1f/Qoup039h2TDMp+4IG3tiYsV6kOirrdMFvS5czLsIxNyyQ9dGhB0xeARAd1LWQD
-	Ajyt/ju8pPwtGeZ9blXTY+5zINR9YpcBUe9807TzYDWybBP9uYfIRMMKMGjl+LuKr31DaULBRHD
-	GArMpIF9Q3vLwBfBs6ULWjSOgOjzNwXi8mEsuLYR8ngNlN/josjv0GBsdmbPdf9O43GlIHNal/A
-	vF36yp9p5F9Nj1UdhSbzAuD06A2FoSqMU1I/B6rnVW2LJwra/VAa+3NHP5DU9h3SRJ3e5fgh0hm
-	CO9aeoq9NVQqp/0T45HqBkvu6DFv5h68A2IbVDSy/nPTOQ2ePJJ3lXZ0F0qVlLi067T2x9RHKb4
-	ouvdv+Q6Eowentb7gMfsbyP+Db
-X-Google-Smtp-Source: AGHT+IHMSNNWjuMVf6ka4ZRAthIkCQkaS+3tfv60BOFg4hlZ3TU5YeQGrih/jnEx7KdcsWc9ynXdTw==
-X-Received: by 2002:a17:90b:2d8f:b0:335:2eee:19dc with SMTP id 98e67ed59e1d1-33bcf8f94b6mr2535744a91.28.1760677943281;
-        Thu, 16 Oct 2025 22:12:23 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:98b0:109e:180c:f908])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33bd78dff7esm1409370a91.0.2025.10.16.22.12.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Oct 2025 22:12:22 -0700 (PDT)
-Date: Fri, 17 Oct 2025 14:12:15 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>, "yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>, 
-	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
-	"sj@kernel.org" <sj@kernel.org>, "kasong@tencent.com" <kasong@tencent.com>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>, 
-	"ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com" <surenb@google.com>, 
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>, "Gomes, Vinicius" <vinicius.gomes@intel.com>, 
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v12 14/23] crypto: iaa - IAA Batching for parallel
- compressions/decompressions.
-Message-ID: <rbl5iuovk5xd2ed5ip4n6mkh5ad6d52ygkqlwbehu3rm6awkn6@tswgallufq4u>
-References: <20250926033502.7486-1-kanchana.p.sridhar@intel.com>
- <20250926033502.7486-15-kanchana.p.sridhar@intel.com>
- <aPGXUxRZeYLO_CUo@gondor.apana.org.au>
- <PH7PR11MB8121C3BAD72D03573D6B4951C9F6A@PH7PR11MB8121.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ORY0w2BI"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=8yw0M0VnK4HX+aAzMi+L4/qHOL+9gcWX9ypFnvc4gPo=; 
+	b=ORY0w2BIJ52gWpfOiTUhxkU7Rxrk5QuZIpHsH/qKhV2KYUI+VptMu9pQLOJelwQHE0IUBZm2ixp
+	Z5TfkRdtFn5Uv0uL5WNkmL+6rgnK0bXZCLmV7/881kxvfGlAsKKiSBE0O4P1kNrTi/D646ePVyx8I
+	nUjoWXGsjKKL91I1ywc06LJ8RtMbEX+ersUklUr6IA5liDSekoOBTct3dvZ2X9H1LABPoxw/IkEti
+	PO8Ah4xNouZkUIX43bomY2rF6K101nXnl79R/h24bVm2NTKIsQo2nReZNayG6/8IUOjlxwxnTzLA1
+	vvc375n9bm8t9bzSxoXos5OHRwdPRy1iqjQg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1v9dDL-00DL2K-1L;
+	Fri, 17 Oct 2025 13:41:20 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 13:41:19 +0800
+Date: Fri, 17 Oct 2025 13:41:19 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: T Pratham <t-pratham@ti.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Manorit Chawdhry <m-chawdhry@ti.com>,
+	Kamlesh Gurudasani <kamlesh@ti.com>,
+	Shiva Tripathi <s-tripathi1@ti.com>,
+	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
+	Vishal Mahaveer <vishalm@ti.com>,
+	Praneeth Bajjuri <praneeth@ti.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 1/4] crypto: ti - Add support for AES-XTS in DTHEv2
+ driver
+Message-ID: <aPHW_zyWwA36Usy1@gondor.apana.org.au>
+References: <20251009111727.911738-1-t-pratham@ti.com>
+ <20251009111727.911738-2-t-pratham@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -86,13 +54,31 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <PH7PR11MB8121C3BAD72D03573D6B4951C9F6A@PH7PR11MB8121.namprd11.prod.outlook.com>
+In-Reply-To: <20251009111727.911738-2-t-pratham@ti.com>
 
-On (25/10/17 04:04), Sridhar, Kanchana P wrote:
-> > What are these for?
-> 
-> Hi Herbert,
-> 
-> These are for non-crypto users such as zram.
+On Thu, Oct 09, 2025 at 04:11:31PM +0530, T Pratham wrote:
+>
+> +static int dthe_cipher_xts_init_tfm(struct crypto_skcipher *tfm)
+> +{
+> +	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +	struct dthe_data *dev_data = dthe_get_dev(ctx);
+> +
+> +	ctx->dev_data = dev_data;
+> +	ctx->keylen = 0;
+> +
+> +	const char *alg_name = crypto_tfm_alg_name(crypto_skcipher_tfm(tfm));
 
-I agree with Herbert, I'd keep zram out of this discussion for now.
+Just use the name "xts(aes)" directly.
+
+> +	ctx->skcipher_fb = crypto_alloc_skcipher(alg_name, 0,
+> +						 CRYPTO_ALG_NEED_FALLBACK);
+
+You should allocate a fallback that is synchronous only.  Then you
+can store the sub-request on the stack with SYNC_SKCIPHER_REQUEST_ON_STACK.
+Otherwise the sub-request reqsize may overflow your request object.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
