@@ -1,110 +1,42 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D7132A3C3
-	for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 18:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D521D5CC6;
+	Fri, 17 Oct 2025 20:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760727104; cv=none; b=BJ+sZPVzAtZTPgTzpwGWt/3oAlRgYfblOY/jsMLqU6gpFFCCUeek9wYZg9gE7U6kMTH8Jc9kEQ6lTmcvxh5CFeixfmOmVespXVu2VHjX3whKgrmkE3mxrAG376qtVgUEJs7Qe4N8iJQIzgpWJJk19WaSpPZ+BmqyThDxGmpDaTY=
+	t=1760734210; cv=none; b=d5GZsi3by+A5ZJ+m2/eH09lbOHR0tIFPMAHc7AWKrvZtyaPVZBuIjrANwMGV5Tb6ScNQ1g3UY3USZFBGOXj94k3ThOk8DXXbDboycPC7pV2Qmq9FElD5ahhERfgpmEusCAbSH+2hGzSh83dclVl/TyuuI1+FGDkQdD4cVvZx25g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760727104; c=relaxed/simple;
-	bh=gXqMz+CcZKPeGt9WvOXq76EJR6tDE24GCMGXdrKpDu0=;
+	s=arc-20240116; t=1760734210; c=relaxed/simple;
+	bh=y9filx/ib83dvzxxqQeg2wIADdpOLjMgN0KWwMwZ5HA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E49VT3YFgWFyKstKnLBbc0Yj5iHSVxAXCTvv9SxBbMbyFp6hUI4dlApTNGxHzEoXfO9+Ve8ti/Youau2+OEmCs5N5UJyN19Fx5GKDg70vXzT78RWQ3xwryQPTMOVDXvIHRK8DADQUniH8C8+Odx7hk2T7lkwQtZ+qLZ3InWTH34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YlifDMN/; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=MVo0tJBZEDa1EhROx2px2S/Z6r9vsOzTX2CLi/eUHdHSiJAkcHiIBRUdXl2P5Jq/DOuVtPV2C3UzF676Trj8osxbesjlmQ2JrALxaHXJz9xcJVDzHid5j/VnF40iM94D2wGfCUinQf42QsSD3BTErfrzPqyLLSSbQIcJGQnZ/o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OH6RqLIF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlifDMN/"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-88e4704a626so329178085a.0
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 11:51:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760727101; x=1761331901; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kcMHrjvb7aW8dOEyGXLP26k9PcHppfS2rsN7ygfXW0s=;
-        b=YlifDMN/c6vzWfG76u/120EPvwuMWFthOAow4pFmcd4wRErr+JpLRZql/RdI3ZFvcB
-         i/kn+nu5cNXXW48slMOD4L6lHLVy3FA4mmGcR3j7sUmM/LE4seQpds7VwSE9vlLwVh3o
-         X1HTtMLfOIpOJyJOjUCEWK8GwEwrWZX/JQPe4/ixsO1syLpRFZhVfUI0Ov235fj/Q76A
-         WJZ59va+96A/5qkKYYeqeNYf62Q9XkdErfCxy9xNt6llZj9JDoLeCM2K0Ze4Yd+TiJPv
-         A6K/xxN5jA/qgnJr3ePqiE3FHyhC5XCOvqxac3E8yeWImyX2jvnjQPJXoRM1N0UQNxHH
-         rODQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760727101; x=1761331901;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kcMHrjvb7aW8dOEyGXLP26k9PcHppfS2rsN7ygfXW0s=;
-        b=eG2Vha4GgXJxPWFf2hhA37IvntOlGzm/p/M3VjgJWQj0/mLfd9SlpdMgwEbNBl4g+f
-         wbcdYUrJBAFnibQDWLWIS/90B0YWaE3VjnFyvzbN6dmJoGHunirTiIOuySlJF2loCE6f
-         FKYcBF+9MxiBOqMr1CWYPMoinTgDFAlJnDD55PhAtUcGHn7T7ykwPefGgXhmgWUpy7HH
-         VxJzxUDWFqtiQkKcgmQdGhyiTDFbkJ9gIXCGF0LimNyjZDj0Y3TRqf6Mx+EwwbufEigK
-         AJxiEhVzFB8hgz1GFau5cRG+KSanSsEgHxCRVcyOSC5yzFBwwhRFv+hYqdnioTUUSVrn
-         FENg==
-X-Forwarded-Encrypted: i=1; AJvYcCXdW8uXVjfdZDgZelcjTmiugZkDTsExQ4HWxS0cZG/UVJqP/TsHxTlJsMjVgfYhAiq3bx1uq5AshrMsMdA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy94agxY5vnPlNL3EsKHXjZyDWQHCcLixzCtqUtNfYoBPA2QKtb
-	pBqVhIcwbhDYhNUnd7yBZHihr81TSARRsQz06C+Ljzv91oI4/JOD8xLw
-X-Gm-Gg: ASbGncvse6dkTL3UdhLc9+FSI197/wB0GfTFRUQJ+L2nm/PkZa1R89uEPHbsSMW1f4P
-	V4r3Xvrgnxea1QkFSrKbF65oFxNnBAgpKJ1yFvO/3Hp+HKo4Tb58k6UqHBNTVItHoJyy/u30zId
-	+kxCeu2rfVlGktav0VA+hbsQ0qN+ShrqjRSNeXmMHhylFEym1u8sOGBcyy/XShFbPIoxhLaEVlO
-	IvyftvVCgXSacj49mDX9qzTWN5uA3oN/s+EmJbgr1BzC7oILeK9/OOidanYIfCIPQmz1x8cZxAO
-	9o1vj3dB90lcjV4W6X7B2PAgqKlidy369m7UqoDfQ8XM+H3Y+883c8+EYAYT4H3mZrqXLjd44r+
-	Ky/Ofo9nCZcHZq4ZkGnGST2BWvT5ODVNeXUVvfn4QQEwvrYnYcRMRNCMEJUO/zc2j+gNYwTmCxE
-	xLDtjQj5U=
-X-Google-Smtp-Source: AGHT+IGgZXVqJ39mGvceINRef9aDCQGOzv3U5h5nFkBRWec10RvkxHjWCypd6ooOxs18G5q6X1BFng==
-X-Received: by 2002:ac8:7f48:0:b0:4e8:910a:ad95 with SMTP id d75a77b69052e-4e89d20f6cdmr65322091cf.6.1760727100900;
-        Fri, 17 Oct 2025 11:51:40 -0700 (PDT)
-Received: from localhost ([12.22.141.131])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4e8aaf87ecdsm3689291cf.16.2025.10.17.11.51.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Oct 2025 11:51:40 -0700 (PDT)
-Date: Fri, 17 Oct 2025 14:51:38 -0400
-From: Yury Norov <yury.norov@gmail.com>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Crt Mori <cmo@melexis.com>, Jonathan Cameron <jic23@kernel.org>,
-	Lars-Peter Clausen <lars@metafoo.de>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>,
-	David Laight <david.laight.linux@gmail.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>,
-	Tony Luck <tony.luck@intel.com>,
-	Michael Hennerich <Michael.Hennerich@analog.com>,
-	Kim Seer Paller <kimseer.paller@analog.com>,
-	David Lechner <dlechner@baylibre.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Richard Genoud <richard.genoud@bootlin.com>,
-	Cosmin Tanislav <demonsingur@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Jianping Shen <Jianping.Shen@de.bosch.com>,
-	linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-edac@vger.kernel.org, qat-linux@intel.com,
-	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
-	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH v4 2/4] bitfield: Add non-constant field_{prep,get}()
- helpers
-Message-ID: <aPKQMdyMO-vrb30X@yury>
-References: <cover.1760696560.git.geert+renesas@glider.be>
- <67c1998f144b3a21399672c8e4d58d3884ae2b3c.1760696560.git.geert+renesas@glider.be>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OH6RqLIF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB53C4CEE7;
+	Fri, 17 Oct 2025 20:50:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760734208;
+	bh=y9filx/ib83dvzxxqQeg2wIADdpOLjMgN0KWwMwZ5HA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OH6RqLIF0YP0/mCOCZopecGrUTpGDNN7vuh2fsWyatq/fBcFC6+Qo35veXQ5TiHPq
+	 4mAr9rEDV4L6Ipvo4AKEs5FuhmQCeXZdEAZ13mYMW0JCNcZDkwlCVF87JXbemaCXQ/
+	 nI3kTqTDDz1FxnlKm/gC8ZcXJqV3YBCAkkthSSVFOzx4Xp5E37xclRRC67VuQtlVD6
+	 ovyxIKUm105PSuLkgVTKNx/rIKg7Mx7lAwpWS3tgkhsVkZ8hWs3iytMsheNu3GxnKl
+	 ggJF+tKI1VGM2CLNUTxzQPgjFdnDQvHSiOQtTdYI0CjVSeeCLj0E+vDE0HhrtQEP/U
+	 827hcejm+bV0A==
+Date: Fri, 17 Oct 2025 20:50:06 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	linux-kernel@vger.kernel.org, x86@kernel.org, Jason@zx2c4.com
+Subject: Re: [PATCH 0/8] VAES+AVX2 optimized implementation of AES-GCM
+Message-ID: <20251017205006.GA769943@google.com>
+References: <20251014003123.GA2763@sol>
+ <aPH9ZQP0m8Pq5Iy-@gondor.apana.org.au>
+ <CAMj1kXGE6-xiUSyKa92=HWeywt=5-F2_G2H7V-UnVhKG65zwCA@mail.gmail.com>
+ <20251017160437.GA1566@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -113,167 +45,71 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <67c1998f144b3a21399672c8e4d58d3884ae2b3c.1760696560.git.geert+renesas@glider.be>
+In-Reply-To: <20251017160437.GA1566@sol>
 
-On Fri, Oct 17, 2025 at 12:54:10PM +0200, Geert Uytterhoeven wrote:
-> The existing FIELD_{GET,PREP}() macros are limited to compile-time
-> constants.  However, it is very common to prepare or extract bitfield
-> elements where the bitfield mask is not a compile-time constant.
+On Fri, Oct 17, 2025 at 09:04:37AM -0700, Eric Biggers wrote:
+> On Fri, Oct 17, 2025 at 10:44:37AM +0200, Ard Biesheuvel wrote:
+> > On Fri, 17 Oct 2025 at 10:25, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > >
+> > > Eric Biggers <ebiggers@kernel.org> wrote:
+> > > > On Wed, Oct 01, 2025 at 07:31:09PM -0700, Eric Biggers wrote:
+> > > >> This patchset replaces the 256-bit vector implementation of AES-GCM for
+> > > >> x86_64 with one that requires AVX2 rather than AVX512.  This greatly
+> > > >> improves AES-GCM performance on CPUs that have VAES but not AVX512, for
+> > > >> example by up to 74% on AMD Zen 3.  For more details, see patch 1.
+> > > >>
+> > > >> This patchset also renames the 512-bit vector implementation of AES-GCM
+> > > >> for x86_64 to be named after AVX512 rather than AVX10/512, then adds
+> > > >> some additional optimizations to it.
+> > > >>
+> > > >> This patchset applies to next-20250929 and is targeting 6.19.  Herbert,
+> > > >> I'd prefer to just apply this myself.  But let me know if you'd prefer
+> > > >> to take it instead (considering that AES-GCM hasn't been librarified
+> > > >> yet).  Either way, there's no hurry, since this is targeting 6.19.
+> > > >>
+> > > >> Eric Biggers (8):
+> > > >>   crypto: x86/aes-gcm - add VAES+AVX2 optimized code
+> > > >>   crypto: x86/aes-gcm - remove VAES+AVX10/256 optimized code
+> > > >>   crypto: x86/aes-gcm - rename avx10 and avx10_512 to avx512
+> > > >>   crypto: x86/aes-gcm - clean up AVX512 code to assume 512-bit vectors
+> > > >>   crypto: x86/aes-gcm - reorder AVX512 precompute and aad_update
+> > > >>     functions
+> > > >>   crypto: x86/aes-gcm - revise some comments in AVX512 code
+> > > >>   crypto: x86/aes-gcm - optimize AVX512 precomputation of H^2 from H^1
+> > > >>   crypto: x86/aes-gcm - optimize long AAD processing with AVX512
+> > > >>
+> > > >>  arch/x86/crypto/Makefile                      |    5 +-
+> > > >>  arch/x86/crypto/aes-gcm-aesni-x86_64.S        |   12 +-
+> > > >>  arch/x86/crypto/aes-gcm-vaes-avx2.S           | 1150 +++++++++++++++++
+> > > >>  ...m-avx10-x86_64.S => aes-gcm-vaes-avx512.S} |  722 +++++------
+> > > >>  arch/x86/crypto/aesni-intel_glue.c            |  264 ++--
+> > > >>  5 files changed, 1667 insertions(+), 486 deletions(-)
+> > > >>  create mode 100644 arch/x86/crypto/aes-gcm-vaes-avx2.S
+> > > >>  rename arch/x86/crypto/{aes-gcm-avx10-x86_64.S => aes-gcm-vaes-avx512.S} (69%)
+> > > >>
+> > > >> base-commit: 3b9b1f8df454caa453c7fb07689064edb2eda90a
+> > > >
+> > > > Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
+> > >
+> > > Oops, I didn't see this email until it was too late.  Since the
+> > > patches should be identical I don't think it matters.
 > 
-> To avoid this limitation, the AT91 clock driver and several other
-> drivers already have their own non-const field_{prep,get}() macros.
-> Make them available for general use by consolidating them in
-> <linux/bitfield.h>, and improve them slightly:
->   1. Avoid evaluating macro parameters more than once,
->   2. Replace "ffs() - 1" by "__ffs()",
->   3. Support 64-bit use on 32-bit architectures.
+> Well, it seems you didn't read the patchset (even the cover letter) or
+> any of the replies to it.  So maybe I should just take it, as I already
+> said I preferred, and later did do since you hadn't said you wanted to
+> take it.  It would have been okay if you had volunteered to take this,
+> but you need to actually read the patches and replies.
 > 
-> This is deliberately not merged into the existing FIELD_{GET,PREP}()
-> macros, as people expressed the desire to keep stricter variants for
-> increased safety, or for performance critical paths.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Acked-by: Crt Mori <cmo@melexis.com>
-> ---
-> v4:
->   - Add Acked-by,
->   - Rebase on top of commit 7c68005a46108ffa ("crypto: qat - relocate
->     power management debugfs helper APIs") in v6.17-rc1,
->   - Convert more recently introduced upstream copies:
->       - drivers/edac/ie31200_edac.c
->       - drivers/iio/dac/ad3530r.c
+> As for the patches being identical, besides correctly applying Ard's
+> tags, I made a couple very minor changes that weren't worth sending a v2
+> for: clarifying one of the commit messages, and correcting two comments
+> and dropping some unused aliases from aes-gcm-vaes-avx2.S.
 
-Can you split out the part that actually introduces the new API?
-
-...
-
-> diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-> index 7ff817bdae19b468..c999fe70076f6684 100644
-> --- a/include/linux/bitfield.h
-> +++ b/include/linux/bitfield.h
-> @@ -220,4 +220,40 @@ __MAKE_OP(64)
->  #undef __MAKE_OP
->  #undef ____MAKE_OP
->  
-> +/**
-> + * field_prep() - prepare a bitfield element
-> + * @mask: shifted mask defining the field's length and position
-> + * @val:  value to put in the field
-> + *
-> + * field_prep() masks and shifts up the value.  The result should be
-> + * combined with other fields of the bitfield using logical OR.
-> + * Unlike FIELD_PREP(), @mask is not limited to a compile-time constant.
-> + */
-> +#define field_prep(mask, val)						\
-> +	({								\
-> +		__auto_type __mask = (mask);				\
-> +		typeof(mask) __val = (val);				\
-> +		unsigned int __shift = sizeof(mask) <= 4 ?		\
-> +				       __ffs(__mask) : __ffs64(__mask);	\
-> +		(__val << __shift) & __mask;	\
-
-__ffs(0) is undef. The corresponding comment in
-include/asm-generic/bitops/__ffs.h explicitly says: "code should check
-against 0 first".
-
-I think mask = 0 is a sign of error here. Can you add a code catching
-it at compile time, and maybe at runtime too? Something like:
-
- #define __field_prep(mask, val)
- ({
-	unsigned __shift = sizeof(mask) <= 4 ? __ffs(mask) : __ffs64(mask);
-        (val << __shift) & mask;
- })
-
- #define field_prep(mask, val)
- ({
-        unsigned int __shift;
-	__auto_type __mask = (mask), __ret = 0;
-	typeof(mask) __val = (val);				
-
-        BUILD_BUG_ON_ZERO(const_true(mask == 0));
-
-        if (WARN_ON_ONCE(mask == 0))
-                goto out;
-        
-        __ret = __field_prep(__mask, __val);
- out:
-        ret;
- })
-
-> +
-> +/**
-> + * field_get() - extract a bitfield element
-> + * @mask: shifted mask defining the field's length and position
-> + * @reg:  value of entire bitfield
-> + *
-> + * field_get() extracts the field specified by @mask from the
-> + * bitfield passed in as @reg by masking and shifting it down.
-> + * Unlike FIELD_GET(), @mask is not limited to a compile-time constant.
-> + */
-> +#define field_get(mask, reg)						\
-> +	({								\
-> +		__auto_type __mask = (mask);				\
-> +		typeof(mask) __reg =  (reg);				\
-
-This would trigger Wconversion warning. Consider
-        unsigned reg = 0xfff;
-        field_get(0xf, reg);
-
-<source>:6:26: warning: conversion to 'int' from 'unsigned int' may change the sign of the result [-Wsign-conversion]
-    6 |     typeof(mask) __reg = reg;
-      |                          ^~~
-
-Notice, the __auto_type makes the __mask to be int, while the reg is
-unsigned int. You need to do:
-
-        typeof(mask) __reg = (typeof(mask))(reg); 
-
-Please enable higher warning levels for the next round.
-
-Also, because for numerals __auto_type is int, when char is enough - are
-you sure that the macro generates the optimal code? User can workaround it
-with:
-        
-        field_get((u8)0xf, reg)
-
-but it may not be trivial. Can you add an example and explanation please?
-
-> +		unsigned int __shift = sizeof(mask) <= 4 ?		\
-> +				       __ffs(__mask) : __ffs64(__mask);	\
-
-Can you use BITS_PER_TYPE() here?
-
-> +		(__reg & __mask) >> __shift;	\
-> +	})
-> +
-
-When mask == 0, we shouldn't touch 'val' at all. Consider
-
-        field_get(0, get_user(ptr))
-
-In this case, evaluating 'reg' is an error, similarly to memcpy().
+And to be clear, these aren't going to go through two trees.  That would
+be silly.  If you really want to take them after all, then ask me to
+drop them first, and make sure to apply them properly with Acked-by and
+Tested-by tags.  Otherwise, please drop your duplicate copy.
 
 Thanks,
-Yury
 
->  #endif
-> diff --git a/sound/usb/mixer_quirks.c b/sound/usb/mixer_quirks.c
-> index 828af3095b86ee0a..6eee89cbc0867f2b 100644
-> --- a/sound/usb/mixer_quirks.c
-> +++ b/sound/usb/mixer_quirks.c
-> @@ -3311,10 +3311,6 @@ static int snd_bbfpro_controls_create(struct usb_mixer_interface *mixer)
->  #define RME_DIGIFACE_REGISTER(reg, mask) (((reg) << 16) | (mask))
->  #define RME_DIGIFACE_INVERT BIT(31)
->  
-> -/* Nonconst helpers */
-> -#define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))
-> -#define field_prep(_mask, _val) (((_val) << (ffs(_mask) - 1)) & (_mask))
-> -
->  static int snd_rme_digiface_write_reg(struct snd_kcontrol *kcontrol, int item, u16 mask, u16 val)
->  {
->  	struct usb_mixer_elem_list *list = snd_kcontrol_chip(kcontrol);
-> -- 
-> 2.43.0
+- Eric
