@@ -1,51 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D569027B34C;
-	Fri, 17 Oct 2025 08:19:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4294E28727B;
+	Fri, 17 Oct 2025 08:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760689178; cv=none; b=FY26ip/PQiLdpVZOxBB2aIt8rgVY8M/L4AtCUar4NdoZTp4Y+QM9gekpkU/gnZ83CESYPY8Mh3JV/8yDDAqJYAct3gNeBHWSGQN3/JEQVcl4mJ4nSLGxXk3ms94e/ee0435Eg4OTh1lcBcNNrL/fYxaHdAC9gZefCI8AeEYc4u4=
+	t=1760689381; cv=none; b=ETRiw03vwBKgGLYSQAUisCBZLgY5xbNaklMkyXYmdjeg9D6vgiDznjs/xRgkxrRyTkcZK8ZLP9kSb/RGE8hQxeYqdNOqQk9ZmyTR2OJSIEs3D3AVHkhIlzZ21qZbsyZMjlqGXFgwpZCLCyb8jSFiyX8r5C2UqF9p5OZyBD/GF/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760689178; c=relaxed/simple;
-	bh=LWebXPXjK8TZe7NRiXGXFdgiR6KhJ+52RIjtJJXwWoM=;
+	s=arc-20240116; t=1760689381; c=relaxed/simple;
+	bh=OxPPXWaxtS5ARtDeuNtZSj/+wvLkD+KBGcHhEj+azrE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=erPQRDziLAZSKSVFwgh0jbijAn2eUdJl06GDkD2qLeGJOTV800k927OHPL/Ym9IzonlpfMhpt6zgN1wxkwt2J7zmdyqnPZ6pv3vOZa39miz3k2/bQ0YI1z6ZmGeFFJNixJZMplo6LXtfdsTb387AWqrdMmdDXDCNejJ1QVFXHwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=qQKeUL9f; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=VX+LBgE9r6A+ylw0gEX7fx/k0b41iXdEFoKUQhkMePY5LWTD1P7Xeloy39rD50cFuHEbcayofHX/v9HQwV/Y5ScLbbDRsKI6aaPTsjL+6tBUjePm4U6uSXxU+L3uGKMYPUsyxyyQErf55FlmmSdi3BHSwAkwleDrz0WSdwOsbuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=I4BBg2wO; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="qQKeUL9f"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="I4BBg2wO"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=l0GpXpfo2yqMk8lrtmMl3O2NGLxAtwJghNLZjo4X3Ls=; 
-	b=qQKeUL9fHE3uE+67X6gIs+DScB21ChQBhhFZWFi/KmkEOEwTwkY/BlUVPoDF0fX7vq9/sJenKu0
-	yWq/TmellfQ70k2+/tNwFDJ6baG21JrUty7NVcNZPI2G+2RuFm2EDvBW9RgdkqcY1u7ELfMsSICbV
-	5wW4K62VdHfhS6VhLWIjlgArdab5xV6IkpRqhQ7KDd+kwGqVDLowHtQy4X5AzTXoQkXkBE9BdRzze
-	B6qr27N8Qf263RUZFM1qD2WzLEVjsT6GhwM/dy/udcD/3UT0yExH4tF9MPnV+zUKwzWhi5q87z7EB
-	n5YbSk2Yuq7YhBNUW5pscAOODUW0XmFX/YLA==;
+	from:content-type:reply-to; bh=f1UgrtkRd8hzFxDQXSida2T4QLJIXoBHA//CXqka/gA=; 
+	b=I4BBg2wOqPtr6WipkUrHnbVRKlhH3MvAlzxSK3Wjf63bV0xvxpVwYT4FC4NYcEK/JZvLqD4sJgK
+	ZxoNrza5jDZ+S91IQBRgCHU6248RxE3RC+9W+bIqXmFNPLsOmqrJMkvwxJv+EKkdUbDrOtqdgaxkz
+	rY3vFbOsHgFOgRpmVWTeMP8GIJvJZnqeqtxMEQnRI3w/4aiDNWY8Ohk6c/hCw71Ty6h9a76GH1RaJ
+	sVKgCXaSvUiWFbqnscUi0zfTojMo96+JNBjy1zCtnT3BMBvs0fWUxdRcvP8DbJEnc3oL22bkpPLwk
+	ip70R+iNHAELfA4TgbBMa3JfqGlXax/5kkOQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v9fgQ-00DN35-1C;
-	Fri, 17 Oct 2025 16:19:31 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:19:30 +0800
-Date: Fri, 17 Oct 2025 16:19:30 +0800
+	id 1v9fjj-00DN5a-1w;
+	Fri, 17 Oct 2025 16:22:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:22:55 +0800
+Date: Fri, 17 Oct 2025 16:22:55 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	aiqun.yu@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com,
-	trilok.soni@oss.qualcomm.com, yijie.yang@oss.qualcomm.com,
-	Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
-Subject: Re: [PATCH] dt-bindings: crypto: qcom,inline-crypto-engine: Document
- the kaanapali ICE
-Message-ID: <aPH8Er_hJ8WoosPw@gondor.apana.org.au>
-References: <20250924-knp-ice-v1-1-1adfc2d9e83c@oss.qualcomm.com>
+To: meenakshi.aggarwal@nxp.com
+Cc: horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
+	gaurav.jain@nxp.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] trusted-keys: Add support for protected keys using
+ CAAM
+Message-ID: <aPH83_rWq8E1dYZ2@gondor.apana.org.au>
+References: <20251006071753.3073538-1-meenakshi.aggarwal@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,20 +48,77 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250924-knp-ice-v1-1-1adfc2d9e83c@oss.qualcomm.com>
+In-Reply-To: <20251006071753.3073538-1-meenakshi.aggarwal@nxp.com>
 
-On Wed, Sep 24, 2025 at 04:29:37PM -0700, Jingyi Wang wrote:
-> From: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
+On Mon, Oct 06, 2025 at 09:17:50AM +0200, meenakshi.aggarwal@nxp.com wrote:
+> From: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
 > 
-> Document the Inline Crypto Engine (ICE) on the kaanapali platform.
+> Overview:
+> This patch set adds:
+> - Support for creating and loading protected keys via `keyctl` interface.
+> - Documentation updates to describe protected key usage and options.
+> - CAAM-specific implementation for protected key encryption algorithms.
 > 
-> Signed-off-by: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
-> Signed-off-by: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
-> ---
->  Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml | 1 +
->  1 file changed, 1 insertion(+)
+> User can create protected/encrypted key using keyctl interface:
+> 
+> KEYNAME=dm_trust_key_hw
+> KEY="$(keyctl add trusted $KEYNAME 'new 32 pk key_enc_algo=1' @s)"
+> keyctl pipe $KEY >~/$KEYNAME.blob
+> keyctl list @s
+> 
+> dm-crypt can load the protected key buffer from the keyring and use it to
+> initialize encrypted volumes, ensuring that key material is never exposed in plaintext.
+> 
+> The Protected key buffer is passed to the CAAM driver via the kernel crypto API.
+> CAAM driver will decapsulate the protected key buffer and perform cipher operation.
+> 
+> Protected Keys are identified by a header structure:
+> 
+> struct caam_pkey_info {
+> 	u8  is_pkey;
+> 	u8  key_enc_algo;
+> 	u16 plain_key_sz;
+> 	u8 key_buf[];
+> };
+> 
+> This information is populated based on the parameters provided during key creation such as 'new 32 pk key_enc_algo=1'
+> 
+> Internal Workflow:
+> ::
+> 
+>  +------------------------+     +-------------------------------+
+>  |   Seal Function        |     | paes_skcipher_setkey()        |
+>  | - Constructs key buffer|---->| - Parses header and key_buf[] |
+>  | - Adds header metadata |     | - Initializes cipher context  |
+>  +------------------------+     +-------------------------------+
+> 
+> I welcome feedback and suggestions from the community.
+> 
+> Thank you for your time and consideration.
+> 
+> Best regards,
+> Meenakshi Aggarwal 
+> 
+> Meenakshi Aggarwal (3):
+>   Doc: trusted-keys as protected keys
+>   KEYS: trusted: caam based protected key
+>   crypto:caam: Add support of paes algorithm
+> 
+>  .../security/keys/trusted-encrypted.rst       |  87 +++++++++++-
+>  drivers/crypto/caam/blob_gen.c                |  86 +++++++++---
+>  drivers/crypto/caam/caamalg.c                 | 128 ++++++++++++++++--
+>  drivers/crypto/caam/caamalg_desc.c            |  87 +++++++++++-
+>  drivers/crypto/caam/caamalg_desc.h            |  13 +-
+>  drivers/crypto/caam/desc.h                    |   9 +-
+>  drivers/crypto/caam/desc_constr.h             |   8 +-
+>  include/soc/fsl/caam-blob.h                   |  26 ++++
+>  security/keys/trusted-keys/trusted_caam.c     | 108 +++++++++++++++
+>  9 files changed, 518 insertions(+), 34 deletions(-)
+> 
+> -- 
+> 2.25.1
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
