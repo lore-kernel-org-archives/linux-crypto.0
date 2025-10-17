@@ -1,454 +1,247 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEDA2DC328
-	for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 12:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E142D641D;
+	Fri, 17 Oct 2025 12:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760704373; cv=none; b=SOP90zFtFeEglMfzR2ocjOPkArfEAZgdPyIOG6HXVrJC6TKazJ+6ZfTHFHAVCZokm3DtmASMClGANk/1cfetnuCdVOAClSx+6ha52CbeYPz679hxCRL1U+VqDxJckkXrFS3nkLpi2muQqgD6+xXc/oS3RPV5nSxpFldihyXfA6w=
+	t=1760704383; cv=none; b=Iny49IcMJ/NJQ7fa7TQlJXAr+u1SkIU6ljQIzFnIJSSVQhwSaVjmJsROC8SkLmbbDqCXnrjztvH9YxF3pAyzUYsCvPg9eisFaEV/4gm8ai5nEMcUVP8Lg1hJnB4oxHe+VzC1Dok0o0rsRw1F9SaQ58S6GpkzN971b8LRSyfx+9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760704373; c=relaxed/simple;
-	bh=a2A2bEvfMZ/aHPI6Me2QiUdDHn0myC9uOVKxYGHqCIo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=c9LlD+gI27ZoYvjvgCYUL21QTIwRizgCJ5wYhXEOHviRRjTM5UjvwaOn4Z+TuVo/Yzy5i2YJHgkNj4Pls4GlGJdTq0ej8skWqbctQP83ffMb036HAwi0EPwgLyvNaPht6wLvGbfxsDWQaQYovJ+0kWsYaLTytld1xRbIlzylojI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hX4UUnkR; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760704383; c=relaxed/simple;
+	bh=rj/rVvX8Y6+2oqmhQGdBhxdIPpHp46oUjOWLECRX/sc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LjBj3hdzSaz8jvh3I1ElgpJ1euWIjJCsnw3pdd7qBbpBjtMFYA7zR50YvgNNmzLconZYAebjzJxHnDJt61EyZmqeV9L2GrjfmiXif7ToyvcqOCbAPpCh3cVNkXbW++/VW8jqC1lIG/gen3AiPTY1IfvN7YgKTy4LU4Pt+5Wc6Wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ltd811Ol; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hX4UUnkR"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4710665e7deso8962905e9.1
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 05:32:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760704369; x=1761309169; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4lviR4y4KLE3n7RRy47fCgv6ELqJOqJ04I0KWYPDO7E=;
-        b=hX4UUnkRDm0sl1BDUxGs4A9P4X+iFu4CnN5doIHs1faYyJiTeBArKVutaj8lacexLW
-         GT3Xvy/dOwDLFsG5zwUnNEQlDm0iyT9Lgc1hiqHJNWTS1f+EyrbBVaeAmfV6AqNYix9r
-         LfDaiS/wpyOWGXOjHpoKh3XsY81z//Dyd4EknZ+QXEhh5VQgHL2cnc9PMQrRL7KVUT25
-         FOciP4NmIZM0j3e4+zQ0vrHSEnDV8RiKNn9xv5nxXMBTVG/kSgsQIm2JIEHxrh+gPXzr
-         RYIsOeUJK3kVaA1GpxJCJ5gQdmtCyrHXHhTiXSENLK68dh/Vmbxo61w2xzQOy7F8XBOp
-         SabA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760704369; x=1761309169;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4lviR4y4KLE3n7RRy47fCgv6ELqJOqJ04I0KWYPDO7E=;
-        b=nOqNZ3vkczNePYCUYo840kzvBzvap48N/MAmqn+lgU6hMCRxyLq3qhdvrdk2tP39Vp
-         uW33Cn69vcGk8yRP31vVxKUL0kOj6J+YhPBJ8v+X1xzKdKsTmr0kJmG1FuvUOeoz1quI
-         G6Lo8/9Z3HcBNiPK0EQ0TGvhKe+Btk7/4DTvrr/tjLoOltVkRboyDPgbuThRTGfTi+aA
-         h3LTvPDgCtE3M5mRe5HWqakevXkOi0gKHSueq642NJI0LhvPrtMUcwKtsBxjSxLE6osF
-         my6M6zmzHP2HY05DqG0raQMFDX+ntq43qzv0qS1Wg7+Uc5pVsOIwm1m849hnh9cN7HaB
-         SHQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUGwFRneoOOYIhyNxc0yIIhNyRAPSwWZwO68Ze2aj2sSR4YeB24wpcqQPDRZhTFX0uQgQwVsfPlVG5YFhs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfdDVJMiIFcliLwWIgCgBDeJ/Y03Qesv/hS7uQlwKy+Hy9H9VS
-	JPJZv0c/bU803MKM14HorJUGRZimi2EQrBuP9NImUMpCiMLh06o3xdJS
-X-Gm-Gg: ASbGncvvWgsLtPKCnRrjz8+HX9oyt/3o5WMxi1GH56CX72nDVp7Pu7MV1pB+6Tgzi/k
-	Y9GvTKublJT0NmZGBxzOzfcM/ZYiGLFJQQOmOhDHaKiUCE6lYxXiU9TeURwKsJ5ddv5rkur3U6a
-	1lNyWT5j9iuYfRpK7Izklvqzbbx8cbajNEKO3JZ+3EjPDEXz06Gxj2UXT5/tUla8W1btEthrbyv
-	PvDSIq8jRwLxmzz22WgOcoAVIFbg9uGOubYRUGwJ/XPjlI24b8bGV5EldtugJf++sgbxdjCBdAL
-	sBRG1JqQoM5Q50S2RthxpyBJI+0Y/eZ0574zeIY7bmsQiZ2jUYdriZ91HYAmPC4HdJ7e7I6iVSA
-	6sZrgwatm1CXSuYMabSedxu05P/1bb3+NLQRcgheZ/o30RIkZo7wkpmXPJxhuXp/1ayavqWoy1C
-	ygfJ8=
-X-Google-Smtp-Source: AGHT+IE4Z4uZhoJlnHZ4fZWGzVqlXcJ3VtJT0uS7DlsTcLhos7f+a2+qMfmhSL+PiYtMShO/dK+2CQ==
-X-Received: by 2002:a05:600c:548c:b0:468:9e79:bee0 with SMTP id 5b1f17b1804b1-471177bc126mr27325425e9.0.1760704368843;
-        Fri, 17 Oct 2025 05:32:48 -0700 (PDT)
-Received: from [10.5.0.2] ([195.158.248.102])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4270539be85sm5263938f8f.7.2025.10.17.05.32.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Oct 2025 05:32:48 -0700 (PDT)
-Message-ID: <f2b879d3e8120c7aeb0e6c9a5fd45b15a2b8e5a0.camel@gmail.com>
-Subject: Re: [PATCH v4 2/4] bitfield: Add non-constant field_{prep,get}()
- helpers
-From: Nuno =?ISO-8859-1?Q?S=E1?= <noname.nuno@gmail.com>
-To: Geert Uytterhoeven <geert+renesas@glider.be>, Michael Turquette	
- <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, Nicolas Ferre	
- <nicolas.ferre@microchip.com>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>,  Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
- Herbert Xu	 <herbert@gondor.apana.org.au>, David Miller
- <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
- Golaszewski <brgl@bgdev.pl>, Joel Stanley	 <joel@jms.id.au>, Andrew Jeffery
- <andrew@codeconstruct.com.au>, Crt Mori	 <cmo@melexis.com>, Jonathan
- Cameron <jic23@kernel.org>, Lars-Peter Clausen	 <lars@metafoo.de>, Jacky
- Huang <ychuang3@nuvoton.com>, Shan-Chun Hung	 <schung@nuvoton.com>, Yury
- Norov <yury.norov@gmail.com>, Rasmus Villemoes	 <linux@rasmusvillemoes.dk>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai	 <tiwai@suse.com>, Johannes
- Berg <johannes@sipsolutions.net>, Jakub Kicinski	 <kuba@kernel.org>, Alex
- Elder <elder@ieee.org>, David Laight	 <david.laight.linux@gmail.com>,
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>,  Jason Baron
- <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>, Tony Luck
- <tony.luck@intel.com>,  Michael Hennerich <Michael.Hennerich@analog.com>,
- Kim Seer Paller <kimseer.paller@analog.com>, David Lechner	
- <dlechner@baylibre.com>, Nuno =?ISO-8859-1?Q?S=E1?= <nuno.sa@analog.com>, 
- Andy Shevchenko	 <andy@kernel.org>, Richard Genoud
- <richard.genoud@bootlin.com>, Cosmin Tanislav	 <demonsingur@gmail.com>,
- Biju Das <biju.das.jz@bp.renesas.com>, Jianping Shen	
- <Jianping.Shen@de.bosch.com>
-Cc: linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-edac@vger.kernel.org, qat-linux@intel.com,
- linux-gpio@vger.kernel.org, 	linux-aspeed@lists.ozlabs.org,
- linux-iio@vger.kernel.org, 	linux-sound@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jonathan Cameron	
- <Jonathan.Cameron@huawei.com>
-Date: Fri, 17 Oct 2025 13:33:19 +0100
-In-Reply-To: <67c1998f144b3a21399672c8e4d58d3884ae2b3c.1760696560.git.geert+renesas@glider.be>
-References: <cover.1760696560.git.geert+renesas@glider.be>
-	 <67c1998f144b3a21399672c8e4d58d3884ae2b3c.1760696560.git.geert+renesas@glider.be>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.1 
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ltd811Ol"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59HAlkuu012300;
+	Fri, 17 Oct 2025 12:32:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=1BBG0X7k7miIzzq9SKlBFBaTbG/NUUKBIRhUBteX/
+	98=; b=ltd811OlpppWPoiEyqFAA2tEIcRmdAlEB0TtScUUxnpsNpzqpNv2QBCGT
+	g8k7kC5nxxXLtSEtT5ZkE9ATChE29ZUScM2J622kjAZqnnmR50YCmtLyvEH4XbhP
+	cMWJMJbuHWYJfJ7ZZo7o3HlnMdPjVgXyGFgL/B+NyYA65JbQkr4+a5flhSs7DIpK
+	DOnPB8fF1zJU1XFzbx+rdQeaCot6JVhZfo2sDMFN3ga+sQkz/gtskaMSepAnlGgn
+	IhehY9Gtwpc+HjH9C1tnpf/EdLQdqdCYOTMjfwM0FU2p4xHgKyrdZCsoPHaiWnAm
+	6B+tObn+tRpjOruR1opBpmncoFfXw==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49qcnrsgra-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Oct 2025 12:32:57 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59HBaqkI018823;
+	Fri, 17 Oct 2025 12:32:56 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49r2jn58gg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Oct 2025 12:32:56 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59HCWspq59310474
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Oct 2025 12:32:54 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ACE9520102;
+	Fri, 17 Oct 2025 12:32:54 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 906F720101;
+	Fri, 17 Oct 2025 12:32:54 +0000 (GMT)
+Received: from funtu2.ibm.com (unknown [9.111.134.111])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 17 Oct 2025 12:32:54 +0000 (GMT)
+From: Harald Freudenberger <freude@linux.ibm.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        mpatocka@redhat.com
+Subject: [PATCH v3] crypto: s390/phmac - Do not modify the req->nbytes value
+Date: Fri, 17 Oct 2025 14:32:54 +0200
+Message-ID: <20251017123254.140080-1-freude@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=M5ZA6iws c=1 sm=1 tr=0 ts=68f23779 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
+ a=qGRyj5zWsW19h7j0xN0A:9
+X-Proofpoint-GUID: mcDnSsg0FUhspUFXvyfRaQ3nUu8ZFH_L
+X-Proofpoint-ORIG-GUID: mcDnSsg0FUhspUFXvyfRaQ3nUu8ZFH_L
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDEwMDE0MCBTYWx0ZWRfX7nCJBkq1mRMb
+ aKWWxMyMeJZPc4k772tHApR5E61uaAeIgUx3ReyC9Jic1KVUvQ7b0cEKS4GxmOuNx56OlGK2fTr
+ MxZf89KFoZaEZv08vl9nfIGLn5GlseLZI/FbPbq9Dt9lVD+58WHi5y2/ccLVdjCIoGWjlguE4ah
+ zF5KUAKSBER+22cqL044UWyl57av1vSyg0EyteLH56lNBu75DWLGUirewPtW73g/l8Zo4MphK2Q
+ Pm+S/pp3UMFj1wlNLev7J57MfxYHzVEUmGRvIzvE3LDoKQLt2fL6f0GU+KsfOeKUQlqYBUXnsGl
+ 6b5HCAp1hUDgSj8u0E/rSj0mD41X9IQauxYDDgDxHiTKl+hLtgQFi9aSW0vF7REMKlHSz79ziwn
+ SPn8m0Gb2VYzpMzGJXLZZUL/bieXqA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-17_04,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 bulkscore=0 spamscore=0 clxscore=1015 impostorscore=0
+ phishscore=0 adultscore=0 suspectscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510020000
+ definitions=main-2510100140
 
-On Fri, 2025-10-17 at 12:54 +0200, Geert Uytterhoeven wrote:
-> The existing FIELD_{GET,PREP}() macros are limited to compile-time
-> constants.=C2=A0 However, it is very common to prepare or extract bitfiel=
-d
-> elements where the bitfield mask is not a compile-time constant.
->=20
-> To avoid this limitation, the AT91 clock driver and several other
-> drivers already have their own non-const field_{prep,get}() macros.
-> Make them available for general use by consolidating them in
-> <linux/bitfield.h>, and improve them slightly:
-> =C2=A0 1. Avoid evaluating macro parameters more than once,
-> =C2=A0 2. Replace "ffs() - 1" by "__ffs()",
-> =C2=A0 3. Support 64-bit use on 32-bit architectures.
->=20
-> This is deliberately not merged into the existing FIELD_{GET,PREP}()
-> macros, as people expressed the desire to keep stricter variants for
-> increased safety, or for performance critical paths.
->=20
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Acked-by: Crt Mori <cmo@melexis.com>
-> ---
+The phmac implementation used the req->nbytes field on combined
+operations (finup, digest) to track the state:
+with req->nbytes > 0 the update needs to be processed,
+while req->nbytes == 0 means to do the final operation. For
+this purpose the req->nbytes field was set to 0 after successful
+update operation. However, aead uses the req->nbytes field after a
+successful hash operation to determine the amount of data to
+en/decrypt. So an implementation must not modify the nbytes field.
 
-Hopefully this gets merged soon. About time to have these variants (I do ha=
-ve a
-driver submitted - in review - which is adding yet another variant of this)
-=20
-Acked-by: Nuno S=C3=A1 <nuno.sa@analog.com>
+Fixed by a slight rework on the phmac implementation. There is
+now a new field async_op in the request context which tracks
+the (asynch) operation to process. So the 'state' via req->nbytes
+is not needed any more and now this field is untouched and may
+be evaluated even after a request is processed by the phmac
+implementation.
 
-> v4:
-> =C2=A0 - Add Acked-by,
-> =C2=A0 - Rebase on top of commit 7c68005a46108ffa ("crypto: qat - relocat=
-e
-> =C2=A0=C2=A0=C2=A0 power management debugfs helper APIs") in v6.17-rc1,
-> =C2=A0 - Convert more recently introduced upstream copies:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - drivers/edac/ie31200_edac.c
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - drivers/iio/dac/ad3530r.c
->=20
-> v3:
-> =C2=A0 - Add Acked-by,
-> =C2=A0 - Drop underscores from macro parameters,
-> =C2=A0 - Use __auto_type where possible,
-> =C2=A0 - Correctly cast reg to the mask type,
-> =C2=A0 - Introduces __val and __reg intermediates to simplify the actual
-> =C2=A0=C2=A0=C2=A0 operation,
-> =C2=A0 - Drop unneeded parentheses,
-> =C2=A0 - Clarify having both FIELD_{GET,PREP}() and field_{get,prep}(),
->=20
-> v2:
-> =C2=A0 - Cast val resp. reg to the mask type,
-> =C2=A0 - Fix 64-bit use on 32-bit architectures,
-> =C2=A0 - Convert new upstream users:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - drivers/crypto/intel/qat/qat_common/adf_=
-gen4_pm_debugfs.c
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - drivers/gpio/gpio-aspeed.c
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - drivers/iio/temperature/mlx90614.c
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - drivers/pinctrl/nuvoton/pinctrl-ma35.c
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - sound/usb/mixer_quirks.c
-> =C2=A0 - Convert new user queued in renesas-devel for v6.15:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - drivers/soc/renesas/rz-sysc.c
-> ---
-> =C2=A0drivers/clk/at91/clk-peripheral.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
-> =C2=A0drivers/clk/at91/pmc.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 |=C2=A0 3 --
-> =C2=A0.../intel/qat/qat_common/adf_pm_dbgfs_utils.c |=C2=A0 8 +----
-> =C2=A0drivers/edac/ie31200_edac.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
-=A0 4 +--
-> =C2=A0drivers/gpio/gpio-aspeed.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- |=C2=A0 5 +--
-> =C2=A0drivers/iio/dac/ad3530r.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0 3 --
-> =C2=A0drivers/iio/temperature/mlx90614.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 5 +--
-> =C2=A0drivers/pinctrl/nuvoton/pinctrl-ma35.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 |=C2=A0 4 ---
-> =C2=A0drivers/soc/renesas/rz-sysc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 3 +-
-> =C2=A0include/linux/bitfield.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 | 36 +++++++++++++++++++
-> =C2=A0sound/usb/mixer_quirks.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 |=C2=A0 4 ---
-> =C2=A011 files changed, 42 insertions(+), 34 deletions(-)
->=20
-> diff --git a/drivers/clk/at91/clk-peripheral.c b/drivers/clk/at91/clk-
-> peripheral.c
-> index e700f40fd87f9327..e7208c47268b6397 100644
-> --- a/drivers/clk/at91/clk-peripheral.c
-> +++ b/drivers/clk/at91/clk-peripheral.c
-> @@ -3,6 +3,7 @@
-> =C2=A0 *=C2=A0 Copyright (C) 2013 Boris BREZILLON <b.brezillon@overkiz.co=
-m>
-> =C2=A0 */
-> =C2=A0
-> +#include <linux/bitfield.h>
-> =C2=A0#include <linux/bitops.h>
-> =C2=A0#include <linux/clk-provider.h>
-> =C2=A0#include <linux/clkdev.h>
-> diff --git a/drivers/clk/at91/pmc.h b/drivers/clk/at91/pmc.h
-> index 5daa32c4cf2540d7..543d7aee8d248cdb 100644
-> --- a/drivers/clk/at91/pmc.h
-> +++ b/drivers/clk/at91/pmc.h
-> @@ -117,9 +117,6 @@ struct at91_clk_pms {
-> =C2=A0	unsigned int parent;
-> =C2=A0};
-> =C2=A0
-> -#define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))
-> -#define field_prep(_mask, _val) (((_val) << (ffs(_mask) - 1)) & (_mask))
-> -
-> =C2=A0#define ndck(a, s) (a[s - 1].id + 1)
-> =C2=A0#define nck(a) (a[ARRAY_SIZE(a) - 1].id + 1)
-> =C2=A0
-> diff --git a/drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs_utils.c
-> b/drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs_utils.c
-> index 69295a9ddf0ac92f..4ccc94ed9493a64c 100644
-> --- a/drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs_utils.c
-> +++ b/drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs_utils.c
-> @@ -1,18 +1,12 @@
-> =C2=A0// SPDX-License-Identifier: GPL-2.0-only
-> =C2=A0/* Copyright(c) 2025 Intel Corporation */
-> +#include <linux/bitfield.h>
-> =C2=A0#include <linux/bitops.h>
-> =C2=A0#include <linux/sprintf.h>
-> =C2=A0#include <linux/string_helpers.h>
-> =C2=A0
-> =C2=A0#include "adf_pm_dbgfs_utils.h"
-> =C2=A0
-> -/*
-> - * This is needed because a variable is used to index the mask at
-> - * pm_scnprint_table(), making it not compile time constant, so the comp=
-ile
-> - * asserts from FIELD_GET() or u32_get_bits() won't be fulfilled.
-> - */
-> -#define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))
-> -
-> =C2=A0#define PM_INFO_MAX_KEY_LEN	21
-> =C2=A0
-> =C2=A0static int pm_scnprint_table(char *buff, const struct pm_status_row=
- *table,
-> diff --git a/drivers/edac/ie31200_edac.c b/drivers/edac/ie31200_edac.c
-> index 5a080ab65476dacf..dfc9a9cecd74207d 100644
-> --- a/drivers/edac/ie31200_edac.c
-> +++ b/drivers/edac/ie31200_edac.c
-> @@ -44,6 +44,7 @@
-> =C2=A0 * but lo_hi_readq() ensures that we are safe across all e3-1200 pr=
-ocessors.
-> =C2=A0 */
-> =C2=A0
-> +#include <linux/bitfield.h>
-> =C2=A0#include <linux/module.h>
-> =C2=A0#include <linux/init.h>
-> =C2=A0#include <linux/pci.h>
-> @@ -139,9 +140,6 @@
-> =C2=A0#define IE31200_CAPID0_DDPCD		BIT(6)
-> =C2=A0#define IE31200_CAPID0_ECC		BIT(1)
-> =C2=A0
-> -/* Non-constant mask variant of FIELD_GET() */
-> -#define field_get(_mask, _reg)=C2=A0 (((_reg) & (_mask)) >> (ffs(_mask) =
-- 1))
-> -
-> =C2=A0static int nr_channels;
-> =C2=A0static struct pci_dev *mci_pdev;
-> =C2=A0static int ie31200_registered =3D 1;
-> diff --git a/drivers/gpio/gpio-aspeed.c b/drivers/gpio/gpio-aspeed.c
-> index 7953a9c4e36d7550..3da999334971d501 100644
-> --- a/drivers/gpio/gpio-aspeed.c
-> +++ b/drivers/gpio/gpio-aspeed.c
-> @@ -5,6 +5,7 @@
-> =C2=A0 * Joel Stanley <joel@jms.id.au>
-> =C2=A0 */
-> =C2=A0
-> +#include <linux/bitfield.h>
-> =C2=A0#include <linux/cleanup.h>
-> =C2=A0#include <linux/clk.h>
-> =C2=A0#include <linux/gpio/aspeed.h>
-> @@ -31,10 +32,6 @@
-> =C2=A0#include <linux/gpio/consumer.h>
-> =C2=A0#include "gpiolib.h"
-> =C2=A0
-> -/* Non-constant mask variant of FIELD_GET() and FIELD_PREP() */
-> -#define field_get(_mask, _reg)	(((_reg) & (_mask)) >> (ffs(_mask) - 1))
-> -#define field_prep(_mask, _val)	(((_val) << (ffs(_mask) - 1)) &
-> (_mask))
-> -
-> =C2=A0#define GPIO_G7_IRQ_STS_BASE 0x100
-> =C2=A0#define GPIO_G7_IRQ_STS_OFFSET(x) (GPIO_G7_IRQ_STS_BASE + (x) * 0x4=
-)
-> =C2=A0#define GPIO_G7_CTRL_REG_BASE 0x180
-> diff --git a/drivers/iio/dac/ad3530r.c b/drivers/iio/dac/ad3530r.c
-> index 6134613777b8e1d4..b97b46090d808ee7 100644
-> --- a/drivers/iio/dac/ad3530r.c
-> +++ b/drivers/iio/dac/ad3530r.c
-> @@ -53,9 +53,6 @@
-> =C2=A0#define AD3530R_MAX_CHANNELS			8
-> =C2=A0#define AD3531R_MAX_CHANNELS			4
-> =C2=A0
-> -/* Non-constant mask variant of FIELD_PREP() */
-> -#define field_prep(_mask, _val)	(((_val) << (ffs(_mask) - 1)) &
-> (_mask))
-> -
-> =C2=A0enum ad3530r_mode {
-> =C2=A0	AD3530R_NORMAL_OP,
-> =C2=A0	AD3530R_POWERDOWN_1K,
-> diff --git a/drivers/iio/temperature/mlx90614.c
-> b/drivers/iio/temperature/mlx90614.c
-> index 8a44a00bfd5ece38..1ad21b73e1b44cb0 100644
-> --- a/drivers/iio/temperature/mlx90614.c
-> +++ b/drivers/iio/temperature/mlx90614.c
-> @@ -22,6 +22,7 @@
-> =C2=A0 * the "wakeup" GPIO is not given, power management will be disable=
-d.
-> =C2=A0 */
-> =C2=A0
-> +#include <linux/bitfield.h>
-> =C2=A0#include <linux/delay.h>
-> =C2=A0#include <linux/err.h>
-> =C2=A0#include <linux/gpio/consumer.h>
-> @@ -68,10 +69,6 @@
-> =C2=A0#define MLX90614_CONST_SCALE 20 /* Scale in milliKelvin (0.02 * 100=
-0) */
-> =C2=A0#define MLX90614_CONST_FIR 0x7 /* Fixed value for FIR part of low p=
-ass filter
-> */
-> =C2=A0
-> -/* Non-constant mask variant of FIELD_GET() and FIELD_PREP() */
-> -#define field_get(_mask, _reg)	(((_reg) & (_mask)) >> (ffs(_mask) - 1))
-> -#define field_prep(_mask, _val)	(((_val) << (ffs(_mask) - 1)) &
-> (_mask))
-> -
-> =C2=A0struct mlx_chip_info {
-> =C2=A0	/* EEPROM offsets with 16-bit data, MSB first */
-> =C2=A0	/* emissivity correction coefficient */
-> diff --git a/drivers/pinctrl/nuvoton/pinctrl-ma35.c
-> b/drivers/pinctrl/nuvoton/pinctrl-ma35.c
-> index cdad01d68a37e365..8d71dc53cc1de1f8 100644
-> --- a/drivers/pinctrl/nuvoton/pinctrl-ma35.c
-> +++ b/drivers/pinctrl/nuvoton/pinctrl-ma35.c
-> @@ -81,10 +81,6 @@
-> =C2=A0#define MVOLT_1800			0
-> =C2=A0#define MVOLT_3300			1
-> =C2=A0
-> -/* Non-constant mask variant of FIELD_GET() and FIELD_PREP() */
-> -#define field_get(_mask, _reg)	(((_reg) & (_mask)) >> (ffs(_mask) - 1))
-> -#define field_prep(_mask, _val)	(((_val) << (ffs(_mask) - 1)) &
-> (_mask))
-> -
-> =C2=A0static const char * const gpio_group_name[] =3D {
-> =C2=A0	"gpioa", "gpiob", "gpioc", "gpiod", "gpioe", "gpiof", "gpiog",
-> =C2=A0	"gpioh", "gpioi", "gpioj", "gpiok", "gpiol", "gpiom", "gpion",
-> diff --git a/drivers/soc/renesas/rz-sysc.c b/drivers/soc/renesas/rz-sysc.=
-c
-> index 9f79e299e6f41641..73eaf8b9d69f7208 100644
-> --- a/drivers/soc/renesas/rz-sysc.c
-> +++ b/drivers/soc/renesas/rz-sysc.c
-> @@ -5,6 +5,7 @@
-> =C2=A0 * Copyright (C) 2024 Renesas Electronics Corp.
-> =C2=A0 */
-> =C2=A0
-> +#include <linux/bitfield.h>
-> =C2=A0#include <linux/cleanup.h>
-> =C2=A0#include <linux/io.h>
-> =C2=A0#include <linux/mfd/syscon.h>
-> @@ -16,8 +17,6 @@
-> =C2=A0
-> =C2=A0#include "rz-sysc.h"
-> =C2=A0
-> -#define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))
-> -
-> =C2=A0/**
-> =C2=A0 * struct rz_sysc - RZ SYSC private data structure
-> =C2=A0 * @base: SYSC base address
-> diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-> index 7ff817bdae19b468..c999fe70076f6684 100644
-> --- a/include/linux/bitfield.h
-> +++ b/include/linux/bitfield.h
-> @@ -220,4 +220,40 @@ __MAKE_OP(64)
-> =C2=A0#undef __MAKE_OP
-> =C2=A0#undef ____MAKE_OP
-> =C2=A0
-> +/**
-> + * field_prep() - prepare a bitfield element
-> + * @mask: shifted mask defining the field's length and position
-> + * @val:=C2=A0 value to put in the field
-> + *
-> + * field_prep() masks and shifts up the value.=C2=A0 The result should b=
-e
-> + * combined with other fields of the bitfield using logical OR.
-> + * Unlike FIELD_PREP(), @mask is not limited to a compile-time constant.
-> + */
-> +#define field_prep(mask, val)						\
-> +	({								\
-> +		__auto_type __mask =3D (mask);				\
-> +		typeof(mask) __val =3D (val);				\
-> +		unsigned int __shift =3D sizeof(mask) <=3D 4 ?		\
-> +				=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __ffs(__mask) :
-> __ffs64(__mask);	\
-> +		(__val << __shift) & __mask;	\
-> +	})
-> +
-> +/**
-> + * field_get() - extract a bitfield element
-> + * @mask: shifted mask defining the field's length and position
-> + * @reg:=C2=A0 value of entire bitfield
-> + *
-> + * field_get() extracts the field specified by @mask from the
-> + * bitfield passed in as @reg by masking and shifting it down.
-> + * Unlike FIELD_GET(), @mask is not limited to a compile-time constant.
-> + */
-> +#define field_get(mask, reg)						\
-> +	({								\
-> +		__auto_type __mask =3D (mask);				\
-> +		typeof(mask) __reg =3D=C2=A0 (reg);				\
-> +		unsigned int __shift =3D sizeof(mask) <=3D 4 ?		\
-> +				=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __ffs(__mask) :
-> __ffs64(__mask);	\
-> +		(__reg & __mask) >> __shift;	\
-> +	})
-> +
-> =C2=A0#endif
-> diff --git a/sound/usb/mixer_quirks.c b/sound/usb/mixer_quirks.c
-> index 828af3095b86ee0a..6eee89cbc0867f2b 100644
-> --- a/sound/usb/mixer_quirks.c
-> +++ b/sound/usb/mixer_quirks.c
-> @@ -3311,10 +3311,6 @@ static int snd_bbfpro_controls_create(struct
-> usb_mixer_interface *mixer)
-> =C2=A0#define RME_DIGIFACE_REGISTER(reg, mask) (((reg) << 16) | (mask))
-> =C2=A0#define RME_DIGIFACE_INVERT BIT(31)
-> =C2=A0
-> -/* Nonconst helpers */
-> -#define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))
-> -#define field_prep(_mask, _val) (((_val) << (ffs(_mask) - 1)) & (_mask))
-> -
-> =C2=A0static int snd_rme_digiface_write_reg(struct snd_kcontrol *kcontrol=
-, int
-> item, u16 mask, u16 val)
-> =C2=A0{
-> =C2=A0	struct usb_mixer_elem_list *list =3D snd_kcontrol_chip(kcontrol);
+Fixes: cbbc675506cc ("crypto: s390 - New s390 specific protected key hash phmac")
+Reported-by: Ingo Franzki <ifranzki@linux.ibm.com>
+Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+Tested-by: Ingo Franzki <ifranzki@linux.ibm.com>
+Reviewed-by: Ingo Franzki <ifranzki@linux.ibm.com>
+Reviewed-by: Holger Dengler <dengler@linux.ibm.com>
+---
+ arch/s390/crypto/phmac_s390.c | 52 +++++++++++++++++++++++------------
+ 1 file changed, 34 insertions(+), 18 deletions(-)
+
+diff --git a/arch/s390/crypto/phmac_s390.c b/arch/s390/crypto/phmac_s390.c
+index 7ecfdc4fba2d..89f3e6d8fd89 100644
+--- a/arch/s390/crypto/phmac_s390.c
++++ b/arch/s390/crypto/phmac_s390.c
+@@ -169,11 +169,18 @@ struct kmac_sha2_ctx {
+ 	u64 buflen[2];
+ };
+ 
++enum async_op {
++	OP_NOP = 0,
++	OP_UPDATE,
++	OP_FINAL,
++	OP_FINUP,
++};
++
+ /* phmac request context */
+ struct phmac_req_ctx {
+ 	struct hash_walk_helper hwh;
+ 	struct kmac_sha2_ctx kmac_ctx;
+-	bool final;
++	enum async_op async_op;
+ };
+ 
+ /*
+@@ -610,6 +617,7 @@ static int phmac_update(struct ahash_request *req)
+ 	 * using engine to serialize requests.
+ 	 */
+ 	if (rc == 0 || rc == -EKEYEXPIRED) {
++		req_ctx->async_op = OP_UPDATE;
+ 		atomic_inc(&tfm_ctx->via_engine_ctr);
+ 		rc = crypto_transfer_hash_request_to_engine(phmac_crypto_engine, req);
+ 		if (rc != -EINPROGRESS)
+@@ -647,8 +655,7 @@ static int phmac_final(struct ahash_request *req)
+ 	 * using engine to serialize requests.
+ 	 */
+ 	if (rc == 0 || rc == -EKEYEXPIRED) {
+-		req->nbytes = 0;
+-		req_ctx->final = true;
++		req_ctx->async_op = OP_FINAL;
+ 		atomic_inc(&tfm_ctx->via_engine_ctr);
+ 		rc = crypto_transfer_hash_request_to_engine(phmac_crypto_engine, req);
+ 		if (rc != -EINPROGRESS)
+@@ -676,13 +683,16 @@ static int phmac_finup(struct ahash_request *req)
+ 	if (rc)
+ 		goto out;
+ 
++	req_ctx->async_op = OP_FINUP;
++
+ 	/* Try synchronous operations if no active engine usage */
+ 	if (!atomic_read(&tfm_ctx->via_engine_ctr)) {
+ 		rc = phmac_kmac_update(req, false);
+ 		if (rc == 0)
+-			req->nbytes = 0;
++			req_ctx->async_op = OP_FINAL;
+ 	}
+-	if (!rc && !req->nbytes && !atomic_read(&tfm_ctx->via_engine_ctr)) {
++	if (!rc && req_ctx->async_op == OP_FINAL &&
++	    !atomic_read(&tfm_ctx->via_engine_ctr)) {
+ 		rc = phmac_kmac_final(req, false);
+ 		if (rc == 0)
+ 			goto out;
+@@ -694,7 +704,7 @@ static int phmac_finup(struct ahash_request *req)
+ 	 * using engine to serialize requests.
+ 	 */
+ 	if (rc == 0 || rc == -EKEYEXPIRED) {
+-		req_ctx->final = true;
++		/* req->async_op has been set to either OP_FINUP or OP_FINAL */
+ 		atomic_inc(&tfm_ctx->via_engine_ctr);
+ 		rc = crypto_transfer_hash_request_to_engine(phmac_crypto_engine, req);
+ 		if (rc != -EINPROGRESS)
+@@ -855,15 +865,16 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
+ 
+ 	/*
+ 	 * Three kinds of requests come in here:
+-	 * update when req->nbytes > 0 and req_ctx->final is false
+-	 * final when req->nbytes = 0 and req_ctx->final is true
+-	 * finup when req->nbytes > 0 and req_ctx->final is true
+-	 * For update and finup the hwh walk needs to be prepared and
+-	 * up to date but the actual nr of bytes in req->nbytes may be
+-	 * any non zero number. For final there is no hwh walk needed.
++	 * 1. req->async_op == OP_UPDATE with req->nbytes > 0
++	 * 2. req->async_op == OP_FINUP with req->nbytes > 0
++	 * 3. req->async_op == OP_FINAL
++	 * For update and finup the hwh walk has already been prepared
++	 * by the caller. For final there is no hwh walk needed.
+ 	 */
+ 
+-	if (req->nbytes) {
++	switch (req_ctx->async_op) {
++	case OP_UPDATE:
++	case OP_FINUP:
+ 		rc = phmac_kmac_update(req, true);
+ 		if (rc == -EKEYEXPIRED) {
+ 			/*
+@@ -880,10 +891,11 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
+ 			hwh_advance(hwh, rc);
+ 			goto out;
+ 		}
+-		req->nbytes = 0;
+-	}
+-
+-	if (req_ctx->final) {
++		if (req_ctx->async_op == OP_UPDATE)
++			break;
++		req_ctx->async_op = OP_FINAL;
++		fallthrough;
++	case OP_FINAL:
+ 		rc = phmac_kmac_final(req, true);
+ 		if (rc == -EKEYEXPIRED) {
+ 			/*
+@@ -897,10 +909,14 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
+ 			cond_resched();
+ 			return -ENOSPC;
+ 		}
++		break;
++	default:
++		/* unknown/unsupported/unimplemented asynch op */
++		return -EOPNOTSUPP;
+ 	}
+ 
+ out:
+-	if (rc || req_ctx->final)
++	if (rc || req_ctx->async_op == OP_FINAL)
+ 		memzero_explicit(kmac_ctx, sizeof(*kmac_ctx));
+ 	pr_debug("request complete with rc=%d\n", rc);
+ 	local_bh_disable();
+-- 
+2.43.0
+
