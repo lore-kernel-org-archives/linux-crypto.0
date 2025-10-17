@@ -1,139 +1,156 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9178932ED4E
-	for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 11:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87565328B5F;
+	Fri, 17 Oct 2025 11:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760698949; cv=none; b=aUPKfRnfO1UcXsKmgBOmpPRH9eFAI3WsRZG0xyehGOpmy7sizTvdzt3Ia9j6rP2/FH/qBIPup7B9noZD9HuWHlx9OU6qNOSjhbgaEd280Gb3FgklEUxlmQU+sjudI6BwCWFIT1wprAVlPTBIfIkjP0cIThJFQSX86VpAzbwNcpg=
+	t=1760699231; cv=none; b=SviucGxecueu7O6mZQbvXL/j2YWQ5BGWJ9/eLOJmWt4fqcGeUilMaozLQa8BbRF2ONLKiZFJaovfvWfDJpVeI5b/blUxkUw2nkkZ4akp26xbcoZ8ekdwkI5DWYP8ChIgoYjr1N0ahy9gJdXJZKJwLLMTEhwc4jjkBrq8d8DMh9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760698949; c=relaxed/simple;
-	bh=7roeWK5AtO/7ZwDK0dlN3Uu9wiMocaa5toCTUlYqJaM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mM3ANKyBxH2C8guyKaAl9djuq2p1gvwsCi8IOWWQOTSdvYn0yo7yn6MSCo26aVZ2RnMjKMb6YV7PXMVKrMNAtUTiUW7i4EH5SMNPACBXHBBcZ+JDOVUuYVNeyarsSmEpeKvrJ5arg5Mk+TdBFOZtBnWcHEt71AsGnNJix10iC8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7930132f59aso2477447b3a.0
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 04:02:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760698947; x=1761303747;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zPE9WHNZsdRI3QmdRcH/wWeYzKksV+R5Ry8aWltKbjU=;
-        b=KT5ugBkqALmCLxMyPk1JoULYjZCwb32zQpJGwPzeUg4DDiB9vL6Hvj4hpMpcOccPOq
-         jXedyW9jaIjFTKCFHsaSuRnb+vylVlYJFxxa7TR3XSC0cX0w1uRZVLQ1wrZZcsqHGEU9
-         AYEWs06SOEst5nY1p34bAUFIRgyHDsAIJvhHYxZLJ5ulUFBokr+g/71xNW6lC5e7r8CF
-         EHlwJShIVzcI0GE9A9GnF3h/b4uNvAleQ/1OHzy1l79vZ9wcuI9bPoP1NAQ+0uTgLOov
-         b9LOVar/helrUyBMfFJGIQedLmmhhW0kUh9/ytOjssHrSDyjHSr+al758z6+fFdFOPVB
-         Hxvw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTcQF0O825sNQgSUyCe503cLMa/MLRP/AxZZmdM6rZ1f2Zgsw6kO/v8C9+KpXr/hJcX7e88uKq+ziEPUI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySsvi0OtRj7ObkxLCqAVB/SVKxNvgb9ikjC76YR3ttYFsqchZy
-	o0pSxawak4226qU9d2vjykGPcOvG14WE+R0r9elG55GoWi7XstsfS2ZIWf1MjOm9
-X-Gm-Gg: ASbGncsEyIge6oi5U9in9VB81XnmtSm9IIMy5F6W6keTk6lLhR4x2DXXz8SOu+vO6rw
-	bEZQAE6KFTU+DgTb1XYIT+EibUKZ720C+8qrrzf5PsgS80uy/YM1clwFCWOnAMM0F2o9qXwcAnc
-	Z7HiPo8bTYZP0JzRMdb/K0wTKSx94SpH7DsIdy+HpmQ3/eMB7c9aGcmH6fewnv/KSbDBqvFbipX
-	XcZqF7dCkUHc7Io9uJ4dQ5qj1yTcG+nzbvYTFo4G8KqYlf3hkp0wM9Sovz2xJNSOFxUoI305xDy
-	EmGiECPtKFhKPZWToJek4ZMbLlLy0PS/po8bGI5ZEJAQxu7/t/rr4yQ2O6S44nX7CnLQ+WmhjVi
-	MP0lMi8URQvIFSjvm6P51efItfd+UVvVQn49wAmyxLhC4UdYvuE3KphcDgAKGDN+ZSGgJrSyfI4
-	Mz6laGWOvJlyUTd0gpcU2Hmm9OkEGuwtjL6yCJn0H/9DKAEUckQkv/
-X-Google-Smtp-Source: AGHT+IH1YcMZ+OFtdoh9Zj/bRflii2DR/MhFIFvaEBjkQJmSpglVpOtSexRT9Wya/RYRVC+LpSddyA==
-X-Received: by 2002:a05:6a00:4652:b0:77f:11bd:749a with SMTP id d2e1a72fcca58-7a220d2330amr3343443b3a.20.1760698947339;
-        Fri, 17 Oct 2025 04:02:27 -0700 (PDT)
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com. [209.85.210.180])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992d09671asm25520325b3a.47.2025.10.17.04.02.26
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Oct 2025 04:02:27 -0700 (PDT)
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7930132f59aso2477405b3a.0
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 04:02:26 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU6p/Ro5ozIAB81Z5pgY0Q0JqzskscOJ1Q5jFAS9+VkeWa1CtJkUARwdzh2mqogGWt1ypwMSCgvf12bYtc=@vger.kernel.org
-X-Received: by 2002:a05:6102:5111:b0:5d5:f766:333e with SMTP id
- ada2fe7eead31-5d7dd5934demr1126362137.15.1760698513447; Fri, 17 Oct 2025
- 03:55:13 -0700 (PDT)
+	s=arc-20240116; t=1760699231; c=relaxed/simple;
+	bh=YM1qJhiYW/aJM7mu78MMauGEvaYVNdHVJZF/56mG06A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z4kauBaFC5aK6CN0I+tqgEChB9QjzU6jTpffCbjE1zf0ZFFxLvgg0rtozRXDazvh2LY3zeIpjSWUS/gNcFzP9e0mjJyg5bS4DrQob7lQIscBQAk+Auv+878KAgqtRtv3Fg+ZO/ZbCcaOaDnmkH74T3B9IWOsKg3ddnLQOomPFEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=qwAL2V6b; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="qwAL2V6b"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1760699200; x=1761304000; i=markus.elfring@web.de;
+	bh=mBs//QP/LI/q0shbH30wWUG5UPKzyBqKbrx2NSC0/iA=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=qwAL2V6bkyx6cmydBafs8WZ0S0BOEVtckYXPJzlqKcsMU/uTEwFV8ffzv2njWc5y
+	 +FVsqIN+ACzBv3T+qcNbzR+XcvdyGYB/lyvXO/kRPlyXWVGwe3nEMESRe2DF+tniA
+	 XvEYuFTlnvA+XJE3BSzwhwShlqbYTFLQVTJklBwmdvTcNPJKHh3EUu9LDtsUy4m7/
+	 yPu9o4c0YSKldWHx3WdsQCUgM4Rbsi6qfmEcGck4aj7MfS9mjroqy6hHct1UjTR0e
+	 UIttH3UQY3j/gOnO6jusnUxBceGFD6V+VJKI3/iVCsxBDvEPGlt7CHTSkZ9KF51O7
+	 bQAOj4oN15FQy6oPbQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.195]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1M9ISh-1v69nL1Bvb-0067bb; Fri, 17
+ Oct 2025 13:06:40 +0200
+Message-ID: <51baad8c-6997-4e3b-81df-6d0380fc48d0@web.de>
+Date: Fri, 17 Oct 2025 13:06:27 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1739540679.git.geert+renesas@glider.be> <2d30e5ffe70ce35f952b7d497d2959391fbf0580.1739540679.git.geert+renesas@glider.be>
- <20250214073402.0129e259@kernel.org> <20250214164614.29bbc620@pumpkin>
-In-Reply-To: <20250214164614.29bbc620@pumpkin>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 17 Oct 2025 12:55:02 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXost7vL5uTocMGtrqhEk5AY3QUWvyP5w7_hBtf3MkMfA@mail.gmail.com>
-X-Gm-Features: AS18NWAcP6voBjoIoEi-7RxJ0pdmzXqhfe5FdHBNP60R0y-DyUBofdEL44euygw
-Message-ID: <CAMuHMdXost7vL5uTocMGtrqhEk5AY3QUWvyP5w7_hBtf3MkMfA@mail.gmail.com>
-Subject: Re: [PATCH treewide v3 2/4] bitfield: Add non-constant
- field_{prep,get}() helpers
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Michael Turquette <mturquette@baylibre.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	David Miller <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, 
-	Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, 
-	Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, 
-	Shan-Chun Hung <schung@nuvoton.com>, Yury Norov <yury.norov@gmail.com>, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Alex Elder <elder@ieee.org>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, linux-clk@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, qat-linux@intel.com, linux-gpio@vger.kernel.org, 
-	linux-aspeed@lists.ozlabs.org, linux-iio@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 2/4] Add SPAcc ahash support
+To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>,
+ linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
+Cc: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>,
+ Manjunath Hadli <manjunath.hadli@vayavyalabs.com>,
+ Ruud Derwig <Ruud.Derwig@synopsys.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Aditya Kulkarni <adityak@vayavyalabs.com>, Conor Dooley
+ <conor+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ T Pratham <t-pratham@ti.com>
+References: <20251007065020.495008-3-pavitrakumarm@vayavyalabs.com>
+ <fe4d7cd9-0566-4d1b-97c0-91cc1f952077@web.de>
+ <CALxtO0m1R0kf5Am+oEPAgqommQph9zs6+xfTM0GzGHV+YEXT3Q@mail.gmail.com>
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <CALxtO0m1R0kf5Am+oEPAgqommQph9zs6+xfTM0GzGHV+YEXT3Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:DOUqFi5mKdhYzqNv9/13UKY+qECSIwj2ZbFzXXp7zmcukapKswf
+ yXlhHpC+NyCtA0zfrD36QrmTHyx1n8cCfIHa25+hDYKRQL//E1UDXQqdBNFsFuj5Y2Fpvxy
+ 8mfDlLaCrLC3kL+YuVvXDwtpOxFgMX6SynxfXF7kgR60OZsjIroA9uG+4qBi+uXPMOHwKQR
+ Q8zeuNt3gGPd8cXTqcBlg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:cRf46H0vaUY=;rhkQYmVCzYmb72mZbhYIBoGZV33
+ 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
 
-Hi David,
+>> =E2=80=A6
+>>> +do_shash_err:
+>>> +     crypto_free_shash(hash);
+>>> +     kfree(sdesc);
+>>> +
+>>> +     return rc;
+>>> +}
+>> =E2=80=A6
+>>
+>> * You may use an additional label for better exception handling.
+> PK: Ack, I will go with an additional label.
 
-On Fri, 14 Feb 2025 at 17:46, David Laight <david.laight.linux@gmail.com> wrote:
-> On Fri, 14 Feb 2025 07:34:02 -0800
-> Jakub Kicinski <kuba@kernel.org> wrote:
-> > On Fri, 14 Feb 2025 14:55:51 +0100 Geert Uytterhoeven wrote:
-> > > The existing FIELD_{GET,PREP}() macros are limited to compile-time
-> > > constants.  However, it is very common to prepare or extract bitfield
-> > > elements where the bitfield mask is not a compile-time constant.
-> > >
-> > > To avoid this limitation, the AT91 clock driver and several other
-> > > drivers already have their own non-const field_{prep,get}() macros.
-> > > Make them available for general use by consolidating them in
-> > > <linux/bitfield.h>, and improve them slightly:
-> > >   1. Avoid evaluating macro parameters more than once,
-> > >   2. Replace "ffs() - 1" by "__ffs()",
-> > >   3. Support 64-bit use on 32-bit architectures.
-> > >
-> > > This is deliberately not merged into the existing FIELD_{GET,PREP}()
-> > > macros, as people expressed the desire to keep stricter variants for
-> > > increased safety, or for performance critical paths.
-> >
-> > I really really think that people should just use the static inline
-> > helpers if the field is not constant. And we should do something like
-> > below so that people can actually find them.
->
-> Especially since you really don't want to be calling ffs() on variables.
+Can scope-based resource management become applicable for more use cases?
 
-It is not that bad, as most temporary architectures have an instruction
-for that.
-
-> Much better to have saved the low bit and field width/mask.
-
-While that would allow some space saving (only 10 or 12 bits needed to
-store low + width), gcc would generate quite some code to create the
-mask (even on PowerPC, where I expected a single instruction would
-do ;-).
-
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Regards,
+Markus
