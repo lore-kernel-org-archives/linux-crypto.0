@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EEB9336EC8
-	for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 14:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F8B2F12A6
+	for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 14:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760712299; cv=none; b=fYg/FMaom/h/VGCPuyOIlXOphVbOHg3Vsc4pIqKxLCAsWODJmGapV+cdXPZUo4liC4zbmWE3aeaPUH8SqujQqbaNig4FDkB/6BhjhzLfUJgYw6DR7TLFIxg3ZNIwkWH8wNXa0f9DWa9ZsPp67c084ty+mQIuOPUf1w1iWcnGnmM=
+	t=1760712302; cv=none; b=PVS+xWZQY00DEBzz+Vc1soFGPIoNTDFzMLX9QOk5hG7q9tTIP3haql5/BdcM4Yi2x31mW+Y9PVnggQFreXCr5bx5cf3hAw7+c2KG3i4sTl0iFXOrpWsrAzyFC0OGvm/fEetySUiGYP619My/MRicAAWjbyGten1cf9pnpX/naYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760712299; c=relaxed/simple;
-	bh=RvusHb8iCMBSU7BMwlq1o6N1lbxg25PBi5W0BeXHl0g=;
+	s=arc-20240116; t=1760712302; c=relaxed/simple;
+	bh=zdhUsYsNuD5UVZ5sdV6O5KnrH9qTzwzetvx3pp2yM4U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qNigu0M8wkjHrRo9pOD8OBeW6GHqRBWAXu2JcGugjDDEPmgfoZnp5wSyLyB2e3mcbcubQYV2yLfO1DlhiNQVMF8WKHlr8zQCVsjHLBu9l24V0zyqe2GLY2IndNHd9bFtO8oRcPsjaTADZkoHyA1zbeBnAyVMZwzAy0GIpyxPDS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fSlNh3ca; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=qhHm2IxI1WeMaZQ7R1q/SoUVlvgGynaYVR4jH1s9hFQMCq+isiPsq+jZNIzkS6GOGOdd+1ng6Jo5/fQVrtVhQo/DaFOEch1F3gzYSatUD2qUYds/RO6x0I2Pqr9PDtB/5+62PmSJ483SCNhlclYAozgJavfB8d9jmJoxlR4IAiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LlmP2dUd; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fSlNh3ca"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LlmP2dUd"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760712295;
+	s=mimecast20190719; t=1760712297;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dwXTvBD4Yvz8oojCSyImVAOTuEGuJkeQWe5NSzvpamE=;
-	b=fSlNh3caPtzC7Y26/ExJwrjF7APD117VtUN3CvBeEa/pRTcwmBugVrx1CqQU0yNp0V5fTd
-	rr0PdoMZnKm1zDRxTaZniOH8oq28hgrhWVlH8r2Z+1KY3+3fYVBu8An435dbXvM8qNUJrg
-	7BWRCe9mwvjkhnEZoT6OQFKdGXsaA9A=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+	bh=xuF1zI/X45JtGhKorM1SQByR7PQAM32rNvbgQYcWujw=;
+	b=LlmP2dUdf5vxLEGuojaXCeAu7WAESiU66RknIQIzCyNJ7lklDNFd6aUUBLP4JikARlR9MQ
+	T7Psp9G7Vvd0Vn/L2goRLHfkoJbJ5KaZ2lLQnts2h8Y6yLp+JfYrl3tBa8KbeOcL7NE/qI
+	pOrsFnfjSzlMLAISIOgLjF5hGXxtC+0=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-147-nqmhOHySPIa0xp8IupHunQ-1; Fri,
- 17 Oct 2025 10:44:51 -0400
-X-MC-Unique: nqmhOHySPIa0xp8IupHunQ-1
-X-Mimecast-MFC-AGG-ID: nqmhOHySPIa0xp8IupHunQ_1760712288
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-647-RzTApwSQPB6rBUQSwUbHaQ-1; Fri,
+ 17 Oct 2025 10:44:55 -0400
+X-MC-Unique: RzTApwSQPB6rBUQSwUbHaQ-1
+X-Mimecast-MFC-AGG-ID: RzTApwSQPB6rBUQSwUbHaQ_1760712293
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8F4001800673;
-	Fri, 17 Oct 2025 14:44:48 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6FC271800592;
+	Fri, 17 Oct 2025 14:44:53 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.57])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EF2041800452;
-	Fri, 17 Oct 2025 14:44:44 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E098F1800452;
+	Fri, 17 Oct 2025 14:44:49 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: David Howells <dhowells@redhat.com>,
@@ -59,9 +59,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	keyrings@vger.kernel.org,
 	linux-modules@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 16/17] pkcs7, x509: Add ML-DSA support
-Date: Fri, 17 Oct 2025 15:43:00 +0100
-Message-ID: <20251017144311.817771-17-dhowells@redhat.com>
+Subject: [PATCH v6 17/17] modsign: Enable ML-DSA module signing
+Date: Fri, 17 Oct 2025 15:43:01 +0100
+Message-ID: <20251017144311.817771-18-dhowells@redhat.com>
 In-Reply-To: <20251017144311.817771-1-dhowells@redhat.com>
 References: <20251017144311.817771-1-dhowells@redhat.com>
 Precedence: bulk
@@ -73,8 +73,19 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Add support for ML-DSA keys and signatures to the PKCS#7 and X.509
-implementations.
+Allow ML-DSA module signing to be enabled.
+
+Note that openssl's CMS_*() function suite does not, as of openssl-3.5.1,
+support the use of CMS_NOATTR with ML-DSA, so the prohibition against using
+authenticatedAttributes with module signing has to be removed.  The selected
+digest then applies only to the algorithm used to calculate the digest
+stored in the messageDigest attribute.
+
+The ML-DSA algorithm uses its own internal choice of digest (SHAKE256)
+without regard to what's specified in the CMS message.  This is, in theory,
+configurable, but there's currently no hook in the crypto_sig API to do
+that, though possibly it could be done by parameterising the name of the
+algorithm, e.g. ("ml-dsa87(sha512)").
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Lukas Wunner <lukas@wunner.de>
@@ -85,119 +96,173 @@ cc: Herbert Xu <herbert@gondor.apana.org.au>
 cc: keyrings@vger.kernel.org
 cc: linux-crypto@vger.kernel.org
 ---
- crypto/asymmetric_keys/pkcs7_parser.c     | 15 ++++++++++++++
- crypto/asymmetric_keys/public_key.c       |  7 +++++++
- crypto/asymmetric_keys/x509_cert_parser.c | 24 +++++++++++++++++++++++
- include/linux/oid_registry.h              |  5 +++++
- 4 files changed, 51 insertions(+)
+ Documentation/admin-guide/module-signing.rst | 15 +++++------
+ certs/Kconfig                                | 24 ++++++++++++++++++
+ certs/Makefile                               |  3 +++
+ crypto/asymmetric_keys/pkcs7_verify.c        |  4 ---
+ kernel/module/Kconfig                        |  5 ++++
+ scripts/sign-file.c                          | 26 ++++++++++++++------
+ 6 files changed, 58 insertions(+), 19 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
-index 3cdbab3b9f50..d7c88b90a4fd 100644
---- a/crypto/asymmetric_keys/pkcs7_parser.c
-+++ b/crypto/asymmetric_keys/pkcs7_parser.c
-@@ -297,6 +297,21 @@ int pkcs7_sig_note_pkey_algo(void *context, size_t hdrlen,
- 		ctx->sinfo->sig->pkey_algo = "ecrdsa";
- 		ctx->sinfo->sig->encoding = "raw";
- 		break;
-+	case OID_id_ml_dsa_44:
-+		ctx->sinfo->sig->pkey_algo = "ml-dsa44";
-+		ctx->sinfo->sig->encoding = "raw";
-+		ctx->sinfo->sig->algo_does_hash = true;
-+		break;
-+	case OID_id_ml_dsa_65:
-+		ctx->sinfo->sig->pkey_algo = "ml-dsa65";
-+		ctx->sinfo->sig->encoding = "raw";
-+		ctx->sinfo->sig->algo_does_hash = true;
-+		break;
-+	case OID_id_ml_dsa_87:
-+		ctx->sinfo->sig->pkey_algo = "ml-dsa87";
-+		ctx->sinfo->sig->encoding = "raw";
-+		ctx->sinfo->sig->algo_does_hash = true;
-+		break;
- 	default:
- 		printk("Unsupported pkey algo: %u\n", ctx->last_oid);
- 		return -ENOPKG;
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index e5b177c8e842..96e084668d1b 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -142,6 +142,13 @@ software_key_determine_akcipher(const struct public_key *pkey,
- 		if (strcmp(hash_algo, "streebog256") != 0 &&
- 		    strcmp(hash_algo, "streebog512") != 0)
- 			return -EINVAL;
-+	} else if (strcmp(pkey->pkey_algo, "ml-dsa44") == 0 ||
-+		   strcmp(pkey->pkey_algo, "ml-dsa65") == 0 ||
-+		   strcmp(pkey->pkey_algo, "ml-dsa87") == 0) {
-+		if (strcmp(encoding, "raw") != 0)
-+			return -EINVAL;
-+		if (!hash_algo)
-+			return -EINVAL;
- 	} else {
- 		/* Unknown public key algorithm */
- 		return -ENOPKG;
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index 8df3fa60a44f..6a2a77a647a5 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -257,6 +257,15 @@ int x509_note_sig_algo(void *context, size_t hdrlen, unsigned char tag,
- 	case OID_gost2012Signature512:
- 		ctx->cert->sig->hash_algo = "streebog512";
- 		goto ecrdsa;
-+	case OID_id_ml_dsa_44:
-+		ctx->cert->sig->pkey_algo = "ml-dsa44";
-+		goto ml_dsa;
-+	case OID_id_ml_dsa_65:
-+		ctx->cert->sig->pkey_algo = "ml-dsa65";
-+		goto ml_dsa;
-+	case OID_id_ml_dsa_87:
-+		ctx->cert->sig->pkey_algo = "ml-dsa87";
-+		goto ml_dsa;
- 	}
+diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
+index a8667a777490..6daff80c277b 100644
+--- a/Documentation/admin-guide/module-signing.rst
++++ b/Documentation/admin-guide/module-signing.rst
+@@ -28,10 +28,11 @@ trusted userspace bits.
  
- rsa_pkcs1:
-@@ -274,6 +283,12 @@ int x509_note_sig_algo(void *context, size_t hdrlen, unsigned char tag,
- 	ctx->cert->sig->encoding = "x962";
- 	ctx->sig_algo = ctx->last_oid;
- 	return 0;
-+ml_dsa:
-+	ctx->cert->sig->algo_does_hash = true;
-+	ctx->cert->sig->hash_algo = ctx->cert->sig->pkey_algo;
-+	ctx->cert->sig->encoding = "raw";
-+	ctx->sig_algo = ctx->last_oid;
-+	return 0;
- }
+ This facility uses X.509 ITU-T standard certificates to encode the public keys
+ involved.  The signatures are not themselves encoded in any industrial standard
+-type.  The built-in facility currently only supports the RSA & NIST P-384 ECDSA
+-public key signing standard (though it is pluggable and permits others to be
+-used).  The possible hash algorithms that can be used are SHA-2 and SHA-3 of
+-sizes 256, 384, and 512 (the algorithm is selected by data in the signature).
++type.  The built-in facility currently only supports the RSA, NIST P-384 ECDSA
++and NIST FIPS-204 ML-DSA (Dilithium) public key signing standards (though it is
++pluggable and permits others to be used).  For RSA and ECDSA, the possible hash
++algorithms that can be used are SHA-2 and SHA-3 of sizes 256, 384, and 512 (the
++algorithm is selected by data in the signature); ML-DSA uses SHAKE256.
  
- /*
-@@ -524,6 +539,15 @@ int x509_extract_key_data(void *context, size_t hdrlen,
- 			return -ENOPKG;
- 		}
- 		break;
-+	case OID_id_ml_dsa_44:
-+		ctx->cert->pub->pkey_algo = "ml-dsa44";
-+		break;
-+	case OID_id_ml_dsa_65:
-+		ctx->cert->pub->pkey_algo = "ml-dsa65";
-+		break;
-+	case OID_id_ml_dsa_87:
-+		ctx->cert->pub->pkey_algo = "ml-dsa87";
-+		break;
- 	default:
- 		return -ENOPKG;
- 	}
-diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-index 6de479ebbe5d..30821a6a4f72 100644
---- a/include/linux/oid_registry.h
-+++ b/include/linux/oid_registry.h
-@@ -145,6 +145,11 @@ enum OID {
- 	OID_id_rsassa_pkcs1_v1_5_with_sha3_384, /* 2.16.840.1.101.3.4.3.15 */
- 	OID_id_rsassa_pkcs1_v1_5_with_sha3_512, /* 2.16.840.1.101.3.4.3.16 */
  
-+	/* NIST FIPS-204 ML-DSA (Dilithium) */
-+	OID_id_ml_dsa_44,			/* 2.16.840.1.101.3.4.3.17 */
-+	OID_id_ml_dsa_65,			/* 2.16.840.1.101.3.4.3.18 */
-+	OID_id_ml_dsa_87,			/* 2.16.840.1.101.3.4.3.19 */
+ ==========================
+@@ -146,9 +147,9 @@ into vmlinux) using parameters in the::
+ 
+ file (which is also generated if it does not already exist).
+ 
+-One can select between RSA (``MODULE_SIG_KEY_TYPE_RSA``) and ECDSA
+-(``MODULE_SIG_KEY_TYPE_ECDSA``) to generate either RSA 4k or NIST
+-P-384 keypair.
++One can select between RSA (``MODULE_SIG_KEY_TYPE_RSA``), ECDSA
++(``MODULE_SIG_KEY_TYPE_ECDSA``) and ML-DSA (``MODULE_SIG_KEY_TYPE_ML_DSA``) to
++generate an RSA 4k, a NIST P-384 keypair or an ML-DSA keypair.
+ 
+ It is strongly recommended that you provide your own x509.genkey file.
+ 
+diff --git a/certs/Kconfig b/certs/Kconfig
+index 78307dc25559..a09db4b2c87c 100644
+--- a/certs/Kconfig
++++ b/certs/Kconfig
+@@ -39,6 +39,30 @@ config MODULE_SIG_KEY_TYPE_ECDSA
+ 	 Note: Remove all ECDSA signing keys, e.g. certs/signing_key.pem,
+ 	 when falling back to building Linux 5.14 and older kernels.
+ 
++config MODULE_SIG_KEY_TYPE_ML_DSA_44
++	bool "ML-DSA (Dilithium) 44"
++	select CRYPTO_ML_DSA
++	select LIB_SHA3
++	help
++	  Use an ML-DSA (Dilithium) 87 key (NIST FIPS 204) for module signing
++	  with a SHAKE256 'hash' of the message.
 +
- 	OID__NR
- };
++config MODULE_SIG_KEY_TYPE_ML_DSA_65
++	bool "ML-DSA (Dilithium) 65"
++	select CRYPTO_ML_DSA
++	select LIB_SHA3
++	help
++	  Use an ML-DSA (Dilithium) 87 key (NIST FIPS 204) for module signing
++	  with a SHAKE256 'hash' of the message.
++
++config MODULE_SIG_KEY_TYPE_ML_DSA_87
++	bool "ML-DSA (Dilithium) 87"
++	select CRYPTO_ML_DSA
++	select LIB_SHA3
++	help
++	  Use an ML-DSA (Dilithium) 87 key (NIST FIPS 204) for module signing
++	  with a SHAKE256 'hash' of the message.
++
+ endchoice
  
+ config SYSTEM_TRUSTED_KEYRING
+diff --git a/certs/Makefile b/certs/Makefile
+index f6fa4d8d75e0..231379c91b86 100644
+--- a/certs/Makefile
++++ b/certs/Makefile
+@@ -43,6 +43,9 @@ targets += x509_certificate_list
+ ifeq ($(CONFIG_MODULE_SIG_KEY),certs/signing_key.pem)
+ 
+ keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ECDSA) := -newkey ec -pkeyopt ec_paramgen_curve:secp384r1
++keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ML_DSA_44) := -newkey ml-dsa-44
++keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ML_DSA_65) := -newkey ml-dsa-65
++keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ML_DSA_87) := -newkey ml-dsa-87
+ 
+ quiet_cmd_gen_key = GENKEY  $@
+       cmd_gen_key = openssl req -new -nodes -utf8 -$(CONFIG_MODULE_SIG_HASH) -days 36500 \
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index 0f9f515b784d..f7ea1d41771d 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -424,10 +424,6 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
+ 			pr_warn("Invalid module sig (not pkcs7-data)\n");
+ 			return -EKEYREJECTED;
+ 		}
+-		if (pkcs7->have_authattrs) {
+-			pr_warn("Invalid module sig (has authattrs)\n");
+-			return -EKEYREJECTED;
+-		}
+ 		break;
+ 	case VERIFYING_FIRMWARE_SIGNATURE:
+ 		if (pkcs7->data_type != OID_data) {
+diff --git a/kernel/module/Kconfig b/kernel/module/Kconfig
+index 2a1beebf1d37..4b5d1601d537 100644
+--- a/kernel/module/Kconfig
++++ b/kernel/module/Kconfig
+@@ -327,6 +327,10 @@ config MODULE_SIG_SHA3_512
+ 	bool "SHA3-512"
+ 	select CRYPTO_SHA3
+ 
++config MODULE_SIG_SHAKE256
++	bool "SHAKE256"
++	select CRYPTO_SHA3
++
+ endchoice
+ 
+ config MODULE_SIG_HASH
+@@ -339,6 +343,7 @@ config MODULE_SIG_HASH
+ 	default "sha3-256" if MODULE_SIG_SHA3_256
+ 	default "sha3-384" if MODULE_SIG_SHA3_384
+ 	default "sha3-512" if MODULE_SIG_SHA3_512
++	default "shake256" if MODULE_SIG_SHAKE256
+ 
+ config MODULE_COMPRESS
+ 	bool "Module compression"
+diff --git a/scripts/sign-file.c b/scripts/sign-file.c
+index 7070245edfc1..b726581075f9 100644
+--- a/scripts/sign-file.c
++++ b/scripts/sign-file.c
+@@ -315,18 +315,28 @@ int main(int argc, char **argv)
+ 		ERR(!digest_algo, "EVP_get_digestbyname");
+ 
+ #ifndef USE_PKCS7
++
++		unsigned int flags =
++			CMS_NOCERTS |
++			CMS_PARTIAL |
++			CMS_BINARY |
++			CMS_DETACHED |
++			CMS_STREAM  |
++			CMS_NOSMIMECAP |
++			CMS_NO_SIGNING_TIME |
++			use_keyid;
++		if (!EVP_PKEY_is_a(private_key, "ML-DSA-44") &&
++		    !EVP_PKEY_is_a(private_key, "ML-DSA-65") &&
++		    !EVP_PKEY_is_a(private_key, "ML-DSA-87"))
++			flags |= use_signed_attrs;
++
+ 		/* Load the signature message from the digest buffer. */
+-		cms = CMS_sign(NULL, NULL, NULL, NULL,
+-			       CMS_NOCERTS | CMS_PARTIAL | CMS_BINARY |
+-			       CMS_DETACHED | CMS_STREAM);
++		cms = CMS_sign(NULL, NULL, NULL, NULL, flags);
+ 		ERR(!cms, "CMS_sign");
+ 
+-		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo,
+-				     CMS_NOCERTS | CMS_BINARY |
+-				     CMS_NOSMIMECAP | use_keyid |
+-				     use_signed_attrs),
++		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo, flags),
+ 		    "CMS_add1_signer");
+-		ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) != 1,
++		ERR(CMS_final(cms, bm, NULL, flags) != 1,
+ 		    "CMS_final");
+ 
+ #else
 
