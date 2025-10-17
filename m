@@ -1,86 +1,94 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B4819E81F
-	for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 08:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A91187332
+	for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 08:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760688059; cv=none; b=O9CJEs6JL6rOZXbI0CHuW3Tqy4t3wGRaZYsemzkx1wRkpxd2IaM8/d+skxfAsvsRV5ReaRnWn2sWI7EVoYH5I2NMqGLDiIhsF9i17O4cNkQmTEY4CfIyKSrIINdD884MGYWbbMqBtDrQFPCfLyCeuox1lMeP7r0ZCAJqLbIBOvA=
+	t=1760688959; cv=none; b=TfLE3j0gEe66nyIvodGvnQf9HskXUfcGYD2h3cmqpjRaU/YO8PKQnKXY64GYS5sGwqkhoJXmSOn8Z9JElg+5LY9OHETsou+t72c+c2Pv0F5VeV+jrxUp4iBY/hc9irD8hDbfAs67fe5nyqdwIWmba+hzGTN/rzlp13iouL/L8Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760688059; c=relaxed/simple;
-	bh=CmYry6crPlIzKmqBRZbTHEks84hlKoutmRpsgsQYoNg=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=IM0TA8L4RSic6zSB/mW/PIY+o/+FbgdSYMYzh7eYdWWCVSXK+OAgoa4Yj8dimU39h4x9MdqZ1ji8sVgsAz32uzMlNZgu8vVWh7MYDqer8ZvEznGgNhYsWcmqz/WRrnd1+paKC4a5P2AQs9q2NkSmM82elTOhCQ/xtB251SKFYlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=oOXBQtbW; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1760688959; c=relaxed/simple;
+	bh=n/ZG3TqMNc6JulqL+AARaddXoWSC3CmM7jBAqGrmX1E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uT0CvqPy2wns52HAgvKFj1pgjk1DyZfSTcEECexgtkT5UYYYpQ2mm+fWHW9EbeLv/qubC6DqNwjWQyDIaAvud+nG20ASa9a3PEFIUClMIzOjIxr+g2CkdB851tITxmzkECZQt9eH9iZ/o1ImK6tVNWxfDc3vgjf0oatBiJOVLoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Tcbj1OJF; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="oOXBQtbW"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Tcbj1OJF"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
-	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
-	references:reply-to; bh=MMFAgcumgfAOmgll7weXn0oLsqDeVQTkVKaFRFdBTNQ=; b=oOXBQ
-	tbWte+NKcWWXqC+j17UEnZuC3d1dJXPw0avb6GYzRw7H1QlKo1mHwlLaOADttbmf6KKZxB+8hs+TO
-	JUPckSGCnh1l6SKWc4+QZzWV8bQxYkg05JPWOg5WPKZGCcBO+azAUPNZOFDuTASDgiA1hBdxraUpa
-	3WTGKW8Wzy8BHaeCfGcn7uiE8Ofzun0PUBMQmEueTAlJf6pZHxVW7h+ZrxWa2Ne6z2XeDjEGfRbJE
-	4gz0a33JMJHcKdm2Ca6Lk4The40O7iwFJyvEKpJLI5tlAbuUQBaZ5xXrPDGY1Hf7qfS5uajieezxO
-	gqNIdV42yA8B2CRJOtddAhmMcS5+Q==;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=gHJJEFng9Lbsd6nMJgdE7Ji8Tgk80ATWEKPnYCE3B3A=; 
+	b=Tcbj1OJFunTOljf3mSawEwZF1NMSGOUDxmnr6MGp1fp+lz/HcHKBwwUaYMH1TgdjP6Vlrd3foEJ
+	SXnbnIg7t2zTi1viJD+1NST0Of1gBNutfm0Ud8OXSJ+iGWK0fpufzEwEhzw6AYF8kGum8IhSB8uzj
+	EravldMbQmoUwoigbJQvDlCmfiYcfhLhOYcwuAKyrfohH1ax8vHs8fmKvCN9TbKBcSnQZHUPYmz3b
+	toHFylTyB+vhrbW7uoKMRWj8b79RRC+YAMlkNuXuyRJO8znffcwFaFmXwpwAj1mPaR/CvuA0AR09z
+	geThMIpxTfgyaE/ZJgjYbOHjB8RXiTo5AREQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v9fOM-00DMo0-3A;
-	Fri, 17 Oct 2025 16:00:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:00:50 +0800
-Date: Fri, 17 Oct 2025 16:00:50 +0800
+	id 1v9fct-00DMxt-2T;
+	Fri, 17 Oct 2025 16:15:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:15:51 +0800
+Date: Fri, 17 Oct 2025 16:15:51 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Ovidiu Panait <ovidiu.panait.oss@gmail.com>,
-	Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH] crypto: sun8i-ss - Move j init earlier in sun8i_ss_hash_run
-Message-ID: <aPH3sq2wJeIdkLzd@gondor.apana.org.au>
+To: Harsh Jain <h.jain@amd.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	mounika.botcha@amd.com, sarat.chand.savitala@amd.com,
+	michal.simek@amd.com
+Subject: Re: [PATCH 0/3]  crypto: Use drbg CTR DF function in xilinx-trng
+Message-ID: <aPH7N4gofFl3zWsP@gondor.apana.org.au>
+References: <20250915133027.2100914-1-h.jain@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250915133027.2100914-1-h.jain@amd.com>
 
-With gcc-14 I get
+On Mon, Sep 15, 2025 at 07:00:24PM +0530, Harsh Jain wrote:
+> Export CTR DRBG DF function available in drbg module to use
+> it in xilinx-trng driver.
+> 
+> Testing
+> 
+> Compile tests done
+> 
+> * CONFIG_CRYPTO_DRBG_CTR = n and CONFIG_CRYPTO_DEV_XILINX_TRNG = n
+> * CONFIG_CRYPTO_DRBG_CTR = y and CONFIG_CRYPTO_DEV_XILINX_TRNG = n
+> * CONFIG_CRYPTO_DRBG_CTR = n and CONFIG_CRYPTO_DEV_XILINX_TRNG = m
+> * CONFIG_CRYPTO_DRBG_CTR = y and CONFIG_CRYPTO_DEV_XILINX_TRNG = m
+> 
+> Runtime testing
+> * Boot with CONFIG_CRYPTO_USER_API_RNG_CAVP and CONFIG_CRYPTO_DRBG_CTR enabled.
+> * Run kcapi-rng -b <15, 16, 17, 31, 32, 33> --hex
+> 
+> Harsh Jain (3):
+>   crypto: drbg: Export CTR DRBG DF functions
+>   crypto: drbg: Replace AES cipher calls with library calls
+>   crypto: xilinx-trng: Add CTR_DRBG DF processing of seed
+> 
+>  crypto/Kconfig                      |   8 +-
+>  crypto/Makefile                     |   2 +
+>  crypto/df_sp80090a.c                | 248 ++++++++++++++++++++++++++
+>  crypto/drbg.c                       | 265 ++--------------------------
+>  drivers/crypto/Kconfig              |   1 +
+>  drivers/crypto/xilinx/xilinx-trng.c |  37 +++-
+>  include/crypto/df_sp80090a.h        |  28 +++
+>  include/crypto/drbg.h               |  25 +--
+>  include/crypto/internal/drbg.h      |  54 ++++++
+>  9 files changed, 384 insertions(+), 284 deletions(-)
+>  create mode 100644 crypto/df_sp80090a.c
+>  create mode 100644 include/crypto/df_sp80090a.h
+>  create mode 100644 include/crypto/internal/drbg.h
+> 
+> -- 
+> 2.34.1
 
-../drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c: In function ‘sun8i_ss_hash_run’:
-../drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c:631:21: warning: ‘j’ may be used uninitialized [-Wmaybe-uninitialized]
-  631 |                 j = hash_pad(bf, 4096, j, byte_count, true, bs);
-      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c:493:13: note: ‘j’ was declared here
-  493 |         int j, i, k, todo;
-      |             ^
-
-Fix this false positive by moving the initialisation of j earlier.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-index 8bc08089f044..36a1ebca2e70 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-@@ -502,6 +502,7 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
- 
- 	algt = container_of(alg, struct sun8i_ss_alg_template, alg.hash.base);
- 	ss = algt->ss;
-+	j = 0;
- 
- 	digestsize = crypto_ahash_digestsize(tfm);
- 	if (digestsize == SHA224_DIGEST_SIZE)
-@@ -536,7 +537,6 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
- 		goto err_dma_result;
- 	}
- 
--	j = 0;
- 	len = areq->nbytes;
- 	sg = areq->src;
- 	i = 0;
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
