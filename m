@@ -1,49 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D5E27FB1E;
-	Fri, 17 Oct 2025 08:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135E528469B;
+	Fri, 17 Oct 2025 08:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760689546; cv=none; b=jFtCiYCJ2/L5fR7ifT5psPbsWU2ZvUi54wDQPIRXGuCWifvg1TiWvrruQHpIYDDFAH5lMH4VlkgItcaXb3iDGJweYWvzj/lDqT8UFzbFiocipYR0h34S9Wh1eHt48M3d3wNLUcWeDgP/aULfR8VYStEiJuDlyWSu2XuS5qLhqIk=
+	t=1760689638; cv=none; b=pqT+yQzVfXWsfJOuKGZ1pnfwpuxhQi817lvbq8mKNnRGJTOTkcsLcCt9LJhjprg7SkP0+QB1JEfGmv5J29Esu+2gsiS2DeXkx520SlB/pce3qX9S3Eu3XPdtKV3f4T1vuUdcfBl29kbQ4uD7uhv+nN+bAyHveKNpUsz/p2t7NfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760689546; c=relaxed/simple;
-	bh=crGhxP2XPChdCRTll3MItpLW+qrXhpcZraQXV5TGIHA=;
+	s=arc-20240116; t=1760689638; c=relaxed/simple;
+	bh=ZqkL0xpf0N3Vr71mKQ/EHF/d/mO7pKnjSmhjKch/00c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j88iSHgNIvxiSwNthNYP5AZRfcZI95NCa13Ztu2pNzEc6Vd2K46TtqbTvMb8bKC3ZORs8S8K87Gu1uz2ZjFXM9kqYj76qOIRwUjlih3+gsmHW8dNfMiZq342RQhOLrGUPvMS9f3CbrCUHSy2F4sXX4xB6XlccQEtTP/XtRkENr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=dInuwgmE; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=OBbGMS66BqVM9kbVS64rWcqbwSWpnjbpIFzuwmULJZKyIF4Z/l4Byy2U8Mbtx7+jKKWMxp+BngBvtODbMqSVEJmapKx0uyF5CFcbzJN00ZG4WCREKsSXQFexUob3SB6iAirEcb4PWpp4Wmn2/TjEp0TuvLgn+p92AUKrXry8qA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=A7rk5Ao4; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="dInuwgmE"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="A7rk5Ao4"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=e76ofERkLSKsm6KZLfoUt2NM6P3sOScL+Jzu9OwlTUw=; 
-	b=dInuwgmE3uFw3UZkirPm6rITApJOW8+8kIryPbPqcNk5YY1yKWv7vkc39Avjo0EBM310JmbLT+b
-	5NKHN0+cEWEyqnlz/VI0qxnkMJ4tFNDQjPghhW3e4tzYEtJU/MPDCyHVqeC92tXw1uC/ETp6yrYKp
-	5K0nVYqojG5PCE/z+8IEL46MibhAxo/ijuNTOVhK/CDCZnK8Uz0FfwDTZK+CXpmaFmLx5nfomtAve
-	Kt747ofaTtISOLh0qGjYiT9QUNz8XjzWT3gkr8/c1OG75NNMwCFYZ4AgkKweoiRq7x7PHM2qZ3pwN
-	cQHKAgaVeIhUysliCMYWDBgWFZe+tVPJYiLQ==;
+	from:content-type:reply-to; bh=qNAu1ZYjBpqPzLkLSg8e3NDqlLi+RZkL4fU6lvd999w=; 
+	b=A7rk5Ao4RfoqcZa37SJ0auNUoM63drlXvC870nYYOJMfYjBu7q/aAjuVnc4U2556yRQaJgh6Whh
+	jYR6TCsdICrDEwjZxYbSnZuMYM4nPR+1epClpvc7IRDEahEajEe+eb34eThNE1r8v2QEYotiCK6vJ
+	I03voHV+trSxRnPvQMO7IvPLomLN72W7X6/5IJfqr775JKXAu7opvV7cy99Jv2p8KZbnY0Aycgost
+	otyX1dvqvBjhzHNQxlSnTrBtTvVM6IizLcZCMdONi4+pJ0jiG2oB8RzVa56Yg7/ZwkW4Rzfhph0Ni
+	wb1hUSdMstuJjvM/xLx29MGkvSwn9jxa5cmg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v9fmL-00DN80-1g;
-	Fri, 17 Oct 2025 16:25:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:25:37 +0800
-Date: Fri, 17 Oct 2025 16:25:37 +0800
+	id 1v9fnq-00DNA3-0l;
+	Fri, 17 Oct 2025 16:27:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:27:10 +0800
+Date: Fri, 17 Oct 2025 16:27:10 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Shiva Tripathi <s-tripathi1@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: aead - Fix reqsize handling
-Message-ID: <aPH9gTi-EuL5Gd3s@gondor.apana.org.au>
-References: <20251008100117.808195-1-t-pratham@ti.com>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: neilb@ownmail.net, tgraf@suug.ch, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jiang.biao@linux.dev
+Subject: Re: [PATCH v2] rhashtable: use likely for rhashtable lookup
+Message-ID: <aPH93n2tm4jlF5M7@gondor.apana.org.au>
+References: <20251011014855.73649-1-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,31 +46,37 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251008100117.808195-1-t-pratham@ti.com>
+In-Reply-To: <20251011014855.73649-1-dongml2@chinatelecom.cn>
 
-On Wed, Oct 08, 2025 at 03:03:14PM +0530, T Pratham wrote:
-> Commit afddce13ce81d ("crypto: api - Add reqsize to crypto_alg")
-> introduced cra_reqsize field in crypto_alg struct to replace type
-> specific reqsize fields. It looks like this was introduced specifically
-> for ahash and acomp from the commit description as subsequent commits
-> add necessary changes in these alg frameworks.
+On Sat, Oct 11, 2025 at 09:48:55AM +0800, Menglong Dong wrote:
+> Sometimes, the result of the rhashtable_lookup() is expected to be found.
+> Therefore, we can use likely() for such cases.
 > 
-> However, this is being recommended for use in all crypto algs
-> instead of setting reqsize using crypto_*_set_reqsize(). Using
-> cra_reqsize in aead algorithms, hence, causes memory corruptions and
-> crashes as the underlying functions in the algorithm framework have not
-> been updated to set the reqsize properly from cra_reqsize. [1]
+> Following new functions are introduced, which will use likely or unlikely
+> during the lookup:
 > 
-> Add proper set_reqsize calls in the aead init function to properly
-> initialize reqsize for these algorithms in the framework.
+>  rhashtable_lookup_likely
+>  rhltable_lookup_likely
 > 
-> [1]: https://gist.github.com/Pratham-T/24247446f1faf4b7843e4014d5089f6b
+> A micro-benchmark is made for these new functions: lookup a existed entry
+> repeatedly for 100000000 times, and rhashtable_lookup_likely() gets ~30%
+> speedup.
 > 
-> Fixes: afddce13ce81d ("crypto: api - Add reqsize to crypto_alg")
-> Signed-off-by: T Pratham <t-pratham@ti.com>
+> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
 > ---
->  crypto/aead.c | 1 +
->  1 file changed, 1 insertion(+)
+> v2:
+> - remove the unlikely, as it's not suitable
+> 
+> This patch base on the patch that I commit before:
+>   rhashtable: use __always_inline for rhashtable
+> 
+> The new functions that we introduced can be used by other modules, and I'm
+> not sure if it is a good idea to do it in this series, as they belong to
+> different tree. So I decide to do it in the target tree after this patch
+> merged.
+> ---
+>  include/linux/rhashtable.h | 70 +++++++++++++++++++++++++++++++-------
+>  1 file changed, 58 insertions(+), 12 deletions(-)
 
 Patch applied.  Thanks.
 -- 
