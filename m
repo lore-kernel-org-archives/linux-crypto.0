@@ -1,50 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E1A269AEE;
-	Fri, 17 Oct 2025 08:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7761A2741BC;
+	Fri, 17 Oct 2025 08:18:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760689075; cv=none; b=CSkkNFaQue+vvKl9APvnVCvJLfeuc0VXPZQs0HJ9C4uvCgWtVDCIICtisHG8G9E8U9CT3J7QvcHWgLZ3Dl+HrEtInA/lWOEKldy+yDOM1IQPwYHrPmrVUJyDzqPny5nh8zbhZYRB8fP/9L6hpak7FvnyhCLNBLkSkHLLjQkpwJ0=
+	t=1760689088; cv=none; b=WJ3BNVLxiKreiXxWCq4KWK+Pg1xy40IA4n8ET+MnUxDrwYE0uhw87JBPb5TWrznqc6C2nhCFdhAHVvD63Lf/smMlWcoX10egwWP09DaXFQFM8v2PmWEf39bmJwMwhGdAwucjNVh8J1Uaz7YlmdVk40TTjpbwZhj1+nfOwQ/hmX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760689075; c=relaxed/simple;
-	bh=43YF12BDAH/Ba3dKvt6RFRpVtCOSXmUnBY3cZsIoIeE=;
+	s=arc-20240116; t=1760689088; c=relaxed/simple;
+	bh=HKN0UlynFpDeOnQgRavKv0UJJ04IINksu/6qhDLHy4w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YgOFArZp4PmM6eHWa21FM4Bf5VbEdnZnc8wr2B6yF7ieqqsulBKNn+nU36WKu/ywqUrMUY78NE636AUGH9+gFUUUSTUC58OqFyQOzvFKDEUj96rrJOeS5qvv1Wz7ntZBGLXb1RengpEUUs+7kSRA1QZQhLBmn5S8zjJm7X/hJqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ZvE79FkM; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=tCbG72LPhXq5PWK7ALtfWQ6b//0vJCyw5mWH4hkMlStMrli4x70MwPmNGz5y+bc6G4sg7yxHoZpC3FPOpHMG/FhnUBNeEsVXgNyJlPwVZkNr6sM61Vx5Ftx8tf3m355r/bEOZQ8DD3zoICYVbxEiBJPuNpUgX/OzkX6spkGAK4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rREVEToM; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ZvE79FkM"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rREVEToM"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=96ZHaGBqeD7BFkim6YwKV7lQH4LexCYnCik0wXeuFf4=; 
-	b=ZvE79FkMcSa+mUlR8obnxBjWQobwgwTRmd4E8uzJo0+yc/+pClbvFHm4qD15L6R1UB5k2crwk2g
-	bkPCN8HpIBbviokWxD0Md7uuaHxHofoaTJrHST8sAuNQCynbyRqhIGscGM/mu6SdZehWvydh5tYSg
-	vedFlmzlu93Seq2On8jcXBUceS/7mHSVtHB2yGG4rvdPYmwVtgj85H8cebAsuYs/rnVRMs0MCAGrQ
-	urOSDZrRRSPMmwuiDbkO81eGcmcEg3WMC1p8o4TG3KZ5I9FbcNQ0GxsafGsdC9oFMovEQnnjNY9MO
-	q6UrNteHcQx58amxJMOfkltTyIi5nxGGJk8Q==;
+	from:content-type:reply-to; bh=9FMkFwTqxvxu5xj8ecWFlPV+5JF+fZgYk1Hq9u7el+g=; 
+	b=rREVEToM4l5hyvskaSSqLgFQNghwmzVHHoqmJes1TK0povm4Qfuf6GvKxDW2xzU/VkEaGarcMUH
+	Lq4Od1YyqZJqH76FzNi4kgMIp9UzgymJr9puqmvkyoysBVorseyjU754KUFe9/MvTwMtVKx9aSgwy
+	0EGdtt8QZaVLSrwJlKpGj3shgLu/JJubU9UzomhWtCVGGjM3ub6uH1/O0X9NAn0fp4krxIuqevMiG
+	+DedTUb3YUtPkNwRvVx5LOFiPTzAIvJEvIOdxr4OdgBpfFWnk+EGL1BX3m9P0fAx6eUPHoReJ14+u
+	S3W5rfHqYSCXEk2+WeTfJxNPPROsYV7whj/w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v9feg-00DN05-2L;
-	Fri, 17 Oct 2025 16:17:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:17:42 +0800
-Date: Fri, 17 Oct 2025 16:17:42 +0800
+	id 1v9fes-00DN0a-2W;
+	Fri, 17 Oct 2025 16:17:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:17:54 +0800
+Date: Fri, 17 Oct 2025 16:17:54 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Guangshuo Li <lgs201920130244@gmail.com>
-Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Victoria Milhoan (b42089)" <vicki.milhoan@freescale.com>,
-	Dan Douglass <dan.douglass@nxp.com>,
-	Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v3] crypto: caam: Add check for kcalloc() in test_len()
-Message-ID: <aPH7puE_qyvONCcx@gondor.apana.org.au>
-References: <20250923124418.1857922-1-lgs201920130244@gmail.com>
+To: Jonathan McDowell <noodles@earth.li>
+Cc: Olivia Mackall <olivia@selenic.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
+Subject: Re: [PATCH v3] hwrng: core - Allow runtime disabling of the HW RNG
+Message-ID: <aPH7smwx9VFNztsM@gondor.apana.org.au>
+References: <aLWltVMmuYQn8Pwa@earth.li>
+ <aMg4h_WeJb9bHeNb@earth.li>
+ <aNKhkberbgFJph6R@earth.li>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,27 +48,59 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250923124418.1857922-1-lgs201920130244@gmail.com>
+In-Reply-To: <aNKhkberbgFJph6R@earth.li>
 
-On Tue, Sep 23, 2025 at 08:44:18PM +0800, Guangshuo Li wrote:
-> As kcalloc() may fail, check its return value to avoid a NULL pointer
-> dereference when passing the buffer to rng->read(). On allocation
-> failure, log the error and return since test_len() returns void.
+On Tue, Sep 23, 2025 at 02:33:05PM +0100, Jonathan McDowell wrote:
+> From: Jonathan McDowell <noodles@meta.com>
 > 
-> Fixes: 2be0d806e25e ("crypto: caam - add a test for the RNG")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
-> ---
-> changelog:
-> v3:
-> - Fix build error: test_len() returns void; return without a value.
-> - No functional changes beyond the allocation failure path.
+> The HW RNG core allows for manual selection of which RNG device to use,
+> but does not allow for no device to be enabled. It may be desirable to
+> do this on systems with only a single suitable hardware RNG, where we
+> need exclusive access to other functionality on this device. In
+> particular when performing TPM firmware upgrades this lets us ensure the
+> kernel does not try to access the device.
 > 
-> v2:
-> - Return on allocation failure to avoid possible NULL dereference.
+> Before:
+> 
+> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
+> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0
+> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
+> /sys/devices/virtual/misc/hw_random/rng_quality:1024
+> /sys/devices/virtual/misc/hw_random/rng_selected:0
+> 
+> After:
+> 
+> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
+> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
+> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
+> /sys/devices/virtual/misc/hw_random/rng_quality:1024
+> /sys/devices/virtual/misc/hw_random/rng_selected:0
+> 
+> root@debian-qemu-efi:~# echo none > /sys/devices/virtual/misc/hw_random/rng_current
+> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
+> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
+> /sys/devices/virtual/misc/hw_random/rng_current:none
+> grep: /sys/devices/virtual/misc/hw_random/rng_quality: No such device
+> /sys/devices/virtual/misc/hw_random/rng_selected:1
+> 
+> (Observe using bpftrace no calls to TPM being made)
+> 
+> root@debian-qemu-efi:~# echo "" > /sys/devices/virtual/misc/hw_random/rng_current
+> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
+> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
+> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
+> /sys/devices/virtual/misc/hw_random/rng_quality:1024
+> /sys/devices/virtual/misc/hw_random/rng_selected:0
+> 
+> (Observe using bpftrace that calls to the TPM resume)
+> 
+> Signed-off-by: Jonathan McDowell <noodles@meta.com>
 > ---
->  drivers/crypto/caam/caamrng.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> v3: Always set cur_rng_set_by_user if user forces no HW RNG.
+> v2: If the user manually forces the HWRNG to none do not override this
+>     when a new driver is loaded. Pointed out by Herbert Xu.
+>  drivers/char/hw_random/core.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
