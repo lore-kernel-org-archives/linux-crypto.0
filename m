@@ -1,120 +1,105 @@
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B13D2877F7
-	for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 08:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51BA2BCF6A
+	for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 08:44:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760690251; cv=none; b=BP/MacnbO9NPSGdzk9BCWUXTzZEzwbV2gIcxb8SNRFKRo6ja5W+ET8JcWDVNyf9MWWq4XbZ7Zu6A4JHTXpV9fZSqwJH3moDqiBwmWtjW5ydRIGsW+52wd3jd+70zIo+AZo6L3rbnThj67mgK113rkyjvo2yE8/Ntmqpn8EGERds=
+	t=1760690691; cv=none; b=H/smLnc1N2V8vIz5PL+2COFG8bRFkTkL7DRJFPLfh8oLorvM8xDHvksB6mRqi9scD9931AInuoXT1KXc1wRxZ2vK4lbNx/fuRUGDhgvNHzwEp3pG33S3qP9Xeo6RwEsLrgZzZnh3feISups8HYLfzQfTSkBk9d+TVfFDIE2EWy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760690251; c=relaxed/simple;
-	bh=4gBHm0hg/izrnX9TOrYcTxdW+FZhrbeI7DucFVe4NUs=;
+	s=arc-20240116; t=1760690691; c=relaxed/simple;
+	bh=M3KqIVskwF3grHmlGKXoHw7sNTetWvhv39yaKZa9PgU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tUn6dsWOTq/POxowzr0hhnZZL/+OVevvfxNUruzrobCWYNLhnlPFQSa/j8j7mbUGxq5hm0GiMeUyERzi2j7WASP3fChf4T0g1OsqDg07Y1vd0Xobhvnb7PQU3e5kjZP3BhgtXJj+rwrCFyydpxWNhgHkyqkqLEAsXGh18T+hR3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=E9m0BOgI; arc=none smtp.client-ip=74.125.224.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	 To:Cc:Content-Type; b=MhwDwMqrsdLsMOKgZtONjZ/sqlJZPJrXQ22lE6O0lqxnzCATnnBQElvN6AVSzI6Fl+D0A7d/ISIHcqIpDxLM76qtUW5Ih8UM0ngS+zNsFwAkD3PoeOathMHHYA+vum/Z9e+2sBJSlz38i8FEQRoAtSAaGyvHh2XCqkz1VlFG2u8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HSvQGyYS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="E9m0BOgI"
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-63bbf5f77daso1738444d50.3
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 01:37:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1760690249; x=1761295049; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UEugzOHABBcNtf7WRv870XNmGYg6euUpqckoSgZhyIg=;
-        b=E9m0BOgIYXjSnKst81q1r7r2jEEItDNv5NKuppLmZAwiU6rzYKTg+JvP5HgqXYGqbz
-         9dUwaSq7draPqDx962qd8xKEUXVR3kMSjTWr5sfhTRxb3c0iPqlN1ujxzs6Vgr8UKzmf
-         qwQy9uQsvprIPH2cUB8bKYIdgJdWUrY38Yy7E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760690249; x=1761295049;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UEugzOHABBcNtf7WRv870XNmGYg6euUpqckoSgZhyIg=;
-        b=g+gLxES7CFOgdzpZ8yNzHjHsH4F2Zfs8UbuMrhzJPef9PCvqNt7bYoWxxY1QpDqeiL
-         4FLD5FKM5VgYI/WKZP6gYXS9eEZVA1DBR2xsH2CQWDQqAwGPGeHNenOeAf7l15YneMJe
-         9M+FHA8SZZAELLeug5EreSnYPCtPzNMQh7znVsDYuo15dUSyjaLkonJGtFSFJ8CG+mdY
-         YbVu0nWJUDgTJL2Xkanbkt/lKjCFl5O31TAUAEEDMmHHm9cELKKHQ++Z4CMjwQg9P7rY
-         EnN0g0kNo3Xn+tJxFyQK3v7fIzb0qF722vE9xVHLYbROdzvPvP0FFdk5EiytDbll+lOl
-         Jo3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU6Id1jFVC8vBPJyMm5ZbGDEqIh3TqazDYKezQAPa9LmQmewktcnAsoLdfBDIl5Ib39xVJPzLRgzNLbaBE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzj9osVUGTK6/a0dKLhGIetRjjdiipd5ltgIvkwij89jPvOrNO9
-	GLDXsKO44n9GSUtJLZ8p0pwV9fOOT/qkIvjTaXEfXDhKYb46Kpcg2o8rsnq6AulNFHh4wTnsTgt
-	KCDprPspLKlbvNZzhzhPjIrC84vYqbVvOaVa9nE2Tcg==
-X-Gm-Gg: ASbGncse7E0Pxidjn2JansJxwKqvdHOtTAefT0RtMLmoCZ+BXmCqLboYhGwmy4blkOR
-	iTxb+T2wsia8B9G07lVuCrqZGbR18CZ2LCZpNntoefXHsXTu48QxH9g26FClf/2OPOVeJCP2byQ
-	QpXWnowOpuXsc5wr7ydGfC5dj/Wv3q51Aj3f5oHL/A79hFGJxfPtt5c23AXEbmeRoDZiDyq6NAx
-	xyfzr2KF2vbmzg4CePylbTVZ31PaGZX8a2HGxpUbiSlq2LsiowHdoQw09gf6hHqdpzox8y8a7QP
-	iJ0p7QZVQMkah8gpHz/smtpDzKjyRA==
-X-Google-Smtp-Source: AGHT+IEBawDSgiE20pPoTet4nKGmNqzWfwqDDZv+tdibV8JI2CAptyqGAH85n3YwH/kLHb1q2TIij4NCoDlZL2WIN2s=
-X-Received: by 2002:a05:690e:400d:b0:63d:318a:efb4 with SMTP id
- 956f58d0204a3-63e161f10b9mr2335639d50.63.1760690249015; Fri, 17 Oct 2025
- 01:37:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HSvQGyYS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E53DC4AF09
+	for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 08:44:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760690691;
+	bh=M3KqIVskwF3grHmlGKXoHw7sNTetWvhv39yaKZa9PgU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=HSvQGyYShps59OsNWCUofFffWzSuaviV1nBEixs2Xpm+4/6Kv3xZos4tVee+NdaVy
+	 0s8CBddZNOxP5JP9tv+NaJuDCOJR/7r2DYQpDFRtg6HVjoXgy5oXzCRnw9bd3aHUSE
+	 cgeqJRgWnJlgE/x77TpPJ4lnhHw4w6Qp9eOX3bIqvbFXF+qMsGLwEGKSQRyI0C3s1M
+	 NqPs+yiZ9kRM3Q6bpAFMfjEKUd1DGm8peQY6MwOrc26S6hQigMYKnPBhHZiKKS9yky
+	 +uTP+uWu94KVH11MQjK4ukz2RCb44PasAmG0fJjQEVzfeypUmTJL+X6/afmEgekpWt
+	 87jA3dEkyo5KQ==
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-57e03279bfeso1916486e87.0
+        for <linux-crypto@vger.kernel.org>; Fri, 17 Oct 2025 01:44:51 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV6w9tpE0Yg9ROn2JiZtbOFru3IQiGAFHwKAxwrQHf77N3aO2DybX80jjXGB2omIMC+QfUiVpBfqBiXjN0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwT6Xc9ZFBWtyOpfqDlGi6Ivt4njEW7AhVJGaR1IP3fkxRYHBLI
+	nmxSc+LUQIvAe660T1CymtWk3znQJI+MinLLTqo9MQxZtqRKCIYU1oBxK7s/TquRkgduFh/ayfK
+	TGMrmVG+I/PehLyaigqHFdr8Kyx4xOZ8=
+X-Google-Smtp-Source: AGHT+IG8m+8L4Gxn++Cn2QlcMckIaT6zBogPZazCDfExESimOjZMlCC5sWcVPJIIyV8q2DOeGIJDhBIsPWJJbi/mXEg=
+X-Received: by 2002:a05:6512:224c:b0:591:c8b0:ee63 with SMTP id
+ 2adb3069b0e04-591d8384262mr1076101e87.2.1760690689957; Fri, 17 Oct 2025
+ 01:44:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251007065020.495008-3-pavitrakumarm@vayavyalabs.com> <9ba77ca2-7b22-44da-beaf-dc66801252b5@web.de>
-In-Reply-To: <9ba77ca2-7b22-44da-beaf-dc66801252b5@web.de>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Fri, 17 Oct 2025 14:07:17 +0530
-X-Gm-Features: AS18NWDmYVv2zfDmUEDPEl-EPatrNn-j8Tww2-bbNu5S-jqfIjsD5sH7k8FMEBM
-Message-ID: <CALxtO0kbD44Ek4mUoW-0i+5H6FUyzeOWru7Lqckj0j9Yrzv1=w@mail.gmail.com>
-Subject: Re: [PATCH v7 2/4] Add SPAcc ahash support
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>, 
-	Manjunath Hadli <manjunath.hadli@vayavyalabs.com>, Ruud Derwig <Ruud.Derwig@synopsys.com>, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, Aditya Kulkarni <adityak@vayavyalabs.com>, 
-	Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, T Pratham <t-pratham@ti.com>
+References: <20251014003123.GA2763@sol> <aPH9ZQP0m8Pq5Iy-@gondor.apana.org.au>
+In-Reply-To: <aPH9ZQP0m8Pq5Iy-@gondor.apana.org.au>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 17 Oct 2025 10:44:37 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGE6-xiUSyKa92=HWeywt=5-F2_G2H7V-UnVhKG65zwCA@mail.gmail.com>
+X-Gm-Features: AS18NWCFgWRqDkr026prMo1PlVx4VvNYuzvuaDS2yBki6cEMxGz_HEvQCwa6Ozc
+Message-ID: <CAMj1kXGE6-xiUSyKa92=HWeywt=5-F2_G2H7V-UnVhKG65zwCA@mail.gmail.com>
+Subject: Re: [PATCH 0/8] VAES+AVX2 optimized implementation of AES-GCM
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, Jason@zx2c4.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Markus,
-  Thanks for the review. My comments are embedded below.
+On Fri, 17 Oct 2025 at 10:25, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> Eric Biggers <ebiggers@kernel.org> wrote:
+> > On Wed, Oct 01, 2025 at 07:31:09PM -0700, Eric Biggers wrote:
+> >> This patchset replaces the 256-bit vector implementation of AES-GCM for
+> >> x86_64 with one that requires AVX2 rather than AVX512.  This greatly
+> >> improves AES-GCM performance on CPUs that have VAES but not AVX512, for
+> >> example by up to 74% on AMD Zen 3.  For more details, see patch 1.
+> >>
+> >> This patchset also renames the 512-bit vector implementation of AES-GCM
+> >> for x86_64 to be named after AVX512 rather than AVX10/512, then adds
+> >> some additional optimizations to it.
+> >>
+> >> This patchset applies to next-20250929 and is targeting 6.19.  Herbert,
+> >> I'd prefer to just apply this myself.  But let me know if you'd prefer
+> >> to take it instead (considering that AES-GCM hasn't been librarified
+> >> yet).  Either way, there's no hurry, since this is targeting 6.19.
+> >>
+> >> Eric Biggers (8):
+> >>   crypto: x86/aes-gcm - add VAES+AVX2 optimized code
+> >>   crypto: x86/aes-gcm - remove VAES+AVX10/256 optimized code
+> >>   crypto: x86/aes-gcm - rename avx10 and avx10_512 to avx512
+> >>   crypto: x86/aes-gcm - clean up AVX512 code to assume 512-bit vectors
+> >>   crypto: x86/aes-gcm - reorder AVX512 precompute and aad_update
+> >>     functions
+> >>   crypto: x86/aes-gcm - revise some comments in AVX512 code
+> >>   crypto: x86/aes-gcm - optimize AVX512 precomputation of H^2 from H^1
+> >>   crypto: x86/aes-gcm - optimize long AAD processing with AVX512
+> >>
+> >>  arch/x86/crypto/Makefile                      |    5 +-
+> >>  arch/x86/crypto/aes-gcm-aesni-x86_64.S        |   12 +-
+> >>  arch/x86/crypto/aes-gcm-vaes-avx2.S           | 1150 +++++++++++++++++
+> >>  ...m-avx10-x86_64.S => aes-gcm-vaes-avx512.S} |  722 +++++------
+> >>  arch/x86/crypto/aesni-intel_glue.c            |  264 ++--
+> >>  5 files changed, 1667 insertions(+), 486 deletions(-)
+> >>  create mode 100644 arch/x86/crypto/aes-gcm-vaes-avx2.S
+> >>  rename arch/x86/crypto/{aes-gcm-avx10-x86_64.S => aes-gcm-vaes-avx512.S} (69%)
+> >>
+> >> base-commit: 3b9b1f8df454caa453c7fb07689064edb2eda90a
+> >
+> > Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
+>
+> Oops, I didn't see this email until it was too late.  Since the
+> patches should be identical I don't think it matters.
+>
 
-Warm regards,
-PK
-
-On Thu, Oct 16, 2025 at 11:45=E2=80=AFPM Markus Elfring <Markus.Elfring@web=
-.de> wrote:
->
-> > Add ahash support to SPAcc driver.
-> =E2=80=A6
->
-> Please choose a corresponding subsystem specification for the patch subje=
-ct.
-PK: Ack, will fix that
-
->
->
-> =E2=80=A6
-> > +++ b/drivers/crypto/dwc-spacc/spacc_ahash.c
-> > @@ -0,0 +1,980 @@
-> =E2=80=A6
-> > +static int spacc_register_hash(struct spacc_alg *salg)
-> > +{
-> =E2=80=A6
-> > +     mutex_lock(&spacc_hash_alg_mutex);
-> > +     list_add(&salg->list, &spacc_hash_alg_list);
-> > +     mutex_unlock(&spacc_hash_alg_mutex);
-> > +
-> > +     return 0;
-> > +}
-> =E2=80=A6
->
-> Under which circumstances would you become interested to apply a statemen=
-t
-> like =E2=80=9Cguard(mutex)(&spacc_hash_alg_mutex);=E2=80=9D?
-> https://elixir.bootlin.com/linux/v6.17.1/source/include/linux/mutex.h#L22=
-8
-PK: Ack, thanks for that, this is much better, will update the code.
-
->
-> Regards,
-> Markus
+You also failed to apply my acked-by/tested-by so perhaps you should
+just drop the patches from your tree again.
