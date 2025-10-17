@@ -1,44 +1,51 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EAD227FD5B;
-	Fri, 17 Oct 2025 08:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D569027B34C;
+	Fri, 17 Oct 2025 08:19:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760689109; cv=none; b=LfbbAVwHuQJVohog1cAZACHERB1L4AzAMskavXjBPU1Oo0Afr8+li1DCKwNmCnM7IJJ0kfZ4VMK/FK9INgjwsawfSMLhU3I7mUc9uv4AcgcLtbTE1WUfrFU6JvEzZ8JpUXaGmr5UjTK5n83YsPgmPWzW8/cjnC90J132Y5qt/As=
+	t=1760689178; cv=none; b=FY26ip/PQiLdpVZOxBB2aIt8rgVY8M/L4AtCUar4NdoZTp4Y+QM9gekpkU/gnZ83CESYPY8Mh3JV/8yDDAqJYAct3gNeBHWSGQN3/JEQVcl4mJ4nSLGxXk3ms94e/ee0435Eg4OTh1lcBcNNrL/fYxaHdAC9gZefCI8AeEYc4u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760689109; c=relaxed/simple;
-	bh=BYKpWu9LzXbMiD3TiFvSQ5Xlk3bKT8EpdAsHmXRB/OY=;
+	s=arc-20240116; t=1760689178; c=relaxed/simple;
+	bh=LWebXPXjK8TZe7NRiXGXFdgiR6KhJ+52RIjtJJXwWoM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=na552kvkkE/o9J+FGf5ZObSiBw7rpR50v9rEbhWIHfbaVh8x/5SR/RC4cEhK9+YsJ2pONEJNglkHIGEcRHRj1cGAkJbRyh53BhfYNbVOTDTbxUfBFt2zJwzwsEcseiz4bqRlR2869LpCVNwaVztpteM5I7Twr7Vvx/+b4jNm9H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=r3XujzG+; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=erPQRDziLAZSKSVFwgh0jbijAn2eUdJl06GDkD2qLeGJOTV800k927OHPL/Ym9IzonlpfMhpt6zgN1wxkwt2J7zmdyqnPZ6pv3vOZa39miz3k2/bQ0YI1z6ZmGeFFJNixJZMplo6LXtfdsTb387AWqrdMmdDXDCNejJ1QVFXHwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=qQKeUL9f; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="r3XujzG+"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="qQKeUL9f"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=bo0e6pieeECqFqokjv2Deq0xWP/S8pCHoI67xV/q/LA=; 
-	b=r3XujzG+pYn8FWRufbKg/apIALprem/ih48ldhq73aV9xzXwWFiYjarsu4AZj6/glyuYSEqxhH2
-	W5VMg0cMwt4jJSSg8PJcmWkNCKb5WqN/FRvEWs1MKilLC0hKFah/RDN+jd3ZTAmCnGsalefBiKa1Z
-	DXlfUZUtOwwukaItm/SU0YS9PvlKcu8F5abRfS7Z/EjSm5SxNm/byKojZ47c87vnil0abJgw2XIQK
-	w0neF70btF5ahhU4eG9KpOV6cENwYxzv7NJXsJTPq5OnCAM/9uWqPxljQGPekVWGoBXLqc7lZ9GiA
-	zTVaA6sMGDFdddlfklIXjBeGdeEIEArWu8Lw==;
+	from:content-type:reply-to; bh=l0GpXpfo2yqMk8lrtmMl3O2NGLxAtwJghNLZjo4X3Ls=; 
+	b=qQKeUL9fHE3uE+67X6gIs+DScB21ChQBhhFZWFi/KmkEOEwTwkY/BlUVPoDF0fX7vq9/sJenKu0
+	yWq/TmellfQ70k2+/tNwFDJ6baG21JrUty7NVcNZPI2G+2RuFm2EDvBW9RgdkqcY1u7ELfMsSICbV
+	5wW4K62VdHfhS6VhLWIjlgArdab5xV6IkpRqhQ7KDd+kwGqVDLowHtQy4X5AzTXoQkXkBE9BdRzze
+	B6qr27N8Qf263RUZFM1qD2WzLEVjsT6GhwM/dy/udcD/3UT0yExH4tF9MPnV+zUKwzWhi5q87z7EB
+	n5YbSk2Yuq7YhBNUW5pscAOODUW0XmFX/YLA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v9ffH-00DN1i-2G;
-	Fri, 17 Oct 2025 16:18:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:18:19 +0800
-Date: Fri, 17 Oct 2025 16:18:19 +0800
+	id 1v9fgQ-00DN35-1C;
+	Fri, 17 Oct 2025 16:19:31 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:19:30 +0800
+Date: Fri, 17 Oct 2025 16:19:30 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Karina Yankevich <k.yankevich@omp.ru>
-Subject: Re: [PATCH v2] crypto: drbg - make drbg_{ctr_bcc,kcapi_sym}() return
- *void*
-Message-ID: <aPH7y-MX8lT6YjZr@gondor.apana.org.au>
-References: <1bb8aa58-7f40-4ba7-959a-e44655aa4a83@omp.ru>
+To: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	aiqun.yu@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com,
+	trilok.soni@oss.qualcomm.com, yijie.yang@oss.qualcomm.com,
+	Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
+Subject: Re: [PATCH] dt-bindings: crypto: qcom,inline-crypto-engine: Document
+ the kaanapali ICE
+Message-ID: <aPH8Er_hJ8WoosPw@gondor.apana.org.au>
+References: <20250924-knp-ice-v1-1-1adfc2d9e83c@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,29 +54,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1bb8aa58-7f40-4ba7-959a-e44655aa4a83@omp.ru>
+In-Reply-To: <20250924-knp-ice-v1-1-1adfc2d9e83c@oss.qualcomm.com>
 
-On Thu, Sep 25, 2025 at 12:00:10AM +0300, Sergey Shtylyov wrote:
-> From: Karina Yankevich <k.yankevich@omp.ru>
+On Wed, Sep 24, 2025 at 04:29:37PM -0700, Jingyi Wang wrote:
+> From: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
 > 
-> drgb_kcapi_sym() always returns 0, so make it return void instead.
-> Consequently, make drbg_ctr_bcc() return void too.
+> Document the Inline Crypto Engine (ICE) on the kaanapali platform.
 > 
-> Found by Linux Verification Center (linuxtesting.org) with the Svace static
-> analysis tool.
-> 
-> [Sergey: fixed the subject, refreshed the patch]
-> 
-> Signed-off-by: Karina Yankevich <k.yankevich@omp.ru>
-> Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> 
+> Signed-off-by: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
+> Signed-off-by: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
 > ---
-> The patch is against the master branch of Linus Torvalds' linux.git repo
-> (I'm unable to use the other repos on git.kernel.org and I have to update
-> Linus' repo from GitHub).
-> 
->  crypto/drbg.c |   38 ++++++++++++--------------------------
->  1 file changed, 12 insertions(+), 26 deletions(-)
+>  Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml | 1 +
+>  1 file changed, 1 insertion(+)
 
 Patch applied.  Thanks.
 -- 
