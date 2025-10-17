@@ -1,45 +1,47 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7761A2741BC;
-	Fri, 17 Oct 2025 08:18:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179B827F72C;
+	Fri, 17 Oct 2025 08:18:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760689088; cv=none; b=WJ3BNVLxiKreiXxWCq4KWK+Pg1xy40IA4n8ET+MnUxDrwYE0uhw87JBPb5TWrznqc6C2nhCFdhAHVvD63Lf/smMlWcoX10egwWP09DaXFQFM8v2PmWEf39bmJwMwhGdAwucjNVh8J1Uaz7YlmdVk40TTjpbwZhj1+nfOwQ/hmX0=
+	t=1760689098; cv=none; b=svRa2LWN6LqpkgGXlCjgYjUW9ixWqKj77pKdg9xrSDsu0JxnwL1heyO2JtbwrKm3Q2a+BsL3qntuasvDe8Xm7jzxHbcvB1XIAX7Ushsc6I5h+gTEwOKc0s85pkeQnhKykFIotNwWyZQFihB96PJ8Zz5XT4ntSRVVkw4+AYs+/98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760689088; c=relaxed/simple;
-	bh=HKN0UlynFpDeOnQgRavKv0UJJ04IINksu/6qhDLHy4w=;
+	s=arc-20240116; t=1760689098; c=relaxed/simple;
+	bh=wdVpLu79pmbA89LCGmxTUVEV1tX3C4XJaDey5g4sBqA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tCbG72LPhXq5PWK7ALtfWQ6b//0vJCyw5mWH4hkMlStMrli4x70MwPmNGz5y+bc6G4sg7yxHoZpC3FPOpHMG/FhnUBNeEsVXgNyJlPwVZkNr6sM61Vx5Ftx8tf3m355r/bEOZQ8DD3zoICYVbxEiBJPuNpUgX/OzkX6spkGAK4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rREVEToM; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=LzLMaKMCy9JQH7bToucAK9RS5u1JBqNEvE/wR3ySYclPc2yehPzTyaLCRLy2PjeNSRdG/xypP7mH/hKManbFaIK0fanfxJPfnhkaSWlHMgntmzcjnBfHCzg7vYokFpZQnK1yuFs84Qh9Czhs8FIDhMTm0TUeo86BlPbKFmCICeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=X6C/N3Hb; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rREVEToM"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="X6C/N3Hb"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=9FMkFwTqxvxu5xj8ecWFlPV+5JF+fZgYk1Hq9u7el+g=; 
-	b=rREVEToM4l5hyvskaSSqLgFQNghwmzVHHoqmJes1TK0povm4Qfuf6GvKxDW2xzU/VkEaGarcMUH
-	Lq4Od1YyqZJqH76FzNi4kgMIp9UzgymJr9puqmvkyoysBVorseyjU754KUFe9/MvTwMtVKx9aSgwy
-	0EGdtt8QZaVLSrwJlKpGj3shgLu/JJubU9UzomhWtCVGGjM3ub6uH1/O0X9NAn0fp4krxIuqevMiG
-	+DedTUb3YUtPkNwRvVx5LOFiPTzAIvJEvIOdxr4OdgBpfFWnk+EGL1BX3m9P0fAx6eUPHoReJ14+u
-	S3W5rfHqYSCXEk2+WeTfJxNPPROsYV7whj/w==;
+	from:content-type:reply-to; bh=XaYU9Wbn4fwn3k9kyBk0uiaNLW5c1SeE0TL9SWNic6A=; 
+	b=X6C/N3HbTciFbCwii+IIdfYvkp7VMI0qIueorWKxAYA6v56XYdOpOKFtD9+YKUMMjjgMNyDig/A
+	75p+y9E3plm5QFUM7o56BBkOqk3Z4X3ubEINQOQtc3Uk2jhZWl8roT5Kw3zj4jiiuGnpcxULwdC53
+	/HuQ+csozYO21TD5d6ou3jc3ZgQsS2LLKThssPlerzJbXNbwjXkpL3TIrDSJGMmvtQ0mwk5nrxqlo
+	cbVkVTmLBKptr3qpC/IorlwphJflmL3b4iBou47bKKkmBqw4zZgJOTMrXM/k8tWFHzbtWVEPw0O/n
+	AG3UEpXrOD8BdRLX9sODTHYIZBiFgGloR+ig==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v9fes-00DN0a-2W;
-	Fri, 17 Oct 2025 16:17:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:17:54 +0800
-Date: Fri, 17 Oct 2025 16:17:54 +0800
+	id 1v9ff4-00DN17-1n;
+	Fri, 17 Oct 2025 16:18:07 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Oct 2025 16:18:06 +0800
+Date: Fri, 17 Oct 2025 16:18:06 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Jonathan McDowell <noodles@earth.li>
-Cc: Olivia Mackall <olivia@selenic.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
-Subject: Re: [PATCH v3] hwrng: core - Allow runtime disabling of the HW RNG
-Message-ID: <aPH7smwx9VFNztsM@gondor.apana.org.au>
-References: <aLWltVMmuYQn8Pwa@earth.li>
- <aMg4h_WeJb9bHeNb@earth.li>
- <aNKhkberbgFJph6R@earth.li>
+To: Shivani Agarwal <shivani.agarwal@broadcom.com>
+Cc: davem@davemloft.net, smueller@chronox.de, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
+	ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
+	tapas.kundu@broadcom.com, vamsi-krishna.brahmajosyula@broadcom.com,
+	srinidhi.rao@broadcom.com, stable@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: zero initialize memory allocated via
+ sock_kmalloc
+Message-ID: <aPH7vuz7Z3dunQbk@gondor.apana.org.au>
+References: <20250924060148.299749-1-shivani.agarwal@broadcom.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,59 +50,54 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aNKhkberbgFJph6R@earth.li>
+In-Reply-To: <20250924060148.299749-1-shivani.agarwal@broadcom.com>
 
-On Tue, Sep 23, 2025 at 02:33:05PM +0100, Jonathan McDowell wrote:
-> From: Jonathan McDowell <noodles@meta.com>
+On Tue, Sep 23, 2025 at 11:01:48PM -0700, Shivani Agarwal wrote:
+> Several crypto user API contexts and requests allocated with
+> sock_kmalloc() were left uninitialized, relying on callers to
+> set fields explicitly. This resulted in the use of uninitialized
+> data in certain error paths or when new fields are added in the
+> future.
 > 
-> The HW RNG core allows for manual selection of which RNG device to use,
-> but does not allow for no device to be enabled. It may be desirable to
-> do this on systems with only a single suitable hardware RNG, where we
-> need exclusive access to other functionality on this device. In
-> particular when performing TPM firmware upgrades this lets us ensure the
-> kernel does not try to access the device.
+> The ACVP patches also contain two user-space interface files:
+> algif_kpp.c and algif_akcipher.c. These too rely on proper
+> initialization of their context structures.
 > 
-> Before:
+> A particular issue has been observed with the newly added
+> 'inflight' variable introduced in af_alg_ctx by commit:
 > 
-> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0
-> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
-> /sys/devices/virtual/misc/hw_random/rng_quality:1024
-> /sys/devices/virtual/misc/hw_random/rng_selected:0
+>   67b164a871af ("crypto: af_alg - Disallow multiple in-flight AIO requests")
 > 
-> After:
+> Because the context is not memset to zero after allocation,
+> the inflight variable has contained garbage values. As a result,
+> af_alg_alloc_areq() has incorrectly returned -EBUSY randomly when
+> the garbage value was interpreted as true:
 > 
-> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
-> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
-> /sys/devices/virtual/misc/hw_random/rng_quality:1024
-> /sys/devices/virtual/misc/hw_random/rng_selected:0
+>   https://github.com/gregkh/linux/blame/master/crypto/af_alg.c#L1209
 > 
-> root@debian-qemu-efi:~# echo none > /sys/devices/virtual/misc/hw_random/rng_current
-> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
-> /sys/devices/virtual/misc/hw_random/rng_current:none
-> grep: /sys/devices/virtual/misc/hw_random/rng_quality: No such device
-> /sys/devices/virtual/misc/hw_random/rng_selected:1
+> The check directly tests ctx->inflight without explicitly
+> comparing against true/false. Since inflight is only ever set to
+> true or false later, an uninitialized value has triggered
+> -EBUSY failures. Zero-initializing memory allocated with
+> sock_kmalloc() ensures inflight and other fields start in a known
+> state, removing random issues caused by uninitialized data.
 > 
-> (Observe using bpftrace no calls to TPM being made)
-> 
-> root@debian-qemu-efi:~# echo "" > /sys/devices/virtual/misc/hw_random/rng_current
-> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
-> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
-> /sys/devices/virtual/misc/hw_random/rng_quality:1024
-> /sys/devices/virtual/misc/hw_random/rng_selected:0
-> 
-> (Observe using bpftrace that calls to the TPM resume)
-> 
-> Signed-off-by: Jonathan McDowell <noodles@meta.com>
+> Fixes: fe869cdb89c9 ("crypto: algif_hash - User-space interface for hash operations")
+> Fixes: 5afdfd22e6ba ("crypto: algif_rng - add random number generator support")
+> Fixes: 2d97591ef43d ("crypto: af_alg - consolidation of duplicate code")
+> Fixes: 67b164a871af ("crypto: af_alg - Disallow multiple in-flight AIO requests")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Shivani Agarwal <shivani.agarwal@broadcom.com>
 > ---
-> v3: Always set cur_rng_set_by_user if user forces no HW RNG.
-> v2: If the user manually forces the HWRNG to none do not override this
->     when a new driver is loaded. Pointed out by Herbert Xu.
->  drivers/char/hw_random/core.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
+> Changes in v2:
+> - Dropped algif_skcipher_export changes, The ctx->state will immediately
+> be overwritten by crypto_skcipher_export.
+> - No other changes.
+> ---
+>  crypto/af_alg.c     | 5 ++---
+>  crypto/algif_hash.c | 3 +--
+>  crypto/algif_rng.c  | 3 +--
+>  3 files changed, 4 insertions(+), 7 deletions(-)
 
 Patch applied.  Thanks.
 -- 
