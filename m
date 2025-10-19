@@ -1,69 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E845B18DB1E;
-	Sun, 19 Oct 2025 16:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD2CC2EA;
+	Sun, 19 Oct 2025 23:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760891663; cv=none; b=JtIdAnzlI1KP1dVIbgD2W1Dy7zi9o9iqFrhMHx+388xOaYIauG7Yf3IxmjSW6vg4uhogKHPvOtm8Tt5jWHg7/tjpR42ACqhV9nkpaxv3itxfOQWJ/LvJFgXWFwa0whLFxIYLeqRtdAxTSGywf91OktMAlpo+Q5hFFlhaVdG4oEM=
+	t=1760917161; cv=none; b=u4MEeFzNX5hUYSR9bv/TMLKhq+7OQvhCs1qz/sqCTGzwQ8XlcrlENb5DdPQKyw8xpJoua6hyItXm5seZh0vhvYVWzpYSczy3UvYFLd3yQTo3/vF0ZYYCUZ+onWo2RQgZvPo84GAb2to2GEjyZUTYDCcMGOvO9KEdYDI3f2rhv9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760891663; c=relaxed/simple;
-	bh=/NRRdUmhRaH39Ejf4m2sUH6ftZqYfftBYvCOeLeAB+0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BcA7IBKR6xM0HJ/860tjDe/2KEqiuQn1FQ0A1GbkzRImVUYjyP8eCKnS684cARjk+jWr4amf/HTCuARqmXorsmgVUpbLOdTqCaUJi4QXycjIqiPIbjtuO5VZrsN0lTmhybY0vxQ6RVb9KT2LE3F3vOosoTg84oO+2kmmiGze5pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uoZUXiWm; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760917161; c=relaxed/simple;
+	bh=rdmLtdI2R2sV+7kXC5wpbSF0v6DnJD2dS7chPG05W4Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=mUJNT5v/KgGvERhXIHka1kGIdUva9JazxsH5CxcMMf27HFyK0pVNxfUqwRHZvYtbAP3hEJELcW7nKTE9FYhrYd75Q+Ml6oOcztDhpgXd+3Ox+HwjEnJVmNyrrzBsoT5jFIUqRy/GzYe0pmYp1azwvhpaAjAhq2krFAnTpkzfiFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=XRaQvImD; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uoZUXiWm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 332D9C4CEE7;
-	Sun, 19 Oct 2025 16:34:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760891661;
-	bh=/NRRdUmhRaH39Ejf4m2sUH6ftZqYfftBYvCOeLeAB+0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uoZUXiWmUFW10a1JTRZpdih6o4vHlP6bLJG6+06VXJktkSRm5Cd1TCmTxS16rNd3r
-	 ALWQjIRSV0xCsBZEgp/pOMiuYIm8CFcgfzYYWFPjb4Nlx9f91YPKQdbnXnZPJ7Awdt
-	 GGsuTRrvl8QYJGVpKaOH4muF2nAt0BVsJpCdyay7gdd2r/qC7ct6zdwfMc1HF4ELBU
-	 TubNBemLY6OZIWcDwHOLWFmlDg/38Nhg///DHb4PkvMqBn35EwzpwTl2Rti+H5cw6q
-	 Ci8iYFVrH1ttyCOQcvjnOEOs9Z3G4rHqYVpkYpsdNg9COpzB/0XFwcT5W6VEGN71Qq
-	 EfSnAFK+zQuoA==
-Date: Sun, 19 Oct 2025 09:32:49 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH 07/10] lib/crypto: arm/blake2b: Migrate optimized code
- into library
-Message-ID: <20251019163249.GD1604@sol>
-References: <20251018043106.375964-1-ebiggers@kernel.org>
- <20251018043106.375964-8-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="XRaQvImD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1760917156;
+	bh=vysPfp5uTRWW7DlQl3QvCUX04RLQin8Yxs2x3IdxWZI=;
+	h=Date:From:To:Cc:Subject:From;
+	b=XRaQvImDwWCwwIsKTSB6qlVtp3OxLMZQguRNmvu0/sA+ehI9f8OIleIwPFpvYrYGd
+	 oUQpfF+IvSfVF5nv/X5DwlywYZkAoL3Kr5f5oOGuQK45BXKiAMEA/F3wkTrSLGI+cC
+	 4/xe5jq/vmUmYN9l7D8m8Hg+vzVvOVK81IkT866xhtB4Of02F9GAnWmZR02x0uuN+4
+	 xfeS2EF4gBfsfsq1syCF/A4rgnBstD1p/8GXLmE16YPcBNmYSpl0BIVAPQA1yHDah4
+	 ymZwf3dnpuHlqTld/8+QhciI7CUYohGSfm/zgzKgHEdshnZ78AtiCagCmkIjyrOd+v
+	 dTVb5Lamc4RaA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4cqZlS01dTz4w2J;
+	Mon, 20 Oct 2025 10:39:15 +1100 (AEDT)
+Date: Mon, 20 Oct 2025 10:39:15 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld"
+ <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Herbert Xu
+ <herbert@gondor.apana.org.au>
+Cc: Linux Crypto List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing
+ List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patches in the libcrypto tree
+Message-ID: <20251020103915.6f203f67@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251018043106.375964-8-ebiggers@kernel.org>
+Content-Type: multipart/signed; boundary="Sig_/KLCI9CtiV2Kl_W=sqtwTEQP";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Fri, Oct 17, 2025 at 09:31:03PM -0700, Eric Biggers wrote:
-> diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-> index f863417b16817..5c9a933928188 100644
-> --- a/lib/crypto/Makefile
-> +++ b/lib/crypto/Makefile
-> @@ -34,10 +34,11 @@ obj-$(CONFIG_CRYPTO_LIB_GF128MUL)		+= gf128mul.o
->  obj-$(CONFIG_CRYPTO_LIB_BLAKE2B) += libblake2b.o
->  libblake2b-y := blake2b.o
->  CFLAGS_blake2b.o := -Wframe-larger-than=4096 #  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105930
->  ifeq ($(CONFIG_CRYPTO_LIB_BLAKE2B_ARCH),y)
->  CFLAGS_blake2b.o += -I$(src)/$(SRCARCH)
-> +obj-$(CONFIG_ARM) += arm/blake2b-neon-core.o
->  endif # CONFIG_CRYPTO_LIB_BLAKE2B_ARCH
+--Sig_/KLCI9CtiV2Kl_W=sqtwTEQP
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Correction: it should be
+Hi all,
 
-    libblake2b-$(CONFIG_ARM) += arm/blake2b-neon-core.o
+The following commits are also in the crypto tree as different commits
+(but the same patches):
 
-- Eric
+  3bb8775a518f ("crypto: x86/aes-gcm - optimize long AAD processing with AV=
+X512")
+  5a530ed1e321 ("crypto: x86/aes-gcm - optimize AVX512 precomputation of H^=
+2 from H^1")
+  e274d2ebb428 ("crypto: x86/aes-gcm - revise some comments in AVX512 code")
+  08080b1ea549 ("crypto: x86/aes-gcm - reorder AVX512 precompute and aad_up=
+date functions")
+  42d929de14fb ("crypto: x86/aes-gcm - clean up AVX512 code to assume 512-b=
+it vectors")
+  9bc4bcca89e4 ("crypto: x86/aes-gcm - rename avx10 and avx10_512 to avx512=
+")
+  d03a8a0dc347 ("crypto: x86/aes-gcm - remove VAES+AVX10/256 optimized code=
+")
+
+These are commits
+
+  a7098b73a98c ("crypto: x86/aes-gcm - optimize long AAD processing with AV=
+X512")
+  decb160d8a39 ("crypto: x86/aes-gcm - optimize AVX512 precomputation of H^=
+2 from H^1")
+  4d1fe69597a6 ("crypto: x86/aes-gcm - revise some comments in AVX512 code")
+  12249403d1ef ("crypto: x86/aes-gcm - reorder AVX512 precompute and aad_up=
+date functions")
+  99713223854d ("crypto: x86/aes-gcm - clean up AVX512 code to assume 512-b=
+it vectors")
+  d4acd8519d2a ("crypto: x86/aes-gcm - rename avx10 and avx10_512 to avx512=
+")
+  bbe0e2274a45 ("crypto: x86/aes-gcm - remove VAES+AVX10/256 optimized code=
+")
+
+in the crypto tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/KLCI9CtiV2Kl_W=sqtwTEQP
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmj1dqMACgkQAVBC80lX
+0GxrYAf/RPO1xwe1OrDcDydkXgCztP7xyDwUMGMai7bkcp1/dY6hnJy7/uFnSa5D
+IS1ia8Zis4HlTy9VFi4K2RtDOsUNxgwC71Chl66ZzVHjO2zrwgtzv5VxVvPvg0SX
+NRjMWT3VOPFK8MYmeIA/acoGJa+ymuESmAO1BCRvhQeh8J7ysCif/UtMydcyFYB7
+CbLgIKLbjnYw/b9lfz7FvN6pyywcY/bp1NO3JeLtFoZoHmXrS7zTOSkd98/M9k7D
+bGoXNWmL3VsfcgvOjX8pxIIt4/oLLEMTqSbOo8bBHTA9EuyLnSAz7tWpE7sCGyWL
+sSjAVCNqzVPUiNwifYCJUNh5cwxmNw==
+=uW5r
+-----END PGP SIGNATURE-----
+
+--Sig_/KLCI9CtiV2Kl_W=sqtwTEQP--
