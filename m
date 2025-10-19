@@ -1,107 +1,64 @@
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD223226D16
-	for <linux-crypto@vger.kernel.org>; Sun, 19 Oct 2025 08:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659652E7BA5;
+	Sun, 19 Oct 2025 14:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760861464; cv=none; b=RXIV7ugkLKdPuzstNSzXfEt44hHrChUGAnt+jQB2tS4rmZkLJtRlrI+D6UDD+hfhcGMyiO8PXUm+pYH0EBDpKx+pZbatuCMT4AFTXX9jUwQz8qoubDpb1jEDjZLzGUTL041v5931sojcRoDVAPAbYhc2VwTeggCt1ZEJThM7NdE=
+	t=1760884606; cv=none; b=M3sfE+c8abcY07GMBD8G0B9mLRSz2vMIpGsB/5ndxJpy9Bz2/+Pmo2Y2+wxm+kCrntiL6zB4wrpEm5qNbh8Avc1zSAw1fUx1g/G7WnHlSZ/QEFmK06pl+O6NPjMnv5M1c9Q4DpMJI8WyEJSS2n1S7XhnDmMAMjCL3fUowmrJEL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760861464; c=relaxed/simple;
-	bh=0JD5EhU3dMvt2TzDGGngYx4VWjKCENlPlTrXXievwr0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hJm9VnC0K0rJxXUkvx8veGGyn3W+wTE3l2gYqtGQ0ybm5JBtQbPjtaxH2B/JFfQEDDu6QEfJH6PkSlTZUO1V4BVwtWPhfnZ/+z/IFwiwVX9ouZCjKmQwOSC2BN1plExZLpluZYWKVNfULnx3jTYP8z7+1G79BdzeLfsDwqPbNvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ccTdEhIo; arc=none smtp.client-ip=74.125.224.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760884606; c=relaxed/simple;
+	bh=2xUKFX7jw6qWv0HUe8RCDkQBGTXDQ0mfdbRecnCXCZE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EX2BMW4bQFYNT4KGCF1i3cKrL60s8qbo5fqRtRWsKlkoBI/dHZRPI2UIE6TqVIoMLqw51E3tsdlkM55m8q4+8hlN8NCOyW6HJD05wseKNr+RA9bckJIoCLfiskMd3MihzpNzTvNkgLwUTHOb/zOIn85GYsQN8aRTE88t3qNRt6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=DAENDZL9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ccTdEhIo"
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-63e1e1bf882so1914795d50.1
-        for <linux-crypto@vger.kernel.org>; Sun, 19 Oct 2025 01:11:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760861461; x=1761466261; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0JD5EhU3dMvt2TzDGGngYx4VWjKCENlPlTrXXievwr0=;
-        b=ccTdEhIopdhypwI8L3JBil5M4STne8SmRaQFfCBM02l9LkTDCeY07VksMZS734XIYW
-         fSr9E0vMaFgWvM5hpUfvHCdQwXqN1rLdg7uGpCmcE1a8p73wsSFiGM9KgaCUVorU2bB4
-         QXlk0k/rKjfCpslj0HWJBncYE9y9o12Mjtf9KUBJxsuzUFBzDISvTP/UdlOzuowk2O9I
-         i6m0bPW8oTEyUXCgLGFGHisuLGD8VhQ1MKnYlEu61P8OxgXOJsE/nO9c7FNSYyLg97yE
-         4ySn5cXO9k6TDK22f8AGkED3Ks52VuOYFicnSfjIjvJlszMjZfsukHxg61ULY8iC4TUN
-         9kxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760861461; x=1761466261;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0JD5EhU3dMvt2TzDGGngYx4VWjKCENlPlTrXXievwr0=;
-        b=E7bFzYEsBHW1FGV3hxqkgWAJ6/nxqqoPEnxTGLT/wGhUs1GgY3hk8oJfBYmR0zC36t
-         GDxx3cVurXRORr3ph4NAEnqGfK9koWjv05BlpCbov6eGPc9QBEapslAPPyR2VylKHVCx
-         mNUSkpfxI3zubslsUYhWJuWeleoxI9tPIRsEEGb2V6uG+BfpHvz38e9ceto+C3km24v3
-         nUkvBuXkUassEjyCzZD1bkxXgJtVmv6Ez6T2t/8QvQ6mNLZAgpwMzoLDFPeFqiR1BCrm
-         dqXclrc0joILBQ20jfyTQVT/6I8+jfUDCZ3JGxmEX1y9ZX+MQtKOCSsaiZTQEZLtM5LR
-         B27A==
-X-Forwarded-Encrypted: i=1; AJvYcCV6ZTBbbzyWdwGRb+LhbUZH8Rqwqud/1ZyszahXJkYsFsUcO1E3FxxTci6+VM+MRHbdlOZDwwdEyvZc3RM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlJWITZoSlurebDzj9WhGzqXc4DiQl0XL3GhNX1zVv3nMrFfi3
-	t1E/f2twS1ffYa8K6ITslNILaiRpIji5bzmat+LL1pBfzXmKO2iNJuyswQ1phFKI8UW00uhQ8Sz
-	MeJzwM52D80kbI+m/Zkj92kLQcJSoKzU=
-X-Gm-Gg: ASbGncvdr0OM7JroAqs8idFBH5/6ti4cvDm6wQKAvC0AJjrf5HB2skbPoSu7mDmKuh3
-	kuvX30gN6jarr8flU/iOSwCUrdfRIYToCIbiTL7b+KZS+T5JCouRrRNikR0Fbj0c0NEjgHm4z+J
-	yBo0wPSug0bMyI9tbKNCoLUkPsdGqwKjTzi7Aasxu/RrpLi8uqPW3WgDx+9CFBKu+u2dZlEQrpM
-	UY4d18R9YGQiTWB4N5DUuf9Z+oiBmvhGwzGZfKLGmszPTa8+wGOhiddqQFt1sFVPslyAv9S8Ts=
-X-Google-Smtp-Source: AGHT+IEDp/usYEtVSaz10lwwm2/rh8YYcBuxag2F0nuBjSfSMoio/EijPl9t2f1PGKCDHr/mRoxnx6oC2CKJ7h3r2Ic=
-X-Received: by 2002:a05:690c:31e:b0:782:9037:1491 with SMTP id
- 00721157ae682-7837780ba2dmr109813007b3.42.1760861461100; Sun, 19 Oct 2025
- 01:11:01 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="DAENDZL9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 406FAC4CEE7;
+	Sun, 19 Oct 2025 14:36:45 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="DAENDZL9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1760884599;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ij+Sm1Vah+l0KCMrEHjRbzH5BNb2BrYiDgNTHM/FUDw=;
+	b=DAENDZL99fVwH3WpVJgi/8/EKcff+KC0u6xxQjNTNgORIUrG1JrkuT8CoMfg81Gxd4CyGa
+	jzUOyMalaPFF28PmJwyRiXVvJsS09conv3gMe6DSIF4cCFiF7acLgon+XVvlARpc585s0g
+	/hw1Xtk7e06jFuTtUv2OC8iX1NG+D5Q=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5b1ef5a8 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Sun, 19 Oct 2025 14:36:38 +0000 (UTC)
+Date: Sun, 19 Oct 2025 16:36:36 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH 01/10] lib/crypto: blake2s: Adjust parameter order of
+ blake2s()
+Message-ID: <aPT3dImhaI6Dpqs7@zx2c4.com>
+References: <20251018043106.375964-1-ebiggers@kernel.org>
+ <20251018043106.375964-2-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241202010844.144356-16-ebiggers@kernel.org> <20251019060845.553414-1-safinaskar@gmail.com>
-In-Reply-To: <20251019060845.553414-1-safinaskar@gmail.com>
-From: Askar Safin <safinaskar@gmail.com>
-Date: Sun, 19 Oct 2025 11:10:25 +0300
-X-Gm-Features: AS18NWAhDVf2aU8hB0qWERPwO9zi-ils_dPukaoQchmqqRauvEb3B93Zz-69KFg
-Message-ID: <CAPnZJGAb7AM4p=HdsDhYcANCzD8=gpGjuP4wYfr2utLp3WMSNQ@mail.gmail.com>
-Subject: Re: [PATCH v4 15/19] lib/crc32: make crc32c() go directly to lib
-To: ebiggers@kernel.org
-Cc: ardb@kernel.org, linux-arch@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, 
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
-	linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	loongarch@lists.linux.dev, sparclinux@vger.kernel.org, x86@kernel.org, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251018043106.375964-2-ebiggers@kernel.org>
 
-On Sun, Oct 19, 2025 at 9:09=E2=80=AFAM Askar Safin <safinaskar@gmail.com> =
-wrote:
->
-> Eric Biggers <ebiggers@kernel.org>:
-> > Now that the lower level __crc32c_le() library function is optimized fo=
-r
->
-> This patch (i. e. 38a9a5121c3b ("lib/crc32: make crc32c() go directly to =
-lib"))
-> solves actual bug I found in practice. So, please, backport it
-> to stable kernels.
+On Fri, Oct 17, 2025 at 09:30:57PM -0700, Eric Biggers wrote:
+> Reorder the parameters of blake2s() from (out, in, key, outlen, inlen,
+> keylen) to (key, keylen, in, inlen, out, outlen).
 
-Oops. I just noticed that this patch removes module "libcrc32c".
-And this breaks build for Debian kernel v6.12.48.
-Previously I tested minimal build using "make localmodconfig".
-Now I tried full build of Debian kernel using "dpkg-buildpackage".
-And it failed, because some of Debian files reference "libcrc32c",
-which is not available.
+No objections to putting the size next to the argument. That makes
+sense. But the order really should be:
 
-So, please, don't backport this patch to stable kernels.
-I'm sorry.
+    out, outlen, in, inlen, key, keylen
 
-
-
---=20
-Askar Safin
+in order to match normal APIs that output data. The output argument goes
+first. The input argument goes next. Auxiliary information goes after.
