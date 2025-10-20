@@ -1,37 +1,37 @@
 Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A2E42A9D;
-	Mon, 20 Oct 2025 02:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA3433987;
+	Mon, 20 Oct 2025 03:07:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760928824; cv=none; b=AMWeSqNP7IOqKXE9eulrtcqqIlcWljw+o+qFi/v8glinJsN5MtzA5ebsZJguE0CSkWq1f3WhO+fLvxkVlD1vODEjiIMXmZ0kD7iCkmK+LgE7vg1sLBty3rTqrcnY4I2Xy5ZtCuSO/H3TNWKDr5yFcldDFcwCfpONGOzw92vdss8=
+	t=1760929661; cv=none; b=HoPWyVYwser+O5wbzcEjODKUMZ0JvHRMP5o3kSKwhgGNYMA+6bjMrAhJP9KO2IHEvfdkiKrqw3pHhOIVqHjZCSQon8vQaGylvncQ3LFavw6WCJSbAdAwPSDsBmNaKAqdnDEdwRxtYUMbpF95EKseeyDqDzmM9e+JHYPnrfJ9JOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760928824; c=relaxed/simple;
-	bh=PX1w6KmaerK5HvXDCeICTSWdXcNw991p7sA8iOUH2hc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=XfiErMjkSE1aDXdUVUhUDoUGqJzqy96kzh5paYtSquC9FhU/QeA3bb5wANnJ39YgyqN05f4jTmzr1pTUbEfrupVolF413/QJGTt6VlCnj/T5KYmuevnPADhTLAj9ytnngjXxBgiLjauh6zJEeqTyPQOefQdcmX5/ARif2J7/siE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=HmTZGV00; arc=none smtp.client-ip=150.107.74.76
+	s=arc-20240116; t=1760929661; c=relaxed/simple;
+	bh=vwz/ZV7ZBVKmELGx3Q8Ld/vgZJUtSdseOwB4y/u7fmo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=gEJdvDLEHiO3f0IYhFAuGr86SUJRREw6Sq0T5bHXo0GFvk9mwb0Vfw7H8U9nNn4osTWSkbgf9iXX0DoXtV2Bk3R41vJKJogVW2QoV0ije31awvo6yW2wNwNb/ce3vP+0tCtFthv223uF/jl4sxD+1kkJPtvGq5apg21O17AtwoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=jKMb7xPF; arc=none smtp.client-ip=150.107.74.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="HmTZGV00"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="jKMb7xPF"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1760928820;
-	bh=lXfqmGcVLmzJ3mm9axj+6QOkmdBIZfjNt20RVe2CZ/c=;
+	s=202503; t=1760929656;
+	bh=ycNA5QZP2shWwu+eA5hqxuvfOvT/eyPKJE6eFZiVZ+0=;
 	h=Date:From:To:Cc:Subject:From;
-	b=HmTZGV00OGQMYxgqB/6DewXrtytBfxVGU0/k6fCge1+bKE4TptJPtogBtoQ8yiauw
-	 BPCmYNoe5CsnqnsspNBQrjOe7dI6Co4f6v62pkwB1b5iNQQgvF2PgI7WrkGRYyeP4M
-	 BekbO+JbEdjrhmJqlUNIO58MoiNPGVOEUevFVDr/I0hPSSqgqY+AMcmvU7d+XwDFp7
-	 hOhBJ84LxBdYTQKpWgqY7ThUEMzphv+W0CAf5MCovz0i0EhzgREuVoYl46Co20/LT8
-	 2cbUWDdJ1CosQCDAZyf8s2Oz3ZZyu6ZcqDleKgHmBEmGqhxJ+DnSti8yu5E3Yu9Wr6
-	 UL+7ekHFbaNgw==
+	b=jKMb7xPF8V1cQa3+I9I44/msEwwgRNtHgCzrinUMt6tOfdD1qstk+2NqDrICiF4Xh
+	 o42iSWY2aoRXJjf66jrQo5noADXlk0LX+p3zNiUQutNfXoLrg0B80oobitCq58hcjw
+	 AkauZhlFArAXPul5BRkrVx/2xIweisWeIEc6KjLnHvG4oUGOOi5UrlCuvnNvjwtwnl
+	 SICj4JDhFMLRwZHecvN+6PdNpG0mAdsGIR48HjMDI190O2AbIv4xtex8sqmgkfP7nR
+	 EHwqxq9OD8DpIs8xpSXQ3ovBvauzFUD/R1jLoKHEf5RJboupWB3OoTgdG8QBfqnj6Z
+	 vpuAfJs1oZX7Q==
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4cqg3l6tZTz4w2J;
-	Mon, 20 Oct 2025 13:53:39 +1100 (AEDT)
-Date: Mon, 20 Oct 2025 13:53:39 +1100
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4cqgMr0vCTz4w0q;
+	Mon, 20 Oct 2025 14:07:36 +1100 (AEDT)
+Date: Mon, 20 Oct 2025 14:07:35 +1100
 From: Stephen Rothwell <sfr@canb.auug.org.au>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>, Pankaj Gupta
@@ -39,52 +39,58 @@ Cc: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>, Pankaj Gupta
  Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
  Mailing List <linux-next@vger.kernel.org>
 Subject: linux-next: build warning after merge of the crypto tree
-Message-ID: <20251020135339.5df5ec50@canb.auug.org.au>
+Message-ID: <20251020140735.39084e85@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/lJiicAoeIun5HCPlhVv86uw";
+Content-Type: multipart/signed; boundary="Sig_/5M/pzNkGpv55YL_hm7iuxve";
  protocol="application/pgp-signature"; micalg=pgp-sha256
 
---Sig_/lJiicAoeIun5HCPlhVv86uw
+--Sig_/5M/pzNkGpv55YL_hm7iuxve
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
 Hi all,
 
-After merging the crypto tree, today's linux-next build (htmldocs)
-produced this warning:
+After merging the crypto tree, today's linux-next build (x86_64
+allmodconfig) produced this warning:
 
-Documentation/security/keys/trusted-encrypted.rst:18: ERROR: Unexpected ind=
-entation. [docutils]
-Documentation/security/keys/trusted-encrypted.rst:19: WARNING: Block quote =
-ends without a blank line; unexpected unindent. [docutils]
+security/keys/trusted-keys/trusted_caam.c: In function 'dump_options':
+security/keys/trusted-keys/trusted_caam.c:37:20: note: the ABI of passing s=
+truct with a flexible array member has changed in GCC 4.4
+   37 | static inline void dump_options(struct caam_pkey_info pkey_info)
+      |                    ^~~~~~~~~~~~
 
 Introduced by commit
 
-  95c46f40aac4 ("docs: trusted-encrypted: trusted-keys as protected keys")
+  9eb25ca6c973 ("KEYS: trusted: caam based protected key")
+
+I am not sure what to do about this.  It would be nice if we could
+suppress the note as we do not support gcc 4.4 any more.  Otherwise,
+I suspect that converting the pkey_info argument to a pointer will get
+rid of the note.
 
 --=20
 Cheers,
 Stephen Rothwell
 
---Sig_/lJiicAoeIun5HCPlhVv86uw
+--Sig_/5M/pzNkGpv55YL_hm7iuxve
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmj1pDMACgkQAVBC80lX
-0GyslQf/XZQNZBhQFJil1YYNaKL0KY+F9yWWMbXOF+/WLtOSSeXscP1z0tmZxTMg
-z7H5bOTjuB+DvJiBelOFo0WptJI1qgM9lqBOdkKLeQPPkihDrq64eIUxpQrTiYvo
-t4XhDrBxKhFp+n7CVCJ+cEEo09OdX6BahKur71UnSPl0mBH6/f7Hxt1mJtd+FBYH
-lRZ+OkrzK2c6MIvuBPcgqqWsG91QrfdQj/QVN6SzLxwoR4DDKWvVs0ymTh9wTLJE
-y4gyBRnnU3mrt5cY+YllkyOGGh9c/7qmoBY3OGeZC+oVRXtRKA5baXJ96Bhu+U5r
-sOE30g46uGKgxwh5lc3tdqOzBoXP0Q==
-=NS/g
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmj1p3cACgkQAVBC80lX
+0GzLgggAnI63ZEczZoQRbkSjQa364x0GKkxghxbIU3yOlijZC3zVlfRK22A4rBzM
+VZh0Aqc8rCTU5xYTH6gdZKA1HsdylL+KzSk9zMwaHmXt7V1WnbU2T1Sra8RBjYHm
+TgfKOLkJfgsLVy/3IQLmXGrm4PE9k8ogSU2pHrhRIs15d4h3saaSJd9t4vPLF39H
+X40+sHjdNwGfH/4VtA21LuVqzmRDjKSDalMc8i+ABmQbba4NoDlNj1tg5oB2CpL8
+3kqMLg+SgjB0j3896lXF0dp/qNqz4ti1fh1BX7QSbhV5Yc6P3DOaJ2x5ZWAQuxj4
+xuztswSApACC5LTgR3O3wlZIOmVF7Q==
+=k+R0
 -----END PGP SIGNATURE-----
 
---Sig_/lJiicAoeIun5HCPlhVv86uw--
+--Sig_/5M/pzNkGpv55YL_hm7iuxve--
