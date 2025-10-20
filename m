@@ -1,136 +1,79 @@
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86407333739
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Oct 2025 21:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E87C33343E;
+	Mon, 20 Oct 2025 21:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760994450; cv=none; b=FcFIW0KZ6iBXoEhPUmujbcRRuUxhhpunLEPXxIXPNXHwCCk5Ov9mIwURYbcrEuTdO4+gB1JyFndsbA/g+ZBX7svvCFvUX8Tk/PAk2uUtJfwTnipKu8tVDeqNzdsnU2FaHQBhbr8WT+gYM1pfjrJsdoelCA3vLgzaV1I7xrdOMik=
+	t=1760995261; cv=none; b=XuzIzrKWFlq4R5i+KS7JqnMfWhFB3vff8Ou1oHFMd+zLVUvp9craCMxsy+Tp+7iuEd5YsQUkiQ0s3FU42jwpAi33arBq2auIJaQApStVOFrcu2WYfPqefB83AIfqxZotomJJT2RM2F5wtZrzrSlHcmZQpCsgEB2jdk8yxlO5bKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760994450; c=relaxed/simple;
-	bh=5/CMwqL4rKkh5iFQB2whmHx7BiXLXchrkKqyebLv2Vs=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QglV3tAm/mxbqbSsFdzg7BaTvTHaL8U0HlrYX2Bp4l5MgADFUdw0sn+MHVVCeLlhQKRuqW40ncmab/tsZbk1q79sLjOSrQpTz6Oa0LbLllwZ6L9aPZfkJ2H9LpB2Sfr9aufdEBvS6YvPJLR6TJ9nSlTBR1rE+vbucvw1s/I/uyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-430b3c32f75so44024625ab.0
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Oct 2025 14:07:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760994447; x=1761599247;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7MP4MxmW3g2lLE0ZEpBNI9vD0O79wKy2YFQcAlj3WJw=;
-        b=g7UXZRxianiCJn3obGlLpyjbvERdgfKThdKoh9czinzkd4BA4JmHEBVR2Cq5duQK/1
-         aZ8dj8RJXq57fxjByDwlmNCCR/7VLho+F/1vx+5O8RuVklv18s2TDpzQRJXAmmc870yQ
-         HOAu5MGT9uSL7rnLF2V0A8Vx2erxlqhWizBQ/q7WUkxIL150oRdBcSF77+qNF09QKUlF
-         Elcbw0eHh/AYXIZ0kn9G4HQYUc8vKMCh5ngUwj8lc+i9vUBKrAUGMZbJhI090vjReqUK
-         bK3sy4FBuycLmiL9zgdgGHv+oElBS2JC2bxk8/F4cz9gt30d+spvvXVoH5izYQuH5taj
-         4XNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuIpKzSIOMhySEbl/vPt/v5SQkZ3EEuTmZyVdSt/uA6KLtWKe7C2hH7nx9jQYe04cEBioiNz8/I+4nalI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzowvDTuUuN7Qqr4taNGLtRQTiG52a/aiFP/GhB46+ZZXUDVz2S
-	9OcUIOQJpeTbzBGtVnfd5Wb+FXQq6tTgVAuNzW5+st/gw9eLcNoLGk5dRoxXwVFYVAOqz7517TI
-	EKLaWQNLS/0IUXzZXALnJrvGNJF/eF/OJ9+iqjuNUe7fjhSjZu+8IXP0WaUU=
-X-Google-Smtp-Source: AGHT+IEPbiClZteklFQlevW//+LDYWwrgylqyu6ZXyPbaWziR5zzn8BbnI8rx4um9wuj8TF10rojGmwvuE0tYEYpBPXJIav+TXCD
+	s=arc-20240116; t=1760995261; c=relaxed/simple;
+	bh=3iQtO3/kT4dQdze6I2jUqdxwmT21PUB21GiN34k5zuY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b3irWKV4POzBmGaGeWyEwyycuC35tIj1yjOB1LBzH9zve7fUtUz8uizE9D0KmAwahZgnT+dAWWmxuJw7eG6JM6X2Uoq38nNevsS/L33OfvTQuUZX87IHoYmSwm6qVEP84wuSduxgTFSqXaucCX55hizeZZqjjLE8ugbiBiz/uGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LJfb7Wcb; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LJfb7Wcb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A057C113D0;
+	Mon, 20 Oct 2025 21:20:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760995260;
+	bh=3iQtO3/kT4dQdze6I2jUqdxwmT21PUB21GiN34k5zuY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LJfb7WcbHlUO2BEDHBsJR6EKLKqG8NPDzL40eClZQ5mz8tqWZx5RcwwnI1n3IcyP0
+	 WPRp4LqWfpBNFglRnrGKQTS4c4yPJR04wJ4Tn8DRV69i+ZkbsNZBQm7euYWIuROI0C
+	 4o6qHZev+N4/UEzpExWxC0g3XE3h8qjBi47xgpPW0O/lCPUHzY23ViHODapCdaxS6G
+	 iBp+AKOEmDAIgL2tPols+oykkzqt7n9mCZWPJG+g/fy6DWsE404wLDETrKAckzb17T
+	 aSZt6uA6cxVlKI8FzNqBBOisFSE45rydlnsxwzHudMQnmD+qJ1TjQLKqKV1jzty35J
+	 gI2DZtm1pIZ8Q==
+Date: Mon, 20 Oct 2025 21:20:57 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-s390@vger.kernel.org
+Subject: Re: [PATCH 16/17] crypto: jitterentropy - use default sha3
+ implementation
+Message-ID: <20251020212057.GA83624@google.com>
+References: <20251020005038.661542-17-ebiggers@kernel.org>
+ <20251020005038.661542-1-ebiggers@kernel.org>
+ <1062228.1760956530@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a65:b0:430:aedb:3719 with SMTP id
- e9e14a558f8ab-430c5203730mr190399425ab.4.1760994447398; Mon, 20 Oct 2025
- 14:07:27 -0700 (PDT)
-Date: Mon, 20 Oct 2025 14:07:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68f6a48f.050a0220.91a22.0452.GAE@google.com>
-Subject: [syzbot] [crypto?] KMSAN: uninit-value in poly1305_blocks
-From: syzbot <syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1062228.1760956530@warthog.procyon.org.uk>
 
-Hello,
+On Mon, Oct 20, 2025 at 11:35:30AM +0100, David Howells wrote:
+> Why don't you take my approach and just call lib/crypto/sha3 directly rather
+> than using a crypto/ object as an intermediary if that crypto/ object is just
+> going to wrap lib/crypto?
 
-syzbot found the following issue on:
+We'll do that, and thanks for writing the patch already!  But that's
+something to do in a later patch after adding the library API.  Your
+patch description kind of raised a red flag:
 
-HEAD commit:    211ddde0823f Linux 6.18-rc2
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11af9734580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bbd3e7f3c2e28265
-dashboard link: https://syzkaller.appspot.com/bug?extid=01fcd39a0d90cdb0e3df
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11099492580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1096eb04580000
+    Make the jitterentropy RNG use lib/crypto/sha3 rather than
+    crypto/sha3.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/46c24dbd5a18/disk-211ddde0.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4d12e20e76d7/vmlinux-211ddde0.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9e4b9dd5db28/bzImage-211ddde0.xz
+    For some reason it goes absolutely wild if crypto/sha3 is
+    reimplemented to use lib/crypto/sha3, but it's fine if it uses lib
+    directly.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
+That implies that your changes broke crypto_shash, so you *had* to
+convert to the library right away as a workaround for that.
 
-=====================================================
-BUG: KMSAN: uninit-value in poly1305_blocks+0x1a9/0x5f0 lib/crypto/x86/poly1305.h:110
- poly1305_blocks+0x1a9/0x5f0 lib/crypto/x86/poly1305.h:110
- poly1305_update+0x169/0x400 lib/crypto/poly1305.c:50
- poly_hash+0x9f3/0x1a00 crypto/chacha20poly1305.c:168
- poly_genkey+0x3b6/0x450 crypto/chacha20poly1305.c:233
- chacha_encrypt crypto/chacha20poly1305.c:269 [inline]
- chachapoly_encrypt+0x48a/0x5c0 crypto/chacha20poly1305.c:284
- crypto_aead_encrypt+0xe2/0x160 crypto/aead.c:91
- tls_do_encryption net/tls/tls_sw.c:582 [inline]
- tls_push_record+0x38c7/0x5810 net/tls/tls_sw.c:819
- bpf_exec_tx_verdict+0x1a0c/0x26a0 net/tls/tls_sw.c:859
- tls_sw_sendmsg_locked net/tls/tls_sw.c:1138 [inline]
- tls_sw_sendmsg+0x3401/0x4560 net/tls/tls_sw.c:1281
- inet6_sendmsg+0x26c/0x2a0 net/ipv6/af_inet6.c:659
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x145/0x3d0 net/socket.c:742
- sock_write_iter+0x3a6/0x420 net/socket.c:1195
- do_iter_readv_writev+0x9e1/0xc20 fs/read_write.c:-1
- vfs_writev+0x52a/0x1500 fs/read_write.c:1057
- do_writev+0x1b5/0x580 fs/read_write.c:1103
- __do_sys_writev fs/read_write.c:1171 [inline]
- __se_sys_writev fs/read_write.c:1168 [inline]
- __x64_sys_writev+0x99/0xf0 fs/read_write.c:1168
- x64_sys_call+0x24b1/0x3e30 arch/x86/include/generated/asm/syscalls_64.h:21
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+That shouldn't be necessary.  We should generally keep crypto_shash
+working for now.  In which case, all jitterentropy should need for now
+is a simple substitution s/sha3-256-generic/sha3-256/.
 
-Local variable desc created at:
- poly_hash+0x11d/0x1a00 crypto/chacha20poly1305.c:135
- poly_genkey+0x3b6/0x450 crypto/chacha20poly1305.c:233
+We'll convert jitterentropy to use the library API too.  It's better,
+after all.  But it should be done later and because the library API is
+better -- not as some sort of workaround.
 
-CPU: 1 UID: 0 PID: 6030 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(none) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+- Eric
