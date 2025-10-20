@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0433F1F09A3;
-	Mon, 20 Oct 2025 00:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45B920468E;
+	Mon, 20 Oct 2025 00:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760921615; cv=none; b=KUPao+g9Jc6JgeAg2l+qbp36YjWHArf1dqWdJEThybi4avw8jcMHrRtiqosZ/0S3FM49QsKiS66so/p3OFnZmNZzfOmcQRlovFr9uZ4F2NycJj40rvxwxeGLAmx4ZtXll7N8q+q/f0lDjRC9tWgAwPq8e8FYid+ddsFhz/lulR0=
+	t=1760921615; cv=none; b=NJaZ0Lh6HfEuNktfqPXq0SQiSKcYzB1kXwCS6d3m3QXiW0zDTJo6QNSOiAB4TRDel67wT5PrKD1s3vE1K2JhKLwPjoLEd2oAA5fxJ0I2RpA4Nc+KNhQndeidU4BGHR6oe+nap0to8gAcZhsxI27Y00w4PcalzqP3XlLUSIKZhsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1760921615; c=relaxed/simple;
-	bh=OaQGEhSD9l9BZYpyT3Hv3bwzyb+UiSiWBVKTKVVAllo=;
+	bh=Hauj1v8AzIcWYsh5CTOeRlzypb0Dv3HdLIY/wCgEtzU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tg+OzQ5NO/oIClSKJrVS6DfxkA3nbcdXueeIfUznezVdxUkZGZaNfI/8PFXwDMR6KjybEwjyGwemQxbn/ByrUco6dz/1YeChWm6UPdI4QldeJ62sUfgF8ekNc/AKmmfXgANjdw/bmylz40dmI7cPUxYA+61/27O4UxNMZTg2Di8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YX5RdWEl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=dzzfj9DFAmPfN+zx4WrpK/HkqRkh6IyfHo1kWFTi8dD511eeTEbS0d8kFOmyHGRkSCMPijCxt48Ul3/IA6Gis5QEVKWC6CI2NchRmQNDd/Bqgzm+ONmw64bC+DK0ITNKtGhoaONE7dpcvzdoK0VNVXu4fe+26irWQnHP0f2Yz/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EDmcNoYS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YX5RdWEl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D195C116D0;
-	Mon, 20 Oct 2025 00:53:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EDmcNoYS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08420C4AF09;
+	Mon, 20 Oct 2025 00:53:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760921614;
-	bh=OaQGEhSD9l9BZYpyT3Hv3bwzyb+UiSiWBVKTKVVAllo=;
+	s=k20201202; t=1760921615;
+	bh=Hauj1v8AzIcWYsh5CTOeRlzypb0Dv3HdLIY/wCgEtzU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YX5RdWElee1yHQDh5fsUq6GWg1Nyxlvce5OuFgBg/ky8IQPLykEwhhWoLE5IhtVLg
-	 5hLsqTrpveFOqYKjfgsyqajSVX2R/iWNoP7ETZfTawxlkIOYRQEqDeFlE91g8WqR8V
-	 FJf9Kkm2JL3ouQz6OUTors7MU11lcrhzYH9QJzGpX5MftLgDDcKm1KD19dbzTMNrBR
-	 FED8CKqORxuobkwstChIcHDajbNukiay28cUsmaON2H8ZqaxUQIZY4gn2Mr9Ra4ZAF
-	 gVUe+9uzBP1ALLonpQfDnX7eAAZtnz8zsKJwghxufKpKsurRq7j/84rXSrR1QuxX03
-	 35s6H2ghg/ytQ==
+	b=EDmcNoYSTLKuVAnezV8raI05zhSi+N8DFRp5eUI+SDDMEQx4A3Mi+XXEyv8kGwS9H
+	 mfsiBZOBedmzyu4nmcPr4bmk+suPDgv0bollZO8GCcnM9d3HW/XHoLopB7XAPRttT8
+	 ILXgXsR82tNvVEzfu/dSwY2hS1dVzqtgPmQF5jWfTKlFV5ARz+6VvMp6ycsodwMBqH
+	 7h6cn3vxwdujzqKx9Kwtmz9g0HC1wQdeph9vx1px3QV8Sp0T/5JVBSKDmLVdJ+i0NR
+	 7eGFPwi5GdBWcyMgbJ+lnupzJRhvo7uxeFOT0KqAMY5/y9vsCt8VK1UHi+T48wFc+c
+	 S9X4Wqc+dep2Q==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -35,9 +35,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-s390@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 07/17] lib/crypto: sha3: Use appropriate conversions in sha3_keccakf_generic()
-Date: Sun, 19 Oct 2025 17:50:28 -0700
-Message-ID: <20251020005038.661542-8-ebiggers@kernel.org>
+Subject: [PATCH 08/17] lib/crypto: sha3: Drop unfinished SHAKE support from gen-hash-testvecs.py
+Date: Sun, 19 Oct 2025 17:50:29 -0700
+Message-ID: <20251020005038.661542-9-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.1.dirty
 In-Reply-To: <20251020005038.661542-1-ebiggers@kernel.org>
 References: <20251020005038.661542-1-ebiggers@kernel.org>
@@ -49,39 +49,44 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For converting from little endian to CPU endian, use le64_to_cpus().
-For converting from CPU endian to little endian, use cpu_to_le64s().
-
-No functional change, but this makes the code clearer.
+The SHAKE testing doesn't actually use gen-hash-testvecs.py, so remove
+the unfinished SHAKE support from it.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/sha3.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/crypto/gen-hash-testvecs.py | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/lib/crypto/sha3.c b/lib/crypto/sha3.c
-index 2c292b0b3db34..8f08e7b8f4521 100644
---- a/lib/crypto/sha3.c
-+++ b/lib/crypto/sha3.c
-@@ -168,16 +168,16 @@ static void sha3_keccakf_rounds_generic(struct sha3_state *state)
-  * loops are no-ops on LE machines and will be optimised away.
-  */
- static void sha3_keccakf_generic(struct sha3_state *state)
- {
- 	for (int  i = 0; i < ARRAY_SIZE(state->st); i++)
--		cpu_to_le64s(&state->st[i]);
-+		le64_to_cpus(&state->st[i]);
+diff --git a/scripts/crypto/gen-hash-testvecs.py b/scripts/crypto/gen-hash-testvecs.py
+index cb6f6cfbedeb2..ba241cb1ed2fd 100755
+--- a/scripts/crypto/gen-hash-testvecs.py
++++ b/scripts/crypto/gen-hash-testvecs.py
+@@ -59,14 +59,10 @@ def hash_init(alg):
  
- 	sha3_keccakf_rounds_generic(state);
+ def hash_update(ctx, data):
+     ctx.update(data)
  
- 	for (int  i = 0; i < ARRAY_SIZE(state->st); i++)
--		le64_to_cpus(&state->st[i]);
-+		cpu_to_le64s(&state->st[i]);
- }
+ def hash_final(ctx):
+-    if ctx.name == "shake_128":
+-        return ctx.digest(16)
+-    if ctx.name == "shake_256":
+-        return ctx.digest(32)
+     return ctx.digest()
  
- static void sha3_absorb_block_generic(struct sha3_ctx *ctx, const u8 *data)
- {
- 	struct sha3_state *state = &ctx->state;
+ def compute_hash(alg, data):
+     ctx = hash_init(alg)
+     hash_update(ctx, data)
+@@ -166,9 +162,9 @@ print(f'/* This file was generated by: {sys.argv[0]} {" ".join(sys.argv[1:])} */
+ gen_unkeyed_testvecs(alg)
+ if alg == 'blake2s':
+     gen_additional_blake2s_testvecs()
+ elif alg == 'poly1305':
+     gen_additional_poly1305_testvecs()
+-elif alg.startswith('sha3-') or alg.startswith('shake'):
++elif alg.startswith('sha3-'):
+     pass # no HMAC
+ else:
+     gen_hmac_testvecs(alg)
 -- 
 2.51.1.dirty
 
