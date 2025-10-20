@@ -1,96 +1,110 @@
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843452F7444;
-	Mon, 20 Oct 2025 10:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564502F6579
+	for <linux-crypto@vger.kernel.org>; Mon, 20 Oct 2025 10:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760955105; cv=none; b=MhRSInzmSZHYXtdWxvRhpNlIeagh3tn32MHoLfyEPPN0cxT+GdWsNRLLqxov1lr5KlEb1KVDfHNlVFc7e2fiZMuo5I7rNQdyfaq+HPvkwqFVoOPuO7X/zmuCQ0rB7cg8fSRns+m9LJrT93sRiV5r8eMOyYwuyrYzPrEmFKtk7p4=
+	t=1760956432; cv=none; b=ammZFHG3tzoSKaz/LMEWV2ILO1o4YSA1UQMfLGEjDfbI+Qi87zb5aAREbVvxiPNuvvwzMseEbcui/berMSk8qnFYRRGCje3JCcoKs/TCQaOWYsh65jWspOs95nizppdI1a9BTVLAAjRxKxnL82PnAMsQF2gx1bDzaXFv+6RN7Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760955105; c=relaxed/simple;
-	bh=GTy5Z9KYNiPcjptdrJUxyn4j9Jc8zlzn0Dl9Gd9a+kg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TOqDkVvF9cxDICoJmiwUNZcH+PvZwp1ssrto0HkgPaq0a5Ptkvq1SOkkcm4Bs2ZLUzW7+7P+oeiGETXzuFGEhZyT/yCeUiJEUaa9FiurQHlykB6iPvNT+82gXJ7D4rfknwMZrStOYJk1QroA8NbXpKumvhdswlhOceiQWJQJgak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from DESKTOP-L0HPE2S (unknown [124.16.141.245])
-	by APP-01 (Coremail) with SMTP id qwCowADnPaDLCvZoHdfdEQ--.2307S2;
-	Mon, 20 Oct 2025 18:11:23 +0800 (CST)
-From: Haotian Zhang <vulab@iscas.ac.cn>
-To: neal_liu@aspeedtech.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: joel@jms.id.au,
-	andrew@codeconstruct.com.au,
-	linux-aspeed@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Haotian Zhang <vulab@iscas.ac.cn>
-Subject: [PATCH] crypto: aspeed - fix double free caused by devm
-Date: Mon, 20 Oct 2025 18:11:09 +0800
-Message-ID: <20251020101109.1030-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
+	s=arc-20240116; t=1760956432; c=relaxed/simple;
+	bh=QIfJvWLwwRaiRLgrna29KMjaHzNc87zIwmeMVe/lkCU=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=CCpmRIUJEy4gqjXA5HZrsyxmw8r7Z3dqn//JNOD2aI7ZJ4oh7srcBMUKR8t8SGKzGo8FQMWwOUUaCCrXM4v5dOjGojJtJuS9AiGUOuMss3JLQahsuYcUa1a/crSXDBbiltaCpZjTVAFUakaLqN81ieJbpVe/6O1t3CiwJAARzWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=faDp8PfL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="faDp8PfL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760956428;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8Pa5+u9QjFpdCt3QGlBVROCbgssonhS9xjrxu/nfbTI=;
+	b=faDp8PfLL73S3Y2Rj5YwZy1qnK1lB0ffWgvOOmXtKg5hkUy7YKBfpl1F3XqyyC8led7PKd
+	IbdWeO8A5fA74V3UBIGdIVXEqZgxSHLKh2IiCo41VVGLkn8fsTX3aDzXYOH01iDVRFd1E9
+	8OmauR4DhDfcBWB8mzHIqvPykG5rGYU=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-262-GDfMxLa6PWCu3OjmYdRDgg-1; Mon,
+ 20 Oct 2025 06:33:43 -0400
+X-MC-Unique: GDfMxLa6PWCu3OjmYdRDgg-1
+X-Mimecast-MFC-AGG-ID: GDfMxLa6PWCu3OjmYdRDgg_1760956421
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6701E18009C2;
+	Mon, 20 Oct 2025 10:33:40 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.57])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9FADD30001BC;
+	Mon, 20 Oct 2025 10:33:37 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20251020005038.661542-12-ebiggers@kernel.org>
+References: <20251020005038.661542-12-ebiggers@kernel.org> <20251020005038.661542-1-ebiggers@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
+    Ard Biesheuvel <ardb@kernel.org>,
+    "Jason A . Donenfeld" <Jason@zx2c4.com>,
+    linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+    linux-s390@vger.kernel.org
+Subject: Re: [PATCH 11/17] lib/crypto: sha3: Simplify the API
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowADnPaDLCvZoHdfdEQ--.2307S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kr18AFWfAr4DKrWUZr48Xrb_yoW8Gry5pa
-	yrJ3yFkFW7JF45GFWUJayvqF15J3y5t3yagayxG3W7X3y3JrnYqFZaka1jvFW5AFWkuF1I
-	yF4DJr1UuFn8uFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9G14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwVW8twCF04k20xvY0x0EwIxGrw
-	CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
-	14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
-	IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxK
-	x2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI
-	0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbQVyDUUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCQ4BA2j12CK++wAAsn
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1062181.1760956416.1@warthog.procyon.org.uk>
+Date: Mon, 20 Oct 2025 11:33:36 +0100
+Message-ID: <1062182.1760956416@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-The clock obtained via devm_clk_get_enabled() is automatically managed
-by devres and will be disabled and freed on driver detach. Manually
-calling clk_disable_unprepare() in error path and remove function
-causes double free.
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-Remove the manual clock cleanup in both aspeed_acry_probe()'s error
-path and aspeed_acry_remove().
+> Instead of having separate types and functions for each of the six SHA-3
+> algorithms, instead divide them into two groups: the digests and the
+> XOFs.  The digests use sha3_ctx and the XOFs use shake_ctx.  The
+> internal context is now called __sha3_ctx.
 
-Fixes: 2f1cf4e50c95 ("crypto: aspeed - Add ACRY RSA driver")
-Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
----
- drivers/crypto/aspeed/aspeed-acry.c | 2 --
- 1 file changed, 2 deletions(-)
+Please roll changes into the original patches rather than posting them with a
+set of "fixes" and add a Co-developed-by tag for yourself.  Or if you want
+your authorship on your changes, just switch the Author to yourself and put a
+note in the changelog noting that you modified it from what I posted.
 
-diff --git a/drivers/crypto/aspeed/aspeed-acry.c b/drivers/crypto/aspeed/aspeed-acry.c
-index 8d1c79aaca07..5993bcba9716 100644
---- a/drivers/crypto/aspeed/aspeed-acry.c
-+++ b/drivers/crypto/aspeed/aspeed-acry.c
-@@ -787,7 +787,6 @@ static int aspeed_acry_probe(struct platform_device *pdev)
- err_engine_rsa_start:
- 	crypto_engine_exit(acry_dev->crypt_engine_rsa);
- clk_exit:
--	clk_disable_unprepare(acry_dev->clk);
- 
- 	return rc;
- }
-@@ -799,7 +798,6 @@ static void aspeed_acry_remove(struct platform_device *pdev)
- 	aspeed_acry_unregister(acry_dev);
- 	crypto_engine_exit(acry_dev->crypt_engine_rsa);
- 	tasklet_kill(&acry_dev->done_task);
--	clk_disable_unprepare(acry_dev->clk);
- }
- 
- MODULE_DEVICE_TABLE(of, aspeed_acry_of_matches);
--- 
-2.25.1
+> +/** Context for SHA3-224, SHA3-256, SHA3-384, or SHA3-512 */
+> +struct sha3_ctx {
+> +	struct __sha3_ctx	ctx;
+> +	u8			digest_size;	/* Digest size in bytes */
+> +};
+
+Don't do that.  That expands the context by an extra word when there's spare
+space in __sha3_ctx.  If you go with the separate types, then this field is
+redundant.  Actually, I lean slightly towards passing in the desired digest
+length to sha3_*final() and doing a WARN if it doesn't match.
+
+> +static inline void sha3_zeroize_ctx(struct sha3_ctx *ctx)
+
+sha3_zero_ctx() please if you don't like "sha3_clear_ctx".  "zero" is a
+perfectly usable as verb in itself.
+
+> +/** Zeroize a shake_ctx.  Call this after the last squeeze. */
+
+/**
+ * shake_zero_ctx - Clear a shake_ctx.
+ * @ctx: The context to clear.
+ * 
+ * Clear the context for a shake XOF.  Call after the last squeeze.
+ */
+
+Something like this, please.
+
+David
 
