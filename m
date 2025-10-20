@@ -1,110 +1,43 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B394A228C99
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Oct 2025 14:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABCAF2638BF;
+	Mon, 20 Oct 2025 16:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760972195; cv=none; b=rDnpHGguRB/ouiJxyl1e3GfPcYkM4mmQc3ooXXhIbngcu+aWhqGEDhKfZiZodvLwg2PXuq6l2w2XgmoXGd6Gr4mIDfoBe0VVeQP2GD+h5dEBLVO3kRHMmkddolrF0veRkOFRymD+kwUVHYYskCPVSNl4HsaKHe1bYY1Bb8MgRYA=
+	t=1760979571; cv=none; b=NZAMJ/vwXTIAn1bZBwQitUUP4I+vXS/Cii680o4alLh0U8c9VbJSEaykErWHp420B3y/8DMk5GMJHNfeS7+Q7aqkWJDStWCdlP8eDkeT+yHXP5stDEW8yFGXnwAaSyDqvPLYI+FCPnMVxwR3HLqQ7f9iWIRrDIMQFKbJRil0pAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760972195; c=relaxed/simple;
-	bh=Sug/TiaFVNCgE/OTMIDWvRovNGDHRM3X2PR+kC0SaFc=;
+	s=arc-20240116; t=1760979571; c=relaxed/simple;
+	bh=yQAFF8SAbn3GSlPbThC422AeuOlj4n5ubgneq1cvhko=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bzNuuuUFMN46BAdOtoVYpTTsIYAnPTAfmX6vY8Ne0+7SAfTUA12UTcQKZtJKta1R4Ce4fdYORArmplkM5/PNCVUjPmZ10B3H80njI1LD67N9SsFhwNyzj1jtievulV+5OiLuFeO9QTkIuEdtcs6ppyWE47gLqhTuKlwmlRhY0HY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C+52i0G1; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=OsTdvZsw0K3RxF+A0FI8nUoxhcJ+4+oUCiEKKve8kPKptUml31xUJTodwNAZPk8gUU93Sl8tooSGWnyI/tqZyllAItABtQFcqHEGXom96ET1+V7IexWHG99wkdSfazxhg2TAiUas8TAsU9W+SMLFk6+XOHFcigvG5FD4HhgPCMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dTxUQe0U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+52i0G1"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-784826b75a4so22283097b3.0
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Oct 2025 07:56:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760972193; x=1761576993; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DErh0jkxEaTV4PU1gk6ECpXb4KgwIGFW/OBZ7JW1qeg=;
-        b=C+52i0G1Q5aLYH8+WnTKL2NZUdCf1L4lQCQitDT3kcaz8o1OVvR/hul5Lo05P+kTdK
-         wSAk6OtNDnvAnZ9yazIGJxLkY5PNCsVPgcaoBAt642cUwZUBPg3XF3ibWybW2syzEV4O
-         t0IobW43VIv7D8O8BXNptHEdhwel+TTc7SEYDaz8eZqbejXyVE0cau6Nw5OHikq0KCNZ
-         +EwIno3T6IvxkbX7HvnmwFls2Dh7Rp7a/1fr6ygtjHTg51cAgBICGl+WnI4BLqj03oxC
-         wSfBAbyrfcFOB7pkZQIwetrPw1e36Z4M/Ri3+AWWiJ+FajQE/cxpYJu2lDmEpwYU9sgG
-         RmvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760972193; x=1761576993;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DErh0jkxEaTV4PU1gk6ECpXb4KgwIGFW/OBZ7JW1qeg=;
-        b=vSpHfzpRKSxa+R9emuQwdjgp+QWKED6Aftq/TOODTgEUHTCeTp9R4LTqO14z5IjWZ8
-         l31lk+4JEocsiIQlH72489HfCOhmCCgNub5uhsrHCz71M8D0im6bU78NRf+ELjnoaZZV
-         6v3IDOpTDSt5jixmeNBfAvRIRf6QLEAVqkrTFx3FqrY1X6f+GMcK7HEGDVuN0mYD0gyu
-         w95wZx/OXoQlS+8GS4ssm6iuJgZLiDPrIIfYEObFyGehdb9EJPLUjd5dqa/7vuoCK0fc
-         qDVCghatgj4gdRuQvIkER0bn7q1RRSPTkbiXznZbnOp1Sv+EK28qeoYfRsERAofTPmO7
-         AU3g==
-X-Forwarded-Encrypted: i=1; AJvYcCVRbFtxxn1E+Ly+dewod0273UmHDcoYMEbL1IY4eX4N0iS44irwuDMlVPiBdv3UC2ZQbkdVRptc/x9CL5M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywc3mpcp9dBqSeJKvqBpwrrjg+jR5RwcQw1losFNqkqLymdac1T
-	gk35wRewSPkGxBG84FWnIbp54Xl71g8NnNMva5Bnp7wGgq8wPtfj+hy8
-X-Gm-Gg: ASbGncuJtuUxWUQYmhP5aouPK5HOsjwR4Qcjqse9iAygZzKVl9p/hAt9zorO9ofwF1w
-	IGyiw5kDab2SNe4XUqjw21yJcNJkMqYjMhZ34DKRnpOypM/GCq3JvdyEFfBIQ3d3ul+XxXVHjQH
-	EGCOR2opMT6jWEv28fnW0G+sXfuVm/+S5NDgUjCEMoqw5YJJsaL9zZKj/IpNurXBvEuiJ1JgZ3s
-	d0kgRKzmIbIxbzzk8CSbGt/v4xmISdHLs+c0yF+a/TGRfGiNr8Pi2akn5Gb3+SIp6mI4nt+I/n2
-	dsLalNLmDC3HjrPCQ/w4Ekzt/LhYUM7SfkRMlZkty46idxCjRmCBJkwzSx0SZCXI66peJF/nNSa
-	I5PL7Y0Vz5gfSMCDJC3nHdlZkF8zKNUGXILA7PoJiaRG2inwNb5CPvgbw9cQHRjeXtD+WAWxkI2
-	7NHSdEfWqi+mhH3yOsNtqBcynE2naLyt/5
-X-Google-Smtp-Source: AGHT+IE81F/jaXbyHR42ph2vrE4i4G97ZO8UgGatFFTjrjbQ0UYwj8u7zrZ9iwbiKwTlSepO74M7sA==
-X-Received: by 2002:a05:690c:951c:b0:781:1280:db43 with SMTP id 00721157ae682-7836d3bdceemr92264887b3.68.1760972192509;
-        Mon, 20 Oct 2025 07:56:32 -0700 (PDT)
-Received: from localhost (c-73-105-0-253.hsd1.fl.comcast.net. [73.105.0.253])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-784674d66fesm21762357b3.41.2025.10.20.07.56.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 07:56:31 -0700 (PDT)
-Date: Mon, 20 Oct 2025 10:56:30 -0400
-From: Yury Norov <yury.norov@gmail.com>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Crt Mori <cmo@melexis.com>, Jonathan Cameron <jic23@kernel.org>,
-	Lars-Peter Clausen <lars@metafoo.de>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>,
-	David Laight <david.laight.linux@gmail.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>,
-	Tony Luck <tony.luck@intel.com>,
-	Michael Hennerich <Michael.Hennerich@analog.com>,
-	Kim Seer Paller <kimseer.paller@analog.com>,
-	David Lechner <dlechner@baylibre.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Richard Genoud <richard.genoud@bootlin.com>,
-	Cosmin Tanislav <demonsingur@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Jianping Shen <Jianping.Shen@de.bosch.com>,
-	linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-edac@vger.kernel.org, qat-linux@intel.com,
-	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
-	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/4] bitfield: Drop underscores from macro parameters
-Message-ID: <aPZNnmot-Z5a2yIc@yury>
-References: <cover.1760696560.git.geert+renesas@glider.be>
- <792d176149bc4ffde2a7b78062388dc2466c23ca.1760696560.git.geert+renesas@glider.be>
- <aPJwtZSMgZLDzxH8@yury>
- <CAMuHMdXCoqZmSqRAfujib=2fk0Ob1FiPYWBj8vMXfuXNoKhfVg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dTxUQe0U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 024AEC4CEFE;
+	Mon, 20 Oct 2025 16:59:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760979571;
+	bh=yQAFF8SAbn3GSlPbThC422AeuOlj4n5ubgneq1cvhko=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dTxUQe0UrDTOR7Uz+a83KiWBXl0m+haPoYKi6a/7jXLIVLcgAS0gZFtgAPIa6s+g6
+	 n00tYfJgLDPZYrsZXkZqDmZw4VTL7NwXb2EBidA+r6OjtkcCeNH1FuGiHSFTMM2c8r
+	 MuGqmY1KgBAswg43HxvSHPp7k2SxN6iYkEiO8QBU7IUAZSlYHSA3j7EJL5amNqk986
+	 dRC2Clc2BO4X1KShQKxxUIK3dRlebfiuriUS6rdAZeU+x3xTMklX1g8GJOHRhn7JbK
+	 oJbxblcLRDDbP7Y5XFzQo488RqP2K4KFUulGV2bVcrb09Yuw9DsGxvc+pBbfQvXp5k
+	 erXwbmQBB7nZw==
+Date: Mon, 20 Oct 2025 09:57:58 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, x86@kernel.org, Jason@zx2c4.com
+Subject: Re: [PATCH 0/8] VAES+AVX2 optimized implementation of AES-GCM
+Message-ID: <20251020165758.GA1644@sol>
+References: <20251014003123.GA2763@sol>
+ <aPH9ZQP0m8Pq5Iy-@gondor.apana.org.au>
+ <CAMj1kXGE6-xiUSyKa92=HWeywt=5-F2_G2H7V-UnVhKG65zwCA@mail.gmail.com>
+ <20251017160437.GA1566@sol>
+ <aPW2_B3utVHNxaEV@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -113,17 +46,38 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMuHMdXCoqZmSqRAfujib=2fk0Ob1FiPYWBj8vMXfuXNoKhfVg@mail.gmail.com>
+In-Reply-To: <aPW2_B3utVHNxaEV@gondor.apana.org.au>
 
-> > I agree that underscored parameters are excessive. But fixing them has
-> > a side effect of wiping the history, which is a bad thing.
-> >
-> > I would prefer to save a history over following a rule that seemingly
-> > is not written down. Let's keep this untouched for now, and if there
-> > will be a need to move the code, we can drop underscores as well.
+On Mon, Oct 20, 2025 at 12:13:48PM +0800, Herbert Xu wrote:
+> On Fri, Oct 17, 2025 at 09:04:37AM -0700, Eric Biggers wrote:
+> > 
+> > Well, it seems you didn't read the patchset (even the cover letter) or
+> > any of the replies to it.  So maybe I should just take it, as I already
+> > said I preferred, and later did do since you hadn't said you wanted to
+> > take it.  It would have been okay if you had volunteered to take this,
+> > but you need to actually read the patches and replies.
 > 
-> Fair enough.
-> So I assume you are fine with not having underscored parameters in
-> new code, like in [PATCH v4 2/4]?
+> The reason I didn't see your cover-letter is because you didn't send
+> it to me.  Your To/CC list was:
+> 
+> To: linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org,
+> x86@kernel.org,
+> Ard Biesheuvel <ardb@kernel.org>,
+> "Jason A . Donenfeld" <Jason@zx2c4.com>,
+> Eric Biggers <ebiggers@kernel.org>
+> 
+> So all I get is the patches without the cover letter.  Of course
+> anybody who replies to the cover letter won't be visible to me
+> either.
+> 
+> Please consider adding my email address to the Cc list next time.
 
-Yes, sure.
+Well, one would think you would be subscribed to linux-crypto.
+But whatever, I'll Cc you explicitly on future patches.
+
+> I will drop this patch-set.
+
+Thanks,
+
+- Eric
