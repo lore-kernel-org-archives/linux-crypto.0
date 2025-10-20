@@ -1,156 +1,96 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7162DBF49
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Oct 2025 07:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843452F7444;
+	Mon, 20 Oct 2025 10:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760944084; cv=none; b=nvRJZQgnUcRsBx94GCap4siCwqTjJPZJz4D1WijN9zZ7QMd2CZy4xMHR9k/IdClFfdgft+1/Z62kRxq48if309dDGYOUCH0LVV8WCIg5mFiael8R8VD+e8qNvHNy5310YQ6cqcDoh57NLHiFVVaYAd7oUrqpta57rmuI7hQRiaE=
+	t=1760955105; cv=none; b=MhRSInzmSZHYXtdWxvRhpNlIeagh3tn32MHoLfyEPPN0cxT+GdWsNRLLqxov1lr5KlEb1KVDfHNlVFc7e2fiZMuo5I7rNQdyfaq+HPvkwqFVoOPuO7X/zmuCQ0rB7cg8fSRns+m9LJrT93sRiV5r8eMOyYwuyrYzPrEmFKtk7p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760944084; c=relaxed/simple;
-	bh=XZ0XrFe8i9BOKiZV0xnN18sfKKByLNmWtR6xj1Y69WY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kcRB1RNXaDmvIWuZi8zWTL+y8lCgHEXentyP7JWi/Ab5/r8+mJcdAXWAOdyVJ0Y/xj3MJWWxUSCyfZHfQFDb2RBqnLhokhdMaf8/2jfsa626bfmX3m0Aq0IpWkYeU98LzK5phIc9/G+6cUYBkK9Ec/mpfIgsT9hrM/SXWLdNp+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hw8gCN7o; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hw8gCN7o"
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-33b9dc8d517so3559009a91.0
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Oct 2025 00:08:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760944082; x=1761548882; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/HOxQeFzZprgS340iSyl+E8y8vVH7kK0gqo8lCK0SDQ=;
-        b=Hw8gCN7oSJIanJ7seDeSs7cT6qmeINdD81LFwTET0BnrhqCnTwdyuTHwkSupgmlXzF
-         czR+WcTrS2bCbbQey5V+60iOmwQogFHRTaQxrnKnZ9CM0OxZEv7KIo7yEkGFYAN2+A+L
-         kjVjGVlj9uaUXZTnZTgdCyERCDYGGXKco6j9aCDAN36GASCpUFrTDapd7b3WBwlr+nsf
-         NgzGai106R88mmVazssKKDhkYXPRijbcjfYAEZj+2ZUFFooUuN2tgSPGUKg3ccl3zAWa
-         vXCrnY/T1vxXn0k2Bm20BwzwgKIgT3t7snhv3wwtUsePSE/CoQfOG28+tvYHXKKDd7xD
-         Sulw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760944082; x=1761548882;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/HOxQeFzZprgS340iSyl+E8y8vVH7kK0gqo8lCK0SDQ=;
-        b=gCPhaDuIpb2+Pko6QmU9CGUEkvhYAIEta8xiEN1z316v6JfVfPv0yQytKffIlGrOTL
-         i/dYlml/7jQwFAGqE9UTRRAVgUR6xsvj+muVHmbsLz6R2UP2ieHvhZ06EyuN/uxc8wmE
-         aZQveolzZ95gUmLAQIGHDzWfNH/SS0V1weee+/GhAK+G1Z082+XevzDSzrnCwUdtZ/Kw
-         bxEEAQrHKKPCcnWJXW9kqFHOJe4MjHPlbZG3DnVT/Zw1XaWusVUz8KhRyHeig550SOdx
-         7K7KwHIvh43vAyOFB6YXDqqqGLMBMlbmZM1syukBq7pUiyppC6MjU3Y2VIGujvrEBN8e
-         WbWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVa8+IyNM4k1LGK0ANzbNSeuhZviKRfedu24/gtBkLcTTiT3yW6OCT8ZvTENw2itPbCrifhMjgSo31JMxg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQJsFUXVgKUuMfjLT0e/yAwSNTQy6NrrEUBnRoXIjLbzEzDVVI
-	WFiMyw8FIBHsuE1VifGYutKuuAWOkqPXKBebm3o+E1qnwYXrp6aEkOml
-X-Gm-Gg: ASbGncvGxcbXbChmTD8qnm0cSO2AwYzp3uzQDwn7mb+nWa9gl7h8Hml4mtCkgcVrgmx
-	Gv8IVo1nh4xVGvzCNJSlt2slVisaxTed6PgsTNz3nh2cdI4iGBgzwgHZ8BqByKxLEkddMcDeyDD
-	odS36PFMSNPFie2DcnMXpRUKN5woAPcrROhjDh1Air4a13qDcJvQbGOWsE1QZpLqwWc3lPk1teG
-	p5941oIxoFYVXH8ADc0yc7IZzoWUKGlX/A9tFc0x/NJRlMtsTqhXGm/zlPsxSSbx49noFs8+O89
-	o5YSM0d3xlSJ1uEl8W/1TuCGX4AfGWbWHqMy2sXY7Vsit/gn//sc5/mHSm29RY61eq0a5suY8E8
-	6Km0qJ9Nw8cKX83OdRLNmz2MikcsGuq5qVkwudHwntpjCV2BqrjSVKHMlS9Zwvr9vRfCEdJEGX5
-	o12xo=
-X-Google-Smtp-Source: AGHT+IEQ5375x2wAPSKC6RY36q65Xq6o1ABPfooltKbLM5TnVL2vpALRNQnKbvej+kaD3bTB+gwZ+Q==
-X-Received: by 2002:a17:90b:4b0f:b0:32e:8c14:5cd2 with SMTP id 98e67ed59e1d1-33bcf8faac8mr15518129a91.28.1760944081925;
-        Mon, 20 Oct 2025 00:08:01 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33d5deae553sm7219872a91.21.2025.10.20.00.08.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 00:08:00 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 123104241816; Mon, 20 Oct 2025 14:07:57 +0700 (WIB)
-Date: Mon, 20 Oct 2025 14:07:57 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 03/17] lib/crypto: Add SHA3-224, SHA3-256, SHA3-384,
- SHA3-512, SHAKE128, SHAKE256
-Message-ID: <aPXfzd0KBNg-MjXi@archie.me>
-References: <20251020005038.661542-1-ebiggers@kernel.org>
- <20251020005038.661542-4-ebiggers@kernel.org>
+	s=arc-20240116; t=1760955105; c=relaxed/simple;
+	bh=GTy5Z9KYNiPcjptdrJUxyn4j9Jc8zlzn0Dl9Gd9a+kg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TOqDkVvF9cxDICoJmiwUNZcH+PvZwp1ssrto0HkgPaq0a5Ptkvq1SOkkcm4Bs2ZLUzW7+7P+oeiGETXzuFGEhZyT/yCeUiJEUaa9FiurQHlykB6iPvNT+82gXJ7D4rfknwMZrStOYJk1QroA8NbXpKumvhdswlhOceiQWJQJgak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from DESKTOP-L0HPE2S (unknown [124.16.141.245])
+	by APP-01 (Coremail) with SMTP id qwCowADnPaDLCvZoHdfdEQ--.2307S2;
+	Mon, 20 Oct 2025 18:11:23 +0800 (CST)
+From: Haotian Zhang <vulab@iscas.ac.cn>
+To: neal_liu@aspeedtech.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: joel@jms.id.au,
+	andrew@codeconstruct.com.au,
+	linux-aspeed@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Haotian Zhang <vulab@iscas.ac.cn>
+Subject: [PATCH] crypto: aspeed - fix double free caused by devm
+Date: Mon, 20 Oct 2025 18:11:09 +0800
+Message-ID: <20251020101109.1030-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="bwyeZRG0SF5QekIi"
-Content-Disposition: inline
-In-Reply-To: <20251020005038.661542-4-ebiggers@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowADnPaDLCvZoHdfdEQ--.2307S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr18AFWfAr4DKrWUZr48Xrb_yoW8Gry5pa
+	yrJ3yFkFW7JF45GFWUJayvqF15J3y5t3yagayxG3W7X3y3JrnYqFZaka1jvFW5AFWkuF1I
+	yF4DJr1UuFn8uFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9G14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwVW8twCF04k20xvY0x0EwIxGrw
+	CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
+	14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
+	IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxK
+	x2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI
+	0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbQVyDUUUUU==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCQ4BA2j12CK++wAAsn
 
+The clock obtained via devm_clk_get_enabled() is automatically managed
+by devres and will be disabled and freed on driver detach. Manually
+calling clk_disable_unprepare() in error path and remove function
+causes double free.
 
---bwyeZRG0SF5QekIi
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Remove the manual clock cleanup in both aspeed_acry_probe()'s error
+path and aspeed_acry_remove().
 
-On Sun, Oct 19, 2025 at 05:50:24PM -0700, Eric Biggers wrote:
-> +The SHA-3 algorithm base, as specified in NIST FIPS-202[1], provides a n=
-umber
-> +of specific variants all based on the same basic algorithm (the Keccak s=
-ponge
-> +function and permutation).  The differences between them are: the "rate"=
- (how
-> +much of the common state buffer gets updated with new data between invoc=
-ations
+Fixes: 2f1cf4e50c95 ("crypto: aspeed - Add ACRY RSA driver")
+Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
+---
+ drivers/crypto/aspeed/aspeed-acry.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Use reST footnotes, like:
+diff --git a/drivers/crypto/aspeed/aspeed-acry.c b/drivers/crypto/aspeed/aspeed-acry.c
+index 8d1c79aaca07..5993bcba9716 100644
+--- a/drivers/crypto/aspeed/aspeed-acry.c
++++ b/drivers/crypto/aspeed/aspeed-acry.c
+@@ -787,7 +787,6 @@ static int aspeed_acry_probe(struct platform_device *pdev)
+ err_engine_rsa_start:
+ 	crypto_engine_exit(acry_dev->crypt_engine_rsa);
+ clk_exit:
+-	clk_disable_unprepare(acry_dev->clk);
+ 
+ 	return rc;
+ }
+@@ -799,7 +798,6 @@ static void aspeed_acry_remove(struct platform_device *pdev)
+ 	aspeed_acry_unregister(acry_dev);
+ 	crypto_engine_exit(acry_dev->crypt_engine_rsa);
+ 	tasklet_kill(&acry_dev->done_task);
+-	clk_disable_unprepare(acry_dev->clk);
+ }
+ 
+ MODULE_DEVICE_TABLE(of, aspeed_acry_of_matches);
+-- 
+2.25.1
 
----- >8 ----
-diff --git a/Documentation/crypto/sha3.rst b/Documentation/crypto/sha3.rst
-index c27da98c89b7f8..ae1fd3e01e34c2 100644
---- a/Documentation/crypto/sha3.rst
-+++ b/Documentation/crypto/sha3.rst
-@@ -18,7 +18,7 @@ SHA-3 Algorithm collection
- Overview
- =3D=3D=3D=3D=3D=3D=3D=3D
-=20
--The SHA-3 algorithm base, as specified in NIST FIPS-202[1], provides a num=
-ber
-+The SHA-3 algorithm base, as specified in NIST FIPS-202 [1]_, provides a n=
-umber
- of specific variants all based on the same basic algorithm (the Keccak spo=
-nge
- function and permutation).  The differences between them are: the "rate" (=
-how
- much of the common state buffer gets updated with new data between invocat=
-ions
-@@ -136,7 +136,7 @@ should use the much more comprehensive KUnit test suite=
- instead.
- References
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=20
--[1] https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
-+.. [1] https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
-=20
-=20
-=20
-> +If selectable algorithms are required then the crypto_hash API may be us=
-ed
-> +instead as this binds each algorithm to a specific C type.
-
-What is crypto_hash API then? I can't find any of its documentation beside
-being mentioned here.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---bwyeZRG0SF5QekIi
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaPXfxAAKCRD2uYlJVVFO
-o3A4AP9bdkVnmtIfCagfxHcW5eGHSyGy7zxDqFUTIe8b2dhvVAD+KVzQDxqnujqm
-eYhwNKRJG53xvL9m37FLDKGqqZLtLw0=
-=VJti
------END PGP SIGNATURE-----
-
---bwyeZRG0SF5QekIi--
