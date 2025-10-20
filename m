@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B18191F9C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E2E1A76BC;
 	Mon, 20 Oct 2025 00:53:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760921612; cv=none; b=URITJsuWDWVxsAMrNWcPIyKk8dPyuWbt5xeleJsCxxsA/8fB35GU558uXPeT5n3xJCsLBMKGeTHsr3ACWw0rSI2g8qijMG08Yl/EvtFy5P/vo+8Xl5OuQUCFVs+nb8NWEbzVD9LsiwhML2W22+Xe1Li9IyarALKylrYpPScHIRM=
+	t=1760921613; cv=none; b=IrD+95Uf7qhViYsjo4CWrrNUVD5UG/OXeG+wyNzpQ5v21lLj/LWpWqOMxolP7jDw3178Ea1gD/ZQHzsRD513OWLyjFrdh3pvKIVtHXeoIYsCDDgnUcX9nl+ITBgV4BIjyBQ+1hyTy6x79SAf1pgiizPrWacTNeDZoNyRaG3ObJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760921612; c=relaxed/simple;
-	bh=Y9Gh5NX+Xkq+eNV4N4mdP/PaI0Z1KJcE1oP/YqXj9K4=;
+	s=arc-20240116; t=1760921613; c=relaxed/simple;
+	bh=TSUPKbwNLbb7mhNbu9L6HinZjxHA1TP1J2/JSwQ69+o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pkYS2+DWF8m4bsvIGz44JXDs0H2j4A9J0UgpKpkCtTfx5bUa9+F38yUD39n1y59C/fFEN28dooYV3xoJ/EqkIq9Wy0/wvcjl008j7Cfa1Wfo14iM97b36P5X1wgTdepCgZ7xE7mgrFIDFwstfGKMD7Pr/3gS65fgxpzrV9SHTT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NBOZRs3E; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=lt/3jG6vtfp2xNXwQQMB/NgWqwnnYMQOpQUoV/bcuiRaHHAtOZxRxRZJ+UleyqdJNX6S1R//0P+ObjDAEdx6A4j6yanDK8QCjjX8vo2M/1F9ROB0HUuO7bNbYelaHGryhxnprKW56M4EblpMuCnJWoO6SgITNH2VhIIQp53FBGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o3rU/5QW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NBOZRs3E"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3551C4AF09;
-	Mon, 20 Oct 2025 00:53:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o3rU/5QW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B6E1C113D0;
+	Mon, 20 Oct 2025 00:53:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1760921612;
-	bh=Y9Gh5NX+Xkq+eNV4N4mdP/PaI0Z1KJcE1oP/YqXj9K4=;
+	bh=TSUPKbwNLbb7mhNbu9L6HinZjxHA1TP1J2/JSwQ69+o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NBOZRs3E1gzSfg8V/39IG+n9ZwkE5r4um/mONt1VG59Z72gZiYvq58iD3U056ONN/
-	 LwL4JQiL/xjwShE9dXDUeVVnBtzcldXunITVcYU7JHlEnq3e5gfhkCTcW0XRCDqeU9
-	 3KWzvkRHwhRJgNEdHkIuAUIlw2vDAJx/LEOH6ll6Yt5vihODVzZ10/EQoHCUbLfhrT
-	 2a6yW9jP9qh7CdRObBczszygoV2l8BLngr9suXD7wCO2Etb5xjftdzzgWa0trwrZ1Q
-	 BS710aDApMwShoFhhbz5sCc1JglsWK+VXhd4oftKW/pvzVNFMv1qdC35132kgxboJ6
-	 u9DBQ7edEzpmg==
+	b=o3rU/5QWIxEz/SJlv0INtTPIO8SahTbcLR5YnA1j8KGobBvcuYKZyMZj/6uFoEhmr
+	 dmc/KBdlm1jdOKogUbfx2oCPDiwiMsReEhsEkvMr8nXrNotGlxBVH+PWZNIl6zPHXX
+	 UviGV9j0yHXwJOJp8S/VzCqeRTDMqPKUj0AlPMobVLo2TSGjHd9vGJqc+DyVaqxwVa
+	 LKRGVl/SV574HPIgAlNslrefv4kKsPXiH+IRGipWIbrMPoQtDVOR/KgZCpNk56+7A5
+	 y5UPX61iygmt9y1F5M8ITlF6BwmY9k1bFaJbDxvnG244+mPh6+gztopsvoa/LWZQCR
+	 cJ+B1wJmtA2Rw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -34,14 +34,14 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-s390@vger.kernel.org,
-	Harald Freudenberger <freude@linux.ibm.com>,
 	Eric Biggers <ebiggers@kernel.org>,
-	Holger Dengler <dengler@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 01/17] s390/sha3: Rename conflicting functions
-Date: Sun, 19 Oct 2025 17:50:22 -0700
-Message-ID: <20251020005038.661542-2-ebiggers@kernel.org>
+Subject: [PATCH 02/17] arm64/sha3: Rename conflicting functions
+Date: Sun, 19 Oct 2025 17:50:23 -0700
+Message-ID: <20251020005038.661542-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.1.dirty
 In-Reply-To: <20251020005038.661542-1-ebiggers@kernel.org>
 References: <20251020005038.661542-1-ebiggers@kernel.org>
@@ -55,240 +55,114 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-Rename the s390 sha3_* functions to have an "s390_" prefix to avoid
+Rename the arm64 sha3_* functions to have an "arm64_" prefix to avoid
 conflict with generic code.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-By: Harald Freudenberger <freude@linux.ibm.com>
 cc: Eric Biggers <ebiggers@kernel.org>
 cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
 cc: Ard Biesheuvel <ardb@kernel.org>
-cc: Holger Dengler <dengler@linux.ibm.com>
+cc: Catalin Marinas <catalin.marinas@arm.com>
+cc: Will Deacon <will@kernel.org>
 cc: Herbert Xu <herbert@gondor.apana.org.au>
 cc: Stephan Mueller <smueller@chronox.de>
 cc: linux-crypto@vger.kernel.org
-cc: linux-s390@vger.kernel.org
-Link: https://lore.kernel.org/r/20251017144311.817771-2-dhowells@redhat.com
+cc: linux-arm-kernel@lists.infradead.org
+Link: https://lore.kernel.org/r/20251017144311.817771-3-dhowells@redhat.com
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/s390/crypto/sha3_256_s390.c | 26 +++++++++++++-------------
- arch/s390/crypto/sha3_512_s390.c | 26 +++++++++++++-------------
- 2 files changed, 26 insertions(+), 26 deletions(-)
+ arch/arm64/crypto/sha3-ce-glue.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/arch/s390/crypto/sha3_256_s390.c b/arch/s390/crypto/sha3_256_s390.c
-index 03bb4f4bab701..fd5ecae60a572 100644
---- a/arch/s390/crypto/sha3_256_s390.c
-+++ b/arch/s390/crypto/sha3_256_s390.c
-@@ -17,11 +17,11 @@
- #include <linux/module.h>
- #include <linux/string.h>
- 
- #include "sha.h"
- 
--static int sha3_256_init(struct shash_desc *desc)
-+static int s390_sha3_256_init(struct shash_desc *desc)
- {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
- 
- 	sctx->first_message_part = test_facility(86);
- 	if (!sctx->first_message_part)
-@@ -30,11 +30,11 @@ static int sha3_256_init(struct shash_desc *desc)
- 	sctx->func = CPACF_KIMD_SHA3_256;
- 
- 	return 0;
- }
- 
--static int sha3_256_export(struct shash_desc *desc, void *out)
-+static int s390_sha3_256_export(struct shash_desc *desc, void *out)
- {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
- 	union {
- 		u8 *u8;
- 		u64 *u64;
-@@ -48,11 +48,11 @@ static int sha3_256_export(struct shash_desc *desc, void *out)
- 	for (i = 0; i < SHA3_STATE_SIZE / 8; i++)
- 		put_unaligned(le64_to_cpu(sctx->sha3.state[i]), p.u64++);
- 	return 0;
- }
- 
--static int sha3_256_import(struct shash_desc *desc, const void *in)
-+static int s390_sha3_256_import(struct shash_desc *desc, const void *in)
- {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
- 	union {
- 		const u8 *u8;
- 		const u64 *u64;
-@@ -66,26 +66,26 @@ static int sha3_256_import(struct shash_desc *desc, const void *in)
- 	sctx->func = CPACF_KIMD_SHA3_256;
- 
- 	return 0;
- }
- 
--static int sha3_224_import(struct shash_desc *desc, const void *in)
-+static int s390_sha3_224_import(struct shash_desc *desc, const void *in)
- {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
- 
--	sha3_256_import(desc, in);
-+	s390_sha3_256_import(desc, in);
- 	sctx->func = CPACF_KIMD_SHA3_224;
- 	return 0;
- }
- 
- static struct shash_alg sha3_256_alg = {
- 	.digestsize	=	SHA3_256_DIGEST_SIZE,	   /* = 32 */
--	.init		=	sha3_256_init,
-+	.init		=	s390_sha3_256_init,
- 	.update		=	s390_sha_update_blocks,
- 	.finup		=	s390_sha_finup,
--	.export		=	sha3_256_export,
--	.import		=	sha3_256_import,
-+	.export		=	s390_sha3_256_export,
-+	.import		=	s390_sha3_256_import,
- 	.descsize	=	S390_SHA_CTX_SIZE,
- 	.statesize	=	SHA3_STATE_SIZE,
- 	.base		=	{
- 		.cra_name	 =	"sha3-256",
- 		.cra_driver_name =	"sha3-256-s390",
-@@ -94,26 +94,26 @@ static struct shash_alg sha3_256_alg = {
- 		.cra_blocksize	 =	SHA3_256_BLOCK_SIZE,
- 		.cra_module	 =	THIS_MODULE,
- 	}
- };
- 
--static int sha3_224_init(struct shash_desc *desc)
-+static int s390_sha3_224_init(struct shash_desc *desc)
- {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
- 
--	sha3_256_init(desc);
-+	s390_sha3_256_init(desc);
- 	sctx->func = CPACF_KIMD_SHA3_224;
- 	return 0;
- }
- 
- static struct shash_alg sha3_224_alg = {
- 	.digestsize	=	SHA3_224_DIGEST_SIZE,
--	.init		=	sha3_224_init,
-+	.init		=	s390_sha3_224_init,
- 	.update		=	s390_sha_update_blocks,
- 	.finup		=	s390_sha_finup,
--	.export		=	sha3_256_export, /* same as for 256 */
--	.import		=	sha3_224_import, /* function code different! */
-+	.export		=	s390_sha3_256_export, /* same as for 256 */
-+	.import		=	s390_sha3_224_import, /* function code different! */
- 	.descsize	=	S390_SHA_CTX_SIZE,
- 	.statesize	=	SHA3_STATE_SIZE,
- 	.base		=	{
- 		.cra_name	 =	"sha3-224",
- 		.cra_driver_name =	"sha3-224-s390",
-diff --git a/arch/s390/crypto/sha3_512_s390.c b/arch/s390/crypto/sha3_512_s390.c
-index a5c9690eecb19..f4b52a3a04339 100644
---- a/arch/s390/crypto/sha3_512_s390.c
-+++ b/arch/s390/crypto/sha3_512_s390.c
-@@ -16,11 +16,11 @@
- #include <linux/module.h>
- #include <linux/string.h>
- 
- #include "sha.h"
- 
--static int sha3_512_init(struct shash_desc *desc)
-+static int s390_sha3_512_init(struct shash_desc *desc)
- {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
- 
- 	sctx->first_message_part = test_facility(86);
- 	if (!sctx->first_message_part)
-@@ -29,11 +29,11 @@ static int sha3_512_init(struct shash_desc *desc)
- 	sctx->func = CPACF_KIMD_SHA3_512;
- 
- 	return 0;
- }
- 
--static int sha3_512_export(struct shash_desc *desc, void *out)
-+static int s390_sha3_512_export(struct shash_desc *desc, void *out)
- {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
- 	union {
- 		u8 *u8;
- 		u64 *u64;
-@@ -47,11 +47,11 @@ static int sha3_512_export(struct shash_desc *desc, void *out)
- 	for (i = 0; i < SHA3_STATE_SIZE / 8; i++)
- 		put_unaligned(le64_to_cpu(sctx->sha3.state[i]), p.u64++);
- 	return 0;
- }
- 
--static int sha3_512_import(struct shash_desc *desc, const void *in)
-+static int s390_sha3_512_import(struct shash_desc *desc, const void *in)
- {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
- 	union {
- 		const u8 *u8;
- 		const u64 *u64;
-@@ -65,26 +65,26 @@ static int sha3_512_import(struct shash_desc *desc, const void *in)
- 	sctx->func = CPACF_KIMD_SHA3_512;
- 
- 	return 0;
- }
- 
--static int sha3_384_import(struct shash_desc *desc, const void *in)
-+static int s390_sha3_384_import(struct shash_desc *desc, const void *in)
- {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
- 
--	sha3_512_import(desc, in);
-+	s390_sha3_512_import(desc, in);
- 	sctx->func = CPACF_KIMD_SHA3_384;
- 	return 0;
- }
- 
- static struct shash_alg sha3_512_alg = {
- 	.digestsize	=	SHA3_512_DIGEST_SIZE,
--	.init		=	sha3_512_init,
-+	.init		=	s390_sha3_512_init,
- 	.update		=	s390_sha_update_blocks,
- 	.finup		=	s390_sha_finup,
--	.export		=	sha3_512_export,
--	.import		=	sha3_512_import,
-+	.export		=	s390_sha3_512_export,
-+	.import		=	s390_sha3_512_import,
- 	.descsize	=	S390_SHA_CTX_SIZE,
- 	.statesize	=	SHA3_STATE_SIZE,
- 	.base		=	{
- 		.cra_name	 =	"sha3-512",
- 		.cra_driver_name =	"sha3-512-s390",
-@@ -95,26 +95,26 @@ static struct shash_alg sha3_512_alg = {
- 	}
- };
- 
+diff --git a/arch/arm64/crypto/sha3-ce-glue.c b/arch/arm64/crypto/sha3-ce-glue.c
+index b4f1001046c9a..426d8044535ab 100644
+--- a/arch/arm64/crypto/sha3-ce-glue.c
++++ b/arch/arm64/crypto/sha3-ce-glue.c
+@@ -29,11 +29,11 @@ MODULE_ALIAS_CRYPTO("sha3-384");
  MODULE_ALIAS_CRYPTO("sha3-512");
  
--static int sha3_384_init(struct shash_desc *desc)
-+static int s390_sha3_384_init(struct shash_desc *desc)
- {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
+ asmlinkage int sha3_ce_transform(u64 *st, const u8 *data, int blocks,
+ 				 int md_len);
  
--	sha3_512_init(desc);
-+	s390_sha3_512_init(desc);
- 	sctx->func = CPACF_KIMD_SHA3_384;
- 	return 0;
+-static int sha3_update(struct shash_desc *desc, const u8 *data,
++static int arm64_sha3_update(struct shash_desc *desc, const u8 *data,
+ 		       unsigned int len)
+ {
+ 	struct sha3_state *sctx = shash_desc_ctx(desc);
+ 	struct crypto_shash *tfm = desc->tfm;
+ 	unsigned int bs, ds;
+@@ -53,12 +53,12 @@ static int sha3_update(struct shash_desc *desc, const u8 *data,
+ 		blocks = rem;
+ 	} while (blocks);
+ 	return len;
  }
  
- static struct shash_alg sha3_384_alg = {
- 	.digestsize	=	SHA3_384_DIGEST_SIZE,
--	.init		=	sha3_384_init,
-+	.init		=	s390_sha3_384_init,
- 	.update		=	s390_sha_update_blocks,
- 	.finup		=	s390_sha_finup,
--	.export		=	sha3_512_export, /* same as for 512 */
--	.import		=	sha3_384_import, /* function code different! */
-+	.export		=	s390_sha3_512_export, /* same as for 512 */
-+	.import		=	s390_sha3_384_import, /* function code different! */
- 	.descsize	=	S390_SHA_CTX_SIZE,
- 	.statesize	=	SHA3_STATE_SIZE,
- 	.base		=	{
- 		.cra_name	 =	"sha3-384",
- 		.cra_driver_name =	"sha3-384-s390",
+-static int sha3_finup(struct shash_desc *desc, const u8 *src, unsigned int len,
+-		      u8 *out)
++static int arm64_sha3_finup(struct shash_desc *desc, const u8 *src, unsigned int len,
++			    u8 *out)
+ {
+ 	struct sha3_state *sctx = shash_desc_ctx(desc);
+ 	struct crypto_shash *tfm = desc->tfm;
+ 	__le64 *digest = (__le64 *)out;
+ 	u8 block[SHA3_224_BLOCK_SIZE];
+@@ -88,48 +88,48 @@ static int sha3_finup(struct shash_desc *desc, const u8 *src, unsigned int len,
+ }
+ 
+ static struct shash_alg algs[] = { {
+ 	.digestsize		= SHA3_224_DIGEST_SIZE,
+ 	.init			= crypto_sha3_init,
+-	.update			= sha3_update,
+-	.finup			= sha3_finup,
++	.update			= arm64_sha3_update,
++	.finup			= arm64_sha3_finup,
+ 	.descsize		= SHA3_STATE_SIZE,
+ 	.base.cra_name		= "sha3-224",
+ 	.base.cra_driver_name	= "sha3-224-ce",
+ 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
+ 	.base.cra_blocksize	= SHA3_224_BLOCK_SIZE,
+ 	.base.cra_module	= THIS_MODULE,
+ 	.base.cra_priority	= 200,
+ }, {
+ 	.digestsize		= SHA3_256_DIGEST_SIZE,
+ 	.init			= crypto_sha3_init,
+-	.update			= sha3_update,
+-	.finup			= sha3_finup,
++	.update			= arm64_sha3_update,
++	.finup			= arm64_sha3_finup,
+ 	.descsize		= SHA3_STATE_SIZE,
+ 	.base.cra_name		= "sha3-256",
+ 	.base.cra_driver_name	= "sha3-256-ce",
+ 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
+ 	.base.cra_blocksize	= SHA3_256_BLOCK_SIZE,
+ 	.base.cra_module	= THIS_MODULE,
+ 	.base.cra_priority	= 200,
+ }, {
+ 	.digestsize		= SHA3_384_DIGEST_SIZE,
+ 	.init			= crypto_sha3_init,
+-	.update			= sha3_update,
+-	.finup			= sha3_finup,
++	.update			= arm64_sha3_update,
++	.finup			= arm64_sha3_finup,
+ 	.descsize		= SHA3_STATE_SIZE,
+ 	.base.cra_name		= "sha3-384",
+ 	.base.cra_driver_name	= "sha3-384-ce",
+ 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
+ 	.base.cra_blocksize	= SHA3_384_BLOCK_SIZE,
+ 	.base.cra_module	= THIS_MODULE,
+ 	.base.cra_priority	= 200,
+ }, {
+ 	.digestsize		= SHA3_512_DIGEST_SIZE,
+ 	.init			= crypto_sha3_init,
+-	.update			= sha3_update,
+-	.finup			= sha3_finup,
++	.update			= arm64_sha3_update,
++	.finup			= arm64_sha3_finup,
+ 	.descsize		= SHA3_STATE_SIZE,
+ 	.base.cra_name		= "sha3-512",
+ 	.base.cra_driver_name	= "sha3-512-ce",
+ 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
+ 	.base.cra_blocksize	= SHA3_512_BLOCK_SIZE,
 -- 
 2.51.1.dirty
 
