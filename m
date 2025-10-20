@@ -1,141 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABAF13C3CD;
-	Mon, 20 Oct 2025 17:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86407333739
+	for <linux-crypto@vger.kernel.org>; Mon, 20 Oct 2025 21:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760983149; cv=none; b=sYDevW2ULrC3tBFoJ0iinC4pEwO0nKeTFgh/kuEUZGEx0Uy6qVZN88K6dF2GVqa6L678I5y/A4rv7yk0rvTk7eVFq6yvCoxfnyO6yWTZDJwml/QUuF9vc8VhU1cxy44LAGcsfNY6SvA6X/TjjVzalHYjgovMFZzIQ7ZuvTdUC70=
+	t=1760994450; cv=none; b=FcFIW0KZ6iBXoEhPUmujbcRRuUxhhpunLEPXxIXPNXHwCCk5Ov9mIwURYbcrEuTdO4+gB1JyFndsbA/g+ZBX7svvCFvUX8Tk/PAk2uUtJfwTnipKu8tVDeqNzdsnU2FaHQBhbr8WT+gYM1pfjrJsdoelCA3vLgzaV1I7xrdOMik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760983149; c=relaxed/simple;
-	bh=x7GUYv8Ms47fFopUIi3Wz6TTbTv7Y2GnvOK59yf3mcs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IWS2kr9d/YTHlCHgNKDkq2/LRkiBl19kVwhJlwGCcjm/WC0nIP7NZPCI+2vezC7QNJdo42CAe3iMqEW1z8mxOHo3RrAFKfEIrz/B+oOFs7JrAQ2EFRb1EhgzvSzDKmiHkHsMQLiHVGc713y7iAi7M6qUvDg8V4idb03Hn9NXHPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pIwu3N3R; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pIwu3N3R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0F22C4CEF9;
-	Mon, 20 Oct 2025 17:59:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760983149;
-	bh=x7GUYv8Ms47fFopUIi3Wz6TTbTv7Y2GnvOK59yf3mcs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pIwu3N3RIH04/zJHOEAoM7ocAG9NiaDVkyJ306sift4cHMx3Tb2f/ippaSK8Fg06m
-	 6IQXodbTyF3Qn2c8aDBNoAVRP6uZT4YfvSbV/KeUzZiYZHUyMEJW0Pbfi8/fKQNP3+
-	 pDGdjuzWzXILebjnLWC8McdJmoz/tKPyQwLAhX/T0UQmYRShJMBWRvW45Z1d1FMa6W
-	 s2Dn0RtbK5qByuihJwoqQzl2p1ofOCvEBa9Bfw1Q3yhHuxwDJn4cH0vmPgAfOXoB9i
-	 iMRB0KkL4qetti2maqpV8j/O4nn5UDYIT0eifLYn9cGmrEOg+7i5oDkN/hHaIRQa4v
-	 MoYDtbKU4Sn8A==
-Date: Mon, 20 Oct 2025 10:57:36 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Holger Dengler <dengler@linux.ibm.com>
-Cc: David Howells <dhowells@redhat.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Harald Freudenberger <freude@linux.ibm.com>
-Subject: Re: [PATCH 15/17] lib/crypto: s390/sha3: Migrate optimized code into
- library
-Message-ID: <20251020175736.GC1644@sol>
-References: <20251020005038.661542-1-ebiggers@kernel.org>
- <20251020005038.661542-16-ebiggers@kernel.org>
- <51fc91b6-3a6e-44f7-ae93-aef0bcb48964@linux.ibm.com>
+	s=arc-20240116; t=1760994450; c=relaxed/simple;
+	bh=5/CMwqL4rKkh5iFQB2whmHx7BiXLXchrkKqyebLv2Vs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QglV3tAm/mxbqbSsFdzg7BaTvTHaL8U0HlrYX2Bp4l5MgADFUdw0sn+MHVVCeLlhQKRuqW40ncmab/tsZbk1q79sLjOSrQpTz6Oa0LbLllwZ6L9aPZfkJ2H9LpB2Sfr9aufdEBvS6YvPJLR6TJ9nSlTBR1rE+vbucvw1s/I/uyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-430b3c32f75so44024625ab.0
+        for <linux-crypto@vger.kernel.org>; Mon, 20 Oct 2025 14:07:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760994447; x=1761599247;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7MP4MxmW3g2lLE0ZEpBNI9vD0O79wKy2YFQcAlj3WJw=;
+        b=g7UXZRxianiCJn3obGlLpyjbvERdgfKThdKoh9czinzkd4BA4JmHEBVR2Cq5duQK/1
+         aZ8dj8RJXq57fxjByDwlmNCCR/7VLho+F/1vx+5O8RuVklv18s2TDpzQRJXAmmc870yQ
+         HOAu5MGT9uSL7rnLF2V0A8Vx2erxlqhWizBQ/q7WUkxIL150oRdBcSF77+qNF09QKUlF
+         Elcbw0eHh/AYXIZ0kn9G4HQYUc8vKMCh5ngUwj8lc+i9vUBKrAUGMZbJhI090vjReqUK
+         bK3sy4FBuycLmiL9zgdgGHv+oElBS2JC2bxk8/F4cz9gt30d+spvvXVoH5izYQuH5taj
+         4XNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWuIpKzSIOMhySEbl/vPt/v5SQkZ3EEuTmZyVdSt/uA6KLtWKe7C2hH7nx9jQYe04cEBioiNz8/I+4nalI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzowvDTuUuN7Qqr4taNGLtRQTiG52a/aiFP/GhB46+ZZXUDVz2S
+	9OcUIOQJpeTbzBGtVnfd5Wb+FXQq6tTgVAuNzW5+st/gw9eLcNoLGk5dRoxXwVFYVAOqz7517TI
+	EKLaWQNLS/0IUXzZXALnJrvGNJF/eF/OJ9+iqjuNUe7fjhSjZu+8IXP0WaUU=
+X-Google-Smtp-Source: AGHT+IEPbiClZteklFQlevW//+LDYWwrgylqyu6ZXyPbaWziR5zzn8BbnI8rx4um9wuj8TF10rojGmwvuE0tYEYpBPXJIav+TXCD
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <51fc91b6-3a6e-44f7-ae93-aef0bcb48964@linux.ibm.com>
+X-Received: by 2002:a05:6e02:1a65:b0:430:aedb:3719 with SMTP id
+ e9e14a558f8ab-430c5203730mr190399425ab.4.1760994447398; Mon, 20 Oct 2025
+ 14:07:27 -0700 (PDT)
+Date: Mon, 20 Oct 2025 14:07:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68f6a48f.050a0220.91a22.0452.GAE@google.com>
+Subject: [syzbot] [crypto?] KMSAN: uninit-value in poly1305_blocks
+From: syzbot <syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Oct 20, 2025 at 04:00:42PM +0200, Holger Dengler wrote:
-> On 20/10/2025 02:50, Eric Biggers wrote:
-> > Instead of exposing the s390-optimized SHA-3 code via s390-specific
-> > crypto_shash algorithms, instead just implement the sha3_absorb_blocks()
-> > and sha3_keccakf() library functions.  This is much simpler, it makes
-> > the SHA-3 library functions be s390-optimized, and it fixes the
-> > longstanding issue where the s390-optimized SHA-3 code was disabled by
-> > default.  SHA-3 still remains available through crypto_shash, but
-> > individual architectures no longer need to handle it.
-> > 
-> > Note that the existing code used both CPACF_KIMD_SHA3_224 and
-> > CPACF_KIMD_SHA3_256 after checking for just CPACF_KIMD_SHA3_256, and
-> > similarly for 384 and 512.  I've preserved that behavior.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> The current code also cover a performance feature, which allows (on
-> supported hardware, e.g. z17) to skip the ICV initialization.
+Hello,
 
-I'm not sure if by "ICV" you mean "Integrity Check Value" or "Initial
-Chaining Value", but SHA-3 doesn't have either of those.  It just starts
-with a state of all zeroes.  I assume that skipping the
-zero-initialization of the state is what you're referring to?
+syzbot found the following issue on:
 
-> support has been introduced with 88c02b3f79a6 ("s390/sha3: Support
-> sha3 performance enhancements"). Unfortunately, this patch removes
-> this support. Was this intended?
+HEAD commit:    211ddde0823f Linux 6.18-rc2
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11af9734580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bbd3e7f3c2e28265
+dashboard link: https://syzkaller.appspot.com/bug?extid=01fcd39a0d90cdb0e3df
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11099492580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1096eb04580000
 
-For now, yes.  I should have explained more in the patch, sorry.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/46c24dbd5a18/disk-211ddde0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4d12e20e76d7/vmlinux-211ddde0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9e4b9dd5db28/bzImage-211ddde0.xz
 
-As currently proposed, lib/crypto/sha3.c supports arch-specific
-overrides of sha3_absorb_blocks() and sha3_keccakf().  Those cover the
-Keccak-f permutation which is by far the most performance critical part.
-This strategy is working well in the SHA-2, SHA-1, and MD5 libraries,
-which support the same level of arch overrides.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
 
-We could update lib/crypto/sha3.c to allow architectures to override
-more of the code.  But we need to consider the tradeoffs:
+=====================================================
+BUG: KMSAN: uninit-value in poly1305_blocks+0x1a9/0x5f0 lib/crypto/x86/poly1305.h:110
+ poly1305_blocks+0x1a9/0x5f0 lib/crypto/x86/poly1305.h:110
+ poly1305_update+0x169/0x400 lib/crypto/poly1305.c:50
+ poly_hash+0x9f3/0x1a00 crypto/chacha20poly1305.c:168
+ poly_genkey+0x3b6/0x450 crypto/chacha20poly1305.c:233
+ chacha_encrypt crypto/chacha20poly1305.c:269 [inline]
+ chachapoly_encrypt+0x48a/0x5c0 crypto/chacha20poly1305.c:284
+ crypto_aead_encrypt+0xe2/0x160 crypto/aead.c:91
+ tls_do_encryption net/tls/tls_sw.c:582 [inline]
+ tls_push_record+0x38c7/0x5810 net/tls/tls_sw.c:819
+ bpf_exec_tx_verdict+0x1a0c/0x26a0 net/tls/tls_sw.c:859
+ tls_sw_sendmsg_locked net/tls/tls_sw.c:1138 [inline]
+ tls_sw_sendmsg+0x3401/0x4560 net/tls/tls_sw.c:1281
+ inet6_sendmsg+0x26c/0x2a0 net/ipv6/af_inet6.c:659
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x145/0x3d0 net/socket.c:742
+ sock_write_iter+0x3a6/0x420 net/socket.c:1195
+ do_iter_readv_writev+0x9e1/0xc20 fs/read_write.c:-1
+ vfs_writev+0x52a/0x1500 fs/read_write.c:1057
+ do_writev+0x1b5/0x580 fs/read_write.c:1103
+ __do_sys_writev fs/read_write.c:1171 [inline]
+ __se_sys_writev fs/read_write.c:1168 [inline]
+ __x64_sys_writev+0x99/0xf0 fs/read_write.c:1168
+ x64_sys_call+0x24b1/0x3e30 arch/x86/include/generated/asm/syscalls_64.h:21
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-- Risk of bugs.  QEMU doesn't support the s390 SHA-3 instructions, so no
-  one except the s390 folks can test the code.  I can try to write code
-  for you, but I can't test it.  And the s390 SHA-3 code has had bugs;
-  see commits 992b7066800f, 68279380266a5, 73c2437109c3.
+Local variable desc created at:
+ poly_hash+0x11d/0x1a00 crypto/chacha20poly1305.c:135
+ poly_genkey+0x3b6/0x450 crypto/chacha20poly1305.c:233
 
-  The first priority should be correctness.
+CPU: 1 UID: 0 PID: 6030 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(none) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
+=====================================================
 
-- The proposed change to the init functions would cause the format of
-  'struct __sha3_ctx' to be architecture-dependent.  While we can do
-  that if really needed, it's something that's best avoided for
-  simplicity.  It opens up more opportunity for error.
 
-- As I mentioned, Keccak-f is by far the most performance critical part
-  anyway.  The initial state is just all zeroes, and initializing it is
-  very lightweight.  Also consider that these contexts are often on the
-  stack, and people increasingly set the "init all stack variables to
-  zero" kernel hardening option anyway.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-  I'll also note that commit 88c02b3f79a6 has no performance data in it.
-  So it's not clear that it actually helped much.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-- The library has an optimization to greatly reduce the size of the
-  context: instead of buffering data separately, it just XOR's data into
-  the state.  So, if there's a sha3_*_init() followed by a sha3_update()
-  of less than 1 block, it will have to initialize the state anyway.  We
-  can delay it until that point on s390.  But again: complexity.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-- These potential additional s390 optimizations would presumably help
-  the most on short messages.  However, on short messages, merely
-  switching to the library often gives a large performance improvement
-  due to eliminating the very slow call to crypto_alloc_shash().  That's
-  actually a lot more important.
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
-I would suggest that we drop the sha3_*_init() optimization from
-consideration for now.  Providing overrides for the one-shot functions
-sha3_{224,256,384,512}() should be simpler as well as possibly a bit
-more useful, and I would suggest exploring that.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-I guess I can try to write the code for you again.  But again, without
-QEMU support I cannot test it.  The first priority in cryptography code
-is correctness, so that's not a great position to be in.
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-Note that for new optimized code I'm requiring QEMU support for the
-instructions it uses.  This one would only be allowed because code that
-used these instructions already existed in arch/s390/crypto/.
-
-> Please also add me and Harald Freudenberger to the cc: list for this patch.
-
-Will do, thanks.
-
-- Eric
+If you want to undo deduplication, reply with:
+#syz undup
