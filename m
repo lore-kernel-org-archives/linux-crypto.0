@@ -1,25 +1,25 @@
 Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE97524678F;
-	Tue, 21 Oct 2025 07:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958D428314A;
+	Tue, 21 Oct 2025 08:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761032051; cv=none; b=n0/X8rS5zhHmVPhh8pKwK2fCG17W56ZX19Pe0EFgb/muETq2djPg1NLE7TH4X94ERqnStRobxJyRJQV/clNQ0SFJyxs4McT8V1G1Tmnvyd7uz7qvrSvXRBAhvmeZipw6S4UqoUtYtuVhvO7cG1okJ5jVi7Dt74wpdUcu/sKYboc=
+	t=1761036058; cv=none; b=PHQsVIXeQ+oU3pFraOOjOfipC0sL/QmBfse0EJlBt5ISQSU1b1TNppa3SyN8wEUyMncT+/+HXKwNAHCuAVBvYU+6fd4UjbD9e44pVtivp/3REqa7GjDVJCYWZCocEtDEJFsfio/1v8dyTPObkSOTN+MTDiSNYnWtHhwbFHipw4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761032051; c=relaxed/simple;
-	bh=7Wa28TlMvvSz0WtFrF634en46SUmD/vMXOOAEphY/e0=;
+	s=arc-20240116; t=1761036058; c=relaxed/simple;
+	bh=hb5VcV0ET3l0QzSsWclmOpjmwF9VwY1uM8U2V3HfyDo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bI/4caVjIHndA8oYETLioTwpb3/aEeeTc4yF0YnR6mlmbb88avKPOeTgqkG9TlPUU9OwQllN7Vtsiyiu1iu+gDhNhssI+6ozVcjx5fwv2by/Dkfk+nJaQeF+4QB5XUeyyEL7sykOf9avVJrgJp0Cf39kU0LEY4B9zFyH+b52+pA=
+	 In-Reply-To:Content-Type; b=sh4u+IanLEeJyGmTmPDDj+6h96ejgVStCSLP2IsYAx8i77ucrNd1NBfNOXyG6KlutVVT1RU2w5O4vavORvIRrOi12Phi4TgQkNVljQM/yQ/W0uwr9Jpp10c2JAS4XjcG27/vg6f8DDFubjIHdvpJ+CpxMo8/Z1Zb1J3bTEUkt4U=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 4da09824ae5011f0a38c85956e01ac42-20251021
+X-UUID: a59aa16aae5911f0a38c85956e01ac42-20251021
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:e5b7ec79-23f7-4beb-8f9d-b617b2f56104,IP:0,UR
+X-CID-O-INFO: VERSION:1.3.6,REQID:5b1bc7ac-4984-447d-92b2-fdfde16de3db,IP:0,UR
 	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
 	elease,TS:0
-X-CID-META: VersionHash:a9d874c,CLOUDID:41a275d11e71e244c82dd71ca429188e,BulkI
+X-CID-META: VersionHash:a9d874c,CLOUDID:847313a20b3d4fb0a5562c6197ee2905,BulkI
 	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102,TC:nil,Content:0|52,EDM:
 	-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,
 	AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
@@ -27,14 +27,14 @@ X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 4da09824ae5011f0a38c85956e01ac42-20251021
+X-UUID: a59aa16aae5911f0a38c85956e01ac42-20251021
 X-User: xiaopei01@kylinos.cn
 Received: from [10.42.12.251] [(10.44.16.150)] by mailgw.kylinos.cn
 	(envelope-from <xiaopei01@kylinos.cn>)
 	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
-	with ESMTP id 1792766674; Tue, 21 Oct 2025 15:33:57 +0800
-Message-ID: <37764538-c4c9-482b-9cd0-8895fb973325@kylinos.cn>
-Date: Tue, 21 Oct 2025 15:33:54 +0800
+	with ESMTP id 109458862; Tue, 21 Oct 2025 16:40:50 +0800
+Message-ID: <e1b1df10-ce40-4135-93fc-69a1c6d9f32f@kylinos.cn>
+Date: Tue, 21 Oct 2025 16:40:47 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,8 +44,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] lib/crypto: poly1305: fix uninit-value in poly1305_blocks
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: Jason@zx2c4.com, ardb@kernel.org, ubizjak@gmail.com,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
  syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
 References: <751b3d80293a6f599bb07770afcef24f623c7da0.1761026343.git.xiaopei01@kylinos.cn>
  <20251021061511.GA2385@sol>
@@ -98,15 +97,15 @@ Content-Transfer-Encoding: 8bit
 >> Tested-by: syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
 >> Signed-off-by: Pei Xiao <xiaopei01@kylinos.cn>
 >> ---
+
+hi Eric,
+
+    thanks for your responce.
+
 > Thanks for the bug report.  It will first need to be confirmed that this
 > is actually an issue in lib/crypto/ rather than the calling code, and if
 > so, why poly1305_kunit doesn't catch it (even when run on an KMSAN
-> enabled kernel, which I've done).  
-Is this related to the compiler type? I see it was compiled with
-
-Debian clang version 20.1.8
-
-> And which commit it fixes.  I'm
+> enabled kernel, which I've done).  And which commit it fixes.  I'm
 > guessing it's most likely a KMSAN false positive that was exposed by
 > commit b646b782e522 dropping the dependency of the
 > architecture-optimized Poly1305 code on !KMSAN.  KMSAN doesn't know
@@ -120,18 +119,30 @@ Debian clang version 20.1.8
 > the assembly function that initializes the memory is called.  See
 > sha256_finup_2x_arch() for an example of that.  Note that more than one
 > architecture may need this. 
-So may  I send a patch by use 
 
-kmsan_unpoison_memory(out1, SHA256_DIGEST_SIZE); ?
+--- a/lib/crypto/poly1305.c
++++ b/lib/crypto/poly1305.c
+@@ -13,6 +13,7 @@
+ #include <linux/module.h>
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
++#include <linux/kmsan.h>
 
+ #ifdef CONFIG_CRYPTO_LIB_POLY1305_ARCH
+ #include "poly1305.h" /* $(SRCARCH)/poly1305.h */
+@@ -31,6 +32,7 @@ void poly1305_init(struct poly1305_desc_ctx *desc,
+        desc->s[3] = get_unaligned_le32(key + 28);
+        desc->buflen = 0;
+        poly1305_block_init(&desc->state, key);
++       kmsan_unpoison_memory(desc, sizeof(struct poly1305_desc_ctx));
+ }
+ EXPORT_SYMBOL(poly1305_init)
+
+how about this ? 
 
 >  If it ends up being too inconvenient, we
 > can make the architecture-optimized Poly1305 code depend on !KMSAN
 > again.  But preserving KMSAN coverage is preferable.
 >
 > - Eric
-
-thanks！
-
-Pei.
-
+thanks!
