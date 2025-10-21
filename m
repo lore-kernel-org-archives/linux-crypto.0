@@ -1,124 +1,73 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1F11EB5DB;
-	Tue, 21 Oct 2025 04:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15986149E17
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Oct 2025 04:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761019692; cv=none; b=nA6zPRUHOraW53NdB6AS2i76dz9wPVsgKpgmD9r+mTtnBzWba/vuLyhrt4Iy5EbBOCnJe8Iw7CC8EZRiiOb00A/mzv8ZXYKyUc4L2aPlSDXaz2Eh6jGK9pokVEJqufTqK1qvOyIt/69sTPLKbaZLq+2LS5Pht8dZ6KZCNfr9rO0=
+	t=1761021965; cv=none; b=l5fM0eH7cKpNWjC/e4HkVcDqhXoACLgdx+/iyfDf07RSIOrZDcjLSduxUkYLWGxZCwIwNCFudzeRmSzF/0/WSfei7sZcBPKmZGPjhG0Da8m/VwacW5vmj2Wf6BaR62aJsxcZW9UVU5nJftss5RMtWkc2yrafrroxMspksQbBzwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761019692; c=relaxed/simple;
-	bh=otCA/DNdOW+b41rKqMPvBAFFOBff1X+BHKvz77ZSenk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MKM+Tt9FtZheea7GMxaATsbD1uRnpujwxtyNBLuM1KoFXAs6G4iDm1BISrd9v9TUrmJlPDeRLXe83oeEEsfoNeeqDHTaVEb+OmUDyZudfwZRHE31uDdzyIzhbzXeFdhYhwTHTS1g07yKeNqMCQwNHlkPPwLSCb7QsjwSK16EyWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=M8h10v7q; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="M8h10v7q"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=FFfJ1T3gGeeywcD/IcU+HActRpSmxrKsGyO5NhVaCvU=; 
-	b=M8h10v7q9f5AGT5gKkSuaDbHCdisDtDGyY+dgX+D1L60SumcC4ZD4dqOz85VS/VJWQA04l0LNic
-	kBSiroNiN2e6tph/2kSuBLx9d6OcO30/U/QJTFYxwT1pg7Jw2974mXcZQkkUNESEFjQZiR7qoYR2g
-	TJLyMppS2wKL+gdqEEXjF/ePQlu7rJaxRBgjiLyYdsU2FhLI57Fp0Ld6pHbfPrFxFUKpdqc0ibkph
-	img2dTMvEgCVZitTgh7Kh7B2lJVzvdB/HD/dZEwP15yAHi1ToLEmd30lM2U7ToI8Aenrbsz3Hzgdx
-	Gyd6ASpb0L2/cF4e3icaAuUPduPf7V9uejYA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vB3fA-00EEef-2N;
-	Tue, 21 Oct 2025 12:07:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 21 Oct 2025 12:07:56 +0800
-Date: Tue, 21 Oct 2025 12:07:56 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Linux Crypto List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: [PATCH] KEYS: trusted: Pass argument by pointer in dump_options
-Message-ID: <aPcHHJ29mTHCzVjM@gondor.apana.org.au>
-References: <20251020140735.39084e85@canb.auug.org.au>
+	s=arc-20240116; t=1761021965; c=relaxed/simple;
+	bh=ARk+dXl3GJp829fATNzWdWTntrB3DUJx6d7EBiAx2hg=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=jPz+LpfL3yESwzvkGQtXQbeDW7HaYPg0OdzYD5nEvxQXd3qoLatvQ12yFgzv26xo2DicGZyg187eBmW/fZtCLQ3g610kzVWx6/66Bq+qBvLBf/c6QPKREnLGekKPVD9xARvbBo4zSK6pB6G16bATOob1qSbDDTh3OdZP70iOFCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-93e8839f138so314936439f.2
+        for <linux-crypto@vger.kernel.org>; Mon, 20 Oct 2025 21:46:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761021963; x=1761626763;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ov/NnCma+uLr4ou4mPJLWd11XV7/Qt/IINScC/AN+mI=;
+        b=Z2de1d9uMw68x+mL9qIviktIFOlpLEChW7bNp3Ie5tVaPLWz1xsWoXujNB4Ac58KoP
+         dKMGpxxdEdstdkOnNZM9CZa/mw9Vqe1xJ+YVELCVhmRyTESZ5WeBbW6PiBcCgP0SpTYd
+         cNN1lKGfam8APZNVanbHp1szJ+/KVL4SKml984ikqpuzk6+hM0PpQ6v/LvJlZKGq0LGA
+         m9Ix+J40H50I8z/Qm1Gdh+4nNJqH4OpForslZrW78PM/4by6K4MsgxM39qHHGkznxNXH
+         M/MSN4ccTAK35TBPWMzw54KFUyP+u7uyTPB6qeX5xcVYhgCOdY0tPca0bqa36lYKAyI4
+         rNCA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ1r6sWAoMKloWetw6X3r47dHbeTYV/jmXzsSomJTaL4JzMOds47Q8BbCq/EaacQzo8AMLduIIW9ckqY0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzw/BLX0pwm/3TZSMZfarq3F5U6V/d6cA0v8/eSwtgoob/zStXS
+	ZhQLWyW4rGiAtduUCvRv4fflB3YmSv9iJGWbbxdE2qxPQJHq6S62nGHsiJ6Yp0sAB46gcQH8UBB
+	PXvRFopAGLyGjjXw+Q5eKXOqFKVibA5E2BS6XAAHV5n0Vf/k7/BKDu0kYhKI=
+X-Google-Smtp-Source: AGHT+IHtHLdU4RZdjcnPEHKSIHzV8h2CMzpMI0ejwHCLtyeRB/GOhSmM/Iue0OC9qhphyW6/fHt8grXqO19BOIY6mcWWZqVX4NGX
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251020140735.39084e85@canb.auug.org.au>
+X-Received: by 2002:a05:6602:641c:b0:940:d475:315f with SMTP id
+ ca18e2360f4ac-940d475355amr1238712139f.11.1761021963260; Mon, 20 Oct 2025
+ 21:46:03 -0700 (PDT)
+Date: Mon, 20 Oct 2025 21:46:03 -0700
+In-Reply-To: <6556ef55c42ea17d82561b8182d9453b19d66a62.1761016077.git.xiaopei01@kylinos.cn>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68f7100b.a70a0220.3bf6c6.0000.GAE@google.com>
+Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in poly1305_blocks
+From: syzbot <syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, xiaopei01@kylinos.cn
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Oct 20, 2025 at 02:07:35PM +1100, Stephen Rothwell wrote:
-> Hi all,
-> 
-> After merging the crypto tree, today's linux-next build (x86_64
-> allmodconfig) produced this warning:
-> 
-> security/keys/trusted-keys/trusted_caam.c: In function 'dump_options':
-> security/keys/trusted-keys/trusted_caam.c:37:20: note: the ABI of passing struct with a flexible array member has changed in GCC 4.4
->    37 | static inline void dump_options(struct caam_pkey_info pkey_info)
->       |                    ^~~~~~~~~~~~
-> 
-> Introduced by commit
-> 
->   9eb25ca6c973 ("KEYS: trusted: caam based protected key")
-> 
-> I am not sure what to do about this.  It would be nice if we could
-> suppress the note as we do not support gcc 4.4 any more.  Otherwise,
-> I suspect that converting the pkey_info argument to a pointer will get
-> rid of the note.
+Hello,
 
-Yes let's change that into a pointer:
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
----8<---
-Instead of passing pkey_info into dump_options by value, using a
-pointer instead.
+Reported-by: syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
+Tested-by: syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
 
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Tested on:
 
-diff --git a/security/keys/trusted-keys/trusted_caam.c b/security/keys/trusted-keys/trusted_caam.c
-index 090099d1b04d..601943ce0d60 100644
---- a/security/keys/trusted-keys/trusted_caam.c
-+++ b/security/keys/trusted-keys/trusted_caam.c
-@@ -29,12 +29,12 @@ static const match_table_t key_tokens = {
- };
- 
- #ifdef CAAM_DEBUG
--static inline void dump_options(struct caam_pkey_info pkey_info)
-+static inline void dump_options(const struct caam_pkey_info *pkey_info)
- {
--	pr_info("key encryption algo %d\n", pkey_info.key_enc_algo);
-+	pr_info("key encryption algo %d\n", pkey_info->key_enc_algo);
- }
- #else
--static inline void dump_options(struct caam_pkey_info pkey_info)
-+static inline void dump_options(const struct caam_pkey_info *pkey_info)
- {
- }
- #endif
-@@ -108,7 +108,7 @@ static int trusted_caam_seal(struct trusted_key_payload *p, char *datablob)
- 		ret = get_pkey_options(datablob, &info.pkey_info);
- 		if (ret < 0)
- 			return 0;
--		dump_options(info.pkey_info);
-+		dump_options(&info.pkey_info);
- 	}
- 
- 	ret = caam_encap_blob(blobifier, &info);
-@@ -140,7 +140,7 @@ static int trusted_caam_unseal(struct trusted_key_payload *p, char *datablob)
- 		ret = get_pkey_options(datablob, &info.pkey_info);
- 		if (ret < 0)
- 			return 0;
--		dump_options(info.pkey_info);
-+		dump_options(&info.pkey_info);
- 
- 		p->key_len = p->blob_len + sizeof(struct caam_pkey_info);
- 		memcpy(p->key, &info.pkey_info, sizeof(struct caam_pkey_info));
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+commit:         6548d364 Merge tag 'cgroup-for-6.18-rc2-fixes' of git:..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1266fde2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bbd3e7f3c2e28265
+dashboard link: https://syzkaller.appspot.com/bug?extid=01fcd39a0d90cdb0e3df
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=13b58e7c580000
+
+Note: testing is done by a robot and is best-effort only.
