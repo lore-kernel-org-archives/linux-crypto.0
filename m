@@ -1,54 +1,51 @@
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF00533859C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8953385BB;
 	Tue, 21 Oct 2025 13:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761054614; cv=none; b=ry/TL3suwcOpXIgXOnvuFSyXBekvai8BcJnJaLnVDalm22xA6kuDi4qjpCzTPru04kRytOHCKsm4rH1z5WaZPhzYX9sLdXte03F5OdFgBAs2R5u+CUGajYVZN1sPoT8MtKN7f25lmklYv5PLILYoo68c6NtoSNYPqbkYGfQNd5E=
+	t=1761054614; cv=none; b=GuF5G2dfa4qzM1M0g5lbYGwIWNQ+j5NBH0UEXBn5bHct+lALlwWzOndVIup6ESi4eCpyAiMlAaNGZjigjn7YlwiK5vo/byWwmNiX17fKKhrANJB1FKPfClP+OijFarQJApjz4XbdrL3ECkb+D8JZYcBmHKw4crxwQkmOBso5ykI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1761054614; c=relaxed/simple;
-	bh=Qdg9FL6PkOVbcSXk+d4wy2mvqzBXFzljkk593XOfAGo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gm1qW0mVtYk6BljZbgh4e9MvfpjtW9PLJWDSAaitaHEqiggWOio9Y60HCYCFW3B4rVvq+qp8CGMZi1cCFRS/9QgwiSAY28hAGUVMkRjF1RhZ3crdqdXewRmutSiNQ0kzTblgLQKXp4Z4iSpMZWABs1QscO3XY4cinZH2kGM78KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Bq2Fj4Ca; arc=none smtp.client-ip=113.46.200.216
+	bh=S25G2AZzcgMcGlIiX0c+8ROaue2MIMhb9CwLPOFSdN4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SOBRVvYtob0NQSSdARKNncJkDcLvoxYWAsomTho3QEdzxU8yP71GHFOpyZZpKLD4GUQpzxPGGd3VntHYNLYnoRQA6nPLgF4GcQ/QYUzE3nrwVSTRvhsDyoV7RXIRV4zbbFm/iSJ/Y2XREVDxAedGTXQLDhcTvycYzIrEZPM9fKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=3u+gyWWJ; arc=none smtp.client-ip=113.46.200.217
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Bq2Fj4Ca"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="3u+gyWWJ"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=Vxmc6tMGMusZQB5aEkehobwbLkJE5tlzu+2w1I3v5kk=;
-	b=Bq2Fj4CaPytKEgyYD/Wya4O+a4QCxuA3ZXtVodQ4MZITM1imSW8lr6GNZ1CZw+7EpIffQVJrb
-	mvoNHi53ecogh30jqRusc0ZWZc05auR67vwp/J90FdeT4ICWj90gZlFGP1mJzCguG+4oacJAjtS
-	EPhRvgIfa9ItEWsV/zIu3QM=
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4crYYj0rpnz1T4HL;
-	Tue, 21 Oct 2025 21:49:13 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2EF36180B5A;
-	Tue, 21 Oct 2025 21:50:06 +0800 (CST)
+	bh=afOO440E+h5xHJ+e1TzERB4wQNYDt+r2P7A9Bix2Pck=;
+	b=3u+gyWWJMgMaTiyHlNmjXxSGPnavB/WBNxw29ieA2bnx28EtyDSIDHRUWqaWCh5yx9kMuMwe8
+	XR8xJtMUy+pZDmlZGmOzC0xJtjdd6ibGLx8xq9LkVcKuAkNgRDmTokNZXm2FBxYpylJ0ySJnmbV
+	w4lpV1D3roQK6MuvqKzafug=
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4crYYM1DfYzcZyT;
+	Tue, 21 Oct 2025 21:48:55 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id C4CED18007F;
+	Tue, 21 Oct 2025 21:50:04 +0800 (CST)
 Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 21 Oct 2025 21:50:05 +0800
+ 15.2.1544.11; Tue, 21 Oct 2025 21:50:04 +0800
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 21 Oct 2025 21:50:05 +0800
+ 15.2.1544.11; Tue, 21 Oct 2025 21:50:04 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <gregkh@linuxfoundation.org>, <zhangfei.gao@linaro.org>,
 	<wangzhou1@hisilicon.com>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<fanghao11@huawei.com>, <shenyang39@huawei.com>, <liulongfang@huawei.com>,
 	<qianweili@huawei.com>, <linwenkai6@hisilicon.com>
-Subject: [PATCH v3 4/4] uacce: ensure safe queue release with state management
-Date: Tue, 21 Oct 2025 21:50:03 +0800
-Message-ID: <20251021135003.786588-5-huangchenghai2@huawei.com>
+Subject: [PATCH v3 0/4] uacce: driver fixes for memory leaks and state management
+Date: Tue, 21 Oct 2025 21:49:59 +0800
+Message-ID: <20251021135003.786588-1-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20251021135003.786588-1-huangchenghai2@huawei.com>
-References: <20251021135003.786588-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -60,85 +57,40 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
  kwepemq200001.china.huawei.com (7.202.195.16)
 
-Directly calling `put_queue` carries risks since it cannot
-guarantee that resources of `uacce_queue` have been fully released
-beforehand. So adding a `stop_queue` operation for the
-UACCE_CMD_PUT_Q command and leaving the `put_queue` operation to
-the final resource release ensures safety.
+This patch series addresses several issues in the uacce:
+1.Memory leak fix when device registration fails.
+2.Fix sysfs file creation conditions.
+3.Add error reporting for unsupported mremap operations.
+4.Ensuring safe queue release with proper state management.
 
-Queue states are defined as follows:
-- UACCE_Q_ZOMBIE: Initial state
-- UACCE_Q_INIT: After opening `uacce`
-- UACCE_Q_STARTED: After `start` is issued via `ioctl`
-
-When executing `poweroff -f` in virt while accelerator are still
-working, `uacce_fops_release` and `uacce_remove` may execute
-concurrently. This can cause `uacce_put_queue` within
-`uacce_fops_release` to access a NULL `ops` pointer. Therefore, add
-state checks to prevent accessing freed pointers.
-
-Fixes: 015d239ac014 ("uacce: add uacce driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
-Signed-off-by: Yang Shen <shenyang39@huawei.com>
 ---
- drivers/misc/uacce/uacce.c | 28 +++++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 7 deletions(-)
+Changes in v3:
+- Move the checks for the 'isolate_strategy_show' and
+  'isolate_strategy_store' functions to their respective call sites.
+- Use kobject_put to release the cdev memory instead of modifying
+  cdev to be a static structure member.
+- Link to v2: https://lore.kernel.org/all/20250916144811.1799687-1-huangchenghai2@huawei.com/
 
-diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-index 747efb2d36f5..cfebca4c0012 100644
---- a/drivers/misc/uacce/uacce.c
-+++ b/drivers/misc/uacce/uacce.c
-@@ -40,20 +40,34 @@ static int uacce_start_queue(struct uacce_queue *q)
- 	return 0;
- }
- 
--static int uacce_put_queue(struct uacce_queue *q)
-+static int uacce_stop_queue(struct uacce_queue *q)
- {
- 	struct uacce_device *uacce = q->uacce;
- 
--	if ((q->state == UACCE_Q_STARTED) && uacce->ops->stop_queue)
-+	if (q->state != UACCE_Q_STARTED)
-+		return 0;
-+
-+	if (uacce->ops->stop_queue)
- 		uacce->ops->stop_queue(q);
- 
--	if ((q->state == UACCE_Q_INIT || q->state == UACCE_Q_STARTED) &&
--	     uacce->ops->put_queue)
-+	q->state = UACCE_Q_INIT;
-+
-+	return 0;
-+}
-+
-+static void uacce_put_queue(struct uacce_queue *q)
-+{
-+	struct uacce_device *uacce = q->uacce;
-+
-+	uacce_stop_queue(q);
-+
-+	if (q->state != UACCE_Q_INIT)
-+		return;
-+
-+	if (uacce->ops->put_queue)
- 		uacce->ops->put_queue(q);
- 
- 	q->state = UACCE_Q_ZOMBIE;
--
--	return 0;
- }
- 
- static long uacce_fops_unl_ioctl(struct file *filep,
-@@ -80,7 +94,7 @@ static long uacce_fops_unl_ioctl(struct file *filep,
- 		ret = uacce_start_queue(q);
- 		break;
- 	case UACCE_CMD_PUT_Q:
--		ret = uacce_put_queue(q);
-+		ret = uacce_stop_queue(q);
- 		break;
- 	default:
- 		if (uacce->ops->ioctl)
+Changes in v2:
+- Use cdev_init to allocate cdev memory to ensure that memory leaks
+  are avoided.
+- Supplement the reason for intercepting the remapping operation.
+- Add "cc: stable@vger.kernel.org" to paths with fixed.
+- Link to v1: https://lore.kernel.org/all/20250822103904.3776304-1-huangchenghai2@huawei.com/
+
+Chenghai Huang (2):
+  uacce: fix isolate sysfs check condition
+  uacce: ensure safe queue release with state management
+
+Wenkai Lin (1):
+  uacce: fix for cdev memory leak
+
+Yang Shen (1):
+  uacce: implement mremap in uacce_vm_ops to return -EPERM
+
+ drivers/misc/uacce/uacce.c | 55 ++++++++++++++++++++++++++++++--------
+ 1 file changed, 44 insertions(+), 11 deletions(-)
+
 -- 
 2.33.0
 
