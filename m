@@ -1,40 +1,60 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958D428314A;
-	Tue, 21 Oct 2025 08:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E9A31DDAE;
+	Tue, 21 Oct 2025 08:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761036058; cv=none; b=PHQsVIXeQ+oU3pFraOOjOfipC0sL/QmBfse0EJlBt5ISQSU1b1TNppa3SyN8wEUyMncT+/+HXKwNAHCuAVBvYU+6fd4UjbD9e44pVtivp/3REqa7GjDVJCYWZCocEtDEJFsfio/1v8dyTPObkSOTN+MTDiSNYnWtHhwbFHipw4w=
+	t=1761036191; cv=none; b=bLDVWbWlurJ6mls64OBOI+7GvPr3nRQ4Cy/AHhugDv/tgJcTAcZxO/Qz9tM7YbRyOIlP1UFYT6pIOWXrz7l67nOBmxW1XSgKMIvs+UlZodhavzk0P7tzIpNO6sITKUvZHbChxKauEbc9FEzHQmM8Ttu+tcaD/stL0utY2YE7afA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761036058; c=relaxed/simple;
-	bh=hb5VcV0ET3l0QzSsWclmOpjmwF9VwY1uM8U2V3HfyDo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sh4u+IanLEeJyGmTmPDDj+6h96ejgVStCSLP2IsYAx8i77ucrNd1NBfNOXyG6KlutVVT1RU2w5O4vavORvIRrOi12Phi4TgQkNVljQM/yQ/W0uwr9Jpp10c2JAS4XjcG27/vg6f8DDFubjIHdvpJ+CpxMo8/Z1Zb1J3bTEUkt4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: a59aa16aae5911f0a38c85956e01ac42-20251021
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:5b1bc7ac-4984-447d-92b2-fdfde16de3db,IP:0,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:0
-X-CID-META: VersionHash:a9d874c,CLOUDID:847313a20b3d4fb0a5562c6197ee2905,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102,TC:nil,Content:0|52,EDM:
-	-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,
-	AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: a59aa16aae5911f0a38c85956e01ac42-20251021
-X-User: xiaopei01@kylinos.cn
-Received: from [10.42.12.251] [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <xiaopei01@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
-	with ESMTP id 109458862; Tue, 21 Oct 2025 16:40:50 +0800
-Message-ID: <e1b1df10-ce40-4135-93fc-69a1c6d9f32f@kylinos.cn>
-Date: Tue, 21 Oct 2025 16:40:47 +0800
+	s=arc-20240116; t=1761036191; c=relaxed/simple;
+	bh=mFgPWXuf7wL9HKCJ5zTGJU2zg/9a843RYmcCkmybAOE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=MTkI6bo41HAjnOyC9NsEq5o0VTHFQauCgcwMIqJiwRvoiqR3C7gDYVTtQHpPwHvUhNbcqvLSQMdSsT7zXpCZUv+2MNcAEPVOm2JmE4QkhG8hvB0jVGJBBMDqwlkTpSjHfLE2PT72PivP3I+KYKgmWyknMsPtbsQDPArxH8P5Fis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Rcdo1r2b; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Rcdo1r2b"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59L2cFG6018793;
+	Tue, 21 Oct 2025 08:43:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=m+PGxg
+	H4B1ba9aPC0MCTfuQEhemc8eYzkzRGLtN3e2Q=; b=Rcdo1r2bzj1jwvmC9T0vq/
+	xqq8N1gQ7ORmhthAy1Rr+IqNttolJq4p0BUdSzM664+wuvdvYPcJPpVoojOXTcAA
+	yPBbjtzC6+/f18cD2LuaaeP4za5O0cwKRTNeHbzQFWYDVugtZVdVMONOU0W72/xg
+	1w2uV2oCRDJR9gyiwekoLV2vhhyBUgAGW7z7NqCuEe3Y4/7QZnpVELNwM+gBRBTn
+	nEs2rjd7pKlN3t18saRfLXiDWRIsiLo3QTnAviffu6wrmMgo1/GnwAK9MRZgUjU3
+	aeA5aTso91UiwdpFH3b7rMtf9d+tn1x5e2tH72Qu2WflZjEMkvj4uAoW68M1LI2A
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v326nysc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 08:43:04 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59L88EoD024677;
+	Tue, 21 Oct 2025 08:43:03 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49vpqjss2d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 08:43:02 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59L8h0GD12583286
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Oct 2025 08:43:01 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DA39320043;
+	Tue, 21 Oct 2025 08:43:00 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A326520040;
+	Tue, 21 Oct 2025 08:43:00 +0000 (GMT)
+Received: from [9.111.135.235] (unknown [9.111.135.235])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 21 Oct 2025 08:43:00 +0000 (GMT)
+Message-ID: <5895ed68-dd6e-4f3d-9e6f-c27459556ff7@linux.ibm.com>
+Date: Tue, 21 Oct 2025 10:43:00 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,107 +62,70 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] lib/crypto: poly1305: fix uninit-value in poly1305_blocks
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
-References: <751b3d80293a6f599bb07770afcef24f623c7da0.1761026343.git.xiaopei01@kylinos.cn>
- <20251021061511.GA2385@sol>
-From: Pei Xiao <xiaopei01@kylinos.cn>
-In-Reply-To: <20251021061511.GA2385@sol>
+Subject: Re: [PATCH 15/17] lib/crypto: s390/sha3: Migrate optimized code into
+ library
+From: Holger Dengler <dengler@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>,
+        Harald Freudenberger <freude@linux.ibm.com>
+Cc: David Howells <dhowells@redhat.com>, Ard Biesheuvel <ardb@kernel.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+References: <20251020005038.661542-1-ebiggers@kernel.org>
+ <20251020005038.661542-16-ebiggers@kernel.org>
+ <51fc91b6-3a6e-44f7-ae93-aef0bcb48964@linux.ibm.com>
+ <20251020175736.GC1644@sol>
+ <29e766ca-54e4-453d-9dfc-ea47e2a1f860@linux.ibm.com>
+Content-Language: de-DE
+In-Reply-To: <29e766ca-54e4-453d-9dfc-ea47e2a1f860@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=EJELElZC c=1 sm=1 tr=0 ts=68f74798 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VnNF1IyMAAAA:8 a=w4HzK-rsqA_2YikTyBoA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfX8j24ejwHFVb9
+ F2wIjL2oSQTN4WzBz8x+S+mSBTjDI5wQ8epCJHQMTbtcwJZFGvvXSK71SuQMre3/JuQt9V3vIQ4
+ HqcOXA0J1jmQ3eaRnnhi3jdOU2OsdvbvHX2RevYDlrk687vDT2o9yelcXco4ek/pZ/EurTgNkeB
+ 82iL//vWaEM7Kxe7nIEPDHvIHDt4dLVOWihhZhAgrayMgl8JxHqYhwv2+ZqzSmsICQ3DSCmnUhb
+ 9gXxeZPZB6cqCGwHtmNVa7E6iFO9Bq2gcOLtKW8HWyYgEgl7nxU4Fado3fNSgNNDjIafOp6yUWE
+ eLHpLRy+PgJFoj9VwRUkYYxpVaa2FsY862fDl3UijlUCiiRyx6+IFl0XYZGTTzlfC53E745j52x
+ ppzGxl/1LeVGdU9qd07hy9mEGkP7ZA==
+X-Proofpoint-GUID: R9cfW4_GrmPKJX5GD5hk9lL8OIjZ1tLv
+X-Proofpoint-ORIG-GUID: R9cfW4_GrmPKJX5GD5hk9lL8OIjZ1tLv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-20_07,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 priorityscore=1501 suspectscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 phishscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510180022
 
+Hi Eric,
 
-在 2025/10/21 14:15, Eric Biggers 写道:
-> On Tue, Oct 21, 2025 at 02:01:20PM +0800, Pei Xiao wrote:
->> syzbot reports uninit-value in poly1305_blocks:
+On 21/10/2025 09:24, Holger Dengler wrote:
+> On 20/10/2025 19:57, Eric Biggers wrote:
+[...]>> - Risk of bugs.  QEMU doesn't support the s390 SHA-3 instructions, so no
+>>   one except the s390 folks can test the code.  I can try to write code
+>>   for you, but I can't test it.  And the s390 SHA-3 code has had bugs;
+>>   see commits 992b7066800f, 68279380266a5, 73c2437109c3.
 >>
->> BUG: KMSAN: uninit-value in poly1305_blocks+0x1a9/0x5f0 lib/crypto/x86/poly1305.h:110
->>  poly1305_blocks+0x1a9/0x5f0 lib/crypto/x86/poly1305.h:110
->>  poly1305_update+0x169/0x400 lib/crypto/poly1305.c:50
->>  poly_hash+0x9f3/0x1a00 crypto/chacha20poly1305.c:168
->>  poly_genkey+0x3b6/0x450 crypto/chacha20poly1305.c:233
->>  chacha_encrypt crypto/chacha20poly1305.c:269 [inline]
->>  chachapoly_encrypt+0x48a/0x5c0 crypto/chacha20poly1305.c:284
->>  crypto_aead_encrypt+0xe2/0x160 crypto/aead.c:91
->>  tls_do_encryption net/tls/tls_sw.c:582 [inline]
->>  tls_push_record+0x38c7/0x5810 net/tls/tls_sw.c:819
->>  bpf_exec_tx_verdict+0x1a0c/0x26a0 net/tls/tls_sw.c:859
->>  tls_sw_sendmsg_locked net/tls/tls_sw.c:1138 [inline]
->>  tls_sw_sendmsg+0x3401/0x4560 net/tls/tls_sw.c:1281
->>  inet6_sendmsg+0x26c/0x2a0 net/ipv6/af_inet6.c:659
->>  sock_sendmsg_nosec net/socket.c:727 [inline]
->>  __sock_sendmsg+0x145/0x3d0 net/socket.c:742
->>  sock_write_iter+0x3a6/0x420 net/socket.c:1195
->>  do_iter_readv_writev+0x9e1/0xc20 fs/read_write.c:-1
->>  vfs_writev+0x52a/0x1500 fs/read_write.c:1057
->>  do_writev+0x1b5/0x580 fs/read_write.c:1103
->>  __do_sys_writev fs/read_write.c:1171 [inline]
->>  __se_sys_writev fs/read_write.c:1168 [inline]
->>  __x64_sys_writev+0x99/0xf0 fs/read_write.c:1168
->>  x64_sys_call+0x24b1/0x3e30 arch/x86/include/generated/asm/syscalls_64.h:21
->>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->>  do_syscall_64+0xd9/0xfa0 arch/x86/entry/syscall_64.c:94
->>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->>
->> in poly1305_blocks, ctx->is_base2_26 is uninit-value, ctx init in：
->> poly1305_init ->
->>      poly1305_block_init
->>
->> so add memset in poly1305_block_init, then use poly1305_init_x86_64 to init
->> by asm.
->>
->> Reported-by: syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
->> Tested-by: syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
->> Signed-off-by: Pei Xiao <xiaopei01@kylinos.cn>
->> ---
+>>   The first priority should be correctness.
+> 
+> Let me figure out, if me and my colleagues can do the testing for you.
+> Unfortunately, I'll be unavailable for the next two weeks. But I'll come back
+> with a solution for the testing.
 
-hi Eric,
+I talked to Harald: we can do the testing for you on our development machines.
+Please send new series to us or provide them in your git repo.
 
-    thanks for your responce.
+-- 
+Mit freundlichen Grüßen / Kind regards
+Holger Dengler
+--
+IBM Systems, Linux on IBM Z Development
+dengler@linux.ibm.com
 
-> Thanks for the bug report.  It will first need to be confirmed that this
-> is actually an issue in lib/crypto/ rather than the calling code, and if
-> so, why poly1305_kunit doesn't catch it (even when run on an KMSAN
-> enabled kernel, which I've done).  And which commit it fixes.  I'm
-> guessing it's most likely a KMSAN false positive that was exposed by
-> commit b646b782e522 dropping the dependency of the
-> architecture-optimized Poly1305 code on !KMSAN.  KMSAN doesn't know
-> about memory initialization done by assembly code.  But I'll double
-> check this, if you don't get around to it first.
->
-> The hash algorithms generally don't need a dependency on !KMSAN, as
-> their assembly code doesn't initialize memory.  It looks like the
-> Poly1305 code is an exception to that though, and I missed it.  If so,
-> the proper solution (IMO) is to use kmsan_unpoison_memory() right after
-> the assembly function that initializes the memory is called.  See
-> sha256_finup_2x_arch() for an example of that.  Note that more than one
-> architecture may need this. 
-
---- a/lib/crypto/poly1305.c
-+++ b/lib/crypto/poly1305.c
-@@ -13,6 +13,7 @@
- #include <linux/module.h>
- #include <linux/string.h>
- #include <linux/unaligned.h>
-+#include <linux/kmsan.h>
-
- #ifdef CONFIG_CRYPTO_LIB_POLY1305_ARCH
- #include "poly1305.h" /* $(SRCARCH)/poly1305.h */
-@@ -31,6 +32,7 @@ void poly1305_init(struct poly1305_desc_ctx *desc,
-        desc->s[3] = get_unaligned_le32(key + 28);
-        desc->buflen = 0;
-        poly1305_block_init(&desc->state, key);
-+       kmsan_unpoison_memory(desc, sizeof(struct poly1305_desc_ctx));
- }
- EXPORT_SYMBOL(poly1305_init)
-
-how about this ? 
-
->  If it ends up being too inconvenient, we
-> can make the architecture-optimized Poly1305 code depend on !KMSAN
-> again.  But preserving KMSAN coverage is preferable.
->
-> - Eric
-thanks!
