@@ -1,88 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D35319851
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 10:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B240320A0C
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 11:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761128065; cv=none; b=AMm/AvgrmYOJIq/MfP6kkmJbQui7R5Tzb4djG1Xp6Tb0ayn02IzOjAYUjGCLgTEBghckO2HXdVrYCUxIHcLYkdJKhZJ7izTFh0piKQpJf7aBEjTAae5tPe6+O+ZPHD3ZnGynU98MgM1gtW56p1igRp9Va9L4u6r9hDGKTR97aWs=
+	t=1761131982; cv=none; b=fYKJtlcaGYy26Wj1phJm0z8tzQdDfndqDQJUjoRU1nK+boDcqA58x2BRHbwQciR9FK+9dr9ZjZV8b7gfNTr5RzExQsRbE7UjJjjgQXBci0HrSMrNBtRaZra1wuwMs/ceSBZ+SuWwnLUGoe4g7nc8Tp6AK6mLJZwAizcyfhzxIEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761128065; c=relaxed/simple;
-	bh=BksiNg7tpyriGQ1hysmu056HRi6UuHZRkqrmwRvyfJk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RxFWAA61UCvFNibO7G7E0PPzijjhGQhXMSHPWeQRHc7BRSoLk1iNLyDCprIoRzFsxKVd3D5gRnDEdjA8C97+u4oKy9e0ijnVToqlQ8CIIdPG27AMB1wzMtJV6jzZaOJmG+VmQy7iGOLt1uAtM5arTErHcqWApMtsiLTnGmXvFp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MFXjCo9z; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761131982; c=relaxed/simple;
+	bh=wFL7EaC7oajWS8si1y0wmfU9HL7IN0yiHQa1hCUg5Ls=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=q5mKh1mZAIsBHtc/PAVHgl5hrnmiL0lggpFJ8tL7zqIKgwgSDvh23NycG7qAcZvdepG+maHjrly7TnP17Ovz+yMxu5MaDfffaGHUmfXqZjqp8mId8dvRYhJvDOk2C5suO3Q1ooj/6I2cFyGNLWTQNOBAd8SRniF90nePBUQxa3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AjAKZ/mc; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MFXjCo9z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8B36C4CEF5
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 10:14:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761128064;
-	bh=BksiNg7tpyriGQ1hysmu056HRi6UuHZRkqrmwRvyfJk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=MFXjCo9zcnJWPm3i/uME/Gos6Kai5pOUtMmkZaCxIxH4f1G2iBNWO6BsteyH6XnGr
-	 4Zd90D2WOq3UrIzDnGJbyKY0uVCIqubFuVODaRpPtAkeHAAJ6guyVzzV+PSkBIh6nV
-	 CGRlEUSdJHnegkag5S2Q8n1D884BHBrlZpy2HLc4DpDdwmg/gr5CIevhsYFWNUIjVW
-	 zgNO7y35aGfa12tpEh2Rs78q1h4n0/bbmWAnmahO/cxQJh+1iUay2OwuY0G82vngzM
-	 96vZQ1/6qgpLFmEm6HnzdnnfwmliORhfR6i5038HTOM5kmzD1TuTpgn9l5GUmz1dWp
-	 o0yUB5Qj65/GQ==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-591eb980286so2278837e87.2
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 03:14:24 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yz7lOI6wuq/b3TMaZ7/NVprgHgzpyOWDLKyJSb4nD5p7b98XCST
-	IQr10yLQ2JmYe1eJqKG7i9TdhuKYsuHEkZBHhpKIThXHsbk1eVoqQafvK/cuivNrsEpS+si6kgW
-	OT6ck6ua1dfCkcAoXDRjkOlRrHVnaJOE=
-X-Google-Smtp-Source: AGHT+IG8iUUMQF0D5yVhMfUk3f49gl16EpRj2WucDueAbKHKmqKh7iUJiKFsggwb9AdxMipBw35mRZegqZ8u7W964wc=
-X-Received: by 2002:a05:6512:3d92:b0:57b:5794:ccda with SMTP id
- 2adb3069b0e04-591d84faa97mr5623451e87.20.1761128063284; Wed, 22 Oct 2025
- 03:14:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AjAKZ/mc"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-426fc536b5dso3753616f8f.3
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 04:19:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1761131979; x=1761736779; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+TkKDb8seGZ3p0bb+weF9fHd1+l2SxCH4jqobx5Z0NA=;
+        b=AjAKZ/mc7EWnnQzrNesITi72sW4ZFm4O/4KccWtbn6ml+5ewC3EedtTk73cjVJ5Rjk
+         tLOcdMm73Rr/Zr401m0XnkMbyKodbiHmUXhNADOgIhxsMcxOHgk6kRVY01ef1N9tJIP+
+         pggt58RXe6L+8mv5WOwnH3SXFqgIsvguDeBYW1Zzi8QnuNJRkfWJCi99do2DKW6p/0bI
+         c1QW1MSwLkMj+EE+zxtmbFtHEAov5zhiDZ0Va48A6ZaH/EchiqMy09tHCHc4junXQe8o
+         4+eqIfi517NFIONqqT/v+8MrbPW4zVCq3yUBQXYPOHaloOMyZNWIEDNDlXdjuH2eISAI
+         gncg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761131979; x=1761736779;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+TkKDb8seGZ3p0bb+weF9fHd1+l2SxCH4jqobx5Z0NA=;
+        b=aiC4J90eQTElTTDZKZqnLYSXWEwp3sNRn9fJQI+WnPX+DcV44V8E80zcqiVDA7TTYp
+         Qrm5lldFSVocalELX5q7KNQv7EgH0wnBtwNhYIfgpKEoDk7jSrs09/yGCHPDhaqJ9wnj
+         4uwjsu3q9fQQa3pPJOLxAkhHoAh1R6OnpA6OU9Ba65map1HlyqQMfdGAGmNAGUWwOmPS
+         OqojBbUKX4uKSAPQnS9jycn8YOTLYu0OWHnxmUdzTwMoqGYqXBJ1VwGfCtAyvHICFQpk
+         LVqPKdnQBdpuVvuWyeR37gOzKvvwWOEgMv4pxbcsTPCKL68KYENtuak0a8D+r3JI5F6R
+         mM1A==
+X-Forwarded-Encrypted: i=1; AJvYcCWa2yUEbaOHgpgLxYafz+nhv0SB01qnCrgQAIIDSKIMREJ6f7R4JIwKNN+H7gpTaQvt+Sr+ENUf4nw7WIA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBH9z3s/FklklOIOhXomYZ0Ay0d3i9qSige6Q6EOw5a6Q3URlO
+	Zz4QYIivqPQ9Vxwar8B0mx/mL8gRDupL16UBgGevw91njdWTNr/SJH3c/OI9PNtMKas=
+X-Gm-Gg: ASbGncu/x+Q/Ycd81UNBv8MQsTsEH/RQPjw7Goc4azkNCgVhGk6UnGmNL2qTaK41sca
+	XLeyMe3ne827ZGseiC+oy5trkEHqFVIrniRaXNJHMRyDFkUD48tRikQgvhVBk6a2Ml0978RbWB3
+	UIsL7RVatwzioUOM1G5IzZdjH/YCB3YIVjGE9YhzuduKXNbPEMvpQvyAgchUhK0nCwlWg5/wMCO
+	DuvyUTmQ6qBwY/Lug0HKSYpoqNeZpzrKyMkzetFqNx4h5E3NQ0rzeSxXK9cfBeMjVORYXV0K8bE
+	Khs+TfMMJjdnTDm8qFJOwmmT1Uhjw+qxOAbeIFrMHcixQHO2tfLgKfk6H0VAoCqhucHc6LqJB2D
+	oUdbdQfrSS3F3kmyNmiwYwT6Nf5CPvrYk7v0/KfitEjK21OJxkuPzgsH8YJRf294x77lCwqmC3l
+	afxEUAqVmCdbQnIzSq/0H6O/ggsiRZnvMv5CJggODkzZPgJaqUQ9qtzsnmyVOlZls=
+X-Google-Smtp-Source: AGHT+IE/+qEk3SjQE0WaGw/Ate00STQbnaD0YtCC+WFT4/Fbr+bdpqv2kFO9m4rVu0eXE78+nSoBzA==
+X-Received: by 2002:a05:6000:491d:b0:427:55b:cf6 with SMTP id ffacd0b85a97d-427055b0cf8mr14963659f8f.7.1761131978900;
+        Wed, 22 Oct 2025 04:19:38 -0700 (PDT)
+Received: from ta2.c.googlers.com (213.53.77.34.bc.googleusercontent.com. [34.77.53.213])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427f009a78csm24820692f8f.26.2025.10.22.04.19.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Oct 2025 04:19:38 -0700 (PDT)
+From: Tudor Ambarus <tudor.ambarus@linaro.org>
+Date: Wed, 22 Oct 2025 11:19:35 +0000
+Subject: [PATCH 1/2] dt-bindings: rng: add google,gs101-trng compatible
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251022033405.64761-1-ebiggers@kernel.org>
-In-Reply-To: <20251022033405.64761-1-ebiggers@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 22 Oct 2025 12:14:11 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEjihuC1Wa8fWUqsvsJM6YJZ0wmuhkqicNAfQiHvnWkYw@mail.gmail.com>
-X-Gm-Features: AS18NWBSXzD203ZzkosAKi9Rr6vw53-JkbJxJJd1qk8yGMrx1SL9k2NwvTwhKzM
-Message-ID: <CAMj1kXEjihuC1Wa8fWUqsvsJM6YJZ0wmuhkqicNAfQiHvnWkYw@mail.gmail.com>
-Subject: Re: [PATCH] lib/crypto: poly1305: Restore dependency of arch code on !KMSAN
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Pei Xiao <xiaopei01@kylinos.cn>, Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com, 
-	syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251022-gs101-trng-v1-1-8817e2d7a6fc@linaro.org>
+References: <20251022-gs101-trng-v1-0-8817e2d7a6fc@linaro.org>
+In-Reply-To: <20251022-gs101-trng-v1-0-8817e2d7a6fc@linaro.org>
+To: =?utf-8?q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>, 
+ Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Alim Akhtar <alim.akhtar@samsung.com>, 
+ Peter Griffin <peter.griffin@linaro.org>, 
+ =?utf-8?q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, semen.protsenko@linaro.org, 
+ willmcvicker@google.com, kernel-team@android.com, 
+ linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, Tudor Ambarus <tudor.ambarus@linaro.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1761131977; l=1108;
+ i=tudor.ambarus@linaro.org; s=20241212; h=from:subject:message-id;
+ bh=wFL7EaC7oajWS8si1y0wmfU9HL7IN0yiHQa1hCUg5Ls=;
+ b=BADVR+Jf79pRXQQP7OJ+g5sLQY7l/hCEa6RUAs9sGn87SwsuC7w4rRwpSLmGz9MKiaePKpFtk
+ kdDu7pTDMneDUah7lu5PkCdDDp1n5XfUkpHjxqyC9OeuHgEpauWIQ/v
+X-Developer-Key: i=tudor.ambarus@linaro.org; a=ed25519;
+ pk=uQzE0NXo3dIjeowMTOPCpIiPHEz12IA/MbyzrZVh9WI=
 
-On Wed, 22 Oct 2025 at 05:37, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> Restore the dependency of the architecture-optimized Poly1305 code on
-> !KMSAN.  It was dropped by commit b646b782e522 ("lib/crypto: poly1305:
-> Consolidate into single module").
->
-> Unlike the other hash algorithms in lib/crypto/ (e.g., SHA-512), the way
-> the architecture-optimized Poly1305 code is integrated results in
-> assembly code initializing memory, for several different architectures.
-> Thus, it generates false positive KMSAN warnings.  These could be
-> suppressed with kmsan_unpoison_memory(), but it would be needed in quite
-> a few places.  For now let's just restore the dependency on !KMSAN.
->
-> Note: this should have been caught by running poly1305_kunit with
-> CONFIG_KMSAN=y, which I did.  However, due to an unrelated KMSAN bug
-> (https://lore.kernel.org/r/20251022030213.GA35717@sol/), KMSAN currently
-> isn't working reliably.  Thus, the warning wasn't noticed until later.
->
-> Fixes: b646b782e522 ("lib/crypto: poly1305: Consolidate into single module")
-> Reported-by: syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/r/68f6a48f.050a0220.91a22.0452.GAE@google.com/
-> Reported-by: Pei Xiao <xiaopei01@kylinos.cn>
-> Closes: https://lore.kernel.org/r/751b3d80293a6f599bb07770afcef24f623c7da0.1761026343.git.xiaopei01@kylinos.cn/
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->  lib/crypto/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
+Add support for the TRNG found on GS101. It works well with the current
+exynos850 TRNG support.
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Tudor Ambarus <tudor.ambarus@linaro.org>
+---
+ .../devicetree/bindings/rng/samsung,exynos5250-trng.yaml       | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+index 1a71935d8a1906591439c03b7678538e656324b6..4cae7dccbb915cf50dfa8db86b43293a66200002 100644
+--- a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
++++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+@@ -12,9 +12,13 @@ maintainers:
+ 
+ properties:
+   compatible:
+-    enum:
+-      - samsung,exynos5250-trng
+-      - samsung,exynos850-trng
++    oneOf:
++      - enum:
++          - samsung,exynos5250-trng
++          - samsung,exynos850-trng
++      - items:
++          - const: google,gs101-trng
++          - const: samsung,exynos850-trng
+ 
+   clocks:
+     minItems: 1
+
+-- 
+2.51.0.915.g61a8936c21-goog
+
