@@ -1,295 +1,102 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C2D30C35F
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 10:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B356431D742
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 10:13:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761127810; cv=none; b=elYKddChfLX1wYYtm5UGnoqc8vKe7uXaERqZ+OJPRo6AfjIcfDAFpYv5i7Kn1XuZ884XZAK8d6BE1cFqEFf5dHTiMyigVRrShRGPkLkT137RoXRph/NNfOiBR7sf6vvqSigzPh7R13idacsIyD4RfZYG4Wb1XMJfWUYsts28sfc=
+	t=1761128015; cv=none; b=tPKb6r5W+kX1t+NkMg7P+zSD26uyy1qq1S9+YTrm0sjosxnivcq5eBnnkJxMKFAzd1yFA1sRcgs+ZG4mdic16g8WHff6ksjEp6vIqOxJ9ivZfEi82wwz9tFYR41S13wRZVYC7Gwo3Atk+BlFssj/ZeGq9qzKtDsz0LZpkvfzSuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761127810; c=relaxed/simple;
-	bh=n8auG5eKlZyr31ot6Kp1D+Gj8aLD/n7p+Qqeh5TWnJo=;
+	s=arc-20240116; t=1761128015; c=relaxed/simple;
+	bh=xbleyjew/gUw5tjiH+F/GM5sPSqPUuGp5zFrXdHnEss=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NfPg0TvoHMIcFF4VE6UyXyAa9rkmU+Gk50ereXIeKrHrCwdMNmfbKd6Q5RMcomZiPeFCWhQYehk1hxGWCixOmrMhmY0f5+B0FFg1gXW1uvgJ+yLp8ZW4CG6ZddVqSlSjZz/SdnhWH6bxFw5OYOCl8ZP5uirTG+hUzTD2jv0Nmms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-88f27b67744so886988085a.0
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 03:10:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761127807; x=1761732607;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rEJ/AcXuMMrQoXRwb6HmCfF3LFX3cn+TJWCKJF/dV3w=;
-        b=J6L/isldl5RExqqi/hCYa7K+IY+P+6jdHnaUoYW/fGL209O+9lkBtVF0v5tG0Pbbfq
-         jZlfzmmyQ4o5e1/8fG9lSPsj0Y5qa+3ncDE3rt+49KRFEPx5123caOFW7Zd2euzyYNSm
-         3sqoQPi2ZWp3rzmdUP4ZUgjt6G3cDG+49lG5JQiZjyKv3fmB3cjhSvqzs7kIBRCi9zfO
-         HZ6nRqaud6wtdtJcDnrMToOd3xyv242qtas3fmj0dkUG5+vtRSBZzDNeV0HMvXqGfp9w
-         eWk8T4DPywjOd8Em4jdhiM9NIJR4O0hm/iTRyUMHtZH8+J1zKqXme7tel6Mm5PP1FIJC
-         +1AQ==
-X-Forwarded-Encrypted: i=1; AJvYcCULUHw1M3iV2LtnRzJNwsYEF+Ff7lyW3n1X4P8/TVocuLKHxJD1u8bLoyxtB35X5hyptJixsZCuPjrLe4I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywvvc/DSNF5pLLkizLNhS9ZAdSMIqwTBFOYAmlAaV8dblR2Dwx3
-	ShlRerTVJqEy+JQyvMjhkg4AenJWPCcrI4nwS5UU8kqh4+LVfQQKY0wYdPPvPzpg
-X-Gm-Gg: ASbGncsYscYzjaRNkdmOfeTsF99nIS+F2eLvv2PXe4vKwuDDnSPwrLPMoP/Hnzi/8EO
-	wQrn2v41iHvHQxt3r4lyDXyH/36dIr6x/TnpSD+59QiQYa9niEe4EYZSuBioHAc9GDGSBKkiNxO
-	o4S7wBQIY6eRAvI3ldWhnt9sSikIGCn7Nph75fNQ7+F/ULe9K0eqJr/tJ6jDhxn9bdTSYcugck1
-	4ppoqCgpFHEFfSzxtlBkQ3r85ejgoABvrGPDzbmu0aL988F4tasQ/cNUMtS0fVR3xVzQnupmxaL
-	UxwUHFHObtvmepxqA42k98kMl26rft/XBswOgah98j83QZHMpN33DFgardenvE4gSlqqC+WePAE
-	3LOTnINfZje0HY3zyZ3mQEX/7ihzGYTloPJjSiJwOBKoLDJ4GwYs0H4AV8D621NULD0lwM60cfC
-	CDUE+7N9v1r53ViLpZxTgO3TZyRLyfuR7CiEIrsRurEOPjNqsdFQ8T
-X-Google-Smtp-Source: AGHT+IHsT30CTuy31qGDXONGuzOIqlr7I71AukcqQ4Q9iz+ISpqcjtadPhY2QMxkfDg9BFOE/jA59A==
-X-Received: by 2002:a05:620a:4550:b0:850:3206:9734 with SMTP id af79cd13be357-8906dfe0138mr2043102785a.9.1761127806449;
-        Wed, 22 Oct 2025 03:10:06 -0700 (PDT)
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com. [209.85.222.182])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-891cd098334sm949477385a.18.2025.10.22.03.10.06
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Oct 2025 03:10:06 -0700 (PDT)
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-88fa5974432so880251585a.2
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 03:10:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWdBqp52DkudbWhCUyAbYegzUah6QG4hU/PyllhjK5NoYz/SRDZ/qVZrHtWoeyOdag3AHlv0FSYSIh2Ph4=@vger.kernel.org
-X-Received: by 2002:a05:6102:3f49:b0:5d6:615:a687 with SMTP id
- ada2fe7eead31-5d7dd5544d6mr5930459137.7.1761127308820; Wed, 22 Oct 2025
- 03:01:48 -0700 (PDT)
+	 To:Cc:Content-Type; b=s+sHGelqmfaYz/nKiwrzDVUlJkmiJnbAYYLm8STmGCB5bqZajeWJsnIsm2FJ8mksj8XLXANL2ulzMIwt/hMRFko39c6rZ8Zz59eHLFsxi3j+zavmb1y6VbG0TObt1XIInY5cLURd19JN6NYU0Ww5l7FPi2tt6o2rlNfrfQFIK6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cf+J0OUs; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cf+J0OUs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B375C116C6
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 10:13:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761128015;
+	bh=xbleyjew/gUw5tjiH+F/GM5sPSqPUuGp5zFrXdHnEss=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=cf+J0OUsUIRcsHSBwhz7YYf0Z9ymKDK8GA1J6sql1jQu86YEQyfe66TD9dRlWn0fJ
+	 QxrInwySwhAi0o5kYZrKes3WJ2nzRGBOCd7FwAdipREv5jRGCRMV3IUUimULjKLnfl
+	 +Z0mdXVCUyzfK5up5HUbAFqPGJZcQ8OFOYfLsrPTmYSAcZjplbwcIg7YbDT8uyTR4Z
+	 i/IZKEQtk83EbTkiPASU5XBSDqduHq4NPrpPw2voDdoZ/fvNbX6Xt0yPJqXlVV0nHy
+	 lzJCtpmGOXU1EZV5iqntyALSeMSBpqBto9lXNShOBD0OXh5Fn5LIZU6quA5krtgF0j
+	 GJ74B0vbZiqsQ==
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-57f1b88354eso7442790e87.1
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 03:13:35 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxXG3cFuIGD1rbZT+yIYwvOWIGDn7lVZan0PHxDaDaWwsYRZvwO
+	m4Mxvd+OCl3bU/eWumwB8aALW18p/vfaa8uE/LboYOBW8fb/z8hcyiA2xhcFfLjStd9/2IefmB3
+	KuaR6za9GvXvjI1xhXX8UegoPDSzzauM=
+X-Google-Smtp-Source: AGHT+IFcCPrNwnq8tqyu26uoCns+CxnDTAM88jzdNDUEvsfOGixRrsmaAiH98/VG4HRDwveCRetRp7qwt02Fdgsnfd0=
+X-Received: by 2002:a05:6512:159b:b0:55f:6fb4:e084 with SMTP id
+ 2adb3069b0e04-591d85739edmr7396384e87.50.1761128013726; Wed, 22 Oct 2025
+ 03:13:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1760696560.git.geert+renesas@glider.be> <67c1998f144b3a21399672c8e4d58d3884ae2b3c.1760696560.git.geert+renesas@glider.be>
- <aPKQMdyMO-vrb30X@yury> <CAMuHMdXq7xubX4a6SZWcC1HX+_TsKeQigDVQrWvA=js5bhaUiQ@mail.gmail.com>
- <aPhbhQEWAel4aD9t@yury>
-In-Reply-To: <aPhbhQEWAel4aD9t@yury>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 22 Oct 2025 12:01:37 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdUOX=ToDU_44fHrqKWUtee1LKpgisfTKOe4R33er9g+DA@mail.gmail.com>
-X-Gm-Features: AS18NWAJp5tYw_pRqlFhPyJqRT3wi5ZG4jspqrcr0Xp9hgyi6lbaoTACOgNkevQ
-Message-ID: <CAMuHMdUOX=ToDU_44fHrqKWUtee1LKpgisfTKOe4R33er9g+DA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/4] bitfield: Add non-constant field_{prep,get}() helpers
-To: Yury Norov <yury.norov@gmail.com>
-Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	David Miller <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, 
-	Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, 
-	Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, 
-	Shan-Chun Hung <schung@nuvoton.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>, 
-	David Laight <david.laight.linux@gmail.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>, 
-	Michael Hennerich <Michael.Hennerich@analog.com>, Kim Seer Paller <kimseer.paller@analog.com>, 
-	David Lechner <dlechner@baylibre.com>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
-	Andy Shevchenko <andy@kernel.org>, Richard Genoud <richard.genoud@bootlin.com>, 
-	Cosmin Tanislav <demonsingur@gmail.com>, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Jianping Shen <Jianping.Shen@de.bosch.com>, linux-clk@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-edac@vger.kernel.org, qat-linux@intel.com, 
-	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org, 
-	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jonathan Cameron <Jonathan.Cameron@huawei.com>
+References: <20251020005038.661542-1-ebiggers@kernel.org>
+In-Reply-To: <20251020005038.661542-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Wed, 22 Oct 2025 12:13:22 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEh=nS+pFgJUm5Vsyk1fMvY0dJNjLzA90Zj4AQPrD5ZYg@mail.gmail.com>
+X-Gm-Features: AS18NWDkFNpIn7aOJ7I-K06jIqbriS-x6sjlQuJbYrgZlUVLWfy8F6r6U1x3XZ0
+Message-ID: <CAMj1kXEh=nS+pFgJUm5Vsyk1fMvY0dJNjLzA90Zj4AQPrD5ZYg@mail.gmail.com>
+Subject: Re: [PATCH 00/17] SHA-3 library
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Yury,
-
-On Wed, 22 Oct 2025 at 06:20, Yury Norov <yury.norov@gmail.com> wrote:
-> On Mon, Oct 20, 2025 at 03:00:24PM +0200, Geert Uytterhoeven wrote:
-> > On Fri, 17 Oct 2025 at 20:51, Yury Norov <yury.norov@gmail.com> wrote:
-> > > On Fri, Oct 17, 2025 at 12:54:10PM +0200, Geert Uytterhoeven wrote:
-> > > > The existing FIELD_{GET,PREP}() macros are limited to compile-time
-> > > > constants.  However, it is very common to prepare or extract bitfield
-> > > > elements where the bitfield mask is not a compile-time constant.
-> > > >
-> > > > To avoid this limitation, the AT91 clock driver and several other
-> > > > drivers already have their own non-const field_{prep,get}() macros.
-> > > > Make them available for general use by consolidating them in
-> > > > <linux/bitfield.h>, and improve them slightly:
-> > > >   1. Avoid evaluating macro parameters more than once,
-> > > >   2. Replace "ffs() - 1" by "__ffs()",
-> > > >   3. Support 64-bit use on 32-bit architectures.
-> > > >
-> > > > This is deliberately not merged into the existing FIELD_{GET,PREP}()
-> > > > macros, as people expressed the desire to keep stricter variants for
-> > > > increased safety, or for performance critical paths.
-> > > >
-> > > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > > > Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> > > > Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> > > > Acked-by: Crt Mori <cmo@melexis.com>
-> > > > ---
-> > > > v4:
-> > > >   - Add Acked-by,
-> > > >   - Rebase on top of commit 7c68005a46108ffa ("crypto: qat - relocate
-> > > >     power management debugfs helper APIs") in v6.17-rc1,
-> > > >   - Convert more recently introduced upstream copies:
-> > > >       - drivers/edac/ie31200_edac.c
-> > > >       - drivers/iio/dac/ad3530r.c
-> > >
-> > > Can you split out the part that actually introduces the new API?
-> >
-> > Unfortunately not, as that would cause build warnings/failures due
-> > to conflicting redefinitions.
-> > That is a reason why I want to apply this patch ASAP: new copies show
-> > up all the time.
+On Mon, 20 Oct 2025 at 02:53, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> In a preparation patch, for each driver:
+> This series is targeting libcrypto-next.  It can also be retrieved from:
 >
->  +#ifndef field_prep
->  #define field_prep() ...
->  +#endif
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git sha3-lib-v1
 >
-> Or simply
+> This series builds on the first 5 patches of David's v6 series
+> (https://lore.kernel.org/r/20251017144311.817771-1-dhowells@redhat.com),
+> which I've included unmodified as the initial patches.  The remaining
+> patches improve the SHA-3 library, for example by simplifying the API
+> and migrating the existing arm64 and s390-optimized SHA-3 code into the
+> library.  The last patch reimplements the sha3-* crypto_shash algorithms
+> on top of the library.
 >
->  +#undef field_prep
->  #define field_prep() ...
+> If the s390 folks could re-test the s390 optimized SHA-3 code, that
+> would be helpful.  QEMU doesn't support the instructions it uses.
 >
-> Then add the generic field_prep() in a separate patch. Then you can drop
-> ifdefery in the drivers.
+> David Howells (5):
+>   s390/sha3: Rename conflicting functions
+>   arm64/sha3: Rename conflicting functions
+>   lib/crypto: Add SHA3-224, SHA3-256, SHA3-384, SHA3-512, SHAKE128,
+>     SHAKE256
+>   lib/crypto: Move the SHA3 Iota transform into the single round
+>     function
+>   lib/crypto: Add SHA3 kunit tests
 >
-> Yeah, more patches, but the result is cleaner.
-
-And we need 3 kernel releases, as the addition of the macros to
-the header file now has a hard dependency on adding the #undefs?
-Unless I still apply all of them to an immutable branch, but then what
-is the point?
-
-> > > > --- a/include/linux/bitfield.h
-> > > > +++ b/include/linux/bitfield.h
-> > > > @@ -220,4 +220,40 @@ __MAKE_OP(64)
-> > > >  #undef __MAKE_OP
-> > > >  #undef ____MAKE_OP
-> > > >
-> > > > +/**
-> > > > + * field_prep() - prepare a bitfield element
-> > > > + * @mask: shifted mask defining the field's length and position
-> > > > + * @val:  value to put in the field
-> > > > + *
-> > > > + * field_prep() masks and shifts up the value.  The result should be
-> > > > + * combined with other fields of the bitfield using logical OR.
-> > > > + * Unlike FIELD_PREP(), @mask is not limited to a compile-time constant.
-> > > > + */
-> > > > +#define field_prep(mask, val)                                                \
-> > > > +     ({                                                              \
-> > > > +             __auto_type __mask = (mask);                            \
-> > > > +             typeof(mask) __val = (val);                             \
-> > > > +             unsigned int __shift = sizeof(mask) <= 4 ?              \
-> > > > +                                    __ffs(__mask) : __ffs64(__mask); \
-> > > > +             (__val << __shift) & __mask;    \
-> > >
-> > > __ffs(0) is undef. The corresponding comment in
-> > > include/asm-generic/bitops/__ffs.h explicitly says: "code should check
-> > > against 0 first".
-> >
-> > An all zeroes mask is a bug in the code that calls field_{get,prep}().
+> Eric Biggers (12):
+>   lib/crypto: sha3: Fix libsha3 build condition
+>   lib/crypto: sha3: Use appropriate conversions in
+>     sha3_keccakf_generic()
+>   lib/crypto: sha3: Drop unfinished SHAKE support from
+>     gen-hash-testvecs.py
+>   lib/crypto: sha3: Consistently use EXPORT_SYMBOL_GPL
+>   lib/crypto: sha3: Replace redundant ad-hoc test with FIPS test
+>   lib/crypto: sha3: Simplify the API
+>   lib/crypto: sha3: Document one-shot functions in header and improve
+>     docs
+>   crypto: arm64/sha3 - Update sha3_ce_transform() to prepare for library
+>   lib/crypto: arm64/sha3: Migrate optimized code into library
+>   lib/crypto: s390/sha3: Migrate optimized code into library
+>   crypto: jitterentropy - use default sha3 implementation
+>   crypto: sha3 - Reimplement using library API
 >
-> It's a bug in FIELD_GET() - for sure. Because it's enforced in
-> __BF_FIELD_CHECK(). field_get() doesn't enforce it, doesn't even
-> mention that in the comment.
->
-> I'm not fully convinced that empty runtime mask should be a bug.
 
-Getting (and using) data from nowhere is a bug.
-Storing data where there is no space to store is also a bug.
-
-I will add a comment.
-
-> Consider memcpy(dst, src, 0). This is a no-op, but not a bug as
-> soon as the pointers are valid. If you _think_ it's a bug - please
-> enforce it.
-
-memcpy() with a fixed size of zero is probably a bug.
-memcpy() with a variable size is usually used to copy "as much as is
-needed", so zero is usually not a bug.
-
-> > > I think mask = 0 is a sign of error here. Can you add a code catching
-> > > it at compile time, and maybe at runtime too? Something like:
-> > >
-> > >  #define __field_prep(mask, val)
-> > >  ({
-> > >         unsigned __shift = sizeof(mask) <= 4 ? __ffs(mask) : __ffs64(mask);
-> > >         (val << __shift) & mask;
-> > >  })
-> > >
-> > >  #define field_prep(mask, val)
-> > >  ({
-> > >         unsigned int __shift;
-> > >         __auto_type __mask = (mask), __ret = 0;
-> > >         typeof(mask) __val = (val);
-> > >
-> > >         BUILD_BUG_ON_ZERO(const_true(mask == 0));
-> >
-> > Futile, as code with a constant mask should use FIELD_PREP() instead.
->
-> It's a weak argument. Sometimes compiler is smart enough to realize
-> that something is a constant, while people won't. Sometimes code gets
-> refactored. Sometimes people build complex expressions that should
-> work both in run-time and compile time cases. Sometimes variables are
-> compile- or run-time depending on config (nr_cpu_ids is an example).
->
-> The field_prep() must handle const case just as good as capitalized
-> version does.
-
-OK, I will add the (build-time) check.
-
-> > >         if (WARN_ON_ONCE(mask == 0))
-> > >                 goto out;
-> > >
-> > >         __ret = __field_prep(__mask, __val);
-> > >  out:
-> > >         ret;
-> > >  })
-> >
-> > Should we penalize all users (this is a macro, thus inlined everywhere)
-> > to protect against something that is clearly a bug in the caller?
->
-> No. But we can wrap it with a config:
->
->  #ifdef CONFIG_BITFIELD_HARDENING
->          if (WARN_ON_ONCE(mask == 0))
->                  goto out;
->  #endif
-
-That can be done later, when hardening other bitfield functions
-and macros.
-
-> > These new macros are intended for the case where mask is not a constant.
-> > So typically it is a variable of type u32 or u64.
->
-> You never mentioned that. Anyways, it's again a weak argument.
-
-I'll add more comments ;-)
-
-> > > > +             unsigned int __shift = sizeof(mask) <= 4 ?              \
-> > > > +                                    __ffs(__mask) : __ffs64(__mask); \
-> > >
-> > > Can you use BITS_PER_TYPE() here?
-> >
-> > Yes, I could use BITS_PER_TYPE(unsigned long) here, to match the
-> > parameter type of __ffs() (on 64-bit platforms, __ffs() can be used
-> > unconditionally anyway), at the expense of making the line much longer
-> > so it has to be split.  Is that worthwhile?
->
-> Not sure I understand... The
->
->         "unsigned int __shift = BITS_PER_TYPE(mask) < 64 ?"
->
-> is 49 chars long vs 42 in your version. Even if you add two tabs, it's
-> still way below limits. And yes,
-
-Oh, you meant instead of the size check.
-I thought you objected to the hardcoded number 4.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
