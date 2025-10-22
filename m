@@ -1,54 +1,45 @@
-Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B778D2222B4;
-	Wed, 22 Oct 2025 02:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81855224893;
+	Wed, 22 Oct 2025 03:37:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761099151; cv=none; b=MsUZACElxLa8hOtmA3eiQT0zlNZmJ5mDhTZhzmOLtEdnO/s8194nNM/7oeIC2YTy9wAxoS/NFzg04Il4cj2BeXcDWRBFbGMWcwO+Or8bmlUHKaYldC8LI5f+RiN2DVnDJj2+SPq5ClSMsD/yw44Ye4Nlg3FDe1LllL6ny8cc5ng=
+	t=1761104248; cv=none; b=R4fV0QJmSHO0LUFiy7l0nLtRidZ1uPZ4a5Mq+3LpvM6JNn+7H/4It7dLTJOCOAMOwbmaSYbiK2+vNHMqmBgh8eHQAA6pzXCohPe+HgCOibycquG073fFeev7JkuW9XjjPYWXsBlHswXOGf8p7/TXNo00mYowUaVXyPTwtwBs5Hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761099151; c=relaxed/simple;
-	bh=hWOCC4M64E0HCR/i6BczLCQ0ErSkLekK7uU4+1bkmLY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jEAdvJAxd9xBYsjyVGgszyvNzoklBnOVTykdCAWBOLbjpLROsn1/SJXDC0ycMSdzk8X5L8UAvCW2GxXyIwObFCa2mEZZ8EQlEeae/9hz9yrTbrfRsTHjgfElCJuOgWCkBBtQr3L4dKW3vthZD84EvghOyhvsqKHAWj6SZ9tLgbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=nIXvyfJw; arc=none smtp.client-ip=113.46.200.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1761104248; c=relaxed/simple;
+	bh=Hlb9JiBZWMfBzK/UndbauuxjM6KStdrKstXCa7vxyJw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PCUt7B0HkCIQ+mfs4Jp2rJeWrsufyTJE+4e+V0DA/kni6uncAtdxbnmn70JUfFpZXPE4BWBins7DgOpucnBeilQFGzvi2ChOmkqVyZxTCF+2vGJnN8spI63s6k9IF8/dD9YKDMlQHn5hWA4WtmXGafhMDgYBroJZ1iGuO2S5lEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HqjjRdZf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="nIXvyfJw"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=INfemayc9W6N5hQfUFOB1hQsvy36xI//nAITyW85/tg=;
-	b=nIXvyfJw02GH8R1cDzyx8SVSmIptk34q6zANKqwuyXbBIGripLSf/Uz8c8xpcf+AmbJ8e7tDt
-	qXCcsBiIKSay/6lOKXJN/pLOT1tNlnKfqR9yleYWb00GZ6WMCQlq/CDgCMKqUNN+f2GRvk5SXAP
-	rQaAkRllh3eyU10Fhxue+Co=
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4crt2N4j0DznTW3;
-	Wed, 22 Oct 2025 10:11:40 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 01D391A0194;
-	Wed, 22 Oct 2025 10:12:22 +0800 (CST)
-Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 22 Oct 2025 10:11:51 +0800
-Received: from localhost.huawei.com (10.90.31.46) by
- kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 22 Oct 2025 10:11:50 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <gregkh@linuxfoundation.org>, <zhangfei.gao@linaro.org>,
-	<wangzhou1@hisilicon.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <shenyang39@huawei.com>, <liulongfang@huawei.com>,
-	<qianweili@huawei.com>, <linwenkai6@hisilicon.com>
-Subject: [PATCH v4 1/4] uacce: fix for cdev memory leak
-Date: Wed, 22 Oct 2025 10:11:46 +0800
-Message-ID: <20251022021149.1771168-2-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20251022021149.1771168-1-huangchenghai2@huawei.com>
-References: <20251022021149.1771168-1-huangchenghai2@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HqjjRdZf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE6CC4CEE7;
+	Wed, 22 Oct 2025 03:37:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761104248;
+	bh=Hlb9JiBZWMfBzK/UndbauuxjM6KStdrKstXCa7vxyJw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=HqjjRdZf6jR5AbWGjErUxogrkgYqKEoU5CuD5xMLa24DQaBurXTyhM/BzETK11IS0
+	 F5NYFhJQtadGyIukFkmwTp1g8VZFM7ndqc7MG2JYWHWiDceeRKZ4t88vi1iANv3lIn
+	 qlDTY7F/K9rXzMuv2ct8iKxxVvQDOa7+dBdjYICBOKb/rBsKSZH8vdsgYeQr+843Jo
+	 yrJWnuBxPyfN23npzcAIhIhcZSwXH5fARQRgDc4W+PV1PL95RXiiYMCPUld1zBa5DH
+	 nu4CfL6+Hx90+72R+E4CqcyRdOjaJF5CVnzJYbrWpkW87BjfInA+JGZgAoSZJBjcrw
+	 IHSOci6aaDuog==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Pei Xiao <xiaopei01@kylinos.cn>,
+	Alexander Potapenko <glider@google.com>,
+	kasan-dev@googlegroups.com,
+	Eric Biggers <ebiggers@kernel.org>,
+	syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
+Subject: [PATCH] lib/crypto: poly1305: Restore dependency of arch code on !KMSAN
+Date: Tue, 21 Oct 2025 20:34:05 -0700
+Message-ID: <20251022033405.64761-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.1.dirty
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -56,56 +47,52 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemq200001.china.huawei.com (7.202.195.16)
 
-From: Wenkai Lin <linwenkai6@hisilicon.com>
+Restore the dependency of the architecture-optimized Poly1305 code on
+!KMSAN.  It was dropped by commit b646b782e522 ("lib/crypto: poly1305:
+Consolidate into single module").
 
-In uacce_register(), if cdev_device_add() fails, we should properly
-decrease the reference count of the cdev kobject and set uacce->cdev
-to NULL to avoid potential use-after-free or double free issues.
+Unlike the other hash algorithms in lib/crypto/ (e.g., SHA-512), the way
+the architecture-optimized Poly1305 code is integrated results in
+assembly code initializing memory, for several different architectures.
+Thus, it generates false positive KMSAN warnings.  These could be
+suppressed with kmsan_unpoison_memory(), but it would be needed in quite
+a few places.  For now let's just restore the dependency on !KMSAN.
 
-This change adds proper error handling after cdev_device_add() fails,
-ensuring that kobject_put() is called and uacce->cdev is cleared.
+Note: this should have been caught by running poly1305_kunit with
+CONFIG_KMSAN=y, which I did.  However, due to an unrelated KMSAN bug
+(https://lore.kernel.org/r/20251022030213.GA35717@sol/), KMSAN currently
+isn't working reliably.  Thus, the warning wasn't noticed until later.
 
-Fixes: 015d239ac014 ("uacce: add uacce driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+Fixes: b646b782e522 ("lib/crypto: poly1305: Consolidate into single module")
+Reported-by: syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/r/68f6a48f.050a0220.91a22.0452.GAE@google.com/
+Reported-by: Pei Xiao <xiaopei01@kylinos.cn>
+Closes: https://lore.kernel.org/r/751b3d80293a6f599bb07770afcef24f623c7da0.1761026343.git.xiaopei01@kylinos.cn/
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- drivers/misc/uacce/uacce.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ lib/crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-index 42e7d2a2a90c..9b82a6731832 100644
---- a/drivers/misc/uacce/uacce.c
-+++ b/drivers/misc/uacce/uacce.c
-@@ -519,6 +519,8 @@ EXPORT_SYMBOL_GPL(uacce_alloc);
-  */
- int uacce_register(struct uacce_device *uacce)
- {
-+	int ret;
-+
- 	if (!uacce)
- 		return -ENODEV;
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index eea17e36a22be..8886055e938f2 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -95,11 +95,11 @@ config CRYPTO_LIB_POLY1305
+ 	  The Poly1305 library functions.  Select this if your module uses any
+ 	  of the functions from <crypto/poly1305.h>.
  
-@@ -529,7 +531,14 @@ int uacce_register(struct uacce_device *uacce)
- 	uacce->cdev->ops = &uacce_fops;
- 	uacce->cdev->owner = THIS_MODULE;
- 
--	return cdev_device_add(uacce->cdev, &uacce->dev);
-+	ret = cdev_device_add(uacce->cdev, &uacce->dev);
-+	if (ret) {
-+		kobject_put(&uacce->cdev->kobj);
-+		uacce->cdev = NULL;
-+		return ret;
-+	}
-+
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(uacce_register);
- 
+ config CRYPTO_LIB_POLY1305_ARCH
+ 	bool
+-	depends on CRYPTO_LIB_POLY1305 && !UML
++	depends on CRYPTO_LIB_POLY1305 && !UML && !KMSAN
+ 	default y if ARM
+ 	default y if ARM64 && KERNEL_MODE_NEON
+ 	default y if MIPS
+ 	# The PPC64 code needs to be fixed to work in softirq context.
+ 	default y if PPC64 && CPU_LITTLE_ENDIAN && VSX && BROKEN
+
+base-commit: 552c50713f273b494ac6c77052032a49bc9255e2
 -- 
-2.33.0
+2.51.1.dirty
 
