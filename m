@@ -1,166 +1,81 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42383321DB
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 11:24:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6F03064A5
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 12:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761132277; cv=none; b=T+S7tkHHGtndYRhzuzotauPZNmU24Yn49cMNPLbq7H/6q4uZiFebdhyHR28BQO+U4TUZ7enNpAGkCpMZ43vYbAcVXf96DtaMCSYBsa1HdESG02EwE9Fkuy0fFX3EWf2FG+Xk7K7T0oN+/HS532dv6ZwCdqgmLo1wQVF0yZr1q28=
+	t=1761135800; cv=none; b=SOABAz0/UOkmj1HKSqlywp8Y3THANuCoCeEuSt0CHtb24mc75bqscIy07m1NHCkl68OJQt1Rccr723VNo/3HmqYA1WeM4iixTNUkleBvPd5cOFO6Pvt/Fe5rQSy2g2hFwf25klVBsNDL15rIC38ZHji3ZgXE4hVkyOgWu/mE6mE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761132277; c=relaxed/simple;
-	bh=4D8tvphMGIr2s84sTEq6X1ry1GAv1OlmyNqaGX6YgUs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nZyrI+KgHKf+tldraYJ5EbJz3Ja7CcpFoPlqKMPnxcbaUxI/CcMuyy4fVc9Xi800/BiJXcnZLiP6/z0sAYiLj6kyb66zfEjwwHIbKZHUDqsJS7BHMCxAynlyV/gyD3OKZ9gBPKbvEXGvFGvxy6GalyadSgJlvu7CXlTbkywQ0vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gK4c788o; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1761135800; c=relaxed/simple;
+	bh=JktCQkI6ynd7sl6DFIF72HeqeQ7e4o9Q2QQ2jWvW24k=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=IW6IaCGHD0gR/hubQhiehjKJBzvF+ETXhsUkwbyvPERshyfVXyzSIrM5aMPMT8UElz286ASFNkMwyORT7f/GopqrM1pmwQtgSh9ocoP4GR7pdo1jXzG1va1g+NOvLArVOITcPj5C29nL9J7OaDhtkub4unYJr3W2na26Bz33+jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DL8vOTwA; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gK4c788o"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4711f3c386eso34929895e9.0
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 04:24:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1761132274; x=1761737074; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NE6ALi4oCIm+yd7a3yOvtFqmufCiCdrMy/7EGT/KVX4=;
-        b=gK4c788o2dUERwLeI5fVMForfuiRyVpYluEl/tRSkBoSWiDvE+fhYQHMY4v1RDEHmW
-         Pn32t2Z9nrd2ltd0HzveMoV2j44OKM2spAJpQ/kTqrqa96vwz8mjQrHD6yztYlXqy0ek
-         UZOiaWSWatF3L5vc7Yq8Shupkx8yzWitt7geBvedGjAczs5gM5KbSAmMo5EPGFA0huQt
-         H+ED/Uy9kyRKkag3A5Iu24SLNSwT+4QWusL8lSpn+m86vQHp11JnLcL+XYAHQtTL2k+V
-         ewP+h2jtRFI+U9PrZhDMfo5eEyK2v73AAd6S0ZGQJtGgZccm4VWQ9vlhRmuhFsxFzJF0
-         p7Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761132274; x=1761737074;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NE6ALi4oCIm+yd7a3yOvtFqmufCiCdrMy/7EGT/KVX4=;
-        b=S3SisExN+us9qY7vRGODss3yqA0Y0qZAsuP/xVApbLNF7BNIlCZBBzxBeIe6jJJcO1
-         y66dFBZXIoFYwpdP5m9xTO8Q4Gk1f6LO3u0q6cvID4DN3w1p6HKYlNy+P7ikV6JV4AjB
-         Oz5HIKBz5S/v1JjdGFGDxDpgc1ttuzBiVQm+hrVZO7TYjIebsBLbQet2NskCk5guYJ5G
-         V4s4Pyw6O4sXyJDXDy6o1ijVIV2SCH6zF4N0hTomuBgteLbTmxm/Bi2D8OKfw94uZNR6
-         GStFdQNEvxfsbKj8T0Ksc28ST4achFJKL09URdghjyAYv9vkV2NRbD64QWQcdynooR5J
-         cohw==
-X-Forwarded-Encrypted: i=1; AJvYcCW2KWuKbIG/bA22yQqksTE/ybkPk0mWm1weqgPwF1W0ENkyqciaKzjNIzw0PtWSdhMs+aNGdUiLMQN3Y5w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzngmoktgULdYIsH99iYu2arJWsuzFi7kcgVwqAY9hmFEESbQKg
-	2GlpA+3jzyNPkO2zUOii87BrkI5VILBj3wOYgRrwIKdbw8WACpVn3H/f3Ekw55jiO14=
-X-Gm-Gg: ASbGncufk5I/rCTYel2lwEl1Xdcu4yDU1MspIAdTC1kC5lf02S1s+opRBvQ8QP7txyH
-	4AK0hT+YeIv1uj1+/7pdDA8NlwHi7ws4iR2kHZxWlhiEnypg/7vSeYY7kZzb8HYtA6k5puZRuBx
-	lXTdQb2sm5QaRLEIKjGLzeDoDj90PbzTj7YidpXabCPAIrhsoEMMT4TBJDs1dbJ0bqcIUZ35E2k
-	Hbg1yrL0Fvdd6CXUAJRnGPlWsMEdm5669eqgDuEXOx6X1GQd0gId3HjwnOnpaU+Ms8ShHA/R+Iw
-	3NEpt3/QZTXN8f4iHSU2aSe/Tner3gvaDJvOtUHw0zLui7qDNJrzaz2pya4C6NBAjdLVAuHZjNd
-	MEyNcmTeee//EP0ptxUYJJwluSkIY61ZUXCkNirH+7xn7TJ8DEO9B3a5Z9BGbf3XRRtoRsKKItr
-	YeAF6etUk/EwGqCmZc1VM=
-X-Google-Smtp-Source: AGHT+IFHudZFCqpsdF3BziLjxKHgkZc7fTsjSbocAq1uyR2DAIJq/pryZEZ8IbOeeE5y3RSm6MSLNg==
-X-Received: by 2002:a05:600c:3e12:b0:45b:7d77:b592 with SMTP id 5b1f17b1804b1-471178a74demr147513535e9.12.1761132274047;
-        Wed, 22 Oct 2025 04:24:34 -0700 (PDT)
-Received: from [10.11.12.107] ([79.115.63.145])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475c428a534sm45864405e9.6.2025.10.22.04.24.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Oct 2025 04:24:33 -0700 (PDT)
-Message-ID: <61813f89-3015-4fdb-a182-5c4159f7bb1e@linaro.org>
-Date: Wed, 22 Oct 2025 12:24:31 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DL8vOTwA"
+Content-Type: text/plain;
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761135786;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yXBQTo0YxNH0AV9Ylz3QmVWC6p5HiT23uJ/brCIeGUs=;
+	b=DL8vOTwA6JGAsocBBgFYuTlHJ1nULMgtmBemuRIogJmHoIGvl1xHJefWWth3GrnzYuDkdg
+	imI+9m0fOBjUNVHKbHntErgui7/2DOr1DvLHoLDVtEwZ2whCjxv23Jh+NoQCqLlvUFYhM2
+	Apy/yIhb5R9ecdIRRbu10t86/0qW9GA=
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] hwrng: exynos: enable GS101 TRNG support
-To: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
- Olivia Mackall <olivia@selenic.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Alim Akhtar <alim.akhtar@samsung.com>,
- Peter Griffin <peter.griffin@linaro.org>,
- =?UTF-8?Q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, semen.protsenko@linaro.org,
- willmcvicker@google.com, kernel-team@android.com,
- linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH v3] crypto: asymmetric_keys - prevent overflow in
+ asymmetric_key_generate_id
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Thorsten Blum <thorsten.blum@linux.dev>
+In-Reply-To: <aO0dJeqb9E99xVvD@wunner.de>
+Date: Wed, 22 Oct 2025 14:23:02 +0200
+Cc: David Howells <dhowells@redhat.com>,
+ Ignat Korchagin <ignat@cloudflare.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ Vivek Goyal <vgoyal@redhat.com>,
+ keyrings@vger.kernel.org,
+ linux-crypto@vger.kernel.org,
  linux-kernel@vger.kernel.org
-References: <20251022-gs101-trng-v1-0-8817e2d7a6fc@linaro.org>
-Content-Language: en-US
-From: Tudor Ambarus <tudor.ambarus@linaro.org>
-In-Reply-To: <20251022-gs101-trng-v1-0-8817e2d7a6fc@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+Message-Id: <73423731-F3C2-483A-BDAB-3FEF5471B8EA@linux.dev>
+References: <20251013114010.28983-2-thorsten.blum@linux.dev>
+ <aO0dJeqb9E99xVvD@wunner.de>
+To: Lukas Wunner <lukas@wunner.de>
+X-Migadu-Flow: FLOW_OUT
 
+Hi Lukas,
 
+On 13. Oct 2025, at 17:39, Lukas Wunner wrote:
+> On Mon, Oct 13, 2025 at 01:40:10PM +0200, Thorsten Blum wrote:
+>> Use check_add_overflow() to guard against potential integer overflows
+>> when adding the binary blob lengths and the size of an asymmetric_key_id
+>> structure and return ERR_PTR(-EOVERFLOW) accordingly. This prevents a
+>> possible buffer overflow when copying data from potentially malicious
+>> X.509 certificate fields that can be arbitrarily large, such as ASN.1
+>> INTEGER serial numbers, issuer names, etc.
+>> 
+>> Fixes: 7901c1a8effb ("KEYS: Implement binary asymmetric key ID handling")
+>> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> 
+> Reviewed-by: Lukas Wunner <lukas@wunner.de>
 
-On 10/22/25 12:19 PM, Tudor Ambarus wrote:
-> Hi,
-> 
-> I propose the bindings to go through the Samsung tree as well so that we
-> can match the compatible with the schema when pulling the DT patch.
-> 
-> Thanks!
-> ta
-> 
-> ---
-> Enable GS101 TRNG support. It works well with the current Exynos850 TRNG
-> support. Tested on pixel 6 like this:
-> 
+Thank you for your review.
 
-the commands started with # and were removed from the cover letter.
-I fill them in to avoid a resubmit:
+I removed stable@ after your feedback to v2, but shouldn't v3 be applied
+to stable as well?
 
-# cat /sys/devices/virtual/misc/hw_random/rng_current> 10141400.rng
-> 
-
-dd if=/dev/hwrng bs=100000 count=1 > /dev/null> 1+0 records in
-> 1+0 records out
-> 100000 bytes (100 kB, 98 KiB) copied, 2.03619 s, 49.1 kB/s
-> 
-
-# rngtest -c 1000 < /dev/hwrng> rngtest 6.17
-> ...
-> rngtest: starting FIPS tests...
-> rngtest: bits received from input: 20000032
-> rngtest: FIPS 140-2 successes: 1000
-> rngtest: FIPS 140-2 failures: 0
-> rngtest: FIPS 140-2(2001-10-10) Monobit: 0
-> rngtest: FIPS 140-2(2001-10-10) Poker: 0
-> rngtest: FIPS 140-2(2001-10-10) Runs: 0
-> rngtest: FIPS 140-2(2001-10-10) Long run: 0
-> rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-> rngtest: input channel speed: (min=380.570; avg=385.422; max=386.964)Kibits/s
-> rngtest: FIPS tests speed: (min=75.092; avg=81.784; max=84.771)Mibits/s
-> rngtest: Program run time: 50908949 microseconds
-> 
-> To: Łukasz Stelmach <l.stelmach@samsung.com>
-> To: Olivia Mackall <olivia@selenic.com>
-> To: Herbert Xu <herbert@gondor.apana.org.au>
-> To: Rob Herring <robh@kernel.org>
-> To: Krzysztof Kozlowski <krzk+dt@kernel.org>
-> To: Conor Dooley <conor+dt@kernel.org>
-> To: Alim Akhtar <alim.akhtar@samsung.com>
-> To: Peter Griffin <peter.griffin@linaro.org>
-> To: André Draszik <andre.draszik@linaro.org>
-> Cc: Krzysztof Kozlowski <krzk@kernel.org>
-> Cc: semen.protsenko@linaro.org
-> Cc: willmcvicker@google.com
-> Cc: kernel-team@android.com
-> Cc: linux-samsung-soc@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: devicetree@vger.kernel.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Tudor Ambarus <tudor.ambarus@linaro.org>
-> 
-> ---
-> Tudor Ambarus (2):
->       dt-bindings: rng: add google,gs101-trng compatible
->       arm64: dts: exynos: gs101: add TRNG node
-> 
->  .../devicetree/bindings/rng/samsung,exynos5250-trng.yaml       | 10 +++++++---
->  arch/arm64/boot/dts/exynos/google/gs101.dtsi                   |  9 +++++++++
->  2 files changed, 16 insertions(+), 3 deletions(-)
-> ---
-> base-commit: 8ebc2add3e2d076adc5cc3e8c9bef268f7f1cb31
-> change-id: 20251022-gs101-trng-54b710218424
-> 
-> Best regards,
+Best,
+Thorsten
 
