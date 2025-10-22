@@ -1,72 +1,134 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55B61A267;
-	Wed, 22 Oct 2025 00:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85AA78F4B;
+	Wed, 22 Oct 2025 01:34:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761093335; cv=none; b=gNNy8uQs+EHx47+3pwn9WXGbmvUfLbZUflzUmll1FwsvbDjFSRVfunwlJ5syRuPNxfdQO8oqHstl5fsuYxomVoxv7KeorioFDzH61RSVjBVSmxUukwrGypxfAXCLvsvN9BYIeMVsacqKjl9EH2ejCCpm9UGNvNvPi9LPqdSJyzk=
+	t=1761096890; cv=none; b=N45HRdHannWuzu/QZXSssfeBsTw87OhGfWyI6gujU6kIJTvzyXq0zlshSHfbym/xtbSiXIZOcKCmnVigfUnmG/jIRVm43wB9lHvl1OS++EDwgay/Pk3Fl9cun/Ag8uVSF3nDX3gfAH9kFmL/1OEkxuANo0Zp7nAEwRX03Zc3h70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761093335; c=relaxed/simple;
-	bh=8hRdqy5Yrbx/EhG+2c8n1bTDk146L6f2IOviuCW1FCI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MVqTAlU4FyacmowqHpbSVtwLni7/UuPvy5vj+0608jlGtODyOr0hklfxRWG2ajcFhCDSk3uOG+7E0o1ycqLKWDF3XhdFHCMIwQKlh/MAMrt+0UcxknyTEE6POKVWwqgWvcejZIpzT8LWAtMuAq2ztC4eMF73LtUl65AV/Cmn2EI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=PLltQZbU; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1761096890; c=relaxed/simple;
+	bh=iGEDrF5yfwf+vRxnVRPKHBnPdEPhMrlz3GbZ8GRnFyw=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=EYA07VEGhRsqWYsOcBCSDbKMGnTZY0R25X6QxM4lmsmFWrbMPyIsl5NwgkIOge+dx7DOLIUgvRNNoxXc83SfjV9+Tu+x4K0hLcOlf+hAvJdBKOzbjOPQhJ7zGHEdsg6HQu/EHt2qp1yE4Tc15ZUtQEKyebxr3q5jgtaJ1HVE1SE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=AqTfNumn; arc=none smtp.client-ip=113.46.200.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="PLltQZbU"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=9HPnGCRMUx0VNHlx3dB3LZrNA7OZibLDHCKrVeOOBvA=; 
-	b=PLltQZbUos+LVWwks8BshulxuIHSS2krOiFwPSEE7XtFrgkV8J0a8o065V2IOJYTzME/yPGltMM
-	5QuPe+NjKkf/u+XjtWaOU8p6MRXlxBFz/0yj04Oph6cyiXx5nyOZt2bGXsKhyCdzrM289WtrcPFOw
-	SFDahQUteeM8OFoLbzRLMUg8JTebM2QZFu/XRK/IlfKxhKIsekbAHYgm+VGFs7OsOPhE4JpNmtMeH
-	FoGdcysMt+nYuKNBeUHhnU40MWjpe/EfKjBE7uSjp2R5zVxeUtwxct3bTHsL+kgGeDlqbxtlwoFyq
-	8m5PU7p9GEuIsbyT6uJ+wcqjf65OwtTPjjQQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vBMox-00EXM4-2e;
-	Wed, 22 Oct 2025 08:35:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 22 Oct 2025 08:35:19 +0800
-Date: Wed, 22 Oct 2025 08:35:19 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Shiva Tripathi <s-tripathi1@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/4] crypto: ti - Add support for AES-XTS in DTHEv2
- driver
-Message-ID: <aPgmx4LrekeGkidq@gondor.apana.org.au>
-References: <20251009111727.911738-1-t-pratham@ti.com>
- <20251009111727.911738-2-t-pratham@ti.com>
- <aPHW_zyWwA36Usy1@gondor.apana.org.au>
- <07032efd-52a2-44e1-89bd-81602be9eb32@ti.com>
- <c76843e9-e644-4b9b-803f-b9eb9a31b89c@ti.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="AqTfNumn"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=epdm1RbUwUFBY15HOOvBG2aQfK/58vGsDkZk2qE97Hw=;
+	b=AqTfNumnSPioVgDVgr9Ksjb1meVYQ+ui+tKLKbJ6PwQt+ve4lrM/FTFeHKJcSXAp3P+6daxOp
+	YkVsKgtpBBJKyeLxQuyo0KiiIsxLZjYGbMkxI35k6PtjdtEcDgcrzVxdM1cdaaQqSW8qsz4Gmv+
+	kj9gp9hUGVqmbJLCifB8ZOc=
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4crsBP5XK1zcZxv;
+	Wed, 22 Oct 2025 09:33:33 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4FC0E140154;
+	Wed, 22 Oct 2025 09:34:44 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 22 Oct 2025 09:34:44 +0800
+Received: from [10.67.120.171] (10.67.120.171) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 22 Oct 2025 09:34:43 +0800
+Message-ID: <28d3972c-73c3-40f8-8563-02650aceb4e5@huawei.com>
+Date: Wed, 22 Oct 2025 09:34:42 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c76843e9-e644-4b9b-803f-b9eb9a31b89c@ti.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/4] uacce: fix isolate sysfs check condition
+From: huangchenghai <huangchenghai2@huawei.com>
+To: <gregkh@linuxfoundation.org>, <zhangfei.gao@linaro.org>,
+	<wangzhou1@hisilicon.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <shenyang39@huawei.com>, <liulongfang@huawei.com>,
+	<qianweili@huawei.com>, <linwenkai6@hisilicon.com>
+References: <20251021135003.786588-1-huangchenghai2@huawei.com>
+ <20251021135003.786588-3-huangchenghai2@huawei.com>
+Content-Language: en-US
+In-Reply-To: <20251021135003.786588-3-huangchenghai2@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
 
-On Tue, Oct 21, 2025 at 08:40:40PM +0530, T Pratham wrote:
+
+在 2025/10/21 21:50, Chenghai Huang 写道:
+> uacce supports the device isolation feature. If the driver
+> implements the isolate_err_threshold_read and
+> isolate_err_threshold_write callback functions, uacce will create
+> sysfs files now. Users can read and configure the isolation policy
+> through sysfs. Currently, sysfs files are created as long as either
+> isolate_err_threshold_read or isolate_err_threshold_write callback
+> functions are present.
 >
-> Since a similar mechanism is not available for AEADs, I was wondering if
+> However, accessing a non-existent callback function may cause the
+> system to crash. Therefore, check whether the function exists
+> before calling isolate_err_threshold_read or
+> isolate_err_threshold_write.
+>
+> Fixes: e3e289fbc0b5 ("uacce: supports device isolation feature")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+> ---
+>   drivers/misc/uacce/uacce.c | 10 +++++++---
+>   1 file changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
+> index 9b82a6731832..e3433d95640a 100644
+> --- a/drivers/misc/uacce/uacce.c
+> +++ b/drivers/misc/uacce/uacce.c
+> @@ -382,6 +382,9 @@ static ssize_t isolate_strategy_show(struct device *dev, struct device_attribute
+>   	struct uacce_device *uacce = to_uacce_device(dev);
+>   	u32 val;
+>   
+> +	if (!uacce->ops->isolate_err_threshold_read)
+> +		return -ENOENT;
+> +
+>   	val = uacce->ops->isolate_err_threshold_read(uacce);
+>   
+>   	return sysfs_emit(buf, "%u\n", val);
+> @@ -394,6 +397,9 @@ static ssize_t isolate_strategy_store(struct device *dev, struct device_attribut
+>   	unsigned long val;
+>   	int ret;
+>   
+> +	if (!uacce->ops->isolate_err_threshold_write)
+> +		return -ENOENT;
+> +
+>   	if (kstrtoul(buf, 0, &val) < 0)
+>   		return -EINVAL;
+>   
+> @@ -440,9 +446,7 @@ static umode_t uacce_dev_is_visible(struct kobject *kobj,
+>   	    (!uacce->qf_pg_num[UACCE_QFRT_DUS])))
+>   		return 0;
+>   
+> -	if (attr == &dev_attr_isolate_strategy.attr &&
+> -	    (!uacce->ops->isolate_err_threshold_read &&
+> -	     !uacce->ops->isolate_err_threshold_write))
+> +	if (attr == &dev_attr_isolate_strategy.attr)
+>   		return 0;
 
-Please add the same mechanism for AEADs.
+sorry，I send the wrong version of patch 2.
+
+Intercept the creation of sysfs if neither read nor write exists;
+create sysfs if either is supported, but intercept unsupported
+operations at the call site.
+
+I will send the right version in v4.
+
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Chenghai
+
+>   
+>   	if (attr == &dev_attr_isolate.attr && !uacce->ops->get_isolate_state)
