@@ -1,124 +1,157 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986E62D8DA8
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 06:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AEDE78F54
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 07:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761113874; cv=none; b=NSacuR+DaQEuxCEF2jc8wId0ed4Dbt8CM7Dz26+wSYrrdn2rRLKzObnrn+2I46pLq/VNy2VutLMwCidUJh0qcY5fSN2YIb/wrLbTBF2IGvjWjRyiKsvG5W2/49hyDeEacUmqOqGexWEh5aDwo8QnNJETTYEp5oZdT+8BQ9RLn0k=
+	t=1761117114; cv=none; b=jsr5MI5LcUA24LWKIpYE9GRG3qTnOu/MMF2v7B6VHWzNVsITbXBVi/zlEOQBLRPIARIIEy/s9xmN4q+85LaSNZbt0VbUOvvUm64DSVxzW3au4g4Pf0pIr5JbhNh4P3gOPirU5nhwb+mGn8FBb8uZe0kwil2qN+HW6gAku06K9sE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761113874; c=relaxed/simple;
-	bh=tJ2SLhKeJHRkOm7NmqWKDFbTUH8Da+/KF/tTBGd+IRE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MNv4UiuHAX7/A9NPj5V9qWOLggk1ptxbe1/1MnKMdQK1/MRxsoF3HQ7WvRV233vUNZckEC0IcwDJzmG55a2t2ja/Z3e+SyDpLHDlRxKUbMGi2nVsoBnearCLSsfaxEgFtas+7lNll0V650ojKZE/uhyVAg2Pd/U5Lld9QgsgqtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=exnnUBj2; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1761117114; c=relaxed/simple;
+	bh=lFxy0NK1X/El45Qs3Wjm9AlJrpb5J9XKmRCy6hI9130=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lpcSfncNjSycwf0I45+Yh+eDteeyn19kild2qygw8lAUjRKJ7VOwMgXlgn2RSHYEHKqDl/TcGGs6EClTeKzPk5TBSABNeGUFp5+d4CzugKMnDVx8W5EE74uU0AtjpvR+xJ5OCh9wSofokLvr4iW6EN+fUFdG+1tlp3jR65w9RKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=uwyl57t8; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ugWAT5ne; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Nz14d9Rp; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=2CbetMO3; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="exnnUBj2"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-36639c30bb7so58739241fa.3
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Oct 2025 23:17:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1761113870; x=1761718670; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=UWnH0z3/I2vnbb5PD9yTp0U3AaENDgRIUOGh+uP8nRQ=;
-        b=exnnUBj2xwpbdLT0xd4DCwwnyevoIiZA4+5OIkEshMBGPb6N9jGIypk055LnrFDLs5
-         mcZhsqi7bld4M9HjFPRTJaQ7EmkWgPE+ApvW4ZVBudcKdXM9TwTRM5JdP/lzqkkqKnFO
-         XhWvUS0FB9fj8WDJ21tG0R0TMWdsVzXquDnXyl3yLonjnz8He3ZExikT5V5edeyY7gws
-         NnzBAgMhi2z9DCNGs5ewCh61LHmsMBJNgm25J6HN+vY5WJ8QtcwlnhoS6gqolfMdRKEV
-         BZP42oXHO0MWiXF86QLtpGPU9fhUOfxZf+4EAHIq++KcQ+vnOjRU59l3jdVzcUfRwJ6W
-         AhaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761113870; x=1761718670;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UWnH0z3/I2vnbb5PD9yTp0U3AaENDgRIUOGh+uP8nRQ=;
-        b=G9BXKyog2mudnhRbDF/2GxNeSpZw6/iJ4NMWcby0Pv1WBM6Qg4iYTPPXSm3RK+PY0g
-         0BEds+u9im9Q7vVgyvAnWkQwrGDbVeQCKJRifvtJHyta70N/rzK9HkqqXe53CpcHP+2m
-         rFxT0bOPIm1RDDu2y4+pccfCzSCl9lqVX94D1JcuGnVBSkLFUHnWK4MbK3S58ton14rE
-         K5UIvs+S9oyMBLWtrqa2dOysu9yPmziwEWK1aqTj7pMmBikCnwBbn6ZbwjK+II0tJSV5
-         ncSkRxeAT+3olFk4U9lF2K2Qlktf5/EG2wPgQOCZDNARaEFwF6zXs/Udi6oFVES2q1Ej
-         tNsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWIf9C7TEhWpQhd8aI/RAASgR8B9vQhNNfyvIT7GXs8bsEPsQg0Pm+FukbDoemlMV0XPFGBUWm7VqsVgGo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYlwSpL89NIqLJoj70iudkRM4HLfPO/CzUkuxkGPkW6lmYmx2v
-	QPOgUi1aqQedMus/jfTq0V/60TWlXpxi7x+qQDF8gQy498Y4x5ztFO7XZsevrBFoLJTsyj4RACA
-	KfbB/m1wQLTO9dt4tczBzHfbcQo4211nHNcOk7dyjUQ==
-X-Gm-Gg: ASbGncu/KMSsFRMZZRt3fPMhM8BXGCUqo8YhX9K9CQNkf+6yEhJhz3Fm52BnkgnZXic
-	kkDEuzkeu/j3KYWLfgvci3ukiwkN9kmIGcYmJ4GEmapNQpvJEYolwAUaXU2DuxxlhkRjNNoYl/n
-	y4oDTsIHB4811dtVJ7m0HBTRkF8+hn29c8Kv12Y4adZ+qNDFR3m3NoBM3q5HkNFFOq/UnpNUMIB
-	sYdnt2GB/05pLLVwoKIMxKgyUyezCihdDydHggxeKX1WX2FhhlahkkheDU=
-X-Google-Smtp-Source: AGHT+IEOYG8NIPEs5pKzMS9oFvhSSNaRqyK08+8A+zRLCXw0GMyrztPKw+JpYE7Ez8iSMADnEUIr8G8Bnm4c5IDluno=
-X-Received: by 2002:a2e:bc87:0:b0:36b:c7d2:3aec with SMTP id
- 38308e7fff4ca-37797a3b35bmr64944861fa.31.1761113869658; Tue, 21 Oct 2025
- 23:17:49 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="uwyl57t8";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ugWAT5ne";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Nz14d9Rp";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="2CbetMO3"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 239FE1F397;
+	Wed, 22 Oct 2025 07:11:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761117107;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bCo6c3jOZCaszWTotbd5IGeLwwS2UDsyK+Ikn6++0Po=;
+	b=uwyl57t81guhonppnXFDGMXfR9U7SWkuCFBhChzVol4xQBLUSuzn0vE3zVnroUarlwG8az
+	8inLHxz9uQBj8/nMVAq638zCJxrpfbV347iysJTXbv0YZYVfzYfiazWkTiKsxheKoNXzMx
+	k9yUr4Ck5sSmOF1zucXr97+dnPOPG6M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761117107;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bCo6c3jOZCaszWTotbd5IGeLwwS2UDsyK+Ikn6++0Po=;
+	b=ugWAT5ne/R5Uah2/TnNa3gI2htSG4EnlTGU3w6Kl45ggvUjN+4lut8u3dXWgBspObgqLBn
+	i3Xra7Ck8l9/Q6Aw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761117103;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bCo6c3jOZCaszWTotbd5IGeLwwS2UDsyK+Ikn6++0Po=;
+	b=Nz14d9Rpu4YM6XFzzL3V01i3AKFihaFLwOi9Xtd1MRq+ewjQte5pYedDmNdlKN2SzFKQYs
+	qxT6/s/ZGoB4cjd/0ej5Egw10+wRs2QdL8iu9anPR8O8kjB0FNUVsmmXDONP4bXb3l/2oB
+	HRQzUIWtu+xpL/d1xFmlS/7RRF39ycU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761117103;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bCo6c3jOZCaszWTotbd5IGeLwwS2UDsyK+Ikn6++0Po=;
+	b=2CbetMO3lkdIzGNlIxl8ebU5307el5FJS9UnUP+rsBIIL4JcxlrJJCmefxy6qJcF5nCf5o
+	hqKE8JlAFQ8aygBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0F9231339F;
+	Wed, 22 Oct 2025 07:11:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id VeGiA6+D+GgRBAAAD6G6ig
+	(envelope-from <dsterba@suse.cz>); Wed, 22 Oct 2025 07:11:43 +0000
+Date: Wed, 22 Oct 2025 09:11:41 +0200
+From: David Sterba <dsterba@suse.cz>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH 10/10] btrfs: switch to library APIs for checksums
+Message-ID: <20251022071141.GV13776@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <20251018043106.375964-1-ebiggers@kernel.org>
+ <20251018043106.375964-11-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251022021149.1771168-1-huangchenghai2@huawei.com> <20251022021149.1771168-2-huangchenghai2@huawei.com>
-In-Reply-To: <20251022021149.1771168-2-huangchenghai2@huawei.com>
-From: Zhangfei Gao <zhangfei.gao@linaro.org>
-Date: Wed, 22 Oct 2025 14:17:38 +0800
-X-Gm-Features: AS18NWAFtm0-ZzGTC5xVfvePf8YH974eaCsbWSlfE8Zb9Q6UX9QnJZCOcf1gynk
-Message-ID: <CABQgh9HFHSstR19NtOw5c6E+qS7_d_=6qnCYq9VY6DNKT6o3ng@mail.gmail.com>
-Subject: Re: [PATCH v4 1/4] uacce: fix for cdev memory leak
-To: Chenghai Huang <huangchenghai2@huawei.com>
-Cc: gregkh@linuxfoundation.org, wangzhou1@hisilicon.com, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	fanghao11@huawei.com, shenyang39@huawei.com, liulongfang@huawei.com, 
-	qianweili@huawei.com, linwenkai6@hisilicon.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251018043106.375964-11-ebiggers@kernel.org>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	HAS_REPLYTO(0.30)[dsterba@suse.cz];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:replyto];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[]
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
 
-On Wed, 22 Oct 2025 at 10:12, Chenghai Huang <huangchenghai2@huawei.com> wrote:
->
-> From: Wenkai Lin <linwenkai6@hisilicon.com>
->
-> In uacce_register(), if cdev_device_add() fails, we should properly
-> decrease the reference count of the cdev kobject and set uacce->cdev
-> to NULL to avoid potential use-after-free or double free issues.
->
-> This change adds proper error handling after cdev_device_add() fails,
-> ensuring that kobject_put() is called and uacce->cdev is cleared.
->
-> Fixes: 015d239ac014 ("uacce: add uacce driver")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
-> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
-> ---
->  drivers/misc/uacce/uacce.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-> index 42e7d2a2a90c..9b82a6731832 100644
-> --- a/drivers/misc/uacce/uacce.c
-> +++ b/drivers/misc/uacce/uacce.c
-> @@ -519,6 +519,8 @@ EXPORT_SYMBOL_GPL(uacce_alloc);
->   */
->  int uacce_register(struct uacce_device *uacce)
->  {
-> +       int ret;
-> +
->         if (!uacce)
->                 return -ENODEV;
->
-> @@ -529,7 +531,14 @@ int uacce_register(struct uacce_device *uacce)
->         uacce->cdev->ops = &uacce_fops;
->         uacce->cdev->owner = THIS_MODULE;
->
-> -       return cdev_device_add(uacce->cdev, &uacce->dev);
-> +       ret = cdev_device_add(uacce->cdev, &uacce->dev);
-> +       if (ret) {
-> +               kobject_put(&uacce->cdev->kobj);
+On Fri, Oct 17, 2025 at 09:31:06PM -0700, Eric Biggers wrote:
+> Make btrfs use the library APIs instead of crypto_shash, for all
+> checksum computations.  This has many benefits:
+> 
+> - Allows future checksum types, e.g. XXH3 or CRC64, to be more easily
+>   supported.  Only a library API will be needed, not crypto_shash too.
+> 
+> - Eliminates the overhead of the generic crypto layer, including an
+>   indirect call for every function call and other API overhead.  A
+>   microbenchmark of btrfs_check_read_bio() with crc32c checksums shows a
+>   speedup from 658 cycles to 608 cycles per 4096-byte block.
+> 
+> - Decreases the stack usage of btrfs by reducing the size of checksum
+>   contexts from 384 bytes to 240 bytes, and by eliminating the need for
+>   some functions to declare a checksum context at all.
+> 
+> - Increases reliability.  The library functions always succeed and
+>   return void.  In contrast, crypto_shash can fail and return errors.
+>   Also, the library functions are guaranteed to be available when btrfs
+>   is loaded; there's no longer any need to use module softdeps to try to
+>   work around the crypto modules sometimes not being loaded.
+> 
+> - Fixes a bug where blake2b checksums didn't work on kernels booted with
+>   fips=1.  Since btrfs checksums are for integrity only, it's fine for
+>   them to use non-FIPS-approved algorithms.
+> 
+> Note that with having to handle 4 algorithms instead of just 1-2, this
+> commit does result in a slightly positive diffstat.  That being said,
+> this wouldn't have been the case if btrfs had actually checked for
+> errors from crypto_shash, which technically it should have been doing.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-Not understanding this,
-What if kobject_put(&p->kobj) is called twice?
-cdev_device_add would call cdev_del->kobject_put(&p->kobj) as well.
-
-If you think cdev_device_add has an issue, maybe fixing
-cdev_device_add itself is better?
-
-Thanks
+Thanks, this simplifies quite a few things. I'd like to take it via the
+btrfs tree as there may be the hash additions (XXH3, BLAKE3) but
+currently I'm not sure if it won't make things more complicated. I
+haven't started the kernel part yet so I can use this patchset for
+development and rebase once it's merged. 
