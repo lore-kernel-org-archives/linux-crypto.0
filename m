@@ -1,370 +1,272 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011020.outbound.protection.outlook.com [52.101.70.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752FA2C15BB
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 04:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761106828; cv=none; b=fuATHUwcpVueemqRGzb7XKaJv9X2mAj0zUWAY22SUFz/X0JI5EbJTkR5M/vRioidHfjddcPQF6S5Pn8OHTKs5HoVe/PIDPEgELPDJGRHjiDnz1tHOw8etx94GsSdErcW4a9z0Kud9uAhgU8epatUjnpcwMV+LpuChZNbeguAJnQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761106828; c=relaxed/simple;
-	bh=2LvoX8vCx1tufVUw3MgzD/5yh2XJb4pcCLw0O06vvgI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SARqUyu1BDVE337cz42RaCc295K8Cy0ET22aJ1cUHhD8xjIYwnsg3Wk64YI8C2VX841AmGlmrtOyfbFpqIj0M+QNtxxoaenn68YHUTHl9no5Nc//D2OfZVKvdPGho+CA+rlAjLQhWtUxylz9I3HJPIzsvvcw/NlCBMRObz1xdts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T+8RY0mo; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4A42D781B;
+	Wed, 22 Oct 2025 05:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761109523; cv=fail; b=mU/XAgoJoAys0aaXO3ClpwMfgxt5IwvYIUZ8CKLzzSsFa4HSeVKki4xA1Wt7EknKk2X6OZiffTBucgjPI0FAxmqbgs7i4VqoUOz/8NK7METJ9mADDVSn7xbVxKu4998UvvlAc7g9FL7saef44mCx4IGZQ1Rnls5cSzfNJ8/jSJA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761109523; c=relaxed/simple;
+	bh=fCfdauA/9LCwEf0Z6wJQq/tryffJHyhaCkNCqdf7JHQ=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=AazIOvml7uxk9wUJFEvroyaj6PFE4+cqGF3inXMmg5rKWEPEuLJoyrn3/sfW1qT+eiByL35AH6TJQsP/HUEpFzWKSEib+sh26mXPfJCcZwJgaGzsJu9TzsiuZpbio3p/UFy5z2ZganocQ6jrUq1WVHco+vevdiCT57n0d2YGt2M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b=ERjRO9qD; arc=fail smtp.client-ip=52.101.70.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siemens.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T+8RY0mo"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-88ed6837e2eso1347402585a.1
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Oct 2025 21:20:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761106825; x=1761711625; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ODhNpK7RnCdLY40s70BovQLD/n6xOeEpw27aGxRtg2g=;
-        b=T+8RY0mo3meFeGrhtNs+SAdbYh9kG5VFitFWNSDnMij0o+QbhBGCv+rDwxpRy2qLYo
-         EGWSBn2jnRpMcVRu20fkCv/jKd94mIw5/860KfVkpF6fKtKLAsB84FINpiplQt8Qa6NE
-         Z/XXwywgxJCr6qlQ+RHmOhCzfzYbZ/0t4OV87C8hefJ9MhxIXWfVNccCP5EFzmsy+52R
-         AE128zR2vcG1vjP4s1ExGkBra15uUU5wtN0ga3AYAcVnNaYIw9Hg5DmG82xlw5E9N0Yf
-         GspTUqa8lXbptoM923M+LWCHz/kWUCqF94edYTHA4Vo6DX+J68qYSgvsV/O6wnh/ftM3
-         WHXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761106825; x=1761711625;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ODhNpK7RnCdLY40s70BovQLD/n6xOeEpw27aGxRtg2g=;
-        b=Yl5SgwtjThO3MnyTbt/Bdjj1i3/0ForZR2cRdgJMc7J/RqQsrn/wTuE1TvpkHE0N6/
-         rb/oGAsO+Vmv4W+8w4XZlLnI1Il7zarrfuo6udL+bS3YxLEhGfhuhpINS64RCS7dQkKA
-         /pGzo26sWuv5CKsSlCIWurzkFnhf4S+sFqffaZCcEAcUrygmY87L4j6A/ifDFRuGNArO
-         Y8pTPHdwZi8Fosr6p5FbXfGNjtpsmgbPUTfV4tErvRdqFibyNJr4S90TtmskMTlOmFDs
-         OaFoSCniykDOYaYOiTcvYKjDkcXiIKgzdRoH4K5OpKyvpzL3ew88ZxMwMzw/LYYrSVSB
-         tNXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVzGQc5k1T43qKP5MK0NRUVFthsmyY84MxVDr2unUOX0c5YhBq5Tmim466YNjDDAHeDxkrAxmdhqPJujAU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDsDzRVNw4Vy7ulWRXHvcc9WcWsOaKArsXzjYBICww/9htoeWp
-	PcIK6FPS+MkgUZR2v5VpX4qUekNlFOdU3WXILnRYIajYmubJCZUE7RIQ
-X-Gm-Gg: ASbGncs2uHFscAQ+2wzZGK5UnqLrk4zMIjaVWHGoDzvSNjBhVuaT2janyF8RCbYp2/+
-	C66ddEL2xrgfLAcxJS14xqe5Qq2icuwaRgakINGNXe79VFeCJxl5Zscxc2OLcjEv2WBA8wyN61v
-	ktRvqJ2Dm+PYEqfIn5ONP3ARRUQCpUiTPcTptFMj4uQlHyPw3wynx525gIiaiXK15Vz1xJbAeui
-	dYmp/16l7nmDayDkpJuzlBUA0HxSe2V0a2KjFpt47wtFzA0hIbvvs3mWOVXw3uXhjPB5ICjiBHk
-	q1Tlx6+BFvhtv+Xy7VI9TITNkvAkgsbnJivz06Ne+NF+j20SH2Vo/tJ0cLpl9owlEy9QCL8DMfh
-	hBWwsEkGdA064rC+nx/6zbgDrcyClOLrHP6+x4C1giqohee3oCr9TWSck/oBi833eTYlD0nwY
-X-Google-Smtp-Source: AGHT+IFKpjZaqHyEdyKVtERVYcIxj+O15A9VpaXXOseaN7ns0Zwp6c8+X3yhxQ/MJYZF6q3dxlGylA==
-X-Received: by 2002:a05:620a:170c:b0:891:81e2:fca8 with SMTP id af79cd13be357-89181e2fe2fmr1995019985a.69.1761106824637;
-        Tue, 21 Oct 2025 21:20:24 -0700 (PDT)
-Received: from localhost ([12.22.141.131])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-891cfb56807sm902420985a.63.2025.10.21.21.20.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 21:20:23 -0700 (PDT)
-Date: Wed, 22 Oct 2025 00:20:21 -0400
-From: Yury Norov <yury.norov@gmail.com>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Crt Mori <cmo@melexis.com>, Jonathan Cameron <jic23@kernel.org>,
-	Lars-Peter Clausen <lars@metafoo.de>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>,
-	David Laight <david.laight.linux@gmail.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>,
-	Tony Luck <tony.luck@intel.com>,
-	Michael Hennerich <Michael.Hennerich@analog.com>,
-	Kim Seer Paller <kimseer.paller@analog.com>,
-	David Lechner <dlechner@baylibre.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Richard Genoud <richard.genoud@bootlin.com>,
-	Cosmin Tanislav <demonsingur@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Jianping Shen <Jianping.Shen@de.bosch.com>,
-	linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-edac@vger.kernel.org, qat-linux@intel.com,
-	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
-	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH v4 2/4] bitfield: Add non-constant field_{prep,get}()
- helpers
-Message-ID: <aPhbhQEWAel4aD9t@yury>
-References: <cover.1760696560.git.geert+renesas@glider.be>
- <67c1998f144b3a21399672c8e4d58d3884ae2b3c.1760696560.git.geert+renesas@glider.be>
- <aPKQMdyMO-vrb30X@yury>
- <CAMuHMdXq7xubX4a6SZWcC1HX+_TsKeQigDVQrWvA=js5bhaUiQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="ERjRO9qD"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TlIb5q3X2GfLWzRU2PZpIJhT9rZSJ7FHeseOMpHJ9CSJflGJRK4GAbZRPMiGP68xJtVufdfgfTso5xXSBG+uvQUMOavZ6Oao5xvdj6v/jxMZol2pSL5YVQrq0/7STPPJONtSgowy0IQEmaqMJxeIq5APvtsVSahY6c7trnJMHGnwiNy3ugWKHB0Bp5/n/0EEwyFNfKUr1PwkZhM6Fsug6wZRFqMZwatIyZUXNuQlfSeJL2hW1C1TVeznQUlBdqsJ1kSqABg8Bgo9nSROAWMTNoSTbS8DB1pTQF5a0A4qwXU2h0GrhqOOFM2u9zIGsHVRQVJYiRP7wwj5QOsevF5GvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ouyCN9OoH6iw/C1GvnFUar2u9OYlbKMPaAfhgbN1RCA=;
+ b=KBVmXGhmnhaCY2vrtjX7xLpz5S8caGCT9ProOQh7D3hSPRvJH6o0N7c/7OkGhC2+crnOlI73OCO1iR/gm0pyFVtx7ig4maOEJQo7wC+BMeqigoP2anGT73Fygb2g22h7Bg0U+28G8IMT5sop/pnXW94UMVNo0gopzZKXb81MKfNaeokQ5miPsXzEUilIrPZMmSFgVqvC75eiVcsCxlaHpM0IDWBB6/6lEMSXOqdhqN4kGAs4II0Bqc94m8mzp1Hqi5QnC+pJQSgcrGNBoP+2tVf6vZR7BPUTvmiwEE4NRcrGAr47SseBejJp6L/MWkrHpJyT8f9mx4bJwsqS5hZW6w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
+ dkim=pass header.d=siemens.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ouyCN9OoH6iw/C1GvnFUar2u9OYlbKMPaAfhgbN1RCA=;
+ b=ERjRO9qD5ILy4jh0Sls7fJMiMVZqWXl99OUSotlKeoHfKgGpWgBZdD+8yO4Ga5x0GhG4CJyMe/lP8HQD2IBCDEDdEZdnz6l8d0VopNdi9Qr7tzcc9u7tOIQnDI5A04uoGCqcz8xyKGTNQV7eFDw8sC8p3zuevbtyPIrxeNkNjuFEwKBZSNY5Di6HxVyKjsPrpvWnUZ1M1AgDLD0WQmfspy039jW/ztwwSoAauxwJBirzXvW6aVAj9XJcmYVl3nzT8Mr8+1ggiSNJlJWtxV158XFWcjwIsQhq+yiS19LOJ5gIyl52upJoRxjYGI61Vtu8lnM5diJyMm78c13fPwKKHA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=siemens.com;
+Received: from AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:588::19)
+ by DB9PR10MB5353.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:339::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.16; Wed, 22 Oct
+ 2025 05:05:18 +0000
+Received: from AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::8fe1:7e71:cf4a:7408]) by AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::8fe1:7e71:cf4a:7408%6]) with mapi id 15.20.9253.011; Wed, 22 Oct 2025
+ 05:05:18 +0000
+Message-ID: <5539d518-5216-4730-a2ab-3c59d98d0229@siemens.com>
+Date: Wed, 22 Oct 2025 07:05:17 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] hwrng: tpm: Do not enable by default
+To: James Bottomley <James.Bottomley@HansenPartnership.com>,
+ Peter Huewe <peterhuewe@gmx.de>, Jarkko Sakkinen <jarkko@kernel.org>,
+ linux-integrity@vger.kernel.org
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Jens Wiklander <jens.wiklander@linaro.org>,
+ OP-TEE TrustedFirmware <op-tee@lists.trustedfirmware.org>,
+ linux-crypto@vger.kernel.org
+References: <bbc41534-a2d9-42dc-ac8a-ff8a0b4fd41f@siemens.com>
+ <212818188b192db3b852ec69fde174fd887eafac.camel@HansenPartnership.com>
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Content-Language: en-US
+Autocrypt: addr=jan.kiszka@siemens.com; keydata=
+ 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
+In-Reply-To: <212818188b192db3b852ec69fde174fd887eafac.camel@HansenPartnership.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0266.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b5::11) To AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:588::19)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdXq7xubX4a6SZWcC1HX+_TsKeQigDVQrWvA=js5bhaUiQ@mail.gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS4PR10MB6181:EE_|DB9PR10MB5353:EE_
+X-MS-Office365-Filtering-Correlation-Id: faf5405c-9231-4456-0e88-08de1128980c
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?U2hJVXlReFBCNzF6WFNzb0poUHJXSDQxL2JiMUFTYkNzT2k0K0diV2xlS202?=
+ =?utf-8?B?bk9pYUp4VVdOSG1na05pN09QQjFVSTM2bkFSVnEybDUzSzJBL2s1WFd3dVVi?=
+ =?utf-8?B?ajZGbUN2UXJ1ZlJkR1FDZlQwZWJ5YTd0SDZ6NXZPRXBkSHVMbmFFSmt6OHcr?=
+ =?utf-8?B?Tmx3ZUk1M2hTQnlSSHR0L1dkUGlJT3NQT3cwajZNZVlhTll4aHIvd3hoMGEz?=
+ =?utf-8?B?SUtlU2hVM0d5NmY3OXY5OXB1a3hKeDltVWE5UWg1bExxeEFzN0pRa3pxTXVj?=
+ =?utf-8?B?T2hOeXBnWkxhWFMvb04wRmlwTCtFUUpvZERTdmN1bWxqdjMrbU9XV3llaTlC?=
+ =?utf-8?B?YkpOcWJBc09veVE1cEJ2aXllVmZUUkREY1VPaGIxZjh1M3VnQzBwb3NrUTV0?=
+ =?utf-8?B?YUJJUklDQ0VmSkN0NXhIUWlrL0hCSTN6eEpzTVdWYzRIaXdsaGsxYmZpSXZJ?=
+ =?utf-8?B?bWFlaDIzS0pPR0NleVExT0d3QW85Q0VYQzlKM0M5VjJIWVgzdk9uMGZBRTMy?=
+ =?utf-8?B?L3V1YVpPQnhBMGJPaURMM3pKYkxlV2QvaThGMEdjQjQ1OHRqSml0VlJUbVBY?=
+ =?utf-8?B?SzhSOGxzUXZQVnF5NG5FeUNqVDFnNU5sd0pRTnREZDNYMXpaVytPNTVYVlg2?=
+ =?utf-8?B?REtTdk1nWjRtM2ttMFFadG02L3VjSGtjRnZXZzNaWmJFQ1R1c3ZsdnBDS3d6?=
+ =?utf-8?B?ZzBnN28rNUhPSzdEd1B4WTQxa21yUWpNNG1sQ1pZazZGMWNsU0ZiQnZIbzJS?=
+ =?utf-8?B?S3pPYytDY2xDZ3ZSY3Y4Nm9qYnY2SzQ3bEEzNXBkMjZiK00walNuZ3hTc2Jy?=
+ =?utf-8?B?L0VNY21aVVhjZnRhb1l4VDBVTFEza01pTkQ0V1d2R1VhcGNDU0lVN2hPMEJs?=
+ =?utf-8?B?WG9OUnA2aHBvd2xvUllMdTJKb2N2eDE3aXBZTWdwMEJaOUNmazRyU1pSRm5G?=
+ =?utf-8?B?OXRtOXNWdVlFbkcxR1BrVTU3VXUwVjRNQ09hWklVT3dNK1Bwa0llVlBTRldZ?=
+ =?utf-8?B?TGdrdnkxK1VSeDhBQm02dzZ6eVRJOFFHWEtRQ0tCWDNpcUd2MXF6STJzSjc3?=
+ =?utf-8?B?bncraEdjbi9LZnRndjdidldyVVlzREluYjRRbXZPRmpPb3NFbnNXOGxnckZC?=
+ =?utf-8?B?Ulo5dHRlWHVXWXU4MmorOGlxbEZFbmliWkNHS2kyeXR0dGpzN3JsbThTSk9H?=
+ =?utf-8?B?S2F3YWZ5aS80RU91dWthRUNXdVcxdmdFRWd6L3JJcU9xZ2ZaeWZUUlAzUlR6?=
+ =?utf-8?B?ektVWXlWTjQvekFXZWFZWlBpOGEzeE9ESy9ONk43Ly9ITktaTkovbzdBUkt5?=
+ =?utf-8?B?NENYazBMN3RmR2NVaEhTNWRmSE1zVFZCSGNVZ0o2NHZSNlNNUmZITlloUDU0?=
+ =?utf-8?B?SFdpYVlsdDVlS3l1UzBwbmZHeHNPeDQ2ZlUrdDZONVVPSTdsVTlzS21taURR?=
+ =?utf-8?B?NFZvNjRjWlgzbUNaLy9IK2VEL0FxQy8zOEdndTNidi8wQzlYZ3J3SUIzWVpz?=
+ =?utf-8?B?VHplenJ6VTJlaHBEb2JUQW1uemRuNVZRRnBSRVFQL245SEtQblplcEdHZTB6?=
+ =?utf-8?B?UEpiQnNzM29lbXA1dmF6N2RPVTJBNXRCUkF0WjVkRi9aQ1pIM1BmVHBQNmxS?=
+ =?utf-8?B?NE5CM3JxVllrWVdjTFhoaXluT0NqNGlsSWV2QVBlSmJzSDFvSkgyMWs4S0pn?=
+ =?utf-8?B?OFZ2Qy80L1FHclQ5c2gvVXRCYmFSWFB6TVFrSzRzNkJvU1dVMjU5bzhvWi8r?=
+ =?utf-8?B?RTNtcFlVSVNrRXhaUVJ1aW9kWjMrSlFhMXZTRlA0U1REMTZmNWhhVVJ3UmRI?=
+ =?utf-8?B?WWZPbktVcFFvSmJjeUNBR2t1eHdFNG14UzJ4Y08vM1l0QkZmTm0vZ2dUUFR1?=
+ =?utf-8?B?REJid3BQRjRiODZNckU5Z3BQbmxvZTFLV2lkbzRqVVk0MHVBMjkxSFZGYWgr?=
+ =?utf-8?B?V1gwM24rM3J6c01qS3o3ck90RnRQaXRjSWp3cUtOdi9CcmxQcUlRY3FGNXhP?=
+ =?utf-8?B?OUoxVCtkL2JnPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RmdrWVAwYVhKSnVRenVqb2JQYVh5cGZZczdqN0tMclNRZzBmaUFJbEVyaWh1?=
+ =?utf-8?B?dC9US0VvQ0FHMzl0RzB6M3BVRGtiRVdaNXcvSUNxWTBRcVdDSzhwNjUreVFR?=
+ =?utf-8?B?bjFIcU9RMk93V0VhcDRHQlkxd1FSNC9MVjdUL3BRTk4zeUxUTnZMRUNwNUJl?=
+ =?utf-8?B?SG1oNjhmY0V3dmY0QjI1L1AzWThwZVhxbzJhKzNHSURmend0TWNrMUJWT0tx?=
+ =?utf-8?B?NW00K01GQndCWDZuVW5YSWY3T256WWpQRVZHQ0xDR0pYOGtiK1NiSjVzTStL?=
+ =?utf-8?B?Rk51UjhsTlFId1JzN1Q3ZWVsMUtRSFZKTnV5ektHenNFeFNCS2FSMnNXUXcw?=
+ =?utf-8?B?YStoSmdIOFhacWhrWHVPZkJjT0xxT0psVitMWGJUVElyUTZoRHVIM0RWTW9H?=
+ =?utf-8?B?bVhOR3ZJN2xIZVVQTlgvcExGZmVWR3RaSUFSYTlEZ2l4Q3dDVmplOWVqYnpr?=
+ =?utf-8?B?ZGdvRnM4Q3gyMzdVckJ0QTdncHQra25lWUpwNytZRU9xVm5hTFl2ZDUzYmtM?=
+ =?utf-8?B?cjBrYnVNNHVuUjBHYVd4WmRiemVnL0lrRTNpWHVEcjdZcGh3dGIvTW1ua21p?=
+ =?utf-8?B?NXEzWTBFVjhBSkVmclcxUWUyZS9nMkRlMUxBQ0xQd2dSSnBaQk1kT09tb2Rz?=
+ =?utf-8?B?UEVaRnNUZ0tzd01SVUh5cStQSFFaMm5jZnAranZmVExBbUtNV3NEUGJDQVdU?=
+ =?utf-8?B?bno4NHc5YmFQdEU0QTY2VGNPOGg5cVp0TFc4OExjL0xSWlptT3UvT2svd0Uz?=
+ =?utf-8?B?dTN5L3FxOTM3YTRQWGlxK0g0WXIvWjRreDNkMndrREpTRCtvSFhvVGVVWTcz?=
+ =?utf-8?B?UmZibmFJdmJJOVd4L2NiK0Y0RzZPeWtNQmg5QWlSMzZYS0NTRS9lencvUmpo?=
+ =?utf-8?B?OGQ0WXpGMnpWb2pKNFUrd3YzU3BmYmhQMGYzQ0wrT3NoQnBpVXBzL1R4eWQw?=
+ =?utf-8?B?emdFcTRXbW9VRGNpTVVEUEgxRWwvbVV5Tm1Da2tzL09ST3dreW9vV0szcXc4?=
+ =?utf-8?B?T1NPYit6cCtVd1AxbXBwUVU0R0RBU3ZMbWFVeVVIY2lEaHRrVEQwVDYvZDRo?=
+ =?utf-8?B?dUZkaUErSVVhSzRVLy9mblRNdXFiTUV2Q0RNa1JkWG9mRE5aclAxakZqM2Jv?=
+ =?utf-8?B?cFpIdUxaZGl2UGwxNkZrUHM1dnludU1hVkhHYzJndkUzS3orL3p3akJpN2Rx?=
+ =?utf-8?B?Mi9NaUdqNDB2bWo3LzlQa2d6eXA3ckE0SWtFdzVxQWhPK2pVT1oxV0lXSk9K?=
+ =?utf-8?B?dEU3K2k0b2M3cm13S0RyNkdCb3JHaUw5Q2U4STBoNk15Y2d2SWtYdi8yckli?=
+ =?utf-8?B?ZVZVclVRNVU5M0dySXJqVENjZmd6TC9sTEdGS0JJNGJsV3krbFBKYkNMYlU3?=
+ =?utf-8?B?WEc4aEppbEp1RnJjUXpXTnJEM2hpU05xMXZLSEdJeWFWOTV4Sy8xZTBHVzFQ?=
+ =?utf-8?B?QTBCa25YMzVvVFc2NEhIeHdpVUVXTEhOMVlvaS9yeFB3UitiWVZ1SmZ2ZGdX?=
+ =?utf-8?B?NENOQTZobGgwc0MrTFRhR2Q0Q0V6ZHc1MkNLMUlKV091Uzd4QmtaZ1B5NzRD?=
+ =?utf-8?B?RUpLY3JyUHdGNUhIZFFmUGFpZ3VFVzhrRVE3NWVCcDY1VC9Ud0RIc1Z5UUNv?=
+ =?utf-8?B?UHhNZFZydzdYZDY5OFBTUm9RcE5oejVvcHllekQzSXhHNE9GT1JxM1hKZVVo?=
+ =?utf-8?B?Tmw1V2Vvc2x3K2RaMC9JaW9aWGp6eWtmOGxyUGR4TFlvbDVrbVFIWUhBcDlF?=
+ =?utf-8?B?NWswMmFOUnRhSHR6MmM2TVFQT1IyYVdUR0R4VUs4MEgvUncyOUx2NEwvOGdh?=
+ =?utf-8?B?MHZTK2xpdDVxdnZLMmVMN3FlYWZhMjlESE4yb1pMZ1hBOUkwTkgxK0RxWGkx?=
+ =?utf-8?B?b2dSVU9oYzdML1o2aVVBMmVtMGJtNnhyaWVYZFpmU1hyV2pNVHVTK3dUWmVa?=
+ =?utf-8?B?OStBMGU2U0tjUGN0K0tpOTUySDdIa0l3MEpLKzRCclBMNTcxaE9rbU50YlEw?=
+ =?utf-8?B?M2RNT3hyemFCazZJb3BYeWxFVGZDK0xUaFBuRDA5dllmMXNiWEhVZiswSDFj?=
+ =?utf-8?B?TkR6ajl3Z1dUdGY2RXJPZ1F2N1Q3NVVoRi9aTnhKN3NIQUdmSmhjNEtYOW1Z?=
+ =?utf-8?Q?TE3sXPz1aI1jyqUp8vT4XpwC0?=
+X-OriginatorOrg: siemens.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: faf5405c-9231-4456-0e88-08de1128980c
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2025 05:05:18.2732
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Hb60p27i5dAdFsTt8PYIgmdNjYjErtTaxQAZB/QyCMxCT080E6uvTwzvGBTM8x75DGqyv4Jay2xSZo/lMo3Usg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR10MB5353
 
-On Mon, Oct 20, 2025 at 03:00:24PM +0200, Geert Uytterhoeven wrote:
-> Hi Yury,
+On 21.10.25 18:15, James Bottomley wrote:
+> On Tue, 2025-10-21 at 14:46 +0200, Jan Kiszka wrote:
+>> From: Jan Kiszka <jan.kiszka@siemens.com>
+>>
+>> As seen with optee_ftpm, which uses ms-tpm-20-ref [1], a TPM may
+>> write the current time epoch to its NV storage every 4 seconds if
+>> there are commands sent to it. The 60 seconds periodic update of the
+>> entropy pool that the hwrng kthread does triggers this, causing about
+>> 4 writes per requests. Makes 2 millions per year for a 24/7 device,
+>> and that is a lot for its backing NV storage.
 > 
-> On Fri, 17 Oct 2025 at 20:51, Yury Norov <yury.norov@gmail.com> wrote:
-> > On Fri, Oct 17, 2025 at 12:54:10PM +0200, Geert Uytterhoeven wrote:
-> > > The existing FIELD_{GET,PREP}() macros are limited to compile-time
-> > > constants.  However, it is very common to prepare or extract bitfield
-> > > elements where the bitfield mask is not a compile-time constant.
-> > >
-> > > To avoid this limitation, the AT91 clock driver and several other
-> > > drivers already have their own non-const field_{prep,get}() macros.
-> > > Make them available for general use by consolidating them in
-> > > <linux/bitfield.h>, and improve them slightly:
-> > >   1. Avoid evaluating macro parameters more than once,
-> > >   2. Replace "ffs() - 1" by "__ffs()",
-> > >   3. Support 64-bit use on 32-bit architectures.
-> > >
-> > > This is deliberately not merged into the existing FIELD_{GET,PREP}()
-> > > macros, as people expressed the desire to keep stricter variants for
-> > > increased safety, or for performance critical paths.
-> > >
-> > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > > Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> > > Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> > > Acked-by: Crt Mori <cmo@melexis.com>
-> > > ---
-> > > v4:
-> > >   - Add Acked-by,
-> > >   - Rebase on top of commit 7c68005a46108ffa ("crypto: qat - relocate
-> > >     power management debugfs helper APIs") in v6.17-rc1,
-> > >   - Convert more recently introduced upstream copies:
-> > >       - drivers/edac/ie31200_edac.c
-> > >       - drivers/iio/dac/ad3530r.c
-> >
-> > Can you split out the part that actually introduces the new API?
+> The Reference implementation does this because it's NV ram is main
+> memory and thus not subject to wear.  A physical TPM can defer these
+
+"NV" strongly suggests that a real implementation should permanently
+store whatever is written to it, no?
+
+> writes and condition them to the lifespan expectancy of its NV store. 
+> If you've simply copied over the reference implementation backed by
+> wearable NV, then that might be the thing to fix.
 > 
-> Unfortunately not, as that would cause build warnings/failures due
-> to conflicting redefinitions.
-> That is a reason why I want to apply this patch ASAP: new copies show
-> up all the time.
 
-In a preparation patch, for each driver:
+My impression is that this is exactly what at least half of the fTPM
+world does, starting with [1] and now via [2]. I started a discussion
+with security experts about how often a write back is actually needed
+but have no answer yet.
 
- +#ifndef field_prep
- #define field_prep() ...
- +#endif
-
-Or simply
-
- +#undef field_prep
- #define field_prep() ...
-
-Then add the generic field_prep() in a separate patch. Then you can drop
-ifdefery in the drivers.
-
-Yeah, more patches, but the result is cleaner.
-
-> > > --- a/include/linux/bitfield.h
-> > > +++ b/include/linux/bitfield.h
-> > > @@ -220,4 +220,40 @@ __MAKE_OP(64)
-> > >  #undef __MAKE_OP
-> > >  #undef ____MAKE_OP
-> > >
-> > > +/**
-> > > + * field_prep() - prepare a bitfield element
-> > > + * @mask: shifted mask defining the field's length and position
-> > > + * @val:  value to put in the field
-> > > + *
-> > > + * field_prep() masks and shifts up the value.  The result should be
-> > > + * combined with other fields of the bitfield using logical OR.
-> > > + * Unlike FIELD_PREP(), @mask is not limited to a compile-time constant.
-> > > + */
-> > > +#define field_prep(mask, val)                                                \
-> > > +     ({                                                              \
-> > > +             __auto_type __mask = (mask);                            \
-> > > +             typeof(mask) __val = (val);                             \
-> > > +             unsigned int __shift = sizeof(mask) <= 4 ?              \
-> > > +                                    __ffs(__mask) : __ffs64(__mask); \
-> > > +             (__val << __shift) & __mask;    \
-> >
-> > __ffs(0) is undef. The corresponding comment in
-> > include/asm-generic/bitops/__ffs.h explicitly says: "code should check
-> > against 0 first".
+>> It is therefore better to make the user intentionally enable this,
+>> providing a chance to read the warning.
 > 
-> An all zeroes mask is a bug in the code that calls field_{get,prep}().
+> A standard TPM expects to be a secure RNG source, so is this merely
+> speculation or have you found a physical TPM that has failed due to NV
+> wear because of this?
 
-It's a bug in FIELD_GET() - for sure. Because it's enforced in
-__BF_FIELD_CHECK(). field_get() doesn't enforce it, doesn't even
-mention that in the comment.
+I have not worn out any real TPM so far, only debugged the de-facto
+standard fTPM in QEMU - and found this unexpected property.
 
-I'm not fully convinced that empty runtime mask should be a bug.
-Consider memcpy(dst, src, 0). This is a no-op, but not a bug as
-soon as the pointers are valid. If you _think_ it's a bug - please
-enforce it.
+At the same time, what should be different for a real TPM? It will not
+have a battery-backed RTC either, thus will live from a clock source
+which is reset after power-off. In order to avoid jumping back in its
+own time, becoming vulnerable this way, I would expect a real TPM to
+record the last seen time as well. Maybe it can do that smarter if it
+can still write some bits after detecting power-loss, but that is also
+speculation.
 
-> > I think mask = 0 is a sign of error here. Can you add a code catching
-> > it at compile time, and maybe at runtime too? Something like:
-> >
-> >  #define __field_prep(mask, val)
-> >  ({
-> >         unsigned __shift = sizeof(mask) <= 4 ? __ffs(mask) : __ffs64(mask);
-> >         (val << __shift) & mask;
-> >  })
-> >
-> >  #define field_prep(mask, val)
-> >  ({
-> >         unsigned int __shift;
-> >         __auto_type __mask = (mask), __ret = 0;
-> >         typeof(mask) __val = (val);
-> >
-> >         BUILD_BUG_ON_ZERO(const_true(mask == 0));
 > 
-> Futile, as code with a constant mask should use FIELD_PREP() instead.
-
-It's a weak argument. Sometimes compiler is smart enough to realize
-that something is a constant, while people won't. Sometimes code gets
-refactored. Sometimes people build complex expressions that should
-work both in run-time and compile time cases. Sometimes variables are
-compile- or run-time depending on config (nr_cpu_ids is an example).
-
-The field_prep() must handle const case just as good as capitalized
-version does.
- 
-> >         if (WARN_ON_ONCE(mask == 0))
-> >                 goto out;
-> >
-> >         __ret = __field_prep(__mask, __val);
-> >  out:
-> >         ret;
-> >  })
+> Even if this were a problem, wouldn't a better solution be not to
+> gather entropy if the kernel pool is full enough?  We don't drain the
+> pool the whole time after all.
 > 
-> Should we penalize all users (this is a macro, thus inlined everywhere)
-> to protect against something that is clearly a bug in the caller?
 
-No. But we can wrap it with a config:
+That is a valid question, but at least I'm not deep enough into all of
+this to answer it.
 
- #ifdef CONFIG_BITFIELD_HARDENING
-         if (WARN_ON_ONCE(mask == 0))
-                 goto out;
- #endif
+Jan
 
-The real question here: do you want to help people to catch their bugs,
-or you want them to fight it alone?
+[1]
+https://github.com/microsoft/ms-tpm-20-ref/commit/0ebdda848e16d5ef78d1342c2fdfdd6dffb1004e
+[2] https://github.com/OP-TEE/optee_ftpm
 
-The _BF_FIELD_CHECK() authors are nice people and provide helpful guides.
-(I don't insist, it's up to you.)
-
-> E.g. do_div() does not check for a zero divisor either.
->
-> > > +/**
-> > > + * field_get() - extract a bitfield element
-> > > + * @mask: shifted mask defining the field's length and position
-> > > + * @reg:  value of entire bitfield
-> > > + *
-> > > + * field_get() extracts the field specified by @mask from the
-> > > + * bitfield passed in as @reg by masking and shifting it down.
-> > > + * Unlike FIELD_GET(), @mask is not limited to a compile-time constant.
-> > > + */
-> > > +#define field_get(mask, reg)                                         \
-> > > +     ({                                                              \
-> > > +             __auto_type __mask = (mask);                            \
-> > > +             typeof(mask) __reg =  (reg);                            \
-> >
-> > This would trigger Wconversion warning. Consider
-> >         unsigned reg = 0xfff;
-> >         field_get(0xf, reg);
-> >
-> > <source>:6:26: warning: conversion to 'int' from 'unsigned int' may change the sign of the result [-Wsign-conversion]
-> >     6 |     typeof(mask) __reg = reg;
-> >       |                          ^~~
-> >
-> > Notice, the __auto_type makes the __mask to be int, while the reg is
-> 
-> Apparently using typeof(mask) has the same "issue"...
-> 
-> > unsigned int. You need to do:
-> >
-> >         typeof(mask) __reg = (typeof(mask))(reg);
-> 
-> ... so the cast is just hiding the issue? Worse, the cast may prevent the
-> compiler from flagging other issues, e.g. when accidentally passing
-> a pointer for reg.
- 
-Ok, makes sense.
-
-> > Please enable higher warning levels for the next round.
-> 
-> Enabling -Wsign-conversion gives lots of other (false positive?)
-> warnings.
-> 
-> > Also, because for numerals __auto_type is int, when char is enough - are
-> > you sure that the macro generates the optimal code? User can workaround it
-> > with:
-> >
-> >         field_get((u8)0xf, reg)
-> >
-> > but it may not be trivial. Can you add an example and explanation please?
-> 
-> These new macros are intended for the case where mask is not a constant.
-> So typically it is a variable of type u32 or u64.
-
-You never mentioned that. Anyways, it's again a weak argument.
- 
-> > > +             unsigned int __shift = sizeof(mask) <= 4 ?              \
-> > > +                                    __ffs(__mask) : __ffs64(__mask); \
-> >
-> > Can you use BITS_PER_TYPE() here?
-> 
-> Yes, I could use BITS_PER_TYPE(unsigned long) here, to match the
-> parameter type of __ffs() (on 64-bit platforms, __ffs() can be used
-> unconditionally anyway), at the expense of making the line much longer
-> so it has to be split.  Is that worthwhile?
- 
-Not sure I understand... The
-
-        "unsigned int __shift = BITS_PER_TYPE(mask) < 64 ?"
-
-is 49 chars long vs 42 in your version. Even if you add two tabs, it's
-still way below limits. And yes, 
-
-        unsigned int __shift = sizeof(mask) <= 4 ?               \
-                                __ffs(__mask) : __ffs64(__mask); \
-
-is worse than
-
-        unsigned int __shift = BITS_PER_TYPE(mask) < 64 ?        \
-                                __ffs(__mask) : __ffs64(__mask); \
-
-> > > +             (__reg & __mask) >> __shift;    \
-> > > +     })
-> > > +
-> >
-> > When mask == 0, we shouldn't touch 'val' at all. Consider
-> >
-> >         field_get(0, get_user(ptr))
-> >
-> > In this case, evaluating 'reg' is an error, similarly to memcpy().
-> 
-> Again, a zero mask is a bug.
-> 
-> Thanks!
-> 
-> Gr{oetje,eeting}s,
-> 
->                         Geert
-> 
-> -- 
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-> 
-> In personal conversations with technical people, I call myself a hacker. But
-> when I'm talking to journalists I just say "programmer" or something like that.
->                                 -- Linus Torvalds
+-- 
+Siemens AG, Foundational Technologies
+Linux Expert Center
