@@ -1,102 +1,88 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B356431D742
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 10:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D35319851
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 10:14:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761128015; cv=none; b=tPKb6r5W+kX1t+NkMg7P+zSD26uyy1qq1S9+YTrm0sjosxnivcq5eBnnkJxMKFAzd1yFA1sRcgs+ZG4mdic16g8WHff6ksjEp6vIqOxJ9ivZfEi82wwz9tFYR41S13wRZVYC7Gwo3Atk+BlFssj/ZeGq9qzKtDsz0LZpkvfzSuU=
+	t=1761128065; cv=none; b=AMm/AvgrmYOJIq/MfP6kkmJbQui7R5Tzb4djG1Xp6Tb0ayn02IzOjAYUjGCLgTEBghckO2HXdVrYCUxIHcLYkdJKhZJ7izTFh0piKQpJf7aBEjTAae5tPe6+O+ZPHD3ZnGynU98MgM1gtW56p1igRp9Va9L4u6r9hDGKTR97aWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761128015; c=relaxed/simple;
-	bh=xbleyjew/gUw5tjiH+F/GM5sPSqPUuGp5zFrXdHnEss=;
+	s=arc-20240116; t=1761128065; c=relaxed/simple;
+	bh=BksiNg7tpyriGQ1hysmu056HRi6UuHZRkqrmwRvyfJk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s+sHGelqmfaYz/nKiwrzDVUlJkmiJnbAYYLm8STmGCB5bqZajeWJsnIsm2FJ8mksj8XLXANL2ulzMIwt/hMRFko39c6rZ8Zz59eHLFsxi3j+zavmb1y6VbG0TObt1XIInY5cLURd19JN6NYU0Ww5l7FPi2tt6o2rlNfrfQFIK6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cf+J0OUs; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=RxFWAA61UCvFNibO7G7E0PPzijjhGQhXMSHPWeQRHc7BRSoLk1iNLyDCprIoRzFsxKVd3D5gRnDEdjA8C97+u4oKy9e0ijnVToqlQ8CIIdPG27AMB1wzMtJV6jzZaOJmG+VmQy7iGOLt1uAtM5arTErHcqWApMtsiLTnGmXvFp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MFXjCo9z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cf+J0OUs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B375C116C6
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 10:13:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MFXjCo9z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8B36C4CEF5
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 10:14:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761128015;
-	bh=xbleyjew/gUw5tjiH+F/GM5sPSqPUuGp5zFrXdHnEss=;
+	s=k20201202; t=1761128064;
+	bh=BksiNg7tpyriGQ1hysmu056HRi6UuHZRkqrmwRvyfJk=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=cf+J0OUsUIRcsHSBwhz7YYf0Z9ymKDK8GA1J6sql1jQu86YEQyfe66TD9dRlWn0fJ
-	 QxrInwySwhAi0o5kYZrKes3WJ2nzRGBOCd7FwAdipREv5jRGCRMV3IUUimULjKLnfl
-	 +Z0mdXVCUyzfK5up5HUbAFqPGJZcQ8OFOYfLsrPTmYSAcZjplbwcIg7YbDT8uyTR4Z
-	 i/IZKEQtk83EbTkiPASU5XBSDqduHq4NPrpPw2voDdoZ/fvNbX6Xt0yPJqXlVV0nHy
-	 lzJCtpmGOXU1EZV5iqntyALSeMSBpqBto9lXNShOBD0OXh5Fn5LIZU6quA5krtgF0j
-	 GJ74B0vbZiqsQ==
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-57f1b88354eso7442790e87.1
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 03:13:35 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxXG3cFuIGD1rbZT+yIYwvOWIGDn7lVZan0PHxDaDaWwsYRZvwO
-	m4Mxvd+OCl3bU/eWumwB8aALW18p/vfaa8uE/LboYOBW8fb/z8hcyiA2xhcFfLjStd9/2IefmB3
-	KuaR6za9GvXvjI1xhXX8UegoPDSzzauM=
-X-Google-Smtp-Source: AGHT+IFcCPrNwnq8tqyu26uoCns+CxnDTAM88jzdNDUEvsfOGixRrsmaAiH98/VG4HRDwveCRetRp7qwt02Fdgsnfd0=
-X-Received: by 2002:a05:6512:159b:b0:55f:6fb4:e084 with SMTP id
- 2adb3069b0e04-591d85739edmr7396384e87.50.1761128013726; Wed, 22 Oct 2025
- 03:13:33 -0700 (PDT)
+	b=MFXjCo9zcnJWPm3i/uME/Gos6Kai5pOUtMmkZaCxIxH4f1G2iBNWO6BsteyH6XnGr
+	 4Zd90D2WOq3UrIzDnGJbyKY0uVCIqubFuVODaRpPtAkeHAAJ6guyVzzV+PSkBIh6nV
+	 CGRlEUSdJHnegkag5S2Q8n1D884BHBrlZpy2HLc4DpDdwmg/gr5CIevhsYFWNUIjVW
+	 zgNO7y35aGfa12tpEh2Rs78q1h4n0/bbmWAnmahO/cxQJh+1iUay2OwuY0G82vngzM
+	 96vZQ1/6qgpLFmEm6HnzdnnfwmliORhfR6i5038HTOM5kmzD1TuTpgn9l5GUmz1dWp
+	 o0yUB5Qj65/GQ==
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-591eb980286so2278837e87.2
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2025 03:14:24 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yz7lOI6wuq/b3TMaZ7/NVprgHgzpyOWDLKyJSb4nD5p7b98XCST
+	IQr10yLQ2JmYe1eJqKG7i9TdhuKYsuHEkZBHhpKIThXHsbk1eVoqQafvK/cuivNrsEpS+si6kgW
+	OT6ck6ua1dfCkcAoXDRjkOlRrHVnaJOE=
+X-Google-Smtp-Source: AGHT+IG8iUUMQF0D5yVhMfUk3f49gl16EpRj2WucDueAbKHKmqKh7iUJiKFsggwb9AdxMipBw35mRZegqZ8u7W964wc=
+X-Received: by 2002:a05:6512:3d92:b0:57b:5794:ccda with SMTP id
+ 2adb3069b0e04-591d84faa97mr5623451e87.20.1761128063284; Wed, 22 Oct 2025
+ 03:14:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251020005038.661542-1-ebiggers@kernel.org>
-In-Reply-To: <20251020005038.661542-1-ebiggers@kernel.org>
+References: <20251022033405.64761-1-ebiggers@kernel.org>
+In-Reply-To: <20251022033405.64761-1-ebiggers@kernel.org>
 From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 22 Oct 2025 12:13:22 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEh=nS+pFgJUm5Vsyk1fMvY0dJNjLzA90Zj4AQPrD5ZYg@mail.gmail.com>
-X-Gm-Features: AS18NWDkFNpIn7aOJ7I-K06jIqbriS-x6sjlQuJbYrgZlUVLWfy8F6r6U1x3XZ0
-Message-ID: <CAMj1kXEh=nS+pFgJUm5Vsyk1fMvY0dJNjLzA90Zj4AQPrD5ZYg@mail.gmail.com>
-Subject: Re: [PATCH 00/17] SHA-3 library
+Date: Wed, 22 Oct 2025 12:14:11 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEjihuC1Wa8fWUqsvsJM6YJZ0wmuhkqicNAfQiHvnWkYw@mail.gmail.com>
+X-Gm-Features: AS18NWBSXzD203ZzkosAKi9Rr6vw53-JkbJxJJd1qk8yGMrx1SL9k2NwvTwhKzM
+Message-ID: <CAMj1kXEjihuC1Wa8fWUqsvsJM6YJZ0wmuhkqicNAfQiHvnWkYw@mail.gmail.com>
+Subject: Re: [PATCH] lib/crypto: poly1305: Restore dependency of arch code on !KMSAN
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Pei Xiao <xiaopei01@kylinos.cn>, Alexander Potapenko <glider@google.com>, kasan-dev@googlegroups.com, 
+	syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 20 Oct 2025 at 02:53, Eric Biggers <ebiggers@kernel.org> wrote:
+On Wed, 22 Oct 2025 at 05:37, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> This series is targeting libcrypto-next.  It can also be retrieved from:
+> Restore the dependency of the architecture-optimized Poly1305 code on
+> !KMSAN.  It was dropped by commit b646b782e522 ("lib/crypto: poly1305:
+> Consolidate into single module").
 >
->     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git sha3-lib-v1
+> Unlike the other hash algorithms in lib/crypto/ (e.g., SHA-512), the way
+> the architecture-optimized Poly1305 code is integrated results in
+> assembly code initializing memory, for several different architectures.
+> Thus, it generates false positive KMSAN warnings.  These could be
+> suppressed with kmsan_unpoison_memory(), but it would be needed in quite
+> a few places.  For now let's just restore the dependency on !KMSAN.
 >
-> This series builds on the first 5 patches of David's v6 series
-> (https://lore.kernel.org/r/20251017144311.817771-1-dhowells@redhat.com),
-> which I've included unmodified as the initial patches.  The remaining
-> patches improve the SHA-3 library, for example by simplifying the API
-> and migrating the existing arm64 and s390-optimized SHA-3 code into the
-> library.  The last patch reimplements the sha3-* crypto_shash algorithms
-> on top of the library.
+> Note: this should have been caught by running poly1305_kunit with
+> CONFIG_KMSAN=y, which I did.  However, due to an unrelated KMSAN bug
+> (https://lore.kernel.org/r/20251022030213.GA35717@sol/), KMSAN currently
+> isn't working reliably.  Thus, the warning wasn't noticed until later.
 >
-> If the s390 folks could re-test the s390 optimized SHA-3 code, that
-> would be helpful.  QEMU doesn't support the instructions it uses.
->
-> David Howells (5):
->   s390/sha3: Rename conflicting functions
->   arm64/sha3: Rename conflicting functions
->   lib/crypto: Add SHA3-224, SHA3-256, SHA3-384, SHA3-512, SHAKE128,
->     SHAKE256
->   lib/crypto: Move the SHA3 Iota transform into the single round
->     function
->   lib/crypto: Add SHA3 kunit tests
->
-> Eric Biggers (12):
->   lib/crypto: sha3: Fix libsha3 build condition
->   lib/crypto: sha3: Use appropriate conversions in
->     sha3_keccakf_generic()
->   lib/crypto: sha3: Drop unfinished SHAKE support from
->     gen-hash-testvecs.py
->   lib/crypto: sha3: Consistently use EXPORT_SYMBOL_GPL
->   lib/crypto: sha3: Replace redundant ad-hoc test with FIPS test
->   lib/crypto: sha3: Simplify the API
->   lib/crypto: sha3: Document one-shot functions in header and improve
->     docs
->   crypto: arm64/sha3 - Update sha3_ce_transform() to prepare for library
->   lib/crypto: arm64/sha3: Migrate optimized code into library
->   lib/crypto: s390/sha3: Migrate optimized code into library
->   crypto: jitterentropy - use default sha3 implementation
->   crypto: sha3 - Reimplement using library API
+> Fixes: b646b782e522 ("lib/crypto: poly1305: Consolidate into single module")
+> Reported-by: syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/r/68f6a48f.050a0220.91a22.0452.GAE@google.com/
+> Reported-by: Pei Xiao <xiaopei01@kylinos.cn>
+> Closes: https://lore.kernel.org/r/751b3d80293a6f599bb07770afcef24f623c7da0.1761026343.git.xiaopei01@kylinos.cn/
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>  lib/crypto/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 
 Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
