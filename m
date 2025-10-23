@@ -1,243 +1,292 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9CF30DEBC
-	for <linux-crypto@vger.kernel.org>; Thu, 23 Oct 2025 11:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6F12773EC
+	for <linux-crypto@vger.kernel.org>; Thu, 23 Oct 2025 11:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761218968; cv=none; b=qGBq0l81M28kAJp+R0/REw3Znm+bvE1YdacChVl/ku0U6do/kN5jn8qxsNO5I5XzCTCgbOMwlcKyEPbgfvIb2jrDU1eyRJiAisi2IAnTCo0JXoewsFoj0KHNz0zpFBZ2rMSeTgmqUlEVrHJR/LxQCnQTdi5H+mdEPylO4JhHBoo=
+	t=1761219965; cv=none; b=BkNdhPcircCv3n1ituVNGtGgqHFHCBw+Kjr8y/i9GqufAFyGfaRpUFYPoOEd8TyQXEdtjWiryFao4LNIzPtLRqf5jal/Xs83hrfSLAB+6CxHRQsiw9nIUkmaQ+dKBKvNz/ct2LzceFEydTnRsJovtT3Vx9XPI3Pr2UPf+0vrZhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761218968; c=relaxed/simple;
-	bh=xp/QLlNgU9yT5Z0c6lOZJJZGC+bWM5/vOMB349Lhr6s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Avm0k1ukq3si3V9Hpp2Q0AwhnqMDnwZW8jvYKWfJC9DKjqgtdAx5arIVapBV4qGUO5ZLKSKeI+kOVub4BBQsxaf159FDDDi5tf+tYEvswF9ZuheRqF0jg/Tg3/YueZVyJ2C10xyJ++lWisg9qh5RRa3Y1x29Jj+mqkfXGjcp6L0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jwfrK8th; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1761219965; c=relaxed/simple;
+	bh=t2b3ao92xy0ESrIeC6f3Ix11H+BajiEZp3Qjq0JyHMk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RGWcHfPUVPd/6Oo/s+0dBY67xPnjN9e2vuaAFVzcmbsqrdjNBwjISGM/df1wURGErSVYA281jpJKLu8Me6Vwwg/flDi7ws4yBJAH000F4JY4KZa1iAKV//Dw7wiWFpvafRF3y9dOV28ocnjBOBDkqCrOuXAvnYjLUG8I8P5d3No=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jwfrK8th"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b4aed12cea3so132418066b.1
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Oct 2025 04:29:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761218964; x=1761823764; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GOi8L/T/sc914HyVaQllPfco9t+JbsWkC8LrVlAzwL4=;
-        b=jwfrK8thrXGCV32G7zBks/av8cvyhCoRbtv3JTkDdZhEPt52F4IpIya/eGIwON9ctM
-         /Airg0vaU/J91SbREOgRSl7MVthJ0IaCE3NUBNZdKAdll0PlmWFP2du2Z6G7KbsbZshl
-         dbglUBF3Ig9Ov5dTFoDaUxtkexpiI4GehnvUXhwGpbxzEZtI6DdTAwRtSWZjWoWxrm1A
-         OTltS2GZKmpn5MAsWUTOaBdpEIEKeamRdfcNf3iMBcwSsHAcsTAp7Tq3ueHVAheloz3q
-         8nXLsR/CYENHvn4WXOJh1DKsmaw7egVewLb7JAmaEWNOid6Yg1r7iRshB4iIb5InZAuR
-         +BwQ==
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4e8b4e4ce70so8452581cf.3
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Oct 2025 04:46:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761218964; x=1761823764;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1761219962; x=1761824762;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GOi8L/T/sc914HyVaQllPfco9t+JbsWkC8LrVlAzwL4=;
-        b=rTMJbfbr8+hv0AcS/E8eaxQsxTmkvvv6O0XCB/kDjleSfxcjXQSwJcvX9rheUuj366
-         KnjvqR/mkgn+s0wwUzhMAWfbgrZ3cPJX+16IziWVzEQFuD1LkFf+4SYT46QRRz9bohnW
-         oA9VMxyzWyjAoxGleCsZ+ik9QSB8bsmOK6UQ6GiEpHtibihd8RnlLi39EHIzAVeOOdC5
-         W9Qb0lDadrIh6+2nTtrRPDYlILzu3roGgBvDfmfWn/SsJZtQI7pi1mZcY3PyQG6I5iDS
-         +xbiu13xjWeXNyXIs1jCjicSZs0j1Gpba0YPCtL4+yUh2hAP67GBWNCLJn7hVu2m8te+
-         QCQw==
-X-Forwarded-Encrypted: i=1; AJvYcCXTjdaDclmWoVwtNgJuOMIvbHY75aQTkLMci7AEXy5mP2JMvxR2cZXzmlgNER8+U2NX+oa1CV4g8tjVpkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdR1gwDlaTpECbkfoi8K0r7iQADLPCabFFthza+75Q6VmdaYEQ
-	Ce09N8LIZUE/qeKeuplroOsuzuYRJmrcH6fFqNHbebB7RpabKOQeDeX8
-X-Gm-Gg: ASbGnctKIPr6AacfEX6O/FeEmUqNYaevcQG0akhxBVtsigyF6k1rnNRADcu1/1co+k8
-	wWd/1gGF0kzf0WWFEdkO1q9jpPOtBazyFCZr3pubVo+cWQE0umR0vuHxlJ/eY/WciNopzPw+uNF
-	mD//E5IJHrvVsqayy11wh4hH+PDXCextOr9Ci+r/+tKwiMphNreqIGF2X864/qiMJtXsqyCy+t0
-	qXDYxMSAtw7ohs9kAt7LQ7ve36u+b1qF1fwTusIiiRYItWlG2VOh7kb/3az/D7QedtZjY9lH0hb
-	4XNgR9EJsaVWK8pEsQ024ZNBa+j9l34bFZBnm8N/DXR1FyKKaUgx1/eIcXRUU4TJWpNbID4eKaH
-	VbCXV2Jv1WflQyRa5ATh1YCD6jss5xTt9vYrubzUYNnWucZk2HoARzlPK8CrsYe4j1ZNaRfYlfr
-	FZ
-X-Google-Smtp-Source: AGHT+IGVcD+OUFGiPRHpX8Zf9AyspMjR70F5rNVEqM4+m7vN8XE7B3HIHBPjz9kYyXDPcdhsgkufaQ==
-X-Received: by 2002:a17:907:1b06:b0:b6d:2f3f:3f98 with SMTP id a640c23a62f3a-b6d2f3f4014mr685674566b.41.1761218963986;
-        Thu, 23 Oct 2025 04:29:23 -0700 (PDT)
-Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b6d51471ef6sm182393366b.72.2025.10.23.04.29.21
+        bh=YGr3v7S6fzDOU9nQBXt6OSyvvunrcw7Wuu74VRCbNxc=;
+        b=U9kJeCrl2Pc49moqzJJenUFyhB2z98prO2h8UDFBD01kHgcDWOXK3xDAq5sUIsHWsj
+         nfEFfKJJKGg5h1/FRUAO2vFZesGX0R3YbR36zXXr1mJJw7UDpiFDw3nK8wbj6nkeetDD
+         bP+nZklkM9ghqKz/SEhrmZ5ZtJkwYna345+P7TYWMhAy5/wxackQTQER/UZ5Q3+fp9kF
+         5QVvnDb7unqwk/3dBW8rt9DlVvxxUNBCOozN+iG5l1PQAWIaJ46sp846ObuXe6tSlUqN
+         hkUBYojudTTZHyHaN/GHVX4YrcoNQUIHLsdxFMXvBDlEJV1ZpPQitPIQNnyNn7lGTtFT
+         1I8g==
+X-Forwarded-Encrypted: i=1; AJvYcCW51lbKlrFNU4tlmCHm/4L/0SQFlAmXXHvNc3wvLhMwo0p3L3ovsurMmTk5qLsxEf+1mM+4KYJ5hUoFXSo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJ5kS5WXq8IIJtFuBrHcz48R6KwidVMwyEebuTy6xrHt6wWRhs
+	4Gi9PmO7HuEfCw9caaqatMQgYyzyD1dRGtLqKLgDJBQOIruM3KQfBCszS1AK/t30
+X-Gm-Gg: ASbGnctpW7x1x/HhOey2pIbnHztZnyzDxir16IGtynelVBdjsBBVF70GXmq1xfBOPfy
+	Q9CPlsknnELOTcUWzanDyI0gVmRnDK1sJi+DmfM+idSA3W70ZdVHmA+jXnXUayJ4PLHR4h4OQtT
+	LkVRkHTtEUcuPM/ef0sWHefdQs7/yBEzVQUEJn4IPHwRyibVa6XUiJi1S72oYxdOWMFb0k1M7Fp
+	WgRsp2301dpgGm9j5vlo6dkTna80K3I8tszLPWZMyUrIZviDXCCuH728eqBLP7CPQLiBjPim8y7
+	KedSoqga8XryzreVmRLL708YZkGK/LSCVudum2I292Y5vc89ZpFwD9LW5Sm/iu7osEeXJtr1mxZ
+	1ZaQHc1OIG6KuLZ0j7VHm5itOM0ws8wAlpHsMgEDEevq/qCTuSEtq0IRLtmK1mfbsnyJMJwJ2hJ
+	as3LFrqyBQSfowalR+vWctmihjyQ3vnxYbrIa6YA==
+X-Google-Smtp-Source: AGHT+IHXCMR8nik4QYIgAssnLuG+Z0Y62tocnjj4D6w0y3ZaA8ULyl9ljOHZfjoXUEIQQZQTEwXZVw==
+X-Received: by 2002:ac8:598b:0:b0:4db:e7be:b40b with SMTP id d75a77b69052e-4e89d28371cmr271583671cf.23.1761219962324;
+        Thu, 23 Oct 2025 04:46:02 -0700 (PDT)
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com. [209.85.219.47])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-89c0dbc9850sm146581085a.6.2025.10.23.04.46.02
+        for <linux-crypto@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Oct 2025 04:29:23 -0700 (PDT)
-From: Askar Safin <safinaskar@gmail.com>
-To: linux-mm@kvack.org,
-	linux-pm@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-lvm@lists.linux.dev,
-	lvm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org,
-	"DellClientKernel" <Dell.Client.Kernel@dell.com>,
-	dm-devel@lists.linux.dev,
-	linux-btrfs@vger.kernel.org
-Cc: Nhat Pham <nphamcs@gmail.com>,
-	Kairui Song <ryncsn@gmail.com>,
-	Pavel Machek <pavel@ucw.cz>,
-	=?UTF-8?q?Rodolfo=20Garc=C3=ADa=20Pe=C3=B1as=20=28kix=29?= <kix@kix.es>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Lennart Poettering" <mzxreary@0pointer.de>,
-	Christian Brauner <brauner@kernel.org>,
-	"Linus Torvalds" <torvalds@linux-foundation.org>
-Subject: dm bug: hibernate to swap located on dm-integrity doesn't work (how to get data redundancy for swap?)
-Date: Thu, 23 Oct 2025 14:29:13 +0300
-Message-ID: <20251023112920.133897-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
+        Thu, 23 Oct 2025 04:46:02 -0700 (PDT)
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-879b99b7ca8so7774626d6.0
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Oct 2025 04:46:02 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXnWP4Ld7nLTygj987Z3zo+9l0kiIC9kMr8kWp3+zy6RgvlHa+l4lqzeY535WHddrdnFfa5WkOk1IyIhxc=@vger.kernel.org
+X-Received: by 2002:a05:6102:c8b:b0:5db:350f:2c6b with SMTP id
+ ada2fe7eead31-5db350f2f90mr173817137.38.1761219546544; Thu, 23 Oct 2025
+ 04:39:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1760696560.git.geert+renesas@glider.be> <67c1998f144b3a21399672c8e4d58d3884ae2b3c.1760696560.git.geert+renesas@glider.be>
+ <aPKQMdyMO-vrb30X@yury> <CAMuHMdXq7xubX4a6SZWcC1HX+_TsKeQigDVQrWvA=js5bhaUiQ@mail.gmail.com>
+ <aPhbhQEWAel4aD9t@yury> <CAMuHMdUOX=ToDU_44fHrqKWUtee1LKpgisfTKOe4R33er9g+DA@mail.gmail.com>
+ <aPj9Tu75OFenm7U0@yury>
+In-Reply-To: <aPj9Tu75OFenm7U0@yury>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 23 Oct 2025 13:38:55 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdX0dmJ_bEkKBZkzqXwM9m-Agwr_zMhMDXgdS+LSyoeG5w@mail.gmail.com>
+X-Gm-Features: AWmQ_bkfy7WIJP3UTtd6EyoPnmrw_M6kCYJ9kC1xrPr1U7jSNAuuLhNrJ5p1ts4
+Message-ID: <CAMuHMdX0dmJ_bEkKBZkzqXwM9m-Agwr_zMhMDXgdS+LSyoeG5w@mail.gmail.com>
+Subject: Re: [PATCH v4 2/4] bitfield: Add non-constant field_{prep,get}() helpers
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	David Miller <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, 
+	Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, 
+	Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, 
+	Shan-Chun Hung <schung@nuvoton.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>, 
+	David Laight <david.laight.linux@gmail.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>, 
+	Michael Hennerich <Michael.Hennerich@analog.com>, Kim Seer Paller <kimseer.paller@analog.com>, 
+	David Lechner <dlechner@baylibre.com>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Andy Shevchenko <andy@kernel.org>, Richard Genoud <richard.genoud@bootlin.com>, 
+	Cosmin Tanislav <demonsingur@gmail.com>, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Jianping Shen <Jianping.Shen@de.bosch.com>, linux-clk@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-edac@vger.kernel.org, qat-linux@intel.com, 
+	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org, 
+	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi.
+Hi Yury,
 
-Hibernate to swap located on dm-integrity doesn't work.
-Let me first describe why I need this, then I will describe a bug with steps to reproduce
-(and some speculation on cause of the bug).
+On Wed, 22 Oct 2025 at 17:50, Yury Norov <yury.norov@gmail.com> wrote:
+> On Wed, Oct 22, 2025 at 12:01:37PM +0200, Geert Uytterhoeven wrote:
+> > On Wed, 22 Oct 2025 at 06:20, Yury Norov <yury.norov@gmail.com> wrote:
+> > > On Mon, Oct 20, 2025 at 03:00:24PM +0200, Geert Uytterhoeven wrote:
+> > > > On Fri, 17 Oct 2025 at 20:51, Yury Norov <yury.norov@gmail.com> wrote:
+> > > > > On Fri, Oct 17, 2025 at 12:54:10PM +0200, Geert Uytterhoeven wrote:
+> > > > > > The existing FIELD_{GET,PREP}() macros are limited to compile-time
+> > > > > > constants.  However, it is very common to prepare or extract bitfield
+> > > > > > elements where the bitfield mask is not a compile-time constant.
+> > > > > >
+> > > > > > To avoid this limitation, the AT91 clock driver and several other
+> > > > > > drivers already have their own non-const field_{prep,get}() macros.
+> > > > > > Make them available for general use by consolidating them in
+> > > > > > <linux/bitfield.h>, and improve them slightly:
+> > > > > >   1. Avoid evaluating macro parameters more than once,
+> > > > > >   2. Replace "ffs() - 1" by "__ffs()",
+> > > > > >   3. Support 64-bit use on 32-bit architectures.
+> > > > > >
+> > > > > > This is deliberately not merged into the existing FIELD_{GET,PREP}()
+> > > > > > macros, as people expressed the desire to keep stricter variants for
+> > > > > > increased safety, or for performance critical paths.
+> > > > > >
+> > > > > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> > > > > > Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+> > > > > > Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> > > > > > Acked-by: Crt Mori <cmo@melexis.com>
+> > > > > > ---
+> > > > > > v4:
+> > > > > >   - Add Acked-by,
+> > > > > >   - Rebase on top of commit 7c68005a46108ffa ("crypto: qat - relocate
+> > > > > >     power management debugfs helper APIs") in v6.17-rc1,
+> > > > > >   - Convert more recently introduced upstream copies:
+> > > > > >       - drivers/edac/ie31200_edac.c
+> > > > > >       - drivers/iio/dac/ad3530r.c
+> > > > >
+> > > > > Can you split out the part that actually introduces the new API?
+> > > >
+> > > > Unfortunately not, as that would cause build warnings/failures due
+> > > > to conflicting redefinitions.
+> > > > That is a reason why I want to apply this patch ASAP: new copies show
+> > > > up all the time.
+> > >
+> > > In a preparation patch, for each driver:
+> > >
+> > >  +#ifndef field_prep
+> > >  #define field_prep() ...
+> > >  +#endif
+> > >
+> > > Or simply
+> > >
+> > >  +#undef field_prep
+> > >  #define field_prep() ...
+> > >
+> > > Then add the generic field_prep() in a separate patch. Then you can drop
+> > > ifdefery in the drivers.
+> > >
+> > > Yeah, more patches, but the result is cleaner.
+> >
+> > And we need 3 kernel releases, as the addition of the macros to
+> > the header file now has a hard dependency on adding the #undefs?
+> > Unless I still apply all of them to an immutable branch, but then what
+> > is the point?
+>
+> Not sure what do you mean. You can do it in a single series, and you
+> don't need and should not split the series across releases. Consider
+> my recent cpumask_next_wrap() rework as an example:
+>
+> https://lore.kernel.org/all/20250128164646.4009-1-yury.norov@gmail.com/
+>
+> 1. #1-4 switch kernel users to alternative functions;
+> 2. #5 deprecates cpumask_next_wrap(), making sure it's a pure renaming,
+>    i.e. no-op.
+> 3. #6 introduces the new nice implementation. It's the core-only patch,
+>    no drivers are touched.
+> 4. #7-12 switch the rest of codebase from old version to new.
+> 5. #13 drops deprecated old function.
+>
+> This is the most common scheme. In you case you can cut the corners.
+>
+> The goals here are:
+>
+>  - keep core patches free of non-core code;
+>  - switch drivers to the new functionality one-by-one in sake of
+>    bisectability.
 
-I want a personal Linux laptop fully protected from data corruption (cosmic rays, etc).
-And even if data corruption does happen, I want reliable indication of that,
-so that I know that I need to restore from backups and replace faulty hardware.
+OK, I'll make it so...
 
-So I did this:
-- I bought a laptop with ECC memory: Dell Precision 7780. It seems to be one of
-the few laptop models in the world with ECC memory. And probably the only model
-in the world, which DOES HAVE ECC memory, but DOES NOT HAVE nvidia card
-- I set up btrfs raid-1
+> > > > > > --- a/include/linux/bitfield.h
+> > > > > > +++ b/include/linux/bitfield.h
+> > > > > > @@ -220,4 +220,40 @@ __MAKE_OP(64)
+> > > > > >  #undef __MAKE_OP
+> > > > > >  #undef ____MAKE_OP
+> > > > > >
+> > > > > > +/**
+> > > > > > + * field_prep() - prepare a bitfield element
+> > > > > > + * @mask: shifted mask defining the field's length and position
+> > > > > > + * @val:  value to put in the field
+> > > > > > + *
+> > > > > > + * field_prep() masks and shifts up the value.  The result should be
+> > > > > > + * combined with other fields of the bitfield using logical OR.
+> > > > > > + * Unlike FIELD_PREP(), @mask is not limited to a compile-time constant.
+> > > > > > + */
+> > > > > > +#define field_prep(mask, val)                                                \
+> > > > > > +     ({                                                              \
+> > > > > > +             __auto_type __mask = (mask);                            \
+> > > > > > +             typeof(mask) __val = (val);                             \
+> > > > > > +             unsigned int __shift = sizeof(mask) <= 4 ?              \
+> > > > > > +                                    __ffs(__mask) : __ffs64(__mask); \
+> > > > > > +             (__val << __shift) & __mask;    \
+> > > > >
+> > > > > __ffs(0) is undef. The corresponding comment in
+> > > > > include/asm-generic/bitops/__ffs.h explicitly says: "code should check
+> > > > > against 0 first".
+> > > >
+> > > > An all zeroes mask is a bug in the code that calls field_{get,prep}().
+> > >
+> > > It's a bug in FIELD_GET() - for sure. Because it's enforced in
+> > > __BF_FIELD_CHECK(). field_get() doesn't enforce it, doesn't even
+> > > mention that in the comment.
+> > >
+> > > I'm not fully convinced that empty runtime mask should be a bug.
+> >
+> > Getting (and using) data from nowhere is a bug.
 
-So far, so good. I'm protected from both memory errors and disk errors.
+^^^ This is about field_get().
 
-But my swap partition stays unprotected. And yes, I need swap. I have 64 GiB of RAM,
-but this still is not enough for zillions of Chromium tabs and vscode windows.
+> > Storing data where there is no space to store is also a bug.
 
-And, according to btrfs docs, if I put swapfile to btrfs, it will be exempt from raid-1 guarantees.
+^^^ This is about field_prep().
 
-It seems that the only solution in this case is to put swap partition on top of dm-integrity.
+> > I will add a comment.
+> >
+> > > Consider memcpy(dst, src, 0). This is a no-op, but not a bug as
+> > > soon as the pointers are valid. If you _think_ it's a bug - please
+> > > enforce it.
+> >
+> > memcpy() with a fixed size of zero is probably a bug.
+> > memcpy() with a variable size is usually used to copy "as much as is
+> > needed", so zero is usually not a bug.
 
-Note: I don't need error correcting code for my swap. I don't need a self-healing swap.
-The only thing I need is reliable error detection.
+^^^ These 3 lines are about memcpy().
 
-There is discussion on Stack Exchange on exactly the same problem:
-https://unix.stackexchange.com/questions/269098/silent-disk-errors-and-reliability-of-linux-swap .
-I think it reached the same conclusion: the only solution is dm-integrity.
+> 5 lines above you say: "Getting (and using) data from nowhere is a bug".
+> Now you're saying: "so zero is usually not a bug". So, is it a bug or
+> not?
 
-Also, as well as I understand, md raid is not a solution: when reading, it reads
-from one disk only, and thus doesn't detect all errors. It can detect remaining errors
-during scrub, which is too late (wrong data may be already consumed by some app).
+> > > > > I think mask = 0 is a sign of error here. Can you add a code catching
+> > > > > it at compile time, and maybe at runtime too? Something like:
+> > > > >
+> > > > >  #define __field_prep(mask, val)
+> > > > >  ({
+> > > > >         unsigned __shift = sizeof(mask) <= 4 ? __ffs(mask) : __ffs64(mask);
+> > > > >         (val << __shift) & mask;
+> > > > >  })
+> > > > >
+> > > > >  #define field_prep(mask, val)
+> > > > >  ({
+> > > > >         unsigned int __shift;
+> > > > >         __auto_type __mask = (mask), __ret = 0;
+> > > > >         typeof(mask) __val = (val);
+> > > > >
+> > > > >         BUILD_BUG_ON_ZERO(const_true(mask == 0));
+> > > >
+> > > > Futile, as code with a constant mask should use FIELD_PREP() instead.
+> > >
+> > > It's a weak argument. Sometimes compiler is smart enough to realize
+> > > that something is a constant, while people won't. Sometimes code gets
+> > > refactored. Sometimes people build complex expressions that should
+> > > work both in run-time and compile time cases. Sometimes variables are
+> > > compile- or run-time depending on config (nr_cpu_ids is an example).
+> > >
+> > > The field_prep() must handle const case just as good as capitalized
+> > > version does.
+> >
+> > OK, I will add the (build-time) check.
+>
+> If mask is compile-time, you can wire field_prep() to FIELD_PREP(), so
+> it will do the work for you.
 
-Also: I don't need encryption.
+OK, I will look into it.
 
-(Also: there is other solution: "cryptsetup --integrity", but it uses dm-integrity anyway. We will
-get to it.)
+Thanks!
 
-Okay, so I put swap partition to dm-integrity, and it worked!
+Gr{oetje,eeting}s,
 
-But then hibernation stopped to work.
-
-And here come steps to reproduce.
-
-Okay, so I have Dell Precision 7780. I bought it year ago, so I don't
-think my hardware is faulty. Also, I recently updated BIOS.
-
-My OS is Debian Trixie amd64. My kernel is Linux 6.12.48-1 from Debian.
-I created swap partition so:
-
-integritysetup format --integrity xxhash64 /dev/disk/by-partuuid/c4bbc73d-7909-42ea-8d96-eab82512cbe7
-integritysetup open --integrity xxhash64 /dev/disk/by-partuuid/c4bbc73d-7909-42ea-8d96-eab82512cbe7 swap
-mkswap /dev/mapper/swap
-swapon /dev/mapper/swap
-
-When I need to activate swap, I do this:
-
-integritysetup open --integrity xxhash64 /dev/disk/by-partuuid/c4bbc73d-7909-42ea-8d96-eab82512cbe7 swap
-swapon /dev/mapper/swap
-
-When I need to hibernate, I do "systemctl hibernate".
-
-And hibernate appears to work.
-
-Then, when I need to resume, I boot to my hand-crafted initramfs.
-That initramfs does this (I slightly simplified this script):
-
-==
-busybox mount -t proc proc /proc
-busybox mount -t devtmpfs devtmpfs /dev
-busybox mount -t sysfs sysfs /sys
-modprobe nvme
-modprobe dm-integrity
-modprobe xxhash64
-sleep 1
-integritysetup open --integrity xxhash64 "$LOWER_SWAP_DEV" early-swap
-sleep 1
-# The following "blkid" command should detect what is present on /dev/mapper/early-swap
-TYPE="$(blkid --match-tag TYPE --output value /dev/mapper/early-swap)"
-if [ "$TYPE" = 'swsuspend' ]; then
-  echo "got hibernation image, trying to resume"
-  echo /dev/mapper/early-swap > /sys/power/resume
-elif [ "$TYPE" = 'swap' ]; then
-  echo 'got normal swap without hibernation image'
-  integritysetup close early-swap
-  # proceed with fresh boot here
-fi
-==
-
-And this doesn't work. Hibernate works, resume doesn't. :)
-"blkid" reports swap as "swap" as opposed to "swsuspend".
-
-I suspect this is because hibernation doesn't flush dm-integrity journal.
-
-Also I tried to add "--integrity-bitmap-mode" to "format" and "open".
-Resume started to work, but when I try to shutdown resumed system,
-I get errors about corrupted dm-integrity partition. (Of course, I
-did necessary edits to initramfs script above.)
-
-Also I tried to add "--integrity-no-journal" to "format" and "open".
-It didn't work, either. (I don't remember what exactly didn't work.
-I can do this experiment again, if needed.)
-
-Then I tried to do "cryptsetup" instead of "integritysetup". I created
-swap partition so:
-
-cryptsetup luksFormat --type luks2 /dev/disk/by-partuuid/c4bbc73d-7909-42ea-8d96-eab82512cbe7 /tmp/key
-cryptsetup open --type luks2 --key-file /tmp/key /dev/disk/by-partuuid/c4bbc73d-7909-42ea-8d96-eab82512cbe7 swap
-mkswap /dev/mapper/swap
-swapon /dev/mapper/swap
-
-And, of course, I did all necessary edits to initramfs.
-
-And this time everything worked. This proves that I didn't do any mistakes in my setup
-(i. e. I got initramfs right, etc), and this is actual bug in dm-integrity.
-
-Unfortunately, LUKS created such way doesn't have any redundancy. So this is not solution for me.
-
-So I did this:
-cryptsetup luksFormat --type luks2 --integrity hmac-sha256 /dev/disk/by-partuuid/c4bbc73d-7909-42ea-8d96-eab82512cbe7 /tmp/key
-cryptsetup open --type luks2 --key-file /tmp/key /dev/disk/by-partuuid/c4bbc73d-7909-42ea-8d96-eab82512cbe7 swap
-mkswap /dev/mapper/swap
-swapon /dev/mapper/swap
-
-And this time everything stopped to work, again. I don't remember what exactly went wrong.
-As well as I remember, that "blkid" again returned "swap" instead of "swsuspend".
-I can run experiment again, if needed.
-
-The commands above use dm-integrity internally. So we clearly see: if dm-integrity is involved, then hibernation
-doesn't work.
-
-Here is a user with exactly same problem:
-https://www.reddit.com/r/archlinux/comments/atg18t/hibernation_wipes_swap_and_my_system_hangs_on_boot/ .
-I. e. "hibernation doesn't work if swap is on LUKS with integrity protection".
-
-So, please, fix this bug. Or say me how to solve my original problem (i. e. achieving full reliable error
-reporting). I'm available for testing. Send me experimental patches. I can provide more info, if needed.
-
-There is yet another potential solution: uswsusp ( https://docs.kernel.org/power/userland-swsusp.html ).
-In short, this is hibernation driven from userspace. I. e. uswsusp allows for finer control of hibernation.
-Thus, I can write my own userspace util, which will do hibernation, and execute "integritysetup close"
-after writing image. Assuming that original problem is what I think (i. e. lack of journal flush after writing of image),
-this may work. The problem is... latest commit to userspace implementation is dated 2012-09-15
-( https://git.kernel.org/pub/scm/linux/kernel/git/rafael/suspend-utils.git/ ). Do I really need to use such ancient
-technology? I didn't test this yet, I will test it in coming days. Even if it works, this will still mean that dm-integrity
-is buggy with kernel-based hibernation.
+                        Geert
 
 -- 
-Askar Safin
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
