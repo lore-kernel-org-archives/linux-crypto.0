@@ -1,104 +1,129 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036DD28D8CC
-	for <linux-crypto@vger.kernel.org>; Thu, 23 Oct 2025 16:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E99318146
+	for <linux-crypto@vger.kernel.org>; Thu, 23 Oct 2025 16:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761236375; cv=none; b=g01Pl5nXsPYwW9Uz0mlCVmMAMotYYIoJFXVzNgpi1BLro+OlK8pgN5+4/DNBi5zpi0/zu+m/pojmAoh2Py4tVXmsmyCXPRDn2RkX7Wb60WhwzuTbIBeP2KHMh8ZIWFANxJnbdMYNkitiwAoyff4qxntOgJ3GOwkZvtduJrtk02o=
+	t=1761237426; cv=none; b=SIQiy4A7A2BjXcXGoWjI7K82V9PEs9Kwl/pJ6MeSpkM2xCjDiPnmAYE2QwcDYMkyqKd2m+dc7t+1UOUhsLmfvI5+6zjOnKxQqYZ44hoxC6kJ2Ar7Y7tl5YJ9Hq2Dm6HqfyYPdqbaxH88rPigEoCy9KCTMB5gLodI/iuNBOP2yDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761236375; c=relaxed/simple;
-	bh=J9fgQRAtf/jgUHeHMg6pXGR492Zh7Odx8vgo1NDj8Sw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=W0miik1Y6iYIiWwd6R9k8Bm7R0Vz/cteAa24G6+pdbaWvA3dFEcrXAmPk5PlU1wcKMO37EjP9FvWTRgYA8d+zwF862TwvmvO2Oy8E8DRJdDZiyqBUvMSrUmTKZPY4r9/nTRdugAqugNunoqF+3thUv7W+rJaxQWnOJpttNItyJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1vBy0f-0003DE-8X; Thu, 23 Oct 2025 18:17:53 +0200
-Received: from lupine.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::4e] helo=lupine)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1vBy0Z-0055JC-1Z;
-	Thu, 23 Oct 2025 18:17:47 +0200
-Received: from pza by lupine with local (Exim 4.98.2)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1vBy0Z-00000000E1b-1FyP;
-	Thu, 23 Oct 2025 18:17:47 +0200
-Message-ID: <660b87b77ac97a186796ce4783acd510741f7c54.camel@pengutronix.de>
-Subject: Re: [PATCH] dt-bindings: Remove extra blank lines
-From: Philipp Zabel <p.zabel@pengutronix.de>
-To: "Rob Herring (Arm)" <robh@kernel.org>, Krzysztof Kozlowski	
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Stephen Boyd	
- <sboyd@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter	
- <simona@ffwll.ch>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Thomas Zimmermann <tzimmermann@suse.de>, Andrzej Hajda
- <andrzej.hajda@intel.com>, Robert Foss <rfoss@kernel.org>,  Vinod Koul
- <vkoul@kernel.org>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
- <yilun.xu@intel.com>, Bartosz Golaszewski <brgl@bgdev.pl>, Guenter Roeck
- <linux@roeck-us.net>, Andi Shyti <andi.shyti@kernel.org>,  Jonathan Cameron
-	 <jic23@kernel.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Georgi
- Djakov	 <djakov@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Joerg
- Roedel	 <joro@8bytes.org>, Jassi Brar <jassisinghbrar@gmail.com>, Mauro
- Carvalho Chehab	 <mchehab@kernel.org>, Lee Jones <lee@kernel.org>, Miquel
- Raynal	 <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>,
- Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>,  Johannes Berg <johannes@sipsolutions.net>, Krzysztof
- =?UTF-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,  Manivannan
- Sadhasivam	 <mani@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Kishon
- Vijay Abraham I	 <kishon@kernel.org>, Sebastian Reichel <sre@kernel.org>,
- Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=	 <ukleinek@kernel.org>, Mark Brown
- <broonie@kernel.org>, Mathieu Poirier	 <mathieu.poirier@linaro.org>, Olivia
- Mackall <olivia@selenic.com>, Herbert Xu	 <herbert@gondor.apana.org.au>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,  Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-clk@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-fbdev@vger.kernel.org, dmaengine@vger.kernel.org, 
-	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
- linux-pm@vger.kernel.org, 	iommu@lists.linux.dev,
- linux-media@vger.kernel.org, 	linux-mtd@lists.infradead.org,
- netdev@vger.kernel.org, 	linux-wireless@vger.kernel.org,
- linux-pci@vger.kernel.org, 	linux-phy@lists.infradead.org,
- linux-pwm@vger.kernel.org, 	linux-remoteproc@vger.kernel.org,
- linux-crypto@vger.kernel.org, 	linux-sound@vger.kernel.org,
- linux-usb@vger.kernel.org
-Date: Thu, 23 Oct 2025 18:17:47 +0200
-In-Reply-To: <20251023143957.2899600-1-robh@kernel.org>
-References: <20251023143957.2899600-1-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1-1 
+	s=arc-20240116; t=1761237426; c=relaxed/simple;
+	bh=tkEPfSuMSF6GxJpjuysibX4dYLzDAXInS/wO1Myhx3A=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=RfTNLRhGAMfCDRMbr8nkSmrOMxhbTWCS8+BCH+Km6TLidDlx9xiNFu5T53diZfvD6Umb+TTOUfcFnS5mRY5eHuPDfZ0HqjYmji1uL+j0snD1YQPI3T93YqR/m5usJ8yDjqekYPDIciLug3VmqaQOg2sJ3W4tMEGXEuuqH9OIvjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WVt0Rg/s; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WVt0Rg/s"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ee62ed6beso1668477a91.2
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Oct 2025 09:37:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761237424; x=1761842224; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jtv3AWXkUKD6xrmMF+F/kps4qPDMdvlVlOxla06uyRQ=;
+        b=WVt0Rg/stXcPGFuyqxVli4N/xeR/6ANxBANuAqQO/E5+EBYwkAKk4QgSOvpmHpZlg4
+         aZgseBGGoH7goOcG1C7Mlbjh0V6e+7L4h6pYWfewypvUol5y7L216JJu+qJ/wiIXmFAz
+         XPTJnjEb+n9UVWFY+w9dqSxoKE6+qjBH3PXtAPT8ahiYK4aaDsN/o2qaboY13OEC39uO
+         GlXKpK/k/wPa8SCjp04EV71157hl6+1O+gdp3dRjmg1WRroGygRPzaP2+PuIcO2lz+Cp
+         NlF49RJEiG+9l4O1B6TxIhtztj3pkZe+yiBO2gqWjJdYMNWufa/XLLC5iBG/XPnDnEsV
+         NFMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761237424; x=1761842224;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jtv3AWXkUKD6xrmMF+F/kps4qPDMdvlVlOxla06uyRQ=;
+        b=l5KuW6yz08Y1nW7rJKT9/SIIXBMFMT9eQYYGvzArDaq+KKHeZSrlwOS1KDmGO0fwdT
+         99rildgAqoCVY5PmukM+zj4G00sArJX9nKtUD1cD/WXlMKeffdSJrvBvrCd2nxjOwy0t
+         5/50jgsip+GFHhqPc6V5baPbv+q+QqtrSi9TtpyeRbETB4+IvNyAlBm2/q5gVfxr6SnW
+         DSIt2bUomhwfwJt9tziRUWaaXrltfgesvE3RPAQsQYA48zRcS5mQiGCyEPz/LRCUVxGT
+         x5/BvpL+Cz5Zpmn9MZHothfoAsb+HuOZUF+sT7Pruylm/xPB2rDXR0b6lU8P85uMwJd0
+         NCxA==
+X-Forwarded-Encrypted: i=1; AJvYcCW5fhBi37bwhC3NcaeQ7ivRHCKRaqSvgo/KpkhoRrHfEpRmyFWTmY6x3c3n2WTXPt8oN30I+BsAyKPkl/0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJ+DjBbGwM7Z1ZwzbrZxKMlbkiu+uvLKspnvgQnGWijZIZUnMi
+	vY6Rvh+U3Kp3xgQ+7KeFUffuQp97jbG6TP6chYSe/iFD0cbqzdd2HvvpdXpuEhHilId1xtlVQ+q
+	ykmq/Vg==
+X-Google-Smtp-Source: AGHT+IF0FAeqDrDGXWaUrUjQhS7ytpMli/KUCMauoXGAkgYmGUztcbufyavat55ecmSo7vezKRe5g+t+/Cg=
+X-Received: from pjtf19.prod.google.com ([2002:a17:90a:c293:b0:33b:da89:9788])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2d8f:b0:339:d1f0:c740
+ with SMTP id 98e67ed59e1d1-33bcf86c093mr30922848a91.1.1761237424275; Thu, 23
+ Oct 2025 09:37:04 -0700 (PDT)
+Date: Thu, 23 Oct 2025 09:37:02 -0700
+In-Reply-To: <3a86b3678a78a8b720d3818f4121972f67e2d0a8.1761154644.git.thomas.lendacky@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: p.zabel@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Mime-Version: 1.0
+References: <cover.1761154644.git.thomas.lendacky@amd.com> <3a86b3678a78a8b720d3818f4121972f67e2d0a8.1761154644.git.thomas.lendacky@amd.com>
+Message-ID: <aPpZrpfes8-SY4k_@google.com>
+Subject: Re: [PATCH v3 3/4] crypto: ccp - Add an API to return the supported
+ SEV-SNP policy bits
+From: Sean Christopherson <seanjc@google.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	linux-crypto@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Michael Roth <michael.roth@amd.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset="us-ascii"
 
-On Do, 2025-10-23 at 09:37 -0500, Rob Herring (Arm) wrote:
-> Generally at most 1 blank line is the standard style for DT schema
-> files. Remove the few cases with more than 1 so that the yamllint check
-> for this can be enabled.
->=20
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+On Wed, Oct 22, 2025, Tom Lendacky wrote:
+> Supported policy bits are dependent on the level of SEV firmware that is
+> currently running. Create an API to return the supported policy bits for
+> a given level of firmware. KVM will AND that value with the KVM supported
+
+Given "KVM will AND" and the shortlog, I expected a _future_ patch to have the 
+           ^^^^
+KVM changes.
+
+That's partly a PEBKAC on my end (I mean, it's literally the first diff), but I
+do think it highlights that we should probably separate the KVM change from the
+PSP support. 
+
+Hmm, actually, the patch ordering is bad.  There shouldn't need to be a separate
+KVM change after this commit, because as things are ordered now, there will be an
+ABI change between patch 1 and this patch.
+
+So I think what you want is:
+
+  1. KVM: SEV: Consolidate the SEV policy bits in a single header file
+  2. crypto: ccp - Add an API to return the supported SEV-SNP policy bits
+  3. KVM: SEV: Publish supported SEV-SNP policy bits
+  4. KVM: SEV: Add known supported SEV-SNP policy bits
+
+where #3 uses sev_get_snp_policy_bits() straightaway.
+
+> policy bits to generate the actual supported policy bits.
+> 
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 > ---
-[...]
->  Documentation/devicetree/bindings/reset/ti,sci-reset.yaml    | 1 -
+>  arch/x86/kvm/svm/sev.c       |  3 ++-
+>  drivers/crypto/ccp/sev-dev.c | 37 ++++++++++++++++++++++++++++++++++++
+>  include/linux/psp-sev.h      | 20 +++++++++++++++++++
+>  3 files changed, 59 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 45e87d756e15..24167178bf05 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3099,7 +3099,8 @@ void __init sev_hardware_setup(void)
+>  			sev_snp_supported = is_sev_snp_initialized();
+>  
+>  		if (sev_snp_supported) {
+> -			snp_supported_policy_bits = KVM_SNP_POLICY_MASK_VALID;
+> +			snp_supported_policy_bits = sev_get_snp_policy_bits();
+> +			snp_supported_policy_bits &= KVM_SNP_POLICY_MASK_VALID;
 
-Acked-by: Philipp Zabel <p.zabel@pengutronix.de>
+I vote for:
 
-regards
-Philipp
+			snp_supported_policy_bits = sev_get_snp_policy_bits() &
+						    KVM_SNP_POLICY_MASK_VALID;
+
+which makes it visually easier to see the policy bits logic.
+	
+>  			nr_ciphertext_hiding_asids = init_args.max_snp_asid;
+>  		}
