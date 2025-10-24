@@ -1,82 +1,70 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06091E502
-	for <linux-crypto@vger.kernel.org>; Fri, 24 Oct 2025 18:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9B93563F1;
+	Fri, 24 Oct 2025 19:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761331664; cv=none; b=OOng/em/dlGGv44OH4x14lOZWMc6HBRb2lSJNf9y5nLQ6xpk7csr/Nr5Qcars1zDBSYCsVgutD5MF+jRaiX2zKxf1V4hVEnBlAALkGOlJ59LfJY7ASNycIzbbMA4guW5bvokZcPkTn5pxUqiWLilAUqPcKqH9WBp0Wmaw8n9vsU=
+	t=1761332967; cv=none; b=LtWGvtrEKvi3MPxUBTwix0Licyy+OsTtA56lnHlipOpnK9+EFrL62SL845g1/cGAVjuVRklwX3O89f2yGYltsEO00BV9dTo1Pjjt69XSmFH6M4Lb6bcz+mxU7ttU7+ktojJQbVjpzGcY4d8aJrdbvO4d+zmUEp2rjOaP1QWkEKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761331664; c=relaxed/simple;
-	bh=+eCIF2IlRSgLtgqyMLdcppY91B3d1Izx9iwRGwuPGmw=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=MeMRgKGOPVRB4nz26E1ghjqeBsk+jNpec2n25Av/IU6T1ApnRip3BBHjllcivrX4oJf/Z9voLhzulYNBOwE5nQ/yiWaIQNha58r+GcgccuJ1c6FzTPWOmD//fnTFupMnQ/t6kRHLnXMo7zG3SxJZJFaczvCOE76i3h6HrFBW8pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ReLU5l2p; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1761332967; c=relaxed/simple;
+	bh=+Eq9xOCq1pUJTZafUHci4ZFEe7NEbByt2MpP2q80+FE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=R5QZ3sWAr0YIVm2mAZGQf/RVA89709qF8bEU5d7sPkGb8S1NM8BCystCMNg8nU7Z6kSkpRvkROtfvEE8i9FgWUQqmn3IQr8Me1oL5Pr9N/zhW2ZROuG+FcrEcJFWc00Vg+QuuNLtTtKiSLYUhH6boD7OgJMSAfQQchnWiMGJp9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z5PcEiIh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ReLU5l2p"
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761331656;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nyaAcUFtdOezW/04o42XGGlpnb5s60o3ly6brN/viLg=;
-	b=ReLU5l2p4uD9wbKRbRjyugxHn76F9XWdy3acBYw8rJJC3CReYIFg4GyjwzFvz0G+SZ8ZCV
-	W/eh+kIrPxBLzNtJTN7g6eLxxUPp8ra6Lj7a681wB4qG5L7z9XYuDomkbodq7zCVdZFUyy
-	BpaKJhbPFYlb7XfvZyiqOysELUHBXDc=
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z5PcEiIh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43FE0C4CEF1;
+	Fri, 24 Oct 2025 19:09:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761332966;
+	bh=+Eq9xOCq1pUJTZafUHci4ZFEe7NEbByt2MpP2q80+FE=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Z5PcEiIhZq3la5ZHktJfC4yAkSk7NhKkNZfmW6uJx6nCqfwOk5piWHd5Xabdv8zL1
+	 FtLuayUkG0fxLogGBJn57j+IrYc60iiZEx9VOl0aGKz7Bb0u4rQVwMEV4+3fLYWAkl
+	 cqSbUkWB8DeGk4zOTsGepmePdVB/mBhBU1k1RgyuZe55m1tCSunVLLCyd2tFs4Tt6x
+	 JkyUP5SCmxqAgcdc4BtMhyPhLzB06xurWd4q12AKRXPVTb7fO5dGkMWrRdyV8PwoGY
+	 IYVAhJxPx9VJyiQQxUgodEKdSxeGkSvpUJorkG2FpZOy9jlrgKBLKng+sP7dnv4XON
+	 zm3zHS5LhMZnA==
+Date: Fri, 24 Oct 2025 12:09:24 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Pei Xiao <xiaopei01@kylinos.cn>,
+	syzbot+01fcd39a0d90cdb0e3df@syzkaller.appspotmail.com
+Subject: [GIT PULL] Crypto library fix for v6.18-rc3
+Message-ID: <20251024190924.GA2068@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
-Subject: Re: [PATCH] crypto: qat - use strscpy_pad to simplify buffer
- initialization
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Thorsten Blum <thorsten.blum@linux.dev>
-In-Reply-To: <aPp3cXRxvdJzBkw9@smile.fi.intel.com>
-Date: Fri, 24 Oct 2025 20:47:02 +0200
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- Jack Xu <jack.xu@intel.com>,
- Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
- Qianfeng Rong <rongqianfeng@vivo.com>,
- qat-linux@intel.com,
- linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <B981F95A-287C-44CF-8852-B4642E728975@linux.dev>
-References: <20251022123622.349544-1-thorsten.blum@linux.dev>
- <aPkfsuliKYy5UAbB@smile.fi.intel.com>
- <6DB96B06-108C-465B-9A54-88B8008DDD60@linux.dev>
- <aPp3cXRxvdJzBkw9@smile.fi.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi Andy,
+The following changes since commit 211ddde0823f1442e4ad052a2f30f050145ccada:
 
-On 23. Oct 2025, at 20:44, Andy Shevchenko wrote:
-> On Thu, Oct 23, 2025 at 05:35:00PM +0200, Thorsten Blum wrote:
->> On 22. Oct 2025, at 20:17, Andy Shevchenko wrote:
->>> On Wed, Oct 22, 2025 at 02:36:19PM +0200, Thorsten Blum wrote:
-> 
-> ...
-> 
->> How about this?
-> 
-> LGTM, and that's what I had in mind, ...
+  Linux 6.18-rc2 (2025-10-19 15:19:16 -1000)
 
-I was about to submit v2, but checkpatch warns me about simple_strtoull:
+are available in the Git repository at:
 
-  WARNING: simple_strtoull is obsolete, use kstrtoull instead
+  https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
 
-Any recommendations?
+for you to fetch changes up to 1af424b15401d2be789c4dc2279889514e7c5c94:
 
-Thanks,
-Thorsten
+  lib/crypto: poly1305: Restore dependency of arch code on !KMSAN (2025-10-22 10:52:10 -0700)
 
+----------------------------------------------------------------
+
+Avoid some false-positive KMSAN warnings by restoring the dependency of
+the architecture-optimized Poly1305 code on !KMSAN.
+
+----------------------------------------------------------------
+Eric Biggers (1):
+      lib/crypto: poly1305: Restore dependency of arch code on !KMSAN
+
+ lib/crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
