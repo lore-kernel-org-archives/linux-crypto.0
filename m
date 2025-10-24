@@ -1,120 +1,121 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8BC242D7B
-	for <linux-crypto@vger.kernel.org>; Fri, 24 Oct 2025 05:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B901E2F9D82
+	for <linux-crypto@vger.kernel.org>; Fri, 24 Oct 2025 07:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761285489; cv=none; b=oQU3adaKiUODQ4a2rnqDGoiOLyjwdRPU0cFRzMEyW/f9KdmcwM8A6e39be6WjKHI/UZP7COpEgkEYfXwVBy5n5HtqSWrRs0nHirLMoZA87SlSgarBQFwcGrGfNgFRZu4rAS/Cba3bdiWS+wKNpAZQuRu2QzFyxPdcCUluOUhxn4=
+	t=1761292584; cv=none; b=cZgZ8CZ5w8x7jStIlNZs2G+OrKeu03Tz+px9wjz3xcDA57OGGQ0TkynlNWyGGTSUU9ikFxAhK6VGFURMNlquvbZ5FQWGQ4mOIHr3Std+D/U+J/oJZG8KVXz0mOcSqgebA9bXxACYogGqLc/XOu106zEnoTMiUokXPbI+d9/HQQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761285489; c=relaxed/simple;
-	bh=NmsrupTRkisYQFGhFjZ0bRbIdltnfvRER/RQe8hkLqU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HcjWVSxE/yHtKBxEqOtFl8fgKXQKGqs9yf0emChnbDqvyXJ+LDYmv+9eaMp8tFO2Qcp/rQ3+UwIy/QlWi7vRdshbzUNWPGsg6Ev+BlV+itiyznz3PwGA1yuTDaVUyj7vODg5CLs/eo+Lbd0XUiYvnBXYJCIA3zTcbJTiSu2mWs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PH5RI428; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1761292584; c=relaxed/simple;
+	bh=nxy0zWX1h247nPbsMpYtj4rqvQKsZpsdIsqOdaa3i18=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BwO27n5ZyxEji8ugZUy2t8CcIcSexEN52SPne8Z4mNGP14PKuvjauXrCfT87wQidZX26fNpglGwAb8dHdLqQT/IHcwEkUkoghopJOpjeJStvkN1JAHdM/MWB81h4NghXdpo46cqQ8UNJ6u57n3Vq9BltNV88UZYOuzsRFPDnAAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=v3iF3RAP; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PH5RI428"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-426fd62bfeaso796050f8f.2
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Oct 2025 22:58:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="v3iF3RAP"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-592f22b1e49so1559695e87.0
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Oct 2025 00:56:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1761285484; x=1761890284; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WlbgzRvJgE4Sx6EeAuF7s2GqiVQJOvGqllksow3opC4=;
-        b=PH5RI428SNOsHpUF7L5WveuXG45u84EWGn778+3Wr8bMdv+wkVkqB49ktt4SK7xIHj
-         Tncr5zM4G6R8tSxbmhiHD6juJAH2sQxz2za0S6PGE4mXwEaNctpDMKkn6STQASqJme2e
-         pMIv19vxtvk/unKYgHvS5Dg3InBKAt9dmXDE2huuB1GxdXvdHTY8+tFrsNES3Rf382ae
-         Kqgfv+/8L2sxsOqv9QtP2utjHEClW3Txz9Pup/PpINbpc/XbsbrLWgRsXHjyRAf8S1fG
-         DbDFc+11K0EfswLo1VmQyR7wLkTmePf4g55KqAEzGPySCRFmcXzID++dMRKkWq8vhBoz
-         FkLQ==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1761292579; x=1761897379; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nxy0zWX1h247nPbsMpYtj4rqvQKsZpsdIsqOdaa3i18=;
+        b=v3iF3RAPDCb1elFqO0VtoWQu+fW6ymU7UCcKEvvmYKNYTD2ooJnLd6jMbuJoUoN+Dn
+         48jC0TXcnzK7hHI8l7XLLufqE40irxcJ4vQUvDf4zdOy47noMAAYnUg6+rKFE7kuW8KB
+         USll7/Aewk1bIvHRDatF6iZ+ivUhLjYhiJEJEaA/t1MN12k63JvJ8Z2BqetAPfCPpfzc
+         bXyJLqDmaG/v2uSkzQNDFkhtLwjQdE/QsFWa4lokn+PvuaNQ6Zeenb8G29xaiiFXP0S7
+         FDqWxQyTvlalR9tZ8BC9oRxHctw1PO5qfa50RYj0lq81NdRESC/gWmdIjcg72jvCS2fV
+         wJ4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761285484; x=1761890284;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WlbgzRvJgE4Sx6EeAuF7s2GqiVQJOvGqllksow3opC4=;
-        b=vYUUlxoOlvcDf9RbZF7f4ENMZTgI3X+fLASVMKUxWMghVJYshyyyxgy547BnDucb+1
-         8WvvdSQQBoYjgbJyEOCPvb+jvBIUmm2gPJDARbXMIQWp8vsu33zgo66PoLKVPCzVEkKm
-         OG/oxRVidGmSIwOjK3atVPqEdOvINFzbPOFPH9F9yLRT/GJwHYvy3KsEPnIRgfF/nrXU
-         5/iSDa2eQ99CpsCmJ41oZIG+VgcWNZpH7bheRpIe1NnFK4KmyiMT0t9xlREdZ4LHeybK
-         aq0jmaZ8xQXhlku/u6osKgs9h+7MDOAjxKZtK2TNRsYG7uj6fDKlgtKtSgFPRgiJPT77
-         gAHw==
-X-Forwarded-Encrypted: i=1; AJvYcCVJxu3npGSJyta4c3CEjOzL8E9v0leR80wK6xvTpTTikrqc8uO36ynmD+2sapsbB4GylavAkvmDALZd2rQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXtpwmkkOQrquCLyVAsRDZ3qtE7uEv2lo+rIVqXpFJIO67LMDb
-	eLWHTeHw0dLKne7C8afase69m4aXTGVHGzCr+YQLFlx8S+eIFsqmkvCvwnX+RXSY2vA=
-X-Gm-Gg: ASbGncvMaPH6uj3jzsfC2gzMParBVHlc0EsgeZWUM3con9RDGR3y9yopV5SVawX4tHr
-	gW2yLq+q2x5bGz0UDm2EU0Qvn7xbon82DTPfAg/bSmikxPseqtSSLlT8c0xWswEKff7SHjuSNO7
-	auu4gNbn+ihTAz2fIBFlkHcKTZmlQV5j9lnPf2WrOB0GdB4Zkw+0A+f0Q910uEZMXMW+BhCTLGl
-	cHe96tr3I7+MIcrxesVX9gQHvI2kpwQkh7Tf9CYVkoguslDbj03qJSq4P+o6Bb+bqmYy8mBn+9E
-	sK46sPpiC3LXkxALGow+12GNG2I9NV0/uHnq5L+8Z1MOTTmQ0e0HJaM99FfrtxKYkYYjxRYu7Pm
-	kVviJs4MLSPGxiBpokilHJxB1HTXDN2yFGt+cl3J9P2JW+mGZ5aqyVzhcDrsu3/pn8p2/ru0der
-	NwbN69H5cKHRucopIx0h8=
-X-Google-Smtp-Source: AGHT+IF4FcOKkucmDNCM2/KKpneCA+i1yPeXTsA/LVynPTPJC5AXKg32KTh4dcKAlcjbp/p6c5h7Xg==
-X-Received: by 2002:a05:6000:2387:b0:429:8d0f:e92 with SMTP id ffacd0b85a97d-4298d0f106emr1607568f8f.6.1761285484311;
-        Thu, 23 Oct 2025 22:58:04 -0700 (PDT)
-Received: from [10.11.12.107] ([79.115.63.145])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47496c14a26sm76466825e9.4.2025.10.23.22.57.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Oct 2025 22:58:03 -0700 (PDT)
-Message-ID: <b1b6271a-1f75-4cfb-9af0-4d60b578f2dd@linaro.org>
-Date: Fri, 24 Oct 2025 06:57:54 +0100
+        d=1e100.net; s=20230601; t=1761292579; x=1761897379;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nxy0zWX1h247nPbsMpYtj4rqvQKsZpsdIsqOdaa3i18=;
+        b=TmHBEE6vgrgVAXmNv/Q8ocQMrHCRrKYb1rkbqJnJFmqKOkgKvsk9aiBk0hIS6Z6CjA
+         GpfKkoGDSo1ukvapVtJfEfRBfyXltUWNerrkcdWAMrQQo/AtOeTY0kHR0IZFdQXqYKUH
+         TubW9nL0VGXV8e0PlmAHLTJalnmAH1pBeK2Em0AYLHGnyt0P09ADWRzOiC8lpR0PYJj/
+         s5KxgnBsYw7SSH6/HABhMCDKHm8LrpNH6inf91GdVVGNTW7QEa9IgNNE4gPVtHk7/VoI
+         KUjgqPMjBT4KDpW0br8PdYi6wLkCQLaom0bngMuPXb5MIGfyVGeTIEKUxdZeOI6Txp+1
+         aBfA==
+X-Forwarded-Encrypted: i=1; AJvYcCWJRETlHEdezZBudsTQROo3oGY56GG9i0cFUcU85x71bG+f0qK58mv6EIaw9xIrlVjU3/xEEwiAsanhQPM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxW1px2OHlS2b2lvIo9c8G99G8ZOoemFiQcjOg7SJBjATgV5pmU
+	o989sChy9zprOgUGumlLgI4JS6OzVHX5kM2eQEGUmWJmeI0YuwJitHN3rwFAA5TtTechZ9sAebl
+	oZcnRNgIFTcrQJTxfvgAjMtylgofJLg17Osr+eU9xjw==
+X-Gm-Gg: ASbGncv2XWRFKBUZWFE7lt5aMUDvkBRsZu2SaEpH/EGq3YN3vkvm8dy4GqcToSb7Qsj
+	pCohcwL/HxK6eeFvU5wyZ6jHKjdHeVZfgatEu2j16zEZ907oPEFnR/bzHUghY9Pss+11XdzRMpB
+	rbSyLhlrqY5sKGkzxqfJep3bbKcmxhxF40knZhxvHqaSwyO8lQyDWMApou7iKN7b64oCpLUDhsQ
+	PUS4pM3UbeTXPuuW16/FA8CDR5Nz2/B+/TcG39PfYL7oSQHwacyOkNEcOkmGaDJCtEqCuVvC0n2
+	hYXmhn+JvMCem4g=
+X-Google-Smtp-Source: AGHT+IHSnXZ/gyOux7cXwXN4jLtleYFyXBIE1/V6t/jovl+yJ4b+HMb04wimJ5i7xVzENgmv7b2GUJ2i/5ONH7mEpKM=
+X-Received: by 2002:a05:6512:130c:b0:586:83e2:2295 with SMTP id
+ 2adb3069b0e04-591d85525f5mr9376212e87.45.1761292578695; Fri, 24 Oct 2025
+ 00:56:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: rng: add google,gs101-trng compatible
-To: Krzysztof Kozlowski <krzk@kernel.org>,
- =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
- Olivia Mackall <olivia@selenic.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Alim Akhtar <alim.akhtar@samsung.com>,
- Peter Griffin <peter.griffin@linaro.org>,
- =?UTF-8?Q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>
-Cc: semen.protsenko@linaro.org, willmcvicker@google.com,
- kernel-team@android.com, linux-samsung-soc@vger.kernel.org,
- linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20251022-gs101-trng-v1-0-8817e2d7a6fc@linaro.org>
- <20251022-gs101-trng-v1-1-8817e2d7a6fc@linaro.org>
- <113ee339-566a-4cc2-9786-89252ae072e0@kernel.org>
-Content-Language: en-US
-From: Tudor Ambarus <tudor.ambarus@linaro.org>
-In-Reply-To: <113ee339-566a-4cc2-9786-89252ae072e0@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251023143957.2899600-1-robh@kernel.org>
+In-Reply-To: <20251023143957.2899600-1-robh@kernel.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 24 Oct 2025 09:56:07 +0200
+X-Gm-Features: AS18NWBwXS6t25LKJEi_UKqvj6YhljrcGI4AFOhItyKPndeRwhvu3EmnTJe9vDc
+Message-ID: <CAMRc=MdE=1cPDPQwPQA6mdBkbXF2pG=oQ_oR_YuasGzaPDsKtg@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: Remove extra blank lines
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Stephen Boyd <sboyd@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	Andrzej Hajda <andrzej.hajda@intel.com>, Robert Foss <rfoss@kernel.org>, 
+	Vinod Koul <vkoul@kernel.org>, Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>, 
+	Guenter Roeck <linux@roeck-us.net>, Andi Shyti <andi.shyti@kernel.org>, 
+	Jonathan Cameron <jic23@kernel.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+	Georgi Djakov <djakov@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Joerg Roedel <joro@8bytes.org>, 
+	Jassi Brar <jassisinghbrar@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
+	Lee Jones <lee@kernel.org>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, Sebastian Reichel <sre@kernel.org>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <ukleinek@kernel.org>, 
+	Mark Brown <broonie@kernel.org>, Mathieu Poirier <mathieu.poirier@linaro.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Olivia Mackall <olivia@selenic.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Daniel Lezcano <daniel.lezcano@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-fpga@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-pm@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-pci@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-sound@vger.kernel.org, 
+	linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Oct 23, 2025 at 4:40=E2=80=AFPM Rob Herring (Arm) <robh@kernel.org>=
+ wrote:
+>
+> Generally at most 1 blank line is the standard style for DT schema
+> files. Remove the few cases with more than 1 so that the yamllint check
+> for this can be enabled.
+>
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
 
+For GPIO:
 
-On 10/22/25 5:31 PM, Krzysztof Kozlowski wrote:
-> On 22/10/2025 13:19, Tudor Ambarus wrote:
->> Add support for the TRNG found on GS101. It works well with the current
->> exynos850 TRNG support.
->>
->> Signed-off-by: Tudor Ambarus <tudor.ambarus@linaro.org>
->> ---
->>  .../devicetree/bindings/rng/samsung,exynos5250-trng.yaml       | 10 +++++++---
->>  1 file changed, 7 insertions(+), 3 deletions(-)
-> 
-> 
-> No power domains here? I would prefer to see such additions together
-> with the compatible, if that is possible.
-
-It's part of the misc power domain.
-
-I'll add the following in v2 and keep your R-b tag. Thanks!
-
-+  power-domains:
-+    maxItems: 1
-> 
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
-> Best regards,
-> Krzysztof
-
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
