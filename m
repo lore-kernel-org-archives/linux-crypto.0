@@ -1,228 +1,249 @@
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC918305968;
-	Fri, 24 Oct 2025 08:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761295092; cv=none; b=htPaNIFWmUztPBUKRKg1gOY5/SRI9lg8RPzY+Ap8nddteMxF6kreK6DxnYpyCKMZxlvusD1eoEeCCEpS7kMFKumgjavcGlRATHRG7JmKcDb2qoz6HrLWXvIPuwDVDSTRwE84U/VpnofiAYFhz/15/3Jxru1uBPX9KRaXsa30EiA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761295092; c=relaxed/simple;
-	bh=X0AK2AeMhixfqv+IIy3w6nxQk/qRTqidLVVVTOEJCmI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bVGeStqnaMZT6dZxOexUYyVqSfHgSD1yVMOuY0d+ULy35Ts8W7NUjFCb0/33okLr3+7fk2cDnfdwU6XyuQwpXzQptoeD93yf7ALTR4c7iB3QGFNISchXldKvSbkxAYD1fNA07RbyLqEP0R44/fvxp1Ztv3uSka5k7QztAi7xXDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=BGCyNZWh; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1DA3064B1;
+	Fri, 24 Oct 2025 08:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761295831; cv=fail; b=ZPBjkVxXfmBe0kx3HlZ/lqI/gf2G8UaceMQrFtxeCnVyxESqm6klzjXp/goUya4gD8EjWCfeDWDS4A6y2UxQs47Rmty+fVYRfa2mIXZnZzceJMapiD+u36Mct8Zr+7/4oX4LJEwy1gso+qq7aVQXXtTyYY36ozTwOaUxtzDR7B8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761295831; c=relaxed/simple;
+	bh=Nn8THTKWO7yRgyTOj0LIhmbfE89psSan3VUXXysQECI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=pnCocVh9RUbb3Ucxo/cE/snnunipWL61UBE64YYEt6teShl6co6QJC95z9oWamMVZzQwak9q9eni2sJjUKq+4FEaPWdb9SWab934bAfsbQ5WFnPxt+YR8QQ5/9tzCWRDN0ru763mD0oH+HWx6SCfuhre387pCBbaMslSZxvgYMg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BufR9GwO; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="BGCyNZWh"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=L7lT/wMZ1LMdwxMJTrMezCGdtazbt1qIWepTcDamS+o=;
-	t=1761295090; x=1762504690; b=BGCyNZWhzo8RUUdRzixBT2VzHiS8HQC8yet1u76Zj4WX1Ww
-	JM/OvZsMO7zVdzLfKTcj9KUPdwN2xyVpXuccyHEv1FY8pPcIYeF0vbasrOocMoCunF10LpKeInIUT
-	Lat7JguFy3FtUa/1BaUeod9QZ7Yda7/A9+pGBTzKjjBiUKoTcAXTvS3vZ9dC+jtQGREmFvpQXj2UA
-	hqOVH2WCxhC3ZHfISHFaz1IyKzbBLITAHhFQSqyvxRfHumw10EKtThbt5pqXu/9/YtWF+v3WEE2I6
-	m1QdEElfYLOL2WItoF7zZ6IdZwzViSJIDPQOEPFWxaWfQBKUAsh/vp9FNkPI7lXQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1vCDJ9-00000002PD9-0Qfp;
-	Fri, 24 Oct 2025 10:37:59 +0200
-Message-ID: <438ff89e22a815c81406c3c8761a951b0c7e6916.camel@sipsolutions.net>
-Subject: Re: [PATCH v2 0/10] KFuzzTest: a new kernel fuzzing framework
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: ethangraham@google.com, glider@google.com, andreyknvl@gmail.com, 
-	andy@kernel.org, brauner@kernel.org, brendan.higgins@linux.dev, 
-	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com,
- dvyukov@google.com, 	elver@google.com, herbert@gondor.apana.org.au,
- ignat@cloudflare.com, jack@suse.cz, 	jannh@google.com,
- kasan-dev@googlegroups.com, kees@kernel.org, 	kunit-dev@googlegroups.com,
- linux-crypto@vger.kernel.org, 	linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, lukas@wunner.de, 	rmoar@google.com, shuah@kernel.org,
- sj@kernel.org, tarasmadan@google.com
-Date: Fri, 24 Oct 2025 10:37:57 +0200
-In-Reply-To: <CANgxf6xOJgP6254S8EgSdiivrfE-aJDEQbDdXzWi7K4BCTdrXg@mail.gmail.com> (sfid-20250925_103550_253525_F09A62BB)
-References: <20250919145750.3448393-1-ethan.w.s.graham@gmail.com>
-	 <3562eeeb276dc9cc5f3b238a3f597baebfa56bad.camel@sipsolutions.net>
-	 <CANgxf6xOJgP6254S8EgSdiivrfE-aJDEQbDdXzWi7K4BCTdrXg@mail.gmail.com>
-	 (sfid-20250925_103550_253525_F09A62BB)
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BufR9GwO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761295830; x=1792831830;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=Nn8THTKWO7yRgyTOj0LIhmbfE89psSan3VUXXysQECI=;
+  b=BufR9GwOQ2L7aGGlb/zLvGYv01ooPXK/3dACdlLoXOY/hXQThgn7yj/w
+   +DDBEg/fQroLZU72UYdaC8S7ahdb4HSr5OB3BHjs0XckSmvRO2NNsyXuC
+   sG8OwYHwZcn2vLxrmqYXvz63cK0bClJMGePDQuiOrR64QotW2xbPULMs7
+   6paNjk3xNkV21X+9D3VQvK55OwwxtgeSKSGV1ZQgYwZ+M8wGvY4igPxIM
+   SqQN/57MXUKIifzJm+UFEfZnr/MZWNjm2N33luYuCzMQTLdhLPfr56pe9
+   uNuVi+2NS8T7rR+pAonuUxhNXLHiOPRM2sIa8lWcz7ULKopZEOu6pkfnD
+   A==;
+X-CSE-ConnectionGUID: 6EVggfYLT7qrFa1E/59FFQ==
+X-CSE-MsgGUID: /i9zX6JNQHG4h/LvDoN1xg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="73764337"
+X-IronPort-AV: E=Sophos;i="6.19,252,1754982000"; 
+   d="scan'208";a="73764337"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2025 01:50:30 -0700
+X-CSE-ConnectionGUID: 96pgbvfbT+mQasAkfEGwEQ==
+X-CSE-MsgGUID: t73PYLyAQi+DY7KPNEIstA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,252,1754982000"; 
+   d="scan'208";a="188768636"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2025 01:50:28 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 24 Oct 2025 01:50:27 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Fri, 24 Oct 2025 01:50:27 -0700
+Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.10) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 24 Oct 2025 01:50:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xPLkiXkoU8thdjx5kV4/toqvqDYgmizAYxpsi5dDi7VSzDTJeoIrk7UA82mxPTg01euYfzx6V9ZiRTl/rhVL1c3x+XOmUQt0cVhbYi1BIpoCxxjjgsGfdYwnfCMFlLT7e+0zNMsvtIKeCbPOVE3TN2a6T+W3OQuNPLETNmyrBjcNnl07PfwiiS+d1yZEDxxB00N25miyxU3okhZzUKFZHYmYjQkZZFWrv5JYiWBvzJNzi0WfS2PX57eU/C6XmFOvdk4/GpO14YiXy5pUoEoD5Va86RyIjqiyOScnvxAbchMIym+Pd6/g8S4CE3O10Hutyibre8ICOCJHFP43aL8w4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=l6kmKH4Xt1J91P/wxOAtuvotCTITyPXA0C8guaj77Vs=;
+ b=UzTcAn/kbHqXXvkZc20MlHmrL7V8QzUBNIQ/43Uq1zTZPJ3sAgpsCiGsbLTmuRV+8iskWcma7I+x7Ap314dayw5GO/bVh4AYb2XzkAMZgC/G0tSwWT6cA5tXvFLTA/iuvMHF2qBNdWsmDIjepK8G2tbsk0Sda8AK/jg5sT9AntjZoUSg/2Dz9PuvhHIku6JOxu1zE5HYBvGC4L12w/BNQFc+zbxoxRN+jAoZ9+AmUIi+D0gYxTn0ETWrNIktzyXMGOupVucg+/6m5YiVfz/Nt2pGQh6vPPnwLiWK0OEVOjXPi9X3KLgWA1wQJekZ5gu2OER2LcmgjRwM5aYgR6oufw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by PH3PPF5AF05F6D9.namprd11.prod.outlook.com (2603:10b6:518:1::d24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.13; Fri, 24 Oct
+ 2025 08:50:19 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::22af:c9c9:3681:5201]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::22af:c9c9:3681:5201%4]) with mapi id 15.20.9253.011; Fri, 24 Oct 2025
+ 08:50:19 +0000
+Date: Fri, 24 Oct 2025 09:50:11 +0100
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+CC: Thorsten Blum <thorsten.blum@linux.dev>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, "Jack
+ Xu" <jack.xu@intel.com>, Suman Kumar Chakraborty
+	<suman.kumar.chakraborty@intel.com>, Qianfeng Rong <rongqianfeng@vivo.com>,
+	<qat-linux@intel.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: qat - use strscpy_pad to simplify buffer
+ initialization
+Message-ID: <aPs9w2su33uXfD09@gcabiddu-mobl.ger.corp.intel.com>
+References: <20251022123622.349544-1-thorsten.blum@linux.dev>
+ <aPkfsuliKYy5UAbB@smile.fi.intel.com>
+ <6DB96B06-108C-465B-9A54-88B8008DDD60@linux.dev>
+ <aPp3cXRxvdJzBkw9@smile.fi.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aPp3cXRxvdJzBkw9@smile.fi.intel.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: DB8PR06CA0044.eurprd06.prod.outlook.com
+ (2603:10a6:10:120::18) To CY5PR11MB6366.namprd11.prod.outlook.com
+ (2603:10b6:930:3a::8)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|PH3PPF5AF05F6D9:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0481da71-6147-44ac-9e93-08de12da5c0b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?ZRQ2uyd2E/RjLtTzYDfX9YjsRwfI+0iVYl61qSaCJkRKog/6B0LhN7u9/mYO?=
+ =?us-ascii?Q?HI8ot6hRTF5f16xSFjiLYytqCxRJddUaXbaie+XZmsl4wyjX3SkJKVrazjYF?=
+ =?us-ascii?Q?RVWCbzklW1JJbu+vjJ0/l6LNZUP9HVXp7JLi7Txv6yFqz8ypK9XFiBAhxy7e?=
+ =?us-ascii?Q?RauNYChANDYlGf4yuYAzhg/pza6EH8nRx4gBEE439mhjIumU336X6pCPAYE8?=
+ =?us-ascii?Q?pt7sytANMZ+cTbWCiJFsQwr5iMXgLiQIGt6wwdn4a+QmnK3NJiQ1ugu8BOk6?=
+ =?us-ascii?Q?gxskH5Fb7HVtl3MqBpiUhld6Dp/JIJ/xlY4uDSFZ+MFhrTFYsR5UU87KV8iU?=
+ =?us-ascii?Q?6bFuXqwN7CAspXUD7My4ZavyQw75ARG56UIFOXPUx8kujgF440SA4vNxlU4D?=
+ =?us-ascii?Q?MqLfNcqBPrDN8aMVTt/UCkR6ryj8yV91T2XxOET/PUQ66zFzGygxdNRGGfxB?=
+ =?us-ascii?Q?3pIkGo7LhizBGiXIlUbGs55aB/QxT4NukhiHSbjP8PCBWZxLCseWOi4ojqsD?=
+ =?us-ascii?Q?UDmc+hLFJ01wQhEpFo+ML7mTKCqnPmc4/CB3YuS69eQiY8ZY5AnmgJ1ESJ8q?=
+ =?us-ascii?Q?NdzFd0wL4o+dthAiU8QordZl6HaIGPCaFUvuRMW6amvn2WAX9WdkOVAcazbW?=
+ =?us-ascii?Q?SZddNgcvn8F41JYGZdgLDRURdy8JqSdXviD9GC2lM97N4ZrcKw57eYIxiksj?=
+ =?us-ascii?Q?6VbnZ/QMCfUYpQujM0JZs4asL/nx82LBumW/P7Bi7oDQhVf5W7dnC7aUvYX2?=
+ =?us-ascii?Q?S0onfKjwENYARNnm/qMnKTLtPiTI0npQrzJCJHYvwb/8XYhJ2ojZ5aOKzJFI?=
+ =?us-ascii?Q?uziL80Agd8F7uYVBOe9+WP3ORES66R4Hzty3kXdCZu4vuyDc8qTTcIBMY8Oa?=
+ =?us-ascii?Q?eqj6kBknr+e9G8N/J1d854uvFTehu6XXR+FJXih+v5RD9QmK1LizMaCRvIrB?=
+ =?us-ascii?Q?4bI+DAySQsJeuwgbP3aU8/yE8BTDqCMCV42oNPhqIqI0swnkMwb0uvlvLHys?=
+ =?us-ascii?Q?wO2rufiTNcRDrakDy+tT5nvniKdDZxRY5SK/igvc8m2xP32p/3DGHoet8X42?=
+ =?us-ascii?Q?dNzCusJTc2yZvACpEDUz/k0lyVcqhmnTQ95eFEyFPXR91KGwhd0RlL+7+ge8?=
+ =?us-ascii?Q?4VI0pp1e8yb+uHkpl69LCnx2jLUmDFrW3FpnGa/mU37wDTVUE0Qz0YzekyWC?=
+ =?us-ascii?Q?BdpO79CwVWvFxxHVMBgIeHqlYH4TkY986UEdaEXKkvqdDP06cYQ8zu39DFfS?=
+ =?us-ascii?Q?XlAI/Q2gyoxxJRr/SqHCzy+tCaCtUpFqmRt2YS4jege7JjGe6SzQlZmg64jG?=
+ =?us-ascii?Q?gStuFHDJmtqu13kPEnvqSvQ1xWXvSNPe1QKiQN1YZUOTsOguQPfNZALY7vgV?=
+ =?us-ascii?Q?6ymgwuZXEgYMw4Wvc4lUqtMBmlLLwPvTRnkHPEYI34If7Nc3NVvvZJWHCxuK?=
+ =?us-ascii?Q?qFU8wMx4cMU=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?kd04qJ8YPYZntBkVn9JmRANAZLuftrS7HiE6pzcC5JGWlsYKYzA1XpqRHn4J?=
+ =?us-ascii?Q?E/QJFtJUbUdyYLoSopex2BS66YGeTYHQVr1g1/F0yrne+40R3pcbKGG5X/yZ?=
+ =?us-ascii?Q?wWOk4gONGJHj6M4gSDvD73uZNkjhSkTznb+DIR4p5AdEvh4yxNfdr+BfsOOo?=
+ =?us-ascii?Q?N0NhmxcVRj+AN6Fv6kaH7uBT8ZBDpADKIGSvRAVYLAzcNVEL7dBn79M2G+dd?=
+ =?us-ascii?Q?NlCkHnP3b18btO3ulvizX5F1n775FSTTA0k3D/0OhmLfbeV3VgVubbrk1gfT?=
+ =?us-ascii?Q?V6WRdF+SpG8FlCNZ84dmqiWwByAgMlm2wdS4b0Qq+atAvyFCBjDSrs/rq20v?=
+ =?us-ascii?Q?HMttyFGFkeBZm2m9+M8yKHFMSQL3bgJIRXtASFysBg6JTk0e1nPnFVaBOsX1?=
+ =?us-ascii?Q?X3U4BuQT/clg9QyYjtM3yT9CuR5xWQKZaNgp5cdk+R9JHDwVGY/822jOT4kc?=
+ =?us-ascii?Q?Efe9gqt1fZPocDiknOwWb8/JtqvKWlWSjFWTPFu5s9c9zIYo9BwpFfv04Gd8?=
+ =?us-ascii?Q?OeLuUldGvXAbF+3pLZE0arV4UKSC/pc+NCMffJ6KpDUHnlbgh7zOkBOeH4Dq?=
+ =?us-ascii?Q?d8VhIjt0Ire7Z3uzIEgC4AiVLTNRzk7m2rCecQ9W4vVtZpqm00EoqAJBfk3F?=
+ =?us-ascii?Q?dbR7jf9z1KUNBaKhU4ddEsltFW/pd0YyM49oq5YFYXkVJYI6cT33MaMyoX2v?=
+ =?us-ascii?Q?taNLCQZureKEcBUtOO/ZMtoWs4DNChSDxy0DTdFp7JDRLp6peqymLDnHz72s?=
+ =?us-ascii?Q?1bJeRQRbZrTclv0bBxK2Shs7uZDCLN2wuJLN57uuHJV1KgMKmwVLEk2j/03K?=
+ =?us-ascii?Q?E5BY0nUMnQ0gCaZdEkbgmlURC58WesrSYOxz4Hkp2ufOIQ9I5srGzYiFSa+o?=
+ =?us-ascii?Q?G9Fsio75VfTH2gnKiowDlkBbP2R9BLjyw/JSmUKCNyFqlYlWD0c2e10jto+p?=
+ =?us-ascii?Q?h4vvRr6Hz07lknMno7d7jTLSCNPZcbQ4t2Tz3bY6LJN/zQbuQQnQruc9Iesu?=
+ =?us-ascii?Q?8hV0+sl4ART6MelBvxPh40nMbhZBhwemNAh6FdNuRtaqfEuBgtvnVBkJTfpL?=
+ =?us-ascii?Q?w5KnWmY5C2bECsqZrQ62m1TxE3HIVhjLaxR9MMrjdnoGn4BEFSbgEGFatnVa?=
+ =?us-ascii?Q?OpReV+dz1kc7DUWNkgkilYqRNcyLyoK1aV3F1nMjNueSh0IumBipWMGwOa8y?=
+ =?us-ascii?Q?WQEZPfDQoyhwFfWxCUQVKYmQRaO96YLPTtS3nvk1m7XKPLWIXS1uJOV9vlL9?=
+ =?us-ascii?Q?9F0M4HbBYy315XRqZUKcgzBrwS84vtjN03Hc4DmZBVLDV+Jye4S4EGJFCf6j?=
+ =?us-ascii?Q?KoisH6yadsoDvuOYCbY9Ur+y118lSplijJ1U0en9qhzbYtHylmg9XF1LKweg?=
+ =?us-ascii?Q?lhabnB23F8bOK3OhsWZSiduczpPxCi7q9qEy8tF32gzAonWUSMPUdULH5PuN?=
+ =?us-ascii?Q?zlqaZp0Sf7T01mrTcqQqb0U8/0bGU92TRVn9urKrQ3y5g5i/kVp6qgrJvf2r?=
+ =?us-ascii?Q?VsQbKeJqBRfCEQyGCOdwrk3JjXMSKpSyLKk2942s6CqrVRDlNe1uQQrqb4aL?=
+ =?us-ascii?Q?d4wpK4iPcYDUhCG0FwglbHcXyGQA3arWooZcNXWQCNZe9vJ/nWUzSyp45NwE?=
+ =?us-ascii?Q?7w=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0481da71-6147-44ac-9e93-08de12da5c0b
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2025 08:50:19.1126
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wDCsxsVnn5D2uJjvIutwwegNFcj/5LUkQF5PiQ3DEjsWM7UOR5P0o1XRuTFovvnBuRQbGRfNBaZUl3hVIgqqxHw7AUrbKHq4spIOMHDe4i4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPF5AF05F6D9
+X-OriginatorOrg: intel.com
 
-Hi Ethan, all,
+On Thu, Oct 23, 2025 at 09:44:01PM +0300, Andy Shevchenko wrote:
+> On Thu, Oct 23, 2025 at 05:35:00PM +0200, Thorsten Blum wrote:
+> > On 22. Oct 2025, at 20:17, Andy Shevchenko wrote:
+> > > On Wed, Oct 22, 2025 at 02:36:19PM +0200, Thorsten Blum wrote:
+> 
+> ...
+> 
+> > How about this?
+> 
+> LGTM, and that's what I had in mind, but please double check the behaviour of
+> kstrtox() on an empty strings.
 
-Sorry, my=C2=A0current foray into fuzzing got preempted by other things ...
+LGTM as well.
 
-> > So ... I guess I understand the motivation to make this easy for
-> > developers, but I'm not sure I'm happy to have all of this effectively
-> > depend on syzkaller.
->=20
-> I would argue that it only depends on syzkaller because it is currently
-> the only fuzzer that implements support for KFuzzTest. The communication
-> interface itself is agnostic.
+I checked the behaviour of kstrtoul() when given an empty string. It
+returns -EINVAL (-22). The result variable (the third parameter) is only
+modified if the conversion is succesful.
 
-Yeah I can see how you could argue that. However, syzkaller is also
-effectively the only fuzzer now that supports what you later call "smart
-input generation", and adding it to any other fuzzer is really not
-straight-forward, at least to me. No other fuzzer seems to really have
-felt a need to have this, and there are ... dozens?
+Anyway, the caller will not provide a NULL string to this function [1].
 
-> > the record, and everyone else who might be reading, here's my
-> > understanding:
-> >=20
-> >  - the FUZZ_TEST() macro declares some magic in the Linux binary,
-> >    including the name of the struct that describes the necessary input
-> >=20
-> >  - there's a parser in syzkaller (and not really usable standalone) tha=
-t
-> >    can parse the vmlinux binary (and doesn't handle modules) and
-> >    generates descriptions for the input from it
-> >=20
-> >  - I _think_ that the bridge tool uses these descriptions, though the
-> >    example you have in the documentation just says "use this command fo=
-r
-> >    this test" and makes no representation as to how the first argument
-> >    to the bridge tool is created, it just appears out of thin air
->=20
-> syzkaller doesn't use the bridge tool at all.=C2=A0
+> > diff --git a/drivers/crypto/intel/qat/qat_common/qat_uclo.c b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
+> > index 18c3e4416dc5..04628dc01456 100644
+> > --- a/drivers/crypto/intel/qat/qat_common/qat_uclo.c
+> > +++ b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
+> > @@ -200,20 +200,12 @@ qat_uclo_cleanup_batch_init_list(struct icp_qat_fw_loader_handle *handle,
+> >  
+> >  static int qat_uclo_parse_num(char *str, unsigned int *num)
+> >  {
+> > -	char buf[16] = {0};
+> > -	unsigned long ae = 0;
+> > -	int i;
+> > -
+> > -	strscpy(buf, str, sizeof(buf));
+> > -	for (i = 0; i < 16; i++) {
+> > -		if (!isdigit(buf[i])) {
+> > -			buf[i] = '\0';
+> > -			break;
+> > -		}
+> > -	}
+> > -	if ((kstrtoul(buf, 10, &ae)))
+> > -		return -EFAULT;
+> > +	unsigned long long ae;
+> > +	char *end;
+> >  
+> > +	ae = simple_strtoull(str, &end, 10);
+> > +	if (ae > UINT_MAX || str == end || (end - str) > 20)
+> 
+> I would go with >= 20, the 64-bit value is approx. 1 * 10^19.
 
-Right.
+Just an insight into the type of strings being parsed here. If they are
+well-formed, the format looks like:
 
-> Since a KFuzzTest target is
-> invoked when you write encoded data into its debugfs input file, any
-> fuzzer that is able to do this is able to fuzz it - this is what syzkalle=
-r
-> does. The bridge tool was added to provide an out-of-the-box tool
-> for fuzzing KFuzzTest targets with arbitrary data that doesn't depend
-> on syzkaller at all.
+    <AE_NUMBER>!<...>
 
-Yes, I understand, I guess it just feels a bit like a fig-leaf to me to
-paper over "you need syzkaller" because there's no way to really
-(efficiently) use it for fuzzing.
+Example:
 
-> In the provided examples, the kfuzztest-bridge descriptions were
-> hand-written, but it's also feasible to generate them with the ELF
-> metadata in vmlinux. It would be easy to implement support for
-> this in syzkaller, but then we would depend on an external tool
-> for autogenerating these descriptions which we wanted to avoid.
+    11!l0000!lm_thread_ctrl_struct_base
 
-Oh, I get that you wouldn't necessarily want to have a dependency on
-syzkaller in the kernel example code, but in a sense my argument is that
-there's no such tool at all since syzkaller cannot output anything, and
-then you need to write all the descriptions by hand. Which is fine for
-an _example_ but really doesn't scale to actually running fuzzing.
+This function just extract the first number. Currently, that is 2 digits [2],
+and I believe it is unlikely to exceed 3 in future gens.
 
-So then we're mostly back to "you need syzkaller to run fuzzing against
-this", which at least to me isn't a great situation.
+[1] https://elixir.bootlin.com/linux/v6.17.4/source/drivers/crypto/intel/qat/qat_common/qat_uclo.c#L237
+[2] https://elixir.bootlin.com/linux/v6.17.4/source/drivers/crypto/intel/qat/qat_common/icp_qat_uclo.h#L11
 
-> >  - the bridge tool will then parse the description and use some random
-> >    data to create the serialised data that's deserialized in the kernel
-> >    and then passed to the test
->=20
-> This is exactly right. It's not used by syzkaller, but this is how it's
-> intended to work when it's used as a standalone tool, or for bridging
-> between KFuzzTest targets and an arbitrary fuzzer that doesn't
-> implement the required encoding logic.
+Regards,
 
-Yeah I guess, but that still requires hand-coding the descriptions (or
-writing a separate parser), and notably doesn't work with a sort of in-
-process fuzzing I was envisioning for ARCH=3Dum. Which ought to be much
-faster, and even combinable with fork() as I alluded to in earlier
-emails.
-
-> > I was really hoping to integrate this with ARCH=3Dum and other fuzzers[=
-1],
-> > but ... I don't really think it's entirely feasible. I can basically
-> > only require hard-coding the input description like the bridge tool
-> > does, but that doesn't scale, or attempt to extract a few thousand line=
-s
-> > of code from syzkaller to extract the data...
->=20
-> I would argue that integrating with other fuzzers is feasible, but it doe=
-s
-> require some if not a lot of work depending on the level of support. syzk=
-aller
-> already did most of the heavy lifting with smart input generation and mut=
-ation
-> for kernel functions, so the changes needed for KFuzzTest were mainly:
->=20
-> - Dynamically discovering targets, but you could just as easily write a
->   syzkaller description for them.
-> - Encoding logic for the input format.
->=20
-> Assuming a fuzzer is able to generate C-struct inputs for a kernel functi=
-on,
-> the only further requirement is being able to encode the input and write
-> it into the debugfs input file. The ELF data extraction is a nice-to-have
-> for sure, but it's not a strict requirement.
-
-I mean, yeah, I guess but ... Is there a fuzzer that is able generate
-such input? I haven't seen one. And running the bridge tool separately
-is going to be rather expensive (vs. in-process like I'm thinking
-about), and some form of data extraction is needed to make this scale at
-all.
-
-Sure, I can do it all manually for a single test, but is it really a
-good idea that syzkaller is the only thing that could possibly run this
-at scale?
-
-> > I guess the biggest question to me is ultimately why all that is
-> > necessary? Right now, there's only the single example kfuzztest that
-> > even uses this infrastructure beyond a single linear buffer [2]. Where
-> > is all that complexity even worth it? It's expressly intended for
-> > simpler pieces of code that parse something ("data parsers, format
-> > converters").
->=20
-> You're right that the provided examples don't leverage the feature of
-> being able to pass more complex nested data into the kernel. Perhaps
-> for a future iteration, it might be worth adding a target for a function
-> that takes more complex input. What do you think?
-
-Well, I guess my thought is that there isn't actually going to be a good
-example that really _requires_ all this flexibility. We're going to want
-to test (mostly?) functions that consume untrusted data, but untrusted
-data tends to come in the form of a linear blob, via the network, from a
-file, from userspace, etc. Pretty much only the syscall boundary has
-highly structured untrusted data, but syzkaller already fuzzes that and
-we're not likely to write special kfuzztests for syscalls?
-
-> I'm not sure how much of the kernel complexity really could be reduced
-> if we decided to support only simpler inputs (e.g., linear buffers).
-> It would certainly simplify the fuzzer implementation, but the kernel
-> code would likely be similar if not the same.
-
-Well, you wouldn't need the whole custom serialization format and
-deserialization code for a start, nor the linker changes around
-KFUZZTEST_TABLE since run-time discovery would likely be sufficient,
-though of course those are trivial. And the deserialization is almost
-half of the overall infrastructure code?
-
-Anyway, I don't really know what to do. Maybe this has even landed by
-now ;-) I certainly would've preferred something that was easier to use
-with other fuzzers and in-process fuzzing in ARCH=3Dum, but then that'd
-now mean I need to plug it in at a completely different level, or write
-a DWARF parser and serializer if I don't want to have to hand-code each
-target.
-
-I really do want to do fuzz testing on wifi, but with kfuzztest it
-basically means I rely on syzbot to actually run it or have to run
-syzkaller myself, rather than being able to integrate it with other
-fuzzers say in ARCH=3Dum. Personally, I think it'd be worthwhile to have
-that, but I don't see how to integrate it well with this infrastructure.
-
-Also, more generally, it seems unlikely that _anyone_ would ever do
-this, and then it's basically only syzbot that will ever run it.
-
-johannes
+-- 
+Giovanni
