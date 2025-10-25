@@ -1,92 +1,50 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAEFA27AC41
-	for <linux-crypto@vger.kernel.org>; Sat, 25 Oct 2025 05:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B831C2EA46F;
+	Sat, 25 Oct 2025 10:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761370008; cv=none; b=U5KIqvjL4JBZyzzITqgfCtFHg/+MqBZO6JQDk+WJrmhY0ztRuptrA80UqK191ZUSs6L6DLvZCFmZx3EQr0wf9FiSYjW4Ya3phL1FiZkw3AuFyMG8ckFyQLtW57JC7l7PztIdkSX9YXE2wV/JMd7p74eLbqmdHhy3g0GyiU0/OSk=
+	t=1761387185; cv=none; b=bySY/pSNpCpRFh5gT8c3nv06dLrOCbWs6wiVseowmHn2oxtokNQoa0nfeDYNylKXHb2zNcOndRpie5AAgfpNRu/bCCLaX2voD330VMIyU1W1B0RMThP6A2HaH84yZoE48Zc3xdfhmxwKgwR7Z9Px22qEGy2lojNb1nOuWGsR5dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761370008; c=relaxed/simple;
-	bh=/zQwfhMEJhTOa5/FV1euV1Dku1nFTDlTsbnBQjlqjDQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GtO/NLMGHzvXqAruYTjMXfrJP/xzT2AXafzYAT4u/pVfXsiTWqIiTvt6VZJ7uebGuIiBU1ixR4ft5LCWpUIUD4upGAkaBU1Psq4i5h/UGWzCq/lfncz3Yuzmxf1k97DBtW0fQQPihuN6rTY1MzPuUVXktwjHGMD4MUuDqc4t5SE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pjvfa8SE; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761387185; c=relaxed/simple;
+	bh=LiRJO0uqrTqoomhsftTGBDGSwayh7lHgVXGED2QgW/o=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EtyPnQdmFPD/0jJhBHwXz00uUuBiS6wdPkEkM7tM4oGndkQCU6Sln81YAxRK9inAa68zEalaFQX8d41XaGYVzP7jqsndDF1f/u5ZAWQmP+md8jX937SJRZmQDyiXs7rQZux0eMg0DIUtQ2JmqfRKIVL4bAwnL9K6wgdGxOfEEPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=cMEAVVAf; arc=none smtp.client-ip=113.46.200.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pjvfa8SE"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-63c31c20b64so4945458a12.1
-        for <linux-crypto@vger.kernel.org>; Fri, 24 Oct 2025 22:26:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761370005; x=1761974805; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mV8buuSZQP0rHOq5S4b8K+cOmbjRvDVQwA71gPDHBAE=;
-        b=Pjvfa8SEZbxsM/zJR4PQ+NRDcthojbCwES9h0rerasc6DuX+QlbPq3ReB7mSmCwZzk
-         G+RaYizITPByzjqWgNZCCdnHaJaARqKNOXhortmhpG6uojE+a0urH8nCO97GrZMm6zuO
-         DdvtNpTMeHn5rWMFFQ7Ju4peQwzCN+8hsCog0MMBRSxOQ39Bv9ts+qL7kuXrPafx2mDp
-         gsIImPcmgn6dRmfYObiegOz3nu/ZxylQPh2GOg8+npFQgjOqF89CdQqJEmYiltz2lDST
-         DmfDH2jHtwgINimt1F9lgcm6fSLUUT2WEstjXw4+XuAN4I8VbQ5sjQS+kAyiVJ8caOWb
-         zu7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761370005; x=1761974805;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mV8buuSZQP0rHOq5S4b8K+cOmbjRvDVQwA71gPDHBAE=;
-        b=FN0YeFCoLhHATLFfM5LQ+UcO+CFqV34JcXt5kBUQRu7HL8ib5sH2L3gwWHLv9xvPpp
-         y+M0j/3aRSIzhv9kJ1itmOMGIXiHiNY+MqCq8x3Mz767dCi4xBoGvg4fmNqJV3OFvTiM
-         r8yZW3kgUqBkbq71x89FvzuZvfZ/4GztLNyt4vHANsUb+FGxVurrwSEvTym0cx+nsRg2
-         ssQ5ABPPbsMDroXffor2ZuHc3MzdKeSMJxSG7anPsMAFasEFggtCZ3hRh9SdKOjmaQ6T
-         uVmXxM+M6YbZfM0hEyHaDGe/vmkx04qj2ABWcX1S1bpjmZvdSkAryult60SSQyNe3d9K
-         SczA==
-X-Forwarded-Encrypted: i=1; AJvYcCXL2L6/R0IHHqVN4s431AtW1rosURbsTQgTfWVgcwdce3DceBd/OqjNcWwMpPRkZyZFEeDCT5eo9/mb4kY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCO8IvpwdEPrG1RiIM3EEnSo/2AtkEQJjtzc5g38LrtGESzUAH
-	2UEVQO9fV4I8kJgTD47Bf0Xn6z7ixaRlGBthqSkKp+pGnN58aqYotFxX
-X-Gm-Gg: ASbGncutxKqzQ+zNeO7w+vXxLAXC4NtLioSLApk50KbmanRHyFf7ILrVQKnCcNZ+Dzs
-	akiyxu+XQODszOBXS8sv6ltRumqPuBWr4jlEK39JWby4bLz6cXf9/mIKyPqxdlFC71X7pgpGnZs
-	emXgRoVfOGThgTbsIrVTCMTj0F948+LP/zPWpL3EKWrorm1m+fEL6rPheQTtuG7owDfi/S8OK+T
-	QdeReDrxKb10J+ql/fX2mupAoapsxRGMUDYN/trWrnayHx0QD/2QpkVulS1u0a1ZdrLyFxdRu0O
-	gwZz/PBGErMEJPVP3/gnrtGbapRIYiHlnza1xt9embxyLgDCZ+ym6ZJOszBbDQ3W+n8lheTMwmx
-	r9LFZGhTAlarAgfqp0sP1xzDAD0CODC8Hy2HycBUP3GVQ+EpAvWtIUsN/1v9uRNxDh6lypuAMBg
-	Ta74HlbmAGm1E=
-X-Google-Smtp-Source: AGHT+IHk4JGeekekahtUg2k/EhAC9kyrxVTGjCsIExfHrDtgIcN62P8FCtHZWZXypDamfyJkpyvf/Q==
-X-Received: by 2002:a05:6402:40d5:b0:628:5b8c:64b7 with SMTP id 4fb4d7f45d1cf-63c1f64ec00mr33191598a12.6.1761370005212;
-        Fri, 24 Oct 2025 22:26:45 -0700 (PDT)
-Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-63e7ef96105sm880960a12.19.2025.10.24.22.26.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Oct 2025 22:26:44 -0700 (PDT)
-From: Askar Safin <safinaskar@gmail.com>
-To: safinaskar@gmail.com
-Cc: Dell.Client.Kernel@dell.com,
-	brauner@kernel.org,
-	dm-devel@lists.linux.dev,
-	ebiggers@kernel.org,
-	gmazyland@gmail.com,
-	kix@kix.es,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-lvm@lists.linux.dev,
-	linux-mm@kvack.org,
-	linux-pm@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	lvm-devel@lists.linux.dev,
-	mzxreary@0pointer.de,
-	nphamcs@gmail.com,
-	pavel@ucw.cz,
-	rafael@kernel.org,
-	ryncsn@gmail.com,
-	torvalds@linux-foundation.org
-Subject: Re: dm bug: hibernate to swap located on dm-integrity doesn't work (how to get data redundancy for swap?)
-Date: Sat, 25 Oct 2025 08:26:37 +0300
-Message-ID: <20251025052637.422902-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251024163142.376903-1-safinaskar@gmail.com>
-References: <20251024163142.376903-1-safinaskar@gmail.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="cMEAVVAf"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=ICUYgriAX66Ic6nFV4wDFOSrOFuC1F2rghUO8grP7d0=;
+	b=cMEAVVAfShUlEhAxrzruzN6ToUQAFQVcmd08dnyQIA3X8e3DphMITQiRp3JXazC4BQVIXJSAK
+	gBLyLe9KYVjQAzy17+62yWalwrZj9ltwtF5teHNyopmDmec3+0MrQZHfDfqb7Tm5pPRPipvK1xf
+	E2zQ1vkdHJ54+HAkGw6hciI=
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4ctwYs1jzgz1prLt;
+	Sat, 25 Oct 2025 18:12:33 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 17C9C180488;
+	Sat, 25 Oct 2025 18:13:00 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 25 Oct 2025 18:12:59 +0800
+Received: from localhost.huawei.com (10.90.31.46) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 25 Oct 2025 18:12:59 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linuxarm@openeuler.org>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
+	<wangzhou1@hisilicon.com>, <fanghao11@huawei.com>, <nieweiqiang@huawei.com>
+Subject: [PATCH 0/4] crypto: hisilicon - various cleanup for QM and SGL
+Date: Sat, 25 Oct 2025 18:12:54 +0800
+Message-ID: <20251025101258.2793179-1-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -94,16 +52,39 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
 
-Askar Safin <safinaskar@gmail.com>:
-> Here is output of this script on master:
-> https://zerobin.net/?68ef6601ab203a11#7zBZ44AaVKmvRq161MJaOXIXY/5Hiv+hRUxWoqyZ7uE=
-[...]
-> Also, you will find backtrace in logs above. Disregard it. I think this
-> is just some master bug, which is unrelated to our dm-integrity bug.
+This patch series addresses several issues in the hisilicon crypto
+driver:
+Patch 1: ensures proper synchronization when reading eqe/aeqe
+values by saving the complete 4-byte values atomically. This
+guarantees the valid bit and queue number are read as a consistent
+pair that was written by the device.
+Patch 2: adds concurrency protection for the err_threshold variable
+to prevent race conditions between sysfs operations and hardware
+error handling functions.
+Patch 3: removes redundant error checks for curr_hw_sgl since
+acc_get_sgl() cannot fail after mem_block creation, simplifying the
+code.
+Patch 4: adds a default case to a switch statement in
+qm_vft_data_cfg to comply with coding style and prevent compiler
+warnings.
 
-That WARNING in logs is unrelated bug, which happens always when I hibernate.
-I reported it here: https://lore.kernel.org/regressions/20251025050812.421905-1-safinaskar@gmail.com/
+nieweiqiang (4):
+  crypto: hisilicon/qm - add concurrency protection for variable
+    err_threshold
+  crypto: hisilicon/qm - add missing default in switch in
+    qm_vft_data_cfg
+  crypto: hisilicon/qm - add the save operation of eqe and aeqe
+  crypto: hisilicon/sgl - remove unnecessary checks for curr_hw_sgl
+    error
+
+ drivers/crypto/hisilicon/qm.c  | 41 ++++++++++++++++++++++------------
+ drivers/crypto/hisilicon/sgl.c |  5 -----
+ 2 files changed, 27 insertions(+), 19 deletions(-)
 
 -- 
-Askar Safin
+2.33.0
+
