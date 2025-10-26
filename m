@@ -1,48 +1,48 @@
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65152066F7;
-	Sun, 26 Oct 2025 15:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D183D2222A0;
+	Sun, 26 Oct 2025 15:10:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761491447; cv=none; b=F+xK6uRqH4J4q3fOOMxSwklgcBml5u3Yp+nLDiR1RTaqJpSYUmle0ZBKVNzsp+UhjwCPZMcBPjTOrP1Zy+2blKwis0QZQthsEFM+QxravoNhW3gfl84fG0X94O2YbVx0lDViRCFgcAFQJdzSQeldJYp7VKfVtrc/SuYm2tN47LU=
+	t=1761491449; cv=none; b=nwFnmZ8DDg+dsjBxYRUUhChL8T2L7fu+lzbdjR2glwQXUL6VcS8SeuVMS3I3CoKzaAwbLhkI9wkRT9XKWwbJ+IL0d+oZCCmYSQCsmktlZ6WM9uGL0LuQrYhP+p5aD9Mne/Pzd6ymROaUqbaMKqjOIlSM3gQIi9dnR1NaxJyk1xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761491447; c=relaxed/simple;
-	bh=opy+eyfTR3AQB7TDoFgEKkb7XIztHZ3hyG3IcoXxD38=;
+	s=arc-20240116; t=1761491449; c=relaxed/simple;
+	bh=NqPMZR8QQ1o0eBC33hVIMeFgSXLkYEg/5HCgwjczXgU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Npm2HeG3ZlE41vrZhrW63xikQ+8wEajUSf/UIyL+IXayR/PmrRq+SRFh3WwrukyulnAOCRCKTI7UnseXvB7pwpEEWIT5vqsBuI2wmZuJM5YM1CsRMZ96J7n0v8DJN+AFKBLKshzxBjBTezB7AKAyWR7pYpd3MNuuQKEy8cJTuuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hrgOAg45; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=OczxSmPlIreOwfJAbIMsYO3ANsj1Ul2RyS+iI5tWZgE9RLV6jfdSDP6nIsKHYj2/a52R0LgRVWzR7ptf5mRktmcj2yBQ17yZjWTVD0okrWIBItiuP6698PfGCkdJrBghMFBvnfWo+Lhu9B4g0xr2i7ekxg+8scgOszcsGqtm3Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=abIycOR+; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hrgOAg45"
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59QF0I6h3923829;
-	Sun, 26 Oct 2025 08:10:40 -0700
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="abIycOR+"
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59QEa3vE3822883;
+	Sun, 26 Oct 2025 08:10:44 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=p
-	ztLknqN928WHLt1DwUdVjChb62yXchaIWqOtRCx/AY=; b=hrgOAg45vSv8f/78x
-	nRXRJ/K0R1FTkI8lROI+rWJdoXVfugCinOqd+bR8pj9Pnio7FibCFOGmQgzctHV9
-	PmauUW+KoBV32jIx1G/rebG8muNR6nN3jYUVuXIVywU5fJgTLs/opyymWcVWHFkG
-	o+z2nHouj2+SvyZs/yh93uLBS8APSUxk3TbuYoCN4pLWv0NzXhe+QEY2FXnm1tvn
-	rujW0dzPjrKcA6p0l4uTucK1E56zgI1mvfqeK9lniam991zKcXWFj/o9O9iNOyZh
-	7oBEO7UcrhPrcpel64TJHhahGCRMV3DWKmmuw2+FlM/ToVmtFM4X+8Gi5nIb/HAc
-	CZycQ==
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=b
+	8k/5H4fGysnEmnOlZfS6bckpYsnFeJlyMOjRKBInPY=; b=abIycOR+rqk/1mOJv
+	RD1UjiEDgtfqCB8pzqqU9CNjjvitX4ISri1MjewznTsvG6pFZdFa0FzeFlVF4kFz
+	i4M3jaYTKvtI9p+R5zyCORGKtG7YGiaLy0y8DuoWP7L2KW3HnisEiOq0PDOyDih4
+	xWxf6MAWweVs//d2QxeIwx359U29asjzAmWMHefvc218Bi788BKhRDkev/Hp3ErK
+	1+EQkHi3IBrBSmWLKCsB2RyEjRSCdXuid2YFNrnmhk+bNE+Wkx+B88KTT9q5XuH0
+	0Eg1mM9mm6h/FFGf4nAUnz3hos7WFHwU/Lsut74/s8yf1ezUbPoKwwzx6Mj4Hwkm
+	INVOQ==
 Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4a0x2g1pmb-1
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4a1jt807wh-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 26 Oct 2025 08:10:40 -0700 (PDT)
+	Sun, 26 Oct 2025 08:10:43 -0700 (PDT)
 Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
  DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sun, 26 Oct 2025 08:10:39 -0700
+ 15.2.1544.25; Sun, 26 Oct 2025 08:10:42 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
  (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sun, 26 Oct 2025 08:10:39 -0700
+ Transport; Sun, 26 Oct 2025 08:10:42 -0700
 Received: from optiplex.marvell.com (unknown [10.28.34.253])
-	by maili.marvell.com (Postfix) with ESMTP id 94AEA3F70B5;
-	Sun, 26 Oct 2025 08:10:36 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id BBC943F70B5;
+	Sun, 26 Oct 2025 08:10:39 -0700 (PDT)
 From: Tanmay Jagdale <tanmay@marvell.com>
 To: <davem@davemloft.net>, <horms@kernel.org>, <leon@kernel.org>,
         <herbert@gondor.apana.org.au>, <bbhushan2@marvell.com>,
@@ -50,9 +50,9 @@ To: <davem@davemloft.net>, <horms@kernel.org>, <leon@kernel.org>,
 CC: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
         Tanmay Jagdale
 	<tanmay@marvell.com>
-Subject: [PATCH net-next v5 13/15] octeontx2-pf: ipsec: Process CPT metapackets
-Date: Sun, 26 Oct 2025 20:39:08 +0530
-Message-ID: <20251026150916.352061-14-tanmay@marvell.com>
+Subject: [PATCH net-next v5 14/15] octeontx2-pf: ipsec: Manage NPC rules and SPI-to-SA table entries
+Date: Sun, 26 Oct 2025 20:39:09 +0530
+Message-ID: <20251026150916.352061-15-tanmay@marvell.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251026150916.352061-1-tanmay@marvell.com>
 References: <20251026150916.352061-1-tanmay@marvell.com>
@@ -64,273 +64,419 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI2MDE0NSBTYWx0ZWRfXxCTpy520OG2v
- 9oONkRpN35EJNIlJxtP4FKiowEfMau0H8yxKlRRLoqc1LC46ZW5COZ51P6mb3aSW+4PMdwaLbeD
- RSEpboOcTzI28NIlvDrdk+cg5AF3ICcm7so83faGuvTFUlq8u+plcCJ7ESZPiho0Zk90erZ4qaX
- A31eKL3/Xy/rBFFHjx6bRUCtBbeXZes6XdO1X/xbd1i6gBL/en9rC8o5ksrze62lEc96GzUljzy
- ZulEVTUZHM4Msk9VTTtVSbJrxMYNFuyD8dSrviRfJFLTch5gm9Nb4gEMsXQVhsuqxSKYKinAlUx
- LkVHEa/AeQsf502IxRHu/IDlE+BV35tQIl27wtrdlq15Fnc0DBW329IovG8my+gehNCL5s8koXa
- ASeQOgmtDRK+89aL9+N3iHmprf0zDw==
-X-Proofpoint-ORIG-GUID: RsHqhmYRyuxAvPJ6uv6_vJQTJR6QbF45
-X-Authority-Analysis: v=2.4 cv=I4Bohdgg c=1 sm=1 tr=0 ts=68fe39f0 cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI2MDE0NSBTYWx0ZWRfX5WxgjpPiXcKd
+ 2+xgHNtXbCJ/5Tiq6VVS1HuA01mg/624fpwmQiujU2eziSe3ZZ15RwGJRXW6ek9qfbrnvzZD36C
+ GGXVlNE0zAJxfsXQSnzNb44Q11fDtLiBRxp3VIIkGqA76cUg2S53RcB5fwo3QpBDchrZLVK6GWD
+ QAjWeRGOBHYBjdV1oJnhv+VFFmAFWn+9KgeqOjZWaTyi7zJufeFKZt91WBbAMKIW88c2SaUplL7
+ cQws8TyWEIejpQ0wJdSK1U6q4HCbrzkE8CZmi0RPPnwzSWyv3CypJB3v6Qg/XF+nSn1nICVMPYb
+ 0ZdFJ902bCyMZW/e/HmguW1rIzrLQyuBcN4ZgGsfPzyb/VG52b3mq0RmbgYZttcFyhTgmstvavT
+ CcY9hnIWdb+5ABwrROW36T3xPfQ3rw==
+X-Proofpoint-GUID: rsUniofBNeGOfldipvVDFByz8mrOlAls
+X-Proofpoint-ORIG-GUID: rsUniofBNeGOfldipvVDFByz8mrOlAls
+X-Authority-Analysis: v=2.4 cv=APHuRV3Y c=1 sm=1 tr=0 ts=68fe39f3 cx=c_pps
  a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
- a=2V_QfZprvCi1FviU9xwA:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: RsHqhmYRyuxAvPJ6uv6_vJQTJR6QbF45
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8
+ a=M5GUcnROAAAA:8 a=MWLLgxhS0d5IzbIQ4OoA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+ a=cPQSjfK2_nFv0Q5t_7PE:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-10-26_06,2025-10-22_01,2025-03-28_01
 
-CPT hardware forwards decrypted IPsec packets to NIX via the X2P bus
-as metapackets which are of 256 bytes in length. Each metapacket
-contains CPT_PARSE_HDR_S and initial bytes of the decrypted packet
-that helps NIX RX in classifying and submitting to CPU. Additionally,
-CPT also sets BIT(11) of the channel number to indicate that it's a
-2nd pass packet from CPT.
+NPC rule for IPsec flows
+------------------------
+Incoming IPsec packets are first classified for hardware fastpath
+processing in the NPC block. Hence, allocate an MCAM entry in NPC
+using the MCAM_ALLOC_ENTRY mailbox to add a rule for IPsec flow
+classification.
 
-Since the metapackets are not complete packets, they don't have to go
-through L3/L4 layer length and checksum verification so these are
-disabled via the NIX_LF_INLINE_RQ_CFG mailbox during IPsec initialization.
+Then, install an NPC rule at this entry for packet classification
+based on ESP header and SPI value with match action as UCAST_IPSEC.
+Also, these packets need to be directed to the dedicated receive
+queue so provide the RQ index as part of NPC_INSTALL_FLOW mailbox.
+Add a function to delete NPC rule as well.
 
-The CPT_PARSE_HDR_S contains a WQE pointer to the complete decrypted
-packet. Add code in the rx NAPI handler to parse the header and extract
-WQE pointer. Later, use this WQE pointer to construct the skb, set the
-XFRM packet mode flags to indicate successful decryption before submitting
-it to the network stack.
+SPI-to-SA match table
+---------------------
+NIX RX maintains a common hash table for matching the SPI value from
+in ESP packet to the SA index associated with it. This table has 2K entries
+with 4 ways. When a packet is received with action as UCAST_IPSEC, NIXRX
+uses the SPI from the packet header to perform lookup in the SPI-to-SA
+hash table. This lookup, if successful, returns an SA index that is used
+by NIXRX to calculate the exact SA context address and programs it in
+the CPT_INST_S before submitting the packet to CPT for decryption.
+
+Add functions to install the delete an entry from this table via the
+NIX_SPI_TO_SA_ADD and NIX_SPI_TO_SA_DELETE mailbox calls respectively.
+
+When the RQs are changed at runtime via ethtool, RVU PF driver frees all
+the resources and goes through reinitialization with the new set of receive
+queues. As part of this flow, the UCAST_IPSEC NPC rules that were installed
+by the RVU PF/VF driver have to be reconfigured with the new RQ index.
+
+So, delete the NPC rules when the interface is stopped via otx2_stop().
+When otx2_open() is called, re-install the NPC flow and re-initialize the
+SPI-to-SA table for every SA context that was previously installed.
 
 Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
 ---
-Chnages in V5:
-- Added code to track the number of SPB buffers received for every
-  SPB pool tied to it's RQ.
+Changes in V5:
+- None
 
 Changes in V4:
-- Updated cpt_parse_hdr_s to 4 u64 words
-- Switched to using FIELD_GET macros for extracting fields withing                                    cpt_parse_hdr_s
-- With above changes, all the sparse warnings are now resolved
+- None
+                                                                                                    Changes in V3:
+- Updated definitions as reported by kernel test robot.
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506200609.aTq7YfBa-lkp@intel.com/
 
-Changes in V3:
-- Updated cpt_parse_hdr_s structure to use __be64 type
+Changes in V2:                                                                                      - Use cpu_to_be32
+- Moved code from patch 15/15 in V1 to avoid unusued function warnings
+  for the following:
+                                                                                                    V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-14-tanmay@marvell.com/
+V2 Link: https://lore.kernel.org/netdev/20250618113020.130888-14-tanmay@marvell.com/
+V3 Link: https://lore.kernel.org/netdev/20250711121317.340326-14-tanmay@marvell.com/
+V4 Link: https://lore.kernel.org/netdev/20250819021507.323752-14-tanmay@marvell.com/
 
-Changes in V2:                                                                                      - Removed unnecessary casts
-- Don't convert complete cpt_parse_hdr from BE to LE and just
-  convert required fields
-- Fixed logic to avoid repeated calculation for start and end in sg
-
-V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-15-tanmay@marvell.com/                V2 Link: https://lore.kernel.org/netdev/20250618113020.130888-13-tanmay@marvell.com/
-V3 Link: https://lore.kernel.org/netdev/20250711121317.340326-13-tanmay@marvell.com/
-V4 Link: https://lore.kernel.org/netdev/20250819021507.323752-13-tanmay@marvell.com/
-
- .../marvell/octeontx2/nic/cn10k_ipsec.c       | 50 +++++++++++++++++++
- .../marvell/octeontx2/nic/cn10k_ipsec.h       | 23 +++++++++
- .../marvell/octeontx2/nic/otx2_struct.h       | 16 ++++++
- .../marvell/octeontx2/nic/otx2_txrx.c         | 31 +++++++++++-
- 4 files changed, 119 insertions(+), 1 deletion(-)
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       | 252 +++++++++++++++++-
+ .../marvell/octeontx2/nic/cn10k_ipsec.h       |   7 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   8 +
+ 3 files changed, 262 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-index d545e56e0b6d..c0b8d8267d87 100644
+index c0b8d8267d87..8317656af094 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-@@ -342,6 +342,56 @@ static int cn10k_outb_cpt_init(struct net_device *netdev)
- 	return ret;
+@@ -392,6 +392,205 @@ struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
+ 	return wqe;
  }
  
-+struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
-+						     struct sk_buff *skb,
-+						     dma_addr_t seg_addr)
++static int cn10k_inb_alloc_mcam_entry(struct otx2_nic *pfvf,
++				      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
 +{
-+	struct nix_wqe_rx_s *wqe = NULL;
-+	struct cpt_parse_hdr_s *cptp;
-+	struct xfrm_offload *xo;
-+	struct xfrm_state *xs;
-+	struct sec_path *sp;
-+	dma_addr_t wqe_iova;
-+	u32 sa_index;
-+	u64 *sa_ptr;
++	struct otx2_flow_config *flow_cfg = pfvf->flow_cfg;
++	struct npc_mcam_alloc_entry_req *mcam_req;
++	struct npc_mcam_alloc_entry_rsp *mcam_rsp;
++	int err = 0;
 +
-+	/* CPT_PARSE_HDR_S is present in the beginning of the buffer */
-+	cptp = phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain, seg_addr));
++	if (!pfvf->flow_cfg || !flow_cfg->flow_ent)
++		return -ENODEV;
 +
-+	/* Convert the wqe_ptr from CPT_PARSE_HDR_S to a CPU usable pointer */
-+	wqe_iova = FIELD_GET(CPT_PARSE_HDR_W1_WQE_PTR, cptp->w1);
-+	wqe = phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain,
-+					     be64_to_cpu((__force __be64)wqe_iova)));
++	mutex_lock(&pfvf->mbox.lock);
 +
-+	/* Get the XFRM state pointer stored in SA context */
-+	sa_index = FIELD_GET(CPT_PARSE_HDR_W0_COOKIE, cptp->w0);
-+	sa_ptr = pfvf->ipsec.inb_sa->base + 1024 +
-+		 (be32_to_cpu((__force __be32)sa_index) * pfvf->ipsec.sa_tbl_entry_sz);
-+	xs = (struct xfrm_state *)*sa_ptr;
-+
-+	/* Set XFRM offload status and flags for successful decryption */
-+	sp = secpath_set(skb);
-+	if (!sp) {
-+		netdev_err(pfvf->netdev, "Failed to secpath_set\n");
-+		wqe = NULL;
-+		goto err_out;
++	/* Request an MCAM entry to install UCAST_IPSEC rule */
++	mcam_req = otx2_mbox_alloc_msg_npc_mcam_alloc_entry(&pfvf->mbox);
++	if (!mcam_req) {
++		err = -ENOMEM;
++		goto out;
 +	}
 +
-+	rcu_read_lock();
-+	xfrm_state_hold(xs);
-+	rcu_read_unlock();
++	mcam_req->contig = false;
++	mcam_req->count = 1;
++	mcam_req->ref_entry = flow_cfg->flow_ent[0];
++	mcam_req->priority = NPC_MCAM_HIGHER_PRIO;
 +
-+	sp->xvec[sp->len++] = xs;
-+	sp->olen++;
++	if (otx2_sync_mbox_msg(&pfvf->mbox)) {
++		err = -ENODEV;
++		goto out;
++	}
 +
-+	xo = xfrm_offload(skb);
-+	xo->flags = CRYPTO_DONE;
-+	xo->status = CRYPTO_SUCCESS;
++	mcam_rsp = (struct npc_mcam_alloc_entry_rsp *)otx2_mbox_get_rsp(&pfvf->mbox.mbox,
++									0, &mcam_req->hdr);
 +
-+err_out:
-+	return wqe;
++	/* Store NPC MCAM entry for bookkeeping */
++	inb_ctx_info->npc_mcam_entry = mcam_rsp->entry_list[0];
++
++out:
++	mutex_unlock(&pfvf->mbox.lock);
++	return err;
++}
++
++static int cn10k_inb_install_flow(struct otx2_nic *pfvf,
++				  struct cn10k_inb_sw_ctx_info *inb_ctx_info)
++{
++	struct npc_install_flow_req *req;
++	int err;
++
++	/* Allocate an MCAM entry if not previously allocated */
++	if (!inb_ctx_info->npc_mcam_entry) {
++		err = cn10k_inb_alloc_mcam_entry(pfvf, inb_ctx_info);
++		if (err) {
++			netdev_err(pfvf->netdev,
++				   "Failed to allocate MCAM entry for Inbound IPsec flow\n");
++			goto out;
++		}
++	}
++
++	mutex_lock(&pfvf->mbox.lock);
++
++	req = otx2_mbox_alloc_msg_npc_install_flow(&pfvf->mbox);
++	if (!req) {
++		err = -ENOMEM;
++		goto out;
++	}
++
++	req->entry = inb_ctx_info->npc_mcam_entry;
++	req->features |= BIT(NPC_IPPROTO_ESP) | BIT(NPC_IPSEC_SPI);
++	req->intf = NIX_INTF_RX;
++	req->index = pfvf->ipsec.inb_ipsec_rq;
++	req->match_id = 0xfeed;
++	req->channel = pfvf->hw.rx_chan_base;
++	req->op = NIX_RX_ACTIONOP_UCAST_IPSEC;
++	req->set_cntr = 1;
++	req->packet.spi = inb_ctx_info->spi;
++	req->mask.spi = cpu_to_be32(0xffffffff);
++
++	/* Send message to AF */
++	err = otx2_sync_mbox_msg(&pfvf->mbox);
++out:
++	mutex_unlock(&pfvf->mbox.lock);
++	return err;
++}
++
++static int cn10k_inb_delete_flow(struct otx2_nic *pfvf,
++				 struct cn10k_inb_sw_ctx_info *inb_ctx_info)
++{
++	struct npc_delete_flow_req *req;
++	int err = 0;
++
++	mutex_lock(&pfvf->mbox.lock);
++
++	req = otx2_mbox_alloc_msg_npc_delete_flow(&pfvf->mbox);
++	if (!req) {
++		err = -ENOMEM;
++		goto out;
++	}
++
++	req->entry = inb_ctx_info->npc_mcam_entry;
++
++	/* Send message to AF */
++	err = otx2_sync_mbox_msg(&pfvf->mbox);
++out:
++	mutex_unlock(&pfvf->mbox.lock);
++	return err;
++}
++
++static int cn10k_inb_ena_dis_flow(struct otx2_nic *pfvf,
++				  struct cn10k_inb_sw_ctx_info *inb_ctx_info,
++				  bool disable)
++{
++	struct npc_mcam_ena_dis_entry_req *req;
++	int err = 0;
++
++	mutex_lock(&pfvf->mbox.lock);
++
++	if (disable)
++		req = otx2_mbox_alloc_msg_npc_mcam_dis_entry(&pfvf->mbox);
++	else
++		req = otx2_mbox_alloc_msg_npc_mcam_ena_entry(&pfvf->mbox);
++	if (!req) {
++		err = -ENOMEM;
++		goto out;
++	}
++
++	req->entry = inb_ctx_info->npc_mcam_entry;
++
++	err = otx2_sync_mbox_msg(&pfvf->mbox);
++out:
++	mutex_unlock(&pfvf->mbox.lock);
++	return err;
++}
++
++void cn10k_ipsec_inb_disable_flows(struct otx2_nic *pfvf)
++{
++	struct cn10k_inb_sw_ctx_info *inb_ctx_info;
++
++	list_for_each_entry(inb_ctx_info, &pfvf->ipsec.inb_sw_ctx_list, list) {
++		if (cn10k_inb_ena_dis_flow(pfvf, inb_ctx_info, true)) {
++			netdev_err(pfvf->netdev,
++				   "Failed to disable UCAST_IPSEC entry %d\n",
++				   inb_ctx_info->npc_mcam_entry);
++			continue;
++		}
++		inb_ctx_info->delete_npc_and_match_entry = false;
++	}
++}
++
++static int cn10k_inb_install_spi_to_sa_match_entry(struct otx2_nic *pfvf,
++						   struct xfrm_state *x,
++						   struct cn10k_inb_sw_ctx_info *inb_ctx_info)
++{
++	struct nix_spi_to_sa_add_req *req;
++	struct nix_spi_to_sa_add_rsp *rsp;
++	int err;
++
++	mutex_lock(&pfvf->mbox.lock);
++	req = otx2_mbox_alloc_msg_nix_spi_to_sa_add(&pfvf->mbox);
++	if (!req) {
++		mutex_unlock(&pfvf->mbox.lock);
++		return -ENOMEM;
++	}
++
++	req->sa_index = inb_ctx_info->sa_index;
++	req->spi_index = be32_to_cpu(x->id.spi);
++	req->match_id = 0xfeed;
++	req->valid = 1;
++
++	/* Send message to AF */
++	err = otx2_sync_mbox_msg(&pfvf->mbox);
++
++	rsp = (struct nix_spi_to_sa_add_rsp *)otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
++	inb_ctx_info->hash_index = rsp->hash_index;
++	inb_ctx_info->way = rsp->way;
++
++	mutex_unlock(&pfvf->mbox.lock);
++	return err;
++}
++
++static int cn10k_inb_delete_spi_to_sa_match_entry(struct otx2_nic *pfvf,
++						  struct cn10k_inb_sw_ctx_info *inb_ctx_info)
++{
++	struct nix_spi_to_sa_delete_req *req;
++	int err;
++
++	mutex_lock(&pfvf->mbox.lock);
++	req = otx2_mbox_alloc_msg_nix_spi_to_sa_delete(&pfvf->mbox);
++	if (!req) {
++		mutex_unlock(&pfvf->mbox.lock);
++		return -ENOMEM;
++	}
++
++	req->hash_index = inb_ctx_info->hash_index;
++	req->way = inb_ctx_info->way;
++
++	err = otx2_sync_mbox_msg(&pfvf->mbox);
++	mutex_unlock(&pfvf->mbox.lock);
++	return err;
 +}
 +
  static int cn10k_inb_nix_inline_lf_cfg(struct otx2_nic *pfvf)
  {
  	struct nix_inline_ipsec_lf_cfg *req;
+@@ -719,6 +918,7 @@ static irqreturn_t cn10k_ipsec_npa_inb_ipsecq_intr_handler(int irq, void *data)
+ static int cn10k_inb_cpt_init(struct net_device *netdev)
+ {
+ 	struct otx2_nic *pfvf = netdev_priv(netdev);
++	struct cn10k_inb_sw_ctx_info *inb_ctx_info;
+ 	int ret = 0, spb_cnt;
+ 	char *irq_name;
+ 	int  vec;
+@@ -816,6 +1016,18 @@ static int cn10k_inb_cpt_init(struct net_device *netdev)
+ 	else
+ 		ret = 0;
+ 
++	/* If the driver has any offloaded inbound SA context(s), re-install the
++	 * associated SPI-to-SA match and NPC rules. This is generally executed
++	 * when the RQs are changed at runtime.
++	 */
++	list_for_each_entry(inb_ctx_info, &pfvf->ipsec.inb_sw_ctx_list, list) {
++		cn10k_inb_ena_dis_flow(pfvf, inb_ctx_info, false);
++		cn10k_inb_install_flow(pfvf, inb_ctx_info);
++		cn10k_inb_install_spi_to_sa_match_entry(pfvf,
++							inb_ctx_info->x_state,
++							inb_ctx_info);
++	}
++
+ out:
+ 	return ret;
+ }
+@@ -1219,12 +1431,42 @@ static void cn10k_ipsec_sa_wq_handler(struct work_struct *work)
+ 	struct cn10k_ipsec *ipsec = container_of(work, struct cn10k_ipsec,
+ 						 sa_work);
+ 	struct otx2_nic *pf = container_of(ipsec, struct otx2_nic, ipsec);
++	struct cn10k_inb_sw_ctx_info *inb_ctx_info, *tmp;
++	int err;
+ 
+-	/* Disable static branch when no more SA enabled */
+-	static_branch_disable(&cn10k_ipsec_sa_enabled);
+-	rtnl_lock();
+-	netdev_update_features(pf->netdev);
+-	rtnl_unlock();
++	list_for_each_entry_safe(inb_ctx_info, tmp, &pf->ipsec.inb_sw_ctx_list,
++				 list) {
++		if (!inb_ctx_info->delete_npc_and_match_entry)
++			continue;
++
++		/* Delete all the associated NPC rules associated */
++		err = cn10k_inb_delete_flow(pf, inb_ctx_info);
++		if (err)
++			netdev_err(pf->netdev,
++				   "Failed to free UCAST_IPSEC entry %d\n",
++				   inb_ctx_info->npc_mcam_entry);
++
++		/* Remove SPI_TO_SA exact match entry */
++		err = cn10k_inb_delete_spi_to_sa_match_entry(pf, inb_ctx_info);
++		if (err)
++			netdev_err(pf->netdev,
++				   "Failed to delete spi_to_sa_match_entry\n");
++
++		inb_ctx_info->delete_npc_and_match_entry = false;
++
++		/* Finally clear the entry from the SA Table and free inb_ctx_info */
++		clear_bit(inb_ctx_info->sa_index, pf->ipsec.inb_sa_table);
++		list_del(&inb_ctx_info->list);
++		devm_kfree(pf->dev, inb_ctx_info);
++	}
++
++	/* Disable static branch when no more SA(s) are enabled */
++	if (list_empty(&pf->ipsec.inb_sw_ctx_list) && !pf->ipsec.outb_sa_count) {
++		static_branch_disable(&cn10k_ipsec_sa_enabled);
++		rtnl_lock();
++		netdev_update_features(pf->netdev);
++		rtnl_unlock();
++	}
+ }
+ 
+ void cn10k_ipsec_free_aura_ptrs(struct otx2_nic *pfvf)
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
-index a7d82757ff90..507ddd9b7e78 100644
+index 507ddd9b7e78..89d6812a4d29 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
-@@ -8,6 +8,7 @@
- #define CN10K_IPSEC_H
- 
- #include <linux/types.h>
-+#include "otx2_struct.h"
- 
- DECLARE_STATIC_KEY_FALSE(cn10k_ipsec_sa_enabled);
- 
-@@ -306,6 +307,18 @@ struct cpt_sg_s {
- 	u64 rsvd_63_50	: 14;
- };
- 
-+/* CPT Parse Header Structure for Inbound packets */
-+struct cpt_parse_hdr_s {
-+	u64 w0;
-+	u64 w1;
-+	u64 w2;
-+	u64 w3;
-+};
-+
-+/* Macros to get specific fields from CPT_PARSE_HDR_S*/
-+#define CPT_PARSE_HDR_W0_COOKIE		GENMASK_ULL(63, 32)
-+#define CPT_PARSE_HDR_W1_WQE_PTR	GENMASK_ULL(63, 0)
-+
- /* CPT LF_INPROG Register */
- #define CPT_LF_INPROG_INFLIGHT	GENMASK_ULL(8, 0)
- #define CPT_LF_INPROG_GRB_CNT	GENMASK_ULL(39, 32)
-@@ -334,6 +347,9 @@ bool cn10k_ipsec_transmit(struct otx2_nic *pf, struct netdev_queue *txq,
- 			  struct otx2_snd_queue *sq, struct sk_buff *skb,
- 			  int num_segs, int size);
- void cn10k_ipsec_free_aura_ptrs(struct otx2_nic *pfvf);
-+struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
-+						     struct sk_buff *skb,
-+						     dma_addr_t seg_addr);
+@@ -350,6 +350,7 @@ void cn10k_ipsec_free_aura_ptrs(struct otx2_nic *pfvf);
+ struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
+ 						     struct sk_buff *skb,
+ 						     dma_addr_t seg_addr);
++void cn10k_ipsec_inb_disable_flows(struct otx2_nic *pfvf);
  #else
  static inline __maybe_unused int cn10k_ipsec_init(struct net_device *netdev)
  {
-@@ -370,5 +386,12 @@ void cn10k_ipsec_free_aura_ptrs(struct otx2_nic *pfvf)
+@@ -393,5 +394,11 @@ struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
  {
+ 	return NULL;
  }
- 
++
 +static inline __maybe_unused
-+struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
-+						     struct sk_buff *skb,
-+						     dma_addr_t seg_addr)
++void cn10k_ipsec_inb_delete_flows(struct otx2_nic *pfvf)
 +{
-+	return NULL;
 +}
++
  #endif
  #endif // CN10K_IPSEC_H
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h
-index 4e5899d8fa2e..506fab414b7e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h
-@@ -175,6 +175,22 @@ struct nix_cqe_tx_s {
- 	struct nix_send_comp_s comp;
- };
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index 483956d12cc1..3a16a26c1745 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1808,6 +1808,10 @@ void otx2_free_hw_resources(struct otx2_nic *pf)
+ 	if (!otx2_rep_dev(pf->pdev))
+ 		cn10k_free_all_ipolicers(pf);
  
-+/* NIX WQE header structure */
-+struct nix_wqe_hdr_s {
-+	u64 flow_tag              : 32;
-+	u64 tt                    : 2;
-+	u64 reserved_34_43        : 10;
-+	u64 node                  : 2;
-+	u64 q                     : 14;
-+	u64 wqe_type              : 4;
-+};
++	/* Delete Inbound IPSec flows if any SA's are installed */
++	if (!list_empty(&pf->ipsec.inb_sw_ctx_list))
++		cn10k_ipsec_inb_disable_flows(pf);
 +
-+struct nix_wqe_rx_s {
-+	struct nix_wqe_hdr_s	hdr;
-+	struct nix_rx_parse_s	parse;
-+	struct nix_rx_sg_s	sg;
-+};
-+
- /* NIX SQE header structure */
- struct nix_sqe_hdr_s {
- 	u64 total		: 18; /* W0 */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-index 625bb5a05344..c82f012d3b39 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-@@ -205,11 +205,16 @@ static bool otx2_skb_add_frag(struct otx2_nic *pfvf, struct sk_buff *skb,
- 		}
- 	}
+ 	mutex_lock(&mbox->lock);
+ 	/* Reset NIX LF */
+ 	free_req = otx2_mbox_alloc_msg_nix_lf_free(mbox);
+@@ -2139,6 +2143,10 @@ int otx2_open(struct net_device *netdev)
  
-+	if (parse->chan & 0x800)
-+		off = 0;
-+
- 	page = virt_to_page(va);
- 	if (likely(skb_shinfo(skb)->nr_frags < MAX_SKB_FRAGS)) {
- 		skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, page,
- 				va - page_address(page) + off,
- 				len - off, pfvf->rbsize);
-+		if (parse->chan & 0x800)
-+			return false;
- 		return true;
- 	}
+ 	otx2_do_set_rx_mode(pf);
  
-@@ -333,6 +338,8 @@ static void otx2_rcv_pkt_handler(struct otx2_nic *pfvf,
- 				 struct nix_cqe_rx_s *cqe, bool *need_xdp_flush)
- {
- 	struct nix_rx_parse_s *parse = &cqe->parse;
-+	struct nix_wqe_rx_s *orig_pkt_wqe = NULL;
-+	u32 desc_sizem1 = parse->desc_sizem1;
- 	struct nix_rx_sg_s *sg = &cqe->sg;
- 	struct sk_buff *skb = NULL;
- 	u64 *word = (u64 *)parse;
-@@ -359,8 +366,30 @@ static void otx2_rcv_pkt_handler(struct otx2_nic *pfvf,
- 	if (unlikely(!skb))
- 		return;
++	/* Re-initialize IPsec flows if any previously installed */
++	if (!list_empty(&pf->ipsec.inb_sw_ctx_list))
++		cn10k_ipsec_ethtool_init(netdev, true);
++
+ 	return 0;
  
-+	if (parse->chan & 0x800) {
-+		orig_pkt_wqe = cn10k_ipsec_process_cpt_metapkt(pfvf, skb, sg->seg_addr);
-+		if (!orig_pkt_wqe) {
-+			netdev_err(pfvf->netdev, "Invalid WQE in CPT metapacket\n");
-+			napi_free_frags(napi);
-+			cq->pool_ptrs++;
-+			return;
-+		}
-+		/* Return metapacket buffer back to pool since it's no longer needed */
-+		otx2_free_rcv_seg(pfvf, cqe, parse->pb_aura);
-+
-+		/* Update the count of inbound SPB buffers */
-+		atomic_inc(&pfvf->ipsec.inb_spb_count[parse->pb_aura -
-+						      pfvf->ipsec.inb_ipsec_spb_pool]);
-+
-+		/* Switch *sg to the orig_pkt_wqe's *sg which has the actual
-+		 * complete decrypted packet by CPT.
-+		 */
-+		sg = &orig_pkt_wqe->sg;
-+		desc_sizem1 = orig_pkt_wqe->parse.desc_sizem1;
-+	}
-+
- 	start = (void *)sg;
--	end = start + ((cqe->parse.desc_sizem1 + 1) * 16);
-+	end = start + ((desc_sizem1 + 1) * 16);
- 	while (start < end) {
- 		sg = (struct nix_rx_sg_s *)start;
- 		seg_addr = &sg->seg_addr;
+ err_disable_rxtx:
 -- 
 2.43.0
 
