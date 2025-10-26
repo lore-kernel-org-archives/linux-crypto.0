@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6D4286408;
-	Sun, 26 Oct 2025 05:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9F9288C3D;
+	Sun, 26 Oct 2025 05:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761457988; cv=none; b=NKvLTVayIHYcqC9MctfU2Ny8jzOR3M2Mlsi5AkrAbMJel6TS/LfgvVn4QwW201ruTE8l8KtXjkVILFbkA03oLENF2eEbxYixU33n1nke20FWvZ8vLqMVLQGMc5LDCoffme21ZULt5gUQJXS7WExUqpDUMRci/9oWUFlArockGC8=
+	t=1761457989; cv=none; b=VBDtU6NIIL4l1rLLoyW/9YWtV0Pta9VpYLhiJvBizPP600E1jP/AWwvLMo9QzBk06oUgF4cSXDxpLydFuRNYMtCFggkvUOggIC9iDN6IVNKys/hiOTT68L1cgF7VgpwTIDie8ElMNr9xc39IaoQ2I5Ny3sar7CUPGkMzvmsb7k4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761457988; c=relaxed/simple;
-	bh=G4phGjZg/4DyxMiZScpeB5F56Kh8gOR6USagGkBx7Vo=;
+	s=arc-20240116; t=1761457989; c=relaxed/simple;
+	bh=tK4ZwtbvVT+WWMAoNFlch+KJGW1l/8qhroTz/lgXZ+w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KsFj+4Axn1+dMwAIwzxWPsj2WuMcJJn6J0AArpx6heYOUEbpNsuDH/UFhvLqsST5cMRik/gP3gFVVRjRC1DMGnrgqFOJaiWlYkCyTVENr6A7HJF5Dh6lzS1KksC8VA8EVRVAyyTaxEu5EIV27hBnb4kbgJrVUh2Rm/zGCL19PEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TlTvEPgl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=JtywViQyNsVhA55lRfIMU6mb756YGhJ0d1ffxEBXUgPC06MLu1Vu2uQb1JUdnPfTs6wt7vsk05MZ9Bf4rwfGgaQXCinBW5nkxcqZ3gaI2cFeIz9q9KocRemm80Gzro9Ir5VfSm7zYph6FDhcJJTHYKqffQzEDMlZNuUrtbQi8ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VjCjZuVI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TlTvEPgl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98D9DC4AF09;
-	Sun, 26 Oct 2025 05:53:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VjCjZuVI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68413C116C6;
+	Sun, 26 Oct 2025 05:53:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761457985;
-	bh=G4phGjZg/4DyxMiZScpeB5F56Kh8gOR6USagGkBx7Vo=;
+	s=k20201202; t=1761457988;
+	bh=tK4ZwtbvVT+WWMAoNFlch+KJGW1l/8qhroTz/lgXZ+w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TlTvEPglQOHat1LvQgZUeyeuH7Hcljru/KjtGuDlPGeis3n5PDywGuUR25jVngEOp
-	 T5yZXcLFZ6og46oOZMuQ7zxtDth/L4dx3COFvfMV2Ow2EFNErD0glGUlcdwh7UeBOE
-	 wWenUYvUP+Ih//cuIDUWWg4XEVrTtksjyp3Hrr6JIDvEU1OCybt2M1YcdmsLDis+mU
-	 eWoRbzOIp5aaz5BtZ4nWu/8zl2nG9wqJV/h4GPP4EX2ZBDcXb8UQ5NFva900cfcsXS
-	 Uah4c0CN9RaIVGM+Q7TDU4TRcbg3JQiuhVNtJMXM6hlZYSFRY4ishXF3Nd3XaNcyhX
-	 3XHR8lijJDvvQ==
+	b=VjCjZuVIcC04piSCOr/VPr+Acxc4Jbc9WzwyZjZsuZyijzdgb4V2ePe38orck/ib4
+	 0QDKFZgHjokI7bVMZWsYUuc5osS8lr1CTrTtc4tVumVXTGVy2QFbBft1mQwlkFKYwj
+	 EyuYZXpOpVH7tKFGUGFf9wvRiuQibbsFoeFc5THM2DijB77in3MrMLNRpya/Bj0PuX
+	 ZDj47k4Sy1BRg1Z5kQEmwrVqxi6F4NHEQldxYeGterWeNg57gMojOcKASpAW3uDvEs
+	 Zz7xK6V/lReCdjwRzMavc+tLiIDxETdLKM7iZYd/rjCBbR6EKISWx5mn73nHurZXcE
+	 S5wYHNmhhtH5g==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -38,9 +38,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-s390@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 04/15] lib/crypto: sha3: Move SHA3 Iota step mapping into round function
-Date: Sat, 25 Oct 2025 22:50:21 -0700
-Message-ID: <20251026055032.1413733-5-ebiggers@kernel.org>
+Subject: [PATCH v2 12/15] lib/crypto: s390/sha3: Add optimized one-shot SHA-3 digest functions
+Date: Sat, 25 Oct 2025 22:50:29 -0700
+Message-ID: <20251026055032.1413733-13-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.1.dirty
 In-Reply-To: <20251026055032.1413733-1-ebiggers@kernel.org>
 References: <20251026055032.1413733-1-ebiggers@kernel.org>
@@ -52,81 +52,126 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: David Howells <dhowells@redhat.com>
+Some z/Architecture processors can compute a SHA-3 digest in a single
+instruction.  Use this capability to implement the sha3_224(),
+sha3_256(), sha3_384(), and sha3_512() library functions.
 
-In crypto/sha3_generic.c, the keccakf() function calls keccakf_round()
-to do four of Keccak-f's five step mappings.  However, it does not do
-the Iota step mapping - presumably because that is dependent on round
-number, whereas Theta, Rho, Pi and Chi are not.
+Note that the performance improvement is likely to be relatively small
+and be noticeable primarily on short messages, as the actual Keccak
+permutation is already accelerated via the implementations of
+sha3_absorb_blocks() and sha3_keccakf().  Nevertheless,
+arch/s390/crypto/ takes advantage of the "do the full SHA-3" capability,
+and it was requested that lib/crypto/ do so as well for parity with it.
 
-Note that the keccakf_round() function needs to be explicitly
-non-inlined on certain architectures as gcc's produced output will (or
-used to) use over 1KiB of stack space if inlined.
-
-Now, this code was copied more or less verbatim into lib/crypto/sha3.c,
-so that has the same aesthetic issue.  Fix this there by passing the
-round number into sha3_keccakf_one_round_generic() and doing the Iota
-step mapping there.
-
-crypto/sha3_generic.c is left untouched as that will be converted to use
-lib/crypto/sha3.c at some point.
-
-Suggested-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: David Howells <dhowells@redhat.com>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/sha3.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ lib/crypto/s390/sha3.h | 67 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 65 insertions(+), 2 deletions(-)
 
-diff --git a/lib/crypto/sha3.c b/lib/crypto/sha3.c
-index 049be8414de26..ee7a2ca92b2c5 100644
---- a/lib/crypto/sha3.c
-+++ b/lib/crypto/sha3.c
-@@ -46,11 +46,11 @@ static const u64 sha3_keccakf_rndc[SHA3_KECCAK_ROUNDS] = {
- };
- 
- /*
-  * Perform a single round of Keccak mixing.
+diff --git a/lib/crypto/s390/sha3.h b/lib/crypto/s390/sha3.h
+index 668e53da93d2c..85471404775a3 100644
+--- a/lib/crypto/s390/sha3.h
++++ b/lib/crypto/s390/sha3.h
+@@ -6,10 +6,11 @@
   */
--static SHA3_INLINE void sha3_keccakf_one_round_generic(u64 st[25])
-+static SHA3_INLINE void sha3_keccakf_one_round_generic(u64 st[25], int round)
- {
- 	u64 t[5], tt, bc[5];
+ #include <asm/cpacf.h>
+ #include <linux/cpufeature.h>
  
- 	/* Theta */
- 	bc[0] = st[0] ^ st[5] ^ st[10] ^ st[15] ^ st[20];
-@@ -147,10 +147,13 @@ static SHA3_INLINE void sha3_keccakf_one_round_generic(u64 st[25])
- 	st[20] ^= bc[ 0];
- 	st[21] ^= bc[ 1];
- 	st[22] ^= bc[ 2];
- 	st[23] ^= bc[ 3];
- 	st[24] ^= bc[ 4];
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_sha3);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_sha3_init_optim);
+ 
+ static void sha3_absorb_blocks(struct sha3_state *state, const u8 *data,
+ 			       size_t nblocks, size_t block_size)
+ {
+ 	if (static_branch_likely(&have_sha3)) {
+@@ -58,10 +59,65 @@ static void sha3_keccakf(struct sha3_state *state)
+ 	} else {
+ 		sha3_keccakf_generic(state);
+ 	}
+ }
+ 
++static inline bool s390_sha3(int func, const u8 *in, size_t in_len,
++			     u8 *out, size_t out_len)
++{
++	struct sha3_state state;
 +
-+	/* Iota */
-+	st[0] ^= sha3_keccakf_rndc[round];
- }
- 
- /* Generic implementation of the Keccak-f[1600] permutation */
- static void sha3_keccakf_generic(struct sha3_state *state)
++	if (!static_branch_likely(&have_sha3))
++		return false;
++
++	if (static_branch_likely(&have_sha3_init_optim))
++		func |= CPACF_KLMD_NIP | CPACF_KLMD_DUFOP;
++	else
++		memset(&state, 0, sizeof(state));
++
++	cpacf_klmd(func, &state, in, in_len);
++
++	if (static_branch_likely(&have_sha3_init_optim))
++		kmsan_unpoison_memory(&state, out_len);
++
++	memcpy(out, &state, out_len);
++	memzero_explicit(&state, sizeof(state));
++	return true;
++}
++
++#define sha3_224_arch sha3_224_arch
++static bool sha3_224_arch(const u8 *in, size_t in_len,
++			  u8 out[SHA3_224_DIGEST_SIZE])
++{
++	return s390_sha3(CPACF_KLMD_SHA3_224, in, in_len,
++			 out, SHA3_224_DIGEST_SIZE);
++}
++
++#define sha3_256_arch sha3_256_arch
++static bool sha3_256_arch(const u8 *in, size_t in_len,
++			  u8 out[SHA3_256_DIGEST_SIZE])
++{
++	return s390_sha3(CPACF_KLMD_SHA3_256, in, in_len,
++			 out, SHA3_256_DIGEST_SIZE);
++}
++
++#define sha3_384_arch sha3_384_arch
++static bool sha3_384_arch(const u8 *in, size_t in_len,
++			  u8 out[SHA3_384_DIGEST_SIZE])
++{
++	return s390_sha3(CPACF_KLMD_SHA3_384, in, in_len,
++			 out, SHA3_384_DIGEST_SIZE);
++}
++
++#define sha3_512_arch sha3_512_arch
++static bool sha3_512_arch(const u8 *in, size_t in_len,
++			  u8 out[SHA3_512_DIGEST_SIZE])
++{
++	return s390_sha3(CPACF_KLMD_SHA3_512, in, in_len,
++			 out, SHA3_512_DIGEST_SIZE);
++}
++
+ #define sha3_mod_init_arch sha3_mod_init_arch
+ static void sha3_mod_init_arch(void)
  {
-@@ -161,15 +164,12 @@ static void sha3_keccakf_generic(struct sha3_state *state)
- 	 */
+ 	int num_present = 0;
+ 	int num_possible = 0;
+@@ -77,12 +133,19 @@ static void sha3_mod_init_arch(void)
+ 	({ num_present += !!cpacf_query_func(opcode, func); num_possible++; })
+ 	QUERY(CPACF_KIMD, CPACF_KIMD_SHA3_224);
+ 	QUERY(CPACF_KIMD, CPACF_KIMD_SHA3_256);
+ 	QUERY(CPACF_KIMD, CPACF_KIMD_SHA3_384);
+ 	QUERY(CPACF_KIMD, CPACF_KIMD_SHA3_512);
++	QUERY(CPACF_KLMD, CPACF_KLMD_SHA3_224);
++	QUERY(CPACF_KLMD, CPACF_KLMD_SHA3_256);
++	QUERY(CPACF_KLMD, CPACF_KLMD_SHA3_384);
++	QUERY(CPACF_KLMD, CPACF_KLMD_SHA3_512);
+ #undef QUERY
  
- 	for (int i = 0; i < ARRAY_SIZE(state->words); i++)
- 		state->native_words[i] = le64_to_cpu(state->words[i]);
- 
--	for (int round = 0; round < SHA3_KECCAK_ROUNDS; round++) {
--		sha3_keccakf_one_round_generic(state->native_words);
--		/* Iota */
--		state->native_words[0] ^= sha3_keccakf_rndc[round];
--	}
-+	for (int round = 0; round < SHA3_KECCAK_ROUNDS; round++)
-+		sha3_keccakf_one_round_generic(state->native_words, round);
- 
- 	for (int i = 0; i < ARRAY_SIZE(state->words); i++)
- 		state->words[i] = cpu_to_le64(state->native_words[i]);
+-	if (num_present == num_possible)
++	if (num_present == num_possible) {
+ 		static_branch_enable(&have_sha3);
+-	else if (num_present != 0)
++		if (test_facility(86))
++			static_branch_enable(&have_sha3_init_optim);
++	} else if (num_present != 0) {
+ 		pr_warn("Unsupported combination of SHA-3 facilities\n");
++	}
  }
- 
 -- 
 2.51.1.dirty
 
