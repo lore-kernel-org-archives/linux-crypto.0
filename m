@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C7C26D4C2;
-	Sun, 26 Oct 2025 05:53:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8813127144A;
+	Sun, 26 Oct 2025 05:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761457985; cv=none; b=RmKsvQlPzXRCjOd2RYhwTf5IdbJVVzW1HnnKJbJBmsaAqULyewDwMK2l9z6+CqguwhYmWYhcY27d5KST7c6Gg5OQ0vGE1De24CM3cQ98IjfQyTvvPoKF2ymTpoyr9ApMRW+h+lNecN5FBR3SXhl7cYO/vwD9DAcbMvESUtSoXeY=
+	t=1761457985; cv=none; b=AMmZFdYNJGaIFLvq/jP+gXWWcM9ro+mKYGLcfGaqTezrMn3I7je/GnsFj+U/ecXAzzvHxLetLZwd+uFwz2A1mjmw37fhWSmbfvYduEhgKyAM+RjZI+foLW00YZ3MsW29MnDx2CaMJc2cT+PnxWtKaU7u8YoKs+XSmf71S5hOS0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1761457985; c=relaxed/simple;
-	bh=m54LInOorH439DfIKKGs+6cnPnALMPj8RJ+jLMC/NN0=;
+	bh=0rmCigZD30Y7Qn/5Q6S8PKiXC3oSi31nmGmj7+N9pY0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eak9h3kqK+94Iims6zSzMFdEPWidRhVFCkmHM4dmMCLNduBaPFEnyPJu/O8e4SytNcgo2bmE2ywpPev3vpZ9nEUXJpBcsTxM4+yN9GBISGqfEREePH7Bafk1r92IqfR3lu5GZlQzxprTBhJ58FmimalSJeBvKuXF62L9xVTiL1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FLEx9Bce; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=pK9xaz+XJfvPh/ok3L4Lv0UvQcET+ir65u5XIJxpSuqvhLnMUBY18VIbYoGsHMKo6jdWP7HVZuRjdU0ngqwLQgrHnRvrX4HqOQttzDyYpLr32VxUtO1y2Va1mHuhUzc2jReXteyobMJJrpyivXJ1R1ew1MYwoFFloaPXRWYDMnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J8C8+7Mp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FLEx9Bce"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24267C16AAE;
-	Sun, 26 Oct 2025 05:53:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J8C8+7Mp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A05DC4CEE7;
+	Sun, 26 Oct 2025 05:53:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761457984;
-	bh=m54LInOorH439DfIKKGs+6cnPnALMPj8RJ+jLMC/NN0=;
+	s=k20201202; t=1761457985;
+	bh=0rmCigZD30Y7Qn/5Q6S8PKiXC3oSi31nmGmj7+N9pY0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FLEx9Bce1znOT5HplM0dJsPQI6OhFZz5heWCqC6Y9MlLcMFV8p4lxTcLihYKPe3fA
-	 A+jxbnQfC0G1rcEOwqdcEsQ6UDUaJyakK0Fh5x5OFsOnu4xhmH0neW4KPFUNFFGlIc
-	 pxgCK/8PT9MZT4pSI5JrF+NxvnLrymvurV1ozUEh6bcd1Rg3P6fPJ/nnxCXvNzZYcS
-	 hHBjnB4yehlS7N0VA6+3ZyqX9pePKh/Y1iGdFkF/qjkWRTvxKTX1EQWVzIjH7bFfsv
-	 kWNBqQewcy7/oaAgEGINhN+BevCdSTivtJ0xcla20ihtsoShB8qrnvEvPzAonQsDhc
-	 rWl8O+dTBg50w==
+	b=J8C8+7Mpx81zGro0KS2xamL+VQLInlUrhT0Pvwhyj8wCh7A9k4ZR9gTqSKdvIZEl7
+	 ow1fKXQKwVp3tEiwvrVdoKvPgm59hSBABm3w8bnZ3GFE1N1QP0FvAlEmTLOiZkYW0J
+	 SYtpBbgwitLybc9BVu5xB6L5GGrx6hdpxAJzfEaNGMFeq9Gp5/x2LdQNBCCRjXYJYI
+	 XdRVsOywZuATVMq2SUArXtewQVROAiL1I2j9cDS8ba0sYRiwqbdbaed8WoQABXkVk/
+	 K+qkBPTxzaiGwcAPGit73yD7uIE4jkrz0WokECUomfIRLJG1lEFML0GW91+ItbEsAI
+	 F100nKS05z0HQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -38,9 +38,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-s390@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 03/15] lib/crypto: sha3: Add SHA-3 support
-Date: Sat, 25 Oct 2025 22:50:20 -0700
-Message-ID: <20251026055032.1413733-4-ebiggers@kernel.org>
+Subject: [PATCH v2 05/15] lib/crypto: tests: Add SHA3 kunit tests
+Date: Sat, 25 Oct 2025 22:50:22 -0700
+Message-ID: <20251026055032.1413733-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.1.dirty
 In-Reply-To: <20251026055032.1413733-1-ebiggers@kernel.org>
 References: <20251026055032.1413733-1-ebiggers@kernel.org>
@@ -54,913 +54,709 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-Add SHA-3 support to lib/crypto/.  All six algorithms in the SHA-3
-family are supported: four digests (SHA3-224, SHA3-256, SHA3-384, and
-SHA3-512) and two extendable-output functions (SHAKE128 and SHAKE256).
+Add a SHA3 kunit test suite, providing the following:
 
-The SHAKE algorithms will be required for ML-DSA.
+ (*) A simple test of each of SHA3-224, SHA3-256, SHA3-384, SHA3-512,
+     SHAKE128 and SHAKE256.
+
+ (*) NIST 0- and 1600-bit test vectors for SHAKE128 and SHAKE256.
+
+ (*) Output tiling (multiple squeezing) tests for SHAKE256.
+
+ (*) Standard hash template test for SHA3-256.  To make this possible,
+     gen-hash-testvecs.py is modified to support sha3-256.
+
+ (*) Standard benchmark test for SHA3-256.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-[EB: simplified the API to use fewer types and functions, fixed bug that
-     sometimes caused incorrect SHAKE output, cleaned up the
-     documentation, dropped an ad-hoc test that was inconsistent with
-     the rest of lib/crypto/, and many other cleanups]
-Co-developed-by: Eric Biggers <ebiggers@kernel.org>
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+[EB: dropped some unnecessary changes to gen-hash-testvecs.py, moved
+     addition of Testing section in doc file into this commit, and
+     other small cleanups]
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- Documentation/crypto/index.rst |   1 +
- Documentation/crypto/sha3.rst  | 119 +++++++++++
- include/crypto/sha3.h          | 308 +++++++++++++++++++++++++++-
- lib/crypto/Kconfig             |   7 +
- lib/crypto/Makefile            |   5 +
- lib/crypto/sha3.c              | 359 +++++++++++++++++++++++++++++++++
- 6 files changed, 796 insertions(+), 3 deletions(-)
- create mode 100644 Documentation/crypto/sha3.rst
- create mode 100644 lib/crypto/sha3.c
+ Documentation/crypto/sha3.rst       |   6 +
+ lib/crypto/tests/Kconfig            |  11 +
+ lib/crypto/tests/Makefile           |   1 +
+ lib/crypto/tests/sha3-testvecs.h    | 231 +++++++++++++++++++
+ lib/crypto/tests/sha3_kunit.c       | 344 ++++++++++++++++++++++++++++
+ scripts/crypto/gen-hash-testvecs.py |   4 +-
+ 6 files changed, 596 insertions(+), 1 deletion(-)
+ create mode 100644 lib/crypto/tests/sha3-testvecs.h
+ create mode 100644 lib/crypto/tests/sha3_kunit.c
 
-diff --git a/Documentation/crypto/index.rst b/Documentation/crypto/index.rst
-index 100b47d049c04..4ee667c446f99 100644
---- a/Documentation/crypto/index.rst
-+++ b/Documentation/crypto/index.rst
-@@ -25,5 +25,6 @@ for cryptographic use cases, as well as programming examples.
-    api
-    api-samples
-    descore-readme
-    device_drivers/index
-    krb5
-+   sha3
 diff --git a/Documentation/crypto/sha3.rst b/Documentation/crypto/sha3.rst
-new file mode 100644
-index 0000000000000..b705e70691d7b
---- /dev/null
+index b705e70691d7b..f8c484feaa291 100644
+--- a/Documentation/crypto/sha3.rst
 +++ b/Documentation/crypto/sha3.rst
-@@ -0,0 +1,119 @@
-+.. SPDX-License-Identifier: GPL-2.0-or-later
-+
-+==========================
-+SHA-3 Algorithm Collection
-+==========================
-+
-+.. contents::
-+
-+Overview
-+========
-+
-+The SHA-3 family of algorithms, as specified in NIST FIPS-202 [1]_, contains six
-+algorithms based on the Keccak sponge function.  The differences between them
-+are: the "rate" (how much of the state buffer gets updated with new data between
-+invocations of the Keccak function and analogous to the "block size"), what
-+domain separation suffix gets appended to the input data, and how much output
-+data is extracted at the end.  The Keccak sponge function is designed such that
-+arbitrary amounts of output can be obtained for certain algorithms.
-+
-+Four digest algorithms are provided:
-+
-+ - SHA3-224
-+ - SHA3-256
-+ - SHA3-384
-+ - SHA3-512
-+
-+Additionally, two Extendable-Output Functions (XOFs) are provided:
-+
-+ - SHAKE128
-+ - SHAKE256
-+
-+The SHA-3 library API supports all six of these algorithms.  The four digest
-+algorithms are also supported by the crypto_shash and crypto_ahash APIs.
-+
-+This document describes the SHA-3 library API.
-+
-+
-+Digests
+@@ -105,10 +105,16 @@ More input data cannot be added after squeezing has started.
+ Once all the desired output has been extracted, zeroize the context::
+ 
+ 	void shake_zeroize_ctx(struct shake_ctx *ctx);
+ 
+ 
++Testing
 +=======
 +
-+The following functions compute SHA-3 digests::
-+
-+	void sha3_224(const u8 *in, size_t in_len, u8 out[SHA3_224_DIGEST_SIZE]);
-+	void sha3_256(const u8 *in, size_t in_len, u8 out[SHA3_256_DIGEST_SIZE]);
-+	void sha3_384(const u8 *in, size_t in_len, u8 out[SHA3_384_DIGEST_SIZE]);
-+	void sha3_512(const u8 *in, size_t in_len, u8 out[SHA3_512_DIGEST_SIZE]);
-+
-+For users that need to pass in data incrementally, an incremental API is also
-+provided.  The incremental API uses the following struct::
-+
-+	struct sha3_ctx { ... };
-+
-+Initialization is done with one of::
-+
-+	void sha3_224_init(struct sha3_ctx *ctx);
-+	void sha3_256_init(struct sha3_ctx *ctx);
-+	void sha3_384_init(struct sha3_ctx *ctx);
-+	void sha3_512_init(struct sha3_ctx *ctx);
-+
-+Input data is then added with any number of calls to::
-+
-+	void sha3_update(struct sha3_ctx *ctx, const u8 *in, size_t in_len);
-+
-+Finally, the digest is generated using::
-+
-+	void sha3_final(struct sha3_ctx *ctx, u8 *out);
-+
-+which also zeroizes the context.  The length of the digest is determined by the
-+initialization function that was called.
++To test the SHA-3 code, use sha3_kunit (CONFIG_CRYPTO_LIB_SHA3_KUNIT_TEST).
 +
 +
-+Extendable-Output Functions
-+===========================
-+
-+The following functions compute the SHA-3 extendable-output functions (XOFs)::
-+
-+	void shake128(const u8 *in, size_t in_len, u8 *out, size_t out_len);
-+	void shake256(const u8 *in, size_t in_len, u8 *out, size_t out_len);
-+
-+For users that need to provide the input data incrementally and/or receive the
-+output data incrementally, an incremental API is also provided.  The incremental
-+API uses the following struct::
-+
-+	struct shake_ctx { ... };
-+
-+Initialization is done with one of::
-+
-+	void shake128_init(struct shake_ctx *ctx);
-+	void shake256_init(struct shake_ctx *ctx);
-+
-+Input data is then added with any number of calls to::
-+
-+	void shake_update(struct shake_ctx *ctx, const u8 *in, size_t in_len);
-+
-+Finally, the output data is extracted with any number of calls to::
-+
-+	void shake_squeeze(struct shake_ctx *ctx, u8 *out, size_t out_len);
-+
-+and telling it how much data should be extracted.  Note that performing multiple
-+squeezes, with the output laid consecutively in a buffer, gets exactly the same
-+output as doing a single squeeze for the combined amount over the same buffer.
-+
-+More input data cannot be added after squeezing has started.
-+
-+Once all the desired output has been extracted, zeroize the context::
-+
-+	void shake_zeroize_ctx(struct shake_ctx *ctx);
-+
-+
-+References
-+==========
-+
-+.. [1] https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
-+
-+
-+API Function Reference
-+======================
-+
-+.. kernel-doc:: include/crypto/sha3.h
-diff --git a/include/crypto/sha3.h b/include/crypto/sha3.h
-index 41e1b83a6d918..a7503dfc1a044 100644
---- a/include/crypto/sha3.h
-+++ b/include/crypto/sha3.h
-@@ -1,13 +1,16 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- /*
-  * Common values for SHA-3 algorithms
-+ *
-+ * See also Documentation/crypto/sha3.rst
-  */
- #ifndef __CRYPTO_SHA3_H__
- #define __CRYPTO_SHA3_H__
+ References
+ ==========
  
- #include <linux/types.h>
-+#include <linux/string.h>
+ .. [1] https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
  
- #define SHA3_224_DIGEST_SIZE	(224 / 8)
- #define SHA3_224_BLOCK_SIZE	(200 - 2 * SHA3_224_DIGEST_SIZE)
- #define SHA3_224_EXPORT_SIZE	SHA3_STATE_SIZE + SHA3_224_BLOCK_SIZE + 1
+diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
+index 2ebfd681bae4d..140afd1714bab 100644
+--- a/lib/crypto/tests/Kconfig
++++ b/lib/crypto/tests/Kconfig
+@@ -79,10 +79,21 @@ config CRYPTO_LIB_SHA512_KUNIT_TEST
+ 	select CRYPTO_LIB_SHA512
+ 	help
+ 	  KUnit tests for the SHA-384 and SHA-512 cryptographic hash functions
+ 	  and their corresponding HMACs.
  
-@@ -21,16 +24,315 @@
- 
- #define SHA3_512_DIGEST_SIZE	(512 / 8)
- #define SHA3_512_BLOCK_SIZE	(200 - 2 * SHA3_512_DIGEST_SIZE)
- #define SHA3_512_EXPORT_SIZE	SHA3_STATE_SIZE + SHA3_512_BLOCK_SIZE + 1
- 
-+/*
-+ * SHAKE128 and SHAKE256 actually have variable output size, but this is used to
-+ * calculate the block size (rate) analogously to the above.
-+ */
-+#define SHAKE128_DEFAULT_SIZE	(128 / 8)
-+#define SHAKE128_BLOCK_SIZE	(200 - 2 * SHAKE128_DEFAULT_SIZE)
-+#define SHAKE256_DEFAULT_SIZE	(256 / 8)
-+#define SHAKE256_BLOCK_SIZE	(200 - 2 * SHAKE256_DEFAULT_SIZE)
-+
- #define SHA3_STATE_SIZE		200
- 
- struct shash_desc;
- 
-+int crypto_sha3_init(struct shash_desc *desc);
-+
-+/*
-+ * State for the Keccak-f[1600] permutation: 25 64-bit words.
-+ *
-+ * We usually keep the state words as little-endian, to make absorbing and
-+ * squeezing easier.  (It means that absorbing and squeezing can just treat the
-+ * state as a byte array.)  The state words are converted to native-endian only
-+ * temporarily by implementations of the permutation that need native-endian
-+ * words.  Of course, that conversion is a no-op on little-endian machines.
-+ */
- struct sha3_state {
--	u64		st[SHA3_STATE_SIZE / 8];
-+	union {
-+		u64 st[SHA3_STATE_SIZE / 8]; /* temporarily retained for compatibility purposes */
-+
-+		__le64 words[SHA3_STATE_SIZE / 8];
-+		u8 bytes[SHA3_STATE_SIZE];
-+
-+		u64 native_words[SHA3_STATE_SIZE / 8]; /* see comment above */
-+	};
- };
- 
--int crypto_sha3_init(struct shash_desc *desc);
-+/* Internal context, shared by the digests (SHA3-*) and the XOFs (SHAKE*) */
-+struct __sha3_ctx {
-+	struct sha3_state state;
-+	u8 digest_size;		/* Digests only: the digest size in bytes */
-+	u8 block_size;		/* Block size in bytes */
-+	u8 absorb_offset;	/* Index of next state byte to absorb into */
-+	u8 squeeze_offset;	/* XOFs only: index of next state byte to extract */
-+};
-+
-+void __sha3_update(struct __sha3_ctx *ctx, const u8 *in, size_t in_len);
-+
-+/** Context for SHA3-224, SHA3-256, SHA3-384, or SHA3-512 */
-+struct sha3_ctx {
-+	struct __sha3_ctx ctx;
-+};
-+
-+/**
-+ * Zeroize a sha3_ctx.  This is already called by sha3_final().  Call this
-+ * explicitly when abandoning a context without calling sha3_final().
-+ */
-+static inline void sha3_zeroize_ctx(struct sha3_ctx *ctx)
-+{
-+	memzero_explicit(ctx, sizeof(*ctx));
-+}
-+
-+/** Context for SHAKE128 or SHAKE256 */
-+struct shake_ctx {
-+	struct __sha3_ctx ctx;
-+};
-+
-+/** Zeroize a shake_ctx.  Call this after the last squeeze. */
-+static inline void shake_zeroize_ctx(struct shake_ctx *ctx)
-+{
-+	memzero_explicit(ctx, sizeof(*ctx));
-+}
-+
-+/**
-+ * sha3_224_init() - Initialize a context for SHA3-224
-+ * @ctx: The context to initialize
-+ *
-+ * This begins a new SHA3-224 message digest computation.
-+ *
-+ * Context: Any context.
-+ */
-+static inline void sha3_224_init(struct sha3_ctx *ctx)
-+{
-+	*ctx = (struct sha3_ctx){
-+		.ctx.digest_size = SHA3_224_DIGEST_SIZE,
-+		.ctx.block_size = SHA3_224_BLOCK_SIZE,
-+	};
-+}
-+
-+/**
-+ * sha3_256_init() - Initialize a context for SHA3-256
-+ * @ctx: The context to initialize
-+ *
-+ * This begins a new SHA3-256 message digest computation.
-+ *
-+ * Context: Any context.
-+ */
-+static inline void sha3_256_init(struct sha3_ctx *ctx)
-+{
-+	*ctx = (struct sha3_ctx){
-+		.ctx.digest_size = SHA3_256_DIGEST_SIZE,
-+		.ctx.block_size = SHA3_256_BLOCK_SIZE,
-+	};
-+}
-+
-+/**
-+ * sha3_384_init() - Initialize a context for SHA3-384
-+ * @ctx: The context to initialize
-+ *
-+ * This begins a new SHA3-384 message digest computation.
-+ *
-+ * Context: Any context.
-+ */
-+static inline void sha3_384_init(struct sha3_ctx *ctx)
-+{
-+	*ctx = (struct sha3_ctx){
-+		.ctx.digest_size = SHA3_384_DIGEST_SIZE,
-+		.ctx.block_size = SHA3_384_BLOCK_SIZE,
-+	};
-+}
-+
-+/**
-+ * sha3_512_init() - Initialize a context for SHA3-512
-+ * @ctx: The context to initialize
-+ *
-+ * This begins a new SHA3-512 message digest computation.
-+ *
-+ * Context: Any context.
-+ */
-+static inline void sha3_512_init(struct sha3_ctx *ctx)
-+{
-+	*ctx = (struct sha3_ctx){
-+		.ctx.digest_size = SHA3_512_DIGEST_SIZE,
-+		.ctx.block_size = SHA3_512_BLOCK_SIZE,
-+	};
-+}
-+
-+/**
-+ * sha3_update() - Update a SHA-3 digest context with input data
-+ * @ctx: The context to update; must have been initialized
-+ * @in: The input data
-+ * @in_len: Length of the input data in bytes
-+ *
-+ * This can be called any number of times to add data to a SHA3-224, SHA3-256,
-+ * SHA3-384, or SHA3-512 digest (depending on which init function was called).
-+ *
-+ * Context: Any context.
-+ */
-+static inline void sha3_update(struct sha3_ctx *ctx,
-+			       const u8 *in, size_t in_len)
-+{
-+	__sha3_update(&ctx->ctx, in, in_len);
-+}
-+
-+/**
-+ * sha3_final() - Finish computing a SHA-3 message digest
-+ * @ctx: The context to finalize; must have been initialized
-+ * @out: (output) The resulting SHA3-224, SHA3-256, SHA3-384, or SHA3-512
-+ *	 message digest, matching the init function that was called.  Note that
-+ *	 the size differs for each one; see SHA3_*_DIGEST_SIZE.
-+ *
-+ * After finishing, this zeroizes @ctx.  So the caller does not need to do it.
-+ *
-+ * Context: Any context.
-+ */
-+void sha3_final(struct sha3_ctx *ctx, u8 *out);
-+
-+/**
-+ * shake128_init() - Initialize a context for SHAKE128
-+ * @ctx: The context to initialize
-+ *
-+ * This begins a new SHAKE128 extendable-output function (XOF) computation.
-+ *
-+ * Context: Any context.
-+ */
-+static inline void shake128_init(struct shake_ctx *ctx)
-+{
-+	*ctx = (struct shake_ctx){
-+		.ctx.block_size = SHAKE128_BLOCK_SIZE,
-+	};
-+}
-+
-+/**
-+ * shake256_init() - Initialize a context for SHAKE256
-+ * @ctx: The context to initialize
-+ *
-+ * This begins a new SHAKE256 extendable-output function (XOF) computation.
-+ *
-+ * Context: Any context.
-+ */
-+static inline void shake256_init(struct shake_ctx *ctx)
-+{
-+	*ctx = (struct shake_ctx){
-+		.ctx.block_size = SHAKE256_BLOCK_SIZE,
-+	};
-+}
-+
-+/**
-+ * shake_update() - Update a SHAKE context with input data
-+ * @ctx: The context to update; must have been initialized
-+ * @in: The input data
-+ * @in_len: Length of the input data in bytes
-+ *
-+ * This can be called any number of times to add more input data to SHAKE128 or
-+ * SHAKE256.  This cannot be called after squeezing has begun.
-+ *
-+ * Context: Any context.
-+ */
-+static inline void shake_update(struct shake_ctx *ctx,
-+				const u8 *in, size_t in_len)
-+{
-+	__sha3_update(&ctx->ctx, in, in_len);
-+}
-+
-+/**
-+ * shake_squeeze() - Generate output from SHAKE128 or SHAKE256
-+ * @ctx: The context to squeeze; must have been initialized
-+ * @out: Where to write the resulting output data
-+ * @out_len: The amount of data to extract to @out in bytes
-+ *
-+ * This may be called multiple times.  A number of consecutive squeezes laid
-+ * end-to-end will yield the same output as one big squeeze generating the same
-+ * total amount of output.  More input cannot be provided after squeezing has
-+ * begun.  After the last squeeze, call shake_zeroize_ctx().
-+ *
-+ * Context: Any context.
-+ */
-+void shake_squeeze(struct shake_ctx *ctx, u8 *out, size_t out_len);
-+
-+/**
-+ * sha3_224() - Compute SHA3-224 digest in one shot
-+ * @in: The input data to be digested
-+ * @in_len: Length of the input data in bytes
-+ * @out: The buffer into which the digest will be stored
-+ *
-+ * Convenience function that computes a SHA3-224 digest.  Use this instead of
-+ * the incremental API if you're able to provide all the input at once.
-+ *
-+ * Context: Any context.
-+ */
-+void sha3_224(const u8 *in, size_t in_len, u8 out[SHA3_224_DIGEST_SIZE]);
-+
-+/**
-+ * sha3_256() - Compute SHA3-256 digest in one shot
-+ * @in: The input data to be digested
-+ * @in_len: Length of the input data in bytes
-+ * @out: The buffer into which the digest will be stored
-+ *
-+ * Convenience function that computes a SHA3-256 digest.  Use this instead of
-+ * the incremental API if you're able to provide all the input at once.
-+ *
-+ * Context: Any context.
-+ */
-+void sha3_256(const u8 *in, size_t in_len, u8 out[SHA3_256_DIGEST_SIZE]);
-+
-+/**
-+ * sha3_384() - Compute SHA3-384 digest in one shot
-+ * @in: The input data to be digested
-+ * @in_len: Length of the input data in bytes
-+ * @out: The buffer into which the digest will be stored
-+ *
-+ * Convenience function that computes a SHA3-384 digest.  Use this instead of
-+ * the incremental API if you're able to provide all the input at once.
-+ *
-+ * Context: Any context.
-+ */
-+void sha3_384(const u8 *in, size_t in_len, u8 out[SHA3_384_DIGEST_SIZE]);
-+
-+/**
-+ * sha3_512() - Compute SHA3-512 digest in one shot
-+ * @in: The input data to be digested
-+ * @in_len: Length of the input data in bytes
-+ * @out: The buffer into which the digest will be stored
-+ *
-+ * Convenience function that computes a SHA3-512 digest.  Use this instead of
-+ * the incremental API if you're able to provide all the input at once.
-+ *
-+ * Context: Any context.
-+ */
-+void sha3_512(const u8 *in, size_t in_len, u8 out[SHA3_512_DIGEST_SIZE]);
-+
-+/**
-+ * shake128() - Compute SHAKE128 in one shot
-+ * @in: The input data to be used
-+ * @in_len: Length of the input data in bytes
-+ * @out: The buffer into which the output will be stored
-+ * @out_len: Length of the output to produce in bytes
-+ *
-+ * Convenience function that computes SHAKE128 in one shot.  Use this instead of
-+ * the incremental API if you're able to provide all the input at once as well
-+ * as receive all the output at once.  All output lengths are supported.
-+ *
-+ * Context: Any context.
-+ */
-+void shake128(const u8 *in, size_t in_len, u8 *out, size_t out_len);
-+
-+/**
-+ * shake256() - Compute SHAKE256 in one shot
-+ * @in: The input data to be used
-+ * @in_len: Length of the input data in bytes
-+ * @out: The buffer into which the output will be stored
-+ * @out_len: Length of the output to produce in bytes
-+ *
-+ * Convenience function that computes SHAKE256 in one shot.  Use this instead of
-+ * the incremental API if you're able to provide all the input at once as well
-+ * as receive all the output at once.  All output lengths are supported.
-+ *
-+ * Context: Any context.
-+ */
-+void shake256(const u8 *in, size_t in_len, u8 *out, size_t out_len);
- 
--#endif
-+#endif /* __CRYPTO_SHA3_H__ */
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index 280b888153bf0..a05f5a349cd8c 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -193,10 +193,17 @@ config CRYPTO_LIB_SHA512_ARCH
- 	default y if RISCV && 64BIT && RISCV_ISA_V && TOOLCHAIN_HAS_VECTOR_CRYPTO
- 	default y if S390
- 	default y if SPARC64
- 	default y if X86_64
- 
-+config CRYPTO_LIB_SHA3
-+	tristate
-+	select CRYPTO_LIB_UTILS
++config CRYPTO_LIB_SHA3_KUNIT_TEST
++	tristate "KUnit tests for SHA-3" if !KUNIT_ALL_TESTS
++	depends on KUNIT
++	default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
++	select CRYPTO_LIB_BENCHMARK_VISIBLE
++	select CRYPTO_LIB_SHA3
 +	help
-+	  The SHA3 library functions.  Select this if your module uses any of
-+	  the functions from <crypto/sha3.h>.
++	  KUnit tests for the SHA3 cryptographic hash and XOF functions,
++	  including SHA3-224, SHA3-256, SHA3-384, SHA3-512, SHAKE128 and
++	  SHAKE256.
 +
- config CRYPTO_LIB_SM3
- 	tristate
+ config CRYPTO_LIB_BENCHMARK_VISIBLE
+ 	bool
  
- source "lib/crypto/tests/Kconfig"
- 
-diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-index bc26777d08e97..0cfdb511f32b6 100644
---- a/lib/crypto/Makefile
-+++ b/lib/crypto/Makefile
-@@ -276,10 +276,15 @@ libsha512-$(CONFIG_X86) += x86/sha512-ssse3-asm.o \
- 			   x86/sha512-avx2-asm.o
- endif # CONFIG_CRYPTO_LIB_SHA512_ARCH
- 
- ################################################################################
- 
-+obj-$(CONFIG_CRYPTO_LIB_SHA3) += libsha3.o
-+libsha3-y := sha3.o
-+
-+################################################################################
-+
- obj-$(CONFIG_MPILIB) += mpi/
- 
- obj-$(CONFIG_CRYPTO_SELFTESTS_FULL)		+= simd.o
- 
- obj-$(CONFIG_CRYPTO_LIB_SM3)			+= libsm3.o
-diff --git a/lib/crypto/sha3.c b/lib/crypto/sha3.c
+ config CRYPTO_LIB_BENCHMARK
+ 	bool "Include benchmarks in KUnit tests for cryptographic functions"
+diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
+index f21a48a4415d0..f7d1392dc8475 100644
+--- a/lib/crypto/tests/Makefile
++++ b/lib/crypto/tests/Makefile
+@@ -6,5 +6,6 @@ obj-$(CONFIG_CRYPTO_LIB_CURVE25519_KUNIT_TEST) += curve25519_kunit.o
+ obj-$(CONFIG_CRYPTO_LIB_MD5_KUNIT_TEST) += md5_kunit.o
+ obj-$(CONFIG_CRYPTO_LIB_POLY1305_KUNIT_TEST) += poly1305_kunit.o
+ obj-$(CONFIG_CRYPTO_LIB_SHA1_KUNIT_TEST) += sha1_kunit.o
+ obj-$(CONFIG_CRYPTO_LIB_SHA256_KUNIT_TEST) += sha224_kunit.o sha256_kunit.o
+ obj-$(CONFIG_CRYPTO_LIB_SHA512_KUNIT_TEST) += sha384_kunit.o sha512_kunit.o
++obj-$(CONFIG_CRYPTO_LIB_SHA3_KUNIT_TEST) += sha3_kunit.o
+diff --git a/lib/crypto/tests/sha3-testvecs.h b/lib/crypto/tests/sha3-testvecs.h
 new file mode 100644
-index 0000000000000..049be8414de26
+index 0000000000000..9c4c403cc6e06
 --- /dev/null
-+++ b/lib/crypto/sha3.c
-@@ -0,0 +1,359 @@
++++ b/lib/crypto/tests/sha3-testvecs.h
+@@ -0,0 +1,231 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* This file was generated by: ./scripts/crypto/gen-hash-testvecs.py sha3-256 */
++
++static const struct {
++	size_t data_len;
++	u8 digest[SHA3_256_DIGEST_SIZE];
++} hash_testvecs[] = {
++	{
++		.data_len = 0,
++		.digest = {
++			0xa7, 0xff, 0xc6, 0xf8, 0xbf, 0x1e, 0xd7, 0x66,
++			0x51, 0xc1, 0x47, 0x56, 0xa0, 0x61, 0xd6, 0x62,
++			0xf5, 0x80, 0xff, 0x4d, 0xe4, 0x3b, 0x49, 0xfa,
++			0x82, 0xd8, 0x0a, 0x4b, 0x80, 0xf8, 0x43, 0x4a,
++		},
++	},
++	{
++		.data_len = 1,
++		.digest = {
++			0x11, 0x03, 0xe7, 0x84, 0x51, 0x50, 0x86, 0x35,
++			0x71, 0x8a, 0x70, 0xe3, 0xc4, 0x26, 0x7b, 0x21,
++			0x02, 0x13, 0xa0, 0x81, 0xe8, 0xe6, 0x14, 0x25,
++			0x07, 0x34, 0xe5, 0xc5, 0x40, 0x06, 0xf2, 0x8b,
++		},
++	},
++	{
++		.data_len = 2,
++		.digest = {
++			0x2f, 0x6f, 0x6d, 0x47, 0x48, 0x52, 0x11, 0xb9,
++			0xe4, 0x3d, 0xc8, 0x71, 0xcf, 0xb2, 0xee, 0xae,
++			0x5b, 0xf4, 0x12, 0x84, 0x5b, 0x1c, 0xec, 0x6c,
++			0xc1, 0x66, 0x88, 0xaa, 0xc3, 0x40, 0xbd, 0x7e,
++		},
++	},
++	{
++		.data_len = 3,
++		.digest = {
++			0xec, 0x02, 0xe8, 0x81, 0x4f, 0x84, 0x41, 0x69,
++			0x06, 0xd8, 0xdc, 0x1d, 0x01, 0x78, 0xd7, 0xcb,
++			0x39, 0xdf, 0xd3, 0x12, 0x1c, 0x99, 0xfd, 0xf3,
++			0x5c, 0x83, 0xc9, 0xc2, 0x7a, 0x7b, 0x6a, 0x05,
++		},
++	},
++	{
++		.data_len = 16,
++		.digest = {
++			0xff, 0x6f, 0xc3, 0x41, 0xc3, 0x5f, 0x34, 0x6d,
++			0xa7, 0xdf, 0x3e, 0xc2, 0x8b, 0x29, 0xb6, 0xf1,
++			0xf8, 0x67, 0xfd, 0xcd, 0xb1, 0x9f, 0x38, 0x08,
++			0x1d, 0x8d, 0xd9, 0xc2, 0x43, 0x66, 0x18, 0x6c,
++		},
++	},
++	{
++		.data_len = 32,
++		.digest = {
++			0xe4, 0xb1, 0x06, 0x17, 0xf8, 0x8b, 0x91, 0x95,
++			0xe7, 0x57, 0x66, 0xac, 0x08, 0xb2, 0x03, 0x3e,
++			0xf7, 0x84, 0x1f, 0xe3, 0x25, 0xa3, 0x11, 0xd2,
++			0x11, 0xa4, 0x78, 0x74, 0x2a, 0x43, 0x20, 0xa5,
++		},
++	},
++	{
++		.data_len = 48,
++		.digest = {
++			0xeb, 0x57, 0x5f, 0x20, 0xa3, 0x6b, 0xc7, 0xb4,
++			0x66, 0x2a, 0xa0, 0x30, 0x3b, 0x52, 0x00, 0xc9,
++			0xce, 0x6a, 0xd8, 0x1e, 0xbe, 0xed, 0xa1, 0xd1,
++			0xbe, 0x63, 0xc7, 0xe1, 0xe2, 0x66, 0x67, 0x0c,
++		},
++	},
++	{
++		.data_len = 49,
++		.digest = {
++			0xf0, 0x67, 0xad, 0x66, 0xbe, 0xec, 0x5a, 0xfd,
++			0x29, 0xd2, 0x4f, 0x1d, 0xb2, 0x24, 0xb8, 0x90,
++			0x05, 0x28, 0x0e, 0x66, 0x67, 0x74, 0x2d, 0xee,
++			0x66, 0x25, 0x11, 0xd1, 0x76, 0xa2, 0xfc, 0x3a,
++		},
++	},
++	{
++		.data_len = 63,
++		.digest = {
++			0x57, 0x56, 0x21, 0xb3, 0x2d, 0x2d, 0xe1, 0x9d,
++			0xbf, 0x2c, 0x82, 0xa8, 0xad, 0x7e, 0x6c, 0x46,
++			0xfb, 0x30, 0xeb, 0xce, 0xcf, 0xed, 0x2d, 0x65,
++			0xe7, 0xe4, 0x96, 0x69, 0xe0, 0x48, 0xd2, 0xb6,
++		},
++	},
++	{
++		.data_len = 64,
++		.digest = {
++			0x7b, 0xba, 0x67, 0x15, 0xe5, 0x21, 0xc4, 0x69,
++			0xd3, 0xef, 0x5c, 0x97, 0x9f, 0x5b, 0xba, 0x9c,
++			0xfa, 0x55, 0x64, 0xec, 0xb5, 0x37, 0x53, 0x1b,
++			0x3f, 0x4c, 0x0a, 0xed, 0x51, 0x98, 0x2b, 0x52,
++		},
++	},
++	{
++		.data_len = 65,
++		.digest = {
++			0x44, 0xb6, 0x6b, 0x83, 0x09, 0x83, 0x55, 0x83,
++			0xde, 0x1f, 0xcc, 0x33, 0xef, 0xdc, 0x05, 0xbb,
++			0x3b, 0x63, 0x76, 0x45, 0xe4, 0x8e, 0x14, 0x7a,
++			0x2d, 0xae, 0x90, 0xce, 0x68, 0xc3, 0xa4, 0xf2,
++		},
++	},
++	{
++		.data_len = 127,
++		.digest = {
++			0x50, 0x3e, 0x99, 0x4e, 0x28, 0x2b, 0xc9, 0xf4,
++			0xf5, 0xeb, 0x2b, 0x16, 0x04, 0x2d, 0xf5, 0xbe,
++			0xc0, 0x91, 0x41, 0x2a, 0x8e, 0x69, 0x5e, 0x39,
++			0x53, 0x2c, 0xc1, 0x18, 0xa5, 0xeb, 0xd8, 0xda,
++		},
++	},
++	{
++		.data_len = 128,
++		.digest = {
++			0x90, 0x0b, 0xa6, 0x92, 0x84, 0x30, 0xaf, 0xee,
++			0x38, 0x59, 0x83, 0x83, 0xe9, 0xfe, 0xab, 0x86,
++			0x79, 0x1b, 0xcd, 0xe7, 0x0a, 0x0f, 0x58, 0x53,
++			0x36, 0xab, 0x12, 0xe1, 0x5c, 0x97, 0xc1, 0xfb,
++		},
++	},
++	{
++		.data_len = 129,
++		.digest = {
++			0x2b, 0x52, 0x1e, 0x54, 0xbe, 0x38, 0x4c, 0x3e,
++			0x73, 0x37, 0x18, 0xf5, 0x25, 0x2c, 0xc8, 0xc7,
++			0xda, 0x7e, 0xb6, 0x47, 0x9d, 0xf4, 0x46, 0xce,
++			0xfa, 0x80, 0x20, 0x6b, 0xbd, 0xfd, 0x2a, 0xd8,
++		},
++	},
++	{
++		.data_len = 256,
++		.digest = {
++			0x45, 0xf0, 0xf5, 0x9b, 0xd9, 0x91, 0x26, 0xd5,
++			0x91, 0x3b, 0xf8, 0x87, 0x8b, 0x34, 0x02, 0x31,
++			0x64, 0xab, 0xf4, 0x1c, 0x6e, 0x34, 0x72, 0xdf,
++			0x32, 0x6d, 0xe5, 0xd2, 0x67, 0x5e, 0x86, 0x93,
++		},
++	},
++	{
++		.data_len = 511,
++		.digest = {
++			0xb3, 0xaf, 0x71, 0x64, 0xfa, 0xd4, 0xf1, 0x07,
++			0x38, 0xef, 0x04, 0x8e, 0x89, 0xf4, 0x02, 0xd2,
++			0xa5, 0xaf, 0x3b, 0xf5, 0x67, 0x56, 0xcf, 0xa9,
++			0x8e, 0x43, 0xf5, 0xb5, 0xe3, 0x91, 0x8e, 0xe7,
++		},
++	},
++	{
++		.data_len = 513,
++		.digest = {
++			0x51, 0xac, 0x0a, 0x65, 0xb7, 0x96, 0x20, 0xcf,
++			0x88, 0xf6, 0x97, 0x35, 0x89, 0x0d, 0x31, 0x0f,
++			0xbe, 0x17, 0xbe, 0x62, 0x03, 0x67, 0xc0, 0xee,
++			0x4f, 0xc1, 0xe3, 0x7f, 0x6f, 0xab, 0xac, 0xb4,
++		},
++	},
++	{
++		.data_len = 1000,
++		.digest = {
++			0x7e, 0xea, 0xa8, 0xd7, 0xde, 0x20, 0x1b, 0x58,
++			0x24, 0xd8, 0x26, 0x40, 0x36, 0x5f, 0x3f, 0xaa,
++			0xe5, 0x5a, 0xea, 0x98, 0x58, 0xd4, 0xd6, 0xfc,
++			0x20, 0x4c, 0x5c, 0x4f, 0xaf, 0x56, 0xc7, 0xc3,
++		},
++	},
++	{
++		.data_len = 3333,
++		.digest = {
++			0x61, 0xb1, 0xb1, 0x3e, 0x0e, 0x7e, 0x90, 0x3d,
++			0x31, 0x54, 0xbd, 0xc9, 0x0d, 0x53, 0x62, 0xf1,
++			0xcd, 0x18, 0x80, 0xf9, 0x91, 0x75, 0x41, 0xb3,
++			0x51, 0x39, 0x57, 0xa7, 0xa8, 0x1e, 0xfb, 0xc9,
++		},
++	},
++	{
++		.data_len = 4096,
++		.digest = {
++			0xab, 0x29, 0xda, 0x10, 0xc4, 0x11, 0x2d, 0x5c,
++			0xd1, 0xce, 0x1c, 0x95, 0xfa, 0xc6, 0xc7, 0xb0,
++			0x1b, 0xd1, 0xdc, 0x6f, 0xa0, 0x9d, 0x1b, 0x23,
++			0xfb, 0x6e, 0x90, 0x97, 0xd0, 0x75, 0x44, 0x7a,
++		},
++	},
++	{
++		.data_len = 4128,
++		.digest = {
++			0x02, 0x45, 0x95, 0xf4, 0x19, 0xb5, 0x93, 0x29,
++			0x90, 0xf2, 0x63, 0x3f, 0x89, 0xe8, 0xa5, 0x31,
++			0x76, 0xf2, 0x89, 0x79, 0x66, 0xd3, 0x96, 0xdf,
++			0x33, 0xd1, 0xa6, 0x17, 0x73, 0xb1, 0xd0, 0x45,
++		},
++	},
++	{
++		.data_len = 4160,
++		.digest = {
++			0xd1, 0x8e, 0x22, 0xea, 0x44, 0x87, 0x6e, 0x9d,
++			0xfb, 0x36, 0x02, 0x20, 0x63, 0xb7, 0x69, 0x45,
++			0x25, 0x41, 0x69, 0xe0, 0x9b, 0x87, 0xcf, 0xa3,
++			0x51, 0xbb, 0xfc, 0x8d, 0xf7, 0x29, 0xa7, 0xea,
++		},
++	},
++	{
++		.data_len = 4224,
++		.digest = {
++			0x11, 0x86, 0x7d, 0x84, 0xf9, 0x8c, 0x6e, 0xc4,
++			0x64, 0x36, 0xc6, 0xf3, 0x42, 0x92, 0x31, 0x2b,
++			0x1e, 0x12, 0xe6, 0x4d, 0xbe, 0xfa, 0x77, 0x3f,
++			0x89, 0x41, 0x33, 0x58, 0x1c, 0x98, 0x16, 0x0a,
++		},
++	},
++	{
++		.data_len = 16384,
++		.digest = {
++			0xb2, 0xba, 0x0c, 0x8c, 0x9d, 0xbb, 0x1e, 0xb0,
++			0x03, 0xb5, 0xdf, 0x4f, 0xf5, 0x35, 0xdb, 0xec,
++			0x60, 0xf2, 0x5b, 0xb6, 0xd0, 0x49, 0xd3, 0xed,
++			0x55, 0xc0, 0x7a, 0xd7, 0xaf, 0xa1, 0xea, 0x53,
++		},
++	},
++};
++
++static const u8 hash_testvec_consolidated[SHA3_256_DIGEST_SIZE] = {
++	0x3b, 0x33, 0x67, 0xf8, 0xea, 0x92, 0x78, 0x62,
++	0xdd, 0xbe, 0x72, 0x15, 0xbd, 0x6f, 0xfa, 0xe5,
++	0x5e, 0xab, 0x9f, 0xb1, 0xe4, 0x23, 0x7c, 0x2c,
++	0x80, 0xcf, 0x09, 0x75, 0xf8, 0xe2, 0xfa, 0x30,
++};
+diff --git a/lib/crypto/tests/sha3_kunit.c b/lib/crypto/tests/sha3_kunit.c
+new file mode 100644
+index 0000000000000..c267984c4aff1
+--- /dev/null
++++ b/lib/crypto/tests/sha3_kunit.c
+@@ -0,0 +1,344 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * SHA-3, as specified in
-+ * https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
-+ *
-+ * SHA-3 code by Jeff Garzik <jeff@garzik.org>
-+ *               Ard Biesheuvel <ard.biesheuvel@linaro.org>
-+ *               David Howells <dhowells@redhat.com>
-+ *
-+ * See also Documentation/crypto/sha3.rst
++ * Copyright (C) 2025 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
 + */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +#include <crypto/sha3.h>
-+#include <crypto/utils.h>
-+#include <linux/export.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/unaligned.h>
++#include "sha3-testvecs.h"
++
++#define HASH		sha3_256
++#define HASH_CTX	sha3_ctx
++#define HASH_SIZE	SHA3_256_DIGEST_SIZE
++#define HASH_INIT	sha3_256_init
++#define HASH_UPDATE	sha3_update
++#define HASH_FINAL	sha3_final
++#include "hash-test-template.h"
 +
 +/*
-+ * On some 32-bit architectures, such as h8300, GCC ends up using over 1 KB of
-+ * stack if the round calculation gets inlined into the loop in
-+ * sha3_keccakf_generic().  On the other hand, on 64-bit architectures with
-+ * plenty of [64-bit wide] general purpose registers, not inlining it severely
-+ * hurts performance.  So let's use 64-bitness as a heuristic to decide whether
-+ * to inline or not.
++ * Sample message and the output generated for various algorithms by passing it
++ * into "openssl sha3-224" etc..
 + */
-+#ifdef CONFIG_64BIT
-+#define SHA3_INLINE inline
-+#else
-+#define SHA3_INLINE noinline
-+#endif
++static const u8 test_sha3_sample[] =
++	"The quick red fox jumped over the lazy brown dog!\n"
++	"The quick red fox jumped over the lazy brown dog!\n"
++	"The quick red fox jumped over the lazy brown dog!\n"
++	"The quick red fox jumped over the lazy brown dog!\n";
 +
-+#define SHA3_KECCAK_ROUNDS 24
-+
-+static const u64 sha3_keccakf_rndc[SHA3_KECCAK_ROUNDS] = {
-+	0x0000000000000001ULL, 0x0000000000008082ULL, 0x800000000000808aULL,
-+	0x8000000080008000ULL, 0x000000000000808bULL, 0x0000000080000001ULL,
-+	0x8000000080008081ULL, 0x8000000000008009ULL, 0x000000000000008aULL,
-+	0x0000000000000088ULL, 0x0000000080008009ULL, 0x000000008000000aULL,
-+	0x000000008000808bULL, 0x800000000000008bULL, 0x8000000000008089ULL,
-+	0x8000000000008003ULL, 0x8000000000008002ULL, 0x8000000000000080ULL,
-+	0x000000000000800aULL, 0x800000008000000aULL, 0x8000000080008081ULL,
-+	0x8000000000008080ULL, 0x0000000080000001ULL, 0x8000000080008008ULL
++static const u8 test_sha3_224[8 + SHA3_224_DIGEST_SIZE + 8] = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
++	0xd6, 0xe8, 0xd8, 0x80, 0xfa, 0x42, 0x80, 0x70,
++	0x7e, 0x7f, 0xd7, 0xd2, 0xd7, 0x7a, 0x35, 0x65,
++	0xf0, 0x0b, 0x4f, 0x9f, 0x2a, 0x33, 0xca, 0x0a,
++	0xef, 0xa6, 0x4c, 0xb8,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
 +};
 +
++static const u8 test_sha3_256[8 + SHA3_256_DIGEST_SIZE + 8] = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
++	0xdb, 0x3b, 0xb0, 0xb8, 0x8d, 0x15, 0x78, 0xe5,
++	0x78, 0x76, 0x8e, 0x39, 0x7e, 0x89, 0x86, 0xb9,
++	0x14, 0x3a, 0x1e, 0xe7, 0x96, 0x7c, 0xf3, 0x25,
++	0x70, 0xbd, 0xc3, 0xa9, 0xae, 0x63, 0x71, 0x1d,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
++};
++
++static const u8 test_sha3_384[8 + SHA3_384_DIGEST_SIZE + 8] = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
++	0x2d, 0x4b, 0x29, 0x85, 0x19, 0x94, 0xaa, 0x31,
++	0x9b, 0x04, 0x9d, 0x6e, 0x79, 0x66, 0xc7, 0x56,
++	0x8a, 0x2e, 0x99, 0x84, 0x06, 0xcf, 0x10, 0x2d,
++	0xec, 0xf0, 0x03, 0x04, 0x1f, 0xd5, 0x99, 0x63,
++	0x2f, 0xc3, 0x2b, 0x0d, 0xd9, 0x45, 0xf7, 0xbb,
++	0x0a, 0xc3, 0x46, 0xab, 0xfe, 0x4d, 0x94, 0xc2,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
++};
++
++static const u8 test_sha3_512[8 + SHA3_512_DIGEST_SIZE + 8] = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
++	0xdd, 0x71, 0x3b, 0x44, 0xb6, 0x6c, 0xd7, 0x78,
++	0xe7, 0x93, 0xa1, 0x4c, 0xd7, 0x24, 0x16, 0xf1,
++	0xfd, 0xa2, 0x82, 0x4e, 0xed, 0x59, 0xe9, 0x83,
++	0x15, 0x38, 0x89, 0x7d, 0x39, 0x17, 0x0c, 0xb2,
++	0xcf, 0x12, 0x80, 0x78, 0xa1, 0x78, 0x41, 0xeb,
++	0xed, 0x21, 0x4c, 0xa4, 0x4a, 0x5f, 0x30, 0x1a,
++	0x70, 0x98, 0x4f, 0x14, 0xa2, 0xd1, 0x64, 0x1b,
++	0xc2, 0x0a, 0xff, 0x3b, 0xe8, 0x26, 0x41, 0x8f,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
++};
++
++static const u8 test_shake128[8 + SHAKE128_DEFAULT_SIZE + 8] = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
++	0x41, 0xd6, 0xb8, 0x9c, 0xf8, 0xe8, 0x54, 0xf2,
++	0x5c, 0xde, 0x51, 0x12, 0xaf, 0x9e, 0x0d, 0x91,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
++};
++
++static const u8 test_shake256[8 + SHAKE256_DEFAULT_SIZE + 8] = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-before guard */
++	0xab, 0x06, 0xd4, 0xf9, 0x8b, 0xfd, 0xb2, 0xc4,
++	0xfe, 0xf1, 0xcc, 0xe2, 0x40, 0x45, 0xdd, 0x15,
++	0xcb, 0xdd, 0x02, 0x8d, 0xb7, 0x9f, 0x1e, 0x67,
++	0xd6, 0x7f, 0x98, 0x5e, 0x1b, 0x19, 0xf8, 0x01,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Write-after guard */
++};
++
++static void test_sha3_224_basic(struct kunit *test)
++{
++	u8 out[8 + SHA3_224_DIGEST_SIZE + 8];
++
++	BUILD_BUG_ON(sizeof(out) != sizeof(test_sha3_224));
++
++	memset(out, 0, sizeof(out));
++	sha3_224(test_sha3_sample, sizeof(test_sha3_sample) - 1, out + 8);
++
++	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_sha3_224, sizeof(test_sha3_224),
++			       "SHA3-224 gives wrong output");
++}
++
++static void test_sha3_256_basic(struct kunit *test)
++{
++	u8 out[8 + SHA3_256_DIGEST_SIZE + 8];
++
++	BUILD_BUG_ON(sizeof(out) != sizeof(test_sha3_256));
++
++	memset(out, 0, sizeof(out));
++	sha3_256(test_sha3_sample, sizeof(test_sha3_sample) - 1, out + 8);
++
++	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_sha3_256, sizeof(test_sha3_256),
++			       "SHA3-256 gives wrong output");
++}
++
++static void test_sha3_384_basic(struct kunit *test)
++{
++	u8 out[8 + SHA3_384_DIGEST_SIZE + 8];
++
++	BUILD_BUG_ON(sizeof(out) != sizeof(test_sha3_384));
++
++	memset(out, 0, sizeof(out));
++	sha3_384(test_sha3_sample, sizeof(test_sha3_sample) - 1, out + 8);
++
++	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_sha3_384, sizeof(test_sha3_384),
++			       "SHA3-384 gives wrong output");
++}
++
++static void test_sha3_512_basic(struct kunit *test)
++{
++	u8 out[8 + SHA3_512_DIGEST_SIZE + 8];
++
++	BUILD_BUG_ON(sizeof(out) != sizeof(test_sha3_512));
++
++	memset(out, 0, sizeof(out));
++	sha3_512(test_sha3_sample, sizeof(test_sha3_sample) - 1, out + 8);
++
++	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_sha3_512, sizeof(test_sha3_512),
++			       "SHA3-512 gives wrong output");
++}
++
++static void test_shake128_basic(struct kunit *test)
++{
++	u8 out[8 + SHAKE128_DEFAULT_SIZE + 8];
++
++	BUILD_BUG_ON(sizeof(out) != sizeof(test_shake128));
++
++	memset(out, 0, sizeof(out));
++	shake128(test_sha3_sample, sizeof(test_sha3_sample) - 1,
++		 out + 8, sizeof(out) - 16);
++
++	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake128, sizeof(test_shake128),
++			       "SHAKE128 gives wrong output");
++}
++
++static void test_shake256_basic(struct kunit *test)
++{
++	u8 out[8 + SHAKE256_DEFAULT_SIZE + 8];
++
++	BUILD_BUG_ON(sizeof(out) != sizeof(test_shake256));
++
++	memset(out, 0, sizeof(out));
++	shake256(test_sha3_sample, sizeof(test_sha3_sample) - 1,
++		 out + 8, sizeof(out) - 16);
++
++	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake256, sizeof(test_shake256),
++			       "SHAKE256 gives wrong output");
++}
++
 +/*
-+ * Perform a single round of Keccak mixing.
++ * Usable NIST tests.
++ *
++ * From: https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines/example-values
 + */
-+static SHA3_INLINE void sha3_keccakf_one_round_generic(u64 st[25])
++static const u8 test_nist_1600_sample[] = {
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3,
++	0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3, 0xa3
++};
++
++static const u8 test_shake128_nist_0[] = {
++	0x7f, 0x9c, 0x2b, 0xa4, 0xe8, 0x8f, 0x82, 0x7d,
++	0x61, 0x60, 0x45, 0x50, 0x76, 0x05, 0x85, 0x3e
++};
++
++static const u8 test_shake128_nist_1600[] = {
++	0x13, 0x1a, 0xb8, 0xd2, 0xb5, 0x94, 0x94, 0x6b,
++	0x9c, 0x81, 0x33, 0x3f, 0x9b, 0xb6, 0xe0, 0xce,
++};
++
++static const u8 test_shake256_nist_0[] = {
++	0x46, 0xb9, 0xdd, 0x2b, 0x0b, 0xa8, 0x8d, 0x13,
++	0x23, 0x3b, 0x3f, 0xeb, 0x74, 0x3e, 0xeb, 0x24,
++	0x3f, 0xcd, 0x52, 0xea, 0x62, 0xb8, 0x1b, 0x82,
++	0xb5, 0x0c, 0x27, 0x64, 0x6e, 0xd5, 0x76, 0x2f
++};
++
++static const u8 test_shake256_nist_1600[] = {
++	0xcd, 0x8a, 0x92, 0x0e, 0xd1, 0x41, 0xaa, 0x04,
++	0x07, 0xa2, 0x2d, 0x59, 0x28, 0x86, 0x52, 0xe9,
++	0xd9, 0xf1, 0xa7, 0xee, 0x0c, 0x1e, 0x7c, 0x1c,
++	0xa6, 0x99, 0x42, 0x4d, 0xa8, 0x4a, 0x90, 0x4d,
++};
++
++static void test_shake128_nist(struct kunit *test)
 +{
-+	u64 t[5], tt, bc[5];
++	u8 out[SHAKE128_DEFAULT_SIZE];
 +
-+	/* Theta */
-+	bc[0] = st[0] ^ st[5] ^ st[10] ^ st[15] ^ st[20];
-+	bc[1] = st[1] ^ st[6] ^ st[11] ^ st[16] ^ st[21];
-+	bc[2] = st[2] ^ st[7] ^ st[12] ^ st[17] ^ st[22];
-+	bc[3] = st[3] ^ st[8] ^ st[13] ^ st[18] ^ st[23];
-+	bc[4] = st[4] ^ st[9] ^ st[14] ^ st[19] ^ st[24];
++	shake128("", 0, out, sizeof(out));
++	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake128_nist_0, sizeof(out),
++			       "SHAKE128 gives wrong output for NIST.0");
 +
-+	t[0] = bc[4] ^ rol64(bc[1], 1);
-+	t[1] = bc[0] ^ rol64(bc[2], 1);
-+	t[2] = bc[1] ^ rol64(bc[3], 1);
-+	t[3] = bc[2] ^ rol64(bc[4], 1);
-+	t[4] = bc[3] ^ rol64(bc[0], 1);
-+
-+	st[0] ^= t[0];
-+
-+	/* Rho Pi */
-+	tt = st[1];
-+	st[ 1] = rol64(st[ 6] ^ t[1], 44);
-+	st[ 6] = rol64(st[ 9] ^ t[4], 20);
-+	st[ 9] = rol64(st[22] ^ t[2], 61);
-+	st[22] = rol64(st[14] ^ t[4], 39);
-+	st[14] = rol64(st[20] ^ t[0], 18);
-+	st[20] = rol64(st[ 2] ^ t[2], 62);
-+	st[ 2] = rol64(st[12] ^ t[2], 43);
-+	st[12] = rol64(st[13] ^ t[3], 25);
-+	st[13] = rol64(st[19] ^ t[4],  8);
-+	st[19] = rol64(st[23] ^ t[3], 56);
-+	st[23] = rol64(st[15] ^ t[0], 41);
-+	st[15] = rol64(st[ 4] ^ t[4], 27);
-+	st[ 4] = rol64(st[24] ^ t[4], 14);
-+	st[24] = rol64(st[21] ^ t[1],  2);
-+	st[21] = rol64(st[ 8] ^ t[3], 55);
-+	st[ 8] = rol64(st[16] ^ t[1], 45);
-+	st[16] = rol64(st[ 5] ^ t[0], 36);
-+	st[ 5] = rol64(st[ 3] ^ t[3], 28);
-+	st[ 3] = rol64(st[18] ^ t[3], 21);
-+	st[18] = rol64(st[17] ^ t[2], 15);
-+	st[17] = rol64(st[11] ^ t[1], 10);
-+	st[11] = rol64(st[ 7] ^ t[2],  6);
-+	st[ 7] = rol64(st[10] ^ t[0],  3);
-+	st[10] = rol64(    tt ^ t[1],  1);
-+
-+	/* Chi */
-+	bc[ 0] = ~st[ 1] & st[ 2];
-+	bc[ 1] = ~st[ 2] & st[ 3];
-+	bc[ 2] = ~st[ 3] & st[ 4];
-+	bc[ 3] = ~st[ 4] & st[ 0];
-+	bc[ 4] = ~st[ 0] & st[ 1];
-+	st[ 0] ^= bc[ 0];
-+	st[ 1] ^= bc[ 1];
-+	st[ 2] ^= bc[ 2];
-+	st[ 3] ^= bc[ 3];
-+	st[ 4] ^= bc[ 4];
-+
-+	bc[ 0] = ~st[ 6] & st[ 7];
-+	bc[ 1] = ~st[ 7] & st[ 8];
-+	bc[ 2] = ~st[ 8] & st[ 9];
-+	bc[ 3] = ~st[ 9] & st[ 5];
-+	bc[ 4] = ~st[ 5] & st[ 6];
-+	st[ 5] ^= bc[ 0];
-+	st[ 6] ^= bc[ 1];
-+	st[ 7] ^= bc[ 2];
-+	st[ 8] ^= bc[ 3];
-+	st[ 9] ^= bc[ 4];
-+
-+	bc[ 0] = ~st[11] & st[12];
-+	bc[ 1] = ~st[12] & st[13];
-+	bc[ 2] = ~st[13] & st[14];
-+	bc[ 3] = ~st[14] & st[10];
-+	bc[ 4] = ~st[10] & st[11];
-+	st[10] ^= bc[ 0];
-+	st[11] ^= bc[ 1];
-+	st[12] ^= bc[ 2];
-+	st[13] ^= bc[ 3];
-+	st[14] ^= bc[ 4];
-+
-+	bc[ 0] = ~st[16] & st[17];
-+	bc[ 1] = ~st[17] & st[18];
-+	bc[ 2] = ~st[18] & st[19];
-+	bc[ 3] = ~st[19] & st[15];
-+	bc[ 4] = ~st[15] & st[16];
-+	st[15] ^= bc[ 0];
-+	st[16] ^= bc[ 1];
-+	st[17] ^= bc[ 2];
-+	st[18] ^= bc[ 3];
-+	st[19] ^= bc[ 4];
-+
-+	bc[ 0] = ~st[21] & st[22];
-+	bc[ 1] = ~st[22] & st[23];
-+	bc[ 2] = ~st[23] & st[24];
-+	bc[ 3] = ~st[24] & st[20];
-+	bc[ 4] = ~st[20] & st[21];
-+	st[20] ^= bc[ 0];
-+	st[21] ^= bc[ 1];
-+	st[22] ^= bc[ 2];
-+	st[23] ^= bc[ 3];
-+	st[24] ^= bc[ 4];
++	shake128(test_nist_1600_sample, sizeof(test_nist_1600_sample),
++		 out, sizeof(out));
++	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake128_nist_1600, sizeof(out),
++			       "SHAKE128 gives wrong output for NIST.1600");
 +}
 +
-+/* Generic implementation of the Keccak-f[1600] permutation */
-+static void sha3_keccakf_generic(struct sha3_state *state)
++static void test_shake256_nist(struct kunit *test)
 +{
-+	/*
-+	 * Temporarily convert the state words from little-endian to native-
-+	 * endian so that they can be operated on.  Note that on little-endian
-+	 * machines this conversion is a no-op and is optimized out.
-+	 */
++	u8 out[SHAKE256_DEFAULT_SIZE];
 +
-+	for (int i = 0; i < ARRAY_SIZE(state->words); i++)
-+		state->native_words[i] = le64_to_cpu(state->words[i]);
++	shake256("", 0, out, sizeof(out));
++	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake256_nist_0, sizeof(out),
++			       "SHAKE256 gives wrong output for NIST.0");
 +
-+	for (int round = 0; round < SHA3_KECCAK_ROUNDS; round++) {
-+		sha3_keccakf_one_round_generic(state->native_words);
-+		/* Iota */
-+		state->native_words[0] ^= sha3_keccakf_rndc[round];
-+	}
-+
-+	for (int i = 0; i < ARRAY_SIZE(state->words); i++)
-+		state->words[i] = cpu_to_le64(state->native_words[i]);
++	shake256(test_nist_1600_sample, sizeof(test_nist_1600_sample),
++		 out, sizeof(out));
++	KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake256_nist_1600, sizeof(out),
++			       "SHAKE256 gives wrong output for NIST.1600");
 +}
 +
 +/*
-+ * Generic implementation of absorbing the given nonzero number of full blocks
-+ * into the sponge function Keccak[r=8*block_size, c=1600-8*block_size].
++ * Output tiling test of SHAKE256; equal output tiles barring the last.  A
++ * series of squeezings of the same context should, if laid end-to-end, match a
++ * single squeezing of the combined size.
 + */
-+static void __maybe_unused
-+sha3_absorb_blocks_generic(struct sha3_state *state, const u8 *data,
-+			   size_t nblocks, size_t block_size)
++static void test_shake256_tiling(struct kunit *test)
 +{
-+	do {
-+		for (size_t i = 0; i < block_size; i += 8)
-+			state->words[i / 8] ^= get_unaligned((__le64 *)&data[i]);
-+		sha3_keccakf_generic(state);
-+		data += block_size;
-+	} while (--nblocks);
-+}
++	struct shake_ctx ctx;
++	u8 out[8 + SHA3_512_DIGEST_SIZE + 8];
 +
-+#ifdef CONFIG_CRYPTO_LIB_SHA3_ARCH
-+#include "sha3.h" /* $(SRCARCH)/sha3.h */
-+#else
-+#define sha3_keccakf		sha3_keccakf_generic
-+#define sha3_absorb_blocks	sha3_absorb_blocks_generic
-+#endif
++	for (int tile_size = 1; tile_size < SHAKE256_DEFAULT_SIZE; tile_size++) {
++		int left = SHAKE256_DEFAULT_SIZE;
++		u8 *p = out + 8;
 +
-+void __sha3_update(struct __sha3_ctx *ctx, const u8 *in, size_t in_len)
-+{
-+	const size_t block_size = ctx->block_size;
-+	size_t absorb_offset = ctx->absorb_offset;
++		memset(out, 0, sizeof(out));
++		shake256_init(&ctx);
++		shake_update(&ctx, test_sha3_sample,
++			     sizeof(test_sha3_sample) - 1);
++		while (left > 0) {
++			int part = umin(tile_size, left);
 +
-+	/* Warn if squeezing has already begun. */
-+	WARN_ON_ONCE(absorb_offset >= block_size);
-+
-+	if (absorb_offset && absorb_offset + in_len >= block_size) {
-+		crypto_xor(&ctx->state.bytes[absorb_offset], in,
-+			   block_size - absorb_offset);
-+		in += block_size - absorb_offset;
-+		in_len -= block_size - absorb_offset;
-+		sha3_keccakf(&ctx->state);
-+		absorb_offset = 0;
-+	}
-+
-+	if (in_len >= block_size) {
-+		size_t nblocks = in_len / block_size;
-+
-+		sha3_absorb_blocks(&ctx->state, in, nblocks, block_size);
-+		in += nblocks * block_size;
-+		in_len -= nblocks * block_size;
-+	}
-+
-+	if (in_len) {
-+		crypto_xor(&ctx->state.bytes[absorb_offset], in, in_len);
-+		absorb_offset += in_len;
-+	}
-+	ctx->absorb_offset = absorb_offset;
-+}
-+EXPORT_SYMBOL_GPL(__sha3_update);
-+
-+void sha3_final(struct sha3_ctx *sha3_ctx, u8 *out)
-+{
-+	struct __sha3_ctx *ctx = &sha3_ctx->ctx;
-+
-+	ctx->state.bytes[ctx->absorb_offset] ^= 0x06;
-+	ctx->state.bytes[ctx->block_size - 1] ^= 0x80;
-+	sha3_keccakf(&ctx->state);
-+	memcpy(out, ctx->state.bytes, ctx->digest_size);
-+	sha3_zeroize_ctx(sha3_ctx);
-+}
-+EXPORT_SYMBOL_GPL(sha3_final);
-+
-+void shake_squeeze(struct shake_ctx *shake_ctx, u8 *out, size_t out_len)
-+{
-+	struct __sha3_ctx *ctx = &shake_ctx->ctx;
-+	const size_t block_size = ctx->block_size;
-+	size_t squeeze_offset = ctx->squeeze_offset;
-+
-+	if (ctx->absorb_offset < block_size) {
-+		/* First squeeze: */
-+
-+		/* Add the domain separation suffix and padding. */
-+		ctx->state.bytes[ctx->absorb_offset] ^= 0x1f;
-+		ctx->state.bytes[block_size - 1] ^= 0x80;
-+
-+		/* Indicate that squeezing has begun. */
-+		ctx->absorb_offset = block_size;
-+
-+		/*
-+		 * Indicate that no output is pending yet, i.e. sha3_keccakf()
-+		 * will need to be called before the first copy.
-+		 */
-+		squeeze_offset = block_size;
-+	}
-+	while (out_len) {
-+		if (squeeze_offset == block_size) {
-+			sha3_keccakf(&ctx->state);
-+			squeeze_offset = 0;
++			shake_squeeze(&ctx, p, part);
++			p += part;
++			left -= part;
 +		}
-+		size_t copy = min(out_len, block_size - squeeze_offset);
 +
-+		memcpy(out, &ctx->state.bytes[squeeze_offset], copy);
-+		out += copy;
-+		out_len -= copy;
-+		squeeze_offset += copy;
++		KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake256, sizeof(test_shake256),
++				       "SHAKE tile %u gives wrong output", tile_size);
 +	}
-+	ctx->squeeze_offset = squeeze_offset;
 +}
-+EXPORT_SYMBOL_GPL(shake_squeeze);
 +
-+void sha3_224(const u8 *in, size_t in_len, u8 out[SHA3_224_DIGEST_SIZE])
-+{
-+	struct sha3_ctx ctx;
-+
-+	sha3_224_init(&ctx);
-+	sha3_update(&ctx, in, in_len);
-+	sha3_final(&ctx, out);
-+}
-+EXPORT_SYMBOL_GPL(sha3_224);
-+
-+void sha3_256(const u8 *in, size_t in_len, u8 out[SHA3_256_DIGEST_SIZE])
-+{
-+	struct sha3_ctx ctx;
-+
-+	sha3_256_init(&ctx);
-+	sha3_update(&ctx, in, in_len);
-+	sha3_final(&ctx, out);
-+}
-+EXPORT_SYMBOL_GPL(sha3_256);
-+
-+void sha3_384(const u8 *in, size_t in_len, u8 out[SHA3_384_DIGEST_SIZE])
-+{
-+	struct sha3_ctx ctx;
-+
-+	sha3_384_init(&ctx);
-+	sha3_update(&ctx, in, in_len);
-+	sha3_final(&ctx, out);
-+}
-+EXPORT_SYMBOL_GPL(sha3_384);
-+
-+void sha3_512(const u8 *in, size_t in_len, u8 out[SHA3_512_DIGEST_SIZE])
-+{
-+	struct sha3_ctx ctx;
-+
-+	sha3_512_init(&ctx);
-+	sha3_update(&ctx, in, in_len);
-+	sha3_final(&ctx, out);
-+}
-+EXPORT_SYMBOL_GPL(sha3_512);
-+
-+void shake128(const u8 *in, size_t in_len, u8 *out, size_t out_len)
++/*
++ * Output tiling test of SHAKE256; output tiles getting gradually smaller and
++ * then cycling round to medium sized ones.  A series of squeezings of the same
++ * context should, if laid end-to-end, match a single squeezing of the combined
++ * size.
++ */
++static void test_shake256_tiling2(struct kunit *test)
 +{
 +	struct shake_ctx ctx;
++	u8 out[8 + SHA3_512_DIGEST_SIZE + 8];
 +
-+	shake128_init(&ctx);
-+	shake_update(&ctx, in, in_len);
-+	shake_squeeze(&ctx, out, out_len);
-+	shake_zeroize_ctx(&ctx);
++	for (int first_tile_size = 3;
++	     first_tile_size < SHAKE256_DEFAULT_SIZE;
++	     first_tile_size++) {
++		int tile_size = first_tile_size;
++		int left = SHAKE256_DEFAULT_SIZE;
++		u8 *p = out + 8;
++
++		memset(out, 0, sizeof(out));
++		shake256_init(&ctx);
++		shake_update(&ctx, test_sha3_sample,
++			     sizeof(test_sha3_sample) - 1);
++		while (left > 0) {
++			int part = umin(tile_size, left);
++
++			shake_squeeze(&ctx, p, part);
++			p += part;
++			left -= part;
++			tile_size--;
++			if (tile_size < 1)
++				tile_size = 5;
++		}
++
++		KUNIT_ASSERT_MEMEQ_MSG(test, out, test_shake256, sizeof(test_shake256),
++				       "SHAKE tile %u gives wrong output", tile_size);
++	}
 +}
-+EXPORT_SYMBOL_GPL(shake128);
 +
-+void shake256(const u8 *in, size_t in_len, u8 *out, size_t out_len)
-+{
-+	struct shake_ctx ctx;
++static struct kunit_case sha3_test_cases[] = {
++	HASH_KUNIT_CASES,
++	KUNIT_CASE(test_sha3_224_basic),
++	KUNIT_CASE(test_sha3_256_basic),
++	KUNIT_CASE(test_sha3_384_basic),
++	KUNIT_CASE(test_sha3_512_basic),
++	KUNIT_CASE(test_shake128_basic),
++	KUNIT_CASE(test_shake256_basic),
++	KUNIT_CASE(test_shake128_nist),
++	KUNIT_CASE(test_shake256_nist),
++	KUNIT_CASE(test_shake256_tiling),
++	KUNIT_CASE(test_shake256_tiling2),
++	KUNIT_CASE(benchmark_hash),
++	{},
++};
 +
-+	shake256_init(&ctx);
-+	shake_update(&ctx, in, in_len);
-+	shake_squeeze(&ctx, out, out_len);
-+	shake_zeroize_ctx(&ctx);
-+}
-+EXPORT_SYMBOL_GPL(shake256);
++static struct kunit_suite sha3_test_suite = {
++	.name = "sha3",
++	.test_cases = sha3_test_cases,
++	.suite_init = hash_suite_init,
++	.suite_exit = hash_suite_exit,
++};
++kunit_test_suite(sha3_test_suite);
 +
-+#ifdef sha3_mod_init_arch
-+static int __init sha3_mod_init(void)
-+{
-+	sha3_mod_init_arch();
-+	return 0;
-+}
-+subsys_initcall(sha3_mod_init);
-+
-+static void __exit sha3_mod_exit(void)
-+{
-+}
-+module_exit(sha3_mod_exit);
-+#endif
-+
++MODULE_DESCRIPTION("KUnit tests and benchmark for SHA3");
 +MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("SHA-3 library functions");
+diff --git a/scripts/crypto/gen-hash-testvecs.py b/scripts/crypto/gen-hash-testvecs.py
+index c5b7985fe7280..47f79602e2903 100755
+--- a/scripts/crypto/gen-hash-testvecs.py
++++ b/scripts/crypto/gen-hash-testvecs.py
+@@ -85,11 +85,11 @@ def print_c_struct_u8_array_field(name, value):
+     print('\t\t},')
+ 
+ def alg_digest_size_const(alg):
+     if alg.startswith('blake2'):
+         return f'{alg.upper()}_HASH_SIZE'
+-    return f'{alg.upper()}_DIGEST_SIZE'
++    return f'{alg.upper().replace('-', '_')}_DIGEST_SIZE'
+ 
+ def gen_unkeyed_testvecs(alg):
+     print('')
+     print('static const struct {')
+     print('\tsize_t data_len;')
+@@ -165,7 +165,9 @@ print(f'/* This file was generated by: {sys.argv[0]} {" ".join(sys.argv[1:])} */
+ gen_unkeyed_testvecs(alg)
+ if alg.startswith('blake2'):
+     gen_additional_blake2_testvecs(alg)
+ elif alg == 'poly1305':
+     gen_additional_poly1305_testvecs()
++elif alg.startswith('sha3-'):
++    pass # no HMAC
+ else:
+     gen_hmac_testvecs(alg)
 -- 
 2.51.1.dirty
 
