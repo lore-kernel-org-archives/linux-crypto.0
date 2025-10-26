@@ -1,48 +1,48 @@
 Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B24123EAA1;
-	Sun, 26 Oct 2025 15:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794312222A0;
+	Sun, 26 Oct 2025 15:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761491416; cv=none; b=dDUHbuLkwPw5WLZxJCHmXJYclUBpFv/XXGL3C6KkhEF+ibV7RiNtU33/TAZaUXBnvwxiVCKk/gmEuVFWN4UEJ4Es9WJb3opFEAD5yTzpERtwljmt0/m49ugavxWjPh/h21yywDJMbSCYJhYoeUUFrIKmt+dOgD7XplaSdgtlE/0=
+	t=1761491417; cv=none; b=kD//FMyh8lrULK5PA5S8QiyFzMYsVunaBjKAFgn6DF3C4kqT8rOPuSm+1pO0jDn6+OcWNGVjBByoYok7JbCUKuQDss9x3Ao+nClCODZMRphjIFje21HhbLTyWVe94RTFcW3a4r1PLSpmCe7hwo1skt6/sgkXlLMPW+0owPcw7K0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761491416; c=relaxed/simple;
-	bh=I0dutvfOc7MKonU1TIVeo+x96iiiqgZS4/bMFRsDqNc=;
+	s=arc-20240116; t=1761491417; c=relaxed/simple;
+	bh=eiV6oY/k7TETOu20d0DAv8pa/sFilaQObvLud8dD8IE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i7ru/AOmw5w+IUVmNIw5bQuPCQirOpQkuv63uF1K9Sg97DnmPnwq/nKviqjNV84oDqFyYXKFVWobBNY8ER0Yvc4DoOhgzGzx0thZiltOc8+++P+Tf8b/Cx6W5zgokbq8SaH//I4KZ4t5IGem62z17yv9VLP2iq/mkMPfVK6dSsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=eaLlhUB2; arc=none smtp.client-ip=67.231.148.174
+	 MIME-Version:Content-Type; b=Ypke//3xwfzWaZd8Aa6Yj11MHbw4uMzgsUkDkcgezThaZaNa1j79LIw/jx27wkuGIgkMB8BEa0gFt4zpLQAFdrnhmX4H3i62zirdrynv6zSK/JPx7HmD3ZFKoVmiZM4GfxqlfmQ8iNwc8UOK3GkAS/PNB7Tup5Z592uK0PgPBbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ZxvHC6fp; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="eaLlhUB2"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ZxvHC6fp"
 Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59QBTSIS3498971;
-	Sun, 26 Oct 2025 08:10:07 -0700
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59QBxKeS3550872;
+	Sun, 26 Oct 2025 08:10:10 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=N
-	VruE+igw6iz66u9Xm3S2FkR5oPHFzXrLe+O6tXkKbk=; b=eaLlhUB2fN11prgDn
-	vw1ImgEtBvg1mICrAFfcRs6yuKdgaJEsx5dDSr8NEwI70FTZgnBVtn7typlbMR15
-	dL/U3gBGXpgmQgbplXKeo44UmWL5JqLBTkwXGOCcBI5pZGMyXo1h0KkkI/EjSIeu
-	Dh+WrwASzaSoc9pYkg4fgLQoxLuHf0qB2DVt3GzkK+OcR7MZVykuEXHyMgtfaYSx
-	rSg1ccdq+BKSHIcKEY1Pttj+WYEfmvuSYOzuIT9c7UKuT1HfgD8WrkQwtLusfuq0
-	dA4ZXwe/ThRUPGyr0wf9WzQxSUeLHeY9M1Fe/c2P1K1WkyBBec80uUa66vUDie3c
-	n+qsQ==
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=W
+	XUbJ4tZ89Ve9MFoZ17nejrMseA5lssMeWiRu6zuWXk=; b=ZxvHC6fpEYvAs6aRr
+	Ifhlz1d+Ya+Yzezc9uksF7i/4SnxBlPYeeE/Js8XdlRx+6mhndzHZ9xqQE1YjUp+
+	IuZxxjlg4LqrxMK5QNSahpT1VnYuYKQ0+5zZwTXnQ2DtL8vepe/dyc2bxaT2HdUq
+	yxWl/RrfyK0QSrOVymKNnGFVxmBRQmmL50KS1DSIsI8f4QEOMV7NtCh8cB54fME3
+	UhBB5Jc0o1TXFHKtpjimw5vmtKSZ3aEYcvo2P5EfYyIIxbUyTrcqfoqiHMmF/qiY
+	AE9p3iFKfE/nvvntbqETcWENsMlFviGR3xVIOPiMjwuwgKmD9M+Ifk0jRnkw/wYe
+	ZArFQ==
 Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4a1jt807uy-20
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4a1jt807v3-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 26 Oct 2025 08:10:07 -0700 (PDT)
+	Sun, 26 Oct 2025 08:10:10 -0700 (PDT)
 Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sun, 26 Oct 2025 08:10:13 -0700
+ 15.2.1544.25; Sun, 26 Oct 2025 08:10:19 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
  (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sun, 26 Oct 2025 08:10:13 -0700
+ Transport; Sun, 26 Oct 2025 08:10:19 -0700
 Received: from optiplex.marvell.com (unknown [10.28.34.253])
-	by maili.marvell.com (Postfix) with ESMTP id 97D3E3F70DF;
-	Sun, 26 Oct 2025 08:10:00 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id E5D5B3F70DE;
+	Sun, 26 Oct 2025 08:10:06 -0700 (PDT)
 From: Tanmay Jagdale <tanmay@marvell.com>
 To: <davem@davemloft.net>, <horms@kernel.org>, <leon@kernel.org>,
         <herbert@gondor.apana.org.au>, <bbhushan2@marvell.com>,
@@ -50,9 +50,9 @@ To: <davem@davemloft.net>, <horms@kernel.org>, <leon@kernel.org>,
 CC: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
         Tanmay Jagdale
 	<tanmay@marvell.com>
-Subject: [PATCH net-next v5 02/15] octeontx2-af: Configure crypto hardware for inline ipsec
-Date: Sun, 26 Oct 2025 20:38:57 +0530
-Message-ID: <20251026150916.352061-3-tanmay@marvell.com>
+Subject: [PATCH net-next v5 04/15] octeontx2-af: Handle inbound inline ipsec config in AF
+Date: Sun, 26 Oct 2025 20:38:59 +0530
+Message-ID: <20251026150916.352061-5-tanmay@marvell.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251026150916.352061-1-tanmay@marvell.com>
 References: <20251026150916.352061-1-tanmay@marvell.com>
@@ -62,36 +62,32 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI2MDE0NSBTYWx0ZWRfX1199SNU8MCql
- 1kjb485LI7KV17KSxEP5mUGSfEjjM9HSKzrFUlJSuocm9/QHUwR0TRb25EW9U5l5/d+lzzEdiLR
- gHTelpsebb2e0Vp+DG5s5xHeRTZSy27q3EsU2MotwOmyJVz+wDYyA6HCONy7PH8gAH5cFZtKsN2
- ZMH+xq+YYC427rlSiaWSK1v/K8Fl+Ii+rdHHrrIeMOprcw2C6B/3H2AeUMinRr9AJyiS3H8Yujc
- UPS/IuVQf2nSnjXbsE7pccE4ZshCaNPGRhdJSw0VZR4Fq/Jx+Fc9dJKSY63Z3QxjALmonV9c94A
- gA73lTzfSilR4UfCnt1xMwmBhv9KBmeiQhk3HYmEdIGX2dnDH4z3Hx1e0lrRE83BrZwB4yY9hJy
- E5i3PQLxPzlbnXnMW8t0/y8YhocVJQ==
-X-Proofpoint-GUID: 1Lw-EPZl-V3_4458pxbPBC5fh7PFr7Bv
-X-Proofpoint-ORIG-GUID: 1Lw-EPZl-V3_4458pxbPBC5fh7PFr7Bv
-X-Authority-Analysis: v=2.4 cv=APHuRV3Y c=1 sm=1 tr=0 ts=68fe39cf cx=c_pps
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI2MDE0NSBTYWx0ZWRfX2r3t/X1MGXOS
+ vcoCKntNWF3L+lb3STjnTgDF6Wg6/8myPkyjA50RAcFE/oY+2X8N9b3NLm+LBrSm7xZD0b1qDBJ
+ 4pLkxhVeR/ZT0iCMKkPu1y+SZVErz8WosHIfbXJsEOHB9Sw5288BI3/HjPPNEpJBpWFydXzc8Vz
+ kp4Zur/bT+UlZKk5qJo/fxRq7Xb4lHBFc9Zu3HfovGFQkdaSGXpue8ADsZ67LzcEyQ/dzK0n3tJ
+ ydaRUFW1koWirMzLGwbRgUd1iI1PMAJ42VDGRgVA+8wDYgFHL9YPVqCXEAZGywqGYS062g7e4EX
+ dqL2TPFIFbaKHFuQWWh6Lf7XGIeCY192EwK+Zws9WyLRV+PdoNCha3gSueXWloP4XDDOmy+Gj3j
+ jxXcOZzpSh5Ap26iX+Yjl87rcYdm2Q==
+X-Proofpoint-GUID: lYrquqRmRyEcC7MfFbWsSH_kBt58mpGL
+X-Proofpoint-ORIG-GUID: lYrquqRmRyEcC7MfFbWsSH_kBt58mpGL
+X-Authority-Analysis: v=2.4 cv=APHuRV3Y c=1 sm=1 tr=0 ts=68fe39d2 cx=c_pps
  a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=-RxuePZmPctaZW0Ih-cA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=0Kg_O47jeEA9tVJa3P4A:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-10-26_06,2025-10-22_01,2025-03-28_01
 
 From: Bharat Bhushan <bbhushan2@marvell.com>
 
-Currently cpt_rx_inline_lf_cfg mailbox is handled by CPT PF
-driver to configures inbound inline ipsec. Ideally inbound
-inline ipsec configuration should be done by AF driver.
-
-This patch adds support to allocate, attach and initialize
-a cptlf from AF. It also configures NIX to send CPT instruction
-if the packet needs inline ipsec processing and configures
-CPT LF to handle inline inbound instruction received from NIX.
+Now CPT context flush can be handled in AF as CPT LF
+can be attached to it. With that AF driver can completely
+handle inbound inline ipsec configuration mailbox, so
+forward this mailbox to AF driver and remove all the
+related code from CPT driver.
 
 Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
 Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
@@ -99,865 +95,719 @@ Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
 Changes in V5:
 - None
 
-Changes in V4:
+Changes in v4:
 - None
 
 Changes in V3:
 - None
 
 Changes in V2:
-- Used GENMASK and FIELD_PREP macros
-- Fixed compiler warning for unused function rvu_mbox_handler_cpt_rx_inline_lf_cfg
+- RCT order definition
+- Squashed patch 05/15 from v1 to avoid unused function warning
 
-V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-3-tanmay@marvell.com/
-V2 Link: https://lore.kernel.org/netdev/20250618113020.130888-3-tanmay@marvell.com/
-V3 Link: https://lore.kernel.org/netdev/20250711121317.340326-3-tanmay@marvell.com/
-V4 Link: https://lore.kernel.org/netdev/20250819021507.323752-3-tanmay@marvell.com/
+V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-5-tanmay@marvell.com/
+V2 Link: https://lore.kernel.org/netdev/20250618113020.130888-5-tanmay@marvell.com/
+V3 Link: https://lore.kernel.org/netdev/20250711121317.340326-5-tanmay@marvell.com/
+V4 Link: https://lore.kernel.org/netdev/20250819021507.323752-5-tanmay@marvell.com/
 
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |  16 +
- .../net/ethernet/marvell/octeontx2/af/rvu.c   |   4 +-
- .../net/ethernet/marvell/octeontx2/af/rvu.h   |  34 ++
- .../ethernet/marvell/octeontx2/af/rvu_cpt.c   | 564 ++++++++++++++++++
- .../ethernet/marvell/octeontx2/af/rvu_cpt.h   |  67 +++
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   |   4 +-
- .../ethernet/marvell/octeontx2/af/rvu_reg.h   |  15 +
- 7 files changed, 700 insertions(+), 4 deletions(-)
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h
+ .../marvell/octeontx2/otx2_cpt_common.h       |   1 -
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h |  10 -
+ .../marvell/octeontx2/otx2_cptpf_main.c       |  46 ---
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       | 281 +-----------------
+ .../net/ethernet/marvell/octeontx2/af/mbox.c  |   3 -
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  11 -
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  71 ++---
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   1 +
+ 8 files changed, 34 insertions(+), 390 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index cfa0c1df5536..a2936a287b15 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -222,6 +222,8 @@ M(CPT_FLT_ENG_INFO,     0xA09, cpt_flt_eng_info, cpt_flt_eng_info_req,	\
- 			       cpt_flt_eng_info_rsp)			\
- M(CPT_SET_ENG_GRP_NUM,  0xA0A, cpt_set_eng_grp_num, cpt_set_egrp_num,   \
- 				msg_rsp)				\
-+M(CPT_RX_INLINE_LF_CFG, 0xBFE, cpt_rx_inline_lf_cfg, cpt_rx_inline_lf_cfg_msg, \
-+			       msg_rsp)					\
- /* SDP mbox IDs (range 0x1000 - 0x11FF) */				\
- M(SET_SDP_CHAN_INFO, 0x1000, set_sdp_chan_info, sdp_chan_info_msg, msg_rsp) \
- M(GET_SDP_CHAN_INFO, 0x1001, get_sdp_chan_info, msg_req, sdp_get_chan_info_msg) \
-@@ -1968,6 +1970,20 @@ enum otx2_cpt_eng_type {
- 	OTX2_CPT_MAX_ENG_TYPES,
- };
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+index 89d4dfbb1e8e..f8e32e98eff8 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
++++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+@@ -32,7 +32,6 @@
+ #define BAD_OTX2_CPT_ENG_TYPE OTX2_CPT_MAX_ENG_TYPES
  
-+struct cpt_rx_inline_lf_cfg_msg {
-+	struct mbox_msghdr hdr;
-+	u16 sso_pf_func;
-+	u16 param1;
-+	u16 param2;
-+	u16 opcode;
-+	u32 credit;
-+	u32 credit_th;
-+	u16 bpid;
-+	u32 reserved;
-+	u8 ctx_ilen_valid : 1;
-+	u8 ctx_ilen : 7;
-+};
-+
- struct cpt_set_egrp_num {
- 	struct mbox_msghdr hdr;
- 	bool set;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-index 2d78e08f985f..d8cf8e4a6d00 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-@@ -1780,8 +1780,8 @@ int rvu_mbox_handler_attach_resources(struct rvu *rvu,
+ /* Take mbox id from end of CPT mbox range in AF (range 0xA00 - 0xBFF) */
+-#define MBOX_MSG_RX_INLINE_IPSEC_LF_CFG 0xBFE
+ #define MBOX_MSG_GET_ENG_GRP_NUM        0xBFF
+ #define MBOX_MSG_GET_CAPS               0xBFD
+ #define MBOX_MSG_GET_KVF_LIMITS         0xBFC
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf.h b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
+index e5859a1e1c60..b7d1298e2b85 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
+@@ -41,9 +41,6 @@ struct otx2_cptpf_dev {
+ 	struct work_struct	afpf_mbox_work;
+ 	struct workqueue_struct *afpf_mbox_wq;
+ 
+-	struct otx2_mbox	afpf_mbox_up;
+-	struct work_struct	afpf_mbox_up_work;
+-
+ 	/* VF <=> PF mbox */
+ 	struct otx2_mbox	vfpf_mbox;
+ 	struct workqueue_struct *vfpf_mbox_wq;
+@@ -56,10 +53,8 @@ struct otx2_cptpf_dev {
+ 	u8 pf_id;               /* RVU PF number */
+ 	u8 max_vfs;		/* Maximum number of VFs supported by CPT */
+ 	u8 enabled_vfs;		/* Number of enabled VFs */
+-	u8 sso_pf_func_ovrd;	/* SSO PF_FUNC override bit */
+ 	u8 kvf_limits;		/* Kernel crypto limits */
+ 	bool has_cpt1;
+-	u8 rsrc_req_blkaddr;
+ 
+ 	/* Devlink */
+ 	struct devlink *dl;
+@@ -67,12 +62,7 @@ struct otx2_cptpf_dev {
+ 
+ irqreturn_t otx2_cptpf_afpf_mbox_intr(int irq, void *arg);
+ void otx2_cptpf_afpf_mbox_handler(struct work_struct *work);
+-void otx2_cptpf_afpf_mbox_up_handler(struct work_struct *work);
+ irqreturn_t otx2_cptpf_vfpf_mbox_intr(int irq, void *arg);
+ void otx2_cptpf_vfpf_mbox_handler(struct work_struct *work);
+ 
+-int otx2_inline_cptlf_setup(struct otx2_cptpf_dev *cptpf,
+-			    struct otx2_cptlfs_info *lfs, u8 egrp, int num_lfs);
+-void otx2_inline_cptlf_cleanup(struct otx2_cptlfs_info *lfs);
+-
+ #endif /* __OTX2_CPTPF_H */
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+index 1bceabe5f0e2..4791cd460eaa 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+@@ -13,7 +13,6 @@
+ #define OTX2_CPT_DRV_NAME    "rvu_cptpf"
+ #define OTX2_CPT_DRV_STRING  "Marvell RVU CPT Physical Function Driver"
+ 
+-#define CPT_UC_RID_CN9K_B0   1
+ #define CPT_UC_RID_CN10K_A   4
+ #define CPT_UC_RID_CN10K_B   5
+ 
+@@ -477,19 +476,10 @@ static int cptpf_afpf_mbox_init(struct otx2_cptpf_dev *cptpf)
+ 	if (err)
+ 		goto error;
+ 
+-	err = otx2_mbox_init(&cptpf->afpf_mbox_up, cptpf->afpf_mbox_base,
+-			     pdev, cptpf->reg_base, MBOX_DIR_PFAF_UP, 1);
+-	if (err)
+-		goto mbox_cleanup;
+-
+ 	INIT_WORK(&cptpf->afpf_mbox_work, otx2_cptpf_afpf_mbox_handler);
+-	INIT_WORK(&cptpf->afpf_mbox_up_work, otx2_cptpf_afpf_mbox_up_handler);
+ 	mutex_init(&cptpf->lock);
+-
+ 	return 0;
+ 
+-mbox_cleanup:
+-	otx2_mbox_destroy(&cptpf->afpf_mbox);
+ error:
+ 	destroy_workqueue(cptpf->afpf_mbox_wq);
  	return err;
+@@ -499,33 +489,6 @@ static void cptpf_afpf_mbox_destroy(struct otx2_cptpf_dev *cptpf)
+ {
+ 	destroy_workqueue(cptpf->afpf_mbox_wq);
+ 	otx2_mbox_destroy(&cptpf->afpf_mbox);
+-	otx2_mbox_destroy(&cptpf->afpf_mbox_up);
+-}
+-
+-static ssize_t sso_pf_func_ovrd_show(struct device *dev,
+-				     struct device_attribute *attr, char *buf)
+-{
+-	struct otx2_cptpf_dev *cptpf = dev_get_drvdata(dev);
+-
+-	return sprintf(buf, "%d\n", cptpf->sso_pf_func_ovrd);
+-}
+-
+-static ssize_t sso_pf_func_ovrd_store(struct device *dev,
+-				      struct device_attribute *attr,
+-				      const char *buf, size_t count)
+-{
+-	struct otx2_cptpf_dev *cptpf = dev_get_drvdata(dev);
+-	u8 sso_pf_func_ovrd;
+-
+-	if (!(cptpf->pdev->revision == CPT_UC_RID_CN9K_B0))
+-		return count;
+-
+-	if (kstrtou8(buf, 0, &sso_pf_func_ovrd))
+-		return -EINVAL;
+-
+-	cptpf->sso_pf_func_ovrd = sso_pf_func_ovrd;
+-
+-	return count;
  }
  
--static u16 rvu_get_msix_offset(struct rvu *rvu, struct rvu_pfvf *pfvf,
--			       int blkaddr, int lf)
-+u16 rvu_get_msix_offset(struct rvu *rvu, struct rvu_pfvf *pfvf,
-+			int blkaddr, int lf)
+ static ssize_t kvf_limits_show(struct device *dev,
+@@ -558,11 +521,9 @@ static ssize_t kvf_limits_store(struct device *dev,
+ }
+ 
+ static DEVICE_ATTR_RW(kvf_limits);
+-static DEVICE_ATTR_RW(sso_pf_func_ovrd);
+ 
+ static struct attribute *cptpf_attrs[] = {
+ 	&dev_attr_kvf_limits.attr,
+-	&dev_attr_sso_pf_func_ovrd.attr,
+ 	NULL
+ };
+ 
+@@ -841,13 +802,6 @@ static void otx2_cptpf_remove(struct pci_dev *pdev)
+ 	cptpf_sriov_disable(pdev);
+ 	otx2_cpt_unregister_dl(cptpf);
+ 
+-	/* Cleanup Inline CPT LF's if attached */
+-	if (cptpf->lfs.lfs_num)
+-		otx2_inline_cptlf_cleanup(&cptpf->lfs);
+-
+-	if (cptpf->cpt1_lfs.lfs_num)
+-		otx2_inline_cptlf_cleanup(&cptpf->cpt1_lfs);
+-
+ 	/* Delete sysfs entry created for kernel VF limits */
+ 	sysfs_remove_group(&pdev->dev.kobj, &cptpf_sysfs_group);
+ 	/* Cleanup engine groups */
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
+index 3ff3a49bd82b..326f5c802242 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
+@@ -5,20 +5,6 @@
+ #include "otx2_cptpf.h"
+ #include "rvu_reg.h"
+ 
+-/* Fastpath ipsec opcode with inplace processing */
+-#define CPT_INLINE_RX_OPCODE (0x26 | (1 << 6))
+-#define CN10K_CPT_INLINE_RX_OPCODE (0x29 | (1 << 6))
+-
+-#define cpt_inline_rx_opcode(pdev)                      \
+-({                                                      \
+-	u8 opcode;                                      \
+-	if (is_dev_otx2(pdev))                          \
+-		opcode = CPT_INLINE_RX_OPCODE;          \
+-	else                                            \
+-		opcode = CN10K_CPT_INLINE_RX_OPCODE;    \
+-	(opcode);                                       \
+-})
+-
+ /*
+  * CPT PF driver version, It will be incremented by 1 for every feature
+  * addition in CPT mailbox messages.
+@@ -126,182 +112,6 @@ static int handle_msg_kvf_limits(struct otx2_cptpf_dev *cptpf,
+ 	return 0;
+ }
+ 
+-static int send_inline_ipsec_inbound_msg(struct otx2_cptpf_dev *cptpf,
+-					 int sso_pf_func, u8 slot)
+-{
+-	struct cpt_inline_ipsec_cfg_msg *req;
+-	struct pci_dev *pdev = cptpf->pdev;
+-
+-	req = (struct cpt_inline_ipsec_cfg_msg *)
+-	      otx2_mbox_alloc_msg_rsp(&cptpf->afpf_mbox, 0,
+-				      sizeof(*req), sizeof(struct msg_rsp));
+-	if (req == NULL) {
+-		dev_err(&pdev->dev, "RVU MBOX failed to get message.\n");
+-		return -EFAULT;
+-	}
+-	memset(req, 0, sizeof(*req));
+-	req->hdr.id = MBOX_MSG_CPT_INLINE_IPSEC_CFG;
+-	req->hdr.sig = OTX2_MBOX_REQ_SIG;
+-	req->hdr.pcifunc = OTX2_CPT_RVU_PFFUNC(cptpf->pdev, cptpf->pf_id, 0);
+-	req->dir = CPT_INLINE_INBOUND;
+-	req->slot = slot;
+-	req->sso_pf_func_ovrd = cptpf->sso_pf_func_ovrd;
+-	req->sso_pf_func = sso_pf_func;
+-	req->enable = 1;
+-
+-	return otx2_cpt_send_mbox_msg(&cptpf->afpf_mbox, pdev);
+-}
+-
+-static int rx_inline_ipsec_lf_cfg(struct otx2_cptpf_dev *cptpf, u8 egrp,
+-				  struct otx2_cpt_rx_inline_lf_cfg *req)
+-{
+-	struct nix_inline_ipsec_cfg *nix_req;
+-	struct pci_dev *pdev = cptpf->pdev;
+-	int ret;
+-
+-	nix_req = (struct nix_inline_ipsec_cfg *)
+-		   otx2_mbox_alloc_msg_rsp(&cptpf->afpf_mbox, 0,
+-					   sizeof(*nix_req),
+-					   sizeof(struct msg_rsp));
+-	if (nix_req == NULL) {
+-		dev_err(&pdev->dev, "RVU MBOX failed to get message.\n");
+-		return -EFAULT;
+-	}
+-	memset(nix_req, 0, sizeof(*nix_req));
+-	nix_req->hdr.id = MBOX_MSG_NIX_INLINE_IPSEC_CFG;
+-	nix_req->hdr.sig = OTX2_MBOX_REQ_SIG;
+-	nix_req->enable = 1;
+-	nix_req->credit_th = req->credit_th;
+-	nix_req->bpid = req->bpid;
+-	if (!req->credit || req->credit > OTX2_CPT_INST_QLEN_MSGS)
+-		nix_req->cpt_credit = OTX2_CPT_INST_QLEN_MSGS - 1;
+-	else
+-		nix_req->cpt_credit = req->credit - 1;
+-	nix_req->gen_cfg.egrp = egrp;
+-	if (req->opcode)
+-		nix_req->gen_cfg.opcode = req->opcode;
+-	else
+-		nix_req->gen_cfg.opcode = cpt_inline_rx_opcode(pdev);
+-	nix_req->gen_cfg.param1 = req->param1;
+-	nix_req->gen_cfg.param2 = req->param2;
+-	nix_req->inst_qsel.cpt_pf_func =
+-		OTX2_CPT_RVU_PFFUNC(cptpf->pdev, cptpf->pf_id, 0);
+-	nix_req->inst_qsel.cpt_slot = 0;
+-	ret = otx2_cpt_send_mbox_msg(&cptpf->afpf_mbox, pdev);
+-	if (ret)
+-		return ret;
+-
+-	if (cptpf->has_cpt1) {
+-		ret = send_inline_ipsec_inbound_msg(cptpf, req->sso_pf_func, 1);
+-		if (ret)
+-			return ret;
+-	}
+-
+-	return send_inline_ipsec_inbound_msg(cptpf, req->sso_pf_func, 0);
+-}
+-
+-int
+-otx2_inline_cptlf_setup(struct otx2_cptpf_dev *cptpf,
+-			struct otx2_cptlfs_info *lfs, u8 egrp, int num_lfs)
+-{
+-	int ret;
+-
+-	ret = otx2_cptlf_init(lfs, 1 << egrp, OTX2_CPT_QUEUE_HI_PRIO, 1);
+-	if (ret) {
+-		dev_err(&cptpf->pdev->dev,
+-			"LF configuration failed for RX inline ipsec.\n");
+-		return ret;
+-	}
+-
+-	/* Get msix offsets for attached LFs */
+-	ret = otx2_cpt_msix_offset_msg(lfs);
+-	if (ret)
+-		goto cleanup_lf;
+-
+-	/* Register for CPT LF Misc interrupts */
+-	ret = otx2_cptlf_register_misc_interrupts(lfs);
+-	if (ret)
+-		goto free_irq;
+-
+-	return 0;
+-free_irq:
+-	otx2_cptlf_unregister_misc_interrupts(lfs);
+-cleanup_lf:
+-	otx2_cptlf_shutdown(lfs);
+-	return ret;
+-}
+-
+-void
+-otx2_inline_cptlf_cleanup(struct otx2_cptlfs_info *lfs)
+-{
+-	/* Unregister misc interrupt */
+-	otx2_cptlf_unregister_misc_interrupts(lfs);
+-
+-	/* Cleanup LFs */
+-	otx2_cptlf_shutdown(lfs);
+-}
+-
+-static int handle_msg_rx_inline_ipsec_lf_cfg(struct otx2_cptpf_dev *cptpf,
+-					     struct mbox_msghdr *req)
+-{
+-	struct otx2_cpt_rx_inline_lf_cfg *cfg_req;
+-	int num_lfs = 1, ret;
+-	u8 egrp;
+-
+-	cfg_req = (struct otx2_cpt_rx_inline_lf_cfg *)req;
+-	if (cptpf->lfs.lfs_num) {
+-		dev_err(&cptpf->pdev->dev,
+-			"LF is already configured for RX inline ipsec.\n");
+-		return -EEXIST;
+-	}
+-	/*
+-	 * Allow LFs to execute requests destined to only grp IE_TYPES and
+-	 * set queue priority of each LF to high
+-	 */
+-	egrp = otx2_cpt_get_eng_grp(&cptpf->eng_grps, OTX2_CPT_IE_TYPES);
+-	if (egrp == OTX2_CPT_INVALID_CRYPTO_ENG_GRP) {
+-		dev_err(&cptpf->pdev->dev,
+-			"Engine group for inline ipsec is not available\n");
+-		return -ENOENT;
+-	}
+-
+-	cptpf->lfs.global_slot = 0;
+-	cptpf->lfs.ctx_ilen_ovrd = cfg_req->ctx_ilen_valid;
+-	cptpf->lfs.ctx_ilen = cfg_req->ctx_ilen;
+-
+-	ret = otx2_inline_cptlf_setup(cptpf, &cptpf->lfs, egrp, num_lfs);
+-	if (ret) {
+-		dev_err(&cptpf->pdev->dev, "Inline-Ipsec CPT0 LF setup failed.\n");
+-		return ret;
+-	}
+-
+-	if (cptpf->has_cpt1) {
+-		cptpf->rsrc_req_blkaddr = BLKADDR_CPT1;
+-		cptpf->cpt1_lfs.global_slot = num_lfs;
+-		cptpf->cpt1_lfs.ctx_ilen_ovrd = cfg_req->ctx_ilen_valid;
+-		cptpf->cpt1_lfs.ctx_ilen = cfg_req->ctx_ilen;
+-		ret = otx2_inline_cptlf_setup(cptpf, &cptpf->cpt1_lfs, egrp,
+-					      num_lfs);
+-		if (ret) {
+-			dev_err(&cptpf->pdev->dev, "Inline CPT1 LF setup failed.\n");
+-			goto lf_cleanup;
+-		}
+-		cptpf->rsrc_req_blkaddr = 0;
+-	}
+-
+-	ret = rx_inline_ipsec_lf_cfg(cptpf, egrp, cfg_req);
+-	if (ret)
+-		goto lf1_cleanup;
+-
+-	return 0;
+-
+-lf1_cleanup:
+-	otx2_inline_cptlf_cleanup(&cptpf->cpt1_lfs);
+-lf_cleanup:
+-	otx2_inline_cptlf_cleanup(&cptpf->lfs);
+-	return ret;
+-}
+-
+ static int cptpf_handle_vf_req(struct otx2_cptpf_dev *cptpf,
+ 			       struct otx2_cptvf_info *vf,
+ 			       struct mbox_msghdr *req, int size)
+@@ -322,9 +132,6 @@ static int cptpf_handle_vf_req(struct otx2_cptpf_dev *cptpf,
+ 	case MBOX_MSG_GET_KVF_LIMITS:
+ 		err = handle_msg_kvf_limits(cptpf, vf, req);
+ 		break;
+-	case MBOX_MSG_RX_INLINE_IPSEC_LF_CFG:
+-		err = handle_msg_rx_inline_ipsec_lf_cfg(cptpf, req);
+-		break;
+ 
+ 	default:
+ 		err = forward_to_af(cptpf, vf, req, size);
+@@ -417,28 +224,14 @@ void otx2_cptpf_vfpf_mbox_handler(struct work_struct *work)
+ irqreturn_t otx2_cptpf_afpf_mbox_intr(int __always_unused irq, void *arg)
  {
- 	u16 vec;
+ 	struct otx2_cptpf_dev *cptpf = arg;
+-	struct otx2_mbox_dev *mdev;
+-	struct otx2_mbox *mbox;
+-	struct mbox_hdr *hdr;
+ 	u64 intr;
  
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-index b75de0d4fabc..9e837992924f 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-@@ -570,8 +570,38 @@ struct rvu_cpt_eng_grp {
- 	u8 grp_num;
+ 	/* Read the interrupt bits */
+ 	intr = otx2_cpt_read64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_INT);
+ 
+ 	if (intr & 0x1ULL) {
+-		mbox = &cptpf->afpf_mbox;
+-		mdev = &mbox->dev[0];
+-		hdr = mdev->mbase + mbox->rx_start;
+-		if (hdr->num_msgs)
+-			/* Schedule work queue function to process the MBOX request */
+-			queue_work(cptpf->afpf_mbox_wq, &cptpf->afpf_mbox_work);
+-
+-		mbox = &cptpf->afpf_mbox_up;
+-		mdev = &mbox->dev[0];
+-		hdr = mdev->mbase + mbox->rx_start;
+-		if (hdr->num_msgs)
+-			/* Schedule work queue function to process the MBOX request */
+-			queue_work(cptpf->afpf_mbox_wq, &cptpf->afpf_mbox_up_work);
++		/* Schedule work queue function to process the MBOX request */
++		queue_work(cptpf->afpf_mbox_wq, &cptpf->afpf_mbox_work);
+ 		/* Clear and ack the interrupt */
+ 		otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_INT,
+ 				 0x1ULL);
+@@ -464,8 +257,6 @@ static void process_afpf_mbox_msg(struct otx2_cptpf_dev *cptpf,
+ 			msg->sig, msg->id);
+ 		return;
+ 	}
+-	if (cptpf->rsrc_req_blkaddr == BLKADDR_CPT1)
+-		lfs = &cptpf->cpt1_lfs;
+ 
+ 	switch (msg->id) {
+ 	case MBOX_MSG_READY:
+@@ -592,71 +383,3 @@ void otx2_cptpf_afpf_mbox_handler(struct work_struct *work)
+ 	}
+ 	otx2_mbox_reset(afpf_mbox, 0);
+ }
+-
+-static void handle_msg_cpt_inst_lmtst(struct otx2_cptpf_dev *cptpf,
+-				      struct mbox_msghdr *msg)
+-{
+-	struct cpt_inst_lmtst_req *req = (struct cpt_inst_lmtst_req *)msg;
+-	struct otx2_cptlfs_info *lfs = &cptpf->lfs;
+-	struct msg_rsp *rsp;
+-
+-	if (cptpf->lfs.lfs_num)
+-		lfs->ops->send_cmd((union otx2_cpt_inst_s *)req->inst, 1,
+-				   &lfs->lf[0]);
+-
+-	rsp = (struct msg_rsp *)otx2_mbox_alloc_msg(&cptpf->afpf_mbox_up, 0,
+-						    sizeof(*rsp));
+-	if (!rsp)
+-		return;
+-
+-	rsp->hdr.id = msg->id;
+-	rsp->hdr.sig = OTX2_MBOX_RSP_SIG;
+-	rsp->hdr.pcifunc = 0;
+-	rsp->hdr.rc = 0;
+-}
+-
+-static void process_afpf_mbox_up_msg(struct otx2_cptpf_dev *cptpf,
+-				     struct mbox_msghdr *msg)
+-{
+-	if (msg->id >= MBOX_MSG_MAX) {
+-		dev_err(&cptpf->pdev->dev,
+-			"MBOX msg with unknown ID %d\n", msg->id);
+-		return;
+-	}
+-
+-	switch (msg->id) {
+-	case MBOX_MSG_CPT_INST_LMTST:
+-		handle_msg_cpt_inst_lmtst(cptpf, msg);
+-		break;
+-	default:
+-		otx2_reply_invalid_msg(&cptpf->afpf_mbox_up, 0, 0, msg->id);
+-	}
+-}
+-
+-void otx2_cptpf_afpf_mbox_up_handler(struct work_struct *work)
+-{
+-	struct otx2_cptpf_dev *cptpf;
+-	struct otx2_mbox_dev *mdev;
+-	struct mbox_hdr *rsp_hdr;
+-	struct mbox_msghdr *msg;
+-	struct otx2_mbox *mbox;
+-	int offset, i;
+-
+-	cptpf = container_of(work, struct otx2_cptpf_dev, afpf_mbox_up_work);
+-	mbox = &cptpf->afpf_mbox_up;
+-	mdev = &mbox->dev[0];
+-	/* Sync mbox data into memory */
+-	smp_wmb();
+-
+-	rsp_hdr = (struct mbox_hdr *)(mdev->mbase + mbox->rx_start);
+-	offset = mbox->rx_start + ALIGN(sizeof(*rsp_hdr), MBOX_MSG_ALIGN);
+-
+-	for (i = 0; i < rsp_hdr->num_msgs; i++) {
+-		msg = (struct mbox_msghdr *)(mdev->mbase + offset);
+-
+-		process_afpf_mbox_up_msg(cptpf, msg);
+-
+-		offset = mbox->rx_start + msg->next_msgoff;
+-	}
+-	otx2_mbox_msg_send(mbox, 0);
+-}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.c b/drivers/net/ethernet/marvell/octeontx2/af/mbox.c
+index 75872d257eca..861025bb93c6 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.c
+@@ -555,9 +555,6 @@ const char *otx2_mbox_id2name(u16 id)
+ 	MBOX_UP_CGX_MESSAGES
+ #undef M
+ 
+-#define M(_name, _id, _1, _2, _3) case _id: return # _name;
+-	MBOX_UP_CPT_MESSAGES
+-#undef M
+ 	default:
+ 		return "INVALID ID";
+ 	}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+index a2936a287b15..6e8e36548344 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+@@ -395,9 +395,6 @@ M(MCS_CUSTOM_TAG_CFG_GET, 0xa021, mcs_custom_tag_cfg_get,			\
+ #define MBOX_UP_CGX_MESSAGES						\
+ M(CGX_LINK_EVENT,	0xC00, cgx_link_event, cgx_link_info_msg, msg_rsp)
+ 
+-#define MBOX_UP_CPT_MESSAGES						\
+-M(CPT_INST_LMTST,	0xD00, cpt_inst_lmtst, cpt_inst_lmtst_req, msg_rsp)
+-
+ #define MBOX_UP_MCS_MESSAGES						\
+ M(MCS_INTR_NOTIFY,	0xE00, mcs_intr_notify, mcs_intr_info, msg_rsp)
+ 
+@@ -408,7 +405,6 @@ enum {
+ #define M(_name, _id, _1, _2, _3) MBOX_MSG_ ## _name = _id,
+ MBOX_MESSAGES
+ MBOX_UP_CGX_MESSAGES
+-MBOX_UP_CPT_MESSAGES
+ MBOX_UP_MCS_MESSAGES
+ MBOX_UP_REP_MESSAGES
+ #undef M
+@@ -1933,13 +1929,6 @@ struct cpt_rxc_time_cfg_req {
+ 	u16 active_limit;
  };
  
-+struct rvu_cpt_rx_inline_lf_cfg {
-+	u16 sso_pf_func;
-+	u16 param1;
-+	u16 param2;
-+	u16 opcode;
-+	u32 credit;
-+	u32 credit_th;
-+	u16 bpid;
-+	u32 reserved;
-+	u8 ctx_ilen_valid : 1;
-+	u8 ctx_ilen : 7;
-+};
-+
-+struct rvu_cpt_inst_queue {
-+	u8 *vaddr;
-+	u8 *real_vaddr;
-+	dma_addr_t dma_addr;
-+	dma_addr_t real_dma_addr;
-+	u32 size;
-+};
-+
- struct rvu_cpt {
- 	struct rvu_cpt_eng_grp eng_grp[OTX2_CPT_MAX_ENG_TYPES];
-+
-+	/* RX inline ipsec lock */
-+	struct mutex lock;
-+	bool rx_initialized;
-+	u16 msix_offset;
-+	u8 inline_ipsec_egrp;
-+	struct rvu_cpt_inst_queue cpt0_iq;
-+	struct rvu_cpt_inst_queue cpt1_iq;
-+	struct rvu_cpt_rx_inline_lf_cfg rx_cfg;
- };
- 
- struct rvu {
-@@ -1144,6 +1174,8 @@ void rvu_program_channels(struct rvu *rvu);
- 
- /* CN10K NIX */
- void rvu_nix_block_cn10k_init(struct rvu *rvu, struct nix_hw *nix_hw);
-+void nix_inline_ipsec_cfg(struct rvu *rvu, struct nix_inline_ipsec_cfg *req,
-+			  int blkaddr);
- 
- /* CN10K RVU - LMT*/
- void rvu_reset_lmt_map_tbl(struct rvu *rvu, u16 pcifunc);
-@@ -1175,6 +1207,8 @@ int rvu_mcs_init(struct rvu *rvu);
- int rvu_mcs_flr_handler(struct rvu *rvu, u16 pcifunc);
- void rvu_mcs_ptp_cfg(struct rvu *rvu, u8 rpm_id, u8 lmac_id, bool ena);
- void rvu_mcs_exit(struct rvu *rvu);
-+u16 rvu_get_msix_offset(struct rvu *rvu, struct rvu_pfvf *pfvf,
-+			int blkaddr, int lf);
- 
- /* Representor APIs */
- int rvu_rep_pf_init(struct rvu *rvu);
+-/* Mailbox message request format to request for CPT_INST_S lmtst. */
+-struct cpt_inst_lmtst_req {
+-	struct mbox_msghdr hdr;
+-	u64 inst[8];
+-	u64 rsvd;
+-};
+-
+ /* Mailbox message format to request for CPT LF reset */
+ struct cpt_lf_rst_req {
+ 	struct mbox_msghdr hdr;
 diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
-index 69c1796fba44..e1b170919ba9 100644
+index 84ca775b1871..edc3c356dba3 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
-@@ -11,6 +11,7 @@
- #include "rvu_reg.h"
+@@ -12,6 +12,7 @@
  #include "mbox.h"
  #include "rvu.h"
-+#include "rvu_cpt.h"
+ #include "rvu_cpt.h"
++#include <linux/soc/marvell/octeontx2/asm.h>
  
  /* CPT PF device id */
  #define	PCI_DEVID_OTX2_CPT_PF	0xA0FD
-@@ -968,6 +969,33 @@ int rvu_mbox_handler_cpt_ctx_cache_sync(struct rvu *rvu, struct msg_req *req,
- 	return rvu_cpt_ctx_flush(rvu, req->hdr.pcifunc);
- }
+@@ -26,6 +27,10 @@
+ /* Default CPT_AF_RXC_CFG1:max_rxc_icb_cnt */
+ #define CPT_DFLT_MAX_RXC_ICB_CNT  0xC0ULL
  
-+static int cpt_rx_ipsec_lf_reset(struct rvu *rvu, int blkaddr, int slot)
-+{
-+	struct rvu_block *block;
-+	u16 pcifunc = 0;
-+	int cptlf, ret;
-+	u64 ctl, ctl2;
++/* CPT LMTST */
++#define LMT_LINE_SIZE   128 /* LMT line size in bytes */
++#define LMT_BURST_SIZE  32  /* 32 LMTST lines for burst */
 +
-+	block = &rvu->hw->block[blkaddr];
-+
-+	cptlf = rvu_get_lf(rvu, block, pcifunc, slot);
-+	if (cptlf < 0)
-+		return CPT_AF_ERR_LF_INVALID;
-+
-+	ctl = rvu_read64(rvu, blkaddr, CPT_AF_LFX_CTL(cptlf));
-+	ctl2 = rvu_read64(rvu, blkaddr, CPT_AF_LFX_CTL2(cptlf));
-+
-+	ret = rvu_lf_reset(rvu, block, cptlf);
-+	if (ret)
-+		dev_err(rvu->dev, "Failed to reset blkaddr %d LF%d\n",
-+			block->addr, cptlf);
-+
-+	rvu_write64(rvu, blkaddr, CPT_AF_LFX_CTL(cptlf), ctl);
-+	rvu_write64(rvu, blkaddr, CPT_AF_LFX_CTL2(cptlf), ctl2);
-+
-+	return 0;
-+}
-+
- int rvu_mbox_handler_cpt_lf_reset(struct rvu *rvu, struct cpt_lf_rst_req *req,
- 				  struct msg_rsp *rsp)
- {
-@@ -1087,6 +1115,72 @@ static void cpt_rxc_teardown(struct rvu *rvu, int blkaddr)
- #define DQPTR      GENMASK_ULL(19, 0)
- #define NQPTR      GENMASK_ULL(51, 32)
+ #define cpt_get_eng_sts(e_min, e_max, rsp, etype)                   \
+ ({                                                                  \
+ 	u64 free_sts = 0, busy_sts = 0;                             \
+@@ -699,10 +704,6 @@ int rvu_mbox_handler_cpt_inline_ipsec_cfg(struct rvu *rvu,
+ 		return CPT_AF_ERR_LF_INVALID;
  
-+static void cpt_rx_ipsec_lf_enable_iqueue(struct rvu *rvu, int blkaddr,
-+					  int slot)
-+{
-+	u64 val;
-+
-+	/* Set Execution Enable of instruction queue */
-+	val = otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot, CPT_LF_INPROG);
-+	val |= CPT_LF_INPROG_EXEC_ENABLE;
-+	otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_INPROG, val);
-+
-+	/* Set iqueue's enqueuing */
-+	val = otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot, CPT_LF_CTL);
-+	val |= CPT_LF_CTL_ENQ_ENA;
-+	otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_CTL, val);
-+}
-+
-+static void cpt_rx_ipsec_lf_disable_iqueue(struct rvu *rvu, int blkaddr,
-+					   int slot)
-+{
-+	int timeout = 1000000;
-+	u64 inprog, inst_ptr;
-+	u64 qsize, pending;
-+	int i = 0;
-+
-+	/* Disable instructions enqueuing */
-+	otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_CTL, 0x0);
-+
-+	inprog = otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot, CPT_LF_INPROG);
-+	inprog |= CPT_LF_INPROG_EXEC_ENABLE;
-+	otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_INPROG, inprog);
-+
-+	qsize = otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot, CPT_LF_Q_SIZE)
-+		 & 0x7FFF;
-+	do {
-+		inst_ptr = otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot,
-+					   CPT_LF_Q_INST_PTR);
-+		pending = (FIELD_GET(XQ_XOR, inst_ptr) * qsize * 40) +
-+			   FIELD_GET(NQPTR, inst_ptr) -
-+			   FIELD_GET(DQPTR, inst_ptr);
-+		udelay(1);
-+		timeout--;
-+	} while (pending != 0 && timeout != 0);
-+
-+	if (timeout == 0)
-+		dev_warn(rvu->dev, "TIMEOUT: CPT poll on pending instructions\n");
-+
-+	timeout = 1000000;
-+	/* Wait for CPT queue to become execution-quiescent */
-+	do {
-+		inprog = otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot,
-+					 CPT_LF_INPROG);
-+		if ((FIELD_GET(INFLIGHT, inprog) == 0) &&
-+		    (FIELD_GET(GRB_CNT, inprog) == 0)) {
-+			i++;
-+		} else {
-+			i = 0;
-+			timeout--;
-+		}
-+	} while ((timeout != 0) && (i < 10));
-+
-+	if (timeout == 0)
-+		dev_warn(rvu->dev, "TIMEOUT: CPT poll on inflight count\n");
-+	/* Wait for 2 us to flush all queue writes to memory */
-+	udelay(2);
-+}
-+
- static void cpt_lf_disable_iqueue(struct rvu *rvu, int blkaddr, int slot)
- {
- 	int timeout = 1000000;
-@@ -1310,6 +1404,475 @@ int rvu_cpt_ctx_flush(struct rvu *rvu, u16 pcifunc)
+ 	switch (req->dir) {
+-	case CPT_INLINE_INBOUND:
+-		ret = cpt_inline_ipsec_cfg_inbound(rvu, blkaddr, cptlf, req);
+-		break;
+-
+ 	case CPT_INLINE_OUTBOUND:
+ 		ret = cpt_inline_ipsec_cfg_outbound(rvu, blkaddr, cptlf, req);
+ 		break;
+@@ -1253,20 +1254,36 @@ int rvu_cpt_lf_teardown(struct rvu *rvu, u16 pcifunc, int blkaddr, int lf, int s
  	return 0;
  }
  
-+static irqreturn_t rvu_cpt_rx_ipsec_misc_intr_handler(int irq, void *ptr)
++static void cn10k_cpt_inst_flush(struct rvu *rvu, u64 *inst, u64 size)
 +{
-+	struct rvu_block *block = ptr;
-+	struct rvu *rvu = block->rvu;
-+	int blkaddr = block->addr;
-+	struct device *dev = rvu->dev;
-+	int slot = 0;
-+	u64 val;
++	u64 blkaddr = BLKADDR_CPT0;
++	u64 val = 0, tar_addr = 0;
++	void __iomem *io_addr;
 +
-+	val = otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot, CPT_LF_MISC_INT);
++	io_addr	= rvu->pfreg_base + CPT_RVU_FUNC_ADDR_S(blkaddr, 0, CPT_LF_NQX);
 +
-+	if (val & CPT_LF_MISC_INT_FAULT) {
-+		dev_err(dev, "Memory error detected while executing CPT_INST_S, LF %d.\n",
-+			slot);
-+	} else if (val & CPT_LF_MISC_INT_HWERR) {
-+		dev_err(dev, "HW error from an engine executing CPT_INST_S, LF %d.",
-+			slot);
-+	} else if (val & CPT_LF_MISC_INT_NWRP) {
-+		dev_err(dev, "SMMU fault while writing CPT_RES_S to CPT_INST_S[RES_ADDR], LF %d.\n",
-+			slot);
-+	} else if (val & CPT_LF_MISC_INT_IRDE) {
-+		dev_err(dev, "Memory error when accessing instruction memory queue CPT_LF_Q_BASE[ADDR].\n");
-+	} else if (val & CPT_LF_MISC_INT_NQERR) {
-+		dev_err(dev, "Error enqueuing an instruction received at CPT_LF_NQ.\n");
-+	} else {
-+		dev_err(dev, "Unhandled interrupt in CPT LF %d\n", slot);
-+		return IRQ_NONE;
-+	}
-+
-+	/* Acknowledge interrupts */
-+	otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_MISC_INT,
-+			 val & CPT_LF_MISC_INT_MASK);
-+
-+	return IRQ_HANDLED;
++	/* Target address for LMTST flush tells HW how many 128bit
++	 * words are present.
++	 * tar_addr[6:4] size of first LMTST - 1 in units of 128b.
++	 */
++	tar_addr |= (__force u64)io_addr | (((size / 16) - 1) & 0x7) << 4;
++	dma_wmb();
++	memcpy((u64 *)rvu->rvu_cpt.lmt_addr, inst, size);
++	cn10k_lmt_flush(val, tar_addr);
++	dma_wmb();
 +}
 +
-+static int rvu_cpt_rx_inline_setup_irq(struct rvu *rvu, int blkaddr, int slot)
-+{
-+	struct rvu_hwinfo *hw = rvu->hw;
-+	struct rvu_block *block;
-+	struct rvu_pfvf *pfvf;
-+	u16 msix_offset;
-+	int pcifunc = 0;
-+	int ret, cptlf;
-+
-+	pfvf = rvu_get_pfvf(rvu, pcifunc);
-+	if (!pfvf->msix.bmap)
-+		return -ENODEV;
-+
-+	block = &hw->block[blkaddr];
-+	cptlf = rvu_get_lf(rvu, block, pcifunc, slot);
-+	if (cptlf < 0)
-+		return CPT_AF_ERR_LF_INVALID;
-+
-+	msix_offset = rvu_get_msix_offset(rvu, pfvf, blkaddr, cptlf);
-+	if (msix_offset == MSIX_VECTOR_INVALID)
-+		return -ENODEV;
-+
-+	ret = rvu_cpt_do_register_interrupt(block, msix_offset,
-+					    rvu_cpt_rx_ipsec_misc_intr_handler,
-+					    "CPTLF RX IPSEC MISC");
-+	if (ret)
-+		return ret;
-+
-+	/* Enable All Misc interrupts */
-+	otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot,
-+			 CPT_LF_MISC_INT_ENA_W1S, CPT_LF_MISC_INT_MASK);
-+
-+	rvu->rvu_cpt.msix_offset = msix_offset;
-+	return 0;
-+}
-+
-+static void rvu_cpt_rx_inline_cleanup_irq(struct rvu *rvu, int blkaddr,
-+					  int slot)
-+{
-+	struct rvu_hwinfo *hw = rvu->hw;
-+	struct rvu_block *block;
-+
-+	/* Disable All Misc interrupts */
-+	otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot,
-+			 CPT_LF_MISC_INT_ENA_W1C, CPT_LF_MISC_INT_MASK);
-+
-+	block = &hw->block[blkaddr];
-+	free_irq(pci_irq_vector(rvu->pdev, rvu->rvu_cpt.msix_offset), block);
-+}
-+
-+static int rvu_rx_attach_cptlf(struct rvu *rvu, int blkaddr)
-+{
-+	struct rsrc_attach attach;
-+
-+	memset(&attach, 0, sizeof(struct rsrc_attach));
-+	attach.hdr.id = MBOX_MSG_ATTACH_RESOURCES;
-+	attach.hdr.sig = OTX2_MBOX_REQ_SIG;
-+	attach.hdr.ver = OTX2_MBOX_VERSION;
-+	attach.hdr.pcifunc = 0;
-+	attach.modify = 1;
-+	attach.cptlfs = 1;
-+	attach.cpt_blkaddr = blkaddr;
-+
-+	return rvu_mbox_handler_attach_resources(rvu, &attach, NULL);
-+}
-+
-+static int rvu_rx_detach_cptlf(struct rvu *rvu)
-+{
-+	struct rsrc_detach detach;
-+
-+	memset(&detach, 0, sizeof(struct rsrc_detach));
-+	detach.hdr.id = MBOX_MSG_ATTACH_RESOURCES;
-+	detach.hdr.sig = OTX2_MBOX_REQ_SIG;
-+	detach.hdr.ver = OTX2_MBOX_VERSION;
-+	detach.hdr.pcifunc = 0;
-+	detach.partial = 1;
-+	detach.cptlfs = 1;
-+
-+	return rvu_mbox_handler_detach_resources(rvu, &detach, NULL);
-+}
-+
-+/* Allocate memory for CPT outbound Instruction queue.
-+ * Instruction queue memory format is:
-+ *      -----------------------------
-+ *     | Instruction Group memory    |
-+ *     |  (CPT_LF_Q_SIZE[SIZE_DIV40] |
-+ *     |   x 16 Bytes)               |
-+ *     |                             |
-+ *      ----------------------------- <-- CPT_LF_Q_BASE[ADDR]
-+ *     | Flow Control (128 Bytes)    |
-+ *     |                             |
-+ *      -----------------------------
-+ *     |  Instruction Memory         |
-+ *     |  (CPT_LF_Q_SIZE[SIZE_DIV40] |
-+ *     |   × 40 × 64 bytes)          |
-+ *     |                             |
-+ *      -----------------------------
-+ */
-+static int rvu_rx_cpt_iq_alloc(struct rvu *rvu, struct rvu_cpt_inst_queue *iq)
-+{
-+	iq->size = RVU_CPT_INST_QLEN_BYTES + RVU_CPT_Q_FC_LEN +
-+		    RVU_CPT_INST_GRP_QLEN_BYTES + OTX2_ALIGN;
-+
-+	iq->real_vaddr = dma_alloc_coherent(rvu->dev, iq->size,
-+					    &iq->real_dma_addr, GFP_KERNEL);
-+	if (!iq->real_vaddr)
-+		return -ENOMEM;
-+
-+	/* iq->vaddr/dma_addr points to Flow Control location */
-+	iq->vaddr = iq->real_vaddr + RVU_CPT_INST_GRP_QLEN_BYTES;
-+	iq->dma_addr = iq->real_dma_addr + RVU_CPT_INST_GRP_QLEN_BYTES;
-+
-+	/* Align pointers */
-+	iq->vaddr = PTR_ALIGN(iq->vaddr, OTX2_ALIGN);
-+	iq->dma_addr = PTR_ALIGN(iq->dma_addr, OTX2_ALIGN);
-+	return 0;
-+}
-+
-+static void rvu_rx_cpt_iq_free(struct rvu *rvu, int blkaddr)
-+{
-+	struct rvu_cpt_inst_queue *iq;
-+
-+	if (blkaddr == BLKADDR_CPT0)
-+		iq = &rvu->rvu_cpt.cpt0_iq;
-+	else
-+		iq = &rvu->rvu_cpt.cpt1_iq;
-+
-+	if (!iq->real_vaddr)
-+		dma_free_coherent(rvu->dev, iq->size, iq->real_vaddr,
-+				  iq->real_dma_addr);
-+
-+	iq->real_vaddr = NULL;
-+	iq->vaddr = NULL;
-+}
-+
-+static int rvu_rx_cpt_set_grp_pri_ilen(struct rvu *rvu, int blkaddr, int cptlf)
-+{
-+	u64 reg_val;
-+
-+	reg_val = rvu_read64(rvu, blkaddr, CPT_AF_LFX_CTL(cptlf));
-+	/* Set High priority */
-+	reg_val |= CPT_AF_LFX_CTL_HIGH_PRI;
-+	/* Set engine group */
-+	reg_val |= FIELD_PREP(CPT_AF_LFX_CTL_EGRP, (1ULL << rvu->rvu_cpt.inline_ipsec_egrp));
-+	/* Set ilen if valid */
-+	if (rvu->rvu_cpt.rx_cfg.ctx_ilen_valid)
-+		reg_val |= FIELD_PREP(CPT_AF_LFX_CTL_CTX_ILEN,
-+				      rvu->rvu_cpt.rx_cfg.ctx_ilen);
-+
-+	rvu_write64(rvu, blkaddr, CPT_AF_LFX_CTL(cptlf), reg_val);
-+	return 0;
-+}
-+
-+static int rvu_cpt_rx_inline_cptlf_init(struct rvu *rvu, int blkaddr, int slot)
-+{
-+	struct rvu_cpt_inst_queue *iq;
-+	struct rvu_block *block;
-+	int pcifunc = 0;
-+	int cptlf;
-+	int err;
-+	u64 val;
-+
-+	/* Attach cptlf with AF for inline inbound ipsec */
-+	err = rvu_rx_attach_cptlf(rvu, blkaddr);
-+	if (err)
-+		return err;
-+
-+	block = &rvu->hw->block[blkaddr];
-+	cptlf = rvu_get_lf(rvu, block, pcifunc, slot);
-+	if (cptlf < 0) {
-+		err = CPT_AF_ERR_LF_INVALID;
-+		goto detach_cptlf;
-+	}
-+
-+	if (blkaddr == BLKADDR_CPT0)
-+		iq = &rvu->rvu_cpt.cpt0_iq;
-+	else
-+		iq = &rvu->rvu_cpt.cpt1_iq;
-+
-+	/* Allocate CPT instruction queue */
-+	err = rvu_rx_cpt_iq_alloc(rvu, iq);
-+	if (err)
-+		goto detach_cptlf;
-+
-+	/* reset CPT LF */
-+	cpt_rx_ipsec_lf_reset(rvu, blkaddr, slot);
-+
-+	/* Disable IQ */
-+	cpt_rx_ipsec_lf_disable_iqueue(rvu, blkaddr, slot);
-+
-+	/* Set IQ base address */
-+	otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_Q_BASE,
-+			 iq->dma_addr);
-+	/* Set IQ size */
-+	val = FIELD_PREP(CPT_LF_Q_SIZE_DIV40, RVU_CPT_SIZE_DIV40 +
-+			 RVU_CPT_EXTRA_SIZE_DIV40);
-+	otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_Q_SIZE, val);
-+
-+	/* Enable IQ */
-+	cpt_rx_ipsec_lf_enable_iqueue(rvu, blkaddr, slot);
-+
-+	/* Set High priority */
-+	rvu_rx_cpt_set_grp_pri_ilen(rvu, blkaddr, cptlf);
-+
-+	return 0;
-+detach_cptlf:
-+	rvu_rx_detach_cptlf(rvu);
-+	return err;
-+}
-+
-+static void rvu_cpt_rx_inline_cptlf_clean(struct rvu *rvu, int blkaddr,
-+					  int slot)
-+{
-+	/* Disable IQ */
-+	cpt_rx_ipsec_lf_disable_iqueue(rvu, blkaddr, slot);
-+
-+	/* Free Instruction Queue */
-+	rvu_rx_cpt_iq_free(rvu, blkaddr);
-+
-+	/* Detach CPTLF */
-+	rvu_rx_detach_cptlf(rvu);
-+}
-+
-+static void rvu_cpt_save_rx_inline_lf_cfg(struct rvu *rvu,
-+					  struct cpt_rx_inline_lf_cfg_msg *req)
-+{
-+	rvu->rvu_cpt.rx_cfg.sso_pf_func = req->sso_pf_func;
-+	rvu->rvu_cpt.rx_cfg.param1 = req->param1;
-+	rvu->rvu_cpt.rx_cfg.param2 = req->param2;
-+	rvu->rvu_cpt.rx_cfg.opcode = req->opcode;
-+	rvu->rvu_cpt.rx_cfg.credit = req->credit;
-+	rvu->rvu_cpt.rx_cfg.credit_th = req->credit_th;
-+	rvu->rvu_cpt.rx_cfg.bpid = req->bpid;
-+	rvu->rvu_cpt.rx_cfg.ctx_ilen_valid = req->ctx_ilen_valid;
-+	rvu->rvu_cpt.rx_cfg.ctx_ilen = req->ctx_ilen;
-+}
-+
-+static void
-+rvu_show_diff_cpt_rx_inline_lf_cfg(struct rvu *rvu,
-+				   struct cpt_rx_inline_lf_cfg_msg *req)
-+{
-+	struct device *dev = rvu->dev;
-+
-+	if (rvu->rvu_cpt.rx_cfg.sso_pf_func != req->sso_pf_func)
-+		dev_info(dev, "Mismatch RX inline config sso_pf_func Req %x Prog %x\n",
-+			 req->sso_pf_func, rvu->rvu_cpt.rx_cfg.sso_pf_func);
-+	if (rvu->rvu_cpt.rx_cfg.param1 != req->param1)
-+		dev_info(dev, "Mismatch RX inline config param1 Req %x Prog %x\n",
-+			 req->param1, rvu->rvu_cpt.rx_cfg.param1);
-+	if (rvu->rvu_cpt.rx_cfg.param2 != req->param2)
-+		dev_info(dev, "Mismatch RX inline config param2 Req %x Prog %x\n",
-+			 req->param2, rvu->rvu_cpt.rx_cfg.param2);
-+	if (rvu->rvu_cpt.rx_cfg.opcode != req->opcode)
-+		dev_info(dev, "Mismatch RX inline config opcode Req %x Prog %x\n",
-+			 req->opcode, rvu->rvu_cpt.rx_cfg.opcode);
-+	if (rvu->rvu_cpt.rx_cfg.credit != req->credit)
-+		dev_info(dev, "Mismatch RX inline config credit Req %x Prog %x\n",
-+			 req->credit, rvu->rvu_cpt.rx_cfg.credit);
-+	if (rvu->rvu_cpt.rx_cfg.credit_th != req->credit_th)
-+		dev_info(dev, "Mismatch RX inline config credit_th Req %x Prog %x\n",
-+			 req->credit_th, rvu->rvu_cpt.rx_cfg.credit_th);
-+	if (rvu->rvu_cpt.rx_cfg.bpid != req->bpid)
-+		dev_info(dev, "Mismatch RX inline config bpid Req %x Prog %x\n",
-+			 req->bpid, rvu->rvu_cpt.rx_cfg.bpid);
-+	if (rvu->rvu_cpt.rx_cfg.ctx_ilen != req->ctx_ilen)
-+		dev_info(dev, "Mismatch RX inline config ctx_ilen Req %x Prog %x\n",
-+			 req->ctx_ilen, rvu->rvu_cpt.rx_cfg.ctx_ilen);
-+	if (rvu->rvu_cpt.rx_cfg.ctx_ilen_valid != req->ctx_ilen_valid)
-+		dev_info(dev, "Mismatch RX inline config ctx_ilen_valid Req %x Prog %x\n",
-+			 req->ctx_ilen_valid,
-+			 rvu->rvu_cpt.rx_cfg.ctx_ilen_valid);
-+}
-+
-+static void rvu_cpt_rx_inline_nix_cfg(struct rvu *rvu)
-+{
-+	struct nix_inline_ipsec_cfg nix_cfg;
-+
-+	nix_cfg.enable = 1;
-+	nix_cfg.credit_th = rvu->rvu_cpt.rx_cfg.credit_th;
-+	nix_cfg.bpid = rvu->rvu_cpt.rx_cfg.bpid;
-+	if (!rvu->rvu_cpt.rx_cfg.credit || rvu->rvu_cpt.rx_cfg.credit >
-+	    RVU_CPT_INST_QLEN_MSGS)
-+		nix_cfg.cpt_credit = RVU_CPT_INST_QLEN_MSGS - 1;
-+	else
-+		nix_cfg.cpt_credit = rvu->rvu_cpt.rx_cfg.credit - 1;
-+
-+	nix_cfg.gen_cfg.egrp = rvu->rvu_cpt.inline_ipsec_egrp;
-+	if (rvu->rvu_cpt.rx_cfg.opcode) {
-+		nix_cfg.gen_cfg.opcode = rvu->rvu_cpt.rx_cfg.opcode;
-+	} else {
-+		if (is_rvu_otx2(rvu))
-+			nix_cfg.gen_cfg.opcode = OTX2_CPT_INLINE_RX_OPCODE;
-+		else
-+			nix_cfg.gen_cfg.opcode = CN10K_CPT_INLINE_RX_OPCODE;
-+	}
-+
-+	nix_cfg.gen_cfg.param1 = rvu->rvu_cpt.rx_cfg.param1;
-+	nix_cfg.gen_cfg.param2 = rvu->rvu_cpt.rx_cfg.param2;
-+	nix_cfg.inst_qsel.cpt_pf_func = rvu_get_pf(rvu->pdev, 0);
-+	nix_cfg.inst_qsel.cpt_slot = 0;
-+
-+	nix_inline_ipsec_cfg(rvu, &nix_cfg, BLKADDR_NIX0);
-+
-+	if (is_block_implemented(rvu->hw, BLKADDR_CPT1))
-+		nix_inline_ipsec_cfg(rvu, &nix_cfg, BLKADDR_NIX1);
-+}
-+
-+static int rvu_cpt_rx_inline_ipsec_cfg(struct rvu *rvu)
-+{
-+	struct rvu_block *block;
-+	struct cpt_inline_ipsec_cfg_msg req;
-+	u16 pcifunc  = 0;
-+	int cptlf;
-+	int err;
-+
-+	memset(&req, 0, sizeof(struct cpt_inline_ipsec_cfg_msg));
-+	req.sso_pf_func_ovrd = 0; // Add sysfs interface to set this
-+	req.sso_pf_func = rvu->rvu_cpt.rx_cfg.sso_pf_func;
-+	req.enable = 1;
-+
-+	block = &rvu->hw->block[BLKADDR_CPT0];
-+	cptlf = rvu_get_lf(rvu, block, pcifunc, 0);
-+	if (cptlf < 0)
-+		return CPT_AF_ERR_LF_INVALID;
-+
-+	err = cpt_inline_ipsec_cfg_inbound(rvu, BLKADDR_CPT0, cptlf, &req);
-+	if (err)
-+		return err;
-+
-+	if (!is_block_implemented(rvu->hw, BLKADDR_CPT1))
-+		return 0;
-+
-+	block = &rvu->hw->block[BLKADDR_CPT1];
-+	cptlf = rvu_get_lf(rvu, block, pcifunc, 0);
-+	if (cptlf < 0)
-+		return CPT_AF_ERR_LF_INVALID;
-+
-+	return cpt_inline_ipsec_cfg_inbound(rvu, BLKADDR_CPT1, cptlf, &req);
-+}
-+
-+static int rvu_cpt_rx_inline_cptlf_setup(struct rvu *rvu, int blkaddr, int slot)
-+{
-+	int err;
-+
-+	err = rvu_cpt_rx_inline_cptlf_init(rvu, blkaddr, slot);
-+	if (err) {
-+		dev_err(rvu->dev,
-+			"CPTLF configuration failed for RX inline ipsec\n");
-+		return err;
-+	}
-+
-+	err = rvu_cpt_rx_inline_setup_irq(rvu, blkaddr, slot);
-+	if (err) {
-+		dev_err(rvu->dev,
-+			"CPTLF Interrupt setup failed for RX inline ipsec\n");
-+		rvu_cpt_rx_inline_cptlf_clean(rvu, blkaddr, slot);
-+		return err;
-+	}
-+	return 0;
-+}
-+
-+static void rvu_rx_cptlf_cleanup(struct rvu *rvu, int blkaddr, int slot)
-+{
-+	/* IRQ cleanup */
-+	rvu_cpt_rx_inline_cleanup_irq(rvu, blkaddr, slot);
-+
-+	/* CPTLF cleanup */
-+	rvu_cpt_rx_inline_cptlf_clean(rvu, blkaddr, slot);
-+}
-+
-+int rvu_mbox_handler_cpt_rx_inline_lf_cfg(struct rvu *rvu,
-+					  struct cpt_rx_inline_lf_cfg_msg *req,
-+					  struct msg_rsp *rsp)
-+{
-+	u8 egrp = OTX2_CPT_INVALID_CRYPTO_ENG_GRP;
-+	int err;
-+	int i;
-+
-+	mutex_lock(&rvu->rvu_cpt.lock);
-+	if (rvu->rvu_cpt.rx_initialized) {
-+		dev_info(rvu->dev, "Inline RX CPT already initialized\n");
-+		rvu_show_diff_cpt_rx_inline_lf_cfg(rvu, req);
-+		err = 0;
-+		goto unlock;
-+	}
-+
-+	/* Get Inline Ipsec Engine Group */
-+	for (i = 0; i < OTX2_CPT_MAX_ENG_TYPES; i++) {
-+		if (rvu->rvu_cpt.eng_grp[i].eng_type == OTX2_CPT_IE_TYPES) {
-+			egrp = rvu->rvu_cpt.eng_grp[i].grp_num;
-+			break;
-+		}
-+	}
-+
-+	if (egrp == OTX2_CPT_INVALID_CRYPTO_ENG_GRP) {
-+		dev_err(rvu->dev,
-+			"Engine group for inline ipsec not available\n");
-+		err = -ENODEV;
-+		goto unlock;
-+	}
-+	rvu->rvu_cpt.inline_ipsec_egrp = egrp;
-+
-+	rvu_cpt_save_rx_inline_lf_cfg(rvu, req);
-+
-+	err = rvu_cpt_rx_inline_cptlf_setup(rvu, BLKADDR_CPT0, 0);
-+	if (err)
-+		goto unlock;
-+
-+	if (is_block_implemented(rvu->hw, BLKADDR_CPT1)) {
-+		err = rvu_cpt_rx_inline_cptlf_setup(rvu, BLKADDR_CPT1, 0);
-+		if (err)
-+			goto cptlf_cleanup;
-+	}
-+
-+	rvu_cpt_rx_inline_nix_cfg(rvu);
-+
-+	err = rvu_cpt_rx_inline_ipsec_cfg(rvu);
-+	if (err)
-+		goto cptlf1_cleanup;
-+
-+	rvu->rvu_cpt.rx_initialized = true;
-+	mutex_unlock(&rvu->rvu_cpt.lock);
-+	return 0;
-+
-+cptlf1_cleanup:
-+	rvu_rx_cptlf_cleanup(rvu, BLKADDR_CPT1, 0);
-+cptlf_cleanup:
-+	rvu_rx_cptlf_cleanup(rvu, BLKADDR_CPT0, 0);
-+unlock:
-+	mutex_unlock(&rvu->rvu_cpt.lock);
-+	return err;
-+}
-+
- #define MAX_RXC_ICB_CNT  GENMASK_ULL(40, 32)
+ #define CPT_RES_LEN    16
+ #define CPT_SE_IE_EGRP 1ULL
  
- int rvu_cpt_init(struct rvu *rvu)
-@@ -1336,5 +1899,6 @@ int rvu_cpt_init(struct rvu *rvu)
+ static int cpt_inline_inb_lf_cmd_send(struct rvu *rvu, int blkaddr,
+ 				      int nix_blkaddr)
+ {
+-	int cpt_pf_num = rvu->cpt_pf_num;
+-	struct cpt_inst_lmtst_req *req;
+ 	dma_addr_t res_daddr;
+ 	int timeout = 3000;
++	u64 inst[8];
+ 	u8 cpt_idx;
+-	u64 *inst;
+ 	u16 *res;
+-	int rc;
  
- 	spin_lock_init(&rvu->cpt_intr_lock);
+ 	res = kzalloc(CPT_RES_LEN, GFP_KERNEL);
+ 	if (!res)
+@@ -1276,24 +1293,11 @@ static int cpt_inline_inb_lf_cmd_send(struct rvu *rvu, int blkaddr,
+ 				   DMA_BIDIRECTIONAL);
+ 	if (dma_mapping_error(rvu->dev, res_daddr)) {
+ 		dev_err(rvu->dev, "DMA mapping failed for CPT result\n");
+-		rc = -EFAULT;
+-		goto res_free;
++		kfree(res);
++		return -EFAULT;
+ 	}
+ 	*res = 0xFFFF;
  
-+	mutex_init(&rvu->rvu_cpt.lock);
+-	/* Send mbox message to CPT PF */
+-	req = (struct cpt_inst_lmtst_req *)
+-	       otx2_mbox_alloc_msg_rsp(&rvu->afpf_wq_info.mbox_up,
+-				       cpt_pf_num, sizeof(*req),
+-				       sizeof(struct msg_rsp));
+-	if (!req) {
+-		rc = -ENOMEM;
+-		goto res_daddr_unmap;
+-	}
+-	req->hdr.sig = OTX2_MBOX_REQ_SIG;
+-	req->hdr.id = MBOX_MSG_CPT_INST_LMTST;
+-
+-	inst = req->inst;
+ 	/* Prepare CPT_INST_S */
+ 	inst[0] = 0;
+ 	inst[1] = res_daddr;
+@@ -1314,11 +1318,8 @@ static int cpt_inline_inb_lf_cmd_send(struct rvu *rvu, int blkaddr,
+ 	rvu_write64(rvu, nix_blkaddr, NIX_AF_RX_CPTX_CREDIT(cpt_idx),
+ 		    BIT_ULL(22) - 1);
+ 
+-	otx2_mbox_msg_send(&rvu->afpf_wq_info.mbox_up, cpt_pf_num);
+-	rc = otx2_mbox_wait_for_rsp(&rvu->afpf_wq_info.mbox_up, cpt_pf_num);
+-	if (rc)
+-		dev_warn(rvu->dev, "notification to pf %d failed\n",
+-			 cpt_pf_num);
++	cn10k_cpt_inst_flush(rvu, inst, 64);
++
+ 	/* Wait for CPT instruction to be completed */
+ 	do {
+ 		mdelay(1);
+@@ -1331,11 +1332,8 @@ static int cpt_inline_inb_lf_cmd_send(struct rvu *rvu, int blkaddr,
+ 	if (timeout == 0)
+ 		dev_warn(rvu->dev, "Poll for result hits hard loop counter\n");
+ 
+-res_daddr_unmap:
+ 	dma_unmap_single(rvu->dev, res_daddr, CPT_RES_LEN, DMA_BIDIRECTIONAL);
+-res_free:
+ 	kfree(res);
+-
  	return 0;
  }
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h
-new file mode 100644
-index 000000000000..4b57c7038d6c
---- /dev/null
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h
-@@ -0,0 +1,67 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Marvell AF CPT driver
-+ *
-+ * Copyright (C) 2022 Marvell.
-+ */
-+
-+#ifndef RVU_CPT_H
-+#define RVU_CPT_H
-+
-+#include <linux/types.h>
-+
-+/* CPT instruction size in bytes */
-+#define RVU_CPT_INST_SIZE	64
-+
-+/* CPT instruction (CPT_INST_S) queue length */
-+#define RVU_CPT_INST_QLEN	8200
-+
-+/* CPT instruction queue size passed to HW is in units of
-+ * 40*CPT_INST_S messages.
-+ */
-+#define RVU_CPT_SIZE_DIV40 (RVU_CPT_INST_QLEN / 40)
-+
-+/* CPT instruction and pending queues length in CPT_INST_S messages */
-+#define RVU_CPT_INST_QLEN_MSGS	((RVU_CPT_SIZE_DIV40 - 1) * 40)
-+
-+/* CPT needs 320 free entries */
-+#define RVU_CPT_INST_QLEN_EXTRA_BYTES	(320 * RVU_CPT_INST_SIZE)
-+#define RVU_CPT_EXTRA_SIZE_DIV40	(320 / 40)
-+
-+/* CPT instruction queue length in bytes */
-+#define RVU_CPT_INST_QLEN_BYTES                                               \
-+		((RVU_CPT_SIZE_DIV40 * 40 * RVU_CPT_INST_SIZE) +             \
-+		RVU_CPT_INST_QLEN_EXTRA_BYTES)
-+
-+/* CPT instruction group queue length in bytes */
-+#define RVU_CPT_INST_GRP_QLEN_BYTES                                           \
-+		((RVU_CPT_SIZE_DIV40 + RVU_CPT_EXTRA_SIZE_DIV40) * 16)
-+
-+/* CPT FC length in bytes */
-+#define RVU_CPT_Q_FC_LEN 128
-+
-+/* CPT LF_Q_SIZE Register */
-+#define CPT_LF_Q_SIZE_DIV40 GENMASK_ULL(14, 0)
-+
-+/* CPT invalid engine group num */
-+#define OTX2_CPT_INVALID_CRYPTO_ENG_GRP 0xFF
-+
-+/* Fastpath ipsec opcode with inplace processing */
-+#define OTX2_CPT_INLINE_RX_OPCODE (0x26 | (1 << 6))
-+#define CN10K_CPT_INLINE_RX_OPCODE (0x29 | (1 << 6))
-+
-+/* Calculate CPT register offset */
-+#define CPT_RVU_FUNC_ADDR_S(blk, slot, offs) \
-+		(((blk) << 20) | ((slot) << 12) | (offs))
-+
-+static inline void otx2_cpt_write64(void __iomem *reg_base, u64 blk, u64 slot,
-+				    u64 offs, u64 val)
-+{
-+	writeq_relaxed(val, reg_base + CPT_RVU_FUNC_ADDR_S(blk, slot, offs));
-+}
-+
-+static inline u64 otx2_cpt_read64(void __iomem *reg_base, u64 blk, u64 slot,
-+				  u64 offs)
-+{
-+	return readq_relaxed(reg_base + CPT_RVU_FUNC_ADDR_S(blk, slot, offs));
-+}
-+#endif // RVU_CPT_H
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index 828316211b24..c3d6f363bf61 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -5490,8 +5490,8 @@ int rvu_mbox_handler_nix_lso_format_cfg(struct rvu *rvu,
- #define CPT_INST_CREDIT_BPID  GENMASK_ULL(30, 22)
- #define CPT_INST_CREDIT_CNT   GENMASK_ULL(21, 0)
  
--static void nix_inline_ipsec_cfg(struct rvu *rvu, struct nix_inline_ipsec_cfg *req,
--				 int blkaddr)
-+void nix_inline_ipsec_cfg(struct rvu *rvu, struct nix_inline_ipsec_cfg *req,
-+			  int blkaddr)
- {
- 	u8 cpt_idx, cpt_blkaddr;
- 	u64 val;
+@@ -1381,23 +1379,16 @@ int rvu_cpt_ctx_flush(struct rvu *rvu, u16 pcifunc)
+ 		goto unlock;
+ 	}
+ 
+-	/* Enable BAR2 ALIAS for this pcifunc. */
+-	reg = BIT_ULL(16) | pcifunc;
+-	rvu_bar2_sel_write64(rvu, blkaddr, CPT_AF_BAR2_SEL, reg);
+-
+ 	for (i = 0; i < max_ctx_entries; i++) {
+ 		cam_data = rvu_read64(rvu, blkaddr, CPT_AF_CTX_CAM_DATA(i));
+ 
+ 		if ((FIELD_GET(CTX_CAM_PF_FUNC, cam_data) == pcifunc) &&
+ 		    FIELD_GET(CTX_CAM_CPTR, cam_data)) {
+ 			reg = BIT_ULL(46) | FIELD_GET(CTX_CAM_CPTR, cam_data);
+-			rvu_write64(rvu, blkaddr,
+-				    CPT_AF_BAR2_ALIASX(slot, CPT_LF_CTX_FLUSH),
+-				    reg);
++			otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot,
++					 CPT_LF_CTX_FLUSH, reg);
+ 		}
+ 	}
+-	rvu_bar2_sel_write64(rvu, blkaddr, CPT_AF_BAR2_SEL, 0);
+-
+ unlock:
+ 	mutex_unlock(&rvu->rsrc_lock);
+ 
 diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
-index 62cdc714ba57..d92c154b08cf 100644
+index d92c154b08cf..b24d9e7c8df4 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
 +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
-@@ -509,6 +509,9 @@
- #define CPT_AF_EXE_EPCI_OUTBX_CNT(a)    (0x25000ull | (u64)(a) << 3)
- #define CPT_AF_EXEX_UCODE_BASE(a)       (0x26000ull | (u64)(a) << 3)
- #define CPT_AF_LFX_CTL(a)               (0x27000ull | (u64)(a) << 3)
-+#define CPT_AF_LFX_CTL_HIGH_PRI		BIT_ULL(0)
-+#define CPT_AF_LFX_CTL_CTX_ILEN		GENMASK_ULL(19, 17)
-+#define CPT_AF_LFX_CTL_EGRP		GENMASK_ULL(55, 48)
- #define CPT_AF_LFX_CTL2(a)              (0x29000ull | (u64)(a) << 3)
- #define CPT_AF_CPTCLK_CNT               (0x2a000)
- #define CPT_AF_PF_FUNC                  (0x2b000)
-@@ -562,7 +565,19 @@
- #define CPT_AF_LF_SSO_PF_FUNC_SHIFT 32
- 
- #define CPT_LF_CTL                      0x10
-+#define CPT_LF_CTL_ENQ_ENA		BIT_ULL(0)
- #define CPT_LF_INPROG                   0x40
-+#define CPT_LF_INPROG_EXEC_ENABLE	BIT_ULL(16)
-+#define CPT_LF_MISC_INT                 0xb0
-+#define CPT_LF_MISC_INT_NQERR		BIT_ULL(1)
-+#define CPT_LF_MISC_INT_IRDE		BIT_ULL(2)
-+#define CPT_LF_MISC_INT_NWRP		BIT_ULL(3)
-+#define CPT_LF_MISC_INT_HWERR		BIT_ULL(5)
-+#define CPT_LF_MISC_INT_FAULT		BIT_ULL(6)
-+#define CPT_LF_MISC_INT_MASK            0x6e
-+#define CPT_LF_MISC_INT_ENA_W1S         0xd0
-+#define CPT_LF_MISC_INT_ENA_W1C         0xe0
-+#define CPT_LF_Q_BASE                   0xf0
+@@ -581,6 +581,7 @@
  #define CPT_LF_Q_SIZE                   0x100
  #define CPT_LF_Q_INST_PTR               0x110
  #define CPT_LF_Q_GRP_PTR                0x120
++#define CPT_LF_NQX                      0x400
+ #define CPT_LF_CTX_FLUSH                0x510
+ 
+ #define NPC_AF_BLK_RST                  (0x00040)
 -- 
 2.43.0
 
