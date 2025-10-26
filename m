@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70832280033;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E398B283FE5;
 	Sun, 26 Oct 2025 05:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761457987; cv=none; b=K2jXBlMSKAsaCa5ghwOUNWHjqpZVnwc63ZHR4RrlhEPRmDE8927OjLRBA6KKJ2IlrA7nPdloHoyW8TVF9iyFi0Wo0zGDvB0WjPXjefkRtMARAXgxnZK3Kkr8pxtrvhGGlANh9cJbKB4p7M7uzbk0yudp5C/UhJSigDOCE+y/MKM=
+	t=1761457988; cv=none; b=bTHJ4S08M4IrVrxBBPczKgZkodcdyeM5ElUHIBQP06xSe9pBLnpYG23fukIYMdflU7I1QoqH+7z46yKJ6M2ulah71rHN30Rufe+CLE+/sRei7TQ1q0du+rxs55pNy/5VYXBVxiqCZfEHXV7FEwy4swM2Kg7rPcvgPYS84a9TEUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761457987; c=relaxed/simple;
-	bh=whd3/UAU+Av8P94JmMwJInAffIEeimNA4qb0IpZM3BE=;
+	s=arc-20240116; t=1761457988; c=relaxed/simple;
+	bh=UDeV+e2gTIJPhO0d+cQbe63gbfwYnFHdWs0Ho6ezHg0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dXhOin0JmTxGCKLONhzdN+tZpefbNIsKYtTJTQYTCg0ANINB5bdLHYUQkO6z9FwNgA7zOzKHHBzDD+HSpyvTKu2jUloyOzhGzCgnXXrvURDW66APW/kefHun8vlDM+qdEChqLGiENWpQfDYqm08tgY3tCVamJ1OLIKPpsQi8C8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JkuRP+Ev; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=VW44EEFf9BJAZnu3amwKoe8EsyoT1qzqQxZ+Mi9MX0N+lPDLZvkc7tnRrOOBSn5zuc5PwmzS2St8vg2Z888Cx+FNyDn9HDyrkT7jKnWGKEqdHfpLmGeQ5ph3h0VOm5o5++9R44BEQn/0OKtVf4XOkNf81zi4s8nxLdxV3U3PFrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fUSepT19; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JkuRP+Ev"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 021BAC4CEE7;
-	Sun, 26 Oct 2025 05:53:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fUSepT19"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 752A9C116C6;
+	Sun, 26 Oct 2025 05:53:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1761457987;
-	bh=whd3/UAU+Av8P94JmMwJInAffIEeimNA4qb0IpZM3BE=;
+	bh=UDeV+e2gTIJPhO0d+cQbe63gbfwYnFHdWs0Ho6ezHg0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JkuRP+EvVU4pwZ7E6PK7sAdaSnn9Gseea3mkv7c7lrYvjNCdLocin68xIEW73mnIu
-	 G1+xw1WwcuiedY94SAOKIfsoKHSKt5ujrL36GWVwkyuu88jHtFRqwIz/HC+kPKB46g
-	 r7EBcLuZ6YVTkzr4gLDKn0ib+cL80u/w+62ZekNVooTRwHURSlSj9wFrS8PEKWkPkx
-	 Puuj2RELLpDDFm9Yk1CMlIP0PlrIxXruVuJGjXMWxJohG3jBtTwRLMdlJp3iWrjIF4
-	 zAVOdrZYQHiO6qRR5Tu4f2r1PDD5WQ6dS3U/zY7hnWNSinxfn6ZyFcClRen7R96M+x
-	 XjAN4Bw14/yGA==
+	b=fUSepT19WMWWLhm/3WnKdHgpZlIAoFal9CQHkqFa4qLw5yULTpRBxag4bbuH+qh0V
+	 mu4/41ajLPPg4RQziYYXAU+j4GSdkfCo02xmTo9u5LSTsRDjou7i/QU1QXcGljVHrt
+	 /35RPFqSU+1Fj37OIUV/UxrvGCrzxmwQfpDdo+xDYvuGyzVNGVqNBk7YI0DEAnFm53
+	 DesU1dALhqTdyz8V6p7hYZUybZAHPYtajemxkf527gYM48pb/+FN67/7gW7pfQkErY
+	 uQUWO5uq6eWnkPvraolNzYsPvyLquG22Kye3RWAJyvztSW5fJAzlIdYCPn/BcNtZDr
+	 DjevePua//JHA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -38,9 +38,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-s390@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 09/15] lib/crypto: arm64/sha3: Migrate optimized code into library
-Date: Sat, 25 Oct 2025 22:50:26 -0700
-Message-ID: <20251026055032.1413733-10-ebiggers@kernel.org>
+Subject: [PATCH v2 10/15] lib/crypto: s390/sha3: Add optimized Keccak functions
+Date: Sat, 25 Oct 2025 22:50:27 -0700
+Message-ID: <20251026055032.1413733-11-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.1.dirty
 In-Reply-To: <20251026055032.1413733-1-ebiggers@kernel.org>
 References: <20251026055032.1413733-1-ebiggers@kernel.org>
@@ -52,354 +52,103 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Instead of exposing the arm64-optimized SHA-3 code via arm64-specific
-crypto_shash algorithms, instead just implement the sha3_absorb_blocks()
-and sha3_keccakf() library functions.  This is much simpler, it makes
-the SHA-3 library functions be arm64-optimized, and it fixes the
-longstanding issue where the arm64-optimized SHA-3 code was disabled by
-default.  SHA-3 still remains available through crypto_shash, but
-individual architectures no longer need to handle it.
+Implement sha3_absorb_blocks() and sha3_keccakf() using the hardware-
+accelerated SHA-3 support in Message-Security-Assist Extension 6.
 
-Note: to see the diff from arch/arm64/crypto/sha3-ce-glue.c to
-lib/crypto/arm64/sha3.h, view this commit with 'git show -M10'.
+This accelerates the SHA3-224, SHA3-256, SHA3-384, SHA3-512, and
+SHAKE256 library functions.
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+Note that arch/s390/crypto/ already has SHA-3 code that uses this
+extension, but it is exposed only via crypto_shash.  This commit brings
+the same acceleration to the SHA-3 library.  The arch/s390/crypto/
+version will become redundant and be removed in later changes.
+
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/arm64/configs/defconfig                  |   2 +-
- arch/arm64/crypto/Kconfig                     |  11 --
- arch/arm64/crypto/Makefile                    |   3 -
- arch/arm64/crypto/sha3-ce-glue.c              | 150 ------------------
- lib/crypto/Kconfig                            |   5 +
- lib/crypto/Makefile                           |   5 +
- .../crypto/arm64}/sha3-ce-core.S              |   0
- lib/crypto/arm64/sha3.h                       |  62 ++++++++
- 8 files changed, 73 insertions(+), 165 deletions(-)
- delete mode 100644 arch/arm64/crypto/sha3-ce-glue.c
- rename {arch/arm64/crypto => lib/crypto/arm64}/sha3-ce-core.S (100%)
- create mode 100644 lib/crypto/arm64/sha3.h
+ lib/crypto/Kconfig     |  1 +
+ lib/crypto/s390/sha3.h | 88 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 89 insertions(+)
+ create mode 100644 lib/crypto/s390/sha3.h
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index e3a2d37bd1042..20dd3a39faead 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -1781,14 +1781,14 @@ CONFIG_SECURITY=y
- CONFIG_CRYPTO_USER=y
- CONFIG_CRYPTO_CHACHA20=m
- CONFIG_CRYPTO_BENCHMARK=m
- CONFIG_CRYPTO_ECHAINIV=y
- CONFIG_CRYPTO_MICHAEL_MIC=m
-+CONFIG_CRYPTO_SHA3=m
- CONFIG_CRYPTO_ANSI_CPRNG=y
- CONFIG_CRYPTO_USER_API_RNG=m
- CONFIG_CRYPTO_GHASH_ARM64_CE=y
--CONFIG_CRYPTO_SHA3_ARM64=m
- CONFIG_CRYPTO_SM3_ARM64_CE=m
- CONFIG_CRYPTO_AES_ARM64_CE_BLK=y
- CONFIG_CRYPTO_AES_ARM64_BS=m
- CONFIG_CRYPTO_AES_ARM64_CE_CCM=y
- CONFIG_CRYPTO_DEV_SUN8I_CE=m
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index 91f3093eee6ab..376d6b50743ff 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -23,21 +23,10 @@ config CRYPTO_NHPOLY1305_NEON
- 	  NHPoly1305 hash function (Adiantum)
- 
- 	  Architecture: arm64 using:
- 	  - NEON (Advanced SIMD) extensions
- 
--config CRYPTO_SHA3_ARM64
--	tristate "Hash functions: SHA-3 (ARMv8.2 Crypto Extensions)"
--	depends on KERNEL_MODE_NEON
--	select CRYPTO_HASH
--	select CRYPTO_SHA3
--	help
--	  SHA-3 secure hash algorithms (FIPS 202)
--
--	  Architecture: arm64 using:
--	  - ARMv8.2 Crypto Extensions
--
- config CRYPTO_SM3_NEON
- 	tristate "Hash functions: SM3 (NEON)"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_HASH
- 	select CRYPTO_LIB_SM3
-diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-index a8b2cdbe202c1..fd3d590fa1137 100644
---- a/arch/arm64/crypto/Makefile
-+++ b/arch/arm64/crypto/Makefile
-@@ -3,13 +3,10 @@
- # linux/arch/arm64/crypto/Makefile
- #
- # Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
- #
- 
--obj-$(CONFIG_CRYPTO_SHA3_ARM64) += sha3-ce.o
--sha3-ce-y := sha3-ce-glue.o sha3-ce-core.o
--
- obj-$(CONFIG_CRYPTO_SM3_NEON) += sm3-neon.o
- sm3-neon-y := sm3-neon-glue.o sm3-neon-core.o
- 
- obj-$(CONFIG_CRYPTO_SM3_ARM64_CE) += sm3-ce.o
- sm3-ce-y := sm3-ce-glue.o sm3-ce-core.o
-diff --git a/arch/arm64/crypto/sha3-ce-glue.c b/arch/arm64/crypto/sha3-ce-glue.c
-deleted file mode 100644
-index 250f4fb76b472..0000000000000
---- a/arch/arm64/crypto/sha3-ce-glue.c
-+++ /dev/null
-@@ -1,150 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--/*
-- * sha3-ce-glue.c - core SHA-3 transform using v8.2 Crypto Extensions
-- *
-- * Copyright (C) 2018 Linaro Ltd <ard.biesheuvel@linaro.org>
-- *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License version 2 as
-- * published by the Free Software Foundation.
-- */
--
--#include <asm/hwcap.h>
--#include <asm/neon.h>
--#include <asm/simd.h>
--#include <crypto/internal/hash.h>
--#include <crypto/sha3.h>
--#include <linux/cpufeature.h>
--#include <linux/kernel.h>
--#include <linux/module.h>
--#include <linux/string.h>
--#include <linux/unaligned.h>
--
--MODULE_DESCRIPTION("SHA3 secure hash using ARMv8 Crypto Extensions");
--MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
--MODULE_LICENSE("GPL v2");
--MODULE_ALIAS_CRYPTO("sha3-224");
--MODULE_ALIAS_CRYPTO("sha3-256");
--MODULE_ALIAS_CRYPTO("sha3-384");
--MODULE_ALIAS_CRYPTO("sha3-512");
--
--asmlinkage size_t sha3_ce_transform(struct sha3_state *state, const u8 *data,
--				    size_t nblocks, size_t block_size);
--
--static int arm64_sha3_update(struct shash_desc *desc, const u8 *data,
--			     unsigned int len)
--{
--	struct sha3_state *sctx = shash_desc_ctx(desc);
--	struct crypto_shash *tfm = desc->tfm;
--	unsigned int bs;
--	int blocks;
--
--	bs = crypto_shash_blocksize(tfm);
--	blocks = len / bs;
--	len -= blocks * bs;
--	do {
--		int rem;
--
--		kernel_neon_begin();
--		rem = sha3_ce_transform(sctx, data, blocks, bs);
--		kernel_neon_end();
--		data += (blocks - rem) * bs;
--		blocks = rem;
--	} while (blocks);
--	return len;
--}
--
--static int sha3_finup(struct shash_desc *desc, const u8 *src, unsigned int len,
--		      u8 *out)
--{
--	struct sha3_state *sctx = shash_desc_ctx(desc);
--	struct crypto_shash *tfm = desc->tfm;
--	__le64 *digest = (__le64 *)out;
--	u8 block[SHA3_224_BLOCK_SIZE];
--	unsigned int bs, ds;
--	int i;
--
--	ds = crypto_shash_digestsize(tfm);
--	bs = crypto_shash_blocksize(tfm);
--	memcpy(block, src, len);
--
--	block[len++] = 0x06;
--	memset(block + len, 0, bs - len);
--	block[bs - 1] |= 0x80;
--
--	kernel_neon_begin();
--	sha3_ce_transform(sctx, block, 1, bs);
--	kernel_neon_end();
--	memzero_explicit(block , sizeof(block));
--
--	for (i = 0; i < ds / 8; i++)
--		put_unaligned_le64(sctx->st[i], digest++);
--
--	if (ds & 4)
--		put_unaligned_le32(sctx->st[i], (__le32 *)digest);
--
--	return 0;
--}
--
--static struct shash_alg algs[] = { {
--	.digestsize		= SHA3_224_DIGEST_SIZE,
--	.init			= crypto_sha3_init,
--	.update			= arm64_sha3_update,
--	.finup			= sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
--	.base.cra_name		= "sha3-224",
--	.base.cra_driver_name	= "sha3-224-ce",
--	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
--	.base.cra_blocksize	= SHA3_224_BLOCK_SIZE,
--	.base.cra_module	= THIS_MODULE,
--	.base.cra_priority	= 200,
--}, {
--	.digestsize		= SHA3_256_DIGEST_SIZE,
--	.init			= crypto_sha3_init,
--	.update			= arm64_sha3_update,
--	.finup			= sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
--	.base.cra_name		= "sha3-256",
--	.base.cra_driver_name	= "sha3-256-ce",
--	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
--	.base.cra_blocksize	= SHA3_256_BLOCK_SIZE,
--	.base.cra_module	= THIS_MODULE,
--	.base.cra_priority	= 200,
--}, {
--	.digestsize		= SHA3_384_DIGEST_SIZE,
--	.init			= crypto_sha3_init,
--	.update			= arm64_sha3_update,
--	.finup			= sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
--	.base.cra_name		= "sha3-384",
--	.base.cra_driver_name	= "sha3-384-ce",
--	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
--	.base.cra_blocksize	= SHA3_384_BLOCK_SIZE,
--	.base.cra_module	= THIS_MODULE,
--	.base.cra_priority	= 200,
--}, {
--	.digestsize		= SHA3_512_DIGEST_SIZE,
--	.init			= crypto_sha3_init,
--	.update			= arm64_sha3_update,
--	.finup			= sha3_finup,
--	.descsize		= SHA3_STATE_SIZE,
--	.base.cra_name		= "sha3-512",
--	.base.cra_driver_name	= "sha3-512-ce",
--	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
--	.base.cra_blocksize	= SHA3_512_BLOCK_SIZE,
--	.base.cra_module	= THIS_MODULE,
--	.base.cra_priority	= 200,
--} };
--
--static int __init sha3_neon_mod_init(void)
--{
--	return crypto_register_shashes(algs, ARRAY_SIZE(algs));
--}
--
--static void __exit sha3_neon_mod_fini(void)
--{
--	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
--}
--
--module_cpu_feature_match(SHA3, sha3_neon_mod_init);
--module_exit(sha3_neon_mod_fini);
 diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index a05f5a349cd8c..587490ca65654 100644
+index 587490ca65654..7445054fc0ad4 100644
 --- a/lib/crypto/Kconfig
 +++ b/lib/crypto/Kconfig
-@@ -200,10 +200,15 @@ config CRYPTO_LIB_SHA3
- 	select CRYPTO_LIB_UTILS
- 	help
- 	  The SHA3 library functions.  Select this if your module uses any of
- 	  the functions from <crypto/sha3.h>.
+@@ -204,10 +204,11 @@ config CRYPTO_LIB_SHA3
  
-+config CRYPTO_LIB_SHA3_ARCH
-+	bool
-+	depends on CRYPTO_LIB_SHA3 && !UML
-+	default y if ARM64 && KERNEL_MODE_NEON
-+
+ config CRYPTO_LIB_SHA3_ARCH
+ 	bool
+ 	depends on CRYPTO_LIB_SHA3 && !UML
+ 	default y if ARM64 && KERNEL_MODE_NEON
++	default y if S390
+ 
  config CRYPTO_LIB_SM3
  	tristate
  
  source "lib/crypto/tests/Kconfig"
- 
-diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-index 0cfdb511f32b6..5515e73bfd5e3 100644
---- a/lib/crypto/Makefile
-+++ b/lib/crypto/Makefile
-@@ -279,10 +279,15 @@ endif # CONFIG_CRYPTO_LIB_SHA512_ARCH
- ################################################################################
- 
- obj-$(CONFIG_CRYPTO_LIB_SHA3) += libsha3.o
- libsha3-y := sha3.o
- 
-+ifeq ($(CONFIG_CRYPTO_LIB_SHA3_ARCH),y)
-+CFLAGS_sha3.o += -I$(src)/$(SRCARCH)
-+libsha3-$(CONFIG_ARM64) += arm64/sha3-ce-core.o
-+endif # CONFIG_CRYPTO_LIB_SHA3_ARCH
-+
- ################################################################################
- 
- obj-$(CONFIG_MPILIB) += mpi/
- 
- obj-$(CONFIG_CRYPTO_SELFTESTS_FULL)		+= simd.o
-diff --git a/arch/arm64/crypto/sha3-ce-core.S b/lib/crypto/arm64/sha3-ce-core.S
-similarity index 100%
-rename from arch/arm64/crypto/sha3-ce-core.S
-rename to lib/crypto/arm64/sha3-ce-core.S
-diff --git a/lib/crypto/arm64/sha3.h b/lib/crypto/arm64/sha3.h
+diff --git a/lib/crypto/s390/sha3.h b/lib/crypto/s390/sha3.h
 new file mode 100644
-index 0000000000000..6dd5183056da4
+index 0000000000000..668e53da93d2c
 --- /dev/null
-+++ b/lib/crypto/arm64/sha3.h
-@@ -0,0 +1,62 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
++++ b/lib/crypto/s390/sha3.h
+@@ -0,0 +1,88 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/*
-+ * Copyright (C) 2018 Linaro Ltd <ard.biesheuvel@linaro.org>
++ * SHA-3 optimized using the CP Assist for Cryptographic Functions (CPACF)
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ * Copyright 2025 Google LLC
 + */
-+
-+#include <asm/neon.h>
-+#include <asm/simd.h>
++#include <asm/cpacf.h>
 +#include <linux/cpufeature.h>
 +
 +static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_sha3);
 +
-+asmlinkage size_t sha3_ce_transform(struct sha3_state *state, const u8 *data,
-+				    size_t nblocks, size_t block_size);
-+
 +static void sha3_absorb_blocks(struct sha3_state *state, const u8 *data,
 +			       size_t nblocks, size_t block_size)
 +{
-+	if (static_branch_likely(&have_sha3) && likely(may_use_simd())) {
-+		do {
-+			size_t rem;
-+
-+			kernel_neon_begin();
-+			rem = sha3_ce_transform(state, data, nblocks,
-+						block_size);
-+			kernel_neon_end();
-+			data += (nblocks - rem) * block_size;
-+			nblocks = rem;
-+		} while (nblocks);
-+	} else {
-+		sha3_absorb_blocks_generic(state, data, nblocks, block_size);
++	if (static_branch_likely(&have_sha3)) {
++		/*
++		 * Note that KIMD assumes little-endian order of the state
++		 * words.  sha3_state already uses that order, though, so
++		 * there's no need for a byteswap.
++		 */
++		switch (block_size) {
++		case SHA3_224_BLOCK_SIZE:
++			cpacf_kimd(CPACF_KIMD_SHA3_224, state,
++				   data, nblocks * block_size);
++			return;
++		case SHA3_256_BLOCK_SIZE:
++			/*
++			 * This case handles both SHA3-256 and SHAKE256, since
++			 * they have the same block size.
++			 */
++			cpacf_kimd(CPACF_KIMD_SHA3_256, state,
++				   data, nblocks * block_size);
++			return;
++		case SHA3_384_BLOCK_SIZE:
++			cpacf_kimd(CPACF_KIMD_SHA3_384, state,
++				   data, nblocks * block_size);
++			return;
++		case SHA3_512_BLOCK_SIZE:
++			cpacf_kimd(CPACF_KIMD_SHA3_512, state,
++				   data, nblocks * block_size);
++			return;
++		}
 +	}
++	sha3_absorb_blocks_generic(state, data, nblocks, block_size);
 +}
 +
 +static void sha3_keccakf(struct sha3_state *state)
 +{
-+	if (static_branch_likely(&have_sha3) && likely(may_use_simd())) {
++	if (static_branch_likely(&have_sha3)) {
 +		/*
-+		 * Passing zeroes into sha3_ce_transform() gives the plain
-+		 * Keccak-f permutation, which is what we want here.  Any
-+		 * supported block size may be used.  Use SHA3_512_BLOCK_SIZE
-+		 * since it's the shortest.
++		 * Passing zeroes into any of CPACF_KIMD_SHA3_* gives the plain
++		 * Keccak-f permutation, which is what we want here.  Use
++		 * SHA3-512 since it has the smallest block size.
 +		 */
 +		static const u8 zeroes[SHA3_512_BLOCK_SIZE];
 +
-+		kernel_neon_begin();
-+		sha3_ce_transform(state, zeroes, 1, sizeof(zeroes));
-+		kernel_neon_end();
++		cpacf_kimd(CPACF_KIMD_SHA3_512, state, zeroes, sizeof(zeroes));
 +	} else {
 +		sha3_keccakf_generic(state);
 +	}
@@ -408,8 +157,28 @@ index 0000000000000..6dd5183056da4
 +#define sha3_mod_init_arch sha3_mod_init_arch
 +static void sha3_mod_init_arch(void)
 +{
-+	if (cpu_have_named_feature(SHA3))
++	int num_present = 0;
++	int num_possible = 0;
++
++	if (!cpu_have_feature(S390_CPU_FEATURE_MSA))
++		return;
++	/*
++	 * Since all the SHA-3 functions are in Message-Security-Assist
++	 * Extension 6, just treat them as all or nothing.  This way we need
++	 * only one static_key.
++	 */
++#define QUERY(opcode, func) \
++	({ num_present += !!cpacf_query_func(opcode, func); num_possible++; })
++	QUERY(CPACF_KIMD, CPACF_KIMD_SHA3_224);
++	QUERY(CPACF_KIMD, CPACF_KIMD_SHA3_256);
++	QUERY(CPACF_KIMD, CPACF_KIMD_SHA3_384);
++	QUERY(CPACF_KIMD, CPACF_KIMD_SHA3_512);
++#undef QUERY
++
++	if (num_present == num_possible)
 +		static_branch_enable(&have_sha3);
++	else if (num_present != 0)
++		pr_warn("Unsupported combination of SHA-3 facilities\n");
 +}
 -- 
 2.51.1.dirty
