@@ -1,128 +1,169 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD942E543B
-	for <linux-crypto@vger.kernel.org>; Mon, 27 Oct 2025 08:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDB22EE60F
+	for <linux-crypto@vger.kernel.org>; Mon, 27 Oct 2025 08:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761553660; cv=none; b=Cnj6h6KJpWZ26ZyISLA7jngJ9vaU8yECipGqEztWAQ5KQiQCCc+QJSfPllA4p7NlERywe1NIJyvsQRcXgcr6/CIPowWi8gnsZMXaCrG5fJIPFw0ySWikvzpUTGfrPWT/nj3czumR0POCiGQftTl/8D71KbtiTwOAAFARLNMAKJ8=
+	t=1761554552; cv=none; b=LhJ+tlF10S7UIxi4b858IhlyPVHkkuKXFuvLQz7F/p5+M4zU4U8ZE09iCEyW9cpZtlpDECD4qZD5K5XZImfGltD7iR5ZCnjJkRWZzIfLMt2JfA+1DPirljtnG0nlKGX+cc2d+D+5Bpd8tXp/Ks/rfwii/6VSj0451gzCXVj9Lfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761553660; c=relaxed/simple;
-	bh=SD7mFn3Azck8G6ddO0hF8piSL6ovIEwmDhL2dXByvlY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RGa1d44p5XTj4jRgyX/rFQtqdGmBAqLs7LmyjjQ5wd77+YbVvVIufVrBFW+jdhC7zuXPmGo4CwgEuVTePkm0LOuD4E+U4qrTxxEYS4ECgwnoGIEvLF4YxjTi8dcJyujTrHbnHHy2Vu0eTN/Xh+brVZmcJulEX2qQCH0diRiXleg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=nWLQY8qL; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1761554552; c=relaxed/simple;
+	bh=UG8pE67BLGZgv3QifxWbYYEqvT3PKB5usDKrFSSOST8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=P4BJfC8oQM2DxJRbqPYLBPZ8C1OfGLrGR8xEW4FPqGvjGCsaL4N/YSnH9V4Cix2JHfkMRZL7/Z23YD83SxhMF5EiVUJGiutHWNXJglf2EP8g1feYvSV2j+x1EtuEuTp1MPLn47bkNXWzK/wSt7qVO9aJUvtS3B6y95HikaC50IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bh7j9kBF; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="nWLQY8qL"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59R3H9ls1503208
-	for <linux-crypto@vger.kernel.org>; Mon, 27 Oct 2025 08:27:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	fYQEo6dIiW98w97foyLVsGnKPCs4nvCityw2Go+JiO4=; b=nWLQY8qLLmuxGDnr
-	JIHJrWvauWSgETYrqhPtZC9vlMFGI6Hj8lrQI/7dtlO60JPNh+ijJsR/e1ulqhiz
-	uqOPzMCisa6glDP4LDE6CXa5TJV3S/dDgbbtv9n08XHmMxnCVXtMU8NfGLPHhu+t
-	fZwDw3zJwb5rxLIW/RQGGn8m+12C5wIqhdP12V9i1m+hklhlc+FL1bWSZLgl7BxH
-	4fcrkhERtG7O0dXUoBZstWZMZCGDNo4OtONZedvYnMLo4SYaq85ZParz+dhTB9zR
-	aoOk78+nK/wM0pWBYCYJiru/L6TemfQxBMD0JMmnOiCsqrEZWW2lGLQ0uzMkx0nw
-	spg2Gg==
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com [209.85.219.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a20pnrsb1-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Mon, 27 Oct 2025 08:27:38 +0000 (GMT)
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-87c103b902dso11528986d6.1
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Oct 2025 01:27:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bh7j9kBF"
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b6d3340dc2aso1014020966b.0
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Oct 2025 01:42:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761554549; x=1762159349; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iFlBtrits7DNlZ6h+mgbiMIVvWdiVqZSUXzsme0rVO8=;
+        b=Bh7j9kBFU1CekGtkw8gUdc6g4MwHmMZziwIOcuJR6f393+1syomtldv/ri0gdo75qo
+         CLZz4aNDjBZuK6NhDNOevGVN5naelzt/GG0D5f2NGqcJx4Y9Cf/TjX4cC4Up/PT2/55z
+         gf7vAitFMDtEjr7FDLlTmzm6qYsEzLZ5tNuyO3qiKPfe3z1dxrFDJ2YpZFZSiP3gItVT
+         2qR0YO4NR59xVacMBK27K7kH/ipyUY1oOpZ4M1OS/UB0c4uvE05fy6FChIjA6pJlK+Ve
+         A0PK+MQP6ha0nXImmmd7oYDUZRXQt2q5OuPGOSIP08Ycmg7gya5we6gYQHWWypBuNxY6
+         S8iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761553658; x=1762158458;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fYQEo6dIiW98w97foyLVsGnKPCs4nvCityw2Go+JiO4=;
-        b=kBUSOwRgc/5HmeO92D9aI/Gt/RZh8/J2DuxXIxjy15DnY4ln3Lo45pEYJTwH+rc2Xl
-         pVra74+Dj0Mg+rXp6d3+L8P4lfJ3ThchZqmTvNnKrei6C2o8mtjmcI56+xP2i02/7rcG
-         So77ZCVfjsGDK7x8ydaOEu5xfJToB7d1YpU7jIGEAD10f01zJ8mjkfSDPBlhHCgin1U4
-         RYbli/UCvKvkHX+XzdmSnZ4VYJ6K0XIevxFFL6+SvCFrgXx4OZGYuRVoYbLmGyDA7+EU
-         +W3cuolOje9qXOmcI6SCpiK/Hfj5Cwx30MHjIrNtxTeEIvmfWIEL7uK+SSOPk+xgKrNn
-         O6NA==
-X-Gm-Message-State: AOJu0Ywm6f3hpWLk12n2TVY9irnw16dnvKEXTA8NAYmMvJM3w2zbyUXd
-	EVEVZp4WDnVEa4KnKlnqPzbUQeFr1YLQCf3uVtMS2QUzI/QJu4eDgs9oUgRnsWLdmy9lbFXyHq4
-	hhE+U36Y3CEfgxDe72/Zm9koiZexQ3PlAVs1olx3gJCK7p809eHxyNPlLid043yfZ1sE=
-X-Gm-Gg: ASbGncvDjOgmjYvzIdtYeyzudUM44Bz6yo2OmRVVHcb4S8BVM3IGkm+wrXMfai39twe
-	+MTmgUPU5bRdJC1GGWbbkutAhmQE9sfHmJyIEwJ615uQUv3zAvuKmwad1aVQxNnwD5E4NcnPkKs
-	ZDHFto1fnrBePh+bWx6XdcPRoYHFrWGguvXMlyx/D+w5Pn5JSJXIsh8JepOnsnIb6UgIf3ZLyQO
-	rg2tb3ziBUlnVEjqDDEfyWl5bxYPgEeZ7EMxkc3H7VIsUJT1fbzrxwmWSi6nVqr+pWXvhLAQOkp
-	qUybpC8YjIk+lKxZO8JGsq+fOBa/H+pdN+gthX8Am9Z2zUOix9cFpETQfkA/ZQ1BFBkzsaNzbqM
-	Tvip1COfGbbNwTKMDIyi1/FZn0svjd0qYOIp+qNd85bruaCXKsRzuRMiI
-X-Received: by 2002:a05:6214:19c6:b0:87d:f8d3:2456 with SMTP id 6a1803df08f44-87df8d324a4mr156569886d6.2.1761553657626;
-        Mon, 27 Oct 2025 01:27:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEw4iXYcaTwz3Rp3bM1QNtADojUTF4L8DQ6lROhsJhLze0SnEaWSmqFqR5f8Qej1VLUJuyOjw==
-X-Received: by 2002:a05:6214:19c6:b0:87d:f8d3:2456 with SMTP id 6a1803df08f44-87df8d324a4mr156569726d6.2.1761553657204;
-        Mon, 27 Oct 2025 01:27:37 -0700 (PDT)
-Received: from [192.168.119.202] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d853fb3bdsm695248266b.52.2025.10.27.01.27.35
+        d=1e100.net; s=20230601; t=1761554549; x=1762159349;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iFlBtrits7DNlZ6h+mgbiMIVvWdiVqZSUXzsme0rVO8=;
+        b=pjIHg1QEEI8ozupSan9tfmKW/ydH3AupQ+RNDwOMgfHNFUHYv1a2lprNs2ULgjI9cH
+         abvVal0lxMA3VEKN0xqbyDrVF4YGuNuc8EyJQEBM1gAYRkSHc1a7qQTd/b/Bg/1IW5Mb
+         TMFmy2bjVEtQyJkEuPDt5gRhc0kUk06cE/6lan8KIpRrBOUZNLTuK7p6bR0rPnXUUZER
+         3UxpS521MjOIfctMATuso4itR+Tf+wE+0HrL/6MSt5UQZXagQJy3idZA9eUW6++v507u
+         oyS0UVFfmwE0LilqZ9bl0UZMwt2Usb2Kf59qlkXO79JfUJRNLx6L9LaF+3+1ALtI/7i2
+         KY6A==
+X-Forwarded-Encrypted: i=1; AJvYcCVr/TkL76axtcBdOZdSckmIiZtA1IVAd2sX2Ij6lrVqFAkRKc1Wv7QcOuskdp2/I3dLnGehRqKuCZlKx80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxExvG1fS20+sp72H+m3ubDPb5jD5jnvScGuxtEa1xJcufrhRw7
+	UWFcJds5bggGiDCrIFm5M193hbzgcEzmyYxaU1RKe3RtJMAP/L8/TMtz
+X-Gm-Gg: ASbGnct7FLIfh7KBQFYt30pUdQUsFhu4p/FTg1SKqnAYN3jyXro691FxTjsjnARkX6H
+	cr37pHjaOZ9dsDtvCvwTg7a3pDiRo14H0LBtW612SyZY6D5L0Bk6Bos//H0ER7mMduCofH188h5
+	4syZ8K4REsJ9H4rdYQkgr/niquuZORwGnd3lSjobCscxZvXl2uyVCmDv7NJaOAyQyaef+mjjggT
+	L12EPRs06xCtYh2P44Fr1xlOMJeoAE0QK5JlzBJA04L4l77AwWm2w0ZFSguBcBDsHqgHHIT+Iet
+	rLrsA3KFw57L2LXVmAxWP4ssXfQUFhfqVYgdsksmZLsb9aBsr/Kkmmdqgm0khPIwpLgTgQZls5A
+	YKyZQPXIj0NqHIvT8fpDg+Z6uL94EECVy7wbTpKgpacJrnftMFIia7kt3gcoyUsZnfHywhj8qai
+	K+
+X-Google-Smtp-Source: AGHT+IHNDWdV6nOLEUPb8BsKdy1fTa79zHhvllKqWIEzW+JrO9Bj5NMu8vYte0D/T+VD4YYNH0vo+A==
+X-Received: by 2002:a17:907:1c85:b0:b64:6cc7:6ac7 with SMTP id a640c23a62f3a-b6d6bb9083emr1215693866b.22.1761554548711;
+        Mon, 27 Oct 2025 01:42:28 -0700 (PDT)
+Received: from localhost ([212.73.77.104])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b6d853696aesm704277666b.30.2025.10.27.01.42.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Oct 2025 01:27:36 -0700 (PDT)
-Message-ID: <b622f606-e9c7-40b5-b05d-4f011a98faa5@oss.qualcomm.com>
-Date: Mon, 27 Oct 2025 09:27:35 +0100
+        Mon, 27 Oct 2025 01:42:28 -0700 (PDT)
+From: Askar Safin <safinaskar@gmail.com>
+To: mpatocka@redhat.com
+Cc: Dell.Client.Kernel@dell.com,
+	brauner@kernel.org,
+	dm-devel@lists.linux.dev,
+	ebiggers@kernel.org,
+	kix@kix.es,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-lvm@lists.linux.dev,
+	linux-mm@kvack.org,
+	linux-pm@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	lvm-devel@lists.linux.dev,
+	milan@mazyland.cz,
+	mzxreary@0pointer.de,
+	nphamcs@gmail.com,
+	pavel@ucw.cz,
+	rafael@kernel.org,
+	ryncsn@gmail.com,
+	safinaskar@gmail.com,
+	torvalds@linux-foundation.org
+Subject: Re: [PATCH] pm-hibernate: flush block device cache when hibernating
+Date: Mon, 27 Oct 2025 11:42:20 +0300
+Message-ID: <20251027084220.2064289-1-safinaskar@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <03e58462-5045-e12f-9af6-be2aaf19f32c@redhat.com>
+References: <03e58462-5045-e12f-9af6-be2aaf19f32c@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: qce: Provide dev_err_probe() status on DMA
- failure
-To: Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20251024-qce-dma-err-probe-v1-1-03de2477bb5c@oss.qualcomm.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20251024-qce-dma-err-probe-v1-1-03de2477bb5c@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: _-8UCgw2Uxnzg4eZc0-a6QcRYwQXi4-q
-X-Proofpoint-ORIG-GUID: _-8UCgw2Uxnzg4eZc0-a6QcRYwQXi4-q
-X-Authority-Analysis: v=2.4 cv=A+xh/qWG c=1 sm=1 tr=0 ts=68ff2cfa cx=c_pps
- a=wEM5vcRIz55oU/E2lInRtA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=EUspDBNiAAAA:8 a=25NbGeS3ZlacgUnTFUcA:9 a=QEXdDO2ut3YA:10
- a=OIgjcC2v60KrkQgK7BGD:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI3MDA3NyBTYWx0ZWRfX0omG5t4yPk+T
- mCU7xOFDZZkIvcuVwddqapNOc1pVmEEwoe0BaRDEFq1ix4wdu/hsej6uod137qFCQThnH/LgJxN
- gmthbFhG669AYaHY3QataWwoI2nc+WBsS5tg/9Jdu9hyeKNo4ZTJfxukonb4lcw/xY/LzBQCMle
- DU3+bRh0AizHwnnLFPPqc4waQFM2xbSjvFs/09Ef3ljjAwxLIYylDuHrBSixHrz9haHXXhrg+L2
- vdqCxQAMxZwXPB3s5m/j8y6O6Woo4MM8hHU+erszk/ru6H9hCkQcr1Zoikpw79hKxcgBSbuJZGA
- W3QiCPLc0otkNsYY/Yw9I5vBcp1hBK4TdBvCKP9SePNX1gX8Ark6AXsg7iq259tH6ZWY6+CdjQQ
- Iv+K3HtxuuwbiSpr8DvJxfoWmSu6GA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-27_04,2025-10-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 lowpriorityscore=0 clxscore=1015 suspectscore=0
- spamscore=0 bulkscore=0 adultscore=0 impostorscore=0 phishscore=0
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510020000
- definitions=main-2510270077
+Content-Transfer-Encoding: 8bit
 
-On 10/24/25 11:35 PM, Bjorn Andersson wrote:
-> On multiple occasions the qce device have shown up in devices_deferred,
-> without the explanation that this came from the failure to acquire the
-> DMA channels from the associated BAM.
+Mikulas Patocka <mpatocka@redhat.com>:
+> Hi
 > 
-> Use dev_err_probe() to associate this context with the failure to faster
-> pinpoint the culprit when this happens in the future.
+> Does this patch fix it?
 > 
-> Signed-off-by: Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>
-> ---
+> Mikulas
+> 
+> 
+> From: Mikulas Patocka <mpatocka@redhat.com>
+> 
+> There was reported failure that hibernation doesn't work with 
+> dm-integrity. The reason for the failure is that the hibernation code 
+> doesn't issue the FLUSH bio - the data still sits in the dm-integrity 
+> cache and they are lost when poweroff happens.
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+I tested this patch in Qemu on current master (43e9ad0c55a3). Also I
+applied Mario's patch
+https://lore.kernel.org/linux-pm/20251026033115.436448-1-superm1@kernel.org/ .
+It is needed, otherwise you get WARNING when you try to hibernate.
 
-Konrad
+The patch doesn't work.
+
+Here is script I used for reproduction:
+https://zerobin.net/?66669be7d2404586#xWufhCq7zCoOk3LJcJCj7W4k3vYT3U4vhGutTN3p8m0= .
+It is the same script as in previous letter. I just added some
+"integritysetup status /dev/mapper/..." calls.
+
+Here are results:
+https://zerobin.net/?2331637d633d20c5#EmyhxiHLDmoZT1jBVbe/q9iJKhDEw4n+Bwr5mAcaOpM= .
+
+File names mean the same as in previous letter, i. e.:
+
+> "log-def-1" is output of first Qemu invocation (i. e. first boot) with
+> default integritysetup options. "log-def-2" is second Qemu invocation
+> (i. e. when we try to resume).
+> 
+> log-bit-{1,2} is same thing, but with "--integrity-bitmap-mode" added to
+> "integritysetup format" and "integritysetup open".
+> 
+> log-no-{1,2} is same, but with "--integrity-no-journal".
+> 
+> log-nodm-{1,2} is same, but without dm-integrity at all, i. e. we create
+> swap directly on partition.
+
+Results are somewhat better than without the patch. Without the patch
+we don't even try to resume in default mode. "blkid" simply reports
+"swap" instead of "swsuspend". With patch "blkid" reports "swsuspend", and
+so we try to resume. But then in the middle of resuming we get this:
+
+[    1.008223] PM: Image loading progress:  70%
+[    1.017478] PM: Image loading progress:  80%
+[    1.027069] PM: Image loading progress:  90%
+[    1.029653] PM: hibernation: Read 36196 kbytes in 0.49 seconds (73.86 MB/s)
+[    1.030146] PM: Error -1 resuming
+[    1.030322] PM: hibernation: Failed to load image, recovering.
+
+(See link above for full logs.)
+
+Very similar thing happens in "--integrity-no-journal" mode in the middle of
+resuming:
+
+[    0.531245] device-mapper: integrity: dm-0: Checksum failed at sector 0x6e70
+[    0.531600] PM: Error -84 resuming
+[    0.531799] PM: hibernation: Failed to load image, recovering.
+
+The patch doesn't change anything in "--integrity-bitmap-mode" mode:
+we still are able to resume, but then get integrity errors when we do
+"cat /dev/mapper/swap > /dev/null".
+
+-- 
+Askar Safin
