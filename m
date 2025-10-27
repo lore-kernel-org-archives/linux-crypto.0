@@ -1,43 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCAD32DECB4;
-	Mon, 27 Oct 2025 19:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D1E308F35;
+	Mon, 27 Oct 2025 19:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761594683; cv=none; b=SwFqoLVdOsPVnUGT8Hk/OLcXnNOPj5B3QllxarTdYz95zctdHKNOyvQWYYnZ6by9eLwfAIGMlvkQGak+O1GOLXex1OujHI/AZ2CUiX1cohbIhO0+mrYwVFlYESPxJbAT4AC9PwSsueYII1FlaLl09gV56yzZ9/2Kw+vDcEZXU3Q=
+	t=1761595082; cv=none; b=IS1NrOR1B0AeznaiEywoV99npLSPNdc8rsb28k4dl0Txugi5nzOaA4NxoGUIaFwOTxl60JFAX3URKS9k+zOD5Pab33jIQbUBZ9n1+l0p6Vg6LaW/7AW+UFovQNe8gvQ5EX8KvrFEnxSy6blZDYmjnUGFSlnGLTswCwXLfdycxdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761594683; c=relaxed/simple;
-	bh=Pk4X+7GFkmLsnGR/SwJNrClCir6ovgFLwHy360kWcBY=;
+	s=arc-20240116; t=1761595082; c=relaxed/simple;
+	bh=Ng03B/maD6lMR0eaS2eBOidLYRkO4OlY8lz6H+r3S1o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hd0s0KPMGUYGCqOC77IubU68oWXkPC1NBd16+kdZ8tnHanQwrTU+GqSsU5syWhlwvZ6PPWhgy1fqWG5yZj44iMcbztMtaA2fzhxRwYvJxKPPwYdPDHqnX/SCHkX4gYiEwu2WrHDdExjThFOQ6Tz4WkiQ+35olIn/UutOlf0xjDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WQ62Njui; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=WhxyZCwentvhmtAAbZmw5bYEsJnpO/C/+AfRvv2tbKFx3qSFGlbek9M6LpCCnl6f/8Mm7eUS9NTAznB5VqGfEV76poRYAOQm6utUPW7F/Z8KbsHpGon8+V3GR3RHAkE+bdHsv5rxj9HNLEx6Px44GrqrcYHYUhXXYV5GpGWsDAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KJvqHj6e; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WQ62Njui"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF68BC4CEF1;
-	Mon, 27 Oct 2025 19:51:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KJvqHj6e"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED466C4CEF1;
+	Mon, 27 Oct 2025 19:57:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761594683;
-	bh=Pk4X+7GFkmLsnGR/SwJNrClCir6ovgFLwHy360kWcBY=;
+	s=k20201202; t=1761595080;
+	bh=Ng03B/maD6lMR0eaS2eBOidLYRkO4OlY8lz6H+r3S1o=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WQ62Njuijfkcq9Yzi/L+qU6Gb1+aLtA7bFCHwa2oGLNiBe73pwQ9dd6k0LcgJmUeT
-	 jvfTU93ykAt+iwV0YmENlCqN3dxzc18OR5d1jz+RGjI9zag6jVPbkHKaP+BDZSxcmy
-	 Ih5yTXi44Gp0yGhrAv3s1ckPc5EkONGBmJMTqBANJ/tdjcN0Q5wEd9By4z/b3SFv3S
-	 yszA2vYDGPQZSDsk7LTJwll3MCtr6fWm1ba5QXgcD1MewYRCyFpmCs6HeZ7DDxD/Pq
-	 M1bFn+eBM/2WKzmHSgTdMD6aNTlWQQF1vYRdt/Xzi2A3PEnwNyDQmQGLQZ0eSrBHFi
-	 +E2UDAHJB7b2g==
-Date: Mon, 27 Oct 2025 21:51:19 +0200
+	b=KJvqHj6eCZIvK/j801mk6loSMVFfz+73xGSV9F/6C5GACsNIvN8j9wVhlD5iU8Fwm
+	 GDuOZl4oKQHF0NxK2f9fjXBwhjIwFtJXuJ5EZbQufuYvythkjOczTP3fn422curGn8
+	 X3hkvN1HHHf8/6zAVoF4TTP2CLmh94wRcHqzTofN0YrdNcABmAMyKAPQtbcxd5jq/q
+	 E7YZmft5vKbQdd9pXln7+vgY18uSObfbUcFWFj2RPOYXP9sW4WEBcT/tW05nMDO9Z1
+	 JsgiU17LcIJW5gV+MPIwdnyhTx5ZtNCI8fu5dL4QIppKgcy4lAyOx5syLevlS2JvDV
+	 /VD3xjYfuoWkg==
+Date: Mon, 27 Oct 2025 21:57:56 +0200
 From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: Peter Huewe <peterhuewe@gmx.de>, linux-integrity@vger.kernel.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jens Wiklander <jens.wiklander@linaro.org>,
-	OP-TEE TrustedFirmware <op-tee@lists.trustedfirmware.org>,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] hwrng: tpm: Do not enable by default
-Message-ID: <aP_NN3HwO4Hp0-9T@kernel.org>
-References: <bbc41534-a2d9-42dc-ac8a-ff8a0b4fd41f@siemens.com>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] keys: Annotate struct asymmetric_key_id with __counted_by
+Message-ID: <aP_OxDIHanHij4q2@kernel.org>
+References: <20251023174810.75805-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,31 +45,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bbc41534-a2d9-42dc-ac8a-ff8a0b4fd41f@siemens.com>
+In-Reply-To: <20251023174810.75805-2-thorsten.blum@linux.dev>
 
-On Tue, Oct 21, 2025 at 02:46:15PM +0200, Jan Kiszka wrote:
-> From: Jan Kiszka <jan.kiszka@siemens.com>
+On Thu, Oct 23, 2025 at 07:48:11PM +0200, Thorsten Blum wrote:
+> Add the __counted_by() compiler attribute to the flexible array member
+> 'data' to improve access bounds-checking via CONFIG_UBSAN_BOUNDS and
+> CONFIG_FORTIFY_SOURCE.
 > 
-> As seen with optee_ftpm, which uses ms-tpm-20-ref [1], a TPM may write
-> the current time epoch to its NV storage every 4 seconds if there are
-> commands sent to it. The 60 seconds periodic update of the entropy pool
-> that the hwrng kthread does triggers this, causing about 4 writes per
-> requests. Makes 2 millions per year for a 24/7 device, and that is a lot
-> for its backing NV storage.
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+>  include/keys/asymmetric-type.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> It is therefore better to make the user intentionally enable this,
-> providing a chance to read the warning.
+> diff --git a/include/keys/asymmetric-type.h b/include/keys/asymmetric-type.h
+> index 69a13e1e5b2e..1b91c8f98688 100644
+> --- a/include/keys/asymmetric-type.h
+> +++ b/include/keys/asymmetric-type.h
+> @@ -49,7 +49,7 @@ enum asymmetric_payload_bits {
+>   */
+>  struct asymmetric_key_id {
+>  	unsigned short	len;
+> -	unsigned char	data[];
+> +	unsigned char	data[] __counted_by(len);
+>  };
+>  
+>  struct asymmetric_key_ids {
+> -- 
+> 2.51.0
 > 
-> [1] https://github.com/Microsoft/ms-tpm-20-ref
-> 
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
 
-Looking at DRBG_* from [1] I don't see anything you describe. If OPTEE
-writes NVRAM,  then the implementation is broken.
-
-Also AFAIK, it is pre-seeded per power cycle. There's nothing that even
-distantly relates on using NVRAM.
-
-[1] https://trustedcomputinggroup.org/wp-content/uploads/TPM-2.0-1.83-Part-4-Supporting-Routines-Code.pdf
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
 BR, Jarkko
