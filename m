@@ -1,105 +1,128 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4501D1C6A3;
-	Mon, 27 Oct 2025 08:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD942E543B
+	for <linux-crypto@vger.kernel.org>; Mon, 27 Oct 2025 08:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761553189; cv=none; b=jiNjWh3mglgFd6uI0DB1BjoCCgf0WTku9Hfu8kSGHEkjgbvQFSHaD8Ceqqke8SbmBErfVpKNNuWIz8cP1p5PnlktZXV2LbUjJTLltoGmLtSrIXTGXrAiUP8GpSpSOW8EtEn+Ih8KjzN3Lfrph6FEr5FUxXusNWJ5hSVy8yH7eBM=
+	t=1761553660; cv=none; b=Cnj6h6KJpWZ26ZyISLA7jngJ9vaU8yECipGqEztWAQ5KQiQCCc+QJSfPllA4p7NlERywe1NIJyvsQRcXgcr6/CIPowWi8gnsZMXaCrG5fJIPFw0ySWikvzpUTGfrPWT/nj3czumR0POCiGQftTl/8D71KbtiTwOAAFARLNMAKJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761553189; c=relaxed/simple;
-	bh=e/0INg1R4ncPWvqOqGKVxG5udNRPm41Kt9OtiuObcYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nyKmnyn1MgNeZXvtW68eRUwQsxv6Yl6TBmmBEwfPoodlzxM6JQNFS+jvuWWp9ATyfT6R55NYeYCSoUvCEnomLss1PMo+cbtl1N1l61aKpDRv8DRyoyD89qleZz7LwVjG6pMwYi1mz4TZCY3uBN0N2zRFXIj686PhFcMFsvQ+oF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ls7gkiDu; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1761553660; c=relaxed/simple;
+	bh=SD7mFn3Azck8G6ddO0hF8piSL6ovIEwmDhL2dXByvlY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RGa1d44p5XTj4jRgyX/rFQtqdGmBAqLs7LmyjjQ5wd77+YbVvVIufVrBFW+jdhC7zuXPmGo4CwgEuVTePkm0LOuD4E+U4qrTxxEYS4ECgwnoGIEvLF4YxjTi8dcJyujTrHbnHHy2Vu0eTN/Xh+brVZmcJulEX2qQCH0diRiXleg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=nWLQY8qL; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ls7gkiDu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761553187; x=1793089187;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=e/0INg1R4ncPWvqOqGKVxG5udNRPm41Kt9OtiuObcYk=;
-  b=Ls7gkiDu2sphHghxxcJKiSM8jjvvKQZI5NisvqK6uEH7oWW8RgUwG4WZ
-   q2oHDRxYIoTb2mi1I+jywj6X3q/8RErQa7ZsqyWNBs7QMXwfXyj+yTquB
-   wHh/Q5gb7fG4jv+NsKwKCPCZ7hoHRtJnpUYTWiHx+e94LluhObKWH+fmG
-   uipcNiayBeKgRuQikhHtE0a3eQZOaCJjxfLWaA5fX9XWsl4YA0QssHh9o
-   a591ibmu/3hKJ3S7jmrrfBpecjUSK3TwCte0MS0CSmFXWp22oSrwbyf7e
-   /yvwvZjn+65KYnjWVRRXbn0tTWQmfisTj1VM4NnmbeoB4g1yNsnJBMf3w
-   Q==;
-X-CSE-ConnectionGUID: BLI0c5CjQqaFJDJ+EnyNTA==
-X-CSE-MsgGUID: BPUCujByS+yO+fCd9ZaV1Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="81052652"
-X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
-   d="scan'208";a="81052652"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 01:19:47 -0700
-X-CSE-ConnectionGUID: VkgjIQUZRFm89SDyQlULDg==
-X-CSE-MsgGUID: H57LwCEdSi+Yf7XkGwb+EQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
-   d="scan'208";a="222192081"
-Received: from egrumbac-mobl6.ger.corp.intel.com (HELO ashevche-desk.local) ([10.245.244.5])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 01:19:45 -0700
-Received: from andy by ashevche-desk.local with local (Exim 4.98.2)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1vDIS5-00000002wiW-3UmY;
-	Mon, 27 Oct 2025 10:19:41 +0200
-Date: Mon, 27 Oct 2025 10:19:41 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jack Xu <jack.xu@intel.com>,
-	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
-	Qianfeng Rong <rongqianfeng@vivo.com>, qat-linux@intel.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: qat - use strscpy_pad to simplify buffer
- initialization
-Message-ID: <aP8rHYq4I09pvhFa@smile.fi.intel.com>
-References: <20251022123622.349544-1-thorsten.blum@linux.dev>
- <aPkfsuliKYy5UAbB@smile.fi.intel.com>
- <6DB96B06-108C-465B-9A54-88B8008DDD60@linux.dev>
- <aPp3cXRxvdJzBkw9@smile.fi.intel.com>
- <B981F95A-287C-44CF-8852-B4642E728975@linux.dev>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="nWLQY8qL"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59R3H9ls1503208
+	for <linux-crypto@vger.kernel.org>; Mon, 27 Oct 2025 08:27:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	fYQEo6dIiW98w97foyLVsGnKPCs4nvCityw2Go+JiO4=; b=nWLQY8qLLmuxGDnr
+	JIHJrWvauWSgETYrqhPtZC9vlMFGI6Hj8lrQI/7dtlO60JPNh+ijJsR/e1ulqhiz
+	uqOPzMCisa6glDP4LDE6CXa5TJV3S/dDgbbtv9n08XHmMxnCVXtMU8NfGLPHhu+t
+	fZwDw3zJwb5rxLIW/RQGGn8m+12C5wIqhdP12V9i1m+hklhlc+FL1bWSZLgl7BxH
+	4fcrkhERtG7O0dXUoBZstWZMZCGDNo4OtONZedvYnMLo4SYaq85ZParz+dhTB9zR
+	aoOk78+nK/wM0pWBYCYJiru/L6TemfQxBMD0JMmnOiCsqrEZWW2lGLQ0uzMkx0nw
+	spg2Gg==
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com [209.85.219.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a20pnrsb1-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Mon, 27 Oct 2025 08:27:38 +0000 (GMT)
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-87c103b902dso11528986d6.1
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Oct 2025 01:27:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761553658; x=1762158458;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fYQEo6dIiW98w97foyLVsGnKPCs4nvCityw2Go+JiO4=;
+        b=kBUSOwRgc/5HmeO92D9aI/Gt/RZh8/J2DuxXIxjy15DnY4ln3Lo45pEYJTwH+rc2Xl
+         pVra74+Dj0Mg+rXp6d3+L8P4lfJ3ThchZqmTvNnKrei6C2o8mtjmcI56+xP2i02/7rcG
+         So77ZCVfjsGDK7x8ydaOEu5xfJToB7d1YpU7jIGEAD10f01zJ8mjkfSDPBlhHCgin1U4
+         RYbli/UCvKvkHX+XzdmSnZ4VYJ6K0XIevxFFL6+SvCFrgXx4OZGYuRVoYbLmGyDA7+EU
+         +W3cuolOje9qXOmcI6SCpiK/Hfj5Cwx30MHjIrNtxTeEIvmfWIEL7uK+SSOPk+xgKrNn
+         O6NA==
+X-Gm-Message-State: AOJu0Ywm6f3hpWLk12n2TVY9irnw16dnvKEXTA8NAYmMvJM3w2zbyUXd
+	EVEVZp4WDnVEa4KnKlnqPzbUQeFr1YLQCf3uVtMS2QUzI/QJu4eDgs9oUgRnsWLdmy9lbFXyHq4
+	hhE+U36Y3CEfgxDe72/Zm9koiZexQ3PlAVs1olx3gJCK7p809eHxyNPlLid043yfZ1sE=
+X-Gm-Gg: ASbGncvDjOgmjYvzIdtYeyzudUM44Bz6yo2OmRVVHcb4S8BVM3IGkm+wrXMfai39twe
+	+MTmgUPU5bRdJC1GGWbbkutAhmQE9sfHmJyIEwJ615uQUv3zAvuKmwad1aVQxNnwD5E4NcnPkKs
+	ZDHFto1fnrBePh+bWx6XdcPRoYHFrWGguvXMlyx/D+w5Pn5JSJXIsh8JepOnsnIb6UgIf3ZLyQO
+	rg2tb3ziBUlnVEjqDDEfyWl5bxYPgEeZ7EMxkc3H7VIsUJT1fbzrxwmWSi6nVqr+pWXvhLAQOkp
+	qUybpC8YjIk+lKxZO8JGsq+fOBa/H+pdN+gthX8Am9Z2zUOix9cFpETQfkA/ZQ1BFBkzsaNzbqM
+	Tvip1COfGbbNwTKMDIyi1/FZn0svjd0qYOIp+qNd85bruaCXKsRzuRMiI
+X-Received: by 2002:a05:6214:19c6:b0:87d:f8d3:2456 with SMTP id 6a1803df08f44-87df8d324a4mr156569886d6.2.1761553657626;
+        Mon, 27 Oct 2025 01:27:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEw4iXYcaTwz3Rp3bM1QNtADojUTF4L8DQ6lROhsJhLze0SnEaWSmqFqR5f8Qej1VLUJuyOjw==
+X-Received: by 2002:a05:6214:19c6:b0:87d:f8d3:2456 with SMTP id 6a1803df08f44-87df8d324a4mr156569726d6.2.1761553657204;
+        Mon, 27 Oct 2025 01:27:37 -0700 (PDT)
+Received: from [192.168.119.202] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d853fb3bdsm695248266b.52.2025.10.27.01.27.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Oct 2025 01:27:36 -0700 (PDT)
+Message-ID: <b622f606-e9c7-40b5-b05d-4f011a98faa5@oss.qualcomm.com>
+Date: Mon, 27 Oct 2025 09:27:35 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <B981F95A-287C-44CF-8852-B4642E728975@linux.dev>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: qce: Provide dev_err_probe() status on DMA
+ failure
+To: Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20251024-qce-dma-err-probe-v1-1-03de2477bb5c@oss.qualcomm.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20251024-qce-dma-err-probe-v1-1-03de2477bb5c@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: _-8UCgw2Uxnzg4eZc0-a6QcRYwQXi4-q
+X-Proofpoint-ORIG-GUID: _-8UCgw2Uxnzg4eZc0-a6QcRYwQXi4-q
+X-Authority-Analysis: v=2.4 cv=A+xh/qWG c=1 sm=1 tr=0 ts=68ff2cfa cx=c_pps
+ a=wEM5vcRIz55oU/E2lInRtA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=EUspDBNiAAAA:8 a=25NbGeS3ZlacgUnTFUcA:9 a=QEXdDO2ut3YA:10
+ a=OIgjcC2v60KrkQgK7BGD:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI3MDA3NyBTYWx0ZWRfX0omG5t4yPk+T
+ mCU7xOFDZZkIvcuVwddqapNOc1pVmEEwoe0BaRDEFq1ix4wdu/hsej6uod137qFCQThnH/LgJxN
+ gmthbFhG669AYaHY3QataWwoI2nc+WBsS5tg/9Jdu9hyeKNo4ZTJfxukonb4lcw/xY/LzBQCMle
+ DU3+bRh0AizHwnnLFPPqc4waQFM2xbSjvFs/09Ef3ljjAwxLIYylDuHrBSixHrz9haHXXhrg+L2
+ vdqCxQAMxZwXPB3s5m/j8y6O6Woo4MM8hHU+erszk/ru6H9hCkQcr1Zoikpw79hKxcgBSbuJZGA
+ W3QiCPLc0otkNsYY/Yw9I5vBcp1hBK4TdBvCKP9SePNX1gX8Ark6AXsg7iq259tH6ZWY6+CdjQQ
+ Iv+K3HtxuuwbiSpr8DvJxfoWmSu6GA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-27_04,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 lowpriorityscore=0 clxscore=1015 suspectscore=0
+ spamscore=0 bulkscore=0 adultscore=0 impostorscore=0 phishscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510020000
+ definitions=main-2510270077
 
-On Fri, Oct 24, 2025 at 08:47:02PM +0200, Thorsten Blum wrote:
-> On 23. Oct 2025, at 20:44, Andy Shevchenko wrote:
-> > On Thu, Oct 23, 2025 at 05:35:00PM +0200, Thorsten Blum wrote:
-> >> On 22. Oct 2025, at 20:17, Andy Shevchenko wrote:
-> >>> On Wed, Oct 22, 2025 at 02:36:19PM +0200, Thorsten Blum wrote:
-
-...
-
-> >> How about this?
-> > 
-> > LGTM, and that's what I had in mind, ...
+On 10/24/25 11:35 PM, Bjorn Andersson wrote:
+> On multiple occasions the qce device have shown up in devices_deferred,
+> without the explanation that this came from the failure to acquire the
+> DMA channels from the associated BAM.
 > 
-> I was about to submit v2, but checkpatch warns me about simple_strtoull:
+> Use dev_err_probe() to associate this context with the failure to faster
+> pinpoint the culprit when this happens in the future.
 > 
->   WARNING: simple_strtoull is obsolete, use kstrtoull instead
-> 
-> Any recommendations?
+> Signed-off-by: Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>
+> ---
 
-Yes, fix checkpatch as per commit 885e68e8b7b1 ("kernel.h: update comment about
-simple_strto<foo>() functions") or ignore this false positive.
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Konrad
