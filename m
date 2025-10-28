@@ -1,65 +1,106 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1E91E5724;
-	Tue, 28 Oct 2025 01:58:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4FE27056B;
+	Tue, 28 Oct 2025 04:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761616735; cv=none; b=BIsi51vBQqXCq6T0C4t1Nga2YHuUNEwF888gcWCXTXoIWE4eU4DiVbmz94zntKP0pnJMI3vSb/UrnH7FQmiYVlZRzJzrKCkrFa2DYXPEUZJSy9ZuknM/7ZnPKP0A0SF0K+9C7JYPuRR6cTD5KebOM9wkxvK49lMO9Sda7bqv3As=
+	t=1761625226; cv=none; b=mlWaXxR5m64WraevlGguO0ew9FQ2cGxVHxL3bumzrsDOPqmer9Xe4I6Q2HrZUCmPhXpLCr5cm/F1BkTTvGJEuBiODRzvSV2+U2jPT5SH0IjFXewAyFmJAfkq4aUbPNYsXuigrzvltXUxJUgGB6WDQDw1F+bAYKG2otw8V+mIUUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761616735; c=relaxed/simple;
-	bh=4NqtOroGMdWvkpdSPaNjRBnpSQapxVYKlKtcvx7tKcc=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=R7tEAAi3RPol2bw8I81+6iE+0508e14zFHFbQbTPBRiYK1/fnh55RsKLIiYx/Gr/ieqXM3I8MhozAGS6/Q85gqfrzqrdPvkzUnZguJB/4D2Gjao6vwwCr/y9JNdWpjYkqX+ZHIq49aRIc2naAPlT9zKpaQhEjYm+hGWO8DV6ApY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ExXtKnF4; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1761625226; c=relaxed/simple;
+	bh=DQVSro+kclZFPO6hZuKMFUcWqUwCHRpDitjEZREV9xQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HPkd+S5uLhi0fTz4fC0Q2X9Pd7Wc5tnIxtu61IffD+8KM/7B35NxzotdyttYobqRldKk8T6Gla4fZ19Y348X5kJd/qhgr/k3eAsUAAjobzO0up7c23tZldH3eU56qw+sF21wlmvgZ2Hfat+g0DNoqCBym95rUZ01ftPAaYL10WQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=MehovPFi; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=K09o2W3s; arc=none smtp.client-ip=103.168.172.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ExXtKnF4"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=KHOUpXHjal8YuCB+IlsQ+Bw37AmAL2Nch+hc/9k2doM=;
-	b=ExXtKnF4eKiKvd4ez4uMi71II+rHmFkxPahroG9mgmDV+ZOWcFxdR3ec/87SC0wG9+OgOEqCM
-	PNKSdzK3PBVfMm6OhbtLFgYz/Ve37cmfVsii41vUbvR8TMGPuLC56FwXZSRqlKD2JQMu0s4iUo2
-	wNNl4czZullNdKNRnDxTFZU=
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4cwYS44kHqz12LFQ;
-	Tue, 28 Oct 2025 09:58:12 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9EC7C1402C4;
-	Tue, 28 Oct 2025 09:58:50 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 28 Oct 2025 09:58:49 +0800
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="MehovPFi";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="K09o2W3s"
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id F41D4140041E;
+	Tue, 28 Oct 2025 00:20:15 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Tue, 28 Oct 2025 00:20:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1761625215;
+	 x=1761711615; bh=rqU0ZBTefOcZ43jSwcE7tGeN3Uc2tYGCNlqlAutQi68=; b=
+	MehovPFi0tnm3Q5NuAb0diT5a7xsjljHhQCPtGk4efx/yU904KWv2d8Z+KfI/Vxi
+	G8PbH9jpr2/bMASKJQekphB6IndBbp1RzYUFUGUJrRXs04NpsC9TpzEwkxAyWnsz
+	BVF7990G9hWbSLo2wfhjUxXHhIu5KrC664XhChl6GoLTg53cJQ1VWTOfx2dsTgYG
+	T+p73b6d41TLyUKNhd0qQcvyq+CyhPcf6ROn6Jnbf/vouEN3lTe59rTfXSEY3p3f
+	gWYzD/fz9FNydOZnkXNLmbTwRNSF1Fgg/ux7EsNKYE6iy5QpnPZWHJEiqgWTqxrr
+	ipg4FsadPLWivRyX5IF68A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1761625215; x=
+	1761711615; bh=rqU0ZBTefOcZ43jSwcE7tGeN3Uc2tYGCNlqlAutQi68=; b=K
+	09o2W3sAdqyI0ZaonTZM9L/JUZ9+EEp4bo8RQ+0Pn9n3va57osUZiBEUbqHTyH9A
+	YOspwLUb1h4ZH1YQ8nrfHfa3V2Vffs41rVf6cWWh3I5Juj8dKIwbnZVPE8qio3oS
+	pm8ubh0FNueftCygrht4suxGqV8+MsQneCEoEmBGIpH1vJY9RiDJLmmPcMusng+b
+	B893NGQkW2nQDv2A2+mf2jCFv09zgoXWYL70J/uTIeLftIvjbdv5hzhra0zZ4VgC
+	SBNyTquwqCi9I5wrMquqq0pBuIZ2Qt5UhW0hkTLDVeGjq7m64fUAb7DmWN8EFlxL
+	uQoZN57RLbVpDKeN5U4Kw==
+X-ME-Sender: <xms:fkQAaSZAWov8N39c-Kl4v82PJTu6kB15IJ7umdjHPZmA_lmSE1FKtg>
+    <xme:fkQAaTr6j-R1M7lxdSgDK8yYIhZnGylGztgkQrOt3csz_m7ReZ_rwQ9KK1d_2Mm3j
+    8s3ZZNdbnrDVmZC57GKqS0WSV39Qlmcg8Ihjj6lZbA58HwLJ_INm94>
+X-ME-Received: <xmr:fkQAaWTq45z6EQriF3R7HC7v4LdbPMhP9uBXo5VpGg9Uu4YPdUC89hR-Rm4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduheelkeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
+    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
+    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
+    hffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopedutddpmhhouggvpehs
+    mhhtphhouhhtpdhrtghpthhtoheplhhiuhhlohhnghhfrghngheshhhurgifvghirdgtoh
+    hmpdhrtghpthhtoheprghlvgigrdifihhllhhirghmshhonhesrhgvughhrghtrdgtohhm
+    pdhrtghpthhtohepjhhgghesnhhvihguihgrrdgtohhmpdhrtghpthhtohephhgvrhgsvg
+    hrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehshhgrmhgv
+    vghrkhholhhothhhuhhmsehgmhgrihhlrdgtohhmpdhrtghpthhtohepjhhonhgrthhhrg
+    hnrdgtrghmvghrohhnsehhuhgrfigvihdrtghomhdprhgtphhtthhopehlihhnuhigqdgt
+    rhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvhhmsehvgh
+    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehv
+    ghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:fkQAaXp3tVQY5ZRdDHGczJLPVfqj8u1uzwYt7pwpqcuW7Tbw24kJEg>
+    <xmx:fkQAaQ2W3tphgggTio5C7gQQOrniEMIgHuS5GENWfx-y_KYsuQJ7Uw>
+    <xmx:fkQAaW78woIh5clszLoDQMdQQLDSDr2JdirDessuxXizB4Shqeu3kA>
+    <xmx:fkQAaUSIib2eB1J1BZAHu4KWvuDbEKlaPb1GM-K8iPDh9vWcAsLqDQ>
+    <xmx:f0QAabmHW7UXowaPHp_3ehETCp02Gryo8Vfp_lI4DOC6urO5JQD-DPah>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 28 Oct 2025 00:20:13 -0400 (EDT)
+Date: Mon, 27 Oct 2025 22:20:07 -0600
+From: Alex Williamson <alex@shazbot.org>
+To: Longfang Liu <liulongfang@huawei.com>
+Cc: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+ <herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
+ <jonathan.cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
+ <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linuxarm@openeuler.org>
 Subject: Re: [PATCH v10 2/2] hisi_acc_vfio_pci: adapt to new migration
  configuration
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
-	<jonathan.cameron@huawei.com>
-CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+Message-ID: <20251027222007.5e176e42@shazbot.org>
+In-Reply-To: <20251017091057.3770403-3-liulongfang@huawei.com>
 References: <20251017091057.3770403-1-liulongfang@huawei.com>
- <20251017091057.3770403-3-liulongfang@huawei.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <5ceaf17e-9ae6-901b-7074-5971ee782f32@huawei.com>
-Date: Tue, 28 Oct 2025 09:58:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	<20251017091057.3770403-3-liulongfang@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20251017091057.3770403-3-liulongfang@huawei.com>
-Content-Type: text/plain; charset="gbk"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- dggpemf500015.china.huawei.com (7.185.36.143)
 
-On 2025/10/17 17:10, Longfang Liu wrote:
+On Fri, 17 Oct 2025 17:10:57 +0800
+Longfang Liu <liulongfang@huawei.com> wrote:
+
 > On new platforms greater than QM_HW_V3, the migration region has been
 > relocated from the VF to the PF. The VF's own configuration space is
 > restored to the complete 64KB, and there is no need to divide the
@@ -228,6 +269,13 @@ On 2025/10/17 17:10, Longfang Liu wrote:
 > +	if (ret)
 > +		return ret;
 > +
+
+I'd have thought it'd still make sense that qm_{get,set}_regs() would
+handle this subset of registers even though it's split out into helper
+functions, now we have the dev_data debugfs failing to fill these
+registers.  It's not clear it was worthwhile to split out the xqc
+helpers at all here.
+
 >  	ret = vf_qm_read_data(vf_qm, vf_data);
 >  	if (ret)
 >  		return ret;
@@ -402,8 +450,17 @@ On 2025/10/17 17:10, Longfang Liu wrote:
 > +#define QM_MIG_REGION_SIZE		0x2000
 > +
 > +#define QM_SUB_VERSION_ID		0x100210
+
+Above SUB_VERSION_ID isn't used.
+
 > +#define QM_EQC_PF_DW0			0x1c00
 > +#define QM_AEQC_PF_DW0			0x1c20
+
+Seems like it'd make sense to define these next to the VF offsets and
+perhaps even add "VF" to the existing macros for consistency.  Thanks,
+
+Alex
+
 > +
 > +/**
 > + * On HW_ACC_MIG_VF_CTRL mode, the configuration domain supporting live
@@ -429,11 +486,4 @@ On 2025/10/17 17:10, Longfang Liu wrote:
 >  	/*
 >  	 * vf_qm_state represents the QM_VF_STATE register value.
 >  	 * It is set by Guest driver for the ACC VF dev indicating
-> 
-
-Hi Alex:
-Could you please take a moment to review this patch?
-
-Thanks.
-Longfang.
 
