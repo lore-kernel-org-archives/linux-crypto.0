@@ -1,470 +1,210 @@
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF696286D5C;
-	Tue, 28 Oct 2025 07:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164D22FBE01;
+	Tue, 28 Oct 2025 09:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761635090; cv=none; b=BMFYBj7Me5LJO50T0QDMuewucofetQp64VqHHXqNUZ4BQTpur0B7A3B02apHm0DBdZxVT4NjnshNoDsf8rG4vzM9KT2RGeyB6m6xwKJVEcbemdjl89j72LexkghMu+HJs5+zKpvHMblZsb4DrhtqXly2f+YJNb7l7zWVVGJtCBA=
+	t=1761642954; cv=none; b=JphqEp6s8gJ1imcrfcaJMbdGU9IpojAr6Zl9B0+SEzqlnrWKeUM1LwmiMo6taD3RfDv3uZnKaq+OOMAWZJjxRfK2gxliBs/loZj2IktkVPMiZFxNFGOnq34oJMRxey7REctgbXmy8B9uRdCWK9p3mykw7Tvdpzvvm3+lmlUrrrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761635090; c=relaxed/simple;
-	bh=nGkM12nvXNhOgvIKtqMH28gqlh04JWpLiGAj10BoOKQ=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=gF6lSvI8bNWtro4uDaq4bsKY5ELoVBCoSNCxquWKU3lf3kE2qohnZq7arM+XOXtr3Uk/y9Cec8FFEIkT/cd66tkPQWhLBETTq4L6QLMosJFWR91YMjYTSqrVx4mq+bd8VhNImu0xgYMoPc8S7GlGYtNToBVPg6tjJ5hCxFW6YNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=oNAg1ASs; arc=none smtp.client-ip=113.46.200.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1761642954; c=relaxed/simple;
+	bh=W+e7hOA/Qjutz+64AuQHJm7aMHFQ0pGvnRZi62DxLWw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VUSwDFt2dzmyySb2DknIwK0ua9T0c4DtaUGygjUrlkdvRq0TO7QoZvncRsUb5we5dsteMqoVLNnz+2XD66iAghI09m7ZgXHVgOpJr3DBq2Qmx/DkoOphxi4aYGAo7rzqQSRTL9xWHdouRWdv961gzIQLPKd2BwzTZXBBWhkuMgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n9zCCMZw; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="oNAg1ASs"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=EidUy3fn2h9Jd2vZFLEhj7aVLDGNg739ptn+7Sao1kI=;
-	b=oNAg1ASs4rWlVXEJ703vli3+hOV/p0YoA2Mv7WxDoL2hlkmATcgaeLPRESBOwoKej9/lLsYhx
-	RtuY84UKsSuOwGnjVyRk/sNapKlUTynxuCbwbjJmvGnuhWvg8NagC4CLJZavnO63tOqKJoat3Ed
-	bLu9zHq8E2ju132P/PzIth0=
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4cwhF639C5zRhRJ;
-	Tue, 28 Oct 2025 15:04:10 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id DF52D18007F;
-	Tue, 28 Oct 2025 15:04:38 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 28 Oct 2025 15:04:38 +0800
-Subject: Re: [PATCH v10 2/2] hisi_acc_vfio_pci: adapt to new migration
- configuration
-To: Alex Williamson <alex@shazbot.org>
-CC: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
-	<jonathan.cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linuxarm@openeuler.org>
-References: <20251017091057.3770403-1-liulongfang@huawei.com>
- <20251017091057.3770403-3-liulongfang@huawei.com>
- <20251027222007.5e176e42@shazbot.org>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <734cd156-26c1-50f7-f0fa-db76beaab745@huawei.com>
-Date: Tue, 28 Oct 2025 15:04:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n9zCCMZw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761642953; x=1793178953;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=W+e7hOA/Qjutz+64AuQHJm7aMHFQ0pGvnRZi62DxLWw=;
+  b=n9zCCMZwpg7yYXyQJ5E/5p47j5fHaSQ647GdkYOOeFBZZSJnCcrIXnyy
+   haMQSSmaLZC/6OLfz824/Iq5bCjKZdh342K8gOUGjoPuHB7aXIagn3DF5
+   UpO73MarRvl2ojoBytnTqNygNL3S5SPRAI2/ZbcPa27tUHag+YeKlGkEv
+   3k649awmHNtz8t0u1KCtUekGqxjkzFxy1BbHRrgeiPCmyHhBIzz6zivTf
+   Wq162eQBu+homhgDJUTeCpuY+49B2pM4vOhV+m6ZDm3Udgb7tadRY4ItN
+   3i/erWOQt3cOlglNmXJNBUUv9+AnfP/sQNHrMrYVrFlyKPKovPBMJZfz1
+   Q==;
+X-CSE-ConnectionGUID: KpoiZD8QRAqjDACwTVDHTg==
+X-CSE-MsgGUID: Dy3LcW3aSDamFIjGD5X4Ng==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="74024500"
+X-IronPort-AV: E=Sophos;i="6.19,261,1754982000"; 
+   d="scan'208";a="74024500"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 02:15:52 -0700
+X-CSE-ConnectionGUID: HnXMTj+ZTTS4uXqyEjc08g==
+X-CSE-MsgGUID: 6qzZimyUSheG9U+2/VGM3w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,261,1754982000"; 
+   d="scan'208";a="185624057"
+Received: from dalessan-mobl3.ger.corp.intel.com (HELO ashevche-desk.local) ([10.245.244.136])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 02:15:41 -0700
+Received: from andy by ashevche-desk.local with local (Exim 4.98.2)
+	(envelope-from <andriy.shevchenko@intel.com>)
+	id 1vDfnk-00000003GRk-3M7B;
+	Tue, 28 Oct 2025 11:15:36 +0200
+Date: Tue, 28 Oct 2025 11:15:36 +0200
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Miller <davem@davemloft.net>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	Crt Mori <cmo@melexis.com>, Jonathan Cameron <jic23@kernel.org>,
+	Lars-Peter Clausen <lars@metafoo.de>,
+	Jacky Huang <ychuang3@nuvoton.com>,
+	Shan-Chun Hung <schung@nuvoton.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>,
+	David Laight <david.laight.linux@gmail.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>,
+	Tony Luck <tony.luck@intel.com>,
+	Michael Hennerich <Michael.Hennerich@analog.com>,
+	Kim Seer Paller <kimseer.paller@analog.com>,
+	David Lechner <dlechner@baylibre.com>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Richard Genoud <richard.genoud@bootlin.com>,
+	Cosmin Tanislav <demonsingur@gmail.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Jianping Shen <Jianping.Shen@de.bosch.com>,
+	linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-edac@vger.kernel.org, qat-linux@intel.com,
+	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
+	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH v5 11/23] bitfield: Add non-constant field_{prep,get}()
+ helpers
+Message-ID: <aQCJuADNYTzdbPQJ@smile.fi.intel.com>
+References: <cover.1761588465.git.geert+renesas@glider.be>
+ <bf68a22ce5be93bb2ea0a0c53071433814401ff9.1761588465.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20251027222007.5e176e42@shazbot.org>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bf68a22ce5be93bb2ea0a0c53071433814401ff9.1761588465.git.geert+renesas@glider.be>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On 2025/10/28 12:20, Alex Williamson wrote:
-> On Fri, 17 Oct 2025 17:10:57 +0800
-> Longfang Liu <liulongfang@huawei.com> wrote:
+On Mon, Oct 27, 2025 at 07:41:45PM +0100, Geert Uytterhoeven wrote:
+> The existing FIELD_{GET,PREP}() macros are limited to compile-time
+> constants.  However, it is very common to prepare or extract bitfield
+> elements where the bitfield mask is not a compile-time constant.
 > 
->> On new platforms greater than QM_HW_V3, the migration region has been
->> relocated from the VF to the PF. The VF's own configuration space is
->> restored to the complete 64KB, and there is no need to divide the
->> size of the BAR configuration space equally. The driver should be
->> modified accordingly to adapt to the new hardware device.
->>
->> On the older hardware platform QM_HW_V3, the live migration configuration
->> region is placed in the latter 32K portion of the VF's BAR2 configuration
->> space. On the new hardware platform QM_HW_V4, the live migration
->> configuration region also exists in the same 32K area immediately following
->> the VF's BAR2, just like on QM_HW_V3.
->>
->> However, access to this region is now controlled by hardware. Additionally,
->> a copy of the live migration configuration region is present in the PF's
->> BAR2 configuration space. On the new hardware platform QM_HW_V4, when an
->> older version of the driver is loaded, it behaves like QM_HW_V3 and uses
->> the configuration region in the VF, ensuring that the live migration
->> function continues to work normally. When the new version of the driver is
->> loaded, it directly uses the configuration region in the PF. Meanwhile,
->> hardware configuration disables the live migration configuration region
->> in the VF's BAR2: reads return all 0xF values, and writes are silently
->> ignored.
->>
->> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->> Reviewed-by: Shameer Kolothum <shameerkolothum@gmail.com>
->> ---
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 205 ++++++++++++------
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  21 ++
->>  2 files changed, 165 insertions(+), 61 deletions(-)
->>
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> index fde33f54e99e..55233e62cb1d 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> @@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
->>  	return 0;
->>  }
->>  
->> +static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->> +			   struct acc_vf_data *vf_data)
->> +{
->> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
->> +	struct device *dev = &qm->pdev->dev;
->> +	u32 eqc_addr, aeqc_addr;
->> +	int ret;
->> +
->> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL) {
->> +		eqc_addr = QM_EQC_DW0;
->> +		aeqc_addr = QM_AEQC_DW0;
->> +	} else {
->> +		eqc_addr = QM_EQC_PF_DW0;
->> +		aeqc_addr = QM_AEQC_PF_DW0;
->> +	}
->> +
->> +	/* QM_EQC_DW has 7 regs */
->> +	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
->> +	if (ret) {
->> +		dev_err(dev, "failed to read QM_EQC_DW\n");
->> +		return ret;
->> +	}
->> +
->> +	/* QM_AEQC_DW has 7 regs */
->> +	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
->> +	if (ret) {
->> +		dev_err(dev, "failed to read QM_AEQC_DW\n");
->> +		return ret;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->> +			   struct acc_vf_data *vf_data)
->> +{
->> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
->> +	struct device *dev = &qm->pdev->dev;
->> +	u32 eqc_addr, aeqc_addr;
->> +	int ret;
->> +
->> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL) {
->> +		eqc_addr = QM_EQC_DW0;
->> +		aeqc_addr = QM_AEQC_DW0;
->> +	} else {
->> +		eqc_addr = QM_EQC_PF_DW0;
->> +		aeqc_addr = QM_AEQC_PF_DW0;
->> +	}
->> +
->> +	/* QM_EQC_DW has 7 regs */
->> +	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
->> +	if (ret) {
->> +		dev_err(dev, "failed to write QM_EQC_DW\n");
->> +		return ret;
->> +	}
->> +
->> +	/* QM_AEQC_DW has 7 regs */
->> +	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
->> +	if (ret) {
->> +		dev_err(dev, "failed to write QM_AEQC_DW\n");
->> +		return ret;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>  static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
->>  {
->>  	struct device *dev = &qm->pdev->dev;
->> @@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
->>  		return ret;
->>  	}
->>  
->> -	/* QM_EQC_DW has 7 regs */
->> -	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
->> -	if (ret) {
->> -		dev_err(dev, "failed to read QM_EQC_DW\n");
->> -		return ret;
->> -	}
->> -
->> -	/* QM_AEQC_DW has 7 regs */
->> -	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
->> -	if (ret) {
->> -		dev_err(dev, "failed to read QM_AEQC_DW\n");
->> -		return ret;
->> -	}
->> -
->>  	return 0;
->>  }
->>  
->> @@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
->>  		return ret;
->>  	}
->>  
->> -	/* QM_EQC_DW has 7 regs */
->> -	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
->> -	if (ret) {
->> -		dev_err(dev, "failed to write QM_EQC_DW\n");
->> -		return ret;
->> -	}
->> -
->> -	/* QM_AEQC_DW has 7 regs */
->> -	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
->> -	if (ret) {
->> -		dev_err(dev, "failed to write QM_AEQC_DW\n");
->> -		return ret;
->> -	}
->> -
->>  	return 0;
->>  }
->>  
->> @@ -522,6 +560,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->>  		return ret;
->>  	}
->>  
->> +	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
->> +	if (ret)
->> +		return ret;
->> +
->>  	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
->>  	if (ret) {
->>  		dev_err(dev, "set sqc failed\n");
->> @@ -589,6 +631,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->>  	vf_data->vf_qm_state = QM_READY;
->>  	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
->>  
->> +	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
->> +	if (ret)
->> +		return ret;
->> +
+> To avoid this limitation, the AT91 clock driver and several other
+> drivers already have their own non-const field_{prep,get}() macros.
+> Make them available for general use by adding them to
+> <linux/bitfield.h>, and improve them slightly:
+>   1. Avoid evaluating macro parameters more than once,
+>   2. Replace "ffs() - 1" by "__ffs()",
+>   3. Support 64-bit use on 32-bit architectures,
+>   4. Wire field_{get,prep}() to FIELD_{GET,PREP}() when mask is
+>      actually constant.
 > 
-> I'd have thought it'd still make sense that qm_{get,set}_regs() would
-> handle this subset of registers even though it's split out into helper
-> functions, now we have the dev_data debugfs failing to fill these
-> registers.  It's not clear it was worthwhile to split out the xqc
-> helpers at all here.
+> This is deliberately not merged into the existing FIELD_{GET,PREP}()
+> macros, as people expressed the desire to keep stricter variants for
+> increased safety, or for performance critical paths.
 
-Moving the differentiated handling of eqc and aeqc, which results from different drv_mode values,
-into the helper functions can keep the main business logic code for live migration
-clean and concise.
+Some comments below, but FWIW,
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@intel.com>
+after addressing them.
 
-> 
->>  	ret = vf_qm_read_data(vf_qm, vf_data);
->>  	if (ret)
->>  		return ret;
->> @@ -1186,34 +1232,52 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
->>  {
->>  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
->>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
->> +	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
->>  	struct pci_dev *vf_dev = vdev->pdev;
->> +	u32 val;
->>  
->> -	/*
->> -	 * ACC VF dev BAR2 region consists of both functional register space
->> -	 * and migration control register space. For migration to work, we
->> -	 * need access to both. Hence, we map the entire BAR2 region here.
->> -	 * But unnecessarily exposing the migration BAR region to the Guest
->> -	 * has the potential to prevent/corrupt the Guest migration. Hence,
->> -	 * we restrict access to the migration control space from
->> -	 * Guest(Please see mmap/ioctl/read/write override functions).
->> -	 *
->> -	 * Please note that it is OK to expose the entire VF BAR if migration
->> -	 * is not supported or required as this cannot affect the ACC PF
->> -	 * configurations.
->> -	 *
->> -	 * Also the HiSilicon ACC VF devices supported by this driver on
->> -	 * HiSilicon hardware platforms are integrated end point devices
->> -	 * and the platform lacks the capability to perform any PCIe P2P
->> -	 * between these devices.
->> -	 */
->> +	val = readl(pf_qm->io_base + QM_MIG_REGION_SEL);
->> +	if (pf_qm->ver > QM_HW_V3 && (val & QM_MIG_REGION_EN))
->> +		hisi_acc_vdev->drv_mode = HW_ACC_MIG_PF_CTRL;
->> +	else
->> +		hisi_acc_vdev->drv_mode = HW_ACC_MIG_VF_CTRL;
->>  
->> -	vf_qm->io_base =
->> -		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
->> -			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
->> -	if (!vf_qm->io_base)
->> -		return -EIO;
->> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_PF_CTRL) {
->> +		/*
->> +		 * On hardware platforms greater than QM_HW_V3, the migration function
->> +		 * register is placed in the BAR2 configuration region of the PF,
->> +		 * and each VF device occupies 8KB of configuration space.
->> +		 */
->> +		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
->> +				 hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
->> +	} else {
->> +		/*
->> +		 * ACC VF dev BAR2 region consists of both functional register space
->> +		 * and migration control register space. For migration to work, we
->> +		 * need access to both. Hence, we map the entire BAR2 region here.
->> +		 * But unnecessarily exposing the migration BAR region to the Guest
->> +		 * has the potential to prevent/corrupt the Guest migration. Hence,
->> +		 * we restrict access to the migration control space from
->> +		 * Guest(Please see mmap/ioctl/read/write override functions).
->> +		 *
->> +		 * Please note that it is OK to expose the entire VF BAR if migration
->> +		 * is not supported or required as this cannot affect the ACC PF
->> +		 * configurations.
->> +		 *
->> +		 * Also the HiSilicon ACC VF devices supported by this driver on
->> +		 * HiSilicon hardware platforms are integrated end point devices
->> +		 * and the platform lacks the capability to perform any PCIe P2P
->> +		 * between these devices.
->> +		 */
->>  
->> +		vf_qm->io_base =
->> +			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
->> +				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
->> +		if (!vf_qm->io_base)
->> +			return -EIO;
->> +	}
->>  	vf_qm->fun_type = QM_HW_VF;
->> +	vf_qm->ver = pf_qm->ver;
->>  	vf_qm->pdev = vf_dev;
->>  	mutex_init(&vf_qm->mailbox_lock);
->>  
->> @@ -1250,6 +1314,28 @@ static struct hisi_qm *hisi_acc_get_pf_qm(struct pci_dev *pdev)
->>  	return !IS_ERR(pf_qm) ? pf_qm : NULL;
->>  }
->>  
->> +static size_t hisi_acc_get_resource_len(struct vfio_pci_core_device *vdev,
->> +					unsigned int index)
->> +{
->> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
->> +			hisi_acc_drvdata(vdev->pdev);
->> +
->> +	/*
->> +	 * On the old HW_ACC_MIG_VF_CTRL mode device, the ACC VF device
->> +	 * BAR2 region encompasses both functional register space
->> +	 * and migration control register space.
->> +	 * only the functional region should be report to Guest.
->> +	 */
->> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL)
->> +		return (pci_resource_len(vdev->pdev, index) >> 1);
->> +	/*
->> +	 * On the new HW device, the migration control register
->> +	 * has been moved to the PF device BAR2 region.
->> +	 * The VF device BAR2 is entirely functional register space.
->> +	 */
->> +	return pci_resource_len(vdev->pdev, index);
->> +}
->> +
->>  static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
->>  					size_t count, loff_t *ppos,
->>  					size_t *new_count)
->> @@ -1260,8 +1346,9 @@ static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
->>  
->>  	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
->>  		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
->> -		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
->> +		resource_size_t end;
->>  
->> +		end = hisi_acc_get_resource_len(vdev, index);
->>  		/* Check if access is for migration control region */
->>  		if (pos >= end)
->>  			return -EINVAL;
->> @@ -1282,8 +1369,9 @@ static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
->>  	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
->>  	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
->>  		u64 req_len, pgoff, req_start;
->> -		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
->> +		resource_size_t end;
->>  
->> +		end = hisi_acc_get_resource_len(vdev, index);
->>  		req_len = vma->vm_end - vma->vm_start;
->>  		pgoff = vma->vm_pgoff &
->>  			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
->> @@ -1330,7 +1418,6 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
->>  	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
->>  		struct vfio_pci_core_device *vdev =
->>  			container_of(core_vdev, struct vfio_pci_core_device, vdev);
->> -		struct pci_dev *pdev = vdev->pdev;
->>  		struct vfio_region_info info;
->>  		unsigned long minsz;
->>  
->> @@ -1345,12 +1432,7 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
->>  		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
->>  			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
->>  
->> -			/*
->> -			 * ACC VF dev BAR2 region consists of both functional
->> -			 * register space and migration control register space.
->> -			 * Report only the functional region to Guest.
->> -			 */
->> -			info.size = pci_resource_len(pdev, info.index) / 2;
->> +			info.size = hisi_acc_get_resource_len(vdev, info.index);
->>  
->>  			info.flags = VFIO_REGION_INFO_FLAG_READ |
->>  					VFIO_REGION_INFO_FLAG_WRITE |
->> @@ -1521,7 +1603,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
->>  	hisi_acc_vf_disable_fds(hisi_acc_vdev);
->>  	mutex_lock(&hisi_acc_vdev->open_mutex);
->>  	hisi_acc_vdev->dev_opened = false;
->> -	iounmap(vf_qm->io_base);
->> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL)
->> +		iounmap(vf_qm->io_base);
->>  	mutex_unlock(&hisi_acc_vdev->open_mutex);
->>  	vfio_pci_core_close_device(core_vdev);
->>  }
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> index 91002ceeebc1..d287abe3dd31 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> @@ -59,6 +59,26 @@
->>  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
->>  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
->>  
->> +#define QM_MIG_REGION_OFFSET		0x180000
->> +#define QM_MIG_REGION_SIZE		0x2000
->> +
->> +#define QM_SUB_VERSION_ID		0x100210
-> 
-> Above SUB_VERSION_ID isn't used.
+...
 
-Yes, this macro variable needs to be removed.
+> +#define __field_prep(mask, val)						\
+> +	({								\
+> +		__auto_type __mask = (mask);				\
+> +		typeof(mask) __val = (val);				\
+> +		unsigned int __shift = BITS_PER_TYPE(mask) <= 32 ?	\
+> +				       __ffs(__mask) : __ffs64(__mask);	\
+> +		(__val << __shift) & __mask;	\
 
-> 
->> +#define QM_EQC_PF_DW0			0x1c00
->> +#define QM_AEQC_PF_DW0			0x1c20
-> 
-> Seems like it'd make sense to define these next to the VF offsets and
-> perhaps even add "VF" to the existing macros for consistency.  Thanks,
->
+Unaligned \
 
-OK, it's better to distinguish between the old offset variable names with "VF"
-and the newly added PF offset addresses for clarity
+> +	})
+> +
+> +#define __field_get(mask, reg)						\
+> +	({								\
+> +		__auto_type __mask = (mask);				\
+> +		typeof(mask) __reg =  (reg);				\
+> +		unsigned int __shift = BITS_PER_TYPE(mask) <= 32 ?	\
+> +				       __ffs(__mask) : __ffs64(__mask);	\
+> +		(__reg & __mask) >> __shift;	\
 
-Thanks,
-Longfang.
+Ditto.
 
-> Alex
-> 
->> +
->> +/**
->> + * On HW_ACC_MIG_VF_CTRL mode, the configuration domain supporting live
->> + * migration functionality is located in the latter 32KB of the VF's BAR2.
->> + * The Guest is only provided with the first 32KB of the VF's BAR2.
->> + * On HW_ACC_MIG_PF_CTRL mode, the configuration domain supporting live
->> + * migration functionality is located in the PF's BAR2, and the entire 64KB
->> + * of the VF's BAR2 is allocated to the Guest.
->> + */
->> +enum hw_drv_mode {
->> +	HW_ACC_MIG_VF_CTRL = 0,
->> +	HW_ACC_MIG_PF_CTRL,
->> +};
->> +
->>  struct acc_vf_data {
->>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
->>  	/* QM match information */
->> @@ -125,6 +145,7 @@ struct hisi_acc_vf_core_device {
->>  	struct pci_dev *vf_dev;
->>  	struct hisi_qm *pf_qm;
->>  	struct hisi_qm vf_qm;
->> +	int drv_mode;
->>  	/*
->>  	 * vf_qm_state represents the QM_VF_STATE register value.
->>  	 * It is set by Guest driver for the ACC VF dev indicating
-> 
-> .
-> 
+> +	})
+
+> +/**
+> + * field_prep() - prepare a bitfield element
+> + * @mask: shifted mask defining the field's length and position, must be
+> + *        non-zero
+> + * @val:  value to put in the field
+> + *
+> + * field_prep() masks and shifts up the value.  The result should be
+> + * combined with other fields of the bitfield using logical OR.
+> + * Unlike FIELD_PREP(), @mask is not limited to a compile-time constant.
+> + * Typical usage patterns are a value stored in a table, or calculated by
+> + * shifting a constant by a variable number of bits.
+> + * If you want to ensure that @mask is a compile-time constant, please use
+> + * FIELD_PREP() directly instead.
+
+Shouldn't it have Return section as well?
+
+> + */
+> +#define field_prep(mask, val)						\
+> +	(__builtin_constant_p(mask) ? FIELD_PREP(mask, val)		\
+> +				    : __field_prep(mask, val))
+
+Personally I would give it a single line (but it's up to you, folks).
+
+> +
+> +/**
+> + * field_get() - extract a bitfield element
+> + * @mask: shifted mask defining the field's length and position, must be
+> + *        non-zero
+> + * @reg:  value of entire bitfield
+> + *
+> + * field_get() extracts the field specified by @mask from the
+> + * bitfield passed in as @reg by masking and shifting it down.
+> + * Unlike FIELD_GET(), @mask is not limited to a compile-time constant.
+> + * Typical usage patterns are a value stored in a table, or calculated by
+> + * shifting a constant by a variable number of bits.
+> + * If you want to ensure that @mask is a compile-time constant, please use
+> + * FIELD_GET() directly instead.
+
+Ditto.
+
+> + */
+> +#define field_get(mask, reg)						\
+> +	(__builtin_constant_p(mask) ? FIELD_GET(mask, reg)		\
+> +				    : __field_get(mask, reg))
+
+As per above.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
