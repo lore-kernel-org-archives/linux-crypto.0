@@ -1,134 +1,181 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CF533509B
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Oct 2025 14:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56BC278E5D
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Oct 2025 16:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761661231; cv=none; b=N2xsrKz54Vf8WbN4VFjBwUtUqhilxaTYx8c29eJcm6RZWhG68a+oKypjpfFZ4b3p7JX/Hk7LwrngXYzbCYYQT1YStty99X8nor2SVzYt7zzqbSB/YdnfxZMf2WWsVi/tBN3RuAPOsHAjTH0L2ZRG4yms17zoisTGSr4qfu5j618=
+	t=1761668004; cv=none; b=RzaNevAj9EW2e2uqYAocvi8cYfXLTYJGV8rIEYsVhKFwpAiNtAiyCilS7jrHRUQ1XeEkilSa56ICoOo56m3LuJ0lWZWqkEURpLD357LkjWKO0QiIKuNuf4Mev5wbRSDO7RKyf9c1Sz52BAQV/1KIUHp1G1vnCimWYEI8qZ8+4OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761661231; c=relaxed/simple;
-	bh=pP8FTV47DQsaScTl4AKuec/C6HsHLvvn5JrdlNFvXF8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GYOTip4yiq69BQ0MDlUYEnry0zv2kBKD3EkyYfee0KrRa/6ARrVcxaEIYmN871sZqTxIJYscKLetGWJ7otVgKLQElGFdvnGrq6rO1BS9RbO9xCJiggRc+pBPQtLgCC8UwPtzoagWdngs9l7ueJJ+Cz6XGtg/DWExp9pAQ0jOgSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=uIBa1ecY; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1761668004; c=relaxed/simple;
+	bh=AqmDL9HYwKlOC1v96mDTpURTB0eXu0WZp5/vnGerPw4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RGBZGnUY0OlZdC+OErR6d0jgBeQqi95nwwkzeDA4QB2bWZNjiXardl03ePgL6hJ3il1m767nmYclPJ5hHIf8t2KfgZ1eyPMqb7/5f9wGmDXl9BkZeNT5MkupJvoVkHMLo02QWvc+x3GGJnAi2kSTDJvejsM3S8cPCjoYCxL8MPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KjJPEYPJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Gw2QrTQ4; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KjJPEYPJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Gw2QrTQ4; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="uIBa1ecY"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-376466f1280so90823181fa.0
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Oct 2025 07:20:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1761661227; x=1762266027; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sOmSiTMyA8cqAorOzkSzQ5xujNoDEMVqXsbHnkkNM1c=;
-        b=uIBa1ecYcS0SjQasgAEKQr/pVNdcH2s+vv+Ivq8X+TvJlZm3PK4XkoOKj+ySjsss6V
-         0g8VjUJ/7QVvEAWpyHMqMetwZu3/zoN1N9yyXtB0KFxrE/rVPaA1Wla9t4UuOGIAw/wn
-         tLvnxdxSdn4y9ZLZkoqvs3/uknC8cTF+ohyHp0eXubW+fJwQrXlNVOsgxyt8mMbBy66D
-         1uC4SKbYh7kSu4m2DIPdoiKVO+xnGkWcrG1i+y3Uwm1SYSS1wzr0PjgOSFofFE0v8Jnx
-         uh6w6swnMKwZGoMtYXUS13Dhkpdcfv4aAkZJJYWpnhecHmYQWvg4zllIFHM+xQPboquJ
-         uIow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761661227; x=1762266027;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sOmSiTMyA8cqAorOzkSzQ5xujNoDEMVqXsbHnkkNM1c=;
-        b=VsP+Pm7GuEELvuh23mBxRq4MIT2DjLm/u9V3JWahksurl5DZ55wsnsfLjpJ2wEUQgI
-         CYv2HVxuvjeKlHAh5EIWr5ysQXl8jxkYVWn4nZbU0XPuzDNlvQ+rGhW+rUc1cza7TeTA
-         c5qkPBigDVB9NmhPyrIrlaA9xKCR6JCOIXCpvy+RVa2ghDzbtYV75gB/a8DHCGh+kI4v
-         rhW7gB4p+lFs7w2MX4dZnYs/NYQp2KYbxEfd9CdWqXBwJFi3eJpf0D+ZlUbNZcVdrXaS
-         /dJaKWmiPoY7U3YpjX37KE9VZqsoEpkt9+OxlLriwMOrhmb4rysoTlJ9QqEXzhAStFtw
-         HzGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUIR/D7Mn+LuZTOBF3ka40eCBKF8LzN9itcR6t/3cA+C25KnN0MViTVavirBeoZqLegLubYzAR8FZCoTk8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKn0+sErgiLujb7YUsYO/qJS2cK0eWMTBkDUsxVnfd9TYi08tU
-	Blp2NjSxb7Vz1T0qG04GHB7SSFSZS59PlpCo05n0QQ5dqE/bVo5RQNdTOD952GX+SCEzER0+h2u
-	LLN3ioyqAIeXYuCpwixt51l86Fnv+DDK1yGIl2ph6Bg==
-X-Gm-Gg: ASbGnct1cN/Xfl6FMtXUdcBSpY2psGvO/vyYjUuYkS1EzW+xKV97LjxFuJC6zip+dB9
-	wgE8YA1ekPxua8C/es2c3kS1zSOtJ8fC/MjHSKIaEHS9+5M2HEnA16Vf+XFh+BTN1VZeu5Uj5Mv
-	w9BYd35JpRTJC15oGne6YwFcRx4z1oGLAW9Up6WcrZqlH6IMcbQTY0fCoGcv8UE8RnbcvKIEMzC
-	Co1SnLDdSOFzvO0VawZnDCGnGpq1h+Wcwj3gkFc9A76NjaCHMhT8wS6jSnIJWjLnIVMsp1yWGgC
-	jgJB8pLsVSsIvnqgoRpzah056D4=
-X-Google-Smtp-Source: AGHT+IEa9/49xzFtkrl2WuFSbF2nGR0Ee3sa2JYGGK47IcVnnhS7gaKd3pqPtDHg3v3/2iaUnvbb9dKc2W6cTL8KA/s=
-X-Received: by 2002:a05:651c:2354:10b0:351:62e3:95d6 with SMTP id
- 38308e7fff4ca-3790773c607mr10303011fa.28.1761661226962; Tue, 28 Oct 2025
- 07:20:26 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="KjJPEYPJ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Gw2QrTQ4";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="KjJPEYPJ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Gw2QrTQ4"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id C99BD21A64;
+	Tue, 28 Oct 2025 16:13:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761667999; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pSosvxi5dPFtdhC5U0/TTS2WAyGF8TeP5oXRsKZhx7U=;
+	b=KjJPEYPJ7HZdpBT02TjYQ61cQjBJIEBgA6xrd5hVWW6xAJANi0wiYFNW6d5v7xV2N7YmlE
+	h6SetL0FQi/IqvkJSpicxJI7317JmcnGp5XrGSNF69XjHib4Xs4pSezxRpirGmBaonvMPF
+	xG/ODKCnE+Q8Gml9lNP6EM6O/Lt0Fag=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761667999;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pSosvxi5dPFtdhC5U0/TTS2WAyGF8TeP5oXRsKZhx7U=;
+	b=Gw2QrTQ427yrPNuYnSYVl0sYdSQd5/RgHd0ptf3XwxfdMZudizoPqUBaiHtRb5cqG4Is5B
+	5/rgTt+d8ttytfBA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761667999; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pSosvxi5dPFtdhC5U0/TTS2WAyGF8TeP5oXRsKZhx7U=;
+	b=KjJPEYPJ7HZdpBT02TjYQ61cQjBJIEBgA6xrd5hVWW6xAJANi0wiYFNW6d5v7xV2N7YmlE
+	h6SetL0FQi/IqvkJSpicxJI7317JmcnGp5XrGSNF69XjHib4Xs4pSezxRpirGmBaonvMPF
+	xG/ODKCnE+Q8Gml9lNP6EM6O/Lt0Fag=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761667999;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pSosvxi5dPFtdhC5U0/TTS2WAyGF8TeP5oXRsKZhx7U=;
+	b=Gw2QrTQ427yrPNuYnSYVl0sYdSQd5/RgHd0ptf3XwxfdMZudizoPqUBaiHtRb5cqG4Is5B
+	5/rgTt+d8ttytfBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7D26E13A7D;
+	Tue, 28 Oct 2025 16:13:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id udwmHJ7rAGmPCAAAD6G6ig
+	(envelope-from <tiwai@suse.de>); Tue, 28 Oct 2025 16:13:18 +0000
+Date: Tue, 28 Oct 2025 17:13:18 +0100
+Message-ID: <87o6prf1i9.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Michael Turquette <mturquette@baylibre.com>,	Stephen Boyd
+ <sboyd@kernel.org>,	Nicolas Ferre <nicolas.ferre@microchip.com>,	Alexandre
+ Belloni <alexandre.belloni@bootlin.com>,	Claudiu Beznea
+ <claudiu.beznea@tuxon.dev>,	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,	David Miller
+ <davem@davemloft.net>,	Linus Walleij <linus.walleij@linaro.org>,	Bartosz
+ Golaszewski <brgl@bgdev.pl>,	Joel Stanley <joel@jms.id.au>,	Andrew Jeffery
+ <andrew@codeconstruct.com.au>,	Crt Mori <cmo@melexis.com>,	Jonathan Cameron
+ <jic23@kernel.org>,	Lars-Peter Clausen <lars@metafoo.de>,	Jacky Huang
+ <ychuang3@nuvoton.com>,	Shan-Chun Hung <schung@nuvoton.com>,	Yury Norov
+ <yury.norov@gmail.com>,	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Jaroslav Kysela <perex@perex.cz>,	Takashi Iwai <tiwai@suse.com>,	Johannes
+ Berg <johannes@sipsolutions.net>,	Jakub Kicinski <kuba@kernel.org>,	Alex
+ Elder <elder@ieee.org>,	David Laight <david.laight.linux@gmail.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,	Jason Baron
+ <jbaron@akamai.com>,	Borislav Petkov <bp@alien8.de>,	Tony Luck
+ <tony.luck@intel.com>,	Michael Hennerich <Michael.Hennerich@analog.com>,
+	Kim Seer Paller <kimseer.paller@analog.com>,	David Lechner
+ <dlechner@baylibre.com>,	Nuno =?ISO-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,	Richard Genoud
+ <richard.genoud@bootlin.com>,	Cosmin Tanislav <demonsingur@gmail.com>,	Biju
+ Das <biju.das.jz@bp.renesas.com>,	Jianping Shen
+ <Jianping.Shen@de.bosch.com>,	linux-clk@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,	linux-renesas-soc@vger.kernel.org,
+	linux-crypto@vger.kernel.org,	linux-edac@vger.kernel.org,
+	qat-linux@intel.com,	linux-gpio@vger.kernel.org,
+	linux-aspeed@lists.ozlabs.org,	linux-iio@vger.kernel.org,
+	linux-sound@vger.kernel.org,	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 09/23] ALSA: usb-audio: #undef field_{get,prep}() before local definition
+In-Reply-To: <8f19d783dd783df5510408ffe9664dc6ef0d9434.1761588465.git.geert+renesas@glider.be>
+References: <cover.1761588465.git.geert+renesas@glider.be>
+	<8f19d783dd783df5510408ffe9664dc6ef0d9434.1761588465.git.geert+renesas@glider.be>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1761588465.git.geert+renesas@glider.be> <76ac5587c5ff3aae3c23f7b41e2f3eacb32ebd21.1761588465.git.geert+renesas@glider.be>
-In-Reply-To: <76ac5587c5ff3aae3c23f7b41e2f3eacb32ebd21.1761588465.git.geert+renesas@glider.be>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 28 Oct 2025 15:20:13 +0100
-X-Gm-Features: AWmQ_bkGEmC8OCwW4QksGegCfgNPPWl_EjVB0knvBjv-hfBoqYq6hENcwtWJ0QE
-Message-ID: <CAMRc=MdcH-56_cJ7oDUhHRsJRnDqbss5ET-3yGrBffGmEK_ieQ@mail.gmail.com>
-Subject: Re: [PATCH v5 04/23] gpio: aspeed: #undef field_{get,prep}() before
- local definition
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	David Miller <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, 
-	Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, 
-	Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, 
-	Shan-Chun Hung <schung@nuvoton.com>, Yury Norov <yury.norov@gmail.com>, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>, 
-	David Laight <david.laight.linux@gmail.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>, 
-	Michael Hennerich <Michael.Hennerich@analog.com>, Kim Seer Paller <kimseer.paller@analog.com>, 
-	David Lechner <dlechner@baylibre.com>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
-	Andy Shevchenko <andy@kernel.org>, Richard Genoud <richard.genoud@bootlin.com>, 
-	Cosmin Tanislav <demonsingur@gmail.com>, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Jianping Shen <Jianping.Shen@de.bosch.com>, linux-clk@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-edac@vger.kernel.org, qat-linux@intel.com, 
-	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org, 
-	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-Spamd-Result: default: False [-1.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TAGGED_RCPT(0.00)[renesas];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com,wanadoo.fr];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[baylibre.com,kernel.org,microchip.com,bootlin.com,tuxon.dev,intel.com,gondor.apana.org.au,davemloft.net,linaro.org,bgdev.pl,jms.id.au,codeconstruct.com.au,melexis.com,metafoo.de,nuvoton.com,gmail.com,rasmusvillemoes.dk,perex.cz,suse.com,sipsolutions.net,ieee.org,wanadoo.fr,akamai.com,alien8.de,analog.com,bp.renesas.com,de.bosch.com,vger.kernel.org,lists.infradead.org,lists.ozlabs.org];
+	R_RATELIMIT(0.00)[to_ip_from(RLr5uiezb5xkkwytzfr8x566qh)];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email]
+X-Spam-Flag: NO
+X-Spam-Score: -1.80
+X-Spam-Level: 
 
-On Mon, Oct 27, 2025 at 7:42=E2=80=AFPM Geert Uytterhoeven
-<geert+renesas@glider.be> wrote:
->
+On Mon, 27 Oct 2025 19:41:43 +0100,
+Geert Uytterhoeven wrote:
+> 
 > Prepare for the advent of globally available common field_get() and
 > field_prep() macros by undefining the symbols before defining local
 > variants.  This prevents redefinition warnings from the C preprocessor
 > when introducing the common macros later.
->
+> 
 > Suggested-by: Yury Norov <yury.norov@gmail.com>
 > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 > --
 > v5:
 >   - New.
 > ---
->  drivers/gpio/gpio-aspeed.c | 2 ++
+>  sound/usb/mixer_quirks.c | 2 ++
 >  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/gpio/gpio-aspeed.c b/drivers/gpio/gpio-aspeed.c
-> index 7953a9c4e36d7550..ef4ccaf74a5b379e 100644
-> --- a/drivers/gpio/gpio-aspeed.c
-> +++ b/drivers/gpio/gpio-aspeed.c
-> @@ -32,7 +32,9 @@
->  #include "gpiolib.h"
->
->  /* Non-constant mask variant of FIELD_GET() and FIELD_PREP() */
+> 
+> diff --git a/sound/usb/mixer_quirks.c b/sound/usb/mixer_quirks.c
+> index 828af3095b86ee0a..713a8498b975e1ac 100644
+> --- a/sound/usb/mixer_quirks.c
+> +++ b/sound/usb/mixer_quirks.c
+> @@ -3312,7 +3312,9 @@ static int snd_bbfpro_controls_create(struct usb_mixer_interface *mixer)
+>  #define RME_DIGIFACE_INVERT BIT(31)
+>  
+>  /* Nonconst helpers */
 > +#undef field_get
 >  #define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))
 > +#undef field_prep
->  #define field_prep(_mask, _val)        (((_val) << (ffs(_mask) - 1)) & (=
-_mask))
->
->  #define GPIO_G7_IRQ_STS_BASE 0x100
-> --
-> 2.43.0
->
+>  #define field_prep(_mask, _val) (((_val) << (ffs(_mask) - 1)) & (_mask))
+>  
+>  static int snd_rme_digiface_write_reg(struct snd_kcontrol *kcontrol, int item, u16 mask, u16 val)
 
-Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Acked-by: Takashi Iwai <tiwai@suse.de>
+
+
+thanks,
+
+Takashi
