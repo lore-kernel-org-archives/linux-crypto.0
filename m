@@ -1,280 +1,533 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7436319E82A
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Oct 2025 17:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2232C3274;
+	Tue, 28 Oct 2025 21:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761673165; cv=none; b=r3MlN/O4ak7U49wH4V/gB17wElvGwF3MUmxcjUOKx0My9ZkNoXcB3DRMwhfmdROnWQDaveGmkmGJ1PwLspEKmPh9Zn6IrHtpLIVx7TIH9Xx7Lm2zuVa1ghMYoPfdNzvN5VTvPQaYwtC/FjBgt/wcB9ye6UKMOm4rs9mdspFnzJY=
+	t=1761687547; cv=none; b=joDuNREazRZBiPPzsbn8+3nj58RzZKsoojY/ER7tjB1LRL11c4Vwqv0VkQgwGZcyRixb2vwwfV55QOOLebpt7yxIdyM/b/3laVql8AhgN9oOusAEAblA4uXCmB5D+BZv5mLbRIcI1YC6Dlsln7TOxBNQE8azoMYVSp3fb5UUEig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761673165; c=relaxed/simple;
-	bh=e5GKgH/UTKYoqeaateNe5qxhNdabeLnlG8oSSdUoad4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZEP07QsLl01vTNl8GcfwwZ44Oyt5CIBb8Sspj+1ruqCP8R7jH+lslSOdmKWyrJaapwdv21BJwd4vc7bEn+UGQrIWT57UHkWHLd/MWrxVFobJoc3iBczjGKdM9ScOlF8qVoZxXne30s6Wo96c+225JbHfYdVJZrdooYMRbQl2Mr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H1QFlI4U; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1761687547; c=relaxed/simple;
+	bh=xOASOABBvkPUNsQAaeefvM/VW8nqDwn8XkM2jh36XcY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DrmqlbvwFg7RjCbNGA32pIiP1QlIFGAp/gWZXy42Hm2xvJCRT7Yb6UbqFxZuvwJX5yGCqPCMq4j+rGc89+BsFd19ODObqIk+KmHao56VZTIKmWsSg8a5gtPAktTYDXuxUDdU4UNzsPvFsghvUYjx8ewX+XG78g0vANdooKrTdA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=d3y3Gpup; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=n1SgGhx4; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H1QFlI4U"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-78f75b0a058so56881846d6.0
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Oct 2025 10:39:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761673162; x=1762277962; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e5GKgH/UTKYoqeaateNe5qxhNdabeLnlG8oSSdUoad4=;
-        b=H1QFlI4UXJWp4xwUcmHqd/Npb30gF81hDIFSfgIwdncH0eREcuJtRH0jg0mw0hjjAR
-         4ayhnC5xy6phB304/qUK2PUygSMxQGTwAZxtN3xZC81SYSmPhfY0TyFr1JTdcMkU1wc5
-         PwS178q7xp8qRH6VseV4BfmG1j6K3fbGr/Ji72nVxt8nZxXc7zJhaBIyK/Ka/UxEijfk
-         bq4RS3SGTCl5L4m0h3+3+rCs+t2A9OrUv7G4LtkOBQo/bXF+OdkTAi5UEgcDL59MD/6c
-         u40BCJSLQBL5UL+ICVs85AX/ivVJ8YYr54UWQhzcQ427SsguU7UNIOiUFYvh8m6R17Vq
-         d36Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761673162; x=1762277962;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e5GKgH/UTKYoqeaateNe5qxhNdabeLnlG8oSSdUoad4=;
-        b=oz/i9Mu/QyWORNNoeA6qgJGNpDsiUMvqiiFC0tr+iTzTC0G5rQbaR1N2Wacf4VjQ83
-         FLN3GUf5yH+b/b+xZBMnQlqWwi6JjyQBn9nL2Ms6AUivXUSdwodFJmnWU0l9COtX15Uv
-         PBGBd3n0TFDFrEYjLm+S1GMr9tOECXJJYHtDz6SeoWu36t1nG776Uy8dOUoUegEISZH3
-         knbWPJf2ctGG/2bRcijGrPe18jZWaZHt85Qp0jitKEq8UR0mJZ7urswU/asTChEQ+7cB
-         /v6c7use5MfioDczg05eIanWo/BEo/YsiDHL3X1QUZcVtsjjN0DgTwR3d5Lm2w5rNg1m
-         +lgA==
-X-Forwarded-Encrypted: i=1; AJvYcCXMC9v1EmZbjLhiNmePCCxe4h4CyAakmSHyccJn+UADgvXov5eBptWwY5XN5jxiK7fXSwdX8oWTX7oMbCA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzz/nT1O6CBWN3+SyDCjUUsI/HxqPOz/pkcCMCJlK9yOQ6In/9U
-	gFu2eZggDEEP8qFrYJq2hdnpP39FZla4ljqryLMB/TyK1ub65pmQ8mHStM/o1wLo4+PlUJaGCgS
-	cb6YOvFo32wK/DWnOU6l2gPTFdapvnbfib20ZkJCy
-X-Gm-Gg: ASbGnctMKSFTz/1v1Nd32UThaFudEUgryrqUBGVSmaIzXjOIjzDGwGMY5q+F/+nfSvS
-	pIsTz31N3dQW+qBTimPFVxFe8X3ddJZyYu173f/H/labqeJkVxBd5MyZ4SeRihnk64/8M3QMnUG
-	+1pFKZO3XoSbzxIgdCqq/12fR1Iaft7I8+7ULWPMDJpG8KICaRQoyvZbI5Ud+yoBQ9UFMDIRy6R
-	VBm5uCda1FFzikipJM7nbUuiDZ1tK6x8do72UC8vBwSVyypPR4UNydih8i451cr8lSach5qtjS4
-	VnuPnlT3UYlrY0m1wDV+s4MjiA==
-X-Google-Smtp-Source: AGHT+IEzLhRvjAVm4Cta7u3gqBbuXxGfYAu/L56wiWh0qQYwqjYD99avpLnvK5jAgeVXmSt4Qiq0dgGWWZjR3bNU3C4=
-X-Received: by 2002:a05:6214:40d:b0:87c:2b29:2613 with SMTP id
- 6a1803df08f44-87ffb13ae3fmr67954756d6.50.1761673161744; Tue, 28 Oct 2025
- 10:39:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="d3y3Gpup";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="n1SgGhx4"
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 0D04EEC0496;
+	Tue, 28 Oct 2025 17:39:02 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Tue, 28 Oct 2025 17:39:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1761687542;
+	 x=1761773942; bh=DPOFQal6bpRTx55H2kMHu3VWh654e7b6m98lZBX4dv8=; b=
+	d3y3Gpup1nT5JucMZm7h/cni5GWAv+riD6/qBRuts8V/XroOJLSJL/vcXDk0zq9T
+	ASM7LKJX+86sedzSy2FRFZK8yVpjsYLvGruCYQTxC8/RgEg9iSZBUsqbZfFUlY52
+	DYAmkT2jbyaceXGDzPJwoebFIM8lXYB2qjPLdOi6g0qgXV7BdJvoAuf+oJsjjhHo
+	W3raTfgW1JoHSuVKfUXu0jaaXXMB9HZa+warCfYmSloGCnsmWeiupQuCyXPCAPVS
+	kWcPqWxdQuKAnZQaBtMkCnJiRYiD4XL3rgCEbPoebnHe9zNfHG5SBDF59IBVzZ48
+	63upKJoNPzqs/0fJsVgLCg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1761687542; x=
+	1761773942; bh=DPOFQal6bpRTx55H2kMHu3VWh654e7b6m98lZBX4dv8=; b=n
+	1SgGhx4zuHYCB2GtU5mhuv6MSH0OSP67vEJ1d5ssW46QZT5zBWvbNlVEG38p07vi
+	yQs+h6g9eTQky9hw/O/cxcjj7z3ULT69JmHCUI9O1AqGOPNfTPLga/pJ0aB8rHA3
+	pfEfBPmxv+GB8N4qy2qMJAQBkrDOmtipW5Rz66Id+xe8NURKDCXN+zOxDLxEfNuJ
+	WmQUuS6b1IKUlyVef0Q3bZi/MdFN40T62vzXTxZ37oXhjvr2jO4w+kCTFF5raamg
+	dMU1L2cZD7sJHsWbLp152oqNedhFqPbAqtNk7PSejGpn3A97zGA+dcm5C+sqPZcD
+	zMnsQSftikuzktAH+JIfA==
+X-ME-Sender: <xms:9DcBadGmTZ5PGkXcyoAwft4Enym4aR8UY1TK94Ws9-GLPCq08rHmDw>
+    <xme:9DcBaQlTFJRN_T0GQSFrP0y7Mp2GEStj3dM5mhSrk9e9_iqbojx7QxtOOvypBmnKJ
+    gb1oGSyeFwfhMGtjzogn1BLeXQVkKQeMRAKxvjOhAaLY07WEvIXWQ>
+X-ME-Received: <xmr:9DcBaYe026DLdE2JGOznhDxEVYJtCXrIwFpXLcSgyIUZe7DUfcit51vthUo>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduieduleehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhggtgfgsehtjeertd
+    dttddvnecuhfhrohhmpeetlhgvgicuhghilhhlihgrmhhsohhnuceorghlvgigsehshhgr
+    iigsohhtrdhorhhgqeenucggtffrrghtthgvrhhnpeetteduleegkeeigedugeeluedvff
+    egheeliedvtdefkedtkeekheffhedutefhhfenucevlhhushhtvghrufhiiigvpedtnecu
+    rfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgspg
+    hrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehlihhulhho
+    nhhgfhgrnhhgsehhuhgrfigvihdrtghomhdprhgtphhtthhopegrlhgvgidrfihilhhlih
+    grmhhsohhnsehrvgguhhgrthdrtghomhdprhgtphhtthhopehjghhgsehnvhhiughirgdr
+    tghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrgh
+    drrghupdhrtghpthhtohepshhhrghmvggvrhhkohhlohhthhhumhesghhmrghilhdrtgho
+    mhdprhgtphhtthhopehjohhnrghthhgrnhdrtggrmhgvrhhonheshhhurgifvghirdgtoh
+    hmpdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrkhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:9DcBaWH6FVe8X8tQqzPoxjF_75Dkem5wDjmPIUjl2MmaHQL1rH1eWg>
+    <xmx:9DcBaWjchZJnJ1sSg7oMPa8Gk9NdbgMS-DXunoiVv-hyAAoyHrnVAg>
+    <xmx:9DcBaS2zFcSMYO16nLVwuPEAUx-QnYO5arryp5At3_e42-xe2N6Iyw>
+    <xmx:9DcBaZfxBPjty1ED4qvfjabbOpgBoZxBuwKZEgSQ-Z2BLwYWeeOCQw>
+    <xmx:9jcBaQTxezhmY4dXFeMYMA9TWZzOkyyQRKOv0PEaS5xAQicg1w5WK1T->
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 28 Oct 2025 17:38:59 -0400 (EDT)
+Date: Tue, 28 Oct 2025 15:38:57 -0600
+From: Alex Williamson <alex@shazbot.org>
+To: liulongfang <liulongfang@huawei.com>
+Cc: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+ <herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
+ <jonathan.cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
+ <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linuxarm@openeuler.org>
+Subject: Re: [PATCH v10 2/2] hisi_acc_vfio_pci: adapt to new migration
+ configuration
+Message-ID: <20251028153857.67329c09@shazbot.org>
+In-Reply-To: <734cd156-26c1-50f7-f0fa-db76beaab745@huawei.com>
+References: <20251017091057.3770403-1-liulongfang@huawei.com>
+	<20251017091057.3770403-3-liulongfang@huawei.com>
+	<20251027222007.5e176e42@shazbot.org>
+	<734cd156-26c1-50f7-f0fa-db76beaab745@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250919145750.3448393-1-ethan.w.s.graham@gmail.com>
- <3562eeeb276dc9cc5f3b238a3f597baebfa56bad.camel@sipsolutions.net>
- <CANgxf6xOJgP6254S8EgSdiivrfE-aJDEQbDdXzWi7K4BCTdrXg@mail.gmail.com> <438ff89e22a815c81406c3c8761a951b0c7e6916.camel@sipsolutions.net>
-In-Reply-To: <438ff89e22a815c81406c3c8761a951b0c7e6916.camel@sipsolutions.net>
-From: Alexander Potapenko <glider@google.com>
-Date: Tue, 28 Oct 2025 18:38:43 +0100
-X-Gm-Features: AWmQ_bnW72aQYooWWGflqdYTwRU7KZczsY8iNyINpHaHoghSdwZyWmyrA5jTR-Q
-Message-ID: <CAG_fn=XSUw=4tVpKE7Q+R2qsBzbA5+_XC1xH=goxAUZiRD7iyQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/10] KFuzzTest: a new kernel fuzzing framework
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Ethan Graham <ethan.w.s.graham@gmail.com>, ethangraham@google.com, 
-	andreyknvl@gmail.com, andy@kernel.org, brauner@kernel.org, 
-	brendan.higgins@linux.dev, davem@davemloft.net, davidgow@google.com, 
-	dhowells@redhat.com, dvyukov@google.com, elver@google.com, 
-	herbert@gondor.apana.org.au, ignat@cloudflare.com, jack@suse.cz, 
-	jannh@google.com, kasan-dev@googlegroups.com, kees@kernel.org, 
-	kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lukas@wunner.de, 
-	rmoar@google.com, shuah@kernel.org, sj@kernel.org, tarasmadan@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 24, 2025 at 10:38=E2=80=AFAM Johannes Berg
-<johannes@sipsolutions.net> wrote:
->
-> Hi Ethan, all,
+On Tue, 28 Oct 2025 15:04:37 +0800
+liulongfang <liulongfang@huawei.com> wrote:
 
+> On 2025/10/28 12:20, Alex Williamson wrote:
+> > On Fri, 17 Oct 2025 17:10:57 +0800
+> > Longfang Liu <liulongfang@huawei.com> wrote:
+> >   
+> >> On new platforms greater than QM_HW_V3, the migration region has been
+> >> relocated from the VF to the PF. The VF's own configuration space is
+> >> restored to the complete 64KB, and there is no need to divide the
+> >> size of the BAR configuration space equally. The driver should be
+> >> modified accordingly to adapt to the new hardware device.
+> >>
+> >> On the older hardware platform QM_HW_V3, the live migration configuration
+> >> region is placed in the latter 32K portion of the VF's BAR2 configuration
+> >> space. On the new hardware platform QM_HW_V4, the live migration
+> >> configuration region also exists in the same 32K area immediately following
+> >> the VF's BAR2, just like on QM_HW_V3.
+> >>
+> >> However, access to this region is now controlled by hardware. Additionally,
+> >> a copy of the live migration configuration region is present in the PF's
+> >> BAR2 configuration space. On the new hardware platform QM_HW_V4, when an
+> >> older version of the driver is loaded, it behaves like QM_HW_V3 and uses
+> >> the configuration region in the VF, ensuring that the live migration
+> >> function continues to work normally. When the new version of the driver is
+> >> loaded, it directly uses the configuration region in the PF. Meanwhile,
+> >> hardware configuration disables the live migration configuration region
+> >> in the VF's BAR2: reads return all 0xF values, and writes are silently
+> >> ignored.
+> >>
+> >> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> >> Reviewed-by: Shameer Kolothum <shameerkolothum@gmail.com>
+> >> ---
+> >>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 205 ++++++++++++------
+> >>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  21 ++
+> >>  2 files changed, 165 insertions(+), 61 deletions(-)
+> >>
+> >> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> >> index fde33f54e99e..55233e62cb1d 100644
+> >> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> >> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> >> @@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
+> >>  	return 0;
+> >>  }
+> >>  
+> >> +static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> >> +			   struct acc_vf_data *vf_data)
+> >> +{
+> >> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+> >> +	struct device *dev = &qm->pdev->dev;
+> >> +	u32 eqc_addr, aeqc_addr;
+> >> +	int ret;
+> >> +
+> >> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL) {
+> >> +		eqc_addr = QM_EQC_DW0;
+> >> +		aeqc_addr = QM_AEQC_DW0;
+> >> +	} else {
+> >> +		eqc_addr = QM_EQC_PF_DW0;
+> >> +		aeqc_addr = QM_AEQC_PF_DW0;
+> >> +	}
+> >> +
+> >> +	/* QM_EQC_DW has 7 regs */
+> >> +	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> >> +	if (ret) {
+> >> +		dev_err(dev, "failed to read QM_EQC_DW\n");
+> >> +		return ret;
+> >> +	}
+> >> +
+> >> +	/* QM_AEQC_DW has 7 regs */
+> >> +	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> >> +	if (ret) {
+> >> +		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> >> +		return ret;
+> >> +	}
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> >> +			   struct acc_vf_data *vf_data)
+> >> +{
+> >> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+> >> +	struct device *dev = &qm->pdev->dev;
+> >> +	u32 eqc_addr, aeqc_addr;
+> >> +	int ret;
+> >> +
+> >> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL) {
+> >> +		eqc_addr = QM_EQC_DW0;
+> >> +		aeqc_addr = QM_AEQC_DW0;
+> >> +	} else {
+> >> +		eqc_addr = QM_EQC_PF_DW0;
+> >> +		aeqc_addr = QM_AEQC_PF_DW0;
+> >> +	}
+> >> +
+> >> +	/* QM_EQC_DW has 7 regs */
+> >> +	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> >> +	if (ret) {
+> >> +		dev_err(dev, "failed to write QM_EQC_DW\n");
+> >> +		return ret;
+> >> +	}
+> >> +
+> >> +	/* QM_AEQC_DW has 7 regs */
+> >> +	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> >> +	if (ret) {
+> >> +		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> >> +		return ret;
+> >> +	}
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >>  static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+> >>  {
+> >>  	struct device *dev = &qm->pdev->dev;
+> >> @@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+> >>  		return ret;
+> >>  	}
+> >>  
+> >> -	/* QM_EQC_DW has 7 regs */
+> >> -	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> >> -	if (ret) {
+> >> -		dev_err(dev, "failed to read QM_EQC_DW\n");
+> >> -		return ret;
+> >> -	}
+> >> -
+> >> -	/* QM_AEQC_DW has 7 regs */
+> >> -	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+> >> -	if (ret) {
+> >> -		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> >> -		return ret;
+> >> -	}
+> >> -
+> >>  	return 0;
+> >>  }
+> >>  
+> >> @@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+> >>  		return ret;
+> >>  	}
+> >>  
+> >> -	/* QM_EQC_DW has 7 regs */
+> >> -	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> >> -	if (ret) {
+> >> -		dev_err(dev, "failed to write QM_EQC_DW\n");
+> >> -		return ret;
+> >> -	}
+> >> -
+> >> -	/* QM_AEQC_DW has 7 regs */
+> >> -	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+> >> -	if (ret) {
+> >> -		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> >> -		return ret;
+> >> -	}
+> >> -
+> >>  	return 0;
+> >>  }
+> >>  
+> >> @@ -522,6 +560,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> >>  		return ret;
+> >>  	}
+> >>  
+> >> +	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
+> >> +	if (ret)
+> >> +		return ret;
+> >> +
+> >>  	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
+> >>  	if (ret) {
+> >>  		dev_err(dev, "set sqc failed\n");
+> >> @@ -589,6 +631,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> >>  	vf_data->vf_qm_state = QM_READY;
+> >>  	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+> >>  
+> >> +	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
+> >> +	if (ret)
+> >> +		return ret;
+> >> +  
+> > 
+> > I'd have thought it'd still make sense that qm_{get,set}_regs() would
+> > handle this subset of registers even though it's split out into helper
+> > functions, now we have the dev_data debugfs failing to fill these
+> > registers.  It's not clear it was worthwhile to split out the xqc
+> > helpers at all here.  
+> 
+> Moving the differentiated handling of eqc and aeqc, which results from different drv_mode values,
+> into the helper functions can keep the main business logic code for live migration
+> clean and concise.
 
-Hi Johannes,
+You can keep the helpers if you want, it's already introduced a bug
+here separating the xqc register get/set from all the others though.
+The helpers are also not removing the redundancy of getting the
+register offsets.  It might be better to keep the read/write in the
+get/set function and just add a helper for the offsets:
 
-> > I would argue that it only depends on syzkaller because it is currently
-> > the only fuzzer that implements support for KFuzzTest. The communicatio=
-n
-> > interface itself is agnostic.
->
-> Yeah I can see how you could argue that. However, syzkaller is also
-> effectively the only fuzzer now that supports what you later call "smart
-> input generation", and adding it to any other fuzzer is really not
-> straight-forward, at least to me. No other fuzzer seems to really have
-> felt a need to have this, and there are ... dozens?
+static void qm_xqc_reg_offsets(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+			       u32 *eqc_addr, u32 *aeqc_addr)
+{
+	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL) {
+		*eqc_addr = QM_EQC_VF_DW0;
+		*aeqc_addr = QM_AEQC_VF_DW0;
+	} else {
+		*eqc_addr = QM_EQC_PF_DW0;
+		*aeqc_addr = QM_AEQC_PF_DW0;
+	}
+}
 
-Structure-aware fuzzing is not unique to syzkaller, nor are domain
-constraints for certain values.
-https://github.com/google/fuzztest is one example of a fuzzer that
-supports both.
-libFuzzer also supports custom mutators
-(https://github.com/google/fuzzing/blob/master/docs/structure-aware-fuzzing=
-.md)
+Thanks,
+Alex
 
-> > Since a KFuzzTest target is
-> > invoked when you write encoded data into its debugfs input file, any
-> > fuzzer that is able to do this is able to fuzz it - this is what syzkal=
-ler
-> > does. The bridge tool was added to provide an out-of-the-box tool
-> > for fuzzing KFuzzTest targets with arbitrary data that doesn't depend
-> > on syzkaller at all.
->
-> Yes, I understand, I guess it just feels a bit like a fig-leaf to me to
-> paper over "you need syzkaller" because there's no way to really
-> (efficiently) use it for fuzzing.
+> >   
+> >>  	ret = vf_qm_read_data(vf_qm, vf_data);
+> >>  	if (ret)
+> >>  		return ret;
+> >> @@ -1186,34 +1232,52 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+> >>  {
+> >>  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
+> >>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+> >> +	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
+> >>  	struct pci_dev *vf_dev = vdev->pdev;
+> >> +	u32 val;
+> >>  
+> >> -	/*
+> >> -	 * ACC VF dev BAR2 region consists of both functional register space
+> >> -	 * and migration control register space. For migration to work, we
+> >> -	 * need access to both. Hence, we map the entire BAR2 region here.
+> >> -	 * But unnecessarily exposing the migration BAR region to the Guest
+> >> -	 * has the potential to prevent/corrupt the Guest migration. Hence,
+> >> -	 * we restrict access to the migration control space from
+> >> -	 * Guest(Please see mmap/ioctl/read/write override functions).
+> >> -	 *
+> >> -	 * Please note that it is OK to expose the entire VF BAR if migration
+> >> -	 * is not supported or required as this cannot affect the ACC PF
+> >> -	 * configurations.
+> >> -	 *
+> >> -	 * Also the HiSilicon ACC VF devices supported by this driver on
+> >> -	 * HiSilicon hardware platforms are integrated end point devices
+> >> -	 * and the platform lacks the capability to perform any PCIe P2P
+> >> -	 * between these devices.
+> >> -	 */
+> >> +	val = readl(pf_qm->io_base + QM_MIG_REGION_SEL);
+> >> +	if (pf_qm->ver > QM_HW_V3 && (val & QM_MIG_REGION_EN))
+> >> +		hisi_acc_vdev->drv_mode = HW_ACC_MIG_PF_CTRL;
+> >> +	else
+> >> +		hisi_acc_vdev->drv_mode = HW_ACC_MIG_VF_CTRL;
+> >>  
+> >> -	vf_qm->io_base =
+> >> -		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+> >> -			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+> >> -	if (!vf_qm->io_base)
+> >> -		return -EIO;
+> >> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_PF_CTRL) {
+> >> +		/*
+> >> +		 * On hardware platforms greater than QM_HW_V3, the migration function
+> >> +		 * register is placed in the BAR2 configuration region of the PF,
+> >> +		 * and each VF device occupies 8KB of configuration space.
+> >> +		 */
+> >> +		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
+> >> +				 hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
+> >> +	} else {
+> >> +		/*
+> >> +		 * ACC VF dev BAR2 region consists of both functional register space
+> >> +		 * and migration control register space. For migration to work, we
+> >> +		 * need access to both. Hence, we map the entire BAR2 region here.
+> >> +		 * But unnecessarily exposing the migration BAR region to the Guest
+> >> +		 * has the potential to prevent/corrupt the Guest migration. Hence,
+> >> +		 * we restrict access to the migration control space from
+> >> +		 * Guest(Please see mmap/ioctl/read/write override functions).
+> >> +		 *
+> >> +		 * Please note that it is OK to expose the entire VF BAR if migration
+> >> +		 * is not supported or required as this cannot affect the ACC PF
+> >> +		 * configurations.
+> >> +		 *
+> >> +		 * Also the HiSilicon ACC VF devices supported by this driver on
+> >> +		 * HiSilicon hardware platforms are integrated end point devices
+> >> +		 * and the platform lacks the capability to perform any PCIe P2P
+> >> +		 * between these devices.
+> >> +		 */
+> >>  
+> >> +		vf_qm->io_base =
+> >> +			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+> >> +				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+> >> +		if (!vf_qm->io_base)
+> >> +			return -EIO;
+> >> +	}
+> >>  	vf_qm->fun_type = QM_HW_VF;
+> >> +	vf_qm->ver = pf_qm->ver;
+> >>  	vf_qm->pdev = vf_dev;
+> >>  	mutex_init(&vf_qm->mailbox_lock);
+> >>  
+> >> @@ -1250,6 +1314,28 @@ static struct hisi_qm *hisi_acc_get_pf_qm(struct pci_dev *pdev)
+> >>  	return !IS_ERR(pf_qm) ? pf_qm : NULL;
+> >>  }
+> >>  
+> >> +static size_t hisi_acc_get_resource_len(struct vfio_pci_core_device *vdev,
+> >> +					unsigned int index)
+> >> +{
+> >> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
+> >> +			hisi_acc_drvdata(vdev->pdev);
+> >> +
+> >> +	/*
+> >> +	 * On the old HW_ACC_MIG_VF_CTRL mode device, the ACC VF device
+> >> +	 * BAR2 region encompasses both functional register space
+> >> +	 * and migration control register space.
+> >> +	 * only the functional region should be report to Guest.
+> >> +	 */
+> >> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL)
+> >> +		return (pci_resource_len(vdev->pdev, index) >> 1);
+> >> +	/*
+> >> +	 * On the new HW device, the migration control register
+> >> +	 * has been moved to the PF device BAR2 region.
+> >> +	 * The VF device BAR2 is entirely functional register space.
+> >> +	 */
+> >> +	return pci_resource_len(vdev->pdev, index);
+> >> +}
+> >> +
+> >>  static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
+> >>  					size_t count, loff_t *ppos,
+> >>  					size_t *new_count)
+> >> @@ -1260,8 +1346,9 @@ static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
+> >>  
+> >>  	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+> >>  		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> >> -		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
+> >> +		resource_size_t end;
+> >>  
+> >> +		end = hisi_acc_get_resource_len(vdev, index);
+> >>  		/* Check if access is for migration control region */
+> >>  		if (pos >= end)
+> >>  			return -EINVAL;
+> >> @@ -1282,8 +1369,9 @@ static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
+> >>  	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+> >>  	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+> >>  		u64 req_len, pgoff, req_start;
+> >> -		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
+> >> +		resource_size_t end;
+> >>  
+> >> +		end = hisi_acc_get_resource_len(vdev, index);
+> >>  		req_len = vma->vm_end - vma->vm_start;
+> >>  		pgoff = vma->vm_pgoff &
+> >>  			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+> >> @@ -1330,7 +1418,6 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
+> >>  	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
+> >>  		struct vfio_pci_core_device *vdev =
+> >>  			container_of(core_vdev, struct vfio_pci_core_device, vdev);
+> >> -		struct pci_dev *pdev = vdev->pdev;
+> >>  		struct vfio_region_info info;
+> >>  		unsigned long minsz;
+> >>  
+> >> @@ -1345,12 +1432,7 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
+> >>  		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
+> >>  			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> >>  
+> >> -			/*
+> >> -			 * ACC VF dev BAR2 region consists of both functional
+> >> -			 * register space and migration control register space.
+> >> -			 * Report only the functional region to Guest.
+> >> -			 */
+> >> -			info.size = pci_resource_len(pdev, info.index) / 2;
+> >> +			info.size = hisi_acc_get_resource_len(vdev, info.index);
+> >>  
+> >>  			info.flags = VFIO_REGION_INFO_FLAG_READ |
+> >>  					VFIO_REGION_INFO_FLAG_WRITE |
+> >> @@ -1521,7 +1603,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+> >>  	hisi_acc_vf_disable_fds(hisi_acc_vdev);
+> >>  	mutex_lock(&hisi_acc_vdev->open_mutex);
+> >>  	hisi_acc_vdev->dev_opened = false;
+> >> -	iounmap(vf_qm->io_base);
+> >> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL)
+> >> +		iounmap(vf_qm->io_base);
+> >>  	mutex_unlock(&hisi_acc_vdev->open_mutex);
+> >>  	vfio_pci_core_close_device(core_vdev);
+> >>  }
+> >> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> >> index 91002ceeebc1..d287abe3dd31 100644
+> >> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> >> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> >> @@ -59,6 +59,26 @@
+> >>  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
+> >>  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
+> >>  
+> >> +#define QM_MIG_REGION_OFFSET		0x180000
+> >> +#define QM_MIG_REGION_SIZE		0x2000
+> >> +
+> >> +#define QM_SUB_VERSION_ID		0x100210  
+> > 
+> > Above SUB_VERSION_ID isn't used.  
+> 
+> Yes, this macro variable needs to be removed.
+> 
+> >   
+> >> +#define QM_EQC_PF_DW0			0x1c00
+> >> +#define QM_AEQC_PF_DW0			0x1c20  
+> > 
+> > Seems like it'd make sense to define these next to the VF offsets and
+> > perhaps even add "VF" to the existing macros for consistency.  Thanks,
+> >  
+> 
+> OK, it's better to distinguish between the old offset variable names with "VF"
+> and the newly added PF offset addresses for clarity
+> 
+> Thanks,
+> Longfang.
+> 
+> > Alex
+> >   
+> >> +
+> >> +/**
+> >> + * On HW_ACC_MIG_VF_CTRL mode, the configuration domain supporting live
+> >> + * migration functionality is located in the latter 32KB of the VF's BAR2.
+> >> + * The Guest is only provided with the first 32KB of the VF's BAR2.
+> >> + * On HW_ACC_MIG_PF_CTRL mode, the configuration domain supporting live
+> >> + * migration functionality is located in the PF's BAR2, and the entire 64KB
+> >> + * of the VF's BAR2 is allocated to the Guest.
+> >> + */
+> >> +enum hw_drv_mode {
+> >> +	HW_ACC_MIG_VF_CTRL = 0,
+> >> +	HW_ACC_MIG_PF_CTRL,
+> >> +};
+> >> +
+> >>  struct acc_vf_data {
+> >>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+> >>  	/* QM match information */
+> >> @@ -125,6 +145,7 @@ struct hisi_acc_vf_core_device {
+> >>  	struct pci_dev *vf_dev;
+> >>  	struct hisi_qm *pf_qm;
+> >>  	struct hisi_qm vf_qm;
+> >> +	int drv_mode;
+> >>  	/*
+> >>  	 * vf_qm_state represents the QM_VF_STATE register value.
+> >>  	 * It is set by Guest driver for the ACC VF dev indicating  
+> > 
+> > .
+> >   
 
-When designing KFuzzTest, we anticipated two potential user scenarios:
-1. The code author develops the fuzz test and runs it locally to
-ensure its sanity and catch obvious errors.
-2. The fuzz test lands upstream and syzkaller runs it continuously.
-
-Ethan initially developed tools for both scenarios on the syzkaller
-side, prioritizing simplicity of use over the diversity of potential
-non-default fuzzing engines.
-However, because smoke testing does not require a syzkaller
-dependency, he added the bridge utility (I believe David Gow suggested
-it).
-That utility is easy to use for smoke testing, as it requires only a
-one-line structure description.
-I understand it may not be suitable for users who want to extensively
-fuzz a particular test on their own machine without involving
-syzkaller.
-
-I agree we can do a better job by implementing some of the following option=
-s:
-1. For tests without nested structures, or for tests that request it
-explicitly, allow a simpler input format via a separate debugfs file.
-2. Export the constraints/annotations via debugfs in a string format
-so that fuzzers do not need vmlinux access to obtain them.
-3. Export the fuzz test input structure as a string. (We've looked
-into this and deemed it infeasible because test inputs may reference C
-structures, and we don't have a reflection mechanism that would allow
-us to dump the contents of existing structs).
-
-
-> > This is exactly right. It's not used by syzkaller, but this is how it's
-> > intended to work when it's used as a standalone tool, or for bridging
-> > between KFuzzTest targets and an arbitrary fuzzer that doesn't
-> > implement the required encoding logic.
->
-> Yeah I guess, but that still requires hand-coding the descriptions (or
-> writing a separate parser), and notably doesn't work with a sort of in-
-> process fuzzing I was envisioning for ARCH=3Dum. Which ought to be much
-> faster, and even combinable with fork() as I alluded to in earlier
-> emails.
-
-Can you describe the interface between the fuzz test and the fuzzing
-engine that you have in mind?
-For ARCH=3Dum, if you don't need structure awareness, I think the
-easiest solution would be to make FUZZ_TEST wrap the code into
-something akin to LLVMFuzzerTestOneInput()
-(https://llvm.org/docs/LibFuzzer.html) that would directly pass random
-data into the function under test. The debugfs interface is probably
-excessive in this case.
-
-But let's say we want to run in-kernel fuzzing with e.g. AFL++ - will
-a simplified debugfs interface solve the problem?
-What special cases can we omit to simplify the interface?
-
-> I mean, yeah, I guess but ... Is there a fuzzer that is able generate
-> such input? I haven't seen one. And running the bridge tool separately
-> is going to be rather expensive (vs. in-process like I'm thinking
-> about), and some form of data extraction is needed to make this scale at
-> all.
->
-> Sure, I can do it all manually for a single test, but is it really a
-> good idea that syzkaller is the only thing that could possibly run this
-> at scale?
-
-Adding more fuzzing engines will not automatically allow us to run
-this at scale.
-For that, we'll need a continuous fuzzing system to manage the kernels
-and corpora, report bugs, find reproducers, and bisect the causes.
-I don't think building one for another fuzzing engine will be worth it.
-That said, we can help developers better fuzz their code during local
-runs by not always requiring the serialization format.
-
-> > You're right that the provided examples don't leverage the feature of
-> > being able to pass more complex nested data into the kernel. Perhaps
-> > for a future iteration, it might be worth adding a target for a functio=
-n
-> > that takes more complex input. What do you think?
->
-> Well, I guess my thought is that there isn't actually going to be a good
-> example that really _requires_ all this flexibility. We're going to want
-> to test (mostly?) functions that consume untrusted data, but untrusted
-> data tends to come in the form of a linear blob, via the network, from a
-> file, from userspace, etc. Pretty much only the syscall boundary has
-> highly structured untrusted data, but syzkaller already fuzzes that and
-> we're not likely to write special kfuzztests for syscalls?
-
-We are not limited to fuzzing parsers of untrusted data. The idea
-behind KFuzzTest is to validate that a piece of code can cope with any
-input satisfying the constraints.
-We could just as well fuzz a sorting algorithm or the bitops.
-E.g. Will Deacon had the idea of fuzzing a hypervisor, which
-potentially has many parameters, not all of which are necessarily
-blobs.
-
-> > I'm not sure how much of the kernel complexity really could be reduced
-> > if we decided to support only simpler inputs (e.g., linear buffers).
-> > It would certainly simplify the fuzzer implementation, but the kernel
-> > code would likely be similar if not the same.
->
-> Well, you wouldn't need the whole custom serialization format and
-> deserialization code for a start, nor the linker changes around
-> KFUZZTEST_TABLE since run-time discovery would likely be sufficient,
-> though of course those are trivial. And the deserialization is almost
-> half of the overall infrastructure code?
-
-We could indeed organize the code so that simpler test cases (e.g. the
-examples provided in this series) do not require the custom
-serialization format.
-I am still not convinced the whole serialization idea is useless, but
-perhaps having a simplified version will unblock more users.
-
->
-> Anyway, I don't really know what to do. Maybe this has even landed by
-> now ;-) I certainly would've preferred something that was easier to use
-> with other fuzzers and in-process fuzzing in ARCH=3Dum, but then that'd
-> now mean I need to plug it in at a completely different level, or write
-> a DWARF parser and serializer if I don't want to have to hand-code each
-> target.
->
-> I really do want to do fuzz testing on wifi, but with kfuzztest it
-> basically means I rely on syzbot to actually run it or have to run
-> syzkaller myself, rather than being able to integrate it with other
-> fuzzers say in ARCH=3Dum. Personally, I think it'd be worthwhile to have
-> that, but I don't see how to integrate it well with this infrastructure.
-
-Can you please share some potential entry points you have in mind?
-Understanding which functions you want to fuzz will help us simplify the fo=
-rmat.
-
-Thank you for your input!
-
-> Also, more generally, it seems unlikely that _anyone_ would ever do
-> this, and then it's basically only syzbot that will ever run it.
->
-> johannes
->
-> --
-> You received this message because you are subscribed to the Google Groups=
- "kasan-dev" group.
-> To unsubscribe from this group and stop receiving emails from it, send an=
- email to kasan-dev+unsubscribe@googlegroups.com.
-> To view this discussion visit https://groups.google.com/d/msgid/kasan-dev=
-/438ff89e22a815c81406c3c8761a951b0c7e6916.camel%40sipsolutions.net.
-
-
-
---=20
-Alexander Potapenko
-Software Engineer
-
-Google Germany GmbH
-Erika-Mann-Stra=C3=9Fe, 33
-80636 M=C3=BCnchen
-
-Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Liana Sebastian
-Registergericht und -nummer: Hamburg, HRB 86891
-Sitz der Gesellschaft: Hamburg
