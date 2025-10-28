@@ -1,165 +1,134 @@
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A2A309DCB;
-	Tue, 28 Oct 2025 11:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CF533509B
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Oct 2025 14:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761651551; cv=none; b=AgFYBbacn6ChtzTfAK1zuKWvFspjb4S/ZyU3ucXJmk0OmbwTfaUX+Mi7n7oliYNCZgICxq3UoicwzQoh2AZl6VVnfjKm0dGMXgdDr0OzBB4SmQAbYo52ut8fQh048ZXUSIRO67Er/03yskU3N8gEjPfMA3wCG04boLMaE/u5cuE=
+	t=1761661231; cv=none; b=N2xsrKz54Vf8WbN4VFjBwUtUqhilxaTYx8c29eJcm6RZWhG68a+oKypjpfFZ4b3p7JX/Hk7LwrngXYzbCYYQT1YStty99X8nor2SVzYt7zzqbSB/YdnfxZMf2WWsVi/tBN3RuAPOsHAjTH0L2ZRG4yms17zoisTGSr4qfu5j618=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761651551; c=relaxed/simple;
-	bh=UAxLNhoB84hQRN0kOuuikbSKdb0pgZp04mtjcw3gneI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VgU+Z2ZginrBt6sgDUXKbp3zMynw9f+HJvBN3MkPB+k00RGrDgKf99WBsaJ8+6V02W1wGU7zpxe3ZCBTZviYOL61KMAmEFOBUa/ksuTrCKujeiPWWCVvsKVW5ggmuDlaaTdn+68OwL9C+SUJ1wjr4Em97rEqBsdqyd+uBO2zVYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=xYhysw+u; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lZvHAfsw; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+	s=arc-20240116; t=1761661231; c=relaxed/simple;
+	bh=pP8FTV47DQsaScTl4AKuec/C6HsHLvvn5JrdlNFvXF8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GYOTip4yiq69BQ0MDlUYEnry0zv2kBKD3EkyYfee0KrRa/6ARrVcxaEIYmN871sZqTxIJYscKLetGWJ7otVgKLQElGFdvnGrq6rO1BS9RbO9xCJiggRc+pBPQtLgCC8UwPtzoagWdngs9l7ueJJ+Cz6XGtg/DWExp9pAQ0jOgSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=uIBa1ecY; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="xYhysw+u";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lZvHAfsw"
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id 9BBC9EC02B9;
-	Tue, 28 Oct 2025 07:39:07 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Tue, 28 Oct 2025 07:39:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1761651547; x=
-	1761737947; bh=6FNvSF4bdDqt8+VEMT250QI+6dV1cBTjXy9CJpJx+OY=; b=x
-	Yhysw+uz7P1p7ROv7c5N3pNs9FeTbDUT6hKyoWxonvfhvc6qLfSgSR8hRy4IUUtR
-	qS61iQB2JIx+DJ7xg2J0avBYC32ylrUKfIV94ljhQbPwpIQ/m7tR08Su3yhwktox
-	n1PFqUEiMTgdGA6Mwa8F75ZMBLAJ8Kovd3lw9yPmY/h0P14TtgGo6DTBHuKvBHyD
-	qemBMLW5sMXsTUiKcQOvj9mVnommN/czjzhNFR66S5fUGhUOm4wpb8Dr8kzBKzki
-	OkYNo5/ViIr+O8ULAkcThxnvljyEBZd8E3E4joIyavYx1o2uhsEwvbrj3j8hR0Xn
-	BcQiVDpTQXa/y3WC0VbKg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1761651547; x=1761737947; bh=6FNvSF4bdDqt8+VEMT250QI+6dV1cBTjXy9
-	CJpJx+OY=; b=lZvHAfswUW8xbsw49HIqDI/XyRbtPdzWwwGkVl3HAUGa2P0pSvU
-	01C+HMDHmbhYNLxHNsWCaEOnJS1su0ik3dwUZEwMiIehy+eTSacwFcRQfrpEUP8z
-	YPXQCyIO9wX8w8hz5uF5u/FH+otd7FMPsFGIJzUxnsZkpjZPQLygJy565Zso3WWZ
-	4RQYojlD1eUaFDuUIIU8oU4S7B/tv180W2qO55tp0RjIIEGbxBfOlvASRNUB+uBN
-	G2yeixN2+w6MslZTNA7GuMtBi6DT9Gq9Xrbtcf/hajuoZGsHfUeK0Jx/8g4+3Cf6
-	yJwgUFajxqVDoezkLiRhCp+1xhntHZfkRMw==
-X-ME-Sender: <xms:WqsAaf4K4jYStqcnN3YLfgqcZxNDBqP1ETWoGsN3EAWSpYCgnXe46g>
-    <xme:WqsAaRfJElK_9gado7_GwFdTnt5h7qHY5C4TP0blhedYi6rwxFvGk9KG3TlXw8vNk
-    1U0gBLcYz6zvQ4zUzPXxZ3Jg609WUacVTnAWGS-dg48-Vf6bOmxKZE>
-X-ME-Received: <xmr:WqsAaa6BhJmomZXtgfYfg8-1dOW3eqkFMzBk1bxqBLKAXdu4aq1gMrzu4wPV>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduiedtjeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeelpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehtrghnmhgrhiesmhgrrhhvvghllhdrtghomh
-    dprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohep
-    hhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhgvohhnsehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhr
-    ghdrrghupdhrtghpthhtohepsggshhhushhhrghnvdesmhgrrhhvvghllhdrtghomhdprh
-    gtphhtthhopehsghhouhhthhgrmhesmhgrrhhvvghllhdrtghomhdprhgtphhtthhopehl
-    ihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:WqsAaW-MygqBWjpGd-m6mCepbeB67YtaxNEtQ2yEPmKy1A0bjXBrmA>
-    <xmx:WqsAaUFd26bnFFCKSV_MuQCEWDtkoQ06RQyd78vAaKJuLDMmGdKyLA>
-    <xmx:WqsAaTWSHVBKitKOFXXcj8DuRv3g7fe-1gTfVk6ghY3SZZEI0Aj8XA>
-    <xmx:WqsAaY9HjwC3aVWHBHLCnb96MqCmm32XOM30tZQ-xCX5nnlwq1_qpg>
-    <xmx:W6sAaZ_BVG8u2-e1YtNlN-rLINIc7K7Gmf3OUkLDzeCYtk0ATpC3wO76>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 28 Oct 2025 07:39:06 -0400 (EDT)
-Date: Tue, 28 Oct 2025 12:39:04 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Tanmay Jagdale <tanmay@marvell.com>
-Cc: davem@davemloft.net, horms@kernel.org, leon@kernel.org,
-	herbert@gondor.apana.org.au, bbhushan2@marvell.com,
-	sgoutham@marvell.com, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v5 15/15] octeontx2-pf: ipsec: Add XFRM state
- and policy hooks for inbound flows
-Message-ID: <aQCrWAVZh2VlOl54@krikkit>
-References: <20251026150916.352061-1-tanmay@marvell.com>
- <20251026150916.352061-16-tanmay@marvell.com>
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="uIBa1ecY"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-376466f1280so90823181fa.0
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Oct 2025 07:20:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1761661227; x=1762266027; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sOmSiTMyA8cqAorOzkSzQ5xujNoDEMVqXsbHnkkNM1c=;
+        b=uIBa1ecYcS0SjQasgAEKQr/pVNdcH2s+vv+Ivq8X+TvJlZm3PK4XkoOKj+ySjsss6V
+         0g8VjUJ/7QVvEAWpyHMqMetwZu3/zoN1N9yyXtB0KFxrE/rVPaA1Wla9t4UuOGIAw/wn
+         tLvnxdxSdn4y9ZLZkoqvs3/uknC8cTF+ohyHp0eXubW+fJwQrXlNVOsgxyt8mMbBy66D
+         1uC4SKbYh7kSu4m2DIPdoiKVO+xnGkWcrG1i+y3Uwm1SYSS1wzr0PjgOSFofFE0v8Jnx
+         uh6w6swnMKwZGoMtYXUS13Dhkpdcfv4aAkZJJYWpnhecHmYQWvg4zllIFHM+xQPboquJ
+         uIow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761661227; x=1762266027;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sOmSiTMyA8cqAorOzkSzQ5xujNoDEMVqXsbHnkkNM1c=;
+        b=VsP+Pm7GuEELvuh23mBxRq4MIT2DjLm/u9V3JWahksurl5DZ55wsnsfLjpJ2wEUQgI
+         CYv2HVxuvjeKlHAh5EIWr5ysQXl8jxkYVWn4nZbU0XPuzDNlvQ+rGhW+rUc1cza7TeTA
+         c5qkPBigDVB9NmhPyrIrlaA9xKCR6JCOIXCpvy+RVa2ghDzbtYV75gB/a8DHCGh+kI4v
+         rhW7gB4p+lFs7w2MX4dZnYs/NYQp2KYbxEfd9CdWqXBwJFi3eJpf0D+ZlUbNZcVdrXaS
+         /dJaKWmiPoY7U3YpjX37KE9VZqsoEpkt9+OxlLriwMOrhmb4rysoTlJ9QqEXzhAStFtw
+         HzGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUIR/D7Mn+LuZTOBF3ka40eCBKF8LzN9itcR6t/3cA+C25KnN0MViTVavirBeoZqLegLubYzAR8FZCoTk8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKn0+sErgiLujb7YUsYO/qJS2cK0eWMTBkDUsxVnfd9TYi08tU
+	Blp2NjSxb7Vz1T0qG04GHB7SSFSZS59PlpCo05n0QQ5dqE/bVo5RQNdTOD952GX+SCEzER0+h2u
+	LLN3ioyqAIeXYuCpwixt51l86Fnv+DDK1yGIl2ph6Bg==
+X-Gm-Gg: ASbGnct1cN/Xfl6FMtXUdcBSpY2psGvO/vyYjUuYkS1EzW+xKV97LjxFuJC6zip+dB9
+	wgE8YA1ekPxua8C/es2c3kS1zSOtJ8fC/MjHSKIaEHS9+5M2HEnA16Vf+XFh+BTN1VZeu5Uj5Mv
+	w9BYd35JpRTJC15oGne6YwFcRx4z1oGLAW9Up6WcrZqlH6IMcbQTY0fCoGcv8UE8RnbcvKIEMzC
+	Co1SnLDdSOFzvO0VawZnDCGnGpq1h+Wcwj3gkFc9A76NjaCHMhT8wS6jSnIJWjLnIVMsp1yWGgC
+	jgJB8pLsVSsIvnqgoRpzah056D4=
+X-Google-Smtp-Source: AGHT+IEa9/49xzFtkrl2WuFSbF2nGR0Ee3sa2JYGGK47IcVnnhS7gaKd3pqPtDHg3v3/2iaUnvbb9dKc2W6cTL8KA/s=
+X-Received: by 2002:a05:651c:2354:10b0:351:62e3:95d6 with SMTP id
+ 38308e7fff4ca-3790773c607mr10303011fa.28.1761661226962; Tue, 28 Oct 2025
+ 07:20:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251026150916.352061-16-tanmay@marvell.com>
+References: <cover.1761588465.git.geert+renesas@glider.be> <76ac5587c5ff3aae3c23f7b41e2f3eacb32ebd21.1761588465.git.geert+renesas@glider.be>
+In-Reply-To: <76ac5587c5ff3aae3c23f7b41e2f3eacb32ebd21.1761588465.git.geert+renesas@glider.be>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 28 Oct 2025 15:20:13 +0100
+X-Gm-Features: AWmQ_bkGEmC8OCwW4QksGegCfgNPPWl_EjVB0knvBjv-hfBoqYq6hENcwtWJ0QE
+Message-ID: <CAMRc=MdcH-56_cJ7oDUhHRsJRnDqbss5ET-3yGrBffGmEK_ieQ@mail.gmail.com>
+Subject: Re: [PATCH v5 04/23] gpio: aspeed: #undef field_{get,prep}() before
+ local definition
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	David Miller <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, 
+	Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, 
+	Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, 
+	Shan-Chun Hung <schung@nuvoton.com>, Yury Norov <yury.norov@gmail.com>, 
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>, 
+	David Laight <david.laight.linux@gmail.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>, 
+	Michael Hennerich <Michael.Hennerich@analog.com>, Kim Seer Paller <kimseer.paller@analog.com>, 
+	David Lechner <dlechner@baylibre.com>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Andy Shevchenko <andy@kernel.org>, Richard Genoud <richard.genoud@bootlin.com>, 
+	Cosmin Tanislav <demonsingur@gmail.com>, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Jianping Shen <Jianping.Shen@de.bosch.com>, linux-clk@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-edac@vger.kernel.org, qat-linux@intel.com, 
+	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org, 
+	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-2025-10-26, 20:39:10 +0530, Tanmay Jagdale wrote:
-> +static int cn10k_ipsec_policy_add(struct xfrm_policy *x,
-> +				  struct netlink_ext_ack *extack)
-> +{
-> +	struct cn10k_inb_sw_ctx_info *inb_ctx_info = NULL, *inb_ctx;
-> +	struct net_device *netdev = x->xdo.dev;
-> +	bool disable_rule = true;
-> +	struct otx2_nic *pf;
-> +	int ret = 0;
-> +
-> +	if (x->xdo.dir != XFRM_DEV_OFFLOAD_IN) {
-> +		netdev_err(netdev, "ERR: Can only offload Inbound policies\n");
-> +		ret = -EINVAL;
+On Mon, Oct 27, 2025 at 7:42=E2=80=AFPM Geert Uytterhoeven
+<geert+renesas@glider.be> wrote:
+>
+> Prepare for the advent of globally available common field_get() and
+> field_prep() macros by undefining the symbols before defining local
+> variants.  This prevents redefinition warnings from the C preprocessor
+> when introducing the common macros later.
+>
+> Suggested-by: Yury Norov <yury.norov@gmail.com>
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> --
+> v5:
+>   - New.
+> ---
+>  drivers/gpio/gpio-aspeed.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/gpio/gpio-aspeed.c b/drivers/gpio/gpio-aspeed.c
+> index 7953a9c4e36d7550..ef4ccaf74a5b379e 100644
+> --- a/drivers/gpio/gpio-aspeed.c
+> +++ b/drivers/gpio/gpio-aspeed.c
+> @@ -32,7 +32,9 @@
+>  #include "gpiolib.h"
+>
+>  /* Non-constant mask variant of FIELD_GET() and FIELD_PREP() */
+> +#undef field_get
+>  #define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))
+> +#undef field_prep
+>  #define field_prep(_mask, _val)        (((_val) << (ffs(_mask) - 1)) & (=
+_mask))
+>
+>  #define GPIO_G7_IRQ_STS_BASE 0x100
+> --
+> 2.43.0
+>
 
-missing goto/return?
-
-> +	}
-> +
-> +	if (x->xdo.type != XFRM_DEV_OFFLOAD_PACKET) {
-> +		netdev_err(netdev, "ERR: Only Packet mode supported\n");
-> +		ret = -EINVAL;
-
-missing goto/return?
-
-> +	}
-> +
-> +	pf = netdev_priv(netdev);
-> +
-> +	/* If XFRM state was added before policy, then the inb_ctx_info instance
-> +	 * would be allocated there.
-> +	 */
-> +	list_for_each_entry(inb_ctx, &pf->ipsec.inb_sw_ctx_list, list) {
-> +		if (inb_ctx->reqid == x->xfrm_vec[0].reqid) {
-> +			inb_ctx_info = inb_ctx;
-> +			disable_rule = false;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!inb_ctx_info) {
-> +		/* Allocate a structure to track SA related info in driver */
-> +		inb_ctx_info = devm_kzalloc(pf->dev, sizeof(*inb_ctx_info), GFP_KERNEL);
-
-I'm not so familiar with devm_*, but according to the kdoc for
-devm_kmalloc, this will get freed automatically when the driver goes
-away (but not earlier). This could take a long time. Shouldn't this be
-manually freed in the error path of this function, and somewhere
-during the policy_delete/policy_free calls?
-
-I see that you've got a devm_kfree in cn10k_ipsec_inb_add_state, so
-something similar here?
-
-
-[...]
-> +static void cn10k_ipsec_policy_free(struct xfrm_policy *x)
-> +{
-> +	return;
->  }
-
-The stack can handle a NULL .xdo_dev_policy_free, so this empty
-implementation is not needed. But I'm not sure releasing all
-policy-related resources at delete time (even via WQ) is safe, so
-possibly some of the work done in cn10k_ipsec_policy_delete should be
-moved here (similar comment for the existing cn10k_ipsec_del_state
-code vs adding .xdo_dev_state_free).
-
--- 
-Sabrina
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
