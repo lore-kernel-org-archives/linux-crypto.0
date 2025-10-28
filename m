@@ -1,131 +1,99 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3C73054FA;
-	Mon, 27 Oct 2025 20:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FA7222599;
+	Tue, 28 Oct 2025 01:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761597457; cv=none; b=nUMj47UFRN84F7LSYpJKZ+5h/03rxDtrnLczOeo60GDa14LI+nNVc7Ygi/FwceYxNaFELyvFqlJKhiNAGZgu4qHXwp/RYrtLAI1cqwRhHQGMkyYiZL0yR6cEyoktCfsqZbdRLE8S+UsxWrrEqEQ9aY1PJQKnnz8fTuVazmHKEzw=
+	t=1761614729; cv=none; b=EuCG/NRpch8vCtj6KgqRr1C1F+2HqDDrNhcKoojpKHQQC5O5fhiRj+PHpw4ZBHEETG66ZwhgKAzedkBHhVJZsCtMi6yimTvBu72vUMHy7g3pbStwk3c7NG5QmzHgLKvHmXDRgxhmn363NGJJqH1IjmKkAKT5Oi0j84pKavguOFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761597457; c=relaxed/simple;
-	bh=5m1IrsDTkf+F/nhzqJRjiWrZIfJDK8f7MvjheZ4CUKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CP/dmW+0WfJj5gL3EzZQNEGCMci9r4BvFTFa9PUQCi+rnzXaStbsVHZAH1xgaIDLUE88y44xzIbzmmrZkeS4J0Bhz7GmzGC1gjqFCMOZeSiKM4sHu9G+2iOFTBecMbrqKm8pZySH/FRab3/ipu2oxGIYDHNqf4vfwSvR/thYWAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=D0FvDvo6; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1761614729; c=relaxed/simple;
+	bh=XNraAoXVxJntG+i7sio8dph+Y4eKVdGqB+1lKwdY904=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Dpylm8ZiN4jGCC4cb5kaAPmZdeCSZIhpWpqrtvI5DlP/7o4JCj466QTJ++9TM74+rdRwbCqbiwiG7SXV05w412i6IfhB9vEfyNah4jzomIDggi8OcissgCj15bIk94pXASOUsrdpi9q9AG7XzS0Dcf6zVffjNhuOqXye7XBFlwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Q3SQMxe+; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="D0FvDvo6"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 199381A16C2;
-	Mon, 27 Oct 2025 20:37:31 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D91106062C;
-	Mon, 27 Oct 2025 20:37:30 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B6F94102F2494;
-	Mon, 27 Oct 2025 21:36:42 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761597449; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=ivu3nqaTqww2kM8ddgXsb86XR8Ecjso6qu9XWZHw9NQ=;
-	b=D0FvDvo6wBdzyM4yGf/Mo92JGsnDp3FEhnzQXToKT1lTmRgmCAobeQwwgIerEldSavB9Wj
-	8Fa1YqUSJN1a+KiX1LsgxoTiLAWFpjtTkZ/psXHq539twWXUsfVfZ1tOA47yFwLd40ImsE
-	G9WDXQxl4673JnnqnSaS0aJnztT1jPuWGeK5RQylZ1VZl0DiiBjKRSdLHbVPGru9aMBn/L
-	/NPFjf5YF1MLpjQf7UlDDcAIkfmZHS4oVHjAeodKNVAVJDdwuc8RjEgecO9ymeKN374J5m
-	aI0g1qxMk56Vwb3LCXgHJanQvqdAAA00oe5CNpFNb2x5v0Y/CqIa0frpfHITdQ==
-Date: Mon, 27 Oct 2025 21:36:40 +0100
-From: Alexandre Belloni <alexandre.belloni@bootlin.com>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Crt Mori <cmo@melexis.com>, Jonathan Cameron <jic23@kernel.org>,
-	Lars-Peter Clausen <lars@metafoo.de>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>,
-	David Laight <david.laight.linux@gmail.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>,
-	Tony Luck <tony.luck@intel.com>,
-	Michael Hennerich <Michael.Hennerich@analog.com>,
-	Kim Seer Paller <kimseer.paller@analog.com>,
-	David Lechner <dlechner@baylibre.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Richard Genoud <richard.genoud@bootlin.com>,
-	Cosmin Tanislav <demonsingur@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Jianping Shen <Jianping.Shen@de.bosch.com>,
-	linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-edac@vger.kernel.org, qat-linux@intel.com,
-	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
-	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 01/23] clk: at91: pmc: #undef field_{get,prep}()
- before definition
-Message-ID: <20251027203640291d726b@mail.local>
-References: <cover.1761588465.git.geert+renesas@glider.be>
- <a26cfb39f4ac309ffbff339ffa5f54db12bd8c12.1761588465.git.geert+renesas@glider.be>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Q3SQMxe+"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Ij22skuYDh27GVFz5vurhnY/A38QKFjHqmKXW3cnNng=;
+	b=Q3SQMxe+jJwvyyUrsf8Z1NpeXw/4OpqSY6G4NthBt1239SQU3JCmtCWlRxDgS+Ju6f96Cdjl0
+	QhmHiDXYArqnu1sO7v0ygAllTUdFrYK+lNUM1/OM/tT1MK8qbyoTxqyWjMVPWHXBTpVAMOBtWB1
+	4YHedYwWdIi65I+J1dha9V0=
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4cwXjf2NGtzmV6g;
+	Tue, 28 Oct 2025 09:24:54 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5685D1800B2;
+	Tue, 28 Oct 2025 09:25:22 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 28 Oct 2025 09:25:21 +0800
+Subject: Re: [PATCH] crypto: hisilicon/qm - Fix device reference leak in
+ qm_get_qos_value
+To: Miaoqian Lin <linmq006@gmail.com>, Weili Qian <qianweili@huawei.com>, Zhou
+ Wang <wangzhou1@hisilicon.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, Kai Ye <yekai13@huawei.com>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <stable@vger.kernel.org>
+References: <20251027150934.60013-1-linmq006@gmail.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <fdcaf975-590e-be7e-40ce-1c8eea75f8ce@huawei.com>
+Date: Tue, 28 Oct 2025 09:25:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a26cfb39f4ac309ffbff339ffa5f54db12bd8c12.1761588465.git.geert+renesas@glider.be>
-X-Last-TLS-Session-Version: TLSv1.3
+In-Reply-To: <20251027150934.60013-1-linmq006@gmail.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
-On 27/10/2025 19:41:35+0100, Geert Uytterhoeven wrote:
-> Prepare for the advent of globally available common field_get() and
-> field_prep() macros by undefining the symbols before defining local
-> variants.  This prevents redefinition warnings from the C preprocessor
-> when introducing the common macros later.
+On 2025/10/27 23:09, Miaoqian Lin wrote:
+> The qm_get_qos_value() function calls bus_find_device_by_name() which
+> increases the device reference count, but fails to call put_device()
+> to balance the reference count and lead to a device reference leak.
 > 
-> Suggested-by: Yury Norov <yury.norov@gmail.com>
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-
-Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-
-> --
-> v5:
->   - New.
+> Add put_device() calls in both the error path and success path to
+> properly balance the reference count.
+> 
+> Found via static analysis.
+> 
+> Fixes: 22d7a6c39cab ("crypto: hisilicon/qm - add pci bdf number check")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
 > ---
->  drivers/clk/at91/pmc.h | 2 ++
+>  drivers/crypto/hisilicon/qm.c | 2 ++
 >  1 file changed, 2 insertions(+)
 > 
-> diff --git a/drivers/clk/at91/pmc.h b/drivers/clk/at91/pmc.h
-> index 5daa32c4cf2540d7..78a87d31463e98b0 100644
-> --- a/drivers/clk/at91/pmc.h
-> +++ b/drivers/clk/at91/pmc.h
-> @@ -117,7 +117,9 @@ struct at91_clk_pms {
->  	unsigned int parent;
->  };
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index a5b96adf2d1e..3b391a146635 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -3871,10 +3871,12 @@ static ssize_t qm_get_qos_value(struct hisi_qm *qm, const char *buf,
+>  	pdev = container_of(dev, struct pci_dev, dev);
+>  	if (pci_physfn(pdev) != qm->pdev) {
+>  		pci_err(qm->pdev, "the pdev input does not match the pf!\n");
+> +		put_device(dev);
+>  		return -EINVAL;
+>  	}
 >  
-> +#undef field_get
->  #define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))
-> +#undef field_prep
->  #define field_prep(_mask, _val) (((_val) << (ffs(_mask) - 1)) & (_mask))
+>  	*fun_index = pdev->devfn;
+> +	put_device(dev);
 >  
->  #define ndck(a, s) (a[s - 1].id + 1)
-> -- 
-> 2.43.0
+>  	return 0;
+>  }
 > 
 
--- 
-Alexandre Belloni, co-owner and COO, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Reviewed-by: Longfang Liu <liulongfang@huawei.com>
+
+Thanks.
