@@ -1,103 +1,102 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5ADE3314BC;
-	Wed, 29 Oct 2025 15:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1EB312822
+	for <linux-crypto@vger.kernel.org>; Wed, 29 Oct 2025 16:15:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761751754; cv=none; b=pzqs5mk9mZlL4kPwUbmFV4CTEa3HNsoCGXkHq/A7eMdB5ltB6s0QACoiK9qSfIOHA1jiVwCu9Ca8lfBZJInzHNkK14uKbVTZcxQtzVQBpgL/D9NiwllN2BUW0ypZbfWckF9HDq6BMRA2QSZ6ssvCp98hInijEjv728CoTJq7lO4=
+	t=1761754545; cv=none; b=a/655BIc9mG7G+zg2WYWGgIO7RU0X3JKsOAe6f2F7lXHQrHnuhU/Is0p9050X1eCG2lbxoutMVd8DTrRmAkQDf7h84U4j02IN7On19/GzsNXmboY+zu590hjODCAdZx+IKVvyBQB10mh74rAqsyt+mWJr5UztbK0sIzrE40Xdbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761751754; c=relaxed/simple;
-	bh=wWoixZCw24s45PsgOeN8M9sNYsvmXz/+08ZTkUHm6Rk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GTzxLfIYOXCdD2GWGenvmcIWv3q3zT5r6c7V337n5aBDIGPYQduA4XCPXWrmJVGUbvaJZEE0Gd+pn5SmCK2J8emZ1R8hQv2cWT4c0ws6TIFtb6NG1Hy67O6i1YNNQvI3YxKduk+NzeT0FKtQAu+QCYjyJOIyANTYkstm5Wsl1bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=farpX5Em; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761754545; c=relaxed/simple;
+	bh=QFlqv9P6nVUrzUGFJcOPouxoAPajBFlEDkMQyD7Fcjc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j2pW87VKexI1fHXQKyHXuGPuyDHZfwOjGhO/XWx94/IH77VYKpmhZ22Y6Wb5Y8DYiGfnh0Xsnk/Dsoquf22O1ljAQCgOC3vtxFBeWy4nXkQ2aLBKv9ToU/gw6hBZ6GOuOcM03BNDbvQyxDyEvt4rueQrQrI3l0xV53rt2YKoghw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d69C52XV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="farpX5Em"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A88EDC4CEF7;
-	Wed, 29 Oct 2025 15:29:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d69C52XV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81E70C4CEF7;
+	Wed, 29 Oct 2025 16:15:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761751754;
-	bh=wWoixZCw24s45PsgOeN8M9sNYsvmXz/+08ZTkUHm6Rk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=farpX5Em0n8WIvwICAuanHhaFFfgrgnUhG2BRtKnkPhmdOx2VjJc48+5oVg5z2HHd
-	 WwhKlYZp+ZpvldT1gs14oKuRlBT4YT36xdIwYUZ284QgE+oY0P6lQw0Hyv9+5+8uDu
-	 HIB4Zz+VF93qyT+n8mQRo5feA13qNpBtAmIgbMifXJxB6ZVNZbo2qFV0rR+/SHsXbU
-	 QTKa6qkOcECjVsSHjd2nww4biUU9IRz3v5wuFTixZLBW8ifd6Bu2VMpjrXckxMN0K9
-	 3CjkdulEPsVDdzBvQhlw/RZgbTGAXXo1XSQpZZXddX5H/xjd6dpJbJZhwZNgRQ3N6G
-	 keD1tNEmX1Wmg==
-Date: Wed, 29 Oct 2025 10:32:16 -0500
-From: Bjorn Andersson <andersson@kernel.org>
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Cc: Jingyi Wang <jingyi.wang@oss.qualcomm.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Konrad Dybcio <konradybcio@kernel.org>, 
-	aiqun.yu@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com, trilok.soni@oss.qualcomm.com, 
-	yijie.yang@oss.qualcomm.com, linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
-Subject: Re: [PATCH v2 3/3] crypto: qce: fix version check
-Message-ID: <7ohylqbvlcdu36hbe32jydpfx6ecaajqjzcmvyhdgktci2mzi2@3lcuydcqbzmp>
-References: <20251029-knp-crypto-v2-0-b109a22da4f7@oss.qualcomm.com>
- <20251029-knp-crypto-v2-3-b109a22da4f7@oss.qualcomm.com>
- <a41e45b2-6e50-4236-a71d-ec3fbaccc2b1@oss.qualcomm.com>
+	s=k20201202; t=1761754545;
+	bh=QFlqv9P6nVUrzUGFJcOPouxoAPajBFlEDkMQyD7Fcjc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=d69C52XVpuCjE5HT4FKmAzyb7RNW5BbLVzmKjeLH/IT5SjPECBxWJhkbRiPx2Gn/y
+	 ci46XluBXxrlw/EGzQGII2r831jJxY5y39Nc72V06UUx9SIjXXt6HVzWaCXa/W5r4m
+	 I0wbKQN0PT6VOxbGJKPRHVfDPU63hlLoClaoYq/lEqMo3aa6wArwKHqy+h1qq6t+Aa
+	 mO3aG62mZRQpTnlzn5jIlqCmOYMawPTEMzDZYVv/4pBppYoZDaD9loeUpqLhAcz+4l
+	 5jHYBP+5Yn9HVZnup+xExt9gJ181WkLUu1kTCB/7cerWxm/Ad8VogBsBfDQ8Y0KFfh
+	 aD1yL/jlENRhA==
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: mario.limonciello@amd.com,
+	thomas.lendacky@amd.com,
+	john.allen@amd.com,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	davem@davemloft.net
+Cc: "Mario Limonciello (AMD)" <superm1@kernel.org>,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: ccp - Add support for PCI device 0x115A
+Date: Wed, 29 Oct 2025 11:15:01 -0500
+Message-ID: <20251029161502.2286541-1-superm1@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a41e45b2-6e50-4236-a71d-ec3fbaccc2b1@oss.qualcomm.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 29, 2025 at 10:41:48AM +0100, Konrad Dybcio wrote:
-> On 10/29/25 9:25 AM, Jingyi Wang wrote:
-> > From: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
-> > 
-> > The previous version check made it difficult to support newer major
-> > versions (e.g., v6.0) without adding extra checks/macros. Update the
-> > logic to only reject v5.0 and allow future versions without additional
-> > changes.
-> > 
-> > Signed-off-by: Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>
-> > Signed-off-by: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
-> > ---
-> >  drivers/crypto/qce/core.c | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-> > index e95e84486d9a..b966f3365b7d 100644
-> > --- a/drivers/crypto/qce/core.c
-> > +++ b/drivers/crypto/qce/core.c
-> > @@ -21,7 +21,6 @@
-> >  #include "sha.h"
-> >  #include "aead.h"
-> >  
-> > -#define QCE_MAJOR_VERSION5	0x05
-> >  #define QCE_QUEUE_LENGTH	1
-> >  
-> >  #define QCE_DEFAULT_MEM_BANDWIDTH	393600
-> > @@ -161,7 +160,7 @@ static int qce_check_version(struct qce_device *qce)
-> >  	 * the driver does not support v5 with minor 0 because it has special
-> >  	 * alignment requirements.
-> >  	 */
-> > -	if (major != QCE_MAJOR_VERSION5 || minor == 0)
-> > +	if (major == 5 && minor == 0)
-> >  		return -ENODEV;
-> 
-> This also allows major < 5, should we add a second check to reject that?
-> 
+PCI device 0x115A is similar to pspv5, except it doesn't have platform
+access mailbox support.
 
-The comment says we don't support v5.0, now the code says the same.
+Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
+---
+ drivers/crypto/ccp/sp-pci.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-I think it's okay to leave handling of previous versions as undefined.
-Given the current way this is expressed, there's can't be any existing
-users...
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index e7bb803912a6d..8891ceee1d7d0 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -459,6 +459,17 @@ static const struct psp_vdata pspv6 = {
+ 	.intsts_reg             = 0x10514,	/* P2CMSG_INTSTS */
+ };
+ 
++static const struct psp_vdata pspv7 = {
++	.tee			= &teev2,
++	.cmdresp_reg		= 0x10944,	/* C2PMSG_17 */
++	.cmdbuff_addr_lo_reg	= 0x10948,	/* C2PMSG_18 */
++	.cmdbuff_addr_hi_reg	= 0x1094c,	/* C2PMSG_19 */
++	.bootloader_info_reg	= 0x109ec,	/* C2PMSG_59 */
++	.feature_reg		= 0x109fc,	/* C2PMSG_63 */
++	.inten_reg		= 0x10510,	/* P2CMSG_INTEN */
++	.intsts_reg		= 0x10514,	/* P2CMSG_INTSTS */
++};
++
+ #endif
+ 
+ static const struct sp_dev_vdata dev_vdata[] = {
+@@ -525,6 +536,13 @@ static const struct sp_dev_vdata dev_vdata[] = {
+ 		.psp_vdata = &pspv6,
+ #endif
+ 	},
++	{	/* 9 */
++		.bar = 2,
++#ifdef CONFIG_CRYPTO_DEV_SP_PSP
++		.psp_vdata = &pspv7,
++#endif
++	},
++
+ };
+ static const struct pci_device_id sp_pci_table[] = {
+ 	{ PCI_VDEVICE(AMD, 0x1537), (kernel_ulong_t)&dev_vdata[0] },
+@@ -539,6 +557,7 @@ static const struct pci_device_id sp_pci_table[] = {
+ 	{ PCI_VDEVICE(AMD, 0x17E0), (kernel_ulong_t)&dev_vdata[7] },
+ 	{ PCI_VDEVICE(AMD, 0x156E), (kernel_ulong_t)&dev_vdata[8] },
+ 	{ PCI_VDEVICE(AMD, 0x17D8), (kernel_ulong_t)&dev_vdata[8] },
++	{ PCI_VDEVICE(AMD, 0x115A), (kernel_ulong_t)&dev_vdata[9] },
+ 	/* Last entry must be zero */
+ 	{ 0, }
+ };
+-- 
+2.43.0
 
-Regards,
-Bjorn
-
-> Konrad
