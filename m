@@ -1,196 +1,137 @@
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7BF29ACFC;
-	Wed, 29 Oct 2025 13:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04DD351FC4
+	for <linux-crypto@vger.kernel.org>; Wed, 29 Oct 2025 13:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761744386; cv=none; b=DvzKwwCZV8MrGnEk2422Z0RgaM0/RSmhtAq/3io2+05TQBqSvhu+Ga/kGGwYTJ/1ynH2S3x6P1kSZiIJfkrzCMeL/T572VnbMS8G+LkBwf8DrKDQByNNI9cNECKoLkJGfGaTkEfLxOXMuKRIQsnTNT/ibLJbeJXG3BXgaIzOVfI=
+	t=1761744677; cv=none; b=ZhBJKavL7RzWXWDfKtHKX6M0csVMCoJrojXSxHSy6BxbP+zGcjdXgZTfvfVRrKTU7xvaukwj+ZrDzH8eBwar7eQFT9FZYO8wkdOUsNVvfdF7bjM6DgHU9m9fIo/l9SuXy21K1SeKrJq3DxHKZ62yW9rv6RYZC7LcZUBy1Ka5ksg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761744386; c=relaxed/simple;
-	bh=0vrPMGYikaT3kNZW5OzBGxPhCKlM8IZUrVp90xlGQA4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tX1vjAQIiSTn7Cn0UmM4XJA0nVAxY2wyQWnabDAusKaA00ELipXxCST3dXTR/0rh1MEmm0LWgG7iWG+LWQdyFvAgAhu9oGm65vkLIMuy72hjS6Bj5S5ITRiEthaKhIeNA8QRzKeO9/QbpltS4vS8V+c0PK3rsYnJxejOFaUyIpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=OUKdiLF4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=0EnkgFIo; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+	s=arc-20240116; t=1761744677; c=relaxed/simple;
+	bh=H4STyYQkAuprklyTlY2BjwuSs1iXn17miHrAUSvF+TM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MAUUpcgsomXaKv/sooUBeZiI+XQgAVWh2Xybn1sQc3CcsVn2mAgMaUBAbR8prxVqdgCg25DnIVJUZnwhDFmpJPD3AkI3nV6D8R0nKdBAk+ff6dieT9EQBHY2tKNx3Xvd2TsYc52NgKuXbPu9O64710y0+KrtfmAdYmCHuQwaJ0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/YUzPJY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="OUKdiLF4";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="0EnkgFIo"
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 5F7E01400219;
-	Wed, 29 Oct 2025 09:26:21 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Wed, 29 Oct 2025 09:26:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1761744381;
-	 x=1761830781; bh=sAaBhwjmQu3GhH1t8gq0LCcd1CEeOuI93h7oDi4PQwM=; b=
-	OUKdiLF4t1KKj/BEzW26bzj7zHZ4/xInKJKncRC1PtVCHwxIM6/Gv1slnQt+1fvB
-	oReuGYbjKxAX+48m0btRvSUFtdb5F7tMVeFSA0SqzIrZqPxFOtXyNvY+d9eM8wRW
-	dm1487DNioKqzIw2uGF/UHC29SGh6gtdURQoZwaxF36iwhHxCxg5xvsksdMVNk0A
-	JPuU1jmEnSAOrXl/N4r5C4NQd3ytK5yRbqwRWk/9/YNWcxLzYmoVAag+Lm7eL2Wa
-	fTPO29kcDElqC4GCoIYTpJG7KCKESyU03lIVB6/iIGK1yqTXzbmSamIqrDAyOfdk
-	BuCJzh/NA57zSpzMomkNUg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1761744381; x=
-	1761830781; bh=sAaBhwjmQu3GhH1t8gq0LCcd1CEeOuI93h7oDi4PQwM=; b=0
-	EnkgFIoARTCSr7k7bWoEYRYQ+LS4han3Yia4zKuC7nwCDi/W1dAjk9dLpS+0vjbd
-	wMnzvUjmeBxJXjUAkByO3Ajg+1XNE5E/l/sboKGYAi8ide8kt6R2hWMT5o7w45ZP
-	uINLaXSDsnm5ly0cYI9J7m4fcQIXKVcv6KiRKkUiTU2vLLWI/av9dryJ5o5stVJF
-	e5/sexJadjp+C4aFQ7HgzTUhdciFALFKXii4VSb40jKq2ndUo6IdjfycjF8qODk7
-	AiGakzEE0XcRAxdJuKJ9W4mbtOOfOo62CUor2KnVCdh6w8YzMdLmAxRgZiv25Tth
-	nfqkUOhY2Irbjf4YZJx5g==
-X-ME-Sender: <xms:-xUCaZyG66KtfqZI2X_WppwOwA6N84EfmKZcOnmPWIHOxy838Gfa-g>
-    <xme:-xUCaXj-gLvigiXCMTq8xqiOu2FWqHXU6tSIdyGCQdNmovo5BqSz5Xj4zNqI94Hvr
-    AGz3iBpo44_hgStSIxY6KmNBF3pUxl12dDi7doY9rXz0tbjw-TYpA>
-X-ME-Received: <xmr:-xUCacpselgt01E5wBDJUaZg8GL3knMBo3Gry14LgwVdCu7Y_-lsnWEUnlo>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduieefkeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
-    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
-    htvghrnhephedvtdeuveejudffjeefudfhueefjedvtefgffdtieeiudfhjeejhffhfeeu
-    vedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdp
-    nhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehlih
-    hulhhonhhgfhgrnhhgsehhuhgrfigvihdrtghomhdprhgtphhtthhopegrlhgvgidrfihi
-    lhhlihgrmhhsohhnsehrvgguhhgrthdrtghomhdprhgtphhtthhopehjghhgsehnvhhiug
-    hirgdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdr
-    ohhrghdrrghupdhrtghpthhtohepshhhrghmvggvrhhkohhlohhthhhumhesghhmrghilh
-    drtghomhdprhgtphhtthhopehjohhnrghthhgrnhdrtggrmhgvrhhonheshhhurgifvghi
-    rdgtohhmpdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrkhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:-xUCaeig-haT8IdcAxis2uXabSt36L-DN_Wze_TstpHzml2GoyPhjQ>
-    <xmx:-xUCaeMN8krYecwwurPdGxUwG0HriWMBCeHIWNxVHV4lzVJrxIKl0Q>
-    <xmx:-xUCaYxG_8UknDuuf4QHnq9FVd0ag5CnQmj43ULhxoJb6h4QaRi-TA>
-    <xmx:-xUCaQoLdOD-8SA7MrxttM-S1gFc8hepvINqdu9bK1U-NINAz9BJzQ>
-    <xmx:_RUCaY9fHh_b0MUdBDkvgi6pB5Mw_znmt3X8AiZL45Alwm-WAsX5OnSB>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 29 Oct 2025 09:26:18 -0400 (EDT)
-Date: Wed, 29 Oct 2025 07:26:17 -0600
-From: Alex Williamson <alex@shazbot.org>
-To: Longfang Liu <liulongfang@huawei.com>
-Cc: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
- <herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
- <jonathan.cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
- <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linuxarm@openeuler.org>
-Subject: Re: [PATCH v11 1/2] crypto: hisilicon - qm updates BAR
- configuration
-Message-ID: <20251029072617.38e23c7c@shazbot.org>
-In-Reply-To: <20251029122441.3063127-2-liulongfang@huawei.com>
-References: <20251029122441.3063127-1-liulongfang@huawei.com>
-	<20251029122441.3063127-2-liulongfang@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/YUzPJY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 591F9C19422
+	for <linux-crypto@vger.kernel.org>; Wed, 29 Oct 2025 13:31:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761744677;
+	bh=H4STyYQkAuprklyTlY2BjwuSs1iXn17miHrAUSvF+TM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=k/YUzPJYNKtOchZEqmQ2MNC4VR8TnxopP0fpnEkTWlWsfz9tx8ThePcktS069B0t4
+	 fmcgrYYMrzyXGrbyzar22eouO9Ja3+s8CSZZsdNrDEGINsJysImL8I38EzDlt8mQKs
+	 kGJvCzZje3ZdtNXHUnKVBnXd5esJ+BfuAnzsuRoVkCrsxJMkJ9vqHst9Fve9f9trsm
+	 oLr8pwHCar8rp567vTcxlFJjsQN5QzBt06MZnNFU9uUOzjlAMY3qQrwDt5YhIfog7b
+	 eMvlTyVyC/KzAFBM5H6gHZS6w+lQLG56w53bfIXPd1o3RWZ29qIKSBnB/2IzmVVhRk
+	 uFejWm6Tr2+xQ==
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7c5338b1d10so2915461a34.0
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Oct 2025 06:31:17 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCX43tKxdhj0M3Jc1l6N+ce9Av9iFjsh1YwcqqG6WE/d7uIQgAKnZeLPCTiYzQBPuG2rfIckojEitul3LPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHL3KlPtAC8C5vQiH1cJI9XgbCJrSR9g9glpNVzSNjTwfFrY5W
+	5gXaImEgfY418psjRhG+E5PErcbpSmMwacV/qH0XoYd23zcI4BCLrso0j1RSlSJYK0TLIfcMF51
+	qpZWVn61CvOYNU1+v26PRDn+DpmBZrR4=
+X-Google-Smtp-Source: AGHT+IEi0R7W8u+k9kuQ+Q/TOuonlY+thu2InbF4UTFVllbZ//+bkXdFiNu5AHmFd0ihQtxuffxUIcoyOHNos6JMUKo=
+X-Received: by 2002:a05:6830:82e9:b0:7c5:3afb:79db with SMTP id
+ 46e09a7af769-7c6831898admr1590559a34.35.1761744676587; Wed, 29 Oct 2025
+ 06:31:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20251023112920.133897-1-safinaskar@gmail.com> <4cd2d217-f97d-4923-b852-4f8746456704@mazyland.cz>
+ <03e58462-5045-e12f-9af6-be2aaf19f32c@redhat.com>
+In-Reply-To: <03e58462-5045-e12f-9af6-be2aaf19f32c@redhat.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Wed, 29 Oct 2025 14:31:05 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0gcEjZPVtKrysS=ek7kHpH3afinwY-apKm3Yd4PmKDHdA@mail.gmail.com>
+X-Gm-Features: AWmQ_bnfFqqg5xNQkg3Ut6H7tX7EttVRgAcRKjLdiyhAs_brzIkV0t-kTKujKfc
+Message-ID: <CAJZ5v0gcEjZPVtKrysS=ek7kHpH3afinwY-apKm3Yd4PmKDHdA@mail.gmail.com>
+Subject: Re: [PATCH] pm-hibernate: flush block device cache when hibernating
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Askar Safin <safinaskar@gmail.com>, linux-mm@kvack.org, linux-pm@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-lvm@lists.linux.dev, lvm-devel@lists.linux.dev, 
+	linux-raid@vger.kernel.org, DellClientKernel <Dell.Client.Kernel@dell.com>, 
+	dm-devel@lists.linux.dev, linux-btrfs@vger.kernel.org, 
+	Nhat Pham <nphamcs@gmail.com>, Kairui Song <ryncsn@gmail.com>, Pavel Machek <pavel@ucw.cz>, 
+	=?UTF-8?Q?Rodolfo_Garc=C3=ADa_Pe=C3=B1as?= <kix@kix.es>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
+	Lennart Poettering <mzxreary@0pointer.de>, Christian Brauner <brauner@kernel.org>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Milan Broz <milan@mazyland.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 29 Oct 2025 20:24:40 +0800
-Longfang Liu <liulongfang@huawei.com> wrote:
+On Fri, Oct 24, 2025 at 12:23=E2=80=AFPM Mikulas Patocka <mpatocka@redhat.c=
+om> wrote:
+>
+>
+>
+> On Fri, 24 Oct 2025, Askar Safin wrote:
+>
+> > Hi.
+> >
+> > Hibernate to swap located on dm-integrity doesn't work.
+> > Let me first describe why I need this, then I will describe a bug with =
+steps
+> > to reproduce
+> > (and some speculation on cause of the bug).
+>
+> Hi
+>
+> Does this patch fix it?
+>
+> Mikulas
+>
+>
+> From: Mikulas Patocka <mpatocka@redhat.com>
+>
+> There was reported failure that hibernation doesn't work with
+> dm-integrity. The reason for the failure is that the hibernation code
+> doesn't issue the FLUSH bio - the data still sits in the dm-integrity
+> cache and they are lost when poweroff happens.
+>
+> This commit fixes the suspend code so that it issues flushes before
+> writing the header and after writing the header.
 
-> On new platforms greater than QM_HW_V3, the configuration region for the
-> live migration function of the accelerator device is no longer
-> placed in the VF, but is instead placed in the PF.
-> 
-> Therefore, the configuration region of the live migration function
-> needs to be opened when the QM driver is loaded. When the QM driver
-> is uninstalled, the driver needs to clear this configuration.
-> 
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> Reviewed-by: Shameer Kolothum <shameerkolothum@gmail.com>
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Hmm, shouldn't it flush every time it does a sync write, and not just
+in these two cases?
+
+>
+> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+> Reported-by: Askar Safin <safinaskar@gmail.com>
+> Link: https://lore.kernel.org/dm-devel/a48a37e3-2c22-44fb-97a4-0e57dc2042=
+1a@gmail.com/T/
+> Cc: stable@vger.kernel.org
+>
 > ---
->  drivers/crypto/hisilicon/qm.c | 27 +++++++++++++++++++++++++++
->  include/linux/hisi_acc_qm.h   |  3 +++
->  2 files changed, 30 insertions(+)
-> 
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index a5b96adf2d1e..f0fd0c3698eb 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -3019,11 +3019,36 @@ static void qm_put_pci_res(struct hisi_qm *qm)
->  	pci_release_mem_regions(pdev);
->  }
->  
-> +static void hisi_mig_region_clear(struct hisi_qm *qm)
-> +{
-> +	u32 val;
-> +
-> +	/* Clear migration region set of PF */
-> +	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
-> +		val = readl(qm->io_base + QM_MIG_REGION_SEL);
-> +		val &= ~BIT(0);
-> +		writel(val, qm->io_base + QM_MIG_REGION_SEL);
-> +	}
-> +}
-> +
-> +static void hisi_mig_region_enable(struct hisi_qm *qm)
-> +{
-> +	u32 val;
-> +
-> +	/* Select migration region of PF */
-> +	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
-> +		val = readl(qm->io_base + QM_MIG_REGION_SEL);
-> +		val |= QM_MIG_REGION_EN;
-> +		writel(val, qm->io_base + QM_MIG_REGION_SEL);
-> +	}
-> +}
-
-Same as commented last time:
-
-https://lore.kernel.org/all/20251027222011.05bac6bd@shazbot.org/
-
-> +
->  static void hisi_qm_pci_uninit(struct hisi_qm *qm)
->  {
->  	struct pci_dev *pdev = qm->pdev;
->  
->  	pci_free_irq_vectors(pdev);
-> +	hisi_mig_region_clear(qm);
->  	qm_put_pci_res(qm);
->  	pci_disable_device(pdev);
->  }
-> @@ -5725,6 +5750,7 @@ int hisi_qm_init(struct hisi_qm *qm)
->  		goto err_free_qm_memory;
->  
->  	qm_cmd_init(qm);
-> +	hisi_mig_region_enable(qm);
->  
->  	return 0;
->  
-> @@ -5863,6 +5889,7 @@ static int qm_rebuild_for_resume(struct hisi_qm *qm)
->  	}
->  
->  	qm_cmd_init(qm);
-> +	hisi_mig_region_enable(qm);
->  	hisi_qm_dev_err_init(qm);
->  	/* Set the doorbell timeout to QM_DB_TIMEOUT_CFG ns. */
->  	writel(QM_DB_TIMEOUT_SET, qm->io_base + QM_DB_TIMEOUT_CFG);
-> diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-> index c4690e365ade..aa0129d20c51 100644
-> --- a/include/linux/hisi_acc_qm.h
-> +++ b/include/linux/hisi_acc_qm.h
-> @@ -99,6 +99,9 @@
->  
->  #define QM_DEV_ALG_MAX_LEN		256
->  
-> +#define QM_MIG_REGION_SEL		0x100198
-> +#define QM_MIG_REGION_EN		0x1
-> +
->  /* uacce mode of the driver */
->  #define UACCE_MODE_NOUACCE		0 /* don't use uacce */
->  #define UACCE_MODE_SVA			1 /* use uacce sva mode */
-
+>  kernel/power/swap.c |    4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> Index: linux-2.6/kernel/power/swap.c
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> --- linux-2.6.orig/kernel/power/swap.c  2025-10-13 21:42:48.000000000 +02=
+00
+> +++ linux-2.6/kernel/power/swap.c       2025-10-24 12:01:32.000000000 +02=
+00
+> @@ -320,8 +320,10 @@ static int mark_swapfiles(struct swap_ma
+>                 swsusp_header->flags =3D flags;
+>                 if (flags & SF_CRC32_MODE)
+>                         swsusp_header->crc32 =3D handle->crc32;
+> -               error =3D hib_submit_io_sync(REQ_OP_WRITE | REQ_SYNC,
+> +               error =3D hib_submit_io_sync(REQ_OP_WRITE | REQ_SYNC | RE=
+Q_PREFLUSH,
+>                                       swsusp_resume_block, swsusp_header)=
+;
+> +               if (!error)
+> +                       error =3D blkdev_issue_flush(file_bdev(hib_resume=
+_bdev_file));
+>         } else {
+>                 pr_err("Swap header not found!\n");
+>                 error =3D -ENODEV;
+>
