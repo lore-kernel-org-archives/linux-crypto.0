@@ -1,167 +1,105 @@
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D896837A3D8;
-	Thu, 30 Oct 2025 01:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6232DBF69;
+	Thu, 30 Oct 2025 01:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761787860; cv=none; b=uhCmklzlCVyLfqcCKnEyVhQvhkN/j7Qr8vFTUh7iD2BSbHmGbDw/2ykmn1TxT8iVNDDmzw41LPbhJj92rQ69s/4xhpPQSc0eYkjqX9xyQSjjHbSzq+OEAN5hO8cTHZrCBKoNJI69Pjf7z00YVl3xb3p8xci63QIq31MUEMjvNXs=
+	t=1761789478; cv=none; b=dC6IxQw4UEgJW2ICbWSomjte99RXs3vH7/baYLyOE/3pyY0/DJInpZlaDwZrTQgTQBO4RcooAzRs7IYV8TBXVG3S+Mc3Bn1kXi8/WKHhADsTgdNnL/AJdRD3pduyS6BmoPDa5OUxm5rf4uWwn1vRF4UPotUDjcx9VDvER4h+P9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761787860; c=relaxed/simple;
-	bh=A8gDmF+Om9HTvdq0Ixpq78Bk9hC7lsgL4siwEchBVCU=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=SffDRtw9pKMztdY0n8m6ctkE/QdpedtkHFy7CYf8ggJ4Bl80lJRmVKXlvaROZPQxJbvK34PN84KEE49cttoYIXV4L+5kjBFnd6irQnTQwDmuCax4c47eYfI/1gu9v+lmKiyePcMxa20yj2+L34ALJ9pZuiITLwgs57Oq1CRgi3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=P3Ia09CS; arc=none smtp.client-ip=113.46.200.219
+	s=arc-20240116; t=1761789478; c=relaxed/simple;
+	bh=2uOKnW0pKvL26iNvB7GQ4XEPhUn2FEw/gkksgunO5Mg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rVJGVXYou9FyaEnQzj0nSKewgfZTGbO1b98O2eqNzZKFfp6PT3/hQkObFAGrLzWYrwW2iG7/S7QLMRgs4b+gOwBISoASpvSmRxdYdQohAWZMRFl7MAzxbwfVPGWiDDPJifuuCc9eKnvzxYy9XS/tloq9uKKtuxDDlqswGVFMecc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=a3T3SSZo; arc=none smtp.client-ip=113.46.200.217
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="P3Ia09CS"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="a3T3SSZo"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=JnruyETCqV2Cq8faQLSx9eTVX7WhLs33xmIAAQ2Psd0=;
-	b=P3Ia09CSTkIOIrU0SmML1rpG7AcXDiec0+hynOO3n2VvETPqpp107LriH9a7LvH961GUE9Ln3
-	vJiraoaBURErP5AhMR3aC+L2v0p/3R1LHisEfPuH/+MeTUoRY47F6ZBoRBk1mVOWob7hfirAep/
-	DF1AWDS2NmDJ+AaBrwgUM24=
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4cxml437KXz1prQN;
-	Thu, 30 Oct 2025 09:30:24 +0800 (CST)
+	bh=zwnuXeBVQqXvOjZRpTPcmO5rmI6DRWb7MeDjk6XU674=;
+	b=a3T3SSZoGQtcn7VlXgrjgbMWfl5cPqMnb7IygPHgln+PsbQCt+F1/SPpQg/9q7g/WiNG8rsy4
+	XiSfb+rLvA9v5lkzblMPwZVOHoJrYti5lvZ1t2/0co8jTBK9GUmCPh2NaydRazEjOkDNnYr+tp5
+	V/WPLb7MR7mtO6GBsxAgR20=
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4cxnK03HKnzcb0v;
+	Thu, 30 Oct 2025 09:56:20 +0800 (CST)
 Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 28DBA140279;
-	Thu, 30 Oct 2025 09:30:54 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 30 Oct 2025 09:30:53 +0800
-Subject: Re: [PATCH v11 1/2] crypto: hisilicon - qm updates BAR configuration
-To: Alex Williamson <alex@shazbot.org>
-CC: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	by mail.maildlp.com (Postfix) with ESMTPS id 923B9180B62;
+	Thu, 30 Oct 2025 09:57:45 +0800 (CST)
+Received: from huawei.com (10.90.31.46) by dggpemf500015.china.huawei.com
+ (7.185.36.143) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 30 Oct
+ 2025 09:57:44 +0800
+From: Longfang Liu <liulongfang@huawei.com>
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
 	<herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
-	<jonathan.cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linuxarm@openeuler.org>
-References: <20251029122441.3063127-1-liulongfang@huawei.com>
- <20251029122441.3063127-2-liulongfang@huawei.com>
- <20251029072617.38e23c7c@shazbot.org>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <6c177f1c-91fc-13e5-20b1-0c4cdedac824@huawei.com>
-Date: Thu, 30 Oct 2025 09:30:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	<jonathan.cameron@huawei.com>
+CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <liulongfang@huawei.com>
+Subject: [PATCH v12 0/2] update live migration configuration region
+Date: Thu, 30 Oct 2025 09:57:42 +0800
+Message-ID: <20251030015744.131771-1-liulongfang@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20251029072617.38e23c7c@shazbot.org>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
  dggpemf500015.china.huawei.com (7.185.36.143)
 
-On 2025/10/29 21:26, Alex Williamson wrote:
-> On Wed, 29 Oct 2025 20:24:40 +0800
-> Longfang Liu <liulongfang@huawei.com> wrote:
-> 
->> On new platforms greater than QM_HW_V3, the configuration region for the
->> live migration function of the accelerator device is no longer
->> placed in the VF, but is instead placed in the PF.
->>
->> Therefore, the configuration region of the live migration function
->> needs to be opened when the QM driver is loaded. When the QM driver
->> is uninstalled, the driver needs to clear this configuration.
->>
->> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->> Reviewed-by: Shameer Kolothum <shameerkolothum@gmail.com>
->> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
->> ---
->>  drivers/crypto/hisilicon/qm.c | 27 +++++++++++++++++++++++++++
->>  include/linux/hisi_acc_qm.h   |  3 +++
->>  2 files changed, 30 insertions(+)
->>
->> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
->> index a5b96adf2d1e..f0fd0c3698eb 100644
->> --- a/drivers/crypto/hisilicon/qm.c
->> +++ b/drivers/crypto/hisilicon/qm.c
->> @@ -3019,11 +3019,36 @@ static void qm_put_pci_res(struct hisi_qm *qm)
->>  	pci_release_mem_regions(pdev);
->>  }
->>  
->> +static void hisi_mig_region_clear(struct hisi_qm *qm)
->> +{
->> +	u32 val;
->> +
->> +	/* Clear migration region set of PF */
->> +	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
->> +		val = readl(qm->io_base + QM_MIG_REGION_SEL);
->> +		val &= ~BIT(0);
->> +		writel(val, qm->io_base + QM_MIG_REGION_SEL);
->> +	}
->> +}
->> +
->> +static void hisi_mig_region_enable(struct hisi_qm *qm)
->> +{
->> +	u32 val;
->> +
->> +	/* Select migration region of PF */
->> +	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
->> +		val = readl(qm->io_base + QM_MIG_REGION_SEL);
->> +		val |= QM_MIG_REGION_EN;
->> +		writel(val, qm->io_base + QM_MIG_REGION_SEL);
->> +	}
->> +}
-> 
-> Same as commented last time:
-> 
-> https://lore.kernel.org/all/20251027222011.05bac6bd@shazbot.org/
->
+On the new hardware platform, the configuration register space
+of the live migration function is set on the PF, while on the
+old platform, this part is placed on the VF.
 
-OK, I'll fix this and update the version.
+Change v11 -> v12
+	Standardize register BIT operations
 
-Thanks.
-Longfang.
+Change v10 -> v11
+	Remove redundant register read/write helper functions
 
->> +
->>  static void hisi_qm_pci_uninit(struct hisi_qm *qm)
->>  {
->>  	struct pci_dev *pdev = qm->pdev;
->>  
->>  	pci_free_irq_vectors(pdev);
->> +	hisi_mig_region_clear(qm);
->>  	qm_put_pci_res(qm);
->>  	pci_disable_device(pdev);
->>  }
->> @@ -5725,6 +5750,7 @@ int hisi_qm_init(struct hisi_qm *qm)
->>  		goto err_free_qm_memory;
->>  
->>  	qm_cmd_init(qm);
->> +	hisi_mig_region_enable(qm);
->>  
->>  	return 0;
->>  
->> @@ -5863,6 +5889,7 @@ static int qm_rebuild_for_resume(struct hisi_qm *qm)
->>  	}
->>  
->>  	qm_cmd_init(qm);
->> +	hisi_mig_region_enable(qm);
->>  	hisi_qm_dev_err_init(qm);
->>  	/* Set the doorbell timeout to QM_DB_TIMEOUT_CFG ns. */
->>  	writel(QM_DB_TIMEOUT_SET, qm->io_base + QM_DB_TIMEOUT_CFG);
->> diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
->> index c4690e365ade..aa0129d20c51 100644
->> --- a/include/linux/hisi_acc_qm.h
->> +++ b/include/linux/hisi_acc_qm.h
->> @@ -99,6 +99,9 @@
->>  
->>  #define QM_DEV_ALG_MAX_LEN		256
->>  
->> +#define QM_MIG_REGION_SEL		0x100198
->> +#define QM_MIG_REGION_EN		0x1
->> +
->>  /* uacce mode of the driver */
->>  #define UACCE_MODE_NOUACCE		0 /* don't use uacce */
->>  #define UACCE_MODE_SVA			1 /* use uacce sva mode */
-> 
-> .
-> 
+Change v9 -> v10
+	Update the name of the configuration mode
+
+Change v8 -> v9
+	Update the version name for driver matching
+
+Change v7 -> v8
+	Resolve hardware compatibility issues.
+
+Change v6 -> v7
+	Update the comment of the live migration configuration scheme.
+
+Change v5 -> v6
+	Update VF device properties
+
+Change v4 -> v5
+	Remove BAR length alignment
+
+Change v3 -> v4
+	Rebase on kernel 6.15
+
+Change v2 -> v3
+	Put the changes of Pre_Copy into another bugfix patchset.
+
+Change v1 -> v2
+	Delete the vf_qm_state read operation in Pre_Copy
+
+Longfang Liu (2):
+  crypto: hisilicon - qm updates BAR configuration
+  hisi_acc_vfio_pci: adapt to new migration configuration
+
+ drivers/crypto/hisilicon/qm.c                 |  27 ++++
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 130 +++++++++++++-----
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  23 +++-
+ include/linux/hisi_acc_qm.h                   |   3 +
+ 4 files changed, 144 insertions(+), 39 deletions(-)
+
+-- 
+2.33.0
+
