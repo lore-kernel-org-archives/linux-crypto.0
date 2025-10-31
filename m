@@ -1,321 +1,276 @@
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012050.outbound.protection.outlook.com [40.107.209.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604AC348864
-	for <linux-crypto@vger.kernel.org>; Fri, 31 Oct 2025 10:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761907210; cv=none; b=YuPuchtAq3ZF1AAv5oCRa1Mkco4BHUE+rWlHb5pbN6lUxEz+KFDFIdRFohQ4d5f6sNgU99GBIAEEFsUByO9vkAwe3KkSz3VXo3WfnWlicdKG0ioVDI0iLIEzxTsaC459TwwLPvIK4YrbiFoMoXzcATQJqk8shjDWAKZGImlw8x4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761907210; c=relaxed/simple;
-	bh=HFZsj5SF9uZu3M555auUiRt8ZHbHBGx0ZJPNt87V03I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jxIZiVJ2yW8LdvZWochgp92oQnqDo+eZh/RWhebIU6mli+V2ZGTcwWFLoO2OA9hQio6uJ8hkP2Ih6L/qJ19LVeSymnMsMHV9BqUPVnujTTVZuuy1c6NrtgsrRu86dhk4UrwXRqhc8yEACz4PHwdtscY2Yg7ztzYbw+9QZcSyjis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X/Onl3YO; arc=none smtp.client-ip=209.85.218.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9135235957;
+	Fri, 31 Oct 2025 13:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761916044; cv=fail; b=h6gXYwd2g6Kq40wT2FMDoXvqc8KvMyW0bAL0SYNzkz9Doa84R5fPNJBLxxs43BWf/jLIUc2J9SGvi97kkVK1QAHRZ0fWZXh3S1g9K3vyKayY/uaU7i09zjxa0D67e1aTSeweTZJvlD/K3mjn9x63/b3bm32hkpHGFY7HvAWVkBc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761916044; c=relaxed/simple;
+	bh=XESAF2gcoNqzBXN/rT9JcTJbGtotcRVJPh6JgFsxceg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=OhlGxowcJwQ2mOyd9IOZ3yLEP6a7LZY1IyPUUsjesSNDcBhXHTLGNVaD9ilISIwTFb8pkOKcWlUaOe3qRSVQyRM3P4whaLretTfncQin+hlwDa48StPXGhouMWeYHcNJm36uMYFF0qGJlAKpZPtnqc1gvkbkuD0jAbuTNphLHG0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tuBaAxSI; arc=fail smtp.client-ip=40.107.209.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X/Onl3YO"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b448c864d45so246735166b.2
-        for <linux-crypto@vger.kernel.org>; Fri, 31 Oct 2025 03:40:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761907205; x=1762512005; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hXSBfWV8tpC2Nd3cljXrFyvXUntLEuS79VQ7cN3V6Kg=;
-        b=X/Onl3YON8cYuFvn6SG11uP/41Ek4YHqv7gSldGGuhw6xKMWW/If+HwfsmYVbA67Mp
-         OFiFGFeRFv0QuRPz2WunDFznV2wtRNoJwopwMnACB5yo2jPOCNqB+G0JLh6rORbiKB1M
-         Zk+hps/CHskhwbdgGWlza/xQCWGpGfD1qMcL9DlO3KOZ8kEWAEyWxNBh2kr+gy3/e4tl
-         QV1jdnYYczN418fUcbIRGy4KM5vzJ5xGIG8PJ5iGYISbq1XC360x/EmadunVe83ux5AH
-         dI+Kieb7F6fSevAPuVB0Dg4X+wIuOHW0v1diS+bFpiqGEOch1ZQB3AibM7yk9cxPbBEn
-         ClIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761907205; x=1762512005;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hXSBfWV8tpC2Nd3cljXrFyvXUntLEuS79VQ7cN3V6Kg=;
-        b=iDwgieGk8f3D1uDKPGL83b/b2BkMmtbKQ+vcFTZtaUSpv6xWdwo40n5b2XxJlqX1Ow
-         by6NwFdej3PCwMfTfzlRgofG4LL4IGHketA+yo1rSOA3QOY3d4pdCsTNtsLe6GW2yzvN
-         zJ1n+lO9KkoqCMBruIdHFC+iVm8BKIDE0OTsTSc04zKiNOIj7ARUblJAXSS6k3S9Qi5u
-         vCv546+plejsXsgG3QaYhjtxk+fPaoEM3dUZEum8Hl08uOzUBPloC+IkS8M8fQR0q11C
-         heF2+7Y8VN83/D+UluSbW5b/ylhlnN8sRAtg/Fu/ymzp4xDMtMCfAlwpfur0quKUyv4X
-         o5gQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXWtEs4KPjihPc/1Pt2GG/fG+d3G2dqnq/bpM33zMiGjGeHV1FolVk7b+0t9z4Io12weCpah/7R685Vn5k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6TEtPm8W4grL7ZlaHfE0h/SKOHpgZWQCSdXtU+dc9N0WWHr5o
-	qgPL09Fp+zGDUCqAIcsniJ/Pvqe32POGBLPNWSV1l8CsIAcRd8kQatMr/7lkkrnzlRxzIbep+A=
-	=
-X-Google-Smtp-Source: AGHT+IHsCyufAFYruq64bIN1s13iRBPnlbTRcCcT0v8JxVpk2siEwC+tdjkWMK4wLBKHpRG6/wZkpb6/
-X-Received: from ejnc2.prod.google.com ([2002:a17:906:7622:b0:b3a:f659:314b])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:354a:b0:b6d:4fe5:ead0
- with SMTP id a640c23a62f3a-b70700b561amr213996666b.10.1761907205667; Fri, 31
- Oct 2025 03:40:05 -0700 (PDT)
-Date: Fri, 31 Oct 2025 11:39:20 +0100
-In-Reply-To: <20251031103858.529530-23-ardb+git@google.com>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tuBaAxSI"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=maOelpxgo9pp8svYCTIn39zTilbI2SQUfoQGsV3ZokflOtVZRYUZbb/zTATSxnML+ot0NE2FbWZ7oCGCql55royYjHlARCJ9Ci7JUBf2P9mVDCEXaZ4uQxsjpYW9GeOVa+UgDUfs4AS5bvI6XM3RhwxyiH9E6sLBTjoBvEs0IS2pQqmDg5TqkHbr0xTlgC3iXi8gwljgoTddHbKZ4qfzGIcpZgZB7Nfz2Yc4SARpSpZIzZ4GMAZOE3ZLPgq4NuJKJMQUFu6FLAdkAYeYy099ZSAaAyAXvj8QtuznxqlCuc89FVGsvz1nHgRb+WDkOzTZVwtXdpvj8zCQ5wf7W3jf8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=m126+cJMHNHrExOSFwi+TjuySlB0IMkrX2TWc4QMFYA=;
+ b=HeRQrTk0c/h0yIMFlvyf1wfKejSBVtci+1jJ6wsy3Nk8zHlX1Ww5g10H7vwyB+i9sVJCoibtQ6e9aUFWWUtA8HVI3X038m6hPXK6T0KlaYkPaWLESpog/RPocHnvPPqU0eyDPHUCwlJiVU4IvcUpu+1DZQEJpfk5jZHk164xmAXVorjs/hxzqCqFR+ileI7ebV2xmUJOVzI97pO+KMq6dfHxuR/hi+I5hDeAZUReFCOOLL4eog5zwVYJFN1yCRlv8yXyol7DGyMcBPd5RsN+R4+He4FzenoP9jjWEpACnVtyhvFKS1GT95vbM5sH/gkBFAa9AJGRagFGhKup1yC7oQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m126+cJMHNHrExOSFwi+TjuySlB0IMkrX2TWc4QMFYA=;
+ b=tuBaAxSIEOpBDtazQDQFDVF9DWOCu6HMI/wGYquCnaKOPjn9YbCYNKoXdYRO1Gswykord5B1Xs+loCxk8slMFK5zW2FYzgQ5knjGlW4shskRuQE8tAqebRj+fAoIZvl3EmdNlrHNup5bD8Bq03M9dXGYMWIe09hdvk3K9fbU7+cHKnQ9Tr8OuCs+qWgraoFSWnt9G8/CY2SWHAOc44vndeX12eIDnKFEt7zk+5TrnMyznpf8Nf0EgbbdVgLDvp0xJ4DALCWBR4xhhxyCZX5BwqYJu5HDlDoD7juDuDalc+Pj4yWd2rgliRZRvSDBxqsRXdJPBS3wKrHqhqnZtJMQKQ==
+Received: from BYAPR12MB3015.namprd12.prod.outlook.com (2603:10b6:a03:df::14)
+ by SJ1PR12MB6145.namprd12.prod.outlook.com (2603:10b6:a03:45c::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.15; Fri, 31 Oct
+ 2025 13:07:18 +0000
+Received: from BYAPR12MB3015.namprd12.prod.outlook.com
+ ([fe80::db88:47e8:4619:e06b]) by BYAPR12MB3015.namprd12.prod.outlook.com
+ ([fe80::db88:47e8:4619:e06b%5]) with mapi id 15.20.9275.013; Fri, 31 Oct 2025
+ 13:07:17 +0000
+From: Ron Li <xiangrongl@nvidia.com>
+To: "hdegoede@redhat.com" <hdegoede@redhat.com>,
+	"ilpo.jarvinen@linux.intel.com" <ilpo.jarvinen@linux.intel.com>, Vadim
+ Pasternak <vadimp@nvidia.com>, "alok.a.tiwari@oracle.com"
+	<alok.a.tiwari@oracle.com>, Khalil Blaiech <kblaiech@nvidia.com>, David
+ Thompson <davthompson@nvidia.com>
+CC: "platform-driver-x86@vger.kernel.org"
+	<platform-driver-x86@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>
+Subject: RE: [PATCH v3 0/3] platform/mellanox: Add mlxbf_pka driver for
+ BlueField DPU
+Thread-Topic: [PATCH v3 0/3] platform/mellanox: Add mlxbf_pka driver for
+ BlueField DPU
+Thread-Index: AQHcKZ8Gl+BSsmsolk6LqJ36cprvhbTceycg
+Date: Fri, 31 Oct 2025 13:07:17 +0000
+Message-ID:
+ <BYAPR12MB30158345E1327BD4FFECC8C6A9F8A@BYAPR12MB3015.namprd12.prod.outlook.com>
+References: <20250919195132.1088515-1-xiangrongl@nvidia.com>
+In-Reply-To: <20250919195132.1088515-1-xiangrongl@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BYAPR12MB3015:EE_|SJ1PR12MB6145:EE_
+x-ms-office365-filtering-correlation-id: 5c465b01-cbc1-422f-a8a2-08de187e6b39
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|1800799024|366016|7053199007|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?gBRScdV7galuEEUoqyJZSybjI5A7/GvzcK9ixus05LNaAYU2tSH3TO9aAVcG?=
+ =?us-ascii?Q?bb4VoYlqcB6BMRb3IFsuh/AWB7wws3w3A/UA7q5enbpCxeys5AI73PzEwdwb?=
+ =?us-ascii?Q?FZf/zxe/BAPWD2rDDMu82BUgV3gcClzA4nJkeyVdUSkqtNtKRlNZZdMZCXHV?=
+ =?us-ascii?Q?ShBcO1yQ1s2+EQE5aS46zLR9lpc2kkGX6mbmKlZ/PqQvMgZKQtqD+GpVxgIP?=
+ =?us-ascii?Q?C8q5G/ZW53/nJTQCQgpUsX22eNm1vfnKmQb7gLBxNQahf2Jdb65g0Os8dHv7?=
+ =?us-ascii?Q?LBNQ3h82RXxZHmM4WSHumk2Rswd756OtgTC/NS7JaWlmqFIaXAjh8qXyMONd?=
+ =?us-ascii?Q?V0B8P/ImzYxV/wLbCQzZOK8TlkcvSZ4IBW85sk2vLROwhrc+Asjn8bPP9TAm?=
+ =?us-ascii?Q?Wp4HABg8a4XAd17RKGtYX+ot4srcvW99wfsppjlttHAq0H9jWdXeVB+XQMy9?=
+ =?us-ascii?Q?idYM7JvPqJLK6w0jDtCCJDOIulJ36eHP7nGO6hAdHz4B+QWeNgZ2XCPQfLI7?=
+ =?us-ascii?Q?kECxUvUyz6FgxKLvC510GXHfC1+ZxGMgCQNn3y/zm9tXQibDTw/OHzzNS5yH?=
+ =?us-ascii?Q?O8tUGE8QnALCImAzT2dwGhp4MafdmqFxO9xiNsgBKoD2fdN4BSlP22JbZjuL?=
+ =?us-ascii?Q?EHNU1Z3ViGEcghQHXQ2R509Xts/70a2fIQKpLodaHyy2/JZZqxvYQIgFWN4b?=
+ =?us-ascii?Q?33SJ4mSrzvZwDr2w3P2u1DdFkMnSnnF7v5OXh38kh7UAsGftUe7KSDMFhI9u?=
+ =?us-ascii?Q?LIKDEdnJBASypkdAbnD0plMlj0ELb7LP02U4gfYloYVoNtmGHduJVzsq0KxQ?=
+ =?us-ascii?Q?s8OUohLE4eAtSL/jWSkPF3cDm2YOY1XT5idQAQnsVcZdkGHsb91+Y6rXWgpG?=
+ =?us-ascii?Q?RfGE6XI2rp7ZP0Qe6J5trchUrYM9gxYFVg9axOOQa4FpGY5zNfIVVFZ+oeTZ?=
+ =?us-ascii?Q?ES5DsjfH0z1ZWQRFRm14N1At+r+IAlXI2OJuVuPTxOuJZsc5cY+H78IgdT1a?=
+ =?us-ascii?Q?jA4K8ko8g/9aI+FhA8/rM4IMzLQJ791w0ujs7SqcFPvzQbp8mi7OvaeObO5a?=
+ =?us-ascii?Q?9B3F4MZshNE8mjzVkGJ96iPYxwGtk3yhsTEpzBwC7b8dlEnSOWZ1Z/ER83Ia?=
+ =?us-ascii?Q?bIrZ/8iSgvRgs+XGzzXf6NZgrl0lK8ysNgi7dRvc5T5DDL22IDiiT9OnMe0F?=
+ =?us-ascii?Q?oYdolBVjgRtEIw8VD5rQxFdYcScXVk4YskR7HOU8XFKAeY/8/QciCvq5zR5N?=
+ =?us-ascii?Q?Sb3xvqZKC6hAaPVfidYalR41YuflaN44e7r9Fqr9XQSBBVj0e/LVxPRucN27?=
+ =?us-ascii?Q?Y3d0MYJfgvJaASRASyFrw5DWnHps0KeWSqJ60EqfRRifsBzQOSuvrTC/j7x5?=
+ =?us-ascii?Q?6sLB7YaOJm914lij8Ckz+WZpuqpLgp70R9LiWqgWAnU5J/S+XRy0sXxGsU6k?=
+ =?us-ascii?Q?Zq3cGLO++NHBbKuicVTy9EbJU+kEwSX7Tabl2EPGIO3YPmf5gS/PTpW8Iu2o?=
+ =?us-ascii?Q?7Ht1TI36MuyIAUIXW4FvrqXiLhKBh/r1hT8x?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB3015.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?LE6OfpIrdEcwXtS5EuhtT/8yZosBSp63DIUG8tAZsRZd1tOCi5Lw+C+tvsEJ?=
+ =?us-ascii?Q?Tizu9rrMBEqxOWegFaLpZyI75RP/QwsnBre1bjAZnPxPnDjaY3Gmq50CeS62?=
+ =?us-ascii?Q?LJ/wmLLz42r8NfgpOr7L1QI6DnsEfX+xmnDFOj9OgFe5vaFBBsv2DB/rzk/I?=
+ =?us-ascii?Q?7QIEHbxHEnlNccoN/5OzLFWlCSoXI0CLX5TF1ZYVUjqHqI2aZFzvjIcMVoK5?=
+ =?us-ascii?Q?JCzIoLU+nl9G1+PyWTbmXRJ9NAiryk5hqfRfuCipwZh113zcPj/QMflt6yuV?=
+ =?us-ascii?Q?JPXj1t/XovUfNTD34EqSeG0BFR8m5BOFZ5XIBkGpfDykamDzFpZSUCCoKOxK?=
+ =?us-ascii?Q?a4tOxpYgSNzwPzHjeIXa1dDpudiwoM+9hW2Cxn9/qyrXzVvrxj0+DOPW/7re?=
+ =?us-ascii?Q?j7uO9i3jj1BANxi0G48x9CFoP7wN5bbEDGsZ6qDh60fQohJcJGR9NvNcXlDD?=
+ =?us-ascii?Q?ETxdFwjNDgCxeXW5sSfhPJAGKOxQ0Dx+t/dqPIABim7ncRHnRB12vRGKlTG7?=
+ =?us-ascii?Q?pF9C408PXRHtsRKkHlaq4JzHLhdMmJ1G/s9x6TSvcvc+HangtgtU6RxAN/wS?=
+ =?us-ascii?Q?NOKTx7RMu+KvC8/WyZr70OFYsifbo55J56Y7yejirkRNSZU/oFwNe7g8Je42?=
+ =?us-ascii?Q?PWYB4b/nwzDzagAQ0WbOiTHRFG/HgJgrp2yiMWKr0mw8uxLfnNXE7oXteeBG?=
+ =?us-ascii?Q?Va7ftpEQ+iTG+PXkYW/iqubJJmw7M3bnp8lOiT8Z/P2fP1NluTBM1IxXyWWN?=
+ =?us-ascii?Q?M/UVpoQhXptB31BbyZHruPhhsb2WcvhaGpDy1W9zlkMoKBRWLldBOlUZ/k51?=
+ =?us-ascii?Q?M2Rg1lMUXNVv2iNImkl8NZjHVCQAqXnw59FAW2iVjXb4N9EtvH3rU31gQOLK?=
+ =?us-ascii?Q?q8omq22juuIbGb0lnyI4Bw1Fo7LvrHFzd3uROE8J3k9ey6McWZ7RAujn+58a?=
+ =?us-ascii?Q?IK43XBh4hj5V8/BGb+0wd0phDO79Nbt1ixc1LBLnKf+u7qMoEFI7dN/iG/qq?=
+ =?us-ascii?Q?LYhEztq0iJRJOr0ItdZKLkHdBqqnQmjy3eK/XmY79nplgJKpOItDI4j19y3F?=
+ =?us-ascii?Q?WXHwILB9NjhaMHa17a67O4/DCTj1zgAUW1AZWgdf9nHAdcr+86aw7UpdeAcp?=
+ =?us-ascii?Q?94Nl3pZkp+xHIta3p9nFSby6HyUJka7gnnDJn2bX1k7mwlSLu/7zJ87O+4gX?=
+ =?us-ascii?Q?uC1mWyHKJwWaHjr9w3Q6YIK5Ffa18LXIaGYUQmqA6QfjPQkDrLOi0nbl+IYU?=
+ =?us-ascii?Q?1u42tw3WLLVwlrqcpwlBD44lhmpLdmsShFMkVlRzuWARS47a9ZY1TTBuIo/w?=
+ =?us-ascii?Q?t+GjFdcyD8dhGDphgzj2mBKEm6DOQUfOCaApbDNpQ3A7tFygOMZ3ai1zeL9Z?=
+ =?us-ascii?Q?/Tv4PgRRtwjypOklS+aKXfCXaxORioNt6V2h75YOOMJNmNFPr++KJXvOrCSr?=
+ =?us-ascii?Q?kuJaOyqDW6OPl5BmTt1pTvFfB05bInVHkUTRkNGECITCjej+1RcTOJCVry/5?=
+ =?us-ascii?Q?j00O6WRPY5YohXeBr+R2Zg/5pPI6CsyxywgGdeUzdxj/k5+BC6u02h6zdQW5?=
+ =?us-ascii?Q?nf/UW0eWa5sz04pH+1TfrH8l0PcX/rofLHY02MvB?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251031103858.529530-23-ardb+git@google.com>
-X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8906; i=ardb@kernel.org;
- h=from:subject; bh=cmnjLnh4iP86mnRISKNH+TGi8gCkbqyWu/Q2rv/wC+k=;
- b=owGbwMvMwCVmkMcZplerG8N4Wi2JIZNl4sOk8CMO764nGqfuqbwan9Nbczdctat9y2r203sCq
- 5hLDqzpKGVhEONikBVTZBGY/ffdztMTpWqdZ8nCzGFlAhnCwMUpABOJamRkWP3TQ39O6kPtPvfY
- KSY/lQ6tV1drLvtnylQwpy4+RuJxCCPDKj+rS784v1Smex89/9vBtz7O6AGP5AW9+44q13wW1+7 lBQA=
-X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251031103858.529530-44-ardb+git@google.com>
-Subject: [PATCH v4 21/21] arm64/fpsimd: Allocate kernel mode FP/SIMD buffers
- on the stack
-From: Ard Biesheuvel <ardb+git@google.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	herbert@gondor.apana.org.au, ebiggers@kernel.org, 
-	Ard Biesheuvel <ardb@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3015.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c465b01-cbc1-422f-a8a2-08de187e6b39
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Oct 2025 13:07:17.6593
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9UdstijYViQUoPzQNTJ1TMa75rrN+BJOvszFlR1Z/+EYx1E/k+0KJjIrTO+YZDHjDUVnxZ3VbhK1Rf3HgJo3QQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6145
 
-From: Ard Biesheuvel <ardb@kernel.org>
+Gentle reminder.
 
-Commit aefbab8e77eb16b5
+Thanks
+Ron
 
-  ("arm64: fpsimd: Preserve/restore kernel mode NEON at context switch")
-
-added a 'kernel_fpsimd_state' field to struct thread_struct, which is
-the arch-specific portion of struct task_struct, and is allocated for
-each task in the system. The size of this field is 528 bytes, resulting
-in non-negligible bloat of task_struct, and the resulting memory
-overhead may impact performance on systems with many processes.
-
-This allocation is only used if the task is scheduled out or interrupted
-by a softirq while using the FP/SIMD unit in kernel mode, and so it is
-possible to transparently allocate this buffer on the caller's stack
-instead.
-
-So tweak the 'ksimd' scoped guard implementation so that a stack buffer
-is allocated and passed to both kernel_neon_begin() and
-kernel_neon_end(), and either record it in the task struct, or use it
-directly to preserve the task mode kernel FP/SIMD when running in
-softirq context. Passing the address to both functions, and checking the
-addresses for consistency ensures that callers of the updated bare
-begin/end API use it in a manner that is consistent with the new context
-switch semantics.
-
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- arch/arm64/include/asm/fpu.h       |  4 +-
- arch/arm64/include/asm/neon.h      |  4 +-
- arch/arm64/include/asm/processor.h |  7 ++-
- arch/arm64/include/asm/simd.h      |  7 ++-
- arch/arm64/kernel/fpsimd.c         | 53 ++++++++++++++------
- 5 files changed, 54 insertions(+), 21 deletions(-)
-
-diff --git a/arch/arm64/include/asm/fpu.h b/arch/arm64/include/asm/fpu.h
-index bdc4c6304c6a..751e88a96734 100644
---- a/arch/arm64/include/asm/fpu.h
-+++ b/arch/arm64/include/asm/fpu.h
-@@ -15,12 +15,12 @@ static inline void kernel_fpu_begin(void)
- {
- 	BUG_ON(!in_task());
- 	preempt_disable();
--	kernel_neon_begin();
-+	kernel_neon_begin(NULL);
- }
- 
- static inline void kernel_fpu_end(void)
- {
--	kernel_neon_end();
-+	kernel_neon_end(NULL);
- 	preempt_enable();
- }
- 
-diff --git a/arch/arm64/include/asm/neon.h b/arch/arm64/include/asm/neon.h
-index d4b1d172a79b..acebee4605b5 100644
---- a/arch/arm64/include/asm/neon.h
-+++ b/arch/arm64/include/asm/neon.h
-@@ -13,7 +13,7 @@
- 
- #define cpu_has_neon()		system_supports_fpsimd()
- 
--void kernel_neon_begin(void);
--void kernel_neon_end(void);
-+void kernel_neon_begin(struct user_fpsimd_state *);
-+void kernel_neon_end(struct user_fpsimd_state *);
- 
- #endif /* ! __ASM_NEON_H */
-diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-index 61d62bfd5a7b..de3c3b65461d 100644
---- a/arch/arm64/include/asm/processor.h
-+++ b/arch/arm64/include/asm/processor.h
-@@ -172,7 +172,12 @@ struct thread_struct {
- 	unsigned long		fault_code;	/* ESR_EL1 value */
- 	struct debug_info	debug;		/* debugging */
- 
--	struct user_fpsimd_state	kernel_fpsimd_state;
-+	/*
-+	 * Set [cleared] by kernel_neon_begin() [kernel_neon_end()] to the
-+	 * address of a caller provided buffer that will be used to preserve a
-+	 * task's kernel mode FPSIMD state while it is scheduled out.
-+	 */
-+	struct user_fpsimd_state	*kernel_fpsimd_state;
- 	unsigned int			kernel_fpsimd_cpu;
- #ifdef CONFIG_ARM64_PTR_AUTH
- 	struct ptrauth_keys_user	keys_user;
-diff --git a/arch/arm64/include/asm/simd.h b/arch/arm64/include/asm/simd.h
-index d9f83c478736..7ddb25df5c98 100644
---- a/arch/arm64/include/asm/simd.h
-+++ b/arch/arm64/include/asm/simd.h
-@@ -43,8 +43,11 @@ static __must_check inline bool may_use_simd(void) {
- 
- #endif /* ! CONFIG_KERNEL_MODE_NEON */
- 
--DEFINE_LOCK_GUARD_0(ksimd, kernel_neon_begin(), kernel_neon_end())
-+DEFINE_LOCK_GUARD_1(ksimd,
-+		    struct user_fpsimd_state,
-+		    kernel_neon_begin(_T->lock),
-+		    kernel_neon_end(_T->lock))
- 
--#define scoped_ksimd()	scoped_guard(ksimd)
-+#define scoped_ksimd()	scoped_guard(ksimd, &(struct user_fpsimd_state){})
- 
- #endif
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index e3f8f51748bc..1c652ce4d40d 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -1489,21 +1489,23 @@ static void fpsimd_load_kernel_state(struct task_struct *task)
- 	 * Elide the load if this CPU holds the most recent kernel mode
- 	 * FPSIMD context of the current task.
- 	 */
--	if (last->st == &task->thread.kernel_fpsimd_state &&
-+	if (last->st == task->thread.kernel_fpsimd_state &&
- 	    task->thread.kernel_fpsimd_cpu == smp_processor_id())
- 		return;
- 
--	fpsimd_load_state(&task->thread.kernel_fpsimd_state);
-+	fpsimd_load_state(task->thread.kernel_fpsimd_state);
- }
- 
- static void fpsimd_save_kernel_state(struct task_struct *task)
- {
- 	struct cpu_fp_state cpu_fp_state = {
--		.st		= &task->thread.kernel_fpsimd_state,
-+		.st		= task->thread.kernel_fpsimd_state,
- 		.to_save	= FP_STATE_FPSIMD,
- 	};
- 
--	fpsimd_save_state(&task->thread.kernel_fpsimd_state);
-+	BUG_ON(!cpu_fp_state.st);
-+
-+	fpsimd_save_state(task->thread.kernel_fpsimd_state);
- 	fpsimd_bind_state_to_cpu(&cpu_fp_state);
- 
- 	task->thread.kernel_fpsimd_cpu = smp_processor_id();
-@@ -1774,6 +1776,7 @@ void fpsimd_update_current_state(struct user_fpsimd_state const *state)
- void fpsimd_flush_task_state(struct task_struct *t)
- {
- 	t->thread.fpsimd_cpu = NR_CPUS;
-+	t->thread.kernel_fpsimd_state = NULL;
- 	/*
- 	 * If we don't support fpsimd, bail out after we have
- 	 * reset the fpsimd_cpu for this task and clear the
-@@ -1833,8 +1836,13 @@ void fpsimd_save_and_flush_cpu_state(void)
-  *
-  * The caller may freely use the FPSIMD registers until kernel_neon_end() is
-  * called.
-+ *
-+ * Unless called from non-preemptible task context, @state must point to a
-+ * caller provided buffer that will be used to preserve the task's kernel mode
-+ * FPSIMD context when it is scheduled out, or if it is interrupted by kernel
-+ * mode FPSIMD occurring in softirq context. May be %NULL otherwise.
-  */
--void kernel_neon_begin(void)
-+void kernel_neon_begin(struct user_fpsimd_state *state)
- {
- 	if (WARN_ON(!system_supports_fpsimd()))
- 		return;
-@@ -1846,7 +1854,7 @@ void kernel_neon_begin(void)
- 	/* Save unsaved fpsimd state, if any: */
- 	if (test_thread_flag(TIF_KERNEL_FPSTATE)) {
- 		BUG_ON(IS_ENABLED(CONFIG_PREEMPT_RT) || !in_serving_softirq());
--		fpsimd_save_kernel_state(current);
-+		fpsimd_save_state(state);
- 	} else {
- 		fpsimd_save_user_state();
- 
-@@ -1867,8 +1875,17 @@ void kernel_neon_begin(void)
- 		 * mode in task context. So in this case, setting the flag here
- 		 * is always appropriate.
- 		 */
--		if (IS_ENABLED(CONFIG_PREEMPT_RT) || !in_serving_softirq())
-+		if (IS_ENABLED(CONFIG_PREEMPT_RT) || !in_serving_softirq()) {
-+			/*
-+			 * Record the caller provided buffer as the kernel mode
-+			 * FP/SIMD buffer for this task, so that the state can
-+			 * be preserved and restored on a context switch.
-+			 */
-+			WARN_ON(current->thread.kernel_fpsimd_state != NULL);
-+			WARN_ON(preemptible() && !state);
-+			current->thread.kernel_fpsimd_state = state;
- 			set_thread_flag(TIF_KERNEL_FPSTATE);
-+		}
- 	}
- 
- 	/* Invalidate any task state remaining in the fpsimd regs: */
-@@ -1886,22 +1903,30 @@ EXPORT_SYMBOL_GPL(kernel_neon_begin);
-  *
-  * The caller must not use the FPSIMD registers after this function is called,
-  * unless kernel_neon_begin() is called again in the meantime.
-+ *
-+ * The value of @state must match the value passed to the preceding call to
-+ * kernel_neon_begin().
-  */
--void kernel_neon_end(void)
-+void kernel_neon_end(struct user_fpsimd_state *state)
- {
- 	if (!system_supports_fpsimd())
- 		return;
- 
-+	if (!test_thread_flag(TIF_KERNEL_FPSTATE))
-+		return;
-+
- 	/*
- 	 * If we are returning from a nested use of kernel mode FPSIMD, restore
- 	 * the task context kernel mode FPSIMD state. This can only happen when
- 	 * running in softirq context on non-PREEMPT_RT.
- 	 */
--	if (!IS_ENABLED(CONFIG_PREEMPT_RT) && in_serving_softirq() &&
--	    test_thread_flag(TIF_KERNEL_FPSTATE))
--		fpsimd_load_kernel_state(current);
--	else
-+	if (!IS_ENABLED(CONFIG_PREEMPT_RT) && in_serving_softirq()) {
-+		fpsimd_load_state(state);
-+	} else {
- 		clear_thread_flag(TIF_KERNEL_FPSTATE);
-+		WARN_ON(current->thread.kernel_fpsimd_state != state);
-+		current->thread.kernel_fpsimd_state = NULL;
-+	}
- }
- EXPORT_SYMBOL_GPL(kernel_neon_end);
- 
-@@ -1937,7 +1962,7 @@ void __efi_fpsimd_begin(void)
- 	WARN_ON(preemptible());
- 
- 	if (may_use_simd()) {
--		kernel_neon_begin();
-+		kernel_neon_begin(&efi_fpsimd_state);
- 	} else {
- 		/*
- 		 * If !efi_sve_state, SVE can't be in use yet and doesn't need
-@@ -1986,7 +2011,7 @@ void __efi_fpsimd_end(void)
- 		return;
- 
- 	if (!efi_fpsimd_state_used) {
--		kernel_neon_end();
-+		kernel_neon_end(&efi_fpsimd_state);
- 	} else {
- 		if (system_supports_sve() && efi_sve_state_used) {
- 			bool ffr = true;
--- 
-2.51.1.930.gacf6e81ea2-goog
+> -----Original Message-----
+> From: Ron Li <xiangrongl@nvidia.com>
+> Sent: Friday, September 19, 2025 3:51 PM
+> To: hdegoede@redhat.com; ilpo.jarvinen@linux.intel.com; Vadim Pasternak
+> <vadimp@nvidia.com>; alok.a.tiwari@oracle.com; Khalil Blaiech
+> <kblaiech@nvidia.com>; David Thompson <davthompson@nvidia.com>
+> Cc: platform-driver-x86@vger.kernel.org; linux-kernel@vger.kernel.org; li=
+nux-
+> crypto@vger.kernel.org; Ron Li <xiangrongl@nvidia.com>
+> Subject: [PATCH v3 0/3] platform/mellanox: Add mlxbf_pka driver for
+> BlueField DPU
+>=20
+> This patch series adds the mlxbf_pka driver to support the BlueField DPU
+> Public Key Acceleration (PKA) hardware. The three patches in this series =
+are:
+>=20
+> Patch 1: Base implementation that wires up the platform driver and the
+>          device/shim layer:
+>=20
+> Patch 2: Add userspace PKA ring device interface.
+>=20
+> Patch 3: Add True Random Number Generator support to the BlueField PKA
+> driver
+>          and wire it into the HWRNG core to feed kernel entropy (/dev/hwr=
+ng).
+>=20
+> Testing:
+> - Kernel builds for ARM64
+> - Tested ARM64 build on several Mellanox BlueField 2 and 3 SoC boards tha=
+t
+>   include the PKA hardware.
+> - PKA shim devices probe and remove successfully
+> - The PKA ring devices presented at /dev/mlxbf_pka/.
+> - The PKA device validation test passed.
+> - /dev/hwrng present; rng_available lists mlxbf_pka
+> - Generating random numbers succeeds on BlueField platforms
+>=20
+> Signed-off-by: Ron Li <xiangrongl@nvidia.com>
+> ---
+> v2->v3:
+> - Split the source code into three patches to improve the readability. Ea=
+ch
+>   patch introduces new device features and functions.
+> - The latest kernel APIs are used for each patch in the series.
+> - Updated some variable names to improve the readability.
+> - Fixed the logic in the mlxbf_pka_ring_mem_addr() function.
+> - Update all the pr_xxx() to dev_xxx(). Except for one pr_xxx() print whe=
+n
+>   the PKA device is not available yet.
+>=20
+> v1->v2:
+> For patch 0001:
+> - Move ioctl related definition to include/uapi/linux/mlxbf-pka.h.
+> - Changed the ioctl number from 0xB7 to 0xBF, to avoid conflict with othe=
+r
+>   drivers.
+> - Remove interrupt related code, since the PKA driver uses polling instre=
+ad
+>   of interrupt.
+> - Use devm_kcalloc() to allocate memory with calculated length.
+> - Use read_poll_timeout() to handle infinite loop checking.
+> - Use lockdep_assert_held() to enforce serialization.
+> - Create mlxbf_pka_drv_verify_bootup_status() to handle duplicated code.
+> - Remove error handling in ***_remove_device functions since nothing usef=
+ul
+>   can be done.
+> - Fix the rollbacks in some functions by adding proper goto rollback path=
+.
+> - Updated all comments to under 80 characters per line.
+> - Upgrade some constant with kernel definitions.
+> - Include missing kernel libraries.
+> - Update some pr_xxx() to dev_xxx().
+> - Use FIELD_PREP and GENMASK to handle mask and offset of register access=
+.
+> - Refactor some code snippet to improve readability.
+> - Update the comments of some functions and type definitions.
+> - The FRO in the source code stands for Free Running Oscillator.
+> - Fix typos.
+> ---
+>=20
+> Ron Li (3):
+>   platform/mellanox/mlxbf_pka: Add core BlueField PKA platform driver
+>   platform/mellanox/mlxbf_pka: Add userspace PKA ring device interface
+>   platform/mellanox/mlxbf_pka: Add TRNG support and hwrng integration
+>=20
+>  .../ABI/testing/sysfs-platform-mellanox-pka   |   35 +
+>  .../userspace-api/ioctl/ioctl-number.rst      |    2 +
+>  MAINTAINERS                                   |    8 +
+>  drivers/platform/mellanox/Kconfig             |   10 +
+>  drivers/platform/mellanox/Makefile            |    1 +
+>  drivers/platform/mellanox/mlxbf_pka/Makefile  |   12 +
+>  .../mellanox/mlxbf_pka/mlxbf_pka_dev.c        |  481 ++++++++
+>  .../mellanox/mlxbf_pka/mlxbf_pka_dev.h        |  327 ++++++
+>  .../mellanox/mlxbf_pka/mlxbf_pka_drv.c        | 1016 +++++++++++++++++
+>  .../mellanox/mlxbf_pka/mlxbf_pka_ring.c       |  563 +++++++++
+>  .../mellanox/mlxbf_pka/mlxbf_pka_ring.h       |  255 +++++
+>  .../mellanox/mlxbf_pka/mlxbf_pka_trng.c       |  874 ++++++++++++++
+>  .../mellanox/mlxbf_pka/mlxbf_pka_trng.h       |  152 +++
+>  include/uapi/linux/mlxbf-pka.h                |  112 ++
+>  14 files changed, 3848 insertions(+)
+>  create mode 100644 Documentation/ABI/testing/sysfs-platform-mellanox-
+> pka
+>  create mode 100644 drivers/platform/mellanox/mlxbf_pka/Makefile
+>  create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.c
+>  create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h
+>  create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c
+>  create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_ring.c
+>  create mode 100644
+> drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_ring.h
+>  create mode 100644
+> drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.c
+>  create mode 100644
+> drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.h
+>  create mode 100644 include/uapi/linux/mlxbf-pka.h
+>=20
+> --
+> 2.34.1
 
