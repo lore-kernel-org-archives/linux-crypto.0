@@ -1,59 +1,61 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC4322A4EE
-	for <linux-crypto@vger.kernel.org>; Fri, 31 Oct 2025 04:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442922620E5
+	for <linux-crypto@vger.kernel.org>; Fri, 31 Oct 2025 04:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761886100; cv=none; b=k/SFGWcJaYlmUYVphOC9UAudRMrnZMcC5qKImlYa0Eh12pWEJEfne2z1EnsuSvgaZL2nDuQq6C3yH3YSNfixBl4SjyZivGx/uY7cYt/omfawvhm3FMgHdnpkLo71wx81rJ1PGU44wXjDU2TXFfqbU8ETvmgCI7HWpR+aZO+oqj0=
+	t=1761886109; cv=none; b=rox0HXGFnZi78qH6DPKPqOeqoowVPJ9qU6XO0xWxzezx1ZZ+CLuWdZTNa0/WXDzIMVgJfiPTa5zTyew54N0pqydaJrVRkJIEFQ+gnMYBsQdppSLyHlrbRtLUJM+VOLbclWmI53okxrTAdYVmxkazC6LzNT+MzVT28a4qr2CJjb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761886100; c=relaxed/simple;
-	bh=zAL4Uew2kRkkegj/cOObPY5ATqhKWlz/Yo1+x7xPdR0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iQHyuT7zCO/R4bGXWjwOsoxB9Du9Ef4eT0KqJuZUaufFIHrCsL79ugj4tTu/kHw2TBer1Su9SGWQLIg/6wOt/sRwwvSGYci0quQQfOxzxN/I5Z+R8E4kTV8K2yv+aHFAGgNcehE5L2dzLUJ1ec20VzgjupUtB4JGj+PKyK5Ykwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=H5x99lwx; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1761886109; c=relaxed/simple;
+	bh=VqneJzSj6ZAncie4Pm4kr22vBIPcmTH6MVSrCpJuRgA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Ic6IVrEp47GyaOfH3D8WFidEntBwKonm6LUNAA69T9NIQDYEH2H+pfRxzLHfvWTTiLEERz3PUpi+e+R0Xd5/D/9PAG0Dfr2xq/xZH1WmMyfIqP9b3gbvohvWH8i28pNkM5Nqmj93LzyWPvLXxO94RImum/TObjow3ce4mNNrA5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=obTet3uu; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="H5x99lwx"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2952048eb88so6917035ad.0
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Oct 2025 21:48:19 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="obTet3uu"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-340564186e0so1506946a91.0
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Oct 2025 21:48:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1761886098; x=1762490898; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=O+OiTvskOoQU6h9IL752qz8b+0it9yRGV456YrP7vcs=;
-        b=H5x99lwxp1wnzzbN6g0HNBEplPKXJb3xXfB+W+URrbCSlVMVb+0/jfCdYNyLleWjux
-         jXkchJes8xKGkVHtncDTRMGSTgOEy8wHplerQxg8OV+nepvgdU4Si2AzGfoJZuVuQJzJ
-         EiOk6dgkGuDw7GKj3PKCKAtJYy4RW6FGSqd4k=
+        d=vayavyalabs.com; s=google; t=1761886107; x=1762490907; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zhMtSPXj9mr8UNmQXgxlkL8r6YPZnmm760J+NfJOOMc=;
+        b=obTet3uugPXpambmH203+b0HoH6vkCt97hvsBDPJAuc/DEzPbYA+BeFubWjFyvkmKM
+         fhGtGKhBBvikSqT2kJrPiK3OE0y0xFvcFiKZ+xExrFyP+VMEUxFNmw98uDFqr5KUSJMI
+         73ewlwsJ7wutmoSBHXN6ZDXE9p5SQTwvbyuz8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761886098; x=1762490898;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O+OiTvskOoQU6h9IL752qz8b+0it9yRGV456YrP7vcs=;
-        b=aSaLZO/WPJO+UV5bpz18qyvuA+ZNMr47ZyP8+w1ahTnLDWc4PYgNZZM3YLxl8Llt/d
-         LeiZkz+oJggjs2EW3RQVbZcTSs4zjcCVunXh7JCwpIb2bN8GESL6SysQt3hKEWppQccL
-         ukdkdEDKWYy46utuWMHSq2tzez+doSIRoKhqsSuM5FNhq9iUOlZNku9Ljp4lEkmLj0sn
-         3LAD5pT3gaCg3vY7S9byVUP/92N+0lowS4L6jFjCrZLyVNvOGfDh+H1duQNiVhRyCWUp
-         O9X18C4IPdPn/hMOzWgPDjG1m/nI1Lo7EKG5SLVA694uQzpDKfMaUC1wXha7eyD5UpsE
-         E7+A==
-X-Gm-Message-State: AOJu0YyUprO7btpOLPIJlwkt0NbyPF40ZtYufARWJKyJB8k9k9uiShn3
-	aD6rwkwL58pTcxc3vnbn+qcYPh/vI0chJEsGMuWkb5GsKCSono4YxGNqKo9hNZsMPLXDcyjeNi3
-	GU1tG
-X-Gm-Gg: ASbGncvIl8my6EBYEfQBxe+4dQnPZL35bQyRfWd4iWysIyWBQymiFjhhgL99d9HBZrj
-	j3LCxlKgki17VIQlRzTo/2clMw7xJKIbWh6hqB8io7y8lernf0wYgV4gF3Ma5oxJJI/J4oxn8VT
-	uYrRTYbT9ZMXjQ302dX74+qNbU1H5+4UwfKl1JqW6Hn6J2oIQgaI+3KZsKQW5+b6KpMSyF+D4ww
-	31Ja4gmtlj3Cjm2ynk4RuwLMs6IbBYLWMvP+th/GG53EPhX2BrMLBoI8Bhmfc+vKFz9otfmTT4A
-	PsbtgswGcSm81Mmpgb78HUvNblo74PfWOohNP/eKBKqPJ49wpsymitMiqS2lqLOgy+OWc67e1QE
-	SZRxfFILqJug0zsEIYYKHlDJXD7MOYzI6g9kNscfqadXnimPAu1GGvFh9YwuUaeQp+ys6eZEICe
-	TiZ4uHPPtrhSmALictRqW6OuOcaGfqnX0j3P3Dq3VfSvoUqs045tjU/NU=
-X-Google-Smtp-Source: AGHT+IFkuWxI7QfXkeD58QkM1mtzUAeKNOhuO+csBjlMU7CEihxjPiSob7XqSz3c0UNu/gwIGI8ltA==
-X-Received: by 2002:a17:903:458d:b0:294:9699:74f6 with SMTP id d9443c01a7336-2951a524d52mr32909245ad.43.1761886098289;
-        Thu, 30 Oct 2025 21:48:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761886107; x=1762490907;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zhMtSPXj9mr8UNmQXgxlkL8r6YPZnmm760J+NfJOOMc=;
+        b=GF/NHtyoU5rekKm5rc+3lNdjXOw12YRWAEdJmNOHGmtFTUiyBk4/q86kTmXWW+4cDq
+         +Lm3NGIEbio+fuGabhMjbW4ICvpeWsHdFRJWIcoxUR0szN9nFMvMdEJPYA/D4yqOG08Z
+         sJ+HyZLqZOB7BJ7nyWZjGELA7F0xd4lrRzU1dkURdOF9XhplooFvUxbl7gFVMg8JD8xQ
+         fw8uD1zALiIUu503QUKQZgt1Ka3TQ6ajmUQ1AGbFZHYZRQ8ZpCMOn7OoMcY2AKemZtyE
+         zAs3sYcWTx86x7EdHpeHP1YqxGoCB8XWYfvHJrMGA0cZpapzPJJjMtN/5LOCOUUjyK7c
+         0cOg==
+X-Gm-Message-State: AOJu0YxyYkuuKEwSSRj1Hqh+FwCPJmEsFbV6dGk3nuoIPIuWHW7WwxZ7
+	YA8MrwDz39sfUJR1N2wsgPGBs4MUoFq3PV4o6q5Pc1jvozr/alfzvGnPYL23c+6OuTsL3oUW3u0
+	gqMaL
+X-Gm-Gg: ASbGncuTaRUBiMxbLJawEleM8Eqbb9DItSP8G+YSbR7fdYCqCjGf62eBg6yTlTyzky6
+	S7FVV5NjnKvB6N+a3jZqDRhJsyBQX/alL7R6/hjEVaaKFGgz7qRNOv1C4bKONn6niRCX7x5SMka
+	uRE6TVEPmu4Au4OtTpqjv2aU82DOnDpJJ86XMiAhH2na5PJ25GToKTCdYHuv8fw0ceSE7vNcB+5
+	nRVEl0y5pWoKxbUqtCS2QBymBgLcGNSen63GjF1gFB1Vt67xkrLGZWdQT1+ZPWecSv5rMsnOILe
+	+1+Exb2OJo+0bmnUrMru5Tl7fAoC0cRRVIN3hKROJY2y2xAdGokfkFVWWXfJQ22t6LJI4Rc2M61
+	da3dMmOVmwgyQr8a+t6tjOQg7hiUrowp5c/Ihz1CzW3FAblKNueJKwPGLKry2xTkoj9e/FNSHTY
+	Ash9hq+kKOSD4H004bQ3ZF9qgtqGtm3d5hsdu6GwT3ltp/9OHCrEJWagi4CmDarwiDhQ==
+X-Google-Smtp-Source: AGHT+IFwFawjyprL+VHJsQfq2A4QRg6Hp0AFrY3h2r8j5KgsvmnqMgO6Eqm+eFSnxQRGXR21o0uvdQ==
+X-Received: by 2002:a17:902:c943:b0:267:9aa5:f6a6 with SMTP id d9443c01a7336-2951a470f8emr31237585ad.19.1761886107292;
+        Thu, 30 Oct 2025 21:48:27 -0700 (PDT)
 Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-295269bd2fesm7238875ad.105.2025.10.30.21.48.14
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-295269bd2fesm7238875ad.105.2025.10.30.21.48.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 21:48:17 -0700 (PDT)
+        Thu, 30 Oct 2025 21:48:26 -0700 (PDT)
 From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
 To: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
@@ -65,11 +67,15 @@ Cc: krzk+dt@kernel.org,
 	Ruud.Derwig@synopsys.com,
 	manjunath.hadli@vayavyalabs.com,
 	adityak@vayavyalabs.com,
-	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Subject: [PATCH v8 0/4] crypto: spacc - Add SPAcc Crypto Driver
-Date: Fri, 31 Oct 2025 10:17:59 +0530
-Message-Id: <20251031044803.400524-1-pavitrakumarm@vayavyalabs.com>
+	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>,
+	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v8 1/4] dt-bindings: crypto: Document support for SPAcc
+Date: Fri, 31 Oct 2025 10:18:00 +0530
+Message-Id: <20251031044803.400524-2-pavitrakumarm@vayavyalabs.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20251031044803.400524-1-pavitrakumarm@vayavyalabs.com>
+References: <20251031044803.400524-1-pavitrakumarm@vayavyalabs.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -78,129 +84,77 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the driver for SPAcc(Security Protocol Accelerator), which is a             
-crypto acceleration IP from Synopsys. The SPAcc supports multiple ciphers,      
-hashes and AEAD algorithms with various modes. The driver currently supports    
-below                                                                           
-                                                                                
-hash:                                                                           
-- cmac(aes)                                                                     
-- xcbc(aes)                                                                     
-- cmac(sm4)                                                                     
-- xcbc(sm4)                                                                     
-- hmac(md5)                                                                     
-- md5                                                                           
-- hmac(sha1)                                                                    
-- sha1                                                                          
-- sha224
-- sha256                                                                        
-- sha384                                                                        
-- sha512                                                                        
-- hmac(sha224)                                                                  
-- hmac(sha256)                                                                  
-- hmac(sha384)                                                                  
-- hmac(sha512)                                                                  
-- sha3-224                                                                      
-- sha3-256                                                                      
-- sha3-384                                                                      
-- sha3-512                                                                      
-- hmac(sm3)                                                                     
-- sm3                                                                           
-- michael_mic                                              
+Add DT bindings related to the SPAcc driver for Documentation.
+DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
+Engine is a crypto IP designed by Synopsys.
 
-Pavitrakumar Managutte (4):
-  dt-bindings: crypto: Document support for SPAcc
-  crypto: spacc - Add SPAcc ahash support
-  crypto: spacc - Add SPAcc AUTODETECT Support
-  crypto: spacc - Add SPAcc Kconfig and Makefile
-
-changelog:
-  v1->v2 changes:
-    - Added local_bh_disable() and local_bh_enable() for the below calls.
-      a. for ciphers skcipher_request_complete()
-      b. for aead aead_request_complete()
-      c. for hash ahash_request_complete()
-    - dt-bindings updates
-      a. removed snps,vspacc-priority and made it into config option
-      b. renamed snps,spacc-wdtimer to snps,spacc-internal-counter
-      c. Added description to all properties
-    - Updated corresponding dt-binding changes to code 
-
-  v2->v3 changes:
-    - cra_init and cra_exit replaced with init_tfm and exit_tfm for hashes.
-    - removed mutex_lock/unlock for spacc_skcipher_fallback call
-    - dt-bindings updates
-     a. updated SOC related information
-     b. renamed compatible string as per SOC
-   - Updated corresponding dt-binding changes to code 
-
-  v3->v4 changes:
-   - removed snps,vspacc-id from the dt-bindings 
-   - removed mutex_lock from ciphers
-   - replaced magic numbers with macros
-   - removed sw_fb variable from struct mode_tab and associated code from the
-     hashes
-   - polling code is replaced by wait_event_interruptible
-
-  v4->v5 changes:
-   - Updated to register with the crypto-engine
-   - Used semaphore to manage SPAcc device hardware context pool
-   - This patchset supports Hashes only 
-   - Dropping the support for Ciphers and AEADs in this patchset 
-   - Added Reviewed-by tag on the Device tree patch since it was reviewed on 
-     v4 patch by Krzysztof Kozlowski and Rob Herring (Arm)
-
-  v5->v6 changes:
-   - Removed CRYPTO_DEV_SPACC_CIPHER and CRYPTO_DEV_SPACC_AEAD Kconfig options,
-     since the cipher and aead support is not part of this patchset
-   - Dropped spacc_skcipher.o and spacc_aead.o from Makefile to fix build errors
-     reported by kernel test robot
-   - Added Reported-by and Closes tags as suggested
-
-  v6->v7 changes:
-   - Fixed build error reported by Kernel test robot
-   - Added Reported-by and Closes tags as suggested
-
-  v7->v8 changes:
-   - Fixed misleading comment: Clarified that only HMAC key pre-processing
-     is done in software, while the actual HMAC operation is performed by
-     hardware
-   - Simplified do_shash() function signature by removing unused parameters
-   - Updated all do_shash() call sites to use new simplified signature
-   - Fixed commit message formatting by adding "crypto: spacc - <subject>" to 
-     all patches
-   - used __free() for scope based resource management
-
- .../bindings/crypto/snps,dwc-spacc.yaml       |   50 +
- drivers/crypto/Kconfig                        |    1 +
- drivers/crypto/Makefile                       |    1 +
- drivers/crypto/dwc-spacc/Kconfig              |   88 +
- drivers/crypto/dwc-spacc/Makefile             |    8 +
- drivers/crypto/dwc-spacc/spacc_ahash.c        |  962 +++++++
- drivers/crypto/dwc-spacc/spacc_core.c         | 2393 +++++++++++++++++
- drivers/crypto/dwc-spacc/spacc_core.h         |  828 ++++++
- drivers/crypto/dwc-spacc/spacc_device.c       |  275 ++
- drivers/crypto/dwc-spacc/spacc_device.h       |  233 ++
- drivers/crypto/dwc-spacc/spacc_hal.c          |  374 +++
- drivers/crypto/dwc-spacc/spacc_hal.h          |  114 +
- drivers/crypto/dwc-spacc/spacc_interrupt.c    |  328 +++
- drivers/crypto/dwc-spacc/spacc_manager.c      |  613 +++++
- 14 files changed, 6268 insertions(+)
+Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
+Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+---
+ .../bindings/crypto/snps,dwc-spacc.yaml       | 50 +++++++++++++++++++
+ 1 file changed, 50 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
- create mode 100644 drivers/crypto/dwc-spacc/Kconfig
- create mode 100644 drivers/crypto/dwc-spacc/Makefile
- create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
- create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
- create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
- create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
- create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
- create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
- create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
- create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
- create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
 
-
-base-commit: 275a9a3f9b6a2158bfb7826074b72d5bdfb2ac35
+diff --git a/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+new file mode 100644
+index 000000000000..857e5c6d97fc
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+@@ -0,0 +1,50 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/snps,dwc-spacc.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Synopsys DesignWare Security Protocol Accelerator(SPAcc) Crypto Engine
++
++maintainers:
++  - Ruud Derwig <Ruud.Derwig@synopsys.com>
++
++description: |
++  The Synopsys DWC Security Protocol Accelerator (SPAcc), which is a
++  semiconductor IP designed to accelerate cryptographic operations,
++  such as encryption, decryption, and hashing.
++
++  In this configuration, the SPAcc IP is instantiated within the Synopsys
++  NSIMOSCI virtual SoC platform, a SystemC simulation environment used for
++  software development and testing. The device is accessed as a memory-mapped
++  peripheral and generates interrupts to the ARC interrupt controller.
++
++properties:
++  compatible:
++    items:
++      - const: snps,nsimosci-hs-spacc
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++  - interrupts
++
++additionalProperties: false
++
++examples:
++  - |
++    crypto@40000000 {
++        compatible = "snps,nsimosci-hs-spacc";
++        reg = <0x40000000 0x3ffff>;
++        interrupts = <28>;
++        clocks = <&clock>;
++    };
 -- 
 2.25.1
 
