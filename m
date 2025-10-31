@@ -1,63 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802662BEC3D;
-	Fri, 31 Oct 2025 14:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2997D2F1FF1
+	for <linux-crypto@vger.kernel.org>; Fri, 31 Oct 2025 19:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761922198; cv=none; b=mYMyG/kicdIeQnOXMIGigVGi83J2V9gtIZnECxJACGJ5t97s5EdUWN5S008enlj0XqKzBPeQPm+N5isTNSAVPLqnIDcN/23OpYJL9IyVz2Bqk9kqhgblKoQROZEfExPCxTkR6HTXA3NujASjG/hKbwZ6je7g9DVwNmX2NnL+GDE=
+	t=1761939023; cv=none; b=sexiq0EgXjvvZLfAgxw7PJA4nwsc9QyTaRksNQrbxyVfCNXD3/XNbLzaYXYKbwqnFpAdoe1x6Xtn3LiyT0E3txz4b8xsh4dubKWtI0e0XwN3Gb1kQExsiNnv7LYgem5p+9n0k/yxM9T0WtiDdMNUnOHRR3U3fa6pdl+9QKzps+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761922198; c=relaxed/simple;
-	bh=HLdqFGgxA0GPmDUUA7HdGRWTPcEU3gNNMC5MuOq7yi4=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=haj6SxxW5XSLQTtHQZmCzj2CZC/WNNhJW8BDltHwtgwu/Fv6YlwqAY7vhYvKVve0XTJlVnccE/OkIBRUulkgMBDhxhcj7huTq0gbs5+kLqZ9lNBVOK9urySYbBxQdhCHK/RNXl111rSZo3OPQONFqEoyvZDugtg+bGKDLgiMeqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PPMYv4Ip; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761939023; c=relaxed/simple;
+	bh=HRT1zrlw67YT/v0zGnHpiKEt+Ry9RY8D6BYLFaVppGs=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=o4mHtYwAVr+xg0HBOP0/AT8C/hN4jM6NyG7qSlXPcownKe+Pr/qKinUDn8nkThqExZhfqv5aWsjefYHOc26VYhmkUtPoacCaOL46PHNwzHQaG1bwhB2PY9TDKL3ea9sXmBjjJDLhUaB56iJcllWjIqSiZqlvxxTqrTBM1ufiG4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CP/LAixj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PPMYv4Ip"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CCBDC4CEE7;
-	Fri, 31 Oct 2025 14:49:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761922198;
-	bh=HLdqFGgxA0GPmDUUA7HdGRWTPcEU3gNNMC5MuOq7yi4=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=PPMYv4IpbeGeY/SqFnPVsiNu7sCu56fgR361h3BXCxrVjF89XaQ5SmBYO8f7YkAKe
-	 KAbB+KSYtL5geKS8TaomcpKq4QzGHO36zL/H6ug/aNcz1lcUbhcpKUzia7Bpfj4/OI
-	 +Zu7bKmAmz3nY97Zb+bCR4Txzsy1JpUTX3wEBRH6Xcgj6w0kKSTNYD33+c8IVC15sH
-	 +XFW9tLSUJI98+4LY5nphKCDLutHRf435U3dMsnMqSfxmaUJX96qCvPqpsIwwqgMhB
-	 hoVBsVt3wxzIZFKAncg1J1q+xeQRaLpqeclBHwYDJQD0A+p54gdowyA+/SSYFDbTw4
-	 5wD9NQYPDGzXA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEF63A82560;
-	Fri, 31 Oct 2025 14:49:35 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.18
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <aQR_duMIT385hw9N@gondor.apana.org.au>
-References: <aQR_duMIT385hw9N@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <aQR_duMIT385hw9N@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.18-p4
-X-PR-Tracked-Commit-Id: 3c9bf72cc1ced1297b235f9422d62b613a3fdae9
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3ad81aa52085a7e67edfa4bc8f518e5962196bb3
-Message-Id: <176192217420.504982.17366932003623482304.pr-tracker-bot@kernel.org>
-Date: Fri, 31 Oct 2025 14:49:34 +0000
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CP/LAixj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761939021;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SWgRT7WaYDoMlN1l4H+rmuJdT1C5jyRgb7Xd7l2YF2w=;
+	b=CP/LAixjEt6j/naYZsY0fJ6qiWxzic/Q7udHaUA103+KpAMEFE+1oBE95awFfSPfqY7SAd
+	PiKXLQ2d6E9zI8raISItvtpYMD0LujRPZH0DzxMWJvixRarrPeEMEmTi7ZkSYhM+BcSj2J
+	tvpwXp1Ru6w5QderVR/VQsBLjXqjsaE=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-668-lZ1S-KggMVeFoVz9gzeAxQ-1; Fri,
+ 31 Oct 2025 15:30:15 -0400
+X-MC-Unique: lZ1S-KggMVeFoVz9gzeAxQ-1
+X-Mimecast-MFC-AGG-ID: lZ1S-KggMVeFoVz9gzeAxQ_1761939012
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 747B21954B00;
+	Fri, 31 Oct 2025 19:30:11 +0000 (UTC)
+Received: from [10.45.225.163] (unknown [10.45.225.163])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2B2C118004D4;
+	Fri, 31 Oct 2025 19:30:03 +0000 (UTC)
+Date: Fri, 31 Oct 2025 20:29:58 +0100 (CET)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Askar Safin <safinaskar@gmail.com>
+cc: Dell.Client.Kernel@dell.com, brauner@kernel.org, dm-devel@lists.linux.dev, 
+    ebiggers@kernel.org, kix@kix.es, linux-block@vger.kernel.org, 
+    linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org, 
+    linux-lvm@lists.linux.dev, linux-mm@kvack.org, linux-pm@vger.kernel.org, 
+    linux-raid@vger.kernel.org, lvm-devel@lists.linux.dev, agk@redhat.com, 
+    msnitzer@redhat.com, milan@mazyland.cz, mzxreary@0pointer.de, 
+    nphamcs@gmail.com, pavel@ucw.cz, rafael@kernel.org, ryncsn@gmail.com, 
+    torvalds@linux-foundation.org
+Subject: Re: [PATCH] pm-hibernate: flush block device cache when
+ hibernating
+In-Reply-To: <20251027084220.2064289-1-safinaskar@gmail.com>
+Message-ID: <de1f0036-84f9-2923-2c0a-620e702d850b@redhat.com>
+References: <03e58462-5045-e12f-9af6-be2aaf19f32c@redhat.com> <20251027084220.2064289-1-safinaskar@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-The pull request you sent on Fri, 31 Oct 2025 17:20:54 +0800:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.18-p4
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3ad81aa52085a7e67edfa4bc8f518e5962196bb3
+On Mon, 27 Oct 2025, Askar Safin wrote:
 
-Thank you!
+> Mikulas Patocka <mpatocka@redhat.com>:
+> > Hi
+> > 
+> > Does this patch fix it?
+> > 
+> > Mikulas
+> > 
+> > 
+> > From: Mikulas Patocka <mpatocka@redhat.com>
+> > 
+> > There was reported failure that hibernation doesn't work with 
+> > dm-integrity. The reason for the failure is that the hibernation code 
+> > doesn't issue the FLUSH bio - the data still sits in the dm-integrity 
+> > cache and they are lost when poweroff happens.
+> 
+> I tested this patch in Qemu on current master (43e9ad0c55a3). Also I
+> applied Mario's patch
+> https://lore.kernel.org/linux-pm/20251026033115.436448-1-superm1@kernel.org/ .
+> It is needed, otherwise you get WARNING when you try to hibernate.
+> 
+> The patch doesn't work.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Yes, I see - the problem is harder than I thought.
+
+I've created two patches and I tested them that they work. So, you can try 
+them.
+
+Mikulas
+
