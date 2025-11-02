@@ -1,115 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E62534D3BA;
-	Sun,  2 Nov 2025 10:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D70F1D555;
+	Sun,  2 Nov 2025 12:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762080222; cv=none; b=sFzI8Z+HtEjM7X8/nqWKH+K4KW/D5eaCFMBBNnJJRJy4BQZSkoGjbePVurm1YsQvWvLG9zwXvb4A9bpC8iiIMM3x3xtpFzpLL4u65KXRG+k6SUZrPlOQIISM4GZW7EjqUMP/1nL4MwDqxh7Wby2FFLAkkIelHaRea+aiE2fRNQE=
+	t=1762087239; cv=none; b=DAMGuSO1dUyROb64GjLa5JtSiTo+8urEGEr7gFCS+QCOAIOnCB16aeJGWkUQcJw/lEeQJomvg35Q5IvM3YJ28TETUYJ+rb9i9+sxHIi6UGd0vLdk4Z0O0OFJwT7AigNSGImszFhyCjSIybg5K7/rt7OLQMFShZOenbBIv8VSdX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762080222; c=relaxed/simple;
-	bh=4u8d6QQgjLsALEyZL0hM355ahA8pgo9Ke2RDvhyV/FU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YcRFsyeTdzBB1FAc1+kdF1Xx7mYh/iBAnsBPke+spVFGtOJ+Gkruz8olYvwD2uH8e2GYs4NZsXIbo78AIOwtQQm3cNGb2fppvj45jwPpY1DtLjJZ7GOsFeR1Wb3QNs7xf/rWr5NNhNsUzTDJb6TmFsmLg1bCJQyC3cXcthsqb3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YojVFjn8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762087239; c=relaxed/simple;
+	bh=UiLGkKxUUFQd12okXQW2VCO11UtQ/Tqwtz5NydhJwoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZtDQ8Ajtr1rqSYsfcNmQKRddyzaoCnh5q3KeHWSgcuKVmCQLy+5ji93qz00WmxEtd5J/T2dWFWUmG9iZgCiVRqZsOCQoQOvYSxRZvtl+WgFkzNMjKR6GwdmNw9rlhc1S27sDkeAhONaw+2GMjnIEfKK7AjxDV+uW8R3ktxP7lBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=gSsuL0aJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YojVFjn8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E047CC4CEF7;
-	Sun,  2 Nov 2025 10:43:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762080221;
-	bh=4u8d6QQgjLsALEyZL0hM355ahA8pgo9Ke2RDvhyV/FU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YojVFjn8WsOc90BQ7IjaCvSpawTY/iFM2EPhYDD5dnGWRgy1V9yvL/MEqZ0TtAlR7
-	 bOb/fXVYiil59qXvBq/U3REBPlb5nBkGwDqRIYMBz5I0KEBRnvT5ZEiaYzNyd6y9Zf
-	 5IIUOWr69e6TstOOUFAcseA/Uh3WnpVn2+gfAVjCfVQRnOUA5ypJyOfrOHReuHp7Sg
-	 WGYh/9kMA2mX62kCZYu70IxtgYDcwIcClH+HreNxArWG+BioiWd94cJCtOu6NOrbBI
-	 1yerwBgfvmBsmLmV1VasI237/BiNNQOhrrQMTL8p3/eC2uQh+6fEkO+1LfX3YVL0KT
-	 1QsxP0qktpdJg==
-Date: Sun, 2 Nov 2025 10:43:26 +0000
-From: Jonathan Cameron <jic23@kernel.org>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Nicolas Ferre <nicolas.ferre@microchip.com>, Alexandre
- Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, David Miller
- <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
- Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery
- <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, Lars-Peter
- Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, Shan-Chun
- Hung <schung@nuvoton.com>, Yury Norov <yury.norov@gmail.com>, Rasmus
- Villemoes <linux@rasmusvillemoes.dk>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Johannes Berg <johannes@sipsolutions.net>,
- Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>, David Laight
- <david.laight.linux@gmail.com>, Vincent Mailhol
- <mailhol.vincent@wanadoo.fr>, Jason Baron <jbaron@akamai.com>, Borislav
- Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>, Michael Hennerich
- <Michael.Hennerich@analog.com>, Kim Seer Paller
- <kimseer.paller@analog.com>, David Lechner <dlechner@baylibre.com>, Nuno
- =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Andy Shevchenko <andy@kernel.org>,
- Richard Genoud <richard.genoud@bootlin.com>, Cosmin Tanislav
- <demonsingur@gmail.com>, Biju Das <biju.das.jz@bp.renesas.com>, Jianping
- Shen <Jianping.Shen@de.bosch.com>, linux-clk@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-edac@vger.kernel.org,
- qat-linux@intel.com, linux-gpio@vger.kernel.org,
- linux-aspeed@lists.ozlabs.org, linux-iio@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next v5 10/23] iio: imu: smi330: #undef
- field_{get,prep}() before definition
-Message-ID: <20251102104326.0f1db96a@jic23-huawei>
-In-Reply-To: <97549838f28a1bb7861cfb42ee687f832942b13a.1761588465.git.geert+renesas@glider.be>
-References: <cover.1761588465.git.geert+renesas@glider.be>
-	<97549838f28a1bb7861cfb42ee687f832942b13a.1761588465.git.geert+renesas@glider.be>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gSsuL0aJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FCEEC4CEF7;
+	Sun,  2 Nov 2025 12:40:38 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gSsuL0aJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1762087236;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h9MKNLoYzbnhsIIihKOGhPJkdpll2fUCa9lDyB4xrtA=;
+	b=gSsuL0aJfaGRUaPx0rDl30EMfbI3oGZihRaBYHf47O38cp+jVTpQTbGJ7Ib8f+b2zoT+NT
+	14DXCFdxKXY+n/FuOi8VqqkV1CedCRa0KZWAzl0A8RgfB9dz7CQgmu1YNx275zB2xQIo+j
+	0FxVZ1+sC8Jze7+jfCJHnzscrP6c9rA=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a2971529 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Sun, 2 Nov 2025 12:40:36 +0000 (UTC)
+Date: Sun, 2 Nov 2025 13:40:33 +0100
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] random: remove unused get_random_var_wait functions
+Message-ID: <aQdRQWiOpnt_RGX0@zx2c4.com>
+References: <20251102041941.74095-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251102041941.74095-1-ebiggers@kernel.org>
 
-On Mon, 27 Oct 2025 19:41:44 +0100
-Geert Uytterhoeven <geert+renesas@glider.be> wrote:
-
-> Prepare for the advent of globally available common field_get() and
-> field_prep() macros by undefining the symbols before defining local
-> variants.  This prevents redefinition warnings from the C preprocessor
-> when introducing the common macros later.
+On Sat, Nov 01, 2025 at 09:19:41PM -0700, Eric Biggers wrote:
+> None of these functions are used, so remove them.
 > 
-> Suggested-by: Yury Norov <yury.norov@gmail.com>
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-
-So this is going to make a mess of merging your series given this is
-queued up for next merge window.
-
-I can pick this one up perhaps and we loop back to the replacement of
-these in a future patch?  Or perhaps go instead with a rename
-of these two which is probably nicer in the intermediate state than
-undefs.
-
-> --
-> v5:
->   - New.
-> ---
->  drivers/iio/imu/smi330/smi330_core.c | 2 ++
->  1 file changed, 2 insertions(+)
+> This renders the two bugs moot:
 > 
-> diff --git a/drivers/iio/imu/smi330/smi330_core.c b/drivers/iio/imu/smi330/smi330_core.c
-> index d9178725ade3da83..a79964fe68fadf47 100644
-> --- a/drivers/iio/imu/smi330/smi330_core.c
-> +++ b/drivers/iio/imu/smi330/smi330_core.c
-> @@ -68,7 +68,9 @@
->  #define SMI330_SOFT_RESET_DELAY 2000
->  
->  /* Non-constant mask variant of FIELD_GET() and FIELD_PREP() */
-> +#undef field_get
->  #define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))
-> +#undef field_prep
->  #define field_prep(_mask, _val) (((_val) << (ffs(_mask) - 1)) & (_mask))
->  
->  #define SMI330_ACCEL_CHANNEL(_axis) {					\
+> - get_random_u64_wait() used the wrong pointer type, making it provide
+>   only 32 bits.
+> 
+> - The '#undef' directive used the wrong identifier, leaving the helper
+>   macro defined.
 
+Applied, thanks. And nice catch.
+
+Jason
