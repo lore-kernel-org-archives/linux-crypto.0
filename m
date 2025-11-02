@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A041F78F54;
-	Sun,  2 Nov 2025 01:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E78D1A83F8;
+	Sun,  2 Nov 2025 01:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762048184; cv=none; b=WTB+deQNFtPGJfZXQfOV90nKxFHnNrGarotFoKZ9IH2PTfR9eKjt8mMw40DpmthrJjLgFJ75zN6JZdLZ5TTPI2hCp1v9tQn++sGVJLzBc2JlJJGIVziB9gEdF6PgmEJn2W24ZM3CsccZJAtaMuQIf/QicwMSjyqDUOkw57Ra+oQ=
+	t=1762048426; cv=none; b=GKR+2Mz5IOZhlif80xEasSVEMbJqDDWnGPhMhYbG87eF8u50wP4qsDXnTRwGDD+fXtaSrZgKKEglgGS7SOSoO9KjAufjEzwedBsH4XSmcA6c3ZyPzFxNg1z6WdXZy7SO+DGM1dVU35t489dQunlKaKctd3rgOB7JPTs5Gcsjl50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762048184; c=relaxed/simple;
-	bh=LxQeUgunFc21LIZae/NTxauplw0Lbky943VHdgB/Pv8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JUPr7P14HuHpuybYzC+1m60pTsUKpdftv5k2Zxk15CTv8ocKXBtAFquB7wvsfpr2EB1J0H7glAPUIjFrY0jHuCbqTzS8KJfqSkpEo8aTQOhcVfTHDUfHZBLt/PKe0eNvNeU3pzQLsKU2L5JcxQfy5R+k7cm4AQSJEcO+sunAErE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RgdZuZgp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762048426; c=relaxed/simple;
+	bh=OSoR+A52Jyhxie9Qg/dzo0L+8Bjra/GYLQkxY5sUJTY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZVIeBqegSnvBJkXbiuXPL+5Lu5zrUv8uwKK9Vv5jS6vJclzPkqK6Hy+I+GRm0gNLVu43pT1IAY5ygqa4A0YeWON2JBJsPPJYMJX6l/6xRKrQASdjmOgC4H+dQmvLX11c8BXnbfaeUtul4GGYYIdQ1Jwlz/kSlnfpNRsLeVQQy/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FwZwKZGT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RgdZuZgp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDA4AC4CEF1;
-	Sun,  2 Nov 2025 01:49:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FwZwKZGT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4210C4CEF1;
+	Sun,  2 Nov 2025 01:53:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762048184;
-	bh=LxQeUgunFc21LIZae/NTxauplw0Lbky943VHdgB/Pv8=;
+	s=k20201202; t=1762048426;
+	bh=OSoR+A52Jyhxie9Qg/dzo0L+8Bjra/GYLQkxY5sUJTY=;
 	h=From:To:Cc:Subject:Date:From;
-	b=RgdZuZgpda8jftRQEl3ytHKLcEzEPuYC5EYYJM4E/rxaqjYmfBUAaAxPsBKw9ICkD
-	 By3/AS7/3r63YCQGkfQ15K60SXhFHHIcRrbFEKK/uxCEPUChoCUf8KYPyw40xt2WDB
-	 0Y9Sc8/FB3q12QfzEVpMxvWWsY5jhe7JMAAgnHJNaj+xwCXbdcVbb3TXjYkXHdc1ta
-	 5xaQwJuR/6OJe7OjqulomgSwgL6kY+aqpyZyyye/IKlL2uwe/kCdZ/Cex7Hj94+t79
-	 YWekdWymPCVFqFV1Q3G9bpZT/MeN3ez3yOc7RMTjbx6te9hnAOJWQj3WYcSeSwq7wb
-	 YleWKS4M/zTBA==
+	b=FwZwKZGTxjH9D4Fl+dCylFMtvpFY25xdlzZG9lJYyIxkeo7wvXSOxkm1GCa6txet2
+	 psOuJ/yLO8mFSODL4xDqMqooYFxNK7WmNwDrD67x4rGrUk0OuDXPTuovbTFt2DzBN3
+	 TqhRyv7Uz1YDMZzVvWE4qqE/aQZAvSL864EjsjkEKvzk0/XT5ri+8mtYJS9coHSe4Y
+	 mTScBIg/WDh/LS4av6xXb7NCSQna0iHxcz/+xRmfLYtVAhmul3qrESwASLa8vDpMfL
+	 7/fsz+LmyMB58ViEFYrrSzKHL0CV1EkEn/MiWqU371O9VOazIb53DypWjrGIL4tKwp
+	 ri+j9+eq6kEqg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -32,9 +32,9 @@ Cc: linux-kernel@vger.kernel.org,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: x86/blake2s: Drop check for nblocks == 0
-Date: Sat,  1 Nov 2025 18:49:37 -0700
-Message-ID: <20251102014937.171096-1-ebiggers@kernel.org>
+Subject: [PATCH] crypto: x86/aes-gcm-vaes-avx2 - initialize full %rax return register
+Date: Sat,  1 Nov 2025 18:52:56 -0700
+Message-ID: <20251102015256.171536-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -44,49 +44,37 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since blake2s_compress() is always passed nblocks != 0, remove the
-unnecessary check for nblocks == 0 from blake2s_compress_ssse3().
-
-Note that this makes it consistent with blake2s_compress_avx512() in the
-same file as well as the arm32 blake2s_compress().
+Update aes_gcm_dec_final_vaes_avx2() to be consistent with
+aes_gcm_dec_final_aesni() and aes_gcm_dec_final_vaes_avx512() by
+initializing the full %rax return register instead of just %al.
+Technically this is unnecessary, since these functions return bool.  But
+I think it's worth being extra careful with the result of the tag
+comparison and also keeping the different implementations consistent.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
 
 This patch is targeting libcrypto-next
 
- lib/crypto/x86/blake2s-core.S | 3 ---
- 1 file changed, 3 deletions(-)
+ arch/x86/crypto/aes-gcm-vaes-avx2.S | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/lib/crypto/x86/blake2s-core.S b/lib/crypto/x86/blake2s-core.S
-index ef8e9f427aab..7b820d3eda2c 100644
---- a/lib/crypto/x86/blake2s-core.S
-+++ b/lib/crypto/x86/blake2s-core.S
-@@ -43,12 +43,10 @@ SIGMA2:
- .byte 15,  5,  4, 13, 10,  7,  3, 11, 12,  2,  0,  6,  9,  8,  1, 14
- .byte  8,  7, 14, 11, 13, 15,  0, 12, 10,  4,  5,  6,  3,  2,  1,  9
- 
- .text
- SYM_FUNC_START(blake2s_compress_ssse3)
--	testq		%rdx,%rdx
--	je		.Lendofloop
- 	movdqu		(%rdi),%xmm0
- 	movdqu		0x10(%rdi),%xmm1
- 	movdqa		ROT16(%rip),%xmm12
- 	movdqa		ROR328(%rip),%xmm13
- 	movdqu		0x20(%rdi),%xmm14
-@@ -166,11 +164,10 @@ SYM_FUNC_START(blake2s_compress_ssse3)
- 	decq		%rdx
- 	jnz		.Lbeginofloop
- 	movdqu		%xmm0,(%rdi)
- 	movdqu		%xmm1,0x10(%rdi)
- 	movdqu		%xmm14,0x20(%rdi)
--.Lendofloop:
+diff --git a/arch/x86/crypto/aes-gcm-vaes-avx2.S b/arch/x86/crypto/aes-gcm-vaes-avx2.S
+index d9754e683bde..93c9504a488f 100644
+--- a/arch/x86/crypto/aes-gcm-vaes-avx2.S
++++ b/arch/x86/crypto/aes-gcm-vaes-avx2.S
+@@ -1121,10 +1121,11 @@ SYM_FUNC_END(aes_gcm_aad_update_vaes_avx2)
+ 	vpxor		(%rax), GHASH_ACC, GHASH_ACC
+ 	vaesenclast	GHASH_ACC, %xmm0, %xmm0
+ 	lea		.Lselect_high_bytes_table(%rip), %rax
+ 	vmovdqu		(%rax, TAGLEN64), %xmm1
+ 	vpshufb		BSWAP_MASK, %xmm1, %xmm1 // select low bytes, not high
++	xor		%eax, %eax
+ 	vptest		%xmm1, %xmm0
+ 	sete		%al
+ .endif
+ 	// No need for vzeroupper here, since only used xmm registers were used.
  	RET
- SYM_FUNC_END(blake2s_compress_ssse3)
- 
- SYM_FUNC_START(blake2s_compress_avx512)
- 	vmovdqu		(%rdi),%xmm0
 
 base-commit: 5a2a5e62a5216ba05d4481cf90d915f4de0bfde9
 -- 
