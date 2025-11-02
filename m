@@ -1,47 +1,41 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448A5189B84
-	for <linux-crypto@vger.kernel.org>; Sat,  1 Nov 2025 14:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9901234D3B4;
+	Sun,  2 Nov 2025 01:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762005914; cv=none; b=NOPTjz/B7T/efUNKwlrBnFxCWBHtsgx2KC1tegc6vT8E3GJEnCkvfZr6KKwpqnPIK5Oszbg7x6LWoZ5Iek2Ndeqo7NFa6TpzSWbWKhxbut0RE1M2zPLb4NoTmifAiRj79nbl8361xD6V2llb7prefS5r9/UTY4Ka26oEca2gKkE=
+	t=1762047955; cv=none; b=cYaVrW/COXQ/3I3sKVfD231kKJOUBCv0moXXqK0qaHPXsjQBQx5yHIBKeRuL0K/R2w/LxgRXr2fGTex7m4Ob+sCjtjV9RclbmpNC1iZ584dAWsoWNG+vWoUDP8vJ4YV8K+C56EpBWIX96vQG0wBm7+g2H2TXsNbg0BnRkw9RlOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762005914; c=relaxed/simple;
-	bh=SQ38qYTNJxk5DYz0GtHJiiInMCX0D2KO2qM0xpn1akg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lZ1svPh+k191FdAK8Io3p7X+bwLGbHbUXmuS1CGBQ1uc1YlkhhrTmnIv83RjO3O6TUFgkY+QO69s/FI2CAc3+z3nhQMztfjT9appvcyrwJKzNXJqIDR7WfblGl785zT9wABO8283SHCBTAxoHNsCJEUi1v3mf58fnCh1qdQDLoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TBgUo5xI; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1762047955; c=relaxed/simple;
+	bh=tgrI+I420JUQeKcc5dPb2Ro4SGq5TSKXKMzO89hc6bc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VgYRyQ25KvzKWtURpYy0oBx73ioipRNqj+FH5l6/gLUWCcHNjan79f6lj3VVDjZPJbFYcANal0Ujb/7qxlrz7EkFQTJqeIMRuQxzRIZ6dZuE/MEeiOIkUgn2sjLpa00YghEQ2EuSFmEnssu/aC79NGNDDNUUuNiv8vnNc46+7og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MqoUtjxJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TBgUo5xI"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762005896;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GeA2oPtPm0WGain9EgMxJLDlTytvn/JelbYftagDkAI=;
-	b=TBgUo5xIH0RcEGr3LoS4cfOyE5O7PsYWwEd+Yc9phTdUd6TRM+Kh97F2csTOOF/W5htME3
-	VDcWvB1DIrbEDGhqEv3jT2HXNLdYKhXBAZs1WatoW6CMxahzL6oipj6cIy2accYemYRwSP
-	R5Lx27drlAX7uD32T8R4GNWuT/xvrho=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MqoUtjxJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCBA8C4CEF1;
+	Sun,  2 Nov 2025 01:45:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762047955;
+	bh=tgrI+I420JUQeKcc5dPb2Ro4SGq5TSKXKMzO89hc6bc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MqoUtjxJ+qrE85r6Gthd8zh3RSUYuz1fZVlGCHAfvsw5ggPHzspx9716sTbdvaW6P
+	 KHWc/VjdgpM7bElDP29w/wQmQZLZw28LEa4iLWfdJM3Wo+R4xUVGFRApG56z2pczcm
+	 /h+OV7nrNEpeyFCAU4A0fgg1tpwU9MXf1zj3Y4rh/M37WGj/+HAyA8eUxrU85yB4Ob
+	 T4BCCh2mTQOMPvPiAxobTJZvHq1efKkLL9HFJoM4VGTySsX6b+JF54+uxBDADzSex0
+	 WbgydKZOZK9CwMX+9BPYBNz9AHa7J9QmJrQVq6+u30dK4QMIcF8pz+sSVbFB/5W/Io
+	 NMo3t3B1jKk0Q==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Sai Krishna <saikrishnag@marvell.com>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: octeontx2 - Replace deprecated strcpy in cpt_ucode_load_fw
-Date: Sat,  1 Nov 2025 15:04:42 +0100
-Message-ID: <20251101140445.2226-1-thorsten.blum@linux.dev>
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: arm/blake2s: Fix some comments
+Date: Sat,  1 Nov 2025 18:45:41 -0700
+Message-ID: <20251102014541.170188-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,48 +43,49 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-strcpy() is deprecated; use the safer strscpy() instead.
+Fix the indices in some comments in blake2s-core.S.
 
-The destination buffer is only zero-initialized for the first iteration
-and since strscpy() guarantees its NUL termination anyway, remove
-zero-initializing 'eng_type'.
-
-Link: https://github.com/KSPP/linux/issues/88
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-index ebdf4efa09d4..b5cc5401f704 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-@@ -3,6 +3,7 @@
+This is targeting libcrypto-next
+
+ lib/crypto/arm/blake2s-core.S | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/crypto/arm/blake2s-core.S b/lib/crypto/arm/blake2s-core.S
+index 14eb7c18a836..5553e473f131 100644
+--- a/lib/crypto/arm/blake2s-core.S
++++ b/lib/crypto/arm/blake2s-core.S
+@@ -207,22 +207,22 @@ ENTRY(blake2s_compress)
+ 	_le32_bswap_8x	r2, r3, r4, r5, r6, r7, r8, r9,  r14
+ 	stmia		r12, {r2-r9}
+ .Lcopy_block_done:
+ 	str		r1, [sp, #68]		// Update message pointer
  
- #include <linux/ctype.h>
- #include <linux/firmware.h>
-+#include <linux/string.h>
- #include <linux/string_choices.h>
- #include "otx2_cptpf_ucode.h"
- #include "otx2_cpt_common.h"
-@@ -458,13 +459,13 @@ static int cpt_ucode_load_fw(struct pci_dev *pdev, struct fw_info_t *fw_info,
- 			     u16 rid)
- {
- 	char filename[OTX2_CPT_NAME_LENGTH];
--	char eng_type[8] = {0};
-+	char eng_type[8];
- 	int ret, e, i;
+-	// Calculate v[8..15].  Push v[9..15] onto the stack, and leave space
++	// Calculate v[8..15].  Push v[10..15] onto the stack, and leave space
+ 	// for spilling v[8..9].  Leave v[8..9] in r8-r9.
+ 	mov		r14, r0			// r14 = ctx
+ 	adr		r12, .Lblake2s_IV
+ 	ldmia		r12!, {r8-r9}		// load IV[0..1]
+ 	__ldrd		r0, r1, r14, 40		// load f[0..1]
+-	ldm		r12, {r2-r7}		// load IV[3..7]
++	ldm		r12, {r2-r7}		// load IV[2..7]
+ 	eor		r4, r4, r10		// v[12] = IV[4] ^ t[0]
+ 	eor		r5, r5, r11		// v[13] = IV[5] ^ t[1]
+ 	eor		r6, r6, r0		// v[14] = IV[6] ^ f[0]
+ 	eor		r7, r7, r1		// v[15] = IV[7] ^ f[1]
+-	push		{r2-r7}			// push v[9..15]
++	push		{r2-r7}			// push v[10..15]
+ 	sub		sp, sp, #8		// leave space for v[8..9]
  
- 	INIT_LIST_HEAD(&fw_info->ucodes);
+ 	// Load h[0..7] == v[0..7].
+ 	ldm		r14, {r0-r7}
  
- 	for (e = 1; e < OTX2_CPT_MAX_ENG_TYPES; e++) {
--		strcpy(eng_type, get_eng_type_str(e));
-+		strscpy(eng_type, get_eng_type_str(e));
- 		for (i = 0; i < strlen(eng_type); i++)
- 			eng_type[i] = tolower(eng_type[i]);
- 
+
+base-commit: 5a2a5e62a5216ba05d4481cf90d915f4de0bfde9
 -- 
-2.51.1
+2.51.2
 
