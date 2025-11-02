@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65864200BA1;
-	Sun,  2 Nov 2025 01:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A041F78F54;
+	Sun,  2 Nov 2025 01:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762048096; cv=none; b=eDA849XSc1lXqpjVHGcuQQPWBT0gRUCGQiCcel8vnZEx24jc9oBuhprd3ll8V+9G3fFGYh2nwQWviBj9pfEr2YVToHnW1AJ8gMq+oE8HgMfUQuK1XzUVsEECyu1rAu/mIkN0GyofXCcwuzQvXOtaMtqmtFu5Ag8U6Eme8pmTJ44=
+	t=1762048184; cv=none; b=WTB+deQNFtPGJfZXQfOV90nKxFHnNrGarotFoKZ9IH2PTfR9eKjt8mMw40DpmthrJjLgFJ75zN6JZdLZ5TTPI2hCp1v9tQn++sGVJLzBc2JlJJGIVziB9gEdF6PgmEJn2W24ZM3CsccZJAtaMuQIf/QicwMSjyqDUOkw57Ra+oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762048096; c=relaxed/simple;
-	bh=Ybw8qSmobsr6AnuhrJxqY7qIbI8MGWuX/zhkoes8ZcU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LFfvDJwSCcQ2vQ1AdZP+LBNloXkMbktRkgNOn+7gZu45uZGCj7hppEchPHkFyIzCChln3R5nFM6BaJ71EEJxKi5lGy2rAK5IUYs/VoOttCv4g0nhB6AYZZO2NT9ze/3whYuCBAe+NPEz5LjaRKcRFi2upLcyVF03lXe3YG6e6+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FvZZU8v5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762048184; c=relaxed/simple;
+	bh=LxQeUgunFc21LIZae/NTxauplw0Lbky943VHdgB/Pv8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JUPr7P14HuHpuybYzC+1m60pTsUKpdftv5k2Zxk15CTv8ocKXBtAFquB7wvsfpr2EB1J0H7glAPUIjFrY0jHuCbqTzS8KJfqSkpEo8aTQOhcVfTHDUfHZBLt/PKe0eNvNeU3pzQLsKU2L5JcxQfy5R+k7cm4AQSJEcO+sunAErE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RgdZuZgp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FvZZU8v5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A925C4CEF1;
-	Sun,  2 Nov 2025 01:48:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RgdZuZgp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDA4AC4CEF1;
+	Sun,  2 Nov 2025 01:49:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762048096;
-	bh=Ybw8qSmobsr6AnuhrJxqY7qIbI8MGWuX/zhkoes8ZcU=;
+	s=k20201202; t=1762048184;
+	bh=LxQeUgunFc21LIZae/NTxauplw0Lbky943VHdgB/Pv8=;
 	h=From:To:Cc:Subject:Date:From;
-	b=FvZZU8v5fOmcOd70b4MBz3xJUZvKh36blo52ruoDCA1+YMFtr86GHBfeqLwK+A3Xv
-	 5/dJjZj+KAl+ywyGx0v4VDqf7uoHD5R+O1HD9FhMTMWIQBmw2o3GkiHTT81gS6nyJV
-	 7R2JIt40lWf48dbEp3b7xz/qS/Dah+79Oqahx9McwG3SpxYWaO9yHmfVhvBpAPO70N
-	 9DlxQm5D1O3hmBrvyhBSm2D+XIVu6vCUh8ueKnqFj9uwYXT+SXSyCxuAI6IQggAfTV
-	 retA5MItkY2WsQ5bIag4i5mDQ/sTxkD3zCLfDfA1OK1VFhVz4OTiLDWFZo0Zw3s2Fy
-	 EaeXoQLIgzWUg==
+	b=RgdZuZgpda8jftRQEl3ytHKLcEzEPuYC5EYYJM4E/rxaqjYmfBUAaAxPsBKw9ICkD
+	 By3/AS7/3r63YCQGkfQ15K60SXhFHHIcRrbFEKK/uxCEPUChoCUf8KYPyw40xt2WDB
+	 0Y9Sc8/FB3q12QfzEVpMxvWWsY5jhe7JMAAgnHJNaj+xwCXbdcVbb3TXjYkXHdc1ta
+	 5xaQwJuR/6OJe7OjqulomgSwgL6kY+aqpyZyyye/IKlL2uwe/kCdZ/Cex7Hj94+t79
+	 YWekdWymPCVFqFV1Q3G9bpZT/MeN3ez3yOc7RMTjbx6te9hnAOJWQj3WYcSeSwq7wb
+	 YleWKS4M/zTBA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -32,9 +32,9 @@ Cc: linux-kernel@vger.kernel.org,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: arm, arm64: Drop filenames from file comments
-Date: Sat,  1 Nov 2025 18:48:06 -0700
-Message-ID: <20251102014809.170713-1-ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: x86/blake2s: Drop check for nblocks == 0
+Date: Sat,  1 Nov 2025 18:49:37 -0700
+Message-ID: <20251102014937.171096-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -42,109 +42,51 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Remove self-references to filenames from assembly files in
-lib/crypto/arm/ and lib/crypto/arm64/.  This follows the recommended
-practice and eliminates an outdated reference to sha2-ce-core.S.
+Since blake2s_compress() is always passed nblocks != 0, remove the
+unnecessary check for nblocks == 0 from blake2s_compress_ssse3().
+
+Note that this makes it consistent with blake2s_compress_avx512() in the
+same file as well as the arm32 blake2s_compress().
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
 
 This patch is targeting libcrypto-next
 
- lib/crypto/arm/sha1-armv7-neon.S  | 2 +-
- lib/crypto/arm/sha1-ce-core.S     | 2 +-
- lib/crypto/arm/sha256-ce.S        | 2 +-
- lib/crypto/arm64/sha1-ce-core.S   | 2 +-
- lib/crypto/arm64/sha256-ce.S      | 2 +-
- lib/crypto/arm64/sha512-ce-core.S | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
+ lib/crypto/x86/blake2s-core.S | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/lib/crypto/arm/sha1-armv7-neon.S b/lib/crypto/arm/sha1-armv7-neon.S
-index 6edba3ab62e8..a0323fa5c58a 100644
---- a/lib/crypto/arm/sha1-armv7-neon.S
-+++ b/lib/crypto/arm/sha1-armv7-neon.S
-@@ -1,7 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0-or-later */
--/* sha1-armv7-neon.S - ARM/NEON accelerated SHA-1 transform function
-+/* ARM/NEON accelerated SHA-1 transform function
-  *
-  * Copyright © 2013-2014 Jussi Kivilinna <jussi.kivilinna@iki.fi>
-  */
+diff --git a/lib/crypto/x86/blake2s-core.S b/lib/crypto/x86/blake2s-core.S
+index ef8e9f427aab..7b820d3eda2c 100644
+--- a/lib/crypto/x86/blake2s-core.S
++++ b/lib/crypto/x86/blake2s-core.S
+@@ -43,12 +43,10 @@ SIGMA2:
+ .byte 15,  5,  4, 13, 10,  7,  3, 11, 12,  2,  0,  6,  9,  8,  1, 14
+ .byte  8,  7, 14, 11, 13, 15,  0, 12, 10,  4,  5,  6,  3,  2,  1,  9
  
- #include <linux/linkage.h>
-diff --git a/lib/crypto/arm/sha1-ce-core.S b/lib/crypto/arm/sha1-ce-core.S
-index 2de40dd25e47..7d6b2631ca8d 100644
---- a/lib/crypto/arm/sha1-ce-core.S
-+++ b/lib/crypto/arm/sha1-ce-core.S
-@@ -1,8 +1,8 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
- /*
-- * sha1-ce-core.S - SHA-1 secure hash using ARMv8 Crypto Extensions
-+ * SHA-1 secure hash using ARMv8 Crypto Extensions
-  *
-  * Copyright (C) 2015 Linaro Ltd.
-  * Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-  */
+ .text
+ SYM_FUNC_START(blake2s_compress_ssse3)
+-	testq		%rdx,%rdx
+-	je		.Lendofloop
+ 	movdqu		(%rdi),%xmm0
+ 	movdqu		0x10(%rdi),%xmm1
+ 	movdqa		ROT16(%rip),%xmm12
+ 	movdqa		ROR328(%rip),%xmm13
+ 	movdqu		0x20(%rdi),%xmm14
+@@ -166,11 +164,10 @@ SYM_FUNC_START(blake2s_compress_ssse3)
+ 	decq		%rdx
+ 	jnz		.Lbeginofloop
+ 	movdqu		%xmm0,(%rdi)
+ 	movdqu		%xmm1,0x10(%rdi)
+ 	movdqu		%xmm14,0x20(%rdi)
+-.Lendofloop:
+ 	RET
+ SYM_FUNC_END(blake2s_compress_ssse3)
  
-diff --git a/lib/crypto/arm/sha256-ce.S b/lib/crypto/arm/sha256-ce.S
-index 7481ac8e6c0d..144ee805f64a 100644
---- a/lib/crypto/arm/sha256-ce.S
-+++ b/lib/crypto/arm/sha256-ce.S
-@@ -1,8 +1,8 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
- /*
-- * sha256-ce.S - SHA-224/256 secure hash using ARMv8 Crypto Extensions
-+ * SHA-224/256 secure hash using ARMv8 Crypto Extensions
-  *
-  * Copyright (C) 2015 Linaro Ltd.
-  * Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-  */
- 
-diff --git a/lib/crypto/arm64/sha1-ce-core.S b/lib/crypto/arm64/sha1-ce-core.S
-index 21efbbafd7d6..8fbd4767f0f0 100644
---- a/lib/crypto/arm64/sha1-ce-core.S
-+++ b/lib/crypto/arm64/sha1-ce-core.S
-@@ -1,8 +1,8 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
- /*
-- * sha1-ce-core.S - SHA-1 secure hash using ARMv8 Crypto Extensions
-+ * SHA-1 secure hash using ARMv8 Crypto Extensions
-  *
-  * Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
-  */
- 
- #include <linux/linkage.h>
-diff --git a/lib/crypto/arm64/sha256-ce.S b/lib/crypto/arm64/sha256-ce.S
-index 410174ba5237..e4bfe42a61a9 100644
---- a/lib/crypto/arm64/sha256-ce.S
-+++ b/lib/crypto/arm64/sha256-ce.S
-@@ -1,8 +1,8 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
- /*
-- * sha2-ce-core.S - core SHA-224/SHA-256 transform using v8 Crypto Extensions
-+ * Core SHA-224/SHA-256 transform using v8 Crypto Extensions
-  *
-  * Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
-  */
- 
- #include <linux/linkage.h>
-diff --git a/lib/crypto/arm64/sha512-ce-core.S b/lib/crypto/arm64/sha512-ce-core.S
-index 22f1ded89bc8..ffd51acfd1ee 100644
---- a/lib/crypto/arm64/sha512-ce-core.S
-+++ b/lib/crypto/arm64/sha512-ce-core.S
-@@ -1,8 +1,8 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- /*
-- * sha512-ce-core.S - core SHA-384/SHA-512 transform using v8 Crypto Extensions
-+ * Core SHA-384/SHA-512 transform using v8 Crypto Extensions
-  *
-  * Copyright (C) 2018 Linaro Ltd <ard.biesheuvel@linaro.org>
-  *
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License version 2 as
+ SYM_FUNC_START(blake2s_compress_avx512)
+ 	vmovdqu		(%rdi),%xmm0
 
 base-commit: 5a2a5e62a5216ba05d4481cf90d915f4de0bfde9
 -- 
