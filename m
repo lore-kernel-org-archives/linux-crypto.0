@@ -1,67 +1,76 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5FC2D9796
-	for <linux-crypto@vger.kernel.org>; Mon,  3 Nov 2025 08:16:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622DD2C3247
+	for <linux-crypto@vger.kernel.org>; Mon,  3 Nov 2025 08:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762157786; cv=none; b=KDXreognQ0xMQT+k/0wA6lt3UbUqXJZKm7m5f8KDXl7Bm8P7kRRDPPo6etm9t/xuuz3cxxj84CspP/Q5LWHB5Gd9JvjreOjrs3cxetglwo1I6DbN8koxmKuR7MTu1WWj83fj1Povsswaljku65HusgdTgMxdp5FrMjXxWcSqMZc=
+	t=1762157817; cv=none; b=YFylas1hV2XZ7hReokQAIO8DzqOQjbfu1Xelui1vwj08ANpQf/ei1GE4C/q6XHWJ1dgDwFVyfCJ0ypGZgbqjz8a13HFjzN/X1es2zd7KVCCR3ed1Mia0NayUQXPzBMSp/LPD8NCscHIgBBE3BOPdAGb0wfAfrbh2Jp8OzT8fKuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762157786; c=relaxed/simple;
-	bh=c154LS7C223aeWXiB3Ll1avPbtgcFEIhPTiTybi8syM=;
+	s=arc-20240116; t=1762157817; c=relaxed/simple;
+	bh=WgEI7eEHVqz24S0MjBdhNQ4iYzouwo5KfLOuQiAPpbw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eKnVKr4u4C6TtiHXKxlxztSm1LQPjHBgzKvIaR4STTdWEeEtFsGRMbgRmJNnUNMnITq1KR/lkf327Hd8xDECmhXmFHiVCibyGe046TBX4Sw29amUQdgJ69V+bcEPdFLz9HddBIFMiFPg4dbDpm9GaZVBVqVp3Zswav6nVyfdX7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sN9y6uap; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=d7fbs87h7JUZEy0UMmAO+xt4j6XYPLNLH3/YO8enW8afDcHUqRwCz2GSb1QlWFxsQs1BT+JNRxrR2bPyssMCmEyBdC3l4JRopEeGl6dDakJRSonJnzOWl3lxSm9eQ0TGETZdWhJ4JPuOydfXZkLhuXkipweWH6pQQDRjW0eBAD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpPsGbJR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sN9y6uap"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3A0BC4AF09
-	for <linux-crypto@vger.kernel.org>; Mon,  3 Nov 2025 08:16:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpPsGbJR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 182D2C4AF09
+	for <linux-crypto@vger.kernel.org>; Mon,  3 Nov 2025 08:16:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762157785;
-	bh=c154LS7C223aeWXiB3Ll1avPbtgcFEIhPTiTybi8syM=;
+	s=k20201202; t=1762157817;
+	bh=WgEI7eEHVqz24S0MjBdhNQ4iYzouwo5KfLOuQiAPpbw=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=sN9y6uapHy4tzZAHcHYrItEVUdGQ6UFg90NAfNAODAM1Fq3MJjJUXDBJmrgpPzEMf
-	 pqCnoxaZ60frcHquvMK6C5ppdFQlnjtS/0cDW7Ze8Zxt3CIIZwYcGBvynxqzFmyO1f
-	 EghcwtqUHs9vHxtA9iKyxFoZDYrCFmtJjJ2ds4Nx0vqZC+gut3yNQcSdpVp7Q3yJen
-	 O3jbysdGWVrWs3xujcQQxzdFRVvEQHhtcU1YAarRcD2wtDfUMXN8DBE6syQF/dz+ho
-	 EhMgTpj7cwy0CuAhOwiIwsiHXRUoG0Om7QuXg0qcJDf/VTTjsjExqUrmvvcSKH9k9I
-	 iPRq6hqHoAEcw==
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-37a38e56dd5so3687991fa.0
-        for <linux-crypto@vger.kernel.org>; Mon, 03 Nov 2025 00:16:25 -0800 (PST)
-X-Gm-Message-State: AOJu0Yw7zfTsBMKJ+bAL7B9En7fKKY4+01F9iSP4YZhfYjcz71P1ldu7
-	tC1XKGAcNLLSFJyUrecZ2uWVpFGHfVrpytYAWeB9rpj72B9iDtpz9GYOewSs64LHgw44jTK5Cq/
-	pcs5/WoUYhJfJ4qCvZ8XZG5ozQc8LElU=
-X-Google-Smtp-Source: AGHT+IF4ACwkJR8bwJb7M6QwxTxIEvoPGvLDZOprvgt3QSaFTHynE+1LONAwGjdGlx58bOvJItp+XwzJ/15PYothuaQ=
-X-Received: by 2002:a2e:be1a:0:b0:37a:3615:89f2 with SMTP id
- 38308e7fff4ca-37a36159157mr8317061fa.9.1762157784129; Mon, 03 Nov 2025
- 00:16:24 -0800 (PST)
+	b=YpPsGbJRe3l8L9kG6h4nDc1iNtQeMoUrVZolqwsF9C15xGS1og8XvxNqWqCyk2Dmn
+	 e9FePOkX1GYfMaWPo78UNFo1ldhVLXHRgBEqVWPqhsHDYREBfMSv3i2qqpEziTfMd7
+	 wPb0E4o/Gi+T8gBouSv3JhWey5LQLYbPNIG4xHvXb1WHxxvOzJ8D7U3M9QsEDA5q+6
+	 PtFWxQtKj20Zjyyp86+TKms06ZKSLzJrMAEbdutrAD78LxoIkBgT+0mQW4aHV1OqRJ
+	 2XfQCqh2drz8qkHyNbLTqS0ndXNcHbvIbrgAgO6QyId/UjEriNDZK6ZY7qEZnwEOy9
+	 9wpO8Z8ZacT+A==
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-57992ba129eso5083124e87.3
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Nov 2025 00:16:57 -0800 (PST)
+X-Gm-Message-State: AOJu0Yy2Q+MfCr68xD2wOlT6TVKgto1mkjVVhmB44ziMj11a09E2aP00
+	gjmeQRQwA/BNmF34jqc7xhnwXMwZcJeMFhXbmtjcXcGZVue68J+QGPy4mb0iPS8cNktyHo5r4NN
+	lW1r9jiCjwriFfKcS38VqTBCvZSvux9w=
+X-Google-Smtp-Source: AGHT+IG+lOQrU1AFbtrAgnHhD2b8jTjTxqKjskKGvoenJjx4bjsY6sELSD4i3JTmYaduhKts49p7W/ILOW5vg1lLps0=
+X-Received: by 2002:a05:6512:2390:b0:594:2a78:fab8 with SMTP id
+ 2adb3069b0e04-5942a78fd55mr1151440e87.3.1762157815476; Mon, 03 Nov 2025
+ 00:16:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251102014541.170188-1-ebiggers@kernel.org> <20251102021553.176587-1-ebiggers@kernel.org>
-In-Reply-To: <20251102021553.176587-1-ebiggers@kernel.org>
+References: <20251102015256.171536-1-ebiggers@kernel.org>
+In-Reply-To: <20251102015256.171536-1-ebiggers@kernel.org>
 From: Ard Biesheuvel <ardb@kernel.org>
-Date: Mon, 3 Nov 2025 09:16:12 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXEGLTgM2njWdNTuGtYE3jETgVwBFYdHk52V-N1oYC6=pQ@mail.gmail.com>
-X-Gm-Features: AWmQ_bnEQ-UJpVxlFN-w4khvNkXXvYEeaSS0zddlmSeN1qlxIDjfciglxjhkk_g
-Message-ID: <CAMj1kXEGLTgM2njWdNTuGtYE3jETgVwBFYdHk52V-N1oYC6=pQ@mail.gmail.com>
-Subject: Re: [PATCH v2] lib/crypto: arm/blake2s: Fix some comments
+Date: Mon, 3 Nov 2025 09:16:43 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEJAqt6_QKg12Ejf6RRpvOfh5bhPRg-7wwoB-A8uDKj6Q@mail.gmail.com>
+X-Gm-Features: AWmQ_bnrKcIgct_2mhYFy7vlTQrJxZdAswF-L9lo7h8EFLBPyzRueadWJqf44zE
+Message-ID: <CAMj1kXEJAqt6_QKg12Ejf6RRpvOfh5bhPRg-7wwoB-A8uDKj6Q@mail.gmail.com>
+Subject: Re: [PATCH] crypto: x86/aes-gcm-vaes-avx2 - initialize full %rax
+ return register
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	"Jason A . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>
 Content-Type: text/plain; charset="UTF-8"
 
-On Sun, 2 Nov 2025 at 03:16, Eric Biggers <ebiggers@kernel.org> wrote:
+On Sun, 2 Nov 2025 at 02:53, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> Fix the indices in some comments in blake2s-core.S.
+> Update aes_gcm_dec_final_vaes_avx2() to be consistent with
+> aes_gcm_dec_final_aesni() and aes_gcm_dec_final_vaes_avx512() by
+> initializing the full %rax return register instead of just %al.
+> Technically this is unnecessary, since these functions return bool.  But
+> I think it's worth being extra careful with the result of the tag
+> comparison and also keeping the different implementations consistent.
 >
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
 >
-> v2: Fixed the same mistake in another place.
+> This patch is targeting libcrypto-next
+>
+>  arch/x86/crypto/aes-gcm-vaes-avx2.S | 1 +
+>  1 file changed, 1 insertion(+)
 >
 
 Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
