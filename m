@@ -1,41 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF6E31A579;
-	Mon,  3 Nov 2025 17:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12ED31AF3C;
+	Mon,  3 Nov 2025 17:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762191391; cv=none; b=ZtGDnbFlmefWU+zlEAwy1a3c/TD5zdX8L+QfV8qW7xFQ5ywS3a9mPb1AdtufdfSOdBC0kuczid7qe7zm2RqxcMX1RxSBz2ulHfXEGUfYvwjJoeirbcmFgN9jSiwA5WK68Gj0nwnipFL9MrM1pyiCKn4SaQCSvYRl+uS41XDLEy8=
+	t=1762191411; cv=none; b=EoqJi1kZIXup2V2i6Dv2O5m2/Xien1C+Bq5ErsZnflAe82mW0ZtFh+7GKE0elsDZlXWaU6HF2H6yMiCHc5WR7b/zwAf+Gu9w++iQXnIk6/+yiZEU8emJDURs/x6fDfpg8vdyDxh9zX1DbTeCT+KgDcpWL7+x0GbeS/IzqqOxA9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762191391; c=relaxed/simple;
-	bh=9EcSpTnGG+3lF1LspBXYvB/oLK+tUJK+pPR4eGAWoF8=;
+	s=arc-20240116; t=1762191411; c=relaxed/simple;
+	bh=RT/KjfpFsFH8lkq+Zj6GW/iKKp9K1F7T3uWdzH94VzE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BgbbFAdH+4eUK6r/41Bg+xPUCZb58vW5ScO/213llH/bEEHsQ7rNuz1mT9YR+KX8x5y59bDKmbJynjreo+rfC0PY5QrUZp7aR032c9kQGtMLerNbg1kfj45Y8WdmhIk4kRtGme1R2KG0Otf+uplxMFpInxnDGDmJBCw54oVeShc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KubwgKY0; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=UpXpNvB7uC85wx5W6jIrtG+FvemJyXq7jChP+0a/l91dSZmmYevoPvDMOS1SaU8X01diDipESdnQ4Ybh2xazVKpf8Y2bRPx7I4fAq63/ZL+AozIjIk6VFxYMXK6oVfdWAIxFPP/BzOn7pa7xkPApW8itvgAIF9NOb8bF3DHlQPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0ojfsKQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KubwgKY0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A529AC4CEE7;
-	Mon,  3 Nov 2025 17:36:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0ojfsKQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22133C4CEE7;
+	Mon,  3 Nov 2025 17:36:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762191390;
-	bh=9EcSpTnGG+3lF1LspBXYvB/oLK+tUJK+pPR4eGAWoF8=;
+	s=k20201202; t=1762191410;
+	bh=RT/KjfpFsFH8lkq+Zj6GW/iKKp9K1F7T3uWdzH94VzE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KubwgKY0KUWVM7l32G93OfNgqEAOEsAC8ZB6ZzBpRG/tHOd+U4kcNVvPR0geDHYY5
-	 5tSwUj/WFukSVhgNqwfCXw+lJ7lFrl68S9RgvusAZYrFniazel03A9N4oBhjv0Ha7j
-	 thaFrVS/Zn4MNWqXY7y/cKCG/Cl/ts/PGDw0k2/0VJh0aWgfLh4xZPTKz3P2TIH46u
-	 RT3j5vIYjCQLKeG9FOtYLl6Hh0sTx4hwHvJc9Ai4VO9L+KYWrp/hqxUbKrfRx8vd9h
-	 VM26QhMcg9hpiAukTzEYORdExDHsp4yVRs/ZTmLfZV8jdEGsat/T7AvWecGKwTm8/3
-	 l+L02LCN6R0Uw==
-Date: Mon, 3 Nov 2025 09:34:49 -0800
+	b=n0ojfsKQVvgJZHw/MqBgX2n1kdLlaljE8QjOJc/q9ftJQnD08JS7jOSHRrUZl5QIv
+	 kB+lVQkDQTH+4Qpee7PsuXxWGn9hG+brQyUctnq7q3ND0MsB6aKQQj2h0mW22DYy+z
+	 c52pCvThqh56ocHiSNDyvQqrNTwp7QrqmGFwm0Q/kVXQGA0MbLAqIAyTi2DfYQiUGP
+	 aWgl5f68Sg5FfSKPxzfIIaasKsPTIUmm8A1uJfIDVz6dvp+PWBAZdZCUsUtrsKTua2
+	 kM3C7thnR/uN1lir0SJO/95962bkYY8eFPSER94PU+K1zrtPvvb7cCR1wc++fPuSzU
+	 Xn60tcnAz347A==
+Date: Mon, 3 Nov 2025 09:35:09 -0800
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] lib/crypto: arm/blake2s: Fix some comments
-Message-ID: <20251103173449.GF1735@sol>
-References: <20251102014541.170188-1-ebiggers@kernel.org>
- <20251102021553.176587-1-ebiggers@kernel.org>
+Subject: Re: [PATCH] lib/crypto: arm, arm64: Drop filenames from file comments
+Message-ID: <20251103173509.GG1735@sol>
+References: <20251102014809.170713-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,15 +43,15 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251102021553.176587-1-ebiggers@kernel.org>
+In-Reply-To: <20251102014809.170713-1-ebiggers@kernel.org>
 
-On Sat, Nov 01, 2025 at 07:15:53PM -0700, Eric Biggers wrote:
-> Fix the indices in some comments in blake2s-core.S.
+On Sat, Nov 01, 2025 at 06:48:06PM -0700, Eric Biggers wrote:
+> Remove self-references to filenames from assembly files in
+> lib/crypto/arm/ and lib/crypto/arm64/.  This follows the recommended
+> practice and eliminates an outdated reference to sha2-ce-core.S.
 > 
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
-> 
-> v2: Fixed the same mistake in another place.
 > 
 > This patch is targeting libcrypto-next
 
