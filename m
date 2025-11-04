@@ -1,48 +1,48 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07D13128D2;
-	Tue,  4 Nov 2025 09:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A31313270;
+	Tue,  4 Nov 2025 09:12:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762247562; cv=none; b=FsZlZvaC8/BTnsx1xYLvyPR3BDB4/of6fos+HOMzU+qacD+/cXsLTZu3qCzvLuGflc/ldHbEozKbI/eGrwNccZbGT18axPYy7Lxh9FSylU5qpJfR28bL5Bsgz9/c6iY1VR9bB/ZNHl+GeghqbpSh9m5LcAH60Fq0iISLRKjpFbU=
+	t=1762247564; cv=none; b=Lk+cwxKd+ED4httsbSNCNoXR2Ev1NJXf5ezlTPZu66zYrzdHccSZTmIHv/w7ODNOJ5DX6EtrneSCR2jveSX1wnhBFXZF2dhqJb4hn08mVEqCCFada1YPiMEc4K4YdtK36lFs6wTP9rRCjUdl8gS97AT7YGVpGziaYIihJkAyUOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762247562; c=relaxed/simple;
-	bh=uknpE8VMoJmFrFc9hOoaqzCVgRiwBhnyr7a2KMGbfxE=;
+	s=arc-20240116; t=1762247564; c=relaxed/simple;
+	bh=6i4unP24Rk75I3UX9HXmZHA/5/EFm2CM3Ncnume5Re8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rQsuosKTmD7cyn02hKKAEiVnuHmlRaNohCyIC/FqZdTBYPPqmvWOkItcnA/o9kZS7g0SnXkmJSNd9DFQpx0YgKjFedqb7H3nUREH0cfAJsddvnZHV32qSeO4sfC2ANOCjMmRIRK3WCrMrXlDgVfUZ0QMS6sY+jIhnYHifmUmOw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jbxnXelk; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=NDA5Kn7E5MZn/lz6tXtJFs2DtNM0AEzDvniogSUS3UHxfnDT38KoNE3BH8Xi5hCstAPNYAFWmvJCGevRHcCLhIk/y/HEEGVMPH6rlGe+VTRRhyET30zw+5PPlQFKqLZThDMl8GjQxaqhshSspBBbaVlN3H7G/Qhz4ahqbcmPwpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fjyPeS0S; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jbxnXelk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fjyPeS0S"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762247560; x=1793783560;
+  t=1762247562; x=1793783562;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=uknpE8VMoJmFrFc9hOoaqzCVgRiwBhnyr7a2KMGbfxE=;
-  b=jbxnXelk/CbSCvjzfwILA7T+EOe1vVtG62tqeIqx2q72S2PduNmC/yOj
-   O38bKJolzC5Tvu3POR5dHWO7FaHBwBpaeHeZEgeAx/xYofP96oYfl+cW/
-   h8UhDUvmHGYkJPogNYBlxQr295ogHbjjxb+M3f7Ig31MxPqm71ScHYvBb
-   jK3x/x3dARbJ65hm7LSHpuuOJoP0wdDxehWp2nDKeHBEWW4bSf+FotL+R
-   WW3bTXlu86E+7uBBfZ4rhzUNeoUWzSP0ykYPo/Gqy9IG2SBwtYYgOmKqu
-   /Bwt+vGhublTo/ZpjUFlSwyax4n1c/94+2ErENf84laE2IPtiiMkFHL3r
-   A==;
-X-CSE-ConnectionGUID: 9NogMkXwQ72RX9V+Uw73aA==
-X-CSE-MsgGUID: EHv294ioRh2Q6IP1FCxZEQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="89798676"
+  bh=6i4unP24Rk75I3UX9HXmZHA/5/EFm2CM3Ncnume5Re8=;
+  b=fjyPeS0SSfKCUnAEo44wsXoAXIWdrS/IrL8GE7AkC8XWLO4OmcIdkWfq
+   fKpjqtU77jYUpOi03m898mXEpcCmjRs1t6/i+giVQzv08UzI+U161OlhY
+   n0Y5Lc2GcaYKtLh3c4AMz5jUOnzlQ22SiKCjBgxAfUAeNC2T2s389rPsA
+   Hsp7zAFdZOE/sTYgVwjXD2dkyEBO4zAyD+8taMzzvxCNk0xNxZQLQ71U0
+   6spP9d7Tq9M0O5iXt/yLIcA/LQ0wZn7ORK3kgN9cbexZDjKfJRTshStnh
+   LzmQhN5s7DWmfXKK1zAK7D+cuH2OTsBmAJqsk8LURhAxKs9xORcxuR1qD
+   Q==;
+X-CSE-ConnectionGUID: 7WI0t5foThWA42ySXJrm+w==
+X-CSE-MsgGUID: YixwK111RkWqR5ZV+ONrwQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="89798677"
 X-IronPort-AV: E=Sophos;i="6.19,278,1754982000"; 
-   d="scan'208";a="89798676"
+   d="scan'208";a="89798677"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
   by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 01:12:37 -0800
-X-CSE-ConnectionGUID: ydEucLK2Qlq/OFcpWRQf+A==
-X-CSE-MsgGUID: FRqJEPPDRdSINjQHBgxntg==
+X-CSE-ConnectionGUID: Sl2IvojiT7CLXTI6diAbgg==
+X-CSE-MsgGUID: WpZ5vlf8TTGJzCqEgZJfug==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,278,1754982000"; 
-   d="scan'208";a="186795785"
+   d="scan'208";a="186795788"
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
-  by orviesa009.jf.intel.com with ESMTP; 04 Nov 2025 01:12:37 -0800
+  by orviesa009.jf.intel.com with ESMTP; 04 Nov 2025 01:12:38 -0800
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 To: linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org,
@@ -70,9 +70,9 @@ To: linux-kernel@vger.kernel.org,
 Cc: wajdi.k.feghali@intel.com,
 	vinodh.gopal@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v13 04/22] crypto: iaa - Descriptor allocation timeouts with mitigations.
-Date: Tue,  4 Nov 2025 01:12:17 -0800
-Message-Id: <20251104091235.8793-5-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v13 05/22] crypto: iaa - iaa_wq uses percpu_refs for get/put reference counting.
+Date: Tue,  4 Nov 2025 01:12:18 -0800
+Message-Id: <20251104091235.8793-6-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20251104091235.8793-1-kanchana.p.sridhar@intel.com>
 References: <20251104091235.8793-1-kanchana.p.sridhar@intel.com>
@@ -84,206 +84,270 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch modifies the descriptor allocation from blocking to
-non-blocking with bounded retries or "timeouts".
+This patch modifies the reference counting on "struct iaa_wq" to be a
+percpu_ref in atomic mode, instead of an "int refcount" combined with
+the "idxd->dev_lock" spin_lock currently used as a synchronization
+mechanism to achieve get/put semantics.
 
-This is necessary to prevent task blocked errors in high contention
-scenarios, for instance, when the platform has only 1 IAA device
-enabled. With 1 IAA device enabled per package on a dual-package
-Sapphire Rapids with 56 cores/package, there are 112 logical cores
-mapped to this single IAA device. In this scenario, the task blocked
-errors can occur because idxd_alloc_desc() is called with
-IDXD_OP_BLOCK. With batching, multiple descriptors will need to be
-allocated per batch. Any process that is able to do so, can cause
-contention for allocating descriptors for all other processes that share
-the use of the same sbitmap_queue. Under IDXD_OP_BLOCK, this causes
-compress/decompress jobs to stall in stress test scenarios
-(e.g. zswap_store() of 2M folios).
+This enables a more light-weight, cleaner and effective refcount
+implementation for the iaa_wq, that prevents race conditions and
+significantly reduces batch compress/decompress latency submitted to
+the IAA accelerator.
 
-In order to make the iaa_crypto driver be more fail-safe, this commit
-implements the following:
+For a single-threaded madvise-based workload with the Silesia.tar
+dataset, these are the before/after batch compression latencies for a
+compress batch of 8 pages:
 
-1) Change compress/decompress descriptor allocations to be non-blocking
-   with retries ("timeouts").
-2) Return compress error to zswap if descriptor allocation with timeouts
-   fails during compress ops. zswap_store() will return an error and the
-   folio gets stored in the backing swap device.
-3) Fallback to software decompress if descriptor allocation with timeouts
-   fails during decompress ops.
-
-With these fixes, there are no task blocked errors seen under stress
-testing conditions, and no performance degradation observed.
+ ==================================
+               p50 (ns)    p99 (ns)
+ ==================================
+ before           5,576       5,992
+ after            5,472       5,848
+ Change            -104        -144
+ ==================================
 
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 ---
- drivers/crypto/intel/iaa/iaa_crypto.h      |  5 ++
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 58 +++++++++++++++-------
- 2 files changed, 44 insertions(+), 19 deletions(-)
+ drivers/crypto/intel/iaa/iaa_crypto.h      |   4 +-
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 119 +++++++--------------
+ 2 files changed, 41 insertions(+), 82 deletions(-)
 
 diff --git a/drivers/crypto/intel/iaa/iaa_crypto.h b/drivers/crypto/intel/iaa/iaa_crypto.h
-index 549ac98a9366..cc76a047b54a 100644
+index cc76a047b54a..9611f2518f42 100644
 --- a/drivers/crypto/intel/iaa/iaa_crypto.h
 +++ b/drivers/crypto/intel/iaa/iaa_crypto.h
-@@ -21,6 +21,9 @@
+@@ -47,8 +47,8 @@ struct iaa_wq {
+ 	struct list_head	list;
  
- #define IAA_COMPLETION_TIMEOUT		1000000
+ 	struct idxd_wq		*wq;
+-	int			ref;
+-	bool			remove;
++	struct percpu_ref	ref;
++	bool			free;
+ 	bool			mapped;
  
-+#define IAA_ALLOC_DESC_COMP_TIMEOUT	   1000
-+#define IAA_ALLOC_DESC_DECOMP_TIMEOUT	    500
-+
- #define IAA_ANALYTICS_ERROR		0x0a
- #define IAA_ERROR_DECOMP_BUF_OVERFLOW	0x0b
- #define IAA_ERROR_COMP_BUF_OVERFLOW	0x19
-@@ -141,6 +144,8 @@ enum iaa_mode {
- 
- struct iaa_compression_ctx {
- 	enum iaa_mode	mode;
-+	u16		alloc_comp_desc_timeout;
-+	u16		alloc_decomp_desc_timeout;
- 	bool		verify_compress;
- 	bool		async_mode;
- 	bool		use_irq;
+ 	struct iaa_device	*iaa_device;
 diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 44d4e2494bf3..89e59ef89a69 100644
+index 89e59ef89a69..ca53445a0a7f 100644
 --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
 +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -1602,7 +1602,8 @@ static int iaa_compress_verify(struct crypto_tfm *tfm, struct acomp_req *req,
- 	struct iaa_compression_ctx *ctx = crypto_tfm_ctx(tfm);
- 	u32 *compression_crc = acomp_request_ctx(req);
- 	struct iaa_device *iaa_device;
--	struct idxd_desc *idxd_desc;
-+	struct idxd_desc *idxd_desc = ERR_PTR(-EAGAIN);
-+	u16 alloc_desc_retries = 0;
- 	struct iax_hw_desc *desc;
- 	struct idxd_device *idxd;
- 	struct iaa_wq *iaa_wq;
-@@ -1618,7 +1619,11 @@ static int iaa_compress_verify(struct crypto_tfm *tfm, struct acomp_req *req,
+@@ -701,7 +701,7 @@ static void del_iaa_device(struct iaa_device *iaa_device)
  
- 	active_compression_mode = get_iaa_device_compression_mode(iaa_device, ctx->mode);
- 
--	idxd_desc = idxd_alloc_desc(wq, IDXD_OP_BLOCK);
-+	while ((idxd_desc == ERR_PTR(-EAGAIN)) && (alloc_desc_retries++ < ctx->alloc_decomp_desc_timeout)) {
-+		idxd_desc = idxd_alloc_desc(wq, IDXD_OP_NONBLOCK);
-+		cpu_relax();
-+	}
-+
- 	if (IS_ERR(idxd_desc)) {
- 		dev_dbg(dev, "iaa compress_verify failed: idxd descriptor allocation failure: ret=%ld\n", PTR_ERR(idxd_desc));
- 		return -ENODEV;
-@@ -1778,7 +1783,8 @@ static int iaa_compress(struct crypto_tfm *tfm, struct acomp_req *req,
- 	struct iaa_compression_ctx *ctx = crypto_tfm_ctx(tfm);
- 	u32 *compression_crc = acomp_request_ctx(req);
- 	struct iaa_device *iaa_device;
--	struct idxd_desc *idxd_desc;
-+	struct idxd_desc *idxd_desc = ERR_PTR(-EAGAIN);
-+	u16 alloc_desc_retries = 0;
- 	struct iax_hw_desc *desc;
- 	struct idxd_device *idxd;
- 	struct iaa_wq *iaa_wq;
-@@ -1794,7 +1800,11 @@ static int iaa_compress(struct crypto_tfm *tfm, struct acomp_req *req,
- 
- 	active_compression_mode = get_iaa_device_compression_mode(iaa_device, ctx->mode);
- 
--	idxd_desc = idxd_alloc_desc(wq, IDXD_OP_BLOCK);
-+	while ((idxd_desc == ERR_PTR(-EAGAIN)) && (alloc_desc_retries++ < ctx->alloc_comp_desc_timeout)) {
-+		idxd_desc = idxd_alloc_desc(wq, IDXD_OP_NONBLOCK);
-+		cpu_relax();
-+	}
-+
- 	if (IS_ERR(idxd_desc)) {
- 		dev_dbg(dev, "iaa compress failed: idxd descriptor allocation failure: ret=%ld\n",
- 			PTR_ERR(idxd_desc));
-@@ -1869,7 +1879,8 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 	struct iaa_device_compression_mode *active_compression_mode;
- 	struct iaa_compression_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct iaa_device *iaa_device;
--	struct idxd_desc *idxd_desc;
-+	struct idxd_desc *idxd_desc = ERR_PTR(-EAGAIN);
-+	u16 alloc_desc_retries = 0;
- 	struct iax_hw_desc *desc;
- 	struct idxd_device *idxd;
- 	struct iaa_wq *iaa_wq;
-@@ -1885,12 +1896,17 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 
- 	active_compression_mode = get_iaa_device_compression_mode(iaa_device, ctx->mode);
- 
--	idxd_desc = idxd_alloc_desc(wq, IDXD_OP_BLOCK);
-+	while ((idxd_desc == ERR_PTR(-EAGAIN)) && (alloc_desc_retries++ < ctx->alloc_decomp_desc_timeout)) {
-+		idxd_desc = idxd_alloc_desc(wq, IDXD_OP_NONBLOCK);
-+		cpu_relax();
-+	}
-+
- 	if (IS_ERR(idxd_desc)) {
- 		ret = -ENODEV;
- 		dev_dbg(dev, "%s: idxd descriptor allocation failed: ret=%ld\n", __func__,
- 			PTR_ERR(idxd_desc));
--		return ret;
-+		idxd_desc = NULL;
-+		goto fallback_software_decomp;
- 	}
- 	desc = idxd_desc->iax_hw;
- 
-@@ -1919,7 +1935,7 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 	ret = idxd_submit_desc(wq, idxd_desc);
- 	if (ret) {
- 		dev_dbg(dev, "submit_desc failed ret=%d\n", ret);
--		goto err;
-+		goto fallback_software_decomp;
- 	}
- 
- 	/* Update stats */
-@@ -1932,19 +1948,21 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 	}
- 
- 	ret = check_completion(dev, idxd_desc->iax_completion, false, false);
-+
-+fallback_software_decomp:
- 	if (ret) {
--		dev_dbg(dev, "%s: check_completion failed ret=%d\n", __func__, ret);
--		if (idxd_desc->iax_completion->status == IAA_ANALYTICS_ERROR) {
-+		dev_dbg(dev, "%s: desc allocation/submission/check_completion failed ret=%d\n", __func__, ret);
-+		if (idxd_desc && idxd_desc->iax_completion->status == IAA_ANALYTICS_ERROR) {
- 			pr_warn("%s: falling back to deflate-generic decompress, "
- 				"analytics error code %x\n", __func__,
- 				idxd_desc->iax_completion->error_code);
--			ret = deflate_generic_decompress(req);
--			if (ret) {
--				dev_dbg(dev, "%s: deflate-generic failed ret=%d\n",
--					__func__, ret);
--				goto err;
--			}
--		} else {
-+		}
-+
-+		ret = deflate_generic_decompress(req);
-+
-+		if (ret) {
-+			pr_err("%s: iaa decompress failed: deflate-generic fallback error ret=%d\n",
-+			       __func__, ret);
- 			goto err;
- 		}
- 	} else {
-@@ -2125,6 +2143,8 @@ static int iaa_comp_adecompress(struct acomp_req *req)
- 
- static void compression_ctx_init(struct iaa_compression_ctx *ctx)
+ static void free_iaa_device(struct iaa_device *iaa_device)
  {
-+	ctx->alloc_comp_desc_timeout = IAA_ALLOC_DESC_COMP_TIMEOUT;
-+	ctx->alloc_decomp_desc_timeout = IAA_ALLOC_DESC_DECOMP_TIMEOUT;
- 	ctx->verify_compress = iaa_verify_compress;
- 	ctx->async_mode = async_mode;
- 	ctx->use_irq = use_irq;
-@@ -2139,10 +2159,10 @@ static int iaa_comp_init_fixed(struct crypto_acomp *acomp_tfm)
- 	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp_tfm);
- 	struct iaa_compression_ctx *ctx = crypto_tfm_ctx(tfm);
+-	if (!iaa_device)
++	if (!iaa_device || iaa_device->n_wq)
+ 		return;
  
--	compression_ctx_init(ctx);
--
- 	ctx->mode = IAA_MODE_FIXED;
+ 	remove_device_compression_modes(iaa_device);
+@@ -731,6 +731,13 @@ static bool iaa_has_wq(struct iaa_device *iaa_device, struct idxd_wq *wq)
+ 	return false;
+ }
  
-+	compression_ctx_init(ctx);
++static void __iaa_wq_release(struct percpu_ref *ref)
++{
++	struct iaa_wq *iaa_wq = container_of(ref, typeof(*iaa_wq), ref);
 +
++	iaa_wq->free = true;
++}
++
+ static int add_iaa_wq(struct iaa_device *iaa_device, struct idxd_wq *wq,
+ 		      struct iaa_wq **new_wq)
+ {
+@@ -738,11 +745,20 @@ static int add_iaa_wq(struct iaa_device *iaa_device, struct idxd_wq *wq,
+ 	struct pci_dev *pdev = idxd->pdev;
+ 	struct device *dev = &pdev->dev;
+ 	struct iaa_wq *iaa_wq;
++	int ret;
+ 
+ 	iaa_wq = kzalloc(sizeof(*iaa_wq), GFP_KERNEL);
+ 	if (!iaa_wq)
+ 		return -ENOMEM;
+ 
++	ret = percpu_ref_init(&iaa_wq->ref, __iaa_wq_release,
++			      PERCPU_REF_INIT_ATOMIC, GFP_KERNEL);
++
++	if (ret) {
++		kfree(iaa_wq);
++		return -ENOMEM;
++	}
++
+ 	iaa_wq->wq = wq;
+ 	iaa_wq->iaa_device = iaa_device;
+ 	idxd_wq_set_private(wq, iaa_wq);
+@@ -818,6 +834,9 @@ static void __free_iaa_wq(struct iaa_wq *iaa_wq)
+ 	if (!iaa_wq)
+ 		return;
+ 
++	WARN_ON(!percpu_ref_is_zero(&iaa_wq->ref));
++	percpu_ref_exit(&iaa_wq->ref);
++
+ 	iaa_device = iaa_wq->iaa_device;
+ 	if (iaa_device->n_wq == 0)
+ 		free_iaa_device(iaa_wq->iaa_device);
+@@ -912,53 +931,6 @@ static int save_iaa_wq(struct idxd_wq *wq)
  	return 0;
  }
+ 
+-static int iaa_wq_get(struct idxd_wq *wq)
+-{
+-	struct idxd_device *idxd = wq->idxd;
+-	struct iaa_wq *iaa_wq;
+-	int ret = 0;
+-
+-	spin_lock(&idxd->dev_lock);
+-	iaa_wq = idxd_wq_get_private(wq);
+-	if (iaa_wq && !iaa_wq->remove) {
+-		iaa_wq->ref++;
+-		idxd_wq_get(wq);
+-	} else {
+-		ret = -ENODEV;
+-	}
+-	spin_unlock(&idxd->dev_lock);
+-
+-	return ret;
+-}
+-
+-static int iaa_wq_put(struct idxd_wq *wq)
+-{
+-	struct idxd_device *idxd = wq->idxd;
+-	struct iaa_wq *iaa_wq;
+-	bool free = false;
+-	int ret = 0;
+-
+-	spin_lock(&idxd->dev_lock);
+-	iaa_wq = idxd_wq_get_private(wq);
+-	if (iaa_wq) {
+-		iaa_wq->ref--;
+-		if (iaa_wq->ref == 0 && iaa_wq->remove) {
+-			idxd_wq_set_private(wq, NULL);
+-			free = true;
+-		}
+-		idxd_wq_put(wq);
+-	} else {
+-		ret = -ENODEV;
+-	}
+-	spin_unlock(&idxd->dev_lock);
+-	if (free) {
+-		__free_iaa_wq(iaa_wq);
+-		kfree(iaa_wq);
+-	}
+-
+-	return ret;
+-}
+-
+ /***************************************************************
+  * Mapping IAA devices and wqs to cores with per-cpu wq_tables.
+  ***************************************************************/
+@@ -1771,7 +1743,7 @@ static void iaa_desc_complete(struct idxd_desc *idxd_desc,
+ 
+ 	if (free_desc)
+ 		idxd_free_desc(idxd_desc->wq, idxd_desc);
+-	iaa_wq_put(idxd_desc->wq);
++	percpu_ref_put(&iaa_wq->ref);
+ }
+ 
+ static int iaa_compress(struct crypto_tfm *tfm, struct acomp_req *req,
+@@ -2002,19 +1974,13 @@ static int iaa_comp_acompress(struct acomp_req *req)
+ 	cpu = get_cpu();
+ 	wq = comp_wq_table_next_wq(cpu);
+ 	put_cpu();
+-	if (!wq) {
+-		pr_debug("no wq configured for cpu=%d\n", cpu);
+-		return -ENODEV;
+-	}
+ 
+-	ret = iaa_wq_get(wq);
+-	if (ret) {
++	iaa_wq = wq ? idxd_wq_get_private(wq) : NULL;
++	if (unlikely(!iaa_wq || !percpu_ref_tryget(&iaa_wq->ref))) {
+ 		pr_debug("no wq available for cpu=%d\n", cpu);
+ 		return -ENODEV;
+ 	}
+ 
+-	iaa_wq = idxd_wq_get_private(wq);
+-
+ 	dev = &wq->idxd->pdev->dev;
+ 
+ 	nr_sgs = dma_map_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
+@@ -2067,7 +2033,7 @@ static int iaa_comp_acompress(struct acomp_req *req)
+ err_map_dst:
+ 	dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
+ out:
+-	iaa_wq_put(wq);
++	percpu_ref_put(&iaa_wq->ref);
+ 
+ 	return ret;
+ }
+@@ -2089,19 +2055,13 @@ static int iaa_comp_adecompress(struct acomp_req *req)
+ 	cpu = get_cpu();
+ 	wq = decomp_wq_table_next_wq(cpu);
+ 	put_cpu();
+-	if (!wq) {
+-		pr_debug("no wq configured for cpu=%d\n", cpu);
+-		return -ENODEV;
+-	}
+ 
+-	ret = iaa_wq_get(wq);
+-	if (ret) {
++	iaa_wq = wq ? idxd_wq_get_private(wq) : NULL;
++	if (unlikely(!iaa_wq || !percpu_ref_tryget(&iaa_wq->ref))) {
+ 		pr_debug("no wq available for cpu=%d\n", cpu);
+-		return -ENODEV;
++		return deflate_generic_decompress(req);
+ 	}
+ 
+-	iaa_wq = idxd_wq_get_private(wq);
+-
+ 	dev = &wq->idxd->pdev->dev;
+ 
+ 	nr_sgs = dma_map_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
+@@ -2136,7 +2096,7 @@ static int iaa_comp_adecompress(struct acomp_req *req)
+ err_map_dst:
+ 	dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
+ out:
+-	iaa_wq_put(wq);
++	percpu_ref_put(&iaa_wq->ref);
+ 
+ 	return ret;
+ }
+@@ -2309,7 +2269,6 @@ static void iaa_crypto_remove(struct idxd_dev *idxd_dev)
+ 	struct idxd_wq *wq = idxd_dev_to_wq(idxd_dev);
+ 	struct idxd_device *idxd = wq->idxd;
+ 	struct iaa_wq *iaa_wq;
+-	bool free = false;
+ 
+ 	atomic_set(&iaa_crypto_enabled, 0);
+ 	idxd_wq_quiesce(wq);
+@@ -2330,18 +2289,18 @@ static void iaa_crypto_remove(struct idxd_dev *idxd_dev)
+ 		goto out;
+ 	}
+ 
+-	if (iaa_wq->ref) {
+-		iaa_wq->remove = true;
+-	} else {
+-		wq = iaa_wq->wq;
+-		idxd_wq_set_private(wq, NULL);
+-		free = true;
+-	}
++	/* Drop the initial reference. */
++	percpu_ref_kill(&iaa_wq->ref);
++
++	while (!iaa_wq->free)
++		cpu_relax();
++
++	__free_iaa_wq(iaa_wq);
++
++	idxd_wq_set_private(wq, NULL);
+ 	spin_unlock(&idxd->dev_lock);
+-	if (free) {
+-		__free_iaa_wq(iaa_wq);
+-		kfree(iaa_wq);
+-	}
++
++	kfree(iaa_wq);
+ 
+ 	idxd_drv_disable_wq(wq);
  
 -- 
 2.27.0
