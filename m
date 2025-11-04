@@ -1,125 +1,148 @@
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A332D8DD0;
-	Tue,  4 Nov 2025 12:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF18257836
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Nov 2025 15:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762260072; cv=none; b=H40qHw5X33I7qB/89o9+jusQBQt86M+Iui/DCvMjbuOmf01wFFmRBFSxAra+OuCDQ0Qde6kEnN/3ihCEANjizRUfi8ZLAF6HeLwiWsFZ5egOxphmz3eLGVZhKL5BzBWIIJ41BRvb/BHb/1x7Xha7pPSkqkf3IVCxFLVyx4T2048=
+	t=1762270361; cv=none; b=IL5+tryqNpCjcuY0IgUN7XEeu8cVzb2ONDuP2RG3u4BfSAlP0X7v6QlikrPDW3H0TlxDggfdcUkmzkrInHaRbt8RtW8spsDEvdUCI+5Ri+qVq64XeBfL53WLtcQXznPDjHQNqwLujjDLRBSv1uvn+hSLkV0No2Wot5nTuYlm+No=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762260072; c=relaxed/simple;
-	bh=asMVvWaDfRW//ZOtOFF0CvCOuu/R5Hw+oNHDV3Cvk8Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tJCl+RlLFV2NdT7ult32ZiXnOL3NAYJhPJhYja0pJdiiVNyxb0UBYo838TlLRSSi5oTkgBi/DQDPJJyMjP0CIaWQwaUX4EAcHeFHvrI2eIM5f+0SwqJ13QHSZVxsCtX9jE7A3loAtWsd94gJhgf92J34iL7TR2B6FWSfdj1daRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=h-partners.com; dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b=ZYp3+Ern; arc=none smtp.client-ip=113.46.200.222
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=h-partners.com
+	s=arc-20240116; t=1762270361; c=relaxed/simple;
+	bh=8ucPxln4jCUuHFhw/d6Q11VjxjnmrQRrHkqL4b1Kkeg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y07eIA7iuyKB4xEKuX9gfJNm6pYwLhf2kgwua/Nmtshv17LpT3ZRTJYgoy6rR1ZMsyVhlSarlOUL7eUrkniIfac4UmH2os1HFAYyO/EFzRreArc2rM5MKdn4y4l2rTit9WbR5486yWBnyJWSS9svz4JuhfJ65mLfCA29exUNyrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2EPE5c/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b="ZYp3+Ern"
-dkim-signature: v=1; a=rsa-sha256; d=h-partners.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=3uXoQaYvR1z5GQkw6T1nnphvPuxtVByjX6LrFkv7c5A=;
-	b=ZYp3+ErnpScjfSEx3YxParwax6XWkI+5qA/h3UVi5WjdWJTznzjjdps/zSeFctfVst6ZMhABn
-	qwrKvOWm9qy/7x3u8WiHVmBU0lucQgHbpC8sx/5IHrntZ9CxaV8r2nlpx5lRG0HnutMqWVIHnKH
-	uXFkuNNFahHDj6cN2iBVdWM=
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4d17Ln0SlMzLlT0;
-	Tue,  4 Nov 2025 20:39:29 +0800 (CST)
-Received: from kwepemk200007.china.huawei.com (unknown [7.202.194.73])
-	by mail.maildlp.com (Postfix) with ESMTPS id 66D121A0188;
-	Tue,  4 Nov 2025 20:41:03 +0800 (CST)
-Received: from [10.67.121.172] (10.67.121.172) by
- kwepemk200007.china.huawei.com (7.202.194.73) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 4 Nov 2025 20:41:02 +0800
-Message-ID: <12a8a634-f256-45e8-be74-a283e8edce9c@hisilicon.com>
-Date: Tue, 4 Nov 2025 20:41:02 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2EPE5c/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90EADC4CEF7
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Nov 2025 15:32:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762270361;
+	bh=8ucPxln4jCUuHFhw/d6Q11VjxjnmrQRrHkqL4b1Kkeg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=e2EPE5c/iiYhzgcYCbz55pMXl2qSKkkMnUVtPulbwAO6u99+Shf3FP95kREg0IXhC
+	 B4Wt9Sry1YTldXDY89BrRStt3l2ju/TJCul/a2Bhs2bDoJvKeT+kibcvhSw8fVBEVb
+	 drQeiUd0D/EF4/5iOseSGP+kEvBwDuU5dvOB0efMFp5bGe+PT54w5yQrHQBmSC8ThL
+	 jvFRlXZpd3lPx8vi5OU8mZAig6qvSw9JZ/i8BRIEvFS/9geR3yP0wvLo7P2Tk1wiYc
+	 KC6o9dIYNWuRd7V1V8fLIovimPSfvz2QIoPFn2/0A8QQHHNAvpSJErxScY/Car2A5J
+	 jegtfQx7Qvbwg==
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-37775ed97daso64476611fa.0
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Nov 2025 07:32:41 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXqAYLodLr6kxP4VX7ee8YN17TKI0T88rRnKfjb9EweT/BambHjoiC3OBkJ1v+jmfjgAmV5Dk9J5D3nDw4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwihV1dLmwZAvI2chOFXihvyOgFNRCcSEOsQJnq88nr76cRK1fT
+	6al793jlY/8cXzokQ2IKyckRnkBSUO1ZgaJPM6gaqTgJi8EbLqEdZ5h6fn7IO4NQqcn44aND6Vh
+	TVoSQmE1r7Acg1tSN8HD4nK7w2wNgQvE=
+X-Google-Smtp-Source: AGHT+IH+CVhvcHFEROY6DI4fTTA1A0rVOvk6V2lH0Qy3bvx0oWjtx6rv8LHLiMplqLO8Ccc4rIiO5m5I7sknLNpZ/eA=
+X-Received: by 2002:a2e:a554:0:b0:372:91d2:f659 with SMTP id
+ 38308e7fff4ca-37a4e6f08demr36141fa.3.1762270359952; Tue, 04 Nov 2025 07:32:39
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/4] uacce: fix for cdev memory leak
-To: Zhangfei Gao <zhangfei.gao@linaro.org>, Chenghai Huang
-	<huangchenghai2@huawei.com>
-CC: <gregkh@linuxfoundation.org>, <wangzhou1@hisilicon.com>,
-	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <shenyang39@huawei.com>, <liulongfang@huawei.com>,
-	<qianweili@huawei.com>
-References: <20251022021149.1771168-1-huangchenghai2@huawei.com>
- <20251022021149.1771168-2-huangchenghai2@huawei.com>
- <CABQgh9HFHSstR19NtOw5c6E+qS7_d_=6qnCYq9VY6DNKT6o3ng@mail.gmail.com>
-From: "linwenkai (C)" <linwenkai6@hisilicon.com>
-In-Reply-To: <CABQgh9HFHSstR19NtOw5c6E+qS7_d_=6qnCYq9VY6DNKT6o3ng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk200007.china.huawei.com (7.202.194.73)
+References: <20251031103858.529530-23-ardb+git@google.com> <20251031103858.529530-31-ardb+git@google.com>
+ <20251031134909.00006bf3@huawei.com> <CAMj1kXHMa_Vj3DsuoAR-rvWW12Bsnz10w+BAze6mtngqpABZPw@mail.gmail.com>
+ <CAMj1kXH_YCuBT4CbidTcVDNz2qNvYK9afS+v9eNkNggB3gopBw@mail.gmail.com> <20251103112836.00006966@huawei.com>
+In-Reply-To: <20251103112836.00006966@huawei.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 4 Nov 2025 16:32:28 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGog9bwqc=1qCv+Lh3giK081jf9h4AFCvQ=6Ls6N27LyA@mail.gmail.com>
+X-Gm-Features: AWmQ_bmFX2z95LFUqFBLXa1zysHI_LqNQuskPyUwu9Z4a7PNLTWxdw_qHd8vC_4
+Message-ID: <CAMj1kXGog9bwqc=1qCv+Lh3giK081jf9h4AFCvQ=6Ls6N27LyA@mail.gmail.com>
+Subject: Re: [PATCH v4 08/21] lib/crc: Switch ARM and arm64 to 'ksimd' scoped
+ guard API
+To: Jonathan Cameron <jonathan.cameron@huawei.com>
+Cc: Ard Biesheuvel <ardb+git@google.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	herbert@gondor.apana.org.au, ebiggers@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-
-在 2025/10/22 14:17, Zhangfei Gao 写道:
-> On Wed, 22 Oct 2025 at 10:12, Chenghai Huang <huangchenghai2@huawei.com> wrote:
->> From: Wenkai Lin <linwenkai6@hisilicon.com>
->>
->> In uacce_register(), if cdev_device_add() fails, we should properly
->> decrease the reference count of the cdev kobject and set uacce->cdev
->> to NULL to avoid potential use-after-free or double free issues.
->>
->> This change adds proper error handling after cdev_device_add() fails,
->> ensuring that kobject_put() is called and uacce->cdev is cleared.
->>
->> Fixes: 015d239ac014 ("uacce: add uacce driver")
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
->> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
->> ---
->>   drivers/misc/uacce/uacce.c | 11 ++++++++++-
->>   1 file changed, 10 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
->> index 42e7d2a2a90c..9b82a6731832 100644
->> --- a/drivers/misc/uacce/uacce.c
->> +++ b/drivers/misc/uacce/uacce.c
->> @@ -519,6 +519,8 @@ EXPORT_SYMBOL_GPL(uacce_alloc);
->>    */
->>   int uacce_register(struct uacce_device *uacce)
->>   {
->> +       int ret;
->> +
->>          if (!uacce)
->>                  return -ENODEV;
->>
->> @@ -529,7 +531,14 @@ int uacce_register(struct uacce_device *uacce)
->>          uacce->cdev->ops = &uacce_fops;
->>          uacce->cdev->owner = THIS_MODULE;
->>
->> -       return cdev_device_add(uacce->cdev, &uacce->dev);
->> +       ret = cdev_device_add(uacce->cdev, &uacce->dev);
->> +       if (ret) {
->> +               kobject_put(&uacce->cdev->kobj);
-> Not understanding this,
-> What if kobject_put(&p->kobj) is called twice?
-> cdev_device_add would call cdev_del->kobject_put(&p->kobj) as well.
+On Mon, 3 Nov 2025 at 12:28, Jonathan Cameron
+<jonathan.cameron@huawei.com> wrote:
 >
-> If you think cdev_device_add has an issue, maybe fixing
-> cdev_device_add itself is better?
+> On Fri, 31 Oct 2025 15:05:19 +0100
+> Ard Biesheuvel <ardb@kernel.org> wrote:
 >
-> Thanks
-After more testing, a new conclusion was reached.
+> > On Fri, 31 Oct 2025 at 14:52, Ard Biesheuvel <ardb@kernel.org> wrote:
+> > >
+> > > On Fri, 31 Oct 2025 at 14:49, Jonathan Cameron
+> > > <jonathan.cameron@huawei.com> wrote:
+> > > >
+> > > > On Fri, 31 Oct 2025 11:39:07 +0100
+> > > > Ard Biesheuvel <ardb+git@google.com> wrote:
+> > > >
+> > > > > From: Ard Biesheuvel <ardb@kernel.org>
+> > > > >
+> > > > > Before modifying the prototypes of kernel_neon_begin() and
+> > > > > kernel_neon_end() to accommodate kernel mode FP/SIMD state buffers
+> > > > > allocated on the stack, move arm64 to the new 'ksimd' scoped guard API,
+> > > > > which encapsulates the calls to those functions.
+> > > > >
+> > > > > For symmetry, do the same for 32-bit ARM too.
+> > > > >
+> > > > > Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+> > > > > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> > > > > ---
+> > > > >  lib/crc/arm/crc-t10dif.h   | 16 +++++-----------
+> > > > >  lib/crc/arm/crc32.h        | 11 ++++-------
+> > > > >  lib/crc/arm64/crc-t10dif.h | 16 +++++-----------
+> > > > >  lib/crc/arm64/crc32.h      | 16 ++++++----------
+> > > > >  4 files changed, 20 insertions(+), 39 deletions(-)
+> > > > >
+> > > > > diff --git a/lib/crc/arm/crc-t10dif.h b/lib/crc/arm/crc-t10dif.h
+> > > > > index 63441de5e3f1..aaeeab0defb5 100644
+> > > > > --- a/lib/crc/arm/crc-t10dif.h
+> > > > > +++ b/lib/crc/arm/crc-t10dif.h
+> > > >
+> > > > >  static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
+> > > > > @@ -20,21 +19,16 @@ asmlinkage void crc_t10dif_pmull8(u16 init_crc, const u8 *buf, size_t len,
+> > > > >  static inline u16 crc_t10dif_arch(u16 crc, const u8 *data, size_t length)
+> > > > >  {
+> > > > >       if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE) {
+> > > > > -             if (static_branch_likely(&have_pmull)) {
+> > > > > -                     if (likely(may_use_simd())) {
+> > > > > -                             kernel_neon_begin();
+> > > > > -                             crc = crc_t10dif_pmull64(crc, data, length);
+> > > > > -                             kernel_neon_end();
+> > > > > -                             return crc;
+> > > > > -                     }
+> > > > > +             if (static_branch_likely(&have_pmull) && likely(may_use_simd())) {
+> > > > > +                     scoped_ksimd()
+> > > > > +                             return crc_t10dif_pmull64(crc, data, length);
+> > > >
+> > > > >               } else if (length > CRC_T10DIF_PMULL_CHUNK_SIZE &&
+> > > > >                          static_branch_likely(&have_neon) &&
+> > > > >                          likely(may_use_simd())) {
+> > > >
+> > > > I briefly thought this was a functional change but it's not because
+> > > > of may_use_simd() being something that isn't going to change between
+> > > > the two evaluations.
+> > > >
+> > > > Would it hurt at all to pull that up to be
+> > > >         if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE && likely(may_use_simd())) {
+> > > >                 if (static_branch_likely(&have_pmull)) {
+> > > >                         scoped_ksimd()
+> > > >                                 return crc_t10dif_pmull64(crc, data, length);
+> > > >
+> > > >                 } else if (length > CRC_T10DIF_PMULL_CHUNK_SIZE &&
+> > > >                            static_branch_likely(&have_neon)) {
+> > > >                 ...
+> > > >
+> > > > ?
+> > > >
+> > >
+> > > Yeah that would be a reasonable cleanup, I guess.
+> >
+> > Actually, looking more closely, that would result in may_use_simd()
+> > being evaluated even when the static keys are set to false, given that
+> > the compiler is unlikely to be able to figure out by itself that
+> > may_use_simd() has no side effects.
+> Yeah. That was why it was a question :)
+> Given everything is marked as likely I wasn't sure if we cared about when
+> the static keys aren't set.
+>
 
-After the cdev_set_parent function in cdev_device_add is called,
-the cdev and the device will share the same lifetime and the memory
-of the cdev is managed by the device.
-So when put_device is called in the uacce_remove, the memory of the cdev
-will also be released, so there is no memory leak issue in the code.
-
-In addition, when cdev_device_add fails, a flag should be set to detect
-this situation to prevent the uacce_remove from incorrectly calling
-cdev_device_del to release the unallocated resources.
-This issue will be fixed in the next patch.
-
-Thanks,
-Wenkai
+Yeah, it is rather doubtful that those annotations (or the use of
+static keys, for that matter) make a meaningful difference here.
