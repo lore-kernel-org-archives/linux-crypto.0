@@ -1,83 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B9119CD1B;
-	Tue,  4 Nov 2025 01:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B53219F40A;
+	Tue,  4 Nov 2025 05:51:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762218125; cv=none; b=fCDbo6hotsAr1av9Px7xvz1+/oSuF/V/k/wD69MMHOYLJHLfM78iEs+Sy/m5SxU9iLFD1EDI1PKEhYhsSG/t5cCC7IMXkuxTumnw+Nx9doelqLV0LTqmJHEhRt/cHqpgFYl376ecPomC8uDopfCR/RRb61KnkSWwv+OaJAeQIXs=
+	t=1762235486; cv=none; b=CIgbRnrucMywrdzjkuxLPCKvqpHGdtbsM+dJjRngok3E3L1cIB1xFhFCsfqqxBWFcSwIEUpFrmuhEniUTc0+WU9/Av7EzVsDyHqWvCRVgeYx3nIt/oI8LXZhoxeOJk8Q3o7rY6jVfgLXzDpOxXMdNxzzP50u0ZvJe6LiEcYbFI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762218125; c=relaxed/simple;
-	bh=K+rJ33e8ZnjdO7vzPy3i645krvbBHeCx31o+woikNJE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qe509/6DdS9LhC1bud3iYUUFEa8xAGKyId+liafanklDO6qvJJ/iRY2c52gNPDZxPE6VxpT2ZDDovXgsska+uWVRyQZyG9C5U8ILz8A2x+bcKmmu9Hc/fvrDOf2/7aE0KzJ72kIWDbblZVb/fAKi0o37mIjEai/6NwuOgWlLEuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bCiHQLD1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762235486; c=relaxed/simple;
+	bh=+zIjCyngQqsvAfo8AR7dkJkLn9qM+SwI4b9HqY5K+Pk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eQs+mFkENarU2ob0kt7NjvhlOe+uvtsCqx9XYFKFmOD78mBDUyMrwWhfp8/YtlAKDI5PRdVcTFc7+Eqy8NAMTM7Qou5kXobwwxvb/tc9Drf2/wMZuCx/5nT2ZGK+R5hFvE5A3SSzyo78kwS2Vjwlb6Tr3VKKw6zKm6G7wdNwnoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eizjvtRx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bCiHQLD1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD2FBC4CEE7;
-	Tue,  4 Nov 2025 01:02:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eizjvtRx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFEADC4CEF7;
+	Tue,  4 Nov 2025 05:51:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762218125;
-	bh=K+rJ33e8ZnjdO7vzPy3i645krvbBHeCx31o+woikNJE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bCiHQLD1LfDXnUumr9ujAR8072dTzZSGHyeXTdV2fAzkJLddlFvRZ5nxncNOnF6xI
-	 QRO7nnv4jynO22aRogaHMHDrUYaTKRyDHtBWO0O2mn6yjY2lPBQUjtCwr/Iq7qvr5N
-	 bFW/i9EQ84cnTsQ/iUGFPWjl7/oMePj6kS6YDIYtI3gWqUEYSj9hOFgGNr57Eq6UHa
-	 ydTenu7o9ycaS80pc7ieJkBcRhrlBg1PdjkjYZzzOcsNiDUA8xjWr0A3fj5ERvjt8a
-	 X4f38gGTt00wQ2ySXjhJo5Sw+c+pb0A5kh15QKhtadtJp7kXwrlMV8Qktl9fMLcZ2C
-	 xrxhVToCmyS5A==
-Date: Mon, 3 Nov 2025 19:05:36 -0600
-From: Bjorn Andersson <andersson@kernel.org>
-To: Luca Weiss <luca.weiss@fairphone.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Viresh Kumar <viresh.kumar@linaro.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Vinod Koul <vkoul@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Konrad Dybcio <konradybcio@kernel.org>, 
-	~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org, linux-pm@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 3/7] dt-bindings: qcom,pdc: document the Milos Power
- Domain Controller
-Message-ID: <zug3lkerrgvclenswztfcec3wwk36ra7mwioejjch3si5j6x3b@fok5lio66lp6>
-References: <20250905-sm7635-fp6-initial-v3-0-0117c2eff1b7@fairphone.com>
- <20250905-sm7635-fp6-initial-v3-3-0117c2eff1b7@fairphone.com>
+	s=k20201202; t=1762235486;
+	bh=+zIjCyngQqsvAfo8AR7dkJkLn9qM+SwI4b9HqY5K+Pk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=eizjvtRx6NsjrEsOsNhJcNTVKKLIsXJ7oUbIaV8aRsTgWT/p+J64taxBobqTFrZvY
+	 6OIlp8zMqfHLB/gav3KITTRTtYI63qBODgUTue2maHNe6EmewqqPQN2zLfkiTuUb9Z
+	 i0WzZNGKeOe3f4tblvcszGpEFUohXTeSz+X0cc5BMU8RfgtE5rEyxrOjabw+qvFhrR
+	 hRFSmR9PvUgWUZ/bTcrOireJaKbCOzEqSMubsBnnNOibHcQYZnu5TKtJnRA+AELcoK
+	 5mOFu2k/uVzb7MXQaTZ6XI6fD9OEpTLtHIE0RYkbAj7xmkJwcGQgYdb2qkcpso6T6W
+	 fdqe9BM+8CmMQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-arm-kernel@lists.infradead.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH] lib/crypto: arm/curve25519: Disable on CPU_BIG_ENDIAN
+Date: Mon,  3 Nov 2025 21:49:06 -0800
+Message-ID: <20251104054906.716914-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250905-sm7635-fp6-initial-v3-3-0117c2eff1b7@fairphone.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 05, 2025 at 12:40:34PM +0200, Luca Weiss wrote:
-> Document the Power Domain Controller on the Milos SoC.
-> 
-> Acked-by: Rob Herring (Arm) <robh@kernel.org>
+On big endian arm kernels, the arm optimized Curve25519 code produces
+incorrect outputs and fails the Curve25519 test.  This has been true
+ever since this code was added.
 
-Reviewed-by: Bjorn Andersson <andersson@kernel.org>
+It seems that hardly anyone (or even no one?) actually uses big endian
+arm kernels.  But as long as they're ostensibly supported, we should
+disable this code on them so that it's not accidentally used.
 
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> ---
->  Documentation/devicetree/bindings/interrupt-controller/qcom,pdc.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/interrupt-controller/qcom,pdc.yaml b/Documentation/devicetree/bindings/interrupt-controller/qcom,pdc.yaml
-> index f06b40f88778929579ef9b3b3206f075e140ba96..3f90917a5a4dd9d068ec472565f5009690ea2c5b 100644
-> --- a/Documentation/devicetree/bindings/interrupt-controller/qcom,pdc.yaml
-> +++ b/Documentation/devicetree/bindings/interrupt-controller/qcom,pdc.yaml
-> @@ -26,6 +26,7 @@ properties:
->    compatible:
->      items:
->        - enum:
-> +          - qcom,milos-pdc
->            - qcom,qcs615-pdc
->            - qcom,qcs8300-pdc
->            - qcom,qdu1000-pdc
-> 
-> -- 
-> 2.51.0
-> 
+Note: for future-proofing, use !CPU_BIG_ENDIAN instead of
+CPU_LITTLE_ENDIAN.  Both of these are arch-specific options that could
+get removed in the future if big endian support gets dropped.
+
+Fixes: d8f1308a025f ("crypto: arm/curve25519 - wire up NEON implementation")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+
+This patch is targeting libcrypto-fixes
+
+ lib/crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index 8886055e938f..16859c6226dd 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -62,11 +62,11 @@ config CRYPTO_LIB_CURVE25519
+ 	  of the functions from <crypto/curve25519.h>.
+ 
+ config CRYPTO_LIB_CURVE25519_ARCH
+ 	bool
+ 	depends on CRYPTO_LIB_CURVE25519 && !UML && !KMSAN
+-	default y if ARM && KERNEL_MODE_NEON
++	default y if ARM && KERNEL_MODE_NEON && !CPU_BIG_ENDIAN
+ 	default y if PPC64 && CPU_LITTLE_ENDIAN
+ 	default y if X86_64
+ 
+ config CRYPTO_LIB_CURVE25519_GENERIC
+ 	bool
+
+base-commit: 1af424b15401d2be789c4dc2279889514e7c5c94
+-- 
+2.51.2
+
