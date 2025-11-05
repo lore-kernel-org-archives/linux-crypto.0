@@ -1,192 +1,107 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BD02FB612
-	for <linux-crypto@vger.kernel.org>; Wed,  5 Nov 2025 09:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9E32DC332;
+	Wed,  5 Nov 2025 14:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762336397; cv=none; b=DGFyrZaP9YAoFVaBW9JUm26BaCteqsjBJKbzYKsbKhLYwgToLIqVKjCEMygIP7gOmJm0kgveQoOxZv47nfBQQIVA508dYULlX06LcAdcmW+eQXXABVhsoMPhW6kYNSXBnoktSLpaTVnvM9edAaITSwi2Gwo5FIe+DJmr+g7JCoQ=
+	t=1762354368; cv=none; b=EfnvGUpOL8wCQT/VZoYuEVLkek1tOj6e+NBDHju6J8KS2C5Okir8ttvR8AiVTfrC26XKMk+5QfcPXbTyVErHtN4KYQvxkPFF/26T7vDWO4uZS3iKNdoV+OcvWecnVSlzNZPGKqNmtTkVU396lt5n0cHF+1SAlO6Y/DbFiqYjc9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762336397; c=relaxed/simple;
-	bh=cwKLyl6OdghZKyjNWgxXk0ncG3e1oFv3E8bDIyhxCbE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=CLwH8aULSHecjHHoebqOm+NpV7jmhS/mrKBrNmQ9885oZSC8xAGqcPojVturq6rHFCgnxBlpWBC9R4dlCbbrweXdFLAGGUKZV/jI/51MBESGZvlfI05iQsGS9pk9ctWCHcKGZpsMhqS8VW1hpL5JgmlYJ++azem3h/5dAjIQO0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QgShrYMV; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QgShrYMV"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3402942e79cso8908951a91.2
-        for <linux-crypto@vger.kernel.org>; Wed, 05 Nov 2025 01:53:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762336395; x=1762941195; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=S4s1QvFjCp7Uz78I+HyHouqF2NDvrouz1NOZV4kpvz8=;
-        b=QgShrYMVOu+Lt06Gq8whnDRhCsCyzV7HaCSQu5zHqWXnFh1KONtVnlDK8aiYTSoYsK
-         ZDIp+otSugr0Bm5G/PU9/OPEathiIrW1PbS2JTyZUyS7BBsRkP/KkleOkV8RZrAKFNyc
-         y1HsMH7VWWp0rTSNRUHhdrPDzQI/Wk8xmQUhnnG66SIo14NNJMeyMjeQlSRCU6BIuOtg
-         kLsuZDN5oiCllXW4WgLtjRbuJWJBufVyMpYD//Dc+Yd3yGxog3SNZYXplGUXBko3lso4
-         c6ZNeq4RUsmSsu0qZPQRN0i95oc4ZmkhVa+Erggo6bnNhq/rwIzKb15rdaqa/cpSWjHf
-         lKdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762336395; x=1762941195;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=S4s1QvFjCp7Uz78I+HyHouqF2NDvrouz1NOZV4kpvz8=;
-        b=l7Gbv0J2ftuMxOg8lH+iIpKrzn9wAMRQpBBLHkeK1F6TOhxYe0ZXIMA2YEPBVUNlWd
-         jhKdIqMfgmC0My1A2eNlhTc8jst7jquugkRZqEkJu8rOT2JDSq9i6McUoIlEynbg5oi+
-         9OXEvW8cXiHWGzn07QDYar82WxqUIpGQp5CmGiiXreOQ8bQj5Uxd7r/a0AuW3qU58aeV
-         RxMHZsKMKZWcE6nK0UZqkEuN6yphxeqfIreBFJCOe+AGedB+iwZnaAFm37KxayYaLVx3
-         pP1nGBIlGDlEPICPR0ASoDKVaZ8SdKEMG+8WKqr64jzmX0/GBnLhJTYoz2a+sytrxIX+
-         W94A==
-X-Forwarded-Encrypted: i=1; AJvYcCU2SP3BrMrhcKRwXlWN4CuL7Cqbtyu45sAQCSpLfbZBUzcE9V9CsxRjBmxGMkQ312C2XxdXJECQxsMyU0E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTJFgltubvmHtXcK8s5YxPsdJdW963+MVRfUib9xVQSmQhsCXL
-	NIRNr1A4BBbQVeO2OntwCvTngV2PVEzhpdCYeIKeoSLbHNa6C382UPMs
-X-Gm-Gg: ASbGnctyi0CotNohWnxcfZSre5biJGdwcYMp+KyBhPRbOa0ujjZ0xQVbX6J7BkG/gPf
-	323xJZGBBes855d1kp0uuKaVQ/nskGCt+kODLyt2S86nA3EescZ88QWUIp7Asz36PUyHTYlqxjI
-	Q5lXQps8ZIdSiYloxSJSCcvKcQBGxmeOw2mO/GDibfIFshzY/cg1sYgrQwM7F0qeC6gfW8cg8I1
-	lhmC1WhjmgUDciXewDB5eSdNXSgKpkdmykhJOkaF8mqMz5uTGUyv63lZdsdGArKhExmqVDQd/Q9
-	D+Q2iwhd4IQnL7HMpQwBeFoUod35wXveaqumZ0TNZmoYhmzPp5j+rgcCL149wE3BemEAjaevjKg
-	a2YjETaYPvTkGwGrQoPAdpKNbv6vMVbMghA5OljGdvg93pK+P0DF7S0yJtEiUSNJxoNHdiyjqY1
-	/T
-X-Google-Smtp-Source: AGHT+IGokQzyl1Ef/Pu7LXu2/t70l/hIJHf3/4OMEeOB67voqXxl/MqMrSSU//ZmVk/X50C9V/G3mw==
-X-Received: by 2002:a17:90a:d605:b0:330:84c8:92d0 with SMTP id 98e67ed59e1d1-341a6dc40f3mr3373858a91.24.1762336395041;
-        Wed, 05 Nov 2025 01:53:15 -0800 (PST)
-Received: from aheev.home ([2401:4900:88f4:f6c4:54cc:cfa8:7cce:97b5])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-341a67e1628sm2370422a91.0.2025.11.05.01.53.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 01:53:14 -0800 (PST)
-From: Ally Heev <allyheev@gmail.com>
-Date: Wed, 05 Nov 2025 15:23:08 +0530
-Subject: [PATCH] crypto: asymmetric_keys: fix uninitialized pointers with
- free attr
+	s=arc-20240116; t=1762354368; c=relaxed/simple;
+	bh=9gw1fRNEgUEyLwOYb2BA2vCkFpQAcbdbeE3Y/HO2sYA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QOGFtmbSvP6+rK+t4fIdLUmEWNu1W0AwN8MN+U4b6uaThTpfega9xwy27uJ97rp50M44/pO+x85ARHlOwAVb7S8uAf/arqbTYYi11dqm36d0+P1unw+2RzKcffCT5KgTgbThy6iUQPG1zCXQ6RGIyuqc+M622O1OFJH1lEhtAeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from spb1wst022.omp.ru (87.226.253.162) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 5 Nov
+ 2025 17:52:31 +0300
+From: Karina Yankevich <k.yankevich@omp.ru>
+To: Corentin Labbe <clabbe@baylibre.com>
+CC: Karina Yankevich <k.yankevich@omp.ru>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>, <linux-rockchip@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>, Sergey
+ Shtylyov <s.shtylyov@omp.ru>
+Subject: [PATCH] crypto: rockchip - drop redundant crypto_skcipher_ivsize() calls
+Date: Wed, 5 Nov 2025 17:52:04 +0300
+Message-ID: <20251105145204.2888978-1-k.yankevich@omp.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251105-aheev-uninitialized-free-attr-crypto-v1-1-83da1e10e8c4@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAIMeC2kC/x3NywqDMBBG4VeRWTtgUrNoX6V0EeNvHShRJlG84
- Ls3uPw255yUoIJEr+okxSpJplhg6orC6OMXLH0x2cY6YxrHfgRWXqJEyeJ/cqDnQQH2OSsH3ec
- 8cReeLYLprHUPKqlZMch2b96f6/oDPe/nqHYAAAA=
-X-Change-ID: 20251105-aheev-uninitialized-free-attr-crypto-bc94ec1b2253
-To: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
- Ignat Korchagin <ignat@cloudflare.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>
-Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>, 
- Ally Heev <allyheev@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3886; i=allyheev@gmail.com;
- h=from:subject:message-id; bh=cwKLyl6OdghZKyjNWgxXk0ncG3e1oFv3E8bDIyhxCbE=;
- b=owGbwMvMwCU2zXbRFfvr1TKMp9WSGDK55dqKPrit/lZw21lFM4thx/4aaavrn+ZUMqwMjzfqF
- 3uvUGzRUcrCIMbFICumyMIoKuWnt0lqQtzhpG8wc1iZQIYwcHEKwES6FRkZzpZIPPRatmx3SmWh
- tWHr29ULpQMe7tN+uXpbeOPOj/tP5zMyPDv137eFeZe/b63UeycRjacH/cu0eoM3yG5K3R7Dv+w
- MLwA=
-X-Developer-Key: i=allyheev@gmail.com; a=openpgp;
- fpr=01151A4E2EB21A905EC362F6963DA2D43FD77B1C
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 11/05/2025 14:42:52
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 197802 [Nov 05 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: k.yankevich@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 75 0.3.75
+ aab2175a55dcbd410b25b8694e49bbee3c09cdde
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_black_eng_exceptions}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;87.226.253.162:7.1.2;omp.ru:7.1.1;spb1wst022.omp.ru:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 87.226.253.162
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/05/2025 14:45:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/5/2025 1:23:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Uninitialized pointers with `__free` attribute can cause undefined
-behaviour as the memory assigned(randomly) to the pointer is freed
-automatically when the pointer goes out of scope
+The function already initialized the ivsize variable 
+at the point of declaration, let's use it instead of 
+calling crypto_skcipher_ivsize() extra couple times.
 
-crypto/asymmetric_keys doesn't have any bugs related to this as of now,
-but, it is better to initialize and assign pointers with `__free` attr
-in one statement to ensure proper scope-based cleanup
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/all/aPiG_F5EBQUjZqsl@stanley.mountain/
-Signed-off-by: Ally Heev <allyheev@gmail.com>
+Fixes: 57d67c6e8219 ("crypto: rockchip - rework by using crypto_engine")
+Signed-off-by: Karina Yankevich <k.yankevich@omp.ru>
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 ---
- crypto/asymmetric_keys/x509_cert_parser.c | 11 +++++++----
- crypto/asymmetric_keys/x509_public_key.c  | 14 ++++++++------
- 2 files changed, 15 insertions(+), 10 deletions(-)
+ drivers/crypto/rockchip/rk3288_crypto_skcipher.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index 8df3fa60a44f80fbd71af17faeca2e92b6cc03ce..bfd2cb2a9d81e3c615dfd4fe6f41653869a8cbd6 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -60,12 +60,12 @@ EXPORT_SYMBOL_GPL(x509_free_certificate);
-  */
- struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
- {
--	struct x509_certificate *cert __free(x509_free_certificate);
--	struct x509_parse_context *ctx __free(kfree) = NULL;
- 	struct asymmetric_key_id *kid;
- 	long ret;
+diff --git a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+index 9393e10671c2..e80f9148c012 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
++++ b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+@@ -321,8 +321,7 @@ static int rk_cipher_run(struct crypto_engine *engine, void *async_req)
+ 	algt->stat_req++;
+ 	rkc->nreq++;
  
--	cert = kzalloc(sizeof(struct x509_certificate), GFP_KERNEL);
-+	struct x509_certificate *cert __free(x509_free_certificate) = kzalloc(
-+		sizeof(struct x509_certificate), GFP_KERNEL);
-+
- 	if (!cert)
- 		return ERR_PTR(-ENOMEM);
- 	cert->pub = kzalloc(sizeof(struct public_key), GFP_KERNEL);
-@@ -74,7 +74,10 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
- 	cert->sig = kzalloc(sizeof(struct public_key_signature), GFP_KERNEL);
- 	if (!cert->sig)
- 		return ERR_PTR(-ENOMEM);
--	ctx = kzalloc(sizeof(struct x509_parse_context), GFP_KERNEL);
-+
-+	struct x509_parse_context *ctx __free(kfree) = kzalloc(
-+		sizeof(struct x509_parse_context), GFP_KERNEL);
-+
- 	if (!ctx)
- 		return ERR_PTR(-ENOMEM);
- 
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 8409d7d36cb4f3582e15f9ee4d25f302b3b29358..818c9ab5d63940ff62c21666fd549d3a1ff07e67 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -148,13 +148,13 @@ int x509_check_for_self_signed(struct x509_certificate *cert)
-  */
- static int x509_key_preparse(struct key_preparsed_payload *prep)
- {
--	struct x509_certificate *cert __free(x509_free_certificate);
--	struct asymmetric_key_ids *kids __free(kfree) = NULL;
--	char *p, *desc __free(kfree) = NULL;
-+	char *p;
- 	const char *q;
- 	size_t srlen, sulen;
- 
--	cert = x509_cert_parse(prep->data, prep->datalen);
-+	struct x509_certificate *cert __free(x509_free_certificate) =
-+		x509_cert_parse(prep->data, prep->datalen);
-+
- 	if (IS_ERR(cert))
- 		return PTR_ERR(cert);
- 
-@@ -187,7 +187,7 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 		q = cert->raw_serial;
- 	}
- 
--	desc = kmalloc(sulen + 2 + srlen * 2 + 1, GFP_KERNEL);
-+	char *desc __free(kfree) = kmalloc(sulen + 2 + srlen * 2 + 1, GFP_KERNEL);
- 	if (!desc)
- 		return -ENOMEM;
- 	p = memcpy(desc, cert->subject, sulen);
-@@ -197,7 +197,9 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 	p = bin2hex(p, q, srlen);
- 	*p = 0;
- 
--	kids = kmalloc(sizeof(struct asymmetric_key_ids), GFP_KERNEL);
-+	struct asymmetric_key_ids *kids __free(kfree) = kmalloc(
-+		sizeof(struct asymmetric_key_ids), GFP_KERNEL);
-+
- 	if (!kids)
- 		return -ENOMEM;
- 	kids->id[0] = cert->id;
-
----
-base-commit: c9cfc122f03711a5124b4aafab3211cf4d35a2ac
-change-id: 20251105-aheev-uninitialized-free-attr-crypto-bc94ec1b2253
-
-Best regards,
+-	ivsize = crypto_skcipher_ivsize(tfm);
+-	if (areq->iv && crypto_skcipher_ivsize(tfm) > 0) {
++	if (areq->iv && ivsize > 0) {
+ 		if (rctx->mode & RK_CRYPTO_DEC) {
+ 			offset = areq->cryptlen - ivsize;
+ 			scatterwalk_map_and_copy(rctx->backup_iv, areq->src,
 -- 
-Ally Heev <allyheev@gmail.com>
+2.34.1
 
