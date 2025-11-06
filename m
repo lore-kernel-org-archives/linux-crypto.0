@@ -1,148 +1,139 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E8C350280
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 16:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF932D061C
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 16:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762446737; cv=none; b=uLtwdOTXBiUlfcA2lMEj/2MYMxFFvTI7b/itcmLH9OAGjecx15mvbUcmg0eCV6Ml6ScMW8qVyIcg2xu7yPdr4SYP+hoJsQs4N8DJ8S5fzC7IMR4AdG7P9h6rQfyeVuI2CyjoLzywlIzqg61gMdS5sfr18h50FASPri0HKNrlBZY=
+	t=1762447089; cv=none; b=OSV4MtO76h/zGioOZP2pnDKsJbsOPDmLF19L/211WOy50xuQRGv0tBY5rJG+tZOP1GPVq57MM0qUNwZ4gsTUTQEisDlIrdeD2ThJh1315bTrFuuZiaeRcMbUpQYoIg94jl8tn+6bUrbu4O6aHZEnzVi6JJ8Bu4lmxTg0mv55HBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762446737; c=relaxed/simple;
-	bh=m3Rw4RghvlJpNqwmX5RdKGrpt4N2kWtJe21s2ySaS+U=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ef5XQKCHotYArWwJ88Xq+KVyRA3Bzx3JX83YQ89GFFC3Dc5eSIGu41fGEaAl1UAguxZ0Q5gx7DAgqZj76MkybwMgP/AdwqVD+xDbrB2DMYwNWpn5DZ6hNagGs7wkm25KG/RN6vDgYp/OQsx5SCvkeArJBAD49db+VtYYoDwYkJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=P4hfIJLj; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1762447089; c=relaxed/simple;
+	bh=uHCaSN1HJj7TSyL9maP/C6AySyYk+ApX2MMQbZ4ZLlY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mzEzH++ArJ2h2l0QRfjb9I9/ZlU5yixPgqMw57PV+ozyxddVz3Ty/7znWbU4iKITeglnK8CsYlQlqbXpemI1/bc0tzqkYGQXIk783rrkAzpqGRNmrhyXBZzU/KWi30VyRY6as3O+B6dhoDOmmxwgmllkbjFeWODDyWJUCBWFUYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=M7tFu/oH; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P4hfIJLj"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-633b4861b79so234861a12.1
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 08:32:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="M7tFu/oH"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-477549b3082so11148585e9.0
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 08:38:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1762446734; x=1763051534; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XwLm9ZOqkxP5nRd61gUy/JOG5+aVOeMLvrzzIiEulOE=;
-        b=P4hfIJLj0RBhjGi06fP9eyoUt0dXzlWV/N/hnPR5wStOq3XC/mFAvBHJ9Bf0Mlk2FL
-         NZX+p6Gb5oHbYRA115INCFW20P9OS8XImjBtY0zweCLgovWGM3fHe4UoMxMxL/3q02bZ
-         LJJc/V5uGqIxyIB63zZktUe9RkfXIEpYiDjrMBGHs6mu4uvyJqlYlXGrNwCqCwAfk4Rq
-         TpOK8iAgNKBAbmr2Nza9SQyuRLbnCpvtuSJhidjQq2UIaz7Raq3izCxCTysH/VFJ/mJ1
-         EyKgbUEzGnFe+5hhcr6oXQolMyNU+LtqEkKiJeWU/wwyVE33fIhldwHdScZD2qBdx5M1
-         odOw==
+        d=suse.com; s=google; t=1762447085; x=1763051885; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BIW3cS3n8yzrCh58jhXvAPIZMTRPbdX12tJ5K0TKoIs=;
+        b=M7tFu/oHqJFxzsnQB1EhtPdFbC5mxz7T/M1vlTmt4nJXIAyiafQmrrosOuXJZruzzA
+         p4YVwZQTPuWq5N+M9pU2soWvV9p5nmdbWVq2Eix8WT7r8jKHmaXgOeM4uxZ4ZBcib15r
+         +a+2EintvnpNwtezciOhUVo2WKyGAMNYFaE6R50v89iO+aHihjcZiKIoGEdcixYnkwj8
+         rc78FbPScwlbxJcC2VrIi7u5Tmc+vSDzlklTZH32xOQ9rkjgauE5d+CqvYmu4aSHY38G
+         DaXzW22xiymbGLf1/0nZlQ0T1nHRSW8SkG8vOWNnpmnmjgPFAgzjFkbfOp+KpBC2Pjql
+         y5qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762446734; x=1763051534;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XwLm9ZOqkxP5nRd61gUy/JOG5+aVOeMLvrzzIiEulOE=;
-        b=UP8uH5BF2fbf7Ddfo26yVSp+/bB8tcsROUVsbXNVAPirY9SKOnZgx4yK7bLXGgmWUY
-         xdrT8ZqXqq1vIU6S5bFlA0i+6NwunDwxmWxMKzamQejhOIGbc66W+RCexIoVFVDSWIx2
-         XV+bAL+31g1Or8H6oP/PyCogTDVyjvZGDHNfwlaOtd4PAtQMXkIXFHrTZKPxcVaFDDyN
-         MV1LcHGACX572ud7hOOV7A43C2CRJxufTaA4lBTpfsD39ndcR4RT6Ob3biSvIeWbNwlF
-         6hjWeGejgzaGqvXvsAyegwGl1LfFOhX+rpN4cv0nbHl3+fLDlFSd15f0zjSVqg7kjD28
-         nKrA==
-X-Gm-Message-State: AOJu0YxxczkWZWI+/IlmWzt/fzCN6yD9iCR0ExprpEuhTghCFoYKR27i
-	kXru1ZSIDTVzPeopMipmcFeTQXEiHsOy1CPHU/XZ+R/MiQQzsmfiK6PEPJqNC40jvKI=
-X-Gm-Gg: ASbGncs2+cUeomODH196b5e/CP9/GD7k9gBnG2Nobs7zZG4Nu8OJ7N9rHX2S1KJGjkn
-	vi1NyZMixjaT3RB24+yRQHFtcuz/NYoyRMYbFw+sivg75CdezDG+btilxjTchqmVj7ocYQPG7mD
-	dFb08BHyxFrvM1GvW/fqZOOqxpEtlT0r8eeoEiRd0FmkkL031oJYTg9BEKXll2UVlKQsKmipEw2
-	8R5JgWqeH3k7B4ml8AKlcsNHvcYozQVWzOi7qnWqZJCt7/Bf/lUDQ9u56bk6ZNunJEthYdvrYES
-	n0N4qIwjSsr7NHb73EDdr3su3jEvrq0u400new5t7S/RwtbZlE3A/uYN7pJWGroEPOYMf1dyvtn
-	WNDXwO5cKeetBuD0oCJXi8Sxh3dEo0yA+kvHt+UjQN5kbYFWOp5CAu6ZfFKDuaDmumDXSrcxr30
-	NPBxct/QjbnZ0KCcGJ+kH78w51IcA=
-X-Google-Smtp-Source: AGHT+IHc3F+M/TvLrDrcLFQ9tW2dJiHfP7LuAF+5PCUj3SWO8aHpQIglRCyahcghJNa2WJYjzSTxpA==
-X-Received: by 2002:a17:907:7ea4:b0:b70:be84:5ddf with SMTP id a640c23a62f3a-b728c18cf8amr200241166b.7.1762446733526;
-        Thu, 06 Nov 2025 08:32:13 -0800 (PST)
-Received: from [127.0.1.1] ([178.197.219.123])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7289682544sm249625566b.53.2025.11.06.08.32.11
+        d=1e100.net; s=20230601; t=1762447085; x=1763051885;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BIW3cS3n8yzrCh58jhXvAPIZMTRPbdX12tJ5K0TKoIs=;
+        b=ZjnPY8xpvoRDEmXcpoRMzT0nWa0SxJH7X3g9XthM0WyGJl/P7gpE4/kJjAwv7wKr7F
+         TCFtQ7UIrjGfcfXXxSTyENpdvdDpiZZ3FEsMbR0esQWFBydGo6R53m2yr2HQHQkyC5MO
+         njuUsJl7Re6quueHvDecnprOC3GatXvvKZ1Scqh14dYEf38B/U4jwV8exb+fO2y4O7MO
+         L5pva1VyGRVTDDZ3VYA6/pLR8GhRsgOwqBj8mbcQS2DFEV4oYINIOfEA71GGDb2yClzG
+         aTuwBA8d8Brpj0C5Lgx2akEJ/uImKqF1AwHG+8svtIla+PtQ17p3t57XA/w0aeOQFmcG
+         hJ7g==
+X-Forwarded-Encrypted: i=1; AJvYcCVVduf9DLheQz44oyGHpz1hfifiama1MJDdROu/66Fp0iEJkbQDWJ6Jg9nFEC5v1IqdWrnPWY5KsaKCAtY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXzbLLFTlmo17ZTCvmXmXfPxravU1KyzXs9Zb25//pTLfkjJJh
+	ZFsnXoXXA1EFluZqD47ROWaHSntcOUSZCKyiEQc9vh7aK+6KgPE/PPzmddHxOVPrHgc=
+X-Gm-Gg: ASbGncvD4taQj01u3RtdHOssz5BxLcA2swNao2i9FhoLXZKUoh5W0v2aKTXWPmoGMvd
+	97FlD1Tkl8lGz+PQewbdtHhv0YCnEUzY6yD0JgyAERhLVJT40FlOrHu9/mSMh5Ka37o4MAbpgxe
+	PSy7TLIDqyPwiWw4N9HllIeOLgk3+7UQf/ToWLzr3ySxd+I9FGf+QaVM9YkxqYs2uNLaEumoiW/
+	zMl9Nc3OorlJcxN4TQDQaf9rteDq3qQqlU0fXLog7eihTGrWrGn4zQBSyV15kDymPBxuxVk02V8
+	fmt4NA0PUdcLGj7n67i937V8Vphdv4nHnZ2x13ttcdPplC5dvNjBFyTT50QK0SFbwgvTeFgf3hl
+	ubETE65Nxyz7HhJV/R/js0eN8XWELTVJDQ01KRgTz83sg5bZ1lqCclZavvLn/Len1v75Yqeg6AT
+	57cRK1diqqjkkQ9hWPd9QZCu4=
+X-Google-Smtp-Source: AGHT+IEjgkNrSWOVJ0pFSgXHlp3nXPxcUMJ0BCl/+QeBwIyxvF9R3B+0c4btthob/ZR/dpqpdOq8fw==
+X-Received: by 2002:a05:600c:310c:b0:45d:f83b:96aa with SMTP id 5b1f17b1804b1-4775cdac841mr68114705e9.7.1762447084572;
+        Thu, 06 Nov 2025 08:38:04 -0800 (PST)
+Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477625e88fasm72581015e9.15.2025.11.06.08.38.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 08:32:12 -0800 (PST)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Thu, 06 Nov 2025 17:31:58 +0100
-Subject: [PATCH 6/6] crypto: cesa - Simplify with
- of_device_get_match_data()
+        Thu, 06 Nov 2025 08:38:04 -0800 (PST)
+From: Marco Crivellari <marco.crivellari@suse.com>
+To: linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Tejun Heo <tj@kernel.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Subject: [PATCH] crypto: atmel-i2c - add WQ_PERCPU to alloc_workqueue users
+Date: Thu,  6 Nov 2025 17:37:58 +0100
+Message-ID: <20251106163758.340886-1-marco.crivellari@suse.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251106-crypto-of-match-v1-6-36b26cd35cff@linaro.org>
-References: <20251106-crypto-of-match-v1-0-36b26cd35cff@linaro.org>
-In-Reply-To: <20251106-crypto-of-match-v1-0-36b26cd35cff@linaro.org>
-To: Olivia Mackall <olivia@selenic.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- Florian Fainelli <florian.fainelli@broadcom.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, 
- Jesper Nilsson <jesper.nilsson@axis.com>, 
- Lars Persson <lars.persson@axis.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
- Srujana Challa <schalla@marvell.com>, 
- Bharat Bhushan <bbhushan2@marvell.com>
-Cc: linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@axis.com, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1275;
- i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=m3Rw4RghvlJpNqwmX5RdKGrpt4N2kWtJe21s2ySaS+U=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBpDM2AgBnenLurgSZhuu/V1NPBQsW01qTALo954
- zHx6Qd6Ku6JAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaQzNgAAKCRDBN2bmhouD
- 1yjFD/0SXBjr3o5nVCXeb9CBDYjItP5g7f0LzGkhPBdzKq1eqM1T7O1jSX3hrX794tgPKdroXYo
- QrRDyQh7k+tp2d611N2Q6HZXoHQyybNtsimpOHvf5ptsmVPyynyhzfPUUr3Kpy8VqUahiO5fKE4
- EFriMSYfyNmnJDEZdsIQ+6ZwBjMu/JK3nj2yODqdq8x2Rbm16GcCZ9chcd6AevJZc74OUpPerFK
- itTLja9B+uHdYAml+qdB0bbglDPbJVY22DXqT6w7TC58Pxjt0En3ov3jdHdR0wVmKtlsL78VBUs
- 7Q17yerdZ6SuEv0WkJNsL8L0Gfgi/X+MgRl7R2wmONVWRpeZtw7FahAaqukUBFUBq7jUdcyDudF
- lkvPbw+un3kjL9WYagYeYgT4g2eyVDIMjhDwZdbwQCic9UeUIzbRB3tELLUXOvMCvzYfgdhuAJ2
- aVS62BP7hHEtOHb/5/SZpS/8h9YPNH7nddQDjn+u7wQRokB2Ji9Nzi4TE/ApO48rZ+sjTaqGm6u
- xXEF31vkzrXOo9PbyJcztNZDtuQOXHkvCMwpKYFCrchH3QlDauE2E/6ZsGZuuaYPyuy11LcvjPU
- DhZQey10BF7vpWHGqAt1n3XNk03n2Cintxe2zQLgv8JZxE7DkdxCFws0I1ZW1LGy2zm4KA3NyPL
- nFMld+t4RPp23Dw==
-X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
- fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Driver's probe function matches against driver's of_device_id table,
-where each entry has non-NULL match data, so of_match_node() can be
-simplified with of_device_get_match_data().
+Currently if a user enqueues a work item using schedule_delayed_work() the
+used wq is "system_wq" (per-cpu wq) while queue_delayed_work() use
+WORK_CPU_UNBOUND (used when a cpu is not specified). The same applies to
+schedule_work() that is using system_wq and queue_work(), that makes use
+again of WORK_CPU_UNBOUND.
+This lack of consistency cannot be addressed without refactoring the API.
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+alloc_workqueue() treats all queues as per-CPU by default, while unbound
+workqueues must opt-in via WQ_UNBOUND.
+
+This default is suboptimal: most workloads benefit from unbound queues,
+allowing the scheduler to place worker threads where they’re needed and
+reducing noise when CPUs are isolated.
+
+This continues the effort to refactor workqueue APIs, which began with
+the introduction of new workqueues and a new alloc_workqueue flag in:
+
+commit 128ea9f6ccfb ("workqueue: Add system_percpu_wq and system_dfl_wq")
+commit 930c2ea566af ("workqueue: Add new WQ_PERCPU flag")
+
+This change adds a new WQ_PERCPU flag to explicitly request
+alloc_workqueue() to be per-cpu when WQ_UNBOUND has not been specified.
+
+With the introduction of the WQ_PERCPU flag (equivalent to !WQ_UNBOUND),
+any alloc_workqueue() caller that doesn’t explicitly specify WQ_UNBOUND
+must now use WQ_PERCPU.
+
+Once migration is complete, WQ_UNBOUND can be removed and unbound will
+become the implicit default.
+
+Suggested-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
 ---
- drivers/crypto/marvell/cesa/cesa.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ drivers/crypto/atmel-i2c.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
-index 9c21f5d835d2..301bdf239e7d 100644
---- a/drivers/crypto/marvell/cesa/cesa.c
-+++ b/drivers/crypto/marvell/cesa/cesa.c
-@@ -420,7 +420,6 @@ static int mv_cesa_probe(struct platform_device *pdev)
+diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+index a895e4289efa..9688d116d07e 100644
+--- a/drivers/crypto/atmel-i2c.c
++++ b/drivers/crypto/atmel-i2c.c
+@@ -402,7 +402,7 @@ EXPORT_SYMBOL(atmel_i2c_probe);
+ 
+ static int __init atmel_i2c_init(void)
  {
- 	const struct mv_cesa_caps *caps = &orion_caps;
- 	const struct mbus_dram_target_info *dram;
--	const struct of_device_id *match;
- 	struct device *dev = &pdev->dev;
- 	struct mv_cesa_dev *cesa;
- 	struct mv_cesa_engine *engines;
-@@ -433,11 +432,9 @@ static int mv_cesa_probe(struct platform_device *pdev)
- 	}
+-	atmel_wq = alloc_workqueue("atmel_wq", 0, 0);
++	atmel_wq = alloc_workqueue("atmel_wq", WQ_PERCPU, 0);
+ 	return atmel_wq ? 0 : -ENOMEM;
+ }
  
- 	if (dev->of_node) {
--		match = of_match_node(mv_cesa_of_match_table, dev->of_node);
--		if (!match || !match->data)
-+		caps = of_device_get_match_data(dev);
-+		if (!caps)
- 			return -ENOTSUPP;
--
--		caps = match->data;
- 	}
- 
- 	cesa = devm_kzalloc(dev, sizeof(*cesa), GFP_KERNEL);
-
 -- 
-2.48.1
+2.51.1
 
