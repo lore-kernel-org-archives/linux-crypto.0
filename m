@@ -1,160 +1,133 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8573376A5
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 16:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACEC32B991
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 17:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762447506; cv=none; b=GbvxfctTjleBkQvOtzMpTXz3gN35xtZOqvyukvwTk4qXukHJ/Y0EhzbkL6OP07h3kDHbD0lLshVFaCtLjXw7+z0yrdEpcrtnHS1f66MAX9UPhw7WVpP6e7+XuWDrOoN65kYspxYvfZ5JhuwYhD+2n1dlatQiPdJ+1VsFIKJyVMI=
+	t=1762450678; cv=none; b=CopgAJ80xO4bo9WiRbyI9j3VZM3undx22j5198ugsItwp/Kf9b2Ncep7K2abHKpE/3TaUVNcYgb7RWunFzbYUCjcTyGmkUy4AfboRoEjrACCIGzsJufSgSbv4KinuZCnm1/5JaOYV2siarVI/Mnp4RRL74ESRnZHDAxVcELVbWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762447506; c=relaxed/simple;
-	bh=X9BEWwB0FNpTpkWJhm+qaXY0I7iml0fSupTwank2kMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rMcZ4mWRG5Kg2yCBPCudHaYc/X87HPhvZP1BHd7onWgSaPZ/ZQws6KhE0Y/9mkSc48B8k4ebTBD50n5us8aUL3hrNDc+yjcHYnXie/yw8nfwxQnTps3lpEPneJE80c0qgKVyCl2sQRemJVTIJO6W5WYQWJWIkpVr+6pVCyJZ3+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Es1QkEdA; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762450678; c=relaxed/simple;
+	bh=+nJx01PZoIhVVk4jUct5UQsityQ6G/mROL/5XbpZOO4=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=FT0PLlV7E3oek5Wnx4fDCqL4NvpalVbkk8w1jTUbWe1T4/VDiFuTjllzkfBtOg/W5t2aHjG0D5QEEA+SqGDCp/3lfJYXdMghkOdAhT1T1THG9mcQF/437FJp2wvh2mzG2seyS6AKpO6+zX1SXsCfP20fwokt6qtXPQDM0tQfMPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tx8rWW5u; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Es1QkEdA"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-786a317fe78so10440067b3.2
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 08:45:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762447503; x=1763052303; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YCzuZ/teXYU7yevuP9B3flHK19xr/xlr710i4rE8skU=;
-        b=Es1QkEdA/zBpIPzi+HGQl/7UQTc0u7rQ8nQ0oNHOJvYpsDrh52P+nfcZ1rRMFmekG8
-         oWKW1fPLFi0yEr9g8nCV4eIarl2Kv6/bIY91CoJxqjC4yot5jHJvoora0gdiknA3GU5/
-         RdStclCYNas64mysPuwfygU09X9y4gu0ZUbgVKQIBgM9pLWf4tzdiQpuBD/RsrJTUmiL
-         o/sCo5ZnjxyWXd/cYR+X3YeriM6gB0Nn6LZO5rVnBQNmPEwaWl+/x71i20PG8OY4Fi+S
-         cbK27KlFofPjN4icMa0L/Tu7aA857zVeADmHxcoOlL6BaEvh0ikqYMl4fChbZSHxKrt/
-         O3pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762447503; x=1763052303;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YCzuZ/teXYU7yevuP9B3flHK19xr/xlr710i4rE8skU=;
-        b=ffft3uATS8tLKxTx4VtqenxAeCc+GImvStg2IhZ+K2PxHdyzgwfOo4/At4b5EjXrKD
-         YKxHcy3VoRD2akvQ8zHynDrA+qeoub5jNp1yr8nnFj9o944PZ93Ek5ub2elrmu4Q9Huv
-         RZvvSLkDk91qBxE5hJ3cFQ5mbu3XDih6QjY9y+7fDcYbtV4UGeSBDeCFUb5njFa+p4Ht
-         02ST+Zevph/ay4R710i0CyocWjtA69NWqa74WVYH13qKYbzQrcejzNZHM3vnuaEP3FVt
-         p3auRRB6gmIFXG7UT1R//qShFaoYHLRyAAF0XHfi2f80N/0WkRAsgD2mwPb3mBLNJugY
-         5p8w==
-X-Forwarded-Encrypted: i=1; AJvYcCWiPvPHw/9C/2p3gpTvM23DXzuVH16t6i8AIHtyqUFOtuIB3WsF/iizlNzl5wFmqgFmhNY2LxEygy69nCs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7wu/5l6/H9cuBYKwQ/A61zRTr5aE5+i6Q1sOcYaNRll8Gz+yP
-	bL6iNwuPl/LfURhf5dKYLk6NCiLIX/5+YnErtZSMDF8Ws6RL5/nDo484
-X-Gm-Gg: ASbGncsnjHkYkrUR6wFByZwkXkyu0VrYjKFXS/6nnYWXbPDSxl5/QJU5rovQ57kSlw/
-	cMhD+RAmWxHI7DXBexek92tq7QgYjMVVCXEGXvtJI3ea5eOptrpt/hkTGu117XAN/XyOMY771tq
-	y4p19uVSu10NLR6WQNYGvoGxtpLZDkvzYxA6nksXFwkvWsV+qlQ/3CRvx7UeRmoHruOTYRrP5wj
-	XHd2tpEhTdMO3rQWuuFIYc0bwuOZ5CqEVwM9FmlOckqYIG3roPuBnTaSjiJJcUtvYCMTPokSXe9
-	nHkyORtS2TSJKZm32obxH0vmQzFDXrjJAv5OzkzX834oxgMvnozIlyeknJFrjTETpfXUCGD+aec
-	B53e/1KI+z+Aj77FBHe+HAYbIS+drCI/p6iqvU0sKxW4GJ/Kle4skwm5663AWtiDCjSRcTZQE2i
-	CXCKvq/LxacEiw0snM/okabEKiU7QtbCzt2gs8RofzzUs=
-X-Google-Smtp-Source: AGHT+IFgqblsjDg64jVhZU34czKFHTApBwHTvzKvobAZn60rv4BaSs97biLpVcByf7R85pQynTZCWw==
-X-Received: by 2002:a05:690c:46c3:b0:786:45ce:9bd3 with SMTP id 00721157ae682-786a41b2455mr71656237b3.34.1762447502815;
-        Thu, 06 Nov 2025 08:45:02 -0800 (PST)
-Received: from localhost (c-73-105-0-253.hsd1.fl.comcast.net. [73.105.0.253])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-787b13b6954sm9471997b3.5.2025.11.06.08.45.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 08:45:02 -0800 (PST)
-Date: Thu, 6 Nov 2025 11:45:01 -0500
-From: Yury Norov <yury.norov@gmail.com>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Crt Mori <cmo@melexis.com>, Jonathan Cameron <jic23@kernel.org>,
-	Lars-Peter Clausen <lars@metafoo.de>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>,
-	David Laight <david.laight.linux@gmail.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>,
-	Tony Luck <tony.luck@intel.com>,
-	Michael Hennerich <Michael.Hennerich@analog.com>,
-	Kim Seer Paller <kimseer.paller@analog.com>,
-	David Lechner <dlechner@baylibre.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Richard Genoud <richard.genoud@bootlin.com>,
-	Cosmin Tanislav <demonsingur@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Jianping Shen <Jianping.Shen@de.bosch.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>, linux-clk@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-edac@vger.kernel.org, qat-linux@intel.com,
-	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
-	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org,
-	linux-mtd@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 00/26] Non-const bitfield helpers
-Message-ID: <aQzQjSMOSrUIgMCL@yury>
-References: <cover.1762435376.git.geert+renesas@glider.be>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tx8rWW5u"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762450675;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NwD7CPpHKizbf1uy1rhnrkRajkdGEoQUg1lkgWgfy3U=;
+	b=Tx8rWW5u4qEcYo3sElqYg3mErbPMh591V1eINCo2PFtdjT8HCWMdDIsd0UaJ4SWkZa9fy/
+	zE5m0RTWzTRZJ0SMNYU2Sjearqkg+UwYc3yY/N6cdX7aZaRTH4Vav13TmwTaF0tN2sXgBs
+	QViRfgm7f4qIb6x07aNln4geZxK5h+Y=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-672-HPwJs847Poa2f_AwZAVzBQ-1; Thu,
+ 06 Nov 2025 12:37:50 -0500
+X-MC-Unique: HPwJs847Poa2f_AwZAVzBQ-1
+X-Mimecast-MFC-AGG-ID: HPwJs847Poa2f_AwZAVzBQ_1762450668
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B596E1956096;
+	Thu,  6 Nov 2025 17:37:47 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.6])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7AAD2196B8F6;
+	Thu,  6 Nov 2025 17:37:43 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <81080a24-e4a9-4287-8653-9d707e574d95@suse.com>
+References: <81080a24-e4a9-4287-8653-9d707e574d95@suse.com> <20251017144311.817771-1-dhowells@redhat.com> <20251017144311.817771-18-dhowells@redhat.com>
+To: Petr Pavlu <petr.pavlu@suse.com>
+Cc: dhowells@redhat.com, Eric Biggers <ebiggers@kernel.org>,
+    "Jason A . Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Stephan Mueller <smueller@chronox.de>,
+    Lukas Wunner <lukas@wunner.de>,
+    Ignat Korchagin <ignat@cloudflare.com>,
+    Luis Chamberlain <mcgrof@kernel.org>,
+    Daniel Gomez <da.gomez@kernel.org>,
+    Sami Tolvanen <samitolvanen@google.com>,
+    linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+    linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 17/17] modsign: Enable ML-DSA module signing
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1762435376.git.geert+renesas@glider.be>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <31210.1762450662.1@warthog.procyon.org.uk>
+Date: Thu, 06 Nov 2025 17:37:42 +0000
+Message-ID: <31211.1762450662@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Thu, Nov 06, 2025 at 02:33:48PM +0100, Geert Uytterhoeven wrote:
-> 	Hi all,
-> 
-> <linux/bitfield.h> contains various helpers for accessing bitfields, as
-> typically used in hardware registers for memory-mapped I/O blocks.
-> These helpers ensure type safety, and deduce automatically shift values
-> from mask values, avoiding mistakes due to inconsistent shifts and
-> masks, and leading to a reduction in source code size.
-> 
-> The existing FIELD_{GET,PREP}() macros are limited to compile-time
-> constants.  However, it is very common to prepare or extract bitfield
-> elements where the bitfield mask is not a compile-time constant (e.g. it
-> comes from a table, or is created by shifting a compile-time constant).
-> To avoid this limitation, the AT91 clock driver introduced its own
-> field_{prep,get}() macros.  During the past four years, these have been
-> copied to multiple drivers, and more copies are on their way[1], leading
-> to the obvious review comment "please move this to <linux/bitfield.h>".
-> 
-> Hence this series
->   1. Takes preparatory steps in drivers definining local
->      field_{get,prep}() macros (patches 1-11),
->   2. Introduces __FIELD_{PREP,GET}() helpers to avoid clang W=1 warnings
->      (patch 12),
->   3. Makes field_{prep,get}() available for general use (patch 13),
->   4. Converts drivers with local variants to the common helpers (patches
->      14-24),
->   5. Converts a few Renesas drivers to the existing FIELD_{GET,PREP}()
->      and the new field_{get,prep}() helpers (patches 25-26).
-> 
-> Alternatives would be to use the typed {u*,be*,le*,...}_{get,encode}_bits()
-> macros instead (which currently do not work with non-constant masks
-> either, and the first attempt to change that generates much worse code),
-> or to store the low bit and width of the mask instead (which would
-> require changing all code that passes masks directly, and also generates
-> worse code).
+Petr Pavlu <petr.pavlu@suse.com> wrote:
 
-Everyone please send your tags. I'm going to merge it in
-bitmap-for-next before Monday.
+> This update looks ok to me. However, I'll note some problems that
+> I noticed in the original text, notably:
+> 
+> The text doesn't match the implementation because kernel/module/Kconfig
+> still allows selecting SHA-1 for module signing. What happened is that
+> commit 16ab7cb5825f ("crypto: pkcs7 - remove sha1 support") initially
+> removed CONFIG_MODULE_SIG_SHA1. Then, commit f2b88bab69c8
+> ("Documentation/module-signing.txt: bring up to date") removed it from
+> the documentation. However, commit 203a6763ab69 ("Revert "crypto: pkcs7
+> - remove sha1 support"") brought back CONFIG_MODULE_SIG_SHA1 without
+> reverting the documentation update.
+> 
+> Another problem is that for MODULE_SIG_KEY_TYPE_ECDSA, certs/Kconfig
+> contains the line
+> "depends on !(MODULE_SIG_SHA256 || MODULE_SIG_SHA3_256)",
+> which intends to allow ECDSA only with MODULE_SIG_SHA384,
+> MODULE_SIG_SHA512, MODULE_SIG_SHA3_384 and MODULE_SIG_SHA3_512. This
+> restriction was added in commit d4f5bfe20da9 ("certs: Limit
+> MODULE_SIG_KEY_TYPE_ECDSA to SHA384 or SHA512") and 446b1e0b7b39
+> ("module: enable automatic module signing with FIPS 202 SHA-3").
+> However, the documentation suggests that ECDSA can still be used with
+> SHA-2/3 of size 256.
+> 
+> I'll prepare fixes for these issues. For the first problem, I think we
+> can drop CONFIG_MODULE_SIG_SHA1 instead of correcting the documentation.
 
-Thanks,
-Yury
+Sounds good.
+
+> > +	  Use an ML-DSA (Dilithium) 87 key (NIST FIPS 204) for module signing
+> > +	  with a SHAKE256 'hash' of the message.
+> 
+> Copy-and-paste error in the help message: 87 -> 44.
+> ...
+> Similarly here: 87 -> 65.
+
+Fixed.
+
+> Should all MODULE_SIG_KEY_TYPE_ML_DSA_* options depend on
+> MODULE_SIG_SHAKE256 to match the updated
+> Documentation/admin-guide/module-signing.rst?
+> 
+> Similarly, do MODULE_SIG_KEY_TYPE_RSA and MODULE_SIG_KEY_TYPE_ECDSA
+> require any "depends on" update with respect to the addition of
+> MODULE_SIG_SHAKE256?
+
+Um.  In theory ML-DSA can use hashes other than SHAKE256, but I'm not sure
+that OIDs exist yet to indicate that.  Also, I'm not sure how to implement the
+crypto API interface such that you can ask for, say, "ml-dsa87(sha512)" from
+crypto_sig.
+
+Anyway, for the moment, I'm going to post a v7 as I've made some substantial
+cleanups.
+
+David
+
