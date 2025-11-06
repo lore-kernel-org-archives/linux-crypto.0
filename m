@@ -1,79 +1,79 @@
-Received: from mail-il1-f227.google.com (mail-il1-f227.google.com [209.85.166.227])
+Received: from mail-io1-f99.google.com (mail-io1-f99.google.com [209.85.166.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C5C32E6BD
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 20:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E90C24469E
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 20:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762461253; cv=none; b=CBGtyd6PtUj8kHQLAoIg0m2xji65NkMq9edZ4orgu0Y0Sq9gz++0dUDfZy2d+ZrZ3AQgwNSx8SrHwopk9VbmFWzgH1akDo3nGIAy6rhKrb0aTieVmVhmd0iobKiyIfDpIgzyGe8Aq1s4fPzfHiMlsk2ycWaqcH8YikNYbktugJ4=
+	t=1762461905; cv=none; b=SQvCa9zHhkklfEYyHMUSVvCpzaBJYDu8gUPtaSZPFYrAG9zcllnUSZpVql3uHV2drEdKxWtf7ZW+ff0jSc7s14GcIjn0Tor8tLOL+2JC8WDVnjks6DjPDLd8WQOeverXKtosXa9jzzmrZo2WMiH7PCRGeZcV+DKorqJJXgDtA18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762461253; c=relaxed/simple;
-	bh=6EYQTYVE/8/8+6LqWi+B6QjStsG0lMlB/gZzewfvXFY=;
+	s=arc-20240116; t=1762461905; c=relaxed/simple;
+	bh=Z8uWVHiXtU/sipIn2JMDjsO8DomjkdUGyvjEVgsyAYg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E5kxzel9USwwC5qdP7Va33iJ1F0T878/LIuhWRnknxfit/VzTetg6jxeanPpuxaB35GdHR94iU0jHeSqGK/EmWsV1XVYPsj2Ns9j6h/l/8YNz3t7TCyC5OBAJMtDCesDWuvhnW/aRVXuBXlYLT73MgoIJF7bW4Kykaqnsuo+QXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DANDgZ+l; arc=none smtp.client-ip=209.85.166.227
+	 In-Reply-To:Content-Type; b=dde1ubqzWVE/gvNP+ZX9DARym054eW31tRacvYj5qSWjoY/EoCgKEC0HhXdesPST24M3KuNkUgiUrIhL2do7Uy0BM7OtiTdTIexcydCIsZMy0ewDMgyEM8WRcCv9jM3dFVOHsiEV77hiZGqwqWrL2EH5s5m4gP3gRdg5T3oGgJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=GsNdt4Ql; arc=none smtp.client-ip=209.85.166.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DANDgZ+l"
-Received: by mail-il1-f227.google.com with SMTP id e9e14a558f8ab-433217b58d9so149505ab.1
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 12:34:11 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GsNdt4Ql"
+Received: by mail-io1-f99.google.com with SMTP id ca18e2360f4ac-93e89a59d68so2158439f.0
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 12:45:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762461250; x=1763066050;
+        d=1e100.net; s=20230601; t=1762461903; x=1763066703;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:dkim-signature:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=DzkV34otxN0ctVlzxZXpqYiYjaDeaTvbElNgle63bc8=;
-        b=wgo8OwO3mtwg48HVeNXtguomWoZ5H9Ht5AJMB3GVDa0vdoj9Odlns/Ord+0Afr3TxI
-         U6I1vHmD1QGRpcJ9yNlFH4psYuYjMNoaPdXt3xjeBN5Oqtj/Bw2e6xe86if+pSS07/ik
-         LXhxlYwHcknWhDRj9NySqw9qHFVejtG6VF8ei32aN3xrmRgp+/kNJOkIW9WTPTP3P4YP
-         kea8cJS4hflsx8khZNGWHnCiB93vzrQvJYOEi9rI3Xk9YBKbIkcwpTsS5Puf3DzzLmNp
-         zocaW/rc4uE5quezj9hGE0ArLgAHdZvoeL+lJPAMP2NOSZS5GcApssBLx7xcwbkc2U8f
-         Tz8Q==
-X-Gm-Message-State: AOJu0Yz7PDtyKu057qd+pvLIaUpDL8po9FCpaS6m0u/ZFRxDh3BMbUN2
-	R9g+HASeEpCJgN1V3AJjXqROA1JZo/q2vZ4Mt1h4oWzVKbMPQQqwf4gXlM4VWb/Bs2v2usUHio0
-	ifYhvg5s+XGg8FXzTIR5b3pV30jXCPqUH2hcyp1boIGHxfHGClJwh3PTdGopwP8AC7SHJXFEE3K
-	WOeTroI2G9/hrmHxyqLa1zu3lqYskyJrFkKN2qUdnJoNdSwMzLmK56nO8xx1jRh8Zm2gSBps7ZH
-	TzArGvPjFl5Puc3Ar6mxENX
-X-Gm-Gg: ASbGncuvSsgzzO8k3byF0lZ7oaVpa6O2LivCcMNnLgb3qRgjxuvd8DxaqMOkJ3XRVxa
-	GD/xAM8B6ZF0PZjjV0w9CRZQDE6Enmlfu4XZk7wwH6PZoezCiX84DpalLNARnTdUeKiNw6Y37UE
-	0+OMAJs1gO05qrnxK4IJWidaAreE8tljTO0fjenW0qOmjsvQk68EVLdhzl6PBghrBiGm01twaL7
-	4UaGWX0jx86rSD+CFUzX0fdby8C+f30S0gfQ7D9/Jcc9sGCdsF8+68lPsuPwCrl+ZjiIUBgTtbT
-	OvLHwO+jZ2JUQQGO3BxZn/rRjGkXymjZAeejBnjMKXMCCZMV1dmHy5G4+EgLD3zcZOvvUPadbHd
-	Moie9n87UIDwoDgPVxUnQdlMDxoc3oxmhmyAkAPFawuTK8KuybUHbdyzlwCfaEtOAUu7xOeJaU4
-	xRGj+umEFMrRjcLmqq7rHkJuYzNZVdkJa3BKK8Nx0=
-X-Google-Smtp-Source: AGHT+IE7ssXWYG1Kl6zLN9o6XRXBLYlcIm6Oz9AC7dNpVJKn5DIP/VQrt3e66z6nYAh8AL+d7zdnNkdrmmDq
-X-Received: by 2002:a05:6e02:1686:b0:433:2091:8a86 with SMTP id e9e14a558f8ab-4335f3ab152mr13708665ab.6.1762461250426;
-        Thu, 06 Nov 2025 12:34:10 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-11.dlp.protect.broadcom.com. [144.49.247.11])
-        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-5b746739b58sm335181173.1.2025.11.06.12.34.10
+        bh=RW4FoR0yOC2JMiMbLT5SyorvPZhEQ/Yzvp8kSN7SoHg=;
+        b=IPIDtr4KkCKOo4vdAm/rKVAntvyweyoqzrXM6nBowvFg7XzL4yCMV9Ft0otTDaf6ti
+         AadzCiJW3DYx6ALtFVuSHg4dL8v4AA7C/ZlPLBASTQs7u55pDpLA/83c2HF3fHdgskAV
+         5cYDPmo6jWbwVkdldmSSSsu2zfkwiBaNDazHsi8Bf6ww8d3KKQIRccspsErf888D5aqL
+         oJi0D6pva4Skl/OGcNhXVxNMoaLJHr8ssf2DjYxWJrwri6shDzualyMTghSZob6/AjEu
+         2esKeOgyk7dCMJ5rf5gJRPdKxxyLQQc8RPJtNTKh1Np5H9x9zQElNgQkDGgfwYYjBeC6
+         9RQQ==
+X-Gm-Message-State: AOJu0Yxq/J0YErfiwUutxe4T5g0ou3Fazc6MJpZMeTsXCb0BuElLUaWo
+	pBWvuSQHhPu8V79FuXV6hZtznEE8gF8JrzCfJKSpm6hdU1qKM1GmSYTY9t/1iOTkCzVxXTAnqpM
+	qcJObQyZQta9mQybElzX6QJYuFaoK95B+DRD+w52eO/yNPgsAUj5DR0N4L4XiCm/Fujt1nZeDFk
+	uNAGQgh5/aozR25Gff0+U42NaN0M2abmTLOLcxlqTTXBbUc7Xyl4FM0ZDjXBnOyEgmhGZ/8VraR
+	PEjqSXF38G+IzEVelh6RS2k
+X-Gm-Gg: ASbGncsrF4sS1qENFM6JJgRj5pRRx4A1s7PmnjrqqT8tX74AN8PJM+tOIeKt11Q8AUT
+	/B4GVmhope6GzRaQwy7nrSZbgEilr+FqO2MO/eBPSbsR5aOYEdWWq7WYts5uMuGZU1Y6XfXUcci
+	/hmQ665I0g53ikgRgB+h4opLC0sFQnCrGTVGCq+tOLl//s1eZotEQC57P4bAyGLZwggLfOdSrI+
+	LGx/8bXZ7rTkTFVmwKXFUL1utPhChZPInM1q2OpGyy40sqj6mVyQ4gV0UApqJRyU3RIKrurokPA
+	78bMOu2Ux5yfa7xo1z2vtLGYJbR483QsvFX24wF81Xwj7Q1JxkurAnA0XqzJvGTbPX91IQUvaAs
+	3PmClguh7F1czYJHLy2gc3o+hjIzgHd3KC0fOUvj/ao4kQe7VD7tGVtszBK70PBTvXjjOio+GBm
+	HLjnV5VOFtbUXz6ymv0LtT/KY+bPrzI+Pv5GOzhWg=
+X-Google-Smtp-Source: AGHT+IHtb0kDCZ6WJ8m5hgRWDZ0+t71ESTtJNMMGO9HNEVuKXDMsRdMLpM+ax7IzGCyHpdqWyEKqCuFjODuy
+X-Received: by 2002:a05:6e02:1fcc:b0:433:3322:e35a with SMTP id e9e14a558f8ab-4335f4606femr12751745ab.15.1762461903288;
+        Thu, 06 Nov 2025 12:45:03 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-12.dlp.protect.broadcom.com. [144.49.247.12])
+        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-5b746872602sm365070173.20.2025.11.06.12.45.02
         for <linux-crypto@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Nov 2025 12:34:10 -0800 (PST)
+        Thu, 06 Nov 2025 12:45:03 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b993eb2701bso45844a12.0
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 12:34:09 -0800 (PST)
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3407734d98bso94731a91.3
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 12:45:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1762461249; x=1763066049; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1762461902; x=1763066702; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DzkV34otxN0ctVlzxZXpqYiYjaDeaTvbElNgle63bc8=;
-        b=DANDgZ+lEJQM7x/a8fUxFjWhS31ALEgzMjyMZupHMEohB/WMPKC4ejtHEKcd/3dEaC
-         +DCH281wf3xrHmCeEC6QysjxyVwMX8ZuxSQRhKzI/53626FPoHNdOjGq7zNXjJNXxy/e
-         NF4jPi8rRJbIltaORobmPqrBFdN+v58xHu/o4=
-X-Received: by 2002:a17:902:f54b:b0:294:fb47:b62b with SMTP id d9443c01a7336-297c03be1cbmr9200335ad.21.1762461248974;
-        Thu, 06 Nov 2025 12:34:08 -0800 (PST)
-X-Received: by 2002:a17:902:f54b:b0:294:fb47:b62b with SMTP id d9443c01a7336-297c03be1cbmr9200015ad.21.1762461248558;
-        Thu, 06 Nov 2025 12:34:08 -0800 (PST)
+        bh=RW4FoR0yOC2JMiMbLT5SyorvPZhEQ/Yzvp8kSN7SoHg=;
+        b=GsNdt4QlRRoPTJY2wKeTLkox45eGKk9IaripPFgnUqo1g6lJY+k4m+alf4uscLWbKb
+         XyEhsiuYOkvTdird8tOqvRtPpLWNTEOjbYpuqpoAXpOnABo+n1Qd+A5YjQDrjxv1nikI
+         nAilKWofe+RwD1hYUQMjSmxN1j5QlYcWljgR4=
+X-Received: by 2002:a17:90b:3c86:b0:32e:6fae:ba52 with SMTP id 98e67ed59e1d1-3434c4e3c44mr582836a91.6.1762461901853;
+        Thu, 06 Nov 2025 12:45:01 -0800 (PST)
+X-Received: by 2002:a17:90b:3c86:b0:32e:6fae:ba52 with SMTP id 98e67ed59e1d1-3434c4e3c44mr582806a91.6.1762461901417;
+        Thu, 06 Nov 2025 12:45:01 -0800 (PST)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2965096b8ffsm37038865ad.21.2025.11.06.12.34.06
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3434c30b96dsm346476a91.5.2025.11.06.12.44.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Nov 2025 12:34:07 -0800 (PST)
-Message-ID: <c6aafc19-a3ce-41b3-b3ba-f82494f9c9e9@broadcom.com>
-Date: Thu, 6 Nov 2025 12:34:05 -0800
+        Thu, 06 Nov 2025 12:45:00 -0800 (PST)
+Message-ID: <b0fd87c3-0127-49b1-9784-51b3738c3b79@broadcom.com>
+Date: Thu, 6 Nov 2025 12:44:59 -0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -81,8 +81,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/6] hwrng: bcm2835 - Move MODULE_DEVICE_TABLE() to table
- definition
+Subject: Re: [PATCH 2/6] hwrng: bcm2835 - Simplify with
+ of_device_get_match_data()
 To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
  Olivia Mackall <olivia@selenic.com>, Herbert Xu
  <herbert@gondor.apana.org.au>,
@@ -98,7 +98,7 @@ Cc: linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  linux-arm-kernel@axis.com
 References: <20251106-crypto-of-match-v1-0-36b26cd35cff@linaro.org>
- <20251106-crypto-of-match-v1-1-36b26cd35cff@linaro.org>
+ <20251106-crypto-of-match-v1-2-36b26cd35cff@linaro.org>
 Content-Language: en-US, fr-FR
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -133,19 +133,18 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20251106-crypto-of-match-v1-1-36b26cd35cff@linaro.org>
+In-Reply-To: <20251106-crypto-of-match-v1-2-36b26cd35cff@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
 On 11/6/25 08:31, Krzysztof Kozlowski wrote:
-> Convention is to place MODULE_DEVICE_TABLE() immediately after
-> definition of the affected table, so one can easily spot missing such.
-> There is on the other hand no benefits of putting MODULE_DEVICE_TABLE()
-> far away.
+> Driver's probe function matches against driver's of_device_id table,
+> where each entry has non-NULL match data, so of_match_node() can be
+> simplified with of_device_get_match_data().
 > 
 > Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
---
+-- 
 Florian
