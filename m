@@ -1,193 +1,157 @@
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011043.outbound.protection.outlook.com [52.101.70.43])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882B52E0934;
-	Thu,  6 Nov 2025 16:05:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762445128; cv=fail; b=PHpybSRVxQbpW4xClGLlPsZCPzmjIr1ITm3gQ1QajT9DsKofWSfOALZhLNCc4/T+DCpI4XxSXx/nmwBXQAh84bZS+TXW7D+UvY+P+FB6TNFg5gLXHXTSYc2de2u3fVfhlzB7oMG5aykCJi6TT8G2n2cZ7vldPwayANzCmisocdE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762445128; c=relaxed/simple;
-	bh=UvuwgolgzFH7tKTynkLWFPk2EvR3KuO1LEafyE96Ty4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=kcZwhk7XoLN8O3kkKAv6FwY29pmjxDjluEMi007tq3jWeB/dGPX089iGnih1GbASpCJzWsK9HGmTfmx59trkdhfvO8ARF4zTLRIG8m96jGA0EtSd8BqmNk2jI4n3aNAX5EeuuL8HcgTIX2gDLU6GuhkmlUDFW07s/V7xxepuyX0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=fRW6hIT9; arc=fail smtp.client-ip=52.101.70.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48646302CD0;
+	Thu,  6 Nov 2025 16:08:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762445333; cv=none; b=tgNmyL5bByQeZEKzBewrZ3d1+UIWzOV4OIdE1D7aNQpDLUKwyyty79gvYliH1RpOpYr/wfxjxUEAsd4vUihnRUaMqumhTFd2Ixjn8Q/d4Tp5oPVR9DkyvXkaIQWxqH3G3U3uHtFs0QFvOkkIm1geqaHp0ksPXRS78tbBunDdAm4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762445333; c=relaxed/simple;
+	bh=BxSiubnDJFoi3hF0gZEV1dDowKtMOnRvt3PDCt/YgRc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rVDuktOEjau/zvPRHJUSf41hyi4OacpvccYWbIeDnk71P8DgsgBfuit369aDlGZI7MlVQ2FaVlzfniuxzrpyWbyAFPp/e+Bech877/sLvpzVyV14uVCgkEa7cqOv91WXvQxGxNp3rcxIrk3lDagrmYq490A0RBBo7FdGAVkcyNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jlpSd2oO; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="fRW6hIT9"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Tkfr7TQhZ16tm4EnwiTWI30G6CJ5vThTES26Xkp1eqfYdfR0HT2xV1Y3Rm8HnQp4OS9BTOtwKy8X8vzRn5cjh3+ocEmsbh0FnMFPrTLIYJQAZ9aUZIYvVUg4llTZHEV1g3C1mTPU3Eqr94qihU9qHa8Rfjlpd3upcV5hd/jjwYh4Q64A0y+H4xk0ZEGY4arbyJY29RA6Si249PIE7aey8eGHH3Mhid5aJ64fuC60mKKZvM11MZwVSKYYM8wj5bF1v3l7Tw2m/6MaqUyKeLhonUXqy0Z/Yb9ANY5ovmBZxhGJeTkE3djQLCXiZ/s67KNG9NmCpXiXA+aB5LpiOoqnVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=amCLv1hvaR2F0nU/BqvfI9e0H3aeVVgyuQQjWCzJ8d4=;
- b=QXCbhZnGTHn06z3IT1IbcItzJo4rujQvREaz2NRX6pKrdNGE3A4WFXZIlCTU4rCJ4f7EfidF94aV0S1evb3/ZMbdLpNiYEWIntEnlM5N6eKZwkdaXBOqLAp6XqIhVxVfVFUG3gzeGeazckV42Ao+CYtmywZAmAmP//kmMuLVxWy73jVFt4lOB7CA1A9PuqGrJqiNzCif/xqsIlnsid2flSiuN1ymMC5D5X0kS1aDQUtQPTI8gU1Sp48+kiybfEmsF81oPpge006LJYiQz9XxHJsk4SPQrJ5spL7TpD708fnr0ay7dU+jmqtCr536/QKx/ebz0I1g1+DkmTV/GmW7ww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=amCLv1hvaR2F0nU/BqvfI9e0H3aeVVgyuQQjWCzJ8d4=;
- b=fRW6hIT9jbGEy0iI6l8k7A1i7MzZZaWZkvSO/JWlKQxGWoMDph8UJnwi2PUjNXdom2GTYqZGxAsRd9m3N6VFhA5lcoq8C+gPMSzuHTl4B8AMEeGmCGffMr/IRwzm5sarVY5Hp3Li/lIJcHclKdJlrTSRaVGm5Bq1HtkB0YHP8PVlOMB8TEkEJEeXd/b1jnqMFitAW+rW3VMvxXw9NbwkXRY5RQx9gFglnh62VH6yifizkMynsU9Vms2tzMlcvAeXGtgGwXHdWYNPYYcbpCxP1r6WeDursjE5rS2dNld6QrwRHXTw7ociRKyaslF7byPClhT5AA0EDrYXcQ0Ys5OdFg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXSPRMB0053.eurprd04.prod.outlook.com (2603:10a6:102:23f::21)
- by GV2PR04MB11304.eurprd04.prod.outlook.com (2603:10a6:150:2a8::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.15; Thu, 6 Nov
- 2025 16:05:23 +0000
-Received: from PAXSPRMB0053.eurprd04.prod.outlook.com
- ([fe80::504f:2a06:4579:5f15]) by PAXSPRMB0053.eurprd04.prod.outlook.com
- ([fe80::504f:2a06:4579:5f15%6]) with mapi id 15.20.9298.006; Thu, 6 Nov 2025
- 16:05:23 +0000
-Date: Thu, 6 Nov 2025 11:05:15 -0500
-From: Frank Li <Frank.li@nxp.com>
-To: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-Cc: Greg Ungerer <gerg@linux-m68k.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Olivia Mackall <olivia@selenic.com>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jlpSd2oO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762445331; x=1793981331;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BxSiubnDJFoi3hF0gZEV1dDowKtMOnRvt3PDCt/YgRc=;
+  b=jlpSd2oOR5wZlMbTql+TSqjVWomKBBKMFkf1/VdgcqMXuz273YF6XP6X
+   +hPmSHg9qpLxrHinF0rWesen27BrXf3Q/KirEanRteCqzFck4Wk/gny19
+   sh2CkJ9tzG9UCuYUcXj3ael/zNDeKJe4eUJslJ4Qudtrf7J6PJzGx8SYI
+   Fx/q/sKACbeesblHGGowKuUmu9z/wknoGpL8oDx1Bib1SRanJAAUVLfx7
+   R81tD6r1n/xHs/oeQ86a+ovpfwSlt6PkWqHSJXDx8ajSIYOiy0u2hV1Q0
+   jEDx68lju7PZcMkaZ4AvvqSpAX+mT/9MQf6pF3JW+oSZdgHOyRl+wSe6l
+   w==;
+X-CSE-ConnectionGUID: ejueZuzTRHOLyplIDnJ0GA==
+X-CSE-MsgGUID: TSwY/vFASaOIYPLsG/HSyQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11604"; a="52154280"
+X-IronPort-AV: E=Sophos;i="6.19,284,1754982000"; 
+   d="scan'208";a="52154280"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2025 08:08:49 -0800
+X-CSE-ConnectionGUID: csRhl/YrR3mh6V3vjCg1UA==
+X-CSE-MsgGUID: aB5X0TIERP63avd4sWT1og==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,284,1754982000"; 
+   d="scan'208";a="187454619"
+Received: from abityuts-desk.ger.corp.intel.com (HELO ashevche-desk.local) ([10.245.244.224])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2025 08:08:39 -0800
+Received: from andy by ashevche-desk.local with local (Exim 4.98.2)
+	(envelope-from <andriy.shevchenko@intel.com>)
+	id 1vH2XJ-00000006BqD-4AI9;
+	Thu, 06 Nov 2025 18:08:33 +0200
+Date: Thu, 6 Nov 2025 18:08:33 +0200
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Geert Uytterhoeven <geert+renesas@glider.be>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, linux-m68k@lists.linux-m68k.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] m68k: coldfire: Add RNG support for MCF54418
-Message-ID: <aQzHO6Ty+l1Bwt6N@lizhi-Precision-Tower-5810>
-References: <20251106-m5441x-add-rng-support-v1-1-ee8230910d17@yoseli.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251106-m5441x-add-rng-support-v1-1-ee8230910d17@yoseli.org>
-X-ClientProxiedBy: PH7P221CA0081.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:510:328::33) To PAXSPRMB0053.eurprd04.prod.outlook.com
- (2603:10a6:102:23f::21)
+	David Miller <davem@davemloft.net>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	Crt Mori <cmo@melexis.com>, Jonathan Cameron <jic23@kernel.org>,
+	Lars-Peter Clausen <lars@metafoo.de>,
+	Jacky Huang <ychuang3@nuvoton.com>,
+	Shan-Chun Hung <schung@nuvoton.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>,
+	David Laight <david.laight.linux@gmail.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>,
+	Tony Luck <tony.luck@intel.com>,
+	Michael Hennerich <Michael.Hennerich@analog.com>,
+	Kim Seer Paller <kimseer.paller@analog.com>,
+	David Lechner <dlechner@baylibre.com>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Richard Genoud <richard.genoud@bootlin.com>,
+	Cosmin Tanislav <demonsingur@gmail.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Jianping Shen <Jianping.Shen@de.bosch.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>, linux-clk@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-edac@vger.kernel.org, qat-linux@intel.com,
+	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
+	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org,
+	linux-mtd@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 12/26] bitfield: Add less-checking __FIELD_{GET,PREP}()
+Message-ID: <aQzIAd91tlR3o9hu@smile.fi.intel.com>
+References: <cover.1762435376.git.geert+renesas@glider.be>
+ <cfc32f8530d5c0d4a7fb33c482a4bf549f26ec24.1762435376.git.geert+renesas@glider.be>
+ <aQy0T2vUINze_6_q@smile.fi.intel.com>
+ <aQzGY4AKiMQpuL0R@yury>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXSPRMB0053:EE_|GV2PR04MB11304:EE_
-X-MS-Office365-Filtering-Correlation-Id: be1b0263-b610-4a7e-a5cd-08de1d4e4ac7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|7416014|19092799006|1800799024|366016|376014|38350700014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?IA5Ntnuekd7Cp+hfs0TVFyBE5C5iRhhfHEZnyitpDGej46/UN6lkBkCN6Z/d?=
- =?us-ascii?Q?H7POcJxitELU/kdiGywGqXwI7i4XmZAzjMCNGFyRBfHC2WADPqo5PG4Sb0fx?=
- =?us-ascii?Q?qPPnZ/mhvBxvkJa09AcpblTXhAfsa1wxq+7lC6G9AfDpm+MPNPKt2Ew+vk9C?=
- =?us-ascii?Q?/aHqwBJoj1DCav3uw+GZf/XVxHCMWELgU0u63cVc/mtuV9s4U5AY03fdK/1Z?=
- =?us-ascii?Q?m5KDurQ1tvb3vRJ+BMZ/XRq8HChOeboyqQ5R/JXFWqMWQTviZTflmoZf1eGz?=
- =?us-ascii?Q?d+aFLy6EUsfVdoatwrE/7igykLkNiP3T5lP17zFgn+7vuUcK/UUgnzMen9n4?=
- =?us-ascii?Q?mX6Job+R1PNafP/goe01+NDvKuQoOqht4FT3Pxg/40Dogq/PI3xjzaXqZMmZ?=
- =?us-ascii?Q?1gnvmaftrUkpy2kw3ocrAkK9VbuuYaTlxlnlYsqL2sbiRaCCHdsEQxHLDdST?=
- =?us-ascii?Q?pkSoIsMityqnRydAVTUMHz6WDDgcSOWaBb2Wmg0tlHhaGFRSuRPequme4AdK?=
- =?us-ascii?Q?AwUHkT/z/EMe0xOKDxZVPO9e3jXQXpE039/7pvsev5O98GeLk/iELxv8ZXKP?=
- =?us-ascii?Q?wyNGyhVxMHo5obXGXBAjfkidvDp0I+vJ3OxSiNKSWisWmy8Ux5gK52jAVCwH?=
- =?us-ascii?Q?OCue0vc92B6RigJgix7lttujmgRMn+H0+9oZXuGNLtzMYbhEs6qgxXy5jNhL?=
- =?us-ascii?Q?mbMl71Qy/eMo6KIpMxitdgAoxztBW6JSWRsVzkGqN6qSl90Mfa7cvvkdEwQi?=
- =?us-ascii?Q?zBCtMdx7TeXIGAy4Hz6ZWZB6ikyzAmeCbDc4U4gQ8DoyFpjcCdvS4lNI54qq?=
- =?us-ascii?Q?YsIyJZ0425D3L9P9r+dqnNV6nYvjB4ZK79vvVcjIjW8x16M29+Aq5tHmbMA4?=
- =?us-ascii?Q?v5QvwQ9yp+K1oLLCW2vOaHdkczH0GWrVwLE/ovGM994lzFF6q+euY9b+aj6d?=
- =?us-ascii?Q?SerB5+1HhovVJQKt7GK5wcTjqJVk3Ij6QNrT99mlInuXHjQiPHfhzVUCfKk7?=
- =?us-ascii?Q?jCqi4FLIXGV0GGm59Mmnlrybtko/lHZKQoW0zABEtAL4RmdhkybWsnOuJrBV?=
- =?us-ascii?Q?mQagvIUg7adwIUVNfvumHYYcZYr5hB60D5netT6gJVbspOMoky9Bc8PnBb1k?=
- =?us-ascii?Q?+e2x+zeBpn7Hq1d2seDvGnfd2Qhodzr4vRdr3bYEQ62wphYVVL/BtiyQELfN?=
- =?us-ascii?Q?pf8mxwtxMP5tZyxNi4a5fSEJw2f7kgfkCz6Pk3YtOZ4XlJ7U3g8DFP+vI9Y9?=
- =?us-ascii?Q?4gptxRxmPKVUUygD8vG4/Kq2gPUO8q2BEwd9wAgmZm/nNKVFC+n51CuGZNkO?=
- =?us-ascii?Q?h4mEoDM2AeWMzO8+gkk/nZenLwCR8I75dAPvXXf6Mv6P3XMWCbO6KRqSFCEr?=
- =?us-ascii?Q?Od4VIOry0tsH8JVIQodKSZn8IYVspB7N0HFC3r0YO66HIDrWzroNFjKFBFio?=
- =?us-ascii?Q?6QEK8AkLT1bh+ZCvhOTtof4ssvKuXuCzXm4e6BkHdMfldH6fOetSeZXaU6RT?=
- =?us-ascii?Q?vTLE8xXshEbVqLa29Gwapk1dTt9BfehXSf1y?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXSPRMB0053.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(7416014)(19092799006)(1800799024)(366016)(376014)(38350700014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?3seNkpDVZux0Xj5WskwMkoNOLyW/oCqlEYdcj55xYvh1+kPwtOQexN4piKTB?=
- =?us-ascii?Q?sEQlx2DxFvsliO9omhkhM1OHCHKjM8xdKWV3qbRIBLKFNoIeSBwwnv/sN+CJ?=
- =?us-ascii?Q?BY+jYBMkZVEtf5PZ95i1PxgzjJIlh5+/kf3M4koGubvflnJQoGQ0MK3zFwqp?=
- =?us-ascii?Q?4pumXXQT/8sKvKhRlYEW+sW4XTRvCO952vCMimBHSwlaZfyJSw1dPzp9yBOz?=
- =?us-ascii?Q?b90zs+9jEiZews2uvkzxGdg+2mzGy0LYKIgfQ27taZypDnBBA2GRvvdfjWcy?=
- =?us-ascii?Q?7P3iOAEVaih1FJh0Ce06BQXTtEfkHxwMh4a/dhl9S5Xr7mXtifRvxD5JK+CE?=
- =?us-ascii?Q?EqNnwU7O9EN35SuolJWqh4nbfZ4yhmHThahnhyLa0NjZlbpdfVonixVhB/hW?=
- =?us-ascii?Q?ogs0VAliKzu/ZCCPlCyoGyrsQDPZVw9GJVZbFFCpYvW0FxrJ2eUNJhDKjr1W?=
- =?us-ascii?Q?VQE16Eoj1hV+YzIOsTlMNhTiD6tNghEHPVBv0+MMyDRP1olugGXo35NFI+q6?=
- =?us-ascii?Q?VdU8ae2pSocTohRJTRjiwlwaX9IJNpiA48zIQDG22B6mo2aiybAP++dwxlEl?=
- =?us-ascii?Q?a215akZZnotptz8mlEVWapz2h0NxdDaI62yFYdqff9TL1Krf7i32b/AMqnGm?=
- =?us-ascii?Q?1XpIsgbUojNu1fb2Slh3vJFomq55wFyRDtVtMxvJ/rC2zM/mZ7hdLk9OXzf8?=
- =?us-ascii?Q?uP90a7ZDIAWO7MiXYU0jgKkzYqzZ8mu4J8KyQoE1hFbmsck5VSJVAWxVRLOU?=
- =?us-ascii?Q?sJrJQu8xuuZaydDXWChzCol7icJLusC3OiaIIwj76nh3ywdliYlSblsaL7zO?=
- =?us-ascii?Q?BXs7uEHgWyQyJ/j+hvVAluA4CY4zJR61y2j9bhCRpd76C1tEkzSvNR2VAn22?=
- =?us-ascii?Q?RnFTVa48fRyj5d9qaYXgi2zqqJbUyORO00smsr7pZxaHpKxBQAzwSNlmiBeA?=
- =?us-ascii?Q?3bVy5qCVvmpPN0kBmJg3NwdpohABCtoN5DeUuG7CLM35XeommrkT2jmbamGT?=
- =?us-ascii?Q?MhqMRJHchVnsrENGcZ4YWPCeqIDTkP/hG1+eOngeDjS+1MtuvPTPGJ0mr7FW?=
- =?us-ascii?Q?nvfUFBO61f0KIxGP98AvDJztp/hpwQWylmF/iRnKWQFsBgyVsAgAWERSLGLg?=
- =?us-ascii?Q?iIyO5eNsyWP1at9Ih9omxeSKzyqBzGUCDGo5UVVzFyTvLc1KO+8uasrQ+sRs?=
- =?us-ascii?Q?GR5DrgPzlgyQ4MTUAzSVIoDq2Um7m6DazQh1Kx+o1jEKgheGY228wIaKjv/8?=
- =?us-ascii?Q?zA+ARr5YWXjNBCInHMIhIyzDJ1NZcobW8jIAcK4+bAH7pUAiqihN5Runuxdw?=
- =?us-ascii?Q?E0RwuCPB7UYC5bue12zphKkQXlt4rb92D10eqNaCixxF6xDnQddusKiG6jPe?=
- =?us-ascii?Q?QatFz1EWoOm/cbtQ2HMTwIKuHmIX6Rawvr82Jjvk4Z3uCTnFUTEU+V+FRASg?=
- =?us-ascii?Q?Zk2CXbo0hVlQCTPbzBeANjqNwa5ywWjod7eFloBTFmOjn2K9XCcLPcjdlcRh?=
- =?us-ascii?Q?9UiqySjhlUTDKLDBcRAMvonBvGGsQof5XjX3r8bAwLfqStbJiB4lO8BAl92g?=
- =?us-ascii?Q?MypBnz8hNxWdxWvKcoVQLQLMTjAUQaFxDODQH+pT?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: be1b0263-b610-4a7e-a5cd-08de1d4e4ac7
-X-MS-Exchange-CrossTenant-AuthSource: PAXSPRMB0053.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2025 16:05:23.4376
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: B250hx6ZeyGerc3RHuERpt61mvJGAcvwjQXFdE2BUqKnNBaCgSaSt1yPW02PKYEnWJsHKuniYH2QvDljZHWyog==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR04MB11304
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aQzGY4AKiMQpuL0R@yury>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Thu, Nov 06, 2025 at 08:10:08AM +0100, Jean-Michel Hautbois wrote:
-> Add platform device support for the MCF54418 RNGB hardware with clock
-> enabled at platform initialization.
->
-> The imx-rngc driver now uses devm_clk_get_optional() to support both
-> Coldfire (always-on clock) and i.MX platforms (managed clock).
->
-> Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-> ---
->  arch/m68k/coldfire/device.c       | 28 ++++++++++++++++++++++++++++
->  arch/m68k/coldfire/m5441x.c       |  2 +-
->  arch/m68k/include/asm/m5441xsim.h |  9 +++++++++
->  drivers/char/hw_random/Kconfig    |  3 ++-
->  drivers/char/hw_random/imx-rngc.c |  9 ++++++++-
->  5 files changed, 48 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/m68k/coldfire/device.c b/arch/m68k/coldfire/device.c
-> index b6958ec2a220cf91a78a14fc7fa18749451412f7..9d8f844e319a98f0afb79cceb544c2d3029482a4 100644
-> --- a/arch/m68k/coldfire/device.c
-> +++ b/arch/m68k/coldfire/device.c
-> @@ -622,6 +622,31 @@ static struct platform_device mcf_flexcan0 = {
->  };
->  #endif /* MCFFLEXCAN_SIZE */
->
-> +#ifdef MCF_RNG_BASE
-> +/*
-> + * Random Number Generator (RNG) - only on MCF54418
-> + */
-> +static struct resource mcf_rng_resource[] = {
+On Thu, Nov 06, 2025 at 11:01:39AM -0500, Yury Norov wrote:
+> On Thu, Nov 06, 2025 at 04:44:31PM +0200, Andy Shevchenko wrote:
+> > On Thu, Nov 06, 2025 at 02:34:00PM +0100, Geert Uytterhoeven wrote:
+> > > The BUILD_BUG_ON_MSG() check against "~0ull" works only with "unsigned
+> > > (long) long" _mask types.  For constant masks, that condition is usually
+> > > met, as GENMASK() yields an UL value.  The few places where the
+> > > constant mask is stored in an intermediate variable were fixed by
+> > > changing the variable type to u64 (see e.g. [1] and [2]).
+> > > 
+> > > However, for non-constant masks, smaller unsigned types should be valid,
+> > > too, but currently lead to "result of comparison of constant
+> > > 18446744073709551615 with expression of type ... is always
+> > > false"-warnings with clang and W=1.
+> > > 
+> > > Hence refactor the __BF_FIELD_CHECK() helper, and factor out
+> > > __FIELD_{GET,PREP}().  The later lack the single problematic check, but
+> > > are otherwise identical to FIELD_{GET,PREP}(), and are intended to be
+> > > used in the fully non-const variants later.
+> > > 
+> > > [1] commit 5c667d5a5a3ec166 ("clk: sp7021: Adjust width of _m in
+> > >     HWM_FIELD_PREP()")
+> > > [2] commit cfd6fb45cfaf46fa ("crypto: ccree - avoid out-of-range
+> > >     warnings from clang")
+> > 
+> > 
+> > Also can be made as
+> > 
+> > Link: https://git.kernel.org/torvalds/c/5c667d5a5a3ec166 [1]
+> > 
+> > The positive effect that one may click that on Git Web.
+> > Ideally, of course, would be an additional parses on Git Web kernel.org uses to
+> > parse that standard "commit ...()" notation to add the respective HREF link.
+> 
+> Those flying over Atlantic or cruising cross Caribbean would disagree. :)
 
-const?
+They won't. The purpose of these Links is described in the above commit message.
+Even they read the commit message before clicking.
 
-Frank
-> +	{
-> +		.start = MCF_RNG_BASE,
-> +		.end   = MCF_RNG_BASE + MCF_RNG_SIZE - 1,
-> +		.flags = IORESOURCE_MEM,
-> +	},
-> +	{
-> +		.start = MCF_IRQ_RNG,
-> +		.end   = MCF_IRQ_RNG,
-> +		.flags = IORESOURCE_IRQ,
-> +	},
-> +};
-...
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
