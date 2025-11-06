@@ -1,91 +1,73 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EDB23BF9F;
-	Thu,  6 Nov 2025 03:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1187F18EAB;
+	Thu,  6 Nov 2025 03:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762400189; cv=none; b=TPpgv6dMfyt8okHUNKC42Um1n84ZKD+v762mm6X4LPXZNXwtV+PJylR9vVqypWOpC3YkaCkhBeXEsv23x1EmmWmyYD5QWCSayFfgccqlOhwYv7yZZ2kO2LOlg/RfliGSOWf3m3zHhce3p/XPK5ADUfE38ZNfEHtANgk71omMGqY=
+	t=1762401423; cv=none; b=m/zn40kNk6MBRK6plmqkULMkC3afWRwe0YHaXeMJ6vLX6/e6vt5dXLzlb/zNw6WcEEELA3hhQhwbYV55cO20U29qPZps0L7g8XATQ3ePzjAiliQqWY3XBR/Pt2NmoeosDVJxWLL8l/xYFi8b0eWRFn3+z5h8inDFzYxTnezcCZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762400189; c=relaxed/simple;
-	bh=GNM7TCeMHbwIbYlXWuHY4qz5dEcc72V8VdoUKhsYSsE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=LoS5aUao/h+PGY1kxqdVZc9sZdkPW3V4e8+DrjIcpyKy5NlUegTAcIdAFYAmDanBPZ9KfoFogSdVLhYT1PdgF1lRxoZsCoAly6Vc8qDsgT4JAFZY8ziPJMmuqplB75ZbeDDNROtAfrHSWrug8fZ7ihEs8L1klsVur/aqo7KVuOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=mXIUTRwj; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	s=arc-20240116; t=1762401423; c=relaxed/simple;
+	bh=3DGLDGYWy2Rqy3ANrqvg1wmKrzxrnVatj4+j1+4JM/E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bb5u4WE6EV5Q5WlxuYSscq4Q8WNqBJS2WYQX69PoplOr3TBZ/1VPzmYIdnIuGIJr6/vWZhw7lK5y/7SjFZNyLh5A40yJIlp4bekHBApBQUV/SiB4KdHtvieb7hirF6fuDylKCR+/ac54TUdx1Be/Vv4MCivGBJJzjV/E7JIsRV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KAuVus+d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="mXIUTRwj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1762400184;
-	bh=EjP3pLW0Hcin6KAIIE0/ZI3uWOTZ9EvwyI5DnmbVOgY=;
-	h=Date:From:To:Cc:Subject:From;
-	b=mXIUTRwjvyfoaT1qpKJjFktIOET6zUTl1eSSFcdChHaZmjqermjpYZ678K8sJXE3V
-	 g66M+CHSEW+BDoClmA5cVzq1FzGMIrVPTzrvHXTxWOFA3RR6ODOFWEEYb0cTyjPxan
-	 MkhhGjsCz8xrPjF3nRw512pJ5hV20HSn1gifny0mUxk/cyjHH7rO8qLV5x31SZ9pV5
-	 FyTlfkX29XwY156ThJc1Fa5oG8BXZguGQAr4he9c8u8l8ImBTqLvuS4yTGyJmebOxr
-	 skw2F4LzjdcSBy9ohUEENIxt9zitbo2PPhHvO4IoZ2CugcvKptu5CCmXSRlxiuHdzB
-	 Ynna7IjOrxZ1w==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4d27CC6BxMz4w0q;
-	Thu, 06 Nov 2025 14:36:23 +1100 (AEDT)
-Date: Thu, 6 Nov 2025 14:36:23 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld"
- <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>
-Cc: David Howells <dhowells@redhat.com>, Linux Crypto List
- <linux-crypto@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: build warning after merge of the libcrypto tree
-Message-ID: <20251106143623.06b23d57@canb.auug.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KAuVus+d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53937C4CEFB;
+	Thu,  6 Nov 2025 03:57:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762401422;
+	bh=3DGLDGYWy2Rqy3ANrqvg1wmKrzxrnVatj4+j1+4JM/E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KAuVus+dmtTw5zUSJeLLMlm03p0hHQW9B1xgSUsrzpSCKwkt8tTTJFKH3YToI/Jlp
+	 iONB6F4RilFfckhzZoF+dk1uCFcVGIInEDY8qTGLykxqDcxPxfKerOfuVTFgiHuiTj
+	 sRKrS15ZiJIehI/xtJIxVQsdQ3oE6jsZ6xAgEVT/baKc+l6yfF/WavVzXkTduDOoQG
+	 m/czeNO8J1mdDog4AmxNPyBoFXR7k2q9ShFt9lkQZmnRFhA3jfO2bKqre/Q0VfMHza
+	 cyNnQEeavbK+2JEUnq1pZnCgHtYqISc3Y0HIgkoMSpJ9oSulyl03mpxm11HpQA0p9H
+	 AJoYUkBeH1MLw==
+Date: Wed, 5 Nov 2025 19:55:21 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Linux Crypto List <linux-crypto@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build warning after merge of the libcrypto tree
+Message-ID: <20251106035521.GA1650@sol>
+References: <20251106143623.06b23d57@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/7GoaeS7n7v_YCPwcESvc0YP";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251106143623.06b23d57@canb.auug.org.au>
 
---Sig_/7GoaeS7n7v_YCPwcESvc0YP
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, Nov 06, 2025 at 02:36:23PM +1100, Stephen Rothwell wrote:
+> Hi all,
+> 
+> After merging the libcrypto tree, today's linux-next build (htmldocs)
+> produced this warning:
+> 
+> WARNING: /home/sfr/kernels/next/next/include/crypto/sha3.h:74 This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+>  * Zeroize a sha3_ctx.  This is already called by sha3_final().  Call this
+> 
+> Introduced by commit
+> 
+>   58873ecf091b ("lib/crypto: sha3: Add SHA-3 support")
 
-Hi all,
+Thanks.  Do you know if there's an easy way to find these ahead of time?
+I usually run './scripts/kernel-doc -v -none ${filename}' to catch
+kerneldoc issues.  I did run it on include/crypto/sha3.h, but for some
+reason it doesn't detect this issue.
 
-After merging the libcrypto tree, today's linux-next build (htmldocs)
-produced this warning:
+'make htmldocs' doesn't find it either, but does generate a bunch of
+unrelated warnings.  I may be missing an option to make it even more
+verbose.  Either way, it's also slow to run.
 
-WARNING: /home/sfr/kernels/next/next/include/crypto/sha3.h:74 This comment =
-starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-=
-guide/kernel-doc.rst
- * Zeroize a sha3_ctx.  This is already called by sha3_final().  Call this
-
-Introduced by commit
-
-  58873ecf091b ("lib/crypto: sha3: Add SHA-3 support")
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/7GoaeS7n7v_YCPwcESvc0YP
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmkMF7cACgkQAVBC80lX
-0GzJWgf8CdIwuqZ87ASMPLbr5h+WcmIeOTyyhoZa6BnJDWCCi5RcyMbAUqdL7JBv
-sWPqB9CkiYU2kv7CzFo5jqEe4ql34dtg2k5EPWmieP7hLT3FGh+qpZj1xS8fpOek
-koFW9Up5sNfxg8yow4zPQloJ3119JOqRJcWnGlNqs21CwarvD+Rcvr1tavSFUxJR
-9rKmrzLnXJaM/ikcLGaG96ZogeYEpd+WaSOUqgrYhuucGRbrWR5mv9o6u0Ee/BJJ
-PTjR3U8WSa401t4KEgbkHECsQoYCk3FXD+EodMMNfWExNj5pQFznljfhUPb3H5zN
-oRvDRsW3YApNBT49uYDaq0/lRZpiAA==
-=DUdT
------END PGP SIGNATURE-----
-
---Sig_/7GoaeS7n7v_YCPwcESvc0YP--
+- Eric
