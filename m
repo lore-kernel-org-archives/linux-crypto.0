@@ -1,66 +1,66 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2A134F265
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 16:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A63234FF67
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 16:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762446734; cv=none; b=ZMxlWL+uDVQa6giheZ80yt6Xeymxudc5koAqtnCrrMwfbTeMy+FZ5Ye0HF6tVQP1CW936gPFazDg/0Daj0BtqhgbcbNXYHyVZRuQDotUn6vTqaWCFOhJfb6ybcPB7xaE6mlnGvJ7s7VauUQYQOLuVTTMVayljDloY+b6d7ZGn4g=
+	t=1762446736; cv=none; b=S3bB+QENE6GlV5tbH4a6Jz8vddX6H4Fn2LZ36gMXreNCn3f70cvbTcz4KOfXXLBcE51hJZ3UpkPQUZur5v+E2HTNx+i6qF+j7/P+zf23dwoWCDhFp3tbgEquZTHe8xoWO5zYtdrTFM1SkixLCzg/nEJeK/v2nHXPf1cvmCDPx08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762446734; c=relaxed/simple;
-	bh=kMWfmj/ptzyaxsCFocF8hhBseEl2zvCJsZs+GsRu/Qk=;
+	s=arc-20240116; t=1762446736; c=relaxed/simple;
+	bh=L3Ng/aC4fiC+veLj0saleTuVV2+DCXLKDn5kGqHtuy0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=PDhrlkKbP/NfXomi+c/ucalX61x9LoDFJvRFzSi9taDKD6WN/5zpUcanNORxjd3i4V41/WgWdlzyiSGmc2nxqMxmHP3OnDnJ2b9kNyBCutRg7EUhUw6FNhlcAiAAuA4XapJgn5M+WJaZwByFWff0q3m6livBWhNIeZezsp9+oyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EFFtl36m; arc=none smtp.client-ip=209.85.208.51
+	 In-Reply-To:To:Cc; b=d1S1+/llXlzFLgWY4hJeIQ0MRHU8sqWXE3OoFKkN+Rklj+hcly8T3jkh1XVFA7k2Zds3E5TtKQYr45xwcqsonQa3M7ySiHQOyjsy6lAeuRSqNCCML9cjZleaMk7jTlWc5zKQrpb3ERiCNKsVumwLIOyabHY0r46iDGSZwNx73Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gG3v6ESQ; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EFFtl36m"
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6411f1c4b4fso204248a12.2
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 08:32:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gG3v6ESQ"
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-640e970598cso214709a12.3
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 08:32:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1762446730; x=1763051530; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1762446732; x=1763051532; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ZGmeAD+s54GN07CXVStO6BNg5fZaJA+7jizpGW7KNys=;
-        b=EFFtl36m/EInEft3CNmVUM2Ts/vKlffWODDuYp/f5pSXd9dkNsm7NizLn3/umpcEp9
-         JVZ9Rhbh21AgFmj+Q9aPBMT1/1glV1uFjFGa5j3/BL4ljrNhswiqyjxomz46yBBTrvFA
-         bDP7s5sIfQX0P6PcRyBfkJEIQ+LT4VJC4Z7w/n1qBfSsqcAD7BTpnHOmkTFl+s4hVTAj
-         fAChr0TMvlwnT1F+3l7JED1TULN9MNH0sL09WnbD+0G7ms6c2JtiIn95PGsh89i9mQpg
-         htCVzjNWD2G31VOp6Ot2TSWjMNVeezr31aLSd+R72QfEYMqoGjhus5ivcfNWaHae23OI
-         Hc3A==
+        bh=X5w8hxKvRTGPo6IVAgTGxIFQbqEmNhRknqABWcJ9Jzg=;
+        b=gG3v6ESQVKQiKvJpbiNAO/15hqcosNgMNo/epHDTDAc7jRrAiRC9jHEw07FSrdw7uJ
+         yMmFEYj0FmxKqXVGZcvLbhHeH+bgjVo74ef+ZHEiN/Q7bYx/4rMC7JvCgQaOiH2usyfl
+         5h8Ahh9kwyCw0se3vf/7zvcnoilb6595AR0VMbr6PL6FcipRX+tA1KNb5sS0B76eiRF+
+         lzE8qhFreg9cNR5n40YrMAFATFVNMkRPtGTOGfth9xH8W3h9r/XGds1PKU8rW2gThmhl
+         TR256aG8E71CFHg9UEIPGnkHg1Y/ZZtQoDtgcYOYujKTS1RmiKXMn8xZcYmr5I8btTu1
+         onow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762446730; x=1763051530;
+        d=1e100.net; s=20230601; t=1762446732; x=1763051532;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZGmeAD+s54GN07CXVStO6BNg5fZaJA+7jizpGW7KNys=;
-        b=IHQF7ucko+5DufU5brWmOoqczJFMv5EykfQhX7XXvuZOqL55fyQA2upFafs+Md7hZP
-         O20no4qr1lmMVG6uklYnqonF8i90UGe/kO8LQvVD6eEIaoqPQwCnho2D8aEFKN++O5Ad
-         UmsznBWyASAp5Ig3/2Mc1oRbvcMtrUxc1wVHkeTe+1ZIT+ft/DNWEuUxnbm9jEAS2Gon
-         jL3M3pqwknk9mjZ1o3pN5B7so/APfxB/6BYkiU4a/TP3sEBWI+D5O0EZKKNpy2AzKaMn
-         L2r2fdhe+bb6qFJKJyPHjFeYhvi5xuEI1GlneU5/h7wMRR6Bfbxjy2Uge9jthHpl3zPo
-         MOlw==
-X-Gm-Message-State: AOJu0YxCKlUu49/TWhFV6tZsyBVrRHEFLd5lC9EqNDcmeyO9cVHrPUho
-	BG9AMyBwA/JjvdKbPWCToiQeAZ1NFpuCfwFswPpswCnXOxdQexKYFwMlK8hDtPOYQg0=
-X-Gm-Gg: ASbGncuH/ZlCfeF4WoLdw0+gpAUuj/LyaM4t+xGtnNjcGMP7XwLxNMB1Vh2jIzDbzuI
-	YWzqPLvVLI1/zerKhc0VwtG+vIHSBSF3vGLnrg46DDGAxeKrPmS3k/y0u7R8hva6KfO28Be0GEh
-	L4CwG8X8w0tkmGBfR0dnCRoPc080JzmjLs59055jYO1FONh5WysG7P9mLb3UADWA3zQBF4JvCOS
-	Reu76vKvTd22BvMVIG5XQfC01FWGcIkxNAR0C6Ts+44+uxmq7I1yJ98tMflMdnJPk7tVDN+Ge+v
-	ykCifWtFLjDb67kS6If6CLbGDbZLspD6R3bxSnryO6kt5BN3rOMBgs3g9687FLylRhHVxQI3R7C
-	HAplafBDZhuk+1v4YVzaK2A4oUJSJbXcKRPw+tegyfydXyF2aOI7TAlzO0HilxoGecFKAvVOtZu
-	lLC+7eVIWHk0qSePWr
-X-Google-Smtp-Source: AGHT+IGZs2swuOBj8gaR/OaDywMJNFP+fOLD+tbBh6Eq0osdyg8SSOyQ8RqjagdO3Qncnx1PxLOCmA==
-X-Received: by 2002:a17:907:3f8e:b0:b45:a84e:8b69 with SMTP id a640c23a62f3a-b72654e3240mr428405766b.5.1762446729945;
-        Thu, 06 Nov 2025 08:32:09 -0800 (PST)
+        bh=X5w8hxKvRTGPo6IVAgTGxIFQbqEmNhRknqABWcJ9Jzg=;
+        b=tS8pTdXh4aj49gbVCEfXf5fGK3TqcYmz5K4aFnxOOonsUMZjNU38LpNQ9kJmHPvPSa
+         aEnvaEtUi8zh2bBgECWTFpgHVEU2x8pbwhZn6ShMoru+jxJu6nEKP3/qCJN1FGCNQEir
+         Oy8pYxi9ZPxV7PJEiW+dTheK8E1UspFvNLmpuQ/i7VFG3JyAyTwGS95ApUIZdsgtQ4Hb
+         6q9HU9TXzONxTNfxZl1+uHn+oNHVMNX8ZB+PtxBonPs5FZBlw60QvgjJHUaAJK6IODN9
+         ZuC22yZf8IH4hQZGbsYpwsiO+p+voR/ILBto120pDEER4ZFYWiwGe22TnKz7QPv8Tp2P
+         DtlA==
+X-Gm-Message-State: AOJu0YxiG1OtloN5uEqwhgkjFIxL6rvUGJhq6u76kkMzDso5xqXHBskI
+	uTlhRFYaYAY1ORV/yj3REkFGn/hYyj0jPx90BudiOoN/SXfSiiGFznrIeymtsegQDNo=
+X-Gm-Gg: ASbGnctljzDwFO1qFIOcVXG/cJehbBvIsZgAnKnmKjq9CGit1a+2DXOJd/hAvyIlF9D
+	1wIjWG4JkYrQvYJ7sJp/7HtI1XOG/J1CALwlX+2SR159MNr2QIu2iqKSfXJkAPg4JdJDMiPmJh5
+	5pk5nTeJWdfun5JYbWJMgprRhVfPpjer02/kCA3p2RY0T5vmyTKmpWi5ddauczT6eR2lFuWwdDy
+	1tmCQt76AQrr8E7+StF02yQmAjx4o1d2pwtDF9hqsOheMu1TiIbMzbyEzojabZkcizH6MtEugze
+	hrgnZ2hxaZa7C/0BAs2jgGvgO89AYdNYZiAIBKYYNSkSwg2KrvdjXnDRzSxIa/WB32u5b13Pyth
+	/89oxTvmNKN/Eg4ALcPtybBAgDJ1jthkr3tHLA8RMq0blpiaEsqPBalJQNKoXiTd14FQX8gvTr6
+	r80S+y/XyIcwYfVTOmdUNItfxpp1w=
+X-Google-Smtp-Source: AGHT+IE9h1lVDXWHqHj++HSZUT/NFsSiE1jYUZHNmeLSFQNvfG4uP3f+jidAfY0g2Kf4kE3sf0UIzQ==
+X-Received: by 2002:a17:906:7312:b0:b72:5d4a:45d4 with SMTP id a640c23a62f3a-b726529529amr440381766b.3.1762446731609;
+        Thu, 06 Nov 2025 08:32:11 -0800 (PST)
 Received: from [127.0.1.1] ([178.197.219.123])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7289682544sm249625566b.53.2025.11.06.08.32.08
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7289682544sm249625566b.53.2025.11.06.08.32.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 08:32:09 -0800 (PST)
+        Thu, 06 Nov 2025 08:32:11 -0800 (PST)
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Thu, 06 Nov 2025 17:31:56 +0100
-Subject: [PATCH 4/6] crypto: ccp - Constify 'dev_vdata' member
+Date: Thu, 06 Nov 2025 17:31:57 +0100
+Subject: [PATCH 5/6] crypto: ccp - Simplify with of_device_get_match_data()
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -69,7 +69,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251106-crypto-of-match-v1-4-36b26cd35cff@linaro.org>
+Message-Id: <20251106-crypto-of-match-v1-5-36b26cd35cff@linaro.org>
 References: <20251106-crypto-of-match-v1-0-36b26cd35cff@linaro.org>
 In-Reply-To: <20251106-crypto-of-match-v1-0-36b26cd35cff@linaro.org>
 To: Olivia Mackall <olivia@selenic.com>, 
@@ -88,73 +88,64 @@ Cc: linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
  linux-arm-kernel@axis.com, 
  Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1804;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1468;
  i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=kMWfmj/ptzyaxsCFocF8hhBseEl2zvCJsZs+GsRu/Qk=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBpDM1+eyCUkPULdaZ1GEkFUKEjOTPXhaUshCW+v
- bDMaEMH9XOJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaQzNfgAKCRDBN2bmhouD
- 18ATD/wOYnNM20X+EDtAZHZw28Ys+I/iX3FL+93RIP8Z1O36NFU0Pdnc1IaBpbIwpxB8DBEAFwL
- FVz7cxaRtVlvQm00WJYDzgtPUMnwtIy+oXsEg3Pn1PM5FLnR/RH75aJZQ5BzSrfujqt5KeFviO8
- 7/po64dd8V9hsONfkT94WJxIKpc+B0wiAEQD41bFCVEGX74OBm0KgS46EGrPrkwCnvbe+zzKART
- 6NMwNJXdR3C12R3Qyo0NvGU04v8hnz4r7pi9ukcrEfMIKG1WFxjwQysV3oxb4RIempXL2ij42NR
- T9wXQx1xWttCcvG0TTkaAJJUQsBB1qg0fWDWcL0kyZLWnAiqgo7kMhqdrViytj7ycapPBWlTpsl
- M+ihpiqyJV+W8RetM3K094JyPOELAnv0+Vf7yGKL9rvU3NkPmBC0OHy18SBKKSqSYNWSWdHQPEy
- by9w/XTEH+JhBPeWFtAcr7xptyC+QlSi0n2K3Bm/VTlVayo+dz6ul45SAyu6qkXPvqk61qwidy4
- 5q9esGuJZhUn7k+BTNdRXUOk/PKs01CNGk933A21cxOvD/Y+LZ48WpLihyQyKDZRzvzHe6qGeCE
- uc3ctHLkBUz68GDOAitauO0S5aGCbz81dMOuATOamOeEgghsKNBCvPoaIFiB5hsuUtHEh7VueGC
- ekT0FmK9VnPvTrg==
+ bh=L3Ng/aC4fiC+veLj0saleTuVV2+DCXLKDn5kGqHtuy0=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBpDM1/OKTMp82LpfdWbmimej/PbfwdV/l181iXL
+ aSDDQ45vi6JAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaQzNfwAKCRDBN2bmhouD
+ 180yD/9YhNT1mZl/Gz0eu9cIi6GLKX/FcdI1PNrXMl8bw7s4vs1hVt9p9r/kUMoST9QyDOIwnYw
+ XS+PuirEFbK+HmBlGgfxdA91pX+AGFO+J23YE6atRjfNOAsGSTc2sVRgv6DKDXKeSbqKs/Dm1j4
+ ecZuoXXG4FuC1khyhcp8YVQrVNRvseXzEISg7jolnlwq1siSSf0hYONVx6Y8hVU78dn5y7RZJyJ
+ E6NgvHZcWxzARm5BDGGMr2wJ8oa4lyyIl2a1xtzArRjQmabZLTEAV9EZ0E28DHRJ13d56NnkYmV
+ iNmFJyL5F3U24cBwn0VSm1L8J7VtUXp6zGw3effQ5wk95PP8SSbIDNMOSfjdljfXTEswYxZmWPa
+ dfBnAr8LBBy5iIn/QpvVuVIYde3WjRgY/vjxv6YdzZ+fwqlJgu9NSXMB3S8UB+66t8Ll9VhQW/Z
+ 2HSHHYJwZjmqYy/4D13eV/bLfalQcFfPA5ihUnKCpzSqTNXT0ojLLosi1LNXvjQIllwogaqqvUR
+ x9jzgeU6hQiUO4ZPa5e224D8zDWDp3d5QrbMm/B/GDeAmd8NI3xy2yb4wykagxyd31YQ9Xnpzum
+ Cd7LO4hFlWXOYgMoFeSFgqjOjkhsNe1S+TNtM/hqg6jwNt14Rg0LLrm5VOJErM5swlNr2EhgKZK
+ awaGOcR/fI5C97w==
 X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
  fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-sp_device->dev_vdata points to only const data (see 'static const struct
-sp_dev_vdata dev_vdata'), so can be made pointer to const for code
-safety.
-
-Update also sp_get_acpi_version() function which returns this pointer to
-'pointer to const' for code readability, even though it is not needed.
-
-On the other hand, do not touch similar function sp_get_of_version()
-because it will be immediately removed in next patches.
+Driver's probe function matches against driver's of_device_id table,
+where each entry has non-NULL match data, so of_match_node() can be
+simplified with of_device_get_match_data().
 
 Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- drivers/crypto/ccp/sp-dev.h      | 2 +-
- drivers/crypto/ccp/sp-platform.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/ccp/sp-platform.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
-index 6f9d7063257d..1335a83fe052 100644
---- a/drivers/crypto/ccp/sp-dev.h
-+++ b/drivers/crypto/ccp/sp-dev.h
-@@ -95,7 +95,7 @@ struct sp_device {
- 
- 	struct device *dev;
- 
--	struct sp_dev_vdata *dev_vdata;
-+	const struct sp_dev_vdata *dev_vdata;
- 	unsigned int ord;
- 	char name[SP_MAX_NAME_LEN];
- 
 diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
-index 3933cac1694d..de8a8183efdb 100644
+index de8a8183efdb..3f9843fa7782 100644
 --- a/drivers/crypto/ccp/sp-platform.c
 +++ b/drivers/crypto/ccp/sp-platform.c
-@@ -63,13 +63,13 @@ static struct sp_dev_vdata *sp_get_of_version(struct platform_device *pdev)
- 	return NULL;
- }
+@@ -52,17 +52,6 @@ static const struct of_device_id sp_of_match[] = {
+ };
+ MODULE_DEVICE_TABLE(of, sp_of_match);
  
--static struct sp_dev_vdata *sp_get_acpi_version(struct platform_device *pdev)
-+static const struct sp_dev_vdata *sp_get_acpi_version(struct platform_device *pdev)
+-static struct sp_dev_vdata *sp_get_of_version(struct platform_device *pdev)
+-{
+-	const struct of_device_id *match;
+-
+-	match = of_match_node(sp_of_match, pdev->dev.of_node);
+-	if (match && match->data)
+-		return (struct sp_dev_vdata *)match->data;
+-
+-	return NULL;
+-}
+-
+ static const struct sp_dev_vdata *sp_get_acpi_version(struct platform_device *pdev)
  {
  	const struct acpi_device_id *match;
+@@ -123,7 +112,7 @@ static int sp_platform_probe(struct platform_device *pdev)
+ 		goto e_err;
  
- 	match = acpi_match_device(sp_acpi_match, &pdev->dev);
- 	if (match && match->driver_data)
--		return (struct sp_dev_vdata *)match->driver_data;
-+		return (const struct sp_dev_vdata *)match->driver_data;
- 
- 	return NULL;
- }
+ 	sp->dev_specific = sp_platform;
+-	sp->dev_vdata = pdev->dev.of_node ? sp_get_of_version(pdev)
++	sp->dev_vdata = pdev->dev.of_node ? of_device_get_match_data(&pdev->dev)
+ 					 : sp_get_acpi_version(pdev);
+ 	if (!sp->dev_vdata) {
+ 		ret = -ENODEV;
 
 -- 
 2.48.1
