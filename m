@@ -1,65 +1,67 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFCAA1FF7D7
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 16:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1E9265606
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 16:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762446728; cv=none; b=J4UviHx1Whm/70rc3yD8GWwBLVg26cXEbcGhUS3+b1IQmjjGCrUaJRC4MpcvbS8AJ9IXdG8SCzFz1bdgs6bv/VEMxDLtdyxQRZEcfUHFTyw/8ZWEqKrPi58X6NmW79Mffkh33Z5c30Vz0a8drUm3+nEXnzw/yS3+VV0Ny6OP/9k=
+	t=1762446729; cv=none; b=VjbkoBbULquU/fd2thmLxgX/MiyyulMMugpPK5KsAU+LdhQCk4pZP8oVxAe3nowGgIITbnZMSARsmOjPhtd7L9hiztiXqckhIzrpBDuX0McuidAOeaWgQTSalGhhEbBNjw+LWq2v7Ks4+EO/Lgw7AOoXrdizo34YiSkr0GBv8rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762446728; c=relaxed/simple;
-	bh=baW5v4LiXQ29IowCK0UwIQQ6FO1aSTxQN7dB9lPn4Ww=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qh/uI8E1jyduSNDkFOxZtIlMv/w3Yi3cBcdfKEuK/Y3nhGy+CSb787eAnNJfFmGIEspa+ZeVg9HcmbzI2WFiD/VfTV31E7LhrKtiQlsS7GjRsng8/hnCohyK688WKJMaGiWQ/Y/azgGboIGoTzkJMhTkBJGQl1arb8h3WTpRyqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DcSPAJgk; arc=none smtp.client-ip=209.85.218.48
+	s=arc-20240116; t=1762446729; c=relaxed/simple;
+	bh=xg80kiqnHSCNXwJUc4z9P8NCrVmVT83uMX9FIiKX5sA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=qb9ehrW0TMPyE7KDnQBB2393e9U36WWRucrA7eO83kMuIB9hvf2d3ko6YRZH8wWIGDjlaFf6P4aaRjMM9vgbl/d2bg3gj1ckFxql+98YKStobqlNL3UCdO3/TYZGHqEvHIPPyxXKZmLv4MG+yLEteCvfYKyqut0RgHGd0M7Smco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hGShMMSA; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DcSPAJgk"
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b7128683174so17196866b.2
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 08:32:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hGShMMSA"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b727cce8d21so15155566b.2
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 08:32:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1762446723; x=1763051523; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lQBlUaV8mHeTuGtQUKejSKsUaDFp0QHBYZs9jo/l+EU=;
-        b=DcSPAJgkTQZomOdwGVfcEd0skzoXGvsG40MGdPUld487Q4IJE8X1F3tIGE5cshExa8
-         SQzsw5ApffOpnUYa58LVl2iIEjsAFnFLKepUNTLjz2XaKRZszPwtmsBZpphT2WByKlqN
-         2IiaDxhwDplVH2Jvr1T7WOqgUzjjAGAiv3Mn7oHhtfcvQdMpx2Qej1Zrjj5GoQd8FLwy
-         kZ67bhggU6Ju4QwPUFTz3JncBvL98S7tBSYpdZEgd4V8TUXflNiRwLKw09xh6wUmUBGT
-         TGmSQQ2uEuE2AlwTHELXZIAOwbZbR6dz43o0o9pjzgEiH07J3OBX9UHB0XQUxkx0870F
-         i00A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762446723; x=1763051523;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=linaro.org; s=google; t=1762446725; x=1763051525; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lQBlUaV8mHeTuGtQUKejSKsUaDFp0QHBYZs9jo/l+EU=;
-        b=A9iXlzFPQydtexVNMJVXLd8L+eoz1Ax9y/EKIvlPd+5bFCZszncIsJOy2q4cwQRIz+
-         nyOsacGqNOasU7+tHbUTnXzDDt3npjJGGTRUqpzunEM4fudyVHNV5qHqgCi7hMwpLWO8
-         0xIkOVkomws27u+Eyih0rv4AiSK6F0rOaFQP6Cp7FWww5AYnDB7MJGWMsDeYC3tBWfi5
-         Z4XY9GxdUQPfjtgUmhY7nFFNfZq8ogYTKiWVabffSl5fFVpilXfdNsasK1sTJWIeazJB
-         sFZi28uaqmxmqSFvUoPmsh4f+XTB6ZpQkRRiyJRII35G5Gk7zqc/iHUOqCRrBdacg/qE
-         HBvw==
-X-Gm-Message-State: AOJu0YyWLHXItTPu0y72iokAduqxtHohdEHdTwwVwB99o1LdYFXWFNNv
-	Qw3xYGrn/3oPvZYWpIb5OKNnqfi8YVrvnay0/XTQFyBwxKDrIlc8i6mSLxZtDvrt3kw=
-X-Gm-Gg: ASbGncv08xiVSiUrkb6ZtKyhqIaXOSA86zpEciK8zfoMSfhTwWoo5xirHe9s40JYyuK
-	J89bVSy7v6mk5XPZLVglxpWOP3QBkysC5HbZLW/FutWw/PARay1WRzgNvZzwzfMWcU59sME/nVA
-	bQweSr0xx9HPrM8cJxsh5wVMBrFwcLfDTwmqBWeyN6csKR24SdT4MT7w0l0X5hx/rqiQbP6sE3k
-	ts/0I/ss7EUt6P0CwukuoFmX9OM5Md5M6cUD18/7zW2HibaV/Hk6UZ9YDKtZp/DI/xiYk5Tyi+B
-	dnIGZJMF5jJmB8xtM7hhvhgsLb+HAhAgOpM2tufM59u/eF1e7xAr2nmmLXBNDWfOh01RWMcQDyr
-	2z0vhRaUwLVhh5yPkCyTcfbF2wsrwArYgw7MhqGWzgnPJ6ioGVGraZoyeFj5f12jDJbQbMHN16j
-	I4UneVkdBaEvQr/v4slqYQM4FJSEQ=
-X-Google-Smtp-Source: AGHT+IFaJFGgKtpOfjyJyZjnu6imsT7N583yoy9FXtJIdPh3n6YTMEucNPOZE8ZpXrIC8xcqZHTMPA==
-X-Received: by 2002:a17:906:f34e:b0:b72:6762:f76c with SMTP id a640c23a62f3a-b726762f87amr306427566b.5.1762446722811;
-        Thu, 06 Nov 2025 08:32:02 -0800 (PST)
+        bh=WTiuGCaVTAiVJKKKlWqCv6SA9W0CyzxAyfEzvBxFcPU=;
+        b=hGShMMSAaAaG1/1AZsqqiUJjg2IvHEFDo6E7qV8JEtI2qjU5rc34NkA76ON+aY+/0H
+         veLLAi4aCbxhlC+hRMu0ASbj1+FHoV7nmYZjE67PO+Gvk3wkQlatKpRqEKV39IO9OWrS
+         JKFKfYtqcf7aEw0qW40nAVbD8Oevf1gMbpim9STj9qOggkxRRhFLc2ZhEa8sEKchQQo5
+         DLhEJgUUKGSZZHpTfsdIL0HFQlM9nEVI2DSYeNt1kPyHGOy9KvGZMYKHkm2hY3+EgZHx
+         fECfiJFpf7kbKKZi03NIgIIgCZ9l2DoNbu35fbKLEXLPhvrHW3nICyQZr/XP7NzqKZbd
+         Z4rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762446725; x=1763051525;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WTiuGCaVTAiVJKKKlWqCv6SA9W0CyzxAyfEzvBxFcPU=;
+        b=nz4Kr03N7byKliI7hMovMZ6JDqd8SwsKoCeCpUNKuNmX3Fy5ZsyQx6CK6omaQ1XCW2
+         TybrcU3XpWbcUTwocRR6GbaGW3lriHnlHUwzWRvBw7koNciFOZqJ2h+SuFAeXPzbmZEp
+         bR2yR0Qyk+vdKTJ5ehs0qU6oM7LAO9wvmAtVACokVIhIqsgQbS0cUOYQyv+O+nBO0D5/
+         k2LVFbaqHnyhUyXDUcE0pLzyFTEwYy7y59LUTh5cirsdAzEf/QxgwVBZXibWQrJZniMk
+         WANQGQu3cIYS8QUEOr+sMLeJHGENTHDOu5Ew2okRaYmydayOpommkLHPGcpLQfSRdM+8
+         Y+Uw==
+X-Gm-Message-State: AOJu0Yw5Sh6soiMFr7ZWdvMt1//DrRZ8zaT5u+2SS66t80l+7RbPAY0H
+	2eKsRb4hjaNKdMgwzCH1OmnZvAo3+2yJM3Q6dmjmnwx5UOh1uf/NxBPZrJcBRgN2PtA=
+X-Gm-Gg: ASbGncvkvt/bMShhdsGensnkf0w4O2N+5YE+zLO/yySCLef02lkoIRp/EwKF2PJ5rrN
+	jhN/INiqMoBNeJXupvEYWLVlHeqWOR6yW+zX2inr6t/fpNqmglXM1+vL6PUBCMGMi/S4mzwJrGr
+	ktZdxvXbyBALHfUUYFgkplvPK8rONcWe5r4HVp3g0eocYDEtfwtkzoFjYYfoiOju0iP0gA9WjLD
+	5gjeWj/BKJXltQ5pmlybke4mK9rspfbqYk3auvGoDMI3HgfSimWPaBJjf2sfymkpAD7zfwQed5O
+	mpaQF+C38JecdJbGefr7wQSji9EzZglHVcakDSVgkQAIvkwz0xeEI17PEhCnSh7xL4UrlGOh19C
+	/AD1TE/BX4f46Eyd5xELuo28bYNXzxdeOd0RX0MMtJ84IIxhg4c5Ne3A2ML9QoUh1EvewkzN+3A
+	ng0a+iBgqksQEXC0I/
+X-Google-Smtp-Source: AGHT+IFJFC9RL8ABDmFdtdRmcZ3Dy1rT+k2Sx6X6okxkxPVdsUhn4dsPyGeIOTfuz4qNIhn0Sy5VQw==
+X-Received: by 2002:a17:907:1c93:b0:b5f:d4db:731 with SMTP id a640c23a62f3a-b728b816db9mr234127466b.0.1762446724660;
+        Thu, 06 Nov 2025 08:32:04 -0800 (PST)
 Received: from [127.0.1.1] ([178.197.219.123])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7289682544sm249625566b.53.2025.11.06.08.32.01
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7289682544sm249625566b.53.2025.11.06.08.32.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 08:32:02 -0800 (PST)
+        Thu, 06 Nov 2025 08:32:04 -0800 (PST)
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH 0/6] crypto/hwrng: Simplify with of_device_get_match_data()
-Date: Thu, 06 Nov 2025 17:31:52 +0100
-Message-Id: <20251106-crypto-of-match-v1-0-36b26cd35cff@linaro.org>
+Date: Thu, 06 Nov 2025 17:31:53 +0100
+Subject: [PATCH 1/6] hwrng: bcm2835 - Move MODULE_DEVICE_TABLE() to table
+ definition
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,10 +70,9 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAHjNDGkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1NDQwMz3eSiyoKSfN38NN3cxJLkDF0jI3Mjs7S0FCODJBMloK6CotS0zAq
- widGxtbUA/Gvy/WEAAAA=
-X-Change-ID: 20251106-crypto-of-match-22726ffd20b4
+Message-Id: <20251106-crypto-of-match-v1-1-36b26cd35cff@linaro.org>
+References: <20251106-crypto-of-match-v1-0-36b26cd35cff@linaro.org>
+In-Reply-To: <20251106-crypto-of-match-v1-0-36b26cd35cff@linaro.org>
 To: Olivia Mackall <olivia@selenic.com>, 
  Herbert Xu <herbert@gondor.apana.org.au>, 
  Florian Fainelli <florian.fainelli@broadcom.com>, 
@@ -88,54 +89,56 @@ Cc: linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
  linux-arm-kernel@axis.com, 
  Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1245;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1159;
  i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=baW5v4LiXQ29IowCK0UwIQQ6FO1aSTxQN7dB9lPn4Ww=;
- b=kA0DAAoBwTdm5oaLg9cByyZiAGkMzXqhz9TLDI3aAR+DBM6TzDg9T7YbMFtedDKOWlzXoGLMP
- okCMwQAAQoAHRYhBN3SYig9ERsjO264qME3ZuaGi4PXBQJpDM16AAoJEME3ZuaGi4PX/DsP/ikj
- 8d5AdXEKvQqdeiixME5VLLoqQzb1CpAY1z5OBRhAsVBqHCJbeV6UZ5TtBUk4TeBMb1O3TLsCOk2
- hCeA95G51Irgo3wFG9H19uFb9K9SgUOXexFuv013deXvqjF9MXv+Lqjz+ahaRge0mWDhpqJVTnz
- yabl4NqWMTzzu3JeP0MvnDhN4/65fmtGaSv8nnYezNSb8GuscDH74rO5erp1DS7KdTXB8/Cbvyw
- /QQ86RtXYbiYkN6EwolAI7YqWHGXQg7eKhp0Wska/sYwh7qh39XHgASx3R8Zrf2qgyJUXTSUGsX
- QYaiOT3t0gjzStMjPMv6XVPN9IIIOW+mkTRDa6ICEuvyHrLrC9Hzsex815WCQQ1JiplUM6810Fu
- 4b829gs6JhbUHqbQptqPPMSbffsyf8HyAC2SQGbXuF/yKpPh5fkzR+xnsIYypsJ6aNynObVOozg
- gUG0thCuhQju5aPPXDRU7IEuQOgWrYUoekn9Dx4HfoctPvtw/JMo/pYEvkPJ4zSXDZ9ZGKfkvz0
- dia4w8SHW5bBRpSbVlb6anR9NTfLvlcZrH6socpQ/TzZMby86F6IN8ECn8awltWzE3MGzsD3toq
- gb0+rlWSAR/Fv2lLwnnKNDbtbNPOW9A8+DQJ7RhK70U3dMQMYSsbG6yvyEu0Fpk57pSSqprfj5I
- nqnpy
+ bh=xg80kiqnHSCNXwJUc4z9P8NCrVmVT83uMX9FIiKX5sA=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBpDM17upx0MRGUBjQ/tdX5Rem+B0vFDSLjscqjV
+ RxcfXdfCVqJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaQzNewAKCRDBN2bmhouD
+ 12mjEACNaUET4bG8Ms53cjywxTlnDVDM4fOiiJTV0eNuYz+yQxopkwfslu+z+XpGpp2onkBRQNN
+ q6OdnMGXee/pVh49eofDDW+dZ/hGQ6yL89U8WIzM6s3/c56dxppov1yJMj5LlrMSHeU0FF77mDs
+ U0fsPQtPxjj9Wm6ScwPdr6iIyR+P+7WonOVJI7J5Tw05cY8deLC67d5YTsjFSg5JtsWYPfRD62K
+ IthSFNol6ep5g5H5GzxLzVwQq6CsSmh/cYQZcbf9uLpVLxcUxveU7cKj/vNwmiachL7KlYmKA8+
+ y4ZNmA2Fp5TlE/SiLb19tVsvNlO4W+EyucS9aiAtSpXMsWoLJvUe3gxQJf9kzdAzCZEUHk2DxtQ
+ Coeth0TfNVAhAvo7HTRETnMR+96s/zYAfIGYVXy9Uj/sFMLH0Gnm2fZMLPNdxr5UXACsytnPiE5
+ i9sYVtdf3iMxuwwgEeKozPJOnBn6vEdC0qQCSBl6/GwLdZ4FlcSnS/s3a6TQGzlUm+vRdJdKHOg
+ aOpfw67z5/6anqIQqofjgdxNboUQUxnK052bwK1+8DhvW+NJzdmgZDzU69XLO+TOtyEA5oXLWS/
+ 5tBcJIwCkATSjUWVfT49f/FAop4Xw3oCBAh+KkVWLRkvN8+lc6wJ2N9NELiXOG/Ez3sTmWOBG33
+ uEcbGns5V48mkVg==
 X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
  fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-Few simple cleanups, not tested on the hardware.
+Convention is to place MODULE_DEVICE_TABLE() immediately after
+definition of the affected table, so one can easily spot missing such.
+There is on the other hand no benefits of putting MODULE_DEVICE_TABLE()
+far away.
 
-Care has to be taken when converting of_match_data() into
-of_device_get_match_data(), because first can check arbitrary
-device_node and the latter checks device's node.  Cases here should be
-safe because of_match_data() uses 'dev.of_node'.
-
-Best regards,
-Krzysztof
-
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
-Krzysztof Kozlowski (6):
-      hwrng: bcm2835 - Move MODULE_DEVICE_TABLE() to table definition
-      hwrng: bcm2835 - Simplify with of_device_get_match_data()
-      crypto: artpec6 - Simplify with of_device_get_match_data()
-      crypto: ccp - Constify 'dev_vdata' member
-      crypto: ccp - Simplify with of_device_get_match_data()
-      crypto: cesa - Simplify with of_device_get_match_data()
+ drivers/char/hw_random/bcm2835-rng.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
- drivers/char/hw_random/bcm2835-rng.c | 11 +++--------
- drivers/crypto/axis/artpec6_crypto.c |  9 +++------
- drivers/crypto/ccp/sp-dev.h          |  2 +-
- drivers/crypto/ccp/sp-platform.c     | 17 +++--------------
- drivers/crypto/marvell/cesa/cesa.c   |  7 ++-----
- 5 files changed, 12 insertions(+), 34 deletions(-)
----
-base-commit: 8297f2f148634bfa98b0faec66bab14942801d95
-change-id: 20251106-crypto-of-match-22726ffd20b4
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index aa2b135e3ee2..0b67cfd15b11 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -138,6 +138,7 @@ static const struct of_device_id bcm2835_rng_of_match[] = {
+ 	{ .compatible = "brcm,bcm6368-rng"},
+ 	{},
+ };
++MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
+ 
+ static int bcm2835_rng_probe(struct platform_device *pdev)
+ {
+@@ -191,8 +192,6 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 	return err;
+ }
+ 
+-MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
+-
+ static const struct platform_device_id bcm2835_rng_devtype[] = {
+ 	{ .name = "bcm2835-rng" },
+ 	{ .name = "bcm63xx-rng" },
 
-Best regards,
 -- 
-Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+2.48.1
 
