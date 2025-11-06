@@ -1,134 +1,91 @@
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C783C38;
-	Thu,  6 Nov 2025 02:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EDB23BF9F;
+	Thu,  6 Nov 2025 03:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762395993; cv=none; b=R0g69z5AbfPhFEXaOV5HOamY4PC9t0HZR9o5bG/AlN3MaWCn/HeDutfG7LBJHaC8Kw/sUvnZNMyqeN7yjPWLUAVFIkN+gJb6MtopqYkcgISfhub24LZyYiKlQYWJhQoPaGvQDtrY3M3hjJUSKh/4OskjRrYko0ZeMAo6UKz9C6M=
+	t=1762400189; cv=none; b=TPpgv6dMfyt8okHUNKC42Um1n84ZKD+v762mm6X4LPXZNXwtV+PJylR9vVqypWOpC3YkaCkhBeXEsv23x1EmmWmyYD5QWCSayFfgccqlOhwYv7yZZ2kO2LOlg/RfliGSOWf3m3zHhce3p/XPK5ADUfE38ZNfEHtANgk71omMGqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762395993; c=relaxed/simple;
-	bh=h11H5wkM9ur+m6QwSQpYG0dlXYV2lDeGb7LhuWHxCI4=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=kvNEIJzmOAskVVP3d2uLRxfIXLAL1XfegxsQhORNqqzzXPuf6PU3MQ6TxXG2fjMC4IcbsP94ZSh2R2+cjBnLU5BRjFSbkngSY+lKWMeXMwLZjbQatMSmjacy9gl66OhSXx66gCLBSlv+zy+v82oOztwdkpH6MSfH+99BTAYUblk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=PxU8X9ab; arc=none smtp.client-ip=113.46.200.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1762400189; c=relaxed/simple;
+	bh=GNM7TCeMHbwIbYlXWuHY4qz5dEcc72V8VdoUKhsYSsE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=LoS5aUao/h+PGY1kxqdVZc9sZdkPW3V4e8+DrjIcpyKy5NlUegTAcIdAFYAmDanBPZ9KfoFogSdVLhYT1PdgF1lRxoZsCoAly6Vc8qDsgT4JAFZY8ziPJMmuqplB75ZbeDDNROtAfrHSWrug8fZ7ihEs8L1klsVur/aqo7KVuOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=mXIUTRwj; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="PxU8X9ab"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=4eRyeZfQFp+latL98Ldfp3uBLlWIsOh2ouj3V9Mpzos=;
-	b=PxU8X9abgBP3U+ytYjuICLEqefCFNEIiwu3JBoSYA9P66YWKQi1GHpZgn9guAD7dkJWu9NRvn
-	TCnyb85qJmLS4zc5mOm+CR8itzsxwfNvxBg8NMh5CX7QtfXwmLOVpknn37boE7dXWBCw3Et8F/J
-	c26GuYuA8Axqztvfk9V4feE=
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4d25cf3FbczmVWV;
-	Thu,  6 Nov 2025 10:24:50 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 44E7A1A0188;
-	Thu,  6 Nov 2025 10:26:26 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 6 Nov 2025 10:26:25 +0800
-Subject: Re: [PATCH v12 2/2] hisi_acc_vfio_pci: adapt to new migration
- configuration
-To: Alex Williamson <alex@shazbot.org>
-CC: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
-	<jonathan.cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20251030015744.131771-1-liulongfang@huawei.com>
- <20251030015744.131771-3-liulongfang@huawei.com>
- <20251105153233.59a504ae.alex@shazbot.org>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <7d1bef79-2cd0-9784-6dd9-d7a995ec3238@huawei.com>
-Date: Thu, 6 Nov 2025 10:26:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="mXIUTRwj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1762400184;
+	bh=EjP3pLW0Hcin6KAIIE0/ZI3uWOTZ9EvwyI5DnmbVOgY=;
+	h=Date:From:To:Cc:Subject:From;
+	b=mXIUTRwjvyfoaT1qpKJjFktIOET6zUTl1eSSFcdChHaZmjqermjpYZ678K8sJXE3V
+	 g66M+CHSEW+BDoClmA5cVzq1FzGMIrVPTzrvHXTxWOFA3RR6ODOFWEEYb0cTyjPxan
+	 MkhhGjsCz8xrPjF3nRw512pJ5hV20HSn1gifny0mUxk/cyjHH7rO8qLV5x31SZ9pV5
+	 FyTlfkX29XwY156ThJc1Fa5oG8BXZguGQAr4he9c8u8l8ImBTqLvuS4yTGyJmebOxr
+	 skw2F4LzjdcSBy9ohUEENIxt9zitbo2PPhHvO4IoZ2CugcvKptu5CCmXSRlxiuHdzB
+	 Ynna7IjOrxZ1w==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4d27CC6BxMz4w0q;
+	Thu, 06 Nov 2025 14:36:23 +1100 (AEDT)
+Date: Thu, 6 Nov 2025 14:36:23 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld"
+ <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>
+Cc: David Howells <dhowells@redhat.com>, Linux Crypto List
+ <linux-crypto@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build warning after merge of the libcrypto tree
+Message-ID: <20251106143623.06b23d57@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20251105153233.59a504ae.alex@shazbot.org>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+Content-Type: multipart/signed; boundary="Sig_/7GoaeS7n7v_YCPwcESvc0YP";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On 2025/11/6 6:32, Alex Williamson wrote:
-> On Thu, 30 Oct 2025 09:57:44 +0800
-> Longfang Liu <liulongfang@huawei.com> wrote:
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> index 91002ceeebc1..419a378c3d1d 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> @@ -50,8 +50,10 @@
->>  #define QM_QUE_ISO_CFG_V	0x0030
->>  #define QM_PAGE_SIZE		0x0034
->>  
->> -#define QM_EQC_DW0		0X8000
->> -#define QM_AEQC_DW0		0X8020
->> +#define QM_EQC_VF_DW0		0X8000
->> +#define QM_AEQC_VF_DW0		0X8020
->> +#define QM_EQC_PF_DW0		0x1c00
->> +#define QM_AEQC_PF_DW0		0x1c20
->>  
->>  #define ACC_DRV_MAJOR_VER 1
->>  #define ACC_DRV_MINOR_VER 0
->> @@ -59,6 +61,22 @@
->>  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
->>  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
->>  
->> +#define QM_MIG_REGION_OFFSET		0x180000
->> +#define QM_MIG_REGION_SIZE		0x2000
->> +
->> +/**
->> + * On HW_ACC_MIG_VF_CTRL mode, the configuration domain supporting live
->> + * migration functionality is located in the latter 32KB of the VF's BAR2.
->> + * The Guest is only provided with the first 32KB of the VF's BAR2.
->> + * On HW_ACC_MIG_PF_CTRL mode, the configuration domain supporting live
->> + * migration functionality is located in the PF's BAR2, and the entire 64KB
->> + * of the VF's BAR2 is allocated to the Guest.
->> + */
->> +enum hw_drv_mode {
->> +	HW_ACC_MIG_VF_CTRL = 0,
->> +	HW_ACC_MIG_PF_CTRL,
->> +};
->> +
->>  struct acc_vf_data {
->>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
->>  	/* QM match information */
->> @@ -125,6 +143,7 @@ struct hisi_acc_vf_core_device {
->>  	struct pci_dev *vf_dev;
->>  	struct hisi_qm *pf_qm;
->>  	struct hisi_qm vf_qm;
->> +	int drv_mode;
-> 
-> I can fix this on commit rather than send a new version, but is there
-> any reason we wouldn't make use of the enum here:
-> 
-> 	enum hw_drv_mode drv_mode;
-> 
-> ?  Thanks,
->
+--Sig_/7GoaeS7n7v_YCPwcESvc0YP
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I didn't use the enum type here due to my habit of declaring enum variables with
-integer types.
-If needed, please directly modify it to use the enum type definition.
+Hi all,
 
-Thanks.
-Longfang.
+After merging the libcrypto tree, today's linux-next build (htmldocs)
+produced this warning:
 
-> Alex
-> 
->>  	/*
->>  	 * vf_qm_state represents the QM_VF_STATE register value.
->>  	 * It is set by Guest driver for the ACC VF dev indicating
-> 
-> .
-> 
+WARNING: /home/sfr/kernels/next/next/include/crypto/sha3.h:74 This comment =
+starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-=
+guide/kernel-doc.rst
+ * Zeroize a sha3_ctx.  This is already called by sha3_final().  Call this
+
+Introduced by commit
+
+  58873ecf091b ("lib/crypto: sha3: Add SHA-3 support")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/7GoaeS7n7v_YCPwcESvc0YP
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmkMF7cACgkQAVBC80lX
+0GzJWgf8CdIwuqZ87ASMPLbr5h+WcmIeOTyyhoZa6BnJDWCCi5RcyMbAUqdL7JBv
+sWPqB9CkiYU2kv7CzFo5jqEe4ql34dtg2k5EPWmieP7hLT3FGh+qpZj1xS8fpOek
+koFW9Up5sNfxg8yow4zPQloJ3119JOqRJcWnGlNqs21CwarvD+Rcvr1tavSFUxJR
+9rKmrzLnXJaM/ikcLGaG96ZogeYEpd+WaSOUqgrYhuucGRbrWR5mv9o6u0Ee/BJJ
+PTjR3U8WSa401t4KEgbkHECsQoYCk3FXD+EodMMNfWExNj5pQFznljfhUPb3H5zN
+oRvDRsW3YApNBT49uYDaq0/lRZpiAA==
+=DUdT
+-----END PGP SIGNATURE-----
+
+--Sig_/7GoaeS7n7v_YCPwcESvc0YP--
