@@ -1,135 +1,160 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306042C08CA
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 16:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8573376A5
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 16:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762447367; cv=none; b=A4d1ExVVFT5i+bus1IBPTunLmUtDijOhqMzmuQwqJ38aL0zoA59YazH5hZJZXor/viGFeiwp/2IsuIXf3cu4guM4HMBqa0Uxzq0VNkmEF8iJoPLYCo2to+AuF4QftxtnKboglKedycwHwUb5Lwp/Yk5i88awTijZIausKoF94i0=
+	t=1762447506; cv=none; b=GbvxfctTjleBkQvOtzMpTXz3gN35xtZOqvyukvwTk4qXukHJ/Y0EhzbkL6OP07h3kDHbD0lLshVFaCtLjXw7+z0yrdEpcrtnHS1f66MAX9UPhw7WVpP6e7+XuWDrOoN65kYspxYvfZ5JhuwYhD+2n1dlatQiPdJ+1VsFIKJyVMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762447367; c=relaxed/simple;
-	bh=dWua4jrZl0r37ywkIwIo1mbydYSjyvb6Mj4LORQIgS8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qE2bVaIRgCW16h83GoVPit/rfk2J9D51eb+L1xwF6zf90MayJbrw62mp5x9jlXEk2H9tIHHSDPzjSQfkno2SF5dF50nBsHfXGfvw04j+oOy27w/S2ZPj2HYKn4IX8sZl/3zanZ3PK0mOWcx1DmA7TjN3OPEBjlSDbJObGfolHJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=IusIFD+P; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1762447506; c=relaxed/simple;
+	bh=X9BEWwB0FNpTpkWJhm+qaXY0I7iml0fSupTwank2kMM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rMcZ4mWRG5Kg2yCBPCudHaYc/X87HPhvZP1BHd7onWgSaPZ/ZQws6KhE0Y/9mkSc48B8k4ebTBD50n5us8aUL3hrNDc+yjcHYnXie/yw8nfwxQnTps3lpEPneJE80c0qgKVyCl2sQRemJVTIJO6W5WYQWJWIkpVr+6pVCyJZ3+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Es1QkEdA; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="IusIFD+P"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4710665e7deso5410595e9.1
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 08:42:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Es1QkEdA"
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-786a317fe78so10440067b3.2
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 08:45:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1762447363; x=1763052163; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5bWVfG3C8DSuF6D5kXiUtuvNzIgvYK/pa4hX5McjgVk=;
-        b=IusIFD+P84syu65y/9cYP/jr+NUA/whUPyzdEWdNhCY4ydeduGTGcWsrLolUSFBbbh
-         Nywa2anM0hvGkjv9PIjvcAM4D+/CkU0/1QotZ41j/PDg4YhZENQe644MNSOiU6JXrdNQ
-         LF/csdbGrRGcgUbyTkXzUPD9b6VPhT3+hlt6U+/7e9/mpc7c+XUtV/oX9MeJwU53hmv/
-         hcWFtI+SExtBED/G0uEr8wvAa8YsqWVNioEeUJO6NXThC2zJMoYQmK0T/7VLZS7wOcMq
-         cGXFET/Y1C8HTN3AzR0mFvu6SPZXIBLTu/vI6gdQkzmRc/mg4OiiPg/Mnh16J1srlJ9B
-         jSeA==
+        d=gmail.com; s=20230601; t=1762447503; x=1763052303; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YCzuZ/teXYU7yevuP9B3flHK19xr/xlr710i4rE8skU=;
+        b=Es1QkEdA/zBpIPzi+HGQl/7UQTc0u7rQ8nQ0oNHOJvYpsDrh52P+nfcZ1rRMFmekG8
+         oWKW1fPLFi0yEr9g8nCV4eIarl2Kv6/bIY91CoJxqjC4yot5jHJvoora0gdiknA3GU5/
+         RdStclCYNas64mysPuwfygU09X9y4gu0ZUbgVKQIBgM9pLWf4tzdiQpuBD/RsrJTUmiL
+         o/sCo5ZnjxyWXd/cYR+X3YeriM6gB0Nn6LZO5rVnBQNmPEwaWl+/x71i20PG8OY4Fi+S
+         cbK27KlFofPjN4icMa0L/Tu7aA857zVeADmHxcoOlL6BaEvh0ikqYMl4fChbZSHxKrt/
+         O3pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762447363; x=1763052163;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5bWVfG3C8DSuF6D5kXiUtuvNzIgvYK/pa4hX5McjgVk=;
-        b=XCxJ6Bx+vilLLRe/cjzlFAdXhmA0KhNWhQFILgezbUWFFg1kAr5x2dk8B8b/QeS41c
-         odm8yPrC8e16Zuo33CIhVNjbIULSunh+Y327GgmXvgylSBVmBmjF3V3N+sVke5xOAXwC
-         qlzzHebDdCoVIwvaGpeGdNsyT73qFYFLr/0eVPRbrdmBYUMDrq8xRA8uDkyv9dY6chlH
-         32oRv1U4+CiLaaABArNZFGifGGRtkFN4f+/uPbjcWl/kE1keWCM0cmot+DVskr2QWesH
-         LA4nA7tVsy7AB+aFwhfsgmxIGpy4B8ysm8bBH3Hv8737UHM3U69DgtfPcGkAu8LVfkdF
-         pOIg==
-X-Forwarded-Encrypted: i=1; AJvYcCU+BlputZdzMCj1BoqBcPPgYlc7dYj34BMctuyYbR8AGvu9ukEIogEnyZ0joa9uKMSHNGGrMzVBW85WoCo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzG1aRMaZva+Ezk+bnkZOKC7p6Wq76X4DU0EZceiUBw4+EyX7cm
-	tqseQ8aZpFDSnwzJFeXYJ3RC17ObzlVs3MVlzvhdahHVvRkqBN+T68r3xadHQUuBQ0E=
-X-Gm-Gg: ASbGncvcOHWLUavvufusoKrv2CL0Z8WR5hgf4YlYcIgmrqb79MOSyan+A6n44W/N9O9
-	eOMmvyfjbfG84Ck4pca2n3gl86q1YiC2zQyaJHfBQG7p9PxK7k9hhOGVswSxcTw+9sqBFcreWgs
-	RqtmZTPvaSSAP4shKCPy64LLRsI1uFufzkQSsWnYdBQEFiuPHlIKu6RlkfxPHGrRPKNqe5F/BK2
-	cxAchewbDGBSSk/ICj9vVu8Q3ALONFCFl4IGoAD5jxqTGljpNNmBR7VfsVrpYAD46m/Ijnh268p
-	7sGSHrj74tNzN8gfqnfM/wquIHgKH7s/Wlv+GnxAAx0gvbgRYcV1EK766Q8L1bojTwtkBo0tK0K
-	8ztWPJfRp76Y0Z9e1RB0yJW0NBHU6ZbjjIc2MtdpyZHRVwOPxIarCdjUT5GcYWYhOdqwaEHiw93
-	gMazltdg/NZ+VYNZDdjdvZto3IpCZoIq3vhg==
-X-Google-Smtp-Source: AGHT+IF+PBs1j5FzTL4nTtbZy9S8jQx0oyM0Yw6fciG0T5QoS4kG8UPHtVSxZJs1keD6X3tfzWTt3w==
-X-Received: by 2002:a05:600c:8216:b0:471:1716:11c4 with SMTP id 5b1f17b1804b1-4775ce20dcemr92100835e9.34.1762447363317;
-        Thu, 06 Nov 2025 08:42:43 -0800 (PST)
-Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42abe62b28asm75115f8f.6.2025.11.06.08.42.42
+        d=1e100.net; s=20230601; t=1762447503; x=1763052303;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YCzuZ/teXYU7yevuP9B3flHK19xr/xlr710i4rE8skU=;
+        b=ffft3uATS8tLKxTx4VtqenxAeCc+GImvStg2IhZ+K2PxHdyzgwfOo4/At4b5EjXrKD
+         YKxHcy3VoRD2akvQ8zHynDrA+qeoub5jNp1yr8nnFj9o944PZ93Ek5ub2elrmu4Q9Huv
+         RZvvSLkDk91qBxE5hJ3cFQ5mbu3XDih6QjY9y+7fDcYbtV4UGeSBDeCFUb5njFa+p4Ht
+         02ST+Zevph/ay4R710i0CyocWjtA69NWqa74WVYH13qKYbzQrcejzNZHM3vnuaEP3FVt
+         p3auRRB6gmIFXG7UT1R//qShFaoYHLRyAAF0XHfi2f80N/0WkRAsgD2mwPb3mBLNJugY
+         5p8w==
+X-Forwarded-Encrypted: i=1; AJvYcCWiPvPHw/9C/2p3gpTvM23DXzuVH16t6i8AIHtyqUFOtuIB3WsF/iizlNzl5wFmqgFmhNY2LxEygy69nCs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7wu/5l6/H9cuBYKwQ/A61zRTr5aE5+i6Q1sOcYaNRll8Gz+yP
+	bL6iNwuPl/LfURhf5dKYLk6NCiLIX/5+YnErtZSMDF8Ws6RL5/nDo484
+X-Gm-Gg: ASbGncsnjHkYkrUR6wFByZwkXkyu0VrYjKFXS/6nnYWXbPDSxl5/QJU5rovQ57kSlw/
+	cMhD+RAmWxHI7DXBexek92tq7QgYjMVVCXEGXvtJI3ea5eOptrpt/hkTGu117XAN/XyOMY771tq
+	y4p19uVSu10NLR6WQNYGvoGxtpLZDkvzYxA6nksXFwkvWsV+qlQ/3CRvx7UeRmoHruOTYRrP5wj
+	XHd2tpEhTdMO3rQWuuFIYc0bwuOZ5CqEVwM9FmlOckqYIG3roPuBnTaSjiJJcUtvYCMTPokSXe9
+	nHkyORtS2TSJKZm32obxH0vmQzFDXrjJAv5OzkzX834oxgMvnozIlyeknJFrjTETpfXUCGD+aec
+	B53e/1KI+z+Aj77FBHe+HAYbIS+drCI/p6iqvU0sKxW4GJ/Kle4skwm5663AWtiDCjSRcTZQE2i
+	CXCKvq/LxacEiw0snM/okabEKiU7QtbCzt2gs8RofzzUs=
+X-Google-Smtp-Source: AGHT+IFgqblsjDg64jVhZU34czKFHTApBwHTvzKvobAZn60rv4BaSs97biLpVcByf7R85pQynTZCWw==
+X-Received: by 2002:a05:690c:46c3:b0:786:45ce:9bd3 with SMTP id 00721157ae682-786a41b2455mr71656237b3.34.1762447502815;
+        Thu, 06 Nov 2025 08:45:02 -0800 (PST)
+Received: from localhost (c-73-105-0-253.hsd1.fl.comcast.net. [73.105.0.253])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-787b13b6954sm9471997b3.5.2025.11.06.08.45.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 08:42:42 -0800 (PST)
-From: Marco Crivellari <marco.crivellari@suse.com>
-To: linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>,
+        Thu, 06 Nov 2025 08:45:02 -0800 (PST)
+Date: Thu, 6 Nov 2025 11:45:01 -0500
+From: Yury Norov <yury.norov@gmail.com>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>
-Subject: [PATCH] crypto: cavium/nitrox - add WQ_PERCPU to alloc_workqueue users
-Date: Thu,  6 Nov 2025 17:42:36 +0100
-Message-ID: <20251106164236.344954-1-marco.crivellari@suse.com>
-X-Mailer: git-send-email 2.51.1
+	David Miller <davem@davemloft.net>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	Crt Mori <cmo@melexis.com>, Jonathan Cameron <jic23@kernel.org>,
+	Lars-Peter Clausen <lars@metafoo.de>,
+	Jacky Huang <ychuang3@nuvoton.com>,
+	Shan-Chun Hung <schung@nuvoton.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>,
+	David Laight <david.laight.linux@gmail.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>,
+	Tony Luck <tony.luck@intel.com>,
+	Michael Hennerich <Michael.Hennerich@analog.com>,
+	Kim Seer Paller <kimseer.paller@analog.com>,
+	David Lechner <dlechner@baylibre.com>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Richard Genoud <richard.genoud@bootlin.com>,
+	Cosmin Tanislav <demonsingur@gmail.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Jianping Shen <Jianping.Shen@de.bosch.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>, linux-clk@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-edac@vger.kernel.org, qat-linux@intel.com,
+	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
+	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org,
+	linux-mtd@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 00/26] Non-const bitfield helpers
+Message-ID: <aQzQjSMOSrUIgMCL@yury>
+References: <cover.1762435376.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1762435376.git.geert+renesas@glider.be>
 
-Currently if a user enqueues a work item using schedule_delayed_work() the
-used wq is "system_wq" (per-cpu wq) while queue_delayed_work() use
-WORK_CPU_UNBOUND (used when a cpu is not specified). The same applies to
-schedule_work() that is using system_wq and queue_work(), that makes use
-again of WORK_CPU_UNBOUND.
-This lack of consistency cannot be addressed without refactoring the API.
+On Thu, Nov 06, 2025 at 02:33:48PM +0100, Geert Uytterhoeven wrote:
+> 	Hi all,
+> 
+> <linux/bitfield.h> contains various helpers for accessing bitfields, as
+> typically used in hardware registers for memory-mapped I/O blocks.
+> These helpers ensure type safety, and deduce automatically shift values
+> from mask values, avoiding mistakes due to inconsistent shifts and
+> masks, and leading to a reduction in source code size.
+> 
+> The existing FIELD_{GET,PREP}() macros are limited to compile-time
+> constants.  However, it is very common to prepare or extract bitfield
+> elements where the bitfield mask is not a compile-time constant (e.g. it
+> comes from a table, or is created by shifting a compile-time constant).
+> To avoid this limitation, the AT91 clock driver introduced its own
+> field_{prep,get}() macros.  During the past four years, these have been
+> copied to multiple drivers, and more copies are on their way[1], leading
+> to the obvious review comment "please move this to <linux/bitfield.h>".
+> 
+> Hence this series
+>   1. Takes preparatory steps in drivers definining local
+>      field_{get,prep}() macros (patches 1-11),
+>   2. Introduces __FIELD_{PREP,GET}() helpers to avoid clang W=1 warnings
+>      (patch 12),
+>   3. Makes field_{prep,get}() available for general use (patch 13),
+>   4. Converts drivers with local variants to the common helpers (patches
+>      14-24),
+>   5. Converts a few Renesas drivers to the existing FIELD_{GET,PREP}()
+>      and the new field_{get,prep}() helpers (patches 25-26).
+> 
+> Alternatives would be to use the typed {u*,be*,le*,...}_{get,encode}_bits()
+> macros instead (which currently do not work with non-constant masks
+> either, and the first attempt to change that generates much worse code),
+> or to store the low bit and width of the mask instead (which would
+> require changing all code that passes masks directly, and also generates
+> worse code).
 
-alloc_workqueue() treats all queues as per-CPU by default, while unbound
-workqueues must opt-in via WQ_UNBOUND.
+Everyone please send your tags. I'm going to merge it in
+bitmap-for-next before Monday.
 
-This default is suboptimal: most workloads benefit from unbound queues,
-allowing the scheduler to place worker threads where they’re needed and
-reducing noise when CPUs are isolated.
-
-This continues the effort to refactor workqueue APIs, which began with
-the introduction of new workqueues and a new alloc_workqueue flag in:
-
-commit 128ea9f6ccfb ("workqueue: Add system_percpu_wq and system_dfl_wq")
-commit 930c2ea566af ("workqueue: Add new WQ_PERCPU flag")
-
-This change adds a new WQ_PERCPU flag to explicitly request alloc_workqueue()
-to be per-cpu when WQ_UNBOUND has not been specified.
-
-With the introduction of the WQ_PERCPU flag (equivalent to !WQ_UNBOUND),
-any alloc_workqueue() caller that doesn’t explicitly specify WQ_UNBOUND
-must now use WQ_PERCPU.
-
-Once migration is complete, WQ_UNBOUND can be removed and unbound will
-become the implicit default.
-
-Suggested-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
----
- drivers/crypto/cavium/nitrox/nitrox_mbx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_mbx.c b/drivers/crypto/cavium/nitrox/nitrox_mbx.c
-index d4e06999af9b..a6a76e50ba84 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_mbx.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_mbx.c
-@@ -192,7 +192,7 @@ int nitrox_mbox_init(struct nitrox_device *ndev)
- 	}
- 
- 	/* allocate pf2vf response workqueue */
--	ndev->iov.pf2vf_wq = alloc_workqueue("nitrox_pf2vf", 0, 0);
-+	ndev->iov.pf2vf_wq = alloc_workqueue("nitrox_pf2vf", WQ_PERCPU, 0);
- 	if (!ndev->iov.pf2vf_wq) {
- 		kfree(ndev->iov.vfdev);
- 		ndev->iov.vfdev = NULL;
--- 
-2.51.1
-
+Thanks,
+Yury
