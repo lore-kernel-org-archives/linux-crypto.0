@@ -1,68 +1,67 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF9D310762
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 11:34:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654663126BF
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Nov 2025 11:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762428872; cv=none; b=JaF5ysStCtri3ktZ07ZDMfQWRxiiUGJyMgwd+KfHXbogNlwyU2TLQ6h96e87NXIXHGlQC1tDM+jliab+n07yKib7I5LjVfzwBayB/oZ9SxiGNT4pMKMAoJwxxWnQSNpUepLTyfGhBtRZGa6n/f2Yhg1yX6dPru7KNIqrexfWQis=
+	t=1762428874; cv=none; b=LC2YpefXZk9A6i3H6icDVABLmd6agM/SdBse+mm79sULfue2IPDojNwKRF+8Cu7Bh/vPAShd78bwn2WVFwbVuI6OtZe2WoErGFjoItJGuPZXEM0oAmah8E1/eLCTIcoVTbKszIjTuzAESNtBQcvqqZ1g/lNrPWniCxw24WEFN7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762428872; c=relaxed/simple;
-	bh=a7wQEf6egR4mPuv5cdjgCNZ6WeJSo3nSIgoNmPEuE3E=;
+	s=arc-20240116; t=1762428874; c=relaxed/simple;
+	bh=Gtyj9mEcu6V4pcGmC+SaB8NL97WnrKFGqIgBzP4NOeY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Gec8JjSKtd0d4X1s6DNjfGWKFus4JQYfmvUhpF4jeqFTWTr0Zujy5ajC5GtEeMHl/pvVcZJdkX4b0VOOMyxMPN9AjVcyO1iFKLyF66+CYrEdgP2eHyL7dTbQ9eF+UrWdz6aO8+vv4xtM02E6fdj7OomFEY7rZNBhGdCuAbmAcqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=Ma5hXJlN; arc=none smtp.client-ip=209.85.221.49
+	 In-Reply-To:To:Cc; b=nOUAdti9Huu+gNhxCazqpGKm9V7LbRBcQpqy2Um9L63/I4Zy1m88C8cx0heC8y8uO336hsNPEc8oXlMjKgE0SKNyF4BQCzyl2LvkHHK71TSU0qsJTXsSMlHHnIFLaDnC980HmSJ9y/OIftim5PmWqQ50dNzTH54XI6OtTJosM1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=TcoZBupi; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="Ma5hXJlN"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-429b7eecf7cso589899f8f.0
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 03:34:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="TcoZBupi"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47117f92e32so6773455e9.1
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Nov 2025 03:34:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1762428869; x=1763033669; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1762428871; x=1763033671; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PD+rs5pOYQ8OCsF4o4tgFNdDCvK3XuPAT18E201qmow=;
-        b=Ma5hXJlNfP9rAldaxbjYNN+Y6dJsEchEFnZMhMp/wzb74Nx8BUGeR4eonGeYeLDRzn
-         s9Ar62qlMUQzWN47RiKnvvoIBhDSIrH3MPFiav7i/J2AMnv36NL0f5e0ETQElhVvbg8y
-         NUeHGBnq7mXMpEST+vVzfvefTLif0DD99K25LOcGSzs1TdbsLlL6GkTXVKq7vCCQsIGF
-         cfPHKCLf28sOXyGLFaIxsRgt3YolEE1HdKiSRCdOOwFaMHBo7yX6D8RCOxNpQuBnrmrV
-         u737ornnnETJWfddlzyjIo5DimeOrzWgCjGJiwUH7wi+WSCRcFx6dv3+hM0qqX2TWOBH
-         B6Jg==
+        bh=9ps1dtuocIgHWNi4XIFGNgY4rWCwPTvVS8YGMM8z4E8=;
+        b=TcoZBupiGTHOlhzOH33JG2PhzSY51RD/jkQInI2w6hUgcR21h9S+ROa9s17oSfbUfg
+         8sWwDe6HiJ3qNswIIzt6AOHg2G81D3uTgYpCHU68IwvUrhz5d+latMv/RJrgHZRn2yWo
+         Bu8FPydRToEIfv/QDEZxm1qYl1U54MnrXBJXBWoaU9yEFPxazJ4WqvE+Mvocw4ga2VSo
+         35NQqzPeqt98aRpOZZAX7Jv3xTgpNFuGN+tbTlkr76XAITNVORfIuLrkNsHdOLfrs5yt
+         oFkEex2lUQfdzli+zgtvB/IapqaI2nWnwit7Cpc9WhcgGeglsenxfTZ9gIYk6/eT3wgW
+         /L+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762428869; x=1763033669;
+        d=1e100.net; s=20230601; t=1762428871; x=1763033671;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=PD+rs5pOYQ8OCsF4o4tgFNdDCvK3XuPAT18E201qmow=;
-        b=Xfi9Xink1R+eYbpendrWKH+UN5Kk4fDRUrgkEIePGGZgb3G1HoKKxBvdGa/75/xp2p
-         b/5qfjqZNJHez0/81Bow6rsvREfqVWIm139PV5waIAS09h9kj948m50yroYE+8+ppTpa
-         yyOlXi5ixy7EBM+HFWUOcLzvpL65jsMPXLA7vHfhy+KlLcl+oqm9T5RSYWIaFu05W8Qi
-         e9j3c31krsGF8XxUak9Hu8+vZIMTfd9aVbp8NycnEYmuUALps04L6DFwtdnW+WcV5x70
-         +oaCusUTeYYxONnF0wCTN7WKC26FP7ol1V5A5NLVacGcoJa+E1t0xQ8/EVV6yMbQbBGj
-         4T/g==
-X-Forwarded-Encrypted: i=1; AJvYcCXwuEYweEnAD/HtdiNaesMXG/5EnYOYWknYJAgRLhQXUiQiZ7pFR2BQQa0UJjhbcueDd927dM4+rIHRpuo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwohgTgEiWvptMRzMrrdcgKGbkbehFckuW7VqmCP3+gdtbckhMz
-	doWWxXNE0Rcn3uREU1YQhQqc0PF53ihfg6E9CL047ljMrqceWA9YH8j5ZDZJsNcHaX8=
-X-Gm-Gg: ASbGncuwcNzGsyfsJX5p/j9j0P94y2Da+dO6Gt9J7IJJEY7iWGmRoSYPJWvrw839Ibu
-	9w84TuOjJR/mtGfOb9hD+Gn6IVGUD9JtQhmAsp1W99TsInTzIv1YeVLP0ygFti2lrsoewnyR9Pk
-	r/oOecJkYbe9P6o+HyyIl4OnCbgdq0rVgE6z2j8uMbwusfDgZ1e0OT0srUvBTIFGHf6FzSvLZUk
-	i7lTcDZbNAsUyC50tn3ZX8rPLiSop94uJAbedHrUuF11THLv5Aof/MXedFBsrAYWzhGwkoG73R0
-	NtJHYKU8/gNpiP+40elEkJVnBNkaUghAax2AtCmYfa5EZmcW+PzGFS7ihChx67TGpT38T+CficG
-	rOP6MvNltatsLPwwVyTgzKttmgJydDu0dHlRav6znDwJwnpNiBrtpeBGSzqoj+F4ld437uDaP76
-	lnQ8jPaPruXXZ8eQ==
-X-Google-Smtp-Source: AGHT+IFgtVKctrlOuzKQectqSEwKB2ayhahJJEey2N61I2W/lfSJB2I/53UnlfLzRQMvbCarVAJhsg==
-X-Received: by 2002:a5d:64c4:0:b0:429:bc68:6ca0 with SMTP id ffacd0b85a97d-429eb12fb84mr2538324f8f.4.1762428868641;
-        Thu, 06 Nov 2025 03:34:28 -0800 (PST)
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9ps1dtuocIgHWNi4XIFGNgY4rWCwPTvVS8YGMM8z4E8=;
+        b=kMvIPVZX3WhWD0JRCrjfFpEVF/82PQEJv/L1mShFgKjWevgqfCaqnC3fhxnTzURpWN
+         aA32/pp62S/Xj+gqGFKXEM6qn2vKW+mMR9G9WzHA2cnxQmxbbsl2IolrVlDtZEax8N1L
+         Nay1Ktsnp0I5z74tZWXWlJ53EDb2U6nh/IqZUjcIajRA7vxT+vSxJc7ERA0BHRmRnQgn
+         rJmi3LFvxS4ujwn9jK3dMGGrj4t672g7y4YvLE2JW5FG1x5ZDh2FOSORjQOUj0HgSzAX
+         L9ExQMCdgBTEiHznTpurlDfBKXqdhj5l9twR7mDeJQcOD7frt0u6BSNu5bkrWlc9uhLB
+         C7+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXA7yl0YsWDpih/XXe3Scg3RNJxFG4WAyVhvkduXN06tZvIuegz45psqxw8znC75AmjQbgQRPf+92+G5HM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzF/cQwMU/A75vFWGOXK9dsv0TbJZL4AkLU1lTRQ7yLj3ZaXMzK
+	WddcAxkPaOAdAUJtf+rn0ZnoY/Ao5o9mD9tV+AwlSO8Lo5rgVefHyvCVd+7JwW+A/Aw=
+X-Gm-Gg: ASbGnctQVev8orf2YUAIFbLz/TppUwy2IMgEaDO8dwiHS9heTlYkdzMAmyPrVfhdJVb
+	/yH2QgCl5Pq6ITVGuJXI4vwFcYun6QuHKnUwUNE1W3DXpTsw7WxQ+Z0EDAbBb5WetdDtpNEnst3
+	21R0OzAV/i30qCw2gnSS6P4wjNgmhTsztQmvJL3ITSgbMTn6MXMIEA3Y0fuilk3XSX1pCt39Ay7
+	Npx4Fj7B9mLicxSGGs6sXGG8vzsKj+8RvaCiC3u6jTRUPLy4Lf7o6ZUApkJ+w5BIRP1oHge5MEj
+	WyR+MKVs6ojSA4HF1TZsCdMTx1JhPuYT6IAhLb2RQfp5nJhAPZUw0ftHj1OHikhb3/jc/2lM0mn
+	bkmgyqeor7A9HRAHRxEerKUNp10V0c9ArllerNQGbuL2TiZIOstc1HSB3doRCwmtEnhya
+X-Google-Smtp-Source: AGHT+IEd5LLOqacXKfenHhj7E4pku5yvYiQZ/LXG7Z5ut7z2Sn6vJh9v6vSGwpj/odFCat1KlpmtFw==
+X-Received: by 2002:a05:600c:4f0b:b0:475:de14:db1e with SMTP id 5b1f17b1804b1-47769d50255mr6509055e9.24.1762428870670;
+        Thu, 06 Nov 2025 03:34:30 -0800 (PST)
 Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:d9de:4038:a78:acab])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429eb40379esm4389459f8f.9.2025.11.06.03.34.26
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429eb40379esm4389459f8f.9.2025.11.06.03.34.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 03:34:27 -0800 (PST)
+        Thu, 06 Nov 2025 03:34:29 -0800 (PST)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 06 Nov 2025 12:33:59 +0100
-Subject: [PATCH v8 03/11] dmaengine: qcom: bam_dma: Add bam_pipe_lock flag
- support
+Date: Thu, 06 Nov 2025 12:34:00 +0100
+Subject: [PATCH v8 04/11] crypto: qce - Include algapi.h in the core.h
+ header
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -71,7 +70,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251106-qcom-qce-cmd-descr-v8-3-ecddca23ca26@linaro.org>
+Message-Id: <20251106-qcom-qce-cmd-descr-v8-4-ecddca23ca26@linaro.org>
 References: <20251106-qcom-qce-cmd-descr-v8-0-ecddca23ca26@linaro.org>
 In-Reply-To: <20251106-qcom-qce-cmd-descr-v8-0-ecddca23ca26@linaro.org>
 To: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
@@ -86,125 +85,59 @@ Cc: dmaengine@vger.kernel.org, linux-doc@vger.kernel.org,
  linux-crypto@vger.kernel.org, 
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3204;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1185;
  i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
- bh=qu1xfYVQtzlM9Gqzgkm1BqB5ZitfYYPCUMV4Og+CRDo=;
- b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBpDIe89GdN/Ar44t5r8WnhaHrBfOPqYa8CKf7cs
- 8exTYFLr9qJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCaQyHvAAKCRARpy6gFHHX
- cqW2EADe+TsFJg+T/SYNyFg8jW7yGLupg/8qCkMSkRipiwwmuO5kMlhyTmSTWIb4cBBjjcXnyqI
- 9iqwPS5Rl6+ZCdzHSJlhhGJTCbeMcraPicuujhsUjSFle5cb8M38heAJ2B2buD/2TCw/+oD8TZ6
- IeujESttv94uaR5D+8wYDT0SkrFxWnO2oJdEqoZ42w+I2CnIUoNkxEbAErInw/GbClt7CUjP+ys
- wrlzkgXZmx3+u3XZHftUWg3CkqC/IbQofwY6n/naqiIAWCsQ+QJqu/1w4sQBO/xQyEHoes5HZmV
- oCDJ3BJa+XGw9FYKD6NgxySFr6pE837fWhTCDOqnJ3JSvCWFxJtN+rs5f3rg9dqIiQBMWcburH7
- /vEWzjWcFS7RUVQH7D8RSypiAqUnZu4yyWvVtBq9wnwVjC3Uy/RNE4sqpgkQKdbvMsDETxrQAOW
- ahSW8FjL8H81NS3eqfIhxN5Vj+cFNMeo+VUdIyDky2XDzYG9t88agarsN6/mifiRT4CyDPrsqo3
- DV8Mg0qcZkAutoOkdgLS0ZGIjcVq/s8kzudJl09WOD4BgmJbdvFyg2vFAbbbHSDy6rHnrLiXAzV
- xvkdg2Ka9dm0mI+ZHmNJBzMrarkWX+GdTQLbbUSSRZ5WolvZJrP9hwl4udloyjQ44BDbSphivy3
- xxHtuqNAmDmKe6g==
+ bh=ho7Q/QFIJOMH0B7qxH+AazIfS2TlD8ZgO1niuibbOks=;
+ b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBpDIe8xnsPR9iMo6Jt4SggMvqEQxmfALJYg0MEY
+ ImjhNTu+HKJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCaQyHvAAKCRARpy6gFHHX
+ cvO1EACyxVnNV7Un2A3ha+eMjxYTSDaQ2uctC4w6/Ev+VBpYvLdlTnvDPo/sB+hLmRXuqXbZGtU
+ C5bn03Gj5c2w83a6qONL0f+hfuYlXVMbgfNNorlw7CCwBlrRoS5cc8l5Ehv5cf9JbPh97Epy8FC
+ PzxRdrwMerl1doQ+OmSHB+EIiFI6HRHf16aI9812MlvE6UYb3jRG/xqdVLB3Cj+t+JeuDk6E/EX
+ GAoFcK0zlvZ0dtbbrfYvShzUWEjc6fL3sgPu/7EmtI2iFVS8U/htge9AGLndQk288dLTKR49Faz
+ MBXbfyvzvNi+nee295FJZ1e72m1aLVkeRoTfIgKSIhkGtm2gkYRd6GFouYXRLX/N4GFBLsyO0ED
+ KEfMslFAdJqBzjsojG9gkRD//1LSFWQMaYGpawINGnGbgZBGlQ9jysUJS8BlQ6RM+Af82GNN81q
+ LTCc4vfCHzwcrXE7zrJF5B7z19cC4ImgYkCNvk6lcW6Xn596ekZZsUR4JuxfsvjwmdmdGi2BeTb
+ 2P73eawDofP3rPh261amr2K7PbvN8RnAuMkczrjXkMQiebPwk1fuVOwXXgDBo3EvtLRe/Jq1xdk
+ xa1PLHeYj0aXy0clKX3kSRqMxgFOVOk9sQzlb9XQH3BaCIYC231iu5QZAYut9oiC/jxMbme3HAp
+ bieH1BdGh2InEuQ==
 X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
  fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Extend the device match data with a flag indicating whether the IP
-supports the BAM lock/unlock feature. Set it to true on BAM IP versions
-1.4.0 and above.
+The header defines a struct embedding struct crypto_queue whose size
+needs to be known and which is defined in crypto/algapi.h. Move the
+inclusion from core.c to core.h.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- drivers/dma/qcom/bam_dma.c | 36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+ drivers/crypto/qce/core.c | 1 -
+ drivers/crypto/qce/core.h | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
-index 8861245314b1d13c1abb78f474fd0749fea52f06..68921d22ad7abfef7059b1db78052ff48e842952 100644
---- a/drivers/dma/qcom/bam_dma.c
-+++ b/drivers/dma/qcom/bam_dma.c
-@@ -58,6 +58,8 @@ struct bam_desc_hw {
- #define DESC_FLAG_EOB BIT(13)
- #define DESC_FLAG_NWD BIT(12)
- #define DESC_FLAG_CMD BIT(11)
-+#define DESC_FLAG_LOCK BIT(10)
-+#define DESC_FLAG_UNLOCK BIT(9)
+diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+index e95e84486d9aefe4b9af09a27631f0f9e7ad231f..3114b7f458de0c1cd8527e602b408958f224a7d0 100644
+--- a/drivers/crypto/qce/core.c
++++ b/drivers/crypto/qce/core.c
+@@ -13,7 +13,6 @@
+ #include <linux/mod_devicetable.h>
+ #include <linux/platform_device.h>
+ #include <linux/types.h>
+-#include <crypto/algapi.h>
+ #include <crypto/internal/hash.h>
  
- struct bam_async_desc {
- 	struct virt_dma_desc vd;
-@@ -113,6 +115,7 @@ struct reg_offset_data {
+ #include "core.h"
+diff --git a/drivers/crypto/qce/core.h b/drivers/crypto/qce/core.h
+index eb6fa7a8b64a81daf9ad5304a3ae4e5e597a70b8..f092ce2d3b04a936a37805c20ac5ba78d8fdd2df 100644
+--- a/drivers/crypto/qce/core.h
++++ b/drivers/crypto/qce/core.h
+@@ -8,6 +8,7 @@
  
- struct bam_device_data {
- 	const struct reg_offset_data *reg_info;
-+	bool bam_pipe_lock;
- };
+ #include <linux/mutex.h>
+ #include <linux/workqueue.h>
++#include <crypto/algapi.h>
  
- static const struct reg_offset_data bam_v1_3_reg_info[] = {
-@@ -179,6 +182,7 @@ static const struct reg_offset_data bam_v1_4_reg_info[] = {
- 
- static const struct bam_device_data bam_v1_4_data = {
- 	.reg_info = bam_v1_4_reg_info,
-+	.bam_pipe_lock = true,
- };
- 
- static const struct reg_offset_data bam_v1_7_reg_info[] = {
-@@ -212,6 +216,7 @@ static const struct reg_offset_data bam_v1_7_reg_info[] = {
- 
- static const struct bam_device_data bam_v1_7_data = {
- 	.reg_info = bam_v1_7_reg_info,
-+	.bam_pipe_lock = true,
- };
- 
- /* BAM CTRL */
-@@ -386,6 +391,9 @@ struct bam_chan {
- 	struct list_head desc_list;
- 
- 	struct list_head node;
-+
-+	/* Is the BAM currently locked? */
-+	bool locked;
- };
- 
- static inline struct bam_chan *to_bam_chan(struct dma_chan *common)
-@@ -667,6 +675,7 @@ static struct dma_async_tx_descriptor *bam_prep_slave_sg(struct dma_chan *chan,
- {
- 	struct bam_chan *bchan = to_bam_chan(chan);
- 	struct bam_device *bdev = bchan->bdev;
-+	const struct bam_device_data *bdata = bdev->dev_data;
- 	struct bam_async_desc *async_desc;
- 	struct scatterlist *sg;
- 	u32 i;
-@@ -707,9 +716,34 @@ static struct dma_async_tx_descriptor *bam_prep_slave_sg(struct dma_chan *chan,
- 		unsigned int curr_offset = 0;
- 
- 		do {
--			if (flags & DMA_PREP_CMD)
-+			if (flags & DMA_PREP_CMD) {
-+				if (!bdata->bam_pipe_lock &&
-+				    (flags & (DMA_PREP_LOCK | DMA_PREP_UNLOCK))) {
-+					dev_err(bdev->dev, "Device doesn't support BAM locking\n");
-+					return NULL;
-+				}
-+
- 				desc->flags |= cpu_to_le16(DESC_FLAG_CMD);
- 
-+				if (bdata->bam_pipe_lock && (flags & DMA_PREP_LOCK)) {
-+					if (bchan->locked) {
-+						dev_err(bdev->dev, "BAM already locked\n");
-+						return NULL;
-+					}
-+
-+					desc->flags |= cpu_to_le16(DESC_FLAG_LOCK);
-+					bchan->locked = true;
-+				} else if (bdata->bam_pipe_lock && (flags & DMA_PREP_UNLOCK)) {
-+					if (!bchan->locked) {
-+						dev_err(bdev->dev, "BAM is not locked\n");
-+						return NULL;
-+					}
-+
-+					desc->flags |= cpu_to_le16(DESC_FLAG_UNLOCK);
-+					bchan->locked = false;
-+				}
-+			}
-+
- 			desc->addr = cpu_to_le32(sg_dma_address(sg) +
- 						 curr_offset);
+ #include "dma.h"
  
 
 -- 
