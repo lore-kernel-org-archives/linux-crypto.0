@@ -1,148 +1,163 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9053311C1F
-	for <linux-crypto@vger.kernel.org>; Fri,  7 Nov 2025 08:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD8F15855E
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Nov 2025 08:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762503392; cv=none; b=P4qkemxgfu+x5kjCNpXWWijVVyXoacW12vqtLTUFQgikzHOh+Ik0DWfU5wamZBBL2rK5mEGF6xw62CxvrqBmVsW6SnYZpY0fwjRIxxfvsi0TPM4+2L7Pi45Xe5LHyZuisRVxeCT05tAOWZYzeZq9lA0rIUVt0sJXV6e9CkpMBlk=
+	t=1762504881; cv=none; b=XLZUZHSo5eLgPu4gq9R0Ema49VPQNYPLA7u6wDatCtjBZR3Cu7PsrJmVzPxFqwtNM+niM3821nfOVvQFSBX0Mh6O8llmxl/ut9r4mSm7xZ9Bmyj+nyQqZn6hUNAylUXe0bUCiPHi2q6sJcCi6zghziDdfxNgeXsPEpS+cEdDWUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762503392; c=relaxed/simple;
-	bh=m3Rw4RghvlJpNqwmX5RdKGrpt4N2kWtJe21s2ySaS+U=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Gxel91GcMxHkF2ZX1CHZRe3zltHJ8aQURJDx8BrYwr4J4MRGri2jC+adJ+MHAZvVbN3s7JXTixrd0EtvVGaiglTPnb3SM/uszgc9Ce0MDTvoB8KBliUsHbvt3vihqrCU44uGdtZGCS5Gd3p7CR21ll8Pj2ewVsAjxj/KiuWo8wM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=uDjhlYum; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uDjhlYum"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-429ebf2eb83so55881f8f.1
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Nov 2025 00:16:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1762503389; x=1763108189; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XwLm9ZOqkxP5nRd61gUy/JOG5+aVOeMLvrzzIiEulOE=;
-        b=uDjhlYumG2HKqyKZq4ail7nY6nayqHb91XgWcJfpkM8EzBS+fjY1aCpDYxU1dFrA6L
-         gXfWbCNtccho3ECozvtZ5g1uTKbzsoqt7lR8IaxDzeAx3QRdqhIzroPSDrDGuUMSEnnk
-         jZTPigMkDKELZQh4nERKVmm6pc34hRHsrsxCQNe9CtmOLsLAGnBH4rR544JNwM0VN337
-         NoEiQ5eP2Pwys9Li7m72YFJMmj+OssCl+acOJNxTc0f43JgKC/AkYVQ7g8wSADeQSdHD
-         Dx3KJFmFXWnpN+GjbkW36Lo/PgtearM/7xJcCy2sMqRD8jr6Ts5SgLPUtbagT42GwTtW
-         fTqw==
+	s=arc-20240116; t=1762504881; c=relaxed/simple;
+	bh=9JcvPVILVy97hsdXJNb7VMxu6BBjGO1PhoJ8NRS9yLs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lm9UlBmOdhKfLN+gHbs9/VcLE+AHHVDcyz1BBo8vNcUnYclg1Soj+yrjwjANcpd2fRoVRCExUiCvD+4QbY1Y/JnS7JCZgEzZiglu4ur7+2VKYNyg29ZJ9jbl/KcYClDjkJuNdx3OnJ46MEKRFn6qM0y8R6ACNaxWl73wdeAIDJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-932c2071cf5so275736241.0
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Nov 2025 00:41:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762503389; x=1763108189;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XwLm9ZOqkxP5nRd61gUy/JOG5+aVOeMLvrzzIiEulOE=;
-        b=aTKICjPZxzkI+sOosGXHZWGFbde7Fz2NcstlqknyAXaew6VUUAscrmIDdRsNbeivLy
-         ZRBxSvz+UizBZmgPqlQEoT2cf5WiOsofxTw6/eHIuWbv39hHuiKuxHKIhUCdbJ8SvAm1
-         3rC5SpWycRAWMkB9YXRgcRAO+3Y4T287s+id/D7z4ylq6mzIAYtJpsWXs1TIdTC+wOm4
-         8uTd/6d0sg6jPLKmFanCR6dMd2UyLP0pxydrTaZqVBVr3OwBjWPIOmMqNIbhdEGFbqvF
-         JemtZoRr/kFuFObMdMziXEK2WdefZv6ylOkgj3uRIY/Rf7gsypQSiPvg8YaUAIyau19x
-         54eA==
-X-Gm-Message-State: AOJu0YxkxDi4L+eIkgnUYKUPD2yYg/kG1IDepCPm4/Q/t7HTt54nG3q8
-	uBOhafBrjgQd7FSR1FCcMS6dzB+UjPZ5m+wMOe1GAbw761NmkngCgIkVU0dj1WbWegw=
-X-Gm-Gg: ASbGncufKisfODaPQk7lHesJggyT/FrEOh/TPzmhgbzEeEa4MTcTNydiNXTKMnilPFr
-	zHyHxWoDkj6M6DQbmKihjq/U31yQfx6lT4cixVQ6eg5MyCDYWeeArQyFxXoqTKC2h46NNOkEYYa
-	qM+SaIhNTQ7l6ZFMc8pKItRnMxEiNQqRWLtRzcKnzGNqBG5R3EoPPz9A9UASLBWtDjs7lYsk0OF
-	r1yWHzX4/A4wJkshxBnpw17cYQpNShff/jYQdwNQ8ESVYXlmh5/unrmeBlWzzmrmQoVIVokx/G9
-	EquUec66GY7U1nv3xK+nMwg6Rhd0Zs9S12+MTLVekJCu/kABOcyyMXgOUOFhQTAk8IqrUYyqeKz
-	FAjnddWJ0qiKDL+pi0gA0oKIqJQ3fjhwimmHfWLSbk/xP7W7uZrrsnAlIxLo68NqIkDBdQUv6ZN
-	7WfmJ+eWPEv0tRV6h+B1blQ5aqEcM=
-X-Google-Smtp-Source: AGHT+IEW7931OZiZRGfsN4XwbENTbfXf5yTkeG5zUHKOhA4eCYE8JeVUBwhn/sIFVaN+bw8gO6m78g==
-X-Received: by 2002:adf:ec41:0:b0:42b:13cb:41bf with SMTP id ffacd0b85a97d-42b13cb4268mr623938f8f.9.1762503388885;
-        Fri, 07 Nov 2025 00:16:28 -0800 (PST)
-Received: from [127.0.1.1] ([178.197.219.123])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42ac679d544sm4058381f8f.46.2025.11.07.00.16.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Nov 2025 00:16:28 -0800 (PST)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Fri, 07 Nov 2025 09:15:53 +0100
-Subject: [PATCH v2 6/6] crypto: cesa - Simplify with
- of_device_get_match_data()
+        d=1e100.net; s=20230601; t=1762504879; x=1763109679;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RsHZezS59+NExnNGIIdIy6ER8EF0CQG8kO0yNppcdcI=;
+        b=fB0eOAn/azPNvvc+yzjJezu/TwLvjzf5L25zwbpJ1CnAo7tnIN+Szh3CfkWDh6aqhh
+         W7BqedsvLb7DJ4aF65zYurqwRAcn2PhZ2oh8fQPQKQTt0manOtQq8JEJVD53JwVYN9W/
+         WQGpwQSuQ6NQmrPD8R5oq1qaZLZhlLEBlZwqlyMnf8sQmvlzIHTV+xInb2JAoRbsFS/r
+         lv83anpV8gqq4NhzeuvMH1JDBERsPZC6Muy/l8QZR/cnM59WfqKMQ1waUydL1oaq/mS1
+         Ijjqqzo5890BRRvyG7IYUJ3BId6Kbs4IFK4defhcnKwB83QmR5uNf761lRMC6y2b8m79
+         UoFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXkjQfxDtBg9IoYEPWVs39VNnfleNX0Zvz/MopP2CXzNeT8HRYXcieR9YIDM7b2UNdlH7FcB9ZhMCoZD88=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5zF7RGWBl3hhB2jg85qtVx607YH1HP4qoI5kg555fsayFqPQV
+	BXM9VWAtMI4fnBB0EYrOSAXJ8qxHxdpWD4vdWrmjLFg9MQ7I4pjbXmbUdOGhkWe1K10=
+X-Gm-Gg: ASbGncsQVJMHnCjoy0wG/7+i1yg+XQ7vyIt/XnRlpWSCNCj4zP3gE35pSVjhL4WuJ6h
+	IN03CL5IV47XZRMHmxsodNpNApvY0eRumxLk9kdnOBvbBwqWVwvjaWACc2gNEI0tuZuNHMb4LyG
+	MFA1Tl3GyDDSmnKrBTFGJKsozohPypomV3hHJ/22+qvXtueUWmuOMqXRlnU4Zi/dopzr5whsd1U
+	OBpi84y6s6O/T4U9V7INauW2/PNKiXauhLm6r5wwODBh1qyZtiLqeXtLlLeeZdnDJpwwqPKfgqc
+	kvFr1AeU4b29lORcVISyyovDfr1552O+L4w0SvqR/gLDBM6dCw41W8T7I1601DhycCHxzwjvMAx
+	SEArOfGu196EtMf5zo6hruIxR04enuc2F86UAcLqOtWhDWRk2IdCYOeMAqkUdIpkgdZDyKyFEsx
+	zmSwiMQygog4iY5xWwCe/IXRnyPLAPR7d/edcXGf6rjl5+peoAuz4J
+X-Google-Smtp-Source: AGHT+IH0IjJst2+raS5xq79fdHPLVBD0bG2cn14RL0feuTd7JZsNM+pe+MZN1j12HLbSqoLBxP9Btg==
+X-Received: by 2002:a05:6102:374c:b0:5db:aee2:9964 with SMTP id ada2fe7eead31-5ddb9b7dd5fmr268979137.9.1762504878925;
+        Fri, 07 Nov 2025 00:41:18 -0800 (PST)
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com. [209.85.221.176])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9370898d9d1sm2158891241.12.2025.11.07.00.41.18
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Nov 2025 00:41:18 -0800 (PST)
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-5598942c187so273636e0c.1
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Nov 2025 00:41:18 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXaw4rEpZCQF2LstALBdedGx5doGbkRM7an1d0MOwTMvoSZYOEniafECV5/JG+FNUNRYpDP0t0kXnXwRc8=@vger.kernel.org
+X-Received: by 2002:a05:6102:4425:b0:5db:e32d:a3ff with SMTP id
+ ada2fe7eead31-5ddb9e056aemr278996137.19.1762504514580; Fri, 07 Nov 2025
+ 00:35:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251107-crypto-of-match-v2-6-a0ea93e24d2a@linaro.org>
-References: <20251107-crypto-of-match-v2-0-a0ea93e24d2a@linaro.org>
-In-Reply-To: <20251107-crypto-of-match-v2-0-a0ea93e24d2a@linaro.org>
-To: Olivia Mackall <olivia@selenic.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- Florian Fainelli <florian.fainelli@broadcom.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, 
- Jesper Nilsson <jesper.nilsson@axis.com>, 
- Lars Persson <lars.persson@axis.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
- Srujana Challa <schalla@marvell.com>, 
- Bharat Bhushan <bbhushan2@marvell.com>
-Cc: linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@axis.com, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1275;
- i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=m3Rw4RghvlJpNqwmX5RdKGrpt4N2kWtJe21s2ySaS+U=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBpDarQIPQj/uwSRGyYOhxeW+nG59uNrfsSEqYi2
- oMqO3cMHzOJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaQ2q0AAKCRDBN2bmhouD
- 117lD/44tUDFYEjT0xJr9FfxIcOknzx85sePA1ZDeP3Oavbz5mSDgFRWG3DUqcS8jQOge532MGD
- bQjMZh6FAAXgJGYB+EHXJDe/SQrp4/DIppftDO9LMqt6wzkDR4caV24D59K7WrHRh+Ew4B4eX7H
- Tj0FOrTLAwACR0QCh3NIKEKODka/+oldeK71aizC4jVy+pODsfHA7ItLXF/FXjwrhykAoKx0RfQ
- 7ApCmu6gmBUHmOn+BwYj9NFnOpf0yI8MXnRvH0UbvXeJwJK94FXrA3GItVtAfNyY4L4sPIoT4Ej
- Xwk2j55yDLd01zbRWPoxgiw5feUeibT3g9P2T8tzZ0xP9IFFfRKYCufYydLHBkoX2izid4uZG7g
- 97WX+Cb3Jr8MH6pqpy9mf7T6qOTXCpGWCbrMWzAWVLTWeHsR9/MIc4uT4HvaHQnjS7j67p1rs7h
- lxsVtbgKHLUwIiuzQf5b93POHRRWwIjjzmagPIZyydUZt5hhIPxsBzfej51KDb8nqbycE8HBBL9
- kLEMB+5pQ5OisidwDx7ofZmxsKG3gL5uT7s4cifHxrkcK9jHQ9Y2NGtY5fkPCKzXbGr4c0mJQ1p
- jkSV2wodegqW3xwn+ba+mQxCItmBQXjlMqdASt7kbtMKHZGScO35Sdv8rl/aJd3U93rd3sMMdvm
- B9F8iTOyyri2UmA==
-X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
- fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
+References: <cover.1762435376.git.geert+renesas@glider.be> <cfc32f8530d5c0d4a7fb33c482a4bf549f26ec24.1762435376.git.geert+renesas@glider.be>
+ <aQy0T2vUINze_6_q@smile.fi.intel.com> <CAMuHMdXVUJq36GvNUQE8FnHsX+=1jG4GOJ_034r=fgr_Rw4Djg@mail.gmail.com>
+ <aQzIIqNnTY41giH_@smile.fi.intel.com> <CAMuHMdW8ndAdGnSHopYFMWvw7wk7wKz_7+N91M1jRHoqK1KBrg@mail.gmail.com>
+ <c62eb5a727f149fb9d8b4a4c8d77418a@realtek.com>
+In-Reply-To: <c62eb5a727f149fb9d8b4a4c8d77418a@realtek.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 7 Nov 2025 09:35:03 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdU3hWDOWXxuOJcBA7tphBT7X-0H+g0-oq0tZdKw+O5W3A@mail.gmail.com>
+X-Gm-Features: AWmQ_bkZe8xF0tkRpW5gVlylkcfm2r3jZb2Xa1XdOQVS8F7wx8KXagIs6XSHJvI
+Message-ID: <CAMuHMdU3hWDOWXxuOJcBA7tphBT7X-0H+g0-oq0tZdKw+O5W3A@mail.gmail.com>
+Subject: Re: [PATCH v6 12/26] bitfield: Add less-checking __FIELD_{GET,PREP}()
+To: Ping-Ke Shih <pkshih@realtek.com>
+Cc: Andy Shevchenko <andriy.shevchenko@intel.com>, Yury Norov <yury.norov@gmail.com>, 
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	David Miller <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, 
+	Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, 
+	Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, 
+	Shan-Chun Hung <schung@nuvoton.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>, 
+	David Laight <david.laight.linux@gmail.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>, 
+	Michael Hennerich <Michael.Hennerich@analog.com>, Kim Seer Paller <kimseer.paller@analog.com>, 
+	David Lechner <dlechner@baylibre.com>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Andy Shevchenko <andy@kernel.org>, Richard Genoud <richard.genoud@bootlin.com>, 
+	Cosmin Tanislav <demonsingur@gmail.com>, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Jianping Shen <Jianping.Shen@de.bosch.com>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, 
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
+	"linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>, "qat-linux@intel.com" <qat-linux@intel.com>, 
+	"linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>, 
+	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>, 
+	"linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>, 
+	"linux-sound@vger.kernel.org" <linux-sound@vger.kernel.org>, 
+	"linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	linux-wireless <linux-wireless@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Driver's probe function matches against driver's of_device_id table,
-where each entry has non-NULL match data, so of_match_node() can be
-simplified with of_device_get_match_data().
+Hi Ping-Ke,
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- drivers/crypto/marvell/cesa/cesa.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+On Fri, 7 Nov 2025 at 02:16, Ping-Ke Shih <pkshih@realtek.com> wrote:
+> Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> > The extra checking in field_prep() in case the compiler can
+> > determine that the mask is a constant already found a possible bug
+> > in drivers/net/wireless/realtek/rtw89/core.c:rtw89_roc_end():
+> >
+> >     rtw89_write32_mask(rtwdev, reg, B_AX_RX_FLTR_CFG_MASK, rtwdev->hal.rx_fltr);
+> >
+> > drivers/net/wireless/realtek/rtw89/reg.h:
+> >
+> >     #define B_AX_RX_MPDU_MAX_LEN_MASK GENMASK(21, 16)
+> >     #define B_AX_RX_FLTR_CFG_MASK ((u32)~B_AX_RX_MPDU_MAX_LEN_MASK)
+> >
+> > so it looks like B_AX_RX_FLTR_CFG_MASK is not the proper mask for
+> > this operation...
+>
+> The purpose of the statements is to update values excluding bits of
+> B_AX_RX_MPDU_MAX_LEN_MASK. The use of B_AX_RX_FLTR_CFG_MASK is tricky, but
+> the operation is correct because bit 0 is set, so __ffs(mask) returns 0 in
+> rtw89_write32_mask(). Then, operation looks like
+>
+>    orig = read(reg);
+>    new = (orig & ~mask) | (data & mask);
+>    write(new);
 
-diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
-index 9c21f5d835d2..301bdf239e7d 100644
---- a/drivers/crypto/marvell/cesa/cesa.c
-+++ b/drivers/crypto/marvell/cesa/cesa.c
-@@ -420,7 +420,6 @@ static int mv_cesa_probe(struct platform_device *pdev)
- {
- 	const struct mv_cesa_caps *caps = &orion_caps;
- 	const struct mbus_dram_target_info *dram;
--	const struct of_device_id *match;
- 	struct device *dev = &pdev->dev;
- 	struct mv_cesa_dev *cesa;
- 	struct mv_cesa_engine *engines;
-@@ -433,11 +432,9 @@ static int mv_cesa_probe(struct platform_device *pdev)
- 	}
- 
- 	if (dev->of_node) {
--		match = of_match_node(mv_cesa_of_match_table, dev->of_node);
--		if (!match || !match->data)
-+		caps = of_device_get_match_data(dev);
-+		if (!caps)
- 			return -ENOTSUPP;
--
--		caps = match->data;
- 	}
- 
- 	cesa = devm_kzalloc(dev, sizeof(*cesa), GFP_KERNEL);
+Thanks for your quick confirmation!
+So the intention really is to clear bits 22-31, and write the rx_fltr
+value to bits 0-15?
+
+if the clearing is not needed, it would be better to use
+#define B_AX_RX_FLTR_CFG_MASK GENMASK(15, 0)
+
+If the clearing is needed, I still think it would be better to
+change B_AX_RX_FLTR_CFG_MASK, and split the clearing off in a separate
+operation, to make it more explicit and obvious for the casual reader.
+
+> Since we don't use FIELD_{GET,PREP} macros with B_AX_RX_FLTR_CFG_MASK, how
+> can you find the problem? Please guide us. Thanks.
+
+I still have "[PATCH/RFC 17/17] rtw89: Use bitfield helpers"
+https://lore.kernel.org/all/f7b81122f7596fa004188bfae68f25a68c2d2392.1637592133.git.geert+renesas@glider.be/
+in my local tree, which started flagging the use of a discontiguous
+mask with the improved checking in field_prep().
+
+Gr{oetje,eeting}s,
+
+                        Geert
 
 -- 
-2.48.1
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
