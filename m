@@ -1,66 +1,66 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8412877D7
-	for <linux-crypto@vger.kernel.org>; Fri,  7 Nov 2025 08:16:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E947230FC33
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Nov 2025 08:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762503386; cv=none; b=PhzcJsjjNJyfV+pxUXkWuvMqlKjvQH4ltfbNGHli9ojwNB+ddGb2jCIm2R8D4PmMW5TVBg+/u13EqByGqPioErtO6DulVx0JFgeYDF3N9x9W4Rer9lFCvX+dZV8NSTxLJ7zGMDsTNkjvUfrJeyE35wjN+jvByhsA6LwXMkQCUqs=
+	t=1762503389; cv=none; b=ZlVEdt5WlgGVlWqmOpF3WS9Jc9Gr7bLLMr7XiboZC/do6KjXEQWljTgja5WMubde6SGayBBZrKRnOhF3Tjrk2levbTACBTNEJ6a2PzBoJo5b2kgYtMf93FeBY639l7SS/Dg81+5Q36RWn/WZ+hQGQ3qzOaC1bRARKARno/8gWSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762503386; c=relaxed/simple;
-	bh=KzWXn+yRUUjpBHJaXgRwSAXb1HJyVmNmYBGEb7asavE=;
+	s=arc-20240116; t=1762503389; c=relaxed/simple;
+	bh=DQmjxDQk3FjHige1OE8Ou8+bJv85dK/Lal/Y6klcg5k=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NXoUkC1ynTRUQ6I7LhmG+7VQQOhDq2lo65WxKaxcBz3pVD58fS8bb7xt5H5/E59NHl/OIUdqxOGN2ZWAA9idAWHX03Wxoor8cZOy85WR66UPuuXXROAnp0kBw8X+5PhxX3nSxPaQa0HLMqzPSxk0OMEAczfR5/uHF3xteyMBTNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wJoPvWAj; arc=none smtp.client-ip=209.85.221.51
+	 In-Reply-To:To:Cc; b=dCmqMdnh0IB2CvsKgqH38fSQPiud/phO88sb3V91PypdOqwf2h9uZ2BbJB4vRXrfp3/X8WwNVjvX4EPPpWtbg+hrSaRnnCjtSLOyBpOHnDpae1QC559u/zf1f2+fOoAsI1w1dLenbIZZyQAs//AZdtnbjlr7f025vA3gI0360b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=K63IoFjk; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wJoPvWAj"
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-429c844066fso60405f8f.3
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Nov 2025 00:16:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K63IoFjk"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-429c8d1be2eso32901f8f.0
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Nov 2025 00:16:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1762503383; x=1763108183; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1762503384; x=1763108184; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=iCvxgq9zYPyMV5RPPEtwvCqno8HSagbXhXnbN1FGzJY=;
-        b=wJoPvWAjDNsQo75o9F1XihcBniaON/4swlNWgWa+5PVPviJ6CMpzqbN5WMkRgK+BmE
-         J81GVex6q8gXnVo6r9V6CJiZi6ij6vsKCFXeFyF6vWpopqkx0fIceO+HcHAcNN7yr6vg
-         EsJaK60hkablPQ1INA8MS/LBtUbQcEuWcqsLTmABEOtSLIFGzm31cgyiCSpEGEXdT3Kk
-         +DPyBCVn+Pxb73Tl51Kx5qvxL7rU5oT672uAE5aPho9UyqZjDse/DLjHqWJeT4ulEDYi
-         j6Wel21fZ4fxWxsZ1xV+FHWfI/E2Kwy3tIa2Tkz1TRajblUS9LmkasTMKNtuKNp9BXQS
-         2z8Q==
+        bh=aU3ckHK9dgiwiJ1SDtj2Q9mmUFDa+cikTDpXLmxraq0=;
+        b=K63IoFjkE26DOlE1ZZ9Fl8CV0LPB8CfcBwJOsGPjXbczI7AtzftR4d+l77aQ+cFdHc
+         3QdWXlqjddmZaTB5Z0xjFtCw4ZLIVTrOx5DtuaCeV1gqBsuwkCmwvyt7iq5AB1R9D85Z
+         kw6/44HAsK7b7eibQEbrhgkOpGRFYv24liHSrCKnPaSo90gRzs7X0yBk3XZYZGsyrHhm
+         UKSrJmuUml9+oj5/u5VA3ojWn7LAulegbqLK4GZOrJIAkU9ngVLE0/nuzVrOCZgqNghs
+         tl37qLkwpeoUuBo+NkIcnG9Y5iE4xAQnIRk7zCTwa6IA8dFuY7qUlLGt0zvbRzN+xn4H
+         IzrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762503383; x=1763108183;
+        d=1e100.net; s=20230601; t=1762503384; x=1763108184;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=iCvxgq9zYPyMV5RPPEtwvCqno8HSagbXhXnbN1FGzJY=;
-        b=G6EIH0DAnOTDQf/YMsZOAYvFlLaqMcZ6lkpGz0P+LIO5dDBwj6FIIyBabo93iiX84w
-         bxmoQR0Kj0o5ncz8LnTp5rNq2Qfyl6i4SvZ3xfPFLx1x+F85gh++HYCntWmTvaTgqqBD
-         eHKbWu53VvS3ThCIxJEozRQlM2T61CoCP7kBjkLa+jqHtgbkK0mQNWEH23LmM+t7dDtR
-         snfkBFw4DkKpv8ubvSB0xJN7DibQnLOdLt7qQUBDcthjNV0S+gz1HxowzxZGk6JsWbWZ
-         G+X9VfinB7RwfD1tEoGkIDELn+6jsTd3T+XyzWXrCQrUqE5coq3P/9/h6B3remD5g6ZX
-         yeKQ==
-X-Gm-Message-State: AOJu0YwNwnmoFLx8O1sC8SSY8lUx0WDYyHJ8IbRJlBiNl7BAITDBnTDg
-	ZoCDk5wIHF6ThpDk+tAKz8bCQwXh8FvYfV0XazF9TowSKFYPGPlL1PX7Ky6PWgK0sVo=
-X-Gm-Gg: ASbGncu9Yicea2+9lC/BN0G/nJulptjoh/zBSyXtKmBlb1NMPBEzOfjiw3gjy4wekl4
-	5Q2MInlhfEPcc/vy8+5PSQOEMhl6s2dAxDGKc6aaM0IMiFL+/mGuJi964dlWIN3jaFHp9dj2BA2
-	bqKu6mxrJ8bUFgZ8P77kM+b9+t72iNspRcSKZf4TMZJ2ZyxU7ykf/oULyojQPmXq9Q3g6SLCJ0m
-	3317V7rbFp3/xwLhcOOpT1E78YJ0LA1+XXqjrkdroksUxa/OIYqoYh7QPzRx6O4imRo/TtfHo8n
-	RIprmAZwa7XzbXSw5iibjPZRu8npZf2f+THsUCPrpTVdq4C2apM6INcKs7576QvQdA+sgHJK7YL
-	VO1kRgiSG/7ENoHR2KZivjU0I04VJ+eB73OcZAsW6uBuHR/KYV7vdSLtLoc++d//gbyTOhODLqo
-	GFcLbRoinOlCJfBxHBT3B9LBkVoV0=
-X-Google-Smtp-Source: AGHT+IG1WfPwzcneuCdATSCE09C1Y773iKrUOLTnPDkh/cXKuCKQ3K5m15q+fwccDXPfnzCmzpQ3Jw==
-X-Received: by 2002:a05:600c:a06:b0:471:ab1:18f5 with SMTP id 5b1f17b1804b1-4776bcc5334mr10868915e9.7.1762503382674;
-        Fri, 07 Nov 2025 00:16:22 -0800 (PST)
+        bh=aU3ckHK9dgiwiJ1SDtj2Q9mmUFDa+cikTDpXLmxraq0=;
+        b=l788fdsFqq14jFJ9yT2mhWGUA2vuHpWV4YNZjFtI2rk+MJQVIz6LvzPGbJ47H0VswY
+         HK68k6S+b7ODHG3V3to06wKbrJGA/LHeweW6CPnpnSCl77Bq9XNr8OtiHSQ1XM6nUUB9
+         P4SsJpr93Bi5zXqZK3G0UmVEYQtGfILEjJz7zfUzY48VeU0igw39+G2iMwODdVZy+Zha
+         ovA5NUJKb9QkFPTGlzAgts+04DM0TYVdt44rQFvURsseK9S4L1R2jqI7GgBWmK12fmJa
+         T5boXH7h6qdB69apoGuIeMMz6L5VJREPrEmN6tT/O0ox2xJsGDmEC3NGwEC/wRwCsMyR
+         ehAw==
+X-Gm-Message-State: AOJu0YzgV2/a3Z0UcrXES5UIxe3QY8LMftxjR1sbsBKgIewrLIqPHS+w
+	7Hb4TCbCGeR+xMJcRGD1vH9jvmH/KfqcQ0QsiGQhQRDAARInwk2kkSNA5Yejld4iZVs=
+X-Gm-Gg: ASbGnctdOJGmt4vfr/V5ydbmW5qzGePmKmWOAdV8ijsAIXE5TwvR4Hm/CKm4xvMQBOZ
+	UetSMS9Pnkj5VudQAFvej+eqwcHymwxShqYt8iIvyuz6+bjslS7J8NL3qB4W6LXhunXAj3SE1Zf
+	jQd97Y5ZIMyj7y6d3IfUIPy0rwhoAiWQGdizs8Q5gTVZP4+xFTmthl/8kBKNPLdRVHvVAEqPVT5
+	fjX+14MBg13lbh81R9GSMV6U0K6TsxGEyNn3YBVuWzIpEQMxTtE3rQ1MwBAHJ6JzquC5GXnT6I8
+	gW9n+UNIRclgNpUZ8UZkiqp9OHDC0vCmhwiW6ADU9kf2O6ktcoWPfP2LmDXp9qGiGXzWzcEDUtv
+	2q9WrIJKLp/2GL/sOK+xFHYpIHM8MIv9icr59qb6qf2idPkQXkcVVw5e5a0+mRtHBcZsavaGBnG
+	5nB0uHCpmNzQcsCqJT
+X-Google-Smtp-Source: AGHT+IH/RG0uxXiS/Bad3Qza1ZSpzCt5mxPh4pMV3zd/0zfxxfO/oX4SzRHF7EYOxVilfXSfENyJNA==
+X-Received: by 2002:a05:6000:1848:b0:429:b751:7922 with SMTP id ffacd0b85a97d-42ae5aeaef9mr862850f8f.8.1762503384161;
+        Fri, 07 Nov 2025 00:16:24 -0800 (PST)
 Received: from [127.0.1.1] ([178.197.219.123])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42ac679d544sm4058381f8f.46.2025.11.07.00.16.21
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42ac679d544sm4058381f8f.46.2025.11.07.00.16.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Nov 2025 00:16:22 -0800 (PST)
+        Fri, 07 Nov 2025 00:16:23 -0800 (PST)
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Fri, 07 Nov 2025 09:15:49 +0100
-Subject: [PATCH v2 2/6] hwrng: bcm2835 - Simplify with
+Date: Fri, 07 Nov 2025 09:15:50 +0100
+Subject: [PATCH v2 3/6] crypto: artpec6 - Simplify with
  of_device_get_match_data()
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251107-crypto-of-match-v2-2-a0ea93e24d2a@linaro.org>
+Message-Id: <20251107-crypto-of-match-v2-3-a0ea93e24d2a@linaro.org>
 References: <20251107-crypto-of-match-v2-0-a0ea93e24d2a@linaro.org>
 In-Reply-To: <20251107-crypto-of-match-v2-0-a0ea93e24d2a@linaro.org>
 To: Olivia Mackall <olivia@selenic.com>, 
@@ -89,63 +89,72 @@ Cc: linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
  linux-arm-kernel@axis.com, 
  Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1474;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1653;
  i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=KzWXn+yRUUjpBHJaXgRwSAXb1HJyVmNmYBGEb7asavE=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBpDarNNAJtIDGyF0BhraA4Wnr5mnztF9FLWAyE4
- QqQdRi0AUaJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaQ2qzQAKCRDBN2bmhouD
- 15E5D/9wMVJ2fBEQHcIitgPv5MZFIyz/UJUAVG5KpW34AGSs13BNXX9GX9JhxLopOlp4kbCw7LD
- LM83IxKwW3aPefI/ObmGin+Z8QuT7c4+iBH3BF8oZLMY816wuEvhUUOBK25+MN92Et1e2GK2x47
- D+7l2c/Ckz5y/KZKuUaQVx4yqIVYHsDgQMmpYdQo4jAHOZ+vZ4UE5NPul6Di0O4xtNSHbdN9ppU
- ojKI++kkK2+aHUG5bbdZzh0HlXyYzYnZL2Mwd6d8eH77j5+rcOlmM25j3q2Rm3GHHyQlX72/WqI
- XyHZLur3iHCfwdLU5i+TnSydF02ZTC2RgmlW8g7JsRaIxaDnv8pG5c9Lv62kuI4uFyc7wpRN1eg
- D7FH7I5nO86WJUf9XsgTqqyBZ3xHsr372Xlmmcwql4bGQ0W/mtk9x6oINveXqB07jplrUK6jgaT
- ica/DQIrHkSwtGAYP1d3klEQJl9elCyP2rbqbMAcwCK4ugqTH9sKrItpB7nolG/fooCvwZhscaI
- tCvarQKE/ugM1/VKq2is7VECZJX9RdjtbVR3JDUqqt32PkTM5xPeCBbusX4Ze9O+FNPhtc9OqYa
- tJI8rzapmJEkLvPLX93C4eW27wIra8myCvPx1F5zyQh3z8LFN2cgajSoT+1h4eCE9kN+S/Y5yX3
- ED+hsjI9pJQgvqw==
+ bh=DQmjxDQk3FjHige1OE8Ou8+bJv85dK/Lal/Y6klcg5k=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBpDarNuKezPIUCrc4hA8Jc267ky7kEGrYSaIA8q
+ xzBceHykJGJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaQ2qzQAKCRDBN2bmhouD
+ 1yXbEACApfTnmc9QitQZ7XSNkCS4VPyfKF/yLOgWiI3obDxmie7No/brRdIf5LMnNazuIyPCZF3
+ cFWq/lMz/XGuXHwd6JfKiB/7CaeiEGhSVesqCG6xiLwn9swYpTXCRAkfkSfvLUJ1zw6Dqh79+nm
+ RcWi4MkYDvpv05EKstpdQAc0p93wcuPKRkneKXx+eaPyUE/Lh37ne4zR3Ct8U+21S0sLADr6CoN
+ cEwOiG5d3LIphAp78Y3xCT7+UqZKyQfKVrF04V5E3jF4bAbL9KiZhgHxfr6u1Ymtoigbvr75tHF
+ rrjHned89Lt/e4LJnp716ojV8vi8qBD0fziwotfbBGbZc9WCPWIddPJKbtcD6JEGZSBGptebElN
+ q5XqPkiqkSa4aWdQrwmi/H/uZ7aefqryw156F+Bj5DQwnJTuw+6tA4vFnB0N2caGA1hNIAoqvJQ
+ QS1fmrXafW0XOKw2lvkL5EJSix7d5URiz8RrEq6geM1aajgUHhypvhCFmUw3Pg1Zs0rp01uWCRd
+ CHkS0/IfDTayW/vN1mHLSqv81WjvP1xoesX5Vico0Y4V07eB8RwSIC8cGNs+0A2EgDPy6mJyacY
+ bQ/pElgAalP6edLqPZQS5dRVAwQA6cVRgw2JqSebY+zuOKUJwlNxGqWvYZbjVPpq/nQp8yVweXr
+ 9i4P/m1X/ZKL/bg==
 X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
  fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-Driver's probe function matches against driver's of_device_id table,
-where each entry has non-NULL match data, so of_match_node() can be
-simplified with of_device_get_match_data().
+Driver's probe function matches against driver's of_device_id table, so
+of_match_node() can be simplified with of_device_get_match_data().
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+This requires changing the enum used in the driver match data entries to
+non-zero, to be able to recognize error case of
+of_device_get_match_data().
+
 Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- drivers/char/hw_random/bcm2835-rng.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ drivers/crypto/axis/artpec6_crypto.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-index 0b67cfd15b11..6d6ac409efcf 100644
---- a/drivers/char/hw_random/bcm2835-rng.c
-+++ b/drivers/char/hw_random/bcm2835-rng.c
-@@ -142,9 +142,7 @@ MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
+diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
+index 75ee065da1ec..b04d6379244a 100644
+--- a/drivers/crypto/axis/artpec6_crypto.c
++++ b/drivers/crypto/axis/artpec6_crypto.c
+@@ -252,7 +252,7 @@ struct artpec6_crypto_dma_descriptors {
+ };
  
- static int bcm2835_rng_probe(struct platform_device *pdev)
+ enum artpec6_crypto_variant {
+-	ARTPEC6_CRYPTO,
++	ARTPEC6_CRYPTO = 1,
+ 	ARTPEC7_CRYPTO,
+ };
+ 
+@@ -2842,7 +2842,6 @@ MODULE_DEVICE_TABLE(of, artpec6_crypto_of_match);
+ 
+ static int artpec6_crypto_probe(struct platform_device *pdev)
  {
--	const struct bcm2835_rng_of_data *of_data;
+-	const struct of_device_id *match;
+ 	enum artpec6_crypto_variant variant;
+ 	struct artpec6_crypto *ac;
  	struct device *dev = &pdev->dev;
--	const struct of_device_id *rng_id;
- 	struct bcm2835_rng_priv *priv;
- 	int err;
+@@ -2853,12 +2852,10 @@ static int artpec6_crypto_probe(struct platform_device *pdev)
+ 	if (artpec6_crypto_dev)
+ 		return -ENODEV;
  
-@@ -172,12 +170,10 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
- 	priv->rng.cleanup = bcm2835_rng_cleanup;
+-	match = of_match_node(artpec6_crypto_of_match, dev->of_node);
+-	if (!match)
++	variant = (enum artpec6_crypto_variant)of_device_get_match_data(dev);
++	if (!variant)
+ 		return -EINVAL;
  
- 	if (dev_of_node(dev)) {
--		rng_id = of_match_node(bcm2835_rng_of_match, dev->of_node);
--		if (!rng_id)
--			return -EINVAL;
-+		const struct bcm2835_rng_of_data *of_data;
- 
- 		/* Check for rng init function, execute it */
--		of_data = rng_id->data;
-+		of_data = of_device_get_match_data(dev);
- 		if (of_data)
- 			priv->mask_interrupts = of_data->mask_interrupts;
- 	}
+-	variant = (enum artpec6_crypto_variant)match->data;
+-
+ 	base = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(base))
+ 		return PTR_ERR(base);
 
 -- 
 2.48.1
