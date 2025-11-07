@@ -1,194 +1,145 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303EE30F7E0
-	for <linux-crypto@vger.kernel.org>; Fri,  7 Nov 2025 08:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBEC276058
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Nov 2025 08:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762502437; cv=none; b=cexCd1gCG3w8PE85EQ+FO7OHOs92xPBuxYyUrhOQh9in65IwedGQYjCrOUTE07JvFxN4dcfAxIyKsxM3EJ8OZFwOUB9Cjtg4v4CxD7EBp2Ea09GN4KS74W6oPDoh2oUuQDWcXKMLWLNGlprY98IjWWAVZ0nu84qpMo+ECQwfmDI=
+	t=1762503384; cv=none; b=QUb98VwPJRIgv3O0AfbtwkfIUCWKtNfLilZbS1ErDQysX7AbYz6o/5XpacU/FCg0ZXnMhlV9CYta3T/maxKY68l/5QHQ+NJ/PpJ///L8vUVIOsrt6upddH9ShWIdBKWV/WDRpckXIRBQCqjFdM8ovcSC1pDbC8yB71lKP6mFod0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762502437; c=relaxed/simple;
-	bh=gTrtMTVdIq8o2Lv2gAG8UVNbAa67NI0LZcaPzCP9uxA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g8OmJGqF922PXGdRrxWpdQmzURDWfYS3364TQpiYN5VK5SOWkWKHuSiIkJQtRMA+AjTLKs6rnhm6YWTEnkean98O2vQksOdeHTfulKyzwcLmY9TdGu5YnmFb0B7jFD7/GaJ+Q8Hd3u3Is/rL4TCrTp+C7GuySGa1rUakVF4khGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AmyoA+YH; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762503384; c=relaxed/simple;
+	bh=mwupmXstNf8xEWIA2tRou1u+HCCZBqAzg8Ar7CQRwTQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=OCAh7wBpN6wOVi4GBy0ksa83g+FNZZaDN/g6yCYS7RzsI84avv3cyaFhFNfMvoq1PUEBp0rr0AamJ5gV/j9kcdjRwhFuyMiWxowcAHzZ8d+lFgwkitfg5FoR8QpN57YgzDz81xhIb5IYm7DC2D2wuKvLt8sp4S9SDPf/Po0dwz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=COiR5rzY; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AmyoA+YH"
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6408f9cb1dcso818336a12.3
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Nov 2025 00:00:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="COiR5rzY"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-429cbdab700so24953f8f.1
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Nov 2025 00:16:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762502433; x=1763107233; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L4L8nwY5tA46qS9RhjMiBvwIJ3m3PvlUWeeZDUBNYNE=;
-        b=AmyoA+YHQZgstGRmD8U6Uc5Qp3lHeC8gVhIBg5c7IDTiz9uxO1MKh5pvTLMYZ1uWXu
-         ZOiCh/0sWFaopk+f5KfR3BcFOL9zYZNgwM+yWnrs/cvXnteu3aoXVLpBmW9Pfhsbf51W
-         laGx54OYB+zhf/9On7oJS1XjUSQyqr2R4q7FPf5IKZPIZLj6jE2u+xaaRonDpdo8cYNo
-         sT26cX0LyiU9BpU1+93/AVTPh27969l83AWVEOF9a/s1OW3QFogNfFxrcAkv9htYErpE
-         eVO+m5sjBQ7LePaEsHPnv1juoEuTT3WWZG2NexOODGf77B/buQoApHYTaAQa3EaoqGXO
-         dy/Q==
+        d=linaro.org; s=google; t=1762503381; x=1763108181; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V5wQ8l8yRqZt2AYZdeFxAu/RxXTrH/Y9KHqi9cP6d1Q=;
+        b=COiR5rzYvR8NclwASqoMET8P/+6PttePi5axJ2FD691eaSQkEjEyv6TEkp8Ykw/6KS
+         elNRREER0fzJEp4kaXS9bU40reXenItUVvGNA150ARcQT8dotbBRXWlSz0QMvC/66B6i
+         OoJ71CVfDOGFPSURj8sgDhYrtGXi6QoRkHImVn+2Q7QsBdji7PhR6/6Me3r2d78hruam
+         H4OQW+PLxbAFf4gg5LdEQFOypyoiCfowf4X3urj9wdjOQ9lmyajQSj/8fLcT+oFDzIg9
+         oXk/eBKS8xM6F3/n/CB/Y2K5Vq6XP4dvAyjD9/u0lZDk+k31Hy83MTdt177jyZ3M61G2
+         YgUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762502433; x=1763107233;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=L4L8nwY5tA46qS9RhjMiBvwIJ3m3PvlUWeeZDUBNYNE=;
-        b=ZZGRMS6b1dQsznZ+lelfmxmgdutSW+c6OYuFd/+OzIjjWJxKhpFsC3LJFhX57pfpXg
-         JdWTTBVoeo6QFssJBAezGXptD5yy5RPsqtn1F/a2CvGihHhl00kD7jF2WJTTqKyuDv7q
-         zX2m7bhOLwrgR8l4+kNfuVGLlw0EnPgdxcnJBLWjzJ1qxS+lW7fGX0NWKs7/sdKw0w0K
-         Hsdigl11mxYuioMSdGDnXKcc+uCyYjl8x6gmgs68HZlb/ocCJaF2KAupKw0Xv6RqRXT7
-         OeBkT5c7lP1Zd5JdGaF7pxe6HRTKzVR7Ikge+imPAM4LtuB1c/rQel1+7cB2HSWVXUBW
-         KsvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVZdny4arqtjgV+MpMK6y3kovlUOleIK8QkHzdjEJw1BEDhPkxqACqAOkvBHoI51rR/4dnkWM8ACJvu2LY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnR3IQkrTBsWPrb6rFZrlrY7Kb26eBiF0km7G0S/87z/r68buI
-	4QLAjNeqOpYQIP8iOmHGWe0RCBLM5k/IzTJ8xaa3pNPbWwQ6S3jwdo3TQ12jsFGtx/Hrnw9hIMQ
-	xfoEWaOEyapDwD6zpUTvKpioegg7ZBiw=
-X-Gm-Gg: ASbGncv0JlOBNNMlyiUfHXz6sFv2qHS3E+V4FRAEJL/grgQhX8tEdtHCentA0ZaR0mm
-	sFDR/IUsQGXexkmAar/kyvC8wt2Gs++eMeAcnNoMfKzxe7zWWnqpQoaAG+TZ6PW7Sm0dWe7J1++
-	O/ZAmknfJ9z4oV8oQyEVWnY6VmEJIkEKTUlXHeLAZUpUhg9BEyuEt71yWOMkFAB6kXbrQK0zTsa
-	yMTHgrVDCqNff+Df6IA99iq4wyLXxb0lEIorAlV072KK2KhnNHtYs8H7AAxBteWbYKBks/h
-X-Google-Smtp-Source: AGHT+IF1uok4S2/ZJxGVMG6j0RZBxmZiPcUtNqCXKtotlWPr6F8OAXOZaMRmuRE8uDgHau7bT5W5RrHY3dcLjEjQckY=
-X-Received: by 2002:a17:907:3cd6:b0:b70:6f46:d401 with SMTP id
- a640c23a62f3a-b72c093317amr195124066b.11.1762502433125; Fri, 07 Nov 2025
- 00:00:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762503381; x=1763108181;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=V5wQ8l8yRqZt2AYZdeFxAu/RxXTrH/Y9KHqi9cP6d1Q=;
+        b=wm56Xaai6B+k1ZRzWPESh8hMz09P/EVTXy5kmpFpKdm4xocjZM4251KQPebARN3AR/
+         Tp+EDsaSHax8pnwKAt3SIZBN9NKPv/vCWKatY5wuS3Jf898yUpktkQU5i+6TBJiyRNhm
+         t3uRzJpo7nO5VdNA7Rn4ayfLFdq+RIFuYXsv0Yt/D029+9w8PRC8Rg4nC1mDNaEfAOXY
+         z6lFM4iWnUD4KWE8dMGPIgxfB39oeAYBSZUcgPnD68Rtat6aiBQ2mBmKgps3WDx76PLX
+         OiyUWR/8vVa51oSVcFT1RNI6g85Vg3xCRUGVwcl1XfTTaGksX3XYL1Y3i2urw18k2hlH
+         KplQ==
+X-Gm-Message-State: AOJu0Yxih1+nteFAhObJzLJsxAs5CYZ7A7Cd2gDYFu9mCSCL0fVgisAh
+	Lt/N4tO4S2Pnc3ek7RAJ7KShObLzs749AwuYKzzH32aZmKcgEZaytzyIgFBVuow7DL8=
+X-Gm-Gg: ASbGncvL8v3aq1uJl9jem4aKPlALoJHXgMYNizOM7FGmK0YfO+LO1b0reEfhegg0KhC
+	XjkRCI72jYnIFBo2xv+gbA8R2/q8o7TKTOTG+3LVftOA+2bcHPWbCRcpWiKzZM4y/jAW2yd9tkZ
+	8ORWHy8FcJL+PEjBd42L2MPrdxTDhPDs80JRF+lm0WZy4TvasXs89VVPAxiR2+CWiz7/jbVWFnt
+	0nGY+FAz/YHsCyqfMONbcBC614uR3TrqoNb5FNUCH/7cp65KemB3eL+RxTk23ByZc3L1yvNSG9e
+	mGX9pjsXhlwM41bzE0Z4CrE2gMFxicxdRp2lWh51FAesaNlZ1Ba8cs54IFlNNVjrgkd4P/yXX/c
+	5j0TaYSjufOwJ7xeVTkXpDmOEdG8Jfz9zjW8XA6+cakO3wh84pf+KWzeXRM87kNgbywXtYhwuYR
+	YMeKMy/ktfoDOrlI3NvAXooHkxmiw=
+X-Google-Smtp-Source: AGHT+IGiFUrINL/leIojlLr7ytWK4S+6B3l6Xe10W7uJ5w++tU15SiQgprIswsFrF6XRbpkzN7rY/A==
+X-Received: by 2002:a05:6000:2886:b0:429:b4ce:c692 with SMTP id ffacd0b85a97d-42ae5aeae4fmr919422f8f.7.1762503380867;
+        Fri, 07 Nov 2025 00:16:20 -0800 (PST)
+Received: from [127.0.1.1] ([178.197.219.123])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42ac679d544sm4058381f8f.46.2025.11.07.00.16.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Nov 2025 00:16:20 -0800 (PST)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Date: Fri, 07 Nov 2025 09:15:48 +0100
+Subject: [PATCH v2 1/6] hwrng: bcm2835 - Move MODULE_DEVICE_TABLE() to
+ table definition
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1762435376.git.geert+renesas@glider.be> <cfc32f8530d5c0d4a7fb33c482a4bf549f26ec24.1762435376.git.geert+renesas@glider.be>
- <aQy0T2vUINze_6_q@smile.fi.intel.com> <CAMuHMdXVUJq36GvNUQE8FnHsX+=1jG4GOJ_034r=fgr_Rw4Djg@mail.gmail.com>
- <aQzIIqNnTY41giH_@smile.fi.intel.com> <CAMuHMdW8ndAdGnSHopYFMWvw7wk7wKz_7+N91M1jRHoqK1KBrg@mail.gmail.com>
- <c62eb5a727f149fb9d8b4a4c8d77418a@realtek.com>
-In-Reply-To: <c62eb5a727f149fb9d8b4a4c8d77418a@realtek.com>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Fri, 7 Nov 2025 09:59:56 +0200
-X-Gm-Features: AWmQ_bndsm6ikZxAsR6MbqZ_7CJczSuokLGcsZHpDoyZxbjksOeSkgDr0jWR8fA
-Message-ID: <CAHp75VeMqvywS20603yDSo-C3KCu+i+8vvDNuz3h9e8Ma9BOCw@mail.gmail.com>
-Subject: Re: [PATCH v6 12/26] bitfield: Add less-checking __FIELD_{GET,PREP}()
-To: Ping-Ke Shih <pkshih@realtek.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Andy Shevchenko <andriy.shevchenko@intel.com>, 
-	Yury Norov <yury.norov@gmail.com>, Michael Turquette <mturquette@baylibre.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	David Miller <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, 
-	Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, 
-	Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, 
-	Shan-Chun Hung <schung@nuvoton.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>, 
-	David Laight <david.laight.linux@gmail.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>, 
-	Michael Hennerich <Michael.Hennerich@analog.com>, Kim Seer Paller <kimseer.paller@analog.com>, 
-	David Lechner <dlechner@baylibre.com>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
-	Andy Shevchenko <andy@kernel.org>, Richard Genoud <richard.genoud@bootlin.com>, 
-	Cosmin Tanislav <demonsingur@gmail.com>, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Jianping Shen <Jianping.Shen@de.bosch.com>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
-	Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, 
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
-	"linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>, "qat-linux@intel.com" <qat-linux@intel.com>, 
-	"linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>, 
-	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>, 
-	"linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>, 
-	"linux-sound@vger.kernel.org" <linux-sound@vger.kernel.org>, 
-	"linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	linux-wireless <linux-wireless@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251107-crypto-of-match-v2-1-a0ea93e24d2a@linaro.org>
+References: <20251107-crypto-of-match-v2-0-a0ea93e24d2a@linaro.org>
+In-Reply-To: <20251107-crypto-of-match-v2-0-a0ea93e24d2a@linaro.org>
+To: Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ Florian Fainelli <florian.fainelli@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, 
+ Jesper Nilsson <jesper.nilsson@axis.com>, 
+ Lars Persson <lars.persson@axis.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
+ Srujana Challa <schalla@marvell.com>, 
+ Bharat Bhushan <bbhushan2@marvell.com>
+Cc: linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@axis.com, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1222;
+ i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
+ bh=mwupmXstNf8xEWIA2tRou1u+HCCZBqAzg8Ar7CQRwTQ=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBpDarMNQIEm7jkhc6p5V4t84APz0kMHwWQbHoPN
+ T6F+7S44veJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaQ2qzAAKCRDBN2bmhouD
+ 10TND/wMoqicvebUpoVcbR1jTLD/jtqocL/+JgZIAAmze31Z0LQKSRT4Q1CF+zbBQSHqj5JeLKg
+ Ic1EiE7D45QLDkW7P0NqLKpUu9aOvL9yR2l61QOJHjYwQcWN3rkSm1AL0XsskMpvfjL86947cAL
+ K4wnFPuYC2EJ3Z1QZRlLohYdj3kbwLQlUwkKe1BUHowK6xDLkhh1FQwl/lpJF3A8pCnVFYWoquV
+ 9cBX6M5iDQzNS8kjLfehHPeBSLELEHOLv4Aa1Yu3glnUqw86Vj1z80RXG8l9QrozkZ5baBor+t5
+ jmIM2FSe1SDsryYOIY4+Z9c69COZ3KC0vNeo5jtxYCQmnuQ6Vg7xHFooOY7uNT0LqFVR2ccNDDb
+ g3Ifga+yKoycnjifcaYo0Xa3qTkincp6NpsNCLDA0mJqkFGoXlP3obFbOoi9OTo3TwvVyIw4R/O
+ TlDK7Kx2mBRiePZPpvG7RNeGBAdhPkhZqbvNsEjdArJ23DGNJq63oscVhaJxBVfrcP82iQ58V5L
+ Jem3bCHqb8h1/treM0vEkuXFpvD5seukFp3QZ9DYRKyLIgLLp1dDmDWKaMhmxE4N2HC1cWOGvFW
+ OH6YJIl9Umg9PxPe/Qa+V63YDRjFyb2V6dokZRU0z0liBszqXCu040y58hXSoD82sqxnmNTqjye
+ of4ZE2UIcI56IRg==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
+ fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-On Fri, Nov 7, 2025 at 3:16=E2=80=AFAM Ping-Ke Shih <pkshih@realtek.com> wr=
-ote:
->
-> Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> > On Thu, 6 Nov 2025 at 17:09, Andy Shevchenko
-> > <andriy.shevchenko@intel.com> wrote:
-> > > On Thu, Nov 06, 2025 at 03:49:03PM +0100, Geert Uytterhoeven wrote:
-> > > > On Thu, 6 Nov 2025 at 15:44, Andy Shevchenko
-> > > > <andriy.shevchenko@intel.com> wrote:
-> > > > > On Thu, Nov 06, 2025 at 02:34:00PM +0100, Geert Uytterhoeven wrot=
-e:
-> > > > > > The BUILD_BUG_ON_MSG() check against "~0ull" works only with "u=
-nsigned
-> > > > > > (long) long" _mask types.  For constant masks, that condition i=
-s usually
-> > > > > > met, as GENMASK() yields an UL value.  The few places where the
-> > > > > > constant mask is stored in an intermediate variable were fixed =
-by
-> > > > > > changing the variable type to u64 (see e.g. [1] and [2]).
-> > > > > >
-> > > > > > However, for non-constant masks, smaller unsigned types should =
-be valid,
-> > > > > > too, but currently lead to "result of comparison of constant
-> > > > > > 18446744073709551615 with expression of type ... is always
-> > > > > > false"-warnings with clang and W=3D1.
-> > > > > >
-> > > > > > Hence refactor the __BF_FIELD_CHECK() helper, and factor out
-> > > > > > __FIELD_{GET,PREP}().  The later lack the single problematic ch=
-eck, but
-> > > > > > are otherwise identical to FIELD_{GET,PREP}(), and are intended=
- to be
-> > > > > > used in the fully non-const variants later.
-> >
-> > > > > > +     BUILD_BUG_ON_MSG(__bf_cast_unsigned(mask, mask) >        =
-       \
-> > > > > > +                      __bf_cast_unsigned(reg, ~0ull),         =
-       \
-> > > > > > +                      pfx "type of reg too small for mask")
-> > > > >
-> > > > > Perhaps we may convert this (and others?) to static_assert():s at=
- some point?
-> > > >
-> > > > Nick tried that before, without success:
-> > > > https://lore.kernel.org/all/CAKwvOdm_prtk1UQNJQGidZm44Lk582S3p=3Dof=
-0y46+rVjnSgXJg@mail.gmail.com
-> > >
-> > > Ah, this is unfortunate.
-> >
-> > Of course, it might be an actual bug in the i915 driver...
-> >
-> > The extra checking in field_prep() in case the compiler can
-> > determine that the mask is a constant already found a possible bug
-> > in drivers/net/wireless/realtek/rtw89/core.c:rtw89_roc_end():
-> >
-> >     rtw89_write32_mask(rtwdev, reg, B_AX_RX_FLTR_CFG_MASK, rtwdev->hal.=
-rx_fltr);
-> >
-> > drivers/net/wireless/realtek/rtw89/reg.h:
-> >
-> >     #define B_AX_RX_MPDU_MAX_LEN_MASK GENMASK(21, 16)
-> >     #define B_AX_RX_FLTR_CFG_MASK ((u32)~B_AX_RX_MPDU_MAX_LEN_MASK)
-> >
-> > so it looks like B_AX_RX_FLTR_CFG_MASK is not the proper mask for
-> > this operation...
->
-> The purpose of the statements is to update values excluding bits of
-> B_AX_RX_MPDU_MAX_LEN_MASK. The use of B_AX_RX_FLTR_CFG_MASK is tricky, bu=
-t
-> the operation is correct because bit 0 is set, so __ffs(mask) returns 0 i=
-n
-> rtw89_write32_mask(). Then, operation looks like
->
->    orig =3D read(reg);
->    new =3D (orig & ~mask) | (data & mask);
->    write(new);
->
-> Since we don't use FIELD_{GET,PREP} macros with B_AX_RX_FLTR_CFG_MASK, ho=
-w
-> can you find the problem? Please guide us. Thanks.
+Convention is to place MODULE_DEVICE_TABLE() immediately after
+definition of the affected table, so one can easily spot missing such.
+There is on the other hand no benefits of putting MODULE_DEVICE_TABLE()
+far away.
 
-Isn't FIELD_MODIFY() what you want to use?
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ drivers/char/hw_random/bcm2835-rng.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
---=20
-With Best Regards,
-Andy Shevchenko
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index aa2b135e3ee2..0b67cfd15b11 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -138,6 +138,7 @@ static const struct of_device_id bcm2835_rng_of_match[] = {
+ 	{ .compatible = "brcm,bcm6368-rng"},
+ 	{},
+ };
++MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
+ 
+ static int bcm2835_rng_probe(struct platform_device *pdev)
+ {
+@@ -191,8 +192,6 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 	return err;
+ }
+ 
+-MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
+-
+ static const struct platform_device_id bcm2835_rng_devtype[] = {
+ 	{ .name = "bcm2835-rng" },
+ 	{ .name = "bcm63xx-rng" },
+
+-- 
+2.48.1
+
