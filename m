@@ -1,122 +1,94 @@
-Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7326315665C;
-	Fri,  7 Nov 2025 04:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93082AD25;
+	Fri,  7 Nov 2025 06:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762490094; cv=none; b=IUgKqGVdMc8bwLZPluUiOuXPmDgTx7pysmMzmhhtoMjyf6v+Ge6JYsU6VcfYm3RzPiq10XFzdCtnVUKrgf/8qb5pwGhrPkunJUi0eahS9pB7TMoZcK13zU1h5XqFnyF2t0OVaDpZ/heDuVng0AX/BfRkXN5GYhHlP/ahuK5aWDg=
+	t=1762496404; cv=none; b=k+RHi6t8OvjsIjFYQFSBJZrQPaw/hr9CeAgoMDocOvGRXdCGD9HY3okVvAufrd5QWe4cl4uMrNsUWNQbSISul4WzIZTjIduoxW7bqgvkLHNe2o0/XPUpLPjx64p2dZBqxnAauoCYFzUs5UTFUggxlUC7YHwAXO4A8sGsdXz5qnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762490094; c=relaxed/simple;
-	bh=LpDjai4q0rYZlNT/t/DaZw1QLei4+SJSHOyYk17Mi6A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KCarhoSvo/PsIyhOrUxxc9J4qtS7y74c8SiZ5ZpQlvwct2YRmcenXSnOscDylRkzqOgSxzFfPxBjlACcZODlxd97K5m4TmrQBTm3Noq1l/7R/9HDYlituP6rhZX/s0nzkLmvZDkf+X0DYI8XOUEXcqWvIifukJD5YFJdN3RrFOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=TJHdhz/x; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iGPb+o4L; arc=none smtp.client-ip=202.12.124.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+	s=arc-20240116; t=1762496404; c=relaxed/simple;
+	bh=QK4tnVEnx0dnUu1VZrRPH5XHyZSuEa5wnts9WKB07xc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=trYwP7i5cXkFhc5QyLFKXnp3n/af0KkefdUrStdWNd0JrzS5yzcn5EC/NCs3wY4MBzNP+PxW4+Ous9lvpVEOd8JTelPGLUrXSoRCSm70jS7B3UctP+gLlzCPpclmEwwJgt4zt6x8wL/6BmJzgV0Ha/EZN00WzBd8rwff19v6DX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=T+y+/CwW; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="TJHdhz/x";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iGPb+o4L"
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.stl.internal (Postfix) with ESMTP id 7F58B1D00064;
-	Thu,  6 Nov 2025 23:34:51 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Thu, 06 Nov 2025 23:34:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1762490091;
-	 x=1762576491; bh=i6NkcmT2cWqYuHN9PAguwWxmbI/1ym/m58KYz13FB2c=; b=
-	TJHdhz/xcuPEB5ScY1qi2mohtP/aEeG8Fyazew2tMRG0jdR4U83DvBtcfuMCu55U
-	JT+jTJvqydmzcVJOKT1DUe1vN8qfiTL9XJnvtBjhgAbHMqY+TVjTkVbEaX/0DDAZ
-	uJXiH3YCbZYcUeo7RHarR2njGVvTMjzUv1nBb9OeNLufoTOOIHtbNE+5lDJfK52+
-	e3jfR9b2cvXnZqWW2B+YvY+syT520tXhguTlNNv29RR7IDcppkG1icUnMbVsGBBB
-	Lk8ZPbwndSvrSnCwPU2zfxIFJSp+11jXrmMInSitF5eraYNLk0zNgGtIGKYnXiTs
-	rHtot9j4bXWEFbHa/onGxg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762490091; x=
-	1762576491; bh=i6NkcmT2cWqYuHN9PAguwWxmbI/1ym/m58KYz13FB2c=; b=i
-	GPb+o4LOdpGV+GQYm7IlR6Pbnx3D1KhkFOmRKLuWq1CmjBHtykVSS3Y5K8qXEfk8
-	neFREorv6hRbda9i9NoEfgc4GEcSJP8ERslwD0l+WQf535K+KQl3NBWLuGT/9ETR
-	d+yzR27HifYt9UIFOGp6WQUB7PfrshltMMQeudivYw2hOW5ryAQPSMVK8tuUuJzn
-	qZO77TDe3fUj0bdq7zUjl7AqGpaus6VBxJGOBSQ/j1+xQe9yOdUdbi3UYdZNkg+B
-	MVT0u21nFr4sNjB7hnKlmhqrgNb3ErQxQC/mXFSvcIuKzNI482ICPuXPc9/wu8mJ
-	4qNqSYE1cPQAq1aq0Ir7w==
-X-ME-Sender: <xms:6XYNaTjajKAVWvNAnAZAZFOcncDU0LAVaSe4WexRzDi7V4LOajeeyw>
-    <xme:6XYNaTE7HNRpdUYdaHBqzxMA0ekXdGqpvryPCzBoAEh61Sy2zHfbozRK3fIZmT6kG
-    EILRoKzm5Y778TS79N6jfwJhS3XORRHt_WT-nCKZpOtvITZ>
-X-ME-Received: <xmr:6XYNadsRfRgyQi-ADM2b9Gda_KpzdHFsTW2qeZaUcOlKyDWDBzGcfV4M>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeekjeduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
-    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
-    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
-    hffhnecuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopeelpdhmohguvgepshhm
-    thhpohhuthdprhgtphhtthhopehlihhulhhonhhgfhgrnhhgsehhuhgrfigvihdrtghomh
-    dprhgtphhtthhopegrlhgvgidrfihilhhlihgrmhhsohhnsehrvgguhhgrthdrtghomhdp
-    rhgtphhtthhopehjghhgsehnvhhiughirgdrtghomhdprhgtphhtthhopehhvghrsggvrh
-    htsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepshhhrghmvggv
-    rhhkohhlohhthhhumhesghhmrghilhdrtghomhdprhgtphhtthhopehjohhnrghthhgrnh
-    drtggrmhgvrhhonheshhhurgifvghirdgtohhmpdhrtghpthhtoheplhhinhhugidqtghr
-    hihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhvmhesvhhgvg
-    hrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhg
-    vghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:6XYNacfTMQSWz5GClxrzf36bAr0qbksH68KIRYMN_9a8w_9OZwRGIA>
-    <xmx:6XYNablesO7ufJ9URXRr4qD0kTEop4Ny6OtHHw8TvoplTOkIOwXwjg>
-    <xmx:6XYNaXCbMJmshMBt7fB1YAHjvH8SGYcMLRq8nqOJ9rtmAng1bvCdiA>
-    <xmx:6XYNadOQE9qLuczcc3nfgO2jRpkR62QTVmGqKY_EcTcReWVPvAJdew>
-    <xmx:63YNaTKTVqQrUcW2lxGITWsVt4F48hP1Ho0L95dCDvG0GEJUZXAte0ta>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 6 Nov 2025 23:34:48 -0500 (EST)
-Date: Thu, 6 Nov 2025 21:34:47 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Longfang Liu <liulongfang@huawei.com>
-Cc: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
- <herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
- <jonathan.cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
- <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v12 0/2] update live migration configuration region
-Message-ID: <20251106213447.76dc2e3f.alex@shazbot.org>
-In-Reply-To: <20251030015744.131771-1-liulongfang@huawei.com>
-References: <20251030015744.131771-1-liulongfang@huawei.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="T+y+/CwW"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=cx/OeR/TpXmHZozLgJx6VvSjc4tPJLhnHkHJTi2lSbo=; b=T+y+/CwWjmHf+F0zKFUbi4yg0S
+	pOqOmPKpfXbvaGTKYWi0KY47yOEBYUKywOJpBvGz7l94PhtsE4inro+ZXGbNDIS/ObLv4iGARtDZT
+	PA3XwsvZ3HbMBk55wj8LvauK3bCqjydtgy/En9ZhIs7hU+E0YLPGJ9PCWgKQPJed3/m943DDcYbDR
+	cUHUL9H2RmlJ7XruSVjh1iD2dagE8FIf777IVhmZVfiDrQlQnhaItGshJJ3wN/RYxAYKhqXj1ySx1
+	ZTT/aQYmqdgQW9aj9R+Cgzp6Kwb46grGj2GYC+mQkH+1cVQYJQmiAWGEIzIY+jl3uOcfw3SWU2UbY
+	o1logx0g==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vHFpH-0000000GjAS-2VnY;
+	Fri, 07 Nov 2025 06:19:59 +0000
+Message-ID: <1f9aa097-27c2-49c0-b01c-cd0377143bb4@infradead.org>
+Date: Thu, 6 Nov 2025 22:19:58 -0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 01/11] dmaengine: Add DMA_PREP_LOCK/DMA_PREP_UNLOCK
+ flags
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Vinod Koul <vkoul@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Thara Gopinath <thara.gopinath@gmail.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ Udit Tiwari <quic_utiwari@quicinc.com>,
+ Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
+ Md Sadre Alam <mdalam@qti.qualcomm.com>
+Cc: dmaengine@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-crypto@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20251106-qcom-qce-cmd-descr-v8-0-ecddca23ca26@linaro.org>
+ <20251106-qcom-qce-cmd-descr-v8-1-ecddca23ca26@linaro.org>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20251106-qcom-qce-cmd-descr-v8-1-ecddca23ca26@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Thu, 30 Oct 2025 09:57:42 +0800
-Longfang Liu <liulongfang@huawei.com> wrote:
 
-> On the new hardware platform, the configuration register space
-> of the live migration function is set on the PF, while on the
-> old platform, this part is placed on the VF.
-> 
-> Change v11 -> v12
-> 	Standardize register BIT operations
-...
-> 
-> Longfang Liu (2):
->   crypto: hisilicon - qm updates BAR configuration
->   hisi_acc_vfio_pci: adapt to new migration configuration
-> 
->  drivers/crypto/hisilicon/qm.c                 |  27 ++++
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 130 +++++++++++++-----
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  23 +++-
->  include/linux/hisi_acc_qm.h                   |   3 +
->  4 files changed, 144 insertions(+), 39 deletions(-)
 
-Applied to vfio next branch for v6.19 with discussed enum field change.
-Thanks,
+On 11/6/25 3:33 AM, Bartosz Golaszewski wrote:
+>  Documentation/driver-api/dmaengine/provider.rst | 9 +++++++++
+>  include/linux/dmaengine.h                       | 6 ++++++
+>  2 files changed, 15 insertions(+)
+> 
+> diff --git a/Documentation/driver-api/dmaengine/provider.rst b/Documentation/driver-api/dmaengine/provider.rst
+> index 1594598b331782e4dddcf992159c724111db9cf3..6428211405472dd1147e363f5786acc91d95ed43 100644
+> --- a/Documentation/driver-api/dmaengine/provider.rst
+> +++ b/Documentation/driver-api/dmaengine/provider.rst
+> @@ -630,6 +630,15 @@ DMA_CTRL_REUSE
+>    - This flag is only supported if the channel reports the DMA_LOAD_EOT
+>      capability.
+>  
+> +- DMA_PREP_LOCK
+> +
+> +  - If set, the DMA controller will be locked for the duration of the current
+> +    transaction.
+> +
+> +- DMA_PREP_UNLOCK
+> +
+> +  - If set, DMA will release he controller lock.
 
-Alex
+                                the
+
+> +
+>  General Design Notes
+
+-- 
+~Randy
+
