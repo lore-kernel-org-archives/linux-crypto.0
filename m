@@ -1,116 +1,187 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A69532AAD6
-	for <linux-crypto@vger.kernel.org>; Fri,  7 Nov 2025 10:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936EC29AB05
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Nov 2025 11:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762511663; cv=none; b=TXMjDXAeStO9dStr6do/GmG/OkimVKUh0LZrwosYQG2VWocwFs3y7ROTUWqTsoT2jkuFMHxWvmDBKjwhlSLYVAz/N7ve5alSsQFiopZIUdUgSbqXmu5KvgsPJlqxx4U1dBHA6gr7oiy8LlcoAd0ldzJcxdt4boo7lREtQxOuoiQ=
+	t=1762514645; cv=none; b=W9IIljKVmeNJbI0oOELGjoidwTAceYP2c0bkWlgDqUy7k5+NvIQYVmO1yYRjgB5qwCwLPFYSOOx7+mw0O2O/7/Tcn0scxC8UhlH/gGFjiS9MJgHsMwOp+7J21hAPdv3ZydyEqNWA/VhBWzPp4/dIZm5PtGo1XAr/Hqm4wgyGo90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762511663; c=relaxed/simple;
-	bh=cOCGVKmVEovJesU3WW8kK1oX09gBBIpX3J0LJkfvNN8=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=eWXyfMuj8J6YHii2pp/W9w3xyGUrFwlevjcMuwFORI3HVnJx2O+AmhrI24Gu+mEYeQroxkJ88yo2i+zGuBWlkAYb4H/ALRajx1egjqrsCViyDoiSNdEb2z4lUq92wWIvwHpUWjSJ35jCtpZxC09SZEAhanPSozBoRYBIoELzYUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h8T10DCd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1762514645; c=relaxed/simple;
+	bh=9qvKFyWCzhaawn1KuJuE+xpn/FGFoohIYfFNP0qIMWk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q6iJCnwBhlyRkNAnQTY9+4BkxM/6tD4FMr+5kO2QAgzp6Vt3F3IpwSBHrdGB+oYMvmKXyF58tcIrtSUlfhVeAkjaV4Ueas63RbhrAKv635TqNsRCKnZB1KjQ89mFnC6EtKsJolmQHw3YbJ+vzluZYXSPbpun0C75Tic6nbpqpBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=KsGaLRUg; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h8T10DCd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762511660;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mRnffMyHiAhteHPeQJ+/psTcXTA9GHmSEDbZPxSCiXA=;
-	b=h8T10DCdX3S0J928wLsJDe/hqBrFrMD+G9OElKRUjEZ06LVFGlgYZJGlw8zkgIFQy+jUmR
-	IlFOZTNbe69PFCMxKmNrckHAzloZIfGr4rKA0OU1h1O9o7ECel1ET851kK6u+9KG7OG9v4
-	goguFb1p8zElbwzys+FTV8EyENxs3yo=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-633-kFb5TB9lMOqKe88aYlyBOA-1; Fri,
- 07 Nov 2025 05:34:17 -0500
-X-MC-Unique: kFb5TB9lMOqKe88aYlyBOA-1
-X-Mimecast-MFC-AGG-ID: kFb5TB9lMOqKe88aYlyBOA_1762511655
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 24E7E1956063;
-	Fri,  7 Nov 2025 10:34:15 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.6])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9EC2B1945110;
-	Fri,  7 Nov 2025 10:34:10 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20251106192016.GA3318@quark>
-References: <20251106192016.GA3318@quark> <20251106174456.31818-1-dhowells@redhat.com> <20251106174456.31818-3-dhowells@redhat.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-    Luis Chamberlain <mcgrof@kernel.org>,
-    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
-    Sami Tolvanen <samitolvanen@google.com>,
-    "Jason A .
- Donenfeld" <Jason@zx2c4.com>,
-    Ard Biesheuvel <ardb@kernel.org>,
-    Stephan Mueller <smueller@chronox.de>,
-    Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>, linux-crypto@vger.kernel.org,
-    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 2/8] crypto: Add ML-DSA/Dilithium verify support
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="KsGaLRUg"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-477619f8ae5so5109125e9.3
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Nov 2025 03:24:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1762514642; x=1763119442; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=f241uCY+pmrH1f0NrM2ehLiNX5bhGdKZqui5I9vth0o=;
+        b=KsGaLRUg6TSie64qV6TZqlHQBhpvfJAITdSEpfnICgDzQW2wpgojOEQDXLR2J1qSNF
+         fCI5xHDDvwnX8YyX61+OoEbQklvEVoF2gQSZirrAVT4NBwoF56LGco3Z4v/wIKSk2eg1
+         KhHvAX2kfHDVAgfh0Dx+rTelugsQMPCHKanXqjwW/Mye5fcfuIr6c1tRsLjd5ssPj9Dx
+         NG86LMyy2Qb15CuOO7+lupQFdEs6cjCeHRP9sBsK4mHKaFILiopuT6jVorzJsL9uCU/b
+         z7pttL0DdlZg5JvZh0iSlWAQjYYYfQw/xTKv8BaFrzJ0g/CkP+ja+NL3ixo8D67Dwsr/
+         vv+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762514642; x=1763119442;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f241uCY+pmrH1f0NrM2ehLiNX5bhGdKZqui5I9vth0o=;
+        b=K6Y+OZzxjsNVgXlTX1hCIhJhWl2sgB8sdl4r3+NTeCJUJWFSvcVFWW4czKNNXIUMU8
+         1R0ughrEtlltze2jOmQHAPLpYfco+JnhdvUTyFpnzp5Ky6Sk2BFx2HD3JVcbJXaC0FJv
+         RLAO/dClp4LyiGVig+va0L/tCJCjZS49P8TYorqosL+FILNEuU0k0DCyEKQQ1XjNSg1T
+         7qfL31ZgpsdiY63a6t9brAsqjIHJvEJbyfefj1Fij1WfFkblVYNXVMdEDpFp9F1saB5c
+         MRD8Q6PvOWV3Rg94p55afYXk4/gF2IAKjsfRv7jj7VmhpfmtCWL7Taua7v61wsCTXiW1
+         Zilg==
+X-Forwarded-Encrypted: i=1; AJvYcCU1U7MWFOehVBflizSitDD1A2+u5ExBCEBP9LxL6hAbW6+g0a3G7okeu5F4Y0DF6GUHHt9xh2o8jWMlwHU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxoc3KiluGM8r/je5E8eGLX4DUvDPEF+ScXh1ZYGpVjJGbo19Hp
+	0MQ4UcxtdG31ki0hRf6Aa/n+rs96QYxpQ7Ln2y6Pehzmi+CcK8UBqNp99uU6GbmeZes=
+X-Gm-Gg: ASbGncvQYAcJTBJo6rBeSO1jbORBe+spIDt7Kij4n0PkstWMTEw2xlS0r86oqEnhFVe
+	G4aNFcLjGBPym7FGgl+0IawJn0rvpcWFf9eD2zmOTArbCym665xEJr3h08JoOGpjShUnPJtCwJq
+	J6ftelLH+WlGIm1I4shtfH0gm5gmu9QWEKj9KVx7yod/J1u+5xn4bSdT/SAZX5JsRDM9JFXiiZj
+	mYGGnIs0uvZa3gw2BZVcAUX333h5oSDgAc+4vLSfNRaJyvXfWP5lV586WVaWu+DTjMR/Ff2Ri97
+	3wRwIsWZnf6ZYW+uJsAxlWm8sqnl8pEZq7OWTJy/J9BobUYH+x616PMr3cglRvuiaFj4FX0eS6k
+	WXrY/eZu8B0a4Mj2+W6Gd5ofBlk3ghGctNs5TgKV7NgttRqeRYFh8XHss47mhafu4fLubn5mFGW
+	ZlvoyUA7FMzKLZtZ3sxe7NWlxA7yI5m0HgBrE=
+X-Google-Smtp-Source: AGHT+IEgrc0DHLVfayeak/o3tbBp6AOETc/w2hdnSCkhCEY7583sQoY+NixM9DDmkWzAVLWh7Q7ymg==
+X-Received: by 2002:a05:600c:630d:b0:477:54b3:3484 with SMTP id 5b1f17b1804b1-4776bcff5b4mr22968565e9.37.1762514641875;
+        Fri, 07 Nov 2025 03:24:01 -0800 (PST)
+Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47763eb362bsm40540675e9.4.2025.11.07.03.24.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Nov 2025 03:24:01 -0800 (PST)
+From: Marco Crivellari <marco.crivellari@suse.com>
+To: linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	qat-linux@intel.com
+Cc: Tejun Heo <tj@kernel.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - add WQ_PERCPU to alloc_workqueue users
+Date: Fri,  7 Nov 2025 12:23:54 +0100
+Message-ID: <20251107112354.144707-1-marco.crivellari@suse.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <62629.1762511649.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Nov 2025 10:34:09 +0000
-Message-ID: <62630.1762511649@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Eric Biggers <ebiggers@kernel.org> wrote:
+Currently if a user enqueues a work item using schedule_delayed_work() the
+used wq is "system_wq" (per-cpu wq) while queue_delayed_work() use
+WORK_CPU_UNBOUND (used when a cpu is not specified). The same applies to
+schedule_work() that is using system_wq and queue_work(), that makes use
+again of WORK_CPU_UNBOUND.
+This lack of consistency cannot be addressed without refactoring the API.
 
-> On Thu, Nov 06, 2025 at 05:44:46PM +0000, David Howells wrote:
-> > The interface to this code is through the crypto_sig API as the PKCS#7=
- code
-> > wants to use that rather than calling it directly.  As such, I've plac=
-ed it
-> > in crypto/ rather than lib/crypto/.  Only the verification hooks are
-> > implemented; the signing hooks return an error.
-> =
+alloc_workqueue() treats all queues as per-CPU by default, while unbound
+workqueues must opt-in via WQ_UNBOUND.
 
-> As I mentioned before
-> (https://lore.kernel.org/linux-crypto/20250613170456.GA1284@sol/), this
-> code should go in lib/crypto/.  There seems to be a clean API in
-> crypto/ml_dsa/dilithium.h already.  Just make that the library API.
+This default is suboptimal: most workloads benefit from unbound queues,
+allowing the scheduler to place worker threads where they’re needed and
+reducing noise when CPUs are isolated.
 
-Fine.  Is it ever likely to be used directly, I wonder?
+This continues the effort to refactor workqueue APIs, which began with
+the introduction of new workqueues and a new alloc_workqueue flag in:
 
-There is a downside of moving stuff to lib/crypto/: dynamically loadable
-algorithms now need two modules instead of one.  For initial module signin=
-g,
-granted, the algorithms for that must be built in.
+commit 128ea9f6ccfb ("workqueue: Add system_percpu_wq and system_dfl_wq")
+commit 930c2ea566af ("workqueue: Add new WQ_PERCPU flag")
 
-> If "crypto_sig" support is really needed too, then put that in
-> crypto/ml-dsa.c, built on top of the library API.  It's not clear the
-> crypto_sig support is very useful, though.  For one, you had to add
-> ML-DSA specific logic to the calling code anyway (see "pkcs7: Allow the
-> signing algo to calculate the digest itself").
+This change adds a new WQ_PERCPU flag to explicitly request alloc_workqueue()
+to be per-cpu when WQ_UNBOUND has not been specified.
 
-The actual signature check still goes through the same code path as everyt=
-hing
-else, so crypto_sig will remain the API.  Otherwise I have to basically
-reimplement crypto_sig inside crypto/asymmetric_keys/, including the on-de=
-mand
-algorithm loading.
+With the introduction of the WQ_PERCPU flag (equivalent to !WQ_UNBOUND),
+any alloc_workqueue() caller that doesn’t explicitly specify WQ_UNBOUND
+must now use WQ_PERCPU.
 
-David
+Once migration is complete, WQ_UNBOUND can be removed and unbound will
+become the implicit default.
+
+Suggested-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
+---
+ drivers/crypto/intel/qat/qat_common/adf_aer.c    | 4 ++--
+ drivers/crypto/intel/qat/qat_common/adf_isr.c    | 3 ++-
+ drivers/crypto/intel/qat/qat_common/adf_sriov.c  | 3 ++-
+ drivers/crypto/intel/qat/qat_common/adf_vf_isr.c | 3 ++-
+ 4 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+index 35679b21ff63..667d5e320f50 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+@@ -276,11 +276,11 @@ int adf_notify_fatal_error(struct adf_accel_dev *accel_dev)
+ int adf_init_aer(void)
+ {
+ 	device_reset_wq = alloc_workqueue("qat_device_reset_wq",
+-					  WQ_MEM_RECLAIM, 0);
++					  WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 	if (!device_reset_wq)
+ 		return -EFAULT;
+ 
+-	device_sriov_wq = alloc_workqueue("qat_device_sriov_wq", 0, 0);
++	device_sriov_wq = alloc_workqueue("qat_device_sriov_wq", WQ_PERCPU, 0);
+ 	if (!device_sriov_wq) {
+ 		destroy_workqueue(device_reset_wq);
+ 		device_reset_wq = NULL;
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_isr.c b/drivers/crypto/intel/qat/qat_common/adf_isr.c
+index 12e565613661..4639d7fd93e6 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_isr.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_isr.c
+@@ -384,7 +384,8 @@ EXPORT_SYMBOL_GPL(adf_isr_resource_alloc);
+  */
+ int __init adf_init_misc_wq(void)
+ {
+-	adf_misc_wq = alloc_workqueue("qat_misc_wq", WQ_MEM_RECLAIM, 0);
++	adf_misc_wq = alloc_workqueue("qat_misc_wq",
++				      WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 
+ 	return !adf_misc_wq ? -ENOMEM : 0;
+ }
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_sriov.c b/drivers/crypto/intel/qat/qat_common/adf_sriov.c
+index 31d1ef0cb1f5..bb904ba4bf84 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_sriov.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_sriov.c
+@@ -299,7 +299,8 @@ EXPORT_SYMBOL_GPL(adf_sriov_configure);
+ int __init adf_init_pf_wq(void)
+ {
+ 	/* Workqueue for PF2VF responses */
+-	pf2vf_resp_wq = alloc_workqueue("qat_pf2vf_resp_wq", WQ_MEM_RECLAIM, 0);
++	pf2vf_resp_wq = alloc_workqueue("qat_pf2vf_resp_wq",
++					WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 
+ 	return !pf2vf_resp_wq ? -ENOMEM : 0;
+ }
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_vf_isr.c b/drivers/crypto/intel/qat/qat_common/adf_vf_isr.c
+index a4636ec9f9ca..d0fef20a3df4 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_vf_isr.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_vf_isr.c
+@@ -299,7 +299,8 @@ EXPORT_SYMBOL_GPL(adf_flush_vf_wq);
+  */
+ int __init adf_init_vf_wq(void)
+ {
+-	adf_vf_stop_wq = alloc_workqueue("adf_vf_stop_wq", WQ_MEM_RECLAIM, 0);
++	adf_vf_stop_wq = alloc_workqueue("adf_vf_stop_wq",
++					 WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 
+ 	return !adf_vf_stop_wq ? -EFAULT : 0;
+ }
+-- 
+2.51.1
 
