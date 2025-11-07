@@ -1,144 +1,118 @@
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.166])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D69AC1E51EE;
-	Fri,  7 Nov 2025 10:23:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.166
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762511039; cv=pass; b=PIxBnUXUxGDleI8IkqIDKEVtVEFDZWs7tUE5ZJGRsjJoHjfWPGI7MY2Xpm16TTHsSlV3kVUVFpumXZ4TwSsQxCn1d4oQB7QAt6JnE1ca9QBiTueDjrOLhKKJvKGubD+PvOtO79Bb+8jD9/paykLmFtmFA7T5YIO22kny9Gg/t00=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762511039; c=relaxed/simple;
-	bh=IfvDo4DJe7UiNB3LGseK57aJdtQyepnmkpfrGIgJmqo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JgaGsw8oZ57duyx0KQZlJ5g3K0gQbdkSNiUDUBky88dtbraOBvj/gyBAiyJ5WTo4sy/9j/jjNIxgEusb7psPxfUyuBT0nJ8p9aAQcH3cyKVu6XcU3pyPZRzI9UL/qfT7THNcvsT9J59rckiFCdhSBGV8XdsSCbD/Q6swlLkJkuM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=GLewI4R3; dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b=5/2WW30r; arc=pass smtp.client-ip=81.169.146.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chronox.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCFA3054E9;
+	Fri,  7 Nov 2025 10:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762511392; cv=none; b=pofsC40zECBmq6jZaQrBowLstOPNwNpgLiol5JRdwp8JqUOJrRmYomLPQcaYFo48L790Nfwkxjz3FHCu7ibBH/7m3WBt2do/RDT3DUTYgf7oJhxshbylLjMNO8doolVbgD84jxf0ZaqZl4IzSp6aHhe4NNlFIJo0QpsaYEBVvT8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762511392; c=relaxed/simple;
+	bh=MUNYUXR+6Apmlduc5P0840WUQkROO+KLh9YaxqpeACI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=vBkEPy0NEJwRO93QSZtZcWNfRgp7APUkRS2Vl/ktv2LCC6PWKLcZEHE7U1y2q5vEbReNfO/mS40TcuKrwoaFRM4yD9P68S7TOARpZqpRzCnvdn849dzfwxKEBHzG9w2y29dG3SnLvn3qbdNGJsUrsExIwKYPzU2v8zpiYZ1Ne30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org; spf=pass smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=TmdEkJ75; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yoseli.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="GLewI4R3";
-	dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b="5/2WW30r"
-ARC-Seal: i=1; a=rsa-sha256; t=1762511028; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=WSeKpbqRA32meDqqfKW/ORlMun85BL1twqUu1y85rsAhXWyY1KYvmTZYRVo82Y0XA3
-    6jv/DGLSoEinkXr658eqYUU4B1fCnV/KCXqXjtiROFMdiqBZzddbuwYANkWZyokacsa2
-    pydkzy0jh9YIfeW5PsjqAr0OFeBW5wTNI4/P54K7T6UEEdG2OU8l9mGNmEyKsCgRlu5m
-    sC2oJ7ZX0PwN5/rUoG6a3yhKw/HApmGZjGPIABYIqn2hTS1tqYVU2rcvPe160DDvMy4K
-    7QupM1WpESsE/Fl4GS5t2CPPm9u1LHQ72sxMPDozuhV522NbO5z4IYxUtyjXZfEijmDV
-    OkXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1762511028;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=IfvDo4DJe7UiNB3LGseK57aJdtQyepnmkpfrGIgJmqo=;
-    b=Ez0gm3GOcB2gjfv3NDznTRXPM99Y8g9U+Fi8lVH1zc6b3fD8rYxjtrVv1IMPN2aJ8r
-    kinMhJ68hA2dnIWWQvSzGeKLnBoSFtIMYYICLn2xxA5yl6QoGh1bW7oDBWrkK9VlslG3
-    wwQQ4nGbiq6TgWHY+MfT7C+KQ7purwGqEdBocsOGNlew6SiivNuVAFxCW3HjCHGZO009
-    JsCvH1T959YrmYr0B4zHHTZ6j57uttIL2M4JdlLsIZ+++kPd4Qmvox3GI+wozTBQeyLV
-    L2vJ/Q5GW0+AXZi15jSJ3KgwMN+331Qayih+9ZXBh6OIWLngH4RUFzvf8rO0u441WGpw
-    xF3A==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1762511028;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=IfvDo4DJe7UiNB3LGseK57aJdtQyepnmkpfrGIgJmqo=;
-    b=GLewI4R3yTbYgXfczGE7AmPhjvr6QGNbEzKiRa7E60fnGMh8wsyBdRiwtAbmh8W7WF
-    FhhvZphdMEPrI1Otf0xIaUUaST9A38fsn3gMOwcHL5mHvzlXq6IAzwJp0jPdvfbif7xs
-    WtKhvboSsmBnPZAJlqfbkPlxSmzVgQWQiavbWFEjlk8d2cPX6/YgSJoZhuVDblwkxRDF
-    LwNiv88+wgyIOMwGn5ec0aXt6Hkow5IVHFMZ1qEqO4ynH7qZDIzVabdUhxCwLV3aXmvn
-    LN1Gsm+YNPXbe8KFtntm4XgSz1e3CCWKCwPkRhr2ZX3XallLmbQGa/+tH0wIH/TsYmoV
-    YNAg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1762511028;
-    s=strato-dkim-0003; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=IfvDo4DJe7UiNB3LGseK57aJdtQyepnmkpfrGIgJmqo=;
-    b=5/2WW30rYplD9tb1hPieiFCvpVFLWwvGcnQpXmAsjAHqiW/lpH5r/5Larq5QBgL9lh
-    lgmZFjUM7CQt/Lg9O2Bg==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXDYJPSfOH7S"
-Received: from tauon.localnet
-    by smtp.strato.de (RZmta 54.0.0 DYNA|AUTH)
-    with ESMTPSA id fd5b701A7ANk3FS
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Fri, 7 Nov 2025 11:23:46 +0100 (CET)
-From: Stephan Mueller <smueller@chronox.de>
-To: Stefan Berger <stefanb@linux.ibm.com>, David Howells <dhowells@redhat.com>
-Cc: dhowells@redhat.com, Simo Sorce <simo@redhat.com>,
- James Bottomley <James.Bottomley@hansenpartnership.com>,
- Ignat Korchagin <ignat@cloudflare.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, torvalds@linux-foundation.org,
- Paul Moore <paul@paul-moore.com>, Lukas Wunner <lukas@wunner.de>,
- Clemens Lang <cllang@redhat.com>, David Bohannon <dbohanno@redhat.com>,
- Roberto Sassu <roberto.sassu@huawei.com>, keyrings@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: Module signing and post-quantum crypto public key algorithms
-Date: Fri, 07 Nov 2025 11:23:46 +0100
-Message-ID: <3917048.kQq0lBPeGt@tauon>
-In-Reply-To: <61528.1762509829@warthog.procyon.org.uk>
-References:
- <53e81761-47e1-400e-933d-0a53018c9cab@linux.ibm.com>
- <3d650cc9ff07462e5c55cc3d9c0da72a3f2c5df2.camel@redhat.com>
- <61528.1762509829@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="TmdEkJ75"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 603D6441E6;
+	Fri,  7 Nov 2025 10:29:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
+	t=1762511388;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=43yyG9LNy5Zyb96mTIsBza5rvvnkZsHU9mwls4Id0h8=;
+	b=TmdEkJ75lNDvbZzF3RAYKGUmIJfu/FQKzzHTFCF46egr3grD0MHW8oAqSD0tmpdBu4RW9P
+	gjLM9Q3PEP+LSqfSCvmAiS7ZU9NaBuIU6fZj5cGiOKBnXVr8O5wc2Ijnh51O55on+h3aIM
+	pvVAWCivuHMlgnACT7jsgDPDZIOZ4FyGvi/OeMWFSSli2hr2obP5pC3uplYlzW2rtHgjx5
+	IMYvQlUAinb2UCUYHeRlCoI2keUA7ctSmuGi5B3+VZvhyGjA6L5bUlX2eZi4vyLpsK4rtM
+	ZIkjUc+uY58wfMZ/kK2N8XgJ3LXlThyEIspz8wYwyDy40hfvMCLgh/deqGHExQ==
+From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+Subject: [PATCH v2 0/2] m68k: coldfire: Add RNG support and const
+ qualifiers for MCF54418
+Date: Fri, 07 Nov 2025 11:29:42 +0100
+Message-Id: <20251107-b4-m5441x-add-rng-support-v2-0-f91d685832b9@yoseli.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABbKDWkC/x3MQQqEMAxA0atI1gbSUnGYqwyzqCZqFlNLOoog3
+ t3i8i3+P6GIqRR4NyeY7Fp0TRW+bWBcYpoFlavBk++cox6HgL8uBHdgZEZLM5Yt59X+SBMPLw7
+ kHUWofTaZ9Hjen+913eC3QNJrAAAA
+X-Change-ID: 20251107-b4-m5441x-add-rng-support-0fdb8d40210a
+To: Greg Ungerer <gerg@linux-m68k.org>, 
+ Geert Uytterhoeven <geert@linux-m68k.org>, 
+ Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Shawn Guo <shawnguo@kernel.org>, 
+ Sascha Hauer <s.hauer@pengutronix.de>, 
+ Pengutronix Kernel Team <kernel@pengutronix.de>, 
+ Fabio Estevam <festevam@gmail.com>
+Cc: linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, imx@lists.linux.dev, 
+ linux-arm-kernel@lists.infradead.org, 
+ Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>, 
+ Frank Li <Frank.Li@nxp.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1762511384; l=1826;
+ i=jeanmichel.hautbois@yoseli.org; s=20240925; h=from:subject:message-id;
+ bh=MUNYUXR+6Apmlduc5P0840WUQkROO+KLh9YaxqpeACI=;
+ b=eVGUWoVGiY2HGHRt1PEYYMxNqqX3aeQhPojZB5FNxte8LKv8HnWJFBlR1zIUSo5fr78aoXEG2
+ 273WE5cmvwQBKRezy3ONRUdo25kJxA+1nN7Ps6ANkITL/hGheH6GZF8
+X-Developer-Key: i=jeanmichel.hautbois@yoseli.org; a=ed25519;
+ pk=MsMTVmoV69wLIlSkHlFoACIMVNQFyvJzvsJSQsn/kq4=
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeelgeefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhufffkfggtgfgvfevofesthejredtredtjeenucfhrhhomheplfgvrghnqdfoihgthhgvlhcujfgruhhtsghoihhsuceojhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgqeenucggtffrrghtthgvrhhnpeduteehgeeihfelleelkeetkeetvefhvddugeduvddvudegheelkeeltdfftdehjeenucfkphepvdgrtddumegvtdgrmeduieelmeejudegtdemkegtrgdtmedukegtjeemhegvfhgtmegtsghfvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgdtrgemudeileemjedugedtmeektggrtdemudektgejmeehvghftgemtggsfhdvpdhhvghlohephihoshgvlhhiqdihohgtthhordihohhsvghlihdrohhrghdpmhgrihhlfhhrohhmpehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrghdpnhgspghrtghpthhtohepudehpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhnvghlsehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrkhgvr
+ hhnvghlrdhorhhgpdhrtghpthhtohepkhgvrhhnvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopehgvggvrhhtsehlihhnuhigqdhmieekkhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrghdprhgtphhtthhopehfvghsthgvvhgrmhesghhmrghilhdrtghomhdprhgtphhtthhopehgvghrgheslhhinhhugidqmheikehkrdhorhhg
+X-GND-Sasl: jeanmichel.hautbois@yoseli.org
 
-Am Freitag, 7. November 2025, 11:03:49 Mitteleurop=C3=A4ische Normalzeit sc=
-hrieb=20
-David Howells:
+This series adds support for the MCF54418 hardware random number generator
+(RNGB) and improves type safety for platform device resources.
 
-Hi David,
+The MCF54418 contains an RNGB hardware block compatible with the imx-rngc
+driver. This series enables its use by:
+- Adding platform device registration for the RNG hardware
+- Enabling the clock at platform initialization
+- Making the imx-rngc driver compatible with Coldfire's always-on clock
+model using devm_clk_get_optional()
 
-> Stefan Berger <stefanb@linux.ibm.com> wrote:
-> > On 6/16/25 1:27 PM, Simo Sorce wrote:
-> > > Of course we can decide to hedge *all bets* and move to a composed
-> > > signature (both a classic and a PQ one), in which case I would suggest
-> > > looking into signatures that use ML-DSA-87 + Ed448 or ML-DSA-87 + P-5=
-21
-> > > ,ideally disjoint, with a kernel policy that can decide which (or bot=
-h)
-> > > needs to be valid/checked so that the policy can be changed quickly v=
-ia
-> > > configuration if any of the signature is broken.
-> >=20
-> > FYI: based on this implementation of ML-DSA-44/65/87
-> >=20
-> > https://github.com/IBM/mlca/tree/main/qsc/crystals
->=20
-> The problem with that is that the Apache-2 licence is incompatible with
-> GPLv2. Now, it might be possible to persuade IBM to dual-license their
-> code.
+Additionally, following Frank Li's suggestion, all static resource array
+in arch/m68k/coldfire/device.c are marked const, moving them to read-only
+memory and aligning with kernel API expectations.
 
-The code used as a basis for the current approach (leancrypto.org) offers=20
-hybrids with ED25519 and ED448) including the X.509/PKCS7 support.
+Testing on DLC Next board shows:
+- Hardware RNG throughput: 26 MB/s
+- FIPS 140-2 quality: 0.2% failure rate (rng-tools)
+- Boot time improvement: CRNG initialization 7 seconds faster
 
-However, please note that the X.509 specification for storing hybrid public=
-=20
-keys is not yet completed and there is still some work on the draft IETF=20
-standard [1].
+Changes since v1:
+- Split const qualifier changes into a separate patch as suggested by
+Frank Li
+- Mark all resource arrays (including RNG) as const in device.c
+- No functional changes to RNG implementation
 
-Side note: the leancrypto code base uses the Linux kernel X.509/PKCS7 parse=
-r=20
-code where the relevant handler functions (see [2]) could be relatively=20
-quickly transplanted into the kernel if needed.
+Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+---
+Jean-Michel Hautbois (2):
+      m68k: coldfire: Mark platform device resource arrays as const
+      m68k: coldfire: Add RNG support for MCF54418
 
-[1] https://lamps-wg.github.io/draft-composite-sigs/draft-ietf-lamps-pq-com=
-posite-sigs.html
+ arch/m68k/coldfire/device.c       | 52 ++++++++++++++++++++++++++++++---------
+ arch/m68k/coldfire/m5441x.c       |  2 +-
+ arch/m68k/include/asm/m5441xsim.h |  9 +++++++
+ drivers/char/hw_random/Kconfig    |  3 ++-
+ drivers/char/hw_random/imx-rngc.c |  9 ++++++-
+ 5 files changed, 60 insertions(+), 15 deletions(-)
+---
+base-commit: 5e5629c7ce42cfa1da9c6aaaa6d7aff0d396c46e
+change-id: 20251107-b4-m5441x-add-rng-support-0fdb8d40210a
 
-[2] https://github.com/smuellerDD/leancrypto/blob/master/asn1/src/
-x509_cert_parser.c
-
-Ciao
-Stephan
-
+Best regards,
+-- 
+Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
 
