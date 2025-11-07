@@ -1,39 +1,38 @@
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5969E302153;
-	Fri,  7 Nov 2025 10:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA5B305E09;
+	Fri,  7 Nov 2025 10:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762511393; cv=none; b=PpfORfoeq+HQJkidbvvfdLEGaShg7irNWpBu6caAPg22NcizRXcTREmCDydU2YPY6iXgn92Yi6QnqVDczS9U5HcD4s00LnYCfepYkiJwx4sk1AxBDhnLauGMG9T+icFdaDI9EVy4aXSxesasLzejQZ7EGoXBKZEpnYh2oEsP/MU=
+	t=1762511395; cv=none; b=ho8JK0+/uhJnOjNyXqn92ojrHJ7Jm7byiPDnzdZVfFX+2e7bI2nZ9moaU3ONx2rILD0jE/ySVG+eAJild1zSnN9c8fmj3yBYB7voC2EAzP9y9J72/lvk81aukeH0VocExtydytzkwYS1XkrM0vpJdz74I4oVGRwEgM3DIgSiAzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762511393; c=relaxed/simple;
-	bh=JckmVSzukyidG2dui/LSzqe71K/hORksPnHdkUfcy0s=;
+	s=arc-20240116; t=1762511395; c=relaxed/simple;
+	bh=PSrSWiIVbpn6czV4JmjiWTzr+3TkryO0Cfx8dgQT/XY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QfUtu1aKLMP1B3LcSxCWxKPoI/bKk+2vbaLbEqiH2Ie5+iIAIAes3TyN73wJlx9HdkQ1QyhuBwiav6T9vYQ5YK2eEZCpJKuDmFMkGBSMQ8lLbn+LmNZx8rsKcSR3esngcQfjXrWqsX6uIzr7QYpY08UXz3yhL1saphC0yP/j/jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org; spf=pass smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=V8LVPEQW; arc=none smtp.client-ip=217.70.183.199
+	 In-Reply-To:To:Cc; b=I5YIlQPMYyFS1LtLUrHlsC/zFbklkML5RGheOb4BMDC/J02fubEI1JSRvgiY/t9GrxetMXGpWnabXs2SYe9KGzy8OH6tfeSO/1X6zQadn3SW9cgKD5ZK1Vlkx8gUZvNcN41D3UuEgkIarWPYeIynAyKIDnClk+aQ3GLTolzwqbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org; spf=pass smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=aF213VrY; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yoseli.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="V8LVPEQW"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 23E714427F;
-	Fri,  7 Nov 2025 10:29:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="aF213VrY"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EBB2944292;
+	Fri,  7 Nov 2025 10:29:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
-	t=1762511389;
+	t=1762511391;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8jK/BJit61+AKutAJR0P94X+7KV8Ubt7aBKM7Qa21V0=;
-	b=V8LVPEQW72X9Te3PCLgvRZ9RQ37r2aV9aN/ZHurnluGlTpbSI6RRPfOJRpNfuvyafKtk+/
-	2+AveWC5DQaXeCtmR9TnaWk7UQ1d/UrzgozvoaUlQTq6ZkL6AOT1pVSClAsfc9Xu51+M39
-	zYSFwglNP4eHXtI3F7dIOUMl0dOjcLhqujQ1fKEBgFceDUUlzeTxWhvwYfUMnx6FacAvyw
-	WXyjPQyAzu107Fvpu9KWI5pOPyM8vgEP36YIvet0zZlgDy4Putvr2K3PcmbGYSURMe8YjF
-	TLxTF4xHHgHPtSM6WWOGo2aCF+t6VsEjono6oyYNnZOHeD2gDhynPqeVj+nUxg==
+	bh=BmMJrFZ2dloB0VnzDAR4oKmr7EZY45/bU42OgpgHP8U=;
+	b=aF213VrYZkaoeI7ntvYcD4qfJdxve7h8TfI/ZQPBx8nKe6RMTzyJDL7YNjzYERDBSI9hM2
+	89bAY58o3CKalW6GEyH3bvjkuYPEP8nY9ZNuA4P14gs6XX2NboXsiyMHB/ajxFh9I30oy2
+	qPtOq0H0jPJ/MZmvSE77FX72bQSy7ft09NnOYVfErakBaX1orsOjtxhHFIlvp15Yi+yqID
+	hh/ZoF45KAayWtgQ1zQyqIBmeliHmd1ryxNavIilp39PVrYM2+CnJdLkliF+NwxnPSUOHG
+	OHG+XJC0N3J0Bcad1SEeVJ0NavHbHNAY18sCnuqgBDhlRK7mCW792VqY9kjhtw==
 From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-Date: Fri, 07 Nov 2025 11:29:43 +0100
-Subject: [PATCH v2 1/2] m68k: coldfire: Mark platform device resource
- arrays as const
+Date: Fri, 07 Nov 2025 11:29:44 +0100
+Subject: [PATCH v2 2/2] m68k: coldfire: Add RNG support for MCF54418
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,7 +41,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251107-b4-m5441x-add-rng-support-v2-1-f91d685832b9@yoseli.org>
+Message-Id: <20251107-b4-m5441x-add-rng-support-v2-2-f91d685832b9@yoseli.org>
 References: <20251107-b4-m5441x-add-rng-support-v2-0-f91d685832b9@yoseli.org>
 In-Reply-To: <20251107-b4-m5441x-add-rng-support-v2-0-f91d685832b9@yoseli.org>
 To: Greg Ungerer <gerg@linux-m68k.org>, 
@@ -55,144 +54,174 @@ To: Greg Ungerer <gerg@linux-m68k.org>,
 Cc: linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org, 
  linux-crypto@vger.kernel.org, imx@lists.linux.dev, 
  linux-arm-kernel@lists.infradead.org, 
- Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>, 
- Frank Li <Frank.Li@nxp.com>
+ Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1762511384; l=4439;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1762511384; l=5529;
  i=jeanmichel.hautbois@yoseli.org; s=20240925; h=from:subject:message-id;
- bh=JckmVSzukyidG2dui/LSzqe71K/hORksPnHdkUfcy0s=;
- b=ezvsVZEGOwzO9imh4uUDYPibZqM44HE5Mx8qGnrKtz5/fZzh9SAHKsQPv4+Gus6A+wbwwo1KY
- MsUMKxTRPMaDMU5aOvMyypk//4djgE2Q11it3xgr+XloLXPFfuIM8sp
+ bh=PSrSWiIVbpn6czV4JmjiWTzr+3TkryO0Cfx8dgQT/XY=;
+ b=EUGS7OCZpt1eCI5kkVQK7/hSxyPZTuOtSCCY8VQLiT6XtgYTF117WBjImk+M0Eq9+8h1vy5jQ
+ djb/Z7vDqjKBY/IyELs3wLWOxX4d0Bm5RlRHb3mk9cKjwsc2LtYrw4P
 X-Developer-Key: i=jeanmichel.hautbois@yoseli.org; a=ed25519;
  pk=MsMTVmoV69wLIlSkHlFoACIMVNQFyvJzvsJSQsn/kq4=
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeelgeefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthejredtredtjeenucfhrhhomheplfgvrghnqdfoihgthhgvlhcujfgruhhtsghoihhsuceojhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgqeenucggtffrrghtthgvrhhnpeffjefhtdelhffhheevheeutefghfefteeluedvudfhgeegteeitddtuefhhfelteenucfkphepvdgrtddumegvtdgrmeduieelmeejudegtdemkegtrgdtmedukegtjeemhegvfhgtmegtsghfvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgdtrgemudeileemjedugedtmeektggrtdemudektgejmeehvghftgemtggsfhdvpdhhvghlohephihoshgvlhhiqdihohgtthhordihohhsvghlihdrohhrghdpmhgrihhlfhhrohhmpehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrghdpnhgspghrtghpthhtohepudehpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhnvghlsehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrk
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeelgeefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthejredtredtjeenucfhrhhomheplfgvrghnqdfoihgthhgvlhcujfgruhhtsghoihhsuceojhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgqeenucggtffrrghtthgvrhhnpeffjefhtdelhffhheevheeutefghfefteeluedvudfhgeegteeitddtuefhhfelteenucfkphepvdgrtddumegvtdgrmeduieelmeejudegtdemkegtrgdtmedukegtjeemhegvfhgtmegtsghfvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgdtrgemudeileemjedugedtmeektggrtdemudektgejmeehvghftgemtggsfhdvpdhhvghlohephihoshgvlhhiqdihohgtthhordihohhsvghlihdrohhrghdpmhgrihhlfhhrohhmpehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrghdpnhgspghrtghpthhtohepudegpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhnvghlsehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrk
  hgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhgvrhhnvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopehgvggvrhhtsehlihhnuhigqdhmieekkhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrghdprhgtphhtthhopehfvghsthgvvhgrmhesghhmrghilhdrtghomhdprhgtphhtthhopehgvghrgheslhhinhhugidqmheikehkrdhorhhg
 X-GND-Sasl: jeanmichel.hautbois@yoseli.org
 
-Add 'const' qualifier to all static resource arrays in device.c.
-These arrays are never modified at runtime, they are only read by
-platform device registration functions.
+Add platform device support for the MCF54418 RNGB hardware with clock
+enabled at platform initialization.
 
-Suggested-by: Frank Li <Frank.Li@nxp.com>
+The imx-rngc driver now uses devm_clk_get_optional() to support both
+Coldfire (always-on clock) and i.MX platforms (managed clock).
+
 Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
 ---
- arch/m68k/coldfire/device.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ arch/m68k/coldfire/device.c       | 28 ++++++++++++++++++++++++++++
+ arch/m68k/coldfire/m5441x.c       |  2 +-
+ arch/m68k/include/asm/m5441xsim.h |  9 +++++++++
+ drivers/char/hw_random/Kconfig    |  3 ++-
+ drivers/char/hw_random/imx-rngc.c |  9 ++++++++-
+ 5 files changed, 48 insertions(+), 3 deletions(-)
 
 diff --git a/arch/m68k/coldfire/device.c b/arch/m68k/coldfire/device.c
-index b6958ec2a220cf91a78a14fc7fa18749451412f7..20adba27a687029ef53249bad71b342d563d612b 100644
+index 20adba27a687029ef53249bad71b342d563d612b..4183929b0b501459da25d1b4cde7d77f19c3dc16 100644
 --- a/arch/m68k/coldfire/device.c
 +++ b/arch/m68k/coldfire/device.c
-@@ -111,7 +111,7 @@ static struct fec_platform_data fec_pdata = {
-  *	block. It is Freescale's own hardware block. Some ColdFires
-  *	have 2 of these.
+@@ -622,6 +622,31 @@ static struct platform_device mcf_flexcan0 = {
+ };
+ #endif /* MCFFLEXCAN_SIZE */
+ 
++#ifdef MCF_RNG_BASE
++/*
++ * Random Number Generator (RNG) - only on MCF54418
++ */
++static const struct resource mcf_rng_resource[] = {
++	{
++		.start = MCF_RNG_BASE,
++		.end   = MCF_RNG_BASE + MCF_RNG_SIZE - 1,
++		.flags = IORESOURCE_MEM,
++	},
++	{
++		.start = MCF_IRQ_RNG,
++		.end   = MCF_IRQ_RNG,
++		.flags = IORESOURCE_IRQ,
++	},
++};
++
++static struct platform_device mcf_rng = {
++	.name           = "imx-rngc",
++	.id             = -1,
++	.num_resources  = ARRAY_SIZE(mcf_rng_resource),
++	.resource       = mcf_rng_resource,
++};
++#endif /* MCF_RNG_BASE */
++
+ static struct platform_device *mcf_devices[] __initdata = {
+ 	&mcf_uart,
+ #ifdef MCFFEC_BASE0
+@@ -660,6 +685,9 @@ static struct platform_device *mcf_devices[] __initdata = {
+ #ifdef MCFFLEXCAN_SIZE
+ 	&mcf_flexcan0,
+ #endif
++#ifdef MCF_RNG_BASE
++	&mcf_rng,
++#endif
+ };
+ 
+ /*
+diff --git a/arch/m68k/coldfire/m5441x.c b/arch/m68k/coldfire/m5441x.c
+index 7a25cfc7ac07570ff15da3c55d080a717cf93a06..ab5b006372379294db3b522820de88137bfb7e78 100644
+--- a/arch/m68k/coldfire/m5441x.c
++++ b/arch/m68k/coldfire/m5441x.c
+@@ -158,6 +158,7 @@ static struct clk * const enable_clks[] __initconst = {
+ 	&__clk_0_33, /* pit.1 */
+ 	&__clk_0_37, /* eport */
+ 	&__clk_0_48, /* pll */
++	&__clk_0_49, /* rng */
+ 	&__clk_0_51, /* esdhc */
+ 
+ 	&__clk_1_36, /* CCM/reset module/Power management */
+@@ -179,7 +180,6 @@ static struct clk * const disable_clks[] __initconst = {
+ 	&__clk_0_44, /* usb otg */
+ 	&__clk_0_45, /* usb host */
+ 	&__clk_0_47, /* ssi.0 */
+-	&__clk_0_49, /* rng */
+ 	&__clk_0_50, /* ssi.1 */
+ 	&__clk_0_53, /* enet-fec */
+ 	&__clk_0_54, /* enet-fec */
+diff --git a/arch/m68k/include/asm/m5441xsim.h b/arch/m68k/include/asm/m5441xsim.h
+index f48cf63bd7822fd53c33788128f984585c0c421a..dd64cdfcad3e810254c6854b9de5b6bbeb67b950 100644
+--- a/arch/m68k/include/asm/m5441xsim.h
++++ b/arch/m68k/include/asm/m5441xsim.h
+@@ -198,6 +198,15 @@
+ #define MCFRTC_SIZE		(0xfc0a8840 - 0xfc0a8000)
+ #define MCF_IRQ_RTC		(MCFINT2_VECBASE + MCFINT2_RTC)
+ 
++/*
++ *  Random Number Generator (RNG) Module.
++ *  Note: Only present in MCF54418, not in MCF54410/54415/54417
++ */
++#define MCF_RNG_BASE		0xfc0c4000
++#define MCF_RNG_SIZE		0x1c
++#define MCFINT2_RNG		28
++#define MCF_IRQ_RNG		(MCFINT2_VECBASE + MCFINT2_RNG)
++
+ /*
+  *  GPIO Module.
   */
--static struct resource mcf_fec0_resources[] = {
-+static const struct resource mcf_fec0_resources[] = {
- 	{
- 		.start		= MCFFEC_BASE0,
- 		.end		= MCFFEC_BASE0 + MCFFEC_SIZE0 - 1,
-@@ -148,7 +148,7 @@ static struct platform_device mcf_fec0 = {
- #endif /* MCFFEC_BASE0 */
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 492a2a61a65be8bd9e46b0a70f3e43703973512e..e046eabaac2d9053a5a4a98c6e3733bb19258e54 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -270,12 +270,13 @@ config HW_RANDOM_MXC_RNGA
+ config HW_RANDOM_IMX_RNGC
+ 	tristate "Freescale i.MX RNGC Random Number Generator"
+ 	depends on HAS_IOMEM
+-	depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL || COMPILE_TEST
++	depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL || M5441x || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+ 	  Generator Version C hardware found on some Freescale i.MX
+ 	  processors. Version B is also supported by this driver.
++	  Also supports RNGB on Freescale MCF54418 (Coldfire V4e).
  
- #ifdef MCFFEC_BASE1
--static struct resource mcf_fec1_resources[] = {
-+static const struct resource mcf_fec1_resources[] = {
- 	{
- 		.start		= MCFFEC_BASE1,
- 		.end		= MCFFEC_BASE1 + MCFFEC_SIZE1 - 1,
-@@ -189,7 +189,7 @@ static struct platform_device mcf_fec1 = {
-  *	The ColdFire QSPI module is an SPI protocol hardware block used
-  *	on a number of different ColdFire CPUs.
-  */
--static struct resource mcf_qspi_resources[] = {
-+static const struct resource mcf_qspi_resources[] = {
- 	{
- 		.start		= MCFQSPI_BASE,
- 		.end		= MCFQSPI_BASE + MCFQSPI_SIZE - 1,
-@@ -340,7 +340,7 @@ static struct platform_device mcf_qspi = {
- #endif /* IS_ENABLED(CONFIG_SPI_COLDFIRE_QSPI) */
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called imx-rngc.
+diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+index 241664a9b5d9ac7244f15cbe5d5302ca3787ebea..44f20a05de0a425cb6ff7b2a347b111750ac3702 100644
+--- a/drivers/char/hw_random/imx-rngc.c
++++ b/drivers/char/hw_random/imx-rngc.c
+@@ -259,7 +259,7 @@ static int __init imx_rngc_probe(struct platform_device *pdev)
+ 	if (IS_ERR(rngc->base))
+ 		return PTR_ERR(rngc->base);
  
- #if IS_ENABLED(CONFIG_I2C_IMX)
--static struct resource mcf_i2c0_resources[] = {
-+static const struct resource mcf_i2c0_resources[] = {
- 	{
- 		.start          = MCFI2C_BASE0,
- 		.end            = MCFI2C_BASE0 + MCFI2C_SIZE0 - 1,
-@@ -361,7 +361,7 @@ static struct platform_device mcf_i2c0 = {
+-	rngc->clk = devm_clk_get(&pdev->dev, NULL);
++	rngc->clk = devm_clk_get_optional(&pdev->dev, NULL);
+ 	if (IS_ERR(rngc->clk))
+ 		return dev_err_probe(&pdev->dev, PTR_ERR(rngc->clk), "Cannot get rng_clk\n");
+ 
+@@ -353,12 +353,19 @@ static const struct of_device_id imx_rngc_dt_ids[] = {
  };
- #ifdef MCFI2C_BASE1
+ MODULE_DEVICE_TABLE(of, imx_rngc_dt_ids);
  
--static struct resource mcf_i2c1_resources[] = {
-+static const struct resource mcf_i2c1_resources[] = {
- 	{
- 		.start          = MCFI2C_BASE1,
- 		.end            = MCFI2C_BASE1 + MCFI2C_SIZE1 - 1,
-@@ -385,7 +385,7 @@ static struct platform_device mcf_i2c1 = {
- 
- #ifdef MCFI2C_BASE2
- 
--static struct resource mcf_i2c2_resources[] = {
-+static const struct resource mcf_i2c2_resources[] = {
- 	{
- 		.start          = MCFI2C_BASE2,
- 		.end            = MCFI2C_BASE2 + MCFI2C_SIZE2 - 1,
-@@ -409,7 +409,7 @@ static struct platform_device mcf_i2c2 = {
- 
- #ifdef MCFI2C_BASE3
- 
--static struct resource mcf_i2c3_resources[] = {
-+static const struct resource mcf_i2c3_resources[] = {
- 	{
- 		.start          = MCFI2C_BASE3,
- 		.end            = MCFI2C_BASE3 + MCFI2C_SIZE3 - 1,
-@@ -433,7 +433,7 @@ static struct platform_device mcf_i2c3 = {
- 
- #ifdef MCFI2C_BASE4
- 
--static struct resource mcf_i2c4_resources[] = {
-+static const struct resource mcf_i2c4_resources[] = {
- 	{
- 		.start          = MCFI2C_BASE4,
- 		.end            = MCFI2C_BASE4 + MCFI2C_SIZE4 - 1,
-@@ -457,7 +457,7 @@ static struct platform_device mcf_i2c4 = {
- 
- #ifdef MCFI2C_BASE5
- 
--static struct resource mcf_i2c5_resources[] = {
-+static const struct resource mcf_i2c5_resources[] = {
- 	{
- 		.start          = MCFI2C_BASE5,
- 		.end            = MCFI2C_BASE5 + MCFI2C_SIZE5 - 1,
-@@ -507,7 +507,7 @@ static struct mcf_edma_platform_data mcf_edma_data = {
- 	.slavecnt		= ARRAY_SIZE(mcf_edma_map),
++static const struct platform_device_id imx_rngc_devtype[] = {
++	{ .name = "imx-rngc" },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(platform, imx_rngc_devtype);
++
+ static struct platform_driver imx_rngc_driver = {
+ 	.driver = {
+ 		.name = KBUILD_MODNAME,
+ 		.pm = pm_ptr(&imx_rngc_pm_ops),
+ 		.of_match_table = imx_rngc_dt_ids,
+ 	},
++	.id_table = imx_rngc_devtype,
  };
  
--static struct resource mcf_edma_resources[] = {
-+static const struct resource mcf_edma_resources[] = {
- 	{
- 		.start		= MCFEDMA_BASE,
- 		.end		= MCFEDMA_BASE + MCFEDMA_SIZE - 1,
-@@ -560,7 +560,7 @@ static struct mcf_esdhc_platform_data mcf_esdhc_data = {
- 	.cd_type = ESDHC_CD_NONE,
- };
- 
--static struct resource mcf_esdhc_resources[] = {
-+static const struct resource mcf_esdhc_resources[] = {
- 	{
- 		.start = MCFSDHC_BASE,
- 		.end = MCFSDHC_BASE + MCFSDHC_SIZE - 1,
-@@ -590,7 +590,7 @@ static struct flexcan_platform_data mcf5441x_flexcan_info = {
- 	.clock_frequency = 120000000,
- };
- 
--static struct resource mcf5441x_flexcan0_resource[] = {
-+static const struct resource mcf5441x_flexcan0_resource[] = {
- 	{
- 		.start = MCFFLEXCAN_BASE0,
- 		.end = MCFFLEXCAN_BASE0 + MCFFLEXCAN_SIZE,
+ module_platform_driver_probe(imx_rngc_driver, imx_rngc_probe);
 
 -- 
 2.39.5
