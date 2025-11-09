@@ -1,75 +1,109 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1CD1482F2
-	for <linux-crypto@vger.kernel.org>; Sat,  8 Nov 2025 14:57:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B82334D3A9;
+	Sun,  9 Nov 2025 04:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762613866; cv=none; b=VcdeApNOLWBN3eRFn6NUBi238hffCTjTRKM3ZU6RIbsfD0QHOJcMD/5hUj+bABQILdc0RXEug3nwlhYP0ucYb55shYGAZCGnhHeCufHWgpCipzvGRGfPr5PvduvIsYlx1ooNY0KFoZ+LYyivuEkrTItgexH5gViOfsDMUtOUGzM=
+	t=1762663408; cv=none; b=CREf8ZQDC7Hew/5WVr3nXSnwtkAkQAJP9NUPL8ep55+B6uh3LFvRrNPmIr8bS6slecmekN9h+iEdq3194uVSYeYbpTNfpGfpoQM8qXBuinrrmQn6e+eoHQTeJAog+aOBAkepGhErPsNEaQf++ddLRWCWGwA5h4A4ajx+VZBwOEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762613866; c=relaxed/simple;
-	bh=9xG33c5hbKQopH0CAV0Bn0I3IvIDemsAuYVKtmP6i7c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jnQPX8BJcoKtnBul7nEueJxbB0XC8jNucrJA/KPxYjFfibAd3mO+f7rH/3jRko5VyZizjBGRWyWuS+fTYT7llA1/gbPSq4pZFGNrJp3d5yjXIrHnnMDfoqVe6Z8Hwxit6XsUurNyxfSkB89iQYSwlt98KZEA5X5L/NbvBNbnrnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hk+y3vZg; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1762663408; c=relaxed/simple;
+	bh=5CbNfJSCxl8HnzpXwbj6AAiDFFskY5T1/xV5lkIEmYc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FV9jRQ6nz28oR5IRk9miL1sBuWPCQx4Ats4Pqvqxw6X9+MTxLGlWmOtu49SidWjgLrxIw75I3n3gJfKWynuGL0yXlRR79B36ENwJjU9FO/Cc+HvN1G8IZ+mL5l8MjKrmuA0ykzj2XV2br3u203QofAy4C3k52FZo5P2R4r8TbbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gsWT4CJc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hk+y3vZg"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762613852;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eF83UrrqufcAO5fdD9HeFwWyXs7e6m4eqdJQzQl2LxA=;
-	b=hk+y3vZgpvqCd9e5Wbs/aQ0g7Bm+r8iEYQfWVKuM1o+aY+FSCp+YXoRnuUOZaEb8PrWBBF
-	mIQ9EGTQ8rmebv8zAT3RxsW8qR/xSccYIM9A4qN/hMMmg5auO2p4ab6w9zvhusMkSG9ZcR
-	eBJJxJpi0W1ugbzE4EvbW2C1u1XMSus=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nick Terrell <terrelln@fb.com>,
-	David Sterba <dsterba@suse.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: zstd - Remove unnecessary size_t cast
-Date: Sat,  8 Nov 2025 15:57:07 +0100
-Message-ID: <20251108145707.258538-2-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gsWT4CJc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AB04C4CEF8;
+	Sun,  9 Nov 2025 04:43:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762663407;
+	bh=5CbNfJSCxl8HnzpXwbj6AAiDFFskY5T1/xV5lkIEmYc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gsWT4CJcOnoXmiMm7bX3qTOENwIr71B6rdC5ssF0Hglo1gwuLcslrSoalIOlQcTj3
+	 qROtz73xYD/cMkB4++r3Uelu/oA51M0+S3zb6/seEtoJDMkn9MI9mnmMH5+fgKx6Yg
+	 hZ39g+K/Ng4L56glUYuIZqOU+rVE4URpH0XgcNgYuoGDzRbqNvCvwpr7D0d2ACIQYA
+	 QV7W45qHee1T+qIhLUPYjC0u/C9kMjd1s8ouDEM5FxnGdYEnkLgK3Gwi4nDqWlEWJD
+	 JM8HGcF6Es08PYV06Y22ab4Q5HporTmG9QxkD/DZHfjh4RFSRlhI8MU7SjGwVl3V/9
+	 zemUw3GDPDIlw==
+Date: Sun, 9 Nov 2025 06:43:24 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: Peter Huewe <peterhuewe@gmx.de>, linux-integrity@vger.kernel.org,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jens Wiklander <jens.wiklander@linaro.org>,
+	OP-TEE TrustedFirmware <op-tee@lists.trustedfirmware.org>,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] hwrng: tpm: Do not enable by default
+Message-ID: <aRAb7KEPmPmoyQbm@kernel.org>
+References: <bbc41534-a2d9-42dc-ac8a-ff8a0b4fd41f@siemens.com>
+ <aP_NN3HwO4Hp0-9T@kernel.org>
+ <9cbee028-81a7-4be6-aa31-907c7cc683e3@siemens.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9cbee028-81a7-4be6-aa31-907c7cc683e3@siemens.com>
 
-Use max() instead of max_t() since zstd_cstream_workspace_bound() and
-zstd_dstream_workspace_bound() already return size_t and casting the
-values is unnecessary.
+On Tue, Oct 28, 2025 at 06:46:39AM +0100, Jan Kiszka wrote:
+> On 27.10.25 20:51, Jarkko Sakkinen wrote:
+> > On Tue, Oct 21, 2025 at 02:46:15PM +0200, Jan Kiszka wrote:
+> >> From: Jan Kiszka <jan.kiszka@siemens.com>
+> >>
+> >> As seen with optee_ftpm, which uses ms-tpm-20-ref [1], a TPM may write
+> >> the current time epoch to its NV storage every 4 seconds if there are
+> >> commands sent to it. The 60 seconds periodic update of the entropy pool
+> >> that the hwrng kthread does triggers this, causing about 4 writes per
+> >> requests. Makes 2 millions per year for a 24/7 device, and that is a lot
+> >> for its backing NV storage.
+> >>
+> >> It is therefore better to make the user intentionally enable this,
+> >> providing a chance to read the warning.
+> >>
+> >> [1] https://github.com/Microsoft/ms-tpm-20-ref
+> >>
+> >> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> > 
+> > Looking at DRBG_* from [1] I don't see anything you describe. If OPTEE
+> > writes NVRAM,  then the implementation is broken.
+> 
+> It's not OP-TEE, but it might be indeed an artifact of the reference
+> implementation that the fTPM is using because it is also targeting
+> simulation:
+> 
+> https://github.com/microsoft/ms-tpm-20-ref/blob/ee21db0a941decd3cac67925ea3310873af60ab3/TPMCmd/tpm/src/main/ExecCommand.c#L99
+> (Page 942 in [1])
+> 
+> -> ... ->
+> 
+> https://github.com/microsoft/ms-tpm-20-ref/blob/main/TPMCmd/tpm/src/subsystem/Time.c#L68
+> (Page 1075 in [1])
+> 
+> > 
+> > Also AFAIK, it is pre-seeded per power cycle. There's nothing that even
+> > distantly relates on using NVRAM.
+> > 
+> > [1] https://trustedcomputinggroup.org/wp-content/uploads/TPM-2.0-1.83-Part-4-Supporting-Routines-Code.pdf
+> > 
+> > BR, Jarkko
+> 
+> Given how detailed [1] is, we likely need to address that directly there
+> to avoid spreading this issue into fTPMs. Fact is, that there firmware
+> implementations out there which exactly do what [1] suggests: writing to
+> NV every 4 seconds on every command.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- crypto/zstd.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+We don't reference code as a certified hardware product, sorry.
 
-diff --git a/crypto/zstd.c b/crypto/zstd.c
-index ac318d333b68..ff21cab382ba 100644
---- a/crypto/zstd.c
-+++ b/crypto/zstd.c
-@@ -38,9 +38,8 @@ static void *zstd_alloc_stream(void)
- 
- 	params = zstd_get_params(ZSTD_DEF_LEVEL, ZSTD_MAX_SIZE);
- 
--	wksp_size = max_t(size_t,
--			  zstd_cstream_workspace_bound(&params.cParams),
--			  zstd_dstream_workspace_bound(ZSTD_MAX_SIZE));
-+	wksp_size = max(zstd_cstream_workspace_bound(&params.cParams),
-+			zstd_dstream_workspace_bound(ZSTD_MAX_SIZE));
- 	if (!wksp_size)
- 		return ERR_PTR(-EINVAL);
- 
--- 
-2.51.1
+> 
+> Jan
+> 
+> -- 
+> Siemens AG, Foundational Technologies
+> Linux Expert Center
 
+BR, Jarkko
