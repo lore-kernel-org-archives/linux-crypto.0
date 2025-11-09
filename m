@@ -1,65 +1,36 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D4433F6;
-	Sun,  9 Nov 2025 14:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693942DE70C;
+	Sun,  9 Nov 2025 14:57:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762699558; cv=none; b=gu37KW7uEukbo/57tgHrvo29/4mA2yTQqfwclyAMbxc0MikMnnPPweZjW8EfB7n6X2eS5xbQfwZslRoZVvcUNzh3FwglQkgoXctbZAxnYwVkfsmDHhjZOdMZ23ZJkuva+agZ61HEiRgswQIicP6MVt1UKRqBELM3JzrcCF2awKQ=
+	t=1762700226; cv=none; b=bqdSxr9PWUhDwpFDLvXxT9WlKNlOCmhIy5xz968u7hHQ9MX8PiC4XQUMn/IhhfEeINO5nm78E+zc0Qx5woctbwUakOHel7vCsnOqDSBIsxsLInNmKVa6Q32b5AxwtzhBBVIHuzQgmslkWV0ZL6HMFHBhsz8JNjFgN8X/V/4yMxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762699558; c=relaxed/simple;
-	bh=1IcjavsIzywwpfImhhe3Ii+OnYJEwOlXREv3CiZfPdM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iX3OTx6UQR3yUyS8kTf5zNSBeGhD8mxdJ94KOBdPh88bGsnLXtaV/SX/oGlI+Npf/1hoX0rfRaNTfh2SAujSGZCQ0ntUmPrjlWBEYkIRwPmJjG598zhD1630cN9PoZ9yHg1B/9auYTKJJUjascq7yBu/pK/tWz+hADNAX7ut3Fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: c1d4f0b2bd7a11f0a38c85956e01ac42-20251109
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
-	DN_TRUSTED, SRC_TRUSTED, SA_EXISTED, SN_EXISTED, SPF_NOPASS
-	DKIM_NOPASS, DMARC_NOPASS, UD_TRUSTED, CIE_BAD, CIE_GOOD_SPF
-	CIE_UNKNOWN, GTI_FG_BS, GTI_C_CI, GTI_FG_IT, GTI_RG_INFO
-	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-CACHE: Type:Local,Time:202511092244+08,HitQuantity:1
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:e9c7f34b-8220-4242-a264-1003ae9b8153,IP:10,U
-	RL:0,TC:0,Content:0,EDM:-25,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACT
-	ION:release,TS:-45
-X-CID-INFO: VERSION:1.3.6,REQID:e9c7f34b-8220-4242-a264-1003ae9b8153,IP:10,URL
-	:0,TC:0,Content:0,EDM:-25,RT:0,SF:-30,FILE:0,BULK:0,RULE:EDM_GN8D19FE,ACTI
-	ON:release,TS:-45
-X-CID-META: VersionHash:a9d874c,CLOUDID:0a3df30eafa8c650610621555f9363b5,BulkI
-	D:2511092244216HOW2UMU,BulkQuantity:0,Recheck:0,SF:10|66|78|102|850,TC:nil
-	,Content:0|15|50,EDM:2,IP:-2,URL:1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil
-	,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_AEC,TF_CID_SPAM_ULS
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: c1d4f0b2bd7a11f0a38c85956e01ac42-20251109
-X-User: hehuiwen@kylinos.cn
-Received: from localhost.localdomain [(220.202.195.89)] by mailgw.kylinos.cn
-	(envelope-from <hehuiwen@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1672393917; Sun, 09 Nov 2025 22:45:38 +0800
-From: Huiwen He <hehuiwen@kylinos.cn>
-To: schalla@marvell.com
-Cc: bbhushan2@marvell.com,
+	s=arc-20240116; t=1762700226; c=relaxed/simple;
+	bh=m4XFGKFTDrqGxPfpMveNvzc7LGZutlSuep9QA58X1PQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZFnt5XRWB1pzfrdXs/ZuDdw9kyklNnGihRFmtwdb8jMQvDMxSagqnCIWPBMSxT2HO6X1AzMIDehL9NbgHIeiJnO2L+t0esHaVS3+iOxa97V+wRVwpSXL8VvI+LluYf4Otd7Fo+oPA1TWaOrAXJMD57yHxMwYnmj6W4VjvztKARo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=DxZJL26u; arc=none smtp.client-ip=45.254.49.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="DxZJL26u"
+Received: from LAPTOP-N070L597.localdomain (unknown [221.228.238.82])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 28ea96242;
+	Sun, 9 Nov 2025 22:56:52 +0800 (GMT+08:00)
+From: Zilin Guan <zilin@seu.edu.cn>
+To: kristen.c.accardi@intel.com
+Cc: vinicius.gomes@intel.com,
 	herbert@gondor.apana.org.au,
 	davem@davemloft.net,
-	krzk@kernel.org,
-	sbhatta@marvell.com,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Huiwen He <hehuiwen@kylinos.cn>
-Subject: [PATCH] crypto: octeontx2 - Replace deprecated strcpy() in cpt_ucode_load_fw()
-Date: Mon, 10 Nov 2025 06:45:15 +0800
-Message-Id: <20251109224515.182108-1-hehuiwen@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	jianhao.xu@seu.edu.cn,
+	Zilin Guan <zilin@seu.edu.cn>
+Subject: [PATCH] crypto: iaa - Fix incorrect return value in save_iaa_wq()
+Date: Sun,  9 Nov 2025 14:56:48 +0000
+Message-Id: <20251109145648.3678596-1-zilin@seu.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -67,40 +38,42 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9a691eb6cd03a1kunm1909047a9f17dc
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZHh9MVkxMHk9OS0xKT0geT1YeHw5VEwETFhoSFy
+	QUDg9ZV1kYEgtZQVlJSUpVSUlDVUlIQ1VDSVlXWRYaDxIVHRRZQVlLVUtVS1VLWQY+
+DKIM-Signature: a=rsa-sha256;
+	b=DxZJL26uSGz+LvKxIh380zmk686Y7XAVGOmPi2t7CLnAMeWsXUel4dqhm0JUN+kLUD3BkkKD3h1ddf83MOnM/VEf/XQnU56jOo1onV4wL5WpoAoY64as1k1e8ltiNWqTzig6Q0TmRXE8II9UaEGqGCkBNwQBpVNtQdWMuqNGgXA=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
+	bh=NYEg8jeFNgjtfLM1mSioLcSsaf0LlHh9g3RjFmqChaw=;
+	h=date:mime-version:subject:message-id:from;
 
-strlen() requires eng_type[8] to be NUL-terminated, but strcpy() does
-not check the buffer size or guarantee NUL termination. This may lead
-to out-of-bounds memory access when accessing eng_type[i].
+The save_iaa_wq() function unconditionally returns 0, even when an error
+is encountered. This prevents the error code from being propagated to the
+caller.
 
-Replace strcpy() with strscpy() to ensure NUL termination and prevent
-potential overflow. This improves code safety and robustness.
+Fix this by returning the 'ret' variable, which holds the actual status
+of the operations within the function.
 
-Link: https://github.com/KSPP/linux/issues/88
-Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+Fixes: ea7a5cbb43696 ("crypto: iaa - Add Intel IAA Compression Accelerator crypto driver core")
+Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
 ---
- drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-index ebdf4efa09d4..2371696df426 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-@@ -458,13 +458,13 @@ static int cpt_ucode_load_fw(struct pci_dev *pdev, struct fw_info_t *fw_info,
- 			     u16 rid)
- {
- 	char filename[OTX2_CPT_NAME_LENGTH];
--	char eng_type[8] = {0};
-+	char eng_type[8];
- 	int ret, e, i;
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+index 23f585219fb4..d0058757b000 100644
+--- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
++++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+@@ -805,7 +805,7 @@ static int save_iaa_wq(struct idxd_wq *wq)
+ 	if (!cpus_per_iaa)
+ 		cpus_per_iaa = 1;
+ out:
+-	return 0;
++	return ret;
+ }
  
- 	INIT_LIST_HEAD(&fw_info->ucodes);
- 
- 	for (e = 1; e < OTX2_CPT_MAX_ENG_TYPES; e++) {
--		strcpy(eng_type, get_eng_type_str(e));
-+		strscpy(eng_type, get_eng_type_str(e));
- 		for (i = 0; i < strlen(eng_type); i++)
- 			eng_type[i] = tolower(eng_type[i]);
- 
+ static void remove_iaa_wq(struct idxd_wq *wq)
 -- 
-2.25.1
+2.34.1
 
