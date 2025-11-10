@@ -1,32 +1,31 @@
 Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E11414A60C;
-	Mon, 10 Nov 2025 06:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1088021CC64;
+	Mon, 10 Nov 2025 07:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762757716; cv=none; b=FL/fXZjr+PreKEDJjDiQdONO8XpEW71z9Eh0geAhuscBNSG8JzM5zO6hLNJ94oRqQxSTFgdTNkQXduWRy/cKFB4Lh054mj44Q8PTsFHT1MDaqaMpuUbSNwYBodrIwR+z+a2n7aWswqIEFYpsmnlx/xj/9xRj2QgmTmcXULQggNE=
+	t=1762759255; cv=none; b=p7MORnCm1Was759pZoOXvVuSCLtZHRleAtx0N4W2CKX1v4tnmZl+Xut2GPapbEKGnoiWAKCkoaWEWkUjEH4u4mBDWOA+O7Pn+1cBo24ghIQ1W/GuDVxehcgPiiaGti5BycCCZEX5WJzffJ8BcEmM+obS0uH0FYRlWecdEcCbrEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762757716; c=relaxed/simple;
-	bh=vl24YyeTi1eeULzWrbNkRM3cgOR7pIDchtUMwWFoL0U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=btIC1jlmdtHf5sElfQ4ZI+5q7zLS/D2gwtLRWoSvVWzSDIcTalW1EB5c0mN4OxMOdXAp2akKLiWEh2QC92I9kFGCAwTN8/XIxLy7reYCGd8NWU8KUp2NAvDOMoOPdRQYrOOOJWBWVNhulNZCbwbuK8caGTXOiHFql4TCAdwFmdw=
+	s=arc-20240116; t=1762759255; c=relaxed/simple;
+	bh=8kLArvmlgfu3jBH0P7V+k+Ee5IjH+0qfY+EyhZHK81Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C4ChehhVNl4zgQ2cimcQL9MKthq6RQeHXtMmfbvbp7ZXWfds9ackZ+rJC7OrlQnPsN+cVBxxlKteGWI7OjmWiXLZ+X1AJnhNzJOlP0BR+BM4nMdqpi7aHdM2ktrRG2xIvQYtfbabANMtHfRW4CBhjVz6q0rmzrSbf0U7x+WmM8k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
 Received: from DESKTOP-L0HPE2S (unknown [124.16.141.245])
-	by APP-03 (Coremail) with SMTP id rQCowABH19kxjBFpPGk0AA--.10014S2;
-	Mon, 10 Nov 2025 14:54:42 +0800 (CST)
+	by APP-03 (Coremail) with SMTP id rQCowABX59lLkhFpSAA1AA--.10157S2;
+	Mon, 10 Nov 2025 15:20:45 +0800 (CST)
 From: Haotian Zhang <vulab@iscas.ac.cn>
-To: jiajie.ho@starfivetech.com,
-	william.qiu@starfivetech.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
+To: gilad@benyossef.com
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Haotian Zhang <vulab@iscas.ac.cn>
-Subject: [PATCH] crypto: starfive: Correctly handle return of sg_nents_for_len
-Date: Mon, 10 Nov 2025 14:54:38 +0800
-Message-ID: <20251110065438.898-1-vulab@iscas.ac.cn>
+Subject: [PATCH] crypto: ccree: Correctly handle return of sg_nents_for_len
+Date: Mon, 10 Nov 2025 15:20:41 +0800
+Message-ID: <20251110072041.941-1-vulab@iscas.ac.cn>
 X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -35,62 +34,62 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowABH19kxjBFpPGk0AA--.10014S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF4kWw1kKF4DAryxAw1fWFg_yoW8Ww1UpF
-	4YyFZYyrW5Jw17CF95JrnYkr1rJ3sakr12gFW0g34ayr15Xa4kZ34fCrW0qFnrAFZ7Gw18
-	KFZF9w15AFs8ZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:rQCowABX59lLkhFpSAA1AA--.10157S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJryfAr1kAFyrKFyUAF1UWrg_yoW8ArWrpF
+	Z8GrZYvrWFqw12vFy7tFy5WFWF9a9ruF42krWktwn7CrySvF9rXFyjka42v3WDCr1Iyr18
+	Ka1qka18G3WUXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvv14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
 	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
 	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
 	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
 	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
-	AVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUBVbkUUU
-	UU=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgoCA2kRRWaDEAABsE
+	AVWUtwCY02Avz4vE14v_GF4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73Uj
+	IFyTuYvjfUnzuWDUUUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwsCA2kRjlkPawAAsG
 
-The return value of sg_nents_for_len was assigned to an unsigned long
-in starfive_hash_digest, causing negative error codes to be converted
-to large positive integers.
+Fix error handling in cc_map_hash_request_update where sg_nents_for_len
+return value was assigned to u32, converting negative errors to large
+positive values before passing to sg_copy_to_buffer.
 
-Add error checking for sg_nents_for_len and return immediately on
-failure to prevent potential buffer overflows.
+Check sg_nents_for_len return value and propagate errors before
+assigning to areq_ctx->in_nents.
 
-Fixes: 7883d1b28a2b ("crypto: starfive - Add hash and HMAC support")
+Fixes: b7ec8530687a ("crypto: ccree - use std api when possible")
 Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
 ---
- drivers/crypto/starfive/jh7110-hash.c | 6 +++++-
+ drivers/crypto/ccree/cc_buffer_mgr.c | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/starfive/jh7110-hash.c b/drivers/crypto/starfive/jh7110-hash.c
-index 6cfe0238f615..66a8b04c0a55 100644
---- a/drivers/crypto/starfive/jh7110-hash.c
-+++ b/drivers/crypto/starfive/jh7110-hash.c
-@@ -326,6 +326,7 @@ static int starfive_hash_digest(struct ahash_request *req)
- 	struct starfive_cryp_ctx *ctx = crypto_ahash_ctx(tfm);
- 	struct starfive_cryp_request_ctx *rctx = ahash_request_ctx(req);
- 	struct starfive_cryp_dev *cryp = ctx->cryp;
-+	int sg_len;
+diff --git a/drivers/crypto/ccree/cc_buffer_mgr.c b/drivers/crypto/ccree/cc_buffer_mgr.c
+index 3963bb91321f..dc7e0cd51c25 100644
+--- a/drivers/crypto/ccree/cc_buffer_mgr.c
++++ b/drivers/crypto/ccree/cc_buffer_mgr.c
+@@ -1235,6 +1235,7 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
+ 	int rc = 0;
+ 	u32 dummy = 0;
+ 	u32 mapped_nents = 0;
++	int sg_nents;
  
- 	memset(rctx, 0, sizeof(struct starfive_cryp_request_ctx));
- 
-@@ -334,7 +335,10 @@ static int starfive_hash_digest(struct ahash_request *req)
- 	rctx->in_sg = req->src;
- 	rctx->blksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
- 	rctx->digsize = crypto_ahash_digestsize(tfm);
--	rctx->in_sg_len = sg_nents_for_len(rctx->in_sg, rctx->total);
-+	sg_len = sg_nents_for_len(rctx->in_sg, rctx->total);
-+	if (sg_len < 0)
-+		return sg_len;
-+	rctx->in_sg_len = sg_len;
- 	ctx->rctx = rctx;
- 
- 	return crypto_transfer_hash_request_to_engine(cryp->engine, req);
+ 	dev_dbg(dev, " update params : curr_buff=%p curr_buff_cnt=0x%X nbytes=0x%X src=%p curr_index=%u\n",
+ 		curr_buff, *curr_buff_cnt, nbytes, src, areq_ctx->buff_index);
+@@ -1248,7 +1249,10 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
+ 	if (total_in_len < block_size) {
+ 		dev_dbg(dev, " less than one block: curr_buff=%p *curr_buff_cnt=0x%X copy_to=%p\n",
+ 			curr_buff, *curr_buff_cnt, &curr_buff[*curr_buff_cnt]);
+-		areq_ctx->in_nents = sg_nents_for_len(src, nbytes);
++		sg_nents = sg_nents_for_len(src, nbytes);
++		if (sg_nents < 0)
++			return sg_nents;
++		areq_ctx->in_nents = sg_nents;
+ 		sg_copy_to_buffer(src, areq_ctx->in_nents,
+ 				  &curr_buff[*curr_buff_cnt], nbytes);
+ 		*curr_buff_cnt += nbytes;
 -- 
 2.50.1.windows.1
 
