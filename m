@@ -1,121 +1,200 @@
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252BE2F7AA2
-	for <linux-crypto@vger.kernel.org>; Mon, 10 Nov 2025 09:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93A82E92B0
+	for <linux-crypto@vger.kernel.org>; Mon, 10 Nov 2025 09:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762767114; cv=none; b=KUxeHTiFe5xxKve1hFhKkywAA8Fc58Ec4/Dsf7tP2JJZjTV3NSPLWai1W5XXTWJhFatFwhhWci2/jQzkB0tBlL99sr2vWrlvzFVeRl9kRpmVnYcjsN5bsIBzyNG9fm7bfMBQp+TvGxHUGxGGEUq31EW+bTJ7wrkZQq+Gru+ppJU=
+	t=1762767604; cv=none; b=qfOMmZXmQcejx7Z0SxPF1H3WSkl+kJxej4juD8k09MFwM5MmiuIsgQ02FMF5Pg/kCk0a41F9zByirOCOoOwpYwO2lHm1RBjg+K3+KfgkV00rijahiLN/sQhKTQuEm3xvPvWetqn8Y6IR8Z9YJ4clClt6DOayZw7ATGti9dFBxCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762767114; c=relaxed/simple;
-	bh=/fJzjpPCho25zV5kgp+Mt+JXbM7T0RiVyjwGWi7iCBY=;
+	s=arc-20240116; t=1762767604; c=relaxed/simple;
+	bh=SmCYeZZA+MZ4YAMzw1eRf/lethvMOqxmL8UnzEdKQB8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DoFigdI6jWTFumTuMEUMTzTxLJmf+LI6Ew0wHaGXHghrTDYcYcE3FZn+eLt/m+9R7aB1482xu8XNqi/WClv4nLUCFVsOsveMeiN5i3wpyYHYqeCy9YO7DjgeZ4+UjZ0C7d7EcJTeYrWtaaMhETJnopwg7kKqymAODiFYutcRlpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.51
+	 To:Cc:Content-Type; b=HnJExqNN5DbBRcHzKgnqAAcFKIDBwhyEXQ1N6JiclhOjXYpyDSchNcFW5CY2hO5smnpEd9Kh21Ihm/g/Em6GLUELLOjFb2R/oCQuK0ydsNk5r+erCTrn0coTkmz9eZO5dEuCf3OBtMmfSGNKujt21U6TCtc/Kke6BiWc5MGmzEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-5dbd2b7a7e3so2336527137.0
-        for <linux-crypto@vger.kernel.org>; Mon, 10 Nov 2025 01:31:53 -0800 (PST)
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-559836d04f6so1802715e0c.0
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Nov 2025 01:40:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762767112; x=1763371912;
+        d=1e100.net; s=20230601; t=1762767600; x=1763372400;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=hRtPdzI1Yw78zykFlB0XCziKqeVOXzigJtW+jsiVzcI=;
-        b=rSlf08PhJFbfRBdO5Xu4w77ijHr5ZyVqiqZ3P3p+F63Xfg5o+GuuB9N5QuVIjqIJXT
-         WuXE4x0SUEycgQj4oTGu5PknRL6J3Szx8zF1SEqNZVkNtG+nV679PM2hnC+lTpGOvJ3q
-         kpWKEO3QCuaIAI0+y61hpUw1fuCg/rL5+cMO1zDRKLzaFgTfOeqhfIRJneGgH1rUHs7V
-         o6aO64/80rO6hD5ksSwyK95Zwvh6FF6CjBy6mmUhBIukbvHza9iTChpKUDnPypq/J+Yu
-         XCXXAWHZgWGwI3BpIAD91OFgQ1oVqA74Hm4tSPTaGL6s8S0uRqdueHVhpfmNziIMsnhW
-         +Dsg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJRDUHvK3Pkp2EDhkPUXMvSVs8H4dCCltX4Sap/K/m1hDTY0+QPqoSechCgm6p3hOWd32tLC3poBnpUIE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKLP+5gBbXNfzzmzZbeuyX0FSVBor4vgw+WTemsJiPVvtOmvyO
-	5B95aojjKl8s5r140BYmUP60mjOBmjoYjOzJNh2hyLx0O2uv29ViWctpgvanVmgR
-X-Gm-Gg: ASbGncuYtb0y2ATA+tmrOIfMPyXQAUHzQBhuGUIUsKy6Ufepsv3p5pnMzbBqSeN4T3e
-	8zUXRV/OVudW+Bv85xYIy3/UvfdMWLYNbH35aDFdCyhZqHZMvM2A4c5qa4/2w01GWggxN+Zm2Vo
-	GjjzN39dZWKLtIT9dfkINgRCnXglXXpuRU4p/8/NBMBDk4TuhsT/a9bnZlyuMKuZ3p1SL+qzXW/
-	BmbBKI572nhemYUmFBC9kvr+Qxak+X6YP+viqIHKcQr5w69yuJ+urgcAIK1WyowK0MwueJAtW3F
-	vcX5Wd6rWzT9JegyB6U7pLj4sdVaiDfkRD5R1R4WGncPM9k4tSrei2Kt16CEYKwK04EExzNs+XL
-	SU9kQbkNJv/DO94nPaHC9KloUHpBf2MkV735dFn6rEXDN5pcEBj9d5fe6DIHASQJ4FQpd86feY5
-	iIo6KBP1FUpnG5JNPGgCA0OP/WzsCnXCnJvHtdRqX1FQ==
-X-Google-Smtp-Source: AGHT+IFqHRiZCnc4ZBhIR/7XtCIfLNkGXDFeHxcH2hZaWCdCCMl/AaKndC1rod9zimD8D2AI2+ew6Q==
-X-Received: by 2002:a05:6102:c04:b0:520:dbc0:6ac4 with SMTP id ada2fe7eead31-5ddc46497a0mr2779300137.2.1762767111962;
-        Mon, 10 Nov 2025 01:31:51 -0800 (PST)
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com. [209.85.222.42])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-55995862fe0sm6848037e0c.21.2025.11.10.01.31.50
+        bh=lsrcVDrEohRhH3DeIYD/Jz8ulaHSwnUzTLywFA/cyng=;
+        b=hxuQGl5YviNltEgYapXUOip+SEwZtIM13RUC0BfEPIuvPvB0dWVodrC0IQ2Tbn1Lp/
+         nm7V/mj5EZyjUYE0ezHDMeV1xhCbZ+83rqhsHDrMYHRYLHPdLtaLUnprtT2MI8FvQMqy
+         tayVscqLfFZyE0cC/mCwAADOLW68ZLjQUNmQStv1WfVUVcI7S25WvxRoGo0iJw1gRhrm
+         1BCmp/0+iSEsxPUbw9j4tOJGmNksotPlK/QJ/FTlZ75zP+9WXIfPZXAqChsl3oFNiGlj
+         yBlO86JhfBpki8XdwKqTajG0bShs1d9C3v2bpN0CiIBWlNRBbsdIpw8z9GyiQ+jFxlDh
+         rEtw==
+X-Forwarded-Encrypted: i=1; AJvYcCVxn1MMe7Gnbq/k09aWKbRqyRh84g1cDt20zdkyviwUBsZexf/5PZ9g4xoByymtlPeOYScu2NmS5iOFuuI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJN4DwJFZNzWRtJwe4NhkvVk5ns0APkuKfT8Jv+EH26UlO3sew
+	0KDwvx+zyx5WzMqotEBBUDeBcD/d3/aOT1a/VRIbBgmmad4dKGvYRIvY4nOYfFdv
+X-Gm-Gg: ASbGncs81xaRqkAF86EUVr5L+Yg+DIhG9bBExg9hcrDV6VYtQM2S7nuFk+M5NY4UVt7
+	Bli45xhyr7ltH6b8qYePMn6HXZ3eqnW4IuNqg6QcofZunF4HgJKFtR4O3DzqByoQELE7X9QxmQi
+	y9r7Phml3cGLDwhedx+qMUmBJ7GtKxZFtYSZ+2kDAVQiqmUjeFMT3yYdOx5KSFZ5IWwDH5sG20/
+	MZkIwNwQdJbNEXxOnOXGCb1g+mfkbYQ1iHwgUh0yghjsGToO/MGW6STKzQ1dJ6tn0x+OHqThkxd
+	3llGY+YyG6TMtmr80PPzXMyuEgWmfXXMFrqOxNi8hfQ7yRI92oiDH8U+31CE6pEYwohphcAw/J8
+	4G/kz/ii3PoHqGu+dOcsEZ0ZhXXnyUQc/VH8E7d+BvMCcH9t2XGIDZpEKB7ugQ+EBIc8PkHk14v
+	IhWmUBnkhPE6ZWIYlguPRE90Ar1YQlk8Xe6wJ+gRu3gtdXJ9GgrGrsQcYR
+X-Google-Smtp-Source: AGHT+IEdu6AyAuFvGmGjq/5juO+dPa/jw2JIVVnwdzjhAlolpOgfrnMfVu1r5tuvIyR+nlwefq9RBg==
+X-Received: by 2002:a05:6122:4687:b0:559:6092:936c with SMTP id 71dfb90a1353d-559b32c51a6mr2795926e0c.12.1762767600295;
+        Mon, 10 Nov 2025 01:40:00 -0800 (PST)
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com. [209.85.221.176])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-559957fb3c1sm7040196e0c.12.2025.11.10.01.40.00
         for <linux-crypto@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Nov 2025 01:31:50 -0800 (PST)
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-93728bac144so896057241.2
-        for <linux-crypto@vger.kernel.org>; Mon, 10 Nov 2025 01:31:50 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXuIatCbIo6ue0U6oCowCj4wgC65ktLRAyCiyxUpNj16di7cyAq94alzVtLjs3ScPLXGDQAGWj0d7UQjQE=@vger.kernel.org
-X-Received: by 2002:a05:6102:c04:b0:520:dbc0:6ac4 with SMTP id
- ada2fe7eead31-5ddc46497a0mr2779273137.2.1762767109934; Mon, 10 Nov 2025
- 01:31:49 -0800 (PST)
+        Mon, 10 Nov 2025 01:40:00 -0800 (PST)
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-5598b58d816so1888229e0c.3
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Nov 2025 01:40:00 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWhg6baZgEZc3X+MdnEfYV4TQhDpQmqcwokkeZ9DWgvsVcf7G+ubfcH75iqOqikxSh7T75aL7RXJhy74oQ=@vger.kernel.org
+X-Received: by 2002:a05:6102:162a:b0:5dd:8a20:d6eb with SMTP id
+ ada2fe7eead31-5ddc47517c6mr2576190137.25.1762767247552; Mon, 10 Nov 2025
+ 01:34:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251107-b4-m5441x-add-rng-support-v2-0-f91d685832b9@yoseli.org>
- <20251107-b4-m5441x-add-rng-support-v2-2-f91d685832b9@yoseli.org>
- <CAMuHMdWL76hY-Pv30ooSM1J6XkVWbRXSLTDCjfpPOvhFN4tKyA@mail.gmail.com> <12779401.O9o76ZdvQC@jeanmichel-ms7b89>
-In-Reply-To: <12779401.O9o76ZdvQC@jeanmichel-ms7b89>
+References: <cover.1762435376.git.geert+renesas@glider.be> <cfc32f8530d5c0d4a7fb33c482a4bf549f26ec24.1762435376.git.geert+renesas@glider.be>
+ <aQy0T2vUINze_6_q@smile.fi.intel.com> <CAMuHMdXVUJq36GvNUQE8FnHsX+=1jG4GOJ_034r=fgr_Rw4Djg@mail.gmail.com>
+ <aQzIIqNnTY41giH_@smile.fi.intel.com> <CAMuHMdW8ndAdGnSHopYFMWvw7wk7wKz_7+N91M1jRHoqK1KBrg@mail.gmail.com>
+ <c62eb5a727f149fb9d8b4a4c8d77418a@realtek.com> <CAHp75VeMqvywS20603yDSo-C3KCu+i+8vvDNuz3h9e8Ma9BOCw@mail.gmail.com>
+In-Reply-To: <CAHp75VeMqvywS20603yDSo-C3KCu+i+8vvDNuz3h9e8Ma9BOCw@mail.gmail.com>
 From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 10 Nov 2025 10:31:37 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdW26uKBUnYB5c3XAzKPKFVGNoOOwra_u_NOjPCV20Y-AA@mail.gmail.com>
-X-Gm-Features: AWmQ_blSVM0mC21k2j7-_pQqo1T8ZhoFgD5EPrlyILfYI73Lumvke_itdhGi4eY
-Message-ID: <CAMuHMdW26uKBUnYB5c3XAzKPKFVGNoOOwra_u_NOjPCV20Y-AA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] m68k: coldfire: Add RNG support for MCF54418
-To: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-Cc: Greg Ungerer <gerg@linux-m68k.org>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Shawn Guo <shawnguo@kernel.org>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Fabio Estevam <festevam@gmail.com>, linux-m68k@lists.linux-m68k.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Date: Mon, 10 Nov 2025 10:33:56 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdVUdey27RTX8mLsB5wsTfuW_mP_hF503AaF2QyS4awDcw@mail.gmail.com>
+X-Gm-Features: AWmQ_bkW2UuenDn6w7Wole8ay3msAtk8Ugj-awLiClF7uVATEqk1c30upT0lUKU
+Message-ID: <CAMuHMdVUdey27RTX8mLsB5wsTfuW_mP_hF503AaF2QyS4awDcw@mail.gmail.com>
+Subject: Re: [PATCH v6 12/26] bitfield: Add less-checking __FIELD_{GET,PREP}()
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Ping-Ke Shih <pkshih@realtek.com>, Andy Shevchenko <andriy.shevchenko@intel.com>, 
+	Yury Norov <yury.norov@gmail.com>, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	David Miller <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, 
+	Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, 
+	Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, 
+	Shan-Chun Hung <schung@nuvoton.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>, 
+	David Laight <david.laight.linux@gmail.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>, 
+	Michael Hennerich <Michael.Hennerich@analog.com>, Kim Seer Paller <kimseer.paller@analog.com>, 
+	David Lechner <dlechner@baylibre.com>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Andy Shevchenko <andy@kernel.org>, Richard Genoud <richard.genoud@bootlin.com>, 
+	Cosmin Tanislav <demonsingur@gmail.com>, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Jianping Shen <Jianping.Shen@de.bosch.com>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, 
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
+	"linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>, "qat-linux@intel.com" <qat-linux@intel.com>, 
+	"linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>, 
+	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>, 
+	"linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>, 
+	"linux-sound@vger.kernel.org" <linux-sound@vger.kernel.org>, 
+	"linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	linux-wireless <linux-wireless@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jean-Michel,
+Hi Ady,
 
-On Mon, 10 Nov 2025 at 09:34, Jean-Michel Hautbois
-<jeanmichel.hautbois@yoseli.org> wrote:
-> Le lundi 10 novembre 2025, 09:15:11 heure normale d=E2=80=99Europe centra=
-le Geert
-> Uytterhoeven a =C3=A9crit :
-> > On Fri, 7 Nov 2025 at 11:29, Jean-Michel Hautbois
-> > <jeanmichel.hautbois@yoseli.org> wrote:
-> > > Add platform device support for the MCF54418 RNGB hardware with clock
-> > > enabled at platform initialization.
+On Fri, 7 Nov 2025 at 09:00, Andy Shevchenko <andy.shevchenko@gmail.com> wr=
+ote:
+> On Fri, Nov 7, 2025 at 3:16=E2=80=AFAM Ping-Ke Shih <pkshih@realtek.com> =
+wrote:
+> > Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> > > On Thu, 6 Nov 2025 at 17:09, Andy Shevchenko
+> > > <andriy.shevchenko@intel.com> wrote:
+> > > > On Thu, Nov 06, 2025 at 03:49:03PM +0100, Geert Uytterhoeven wrote:
+> > > > > On Thu, 6 Nov 2025 at 15:44, Andy Shevchenko
+> > > > > <andriy.shevchenko@intel.com> wrote:
+> > > > > > On Thu, Nov 06, 2025 at 02:34:00PM +0100, Geert Uytterhoeven wr=
+ote:
+> > > > > > > The BUILD_BUG_ON_MSG() check against "~0ull" works only with =
+"unsigned
+> > > > > > > (long) long" _mask types.  For constant masks, that condition=
+ is usually
+> > > > > > > met, as GENMASK() yields an UL value.  The few places where t=
+he
+> > > > > > > constant mask is stored in an intermediate variable were fixe=
+d by
+> > > > > > > changing the variable type to u64 (see e.g. [1] and [2]).
+> > > > > > >
+> > > > > > > However, for non-constant masks, smaller unsigned types shoul=
+d be valid,
+> > > > > > > too, but currently lead to "result of comparison of constant
+> > > > > > > 18446744073709551615 with expression of type ... is always
+> > > > > > > false"-warnings with clang and W=3D1.
+> > > > > > >
+> > > > > > > Hence refactor the __BF_FIELD_CHECK() helper, and factor out
+> > > > > > > __FIELD_{GET,PREP}().  The later lack the single problematic =
+check, but
+> > > > > > > are otherwise identical to FIELD_{GET,PREP}(), and are intend=
+ed to be
+> > > > > > > used in the fully non-const variants later.
 > > >
-> > > The imx-rngc driver now uses devm_clk_get_optional() to support both
-> > > Coldfire (always-on clock) and i.MX platforms (managed clock).
+> > > > > > > +     BUILD_BUG_ON_MSG(__bf_cast_unsigned(mask, mask) >      =
+         \
+> > > > > > > +                      __bf_cast_unsigned(reg, ~0ull),       =
+         \
+> > > > > > > +                      pfx "type of reg too small for mask")
+> > > > > >
+> > > > > > Perhaps we may convert this (and others?) to static_assert():s =
+at some point?
+> > > > >
+> > > > > Nick tried that before, without success:
+> > > > > https://lore.kernel.org/all/CAKwvOdm_prtk1UQNJQGidZm44Lk582S3p=3D=
+of0y46+rVjnSgXJg@mail.gmail.com
+> > > >
+> > > > Ah, this is unfortunate.
 > > >
-> > > Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+> > > Of course, it might be an actual bug in the i915 driver...
+> > >
+> > > The extra checking in field_prep() in case the compiler can
+> > > determine that the mask is a constant already found a possible bug
+> > > in drivers/net/wireless/realtek/rtw89/core.c:rtw89_roc_end():
+> > >
+> > >     rtw89_write32_mask(rtwdev, reg, B_AX_RX_FLTR_CFG_MASK, rtwdev->ha=
+l.rx_fltr);
+> > >
+> > > drivers/net/wireless/realtek/rtw89/reg.h:
+> > >
+> > >     #define B_AX_RX_MPDU_MAX_LEN_MASK GENMASK(21, 16)
+> > >     #define B_AX_RX_FLTR_CFG_MASK ((u32)~B_AX_RX_MPDU_MAX_LEN_MASK)
+> > >
+> > > so it looks like B_AX_RX_FLTR_CFG_MASK is not the proper mask for
+> > > this operation...
 > >
-> > Thanks for your patch!
+> > The purpose of the statements is to update values excluding bits of
+> > B_AX_RX_MPDU_MAX_LEN_MASK. The use of B_AX_RX_FLTR_CFG_MASK is tricky, =
+but
+> > the operation is correct because bit 0 is set, so __ffs(mask) returns 0=
+ in
+> > rtw89_write32_mask(). Then, operation looks like
 > >
-> > > --- a/drivers/char/hw_random/Kconfig
-> > > +++ b/drivers/char/hw_random/Kconfig
-> > > @@ -270,12 +270,13 @@ config HW_RANDOM_MXC_RNGA
-> > >
-> > >  config HW_RANDOM_IMX_RNGC
-> > >
-> > >         tristate "Freescale i.MX RNGC Random Number Generator"
-> > >         depends on HAS_IOMEM
-> > >
-> > > -       depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6=
-UL ||
-> > > COMPILE_TEST +       depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SL=
-L ||
-> > > SOC_IMX6UL || M5441x || COMPILE_TEST
-> > Is the same RNG present in other Coldfire SoCs?
+> >    orig =3D read(reg);
+> >    new =3D (orig & ~mask) | (data & mask);
+> >    write(new);
+> >
+> > Since we don't use FIELD_{GET,PREP} macros with B_AX_RX_FLTR_CFG_MASK, =
+how
+> > can you find the problem? Please guide us. Thanks.
 >
-> According to the RM, it is only present in MCF54416 and MCF54418.
+> Isn't FIELD_MODIFY() what you want to use?
 
-I guess that is sufficient to make it depend on COLDFIRE?
+FIELD_MODIFY() is a rather recent addition.
+That is also the reason why I didn't add a non-const field_modify() yet
+(I didn't want to risk delaying this series even more ;-)
 
 Gr{oetje,eeting}s,
 
