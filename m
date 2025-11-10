@@ -1,174 +1,145 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251BD1DF723;
-	Mon, 10 Nov 2025 08:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31BF92F39BF
+	for <linux-crypto@vger.kernel.org>; Mon, 10 Nov 2025 08:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762763707; cv=none; b=SL8Dfk1sU/XXHXUB3s15EeGr95Rdm17LKvk8uCKrpl/1qyNqb/QvPnIAKLTE6qxKDDc/LmwuJ8+sZI/ts1d+oU5urCPLF1yrru1TG9iat3y/HjjFZoRSguHycsyoP5OnMOMdmdd/0Uh1869vLvhTD6JRxsCQjYJMrKIwg5nayYo=
+	t=1762765190; cv=none; b=RmWruaGZPAivZMsUzUP50CJ2aH5yL+I5d1JYL+Ru6UsEvMRVVvjic7W6pHSgz2xZBlTHKnnYoiomvEmehoWoKNmt/sgOHgzRMXfmI4Z23VP3tu9QAV0r5pKll15C7ZyZz1qx9W53v/+sGh/ka/RmPSWLLFkVZMXRuzy8tjuv7UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762763707; c=relaxed/simple;
-	bh=+ijNI65W+ZEFvK4Ew06TjA+hc0H10nDb/fRorO6fxqo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q6HtVtXysgArRscS6X/x7F48CkrMXPPNeYyuUHvewLR3xWuk/eS/SkbmNbq7kxtqZidTWBA7wM4XlaLVQs+LQ3hmXceILPhKUx3Es8NZ44VYTBo1KKApRx0fGb7COpU9CcDZJifLnZ3OyWwBg5r/+6l6QUt4jX8FO3+DS2sntI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org; spf=pass smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=A121KGlo; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yoseli.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="A121KGlo"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B2E6843A97;
-	Mon, 10 Nov 2025 08:34:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
-	t=1762763697;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z6wRniPCN18DmCkPRn+D/brzx7dyupMuJ1WbzWmkjT4=;
-	b=A121KGloifIUhJ77Bap/KOBzqy308FGX0YX9ci0cAfs5CYooKQhgPPLMF1FQtVjbVTJ6lv
-	2lkQ0FW1JGeCS0eKxh0frvsNIaLNqpPNws2awkS2/MJyc4KARgpqDsE4jl12Q2Qt1rrX+W
-	jbp/RnR1Ocsz1u0G0OWIrPDKObMSirSACifE1/RV3AEJIe38uDeYmvSc3qfOXS/kKzmvd4
-	Ffv/q8r/dhI+l0dkUO4pftTJslWKs5/tWVbNxZx9hquw9PWMEuhWxtXtbiEXBXJFHZb8W0
-	OR30Ia18TDhJPUsRXlm/wFCKiJGuqAt4xrkO+eynqfGwvm0qYuBr0i4a0y2ZkA==
-From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Greg Ungerer <gerg@linux-m68k.org>, Olivia Mackall <olivia@selenic.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, linux-m68k@lists.linux-m68k.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 2/2] m68k: coldfire: Add RNG support for MCF54418
-Date: Mon, 10 Nov 2025 09:34:42 +0100
-Message-ID: <12779401.O9o76ZdvQC@jeanmichel-ms7b89>
-In-Reply-To:
- <CAMuHMdWL76hY-Pv30ooSM1J6XkVWbRXSLTDCjfpPOvhFN4tKyA@mail.gmail.com>
-References:
- <20251107-b4-m5441x-add-rng-support-v2-0-f91d685832b9@yoseli.org>
- <20251107-b4-m5441x-add-rng-support-v2-2-f91d685832b9@yoseli.org>
- <CAMuHMdWL76hY-Pv30ooSM1J6XkVWbRXSLTDCjfpPOvhFN4tKyA@mail.gmail.com>
+	s=arc-20240116; t=1762765190; c=relaxed/simple;
+	bh=JRmjklDdMnXYPa/YzcCMj4xR0iBgS1Ed7pmHd076aaU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eFuxdM9WW2JhVBwcGf8ZY/BKeiFnDvqLK1STa6hsQb1wAbxdsuJ+KVVvqHzGKT5nD/PwRmqcimgHhBWVYMuYolWYVIjdV8nQilgKjS7Z63yChkhWM10AsHA4PBhjHo+YyYMyLdkaKRSu22m3k7ArEkmmyhzvSpg4wvCOHxjTw58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-55999cc2a87so340653e0c.0
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Nov 2025 00:59:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762765188; x=1763369988;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zuaR1c68u39/qbD5w07qCJ9IxeheIz5/8CL8hB/l6OE=;
+        b=GmJ8zMu8fEvf0Dnj3T5si4545ho4/xeKy/Z4bnHRvi6pDqADxCLqZk7fZnsKORSiyZ
+         6RHCkj86iWloeHu0Fs6cU74yrBV8PiNH8r1Ik2VHVow5PVE23EtPjOTZFZ1yGNlEKJJP
+         ZaiMjec1JbGosaZXsnAoob/KqCpiTcVf+idC5M/U6ZnET4mnF/IUhZ3fESUAIx/tahqE
+         rljffZqDfIbAA2UVeN0Riw2XVgCSNlVCEf9k76/q+soO7deAJa1tYoB135oxKTXWzMWo
+         ry+aRiZyr+FkGb9Yny7hueTsmYvyl57ebYqOyMShtt8bQxzH0953ZHXD6RN6jg8EBGCU
+         zaKA==
+X-Forwarded-Encrypted: i=1; AJvYcCU7hoNiai1zVCXd8KFmzJ9d1S+OEPPYVnltC+wK2ZKnd1W7fjg/iMZSNCqWQSNJdxeTGSyKwGNbbZsBchk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhS5Hr8Pn/8GTsEKy8HhPhWwn0/uF93x5MeqpxnpfQGCcRo+IX
+	06jsQuyDcoqhPu9UGIicgaKzcbCdvc2XIebYWo9Zy3QEmO2exhT9Q0Ue7u5fm3rC
+X-Gm-Gg: ASbGncsOJWvxZLrKUBkT6nujFQz74FRGP7C+LKgIQmQpQ/DPqUoDnJ4Ak2QySB8Aide
+	MhPtt6/YBxo+fs/+8a/mLN7q/xYwRD1OhFNRc48HcqGunF6+x1wBQ177zSI/PGY5Dq/pMKw4dRM
+	33QJQCyuwIiXlf4+uExXNrojRNCUphxruKXMyxwjxO3I0KaZF86WlxOsjDTy6f2wcmlLVqjYEwd
+	CkmyW23nFlffQ43MHLkXToG67PceviPm2vsZa3zpPauJAJUTe/5SP+evNNqgRKreUHFvfY3fuwf
+	HHDce0IjtlOWRyHMThHVhF5ZDLED1fNCfPqTEe7DNj9Cpk2tiaB1gLC5E35ybMliIS+m1NwGujj
+	uFpiEHYqQ71xgBlPcf/q+fZXFp8ikmrDol5DYGdcrkcsHbjQCFOSKv7JOTtxXhMQyjx/LvGZpXs
+	jrvK9r1oZp2K/f4lmIvI474phCKQWOByARG8T9an606q+NbFaESxHG
+X-Google-Smtp-Source: AGHT+IEBXM/xTHFOeHr1BecB5IthKiaExqAc1uMPx5ZmzgMgx5IFJlrW5mLeJ7wcCD5+TLSlejGRdg==
+X-Received: by 2002:a05:6122:4687:b0:559:6e78:a43a with SMTP id 71dfb90a1353d-559b328ca8fmr2226248e0c.9.1762765187749;
+        Mon, 10 Nov 2025 00:59:47 -0800 (PST)
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com. [209.85.217.51])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5599582860asm7179669e0c.16.2025.11.10.00.59.45
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Nov 2025 00:59:46 -0800 (PST)
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-5db2d2030bbso715169137.1
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Nov 2025 00:59:45 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVh62lviFNFJRT9u16PBfhyFVcFCsdyZnFK7yazJhWvBZyEVaDEaPQspINXBvunaU+dJYpA9OfBSML45cA=@vger.kernel.org
+X-Received: by 2002:a05:6102:950:b0:5db:fb4c:3a89 with SMTP id
+ ada2fe7eead31-5ddc471358fmr2304047137.19.1762765185596; Mon, 10 Nov 2025
+ 00:59:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduleejkeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkfgjfhgggfgtsehtqhertddttdejnecuhfhrohhmpeflvggrnhdqofhitghhvghlucfjrghuthgsohhishcuoehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrgheqnecuggftrfgrthhtvghrnhepffevhfduvdeludeugfdtleduuedvhfeuvdevgfeiieefieevteektdettdeifeetnecukfhppedvrgdtudemvgdtrgemudeileemjedugedtmedvrgegtdemfhefrggrmeejudejvgemudefsgdvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvtdgrmeduieelmeejudegtdemvdgrgedtmehffegrrgemjedujegvmedufegsvddphhgvlhhopehjvggrnhhmihgthhgvlhdqmhhsjegskeelrdhlohgtrghlnhgvthdpmhgrihhlfhhrohhmpehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrghdpnhgspghrtghpthhtohepudefpdhrtghpthhtohepghgvvghrtheslhhinhhugidqmheikehkrdhorhhgpdhrtghpthhtohepghgvrhhgsehlihhnuhigqdhmieekkhdrohhrghdprhgtphhtthhopeholhhivhhir
- gesshgvlhgvnhhitgdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepshhhrgifnhhguhhosehkvghrnhgvlhdrohhrghdprhgtphhtthhopehsrdhhrghuvghrsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopehkvghrnhgvlhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtohepfhgvshhtvghvrghmsehgmhgrihhlrdgtohhm
-X-GND-Sasl: jeanmichel.hautbois@yoseli.org
+References: <cover.1761588465.git.geert+renesas@glider.be> <97549838f28a1bb7861cfb42ee687f832942b13a.1761588465.git.geert+renesas@glider.be>
+ <20251102104326.0f1db96a@jic23-huawei> <CAMuHMdUkm2hxSW1yeKn8kZkSrosr8V-QTrHKSMkY2CPJ8UH_BQ@mail.gmail.com>
+ <20251109125956.106c9a1a@jic23-huawei>
+In-Reply-To: <20251109125956.106c9a1a@jic23-huawei>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 10 Nov 2025 09:59:34 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdX8c1VkBuPDpJ5mpCcRH+zEX4F1bQKFf_V8N9ZZtCYqxA@mail.gmail.com>
+X-Gm-Features: AWmQ_bmD7LCstBufqr7pTwqKUhf3WnheTdaFZy-l1C13xKAmQ3xomq2Nqy5MxZo
+Message-ID: <CAMuHMdX8c1VkBuPDpJ5mpCcRH+zEX4F1bQKFf_V8N9ZZtCYqxA@mail.gmail.com>
+Subject: Re: [PATCH -next v5 10/23] iio: imu: smi330: #undef
+ field_{get,prep}() before definition
+To: Jonathan Cameron <jic23@kernel.org>
+Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	David Miller <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, 
+	Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, 
+	Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, 
+	Shan-Chun Hung <schung@nuvoton.com>, Yury Norov <yury.norov@gmail.com>, 
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>, 
+	David Laight <david.laight.linux@gmail.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>, 
+	Michael Hennerich <Michael.Hennerich@analog.com>, Kim Seer Paller <kimseer.paller@analog.com>, 
+	David Lechner <dlechner@baylibre.com>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Andy Shevchenko <andy@kernel.org>, Richard Genoud <richard.genoud@bootlin.com>, 
+	Cosmin Tanislav <demonsingur@gmail.com>, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Jianping Shen <Jianping.Shen@de.bosch.com>, linux-clk@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-edac@vger.kernel.org, qat-linux@intel.com, 
+	linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org, 
+	linux-iio@vger.kernel.org, linux-sound@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Geert,
+Hi Jonathan,
 
-Le lundi 10 novembre 2025, 09:15:11 heure normale d=E2=80=99Europe centrale=
- Geert=20
-Uytterhoeven a =C3=A9crit :
-> Hi Jean-Michel,
->=20
-> On Fri, 7 Nov 2025 at 11:29, Jean-Michel Hautbois
->=20
-> <jeanmichel.hautbois@yoseli.org> wrote:
-> > Add platform device support for the MCF54418 RNGB hardware with clock
-> > enabled at platform initialization.
-> >=20
-> > The imx-rngc driver now uses devm_clk_get_optional() to support both
-> > Coldfire (always-on clock) and i.MX platforms (managed clock).
-> >=20
-> > Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
->=20
-> Thanks for your patch!
->=20
-> > --- a/drivers/char/hw_random/Kconfig
-> > +++ b/drivers/char/hw_random/Kconfig
-> > @@ -270,12 +270,13 @@ config HW_RANDOM_MXC_RNGA
-> >=20
-> >  config HW_RANDOM_IMX_RNGC
-> > =20
-> >         tristate "Freescale i.MX RNGC Random Number Generator"
-> >         depends on HAS_IOMEM
-> >=20
-> > -       depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL=
- ||
-> > COMPILE_TEST +       depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL =
-||
-> > SOC_IMX6UL || M5441x || COMPILE_TEST
-> Is the same RNG present in other Coldfire SoCs?
+On Sun, 9 Nov 2025 at 14:01, Jonathan Cameron <jic23@kernel.org> wrote:
+> On Mon, 3 Nov 2025 11:09:36 +0100
+> Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> > On Sun, 2 Nov 2025 at 11:43, Jonathan Cameron <jic23@kernel.org> wrote:
+> > > On Mon, 27 Oct 2025 19:41:44 +0100
+> > > Geert Uytterhoeven <geert+renesas@glider.be> wrote:
+> > >
+> > > > Prepare for the advent of globally available common field_get() and
+> > > > field_prep() macros by undefining the symbols before defining local
+> > > > variants.  This prevents redefinition warnings from the C preprocessor
+> > > > when introducing the common macros later.
+> > > >
+> > > > Suggested-by: Yury Norov <yury.norov@gmail.com>
+> > > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> > >
+> > > So this is going to make a mess of merging your series given this is
+> > > queued up for next merge window.
+> > >
+> > > I can pick this one up perhaps and we loop back to the replacement of
+> > > these in a future patch?  Or perhaps go instead with a rename
+> > > of these two which is probably nicer in the intermediate state than
+> > > undefs.
+> >
+> > Renaming would mean a lot of churn.
+> > Just picking up the #undef patch should be simple and safe? The
+> > removal of the underf and redef can be done in the next cycle.
+> > Thanks!
+>
+> Only 1 call of each of these in the driver, so churn is small either way.
+>
+> To avoid a bisection problem if your tree merges first I need to modify
+> this stuff in the original patch or leave it for Linus to deal with as
+> a merge conflict resolution which is mess I'd rather do without.
 
-According to the RM, it is only present in MCF54416 and MCF54418.
+If you add the #undef, there won't be any bisection problem?
 
->=20
-> >         default HW_RANDOM
-> >         help
-> >        =20
-> >           This driver provides kernel-side support for the Random Number
-> >           Generator Version C hardware found on some Freescale i.MX
-> >           processors. Version B is also supported by this driver.
-> >=20
-> > +         Also supports RNGB on Freescale MCF54418 (Coldfire V4e).
-> >=20
-> >           To compile this driver as a module, choose M here: the
-> >           module will be called imx-rngc.
-> >=20
-> > diff --git a/drivers/char/hw_random/imx-rngc.c
-> > b/drivers/char/hw_random/imx-rngc.c index
-> > 241664a9b5d9ac7244f15cbe5d5302ca3787ebea..44f20a05de0a425cb6ff7b2a347b1=
-11
-> > 750ac3702 100644 --- a/drivers/char/hw_random/imx-rngc.c
-> > +++ b/drivers/char/hw_random/imx-rngc.c
-> > @@ -353,12 +353,19 @@ static const struct of_device_id imx_rngc_dt_ids[=
-] =3D
-> > {>=20
-> >  };
-> >  MODULE_DEVICE_TABLE(of, imx_rngc_dt_ids);
-> >=20
-> > +static const struct platform_device_id imx_rngc_devtype[] =3D {
-> > +       { .name =3D "imx-rngc" },
->=20
-> I believe this is identical to KBUILD_MODNAME, so the .name below
-> should be sufficient for binding?
->=20
-> > +       { /* sentinel */ }
-> > +};
-> > +MODULE_DEVICE_TABLE(platform, imx_rngc_devtype);
->=20
-> Or do you need this mainly for the addition of MODULE_DEVICE_TABLE(),
-> i.e. the module is not auto-loaded based on just KBUILD_MODNAME?
+Gr{oetje,eeting}s,
 
-Yes, exactly. If you have a better way, I will happily apply it :-).
+                        Geert
 
-Thanks !
-JM
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
->=20
-> > +
-> >=20
-> >  static struct platform_driver imx_rngc_driver =3D {
-> > =20
-> >         .driver =3D {
-> >        =20
-> >                 .name =3D KBUILD_MODNAME,
->=20
->                   ^^^^^^^^^^^^^^^^^^^^^^^
->=20
-> >                 .pm =3D pm_ptr(&imx_rngc_pm_ops),
-> >                 .of_match_table =3D imx_rngc_dt_ids,
-> >        =20
-> >         },
-> >=20
-> > +       .id_table =3D imx_rngc_devtype,
-> >=20
-> >  };
-> > =20
-> >  module_platform_driver_probe(imx_rngc_driver, imx_rngc_probe);
->=20
-> Gr{oetje,eeting}s,
->=20
->                         Geert
-
-
-
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
