@@ -1,293 +1,203 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC3527EFE9;
-	Sun,  9 Nov 2025 23:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397E220330;
+	Mon, 10 Nov 2025 02:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762732201; cv=none; b=c6oAvDoK7iZObraG3sCd54DDRKboAZenZXxtT2sGTas66u0SBZkgyrGaETrTzuAUJicHboK0rOhH2HFELOCdPDQhG9vgU/XyeNg2KI267yUvVktxDAgDUFpQO14XKIF6zpL96AdVn3JKTyb/6bIqgT3FaVVz+4axRNBEXwuLiYs=
+	t=1762743004; cv=none; b=fDJj3yv66ygPC+MRFUzaMyUuvi5F/W185SNHrKkDTgACucZrEfIpzyK241ao8KsTRTkF1STL4Rsz92QL8BkaJi1NjpHNlydha+EsN+elI4MDWnGWWFh7W8arHtxqKQrVoePs9tKaYjXhE6LylqFWUdi7SuEILLJZsyhyvL819CA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762732201; c=relaxed/simple;
-	bh=nqSfESYD3WdUWSz/fBnUEecChZSD29umtZlw2xLsB0o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KphOvpRtx9Inz//tIz4f2kVhUO0+78ZV1WC1Lb8kt5LbzsgOwGiH74mKjmtmM83c7O04yPIpZtdFfHKQHLDvSVA4EYQ/HRcG1YJnECwJdzkR9Y486H2wl8gg+z207dxY1MAW7Wlbl4uFdD8qgvJq46LNtgiCNpFs5Lqjy2vlQBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ipyjBVVB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762743004; c=relaxed/simple;
+	bh=1cIL7/KPl3K5v0wQHaJ0tGfwMgE5xx/pMZWjRm2tfIk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:Content-Type:
+	 MIME-Version; b=hrkByD+UQ92iphiCNpB9AkVhN+x/5m7aLpvZdHKV0xGC6Ip8DYEAz/Yq2BkU82I00yCyUKCOyTaKqnfrp4JvrJH4/5FPPjkbTnrrBwUSvLHhuOockGBuCZ9bGdY1g1EwmRFHwqLKV2WEX44Tz7FSXXDzNYpmiJnWBIVTxM8cO+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=NXeu6m4w; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ipyjBVVB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B38CCC4CEF8;
-	Sun,  9 Nov 2025 23:49:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762732199;
-	bh=nqSfESYD3WdUWSz/fBnUEecChZSD29umtZlw2xLsB0o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ipyjBVVBmsPbmwitdkyiaqgT4axyARVg2FomhDjAfZkJc1ubHKtY/wftpORy2bCuo
-	 g3pkYu7Msd6Ua1c0v+tsP3fY+RprmxzK9s2+KaN6DKW0tl+eBqfxmfSgSq8W0qNhNM
-	 /Klt2r7KxtbhBX73y8AxEZZ1Hp1f2gK7VbciFBTvjrZuxAVn0g/+SfegyuxVAaOeT+
-	 cqgQL10S3WCaG5efZKJE5T722jmmCEIha+0RjvYOTfKohjIoS0xgNvupDTVy+gdMfE
-	 Ihy86GM1k2fQ+jAF5ZWJYRTlC/5S/GyBuFHdwo9aq7BPf439kTep7b2KvkifiqUUew
-	 YbRlwKqxunQbQ==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org,
-	x86@kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 8/9] crypto: testmgr - Remove polyval tests
-Date: Sun,  9 Nov 2025 15:47:23 -0800
-Message-ID: <20251109234726.638437-9-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.51.2
-In-Reply-To: <20251109234726.638437-1-ebiggers@kernel.org>
-References: <20251109234726.638437-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="NXeu6m4w"
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 5AA2hbGwB716235, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1762742617; bh=1cIL7/KPl3K5v0wQHaJ0tGfwMgE5xx/pMZWjRm2tfIk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version;
+	b=NXeu6m4w8KSIT/e89NQIAhnT0TTUgnu/lICYnlmDLN6lG+JAS5BBSg4pfyHxOZ+3G
+	 MzKwilsYGhtBNzZkD7rUNJCT3VNQl98gZXpKjgSPPQiuTxDdeIuzegB6cC4M5XsTJS
+	 AV7e9bElud20xerYcARWvseFofGg25WQqasBBRr5eZAnHJU18VeEzJYtSPiNV8xEjE
+	 78GOeYXYKc+5Kjgu9vL26BGNE5uua7vNEW7kgceGHaDh/qy5GivYAfodqfyMvlq2ap
+	 9zwrtSw2nup/b6fBieuy1tiYv1l7lLfGHKxd1nnqQcgtG3k9Hw7RTQVM7B8bAUUUrb
+	 a5rLbIXf8JWcA==
+Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 5AA2hbGwB716235
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 10 Nov 2025 10:43:37 +0800
+Received: from RTKEXHMBS06.realtek.com.tw (10.21.1.56) by
+ RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.27; Mon, 10 Nov 2025 10:43:37 +0800
+Received: from RTKEXHMBS06.realtek.com.tw (10.21.1.56) by
+ RTKEXHMBS06.realtek.com.tw (10.21.1.56) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.27; Mon, 10 Nov 2025 10:43:37 +0800
+Received: from RTKEXHMBS06.realtek.com.tw ([::1]) by
+ RTKEXHMBS06.realtek.com.tw ([fe80::744:4bc9:832c:9b7e%10]) with mapi id
+ 15.02.1544.027; Mon, 10 Nov 2025 10:43:37 +0800
+From: Ping-Ke Shih <pkshih@realtek.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+CC: Andy Shevchenko <andriy.shevchenko@intel.com>,
+        Yury Norov
+	<yury.norov@gmail.com>,
+        Michael Turquette <mturquette@baylibre.com>,
+        "Stephen
+ Boyd" <sboyd@kernel.org>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea
+	<claudiu.beznea@tuxon.dev>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski
+	<brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery
+	<andrew@codeconstruct.com.au>,
+        Crt Mori <cmo@melexis.com>, Jonathan Cameron
+	<jic23@kernel.org>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Jacky Huang
+	<ychuang3@nuvoton.com>,
+        Shan-Chun Hung <schung@nuvoton.com>,
+        Rasmus Villemoes
+	<linux@rasmusvillemoes.dk>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
+	<tiwai@suse.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Alex Elder <elder@ieee.org>,
+        David Laight
+	<david.laight.linux@gmail.com>,
+        Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+        Jason Baron <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>,
+        Tony Luck
+	<tony.luck@intel.com>,
+        Michael Hennerich <Michael.Hennerich@analog.com>,
+        "Kim
+ Seer Paller" <kimseer.paller@analog.com>,
+        David Lechner
+	<dlechner@baylibre.com>,
+        =?utf-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>,
+        "Andy
+ Shevchenko" <andy@kernel.org>,
+        Richard Genoud <richard.genoud@bootlin.com>,
+        Cosmin Tanislav <demonsingur@gmail.com>,
+        Biju Das
+	<biju.das.jz@bp.renesas.com>,
+        Jianping Shen <Jianping.Shen@de.bosch.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers
+	<nick.desaulniers+lkml@gmail.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+        "linux-renesas-soc@vger.kernel.org"
+	<linux-renesas-soc@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>,
+        "linux-edac@vger.kernel.org"
+	<linux-edac@vger.kernel.org>,
+        "qat-linux@intel.com" <qat-linux@intel.com>,
+        "linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "linux-sound@vger.kernel.org" <linux-sound@vger.kernel.org>,
+        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-wireless
+	<linux-wireless@vger.kernel.org>
+Subject: RE: [PATCH v6 12/26] bitfield: Add less-checking __FIELD_{GET,PREP}()
+Thread-Topic: [PATCH v6 12/26] bitfield: Add less-checking
+ __FIELD_{GET,PREP}()
+Thread-Index: AQHcTzpEEEZZM/7p4kSHE1AyVJF587TmYVZQ///87ICAAIzmQIAETHKg
+Date: Mon, 10 Nov 2025 02:43:37 +0000
+Message-ID: <5cc8a69c155948078bd14e5f031e4468@realtek.com>
+References: <cover.1762435376.git.geert+renesas@glider.be>
+ <cfc32f8530d5c0d4a7fb33c482a4bf549f26ec24.1762435376.git.geert+renesas@glider.be>
+ <aQy0T2vUINze_6_q@smile.fi.intel.com>
+ <CAMuHMdXVUJq36GvNUQE8FnHsX+=1jG4GOJ_034r=fgr_Rw4Djg@mail.gmail.com>
+ <aQzIIqNnTY41giH_@smile.fi.intel.com>
+ <CAMuHMdW8ndAdGnSHopYFMWvw7wk7wKz_7+N91M1jRHoqK1KBrg@mail.gmail.com>
+ <c62eb5a727f149fb9d8b4a4c8d77418a@realtek.com>
+ <CAMuHMdU3hWDOWXxuOJcBA7tphBT7X-0H+g0-oq0tZdKw+O5W3A@mail.gmail.com> 
+Accept-Language: en-US, zh-TW
+Content-Language: zh-TW
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-These are no longer used, since polyval support has been removed from
-the crypto_shash API.
-
-POLYVAL remains supported via lib/crypto/, where it has a KUnit test
-suite instead.
-
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- crypto/tcrypt.c  |   4 --
- crypto/testmgr.c |   6 --
- crypto/testmgr.h | 171 -----------------------------------------------
- 3 files changed, 181 deletions(-)
-
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index d1d88debbd71..32d9eaf2c8af 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1688,14 +1688,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 
- 	case 56:
- 		ret = min(ret, tcrypt_test("ccm(sm4)"));
- 		break;
- 
--	case 57:
--		ret = min(ret, tcrypt_test("polyval"));
--		break;
--
- 	case 58:
- 		ret = min(ret, tcrypt_test("gcm(aria)"));
- 		break;
- 
- 	case 59:
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 499e979a56dc..6fb53978df11 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5368,16 +5368,10 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.fips_allowed = 1,
- 	}, {
- 		.alg = "pkcs1pad(rsa)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
--	}, {
--		.alg = "polyval",
--		.test = alg_test_hash,
--		.suite = {
--			.hash = __VECS(polyval_tv_template)
--		}
- 	}, {
- 		.alg = "rfc3686(ctr(aes))",
- 		.test = alg_test_skcipher,
- 		.fips_allowed = 1,
- 		.suite = {
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 268231227282..a3e4695945ca 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -36233,181 +36233,10 @@ static const struct cipher_testvec aes_xctr_tv_template[] = {
- 		.len	= 512,
- 	},
- 
- };
- 
--/*
-- * Test vectors generated using https://github.com/google/hctr2
-- *
-- * To ensure compatibility with RFC 8452, some tests were sourced from
-- * https://datatracker.ietf.org/doc/html/rfc8452
-- */
--static const struct hash_testvec polyval_tv_template[] = {
--	{ // From RFC 8452
--		.key	= "\x31\x07\x28\xd9\x91\x1f\x1f\x38"
--			  "\x37\xb2\x43\x16\xc3\xfa\xb9\xa0",
--		.plaintext	= "\x65\x78\x61\x6d\x70\x6c\x65\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x48\x65\x6c\x6c\x6f\x20\x77\x6f"
--			  "\x72\x6c\x64\x00\x00\x00\x00\x00"
--			  "\x38\x00\x00\x00\x00\x00\x00\x00"
--			  "\x58\x00\x00\x00\x00\x00\x00\x00",
--		.digest	= "\xad\x7f\xcf\x0b\x51\x69\x85\x16"
--			  "\x62\x67\x2f\x3c\x5f\x95\x13\x8f",
--		.psize	= 48,
--		.ksize	= 16,
--	},
--	{ // From RFC 8452
--		.key	= "\xd9\xb3\x60\x27\x96\x94\x94\x1a"
--			  "\xc5\xdb\xc6\x98\x7a\xda\x73\x77",
--		.plaintext	= "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00",
--		.digest	= "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00",
--		.psize	= 16,
--		.ksize	= 16,
--	},
--	{ // From RFC 8452
--		.key	= "\xd9\xb3\x60\x27\x96\x94\x94\x1a"
--			  "\xc5\xdb\xc6\x98\x7a\xda\x73\x77",
--		.plaintext	= "\x01\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x40\x00\x00\x00\x00\x00\x00\x00",
--		.digest	= "\xeb\x93\xb7\x74\x09\x62\xc5\xe4"
--			  "\x9d\x2a\x90\xa7\xdc\x5c\xec\x74",
--		.psize	= 32,
--		.ksize	= 16,
--	},
--	{ // From RFC 8452
--		.key	= "\xd9\xb3\x60\x27\x96\x94\x94\x1a"
--			  "\xc5\xdb\xc6\x98\x7a\xda\x73\x77",
--		.plaintext	= "\x01\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x02\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x03\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x80\x01\x00\x00\x00\x00\x00\x00",
--		.digest	= "\x81\x38\x87\x46\xbc\x22\xd2\x6b"
--			  "\x2a\xbc\x3d\xcb\x15\x75\x42\x22",
--		.psize	= 64,
--		.ksize	= 16,
--	},
--	{ // From RFC 8452
--		.key	= "\xd9\xb3\x60\x27\x96\x94\x94\x1a"
--			  "\xc5\xdb\xc6\x98\x7a\xda\x73\x77",
--		.plaintext	= "\x01\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x02\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x03\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x04\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x02\x00\x00\x00\x00\x00\x00",
--		.digest	= "\x1e\x39\xb6\xd3\x34\x4d\x34\x8f"
--			  "\x60\x44\xf8\x99\x35\xd1\xcf\x78",
--		.psize	= 80,
--		.ksize	= 16,
--	},
--	{ // From RFC 8452
--		.key	= "\xd9\xb3\x60\x27\x96\x94\x94\x1a"
--			  "\xc5\xdb\xc6\x98\x7a\xda\x73\x77",
--		.plaintext	= "\x01\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x02\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x03\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x04\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x05\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x08\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x02\x00\x00\x00\x00\x00\x00",
--		.digest	= "\xff\xcd\x05\xd5\x77\x0f\x34\xad"
--			  "\x92\x67\xf0\xa5\x99\x94\xb1\x5a",
--		.psize	= 96,
--		.ksize	= 16,
--	},
--	{ // Random ( 1)
--		.key	= "\x90\xcc\xac\xee\xba\xd7\xd4\x68"
--			  "\x98\xa6\x79\x70\xdf\x66\x15\x6c",
--		.plaintext	= "",
--		.digest	= "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00",
--		.psize	= 0,
--		.ksize	= 16,
--	},
--	{ // Random ( 1)
--		.key	= "\xc1\x45\x71\xf0\x30\x07\x94\xe7"
--			  "\x3a\xdd\xe4\xc6\x19\x2d\x02\xa2",
--		.plaintext	= "\xc1\x5d\x47\xc7\x4c\x7c\x5e\x07"
--			  "\x85\x14\x8f\x79\xcc\x73\x83\xf7"
--			  "\x35\xb8\xcb\x73\x61\xf0\x53\x31"
--			  "\xbf\x84\xde\xb6\xde\xaf\xb0\xb8"
--			  "\xb7\xd9\x11\x91\x89\xfd\x1e\x4c"
--			  "\x84\x4a\x1f\x2a\x87\xa4\xaf\x62"
--			  "\x8d\x7d\x58\xf6\x43\x35\xfc\x53"
--			  "\x8f\x1a\xf6\x12\xe1\x13\x3f\x66"
--			  "\x91\x4b\x13\xd6\x45\xfb\xb0\x7a"
--			  "\xe0\x8b\x8e\x99\xf7\x86\x46\x37"
--			  "\xd1\x22\x9e\x52\xf3\x3f\xd9\x75"
--			  "\x2c\x2c\xc6\xbb\x0e\x08\x14\x29"
--			  "\xe8\x50\x2f\xd8\xbe\xf4\xe9\x69"
--			  "\x4a\xee\xf7\xae\x15\x65\x35\x1e",
--		.digest	= "\x00\x4f\x5d\xe9\x3b\xc0\xd6\x50"
--			  "\x3e\x38\x73\x86\xc6\xda\xca\x7f",
--		.psize	= 112,
--		.ksize	= 16,
--	},
--	{ // Random ( 1)
--		.key	= "\x37\xbe\x68\x16\x50\xb9\x4e\xb0"
--			  "\x47\xde\xe2\xbd\xde\xe4\x48\x09",
--		.plaintext	= "\x87\xfc\x68\x9f\xff\xf2\x4a\x1e"
--			  "\x82\x3b\x73\x8f\xc1\xb2\x1b\x7a"
--			  "\x6c\x4f\x81\xbc\x88\x9b\x6c\xa3"
--			  "\x9c\xc2\xa5\xbc\x14\x70\x4c\x9b"
--			  "\x0c\x9f\x59\x92\x16\x4b\x91\x3d"
--			  "\x18\x55\x22\x68\x12\x8c\x63\xb2"
--			  "\x51\xcb\x85\x4b\xd2\xae\x0b\x1c"
--			  "\x5d\x28\x9d\x1d\xb1\xc8\xf0\x77"
--			  "\xe9\xb5\x07\x4e\x06\xc8\xee\xf8"
--			  "\x1b\xed\x72\x2a\x55\x7d\x16\xc9"
--			  "\xf2\x54\xe7\xe9\xe0\x44\x5b\x33"
--			  "\xb1\x49\xee\xff\x43\xfb\x82\xcd"
--			  "\x4a\x70\x78\x81\xa4\x34\x36\xe8"
--			  "\x4c\x28\x54\xa6\x6c\xc3\x6b\x78"
--			  "\xe7\xc0\x5d\xc6\x5d\x81\xab\x70"
--			  "\x08\x86\xa1\xfd\xf4\x77\x55\xfd"
--			  "\xa3\xe9\xe2\x1b\xdf\x99\xb7\x80"
--			  "\xf9\x0a\x4f\x72\x4a\xd3\xaf\xbb"
--			  "\xb3\x3b\xeb\x08\x58\x0f\x79\xce"
--			  "\xa5\x99\x05\x12\x34\xd4\xf4\x86"
--			  "\x37\x23\x1d\xc8\x49\xc0\x92\xae"
--			  "\xa6\xac\x9b\x31\x55\xed\x15\xc6"
--			  "\x05\x17\x37\x8d\x90\x42\xe4\x87"
--			  "\x89\x62\x88\x69\x1c\x6a\xfd\xe3"
--			  "\x00\x2b\x47\x1a\x73\xc1\x51\xc2"
--			  "\xc0\x62\x74\x6a\x9e\xb2\xe5\x21"
--			  "\xbe\x90\xb5\xb0\x50\xca\x88\x68"
--			  "\xe1\x9d\x7a\xdf\x6c\xb7\xb9\x98"
--			  "\xee\x28\x62\x61\x8b\xd1\x47\xf9"
--			  "\x04\x7a\x0b\x5d\xcd\x2b\x65\xf5"
--			  "\x12\xa3\xfe\x1a\xaa\x2c\x78\x42"
--			  "\xb8\xbe\x7d\x74\xeb\x59\xba\xba",
--		.digest	= "\xae\x11\xd4\x60\x2a\x5f\x9e\x42"
--			  "\x89\x04\xc2\x34\x8d\x55\x94\x0a",
--		.psize	= 256,
--		.ksize	= 16,
--	},
--
--};
--
- /*
-  * Test vectors generated using https://github.com/google/hctr2
-  */
- static const struct cipher_testvec aes_hctr2_tv_template[] = {
- 	{
--- 
-2.51.2
-
+SGkgR2VlcnQsDQoNClBpbmctS2UgU2hpaCA8cGtzaGloQHJlYWx0ZWsuY29tPiB3cm90ZToNCj4g
+R2VlcnQgVXl0dGVyaG9ldmVuIDxnZWVydEBsaW51eC1tNjhrLm9yZz4gd3JvdGU6DQo+ID4gSGkg
+UGluZy1LZSwNCj4gPg0KPiA+IE9uIEZyaSwgNyBOb3YgMjAyNSBhdCAwMjoxNiwgUGluZy1LZSBT
+aGloIDxwa3NoaWhAcmVhbHRlay5jb20+IHdyb3RlOg0KPiA+ID4gR2VlcnQgVXl0dGVyaG9ldmVu
+IDxnZWVydEBsaW51eC1tNjhrLm9yZz4gd3JvdGU6DQo+ID4gPiA+IFRoZSBleHRyYSBjaGVja2lu
+ZyBpbiBmaWVsZF9wcmVwKCkgaW4gY2FzZSB0aGUgY29tcGlsZXIgY2FuDQo+ID4gPiA+IGRldGVy
+bWluZSB0aGF0IHRoZSBtYXNrIGlzIGEgY29uc3RhbnQgYWxyZWFkeSBmb3VuZCBhIHBvc3NpYmxl
+IGJ1Zw0KPiA+ID4gPiBpbiBkcml2ZXJzL25ldC93aXJlbGVzcy9yZWFsdGVrL3J0dzg5L2NvcmUu
+YzpydHc4OV9yb2NfZW5kKCk6DQo+ID4gPiA+DQo+ID4gPiA+ICAgICBydHc4OV93cml0ZTMyX21h
+c2socnR3ZGV2LCByZWcsIEJfQVhfUlhfRkxUUl9DRkdfTUFTSywgcnR3ZGV2LT5oYWwucnhfZmx0
+cik7DQo+ID4gPiA+DQo+ID4gPiA+IGRyaXZlcnMvbmV0L3dpcmVsZXNzL3JlYWx0ZWsvcnR3ODkv
+cmVnLmg6DQo+ID4gPiA+DQo+ID4gPiA+ICAgICAjZGVmaW5lIEJfQVhfUlhfTVBEVV9NQVhfTEVO
+X01BU0sgR0VOTUFTSygyMSwgMTYpDQo+ID4gPiA+ICAgICAjZGVmaW5lIEJfQVhfUlhfRkxUUl9D
+RkdfTUFTSyAoKHUzMil+Ql9BWF9SWF9NUERVX01BWF9MRU5fTUFTSykNCj4gPiA+ID4NCj4gPiA+
+ID4gc28gaXQgbG9va3MgbGlrZSBCX0FYX1JYX0ZMVFJfQ0ZHX01BU0sgaXMgbm90IHRoZSBwcm9w
+ZXIgbWFzayBmb3INCj4gPiA+ID4gdGhpcyBvcGVyYXRpb24uLi4NCj4gPiA+DQo+ID4gPiBUaGUg
+cHVycG9zZSBvZiB0aGUgc3RhdGVtZW50cyBpcyB0byB1cGRhdGUgdmFsdWVzIGV4Y2x1ZGluZyBi
+aXRzIG9mDQo+ID4gPiBCX0FYX1JYX01QRFVfTUFYX0xFTl9NQVNLLiBUaGUgdXNlIG9mIEJfQVhf
+UlhfRkxUUl9DRkdfTUFTSyBpcyB0cmlja3ksIGJ1dA0KPiA+ID4gdGhlIG9wZXJhdGlvbiBpcyBj
+b3JyZWN0IGJlY2F1c2UgYml0IDAgaXMgc2V0LCBzbyBfX2ZmcyhtYXNrKSByZXR1cm5zIDAgaW4N
+Cj4gPiA+IHJ0dzg5X3dyaXRlMzJfbWFzaygpLiBUaGVuLCBvcGVyYXRpb24gbG9va3MgbGlrZQ0K
+PiA+ID4NCj4gPiA+ICAgIG9yaWcgPSByZWFkKHJlZyk7DQo+ID4gPiAgICBuZXcgPSAob3JpZyAm
+IH5tYXNrKSB8IChkYXRhICYgbWFzayk7DQo+ID4gPiAgICB3cml0ZShuZXcpOw0KPiA+DQo+ID4g
+VGhhbmtzIGZvciB5b3VyIHF1aWNrIGNvbmZpcm1hdGlvbiENCj4gPiBTbyB0aGUgaW50ZW50aW9u
+IHJlYWxseSBpcyB0byBjbGVhciBiaXRzIDIyLTMxLCBhbmQgd3JpdGUgdGhlIHJ4X2ZsdHINCj4g
+PiB2YWx1ZSB0byBiaXRzIDAtMTU/DQo+ID4NCj4gPiBpZiB0aGUgY2xlYXJpbmcgaXMgbm90IG5l
+ZWRlZCwgaXQgd291bGQgYmUgYmV0dGVyIHRvIHVzZQ0KPiA+ICNkZWZpbmUgQl9BWF9SWF9GTFRS
+X0NGR19NQVNLIEdFTk1BU0soMTUsIDApDQo+IA0KPiBCdXQgaXQgc2hvdWxkIGJlDQo+ICNkZWZp
+bmUgQl9BWF9SWF9GTFRSX0NGR19NQVNLIChHRU5NQVNLKDMxLCAyMikgfCBHRU5NQVNLKDE1LCAw
+KSkNCj4gDQo+IE9yaWdpbmFsbHkgKHdpdGggYnVnKSB3ZSBqdXN0IGJhY2t1cCByeF9mbHRyIGFu
+ZCB3cml0ZSB3aG9sZSAzMi1iaXRzIGJhY2ssDQo+IGJ1dCBpdCdzIGluY29ycmVjdCB0byBtb2Rp
+ZnkgR0VOTUFTSygyMSwgMTYpIHdoaWNoIGlzIHdyaXR0ZW4gYnkgYW5vdGhlcg0KPiBjb2RlLg0K
+PiANCj4gT25lIHdheSBpcyB0byBpbXBsZW1lbnQgYSBzcGVjaWFsIGZ1bmN0aW9uIHRvIHJlcGxh
+Y2UNCj4gICBydHc4OV93cml0ZTMyX21hc2socnR3ZGV2LCByZWcsIEJfQVhfUlhfRkxUUl9DRkdf
+TUFTSywgcnR3ZGV2LT5oYWwucnhfZmx0cik7DQo+IFN1Y2ggYXMNCj4gICBydHc4OV93cml0ZV9y
+eF9mbHRlcihydHdkZXYsIHJ0d2Rldi0+aGFsLnJ4X2ZsdHIpDQo+ICAgew0KPiAgICAgb3JpZyA9
+IHJlYWQocmVnKTsNCj4gICAgIG5ldyA9IChvcmlnICYgfm1hc2spIHwgKGRhdGEgJiBtYXNrKTsN
+Cj4gICAgIHdyaXRlKG5ldyk7DQo+ICAgfQ0KPiANCj4gQW5vdGhlciB3YXkgaXMgdGhhdCBJIGFk
+ZCB2YWx1ZSBvZiBCX0FYX1JYX01QRFVfTUFYX0xFTl9NQVNLIGludG8NCj4gcnR3ZGV2LT5oYWwu
+cnhfZmx0ci4gVGhlbiwganVzdCB3cml0ZSB3aG9sZSAzMi1iaXQsIG5vIG5lZWQgbWFzay4NCj4g
+DQo+ID4NCj4gPiBJZiB0aGUgY2xlYXJpbmcgaXMgbmVlZGVkLCBJIHN0aWxsIHRoaW5rIGl0IHdv
+dWxkIGJlIGJldHRlciB0bw0KPiA+IGNoYW5nZSBCX0FYX1JYX0ZMVFJfQ0ZHX01BU0ssIGFuZCBz
+cGxpdCB0aGUgY2xlYXJpbmcgb2ZmIGluIGEgc2VwYXJhdGUNCj4gPiBvcGVyYXRpb24sIHRvIG1h
+a2UgaXQgbW9yZSBleHBsaWNpdCBhbmQgb2J2aW91cyBmb3IgdGhlIGNhc3VhbCByZWFkZXIuDQoN
+CkkgbWlzc2VkIHRoaXMgcGFyYWdyYXBoIGxhc3Qgd2VlaywgYnV0IHRoYXQgaXMgbGlrZSBteSB0
+aG91Z2h0Lg0KVGhlbiBJIHNwaW4gYSBSRlQgWzFdLiBQbGVhc2UgdHJ5IGlmIGl0IGNhbiB3b3Jr
+IHdpdGggeW91ciBjaGFuZ2VzLg0KDQpbMV0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgt
+d2lyZWxlc3MvMjAyNTExMTAwMjM3MDcuNjI3Mi0xLXBrc2hpaEByZWFsdGVrLmNvbS9ULyN1DQoN
+Cj4gPg0KPiA+ID4gU2luY2Ugd2UgZG9uJ3QgdXNlIEZJRUxEX3tHRVQsUFJFUH0gbWFjcm9zIHdp
+dGggQl9BWF9SWF9GTFRSX0NGR19NQVNLLCBob3cNCj4gPiA+IGNhbiB5b3UgZmluZCB0aGUgcHJv
+YmxlbT8gUGxlYXNlIGd1aWRlIHVzLiBUaGFua3MuDQo+ID4NCj4gPiBJIHN0aWxsIGhhdmUgIltQ
+QVRDSC9SRkMgMTcvMTddIHJ0dzg5OiBVc2UgYml0ZmllbGQgaGVscGVycyINCj4gPg0KPiBodHRw
+czovL2xvcmUua2VybmVsLm9yZy9hbGwvZjdiODExMjJmNzU5NmZhMDA0MTg4YmZhZTY4ZjI1YTY4
+YzJkMjM5Mi4xNjM3NTkyMTMzLmdpdC5nZWVydCtyZW5lc2FzQGdsaWQNCj4gPiBlci5iZS8NCj4g
+PiBpbiBteSBsb2NhbCB0cmVlLCB3aGljaCBzdGFydGVkIGZsYWdnaW5nIHRoZSB1c2Ugb2YgYSBk
+aXNjb250aWd1b3VzDQo+ID4gbWFzayB3aXRoIHRoZSBpbXByb3ZlZCBjaGVja2luZyBpbiBmaWVs
+ZF9wcmVwKCkuDQo+IA0KPiBHb3QgaXQuIFlvdSBhcmUgZG9pbmcgIk5vbi1jb25zdCBiaXRmaWVs
+ZCBoZWxwZXIgY29udmVyc2lvbnMiLg0KPiANCj4gUGluZy1LZQ0KDQo=
