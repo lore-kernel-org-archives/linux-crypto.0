@@ -1,75 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71506258CD7;
-	Tue, 11 Nov 2025 17:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716DD28506F
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Nov 2025 18:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762881149; cv=none; b=WbP1iCDsJLKw4p5XRzn/wmqr2IGTkKsdXERqBiF/Zbx01jmx2gxDHji9ymLdzgbXybO6ATFJdM/DqRGB7sjX7knq9GqI8EYlFwh7RbBWjBm0X/0U8gVN/7LvBx3CF3/uQzbF1cLegQLSpW/JWyRPI4wR1E66cQr6x0wcGFg+qZ4=
+	t=1762886326; cv=none; b=tcwZV2phwGcEv8NAJcnO5lI51kRWhMx/mk8kGqBfM/O+MFD5xUFRutUrcUBqEcXrW0FsyINEu1ozDnbc0Zxymv6ZXTmIEkqfDzZFPv/MZgjJ8KhCNbe8gl20hBsLBkh+n+cW9F91boVzkbeRYzt6MO3k6pT6dEU3JYAgv+btYyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762881149; c=relaxed/simple;
-	bh=wA1v/5K7nr9vmQOy0S5/hiIpm8ILDbanX/rFh69HcQo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EOvX3oAso1AGxm+lVz6KtuSlDzexzJSZJO8y7EuqqaWexnAFXE/n+x95zdKjWpl8wRikOUyiMFVDhbTa6oB8bfJIwejMEzcrR1t6qt30jJA7+n+xG1LHs++d8Jn0xP2+zwpssnHaTwmOw/c9jd3njhgh3aPQroDH+bs//spcCOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5F73C116D0;
-	Tue, 11 Nov 2025 17:12:26 +0000 (UTC)
-Date: Tue, 11 Nov 2025 17:12:23 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	ebiggers@kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 00/21] arm64: Move kernel mode FPSIMD buffer to the
- stack
-Message-ID: <aRNudxVu_qNjk0I0@arm.com>
-References: <20251031103858.529530-23-ardb+git@google.com>
+	s=arc-20240116; t=1762886326; c=relaxed/simple;
+	bh=m6sTk8T64878pdyCXjz95N9hZFFiTrac4lxnmwKPPls=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=LKvWSBW74s+0Zho7ZbmCN6wOjxY1y+lZx3GtkiB8IRmf52w5JvksdPNKHab4iFJDqWDkTd5J0CuehVC9jNkQgQ82CUOPadCkcpE9ooSRKObxQQJpl36/PeU1Yg+yndDyZ0UplwfiFla4P1AK8Lysye4UGxgNkUZpihDO86UtbzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lklcwhcz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lklcwhcz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762886324;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q9enfXg+0ycV2tTaXeBLF9cpw7nkyL9VYMhWpucnN4M=;
+	b=LklcwhczCIZRrX9d8eZK2Hd0uOcXNz8TUmzmjBKrn82mMgeaIK2JwM6jgZgVxvTsdHZBFI
+	t8kl4VM2H7WU2k/EqnLpBjLq2Btw3RDfk8XURWkbyzUgx2OJtV+aXo1vKnRiz1tIVw8FLV
+	0WMTvNyNHabx9A+bJE8yuuZZ2L1Uywc=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-595-I4RIVNJmPAOiKKq4B-z5CQ-1; Tue,
+ 11 Nov 2025 13:38:41 -0500
+X-MC-Unique: I4RIVNJmPAOiKKq4B-z5CQ-1
+X-Mimecast-MFC-AGG-ID: I4RIVNJmPAOiKKq4B-z5CQ_1762886319
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A41CF1955DD9;
+	Tue, 11 Nov 2025 18:38:38 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.87])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8CD4F1800361;
+	Tue, 11 Nov 2025 18:38:33 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <1ce413b202ca7c008e077a6f1cfa88f94a3a7cbd.camel@redhat.com>
+References: <1ce413b202ca7c008e077a6f1cfa88f94a3a7cbd.camel@redhat.com> <IA4PR84MB4011FE5ABA934DEF08F1A263ABC3A@IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM> <501216.1749826470@warthog.procyon.org.uk> <CALrw=nGkM9V12y7dB8y84UHKnroregUwiLBrtn5Xyf3k4pREsg@mail.gmail.com> <de070353cc7ef2cd6ad68f899f3244917030c39b.camel@redhat.com> <3081793dc1d846dccef07984520fc544f709ca84.camel@HansenPartnership.com> <7ad6d5f61d6cd602241966476252599800c6a304.camel@redhat.com> <69775877d04b8ee9f072adfd2c595187997e59fb.camel@HansenPartnership.com> <3d650cc9ff07462e5c55cc3d9c0da72a3f2c5df2.camel@redhat.com> <534145.1762588015@warthog.procyon.org.uk> <IA4PR84MB4011485C0EFFFF9F2820A1BFABC1A@IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM>
+To: Simo Sorce <simo@redhat.com>
+Cc: dhowells@redhat.com, "Elliott, Robert (Servers)" <elliott@hpe.com>,
+    James Bottomley <James.Bottomley@HansenPartnership.com>,
+    Ignat Korchagin <ignat@cloudflare.com>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Stephan Mueller <smueller@chronox.de>,
+    "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
+    Paul Moore <paul@paul-moore.com>, Lukas Wunner <lukas@wunner.de>,
+    Clemens Lang <cllang@redhat.com>,
+    David Bohannon <dbohanno@redhat.com>,
+    Roberto Sassu <roberto.sassu@huawei.com>,
+    "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+    "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+    "linux-security-module@vger.kernel.org" <linux-security-module@vger.kernel.org>,
+    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: Module signing and post-quantum crypto public key algorithms
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251031103858.529530-23-ardb+git@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <990171.1762886312.1@warthog.procyon.org.uk>
+Date: Tue, 11 Nov 2025 18:38:32 +0000
+Message-ID: <990172.1762886312@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Fri, Oct 31, 2025 at 11:38:59AM +0100, Ard Biesheuvel wrote:
-> Ard Biesheuvel (21):
->   crypto/arm64: aes-ce-ccm - Avoid pointless yield of the NEON unit
->   crypto/arm64: sm4-ce-ccm - Avoid pointless yield of the NEON unit
->   crypto/arm64: sm4-ce-gcm - Avoid pointless yield of the NEON unit
->   arm64/simd: Add scoped guard API for kernel mode SIMD
->   ARM/simd: Add scoped guard API for kernel mode SIMD
->   crypto: aegis128-neon - Move to more abstract 'ksimd' guard API
->   raid6: Move to more abstract 'ksimd' guard API
->   lib/crc: Switch ARM and arm64 to 'ksimd' scoped guard API
->   lib/crypto: Switch ARM and arm64 to 'ksimd' scoped guard API
->   crypto/arm64: aes-ccm - Switch to 'ksimd' scoped guard API
->   crypto/arm64: aes-blk - Switch to 'ksimd' scoped guard API
->   crypto/arm64: aes-gcm - Switch to 'ksimd' scoped guard API
->   crypto/arm64: nhpoly1305 - Switch to 'ksimd' scoped guard API
->   crypto/arm64: polyval - Switch to 'ksimd' scoped guard API
->   crypto/arm64: sha3 - Switch to 'ksimd' scoped guard API
->   crypto/arm64: sm3 - Switch to 'ksimd' scoped guard API
->   crypto/arm64: sm4 - Switch to 'ksimd' scoped guard API
->   arm64/xorblocks:  Switch to 'ksimd' scoped guard API
->   net/mlx5: Switch to more abstract scoped ksimd guard API on arm64
->   arm64/fpu: Enforce task-context only for generic kernel mode FPU
->   arm64/fpsimd: Allocate kernel mode FP/SIMD buffers on the stack
+Simo Sorce <simo@redhat.com> wrote:
 
-For the series, especially the arm64 bits:
+> If a defect in a signing algorithm is found you can simply distribute a
+> new kernel with modules resigned with a different algorithm.
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Probably more "have to" than "can".  The cert providing the composite key for
+both would have to be invalidated to stop it from being used - and invalidated
+by having it added to the UEFI dbx table.
 
-Since most of this is crypto library changes, I'm fine for it to go
-upstream via your tree but please keep it on a stable branch in case we
-need to solve any conflicts.
+David
 
-Thanks.
-
--- 
-Catalin
