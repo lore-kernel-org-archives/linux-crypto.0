@@ -1,60 +1,54 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF072BB17;
-	Tue, 11 Nov 2025 07:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FB32367D5;
+	Tue, 11 Nov 2025 09:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762847126; cv=none; b=ASrGhwUjv0/h8Ku6wJ3G6WOA3RohO5A9tJiyv3Jns953vbHtw14XgZVbJmGs/FJOcNJzWvNMwfriiHEawxSYc/g+Q/+lMBj8ISc6FMcuJVvJ+UgnHHSth8y8xh1CUS05/pUaqVbLNKbtQSCFpb2qXr1FeZMa2SnK2wV8oOcA9Cs=
+	t=1762853744; cv=none; b=k2jlff67hQlEu2AnBOwkgyfpyH/gCbP++f+sJ3Y520tndsvuJvdZt3o8jENSMmCqwRbopceq44mFxXl/tuk0P0Xmr02fqU27+g9frwRTylCW5CY921ofpFCaT3qY09iOxaLDHJTacqL08DXf4E6zVIGqhrVExqHQlz1cuAfXmvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762847126; c=relaxed/simple;
-	bh=kTmo2x6zuAhJQW95nab+9WiQ1laTWaIabF0YIpugNN8=;
+	s=arc-20240116; t=1762853744; c=relaxed/simple;
+	bh=5AI/piut+WFoihOlBkm0FvES+FMSfwHi0GXje6ubS/E=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T+P4g9nCz7CTfVvifZ0/SXLxVl1z3LrxxvIbK1P7qGiIWYnXp3hN+uVXEp8Gqv7bSKWDP62jzmEwuAXjarFZMN2Ar7Np2U6GqpGlbgtEG1mho3YudvAt88MFJMEzKEEeyGvXZ3rhIZonAvuuJ+NePvthaJWR3Nifw1Jdu336g6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=mt3k4Nld; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=mt3k4Nld; arc=none smtp.client-ip=45.249.212.187
+	 MIME-Version:Content-Type; b=cNf8TPeYPTLCjhF47KMflPFb6eq4KowzlX3JNN3FXNZ062bsbtTtljZgmEA7lAngxGzE2N3AXnlUtVEPPR+MCi+sXpspSRyNPQW+SPkOLKd0u+D1FNJkDHn6WCuoPwXrfgxb4ewLRNs4FHNbUcmYnUKALoAoxg87yViOab0XkNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=g2rICyYG; arc=none smtp.client-ip=113.46.200.221
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="mt3k4Nld";
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="mt3k4Nld"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="g2rICyYG"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=+xb/xGFV3+SOYW1VLDvSVDCTrOmrz1O3z37sbePsiVU=;
-	b=mt3k4NldqM69rlxFsAGrZHPjNHv4YKnartDTFn45ZFYQZiGzXIul58Ve8eLPAxrNROEKcDzIK
-	w7xGOYIWFiOmQqZzLfPFYxs3ElcUWK/L9PftaNWGQGngyruQO5js15CNLIu1wvdKQn6WPKL/qWE
-	T9BSHhp1SLUTjEMHv0wM1E4=
-Received: from canpmsgout04.his.huawei.com (unknown [172.19.92.133])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTPS id 4d5JTb3Rz9z1BFvc;
-	Tue, 11 Nov 2025 15:44:51 +0800 (CST)
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=+xb/xGFV3+SOYW1VLDvSVDCTrOmrz1O3z37sbePsiVU=;
-	b=mt3k4NldqM69rlxFsAGrZHPjNHv4YKnartDTFn45ZFYQZiGzXIul58Ve8eLPAxrNROEKcDzIK
-	w7xGOYIWFiOmQqZzLfPFYxs3ElcUWK/L9PftaNWGQGngyruQO5js15CNLIu1wvdKQn6WPKL/qWE
-	T9BSHhp1SLUTjEMHv0wM1E4=
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4d5JRx1ZSjz1prLT;
-	Tue, 11 Nov 2025 15:43:25 +0800 (CST)
-Received: from kwepemh100007.china.huawei.com (unknown [7.202.181.92])
-	by mail.maildlp.com (Postfix) with ESMTPS id A6E5B1402D0;
-	Tue, 11 Nov 2025 15:45:04 +0800 (CST)
-Received: from huawei.com (10.67.174.33) by kwepemh100007.china.huawei.com
- (7.202.181.92) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 11 Nov
- 2025 15:45:04 +0800
-From: Gu Bowen <gubowen5@huawei.com>
-To: <herbert@gondor.apana.org.au>
-CC: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <torvalds@linux-foundation.org>, Lu Jialin
-	<lujialin4@huawei.com>
-Subject: Re: [GIT PULL] Crypto Fixes for 6.17
-Date: Tue, 11 Nov 2025 15:57:39 +0800
-Message-ID: <20251111075739.1649924-1-gubowen5@huawei.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <aMzXm4zy8LARVMbk@gondor.apana.org.au>
-References: <aMzXm4zy8LARVMbk@gondor.apana.org.au>
+	bh=PHarLjZzOHZRKUIH+D7ZcBsW2Ul6UQ+BgUzGUpkAbQk=;
+	b=g2rICyYGm8DcDJhyoYjvPuYwFxvNx4BVjqHTLfYv56Jl7jfwNgRO+lncjdsulG54h71BY5x4r
+	Jn2ba/81HlozS3zt1AbigfCMmFYkiLFlcbyBc96cNcRqgREovNE6be/FnGKIyWYh/amIA5yEEo4
+	dSA18tbwZX7JpmTlmYtycHo=
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4d5LvX2kcTzRhR5;
+	Tue, 11 Nov 2025 17:34:00 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id C397A140203;
+	Tue, 11 Nov 2025 17:35:38 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 11 Nov 2025 17:35:38 +0800
+Received: from localhost.huawei.com (10.90.31.46) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 11 Nov 2025 17:35:38 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <gregkh@linuxfoundation.org>, <zhangfei.gao@linaro.org>,
+	<wangzhou1@hisilicon.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <shenyang39@huawei.com>, <liulongfang@huawei.com>,
+	<qianweili@huawei.com>, <linwenkai6@hisilicon.com>
+Subject: [PATCH v5 2/4] uacce: fix isolate sysfs check condition
+Date: Tue, 11 Nov 2025 17:35:34 +0800
+Message-ID: <20251111093536.3729-3-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20251111093536.3729-1-huangchenghai2@huawei.com>
+References: <20251111093536.3729-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -63,20 +57,54 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemh100007.china.huawei.com (7.202.181.92)
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
 
-Hi, 
-On Fri, Sep 19, 2025 at 12:10:03PM +0800, Herbert Xu wrote:
-> Herbert Xu (2):
->       crypto: af_alg - Set merge to zero early in af_alg_sendmsg
+uacce supports the device isolation feature. If the driver
+implements the isolate_err_threshold_read and
+isolate_err_threshold_write callback functions, uacce will create
+sysfs files now. Users can read and configure the isolation policy
+through sysfs. Currently, sysfs files are created as long as either
+isolate_err_threshold_read or isolate_err_threshold_write callback
+functions are present.
 
-I have a question about this patch: is the "fixes" tag not quite
-appropriate? In older kernel versions, such as v5.10, MSG_SPLICE_PAGES
-is not yet supported, so there is no need for ctx->merge = 0. Perhaps
-d3dccb0a487d ("crypto: af_alg - Fix merging of written data into spliced
-pages") would be more suitable.
+However, accessing a non-existent callback function may cause the
+system to crash. Therefore, intercept the creation of sysfs if
+neither read nor write exists; create sysfs if either is supported,
+but intercept unsupported operations at the call site.
 
-Best Regards,
-Guber
+Fixes: e3e289fbc0b5 ("uacce: supports device isolation feature")
+Cc: stable@vger.kernel.org
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+Acked-by: Zhangfei Gao <zhangfei.gao@linaro.org>
+---
+ drivers/misc/uacce/uacce.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
+index 688050c35d88..8a0cb38d9a3d 100644
+--- a/drivers/misc/uacce/uacce.c
++++ b/drivers/misc/uacce/uacce.c
+@@ -382,6 +382,9 @@ static ssize_t isolate_strategy_show(struct device *dev, struct device_attribute
+ 	struct uacce_device *uacce = to_uacce_device(dev);
+ 	u32 val;
+ 
++	if (!uacce->ops->isolate_err_threshold_read)
++		return -ENOENT;
++
+ 	val = uacce->ops->isolate_err_threshold_read(uacce);
+ 
+ 	return sysfs_emit(buf, "%u\n", val);
+@@ -394,6 +397,9 @@ static ssize_t isolate_strategy_store(struct device *dev, struct device_attribut
+ 	unsigned long val;
+ 	int ret;
+ 
++	if (!uacce->ops->isolate_err_threshold_write)
++		return -ENOENT;
++
+ 	if (kstrtoul(buf, 0, &val) < 0)
+ 		return -EINVAL;
+ 
+-- 
+2.33.0
 
