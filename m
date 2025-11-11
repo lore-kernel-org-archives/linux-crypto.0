@@ -1,149 +1,152 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2416636B06F
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Nov 2025 16:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC4736C585
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Nov 2025 16:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762877341; cv=none; b=GhrvXUk+0GWEPO0O/HPrq2k939XDQMQuAq6nETt+eB1IVc2KrJ1UiyUAq82ksQuiMWmAyweLIr1oIwKiyb1CqqhNJxfGNN34Yb7MkGNHS9cLB8D/T8JbcYyky0XpOlzP1M9ZQwP8oh2I6yLSFNrnsvu4Ws/dO0aV6IoTD8jo3lg=
+	t=1762877706; cv=none; b=NrU7p/10lIbFsPkqX2TpFwvak47VgIyxSWx+Qc4B2I2TNQeRcRvlEkXCsQBvdxY0LL1ccxeHiZUsxsfbZyuu2dB6FM2v7FCnk7Ynhyvm+1y1e35nTQtBfynbOjnG0qpFA0dzayYZxPx5nYFt/1mGuXUkITBnleO6vjPrRZN7Eho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762877341; c=relaxed/simple;
-	bh=aysh5UWarQ7L8UM6wmzXLNddrubxWUn3U+QaaL3x7+s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q9u2GdAWgC/dsiAv6p7QlPMqBE1tMzBQqRukzeFwudEphDYP0uvUWv72/+T5Pp63i2+zYAKdM6SYNmy8IFp67poMAk8gNfz55wftDuc2uWqscc9aYfUk2C+ohAYVxoUoA7uV8Ty+KjFUhKwnhvNJO4PADzKEq0bz7ps/jSm7zRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=T9NakLss; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+	s=arc-20240116; t=1762877706; c=relaxed/simple;
+	bh=CAzz4tdO9jRd3NYeIx+mzCdWu/XNR9YZQNSh6xs3tkM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Bo11sOAn9FeGonubVe4DQVrsGzqpJExwSnfh9hcoNU0pKgB0vCYOBoEHXqJN8eyA4QU06lmiHiF3is5i0hxU4G/CNfC6dVS54halpYI4AaJC1+QJfOtAwd3Gx9U5kxdov00Llmw/GKgqc5exS359DsMlhWecvw8oWnGETH5TMUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ShpdqHqd; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=f7gO8GYo; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="T9NakLss"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-378d6fa5aebso38200781fa.2
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Nov 2025 08:08:58 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ShpdqHqd";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="f7gO8GYo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762877703;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CAzz4tdO9jRd3NYeIx+mzCdWu/XNR9YZQNSh6xs3tkM=;
+	b=ShpdqHqd+rzXQjaYRwkTL8gcJ24Pgkfs9TIw6ziKC4xuK2NdrxtcRnkVHXUony4ixqWMAZ
+	T+pG42eOOzzv/Ga/HnJxqzdBHw9Xy7bvHAYjroeN7yIJiOhyFSssJTpSKgRtbqnqry6tCq
+	ju2Co95NeFB89rsiYwwfkIYg1M3KAPM=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-354-KlonSBIwPACvpA8hKOzU7w-1; Tue, 11 Nov 2025 11:15:02 -0500
+X-MC-Unique: KlonSBIwPACvpA8hKOzU7w-1
+X-Mimecast-MFC-AGG-ID: KlonSBIwPACvpA8hKOzU7w_1762877702
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-89ee646359cso794849385a.1
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Nov 2025 08:15:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1762877337; x=1763482137; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iLmijrLc4WS3nSB0g1tes3gmjZB4xp4JotsNrP4RgbI=;
-        b=T9NakLssrxRZu4Y1431XbGWnyx7s417lj3ApaCz0BRZUZjEedWsHiTYNEmZ4ef0gK7
-         RjehRBafD7u+FIeiqgxiRBLOFTyMBhn6hzZDPPFAb8ng7++LFIbsKKYaOTutOK0t9geo
-         4Qvqh0yNnroKgO9HPWtIMZyL+HYY+4SQVNdIzx06hs3XX2R3MeWeItQCXCObm66eMLi2
-         fiI9HbC7MOzxJh58B1txJW+IUYJn6shk82Hd+JTNpmNzduI72JhGOArvkbvRYhOxyUeM
-         s6GzEDgoJJtaqBiZfXwHnVpCyVbLBpLYYEbAMvsA2n6CClkqSo+2Y6FMcbgTe0/EfONg
-         /VpA==
+        d=redhat.com; s=google; t=1762877702; x=1763482502; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CAzz4tdO9jRd3NYeIx+mzCdWu/XNR9YZQNSh6xs3tkM=;
+        b=f7gO8GYoC8MqmXdqCaeuPrwYc/o1ZTt5TwoG+7p497nALVc5haN6UkLoPC1fPUq4i6
+         aqqVaMBUoXfZvcMvIIucuWFbg/+UeQGALsvDt9eabZLkj6ekGsR1pJY2zne/54OIbeOH
+         RXhpKQw7KJs5Kauii1V+AVaDnTUecJ/QynXXQh03T4hwpopeyBgdR36oOGytl/XahJPV
+         Y5nNtsQlj/K0UGYfQYABkfQP80YJWEa/6V+PspzlB1ogQRgNFQ/q5pOOuMqH2yggMaC+
+         GZhw5EnbnY5BILZUiV3AyeYhNMPt7DPHSwpQs8XkQvO9yPslLowfkwaBnTQLK9doxkRl
+         ldEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762877337; x=1763482137;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=iLmijrLc4WS3nSB0g1tes3gmjZB4xp4JotsNrP4RgbI=;
-        b=p/UYWdK7+uHqA/oxDQZJaYWG/v0pNa1AD3wcIJTvxwe+xCQ6e+gVWcC/tinagfN99O
-         6U3ksZ6R7wzmmSpB80oDpDBuKtEHnNuuNrjqbfzADoGowHTyzovpdOB32LsgRD5wLcET
-         ShUkKdMEBExjfz2XMiH1BjB1omk5Jcnzi2NfMZMQXxsvQffm9pCyplB+AKj4g4Rt6W97
-         EodeiOl3DqC8MMuzVOxXI7Oyw9jGHSyfmqFSyWpITRUlbrNDfEOndtoldOzj62st+UGd
-         DzxUS41F9Mj3VJHFNZdLv8MPqUPl5K6oorQO1fCQFQGw0jkP6OojmcUhYnfDthmc2P9l
-         UlLg==
-X-Forwarded-Encrypted: i=1; AJvYcCXdTgkHiE+EvDuBOWaIzhhGeI779KAXi8CrRWugKukrmuY6mqBdYiNFZ7LTJnud8CYY+fFfa7IVjLEzN6w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+ZPu9aOyWVyRi3KQ20n9R5mKyidV3DJoFHgTZHXjPs9WlFpsf
-	C0UvsRk6Aiuv/dPNZ9QbZbbgEV3L2wzS1fwExonfw4heVXpuoRl7ySDwgxD5HQaE7PaH5rqat7x
-	CIVjEYEWWGJO/dV/N/SYnpvmOHtQn3E97FTMhvp7Ckg==
-X-Gm-Gg: ASbGncvapUW17wl1E7WTy5bA30oE9nlGlSmme4/o/MQN5M3WxEouq/1vW5UXI9KU99T
-	ugSwzJVafhuictDjYrXqhRdP8UWhhPDyjuojh0euuv1WEJmbgUVAToBZgHRlPM5xRAVP+OKVQEx
-	H2jiRpts0zWLZR5SF4LOaMVeVky5zcE670zE8s462oIqoJX2Y1yXHiG+DA60bSEFlFLyu8LyRqO
-	4ndYS9mRRUfJOzzfd9uXLuujDXal4r8cqyrFEaEayYMekrjGxXKk9jUOXi8K5a1YV6HepNFY4CR
-	cCsDTQQKZ6vb4w==
-X-Google-Smtp-Source: AGHT+IEcmZOwLvG+h7fUXsvJcnFNIhiV+MryGzOffXJ6dYV5aA7YnFbnyG0YTd/n2a6NhgLGBZaHssoFT3rWJmo9VQY=
-X-Received: by 2002:a05:6512:3a86:b0:57c:2474:371f with SMTP id
- 2adb3069b0e04-5945f1e5562mr4251059e87.45.1762877337250; Tue, 11 Nov 2025
- 08:08:57 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762877702; x=1763482502;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CAzz4tdO9jRd3NYeIx+mzCdWu/XNR9YZQNSh6xs3tkM=;
+        b=F0ZRiZoufL/0iU79Y5nOVPllNpRJNVkHHATMIttaLOX/nDfwByZ/priIC+em4sIh/C
+         GdjHNWtPGgMfTRk06bLg0zOTnoO7lMM6QfUAaLMasCF6HsNtVrFUn0J+homzY6UtiHUU
+         +iUHiQtnm86xOPmq2e/SQo5k5eQ3lULWrgh7ycMroAlOjLASK/Zha+LalPVUllI/mn/g
+         ZvJO6gzRAx4k0mn6m4T1s4uF35JTQbwrQRNH8cN2Ic34ZPFbSkyqbBCYqc2KWPMgr8VM
+         hv0tn8sEQKxUPJ/RmV1HHiBIdunbLfh6EZ5zrwvrmjRyDeKxPeMaYZCka7Q4D9pgoKin
+         4WSw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXf7zuxPxj8cnS6WjSVZA5//Dksv36UceEOhP2uKmuludVDT1Y6/nvzzmR//bic/FcCGGe3R6rn9QJDUQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8/kZC+gLxCVSt0/rVx7l8223ZW9/xPxDyGrmWwvS7HYGG+VQr
+	ZEjIbAa7jYrJBoxmB3xErEAupX8Buw0Tht6gDkxVBm3k0kfe5QSP0t7LrHE7Ho2CNqPtUPAyAtb
+	y9MTf00f66fkXLj3oVGNV/acTgv2OxoA0wYSoBH4+9fHu+31i0JcRtadjvXnUKXRl1A==
+X-Gm-Gg: ASbGncsIj8Dpa/40740I3jQ88WeVXax2reKV3e+J6P5K+156zbvzAcrx2LMEr9g57yb
+	CpVttXlZceHNOWFw4eafocAUm76bj2eGFhxImsDBfQFZB/joq9zeurKTOAj5cvMfQfHIA7uvOdz
+	BuS5hbNXjxky7Facpw1NOqOHJnQn5qYApkO75Ckb8GHL7ni8KYhRumGcor2j37w0NcvOM4xkWv0
+	GO/2jWeKT3RBmF+IeWPZSvgc+dmM9cQ5MlhBFzSquKuMjOdfMnhuIRLdqzHrA71mil+/QVyguR1
+	ts7THIDgOCYPNi9kz5n/+/A1sJvYpASJwEyL5WA+sFDeNg7GP/v9+dM9rc7MWztzfxa79A==
+X-Received: by 2002:a05:620a:6914:b0:8b2:1f64:7bc5 with SMTP id af79cd13be357-8b257f69f9emr1539504085a.86.1762877701871;
+        Tue, 11 Nov 2025 08:15:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGZzM88+sgVGmR4fCbMdvG+bTstulnQHQtfzsOqHKlcvJHTzfGD4ZKhDU5deE0z92drdTBPyA==
+X-Received: by 2002:a05:620a:6914:b0:8b2:1f64:7bc5 with SMTP id af79cd13be357-8b257f69f9emr1539498485a.86.1762877701360;
+        Tue, 11 Nov 2025 08:15:01 -0800 (PST)
+Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::318])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b29aa25791sm9814985a.52.2025.11.11.08.15.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Nov 2025 08:15:00 -0800 (PST)
+Message-ID: <1ce413b202ca7c008e077a6f1cfa88f94a3a7cbd.camel@redhat.com>
+Subject: Re: Module signing and post-quantum crypto public key algorithms
+From: Simo Sorce <simo@redhat.com>
+To: "Elliott, Robert (Servers)" <elliott@hpe.com>, David Howells
+	 <dhowells@redhat.com>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>, Ignat Korchagin
+	 <ignat@cloudflare.com>, Herbert Xu <herbert@gondor.apana.org.au>, Stephan
+ Mueller <smueller@chronox.de>, "torvalds@linux-foundation.org"
+ <torvalds@linux-foundation.org>,  Paul Moore <paul@paul-moore.com>, Lukas
+ Wunner <lukas@wunner.de>, Clemens Lang <cllang@redhat.com>,  David Bohannon
+ <dbohanno@redhat.com>, Roberto Sassu <roberto.sassu@huawei.com>,
+ "keyrings@vger.kernel.org"	 <keyrings@vger.kernel.org>,
+ "linux-crypto@vger.kernel.org"	 <linux-crypto@vger.kernel.org>,
+ "linux-security-module@vger.kernel.org"	
+ <linux-security-module@vger.kernel.org>, "linux-kernel@vger.kernel.org"	
+ <linux-kernel@vger.kernel.org>
+Date: Tue, 11 Nov 2025 11:14:59 -0500
+In-Reply-To: <IA4PR84MB4011485C0EFFFF9F2820A1BFABC1A@IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM>
+References: 
+	<IA4PR84MB4011FE5ABA934DEF08F1A263ABC3A@IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM>
+	 <501216.1749826470@warthog.procyon.org.uk>
+	 <CALrw=nGkM9V12y7dB8y84UHKnroregUwiLBrtn5Xyf3k4pREsg@mail.gmail.com>
+	 <de070353cc7ef2cd6ad68f899f3244917030c39b.camel@redhat.com>
+	 <3081793dc1d846dccef07984520fc544f709ca84.camel@HansenPartnership.com>
+	 <7ad6d5f61d6cd602241966476252599800c6a304.camel@redhat.com>
+	 <69775877d04b8ee9f072adfd2c595187997e59fb.camel@HansenPartnership.com>
+	 <3d650cc9ff07462e5c55cc3d9c0da72a3f2c5df2.camel@redhat.com>
+	 <534145.1762588015@warthog.procyon.org.uk>
+	 <IA4PR84MB4011485C0EFFFF9F2820A1BFABC1A@IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251111-aheev-uninitialized-free-attr-crypto-v2-1-33699a37a3ed@gmail.com>
-In-Reply-To: <20251111-aheev-uninitialized-free-attr-crypto-v2-1-33699a37a3ed@gmail.com>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Tue, 11 Nov 2025 16:08:45 +0000
-X-Gm-Features: AWmQ_bmEt7CJwei-GA566n9pELQVcfSa-BAXmZkdFeUOGoDXbcYtgD_qygu4668
-Message-ID: <CALrw=nF1ms+s9gbY-aLfGkTcTWGBoKjJXBsUpQ5v07d+8_M_gg@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: asymmetric_keys: fix uninitialized pointers
- with free attribute
-To: Ally Heev <allyheev@gmail.com>
-Cc: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 11, 2025 at 1:36=E2=80=AFPM Ally Heev <allyheev@gmail.com> wrot=
-e:
->
-> Uninitialized pointers with `__free` attribute can cause undefined
-> behavior as the memory assigned randomly to the pointer is freed
-> automatically when the pointer goes out of scope.
->
-> crypto/asymmetric_keys doesn't have any bugs related to this as of now,
-> but, it is better to initialize and assign pointers with `__free`
-> attribute in one statement to ensure proper scope-based cleanup
->
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Closes: https://lore.kernel.org/all/aPiG_F5EBQUjZqsl@stanley.mountain/
-> Signed-off-by: Ally Heev <allyheev@gmail.com>
+On Sun, 2025-11-09 at 19:30 +0000, Elliott, Robert (Servers) wrote:
+> The composite motivation is to provide some protection if someone
+> discovers a basic flaw in the PQC algorithm. If quantum computers
+> haven't arrived yet to break the traditional algorithm, the
+> composite still proves validity.
 
-Reviewed-by: Ignat Korchagin <ignat@cloudflare.com>
+Given you quoted me wrt composite signatures, I'd like to make clear I
+do *not* necessarily favor it.
 
-> ---
-> Changes in v2:
-> - moved declarations to the top and initialized them with NULL
-> - Link to v1: https://lore.kernel.org/r/20251105-aheev-uninitialized-free=
--attr-crypto-v1-1-83da1e10e8c4@gmail.com
-> ---
->  crypto/asymmetric_keys/x509_cert_parser.c | 2 +-
->  crypto/asymmetric_keys/x509_public_key.c  | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetri=
-c_keys/x509_cert_parser.c
-> index 8df3fa60a44f80fbd71af17faeca2e92b6cc03ce..b37cae914987b69c996d65590=
-58c00f13c92b5b9 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -60,7 +60,7 @@ EXPORT_SYMBOL_GPL(x509_free_certificate);
->   */
->  struct x509_certificate *x509_cert_parse(const void *data, size_t datale=
-n)
->  {
-> -       struct x509_certificate *cert __free(x509_free_certificate);
-> +       struct x509_certificate *cert __free(x509_free_certificate) =3D N=
-ULL;
->         struct x509_parse_context *ctx __free(kfree) =3D NULL;
->         struct asymmetric_key_id *kid;
->         long ret;
-> diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric=
-_keys/x509_public_key.c
-> index 8409d7d36cb4f3582e15f9ee4d25f302b3b29358..12e3341e806b8db93803325a9=
-6a3821fd5d0a9f0 100644
-> --- a/crypto/asymmetric_keys/x509_public_key.c
-> +++ b/crypto/asymmetric_keys/x509_public_key.c
-> @@ -148,7 +148,7 @@ int x509_check_for_self_signed(struct x509_certificat=
-e *cert)
->   */
->  static int x509_key_preparse(struct key_preparsed_payload *prep)
->  {
-> -       struct x509_certificate *cert __free(x509_free_certificate);
-> +       struct x509_certificate *cert __free(x509_free_certificate) =3D N=
-ULL;
->         struct asymmetric_key_ids *kids __free(kfree) =3D NULL;
->         char *p, *desc __free(kfree) =3D NULL;
->         const char *q;
->
-> ---
-> base-commit: c9cfc122f03711a5124b4aafab3211cf4d35a2ac
-> change-id: 20251105-aheev-uninitialized-free-attr-crypto-bc94ec1b2253
->
-> Best regards,
-> --
-> Ally Heev <allyheev@gmail.com>
->
+Unlike regular software or firmware, kernel modules are generally tied
+to a specific version of the kernel, therefore there is no real need
+for long term resistance (unless you plan to never upgrade a kernel).
+
+If a defect in a signing algorithm is found you can simply distribute a
+new kernel with modules resigned with a different algorithm.
+
+The problem of using composite algorithms are many:
+- You need composite keys (or at least two keys, depending on the
+implementation).
+- You will pay a higher price in terms of CPU/time for verification for
+each signature.=20
+- You will pay a higher price in terms of disk/ram space to store
+multiple signatures.
+
+It is generally not worth paying this price when the remediation is
+easy.
+
+--=20
+Simo Sorce
+Distinguished Engineer
+RHEL Crypto Team
+Red Hat, Inc
+
