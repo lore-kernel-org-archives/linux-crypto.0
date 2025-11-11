@@ -1,89 +1,140 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716DD28506F
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Nov 2025 18:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78742571BE;
+	Tue, 11 Nov 2025 19:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762886326; cv=none; b=tcwZV2phwGcEv8NAJcnO5lI51kRWhMx/mk8kGqBfM/O+MFD5xUFRutUrcUBqEcXrW0FsyINEu1ozDnbc0Zxymv6ZXTmIEkqfDzZFPv/MZgjJ8KhCNbe8gl20hBsLBkh+n+cW9F91boVzkbeRYzt6MO3k6pT6dEU3JYAgv+btYyY=
+	t=1762888668; cv=none; b=TBb/aWU0jTg8i0jrNz1WbVOW3lAeZPR7pCcbL2SO9eWbBAbFI+p5TLUiNcOnDjVktgn9W0YfppWECngOdTywYmQjWyoSJu6uPH1bVs7nXt4oXJ3+sCo3WrPnuAlntbUuEeGRWuy8nHCSlFm7j9UjmzfZjzZ/AGSSPdh3KFkWX3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762886326; c=relaxed/simple;
-	bh=m6sTk8T64878pdyCXjz95N9hZFFiTrac4lxnmwKPPls=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=LKvWSBW74s+0Zho7ZbmCN6wOjxY1y+lZx3GtkiB8IRmf52w5JvksdPNKHab4iFJDqWDkTd5J0CuehVC9jNkQgQ82CUOPadCkcpE9ooSRKObxQQJpl36/PeU1Yg+yndDyZ0UplwfiFla4P1AK8Lysye4UGxgNkUZpihDO86UtbzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lklcwhcz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1762888668; c=relaxed/simple;
+	bh=41RLRtaKbXKVyhTCyKGvYapSSOb8728iYPhMLtH1kSQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=njk41oaX0JhW9Mt/26CCUL8MvphIpHTP/uT229bHmQbCVE0u/e6FsK8isfCKz77W0NicfbISBjWgpbhHRB+dVO2YlBLaGxAVFr8SdN4wroFJZ+k3XA4sOGHPzh7eLcmrDIAyc9jg0e4h8LDgBXo96EE927CYGEwbQXHjbXZT8IA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WAB3TiSt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lklcwhcz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762886324;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q9enfXg+0ycV2tTaXeBLF9cpw7nkyL9VYMhWpucnN4M=;
-	b=LklcwhczCIZRrX9d8eZK2Hd0uOcXNz8TUmzmjBKrn82mMgeaIK2JwM6jgZgVxvTsdHZBFI
-	t8kl4VM2H7WU2k/EqnLpBjLq2Btw3RDfk8XURWkbyzUgx2OJtV+aXo1vKnRiz1tIVw8FLV
-	0WMTvNyNHabx9A+bJE8yuuZZ2L1Uywc=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-595-I4RIVNJmPAOiKKq4B-z5CQ-1; Tue,
- 11 Nov 2025 13:38:41 -0500
-X-MC-Unique: I4RIVNJmPAOiKKq4B-z5CQ-1
-X-Mimecast-MFC-AGG-ID: I4RIVNJmPAOiKKq4B-z5CQ_1762886319
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A41CF1955DD9;
-	Tue, 11 Nov 2025 18:38:38 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.87])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8CD4F1800361;
-	Tue, 11 Nov 2025 18:38:33 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <1ce413b202ca7c008e077a6f1cfa88f94a3a7cbd.camel@redhat.com>
-References: <1ce413b202ca7c008e077a6f1cfa88f94a3a7cbd.camel@redhat.com> <IA4PR84MB4011FE5ABA934DEF08F1A263ABC3A@IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM> <501216.1749826470@warthog.procyon.org.uk> <CALrw=nGkM9V12y7dB8y84UHKnroregUwiLBrtn5Xyf3k4pREsg@mail.gmail.com> <de070353cc7ef2cd6ad68f899f3244917030c39b.camel@redhat.com> <3081793dc1d846dccef07984520fc544f709ca84.camel@HansenPartnership.com> <7ad6d5f61d6cd602241966476252599800c6a304.camel@redhat.com> <69775877d04b8ee9f072adfd2c595187997e59fb.camel@HansenPartnership.com> <3d650cc9ff07462e5c55cc3d9c0da72a3f2c5df2.camel@redhat.com> <534145.1762588015@warthog.procyon.org.uk> <IA4PR84MB4011485C0EFFFF9F2820A1BFABC1A@IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM>
-To: Simo Sorce <simo@redhat.com>
-Cc: dhowells@redhat.com, "Elliott, Robert (Servers)" <elliott@hpe.com>,
-    James Bottomley <James.Bottomley@HansenPartnership.com>,
-    Ignat Korchagin <ignat@cloudflare.com>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Stephan Mueller <smueller@chronox.de>,
-    "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
-    Paul Moore <paul@paul-moore.com>, Lukas Wunner <lukas@wunner.de>,
-    Clemens Lang <cllang@redhat.com>,
-    David Bohannon <dbohanno@redhat.com>,
-    Roberto Sassu <roberto.sassu@huawei.com>,
-    "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-    "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-    "linux-security-module@vger.kernel.org" <linux-security-module@vger.kernel.org>,
-    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: Module signing and post-quantum crypto public key algorithms
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WAB3TiSt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D8EDC4CEFB;
+	Tue, 11 Nov 2025 19:17:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762888668;
+	bh=41RLRtaKbXKVyhTCyKGvYapSSOb8728iYPhMLtH1kSQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WAB3TiStxkM1FNwO8Op8NHHDZWFMtIxWcQcyMeysB/zEXMu7NC5jN7X7oCAZuO/uB
+	 kcb7FtT/bygYU7KdFv5BXUDnSmTnFkOZ8nnrMugK3rc8YAb9Myqj0+j/30pn8eY8Mi
+	 FkINs55JVB5sRHCnTlFQ5BMCeVelWSh/mOsZSAa3tc2o2UVRqLAHzjnGrk3XfMFmKE
+	 yUZtkwYIljsWxIjRlVV5OUJuG4eBUG7Ex4ojuJLvn0I0Ye5hWgfKtnWEOSOBCHSp4c
+	 JDb7nCKhP6NvnxojBfFa0FUjKp21Eg/jL89c2RHwG69wReDvu3Q1lYYDIxR5d/e8TK
+	 8F/IQbicLA9ig==
+Date: Tue, 11 Nov 2025 19:17:33 +0000
+From: Jonathan Cameron <jic23@kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Nicolas Ferre <nicolas.ferre@microchip.com>, Alexandre
+ Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea
+ <claudiu.beznea@tuxon.dev>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, David Miller
+ <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
+ Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery
+ <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, Lars-Peter
+ Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, Shan-Chun
+ Hung <schung@nuvoton.com>, Yury Norov <yury.norov@gmail.com>, Rasmus
+ Villemoes <linux@rasmusvillemoes.dk>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Johannes Berg <johannes@sipsolutions.net>,
+ Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>, David Laight
+ <david.laight.linux@gmail.com>, Vincent Mailhol
+ <mailhol.vincent@wanadoo.fr>, Jason Baron <jbaron@akamai.com>, Borislav
+ Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>, Michael Hennerich
+ <Michael.Hennerich@analog.com>, Kim Seer Paller
+ <kimseer.paller@analog.com>, David Lechner <dlechner@baylibre.com>, Nuno
+ =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Andy Shevchenko <andy@kernel.org>,
+ Richard Genoud <richard.genoud@bootlin.com>, Cosmin Tanislav
+ <demonsingur@gmail.com>, Biju Das <biju.das.jz@bp.renesas.com>, Jianping
+ Shen <Jianping.Shen@de.bosch.com>, linux-clk@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-edac@vger.kernel.org,
+ qat-linux@intel.com, linux-gpio@vger.kernel.org,
+ linux-aspeed@lists.ozlabs.org, linux-iio@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next v5 10/23] iio: imu: smi330: #undef
+ field_{get,prep}() before definition
+Message-ID: <20251111191351.06c0e660@jic23-huawei>
+In-Reply-To: <CAMuHMdX8c1VkBuPDpJ5mpCcRH+zEX4F1bQKFf_V8N9ZZtCYqxA@mail.gmail.com>
+References: <cover.1761588465.git.geert+renesas@glider.be>
+	<97549838f28a1bb7861cfb42ee687f832942b13a.1761588465.git.geert+renesas@glider.be>
+	<20251102104326.0f1db96a@jic23-huawei>
+	<CAMuHMdUkm2hxSW1yeKn8kZkSrosr8V-QTrHKSMkY2CPJ8UH_BQ@mail.gmail.com>
+	<20251109125956.106c9a1a@jic23-huawei>
+	<CAMuHMdX8c1VkBuPDpJ5mpCcRH+zEX4F1bQKFf_V8N9ZZtCYqxA@mail.gmail.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <990171.1762886312.1@warthog.procyon.org.uk>
-Date: Tue, 11 Nov 2025 18:38:32 +0000
-Message-ID: <990172.1762886312@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Simo Sorce <simo@redhat.com> wrote:
+On Mon, 10 Nov 2025 09:59:34 +0100
+Geert Uytterhoeven <geert@linux-m68k.org> wrote:
 
-> If a defect in a signing algorithm is found you can simply distribute a
-> new kernel with modules resigned with a different algorithm.
+> Hi Jonathan,
 
-Probably more "have to" than "can".  The cert providing the composite key for
-both would have to be invalidated to stop it from being used - and invalidated
-by having it added to the UEFI dbx table.
+Hi Geert,
 
-David
+> 
+> On Sun, 9 Nov 2025 at 14:01, Jonathan Cameron <jic23@kernel.org> wrote:
+> > On Mon, 3 Nov 2025 11:09:36 +0100
+> > Geert Uytterhoeven <geert@linux-m68k.org> wrote:  
+> > > On Sun, 2 Nov 2025 at 11:43, Jonathan Cameron <jic23@kernel.org> wrote:  
+> > > > On Mon, 27 Oct 2025 19:41:44 +0100
+> > > > Geert Uytterhoeven <geert+renesas@glider.be> wrote:
+> > > >  
+> > > > > Prepare for the advent of globally available common field_get() and
+> > > > > field_prep() macros by undefining the symbols before defining local
+> > > > > variants.  This prevents redefinition warnings from the C preprocessor
+> > > > > when introducing the common macros later.
+> > > > >
+> > > > > Suggested-by: Yury Norov <yury.norov@gmail.com>
+> > > > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>  
+> > > >
+> > > > So this is going to make a mess of merging your series given this is
+> > > > queued up for next merge window.
+> > > >
+> > > > I can pick this one up perhaps and we loop back to the replacement of
+> > > > these in a future patch?  Or perhaps go instead with a rename
+> > > > of these two which is probably nicer in the intermediate state than
+> > > > undefs.  
+> > >
+> > > Renaming would mean a lot of churn.
+> > > Just picking up the #undef patch should be simple and safe? The
+> > > removal of the underf and redef can be done in the next cycle.
+> > > Thanks!  
+> >
+> > Only 1 call of each of these in the driver, so churn is small either way.
+> >
+> > To avoid a bisection problem if your tree merges first I need to modify
+> > this stuff in the original patch or leave it for Linus to deal with as
+> > a merge conflict resolution which is mess I'd rather do without.  
+> 
+> If you add the #undef, there won't be any bisection problem?
+
+Two different things.  The bisection comment was about squashing into the
+original driver patch - not what was squashed.  Your tree may well merge
+before mine does and a bisection could therefore land in between the 
+driver introduction and a patch I merge today.
+
+The rename is a preference only because I don't want an undef that smells
+like a hack / bug work around kicking around in the tree for significant time
+(probably a whole kernel cycle). In this case the churn is very similar
+with that or a rename of the macros - so rename it is.
+
+Jonathan
+
+ 
+> Gr{oetje,eeting}s,
+> 
+>                         Geert
+> 
 
