@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4061133D6F8;
-	Tue, 11 Nov 2025 20:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9CA33D6FD;
+	Tue, 11 Nov 2025 20:31:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762893075; cv=none; b=d03y6E53jsYL6QBO4VNoQD1Q4v6TJJozKqJGWOPFHDfUx1bP8Ffy1+PEepmS7zZ0FhHqAFWMkXiwtKJKaUC8jBqCjHVNPurP8hHTJme9vbQFN4uZP34eg67oRiC3P3XYp+vw7046E3A4m6+Q4kGNYXCexJ/yvqz25bhpaSn+a1c=
+	t=1762893080; cv=none; b=q9/Uns5fwORct21XKjnyEC9noJg5fcnOxD0DzNmQFq9WjMgSlVMOOg8lPQ+YV7SQQw/Yt0ew0cu8CPK8EDI9sBhgiStNeS6JKWO26wgHPdG+xAzDl86dtsAiVf57wmyzh4761zNCT2CgEW2Rm2U4hWwZhFUQiAAPJLOBExXmJQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762893075; c=relaxed/simple;
-	bh=ADQaa9sHdyu7ZOrKR4J4rnxR26WrlTbpv0rZh7Rvzs4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k2z7FNIG1IZMWvpCoLACf0/Rw4enOHZ87c8UJQA1KbvZon4356b0w6efxTcpwbRza21x34Yax6Enn1Vdv5bD5dmbtWMyS65r7CKiHCgcbG067TDq1Lei4PlqOSAxez/uj7hCpBcovW6fbBqsy7Vn82xNGDm+CNcaZp5C3V6rnTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mu73vyL9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762893080; c=relaxed/simple;
+	bh=gCZM1PW6lB4y/ctI+DBLIH5T9x6I2f3q/IeDY5nP8NY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=douRg1c4fUYH+Sob+1Vh+CXZLI0K9QBvk02U/DxBOcfFrweAYfJi6UWdUY3TmwgC97AwqivA/nXl9eIbzRal3AIIuZQhNgPvdmBAY16tf/iU5RUMXHH4W0U674U5PH/2rnMIkW7+4MeNBTCwxSCgidIQLyohuTDGs//MjcT57fA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hMLdmCzg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mu73vyL9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A1DFC4CEF5;
-	Tue, 11 Nov 2025 20:31:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hMLdmCzg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D873C4CEFB;
+	Tue, 11 Nov 2025 20:31:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762893074;
-	bh=ADQaa9sHdyu7ZOrKR4J4rnxR26WrlTbpv0rZh7Rvzs4=;
+	s=k20201202; t=1762893080;
+	bh=gCZM1PW6lB4y/ctI+DBLIH5T9x6I2f3q/IeDY5nP8NY=;
 	h=From:To:Cc:Subject:Date:From;
-	b=Mu73vyL98SfZbW0XLaL1lLDHzfv7CD2IRJog7hFqXanRFkE3u144BBpJ02Kq6DbZl
-	 rcko2K3NWUxAJceXeZOLHAQ1Gg+RMtOsNrPrAIANiZYy9Bo+PBpvSLnBdxWXf0mKpr
-	 CRpS6prtnd23Fm15F2aHyqe3gAYn2fJs4dS02MaliAdNz+2oL/9MiMq47YOqY9zMsF
-	 zgPrAwGd/hObzqyDmK6vhyZmi9hfrbLgDJpi86KhYBmE1qt9GR5RFhDJrjYcuxmltE
-	 BPlMEhYvxYOlb8Bxemv2UL/Cgfroe4VoMYWD8TvTS/RbS7091gjInmzPsAnKEHQDmi
-	 I4BEWVVp0U06Q==
+	b=hMLdmCzg667o9JxB9QrDVqLmME6u/bikaDYs9dlbLlCwWEoFdB7co4vETD5hmDeeg
+	 mF1uD4dOPy+N+TtUMyozFIr4D/cMnoKJYbSbaDjUfCpvBYBzROVMRD7xPf7pNVZ7qW
+	 CcLo+KW+Rr1AZVUrSQBFYqlGuKo7rzzu+IjOkIkZ0BkcneZz9smixyPY5ul+AWfcvr
+	 kucQcAdi8zyySb6fcXZSHCOIIwEQ3lG8pgND4zuOoSfV/7+EeAZEzGVM+at1odjJp5
+	 ivFcGmJBLU/eOtbTEyQS9L1jCkrTIUNGI6BxRtPnuBRMMEg3yOfdXpWFQab6monUJK
+	 hwmud04yL1PaQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -33,9 +33,9 @@ Cc: linux-crypto@vger.kernel.org,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 6.17] lib/crypto: arm/curve25519: Disable on CPU_BIG_ENDIAN
-Date: Tue, 11 Nov 2025 12:29:23 -0800
-Message-ID: <20251111202923.242700-1-ebiggers@kernel.org>
+Subject: [PATCH 6.12] lib/crypto: arm/curve25519: Disable on CPU_BIG_ENDIAN
+Date: Tue, 11 Nov 2025 12:29:36 -0800
+Message-ID: <20251111202936.242896-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -69,7 +69,7 @@ Signed-off-by: Eric Biggers <ebiggers@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index 1e5f3cdf691c..a00ab9265280 100644
+index f87e63b2212e..df2ae5c6af95 100644
 --- a/arch/arm/crypto/Kconfig
 +++ b/arch/arm/crypto/Kconfig
 @@ -2,11 +2,11 @@
@@ -86,7 +86,7 @@ index 1e5f3cdf691c..a00ab9265280 100644
  	default CRYPTO_LIB_CURVE25519_INTERNAL
  	help
 
-base-commit: 7660ce69123ea73b22930fcf20d995ad310049ef
+base-commit: 8a243ecde1f6447b8e237f2c1c67c0bb67d16d67
 -- 
 2.51.2
 
