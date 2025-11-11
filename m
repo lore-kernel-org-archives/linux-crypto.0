@@ -1,268 +1,202 @@
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013059.outbound.protection.outlook.com [40.93.201.59])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E3F2E6116;
-	Tue, 11 Nov 2025 11:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762862263; cv=fail; b=SAr7dgSaUwkCArR1UVcm+6tNcTsAArvG/MyZUh/07GlxS5zCyfY4/OUDLK5zDcDg47uIeHnj545QDY5puvLv5l/VGcN46rsbC7Nle5VIQKxN4Nl+odCMzNR6PCjp5QmR/GPslowJTOqRMOgqQilnvzoWZpvSLRrG6iDFJJdBPRg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762862263; c=relaxed/simple;
-	bh=tuINL1204aLA0U87P30t2uEfGr4xr8haaFF5FWN3BAg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YtIdIM/6oqPMKAh2QGojPiZukoFX1CgwZrzD3wJEldpRDMv6+5IWyIvzhkIs8Le1mFS7NgHWdSTwFpiaeMB0n20A+V1R0KtICZ/otSbTtmTbfXpl0bn+cseKzuvrHYOrNfmVNB1KdnOAc0ZsnJrOdpU4pU2L+FhCGGZjteoJoiw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=b3CDMYOh; arc=fail smtp.client-ip=40.93.201.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1A43711B1
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Nov 2025 12:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762864210; cv=none; b=hCtGKEJIQZn8h9ggKwxk8eeeWLvYSa2SjcjqNcsTXo/tsrQ3lUC3zJL59zsMdHrtUm/ovAvEW7KNSinKKYPMNqVIMn5OvV8CP85z6FGLavT4PecFLvESoBtDr42vyb7FW882JMRvCEXn6DG40007Hk67/7NGU5AqSTDSCiWTLSw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762864210; c=relaxed/simple;
+	bh=dB8Ue9D/OJCd2P+B6eSyqNbmWDWbA3cTGphzjnIuCJY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IU0DexB2fRNGGpxCTUwrGGYGgvWjDmssLQ7U0s8bBOI4AS+uNOcdEnfHaxqMgzQZKmUuFl+oiqfqAQ6qvjx1saI4xd7oMravDEF4xM0WndgeAa/Rv5vlFfT7/V6xNekAugllZN61fLFTpu12H52QewiCVrZ3ok1xUOoN73ZjYHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=eSxsaPr6; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=JuaxlcbR; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="b3CDMYOh"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=e6Sb27Nr7nE3HVJbPlgtjzEPG2ioxHvYM87fZk/y7imNNgnpAOJwVyqN1hRZ7G55R9IwINNr6q9QV4Sx/OIJhsQkbeIwxax4WNAkAX7BAjEvUJAA9LDRjnpGpqhr7Roolh1CV7URHQ0At4YcCVC43/hAQ4vNwvfOiwf39UhLkFIoOSVk+BFlPw7vyRtk2/gWPNyNOewB8EzxGK1ZG3+LFzp8o95sf05utzXq5tY+7OIWxH+5tQN/uWAZA8Xn4ifln6pL/Bkd04wIsJslgrGjKAVtLmYWXmlYEydj+BZ5ufjFw37i8aITFmnHjzeL2/HC8kmZ3jwdvHiTH/3Cf+ypvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=n/+DpLeTqUhzHXwi6k7Py2elVbJHKKOt0rAE1jaDZVo=;
- b=DTBbixIyb256GxYq5pamEhD56AxEcnTkMZF/MrZCiwicZ3yKQZGrwEOs1Eox9FTqomairkXhDIZ8fsYOYvzI1yWIeSn7bD/0ljEbRUiqIPHaYMZLJ/efkV2Pr8AbC5prHHazowkjUi2aOdXHk2lPTCssangjCljuG2x1qUIf18qPtof+5+98M5NS2qFyAlO+i1y2mZifwWGlFCHjc/eA9k7c19wAMlXWUIx312Q/jpKGqRCVOyfb9zll7fOuosbTaXSgM13Mie9UiCZbTMK1q5qjTxE1HBLBq1eNq+4hscjTjVoqSO21UN33sgHV5Fv0C1D0BeqyqVTUSanoOg0RoA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=n/+DpLeTqUhzHXwi6k7Py2elVbJHKKOt0rAE1jaDZVo=;
- b=b3CDMYOh+SDg+TCUYgdhftpxCpo2See48D4KzbhoJpfRWBPczlKLWEb/77Ut3EnNagLlH5ROVl/WzEOgSP1b3i/wxf1OeVnnvU8mw+l5cMqQSubpwCUfxntt0Fl4XdOVRQEap6jbgFN4SmiO0Dr4rZYGxP0LTrCnliDIh2cPQjw=
-Received: from DS0PR12MB9345.namprd12.prod.outlook.com (2603:10b6:8:1a9::10)
- by PH7PR12MB6858.namprd12.prod.outlook.com (2603:10b6:510:1b4::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Tue, 11 Nov
- 2025 11:57:33 +0000
-Received: from DS0PR12MB9345.namprd12.prod.outlook.com
- ([fe80::65ab:d63c:7341:edbb]) by DS0PR12MB9345.namprd12.prod.outlook.com
- ([fe80::65ab:d63c:7341:edbb%2]) with mapi id 15.20.9320.013; Tue, 11 Nov 2025
- 11:57:33 +0000
-From: "Jain, Harsh (AECG-SSW)" <h.jain@amd.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "robh@kernel.org"
-	<robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "Botcha, Mounika"
-	<Mounika.Botcha@amd.com>, "Savitala, Sarat Chand"
-	<sarat.chand.savitala@amd.com>, "Simek, Michal" <michal.simek@amd.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "Buddhabhatti, Jay"
-	<jay.buddhabhatti@amd.com>
-Subject: RE: [PATCH 09/15] crypto: zynqmp-aes-gcm: Fix setkey operation to
- select HW keys
-Thread-Topic: [PATCH 09/15] crypto: zynqmp-aes-gcm: Fix setkey operation to
- select HW keys
-Thread-Index: AQHcSL4fwl9HB3A2vEaDmA0sI135SrTlG3sAgAhWX/A=
-Date: Tue, 11 Nov 2025 11:57:33 +0000
-Message-ID:
- <DS0PR12MB934525C9192C679D5AE681DD97CFA@DS0PR12MB9345.namprd12.prod.outlook.com>
-References: <20251029102158.3190743-1-h.jain@amd.com>
- <20251029102158.3190743-10-h.jain@amd.com>
- <aQwlEgMlYr8EPrTo@gondor.apana.org.au>
-In-Reply-To: <aQwlEgMlYr8EPrTo@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Enabled=True;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SetDate=2025-11-11T11:52:35.0000000Z;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Name=AMD
- Internal Distribution
- Only;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_ContentBits=3;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Method=Standard
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR12MB9345:EE_|PH7PR12MB6858:EE_
-x-ms-office365-filtering-correlation-id: 0d405bea-009b-4e26-86d4-08de21197fcd
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?0nso2AWOkKKY5z2+Iq/56q3DSkWGmqHWCBITLfFKuhasvoCqEjexoqVcbTbz?=
- =?us-ascii?Q?0FdNXBLlY6kj+Uht1yszNzYAHxeGMVsy+JvzGZq6p5TA/n31sad+DQkQBivd?=
- =?us-ascii?Q?yZrNnsDAJ2/eZJ70jY8JzQUP0BMa1ZG31pw8XFXYwcXn9D4aN/eP5xJ4iGsH?=
- =?us-ascii?Q?OBPEEKWYxh/MVrU8A55xFi3B1lgXsoiP3RjHzXiq6J8IM41ioH0QS37c3/JM?=
- =?us-ascii?Q?rSri8OwHB4wgYKE2Nr1yO/PNyIXK+9bZMG7CBWHIPTHCWc95oeNyHdWat/2M?=
- =?us-ascii?Q?+1fpeVJiV5Oq+EoB8vFKiS2UldSHHGWPHmlpyVHL9fMgrCft1qjxAtRDVsEo?=
- =?us-ascii?Q?nBvryGv/hg2KYF6aEd6TXITSlLy/RNT+3GG4RsEdRU/rLeu4rv5m4aAlEthS?=
- =?us-ascii?Q?u+BWmj+HbNbB55nRF2ulQrcveoD/ghwl6BrXilv76KZoX3scvP4t1LcYGXQh?=
- =?us-ascii?Q?NBe8EVkh9GTvMQh1lH19t7L/0Ge5j8X9X5ptZ2VhzsTBIjS0d6TrwlYjhWkp?=
- =?us-ascii?Q?3sj6TkiJvL3HyvOG4lyNwjKic4cc/fZIJkcHlEzYLgyimn8ttv1Vjk6KCC/E?=
- =?us-ascii?Q?8wbc+JlVG0Pl5Wg2Do4WWI5MBhDFjJ2v2tU954kJQckHZCgG8HuGQA9OeABd?=
- =?us-ascii?Q?GXCNuOD3OIiOvyRtt4oDWY8vol2cS3z5Wzk7SS1pT/kdF/J3wy4IUAg5UYoJ?=
- =?us-ascii?Q?cpjvKmm1InryoY+GJYo4uL9Lm1KqS/uRY+k9i1RiY6K/zy4SkIX7qAo7rHt8?=
- =?us-ascii?Q?lHCVuoVUUX9HRGp7lHN9Z9GGBOI8ufT/K2FO3hSeOMg0MC7AQr7R5AsaECZ+?=
- =?us-ascii?Q?1NBwY1xhohrgI3iliC6akMc+nDyrP56wdV6PB9GBAn5le/vCyepId5Q/VpEZ?=
- =?us-ascii?Q?4hOWQnt7oEBBant3s0einaEFu/D376YLSxpSoT458YzN3sIoPAJNc+NW+pB7?=
- =?us-ascii?Q?wSSUr/WTEXuhp95elrKji8J6m3344Gv4i6hcsyakZq+hRXav8NBBdfm9i4ef?=
- =?us-ascii?Q?yjvcv56yZDIRG9g3iZEE5VutTyeKdg0sDzQ7aEtBXVvvqq5Pk/+cL+ZrIBJE?=
- =?us-ascii?Q?86laPt3Z5bJFS8Wjgx9ZTxkofMrDh89xQ9O0S+fGwSwkjoV/qM1bMPF0Lumt?=
- =?us-ascii?Q?YgIy8gAcvff/tnXV7stmJiLfdtA3U/4FemSoUKrnDfpWZlsI87lS8pWHdE2y?=
- =?us-ascii?Q?8zr/AgJD+8yRVb4eIgBNv/NHJYN3sdGe/Bm8VUQvuh+XOYJWOYsgtLEYPjqH?=
- =?us-ascii?Q?32PCx0ZKjpP6WxekfB//K6OxX3pFTYGSeQd9mAb/VNpeq8qXy1PtO/Baek8m?=
- =?us-ascii?Q?RMa9Lh0wr/volp/Fw/ywJVsIC4z8pcse/qM49Wri4nUnKDzjJm7HF5JV4pye?=
- =?us-ascii?Q?c+sBkphez6nyBFAgJg2ZYXnE98RCduV7WgTyYJNLsGbkDUo6PelAwAlqbTB8?=
- =?us-ascii?Q?OehO/TsBxgGynmHliDvVCSggilvHq/miHUm97/JkqLjK5iyjO7dNbQ=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB9345.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?qoDcF9NqUbBF4unBTy4oOD5jFm7/gv9KKBYrqRNtIvyNEgVeLtpJqyiqsnrH?=
- =?us-ascii?Q?nRk9K0RA8uyXNQ3GKle7FhsopTTEgMgQaahq0MHSTOOntEgd4IsKx3mkQVFU?=
- =?us-ascii?Q?utrGEtc2zvMONKMZfYWRTcUTS2UkP3VCvKT+L1HNeD8YEuyh2KyyUgp6L+QW?=
- =?us-ascii?Q?C3UwSPY5TdDK4g74byFdeTVDHH76NWovL5itV83hRHBMryaHbDD/IHgDQehn?=
- =?us-ascii?Q?LnWcQ5oG7wjJzsN2fnV1V5MfQf5J3tAQl3yAGnQ2WAAqHf1Qe/W+rh2ORt1w?=
- =?us-ascii?Q?t+uVHy5f0/TxxiYZmvKuj5bylHCkxDQJyqEs7Tsu6qw1kbRCdAbdJKyoT9Mb?=
- =?us-ascii?Q?/iV9NxcIY6DnVqmVANWovWaAmjXwIXBL9qt4mbvjplFpE/hBoZ5/qpaobxCu?=
- =?us-ascii?Q?l2gTZ1fpTP4GoINBJI7AtAngmg6stvSI0TuJjx943j9zjMEjOIoNWUcQAGyf?=
- =?us-ascii?Q?Xnv132g1wNn8V1PBcAU97uFZAXS5PvQIXEY7JsLKrp/yH/RG/JFuniCFYS8X?=
- =?us-ascii?Q?FvokwR514UW3tCkZJQHq/HnEYK1m2Hxfoomd4i81D2srwh9ivNCI5L4bRlJJ?=
- =?us-ascii?Q?sNlZE/VbF/VTl+1JcTU/E6ttzLmus2gCKH72QGN111W5BWgXGT8+tkNrgT0g?=
- =?us-ascii?Q?qM4t0+DhqPg16/JRIL8IXnHeyE0ToJnHvX6umydod2zQwa68x6ibKW1UudKW?=
- =?us-ascii?Q?Kz2h48lew2cAzW71wP0RKCFm9svO1qU4np2z/bpb23sK2uwkHBbzA2W6pp8R?=
- =?us-ascii?Q?0hEm1EXQ1rf6/GXR3KvNnv4+onU4t2iaHE/2vC43+S+uquSoLebFNuE9362+?=
- =?us-ascii?Q?/u0lVLws6JSBP6TlUPt/BEbmsrydKQ+L0NgsrQUF9d93R6Xvgk/wiOVXA4jU?=
- =?us-ascii?Q?qZt/XcP7IRq6rAehqVyu8Zz89tNwkZ2JfOFG33DYyO73YsuOQhZr0yj6lnGq?=
- =?us-ascii?Q?+ZPaiZHPR59z5UoT7iiSPttHnnUxwPyVftcsvPU9Q8KlmChQcpX6uFrM7I2L?=
- =?us-ascii?Q?d5onfFJFchswkIHfVyU4zoDbr9KN8DjD/gO8Ys8kXVuoWVT9/HqNiST/U8W+?=
- =?us-ascii?Q?0tL1bJxMsPDhObW5oC5PA1ESbwFYQUw4rWEq/o32x/0MQ3lp3wTe98Ic5Jbh?=
- =?us-ascii?Q?VdfmHVZUcAo00IdM/Ruf7edX46Rn4N2xERpyfruXnLLMQRIq5BCImH0fj+r+?=
- =?us-ascii?Q?dSiy7wqU5jIeceJGJiGM39ol3aLOjseHwHcP37TaHyBKX8FBcADkiT5EZBkN?=
- =?us-ascii?Q?HFnthBWOepWKRoZ4HA/DE6a7aRgU1s3ndnG23oer8I2QbOTnRGfL2wDI4d4g?=
- =?us-ascii?Q?Nio488g1zzi2LqaiKFapPSiM9HclUEnOPJllByfRr+XqS6BwucS1CtIcXch5?=
- =?us-ascii?Q?ax7KzKajE6dd0+EK0t25d/TFmVW4jLGZiOiF/fnMVcb5+iJcBrXajd37uvIV?=
- =?us-ascii?Q?L7YwVeOTUHtPZ6SpdC/MyAT/h4TFKFslDKcGZa+7koGH5u4lQGa3yVxQe2M1?=
- =?us-ascii?Q?bTMOdH3WKFvhzMnXwF9ZmW+nQlO8Iacdj3uzo8Cz+OcDLmapxm8QA66Ugfif?=
- =?us-ascii?Q?F9FzWNIPDdpD/a6WuZI=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="eSxsaPr6";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="JuaxlcbR"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ABBGd8W2027969
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Nov 2025 12:30:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=hBs6+xWoLI/U3b24rkOBpj2F
+	X7NTpjk+sdbP859Hs0s=; b=eSxsaPr6WrcV5ySsbXB9AYitmCJYpQFggD+nREFQ
+	pG2uX8DRL+X4TNu0TEJNH3G+Y5fIs/zXNu2GsVVsftljOFzfCI8q+xSN9ZVKt1cT
+	AMDCAAHdDWd/Mxp6Sd55K0MV7R/lCekb+a/txYFISaZ+94e74VSkE53HZRFEp7cq
+	qt+W2abJoVe9XYk9We8mvXHVJK1DjbzSk2RJlKWPCCv22CRu5Rgch/8QLMQflF/B
+	1n0dSArA4TyMHwSIW6cxDBUBwEkQqzfSg4mPnd1nLaokUVQOdfvXxr15mFYEquou
+	8Z0hfWV8uUOGrGUV5fmx5by/rgYi4TxCgnswYT5FUlljDQ==
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4abxqw17a3-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Nov 2025 12:30:06 +0000 (GMT)
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4edaf614c7aso54143701cf.1
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Nov 2025 04:30:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1762864206; x=1763469006; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hBs6+xWoLI/U3b24rkOBpj2FX7NTpjk+sdbP859Hs0s=;
+        b=JuaxlcbRZkQbjzX9tRMI6NY7pcYSG9Ty9SEU8gXdHCpvVtThRdHBBfYvV7VVFVjTd8
+         O5oE3aJkel1zuGwOo6VIVardtaeqe36epmrv1RluJpCkV7pBo2poIR4ud/ZYacUoXQKo
+         V1xDvdLSC07bSs4ywihIiY8ivJYNrPhbNhRyN9szo0ffoCdhuNG/76+89hv25Qz/QKGR
+         s8v01TCRnZ9KPCyepzJdAPMqGHkd3agZ+sXkSTKi00E7Z5AUD9SrVtP3T+ufsv+c5lvv
+         kPrQXC2rcYTGoiEadK0Xy5vOI8dqYOGA0t4T3pWQkcRzgArcxqUBCNFBzyCK8A1KNpFG
+         T1tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762864206; x=1763469006;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hBs6+xWoLI/U3b24rkOBpj2FX7NTpjk+sdbP859Hs0s=;
+        b=tMhit5BucjKDoiNC2M2WakB9d8fnhCLpbGapYUQZAi5i5Q+rk2Z8BhQikJ6IzJ2/TY
+         Gb9shW0lFhKyihZvTdybRSpm84SvWrsX01Lw1RSo3LpV2Tx4sVYlhD4YV58j8i3ouIxL
+         eJnM6qr9YeGutp1FivPzJYPv5QF+qq5MTCWoh+M0fcyN9+qkbGzc5yb4zY0aaQRDjXAp
+         0fbYl+uhP3uqE91EOtXMIhODNkhYJgMo1KjQsPA2M1ndXpR4jOAoFfpLCRjgmO+ke7GX
+         ZGOoOFtjo4gzkVVnBgWfYkjYwDkHlD4VqtJORYG80GgKh5Kh2Bl0OpuVMylNdLJHz052
+         /iXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVuYkNRxIElYyiZr/rYPZ8Rs0YEsNh98QIMUd9833/qtbXVQZ5HEu7OfOCnUsTfkYRDhSslVYM+PXorBRU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDQkSNP1bvMYxGLqPPCGgdb6dljwvdMzP4xkeYYnBNjQMe2iP0
+	grjVUf9wboyP9NUbshCZDAGr2z9ew7mNgIVM97LMuZTN8LDBFz4IsKh6ZL6KLLERFEDV1XL2fHL
+	STY+vXix1OAMJrqP7afOA5Rz/sQ3CijxEjHFc+Yp/mLq1tL7Mr/nulWwLvtzNTPn5Zx0=
+X-Gm-Gg: ASbGncusMPkjQhamHmQSmgDlXqwgyR1OXd033IvC5HeiF5yrwkxfU7GGlJK5YScHHax
+	JtLoA7SohvlWg099zZyWMXqHBwV5mlqdesHhBtbKVB061b1vUMSj6Z91E5kK54jpXyjdTp0dDfa
+	ipYM1+rUoxOZvxqKi1FxwQKAactYG2iiF9c/3IchDHytQCAM625RGkmmuNF2K0TDpS3OlUc9p4T
+	qFi7zgRtVG4lbwYJkWK9UP4Nqj5RAr+D6cHOcoXEonUJRfnSTHFUOk+EZg4T4EL6A+T4WayIp+i
+	AYp0K0EBqpGaP3dgzCm3gQsD+moVAkcMIYB8n3jYgMEPgYwmA1xQ3dMF7Kic5/D2Rm1EZHXDVHM
+	+pxIiLSG+3HV+RT+UetyipdA2lHI9mzLg/v8QJTVWRDt9LFH1fmASSkODJThjFohukotAIZaUDe
+	ozbGZ/WKiUJxNI
+X-Received: by 2002:ac8:5f94:0:b0:4ec:fb4d:105e with SMTP id d75a77b69052e-4eda4fe0a8bmr137123381cf.69.1762864205827;
+        Tue, 11 Nov 2025 04:30:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF/wAmTt64QZYcRPu2yVc2CYacZ2Ql3aGNECWBHUNigTi3vj/RKjWKUB+wbah0KY0qbLTwsww==
+X-Received: by 2002:ac8:5f94:0:b0:4ec:fb4d:105e with SMTP id d75a77b69052e-4eda4fe0a8bmr137122491cf.69.1762864204948;
+        Tue, 11 Nov 2025 04:30:04 -0800 (PST)
+Received: from umbar.lan (2001-14ba-a0c3-3a00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a0c3:3a00:264b:feff:fe8b:be8a])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-37a5f078765sm44935281fa.19.2025.11.11.04.30.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Nov 2025 04:30:04 -0800 (PST)
+Date: Tue, 11 Nov 2025 14:30:02 +0200
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Udit Tiwari <quic_utiwari@quicinc.com>,
+        Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
+        Md Sadre Alam <mdalam@qti.qualcomm.com>, dmaengine@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v8 01/11] dmaengine: Add DMA_PREP_LOCK/DMA_PREP_UNLOCK
+ flags
+Message-ID: <xozu7tlourkzuclx7brdgzzwomulrbznmejx5d4lr6dksasctd@zngg5ptmedej>
+References: <20251106-qcom-qce-cmd-descr-v8-0-ecddca23ca26@linaro.org>
+ <20251106-qcom-qce-cmd-descr-v8-1-ecddca23ca26@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB9345.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d405bea-009b-4e26-86d4-08de21197fcd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2025 11:57:33.4676
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WEKrFCK1wuuDjMa9ku++pXCqzb/CvYcrLEge6zTzo8B3023CCCLdLM1j1OUHV944
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6858
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251106-qcom-qce-cmd-descr-v8-1-ecddca23ca26@linaro.org>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTExMDA5OSBTYWx0ZWRfXzgk+8eup6V1C
+ cXgcd9qXuDkiyUa3lbchx/D7TVVI7jg4zv9LULTCifXqP9HEgYVp8gSCtxT0VyMaSw1vqtvDoVC
+ WTj7awsZTTNNdwrTHuiS3ArWjCLmH1S7Xjwl6f9IQqmG9zI6SuzbXG0wDLxXF81wZrCB1vg5Bdj
+ BUka5O+y+w0rGG7buztEjuYGOMORjhSAqC2vhEsWu99MDb3Me1OFYeqAq+MVGCcR7yTrwgO4Zjv
+ 2vAg/+qOrTfVXteupqwCEvtUg8FOKCNM9w+S7SR7QKXG7XEAdHg0tk8QgW5keSD/zM4NdsbaRVE
+ T0xnFe6hSTtQvc+vi+qIOSF5WwKuu7C1oX48M8MjzIJ5ByKQJYczUg6U14Z6opo7Qqf4zBwDJdV
+ bdMPffU/9raMi06iFm2td066NMA4oQ==
+X-Proofpoint-GUID: fM8AIBys3BDGGp64-M4xe0Bt6eiIpepY
+X-Proofpoint-ORIG-GUID: fM8AIBys3BDGGp64-M4xe0Bt6eiIpepY
+X-Authority-Analysis: v=2.4 cv=CeIFJbrl c=1 sm=1 tr=0 ts=69132c4e cx=c_pps
+ a=JbAStetqSzwMeJznSMzCyw==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=KKAkSRfTAAAA:8 a=8Z5QE3b6LG9DqZ8cva8A:9 a=CjuIK1q_8ugA:10
+ a=uxP6HrT_eTzRwkO_Te1X:22 a=cvBusfyB2V15izCimMoJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-11_02,2025-11-11_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 lowpriorityscore=0 bulkscore=0
+ impostorscore=0 clxscore=1015 phishscore=0 malwarescore=0 spamscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2511110099
 
-[AMD Official Use Only - AMD Internal Distribution Only]
+On Thu, Nov 06, 2025 at 12:33:57PM +0100, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Some DMA engines may be accessed from linux and the TrustZone
+> simultaneously. In order to allow synchronization, add lock and unlock
+> flags for the command descriptor that allow the caller to request the
+> controller to be locked for the duration of the transaction in an
+> implementation-dependent way.
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Thursday, November 6, 2025 10:03 AM
-> To: Jain, Harsh (AECG-SSW) <h.jain@amd.com>
-> Cc: davem@davemloft.net; linux-crypto@vger.kernel.org;
-> devicetree@vger.kernel.org; robh@kernel.org; krzk+dt@kernel.org;
-> conor+dt@kernel.org; Botcha, Mounika <Mounika.Botcha@amd.com>; Savitala,
-> Sarat Chand <sarat.chand.savitala@amd.com>; Simek, Michal
-> <michal.simek@amd.com>; linux-arm-kernel@lists.infradead.org; Buddhabhatt=
-i, Jay
-> <jay.buddhabhatti@amd.com>
-> Subject: Re: [PATCH 09/15] crypto: zynqmp-aes-gcm: Fix setkey operation t=
-o select
-> HW keys
->
->
->
-> On Wed, Oct 29, 2025 at 03:51:52PM +0530, Harsh Jain wrote:
-> > Currently keylen 1 is used to select hw key. There are -ve self test
-> > which can fail for setkey length 1. Update driver to use 4 bytes
-> > with magic number to select H/W key type.
-> >
-> > Signed-off-by: Harsh Jain <h.jain@amd.com>
-> > ---
-> >  drivers/crypto/xilinx/zynqmp-aes-gcm.c | 94 ++++++++++++++++----------
-> >  1 file changed, 60 insertions(+), 34 deletions(-)
->
-> The hardware key support should be registered under the name paes
-> instead of aes.  Grep for paes in drivers/crypto for examples.
+What is the expected behaviour if Linux "locks" the engine and then TZ
+tries to use it before Linux has a chance to unlock it.
 
-Sure, Will check and update the driver accordingly.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  Documentation/driver-api/dmaengine/provider.rst | 9 +++++++++
+>  include/linux/dmaengine.h                       | 6 ++++++
+>  2 files changed, 15 insertions(+)
+> 
+> diff --git a/Documentation/driver-api/dmaengine/provider.rst b/Documentation/driver-api/dmaengine/provider.rst
+> index 1594598b331782e4dddcf992159c724111db9cf3..6428211405472dd1147e363f5786acc91d95ed43 100644
+> --- a/Documentation/driver-api/dmaengine/provider.rst
+> +++ b/Documentation/driver-api/dmaengine/provider.rst
+> @@ -630,6 +630,15 @@ DMA_CTRL_REUSE
+>    - This flag is only supported if the channel reports the DMA_LOAD_EOT
+>      capability.
+>  
+> +- DMA_PREP_LOCK
+> +
+> +  - If set, the DMA controller will be locked for the duration of the current
+> +    transaction.
+> +
+> +- DMA_PREP_UNLOCK
+> +
+> +  - If set, DMA will release he controller lock.
+> +
+>  General Design Notes
+>  ====================
+>  
+> diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
+> index 99efe2b9b4ea9844ca6161208362ef18ef111d96..c02be4bc8ac4c3db47c7c11751b949e3479e7cb8 100644
+> --- a/include/linux/dmaengine.h
+> +++ b/include/linux/dmaengine.h
+> @@ -200,6 +200,10 @@ struct dma_vec {
+>   *  transaction is marked with DMA_PREP_REPEAT will cause the new transaction
+>   *  to never be processed and stay in the issued queue forever. The flag is
+>   *  ignored if the previous transaction is not a repeated transaction.
+> + *  @DMA_PREP_LOCK: tell the driver that there is a lock bit set on command
+> + *  descriptor.
+> + *  @DMA_PREP_UNLOCK: tell the driver that there is a un-lock bit set on command
+> + *  descriptor.
+>   */
+>  enum dma_ctrl_flags {
+>  	DMA_PREP_INTERRUPT = (1 << 0),
+> @@ -212,6 +216,8 @@ enum dma_ctrl_flags {
+>  	DMA_PREP_CMD = (1 << 7),
+>  	DMA_PREP_REPEAT = (1 << 8),
+>  	DMA_PREP_LOAD_EOT = (1 << 9),
+> +	DMA_PREP_LOCK = (1 << 10),
+> +	DMA_PREP_UNLOCK = (1 << 11),
+>  };
+>  
+>  /**
+> 
+> -- 
+> 2.51.0
+> 
 
->
-> > @@ -218,32 +220,42 @@ static int zynqmp_aes_aead_setkey(struct
-> crypto_aead *aead, const u8 *key,
-> >                                 unsigned int keylen)
-> >  {
-> >       struct crypto_tfm *tfm =3D crypto_aead_tfm(aead);
-> > -     struct zynqmp_aead_tfm_ctx *tfm_ctx =3D
-> > -                     (struct zynqmp_aead_tfm_ctx *)crypto_tfm_ctx(tfm)=
-;
-> > +     struct zynqmp_aead_tfm_ctx *tfm_ctx =3D crypto_tfm_ctx(tfm);
-> > +     struct xilinx_hwkey_info hwkey;
-> >       unsigned char keysrc;
-> > +     int err;
-> >
-> > -     if (keylen =3D=3D ZYNQMP_KEY_SRC_SEL_KEY_LEN) {
-> > -             keysrc =3D *key;
-> > +     if (keylen =3D=3D sizeof(struct xilinx_hwkey_info)) {
-> > +             memcpy(&hwkey, key, sizeof(struct xilinx_hwkey_info));
-> > +             if (hwkey.magic !=3D XILINX_KEY_MAGIC)
-> > +                     return -EINVAL;
-> > +             keysrc =3D hwkey.type;
-> >               if (keysrc =3D=3D ZYNQMP_AES_KUP_KEY ||
-> >                   keysrc =3D=3D ZYNQMP_AES_DEV_KEY ||
-> >                   keysrc =3D=3D ZYNQMP_AES_PUF_KEY) {
-> > -                     tfm_ctx->keysrc =3D (enum zynqmp_aead_keysrc)keys=
-rc;
-> > -             } else {
-> > -                     tfm_ctx->keylen =3D keylen;
-> > +                     tfm_ctx->keysrc =3D keysrc;
-> > +                     tfm_ctx->keylen =3D sizeof(struct xilinx_hwkey_in=
-fo);
-> > +                     return 0;
-> >               }
-> > -     } else {
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     if (keylen =3D=3D ZYNQMP_AES_KEY_SIZE && tfm_ctx->keysrc =3D=3D
-> ZYNQMP_AES_KUP_KEY) {
-> >               tfm_ctx->keylen =3D keylen;
-> > -             if (keylen =3D=3D ZYNQMP_AES_KEY_SIZE) {
-> > -                     tfm_ctx->keysrc =3D ZYNQMP_AES_KUP_KEY;
-> > -                     memcpy(tfm_ctx->key, key, keylen);
-> > -             }
-> > +             memcpy(tfm_ctx->key, key, keylen);
-> > +     } else if (tfm_ctx->keysrc !=3D ZYNQMP_AES_KUP_KEY) {
-> > +             return -EINVAL;
-> >       }
-> >
-> >       tfm_ctx->fbk_cipher->base.crt_flags &=3D ~CRYPTO_TFM_REQ_MASK;
-> >       tfm_ctx->fbk_cipher->base.crt_flags |=3D (aead->base.crt_flags &
-> >                                       CRYPTO_TFM_REQ_MASK);
-> >
-> > -     return crypto_aead_setkey(tfm_ctx->fbk_cipher, key, keylen);
-> > +     err =3D crypto_aead_setkey(tfm_ctx->fbk_cipher, key, keylen);
-> > +     if (!err)
-> > +             tfm_ctx->keylen =3D keylen;
->
-> You can't have a fallback when there is a hardware key.  How did
-> the fallback not return an error here?
-
-We have two types of key registers
-1) Registers to save user supplied keys like ZYNQMP_AES_KUP_KEY
-2) Register Where H/W internally generates the keys like ZYNQMP_AES_DEV_KEY=
- and ZYNQMP_AES_PUF_KEY
-
-Fallback is for 1), because driver has saved key in private ctx and can be =
-fallback to S/W.
-
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
+-- 
+With best wishes
+Dmitry
