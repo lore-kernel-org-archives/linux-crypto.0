@@ -1,41 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0769C27B359;
-	Wed, 12 Nov 2025 20:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81705280A5A;
+	Wed, 12 Nov 2025 21:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762979048; cv=none; b=WUEUiCHDgULlvrhjQkz8joz/aaDCW+iX/RpxYSMMJ6VC3RxYoLrwaB9zarS0Ce7Cq2zEBqGTrWCmcAm1Bj4aYBSfgjp2xulrqH7MFybG8oEuuthZlfi2IobECKusfDOH0IISb3bhosblvbRYHspK+/ENQ4pNy8iZaXE1Fk7wtfI=
+	t=1762981214; cv=none; b=em1LlZo2QxyKVtek/xlJyzkVurMsrVrvcs2wGcGdiH6LeepuT1MX/oEkiKvikVKA+8L3CuPqMyNipb1xfAPASekem1emDvUIEL0OCN+bQL6neRMJU4bWKr4vd26cfA+fxiVFyCSTV4jZYTp4WFipuzYUWM1oHaoO+cOaR2Z3D8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762979048; c=relaxed/simple;
-	bh=V7Viu4MHlojVqnJ12RNQpm9DyfbuvHsqxBrF6sBFiRg=;
+	s=arc-20240116; t=1762981214; c=relaxed/simple;
+	bh=y4Ld6BCnq7KX+vDSRVwSUYQvdimBcRrIcm5ooyZboEE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d/iHEtJl9FNbcBubNNYpjYaULagGv9Wn1/vsBHuDVOQ8SwsKD9fdcHSfKViefOU3hXZH5hQ03EHtSyV3EDreiUxuEqF/F/4QWDKX/n2oFOYiPSoDJmcUy3lJ7tr99ivcJzA3lwIkZg1C+rKy583tehnscCEVbksGsoT7Ys3DLcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EQSFzRYI; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ztot586rs/YeYgHpfY6L+xyCHw/iogxBy6IallQxdI/U5B65BwJnuuzIt6smwcmvLhwQYtVSCmLu33A6I5HtvpnOVi+m2KlITR0WuD4FoMvom9iR1TWXmhMuCMD5F0TPf68ftxTsymnUq2TUS/odj1u9Etk/SnlqjCAN1IIJ47U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9KNBCdI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EQSFzRYI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B4F2C4CEF5;
-	Wed, 12 Nov 2025 20:24:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9KNBCdI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D07FAC4CEF7;
+	Wed, 12 Nov 2025 21:00:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762979046;
-	bh=V7Viu4MHlojVqnJ12RNQpm9DyfbuvHsqxBrF6sBFiRg=;
+	s=k20201202; t=1762981213;
+	bh=y4Ld6BCnq7KX+vDSRVwSUYQvdimBcRrIcm5ooyZboEE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EQSFzRYI9dEBuYpJYxBr7pyiPHx/cRWWYOs4tDdA1IqO6Q9EBpfwrad+jgXqFol9D
-	 iaMIDlxzzlOKr67fOuSvZ24a3yNhudTefFp/yVynWSV6rLVIkrEMlC/FeUvfwKP6iy
-	 CGN04HLsi/T1rbczApWoQocq2o559D8DAa1CCVkeZXzSwuktBoOB9ZIcVDTUkJksVY
-	 f4nUMiL4EwcshakDdw41t40mUPEMgSA6PCO4o15dsO9ELKWizawSnwcJsKybeKJnpe
-	 ObawuvA9V989S5mQKcQBT6GsKHSzzaoJHDo9O+tSpBtcqSBn22tpuDXFM9TdeBsnTA
-	 jJ2ORlThR19ZA==
-Date: Wed, 12 Nov 2025 12:22:25 -0800
+	b=s9KNBCdIQnX4NqogZP5t9fr/bVLmOpAcYpydtyT11eaAXfRe32MGmyfP5gaQnnRhR
+	 o+9E5tSgi/SjmlpWTbxOuCyJKjMh8iu/ma+NnD2czJ9USvlo/1FIARwRNNJPQuEcRZ
+	 /4g8rMzdFJRGYzgPaU+OzpK68OoVqpft4p5G3p4J7J83YxYi3026N9ncSGU6UY00KB
+	 H5WQJ+8AuoptYS9SGk0WTrzT0LAq59zhNyFP5NdM0wliZ0bEPaYpsaVDwfj44z3cXW
+	 tPzbx8wfs1tCxUPsWgd8wKiDDPIUMvO69WBRCmocsFTY2PUNsJhNs6nJeuQQ+/jcz4
+	 LxJUKHmbuav0g==
+Date: Wed, 12 Nov 2025 12:58:32 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
-	linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1
- code instead of AF_ALG
-Message-ID: <20251112202225.GA1760@sol>
-References: <20250929194648.145585-1-ebiggers@kernel.org>
- <20251112121212.66e15a2d@phoenix>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Jonathan Cameron <jonathan.cameron@huawei.com>,
+	Ard Biesheuvel <ardb+git@google.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Subject: Re: [PATCH v4 08/21] lib/crc: Switch ARM and arm64 to 'ksimd' scoped
+ guard API
+Message-ID: <20251112205832.GC1760@sol>
+References: <20251031103858.529530-23-ardb+git@google.com>
+ <20251031103858.529530-31-ardb+git@google.com>
+ <20251031134909.00006bf3@huawei.com>
+ <CAMj1kXHMa_Vj3DsuoAR-rvWW12Bsnz10w+BAze6mtngqpABZPw@mail.gmail.com>
+ <CAMj1kXH_YCuBT4CbidTcVDNz2qNvYK9afS+v9eNkNggB3gopBw@mail.gmail.com>
+ <20251103112836.00006966@huawei.com>
+ <CAMj1kXGog9bwqc=1qCv+Lh3giK081jf9h4AFCvQ=6Ls6N27LyA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,39 +51,105 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251112121212.66e15a2d@phoenix>
+In-Reply-To: <CAMj1kXGog9bwqc=1qCv+Lh3giK081jf9h4AFCvQ=6Ls6N27LyA@mail.gmail.com>
 
-On Wed, Nov 12, 2025 at 12:12:12PM -0800, Stephen Hemminger wrote:
-> On Mon, 29 Sep 2025 12:46:48 -0700
-> Eric Biggers <ebiggers@kernel.org> wrote:
+On Tue, Nov 04, 2025 at 04:32:28PM +0100, Ard Biesheuvel wrote:
+> On Mon, 3 Nov 2025 at 12:28, Jonathan Cameron
+> <jonathan.cameron@huawei.com> wrote:
+> >
+> > On Fri, 31 Oct 2025 15:05:19 +0100
+> > Ard Biesheuvel <ardb@kernel.org> wrote:
+> >
+> > > On Fri, 31 Oct 2025 at 14:52, Ard Biesheuvel <ardb@kernel.org> wrote:
+> > > >
+> > > > On Fri, 31 Oct 2025 at 14:49, Jonathan Cameron
+> > > > <jonathan.cameron@huawei.com> wrote:
+> > > > >
+> > > > > On Fri, 31 Oct 2025 11:39:07 +0100
+> > > > > Ard Biesheuvel <ardb+git@google.com> wrote:
+> > > > >
+> > > > > > From: Ard Biesheuvel <ardb@kernel.org>
+> > > > > >
+> > > > > > Before modifying the prototypes of kernel_neon_begin() and
+> > > > > > kernel_neon_end() to accommodate kernel mode FP/SIMD state buffers
+> > > > > > allocated on the stack, move arm64 to the new 'ksimd' scoped guard API,
+> > > > > > which encapsulates the calls to those functions.
+> > > > > >
+> > > > > > For symmetry, do the same for 32-bit ARM too.
+> > > > > >
+> > > > > > Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+> > > > > > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> > > > > > ---
+> > > > > >  lib/crc/arm/crc-t10dif.h   | 16 +++++-----------
+> > > > > >  lib/crc/arm/crc32.h        | 11 ++++-------
+> > > > > >  lib/crc/arm64/crc-t10dif.h | 16 +++++-----------
+> > > > > >  lib/crc/arm64/crc32.h      | 16 ++++++----------
+> > > > > >  4 files changed, 20 insertions(+), 39 deletions(-)
+> > > > > >
+> > > > > > diff --git a/lib/crc/arm/crc-t10dif.h b/lib/crc/arm/crc-t10dif.h
+> > > > > > index 63441de5e3f1..aaeeab0defb5 100644
+> > > > > > --- a/lib/crc/arm/crc-t10dif.h
+> > > > > > +++ b/lib/crc/arm/crc-t10dif.h
+> > > > >
+> > > > > >  static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
+> > > > > > @@ -20,21 +19,16 @@ asmlinkage void crc_t10dif_pmull8(u16 init_crc, const u8 *buf, size_t len,
+> > > > > >  static inline u16 crc_t10dif_arch(u16 crc, const u8 *data, size_t length)
+> > > > > >  {
+> > > > > >       if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE) {
+> > > > > > -             if (static_branch_likely(&have_pmull)) {
+> > > > > > -                     if (likely(may_use_simd())) {
+> > > > > > -                             kernel_neon_begin();
+> > > > > > -                             crc = crc_t10dif_pmull64(crc, data, length);
+> > > > > > -                             kernel_neon_end();
+> > > > > > -                             return crc;
+> > > > > > -                     }
+> > > > > > +             if (static_branch_likely(&have_pmull) && likely(may_use_simd())) {
+> > > > > > +                     scoped_ksimd()
+> > > > > > +                             return crc_t10dif_pmull64(crc, data, length);
+> > > > >
+> > > > > >               } else if (length > CRC_T10DIF_PMULL_CHUNK_SIZE &&
+> > > > > >                          static_branch_likely(&have_neon) &&
+> > > > > >                          likely(may_use_simd())) {
+> > > > >
+> > > > > I briefly thought this was a functional change but it's not because
+> > > > > of may_use_simd() being something that isn't going to change between
+> > > > > the two evaluations.
+> > > > >
+> > > > > Would it hurt at all to pull that up to be
+> > > > >         if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE && likely(may_use_simd())) {
+> > > > >                 if (static_branch_likely(&have_pmull)) {
+> > > > >                         scoped_ksimd()
+> > > > >                                 return crc_t10dif_pmull64(crc, data, length);
+> > > > >
+> > > > >                 } else if (length > CRC_T10DIF_PMULL_CHUNK_SIZE &&
+> > > > >                            static_branch_likely(&have_neon)) {
+> > > > >                 ...
+> > > > >
+> > > > > ?
+> > > > >
+> > > >
+> > > > Yeah that would be a reasonable cleanup, I guess.
+> > >
+> > > Actually, looking more closely, that would result in may_use_simd()
+> > > being evaluated even when the static keys are set to false, given that
+> > > the compiler is unlikely to be able to figure out by itself that
+> > > may_use_simd() has no side effects.
+> > Yeah. That was why it was a question :)
+> > Given everything is marked as likely I wasn't sure if we cared about when
+> > the static keys aren't set.
+> >
 > 
-> > diff --git a/lib/sha1.c b/lib/sha1.c
-> > new file mode 100644
-> > index 00000000..1aa8fd83
-> > --- /dev/null
-> > +++ b/lib/sha1.c
-> > @@ -0,0 +1,108 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/*
-> > + * SHA-1 message digest algorithm
-> > + *
-> > + * Copyright 2025 Google LLC
-> > + */
-> 
-> Not a big fan of having actual crypto in iproute2.
-> It creates even more technical debt.
-> Is there another crypto library that could be used?
+> Yeah, it is rather doubtful that those annotations (or the use of
+> static keys, for that matter) make a meaningful difference here.
 
-Currently iproute2 doesn't depend on OpenSSL.  You can make it do that,
-if you want, and then you could use SHA-1 from there.  I suspect that
-doing that would be much more trouble than just adding this SHA-1 code.
+Well, this change makes crc_t10dif_update() not usable during early boot
+on arm64, as it will start hitting the
+WARN_ON(!system_capabilities_finalized() in may_use_simd().
 
-If you happen to be planning to pull in OpenSSL as a dependency for
-other reasons, it might make sense then.
+I doubt there are any current callers where that matters, but I've been
+trying to avoid this sort of unnecessary pitfall in the CRC functions.
 
-> Better yet, is there a reason legacy BPF code needs to still exist
-> in current iproute2? When was the cut over.
-
-No idea.  That's a question for the BPF folks.
+Checking the static key first eliminates this pitfall and is also more
+efficient on CPUs that don't support the relevant CPU feature.
 
 - Eric
