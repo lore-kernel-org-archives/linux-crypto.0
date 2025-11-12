@@ -1,147 +1,103 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6BA33C502
-	for <linux-crypto@vger.kernel.org>; Wed, 12 Nov 2025 17:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DBC29ACD7
+	for <linux-crypto@vger.kernel.org>; Wed, 12 Nov 2025 20:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762970246; cv=none; b=X9cuytQaaEQ8cYl5lY3cWiFiAJ8CVYZCbOFFdZh2/IMOKvnpWtrzSG+vtHbRKQYaUW4z9ImXA9cX/d3394nut4ZUbspKZjqmrR8C7XA9sPVGx/DuBLejnaeGFKg3DSMARFpHa6JMdd6yulwkSZW63lAon8xueBDxofaTCBuAqEo=
+	t=1762978338; cv=none; b=YvOOzMRhoSKcxoW+gVJl3qQSDW2UkNmNXX+iECqEqMAtqdkqZStf55A6KcRMx8rLmft4CiCxejB+yJ1tpAm50SPRfi3Q4mscpZQ/bKsavIRk8UJeXoaz80UrquU2k7UEoiOU/nT0vWyw+Ccz8JbRRx16Pj+mCda5PFckVzzZ5/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762970246; c=relaxed/simple;
-	bh=MjEDmAYq4++Uq2lZMtscjOWc1UU/sEDwm5bxzdQwgKg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mz6ENxwbisWHMtN68DKmPEwcg3ke4AnI5pCqTnBmpd9w1Jo5s/QiXsuvixAo6orTCs12UY+0JuyWfg0IZ3AREFDqSZLA5dBID9LuxyvkkK6h/IspMNFNMN7dg7KcD5l/uWWaWJwhSVYXu4Ac2k3YF2QLpKT1TdKVXvB8LIxFhAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=GJ09pnOY; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1762978338; c=relaxed/simple;
+	bh=gsP4RuV0SX74Q4sn2qalh8C+3yPvQoVzq/xVfun11BQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ITd4DZbUX02M2IH6jnEQeojh/5tOFOhFwnErItKEr8Y48xjv5VhHhjw4Ttc3K6qT9qwRLRc8FreLuyswvhFIvVHwxhzjW4mj7yWoVU5y6IU5yYJpGvOFFtn87I9P0lGsAAQSUwBJhW8jsriQFD35NCLGhu4prRKF5Z2GDjOnhTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ujCFF9vV; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="GJ09pnOY"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-594516d941cso1253318e87.0
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Nov 2025 09:57:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ujCFF9vV"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7b80fed1505so15106b3a.3
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Nov 2025 12:12:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1762970242; x=1763575042; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1762978336; x=1763583136; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7ewolTBS7IZhPq/yo/5TbBzsZlBs135aryiIEkWYvqI=;
-        b=GJ09pnOYIIUi8zUlB+/LmdkFnoXWCl2PymtZ7bxN961n/YsXyNFy8fvViIuHHGP5n1
-         HvWzISfzdTE32b2lXT9ubVFGgp4E9lc66kJKvQzs0byf9v6Sn7qe58YvCNKfH1lKSMG+
-         E2OGWKt/dtTE8Ja9q4KJXpZY0neVu09QC6yooF+5o2etjk9zINuhh6XZm5FKwPDBwaXH
-         AwGKj2sl4YRK7qCAxCKqMplfFuC/m5swIWIBzs5CDNEYrcOpYFN5/Fe/UR3wBSxkZhc7
-         P/f4r69I49E3zIBW8+Ahje+FQCrawYpuy7VMWeGgXQUjiGkfu8KZ9unlCnw424CBhmWv
-         t93w==
+        bh=gsP4RuV0SX74Q4sn2qalh8C+3yPvQoVzq/xVfun11BQ=;
+        b=ujCFF9vVRnLXzvMS2k3iAG8SDEEJO5uSSvMq6Esy8L5kuhwMHCaOZFqZZ4qtAIUy1d
+         XQ44qIYBcNuxiyQaIUFIZ6GjH5pWkxSjWTOg96GlX+cz7yS9iQ5szPdiD74Xccj1mZQr
+         50W6mg62KC7dH2JGkSwXBA1vpVi4pEw6t9QrQzbJEs5WvNZ0UDBx2OUgb7Mt7XPJuIya
+         y3farylFxhsdp9NHRhQyljRBhHH09c/B44PWG/kXG6MaEJRZOJImesuFbni2tXeQVeLU
+         X1SR6hyYhRZKP76LN5coM6vSBCScVuoSZzCiqP1wjRufdbyQkLToFe7X7ACvKFDWdMnj
+         UWwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762970242; x=1763575042;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1762978336; x=1763583136;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=7ewolTBS7IZhPq/yo/5TbBzsZlBs135aryiIEkWYvqI=;
-        b=nMej11qxRpVUE2mzY7N5JGJQ8G3SQT4h9ilaVGpcSzddpntNSidBBODPuwfN1KaaPz
-         F2POeSJaFZPm4r094w+xXaGXbxzkcg2+aYS0yuybzDk0il6VPlIBliGmbpvTNAH8+8lp
-         l9Kbs5t15OHuu3tFVENPfW+YUM4OEZnxnZ988W0kvgsF1YXbvslduJJG5HUxwrNCuU1N
-         QiyGfmHKgakpaIXLASnhm700qflP0SrJW40FZKmcH+kvai/C9qqLXvPaak+ZO9bgaNH4
-         dDx77mUSt08RG1F4Dy2CsQXk0joQsUl5SAHXHJEEQnuJYbikVe2jVlFhBLGZUJJ/Cepg
-         fqVg==
-X-Forwarded-Encrypted: i=1; AJvYcCUCW6/77+MLtuo6s0+9TG2mcvCBlDvwaJGUSI43ODouMEyaGnXzjsvVk9j7ax2BRKQSmiHh0wZ8GEkb8Fo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynkOyCoLTWZNv6BHjyoaTjCtlnhhWnBkcavwzRXEHpl3hnfK2/
-	yVAhutsGs4JlNloIhaukJATNeN7XyHtQ2vV6MFNZDm8lEC1V7KI7qq3o1+i+suyjbZO5p44pATf
-	S68YdnGQu9KSI7qw4ondXUyfDXhgi8CVgcAa2wqeGyA==
-X-Gm-Gg: ASbGnctqyLmUgyAH++sPhzj1ys9s09h++nGOBGhG68CirDFzRimjuDpKIZtL7JggC/h
-	qVErLmXhYeuSWrDePMrAZ+wT9k1xsl/M7TVHL7zGaLxmyXChSmCYXvK0Apair/2y8tbaUIcDW7Y
-	KgWkgElfSk+ALsyrTDiMMzKb6336Ebfoi2OKS8U33S2KPYX7daMwhyMGIPtdczIqLlvP/vRS1yG
-	N9z6ZklOW7x8Xgkw8Ji0SETiViM9K7zSIlbl4U1u5bMYypVpek+ssulnhlWB/mZkSwRMoE06+Td
-	LfeWFaYuXK+XoYJa0A==
-X-Google-Smtp-Source: AGHT+IEmeeVaV5q744epyzVmrwDVFW7j4/cmgThHS6LnRlZKUqyjMPJJRdHK4mRn9u1u/f1P1HM1MIsX1SPUfQ8SiIU=
-X-Received: by 2002:a05:6512:2388:b0:594:2d02:85b3 with SMTP id
- 2adb3069b0e04-59576e02c4cmr1410016e87.8.1762970241801; Wed, 12 Nov 2025
- 09:57:21 -0800 (PST)
+        bh=gsP4RuV0SX74Q4sn2qalh8C+3yPvQoVzq/xVfun11BQ=;
+        b=NPUsoJnkT4yNaiBKyI9SPTuS04UpuBmak+utLgK5RMU7fPEwE5HxkaYKwoCRg3sLwm
+         6/3C3hwOOHXPUVK4RAalS6KNOWTVpqTrMtcWcf7EbDNxE2ZxCouV/2a/UHFqxMUqSdEt
+         nU55fCsaz42A2zRQvciQ9GPFyZY1UYSCurQ4rCdkPs0A/jwOnYdi88Fb0t1PdhVrYwd2
+         4ImpAy3IG5cIQGyP9K0KO4wVFfNRvt8tW1419g241isO1/fcLY8kI3LeQDvBtxw7JtXu
+         BRxKbGObHj4qBm2yABOt21Vl8u4qFCERG1fqFtnXW4aN8whS73k62y1JlQbZD/dGeU3C
+         /6Gg==
+X-Forwarded-Encrypted: i=1; AJvYcCXbvznBOyVWIYjvu+n0z8YOB18daaCiD/bP77e7VLQksQqyvXMgswjADcgF+SC9PbjRJbrCE9pg0BraBaI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyEs9k3qC0Iq8BtsMDYGx52uJBJ50Hrdz3dIvYZKlitgszuSbD
+	tq95H/7fY9FVkgZH65dato+gqUl6Ew8Wc4FTfVN/E1qlF9wxCD62js3OIusiDFUv9gU=
+X-Gm-Gg: ASbGncvXT67hy88nRPj/L5Dl5RFErv0MjRCjvXO0kgUi4+r2+/qIbxKELlxlLJd5hvI
+	uBkMsR4EZP39504NTYexxvX2NBFZYlFaeyLuAspi7FoGn7ughb5LzyIdnKloM50rz5cI+66g+sa
+	jHVVo8jaEiM6mPrtp9Esaw1ICht5uOtU+g06GvrJrXZqxvCOM45yUYnmGaSh6SJ5dBEEGQEvJ6l
+	mS/tFFxdAN35Lutd3ZabXwwwmkQmEurY4hUeUkbiLUJ04pBbxicpoNOjQDo1P010CqIecWxlgrG
+	DI+Yv8gOo6J10pDkoSWBcyqE4RoqMdSIfq7q/A143xi4VEdAZx94VQ3+VGAwaX4rOlEKM8ELuiq
+	SFIDOxioxF4fv8IN4T8YogL65LA4yV2NaMvH+PRzBVw2TilJ1PZb775bOl6HlYZL4xBP6diOCMW
+	4MhaVFtKTupzK/s43IMhc7THGX1S1RAsi93A==
+X-Google-Smtp-Source: AGHT+IG0T8LAB89N+NLBKJi4tziCPLU6tUuh6eDgoooLFm7itDIrTgHFde48cWwu0NOkAzvIltUARQ==
+X-Received: by 2002:a05:6a00:4616:b0:7a9:f465:f25 with SMTP id d2e1a72fcca58-7b7a52c74b9mr4620225b3a.27.1762978335682;
+        Wed, 12 Nov 2025 12:12:15 -0800 (PST)
+Received: from phoenix (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0c9ff8538sm19700242b3a.28.2025.11.12.12.12.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 12:12:15 -0800 (PST)
+Date: Wed, 12 Nov 2025 12:12:12 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1
+ code instead of AF_ALG
+Message-ID: <20251112121212.66e15a2d@phoenix>
+In-Reply-To: <20250929194648.145585-1-ebiggers@kernel.org>
+References: <20250929194648.145585-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251107112354.144707-1-marco.crivellari@suse.com> <aRS9Vk6yh1wEq614@gcabiddu-mobl.ger.corp.intel.com>
-In-Reply-To: <aRS9Vk6yh1wEq614@gcabiddu-mobl.ger.corp.intel.com>
-From: Marco Crivellari <marco.crivellari@suse.com>
-Date: Wed, 12 Nov 2025 18:57:10 +0100
-X-Gm-Features: AWmQ_bl8otP7iEdFT2es07jTQBY0O2yc5dPncwp_ZOFehTsDj7eU4vYdCQlrMH4
-Message-ID: <CAAofZF4UJ1UGAH=r4cWn5HssTinY5e=aXRRMj95Bz40deakmjQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: qat - add WQ_PERCPU to alloc_workqueue users
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	qat-linux@intel.com, Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Michal Hocko <mhocko@suse.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S . Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 12, 2025 at 6:02=E2=80=AFPM Giovanni Cabiddu
-<giovanni.cabiddu@intel.com> wrote:
->
-> Hi Marco,
->
-> On Fri, Nov 07, 2025 at 12:23:54PM +0100, Marco Crivellari wrote:
-> > Currently if a user enqueues a work item using schedule_delayed_work() =
-the
-> > used wq is "system_wq" (per-cpu wq) while queue_delayed_work() use
-> > WORK_CPU_UNBOUND (used when a cpu is not specified). The same applies t=
-o
-> > schedule_work() that is using system_wq and queue_work(), that makes us=
-e
-> > again of WORK_CPU_UNBOUND.
-> > This lack of consistency cannot be addressed without refactoring the AP=
-I.
-> The reference to WORK_CPU_UNBOUND in this paragraph got me a bit
-> confused :-). As I understand it, if a workqueue is allocated with defaul=
-t
-> parameters (i.e., no flags), it is per-CPU, so using queue_work() or
-> queue_delayed_work() on such a queue would behave similarly to
-> schedule_work() or schedule_delayed_work() in terms of CPU affinity.
->
-> Is the `lack of consistency` you are referring in this paragraph about
-> developer expectations?  IOW developers might assume they're getting
-> unbound behavior?
+On Mon, 29 Sep 2025 12:46:48 -0700
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-Hi Giovanni,
+> diff --git a/lib/sha1.c b/lib/sha1.c
+> new file mode 100644
+> index 00000000..1aa8fd83
+> --- /dev/null
+> +++ b/lib/sha1.c
+> @@ -0,0 +1,108 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * SHA-1 message digest algorithm
+> + *
+> + * Copyright 2025 Google LLC
+> + */
 
-Sorry for the confusion. The first paragraph is mostly to give some informa=
-tion
-about the reason for the change.
+Not a big fan of having actual crypto in iproute2.
+It creates even more technical debt.
+Is there another crypto library that could be used?
 
-It is correct what you are saying, indeed.
-I will share the cover letter (for subsystem that needs one):
 
-----
-Let's consider a nohz_full system with isolated CPUs: wq_unbound_cpumask is
-set to the housekeeping CPUs, for !WQ_UNBOUND the local CPU is selected.
-
-This leads to different scenarios if a work item is scheduled on an
-isolated CPU where "delay" value is 0 or greater then 0:
-        schedule_delayed_work(, 0);
-
-This will be handled by __queue_work() that will queue the work item on the
-current local (isolated) CPU, while:
-
-        schedule_delayed_work(, 1);
-
-Will move the timer on an housekeeping CPU, and schedule the work there.
-----
-
-You can find more information and details at (also the reasons about the WQ
-API change):
-
-https://lore.kernel.org/all/20250221112003.1dSuoGyc@linutronix.de/
-
-In short anyhow: that paragraph is not directly related to the changes
-introduced here.
-Here we only added explicitly WQ_PERCPU if WQ_UNBOUND is not present.
-
-Thanks!
-
---
-
-Marco Crivellari
-
-L3 Support Engineer, Technology & Product
+Better yet, is there a reason legacy BPF code needs to still exist
+in current iproute2? When was the cut over.
