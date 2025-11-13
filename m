@@ -1,184 +1,376 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB522877F2
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2025 20:12:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC1F2877F2
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2025 20:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763064761; cv=none; b=fI6LXX2Ts5dcw5WPUPYxzDkZJuA5BLAkEjfVpVpmzo6eZ0YGFyqDj7IwwGrcOfuZ0jWzAYmV5ESpRA6/R1gBOCfo1/1wREMtaKDi2ZEXxPiFFIhO8DT+nEzuW6EuBDXdqrp/ewjx2rNlVOsG/ZHRIfQfNmOOYsJWMqajyy2s54M=
+	t=1763065477; cv=none; b=pWxLSvrRMMjGrvzGwtl8jHpGgq7M8luHkfmVG9v5CrXrPRbyeQ9IbcEExOvMngR/cqXQapsaDAc5cY0WGvwaaXqRXXKJxmCs2duaXojFaMYvEB37f7bVDaixbCvD+ffjpDGDknFVEdVppIZtxSKZaTyXjJur+8vv0itCrBvW8Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763064761; c=relaxed/simple;
-	bh=RDx5dz0e5GnBBm/MAj6xKbVI2FDM3MsclgzK5hYTxNY=;
+	s=arc-20240116; t=1763065477; c=relaxed/simple;
+	bh=/Z23KZhqEvpPjVvhZY15umJCo3I1rmdSkkLyALi9p4w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p666lE9STk4RMxBISA3PDZRlFYXCOkjCQbJYYALbGfun03WbECCSa8b/DhEaOHqAbICdtvfMO2VjoOQcY6gIMRaRl02l9yYo5QeFfFeyMZAWZ1OWsT7vTtbX4aRd6DpU/Ueudf2SPNlEuOOnh53/79UaONdjBEylZNi/L8qnWv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Gf7BzC6B; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Afd7Cm+u; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=S4UlxMkhLNE2JbWwJiw9weH5s5objHX1ya/v5oETAyuLA+njEfkTzezBLjfC+PcNoIXUoioV7hdMruUZhP9Bgqm6I7h/RtdzknWEnXqX/jXf5eAHGfoguBRJfDYHCGZ+OSuH0MEmOvnAvWJaLyqmw/DEr6SwbwfqkcNaS9Oa6ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xqfxIfOF; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Gf7BzC6B";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Afd7Cm+u"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ADGqc5o904974
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2025 20:12:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	6EqNtYCdIa5BLP8lbDNwtORof81XIy0mVAFt0m//rc4=; b=Gf7BzC6B8e081yal
-	vjEBOwPIHlibvAEbvorzDxpu5i4vFGoguoHxWFpfs+mILKG+kBod5OsqcsBO8Eih
-	PVEU++yB+QXRHGYjMud2LseSSGJfJkdGdXyj7slxclUtV3z1zdFwfOo6ReA/J/x0
-	GcwuOuqL/Pn/xag5X596RKkimD2Bpiu+f5aNWcxPczkJnzCqrKwc5yTJFL9nW5kx
-	FhkuJGu24pTuZRFpOVly+DLYEvvxjpwCO8emRMi5IMmKUW+9WABIONOCq1CVsOpm
-	J1BldoOVgVygzOEJdcK/t0utcEP1xak3hUDfIGI40oOAN5iLB71xfN2t+I7edn7L
-	4LCmAQ==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4adk828kyq-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2025 20:12:39 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8b22ab98226so543189585a.2
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2025 12:12:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1763064758; x=1763669558; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6EqNtYCdIa5BLP8lbDNwtORof81XIy0mVAFt0m//rc4=;
-        b=Afd7Cm+utttpKHE46CQ1kSstmsyHRbVmurZf/+197ve7GVxqGvHFADKzhl30zjViM5
-         l8RGWftyLBzS1qOaueB7Ij4LdcfPm0Ry+VIRgLloNrzMC+K2EiLlybpp3fmdg5FtmBvo
-         /Ik/AdvWNLYyyBazmlKaOxWXxISZOdPHgQwQsWAZMYgNwMVJ4ApI0iqlb55u8bkwZuVg
-         VGxCEJt+mIGTzH6oH1Lb/UyBzR3HDphuqe2ASo0ZtfpRabMgKpGgYXuNVDIdzW3zE7ic
-         A9phCb8bPkAiMG/kMfiV235uoowT6wBI08MBw1Hwd8aWXIvKcatkGdwyoSglK8wJmqlR
-         OnAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763064758; x=1763669558;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6EqNtYCdIa5BLP8lbDNwtORof81XIy0mVAFt0m//rc4=;
-        b=aGEX+0PLuRzSbSho3PIuzQOTmD/DyyK9uWDRrAZ1BtzsROvuS7GzIHrRfjj2Q47EoI
-         klEkpGsM9fv4DuVOltyPOOfNJLSvkDtQ7Piul1iAi9AxfBW9JXwpT41KBuUnsZhWXgSB
-         6qPVxsAnjdsil1FzKa2g2vW+WsZIoGppj0JYuLMWKcrq9dD+XQQ4bfh7H6Cm7lu+F3k/
-         mdhccIKvn8Ug4lEZLs2R8fQCHz81ZniZG/+yHEP/pEJxWWHxbpWylmkljrG64Q9KgRo3
-         cfA92rSyHH/rHJqkwrgfIQRGB1K2mXj5bb0YPoB+ekFZoakWBbl7n6hwpNu1zZ7CZ7op
-         AGHg==
-X-Forwarded-Encrypted: i=1; AJvYcCXTp6kCtLD5Wc6HFhQpsl9LM0UFlFUMJldvZuj0f5ZkcjZfHuRXnjutPh4dBFhYrOvTJTCO41xtZ/5krOc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzt582omnU4hClSiVugnRUMmY2ZzuM0QlNvGrMxBo2X4B9w3Clq
-	PYvsPQUF9ysrgQ8RcV2t4JgVaPJDfbFBRvrIKu8tpGIIJOF1w4NsmXF8/NnoTjdOj5dLn1lC5IS
-	IDqX1syI7kfCIwLLJUjiA+pxg6BZB8raXH8o011Xj96mK4LmmsHFn9MWi6iq0k+vvfNM=
-X-Gm-Gg: ASbGncvVGJ1J12gKiRKXzy42sL9LcDjh4V96Ktx59nqKY2CYnV3Sq3UpVrM1374qOGL
-	p4EGWeV8PaDkesyHSAI5Lw2gnWQ9FEDSMlnRKusoDfV0eH24mK1pIKPbaL+1uuNdSGa0fgkCxbb
-	JBSVWvf2JoNRNQZ5wcppFyfP29MDCK9VVV3W202a7bjCXkP5Ae9lV78bkUk63dtGxR/DITnmtcZ
-	YLAUkR5ktaLeK9VXvIfnbgaHYpoRAqs3QKUsoa4l0Otx+xO19xVgKjddcVFCXX4bbbM/FV3NJXw
-	rdW/lXv8NLYoLTQI+TF9RfsZMzXkbjn4+laQeByEVHtJdNDuIRdwrQsxshHY0/VUGqsT7T3w4Ec
-	Qrt2egUKz4QQSJZhKHXx2NWTTJXFb5nuhJOF3wx8UUCG2Q4v1lwrmgbpNpxxkhc1+IRbNSpravM
-	pjQpesbqoIVUTp
-X-Received: by 2002:a05:620a:4689:b0:8b2:737d:aa24 with SMTP id af79cd13be357-8b2c315e556mr89756885a.26.1763064758520;
-        Thu, 13 Nov 2025 12:12:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFfftwI33WcTytiC/mz27Cvb5o52FXrSqcNcUgmDQbZd9S+FCYZL8u1cWrY+wAhlrdUZMYlYg==
-X-Received: by 2002:a05:620a:4689:b0:8b2:737d:aa24 with SMTP id af79cd13be357-8b2c315e556mr89752085a.26.1763064757998;
-        Thu, 13 Nov 2025 12:12:37 -0800 (PST)
-Received: from umbar.lan (2001-14ba-a0c3-3a00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a0c3:3a00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-37b9ced4acfsm5675661fa.30.2025.11.13.12.12.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Nov 2025 12:12:36 -0800 (PST)
-Date: Thu, 13 Nov 2025 22:12:35 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Udit Tiwari <quic_utiwari@quicinc.com>,
-        Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
-        Md Sadre Alam <mdalam@qti.qualcomm.com>, dmaengine@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v8 01/11] dmaengine: Add DMA_PREP_LOCK/DMA_PREP_UNLOCK
- flags
-Message-ID: <66nhvrt4krn7lvmsrqoc5quygh7ckc36fax3fgol2feymqfbdp@lqlfye47cs2p>
-References: <20251106-qcom-qce-cmd-descr-v8-0-ecddca23ca26@linaro.org>
- <20251106-qcom-qce-cmd-descr-v8-1-ecddca23ca26@linaro.org>
- <xozu7tlourkzuclx7brdgzzwomulrbznmejx5d4lr6dksasctd@zngg5ptmedej>
- <CAMRc=MdC7haZ9fkCNGKoGb-8R5iB0P2UA5+Fap8Svjq-WdE-=w@mail.gmail.com>
- <m4puer7jzmicbjrz54yx3fsrlakz7nwkuhbyfedqwco2udcivp@ctlklvrk3ixg>
- <CAMRc=MfkVoRGFLSp6gy0aWe_3iA2G5v0U7yvgwLp5JFjmqkzsw@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xqfxIfOF"
+Date: Thu, 13 Nov 2025 20:24:23 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763065473;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jT/ew4lyAZdjduPWOHcjteBKICf50dJTobZNEHLjS+A=;
+	b=xqfxIfOFHqlzr4bODDqrWDXl7d/V2JzDrkJAG4mfkCMBnhYeRFqhwKuPehPQpRLWMRclII
+	7R4a9RIYL/T32vumS+yVYWmSGtn7QM2CwNMi5RQqY0u47JIOV75F59VN6lZXt+/m5ha1Rx
+	8rrmNCD7B6LUgs0MY862IxYraVu/2jo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org, 
+	nphamcs@gmail.com, chengming.zhou@linux.dev, usamaarif642@gmail.com, 
+	ryan.roberts@arm.com, 21cnbao@gmail.com, ying.huang@linux.alibaba.com, 
+	akpm@linux-foundation.org, senozhatsky@chromium.org, sj@kernel.org, kasong@tencent.com, 
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	clabbe@baylibre.com, ardb@kernel.org, ebiggers@google.com, surenb@google.com, 
+	kristen.c.accardi@intel.com, vinicius.gomes@intel.com, wajdi.k.feghali@intel.com, 
+	vinodh.gopal@intel.com
+Subject: Re: [PATCH v13 19/22] mm: zswap: Per-CPU acomp_ctx resources exist
+ from pool creation to deletion.
+Message-ID: <yf2obwzmjxg4iu2j3u5kkhruailheld4uodqsfcheeyvh3rdm7@w7mhranpcsgr>
+References: <20251104091235.8793-1-kanchana.p.sridhar@intel.com>
+ <20251104091235.8793-20-kanchana.p.sridhar@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=MfkVoRGFLSp6gy0aWe_3iA2G5v0U7yvgwLp5JFjmqkzsw@mail.gmail.com>
-X-Proofpoint-ORIG-GUID: A5qmS9jAoVuFQtPhPPAxeqVXdSoO3dzL
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEzMDE1OCBTYWx0ZWRfX6oBVciFPFIRr
- I2Q9uiaY0Q/YrUtRi/BwTYJR49DHDOfODU1lc7BQPbCSL+W5fbHWr0eSdLanXs4mWdR+xqJ95Jv
- BrI/nlwrIovVkftz+CNoKpCMeh6D5QjjFbZ7UPwKaEvg77FjpMZJ2kr/cORisxRac5rlstAOPVp
- zu6Cwi+HGHffmmZO47ryC1GCLRUOdHhp8KcdxhL7ot8amgQDXPKTOHfalMk6M7cXW1i1G3SzyqT
- RXMrGq9MH98jR0ulPq8lsFuSaQUQ6fxfOxQMlen8TzoAdHQ2OD8TqPM+4gLH1fjIW9DxqlJehVg
- yY+vXbJYac2Zs33aA1wXfo2gcx42mjH4bFK2PgOHEjESE2BoUiFC8cwNmXr6PZpJ0N7GkGrT0an
- xWCbLr7mZjpfjloEIKVyPMBCKgHwzg==
-X-Authority-Analysis: v=2.4 cv=Wa8BqkhX c=1 sm=1 tr=0 ts=69163bb7 cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=EUspDBNiAAAA:8 a=KKAkSRfTAAAA:8 a=mQADmR9Bmzp49jEYGiUA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=NFOGd7dJGGMPyQGDc5-O:22 a=cvBusfyB2V15izCimMoJ:22
-X-Proofpoint-GUID: A5qmS9jAoVuFQtPhPPAxeqVXdSoO3dzL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-13_05,2025-11-13_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0 adultscore=0 priorityscore=1501 bulkscore=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 impostorscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511130158
+In-Reply-To: <20251104091235.8793-20-kanchana.p.sridhar@intel.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Nov 13, 2025 at 04:52:56PM +0100, Bartosz Golaszewski wrote:
-> On Thu, Nov 13, 2025 at 1:28 PM Dmitry Baryshkov
-> <dmitry.baryshkov@oss.qualcomm.com> wrote:
-> >
-> > On Thu, Nov 13, 2025 at 11:02:11AM +0100, Bartosz Golaszewski wrote:
-> > > On Tue, Nov 11, 2025 at 1:30 PM Dmitry Baryshkov
-> > > <dmitry.baryshkov@oss.qualcomm.com> wrote:
-> > > >
-> > > > On Thu, Nov 06, 2025 at 12:33:57PM +0100, Bartosz Golaszewski wrote:
-> > > > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > > > >
-> > > > > Some DMA engines may be accessed from linux and the TrustZone
-> > > > > simultaneously. In order to allow synchronization, add lock and unlock
-> > > > > flags for the command descriptor that allow the caller to request the
-> > > > > controller to be locked for the duration of the transaction in an
-> > > > > implementation-dependent way.
-> > > >
-> > > > What is the expected behaviour if Linux "locks" the engine and then TZ
-> > > > tries to use it before Linux has a chance to unlock it.
-> > > >
-> > >
-> > > Are you asking about the actual behavior on Qualcomm platforms or are
-> > > you hinting that we should describe the behavior of the TZ in the docs
-> > > here? Ideally TZ would use the same synchronization mechanism and not
-> > > get in linux' way. On Qualcomm the BAM, once "locked" will not fetch
-> > > the next descriptors on pipes other than the current one until
-> > > unlocked so effectively DMA will just not complete on other pipes.
-> > > These flags here however are more general so I'm not sure if we should
-> > > describe any implementation-specific details.
-> > >
-> > > We can say: "The DMA controller will be locked for the duration of the
-> > > current transaction and other users of the controller/TrustZone will
-> > > not see their transactions complete before it is unlocked"?
-> >
-> > So, basically, we are providing a way to stall TZ's DMA transactions?
-> > Doesn't sound good enough to me.
+On Tue, Nov 04, 2025 at 01:12:32AM -0800, Kanchana P Sridhar wrote:
+
+The subject can be shortened to:
+
+"mm: zswap: Tie per-CPU acomp_ctx lifetime to the pool"
+
+> This patch simplifies the zswap_pool's per-CPU acomp_ctx resource
+> management. Similar to the per-CPU acomp_ctx itself, the per-CPU
+> acomp_ctx's resources' (acomp, req, buffer) lifetime will also be from
+> pool creation to pool deletion. These resources will persist through CPU
+> hotplug operations instead of being destroyed/recreated. The
+> zswap_cpu_comp_dead() teardown callback has been deleted from the call
+> to cpuhp_setup_state_multi(CPUHP_MM_ZSWP_POOL_PREPARE). As a result, CPU
+> offline hotplug operations will be no-ops as far as the acomp_ctx
+> resources are concerned.
+
+Currently, per-CPU acomp_ctx are allocated on pool creation and/or CPU
+hotplug, and destroyed on pool destruction or CPU hotunplug. This
+complicates the lifetime management to save memory while a CPU is
+offlined, which is not very common.
+
+Simplify lifetime management by allocating per-CPU acomp_ctx once on
+pool creation (or CPU hotplug for CPUs onlined later), and keeping them
+allocated until the pool is destroyed.
+
 > 
-> Can you elaborate because I'm not sure if you're opposed to the idea
-> itself or the explanation is not good enough?
+> This commit refactors the code from zswap_cpu_comp_dead() into a
+> new function acomp_ctx_dealloc() that is called to clean up acomp_ctx
+> resources from:
+> 
+> 1) zswap_cpu_comp_prepare() when an error is encountered,
+> 2) zswap_pool_create() when an error is encountered, and
+> 3) from zswap_pool_destroy().
 
-I find it a bit strange that the NS-OS (Linux) can cause side-effects to
-the TZ. Please correct me if I'm wrong, but I assumed that TZ should be
-able to function even when LInux is misbehaving.
 
--- 
-With best wishes
-Dmitry
+Refactor cleanup code from zswap_cpu_comp_dead() into
+acomp_ctx_dealloc() to be used elsewhere.
+
+> 
+> The main benefit of using the CPU hotplug multi state instance startup
+> callback to allocate the acomp_ctx resources is that it prevents the
+> cores from being offlined until the multi state instance addition call
+> returns.
+> 
+>   From Documentation/core-api/cpu_hotplug.rst:
+> 
+>     "The node list add/remove operations and the callback invocations are
+>      serialized against CPU hotplug operations."
+> 
+> Furthermore, zswap_[de]compress() cannot contend with
+> zswap_cpu_comp_prepare() because:
+> 
+>   - During pool creation/deletion, the pool is not in the zswap_pools
+>     list.
+> 
+>   - During CPU hot[un]plug, the CPU is not yet online, as Yosry pointed
+>     out. zswap_cpu_comp_prepare() will be run on a control CPU,
+>     since CPUHP_MM_ZSWP_POOL_PREPARE is in the PREPARE section of "enum
+>     cpuhp_state". Thanks Yosry for sharing this observation!
+> 
+>   In both these cases, any recursions into zswap reclaim from
+>   zswap_cpu_comp_prepare() will be handled by the old pool.
+> 
+> The above two observations enable the following simplifications:
+> 
+>  1) zswap_cpu_comp_prepare(): CPU cannot be offlined. Reclaim cannot use
+>     the pool. Considerations for mutex init/locking and handling
+>     subsequent CPU hotplug online-offline-online:
+> 
+>     Should we lock the mutex of current CPU's acomp_ctx from start to
+>     end? It doesn't seem like this is required. The CPU hotplug
+>     operations acquire a "cpuhp_state_mutex" before proceeding, hence
+>     they are serialized against CPU hotplug operations.
+> 
+>     If the process gets migrated while zswap_cpu_comp_prepare() is
+>     running, it will complete on the new CPU. In case of failures, we
+>     pass the acomp_ctx pointer obtained at the start of
+>     zswap_cpu_comp_prepare() to acomp_ctx_dealloc(), which again, can
+>     only undergo migration. There appear to be no contention scenarios
+>     that might cause inconsistent values of acomp_ctx's members. Hence,
+>     it seems there is no need for mutex_lock(&acomp_ctx->mutex) in
+>     zswap_cpu_comp_prepare().
+> 
+>     Since the pool is not yet on zswap_pools list, we don't need to
+>     initialize the per-CPU acomp_ctx mutex in zswap_pool_create(). This
+>     has been restored to occur in zswap_cpu_comp_prepare().
+> 
+>     zswap_cpu_comp_prepare() checks upfront if acomp_ctx->acomp is
+>     valid. If so, it returns success. This should handle any CPU
+>     hotplug online-offline transitions after pool creation is done.
+> 
+>  2) CPU offline vis-a-vis zswap ops: Let's suppose the process is
+>     migrated to another CPU before the current CPU is dysfunctional. If
+>     zswap_[de]compress() holds the acomp_ctx->mutex lock of the offlined
+>     CPU, that mutex will be released once it completes on the new
+>     CPU. Since there is no teardown callback, there is no possibility of
+>     UAF.
+> 
+>  3) Pool creation/deletion and process migration to another CPU:
+> 
+>     - During pool creation/deletion, the pool is not in the zswap_pools
+>       list. Hence it cannot contend with zswap ops on that CPU. However,
+>       the process can get migrated.
+> 
+>       Pool creation --> zswap_cpu_comp_prepare()
+>                                 --> process migrated:
+>                                     * CPU offline: no-op.
+>                                     * zswap_cpu_comp_prepare() continues
+>                                       to run on the new CPU to finish
+>                                       allocating acomp_ctx resources for
+>                                       the offlined CPU.
+> 
+>       Pool deletion --> acomp_ctx_dealloc()
+>                                 --> process migrated:
+>                                     * CPU offline: no-op.
+>                                     * acomp_ctx_dealloc() continues
+>                                       to run on the new CPU to finish
+>                                       de-allocating acomp_ctx resources
+>                                       for the offlined CPU.
+> 
+>  4) Pool deletion vis-a-vis CPU onlining:
+>     The call to cpuhp_state_remove_instance() cannot race with
+>     zswap_cpu_comp_prepare() because of hotplug synchronization.
+> 
+> This patch deletes acomp_ctx_get_cpu_lock()/acomp_ctx_put_unlock().
+> Instead, zswap_[de]compress() directly call
+> mutex_[un]lock(&acomp_ctx->mutex).
+
+I am not sure why all of this is needed. We should just describe why
+it's safe to drop holding the mutex while initializing per-CPU
+acomp_ctx:
+
+It is no longer possible for CPU hotplug to race against allocation or
+usage of per-CPU acomp_ctx, as they are only allocated once before the
+pool can be used, and remain allocated as long as the pool is used.
+Hence, stop holding the lock during acomp_ctx initialization, and drop
+acomp_ctx_get_cpu_lock()//acomp_ctx_put_unlock().
+
+> 
+> The per-CPU memory cost of not deleting the acomp_ctx resources upon CPU
+> offlining, and only deleting them when the pool is destroyed, is as
+> follows, on x86_64:
+> 
+>     IAA with 8 dst buffers for batching:    64.34 KB
+>     Software compressors with 1 dst buffer:  8.28 KB
+
+This cost is only paid when a CPU is offlined, until it is onlined
+again.
+
+> 
+> Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+> ---
+>  mm/zswap.c | 164 +++++++++++++++++++++--------------------------------
+>  1 file changed, 64 insertions(+), 100 deletions(-)
+> 
+> diff --git a/mm/zswap.c b/mm/zswap.c
+> index 4897ed689b9f..87d50786f61f 100644
+> --- a/mm/zswap.c
+> +++ b/mm/zswap.c
+> @@ -242,6 +242,20 @@ static inline struct xarray *swap_zswap_tree(swp_entry_t swp)
+>  **********************************/
+>  static void __zswap_pool_empty(struct percpu_ref *ref);
+>  
+> +static void acomp_ctx_dealloc(struct crypto_acomp_ctx *acomp_ctx)
+> +{
+> +	if (IS_ERR_OR_NULL(acomp_ctx))
+> +		return;
+> +
+> +	if (!IS_ERR_OR_NULL(acomp_ctx->req))
+> +		acomp_request_free(acomp_ctx->req);
+> +
+> +	if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
+> +		crypto_free_acomp(acomp_ctx->acomp);
+> +
+> +	kfree(acomp_ctx->buffer);
+> +}
+> +
+>  static struct zswap_pool *zswap_pool_create(char *compressor)
+>  {
+>  	struct zswap_pool *pool;
+> @@ -263,19 +277,26 @@ static struct zswap_pool *zswap_pool_create(char *compressor)
+>  
+>  	strscpy(pool->tfm_name, compressor, sizeof(pool->tfm_name));
+>  
+> -	pool->acomp_ctx = alloc_percpu(*pool->acomp_ctx);
+> +	/* Many things rely on the zero-initialization. */
+> +	pool->acomp_ctx = alloc_percpu_gfp(*pool->acomp_ctx,
+> +					   GFP_KERNEL | __GFP_ZERO);
+>  	if (!pool->acomp_ctx) {
+>  		pr_err("percpu alloc failed\n");
+>  		goto error;
+>  	}
+>  
+> -	for_each_possible_cpu(cpu)
+> -		mutex_init(&per_cpu_ptr(pool->acomp_ctx, cpu)->mutex);
+> -
+> +	/*
+> +	 * This is serialized against CPU hotplug operations. Hence, cores
+> +	 * cannot be offlined until this finishes.
+> +	 * In case of errors, we need to goto "ref_fail" instead of "error"
+> +	 * because there is no teardown callback registered anymore, for
+> +	 * cpuhp_state_add_instance() to de-allocate resources as it rolls back
+> +	 * state on cores before the CPU on which error was encountered.
+> +	 */
+
+Do we need to manually call acomp_ctx_dealloc() on each CPU on failure
+because cpuhp_state_add_instance() relies on the hotunplug callback for
+cleanup, and we don't have any?
+
+If that's the case:
+
+	/*
+	 * cpuhp_state_add_instance() will not cleanup on failure since
+	 * we don't register a hotunplug callback.
+	 */
+
+Describing what the code does is not helpful, and things like "anymore"
+do not make sense once the code is merged.
+
+>  	ret = cpuhp_state_add_instance(CPUHP_MM_ZSWP_POOL_PREPARE,
+>  				       &pool->node);
+>  	if (ret)
+> -		goto error;
+> +		goto ref_fail;
+
+IIUC we shouldn't call cpuhp_state_remove_instance() on failure, we
+probably should add a new label.
+
+>  
+>  	/* being the current pool takes 1 ref; this func expects the
+>  	 * caller to always add the new pool as the current pool
+> @@ -292,6 +313,9 @@ static struct zswap_pool *zswap_pool_create(char *compressor)
+>  
+>  ref_fail:
+>  	cpuhp_state_remove_instance(CPUHP_MM_ZSWP_POOL_PREPARE, &pool->node);
+> +
+> +	for_each_possible_cpu(cpu)
+> +		acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu));
+>  error:
+>  	if (pool->acomp_ctx)
+>  		free_percpu(pool->acomp_ctx);
+> @@ -322,9 +346,15 @@ static struct zswap_pool *__zswap_pool_create_fallback(void)
+>  
+>  static void zswap_pool_destroy(struct zswap_pool *pool)
+>  {
+> +	int cpu;
+> +
+>  	zswap_pool_debug("destroying", pool);
+>  
+>  	cpuhp_state_remove_instance(CPUHP_MM_ZSWP_POOL_PREPARE, &pool->node);
+> +
+> +	for_each_possible_cpu(cpu)
+> +		acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu));
+> +
+>  	free_percpu(pool->acomp_ctx);
+>  
+>  	zs_destroy_pool(pool->zs_pool);
+> @@ -736,39 +766,35 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+>  {
+>  	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
+>  	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
+> -	struct crypto_acomp *acomp = NULL;
+> -	struct acomp_req *req = NULL;
+> -	u8 *buffer = NULL;
+> -	int ret;
+> +	int ret = -ENOMEM;
+>  
+> -	buffer = kmalloc_node(PAGE_SIZE, GFP_KERNEL, cpu_to_node(cpu));
+> -	if (!buffer) {
+> -		ret = -ENOMEM;
+> -		goto fail;
+> -	}
+> +	/*
+> +	 * To handle cases where the CPU goes through online-offline-online
+> +	 * transitions, we return if the acomp_ctx has already been initialized.
+> +	 */
+> +	if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
+> +		return 0;
+
+Is it possible for acomp_ctx->acomp to be an ERR value here? If it is,
+then zswap initialization should have failed. Maybe WARN_ON_ONCE() for
+that case?
+
+>  
+> -	acomp = crypto_alloc_acomp_node(pool->tfm_name, 0, 0, cpu_to_node(cpu));
+> -	if (IS_ERR(acomp)) {
+> +	acomp_ctx->buffer = kmalloc_node(PAGE_SIZE, GFP_KERNEL, cpu_to_node(cpu));
+> +	if (!acomp_ctx->buffer)
+> +		return ret;
+> +
+> +	acomp_ctx->acomp = crypto_alloc_acomp_node(pool->tfm_name, 0, 0, cpu_to_node(cpu));
+> +	if (IS_ERR(acomp_ctx->acomp)) {
+>  		pr_err("could not alloc crypto acomp %s : %ld\n",
+> -				pool->tfm_name, PTR_ERR(acomp));
+> -		ret = PTR_ERR(acomp);
+> +				pool->tfm_name, PTR_ERR(acomp_ctx->acomp));
+> +		ret = PTR_ERR(acomp_ctx->acomp);
+>  		goto fail;
+>  	}
+> +	acomp_ctx->is_sleepable = acomp_is_async(acomp_ctx->acomp);
+>  
+> -	req = acomp_request_alloc(acomp);
+> -	if (!req) {
+> +	acomp_ctx->req = acomp_request_alloc(acomp_ctx->acomp);
+> +	if (!acomp_ctx->req) {
+>  		pr_err("could not alloc crypto acomp_request %s\n",
+>  		       pool->tfm_name);
+> -		ret = -ENOMEM;
+>  		goto fail;
+>  	}
+>  
+> -	/*
+> -	 * Only hold the mutex after completing allocations, otherwise we may
+> -	 * recurse into zswap through reclaim and attempt to hold the mutex
+> -	 * again resulting in a deadlock.
+> -	 */
+> -	mutex_lock(&acomp_ctx->mutex);
+>  	crypto_init_wait(&acomp_ctx->wait);
+>  
+>  	/*
+[..]
