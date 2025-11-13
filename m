@@ -1,114 +1,108 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52602C326F
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2025 14:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43A9331A7A
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2025 15:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763044247; cv=none; b=gCoOEDGUiiUWNsiGP1lbm1zUIhC4QWQtLnNC8SL7X8+NHTZLmn0vlR5WMqhP3SKnDUJDxnIWGmQPVz6Ygq2pHD693VeDnNqMhInseeYmGAOHYqY5ErE4jNb3E7WjcWrDYCW8rBlT4VfmHXl2vWQaVNyXxqcG49H7M5VuY84X4ek=
+	t=1763048121; cv=none; b=W3F++ANaw5aUaLiIATnLtILqQ3QCIznc/069ujp1z84sH8AgiUswGxsmvEVMygC/81AVp/Fu0j+gcAPWjzMP0SNZSrdAm8p9PutDQcxbmpVIUmQIFPDXOuHb5uBI8YqYQVAMR0HeL6/Gt8hgyAGxQhsqgdqP3oVMDllMG8ckZKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763044247; c=relaxed/simple;
-	bh=MBXryWsSo8WBJYsfFQQsezl+bvHfvcNsNG0PI/C7tiU=;
+	s=arc-20240116; t=1763048121; c=relaxed/simple;
+	bh=7y97fQ5anqKPljbcJwEjLuD7ZGbwhoE7qAa90lGJPtw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MS4c+uiHarLVnmRFGCGDBzFl4jIwvnE8NZeHUB+M5mInfKFez+5lnTttLy5clNvIRcZYz6Cj5kafiWDCz3qBeC1gD5uTFZnYMeK1yWGS2CI3Z2sVNyCCp1XXhTaCN9VHfzapu02Kw8uMIXZgEwMQsLRRXNntsC+89f63kvu6jSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nEke/2FF; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=DH+uST+zUkdjTcHyaVHLiOJveKj8HzVVZJYRHOUnTFb9PSRrsEO1TPC3zXbMxmfCo1iV7p1QodUy3HGXCEn3VPM32RgqaXue0vYx3GhX3BZaAcNmowA2hZUz02Rbin+XeZDwGtxZ/8QA0tG4BN6gd/8k/psfYkPBngyrljwTa/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kNN3kQT0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nEke/2FF"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7af6a6f20easo848221b3a.0
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2025 06:30:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763044245; x=1763649045; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=MBXryWsSo8WBJYsfFQQsezl+bvHfvcNsNG0PI/C7tiU=;
-        b=nEke/2FFZG1ng+mTf7XuFWr72uIT/zMOwz5Plept3fLottY4A7mR9yd0pdYTXPfV3L
-         hK19/tFNKtBWt03/3aIrLuEFubAZ86OG8UKxWfMXZ/xwaPm0haeaSFvRKRZyqL68IFFr
-         RUbfkpw/AxbmwRe4UBjcf4u0hY4RgCtAQU+DeP++bLkWGUge3WghXIIG2aYlBAHwJrwa
-         qNbtn/U/W2g+PNsPotzSGxq1CDZ2ivBjEr/ylIi5pnAtig/o0c8DLddUOMVoTVfBVYw2
-         2Wrg941g53UdcpQMWmmNwsTkD97k9PkGsnanMcPBhYlfeFftgOS6jQNCW+h68bt/aUbO
-         AUAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763044245; x=1763649045;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MBXryWsSo8WBJYsfFQQsezl+bvHfvcNsNG0PI/C7tiU=;
-        b=ar51kQNoHZE9Fc+NohVCaUXTRQ5ZQU7ZQxUElMFRFwiQpOpf7utgDXN2Nhnd9a9ID7
-         rN5yxdO7BXg0DdeFwo16SWELEmnqEd1fN2/1UBRE2as5R3TQ0Q8j/RfKC0ULHhVAPbrI
-         fhNMe5d7eQ9oYgpmJ5Xen/IGOcNdRXzAzj1nRF/Aq5M0sQt+EIGrwEREegTzFs8c/uin
-         LDJxUZJ4IOBudEvsqqeB8eQOHQa4Zt9CI+h5D9XINbFina/zbF/ZfMgziItEkO7SjBWx
-         utbBV4/d2M2BSIeuOUFU8QGq+Zavyenn935va/wMq/TWx+2bvqyntBe4IVufDlCtYEJe
-         5zyw==
-X-Forwarded-Encrypted: i=1; AJvYcCXYg8XwMT8JgApxFWXxm2RQXXFJGiGNWOsMRYoGCJV2kVJLJTYwBFAlKwCdbxzrNFRm8xMHxh/FHQK82pQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywyg4pojnWJXzB8p7O9EPFmIuSi04O2y/5j+VuVlKTdT7wIlI8N
-	RGptEh/VpJ8RW/tZ54uTkbGjX3VcF37puMm/TLsFqJbxFEcqJ/sNI3xAw7vV1BQ41YsiG5VHwcr
-	Hc62aAreXfacr7kMgPEfsgSwOSBRdaZBit11a+gmk
-X-Gm-Gg: ASbGncsB8+ZdldtloN5262V8k+3uTeXxLfa1dmIGa3C4U0HTCDyQyXp0V9JGel06MAR
-	bQ5IkViPbuClFcOq3GCwTWZImzMyMvuwdDQME2Lieei/NC+a6cPboG8I/iwoO0t+/0uyNjWxWs7
-	gujA9PhYbLEt3UO0EqtGalA+QRBfnBxBIhsPZzMRpgTfE36pHU2AIZ+CEu3txw2XXUJ6BEPPHb0
-	HUEF+mVBe82kQX+Z89g61kpdxDDCY8Zc5ewZ8zy3SCF7HJjJ/fTRNd7FEOodIcEiiem5FPs2T+l
-	VuqymtKg1Zxp41cl1sPEjmA=
-X-Google-Smtp-Source: AGHT+IFnNFIlMm9/L/bcyHMVah+51vkdm0T/jdjxqhLQ7LFy8/zaHzLzvotK4qxuC0MECLmidBODybpZNRr9UFx4Cuk=
-X-Received: by 2002:a17:903:fa7:b0:294:f6b4:9a42 with SMTP id
- d9443c01a7336-2984ed2b5edmr67173465ad.9.1763044244630; Thu, 13 Nov 2025
- 06:30:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kNN3kQT0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A075AC4CEF5
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2025 15:35:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763048120;
+	bh=7y97fQ5anqKPljbcJwEjLuD7ZGbwhoE7qAa90lGJPtw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=kNN3kQT09Vu1lJHMPXHaFstAWj/37XFx6oSuGdar0db28Wt7PRoeZhZ/Y6Z91H1or
+	 JzMN3Z/s8BIwF2N+NI2eJrqxdTa75B1nQm+3JuPGIbrXqPD3+MG2Z4LJcdRCqmbp1+
+	 fgCrrni2/GHcu8nnAbbzhZZ5gk3+0qTh4q+ohKuzeS3LTDscvGcjLVK2DsS+WL6jMa
+	 luu+52cf40KsPFuSFk7i3fp0r2tuHy/4oFSn2GAFqmGyHaSfnX7ddoXpSyM0/OP6s+
+	 v3IWEKymsswBFwDs8zkcjeh+6dViLvI4vAIp2uG5/DmVJTgY/yiR7nMSczIRvi4haP
+	 LQScSTfHl7eOw==
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-594285c6509so897324e87.0
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2025 07:35:20 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXIZiKOe8J0B7RT5BEY189kKmv43r7M0lzsLxqAdjoS6c30fWeUP887VNBa3+QPvENEPWjgKW9t4xXnn1Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFxGfKA6MMhOV4AhI6UXJ4qra2MBCJkQgRbgY9NYQHu1+SpaNz
+	A08ikRqymR5pV6Wyg21OMf24zl4nw3rWeP7vSM63MU0X5oo62n7V0U38mpqLTR6xm2BP9UFDVQh
+	AvlCc1uOoc+xsrQpHMEJ4nUb4uehy/sM=
+X-Google-Smtp-Source: AGHT+IFSYtlQ0Ik6SQdcIxTxPW7UMALLWKETzooevgZgxo2E3TFUk/0TVwKl+Z8PWkRPVlHulNC7+/9hXtr5ug1/GIY=
+X-Received: by 2002:a05:6512:68f:b0:593:f74:9088 with SMTP id
+ 2adb3069b0e04-59576e2e9b7mr2377457e87.43.1763048118988; Thu, 13 Nov 2025
+ 07:35:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250918140451.1289454-1-elver@google.com> <CAHk-=wgd-Wcp0GpYaQnU7S9ci+FvFmaNw1gm75mzf0ZWdNLxvw@mail.gmail.com>
- <aMx4-B_WAtX2aiKx@elver.google.com> <CAHk-=wgQO7c0zc8_VwaVSzG3fEVFFcjWzVBKM4jYjv8UiD2dkg@mail.gmail.com>
- <aM0eAk12fWsr9ZnV@elver.google.com>
-In-Reply-To: <aM0eAk12fWsr9ZnV@elver.google.com>
-From: Marco Elver <elver@google.com>
-Date: Thu, 13 Nov 2025 15:30:08 +0100
-X-Gm-Features: AWmQ_bmFh2aVYHZwkaHdVYkb7IeD9B_c5E9TrUEhRxSr8kO14B_rxSCEK8GKI2o
-Message-ID: <CANpmjNNoKiFEW2VfGM7rdak7O8__U3S+Esub9yM=9Tq=02d_ag@mail.gmail.com>
-Subject: Re: [PATCH v3 00/35] Compiler-Based Capability- and Locking-Analysis
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Boqun Feng <boqun.feng@gmail.com>, 
-	Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Bart Van Assche <bvanassche@acm.org>, Bill Wendling <morbo@google.com>, Christoph Hellwig <hch@lst.de>, 
-	Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Ian Rogers <irogers@google.com>, 
-	Jann Horn <jannh@google.com>, Joel Fernandes <joelagnelf@nvidia.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Josh Triplett <josh@joshtriplett.org>, 
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>, 
-	Kentaro Takeda <takedakn@nttdata.co.jp>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Thomas Gleixner <tglx@linutronix.de>, 
-	Thomas Graf <tgraf@suug.ch>, Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, 
-	kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, linux-sparse@vger.kernel.org, 
-	llvm@lists.linux.dev, rcu@vger.kernel.org
+References: <20250929194648.145585-1-ebiggers@kernel.org> <20251112121212.66e15a2d@phoenix>
+ <CAMj1kXEM62YLP2oLEA447hCFidTqE0E76XrTO02B373=sa0Jkw@mail.gmail.com> <c4028d3f-69f1-47f2-bd76-f9f5fb432fb7@hogyros.de>
+In-Reply-To: <c4028d3f-69f1-47f2-bd76-f9f5fb432fb7@hogyros.de>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 13 Nov 2025 16:35:07 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEF2iQ_EO2kiwqwqGL=br4FjEt=9QF0MXs4ATzLes7uOQ@mail.gmail.com>
+X-Gm-Features: AWmQ_bmsczc6-5DSYNKgFaTPCnPO7lGTY1Pd1cuVDihMrI5Rufc5_S7Ihn_wzuw
+Message-ID: <CAMj1kXEF2iQ_EO2kiwqwqGL=br4FjEt=9QF0MXs4ATzLes7uOQ@mail.gmail.com>
+Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1 code
+ instead of AF_ALG
+To: Simon Richter <Simon.Richter@hogyros.de>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, Eric Biggers <ebiggers@kernel.org>, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 19 Sept 2025 at 11:10, Marco Elver <elver@google.com> wrote:
-[..]
-> I went with "context guard" to refer to the objects themselves, as that
-> doesn't look too odd. It does match the concept of "guard" in
-> <linux/cleanup.h>.
+On Thu, 13 Nov 2025 at 09:51, Simon Richter <Simon.Richter@hogyros.de> wrote:
 >
-> See second attempt below.
-[..]
+> Hi,
+>
+> On 11/13/25 4:25 PM, Ard Biesheuvel wrote:
+>
+> > Also, I strongly agree with Eric that a syscall interface to perform
+> > crypto s/w arithmetic that could easily execute in user space is
+> > something that should have never been added, and creates portability
+> > concerns for no good reason.
+>
+> Would it make sense to add crypto (and other transform) operations to
+> the vdso, and make the decision whether the syscall is beneficial from
+> there, depending on request/batch size (speed vs overhead tradeoff),
+> data source/sink and available hardware?
+>
 
-I finally got around baking this into a renamed series, that now calls
-it "Context Analysis" - here's a preview:
-https://git.kernel.org/pub/scm/linux/kernel/git/melver/linux.git/log/?h=ctx-analysis/dev
+No. User space has all the tools it needs to make his determination
+itself, and OpenSSL (for example) already supports the 'afalg' engine,
+which will use AF_ALG, but transparently fall back to software crypto
+if the engine does not support the algorithm in question. So there is
+prior art, and therefore no need to complicate the kernel for this.
 
-As for when we should give this v4 another try: I'm 50/50 on sending
-this now vs. waiting for final Clang 22 to be released (~March 2026).
+Note that taking the SHA-1 of a BPF program is guaranteed to be way
+below the threshold of being worth the overhead of using a crypto
+offload engine, so in the context of this thread, it is kind of a moot
+point.
 
-Preferences?
+> For example, "gzip -d" pulling data from a file and writing to a file
+> will need to transfer the data to userspace first, process it there,
+> then transfer it back to kernelspace so it can be written to a file.
+>
+
+That is a different matter, and AF_ALG does not really help here at
+all. The crypto equivalent of what you describe already exists in
+fscrypt, which can transparently encrypt files, making use of
+whichever flavor of crypto is available, including inline crypto,
+where the h/w accelerator is in the storage controller, and not in a
+separate IP block. I'm not a file system expert, but AFAIK, some file
+systems already support compression at the file level as well, in
+which case h/w offload will be used where available, and the
+compressed data never travels to user space.
+
+Similarly, on the networking side, there are things like VPN
+acceleration and kTLS, where the crypto offload is combined with the
+networking hardware.
+
+Discrete crypto offload hardware is simply not something that has a
+lot of good use cases anymore.
