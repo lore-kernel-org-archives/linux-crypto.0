@@ -1,67 +1,53 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3F827D782;
-	Fri, 14 Nov 2025 09:37:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782AB30B50C;
+	Fri, 14 Nov 2025 09:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763113042; cv=none; b=USI5Jrb1K7VWh81BEXiJCfMXqHxVIb0xkd5haVV5Ax87kdgEedLPQsRaOg9uinkxX1lstcRVSY3sa6STdcjcBY5JUiQ8fZL+i2i8kQsr1E9jHELpoicK6Xc8JNL4YvGkSCuMiAWRfHTbRt0wcdIJ2nL8E01PnDAQtZASBob1vxc=
+	t=1763114396; cv=none; b=POYj6zv3mZA6DNzp/n0pxlQMXFJ1PCah4w89szZRtvcLyHQ7U0HasjQ+XkZIKBgv0C+YvVTBc2dRog03efkPD5kSlXqk8S/+vfXK+6lMeBLi+dwPvb0Opj+UTOS+1caiaweq12dlAKVmKs+JcJ0dLr/otUJbLKmgP+cd9h5jsx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763113042; c=relaxed/simple;
-	bh=VVIqPEqnNo0EhTLfDg/0eZ9CprIn3SbGY9+ZPeN0Utc=;
+	s=arc-20240116; t=1763114396; c=relaxed/simple;
+	bh=h/YX3dJDvTfjdK/QBeR1KF7ld5D/KoATDZ+ba3OtIJE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AfAOmnzhHh18uhNbu48C+jm+ER89qtWOPvqn5eka14jcvC0Tb07DfMM4OLqWfETRS8GRn7ISuRuqJ5pDZMhyt0aR5z545YCOh5xKhm0GjO98/RwqPXyZoTEeNS0rBNqQas5H++DsVeUSdFXFudzHiU1LfxnawYQLvVGrMsIRGAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cy5pyOOW; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=EySZo/C0kpIucjz2xyGMVkp7ynOF7xrZDRw3uCkn+YKF7/itlzrFN/CLs8rCfp3uOa/5f5KN7m3xuNfpLPzLI/QgNv6wvnI05NZR7ZvoCKaLv+eid/XZ4dDsgNwJHPBHV9+SN8lFnnZJTfU3tHyiOeRDfr02ZEy2Jwka4rnsGAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=LqnKDYHJ; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cy5pyOOW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763113040; x=1794649040;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VVIqPEqnNo0EhTLfDg/0eZ9CprIn3SbGY9+ZPeN0Utc=;
-  b=cy5pyOOWZEVnJZASCUI1zz6vXcjN7uUqs8UOVMJeZfx3cMqaIlxzurkP
-   8YVcgyqduY81vpWdnTOwo/KbP7Z0y+aA7nfGYbdMvodO1Y+c1YYyy8gko
-   Z6Psjqv04JsoZGnTxLl/sxtWiS599fsPXehE2aQujYUgsboTZxV9t5aEu
-   jGF6ZA34rQ/L6u5t7a7gMMcSeCk+kdz9ehpGPrtwu07kw9cAbL0jMhbJk
-   k57LO3gLn25mmZI8jZkihv7aTO3k0v0sm2Juyj6N69XleHtpIz+tfSpX6
-   ZJD0cFi+PXLQxC0NCWa0cBF5EhQ0y1wFBFG5q/hNLwPShJoiR97wXx7nw
-   g==;
-X-CSE-ConnectionGUID: +mnZg9JaQLqnvBeMZMwxnQ==
-X-CSE-MsgGUID: jpRJI2BrQtGdBMjslrOSbQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11612"; a="65092737"
-X-IronPort-AV: E=Sophos;i="6.19,304,1754982000"; 
-   d="scan'208";a="65092737"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 01:37:19 -0800
-X-CSE-ConnectionGUID: C3+0W0jSRQaX7Eh3jk8OUA==
-X-CSE-MsgGUID: AaynQJoFQ06GVme5Xvfr7g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,304,1754982000"; 
-   d="scan'208";a="189001449"
-Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 14 Nov 2025 01:37:17 -0800
-Received: from kbuild by 7b01c990427b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vJqF0-0006Pv-1s;
-	Fri, 14 Nov 2025 09:37:14 +0000
-Date: Fri, 14 Nov 2025 17:36:49 +0800
-From: kernel test robot <lkp@intel.com>
-To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Shiva Tripathi <s-tripathi1@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 3/4] crypto: ti - Add support for AES-GCM in DTHEv2
- driver
-Message-ID: <202511141721.73B0pu4H-lkp@intel.com>
-References: <20251111112137.976121-4-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="LqnKDYHJ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=A2r/Q/+wRJ2BFr/BHn0s3SothtWMfgvNhJUxmswYYkc=; 
+	b=LqnKDYHJ2hV1IWITk+XlcWoHcu2Bw8J4lGqIWsyd9e2uwsdNVw9Yn38Wt/o2M7PcyulnvfUhU39
+	4KxuZBwog498fmSq/U2tuU0k1n2FhhPvnzMSrrDQr7Jml0Grp5VoP6FxpqtpZGKQDMdd2Yt0AjfTr
+	b8ud4vzpnGbgPkdCX7WvJR+hGGpKIU55v5G3xX2WxkSZlqnkmFRg3XEKLH6yztg4cjQUjeCWaTktt
+	LFaXDmsiA1XVetPG1Y0YvcILkSqEt/RLoe1cNVyvZpfYpmgW9p5gKglPeIz6HhQnaFov/u9bkhRB5
+	EKf+ZLk6JT1ynYj6u61PoNfgwjO2ZHji95Eg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vJqaS-002y5g-25;
+	Fri, 14 Nov 2025 17:59:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Nov 2025 17:59:24 +0800
+Date: Fri, 14 Nov 2025 17:59:24 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org,
+	yosry.ahmed@linux.dev, nphamcs@gmail.com, chengming.zhou@linux.dev,
+	usamaarif642@gmail.com, ryan.roberts@arm.com, 21cnbao@gmail.com,
+	ying.huang@linux.alibaba.com, akpm@linux-foundation.org,
+	senozhatsky@chromium.org, sj@kernel.org, kasong@tencent.com,
+	linux-crypto@vger.kernel.org, davem@davemloft.net,
+	clabbe@baylibre.com, ardb@kernel.org, ebiggers@google.com,
+	surenb@google.com, kristen.c.accardi@intel.com,
+	vinicius.gomes@intel.com, wajdi.k.feghali@intel.com,
+	vinodh.gopal@intel.com
+Subject: Re: [PATCH v13 13/22] crypto: iaa - IAA Batching for parallel
+ compressions/decompressions.
+Message-ID: <aRb9fGDUhgRASTmM@gondor.apana.org.au>
+References: <20251104091235.8793-1-kanchana.p.sridhar@intel.com>
+ <20251104091235.8793-14-kanchana.p.sridhar@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -70,111 +56,119 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251111112137.976121-4-t-pratham@ti.com>
+In-Reply-To: <20251104091235.8793-14-kanchana.p.sridhar@intel.com>
 
-Hi Pratham,
+On Tue, Nov 04, 2025 at 01:12:26AM -0800, Kanchana P Sridhar wrote:
+>
+> +/**
+> + * This API provides IAA compress batching functionality for use by swap
+> + * modules.
+> + *
+> + * @ctx:  compression ctx for the requested IAA mode (fixed/dynamic).
+> + * @parent_req: The "parent" iaa_req that contains SG lists for the batch's
+> + *              inputs and outputs.
+> + * @unit_size: The unit size to apply to @parent_req->slen to get the number of
+> + *             scatterlists it contains.
+> + *
+> + * The caller should check the individual sg->lengths in the @parent_req for
+> + * errors, including incompressible page errors.
+> + *
+> + * Returns 0 if all compress requests in the batch complete successfully,
+> + * -EINVAL otherwise.
+> + */
+> +static int iaa_comp_acompress_batch(
+> +	struct iaa_compression_ctx *ctx,
+> +	struct iaa_req *parent_req,
+> +	unsigned int unit_size)
+> +{
+> +	struct iaa_batch_ctx *cpu_ctx = raw_cpu_ptr(iaa_batch_ctx);
+> +	int nr_reqs = parent_req->slen / unit_size;
+> +	int errors[IAA_CRYPTO_MAX_BATCH_SIZE];
+> +	int *dlens[IAA_CRYPTO_MAX_BATCH_SIZE];
+> +	bool compressions_done = false;
+> +	struct sg_page_iter sgiter;
+> +	struct scatterlist *sg;
+> +	struct iaa_req **reqs;
+> +	int i, err = 0;
+> +
+> +	mutex_lock(&cpu_ctx->mutex);
+> +
+> +	reqs = cpu_ctx->reqs;
+> +
+> +	__sg_page_iter_start(&sgiter, parent_req->src, nr_reqs,
+> +			     parent_req->src->offset/unit_size);
+> +
+> +	for (i = 0; i < nr_reqs; ++i, ++sgiter.sg_pgoffset) {
+> +		sg_set_page(reqs[i]->src, sg_page_iter_page(&sgiter), PAGE_SIZE, 0);
+> +		reqs[i]->slen = PAGE_SIZE;
+> +	}
+> +
+> +	for_each_sg(parent_req->dst, sg, nr_reqs, i) {
+> +		sg->length = PAGE_SIZE;
+> +		dlens[i] = &sg->length;
+> +		reqs[i]->dst = sg;
+> +		reqs[i]->dlen = PAGE_SIZE;
+> +	}
+> +
+> +	iaa_set_req_poll(reqs, nr_reqs, true);
+> +
+> +	/*
+> +	 * Prepare and submit the batch of iaa_reqs to IAA. IAA will process
+> +	 * these compress jobs in parallel.
+> +	 */
+> +	for (i = 0; i < nr_reqs; ++i) {
+> +		errors[i] = iaa_comp_acompress(ctx, reqs[i]);
+> +
+> +		if (likely(errors[i] == -EINPROGRESS)) {
+> +			errors[i] = -EAGAIN;
+> +		} else if (unlikely(errors[i])) {
+> +			*dlens[i] = errors[i];
+> +			err = -EINVAL;
+> +		} else {
+> +			*dlens[i] = reqs[i]->dlen;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * Asynchronously poll for and process IAA compress job completions.
+> +	 */
+> +	while (!compressions_done) {
+> +		compressions_done = true;
+> +
+> +		for (i = 0; i < nr_reqs; ++i) {
+> +			/*
+> +			 * Skip, if the compression has already completed
+> +			 * successfully or with an error.
+> +			 */
+> +			if (errors[i] != -EAGAIN)
+> +				continue;
+> +
+> +			errors[i] = iaa_comp_poll(ctx, reqs[i]);
+> +
+> +			if (errors[i]) {
+> +				if (likely(errors[i] == -EAGAIN)) {
+> +					compressions_done = false;
+> +				} else {
+> +					*dlens[i] = errors[i];
+> +					err = -EINVAL;
+> +				}
+> +			} else {
+> +				*dlens[i] = reqs[i]->dlen;
+> +			}
+> +		}
+> +	}
 
-kernel test robot noticed the following build errors:
+Why is this polling necessary?
 
-[auto build test ERROR on herbert-crypto-2.6/master]
-[also build test ERROR on linus/master v6.18-rc5]
-[cannot apply to herbert-cryptodev-2.6/master next-20251114]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+The crypto_acomp interface is async, even if the only user that
+you're proposing is synchronous.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/T-Pratham/crypto-ti-Add-support-for-AES-XTS-in-DTHEv2-driver/20251111-192827
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
-patch link:    https://lore.kernel.org/r/20251111112137.976121-4-t-pratham%40ti.com
-patch subject: [PATCH v6 3/4] crypto: ti - Add support for AES-GCM in DTHEv2 driver
-config: s390-randconfig-002-20251114 (https://download.01.org/0day-ci/archive/20251114/202511141721.73B0pu4H-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 11.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251114/202511141721.73B0pu4H-lkp@intel.com/reproduce)
+IOW the driver shouldn't care about synchronous polling at all.
+Just invoke the callback once all the sub-requests are complete
+and the wait call in zswap will take care of the rest.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511141721.73B0pu4H-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_init_tfm':
->> drivers/crypto/ti/dthev2-aes.c:573:24: error: implicit declaration of function 'crypto_alloc_sync_aead'; did you mean 'crypto_alloc_aead'? [-Werror=implicit-function-declaration]
-     573 |         ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
-         |                        ^~~~~~~~~~~~~~~~~~~~~~
-         |                        crypto_alloc_aead
-   drivers/crypto/ti/dthev2-aes.c:573:22: warning: assignment to 'struct crypto_sync_aead *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-     573 |         ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
-         |                      ^
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_exit_tfm':
->> drivers/crypto/ti/dthev2-aes.c:588:9: error: implicit declaration of function 'crypto_free_sync_aead'; did you mean 'crypto_free_aead'? [-Werror=implicit-function-declaration]
-     588 |         crypto_free_sync_aead(ctx->aead_fb);
-         |         ^~~~~~~~~~~~~~~~~~~~~
-         |         crypto_free_aead
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_setkey':
->> drivers/crypto/ti/dthev2-aes.c:831:9: error: implicit declaration of function 'crypto_sync_aead_clear_flags'; did you mean 'crypto_aead_clear_flags'? [-Werror=implicit-function-declaration]
-     831 |         crypto_sync_aead_clear_flags(ctx->aead_fb, CRYPTO_TFM_REQ_MASK);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         |         crypto_aead_clear_flags
->> drivers/crypto/ti/dthev2-aes.c:832:9: error: implicit declaration of function 'crypto_sync_aead_set_flags'; did you mean 'crypto_aead_set_flags'? [-Werror=implicit-function-declaration]
-     832 |         crypto_sync_aead_set_flags(ctx->aead_fb,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-         |         crypto_aead_set_flags
->> drivers/crypto/ti/dthev2-aes.c:836:16: error: implicit declaration of function 'crypto_sync_aead_setkey'; did you mean 'crypto_aead_setkey'? [-Werror=implicit-function-declaration]
-     836 |         return crypto_sync_aead_setkey(ctx->aead_fb, key, keylen);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~
-         |                crypto_aead_setkey
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_setauthsize':
->> drivers/crypto/ti/dthev2-aes.c:846:16: error: implicit declaration of function 'crypto_sync_aead_setauthsize'; did you mean 'crypto_aead_setauthsize'? [-Werror=implicit-function-declaration]
-     846 |         return crypto_sync_aead_setauthsize(ctx->aead_fb, authsize);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         |                crypto_aead_setauthsize
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_do_fallback':
->> drivers/crypto/ti/dthev2-aes.c:854:9: error: implicit declaration of function 'SYNC_AEAD_REQUEST_ON_STACK'; did you mean 'SYNC_SKCIPHER_REQUEST_ON_STACK'? [-Werror=implicit-function-declaration]
-     854 |         SYNC_AEAD_REQUEST_ON_STACK(subreq, ctx->aead_fb);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-         |         SYNC_SKCIPHER_REQUEST_ON_STACK
->> drivers/crypto/ti/dthev2-aes.c:854:36: error: 'subreq' undeclared (first use in this function)
-     854 |         SYNC_AEAD_REQUEST_ON_STACK(subreq, ctx->aead_fb);
-         |                                    ^~~~~~
-   drivers/crypto/ti/dthev2-aes.c:854:36: note: each undeclared identifier is reported only once for each function it appears in
-   drivers/crypto/ti/dthev2-aes.c:863:1: warning: control reaches end of non-void function [-Wreturn-type]
-     863 | }
-         | ^
-   cc1: some warnings being treated as errors
-
-
-vim +573 drivers/crypto/ti/dthev2-aes.c
-
-   563	
-   564	static int dthe_aead_init_tfm(struct crypto_aead *tfm)
-   565	{
-   566		struct dthe_tfm_ctx *ctx = crypto_aead_ctx(tfm);
-   567		struct dthe_data *dev_data = dthe_get_dev(ctx);
-   568	
-   569		ctx->dev_data = dev_data;
-   570	
-   571		const char *alg_name = crypto_tfm_alg_name(crypto_aead_tfm(tfm));
-   572	
- > 573		ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
-   574						      CRYPTO_ALG_NEED_FALLBACK);
-   575		if (IS_ERR(ctx->aead_fb)) {
-   576			dev_err(dev_data->dev, "fallback driver %s couldn't be loaded\n",
-   577				alg_name);
-   578			return PTR_ERR(ctx->aead_fb);
-   579		}
-   580	
-   581		return 0;
-   582	}
-   583	
-   584	static void dthe_aead_exit_tfm(struct crypto_aead *tfm)
-   585	{
-   586		struct dthe_tfm_ctx *ctx = crypto_aead_ctx(tfm);
-   587	
- > 588		crypto_free_sync_aead(ctx->aead_fb);
-   589	}
-   590	
-
+Cheers,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
