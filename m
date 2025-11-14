@@ -1,383 +1,412 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D572F6195
-	for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 15:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70AA21D3E4
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 18:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763134686; cv=none; b=UHdv3eGoiPaR9r52QB0ne/4byH5PHMt+myWDLd8pIZPB2t4XZRa1Grelk1fbfGpLcNlFIk61xSR/dUvEaHPALrsuRQJQGaftwW5gLg1bwVfeFTr2nZF5Sj/xFKQRPTCxIHQ+NRyS1TxQK8PQvB7qk41cImMgP8O7papNdW6Cglk=
+	t=1763143639; cv=none; b=HY2RAmz+iZzkNmZYcsVRbrRi5AcqT2Ssu5jIfusWfZOcfY6PkBKjms9SHaLwjShomlv49XdTzXyiH7yNwpxrGmG+BTfkZXF1GhMf0C4uaWDIdmbjx23IT4b6KErxcwp1jJq6ZI9/IekjWlXLuhrCUe+Gqx2zBtJgMr57rEhonuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763134686; c=relaxed/simple;
-	bh=k5pWI7YkpHxTuWyuvpI4Wql/v0tWJUn8BMdIu9q/ZUI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MpKyN/KHlGqDchuOoEEl3SDE/blwC2HFzJXUQ7+DYLvywDOYovuhMfVmyHxEm0wA1ZbmD/tPilZiKwABR9ccxtP1gFQhpcNogH5SyVDHQIr+ypDlBXZr3yJ8OVjEbTxgDPemKgPpm4IetQoY5kWR8NNJbuSWSk0NGo/QTqlW5iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AEsLfZVR; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1763143639; c=relaxed/simple;
+	bh=hTu1/WQ+28TiFImW6GRlwL2wPHub15rZc9OtNmfK2JQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JCqczJKIomMm1BL4AD6dxpAVAjGDMqjzmojyZKpTmHGZwWuJIWp9aHPSGVsvbZFrT5BeJKTHH8scND9dO9eQ74hz3L41CzPwRn9KxnmDaU7YiLWej+Ft7Pz+s2UiuiwuKFsoVAuv0x+fqSd3pCHeYSjbXONhNsVQpb/W2ipwcmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BA0dwHu4; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AEsLfZVR"
-Date: Fri, 14 Nov 2025 15:37:53 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763134681;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g+QdaGT/kuh4dpaf+w+I3WyS3w+lP4iRnjMTwkXDKFQ=;
-	b=AEsLfZVReXi9oJbcRurLiREhWdUCS4oLu0vGOIXNHL9mRlcG3I26iP90MT2vjXwnulM2Af
-	XNShS6As0shmBnbdM86SVp3y7Qn7EIPWuhjEkmCcVgb8E9he1DHZ+Ik8XthS3M3mN9UAeE
-	t+MP6cD0QBOKQsUjplcgdWNhRvbTqK8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>, 
-	SeongJae Park <sj@kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org" <hannes@cmpxchg.org>, 
-	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
-	"sj@kernel.org" <sj@kernel.org>, "kasong@tencent.com" <kasong@tencent.com>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com" <clabbe@baylibre.com>, 
-	"ardb@kernel.org" <ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
-	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>, "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, 
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
- compress batching of large folios.
-Message-ID: <ygtejnrci7cnjkpomoqhz3jdtryjffmk3o2avatjppylirbbem@qppr4eybud47>
-References: <20251104091235.8793-1-kanchana.p.sridhar@intel.com>
- <20251104091235.8793-23-kanchana.p.sridhar@intel.com>
- <q54bjetgzmwbsqpgbuuovdmcwxjwmtowwgsv7p3ykbodhxpvc7@6mqmz6ji4jja>
- <SJ2PR11MB8472011B61F644D4662FE980C9CDA@SJ2PR11MB8472.namprd11.prod.outlook.com>
- <ifqmrypobhqxlkh734md5it22vggmkvqo2t2uy7hgch5hmlyln@flqi75fwmfd4>
- <SJ2PR11MB8472610CE6EF5BA83BCC8D2EC9CAA@SJ2PR11MB8472.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BA0dwHu4"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-429cceeeb96so954831f8f.1
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 10:07:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763143636; x=1763748436; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=70La2at0aBhGjVKVAQXm26whTjSUNtWh3smGEz2qZ5c=;
+        b=BA0dwHu4aCymFlrv6utSameMBEFaP99xPh6aby3rccNMpCn6CaaPy1BPjClNZuxSFD
+         55jPAv7SGXRrjhOPMnLNSzheNxn59jopJv4gHG/WhLQnCZJdUldxM/1p27UaXDOJmehH
+         ZrRs5QMP97J2WSWGCR/1PQLgkp0Yagc08XdJ8ceTKKcMMG5abE72Iuh1ixBzg+iv1Pdw
+         BShuaiE0nNulwJn0M2kEAfkLenDyUvjJlYLPrREy1MmDDSgRfE7/RT5huq47arligvHG
+         BNyqOFJ1lKI+hFxM01VO9GjiwvQuSuhOam1NQ+JQmxzeDMKaXkGnGs6a7AoXaOgHQ8Q2
+         +q6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763143636; x=1763748436;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=70La2at0aBhGjVKVAQXm26whTjSUNtWh3smGEz2qZ5c=;
+        b=nCZhcQY1N3uJR7sbuvSy5VaCI1P3YEXUYw5gd5w90fZPtyDuFUnnRwh8cDeWoBmVh3
+         xvWzYG+SoLY8JMdP0F0o0d0bHHdsdpYPFGCbP+8CibNIgwQOyloa0Ev79zViraL2thny
+         2+ueVwkJWitkQNEFI0JPRlSXUaSk8tRSLGpswoLpyhDzfcnCLLWHofRAHuWF7OaP0YIJ
+         6sr7/XhNzLAso36+mdz932Cikyzho0deXX4JCqXYD+z3gqI+lqYp6152zrWTUkkJOaYB
+         Ip2g/f10yCS6D9OgU3NKpjmauuvDQksmDWomlhyDnlhVBtWJgyzaHgR/k0UNhsyM30wA
+         AUBQ==
+X-Gm-Message-State: AOJu0YymkOy3kSdHxNY1ZhE3C3wOY2oPgwa/bpY2mOtl3BvdJpyISR1z
+	JS6AoAy5+e4TbwJnjb+oUyGNnvBCxT4Tt0cCYamw6BH4BBNauAaCRXmSItsMMqwxKvLIshzOdjR
+	Q0WC8GAN8s3u+v/mWN7Ttbx6T/JyLEQoB79G2Atu3Gh0qH9FeDLy1eD6sQZ9YRZAKqJZvGwKpnk
+	TOzTj2myYTQtqHfPY98v94VQky9IWTnlZDzg==
+X-Google-Smtp-Source: AGHT+IHrssAIl5QgOTBhVvC3FX8N1w2fmbDT7vQZV5nc4o6s8ltYVfLjTSMcgaL5kqMiXppGL0YKb/ka
+X-Received: from wrbei2.prod.google.com ([2002:a05:6000:4182:b0:42b:367f:bbfe])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2912:b0:42b:31a5:f065
+ with SMTP id ffacd0b85a97d-42b5934e90bmr4327625f8f.28.1763143635930; Fri, 14
+ Nov 2025 10:07:15 -0800 (PST)
+Date: Fri, 14 Nov 2025 19:07:07 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SJ2PR11MB8472610CE6EF5BA83BCC8D2EC9CAA@SJ2PR11MB8472.namprd11.prod.outlook.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+X-Developer-Signature: v=1; a=openpgp-sha256; l=14505; i=ardb@kernel.org;
+ h=from:subject; bh=1z4sw6a8RgdKmiCnM4RterECB1hYo/FGLr4nXeE1W+g=;
+ b=owGbwMvMwCVmkMcZplerG8N4Wi2JIVM8/7SMbv++Q8VaisJXm6P+3nhizO1nlCvBZO/wpu3b5
+ Z+9e192lLIwiHExyIopsgjM/vtu5+mJUrXOs2Rh5rAygQxh4OIUgIms9mX4n/P0Vq3men9NabsI
+ lZCT8rWNM0xLalfvZtXKrLy67XusICPDbbaEvsMOL/7v6j2X2/TpTf7a7SH+rPtnW5/l7n8QqF/ KDwA=
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
+Message-ID: <20251114180706.318152-2-ardb+git@google.com>
+Subject: [RFC PATCH] libcrypto/chachapoly: Use strict typing for fixed size
+ array arguments
+From: Ard Biesheuvel <ardb+git@google.com>
+To: linux-crypto@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
+	"Jason A. Donenfeld" <Jason@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Nov 14, 2025 at 06:43:21AM +0000, Sridhar, Kanchana P wrote:
-> 
-> > -----Original Message-----
-> > From: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > Sent: Thursday, November 13, 2025 9:52 PM
-> > To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
-> > Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> > hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
-> > usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
-> > ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
-> > senozhatsky@chromium.org; sj@kernel.org; kasong@tencent.com; linux-
-> > crypto@vger.kernel.org; herbert@gondor.apana.org.au;
-> > davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
-> > ebiggers@google.com; surenb@google.com; Accardi, Kristen C
-> > <kristen.c.accardi@intel.com>; Gomes, Vinicius <vinicius.gomes@intel.com>;
-> > Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
-> > <vinodh.gopal@intel.com>
-> > Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
-> > compress batching of large folios.
-> > 
-> > On Thu, Nov 13, 2025 at 11:55:10PM +0000, Sridhar, Kanchana P wrote:
-> > >
-> > > > -----Original Message-----
-> > > > From: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > > > Sent: Thursday, November 13, 2025 1:35 PM
-> > > > To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
-> > > > Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> > > > hannes@cmpxchg.org; nphamcs@gmail.com;
-> > chengming.zhou@linux.dev;
-> > > > usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
-> > > > ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
-> > > > senozhatsky@chromium.org; sj@kernel.org; kasong@tencent.com; linux-
-> > > > crypto@vger.kernel.org; herbert@gondor.apana.org.au;
-> > > > davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
-> > > > ebiggers@google.com; surenb@google.com; Accardi, Kristen C
-> > > > <kristen.c.accardi@intel.com>; Gomes, Vinicius
-> > <vinicius.gomes@intel.com>;
-> > > > Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
-> > > > <vinodh.gopal@intel.com>
-> > > > Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress()
-> > with
-> > > > compress batching of large folios.
-> > > >
-> > [..]
-> > > > > +		/*
-> > > > > +		 * If a page cannot be compressed into a size smaller than
-> > > > > +		 * PAGE_SIZE, save the content as is without a compression,
-> > > > to
-> > > > > +		 * keep the LRU order of writebacks.  If writeback is disabled,
-> > > > > +		 * reject the page since it only adds metadata overhead.
-> > > > > +		 * swap_writeout() will put the page back to the active LRU
-> > > > list
-> > > > > +		 * in the case.
-> > > > > +		 *
-> > > > > +		 * It is assumed that any compressor that sets the output
-> > > > length
-> > > > > +		 * to 0 or a value >= PAGE_SIZE will also return a negative
-> > > > > +		 * error status in @err; i.e, will not return a successful
-> > > > > +		 * compression status in @err in this case.
-> > > > > +		 */
-> > > >
-> > > > Ugh, checking the compression error and checking the compression length
-> > > > are now in separate places so we need to check if writeback is disabled
-> > > > in separate places and store the page as-is. It's ugly, and I think the
-> > > > current code is not correct.
-> > >
-> > > The code is 100% correct. You need to spend more time understanding
-> > > the code. I have stated my assumption above in the comments to
-> > > help in understanding the "why".
-> > >
-> > > From a maintainer, I would expect more responsible statements than
-> > > this. A flippant remark made without understanding the code (and,
-> > > disparaging the comments intended to help you do this), can impact
-> > > someone's career. I am held accountable in my job based on your
-> > > comments.
-> > >
-> > > That said, I have worked tirelessly and innovated to make the code
-> > > compliant with Herbert's suggestions (which btw have enabled an
-> > > elegant batching implementation and code commonality for IAA and
-> > > software compressors), validated it thoroughly for IAA and ZSTD to
-> > > ensure that both demonstrate performance improvements, which
-> > > are crucial for memory savings. I am proud of this work.
-> > >
-> > >
-> > > >
-> > > > > +		if (err && !wb_enabled)
-> > > > > +			goto compress_error;
-> > > > > +
-> > > > > +		for_each_sg(acomp_ctx->sg_outputs->sgl, sg, nr_comps, k) {
-> > > > > +			j = k + i;
-> > > >
-> > > > Please use meaningful iterator names rather than i, j, and k and the huge
-> > > > comment explaining what they are.
-> > >
-> > > I happen to have a different view: having longer iterator names firstly makes
-> > > code seem "verbose" and detracts from readability, not to mention
-> > exceeding the
-> > > 80-character line limit. The comments are essential for code maintainability
-> > > and avoid out-of-bounds errors when the next zswap developer wants to
-> > > optimize the code.
-> > >
-> > > One drawback of i/j/k iterators is mis-typing errors which cannot be caught
-> > > at compile time. Let me think some more about how to strike a good
-> > balance.
-> > >
-> > > >
-> > > > > +			dst = acomp_ctx->buffers[k];
-> > > > > +			dlen = sg->length | *errp;
-> > > >
-> > > > Why are we doing this?
-> > > >
-> > > > > +
-> > > > > +			if (dlen < 0) {
-> > > >
-> > > > We should do the incompressible page handling also if dlen is PAGE_SIZE,
-> > > > or if the compression failed (I guess that's the intention of bit OR'ing
-> > > > with *errp?)
-> > >
-> > > Yes, indeed: that's the intention of bit OR'ing with *errp.
-> > 
-> > ..and you never really answered my question. In the exising code we
-> > store the page as incompressible if writeback is enabled AND
-> > crypto_wait_req() fails or dlen is zero or PAGE_SIZE. We check above
-> > if crypto_wait_req() fails and writeback is disabled, but what about the
-> > rest?
-> 
-> Let me explain this some more. The new code only relies on the assumption
-> that if dlen is zero or >= PAGE_SIZE, the compressor will not return a 0
-> ("successful status"). In other words, the compressor will return an error status
-> in this case, which is expected to be a negative error code.
+From: Ard Biesheuvel <ardb@kernel.org>
 
-I am not sure if all compressors do that, especially for the case where
-dlen >= PAGE_SIZE. The existing code does not assume that there will be
-an error code in these cases.
+The C routines in libcrypto take in/outputs of arbitrary size on the one
+hand (plaintext, ciphertext, etc) and in/outputs of fixed size on the
+other (keys, nonces, digests).
 
-For the dlen == 0 case, the check was introduced recently by commit
-dca4437a5861 ("mm/zswap: store <PAGE_SIZE compression failed page
-as-is"). Looking through the history it seems like it was introduced in
-v4 of that patch but I don't see the reasoning.
+In many cases, we pass these fixed size in/outputs as array of u8, with
+the dimension in square brackets. However, this dimension only serves as
+a human readable annotation, and is completely ignored by the compiler.
 
-SeongJae, did you observe any compressors returning dlen == 0 but no
-error code? What was the reasoning behind the dlen == 0 check?
+For example, mixing up any of the const u8[]/const u8* arguments in the
+prototype below will not trigger a compiler diagnostic:
 
-> 
-> Under these (hopefully valid) assumptions, the code handles the simple case
-> of an error compression return status and writeback is disabled, by the
-> "goto compress_error".
-> 
-> The rest is handled by these:
-> 
-> 1) First, I need to adapt the use of sg_outputs->sgl->length to represent the
-> compress length for software compressors, so I do this after crypto_wait_req()
-> returns:
-> 
->                 acomp_ctx->sg_outputs->sgl->length = acomp_ctx->req->dlen;
+void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+                               const u8 *ad, const size_t ad_len,
+                               const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
+                               const u8 key[CHACHA20POLY1305_KEY_SIZE])
 
-For SW compressors, why is acomp_ctx->sg_outputs->sgl->length not set?
-IIUC we are using the same API for SW and HW compressors, why is the
-output length in different places for each of them?
+If we change this to the below, the codegen is identical, given that the
+actual value passed as the argument is the address of the entire array,
+which is equal to the address of its first element,
 
-> 
-> I did not want to propose any changes to crypto software compressors protocols.
-> 
-> 2) After the check for the "if (err && !wb_enabled)" case, the new code has this:
-> 
->                 for_each_sg(acomp_ctx->sg_outputs->sgl, sg, nr_comps, k) {
->                         j = k + i;
->                         dst = acomp_ctx->buffers[k];
->                         dlen = sg->length | *errp;
-> 
->                         if (dlen < 0) {
->                                 dlen = PAGE_SIZE;
->                                 dst = kmap_local_page(folio_page(folio, start + j));
->                         }
-> 
-> For batching compressors, namely, iaa_crypto, the individual output SG
-> lists sg->length follows the requirements from Herbert: each sg->length
-> is the compressed length or the error status (a negative error code).
-> 
-> Then all I need to know whether to store the page as incompressible
-> is to either directly test if sg->length is negative (for batching compressors),
-> or sg->length bit-OR'ed with the crypto_wait_req() return status ("err")
-> is negative. This is accomplished by the "dlen = sg->length | *errp;".
-> 
-> I believe this maintains backward compatibility with the existing code.
-> Please let me know if you agree.
+void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+                               const u8 *ad, const size_t ad_len,
+                               const u8 (*nonce)[XCHACHA20POLY1305_NONCE_SIZE],
+                               const u8 (*key)[CHACHA20POLY1305_KEY_SIZE])
 
-For batching compressors, will 'err' be set as well, or just sg->length?
-If it's just sg->length, then we need to check again if WB is enabled
-here before storing the page uncompressed. Right?
+However, this variant is checked more strictly by the compiler, and only
+arrays of the correct size are accepted as plain arguments (using the &
+operator), and so inadvertent mixing up of arguments or passing buffers
+of an incorrect size will trigger an error at build time.
 
-> 
-> > 
-> > We don't check again if writeback is enabled before storing the page is
-> > incompressible, and we do not check if dlen is zero or PAGE_SIZE. Are
-> > these cases no longer possible?
-> 
-> Hope the above explanation clarifies things some more? These case
-> are possible, and as long as they return an error status, they should be
-> correctly handled by the new code.
+So let's switch to this for the ChaCha20Poly1305 library used by
+WireGuard.
 
-As mentioned above, I am not sure if that's correct for dlen >=
-PAGE_SIZE.
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
 
-> 
-> > 
-> > Also, why use errp, why not explicitly use the appropriate error code?
-> > It's also unclear to me why the error code is always zero with HW
-> > compression?
-> 
-> This is because of the sg->length requirements (compressed length/error)
-> for the batching interface suggested by Herbert. Hence, I upfront define
-> err_sg to 0, and, set errp to &err_sg for batching compressors. For software
-> compressors, errp is set to &err, namely, the above check will always apply
-> the software compressor's error status to the compressed length via
-> the bit-OR to determine if the page needs to be stored uncompressed.
+Sending this RFC as an example, as a starting point for a discussion
+whether or not we want to go down this route for all library crypto.
 
-Thanks for the clarification. I understand that the error code has
-different sources for SW and HW compressors, but I do not like using
-errp as an indirection. It makes the code unclear. I would rather we
-explicitly check err for SW compressors and dlen for HW compressors.
+ drivers/net/wireguard/cookie.c    |  8 ++--
+ drivers/net/wireguard/noise.c     | 16 ++++----
+ drivers/net/wireguard/receive.c   |  2 +-
+ drivers/net/wireguard/send.c      |  2 +-
+ include/crypto/chacha20poly1305.h | 16 ++++----
+ lib/crypto/chacha20poly1305.c     | 41 ++++++++++----------
+ 6 files changed, 43 insertions(+), 42 deletions(-)
 
-That being said, I thought what Herbert suggested was that the same API
-is used for both SW and HW compressors. IOW, either way we submit a
-batch of pages (8 pages for SW compressors), and then the crypto API
-would either give the entire batch to the compressor if it supports
-batching, or loop over them internally and hand them page-by-page to
-the compressor.
+diff --git a/drivers/net/wireguard/cookie.c b/drivers/net/wireguard/cookie.c
+index 08731b3fa32b..b0ebbd2f8af4 100644
+--- a/drivers/net/wireguard/cookie.c
++++ b/drivers/net/wireguard/cookie.c
+@@ -191,8 +191,8 @@ void wg_cookie_message_create(struct message_handshake_cookie *dst,
+ 
+ 	make_cookie(cookie, skb, checker);
+ 	xchacha20poly1305_encrypt(dst->encrypted_cookie, cookie, COOKIE_LEN,
+-				  macs->mac1, COOKIE_LEN, dst->nonce,
+-				  checker->cookie_encryption_key);
++				  macs->mac1, COOKIE_LEN, &dst->nonce,
++				  &checker->cookie_encryption_key);
+ }
+ 
+ void wg_cookie_message_consume(struct message_handshake_cookie *src,
+@@ -215,8 +215,8 @@ void wg_cookie_message_consume(struct message_handshake_cookie *src,
+ 	}
+ 	ret = xchacha20poly1305_decrypt(
+ 		cookie, src->encrypted_cookie, sizeof(src->encrypted_cookie),
+-		peer->latest_cookie.last_mac1_sent, COOKIE_LEN, src->nonce,
+-		peer->latest_cookie.cookie_decryption_key);
++		peer->latest_cookie.last_mac1_sent, COOKIE_LEN, &src->nonce,
++		&peer->latest_cookie.cookie_decryption_key);
+ 	up_read(&peer->latest_cookie.lock);
+ 
+ 	if (ret) {
+diff --git a/drivers/net/wireguard/noise.c b/drivers/net/wireguard/noise.c
+index 1fe8468f0bef..e4f560df5f03 100644
+--- a/drivers/net/wireguard/noise.c
++++ b/drivers/net/wireguard/noise.c
+@@ -461,7 +461,7 @@ static void handshake_init(u8 chaining_key[NOISE_HASH_LEN],
+ }
+ 
+ static void message_encrypt(u8 *dst_ciphertext, const u8 *src_plaintext,
+-			    size_t src_len, u8 key[NOISE_SYMMETRIC_KEY_LEN],
++			    size_t src_len, u8 (*key)[NOISE_SYMMETRIC_KEY_LEN],
+ 			    u8 hash[NOISE_HASH_LEN])
+ {
+ 	chacha20poly1305_encrypt(dst_ciphertext, src_plaintext, src_len, hash,
+@@ -471,7 +471,7 @@ static void message_encrypt(u8 *dst_ciphertext, const u8 *src_plaintext,
+ }
+ 
+ static bool message_decrypt(u8 *dst_plaintext, const u8 *src_ciphertext,
+-			    size_t src_len, u8 key[NOISE_SYMMETRIC_KEY_LEN],
++			    size_t src_len, u8 (*key)[NOISE_SYMMETRIC_KEY_LEN],
+ 			    u8 hash[NOISE_HASH_LEN])
+ {
+ 	if (!chacha20poly1305_decrypt(dst_plaintext, src_ciphertext, src_len,
+@@ -554,7 +554,7 @@ wg_noise_handshake_create_initiation(struct message_handshake_initiation *dst,
+ 	/* s */
+ 	message_encrypt(dst->encrypted_static,
+ 			handshake->static_identity->static_public,
+-			NOISE_PUBLIC_KEY_LEN, key, handshake->hash);
++			NOISE_PUBLIC_KEY_LEN, &key, handshake->hash);
+ 
+ 	/* ss */
+ 	if (!mix_precomputed_dh(handshake->chaining_key, key,
+@@ -564,7 +564,7 @@ wg_noise_handshake_create_initiation(struct message_handshake_initiation *dst,
+ 	/* {t} */
+ 	tai64n_now(timestamp);
+ 	message_encrypt(dst->encrypted_timestamp, timestamp,
+-			NOISE_TIMESTAMP_LEN, key, handshake->hash);
++			NOISE_TIMESTAMP_LEN, &key, handshake->hash);
+ 
+ 	dst->sender_index = wg_index_hashtable_insert(
+ 		handshake->entry.peer->device->index_hashtable,
+@@ -610,7 +610,7 @@ wg_noise_handshake_consume_initiation(struct message_handshake_initiation *src,
+ 
+ 	/* s */
+ 	if (!message_decrypt(s, src->encrypted_static,
+-			     sizeof(src->encrypted_static), key, hash))
++			     sizeof(src->encrypted_static), &key, hash))
+ 		goto out;
+ 
+ 	/* Lookup which peer we're actually talking to */
+@@ -626,7 +626,7 @@ wg_noise_handshake_consume_initiation(struct message_handshake_initiation *src,
+ 
+ 	/* {t} */
+ 	if (!message_decrypt(t, src->encrypted_timestamp,
+-			     sizeof(src->encrypted_timestamp), key, hash))
++			     sizeof(src->encrypted_timestamp), &key, hash))
+ 		goto out;
+ 
+ 	down_read(&handshake->lock);
+@@ -708,7 +708,7 @@ bool wg_noise_handshake_create_response(struct message_handshake_response *dst,
+ 		handshake->preshared_key);
+ 
+ 	/* {} */
+-	message_encrypt(dst->encrypted_nothing, NULL, 0, key, handshake->hash);
++	message_encrypt(dst->encrypted_nothing, NULL, 0, &key, handshake->hash);
+ 
+ 	dst->sender_index = wg_index_hashtable_insert(
+ 		handshake->entry.peer->device->index_hashtable,
+@@ -779,7 +779,7 @@ wg_noise_handshake_consume_response(struct message_handshake_response *src,
+ 
+ 	/* {} */
+ 	if (!message_decrypt(NULL, src->encrypted_nothing,
+-			     sizeof(src->encrypted_nothing), key, hash))
++			     sizeof(src->encrypted_nothing), &key, hash))
+ 		goto fail;
+ 
+ 	/* Success! Copy everything to peer */
+diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/receive.c
+index eb8851113654..21b4d825e9f7 100644
+--- a/drivers/net/wireguard/receive.c
++++ b/drivers/net/wireguard/receive.c
+@@ -277,7 +277,7 @@ static bool decrypt_packet(struct sk_buff *skb, struct noise_keypair *keypair)
+ 
+ 	if (!chacha20poly1305_decrypt_sg_inplace(sg, skb->len, NULL, 0,
+ 					         PACKET_CB(skb)->nonce,
+-						 keypair->receiving.key))
++						 &keypair->receiving.key))
+ 		return false;
+ 
+ 	/* Another ugly situation of pushing and pulling the header so as to
+diff --git a/drivers/net/wireguard/send.c b/drivers/net/wireguard/send.c
+index 26e09c30d596..a0d8c541b72c 100644
+--- a/drivers/net/wireguard/send.c
++++ b/drivers/net/wireguard/send.c
+@@ -215,7 +215,7 @@ static bool encrypt_packet(struct sk_buff *skb, struct noise_keypair *keypair)
+ 		return false;
+ 	return chacha20poly1305_encrypt_sg_inplace(sg, plaintext_len, NULL, 0,
+ 						   PACKET_CB(skb)->nonce,
+-						   keypair->sending.key);
++						   &keypair->sending.key);
+ }
+ 
+ void wg_packet_send_keepalive(struct wg_peer *peer)
+diff --git a/include/crypto/chacha20poly1305.h b/include/crypto/chacha20poly1305.h
+index d2ac3ff7dc1e..4b49b229eb77 100644
+--- a/include/crypto/chacha20poly1305.h
++++ b/include/crypto/chacha20poly1305.h
+@@ -18,32 +18,32 @@ enum chacha20poly1305_lengths {
+ void chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			      const u8 *ad, const size_t ad_len,
+ 			      const u64 nonce,
+-			      const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++			      const u8 (*key)[CHACHA20POLY1305_KEY_SIZE]);
+ 
+ bool __must_check
+ chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			 const u8 *ad, const size_t ad_len, const u64 nonce,
+-			 const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++			 const u8 (*key)[CHACHA20POLY1305_KEY_SIZE]);
+ 
+ void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			       const u8 *ad, const size_t ad_len,
+-			       const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
+-			       const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++			       const u8 (*nonce)[XCHACHA20POLY1305_NONCE_SIZE],
++			       const u8 (*key)[CHACHA20POLY1305_KEY_SIZE]);
+ 
+ bool __must_check xchacha20poly1305_decrypt(
+ 	u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
+-	const size_t ad_len, const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
+-	const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++	const size_t ad_len, const u8 (*nonce)[XCHACHA20POLY1305_NONCE_SIZE],
++	const u8 (*key)[CHACHA20POLY1305_KEY_SIZE]);
+ 
+ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src, size_t src_len,
+ 					 const u8 *ad, const size_t ad_len,
+ 					 const u64 nonce,
+-					 const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++					 const u8 (*key)[CHACHA20POLY1305_KEY_SIZE]);
+ 
+ bool chacha20poly1305_decrypt_sg_inplace(struct scatterlist *src, size_t src_len,
+ 					 const u8 *ad, const size_t ad_len,
+ 					 const u64 nonce,
+-					 const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++					 const u8 (*key)[CHACHA20POLY1305_KEY_SIZE]);
+ 
+ bool chacha20poly1305_selftest(void);
+ 
+diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
+index 0b49d6aedefd..413e06eb1da0 100644
+--- a/lib/crypto/chacha20poly1305.c
++++ b/lib/crypto/chacha20poly1305.c
+@@ -18,20 +18,21 @@
+ #include <linux/module.h>
+ #include <linux/unaligned.h>
+ 
+-static void chacha_load_key(u32 *k, const u8 *in)
++static void chacha_load_key(u32 *k, const u8 (*in)[CHACHA20POLY1305_KEY_SIZE])
+ {
+-	k[0] = get_unaligned_le32(in);
+-	k[1] = get_unaligned_le32(in + 4);
+-	k[2] = get_unaligned_le32(in + 8);
+-	k[3] = get_unaligned_le32(in + 12);
+-	k[4] = get_unaligned_le32(in + 16);
+-	k[5] = get_unaligned_le32(in + 20);
+-	k[6] = get_unaligned_le32(in + 24);
+-	k[7] = get_unaligned_le32(in + 28);
++	k[0] = get_unaligned_le32((u8 *)in);
++	k[1] = get_unaligned_le32((u8 *)in + 4);
++	k[2] = get_unaligned_le32((u8 *)in + 8);
++	k[3] = get_unaligned_le32((u8 *)in + 12);
++	k[4] = get_unaligned_le32((u8 *)in + 16);
++	k[5] = get_unaligned_le32((u8 *)in + 20);
++	k[6] = get_unaligned_le32((u8 *)in + 24);
++	k[7] = get_unaligned_le32((u8 *)in + 28);
+ }
+ 
+ static void xchacha_init(struct chacha_state *chacha_state,
+-			 const u8 *key, const u8 *nonce)
++			 const u8 (*key)[CHACHA20POLY1305_KEY_SIZE],
++			 const u8 (*nonce)[XCHACHA20POLY1305_NONCE_SIZE])
+ {
+ 	u32 k[CHACHA_KEY_WORDS];
+ 	u8 iv[CHACHA_IV_SIZE];
+@@ -42,7 +43,7 @@ static void xchacha_init(struct chacha_state *chacha_state,
+ 	chacha_load_key(k, key);
+ 
+ 	/* Compute the subkey given the original key and first 128 nonce bits */
+-	chacha_init(chacha_state, k, nonce);
++	chacha_init(chacha_state, k, (u8 *)nonce);
+ 	hchacha_block(chacha_state, k, 20);
+ 
+ 	chacha_init(chacha_state, k, iv);
+@@ -89,7 +90,7 @@ __chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ void chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			      const u8 *ad, const size_t ad_len,
+ 			      const u64 nonce,
+-			      const u8 key[CHACHA20POLY1305_KEY_SIZE])
++			      const u8 (*key)[CHACHA20POLY1305_KEY_SIZE])
+ {
+ 	struct chacha_state chacha_state;
+ 	u32 k[CHACHA_KEY_WORDS];
+@@ -111,8 +112,8 @@ EXPORT_SYMBOL(chacha20poly1305_encrypt);
+ 
+ void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			       const u8 *ad, const size_t ad_len,
+-			       const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
+-			       const u8 key[CHACHA20POLY1305_KEY_SIZE])
++			       const u8 (*nonce)[XCHACHA20POLY1305_NONCE_SIZE],
++			       const u8 (*key)[CHACHA20POLY1305_KEY_SIZE])
+ {
+ 	struct chacha_state chacha_state;
+ 
+@@ -170,7 +171,7 @@ __chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ bool chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			      const u8 *ad, const size_t ad_len,
+ 			      const u64 nonce,
+-			      const u8 key[CHACHA20POLY1305_KEY_SIZE])
++			      const u8 (*key)[CHACHA20POLY1305_KEY_SIZE])
+ {
+ 	struct chacha_state chacha_state;
+ 	u32 k[CHACHA_KEY_WORDS];
+@@ -195,8 +196,8 @@ EXPORT_SYMBOL(chacha20poly1305_decrypt);
+ 
+ bool xchacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			       const u8 *ad, const size_t ad_len,
+-			       const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
+-			       const u8 key[CHACHA20POLY1305_KEY_SIZE])
++			       const u8 (*nonce)[XCHACHA20POLY1305_NONCE_SIZE],
++			       const u8 (*key)[CHACHA20POLY1305_KEY_SIZE])
+ {
+ 	struct chacha_state chacha_state;
+ 
+@@ -211,7 +212,7 @@ bool chacha20poly1305_crypt_sg_inplace(struct scatterlist *src,
+ 				       const size_t src_len,
+ 				       const u8 *ad, const size_t ad_len,
+ 				       const u64 nonce,
+-				       const u8 key[CHACHA20POLY1305_KEY_SIZE],
++				       const u8 (*key)[CHACHA20POLY1305_KEY_SIZE],
+ 				       int encrypt)
+ {
+ 	const u8 *pad0 = page_address(ZERO_PAGE(0));
+@@ -335,7 +336,7 @@ bool chacha20poly1305_crypt_sg_inplace(struct scatterlist *src,
+ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src, size_t src_len,
+ 					 const u8 *ad, const size_t ad_len,
+ 					 const u64 nonce,
+-					 const u8 key[CHACHA20POLY1305_KEY_SIZE])
++					 const u8 (*key)[CHACHA20POLY1305_KEY_SIZE])
+ {
+ 	return chacha20poly1305_crypt_sg_inplace(src, src_len, ad, ad_len,
+ 						 nonce, key, 1);
+@@ -345,7 +346,7 @@ EXPORT_SYMBOL(chacha20poly1305_encrypt_sg_inplace);
+ bool chacha20poly1305_decrypt_sg_inplace(struct scatterlist *src, size_t src_len,
+ 					 const u8 *ad, const size_t ad_len,
+ 					 const u64 nonce,
+-					 const u8 key[CHACHA20POLY1305_KEY_SIZE])
++					 const u8 (*key)[CHACHA20POLY1305_KEY_SIZE])
+ {
+ 	if (unlikely(src_len < POLY1305_DIGEST_SIZE))
+ 		return false;
+-- 
+2.52.0.rc1.455.g30608eb744-goog
 
-This would simplify usage as we do not have to handle the differences in
-zswap.
-
-If that is not doable, at the very least the API should be consistent.
-Right now the error code and length are propagated differently to the
-caller based on whether or not the compressor support batching.
-
-> 
-> 
-> > 
-> > >
-> > > >
-> > > > > +				dlen = PAGE_SIZE;
-> > > > > +				dst = kmap_local_page(folio_page(folio, start
-> > > > + j));
-> > > > > +			}
-> > > > > +
-> > > > > +			handle = zs_malloc(pool->zs_pool, dlen, gfp, nid);
-> > > > >
-> > > > > -	zs_obj_write(pool->zs_pool, handle, dst, dlen);
-> > > > > -	entry->handle = handle;
-> > > > > -	entry->length = dlen;
-> > > > > +			if (IS_ERR_VALUE(handle)) {
-> > > > > +				if (PTR_ERR((void *)handle) == -ENOSPC)
-> > > > > +					zswap_reject_compress_poor++;
-> > > > > +				else
-> > > > > +					zswap_reject_alloc_fail++;
-> > > > >
-> > > > > -unlock:
-> > > > > -	if (mapped)
-> > > > > -		kunmap_local(dst);
-> > > > > -	if (comp_ret == -ENOSPC || alloc_ret == -ENOSPC)
-> > > > > -		zswap_reject_compress_poor++;
-> > > > > -	else if (comp_ret)
-> > > > > -		zswap_reject_compress_fail++;
-> > > > > -	else if (alloc_ret)
-> > > > > -		zswap_reject_alloc_fail++;
-> > > > > +				goto err_unlock;
-> > > > > +			}
-> > > > > +
-> > > > > +			zs_obj_write(pool->zs_pool, handle, dst, dlen);
-> > > > > +			entries[j]->handle = handle;
-> > > > > +			entries[j]->length = dlen;
-> > > > > +			if (dst != acomp_ctx->buffers[k])
-> > > > > +				kunmap_local(dst);
-> > > > > +		}
-> > > > > +	} /* finished compress and store nr_pages. */
-> > > > > +
-> > > > > +	mutex_unlock(&acomp_ctx->mutex);
-> > > > > +	return true;
-> > > > > +
-> > > > > +compress_error:
-> > > > > +	for_each_sg(acomp_ctx->sg_outputs->sgl, sg, nr_comps, k) {
-> > > > > +		if ((int)sg->length < 0) {
-> > > > > +			if ((int)sg->length == -ENOSPC)
-> > > > > +				zswap_reject_compress_poor++;
-> > > > > +			else
-> > > > > +				zswap_reject_compress_fail++;
-> > > > > +		}
-> > > > > +	}
-> > > > >
-> > > > > +err_unlock:
-> > > > >  	mutex_unlock(&acomp_ctx->mutex);
-> > > > > -	return comp_ret == 0 && alloc_ret == 0;
-> > > > > +	return false;
-> > > > >  }
-> > > > >
-> > > > >  static bool zswap_decompress(struct zswap_entry *entry, struct folio
-> > > > *folio)
-> > > > > @@ -1488,12 +1604,9 @@ static bool zswap_store_pages(struct folio
-> > > > *folio,
-> > > > >  		INIT_LIST_HEAD(&entries[i]->lru);
-> > > > >  	}
-> > > > >
-> > > > > -	for (i = 0; i < nr_pages; ++i) {
-> > > > > -		struct page *page = folio_page(folio, start + i);
-> > > > > -
-> > > > > -		if (!zswap_compress(page, entries[i], pool, wb_enabled))
-> > > > > -			goto store_pages_failed;
-> > > > > -	}
-> > > > > +	if (unlikely(!zswap_compress(folio, start, nr_pages, entries, pool,
-> > > > > +				     nid, wb_enabled)))
-> > > > > +		goto store_pages_failed;
-> > > > >
-> > > > >  	for (i = 0; i < nr_pages; ++i) {
-> > > > >  		struct zswap_entry *old, *entry = entries[i];
-> > > > > --
-> > > > > 2.27.0
-> > > > >
