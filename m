@@ -1,173 +1,127 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105BF2C0F71;
-	Fri, 14 Nov 2025 07:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6ED2FDC28
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 08:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763106793; cv=none; b=NMABHGzfXZWBC4OGoGlEyesMZPYN2s30T+aFlga7Kva+NSxDtbw6UHWxYp3pnDvqjrX7dwuJTNljn8vLJZGzovrOtbkSoqCb5pQEQ0an9+5xrocfb3a8Sx9zQUe74aEBTz7fiRJscyXKWv7qz8y6ysQLW7RJ44XOub5jZ37wu3g=
+	t=1763109374; cv=none; b=qX8fbPAcsXYSKyozU5a7QonwOsWMbTNtW/MfayC8afEah1WvlZFvdriEhTV+mlJZgIlZSKWBvYXZcsBeI+I7puebzwlAY14RjB1Rs95BeD5FVQk4ee06vyETVNT06gA4w5/ki0O7qycwATgxOJu9KUnpRyWlACRIq+VNMk40Tl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763106793; c=relaxed/simple;
-	bh=n6gisGumhyHm0iSyc++Fqi4mMumUiPc9QS0LMIYv9n4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TMsO02wxBqL6vH86rK8lLxre/EGKFA4aSXCje9qkEPdCdASFzGxMdMwnxDkbSXCvmhrKzQKnVK5V1ufzRE5p8aDbQGBeasCCEoj+nIkbwidxlGsYLL2xe46M+rjB/oWosO5KaaHDWkIsKKMGLUU86U8riyOucvgAfB1yuYMF/Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BGy/gvXA; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1763109374; c=relaxed/simple;
+	bh=QTgEQGJZ3GHZmXCkPNrDf8CvJ8SwxwiLHdjeVMSJS9I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QI5rzVylx2Zgmz47dJrxKIbjd3U7BU4Fweb5aj5coyONNdN6hn8QdpI6wlsyj3D5rIv3mCVxf8C7JT4JzfhdKYrOHNQ+y+LFzxVO9qwAeUVxgsn05bbzqtvyfX0IUHASrXzKrL8Mcec7Hu4vZauODd2fzpi1doSgKQq6KB8AGzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UU2Bp4pA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BGy/gvXA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763106790; x=1794642790;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=n6gisGumhyHm0iSyc++Fqi4mMumUiPc9QS0LMIYv9n4=;
-  b=BGy/gvXAiTHy83fV+BltFXDvWVQyt/xMowtSER/uBFhsPcdqgiLXiysP
-   s5Fibn+97OiT8f64Q3TF7Wa/2kHHF/QNRsxhHS7k530XAJLsSOLiAB2E1
-   60xAhrrjgkqxTjLosLWFgOhfmXGG4oSYVud9/m9PSpADKfDPsiZe5mkS7
-   a2ZNvIu/XUJA1RRw+7RG/MRfUTQmS95xxBD9tbAp7ijGtsP6J/+igdKjo
-   C9+MpMD60+zlJXx96KqoN1AkVZRBbg7bGvyGp3oF76B2tjOTSSobPxsco
-   E+mi9piRD3m7+/9i1YF1eatGQnJcoTT8d7hC2NRbgkn5JvePI7hgGdwgY
-   g==;
-X-CSE-ConnectionGUID: 2Yt4MDW+QBOObQCIhfgoRQ==
-X-CSE-MsgGUID: Ei6bErOOT6qNEQNLHw12og==
-X-IronPort-AV: E=McAfee;i="6800,10657,11612"; a="65232174"
-X-IronPort-AV: E=Sophos;i="6.19,304,1754982000"; 
-   d="scan'208";a="65232174"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2025 23:53:09 -0800
-X-CSE-ConnectionGUID: 4kz7Zil0R3iSmEZ6LDgM2w==
-X-CSE-MsgGUID: EcrnkQxzTeShHK/4jn8r7Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,304,1754982000"; 
-   d="scan'208";a="190497773"
-Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 13 Nov 2025 23:53:07 -0800
-Received: from kbuild by 7b01c990427b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vJocC-0006Jn-1p;
-	Fri, 14 Nov 2025 07:53:04 +0000
-Date: Fri, 14 Nov 2025 15:52:18 +0800
-From: kernel test robot <lkp@intel.com>
-To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Shiva Tripathi <s-tripathi1@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 3/4] crypto: ti - Add support for AES-GCM in DTHEv2
- driver
-Message-ID: <202511141528.zox1IMuF-lkp@intel.com>
-References: <20251111112137.976121-4-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UU2Bp4pA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 394F3C16AAE
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 08:36:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763109373;
+	bh=QTgEQGJZ3GHZmXCkPNrDf8CvJ8SwxwiLHdjeVMSJS9I=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=UU2Bp4pA8noTn5MRb2hXSLTYCftQtK+OYh1SJRDK1rWEPNqeZC3EZNe0pOKC8pBrn
+	 s1rPgn2wCfDhPv4emE/FwFm6uTZ+PqwHmonV3DtVALF/gwTKWk1QZ/F4eD7ANwfwE3
+	 H9Re9w8LN4lXcDNiqoHAQOjFXi2RrAnr6szeG4g2Of+EXVWNaWfW6/gx+IOiQDwaK2
+	 2xcSaGQVofyJOzeXVdZ727b6ytl8bsYW1mg27NdQCtAhM5b3a5BZhEmpQM9oHrZQus
+	 EQfLb9NZudDI5s3kXV/g0iMJuqhvuHW6KLdp9X9qPWqxn7lLyBlnw3XlzXk57jNQyj
+	 onWFMKUZzMoTQ==
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5943d20f352so1887964e87.0
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 00:36:13 -0800 (PST)
+X-Gm-Message-State: AOJu0Yy5sH/c1FQk2snOdOuAB3c8e0z/3eLanAuQ4m7a47D75KB5eWWz
+	H6hzI+DdoxrzZmi+rEA5IqQKMRb6SYx9gLiBDOBL7dpNzLVhUdTu9/fraBJ2kTWKxurzohhio2D
+	uoVmkiSSDOlqzHIU6GQF/WgKST2U3Wxs=
+X-Google-Smtp-Source: AGHT+IHdWqZkqACKPeCuoyyfoQ2ao+Z2i5UwCLvcCG1YlqNw139A5+yThWPuXkYJs5HZd1c3I2GCh+9K/2GudZ/qZ+s=
+X-Received: by 2002:a05:6512:10cc:b0:590:9a11:9c23 with SMTP id
+ 2adb3069b0e04-5958426ee7bmr688933e87.55.1763109371590; Fri, 14 Nov 2025
+ 00:36:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251111112137.976121-4-t-pratham@ti.com>
+References: <20251114030344.235748-1-ebiggers@kernel.org>
+In-Reply-To: <20251114030344.235748-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 14 Nov 2025 09:35:58 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGGZ_WNp3E0V-gGv8Jf9VVuC2LdwXuG4rQX6QyEsimbHA@mail.gmail.com>
+X-Gm-Features: AWmQ_bnyE6LaoCJP4nFzKPZy-sGiG3o3Eddf_TiqXrtbeBnC4JQRF5i59xx5e6k
+Message-ID: <CAMj1kXGGZ_WNp3E0V-gGv8Jf9VVuC2LdwXuG4rQX6QyEsimbHA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: tcrypt - Remove unused poly1305 support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Pratham,
+On Fri, 14 Nov 2025 at 04:05, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> Since the crypto_shash support for poly1305 was removed, the tcrypt
+> support for it is now unused as well.  Support for benchmarking the
+> kernel's Poly1305 code is now provided by the poly1305 kunit test.
+>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-kernel test robot noticed the following build warnings:
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
-[auto build test WARNING on herbert-crypto-2.6/master]
-[also build test WARNING on linus/master v6.18-rc5]
-[cannot apply to herbert-cryptodev-2.6/master next-20251113]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/T-Pratham/crypto-ti-Add-support-for-AES-XTS-in-DTHEv2-driver/20251111-192827
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
-patch link:    https://lore.kernel.org/r/20251111112137.976121-4-t-pratham%40ti.com
-patch subject: [PATCH v6 3/4] crypto: ti - Add support for AES-GCM in DTHEv2 driver
-config: s390-randconfig-002-20251114 (https://download.01.org/0day-ci/archive/20251114/202511141528.zox1IMuF-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 11.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251114/202511141528.zox1IMuF-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511141528.zox1IMuF-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_init_tfm':
-   drivers/crypto/ti/dthev2-aes.c:573:24: error: implicit declaration of function 'crypto_alloc_sync_aead'; did you mean 'crypto_alloc_aead'? [-Werror=implicit-function-declaration]
-     573 |         ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
-         |                        ^~~~~~~~~~~~~~~~~~~~~~
-         |                        crypto_alloc_aead
->> drivers/crypto/ti/dthev2-aes.c:573:22: warning: assignment to 'struct crypto_sync_aead *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-     573 |         ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
-         |                      ^
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_exit_tfm':
-   drivers/crypto/ti/dthev2-aes.c:588:9: error: implicit declaration of function 'crypto_free_sync_aead'; did you mean 'crypto_free_aead'? [-Werror=implicit-function-declaration]
-     588 |         crypto_free_sync_aead(ctx->aead_fb);
-         |         ^~~~~~~~~~~~~~~~~~~~~
-         |         crypto_free_aead
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_setkey':
-   drivers/crypto/ti/dthev2-aes.c:831:9: error: implicit declaration of function 'crypto_sync_aead_clear_flags'; did you mean 'crypto_aead_clear_flags'? [-Werror=implicit-function-declaration]
-     831 |         crypto_sync_aead_clear_flags(ctx->aead_fb, CRYPTO_TFM_REQ_MASK);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         |         crypto_aead_clear_flags
-   drivers/crypto/ti/dthev2-aes.c:832:9: error: implicit declaration of function 'crypto_sync_aead_set_flags'; did you mean 'crypto_aead_set_flags'? [-Werror=implicit-function-declaration]
-     832 |         crypto_sync_aead_set_flags(ctx->aead_fb,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-         |         crypto_aead_set_flags
-   drivers/crypto/ti/dthev2-aes.c:836:16: error: implicit declaration of function 'crypto_sync_aead_setkey'; did you mean 'crypto_aead_setkey'? [-Werror=implicit-function-declaration]
-     836 |         return crypto_sync_aead_setkey(ctx->aead_fb, key, keylen);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~
-         |                crypto_aead_setkey
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_setauthsize':
-   drivers/crypto/ti/dthev2-aes.c:846:16: error: implicit declaration of function 'crypto_sync_aead_setauthsize'; did you mean 'crypto_aead_setauthsize'? [-Werror=implicit-function-declaration]
-     846 |         return crypto_sync_aead_setauthsize(ctx->aead_fb, authsize);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         |                crypto_aead_setauthsize
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_do_fallback':
-   drivers/crypto/ti/dthev2-aes.c:854:9: error: implicit declaration of function 'SYNC_AEAD_REQUEST_ON_STACK'; did you mean 'SYNC_SKCIPHER_REQUEST_ON_STACK'? [-Werror=implicit-function-declaration]
-     854 |         SYNC_AEAD_REQUEST_ON_STACK(subreq, ctx->aead_fb);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-         |         SYNC_SKCIPHER_REQUEST_ON_STACK
-   drivers/crypto/ti/dthev2-aes.c:854:36: error: 'subreq' undeclared (first use in this function)
-     854 |         SYNC_AEAD_REQUEST_ON_STACK(subreq, ctx->aead_fb);
-         |                                    ^~~~~~
-   drivers/crypto/ti/dthev2-aes.c:854:36: note: each undeclared identifier is reported only once for each function it appears in
->> drivers/crypto/ti/dthev2-aes.c:863:1: warning: control reaches end of non-void function [-Wreturn-type]
-     863 | }
-         | ^
-   cc1: some warnings being treated as errors
-
-
-vim +573 drivers/crypto/ti/dthev2-aes.c
-
-   563	
-   564	static int dthe_aead_init_tfm(struct crypto_aead *tfm)
-   565	{
-   566		struct dthe_tfm_ctx *ctx = crypto_aead_ctx(tfm);
-   567		struct dthe_data *dev_data = dthe_get_dev(ctx);
-   568	
-   569		ctx->dev_data = dev_data;
-   570	
-   571		const char *alg_name = crypto_tfm_alg_name(crypto_aead_tfm(tfm));
-   572	
- > 573		ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
-   574						      CRYPTO_ALG_NEED_FALLBACK);
-   575		if (IS_ERR(ctx->aead_fb)) {
-   576			dev_err(dev_data->dev, "fallback driver %s couldn't be loaded\n",
-   577				alg_name);
-   578			return PTR_ERR(ctx->aead_fb);
-   579		}
-   580	
-   581		return 0;
-   582	}
-   583	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> ---
+>
+> This patch is targeting cryptodev/master
+>
+>  crypto/tcrypt.c |  4 ----
+>  crypto/tcrypt.h | 18 ------------------
+>  2 files changed, 22 deletions(-)
+>
+> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+> index d1d88debbd71..3baff6bfb9d1 100644
+> --- a/crypto/tcrypt.c
+> +++ b/crypto/tcrypt.c
+> @@ -2266,14 +2266,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+>                 fallthrough;
+>         case 319:
+>                 test_hash_speed("crc32c", sec, generic_hash_speed_template);
+>                 if (mode > 300 && mode < 400) break;
+>                 fallthrough;
+> -       case 321:
+> -               test_hash_speed("poly1305", sec, poly1305_speed_template);
+> -               if (mode > 300 && mode < 400) break;
+> -               fallthrough;
+>         case 322:
+>                 test_hash_speed("sha3-224", sec, generic_hash_speed_template);
+>                 if (mode > 300 && mode < 400) break;
+>                 fallthrough;
+>         case 323:
+> diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+> index 7f938ac93e58..85c3f77bcfb4 100644
+> --- a/crypto/tcrypt.h
+> +++ b/crypto/tcrypt.h
+> @@ -94,24 +94,6 @@ static struct hash_speed generic_hash_speed_template[] = {
+>
+>         /* End marker */
+>         {  .blen = 0,   .plen = 0, }
+>  };
+>
+> -static struct hash_speed poly1305_speed_template[] = {
+> -       { .blen = 96,   .plen = 16, },
+> -       { .blen = 96,   .plen = 32, },
+> -       { .blen = 96,   .plen = 96, },
+> -       { .blen = 288,  .plen = 16, },
+> -       { .blen = 288,  .plen = 32, },
+> -       { .blen = 288,  .plen = 288, },
+> -       { .blen = 1056, .plen = 32, },
+> -       { .blen = 1056, .plen = 1056, },
+> -       { .blen = 2080, .plen = 32, },
+> -       { .blen = 2080, .plen = 2080, },
+> -       { .blen = 4128, .plen = 4128, },
+> -       { .blen = 8224, .plen = 8224, },
+> -
+> -       /* End marker */
+> -       {  .blen = 0,   .plen = 0, }
+> -};
+> -
+>  #endif /* _CRYPTO_TCRYPT_H */
+>
+> base-commit: d633730bb3873578a00fde4b97f9ac62a1be8d34
+> --
+> 2.51.2
+>
+>
