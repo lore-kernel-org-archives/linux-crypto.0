@@ -1,79 +1,54 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B31C2C0275;
-	Fri, 14 Nov 2025 04:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916F81FDA92
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 05:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763095105; cv=none; b=HpmPAILEXF+6Lae49yjGKu7VUWHpQcHZcUiA0MVYgV+KXgvcEsR+g8vo1uoqe/KKL6V466RRgWNPZ2byBtmL9QSkQ0lbwQ7+iAEwSEv2wlm2ZbT8hSiCwrnCv6SqbOX76nY9IOiVbkFygHaZ95+J3I76jwq0Bgk/sdiBH6nb8tA=
+	t=1763099559; cv=none; b=Rfr67Vs9dczM0sjdY1yEbxBCJprYkgfcaHIDxbulquALa5g6LXa2fDtu+1aK6aw5n6gPuPlxPBHaNGwzueynqt2LZmSFJKhpeiWBP70M+jLqRCLhLcyx6zB7vJ68LNbZ2yj3gAVk0gPXdQtWQ1bu5nGLsJF3TY7VaLYsMkv6cfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763095105; c=relaxed/simple;
-	bh=nHpuwrB2PqWoFYl7cIf1QtHauh5mGZ3uTev/Ldhcw+Q=;
+	s=arc-20240116; t=1763099559; c=relaxed/simple;
+	bh=HJ9fq5KFA2WXbJbM4wkAhfACjzvC7TSJ+QfsiP6Q5Y4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U0NOv7Lx79UjNcUKNdWJSx6o4q2lesY9vYqPhlNnA5p5ZTPds6YFwzUM6aDpnyRrf5d98ErUSRe5PhOgfMFuofEPNKWRovGnS0RlgqkMT4KYOpxUx/Rc7N/WqEPFf8MYo7pFmhPWsUqiJoSzYsrVB8i5QHYBWirg+9/sd8LIdnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D3U+OeK9; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=aQ1CY7CpMYPqVNMpeb6XiGGspJfSojRUN1eM1lgitDd6MVrJhZd6G1grxWWPmhvVp1Ycl86K9KGZ4SrronFdAbU1BlPyx/MYCO2qeR7EQm3up2e01jFWVVHKP0c6rf+PQX7TH2w1sBEzrfWDmMZ2J7NXJucaZUD4rNnw0tCqr3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I4Zby4cW; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D3U+OeK9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D54CC4AF09;
-	Fri, 14 Nov 2025 04:38:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763095105;
-	bh=nHpuwrB2PqWoFYl7cIf1QtHauh5mGZ3uTev/Ldhcw+Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D3U+OeK9GhqfWF0+J2jd+muy8AARO4qDhP50T8K6+Ixjl7OYP08hLGOSjvEgNxOBJ
-	 S2GLkZXFLi/O9NjK1ipo/SNFyF/x2q+MTldVC8dPMtD+AzPiMHugVxJM95DcCbrvhf
-	 w+P4TONQUjEMO29loLzdZvpX463OkL/mVZC1yaEqf8ktr2zjE4sZ+5mY+avsykTA+K
-	 YA5I/rS3IC+TdNYYZ7Ei3wdD0P6JsEmLKcGpkSPlRUNbHgBaj0L7XpDuh3mccUNosD
-	 JdIkdst85rXaaJZP3s8sX9A0Gu6//cXcUYjCevnXiDhCSLjMa0X/U4YWXnNUEkL3Gn
-	 Gdnc8kbREu9lw==
-Date: Thu, 13 Nov 2025 21:38:12 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Marco Elver <elver@google.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Alexander Potapenko <glider@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
-	Bill Wendling <morbo@google.com>, Christoph Hellwig <hch@lst.de>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Kentaro Takeda <takedakn@nttdata.co.jp>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
-	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-	linux-sparse@vger.kernel.org, llvm@lists.linux.dev,
-	rcu@vger.kernel.org
-Subject: Re: [PATCH v3 00/35] Compiler-Based Capability- and Locking-Analysis
-Message-ID: <20251114043812.GC2566209@ax162>
-References: <20250918140451.1289454-1-elver@google.com>
- <CAHk-=wgd-Wcp0GpYaQnU7S9ci+FvFmaNw1gm75mzf0ZWdNLxvw@mail.gmail.com>
- <aMx4-B_WAtX2aiKx@elver.google.com>
- <CAHk-=wgQO7c0zc8_VwaVSzG3fEVFFcjWzVBKM4jYjv8UiD2dkg@mail.gmail.com>
- <aM0eAk12fWsr9ZnV@elver.google.com>
- <CANpmjNNoKiFEW2VfGM7rdak7O8__U3S+Esub9yM=9Tq=02d_ag@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I4Zby4cW"
+Date: Fri, 14 Nov 2025 05:52:26 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763099554;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jXkxn+nUrE4qhcH53ASIXVe+cIbpnFTU4tsJNDHC20I=;
+	b=I4Zby4cWK2XFX5NxE4X+qHrxjoy5T/HYxLZrxPbMMl9bUlmDerYHa0lpiGb6YgQpuPzFTZ
+	Wtf8HEMRXWaWYQNSKHTyCgYSjs60uxptFvI7K1dJ1YnvNApqgx7ot5Xa7Cu8DZYMJdGCZm
+	AytU+hPToISs+NkMJgd7rnXrXiUq+vo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org" <hannes@cmpxchg.org>, 
+	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
+	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
+	"sj@kernel.org" <sj@kernel.org>, "kasong@tencent.com" <kasong@tencent.com>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com" <clabbe@baylibre.com>, 
+	"ardb@kernel.org" <ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
+	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
+	"Gomes, Vinicius" <vinicius.gomes@intel.com>, "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, 
+	"Gopal, Vinodh" <vinodh.gopal@intel.com>
+Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
+ compress batching of large folios.
+Message-ID: <ifqmrypobhqxlkh734md5it22vggmkvqo2t2uy7hgch5hmlyln@flqi75fwmfd4>
+References: <20251104091235.8793-1-kanchana.p.sridhar@intel.com>
+ <20251104091235.8793-23-kanchana.p.sridhar@intel.com>
+ <q54bjetgzmwbsqpgbuuovdmcwxjwmtowwgsv7p3ykbodhxpvc7@6mqmz6ji4jja>
+ <SJ2PR11MB8472011B61F644D4662FE980C9CDA@SJ2PR11MB8472.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -82,36 +57,194 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANpmjNNoKiFEW2VfGM7rdak7O8__U3S+Esub9yM=9Tq=02d_ag@mail.gmail.com>
+In-Reply-To: <SJ2PR11MB8472011B61F644D4662FE980C9CDA@SJ2PR11MB8472.namprd11.prod.outlook.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Nov 13, 2025 at 03:30:08PM +0100, Marco Elver wrote:
-> On Fri, 19 Sept 2025 at 11:10, Marco Elver <elver@google.com> wrote:
-> [..]
-> > I went with "context guard" to refer to the objects themselves, as that
-> > doesn't look too odd. It does match the concept of "guard" in
-> > <linux/cleanup.h>.
-> >
-> > See second attempt below.
-> [..]
+On Thu, Nov 13, 2025 at 11:55:10PM +0000, Sridhar, Kanchana P wrote:
 > 
-> I finally got around baking this into a renamed series, that now calls
-> it "Context Analysis" - here's a preview:
-> https://git.kernel.org/pub/scm/linux/kernel/git/melver/linux.git/log/?h=ctx-analysis/dev
+> > -----Original Message-----
+> > From: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > Sent: Thursday, November 13, 2025 1:35 PM
+> > To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
+> > Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
+> > hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
+> > usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
+> > ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
+> > senozhatsky@chromium.org; sj@kernel.org; kasong@tencent.com; linux-
+> > crypto@vger.kernel.org; herbert@gondor.apana.org.au;
+> > davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
+> > ebiggers@google.com; surenb@google.com; Accardi, Kristen C
+> > <kristen.c.accardi@intel.com>; Gomes, Vinicius <vinicius.gomes@intel.com>;
+> > Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
+> > <vinodh.gopal@intel.com>
+> > Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
+> > compress batching of large folios.
+> > 
+[..]
+> > > +		/*
+> > > +		 * If a page cannot be compressed into a size smaller than
+> > > +		 * PAGE_SIZE, save the content as is without a compression,
+> > to
+> > > +		 * keep the LRU order of writebacks.  If writeback is disabled,
+> > > +		 * reject the page since it only adds metadata overhead.
+> > > +		 * swap_writeout() will put the page back to the active LRU
+> > list
+> > > +		 * in the case.
+> > > +		 *
+> > > +		 * It is assumed that any compressor that sets the output
+> > length
+> > > +		 * to 0 or a value >= PAGE_SIZE will also return a negative
+> > > +		 * error status in @err; i.e, will not return a successful
+> > > +		 * compression status in @err in this case.
+> > > +		 */
+> > 
+> > Ugh, checking the compression error and checking the compression length
+> > are now in separate places so we need to check if writeback is disabled
+> > in separate places and store the page as-is. It's ugly, and I think the
+> > current code is not correct.
 > 
-> As for when we should give this v4 another try: I'm 50/50 on sending
-> this now vs. waiting for final Clang 22 to be released (~March 2026).
+> The code is 100% correct. You need to spend more time understanding
+> the code. I have stated my assumption above in the comments to
+> help in understanding the "why".
 > 
-> Preferences?
+> From a maintainer, I would expect more responsible statements than
+> this. A flippant remark made without understanding the code (and,
+> disparaging the comments intended to help you do this), can impact
+> someone's career. I am held accountable in my job based on your
+> comments.
+> 
+> That said, I have worked tirelessly and innovated to make the code
+> compliant with Herbert's suggestions (which btw have enabled an
+> elegant batching implementation and code commonality for IAA and
+> software compressors), validated it thoroughly for IAA and ZSTD to
+> ensure that both demonstrate performance improvements, which
+> are crucial for memory savings. I am proud of this work.
+> 
+> 
+> > 
+> > > +		if (err && !wb_enabled)
+> > > +			goto compress_error;
+> > > +
+> > > +		for_each_sg(acomp_ctx->sg_outputs->sgl, sg, nr_comps, k) {
+> > > +			j = k + i;
+> > 
+> > Please use meaningful iterator names rather than i, j, and k and the huge
+> > comment explaining what they are.
+> 
+> I happen to have a different view: having longer iterator names firstly makes
+> code seem "verbose" and detracts from readability, not to mention exceeding the
+> 80-character line limit. The comments are essential for code maintainability
+> and avoid out-of-bounds errors when the next zswap developer wants to
+> optimize the code.
+> 
+> One drawback of i/j/k iterators is mis-typing errors which cannot be caught
+> at compile time. Let me think some more about how to strike a good balance.
+> 
+> > 
+> > > +			dst = acomp_ctx->buffers[k];
+> > > +			dlen = sg->length | *errp;
+> > 
+> > Why are we doing this?
+> > 
+> > > +
+> > > +			if (dlen < 0) {
+> > 
+> > We should do the incompressible page handling also if dlen is PAGE_SIZE,
+> > or if the compression failed (I guess that's the intention of bit OR'ing
+> > with *errp?)
+> 
+> Yes, indeed: that's the intention of bit OR'ing with *errp.
 
-For the record, I can continue to upload clang snapshots for testing and
-validating this plus the sooner this hits a tree that goes into -next,
-the sooner the ClangBuiltLinux infrastructure can start testing it. I
-assume there will not need to be many compiler side fixes but if
-__counted_by has shown us anything, it is that getting this stuff
-deployed and into the hands of people who want to use it is the only
-real way to find corner cases to address. No strong objection from me if
-you want to wait for clang-22 to actually be released though for more
-access.
+..and you never really answered my question. In the exising code we
+store the page as incompressible if writeback is enabled AND
+crypto_wait_req() fails or dlen is zero or PAGE_SIZE. We check above
+if crypto_wait_req() fails and writeback is disabled, but what about the
+rest?
 
-Cheers,
-Nathan
+We don't check again if writeback is enabled before storing the page is
+incompressible, and we do not check if dlen is zero or PAGE_SIZE. Are
+these cases no longer possible?
+
+Also, why use errp, why not explicitly use the appropriate error code?
+It's also unclear to me why the error code is always zero with HW
+compression?
+
+> 
+> > 
+> > > +				dlen = PAGE_SIZE;
+> > > +				dst = kmap_local_page(folio_page(folio, start
+> > + j));
+> > > +			}
+> > > +
+> > > +			handle = zs_malloc(pool->zs_pool, dlen, gfp, nid);
+> > >
+> > > -	zs_obj_write(pool->zs_pool, handle, dst, dlen);
+> > > -	entry->handle = handle;
+> > > -	entry->length = dlen;
+> > > +			if (IS_ERR_VALUE(handle)) {
+> > > +				if (PTR_ERR((void *)handle) == -ENOSPC)
+> > > +					zswap_reject_compress_poor++;
+> > > +				else
+> > > +					zswap_reject_alloc_fail++;
+> > >
+> > > -unlock:
+> > > -	if (mapped)
+> > > -		kunmap_local(dst);
+> > > -	if (comp_ret == -ENOSPC || alloc_ret == -ENOSPC)
+> > > -		zswap_reject_compress_poor++;
+> > > -	else if (comp_ret)
+> > > -		zswap_reject_compress_fail++;
+> > > -	else if (alloc_ret)
+> > > -		zswap_reject_alloc_fail++;
+> > > +				goto err_unlock;
+> > > +			}
+> > > +
+> > > +			zs_obj_write(pool->zs_pool, handle, dst, dlen);
+> > > +			entries[j]->handle = handle;
+> > > +			entries[j]->length = dlen;
+> > > +			if (dst != acomp_ctx->buffers[k])
+> > > +				kunmap_local(dst);
+> > > +		}
+> > > +	} /* finished compress and store nr_pages. */
+> > > +
+> > > +	mutex_unlock(&acomp_ctx->mutex);
+> > > +	return true;
+> > > +
+> > > +compress_error:
+> > > +	for_each_sg(acomp_ctx->sg_outputs->sgl, sg, nr_comps, k) {
+> > > +		if ((int)sg->length < 0) {
+> > > +			if ((int)sg->length == -ENOSPC)
+> > > +				zswap_reject_compress_poor++;
+> > > +			else
+> > > +				zswap_reject_compress_fail++;
+> > > +		}
+> > > +	}
+> > >
+> > > +err_unlock:
+> > >  	mutex_unlock(&acomp_ctx->mutex);
+> > > -	return comp_ret == 0 && alloc_ret == 0;
+> > > +	return false;
+> > >  }
+> > >
+> > >  static bool zswap_decompress(struct zswap_entry *entry, struct folio
+> > *folio)
+> > > @@ -1488,12 +1604,9 @@ static bool zswap_store_pages(struct folio
+> > *folio,
+> > >  		INIT_LIST_HEAD(&entries[i]->lru);
+> > >  	}
+> > >
+> > > -	for (i = 0; i < nr_pages; ++i) {
+> > > -		struct page *page = folio_page(folio, start + i);
+> > > -
+> > > -		if (!zswap_compress(page, entries[i], pool, wb_enabled))
+> > > -			goto store_pages_failed;
+> > > -	}
+> > > +	if (unlikely(!zswap_compress(folio, start, nr_pages, entries, pool,
+> > > +				     nid, wb_enabled)))
+> > > +		goto store_pages_failed;
+> > >
+> > >  	for (i = 0; i < nr_pages; ++i) {
+> > >  		struct zswap_entry *old, *entry = entries[i];
+> > > --
+> > > 2.27.0
+> > >
