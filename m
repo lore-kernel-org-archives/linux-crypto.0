@@ -1,48 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AAC130FC22;
-	Fri, 14 Nov 2025 10:22:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0423101DC;
+	Fri, 14 Nov 2025 10:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763115738; cv=none; b=rW5kEk0v8BvZ6B0uwa+3Y3x61vpLJ5svVpLOaLot5iLi4P1KTzJE4VeBrzSlxtYuSxBDBehY+DN1cZN6g5qGDV4FNe0yDyGZhh0V4InJiBoMHfFvNcu5x3gtmxDEPeLGzGUAePCgGz3b4pdXkX2JJEYjQ4JtUwk9vYV81gq5oTk=
+	t=1763115799; cv=none; b=BK5Jj1jwaA+O4EtkpkxoOlzJqrap6jtP4tWKeY+28VFuG6qX2TAxGOffSRm9jzmANy1q9KYYh4zNZ73tTEoZiJfEKyG10e4UqwCQt9oCIHu0f+hcNN12/bmtgUIGAup27Ixeb/odrFBK0n3VXwk1q/B5ZtRYJbwr15y2FjbSaf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763115738; c=relaxed/simple;
-	bh=roxFtnzuRkMpVmMngmMbrFnsoA97ovUMzkdQu17m+Ow=;
+	s=arc-20240116; t=1763115799; c=relaxed/simple;
+	bh=Ontk/xqo0280NZ5Ge0ftL1Nt4QkkH+vFrQmkO6LEOMo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V7F2xoZBQkXLmPROqUbQ3lyrdkECf9n40aBLnQpUYNBDAlKlenlCv/lOU16jdFsd+IbgMyGDjxnWOJImair+eIuj5W4Li09lZX7A84BknMixNVayR7mj9GNUihqxWYsCXey28z2wHTSqdvAiXaC9W6AGyTlOZEoqgMQ5Q/OaHJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=kGrEOoIt; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=AUM4blnAqTFIGc1EtY0tSJoDK7imnX7ITCNSAvlQ50Fl+gJjbKnU4LXt1cE6jxrhgT3LkGAGzANJgjaLuK+5pZwjlcf+VyT9p61+W0z2tpiK5zc8X4yMLM2FyJ+UL5C7WG+f32zxy5XE8iZnV/5s08ASsKaBB2f7x5Cwb5IBOts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=mVNHKSZW; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="kGrEOoIt"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="mVNHKSZW"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=s8WLRgGe3nIjen0XaffMdObT975V6kaP5eCQBJs1sug=; 
-	b=kGrEOoItzCpGhuSJ2jbwDP1OhGaDco8UuAKWO1uHDSpg/uIGOAtkkiOPY4UB3lNVgJ4CLupwNY0
-	ZHHInSuv4xNCIZLTOg374Z4qbT846AfmvK5bOJlKgnPdRcnqPxJWHd341/67QML26MotB5fISUPny
-	V+HjQuUxbtfzAbe/2miUkBoX/YPpJ4DG3wMne7KtvTB4iKU+Bel+wXKn937yCVDkTB6rY3iKoGqHh
-	dZkUDVO7AWQElEzIOUNF6N0arxjySDHRdoB+hOKNH95BJKgdydXrph827wIxX+rSSgpDJf2hyMvhG
-	O8DwpQjyz5/tdTnbSxLviU6T59L57RUmUGIw==;
+	from:content-type:reply-to; bh=NLyjsu/cXglRKsLNLch7b9iQktHKKZH+AG+ArSPP9pw=; 
+	b=mVNHKSZWR1udfa7kCCSSXuLO2nnCc8bMMW3hVf2GhXY8ZesQupggqqJ+GlBnxtTLG/0XFWIVSRm
+	lSKv0uPlpt18RBhLti3//8wF2Uaq382e89OPg08Ws4lSI4pD5WwbNq84hSRlJSNqSD6Km2jfxC5G8
+	F+0C/rpVZOQ2NSTXAVfIHX8s5hH0FBYUH5qcWjHoK6w8Dg180j5ev3h8PPttZ2MoH/kgmDR2XoEjZ
+	GTLOjvROx7QBaBej0MkcLHnbZZQzioVHdRKWkuac8/9GZYHtqI+NWQFUCypuv+Znnp7p8GRkK+KsB
+	ybE0vC43vbPwft/+n+j6QpEVluBs1onnrTMA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vJqwW-002yOU-1x;
-	Fri, 14 Nov 2025 18:22:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Nov 2025 18:22:12 +0800
-Date: Fri, 14 Nov 2025 18:22:12 +0800
+	id 1vJqxW-002yPn-0A;
+	Fri, 14 Nov 2025 18:23:15 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Nov 2025 18:23:14 +0800
+Date: Fri, 14 Nov 2025 18:23:14 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Marco Crivellari <marco.crivellari@suse.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
+	qat-linux@intel.com, Tejun Heo <tj@kernel.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
 	Frederic Weisbecker <frederic@kernel.org>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	Michal Hocko <mhocko@suse.com>,
-	"David S . Miller" <davem@davemloft.net>
-Subject: Re: [PATCH] crypto: cavium/nitrox - add WQ_PERCPU to alloc_workqueue
- users
-Message-ID: <aRcC1BbR6qNf1P2E@gondor.apana.org.au>
-References: <20251106164236.344954-1-marco.crivellari@suse.com>
+	"David S . Miller" <davem@davemloft.net>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH] crypto: qat - add WQ_PERCPU to alloc_workqueue users
+Message-ID: <aRcDEsXIJukZrZUN@gondor.apana.org.au>
+References: <20251107112354.144707-1-marco.crivellari@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,9 +53,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251106164236.344954-1-marco.crivellari@suse.com>
+In-Reply-To: <20251107112354.144707-1-marco.crivellari@suse.com>
 
-On Thu, Nov 06, 2025 at 05:42:36PM +0100, Marco Crivellari wrote:
+On Fri, Nov 07, 2025 at 12:23:54PM +0100, Marco Crivellari wrote:
 > Currently if a user enqueues a work item using schedule_delayed_work() the
 > used wq is "system_wq" (per-cpu wq) while queue_delayed_work() use
 > WORK_CPU_UNBOUND (used when a cpu is not specified). The same applies to
@@ -88,8 +89,11 @@ On Thu, Nov 06, 2025 at 05:42:36PM +0100, Marco Crivellari wrote:
 > Suggested-by: Tejun Heo <tj@kernel.org>
 > Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
 > ---
->  drivers/crypto/cavium/nitrox/nitrox_mbx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/crypto/intel/qat/qat_common/adf_aer.c    | 4 ++--
+>  drivers/crypto/intel/qat/qat_common/adf_isr.c    | 3 ++-
+>  drivers/crypto/intel/qat/qat_common/adf_sriov.c  | 3 ++-
+>  drivers/crypto/intel/qat/qat_common/adf_vf_isr.c | 3 ++-
+>  4 files changed, 8 insertions(+), 5 deletions(-)
 
 Patch applied.  Thanks.
 -- 
