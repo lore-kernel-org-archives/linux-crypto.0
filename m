@@ -1,364 +1,331 @@
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012052.outbound.protection.outlook.com [40.107.200.52])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2ADB35CBAF;
-	Fri, 14 Nov 2025 12:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763123190; cv=fail; b=bf4Bjo3moraHQb2JcxNX9l3cxkrArPTLw+zeQSXN+KCoX5f6WuLo+LGEvTBjC3LMIzpK0s3igsRY1maME3pKRx5/rZldxDlcX27X8f5LJbhIYPnBoJFI8ooKRxV4lJr7Q6NcxJ7nU1zrLd9nDC19/VAmVoBoAhwcLt+hDbBWElM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763123190; c=relaxed/simple;
-	bh=P1Z7UbezDRZ++JgdKwZxV7Kz4aCTyrGC9gTsIQaOclQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=AoleAqA+IaFHa7r/PdpLg2IQvIiOqPIW3YjA0oUpmkE014yvkS4H5uYNi1CmIjtyHcbXp5NmA198hp7cXYdT4V2MyTxzmiNRhYSuKvqdcWHIkwuoRE+0JAnwI++3HxykKLoZv6gslZzFKKzX6QW/p4LJ2U1j7n6zzajKHCPCfB8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Bfeo5ele; arc=fail smtp.client-ip=40.107.200.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7154D1FE44B
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 13:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763125476; cv=none; b=j0x8lLLxws7fGYXrFb1txrOatgkED7i7JqHPh2cQbaF0FMt+AzpghFnKWQyXfF3f/45HKci6cS9dlfIX8bIOSilY6HAG3/xsxNO1kW5gSAKdwRurBienc/OWnHd6VAixU/6WlM5zLs0/hZiDev6/HY1lP2YgHs6qf9q3Seww5+0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763125476; c=relaxed/simple;
+	bh=mJMSS9RzJ9Gn+CgJBw19jj5u7pcKxSJxWoXqvuccwxU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mJ5ZOqE8Ub88x8+MEeNF/A+2c6BEUwMd/YIYQ8ollch+Xg9V80YrtpmeuN9sPcdsQIxnlH8jVOJUKYWIo0gex8pQXlk4F6UdAktpWsiz5H3nw7UNT+yNCU2bd1QzybwwaydAIRoGynl9sgDrJHNHdau0VWBgq6k/oI16bVR59S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fpxw8CKq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Bfeo5ele"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nIGyN5g1n10scvMjQWh7yWwNKdVrrgDDWBRjDZN1t7HzIRoxZIoPxpGVBKLeopSwgQYm3iRZJAcLvoGsuYPcna3h2GRAQrqvJ1Yw+ilMc3ipK2WXlVLT5dWupy4JnAHAs82z+qygghGpTzrZpNey5EBLe+PBvAPCQrlJL7P9gYpuBL+fRQG10aEq9zMOOTUPxfV33zo8aPdZzzgshc31KvKPGDQrW3EPUmPTlkplp37XOqDxiIDdLIkL2XdV7+sllCFoFzZQspoP6wUnbZkoRIfMDzys90vBHGBcnJLKJWeyzwmFdbDOTrVpViJiIZbqajEEJRAu4T00UkH2gIgc/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KBgB4YUBtpLDIioodMNTAw4p71N1uV2hlJNpOb7kBqE=;
- b=wImtTtP7IUsw7Ao1jirtSQSL1peuD7MZdK2G7HZF4gH1APqBdruF1AFORfNcTqrciLm1Vfd7oG8kWxaOxgr+c08uSizXBeTWxkgfDk5Gr3abrnBMFI0xqtuU5Q0u8ECbKyCNJCKmL7n1jLwZzaCbitLIhZ2p2It0FmrKTnLzwbs3LLjnudGBYsCjiSdPOTsMk7KSQsmw6fyJoQoONdY9hBA6cLoo1TeoEcGTDJg9H7KbS//fn+QPVPiwRKvXbSz4+14T9P2JdK3gAT5x0xEtlxx7eeIxMMKADVwy2DWLbm5cN/GI+IB32xeEvrJ06E2wQGAcGTcHUwG4gEM/jIQ1wA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KBgB4YUBtpLDIioodMNTAw4p71N1uV2hlJNpOb7kBqE=;
- b=Bfeo5eleCmD58kzty3J3VRPkUoJW0D8tr4dIg04STH1KYLoUPYEz7rmsJwW+OAkRateMqX99ZThUT/thDT0cLk0v4PWDOP7WszYSQO+70RZMkc0vRV4vCbyL8T3hvM3we3XAr0W5b4jRj8wN9wqNqMTDSF81LCxol0KH/NNdYizq11qxd7+Wb/fXM0zq17Kt9XeVJLxa+uC5mAAwh+tH3W1mcIkfHmt6VSYDnVMhl72U9h7AuI5Z5s60jTdTOC+VyYwUyqLh32z0ipp//Kvc+nzqmF9V8iu+LtJ8H2BwPqaPO7rVZR018CKsK3e+yDD1iKanZYaVHUVcTvbRC5yIAA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS0PR12MB8294.namprd12.prod.outlook.com (2603:10b6:8:f4::16) by
- IA0PR12MB8277.namprd12.prod.outlook.com (2603:10b6:208:3de::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.18; Fri, 14 Nov
- 2025 12:26:23 +0000
-Received: from DS0PR12MB8294.namprd12.prod.outlook.com
- ([fe80::d6a9:5e83:27dc:a968]) by DS0PR12MB8294.namprd12.prod.outlook.com
- ([fe80::d6a9:5e83:27dc:a968%7]) with mapi id 15.20.9320.018; Fri, 14 Nov 2025
- 12:26:23 +0000
-From: Colin Ian King <coking@nvidia.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fpxw8CKq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763125473;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MUOvNt/admaEgWCOU636kbVRsDVuwzYnDCb9rsroxOM=;
+	b=Fpxw8CKq86DewPeFzolG/7SusJz3n9p812cZ+bzFfRYv3KD1t51lIdPAwVjLTJhmgwwuVt
+	1ROVgRdjEk1SGyW+3fjNuMdrP168aVBX1M7k7TyKAMZVWj6rnOmaN6oyWeIR4YnTROgNNN
+	3Gtb12V7DPTZxkSWPbQ8/ulgGVg2sEg=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-213-TjSMxLQ8McqLJqR77qX_-A-1; Fri,
+ 14 Nov 2025 08:04:29 -0500
+X-MC-Unique: TjSMxLQ8McqLJqR77qX_-A-1
+X-Mimecast-MFC-AGG-ID: TjSMxLQ8McqLJqR77qX_-A_1763125468
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C08119560AF;
+	Fri, 14 Nov 2025 13:04:27 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.87])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BF9D918004A3;
+	Fri, 14 Nov 2025 13:04:22 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David Howells <dhowells@redhat.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	linux-crypto@vger.kernel.org,
+	keyrings@vger.kernel.org,
+	linux-modules@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: scatterwalk: propagate errors from failed call to skcipher_walk_first
-Date: Fri, 14 Nov 2025 12:26:19 +0000
-Message-ID: <20251114122620.111623-1-coking@nvidia.com>
-X-Mailer: git-send-email 2.51.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: LO4P123CA0212.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:1a5::19) To DS0PR12MB8294.namprd12.prod.outlook.com
- (2603:10b6:8:f4::16)
+Subject: [PATCH v8 0/9] lib/crypto: Add ML-DSA signing
+Date: Fri, 14 Nov 2025 13:04:03 +0000
+Message-ID: <20251114130417.1756230-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB8294:EE_|IA0PR12MB8277:EE_
-X-MS-Office365-Filtering-Correlation-Id: b8e41a67-c742-49c8-da8e-08de237905dd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+IgATc0nRLFCPShwwPKe91Dhzc4dNylMKLmue9XX4cqzVx+DE3uYh3+3El8M?=
- =?us-ascii?Q?i6m0J4CV5dXRD+eTyjV+3AAk9qlaAm+vO641soxCNd/qa09KoQ5moTfTHXxm?=
- =?us-ascii?Q?NOcdIG6DUDh6KR++Gpoc3FNvkoc/T3N2jPX/MtOCL3JXfmJsvk4Y3hTAkwYx?=
- =?us-ascii?Q?lVGImMMsy9SzS1mj5EeMsJaftGckfyTj4eWdjCPhcW58lFaxHGh7bXzFQcZG?=
- =?us-ascii?Q?gCVs1YIaMWSIDItst7FZIuVZemwesea888ejMfp8GPPWZqG/XDX5wQBwIGAY?=
- =?us-ascii?Q?QJ148nb5nK/JX7ycxOa7K6oRKPvr/UWi+k7NMq97KimHGxSntG+3pl3/8CQj?=
- =?us-ascii?Q?kZkZl0Zn2uRZYzrbhmu9Z8HQu14GKIm/H8O8DQa4FkVXmw72/FxzE94EJWE6?=
- =?us-ascii?Q?I+WxLzwN/7NEZDJktcKQp34Qp2PGyn63NYh8gXc+0eBvJ/53bNsAWFPlQpx1?=
- =?us-ascii?Q?PIOS9H9x/RDoQKfe943o6GtaoUC0WdmuHrX8PlohtNaFNajT1lsLOea8jOZo?=
- =?us-ascii?Q?nAFORjhIlgAna2pr8ZjtfgN5NqfyqXB2NAuZ0Upx6kfkzwCrnQGUjT06oynB?=
- =?us-ascii?Q?Tk/SWGsYvrBQUXTN0/EVl+x+mHkSAuXGt9FlkpYDcewjD5wfbK4+vCdBJjvN?=
- =?us-ascii?Q?jByMktqTLRglkqV2Nf9gnMdHU7cRfQLsnbYlT5f/dsKyrLp3rGZnvLT70lis?=
- =?us-ascii?Q?1SQjfDMWQqAypU2LWRKg62+7kJ7E7S5mDm2H1bbdbnmEp0GWcCv08aHCyrHc?=
- =?us-ascii?Q?E48hpQ/VIBQ2usb/qrhJ7GSfPiudwHLCbFVoaMD2mQL82KylQqq/M6O7mt5N?=
- =?us-ascii?Q?MfmCbum1mH1SkrC/DQ/o22Uu4EPH7ln1CuYRNJwrHgxlwzOmBQ1ZYIpiwsdT?=
- =?us-ascii?Q?bcDov1rTii8RXza8MapAjquAdN2c+1++b54oel04iWfATrA9+y3P2ny+KlEX?=
- =?us-ascii?Q?rnlYTwkgoROX0dbPLDdgqUvSFVC/Mj+vDj9IqMsRc1KHv0iccLa3EvK8nqk5?=
- =?us-ascii?Q?VVmILRUwg+1HKwXPRF5G5ivneT0tTR+efuz9ASjG8id1EupAgAKxaimVaIgt?=
- =?us-ascii?Q?Xi4NS0upa+D3dHJ0C5z4E5AzEY23VuvDBFPH6xPb6f6qQhImRSRHIaXd5HAZ?=
- =?us-ascii?Q?LKgmXimiV8/cBBxcZq7UV6M2oSqaQy1TztJmv0cgiH9LzPa8vDKzERCs3iLQ?=
- =?us-ascii?Q?BVWNijs2iFxXyfCbl3bxtPTsn/a8xYRg7gx3NwtGoxJeedPhgb/6mlt/Wom4?=
- =?us-ascii?Q?vTvyRHO64wXYHpffDGyky8SokFRf//VrrC1tRv84tY01vQWHeS1Ff6MAhI+e?=
- =?us-ascii?Q?4nr7liFqaQnEewzTNrMz7FCQU0RkJksOYyNNXI/5WhI1tP6Av6pq/B3la+Mc?=
- =?us-ascii?Q?RUQApvLP5xBRj/4cwksPPpXPWJZ74YbKozgt3B8JUuxMG19GvC2Q0Y9os4uD?=
- =?us-ascii?Q?66Bm+9ppw/kMCI/l93e26hG3ndRLOYnT?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB8294.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?XAm6cfl/rz4XyO0digG5goK+DrCZyCZgMh2TmdSuOPLnHGyvhWfHxjzteTZL?=
- =?us-ascii?Q?3aVQ2KUfzc7yQcrj8r/SU2rb5/sOa5qr84Upooe5tVBA7+saUK9EnpwP+SSX?=
- =?us-ascii?Q?L2LX2bQAA75/XgHLYnO+RD470En2RYlEyjRUHwW/RmEnYx3K3bdRY7wMHThA?=
- =?us-ascii?Q?5EIN7NT5+NjZQjKEMP1KCziHxs7G0qxVPVoCnIE/xMWoYvlyDaLeqyagWD8b?=
- =?us-ascii?Q?rNrJbCb9NCV/TqE6W6r85aYVvyYg70Vnh8uB8O8+V4UCrwi4cYNF8KgY4LUr?=
- =?us-ascii?Q?ibkVfB8VtdnV19cwuz3Cb7YYY7kCViwWC6rneyZ3KbxC+zhsJa58Y+RjH7em?=
- =?us-ascii?Q?w9vL3o6KvpEPMNiXLgemRwWkfGvpiOUhWK1IiqgSNt08Yu6gulEIUeiJ9514?=
- =?us-ascii?Q?Q8xZ0FvDeF75295cp+apdjhqRcd3zZA/7eR/1374RALblDch/aGeEx/hZ4uh?=
- =?us-ascii?Q?wP6uRZcRF5SXMLdaKwneX1ed14CHnXlm79Xsf0+mHHHBSPSX9EasHFYNf/Xk?=
- =?us-ascii?Q?Jsf5Q/p8g8cvPA1mQqcoOb9KmPIcyy3FqFEoQoe0Fa0SWZ3MMDvS3PKYUMdT?=
- =?us-ascii?Q?60Q87oK7qzZ4JaIc4Euun14IhVo34sGyP2Y177JV+IhTr5yl7/H3m40q+cDx?=
- =?us-ascii?Q?IOa/aD1TJB0G/gnCmwQGp5UG0F3luwaikDfB7Y+4ZgUU1fJmDqzBFytwtv7h?=
- =?us-ascii?Q?UEMkX6/C6bhSTtCh/KXCx2B5aLjZEM4wtTLxbfgoCiO+CSlibhPGIurjBTrO?=
- =?us-ascii?Q?JW67yBLaPqAzNCFQNEQ8KtqnQNhbsa86tTeBBbBHH6XfRNhjGqC+cp+Jlnp6?=
- =?us-ascii?Q?Fc2C/twuepiwROcHym7fm1BRxsW/fiExnNxpuEh9eoNG2UHNJwkd5g/58rpj?=
- =?us-ascii?Q?2Z5Zeu8Nam6Tpuqwsa/HsvOj3pX4Dn4Xczti5cpN6lgVbHRlGMcPuKf+qHhU?=
- =?us-ascii?Q?KhnQF3Log6W/oCBXLSgE0wnjv0vfMIRKA9dRkeQAZLQMR5RYtNWfoj6z7DS4?=
- =?us-ascii?Q?oW/a6+JXrizlwBbxI/CeDkv3Dr1Yw1iezzT9oDqu/L67hp3vQgGjFCEjbV4G?=
- =?us-ascii?Q?BdaesM4BnMTOZlee5dEzGhh6hD4SJfo5X3+mk7VvYW/rNMJxw47ttJkQIBWR?=
- =?us-ascii?Q?qpW/OQUXa7Tyg+jMGB6DifhDY9vcOMuXOxAJFkTxwf2AeoLkwGf3Zj/tZMBL?=
- =?us-ascii?Q?/nzVW0smPqqTE6U4m0ntv+DwmzgzQD9HwA8+rJxEdo3OF0ACxtGCbMUrkyQv?=
- =?us-ascii?Q?ccEUurhSvp08luQvnfziZg0oAoYo7dTDI6an3ztjHlvHkAxo1r1ci0BYxofU?=
- =?us-ascii?Q?PN5/SCc+dXt34KEQhALcEmMG741/I1VDJoZT2LlpKAN9JRdF+z1cGI+EqLqN?=
- =?us-ascii?Q?9fH2aSuK22J1wS0fRoU++wJcN2A5Lt+CM75VHmu3Tbc7hA4C0EhChjmp1r9X?=
- =?us-ascii?Q?6bgKv7lyxNlOFJOegyVBdEfUSERyAHY0dAVMaxZ/ZON7d1k4V/xLTimLKWTw?=
- =?us-ascii?Q?6SfALh5G+nUHdeDrXNOBuBfyizeDmENghq2MTMZnwydA40IQzpExkV+SXVMU?=
- =?us-ascii?Q?3d0g6CgUKRZENNiOtexn3Ts4KfaTsdQnFtyKr6+6?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b8e41a67-c742-49c8-da8e-08de237905dd
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB8294.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2025 12:26:23.2509
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uc4npt8U3Gt3qaIbjMNr25GaDwNkaHFGUBuBLdWeqIAKluFasos5iXcQttSvp28gY7NFZHOSmrSymd7qNxwn1g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8277
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-There are cases where skcipher_walk_first can fail and errors such as
--ENOMEM or -EDEADLK are being ignored in memcpy_sglist. Add error checks
-and propagate the error down to callers.
+Hi Herbert, Eric, et al.,
 
-This fixes silent data loss from callers to memcpy_sglist (since walk is
-zero'd) or potential encryption on the wrong data.
+Building on the SHA-3 lib-crypto patches now in Eric's tree, here's a set of
+patches does the following:
 
-Signed-off-by: Colin Ian King <coking@nvidia.com>
----
- crypto/algif_aead.c          |  8 ++++++--
- crypto/authenc.c             |  4 +++-
- crypto/authencesn.c          | 11 ++++++++---
- crypto/chacha20poly1305.c    |  8 ++++++--
- crypto/echainiv.c            |  9 +++++++--
- crypto/gcm.c                 |  5 ++++-
- crypto/scatterwalk.c         | 11 ++++++++---
- crypto/seqiv.c               |  7 +++++--
- include/crypto/scatterwalk.h |  2 +-
- 9 files changed, 48 insertions(+), 17 deletions(-)
+ (1) Add SHAKE-256 crypto_sig support, generating 32-byte fixed output.  The
+     XOF features aren't available through this.  SHAKE-128 crypto_sig support
+     isn't required for ML-DSA, so I haven't implemented that at this time.
 
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 79b016a899a1..fd571bda0799 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -199,8 +199,10 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 		 *	    v	   v
- 		 * RX SGL: AAD || PT || Tag
- 		 */
--		memcpy_sglist(areq->first_rsgl.sgl.sgt.sgl, tsgl_src,
-+		err = memcpy_sglist(areq->first_rsgl.sgl.sgt.sgl, tsgl_src,
- 			      processed);
-+		if (err)
-+			goto free;
- 		af_alg_pull_tsgl(sk, processed, NULL, 0);
- 	} else {
- 		/*
-@@ -215,7 +217,9 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 		 */
- 
- 		/* Copy AAD || CT to RX SGL buffer for in-place operation. */
--		memcpy_sglist(areq->first_rsgl.sgl.sgt.sgl, tsgl_src, outlen);
-+		err = memcpy_sglist(areq->first_rsgl.sgl.sgt.sgl, tsgl_src, outlen);
-+		if (err)
-+			goto free;
- 
- 		/* Create TX SGL for tag and chain it to RX SGL. */
- 		areq->tsgl_entries = af_alg_count_tsgl(sk, processed,
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index ac679ce2cb95..1abb4931ab59 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -202,7 +202,9 @@ static int crypto_authenc_encrypt(struct aead_request *req)
- 	dst = src;
- 
- 	if (req->src != req->dst) {
--		memcpy_sglist(req->dst, req->src, req->assoclen);
-+		err = memcpy_sglist(req->dst, req->src, req->assoclen);
-+		if (err)
-+			return err;
- 		dst = scatterwalk_ffwd(areq_ctx->dst, req->dst, req->assoclen);
- 	}
- 
-diff --git a/crypto/authencesn.c b/crypto/authencesn.c
-index d1bf0fda3f2e..6dc61dd4ab1a 100644
---- a/crypto/authencesn.c
-+++ b/crypto/authencesn.c
-@@ -174,7 +174,9 @@ static int crypto_authenc_esn_encrypt(struct aead_request *req)
- 	dst = src;
- 
- 	if (req->src != req->dst) {
--		memcpy_sglist(req->dst, req->src, assoclen);
-+		err = memcpy_sglist(req->dst, req->src, assoclen);
-+		if (err)
-+			return err;
- 		sg_init_table(areq_ctx->dst, 2);
- 		dst = scatterwalk_ffwd(areq_ctx->dst, req->dst, assoclen);
- 	}
-@@ -258,8 +260,11 @@ static int crypto_authenc_esn_decrypt(struct aead_request *req)
- 
- 	cryptlen -= authsize;
- 
--	if (req->src != dst)
--		memcpy_sglist(dst, req->src, assoclen + cryptlen);
-+	if (req->src != dst) {
-+		err = memcpy_sglist(dst, req->src, assoclen + cryptlen);
-+		if (err)
-+			return err;
-+	}
- 
- 	scatterwalk_map_and_copy(ihash, req->src, assoclen + cryptlen,
- 				 authsize, 0);
-diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
-index b4b5a7198d84..c15ae1a2d666 100644
---- a/crypto/chacha20poly1305.c
-+++ b/crypto/chacha20poly1305.c
-@@ -145,9 +145,13 @@ static int poly_hash(struct aead_request *req)
- 	} tail;
- 	unsigned int padlen;
- 	unsigned int total;
-+	int err;
- 
--	if (sg != req->dst)
--		memcpy_sglist(req->dst, sg, req->assoclen);
-+	if (sg != req->dst) {
-+		err = memcpy_sglist(req->dst, sg, req->assoclen);
-+		if (err)
-+			return err;
-+	}
- 
- 	if (rctx->cryptlen == req->cryptlen) /* encrypting */
- 		sg = req->dst;
-diff --git a/crypto/echainiv.c b/crypto/echainiv.c
-index e0a2d3209938..d46fb04c16f4 100644
---- a/crypto/echainiv.c
-+++ b/crypto/echainiv.c
-@@ -40,9 +40,14 @@ static int echainiv_encrypt(struct aead_request *req)
- 
- 	info = req->iv;
- 
--	if (req->src != req->dst)
--		memcpy_sglist(req->dst, req->src,
-+	if (req->src != req->dst) {
-+		int err;
-+
-+		err = memcpy_sglist(req->dst, req->src,
- 			      req->assoclen + req->cryptlen);
-+		if (err)
-+			return err;
-+	}
- 
- 	aead_request_set_callback(subreq, req->base.flags,
- 				  req->base.complete, req->base.data);
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index 97716482bed0..2c40df82ad20 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -928,10 +928,13 @@ static int crypto_rfc4543_crypt(struct aead_request *req, bool enc)
- 			   crypto_aead_alignmask(ctx->child) + 1);
- 
- 	if (req->src != req->dst) {
-+		int err;
- 		unsigned int nbytes = req->assoclen + req->cryptlen -
- 				      (enc ? 0 : authsize);
- 
--		memcpy_sglist(req->dst, req->src, nbytes);
-+		err = memcpy_sglist(req->dst, req->src, nbytes);
-+		if (err)
-+			return err;
- 	}
- 
- 	memcpy(iv, ctx->nonce, 4);
-diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-index 1d010e2a1b1a..021368d1c519 100644
---- a/crypto/scatterwalk.c
-+++ b/crypto/scatterwalk.c
-@@ -101,26 +101,31 @@ void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
- }
- EXPORT_SYMBOL_GPL(memcpy_to_sglist);
- 
--void memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
-+int memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
- 		   unsigned int nbytes)
- {
- 	struct skcipher_walk walk = {};
-+	int err;
- 
- 	if (unlikely(nbytes == 0)) /* in case sg == NULL */
--		return;
-+		return 0;
- 
- 	walk.total = nbytes;
- 
- 	scatterwalk_start(&walk.in, src);
- 	scatterwalk_start(&walk.out, dst);
- 
--	skcipher_walk_first(&walk, true);
-+	err = skcipher_walk_first(&walk, true);
-+	if (err)
-+		return err;
- 	do {
- 		if (walk.src.virt.addr != walk.dst.virt.addr)
- 			memcpy(walk.dst.virt.addr, walk.src.virt.addr,
- 			       walk.nbytes);
- 		skcipher_walk_done(&walk, 0);
- 	} while (walk.nbytes);
-+
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(memcpy_sglist);
- 
-diff --git a/crypto/seqiv.c b/crypto/seqiv.c
-index 2bae99e33526..bfb484b2514f 100644
---- a/crypto/seqiv.c
-+++ b/crypto/seqiv.c
-@@ -64,9 +64,12 @@ static int seqiv_aead_encrypt(struct aead_request *req)
- 	data = req->base.data;
- 	info = req->iv;
- 
--	if (req->src != req->dst)
--		memcpy_sglist(req->dst, req->src,
-+	if (req->src != req->dst) {
-+		err = memcpy_sglist(req->dst, req->src,
- 			      req->assoclen + req->cryptlen);
-+		if (err)
-+			return err;
-+	}
- 
- 	if (unlikely(!IS_ALIGNED((unsigned long)info,
- 				 crypto_aead_alignmask(geniv) + 1))) {
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 83d14376ff2b..ee9fa43bc82e 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -278,7 +278,7 @@ void memcpy_from_sglist(void *buf, struct scatterlist *sg,
- void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
- 		      const void *buf, unsigned int nbytes);
- 
--void memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
-+int memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
- 		   unsigned int nbytes);
- 
- /* In new code, please use memcpy_{from,to}_sglist() directly instead. */
--- 
-2.51.0
+ (2) Add ML-DSA signature verification code, extracted from Stephan
+     Mueller's Leancrypto project.  The primary interface is intended to be
+     through crypto_sig.
+
+ (3) Add a simplified ML-DSA API for direct lib-crypto access.  Possibly
+     this should be conditional as the main access (from PKCS#7/X.509) is
+     going to be through crypto_sig.
+
+ (4) Add a kunit test in three instalments (due to size) to add some
+     testing for the three different levels of ML-DSA (44, 65 and 87).
+
+ (5) Modify PKCS#7 support to allow kernel module signatures to carry
+     authenticatedAttributes as OpenSSL refuses to let them be opted out of
+     for ML-DSA (CMS_NOATTR).  This adds an extra digest calculation to the
+     process.
+
+ (6) Modify PKCS#7 to pass the authenticatedAttributes directly to the
+     ML-DSA algorithm rather than passing over a digest as is done with RSA
+     as ML-DSA wants to do its own hashing and will add other stuff into
+     the hash.  We could use hashML-DSA or an external mu instead, but they
+     aren't standardised for CMS yet.
+
+ (7) Add support to the PKCS#7 and X.509 parsers for ML-DSA.
+
+ (8) Modify sign-file to handle OpenSSL not permitting CMS_NOATTR with
+     ML-DSA.
+
+ (9) Allow SHA-3 algorithms, including SHAKE256, to be used for the message
+     digest and add ML-DSA to the choice of algorithm with which to sign.
+
+With that, ML-DSA signing appears to work.
+
+This is based on Eric's libcrypto-next branch.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-pqc
+
+David
+
+Changes
+=======
+ver #8)
+ - Moved the ML-DSA code to lib/crypto/mldsa/.
+ - Renamed some bits from ml-dsa to mldsa.
+ - Created a simplified API and placed that in include/crypto/mldsa.h.
+ - Made the testing code use the simplified API.
+ - Fixed a warning about implicitly casting between uint16_t and __le16.
+
+ver #7)
+ - Rebased on Eric's tree as that now contains all the necessary SHA-3
+   infrastructure and drop the SHA-3 patches from here.
+ - Added a minimal patch to provide shake256 support for crypto_sig.
+ - Got rid of the memory allocation wrappers.
+ - Removed the ML-DSA keypair generation code and the signing code, leaving
+   only the signature verification code.
+ - Removed the secret key handling code.
+ - Removed the secret keys from the kunit tests and the signing testing.
+ - Removed some unused bits from the ML-DSA code.
+ - Downgraded the kdoc comments to ordinary comments, but keep the markup
+   for easier comparison to Leancrypto.
+
+ver #6)
+ - Added a patch to make the jitterentropy RNG use lib/sha3.
+ - Added back the crypto/sha3_generic changes.
+ - Added ML-DSA implementation (still needs more cleanup).
+ - Added kunit test for ML-DSA.
+ - Modified PKCS#7 to accommodate ML-DSA.
+ - Modified PKCS#7 and X.509 to allow ML-DSA to be specified and used.
+ - Modified sign-file to not use CMS_NOATTR with ML-DSA.
+ - Allowed SHA3 and SHAKE* algorithms for module signing default.
+ - Allowed ML-DSA-{44,65,87} to be selected as the module signing default.
+
+ver #5)
+ - Fix gen-hash-testvecs.py to correctly handle algo names that contain a
+   dash.
+ - Fix gen-hash-testvecs.py to not generate HMAC for SHA3-* or SHAKE* as
+   these don't currently have HMAC variants implemented.
+ - Fix algo names to be correct.
+ - Fix kunit module description as it now tests all SHA3 variants.
+
+ver #4)
+ - Fix a couple of arm64 build problems.
+ - Doc fixes:
+   - Fix the description of the algorithm to be closer to the NIST spec's
+     terminology.
+   - Don't talk of finialising the context for XOFs.
+   - Don't say "Return: None".
+   - Declare the "Context" to be "Any context" and make no mention of the
+     fact that it might use the FPU.
+   - Change "initialise" to "initialize".
+   - Don't warn that the context is relatively large for stack use.
+ - Use size_t for size parameters/variables.
+ - Make the module_exit unconditional.
+ - Dropped the crypto/ dir-affecting patches for the moment.
+
+ver #3)
+ - Renamed conflicting arm64 functions.
+ - Made a separate wrapper API for each algorithm in the family.
+ - Removed sha3_init(), sha3_reinit() and sha3_final().
+ - Removed sha3_ctx::digest_size.
+ - Renamed sha3_ctx::partial to sha3_ctx::absorb_offset.
+ - Refer to the output of SHAKE* as "output" not "digest".
+ - Moved the Iota transform into the one-round function.
+ - Made sha3_update() warn if called after sha3_squeeze().
+ - Simplified the module-load test to not do update after squeeze.
+ - Added Return: and Context: kdoc statements and expanded the kdoc
+   headers.
+ - Added an API description document.
+ - Overhauled the kunit tests.
+   - Only have one kunit test.
+   - Only call the general hash tester on one algo.
+   - Add separate simple cursory checks for the other algos.
+   - Add resqueezing tests.
+   - Add some NIST example tests.
+ - Changed crypto/sha3_generic to use this
+ - Added SHAKE128/256 to crypto/sha3_generic and crypto/testmgr
+ - Folded struct sha3_state into struct sha3_ctx.
+
+ver #2)
+  - Simplify the endianness handling.
+  - Rename sha3_final() to sha3_squeeze() and don't clear the context at the
+    end as it's permitted to continue calling sha3_final() to extract
+    continuations of the digest (needed by ML-DSA).
+  - Don't reapply the end marker to the hash state in continuation
+    sha3_squeeze() unless sha3_update() gets called again (needed by
+    ML-DSA).
+  - Give sha3_squeeze() the amount of digest to produce as a parameter
+    rather than using ctx->digest_size and don't return the amount digested.
+  - Reimplement sha3_final() as a wrapper around sha3_squeeze() that
+    extracts ctx->digest_size amount of digest and then zeroes out the
+    context.  The latter is necessary to avoid upsetting
+    hash-test-template.h.
+  - Provide a sha3_reinit() function to clear the state, but to leave the
+    parameters that indicate the hash properties unaffected, allowing for
+    reuse.
+  - Provide a sha3_set_digestsize() function to change the size of the
+    digest to be extracted by sha3_final().  sha3_squeeze() takes a
+    parameter for this instead.
+  - Don't pass the digest size as a parameter to shake128/256_init() but
+    rather default to 128/256 bits as per the function name.
+  - Provide a sha3_clear() function to zero out the context.
+
+David Howells (9):
+  crypto: Add support for shake256 through crypto_shash
+  crypto: Add ML-DSA/Dilithium verify support
+  mldsa: Add a simpler API
+  crypto: Add ML-DSA-44 pure rejection test vectors as a kunit test
+  crypto: Add ML-DSA-65 pure rejection test vectors as a kunit test
+  crypto: Add ML-DSA-87 pure rejection test vectors as a kunit test
+  pkcs7: Allow the signing algo to calculate the digest itself
+  pkcs7, x509: Add ML-DSA support
+  modsign: Enable ML-DSA module signing
+
+ Documentation/admin-guide/module-signing.rst  |   15 +-
+ Documentation/crypto/index.rst                |    1 +
+ Documentation/crypto/mldsa.rst                |  111 +
+ certs/Kconfig                                 |   24 +
+ certs/Makefile                                |    3 +
+ crypto/asymmetric_keys/pkcs7_parser.c         |   19 +-
+ crypto/asymmetric_keys/pkcs7_verify.c         |   52 +-
+ crypto/asymmetric_keys/public_key.c           |    7 +
+ crypto/asymmetric_keys/x509_cert_parser.c     |   24 +
+ crypto/sha3.c                                 |   42 +
+ include/crypto/mldsa.h                        |   34 +
+ include/crypto/public_key.h                   |    1 +
+ include/linux/oid_registry.h                  |    5 +
+ kernel/module/Kconfig                         |    5 +
+ lib/crypto/Kconfig                            |    1 +
+ lib/crypto/Makefile                           |    2 +
+ lib/crypto/mldsa/Kconfig                      |   28 +
+ lib/crypto/mldsa/Makefile                     |   15 +
+ lib/crypto/mldsa/crypto_mldsa.c               |  332 +
+ lib/crypto/mldsa/dilithium.h                  |  545 ++
+ lib/crypto/mldsa/dilithium_44.c               |   33 +
+ lib/crypto/mldsa/dilithium_44.h               |  282 +
+ lib/crypto/mldsa/dilithium_65.c               |   33 +
+ lib/crypto/mldsa/dilithium_65.h               |  282 +
+ lib/crypto/mldsa/dilithium_87.c               |   33 +
+ lib/crypto/mldsa/dilithium_87.h               |  282 +
+ lib/crypto/mldsa/dilithium_api.c              |  429 ++
+ lib/crypto/mldsa/dilithium_debug.h            |   49 +
+ lib/crypto/mldsa/dilithium_ntt.c              |   89 +
+ lib/crypto/mldsa/dilithium_ntt.h              |   35 +
+ lib/crypto/mldsa/dilithium_pack.h             |  119 +
+ lib/crypto/mldsa/dilithium_poly.c             |  377 +
+ lib/crypto/mldsa/dilithium_poly.h             |  181 +
+ lib/crypto/mldsa/dilithium_poly_c.h           |  141 +
+ lib/crypto/mldsa/dilithium_poly_common.h      |   35 +
+ lib/crypto/mldsa/dilithium_polyvec.h          |  343 +
+ lib/crypto/mldsa/dilithium_polyvec_c.h        |   81 +
+ lib/crypto/mldsa/dilithium_reduce.h           |   85 +
+ lib/crypto/mldsa/dilithium_rounding.c         |  128 +
+ lib/crypto/mldsa/dilithium_service_helpers.h  |   99 +
+ lib/crypto/mldsa/dilithium_signature_c.c      |  102 +
+ lib/crypto/mldsa/dilithium_signature_c.h      |   37 +
+ lib/crypto/mldsa/dilithium_signature_helper.c |   79 +
+ lib/crypto/mldsa/dilithium_signature_impl.h   |  370 +
+ lib/crypto/mldsa/dilithium_type.h             |  102 +
+ lib/crypto/mldsa/dilithium_zetas.c            |   67 +
+ lib/crypto/mldsa/mldsa_api.c                  |  186 +
+ .../mldsa/signature_domain_separation.c       |  203 +
+ .../mldsa/signature_domain_separation.h       |   30 +
+ lib/crypto/tests/Kconfig                      |   10 +
+ lib/crypto/tests/Makefile                     |    1 +
+ lib/crypto/tests/mldsa_kunit.c                |  103 +
+ .../tests/mldsa_pure_rejection_vectors_44.h   |  489 ++
+ .../tests/mldsa_pure_rejection_vectors_65.h   | 4741 ++++++++++++
+ .../tests/mldsa_pure_rejection_vectors_87.h   | 6456 +++++++++++++++++
+ scripts/sign-file.c                           |   26 +-
+ 56 files changed, 17368 insertions(+), 36 deletions(-)
+ create mode 100644 Documentation/crypto/mldsa.rst
+ create mode 100644 include/crypto/mldsa.h
+ create mode 100644 lib/crypto/mldsa/Kconfig
+ create mode 100644 lib/crypto/mldsa/Makefile
+ create mode 100644 lib/crypto/mldsa/crypto_mldsa.c
+ create mode 100644 lib/crypto/mldsa/dilithium.h
+ create mode 100644 lib/crypto/mldsa/dilithium_44.c
+ create mode 100644 lib/crypto/mldsa/dilithium_44.h
+ create mode 100644 lib/crypto/mldsa/dilithium_65.c
+ create mode 100644 lib/crypto/mldsa/dilithium_65.h
+ create mode 100644 lib/crypto/mldsa/dilithium_87.c
+ create mode 100644 lib/crypto/mldsa/dilithium_87.h
+ create mode 100644 lib/crypto/mldsa/dilithium_api.c
+ create mode 100644 lib/crypto/mldsa/dilithium_debug.h
+ create mode 100644 lib/crypto/mldsa/dilithium_ntt.c
+ create mode 100644 lib/crypto/mldsa/dilithium_ntt.h
+ create mode 100644 lib/crypto/mldsa/dilithium_pack.h
+ create mode 100644 lib/crypto/mldsa/dilithium_poly.c
+ create mode 100644 lib/crypto/mldsa/dilithium_poly.h
+ create mode 100644 lib/crypto/mldsa/dilithium_poly_c.h
+ create mode 100644 lib/crypto/mldsa/dilithium_poly_common.h
+ create mode 100644 lib/crypto/mldsa/dilithium_polyvec.h
+ create mode 100644 lib/crypto/mldsa/dilithium_polyvec_c.h
+ create mode 100644 lib/crypto/mldsa/dilithium_reduce.h
+ create mode 100644 lib/crypto/mldsa/dilithium_rounding.c
+ create mode 100644 lib/crypto/mldsa/dilithium_service_helpers.h
+ create mode 100644 lib/crypto/mldsa/dilithium_signature_c.c
+ create mode 100644 lib/crypto/mldsa/dilithium_signature_c.h
+ create mode 100644 lib/crypto/mldsa/dilithium_signature_helper.c
+ create mode 100644 lib/crypto/mldsa/dilithium_signature_impl.h
+ create mode 100644 lib/crypto/mldsa/dilithium_type.h
+ create mode 100644 lib/crypto/mldsa/dilithium_zetas.c
+ create mode 100644 lib/crypto/mldsa/mldsa_api.c
+ create mode 100644 lib/crypto/mldsa/signature_domain_separation.c
+ create mode 100644 lib/crypto/mldsa/signature_domain_separation.h
+ create mode 100644 lib/crypto/tests/mldsa_kunit.c
+ create mode 100644 lib/crypto/tests/mldsa_pure_rejection_vectors_44.h
+ create mode 100644 lib/crypto/tests/mldsa_pure_rejection_vectors_65.h
+ create mode 100644 lib/crypto/tests/mldsa_pure_rejection_vectors_87.h
 
