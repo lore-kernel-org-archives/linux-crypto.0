@@ -1,159 +1,339 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61AF02FABE3
-	for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 20:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8124B2FB990
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 20:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763152436; cv=none; b=T/iExT7gZtB6+y4CKchWOIbXPL36CaFnRdJNCz7wT2G0YnQYcwQv6x5flZ+YQQ9BJjjK3yqoaMocc8Rw8rpQYeRx15cbIQYoxqElFBrznmGtq1Itd1cZqbTufJccaXh8lp7BWsGzV5hRxWzSEw0qsigUYKqKWCP7h3OpuVKRi4w=
+	t=1763153415; cv=none; b=lYUBxHxK+hswB94mqYO1quogjBq+oMsD+uqw4RtYgobOdiD65e5r7SIAWzWdAW5HZCnl+RtXHYtVcWTMZkPzfS9EphWDuGJtQtHJ59sHzGh7qAicyMOZk5s5hsE5J4p6CvQ+BLGNCNpFbNoqneNN5aAHZJG5WLzgkTVJhG3NJSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763152436; c=relaxed/simple;
-	bh=LhaA9nPEsAzGsE8Myhg2I0EH0s1kuDU/fMxqhQvgOas=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dcy/9pSpE2Zhmv+nqxesoNivNBQ9BKeFuTrX8ceyQ5VSi5/uZfB2HwXD97+CXHmdN+6pv4GiM18E6no+Pw0CEIwMDn3uNoNXV+u/YF3CBR2aMYi3xUs+JC6Yf+dYHyhduJTgFHKaaY3gu/r15vjtXBvPCyHK8ostWCKLf8rJqwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Id6V7zFI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763153415; c=relaxed/simple;
+	bh=O1WmUWAKm+kgsHWl6/7GZ+ARWS5YZLcRXAOnxgDLQPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=USGrZwaJeDPslNISGpuqR2ptXxYhnRhSl7Hn4/NH4WT40iZF/mbfdP0Rk7CNX5ggkF5il+rmNgVsmob5xR5QShdaa1p82j/5fwmBxeHL9yOCxnyc2irVNiazBW+WllAvQ3/ZTgHtLVAOF/Yj/GDRyRl/Phq+F95qAC8HVA8dENg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=It51VS1w; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Id6V7zFI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBA60C19422
-	for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 20:33:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763152436;
-	bh=LhaA9nPEsAzGsE8Myhg2I0EH0s1kuDU/fMxqhQvgOas=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Id6V7zFI3y8rH0kA9rC2sqXiILUg9LL6asGOP9azALAoi5verTH+xXLXeD2jMXw3g
-	 SmZmADOz39YmOBw7sIs0naOYdj9LV0Nt9bg4fLLPYw1k1BSXEQpBYCrEI8G6fEfjfP
-	 r9+DNW0wfQVmQIY0RjhISKmRmeVL07/1qRRrj1zLLD4lbgCBJqBqEaBG4F5LOrNy0j
-	 szenle25iuYSlsRUKIDdndnWcY5BzR2NdSjztiCfUUP/zd71XPa45BZwrmKPcmzq5N
-	 9IYD3SBIOU8ipqQjm4cCufgagvOySdT8MYWnfeKeE3HdnEuWdulVOB02pEFzY4BOg6
-	 +Ye2Dpc5ECVDg==
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-594516d941cso2251416e87.0
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 12:33:55 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVNbyIDBL400AHawG6wQ6/1raqy8Hvst1tgQZsD6Q9s3mYPs7Y2fgodWfBpuoTpFEQ9rF5zU7BNFwabpv0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFZMbMCXYwSmTUfjMNil903vkW4RMO16PU69rQzb9uv/tOrYpv
-	q1+ythtsKVuPn0bMdO4inEdftQ65VAf+nuVg0EXhdhr6Pu1pPayib1SA6AHF8E2gyMgLMWx2EoG
-	r7OHVl845YFHqQEl1V9ggdikQq0M8kiQ=
-X-Google-Smtp-Source: AGHT+IGvF+VMNJkVJEG3/BZ2cDSEyZ9W+Lk4S/ygZqRuc5EpK80o29GIXyiCdmmlAAKe+Zhqlq5YqfJNEU+EDhgUClo=
-X-Received: by 2002:a05:6512:e9d:b0:594:364b:821a with SMTP id
- 2adb3069b0e04-59584208956mr1594092e87.52.1763152434350; Fri, 14 Nov 2025
- 12:33:54 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="It51VS1w"
+Date: Fri, 14 Nov 2025 20:49:52 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763153400;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uCubXLGEjf5yNbIg/so5Dl6MiWPjIZCOszTICQIIzp8=;
+	b=It51VS1wlp2x9Qt7YpG8krPvvqoaLDqdqRwhNlKo8zhqqq/V0B5K3FWIMQ3XBjycbofuHC
+	pGAwtOiIS939CuoE805Eqsd1Nkmh0lzAgoH2XeO3Km5Ew9kb+rWySvMgoU3Tox+gw8Nyeq
+	yGJjTREn5JqefyyP7mOBjmOxamJBXaI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+Cc: SeongJae Park <sj@kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>, "nphamcs@gmail.com" <nphamcs@gmail.com>, 
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, "usamaarif642@gmail.com" <usamaarif642@gmail.com>, 
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "21cnbao@gmail.com" <21cnbao@gmail.com>, 
+	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+	"senozhatsky@chromium.org" <senozhatsky@chromium.org>, "kasong@tencent.com" <kasong@tencent.com>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com" <clabbe@baylibre.com>, 
+	"ardb@kernel.org" <ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
+	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
+	"Gomes, Vinicius" <vinicius.gomes@intel.com>, "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, 
+	"Gopal, Vinodh" <vinodh.gopal@intel.com>
+Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
+ compress batching of large folios.
+Message-ID: <ekilv3urk442lezvzul5dwergk6baubuhgrnflf5j4yfj47lwx@ae6y6mvsvs3v>
+References: <20251104091235.8793-1-kanchana.p.sridhar@intel.com>
+ <20251104091235.8793-23-kanchana.p.sridhar@intel.com>
+ <q54bjetgzmwbsqpgbuuovdmcwxjwmtowwgsv7p3ykbodhxpvc7@6mqmz6ji4jja>
+ <SJ2PR11MB8472011B61F644D4662FE980C9CDA@SJ2PR11MB8472.namprd11.prod.outlook.com>
+ <ifqmrypobhqxlkh734md5it22vggmkvqo2t2uy7hgch5hmlyln@flqi75fwmfd4>
+ <SJ2PR11MB8472610CE6EF5BA83BCC8D2EC9CAA@SJ2PR11MB8472.namprd11.prod.outlook.com>
+ <ygtejnrci7cnjkpomoqhz3jdtryjffmk3o2avatjppylirbbem@qppr4eybud47>
+ <SJ2PR11MB84727C029B980E5E06F7291EC9CAA@SJ2PR11MB8472.namprd11.prod.outlook.com>
+ <keys236tojsj7a4lx6tyqtr3hbhvtjtkbpb73zejgzxmegjwrb@i2xkzvgp5ake>
+ <SJ2PR11MB8472CE2B46F08804CF5F2158C9CAA@SJ2PR11MB8472.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251114180706.318152-2-ardb+git@google.com> <aRePu_IMV5G76kHK@zx2c4.com>
-In-Reply-To: <aRePu_IMV5G76kHK@zx2c4.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 14 Nov 2025 21:33:43 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXG0RKOE4uQHfWnY1vU_FS+KUkZNNOLCrhC8dfbtf4PUjA@mail.gmail.com>
-X-Gm-Features: AWmQ_bn0RYFL_oOxZKO6bgy1Ui2gsJ4-kNK-CbPoPlTsaBQ1jFj9ZMW16yMWZ5Y
-Message-ID: <CAMj1kXG0RKOE4uQHfWnY1vU_FS+KUkZNNOLCrhC8dfbtf4PUjA@mail.gmail.com>
-Subject: Re: [RFC PATCH] libcrypto/chachapoly: Use strict typing for fixed
- size array arguments
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Ard Biesheuvel <ardb+git@google.com>, linux-crypto@vger.kernel.org, 
-	Eric Biggers <ebiggers@kernel.org>, arnd@arndb.de
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SJ2PR11MB8472CE2B46F08804CF5F2158C9CAA@SJ2PR11MB8472.namprd11.prod.outlook.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 14 Nov 2025 at 21:23, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Fri, Nov 14, 2025 at 07:07:07PM +0100, Ard Biesheuvel wrote:
-> > void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src=
-_len,
-> >                                const u8 *ad, const size_t ad_len,
-> >                                const u8 (*nonce)[XCHACHA20POLY1305_NONC=
-E_SIZE],
-> >                                const u8 (*key)[CHACHA20POLY1305_KEY_SIZ=
-E])
-> >
-> > However, this variant is checked more strictly by the compiler, and onl=
-y
-> > arrays of the correct size are accepted as plain arguments (using the &
-> > operator), and so inadvertent mixing up of arguments or passing buffers
-> > of an incorrect size will trigger an error at build time.
->
-> Interesting idea! And codegen is the same, you say?
->
+On Fri, Nov 14, 2025 at 07:59:57PM +0000, Sridhar, Kanchana P wrote:
+> 
+> > -----Original Message-----
+> > From: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > Sent: Friday, November 14, 2025 11:44 AM
+> > To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
+> > Cc: SeongJae Park <sj@kernel.org>; linux-kernel@vger.kernel.org; linux-
+> > mm@kvack.org; hannes@cmpxchg.org; nphamcs@gmail.com;
+> > chengming.zhou@linux.dev; usamaarif642@gmail.com;
+> > ryan.roberts@arm.com; 21cnbao@gmail.com;
+> > ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
+> > senozhatsky@chromium.org; kasong@tencent.com; linux-
+> > crypto@vger.kernel.org; herbert@gondor.apana.org.au;
+> > davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
+> > ebiggers@google.com; surenb@google.com; Accardi, Kristen C
+> > <kristen.c.accardi@intel.com>; Gomes, Vinicius <vinicius.gomes@intel.com>;
+> > Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
+> > <vinodh.gopal@intel.com>
+> > Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
+> > compress batching of large folios.
+> > 
+> > On Fri, Nov 14, 2025 at 07:23:42PM +0000, Sridhar, Kanchana P wrote:
+> > [..]
+> >  > > > > >
+> > > > > > > > > +		if (err && !wb_enabled)
+> > > > > > > > > +			goto compress_error;
+> > > > > > > > > +
+> > > > > > > > > +		for_each_sg(acomp_ctx->sg_outputs->sgl, sg,
+> > > > nr_comps, k) {
+> > > > > > > > > +			j = k + i;
+> > > > > > > >
+> > [..]
+> > > > > > >
+> > > > > > > >
+> > > > > > > > > +			dst = acomp_ctx->buffers[k];
+> > > > > > > > > +			dlen = sg->length | *errp;
+> > > > > > > >
+> > > > > > > > Why are we doing this?
+> > > > > > > >
+> > > > > > > > > +
+> > > > > > > > > +			if (dlen < 0) {
+> > > > > > > >
+> > > > > > > > We should do the incompressible page handling also if dlen is
+> > > > PAGE_SIZE,
+> > > > > > > > or if the compression failed (I guess that's the intention of bit
+> > OR'ing
+> > > > > > > > with *errp?)
+> > > > > > >
+> > > > > > > Yes, indeed: that's the intention of bit OR'ing with *errp.
+> > > > > >
+> > > > > > ..and you never really answered my question. In the exising code we
+> > > > > > store the page as incompressible if writeback is enabled AND
+> > > > > > crypto_wait_req() fails or dlen is zero or PAGE_SIZE. We check above
+> > > > > > if crypto_wait_req() fails and writeback is disabled, but what about the
+> > > > > > rest?
+> > > > >
+> > > > > Let me explain this some more. The new code only relies on the
+> > assumption
+> > > > > that if dlen is zero or >= PAGE_SIZE, the compressor will not return a 0
+> > > > > ("successful status"). In other words, the compressor will return an error
+> > > > status
+> > > > > in this case, which is expected to be a negative error code.
+> > > >
+> > > > I am not sure if all compressors do that, especially for the case where
+> > > > dlen >= PAGE_SIZE. The existing code does not assume that there will be
+> > > > an error code in these cases.
+> > > >
+> > > > For the dlen == 0 case, the check was introduced recently by commit
+> > > > dca4437a5861 ("mm/zswap: store <PAGE_SIZE compression failed page
+> > > > as-is"). Looking through the history it seems like it was introduced in
+> > > > v4 of that patch but I don't see the reasoning.
+> > >
+> > > The existing code did not check for dlen == 0 and dlen >= PAGE_SIZE
+> > > prior to commit dca4437a5861 ("mm/zswap: store <PAGE_SIZE compression
+> > > failed page as-is") either. We need SeongJae or Herbert to clarify whether
+> > > this check is needed, or if it is sufficient to rely on comp_ret, the return from
+> > > crypto_wait_req().
+> > >
+> > > >
+> > > > SeongJae, did you observe any compressors returning dlen == 0 but no
+> > > > error code? What was the reasoning behind the dlen == 0 check?
+> > > >
+> > > > >
+> > > > > Under these (hopefully valid) assumptions, the code handles the simple
+> > case
+> > > > > of an error compression return status and writeback is disabled, by the
+> > > > > "goto compress_error".
+> > > > >
+> > > > > The rest is handled by these:
+> > > > >
+> > > > > 1) First, I need to adapt the use of sg_outputs->sgl->length to represent
+> > the
+> > > > > compress length for software compressors, so I do this after
+> > > > crypto_wait_req()
+> > > > > returns:
+> > > > >
+> > > > >                 acomp_ctx->sg_outputs->sgl->length = acomp_ctx->req->dlen;
+> > > >
+> > > > For SW compressors, why is acomp_ctx->sg_outputs->sgl->length not set?
+> > > > IIUC we are using the same API for SW and HW compressors, why is the
+> > > > output length in different places for each of them?
+> > >
+> > > This is to first implement the SG lists batching interface in iaa_crypto, while
+> > > maintaining backward compatibility for SW compressors with the new API.
+> > > I believe we may want to adapt the crypto API to SW compressors
+> > > at a later point. I also believe this would be outside the scope of this patch.
+> > > It would be nice if Herbert can share his vision on this aspect.
+> > >
+> > > >
+> > > > >
+> > > > > I did not want to propose any changes to crypto software compressors
+> > > > protocols.
+> > > > >
+> > > > > 2) After the check for the "if (err && !wb_enabled)" case, the new code
+> > has
+> > > > this:
+> > > > >
+> > > > >                 for_each_sg(acomp_ctx->sg_outputs->sgl, sg, nr_comps, k) {
+> > > > >                         j = k + i;
+> > > > >                         dst = acomp_ctx->buffers[k];
+> > > > >                         dlen = sg->length | *errp;
+> > > > >
+> > > > >                         if (dlen < 0) {
+> > > > >                                 dlen = PAGE_SIZE;
+> > > > >                                 dst = kmap_local_page(folio_page(folio, start + j));
+> > > > >                         }
+> > > > >
+> > > > > For batching compressors, namely, iaa_crypto, the individual output SG
+> > > > > lists sg->length follows the requirements from Herbert: each sg->length
+> > > > > is the compressed length or the error status (a negative error code).
+> > > > >
+> > > > > Then all I need to know whether to store the page as incompressible
+> > > > > is to either directly test if sg->length is negative (for batching
+> > compressors),
+> > > > > or sg->length bit-OR'ed with the crypto_wait_req() return status ("err")
+> > > > > is negative. This is accomplished by the "dlen = sg->length | *errp;".
+> > > > >
+> > > > > I believe this maintains backward compatibility with the existing code.
+> > > > > Please let me know if you agree.
+> > > >
+> > > > For batching compressors, will 'err' be set as well, or just sg->length?
+> > > > If it's just sg->length, then we need to check again if WB is enabled
+> > > > here before storing the page uncompressed. Right?
+> > >
+> > > iaa_crypto will set 'err' and set the sg->length as per the batching interface
+> > > spec from Herbert.
+> > 
+> > So both 'err' and sg->length will contain the same error? In this case
+> > why do we need to check if dlen < 0? Shouldn't checking 'err' be
+> > sufficient? and it would work for both SW and HW and we wouldn't need
+> > errp. Did I miss something?
+> 
+> Great question. For a batching compressor, 'err' will contain an error if any
+> page in the batch had a compression error. This allows the early bail-out
+> path for SW and HW compressors if writeback is not enabled for the folio.
+> 
+> Only the specific pages' sg->length will contain an error code. The other
+> batch pages that compressed fine will have the compressed length in
+> sg->length. This enables the post-compression loop with the errp check
+> bit-ORed with the sg->length, which for SW, has been brought up to date
+> with the acomp_req->dlen before we get to the wb_enabled code path.
+> 
+> > 
+> > >
+> > > >
+> > > > >
+> > > > > >
+> > > > > > We don't check again if writeback is enabled before storing the page is
+> > > > > > incompressible, and we do not check if dlen is zero or PAGE_SIZE. Are
+> > > > > > these cases no longer possible?
+> > > > >
+> > > > > Hope the above explanation clarifies things some more? These case
+> > > > > are possible, and as long as they return an error status, they should be
+> > > > > correctly handled by the new code.
+> > > >
+> > > > As mentioned above, I am not sure if that's correct for dlen >=
+> > > > PAGE_SIZE.
+> > >
+> > > We need to get clarity on this from SeongJae/Herbert.
+> > >
+> > > >
+> > > > >
+> > > > > >
+> > > > > > Also, why use errp, why not explicitly use the appropriate error code?
+> > > > > > It's also unclear to me why the error code is always zero with HW
+> > > > > > compression?
+> > > > >
+> > > > > This is because of the sg->length requirements (compressed
+> > length/error)
+> > > > > for the batching interface suggested by Herbert. Hence, I upfront define
+> > > > > err_sg to 0, and, set errp to &err_sg for batching compressors. For
+> > software
+> > > > > compressors, errp is set to &err, namely, the above check will always
+> > apply
+> > > > > the software compressor's error status to the compressed length via
+> > > > > the bit-OR to determine if the page needs to be stored uncompressed.
+> > > >
+> > > > Thanks for the clarification. I understand that the error code has
+> > > > different sources for SW and HW compressors, but I do not like using
+> > > > errp as an indirection. It makes the code unclear. I would rather we
+> > > > explicitly check err for SW compressors and dlen for HW compressors.
+> > > >
+> > > > That being said, I thought what Herbert suggested was that the same API
+> > > > is used for both SW and HW compressors. IOW, either way we submit a
+> > > > batch of pages (8 pages for SW compressors), and then the crypto API
+> > > > would either give the entire batch to the compressor if it supports
+> > > > batching, or loop over them internally and hand them page-by-page to
+> > > > the compressor.
+> > >
+> > > That was not how I understood Herbert's suggestion for the batching
+> > interface.
+> > > He did suggest the following:
+> > >
+> > > "Before the call to acomp, the destination SG list should contain as
+> > > many elements as the number of units.  On return, the dst lengths
+> > > should be stored in each destination SG entry."
+> > >
+> > > I have incorporated this suggestion in the iaa_crypto driver. For SW
+> > > compressors, I have tried not to propose any API changes, while making
+> > > sure that the zswap changes for the SG lists batching API work as expected
+> > > for SW without too much special-casing code.
+> > >
+> > > I suppose I always assumed that we would update SW compressors later,
+> > > and not as part of this patch-set.
+> > 
+> > I am not sure I understand what changes lie in the crypto layer and what
+> > changes lie in the SW compressors. I am not suggesting we do any
+> > modification to the SW compressors.
+> > 
+> > I imagined that the crypto layer would present a uniform API regardless
+> > of whether or not the compressor supports batching. Ideally zswap would
+> > pass in a batch to crypto and it would figure out if it needs to break
+> > them down or not. Then the output length and errors would be presented
+> > uniformly to the caller.
+> 
+> From my understanding, this would require changes to the crypto layer for
+> SW compressors, which again IIUC, does not set the sg->length, only sets
+> the acomp_req->dlen (IIUC, a temporary state until crypto for SW also uses
+> SG lists).
+> 
+> Ideally, batching could be handled similarly by crypto for SW. I believe we
+> will get there, albeit outside the scope of this patch.
+> 
+> > 
+> > That being said, I am not at all familiar with how crypto works and how
+> > straightforward that would be. Herbert, WDYT?
+> > 
+> > >
+> > > >
+> > > > This would simplify usage as we do not have to handle the differences in
+> > > > zswap.
+> > >
+> > > That's the nice thing about SG lists - I think the zswap_compress() calls to
+> > > the new batching API appears agnostic to SW and HW compressors.
+> > > Other than the upfront "errp = (pool->compr_batch_size == 1) ? &err :
+> > &err_sg;"
+> > > the logical code organization of the new zswap_compress() is quite similar to
+> > > the existing code. The post-compress "dlen = sg->length | *errp;" handles
+> > the rest.
+> > 
+> > It would be even nicer if the batches are also abstracted by SG lists.
+> > 
+> > Also, I don't like how the error codes and output lengths are presented
+> > differently for HW and SW compressors.
+> 
+> I do believe this is short-term and is the first step in implementing batching
+> in zswap. We should get Herbert's thoughts on this.
 
-Well, the address values passed into the functions are the same.
-Whether or not some compilers may behave differently as a result is a
-different matter: I suppose some heuristics may produce different
-results knowing the fixed sizes of the inputs.
-
-> There's another variant of this that doesn't change callsites and keeps
-> the single pointer, which more accurate reflects what the function does:
->
-> void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_l=
-en,
->                                const u8 *ad, const size_t ad_len,
->                                const u8 nonce[static XCHACHA20POLY1305_NO=
-NCE_SIZE],
->                                const u8 key[static CHACHA20POLY1305_KEY_S=
-IZE])
->
-
-Whoah!
-
-> An obscure use of the `static` keyword, but this is what it's used for -
-> telling the compiler what size you expect the object to be. Last time I
-> investigated this, only clang respected it, but now it looks like gcc
-> does too:
->
->     zx2c4@thinkpad /tmp $ cat a.c
->
->     void blah(unsigned char herp[static 7]);
->
->     static void schma(void)
->     {
->         unsigned char good[] =3D { 1, 2, 3, 4, 5, 6, 7 };
->         unsigned char bad[] =3D { 1, 2, 3, 4, 5, 6 };
->         blah(good);
->         blah(bad);
->     }
->     zx2c4@thinkpad /tmp $ gcc -c a.c
->     a.c: In function =E2=80=98schma=E2=80=99:
->     a.c:9:9: warning: =E2=80=98blah=E2=80=99 accessing 7 bytes in a regio=
-n of size 6 [-Wstringop-overflow=3D]
->         9 |         blah(bad);
->           |         ^~~~~~~~~
->     a.c:9:9: note: referencing argument 1 of type =E2=80=98unsigned char[=
-7]=E2=80=99
->     a.c:2:6: note: in a call to function =E2=80=98blah=E2=80=99
->         2 | void blah(unsigned char herp[static 7]);
->           |      ^~~~
->     zx2c4@thinkpad /tmp $ clang -c a.c
->     a.c:9:2: warning: array argument is too small; contains 6 elements, c=
-allee requires at least 7
->           [-Warray-bounds]
->         9 |         blah(bad);
->           |         ^    ~~~
->     a.c:2:25: note: callee declares array parameter as static here
->         2 | void blah(unsigned char herp[static 7]);
->           |                         ^   ~~~~~~~~~~
->     1 warning generated.
->
->
-> This doesn't account for buffers that are oversize -- the less dangerous
-> case -- but maybe that's fine, to keep "normal" semantics of function
-> calls and still get some checking? And adding `static` a bunch of places
-> is easy.
-
-Yeah if that is as portable as you say it is, it is a much better
-solution, given that the minimum size is the most important:
-inadvertently swapping two arguments will still result in a
-diagnostic, unless the buffers are the same size, in which case there
-is still a bug but not a memory safety issue. And passing a buffer
-that is too large is not a memory safety issue either.
-
-> It could apply much wider than just chapoly.
->
-
-Yes, that was always the intent. I used this as an example because it
-is low hanging fruit, given that it only has a single user.
-
-> This all makes me wish we had NT's SAL notations though...
->
-
-(quotation needed)
+If we have to keep the different approaches for now I would still like
+to simplify the error handling. We should remove errp and explicitly
+check sg->length or 'err' based on the batch size.
