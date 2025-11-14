@@ -1,46 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C6330FC31;
-	Fri, 14 Nov 2025 10:24:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586953112C0;
+	Fri, 14 Nov 2025 10:24:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763115871; cv=none; b=Cjp/hJXZabpUZaqzNVWmfjOtgZOIxQeBFK1PJHiCmCNomrC+IwOh9Udd7tFH8iPP18A9ipQqQy4LzXi/8eTN4TVPc/pnE1GV5W3R6oijjJGRvtK/wYuwBUMeKBvIxg9i92wd78JKB2HsQ7tKX++x1e+8fxRqdEk+TAop9hdyb3M=
+	t=1763115877; cv=none; b=nCggL9L0ngAJfgTJMk28m4T6HFGCbte+rAG7WQ8kUhOWu5wBovZ7eIuaPncfxRw+a/oHaC3rsLzEzb5Ua97l5cXFdnN2sEJXA4uyXQWcNru7WodECD9xHAQN4UG85wzVK0RBlravk/pHneNQJTlLHGzESD7D1wwwAVzTkRVpyb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763115871; c=relaxed/simple;
-	bh=L2znFfLlo19Ya/Q4qyF5INzpQfXSumiV/vZ9w6Jdumo=;
+	s=arc-20240116; t=1763115877; c=relaxed/simple;
+	bh=HarAnT/JgGZIWrovuGfKnGkXZ9ld2RWbLEllCumIxP0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KDhScZBGmYsa2kS2ForPL6+YS4707QoMLvzKb72FIdNZHK1p7X08LhAJovFlXNOViN5Efj1q2q4AWSaeA6933U0WRAT1f6byvmhNY0tXk27ur6zeoooOeO9iGX+mUWjVKM67GlsPYz52BQTjBvhzxDQBBPRMJPI7bnjeab8rKxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=jixnp9Dj; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=thLCQtLzliESB+oeZyjhGyQ59Hx1GrnKb4qxMwNNW1DlooyP8k8jA4N8JoUZXUVgkXIKR4oBKkZxatmC/MBdmC6OwhhtoPoUhTXqjIpO85wn5njzuGmQx11C8Vg9XbnRGZZ0ykBp5NofCaSZ8W736cw6LhNR/W4WWJP/x8CnPBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Gsuu68Hn; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="jixnp9Dj"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Gsuu68Hn"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=8EAg98BYyKHe7EgrE3l9zD3sK3piwHgmRR9FV9NI7Ds=; 
-	b=jixnp9DjvvE/bDwBzVdplP9o9ik25RgeLZl/iStoDkR5NBffS8wAmsPUaUClX+XjiDGJ8SP1oeM
-	5CeQWcmdaRdKFtduSytHmc9qhQZB/19MGSBAatC5SqTp5bHusIKFT9f5lHpvnd3n1F2cHmCOCk0E0
-	9a60IbYSmJPocqqrOzhhhj5GJuiJ8jyk+fAIzEPXRAMr5RiINzCtXTLbdfaqP+wc8IDDYtribnkE5
-	LAcqkeh0Y3x3kPGZsnSwpAFrqlh+wnbT5nAiYgFQVbeeBZDrBNBMDXTDbQfjYsOy0nOI7ekwvuzCb
-	UhjkZUyBXkRCAmZ7rw6l3P23PjgrIjc7igyg==;
+	from:content-type:reply-to; bh=hIAkDKvcEiMM7v57vmJikYmHE9Naf3G9F24VuTNYT4Y=; 
+	b=Gsuu68HndGdZqpLe1dvHrFpbtvbvivPV4X2WG1tc/qe3u2fi4yqJ+jYKoni6S8cfQ5NDJi//sOK
+	tv3OpYQXF7EDrVXWVKhiWN8jLl2dCDTTj53W/TsBQkxhbs+f4glBmy6NbmQ5dtMluK9ThOVnHs05y
+	jgOdpAP00kRgpEZJnhtosBudnsIIu76SoyW5FvhXFuwNykq/ZrrXFmumuue3MH6Uo45aT6+3+xD6S
+	aH6xpcBa8JyWykohdbPFrOBfZAvDzG0QRk4huGqW8qZ7Ayk9BI0ppTuYCJCDVpvaYC0dJwZpD1vVo
+	LZJLu3mxXLczj19RbML/NJc0HLqoOu0cEVCw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vJqyN-002yRC-0c;
-	Fri, 14 Nov 2025 18:24:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Nov 2025 18:24:07 +0800
-Date: Fri, 14 Nov 2025 18:24:07 +0800
+	id 1vJqyj-002yUU-0n;
+	Fri, 14 Nov 2025 18:24:30 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Nov 2025 18:24:29 +0800
+Date: Fri, 14 Nov 2025 18:24:29 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>, Nick Terrell <terrelln@fb.com>,
-	David Sterba <dsterba@suse.com>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] crypto: zstd - Annotate struct zstd_ctx with __counted_by
-Message-ID: <aRcDR1OdNL293aem@gondor.apana.org.au>
-References: <20251108120740.149799-2-thorsten.blum@linux.dev>
+To: Zilin Guan <zilin@seu.edu.cn>
+Cc: kristen.c.accardi@intel.com, vinicius.gomes@intel.com,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
+Subject: Re: [PATCH] crypto: iaa - Fix incorrect return value in save_iaa_wq()
+Message-ID: <aRcDXZ3dgtGvofYe@gondor.apana.org.au>
+References: <20251109145648.3678596-1-zilin@seu.edu.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,21 +47,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251108120740.149799-2-thorsten.blum@linux.dev>
+In-Reply-To: <20251109145648.3678596-1-zilin@seu.edu.cn>
 
-On Sat, Nov 08, 2025 at 01:07:40PM +0100, Thorsten Blum wrote:
-> Add the __counted_by() compiler attribute to the flexible array member
-> 'wksp' to improve access bounds-checking via CONFIG_UBSAN_BOUNDS and
-> CONFIG_FORTIFY_SOURCE.
+On Sun, Nov 09, 2025 at 02:56:48PM +0000, Zilin Guan wrote:
+> The save_iaa_wq() function unconditionally returns 0, even when an error
+> is encountered. This prevents the error code from being propagated to the
+> caller.
 > 
-> Use struct_size(), which provides additional compile-time checks for
-> structures with flexible array members (e.g., __must_be_array()), for
-> the allocation size for a new 'zstd_ctx' while we're at it.
+> Fix this by returning the 'ret' variable, which holds the actual status
+> of the operations within the function.
 > 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> Fixes: ea7a5cbb43696 ("crypto: iaa - Add Intel IAA Compression Accelerator crypto driver core")
+> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
 > ---
->  crypto/zstd.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  drivers/crypto/intel/iaa/iaa_crypto_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
