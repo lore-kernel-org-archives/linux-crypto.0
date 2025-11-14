@@ -1,63 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66D931C595;
-	Fri, 14 Nov 2025 18:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29E42D6E54;
+	Fri, 14 Nov 2025 18:27:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763144436; cv=none; b=Q33MdCF9hnsWTuW/gTN7vU8iTxrZ/KMNks2jx+2LPj4tH/f01krJF+emEP7oHXy1l/wM1cpjyaPYpKVl4qgggEcJWGc7UnXX8TXlYnOrJaTKtbIdCpMsAL1r9+iQLjycFgNM3LjhJ9xpz4vqYAWAI8/3pANCu13OzIfBGuK1cJU=
+	t=1763144836; cv=none; b=Bzk9954IiKWHV3GymFpLEixz+2pQRFb5Dhx4GpKGvVOHjN/xADf/H5r7DD3yvxuhtKRfp+anQXQJHezh0Z+0oInCVPpwahoXh+vGtgFcVRcqM8AkA4xDe/iPos5hUQbEWsic6PXUpzMXFM7rzcB/YmWDav97edMyoHYSO01SFm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763144436; c=relaxed/simple;
-	bh=PziOzj8UlCOhp8w/YGnSDZ7jYPbZA60+DziSrmjJAfE=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=o4ilLuvisBF9Tl5QdGLIjrtgEsyxqgkG7dI1anQRfWIESN3i07nguFDx4CwKE5ZNfOGJ/sf1n/j31RwnshKEiETBeyBYfmtcpCfin8tPX2ZmybMUlA97D7iWiqyQgPhpdwfitaUiOfU95pqOqwZsm7aRPh7yH0BrzL7Fmn7uPak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gfNI+kfc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763144836; c=relaxed/simple;
+	bh=LhMJfjH+jFkwHCO7adoRqeMeXRoBuV6Gs/enLTwrrO0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iyzWQ3sftfuAvJJ0xyevHybfxVJjN8KXf/6b5/3l7GBoS4/Ib+Y+lygsRzX75CBuuze5VY7zs2db1GrIMZi+E1EWOd1Pd627AMXFzb2TPRYz3GLdYHv310bIdANELvS8hYkIVxzvD8HFiHQN2y5rcD0YMrH8IpR/+BNM6z/GL4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HTx7EeJW; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gfNI+kfc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6D81C4CEF5;
-	Fri, 14 Nov 2025 18:20:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763144436;
-	bh=PziOzj8UlCOhp8w/YGnSDZ7jYPbZA60+DziSrmjJAfE=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=gfNI+kfcvkCCR3z0WXBvN4NSVyvrZPLYVDzT5ezHkWgecUMjzsrV6WlbHHeclpzzw
-	 Py28YFjVCS55dTBsjcK4YOfCYgJqLquT+DuQC5vdSXcd0j5EEUn88Z5gFEBnuBzpJB
-	 R8oP577TaTghgdUZ4Lo9FKEuoD2WZJeuvVF/Tyx4W+npXFcSee7UJLkdj1fMwaSd2D
-	 N/KuqMUWc96gGN/9cdxSenSsPdfsWfVe0jZ2sR0ssdrsQTLjmLnhtKc0MS0/pjMfyD
-	 1diOJkvg9sTnMLDUF1cXPIySL+zBy1Up7NnuN39Xwsm+CrR+Hx3714f8mulxeCKg1G
-	 TElVaTHyhv0Kg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7104A3A78A5D;
-	Fri, 14 Nov 2025 18:20:06 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.18
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <aRcBNZJDTLFTTHxN@gondor.apana.org.au>
-References: <aRcBNZJDTLFTTHxN@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <aRcBNZJDTLFTTHxN@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.18-p5
-X-PR-Tracked-Commit-Id: 59b0afd01b2ce353ab422ea9c8375b03db313a21
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b86caedd0b2c6e86c3fbaf5a04e5f9161b5688fd
-Message-Id: <176314440512.1790606.9345148328376095634.pr-tracker-bot@kernel.org>
-Date: Fri, 14 Nov 2025 18:20:05 +0000
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HTx7EeJW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763144835; x=1794680835;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LhMJfjH+jFkwHCO7adoRqeMeXRoBuV6Gs/enLTwrrO0=;
+  b=HTx7EeJWm+bzM4zI/UekuHaI3O46OWJ3MbCeC5DyFK0Jgo7j3Bq36ToH
+   W9CD6DIprSVoufBNWqT84v5r6UTcs7op+dbpsQKEoElbpeJmOLcOcrXsR
+   2xJqIQIMUFS85UAxYFzYhVYWwqL6EjyWZd7KjdFtZ2lLhSf0Zfa9FpWEG
+   /v4uIycz3vgb1E8jGx5wDMefV4Z/w+eAtqyRxqzOJtuZk8MJRmg9WlT0f
+   ZO9QXEx1Fh4ZfSukvKVf1Y44hPLkT9vSPhKEd16XPEittE7RspkxcqZ/T
+   ceGL61pQ5jnWrxIfO+eWME6n90whXeNVbRtti6M6ryevoM4qMvoKd46I2
+   A==;
+X-CSE-ConnectionGUID: nwltIIjQTtGr/8AeICB5aw==
+X-CSE-MsgGUID: /zluCSYARDChQ75fi7Wf6A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11613"; a="68868203"
+X-IronPort-AV: E=Sophos;i="6.19,305,1754982000"; 
+   d="scan'208";a="68868203"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 10:27:15 -0800
+X-CSE-ConnectionGUID: OBTeTqOiSsShmCpZiTM8nw==
+X-CSE-MsgGUID: I2wcZj5PSxemTEuaC0dytA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,305,1754982000"; 
+   d="scan'208";a="194833571"
+Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
+  by fmviesa004.fm.intel.com with ESMTP; 14 Nov 2025 10:27:14 -0800
+From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+To: linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	clabbe@baylibre.com,
+	ardb@kernel.org,
+	ebiggers@google.com,
+	surenb@google.com,
+	kristen.c.accardi@intel.com,
+	vinicius.gomes@intel.com
+Cc: wajdi.k.feghali@intel.com,
+	vinodh.gopal@intel.com,
+	kanchana.p.sridhar@intel.com
+Subject: [PATCH] crypto: iaa - Request to add Kanchana P Sridhar to Maintainers.
+Date: Fri, 14 Nov 2025 10:27:13 -0800
+Message-Id: <20251114182713.32485-1-kanchana.p.sridhar@intel.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Fri, 14 Nov 2025 18:15:17 +0800:
+As suggested by Herbert, I would like to request to be added as a
+Maintainer for the iaa_crypto driver.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.18-p5
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b86caedd0b2c6e86c3fbaf5a04e5f9161b5688fd
-
-Thank you!
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c1a1732df7b1..b0ccaa3a67d4 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -12561,6 +12561,7 @@ F:	drivers/dma/ioat*
+ INTEL IAA CRYPTO DRIVER
+ M:	Kristen Accardi <kristen.c.accardi@intel.com>
+ M:	Vinicius Costa Gomes <vinicius.gomes@intel.com>
++M:	Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Supported
+ F:	Documentation/driver-api/crypto/iaa/iaa-crypto.rst
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.27.0
+
