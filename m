@@ -1,736 +1,300 @@
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841B61C28E
-	for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2025 00:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763081178; cv=none; b=hw1hH0/I1M2M2uq27Jj6ReP3JioC37IuPu6YInmEX9S9VdOwV1z/crS5N6IbD5+Oj3i7JhUkjevmm40AaH+qRfZ9LChcYDvlTnQLrwRDf80ZBS388VFzwzuFaCsI7+p79Ci5MyCDH1eJmO4L+DvhXCazl3Cz4XAOWSl6UJcinq0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763081178; c=relaxed/simple;
-	bh=ey27USmbIAxcbkxEg4s37ji5e1JRNnE70fXh7408myY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pDsRpvBgvo8wGVXqMfNnwDCCDBjLqorG8GPW82SUfpdNUDp5OvL4OO/47ambNUNBdWIYn4t/duv/dm+hlIaik9kP97vzUiKmkzE2pdHmlrk5OE32pBc5b0Kvi8IxphxzRd9ZqkTZjdofCkZHhQ0CTo4xSgvxcTbhcBbnUaJ1cuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p9VZ+sWm; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE53C2550AF;
+	Fri, 14 Nov 2025 01:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763085092; cv=fail; b=pS141H0xvy/zTPDfWKTCJXvvrS96JmpJJCCRcZTmfcpShux3V8mNlWTun8ARgdEByUwr+afBcOl60vTHMYI0Kj01TCrJ+g9CUPCd05UgDj5KeZmxwIDpC5rd/1sX3zvetEEMFpyM6ngxD2r9COVF81r/KAZSvP0h1hlRi+iBd14=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763085092; c=relaxed/simple;
+	bh=MsCeXZ7JvDrHnF6/HYLiTXv8TdE4/viALgA+87HMRak=;
+	h=From:Date:To:CC:Message-ID:In-Reply-To:References:Subject:
+	 Content-Type:MIME-Version; b=eK4d89U9TfDBzJZ775ZgoQdRqAfFpAWrcrejhifB0/XQoUlI76rF7AdKXA+xosRHpySZRSjw3T/z7r5VialaMwx9R83TkYV6LL7KCtj/LSZQhXZIILMco3FqIn8jprtZw4AG22QwCOa9ue9OEky6S5FOQMvXxM2004IVXxvYjxI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WguQTuCZ; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="p9VZ+sWm"
-Date: Fri, 14 Nov 2025 00:46:01 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763081171;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X/iGyGoK6DUAfKx0bXTPWyfeMNYwedRqSwZFE0W+ZJ8=;
-	b=p9VZ+sWm9oGYqVxQAqnF6D1oX7c4m2zFMYaGSUefHHgKszKmLUqdRLehx5rb6HR5sy8FAS
-	d2NXLuD1NEqD+q4IytLYAvcNKUdNw/QDez71n/RdDUINd3eIjRp/oi9tbK/RXRXzRE8KYH
-	r3KG12OhyZqMLP53kjHAkj1ZAW2jWBY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org" <hannes@cmpxchg.org>, 
-	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
-	"sj@kernel.org" <sj@kernel.org>, "kasong@tencent.com" <kasong@tencent.com>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com" <clabbe@baylibre.com>, 
-	"ardb@kernel.org" <ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
-	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>, "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, 
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
- compress batching of large folios.
-Message-ID: <vc65dxjoledwtojbcdgyxh2xt3hhlqrzgxcnbgufji7sgnhkus@fqkcflhwbags>
-References: <20251104091235.8793-1-kanchana.p.sridhar@intel.com>
- <20251104091235.8793-23-kanchana.p.sridhar@intel.com>
- <q54bjetgzmwbsqpgbuuovdmcwxjwmtowwgsv7p3ykbodhxpvc7@6mqmz6ji4jja>
- <SJ2PR11MB8472011B61F644D4662FE980C9CDA@SJ2PR11MB8472.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WguQTuCZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763085091; x=1794621091;
+  h=from:date:to:cc:message-id:in-reply-to:references:
+   subject:content-transfer-encoding:mime-version;
+  bh=MsCeXZ7JvDrHnF6/HYLiTXv8TdE4/viALgA+87HMRak=;
+  b=WguQTuCZzSkGjsbpiKdcg1BkY9gEOOCuoRG3VcbsK7AwJKZUC0wRsmUl
+   HtQf3C1tmz2B1uL8RtLC9B0zvOZGn4mJ8g8T8E77gn/sVIOVOoFCFFsSU
+   a1gqtr+X8QURYy6Y6WuYLSiNEWAtHFbzUZScETaUSejqX7I79thg5wLTy
+   HmtTDrb6CE79lgW7hB2lDMZUKa6HJ8C3uMG4WWHDJyFKuRq0Y2zc5s9ZQ
+   dQ2VPXgz3V1nWwT9nzcbWVEgJpWyX8e21a/RoQhkSssk6LCyXCUcIeip6
+   FQq95oJT8Dbqm+T9kifXwowsMjvDISmqZ7M49eanwceHDCnlzkPHzl5hU
+   A==;
+X-CSE-ConnectionGUID: mXG44eYDQkSRL5Im95OKfQ==
+X-CSE-MsgGUID: mdIij8ljSf+HS/A7zEv/Zw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11612"; a="64382331"
+X-IronPort-AV: E=Sophos;i="6.19,303,1754982000"; 
+   d="scan'208";a="64382331"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2025 17:51:30 -0800
+X-CSE-ConnectionGUID: UtCzHglOQr+J5WfimHoPbg==
+X-CSE-MsgGUID: 7o4S7PPtRFq3cU7/2bvBeg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,303,1754982000"; 
+   d="scan'208";a="190426278"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2025 17:51:29 -0800
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 13 Nov 2025 17:51:28 -0800
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Thu, 13 Nov 2025 17:51:28 -0800
+Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.56) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 13 Nov 2025 17:51:28 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=migQSjfyIOmYVN8VIVP6AaTSkNdz4yUfxTMh3KyFk/oFvW677aKeXh6mpl4GgBjUVvWfrJ3VwCS4GwV+1RLA3DQxQVU7h5tTA/JbYvvR1HQWgA1vVtsKNLpi9O1dUw9v0Pu3Bl+FqlVdzFq42pYYh4ERQ8TBb3QMUb4Kd9xOxUni1C/4mGIarCAiQg/zgZOs/NNEACQ9JKapdaj6+TzBDgpfypF9xpJyFO9QjulDmHRh+9gIX/G+ZRm89iFT/hjDLX2CmkYbuttA3O97lVRuGrel0o5f+6XwGtuvMYBUIj8vNjOyw63D1pe3xB+ix7yXawuujSoHLuSQdOn+KNMrsQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rPnbclblpYKhvZxGVR4NqLFDRj4j08OrDud4LhA3L1I=;
+ b=KcOHPcoEUn9j+Rjvp3vNlTRTmz/T92DQzjFQ/hArqF4aATAfzXfIrIgyEMB3WEINHLbAc8MtGPvhouwRuhZpl54Vrmcp96tH5OKPXZCUPT75+IQAvPfSjYAaAhNCZZklw4cEsJdzIvp1E8O1Lz388bgwKlw8+yFYH43lSXQdzQVwgq5SKBWMNWVlxa2h3OQ/7Ae3YRTHTa4i2+ZIzoWeUKmHSB2TYzEh77XYS/p4xTTPnP8R8TALu4WzwP7dxoDExUTcBqIxR7nE4P8Wt8n51BI5wFdiendnSZ9T8pKH5RS/BNMJc5LXngfWeS0CSAJ5zjyUWvgWRu7QtEtA2WLEIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by SA1PR11MB8319.namprd11.prod.outlook.com (2603:10b6:806:38c::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.17; Fri, 14 Nov
+ 2025 01:51:18 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::1ff:1e09:994b:21ff]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::1ff:1e09:994b:21ff%4]) with mapi id 15.20.9320.013; Fri, 14 Nov 2025
+ 01:51:18 +0000
+From: <dan.j.williams@intel.com>
+Date: Thu, 13 Nov 2025 17:51:16 -0800
+To: Alexey Kardashevskiy <aik@amd.com>, <linux-kernel@vger.kernel.org>
+CC: <linux-crypto@vger.kernel.org>, <linux-pci@vger.kernel.org>, Tom Lendacky
+	<thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>, "Suravee
+ Suthikulpanit" <suravee.suthikulpanit@amd.com>, Will Deacon
+	<will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Dan Williams
+	<dan.j.williams@intel.com>, Bjorn Helgaas <bhelgaas@google.com>, Eric Biggers
+	<ebiggers@google.com>, Brijesh Singh <brijesh.singh@amd.com>, Gary R Hook
+	<gary.hook@amd.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, Kim Phillips
+	<kim.phillips@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, Jason Gunthorpe
+	<jgg@ziepe.ca>, "Michael Roth" <michael.roth@amd.com>, Jonathan Cameron
+	<jonathan.cameron@huawei.com>, Xu Yilun <yilun.xu@linux.intel.com>, Gao
+ Shiyuan <gaoshiyuan@baidu.com>, "Sean Christopherson" <seanjc@google.com>,
+	Nikunj A Dadhania <nikunj@amd.com>, Dionna Glaze <dionnaglaze@google.com>,
+	<iommu@lists.linux.dev>, <linux-coco@lists.linux.dev>, Alexey Kardashevskiy
+	<aik@amd.com>
+Message-ID: <69168b145da7f_10154100fd@dwillia2-mobl4.notmuch>
+In-Reply-To: <20251111063819.4098701-2-aik@amd.com>
+References: <20251111063819.4098701-1-aik@amd.com>
+ <20251111063819.4098701-2-aik@amd.com>
+Subject: Re: [PATCH kernel 1/6] PCI/TSM: Add secure SPDM DOE mailbox
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY3PR05CA0039.namprd05.prod.outlook.com
+ (2603:10b6:a03:39b::14) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SJ2PR11MB8472011B61F644D4662FE980C9CDA@SJ2PR11MB8472.namprd11.prod.outlook.com>
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|SA1PR11MB8319:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2f20e8aa-7278-4b8c-3f00-08de23204d6d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?c3FsaGc3eER1Q2gvb1ZrK212UlB3TXkxR3dvVkZLUEhqV2F5WDUrcnFnV0pG?=
+ =?utf-8?B?eHZ5ZnZjTXdjb1hZSGkxZnFDRUtEZENwcHA4VlVlMHNBRVY0VHhNRGhMeUpu?=
+ =?utf-8?B?VmtCc0ZZblg4QUtrMVg3MVRZd1M4dWVIR1FpVUpLL21oeHpFT0FGZGQ0NnYy?=
+ =?utf-8?B?TkNpSnAwOFIxTVFCSkd6NGVtSDgrTzBnVnlQdWZHTE1JUU1janRWREhNRjMx?=
+ =?utf-8?B?K1Y3V2o1ZFBvMXBVUEdSbFN4OXo2SXg0dFBLQWY1ejZ5QVN6cWtjQ3NVUDlh?=
+ =?utf-8?B?b25WYlFEZG8yb0ZlbkNucXNmeG91VUQvYi9INHB5YkJuWE0rOHFyZG5wK2hR?=
+ =?utf-8?B?SlYwYjRIamZoZ3JPcUtBYWFwcFVyTDhCUWFuYWI5RXA3SDZhRU1xOHNKRyta?=
+ =?utf-8?B?MmtjYTQwdVRiOWVGclJQcFVSZmFxUzBKZjlwKzkxeWwyZmlLbnhIR01IWUVo?=
+ =?utf-8?B?ZjVWTzh1Q0QyNmNOY0NKaVZKT0R2Q3BIRmNucU9oNmw4Q0NrMFBEaGY1RlRG?=
+ =?utf-8?B?ajZWZ2hnWUxzVk1JYVBGTjMrUkxjWjBRczVDYitoMnJHc2RXbStpWlA4T2du?=
+ =?utf-8?B?UFJXTncrVU1rVFFBQVUycUJ4R1NWbUhZRXZYQlBlck0xUEpEdDZoWnZSV0ta?=
+ =?utf-8?B?Y3NKa2lhQjF4Y3R6RUQrM3lmS0pZZFlIRnhiekI2ZEhrdENUYjhVME13ME8z?=
+ =?utf-8?B?SUpCRFRnMzNzMFg5OVk1cGgwdTJaOVJrZUxOZWhlc3ppa0pSbVVwYWVQVU9Q?=
+ =?utf-8?B?aDN4ZCt4VjNUZVpXS0ZTY3JlMkdRVmlOQnhPb1hSZXN1Mk5HQ0Zkb0ZhSExK?=
+ =?utf-8?B?ejRFN3BmeEpnV0lWakRvU1U3Y2FqTjc5M1psZUN4V2xFdy9uSlc5MXJLM3dX?=
+ =?utf-8?B?ZUs0ZXN0cXdLb0tObEZCdDFmd0VBWTZ0TkRGbUVUZ2VuUFdDZG5MN1NibHNr?=
+ =?utf-8?B?cmRnNTBuMkZ4VTM4YmRqZEFjS1ZkTHVhZ2RXTkNJR0Q5Q3hBUmhJL2ZiYURX?=
+ =?utf-8?B?dy9zOHdMVk5md0J4dllUU1J1aTE2dDFiSy9Qa3F4aWFLUUdrMkF4NFZaV3VH?=
+ =?utf-8?B?aHU1L3VpVEF2VXBaRkJQdkdjemNla1B6UUljdGhuWHYvQk02L0ZNSjNIUytN?=
+ =?utf-8?B?UGdtMG1VeGoxclkxLzhTbytQVzFiLzRhRFVPdklOUkhSUjc3SVgvWVRiMXBq?=
+ =?utf-8?B?T1hFL0QwQnVVTlQvOHQvUWdpL2hscVovVWg5L1NtVE94d3JVQTJjTG42NGhP?=
+ =?utf-8?B?enphQk5qakpzVkMzK0FtUU5VTkNTS0hlUzdzMkZhZGNjNEpkOUVjZVM0N2dx?=
+ =?utf-8?B?QXRoSHUyRVhZK2M5bmRWWjVUNFVMR1VKY3pKMUxMeklmUk1zWU1wWE5yTDNX?=
+ =?utf-8?B?L2VpT1V4dDBLZGJkQ0tycmdscTFBbDN6TTd5RGg5L1ZPc2YrNW51eTN0cUdq?=
+ =?utf-8?B?N242Tms4NGx4TkpqNnNqSEJjSVdCN2pIQ1BmR3plNkNhRjBDZTRxS2dqQkxW?=
+ =?utf-8?B?QUpOZkdpV0ZQTnU0VGgzaE9HRXlkQUpqaDhoajlKNnJtVVBZSmJGeXE5T3lp?=
+ =?utf-8?B?dU1Ka1prSUFDR0FlVFVpdnVZWnF3dnFQa2sxWWp1WDU2TXZEVXhUMjROOHhy?=
+ =?utf-8?B?bnpManVDOENRUDFlQzJWM280amNOZENDZzg2TWJILzdEVGsxTUdNOUJZVlpp?=
+ =?utf-8?B?SVhpU0ZiWmxVSFFlalArdDhGam1pQ0hSaVVrTnBBYkFrMU5SWHBJRi9kWnJk?=
+ =?utf-8?B?RThhc0h4UmxFTmN3TFF1YmhwNko2SkNqOVZ1QVovNkxNY1NPQ0VpUkRRTEds?=
+ =?utf-8?B?Y2Ira3dXaXRMZDN4TEsyRTNNRG9YSnJLRkZncE43U3dCM2FCRjgvaFFGcWQ4?=
+ =?utf-8?B?M3RiQTVZRmtRdWllZVhCak1vY3YzNFNBeEdzWFhGcXZ0Wmo0d0s4SSs0WXAr?=
+ =?utf-8?Q?7uQhtyxQCMa/3tsfbwCsyv82eaPvJdKM?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QlBKdHZoSzZuazRZdlpVRmRuV0VPWURZVC9qa0FqTEFTckd1S1hMWHVxdnF3?=
+ =?utf-8?B?OC92KzAzN2dFUjVONnUzNUFNNUJISEU0SlZOYWlqUE1xT3FjWWFNek1zUzBo?=
+ =?utf-8?B?VkxtY3BsUEo1N0lXUjhHdnVkOXhYeHBRbDhNYitqTjdNUTlBemMxR3Z2b3Rp?=
+ =?utf-8?B?ZUl0M0hVN2J2aG1JWHZxS2tJa3dwbTQ0c3o5R2ZjejhOam1wT0luM1c2NFVJ?=
+ =?utf-8?B?OUFxNGFzTzlxRUtJK2lvSUdFRElYbWgydjVVU3BYSWpObSsxUFU3WXA0Wjg3?=
+ =?utf-8?B?TVVWbllCRWRVd09zSEIrbmVQbVhpOXdGcWRkOVJxM3ZRbDlPSmUxY0xSTENa?=
+ =?utf-8?B?Q2NsRTN0M1hHYkZkeEJwR0JMMWk2RFdFcUdPV3ZyQmkxR0ZzNWl2Z3FkR3Nz?=
+ =?utf-8?B?Yi9GUm9QdExXUnJDSm50Z0JnU2JwZUtPb2UzVDdGZm45OFZUVkpqRDI0Q1lH?=
+ =?utf-8?B?aWdvOWszM1RNUHpFaGtENVpYZ05uREpwbXQ0ZjV1WlRGZjIza3VxbDJLVWo2?=
+ =?utf-8?B?ZjBobGVYbVcwbVJyaFpZSHRoWmlDdjRXY1RzNWNSRHZvRVVleXpycGU5R0lT?=
+ =?utf-8?B?Tzk4dmFWVUR2eFl3L3daaHdPcHNQVlFzcnVWSXpzL2tWRXl3TDIvaHhNTGpw?=
+ =?utf-8?B?bWlaSHIxYjROKzMxQms5MWZZQndWMGw3Unh6Q2U1ci9MU29YdFlPbnpNelBn?=
+ =?utf-8?B?T3BDWTRYWFJBUE85SGcyYm1oT0hNbzBjSzFQN2RwajlhN3hXTFdyeGFHV21B?=
+ =?utf-8?B?Qkp1TDFQMDZJNmlJeWNPOEpkZXJOWXg2WmpWbVhkYU1FR0Nnbmwra0pxYmlI?=
+ =?utf-8?B?N3FVRmUzM05jZzR6RnNSVVdiYjcrUi90NVBnaldJNG9aRkZkSjhQWGJhT1NJ?=
+ =?utf-8?B?K0Fxd2ZWaE5LSlp6ZDNqd0lFb0MvMjlWSDlvTFZTalpnWVlpTlhxWDZheG1k?=
+ =?utf-8?B?YXRDQmZ1RjJPdzBkMm9YcjZGRFJLeERrUnVlSHA0NGNiaGJydGlYNFR3T1JB?=
+ =?utf-8?B?ZTVBQmxSUmFQMXJya3ZsUWUreE93UVF0TEt2OHY1QVRxbXVqdndsSnpLQU1D?=
+ =?utf-8?B?OVJCbjdzelZiSWlUdEQxQXlpZDYycitWUldiTmtUSjU1dHBEVjB0Z05Fb0pL?=
+ =?utf-8?B?TEJKTnNRZjArallXVC9ac25CUlpnMFZ5ZVV3WExlYjl0Qmpqak1od0pnNTRx?=
+ =?utf-8?B?bjJ1VlpXbHpzcTIyeU5oLzJIUkEzUzVscUozeDNHUEE1S3VRTllRUmplT2la?=
+ =?utf-8?B?NThJOCtiUTZudkdraFJSNTV0UnNTV2RVU1Y0c1d6TDN6MlArbW1URjFCYXU2?=
+ =?utf-8?B?blpIbkFNM29UamowTFpVODNYZEs3cHFVRU5VeUlMalVTMyt6YmVIR2hRTVFh?=
+ =?utf-8?B?YkpEWG5jcExxREhiVnhnc2pIWDVSUWRSWTdKREtMc0dUZUFFeWVyaUtIRGlj?=
+ =?utf-8?B?Y1N3elhGckF5Rk5PU0hDS2trVTBYSnNvTlJJaWd6d1dFQTMwYlErTUdUVFda?=
+ =?utf-8?B?TVRBMmJYNnRQQlVsL1dYSkpTdW1pN0NkMEtBdEZXYnkvWVhJY2VpMnJlQUt1?=
+ =?utf-8?B?TTRhZXdmWWRtMit3QkIyMTR4QXlXS3JTV1FQYWVmU2FoYUJseWEzbmlyNXE5?=
+ =?utf-8?B?NWFiejZQMndUSFFTV01SWEFvZkF4ZjQ1Q3JkUUpNZG4xUVdBYUliSWM4SU9q?=
+ =?utf-8?B?NjdyLy8yVzF6bGZLcXhQekpvUjgzTEd0bUlWRDJMK0NKR0NGSFRvMWUrV09X?=
+ =?utf-8?B?cXJpOVVJTnJpUFZ2cHNFODFmekVXekczcnE3RHVwbWtKditZTlpCOFRuZVQv?=
+ =?utf-8?B?Rks3NU1qUGdpNEtqNFZZZ2xZMHRtNGZIelBjRlMxRWI0a01nR2gxN3NRMkd6?=
+ =?utf-8?B?QkR1c085c3JRaVU2eG5iaExnQTRYQ2RoSFM1dEtkWW5xOTBmNVhsNDJEajhR?=
+ =?utf-8?B?bFB1b0tXRm1BNnU0MEozRlpTbUllUTVjc1luRVdBMVpjeE1xd3RSQTl5K1VD?=
+ =?utf-8?B?UGg1T3FaZFE1SnBFbS80enIyYlJLa0w5WG5GbUg5MS81T0wzUlZIeVdnOExk?=
+ =?utf-8?B?anVOMEFCa0tqS3RlQ1poZ3NhVHhxOVZ4RS9qampBYmEyeGRYNmZ2NmtqQ2Y0?=
+ =?utf-8?B?U09pYVJpUkNBS3JoRzYvdXkwYjZIN3ZmbDBBckpKajJNcGxhUlVPYXNsQ1dT?=
+ =?utf-8?B?ZGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f20e8aa-7278-4b8c-3f00-08de23204d6d
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2025 01:51:18.1217
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oBWojHNt5kuOO6vAuufI8erWrDxhofpfUhWdZRFoNzXdRsG3ld8C/MNUthgKcyq/eSgDE3Ag13jVMRMjVxosJb9/Y9fmOu5es5yR5Phs7hQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8319
+X-OriginatorOrg: intel.com
 
-On Thu, Nov 13, 2025 at 11:55:10PM +0000, Sridhar, Kanchana P wrote:
+Alexey Kardashevskiy wrote:
+> The IDE key programming happens via Secure SPDM channel, initialise it
+> at the PF0 probing.
 > 
-> > -----Original Message-----
-> > From: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > Sent: Thursday, November 13, 2025 1:35 PM
-> > To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
-> > Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> > hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
-> > usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
-> > ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
-> > senozhatsky@chromium.org; sj@kernel.org; kasong@tencent.com; linux-
-> > crypto@vger.kernel.org; herbert@gondor.apana.org.au;
-> > davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
-> > ebiggers@google.com; surenb@google.com; Accardi, Kristen C
-> > <kristen.c.accardi@intel.com>; Gomes, Vinicius <vinicius.gomes@intel.com>;
-> > Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
-> > <vinodh.gopal@intel.com>
-> > Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
-> > compress batching of large folios.
-> > 
-> > On Tue, Nov 04, 2025 at 01:12:35AM -0800, Kanchana P Sridhar wrote:
-> > > This patch introduces a new unified implementation of zswap_compress()
-> > > for compressors that do and do not support batching. This eliminates
-> > > code duplication and facilitates code maintainability with the
-> > > introduction of compress batching.
-> > >
-> > > The vectorized implementation of calling the earlier zswap_compress()
-> > > sequentially, one page at a time in zswap_store_pages(), is replaced
-> > > with this new version of zswap_compress() that accepts multiple pages to
-> > > compress as a batch.
-> > >
-> > > If the compressor does not support batching, each page in the batch is
-> > > compressed and stored sequentially. If the compressor supports batching,
-> > > for e.g., 'deflate-iaa', the Intel IAA hardware accelerator, the batch
-> > > is compressed in parallel in hardware. If the batch is compressed
-> > > without errors, the compressed buffers are then stored in zsmalloc. In
-> > > case of compression errors, the current behavior is preserved for the
-> > > batching zswap_compress(): if the folio's memcg is writeback enabled,
-> > > pages with compression errors are store uncompressed in zsmalloc; if
-> > > not, we return an error for the folio in zswap_store().
-> > >
-> > > As per Herbert's suggestion in [1] for batching to be based on SG lists
-> > > to interface with the crypto API, a "struct sg_table *sg_outputs" is
-> > > added to the per-CPU acomp_ctx. In zswap_cpu_comp_prepare(), memory
-> > is
-> > > allocated for @pool->compr_batch_size scatterlists in
-> > > @acomp_ctx->sg_outputs. The per-CPU @acomp_ctx->buffers' addresses
-> > are
-> > > statically mapped to the respective SG lists. The existing non-NUMA
-> > > sg_alloc_table() was found to give better performance than a NUMA-aware
-> > > allocation function, hence is used in this patch.
-> > >
-> > > Batching compressors should initialize the output SG lengths to
-> > > PAGE_SIZE as part of the internal compress batching setup, to avoid
-> > > having to do multiple traversals over the @acomp_ctx->sg_outputs->sgl.
-> > > This is exactly how batching is implemented in the iaa_crypto driver's
-> > > compress batching procedure, iaa_comp_acompress_batch().
-> > >
-> > > The batched zswap_compress() implementation is generalized as much as
-> > > possible for non-batching and batching compressors, so that the
-> > > subsequent incompressible page handling, zs_pool writes, and error
-> > > handling code is seamless for both, without the use of conditionals to
-> > > switch to specialized code for either.
-> > >
-> > > The new batching implementation of zswap_compress() is called with a
-> > > batch of @nr_pages sent from zswap_store() to zswap_store_pages().
-> > > zswap_compress() steps through the batch in increments of the
-> > > compressor's batch-size, sets up the acomp_ctx->req's src/dst SG lists
-> > > to contain the folio pages and output buffers, before calling
-> > > crypto_acomp_compress().
-> > >
-> > > Some important requirements of this batching architecture for batching
-> > > compressors:
-> > >
-> > >   1) The output SG lengths for each sg in the acomp_req->dst should be
-> > >      intialized to PAGE_SIZE as part of other batch setup in the batch
-> > >      compression function. zswap will not take care of this in the
-> > >      interest of avoiding repetitive traversals of the
-> > >      @acomp_ctx->sg_outputs->sgl so as to not lose the benefits of
-> > >      batching.
-> > >
-> > >   2) In case of a compression error for any page in the batch, the
-> > >      batching compressor should set the corresponding @sg->length to a
-> > >      negative error number, as suggested by Herbert. Otherwise, the
-> > >      @sg->length will contain the compressed output length.
-> > >
-> > >   3) Batching compressors should set acomp_req->dlen to
-> > >      acomp_req->dst->length, i.e., the sg->length of the first SG in
-> > >      acomp_req->dst.
-> > >
-> > > Another important change this patch makes is with the acomp_ctx mutex
-> > > locking in zswap_compress(). Earlier, the mutex was held per page's
-> > > compression. With the new code, [un]locking the mutex per page caused
-> > > regressions for software compressors when testing with 30 usemem
-> > > processes, and also kernel compilation with 'allmod' config. The
-> > > regressions were more eggregious when PMD folios were stored. The
-> > > implementation in this commit locks/unlocks the mutex once per batch,
-> > > that resolves the regression.
-> > >
-> > > Architectural considerations for the zswap batching framework:
-> > >
-> > ==============================================================
-> > > We have designed the zswap batching framework to be
-> > > hardware-agnostic. It has no dependencies on Intel-specific features and
-> > > can be leveraged by any hardware accelerator or software-based
-> > > compressor. In other words, the framework is open and inclusive by
-> > > design.
-> > >
-> > > Other ongoing work that can use batching:
-> > > =========================================
-> > > This patch-series demonstrates the performance benefits of compress
-> > > batching when used in zswap_store() of large folios. shrink_folio_list()
-> > > "reclaim batching" of any-order folios is the major next work that uses
-> > > the zswap compress batching framework: our testing of kernel_compilation
-> > > with writeback and the zswap shrinker indicates 10X fewer pages get
-> > > written back when we reclaim 32 folios as a batch, as compared to one
-> > > folio at a time: this is with deflate-iaa and with zstd. We expect to
-> > > submit a patch-series with this data and the resulting performance
-> > > improvements shortly. Reclaim batching relieves memory pressure faster
-> > > than reclaiming one folio at a time, hence alleviates the need to scan
-> > > slab memory for writeback.
-> > >
-> > > Nhat has given ideas on using batching with the ongoing kcompressd work,
-> > > as well as beneficially using decompression batching & block IO batching
-> > > to improve zswap writeback efficiency.
-> > >
-> > > Experiments that combine zswap compress batching, reclaim batching,
-> > > swapin_readahead() decompression batching of prefetched pages, and
-> > > writeback batching show that 0 pages are written back with deflate-iaa
-> > > and zstd. For comparison, the baselines for these compressors see
-> > > 200K-800K pages written to disk (kernel compilation 'allmod' config).
-> > >
-> > > To summarize, these are future clients of the batching framework:
-> > >
-> > >    - shrink_folio_list() reclaim batching of multiple folios:
-> > >        Implemented, will submit patch-series.
-> > >    - zswap writeback with decompress batching:
-> > >        Implemented, will submit patch-series.
-> > >    - zram:
-> > >        Implemented, will submit patch-series.
-> > >    - kcompressd:
-> > >        Not yet implemented.
-> > >    - file systems:
-> > >        Not yet implemented.
-> > >    - swapin_readahead() decompression batching of prefetched pages:
-> > >        Implemented, will submit patch-series.
-> > >
-> > > Additionally, any place we have folios that need to be compressed, can
-> > > potentially be parallelized.
-> > >
-> > > Performance data:
-> > > =================
-> > >
-> > > As suggested by Barry, this is the performance data gathered on Intel
-> > > Sapphire Rapids with usemem 30 processes running at 50% memory
-> > pressure
-> > > and kernel_compilation/allmod config run with 2G limit using 32
-> > > threads. To keep comparisons simple, all testing was done without the
-> > > zswap shrinker.
-> > >
-> > >   usemem30 with 64K folios:
-> > >   =========================
-> > >
-> > >      zswap shrinker_enabled = N.
-> > >
-> > >      -----------------------------------------------------------------------
-> > >                      mm-unstable-10-24-2025             v13
-> > >      -----------------------------------------------------------------------
-> > >      zswap compressor          deflate-iaa     deflate-iaa   IAA Batching
-> > >                                                                  vs.
-> > >                                                              IAA Sequential
-> > >      -----------------------------------------------------------------------
-> > >      Total throughput (KB/s)     6,118,675       9,901,216       62%
-> > >      Average throughput (KB/s)     203,955         330,040       62%
-> > >      elapsed time (sec)              98.94           70.90      -28%
-> > >      sys time (sec)               2,379.29        1,686.18      -29%
-> > >      -----------------------------------------------------------------------
-> > >
-> > >      -----------------------------------------------------------------------
-> > >                      mm-unstable-10-24-2025             v13
-> > >      -----------------------------------------------------------------------
-> > >      zswap compressor                 zstd            zstd   v13 zstd
-> > >                                                              improvement
-> > >      -----------------------------------------------------------------------
-> > >      Total throughput (KB/s)     5,983,561       6,003,851      0.3%
-> > >      Average throughput (KB/s)     199,452         200,128      0.3%
-> > >      elapsed time (sec)             100.93           96.62     -4.3%
-> > >      sys time (sec)               2,532.49        2,395.83       -5%
-> > >      -----------------------------------------------------------------------
-> > >
-> > >   usemem30 with 2M folios:
-> > >   ========================
-> > >
-> > >      -----------------------------------------------------------------------
-> > >                      mm-unstable-10-24-2025             v13
-> > >      -----------------------------------------------------------------------
-> > >      zswap compressor          deflate-iaa     deflate-iaa   IAA Batching
-> > >                                                                  vs.
-> > >                                                              IAA Sequential
-> > >      -----------------------------------------------------------------------
-> > >      Total throughput (KB/s)     6,309,635      10,558,225       67%
-> > >      Average throughput (KB/s)     210,321         351,940       67%
-> > >      elapsed time (sec)              88.70           67.84      -24%
-> > >      sys time (sec)               2,059.83        1,581.07      -23%
-> > >      -----------------------------------------------------------------------
-> > >
-> > >      -----------------------------------------------------------------------
-> > >                      mm-unstable-10-24-2025             v13
-> > >      -----------------------------------------------------------------------
-> > >      zswap compressor                 zstd            zstd   v13 zstd
-> > >                                                              improvement
-> > >      -----------------------------------------------------------------------
-> > >      Total throughput (KB/s)     6,562,687       6,567,946      0.1%
-> > >      Average throughput (KB/s)     218,756         218,931      0.1%
-> > >      elapsed time (sec)              94.69           88.79       -6%
-> > >      sys time (sec)               2,253.97        2,083.43       -8%
-> > >      -----------------------------------------------------------------------
-> > >
-> > >     The main takeaway from usemem, a workload that is mostly compression
-> > >     dominated (very few swapins) is that the higher the number of batches,
-> > >     such as with larger folios, the more the benefit of batching cost
-> > >     amortization, as shown by the PMD usemem data. This aligns well
-> > >     with the future direction for batching.
-> > >
-> > > kernel_compilation/allmodconfig, 64K folios:
-> > > ============================================
-> > >
-> > >      --------------------------------------------------------------------------
-> > >                mm-unstable-10-24-2025             v13
-> > >      --------------------------------------------------------------------------
-> > >      zswap compressor    deflate-iaa     deflate-iaa    IAA Batching
-> > >                                                              vs.
-> > >                                                         IAA Sequential
-> > >      --------------------------------------------------------------------------
-> > >      real_sec                 836.64          806.94      -3.5%
-> > >      sys_sec                3,897.57        3,661.83        -6%
-> > >      --------------------------------------------------------------------------
-> > >
-> > >      --------------------------------------------------------------------------
-> > >                mm-unstable-10-24-2025             v13
-> > >      --------------------------------------------------------------------------
-> > >      zswap compressor           zstd            zstd    Improvement
-> > >      --------------------------------------------------------------------------
-> > >      real_sec                 880.62          850.41      -3.4%
-> > >      sys_sec                5,171.90        5,076.51      -1.8%
-> > >      --------------------------------------------------------------------------
-> > >
-> > > kernel_compilation/allmodconfig, PMD folios:
-> > > ============================================
-> > >
-> > >      --------------------------------------------------------------------------
-> > >                mm-unstable-10-24-2025             v13
-> > >      --------------------------------------------------------------------------
-> > >      zswap compressor    deflate-iaa     deflate-iaa    IAA Batching
-> > >                                                              vs.
-> > >                                                         IAA Sequential
-> > >      --------------------------------------------------------------------------
-> > >      real_sec                 818.48          779.67      -4.7%
-> > >      sys_sec                4,226.52        4,245.18       0.4%
-> > >      --------------------------------------------------------------------------
-> > >
-> > >      --------------------------------------------------------------------------
-> > >               mm-unstable-10-24-2025             v13
-> > >      --------------------------------------------------------------------------
-> > >      zswap compressor          zstd             zstd    Improvement
-> > >      --------------------------------------------------------------------------
-> > >      real_sec                888.45           849.54      -4.4%
-> > >      sys_sec               5,866.72         5,847.17      -0.3%
-> > >      --------------------------------------------------------------------------
-> > >
-> > > [1]:
-> > https://lore.kernel.org/all/aJ7Fk6RpNc815Ivd@gondor.apana.org.au/T/#m99
-> > aea2ce3d284e6c5a3253061d97b08c4752a798
-> > >
-> > > Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-> > 
-> > I won't go through the commit log and rewrite for this one too, but
-> > please do so similar to how I did for the previous patches. Do not
-> > describe the code, give a high-level overview of what is happening and
-> > why it's happeneing, as well as very concise performance results.
+> Add the SPDM certificate slot (up to 8 are allowed by SPDM), the platform
+> is expected to select one.
 > 
-> With all due respect, I am not describing the code. zswap compress batching
-> is a major architectural change and I am documenting the changes from the
-> status quo, for other zswap developers. Yes, some of this might involve
-> weaving in repetition of current behavior, again to stress the backward
-> compatibility of main concepts.
-
-As I said, I did not go through the commit log as I did for previous
-ones, which did include unnecessary description of the code. What I
-asked is for you to do similar changes here, if needed, because the
-commit log is too big.
-
-For example, you should remove mentions of ongoing work and future work,
-simply because things change and they may not land. Just briefly
-mentioning that there are future use cases (with maybe an example) is
-sufficient.
-
+> While at this, add a common struct for SPDM request/response as these
+> are going to needed by every platform.
 > 
-> I believe there is not one redundant datapoint when it comes to performance
-> metrics in this summary - please elaborate. Thanks.
-
-I never said they were redundant, I said we should make them more
-concise. For example, the first table can be replaced by stating that
-throughput improves by ~62% and the time is reduced by 28-29% and so on.
-
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+> ---
 > 
-> > 
-> > Do not include things that only make sense in the context of a patch and
-> > won't make sense as part of git histroy.
-> 
-> This makes sense, duly noted and will be addressed.
-> 
-> > 
-> > That being said, I'd like Herbert to review this patch and make sure the
-> > scatterlist and crypto APIs are being used correctly as he advised
-> > earlier. I do have some comments on the zswap side though.
-> > 
-[..]
-> > > @@ -869,84 +892,177 @@ static int zswap_cpu_comp_prepare(unsigned
-> > int cpu, struct hlist_node *node)
-> > >  	return ret;
-> > >  }
-> > >
-> > > -static bool zswap_compress(struct page *page, struct zswap_entry *entry,
-> > > -			   struct zswap_pool *pool, bool wb_enabled)
-> > > +/*
-> > > + * Unified code path for compressors that do and do not support batching.
-> > This
-> > > + * procedure will compress multiple @nr_pages in @folio starting from the
-> > > + * @start index.
-> > > + *
-> > > + * It is assumed that @nr_pages <= ZSWAP_MAX_BATCH_SIZE.
-> > zswap_store() makes
-> > > + * sure of this by design and zswap_store_pages() warns if this is not
-> > > + * true.
-> > > + *
-> > > + * @nr_pages can be in (1, ZSWAP_MAX_BATCH_SIZE] even if the
-> > compressor does not
-> > > + * support batching.
-> > > + *
-> > > + * If @pool->compr_batch_size is 1, each page is processed sequentially.
-> > > + *
-> > > + * If @pool->compr_batch_size is > 1, compression batching is invoked
-> > within
-> > > + * the algorithm's driver, except if @nr_pages is 1: if so, the driver can
-> > > + * choose to call the sequential/non-batching compress API.
-> > > + *
-> > > + * In both cases, if all compressions are successful, the compressed buffers
-> > > + * are stored in zsmalloc.
-> > > + *
-> > > + * Traversing multiple SG lists when @nr_comps is > 1 is expensive, and
-> > impacts
-> > > + * batching performance if we were to repeat this operation multiple
-> > times,
-> > > + * such as:
-> > > + *   - to map destination buffers to each SG list in the @acomp_ctx-
-> > >sg_outputs
-> > > + *     sg_table.
-> > > + *   - to initialize each output SG list's @sg->length to PAGE_SIZE.
-> > > + *   - to get the compressed output length in each @sg->length.
-> > > + *
-> > > + * These are some design choices made to optimize batching with SG lists:
-> > > + *
-> > > + * 1) The source folio pages in the batch are directly submitted to
-> > > + *    crypto_acomp via acomp_request_set_src_folio().
-> > > + *
-> > > + * 2) The per-CPU @acomp_ctx->sg_outputs scatterlists are used to set up
-> > > + *    destination buffers for interfacing with crypto_acomp.
-> > > + *
-> > > + * 3) To optimize performance, we map the per-CPU @acomp_ctx->buffers
-> > to the
-> > > + *    @acomp_ctx->sg_outputs->sgl SG lists at pool creation time. The only
-> > task
-> > > + *    remaining to be done for the output SG lists in zswap_compress() is to
-> > > + *    set each @sg->length to PAGE_SIZE. This is done in zswap_compress()
-> > > + *    for non-batching compressors. This needs to be done within the
-> > compress
-> > > + *    batching driver procedure as part of iterating through the SG lists for
-> > > + *    batch setup, so as to minimize expensive traversals through the SG
-> > lists.
-> > > + *
-> > > + * 4) Important requirements for batching compressors:
-> > > + *    - Each @sg->length in @acomp_ctx->req->sg_outputs->sgl should
-> > reflect the
-> > > + *      compression outcome for that specific page, and be set to:
-> > > + *      - the page's compressed length, or
-> > > + *      - the compression error value for that page.
-> > > + *    - The @acomp_ctx->req->dlen should be set to the first page's
-> > > + *      @sg->length. This enables code generalization in zswap_compress()
-> > > + *      for non-batching and batching compressors.
-> > > + *
-> > > + * acomp_ctx mutex locking:
-> > > + *    Earlier, the mutex was held per page compression. With the new code,
-> > > + *    [un]locking the mutex per page caused regressions for software
-> > > + *    compressors. We now lock the mutex once per batch, which resolves
-> > the
-> > > + *    regression.
-> > > + */
-> > 
-> > Please, no huge comments describing what the code is doing. If there's
-> > anything that is not clear from reading the code or needs to be
-> > explained or documented, please do so **concisely** in the relevant part
-> > of the function.
-> 
-> Again, these are important requirements related to the major change, i.e.,
-> batching, wrt why/how. I think it is important to note considerations for the
-> next batching algorithm, just like I have done within the IAA driver. To be very
-> clear, I am not describing code.
-> 
-> If questions arise as to why the mutex is being locked per batch as against
-> per page, I think the comment above is helpful and saves time for folks to
-> understand the "why".
+> (!tsm->doe_mb_sec) is definitely an error on AMD SEV-TIO, is not it on other platforms?
 
-Having a huge comment above the function does not help. For things like
-this, you should add a brief comment above the mutex locking (where it's
-relevant). Otherwise it's easy for someone to move the mutex locking
-without reading this comment.
+I think you just happen to have a multi-DOE test device, or a device
+that has a PCI_DOE_FEATURE_SSESSION DOE and not a PCI_DOE_FEATURE_CMA
+DOE.
 
-Same applies for other things. I am not saying we should throw away the
-entire comment, but it's not helpful in its current form. Concise
-comments in the relevant parts are much more helpful. Keep comments
-above the function to general notes and things that are important to
-callers, not implementation details.
-
+> ---
+>  include/linux/pci-tsm.h | 14 ++++++++++++++
+>  drivers/pci/tsm.c       |  4 ++++
+>  2 files changed, 18 insertions(+)
 > 
-> > 
-> > > +static bool zswap_compress(struct folio *folio, long start, unsigned int
-> > nr_pages,
-> > > +			   struct zswap_entry *entries[], struct zswap_pool
-> > *pool,
-> > > +			   int nid, bool wb_enabled)
-> > >  {
-> > > +	gfp_t gfp = GFP_NOWAIT | __GFP_NORETRY | __GFP_HIGHMEM |
-> > __GFP_MOVABLE;
-> > > +	unsigned int nr_comps = min(nr_pages, pool->compr_batch_size);
-> > > +	unsigned int slen = nr_comps * PAGE_SIZE;
-> > >  	struct crypto_acomp_ctx *acomp_ctx;
-> > > -	struct scatterlist input, output;
-> > > -	int comp_ret = 0, alloc_ret = 0;
-> > > -	unsigned int dlen = PAGE_SIZE;
-> > > +	int err = 0, err_sg = 0;
-> > > +	struct scatterlist *sg;
-> > > +	unsigned int i, j, k;
-> > >  	unsigned long handle;
-> > > -	gfp_t gfp;
-> > > -	u8 *dst;
-> > > -	bool mapped = false;
-> > > +	int *errp, dlen;
-> > > +	void *dst;
-> > >
-> > >  	acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
-> > >  	mutex_lock(&acomp_ctx->mutex);
-> > >
-> > > -	dst = acomp_ctx->buffers[0];
-> > > -	sg_init_table(&input, 1);
-> > > -	sg_set_page(&input, page, PAGE_SIZE, 0);
-> > > -
-> > > -	sg_init_one(&output, dst, PAGE_SIZE);
-> > > -	acomp_request_set_params(acomp_ctx->req, &input, &output,
-> > PAGE_SIZE, dlen);
-> > > +	errp = (pool->compr_batch_size == 1) ? &err : &err_sg;
-> > 
-> > err_sg is not used anywhere, so *errp could end up being garbage. Why do
-> > we need this?
-> 
-> err_sg is initialized to 0 and never changes. It can never be garbage.
-> We need this because of the current dichotomy between software compressors
-> and IAA in the sg->length based error handling per Herbert's suggestions,
-> included in the huge function comment block. It is needed to avoid branches
-> and have the zswap_compress() code look seamless for all compressors.
+> diff --git a/include/linux/pci-tsm.h b/include/linux/pci-tsm.h
+> index 40c5e4c31a3f..b6866f7c14b4 100644
+> --- a/include/linux/pci-tsm.h
+> +++ b/include/linux/pci-tsm.h
+> @@ -10,6 +10,14 @@ struct tsm_dev;
+>  struct kvm;
+>  enum pci_tsm_req_scope;
+>  
+> +/* SPDM control structure for DOE */
+> +struct tsm_spdm {
+> +	unsigned long req_len;
+> +	void *req;
+> +	unsigned long rsp_len;
+> +	void *rsp;
+> +};
 
-This is exactly what I meant by saying the huge comment doesn't help. It
-should be documented where it is implemented.
+I would only add things to the core that the core needs, or all
+implementations can unify. You can see that tdx_spdm_msg_exchange() can
+not use this common definition for example.
 
-That being said, the code is confusing and not readable, why do we need
-to do such manuevring with the error codes? It's really hard to track.
+> +
+>  /*
+>   * struct pci_tsm_ops - manage confidential links and security state
+>   * @link_ops: Coordinate PCIe SPDM and IDE establishment via a platform TSM.
+> @@ -130,11 +138,17 @@ struct pci_tsm {
+>   * @base_tsm: generic core "tsm" context
+>   * @lock: mutual exclustion for pci_tsm_ops invocation
+>   * @doe_mb: PCIe Data Object Exchange mailbox
+> + * @doe_mb_sec: DOE mailbox used when secured SPDM is requested
+> + * @spdm: cached SPDM request/response buffers for the link
+> + * @cert_slot: SPDM certificate slot
+>   */
+>  struct pci_tsm_pf0 {
+>  	struct pci_tsm base_tsm;
+>  	struct mutex lock;
+>  	struct pci_doe_mb *doe_mb;
+> +	struct pci_doe_mb *doe_mb_sec;
 
-> 
-> > 
-> > >
-> > >  	/*
-> > > -	 * it maybe looks a little bit silly that we send an asynchronous
-> > request,
-> > > -	 * then wait for its completion synchronously. This makes the process
-> > look
-> > > -	 * synchronous in fact.
-> > > -	 * Theoretically, acomp supports users send multiple acomp requests
-> > in one
-> > > -	 * acomp instance, then get those requests done simultaneously. but
-> > in this
-> > > -	 * case, zswap actually does store and load page by page, there is no
-> > > -	 * existing method to send the second page before the first page is
-> > done
-> > > -	 * in one thread doing zswap.
-> > > -	 * but in different threads running on different cpu, we have different
-> > > -	 * acomp instance, so multiple threads can do (de)compression in
-> > parallel.
-> > > +	 * [i] refers to the incoming batch space and is used to
-> > > +	 *     index into the folio pages.
-> > > +	 *
-> > > +	 * [j] refers to the incoming batch space and is used to
-> > > +	 *     index into the @entries for the folio's pages in this
-> > > +	 *     batch, per compress call while iterating over the output SG
-> > > +	 *     lists. Also used to index into the folio's pages from @start,
-> > > +	 *     in case of compress errors.
-> > > +	 *
-> > > +	 * [k] refers to the @acomp_ctx space, as determined by
-> > > +	 *     @pool->compr_batch_size, and is used to index into
-> > > +	 *     @acomp_ctx->sg_outputs->sgl and @acomp_ctx->buffers.
-> > >  	 */
-> > > -	comp_ret = crypto_wait_req(crypto_acomp_compress(acomp_ctx-
-> > >req), &acomp_ctx->wait);
-> > > -	dlen = acomp_ctx->req->dlen;
-> > > +	for (i = 0; i < nr_pages; i += nr_comps) {
-> > 
-> > What are looping over here? I thought zswap_compress() takes in exactly
-> > one batch.
-> 
-> We are iterating once over one batch for batching compressors, and one
-> page at a time for software.
+See below, pci_tsm_pf0 should only ever need one doe_mb instance.
 
-I thought we wanted to have a single acomp API that takes in a batch of
-pages, and then either hands them over to HW compressors, or loops over
-them for SW compressors. This would simplify the users like zswap
-because the differences between SW and HW compressors would be handled
-internally.
+> +	struct tsm_spdm spdm;
 
-> 
-> > 
-> > > +		acomp_request_set_src_folio(acomp_ctx->req, folio,
-> > > +					    (start + i) * PAGE_SIZE,
-> > > +					    slen);
-> > >
-> > > -	/*
-> > > -	 * If a page cannot be compressed into a size smaller than PAGE_SIZE,
-> > > -	 * save the content as is without a compression, to keep the LRU
-> > order
-> > > -	 * of writebacks.  If writeback is disabled, reject the page since it
-> > > -	 * only adds metadata overhead.  swap_writeout() will put the page
-> > back
-> > > -	 * to the active LRU list in the case.
-> > > -	 */
-> > > -	if (comp_ret || !dlen || dlen >= PAGE_SIZE) {
-> > > -		if (!wb_enabled) {
-> > > -			comp_ret = comp_ret ? comp_ret : -EINVAL;
-> > > -			goto unlock;
-> > > -		}
-> > > -		comp_ret = 0;
-> > > -		dlen = PAGE_SIZE;
-> > > -		dst = kmap_local_page(page);
-> > > -		mapped = true;
-> > > -	}
-> > > +		acomp_ctx->sg_outputs->sgl->length = slen;
-> > >
-> > > -	gfp = GFP_NOWAIT | __GFP_NORETRY | __GFP_HIGHMEM |
-> > __GFP_MOVABLE;
-> > > -	handle = zs_malloc(pool->zs_pool, dlen, gfp, page_to_nid(page));
-> > > -	if (IS_ERR_VALUE(handle)) {
-> > > -		alloc_ret = PTR_ERR((void *)handle);
-> > > -		goto unlock;
-> > > -	}
-> > > +		acomp_request_set_dst_sg(acomp_ctx->req,
-> > > +					 acomp_ctx->sg_outputs->sgl,
-> > > +					 slen);
-> > > +
-> > > +		err = crypto_wait_req(crypto_acomp_compress(acomp_ctx-
-> > >req),
-> > > +				      &acomp_ctx->wait);
-> > > +
-> > > +		acomp_ctx->sg_outputs->sgl->length = acomp_ctx->req-
-> > >dlen;
-> > > +
-> > > +		/*
-> > > +		 * If a page cannot be compressed into a size smaller than
-> > > +		 * PAGE_SIZE, save the content as is without a compression,
-> > to
-> > > +		 * keep the LRU order of writebacks.  If writeback is disabled,
-> > > +		 * reject the page since it only adds metadata overhead.
-> > > +		 * swap_writeout() will put the page back to the active LRU
-> > list
-> > > +		 * in the case.
-> > > +		 *
-> > > +		 * It is assumed that any compressor that sets the output
-> > length
-> > > +		 * to 0 or a value >= PAGE_SIZE will also return a negative
-> > > +		 * error status in @err; i.e, will not return a successful
-> > > +		 * compression status in @err in this case.
-> > > +		 */
-> > 
-> > Ugh, checking the compression error and checking the compression length
-> > are now in separate places so we need to check if writeback is disabled
-> > in separate places and store the page as-is. It's ugly, and I think the
-> > current code is not correct.
-> 
-> The code is 100% correct. You need to spend more time understanding
-> the code. I have stated my assumption above in the comments to
-> help in understanding the "why".
-> 
-> From a maintainer, I would expect more responsible statements than
-> this. A flippant remark made without understanding the code (and,
-> disparaging the comments intended to help you do this), can impact
-> someone's career. I am held accountable in my job based on your
-> comments.
-> 
-> That said, I have worked tirelessly and innovated to make the code
-> compliant with Herbert's suggestions (which btw have enabled an
-> elegant batching implementation and code commonality for IAA and
-> software compressors), validated it thoroughly for IAA and ZSTD to
-> ensure that both demonstrate performance improvements, which
-> are crucial for memory savings. I am proud of this work.
+Per above, just move @tsm_spdm into the TIO object that wraps
+pci_tsm_pf0.
 
-I really do NOT appreciate the personal attack here. I am not sure why
-my comment came across as a "flippant remark".
+> +	u8 cert_slot;
+>  };
+>  
+>  struct pci_tsm_mmio {
+> diff --git a/drivers/pci/tsm.c b/drivers/pci/tsm.c
+> index ed8a280a2cf4..378748b15825 100644
+> --- a/drivers/pci/tsm.c
+> +++ b/drivers/pci/tsm.c
+> @@ -1067,6 +1067,10 @@ int pci_tsm_pf0_constructor(struct pci_dev *pdev, struct pci_tsm_pf0 *tsm,
+>  		pci_warn(pdev, "TSM init failure, no CMA mailbox\n");
+>  		return -ENODEV;
+>  	}
+> +	tsm->doe_mb_sec = pci_find_doe_mailbox(pdev, PCI_VENDOR_ID_PCI_SIG,
+> +					       PCI_DOE_FEATURE_SSESSION);
+> +	if (!tsm->doe_mb_sec)
+> +		pci_warn(pdev, "TSM init failed to init SSESSION mailbox\n");
 
-Let me be clear, I never said anything bad about "this work", or
-expressed that I do not want to see it merged. You did a good job and
-you should be proud of your work.
+So it is surprising to find that a device supports PCI_DOE_FEATURE_CMA,
+but requires the TSM to also use the PCI_DOE_FEATURE_SSESSION mailbox?
+A PCI_DOE_FEATURE_CMA mailbox is capable of supporting secure sessions
+and IDE.
 
-That being said, code review is part of the process, and you should know
-better than anyone given how much this series evolved over 13 revisions
-of careful reviews. I spent a considerable amount of time reviewing
-previous revisions, pointing out problems, and helping this series
-evolve. Telling me that I "should spend more time understanding the
-code" is enraging at this point.
+When a device supports multiple DOE, the VMM does need to pick one, but the
+hope was that "first CMA DOE" would work, but apparently you have a
+device that wants to violate this simple heuristic?
 
-To be even more clear, I gain NOTHING by reviewing your code and helping
-you land this work. I also have a job, and it's not reviewing your code.
-I would tread very carefully if I were you.
-
-Let's keep the discussion technical and civil. I will NOT tolerate such
-comments going forward.
-
-> 
-> 
-> > 
-> > > +		if (err && !wb_enabled)
-> > > +			goto compress_error;
-> > > +
-> > > +		for_each_sg(acomp_ctx->sg_outputs->sgl, sg, nr_comps, k) {
-> > > +			j = k + i;
-> > 
-> > Please use meaningful iterator names rather than i, j, and k and the huge
-> > comment explaining what they are.
-> 
-> I happen to have a different view: having longer iterator names firstly makes
-> code seem "verbose" and detracts from readability, not to mention exceeding the
-> 80-character line limit. The comments are essential for code maintainability
-> and avoid out-of-bounds errors when the next zswap developer wants to
-> optimize the code.
-> 
-> One drawback of i/j/k iterators is mis-typing errors which cannot be caught
-> at compile time. Let me think some more about how to strike a good balance.
-
-I think if we get rid of the outer loop things will get much simpler. I
-initially thought the acomp API will handle the looping internally for
-SW compressors.
-
-> 
-> > 
-> > > +			dst = acomp_ctx->buffers[k];
-> > > +			dlen = sg->length | *errp;
-> > 
-> > Why are we doing this?
-> > 
-> > > +
-> > > +			if (dlen < 0) {
-> > 
-> > We should do the incompressible page handling also if dlen is PAGE_SIZE,
-> > or if the compression failed (I guess that's the intention of bit OR'ing
-> > with *errp?)
-> 
-> Yes, indeed: that's the intention of bit OR'ing with *errp.
-
-This is not very readable.
+What happens on this device if you use the CMA mailbox for IDE
+establishment and secure sessions?
