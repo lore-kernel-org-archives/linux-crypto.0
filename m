@@ -1,75 +1,71 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4AE23C512;
-	Sat, 15 Nov 2025 22:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E804622D781;
+	Sat, 15 Nov 2025 23:09:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763246828; cv=none; b=CTEdB35e9s5WQnJTDSOvn/XXYlbiCFewTAk4m1KbhLqZhFWBVD9kP54Zi3CGch7niWhnNRRT45EexHpHxiPTG2uIe6XZaC38Nvz4EzdY/LuBuJMjY9bzUD3KTMzAhau0bfsLebDGugkZms3UmabyCX0Jx/Iziu9oajeCiTRyf3A=
+	t=1763248178; cv=none; b=MxlBydn+W4Zd2KENZFX0x9hHmxzOQpbbZ6L5MfAUq9TT0lfX1OexBdb+QPYaM6gCAcEX6TPSxKQjz6orH1Mwzp1wWK1YXrCMcmWJ0In+yYvtsaABKPricn+s+xfH0KN8Vh0dgQ2W+qwVr96Io/yUisMpVtYIFNA728dOZk7YP94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763246828; c=relaxed/simple;
-	bh=hQwb56XishG6Npr0bKU5tri4GKJyyN/6ZQreEwScrKw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VRV2iS6HJyF4/BZhspURAh8otSFH5mxY3Zs3rngZ3HfQdqGs3fYdaYBi3XO49dsj8UWfSL7PMtOP1PBfg98ztC/IMk+iq7OfuCL7IX9mkT0nBrmUlwsdm4RfIH+rb1JdmOyv2Ht5dym0KQ+1mDLI5LrqdmfanJQXTpd32Dq8yCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lxb0xi7P; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763248178; c=relaxed/simple;
+	bh=+pinOLeFZxQs93A84yEGNHG0OKL1EHDvdEp9Dg/hWqg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A2Bwiz+csk39x/uvOKzrIMzyDoOQekHiA5MsoUbrGwbSr5T1IKd9puvy5tayaE2vY5woAapU632UaQ4gIW6DcB53dfr5wH3eUKVkoeP3WQzKK1fSzjmIk4R1jkqEGj534n/bK0bWXLPoWKHorrNGU5VF7RNXlDLzT/kRarnVp3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D2bLRNFQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lxb0xi7P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34D11C4CEF7;
-	Sat, 15 Nov 2025 22:47:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D2bLRNFQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29505C4CEF8;
+	Sat, 15 Nov 2025 23:09:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763246824;
-	bh=hQwb56XishG6Npr0bKU5tri4GKJyyN/6ZQreEwScrKw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Lxb0xi7PJvh7StcNDuwQvJrFI+1nX4Ftglp4eQgwlPlN5UQhvCnXRqzGD+QyLwGdz
-	 lgDw5CniJZbi29c2Cw1mQVXTlpQ4NC+Q+Z3yBueMnVW/e4lQMjz63dPlb1Bam4b5q0
-	 9HdscdILI8NFCphk36akV2Y6GXciklLJRRusO6CPJRkl7hYe+V88prQp0ptLB+N21O
-	 Ef1xK10onaipIy6utWNAtpLQQYooPqe0q/TDZQXzm9jg1/ZFUKnX8XFI6CzCz/sOHA
-	 O6Yt9g1wPjuuYdPwhscQ+/E9yruO07nFqptcm/Qaubkr8dHyASFxbUwVYWRkxImwMX
-	 +/nnf+gzR33Ng==
-Date: Sat, 15 Nov 2025 14:47:00 -0800
+	s=k20201202; t=1763248177;
+	bh=+pinOLeFZxQs93A84yEGNHG0OKL1EHDvdEp9Dg/hWqg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=D2bLRNFQ1NTesURfGJJmg0hnEVb467FGb6Rjq9OiQImP11WEKuVUzSIP79LQYF1Xx
+	 Ry9+p9ZBe3jQfSpvJz+TBw6Kr+aS6BIrSzfqDmumYytOY7/uPTN7ELkA9zT+fOOCO3
+	 YAOait1FUwlluCBPNTsdT6Cm1KFgxilSwTju3Pt/NBz3Z9RTanP+1R3PuAhBMbhNjv
+	 VArReW/EjDKVMVvHD7jbuI1KaIzRH3nVfPbOgcY8oCy8Ym8IGVAGWvxahs034ZdTcD
+	 H0OY7yCe1lLXDwBiR14oA9MiaNFUkFd4jYdeczujFJXBr5uEqZwqdjlTiJdfGgqXab
+	 uw+AxYsl+EBDA==
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Colin Ian King <coking@nvidia.com>, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] crypto: scatterwalk - Fix memcpy_sglist() to always
- succeed
-Message-ID: <20251115224700.GA8885@quark>
-References: <20251114225851.324143-1-ebiggers@kernel.org>
- <20251114225851.324143-2-ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Colin Ian King <coking@nvidia.com>,
+	linux-kernel@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v2 0/2] crypto: Fix memcpy_sglist()
+Date: Sat, 15 Nov 2025 15:08:15 -0800
+Message-ID: <20251115230817.26070-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251114225851.324143-2-ebiggers@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 14, 2025 at 02:58:50PM -0800, Eric Biggers wrote:
-> +/**
-> + * memcpy_sglist() - Copy data from one scatterlist to another
-> + * @dst: The destination scatterlist.  Can be NULL if @nbytes == 0.
-> + * @src: The source scatterlist.  Can be NULL if @nbytes == 0.
-> + * @nbytes: Number of bytes to copy
-> + *
-> + * The scatterlists can overlap.  Hence this really acts like memmove(), not
-> + * memcpy().
-> + *
-> + * Context: Any context
-> + */
-[...]
-> +			if (src_virt != dst_virt) {
-> +				memmove(dst_virt, src_virt, len);
-> +				if (ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE)
-> +					__scatterwalk_flush_dcache_pages(
-> +						dst_page, dst_offset, len);
-> +			}
+This series rewrites memcpy_sglist() to fix the bug where it called
+functions that could fail and ignored errors.
 
-I realized that this doesn't correctly handle arbitrary overlaps in the
-case where there are multiple copy steps.  So, my idea to make this
-function more robust by allowing arbitrary overlaps won't easily work.
-I'll send a revised version that only claims to support exact overlaps,
-which is consistent with the current code.
+This series is targeting crypto/master.
 
-- Eric
+Changed in v2:
+    - Don't try to support arbitrary overlaps
+    - Use memcpy_page()
+
+Eric Biggers (2):
+  crypto: scatterwalk - Fix memcpy_sglist() to always succeed
+  Revert "crypto: scatterwalk - Move skcipher walk and use it for
+    memcpy_sglist"
+
+ crypto/scatterwalk.c               | 345 +++++++----------------------
+ crypto/skcipher.c                  | 261 +++++++++++++++++++++-
+ include/crypto/algapi.h            |  12 +
+ include/crypto/internal/skcipher.h |  48 +++-
+ include/crypto/scatterwalk.h       | 117 +++-------
+ 5 files changed, 431 insertions(+), 352 deletions(-)
+
+
+base-commit: 59b0afd01b2ce353ab422ea9c8375b03db313a21
+-- 
+2.51.2
+
