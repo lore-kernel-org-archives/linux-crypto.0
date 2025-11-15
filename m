@@ -1,187 +1,326 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C281758B
-	for <linux-crypto@vger.kernel.org>; Sat, 15 Nov 2025 02:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9A83594F;
+	Sat, 15 Nov 2025 08:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763172973; cv=none; b=cQEsa+r+E3gQR204x5UXaKzmCOtK4N2Qc9eWmjaX3PRF7fHvhdQox+nEsqeZVxX5uInoK0cJtxNNICK/iiMkBNXM5qVT85UhX1VC7HjsHzqJPD9apo5Y4r1OKVyv1cQiJ6IsHWhUB2bH7cR701mpHvPRNSE4udwov7PSX9fpwxQ=
+	t=1763196599; cv=none; b=TMVjYmTmgizgkXMG7/mIo56LNhWrJqQF8tomWWU9rBThtmITzRbypmGj6rKEUcX1Alk9U+TrDNDq29+1T+Ja8yGaEMtiysA2ZR2XYXAUghi1V1s/V2RqTXG9ENLnxUXt/E1Cg+USTJBUsp2QIZspEoMCc/cmVaxtYvQA8L5ncwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763172973; c=relaxed/simple;
-	bh=T+w0VXNtp5zZKUsqLWZdEqjjJiojdy0U/f2sjZ5jaLE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hHNUNAhsVvSf58JcoJY8/QtY/uSDlqwXguKeCSC0TqCzV8a/npDWoWenl6Ki3WJ77Ts626pVxa/l4TnQUDzr1AoGwDbSqPjB3Br0HaHF3ws4Uo5YY6/ypDWOMSMebngYXGPc7yPM9dB8uwm/uliBdvRkNCtK41V+lm3KvYXebPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=isQ+YJze; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763196599; c=relaxed/simple;
+	bh=WPeZ2K9xwtPxTbsXplpRKYXcSleJmAUeDkSfkT08GQ8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j4uEzAs1JlKKgErXa0mNtfzFiE0W4OPggspJZaCOBtE5fHSn12ibVBZ7G8HwQgTG/Twn/OIT1eoNQG1d/eUHSqoei6eYmvdNVRB0PbDmhQWKJT8UAC+FB03KI4kOhfYbmRhZuP9Knh8y5nB2u9S81kCjcN9GulR9/C55AoCPmxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FqOAo04y; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="isQ+YJze"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 047D0C4CEF1;
-	Sat, 15 Nov 2025 02:16:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763172972;
-	bh=T+w0VXNtp5zZKUsqLWZdEqjjJiojdy0U/f2sjZ5jaLE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=isQ+YJzeFU/NDSQMITCXJcGNacHnCVfR7JeSZU6LcPudBHSp1VQIGbmGxSzOMF61D
-	 V7eqczHra1HWM6eq3m9iWKN1zzygaUdjkndcA8sI/lqEaX/xKlUiIWNG6Gmw6H+yA0
-	 lJf/psPTCgzK+sTX2uy18D4Fj9u9fEAC/K4O6q1IIrPj0iqYX/V+/i7TRGlithYQYp
-	 BdEAvtxwZqXwY8z2RPi1K2h/LW9JSXF3+icNlAX0GzhvsLRjZ+g2G4bSksod5hS1a6
-	 t5UTcGnVbmpaf5Fk0w0WiWsnQdkCwlCSsAk/DVH0wn2ReOx/4shuKUYa4BzrGjYRPw
-	 W4Atd9uGLSw2w==
-Date: Fri, 14 Nov 2025 18:14:30 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb+git@google.com>, linux-crypto@vger.kernel.org,
-	arnd@arndb.de, Linus Torvalds <torvalds@linux-foundation.org>,
-	Kees Cook <kees@kernel.org>
-Subject: Re: [RFC PATCH] libcrypto/chachapoly: Use strict typing for fixed
- size array arguments
-Message-ID: <20251115021430.GA2148@sol>
-References: <20251114180706.318152-2-ardb+git@google.com>
- <aRePu_IMV5G76kHK@zx2c4.com>
- <CAMj1kXG0RKOE4uQHfWnY1vU_FS+KUkZNNOLCrhC8dfbtf4PUjA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FqOAo04y"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AF4T1Ic1292054;
+	Sat, 15 Nov 2025 08:49:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=YB+XuaY7R6m8H1sXldfmD8
+	Pyhrmey7X5nIWEhzrSI6w=; b=FqOAo04yB/7+QTGIorCUne8645WC4A/hZgkVJe
+	cFdIMFwjCMmqPKUh9128oCCHJ8TfHmjqPrrS3/jN1Nav3888p9tZJS+qoQX0ZGh7
+	vU1G0GRF3Jixo1t7r8GpxkYGoyUNTJRl7B2eWdxaHY2cBs/CMIdtRY8yVWESKHiS
+	KqYzejNr1nV6J3OCy92nalr3gPuff60SXQPZbBFfFQTLJ0ZHdrZkC2BSWfAMMObA
+	itTSyG03aocCMalSPXEwxYGbsY9CtT6D9qGeC54JYeCYtzszMuiHLtTrXOMTRk9u
+	Fc8Hy8IcBXtJ9M1cQWiKgtdQ7GAL9eyLNdERfXGmAHQDkCCw==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4aejh08a0p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 15 Nov 2025 08:49:46 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 5AF8njPj003170
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 15 Nov 2025 08:49:45 GMT
+Received: from hu-utiwari-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Sat, 15 Nov 2025 00:49:43 -0800
+From: <quic_utiwari@quicinc.com>
+To: <herbert@gondor.apana.org.au>, <thara.gopinath@gmail.com>,
+        <davem@davemloft.net>
+CC: <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_neersoni@quicinc.com>
+Subject: [PATCH v3] crypto: qce - Add runtime PM and interconnect bandwidth scaling support
+Date: Sat, 15 Nov 2025 14:18:51 +0530
+Message-ID: <20251115084851.2750446-1-quic_utiwari@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMj1kXG0RKOE4uQHfWnY1vU_FS+KUkZNNOLCrhC8dfbtf4PUjA@mail.gmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: i_bS2geTWCKFnsp32xXHMZkSsVsK7y8p
+X-Authority-Analysis: v=2.4 cv=A8lh/qWG c=1 sm=1 tr=0 ts=69183eaa cx=c_pps
+ a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=GEpy-HfZoHoA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=tY3p4qJyD-uLZWqq6sMA:9
+ a=TjNXssC_j7lpFel5tvFf:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: i_bS2geTWCKFnsp32xXHMZkSsVsK7y8p
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDA3MCBTYWx0ZWRfX9N1qBSrCY1mx
+ E+n7tJtSc5Zy99gykPOQp6bWdQ244E4kk5WtPKbviUwVWTMy/bZjaDYjuEyif/u4hTsipluTpBT
+ CwKBjJEQpqFH5XtLR4+lZVQybLP5XUqbkupXShKRDpGXOMoxEC2t0R4wbTzKbXksUVh4IH0+yhj
+ CfBAaBMpDsdrb7s792qbuJ7hfjZspV2fs3fhSnqrdqQHocGeiH20KKpYCLgGLuoBzr7uYNfSqZO
+ dq8AZNAZrQclIFmWn5MZ4XWQvHsEKKTwtQA3WZvrfRZxxAGTJH3M4XxtOGAnA9psZqIBYQGk4lF
+ bBVFFowKUW9orMWINmCGZLowCvLky+DXybRSl+m38fLEwFLde/qvB17yh8QOxsW37oKb8CTm7Kt
+ 26S97dPrDyQ2TzeBzm9LaMH3gJdROw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-15_03,2025-11-13_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0 bulkscore=0
+ adultscore=0 malwarescore=0 priorityscore=1501 impostorscore=0 clxscore=1011
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511150070
 
-[+Linus and Kees]
+From: Udit Tiwari <quic_utiwari@quicinc.com>
 
-On Fri, Nov 14, 2025 at 09:33:43PM +0100, Ard Biesheuvel wrote:
-> On Fri, 14 Nov 2025 at 21:23, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >
-> > On Fri, Nov 14, 2025 at 07:07:07PM +0100, Ard Biesheuvel wrote:
-> > > void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
-> > >                                const u8 *ad, const size_t ad_len,
-> > >                                const u8 (*nonce)[XCHACHA20POLY1305_NONCE_SIZE],
-> > >                                const u8 (*key)[CHACHA20POLY1305_KEY_SIZE])
-> > >
-> > > However, this variant is checked more strictly by the compiler, and only
-> > > arrays of the correct size are accepted as plain arguments (using the &
-> > > operator), and so inadvertent mixing up of arguments or passing buffers
-> > > of an incorrect size will trigger an error at build time.
-> >
-> > Interesting idea! And codegen is the same, you say?
-> >
-> 
-> Well, the address values passed into the functions are the same.
-> Whether or not some compilers may behave differently as a result is a
-> different matter: I suppose some heuristics may produce different
-> results knowing the fixed sizes of the inputs.
-> 
-> > There's another variant of this that doesn't change callsites and keeps
-> > the single pointer, which more accurate reflects what the function does:
-> >
-> > void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
-> >                                const u8 *ad, const size_t ad_len,
-> >                                const u8 nonce[static XCHACHA20POLY1305_NONCE_SIZE],
-> >                                const u8 key[static CHACHA20POLY1305_KEY_SIZE])
-> >
-> 
-> Whoah!
-> 
-> > An obscure use of the `static` keyword, but this is what it's used for -
-> > telling the compiler what size you expect the object to be. Last time I
-> > investigated this, only clang respected it, but now it looks like gcc
-> > does too:
-> >
-> >     zx2c4@thinkpad /tmp $ cat a.c
-> >
-> >     void blah(unsigned char herp[static 7]);
-> >
-> >     static void schma(void)
-> >     {
-> >         unsigned char good[] = { 1, 2, 3, 4, 5, 6, 7 };
-> >         unsigned char bad[] = { 1, 2, 3, 4, 5, 6 };
-> >         blah(good);
-> >         blah(bad);
-> >     }
-> >     zx2c4@thinkpad /tmp $ gcc -c a.c
-> >     a.c: In function ‘schma’:
-> >     a.c:9:9: warning: ‘blah’ accessing 7 bytes in a region of size 6 [-Wstringop-overflow=]
-> >         9 |         blah(bad);
-> >           |         ^~~~~~~~~
-> >     a.c:9:9: note: referencing argument 1 of type ‘unsigned char[7]’
-> >     a.c:2:6: note: in a call to function ‘blah’
-> >         2 | void blah(unsigned char herp[static 7]);
-> >           |      ^~~~
-> >     zx2c4@thinkpad /tmp $ clang -c a.c
-> >     a.c:9:2: warning: array argument is too small; contains 6 elements, callee requires at least 7
-> >           [-Warray-bounds]
-> >         9 |         blah(bad);
-> >           |         ^    ~~~
-> >     a.c:2:25: note: callee declares array parameter as static here
-> >         2 | void blah(unsigned char herp[static 7]);
-> >           |                         ^   ~~~~~~~~~~
-> >     1 warning generated.
-> >
-> >
-> > This doesn't account for buffers that are oversize -- the less dangerous
-> > case -- but maybe that's fine, to keep "normal" semantics of function
-> > calls and still get some checking? And adding `static` a bunch of places
-> > is easy.
-> 
-> Yeah if that is as portable as you say it is, it is a much better
-> solution, given that the minimum size is the most important:
-> inadvertently swapping two arguments will still result in a
-> diagnostic, unless the buffers are the same size, in which case there
-> is still a bug but not a memory safety issue. And passing a buffer
-> that is too large is not a memory safety issue either.
-> 
-> > It could apply much wider than just chapoly.
-> >
-> 
-> Yes, that was always the intent. I used this as an example because it
-> is low hanging fruit, given that it only has a single user.
-> 
-> > This all makes me wish we had NT's SAL notations though...
-> >
-> 
-> (quotation needed)
+The Qualcomm Crypto Engine (QCE) driver currently lacks support for
+runtime power management (PM) and interconnect bandwidth control.
+As a result, the hardware remains fully powered and clocks stay
+enabled even when the device is idle. Additionally, static
+interconnect bandwidth votes are held indefinitely, preventing the
+system from reclaiming unused bandwidth.
 
-Those are some interesting ideas to make C a bit less bad!
+Address this by enabling runtime PM and dynamic interconnect
+bandwidth scaling to allow the system to suspend the device when idle
+and scale interconnect usage based on actual demand. Improve overall
+system efficiency by reducing power usage and optimizing interconnect
+resource allocation.
 
-I knew about the 'static' trick with array parameters, and I used to use
-it in other projects.  It's a bit obscure, but it's in the C standard,
-and both gcc and clang support the syntax.  It indeed causes clang to
-start warning about too-small arrays, via -Warray-bounds which is
-enabled by default.  So if we e.g. change:
+Make the following changes as part of this integration:
 
-    void sha256(const u8 *data, size_t len, u8 out[SHA256_DIGEST_SIZE]);
+- Add support for pm_runtime APIs to manage device power state
+  transitions.
+- Implement runtime_suspend() and runtime_resume() callbacks to gate
+  clocks and vote for interconnect bandwidth only when needed.
+- Replace devm_clk_get_optional_enabled() with devm_pm_clk_create() +
+  pm_clk_add() and let the PM core manage device clocks during runtime
+  PM and system sleep.
+- Register dev_pm_ops with the platform driver to hook into the PM
+  framework.
 
-to
+Tested:
 
-    void sha256(const u8 *data, size_t len, u8 out[static SHA256_DIGEST_SIZE]);
+- Verify that ICC votes drop to zero after probe and upon request
+  completion.
+- Confirm that runtime PM usage count increments during active
+  requests and decrements afterward.
+- Observe that the device correctly enters the suspended state when
+  idle.
 
-... then clang warns if a caller passes an array smaller than
-SHA256_DIGEST_SIZE as 'out' (if its size is statically known).
+Signed-off-by: Udit Tiwari <quic_utiwari@quicinc.com>
+---
+Changes in v3:
+- Switch from manual clock management to PM clock helpers
+  (devm_pm_clk_create() + pm_clk_add()); no direct clk_* enable/disable
+  in runtime callbacks.
+- Replace pm_runtime_get_sync() with pm_runtime_resume_and_get(); remove
+  pm_runtime_put_noidle() on error.
+- Define PM ops using helper macros and reuse runtime callbacks for system
+  sleep via pm_runtime_force_suspend()/pm_runtime_force_resume().
+- Link to v2: https://lore.kernel.org/lkml/20250826110917.3383061-1-quic_utiwari@quicinc.com/
 
-gcc can actually warn about the too-small array regardless of 'static'.
-However, gcc's warning is under -Wstringop-overflow, which we never see
-because the kernel build system disables -Wstringop-overflow with gcc.
+Changes in v2:
+- Extend suspend/resume support to include runtime PM and ICC scaling.
+- Register dev_pm_ops and implement runtime_suspend/resume callbacks.
+- Link to v1: https://lore.kernel.org/lkml/20250606105808.2119280-1-quic_utiwari@quicinc.com/
+---
+ drivers/crypto/qce/core.c | 104 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 87 insertions(+), 17 deletions(-)
 
-So, for now the benefit of adding 'static' would be to get warnings
-about too-small arrays with one of the two supported compilers (clang).
-It's too bad 'static' isn't the default behavior for array parameters in
-C, but oh well...
+diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+index b966f3365b7d..726c162f6ee7 100644
+--- a/drivers/crypto/qce/core.c
++++ b/drivers/crypto/qce/core.c
+@@ -12,6 +12,9 @@
+ #include <linux/module.h>
+ #include <linux/mod_devicetable.h>
+ #include <linux/platform_device.h>
++#include <linux/pm.h>
++#include <linux/pm_runtime.h>
++#include <linux/pm_clock.h>
+ #include <linux/types.h>
+ #include <crypto/algapi.h>
+ #include <crypto/internal/hash.h>
+@@ -90,13 +93,17 @@ static int qce_handle_queue(struct qce_device *qce,
+ 	struct crypto_async_request *async_req, *backlog;
+ 	int ret = 0, err;
+ 
++	ret = pm_runtime_resume_and_get(qce->dev);
++	if (ret < 0)
++		return ret;
++
+ 	scoped_guard(mutex, &qce->lock) {
+ 		if (req)
+ 			ret = crypto_enqueue_request(&qce->queue, req);
+ 
+ 		/* busy, do not dequeue request */
+ 		if (qce->req)
+-			return ret;
++			goto qce_suspend;
+ 
+ 		backlog = crypto_get_backlog(&qce->queue);
+ 		async_req = crypto_dequeue_request(&qce->queue);
+@@ -105,7 +112,7 @@ static int qce_handle_queue(struct qce_device *qce,
+ 	}
+ 
+ 	if (!async_req)
+-		return ret;
++		goto qce_suspend;
+ 
+ 	if (backlog) {
+ 		scoped_guard(mutex, &qce->lock)
+@@ -118,6 +125,8 @@ static int qce_handle_queue(struct qce_device *qce,
+ 		schedule_work(&qce->done_work);
+ 	}
+ 
++qce_suspend:
++	pm_runtime_put_autosuspend(qce->dev);
+ 	return ret;
+ }
+ 
+@@ -207,37 +216,48 @@ static int qce_crypto_probe(struct platform_device *pdev)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	qce->core = devm_clk_get_optional_enabled(qce->dev, "core");
+-	if (IS_ERR(qce->core))
+-		return PTR_ERR(qce->core);
++/* PM clock helpers: register device clocks */
++	ret = devm_pm_clk_create(dev);
++	if (ret)
++		return ret;
+ 
+-	qce->iface = devm_clk_get_optional_enabled(qce->dev, "iface");
+-	if (IS_ERR(qce->iface))
+-		return PTR_ERR(qce->iface);
++	ret = pm_clk_add(dev, "core");
++	if (ret)
++		return ret;
+ 
+-	qce->bus = devm_clk_get_optional_enabled(qce->dev, "bus");
+-	if (IS_ERR(qce->bus))
+-		return PTR_ERR(qce->bus);
++	ret = pm_clk_add(dev, "iface");
++	if (ret)
++		return ret;
+ 
+-	qce->mem_path = devm_of_icc_get(qce->dev, "memory");
++	ret = pm_clk_add(dev, "bus");
++	if (ret)
++		return ret;
++
++	qce->mem_path = devm_of_icc_get(dev, "memory");
+ 	if (IS_ERR(qce->mem_path))
+ 		return PTR_ERR(qce->mem_path);
+ 
+-	ret = icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH, QCE_DEFAULT_MEM_BANDWIDTH);
++	/* Enable runtime PM after clocks and ICC are acquired */
++
++	ret = devm_pm_runtime_enable(dev);
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = devm_qce_dma_request(qce->dev, &qce->dma);
++	ret = pm_runtime_resume_and_get(dev);
+ 	if (ret)
+ 		return ret;
+ 
++	ret = devm_qce_dma_request(qce->dev, &qce->dma);
++	if (ret)
++		goto err_pm;
++
+ 	ret = qce_check_version(qce);
+ 	if (ret)
+-		return ret;
++		goto err_pm;
+ 
+ 	ret = devm_mutex_init(qce->dev, &qce->lock);
+ 	if (ret)
+-		return ret;
++		goto err_pm;
+ 
+ 	INIT_WORK(&qce->done_work, qce_req_done_work);
+ 	crypto_init_queue(&qce->queue, QCE_QUEUE_LENGTH);
+@@ -245,9 +265,58 @@ static int qce_crypto_probe(struct platform_device *pdev)
+ 	qce->async_req_enqueue = qce_async_request_enqueue;
+ 	qce->async_req_done = qce_async_request_done;
+ 
+-	return devm_qce_register_algs(qce);
++	ret = devm_qce_register_algs(qce);
++	if (ret)
++		goto err_pm;
++
++	/* Configure autosuspend after successful init */
++	pm_runtime_set_autosuspend_delay(dev, 100);
++	pm_runtime_use_autosuspend(dev);
++	pm_runtime_mark_last_busy(dev);
++	pm_runtime_put_autosuspend(dev);
++
++	return 0;
++
++err_pm:
++	pm_runtime_put(dev);
++
++	return ret;
+ }
+ 
++static int qce_runtime_suspend(struct device *dev)
++{
++	struct qce_device *qce = dev_get_drvdata(dev);
++
++	icc_disable(qce->mem_path);
++
++	return 0;
++}
++
++static int qce_runtime_resume(struct device *dev)
++{
++	struct qce_device *qce = dev_get_drvdata(dev);
++	int ret = 0;
++
++	ret = icc_enable(qce->mem_path);
++	if (ret)
++		return ret;
++
++	ret = icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH, QCE_DEFAULT_MEM_BANDWIDTH);
++	if (ret)
++		goto err_icc;
++
++	return 0;
++
++err_icc:
++	icc_disable(qce->mem_path);
++	return ret;
++}
++
++static const struct dev_pm_ops qce_crypto_pm_ops = {
++	SET_RUNTIME_PM_OPS(qce_runtime_suspend, qce_runtime_resume, NULL)
++	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
++};
++
+ static const struct of_device_id qce_crypto_of_match[] = {
+ 	{ .compatible = "qcom,crypto-v5.1", },
+ 	{ .compatible = "qcom,crypto-v5.4", },
+@@ -261,6 +330,7 @@ static struct platform_driver qce_crypto_driver = {
+ 	.driver = {
+ 		.name = KBUILD_MODNAME,
+ 		.of_match_table = qce_crypto_of_match,
++		.pm = &qce_crypto_pm_ops,
+ 	},
+ };
+ module_platform_driver(qce_crypto_driver);
+-- 
+2.34.1
 
-I think it's worthwhile adding it to get better warnings, though we
-should check with Linus whether he'd be okay with kernel code starting
-to use this relatively obscure feature of C.
-
-I think the 'static' trick would be better than Ard's suggestion of:
-
-    void sha256(const u8 *data, size_t len, u8 (*out)[SHA256_DIGEST_SIZE]);
-
-... since the "pointer to array of N elements" type would make things
-difficult for callers that have any other type.  For example callers
-wouldn't be able to directly use 'u8 *a', 'u8 a[M]' with size M > N, or
-even a function argument 'u8 a[N]' since C implicitly converts that to
-'u8 *'.  They'd need to cast it first.
-
-- Eric
