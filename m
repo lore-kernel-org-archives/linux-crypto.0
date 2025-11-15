@@ -1,117 +1,75 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DAC232395
-	for <linux-crypto@vger.kernel.org>; Sat, 15 Nov 2025 20:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4AE23C512;
+	Sat, 15 Nov 2025 22:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763239536; cv=none; b=Webxk8/ghRSoPWqBp0dVtJrFyvZaYePU2adLmSXEk1Ih2RlGobpW2KaMzSBWbkQQQt+0B5RqcGCrFSyL53UXYwXRrF9QiJ6U1mnLLTUkb7R72tK8IZlt1X05r/YX3EkVQPKcigTXoqdZ9rKd4X1MZAXPN5hL2sngtCtEostbqGk=
+	t=1763246828; cv=none; b=CTEdB35e9s5WQnJTDSOvn/XXYlbiCFewTAk4m1KbhLqZhFWBVD9kP54Zi3CGch7niWhnNRRT45EexHpHxiPTG2uIe6XZaC38Nvz4EzdY/LuBuJMjY9bzUD3KTMzAhau0bfsLebDGugkZms3UmabyCX0Jx/Iziu9oajeCiTRyf3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763239536; c=relaxed/simple;
-	bh=9IrsNUai8hrJv3DivA0xbRcJoWWJOWnE+9BkopR6e0o=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:Content-Type; b=BvXFg4hgkMuv0zLbCSD8sqUkJuSl4zQ1QupYUj3Ggl1A0JllUop8cPGSe8lc84hdKoDPcdZHNP0rllv/u1TnBeb90jMQhjRvIx3GDwtdq4OazuoOm4gluRQAwJ0ayEysIamuggqml6Qd5zuuhYO0kIsEJ/xhq8ch1G8uaLvOsZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.2.104] (213.87.132.14) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 15 Nov
- 2025 23:45:13 +0300
-Message-ID: <28d3bdbc-c3f4-4f51-9d83-73c4b4ac85cc@omp.ru>
-Date: Sat, 15 Nov 2025 23:45:12 +0300
+	s=arc-20240116; t=1763246828; c=relaxed/simple;
+	bh=hQwb56XishG6Npr0bKU5tri4GKJyyN/6ZQreEwScrKw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VRV2iS6HJyF4/BZhspURAh8otSFH5mxY3Zs3rngZ3HfQdqGs3fYdaYBi3XO49dsj8UWfSL7PMtOP1PBfg98ztC/IMk+iq7OfuCL7IX9mkT0nBrmUlwsdm4RfIH+rb1JdmOyv2Ht5dym0KQ+1mDLI5LrqdmfanJQXTpd32Dq8yCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lxb0xi7P; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lxb0xi7P"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34D11C4CEF7;
+	Sat, 15 Nov 2025 22:47:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763246824;
+	bh=hQwb56XishG6Npr0bKU5tri4GKJyyN/6ZQreEwScrKw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Lxb0xi7PJvh7StcNDuwQvJrFI+1nX4Ftglp4eQgwlPlN5UQhvCnXRqzGD+QyLwGdz
+	 lgDw5CniJZbi29c2Cw1mQVXTlpQ4NC+Q+Z3yBueMnVW/e4lQMjz63dPlb1Bam4b5q0
+	 9HdscdILI8NFCphk36akV2Y6GXciklLJRRusO6CPJRkl7hYe+V88prQp0ptLB+N21O
+	 Ef1xK10onaipIy6utWNAtpLQQYooPqe0q/TDZQXzm9jg1/ZFUKnX8XFI6CzCz/sOHA
+	 O6Yt9g1wPjuuYdPwhscQ+/E9yruO07nFqptcm/Qaubkr8dHyASFxbUwVYWRkxImwMX
+	 +/nnf+gzR33Ng==
+Date: Sat, 15 Nov 2025 14:47:00 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Colin Ian King <coking@nvidia.com>, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] crypto: scatterwalk - Fix memcpy_sglist() to always
+ succeed
+Message-ID: <20251115224700.GA8885@quark>
+References: <20251114225851.324143-1-ebiggers@kernel.org>
+ <20251114225851.324143-2-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: [PATCH] crypto: drbg - simplify drbg_get_random_bytes()
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller\""
-	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>
-CC: Karina Yankevich <k.yankevich@omp.ru>, <lvc-project@linuxtesting.org>
-Content-Language: en-US
-Organization: Open Mobile Platform
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 11/15/2025 20:30:11
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 198116 [Nov 15 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 76 0.3.76
- 6aad6e32ec76b30ee13ccddeafeaa4d1732eef15
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.132.14 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.132.14 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.132.14
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/15/2025 20:32:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/15/2025 3:16:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251114225851.324143-2-ebiggers@kernel.org>
 
-To begin with, drbg_fips_continuous_test() only returns 0 and -EAGAIN,
-so an early return from the *do/while* loop in drbg_get_random_bytes()
-just isn't possible.  Then, the loop condition needs to be adjusted to
-only continue the loop while -EAGAIN is returned and the final *return*
-statement needs to be adjusted as well, in order to be prepared for the
-case of drbg_fips_continuous_test() starting to return some other error
-codes...
+On Fri, Nov 14, 2025 at 02:58:50PM -0800, Eric Biggers wrote:
+> +/**
+> + * memcpy_sglist() - Copy data from one scatterlist to another
+> + * @dst: The destination scatterlist.  Can be NULL if @nbytes == 0.
+> + * @src: The source scatterlist.  Can be NULL if @nbytes == 0.
+> + * @nbytes: Number of bytes to copy
+> + *
+> + * The scatterlists can overlap.  Hence this really acts like memmove(), not
+> + * memcpy().
+> + *
+> + * Context: Any context
+> + */
+[...]
+> +			if (src_virt != dst_virt) {
+> +				memmove(dst_virt, src_virt, len);
+> +				if (ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE)
+> +					__scatterwalk_flush_dcache_pages(
+> +						dst_page, dst_offset, len);
+> +			}
 
-Found by Linux Verification Center (linuxtesting.org) with the Svace static
-analysis tool.
+I realized that this doesn't correctly handle arbitrary overlaps in the
+case where there are multiple copy steps.  So, my idea to make this
+function more robust by allowing arbitrary overlaps won't easily work.
+I'll send a revised version that only claims to support exact overlaps,
+which is consistent with the current code.
 
-Suggested-by: Yann Droneaud <yann@droneaud.fr>
-Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-
----
-The patch is against the master branch of Herbert Xu's cryptodev-2.6.git repo.
-
- crypto/drbg.c |    6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-Index: cryptodev-2.6/crypto/drbg.c
-===================================================================
---- cryptodev-2.6.orig/crypto/drbg.c
-+++ cryptodev-2.6/crypto/drbg.c
-@@ -854,11 +854,9 @@ static inline int drbg_get_random_bytes(
- 	do {
- 		get_random_bytes(entropy, entropylen);
- 		ret = drbg_fips_continuous_test(drbg, entropy);
--		if (ret && ret != -EAGAIN)
--			return ret;
--	} while (ret);
-+	} while (ret == -EAGAIN);
- 
--	return 0;
-+	return ret;
- }
- 
- static int drbg_seed_from_random(struct drbg_state *drbg)
+- Eric
