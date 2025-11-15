@@ -1,889 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B5B25B305;
-	Sat, 15 Nov 2025 23:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E77525F97C;
+	Sat, 15 Nov 2025 23:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763248178; cv=none; b=YAsHJKLIt6imYeghFqRHIop06FoRtt7K9GCnhQSi7eO6AYQi3HTcCSonmzTGP+4qKGi/yse1w66GDHKjk2Rs+wVqhMW8Wh5Caa9WVZ7Y5efPxGmKoUKxPWMGNLnpUgqgx74IofZ3ydg5bvObOE8R+Mho4eYyqk1YzLCSy8y2aQ4=
+	t=1763250850; cv=none; b=LXFhB1U16LbXxD7hacBxIFMb37Gr6nntghjVzB7DpHKbSZXMT1NdXV7BsDCXwYYBWEIdVY1zSHY/Ct9xIPK4rwRRIl4jH3daoWVgC8NgmnS19ajQsWHaRhgHT9q/MC5EZbci/aw8QtXNUOHiizaEDqoqKBWyqeL+nh53IDRTAHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763248178; c=relaxed/simple;
-	bh=SwDdiR2CHC1AriktNlXRtJxcwG3MiX6jnkkBdHZckKE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AuArvbTexO6LNEQkuc+7FhozxVpwhSduzXtsJ1+vO5OVM63lXAgPZe5zNhse41GPhg2wNQptxYkSfONvzP/QQu/laKsZOqlBT1G6xef3n1ZPJdYtRTtPNfh9bIIs+KWRVabXF8/7Qoll6EGScnfrE1fYOTzgtx1CqVrfUGXrlf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YkKggI1X; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763250850; c=relaxed/simple;
+	bh=D8WoOI+gppvZIMnVLNAEUdHzU6Alj036nY1pL0ZtroU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lCd4hm5VFz3ndk2g426mqgBwRVlDkHnnFEvWbGPNEEzTBf8A025/cD6zqqVxf5/M0Blb8gLIfjGX6ulHc/5BlSP2tlgET6TifFPe0n2XP/9dY9Bh008eViyYUBW3t/04Va0ZlooRCXmU0NtKX/jiczQ9jmB89WR4cUpXDZ5l5aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TwQ6nvw2; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YkKggI1X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0DB1C116D0;
-	Sat, 15 Nov 2025 23:09:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763248178;
-	bh=SwDdiR2CHC1AriktNlXRtJxcwG3MiX6jnkkBdHZckKE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YkKggI1XYK6at5/Fr962NsNWbl+5oEEmmE4smd5XzodHReZmpar3S7IMGPiKzdRbS
-	 ZH3J1r2Mi0s1BSjVmtf6e863a5bewqUeg/A5ACBDoH+AzmDoE9bcVqVKrcFkPcwwB+
-	 q9MO3Rf1WWxcLRlXR5bn4q0XjrSZvgOtO+USIh1jR9BKZsLynVblHeVxPyHULq2NPC
-	 X/NUXVT4y3uCUkmvQlVRbfTKif4xb3+nu3zVna7qemqrnqSTrwQNh21Xc+z54B9E+G
-	 w3hbPb/YMKHAN6PXfEgT3iKrduUS96WyIs+SGKOfgIH5Z9EAUrJJawwJKCgB5BaqW2
-	 cEh3GH0CcmU2Q==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Colin Ian King <coking@nvidia.com>,
-	linux-kernel@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 2/2] Revert "crypto: scatterwalk - Move skcipher walk and use it for memcpy_sglist"
-Date: Sat, 15 Nov 2025 15:08:17 -0800
-Message-ID: <20251115230817.26070-3-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.51.2
-In-Reply-To: <20251115230817.26070-1-ebiggers@kernel.org>
-References: <20251115230817.26070-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TwQ6nvw2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763250849; x=1794786849;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=D8WoOI+gppvZIMnVLNAEUdHzU6Alj036nY1pL0ZtroU=;
+  b=TwQ6nvw23pIMr9C7YvuBUTaP6HQpmZyBtEWq2kk0FclMC12ZRNni5VB7
+   MxDr+cqEJ7/4nXzN54keMDMbVdN2MViZgbOF6u7Y+sTJdTXU0owtcLqO8
+   XIa8wdMHnprpHsT5EdkF/GEjE8PrCJ1slwitQ0bZU/XCnZnFraBtvayz7
+   vWHmvDCkJjx9fBEUXSMFYcuGYD+m4BWRD9DEUskW4WIMxONIrQuJrJnOv
+   0puQbenM+J56Z8TDUuGu/oRWoaxAyYdcxJ3Z7U8MtEUUsF353ue4963sW
+   ydg0Kn4r3hL/OejZYvZKX68/VSgKWNkfic0/K9POP7FiNz2OMCNqLeJgx
+   A==;
+X-CSE-ConnectionGUID: sSk4qqRzR+ueuMS2sfRwVg==
+X-CSE-MsgGUID: phezhA8TT/y7Cmzo9f+HPw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11614"; a="76404770"
+X-IronPort-AV: E=Sophos;i="6.19,308,1754982000"; 
+   d="scan'208";a="76404770"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2025 15:54:08 -0800
+X-CSE-ConnectionGUID: r+ho4jq0R3K+dftKK4xIcA==
+X-CSE-MsgGUID: G1FD0U3pRbm7BmaR+zfg5Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,308,1754982000"; 
+   d="scan'208";a="195067611"
+Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 15 Nov 2025 15:54:06 -0800
+Received: from kbuild by 7b01c990427b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vKQ5j-0008Lj-1n;
+	Sat, 15 Nov 2025 23:54:03 +0000
+Date: Sun, 16 Nov 2025 07:53:45 +0800
+From: kernel test robot <lkp@intel.com>
+To: quic_utiwari@quicinc.com, herbert@gondor.apana.org.au,
+	thara.gopinath@gmail.com, davem@davemloft.net
+Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	quic_neersoni@quicinc.com
+Subject: Re: [PATCH v3] crypto: qce - Add runtime PM and interconnect
+ bandwidth scaling support
+Message-ID: <202511160711.Q6ytYvlG-lkp@intel.com>
+References: <20251115084851.2750446-1-quic_utiwari@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251115084851.2750446-1-quic_utiwari@quicinc.com>
 
-This reverts commit 0f8d42bf128d349ad490e87d5574d211245e40f1, with the
-memcpy_sglist() part dropped.
+Hi,
 
-Now that memcpy_sglist() no longer uses the skcipher_walk code, the
-skcipher_walk code can be moved back to where it belongs.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- crypto/scatterwalk.c               | 248 ---------------------------
- crypto/skcipher.c                  | 261 ++++++++++++++++++++++++++++-
- include/crypto/algapi.h            |  12 ++
- include/crypto/internal/skcipher.h |  48 +++++-
- include/crypto/scatterwalk.h       |  65 +------
- 5 files changed, 316 insertions(+), 318 deletions(-)
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master linus/master v6.18-rc5 next-20251114]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-index b95e5974e327..be0e24843806 100644
---- a/crypto/scatterwalk.c
-+++ b/crypto/scatterwalk.c
-@@ -8,29 +8,14 @@
-  *               2002 Adam J. Richter <adam@yggdrasil.com>
-  *               2004 Jean-Luc Cooke <jlcooke@certainkey.com>
-  */
- 
- #include <crypto/scatterwalk.h>
--#include <linux/crypto.h>
--#include <linux/errno.h>
- #include <linux/kernel.h>
- #include <linux/mm.h>
- #include <linux/module.h>
- #include <linux/scatterlist.h>
--#include <linux/slab.h>
--
--enum {
--	SKCIPHER_WALK_SLOW = 1 << 0,
--	SKCIPHER_WALK_COPY = 1 << 1,
--	SKCIPHER_WALK_DIFF = 1 << 2,
--	SKCIPHER_WALK_SLEEP = 1 << 3,
--};
--
--static inline gfp_t skcipher_walk_gfp(struct skcipher_walk *walk)
--{
--	return walk->flags & SKCIPHER_WALK_SLEEP ? GFP_KERNEL : GFP_ATOMIC;
--}
- 
- void scatterwalk_skip(struct scatter_walk *walk, unsigned int nbytes)
- {
- 	struct scatterlist *sg = walk->sg;
- 
-@@ -215,238 +200,5 @@ struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
- 	scatterwalk_crypto_chain(dst, sg_next(src), 2);
- 
- 	return dst;
- }
- EXPORT_SYMBOL_GPL(scatterwalk_ffwd);
--
--static int skcipher_next_slow(struct skcipher_walk *walk, unsigned int bsize)
--{
--	unsigned alignmask = walk->alignmask;
--	unsigned n;
--	void *buffer;
--
--	if (!walk->buffer)
--		walk->buffer = walk->page;
--	buffer = walk->buffer;
--	if (!buffer) {
--		/* Min size for a buffer of bsize bytes aligned to alignmask */
--		n = bsize + (alignmask & ~(crypto_tfm_ctx_alignment() - 1));
--
--		buffer = kzalloc(n, skcipher_walk_gfp(walk));
--		if (!buffer)
--			return skcipher_walk_done(walk, -ENOMEM);
--		walk->buffer = buffer;
--	}
--
--	buffer = PTR_ALIGN(buffer, alignmask + 1);
--	memcpy_from_scatterwalk(buffer, &walk->in, bsize);
--	walk->out.__addr = buffer;
--	walk->in.__addr = walk->out.addr;
--
--	walk->nbytes = bsize;
--	walk->flags |= SKCIPHER_WALK_SLOW;
--
--	return 0;
--}
--
--static int skcipher_next_copy(struct skcipher_walk *walk)
--{
--	void *tmp = walk->page;
--
--	scatterwalk_map(&walk->in);
--	memcpy(tmp, walk->in.addr, walk->nbytes);
--	scatterwalk_unmap(&walk->in);
--	/*
--	 * walk->in is advanced later when the number of bytes actually
--	 * processed (which might be less than walk->nbytes) is known.
--	 */
--
--	walk->in.__addr = tmp;
--	walk->out.__addr = tmp;
--	return 0;
--}
--
--static int skcipher_next_fast(struct skcipher_walk *walk)
--{
--	unsigned long diff;
--
--	diff = offset_in_page(walk->in.offset) -
--	       offset_in_page(walk->out.offset);
--	diff |= (u8 *)(sg_page(walk->in.sg) + (walk->in.offset >> PAGE_SHIFT)) -
--		(u8 *)(sg_page(walk->out.sg) + (walk->out.offset >> PAGE_SHIFT));
--
--	scatterwalk_map(&walk->out);
--	walk->in.__addr = walk->out.__addr;
--
--	if (diff) {
--		walk->flags |= SKCIPHER_WALK_DIFF;
--		scatterwalk_map(&walk->in);
--	}
--
--	return 0;
--}
--
--static int skcipher_walk_next(struct skcipher_walk *walk)
--{
--	unsigned int bsize;
--	unsigned int n;
--
--	n = walk->total;
--	bsize = min(walk->stride, max(n, walk->blocksize));
--	n = scatterwalk_clamp(&walk->in, n);
--	n = scatterwalk_clamp(&walk->out, n);
--
--	if (unlikely(n < bsize)) {
--		if (unlikely(walk->total < walk->blocksize))
--			return skcipher_walk_done(walk, -EINVAL);
--
--slow_path:
--		return skcipher_next_slow(walk, bsize);
--	}
--	walk->nbytes = n;
--
--	if (unlikely((walk->in.offset | walk->out.offset) & walk->alignmask)) {
--		if (!walk->page) {
--			gfp_t gfp = skcipher_walk_gfp(walk);
--
--			walk->page = (void *)__get_free_page(gfp);
--			if (!walk->page)
--				goto slow_path;
--		}
--		walk->flags |= SKCIPHER_WALK_COPY;
--		return skcipher_next_copy(walk);
--	}
--
--	return skcipher_next_fast(walk);
--}
--
--static int skcipher_copy_iv(struct skcipher_walk *walk)
--{
--	unsigned alignmask = walk->alignmask;
--	unsigned ivsize = walk->ivsize;
--	unsigned aligned_stride = ALIGN(walk->stride, alignmask + 1);
--	unsigned size;
--	u8 *iv;
--
--	/* Min size for a buffer of stride + ivsize, aligned to alignmask */
--	size = aligned_stride + ivsize +
--	       (alignmask & ~(crypto_tfm_ctx_alignment() - 1));
--
--	walk->buffer = kmalloc(size, skcipher_walk_gfp(walk));
--	if (!walk->buffer)
--		return -ENOMEM;
--
--	iv = PTR_ALIGN(walk->buffer, alignmask + 1) + aligned_stride;
--
--	walk->iv = memcpy(iv, walk->iv, walk->ivsize);
--	return 0;
--}
--
--int skcipher_walk_first(struct skcipher_walk *walk, bool atomic)
--{
--	if (WARN_ON_ONCE(in_hardirq()))
--		return -EDEADLK;
--
--	walk->flags = atomic ? 0 : SKCIPHER_WALK_SLEEP;
--
--	walk->buffer = NULL;
--	if (unlikely(((unsigned long)walk->iv & walk->alignmask))) {
--		int err = skcipher_copy_iv(walk);
--		if (err)
--			return err;
--	}
--
--	walk->page = NULL;
--
--	return skcipher_walk_next(walk);
--}
--EXPORT_SYMBOL_GPL(skcipher_walk_first);
--
--/**
-- * skcipher_walk_done() - finish one step of a skcipher_walk
-- * @walk: the skcipher_walk
-- * @res: number of bytes *not* processed (>= 0) from walk->nbytes,
-- *	 or a -errno value to terminate the walk due to an error
-- *
-- * This function cleans up after one step of walking through the source and
-- * destination scatterlists, and advances to the next step if applicable.
-- * walk->nbytes is set to the number of bytes available in the next step,
-- * walk->total is set to the new total number of bytes remaining, and
-- * walk->{src,dst}.virt.addr is set to the next pair of data pointers.  If there
-- * is no more data, or if an error occurred (i.e. -errno return), then
-- * walk->nbytes and walk->total are set to 0 and all resources owned by the
-- * skcipher_walk are freed.
-- *
-- * Return: 0 or a -errno value.  If @res was a -errno value then it will be
-- *	   returned, but other errors may occur too.
-- */
--int skcipher_walk_done(struct skcipher_walk *walk, int res)
--{
--	unsigned int n = walk->nbytes; /* num bytes processed this step */
--	unsigned int total = 0; /* new total remaining */
--
--	if (!n)
--		goto finish;
--
--	if (likely(res >= 0)) {
--		n -= res; /* subtract num bytes *not* processed */
--		total = walk->total - n;
--	}
--
--	if (likely(!(walk->flags & (SKCIPHER_WALK_SLOW |
--				    SKCIPHER_WALK_COPY |
--				    SKCIPHER_WALK_DIFF)))) {
--		scatterwalk_advance(&walk->in, n);
--	} else if (walk->flags & SKCIPHER_WALK_DIFF) {
--		scatterwalk_done_src(&walk->in, n);
--	} else if (walk->flags & SKCIPHER_WALK_COPY) {
--		scatterwalk_advance(&walk->in, n);
--		scatterwalk_map(&walk->out);
--		memcpy(walk->out.addr, walk->page, n);
--	} else { /* SKCIPHER_WALK_SLOW */
--		if (res > 0) {
--			/*
--			 * Didn't process all bytes.  Either the algorithm is
--			 * broken, or this was the last step and it turned out
--			 * the message wasn't evenly divisible into blocks but
--			 * the algorithm requires it.
--			 */
--			res = -EINVAL;
--			total = 0;
--		} else
--			memcpy_to_scatterwalk(&walk->out, walk->out.addr, n);
--		goto dst_done;
--	}
--
--	scatterwalk_done_dst(&walk->out, n);
--dst_done:
--
--	if (res > 0)
--		res = 0;
--
--	walk->total = total;
--	walk->nbytes = 0;
--
--	if (total) {
--		if (walk->flags & SKCIPHER_WALK_SLEEP)
--			cond_resched();
--		walk->flags &= ~(SKCIPHER_WALK_SLOW | SKCIPHER_WALK_COPY |
--				 SKCIPHER_WALK_DIFF);
--		return skcipher_walk_next(walk);
--	}
--
--finish:
--	/* Short-circuit for the common/fast path. */
--	if (!((unsigned long)walk->buffer | (unsigned long)walk->page))
--		goto out;
--
--	if (walk->iv != walk->oiv)
--		memcpy(walk->oiv, walk->iv, walk->ivsize);
--	if (walk->buffer != walk->page)
--		kfree(walk->buffer);
--	if (walk->page)
--		free_page((unsigned long)walk->page);
--
--out:
--	return res;
--}
--EXPORT_SYMBOL_GPL(skcipher_walk_done);
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 8fa5d9686d08..14a820cb06c7 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -15,28 +15,273 @@
- #include <crypto/scatterwalk.h>
- #include <linux/bug.h>
- #include <linux/cryptouser.h>
- #include <linux/err.h>
- #include <linux/kernel.h>
-+#include <linux/mm.h>
- #include <linux/module.h>
- #include <linux/seq_file.h>
- #include <linux/slab.h>
- #include <linux/string.h>
- #include <linux/string_choices.h>
- #include <net/netlink.h>
- #include "skcipher.h"
- 
- #define CRYPTO_ALG_TYPE_SKCIPHER_MASK	0x0000000e
- 
-+enum {
-+	SKCIPHER_WALK_SLOW = 1 << 0,
-+	SKCIPHER_WALK_COPY = 1 << 1,
-+	SKCIPHER_WALK_DIFF = 1 << 2,
-+	SKCIPHER_WALK_SLEEP = 1 << 3,
-+};
-+
- static const struct crypto_type crypto_skcipher_type;
- 
-+static int skcipher_walk_next(struct skcipher_walk *walk);
-+
-+static inline gfp_t skcipher_walk_gfp(struct skcipher_walk *walk)
-+{
-+	return walk->flags & SKCIPHER_WALK_SLEEP ? GFP_KERNEL : GFP_ATOMIC;
-+}
-+
- static inline struct skcipher_alg *__crypto_skcipher_alg(
- 	struct crypto_alg *alg)
- {
- 	return container_of(alg, struct skcipher_alg, base);
- }
- 
-+/**
-+ * skcipher_walk_done() - finish one step of a skcipher_walk
-+ * @walk: the skcipher_walk
-+ * @res: number of bytes *not* processed (>= 0) from walk->nbytes,
-+ *	 or a -errno value to terminate the walk due to an error
-+ *
-+ * This function cleans up after one step of walking through the source and
-+ * destination scatterlists, and advances to the next step if applicable.
-+ * walk->nbytes is set to the number of bytes available in the next step,
-+ * walk->total is set to the new total number of bytes remaining, and
-+ * walk->{src,dst}.virt.addr is set to the next pair of data pointers.  If there
-+ * is no more data, or if an error occurred (i.e. -errno return), then
-+ * walk->nbytes and walk->total are set to 0 and all resources owned by the
-+ * skcipher_walk are freed.
-+ *
-+ * Return: 0 or a -errno value.  If @res was a -errno value then it will be
-+ *	   returned, but other errors may occur too.
-+ */
-+int skcipher_walk_done(struct skcipher_walk *walk, int res)
-+{
-+	unsigned int n = walk->nbytes; /* num bytes processed this step */
-+	unsigned int total = 0; /* new total remaining */
-+
-+	if (!n)
-+		goto finish;
-+
-+	if (likely(res >= 0)) {
-+		n -= res; /* subtract num bytes *not* processed */
-+		total = walk->total - n;
-+	}
-+
-+	if (likely(!(walk->flags & (SKCIPHER_WALK_SLOW |
-+				    SKCIPHER_WALK_COPY |
-+				    SKCIPHER_WALK_DIFF)))) {
-+		scatterwalk_advance(&walk->in, n);
-+	} else if (walk->flags & SKCIPHER_WALK_DIFF) {
-+		scatterwalk_done_src(&walk->in, n);
-+	} else if (walk->flags & SKCIPHER_WALK_COPY) {
-+		scatterwalk_advance(&walk->in, n);
-+		scatterwalk_map(&walk->out);
-+		memcpy(walk->out.addr, walk->page, n);
-+	} else { /* SKCIPHER_WALK_SLOW */
-+		if (res > 0) {
-+			/*
-+			 * Didn't process all bytes.  Either the algorithm is
-+			 * broken, or this was the last step and it turned out
-+			 * the message wasn't evenly divisible into blocks but
-+			 * the algorithm requires it.
-+			 */
-+			res = -EINVAL;
-+			total = 0;
-+		} else
-+			memcpy_to_scatterwalk(&walk->out, walk->out.addr, n);
-+		goto dst_done;
-+	}
-+
-+	scatterwalk_done_dst(&walk->out, n);
-+dst_done:
-+
-+	if (res > 0)
-+		res = 0;
-+
-+	walk->total = total;
-+	walk->nbytes = 0;
-+
-+	if (total) {
-+		if (walk->flags & SKCIPHER_WALK_SLEEP)
-+			cond_resched();
-+		walk->flags &= ~(SKCIPHER_WALK_SLOW | SKCIPHER_WALK_COPY |
-+				 SKCIPHER_WALK_DIFF);
-+		return skcipher_walk_next(walk);
-+	}
-+
-+finish:
-+	/* Short-circuit for the common/fast path. */
-+	if (!((unsigned long)walk->buffer | (unsigned long)walk->page))
-+		goto out;
-+
-+	if (walk->iv != walk->oiv)
-+		memcpy(walk->oiv, walk->iv, walk->ivsize);
-+	if (walk->buffer != walk->page)
-+		kfree(walk->buffer);
-+	if (walk->page)
-+		free_page((unsigned long)walk->page);
-+
-+out:
-+	return res;
-+}
-+EXPORT_SYMBOL_GPL(skcipher_walk_done);
-+
-+static int skcipher_next_slow(struct skcipher_walk *walk, unsigned int bsize)
-+{
-+	unsigned alignmask = walk->alignmask;
-+	unsigned n;
-+	void *buffer;
-+
-+	if (!walk->buffer)
-+		walk->buffer = walk->page;
-+	buffer = walk->buffer;
-+	if (!buffer) {
-+		/* Min size for a buffer of bsize bytes aligned to alignmask */
-+		n = bsize + (alignmask & ~(crypto_tfm_ctx_alignment() - 1));
-+
-+		buffer = kzalloc(n, skcipher_walk_gfp(walk));
-+		if (!buffer)
-+			return skcipher_walk_done(walk, -ENOMEM);
-+		walk->buffer = buffer;
-+	}
-+
-+	buffer = PTR_ALIGN(buffer, alignmask + 1);
-+	memcpy_from_scatterwalk(buffer, &walk->in, bsize);
-+	walk->out.__addr = buffer;
-+	walk->in.__addr = walk->out.addr;
-+
-+	walk->nbytes = bsize;
-+	walk->flags |= SKCIPHER_WALK_SLOW;
-+
-+	return 0;
-+}
-+
-+static int skcipher_next_copy(struct skcipher_walk *walk)
-+{
-+	void *tmp = walk->page;
-+
-+	scatterwalk_map(&walk->in);
-+	memcpy(tmp, walk->in.addr, walk->nbytes);
-+	scatterwalk_unmap(&walk->in);
-+	/*
-+	 * walk->in is advanced later when the number of bytes actually
-+	 * processed (which might be less than walk->nbytes) is known.
-+	 */
-+
-+	walk->in.__addr = tmp;
-+	walk->out.__addr = tmp;
-+	return 0;
-+}
-+
-+static int skcipher_next_fast(struct skcipher_walk *walk)
-+{
-+	unsigned long diff;
-+
-+	diff = offset_in_page(walk->in.offset) -
-+	       offset_in_page(walk->out.offset);
-+	diff |= (u8 *)(sg_page(walk->in.sg) + (walk->in.offset >> PAGE_SHIFT)) -
-+		(u8 *)(sg_page(walk->out.sg) + (walk->out.offset >> PAGE_SHIFT));
-+
-+	scatterwalk_map(&walk->out);
-+	walk->in.__addr = walk->out.__addr;
-+
-+	if (diff) {
-+		walk->flags |= SKCIPHER_WALK_DIFF;
-+		scatterwalk_map(&walk->in);
-+	}
-+
-+	return 0;
-+}
-+
-+static int skcipher_walk_next(struct skcipher_walk *walk)
-+{
-+	unsigned int bsize;
-+	unsigned int n;
-+
-+	n = walk->total;
-+	bsize = min(walk->stride, max(n, walk->blocksize));
-+	n = scatterwalk_clamp(&walk->in, n);
-+	n = scatterwalk_clamp(&walk->out, n);
-+
-+	if (unlikely(n < bsize)) {
-+		if (unlikely(walk->total < walk->blocksize))
-+			return skcipher_walk_done(walk, -EINVAL);
-+
-+slow_path:
-+		return skcipher_next_slow(walk, bsize);
-+	}
-+	walk->nbytes = n;
-+
-+	if (unlikely((walk->in.offset | walk->out.offset) & walk->alignmask)) {
-+		if (!walk->page) {
-+			gfp_t gfp = skcipher_walk_gfp(walk);
-+
-+			walk->page = (void *)__get_free_page(gfp);
-+			if (!walk->page)
-+				goto slow_path;
-+		}
-+		walk->flags |= SKCIPHER_WALK_COPY;
-+		return skcipher_next_copy(walk);
-+	}
-+
-+	return skcipher_next_fast(walk);
-+}
-+
-+static int skcipher_copy_iv(struct skcipher_walk *walk)
-+{
-+	unsigned alignmask = walk->alignmask;
-+	unsigned ivsize = walk->ivsize;
-+	unsigned aligned_stride = ALIGN(walk->stride, alignmask + 1);
-+	unsigned size;
-+	u8 *iv;
-+
-+	/* Min size for a buffer of stride + ivsize, aligned to alignmask */
-+	size = aligned_stride + ivsize +
-+	       (alignmask & ~(crypto_tfm_ctx_alignment() - 1));
-+
-+	walk->buffer = kmalloc(size, skcipher_walk_gfp(walk));
-+	if (!walk->buffer)
-+		return -ENOMEM;
-+
-+	iv = PTR_ALIGN(walk->buffer, alignmask + 1) + aligned_stride;
-+
-+	walk->iv = memcpy(iv, walk->iv, walk->ivsize);
-+	return 0;
-+}
-+
-+static int skcipher_walk_first(struct skcipher_walk *walk)
-+{
-+	if (WARN_ON_ONCE(in_hardirq()))
-+		return -EDEADLK;
-+
-+	walk->buffer = NULL;
-+	if (unlikely(((unsigned long)walk->iv & walk->alignmask))) {
-+		int err = skcipher_copy_iv(walk);
-+		if (err)
-+			return err;
-+	}
-+
-+	walk->page = NULL;
-+
-+	return skcipher_walk_next(walk);
-+}
-+
- int skcipher_walk_virt(struct skcipher_walk *__restrict walk,
- 		       struct skcipher_request *__restrict req, bool atomic)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct skcipher_alg *alg;
-@@ -47,12 +292,14 @@ int skcipher_walk_virt(struct skcipher_walk *__restrict walk,
- 
- 	walk->total = req->cryptlen;
- 	walk->nbytes = 0;
- 	walk->iv = req->iv;
- 	walk->oiv = req->iv;
--	if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP))
--		atomic = true;
-+	if ((req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) && !atomic)
-+		walk->flags = SKCIPHER_WALK_SLEEP;
-+	else
-+		walk->flags = 0;
- 
- 	if (unlikely(!walk->total))
- 		return 0;
- 
- 	scatterwalk_start(&walk->in, req->src);
-@@ -65,11 +312,11 @@ int skcipher_walk_virt(struct skcipher_walk *__restrict walk,
- 	if (alg->co.base.cra_type != &crypto_skcipher_type)
- 		walk->stride = alg->co.chunksize;
- 	else
- 		walk->stride = alg->walksize;
- 
--	return skcipher_walk_first(walk, atomic);
-+	return skcipher_walk_first(walk);
- }
- EXPORT_SYMBOL_GPL(skcipher_walk_virt);
- 
- static int skcipher_walk_aead_common(struct skcipher_walk *__restrict walk,
- 				     struct aead_request *__restrict req,
-@@ -78,12 +325,14 @@ static int skcipher_walk_aead_common(struct skcipher_walk *__restrict walk,
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 
- 	walk->nbytes = 0;
- 	walk->iv = req->iv;
- 	walk->oiv = req->iv;
--	if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP))
--		atomic = true;
-+	if ((req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) && !atomic)
-+		walk->flags = SKCIPHER_WALK_SLEEP;
-+	else
-+		walk->flags = 0;
- 
- 	if (unlikely(!walk->total))
- 		return 0;
- 
- 	scatterwalk_start_at_pos(&walk->in, req->src, req->assoclen);
-@@ -92,11 +341,11 @@ static int skcipher_walk_aead_common(struct skcipher_walk *__restrict walk,
- 	walk->blocksize = crypto_aead_blocksize(tfm);
- 	walk->stride = crypto_aead_chunksize(tfm);
- 	walk->ivsize = crypto_aead_ivsize(tfm);
- 	walk->alignmask = crypto_aead_alignmask(tfm);
- 
--	return skcipher_walk_first(walk, atomic);
-+	return skcipher_walk_first(walk);
- }
- 
- int skcipher_walk_aead_encrypt(struct skcipher_walk *__restrict walk,
- 			       struct aead_request *__restrict req,
- 			       bool atomic)
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index fc4574940636..05deea9dac5e 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -105,10 +105,22 @@ struct crypto_queue {
- 
- 	unsigned int qlen;
- 	unsigned int max_qlen;
- };
- 
-+struct scatter_walk {
-+	/* Must be the first member, see struct skcipher_walk. */
-+	union {
-+		void *const addr;
-+
-+		/* Private API field, do not touch. */
-+		union crypto_no_such_thing *__addr;
-+	};
-+	struct scatterlist *sg;
-+	unsigned int offset;
-+};
-+
- struct crypto_attr_alg {
- 	char name[CRYPTO_MAX_ALG_NAME];
- };
- 
- struct crypto_attr_type {
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index d5aa535263f6..0cad8e7364c8 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -8,11 +8,10 @@
- #ifndef _CRYPTO_INTERNAL_SKCIPHER_H
- #define _CRYPTO_INTERNAL_SKCIPHER_H
- 
- #include <crypto/algapi.h>
- #include <crypto/internal/cipher.h>
--#include <crypto/scatterwalk.h>
- #include <crypto/skcipher.h>
- #include <linux/types.h>
- 
- /*
-  * Set this if your algorithm is sync but needs a reqsize larger
-@@ -53,10 +52,51 @@ struct crypto_skcipher_spawn {
- 
- struct crypto_lskcipher_spawn {
- 	struct crypto_spawn base;
- };
- 
-+struct skcipher_walk {
-+	union {
-+		/* Virtual address of the source. */
-+		struct {
-+			struct {
-+				const void *const addr;
-+			} virt;
-+		} src;
-+
-+		/* Private field for the API, do not use. */
-+		struct scatter_walk in;
-+	};
-+
-+	union {
-+		/* Virtual address of the destination. */
-+		struct {
-+			struct {
-+				void *const addr;
-+			} virt;
-+		} dst;
-+
-+		/* Private field for the API, do not use. */
-+		struct scatter_walk out;
-+	};
-+
-+	unsigned int nbytes;
-+	unsigned int total;
-+
-+	u8 *page;
-+	u8 *buffer;
-+	u8 *oiv;
-+	void *iv;
-+
-+	unsigned int ivsize;
-+
-+	int flags;
-+	unsigned int blocksize;
-+	unsigned int stride;
-+	unsigned int alignmask;
-+};
-+
- static inline struct crypto_instance *skcipher_crypto_instance(
- 	struct skcipher_instance *inst)
- {
- 	return &inst->s.base;
- }
-@@ -169,20 +209,26 @@ void crypto_unregister_lskcipher(struct lskcipher_alg *alg);
- int crypto_register_lskciphers(struct lskcipher_alg *algs, int count);
- void crypto_unregister_lskciphers(struct lskcipher_alg *algs, int count);
- int lskcipher_register_instance(struct crypto_template *tmpl,
- 				struct lskcipher_instance *inst);
- 
-+int skcipher_walk_done(struct skcipher_walk *walk, int res);
- int skcipher_walk_virt(struct skcipher_walk *__restrict walk,
- 		       struct skcipher_request *__restrict req,
- 		       bool atomic);
- int skcipher_walk_aead_encrypt(struct skcipher_walk *__restrict walk,
- 			       struct aead_request *__restrict req,
- 			       bool atomic);
- int skcipher_walk_aead_decrypt(struct skcipher_walk *__restrict walk,
- 			       struct aead_request *__restrict req,
- 			       bool atomic);
- 
-+static inline void skcipher_walk_abort(struct skcipher_walk *walk)
-+{
-+	skcipher_walk_done(walk, -ECANCELED);
-+}
-+
- static inline void *crypto_skcipher_ctx(struct crypto_skcipher *tfm)
- {
- 	return crypto_tfm_ctx(&tfm->base);
- }
- 
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index f485454e3955..624fab589c2c 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -9,68 +9,15 @@
-  */
- 
- #ifndef _CRYPTO_SCATTERWALK_H
- #define _CRYPTO_SCATTERWALK_H
- 
--#include <linux/errno.h>
-+#include <crypto/algapi.h>
-+
- #include <linux/highmem.h>
- #include <linux/mm.h>
- #include <linux/scatterlist.h>
--#include <linux/types.h>
--
--struct scatter_walk {
--	/* Must be the first member, see struct skcipher_walk. */
--	union {
--		void *const addr;
--
--		/* Private API field, do not touch. */
--		union crypto_no_such_thing *__addr;
--	};
--	struct scatterlist *sg;
--	unsigned int offset;
--};
--
--struct skcipher_walk {
--	union {
--		/* Virtual address of the source. */
--		struct {
--			struct {
--				const void *const addr;
--			} virt;
--		} src;
--
--		/* Private field for the API, do not use. */
--		struct scatter_walk in;
--	};
--
--	union {
--		/* Virtual address of the destination. */
--		struct {
--			struct {
--				void *const addr;
--			} virt;
--		} dst;
--
--		/* Private field for the API, do not use. */
--		struct scatter_walk out;
--	};
--
--	unsigned int nbytes;
--	unsigned int total;
--
--	u8 *page;
--	u8 *buffer;
--	u8 *oiv;
--	void *iv;
--
--	unsigned int ivsize;
--
--	int flags;
--	unsigned int blocksize;
--	unsigned int stride;
--	unsigned int alignmask;
--};
- 
- static inline void scatterwalk_crypto_chain(struct scatterlist *head,
- 					    struct scatterlist *sg, int num)
- {
- 	if (sg)
-@@ -304,14 +251,6 @@ static inline void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
- 
- struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
- 				     struct scatterlist *src,
- 				     unsigned int len);
- 
--int skcipher_walk_first(struct skcipher_walk *walk, bool atomic);
--int skcipher_walk_done(struct skcipher_walk *walk, int res);
--
--static inline void skcipher_walk_abort(struct skcipher_walk *walk)
--{
--	skcipher_walk_done(walk, -ECANCELED);
--}
--
- #endif  /* _CRYPTO_SCATTERWALK_H */
+url:    https://github.com/intel-lab-lkp/linux/commits/quic_utiwari-quicinc-com/crypto-qce-Add-runtime-PM-and-interconnect-bandwidth-scaling-support/20251115-165032
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20251115084851.2750446-1-quic_utiwari%40quicinc.com
+patch subject: [PATCH v3] crypto: qce - Add runtime PM and interconnect bandwidth scaling support
+config: openrisc-allyesconfig (https://download.01.org/0day-ci/archive/20251116/202511160711.Q6ytYvlG-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251116/202511160711.Q6ytYvlG-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511160711.Q6ytYvlG-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/crypto/qce/core.c:295:12: warning: 'qce_runtime_resume' defined but not used [-Wunused-function]
+     295 | static int qce_runtime_resume(struct device *dev)
+         |            ^~~~~~~~~~~~~~~~~~
+>> drivers/crypto/qce/core.c:286:12: warning: 'qce_runtime_suspend' defined but not used [-Wunused-function]
+     286 | static int qce_runtime_suspend(struct device *dev)
+         |            ^~~~~~~~~~~~~~~~~~~
+
+
+vim +/qce_runtime_resume +295 drivers/crypto/qce/core.c
+
+   285	
+ > 286	static int qce_runtime_suspend(struct device *dev)
+   287	{
+   288		struct qce_device *qce = dev_get_drvdata(dev);
+   289	
+   290		icc_disable(qce->mem_path);
+   291	
+   292		return 0;
+   293	}
+   294	
+ > 295	static int qce_runtime_resume(struct device *dev)
+   296	{
+   297		struct qce_device *qce = dev_get_drvdata(dev);
+   298		int ret = 0;
+   299	
+   300		ret = icc_enable(qce->mem_path);
+   301		if (ret)
+   302			return ret;
+   303	
+   304		ret = icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH, QCE_DEFAULT_MEM_BANDWIDTH);
+   305		if (ret)
+   306			goto err_icc;
+   307	
+   308		return 0;
+   309	
+   310	err_icc:
+   311		icc_disable(qce->mem_path);
+   312		return ret;
+   313	}
+   314	
+
 -- 
-2.51.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
