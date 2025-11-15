@@ -1,72 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF0E2FF66C
-	for <linux-crypto@vger.kernel.org>; Sat, 15 Nov 2025 17:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DAC232395
+	for <linux-crypto@vger.kernel.org>; Sat, 15 Nov 2025 20:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763228373; cv=none; b=jOWRoJLANgqnoYM0E/FoWsnXq19X34pfAep9doHf8YGGjt1LBHQ0GvvaGbEnT1uhXwn9GXogNDV1AB0sQAYcr7020uVWO1PueJx/bInlLBWnMzczXmTuLdx3Y7PYOQSnuR+wZY0Qb2EhgI/NxHYrq6NKnem56n2cwq93eRlcLps=
+	t=1763239536; cv=none; b=Webxk8/ghRSoPWqBp0dVtJrFyvZaYePU2adLmSXEk1Ih2RlGobpW2KaMzSBWbkQQQt+0B5RqcGCrFSyL53UXYwXRrF9QiJ6U1mnLLTUkb7R72tK8IZlt1X05r/YX3EkVQPKcigTXoqdZ9rKd4X1MZAXPN5hL2sngtCtEostbqGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763228373; c=relaxed/simple;
-	bh=1mpyqGo4hpAjAjZbLsfCCtLiR/5WguPcnLRKeBqp5QA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eXpZw8t6M5Jx5qIEbL4XEl8qWgr2odHewKGG/pNbuhb0Y1o6O/XT5C7/3uYalva7ofYnBaBIF2JS7HHK5tAri16ZAZEXCMNmfGZbsz8plQsh4ALK9B8wghw+OchtFiurX5XKBSEpiiSXApHnFltlJjbS+0HrjqJuZdIbZsqAWHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=aNRt3OwM; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aNRt3OwM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCD37C113D0;
-	Sat, 15 Nov 2025 17:39:31 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aNRt3OwM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1763228369;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OV/BFGApxXKUVYDvY1tKAGFV6CTc4ZfvXv0Uxs5u8W8=;
-	b=aNRt3OwMnH0W6I1ExcT9gcBGYSc+avEWNV8AY9mI3gFzOgfrpNPtv7XCm3BE4nJFdMMk0z
-	trd7izsTigprFhBQKfY630D++nQ8ytjW5m+yBY547k0s2DHjrxHjcI55m6J9g6q0DpCeZX
-	S5KHGq5U1Kfo/2THaJ8Kie45B+L53Ts=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d1a0f857 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Sat, 15 Nov 2025 17:39:29 +0000 (UTC)
-Date: Sat, 15 Nov 2025 18:39:26 +0100
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-	Ard Biesheuvel <ardb+git@google.com>, linux-crypto@vger.kernel.org,
-	arnd@arndb.de, Kees Cook <kees@kernel.org>
-Subject: Re: [RFC PATCH] libcrypto/chachapoly: Use strict typing for fixed
- size array arguments
-Message-ID: <aRi6zrH3sGyTZcmf@zx2c4.com>
-References: <20251114180706.318152-2-ardb+git@google.com>
- <aRePu_IMV5G76kHK@zx2c4.com>
- <CAMj1kXG0RKOE4uQHfWnY1vU_FS+KUkZNNOLCrhC8dfbtf4PUjA@mail.gmail.com>
- <20251115021430.GA2148@sol>
- <CAHk-=wj6J5L5Y+oHc-i9BrDONpSbtt=iEemcyUm3dYnZ3pXxxg@mail.gmail.com>
+	s=arc-20240116; t=1763239536; c=relaxed/simple;
+	bh=9IrsNUai8hrJv3DivA0xbRcJoWWJOWnE+9BkopR6e0o=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:Content-Type; b=BvXFg4hgkMuv0zLbCSD8sqUkJuSl4zQ1QupYUj3Ggl1A0JllUop8cPGSe8lc84hdKoDPcdZHNP0rllv/u1TnBeb90jMQhjRvIx3GDwtdq4OazuoOm4gluRQAwJ0ayEysIamuggqml6Qd5zuuhYO0kIsEJ/xhq8ch1G8uaLvOsZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.104] (213.87.132.14) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 15 Nov
+ 2025 23:45:13 +0300
+Message-ID: <28d3bdbc-c3f4-4f51-9d83-73c4b4ac85cc@omp.ru>
+Date: Sat, 15 Nov 2025 23:45:12 +0300
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wj6J5L5Y+oHc-i9BrDONpSbtt=iEemcyUm3dYnZ3pXxxg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Subject: [PATCH] crypto: drbg - simplify drbg_get_random_bytes()
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller\""
+	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>
+CC: Karina Yankevich <k.yankevich@omp.ru>, <lvc-project@linuxtesting.org>
+Content-Language: en-US
+Organization: Open Mobile Platform
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 11/15/2025 20:30:11
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 198116 [Nov 15 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 76 0.3.76
+ 6aad6e32ec76b30ee13ccddeafeaa4d1732eef15
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.132.14 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.132.14 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.132.14
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/15/2025 20:32:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/15/2025 3:16:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hi Linus,
+To begin with, drbg_fips_continuous_test() only returns 0 and -EAGAIN,
+so an early return from the *do/while* loop in drbg_get_random_bytes()
+just isn't possible.  Then, the loop condition needs to be adjusted to
+only continue the loop while -EAGAIN is returned and the final *return*
+statement needs to be adjusted as well, in order to be prepared for the
+case of drbg_fips_continuous_test() starting to return some other error
+codes...
 
-On Sat, Nov 15, 2025 at 09:11:31AM -0800, Linus Torvalds wrote:
-> So *if* we end up using this syntax more widely, I suspect we'd want
-> to have a macro that makes the semantics more obvious, even if it's
-> something silly and trivial like
-> 
->    #define min_array_size(n) static n
-> 
-> just so that people who aren't familiar with that crazy syntax
-> understand what it means.
+Found by Linux Verification Center (linuxtesting.org) with the Svace static
+analysis tool.
 
-Oh that's a good suggestion. I'll see if I can rig that up and send
-something.
+Suggested-by: Yann Droneaud <yann@droneaud.fr>
+Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-Jason
+---
+The patch is against the master branch of Herbert Xu's cryptodev-2.6.git repo.
+
+ crypto/drbg.c |    6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+Index: cryptodev-2.6/crypto/drbg.c
+===================================================================
+--- cryptodev-2.6.orig/crypto/drbg.c
++++ cryptodev-2.6/crypto/drbg.c
+@@ -854,11 +854,9 @@ static inline int drbg_get_random_bytes(
+ 	do {
+ 		get_random_bytes(entropy, entropylen);
+ 		ret = drbg_fips_continuous_test(drbg, entropy);
+-		if (ret && ret != -EAGAIN)
+-			return ret;
+-	} while (ret);
++	} while (ret == -EAGAIN);
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ static int drbg_seed_from_random(struct drbg_state *drbg)
