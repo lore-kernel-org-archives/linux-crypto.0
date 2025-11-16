@@ -1,48 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BED723A984
-	for <linux-crypto@vger.kernel.org>; Sun, 16 Nov 2025 17:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2511CD15;
+	Sun, 16 Nov 2025 17:45:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763313584; cv=none; b=NE5xNYSqlfUSj4rECpxCo47F/38LHK/CCRsGPfCFLQe6L7g8Crkoefe3tkfSk2LYakYo4ZedJvaIbtatUvpsR8cBODmOIWOkE8EZ4Sngjx2EzJJJQ/aSSF43GSoO+k2OP4IbxsYUJGFnAuB1UM/kMsUUwtmiw8TPk8UR6DoPbmQ=
+	t=1763315149; cv=none; b=rePWZRl2GY61ecfA5VSAtPCUQzhIx7rNJoRWYUBDdGZgoijyrzaIgn4EbWWvZTGyyfVZyHB933MBh5h7dQcs/GzVhdXJz8rg4ILYjf15nHlWj6/AGbwQ8SWowg8TPbtGHMoCeCKQMkHFuEcqyTFrxrKGk6/PSCtraX2a19vGb/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763313584; c=relaxed/simple;
-	bh=CUPTKBgw0WdF7nGsD7yxeah7Cl8OgUDUMve2dz2HbuU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GEsw8pc2ip89t0WvuUMTzwAhqruZJirmJE2l+T7HnBxaEXmqePiAjR0VU82lOebziUh1mWBozbkcTqB1iZn2NF+MCwmjl3PVMZzk3a8RQkMIlO7/J0p1Dw+DwdsrgpXOTghNiKWotUFiiBYDPU+DsgsrG8nRmxZZVJky8EIUtN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+4mQdLz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763315149; c=relaxed/simple;
+	bh=mIMof+j6xW8EbtWWouxNGS8h1imgmKlIsYXitSco97I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u3CeAwEjwgHNnir6c/4gyc1cDnMHUJlt+WSVwpRVPIhlaFRFKYecSpzSlQKg+0T9EpCB4/La2ErkoMOpDu4Aon7xlBwKsAJ/t4wieox6z7MxfB5/qG1Tn9cUv1mu8ddTo4l37w1j7j9Bv4AxO/cywNB1XE00DuUucEHu+mh59Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GWNTQiM4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+4mQdLz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78DEBC4CEF1;
-	Sun, 16 Nov 2025 17:19:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWNTQiM4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1E8EC4CEFB;
+	Sun, 16 Nov 2025 17:45:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763313583;
-	bh=CUPTKBgw0WdF7nGsD7yxeah7Cl8OgUDUMve2dz2HbuU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=q+4mQdLzJyOH8fyS1uqXt0v7AG7t8OmsI2G9Je5Hp4y2v5uO7jBYLvvVgkGNVbabI
-	 5za5wIl/PctGaowYkQNlLFSco9WJgRoZG5Mz9W8iVxQEv5v8r26/umekNBI/GAhUYU
-	 hVsR5nTcsXLP5rdSDa97GKqjLvI46kS8b4X/14Rcg6WuiD+MsFtWQpLgBzZALmcwi+
-	 DgRiY76ly8o6V649UmoDpEOWwDM9Sw6+UEVty/fH/W2wgh9GbM0UVOn0wI/EJ1zUcL
-	 dVz6v2D7OvKTjwJ5GXlZWw0LFZ9/5Ee9soCNxlFJmZ4ccYyshOYKyjSGYhZu5ln5CL
-	 DR8Qo/shX5MGw==
-From: Sasha Levin <sashal@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 6.12] lib/crypto: arm/curve25519: Disable on CPU_BIG_ENDIAN
-Date: Sun, 16 Nov 2025 12:19:42 -0500
-Message-ID: <20251116171942.3613128-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251111202936.242896-1-ebiggers@kernel.org>
-References: <20251111202936.242896-1-ebiggers@kernel.org>
+	s=k20201202; t=1763315149;
+	bh=mIMof+j6xW8EbtWWouxNGS8h1imgmKlIsYXitSco97I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GWNTQiM4QKHL1hTXslK0h0UIB+ahqAweF4kMbt8g6fpGq4sp/jQ+bXRloojTBtUR6
+	 4cr/uBAGL9uzQ6RnWR9jo4BJrSzu5W7/dM0HOebdgORuszGIAsP9zDunSLbW7NftiS
+	 lMY/ZTCTpHt2OmyCTEWS0+P24oPVSQVjO1rFG9sfySiK35/O7o9cEqw0ks9Xy/vW6K
+	 ly5QvYRlsCZNPBhfzZruRNjIFqmNPWojhglGlM5y/lTSsjks1G9gIxwuiXfMhjm5wd
+	 rEaLgqqA5C3J0VD/eehKCk+GpiyMCJ1TiZFL89DGqmfnaxOkImHR8V+C418CUKScKK
+	 y3FwdbDiXp7gQ==
+Message-ID: <59755b49-fb81-41bf-8875-17e0215f1d8e@kernel.org>
+Date: Sun, 16 Nov 2025 10:45:47 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1 code
+ instead of AF_ALG
+Content-Language: en-US
+To: Eric Biggers <ebiggers@kernel.org>,
+ Stephen Hemminger <stephen@networkplumber.org>
+Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
+References: <20250929194648.145585-1-ebiggers@kernel.org>
+ <20251112040719.GB2832160@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20251112040719.GB2832160@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Subject: lib/crypto: arm/curve25519: Disable on CPU_BIG_ENDIAN
+On 11/11/25 9:07 PM, Eric Biggers wrote:
+> [Adding David Ahern.  I overlooked that iproute2 has separate
+> maintainers for the main tree and the next tree.]
+> 
+> On Mon, Sep 29, 2025 at 12:46:48PM -0700, Eric Biggers wrote:
+>> Add a basic SHA-1 implementation to lib/, and make lib/bpf_legacy.c use
+>> it to calculate SHA-1 digests instead of the previous AF_ALG-based code.
+>>
+>> This eliminates the dependency on AF_ALG, specifically the kernel config
+>> options CONFIG_CRYPTO_USER_API_HASH and CONFIG_CRYPTO_SHA1.
+>>
+>> Over the years AF_ALG has been very problematic, and it is also not
+>> supported on all kernels.  Escalating to the kernel's privileged
+>> execution context merely to calculate software algorithms, which can be
+>> done in userspace instead, is not something that should have ever been
+>> supported.  Even on kernels that support it, the syscall overhead of
+>> AF_ALG means that it is often slower than userspace code.
+>>
+>> Let's do the right thing here, and allow people to disable AF_ALG
+>> support (or not enable it) on systems where iproute2 is the only user.
+>>
+>> Acked-by: Ard Biesheuvel <ardb@kernel.org>
+>> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> 
+> Stephen and David, any interest in applying this patch?
+> 
+> - Eric
 
-Thanks!
+I do not have a strong opinion in either direction.
+
+If we are going to entertain removing AF_ALG code, we should apply the
+patch to iproute2-next at the beginning of a dev cycle to give maximum
+time for testing before it rolls out.
