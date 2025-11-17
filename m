@@ -1,37 +1,32 @@
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
+Received: from mail-m16.yeah.net (mail-m16.yeah.net [220.197.32.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9A031B80C
-	for <linux-crypto@vger.kernel.org>; Mon, 17 Nov 2025 09:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D750232B98A;
+	Mon, 17 Nov 2025 10:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.32.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763372318; cv=none; b=bFZcdW7AfT46Ynrg5TxuRnKyN01THqCVqrLq+P53QCJp18s+yAEqaYlAbQuH8q1Xrr/vlBfpBc9WF4iCrOvakGFeqPBvrmGubXWn3EJzX4glhlcUzcLQmsSEyu8lMf9ou4Z5OxETlCKyE6j54iAFPXXKkNz52VxI5U+YbeM6jTQ=
+	t=1763374123; cv=none; b=bnzHc/nbZ1ys34CXDOT32kfxYSUQciXBVqIbkiQtClFlc6LsDT9x5U1YgPu8XkhQdBCNWhEnVoR8VDhPuNyULVBRplVWldkeSRS6VGZxd3t6MhaIxRusqAboZyd6CH1NF7zyX32Wyn1oDe+tTv0VZ1JeIsbuy66ul0FREC4+KNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763372318; c=relaxed/simple;
-	bh=0Gq1vTAls4U5lWqQVRIcTaH4k9hEnn0rjpzDd+hIbT0=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=J/dxnYWkvrLVLtD/A1ZXQDqwWit6D31xDUDhyZ/fAEtnO0zWv4LWkoicQB3ZKUVJ5dDsIuZqwuoD91f5H+utbW1O4/CJ5tayIxDg0MHl6+6lWisR6uxJyUWsK59QbLxTpiOl4k8MbJNw5xYuZvv5ygfQuhAzsRIvVeyccfhXH8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1763371317-1eb14e3d8797650001-Xm9f1P
-Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx2.zhaoxin.com with ESMTP id UscqPKxxjogxNE8Z (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Mon, 17 Nov 2025 17:21:57 +0800 (CST)
-X-Barracuda-Envelope-From: AlanSong-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
-Received: from ZXSHMBX1.zhaoxin.com (10.28.252.163) by ZXSHMBX3.zhaoxin.com
- (10.28.252.165) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.59; Mon, 17 Nov
- 2025 17:21:57 +0800
-Received: from ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85]) by
- ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85%7]) with mapi id
- 15.01.2507.059; Mon, 17 Nov 2025 17:21:57 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
-Received: from [10.32.65.156] (10.32.65.156) by ZXBJMBX02.zhaoxin.com
- (10.29.252.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.59; Mon, 17 Nov
- 2025 17:04:25 +0800
-Message-ID: <c24d0582-ae94-4dfb-ae6f-6baafa7fe689@zhaoxin.com>
-Date: Mon, 17 Nov 2025 17:03:17 +0800
+	s=arc-20240116; t=1763374123; c=relaxed/simple;
+	bh=HbCz8YLG9Amwgm/orq88CmskYMtURJk6OPTehqK7koA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=maBPskKgBouHDuSoA/MwXoRbk+yZ7lbf1uQgOmbhw5r26GZe3WKq9nb4IPh5CIDYv4yoTXBxppBAeqFLaZlk3qBuG+U+lpda9NTRhrP2T+K/y0T50FSk/8uWcYyujx9+1jgC+GCnx6UWXQu16fERourRz0AqBGf8YTl1zZH3D0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=YJVjz7pR; arc=none smtp.client-ip=220.197.32.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="YJVjz7pR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
+	Content-Type; bh=ZGoM8BR5/8+LO/jGHnNF3hsgKqe4bKMupg4l6A1D9XU=;
+	b=YJVjz7pRT6kHf5fghNEgQfz35nJVmzRbXbjD7HAfR6WRTKE5V8m7254bXj7L6+
+	y2Ru5DsE+rT6BiXIWpWhdiYHxFMnuM0nQbJfi5pAwgGEIKKcuZ5aei7HMAIPxrAi
+	DL3e/h1qLNtKjLIhixkyyEmWsB5CaPZkTJBzRZddJ6fSU=
+Received: from [192.168.31.127] (unknown [])
+	by gzsmtp1 (Coremail) with SMTP id Mc8vCgDn+t0L9Bpp97dKAQ--.21938S2;
+	Mon, 17 Nov 2025 18:08:13 +0800 (CST)
+Message-ID: <c829e264-1cd0-4307-ac62-b75515ad3027@yeah.net>
+Date: Mon, 17 Nov 2025 18:08:07 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -39,55 +34,43 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: AlanSong-oc <AlanSong-oc@zhaoxin.com>
 Subject: Re: [PATCH] crypto: padlock-sha - Disable broken driver
-To: Eric Biggers <ebiggers@kernel.org>, <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-X-ASG-Orig-Subj: Re: [PATCH] crypto: padlock-sha - Disable broken driver
-CC: <linux-kernel@vger.kernel.org>, larryw3i <larryw3i@yeah.net>,
-	<stable@vger.kernel.org>, <CobeChen@zhaoxin.com>, <GeorgeXue@zhaoxin.com>,
-	<HansHu@zhaoxin.com>, <LeoLiu-oc@zhaoxin.com>, <TonyWWang-oc@zhaoxin.com>,
-	<YunShen@zhaoxin.com>
+To: AlanSong-oc <AlanSong-oc@zhaoxin.com>, Eric Biggers
+ <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ CobeChen@zhaoxin.com, GeorgeXue@zhaoxin.com, HansHu@zhaoxin.com,
+ LeoLiu-oc@zhaoxin.com, TonyWWang-oc@zhaoxin.com, YunShen@zhaoxin.com
 References: <3af01fec-b4d3-4d0c-9450-2b722d4bbe39@yeah.net>
  <20251116183926.3969-1-ebiggers@kernel.org>
-In-Reply-To: <20251116183926.3969-1-ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
- ZXBJMBX02.zhaoxin.com (10.29.252.6)
-X-Moderation-Data: 11/17/2025 5:21:55 PM
-X-Barracuda-Connect: ZXSHMBX3.zhaoxin.com[10.28.252.165]
-X-Barracuda-Start-Time: 1763371317
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 736
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -1.52
-X-Barracuda-Spam-Status: No, SCORE=-1.52 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=BSF_SC0_SA983
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.150256
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
-	0.50 BSF_SC0_SA983          Custom Rule BSF_SC0_SA983
+ <c24d0582-ae94-4dfb-ae6f-6baafa7fe689@zhaoxin.com>
+Content-Language: en-US
+From: larryw3i <larryw3i@yeah.net>
+In-Reply-To: <c24d0582-ae94-4dfb-ae6f-6baafa7fe689@zhaoxin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Mc8vCgDn+t0L9Bpp97dKAQ--.21938S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrJF1fuFyrWrWftFyxAF43ZFb_yoWxXrg_ur
+	yDXrWxWas8C3yIqF1YgFsrKF13Kw47Wr1kGay8Ja13W34jqFs8tFnFgFn29rWxZayfXrnr
+	Jry0vw1a9ryFkjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8qsj5UUUUU==
+X-CM-SenderInfo: xodu25vztlq5hhdkh0dhw/1tbiNg4hXWka9A6+dgAA3F
 
 
-On 11/17/2025 2:39 AM, Eric Biggers wrote:
+On 11/17/25 17:03, AlanSong-oc wrote:
+> I will submit the finalized patch immediately. 
+Dear AlanSong-oc,
 
-> This driver is known broken, as it computes the wrong SHA-1 and SHA-256
-> hashes.  Correctness needs to be the first priority for cryptographic
-> code.  Just disable it, allowing the standard (and actually correct)
-> SHA-1 and SHA-256 implementations to take priority.
-> =20
+I also want to nag a few more words. I think after a period of time, 
+most of your machines without external graphics cards may not be able to 
+install Debian properly (I don't know if KX-7000 is the same). It seems 
+that GNOME 49 no longer uses X11 by default but Wayland. However, as far 
+as I know, Wayland requires a graphics card driver to work. I have over 
+ten laptops with your CPUs built-in here. The operating system I 
+installed is Debian testing, but now GNOME is not working and I have to 
+use XFCE4.  😭
 
-Following Herbert Xu's=20
-suggestion=EF=BC=88https://lore.kernel.org/linux-crypto/aFkdNoQFmr8-x4cu@go=
-ndor.apana.org.au/=EF=BC=89,=20
-we have prepared a new version of the patch to address this issue. Since=20
-the code needs to remain compatible with older platforms, we are still=20
-conducting extensive testing. Once the testing is complete, I will=20
-submit the finalized patch immediately.
+Regards,
 
-Best Regards
-AlanSong-oc
+larryw3i
+
