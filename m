@@ -1,98 +1,86 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB84285CAA
-	for <linux-crypto@vger.kernel.org>; Mon, 17 Nov 2025 16:01:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D0F2DCC13
+	for <linux-crypto@vger.kernel.org>; Mon, 17 Nov 2025 16:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763395317; cv=none; b=gJZgSfBYbIHDOcAEf5R4H6OtU5sso6fXeG87QTlCT2f2gDNC0JjeRNbN/fUkEL2AAlGxVquxMmYs/75LZmFCatNB191E/O58CpFG6APySmr/cYpWKjLBSK4em+DkTv1fKCQlK1gcalwt2qG0khGEDcfq7nIvl26NNgHcYaCmKAQ=
+	t=1763397601; cv=none; b=clpcnHLPUvciow/dS65Da71Ar8C5Mjr9oFYhekmmd8zIh9aGowQFw8SHbBmucAgTzImfAevtJNxGj8qY1poi9I5Oz6FkczW7FLWqOzf3Y2ckFLwANlyk2k0VMgCV4mGrInEZEp1gz8cQrFTCC7/yS6GDDag9FjLLhuw19op2thc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763395317; c=relaxed/simple;
-	bh=IvWsMcb+Yh4OQgVKqlQOqb7kOQu14WaUOMto1enyEz4=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=jSZucu15/+KYOvv+RQU3Sdqdf+vbPwavl4FulCs/ZmmxxNunnM9bemwl4XStR5s1miyRwcw8z6Qys6Ewm2+hZV7OYdEU79Lij65/ppDcI3gUINm4beEtYUOTmK4SsWvg5jITaweTgahC9a1qmPVYF1lPf8aijcDMwNIsdJ5ceJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JKNPXl1K; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1763397601; c=relaxed/simple;
+	bh=CERm8fg4ws08oLit1qYwEfZhqnzPhYE3bQGj+8UqMy4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uUzKuefksf6hHrhGceEkBNz7IU7OgI+AVEgmxdTkOy8Xg9r0X8jRCorhaHw2YN9z5XKiMa2RUV1tIuwN/2dkReaQbLAqLzLJzbqmmLRvrIM6DVrUwQf2LXZJcht+F0SrdQ6SQpyaN1+O32o9pXx2Z6mX2MiPF91G08tWqEsWnvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dxzlc22g; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JKNPXl1K"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763395314;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xN1tMHSK0V4V/Ye9++bgGmJbF6vFPnFJ43P66UO+n5Q=;
-	b=JKNPXl1Kor5vBF2qQdQmxUBPc2/lZSJNxZNkK6jMjFIXfzH+ZUyw4S8RIE4iP5g8oDDrjn
-	0lsC42OogIuKaXVg79E4Z7aF8wGdFJMtAwXAl+6cP4W8SsJtHUrIcMynVablGvLzUsM6Zk
-	zzDpJtV1+O691tnuuU1VTnAsavsadUQ=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-352-BuuLYLfTOkKQ9jkBXfwKiw-1; Mon,
- 17 Nov 2025 11:01:51 -0500
-X-MC-Unique: BuuLYLfTOkKQ9jkBXfwKiw-1
-X-Mimecast-MFC-AGG-ID: BuuLYLfTOkKQ9jkBXfwKiw_1763395305
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A6C1A1802AAD;
-	Mon, 17 Nov 2025 16:01:44 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 785E33003778;
-	Mon, 17 Nov 2025 16:01:40 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20251117145606.2155773-1-dhowells@redhat.com>
-References: <20251117145606.2155773-1-dhowells@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dhowells@redhat.com, Eric Biggers <ebiggers@kernel.org>,
-    Luis Chamberlain <mcgrof@kernel.org>,
-    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
-    Sami Tolvanen <samitolvanen@google.com>,
-    "Jason A . Donenfeld" <Jason@zx2c4.com>,
-    Ard Biesheuvel <ardb@kernel.org>,
-    Stephan Mueller <smueller@chronox.de>,
-    Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>, linux-crypto@vger.kernel.org,
-    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Where to add FIPS tests
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dxzlc22g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B40F4C19421;
+	Mon, 17 Nov 2025 16:40:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763397600;
+	bh=CERm8fg4ws08oLit1qYwEfZhqnzPhYE3bQGj+8UqMy4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Dxzlc22ghPf3NgzbI9W7PD6qs8/Km84fjavec/cy+4N3ZFfXFnXGE9DoER1fLVow+
+	 cR6rb2uMa2rc0loVi9DTJdmDLEmvNHv1TXyqeHK6Q61U4rTZTASSV11+/TUpX5NXhJ
+	 TrvUwVZ2bE/8XfVySFGc27OdvoHUOMja0KwCxEIJ1Izs5ftbx/3U7W8lWqBEsBWUJO
+	 q6UZVFHddkJgOuPsySImo7srac8oO2e1bYfLz87SLPTabxBN/z8Lu/Dakux3lvjS+7
+	 3J/oTP9NU3Qill+1HvKnQImRw4GSlB6EN/Wglvn0NN3PDSAz2bxyF0FVMGXNwTmHiw
+	 5j/a/4zaATLSw==
+Date: Mon, 17 Nov 2025 11:39:59 -0500
+From: Sasha Levin <sashal@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 6.12] lib/crypto: arm/curve25519: Disable on
+ CPU_BIG_ENDIAN
+Message-ID: <aRtP3_mtZ6gqmIpU@laps>
+References: <20251111202936.242896-1-ebiggers@kernel.org>
+ <20251116171942.3613128-1-sashal@kernel.org>
+ <20251116193423.GA7489@quark>
+ <aRpvevwfpVA4hqr3@laps>
+ <20251117012513.GA1761@sol>
+ <aRp9sPD7Am9nF-_3@laps>
+ <20251117015052.GA177915@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2158595.1763395299.1@warthog.procyon.org.uk>
-Date: Mon, 17 Nov 2025 16:01:39 +0000
-Message-ID: <2158596.1763395299@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20251117015052.GA177915@sol>
 
-Hi Herbert,
+On Sun, Nov 16, 2025 at 05:50:52PM -0800, Eric Biggers wrote:
+>On Sun, Nov 16, 2025 at 08:43:12PM -0500, Sasha Levin wrote:
+>> On Sun, Nov 16, 2025 at 05:25:13PM -0800, Eric Biggers wrote:
+>> > On Sun, Nov 16, 2025 at 07:42:34PM -0500, Sasha Levin wrote:
+>> > > On Sun, Nov 16, 2025 at 11:42:24AM -0800, Eric Biggers wrote:
+>> > > > On Sun, Nov 16, 2025 at 12:19:42PM -0500, Sasha Levin wrote:
+>> > > > > Subject: lib/crypto: arm/curve25519: Disable on CPU_BIG_ENDIAN
+>> > > > >
+>> > > > > Thanks!
+>> > > >
+>> > > > I assume that you meant to write something meaningful in this message.
+>> > >
+>> > > What else did you expect to see here?
+>> >
+>> > Maybe some actual information that wasn't already in the email that
+>> > you're replying to?  What are you trying to accomplish?
+>>
+>> Letting you know that your backport was queued up?
+>
+>Maybe you should have mentioned that then?
 
-I'm wondering from where I should invoke the FIPS tests for ML-DSA.
+Oh!
 
-Currently, the asymmetric key type has some FIPS selftests for RSA and ECDSA
-built into it, but I wonder if that's the best way.  The problem is that it
-does the selftest during module init - but that can only test whatever
-algorithms are built into the base kernel image and initialised at the time
-late_initcall() happens.
+Apparently if I call git-send-email with --subject, it'll still strip the first
+line from the patch file.
 
-It might be better to put the tests into the algorithm modules themselves -
-but that then has a potential circular dependency issue.  However, that might
-not matter as the asymmetric key type won't be built as a module and will be
-built into the kernel (though some of the components such as X.509 and PKCS#7
-can be built as modules).
+The first line was "This patch has been queued up for the ${KERNEL_VERSION}
+stable tree." :)
 
-If I don't involve X.509/PKCS#7 in the selftest, then doing it from the ML-DSA
-modules during module init would be fine.
+Thanks for pointing it out, I've fixed up the script.
 
-Do you (or anyone else) have any thoughts?
-
-David
-
+-- 
+Thanks,
+Sasha
