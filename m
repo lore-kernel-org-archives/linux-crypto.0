@@ -1,198 +1,189 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E919A2BE7AB
-	for <linux-crypto@vger.kernel.org>; Tue, 18 Nov 2025 13:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0E534DCE0
+	for <linux-crypto@vger.kernel.org>; Tue, 18 Nov 2025 13:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763471302; cv=none; b=btDSw8qn/NcxmtEXbBPmNKSgfrQPPUvZm3UqOWqUV9iT9NTGEJoMST++CTUsbtx+AkKB+6zVaOecWoAJCGtvIiWHtec8y2ChN3YKUysyTlTvGcZ/4lukSlWupx5p81M+WDrNJMCKxWA+Esrl1nfc0xW3KhXGu/QdMhc+1DvJNx0=
+	t=1763473049; cv=none; b=XClWsALjjvtK+lG3O//wAcMUli8Lr7tQpQUon//DSKofk9tFto+KhItts184uHKoUagSyZTj2bAItkVg7z3NqNetcZGhrggDQkH11HaU+UU+rt6mDC9XDS6kA/RX7jpd8Q6uHjy2izKIKfdbWxzwR1DOolLOyMcoArVdvfDRJDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763471302; c=relaxed/simple;
-	bh=yk/uD48fD9QSf0Lw4IV6FJPv3ma0pqKXpe4LLe+mTC4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kCToSnknXSde16Uz+7NegFvw01dvJW51Qb2JbZCepUUeMD/JcO65b5Twd1RtFaFYtCp4xbJznbTogxH3K4KjmUQwIdifmTkQa7nd2eb7EVA0rICvOfGd5v6KIAdGmIvpsEPAR18+Q4kvofBhm5ZJeqp6i/UuBUH9nmEzNRpNqIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=GIKNgNeN; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=jIgeEdrQ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="GIKNgNeN";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="jIgeEdrQ"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AI9i0DT028363
-	for <linux-crypto@vger.kernel.org>; Tue, 18 Nov 2025 13:08:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	1cAkkko524XBA8vmRtigx+r0VJhPkOMYddNvO7s5UTg=; b=GIKNgNeNLd10xo+z
-	cSaHKeINY/XkCySdyuzkuR8GqwQz4RkxuIYP+a+rFTXCDeJifSWnS1MMoLKKwHpd
-	dIHynOf70X4UTLSfEpo1gGShTak8W+94KTitxAJGBHujmmwUX4/zurOBJ6ZkFs8v
-	s5khu3BkNhJhFsSi19AZLkYUib/DZZmg5B7waCM0lwoJxR0MsMvYZwMb076ge6Ph
-	93Aoa5DEy+timoTb7ZLJ3Tj0TqKuEYDMaw8SBK0Yg33W57bIutijEbqdgWprMnp8
-	In+sPvI9gsBkX2dBgZ3zHWpxoyVTudQFFVhuChKZ4a3lLxJV5cgQu5aycPkr2Whr
-	EhQvww==
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com [209.85.219.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ag77t35e8-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Tue, 18 Nov 2025 13:08:20 +0000 (GMT)
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-8823e9c63c6so19745466d6.0
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Nov 2025 05:08:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1763471299; x=1764076099; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1cAkkko524XBA8vmRtigx+r0VJhPkOMYddNvO7s5UTg=;
-        b=jIgeEdrQuxL0j3qR4D3HGXR3BO6YA+j/8C3sXXkr8q+4mF6o1SJeGqxuxZMphfv98Y
-         8xFpZPARXhaDuqhd97AA5MEkXAMZIrGM7HCW+g/5W/+AVs9iL1KN9WTQNrLDUv3Sxh+B
-         7x3JwiR8tc41aAcMTH5cL0ppMBhX6FO1ns22jMFAkU6RIEOdsRZJ3wrHD0p+zhDrclZX
-         i1jRiUvb5cfsnrK90z6f11PapYC8tH0djnLTfGo712gD4KnntNoeTgDY2S8Tkd8xL3ay
-         IozWjiuu2ZiSvoWyUd5bJaUyOWO5ov/agCFbFCNx9EEg3UwC8jCvlrwelW4CLh4Dvemn
-         WZ3Q==
+	s=arc-20240116; t=1763473049; c=relaxed/simple;
+	bh=aYLtYDuLNVEl76fJnhP2Lx52h1KY2MU3wh/+LjbIA0s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HNAO51xVZbo+Gn3+0Ws8w+DBp4RLOdECDOHWo85VqbyurNAX5gRd0+ixF7dRcDCSFi9ln6bcBoz7xAfzh1m2kS8tDBNiNWZ2siPlZNyMkMle32cTbgocVw6jepC7VQEJ4+Zq1Eer0wI6jpPHa1fEvb+t2o/09eRpRjnQyT+TOAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-5dbe6be1ac5so2244786137.1
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Nov 2025 05:37:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763471299; x=1764076099;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1cAkkko524XBA8vmRtigx+r0VJhPkOMYddNvO7s5UTg=;
-        b=ijeZ7yg/3iC5lS+5qC0SPSimb9VYYGAcGH5mfAYVor3Aqzkx91EBsOgPH7vmA+/w0X
-         DeXibAxn3qU2h+dMHwdgXewyi6/XQHNcFaCrpCK2kTjst3kqiGIwX1AQiCT9EMroCtl8
-         6bv6+w1t154+m7leHAhZHr5BmdLbFh8hyTl6E7PELQaX6a9ABCxz1QiSsXSQFX/B9/Y+
-         AxiWNnvp9+WOT43KXOW1b5VcvWuW7jmwTCz3kOiwU/2JdB5kv+LKDSe6pUyxnMOemxWb
-         vClGrYw+VUhVqlbEyK8+N6VSGYjUX2GrsUpfKhnhdP6RM1syG7+dY8pqvxdCxNv+eD67
-         jxSA==
-X-Gm-Message-State: AOJu0YzPPw9wrVkALUUp+qo3srshGMki5TMbdoixAKviPGdqehUWx3B6
-	qem0GZQ3Dz5Lx8jCB+CJ/HXZ29ZvJdv5QPx+1Jky5kEsBx4ZEZxYoF3EblhyeYvaGzq6l1FsWP5
-	RXk1AMBYTaJuz/ss6UNt7QilXGy3j7c9ZNy/iDeA5425sBF6tjiM1iniE7KMkm+efcCw=
-X-Gm-Gg: ASbGncv7uN4mWoGYP0gkkeR4VwcqUMeGXvah6IPg0Inq7unWYS7uXd2M5W+4P3M1td+
-	BFw+vaGTJH6rluKIiYO31MJ0Nu/+6uzZ3eZ6M6tsE2ht5MFZqOvf9RlRU6dLuikL9ed/w0HbZYW
-	enyknmtZn6EOdwdaUHDrTMQmNtGy5DsPpI5F1paqM+QWmWVOOaLIdtX9SM6/sQ6LyzxddiHWQGI
-	8oo8rjXvPPF/Pi44HC4uRLewp0597J5x5A8CrwFqNGawV2khikLAerMAwMB0nHkgHKgZv1Gq9JU
-	k644uKLPIGo60/YqMmkysezFVvgv3xkcxFzIaobx5YNcLe9FwEbw/PSRvobV2puZ2GT/lVls08K
-	X6L0H49IfF127kpaAR0P+2VhzIaTp5uzQdLAMdWznmGL1LwFXptwEati3IKu11jtvApA=
-X-Received: by 2002:a05:622a:1353:b0:4ee:1eb0:fbd9 with SMTP id d75a77b69052e-4ee313e7788mr24334741cf.1.1763471299015;
-        Tue, 18 Nov 2025 05:08:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGdqUqOyJ0Aro8rRS139qTe9lsMxr8JcnQEiHJrvX0pgs6TEAhrO6KwjIEuC52rzeMJnwkG0g==
-X-Received: by 2002:a05:622a:1353:b0:4ee:1eb0:fbd9 with SMTP id d75a77b69052e-4ee313e7788mr24334251cf.1.1763471298462;
-        Tue, 18 Nov 2025 05:08:18 -0800 (PST)
-Received: from [192.168.119.202] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fda8a7bsm1320492666b.54.2025.11.18.05.08.16
+        d=1e100.net; s=20230601; t=1763473046; x=1764077846;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HAgEnjBHe9vjRkHMQeQGLB6OvwD2DqiTQj/HhxtNAY0=;
+        b=OUJv9LzzYybzFPeNYrWJh5f3Y2ZSDEuWEJOnEvFRm8dz5xF9xRa0kR0MwXRIqipH6h
+         b4ZJ9BjAvwG+oqnP1W5TqfGHLFZyYJca9onxGR01YH2uuQOKWXgAUiwDhxt2mgfzsVpG
+         g8uDKeHPqeF1vt4CF/O2zWFAkZWyXoHDsa0zMjD9L5G+0v6jb9/o4yoZSnmgWWK0Zs1z
+         Rq3NrLO+sM7aosLh1z8ScRny/7aySBUYmpdIwCQaiZ/iMMPvhE8fPN6udLF66j44SJBO
+         GIGvumwR2PET8zjW5YHTATDaA8BsQyxl9yS0wg+TTNl1cgm6SleQ87Bu63HHESsZoi8t
+         PnQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXn/NoPWVVVwRJzGPOtA7dVq92OFFZinaGWmXyUNw5Fh6IF9T3ACfhW06u6x2HPNbBOP2NI3mnBgSPOzKI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHWUN/VjI9lhw2y6EtG9rDA4tv9Lc/VDggIlU4epkbvxBUYQX0
+	wn3zX2J7s/gUSG3YxKnPTjxgBeIIzZOvjUtlAfzh+oaDZf5NNgpbkFg+Ej8EOHGz
+X-Gm-Gg: ASbGncvNFPWxTXkrKEXurebcWeT6Bdo7xN2q89obdzx4sajQNOAxRUGoJIzD+Wh/EG/
+	OHyMsPogvHrgF2J3IbYXxw5hkH6ieCLa49/D62DPuIj9FxgIlw5SRuKNLskRV0uCodFtP0PFu4p
+	/O+ohEtn8bgy6WgzznY3VIHOqX71rC1XATFU/az/ekAGBnpZaU12gpzxjrsi7uTVM68K6I49ZSw
+	UQ9ULTV4RTnkte3yLtbxzZM/qb9G8/k48FIO5uPMIz2qXYkM3XAMpgM/U6koC04+8R91Eap9Rbu
+	0eHu9Oqtqx62E6qsD8tyH5H7qb8y5WJMEgyoTCeXRX1wRYw/4oEoHPFGEdoHcxLtze9raSa7Aa+
+	th/w06KD+xeob/puaTA9HcwC1B50PiqYP6I4OSYzRrXOSBgo8WrpfBZSlVtWyoaNhkJYXLPId3a
+	5ghu1lx4zdZnIHPvyvkyIV2XlScl88aqUOfJvcSKVnrz1cbPPIG8pHUwWLW5E=
+X-Google-Smtp-Source: AGHT+IHqo0HHvTl76U1SB9qLB+cI9VTfV4gqVx2Nj4TQISNBtq0DLJ74O1uiTSKoNThHZhTsM1diVA==
+X-Received: by 2002:a05:6102:a54:b0:5df:c228:28a4 with SMTP id ada2fe7eead31-5dfc5651965mr5505171137.20.1763473045433;
+        Tue, 18 Nov 2025 05:37:25 -0800 (PST)
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com. [209.85.217.51])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-937610d48b9sm4955277241.2.2025.11.18.05.37.24
+        for <linux-crypto@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Nov 2025 05:08:17 -0800 (PST)
-Message-ID: <306f6354-1502-4b9f-9a28-dcb7a882b367@oss.qualcomm.com>
-Date: Tue, 18 Nov 2025 14:08:15 +0100
+        Tue, 18 Nov 2025 05:37:24 -0800 (PST)
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-5dfcfbcbcc0so1352093137.2
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Nov 2025 05:37:24 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVhNtWA+wqDOie/yZe9SGGRVSYPt7GVq5ccumzlUtpk3n46X6u0jdb8rxhDbeSGh0YO4gOZjdrZ5OqN0yk=@vger.kernel.org
+X-Received: by 2002:a05:6102:5810:b0:5db:ca9e:b57e with SMTP id
+ ada2fe7eead31-5dfc5b94a4amr4590345137.43.1763473044116; Tue, 18 Nov 2025
+ 05:37:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <20251117062737.3946074-1-quic_utiwari@quicinc.com>
+ <121a5d34-e94f-4c29-9d58-4b730757760a@oss.qualcomm.com> <283e7a7d-c69b-4931-8e54-d473f0209abe@quicinc.com>
+ <306f6354-1502-4b9f-9a28-dcb7a882b367@oss.qualcomm.com>
+In-Reply-To: <306f6354-1502-4b9f-9a28-dcb7a882b367@oss.qualcomm.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 18 Nov 2025 14:37:12 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXk91aKo6n97y8eGhfB3Ngu66mzqWhgwe3u86sPx2iaSg@mail.gmail.com>
+X-Gm-Features: AWmQ_blb27zH5h3ZZ3oFEsGZzTMAKs0a-KLhrPwJAU9pj_AZJkAdwgdJpubgSzw
+Message-ID: <CAMuHMdXk91aKo6n97y8eGhfB3Ngu66mzqWhgwe3u86sPx2iaSg@mail.gmail.com>
 Subject: Re: [PATCH v4] crypto: qce - Add runtime PM and interconnect
  bandwidth scaling support
-To: Udit Tiwari <quic_utiwari@quicinc.com>, herbert@gondor.apana.org.au,
-        thara.gopinath@gmail.com, davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, quic_neersoni@quicinc.com,
-        kernel test robot <lkp@intel.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-References: <20251117062737.3946074-1-quic_utiwari@quicinc.com>
- <121a5d34-e94f-4c29-9d58-4b730757760a@oss.qualcomm.com>
- <283e7a7d-c69b-4931-8e54-d473f0209abe@quicinc.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <283e7a7d-c69b-4931-8e54-d473f0209abe@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE4MDEwNSBTYWx0ZWRfX5SxNr1dq+bQ4
- Tf0o4ug1VGp8lHp68i6RX2J7/wG8DDhAprhgASSYySA6js3HRhmjIVQWlxZxiLzAaoovRFGsg8H
- m9epbyWVkshOEg3PFc5+O9CAyhvA2kFgSDOf7xIbf0CxgrRgFP0lZlHLU0AxcNxC5vCHuvqvdsX
- ptYcmdVWEFNamxDEdz/HtG6oaWrYyfDi3TXfIIXSwh8agp+1ZXoOLn5dMIEkM8P9++9Nh8OhrMQ
- I0n1cpA0Ecg3FDTPVS/J4L3mM0ZYqzGQ9G2WKj7k1RM/lQajsgw+aa7xyHHzziBR1wp7s7JfaQI
- OeSU/fxqzeuXmrhmIBkv+S8HB4ch+5xBoMVB8tPtQxnbknBwE/mfUbZDofjx7CKVR5wROPfGLAP
- GeXtpt5aj0Y8o5g61XBYLlyK9hLHPQ==
-X-Authority-Analysis: v=2.4 cv=EPoLElZC c=1 sm=1 tr=0 ts=691c6fc4 cx=c_pps
- a=wEM5vcRIz55oU/E2lInRtA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8 a=COk6AnOGAAAA:8
- a=pBN3b43mpwga8PqSKsUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=OIgjcC2v60KrkQgK7BGD:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-ORIG-GUID: hUd4LfI4w92Mh0bfBFNOCjSiQZYhnCNW
-X-Proofpoint-GUID: hUd4LfI4w92Mh0bfBFNOCjSiQZYhnCNW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-17_04,2025-11-18_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
- lowpriorityscore=0 phishscore=0 adultscore=0 spamscore=0 clxscore=1015
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
- definitions=main-2511180105
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Cc: Udit Tiwari <quic_utiwari@quicinc.com>, herbert@gondor.apana.org.au, 
+	thara.gopinath@gmail.com, davem@davemloft.net, linux-crypto@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	quic_neersoni@quicinc.com, kernel test robot <lkp@intel.com>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/18/25 7:46 AM, Udit Tiwari wrote:
-> Hi Konrad,
-> 
-> Thanks for the review, please find my response inline.
-> 
-> On 11/17/2025 5:55 PM, Konrad Dybcio wrote:
->> On 11/17/25 7:27 AM, quic_utiwari@quicinc.com wrote:
->>> From: Udit Tiwari <quic_utiwari@quicinc.com>
->>>
->>> The Qualcomm Crypto Engine (QCE) driver currently lacks support for
->>> runtime power management (PM) and interconnect bandwidth control.
->>> As a result, the hardware remains fully powered and clocks stay
->>> enabled even when the device is idle. Additionally, static
->>> interconnect bandwidth votes are held indefinitely, preventing the
->>> system from reclaiming unused bandwidth.
+On Tue, 18 Nov 2025 at 14:08, Konrad Dybcio
+<konrad.dybcio@oss.qualcomm.com> wrote:
+> On 11/18/25 7:46 AM, Udit Tiwari wrote:
+> > Thanks for the review, please find my response inline.
+> >
+> > On 11/17/2025 5:55 PM, Konrad Dybcio wrote:
+> >> On 11/17/25 7:27 AM, quic_utiwari@quicinc.com wrote:
+> >>> From: Udit Tiwari <quic_utiwari@quicinc.com>
+> >>>
+> >>> The Qualcomm Crypto Engine (QCE) driver currently lacks support for
+> >>> runtime power management (PM) and interconnect bandwidth control.
+> >>> As a result, the hardware remains fully powered and clocks stay
+> >>> enabled even when the device is idle. Additionally, static
+> >>> interconnect bandwidth votes are held indefinitely, preventing the
+> >>> system from reclaiming unused bandwidth.
+>
+> [...]
+>
+> >>> Signed-off-by: Udit Tiwari <quic_utiwari@quicinc.com>
+> >>> Reported-by: kernel test robot <lkp@intel.com>
+> >>> Closes: https://lore.kernel.org/oe-kbuild-all/202511160711.Q6ytYvlG-l=
+kp@intel.com/
+> >>> ---
+> >>> Changes in v4:
+> >>> - Annotate runtime PM callbacks with __maybe_unused to silence W=3D1 =
+warnings.
+> >>> - Add Reported-by and Closes tags for kernel test robot warning.
+> >>
+> >> The tags are now saying
+> >>
+> >> "The kernel test robot reported that the QCE driver does not have PM
+> >> operations and this patch fixes that."
+> >>
+> >> Which doesn't have a reflection in reality.
+> >>
+> >> [...]
+> >>
+> > I may be misunderstanding this comment but the bot flagged W=3D1 unused=
+-function warnings under !CONFIG_PM. In v4 I added __maybe_unused and Repor=
+ted-by/Closes for that exact warning; I didn=E2=80=99t mean to imply the dr=
+iver lacks PM ops.
+>
+> The case where the tags would apply would be:
+>
+> A patch is submitted
+> The patch gets reviewed and applied to the tree
+> Kernel testing robot reports an issue
+> You send a fix-up patch (incl. robot's tags)
 
-[...]
+Exactly. The robot's report even says so:
 
->>> Signed-off-by: Udit Tiwari <quic_utiwari@quicinc.com>
->>> Reported-by: kernel test robot <lkp@intel.com>
->>> Closes: https://lore.kernel.org/oe-kbuild-all/202511160711.Q6ytYvlG-lkp@intel.com/
->>> ---
->>> Changes in v4:
->>> - Annotate runtime PM callbacks with __maybe_unused to silence W=1 warnings.
->>> - Add Reported-by and Closes tags for kernel test robot warning.
->>
->> The tags are now saying
->>
->> "The kernel test robot reported that the QCE driver does not have PM
->> operations and this patch fixes that."
->>
->> Which doesn't have a reflection in reality.
->>
->> [...]
->>
-> I may be misunderstanding this comment but the bot flagged W=1 unused-function warnings under !CONFIG_PM. In v4 I added __maybe_unused and Reported-by/Closes for that exact warning; I didn’t mean to imply the driver lacks PM ops.
+    If you fix the issue in a separate patch/commit (i.e. not just a
+new version of
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^=
+^^^^^^^^
+    the same patch/commit), kindly add following tags
+    ^^^^^^^^^^^^^^^^^^^^^^
+    | Reported-by: kernel test robot <lkp@intel.com>
+    | Closes: https://lore.kernel.org/oe-kbuild-all/202511160711.Q6ytYvlG-l=
+kp@intel.com/
 
-The case where the tags would apply would be:
+>
+> [...]
+>
+> >>> +    ret =3D pm_clk_add(dev, "bus");
+> >>> +    if (ret)
+> >>> +        return ret;
+> >>
+> >> Not all SoC have a pair of clocks. This is going to break those who do=
+n't
+> >>
+> >> Konrad
+> > On the concern that not all SoCs have "core/iface/bus" clocks and that =
+this could break those platforms: i believe the PM clock helpers are tolera=
+nt of missing clock entries. If a clock is not described in DT, pm_clk_add =
+will not cause the probe to fail, also on such platforms, runtime/system PM=
+ will simply not toggle that clock.
+> >
+> > I=E2=80=99ve tested this on sc7280 where the QCE node has no clock entr=
+ies, and the driver probes and operates correctly; runtime PM and interconn=
+ect behavior are as expected.
+> >
+> > If you=E2=80=99d like this handled in a specific way, please let me kno=
+w=E2=80=94I=E2=80=99m happy to implement that approach.
+>
+> No, you're right. I took a look at the pm_clk_add() call chain and notice=
+d
+> that clk_get() (notably not _optional) is in there, but apparently its
+> retval is never propagated if things fail
+>
+> (+RJW/Geert is that intended behavior?)
 
-A patch is submitted
-The patch gets reviewed and applied to the tree
-Kernel testing robot reports an issue
-You send a fix-up patch (incl. robot's tags)
+I think most checking is done before calling pm_clk_add() or
+pm_clk_add_clk(). of_pm_clk_add_clks() also calls of_clk_get() first.
+So that looks intentional to me.
 
-[...]
+Gr{oetje,eeting}s,
 
->>> +    ret = pm_clk_add(dev, "bus");
->>> +    if (ret)
->>> +        return ret;
->>
->> Not all SoC have a pair of clocks. This is going to break those who don't
->>
->> Konrad
-> On the concern that not all SoCs have "core/iface/bus" clocks and that this could break those platforms: i believe the PM clock helpers are tolerant of missing clock entries. If a clock is not described in DT, pm_clk_add will not cause the probe to fail, also on such platforms, runtime/system PM will simply not toggle that clock.
-> 
-> I’ve tested this on sc7280 where the QCE node has no clock entries, and the driver probes and operates correctly; runtime PM and interconnect behavior are as expected.
-> 
-> If you’d like this handled in a specific way, please let me know—I’m happy to implement that approach.
+                        Geert
 
-No, you're right. I took a look at the pm_clk_add() call chain and noticed
-that clk_get() (notably not _optional) is in there, but apparently its
-retval is never propagated if things fail
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
-(+RJW/Geert is that intended behavior?)
-
-Konrad
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
