@@ -1,34 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0508836CE1C;
-	Tue, 18 Nov 2025 17:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270EC393DF2;
+	Tue, 18 Nov 2025 17:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763485388; cv=none; b=EmV8BDWVYclQeajjnYH7M4Pst9QwrmMLx6YimJsQlKvCY8KdbP+8exVv8bExpvxDHUJGDcLk13hS6X7yJKv2e0N3PV/O4uydNdLfR4WVGAswKAKFZ9Fd3fNLoiqqdIoUF3hX7QkHon+IuQb7ElUzNutLdtwAmY1rN3MzrHdNYhU=
+	t=1763485392; cv=none; b=EXFuvLWsukzUiYKIF/d6EaxRHR+sD2cmogdsoVSDQxZeCXudgQa8qj0bnC3RsIvzcNiGFdMtPsj9RoJ4uouzOmOWC5onDB71a6b+IEq7aNF28EgxGnOH/qRgE9KMQqs60ip5e37phEepByASsekEsNdxq0cgmiVJVrVuMbUSFKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763485388; c=relaxed/simple;
-	bh=FuYoqguP7bcYpyCkSan1ZcwKcNavEG6ckSTFvvv/mhM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eq+xWCDq+QRZSe9JdbNiWxAgYOeSuxAkUu8iFNYFtI4/cSu9PqtYug9WPq+SOXJFXrHDG1MeDJlA/ihjsxkD3uva3jVD5NmtFVUClKA9ahb3ZMoLWhdjA/1sQAiWVaRUc19O3PK33jlAwLJQvFRt+sQxgqRV0/VY57pohwihcVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=BzxA53fk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763485392; c=relaxed/simple;
+	bh=6PzMV1gm7C7OASBlBKI3M5sPAhzVyrBTNUO/jy34KdU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hF+kBsrqqgaxhWQHYW3wxTriJfK5+6c8ngb2H3ZAYU9W36At4IgRrBlcF96ARDzVZbHeynNe2Y5t+3heZOZxWNrmlb5jp+UxCPFXQNk+xJIMnslwv0EJ/60JSp52QC2VkSbfkCz/uZeMlYD+ikeaHyxEVXA4rMwTLRi81oQtry0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=gwoHOAlz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BzxA53fk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34986C116D0;
-	Tue, 18 Nov 2025 17:03:06 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gwoHOAlz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94197C2BCB0;
+	Tue, 18 Nov 2025 17:03:10 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BzxA53fk"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gwoHOAlz"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1763485384;
+	t=1763485389;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=9+57XdN/Gbe2F3qKJBw0ih4kdK6TNvPjlqGo0bVtGjs=;
-	b=BzxA53fkwoTRFr+Uw5eOPaBfzaiJhoxFzS/tPh5owdd45rQQtwJKU29KlXis7l1h9KExng
-	L4MHe6YTZRYBqq3zMk2Xfhs6KXQYjgz9B2qzhglgvNYM5V17PUlGKtnG2L+Jz8fMNiPfWB
-	m79RKzSp6JiORKRc2YfZN0ptAjNkA4o=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dxMmbZ95X9o27DpSIzq/k0A09r8nwA0F6gLdrEzkdRo=;
+	b=gwoHOAlzmJDNHATEao1l3x/gtaB3UW7csQRwbYGavHAv28YP9wPu09ww+msZk+yRaq1lFF
+	AvFTbgdU+W5ahk0ZpatYIVTqUoJd2V6kQxdcTkufY67HUXN2idcakKoWCjCySfkndr0B3K
+	NMMSXMVfqsU/4Htw/H4OtfaAZc6qeKg=
 Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 405181d5 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Tue, 18 Nov 2025 17:03:03 +0000 (UTC)
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a07f9639 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 18 Nov 2025 17:03:09 +0000 (UTC)
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: Linus Torvalds <torvalds@linux-foundation.org>,
 	Eric Biggers <ebiggers@kernel.org>,
@@ -37,9 +39,11 @@ To: Linus Torvalds <torvalds@linux-foundation.org>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH libcrypto 1/2] array_size: introduce min_array_size() function decoration
-Date: Tue, 18 Nov 2025 18:02:39 +0100
-Message-ID: <20251118170240.689299-1-Jason@zx2c4.com>
+Subject: [PATCH libcrypto 2/2] crypto: chacha20poly1305: statically check fixed array lengths
+Date: Tue, 18 Nov 2025 18:02:40 +0100
+Message-ID: <20251118170240.689299-2-Jason@zx2c4.com>
+In-Reply-To: <20251118170240.689299-1-Jason@zx2c4.com>
+References: <20251118170240.689299-1-Jason@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,81 +53,178 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Clang and recent gcc support warning if they are able to prove that the
-user is passing to a function an array that is too short in size. For
-example:
+Several parameters of the chacha20poly1305 functions require arrays of
+an exact length. Use the new min_array_size() macro to instruct gcc and
+clang to statically check that the caller is passing an object of at
+least that length.
 
-    void blah(unsigned char herp[static 7]);
-    static void schma(void)
-    {
-        unsigned char good[] = { 1, 2, 3, 4, 5, 6, 7 };
-        unsigned char bad[] = { 1, 2, 3, 4, 5, 6 };
-        blah(good);
-        blah(bad);
-    }
+Here it is in action, with this faulty patch:
 
-The notation here, `static 7`, means that it's incorrect to pass
-anything less than 7 elements. This is section 6.7.5.3 of C99:
+diff --git a/drivers/net/wireguard/cookie.h b/drivers/net/wireguard/cookie.h
+index c4bd61ca03f2..2839c46029f8 100644
+--- a/drivers/net/wireguard/cookie.h
++++ b/drivers/net/wireguard/cookie.h
+@@ -13,7 +13,7 @@ struct wg_peer;
 
-    If the keyword static also appears within the [ and ] of the array
-    type derivation, then for each call to the function, the value of
-    the corresponding actual argument shall provide access to the first
-    element of an array with at least as many elements as specified by
-    the size expression.
+ struct cookie_checker {
+ 	u8 secret[NOISE_HASH_LEN];
+-	u8 cookie_encryption_key[NOISE_SYMMETRIC_KEY_LEN];
++	u8 cookie_encryption_key[NOISE_SYMMETRIC_KEY_LEN - 1];
+ 	u8 message_mac1_key[NOISE_SYMMETRIC_KEY_LEN];
+ 	u64 secret_birthdate;
+ 	struct rw_semaphore secret_lock;
 
-Here is the output from gcc 15:
+If I try compiling this code, I get this nasty warning:
 
-    zx2c4@thinkpad /tmp $ gcc -c a.c
-    a.c: In function ‘schma’:
-    a.c:9:9: warning: ‘blah’ accessing 7 bytes in a region of size 6 [-Wstringop-overflow=]
-        9 |         blah(bad);
-          |         ^~~~~~~~~
-    a.c:9:9: note: referencing argument 1 of type ‘unsigned char[7]’
-    a.c:2:6: note: in a call to function ‘blah’
-        2 | void blah(unsigned char herp[static 7]);
-          |      ^~~~
+  CC      drivers/net/wireguard/cookie.o
+drivers/net/wireguard/cookie.c: In function ‘wg_cookie_message_create’:
+drivers/net/wireguard/cookie.c:193:9: warning: ‘xchacha20poly1305_encrypt’ reading 32 bytes from a region of size 31 [-Wstringop-overread]
+  193 |         xchacha20poly1305_encrypt(dst->encrypted_cookie, cookie, COOKIE_LEN,
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  194 |                                   macs->mac1, COOKIE_LEN, dst->nonce,
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  195 |                                   checker->cookie_encryption_key);
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+drivers/net/wireguard/cookie.c:193:9: note: referencing argument 7 of type ‘const u8 *’ {aka ‘const unsigned char *’}
+In file included from drivers/net/wireguard/messages.h:10,
+                 from drivers/net/wireguard/cookie.h:9,
+                 from drivers/net/wireguard/cookie.c:6:
+include/crypto/chacha20poly1305.h:29:6: note: in a call to function ‘xchacha20poly1305_encrypt’
+   29 | void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~
 
-And from clang 21:
-
-    zx2c4@thinkpad /tmp $ clang -c a.c
-    a.c:9:2: warning: array argument is too small; contains 6 elements, callee requires at least 7
-          [-Warray-bounds]
-        9 |         blah(bad);
-          |         ^    ~~~
-    a.c:2:25: note: callee declares array parameter as static here
-        2 | void blah(unsigned char herp[static 7]);
-          |                         ^   ~~~~~~~~~~
-    1 warning generated.
-
-So these are covered by, variously, -Wstringop-overflow and
--Warray-bounds.
-
-Introduce min_array_size(), so that the above code becomes slightly less
-ugly:
-
-    void blah(unsigned char herp[min_array_size(7)]);
+This is exactly what's expected.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- include/linux/array_size.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ include/crypto/chacha20poly1305.h | 17 +++++++++--------
+ lib/crypto/chacha20poly1305.c     | 18 +++++++++---------
+ 2 files changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/include/linux/array_size.h b/include/linux/array_size.h
-index 06d7d83196ca..8671aee11479 100644
---- a/include/linux/array_size.h
-+++ b/include/linux/array_size.h
-@@ -10,4 +10,11 @@
-  */
- #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
+diff --git a/include/crypto/chacha20poly1305.h b/include/crypto/chacha20poly1305.h
+index d2ac3ff7dc1e..b19975f07d2f 100644
+--- a/include/crypto/chacha20poly1305.h
++++ b/include/crypto/chacha20poly1305.h
+@@ -6,6 +6,7 @@
+ #ifndef __CHACHA20POLY1305_H
+ #define __CHACHA20POLY1305_H
  
-+/**
-+ * min_array_size - parameter decoration to hint to the compiler that the
-+ *                  passed array should have at least @n elements
-+ * @n: minimum number of elements, after which the compiler may warn
-+ */
-+#define min_array_size(n) static n
-+
- #endif  /* _LINUX_ARRAY_SIZE_H */
++#include <linux/array_size.h>
+ #include <linux/types.h>
+ #include <linux/scatterlist.h>
+ 
+@@ -18,32 +19,32 @@ enum chacha20poly1305_lengths {
+ void chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			      const u8 *ad, const size_t ad_len,
+ 			      const u64 nonce,
+-			      const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++			      const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)]);
+ 
+ bool __must_check
+ chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			 const u8 *ad, const size_t ad_len, const u64 nonce,
+-			 const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++			 const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)]);
+ 
+ void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			       const u8 *ad, const size_t ad_len,
+-			       const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
+-			       const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++			       const u8 nonce[min_array_size(XCHACHA20POLY1305_NONCE_SIZE)],
++			       const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)]);
+ 
+ bool __must_check xchacha20poly1305_decrypt(
+ 	u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
+-	const size_t ad_len, const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
+-	const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++	const size_t ad_len, const u8 nonce[min_array_size(XCHACHA20POLY1305_NONCE_SIZE)],
++	const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)]);
+ 
+ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src, size_t src_len,
+ 					 const u8 *ad, const size_t ad_len,
+ 					 const u64 nonce,
+-					 const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++					 const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)]);
+ 
+ bool chacha20poly1305_decrypt_sg_inplace(struct scatterlist *src, size_t src_len,
+ 					 const u8 *ad, const size_t ad_len,
+ 					 const u64 nonce,
+-					 const u8 key[CHACHA20POLY1305_KEY_SIZE]);
++					 const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)]);
+ 
+ bool chacha20poly1305_selftest(void);
+ 
+diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
+index 0b49d6aedefd..5916d3bb694c 100644
+--- a/lib/crypto/chacha20poly1305.c
++++ b/lib/crypto/chacha20poly1305.c
+@@ -89,7 +89,7 @@ __chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ void chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			      const u8 *ad, const size_t ad_len,
+ 			      const u64 nonce,
+-			      const u8 key[CHACHA20POLY1305_KEY_SIZE])
++			      const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)])
+ {
+ 	struct chacha_state chacha_state;
+ 	u32 k[CHACHA_KEY_WORDS];
+@@ -111,8 +111,8 @@ EXPORT_SYMBOL(chacha20poly1305_encrypt);
+ 
+ void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			       const u8 *ad, const size_t ad_len,
+-			       const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
+-			       const u8 key[CHACHA20POLY1305_KEY_SIZE])
++			       const u8 nonce[min_array_size(XCHACHA20POLY1305_NONCE_SIZE)],
++			       const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)])
+ {
+ 	struct chacha_state chacha_state;
+ 
+@@ -170,7 +170,7 @@ __chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ bool chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			      const u8 *ad, const size_t ad_len,
+ 			      const u64 nonce,
+-			      const u8 key[CHACHA20POLY1305_KEY_SIZE])
++			      const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)])
+ {
+ 	struct chacha_state chacha_state;
+ 	u32 k[CHACHA_KEY_WORDS];
+@@ -195,8 +195,8 @@ EXPORT_SYMBOL(chacha20poly1305_decrypt);
+ 
+ bool xchacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			       const u8 *ad, const size_t ad_len,
+-			       const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
+-			       const u8 key[CHACHA20POLY1305_KEY_SIZE])
++			       const u8 nonce[min_array_size(XCHACHA20POLY1305_NONCE_SIZE)],
++			       const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)])
+ {
+ 	struct chacha_state chacha_state;
+ 
+@@ -211,7 +211,7 @@ bool chacha20poly1305_crypt_sg_inplace(struct scatterlist *src,
+ 				       const size_t src_len,
+ 				       const u8 *ad, const size_t ad_len,
+ 				       const u64 nonce,
+-				       const u8 key[CHACHA20POLY1305_KEY_SIZE],
++				       const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)],
+ 				       int encrypt)
+ {
+ 	const u8 *pad0 = page_address(ZERO_PAGE(0));
+@@ -335,7 +335,7 @@ bool chacha20poly1305_crypt_sg_inplace(struct scatterlist *src,
+ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src, size_t src_len,
+ 					 const u8 *ad, const size_t ad_len,
+ 					 const u64 nonce,
+-					 const u8 key[CHACHA20POLY1305_KEY_SIZE])
++					 const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)])
+ {
+ 	return chacha20poly1305_crypt_sg_inplace(src, src_len, ad, ad_len,
+ 						 nonce, key, 1);
+@@ -345,7 +345,7 @@ EXPORT_SYMBOL(chacha20poly1305_encrypt_sg_inplace);
+ bool chacha20poly1305_decrypt_sg_inplace(struct scatterlist *src, size_t src_len,
+ 					 const u8 *ad, const size_t ad_len,
+ 					 const u64 nonce,
+-					 const u8 key[CHACHA20POLY1305_KEY_SIZE])
++					 const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)])
+ {
+ 	if (unlikely(src_len < POLY1305_DIGEST_SIZE))
+ 		return false;
 -- 
 2.51.2
 
