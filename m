@@ -1,102 +1,198 @@
-Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FCD2238C08;
-	Tue, 18 Nov 2025 12:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E919A2BE7AB
+	for <linux-crypto@vger.kernel.org>; Tue, 18 Nov 2025 13:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763470787; cv=none; b=XyBYanVW9WjTOfImsqSNmrm8Nb8nUokNXciihoqb0rXwGWWNwvpVxA0dfjD97kW/8FOrek/H/6jkOErh9UkFlznJcFnfS4tQzPIG9d7MQ7B41I49Ao3dBH5h3pd2M2maxCNr9yRbswuABnPdAcQdvCJpc79khmWV++9gV5zDNcU=
+	t=1763471302; cv=none; b=btDSw8qn/NcxmtEXbBPmNKSgfrQPPUvZm3UqOWqUV9iT9NTGEJoMST++CTUsbtx+AkKB+6zVaOecWoAJCGtvIiWHtec8y2ChN3YKUysyTlTvGcZ/4lukSlWupx5p81M+WDrNJMCKxWA+Esrl1nfc0xW3KhXGu/QdMhc+1DvJNx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763470787; c=relaxed/simple;
-	bh=Ncb/lmSZ8o8BxiSBOIglYd7auxVrKItyWqgvXcde6uE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uBr61exL4DsBS9U7VjvWJiPYmN0hFweOSRQREA1r9Uwe6IG/LV8ovfIsfpH7TzDBu3POs9a1tA7sJvKKjwHbURGf5b/1lbt/BEUWJL/KEhxzjMabPgXNGNDozCADYF0tMIwTBlEri9WWaPHCaWUv6NXSPVxcjTRZJ1BTWS1/pa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=i6jdZIEV; arc=none smtp.client-ip=198.37.111.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	s=arc-20240116; t=1763471302; c=relaxed/simple;
+	bh=yk/uD48fD9QSf0Lw4IV6FJPv3ma0pqKXpe4LLe+mTC4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kCToSnknXSde16Uz+7NegFvw01dvJW51Qb2JbZCepUUeMD/JcO65b5Twd1RtFaFYtCp4xbJznbTogxH3K4KjmUQwIdifmTkQa7nd2eb7EVA0rICvOfGd5v6KIAdGmIvpsEPAR18+Q4kvofBhm5ZJeqp6i/UuBUH9nmEzNRpNqIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=GIKNgNeN; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=jIgeEdrQ; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="i6jdZIEV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1763470783;
-	bh=Ncb/lmSZ8o8BxiSBOIglYd7auxVrKItyWqgvXcde6uE=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=i6jdZIEVNwLYytXxL0xyszz9V/5J00crWUsPC1qD1xPY4uMLGG6PFVmMBDI1Qanz4
-	 lX8l8+zo6piIYnCdXIKjZuLVrDq0H5gCjQrZ3hxSmjUEKC9ju5ny/fuZ9cv93pKbjr
-	 FNvQWgk+tdXmaQcgSRiWdhZnGa2QMXI93iQBhnV0=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id E5FEC1C020F;
-	Tue, 18 Nov 2025 07:59:42 -0500 (EST)
-Message-ID: <29700dff2d59fa3a8a97604390280246a35df3bf.camel@HansenPartnership.com>
-Subject: Re: [PATCH v9 2/9] crypto: Add ML-DSA/Dilithium verify support
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: David Howells <dhowells@redhat.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Herbert Xu
- <herbert@gondor.apana.org.au>,  Luis Chamberlain <mcgrof@kernel.org>, Petr
- Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, Sami
- Tolvanen <samitolvanen@google.com>, "Jason A . Donenfeld"
- <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Stephan Mueller
- <smueller@chronox.de>,  Lukas Wunner <lukas@wunner.de>, Ignat Korchagin
- <ignat@cloudflare.com>, linux-crypto@vger.kernel.org, 
- keyrings@vger.kernel.org, linux-modules@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Date: Tue, 18 Nov 2025 07:59:42 -0500
-In-Reply-To: <2187237.1763455154@warthog.procyon.org.uk>
-References: 
-	<13213304ac049113655ab8fe1bae76cc84a3330e.camel@HansenPartnership.com>
-	 <20251117171003.GC1584@sol> <20251117145606.2155773-1-dhowells@redhat.com>
-	 <20251117145606.2155773-3-dhowells@redhat.com>
-	 <2165074.1763409175@warthog.procyon.org.uk>
-	 <2187237.1763455154@warthog.procyon.org.uk>
-Autocrypt: addr=James.Bottomley@HansenPartnership.com;
- prefer-encrypt=mutual;
- keydata=mQENBE58FlABCADPM714lRLxGmba4JFjkocqpj1/6/Cx+IXezcS22azZetzCXDpm2MfNElecY3qkFjfnoffQiw5rrOO0/oRSATOh8+2fmJ6el7naRbDuh+i8lVESfdlkoqX57H5R8h/UTIp6gn1mpNlxjQv6QSZbl551zQ1nmkSVRbA5TbEp4br5GZeJ58esmYDCBwxuFTsSsdzbOBNthLcudWpJZHURfMc0ew24By1nldL9F37AktNcCipKpC2U0NtGlJjYPNSVXrCd1izxKmO7te7BLP+7B4DNj1VRnaf8X9+VIApCi/l4Kdx+ZR3aLTqSuNsIMmXUJ3T8JRl+ag7kby/KBp+0OpotABEBAAG0N0phbWVzIEJvdHRvbWxleSA8SmFtZXMuQm90dG9tbGV5QEhhbnNlblBhcnRuZXJzaGlwLmNvbT6JAVgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAhkBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmBLmY0FCRs1hL0ACgkQgUrkfCFIVNaEiQgAg18F4G7PGWQ68xqnIrccke7Reh5thjUz6kQIii6Dh64BDW6/UvXn20UxK2uSs/0TBLO81k1mV4c6rNE+H8b7IEjieGR9frBsp/+Q01JpToJfzzMUY7ZTDV1IXQZ+AY9L7vRzyimnJHx0Ba4JTlAyHB+Ly5i4Ab2+uZcnNfBXquWrG3oPWz+qPK88LJLya5Jxse1m1QT6R/isDuPivBzntLOooxPk+Cwf5sFAAJND+idTAzWzslexr9j7rtQ1UW6FjO4CvK9yVNz7dgG6FvEZl6J/HOr1rivtGgpCZTBzKNF8jg034n49zGfKkkzWLuXbPUOp3/oGfsKv8pnEu1c2GbQpSmFtZXMgQm90dG9tbGV5IDxqZWpiQGxpbnV4LnZuZXQuaWJtLmNvbT6JAVYEEwEIAEACGwMHCwkIBwMCAQYVC
-	AIJCgsEFgIDAQIeAQIXgBYhBNVgbnPItGJxvq2a34FK5HwhSFTWBQJgS5mXBQkbNYS9AAoJEIFK5HwhSFTWEYEH/1YZpV+1uCI2MVz0wTRlnO/3OW/xnyigrw+K4cuO7MToo0tHJb/qL9CBJ2ddG6q+GTnF5kqUe87t7M7rSrIcAkIZMbJmtIbKk0j5EstyYqlE1HzvpmssGpg/8uJBBuWbU35af1ubKCjUs1+974mYXkfLmS0a6h+cG7atVLmyClIc2frd3o0zHF9+E7BaB+HQzT4lheQAXv9KI+63ksnbBpcZnS44t6mi1lzUE65+Am1z+1KJurF2Qbj4AkICzJjJa0bXa9DmFunjPhLbCU160LppaG3OksxuNOTkGCo/tEotDOotZNBYejWaXN2nr9WrH5hDfQ5zLayfKMtLSd33T9u0IUphbWVzIEJvdHRvbWxleSA8amVqYkBrZXJuZWwub3JnPokBVQQTAQgAPwIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQTVYG5zyLRicb6tmt+BSuR8IUhU1gUCYEuZmAUJGzWEvQAKCRCBSuR8IUhU1gacCAC+QZN+RQd+FOoh5g884HQm8S07ON0/2EMiaXBiL6KQb5yP3w2PKEhug3+uPzugftUfgPEw6emRucrFFpwguhriGhB3pgWJIrTD4JUevrBgjEGOztJpbD73bLLyitSiPQZ6OFVOqIGhdqlc3n0qoNQ45n/w3LMVj6yP43SfBQeQGEdq4yHQxXPs0XQCbmr6Nf2p8mNsIKRYf90fCDmABH1lfZxoGJH/frQOBCJ9bMRNCNy+aFtjd5m8ka5M7gcDvM7TAsKhD5O5qFs4aJHGajF4gCGoWmXZGrISQvrNl9kWUhgsvoPqb2OTTeAQVRuV8C4FQamxzE3MRNH25j6s/qujtCRKYW1lcyBCb3R0b21sZXkgPGplamJAbGludXguaWJtLmNvbT6JAVQEEwEIAD
-	4CGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQTVYG5zyLRicb6tmt+BSuR8IUhU1gUCYEuZmQUJGzWEvQAKCRCBSuR8IUhU1kyHB/9VIOkf8RapONUdZ+7FgEpDgESE/y3coDeeb8jrtJyeefWCA0sWU8GSc9KMcMoSUetUreB+fukeVTe/f2NcJ87Bkq5jUEWff4qsbqf5PPM+wlD873StFc6mP8koy8bb7QcH3asH9fDFXUz7Oz5ubI0sE8+qD+Pdlk5qmLY5IiZ4D98V239nrKIhDymcuL7VztyWfdFSnbVXmumIpi79Ox536P2aMe3/v+1jAsFQOIjThMo/2xmLkQiyacB2veMcBzBkcair5WC7SBgrz2YsMCbC37X7crDWmCI3xEuwRAeDNpmxhVCb7jEvigNfRWQ4TYQADdC4KsilPfuW8Edk/8tPtCVKYW1lcyBCb3R0b21sZXkgPEpCb3R0b21sZXlAT2Rpbi5jb20+iQEfBDABAgAJBQJXI+B0Ah0gAAoJEIFK5HwhSFTWzkwH+gOg1UG/oB2lc0DF3lAJPloSIDBW38D3rezXTUiJtAhenWrH2Cl/ejznjdTukxOcuR1bV8zxR9Zs9jhUin2tgCCxIbrdvFIoYilMMRKcue1q0IYQHaqjd7ko8BHn9UysuX8qltJFar0BOClIlH95gdKWJbK46mw7bsXeD66N9IhAsOMJt6mSJmUdIOMuKy4dD4X3adegKMmoTRvHOndZQClTZHiYt5ECRPO534Lb/gyKAKQkFiwirsgx11ZSx3zGlw28brco6ohSLMBylna/Pbbn5hII86cjrCXWtQ4mE0Y6ofeFjpmMdfSRUxy6LHYd3fxVq9PoAJTv7vQ6bLTDFNa0KkphbWVzIEJvdHRvbWxleSA8SkJvdHRvbWxleUBQYXJhbGxlbHMuY29tPokBHwQwAQIACQUCVyPgjAIdIAAKCRCBSuR8IUhU1tXiB/9D9OOU8qB
-	CZPxkxB6ofp0j0pbZppRe6iCJ+btWBhSURz25DQzQNu5GVBRQt1Us6v3PPGU1cEWi5WL935nw+1hXPIVB3x8hElvdCO2aU61bMcpFd138AFHMHJ+emboKHblnhuY5+L1OlA1QmPw6wQooCor1h113lZiBZGrPFxjRYbWYVQmVaM6zhkiGgIkzQw/g9v57nAzYuBhFjnVHgmmu6/B0N8z6xD5sSPCZSjYSS38UG9w189S8HVr4eg54jReIEvLPRaxqVEnsoKmLisryyaw3EpqZcYAWoX0Am+58CXq3j5OvrCvbyqQIWFElba3Ka/oT7CnTdo/SUL/jPNobtCxKYW1lcyBCb3R0b21sZXkgPGplamJAaGFuc2VucGFydG5lcnNoaXAuY29tPokBVwQTAQgAQRYhBNVgbnPItGJxvq2a34FK5HwhSFTWBQJjg2eQAhsDBQkbNYS9BQsJCAcCAiICBhUKCQgLAgQWAgMBAh4HAheAAAoJEIFK5HwhSFTWbtAH/087y9vzXYAHMPbjd8etB/I3OEFKteFacXBRBRDKXI9ZqK5F/xvd1fuehwQWl2Y/sivD4cSAP0iM/rFOwv9GLyrr82pD/GV/+1iXt9kjlLY36/1U2qoyAczY+jsS72aZjWwcO7Og8IYTaRzlqif9Zpfj7Q0Q1e9SAefMlakI6dcZTSlZWaaXCefdPBCc7BZ0SFY4kIg0iqKaagdgQomwW61nJZ+woljMjgv3HKOkiJ+rcB/n+/moryd8RnDhNmvYASheazYvUwaF/aMj5rIb/0w5p6IbFax+wGF5RmH2U5NeUlhIkTodUF/P7g/cJf4HCL+RA1KU/xS9o8zrAOeut2+4UgRaZ7bmEwgqhkjOPQMBBwIDBH4GsIgL0yQij5S5ISDZmlR7qDQPcWUxMVx6zVPsAoITdjKFjaDmUATkS+l5zmiCrUBcJ6MBavPiYQ4kqn4/xwaJAbMEGAEIACYCGwIWIQTVYG5zyLRi
-	cb6tmt+BSuR8IUhU1gUCZag0LwUJDwLkSQCBdiAEGRMIAB0WIQTnYEDbdso9F2cI+arnQslM7pishQUCWme25gAKCRDnQslM7pishdi9AQDyOvLYOBkylBqiTlJrMnGCCsWgGZwPpKq3e3s7JQ/xBAEAlx29pPY5z0RLyIDUsjf9mtkSNTaeaQ6TIjDrFa+8XH8JEIFK5HwhSFTWkasH/j7LL9WH9dRfwfTwuMMj1/KGzjU/4KFIu4uKxDaevKpGS7sDx4F56mafCdGD8u4+ri6bJr/3mmuzIdyger0vJdRlTrnpX3ONXvR57p1JHgCljehE1ZB0RCzIk0vKhdt8+CDBQWfKbbKBTmzA7wR68raMQb2D7nQ9d0KXXbtr7Hag29yj92aUAZ/sFoe9RhDOcRUptdYyPKU1JHgJyc0Z7HwNjRSJ4lKJSKP+Px0/XxT3gV3LaDLtHuHa2IujLEAKcPzTr5DOV+xsgA3iSwTYI6H5aEe+ZRv/rA4sdjqRiVpo2d044aCUFUNQ3PiIHPAZR3KK5O64m6+BJMDXBvgSsMy4VgRaZ7clEggqhkjOPQMBBwIDBMfuMuE+PECbOoYjkD0Teno7TDbcgxJNgPV7Y2lQbNBnexMLOEY6/xJzRi1Xm/o9mOyZ+VIj8h4G5V/eWSntNkwDAQgHiQE8BBgBCAAmAhsMFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmWoNBwFCQ8C4/cACgkQgUrkfCFIVNZs4AgAnIjU1QEPLdpotiy3X01sKUO+hvcT3/Cd6g55sJyKJ5/U0o3f8fdSn6MWPhi1m62zbAxcLJFiTZ3OWNCZAMEvwHrXFb684Ey6yImQ9gm2dG2nVuCzr1+9gIaMSBeZ+4kUJqhdWSJjrNLQG38GbnBuYOJUD+x6oJ2AT10/mQfBVZ3qWDQXr/je2TSf0OIXaWyG6meG5yTqOEv0eaTH22yBb1nbodoZkmlMMb56jzRGZuorhFE06
-	N0Eb0kiGz5cCIrHZoH10dHWoa7/Z+AzfL0caOKjcmsnUPcmcrqmWzJTEibLA81z15GBCrldfQVt+dF7Us2kc0hKUgaWeI8Gv4CzwLkCDQRUdhaZARAApeF9gbNSBBudW8xeMQIiB/CZwK4VOEP7nGHZn3UsWemsvE9lvjbFzbqcIkbUp2V6ExM5tyEgzio2BavLe1ZJGHVaKkL3cKLABoYi/yBLEnogPFzzYfK2fdipm2G+GhLaqfDxtAQ7cqXeo1TCsZLSvjD+kLVV1TvKlaHS8tUCh2oUyR7fTbv6WHi5H8DLyR0Pnbt9E9/Gcs1j11JX+MWJ7jset2FVDsB5U1LM70AjhXiDiQCtNJzKaqKdMei8zazWS50iMKKeo4m/adWBjG/8ld3fQ7/Hcj6Opkh8xPaCnmgDZovYGavw4Am2tjRqE6G6rPQpS0we5I6lSsKNBP/2FhLmI9fnsBnZC1l1NrASRSX1BK0xf4LYB2Ww3fYQmbbApAUBbWZ/1aQoc2ECKbSK9iW0gfZ8rDggfMw8nzpmEEExl0hU6wtJLymyDV+QGoPx5KwYK/6qAUNJQInUYz8z2ERM/HOI09Zu3jiauFBDtouSIraX/2DDvTf7Lfe1+ihARFSlp64kEMAsjKutNBK2u5oj4H7hQ7zD+BvWLHxMgysOtYYtwggweOrM/k3RndsZ/z3nsGqF0ggct1VLuH2eznDksI+KkZ3Bg0WihQyJ7Z9omgaQAyRDFct+jnJsv2Iza+xIvPei+fpbGNAyFvj0e+TsZoQGcC34/ipGwze651UAEQEAAYkBHwQoAQIACQUCVT6BaAIdAwAKCRCBSuR8IUhU1p5QCAC7pgjOM17Hxwqz9mlGELilYqjzNPUoZt5xslcTFGxj/QWNzu0K8gEQPePnc5dTfumzWL077nxhdKYtoqwm2C6fOmXiJBZx6khBfRqctUvN2DlOB6dFf5I+1QT9TRBvceGzw01E4Gi0xjWKAB6OII
-	MAdnPcDVFzaXJdlAAJdjfg/lyJtAyxifflG8NnXJ3elwGqoBso84XBNWWzbc5VKmatzhYLOvXtfzDhu4mNPv/z7S1HTtRguI0NlH5RVBzSvfzybin9hysE3/+r3C0HJ2xiOHzucNAmG03aztzZYDMTbKQW4bQqeD5MJxT68vBYu8MtzfIe41lSLpb/qlwq1qg0iQElBBgBAgAPBQJUdhaZAhsMBQkA7U4AAAoJEIFK5HwhSFTW3YgH/AyJL2rlCvGrkLcas94ND9Pmn0cUlVrPl7wVGcIV+6I4nrw6u49TyqNMmsYam2YpjervJGgbvIbMzoHFCREi6R9XyUsw5w7GCRoWegw2blZYi5A52xe500+/RruG//MKfOtVUotu3N+u7FcXaYAg9gbYeGNZCV70vI+cnFgq0AEJRdjidzfCWVKPjafTo7jHeFxX7Q22kUfWOkMzzhoDbFg0jPhVYNiEXpNyXCwirzvKA7bvFwZPlRkbfihaiXDE7QKIUtQ10i5kw4C9rqDKwx8F0PaWDRF9gGaKd7/IJGHJaac/OcSJ36zxgkNgLsVX5GUroJ2GaZcR7W9Vppj5H+C4UgRkuRyTEwgqhkjOPQMBBwIDBOySomnsW2SkApXv1zUBaD38dFEj0LQeDEMdSE7bm1fnrdjAYt0f/CtbUUiDaPodQk2qeHzOP6wA/2K6rrjwNIWJAT0EGAEIACcDGyAEFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmWoM/gFCQSxfmUACgkQgUrkfCFIVNZhTgf/VQxtQ5rgu2aoXh2KOH6naGzPKDkYDJ/K7XCJAq3nJYEpYN8G+F8mL/ql0hrihAsHfjmoDOlt+INa3AcG3v0jDZIMEzmcjAlu7g5NcXS3kntcMHgw3dCgE9eYDaKGipUCubdXvBaZWU6AUlTldaB8FE6u7It7+UO+IW4/L+KpLYKs8V5POInu2rqahlm7vgxY5iv4Txz4EvCW2e4dAlG
-	8mT2Eh9SkH+YVOmaKsajgZgrBxA7fWmGoxXswEVxJIFj3vW7yNc0C5HaUdYa5iGOMs4kg2ht4s7yy7NRQuh7BifWjo6BQ6k4S1H+6axZucxhSV1L6zN9d+lr3Xo/vy1unzA==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="GIKNgNeN";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="jIgeEdrQ"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AI9i0DT028363
+	for <linux-crypto@vger.kernel.org>; Tue, 18 Nov 2025 13:08:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	1cAkkko524XBA8vmRtigx+r0VJhPkOMYddNvO7s5UTg=; b=GIKNgNeNLd10xo+z
+	cSaHKeINY/XkCySdyuzkuR8GqwQz4RkxuIYP+a+rFTXCDeJifSWnS1MMoLKKwHpd
+	dIHynOf70X4UTLSfEpo1gGShTak8W+94KTitxAJGBHujmmwUX4/zurOBJ6ZkFs8v
+	s5khu3BkNhJhFsSi19AZLkYUib/DZZmg5B7waCM0lwoJxR0MsMvYZwMb076ge6Ph
+	93Aoa5DEy+timoTb7ZLJ3Tj0TqKuEYDMaw8SBK0Yg33W57bIutijEbqdgWprMnp8
+	In+sPvI9gsBkX2dBgZ3zHWpxoyVTudQFFVhuChKZ4a3lLxJV5cgQu5aycPkr2Whr
+	EhQvww==
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com [209.85.219.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ag77t35e8-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Tue, 18 Nov 2025 13:08:20 +0000 (GMT)
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-8823e9c63c6so19745466d6.0
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Nov 2025 05:08:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1763471299; x=1764076099; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1cAkkko524XBA8vmRtigx+r0VJhPkOMYddNvO7s5UTg=;
+        b=jIgeEdrQuxL0j3qR4D3HGXR3BO6YA+j/8C3sXXkr8q+4mF6o1SJeGqxuxZMphfv98Y
+         8xFpZPARXhaDuqhd97AA5MEkXAMZIrGM7HCW+g/5W/+AVs9iL1KN9WTQNrLDUv3Sxh+B
+         7x3JwiR8tc41aAcMTH5cL0ppMBhX6FO1ns22jMFAkU6RIEOdsRZJ3wrHD0p+zhDrclZX
+         i1jRiUvb5cfsnrK90z6f11PapYC8tH0djnLTfGo712gD4KnntNoeTgDY2S8Tkd8xL3ay
+         IozWjiuu2ZiSvoWyUd5bJaUyOWO5ov/agCFbFCNx9EEg3UwC8jCvlrwelW4CLh4Dvemn
+         WZ3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763471299; x=1764076099;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1cAkkko524XBA8vmRtigx+r0VJhPkOMYddNvO7s5UTg=;
+        b=ijeZ7yg/3iC5lS+5qC0SPSimb9VYYGAcGH5mfAYVor3Aqzkx91EBsOgPH7vmA+/w0X
+         DeXibAxn3qU2h+dMHwdgXewyi6/XQHNcFaCrpCK2kTjst3kqiGIwX1AQiCT9EMroCtl8
+         6bv6+w1t154+m7leHAhZHr5BmdLbFh8hyTl6E7PELQaX6a9ABCxz1QiSsXSQFX/B9/Y+
+         AxiWNnvp9+WOT43KXOW1b5VcvWuW7jmwTCz3kOiwU/2JdB5kv+LKDSe6pUyxnMOemxWb
+         vClGrYw+VUhVqlbEyK8+N6VSGYjUX2GrsUpfKhnhdP6RM1syG7+dY8pqvxdCxNv+eD67
+         jxSA==
+X-Gm-Message-State: AOJu0YzPPw9wrVkALUUp+qo3srshGMki5TMbdoixAKviPGdqehUWx3B6
+	qem0GZQ3Dz5Lx8jCB+CJ/HXZ29ZvJdv5QPx+1Jky5kEsBx4ZEZxYoF3EblhyeYvaGzq6l1FsWP5
+	RXk1AMBYTaJuz/ss6UNt7QilXGy3j7c9ZNy/iDeA5425sBF6tjiM1iniE7KMkm+efcCw=
+X-Gm-Gg: ASbGncv7uN4mWoGYP0gkkeR4VwcqUMeGXvah6IPg0Inq7unWYS7uXd2M5W+4P3M1td+
+	BFw+vaGTJH6rluKIiYO31MJ0Nu/+6uzZ3eZ6M6tsE2ht5MFZqOvf9RlRU6dLuikL9ed/w0HbZYW
+	enyknmtZn6EOdwdaUHDrTMQmNtGy5DsPpI5F1paqM+QWmWVOOaLIdtX9SM6/sQ6LyzxddiHWQGI
+	8oo8rjXvPPF/Pi44HC4uRLewp0597J5x5A8CrwFqNGawV2khikLAerMAwMB0nHkgHKgZv1Gq9JU
+	k644uKLPIGo60/YqMmkysezFVvgv3xkcxFzIaobx5YNcLe9FwEbw/PSRvobV2puZ2GT/lVls08K
+	X6L0H49IfF127kpaAR0P+2VhzIaTp5uzQdLAMdWznmGL1LwFXptwEati3IKu11jtvApA=
+X-Received: by 2002:a05:622a:1353:b0:4ee:1eb0:fbd9 with SMTP id d75a77b69052e-4ee313e7788mr24334741cf.1.1763471299015;
+        Tue, 18 Nov 2025 05:08:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGdqUqOyJ0Aro8rRS139qTe9lsMxr8JcnQEiHJrvX0pgs6TEAhrO6KwjIEuC52rzeMJnwkG0g==
+X-Received: by 2002:a05:622a:1353:b0:4ee:1eb0:fbd9 with SMTP id d75a77b69052e-4ee313e7788mr24334251cf.1.1763471298462;
+        Tue, 18 Nov 2025 05:08:18 -0800 (PST)
+Received: from [192.168.119.202] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fda8a7bsm1320492666b.54.2025.11.18.05.08.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Nov 2025 05:08:17 -0800 (PST)
+Message-ID: <306f6354-1502-4b9f-9a28-dcb7a882b367@oss.qualcomm.com>
+Date: Tue, 18 Nov 2025 14:08:15 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] crypto: qce - Add runtime PM and interconnect
+ bandwidth scaling support
+To: Udit Tiwari <quic_utiwari@quicinc.com>, herbert@gondor.apana.org.au,
+        thara.gopinath@gmail.com, davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, quic_neersoni@quicinc.com,
+        kernel test robot <lkp@intel.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+References: <20251117062737.3946074-1-quic_utiwari@quicinc.com>
+ <121a5d34-e94f-4c29-9d58-4b730757760a@oss.qualcomm.com>
+ <283e7a7d-c69b-4931-8e54-d473f0209abe@quicinc.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <283e7a7d-c69b-4931-8e54-d473f0209abe@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE4MDEwNSBTYWx0ZWRfX5SxNr1dq+bQ4
+ Tf0o4ug1VGp8lHp68i6RX2J7/wG8DDhAprhgASSYySA6js3HRhmjIVQWlxZxiLzAaoovRFGsg8H
+ m9epbyWVkshOEg3PFc5+O9CAyhvA2kFgSDOf7xIbf0CxgrRgFP0lZlHLU0AxcNxC5vCHuvqvdsX
+ ptYcmdVWEFNamxDEdz/HtG6oaWrYyfDi3TXfIIXSwh8agp+1ZXoOLn5dMIEkM8P9++9Nh8OhrMQ
+ I0n1cpA0Ecg3FDTPVS/J4L3mM0ZYqzGQ9G2WKj7k1RM/lQajsgw+aa7xyHHzziBR1wp7s7JfaQI
+ OeSU/fxqzeuXmrhmIBkv+S8HB4ch+5xBoMVB8tPtQxnbknBwE/mfUbZDofjx7CKVR5wROPfGLAP
+ GeXtpt5aj0Y8o5g61XBYLlyK9hLHPQ==
+X-Authority-Analysis: v=2.4 cv=EPoLElZC c=1 sm=1 tr=0 ts=691c6fc4 cx=c_pps
+ a=wEM5vcRIz55oU/E2lInRtA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8 a=COk6AnOGAAAA:8
+ a=pBN3b43mpwga8PqSKsUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=OIgjcC2v60KrkQgK7BGD:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: hUd4LfI4w92Mh0bfBFNOCjSiQZYhnCNW
+X-Proofpoint-GUID: hUd4LfI4w92Mh0bfBFNOCjSiQZYhnCNW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-17_04,2025-11-18_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
+ lowpriorityscore=0 phishscore=0 adultscore=0 spamscore=0 clxscore=1015
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2511180105
 
-On Tue, 2025-11-18 at 08:39 +0000, David Howells wrote:
-> James Bottomley <James.Bottomley@HansenPartnership.com> wrote:
->=20
-> > But even if you don't accept that, Google keeps effective joint
-> > ownership of the code through their CLA and so could grant a dual
-> > licence to the kernel anyway without needing to refer to any
-> > contributors.
->=20
-> Actually, the fact that BoringSSL's ML-DSA implementation uses C++
-> with heavy use of integer-parametered templating is more
-> insurmountable for borrowing their code.=C2=A0 Yes, it does allow them to
-> reduce their LoC to ~3000 and is much more readable, but I can't do
-> that in C.
+On 11/18/25 7:46 AM, Udit Tiwari wrote:
+> Hi Konrad,
+> 
+> Thanks for the review, please find my response inline.
+> 
+> On 11/17/2025 5:55 PM, Konrad Dybcio wrote:
+>> On 11/17/25 7:27 AM, quic_utiwari@quicinc.com wrote:
+>>> From: Udit Tiwari <quic_utiwari@quicinc.com>
+>>>
+>>> The Qualcomm Crypto Engine (QCE) driver currently lacks support for
+>>> runtime power management (PM) and interconnect bandwidth control.
+>>> As a result, the hardware remains fully powered and clocks stay
+>>> enabled even when the device is idle. Additionally, static
+>>> interconnect bandwidth votes are held indefinitely, preventing the
+>>> system from reclaiming unused bandwidth.
 
-I was only commenting on the legality of copying not the technical
-feasibility.=20
+[...]
 
-> =C2=A0 Now, if we want to work on persuading Linus to allow C++ into the
-> kernel...
+>>> Signed-off-by: Udit Tiwari <quic_utiwari@quicinc.com>
+>>> Reported-by: kernel test robot <lkp@intel.com>
+>>> Closes: https://lore.kernel.org/oe-kbuild-all/202511160711.Q6ytYvlG-lkp@intel.com/
+>>> ---
+>>> Changes in v4:
+>>> - Annotate runtime PM callbacks with __maybe_unused to silence W=1 warnings.
+>>> - Add Reported-by and Closes tags for kernel test robot warning.
+>>
+>> The tags are now saying
+>>
+>> "The kernel test robot reported that the QCE driver does not have PM
+>> operations and this patch fixes that."
+>>
+>> Which doesn't have a reflection in reality.
+>>
+>> [...]
+>>
+> I may be misunderstanding this comment but the bot flagged W=1 unused-function warnings under !CONFIG_PM. In v4 I added __maybe_unused and Reported-by/Closes for that exact warning; I didn’t mean to imply the driver lacks PM ops.
 
-Having worked on it, C++ is a bit of a messy language in that there are
-many more idioms for the same construct than in C, so I can see why C
-is preferred for cleaner coding.  On the other hand if the safety
-profiles work actually produces something useful (unlike safe C++ which
-just flamed out) I could see that being a reason to revisit.
+The case where the tags would apply would be:
 
-Regards,
+A patch is submitted
+The patch gets reviewed and applied to the tree
+Kernel testing robot reports an issue
+You send a fix-up patch (incl. robot's tags)
 
-James
+[...]
 
+>>> +    ret = pm_clk_add(dev, "bus");
+>>> +    if (ret)
+>>> +        return ret;
+>>
+>> Not all SoC have a pair of clocks. This is going to break those who don't
+>>
+>> Konrad
+> On the concern that not all SoCs have "core/iface/bus" clocks and that this could break those platforms: i believe the PM clock helpers are tolerant of missing clock entries. If a clock is not described in DT, pm_clk_add will not cause the probe to fail, also on such platforms, runtime/system PM will simply not toggle that clock.
+> 
+> I’ve tested this on sc7280 where the QCE node has no clock entries, and the driver probes and operates correctly; runtime PM and interconnect behavior are as expected.
+> 
+> If you’d like this handled in a specific way, please let me know—I’m happy to implement that approach.
+
+No, you're right. I took a look at the pm_clk_add() call chain and noticed
+that clk_get() (notably not _optional) is in there, but apparently its
+retval is never propagated if things fail
+
+(+RJW/Geert is that intended behavior?)
+
+Konrad
