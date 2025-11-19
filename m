@@ -1,144 +1,88 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC6835B157;
-	Wed, 19 Nov 2025 12:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39BE274B34
+	for <linux-crypto@vger.kernel.org>; Wed, 19 Nov 2025 14:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763556356; cv=none; b=LwvYdgJjuwkZyV6/bOdbG/At69BNU3tnhDUg3hhqqjvNN8Ls7Hl0n56u9dQ7YQ9ydk9kQLox/kLB8rQax92ZACcVNynLuuO1/2pMeHOPGT3oK3hFUWXVhrU8jiFjscCwjYf58mpgaVLnc/rAYSshS6lJreiIbE8LvAZwwZs4JC0=
+	t=1763562031; cv=none; b=ZzeuT2pMhz4mutisx622SvwP0S+vmJgjs7g1wCA+Mrdb6ekT7cyExQ+BqDJFmbC9RJXUKYJ6RW1DJL6qXPyo+Grj1bDam6Xiqm7y/WXo4ruWibGndtaGGQCpdVBPgzH55ZtUzaxB7e8QtNwtpKzyiXeWZsTynTCUa47db8AOJ3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763556356; c=relaxed/simple;
-	bh=HF9GdCIMZF1sjrLdRxndNornshZnJxuUvneqfFK3BPw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qj0/r2BJpnOoH+zvIjwejApHgd3BwbGm/J/d9Jpch6vg5CPxrvx/nVrVgrLiOEZoVhXuwtAvW8uaARDo/4tp/yKPq3pJEKK2xpaMfs/4GxuG0WBGWy7zIxtEZso6YQlxTyqCcuEMQtqwZ9MLwSVnCJHL65h+FmmTOBqk5Sddyt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mE9liDhx; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1763562031; c=relaxed/simple;
+	bh=XzRalQKs57czmv5x4N/a/52SISZhq2Nkv4q9UkJ+pyo=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=Inf0WeNkDGcGthmQRpdtTmGEBZOOZ8Ww15MztnTphImxEWu0/NViFTkpbICG8Kxig6xHSlv3lMFD2OTEY2ww5xaIXLLSwa9Q+oTar7Cun3cT2rXGe632W7cxpPCgz0doq41ViyKHlh3Mt+7p5fgwnuvWwHiS3y6ETAaPzN7hruQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hH49AX7l; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mE9liDhx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763556354; x=1795092354;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=HF9GdCIMZF1sjrLdRxndNornshZnJxuUvneqfFK3BPw=;
-  b=mE9liDhxN/9SCPhYRl170wJYg2trpB357nlTb3khV1TNglOrWI/gu1h/
-   axt5824lM0PAMFL2wjnoNPa7/GS2K9iVjHlCTMKYZ+3b46uX6KsuAQfzF
-   q6eUgTbUG+Pp8nGGjmcQUSYsn8P1j62A+9a1tgkLgYdyGxScVU9ixIjfy
-   EcoPMSAQL4Un9LAq1ygW3loV/oCVO59i1Y+klRIlVM04Zi1rabkQ8ysiW
-   nfUJ5KT0VJMPgfhWXkceyUoEhlAHZT3TAkcfjp37O79rv3XBnXNRk60Of
-   Apd6GIqalKAah0lOsAhWT/Z64az3Ydv8ictFAjLTh/e6ipLCj+GUWYU+n
-   Q==;
-X-CSE-ConnectionGUID: PG92Z0P1SBegtJk3lDSnJQ==
-X-CSE-MsgGUID: EhgspRb9SYWC90R7o0ytPQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11617"; a="91070275"
-X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
-   d="scan'208";a="91070275"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 04:45:48 -0800
-X-CSE-ConnectionGUID: B0RsA/byT9izExDqLpupDQ==
-X-CSE-MsgGUID: fxKk5ZwHQG+ErFr+MlomYw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
-   d="scan'208";a="190708391"
-Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 19 Nov 2025 04:45:45 -0800
-Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vLhZ9-0002sn-2G;
-	Wed, 19 Nov 2025 12:45:43 +0000
-Date: Wed, 19 Nov 2025 20:45:15 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>, Kees Cook <kees@kernel.org>,
-	linux-crypto@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	LKML <linux-kernel@vger.kernel.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH libcrypto 2/2] crypto: chacha20poly1305: statically check
- fixed array lengths
-Message-ID: <202511192000.TLYrcg0Z-lkp@intel.com>
-References: <20251118170240.689299-2-Jason@zx2c4.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hH49AX7l"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763562029;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+eUfWZZGN6Clg4COI6/ZdHoTco2pZOYMsSV3TEOpY1Y=;
+	b=hH49AX7lDqIj2WBB6ID4JyiiNEQ0mRASuXG9Yhqojc8hP0MqsiHAzLqJ3JBo4Zh0DoOkRc
+	YBNbXt0ukIsEZgGhutF6Ia1xhG7lqAohugQvwsL0bTLIcViND2OSCrJWCbG5oSq8/riKy3
+	MysEj+/EXFBBzXogkRMKFJyLHRAqNmM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-57-E_mdSrUXMpmGvhiu52itOA-1; Wed,
+ 19 Nov 2025 09:20:25 -0500
+X-MC-Unique: E_mdSrUXMpmGvhiu52itOA-1
+X-Mimecast-MFC-AGG-ID: E_mdSrUXMpmGvhiu52itOA_1763562023
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BA6C818D95C7;
+	Wed, 19 Nov 2025 14:20:22 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B14971800876;
+	Wed, 19 Nov 2025 14:20:17 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20251119035905.GA1743@sol>
+References: <20251119035905.GA1743@sol> <20251117171003.GC1584@sol> <20251117145606.2155773-1-dhowells@redhat.com> <20251117145606.2155773-3-dhowells@redhat.com> <2165074.1763409175@warthog.procyon.org.uk> <20251117201233.GA3993@sol>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+    Luis Chamberlain <mcgrof@kernel.org>,
+    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
+    Sami Tolvanen <samitolvanen@google.com>,
+    "Jason A .
+ Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Stephan Mueller <smueller@chronox.de>,
+    Lukas Wunner <lukas@wunner.de>,
+    Ignat Korchagin <ignat@cloudflare.com>, linux-crypto@vger.kernel.org,
+    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 2/9] crypto: Add ML-DSA/Dilithium verify support
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251118170240.689299-2-Jason@zx2c4.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2450666.1763562016.1@warthog.procyon.org.uk>
+Date: Wed, 19 Nov 2025 14:20:16 +0000
+Message-ID: <2450667.1763562016@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Hi Jason,
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-kernel test robot noticed the following build warnings:
+> I've written an implementation of ML-DSA verification in about 600
+> lines.  It may grow slightly as I clean it up and test it, but we
+> definitely don't need 4800 lines.  I'll send it out once it's ready.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master ebiggers/libcrypto-next ebiggers/libcrypto-fixes linus/master linux/master v6.18-rc6 next-20251119]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Could you post what you have now so that I can have a look at it, please?  It
+doesn't matter if it's fully tested, but I can at least compare the algorithm
+to that of Leancrypto.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jason-A-Donenfeld/crypto-chacha20poly1305-statically-check-fixed-array-lengths/20251119-011125
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20251118170240.689299-2-Jason%40zx2c4.com
-patch subject: [PATCH libcrypto 2/2] crypto: chacha20poly1305: statically check fixed array lengths
-config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20251119/202511192000.TLYrcg0Z-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251119/202511192000.TLYrcg0Z-lkp@intel.com/reproduce)
+David
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511192000.TLYrcg0Z-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/wireguard/cookie.c:193:2: warning: array argument is too small; contains 31 elements, callee requires at least 32 [-Warray-bounds]
-     193 |         xchacha20poly1305_encrypt(dst->encrypted_cookie, cookie, COOKIE_LEN,
-         |         ^
-     194 |                                   macs->mac1, COOKIE_LEN, dst->nonce,
-     195 |                                   checker->cookie_encryption_key);
-         |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/crypto/chacha20poly1305.h:32:20: note: callee declares array parameter as static here
-      32 |                                const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)]);
-         |                                         ^  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   In file included from drivers/net/wireguard/cookie.c:6:
-   In file included from drivers/net/wireguard/cookie.h:9:
-   In file included from drivers/net/wireguard/messages.h:10:
-   In file included from include/crypto/chacha20poly1305.h:11:
-   In file included from include/linux/scatterlist.h:5:
-   In file included from include/linux/string.h:382:
-   include/linux/fortify-string.h:480:4: warning: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Wattribute-warning]
-     480 |                         __write_overflow_field(p_size_field, size);
-         |                         ^
-   2 warnings generated.
-
-
-vim +193 drivers/net/wireguard/cookie.c
-
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  179  
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  180  void wg_cookie_message_create(struct message_handshake_cookie *dst,
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  181  			      struct sk_buff *skb, __le32 index,
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  182  			      struct cookie_checker *checker)
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  183  {
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  184  	struct message_macs *macs = (struct message_macs *)
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  185  		((u8 *)skb->data + skb->len - sizeof(*macs));
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  186  	u8 cookie[COOKIE_LEN];
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  187  
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  188  	dst->header.type = cpu_to_le32(MESSAGE_HANDSHAKE_COOKIE);
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  189  	dst->receiver_index = index;
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  190  	get_random_bytes_wait(dst->nonce, COOKIE_NONCE_LEN);
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  191  
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  192  	make_cookie(cookie, skb, checker);
-e7096c131e5161 Jason A. Donenfeld 2019-12-09 @193  	xchacha20poly1305_encrypt(dst->encrypted_cookie, cookie, COOKIE_LEN,
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  194  				  macs->mac1, COOKIE_LEN, dst->nonce,
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  195  				  checker->cookie_encryption_key);
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  196  }
-e7096c131e5161 Jason A. Donenfeld 2019-12-09  197  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
