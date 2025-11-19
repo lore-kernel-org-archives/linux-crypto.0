@@ -1,106 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36AA730ACEA
-	for <linux-crypto@vger.kernel.org>; Wed, 19 Nov 2025 19:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62C9372AAE;
+	Wed, 19 Nov 2025 20:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763579426; cv=none; b=PRVeUSpn8+EwTX5dSZNX0gToPq1GXatK1x++N4RWyjMxTAKom0fTZjjUq8/xZZJMm1fTcBBCYmpGLXzjEhm0EkQ1LeHALf7fXfhUuj6rVsTLq2klgJGv6s+YtL4O/+X+/ExvqocC1pWhUQ8wHGoBWNGhva9Uj1Six2Bv52H6THM=
+	t=1763585992; cv=none; b=jHCPya0221J965AuIgIJHEUsHhRAUFpb66r6bu/VAQdCG+UX8LL9UtZLapA4VfTHbk2pm5xCUSJnSf2W7/T2oQNruFb1td6Wo3XzWLbbEaVibKzsjEP6J49L26eFkRQL8Lc+eLcVSSSNvBu+DbY1tF26EVO2KnykT/xcICtDeIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763579426; c=relaxed/simple;
-	bh=r8AioyiEzgLoMj1rUwQD3nyimHbMiw6+wR+NJylFwi4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nj5gLxMlUt++5Nciwqa6FXvz5CqocYwlu+Yxv9QNT3gQJaaK9+7XhiB4X9JoUBeWw6icG86FzovNBgRfsPsiz45DE8glS2PvFl35LKrtNfXpBSI1WWDjviIIJFB7x0wsEpwNlm7w9mcnNR0/EfNTyYcGd25PkGvCGFoDxQwsYUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hiNn55wH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763585992; c=relaxed/simple;
+	bh=a+xAmjMW/FZQJF/Qo9/dEFUK1+W3RtZLD+iGETemTJw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m34o15wUjlexNrOROpVFl/eRiiQ6eDZSw9oKygAT+uJZq/ciTYoyvoeDuL1P4nHaySo9pdspPo6uH9UF0fvwsBZLvKrR7qExavi1MVhxdL/1yAKs1hNJhiOyS9kgadVWIMnbpyXm1vfBuXSoPC0f8lrv0oU7HQbdPVwSNyB4MGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1UcVEJA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hiNn55wH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CDD6C4AF09
-	for <linux-crypto@vger.kernel.org>; Wed, 19 Nov 2025 19:10:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1UcVEJA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6054AC4CEF5;
+	Wed, 19 Nov 2025 20:59:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763579425;
-	bh=r8AioyiEzgLoMj1rUwQD3nyimHbMiw6+wR+NJylFwi4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=hiNn55wHO8VwP2/37jouPwz0p6Hd4BzHXDvx4UppVbw3eYekkJqrgRuMeqKhHZ1Zw
-	 lTXdGfuVJc/nBbLjmBySMGvACwoLnU2aMXlYukzykrJ4vks0kxecuYUHDyWE4vNYGV
-	 EDzvwpRWh5uRDKtNHkBUaQxAu5hGlD6hPz9lHvAqK3Ii1BvFVrj+H0jLhBhgEGD376
-	 NJVf3M1JcPT89VfiNmHteQl5BV+WPDyZirv7Xme2UVp0kSTYEvTbSE9yDWk//oIx/n
-	 FQnn7FcSx0w4g4X/XpBUB+W/FEoQ6N/D5rDYXxD7xirEmfdDDDDMHWhm7izu/aJLdC
-	 158chclwMnkAw==
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-595910c9178so4395e87.1
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Nov 2025 11:10:25 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUiAwdbh6mWgh/zUzSINDlJGjH85n5PSOKwK1LmIJ3pZPzsMheybX4ytn6svGPyrFbV7+RwpilFC/+ka/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0y7tP0J9amKxc/cqTjW7HP2hJBbYuNByc5qIvSs5PDMkxpecU
-	V06YXuxQLaqB6wv0akIxnGcOW8GoJsl32Y60PgVPVRnLLQojKRYmRPKQgJUXsO6ARJLZsomzU1E
-	80Bl7TwVZ8cOsDu8xHzsG2/La27UgmcU=
-X-Google-Smtp-Source: AGHT+IE0qvqcttMW0U586sYwjlkNWPppgfwBdUQBUPS1JPYzNRxY85RWaOft/PamwKm+nBHogM8oceyIEaulg9YwAkI=
-X-Received: by 2002:a05:6512:e97:b0:595:8311:dc80 with SMTP id
- 2adb3069b0e04-5969e2d9271mr4328e87.20.1763579423788; Wed, 19 Nov 2025
- 11:10:23 -0800 (PST)
+	s=k20201202; t=1763585992;
+	bh=a+xAmjMW/FZQJF/Qo9/dEFUK1+W3RtZLD+iGETemTJw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=G1UcVEJAtoCbWvltGxZOVh+Bh4MBAODy8av/4GWZppmEjmNEAVzx0p2z01yxBCjEw
+	 eMqaLeq2BfjXmhBSKSbbUWwJOEG5HJNUF6gYn3T7BN4z2gPUUPFl3o6Cw3TC7xOQXo
+	 Xr2TToP2f8VEm1X9SiYAQ06FUSD7aZpR9aABfVn2PtMjShG92lHlfWTd3XTGcfKq/y
+	 rrwCAGVNuZTQfzyBqa60mAT9DZLSfsIIDAhyQht//Dgqy/mmnqQhUcrlLvUZvr/Pe7
+	 P/3HOsmrX0id+Nu2o0D10fBI9dwsmFxbUiOXQRKOZQTN0bsTwf2EVjSL6NPPSKZHBC
+	 mpDJ6ysGoZLoA==
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: John Allen <john.allen@amd.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Hans de Goede <hansg@kernel.org>,
+	linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER),
+	platform-driver-x86@vger.kernel.org (open list:AMD PMF DRIVER),
+	"Mario Limonciello (AMD)" <superm1@kernel.org>
+Subject: [PATCH 0/2] Fixes for PMF driver after S4
+Date: Wed, 19 Nov 2025 14:59:40 -0600
+Message-ID: <20251119205942.3411155-1-superm1@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251118170240.689299-1-Jason@zx2c4.com> <20251118232435.GA6346@quark>
- <aR0Bv-MJShwCZBYL@zx2c4.com> <aR4UvNzdLLofbRpW@zx2c4.com>
-In-Reply-To: <aR4UvNzdLLofbRpW@zx2c4.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 19 Nov 2025 20:10:12 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXE63pP9EwQgAUUDEeK3CDkwscuVKPdbQ9o5607ue3U_pA@mail.gmail.com>
-X-Gm-Features: AWmQ_bkzY6P8NgMWw02eM01xMsLM-m4lzq-47wfA5yoKwi0MAHlAVcWMIt6sEio
-Message-ID: <CAMj1kXE63pP9EwQgAUUDEeK3CDkwscuVKPdbQ9o5607ue3U_pA@mail.gmail.com>
-Subject: Re: [PATCH libcrypto 1/2] array_size: introduce min_array_size()
- function decoration
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Kees Cook <kees@kernel.org>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, 19 Nov 2025 at 20:04, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Wed, Nov 19, 2025 at 12:31:11AM +0100, Jason A. Donenfeld wrote:
-> > There's also this other approach from 2001 that the C committee I guess
-> > shot down: https://www.open-std.org/jtc1/sc22/wg14/www/docs/dr_205.htm
-> > It is basically:
-> >
-> >     #define __at_least static
-> >
-> > We could attempt to do the same with `at_least`...
-> >
-> > It kind of feels like we're just inventing a language at that point
-> > though.
->
-> Actually, you know, the more this apparently terrible idea sits in my
-> head, the more I like it.
->
-> Which of these is most readable to you?
->
-> bool __must_check xchacha20poly1305_decrypt(
->         u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
->         const size_t ad_len, const u8 nonce[min_array_size(XCHACHA20POLY1305_NONCE_SIZE)],
->         const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)]);
->
-> bool __must_check xchacha20poly1305_decrypt(
->         u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
->         const size_t ad_len, const u8 nonce[static XCHACHA20POLY1305_NONCE_SIZE],
->         const u8 key[static CHACHA20POLY1305_KEY_SIZE]);
->
-> bool __must_check xchacha20poly1305_decrypt(
->         u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
->         const size_t ad_len, const u8 nonce[at_least XCHACHA20POLY1305_NONCE_SIZE],
->         const u8 key[at_least CHACHA20POLY1305_KEY_SIZE]);
->
-> The macro function syntax of the first one means nested bracket brain
-> parsing. The second one means more `static` usage that might be
-> unfamiliar. The third one actually makes it kind of clear what's up.
-> It's got that weird-but-nice Objective-C-style sentence programming
-> thing.
->
-> Would somebody jump in here to tell me to stop sniffing glue? I feel
-> silly actually considering this, but here I am. Maybe this is actually
-> an okay idea?
->
+Lars Francke reported that the PMF driver fails to work afer S4 with:
+  ccp 0000:c3:00.2: tee: command 0x5 timed out, disabling PSP
 
-I quite like it, actually.
+This is because there is a TA loaded to the TEE environment that
+is lost during S4.  The TEE rings need to be reinitialized and the
+TA needs to be reloaded.
+
+This series adds those flows.
+
+Note:
+I validated this on top of 6.18-rc6.  I could reproduce Lars'
+original issue on a Strix laptop and then confirmed that after
+applying these two patches that PMF continues to work after resume.
+I ran a handful of S4 cycles, module unload tests and reboot tests.
+
+Mario Limonciello (AMD) (1):
+  crypto: ccp - Add an S4 restore flow
+
+Shyam Sundar S K (1):
+  platform/x86/amd/pmf: Prevent TEE errors after hibernate
+
+ drivers/crypto/ccp/sp-dev.c           | 13 ++++++
+ drivers/crypto/ccp/sp-dev.h           |  1 +
+ drivers/crypto/ccp/sp-pci.c           | 16 ++++++-
+ drivers/crypto/ccp/tee-dev.c          |  6 +++
+ drivers/crypto/ccp/tee-dev.h          |  1 +
+ drivers/platform/x86/amd/pmf/core.c   | 62 ++++++++++++++++++++++++++-
+ drivers/platform/x86/amd/pmf/pmf.h    | 10 +++++
+ drivers/platform/x86/amd/pmf/tee-if.c | 12 ++----
+ 8 files changed, 110 insertions(+), 11 deletions(-)
+
+-- 
+2.43.0
+
