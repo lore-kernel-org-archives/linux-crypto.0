@@ -1,44 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E311E1E1C;
-	Wed, 19 Nov 2025 04:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFAC9225403;
+	Wed, 19 Nov 2025 04:45:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763527123; cv=none; b=WUT1AoTEZg7G1yg8x8zkDIyketlnPKvRw1gjP6Ph6Y+JxotUgl8IeKivaHn1GL5OF2B/Nb9eBfKjh7U+2FU8UAuw+HsPEOzWyAb3UsW49oOFJBlMYaW/zhGUyrkOb5Ld82A3dCudzGC8qtheOZL1zwsWnD9Gypwp1kdsTqRrT0A=
+	t=1763527552; cv=none; b=lJ3yGI+gvA1KH2Rip+IQg/xnV5J6/2h4bmXxyrFR+/Y1saWaaO3W0P0SlzfUuLHAAcbtVkegapS7OJi2Rd2R602tOH2UipyGdqj9ifNnpmpuCyT5lB0IiIu6kZ0Kh+5XEPFhwVLrnvB0IvdrxV0UStZ6u43AYECXKgZ0//47lno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763527123; c=relaxed/simple;
-	bh=3iYnV2APAfKcWv3J6sIcxfy8P/u2uVbuCK+FxI4RvqE=;
+	s=arc-20240116; t=1763527552; c=relaxed/simple;
+	bh=xonWsW4Mn1ADS389J5gbxnd46hIOAisJFhRzn07OXZ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cWy+Cz63t42yQRtOxSeyHrHoTJRkrETUklJMSlH5McevBksfFfeO2tahulVRJnQHZDx9rPfq0SnlOoprsONtE9pymD5VJt6C8elGYXIqefrcRc9OcSB8vzmyOw0b46ft/kIRNmvceidOFtAHd0q/bhmx6cdy/N4WvT/9oBYk2L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=fBn/Ktyg; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=t4WctlpqbL79rUmX5N6DCvtNi9iNvI4Owfx41vHwSXR6HgrzdkX2z0V6jatorT1ZTwYrU2WL1azHXey4dt5kclZ74Bblt4kCZssbHBD6Yqt9jxCxnjDMQIz72nwfg8KCiaPvHm0TavreP2xNA3A55zrXbgxQX9C5piqGsVPIFHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Iu0eZ4Op; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="fBn/Ktyg"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Iu0eZ4Op"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=O/97SlunYFZGuq7T38VDsyylG1LcCUBunsdRAcz52CE=; 
-	b=fBn/KtygmzSMxbtPbC4QrcLT4SWai8U9Aa+y0cA1f2wV2UjW0d12dtSi5JIu0XGxpTsTiDGhivB
-	yi2okr87eBgjijIN+TDlPXgjyA0cHcInFcuMEv/4sjZexRVzNCFA1/095SYpWHVI/BDLPJMW+JUAS
-	eTdL5thbjLe0HhTSAcUzIYuZqdtrFroPqtKatUjQnc2YnMA+2G7qA6n189WRkdBq5FAhh5ir7zj2i
-	ofQzNkK2nZFpSGwD8QWFvZWqTUkG0JPxE6q5c+IHi7rm/TeUUKGNcojsUahsU2fZ2TiRBIQN3XuIl
-	e1mpnzAfTf7y07sgH3u7DF4+BU2iuM2qq5NA==;
+	from:content-type:reply-to; bh=6BEIqZG6bo5PQjoxroG9YI7kWvevX/mqtoG1am08OZU=; 
+	b=Iu0eZ4OptbLzd4hBHH3FN3998y37bkRDMDZScjS4j1KN6Bob9a7k7v4U6lomVhVxlEHpoAr4Suq
+	PDbpI0P6rqx/250DTm533BpMQt9gSwe60UC5lk3aEFxMR0s1O5r2ul3s7Amt461IRPVp63Rp0VZ40
+	Nri9ExN/q25yB2/lbwTH4L8rxSTOG1s/slvfC0q341iEKH0Ws9HAx0grEtIwgejY5hD3U+qBeVskI
+	P6fQwwneEIsiaImHItTVmfIdbslhhsorJMPzV+pcRkpn00lhERMhiFmd6SSlf85e0E912zLJPpG/8
+	09ndI1OA4yjQkb//kQqYjq/zqM16QrGicCog==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vLZxW-004DyL-1p;
-	Wed, 19 Nov 2025 12:38:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 19 Nov 2025 12:38:22 +0800
-Date: Wed, 19 Nov 2025 12:38:22 +0800
+	id 1vLa4W-004E2z-24;
+	Wed, 19 Nov 2025 12:45:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 19 Nov 2025 12:45:36 +0800
+Date: Wed, 19 Nov 2025 12:45:36 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	Stephan Mueller <smueller@chronox.de>
-Subject: [v2 PATCH] crypto: drbg - Delete unused ctx from struct sdesc
-Message-ID: <aR1JvnpTBomcKAMZ@gondor.apana.org.au>
-References: <aRHCKMGDbWkXIY8f@kspp>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Neil Horman <nhorman@tuxdriver.com>,
+	LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: rng - Combine two seq_printf() calls into one in
+ crypto_rng_show()
+Message-ID: <aR1LcMOO0B6qUdOX@gondor.apana.org.au>
+References: <d9574f40-8d0f-4f14-bc9f-b29c56069b8b@web.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,48 +48,36 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aRHCKMGDbWkXIY8f@kspp>
+In-Reply-To: <d9574f40-8d0f-4f14-bc9f-b29c56069b8b@web.de>
 
-On Mon, Nov 10, 2025 at 07:44:56PM +0900, Gustavo A. R. Silva wrote:
->
-> diff --git a/crypto/drbg.c b/crypto/drbg.c
-> index 511a27c91813..e9f9775c237f 100644
-> --- a/crypto/drbg.c
-> +++ b/crypto/drbg.c
-> @@ -1442,9 +1442,12 @@ static void drbg_kcapi_set_entropy(struct crypto_rng *tfm,
->  
->  #if defined(CONFIG_CRYPTO_DRBG_HASH) || defined(CONFIG_CRYPTO_DRBG_HMAC)
->  struct sdesc {
-> -	struct shash_desc shash;
-> -	char ctx[];
-> +	/* Must be last as it ends in a flexible-array member. */
-> +	TRAILING_OVERLAP(struct shash_desc, shash, __ctx,
-> +		char ctx[];
-> +	);
->  };
-> +static_assert(offsetof(struct sdesc, shash.__ctx) == offsetof(struct sdesc, ctx));
+On Mon, Nov 10, 2025 at 04:56:10PM +0100, Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Mon, 10 Nov 2025 16:45:13 +0100
+> 
+> A bit of data was put into a sequence by two separate function calls.
+> Print the same data by a single function call instead.
+> 
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> ---
+>  crypto/rng.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/crypto/rng.c b/crypto/rng.c
+> index ee1768c5a400..479c4ac6fb6c 100644
+> --- a/crypto/rng.c
+> +++ b/crypto/rng.c
+> @@ -81,8 +81,7 @@ static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
+>  	__maybe_unused;
+>  static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
+>  {
+> -	seq_printf(m, "type         : rng\n");
+> -	seq_printf(m, "seedsize     : %u\n", seedsize(alg));
+> +	seq_printf(m, "type         : rng\nseedsize     : %u\n", seedsize(alg));
 
-This isn't even used.  Just delete it:
+This makes the code look worse and appears to be an optimisation
+that isn't really needed.
 
----8<---
-The ctx array in struct sdesc is never used.  Delete it as it's
-bogus since the previous member ends with a flexible array.
-
-Reported-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 511a27c91813..1d433dae9955 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1443,7 +1443,6 @@ static void drbg_kcapi_set_entropy(struct crypto_rng *tfm,
- #if defined(CONFIG_CRYPTO_DRBG_HASH) || defined(CONFIG_CRYPTO_DRBG_HMAC)
- struct sdesc {
- 	struct shash_desc shash;
--	char ctx[];
- };
- 
- static int drbg_init_hash_kernel(struct drbg_state *drbg)
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
