@@ -1,47 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B9921257E;
-	Wed, 19 Nov 2025 18:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BBD31ED7D;
+	Wed, 19 Nov 2025 19:04:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763577909; cv=none; b=bsKpLyv1PKB/yYrhd8+GlxfXyqWVXjh4+tREYA5LtKQxBfI/DCNkkludmgJuzFgOh2pyqSbWDN3rqheBe2JSqGXziQnmZcSnjVkZxG4Bc+J28Dz3Dj4ZrkH6vvCmWhYfr89qC2jvpQeIFWKOEUsnNJCUetF6dtXPurfmSUgJUQI=
+	t=1763579077; cv=none; b=ffZQolU6vGWBojGbr8hr+zqr693aRJUsQIFJpTR4jz8h6ugj5WPu3BMZpPifWQ6GyZWUo58jf+DUo2jBBAV+gVj/OKHJLw1Mh9azeFOhaA9PBHqqaBzpgGpcEnTb/xjvxmYwrsH02gDkxljCMzfGvncOYGzRSDR1sWfso5CNa0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763577909; c=relaxed/simple;
-	bh=lREu9tNPPw7ji/ZfllpGZdKS3aTWW/dNnGWc7GYvBEA=;
+	s=arc-20240116; t=1763579077; c=relaxed/simple;
+	bh=sh/IqdirFiY9KE9bye27UXNCNGUTRosTLT2d0iGtz3c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/KI/N33NKQx+QOJ6nHnMLJ/KqGMKvq6jS81oXp24fTgFCcDrKZYK9dOrmUFFKp35SqDNInk2kEmifGPahZI94PD6nirX/q7BYlQUv8JPkxmtHpf4r4vP+giUyOjk/Pl50FVAK3ba9ZdIKJ3CyGKcLCn49EZxOV9xrieRIgH2x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XG6KJfK2; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=RYb8C+tdkg3LsOCJcGYIbwpjDmYYLqVnxh1WjirwHnt3yr63g4YSZOAnJNtguU2UsZC9WEEWligGH5whmu6x4Q8vTOZM41BWRLCm48uwmYM5mnsPxXEwXxSe/Ra5IQ5bMB80BsRjErDmgwlFyKypF9mQd2Ok7RQG5obVYZEqyms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=AjCgQ5TV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XG6KJfK2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACFB2C4CEF5;
-	Wed, 19 Nov 2025 18:45:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763577905;
-	bh=lREu9tNPPw7ji/ZfllpGZdKS3aTWW/dNnGWc7GYvBEA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XG6KJfK2DmumFoLSpYzy9iwgv2UkuH3HHAlMrJISRMAhTlkWo08RVAJNDN4WJ6nWB
-	 JZgqtpMhiUhjHGTyL289YUxD2lY9OTX0HEmqZkWIIZwqXjGY2BFn7KpaTYaj43dwI+
-	 Xa8ZA2gyzkIou44jFeZtPRCE5vPJb/aKgY7A0isl4iZWQH7qL7tbSdF0WmpXi5njyX
-	 khPoyMlFGQs9xIoop+d+v9v2Tt1pRCGix01MLPg+6TC49/3NxyYGskEbbNCKPCETgN
-	 YHyk4Qd1S0xtPtazwqxd7RGq+ESRKmsJC80CYq3jzn0hOl02/2FgwNYjqru/L4d0mB
-	 mfTuWds/T//vg==
-Date: Wed, 19 Nov 2025 11:45:00 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="AjCgQ5TV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03CB2C4CEF5;
+	Wed, 19 Nov 2025 19:04:35 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="AjCgQ5TV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1763579074;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8RaFVCFkNE2gveE58cqPfbgyLOAWWmddI0dYQ8V36dI=;
+	b=AjCgQ5TVGq1Dv3lCojkIgQGkKSTpoZ0RHPb7p7hsPKEMhx8JShxfG+hN5Z1uI4ayDkodEi
+	kG1JirwmPnOaTRC76burDXB9otX8LaP4VBH3MFQDW/AeHfXtpG059q/ZGexu3wd5Bkmd7D
+	X2vmg4VrosG8UD/ZhV5aT50HRfXT7IY=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f1b13644 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 19 Nov 2025 19:04:33 +0000 (UTC)
+Date: Wed, 19 Nov 2025 20:04:28 +0100
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Eric Biggers <ebiggers@kernel.org>
 Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	kernel test robot <lkp@intel.com>,
-	Eric Biggers <ebiggers@kernel.org>,
 	Ard Biesheuvel <ardb@kernel.org>, Kees Cook <kees@kernel.org>,
-	linux-crypto@vger.kernel.org, llvm@lists.linux.dev,
-	oe-kbuild-all@lists.linux.dev, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH libcrypto 2/2] crypto: chacha20poly1305: statically check
- fixed array lengths
-Message-ID: <20251119184500.GA3303394@ax162>
-References: <20251118170240.689299-2-Jason@zx2c4.com>
- <202511192000.TLYrcg0Z-lkp@intel.com>
- <CAHk-=wj9+OtEku8u9vfEUzMe5LMN-j5VjkDoo-KyKrcjN0oxrA@mail.gmail.com>
- <CAHmME9pvgyot-PJDbWu1saYagEYutddc_B9qNHf-MZ-vkw4zoQ@mail.gmail.com>
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH libcrypto 1/2] array_size: introduce min_array_size()
+ function decoration
+Message-ID: <aR4UvNzdLLofbRpW@zx2c4.com>
+References: <20251118170240.689299-1-Jason@zx2c4.com>
+ <20251118232435.GA6346@quark>
+ <aR0Bv-MJShwCZBYL@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,75 +50,48 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHmME9pvgyot-PJDbWu1saYagEYutddc_B9qNHf-MZ-vkw4zoQ@mail.gmail.com>
+In-Reply-To: <aR0Bv-MJShwCZBYL@zx2c4.com>
 
-On Wed, Nov 19, 2025 at 05:46:44PM +0100, Jason A. Donenfeld wrote:
-> Hey Linus,
+On Wed, Nov 19, 2025 at 12:31:11AM +0100, Jason A. Donenfeld wrote:
+> There's also this other approach from 2001 that the C committee I guess
+> shot down: https://www.open-std.org/jtc1/sc22/wg14/www/docs/dr_205.htm
+> It is basically:
 > 
-> On Wed, Nov 19, 2025 at 5:29 PM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
-> >
-> >  On Wed, 19 Nov 2025 at 04:46, kernel test robot <lkp@intel.com> wrote:
-> > >
-> > > >> drivers/net/wireguard/cookie.c:193:2: warning: array argument is too small; contains 31 elements, callee requires at least 32 [-Warray-bounds]
-> >
-> > Hmm. Is this a compiler bug?
+>     #define __at_least static
 > 
-> It's not. It's a 0day test bot bug! My original patch had in it some
-> commentary about what a bug would look like when it's caught by the
-> compiler. In order to provoke that compiler output, I mentioned in the
-> commit message that this diff will produce such and such result:
+> We could attempt to do the same with `at_least`...
 > 
-> diff --git a/drivers/net/wireguard/cookie.h b/drivers/net/wireguard/cookie.h
-> index c4bd61ca03f2..2839c46029f8 100644
-> --- a/drivers/net/wireguard/cookie.h
-> +++ b/drivers/net/wireguard/cookie.h
-> @@ -13,7 +13,7 @@ struct wg_peer;
-> 
->  struct cookie_checker {
->         u8 secret[NOISE_HASH_LEN];
-> -       u8 cookie_encryption_key[NOISE_SYMMETRIC_KEY_LEN];
-> +       u8 cookie_encryption_key[NOISE_SYMMETRIC_KEY_LEN - 1];
->         u8 message_mac1_key[NOISE_SYMMETRIC_KEY_LEN];
->         u64 secret_birthdate;
->         struct rw_semaphore secret_lock;
-> 
-> It looks like the 0day test bot just went through the email and
-> applied all the `diff --git ...` hunks, without taking into account
-> the context area above where the actual patches start.
+> It kind of feels like we're just inventing a language at that point
+> though.
 
-I don't think it is a bot issue. Just running 'b4 shazam' (i.e. just
-applying the patch with 'git am') on the series results in:
+Actually, you know, the more this apparently terrible idea sits in my
+head, the more I like it.
 
-commit 6ddc87109d4bb589d02cc3a8b037c99fdc4cbbf9
-Author: Jason A. Donenfeld <Jason@zx2c4.com>
-Date:   Tue Nov 18 18:02:40 2025 +0100
+Which of these is most readable to you?
 
-    crypto: chacha20poly1305: statically check fixed array lengths
-    
-    Several parameters of the chacha20poly1305 functions require arrays of
-    an exact length. Use the new min_array_size() macro to instruct gcc and
-    clang to statically check that the caller is passing an object of at
-    least that length.
-    
-    Here it is in action, with this faulty patch:
+bool __must_check xchacha20poly1305_decrypt(
+        u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
+        const size_t ad_len, const u8 nonce[min_array_size(XCHACHA20POLY1305_NONCE_SIZE)],
+        const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)]);
 
-diff --git a/drivers/net/wireguard/cookie.h b/drivers/net/wireguard/cookie.h
-index c4bd61ca03f2..2839c46029f8 100644
---- a/drivers/net/wireguard/cookie.h
-+++ b/drivers/net/wireguard/cookie.h
-@@ -13,7 +13,7 @@ struct wg_peer;
- 
- struct cookie_checker {
- 	u8 secret[NOISE_HASH_LEN];
--	u8 cookie_encryption_key[NOISE_SYMMETRIC_KEY_LEN];
-+	u8 cookie_encryption_key[NOISE_SYMMETRIC_KEY_LEN - 1];
- 	u8 message_mac1_key[NOISE_SYMMETRIC_KEY_LEN];
- 	u64 secret_birthdate;
- 	struct rw_semaphore secret_lock;
+bool __must_check xchacha20poly1305_decrypt(
+        u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
+        const size_t ad_len, const u8 nonce[static XCHACHA20POLY1305_NONCE_SIZE],
+        const u8 key[static CHACHA20POLY1305_KEY_SIZE]);
 
-followed by the rest of the patch for me.
+bool __must_check xchacha20poly1305_decrypt(
+        u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
+        const size_t ad_len, const u8 nonce[at_least XCHACHA20POLY1305_NONCE_SIZE],
+        const u8 key[at_least CHACHA20POLY1305_KEY_SIZE]);
 
-Cheers,
-Nathan
+The macro function syntax of the first one means nested bracket brain
+parsing. The second one means more `static` usage that might be
+unfamiliar. The third one actually makes it kind of clear what's up.
+It's got that weird-but-nice Objective-C-style sentence programming
+thing.
+
+Would somebody jump in here to tell me to stop sniffing glue? I feel
+silly actually considering this, but here I am. Maybe this is actually
+an okay idea?
+
+Jason
