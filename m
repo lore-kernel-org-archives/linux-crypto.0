@@ -1,156 +1,139 @@
-Received: from mout.web.de (mout.web.de [212.227.17.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A6934C988;
-	Wed, 19 Nov 2025 10:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DDE2EA158;
+	Wed, 19 Nov 2025 10:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763547782; cv=none; b=P7F3FDqKfOxbmTZ3hXh0qBWQ0FM6AmimuikSDQ2X/+wyG3qYX5zCQDNfIYH3ke44jHT3BoER8ENupPyN+FjGsZH4auvbEd8Tt9bpI9Czp0ZqeOD7eIXNh9Lh1CBhEc49x37bCESh+5PLiY83ZB35kmdxApJla8WyrA59RYfxE3I=
+	t=1763548658; cv=none; b=FKxafkVmC4He2zLZUl/lmvry0vjsCKV+WMs9HUzfYNFDt+DVPAtRdx/vY56uCB3kvIdnUBVcsekEab0B8Bl8eoPmSz2L0J/4tz5YTJ/dEuJYx7SuKPFonHgyNI9azfKmxqeIoRL2MVBQ+Wzezl8yLWZ9YMs1op8SvMKZcXoJDIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763547782; c=relaxed/simple;
-	bh=etSxlk3VdiVuno4QNgeaBsata9waidEkviYpV9PQZHg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nskjlETNbthL+TfPZmUtse8QNY2m239gekuC3USkUGfrF4zar9Zt3bwgJFmk4TAglw8JupRJV6P/n7iAGuyTAcxBoD6It0SJ3ggUjLVcYw9yQSz2WNhP4VJua6/7rQKZZEhP+g9g62r0SHYVxkLnXMVYBPjywTEO+jQCgGORMOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=NBvCl5mz; arc=none smtp.client-ip=212.227.17.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1763548658; c=relaxed/simple;
+	bh=uz9BVyfkCdlbHT0ASnX/NSFrExl1oVyHkEaFMaaghGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CN9aM1oGcPpqHUeKqcQuqLp4eImezrqXJ1f9JuR5QDtD0CiuY6pFBq5uAWUHxPm4jp2wEk2CpaiTJFgRza8xmg0E5FJX42LqYGcKHLGFeFr/6lVUcEvSMJLLAkXsuecYpu+5/cDMQDvbVjwGrbJ1xHEV14oineTztvqyOc0hrlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=az+9sbhe; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="NBvCl5mz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1763547775; x=1764152575; i=markus.elfring@web.de;
-	bh=tIGlYpdUl0sVRsSnYywWJ0QnlzCdlV+htmmqnf9W4h0=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=NBvCl5mzcA0Z0FAmT/IvYxs1itUPBqizTf/IdGZOe2ZTcbmdlLB/42V8qQ05zgha
-	 MLZ8CZUwhBAA0KKpi6eLitmKSjY+1pg7B5cSbbUKJ73etGuG12njj4Jqkk9Rf+CwU
-	 ZfVmmdjzg/b61z19dbKSDfIBKc3sAQfNnWIY6ZA7bHfQ5FDK8ZiE7tAHodCD7qyx8
-	 sIhb03TnGVm3GTkTEcFwrBjnSAKZPDFFT1YgvlzfgyF6oQrr6zDYqdBGTJOchrEi5
-	 ck6PiG/uVssbSZO3k3HDk+q2BbHmowEq33iMbZCLllmzgB0bAh0KDiTESjFRL500F
-	 P1wdXqAb0OY4c8/3TA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.92.228]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MZjET-1vgvhE0fFn-00OfgR; Wed, 19
- Nov 2025 11:16:43 +0100
-Message-ID: <af38ab0e-79b8-432d-a923-16d2af129154@web.de>
-Date: Wed, 19 Nov 2025 11:16:22 +0100
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="az+9sbhe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763548657; x=1795084657;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=uz9BVyfkCdlbHT0ASnX/NSFrExl1oVyHkEaFMaaghGQ=;
+  b=az+9sbheuCY7P2kXtoULRzwe63faSnJTtkYU9Di7GlicWMjej47DsHnB
+   S0C0arwrBRFVKyjcrqTqUu4/X2LEWwoCEBzQt7Upp44LQip/LYQwpODWH
+   QrfQPZgiuOBV88Jf2XZu9OLirZn5qhMRTJS/p1aBJqYDBoolkGLRLJR4F
+   DQ7s7GSDMyb2DzjB+f+4ZrzZg2FVWywIIfM4JL6VV3YNsmJYAQBju1Nhj
+   xXF/TIoef0LBNw4PvsvTr6exfeAE/vELGVJvzORfFx6emSyp0D/KJZp/K
+   w/TqG4eZ4RGD7EdeeTKBLUz98vBY5HuX0Wa6esrPvZwBwFJALQFp6pTB+
+   A==;
+X-CSE-ConnectionGUID: cucyoykQSM+M+HoWY1tnQg==
+X-CSE-MsgGUID: arlIqTvFTamsR4Jhdwi+eQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11617"; a="64782715"
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="64782715"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 02:37:36 -0800
+X-CSE-ConnectionGUID: piT3SsmyQ7K9pggikPDWDQ==
+X-CSE-MsgGUID: ocqkq51PSPa8wMG2H3m8nw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="228366658"
+Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 19 Nov 2025 02:37:33 -0800
+Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vLfZ5-0002m7-0z;
+	Wed, 19 Nov 2025 10:37:31 +0000
+Date: Wed, 19 Nov 2025 18:36:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>, Kees Cook <kees@kernel.org>,
+	linux-crypto@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, LKML <linux-kernel@vger.kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH libcrypto 2/2] crypto: chacha20poly1305: statically check
+ fixed array lengths
+Message-ID: <202511191846.AAKP7VQw-lkp@intel.com>
+References: <20251118170240.689299-2-Jason@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: rng - Combine two seq_printf() calls into one in
- crypto_rng_show()
-To: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Neil Horman <nhorman@tuxdriver.com>, LKML <linux-kernel@vger.kernel.org>
-References: <d9574f40-8d0f-4f14-bc9f-b29c56069b8b@web.de>
- <aR1LcMOO0B6qUdOX@gondor.apana.org.au>
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <aR1LcMOO0B6qUdOX@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:VWM2MQ5W6BCYVcyQbH4/QP8OGNhnSqnxLVGkLz6GcdTghW+Hq1c
- nG0UNMvsS5kr6bXKn9e72tC2K9r2vAljq/yAzUQiJa8cKlEeoyeWv7cp056odTaT4hOyR03
- LT7hAEhjs/ByPP45jgV5OYhHOvRQH7T2UqXn3Asb2B/CZRFpyBxKpYvx0qOJmxD/TeakkFr
- SOj/59QdZB9IaLqXo+erQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:22ZrfbNc1rY=;j/xWTvtIXaHlXqDLdqIDnSdE8/k
- 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
- yus3zHF7vDXZtYTco=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251118170240.689299-2-Jason@zx2c4.com>
 
-=E2=80=A6>> +++ b/crypto/rng.c
->> @@ -81,8 +81,7 @@ static void crypto_rng_show(struct seq_file *m, struc=
-t crypto_alg *alg)
->>  	__maybe_unused;
->>  static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg=
-)
->>  {
->> -	seq_printf(m, "type         : rng\n");
->> -	seq_printf(m, "seedsize     : %u\n", seedsize(alg));
->> +	seq_printf(m, "type         : rng\nseedsize     : %u\n", seedsize(alg=
-));
->=20
-> This makes the code look worse and appears to be an optimisation
-> that isn't really needed.
+Hi Jason,
 
-Would you expect to specify still two string literals at such a source cod=
-e place?
+kernel test robot noticed the following build warnings:
 
-Regards,
-Markus
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master ebiggers/libcrypto-next ebiggers/libcrypto-fixes linus/master linux/master v6.18-rc6 next-20251119]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Jason-A-Donenfeld/crypto-chacha20poly1305-statically-check-fixed-array-lengths/20251119-011125
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20251118170240.689299-2-Jason%40zx2c4.com
+patch subject: [PATCH libcrypto 2/2] crypto: chacha20poly1305: statically check fixed array lengths
+config: m68k-defconfig (https://download.01.org/0day-ci/archive/20251119/202511191846.AAKP7VQw-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251119/202511191846.AAKP7VQw-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511191846.AAKP7VQw-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/wireguard/cookie.c: In function 'wg_cookie_message_create':
+>> drivers/net/wireguard/cookie.c:193:9: warning: 'xchacha20poly1305_encrypt' reading 32 bytes from a region of size 31 [-Wstringop-overread]
+     193 |         xchacha20poly1305_encrypt(dst->encrypted_cookie, cookie, COOKIE_LEN,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     194 |                                   macs->mac1, COOKIE_LEN, dst->nonce,
+         |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     195 |                                   checker->cookie_encryption_key);
+         |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/wireguard/cookie.c:193:9: note: referencing argument 7 of type 'const u8[32]' {aka 'const unsigned char[32]'}
+   In file included from drivers/net/wireguard/messages.h:10,
+                    from drivers/net/wireguard/cookie.h:9,
+                    from drivers/net/wireguard/cookie.c:6:
+   include/crypto/chacha20poly1305.h:29:6: note: in a call to function 'xchacha20poly1305_encrypt'
+      29 | void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/xchacha20poly1305_encrypt +193 drivers/net/wireguard/cookie.c
+
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  179  
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  180  void wg_cookie_message_create(struct message_handshake_cookie *dst,
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  181  			      struct sk_buff *skb, __le32 index,
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  182  			      struct cookie_checker *checker)
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  183  {
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  184  	struct message_macs *macs = (struct message_macs *)
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  185  		((u8 *)skb->data + skb->len - sizeof(*macs));
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  186  	u8 cookie[COOKIE_LEN];
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  187  
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  188  	dst->header.type = cpu_to_le32(MESSAGE_HANDSHAKE_COOKIE);
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  189  	dst->receiver_index = index;
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  190  	get_random_bytes_wait(dst->nonce, COOKIE_NONCE_LEN);
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  191  
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  192  	make_cookie(cookie, skb, checker);
+e7096c131e5161f Jason A. Donenfeld 2019-12-09 @193  	xchacha20poly1305_encrypt(dst->encrypted_cookie, cookie, COOKIE_LEN,
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  194  				  macs->mac1, COOKIE_LEN, dst->nonce,
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  195  				  checker->cookie_encryption_key);
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  196  }
+e7096c131e5161f Jason A. Donenfeld 2019-12-09  197  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
