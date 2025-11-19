@@ -1,73 +1,66 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EB832C923
-	for <linux-crypto@vger.kernel.org>; Wed, 19 Nov 2025 11:39:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC6835B157;
+	Wed, 19 Nov 2025 12:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763552368; cv=none; b=vFOqpEbkvuTgpOWVkn/cKBA+Efd8dE+ggID2DC1gbYpRB2RunsDZKuadFsFWMJlpnCSDOyhqqBSn2phgHd4JMCFvhoha9HUOgCnef1cvXQdb9njkhc5a8pSmqeWSzZYgqdvzGkojbnZTtY3aORUsPzI4vAoVNy0XEGdDug6pOV0=
+	t=1763556356; cv=none; b=LwvYdgJjuwkZyV6/bOdbG/At69BNU3tnhDUg3hhqqjvNN8Ls7Hl0n56u9dQ7YQ9ydk9kQLox/kLB8rQax92ZACcVNynLuuO1/2pMeHOPGT3oK3hFUWXVhrU8jiFjscCwjYf58mpgaVLnc/rAYSshS6lJreiIbE8LvAZwwZs4JC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763552368; c=relaxed/simple;
-	bh=UM9INyxyuJVSYVO3rVZYPCdEeNlMNoNnBRz+IvQdnpE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=oZ298F0r4Uul9ycC8JIcUF7Vw5WTSnnYnWMoym4+yuacArNZnzCV9y/b2sTVynqwQcASRXxXUGtuL6gnLkOv4fCRCjI6dzE70yJklE02FyDJOb88zKr4Pb5PjMaotu8QuSGwUFhLajH+cdKWGGnzpBCWU4XGUfLXPnHmNZXk8UQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=E8EDIuRt; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1763556356; c=relaxed/simple;
+	bh=HF9GdCIMZF1sjrLdRxndNornshZnJxuUvneqfFK3BPw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qj0/r2BJpnOoH+zvIjwejApHgd3BwbGm/J/d9Jpch6vg5CPxrvx/nVrVgrLiOEZoVhXuwtAvW8uaARDo/4tp/yKPq3pJEKK2xpaMfs/4GxuG0WBGWy7zIxtEZso6YQlxTyqCcuEMQtqwZ9MLwSVnCJHL65h+FmmTOBqk5Sddyt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mE9liDhx; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E8EDIuRt"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42b32a5494dso3956289f8f.2
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Nov 2025 03:39:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1763552364; x=1764157164; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gwJG9GJDfyq4+RD2BDGOinZg52cTnz6+3CySEDanXDg=;
-        b=E8EDIuRtVWvH3GhtbQVpo4qfCgt6xxLKLHasregH+FsaIsTwaeUTfXjPkgbMvuwugt
-         D6nrwLhqu8IYbIMG1S/2GAmtuWmg/vnOZTOstf8CNEnqDgYdgF6py21saesZh89mCtQ5
-         DgpzYMsBPd0XzU3kUp+rHSh8GvE5IPa/fYyhRI9B3NIk+5foM5P2QzWmpAp/UwQMQzky
-         FFQdSHKB+EspHJWjmVantjv4KHcbEoQ4Q8pR8b41KI9sva2iwojfbMjjNfzYFGBI/pLZ
-         kXOFyJCjzH+fWqe7ZZZ0m+JttIfMeIFzoF2b/jINuX1g8r7n4dnwX0WY8WI8psQ+hF0f
-         5MVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763552364; x=1764157164;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gwJG9GJDfyq4+RD2BDGOinZg52cTnz6+3CySEDanXDg=;
-        b=SYXqviLH0/ZQO/P55xbc6vwTdfZxU+ZoV8fupwhqrQDpFKKGPWArONrvIvAQZZ+Ti5
-         wimy0DeUksAY27LZwJFMI7jjcXPy50bGSWrC04NlQPUzfYvvPylW1Qf14fZTCkeQ6YPG
-         oZU1HvFqvbLA5rKYDGfZrBV+/WNNWTAF+/xcU+2VcKi/TRQ3TdUQKmbHI7H8us/wCkUA
-         EgAZzek1/dwjURnqXN/zCfShiJFdHQqQiAkn/PJ95ea54dbKnYokG9yKU9O6gFukOD0T
-         GUJ3iJPTpW7CQxf271yz/tGFT7m3z6+KUHvtovGibS0CHZOMnxIrHc8g0e+okhPEzPaO
-         MzIA==
-X-Forwarded-Encrypted: i=1; AJvYcCXjDvEZ4yUjOSwaYbzrrhgWze4mok9KsfPrrp9BRyGjAMPCZJsfmLhhjNESais31A3mXuZ0ZMABa6HTL6c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZ/5IxlSZMyIWMvp1IdfWsLHCN6ET/XkjcP0tyzOmyZYsQgivE
-	0tcucwLBvDpuriOiBnk+0SlmRatOmuHzCxe5+5iUYOhdUMrVfnCD8O9WysZm3vuNVU8=
-X-Gm-Gg: ASbGnctz8ggs0k5ace11bjUOoPtkaEiCCOmVb4tMKBQXhiv6PrpWv3GH6JLkLZjIAWO
-	JMcMyyoWhgXdWwdYyHNh42r4sEMTzLHdhBuGbEpttq6oX9Rv6DSLYaV5ShHN0mq/kQeDZe+OdFL
-	uvmaMyEraLPrDtcbf5twuQnlgMTCfvJmRJYkIu9U0U4lTsbB8cP9l/S5JwbFnBNPNms/1xA1kvi
-	g5xg6pzFouC310YLpYsk9lDz7VsIDccdiI2mJrI6t1sxbQSDhN4y1VgXbiWDmFbKXthW69bv2AG
-	2RPTRL9vmt0mCCGQQ9ckW5lzYQ3TryLHhw0n0IwS/0SJzmtxG/6ED1TPhCYxo3fHr21BghQcJGa
-	pcGDUqI2tdqrPUJi52NqWUeOowB/SwvVxBTsd71ZHLe7ZM3AsaPYARfLTFuX/CAQIxaQ9Og3mEu
-	hPim5ICgiA18+GPWMT
-X-Google-Smtp-Source: AGHT+IG0+nc2u44sOAgm3B9nfVuClMzbG47n0TMuwtBie7ZMDQ8A+R83vkbvW2yFaDixREsq5GJsjA==
-X-Received: by 2002:a05:6000:2310:b0:42b:3661:305c with SMTP id ffacd0b85a97d-42cb1fc8f6cmr2298825f8f.55.1763552364075;
-        Wed, 19 Nov 2025 03:39:24 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-42b53e85627sm39489729f8f.16.2025.11.19.03.39.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 03:39:23 -0800 (PST)
-Date: Wed, 19 Nov 2025 14:39:20 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Haotian Zhang <vulab@iscas.ac.cn>,
-	herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Haotian Zhang <vulab@iscas.ac.cn>
-Subject: Re: [PATCH v2] crypto: sa2ul: Add error handling for DMA metadata
- retrieval
-Message-ID: <202511191706.iBCITtX2-lkp@intel.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mE9liDhx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763556354; x=1795092354;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HF9GdCIMZF1sjrLdRxndNornshZnJxuUvneqfFK3BPw=;
+  b=mE9liDhxN/9SCPhYRl170wJYg2trpB357nlTb3khV1TNglOrWI/gu1h/
+   axt5824lM0PAMFL2wjnoNPa7/GS2K9iVjHlCTMKYZ+3b46uX6KsuAQfzF
+   q6eUgTbUG+Pp8nGGjmcQUSYsn8P1j62A+9a1tgkLgYdyGxScVU9ixIjfy
+   EcoPMSAQL4Un9LAq1ygW3loV/oCVO59i1Y+klRIlVM04Zi1rabkQ8ysiW
+   nfUJ5KT0VJMPgfhWXkceyUoEhlAHZT3TAkcfjp37O79rv3XBnXNRk60Of
+   Apd6GIqalKAah0lOsAhWT/Z64az3Ydv8ictFAjLTh/e6ipLCj+GUWYU+n
+   Q==;
+X-CSE-ConnectionGUID: PG92Z0P1SBegtJk3lDSnJQ==
+X-CSE-MsgGUID: EhgspRb9SYWC90R7o0ytPQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11617"; a="91070275"
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="91070275"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 04:45:48 -0800
+X-CSE-ConnectionGUID: B0RsA/byT9izExDqLpupDQ==
+X-CSE-MsgGUID: fxKk5ZwHQG+ErFr+MlomYw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="190708391"
+Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 19 Nov 2025 04:45:45 -0800
+Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vLhZ9-0002sn-2G;
+	Wed, 19 Nov 2025 12:45:43 +0000
+Date: Wed, 19 Nov 2025 20:45:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>, Kees Cook <kees@kernel.org>,
+	linux-crypto@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	LKML <linux-kernel@vger.kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH libcrypto 2/2] crypto: chacha20poly1305: statically check
+ fixed array lengths
+Message-ID: <202511192000.TLYrcg0Z-lkp@intel.com>
+References: <20251118170240.689299-2-Jason@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -76,73 +69,76 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251117023117.90-1-vulab@iscas.ac.cn>
+In-Reply-To: <20251118170240.689299-2-Jason@zx2c4.com>
 
-Hi Haotian,
+Hi Jason,
 
 kernel test robot noticed the following build warnings:
 
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master ebiggers/libcrypto-next ebiggers/libcrypto-fixes linus/master linux/master v6.18-rc6 next-20251119]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Haotian-Zhang/crypto-sa2ul-Add-error-handling-for-DMA-metadata-retrieval/20251117-103258
+url:    https://github.com/intel-lab-lkp/linux/commits/Jason-A-Donenfeld/crypto-chacha20poly1305-statically-check-fixed-array-lengths/20251119-011125
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20251117023117.90-1-vulab%40iscas.ac.cn
-patch subject: [PATCH v2] crypto: sa2ul: Add error handling for DMA metadata retrieval
-config: m68k-randconfig-r073-20251119 (https://download.01.org/0day-ci/archive/20251119/202511191706.iBCITtX2-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 11.5.0
+patch link:    https://lore.kernel.org/r/20251118170240.689299-2-Jason%40zx2c4.com
+patch subject: [PATCH libcrypto 2/2] crypto: chacha20poly1305: statically check fixed array lengths
+config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20251119/202511192000.TLYrcg0Z-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251119/202511192000.TLYrcg0Z-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202511191706.iBCITtX2-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511192000.TLYrcg0Z-lkp@intel.com/
 
-smatch warnings:
-drivers/crypto/sa2ul.c:1064 sa_aes_dma_in_callback() warn: 'mdptr' can also be NULL
-drivers/crypto/sa2ul.c:1394 sa_sha_dma_in_callback() warn: 'mdptr' can also be NULL
-drivers/crypto/sa2ul.c:1709 sa_aead_dma_in_callback() warn: 'mdptr' can also be NULL
+All warnings (new ones prefixed by >>):
 
-vim +/mdptr +1064 drivers/crypto/sa2ul.c
-
-7694b6ca649fea Keerthy        2020-07-13  1039  static void sa_aes_dma_in_callback(void *data)
-7694b6ca649fea Keerthy        2020-07-13  1040  {
-aedf818b1f1965 Yu Zhe         2023-03-17  1041  	struct sa_rx_data *rxd = data;
-7694b6ca649fea Keerthy        2020-07-13  1042  	struct skcipher_request *req;
-7694b6ca649fea Keerthy        2020-07-13  1043  	u32 *result;
-7694b6ca649fea Keerthy        2020-07-13  1044  	__be32 *mdptr;
-7694b6ca649fea Keerthy        2020-07-13  1045  	size_t ml, pl;
-7694b6ca649fea Keerthy        2020-07-13  1046  	int i;
-7694b6ca649fea Keerthy        2020-07-13  1047  
-00c9211f60db2d Peter Ujfalusi 2020-09-23  1048  	sa_sync_from_device(rxd);
-7694b6ca649fea Keerthy        2020-07-13  1049  	req = container_of(rxd->req, struct skcipher_request, base);
-7694b6ca649fea Keerthy        2020-07-13  1050  
-7694b6ca649fea Keerthy        2020-07-13  1051  	if (req->iv) {
-7694b6ca649fea Keerthy        2020-07-13  1052  		mdptr = (__be32 *)dmaengine_desc_get_metadata_ptr(rxd->tx_in, &pl,
-7694b6ca649fea Keerthy        2020-07-13  1053  							       &ml);
+>> drivers/net/wireguard/cookie.c:193:2: warning: array argument is too small; contains 31 elements, callee requires at least 32 [-Warray-bounds]
+     193 |         xchacha20poly1305_encrypt(dst->encrypted_cookie, cookie, COOKIE_LEN,
+         |         ^
+     194 |                                   macs->mac1, COOKIE_LEN, dst->nonce,
+     195 |                                   checker->cookie_encryption_key);
+         |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/crypto/chacha20poly1305.h:32:20: note: callee declares array parameter as static here
+      32 |                                const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)]);
+         |                                         ^  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   In file included from drivers/net/wireguard/cookie.c:6:
+   In file included from drivers/net/wireguard/cookie.h:9:
+   In file included from drivers/net/wireguard/messages.h:10:
+   In file included from include/crypto/chacha20poly1305.h:11:
+   In file included from include/linux/scatterlist.h:5:
+   In file included from include/linux/string.h:382:
+   include/linux/fortify-string.h:480:4: warning: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Wattribute-warning]
+     480 |                         __write_overflow_field(p_size_field, size);
+         |                         ^
+   2 warnings generated.
 
 
-The Kconfig file should probably enforce that CONFIG_DMA_ENGINE
-is set.  Otherwise dmaengine_desc_get_metadata_ptr() returns NULL.
+vim +193 drivers/net/wireguard/cookie.c
 
-90d79e983588a8 Haotian Zhang  2025-11-17  1054  		if (IS_ERR(mdptr)) {
-90d79e983588a8 Haotian Zhang  2025-11-17  1055  			dev_err(rxd->ddev, "Failed to get AES RX metadata pointer: %ld\n",
-90d79e983588a8 Haotian Zhang  2025-11-17  1056  				PTR_ERR(mdptr));
-90d79e983588a8 Haotian Zhang  2025-11-17  1057  			sa_free_sa_rx_data(rxd);
-90d79e983588a8 Haotian Zhang  2025-11-17  1058  			skcipher_request_complete(req, PTR_ERR(mdptr));
-90d79e983588a8 Haotian Zhang  2025-11-17  1059  			return;
-90d79e983588a8 Haotian Zhang  2025-11-17  1060  		}
-7694b6ca649fea Keerthy        2020-07-13  1061  		result = (u32 *)req->iv;
-7694b6ca649fea Keerthy        2020-07-13  1062  
-7694b6ca649fea Keerthy        2020-07-13  1063  		for (i = 0; i < (rxd->enc_iv_size / 4); i++)
-7694b6ca649fea Keerthy        2020-07-13 @1064  			result[i] = be32_to_cpu(mdptr[i + rxd->iv_idx]);
-7694b6ca649fea Keerthy        2020-07-13  1065  	}
-7694b6ca649fea Keerthy        2020-07-13  1066  
-00c9211f60db2d Peter Ujfalusi 2020-09-23  1067  	sa_free_sa_rx_data(rxd);
-7694b6ca649fea Keerthy        2020-07-13  1068  
-7694b6ca649fea Keerthy        2020-07-13  1069  	skcipher_request_complete(req, 0);
-7694b6ca649fea Keerthy        2020-07-13  1070  }
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  179  
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  180  void wg_cookie_message_create(struct message_handshake_cookie *dst,
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  181  			      struct sk_buff *skb, __le32 index,
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  182  			      struct cookie_checker *checker)
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  183  {
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  184  	struct message_macs *macs = (struct message_macs *)
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  185  		((u8 *)skb->data + skb->len - sizeof(*macs));
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  186  	u8 cookie[COOKIE_LEN];
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  187  
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  188  	dst->header.type = cpu_to_le32(MESSAGE_HANDSHAKE_COOKIE);
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  189  	dst->receiver_index = index;
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  190  	get_random_bytes_wait(dst->nonce, COOKIE_NONCE_LEN);
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  191  
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  192  	make_cookie(cookie, skb, checker);
+e7096c131e5161 Jason A. Donenfeld 2019-12-09 @193  	xchacha20poly1305_encrypt(dst->encrypted_cookie, cookie, COOKIE_LEN,
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  194  				  macs->mac1, COOKIE_LEN, dst->nonce,
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  195  				  checker->cookie_encryption_key);
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  196  }
+e7096c131e5161 Jason A. Donenfeld 2019-12-09  197  
 
 -- 
 0-DAY CI Kernel Test Service
 https://github.com/intel/lkp-tests/wiki
-
