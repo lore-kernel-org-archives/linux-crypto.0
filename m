@@ -1,104 +1,154 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB669372AD8;
-	Thu, 20 Nov 2025 13:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0B333A006
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 13:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763644893; cv=none; b=m3+A6c0d+M+ZDx5uLVBC+Xyx/Kk0BDhPWfTTfxlcomDn38ds6mVJzR//Ch0nL50H07ZTRBbFrWpj85rU9AWYBaS++4Vn+ITZB+2dVQJLJCfT6gF8dUg8/oIoPMQ1kHaBLM3vce23InElTRkah3LaclCRVk/DMqHl8DBfwLpdP/s=
+	t=1763646933; cv=none; b=MmGekhEtT5t4jIXMVlurCRqID3v8pecAGAymRMWJGnwvO1D+BUrqKE9vv252rpaovGM+f8TIR6GDzR9NEpFY87NR5a9Zh+UafEYSGziaq/C3FyC7GE7e6MRQxL6T9UBqp0Onzqa4uHijA0EvRsiXvOLzQhF274Ka93lRyBUj4Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763644893; c=relaxed/simple;
-	bh=EGAJmfNABAJZ/aTR5JJfUbbsyzvWxPMbC/KsM//JTVA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VOn8TtVZClmTPUGaPJxlB8VbcVlixX3WbI/SaWXwy5zXTLU5199gBhQG+dlF4C06g4DZpTel6Z4/RsqsH969wq18iT1KT0X3aU0iYE/pJhPhDo7VmivLBTdKHCWppy2V1OqHTLor6qhMmE0LFKKRYgj1eJXJ8M1TVyOBsgyKANw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=y+htPCVH; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1763646933; c=relaxed/simple;
+	bh=emfT4JXRXejRJxV18S/z18iLUjgMJbsFUVn1IaRCxg0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=fuC0NlqWxtvU5C3x9Hm1FpTQLet6fcwVm4qZKx+l/hcEHBq1x9060XubKEkk7Ip0T6oG81r/2U6sMZMveQbDmKrVKIXmvfmJdiC6UVm2PvJMEnjwEa4WAf8twpCepAo/7HqGxi621mGKSduHYDnmMGcP6thSa8g64Ur/xeibX0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KysYYDvq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="y+htPCVH"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=KU5q0xHZlC5umw1PzPbWqyaghdMkTa7ujFvADo3xQnw=;
-	b=y+htPCVHQtoNC20P9eBuFqh4bLNt3jXOyadOL10/Xb6BKLw/3yjggAevlEMOdGtQpy+oQB/zk
-	vM5bo3TMLfFfqqS8Ux+nTJgNyJTCOMlQF29JFinbcck/aVawUEutMdb5nmMuHiFFayjYIPHlPKk
-	J2O4nElRQpiLMj8gl+t+98U=
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4dBzV70rFfz12LDg;
-	Thu, 20 Nov 2025 21:19:59 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1908318046F;
-	Thu, 20 Nov 2025 21:21:26 +0800 (CST)
-Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 20 Nov 2025 21:21:25 +0800
-Received: from localhost.huawei.com (10.90.31.46) by
- kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 20 Nov 2025 21:21:25 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<linuxarm@openeuler.org>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
-	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH] crypto: hisilicon/qm - fix incorrect judgment in qm_get_complete_eqe_num()
-Date: Thu, 20 Nov 2025 21:21:24 +0800
-Message-ID: <20251120132124.1779549-1-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KysYYDvq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763646930;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1C8+LrjU0KzWq9emHiCsxm0TlrKfuklcXtM1rteIByw=;
+	b=KysYYDvq5q7EtNh+fK9bN4C3/Nyy7g53VyKeWcO7m3PpDOFm4I9d9nWi2gfs6NrEjh8kVR
+	VsF+DJ7jkiB01TJyU33n8SvTmQcrzDz33CzWO8XwGNolLWgCmbHCNlGMDJX3nmIMs8Rgaz
+	CHR5orE+nKjoSDR9t41AXjCgDnyIxms=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-56-QkHHSkW8Ouy8-NP7xFcggQ-1; Thu,
+ 20 Nov 2025 08:55:26 -0500
+X-MC-Unique: QkHHSkW8Ouy8-NP7xFcggQ-1
+X-Mimecast-MFC-AGG-ID: QkHHSkW8Ouy8-NP7xFcggQ_1763646924
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 573871800358;
+	Thu, 20 Nov 2025 13:55:24 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 109A41955F2C;
+	Thu, 20 Nov 2025 13:55:19 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20251120003653.335863-2-ebiggers@kernel.org>
+References: <20251120003653.335863-2-ebiggers@kernel.org> <20251120003653.335863-1-ebiggers@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Luis Chamberlain <mcgrof@kernel.org>,
+    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
+    Sami Tolvanen <samitolvanen@google.com>,
+    "Jason A . Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Stephan Mueller <smueller@chronox.de>,
+    Lukas Wunner <lukas@wunner.de>,
+    Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
+    linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] lib/crypto: Add ML-DSA verification support
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemq200001.china.huawei.com (7.202.195.16)
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2624663.1763646918.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 20 Nov 2025 13:55:18 +0000
+Message-ID: <2624664.1763646918@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-In qm_get_complete_eqe_num(), the function entry has already
-checked whether the interrupt is valid, so the interrupt event
-can be processed directly. Currently, the interrupt valid bit is
-being checked again redundantly, and no interrupt processing is
-performed. Therefore, the loop condition should be modified to
-directly process the interrupt event, and use do while instead of
-the current while loop, because the condition is always satisfied
-on the first iteration.
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-Fixes: f5a332980a68 ("crypto: hisilicon/qm - add the save operation of eqe and aeqe")
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
----
- drivers/crypto/hisilicon/qm.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+> +	/* Compute d =3D (c mod 2^32) * (q^-1 mod 2^32). */
+> +	s32 d =3D (s32)c * QINV_MOD_R;
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 8533384e3eaa..56bbb46f1877 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -991,7 +991,7 @@ static void qm_get_complete_eqe_num(struct hisi_qm *qm)
- 		return;
- 	poll_data = &qm->poll_data[cqn];
- 
--	while (QM_EQE_PHASE(dw0) != qm->status.eqc_phase) {
-+	do {
- 		poll_data->qp_finish_id[eqe_num] = dw0 & QM_EQE_CQN_MASK;
- 		eqe_num++;
- 
-@@ -1004,11 +1004,10 @@ static void qm_get_complete_eqe_num(struct hisi_qm *qm)
- 			qm->status.eq_head++;
- 		}
- 
--		if (eqe_num == (eq_depth >> 1) - 1)
--			break;
--
- 		dw0 = le32_to_cpu(eqe->dw0);
--	}
-+		if (QM_EQE_PHASE(dw0) != qm->status.eqc_phase)
-+			break;
-+	} while (eqe_num < (eq_depth >> 1) - 1);
- 
- 	poll_data->eqe_num = eqe_num;
- 	queue_work(qm->wq, &poll_data->work);
--- 
-2.33.0
+Hmmm...  is "(s32)c" actually "(c mod 2^32)"?  Should that be:
+
+	u32 d =3D (u32)c * QINV_MOD_R;
+
+This is followed up by casting 'd' to "s64".  I don't think that should
+sign-extend it, but...
+
+> +	for (int m =3D 0, len =3D 128; len >=3D 1; len /=3D 2) {
+
+Can you put "int m =3D 0" outside of the for-statement?  I know putting it
+inside saves a line or two, but 'm' is not the loop counter - which it see=
+ms
+like it should be by virtue of being listed first.
+
+> +	for (int m =3D 256, len =3D 1; len < 256; len *=3D 2) {
+
+Ditto.
+
+> +static const u8 *decode_t1_elem(struct mldsa_ring_elem *out,
+> +				const u8 *t1_encoded)
+
+I think this is (more or less) pkDecode()?  Can you put something like:
+
+  * Decode the vector 't1' from the public key.
+  * Reference: FIPS 204 Algorithm 23, sigDecode.
+
+in the comment before it?
+
+> +/*
+> + * Use @seed to generate a ring element @c with coefficients in {-1, 0,=
+ 1},
+> + * exactly @tau of them nonzero.  Reference: FIPS 204 Algorithm 29, Sam=
+pleInBall
+> + */
+> +static void sample_in_ball(struct mldsa_ring_elem *c, const u8 *seed,
+> +			   size_t seed_len, int tau, struct shake_ctx *shake)
+
+Should "seed" actually be labelled "rho"?  I know a seed is what it is, bu=
+t
+the algo description has a different label - and the caller passes it ctil=
+de,
+not rho:-/.
+
+> +	u8 (*h)[N]; /* The signer's hint vector, length k */
+> +	h =3D (u8 (*)[N])&ws->z[l];
+
+C is weird sometimes.
+
+> +		/* Reduce to [0, q), then tmp =3D w'_1 =3D UseHint(h, w'_Approx) */
+
+Bracket mismatch.  "[0, q]"
+
+> +		/* w1Encode(w'_1) */
+> +		w1_pos =3D 0;
+> ...
+
+Given you put the decode functions into helpers, don't you want to do that
+with this?
+
+> +	if (memcmp(ws->ctildeprime, ctilde, params->ctilde_len) !=3D 0)
+> +		return -EBADMSG;
+
+Actually, this should return -EKEYREJECTED, not -EBADMSG.
+
+I guess you don't need to use crypto_memneq() as timing doesn't matter.
+
+The maths look okay, I think.  You can add:
+
+	Reviewed-by: David Howells <dhowells@redhat.com>
+
+David
 
