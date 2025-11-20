@@ -1,180 +1,248 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78AEC2FE57B
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 18:21:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763662920; cv=none; b=O2tqhJI918wAI3+VJykAE2ZYUTgDz5wWvZL0wdHIbX6MV8L9GNZMvmtrExAFFgLOE4YHtWSOMYMnvcLv+6BWwcZ9XH4LwQ6VeudtG2fLW843qMbrRB3dz2TyRiuaFQ42cKkNJGUEu4F88ajJBknRVurfHWfn30CHDhJGhr95Noo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763662920; c=relaxed/simple;
-	bh=wecZEUleM2pVH/ldG6VyoxAP3Tx+t9JIJBh2fst1eeo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d3xgxRxigYXwpugILnf9NaShxtu1Ht3RMcytztmL1NsPcMyaTE66uBYuZPTYGPflr1rIwkzAq58hwsfT6q34u3XvRGHmrmY56YELmjHoBYDrAvFdk+C3YOFBHu6qbSUvVmW5mqaLDdvwfZbTLgdSD7pKZwHqJ5saRMtKdQZM3g0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=QHZUmRK5; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C520245012;
+	Thu, 20 Nov 2025 21:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763674139; cv=fail; b=aN9Cn8z2yyaWH9u1mFUNPbqz12c6oQy5VTeivxC6qBiQNRjWHf3+BJczLPOA3mVKMYQyv/bhyFMWgFVfZBWju4CoaRQE8vGXvsycuXllhMEyzitVjSopwZZ9ppKybuobpaorzUKcOV15yIwqwo3R8LKdYXRWbtoUzoa+z4uKsd8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763674139; c=relaxed/simple;
+	bh=9XTi1YFUCgRfCYkw2G9+6QtXkIUP/+CBWQict3TsYAI=;
+	h=From:Date:To:CC:Message-ID:In-Reply-To:References:Subject:
+	 Content-Type:MIME-Version; b=KcxVW8+fSHN3WQHF8VViOa5niUSMQLR1EYmT/BJkmUgy1PIT1he4rH+Tnq2ekYApkgfD9zSdoh6Z3Xuac/J1dsPmgH1WF3iwLn1XxsZKdBCE2PCqMx5Efc+ZBt19OYi+FSqxFQX/5AugxtpPpbml4G01AKsyM7AuUDZwEI1K3oo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kdDNleF0; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="QHZUmRK5"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-37a33b06028so11413041fa.2
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 10:21:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1763662916; x=1764267716; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+BPfdnrOHpw/8tC+sL0oorkp9gKYtrunKdRWYzTn+GA=;
-        b=QHZUmRK5/RdLNmdm99gtRcafG2F2E4ySFAErTof2jVn0d+laptat9VSOpWIB+UF4qd
-         /hn3y/4EPti9rugLesTnUfjBOcuvdgxIDrMhe/OYg/lyEXNhcNFaf78Pwvjk0+av7/ND
-         JjqRxQeSEkf6OctNlhKktG1Ck3z+08f7sscy8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763662916; x=1764267716;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+BPfdnrOHpw/8tC+sL0oorkp9gKYtrunKdRWYzTn+GA=;
-        b=WR/haLwtcFNfQmmH/VbcHMJ9odOnNmGDD578XtGksWSUskTVF775M7iNlw/qcmquUr
-         /bsclhh8PC+19iN2iw8zW7YBy2gXs31fuE2sm8+Il5wcBWyFNL305LpQTVVkEcPUV3Rs
-         +aaX41la72nsALJ2MmO69EAigg7+CfXYnWznvdavS3wwsSro26MEBtTk2lrozN+3BxvT
-         CpCYC2MWnyoTI3gLnsUdMr4GaVOSNRjieZMQY9m8YYCnIFsq+Kf5Rr1EvReEVa0CUoqa
-         ydXMa/Ts9Jphla6xwYFP960tE1ZHqf9SC4+bJmuBb74PWNhvLo3A7aQBwS700iOlG4Kc
-         uWuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVgDDUs/kA45LGErQymHcZmKtUDBq8mk23viY/X17RQuUqaOMfFn+yd84EJzlAYpwv7Rlk6Xq7gLC9+DaM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHfIX75L9pRCSzJy8m/2Jgg4AviAZZl1f+meiQDED+Lt8kL2Ec
-	mIqa6MAtbaBdtTGDNCVZcEpRk/MpZ6COa0A0RDEffVpffcyXTngNEP8mvSjJivu50wHQYIs0tWr
-	A614qqCwVAw==
-X-Gm-Gg: ASbGncvUgx7OnPDLPtUMvHV5bX1LOREy1FcNzEjXzbY7Mq8FM+VqRjhyk1o/OEWwkoq
-	dBfrSxXg3nj70eX6ef5AabbAinNsHnJ6bWxsrozt9qYu/npTm8Vjxzl4ASi29BmhpcxVCjI26fy
-	Jcy0HY5Lvhr5GhvM8xpqI+TJlpf0qqlNL9R7oe9oV/MexupGEN9eJRtTqvUw3z0aD06mJyv2/k1
-	uEtiZLo4umWFXItGlVkttrkG8OBvOjfHNs3tUTc7WLnHaUJ5/cM9jkqop4sGq+DYMS8UGBA4d2V
-	LnCD0C7P1SfjW26oUcjeHcQ5uAZ26lXpkPYusoOjOd6Xq4V9i7pm3XTim9wN5EEBesbxeBPybna
-	jOwzIDM/4luOB5AaZ+1GtJvO3iG7rNdKFPQ6C/0Sx9l61dwDpUkyMz9bRyEze+8AQRtRexo8/9/
-	8LTM4rTp/RZwXDDdAAyticaqwy7rprsIs4OhrZZ86m9NRWySifnFpYKk3AnL6qk6Lr
-X-Google-Smtp-Source: AGHT+IFSGU1GtncXgtqZw4JtH0kJ/BQYyXs8IWpgFlOY+kFXaRbaZJ5Dh34XKQHvsdjRKOQbaC8OHQ==
-X-Received: by 2002:a2e:88d1:0:b0:37a:4611:9fe5 with SMTP id 38308e7fff4ca-37cc67563d1mr9914271fa.18.1763662916231;
-        Thu, 20 Nov 2025 10:21:56 -0800 (PST)
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com. [209.85.208.182])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-37cc6bcb262sm6489731fa.43.2025.11.20.10.21.55
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 10:21:55 -0800 (PST)
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-37a3d86b773so10728981fa.0
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 10:21:55 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWHhwukXX7Ny8dZn5xtwSJivtKwdMJf+S1kWG6QDAuAtvdVton8vbViHSQ7fCA6SEycPzt3gls/ezPGE6M=@vger.kernel.org
-X-Received: by 2002:a17:907:7f0a:b0:b70:b71a:a5ae with SMTP id
- a640c23a62f3a-b7654fe9b97mr482177966b.44.1763662490181; Thu, 20 Nov 2025
- 10:14:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kdDNleF0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763674134; x=1795210134;
+  h=from:date:to:cc:message-id:in-reply-to:references:
+   subject:content-transfer-encoding:mime-version;
+  bh=9XTi1YFUCgRfCYkw2G9+6QtXkIUP/+CBWQict3TsYAI=;
+  b=kdDNleF0SuXKg8EUvSzB/CSlXBEdVQ72H7ttueaq1z6OPwyKRiup0lBw
+   51OMdgjHQ69MrgSs2AC83tUscwVytdgX7tXP8SkssLig0edY9MdyOlxdB
+   ujs1Svt0aK6NcA/zkQGJJWwpnkbNxOCM1lkiqLT1Nvbm3Qp4tQaQieBRq
+   DVHD6pckoU+kLU46YUEqQU7cBAA5IFCB3fuqE1Ug56lV7n1+XA1dg/LHr
+   j6JRv7TGPyaEHKYVtTvXhm8S84uEw+WsbZRsoQ/8h5zAg3SiYpiwGWHqp
+   ByVtSnLsRYTM5cpc1S6CCDVvEIo+yisidks4T0ZHKrMM5vqAuAtBhaWbH
+   w==;
+X-CSE-ConnectionGUID: EuPD9xwkTpusyjIbwPeAew==
+X-CSE-MsgGUID: vyeoMvXAS3uDTYh5xv0twA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="64951338"
+X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
+   d="scan'208";a="64951338"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 13:28:49 -0800
+X-CSE-ConnectionGUID: oWLAQx48SMW1LwDtumxH8g==
+X-CSE-MsgGUID: QYcCrkw6StGbaEuZlTcYYA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
+   d="scan'208";a="190785980"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 13:28:49 -0800
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 20 Nov 2025 13:28:48 -0800
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Thu, 20 Nov 2025 13:28:48 -0800
+Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.11) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 20 Nov 2025 13:28:48 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=x0CHysjVKiVdbGO6pJq899OI7oitmRS2H5r2quFsXQO8ytZ+rUQm+fY23umZ7ZMbmHGuAyvM84NLAD1f5zoLNiPnu0t3uNchpsfvu0lyZGwmkxelkwTK4FhFCrhMywpvQWGB8OpinTT+T7pWKCxC/waddweexkGhuIo/VcezoDw07+PW08sMHBAphOpgadl8Hs5VkfvV7+jT1yr07JOAr33uyafnSx/+Y3L/VRrXf0dXa8rjNRuuhmjLnHT8wSodcl5Uqknd8/mN++A3Z1VHD8OWHSjAzGG1C0eVTfNewnuRwR1BOvNQ+2pZ+327NDWjW6UUx0+u1hm31jJFdwyppg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jXxbl3qTLg3FxY2O38hQqyp+rM0tq7aWI91d875EkjE=;
+ b=ag2dICFsrILmIwh8UbIBpYwFecH/B2npOCVzwLjaCnCCPLwR70NgSkpd0qkriZ2MULtNkwuCz8mJTG+2yRSuykGsRSXJydzKzOS+Ce/pUjFkjwTcH/dDXMinCMlJQTz93YPdXe6Z3aeSMKiH0G45bq/AV9NKNjQsRUjQs8GK8nvEUX6Qgcv4DVUH4wVIFglQh60XSz3P4ISnPNPdg/2wnHm5ljeEwhCG6Cdt8z22XvwCIAppSgZX5+2GrJnoePdnhQEpwybwAqG1DVtUOOP2C9zb2KFdx7ok3qakHm5qsDfAJfYix9MGU5nWsNnGiqL+k982uS0iUsCsK9u3m0F1Gg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by DS0PR11MB7959.namprd11.prod.outlook.com (2603:10b6:8:fd::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.11; Thu, 20 Nov 2025 21:28:46 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::1ff:1e09:994b:21ff]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::1ff:1e09:994b:21ff%4]) with mapi id 15.20.9343.009; Thu, 20 Nov 2025
+ 21:28:46 +0000
+From: <dan.j.williams@intel.com>
+Date: Thu, 20 Nov 2025 13:28:44 -0800
+To: Alexey Kardashevskiy <aik@amd.com>, Jonathan Cameron
+	<jonathan.cameron@huawei.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-pci@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>, "John
+ Allen" <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David
+ S. Miller" <davem@davemloft.net>, Ashish Kalra <ashish.kalra@amd.com>, "Joerg
+ Roedel" <joro@8bytes.org>, Suravee Suthikulpanit
+	<suravee.suthikulpanit@amd.com>, Will Deacon <will@kernel.org>, Robin Murphy
+	<robin.murphy@arm.com>, Dan Williams <dan.j.williams@intel.com>, "Bjorn
+ Helgaas" <bhelgaas@google.com>, Eric Biggers <ebiggers@google.com>, "Brijesh
+ Singh" <brijesh.singh@amd.com>, Gary R Hook <gary.hook@amd.com>, "Borislav
+ Petkov (AMD)" <bp@alien8.de>, Kim Phillips <kim.phillips@amd.com>, "Vasant
+ Hegde" <vasant.hegde@amd.com>, Jason Gunthorpe <jgg@ziepe.ca>, Michael Roth
+	<michael.roth@amd.com>, Xu Yilun <yilun.xu@linux.intel.com>, Gao Shiyuan
+	<gaoshiyuan@baidu.com>, Sean Christopherson <seanjc@google.com>, "Nikunj A
+ Dadhania" <nikunj@amd.com>, Dionna Glaze <dionnaglaze@google.com>,
+	<iommu@lists.linux.dev>, <linux-coco@lists.linux.dev>
+Message-ID: <691f880c7811c_1eb851006e@dwillia2-mobl4.notmuch>
+In-Reply-To: <442d4c48-8d6a-4129-b21a-cc2de4f0fcd0@amd.com>
+References: <20251111063819.4098701-1-aik@amd.com>
+ <20251111063819.4098701-7-aik@amd.com>
+ <20251111114742.00007cd8@huawei.com>
+ <442d4c48-8d6a-4129-b21a-cc2de4f0fcd0@amd.com>
+Subject: Re: [PATCH kernel 6/6] crypto/ccp: Implement SEV-TIO PCIe IDE
+ (phase1)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY3PR03CA0015.namprd03.prod.outlook.com
+ (2603:10b6:a03:39a::20) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251120145835.3833031-2-elver@google.com> <20251120145835.3833031-4-elver@google.com>
-In-Reply-To: <20251120145835.3833031-4-elver@google.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 20 Nov 2025 10:14:34 -0800
-X-Gmail-Original-Message-ID: <CAHk-=whyKteNtcLON-gScv6tu8ssvKWdNw-k371ufDrjOv374g@mail.gmail.com>
-X-Gm-Features: AWmQ_bk-my8wSL6P8yRhTUREdDraem8VrQQmjD7uS2S9oN6T2mRX46ftlS1ytQU
-Message-ID: <CAHk-=whyKteNtcLON-gScv6tu8ssvKWdNw-k371ufDrjOv374g@mail.gmail.com>
-Subject: Re: [PATCH v4 02/35] compiler-context-analysis: Add infrastructure
- for Context Analysis with Clang
-To: Marco Elver <elver@google.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Boqun Feng <boqun.feng@gmail.com>, 
-	Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, 
-	Chris Li <sparse@chrisli.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>, 
-	Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Ian Rogers <irogers@google.com>, 
-	Jann Horn <jannh@google.com>, Joel Fernandes <joelagnelf@nvidia.com>, 
-	Johannes Berg <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Josh Triplett <josh@joshtriplett.org>, Justin Stitt <justinstitt@google.com>, 
-	Kees Cook <kees@kernel.org>, Kentaro Takeda <takedakn@nttdata.co.jp>, 
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Thomas Gleixner <tglx@linutronix.de>, 
-	Thomas Graf <tgraf@suug.ch>, Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, 
-	kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, linux-sparse@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|DS0PR11MB7959:EE_
+X-MS-Office365-Filtering-Correlation-Id: 78ccb8fa-464d-4da5-4c29-08de287bc9db
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?eXZiS1NEcmUxc20xaEQ1UHlidHJKcW1ZQnhjdjNMYklpNTNCVDdQamg0amVk?=
+ =?utf-8?B?dW8vbmo0N2RVTjRaUjc3MHN6bGN5d0JvbGRyUWdIZlZlbXV6VFdiRnpHSWxx?=
+ =?utf-8?B?UE4yQWwvNVhUYlJlcVFUNjVaT1FNdzMyTEVYb09LL0xXeGFPZ09RWmN0Tndi?=
+ =?utf-8?B?SExYSHFIcHc5TkxFTVZMVDgrdk5Ka1VkbXdLaDMvbXlvZ2FlU3hvMTVhVGNU?=
+ =?utf-8?B?Qks2UDJLL1NCNzl5VHp1L1FzSEw3Y05zakt5bEZ4SXNubVk1b3pZNjhBWkZh?=
+ =?utf-8?B?d1k0V2t0K2tSUk9tditoZUJtWDBSbDVjYmdoZjNYSnlFdU5oVDdwTXFhT2gx?=
+ =?utf-8?B?Q3FldEhrSUVVcWtjalJkNjk4RmhhZEVBSWVGaVlYRndnZXFQRUZWYnNDZlN6?=
+ =?utf-8?B?NkQyKzBwbGFMRG5OcE9aekxVMmRNeHRpRG5CWmtZUm5yZWNsak1yNUszbHpH?=
+ =?utf-8?B?QjlHelVISitVcVJPVldKTkU2MHFGQ3A5M1NVczZ5ajdId0pmVEdKS0FSTXda?=
+ =?utf-8?B?QjR5c0FPMFdScjU5dmYwU3JsNkR4VzBhemI4WktuTWgyYklNK2Y1M051MTZ1?=
+ =?utf-8?B?clRMMG9uOU9yY3ljS1VlQkZXUzYyZHB3TU50NVlralBqNUh6RlE1Y3hWbGpJ?=
+ =?utf-8?B?RE1QMnJFVzVNRm5hZG4vWnZ1OCtta2hsT0FXUmx5b0MzZnhoK25oUDViRVA5?=
+ =?utf-8?B?QlpaYWNZOTlkb1J4NVgwN3MvTVVIVEZ1WWNyTDNzWnpvRHE3dGo4d0JvWVV0?=
+ =?utf-8?B?bm1KTFYvYkRHNUlqU0ZUdjJFajY5SVNlNWlZL3pDZDViMHRwYjVGV1FLWVA0?=
+ =?utf-8?B?NTdYalF5Kzl2YkVoZ1VxUlFNRndlNkhTZWI1Z1pGQ0NDWTcvREYyNzdpalc1?=
+ =?utf-8?B?aWxqWExQdWxXSyswTEQySmVTQ25VZUEyVGN4TmFJZjN3bXlsay85U014ZnlD?=
+ =?utf-8?B?Tis0UHpxcTdlNWppTFkxdXlxTUVjWjBFSVhlQWtoMEp0SUQzcW1jdDVWS2JU?=
+ =?utf-8?B?ZkFoYnh2WHRYbWhjckg3ZFVvOGIzdWtuMG9qNk8xQjQ2ek40aFJtY1dQYXlL?=
+ =?utf-8?B?K0FtTUpacG01emRLVzNLZ1JQNnZoTjg1K1N2Vm9vdkgrb3NFdnIxaE9ldFh6?=
+ =?utf-8?B?SzZvenN0ZHJpNzV1V2JsNE13QnduMVNWb1ovS2hwVEJoOEwxMFkxczUxNytL?=
+ =?utf-8?B?SHA0RENqVGFhWkQ0UnhlaTBDdHNRYW9JZ0k3QzRjVlMwU0hNT2V2T3hoRktJ?=
+ =?utf-8?B?RThoTmx6NjA2anBqK3ltRjY4VDhhL0RMS3NicVhVOXNJbGk4aWl1R1pDNVhG?=
+ =?utf-8?B?eWlJclYxV2x3RHFaZHpRaDc4RlZqVDBrMFIzT1hwd1pUb1VTM1ZHNW9QTUFv?=
+ =?utf-8?B?cEJPNmJQYThKQ05CYnFhdWhIUWJoTFUwUTFtZ3FOU1lHQ3J2ZjhpdjZ4RGdQ?=
+ =?utf-8?B?czc1SkI5YTJSMnJxVmloMUUzTncxdUVCek1JZGI1ZW1oRktNdUxjeDBhQStN?=
+ =?utf-8?B?dDY2Qmh3LzJ4UXR4RmVEb3dPRURjTUlWME1KaGJyN01mcERFdER1SXhlVTBT?=
+ =?utf-8?B?ZHRGN1hLb0d1V2tvMWJwSVh0SDFlZkRkUklEK24zVmdSUiswNFBBVE81VXZU?=
+ =?utf-8?B?VkVKUW53QW0yVG5PZ0ZwRWUxRWQzdHVtMHp6T3hlU25jN0JRTERuUTNVN2dB?=
+ =?utf-8?B?dzNXUDEyeW95anNTblBzOHdHYnZFNUp0R25kZHArU1NzcVg4MjBjS0FzOGYz?=
+ =?utf-8?B?N0UxSWhkbjZ1V0N5aSt0ZjZZWE92V3M4TE9UU2lGWWhyV0JHVDRrY3NmWlZI?=
+ =?utf-8?B?SXZnNXlTdkgzN3MzbFdLd045WXdnZURQQ3JBd0VsQzVvZ2lleWlVekZvVUFa?=
+ =?utf-8?B?V2h0Y3BKSG9hVEdxaDZpU0sxSzRoQ1IvaS96alZ4dERBRzY4YmtHN21waXB4?=
+ =?utf-8?Q?kpJHEU+kQLM+kBILoTTbLEQvx9ix8/Gq?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MTlsSzZSK2VWYUR2OElwVUs0ZGxieEhpbG9pY3JGaTVpYm5XRXBYYkNZTVNk?=
+ =?utf-8?B?ZEVCUW55dTJ1dnREMWF2K2RZa3lPR2NkeS9Rd0pUSVVpUXJDd2FQcHBaUElo?=
+ =?utf-8?B?eU1sNVlqVDdJYVEwYzlTcVBiTitLL0ZJR0k0dVZNMklwY3ArNnRNVTZwK0cz?=
+ =?utf-8?B?KzJXbWc2UjJBUnFjVU1XMElOZDZOcmhZRWc0L3l3SEl5NHl5aWJ5Q2pMKzBr?=
+ =?utf-8?B?ZzZkdFpPQVNZeDNWY0NhTm9Jd0RuRXNHeEZlSTM0MXNDa08xYWRlWk9RM3pm?=
+ =?utf-8?B?bElHZTlhM2dCdnFablFMcUhqQ0xiRHdOMHVWaVpmRTkwZFJ4V2FEWXd1WmUy?=
+ =?utf-8?B?S3BlZWZHVjZWb25pQlR4TVJKV0NpMTdTNXZIYXZYNXlNbGtCaHNpMnA4SkVz?=
+ =?utf-8?B?WnZDMTNlZ1h5RjBmdmxUSmNzUnlsbnFXSStNNllnU3RPQ3FlVlFoLzVVeFFV?=
+ =?utf-8?B?WmE5NHhtek9HdloyK0h0WkI2d2M3YnBZTEtQdXNqbnBENWN1cit6d3ZJZXhl?=
+ =?utf-8?B?ZHJYRDJiWkYrTUlnaVkxNTh5dUtER2kwYUJJU0svRjJvNFVsOGNOWVdZYWxi?=
+ =?utf-8?B?TVBzSTF6V2NUSnBtTUU1WVBRRDN3RFh1b3phU0JQRnFDZjNSWTJLSi9JWmJJ?=
+ =?utf-8?B?NkhrRkZaaXFEdjg2SEI3MG9yeHZEcjF0UjYyUEhTNHVjaU1yTkVLYnRGMXc1?=
+ =?utf-8?B?alVXL0svczF3WExrc0lTZEthWkdqckJUT1lLdHJYdTNLUXl5Rit0TS9tdkFP?=
+ =?utf-8?B?RkxnUVJSWW15T1Azb2k1NllESVFxa2dpSDJBN2h5bFZLbEFpQVVIK2F0TDdW?=
+ =?utf-8?B?cDdYai9Jc1BkMlhDaDNFVDRaOWFISGQ4WUVDSnpYS3JIdG96dVExRzV1OXNn?=
+ =?utf-8?B?SFNhK0JXN2cxckFQQ25OcTMweU1SWXhLdlY5MXZuZHZOc3FxcGFJcnRkZmVG?=
+ =?utf-8?B?VzdnTjE5WU9KZ3ZZcmZDOTRxb3BxQmxxZjgwTGk0a2VsSFVYUXBRWVRRelNh?=
+ =?utf-8?B?WjJRRi91cElFd2Y3RGp0dGxxMkFIZGJXWkQ1KzE4Ykl3emlCMmxuUzRPWVdr?=
+ =?utf-8?B?blVBbUVwY1FSMS9JR3NsZnZGSVdUdm1hdXRqRml0bVZoNVdkUzR5bnl4OUtk?=
+ =?utf-8?B?Tmw3c0V4NnNlSG03L1NVTGJlUFRNRTF5eXJOUVoyZjFmWGZnMUNLSzhRNkFO?=
+ =?utf-8?B?b29YclVDWWNxa2NmeWZWcjh2b2NxTmswNUdNSm5aekkzdDZMZ0Z6dnB2UEs2?=
+ =?utf-8?B?akFvMjcrcko3LzBVK2dyeU1FNmZhUWgrN3hkL21weEh4K3UzZG1tdzZBK01Y?=
+ =?utf-8?B?M2h2YTZzQlU5SVNzWnZ5T3M2NXNEZ29HM3lWdE9CSzBkb2p0cmtuTjhmcjR1?=
+ =?utf-8?B?T1pmOHBhems2bmJlZG1aTUF2Z29qTzZYM25xaEJudDl1bWhndmRRRFJJR2Rl?=
+ =?utf-8?B?RDZtQXpPbWlJcHhXeHdaNjZTZTBnZ2s5QTQ3a0gvdzZiVnhDSkVrRDNZUEdC?=
+ =?utf-8?B?c2xJczhWclRjcnJ3Q0NRYktWU3lRSXl3dG1zS2U4Sm9FVVBqK1A1VXkxbzdV?=
+ =?utf-8?B?R2FyV0RaZGpJVC9wRitqWXVpdldKMW5GVVQ5ZDIyZzFJTlU4aWpnQ25uT3ND?=
+ =?utf-8?B?cnpKZ1VGT3E4VnpLR2FhYXY4bDA4MEUvTFBZOHBvSlc1WTNoUUJBdlhkZHlB?=
+ =?utf-8?B?b3BlMTJCcXN4aGpzV0FyTVRyR1NtenRnYlFnd1R6Y3psZytQN0N5dVorTHVP?=
+ =?utf-8?B?dTM2d29BYXRrRUVGMkNlN0pZNlhFZHR6VmFsRzVtbVNhTTRYanlnYU5VU3dz?=
+ =?utf-8?B?QzJnZUpON21tamdtck1RcWhLMHEzVHZRRCsxbmJ2MFhIcTlvb1lLZ3VUZDJN?=
+ =?utf-8?B?OUFpcGNXQlo1R1l5ZXpWRzN1S011UjNiTXBBQ3JGaWFUYnREcmJLVHNkdVhG?=
+ =?utf-8?B?RU11NDRlSzNKSGFOTW9EcUlJTUw0UCs4VkFRbkZFTXdGV0pKbjBzV3d6Y0tm?=
+ =?utf-8?B?UGcwQU9ITG1KamNPa1BWcFNDd3QvOWQ4cHA1ZWVTdzU0bmpxNXdTV3Y4WVMv?=
+ =?utf-8?B?QThuUExWblQ4djFOVmMwSkpPdWw4MmNKcXZERGpBaG94cy85WmVYMTdyRGIr?=
+ =?utf-8?B?RlVDNnhESGh6QXdNSVQ3NERyRVlrVHlpZkIxb29pY083amk3OFB5ZWg2YXBW?=
+ =?utf-8?B?WlE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78ccb8fa-464d-4da5-4c29-08de287bc9db
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2025 21:28:46.7527
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jPOCNIsVYp/bia82fKI+vfrBpkA3FbO48J757pQ4BAtLwcXtoQpWzWOAr0zMlqTfRRm2/fIX3cGhAI/IGJjdDxwAwB4HBCYJyXLX/0KYTD4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7959
+X-OriginatorOrg: intel.com
 
-On Thu, 20 Nov 2025 at 07:13, Marco Elver <elver@google.com> wrote:
->
-> --- a/include/linux/compiler-context-analysis.h
-> +++ b/include/linux/compiler-context-analysis.h
-> @@ -6,27 +6,465 @@
->  #ifndef _LINUX_COMPILER_CONTEXT_ANALYSIS_H
->  #define _LINUX_COMPILER_CONTEXT_ANALYSIS_H
->
-> +#if defined(WARN_CONTEXT_ANALYSIS)
+Alexey Kardashevskiy wrote:
+[..]
+> >> +/*to_pci_tsm_pf0((pdev)->tsm)*/
+> > 
+> > Left over of something?
+> 
+> Actually not, to_pci_tsm_pf0() is a static helper in drivers/pci/tsm.c
+> and pdev_to_tsm_pf0() (below) is the same thing defined for
+> drivers/crypto/ccp/sev-dev-tsm.c and I wonder if to_pci_tsm_pf0() is
+> better be exported. pdev_to_tsm_pf0() does not need all the checks as
+> if we are that far past the initial setup, we can skip on some checks
+> which to_pci_tsm_pf0() performs so I have not exported
+> to_pci_tsm_pf0() but left the comment. Thanks,
 
-Note the 400+ added lines to this header...
+Why does the low-level TSM driver need to_pci_tsm_pf0() when it
+allocated the container for @tsm in the first place?
 
-And then note how the header gets used:
+For example, samples/devsec/ does this:
 
-> +++ b/scripts/Makefile.context-analysis
-> @@ -0,0 +1,7 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +context-analysis-cflags := -DWARN_CONTEXT_ANALYSIS             \
-> +       -fexperimental-late-parse-attributes -Wthread-safety    \
-> +       -Wthread-safety-pointer -Wthread-safety-beta
-> +
-> +export CFLAGS_CONTEXT_ANALYSIS := $(context-analysis-cflags)
+static void devsec_link_tsm_pci_remove(struct pci_tsm *tsm)
+{
+        struct pci_dev *pdev = tsm->pdev;
 
-Please let's *not* do it this way, where the header contents basically
-get enabled or not based on a compiler flag, but then everybody
-includes this 400+ line file whether they need it or not.
+        dev_dbg(pci_tsm_host(pdev), "%s\n", pci_name(pdev));
 
-Can we please just make the header file *itself* not have any
-conditionals, and what happens is that the header file is included (or
-not) using a pattern something like
+        if (is_pci_tsm_pf0(pdev)) {
+                struct devsec_tsm_pf0 *devsec_tsm = to_devsec_tsm_pf0(tsm);
 
-   -include $(srctree)/include/linux/$(context-analysis-header)
+                pci_tsm_pf0_destructor(&devsec_tsm->pci);
+                kfree(devsec_tsm);
+        } else {
+                struct devsec_tsm_fn *devsec_tsm = to_devsec_tsm_fn(tsm);
 
-instead.
+                kfree(devsec_tsm);
+        }
+}
 
-IOW, we'd have three different header files entirely: the "no context
-analysis", the "sparse" and the "clang context analysis" header, and
-instead of having a "-DWARN_CONTEXT_ANALYSIS" define, we'd just
-include the appropriate header automatically.
+...where that to_devsec_tsm_pf0() is:
 
-We already use that "-include" pattern for <linux/kconfig.h> and
-<linux/compiler-version.h>. It's probably what we should have done for
-<linux/compiler.h> and friends too.
-
-The reason I react to things like this is that I've actually seen just
-the parsing of header files being a surprisingly big cost in build
-times. People think that optimizations are expensive, and yes, some of
-them really are, but when a lot of the code we parse is never actually
-*used*, but just hangs out in header files that gets included by
-everybody, the parsing overhead tends to be noticeable. There's a
-reason why most C compilers end up integrating the C pre-processor: it
-avoids parsing and tokenizing things multiple times.
-
-The other reason is that I often use "git grep" for looking up
-definitions of things, and when there are multiple definitions of the
-same thing, I actually find it much more informative when they are in
-two different files than when I see two different definitions (or
-declarations) in the same file and then I have to go look at what the
-#ifdef condition is. In contrast, when it's something where there are
-per-architecture definitions, you *see* that, because the grep results
-come from different header files.
-
-I dunno. This is not a huge deal, but I do think that it would seem to
-be much simpler and more straightforward to treat this as a kind of "N
-different baseline header files" than as "include this one header file
-in everything, and then we'll have #ifdef's for the configuration".
-
-Particularly when that config is not even a global config, but a per-file one.
-
-Hmm? Maybe there's some reason why this suggestion is very
-inconvenient, but please at least consider it.
-
-              Linus
+static struct devsec_tsm_pf0 *to_devsec_tsm_pf0(struct pci_tsm *tsm)
+{
+        return container_of(tsm, struct devsec_tsm_pf0, pci.base_tsm);
+}
