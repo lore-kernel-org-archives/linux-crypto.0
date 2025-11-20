@@ -1,211 +1,104 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7CC9248F47;
-	Thu, 20 Nov 2025 01:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F05816EB42;
+	Thu, 20 Nov 2025 01:47:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763601089; cv=none; b=LG+vuYSd9Vc0WGIk3gTKU3SJLrnd+Usn2pterFyWl2XTU9IWxOpm8VgD1eAzbw+z5eD7iZMBYgpX6Qyce+DuOcKMy2kiAb+vPke0tbKlVMsYXqI/brMQP4vgSCH3g72lGCqF+Bb21HaGfER6B+9jA4zz7MfPjdxcye97kqhdemU=
+	t=1763603259; cv=none; b=LehxLUdygbahBDgmM6n5WKLwmWaaFf9RQCIqQl/qgs2FG5m4isINVZgc+kLIMe0fLrbzyB7ytxDo9p+6iljFwa9nzhm8E8sTPonJt7PR5SgkmRLxv8aL1eiKt4NuVQYW+Yr6g3fvw6SDUo3r+ctpDePa5hzfAdvYg0zmpUaut44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763601089; c=relaxed/simple;
-	bh=OrpadXPcGL4QR/s9rjD65iXGwUfPmFZ/5REVZLhumg8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OL1CFR6pKBW+Xe93EKh1etUM26P1ESO5+Uv90CkcfOmSNHXcwxo4XRkHPjg2wnQsXpQ3fVU0E/vKbI/2L/8YaGGfeYAB0R/tUy1Lt+LNMwNuLdPuiYCnV0tYO6mUVYXbK9m+Mxs+u3NgHmhM9FTtc8HGEzk2oRtcL5mWbkvy3v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=c9mD4utT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763603259; c=relaxed/simple;
+	bh=Qz0Kt9BVZotF+W8b8C03wV9uEpjzU2IZVkSaOcZVd50=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AvH6jxCmb00Tu1pC9E68hK/IG2HkCQ2rUi3fteRS7RVCxd98MBVlgnbfgacz7Bq+11mxmr99AHS127RFH9nx6yI1texBxvKKBN1LoiUA+0YwLVTYlGXrBHoll7rtuLyDG5WYzWYIYohdSn8tVnM9wZ6SCws3KeZBQ74dXRwQNSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uF2z7xSs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="c9mD4utT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B23DAC19421;
-	Thu, 20 Nov 2025 01:11:28 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="c9mD4utT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1763601088;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XYsMygdVjvxx+SJ8FOo5xMFLm6Xlme/wtmmyTi0+TWI=;
-	b=c9mD4utTn76iGexY4oprNtUc7EVqc01Ypy2BdtYpeBWDjlqcCrzSeuxrVxsrK1IxqzzwWK
-	D5cS7hoFKVrh7OmeNns+mqBxgDmyl0avNLVfiaCPO/E89NY5gZlc4BnoD1F4V6WcChSwjT
-	Ji6p0cz/p5VrWhJ3kZ8BSZlhzcbdgjI=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 35741e02 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 20 Nov 2025 01:11:28 +0000 (UTC)
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH libcrypto v2 3/3] crypto: chacha20poly1305: statically check fixed array lengths
-Date: Thu, 20 Nov 2025 02:10:22 +0100
-Message-ID: <20251120011022.1558674-3-Jason@zx2c4.com>
-In-Reply-To: <20251120011022.1558674-1-Jason@zx2c4.com>
-References: <20251120011022.1558674-1-Jason@zx2c4.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uF2z7xSs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFC38C113D0;
+	Thu, 20 Nov 2025 01:47:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763603258;
+	bh=Qz0Kt9BVZotF+W8b8C03wV9uEpjzU2IZVkSaOcZVd50=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uF2z7xSsJBEF2o7jOCGEA8BICVnf2Ll7GN/YdEoLbs8PaQeAHioKS/o3SZ7QSxsKt
+	 vFnjbh6TICH8PLye1zHlHKdpzDE5Fm345e4L/w0hg/fEJ7Itp2slYgup6C6JZwwIym
+	 LLCi+QyeEmLY48F4L7ZzcbTStdyHeEENY8Hfnp0DqQrXSF5r2MrZk7t4OMHkvbN7PR
+	 8Qcsuc8hp1q4+vdSlLZQjWoYyrPh5U9WhuFsg9TNqdi8dNwuUtBQRxPyNJujXI9VwL
+	 mc5s7M6miwKRs2zV2Elwkq7lUfoGg+X1KHfkkxDDXD+SynQUk6oIGjhckD0gmUEmi4
+	 nBJOVjtHwyLhA==
+Date: Wed, 19 Nov 2025 17:47:34 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: david.laight.linux@gmail.com
+Cc: linux-kernel@vger.kernel.org, Alan Stern <stern@rowland.harvard.edu>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Alexei Starovoitov
+ <ast@kernel.org>, Andi Shyti <andi.shyti@kernel.org>, Andreas Dilger
+ <adilger.kernel@dilger.ca>, Andrew Lunn <andrew@lunn.ch>, Andrew Morton
+ <akpm@linux-foundation.org>, Andrii Nakryiko <andrii@kernel.org>, Andy
+ Shevchenko <andriy.shevchenko@linux.intel.com>, Ard Biesheuvel
+ <ardb@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, Bjorn
+ Helgaas <bhelgaas@google.com>, Borislav Petkov <bp@alien8.de>, Christian
+ Brauner <brauner@kernel.org>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, Christoph Hellwig <hch@lst.de>, Daniel Borkmann
+ <daniel@iogearbox.net>, Dan Williams <dan.j.williams@intel.com>, Dave
+ Hansen <dave.hansen@linux.intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ David Ahern <dsahern@kernel.org>, David Hildenbrand <david@redhat.com>,
+ Davidlohr Bueso <dave@stgolabs.net>, "David S. Miller"
+ <davem@davemloft.net>, Dennis Zhou <dennis@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Jarkko Sakkinen
+ <jarkko@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Jens Axboe
+ <axboe@kernel.dk>, Jiri Slaby <jirislaby@kernel.org>, Johannes Weiner
+ <hannes@cmpxchg.org>, John Allen <john.allen@amd.com>, Jonathan Cameron
+ <jonathan.cameron@huawei.com>, Juergen Gross <jgross@suse.com>, Kees Cook
+ <kees@kernel.org>, KP Singh <kpsingh@kernel.org>, Linus Walleij
+ <linus.walleij@linaro.org>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, "Matthew Wilcox (Oracle)"
+ <willy@infradead.org>, Mika Westerberg <westeri@kernel.org>, Mike Rapoport
+ <rppt@kernel.org>, Miklos Szeredi <miklos@szeredi.hu>, Namhyung Kim
+ <namhyung@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ nic_swsd@realtek.com, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, Olivia
+ Mackall <olivia@selenic.com>, Paolo Abeni <pabeni@redhat.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Peter Huewe <peterhuewe@gmx.de>, Peter
+ Zijlstra <peterz@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Sean Christopherson <seanjc@google.com>, Srinivas Kandagatla
+ <srini@kernel.org>, Stefano Stabellini <sstabellini@kernel.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Tejun Heo <tj@kernel.org>, "Theodore Ts'o"
+ <tytso@mit.edu>, Thomas Gleixner <tglx@linutronix.de>, Tom Lendacky
+ <thomas.lendacky@amd.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, x86@kernel.org, Yury Norov
+ <yury.norov@gmail.com>, amd-gfx@lists.freedesktop.org, bpf@vger.kernel.org,
+ cgroups@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ io-uring@vger.kernel.org, kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-cxl@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
+ linux-integrity@vger.kernel.org, linux-mm@kvack.org,
+ linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-serial@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ usb-storage@lists.one-eyed-alien.net
+Subject: Re: [PATCH 00/44] Change a lot of min_t() that might mask high bits
+Message-ID: <20251119174734.5cba3f95@kernel.org>
+In-Reply-To: <20251119224140.8616-1-david.laight.linux@gmail.com>
+References: <20251119224140.8616-1-david.laight.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Several parameters of the chacha20poly1305 functions require arrays of
-an exact length. Use the new at_least keyword to instruct gcc and
-clang to statically check that the caller is passing an object of at
-least that length.
+On Wed, 19 Nov 2025 22:40:56 +0000 david.laight.linux@gmail.com wrote:
+> I've had to trim the 124 maintainers/lists that get_maintainer.pl finds
+> from 124 to under 100 to be able to send the cover letter.
+> The individual patches only go to the addresses found for the associated files.
+> That reduces the number of emails to a less unsane number.
 
-Here it is in action, with this faulty patch to wireguard's cookie.h:
-
-     struct cookie_checker {
-     	u8 secret[NOISE_HASH_LEN];
-    -	u8 cookie_encryption_key[NOISE_SYMMETRIC_KEY_LEN];
-    +	u8 cookie_encryption_key[NOISE_SYMMETRIC_KEY_LEN - 1];
-     	u8 message_mac1_key[NOISE_SYMMETRIC_KEY_LEN];
-
-If I try compiling this code, I get this helpful warning:
-
-  CC      drivers/net/wireguard/cookie.o
-drivers/net/wireguard/cookie.c: In function ‘wg_cookie_message_create’:
-drivers/net/wireguard/cookie.c:193:9: warning: ‘xchacha20poly1305_encrypt’ reading 32 bytes from a region of size 31 [-Wstringop-overread]
-  193 |         xchacha20poly1305_encrypt(dst->encrypted_cookie, cookie, COOKIE_LEN,
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  194 |                                   macs->mac1, COOKIE_LEN, dst->nonce,
-      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  195 |                                   checker->cookie_encryption_key);
-      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/wireguard/cookie.c:193:9: note: referencing argument 7 of type ‘const u8 *’ {aka ‘const unsigned char *’}
-In file included from drivers/net/wireguard/messages.h:10,
-                 from drivers/net/wireguard/cookie.h:9,
-                 from drivers/net/wireguard/cookie.c:6:
-include/crypto/chacha20poly1305.h:28:6: note: in a call to function ‘xchacha20poly1305_encrypt’
-   28 | void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
-
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- include/crypto/chacha20poly1305.h | 16 ++++++++--------
- lib/crypto/chacha20poly1305.c     | 18 +++++++++---------
- 2 files changed, 17 insertions(+), 17 deletions(-)
-
-diff --git a/include/crypto/chacha20poly1305.h b/include/crypto/chacha20poly1305.h
-index d2ac3ff7dc1e..7617366f8218 100644
---- a/include/crypto/chacha20poly1305.h
-+++ b/include/crypto/chacha20poly1305.h
-@@ -18,32 +18,32 @@ enum chacha20poly1305_lengths {
- void chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
- 			      const u8 *ad, const size_t ad_len,
- 			      const u64 nonce,
--			      const u8 key[CHACHA20POLY1305_KEY_SIZE]);
-+			      const u8 key[at_least CHACHA20POLY1305_KEY_SIZE]);
- 
- bool __must_check
- chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
- 			 const u8 *ad, const size_t ad_len, const u64 nonce,
--			 const u8 key[CHACHA20POLY1305_KEY_SIZE]);
-+			 const u8 key[at_least CHACHA20POLY1305_KEY_SIZE]);
- 
- void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
- 			       const u8 *ad, const size_t ad_len,
--			       const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
--			       const u8 key[CHACHA20POLY1305_KEY_SIZE]);
-+			       const u8 nonce[at_least XCHACHA20POLY1305_NONCE_SIZE],
-+			       const u8 key[at_least CHACHA20POLY1305_KEY_SIZE]);
- 
- bool __must_check xchacha20poly1305_decrypt(
- 	u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
--	const size_t ad_len, const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
--	const u8 key[CHACHA20POLY1305_KEY_SIZE]);
-+	const size_t ad_len, const u8 nonce[at_least XCHACHA20POLY1305_NONCE_SIZE],
-+	const u8 key[at_least CHACHA20POLY1305_KEY_SIZE]);
- 
- bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src, size_t src_len,
- 					 const u8 *ad, const size_t ad_len,
- 					 const u64 nonce,
--					 const u8 key[CHACHA20POLY1305_KEY_SIZE]);
-+					 const u8 key[at_least CHACHA20POLY1305_KEY_SIZE]);
- 
- bool chacha20poly1305_decrypt_sg_inplace(struct scatterlist *src, size_t src_len,
- 					 const u8 *ad, const size_t ad_len,
- 					 const u64 nonce,
--					 const u8 key[CHACHA20POLY1305_KEY_SIZE]);
-+					 const u8 key[at_least CHACHA20POLY1305_KEY_SIZE]);
- 
- bool chacha20poly1305_selftest(void);
- 
-diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
-index 0b49d6aedefd..212ce33562af 100644
---- a/lib/crypto/chacha20poly1305.c
-+++ b/lib/crypto/chacha20poly1305.c
-@@ -89,7 +89,7 @@ __chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
- void chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
- 			      const u8 *ad, const size_t ad_len,
- 			      const u64 nonce,
--			      const u8 key[CHACHA20POLY1305_KEY_SIZE])
-+			      const u8 key[at_least CHACHA20POLY1305_KEY_SIZE])
- {
- 	struct chacha_state chacha_state;
- 	u32 k[CHACHA_KEY_WORDS];
-@@ -111,8 +111,8 @@ EXPORT_SYMBOL(chacha20poly1305_encrypt);
- 
- void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
- 			       const u8 *ad, const size_t ad_len,
--			       const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
--			       const u8 key[CHACHA20POLY1305_KEY_SIZE])
-+			       const u8 nonce[at_least XCHACHA20POLY1305_NONCE_SIZE],
-+			       const u8 key[at_least CHACHA20POLY1305_KEY_SIZE])
- {
- 	struct chacha_state chacha_state;
- 
-@@ -170,7 +170,7 @@ __chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
- bool chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
- 			      const u8 *ad, const size_t ad_len,
- 			      const u64 nonce,
--			      const u8 key[CHACHA20POLY1305_KEY_SIZE])
-+			      const u8 key[at_least CHACHA20POLY1305_KEY_SIZE])
- {
- 	struct chacha_state chacha_state;
- 	u32 k[CHACHA_KEY_WORDS];
-@@ -195,8 +195,8 @@ EXPORT_SYMBOL(chacha20poly1305_decrypt);
- 
- bool xchacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
- 			       const u8 *ad, const size_t ad_len,
--			       const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
--			       const u8 key[CHACHA20POLY1305_KEY_SIZE])
-+			       const u8 nonce[at_least XCHACHA20POLY1305_NONCE_SIZE],
-+			       const u8 key[at_least CHACHA20POLY1305_KEY_SIZE])
- {
- 	struct chacha_state chacha_state;
- 
-@@ -211,7 +211,7 @@ bool chacha20poly1305_crypt_sg_inplace(struct scatterlist *src,
- 				       const size_t src_len,
- 				       const u8 *ad, const size_t ad_len,
- 				       const u64 nonce,
--				       const u8 key[CHACHA20POLY1305_KEY_SIZE],
-+				       const u8 key[at_least CHACHA20POLY1305_KEY_SIZE],
- 				       int encrypt)
- {
- 	const u8 *pad0 = page_address(ZERO_PAGE(0));
-@@ -335,7 +335,7 @@ bool chacha20poly1305_crypt_sg_inplace(struct scatterlist *src,
- bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src, size_t src_len,
- 					 const u8 *ad, const size_t ad_len,
- 					 const u64 nonce,
--					 const u8 key[CHACHA20POLY1305_KEY_SIZE])
-+					 const u8 key[at_least CHACHA20POLY1305_KEY_SIZE])
- {
- 	return chacha20poly1305_crypt_sg_inplace(src, src_len, ad, ad_len,
- 						 nonce, key, 1);
-@@ -345,7 +345,7 @@ EXPORT_SYMBOL(chacha20poly1305_encrypt_sg_inplace);
- bool chacha20poly1305_decrypt_sg_inplace(struct scatterlist *src, size_t src_len,
- 					 const u8 *ad, const size_t ad_len,
- 					 const u64 nonce,
--					 const u8 key[CHACHA20POLY1305_KEY_SIZE])
-+					 const u8 key[at_least CHACHA20POLY1305_KEY_SIZE])
- {
- 	if (unlikely(src_len < POLY1305_DIGEST_SIZE))
- 		return false;
--- 
-2.52.0
-
+Please split the networking (9?) patches out to a separate series.
+It will help you with the CC list, and help us to get this applied..
