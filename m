@@ -1,266 +1,161 @@
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084DC345CB1;
-	Thu, 20 Nov 2025 13:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048AB3376AA
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 14:52:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763647116; cv=none; b=DSoLfs+OSlKTxYCnR1rNl9JkJ8RJVdj3RsdTDkGr3OtnhdQhri87yVVbpHJoJG7wxi/VqBq3f2/nLyMPb5Gpi+ELV1Vbvhvpcp7+xjLhv3D8mVBWQR/wA/b+g6lM/pTldQI0YW0WVvFMIvyCjhKFaJSTFzqkZqUUsiQcx4xwNHs=
+	t=1763650374; cv=none; b=f/0wWOfCw0b+e22Pb+k+0HjBJfJSzH9uAUe6pAcFXxbMa4AGt+dNEski6BlKnQSiT1NmC4Q+C288hT3aA8wov9biVytEw1nA5Th+gO+v70Q9krd8FSZXIxC6FU1Q0D3LxJ8z/vPeq/0bysQwDlVVg0Cees67moECLuv/27oTah8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763647116; c=relaxed/simple;
-	bh=0BzFpp/AjXyzPaiI73qdjVHGf2Lh/9FbsHIJNtrf7B4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qiNQpff44xvxdFuZnaC5d/flL1urg77dX8mrHCmhtBXSLNBa4gptByecgSjk0Ub6kHe5ciuBGDvQa+52NlJSOAcRHcxx5kZRNWS0Nc3NWad/9vlYV4jXNF12ChJqlwv+NHm3eC5PCgPueNBILGfotCqW+3SWOLKwDgpuJni+/Yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=xIA6Q8pz; arc=none smtp.client-ip=113.46.200.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1763650374; c=relaxed/simple;
+	bh=fJNbQYu7PoiJLsEPpjUYNqAPI6k2geFEJacIKnsv5a4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=DCNw84rRhOG37Pl9QQRiQoX7LZHi8HoHWw4WMD6mmO0YpXF4Ez7l321zew1E91OxT74a2cVvXwt7O125HzfDdIa7NxDgDX1jQPAB+aiZugypcj4aEkQMRH2/gSw3zBGB9l1uLVlr0zE2w7NWnuO/u7eKAoUDyTmAB5Ozd2iU/6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Nlop4bDN; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="xIA6Q8pz"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=DZf+O5qJ0V6Yjg3qBBK9Tx120w3wgIPbtRLvX4AGG8I=;
-	b=xIA6Q8pzkYb3/wQCul79eZXWswUJJKGIAHu89QK8d/gGU9eLgW6yYGO68cIs9hwji6oY/ZVnJ
-	IRvUtvvyTYY+UzCocmaMZNqdEfYP6hW4typ7VseEiAyZEoT06oisQ/X/XH9kHI/4eq54037QDfX
-	b8gXR4Klf5gLqwlzjhlV8hc=
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dC0J95YTwzpSv2;
-	Thu, 20 Nov 2025 21:56:25 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id E9B6E180BD1;
-	Thu, 20 Nov 2025 21:58:22 +0800 (CST)
-Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 20 Nov 2025 21:58:14 +0800
-Received: from localhost.huawei.com (10.90.31.46) by
- kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 20 Nov 2025 21:58:13 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
-	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH 1/2] crypto: hisilicon/trng - use DEFINE_MUTEX() and LIST_HEAD()
-Date: Thu, 20 Nov 2025 21:58:11 +0800
-Message-ID: <20251120135812.1814923-2-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20251120135812.1814923-1-huangchenghai2@huawei.com>
-References: <20251120135812.1814923-1-huangchenghai2@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Nlop4bDN"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-43476cba770so4317405ab.1
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 06:52:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763650367; x=1764255167; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mIp1emodWmrQX+c6TjoXmEBGWcecINECr9nK+dGHBUw=;
+        b=Nlop4bDNIOkjuo0pMhzaqc0ODrEsmRo7XtLqwhp00uyFASxw+sbIvvfDKg63/0WNIr
+         Irgw7i1L5c7f3KspyZuRfY76O51HffIuodvQy5ZIcDN4No7WwIxUOGZ9dpes/M6K+nsd
+         SNLzENdMcdkRpJUmuFjuM9BMlGaR61DPmsUMatu7aVJzbpi7Z/RO6GbliOgOscpBha8S
+         DnzFtV5phPRpPEJgf98WlMFKyzL6CdLykV3ZnkTgBAq3ZRb9M24771+6fglXYKmcEHuj
+         JwzMwrRMP1iOEu/PZF6XSo/nxjqLzdvmfaif9TGvKGR4YXIy2m1LIpokuAZvSHGS7C+s
+         olCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763650367; x=1764255167;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mIp1emodWmrQX+c6TjoXmEBGWcecINECr9nK+dGHBUw=;
+        b=lmkpHLC9Y5Az9nzCWcYK8EllS6HQkIo2/gd8zu7K0/QgP7RkRjpSUkY7gq5+GEXeRo
+         KzGhm5mUa4a6OQgYkDSi1YXVwK76wcCqTxCeQzx4dAY2ZD1IPN8T3mPIJtHX4uhauQO+
+         9OOvV3q76/767hvblYHAPnB5dDjjmqP1/P4FBSy7O4kKDzVtrrtcIIqsIBYi5Rn6CFin
+         vXDYQWO1ksJlE5m3o2/KU+baP2Ebk51jQ78jWTRotNwoyehi3Y+cUfSzBvMefa81MX6K
+         6Bql/aODc5hrcoJ/Tor26GkqEVqOaV2EdoiAySWeNGAfvoDpxxhV2NUl7pcr4kMpLKGo
+         Bg/g==
+X-Forwarded-Encrypted: i=1; AJvYcCVlhnuBUAGFTAE+DM61sUi//9egBe7UfkScixy56tGlXfADwnbYT1JWYkGUUEHuaTXw7xm0wgrCgMuZABQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHt+nvU5HzBuc0gQZJBX4P9VcO9vMuOy2cTv2qKZGg6V3WT8nP
+	3m+uFPTkZNT/OuXR+8j+/EK5noiAEzs13Q94+544Fjj0D0+rJIBbs1Z1R/Q5rUMVP8I=
+X-Gm-Gg: ASbGnctJ4fEYGa2H7y3Am+0l+/cbjFkPGxInCCqQFoXfePLfALmhxYbbEy1j1ExfGwl
+	RgIs9TJfpFNijaFBsXiNjzf54BCXRFVNca8tsFLCZLXrosXHzEhpUzBK4N9l32bI4/OAdnr+5RM
+	5gbkphyJq7HyRkCjNtxtHuqxJFJbOcd+DQjQPvg0YChcMmPcGLk+vR7rBXidaHoXPnr8CALQ3Hh
+	hb8/kPMxV6bREve2+Q6GxeGfA89TvQhLMpaPi4Ew7+LXQAS5HAwN6e+v3ewAFe9T0vjUm3afmGa
+	GYAr01bwB/w4EjmQztzH1O8Ekq2x20QM8fuw518EXu1nJpRcub34CP8KAzSCRX/XgTqKmujlgKr
+	31ia1Zhlsvg2rhektZ6Eop6DTDzfl2wxmMpKeabj8FNmE9bcUwU8W1daC4ATDMt1e74kj8HfynC
+	j2fQ==
+X-Google-Smtp-Source: AGHT+IEmRlVKCe07qbgo1t2w3uFpBKsqx62crTftDC+8sZ0oUBIrcGL53VTRakva//fmnWvcfQrQww==
+X-Received: by 2002:a05:6e02:1c01:b0:433:1d5a:5157 with SMTP id e9e14a558f8ab-435aa88e822mr21434775ab.6.1763650367018;
+        Thu, 20 Nov 2025 06:52:47 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b954b207d7sm1008611173.33.2025.11.20.06.52.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Nov 2025 06:52:46 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-kernel@vger.kernel.org, david.laight.linux@gmail.com
+Cc: Alan Stern <stern@rowland.harvard.edu>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Alexei Starovoitov <ast@kernel.org>, Andi Shyti <andi.shyti@kernel.org>, 
+ Andreas Dilger <adilger.kernel@dilger.ca>, Andrew Lunn <andrew@lunn.ch>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Ard Biesheuvel <ardb@kernel.org>, 
+ Arnaldo Carvalho de Melo <acme@kernel.org>, 
+ Bjorn Helgaas <bhelgaas@google.com>, Borislav Petkov <bp@alien8.de>, 
+ Christian Brauner <brauner@kernel.org>, 
+ =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ Christoph Hellwig <hch@lst.de>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Dan Williams <dan.j.williams@intel.com>, 
+ Dave Hansen <dave.hansen@linux.intel.com>, 
+ Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>, 
+ Davidlohr Bueso <dave@stgolabs.net>, 
+ "David S. Miller" <davem@davemloft.net>, Dennis Zhou <dennis@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Jakub Sitnicki <jakub@cloudflare.com>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+ Jarkko Sakkinen <jarkko@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
+ Jiri Slaby <jirislaby@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+ John Allen <john.allen@amd.com>, 
+ Jonathan Cameron <jonathan.cameron@huawei.com>, 
+ Juergen Gross <jgross@suse.com>, Kees Cook <kees@kernel.org>, 
+ KP Singh <kpsingh@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+ Mika Westerberg <westeri@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+ Miklos Szeredi <miklos@szeredi.hu>, Namhyung Kim <namhyung@kernel.org>, 
+ Neal Cardwell <ncardwell@google.com>, nic_swsd@realtek.com, 
+ OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+ Olivia Mackall <olivia@selenic.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Peter Huewe <peterhuewe@gmx.de>, 
+ Peter Zijlstra <peterz@infradead.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Sean Christopherson <seanjc@google.com>, 
+ Srinivas Kandagatla <srini@kernel.org>, 
+ Stefano Stabellini <sstabellini@kernel.org>, 
+ Steven Rostedt <rostedt@goodmis.org>, Tejun Heo <tj@kernel.org>, 
+ Theodore Ts'o <tytso@mit.edu>, Thomas Gleixner <tglx@linutronix.de>, 
+ Tom Lendacky <thomas.lendacky@amd.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, x86@kernel.org, 
+ Yury Norov <yury.norov@gmail.com>, amd-gfx@lists.freedesktop.org, 
+ bpf@vger.kernel.org, cgroups@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, io-uring@vger.kernel.org, 
+ kvm@vger.kernel.org, linux-acpi@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ linux-cxl@vger.kernel.org, linux-efi@vger.kernel.org, 
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+ linux-integrity@vger.kernel.org, linux-mm@kvack.org, 
+ linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, 
+ linux-perf-users@vger.kernel.org, linux-scsi@vger.kernel.org, 
+ linux-serial@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+ linux-usb@vger.kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
+ usb-storage@lists.one-eyed-alien.net, David Hildenbrand <david@kernel.org>
+In-Reply-To: <20251119224140.8616-1-david.laight.linux@gmail.com>
+References: <20251119224140.8616-1-david.laight.linux@gmail.com>
+Subject: Re: (subset) [PATCH 00/44] Change a lot of min_t() that might mask
+ high bits
+Message-Id: <176365036384.566630.2992984118137417732.b4-ty@kernel.dk>
+Date: Thu, 20 Nov 2025 07:52:43 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemq200001.china.huawei.com (7.202.195.16)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-From: Weili Qian <qianweili@huawei.com>
 
-Runtime initialization of lock and list head is not
-reliable in a concurrent environment. Therefore, use
-DEFINE_MUTEX() and LIST_HEAD() for automatic initialization.
-And decide whether to register the algorithm to the crypto
-subsystem based on whether the list is empty, instead of
-using atomic operations.
+On Wed, 19 Nov 2025 22:40:56 +0000, david.laight.linux@gmail.com wrote:
+> It in not uncommon for code to use min_t(uint, a, b) when one of a or b
+> is 64bit and can have a value that is larger than 2^32;
+> This is particularly prevelant with:
+> 	uint_var = min_t(uint, uint_var, uint64_expression);
+> 
+> Casts to u8 and u16 are very likely to discard significant bits.
+> 
+> [...]
 
-Fixes: e4d9d10ef4be ("crypto: hisilicon/trng - add support for PRNG")
-Signed-off-by: Weili Qian <qianweili@huawei.com>
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
----
- drivers/crypto/hisilicon/trng/trng.c | 104 +++++++++++++--------------
- 1 file changed, 48 insertions(+), 56 deletions(-)
+Applied, thanks!
 
-diff --git a/drivers/crypto/hisilicon/trng/trng.c b/drivers/crypto/hisilicon/trng/trng.c
-index ac74df4a9471..dae81b6f43e3 100644
---- a/drivers/crypto/hisilicon/trng/trng.c
-+++ b/drivers/crypto/hisilicon/trng/trng.c
-@@ -40,16 +40,10 @@
- #define SEED_SHIFT_24		24
- #define SEED_SHIFT_16		16
- #define SEED_SHIFT_8		8
--
--struct hisi_trng_list {
--	struct mutex lock;
--	struct list_head list;
--	bool is_init;
--};
-+#define WAIT_PERIOD		20
- 
- struct hisi_trng {
- 	void __iomem *base;
--	struct hisi_trng_list *trng_list;
- 	struct list_head list;
- 	struct hwrng rng;
- 	u32 ver;
-@@ -61,8 +55,8 @@ struct hisi_trng_ctx {
- 	struct hisi_trng *trng;
- };
- 
--static atomic_t trng_active_devs;
--static struct hisi_trng_list trng_devices;
-+static LIST_HEAD(trng_devices_list);
-+static DEFINE_MUTEX(trng_device_lock);
- 
- static void hisi_trng_set_seed(struct hisi_trng *trng, const u8 *seed)
- {
-@@ -157,8 +151,8 @@ static int hisi_trng_init(struct crypto_tfm *tfm)
- 	struct hisi_trng *trng;
- 	int ret = -EBUSY;
- 
--	mutex_lock(&trng_devices.lock);
--	list_for_each_entry(trng, &trng_devices.list, list) {
-+	mutex_lock(&trng_device_lock);
-+	list_for_each_entry(trng, &trng_devices_list, list) {
- 		if (!trng->is_used) {
- 			trng->is_used = true;
- 			ctx->trng = trng;
-@@ -166,7 +160,7 @@ static int hisi_trng_init(struct crypto_tfm *tfm)
- 			break;
- 		}
- 	}
--	mutex_unlock(&trng_devices.lock);
-+	mutex_unlock(&trng_device_lock);
- 
- 	return ret;
- }
-@@ -175,9 +169,9 @@ static void hisi_trng_exit(struct crypto_tfm *tfm)
- {
- 	struct hisi_trng_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	mutex_lock(&trng_devices.lock);
-+	mutex_lock(&trng_device_lock);
- 	ctx->trng->is_used = false;
--	mutex_unlock(&trng_devices.lock);
-+	mutex_unlock(&trng_device_lock);
- }
- 
- static int hisi_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-@@ -226,24 +220,43 @@ static struct rng_alg hisi_trng_alg = {
- 	},
- };
- 
--static void hisi_trng_add_to_list(struct hisi_trng *trng)
-+static int hisi_trng_crypto_register(struct hisi_trng *trng)
- {
--	mutex_lock(&trng_devices.lock);
--	list_add_tail(&trng->list, &trng_devices.list);
--	mutex_unlock(&trng_devices.lock);
-+	int ret = 0;
-+
-+	mutex_lock(&trng_device_lock);
-+	if (trng->ver != HISI_TRNG_VER_V1 &&
-+	    list_empty(&trng_devices_list)) {
-+		ret = crypto_register_rng(&hisi_trng_alg);
-+		if (ret) {
-+			pr_err("failed to register crypto(%d)\n", ret);
-+			goto unlock;
-+		}
-+	}
-+
-+	list_add_tail(&trng->list, &trng_devices_list);
-+unlock:
-+	mutex_unlock(&trng_device_lock);
-+	return ret;
- }
- 
--static int hisi_trng_del_from_list(struct hisi_trng *trng)
-+static int hisi_trng_crypto_unregister(struct hisi_trng *trng)
- {
- 	int ret = -EBUSY;
- 
--	mutex_lock(&trng_devices.lock);
--	if (!trng->is_used) {
--		list_del(&trng->list);
--		ret = 0;
--	}
--	mutex_unlock(&trng_devices.lock);
-+	mutex_lock(&trng_device_lock);
-+	if (trng->is_used)
-+		goto unlock;
-+
-+	list_del(&trng->list);
-+	if (trng->ver != HISI_TRNG_VER_V1 &&
-+	    list_empty(&trng_devices_list))
-+		crypto_unregister_rng(&hisi_trng_alg);
- 
-+	ret = 0;
-+
-+unlock:
-+	mutex_unlock(&trng_device_lock);
- 	return ret;
- }
- 
-@@ -264,23 +277,9 @@ static int hisi_trng_probe(struct platform_device *pdev)
- 
- 	trng->is_used = false;
- 	trng->ver = readl(trng->base + HISI_TRNG_VERSION);
--	if (!trng_devices.is_init) {
--		INIT_LIST_HEAD(&trng_devices.list);
--		mutex_init(&trng_devices.lock);
--		trng_devices.is_init = true;
--	}
--
--	hisi_trng_add_to_list(trng);
--	if (trng->ver != HISI_TRNG_VER_V1 &&
--	    atomic_inc_return(&trng_active_devs) == 1) {
--		ret = crypto_register_rng(&hisi_trng_alg);
--		if (ret) {
--			dev_err(&pdev->dev,
--				"failed to register crypto(%d)\n", ret);
--			atomic_dec_return(&trng_active_devs);
--			goto err_remove_from_list;
--		}
--	}
-+	ret = hisi_trng_crypto_register(trng);
-+	if (ret)
-+		return ret;
- 
- 	trng->rng.name = pdev->name;
- 	trng->rng.read = hisi_trng_read;
-@@ -288,18 +287,13 @@ static int hisi_trng_probe(struct platform_device *pdev)
- 	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
- 	if (ret) {
- 		dev_err(&pdev->dev, "failed to register hwrng: %d!\n", ret);
--		goto err_crypto_unregister;
-+		goto unregister_crypto;
- 	}
- 
- 	return ret;
- 
--err_crypto_unregister:
--	if (trng->ver != HISI_TRNG_VER_V1 &&
--	    atomic_dec_return(&trng_active_devs) == 0)
--		crypto_unregister_rng(&hisi_trng_alg);
--
--err_remove_from_list:
--	hisi_trng_del_from_list(trng);
-+unregister_crypto:
-+	hisi_trng_crypto_unregister(trng);
- 	return ret;
- }
- 
-@@ -308,12 +302,10 @@ static void hisi_trng_remove(struct platform_device *pdev)
- 	struct hisi_trng *trng = platform_get_drvdata(pdev);
- 
- 	/* Wait until the task is finished */
--	while (hisi_trng_del_from_list(trng))
--		;
--
--	if (trng->ver != HISI_TRNG_VER_V1 &&
--	    atomic_dec_return(&trng_active_devs) == 0)
--		crypto_unregister_rng(&hisi_trng_alg);
-+	while (hisi_trng_crypto_unregister(trng)) {
-+		dev_info(&pdev->dev, "trng is in using!\n");
-+		msleep(WAIT_PERIOD);
-+	}
- }
- 
- static const struct acpi_device_id hisi_trng_acpi_match[] = {
+[12/44] block: use min() instead of min_t()
+        commit: 9420e720ad192c53c8d2803c5a2313b2d586adbd
+
+Best regards,
 -- 
-2.33.0
+Jens Axboe
+
+
 
