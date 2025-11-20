@@ -1,55 +1,55 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA7535BDDC
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 15:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0901B35B153
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 15:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763651566; cv=none; b=fUTK8EQ934qCjD14x1AHhXjjveFWHd7UqpiqTLSAgbRlYXEZqmwUq0orT0YtYJ8tThrGXfqrjyNaJfvjmrHmRSSBnK7NTai/GXYoG2O5iUf8n8167+ye02QAo8EiOa98Uv50TYlyam1e1iB7aEQPCegAfj1IsHMHHo4/CSXtUqM=
+	t=1763651563; cv=none; b=RiYOONwvg4dJRRmxvNul+ixFkO8GcOTCaGc5GU+tMDiBBx7NjYlYOEptny/SlH1gVKkGtDSprBrXbc+ExUZy7tOgutFeHMzZF3HTUsHJf/a/XnBcxP2hnLPHRrojBIYZ8aY8zN/NEe28uL6yvZxvhAdYiMIgafWe1Ymq4K6QKqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763651566; c=relaxed/simple;
-	bh=y6w7yFFLonXGAgHrhzP0GGTXuB+T66hNiJkaYUhbT3c=;
+	s=arc-20240116; t=1763651563; c=relaxed/simple;
+	bh=JsRVhDxMTESFNC0k9j5iAV1EVftZ5NwIrNhmhZrLX5Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Wzclcmj5WYkLgwGi53lO0z+g9aKJVc3eRL+TDHuQJxa03qHvDXQbDp/aIZLCA1d2IvpGbn/ypTgB81Msw+qqYOxoHR5eYQYrAx3rE5v9bzbJSvUTly+6hM6Bs6bQkmjicsAynmX6+nnFtBRuZkxEKvXGERc3BC3jlqw/1OSb77c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=23/WJz7p; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=rHDHYHudIFYKV2mWAbnm8E8EhGDivXs2SpfYuN+NmqnW4hdD0wDV2zQ1Z9+axEBcoa9fewHOx/a9v225Zvk5p8vOD8iyM/Vh/jmvkubU5Whl+oLaujKvBEtyM0gpqKnL2e318fhMuLMLpXwx3h9NQ7vdI2S8NvwEz5h3BhYp4rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fVfukvmr; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="23/WJz7p"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-47799717212so7858805e9.3
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 07:12:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fVfukvmr"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-429c76c8a1bso1051570f8f.0
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 07:12:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763651548; x=1764256348; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763651543; x=1764256343; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IMqqhFVNLAUw4V1kneJBauR05JGQwrZoFZiIsH/esVM=;
-        b=23/WJz7pJMZvsMOcrDtaoeL75FPQzEL1GmTqQw7b9Q8EqGNAy+XfI+ymQdA3NPSkv7
-         qBsVIZAQ+17t897cRStgYtEnoWejYXuYIqtrsV2Y/lXTbRwmyFSquy7ke2ZLdMody2mw
-         UXBYwDsKqVnNtpyauD9K4wDcu6+k3VDmri8S0mGlgLjAuv6AISs2SLSHD6Pr9mhFNf8E
-         qiIFoux8ZR7wltm0ohs+10Xtbtel02lidjXv+mj4ZwJttoZGax654/78ETLBkKLB+hFu
-         ujNNfXbo2HAtfdglXemNH0ccN0R2byaPaFXWAedlOZAP889YYd3uqtOq++Ppuv4/I+f+
-         ORng==
+        bh=YhzmKujL7bNVWf02jAjaSOrp3urplpV1YekSTYKrBiM=;
+        b=fVfukvmrtlZIh4E5wGUGJEuC5vPOv7dihBhfAbI5aQz5c3kDA3luttWFvQ20epfX4R
+         sy1L2NGUzJJ9E4CLFA8moK9/63iPtg72D+v2+iSQVM/gO83xXzliQ9xRKx1EXiWf83Vb
+         dFWHRV8xlFwnw3Mj0HYNrmAszRt2pUknH5pk/eVLqXcfCzNw2hgSNrwt+M8k0STZ98P7
+         4bpchl8Skgut/02et0r3gtweQK6mORjU+BY7YP3iNqtVpEX81Kjxl7cUgHQZo6mA5ClF
+         r9rN2f7Hz5iV/DC1MqYQAj/CMg6VrtkKXpVCxbioheE0Y69YMnLLBew1kCErdSAuFMSz
+         F3QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763651548; x=1764256348;
+        d=1e100.net; s=20230601; t=1763651543; x=1764256343;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IMqqhFVNLAUw4V1kneJBauR05JGQwrZoFZiIsH/esVM=;
-        b=uG+7xxxd2BCGhCSWgL73L92RdKP9mafhRx9ptUo6utj6cfrNV+HZUpZu/E6iR/N90a
-         TU5Zk7FQpGddGuwEVjonENis5EmgnsUBCZSOGErDIHBi2RskoTSTCg40P2btF48HatGD
-         OjV55RdEQWKlEcfZ8kDjwVD32Ud7LILdMb/C8Iidpj+fYwYQ7l6t3/T/NxnuvtEWU6wO
-         TKwvTwt2YjMM8tIMp5lUPP4UCG5N8MeYA5hX2f8hA6j2BbxrGMWJKXWdW+ULJE+D2XNx
-         ulIT0NtYD+sK8qOMpgxF1UdKXZHqNMYauUt6syDovxuJL6Pe7qfpEIA3pu9NQu/AF9Gj
-         vNfg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4HyBSfCi4vKSWLFZx1EmWvHbtwaGkoAtldo5FlY0ZwdQ1Z5oAL7pSUeptxZwn3w2r0vOlK0cH7E4Sers=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKIjtv8epbjD3rETJPnE0a4PKVjSRH0Ji+YT9paYPZKhAfnZAj
-	V8mDALrYbPPQtEBHXSq5DAvAiJxRZOC/w+v8Cn3utiHC9VoW+eKeddMA7cAusDOtZWVt7brePQh
-	+/Q==
-X-Google-Smtp-Source: AGHT+IF2zd2nCypWW3xVuzIPJvJqZO4w5aeyOpnB4ViuWbndz94zzjGIlhjCu+pGCOqCDC+J6F1KwZFxwQ==
-X-Received: from wmbgz10.prod.google.com ([2002:a05:600c:888a:b0:477:afa:d217])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:8b16:b0:477:632a:fd67
- with SMTP id 5b1f17b1804b1-477b895407bmr35716765e9.12.1763651547909; Thu, 20
- Nov 2025 07:12:27 -0800 (PST)
-Date: Thu, 20 Nov 2025 16:09:38 +0100
+        bh=YhzmKujL7bNVWf02jAjaSOrp3urplpV1YekSTYKrBiM=;
+        b=YMdDVfzUw5gbSO6cB14zCJzfEnpwevDBeEgvSGs/hj/KboMD1UW7eMJY88qv/3pNHb
+         RKmDez7+jo/dPcVxuHKcbvGkUgWvgX1/VJE6KF0K9jfpwiIhgCFfMDy31vkw83yg6Web
+         p+MU6PnqjzPOUln69nHQp/Qd6fjnPpvKfyWQVDkkx378EM7+zyTKKjSRx5y6gNje/TZf
+         T4oRCOzRGm0WMa7xIM1mnL5tEb7A1NhSMDncZsV1zWPvxXZL3Po8tNOq170CHH0ZD0Us
+         HypVIuhIpyYthP7n8ChroWOVtjfMnxLlaBkXa1d0e5NfVwci3sdMadDHh0F34qS/bcM+
+         nXyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUefoLg+IfqRM6ltJEcDrsdiHBzrLGbkq4REhIe8PjtLbpnIPLcZ9w5rkN+3XOtxoEHZGHNu5Ol1OvztGQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziKXRydXby1ycueGb5zyE59y9EhrF/in0JNZZMN9NrBrTjCUvv
+	zLyhyNwdvQFrp+Ljoh2NgagotIoaw3w2EZgkbItuHC/AgjVlk4mDpb2STv5juEKTA3ChKqWYFXD
+	HMQ==
+X-Google-Smtp-Source: AGHT+IFL0EI2FVZUMy6GZbaXFPeZWxMdszC7G+QJPxJYJ5Tt54juOMlly5lP2pxtgOuHE3Qi1fA/jEG3bQ==
+X-Received: from wrs17.prod.google.com ([2002:a05:6000:651:b0:42b:328d:1994])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2287:b0:42b:3bd2:b2f8
+ with SMTP id ffacd0b85a97d-42cb9a603f4mr3376737f8f.46.1763651542984; Thu, 20
+ Nov 2025 07:12:22 -0800 (PST)
+Date: Thu, 20 Nov 2025 16:09:37 +0100
 In-Reply-To: <20251120151033.3840508-7-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251120145835.3833031-2-elver@google.com> <20251120151033.3840508-7-elver@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251120151033.3840508-14-elver@google.com>
-Subject: [PATCH v4 13/35] bit_spinlock: Support Clang's context analysis
+Message-ID: <20251120151033.3840508-13-elver@google.com>
+Subject: [PATCH v4 12/35] bit_spinlock: Include missing <asm/processor.h>
 From: Marco Elver <elver@google.com>
 To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, 
 	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>
@@ -87,192 +87,35 @@ Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenry
 	linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-The annotations for bit_spinlock.h have simply been using "bitlock" as
-the token. For Sparse, that was likely sufficient in most cases. But
-Clang's context analysis is more precise, and we need to ensure we
-can distinguish different bitlocks.
+Including <linux/bit_spinlock.h> into an empty TU will result in the
+compiler complaining:
 
-To do so, add a token context, and a macro __bitlock(bitnum, addr)
-that is used to construct unique per-bitlock tokens.
+./include/linux/bit_spinlock.h:34:4: error: call to undeclared function 'cpu_relax'; <...>
+   34 |                         cpu_relax();
+      |                         ^
+1 error generated.
 
-Add the appropriate test.
-
-<linux/list_bl.h> is implicitly included through other includes, and
-requires 2 annotations to indicate that acquisition (without release)
-and release (without prior acquisition) of its bitlock is intended.
+Include <asm/processor.h> to allow including bit_spinlock.h where
+<asm/processor.h> is not otherwise included.
 
 Signed-off-by: Marco Elver <elver@google.com>
 ---
-v4:
-* Rename capability -> context analysis.
----
- Documentation/dev-tools/context-analysis.rst |  3 ++-
- include/linux/bit_spinlock.h                 | 22 ++++++++++++++---
- include/linux/list_bl.h                      |  2 ++
- lib/test_context-analysis.c                  | 26 ++++++++++++++++++++
- 4 files changed, 48 insertions(+), 5 deletions(-)
+ include/linux/bit_spinlock.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Documentation/dev-tools/context-analysis.rst b/Documentation/dev-tools/context-analysis.rst
-index 598962f6cb40..a3d925ce2df4 100644
---- a/Documentation/dev-tools/context-analysis.rst
-+++ b/Documentation/dev-tools/context-analysis.rst
-@@ -80,7 +80,8 @@ Supported Kernel Primitives
- ~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
- Currently the following synchronization primitives are supported:
--`raw_spinlock_t`, `spinlock_t`, `rwlock_t`, `mutex`, `seqlock_t`.
-+`raw_spinlock_t`, `spinlock_t`, `rwlock_t`, `mutex`, `seqlock_t`,
-+`bit_spinlock`.
- 
- For context guards with an initialization function (e.g., `spin_lock_init()`),
- calling this function before initializing any guarded members or globals
 diff --git a/include/linux/bit_spinlock.h b/include/linux/bit_spinlock.h
-index 59e345f74b0e..07593d9003d5 100644
+index c0989b5b0407..59e345f74b0e 100644
 --- a/include/linux/bit_spinlock.h
 +++ b/include/linux/bit_spinlock.h
-@@ -9,6 +9,16 @@
+@@ -7,6 +7,8 @@
+ #include <linux/atomic.h>
+ #include <linux/bug.h>
  
- #include <asm/processor.h>  /* for cpu_relax() */
- 
-+/*
-+ * For static context analysis, we need a unique token for each possible bit
-+ * that can be used as a bit_spinlock. The easiest way to do that is to create a
-+ * fake context that we can cast to with the __bitlock(bitnum, addr) macro
-+ * below, which will give us unique instances for each (bit, addr) pair that the
-+ * static analysis can use.
-+ */
-+context_guard_struct(__context_bitlock) { };
-+#define __bitlock(bitnum, addr) (struct __context_bitlock *)(bitnum + (addr))
++#include <asm/processor.h>  /* for cpu_relax() */
 +
  /*
   *  bit-based spin_lock()
   *
-@@ -16,6 +26,7 @@
-  * are significantly faster.
-  */
- static __always_inline void bit_spin_lock(int bitnum, unsigned long *addr)
-+	__acquires(__bitlock(bitnum, addr))
- {
- 	/*
- 	 * Assuming the lock is uncontended, this never enters
-@@ -34,13 +45,14 @@ static __always_inline void bit_spin_lock(int bitnum, unsigned long *addr)
- 		preempt_disable();
- 	}
- #endif
--	__acquire(bitlock);
-+	__acquire(__bitlock(bitnum, addr));
- }
- 
- /*
-  * Return true if it was acquired
-  */
- static __always_inline int bit_spin_trylock(int bitnum, unsigned long *addr)
-+	__cond_acquires(true, __bitlock(bitnum, addr))
- {
- 	preempt_disable();
- #if defined(CONFIG_SMP) || defined(CONFIG_DEBUG_SPINLOCK)
-@@ -49,7 +61,7 @@ static __always_inline int bit_spin_trylock(int bitnum, unsigned long *addr)
- 		return 0;
- 	}
- #endif
--	__acquire(bitlock);
-+	__acquire(__bitlock(bitnum, addr));
- 	return 1;
- }
- 
-@@ -57,6 +69,7 @@ static __always_inline int bit_spin_trylock(int bitnum, unsigned long *addr)
-  *  bit-based spin_unlock()
-  */
- static __always_inline void bit_spin_unlock(int bitnum, unsigned long *addr)
-+	__releases(__bitlock(bitnum, addr))
- {
- #ifdef CONFIG_DEBUG_SPINLOCK
- 	BUG_ON(!test_bit(bitnum, addr));
-@@ -65,7 +78,7 @@ static __always_inline void bit_spin_unlock(int bitnum, unsigned long *addr)
- 	clear_bit_unlock(bitnum, addr);
- #endif
- 	preempt_enable();
--	__release(bitlock);
-+	__release(__bitlock(bitnum, addr));
- }
- 
- /*
-@@ -74,6 +87,7 @@ static __always_inline void bit_spin_unlock(int bitnum, unsigned long *addr)
-  *  protecting the rest of the flags in the word.
-  */
- static __always_inline void __bit_spin_unlock(int bitnum, unsigned long *addr)
-+	__releases(__bitlock(bitnum, addr))
- {
- #ifdef CONFIG_DEBUG_SPINLOCK
- 	BUG_ON(!test_bit(bitnum, addr));
-@@ -82,7 +96,7 @@ static __always_inline void __bit_spin_unlock(int bitnum, unsigned long *addr)
- 	__clear_bit_unlock(bitnum, addr);
- #endif
- 	preempt_enable();
--	__release(bitlock);
-+	__release(__bitlock(bitnum, addr));
- }
- 
- /*
-diff --git a/include/linux/list_bl.h b/include/linux/list_bl.h
-index ae1b541446c9..df9eebe6afca 100644
---- a/include/linux/list_bl.h
-+++ b/include/linux/list_bl.h
-@@ -144,11 +144,13 @@ static inline void hlist_bl_del_init(struct hlist_bl_node *n)
- }
- 
- static inline void hlist_bl_lock(struct hlist_bl_head *b)
-+	__acquires(__bitlock(0, b))
- {
- 	bit_spin_lock(0, (unsigned long *)b);
- }
- 
- static inline void hlist_bl_unlock(struct hlist_bl_head *b)
-+	__releases(__bitlock(0, b))
- {
- 	__bit_spin_unlock(0, (unsigned long *)b);
- }
-diff --git a/lib/test_context-analysis.c b/lib/test_context-analysis.c
-index 59c6642c582e..77e599a9281b 100644
---- a/lib/test_context-analysis.c
-+++ b/lib/test_context-analysis.c
-@@ -4,6 +4,7 @@
-  * positive errors when compiled with Clang's context analysis.
-  */
- 
-+#include <linux/bit_spinlock.h>
- #include <linux/build_bug.h>
- #include <linux/mutex.h>
- #include <linux/seqlock.h>
-@@ -251,3 +252,28 @@ static void __used test_seqlock_writer(struct test_seqlock_data *d)
- 	d->counter++;
- 	write_sequnlock_irqrestore(&d->sl, flags);
- }
-+
-+struct test_bit_spinlock_data {
-+	unsigned long bits;
-+	int counter __guarded_by(__bitlock(3, &bits));
-+};
-+
-+static void __used test_bit_spin_lock(struct test_bit_spinlock_data *d)
-+{
-+	/*
-+	 * Note, the analysis seems to have false negatives, because it won't
-+	 * precisely recognize the bit of the fake __bitlock() token.
-+	 */
-+	bit_spin_lock(3, &d->bits);
-+	d->counter++;
-+	bit_spin_unlock(3, &d->bits);
-+
-+	bit_spin_lock(3, &d->bits);
-+	d->counter++;
-+	__bit_spin_unlock(3, &d->bits);
-+
-+	if (bit_spin_trylock(3, &d->bits)) {
-+		d->counter++;
-+		bit_spin_unlock(3, &d->bits);
-+	}
-+}
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
