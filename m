@@ -1,118 +1,286 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6BE7345729;
-	Thu, 20 Nov 2025 13:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C83132FA16;
+	Thu, 20 Nov 2025 13:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763646980; cv=none; b=KLw/dLoOrlQFMMZcauRYf4x8idlwhZjzyDo6wQQvHl70W8gTsGexfpw4KdUuuh+D7YgVhJfAi6kC9dI0z1C/Ql72niuklre6IinoGGCVOzO/BLpW0RAeL0zZSAyxZcP2n7TbxeXhdDDUWMPvHyMSz4iBfklob6cKqMPNHXpY2VM=
+	t=1763647100; cv=none; b=jykM8WECVM6nEjSw/YOptFoL4GWXttpioFZbvTiKd0/Jca3i2StTtPuaDnktU16cV6a0L+/5BrUzPEYiWjOf+4t8E1APdS+7zWNEXw1akdn2+cKNyJLGHpAioJJLpBfSAkBGE6ck/aroXlfA4WnVRRhBSfpdOoJFqtwu882/+FA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763646980; c=relaxed/simple;
-	bh=qjwbKhdVipvIJ0N2rgFc287iWpDosQTnc6T99JMqA3Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UBcUc51vD0oLxqJ5487QRdbO2vRCrACHJn103Uh46RpnwIkrmA2r5Uwc0nlRtEjPqwTomkT42qwgMptcd/BSiffTyrO6Bex2QJoIcBts8EM36u4ltnvpZftuQQjQF4ZgTWRK5Ikunh8GPBUOu5LYGvu6kmN0QPj9HQ/zv6Hic3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NCGTKWx0; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1763647100; c=relaxed/simple;
+	bh=/7tuEZLmnzvlhkwWeK1maNDWP7S8pXHUBUG0bkWAL28=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iCCY2pYH4xSgmiiSvo3t3QsnXnCDHCauT7cGh8fmiMgvjvHNCsgp3CeicU4GiSrJ+RLbr7skJIKzkbEyZhnRHHcIH21ZIJYQ6sK+fobyUxlh8UTTZyXz9Xqo2pPP0rQww2YZH0WGfISbOmUA2FOyP2AfD4BZfWJXT+65k4Gsii8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=dJLTn4xU; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NCGTKWx0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763646979; x=1795182979;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qjwbKhdVipvIJ0N2rgFc287iWpDosQTnc6T99JMqA3Y=;
-  b=NCGTKWx0a/BsbeKOzgijkPqI5PKG/IME8ordXwnGGE7mhl1SpsVoQojy
-   XMSkoGHPdby4OLDKnwrEYkglxV5g+zSJ2iGDNtdlKMTHXKcKHtyWDkGvv
-   GYoT+vuJqP9O+y1UjS31vFqkS9x2+bIOLRFcowqV0z/LqwlJ8tP5T3tX4
-   nHOn5IBFJU+Db4TwQSVwSWglhACj70G7KdKS/Mikvy6kxhnYDXUSNt4Ap
-   vfhLiJWmsHqlJpGQ/APwhEmxKeAE/NdQ8GoWFDE8kWKlib4Q+tzECdH3T
-   +Yp1BCgid7wIaa3CvfdgWhCCb2PZnJxkOUNuoJWoXYUtVBhdifsUdYKnX
-   w==;
-X-CSE-ConnectionGUID: WMdb3h4hTuSg14F9laKJuA==
-X-CSE-MsgGUID: SBo7AXAYRVCxCM49AgHXTg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="53286313"
-X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="53286313"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 05:56:18 -0800
-X-CSE-ConnectionGUID: LpySW7dPTTKtDU45dJ3A/g==
-X-CSE-MsgGUID: 25bOMTJ4Q8OZbjzrpKXwcA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="192169734"
-Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 20 Nov 2025 05:56:16 -0800
-Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vM58v-00043P-1O;
-	Thu, 20 Nov 2025 13:56:13 +0000
-Date: Thu, 20 Nov 2025 21:55:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Mario Limonciello (AMD)" <superm1@kernel.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: oe-kbuild-all@lists.linux.dev, John Allen <john.allen@amd.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Hans de Goede <hansg@kernel.org>,
-	"(open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER)" <linux-crypto@vger.kernel.org>,
-	platform-driver-x86@vger.kernel.org,
-	"Mario Limonciello (AMD)" <superm1@kernel.org>,
-	Lars Francke <lars.francke@gmail.com>
-Subject: Re: [PATCH 2/2] crypto: ccp - Add an S4 restore flow
-Message-ID: <202511202139.doSFJwaz-lkp@intel.com>
-References: <20251119205942.3411155-3-superm1@kernel.org>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="dJLTn4xU"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=+HcWhgPXtR7D8JcBEJZDe9j2C8W06P1QKnc0m/hTd+4=;
+	b=dJLTn4xUvA8t1w9XK/bFpJK8h2LZp1wDdioJKg3iyAPuJm6FOAWTg0HpWAAILg6rO92PwIwIL
+	0socxBLRLvJQTfxZ0ZKJ4/nOvRyOijI2+SOh5ieFyDmhneFJIN9MZnKJIHBYdn8Bw2LJrJUjS6y
+	FMfx4eMqTpmj4/w2r4x18Gw=
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4dC0JG1pD2zmV6R;
+	Thu, 20 Nov 2025 21:56:30 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id D9A551800B2;
+	Thu, 20 Nov 2025 21:58:14 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 20 Nov 2025 21:58:14 +0800
+Received: from localhost.huawei.com (10.90.31.46) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 20 Nov 2025 21:58:14 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
+	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>
+Subject: [PATCH 2/2] crypto: hisilicon/trng - support tfms sharing the device
+Date: Thu, 20 Nov 2025 21:58:12 +0800
+Message-ID: <20251120135812.1814923-3-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20251120135812.1814923-1-huangchenghai2@huawei.com>
+References: <20251120135812.1814923-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251119205942.3411155-3-superm1@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
 
-Hi Mario,
+From: Weili Qian <qianweili@huawei.com>
 
-kernel test robot noticed the following build warnings:
+Since the number of devices is limited, and the number
+of tfms may exceed the number of devices, to ensure that
+tfms can be successfully allocated, support tfms
+sharing the same device.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master linus/master v6.18-rc6 next-20251120]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Fixes: e4d9d10ef4be ("crypto: hisilicon/trng - add support for PRNG")
+Signed-off-by: Weili Qian <qianweili@huawei.com>
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+---
+ drivers/crypto/hisilicon/trng/trng.c | 98 ++++++++++++++++++++--------
+ 1 file changed, 69 insertions(+), 29 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mario-Limonciello-AMD/platform-x86-amd-pmf-Prevent-TEE-errors-after-hibernate/20251120-050203
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20251119205942.3411155-3-superm1%40kernel.org
-patch subject: [PATCH 2/2] crypto: ccp - Add an S4 restore flow
-config: i386-randconfig-r133-20251120 (https://download.01.org/0day-ci/archive/20251120/202511202139.doSFJwaz-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251120/202511202139.doSFJwaz-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511202139.doSFJwaz-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/crypto/ccp/sp-pci.c:573:25: sparse: sparse: symbol 'sp_pci_pm_ops' was not declared. Should it be static?
-
-vim +/sp_pci_pm_ops +573 drivers/crypto/ccp/sp-pci.c
-
-   572	
- > 573	const struct dev_pm_ops sp_pci_pm_ops = {
-   574		.suspend = pm_sleep_ptr(sp_pci_suspend),
-   575		.resume = pm_sleep_ptr(sp_pci_resume),
-   576		.freeze = pm_sleep_ptr(sp_pci_suspend),
-   577		.thaw = pm_sleep_ptr(sp_pci_resume),
-   578		.poweroff = pm_sleep_ptr(sp_pci_suspend),
-   579		.restore = pm_sleep_ptr(sp_pci_restore),
-   580	};
-   581	
-
+diff --git a/drivers/crypto/hisilicon/trng/trng.c b/drivers/crypto/hisilicon/trng/trng.c
+index dae81b6f43e3..4dcb3398e020 100644
+--- a/drivers/crypto/hisilicon/trng/trng.c
++++ b/drivers/crypto/hisilicon/trng/trng.c
+@@ -41,14 +41,16 @@
+ #define SEED_SHIFT_16		16
+ #define SEED_SHIFT_8		8
+ #define WAIT_PERIOD		20
++#define SW_MAX_RANDOM_BYTES	65520
+ 
+ struct hisi_trng {
+ 	void __iomem *base;
+ 	struct list_head list;
+ 	struct hwrng rng;
+ 	u32 ver;
+-	bool is_used;
+-	struct mutex mutex;
++	u32 ctx_num;
++	u32 random_bytes;
++	struct mutex lock;
+ };
+ 
+ struct hisi_trng_ctx {
+@@ -57,10 +59,14 @@ struct hisi_trng_ctx {
+ 
+ static LIST_HEAD(trng_devices_list);
+ static DEFINE_MUTEX(trng_device_lock);
++static int hisi_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait);
+ 
+-static void hisi_trng_set_seed(struct hisi_trng *trng, const u8 *seed)
++static int hisi_trng_set_seed(struct hisi_trng *trng, const u8 *seed)
+ {
+ 	u32 val, seed_reg, i;
++	int ret;
++
++	writel(0x0, trng->base + SW_DRBG_BLOCKS);
+ 
+ 	for (i = 0; i < SW_DRBG_SEED_SIZE;
+ 	     i += SW_DRBG_SEED_SIZE / SW_DRBG_SEED_REGS_NUM) {
+@@ -72,6 +78,20 @@ static void hisi_trng_set_seed(struct hisi_trng *trng, const u8 *seed)
+ 		seed_reg = (i >> SW_DRBG_NUM_SHIFT) % SW_DRBG_SEED_REGS_NUM;
+ 		writel(val, trng->base + SW_DRBG_SEED(seed_reg));
+ 	}
++
++	writel(SW_DRBG_BLOCKS_NUM | (0x1 << SW_DRBG_ENABLE_SHIFT),
++	       trng->base + SW_DRBG_BLOCKS);
++	writel(0x1, trng->base + SW_DRBG_INIT);
++	ret = readl_relaxed_poll_timeout(trng->base + SW_DRBG_STATUS,
++					 val, val & BIT(0), SLEEP_US, TIMEOUT_US);
++	if (ret) {
++		pr_err("failed to init trng(%d)\n", ret);
++		return -EIO;
++	}
++
++	trng->random_bytes = 0;
++
++	return 0;
+ }
+ 
+ static int hisi_trng_seed(struct crypto_rng *tfm, const u8 *seed,
+@@ -79,8 +99,7 @@ static int hisi_trng_seed(struct crypto_rng *tfm, const u8 *seed,
+ {
+ 	struct hisi_trng_ctx *ctx = crypto_rng_ctx(tfm);
+ 	struct hisi_trng *trng = ctx->trng;
+-	u32 val = 0;
+-	int ret = 0;
++	int ret;
+ 
+ 	if (slen < SW_DRBG_SEED_SIZE) {
+ 		pr_err("slen(%u) is not matched with trng(%d)\n", slen,
+@@ -88,19 +107,30 @@ static int hisi_trng_seed(struct crypto_rng *tfm, const u8 *seed,
+ 		return -EINVAL;
+ 	}
+ 
+-	writel(0x0, trng->base + SW_DRBG_BLOCKS);
+-	hisi_trng_set_seed(trng, seed);
++	mutex_lock(&trng->lock);
++	ret = hisi_trng_set_seed(trng, seed);
++	mutex_unlock(&trng->lock);
+ 
+-	writel(SW_DRBG_BLOCKS_NUM | (0x1 << SW_DRBG_ENABLE_SHIFT),
+-	       trng->base + SW_DRBG_BLOCKS);
+-	writel(0x1, trng->base + SW_DRBG_INIT);
++	return ret;
++}
+ 
+-	ret = readl_relaxed_poll_timeout(trng->base + SW_DRBG_STATUS,
+-					val, val & BIT(0), SLEEP_US, TIMEOUT_US);
+-	if (ret)
+-		pr_err("fail to init trng(%d)\n", ret);
++static int hisi_trng_reseed(struct hisi_trng *trng)
++{
++	u8 seed[SW_DRBG_SEED_SIZE];
++	int size;
+ 
+-	return ret;
++	/* Allow other threads to acquire the lock and execute their jobs. */
++	mutex_unlock(&trng->lock);
++	mutex_lock(&trng->lock);
++
++	if (trng->random_bytes < SW_MAX_RANDOM_BYTES)
++		return 0;
++
++	size = hisi_trng_read(&trng->rng, seed, SW_DRBG_SEED_SIZE, false);
++	if (size != SW_DRBG_SEED_SIZE)
++		return -EIO;
++
++	return hisi_trng_set_seed(trng, seed);
+ }
+ 
+ static int hisi_trng_generate(struct crypto_rng *tfm, const u8 *src,
+@@ -114,17 +144,23 @@ static int hisi_trng_generate(struct crypto_rng *tfm, const u8 *src,
+ 	int ret;
+ 	u32 i;
+ 
+-	if (dlen > SW_DRBG_BLOCKS_NUM * SW_DRBG_BYTES || dlen == 0) {
+-		pr_err("dlen(%u) exceeds limit(%d)!\n", dlen,
+-			SW_DRBG_BLOCKS_NUM * SW_DRBG_BYTES);
++	if (!dstn || !dlen) {
++		pr_err("output is error, dlen %u !\n", dlen);
+ 		return -EINVAL;
+ 	}
+ 
++	mutex_lock(&trng->lock);
+ 	do {
++		if (trng->random_bytes >= SW_MAX_RANDOM_BYTES) {
++			ret = hisi_trng_reseed(trng);
++			if (ret)
++				break;
++		}
++
+ 		ret = readl_relaxed_poll_timeout(trng->base + SW_DRBG_STATUS,
+-		     val, val & BIT(1), SLEEP_US, TIMEOUT_US);
++						 val, val & BIT(1), SLEEP_US, TIMEOUT_US);
+ 		if (ret) {
+-			pr_err("fail to generate random number(%d)!\n", ret);
++			pr_err("failed to generate random number(%d)!\n", ret);
+ 			break;
+ 		}
+ 
+@@ -139,9 +175,12 @@ static int hisi_trng_generate(struct crypto_rng *tfm, const u8 *src,
+ 			currsize = dlen;
+ 		}
+ 
++		trng->random_bytes += SW_DRBG_BYTES;
+ 		writel(0x1, trng->base + SW_DRBG_GEN);
+ 	} while (currsize < dlen);
+ 
++	mutex_unlock(&trng->lock);
++
+ 	return ret;
+ }
+ 
+@@ -149,20 +188,19 @@ static int hisi_trng_init(struct crypto_tfm *tfm)
+ {
+ 	struct hisi_trng_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct hisi_trng *trng;
+-	int ret = -EBUSY;
++	u32 ctx_num = ~0;
+ 
+ 	mutex_lock(&trng_device_lock);
+ 	list_for_each_entry(trng, &trng_devices_list, list) {
+-		if (!trng->is_used) {
+-			trng->is_used = true;
++		if (trng->ctx_num < ctx_num) {
++			ctx_num = trng->ctx_num;
+ 			ctx->trng = trng;
+-			ret = 0;
+-			break;
+ 		}
+ 	}
++	ctx->trng->ctx_num++;
+ 	mutex_unlock(&trng_device_lock);
+ 
+-	return ret;
++	return 0;
+ }
+ 
+ static void hisi_trng_exit(struct crypto_tfm *tfm)
+@@ -170,7 +208,7 @@ static void hisi_trng_exit(struct crypto_tfm *tfm)
+ 	struct hisi_trng_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	mutex_lock(&trng_device_lock);
+-	ctx->trng->is_used = false;
++	ctx->trng->ctx_num--;
+ 	mutex_unlock(&trng_device_lock);
+ }
+ 
+@@ -245,7 +283,7 @@ static int hisi_trng_crypto_unregister(struct hisi_trng *trng)
+ 	int ret = -EBUSY;
+ 
+ 	mutex_lock(&trng_device_lock);
+-	if (trng->is_used)
++	if (trng->ctx_num)
+ 		goto unlock;
+ 
+ 	list_del(&trng->list);
+@@ -275,7 +313,9 @@ static int hisi_trng_probe(struct platform_device *pdev)
+ 	if (IS_ERR(trng->base))
+ 		return PTR_ERR(trng->base);
+ 
+-	trng->is_used = false;
++	trng->ctx_num = 0;
++	trng->random_bytes = SW_MAX_RANDOM_BYTES;
++	mutex_init(&trng->lock);
+ 	trng->ver = readl(trng->base + HISI_TRNG_VERSION);
+ 	ret = hisi_trng_crypto_register(trng);
+ 	if (ret)
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.33.0
+
