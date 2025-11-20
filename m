@@ -1,57 +1,56 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292E2137923
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 11:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876282D062F
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 11:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763638109; cv=none; b=jF0bhXuztdgh+Q0FkYafvn3Awaej/8/kvVpb70I+4wtDW7+VrpNb7HZcdED+phcU4GGIcHNYUSBdoxR+J1/0HbdsKJuuV8uu4yKK+yxBv9kC0N5LL3QDe+Xly0nN5a3RyVLdbyYYw1Ki/Sgeee3OwNoK57x4Jnhf08ONmOjIdRM=
+	t=1763638160; cv=none; b=KjFR2hhZ5kxaLlYJA8VBPh/IZioxYBrJwcIQqAaCYbIP/RZ1QGRmtR5odj7q6M4zaFrlSa33vaePtibqsbnPcy+NBbKv6Zm6bbqoCi4BC8UXfcSMsXaBy1vyMHGlVfuAmhsX4z8q1G3Ohm/Yi0WH7jb3W/T5KYfLhyxBfNqz4IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763638109; c=relaxed/simple;
-	bh=4Gy4UJF2o/HD0aI+1to6lVh6fKMLQO6d3/S7KNNALak=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aNVsiZ4NZwGKpvUqjsUKOfMTujZesttOvUzcA9L9WAjewIq1v6a9gTrl2yJnpKz7aaXZTQpqeDIwkPzqliuVlwEFAWF6muyJQ7OQNV/zMPmn9tF9reVEs7cIEjbrNG3XSYGoqLApXfycNIGBTdEBtVRG2CJaVeLeCW6VuGDDP1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lzUduPLe; arc=none smtp.client-ip=198.175.65.15
+	s=arc-20240116; t=1763638160; c=relaxed/simple;
+	bh=H8KdxWI8tT/1G+hSIa6MgaJtJAdzJDCN/IudFGQi9Jk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SghKX29xLt5inuwdwsE1JYdZ6DavDbH9tuiOAKF05gv5qoaVjvsaWK6p8vwo0nqkc65JFGyupdzsXSWIAKDlSxh4i6dycwMNA8SyxIrzKwZzV8KEFnXbwU+r1tRcY/zYx5X5l3GxiwPfu3P7Roa1AVfJMkLHhkILOwMcLH6FUl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=grIhoUlC; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lzUduPLe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="grIhoUlC"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763638108; x=1795174108;
+  t=1763638159; x=1795174159;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=4Gy4UJF2o/HD0aI+1to6lVh6fKMLQO6d3/S7KNNALak=;
-  b=lzUduPLes/2SEUqGe3mRkbJmdn4XlcS1CDRw+Zu1XBINQ4R36aJODGBv
-   wJr+ZkEsq2eqFOft+aujI5d3eNyEucPN8pUCUd1d7pDeiVFaRFFcL7srU
-   Ww0tyGdhKVry3Cf0av9idVe9fL9ak3CfVR/7okk7ezEdi6X1diDtjrnBW
-   KKDJUM8bCc8oFlyYN4a7i1ohv6YmMFy4dhfZ3PAsT1JOv3YKwWf5DGLHu
-   4V/ddzTEz67Xw07kO+kG+2hoBSGeNuSGB4AUJPaRBqmjMIF8qzh6lM8hu
-   ePXdP57/uzh7EbZpRGb7dr7L0GffnJLSL2bJr1H7DMJQ7dJsmIQi/qyiI
+  bh=H8KdxWI8tT/1G+hSIa6MgaJtJAdzJDCN/IudFGQi9Jk=;
+  b=grIhoUlCYeD/UlMo0dUA1aTBctOR/1EEGAOUXlIkvXS430j1J8is/Oca
+   GBNSsiH3/IiWXRei17LYz2Jx2sH43k9k/BVxmSw6+wsYpAoPzmyfYKzur
+   xRpJU7gLZTDNa+XH4BXXs+lMnOZhU/8xVNz5nihhpErMFO9sEcOMEDlPw
+   /v7onTSUeRmfU4j6dLdTz5kABZv2gtc8hrz0VhsEJ9fBCrjbTgHiHjOMd
+   Nt/5PyLT1v7+bqcdMWsaAi4TcdgAeDm+CjZE93uFyWpaFvpaoeeRLTP8C
+   l3jkHL3e0d9pmYykuNmhTfxRwYkixlqpnrOR0D889mIB3/zMd4kbO8Q/j
    A==;
-X-CSE-ConnectionGUID: JaAuVmiMTBWAZkJ6yX0wag==
-X-CSE-MsgGUID: htArdYUKRj+wXTKNuMYCdQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="69320679"
+X-CSE-ConnectionGUID: pD16HOomQA6RHzE8VF3LnQ==
+X-CSE-MsgGUID: otY1aKxVTauQKK0fqXLILA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="65597051"
 X-IronPort-AV: E=Sophos;i="6.20,317,1758610800"; 
-   d="scan'208";a="69320679"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 03:28:28 -0800
-X-CSE-ConnectionGUID: k1LqcxndQ1ihkg1dGqXKAg==
-X-CSE-MsgGUID: Na2/t/ndT0WqiQGYnG8ABQ==
+   d="scan'208";a="65597051"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 03:29:18 -0800
+X-CSE-ConnectionGUID: UNlAabVkQmm/F+PxgQeXzQ==
+X-CSE-MsgGUID: axbtRYf5QYKKvcF/dCwK6A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,317,1758610800"; 
-   d="scan'208";a="195822007"
+   d="scan'208";a="191465366"
 Received: from silpixa00401971.ir.intel.com ([10.20.226.106])
-  by orviesa004.jf.intel.com with ESMTP; 20 Nov 2025 03:28:26 -0800
+  by orviesa008.jf.intel.com with ESMTP; 20 Nov 2025 03:29:16 -0800
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	qat-linux@intel.com,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Qihua Dai <qihua.dai@intel.com>,
 	Ahsan Atta <ahsan.atta@intel.com>
-Subject: [PATCH] crypto: qat - fix parameter order used in ICP_QAT_FW_COMN_FLAGS_BUILD
-Date: Thu, 20 Nov 2025 16:29:23 +0000
-Message-ID: <20251120162932.29051-1-giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - add bank state save and restore for qat_420xx
+Date: Thu, 20 Nov 2025 16:30:19 +0000
+Message-ID: <20251120163023.29288-1-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -62,71 +61,40 @@ MIME-Version: 1.0
 Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 
-The macro ICP_QAT_FW_COMN_FLAGS_BUILD sets flags in the firmware
-descriptor to indicate:
+Register the functions required to save and restore the state of a ring
+bank on the qat_420xx device.  Since this logic is shared across QAT
+GEN4 devices, reuse the existing GEN4 implementation.
 
-  * Whether the content descriptor is a pointer or contains embedded
-    data.
-  * Whether the source and destination buffers are scatter-gather lists
-    or flat buffers.
+This functionality enables saving and restoring the state of a Virtual
+Function (VF), which is required for supporting VM Live Migration.
 
-The correct parameter order is:
-
-  * First: content descriptor type
-  * Second: source/destination pointer type
-
-In the asymmetric crypto code, the macro was used with the parameters
-swapped. Although this does not cause functional issues, since both
-macros currently evaluate to 0, it is incorrect.
-
-Fix the parameter order in the Diffie-Hellman and RSA code paths.
-
-Fixes: a990532023b9 ("crypto: qat - Add support for RSA algorithm")
-Fixes: c9839143ebbf ("crypto: qat - Add DH support")
-Reported-by: Qihua Dai <qihua.dai@intel.com> # off-list
-Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
 ---
- drivers/crypto/intel/qat/qat_common/qat_asym_algs.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-index 85c682e248fb..e09b9edfce42 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-@@ -255,8 +255,8 @@ static int qat_dh_compute_value(struct kpp_request *req)
- 	qat_req->areq.dh = req;
- 	msg->pke_hdr.service_type = ICP_QAT_FW_COMN_REQ_CPM_FW_PKE;
- 	msg->pke_hdr.comn_req_flags =
--		ICP_QAT_FW_COMN_FLAGS_BUILD(QAT_COMN_PTR_TYPE_FLAT,
--					    QAT_COMN_CD_FLD_TYPE_64BIT_ADR);
-+		ICP_QAT_FW_COMN_FLAGS_BUILD(QAT_COMN_CD_FLD_TYPE_64BIT_ADR,
-+					    QAT_COMN_PTR_TYPE_FLAT);
- 
- 	/*
- 	 * If no source is provided use g as base
-@@ -731,8 +731,8 @@ static int qat_rsa_enc(struct akcipher_request *req)
- 	qat_req->areq.rsa = req;
- 	msg->pke_hdr.service_type = ICP_QAT_FW_COMN_REQ_CPM_FW_PKE;
- 	msg->pke_hdr.comn_req_flags =
--		ICP_QAT_FW_COMN_FLAGS_BUILD(QAT_COMN_PTR_TYPE_FLAT,
--					    QAT_COMN_CD_FLD_TYPE_64BIT_ADR);
-+		ICP_QAT_FW_COMN_FLAGS_BUILD(QAT_COMN_CD_FLD_TYPE_64BIT_ADR,
-+					    QAT_COMN_PTR_TYPE_FLAT);
- 
- 	qat_req->in.rsa.enc.e = ctx->dma_e;
- 	qat_req->in.rsa.enc.n = ctx->dma_n;
-@@ -867,8 +867,8 @@ static int qat_rsa_dec(struct akcipher_request *req)
- 	qat_req->areq.rsa = req;
- 	msg->pke_hdr.service_type = ICP_QAT_FW_COMN_REQ_CPM_FW_PKE;
- 	msg->pke_hdr.comn_req_flags =
--		ICP_QAT_FW_COMN_FLAGS_BUILD(QAT_COMN_PTR_TYPE_FLAT,
--					    QAT_COMN_CD_FLD_TYPE_64BIT_ADR);
-+		ICP_QAT_FW_COMN_FLAGS_BUILD(QAT_COMN_CD_FLD_TYPE_64BIT_ADR,
-+					    QAT_COMN_PTR_TYPE_FLAT);
- 
- 	if (ctx->crt_mode) {
- 		qat_req->in.rsa.dec_crt.p = ctx->dma_p;
+diff --git a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
+index 53fa91d577ed..35105213d40c 100644
+--- a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
+@@ -3,6 +3,7 @@
+ #include <linux/iopoll.h>
+ #include <adf_accel_devices.h>
+ #include <adf_admin.h>
++#include <adf_bank_state.h>
+ #include <adf_cfg.h>
+ #include <adf_cfg_services.h>
+ #include <adf_clock.h>
+@@ -459,6 +460,8 @@ void adf_init_hw_data_420xx(struct adf_hw_device_data *hw_data, u32 dev_id)
+ 	hw_data->get_ring_to_svc_map = adf_gen4_get_ring_to_svc_map;
+ 	hw_data->disable_iov = adf_disable_sriov;
+ 	hw_data->ring_pair_reset = adf_gen4_ring_pair_reset;
++	hw_data->bank_state_save = adf_bank_state_save;
++	hw_data->bank_state_restore = adf_bank_state_restore;
+ 	hw_data->enable_pm = adf_gen4_enable_pm;
+ 	hw_data->handle_pm_interrupt = adf_gen4_handle_pm_interrupt;
+ 	hw_data->dev_config = adf_gen4_dev_config;
 
 base-commit: 8faa5c4b47998c5930314a3bb8ee53534cfdc1ce
 -- 
