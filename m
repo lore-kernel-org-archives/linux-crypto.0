@@ -1,129 +1,103 @@
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11A1290D81;
-	Wed, 19 Nov 2025 23:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCF8322A;
+	Thu, 20 Nov 2025 00:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763593340; cv=none; b=P0VwCA8qFAo9rjGxoTFLQxRoyzSZnchhm+joOnMBKpxss4JcObvkqHBqqW4BoP+ArIihpaW9srlNWekAUwJgFa5MMVez2XzNB0MAzQwLpBjOBrFHOC7A+fI99/x0IMLvU1N4UubL/MUjhr9uIJNiPpKPokr0OBMvkOBF0z7mYng=
+	t=1763599164; cv=none; b=uQyLdA436v3Sx8LD7ZqOvEcadqDIhxpFET8owT5gyQfdKfGuZIzebn2ReL4O9WpJ80EKY7ZxrnNNaWwX2ZRLhyZcIveJQBa+uCfE32x03U3dKbnJJ2K5kjkhXt8KXJtn6WwD52ade9Gz6WXerbSWErdnKLJuzOhENvs5XGwLtJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763593340; c=relaxed/simple;
-	bh=88ujur/zx2sS97Eo0R22GV6fR1pB4vFJWHNNkHMm5eE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fRYCaPfJxFR7BImW8lNEb2CEuDZaayy0Bx0ErVGnQrD8R7dpho0FroZCdV3RX9sxAOSB4f5kh8GYkC1XBqOisY/gL0kmkE16eYDKJjsvGdnYcy+l4WQyvt0MgTnw/0DSpV8jmCmYR6aM8xCDHfj5VClkrU33mzpwqpsofx4oaqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=GcPzQE3l; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
+	s=arc-20240116; t=1763599164; c=relaxed/simple;
+	bh=lssvfUxVbhw3PvKV3aW2w1m7cwIJv0Szyc9PyoP8IM4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IjY4ot1dicJyWTb8TOnBYJ0W6UwB3TFVsNhHT41tnttQTMZlEGfDcLWFFw9lg4xoEGqY6782kDBeYrx06hYeX2am1Bgp/XawBgG69cYB43Q8GizqW+XVC0lDtgVC4FqWdv8SZ0s5EsYFiWElo1ir44s8kgEomlVJuF75zS73sww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MjJa6twn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="GcPzQE3l"
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <david.laight@runbox.com>)
-	id 1vLrBm-006ncP-TQ; Thu, 20 Nov 2025 00:02:14 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
-	 s=selector1; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
-	References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date;
-	bh=DcR8ifpAjTY4p77mfshCTMj2URt2zXnkTzn9wnKCz8c=; b=GcPzQE3lvG5IXh1Th0OtyYB7f7
-	GHHFtLJy9GF/Jp3E93kWKdwlZIjtpSUOuEnVQmIlroKLBsf6cF4XpkQ4GZmNDDSjJhsyMeK1zzA1q
-	YlstTuTLKWpCVy2r9yMYx/UUsBwpd8AHyikAh7y215IiC2g114U+rea8XGdyUTERuI90/rNS5q5Rd
-	YKdw7GYuCJ0QA12vr7BXuBSceh8sHjEuy+V5qcto3+I3dZNgZf8uwC0p3FQ+kGKvSwErUxpiEmnNY
-	gz1wWkoJjgHok2XnP73gebv/Doqy7uyCdQC3Ig06lzBWxdOxnHj/SnHCrHRXPb/KcJh0SFn4EOXMY
-	BeDwN48Q==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <david.laight@runbox.com>)
-	id 1vLrBm-00010l-62; Thu, 20 Nov 2025 00:02:14 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vLrBi-00Fqde-53; Thu, 20 Nov 2025 00:02:10 +0100
-Date: Wed, 19 Nov 2025 23:02:05 +0000
-From: david laight <david.laight@runbox.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Linus Torvalds
- <torvalds@linux-foundation.org>, Ard Biesheuvel <ardb@kernel.org>, Kees
- Cook <kees@kernel.org>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH libcrypto 1/2] array_size: introduce min_array_size()
- function decoration
-Message-ID: <20251119230205.2551d7eb@pumpkin>
-In-Reply-To: <aR4UvNzdLLofbRpW@zx2c4.com>
-References: <20251118170240.689299-1-Jason@zx2c4.com>
-	<20251118232435.GA6346@quark>
-	<aR0Bv-MJShwCZBYL@zx2c4.com>
-	<aR4UvNzdLLofbRpW@zx2c4.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MjJa6twn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E456C4CEF5;
+	Thu, 20 Nov 2025 00:39:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763599163;
+	bh=lssvfUxVbhw3PvKV3aW2w1m7cwIJv0Szyc9PyoP8IM4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MjJa6twn93daMmVBQKuDCLuz3kNgbg/1xwZpwo0ikcT8jtMlLpMO/xMd80eyGJrKH
+	 GPdD1uFMrmF0sUsYiVSqHeVFxF+qlIFWNgG1J/j29CjDDfjINPFascN3U7HaOMIT68
+	 2U41aVCMd8IfJxnt7IuUiqpdITDdu+kP0VmDnHYZraRpVyJ7Ikd0Zx5Bxy4maeg+RQ
+	 qe6FQu4JUxeSlYzHR1fWo392vMez5mcausrFADWtsvjFNSfe9GPikGHRH+XcE+dxXL
+	 TIM+ri1dYilGhW+SMh0zQQvOLYSV5/Fs3et0g1klzGr2OcsjT12lz9CIuzCHMYlhBM
+	 V2i1fWao4sKcQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+	David Howells <dhowells@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	keyrings@vger.kernel.org,
+	linux-modules@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/4] lib/crypto: ML-DSA verification support
+Date: Wed, 19 Nov 2025 16:36:49 -0800
+Message-ID: <20251120003653.335863-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 19 Nov 2025 20:04:28 +0100
-"Jason A. Donenfeld" <Jason@zx2c4.com> wrote:
+This series is targeting libcrypto-next.  It can also be retrieved from:
 
-> On Wed, Nov 19, 2025 at 12:31:11AM +0100, Jason A. Donenfeld wrote:
-> > There's also this other approach from 2001 that the C committee I guess
-> > shot down: https://www.open-std.org/jtc1/sc22/wg14/www/docs/dr_205.htm
-> > It is basically:
-> > 
-> >     #define __at_least static
-> > 
-> > We could attempt to do the same with `at_least`...
-> > 
-> > It kind of feels like we're just inventing a language at that point
-> > though.  
-> 
-> Actually, you know, the more this apparently terrible idea sits in my
-> head, the more I like it.
-> 
-> Which of these is most readable to you?
-> 
-> bool __must_check xchacha20poly1305_decrypt(
->         u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
->         const size_t ad_len, const u8 nonce[min_array_size(XCHACHA20POLY1305_NONCE_SIZE)],
->         const u8 key[min_array_size(CHACHA20POLY1305_KEY_SIZE)]);
-> 
-> bool __must_check xchacha20poly1305_decrypt(
->         u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
->         const size_t ad_len, const u8 nonce[static XCHACHA20POLY1305_NONCE_SIZE],
->         const u8 key[static CHACHA20POLY1305_KEY_SIZE]);
-> 
-> bool __must_check xchacha20poly1305_decrypt(
->         u8 *dst, const u8 *src, const size_t src_len, const u8 *ad,
->         const size_t ad_len, const u8 nonce[at_least XCHACHA20POLY1305_NONCE_SIZE],
->         const u8 key[at_least CHACHA20POLY1305_KEY_SIZE]);
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git mldsa-v1
 
-While bikeshedding...
-I'd drop the pointless 'const' and always try to put a ptr/len pair on the same line.
-So end up with:
-bool __must_check xchacha20poly1305_decrypt(u8 *dst, const u8 *src, size_t src_len,
-	const u8 *ad, size_t ad_len,
-	const u8 nonce[at_least XCHACHA20POLY1305_NONCE_SIZE],
-	const u8 key[at_least CHACHA20POLY1305_KEY_SIZE]);
-or perhaps:
-bool __must_check xchacha20poly1305_decrypt(u8 *dst,
-	const u8 *src, size_t src_len, const u8 *ad, size_t ad_len,
-	const u8 nonce[at_least XCHACHA20POLY1305_NONCE_SIZE],
-	const u8 key[at_least CHACHA20POLY1305_KEY_SIZE]);
-but I don't know what defines the length of '*ad'.
+This series adds support for verifying ML-DSA signatures to lib/crypto/.
+Patch 1 is the ML-DSA implementation itself.  See that for full details.
 
-	David
+Patches 2-4 are the KUnit tests, which still need some more work.
 
-> 
-> The macro function syntax of the first one means nested bracket brain
-> parsing. The second one means more `static` usage that might be
-> unfamiliar. The third one actually makes it kind of clear what's up.
-> It's got that weird-but-nice Objective-C-style sentence programming
-> thing.
-> 
-> Would somebody jump in here to tell me to stop sniffing glue? I feel
-> silly actually considering this, but here I am. Maybe this is actually
-> an okay idea?
-> 
-> Jason
-> 
+Sending this out now as requested by David.  I'd like some more time to
+work on writing proper tests and making sure that everything is correct.
+
+This is just the lib/crypto/ part.  On top of this, we'll want to make
+public_key_verify_signature() call mldsa_verify() to support ML-DSA.
+(No need for the redundant crypto_sig abstraction layer.)
+
+David Howells (1):
+  lib/crypto: tests: Add KUnit tests for ML-DSA
+
+Eric Biggers (3):
+  lib/crypto: Add ML-DSA verification support
+  lib/crypto: tests: Add ML-DSA-65 test cases
+  lib/crypto: tests: Add ML-DSA-87 test cases
+
+ include/crypto/mldsa.h                        |   51 +
+ lib/crypto/Kconfig                            |    7 +
+ lib/crypto/Makefile                           |    5 +
+ lib/crypto/mldsa.c                            |  566 ++
+ lib/crypto/tests/Kconfig                      |   10 +
+ lib/crypto/tests/Makefile                     |    1 +
+ lib/crypto/tests/mldsa_kunit.c                |  124 +
+ .../tests/mldsa_pure_rejection_vectors_44.h   |  489 ++
+ .../tests/mldsa_pure_rejection_vectors_65.h   | 4702 ++++++++++++
+ .../tests/mldsa_pure_rejection_vectors_87.h   | 6390 +++++++++++++++++
+ 10 files changed, 12345 insertions(+)
+ create mode 100644 include/crypto/mldsa.h
+ create mode 100644 lib/crypto/mldsa.c
+ create mode 100644 lib/crypto/tests/mldsa_kunit.c
+ create mode 100644 lib/crypto/tests/mldsa_pure_rejection_vectors_44.h
+ create mode 100644 lib/crypto/tests/mldsa_pure_rejection_vectors_65.h
+ create mode 100644 lib/crypto/tests/mldsa_pure_rejection_vectors_87.h
+
+
+base-commit: 10a1140107e0b98bd67d37ae7af72989dd7df00b
+-- 
+2.51.2
 
