@@ -1,154 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0B333A006
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 13:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6BE7345729;
+	Thu, 20 Nov 2025 13:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763646933; cv=none; b=MmGekhEtT5t4jIXMVlurCRqID3v8pecAGAymRMWJGnwvO1D+BUrqKE9vv252rpaovGM+f8TIR6GDzR9NEpFY87NR5a9Zh+UafEYSGziaq/C3FyC7GE7e6MRQxL6T9UBqp0Onzqa4uHijA0EvRsiXvOLzQhF274Ka93lRyBUj4Gw=
+	t=1763646980; cv=none; b=KLw/dLoOrlQFMMZcauRYf4x8idlwhZjzyDo6wQQvHl70W8gTsGexfpw4KdUuuh+D7YgVhJfAi6kC9dI0z1C/Ql72niuklre6IinoGGCVOzO/BLpW0RAeL0zZSAyxZcP2n7TbxeXhdDDUWMPvHyMSz4iBfklob6cKqMPNHXpY2VM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763646933; c=relaxed/simple;
-	bh=emfT4JXRXejRJxV18S/z18iLUjgMJbsFUVn1IaRCxg0=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=fuC0NlqWxtvU5C3x9Hm1FpTQLet6fcwVm4qZKx+l/hcEHBq1x9060XubKEkk7Ip0T6oG81r/2U6sMZMveQbDmKrVKIXmvfmJdiC6UVm2PvJMEnjwEa4WAf8twpCepAo/7HqGxi621mGKSduHYDnmMGcP6thSa8g64Ur/xeibX0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KysYYDvq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1763646980; c=relaxed/simple;
+	bh=qjwbKhdVipvIJ0N2rgFc287iWpDosQTnc6T99JMqA3Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UBcUc51vD0oLxqJ5487QRdbO2vRCrACHJn103Uh46RpnwIkrmA2r5Uwc0nlRtEjPqwTomkT42qwgMptcd/BSiffTyrO6Bex2QJoIcBts8EM36u4ltnvpZftuQQjQF4ZgTWRK5Ikunh8GPBUOu5LYGvu6kmN0QPj9HQ/zv6Hic3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NCGTKWx0; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KysYYDvq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763646930;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1C8+LrjU0KzWq9emHiCsxm0TlrKfuklcXtM1rteIByw=;
-	b=KysYYDvq5q7EtNh+fK9bN4C3/Nyy7g53VyKeWcO7m3PpDOFm4I9d9nWi2gfs6NrEjh8kVR
-	VsF+DJ7jkiB01TJyU33n8SvTmQcrzDz33CzWO8XwGNolLWgCmbHCNlGMDJX3nmIMs8Rgaz
-	CHR5orE+nKjoSDR9t41AXjCgDnyIxms=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-56-QkHHSkW8Ouy8-NP7xFcggQ-1; Thu,
- 20 Nov 2025 08:55:26 -0500
-X-MC-Unique: QkHHSkW8Ouy8-NP7xFcggQ-1
-X-Mimecast-MFC-AGG-ID: QkHHSkW8Ouy8-NP7xFcggQ_1763646924
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 573871800358;
-	Thu, 20 Nov 2025 13:55:24 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 109A41955F2C;
-	Thu, 20 Nov 2025 13:55:19 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20251120003653.335863-2-ebiggers@kernel.org>
-References: <20251120003653.335863-2-ebiggers@kernel.org> <20251120003653.335863-1-ebiggers@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Luis Chamberlain <mcgrof@kernel.org>,
-    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
-    Sami Tolvanen <samitolvanen@google.com>,
-    "Jason A . Donenfeld" <Jason@zx2c4.com>,
-    Ard Biesheuvel <ardb@kernel.org>,
-    Stephan Mueller <smueller@chronox.de>,
-    Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
-    linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] lib/crypto: Add ML-DSA verification support
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NCGTKWx0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763646979; x=1795182979;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qjwbKhdVipvIJ0N2rgFc287iWpDosQTnc6T99JMqA3Y=;
+  b=NCGTKWx0a/BsbeKOzgijkPqI5PKG/IME8ordXwnGGE7mhl1SpsVoQojy
+   XMSkoGHPdby4OLDKnwrEYkglxV5g+zSJ2iGDNtdlKMTHXKcKHtyWDkGvv
+   GYoT+vuJqP9O+y1UjS31vFqkS9x2+bIOLRFcowqV0z/LqwlJ8tP5T3tX4
+   nHOn5IBFJU+Db4TwQSVwSWglhACj70G7KdKS/Mikvy6kxhnYDXUSNt4Ap
+   vfhLiJWmsHqlJpGQ/APwhEmxKeAE/NdQ8GoWFDE8kWKlib4Q+tzECdH3T
+   +Yp1BCgid7wIaa3CvfdgWhCCb2PZnJxkOUNuoJWoXYUtVBhdifsUdYKnX
+   w==;
+X-CSE-ConnectionGUID: WMdb3h4hTuSg14F9laKJuA==
+X-CSE-MsgGUID: SBo7AXAYRVCxCM49AgHXTg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="53286313"
+X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
+   d="scan'208";a="53286313"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 05:56:18 -0800
+X-CSE-ConnectionGUID: LpySW7dPTTKtDU45dJ3A/g==
+X-CSE-MsgGUID: 25bOMTJ4Q8OZbjzrpKXwcA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
+   d="scan'208";a="192169734"
+Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 20 Nov 2025 05:56:16 -0800
+Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vM58v-00043P-1O;
+	Thu, 20 Nov 2025 13:56:13 +0000
+Date: Thu, 20 Nov 2025 21:55:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Mario Limonciello (AMD)" <superm1@kernel.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: oe-kbuild-all@lists.linux.dev, John Allen <john.allen@amd.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Hans de Goede <hansg@kernel.org>,
+	"(open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER)" <linux-crypto@vger.kernel.org>,
+	platform-driver-x86@vger.kernel.org,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>,
+	Lars Francke <lars.francke@gmail.com>
+Subject: Re: [PATCH 2/2] crypto: ccp - Add an S4 restore flow
+Message-ID: <202511202139.doSFJwaz-lkp@intel.com>
+References: <20251119205942.3411155-3-superm1@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2624663.1763646918.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 20 Nov 2025 13:55:18 +0000
-Message-ID: <2624664.1763646918@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119205942.3411155-3-superm1@kernel.org>
 
-Eric Biggers <ebiggers@kernel.org> wrote:
+Hi Mario,
 
-> +	/* Compute d =3D (c mod 2^32) * (q^-1 mod 2^32). */
-> +	s32 d =3D (s32)c * QINV_MOD_R;
+kernel test robot noticed the following build warnings:
 
-Hmmm...  is "(s32)c" actually "(c mod 2^32)"?  Should that be:
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master linus/master v6.18-rc6 next-20251120]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-	u32 d =3D (u32)c * QINV_MOD_R;
+url:    https://github.com/intel-lab-lkp/linux/commits/Mario-Limonciello-AMD/platform-x86-amd-pmf-Prevent-TEE-errors-after-hibernate/20251120-050203
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20251119205942.3411155-3-superm1%40kernel.org
+patch subject: [PATCH 2/2] crypto: ccp - Add an S4 restore flow
+config: i386-randconfig-r133-20251120 (https://download.01.org/0day-ci/archive/20251120/202511202139.doSFJwaz-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251120/202511202139.doSFJwaz-lkp@intel.com/reproduce)
 
-This is followed up by casting 'd' to "s64".  I don't think that should
-sign-extend it, but...
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511202139.doSFJwaz-lkp@intel.com/
 
-> +	for (int m =3D 0, len =3D 128; len >=3D 1; len /=3D 2) {
+sparse warnings: (new ones prefixed by >>)
+>> drivers/crypto/ccp/sp-pci.c:573:25: sparse: sparse: symbol 'sp_pci_pm_ops' was not declared. Should it be static?
 
-Can you put "int m =3D 0" outside of the for-statement?  I know putting it
-inside saves a line or two, but 'm' is not the loop counter - which it see=
-ms
-like it should be by virtue of being listed first.
+vim +/sp_pci_pm_ops +573 drivers/crypto/ccp/sp-pci.c
 
-> +	for (int m =3D 256, len =3D 1; len < 256; len *=3D 2) {
+   572	
+ > 573	const struct dev_pm_ops sp_pci_pm_ops = {
+   574		.suspend = pm_sleep_ptr(sp_pci_suspend),
+   575		.resume = pm_sleep_ptr(sp_pci_resume),
+   576		.freeze = pm_sleep_ptr(sp_pci_suspend),
+   577		.thaw = pm_sleep_ptr(sp_pci_resume),
+   578		.poweroff = pm_sleep_ptr(sp_pci_suspend),
+   579		.restore = pm_sleep_ptr(sp_pci_restore),
+   580	};
+   581	
 
-Ditto.
-
-> +static const u8 *decode_t1_elem(struct mldsa_ring_elem *out,
-> +				const u8 *t1_encoded)
-
-I think this is (more or less) pkDecode()?  Can you put something like:
-
-  * Decode the vector 't1' from the public key.
-  * Reference: FIPS 204 Algorithm 23, sigDecode.
-
-in the comment before it?
-
-> +/*
-> + * Use @seed to generate a ring element @c with coefficients in {-1, 0,=
- 1},
-> + * exactly @tau of them nonzero.  Reference: FIPS 204 Algorithm 29, Sam=
-pleInBall
-> + */
-> +static void sample_in_ball(struct mldsa_ring_elem *c, const u8 *seed,
-> +			   size_t seed_len, int tau, struct shake_ctx *shake)
-
-Should "seed" actually be labelled "rho"?  I know a seed is what it is, bu=
-t
-the algo description has a different label - and the caller passes it ctil=
-de,
-not rho:-/.
-
-> +	u8 (*h)[N]; /* The signer's hint vector, length k */
-> +	h =3D (u8 (*)[N])&ws->z[l];
-
-C is weird sometimes.
-
-> +		/* Reduce to [0, q), then tmp =3D w'_1 =3D UseHint(h, w'_Approx) */
-
-Bracket mismatch.  "[0, q]"
-
-> +		/* w1Encode(w'_1) */
-> +		w1_pos =3D 0;
-> ...
-
-Given you put the decode functions into helpers, don't you want to do that
-with this?
-
-> +	if (memcmp(ws->ctildeprime, ctilde, params->ctilde_len) !=3D 0)
-> +		return -EBADMSG;
-
-Actually, this should return -EKEYREJECTED, not -EBADMSG.
-
-I guess you don't need to use crypto_memneq() as timing doesn't matter.
-
-The maths look okay, I think.  You can add:
-
-	Reviewed-by: David Howells <dhowells@redhat.com>
-
-David
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
