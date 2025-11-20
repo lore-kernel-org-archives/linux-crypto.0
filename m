@@ -1,55 +1,55 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49CC3624B7
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 15:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD215359FB4
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 15:13:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763651644; cv=none; b=Hpv/KOJGncWNREU7BTs1tot1/loVMEvp1wxihQTPTAaWKZplg4RWsqn2CAzKszRa0Ftzh2acjPgmtJhQ346GVy521sD6916wwWgid7zUOBrnOJLn2dhuf9+/5bzoQzlv1Pg1ovpZvqyPtQ4j1zHLGW/BVcKClz9RpIbVnHqqPC4=
+	t=1763651645; cv=none; b=iL8Py1JMt7q0NvPxZjs4e68cvASn5NSiqDmE896TxaM9xsM6WQBFkmxj7ObSirZIxdfJpuZJPwC1PUKzVk6X5qxQRYz+beQtsMFBVid8ugHZTNl1mAjmPMnFXXJe4wjTRt457i0ItVOm+i89zOebenKZHOpqs8PBDEuEenl9TCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763651644; c=relaxed/simple;
-	bh=VbJWJQZmBX4+csAoT1yUNldmDqG40I0IsN6jc/COgn4=;
+	s=arc-20240116; t=1763651645; c=relaxed/simple;
+	bh=vcgTIJAFLrmtkKi4iJO6FAjVEZE8asCuoEljUE7/+E0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uqRYXZkLDEegQcFhrKhkOrv4GYKRCVfMskM/VassKvxthptD68o6dznQ1JT+J5kc2Z1nsc4cdP/KErLyJG0L7caNucteupPxLBFP+x2pkJ2MRNNUxaLkBbwI1csb+f+dZfY8Z80MtAHImwew4pwEQSabgtfeF7J2EcOEEWgg+T8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GrdudiZa; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=ILsj/yq81ZouQNz9FiuPBxlYdGXfJ4D1ZXQOXcbkwoWia2dkM/CXkjmpO3U9OhPjpALc3Kv8pAraVHO6NTf8OmcDJMrrsyGrCFZ1jdrRqPkFU2MnnWz9cB5+rfe9KalEqwNpU1lTx6R0K3j0csKoh1kYWUKQktXaYnyv2eXxMTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vUqdG4pc; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GrdudiZa"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4779c35a66bso6902035e9.2
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 07:13:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vUqdG4pc"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-429c5c8ae3bso860648f8f.0
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 07:13:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763651628; x=1764256428; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763651620; x=1764256420; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aJMOXRb0WgY3NkQlI/hPCIKlELlXVsKWBZcrKDKyFiM=;
-        b=GrdudiZaHvxb1ceX1CbrJeUQy6v+6Dja9fYK1GVBTfp5tDyfaWLBbkziOkp+4OATq1
-         vkzOMCn6UePQO6uF7yU5m6ZnAhoKEv2rMbK+rglsDKVfZbp41FKRInaOgg7L/m4X/X71
-         Qf7xw3ntI0rHCD7XRphR/0WgM1uXvmlbL2VpvsT6Nrgu8ameafysrzxZG0JZfyyJNH1E
-         WAMMz9z+y1jAt0MlLwb5NJjxq9Dz+Un6zFFOfHmd96Vee0Z964+CrgaG8kiDlaAyoUyT
-         jAzyYckkjya33dwP+UsD4A7XOTYa0KkswBE5ypf+yGk9uFGH0UmoVdLerP9WXZx8D/m2
-         UMow==
+        bh=pcD6uieBoqcsyDkA1zkurf5hLc/pXwP1OAaVy3DV1GQ=;
+        b=vUqdG4pcuLJBbByLZXUcGZYtTzHnSZelityX4UBduOrj1B2zIMmqP7K80hgefZpZz0
+         OeFPhzl/NgFDJLPj0AiWyN0ubn8oHSJDUC60TIK8hLVjf+H2bdJ7uuwnN0OU8Mg7Uprd
+         KK2JQ90csZY3t+lbwUDVXUGcfhg6a3TsrDLZxuq00ERiXP469NuPO0WuFf8JEsHnZfit
+         /ypZVErtt8T8+NCBuFQBwclr6VwEMSbOGH81+vhgn783Yc8/vpHRxWJ/aV4iMTHChx91
+         76qHw1EvklctJbHoZOwNgwk9DBMgYz4AD20bU4qWGnPOhkIAZtvXk2mxpc42YAJUscSN
+         gJcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763651628; x=1764256428;
+        d=1e100.net; s=20230601; t=1763651620; x=1764256420;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aJMOXRb0WgY3NkQlI/hPCIKlELlXVsKWBZcrKDKyFiM=;
-        b=MIeredU1ZLGH0t+Ry4pBy9O5ZH4YJjj2oKdDNW+qbwgzGZw+fiHTiSd+1tVsTp6HVR
-         PDo693sa1C+abhRBPrtOsc4xE/y/e27jVu2tncDeI7j0Lx8hcpu1ews+5QEoLyvJEgY2
-         NL8XpRqICK8Kfo3xnO+Pe3uY9Mso/96oJqCESs0sE+bUk5eiwBy+7szEgF8UvbEuhyD6
-         UvayQd99fTah7dpxyqxMOcgomLaJqfn+fIPM8NvTSiCVWUFajfs12o0MwfdDg6awFg8x
-         pyFo7T1BW2qC24eK1wRPvCuqUkuZD7g+/pgSncCwYzdyqUF0ol2R7wg9oHUXdVb+m9XT
-         TguA==
-X-Forwarded-Encrypted: i=1; AJvYcCWIjHq/8iZY9YTNXW2FsmHu3hPu3NqojB5UsYDVP5PQ6KRCjv+lpkUe9JTmsiutVPMiEY7X7KmUqSry7Bc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTeylfoI/bR0TydKrfe8OxpynryNLjdgbtCX2BXIjwXhTTTsov
-	NNswcN8lRBGpS74oKy+PEMRL3wmM9RhJ6CQT6mmPNjcVvz4TNQjIH4toOIFkEw5JiqypzDvlJXB
-	DNw==
-X-Google-Smtp-Source: AGHT+IFOmV1c9L2LvdRR9E5a5WseLoVuoNabSykiYJeUUPoV60hKtqkuL5rUoQ3b9gFsGSgiTWOm153hKQ==
-X-Received: from wmpi31.prod.google.com ([2002:a05:600c:4b1f:b0:477:55c0:6392])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4f49:b0:477:7991:5d1e
- with SMTP id 5b1f17b1804b1-477b8a9fd96mr32224715e9.25.1763651627745; Thu, 20
- Nov 2025 07:13:47 -0800 (PST)
-Date: Thu, 20 Nov 2025 16:09:55 +0100
+        bh=pcD6uieBoqcsyDkA1zkurf5hLc/pXwP1OAaVy3DV1GQ=;
+        b=kjf1FW4P1kWBRCPnLAX8nuChaWnCTYwAoLeznRqzhBHNLCoCJMAvDNlyOXzOaU3cSx
+         E1bU7yGjbsilR4wBBZbCL3+SeHOXrwMJeK3K8GV2YA1rLWSW2hXgIy9ymverBfHPmpbx
+         0WPekGvKYkNXhYm4IkwnWBb3IgU3Ml/rh6dRZXnWoGGZUd4eUqtXscQh2jtfu/8Mu3Bl
+         V3y3THS252tsUUIY22ovMO4IOiYrIlBigCtrzsD4VYOqON9biXdhpW6ryDG8tSv/Sj3i
+         UhyW+nrheo/dQFzdnSxdq8IOB86w7KLjsC62QhpKMRYKvnNL8HX+XrreUlfqnkJ2hLk1
+         UzUg==
+X-Forwarded-Encrypted: i=1; AJvYcCVSQu3d1md9NVt2cgs9pZXR22RsNPE4aN9oQB9+DK2/gzWMM6D2bpZNZBo1SR22n9hqcp9TPriZQs4llvY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/p4CzPvqhCuccKMiCWF5FLCH0NDSZb/Ay0OsBIz7FuBHrdye+
+	0wQqJC4P58J6Crky/ks3/nTpltWuyZkNfdWthkKSM7bAk5obbN3m/5kEfVc/v38UkdkNqwEjsqt
+	wmw==
+X-Google-Smtp-Source: AGHT+IH2phiGswjRxahv1kYcFFnsn5EpFBG5GTvKLIn0Gw3adW5QmNBoQt0gQRrs7c/SRmL4IrpsGmOf6A==
+X-Received: from wrwn2.prod.google.com ([2002:a5d:67c2:0:b0:42b:349a:10f6])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2002:b0:42b:3746:3b84
+ with SMTP id ffacd0b85a97d-42cb9a6acd7mr3408354f8f.55.1763651619825; Thu, 20
+ Nov 2025 07:13:39 -0800 (PST)
+Date: Thu, 20 Nov 2025 16:09:53 +0100
 In-Reply-To: <20251120151033.3840508-7-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251120145835.3833031-2-elver@google.com> <20251120151033.3840508-7-elver@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251120151033.3840508-31-elver@google.com>
-Subject: [PATCH v4 30/35] stackdepot: Enable context analysis
+Message-ID: <20251120151033.3840508-29-elver@google.com>
+Subject: [PATCH v4 28/35] kcov: Enable context analysis
 From: Marco Elver <elver@google.com>
 To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, 
 	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>
@@ -87,126 +87,175 @@ Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenry
 	linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Enable context analysis for stackdepot.
+Enable context analysis for the KCOV subsystem.
 
 Signed-off-by: Marco Elver <elver@google.com>
 ---
 v4:
+* Fix new temporary variable type.
 * Rename capability -> context analysis.
 
 v2:
 * Remove disable/enable_context_analysis() around headers.
 ---
- lib/Makefile     |  1 +
- lib/stackdepot.c | 20 ++++++++++++++------
- 2 files changed, 15 insertions(+), 6 deletions(-)
+ kernel/Makefile |  2 ++
+ kernel/kcov.c   | 36 +++++++++++++++++++++++++-----------
+ 2 files changed, 27 insertions(+), 11 deletions(-)
 
-diff --git a/lib/Makefile b/lib/Makefile
-index 59ed5f881bcb..2e983f37d173 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -248,6 +248,7 @@ obj-$(CONFIG_POLYNOMIAL) += polynomial.o
- # Prevent the compiler from calling builtins like memcmp() or bcmp() from this
- # file.
- CFLAGS_stackdepot.o += -fno-builtin
-+CONTEXT_ANALYSIS_stackdepot.o := y
- obj-$(CONFIG_STACKDEPOT) += stackdepot.o
- KASAN_SANITIZE_stackdepot.o := n
- # In particular, instrumenting stackdepot.c with KMSAN will result in infinite
-diff --git a/lib/stackdepot.c b/lib/stackdepot.c
-index de0b0025af2b..166f50ad8391 100644
---- a/lib/stackdepot.c
-+++ b/lib/stackdepot.c
-@@ -61,18 +61,18 @@ static unsigned int stack_bucket_number_order;
- /* Hash mask for indexing the table. */
- static unsigned int stack_hash_mask;
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 9fe722305c9b..82d49723904d 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -43,6 +43,8 @@ KASAN_SANITIZE_kcov.o := n
+ KCSAN_SANITIZE_kcov.o := n
+ UBSAN_SANITIZE_kcov.o := n
+ KMSAN_SANITIZE_kcov.o := n
++
++CONTEXT_ANALYSIS_kcov.o := y
+ CFLAGS_kcov.o := $(call cc-option, -fno-conserve-stack) -fno-stack-protector
  
-+/* The lock must be held when performing pool or freelist modifications. */
-+static DEFINE_RAW_SPINLOCK(pool_lock);
- /* Array of memory regions that store stack records. */
--static void **stack_pools;
-+static void **stack_pools __pt_guarded_by(&pool_lock);
- /* Newly allocated pool that is not yet added to stack_pools. */
- static void *new_pool;
- /* Number of pools in stack_pools. */
- static int pools_num;
- /* Offset to the unused space in the currently used pool. */
--static size_t pool_offset = DEPOT_POOL_SIZE;
-+static size_t pool_offset __guarded_by(&pool_lock) = DEPOT_POOL_SIZE;
- /* Freelist of stack records within stack_pools. */
--static LIST_HEAD(free_stacks);
--/* The lock must be held when performing pool or freelist modifications. */
--static DEFINE_RAW_SPINLOCK(pool_lock);
-+static __guarded_by(&pool_lock) LIST_HEAD(free_stacks);
- 
- /* Statistics counters for debugfs. */
- enum depot_counter_id {
-@@ -291,6 +291,7 @@ EXPORT_SYMBOL_GPL(stack_depot_init);
-  * Initializes new stack pool, and updates the list of pools.
-  */
- static bool depot_init_pool(void **prealloc)
-+	__must_hold(&pool_lock)
- {
- 	lockdep_assert_held(&pool_lock);
- 
-@@ -338,6 +339,7 @@ static bool depot_init_pool(void **prealloc)
- 
- /* Keeps the preallocated memory to be used for a new stack depot pool. */
- static void depot_keep_new_pool(void **prealloc)
-+	__must_hold(&pool_lock)
- {
- 	lockdep_assert_held(&pool_lock);
- 
-@@ -357,6 +359,7 @@ static void depot_keep_new_pool(void **prealloc)
-  * the current pre-allocation.
-  */
- static struct stack_record *depot_pop_free_pool(void **prealloc, size_t size)
-+	__must_hold(&pool_lock)
- {
- 	struct stack_record *stack;
- 	void *current_pool;
-@@ -391,6 +394,7 @@ static struct stack_record *depot_pop_free_pool(void **prealloc, size_t size)
- 
- /* Try to find next free usable entry from the freelist. */
- static struct stack_record *depot_pop_free(void)
-+	__must_hold(&pool_lock)
- {
- 	struct stack_record *stack;
- 
-@@ -428,6 +432,7 @@ static inline size_t depot_stack_record_size(struct stack_record *s, unsigned in
- /* Allocates a new stack in a stack depot pool. */
- static struct stack_record *
- depot_alloc_stack(unsigned long *entries, unsigned int nr_entries, u32 hash, depot_flags_t flags, void **prealloc)
-+	__must_hold(&pool_lock)
- {
- 	struct stack_record *stack = NULL;
- 	size_t record_size;
-@@ -486,6 +491,7 @@ depot_alloc_stack(unsigned long *entries, unsigned int nr_entries, u32 hash, dep
+ obj-y += sched/
+diff --git a/kernel/kcov.c b/kernel/kcov.c
+index 6563141f5de9..6cbc6e2d8aee 100644
+--- a/kernel/kcov.c
++++ b/kernel/kcov.c
+@@ -55,13 +55,13 @@ struct kcov {
+ 	refcount_t		refcount;
+ 	/* The lock protects mode, size, area and t. */
+ 	spinlock_t		lock;
+-	enum kcov_mode		mode;
++	enum kcov_mode		mode __guarded_by(&lock);
+ 	/* Size of arena (in long's). */
+-	unsigned int		size;
++	unsigned int		size __guarded_by(&lock);
+ 	/* Coverage buffer shared with user space. */
+-	void			*area;
++	void			*area __guarded_by(&lock);
+ 	/* Task for which we collect coverage, or NULL. */
+-	struct task_struct	*t;
++	struct task_struct	*t __guarded_by(&lock);
+ 	/* Collecting coverage from remote (background) threads. */
+ 	bool			remote;
+ 	/* Size of remote area (in long's). */
+@@ -391,6 +391,7 @@ void kcov_task_init(struct task_struct *t)
  }
  
- static struct stack_record *depot_fetch_stack(depot_stack_handle_t handle)
-+	__must_not_hold(&pool_lock)
+ static void kcov_reset(struct kcov *kcov)
++	__must_hold(&kcov->lock)
  {
- 	const int pools_num_cached = READ_ONCE(pools_num);
- 	union handle_parts parts = { .handle = handle };
-@@ -502,7 +508,8 @@ static struct stack_record *depot_fetch_stack(depot_stack_handle_t handle)
- 		return NULL;
+ 	kcov->t = NULL;
+ 	kcov->mode = KCOV_MODE_INIT;
+@@ -400,6 +401,7 @@ static void kcov_reset(struct kcov *kcov)
+ }
+ 
+ static void kcov_remote_reset(struct kcov *kcov)
++	__must_hold(&kcov->lock)
+ {
+ 	int bkt;
+ 	struct kcov_remote *remote;
+@@ -419,6 +421,7 @@ static void kcov_remote_reset(struct kcov *kcov)
+ }
+ 
+ static void kcov_disable(struct task_struct *t, struct kcov *kcov)
++	__must_hold(&kcov->lock)
+ {
+ 	kcov_task_reset(t);
+ 	if (kcov->remote)
+@@ -435,8 +438,11 @@ static void kcov_get(struct kcov *kcov)
+ static void kcov_put(struct kcov *kcov)
+ {
+ 	if (refcount_dec_and_test(&kcov->refcount)) {
+-		kcov_remote_reset(kcov);
+-		vfree(kcov->area);
++		/* Context-safety: no references left, object being destroyed. */
++		context_unsafe(
++			kcov_remote_reset(kcov);
++			vfree(kcov->area);
++		);
+ 		kfree(kcov);
  	}
- 
--	pool = stack_pools[pool_index];
-+	/* @pool_index either valid, or user passed in corrupted value. */
-+	pool = context_unsafe(stack_pools[pool_index]);
- 	if (WARN_ON(!pool))
- 		return NULL;
- 
-@@ -515,6 +522,7 @@ static struct stack_record *depot_fetch_stack(depot_stack_handle_t handle)
- 
- /* Links stack into the freelist. */
- static void depot_free_stack(struct stack_record *stack)
-+	__must_not_hold(&pool_lock)
- {
+ }
+@@ -491,6 +497,7 @@ static int kcov_mmap(struct file *filep, struct vm_area_struct *vma)
+ 	unsigned long size, off;
+ 	struct page *page;
  	unsigned long flags;
++	void *area;
  
+ 	spin_lock_irqsave(&kcov->lock, flags);
+ 	size = kcov->size * sizeof(unsigned long);
+@@ -499,10 +506,11 @@ static int kcov_mmap(struct file *filep, struct vm_area_struct *vma)
+ 		res = -EINVAL;
+ 		goto exit;
+ 	}
++	area = kcov->area;
+ 	spin_unlock_irqrestore(&kcov->lock, flags);
+ 	vm_flags_set(vma, VM_DONTEXPAND);
+ 	for (off = 0; off < size; off += PAGE_SIZE) {
+-		page = vmalloc_to_page(kcov->area + off);
++		page = vmalloc_to_page(area + off);
+ 		res = vm_insert_page(vma, vma->vm_start + off, page);
+ 		if (res) {
+ 			pr_warn_once("kcov: vm_insert_page() failed\n");
+@@ -522,10 +530,10 @@ static int kcov_open(struct inode *inode, struct file *filep)
+ 	kcov = kzalloc(sizeof(*kcov), GFP_KERNEL);
+ 	if (!kcov)
+ 		return -ENOMEM;
++	spin_lock_init(&kcov->lock);
+ 	kcov->mode = KCOV_MODE_DISABLED;
+ 	kcov->sequence = 1;
+ 	refcount_set(&kcov->refcount, 1);
+-	spin_lock_init(&kcov->lock);
+ 	filep->private_data = kcov;
+ 	return nonseekable_open(inode, filep);
+ }
+@@ -556,6 +564,7 @@ static int kcov_get_mode(unsigned long arg)
+  * vmalloc fault handling path is instrumented.
+  */
+ static void kcov_fault_in_area(struct kcov *kcov)
++	__must_hold(&kcov->lock)
+ {
+ 	unsigned long stride = PAGE_SIZE / sizeof(unsigned long);
+ 	unsigned long *area = kcov->area;
+@@ -584,6 +593,7 @@ static inline bool kcov_check_handle(u64 handle, bool common_valid,
+ 
+ static int kcov_ioctl_locked(struct kcov *kcov, unsigned int cmd,
+ 			     unsigned long arg)
++	__must_hold(&kcov->lock)
+ {
+ 	struct task_struct *t;
+ 	unsigned long flags, unused;
+@@ -814,6 +824,7 @@ static inline bool kcov_mode_enabled(unsigned int mode)
+ }
+ 
+ static void kcov_remote_softirq_start(struct task_struct *t)
++	__must_hold(&kcov_percpu_data.lock)
+ {
+ 	struct kcov_percpu_data *data = this_cpu_ptr(&kcov_percpu_data);
+ 	unsigned int mode;
+@@ -831,6 +842,7 @@ static void kcov_remote_softirq_start(struct task_struct *t)
+ }
+ 
+ static void kcov_remote_softirq_stop(struct task_struct *t)
++	__must_hold(&kcov_percpu_data.lock)
+ {
+ 	struct kcov_percpu_data *data = this_cpu_ptr(&kcov_percpu_data);
+ 
+@@ -896,10 +908,12 @@ void kcov_remote_start(u64 handle)
+ 	/* Put in kcov_remote_stop(). */
+ 	kcov_get(kcov);
+ 	/*
+-	 * Read kcov fields before unlock to prevent races with
+-	 * KCOV_DISABLE / kcov_remote_reset().
++	 * Read kcov fields before unlocking kcov_remote_lock to prevent races
++	 * with KCOV_DISABLE and kcov_remote_reset(); cannot acquire kcov->lock
++	 * here, because it might lead to deadlock given kcov_remote_lock is
++	 * acquired _after_ kcov->lock elsewhere.
+ 	 */
+-	mode = kcov->mode;
++	mode = context_unsafe(kcov->mode);
+ 	sequence = kcov->sequence;
+ 	if (in_task()) {
+ 		size = kcov->remote_size;
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
