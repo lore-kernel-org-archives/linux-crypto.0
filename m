@@ -1,55 +1,55 @@
 Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2A8365A14
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 15:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49CC3624B7
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 15:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763651640; cv=none; b=HxTewuz53PTDzc1qeO2w5AWembEZEMiQfRU/Oy4nBmAHfUFUhB3/4lRT1Wu/QmkCcY+rYg67ujn1nF8C1TBeJiDV4Cysxfi6y2dh+XufkdYnv0l4PRmTGMCel33EaVsrrsYISmeswqPc5kxEt1hmmmnzOxO+PYg0tptQCLLmf5I=
+	t=1763651644; cv=none; b=Hpv/KOJGncWNREU7BTs1tot1/loVMEvp1wxihQTPTAaWKZplg4RWsqn2CAzKszRa0Ftzh2acjPgmtJhQ346GVy521sD6916wwWgid7zUOBrnOJLn2dhuf9+/5bzoQzlv1Pg1ovpZvqyPtQ4j1zHLGW/BVcKClz9RpIbVnHqqPC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763651640; c=relaxed/simple;
-	bh=JSFE6OXplsVQRasUjLyJp87wPLoBhJo5boc6e5TlRPY=;
+	s=arc-20240116; t=1763651644; c=relaxed/simple;
+	bh=VbJWJQZmBX4+csAoT1yUNldmDqG40I0IsN6jc/COgn4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Do7Q3/8V5Dxflqf7cIR7RNXm3z5uYQh63uOK9LUW06zOiobpj3LAyp30FaP2B3B38JUnHl99wJfKtgzc/F4H4z9wLyijarQESDw+/adNwzvSrpiIuixsznU5UN3oWcPTdVT4FrsTI/3zZgX0BZ5RHkfJW5XgONGaLpGjG1op/1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iCLMPfCc; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=uqRYXZkLDEegQcFhrKhkOrv4GYKRCVfMskM/VassKvxthptD68o6dznQ1JT+J5kc2Z1nsc4cdP/KErLyJG0L7caNucteupPxLBFP+x2pkJ2MRNNUxaLkBbwI1csb+f+dZfY8Z80MtAHImwew4pwEQSabgtfeF7J2EcOEEWgg+T8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GrdudiZa; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iCLMPfCc"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4779d8fd4ecso4054635e9.1
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 07:13:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GrdudiZa"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4779c35a66bso6902035e9.2
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 07:13:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763651613; x=1764256413; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763651628; x=1764256428; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xNvl5AadBnBbkNqIZ5ePr/ep+DGb1qTLi02EcnmaTpQ=;
-        b=iCLMPfCc7jWhEpnYhobvI2CKA2SElpM9LR0+higIlNVPix1drSCs++UbXykawgetXH
-         UiK2Mlropxx9wOJeRRbYAassEHRQmIuimGssASlfFCMIHugwhSwj3b/fCzNmiq9VN+nt
-         nfzqFiywxCAnOPudXpRx+zUking//m8pTDAm28RHuO9pbcxIIYZA7l9QX4pAUeSVZbPP
-         eh6Nz4aythN+TVoBhg44bsA9fQEmI3pG42o6MSQ0gaXXDnwhtpTIkNZOQZ7qHP+DY1pe
-         pc31FewAdejDaVASt7E7NmYup1vOHoofrZHC3welUeiAxyB3/Q+FX0BPWg8UOt8wyTVB
-         +5Iw==
+        bh=aJMOXRb0WgY3NkQlI/hPCIKlELlXVsKWBZcrKDKyFiM=;
+        b=GrdudiZaHvxb1ceX1CbrJeUQy6v+6Dja9fYK1GVBTfp5tDyfaWLBbkziOkp+4OATq1
+         vkzOMCn6UePQO6uF7yU5m6ZnAhoKEv2rMbK+rglsDKVfZbp41FKRInaOgg7L/m4X/X71
+         Qf7xw3ntI0rHCD7XRphR/0WgM1uXvmlbL2VpvsT6Nrgu8ameafysrzxZG0JZfyyJNH1E
+         WAMMz9z+y1jAt0MlLwb5NJjxq9Dz+Un6zFFOfHmd96Vee0Z964+CrgaG8kiDlaAyoUyT
+         jAzyYckkjya33dwP+UsD4A7XOTYa0KkswBE5ypf+yGk9uFGH0UmoVdLerP9WXZx8D/m2
+         UMow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763651613; x=1764256413;
+        d=1e100.net; s=20230601; t=1763651628; x=1764256428;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xNvl5AadBnBbkNqIZ5ePr/ep+DGb1qTLi02EcnmaTpQ=;
-        b=BN6OhSCBgtYcRHERHUpfzd/0fpnb/IExM4JTFofsF7VaWHTosmvFxXSQuhas+NgsSj
-         ft7Qij8C67WibubaaBXz7vlqYopcQtCokxg1YVCCCiex/tMwx/TUIEVvL5Ctl7EgZlnk
-         1Ejjtgj7ipuJa2qPqr6iqvyHiVA23uCxoNICnCOYP0UUPUAXXLlABTNJceR5xrIOZaKr
-         idHoQJb2GRpNvIrIWIIMMfLRUMQm2yfsEt5vOpNp6llycrPbAkJRcCkpll73ubiPwA9q
-         oat4EIiKHGG3DNBQndycDPLGf63D/NRhsPyiz4OOGqmyLtQZDz4wIc5AdFRiwNXmqx39
-         CKaA==
-X-Forwarded-Encrypted: i=1; AJvYcCVVErE/B5/e71pWY5fi2i5MKMyuupzvdbGwvNPmvJ2vN6KEcgMsImxf2zGGOEBSM26dci3SVxVLbRhzs2g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxmxux1qb+vHf2ldqWE6jCPY8h20Ta2ixXXQJJBi0xzowjp3Nb6
-	yp+h3HmXi++DqEfp7CV3cdhKWFKl6A8Noujcq22hliFkPFEmecnhs2NgxT5mrBlV7fscs9kvrJ+
-	pRw==
-X-Google-Smtp-Source: AGHT+IF9W56E3BCf4ycfyNzV0Jbt7zmYcg646z2GlS6yDnrRg6LpKFxf4hnN1dp2GqjQ6ITkpBqUZJJJqw==
-X-Received: from wmbbd8.prod.google.com ([2002:a05:600c:1f08:b0:470:fd92:351d])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:1516:b0:477:14ba:28da
- with SMTP id 5b1f17b1804b1-477b9ea8f78mr18741385e9.5.1763651612613; Thu, 20
- Nov 2025 07:13:32 -0800 (PST)
-Date: Thu, 20 Nov 2025 16:09:51 +0100
+        bh=aJMOXRb0WgY3NkQlI/hPCIKlELlXVsKWBZcrKDKyFiM=;
+        b=MIeredU1ZLGH0t+Ry4pBy9O5ZH4YJjj2oKdDNW+qbwgzGZw+fiHTiSd+1tVsTp6HVR
+         PDo693sa1C+abhRBPrtOsc4xE/y/e27jVu2tncDeI7j0Lx8hcpu1ews+5QEoLyvJEgY2
+         NL8XpRqICK8Kfo3xnO+Pe3uY9Mso/96oJqCESs0sE+bUk5eiwBy+7szEgF8UvbEuhyD6
+         UvayQd99fTah7dpxyqxMOcgomLaJqfn+fIPM8NvTSiCVWUFajfs12o0MwfdDg6awFg8x
+         pyFo7T1BW2qC24eK1wRPvCuqUkuZD7g+/pgSncCwYzdyqUF0ol2R7wg9oHUXdVb+m9XT
+         TguA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIjHq/8iZY9YTNXW2FsmHu3hPu3NqojB5UsYDVP5PQ6KRCjv+lpkUe9JTmsiutVPMiEY7X7KmUqSry7Bc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTeylfoI/bR0TydKrfe8OxpynryNLjdgbtCX2BXIjwXhTTTsov
+	NNswcN8lRBGpS74oKy+PEMRL3wmM9RhJ6CQT6mmPNjcVvz4TNQjIH4toOIFkEw5JiqypzDvlJXB
+	DNw==
+X-Google-Smtp-Source: AGHT+IFOmV1c9L2LvdRR9E5a5WseLoVuoNabSykiYJeUUPoV60hKtqkuL5rUoQ3b9gFsGSgiTWOm153hKQ==
+X-Received: from wmpi31.prod.google.com ([2002:a05:600c:4b1f:b0:477:55c0:6392])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4f49:b0:477:7991:5d1e
+ with SMTP id 5b1f17b1804b1-477b8a9fd96mr32224715e9.25.1763651627745; Thu, 20
+ Nov 2025 07:13:47 -0800 (PST)
+Date: Thu, 20 Nov 2025 16:09:55 +0100
 In-Reply-To: <20251120151033.3840508-7-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251120145835.3833031-2-elver@google.com> <20251120151033.3840508-7-elver@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251120151033.3840508-27-elver@google.com>
-Subject: [PATCH v4 26/35] MAINTAINERS: Add entry for Context Analysis
+Message-ID: <20251120151033.3840508-31-elver@google.com>
+Subject: [PATCH v4 30/35] stackdepot: Enable context analysis
 From: Marco Elver <elver@google.com>
 To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, 
 	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>
@@ -87,39 +87,126 @@ Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenry
 	linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Add entry for all new files added for Clang's context analysis.
+Enable context analysis for stackdepot.
 
 Signed-off-by: Marco Elver <elver@google.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
 v4:
 * Rename capability -> context analysis.
----
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e64b94e6b5a9..0445478f74c7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -6029,6 +6029,17 @@ M:	Nelson Escobar <neescoba@cisco.com>
- S:	Supported
- F:	drivers/infiniband/hw/usnic/
+v2:
+* Remove disable/enable_context_analysis() around headers.
+---
+ lib/Makefile     |  1 +
+ lib/stackdepot.c | 20 ++++++++++++++------
+ 2 files changed, 15 insertions(+), 6 deletions(-)
+
+diff --git a/lib/Makefile b/lib/Makefile
+index 59ed5f881bcb..2e983f37d173 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -248,6 +248,7 @@ obj-$(CONFIG_POLYNOMIAL) += polynomial.o
+ # Prevent the compiler from calling builtins like memcmp() or bcmp() from this
+ # file.
+ CFLAGS_stackdepot.o += -fno-builtin
++CONTEXT_ANALYSIS_stackdepot.o := y
+ obj-$(CONFIG_STACKDEPOT) += stackdepot.o
+ KASAN_SANITIZE_stackdepot.o := n
+ # In particular, instrumenting stackdepot.c with KMSAN will result in infinite
+diff --git a/lib/stackdepot.c b/lib/stackdepot.c
+index de0b0025af2b..166f50ad8391 100644
+--- a/lib/stackdepot.c
++++ b/lib/stackdepot.c
+@@ -61,18 +61,18 @@ static unsigned int stack_bucket_number_order;
+ /* Hash mask for indexing the table. */
+ static unsigned int stack_hash_mask;
  
-+CLANG CONTEXT ANALYSIS
-+M:	Marco Elver <elver@google.com>
-+R:	Bart Van Assche <bvanassche@acm.org>
-+L:	llvm@lists.linux.dev
-+S:	Maintained
-+F:	Documentation/dev-tools/context-analysis.rst
-+F:	include/linux/compiler-context-analysis.h
-+F:	lib/test_context-analysis.c
-+F:	scripts/Makefile.context-analysis
-+F:	scripts/context-analysis-suppression.txt
-+
- CLANG CONTROL FLOW INTEGRITY SUPPORT
- M:	Sami Tolvanen <samitolvanen@google.com>
- M:	Kees Cook <kees@kernel.org>
++/* The lock must be held when performing pool or freelist modifications. */
++static DEFINE_RAW_SPINLOCK(pool_lock);
+ /* Array of memory regions that store stack records. */
+-static void **stack_pools;
++static void **stack_pools __pt_guarded_by(&pool_lock);
+ /* Newly allocated pool that is not yet added to stack_pools. */
+ static void *new_pool;
+ /* Number of pools in stack_pools. */
+ static int pools_num;
+ /* Offset to the unused space in the currently used pool. */
+-static size_t pool_offset = DEPOT_POOL_SIZE;
++static size_t pool_offset __guarded_by(&pool_lock) = DEPOT_POOL_SIZE;
+ /* Freelist of stack records within stack_pools. */
+-static LIST_HEAD(free_stacks);
+-/* The lock must be held when performing pool or freelist modifications. */
+-static DEFINE_RAW_SPINLOCK(pool_lock);
++static __guarded_by(&pool_lock) LIST_HEAD(free_stacks);
+ 
+ /* Statistics counters for debugfs. */
+ enum depot_counter_id {
+@@ -291,6 +291,7 @@ EXPORT_SYMBOL_GPL(stack_depot_init);
+  * Initializes new stack pool, and updates the list of pools.
+  */
+ static bool depot_init_pool(void **prealloc)
++	__must_hold(&pool_lock)
+ {
+ 	lockdep_assert_held(&pool_lock);
+ 
+@@ -338,6 +339,7 @@ static bool depot_init_pool(void **prealloc)
+ 
+ /* Keeps the preallocated memory to be used for a new stack depot pool. */
+ static void depot_keep_new_pool(void **prealloc)
++	__must_hold(&pool_lock)
+ {
+ 	lockdep_assert_held(&pool_lock);
+ 
+@@ -357,6 +359,7 @@ static void depot_keep_new_pool(void **prealloc)
+  * the current pre-allocation.
+  */
+ static struct stack_record *depot_pop_free_pool(void **prealloc, size_t size)
++	__must_hold(&pool_lock)
+ {
+ 	struct stack_record *stack;
+ 	void *current_pool;
+@@ -391,6 +394,7 @@ static struct stack_record *depot_pop_free_pool(void **prealloc, size_t size)
+ 
+ /* Try to find next free usable entry from the freelist. */
+ static struct stack_record *depot_pop_free(void)
++	__must_hold(&pool_lock)
+ {
+ 	struct stack_record *stack;
+ 
+@@ -428,6 +432,7 @@ static inline size_t depot_stack_record_size(struct stack_record *s, unsigned in
+ /* Allocates a new stack in a stack depot pool. */
+ static struct stack_record *
+ depot_alloc_stack(unsigned long *entries, unsigned int nr_entries, u32 hash, depot_flags_t flags, void **prealloc)
++	__must_hold(&pool_lock)
+ {
+ 	struct stack_record *stack = NULL;
+ 	size_t record_size;
+@@ -486,6 +491,7 @@ depot_alloc_stack(unsigned long *entries, unsigned int nr_entries, u32 hash, dep
+ }
+ 
+ static struct stack_record *depot_fetch_stack(depot_stack_handle_t handle)
++	__must_not_hold(&pool_lock)
+ {
+ 	const int pools_num_cached = READ_ONCE(pools_num);
+ 	union handle_parts parts = { .handle = handle };
+@@ -502,7 +508,8 @@ static struct stack_record *depot_fetch_stack(depot_stack_handle_t handle)
+ 		return NULL;
+ 	}
+ 
+-	pool = stack_pools[pool_index];
++	/* @pool_index either valid, or user passed in corrupted value. */
++	pool = context_unsafe(stack_pools[pool_index]);
+ 	if (WARN_ON(!pool))
+ 		return NULL;
+ 
+@@ -515,6 +522,7 @@ static struct stack_record *depot_fetch_stack(depot_stack_handle_t handle)
+ 
+ /* Links stack into the freelist. */
+ static void depot_free_stack(struct stack_record *stack)
++	__must_not_hold(&pool_lock)
+ {
+ 	unsigned long flags;
+ 
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
