@@ -1,251 +1,335 @@
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A3B135A53;
-	Thu, 20 Nov 2025 02:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.143.35
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763605793; cv=fail; b=CZOXb6MN9GKwZhIFjN0IMeSnGUsCBEa1V5W74PB429aBuBWQB1Y1cb58NetYzEou9NYzfoVmEyvCAGjvN6oOresHo4V+Kfn/R0ld8J5L4u6/xFt1Mlo+Fk8BvAvtyMD+PKUwYw0L5stTqrZ040ave0z2ejdL9u/4Y5V/zocH+Zc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763605793; c=relaxed/simple;
-	bh=JbOxmMBUr6qr+Dsu68aNBBPIZmcmPl2ZUaaW/Q9r+iE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tDPsqTcqb+PBVXmZXVYlHDk8ZdOY9Rn1lj3C/aF/gpwLou3F944UY/Itt6p1YZQ+y/zb7ZMb9y41ggBqkjYnsZ12rQN1+P7+tzALEUIXpeQyvln52RuB109Cx3Y6YzoAuDVog4GbRBDsvttz08lK+oj4EJELs/Y+tc3NHsnGfX0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=OaxvIi98; arc=fail smtp.client-ip=148.163.143.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E242DECD2;
+	Thu, 20 Nov 2025 06:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763619911; cv=none; b=HnS/TNNupiC3Na6zEfRyViqwxQ1gM+86bo7LAC/yTO56posS0V6ACEYyLTv8zx1nlLT2Rt5/K9SHvmTap7dQLpZyjKrlic2+MlM7Gggn0su1kMirulofWBw6k/pmej97yjzOwq6b5PeHfYYVQHALB2y9KRKbWHqENCFSJR1Vdh8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763619911; c=relaxed/simple;
+	bh=24/4EwMfY2f7465Cyam41CVmzrHz5CcrlMxrLmS0Xns=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ecmVycFLWir9iLK7DfRPHlyW1LDhD5PZpZpzFNzhvOcdwHqn4sZ3k5fmzVH16LbY9sGVcaywIM3/7cz2befyM7sZes2mqeFqS8KMGojaXF9hR6ZqZ/OOAOJtfThTr3huLIWqsmuxHw7I56sVZS4aCh60+zfcQxdPzaZM4XVBok8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Yg1g4UIR; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="OaxvIi98"
-Received: from pps.filterd (m0148664.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AJHb38O010882;
-	Thu, 20 Nov 2025 02:29:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps0720; bh=Pk
-	2Xk9SSx/fIQtY3S3ANEb53BQE4SIfszsiMqRjDkxE=; b=OaxvIi98Qememxv0iA
-	e6zmgrUjCgH1LC3Etpw6MIXCa7AlzBRIQtf2id4HHsb/B1JgiMJl29r8iOSCHvlf
-	4wPPVRfqA6mv5ThKU0Hd3dQzFdDDFbk1x/puw26Uv11KXFOXcWEUNteKqpLfc7V1
-	+DaBqHM5h+XBOUCR2qZ60J+fH3hH/i9aoSJQ1ra7AD1s+2fHrn9N6cS4cQKin9nM
-	naDCvundRu7JJF4FGSIfdJ5gmQj/+dH3Ciuzfd1r8zsCQpV4dnAiMwp8TFlPrJvn
-	5KVd+6LTcQx4CL2cuVh/Km37lC/mKBHWdGKvN8KreU6o+T9tJuJXyCBMxIsTTrX3
-	Ii6w==
-Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 4ahg21ensw-1
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Yg1g4UIR"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AK64IrG3925993;
+	Thu, 20 Nov 2025 06:25:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=hyVxV7yR/QWeZeAzmOTtMw
+	ls/oLG4k6t5fu24Py0I5k=; b=Yg1g4UIREHyyDXx7Zigb0hsvQ7rGw8loK21nuU
+	CMqDsAuSD3BlsmxD8XNQgHd6iqvjy4igMGkD9ycOgxlRkrhlUgfCdsCMOGgy1r3k
+	0qtE0M6x/ISGXocjRMziPwoN/U2j7mrJyNPPQdTlG/9AOIlSe6kXBnUl8fiImgp1
+	jd3UdvGH4670Ma5t8F+wOPtsTMGDqI5miEY9rU2AZnyx13Cf+rgIwRwvXTs+el9q
+	8TYrKaifjCkLM14KEr4Ul5/HHiVuMO7SWVoRaLHFTpLW7FxXgYVa9xm2TxTLuTYR
+	xYtHAI8irDWoK/QjAxg7dOLzIs8WxIgvXLOTLSShXS4gq0bw==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ahwd781nh-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Nov 2025 02:29:15 +0000 (GMT)
-Received: from p1wg14926.americas.hpqcorp.net (unknown [10.119.18.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 6747F800254;
-	Thu, 20 Nov 2025 02:29:13 +0000 (UTC)
-Received: from p1wg14926.americas.hpqcorp.net (10.119.18.115) by
- p1wg14926.americas.hpqcorp.net (10.119.18.115) with Microsoft SMTP Server
+	Thu, 20 Nov 2025 06:25:05 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 5AK6P4Y1012817
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 20 Nov 2025 06:25:04 GMT
+Received: from hu-utiwari-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 19 Nov 2025 14:29:12 -1200
-Received: from P1WG14918.americas.hpqcorp.net (16.230.19.121) by
- p1wg14926.americas.hpqcorp.net (10.119.18.115) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Wed, 19 Nov 2025 14:29:12 -1200
-Received: from DM2PR04CU003.outbound.protection.outlook.com (192.58.206.35) by
- edge.it.hpe.com (16.230.19.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 20 Nov
- 2025 02:29:11 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fzdunvi1rdI5e2PCWsc4xcGdm9cSkEdMoGp24oNKdJ/dq4Hicuv44XBB9sLdZEdWpOAUmcZyVVe2HnjKEuT4k/sqFJ8l4X+OyGBvfSZDw/Py9FbET/0YSb3fD7kyXk6XqDcN4MzEzL1uU4r/94W7HGZGixgp4cjKNFLuc82RkrnIZDVumw6C9MkB5VOBgkrl2ZNfDCIbKBoeHvAW9LT8v2gZ3FmAZ4piCBdrDkz8K6okvmCTO6pXbZEdyRApRit/UCuaSYDH+2fGxG5hsevKeig5R6NDGu9jzmR5NQU3YRjh2pDwSYWnhHUuUnvkklCJmz2RjxFd4CMsahzTm7+wuw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Pk2Xk9SSx/fIQtY3S3ANEb53BQE4SIfszsiMqRjDkxE=;
- b=eZ9OXhN+amQFjo6uHlgpCKJxqGtZifiJOuJKvKUdSZTmmtp5nMwdlx/Y/4QWVnslDkixADsX0RdwRwkA5BwSj388aqzPXPA/PjYqNZhIPM4DjmMJEILBYefm6Qy0VH1jPKH1He3BRBsyE0dhvQxeeymayJDh7t6+Y6HZfHtzrKrjWHzCs073z0lwXR321LHOhdgNTtzSs/iz6y2lTdUDO6E6VKZHriuebSY4yZJOUCHswVO4D9vkGtlkGRlyPfVzaH3Zch/LU4/q71aiffE7qm+BAlz2FyN1kJe4Kj4nL4pakn7QLwEhBRkd28gLsVKDG+AV+d5dTXfkQBhvo4hClQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
- header.d=hpe.com; arc=none
-Received: from IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:208:54f::12)
- by LV9PR84MB4008.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:408:2f1::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Thu, 20 Nov
- 2025 02:29:10 +0000
-Received: from IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::766:753d:9ff8:1c8b]) by IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::766:753d:9ff8:1c8b%4]) with mapi id 15.20.9343.009; Thu, 20 Nov 2025
- 02:29:10 +0000
-From: "Elliott, Robert (Servers)" <elliott@hpe.com>
-To: Eric Biggers <ebiggers@kernel.org>,
-        "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>,
-        Luis Chamberlain
-	<mcgrof@kernel.org>,
-        Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez
-	<da.gomez@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        "Jason A .
- Donenfeld" <Jason@zx2c4.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "Stephan
- Mueller" <smueller@chronox.de>,
-        Lukas Wunner <lukas@wunner.de>,
-        "Ignat
- Korchagin" <ignat@cloudflare.com>,
-        "keyrings@vger.kernel.org"
-	<keyrings@vger.kernel.org>,
-        "linux-modules@vger.kernel.org"
-	<linux-modules@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH 2/4] lib/crypto: tests: Add KUnit tests for ML-DSA
-Thread-Topic: [PATCH 2/4] lib/crypto: tests: Add KUnit tests for ML-DSA
-Thread-Index: AQHcWbZqxJ3MuJzK4UuM43fEwkWrTrT61EIQ
-Date: Thu, 20 Nov 2025 02:29:10 +0000
-Message-ID: <IA4PR84MB4011DD869EB624399BD9AD7FABD4A@IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM>
-References: <20251120003653.335863-1-ebiggers@kernel.org>
- <20251120003653.335863-3-ebiggers@kernel.org>
-In-Reply-To: <20251120003653.335863-3-ebiggers@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA4PR84MB4011:EE_|LV9PR84MB4008:EE_
-x-ms-office365-filtering-correlation-id: 019ac69b-d7d8-48d4-418c-08de27dc9658
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?SK3WLGbqH99TWGIQRmytVBsm4Wlg1OznqWZ4naPeGnk9zAnK/1pNmhft+Roj?=
- =?us-ascii?Q?qyRhZLykHxaqXu6qnFOTiC2Rn/Ox7Lj1d1DEp5sJn422MATiWeuGpAZxIUTy?=
- =?us-ascii?Q?B7m+B+E2R0JwRf74e5gQUQVj24Es4bQPFt/H0gdPPnK+Zf5zAFJaYtVy6k+q?=
- =?us-ascii?Q?0GBJWVzmzy/XuEJvW14IsoZrB1k15sfAAZtwOohOvSio/pkG9enV5hTifwBi?=
- =?us-ascii?Q?LWQuAph/L76JQRQ20UBnxghIMn+vz7o2BhSWOPg23286S2IJMpeH1oq/E5hB?=
- =?us-ascii?Q?F82xJiEwcYDZNFugoB8Xn4/1kISaTLXZWlwmyJb7zbTt02UwF9NjaqDSccz8?=
- =?us-ascii?Q?chXy0Vrkv7Ejx/MloSjq/lBRESB4t3G6NpMAF7FLZYNxqoTCTZNhze/9JbnH?=
- =?us-ascii?Q?RsEILLnSbXdEBtgX1PbD4LCg4dmVKbBcoNOcd01Jm6o42kz1rW3UFbCuR93/?=
- =?us-ascii?Q?2lafn0FLYivcXtCguDzUIDL1xEY0QfY8jSWchSGQ9KSJjt0+aZEY7K0eNuW+?=
- =?us-ascii?Q?VKCRBBS/TthonK3+kLxxa2LjPvBkzLc4hFpUz40X5KPL2xigIWK5gabH0+gD?=
- =?us-ascii?Q?9ZI5gbC4+2dNO5QpX6jWk23liki28gfZkyO2EO5WoPQ8S+LqaExn/6inWSUR?=
- =?us-ascii?Q?jH6I0+2vahVe1zQ5A5W/gx3dVh+D4e4pTCjpbaew/IYnQw0tt8VZf6HZurUe?=
- =?us-ascii?Q?iWtcH+bO29E1zGlbMoHZzN+9biMqp7QsEhbXj/k7dH9M7ACTLA/D/jl2xNL7?=
- =?us-ascii?Q?WE4y0I7xbTvGzGxbcJMndI+Dwoj3uALh7MEkeCdTI/CDCj3b2gqbts6PfRG0?=
- =?us-ascii?Q?XTfjURas1pyNLMUlzLX/i8JmCTb7CrVsrn9UWFinVdgBoUkWKCuqpPn12d0g?=
- =?us-ascii?Q?MKev1Zpjf6xd1ac5NZcpbHoNvcaYoY2dOQ6HakQFVsaI8+Mmu4YFjeIKK5tE?=
- =?us-ascii?Q?iPk8VTJdQkjxyv+zegvn8kyaw1W5YtH1gzw/jEgSuBdZ90RLHWlI/APQx60z?=
- =?us-ascii?Q?++PNlvVYD9TERYrTkO0rs0NsqFF4KGx5DGjoV/OacV1TxKn2Vv2easwer1cq?=
- =?us-ascii?Q?56BEaQqcrnHJ3nFygKqoStj6SbFvaBlJtwaY9ArPwW8k6clUbzG0yMl4DOLe?=
- =?us-ascii?Q?COvhaAUui2LvnPljCRNTmN8P++/c87MNVKCrKFUKoPpswSiadIGxYce5cNtg?=
- =?us-ascii?Q?KOat5gY4msevLj1vuK1kvZRSXZjFn7M1bXM0oDks5ONuqA0PslfeH52r7taQ?=
- =?us-ascii?Q?ELCDRwGjazHqDqesczvvwf5CegHGc+lf0iKg5z2t6G7TcAs3OiibNLXpVb0+?=
- =?us-ascii?Q?dsGr8NjI0PRHLcBx3K37SR0dHAuMv4Ob4qeO4fbN8pjR52LrQpM3n4gjz0F+?=
- =?us-ascii?Q?ubowA+PzKLJbcsFZjie9DFhXo3OvcvmrdcKDGQjSgobFd8R/VVV8lnT0EgUj?=
- =?us-ascii?Q?HgkNiold2FTOAPZZZnzo27p1etBn3pDt0Um+d0+tNIsBT7ltQVnPmO4QBJ53?=
- =?us-ascii?Q?sG5Q7sYQ7AQvXjErqdlqSFPWafJGV1r0eCgW?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?1P+/h2CyAqdAqGZzDnQ4zPo1CQh4gTTTfF5lThChSce9fGL8+7tKKXz1tM1O?=
- =?us-ascii?Q?Rtt8dXObAxJSJCNJZuJiZoH0AUKt959bY0IbG6uFcLuDxFQrSG//xYGTlGgJ?=
- =?us-ascii?Q?Y7FR7CWN+Zf72v20w7XBlpApmT9/uYeL5afj/2IHlGiR8pqCZ0yG8N3H37mx?=
- =?us-ascii?Q?h/YbEVoZG+Df4gl8mLqTjwmUqMV9n4z6GlSSL0crc4sX7g3pfRHWJEDTgwdN?=
- =?us-ascii?Q?mH7FHvKFIimLLUBV0L/K0gl7+QInm7e5E3Ml4X99+R6J4TN7YzdYhMHTqXhN?=
- =?us-ascii?Q?tv8Gt1/r96DVUeHuAZsqTPFlLcPUBVovTmKpcBgXzVJMDfjWS/rwnI8GMqDt?=
- =?us-ascii?Q?Xmf7vfzsX3kESZ02qN3gQMRBZtLLHopRB9QZV3mpOF5DrVKAebaE7BwVI0Oy?=
- =?us-ascii?Q?vXGHZIEBRTubQjNEYrwP/SNCxNiejprkhDjTzLps9cN6/mmTqaxca3c12yNg?=
- =?us-ascii?Q?cduGUaNjR0Dw2Z/zNHjON7LCAXCZaAeq4HXlFLCJpN8XnpVlTu1BctHhit/x?=
- =?us-ascii?Q?Vv5t1qFgQJjiVsoTZ2ybGsRsLAk8kjCHHpuVkutnjDBpUpLAvCgxuAAWa4OJ?=
- =?us-ascii?Q?4bxmZA5YeFs+2An9WDFftCkpLozdru2OsjQRClMHtyrsy55dk9lR2wO4hZ+S?=
- =?us-ascii?Q?aDqnOVm1rL166vszygYKShJlRIYiXQYBb40VUQUNqKDNDCrEWv/HpFv8zLSr?=
- =?us-ascii?Q?pHtuvNNA6skH30pexspErwbqGjTMk0kJTH78W0ANqetcnZqdPqKwK7awzFpf?=
- =?us-ascii?Q?I74m1d/J94Z/QfJ+gxxJVoph0xMFlSqHJZEF1ULw7Xkz3+NwDKTbAULsOT0Z?=
- =?us-ascii?Q?iNkeDpMO6+fimwc8TUQOSwBUOEFjxadwhGQiIUMulIKIouOv9P5ca7vI7J1N?=
- =?us-ascii?Q?upVLkybFnw6/NYCCmzKVchEpPiKxLNIcstXjXizOXOb4zEg63RwLpyHUkowP?=
- =?us-ascii?Q?X8DE/lSwnF7aOrA4EPAUuyzbmwuvbcqyJLFGhJirq6Pm5pp/ARYx7dZwsEA3?=
- =?us-ascii?Q?MHmccJrwYEhWvHxSuHQd90SMlPh4dMSZipaentEm6r1XV92/H4TJPlu9Bju4?=
- =?us-ascii?Q?hGVCu3XJYnM/nz+tL7onqk+ULCW8eKLeLFtK3K3bHjRkiGqRuTwe2oXv8S46?=
- =?us-ascii?Q?hezUYXA7gRYSHY1XoDNXEDWlwipxgVJcBVw+L7EJmTw9cgd9XNfChHjARG+H?=
- =?us-ascii?Q?fX/N/jdFjiD1xaTVVNCH5WoE5khlmYz8MCjJbp+2theye4Nl5zi1+Z+84PWn?=
- =?us-ascii?Q?4tmol0q0oqLdGEe6fKhdPYMaORceV6V6dBB7jTM1OhOBqGtqGrDckE7EBqap?=
- =?us-ascii?Q?qVpRrsaLXA7jowABUXPtUFvBBlW7xUn736FhYk5rRmZYW5kPB97vT6n57ts8?=
- =?us-ascii?Q?F88a+c/0VSzgactKv4uJMva3NYrk6MGsZkJfPKO/5Zcmcr1Br0J2jBS5m2DC?=
- =?us-ascii?Q?otKV4bQLeoy1Hg7fvzDlXBCinbsx+nAO4OE3/nBPuwEr8qUaiX5oLlTwFiWf?=
- =?us-ascii?Q?d2ztY1xjIFa4aIMs4tZtPCpLTVvCcJmERypy3cM4LCoXQcXnyfJeFr8FPVmD?=
- =?us-ascii?Q?WoVjrhvxDNMm+Lm0p+0=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 15.2.2562.17; Wed, 19 Nov 2025 22:25:01 -0800
+From: <quic_utiwari@quicinc.com>
+To: <konrad.dybcio@oss.qualcomm.com>, <herbert@gondor.apana.org.au>,
+        <thara.gopinath@gmail.com>, <davem@davemloft.net>
+CC: <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_neersoni@quicinc.com>
+Subject: [PATCH v5] crypto: qce - Add runtime PM and interconnect bandwidth scaling support
+Date: Thu, 20 Nov 2025 11:54:43 +0530
+Message-ID: <20251120062443.2016084-1-quic_utiwari@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 019ac69b-d7d8-48d4-418c-08de27dc9658
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Nov 2025 02:29:10.1304
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9i71tQjOFfhKl3IpCLRz/RwjACqUDnADRHtZgxDWzE+q+Rk0du6GiXgLQoK0pkhA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV9PR84MB4008
-X-OriginatorOrg: hpe.com
-X-Proofpoint-GUID: 9zisRSx-FNhPxCPN0NZOW-vaA1_ZX8lr
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE5MDExOSBTYWx0ZWRfXyouJM/h6dzK8
- KSqcRww/aN22RTi9hQ2JWNTv6dyrA0nyEgJEvkm1ovFlFNHOzf9J4VHPsE2dEUc/7GZYyRTA2Go
- UuQFtY4v5P3rxLZBRNeiYwsQ68nM0x+2Ncnf4moHEN4K2gmAdfqvea7aOhTTRctSKCxFhaDReIi
- rDVoh0kceiYk+XDBm2ej3OHB29wBkhvzCu3ScCjlqq6VSQW/eh0xjuc+nUMMFz3jrlZSar+xvCf
- XASibs55pzSEbXFhn8fCeyu3VeU6EFpTifZSZZc+lLViPyKJx13yGkfRP5ZaytXgo+dqmp/AboU
- xEN/TJy2mRP2rwXMKhcYRMFGOvXeuN3emQorJppT9aygWP5ZJFngzzioXWDXnUEfcaXu1PPDZAq
- u/1jcqyfyxF0SWRah5GwSlF6jK4Xhw==
-X-Authority-Analysis: v=2.4 cv=JPY2csKb c=1 sm=1 tr=0 ts=691e7cfb cx=c_pps
- a=A+SOMQ4XYIH4HgQ50p3F5Q==:117 a=A+SOMQ4XYIH4HgQ50p3F5Q==:17
- a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
- a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8
- a=2OWJTqkPu8zccz12aJgA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: 9zisRSx-FNhPxCPN0NZOW-vaA1_ZX8lr
-X-HPE-SCL: -1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=Jtf8bc4C c=1 sm=1 tr=0 ts=691eb441 cx=c_pps
+ a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=GEpy-HfZoHoA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=tY3p4qJyD-uLZWqq6sMA:9
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: Uc6Jp052qTlDkaFUboa9yNrVLLweSxhf
+X-Proofpoint-GUID: Uc6Jp052qTlDkaFUboa9yNrVLLweSxhf
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIwMDAzNiBTYWx0ZWRfX+AInOhd1AyoZ
+ iZbXvw3vg6ANPkVRNulj20Q8k1lDYvdKul6N/rV/z+MdOEGyrhwLcYK8ucVsqs4N96Z0uGtLTnp
+ LuqqYjZwwmrlhIXnGO8x1SNHzPFh5oqEn9JKjRgcN0FFW5MqVGYl5N1+MPM6KVBUKJD4TvRWOCI
+ OoZ4EyTMsZA2/8s1djeB4Kd2N+NbPe3TEJseuUF0Bc+n7WQXAo57Lh6q0GfMNEwwvxugc/JoJXA
+ CX1IYZusOh77u3tTHCgo0qC6LofE+IUwXCBQ3O08fZ+aACJB3RI+LEZFsmg7piYLErRBpBtrmT+
+ pxFkNTrMIafVyIaYjre5MtdpdIUbcuKcQMj+Q0ZYLbj6D9wAMVWllUUfeXjqeAUIgurw4fXS95p
+ LADcIdg7WXxXdjAgBhpf46xwMykktQ==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-20_01,2025-11-18_02,2025-10-01_01
+ definitions=2025-11-20_02,2025-11-18_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0
- priorityscore=1501 phishscore=0 clxscore=1015 bulkscore=0 adultscore=0
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
- definitions=main-2511190119
+ priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0
+ lowpriorityscore=0 bulkscore=0 impostorscore=0 phishscore=0 spamscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2511200036
 
+From: Udit Tiwari <quic_utiwari@quicinc.com>
 
+The Qualcomm Crypto Engine (QCE) driver currently lacks support for
+runtime power management (PM) and interconnect bandwidth control.
+As a result, the hardware remains fully powered and clocks stay
+enabled even when the device is idle. Additionally, static
+interconnect bandwidth votes are held indefinitely, preventing the
+system from reclaiming unused bandwidth.
 
-> -----Original Message-----
-> From: Eric Biggers <ebiggers@kernel.org>
-> Subject: [PATCH 2/4] lib/crypto: tests: Add KUnit tests for ML-DSA
-...
->=20
-> From: David Howells <dhowells@redhat.com>
->=20
-> Add a KUnit test suite for ML-DSA, including:
->=20
-> - The ML-DSA-44 "Pure rejection tests" from Stephan Mueller's Leancrypto
-> - An ML-DSA-44 benchmark
->=20
-> Later patches will add test cases for ML-DSA-65 and ML-DSA-87.
->=20
-> (This needs some work.  For one, there are no negative tests yet.)
->=20
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Co-developed-by: Eric Biggers <ebiggers@kernel.org>
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-...
+Address this by enabling runtime PM and dynamic interconnect
+bandwidth scaling to allow the system to suspend the device when idle
+and scale interconnect usage based on actual demand. Improve overall
+system efficiency by reducing power usage and optimizing interconnect
+resource allocation.
 
-> +++ b/lib/crypto/tests/mldsa_pure_rejection_vectors_44.h
-> @@ -0,0 +1,489 @@
-> +/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
-> +	{
-> +		.what =3D "pure rejection vector",
-> +		.algo =3D "ml-dsa44",
+Make the following changes as part of this integration:
 
-Either no dashes or all dashes might be easier to handle:
-  mldsa44
-  mldsa-44
-  ml-dsa44
-  ml-dsa-44
+- Add support for pm_runtime APIs to manage device power state
+  transitions.
+- Implement runtime_suspend() and runtime_resume() callbacks to gate
+  clocks and vote for interconnect bandwidth only when needed.
+- Replace devm_clk_get_optional_enabled() with devm_pm_clk_create() +
+  pm_clk_add() and let the PM core manage device clocks during runtime
+  PM and system sleep.
+- Register dev_pm_ops with the platform driver to hook into the PM
+  framework.
 
+Tested:
+
+- Verify that ICC votes drop to zero after probe and upon request
+  completion.
+- Confirm that runtime PM usage count increments during active
+  requests and decrements afterward.
+- Observe that the device correctly enters the suspended state when
+  idle.
+
+Signed-off-by: Udit Tiwari <quic_utiwari@quicinc.com>
+---
+Changes in v5:
+- Drop Reported-by and Closes tags for kernel test robot W=1 warnings, as
+  the issue was fixed within the same patch series.
+- Fix a minor comment indentation/style issue.
+
+Changes in v4:
+- Annotate runtime PM callbacks with __maybe_unused to silence W=1 warnings.
+- Add Reported-by and Closes tags for kernel test robot warning.
+
+Changes in v3:
+- Switch from manual clock management to PM clock helpers
+  (devm_pm_clk_create() + pm_clk_add()); no direct clk_* enable/disable
+  in runtime callbacks.
+- Replace pm_runtime_get_sync() with pm_runtime_resume_and_get(); remove
+  pm_runtime_put_noidle() on error.
+- Define PM ops using helper macros and reuse runtime callbacks for system
+  sleep via pm_runtime_force_suspend()/pm_runtime_force_resume().
+- Link to v2: https://lore.kernel.org/lkml/20250826110917.3383061-1-quic_utiwari@quicinc.com/
+
+Changes in v2:
+- Extend suspend/resume support to include runtime PM and ICC scaling.
+- Register dev_pm_ops and implement runtime_suspend/resume callbacks.
+- Link to v1: https://lore.kernel.org/lkml/20250606105808.2119280-1-quic_utiwari@quicinc.com/
+---
+ drivers/crypto/qce/core.c | 103 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 86 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+index b966f3365b7d..2f07cc479998 100644
+--- a/drivers/crypto/qce/core.c
++++ b/drivers/crypto/qce/core.c
+@@ -12,6 +12,9 @@
+ #include <linux/module.h>
+ #include <linux/mod_devicetable.h>
+ #include <linux/platform_device.h>
++#include <linux/pm.h>
++#include <linux/pm_runtime.h>
++#include <linux/pm_clock.h>
+ #include <linux/types.h>
+ #include <crypto/algapi.h>
+ #include <crypto/internal/hash.h>
+@@ -90,13 +93,17 @@ static int qce_handle_queue(struct qce_device *qce,
+ 	struct crypto_async_request *async_req, *backlog;
+ 	int ret = 0, err;
+ 
++	ret = pm_runtime_resume_and_get(qce->dev);
++	if (ret < 0)
++		return ret;
++
+ 	scoped_guard(mutex, &qce->lock) {
+ 		if (req)
+ 			ret = crypto_enqueue_request(&qce->queue, req);
+ 
+ 		/* busy, do not dequeue request */
+ 		if (qce->req)
+-			return ret;
++			goto qce_suspend;
+ 
+ 		backlog = crypto_get_backlog(&qce->queue);
+ 		async_req = crypto_dequeue_request(&qce->queue);
+@@ -105,7 +112,7 @@ static int qce_handle_queue(struct qce_device *qce,
+ 	}
+ 
+ 	if (!async_req)
+-		return ret;
++		goto qce_suspend;
+ 
+ 	if (backlog) {
+ 		scoped_guard(mutex, &qce->lock)
+@@ -118,6 +125,8 @@ static int qce_handle_queue(struct qce_device *qce,
+ 		schedule_work(&qce->done_work);
+ 	}
+ 
++qce_suspend:
++	pm_runtime_put_autosuspend(qce->dev);
+ 	return ret;
+ }
+ 
+@@ -207,37 +216,47 @@ static int qce_crypto_probe(struct platform_device *pdev)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	qce->core = devm_clk_get_optional_enabled(qce->dev, "core");
+-	if (IS_ERR(qce->core))
+-		return PTR_ERR(qce->core);
++	/* PM clock helpers: register device clocks */
++	ret = devm_pm_clk_create(dev);
++	if (ret)
++		return ret;
+ 
+-	qce->iface = devm_clk_get_optional_enabled(qce->dev, "iface");
+-	if (IS_ERR(qce->iface))
+-		return PTR_ERR(qce->iface);
++	ret = pm_clk_add(dev, "core");
++	if (ret)
++		return ret;
+ 
+-	qce->bus = devm_clk_get_optional_enabled(qce->dev, "bus");
+-	if (IS_ERR(qce->bus))
+-		return PTR_ERR(qce->bus);
++	ret = pm_clk_add(dev, "iface");
++	if (ret)
++		return ret;
+ 
+-	qce->mem_path = devm_of_icc_get(qce->dev, "memory");
++	ret = pm_clk_add(dev, "bus");
++	if (ret)
++		return ret;
++
++	qce->mem_path = devm_of_icc_get(dev, "memory");
+ 	if (IS_ERR(qce->mem_path))
+ 		return PTR_ERR(qce->mem_path);
+ 
+-	ret = icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH, QCE_DEFAULT_MEM_BANDWIDTH);
++	/* Enable runtime PM after clocks and ICC are acquired */
++	ret = devm_pm_runtime_enable(dev);
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = devm_qce_dma_request(qce->dev, &qce->dma);
++	ret = pm_runtime_resume_and_get(dev);
+ 	if (ret)
+ 		return ret;
+ 
++	ret = devm_qce_dma_request(qce->dev, &qce->dma);
++	if (ret)
++		goto err_pm;
++
+ 	ret = qce_check_version(qce);
+ 	if (ret)
+-		return ret;
++		goto err_pm;
+ 
+ 	ret = devm_mutex_init(qce->dev, &qce->lock);
+ 	if (ret)
+-		return ret;
++		goto err_pm;
+ 
+ 	INIT_WORK(&qce->done_work, qce_req_done_work);
+ 	crypto_init_queue(&qce->queue, QCE_QUEUE_LENGTH);
+@@ -245,9 +264,58 @@ static int qce_crypto_probe(struct platform_device *pdev)
+ 	qce->async_req_enqueue = qce_async_request_enqueue;
+ 	qce->async_req_done = qce_async_request_done;
+ 
+-	return devm_qce_register_algs(qce);
++	ret = devm_qce_register_algs(qce);
++	if (ret)
++		goto err_pm;
++
++	/* Configure autosuspend after successful init */
++	pm_runtime_set_autosuspend_delay(dev, 100);
++	pm_runtime_use_autosuspend(dev);
++	pm_runtime_mark_last_busy(dev);
++	pm_runtime_put_autosuspend(dev);
++
++	return 0;
++
++err_pm:
++	pm_runtime_put(dev);
++
++	return ret;
++}
++
++static int __maybe_unused qce_runtime_suspend(struct device *dev)
++{
++	struct qce_device *qce = dev_get_drvdata(dev);
++
++	icc_disable(qce->mem_path);
++
++	return 0;
++}
++
++static int __maybe_unused qce_runtime_resume(struct device *dev)
++{
++	struct qce_device *qce = dev_get_drvdata(dev);
++	int ret = 0;
++
++	ret = icc_enable(qce->mem_path);
++	if (ret)
++		return ret;
++
++	ret = icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH, QCE_DEFAULT_MEM_BANDWIDTH);
++	if (ret)
++		goto err_icc;
++
++	return 0;
++
++err_icc:
++	icc_disable(qce->mem_path);
++	return ret;
+ }
+ 
++static const struct dev_pm_ops qce_crypto_pm_ops = {
++	SET_RUNTIME_PM_OPS(qce_runtime_suspend, qce_runtime_resume, NULL)
++	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
++};
++
+ static const struct of_device_id qce_crypto_of_match[] = {
+ 	{ .compatible = "qcom,crypto-v5.1", },
+ 	{ .compatible = "qcom,crypto-v5.4", },
+@@ -261,6 +329,7 @@ static struct platform_driver qce_crypto_driver = {
+ 	.driver = {
+ 		.name = KBUILD_MODNAME,
+ 		.of_match_table = qce_crypto_of_match,
++		.pm = &qce_crypto_pm_ops,
+ 	},
+ };
+ module_platform_driver(qce_crypto_driver);
+-- 
+2.34.1
 
