@@ -1,53 +1,53 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A32CDDC5
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 08:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616D4372AD0
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 08:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763626293; cv=none; b=HCXaTQSaFK3MxP/iC941XltXLm4DMiBViX9ER4UIExdG0/Fmhyz5lEVLQ37t106pdMgvBzqfyMHbuNCy6us1J6/J2kHyL6ah+KgZYfQ7EY0zdgMhahLR324M4eroFxbnh5XJe52r/DEJTKRObOSseJ2rZo7DsTJkoOkAspwoK20=
+	t=1763626512; cv=none; b=mN7ogRcE2jTFu0f4R73wKyYBJFL8/3tfdnuhIZlwEmSd/zFsy0NvF0uUfXMp8lEQDBxJY7HTBrH2hc7I9tjfaMU6sCuJewst1CtcZfdMEbR43tXTzud6Ha/1WOr+iDUaEY2qcDBIbGX4M9FS1dOiVnumjMQM9weW7bgFhLP4Zh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763626293; c=relaxed/simple;
-	bh=36D6gk2vyRTStjC34W/E7tLFGicdrezzKfue6iZCHNE=;
+	s=arc-20240116; t=1763626512; c=relaxed/simple;
+	bh=Lb3IrJprVqz6CKxtaqHmth6EKjf78JfcR5bwaWL3YxI=;
 	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=aH2E/arIHUZVf111CUVcovYJV/vUZ6W92ksy993/wdBU2p2kUTLQT60AvQi87xZBFL8hnh64L+xA4hsnlIttEe/oE8yuGTflnQkBxxqI5l7z1F87zIOzT+3dzfzuQk18zPY2KY8TFJAqwS1S+3bILZApEM/z9DhAMxPMQA7x1NU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KQtCGMxB; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Date:Message-ID; b=blIOSymMNMrnjaZ5RV8aI/nOl4xrs+9bRKNmvSDUPj4Cu+3lg9why1tXK0T01r7WlupGs+N1768grDjsq5D91V4mdUWg3PzKh6XyA3duPmE/auqKNiWSG2STtkXDMt3rKiUVsy7dNGVP5v8K0jY9X58Zigt1U5y1e5BVuuepUjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cZ/BBZni; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KQtCGMxB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cZ/BBZni"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763626291;
+	s=mimecast20190719; t=1763626510;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=36D6gk2vyRTStjC34W/E7tLFGicdrezzKfue6iZCHNE=;
-	b=KQtCGMxBmmTvgqttBLLLCgRoK92n08bWp0EIJSY4qDtEHpV6wb4ddNTmZQLVhomCWHk9L5
-	DCT0d8EbEBshaXr5DcdGGRYcxKW8yeE08PxHMJqzK0tEGKMP3B+c29E3VP02KuIv6YvGER
-	hvjQQGRLnyZAybwMxZY1TQ8MH37mBk0=
+	bh=Lb3IrJprVqz6CKxtaqHmth6EKjf78JfcR5bwaWL3YxI=;
+	b=cZ/BBZniClJBtiO6YYZXR8SRgeaf+kqR/2TatdoYA9qSzBzaUNKN5FTPihyjMA5bakbXZ8
+	PIzAgZLUds1kuUvlQaVmSlPqVH44Xco48LcyUbExK4K7AN/HPXY0WbpyMi9q4O958z+ux0
+	6fjelgWV9vnTFewewaYdNJJbSxRbKOE=
 Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-400-LwiNKzOpMqerqMuakPf5Mg-1; Thu,
- 20 Nov 2025 03:11:26 -0500
-X-MC-Unique: LwiNKzOpMqerqMuakPf5Mg-1
-X-Mimecast-MFC-AGG-ID: LwiNKzOpMqerqMuakPf5Mg_1763626284
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-417-jO5k8ezrOFejpa_A36ztYw-1; Thu,
+ 20 Nov 2025 03:15:05 -0500
+X-MC-Unique: jO5k8ezrOFejpa_A36ztYw-1
+X-Mimecast-MFC-AGG-ID: jO5k8ezrOFejpa_A36ztYw_1763626502
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 801DD180048E;
-	Thu, 20 Nov 2025 08:11:23 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EB49118011EF;
+	Thu, 20 Nov 2025 08:15:01 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3B9163003E40;
-	Thu, 20 Nov 2025 08:11:18 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 30F3F19560A2;
+	Thu, 20 Nov 2025 08:14:58 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
 	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
 	Kingdom.
 	Registered in England and Wales under Company Registration No. 3798903
 From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20251120003653.335863-1-ebiggers@kernel.org>
-References: <20251120003653.335863-1-ebiggers@kernel.org>
+In-Reply-To: <20251120003653.335863-2-ebiggers@kernel.org>
+References: <20251120003653.335863-2-ebiggers@kernel.org> <20251120003653.335863-1-ebiggers@kernel.org>
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
     Herbert Xu <herbert@gondor.apana.org.au>,
@@ -60,7 +60,7 @@ Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
     Lukas Wunner <lukas@wunner.de>,
     Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
     linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/4] lib/crypto: ML-DSA verification support
+Subject: Re: [PATCH 1/4] lib/crypto: Add ML-DSA verification support
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,13 +68,17 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2528922.1763626276.1@warthog.procyon.org.uk>
-Date: Thu, 20 Nov 2025 08:11:16 +0000
-Message-ID: <2528923.1763626276@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-ID: <2534430.1763626496.1@warthog.procyon.org.uk>
+Date: Thu, 20 Nov 2025 08:14:56 +0000
+Message-ID: <2534431.1763626496@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Note that your emailed patches seem corrupt somehow, but I can fetch the git
-branch.
+You need to add something like:
+
+#include <linux/module.h>
+...
+MODULE_DESCRIPTION("ML-DSA signature verification");
+MODULE_LICENSE("GPL");
 
 David
 
