@@ -1,45 +1,50 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB672D5936;
-	Fri, 21 Nov 2025 02:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F354A2E88BD;
+	Fri, 21 Nov 2025 03:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763693341; cv=none; b=jJ4LKRfmPzt0IUq8giwHi42/A0uj9amsM9rzUalfGGjFPI7WJdvif8u9V5tdhnykWaCNgLP+elrM9WSzlVZ7LZely3zrYK5DXtq1c3rmPbAyuxJiOk2MauGpGVe6zWXy9zYmAEGeZPtx54r2WgNTogBhnZsAyOv6MbPMNnvsMA8=
+	t=1763694685; cv=none; b=aEg4gHeq6ZjMuKuakkCzGNsTbv1K3D+huizYdgmh2wMF/V1HCCfuol4Y6jeABLoQc/gJXdlv8NctpMOLCRQ3pETbV/Ero88oPrWS23ybuodnHDbTu2+QZQ0k8WVrHvGsEjYGoggDy2Ga3vePS6MR5CNh1hiS7V3DnoLbxIgtcYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763693341; c=relaxed/simple;
-	bh=rYCe1ng9GN8lAKrRsQFaHSoA6O7M1MA4Zq+l9DnN4lk=;
+	s=arc-20240116; t=1763694685; c=relaxed/simple;
+	bh=MKyh0DSs+PdpyZTeHzw6phnLfP7FjPXzkTMdrXHF2Hc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bidfALAD2HoHT9tjXdM92FScDo0oCjuOQMek/bdHTG8P/Y0e2bJ/2iV5l52hre81eo5OPyO9z9vgWZ6HVmDyEqWfM3k1Pxhgv/RHAKcs08fJMd0ZSGXonogKqoSm0/sAcbXQgIh7Y67DAQ1v7d8Jo51QeR+OeNCiDE5EiFecKmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fEyH3ZWm; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=uad0Nh0VjqazOJbmbzPvK9GnBrHBMJqHJm5KzhyxwocIQ8kZGAUqx3DnTcZNWnoE3RymcaHsD0UjSYxleftjFMYOYpo2xCsLWo6K32/3brDPFXfAZHH9zxUOfiB+7ksagJno+iORm9TUw/XKeOSuLoYviZYqlfPi1qNlaqH3Pwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ldIBQRkV; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fEyH3ZWm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BB70C4CEF1;
-	Fri, 21 Nov 2025 02:49:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763693340;
-	bh=rYCe1ng9GN8lAKrRsQFaHSoA6O7M1MA4Zq+l9DnN4lk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fEyH3ZWm+fsM6eRzbdK97zUu9tGNnECbv/u/cmG5V7+7VnhQXsSVn/y3OqDaBZGsY
-	 ZzundhyXBblDJdPMckISY11zL4RbGMdpKp3rMbh/39JxLIAY4IVB13PVjrM7+YD1PB
-	 sA7yEbRHw/ASyP/j2eUKOkUU6nE0NvbnCPPbHCOwtBaBnZJoHytKTNS9YAnp6pYlmM
-	 DTzt7QM9Sld5kgvdCKPdc9OfSUyw+HI6KpPOUODTt3yiXxtNreUzUD1az3bZY2cTGj
-	 UKbBX61r/wfiv/f8VxhRK3pztDNdu4Z3C98fxif90vz+NodQtweK7NCk/I0TQaiq3D
-	 xtlrzsxdzzX+Q==
-Date: Fri, 21 Nov 2025 02:48:58 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: David Howells <dhowells@redhat.com>, Mark Brown <broonie@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-modules@vger.kernel.org, linux-next@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ldIBQRkV"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=KALNcJApPn3SnQzr7hhkWYDp+pfZlkgBJrIioQ8BpAU=; 
+	b=ldIBQRkVJ3LQ7swsqovH5MQC/PC5fS9MVbDJCt3bOxROWv+HoLRbyVVTXKnyM2EpSlFK1mX9GAD
+	44TFb5itGKQZK3mBXvVjN+M+xO4fvVfTTMVDRtnlMlfi/KFBoZIJqQIb4F9mnVpzE/wz1aDumb7d2
+	mUuAIgCq3jSvEhRytPqbg5uwgKSvmLqmQNwZpKIIjizJkJ+QVywQOwlVm8Y03aAwS7nGM+mfAzM8H
+	Zd3Bxe51X27GLcyqO+5CH7/7V/X+QAemFPBro8E+qodg4GgXrvokYWV6zkE+kUMAWao10w9RgBW5c
+	kUMoApgeFiDgelj74qXKxLu1YXX6yhaNquNw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vMHY7-004qaw-0J;
+	Fri, 21 Nov 2025 11:11:04 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Nov 2025 11:11:03 +0800
+Date: Fri, 21 Nov 2025 11:11:03 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: T Pratham <t-pratham@ti.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Manorit Chawdhry <m-chawdhry@ti.com>,
+	Kamlesh Gurudasani <kamlesh@ti.com>,
+	Shiva Tripathi <s-tripathi1@ti.com>,
+	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
+	Vishal Mahaveer <vishalm@ti.com>, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: Pick up keys-pqc branch for linux-next?
-Message-ID: <20251121024858.GF3078357@google.com>
-References: <20251117145606.2155773-1-dhowells@redhat.com>
- <2157243.1763392923@warthog.procyon.org.uk>
- <20251117171126.GD1584@sol>
- <20251120205341.7e28927b@canb.auug.org.au>
+Subject: Re: [PATCH v6 2/4] crypto: ti - Add support for AES-CTR in DTHEv2
+ driver
+Message-ID: <aR_YR_nF4sjUlgN6@gondor.apana.org.au>
+References: <20251111112137.976121-1-t-pratham@ti.com>
+ <20251111112137.976121-3-t-pratham@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,51 +53,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251120205341.7e28927b@canb.auug.org.au>
+In-Reply-To: <20251111112137.976121-3-t-pratham@ti.com>
 
-On Thu, Nov 20, 2025 at 08:53:41PM +1100, Stephen Rothwell wrote:
-> Hi David,
-> 
-> On Mon, 17 Nov 2025 09:11:26 -0800 Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > On Mon, Nov 17, 2025 at 03:22:03PM +0000, David Howells wrote:
-> > > 
-> > > Can you pick up my keys-pqc branch for linux-next please?  It can be found at:
-> > > 
-> > > 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/
-> > > 	keys-pqc
-> > > 
-> > > Note that it's based on Eric Bigger's libcrypto/lbcrypto-next branch which I
-> > > believe you already have in order to get SHA-3/SHAKE support.
-> > 
-> > I don't really see the point yet, since this isn't going to be ready for
-> > the next merge window anyway.
-> 
-> Yeah, if it is not going into the next merge window, then I don't want
-> it until after that merge window closes, OK?
+On Tue, Nov 11, 2025 at 04:38:31PM +0530, T Pratham wrote:
+>
+> @@ -270,12 +326,17 @@ static int dthe_aes_run(struct crypto_engine *engine, void *areq)
+>  	struct scatterlist *src = req->src;
+>  	struct scatterlist *dst = req->dst;
+>  
+> +	struct scatterlist src_pad[2], dst_pad[2];
+> +
+>  	int src_nents = sg_nents_for_len(src, len);
+> -	int dst_nents;
+> +	int dst_nents = sg_nents_for_len(dst, len);
+>  
+>  	int src_mapped_nents;
+>  	int dst_mapped_nents;
+>  
+> +	u8 pad_buf[AES_BLOCK_SIZE] = {0};
 
-Makes sense to me.  David, with
-https://lore.kernel.org/r/20251120003653.335863-2-ebiggers@kernel.org
-we're getting closer, but it's still too late for 6.19.  We need proper
-tests to be added at the same time as the ML-DSA implementation itself.
-The higher-level parts such as crypto/asymmetric_keys/ need review too.
-Also, lib/crypto/ changes should go through the libcrypto tree.
+You can't put stack memory into an SG list since the ability to
+DMA to the stack is not guaranteed.
 
-wycheproof has negative test vectors for ML-DSA edge cases.  We maybe
-could borrow those.  Note that ML-DSA keys and signatures are very
-large, which results in huge files for the test vectors.  I'd also like
-to keep the size down, but we might not have much choice there.
+I suggest that you place the buffer into the request object instead.
+The request object is designed to allow DMA and you can allocate as
+much memory as you like by setting reqsize.
 
-I'm also working to get another crypto-oriented developer, who doesn't
-normally work on the Linux kernel, to review my ML-DSA code.  (I don't
-think I was going to have any chance at getting anyone to look at the
-original 4800-line submission, but with the 600-line one it's feasible.)
-
-It's also worth noting that this is ML-DSA, not ML-KEM.  The
-cryptographic community generally views upgrading to quantum-resistant
-key encapsulation (e.g. ML-KEM) as more urgent than upgrading to
-quantum-resistant signatures (e.g. ML-DSA).  I assume you have a reason
-why you want the signatures.  That's fine, and I'm okay with ML-DSA
-support being added.  But we shouldn't rush it in.
-
-- Eric
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
