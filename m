@@ -1,46 +1,49 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7CC242D6A;
-	Fri, 21 Nov 2025 05:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB6930597E;
+	Fri, 21 Nov 2025 06:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763704469; cv=none; b=N230T+7yO1VhTuFG9TQSh8BkWxcHm9/t6gTHQJpBKxljQdjmGkGT8lKZ1AbnHXkSt2fLSG5Y6YkNMAYlieBgzHRGh7Tdb5jXHbCp8TAciN9Z2egkzRHSnkNCQ8sZ0JKcojczZqAlo4vB0nO7PRKFx0uaLWZ4Urp/L56ja9RlzBk=
+	t=1763705892; cv=none; b=eV1iuTblXlp+k3uvuakzvDr67zG+aS8CllB5Y4jPdmLMfLqkGPxSv5+ulsweOF+S5AEdrjQsRkyYCN0Z8Kt/onS7sdd8lNCm+W2bK9vFpe5huhqBg6YL7GQUkqAsVZPwh1zl2dJ5iaSl4RzpFn3TCCEjHjY75p06Lwds+H5IDtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763704469; c=relaxed/simple;
-	bh=F0ECbPeJ507/VZWqnYbsgJ1xFvStoLMUOi7rDAk1QAk=;
+	s=arc-20240116; t=1763705892; c=relaxed/simple;
+	bh=HO4na2m6whVvr7y4Ia0nxGjnaVEn4flWXUAZOQAc90Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F83WYI2WM5GmEeXa0V8mcWiHeHDm0hgDJFiLGcj6/BZzPDpQvY0ASg/tSbl1X7bmgDvG0D786djbNEZBzmjAecY8yyUggGrR+rF+ZZeTW7QfQjpLTkOYPsIZZpZ1otf4+mcnQjiUclSwRQokQKUrx82EGfaxk7eJc5MVq1biiw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=bfCBvd33; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=iiR8Oz80xQV/m3+lVFc/utYoHZxTbQ+yMXe0frOOUGqId8bltfxFukcYQeVuNRUHLdQ2WptPvQZcFwGvSb3XySxjBkpf5YtEuEzfVsy1hMbpK1H7RScYhSDNAQXBoO/lUmJsjQMHRqrOYn22NEka1hnZdvP7B2WuGrcRz9rUIYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XAtN777A; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="bfCBvd33"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=q2KvzWrlL+bRDSFNzgnTtzTwRl6vwiEvv91AoCCCrvQ=; 
-	b=bfCBvd33clCxhkqd3WG9UXPpux6shGU4sZW31dMGwV2qtTaBr+DuagCFMfuQgK+WujYIwPVd5xz
-	APN8/9LFBhgpGbcO6QaReeVvpYI/HodYeIZFD7qw1ECA/K5y4zCVmSZ4xLgxdpGCjT8EsazYYBEls
-	tC/wmof+P9l3NWHJ7LkAR6FjXZkpLfr20xyHoTPlVqaFzI6RdEC3dni72o347GagUDO/Z3E3T9m8v
-	cmsgwdV4BFKsIo7yz8/FlERJ/Q+3PgXEiviorh9vTZHROn+7rv3H0eiJYhQdWZE7FcDg39oKgHCZE
-	fxqCSY8P5RU5RDm8zppNjqNXVgZzB3JBS2JA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vMK68-004rwz-2z;
-	Fri, 21 Nov 2025 13:54:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Nov 2025 13:54:20 +0800
-Date: Fri, 21 Nov 2025 13:54:20 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Manorit Chawdhry <m-chawdhry@ti.com>,
-	Shiva Tripathi <s-tripathi1@ti.com>
-Subject: [PATCH] crypto: ahash - Zero positive err value in
- ahash_update_finish
-Message-ID: <aR_-jEam8i1qelAT@gondor.apana.org.au>
-References: <20251113140634.1559529-1-t-pratham@ti.com>
- <20251113140634.1559529-3-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XAtN777A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D818C4CEF1;
+	Fri, 21 Nov 2025 06:18:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763705891;
+	bh=HO4na2m6whVvr7y4Ia0nxGjnaVEn4flWXUAZOQAc90Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XAtN777Ad4o/ydmQ4JtcOfmYqUYJRaGZ/xWJrYztDooL6GEHOAfa6BL1cw8npVENw
+	 O1EtPqUpmlxj2/5HWrhBPV0HjOw0mE8I3tz/30PdK3xTm17N9y4NchuEg1hRgHeahe
+	 wofu8Fe7N72hj+OvAAQtDzvex8jhwF0dTIUiVAZufFa15rr/ab6yPXiROEDQQUXqDi
+	 VZjlmGYbBRsDAljcwnqu5mxoBT1F/u/Rbq1TH1CcPih80ql8xKY8HplNg8KzgV5eCY
+	 BwY8ZpjSCIhbcDS2aLYveVOfVQd16IQKDC0moULDaEeFZwL3vkebqIg+RGgrhys2mg
+	 XXwB9lQG0D/sw==
+Date: Thu, 20 Nov 2025 22:16:25 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
+	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/4] lib/crypto: ML-DSA verification support
+Message-ID: <20251121061625.GA1855@sol>
+References: <20251120003653.335863-1-ebiggers@kernel.org>
+ <2528923.1763626276@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,50 +52,24 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251113140634.1559529-3-t-pratham@ti.com>
+In-Reply-To: <2528923.1763626276@warthog.procyon.org.uk>
 
-On Thu, Nov 13, 2025 at 07:30:13PM +0530, T Pratham wrote:
-> 
-> Commit 9d7a0ab1c7536 ("crypto: ahash - Handle partial blocks in API")
-> introduced partial block handling for ahashes in the crypto API layer itself.
-> This enables ahash algorithms to return a positive integer from the update
-> function to indicate the number of bytes in the input which are not processed
-> and should be buffered for next update/finup/final call to process.
+On Thu, Nov 20, 2025 at 08:11:16AM +0000, David Howells wrote:
+> Note that your emailed patches seem corrupt somehow, but I can fetch the git
+> branch.
 
-Thanks for the report!
+Works for me:
 
-This is a bug in the ahash API code, it should return zero instead
-of the positive value.
+git checkout -d 10a1140107e0b98bd67d37ae7af72989dd7df00b
+b4 am 20251120003653.335863-1-ebiggers@kernel.org
+git am ./20251119_ebiggers_lib_crypto_ml_dsa_verification_support.mbx
 
----8<---
-The partial block length returned by a block-only driver should
-not be passed up to the caller since ahash itself deals with the
-partial block data.
+10a1140107e0b98bd67d37ae7af72989dd7df00b is the base-commit listed in
+the cover letter, via the --base option to 'git format-patch'.  It's the
+current head of libcrypto-next and is also in linux-next.  Maybe you
+tried applying the series to a different commit.
 
-Set err to zero in ahash_update_finish if it was positive.
+Anyway, using the git repo is fine too.  This sort of stuff is exactly
+why I usually provide a git link too.
 
-Reported-by: T Pratham <t-pratham@ti.com>
-Fixes: 9d7a0ab1c753 ("crypto: ahash - Handle partial blocks in API")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index dfb4f5476428..e3d0736e9afe 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -423,7 +423,11 @@ static int ahash_update_finish(struct ahash_request *req, int err)
- 
- 	req->nbytes += nonzero - blen;
- 
--	blen = err < 0 ? 0 : err + nonzero;
-+	blen = 0;
-+	if (err >= 0) {
-+		blen = err + nonzero;
-+		err = 0;
-+	}
- 	if (ahash_request_isvirt(req))
- 		memcpy(buf, req->svirt + req->nbytes - blen, blen);
- 	else
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
