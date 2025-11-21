@@ -1,45 +1,46 @@
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012044.outbound.protection.outlook.com [52.101.48.44])
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012069.outbound.protection.outlook.com [52.101.53.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5C92BE658;
-	Fri, 21 Nov 2025 08:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4ED22F8BCD;
+	Fri, 21 Nov 2025 08:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763712423; cv=fail; b=KVI8fFxyN/EcsEy+QL9jiHNWoyMYt2A3p892j/AePSo8MpNHfKkNd/gCR3ZfT4inhyZN0jvYgWc6Eg2dzcKAno6QKVV9SKcHVO0gJGPDFBzD8vgh1W+Vej98G66T26DPS5CmGoEN51mfRXqbblkI7hVwGMnylqnO+JXCxx1dTJI=
+	t=1763712446; cv=fail; b=NPmOKY1bpb617hGvdHxtlCkHi9dJnR/w0XVPGENw1w7ZJAsvNQYoVFirLbc3ykToQK1g5zM7f9ii/7wdmjOs6/VDCEUUvCj2lqw1YvbPw0CiJw5T/VUZSJZIaO8UUHfvfW4tRfmCg5Isc74jDUWxr87SSXCQg+8Ab8pblJEuXF8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763712423; c=relaxed/simple;
-	bh=OOayL5LvvL4oyS7/KTGhxj/sdXojndOjNe1RpGiPbs0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hxQH8gB6RxfZfzIAV5fZkKCP9eHdWjr5MWgqPAGu/t1KzTBqbTZVX591F1c0x6SFaOfiZt7LK4PJgcRR2aJstJzJL/jNFYnWGVn+YK/qDhd/8DIqUDh40ZP0PTvL0PbGHmciOWA1OVqw2vvtieAaOSE6+CXrH9SLVmUmiJasm7E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=l6zacElR; arc=fail smtp.client-ip=52.101.48.44
+	s=arc-20240116; t=1763712446; c=relaxed/simple;
+	bh=eESXuq1cgqrFmPJCVSmA4s+jGH5QBcptGBVCekio0wg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FvkS/7fF1oTzKA66qpQ4sAyt4G+W+0ybtDK6JNnNSw9rLZfFBmhEVN7t28Ubz99wZlR5o6eBirmuGG0kIh06veedQ7HpACVkKiYG/h8v1Vf7mEUsQojpvYeQomJCkckF3t6Uj1gQ2dRS8sJ9+P0wbYIpLZ7EQT6KcDSvTpS53Pc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=HJZeKCrs; arc=fail smtp.client-ip=52.101.53.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="l6zacElR"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="HJZeKCrs"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XBPYQy778zaKtsHKjmHjlhs/ynsFZrGvxkODIPb13IBpXdTdIgCHMgtxVYsb3j60WyNl/lv4Ee1MGZjy2dD6hh032FV1c7BknSLK8epsK04UPK8WdGxwdKjcrJ2CI6ImicwPvt7pGyewRbS9LXuOeCBRjCvMhZjSXFKud5vlq7m1UuY+gPPxCNCKmyjcnB6NhemdF4LjOqYNMAtcQnSv7hDT4lddiSjKGkpgdDo9AG99+T/vmTP+jrtljMK+cY7KiGXoCgYKsY2r/Et0RitBkjwYtvQzEXwfOwUzbveh3tnAhxk/kWXeo4fd/tAfHnBAnpP4MxLSY4C1qdvC2vFJPA==
+ b=YHKgu2w79DbL6iUz9jWqBrN7sANsQMCIvEfJClV2dc1ka1GaFN1A1SYTOvHDp2uM4Uzum0Fq6A1Wy7269ydnsbRawgxJvf+nD30ZwfXjF7t7e00SJ3kqqwKgBakCIcS0tTMr5t6Nzqbpae9pkhKqwPcF8fmKgd+O/qnT0PkH2vslyb/t4rOjBu2S8M13bQG4YOzyHdNbbgkxek7HVxWethT6k1Z2Z629HOQwfinnAAh7YECqp/PB/sgQtPPyjZiOG/XUo/+DJrtS3GwDHmKYTwy6r42sNbngPwn6HYytOEY2zg/xSnVoabSZNNp5k/iEu/uV+xnzEm840u7uOf56MA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O/ts9VdaRvG9tneJXL99BO2H+NG/ouq8x07uERq2QHs=;
- b=sQC2eYgVCcE5qv9Ns2/i2KKMCajfnV5xy8uDft2PTqu8yXfTCloTBDty3s41cs9QqHpPhMTukI7ybIqEnrhep+Pedt6+QdsSre2hXonT6p13Kq0ZgGQMVvaQTxw1b94jllxDjgd4lW5zZFhD0uc7qqLe4xR8LW79T1tyi7KXOkExJgvJ91mYsoVfSR4fuvizP6eorzJgUeR0NLL1YlxoBwQFVEyH3xDiGo1mhq9yFryQx0SKvztz9R0BjxcQXnhqjoPT0oKzMPZLW1uz5RAlidnCFnewhxfnYr1xyMwTPLUE1598USHivFBYdyDE5G8UyRdTiv0FS3GKm3Ge8TXnpA==
+ bh=kO0wfA8Pcb6a6tsLhWY6VkzyCEzMkYR0HZfhkTZvbVw=;
+ b=RpnXSgySMLDlxylcFSGGusR2hgw3JrnWJ1vLicV51sjnt8RJARBm452g1oopTnNmk3uNb0bRcX6lrKiQhw5/mnOkEuIA3pNntZNCJnnVCxjcNYMlt9/MDom3HJZQXxpvoVjHi4lnGnylvThJrU3n/dXplfMHb5R1X8lv4kGZeM2syfsPqPjzu4P1A74BpJ08xxTZCpnnZ4A1O5ed1GzVA/T3/7Udss9/hKfHjaKKMJ0I7sU0CQV3tWr0pz8mgA9+2TpyS8mej4hbyGIorxVWsjIdZdoV8dy9xplyHMsunfhEE/Kjt0DprUG/j0z5Nn/9bR/D4q1/pIo1PoBjIRIpUA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O/ts9VdaRvG9tneJXL99BO2H+NG/ouq8x07uERq2QHs=;
- b=l6zacElRRSV32cr001HA0H8qSe1xBxk36hmCJkse7ScACy5ssD3038TzsV6I8Y+yvBHVfJJ3tQoDX7ENMYM3CsVbJrMEwXyN4jRd3u1i3eUyF2ulkrwAmoUC48k72aWmnPWpjWhdpw6/uol6L4wYgKvg/iGsMN/HhcfArstViEE=
-Received: from DS7PR03CA0077.namprd03.prod.outlook.com (2603:10b6:5:3bb::22)
- by SA1PR12MB7366.namprd12.prod.outlook.com (2603:10b6:806:2b3::8) with
+ bh=kO0wfA8Pcb6a6tsLhWY6VkzyCEzMkYR0HZfhkTZvbVw=;
+ b=HJZeKCrssta5H2Bq/E1S9FILlNWG7ZONQ/ftiQL+tLUkxz+ll0bApQcY7+UqM1/AaRkF3mrk0S2OhIJc1N3NnrlrwaTtYHtSn+jc9svbyelLiUhTj6BBIZs8d2UoXyu+0fKtrBtgvA4ou/r8AQxrbSfdQT+BiwB8R6E6EvB3YMM=
+Received: from DM6PR06CA0089.namprd06.prod.outlook.com (2603:10b6:5:336::22)
+ by IA1PR12MB8520.namprd12.prod.outlook.com (2603:10b6:208:44d::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.13; Fri, 21 Nov
- 2025 08:06:54 +0000
-Received: from CY4PEPF0000EE3E.namprd03.prod.outlook.com
- (2603:10b6:5:3bb:cafe::d0) by DS7PR03CA0077.outlook.office365.com
- (2603:10b6:5:3bb::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.12; Fri, 21 Nov
+ 2025 08:07:21 +0000
+Received: from CY4PEPF0000EE3B.namprd03.prod.outlook.com
+ (2603:10b6:5:336:cafe::ec) by DM6PR06CA0089.outlook.office365.com
+ (2603:10b6:5:336::22) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.11 via Frontend Transport; Fri,
- 21 Nov 2025 08:06:52 +0000
+ 21 Nov 2025 08:07:20 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- CY4PEPF0000EE3E.mail.protection.outlook.com (10.167.242.16) with Microsoft
+ CY4PEPF0000EE3B.mail.protection.outlook.com (10.167.242.14) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9343.9 via Frontend Transport; Fri, 21 Nov 2025 08:06:53 +0000
+ 15.20.9343.9 via Frontend Transport; Fri, 21 Nov 2025 08:07:20 +0000
 Received: from aiemdee.l.aik.id.au (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 21 Nov
- 2025 00:06:41 -0800
+ 2025 00:07:08 -0800
 From: Alexey Kardashevskiy <aik@amd.com>
 To: <linux-kernel@vger.kernel.org>
 CC: <linux-crypto@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
@@ -68,10 +69,12 @@ CC: <linux-crypto@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
  Dadhania" <nikunj@amd.com>, Michael Roth <michael.roth@amd.com>, Amit Shah
 	<amit.shah@amd.com>, Peter Gonda <pgonda@google.com>,
 	<iommu@lists.linux.dev>, Alexey Kardashevskiy <aik@amd.com>
-Subject: [PATCH kernel v2 0/5] PCI/TSM: Enabling core infrastructure on
-Date: Fri, 21 Nov 2025 19:06:24 +1100
-Message-ID: <20251121080629.444992-1-aik@amd.com>
+Subject: [PATCH kernel v2 1/5] ccp: Make snp_reclaim_pages and __sev_do_cmd_locked public
+Date: Fri, 21 Nov 2025 19:06:25 +1100
+Message-ID: <20251121080629.444992-2-aik@amd.com>
 X-Mailer: git-send-email 2.51.1
+In-Reply-To: <20251121080629.444992-1-aik@amd.com>
+References: <20251121080629.444992-1-aik@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -84,137 +87,148 @@ X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3E:EE_|SA1PR12MB7366:EE_
-X-MS-Office365-Filtering-Correlation-Id: bfea9e16-b6da-41c5-c14b-08de28d4eee2
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3B:EE_|IA1PR12MB8520:EE_
+X-MS-Office365-Filtering-Correlation-Id: e2c808be-b7db-4f12-40c1-08de28d4fef0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|7416014|82310400026|1800799024|13003099007;
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|7416014|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?DcjAG0ayNmzjfNMrX8AiSbS9M2zlaOpgELCOCj1oMDWgnMYOGu+elwiWr0kb?=
- =?us-ascii?Q?v1hEAcXhgqpVfsy0baQIg0XaaiUo5oJljKPTZpOZF2ojaTu0jTSLOBFETi5g?=
- =?us-ascii?Q?ZFW/4bIZNC8Wm/iWZK8yL9Q3tw2aioTPYT9/cSNk0wRf0CEzejjBqhx7lqsz?=
- =?us-ascii?Q?qTeqpjJxVt8CLYq50GjDe3G1SkkIrhOsrhAIDiBG4SQlrZexmHUu2bfREdOn?=
- =?us-ascii?Q?wEl1gwK9T77paB4xe6yKK4gH7cfgW+gHTvDNd0jHHpc1dSxU5FuxlAK0S/Tk?=
- =?us-ascii?Q?VuVLDq+e5y56eMgWOZS1y1y3HzSCZVkyHnMwN3y4ONe2nlFYS89RAyRCH3Do?=
- =?us-ascii?Q?QNUc6wGRL7m/KBGULD5ArdhVG0doAI92XPjS6MAzk1uQCuGLxRfP+NKWTuTz?=
- =?us-ascii?Q?gZ1GaubOo5v0FH31QcgE3SZ0BsvooD2Iq8whUv9Ut4m/94bS2FWU5rv1Dnq0?=
- =?us-ascii?Q?Dsya8F53Y38WldH2mxjl+wWPJeHIfBI9ajGEbn1C8ju+RZK9FWkov5yiUXQu?=
- =?us-ascii?Q?H3gBcBY1DZ+PM8+ViG27NH2F1tsUrTKUB7MJzjYrAKDElThYbiU/lL21wz2W?=
- =?us-ascii?Q?cwJOY5pFhIul5Ozln7cVZYUvYSCL7kEInlneGqpZCh5g4wXjK1Upp6bRLfqy?=
- =?us-ascii?Q?mguixQqg76Sw5QHaL4UpUiJ8ANsklAenJFmhVdTJ88Yl7u3SNJnK7zrYu5eh?=
- =?us-ascii?Q?6Y9YJBLh2tQxI+ae5KpCJ57C9DCkNYQogsUHGXIBpdyWzILyd5IzRp3EvAg9?=
- =?us-ascii?Q?7DpBQ84Lvs48ipWDsJyobCUAe4LClAqogYXqUYKKBHfexEjukBG4HibArxrO?=
- =?us-ascii?Q?Z3kZ8MXD/wUwFsfZMSaqma/3SKPCTKtBzLO31FIPwbakXAbGHcdC0DC4xjbq?=
- =?us-ascii?Q?DWGA6XeQi/yLEUWMpn4wFAoLMR/QIrhVaqQR6NqIQ4UWlcYjHOT3dzA1WZcy?=
- =?us-ascii?Q?HACk62V8u6MotGLeXheaN4/+RbPInDghPxz2waw4o0D2boEPHsHcdY0skd4J?=
- =?us-ascii?Q?uFLaqUfHOFmle9HT4kpaerHdKV2614sIz8LUg5N/jAQw1NgK+Mit2/2hRGfc?=
- =?us-ascii?Q?HIceW02ZjOZXei89A6DynEoZQf3xpSg00vXzuJrIxcGHpdwKcyT4HTiL4H5g?=
- =?us-ascii?Q?OUgR5jLlxekStVPeFT+xASs3A4N2mTFFMti8d3LVo/uzD90rhdAAUo7eTfdm?=
- =?us-ascii?Q?lXxfncFu2QHHH3I4rF9JvQdwUaN8pH4cdOz0fv1LVYjeOY7LCS+C3JgxPKF/?=
- =?us-ascii?Q?LgtUAKevUZX9t7+0wu9D9KXrlL4OS/GWQIjvwo4ztyh1XRrBFrVo9nEtKcdB?=
- =?us-ascii?Q?76LxH+lurIYhMThLGNYLVmKm53cRQHDYpbTHOTGoA4WF/CYhJj9grz3xXGuq?=
- =?us-ascii?Q?MYxY2v5TFf9gsB4hjVwEg3BXpwXrCcZRkKeL6NRmYc3MBEjXS+8qIRC2QzEv?=
- =?us-ascii?Q?MiNGLlWdsz0EduyGMKvSSnuWyPxK/hBnSKbLm2viMOWO2sY/a6UKsaGm4H5p?=
- =?us-ascii?Q?mOgVwbjyEmXh/SK+mA47AuEpV2NMe5lh4L+tZLUnyqFIGqO+CXnf6diOH6ht?=
- =?us-ascii?Q?k2zziziYXjnZsX0T0OJ7KkzxWh14OBy39e2JrJsf?=
+	=?us-ascii?Q?FS1xlbeQqJ9M0dGvTaQTtYzjnh0r+wktMXDdBht9SEXF1Uosc4vwJ28m0UA0?=
+ =?us-ascii?Q?pFCM0grxp78Fcfga/EO2/1zVAFTMrHEYWPEqii3i7kzT2o/fDVO9lLPpAfOH?=
+ =?us-ascii?Q?lyXU567dgBNuB0qxk8OSFZq1PRHubfA/RcV9VVUsYf48W08lwdATMGlJxc8r?=
+ =?us-ascii?Q?OGzVD06xlWd5OYbflpnqUGYnGQ1ViUEj2ylaGb0wYOEzP+CjFy6Kro1lGiIT?=
+ =?us-ascii?Q?k9E8ySxLlSEOYuW1rs8q4IKPHOi/wv8yQknwzE8A5l7cvrrExlSS/R6YjgFV?=
+ =?us-ascii?Q?PttkExThw9AOwnON++V42gdFY1txdS8xBBukTJv7O+0wZRAy0B1Hop0tCE6G?=
+ =?us-ascii?Q?DOl9SeD3kMW6+pMC/TJ3PY/YuKLFlyht5hsYMg3pukNETAwtKUIkbvolwuo3?=
+ =?us-ascii?Q?1PJEH4dAXcahz2S7vq0V1ruuttAXrzaIRDameRXMN23Qd2SbzxQ3+6VwtAGS?=
+ =?us-ascii?Q?o6ajhoE2Y2dCAHlqtQGTV3qMPn7KQCbafvnk+uS4Qk1LXWRLWqFOTGArgpTh?=
+ =?us-ascii?Q?KEVoWcPXiifCD6MxXY39rHkOUA3SMwolv+Dfxbs95RqeMI94dMUTwibLEDX5?=
+ =?us-ascii?Q?ogZyVWON/Tc/lFKH5JoGFUC0Yvy8iMSEqo26NFLi5zjmXDv/RcJGy0LmP6g4?=
+ =?us-ascii?Q?ssVR7eTgqkX0isinXoymRff4FAueAVOXdkTWW6jBwoEThmEFmNlsaqWV17/Q?=
+ =?us-ascii?Q?u4TpTvTkIhi2ouJLKfEulxkedoU/3ebjrvraaZjNAWFpnf6y148KhXa7qfQx?=
+ =?us-ascii?Q?9o12Mh0URd1aXH5YtXvy1zFBTyrC3JCqaCdcCfqoSBjy/SPvHEoh7wB+0zoH?=
+ =?us-ascii?Q?2JfAC6dHGnBP0CuEh6A8//s3HTe/GdNxReRghbDPJ//4i3BopsPZSiTq4oof?=
+ =?us-ascii?Q?6bowWpBN6VgXTQVBs7uUpid+eiO/zjee7aE6Wd4wKHOIcoIFxkhZNljFCvZ2?=
+ =?us-ascii?Q?nXqvs3uvqH1H5ge5u5/g3FAsqiG0kxRvr7jYohiU0YihU9M8U6bTvS+75HxX?=
+ =?us-ascii?Q?idswQzleKLmHLfGkpcqxdpE8TpCWnsJVcyHPfXmblkOLyg31+y7msv78lBt8?=
+ =?us-ascii?Q?T7CCTrqFpeTpaudXJfMa1LGEYDvZwymACm7Yxw+DwmETISTEY90qGcGa69ER?=
+ =?us-ascii?Q?7GE6MWmI1Kx0ow+qD1SNF3HkuGECsEEOSUkRHlyyi1/Mq7/sAodMU8TOkUat?=
+ =?us-ascii?Q?DzTG+XzUmpLBRGJVmMQ+XwEowA2uTarRws8e9iwHzr3UPqWmF4vH1cgfUB1a?=
+ =?us-ascii?Q?DJFbrTBnM0mVD42EuTFrXwl3cX+1dT4HTXqGaG2Buoh1xMk49PHEoWmqYuI2?=
+ =?us-ascii?Q?xsFTmBh6DNNXTtnsEO7ozVPQaH7iT0ztcWb3GFfoyBSI+OJ74YgKb1aFzIdQ?=
+ =?us-ascii?Q?rOflxC1FrArCUKyJngTttaNfnUhQg2gQRVJ/7NhCYYzrIJkExj9/1LReQrPY?=
+ =?us-ascii?Q?CIJnzY3esxeKSHb3ke7ZrE0TQioVgSZ0douYCis8r7AOgtYqLhKn5ePcqsQG?=
+ =?us-ascii?Q?M/WAJoHJaevY68PifFqIOeETq2m2QHwSewoUbA1gHpHQ4FK48ivwnztl9a8V?=
+ =?us-ascii?Q?mL1RuOGhlQ2A56xKpWM=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(7416014)(82310400026)(1800799024)(13003099007);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(7416014)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2025 08:06:53.8294
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2025 08:07:20.7636
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bfea9e16-b6da-41c5-c14b-08de28d4eee2
+X-MS-Exchange-CrossTenant-Network-Message-Id: e2c808be-b7db-4f12-40c1-08de28d4fef0
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3E.namprd03.prod.outlook.com
+	CY4PEPF0000EE3B.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7366
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8520
 
-Here are some patches to begin enabling SEV-TIO on AMD.
+The snp_reclaim_pages() helper reclaims pages in the FW state. SEV-TIO
+and the TMPM driver (a hardware engine which smashes IOMMU PDEs among
+other things) will use to reclaim memory when cleaning up.
 
-SEV-TIO allows guests to establish trust in a device that supports TEE
-Device Interface Security Protocol (TDISP, defined in PCIe r6.0+) and
-then interact with the device via private memory.
+Share and export snp_reclaim_pages().
 
-In order to streamline upstreaming process, a common TSM infrastructure
-is being developed in collaboration with Intel+ARM+RiscV. There is
-Documentation/driver-api/pci/tsm.rst with proposed phases:
-1. IDE: encrypt PCI, host only
-2. TDISP: lock + accept flow, host and guest, interface report
-3. Enable secure MMIO + DMA: IOMMUFD, KVM changes
-4. Device attestation: certificates, measurements
+Most of the SEV-TIO code uses sev_do_cmd() which locks the sev_cmd_mutex
+and already exported. But the SNP init code (which also sets up SEV-TIO)
+executes under the sev_cmd_mutex lock so the SEV-TIO code has to use
+the __sev_do_cmd_locked() helper. This one though does not need to be
+exported/shared globally as SEV-TIO is a part of the CCP driver still.
 
-This is phase1 == IDE only.
+Share __sev_do_cmd_locked() via the CCP internal header.
 
-SEV TIO spec:
-https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/specifications/58271.pdf
+Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+---
+ drivers/crypto/ccp/sev-dev.h |  2 ++
+ include/linux/psp-sev.h      |  6 ++++++
+ drivers/crypto/ccp/sev-dev.c | 11 +++--------
+ 3 files changed, 11 insertions(+), 8 deletions(-)
 
-Acronyms:
-TEE - Trusted Execution Environments, a concept of managing trust
-between the host and devices
-TSM - TEE Security Manager (TSM), an entity which ensures security on
-the host
-PSP - AMD platform secure processor (also "ASP", "AMD-SP"), acts as TSM
-on AMD.
-SEV TIO - the TIO protocol implemented by the PSP and used by the host
-GHCB - guest/host communication block - a protocol for guest-to-host
-communication via a shared page
-TDISP - TEE Device Interface Security Protocol (PCIe).
-
-
-Flow:
-- Boot host OS, load CCP which registers itself as a TSM
-- PCI TSM creates sysfs nodes under "tsm" subdirectory in for all
-  TDISP-capable devices
-- Enable IDE via "echo tsm0 >
-    /sys/bus/pci/devices/0000:e1:00.0/tsm/connect"
-- observe "secure" in stream states in "lspci" for the rootport and endpoint
-
-
-This is pushed out to
-https://github.com/AMDESE/linux-kvm/commits/tsm-staging
-
-The full "WIP" trees and configs are here:
-https://github.com/AMDESE/AMDSEV/blob/tsm/stable-commits
-
-
-The previous conversation is here:
-https://lore.kernel.org/r/20251111063819.4098701-1-aik@amd.com
-https://lore.kernel.org/r/20250218111017.491719-1-aik@amd.com
-
-This is based on sha1
-f7ae6d4ec652 Dan Williams "PCI/TSM: Add 'dsm' and 'bound' attributes for dependent functions".
-
-Please comment. Thanks.
-
-
-
-Alexey Kardashevskiy (5):
-  ccp: Make snp_reclaim_pages and __sev_do_cmd_locked public
-  psp-sev: Assign numbers to all status codes and add new
-  iommu/amd: Report SEV-TIO support
-  crypto: ccp: Enable SEV-TIO feature in the PSP when supported
-  crypto/ccp: Implement SEV-TIO PCIe IDE (phase1)
-
- drivers/crypto/ccp/Kconfig          |   1 +
- drivers/crypto/ccp/Makefile         |   8 +
- drivers/crypto/ccp/sev-dev-tio.h    | 142 ++++
- drivers/crypto/ccp/sev-dev.h        |   9 +
- drivers/iommu/amd/amd_iommu_types.h |   1 +
- include/linux/amd-iommu.h           |   2 +
- include/linux/psp-sev.h             |  17 +-
- include/uapi/linux/psp-sev.h        |  66 +-
- drivers/crypto/ccp/sev-dev-tio.c    | 863 ++++++++++++++++++++
- drivers/crypto/ccp/sev-dev-tsm.c    | 405 +++++++++
- drivers/crypto/ccp/sev-dev.c        |  69 +-
- drivers/iommu/amd/init.c            |   9 +
- 12 files changed, 1556 insertions(+), 36 deletions(-)
- create mode 100644 drivers/crypto/ccp/sev-dev-tio.h
- create mode 100644 drivers/crypto/ccp/sev-dev-tio.c
- create mode 100644 drivers/crypto/ccp/sev-dev-tsm.c
-
+diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+index ac03bd0848f7..b9029506383f 100644
+--- a/drivers/crypto/ccp/sev-dev.h
++++ b/drivers/crypto/ccp/sev-dev.h
+@@ -66,6 +66,8 @@ struct sev_device {
+ int sev_dev_init(struct psp_device *psp);
+ void sev_dev_destroy(struct psp_device *psp);
+ 
++int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
++
+ void sev_pci_init(void);
+ void sev_pci_exit(void);
+ 
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index e0dbcb4b4fd9..34a25209f909 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -992,6 +992,7 @@ int sev_do_cmd(int cmd, void *data, int *psp_ret);
+ 
+ void *psp_copy_user_blob(u64 uaddr, u32 len);
+ void *snp_alloc_firmware_page(gfp_t mask);
++int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool locked);
+ void snp_free_firmware_page(void *addr);
+ void sev_platform_shutdown(void);
+ bool sev_is_snp_ciphertext_hiding_supported(void);
+@@ -1027,6 +1028,11 @@ static inline void *snp_alloc_firmware_page(gfp_t mask)
+ 	return NULL;
+ }
+ 
++static inline int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool locked)
++{
++	return -ENODEV;
++}
++
+ static inline void snp_free_firmware_page(void *addr) { }
+ 
+ static inline void sev_platform_shutdown(void) { }
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 0d13d47c164b..9e0c16b36f9c 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -387,13 +387,7 @@ static int sev_write_init_ex_file_if_required(int cmd_id)
+ 	return sev_write_init_ex_file();
+ }
+ 
+-/*
+- * snp_reclaim_pages() needs __sev_do_cmd_locked(), and __sev_do_cmd_locked()
+- * needs snp_reclaim_pages(), so a forward declaration is needed.
+- */
+-static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
+-
+-static int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool locked)
++int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool locked)
+ {
+ 	int ret, err, i;
+ 
+@@ -427,6 +421,7 @@ static int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool lock
+ 	snp_leak_pages(__phys_to_pfn(paddr), npages - i);
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(snp_reclaim_pages);
+ 
+ static int rmp_mark_pages_firmware(unsigned long paddr, unsigned int npages, bool locked)
+ {
+@@ -857,7 +852,7 @@ static int snp_reclaim_cmd_buf(int cmd, void *cmd_buf)
+ 	return 0;
+ }
+ 
+-static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
++int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ {
+ 	struct cmd_buf_desc desc_list[CMD_BUF_DESC_MAX] = {0};
+ 	struct psp_device *psp = psp_master;
 -- 
 2.51.1
 
