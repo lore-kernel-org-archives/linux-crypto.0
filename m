@@ -1,130 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A952338930;
-	Fri, 21 Nov 2025 17:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FA83BBF2
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Nov 2025 17:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763745368; cv=none; b=t0lnudqFLoTdQagI/U5dUolxhnDwW79AG6gut5Lbn9NAl4LRraGjf1Fd+vmtkY3dI3/RsbAeDCoSwLRaueTogO9fsFkL+tFCZnCrd6X6iVpzyGU4CxUZbsYrkiH0rqCjLtFna89lMbdMjuiXheJ5NRW8tHZiq9kpQuWVzjx+xpI=
+	t=1763746334; cv=none; b=eS0V3GzgNahIa0oFPeMEZwuNcmr96HTbU3TfnbzlGZix6FAhUqM57JRuD1kwjKsgrlt6fQ9UqzRLaGqtMrTJjDtRw/ngZtlksyzuGsTB1R2982jfoOqAiaYA/Yl2BLszS++BH3TNEY6JL93DKch8Hv5AM4u0ZJOeUfqODCm6sM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763745368; c=relaxed/simple;
-	bh=5viuxS+I/cjXRipWkU+oShVwBH4G5jomU0gyg8v/XLY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s/7s06/lFu6Yzias8DsQbzwGYNYoQLFGQu0Yv/L53QLKRV5Z0l+LeY12rq9UnzoQSwknofmw27xueCanSmLCcdSNfIpr/G6Sb1hjpkpmbujoQjA+B7zXyetzTR6OpHb/8gDd6lSePPLhgW5coearOgJ5OLlXLZ+BxUvJvHPzQhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kIGxZxdp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763746334; c=relaxed/simple;
+	bh=kth0y7HTa9SOKIU9g0nLJ1NK5z0zg64snesxFb7xaaU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W0OUwJRYMHl+OdcUtVo71ZuwgOYJd7/8U9rdgVfshUgy3ODIqsmoyOI8JUv5Pe1TvOuJin24Ki9zI3dUAVfLoKeGrOVK+uWWxYJ6gHdtsw87mB9Fo06CUx0EZdlXXxyaAW+xF0K20oUYxb/bNpfEUg979x69TbDjAgN0cEYX2OI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=v8zLkXCM; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kIGxZxdp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8FA9C4CEF1;
-	Fri, 21 Nov 2025 17:16:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763745367;
-	bh=5viuxS+I/cjXRipWkU+oShVwBH4G5jomU0gyg8v/XLY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kIGxZxdpWxCPfsq3BQXW6Lf9rIAahY2XiPkAvKlYYxmmGCNQAcSlGljoPlHCG43J+
-	 Sw48MvlB0zwIAKQjb7nbk4XlhQCpw/Hmg6Nant+V9Um5JvwfcNrvO8LRQ9kPkEKSpH
-	 MljzuBoJxNxFNxeKE62+mHyq9o/j3+zKSO93LjbfFMu/Yw8x+jx1vw1BouaPWnvcgk
-	 IqwcVNPDbwX5NvvSXh1Z3Uuj5a3vbwkzCA2txAkbrDQz3gU/WvzV/PEPFhNpFcrChB
-	 I+xvTlkE9wGHBvM6dp9rq6ZAa0HpbpF28hzxVidiH1Sk+jjjAdWmlC7bJUEFR2EXSu
-	 7zLgJQ7vqeAHQ==
-Date: Fri, 21 Nov 2025 09:14:21 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
-	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] lib/crypto: Add ML-DSA verification support
-Message-ID: <20251121171421.GA1737@sol>
-References: <20251121005017.GD3532564@google.com>
- <20251120003653.335863-2-ebiggers@kernel.org>
- <20251120003653.335863-1-ebiggers@kernel.org>
- <2624664.1763646918@warthog.procyon.org.uk>
- <2755899.1763728901@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="v8zLkXCM"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-59578e38613so2656032e87.2
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Nov 2025 09:32:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1763746331; x=1764351131; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kth0y7HTa9SOKIU9g0nLJ1NK5z0zg64snesxFb7xaaU=;
+        b=v8zLkXCMMFZcibfoyLGEaykfU0GqSzBf/fH8MzvfOx4UpRlJtaZZ45ZSTu/2lasd7n
+         Yne74jDpttIVknxLguSWthBre3JFNRoUK6tMT52M4fex+CxTb3TJMvO/r3DEniCL/ams
+         hWBWsa9zEW6h7qQTmeV2WkJ8h//2KVzAthUREbfx+4kMnbk7SpuxDC7mef08sDvfNe0j
+         fBtzNGSoCwcTDlvI9c2t1E9MQRm0/sOTCfFt1i4KajiA3M3nZcmRY9C/AAsVVczz29UZ
+         DbR+PPOK80PG0Ht+PzGhNT326rqyxKZrjGXIuy2Bk694a1fcGEl9BpXm1KN1WQL6X4yG
+         o8tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763746331; x=1764351131;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=kth0y7HTa9SOKIU9g0nLJ1NK5z0zg64snesxFb7xaaU=;
+        b=F4BdVNN2s8XfeNzIexwZneSbQDucch7dJcjIgzJ+C/ouHI9AGSZi4sX52RQvcrxz4j
+         5OraxIBDJyOHeLJSMm6Bi9EVYb9IviyCfCBbBxiQkSxmaXXoOKV6X2rJ7YawzzJBMmj4
+         ybZ7xqawIYQ92fwuWaGThMLJmvVGZd09xc/4hfWKTXDGqtehThKnmqMvjJkHMExi/o2M
+         DQpMzY7VKzH4ni0dN0hOW8P6LviRSgnSlFZ7cnAMyVRzs/QeBG5InMLOdpOKKXWCzMQC
+         CiQEBB1gSZ76T3PeOBWYLVotNX4KBIRn4RZrUVu6i6PyvZGjZX4lfkr1ZThkx9BUSHZR
+         72QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUkgPbw3e6WNGy3c4otGKeHZnRK3/n5pL5Wi4vxgUGVSi71x8jmpYSIuBT6qvyfkjRo2bUNw3vAWtJTgOM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4ZLPmpWmEjyyhQlh0j9/KDFzOw3duxJjH/Uuvm36InNxhdCXd
+	eqDz/O/7EYVjG8Zobd36mrI2ZI2qdwMZ197n/g582lkGctIf6bMgo+Zv1DPa+ZRPGFGtF5PM2rf
+	ApucH6eWYaPCujBj3R3I5p2gFNnh5DJajJ9ex+8XyRQ==
+X-Gm-Gg: ASbGnctKjnlipx5vI1b8iMDa9jB218ePFITaSGQDQh97fGcN6Rs5rrYEPkdHZfr5xGc
+	75hkvJMWKFzIchjRoMXIEQnhRh6laKYTYHE06pKen/YJqOBCPdQlvlwqNPsIaaDBtWEv164DO+8
+	goX7zih2Fx3NjPtsZ/pbwOMCV1uf/AMiAfmOXPFTK9KrXWN9i3PoamX0WkhC263wWNaBLlVLPy4
+	gW6aMLOCS0YQbgfy1LhXkYoa5FkI8+5u3RYHSL/Zp4BhQc1a8O7xeOTvDQiwB2S6C2oJOO1YODK
+	BCCgGHHPfnZ0Saj7BIrLy4rl2Og=
+X-Google-Smtp-Source: AGHT+IFrdM3hZhHWz0WyuYbt+MGt6Thaf3kFt5DbPs90YPkIC9rrtnEFnyWeJ+DyEDb8IAb42i1R+G+ZOCDA0C98CKc=
+X-Received: by 2002:ac2:4e0a:0:b0:595:8258:ccc7 with SMTP id
+ 2adb3069b0e04-596a3e9eb1bmr1000163e87.1.1763746330475; Fri, 21 Nov 2025
+ 09:32:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2755899.1763728901@warthog.procyon.org.uk>
+References: <20251106-qcom-qce-cmd-descr-v8-0-ecddca23ca26@linaro.org>
+ <20251106-qcom-qce-cmd-descr-v8-1-ecddca23ca26@linaro.org>
+ <xozu7tlourkzuclx7brdgzzwomulrbznmejx5d4lr6dksasctd@zngg5ptmedej>
+ <CAMRc=MdC7haZ9fkCNGKoGb-8R5iB0P2UA5+Fap8Svjq-WdE-=w@mail.gmail.com>
+ <m4puer7jzmicbjrz54yx3fsrlakz7nwkuhbyfedqwco2udcivp@ctlklvrk3ixg>
+ <CAMRc=MfkVoRGFLSp6gy0aWe_3iA2G5v0U7yvgwLp5JFjmqkzsw@mail.gmail.com>
+ <66nhvrt4krn7lvmsrqoc5quygh7ckc36fax3fgol2feymqfbdp@lqlfye47cs2p>
+ <CAMRc=McYTdgoAR8AOz-n5JEroyndML1ZQvW=oxiheye3WQmvRw@mail.gmail.com> <whxi2ikode53vrxqpanryw74zd7oovfielgdvhpkka5zy76g75@dxreidnb77y5>
+In-Reply-To: <whxi2ikode53vrxqpanryw74zd7oovfielgdvhpkka5zy76g75@dxreidnb77y5>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 21 Nov 2025 18:31:59 +0100
+X-Gm-Features: AWmQ_bnls5aC2uYMxiloODvlLPPtaHGzyORZnXBgt1VZ07gmTcD09CgNCNE_vtQ
+Message-ID: <CAMRc=MfqYiuLaz_28nE+5QSdiG-MyTk885HSO4OYz8Wf4myfJQ@mail.gmail.com>
+Subject: Re: [PATCH v8 01/11] dmaengine: Add DMA_PREP_LOCK/DMA_PREP_UNLOCK flags
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
+	Daniel Perez-Zoghbi <dperezzo@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
+	dmaengine@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 21, 2025 at 12:41:41PM +0000, David Howells wrote:
-> Eric Biggers <ebiggers@kernel.org> wrote:
-> 
-> > On Thu, Nov 20, 2025 at 01:55:18PM +0000, David Howells wrote:
-> > > Eric Biggers <ebiggers@kernel.org> wrote:
-> > > 
-> > > > +	/* Compute d = (c mod 2^32) * (q^-1 mod 2^32). */
-> > > > +	s32 d = (s32)c * QINV_MOD_R;
-> > > 
-> > > Hmmm...  is "(s32)c" actually "(c mod 2^32)"?  Should that be:
-> > > 
-> > > 	u32 d = (u32)c * QINV_MOD_R;
-> > > 
-> > > This is followed up by casting 'd' to "s64".  I don't think that should
-> > > sign-extend it, but...
-> > 
-> > It selects the representative in the range [INT32_MIN, INT32_MAX],
-> > rather than the representative in the range [0, UINT32_MAX].  The sign
-> > extension is intentional.
-> 
-> I'm concerned about the basis on which it becomes positive or negative.  It
-> looks like the sign bit ends up being chosen arbitrarily.
+On Fri, Nov 21, 2025 at 5:36=E2=80=AFPM Dmitry Baryshkov
+<dmitry.baryshkov@oss.qualcomm.com> wrote:
+>
+> >
+> > The flag has to be passed to the BAM driver at the time of calling of
+> > dmaengine_prep_slave_sg() and attrs seems to be the only way with the
+> > current interface. Off the top of my head: we could extend struct
+> > scatterlist to allow passing some arbitrary driver data but that
+> > doesn't sound like a good approach.
+>
+> Can we use DMA metadata in order to pass the lock / unlock flags
+> instead? I might be missing something, but the LOCK / UNLOCK ops defined
+> in this patchset seem to be too usecase-specific. Using metadata seems
+> to allow for this kind of driver-specific sidechannel.
+>
 
-Right, it's unrelated to the sign of the s64 value, unless the s64 value
-happens to fit in a s32.  And that's okay: the worst-case analysis,
-which considers the largest possible absolute value that can be built
-up, assumes the signs happen to match repeatedly.
+I'll look into it, thanks.
 
-By the way, lest you think I'd doing anything particularly novel here,
-the Dilithium reference code also uses this same (very-nearly-symmetric)
-Montgomery reduction formula including the sign extension, where it made
-its way into leancrypto and your patchset too.  It also appears in FIPS
-204 as Algorithm 49, MontgomeryReduce.  There are other ways to
-implement this stuff, but they would be less efficient.
-
-However, unfortunately neither source explains it properly, and they
-actually provide incorrect information.  The comment in the reference
-code says the the input can be in "-2^{31}Q <= a <= Q*2^31", which isn't
-quite correct; the upper bound is actually exclusive.  In my code, I
-correctly document the upper bound as being exclusive.
-
-FIPS 204 documents the same incorrect interval, but then sort of gets
-around it by only claiming that the output is less than 2q in absolute
-value (rather than q) and also by not clarifying whether sign extension
-is done.  They may have thought that sign extension shouldn't be done,
-as you seem to have thought.  Either way, their explanation is
-misleading.  The very-nearly-symmetric version that produces an output
-less than q in absolute value is the logical version when working with
-signed values, and it seems to be what the Dilithium authors intended.
-
-Anyway, it's clear that my code comments still didn't explain it
-properly either, so I'll work on that.
-
-> > > > +		/* Reduce to [0, q), then tmp = w'_1 = UseHint(h, w'_Approx) */
-> > > 
-> > > Bracket mismatch.  "[0, q]"
-> > 
-> > It's intentional, since it denotes a mathematical range.  Elsewhere I
-> > used the words "the range" explicitly, so I'll add that above too.  (Or
-> > maybe reword it differently.)
-> 
-> I meant you have an opening square bracket and a closing round bracket in
-> "[0, q)".
-
-That means the lower end is inclusive and the upper end is exclusive.
-We're taking mod q, so we do *not* want q to be included.
-
-I could write it another way that wouldn't assume familiarity with open
-interval notation, like [0, q - 1] or 0 <= val < q.
-
-- Eric
+Bart
