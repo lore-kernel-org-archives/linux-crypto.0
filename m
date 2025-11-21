@@ -1,108 +1,85 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FA83BBF2
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Nov 2025 17:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C95A340A49
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Nov 2025 17:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763746334; cv=none; b=eS0V3GzgNahIa0oFPeMEZwuNcmr96HTbU3TfnbzlGZix6FAhUqM57JRuD1kwjKsgrlt6fQ9UqzRLaGqtMrTJjDtRw/ngZtlksyzuGsTB1R2982jfoOqAiaYA/Yl2BLszS++BH3TNEY6JL93DKch8Hv5AM4u0ZJOeUfqODCm6sM8=
+	t=1763746898; cv=none; b=esXNvwGR/4sygceZnlfTNsSHEo7ZZW+Ks27StjPNkvckVrEal9hKX3txEDHEeeayikUdWO4cnRlD//ZazIMqpsSdWcsdksdpnCKd4KUQN2W5Pakg09uJapfytwE12t+Q0eZuUaaMfX2PmLcPHao+aJpidmHuOkH4ER4ByzHQhCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763746334; c=relaxed/simple;
-	bh=kth0y7HTa9SOKIU9g0nLJ1NK5z0zg64snesxFb7xaaU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W0OUwJRYMHl+OdcUtVo71ZuwgOYJd7/8U9rdgVfshUgy3ODIqsmoyOI8JUv5Pe1TvOuJin24Ki9zI3dUAVfLoKeGrOVK+uWWxYJ6gHdtsw87mB9Fo06CUx0EZdlXXxyaAW+xF0K20oUYxb/bNpfEUg979x69TbDjAgN0cEYX2OI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=v8zLkXCM; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1763746898; c=relaxed/simple;
+	bh=Hr0jEcRhdkLIIYgRig4jVVH0qfASNwYnKxYMauD9L7g=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=go0GbkjDfq1F95leKqpqZzvcQ1IRgvYlLhCT7EsygODpL+fCAUSmifvPSaN+94gl88kM9WvO7N2JozmX8wyGryTLrzcydRParTFqSaWTKjGKsfXrWgQPFiWSzeO43sQQy2gtxxQR1rAREqRuHh88nzQjxr2yjH0gD3BcQ90BLqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BTWPWwx1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="v8zLkXCM"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-59578e38613so2656032e87.2
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Nov 2025 09:32:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1763746331; x=1764351131; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kth0y7HTa9SOKIU9g0nLJ1NK5z0zg64snesxFb7xaaU=;
-        b=v8zLkXCMMFZcibfoyLGEaykfU0GqSzBf/fH8MzvfOx4UpRlJtaZZ45ZSTu/2lasd7n
-         Yne74jDpttIVknxLguSWthBre3JFNRoUK6tMT52M4fex+CxTb3TJMvO/r3DEniCL/ams
-         hWBWsa9zEW6h7qQTmeV2WkJ8h//2KVzAthUREbfx+4kMnbk7SpuxDC7mef08sDvfNe0j
-         fBtzNGSoCwcTDlvI9c2t1E9MQRm0/sOTCfFt1i4KajiA3M3nZcmRY9C/AAsVVczz29UZ
-         DbR+PPOK80PG0Ht+PzGhNT326rqyxKZrjGXIuy2Bk694a1fcGEl9BpXm1KN1WQL6X4yG
-         o8tA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763746331; x=1764351131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kth0y7HTa9SOKIU9g0nLJ1NK5z0zg64snesxFb7xaaU=;
-        b=F4BdVNN2s8XfeNzIexwZneSbQDucch7dJcjIgzJ+C/ouHI9AGSZi4sX52RQvcrxz4j
-         5OraxIBDJyOHeLJSMm6Bi9EVYb9IviyCfCBbBxiQkSxmaXXoOKV6X2rJ7YawzzJBMmj4
-         ybZ7xqawIYQ92fwuWaGThMLJmvVGZd09xc/4hfWKTXDGqtehThKnmqMvjJkHMExi/o2M
-         DQpMzY7VKzH4ni0dN0hOW8P6LviRSgnSlFZ7cnAMyVRzs/QeBG5InMLOdpOKKXWCzMQC
-         CiQEBB1gSZ76T3PeOBWYLVotNX4KBIRn4RZrUVu6i6PyvZGjZX4lfkr1ZThkx9BUSHZR
-         72QQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkgPbw3e6WNGy3c4otGKeHZnRK3/n5pL5Wi4vxgUGVSi71x8jmpYSIuBT6qvyfkjRo2bUNw3vAWtJTgOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4ZLPmpWmEjyyhQlh0j9/KDFzOw3duxJjH/Uuvm36InNxhdCXd
-	eqDz/O/7EYVjG8Zobd36mrI2ZI2qdwMZ197n/g582lkGctIf6bMgo+Zv1DPa+ZRPGFGtF5PM2rf
-	ApucH6eWYaPCujBj3R3I5p2gFNnh5DJajJ9ex+8XyRQ==
-X-Gm-Gg: ASbGnctKjnlipx5vI1b8iMDa9jB218ePFITaSGQDQh97fGcN6Rs5rrYEPkdHZfr5xGc
-	75hkvJMWKFzIchjRoMXIEQnhRh6laKYTYHE06pKen/YJqOBCPdQlvlwqNPsIaaDBtWEv164DO+8
-	goX7zih2Fx3NjPtsZ/pbwOMCV1uf/AMiAfmOXPFTK9KrXWN9i3PoamX0WkhC263wWNaBLlVLPy4
-	gW6aMLOCS0YQbgfy1LhXkYoa5FkI8+5u3RYHSL/Zp4BhQc1a8O7xeOTvDQiwB2S6C2oJOO1YODK
-	BCCgGHHPfnZ0Saj7BIrLy4rl2Og=
-X-Google-Smtp-Source: AGHT+IFrdM3hZhHWz0WyuYbt+MGt6Thaf3kFt5DbPs90YPkIC9rrtnEFnyWeJ+DyEDb8IAb42i1R+G+ZOCDA0C98CKc=
-X-Received: by 2002:ac2:4e0a:0:b0:595:8258:ccc7 with SMTP id
- 2adb3069b0e04-596a3e9eb1bmr1000163e87.1.1763746330475; Fri, 21 Nov 2025
- 09:32:10 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BTWPWwx1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763746896;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hr0jEcRhdkLIIYgRig4jVVH0qfASNwYnKxYMauD9L7g=;
+	b=BTWPWwx1OPcY234PdkIZmPG4n4DffMwt9c83+mUWYo5OwurSHV5kSOfSxlNvt/jhdDEtn6
+	r8cWxQGro6OTrNB6Xl/9iiDLBxv23NS9wUiZddYkImFJAn6vc5a5ZYh/dwbzYD1+oYyB1W
+	1tQ/C1k+8bWST3hVftlgqm+HGc63IKw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-336-e8P11Z0mMvKXmHXx4Gzk9A-1; Fri,
+ 21 Nov 2025 12:41:31 -0500
+X-MC-Unique: e8P11Z0mMvKXmHXx4Gzk9A-1
+X-Mimecast-MFC-AGG-ID: e8P11Z0mMvKXmHXx4Gzk9A_1763746889
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE08B1956094;
+	Fri, 21 Nov 2025 17:41:28 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DE8401956045;
+	Fri, 21 Nov 2025 17:41:24 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20251121171421.GA1737@sol>
+References: <20251121171421.GA1737@sol> <20251121005017.GD3532564@google.com> <20251120003653.335863-2-ebiggers@kernel.org> <20251120003653.335863-1-ebiggers@kernel.org> <2624664.1763646918@warthog.procyon.org.uk> <2755899.1763728901@warthog.procyon.org.uk>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Luis Chamberlain <mcgrof@kernel.org>,
+    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
+    Sami Tolvanen <samitolvanen@google.com>,
+    "Jason A . Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Stephan Mueller <smueller@chronox.de>,
+    Lukas Wunner <lukas@wunner.de>,
+    Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
+    linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] lib/crypto: Add ML-DSA verification support
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251106-qcom-qce-cmd-descr-v8-0-ecddca23ca26@linaro.org>
- <20251106-qcom-qce-cmd-descr-v8-1-ecddca23ca26@linaro.org>
- <xozu7tlourkzuclx7brdgzzwomulrbznmejx5d4lr6dksasctd@zngg5ptmedej>
- <CAMRc=MdC7haZ9fkCNGKoGb-8R5iB0P2UA5+Fap8Svjq-WdE-=w@mail.gmail.com>
- <m4puer7jzmicbjrz54yx3fsrlakz7nwkuhbyfedqwco2udcivp@ctlklvrk3ixg>
- <CAMRc=MfkVoRGFLSp6gy0aWe_3iA2G5v0U7yvgwLp5JFjmqkzsw@mail.gmail.com>
- <66nhvrt4krn7lvmsrqoc5quygh7ckc36fax3fgol2feymqfbdp@lqlfye47cs2p>
- <CAMRc=McYTdgoAR8AOz-n5JEroyndML1ZQvW=oxiheye3WQmvRw@mail.gmail.com> <whxi2ikode53vrxqpanryw74zd7oovfielgdvhpkka5zy76g75@dxreidnb77y5>
-In-Reply-To: <whxi2ikode53vrxqpanryw74zd7oovfielgdvhpkka5zy76g75@dxreidnb77y5>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 21 Nov 2025 18:31:59 +0100
-X-Gm-Features: AWmQ_bnls5aC2uYMxiloODvlLPPtaHGzyORZnXBgt1VZ07gmTcD09CgNCNE_vtQ
-Message-ID: <CAMRc=MfqYiuLaz_28nE+5QSdiG-MyTk885HSO4OYz8Wf4myfJQ@mail.gmail.com>
-Subject: Re: [PATCH v8 01/11] dmaengine: Add DMA_PREP_LOCK/DMA_PREP_UNLOCK flags
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
-	dmaengine@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3042396.1763746883.1@warthog.procyon.org.uk>
+Date: Fri, 21 Nov 2025 17:41:23 +0000
+Message-ID: <3042397.1763746883@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, Nov 21, 2025 at 5:36=E2=80=AFPM Dmitry Baryshkov
-<dmitry.baryshkov@oss.qualcomm.com> wrote:
->
-> >
-> > The flag has to be passed to the BAM driver at the time of calling of
-> > dmaengine_prep_slave_sg() and attrs seems to be the only way with the
-> > current interface. Off the top of my head: we could extend struct
-> > scatterlist to allow passing some arbitrary driver data but that
-> > doesn't sound like a good approach.
->
-> Can we use DMA metadata in order to pass the lock / unlock flags
-> instead? I might be missing something, but the LOCK / UNLOCK ops defined
-> in this patchset seem to be too usecase-specific. Using metadata seems
-> to allow for this kind of driver-specific sidechannel.
->
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-I'll look into it, thanks.
+> I could write it another way that wouldn't assume familiarity with open
+> interval notation, like [0, q - 1] or 0 <= val < q.
 
-Bart
+"[0, q-1]" would be less prone to confusion, thanks - and editors flagging the
+bracket mismatch.
+
+David
+
