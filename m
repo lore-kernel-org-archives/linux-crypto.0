@@ -1,173 +1,154 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE4026ED45
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Nov 2025 06:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C8F21B9C9
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Nov 2025 08:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763707460; cv=none; b=h0QiaaHdOLKX95Q9nUF9TexA64FMiTfYq/IBR9UK5EIzVr6zqmKV4bzhQNXz/6CAbcjSfwoHXgiyKzQtZSh8ONQE/0AF0+5LAWWgoks51KC7abB+1pzyEnS76DYBBfB7NO24QqPtF82PecG7nCE9E8X54k4uKApZJXc8Bpk9dYc=
+	t=1763712070; cv=none; b=DVeM+V5DpxMjQHt0tqMo/QisXB5FT245kLXePDF5pig3XKXRy++3MZJUMVI+w137iRDBnAJfck6YLW8Zm8QOkeMj3XB6wQ14wit/xosBHxcczSwO/ShUYOFrMPt9hnNG6bCVClDEdrFQD6mxrfvDdlVwcuPvJI20n/k/3OoY+ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763707460; c=relaxed/simple;
-	bh=l9MuTE5VheQCTPhfizSRT5jBAOEVsLN5vfmku4wTn1E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=evU2KbKmSJUjKOsywWqkXD48l0ntzPTs9CKCt/59sinmC2yTln8jJ2GPXLhXLPW/F5v2pZrjM0oMz0hYki7wb9sgiNcXukXVG3PeUi2wxEhmIt2Zd9fu/MxW82Dm1vzDcFRaR849QLyo35hH6czTC8xdx+eEU2KRzW8JXEoB/78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=XvFMXs6i; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1763712070; c=relaxed/simple;
+	bh=p7uVlvE3Qm03vihPsE08vYaawKMxPv/DQrOZ33uA8iU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DA/hsUtIRjOwi9xiZgZmfrFTPNhIR1tcIlszuL/9zYDyQEv/HDrPhrmMld8wR3ndDQD1TvJtF2ygIlv99CECBcZX9/4k9000ljMUfVtevj6vgkgDZ4Jnc+QlaKIIza2TibXbvN9GFTEmwlZo3FyB2BOivLRAU9Ag3ursZh/xyiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=CDFQbRxh; arc=none smtp.client-ip=74.125.224.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="XvFMXs6i"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4779ce2a624so14887395e9.2
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Nov 2025 22:44:17 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="CDFQbRxh"
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-63fca769163so1825757d50.2
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Nov 2025 00:01:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1763707456; x=1764312256; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iXR0JUhcsmCtHv8GpcE2s/3ds9XyZB689MRsifN/sv0=;
-        b=XvFMXs6iMJE3FcAIsx9z06xbJcD0RqnIU3mr36jrwyqq4EwMwDQeq7Vn/xRSApG6B4
-         H8FqgLJVze406uqB+VhI99EXOzwzZVJRQtuaCHu/MqupCNm013HW6HZBlEJUtF6av/Vw
-         bD/Myi4X/RmB809h7Cye2aDTTS7dpbNULTkTY6GPtSOFnEeM3HlGmkejiX6T/IK6c5xK
-         BVeRYCrY1xE0ikko70jc1omp3nDPa2JycOp978GL2pTkVuwzoB+4oMqVOW86EvLmuFsb
-         PZQEz+Bo7KohgnKJmwlNIg5G3+/EMJqTXjoOSGcBioE/o6idfSXP0r9ooXgxBUmGLGgu
-         p1Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763707456; x=1764312256;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=vayavyalabs.com; s=google; t=1763712068; x=1764316868; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iXR0JUhcsmCtHv8GpcE2s/3ds9XyZB689MRsifN/sv0=;
-        b=q26gq1iwW/zYpFEyWLfwbUoavA1Vqw8yNfIk5JxjotCytyaN1s5NbvzAwqpPH6nB5f
-         5/rA4acjb3DHoh5Sw8tt6S3XVE2/I85Lysc56Vbyu9zl49tRS+ghkv8sBdRkBc+jiEYs
-         SEDd6kaDSSc8efrVamgU8cTpixG1iwPIFlKm8kE7nksGKrHcYoLde1YfKIiyqX2k52jo
-         f05TI1qkpr0ZFMJfZcBTTxNyzSIOB45HVj48aP94b/k3dXc+FFi18rU7Oq1Y2OMr5FDc
-         iDgQpuwR5N5/UHpx3cyIfRH1fdA74Spi9xmMvsWSd2NbKYY23rOUCH72eGZ06N7t70Cj
-         igJg==
-X-Forwarded-Encrypted: i=1; AJvYcCV82OHG8J6m8kBzoyMcg+e0GgL8w2V/smPnGf8rZosLthNSFJE48ruPMe0DtG2POieyVRGKRL5ORXNgYto=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyH+NcDk23xb09nTDyKqJ9rXT27bJBDr5OoXXrtt674Y70BmRVK
-	BJdMlZJJ9k7KA305kQaUAaDt64Wzi/tv/DBI9fwH0pidMn7A0F1v/kqZTcGnR8MXO9K6D9cOXet
-	E/GxG
-X-Gm-Gg: ASbGnctG0COMd5pZRvQ3i6Af1qQlblGOxvL1RRgIfUcGiGeuPVG8QCb1gckkqRKfeu2
-	ZymgaGt+l+Vk9tl2GyQ+4zEZRf5cYyIm5P3P0AEFtz0Pc2LGwZ0KGn99QwbDyjWthN77y6iZyPe
-	PPQpOWedUk8pO38xJackUKN5reULFlPZ8e0/T7/YUdFbV99QAi+kczyh5EWsvl5d+KETUUVtESj
-	cBZo8FrA3VX82LcGx28+JfvRBH3/wOBEGLmj2O0k2gBRYAzuC9hzXbGhgeUOHHDLgRrzqpq0eWc
-	1GPTNZ8Akxh3S9Erw5i+ljSN4oYblnBd7lWt+BerYGQKGTbP+IC1N8ixcMy5XOUSJDJPImSZTtN
-	7V1x7vui8uG81KO31H0r05nSQqKjhizXKYVZnSQIl6O2kiep20Hpj6w3ziylnHJSslcbtM/9bmp
-	3Qhs2xTFcASf0VoyqQ/jxcplxD/9frhjX9G6XM6Hs=
-X-Google-Smtp-Source: AGHT+IGdIK6trM43tQIGcKRtdsyNFsLvxqida6hjALDLiZxyklMajArhH6t08+l8cjPKgEwcO2Hddg==
-X-Received: by 2002:a05:600c:4f15:b0:477:9fcf:3fe3 with SMTP id 5b1f17b1804b1-477c00eae92mr15791095e9.0.1763707455751;
-        Thu, 20 Nov 2025 22:44:15 -0800 (PST)
-Received: from ?IPV6:2403:580d:fda1::299? (2403-580d-fda1--299.ip6.aussiebb.net. [2403:580d:fda1::299])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b274d39sm45907915ad.77.2025.11.20.22.44.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 22:44:15 -0800 (PST)
-Message-ID: <5495561f-415d-4bb0-9cd4-4543c510f111@suse.com>
-Date: Fri, 21 Nov 2025 17:14:10 +1030
+        bh=L1tvndMjP9HAoDprqdYPBtu6xsScYiQegulJGgBItgE=;
+        b=CDFQbRxhpK3BEgEhyY8klRbYdf0Bo9A0y2m2pgDH+qfdVc9ogFEpVpumfHSxD+1069
+         /cvZgw9+SqH1h0bCfXtPQeu3lwe1GrJ+KC69HBV7xH7EwSy84C3WJPs78Cdw730uuGT+
+         S4y/e1TavZ7fLR4DAYquPWYFoKmApW47WyioA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763712068; x=1764316868;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=L1tvndMjP9HAoDprqdYPBtu6xsScYiQegulJGgBItgE=;
+        b=exOOus8n+Z8Ebz1rCZsSC1ubANTWCQ/bGAZEAQslP7VOu2OLAT6QNL4jOQGbBkqS+W
+         6fu3l6YVAbJVO9r+vOrmNNPyoc7LAi3S0NUHq6tcCFP/2qmDU78kC19vomX9vS2rwlLK
+         v3ZD0mpG1Gu8G4SNMv0vTYMhIwpYm5yW04kUzpsqXFaheN9agv3Ruan9a35xJJn9/6lc
+         01aJZTbUXbx6HuumUrlb2oyqjqtnyADRBU2U8rfIoaSduaeX+xE4WcDswmzv8bfdmdM5
+         NbME/SAgxEDo4Vk4ZIDBn1PUrXtq2JdqC+YKQjQSo8cqeD4J5GPVQ9ayLEhf2tZ2I7cS
+         lsFg==
+X-Gm-Message-State: AOJu0YyrHTA3aoe10yWcqSxVeYw92vBXC6nC0FaxSfapVmIqbA1Hj6rg
+	SBgXzdigGyahuCp1/7Bg8Xk49z5lOBOGSSs4pGSTac8wWW2v6XoIIVCsQbZW3VkLusVRk7apAaN
+	EUBkLuTEg7XHVmjvxnCehOWU5z4FsT2hhPDtIncq4FA==
+X-Gm-Gg: ASbGncvou1f9FD22nPEMRMvHzHgMEFacyeigOquRWvr8OKet2hS/SsDYt91O6PAVZ4v
+	Uok5PteYWS4lpJkjXQIhOhEM9osJ6aggoBhdZdtkYsskUU8Fk9FA41RtB+oQ8ePFQ260w0aBQmM
+	7rq3P3SmZIvKIQbBJDWeQ1OlOsKc9ZXra+fku3afVXLGD58BbGD1SGlVwjr260/fl0ZSuKe1fUM
+	H62v8s+jDkyfdZiVXl1DOInHcZqXo79mpMdwATYNH1a+ZcynClAbhmjjjtZZl9ILbQRr2lbMpSx
+	lCD1lilrYCowYJRoNdrwaD882SRq
+X-Google-Smtp-Source: AGHT+IEl8KOODStMI8dm5m76lMMQQ5gRzTphkTRgniUf/5r0P9q1EzWrX2kDa3Fv9kZPz1574X5k0b+ryB9WLwLycEY=
+X-Received: by 2002:a05:690e:190c:b0:640:d255:2d6f with SMTP id
+ 956f58d0204a3-64302a568f1mr802060d50.34.1763712068236; Fri, 21 Nov 2025
+ 00:01:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] btrfs-progs: docs: add warning for btrfs checksum
- features
-To: Christoph Anton Mitterer <calestyo@scientia.org>,
- linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <7458cde1f481c8d8af2786ee64d2bffde5f0386c.1763700989.git.wqu@suse.com>
- <9523838F-B99E-4CC5-8434-B34B105FD08B@scientia.org>
- <bc5249ba-9c39-42b1-903d-e50375a433d2@suse.com>
- <3C200394-F95B-4D1C-9256-3718E331ED34@scientia.org>
-Content-Language: en-US
-From: Qu Wenruo <wqu@suse.com>
-Autocrypt: addr=wqu@suse.com; keydata=
- xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
- 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
- 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
- 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
- gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
- AAHNGFF1IFdlbnJ1byA8d3F1QHN1c2UuY29tPsLAlAQTAQgAPgIbAwULCQgHAgYVCAkKCwIE
- FgIDAQIeAQIXgBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXVgBQkQ/lqxAAoJEMI9kfOh
- Jf6o+jIH/2KhFmyOw4XWAYbnnijuYqb/obGae8HhcJO2KIGcxbsinK+KQFTSZnkFxnbsQ+VY
- fvtWBHGt8WfHcNmfjdejmy9si2jyy8smQV2jiB60a8iqQXGmsrkuR+AM2V360oEbMF3gVvim
- 2VSX2IiW9KERuhifjseNV1HLk0SHw5NnXiWh1THTqtvFFY+CwnLN2GqiMaSLF6gATW05/sEd
- V17MdI1z4+WSk7D57FlLjp50F3ow2WJtXwG8yG8d6S40dytZpH9iFuk12Sbg7lrtQxPPOIEU
- rpmZLfCNJJoZj603613w/M8EiZw6MohzikTWcFc55RLYJPBWQ+9puZtx1DopW2jOwE0EWdWB
- rwEIAKpT62HgSzL9zwGe+WIUCMB+nOEjXAfvoUPUwk+YCEDcOdfkkM5FyBoJs8TCEuPXGXBO
- Cl5P5B8OYYnkHkGWutAVlUTV8KESOIm/KJIA7jJA+Ss9VhMjtePfgWexw+P8itFRSRrrwyUf
- E+0WcAevblUi45LjWWZgpg3A80tHP0iToOZ5MbdYk7YFBE29cDSleskfV80ZKxFv6koQocq0
- vXzTfHvXNDELAuH7Ms/WJcdUzmPyBf3Oq6mKBBH8J6XZc9LjjNZwNbyvsHSrV5bgmu/THX2n
- g/3be+iqf6OggCiy3I1NSMJ5KtR0q2H2Nx2Vqb1fYPOID8McMV9Ll6rh8S8AEQEAAcLAfAQY
- AQgAJgIbDBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXWBBQkQ/lrSAAoJEMI9kfOhJf6o
- cakH+QHwDszsoYvmrNq36MFGgvAHRjdlrHRBa4A1V1kzd4kOUokongcrOOgHY9yfglcvZqlJ
- qfa4l+1oxs1BvCi29psteQTtw+memmcGruKi+YHD7793zNCMtAtYidDmQ2pWaLfqSaryjlzR
- /3tBWMyvIeWZKURnZbBzWRREB7iWxEbZ014B3gICqZPDRwwitHpH8Om3eZr7ygZck6bBa4MU
- o1XgbZcspyCGqu1xF/bMAY2iCDcq6ULKQceuKkbeQ8qxvt9hVxJC2W3lHq8dlK1pkHPDg9wO
- JoAXek8MF37R8gpLoGWl41FIUb3hFiu3zhDDvslYM4BmzI18QgQTQnotJH8=
-In-Reply-To: <3C200394-F95B-4D1C-9256-3718E331ED34@scientia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20251031044803.400524-1-pavitrakumarm@vayavyalabs.com>
+ <20251031044803.400524-3-pavitrakumarm@vayavyalabs.com> <aQw-ugxNqclAqDkg@gondor.apana.org.au>
+In-Reply-To: <aQw-ugxNqclAqDkg@gondor.apana.org.au>
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Date: Fri, 21 Nov 2025 13:30:57 +0530
+X-Gm-Features: AWmQ_bkOmSF2vdQ5-_vP3HC8nfm7o6gE93J9cVBanb22mvJUTU4-cuCIGuUYy3g
+Message-ID: <CALxtO0=LxXg6Cw+PKnPQLhurkPRxvTOn63pyK9gFFH=y+F=hBQ@mail.gmail.com>
+Subject: Re: [PATCH v8 2/4] crypto: spacc - Add SPAcc ahash support
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, Ruud.Derwig@synopsys.com, 
+	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com, 
+	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Herbert,
+
+Thank you for your suggestion regarding removing dynamic statesize and
+reqsize usage in the spacc_ahash driver. I reviewed the
+aspeed_ahash_fallback implementation as you recommended and updated
+our driver to follow the same approach, including using the
+HASH_FBREQ_ON_STACK macro.
+
+With these changes, the ahash self-tests and functional tests pass
+successfully on kernel 6.17-rc1. However, the same implementation is
+failing on 6.18-rc1. Since aspeed_ahash_fallback is currently the only
+reference driver using this new fallback method, we wanted to request
+a bit more insight into the expected usage patterns.
+
+Specifically, it would be helpful to understand:
+
+Whether there were any additional changes in the ahash API or fallback
+handling between 6.17-rc1 and 6.18-rc1 that drivers should adapt to.
+
+Any constraints or assumptions the new fallback mechanism requires,
+beyond what aspeed_ahash_fallback demonstrates.
+
+Whether the stack-based fallback request (HASH_FBREQ_ON_STACK) has any
+new limitations or expected ordering requirements in 6.18-rc1.
+
+We want to ensure our implementation aligns fully with the intended
+direction of the API, so any guidance would be appreciated.
+
+Warm regards,
+PK
 
 
-
-在 2025/11/21 16:32, Christoph Anton Mitterer 写道:
-> 
-> 
-> On November 21, 2025 6:24:26 AM GMT+01:00, Qu Wenruo <wqu@suse.com> wrote:
->> 在 2025/11/21 15:47, Christoph Anton Mitterer 写道:
->>> Is that even the case when the wohle btrfs itself is encrypted, like in dm-crypt (without AEAD or verity, but only a normal cipher like aes-xts-plain64)?
->>> Wouldn't an attacker then neet to know how he can forge the right encrypted checksum?
->>
->> In that case the attacker won't even know it's a btrfs or not.
-> 
-> I wouldn't be so sure about that, at least not depending on the threat model.
-> First, there's always the case of leaking meta data,... like people observing the list or my access to Debian's packages archives (btrfs-progs) would e.g. know that there's a good chance I'm using btrfs.
-> 
-> Also, an attacker might be able to make snapshots of the offline device and see write patterns that may be typical for btrfs.
-> Even with only a single snapshot being made, with the empty device not randomised in advance, it might be clear which fs is used.
-> 
-> 
-> But all that's anyway not the main point.
-> 
-> Even if an attacker doesn't know what's in it,  he could try to silently corrupt data or replace (encrypted)  blocks with such from an older snapshot... which would then perhaps decrypt to something non-gibberish.
-
-Adding linux-crypto list for more feedback.
-
-In that case, as long as the csum tree can not be modified, no matter 
-whatever algorithm is, btrfs can still detect something is modified.
-
-> 
-> The question IMO is, whether a (dm-crypt) encrypted btrfs that uses a strong hash function for btrfs (i.e. like hash-then-encrypt) would be effectively integrity protected.
-
-In that case, I can not give a concrete answer, but I tend to believe 
-it's protected, and no matter what the algorithm is (including CRC32C).
-
-The attack must be able to modify both the data and the checksum to pass 
-the check.
-
-But since it's encrypted, the attacker is only to move the encrypted 
-data around, not able to modify the content pin-pointly, btrfs should be 
-able to detect the mismatch for both metadata and data:
-
-- For metadata
-   The bytenr will mismatch, thus be rejected.
-
-   This prevents csum tree from bing modified.
-
-- For data
-   The checksum will mismatch, thus be rejected.
-
-
-> I never really found a definitive answer on that (as in properly analysed by some professional cryptographer).
-> 
-> If so, keeling SHA256/etc. would make sense for that use case.
-
-Still makes not much sense, CRC32C is enough for the above case.
-
-Thanks,
-Qu
-
-> 
-> Cheers,
-> Chris.
-
+On Thu, Nov 6, 2025 at 11:53=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
+g.au> wrote:
+>
+> On Fri, Oct 31, 2025 at 10:18:01AM +0530, Pavitrakumar Managutte wrote:
+> >
+> > +static int spacc_hash_init_tfm(struct crypto_ahash *tfm)
+> > +{
+> > +     const struct spacc_alg *salg =3D container_of(crypto_ahash_alg(tf=
+m),
+> > +                                                 struct spacc_alg,
+> > +                                                 alg.hash.base);
+> > +     struct spacc_crypto_ctx *tctx =3D crypto_ahash_ctx(tfm);
+> > +
+> > +     tctx->handle    =3D -1;
+> > +     tctx->ctx_valid =3D false;
+> > +     tctx->dev       =3D get_device(salg->dev);
+> > +
+> > +     tctx->fb.hash =3D crypto_alloc_ahash(crypto_ahash_alg_name(tfm), =
+0,
+> > +                     CRYPTO_ALG_NEED_FALLBACK);
+> > +     if (IS_ERR(tctx->fb.hash)) {
+> > +             dev_err(tctx->dev, "SPAcc ahash fallback tfm is NULL!\n")=
+;
+> > +             put_device(tctx->dev);
+> > +             return PTR_ERR(tctx->fb.hash);
+> > +     }
+> > +
+> > +     crypto_ahash_set_statesize(tfm,
+> > +                     crypto_ahash_statesize(tctx->fb.hash));
+> > +
+> > +     crypto_ahash_set_reqsize(tfm,
+> > +                     sizeof(struct spacc_crypto_reqctx) +
+> > +                     crypto_ahash_reqsize(tctx->fb.hash));
+>
+> Please stop using dynamic statesize/reqsize values as they are
+> being phased out.
+>
+> The API now provides a fallback directly that can be used with
+> a stack request.  Grep for aspeed_ahash_fallback to see an example
+> of that being used.
+>
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
