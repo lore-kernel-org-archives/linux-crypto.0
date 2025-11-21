@@ -1,86 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E1B34D4D2;
-	Fri, 21 Nov 2025 11:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536273126B1
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Nov 2025 12:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763723517; cv=none; b=LNCZwaadjZoH+6CMkFR0rrMG35itQex/1qTVdWjZsmvUYA3M9SfY03CgQBTTkPsze0oRT07KlmO/r0LzSkrCh1RVS4iPU8/2/kw9KyvGFXW0kQ56Q9+T0c+3E+otM8AN0yXCsUJe2VNYI5ZMMZRu+IEdbqscoYNPcj1PJVI3YYc=
+	t=1763728916; cv=none; b=GAhqd6j0N0T7YNWJ8eToQX41uM0awgBxSk3w4Y01ZGBagvOXV5aasE3QRY2A8ype/op5OmjP6100mrG+NuslrXsicRzs3SGAX3IkUl3CDhb0Q/wSTPe3G51gLlkUtnXXwVmvkpg09Te/Vnl8UgL9jo/EqQ4AkxKNPLJwatQUIa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763723517; c=relaxed/simple;
-	bh=gWxAYhDmk41PHhTypPTXfd1MsXomDn33hIh6jBxUjgo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YFIgIUhZXLpQXgi1VD7Vt7xljde6CJYm7lDJ1sHkPgxuI//0UY3615375SLA24tDRUVzyQj2mSW6LJl4ao0JAP1joXPY4OhDuJZf/I2Mvurj7da7IFbHlU7Hl9CdUsno6SVOYfAAuGkpbzl0bjNrx6xqwo68xHfml5oUsbG25F8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lnHtHc4O; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763728916; c=relaxed/simple;
+	bh=Vap15O/LCeEV3yjhE8W7o8qtxMXTBX6RyW3ZEv7xYs8=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=Wx/IRBf1R+U8Midco2fMEpOn3b5aSZlq+E3Aliy9WHSLyk6q8wTajYbcRFYMFl2yFc0glgVRXNt+K/mvXeZeqLiMs3/EVjSutfdDACIx0zdGW0sVqVZoK/4eL2lMtiGuNPXUBRTsz5OwiNBed1tB8LO+xQA3RZFiLBbOIOSG8To=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FLfATZ1+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lnHtHc4O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD1FEC4CEF1;
-	Fri, 21 Nov 2025 11:11:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763723516;
-	bh=gWxAYhDmk41PHhTypPTXfd1MsXomDn33hIh6jBxUjgo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=lnHtHc4OMM/UnmrDGuJaiScF4nZfLCqMiCTfJ+qPGeN7dXpWXPmuWlG85E5cARTPO
-	 gKUzEmp7XLzjsytGT7JnC2xeJEIbTxou1/EDhMUu70ptOYaU2HOC4yKY+UrwyhfiX3
-	 qSgNRiCTC1X04Ixq7Kd8UfsmOThPHiU4xvHEzfWKkaNSyte+Dn/kNXNQVPUwK9tTS7
-	 utMefSUGqlt+6azzPpHWMGMfi9cj0OfOJ4wNo2U8rKo8zNDfWcPsddGuCM0aYusCh8
-	 pv6YaxzA9L/nGjywUhkUB1JZoZsjcqigZ18fdxAHEdKxkGG122F11j04qNdzGGHM9Y
-	 DoTxinZ+eJ1XQ==
-Received: from johan by xi.lan with local (Exim 4.98.2)
-	(envelope-from <johan@kernel.org>)
-	id 1vMP3V-000000006W8-0Xly;
-	Fri, 21 Nov 2025 12:11:57 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Weili Qian <qianweili@huawei.com>,
-	Zhou Wang <wangzhou1@hisilicon.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: Kai Ye <yekai13@huawei.com>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH] crypto: hisilicon/qm - fix device leak on QoS updates
-Date: Fri, 21 Nov 2025 12:11:30 +0100
-Message-ID: <20251121111130.25025-1-johan@kernel.org>
-X-Mailer: git-send-email 2.51.2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FLfATZ1+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763728914;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SJyQizyUQfr4vBGiRcxbci2GL/tku31+RZUix1dYDTk=;
+	b=FLfATZ1+i9Bpih2wLvuXerskJRsnVM3ugMlFHcYmVqEdKQ265eaFzwNuB5suJxeiDsNSAU
+	Kbfpix4P04f+45N1xF2QT2EzoqfUfvH9pR4qBdy1YnmzZKN4sQjAy9yAfA7runzMsI4PSq
+	VkF4h0Fw0k0NwwcetES2Nq6b33jxARQ=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-558--A0WeA1uN_uDpccxjrM_Lw-1; Fri,
+ 21 Nov 2025 07:41:49 -0500
+X-MC-Unique: -A0WeA1uN_uDpccxjrM_Lw-1
+X-Mimecast-MFC-AGG-ID: -A0WeA1uN_uDpccxjrM_Lw_1763728908
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 739C9195608A;
+	Fri, 21 Nov 2025 12:41:47 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B555030044DB;
+	Fri, 21 Nov 2025 12:41:42 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20251121005017.GD3532564@google.com>
+References: <20251121005017.GD3532564@google.com> <20251120003653.335863-2-ebiggers@kernel.org> <20251120003653.335863-1-ebiggers@kernel.org> <2624664.1763646918@warthog.procyon.org.uk>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Luis Chamberlain <mcgrof@kernel.org>,
+    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
+    Sami Tolvanen <samitolvanen@google.com>,
+    "Jason A . Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Stephan Mueller <smueller@chronox.de>,
+    Lukas Wunner <lukas@wunner.de>,
+    Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
+    linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] lib/crypto: Add ML-DSA verification support
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2755898.1763728901.1@warthog.procyon.org.uk>
+Date: Fri, 21 Nov 2025 12:41:41 +0000
+Message-ID: <2755899.1763728901@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Make sure to drop the reference taken when looking up the PCI device on
-QoS updates.
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-Fixes: 22d7a6c39cab ("crypto: hisilicon/qm - add pci bdf number check")
-Cc: stable@vger.kernel.org	# 6.2
-Cc: Kai Ye <yekai13@huawei.com>
-Signed-off-by: Johan Hovold <johan@kernel.org>
----
- drivers/crypto/hisilicon/qm.c | 3 +++
- 1 file changed, 3 insertions(+)
+> On Thu, Nov 20, 2025 at 01:55:18PM +0000, David Howells wrote:
+> > Eric Biggers <ebiggers@kernel.org> wrote:
+> > 
+> > > +	/* Compute d = (c mod 2^32) * (q^-1 mod 2^32). */
+> > > +	s32 d = (s32)c * QINV_MOD_R;
+> > 
+> > Hmmm...  is "(s32)c" actually "(c mod 2^32)"?  Should that be:
+> > 
+> > 	u32 d = (u32)c * QINV_MOD_R;
+> > 
+> > This is followed up by casting 'd' to "s64".  I don't think that should
+> > sign-extend it, but...
+> 
+> It selects the representative in the range [INT32_MIN, INT32_MAX],
+> rather than the representative in the range [0, UINT32_MAX].  The sign
+> extension is intentional.
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index a5b96adf2d1e..ef6fdcc3dbcb 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -3871,11 +3871,14 @@ static ssize_t qm_get_qos_value(struct hisi_qm *qm, const char *buf,
- 	pdev = container_of(dev, struct pci_dev, dev);
- 	if (pci_physfn(pdev) != qm->pdev) {
- 		pci_err(qm->pdev, "the pdev input does not match the pf!\n");
-+		put_device(dev);
- 		return -EINVAL;
- 	}
- 
- 	*fun_index = pdev->devfn;
- 
-+	put_device(dev);
-+
- 	return 0;
- }
- 
--- 
-2.51.2
+I'm concerned about the basis on which it becomes positive or negative.  It
+looks like the sign bit ends up being chosen arbitrarily.
+
+> > > +		/* Reduce to [0, q), then tmp = w'_1 = UseHint(h, w'_Approx) */
+> > 
+> > Bracket mismatch.  "[0, q]"
+> 
+> It's intentional, since it denotes a mathematical range.  Elsewhere I
+> used the words "the range" explicitly, so I'll add that above too.  (Or
+> maybe reword it differently.)
+
+I meant you have an opening square bracket and a closing round bracket in
+"[0, q)".
+
+David
 
