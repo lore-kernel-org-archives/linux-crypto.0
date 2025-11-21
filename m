@@ -1,46 +1,46 @@
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013009.outbound.protection.outlook.com [40.107.201.9])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012020.outbound.protection.outlook.com [40.107.200.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5773C2E7F17;
-	Fri, 21 Nov 2025 08:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E942DE719;
+	Fri, 21 Nov 2025 08:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.20
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763712507; cv=fail; b=SoM8Ff9XGKNbt+VqQLYS/knHioLKCRhaarH/F3n+j4xh0x9lN50mGkvDqcIE4heAiHnkdaYZv7wge9Es18ebzPfnmSif/5Uldya0vtTsBmFE1s3+Whxb102djmNrdbCNGPjfwuWOQD5weAL45vNdvbSyvESEIqSkb9FiQbJp+L0=
+	t=1763712537; cv=fail; b=rxz2LHG+bRZgbV7qWN/2FMJYrDtXB6SdJbUUkQd5OqZ6RTNPxDMkzkAW6vr50eAA0B8OAksboBvKfO+nlbDuFK61xYx8ySA8xlz2EBJ69sPF9hr3mcXTDgEfReXYXuAHjOgzCjxDBnT2GPKLc04Su29Z4EHn5Fx6pzFpc0aWR5U=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763712507; c=relaxed/simple;
-	bh=Tpk+JjEkqqzHKrC0rWwdYLZJWWP37Nlde339wCz0LkM=;
+	s=arc-20240116; t=1763712537; c=relaxed/simple;
+	bh=of6eDeh+Ayp2Ym6RB98ftLPufzlBbDyL2hPnWlTHamk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YlXMWoMR1ezY5CKQkMx1+xB81kSRXnAOPrtNKcbom767O8TqYJ4uN0axCmmkgV7y70MkAHK5Hu35mFR27H2my0neWBh7JioFqdnR2T7LePRNUe8wPE4eiEEIEeSYegEmUxNO9R8i/KMISo0Yvcwe+hAN+2SNqBcoU8ZpqAlym9c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XqhgEOe8; arc=fail smtp.client-ip=40.107.201.9
+	 MIME-Version:Content-Type; b=UkGURp5WwLaj0j66UP0yu/Nzuuf67lyq1B8aQqbG/QDSUJ1eRuvj6wqLMgBASHXE9xxrj2MKGQvjvS9n0VT4oz+poFyYd1Vgbp1Gs1CaBeRTORCCvZBafko/8c9sRQPQ8n8KM7I0WpSIv+wHSi4T02oj928Xk0pTdLgIZycoe0s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LlJxyi2r; arc=fail smtp.client-ip=40.107.200.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XqhgEOe8"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LlJxyi2r"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JxOGv3IjFNA3ieuEZIkdM0SN5IYq7YkF/l4Q8MWw6eOrv/oFEz4QsxX3KTnAOqRLXj9EXbvyU96ZUfxES1avJCvQgGlTYEpdZWBEP261mEOdWNUuzhnT1KLv6Om1V/I1p2VPqC6fJc7nLh0/9Jgnl1MxhDzpB5MU2BSnFVsG6j6UQ+CdAFMACgW8dnQg6J5AqLYfAakyVoJIoyKlkZhUHhXwnZG3uX7I++U4pOlsHExygicUrt/L4AuqGwiLhEnWlT6q0dxMiGjHJ0OenG6hj/854h0dCC9f9aIhxUqTF2WG1SRvBr1QOAELewR0O3h34zL4yr43XqeTUioVuDzvGw==
+ b=TdVlRiJvQyOioosBXc9Z1cx9T1y4v3OmMhKThXxZMBX3o34uTk67Jmxd/onV0AMvOkF3oXoY5/rCCebIJ6niD8maP8lob+TS/Hr8z3309CG1GJaHBWur7g3eHkwf5aYkCHdYHB2W4jgMoVtH5193DmmzPAUQgdrgJ7vCsM4fpTpV/eZtsvOc62zKdHn5vS2fuz+dH29rkn9/h3SUNSQ8gytNM4EPWVMeZkusIbUPBG1dWJidY5H9VGWogwBw3rGTsPCA+dKEsxJwLXHTuDTwu4Li6HqwdFMRSd0u0etGyCQAZgx17yFSL5noNUkH1kM1SoomD7OWLR+STuOFq3W64w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uTCW9vMS+OKj4a4kAiX1B3dxybqcDaJ/IMvL/pBlFfA=;
- b=ctkAxUqGF5wcrGa/6BLnNYVjPaJ9YBuLZoHDWhWEF1/gBe5+W24t4+ktSz27IB18+USCJKrpy9m3NuMB6mI4K2+hgRTHwwDPJG52iTbaRj/ICNtCVV1DkMsOOB8Z4SWJxheewgZSgVyp91n+KYW3oBNgojThUJxXh4q++9VSaMHGVaKVB5mJJfTh29Xai1W5jS3lTjwgjcVgKsn/6DbXsdbIQLJh8HULN1k/ASIOVamw2eVf75cRHr7gKVz4OSpYjfgx2J5pihqW7iQoJ1CIXoyaY9Apr2w7/y+xWiKbS+NYDJfPOz987MZO7S4oBtXMG8Yi9m0tRY5Ul6s3z6ZcOw==
+ bh=000nAwWv/D4KpbFuG2buv6PGScLlDcNooq66HQwfwMc=;
+ b=C4QVLB7H5033Su6OYpsAUvymkJIx1vmTtIVKLp+m7v5JDTfbBMT/F+B+YXSb5Pw/qhwsfPBbKIMHcgvCNF2tXRm70hiv/um9CgFo6fEW802HFksbEWl6gN0YsYvfMRja9Wxf5z8M9ZTXhRCfxyfDI+9bri2V4av+R6kPig3XxuZOdG+Wi7cMDyHtbyTALAhtxMEbLUttjjjF/IWPn6ZHebzuSW3KQvT77YrnGeXgr5Lcj13Ce7Y1rM0/1VHzLqUxNCVrJeCOJU813qc5NkBnCMSOjpp9qL+r4vue21dTNrDB7oDFlQ3osut2i0x9g3HvvpFmyLBCw7IYOo97BhZ4pA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uTCW9vMS+OKj4a4kAiX1B3dxybqcDaJ/IMvL/pBlFfA=;
- b=XqhgEOe8Sc0BIF6rupsGNLEn8gvEntJIVfYxbMppuHu2AorRS3C01hgr5BO56d9/VosaGveZzevFsSe1vvorzcqwgBurIGG3tAkWJNpwAwek/U5fwHZyc92cvqtD+h+GRgowArgd0ZxeOrAcf7Qsx9ZsPhuZwSW7xV9ggWO+Irs=
-Received: from DM6PR14CA0064.namprd14.prod.outlook.com (2603:10b6:5:18f::41)
- by SA1PR12MB7412.namprd12.prod.outlook.com (2603:10b6:806:2b2::7) with
+ bh=000nAwWv/D4KpbFuG2buv6PGScLlDcNooq66HQwfwMc=;
+ b=LlJxyi2r/joY7ioRTI/vuxfuQ8tsbkuC4UFUkEUJPdLNQLH+WHeS/NKMsZwALAgtfN+A+d2Wmh5YpeJN9H1xMIoykHo/Reu65l1ysW5P6gPtzE9blyQoSCTUz/KMQoyBq46KNDT88T3hJzFIozVWshy6TDSHuWbsLeR/9R7oFOU=
+Received: from BYAPR03CA0020.namprd03.prod.outlook.com (2603:10b6:a02:a8::33)
+ by DM6PR12MB4370.namprd12.prod.outlook.com (2603:10b6:5:2aa::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.16; Fri, 21 Nov
- 2025 08:08:20 +0000
-Received: from CY4PEPF0000EE38.namprd03.prod.outlook.com
- (2603:10b6:5:18f:cafe::c9) by DM6PR14CA0064.outlook.office365.com
- (2603:10b6:5:18f::41) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.12 via Frontend Transport; Fri,
- 21 Nov 2025 08:08:20 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.11; Fri, 21 Nov
+ 2025 08:08:52 +0000
+Received: from CO1PEPF000042AE.namprd03.prod.outlook.com
+ (2603:10b6:a02:a8:cafe::d8) by BYAPR03CA0020.outlook.office365.com
+ (2603:10b6:a02:a8::33) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.11 via Frontend Transport; Fri,
+ 21 Nov 2025 08:08:52 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- CY4PEPF0000EE38.mail.protection.outlook.com (10.167.242.10) with Microsoft
+ CO1PEPF000042AE.mail.protection.outlook.com (10.167.243.43) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9343.9 via Frontend Transport; Fri, 21 Nov 2025 08:08:19 +0000
+ 15.20.9343.9 via Frontend Transport; Fri, 21 Nov 2025 08:08:51 +0000
 Received: from aiemdee.l.aik.id.au (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 21 Nov
- 2025 00:08:07 -0800
+ 2025 00:08:39 -0800
 From: Alexey Kardashevskiy <aik@amd.com>
 To: <linux-kernel@vger.kernel.org>
 CC: <linux-crypto@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
@@ -69,9 +69,9 @@ CC: <linux-crypto@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
  Dadhania" <nikunj@amd.com>, Michael Roth <michael.roth@amd.com>, Amit Shah
 	<amit.shah@amd.com>, Peter Gonda <pgonda@google.com>,
 	<iommu@lists.linux.dev>, Alexey Kardashevskiy <aik@amd.com>
-Subject: [PATCH kernel v2 3/5] iommu/amd: Report SEV-TIO support
-Date: Fri, 21 Nov 2025 19:06:27 +1100
-Message-ID: <20251121080629.444992-4-aik@amd.com>
+Subject: [PATCH kernel v2 4/5] crypto: ccp: Enable SEV-TIO feature in the PSP when supported
+Date: Fri, 21 Nov 2025 19:06:28 +1100
+Message-ID: <20251121080629.444992-5-aik@amd.com>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251121080629.444992-1-aik@amd.com>
 References: <20251121080629.444992-1-aik@amd.com>
@@ -87,120 +87,126 @@ X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE38:EE_|SA1PR12MB7412:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3178deec-7d76-4099-39b4-08de28d52221
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042AE:EE_|DM6PR12MB4370:EE_
+X-MS-Office365-Filtering-Correlation-Id: a64e269c-b2f6-47b0-6a0c-08de28d5353b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|7416014|376014|36860700013|1800799024;
+	BCL:0;ARA:13230040|82310400026|1800799024|376014|7416014|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?cUbkbzbgYfHcZoyUsBaRDDRvyt8phfrUHV2UajBmbT/wFvGiZIcOUckZ9FRR?=
- =?us-ascii?Q?ggWARPg/k/2FevRXkpM1AtjsAysj9dvwgJNfoJj4W/Tiqc+aREwAA3xRgyf7?=
- =?us-ascii?Q?fFjn8wFGwt7BriKbnAS84BN6wQZxYHR7a1igATRx8sDN0FDw/dn0WtpUageu?=
- =?us-ascii?Q?ZBai3ZWXjiCSXK7EmUeDWSmQYemjCjtgIF8Va5t56LD3RmaXaFvGglhDyr6j?=
- =?us-ascii?Q?YetZWnfagZGNoPZGgmFPXwNkF3uVm7ilVXUZKdVxxU6qAJcLsegA1hZU0xdv?=
- =?us-ascii?Q?6VQSOzGhp8lV+T1bzRkxXn9OhVqd+pz0AI+0ERRHH1ISBQrRKItZjYcnemtp?=
- =?us-ascii?Q?JfV6PbS2149OQrDa3p4Fm1lt4A0+fRCLgyWyZQbbuozaU7JvgpcnQ0eLvC1m?=
- =?us-ascii?Q?AGDAfkzplbS8n3Twyr/QsD2b//q7G7t8kU3gZ6XdAubXWdrWkB/rh9rw6kJD?=
- =?us-ascii?Q?lTw8bBfPQ7pqNqnC7+dKLrPFRm/at/aW/u6aBigCiCpjkhZYam3R74pHYuDN?=
- =?us-ascii?Q?uvsOkUxbphF+jQczX5sa3a7XZ6eTp+e6voEh/0RWKvh718PMQNkdXspew8Xq?=
- =?us-ascii?Q?6fmIxs5U5XeL89KXlu/9YNpegYDLawKQXjFqdGoWw1xVjCg1rHjgxZGzBvsP?=
- =?us-ascii?Q?n/apWet/8QvcqdCWwx6bdlLJ7BgNcSGhkQYyylpQejUOHhOZtM6WjVomt4PU?=
- =?us-ascii?Q?6WB6OA5iwk/surh4h6R9nbvDbcdt+SUx4svRf2MFlbLhGl1YHCOLoWSAa05F?=
- =?us-ascii?Q?opfoAaA8WbE0DT6IfoV0FiLuCeO4mwCgZ8+i2rHljQMoi/U6gWgTQxGHJGuK?=
- =?us-ascii?Q?QqfK7bQ6u5R504q0e5q8ot6w6bqfeGvA0kSnLRLEudryyN+CXkK32iTjTXDM?=
- =?us-ascii?Q?ZbPZ5LU1LYDI+InnzDxJmkOawPAiOsmwVcSua8c+T2/HOEF7l+Nv3g3Xe1Fm?=
- =?us-ascii?Q?Md79ekCz1Dq5Nq5XrhDL8PSgK0iAV4r40uN8rGyDGzessPTXOnY8CIEQDmyR?=
- =?us-ascii?Q?jkLHnEnHlBVXQjZWVp7naM1VISuJKjtCGJK/8A57pUlFCbQGqoGgq2PWhgTZ?=
- =?us-ascii?Q?c1lGOZ1jqWPq8UN1syhsNxjPMKRUXtGbu4P/onO0HwKOg/zkgop2b4ZsE/+J?=
- =?us-ascii?Q?HZAX8pRBIWRA2R7xg8l7rvyvQ1TXGt5dbfN7XYQy6byDykIyxD/UvytXy49Q?=
- =?us-ascii?Q?tOeUZMkMHQAk1MOHpOOqJroA2AbBq0b3gi3iu+SndXvupJSzTroQ/vnCFlT9?=
- =?us-ascii?Q?HpJy+eT2XMtOztHRozc5qPSAOvoTcpS48KSrJ1ODQt3OpSKqximNnG2x9SMo?=
- =?us-ascii?Q?2ZefYKBk9shnPhfC35QjVYVWUYLIk2EEQ/DWD2ZhgureBhyJw6rp5oKaEm53?=
- =?us-ascii?Q?GrSQ0xAF1njo0CK4IxsTgwn9UCEEEapoQ4+gwTjJ0DixVfS07d9kT/PhNFc+?=
- =?us-ascii?Q?PkFSzM1XSgQAb+JU5LXuwf3BZl/bPmM+YsDPYcjACu4IIAIC6jKcAoENJ705?=
- =?us-ascii?Q?oQJxrFKBM09qZG3qiCDodZf/UlgIsP5bqZY0lU03ilMxwXTGpauEY2Z904Ds?=
- =?us-ascii?Q?77FIheaRmaXnywpw8H0=3D?=
+	=?us-ascii?Q?Ehof338VbDwhaC7bamxF6rhHogbDuMGuey9dab0mTEX8bLlAyLSj1Hb0eSFG?=
+ =?us-ascii?Q?vvgmHZa4J4sd4Tn4gRaupBdktMjMP7jWNteu2OI+VM71MgjeJRFFoJNIQXLK?=
+ =?us-ascii?Q?cDc+MJEv+J2BUUqhuxzBtBc8zZV0Q9yM9G4pGN7qdR1Bt+C8HbfNOrmCza16?=
+ =?us-ascii?Q?PkMjP8pOca1CDI985S6BE2E0RcAsrl/7B/kW8lG48ZGiPwy9ltUzf/y4F7UP?=
+ =?us-ascii?Q?9rSsTgoqV457Uh66TvbOMh9rE2M+VUBJHl41OfqvCoNv8mhH3lT7+xIDl8fW?=
+ =?us-ascii?Q?Cw8+m7wKJoMsZvbGT4JuEV+1qeG/0GjzJ3DZehseERSuzYbiUjdlphRxnQak?=
+ =?us-ascii?Q?RxbqADaXWQrKQQ15edL4SeAJuRHI7XTqIpD/nijVFZv1GjiXRTIqwlR3MpmC?=
+ =?us-ascii?Q?sGdlRcxa+J4nQp/JeprHyusvdma+k+K+pc6Og1XblwTIwMlrqJBbYofimwSV?=
+ =?us-ascii?Q?FIPTLY9EqzY6lKkaHy9bUtB8LjRkN/A+aKkwPJ95le8TaqOyI6/k6TdhxFtB?=
+ =?us-ascii?Q?bCm9IxBQAaeb/FaQUtKIevUA7xnKj83gQimU/2jmozyYzUK+v+jXI0hpKZQH?=
+ =?us-ascii?Q?yhNbWyXxw88fgOzZPM93r7E9gojmIvNJEKuzQPIQ6iH/qXCbBleLod7oyaBN?=
+ =?us-ascii?Q?SB0GjCtGdySNQFBawjbXz2tyacGGiRX5kWjgy4Ve+NXE+uHoPfcewMmoKduU?=
+ =?us-ascii?Q?1ac18l1LZN1/YUWi3PAQljLB5hp+yWM/GQ6pktsharHNGreYD2ttZhq0YFuu?=
+ =?us-ascii?Q?23Ml9Tu2drx0zGuqfaFBroEYNrIigJZco5jarSj5rFawaUY2jmxX5dqg+hRH?=
+ =?us-ascii?Q?tTBbuhIEkH1Ucx/bogXqf/7yzIy+G/3e8D3U6LVvZUUD1VV8crMZvZugPIOu?=
+ =?us-ascii?Q?w8gDvOrYSlcH3KG7Va6YwZlwpOUhVp6PdRMgMSfip68FxxAVoFYa56njXtZp?=
+ =?us-ascii?Q?WgSGAC5vcIPf+WncV0FxNOj/5y8ZGhWAPP+hXfCTlJFXbZ+8DBG2ogIUl4ve?=
+ =?us-ascii?Q?79ohIv6yWitME6v0p82tPqdoTfCqvZoqr8OqGK7VFP3Pv9GEbwizgHcm7e7Y?=
+ =?us-ascii?Q?rFmWW/A/X73VFqqrZkG3OL1CjhYNFET0dbiKG12ioPlACzzi1V+O0vmaRwKt?=
+ =?us-ascii?Q?PZYQOsbxEWVv9E5yxzXWmK4c18jON9qA7hhBnHbC2Dz9XxIFfzEKK120eOvS?=
+ =?us-ascii?Q?S3e7CMVaOO4cW9nnuf2jckqus9Qm8hK0O/LsgAeyON4MsHO6YJj+sukPFnCM?=
+ =?us-ascii?Q?aBIm3tpBk3bjq1WUQKkDxiVpU6rSb8i3ym5HrW+a3iWIm/JAaC128m9ku0Pj?=
+ =?us-ascii?Q?ZRYPST0Q0Ims3Sx8b046mhoJw3it3DK2Yr/EhJ7yh5aXOad9+WLdHmWN2Ur+?=
+ =?us-ascii?Q?bHY5dPhscFuB+yhIXl35sAnvyFeVILH/CbFgjVtRbOHzy+6ZuBCeK43R0548?=
+ =?us-ascii?Q?j1iG4gUlMGc4arKskYIl9+MOmbGplMUWyhEargfZzI/qrymUnQ1G1FOlKwcm?=
+ =?us-ascii?Q?/8tZrvP0/1YBReZqE+tXuvi6WNPKHeA3phryuozg+f8V6jFKoAxSCuKnqmwM?=
+ =?us-ascii?Q?74sPSeLrm9SSdzglBlM=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(7416014)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2025 08:08:19.8047
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2025 08:08:51.8097
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3178deec-7d76-4099-39b4-08de28d52221
+X-MS-Exchange-CrossTenant-Network-Message-Id: a64e269c-b2f6-47b0-6a0c-08de28d5353b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE38.namprd03.prod.outlook.com
+	CO1PEPF000042AE.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7412
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4370
 
-The SEV-TIO switch in the AMD BIOS is reported to the OS via
-the IOMMU Extended Feature 2 register (EFR2), bit 1.
+The PSP advertises the SEV-TIO support via the FEATURE_INFO command
+advertised via SNP_PLATFORM_STATUS.
 
-Add helper to parse the bit and report the feature presence.
+The BIOS advertises the SEV-TIO enablement via the IOMMU EFR2 register
+(added in an earlier patch).
+
+Enable SEV-TIO during the SNP_INIT_EX call if both the PSP and the BIOS
+advertise support for it.
 
 Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
 ---
- drivers/iommu/amd/amd_iommu_types.h | 1 +
- include/linux/amd-iommu.h           | 2 ++
- drivers/iommu/amd/init.c            | 9 +++++++++
- 3 files changed, 12 insertions(+)
+ include/linux/psp-sev.h      |  4 +++-
+ drivers/crypto/ccp/sev-dev.c | 10 +++++++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/amd_iommu_types.h
-index a698a2e7ce2a..a2f72c53d3cc 100644
---- a/drivers/iommu/amd/amd_iommu_types.h
-+++ b/drivers/iommu/amd/amd_iommu_types.h
-@@ -107,6 +107,7 @@
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 34a25209f909..c0c817ca3615 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -750,7 +750,8 @@ struct sev_data_snp_init_ex {
+ 	u32 list_paddr_en:1;
+ 	u32 rapl_dis:1;
+ 	u32 ciphertext_hiding_en:1;
+-	u32 rsvd:28;
++	u32 tio_en:1;
++	u32 rsvd:27;
+ 	u32 rsvd1;
+ 	u64 list_paddr;
+ 	u16 max_snp_asid;
+@@ -850,6 +851,7 @@ struct snp_feature_info {
+ } __packed;
  
+ #define SNP_CIPHER_TEXT_HIDING_SUPPORTED	BIT(3)
++#define SNP_SEV_TIO_SUPPORTED			BIT(1) /* EBX */
  
- /* Extended Feature 2 Bits */
-+#define FEATURE_SEVSNPIO_SUP	BIT_ULL(1)
- #define FEATURE_SNPAVICSUP	GENMASK_ULL(7, 5)
- #define FEATURE_SNPAVICSUP_GAM(x) \
- 	(FIELD_GET(FEATURE_SNPAVICSUP, x) == 0x1)
-diff --git a/include/linux/amd-iommu.h b/include/linux/amd-iommu.h
-index 8cced632ecd0..0f64f09d1f34 100644
---- a/include/linux/amd-iommu.h
-+++ b/include/linux/amd-iommu.h
-@@ -18,10 +18,12 @@ struct task_struct;
- struct pci_dev;
+ #ifdef CONFIG_CRYPTO_DEV_SP_PSP
  
- extern void amd_iommu_detect(void);
-+extern bool amd_iommu_sev_tio_supported(void);
- 
- #else /* CONFIG_AMD_IOMMU */
- 
- static inline void amd_iommu_detect(void) { }
-+static inline bool amd_iommu_sev_tio_supported(void) { return false; }
- 
- #endif /* CONFIG_AMD_IOMMU */
- 
-diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-index f2991c11867c..ba95467ba492 100644
---- a/drivers/iommu/amd/init.c
-+++ b/drivers/iommu/amd/init.c
-@@ -2252,6 +2252,9 @@ static void print_iommu_info(void)
- 		if (check_feature(FEATURE_SNP))
- 			pr_cont(" SNP");
- 
-+		if (check_feature2(FEATURE_SEVSNPIO_SUP))
-+			pr_cont(" SEV-TIO");
-+
- 		pr_cont("\n");
- 	}
- 
-@@ -4015,4 +4018,10 @@ int amd_iommu_snp_disable(void)
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 9e0c16b36f9c..2f1c9614d359 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -1358,6 +1358,11 @@ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
  	return 0;
  }
- EXPORT_SYMBOL_GPL(amd_iommu_snp_disable);
-+
-+bool amd_iommu_sev_tio_supported(void)
+ 
++static bool sev_tio_present(struct sev_device *sev)
 +{
-+	return check_feature2(FEATURE_SEVSNPIO_SUP);
++	return (sev->snp_feat_info_0.ebx & SNP_SEV_TIO_SUPPORTED) != 0;
 +}
-+EXPORT_SYMBOL_GPL(amd_iommu_sev_tio_supported);
- #endif
++
+ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+ {
+ 	struct psp_device *psp = psp_master;
+@@ -1434,6 +1439,8 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+ 		data.init_rmp = 1;
+ 		data.list_paddr_en = 1;
+ 		data.list_paddr = __psp_pa(snp_range_list);
++		data.tio_en = sev_tio_present(sev) &&
++			amd_iommu_sev_tio_supported();
+ 		cmd = SEV_CMD_SNP_INIT_EX;
+ 	} else {
+ 		cmd = SEV_CMD_SNP_INIT;
+@@ -1471,7 +1478,8 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+ 
+ 	snp_hv_fixed_pages_state_update(sev, HV_FIXED);
+ 	sev->snp_initialized = true;
+-	dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
++	dev_dbg(sev->dev, "SEV-SNP firmware initialized, SEV-TIO is %s\n",
++		data.tio_en ? "enabled" : "disabled");
+ 
+ 	dev_info(sev->dev, "SEV-SNP API:%d.%d build:%d\n", sev->api_major,
+ 		 sev->api_minor, sev->build);
 -- 
 2.51.1
 
