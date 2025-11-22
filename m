@@ -1,133 +1,116 @@
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACEC26980F
-	for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 14:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6B11CAA92
+	for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 17:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763822203; cv=none; b=Bj1i1aNThnvf+11ffZpt16bUigD+LugmBjkuDpvFe+lUAlJE814eS8T0lHCSkspMUxgoIL8h45tnblyoYqIjChM4sxZLzhHCotbGoSmEj/ratdyHYEdLwXvyqVkDJo0sVJGM3viBOE+nnvIonqcuUOKIvEQEIW3FvNMXS7nItBg=
+	t=1763831950; cv=none; b=XlkgafibFtywkelezrcgu2G5aujAGKuK3NODu54u6X4UGcOdLrwAo2CUjCt1HCJceQZMVYwCUHOu3JVliJDyvWYEbgrj6zIz8t/jZoHBQDGAfDgE8DtJBuOseTbrMH634F2pdUHg/+WY8wmRdRO1ftzYcfZ/XbsgkMbZDV6xexI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763822203; c=relaxed/simple;
-	bh=EFYi9L5UwDPh1mzI94F/EK35AXPC5I9gw0Q51gsezgI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pb633lNHI0u+IE1oBxop6uaD5uUfRnJzn8UOXUHyF2Q52nCp9JO2YZEnNVQtu82HjB4ktlTny+pYLNv2KkI+4PKJtsoxflsiZ3IbyNEZIhDdMJwIPQO4P3AhaL+0XGNg1kDhH2ZtXQ+UpEmQiYTcl87W6SzZ5LZbugZMIN3J2Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gompa.dev; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gompa.dev
+	s=arc-20240116; t=1763831950; c=relaxed/simple;
+	bh=YdVcIwGwKDh/6sNNooTobnWdLRFBymQDy/hqcAiUbLg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Q4ErmC1QI9A+/ozLfPuCPK+YyVy5RStzyXQGebsjJCxIoxBtSw+Ef4GPnJuKNHmm00iK33wkirqZIBYNI42LlvXHOKAWYNqCskRIeAWuIuhjn2pNmZOqvOBWVGnVhcCyvQDok90s3IMV6pNpq4beDNo7UrydCLh4iwKq3L+nl+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TlWVCnM4; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7c7503c73b4so1636513a34.3
-        for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 06:36:41 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TlWVCnM4"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-29516a36affso42765395ad.3
+        for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 09:19:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763831946; x=1764436746; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YdVcIwGwKDh/6sNNooTobnWdLRFBymQDy/hqcAiUbLg=;
+        b=TlWVCnM4nTfqURfZsmDv7A+sN4t+k5G0hkw315A6YvKGECZcoJIvTGAZIUt6Xx73Br
+         91ZBfUFBJlO2ItrUb7yTjcPLErT6a+yUEQ5CPge9iU+5Se7KMyg+pPzwrhaGuyht0R3T
+         2WBYZhw+ZktmDRM9aDX+WR7hozY9inlax+gpwojdL79D9IVBiQMgsXDdO8HynVpFwRZA
+         g6zCPAFgkBCozbU/3vOaaWDFtU/MBFY2DcAXHvISPe8FxyPQTs2Mui6FOf2eCC/IYZKh
+         iQ5QjrpYuMRaHiIyoD5jvHRg3AEXYh3sRQzSYwko5JfTVKG9P8QEwD5Pk7A+7g8IHuN3
+         VD0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763822200; x=1764427000;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mrG3FRl3ZQJELga2T7IxRw84N89LNPCPL/hcWM8uf/0=;
-        b=Q04QwyUNuGaltd7A0uXhlZHo+7cILqXkPcAmQhlt1XUGlmCE1EdPTpjw5PjcN1J3VW
-         5AAdUW/I6SN8nB7B5Cvze3kKvdRLSSZvbnWL3zdTYpWHRHQgN1XlgmQTmgGdgvYMJQj4
-         9PWlFOd0nVvvR4jiRApBUWJuwDB28odkth+TpQnzeUDG4EodlbM69h+ZQZr+86Bhn1hb
-         5VlguDFCMchpoxm8UUC9Z5R8kDzcyQ/0yVx9R2BXF/zDj3Ky+dRIrRth2wUkEw3bp2pO
-         B7fVl0Q7Drxz+cnGdjuYZnKHpmXYgxLNsfNEtt4PfQ4s2Glmu9UoIHp1TorMEpCM4FcT
-         LGaA==
-X-Forwarded-Encrypted: i=1; AJvYcCVYLGtuzzvYn6mDAFyrJUhUwxQHrThQrCHZCziCne3guzIb37yPY8FPQ0gU2ZVyjpNvJg9HWMApE5moST4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjOSzEM7o+1PIs2q7ZFHsiNiQdhuekyHMuZ8ZRc5vlV3IL/2Am
-	MjHhxK+picMNi/yYZ5k75SyA+v7wAq1slOz+NtHo9v/PRfADC082iqSTa3aeQA==
-X-Gm-Gg: ASbGnctxlKUjXqoUJSiZDk/NUkRq4H6dMY6HX5tPD6y8krKKPm31f4THpCs5or6zegv
-	e+53ORIVil2BqAojgo5IysN3Kk1BmDH06iGFBBqO+RrLdph/444ljwPqFUgRLrUD4jN2/Gv1meu
-	raD40E5Y9BE0ogci0obC8RLxgfnphSeRc8UFtHxt5+wC1IMZAmd6v1PkikHxRVEYmm71f8HVfTX
-	yAzBCX3b6hqOVI8PGiGXB4IQQMMzSAre6TuAzxqCIu0i3hQ9C1BIU/fq7j8gzQen8uU00Nzk1Vs
-	NxXaWfoiY0sTVgwuv3K6DAjqr9NWfrk1Tan46YEI1u11o0C7e1EWbGgKAn1deNFyOGoZhcnsPP5
-	mklwE33LiOVCP0u9OrLapwQv7lx076fg3EAgkS5LTOafNlxeLhSXuHyv7EfWXqmQDH+fuLmbxHi
-	nBzSPow2fOPgeLTP3en73puJwZi2CKSvuXTCWo/Sqs3thbURq6pUQFuDy1WvzAlyMDsdgf9OhE
-X-Google-Smtp-Source: AGHT+IHNcVWbQu348+/v02qWhSD4KrblkW5BNMqlCk3pqS7m6qtQtdzea1rKExJPx5HRB1sH7ySVGA==
-X-Received: by 2002:a05:6808:3507:b0:44f:6ab9:4aee with SMTP id 5614622812f47-45115cb85c1mr2162896b6e.63.1763822200000;
-        Sat, 22 Nov 2025 06:36:40 -0800 (PST)
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com. [209.85.210.50])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-450ffe2f361sm2477847b6e.1.2025.11.22.06.36.39
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Nov 2025 06:36:39 -0800 (PST)
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7c7503c73b4so1636510a34.3
-        for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 06:36:39 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWd7b9bhcKtK4mns3QYypdWzX3mjTVkeNEUItKAm0FisU5NH48s1bLLN5IVh5EpcAdHUQbZXHebdsT8VvI=@vger.kernel.org
-X-Received: by 2002:a05:6830:3488:b0:771:5ae2:fcde with SMTP id
- 46e09a7af769-7c798f7ba96mr2916201a34.2.1763822199328; Sat, 22 Nov 2025
- 06:36:39 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763831946; x=1764436746;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YdVcIwGwKDh/6sNNooTobnWdLRFBymQDy/hqcAiUbLg=;
+        b=GnMSviWiQCSFuMgoZh/KRV/E6oE9unr1or2RfDPq/fHUGnqJV0XI0DL1uF5vC5g/Af
+         KsJ2bGqYeSeP7VQVw3f+OvW4orsqzCLCq4/m1xLbD23rQCiTmq5EW0q4UPq+DlY4Xxsf
+         dyMRxT3LeoFspmyxV3zT6XPsRhik0Iw3X5lP0mlxIF3HD5Mib9JQ1DVWG/l+VYUvu86e
+         mW27zDpoFloifr4KaJKJl5nGzKcCJ/BDRxK1LBLewKXh9n1OuEQhAmV25QWSWCUvV48q
+         JYodY4Ow67ZoKG1N3l/8K94rVoZevRqnEOOZNDSTwW2AoSfrLR32IQXAXx1blk875l/F
+         ZKIg==
+X-Forwarded-Encrypted: i=1; AJvYcCVnNugDivluLsI7VPL36zzTBVOOW+VsBuTKSTbhksz44hPzv26aTpbhj3ti7l+ouaEKmhUZCMwenQYcRAc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP2nMtDUM3ixDhTDPjUBUJ9kgVGJQk94zX8Mvc6eV5Kf3oFGZJ
+	Ra1CnTPNxElMEQXeuwuX0Csq/Agk8U4O3/av5mTOe1liyqr0Q9PoUoGx
+X-Gm-Gg: ASbGnct/q3q0UMAOrjZu/+PlMzqSsXbhZZfwFRvTV5O5u5BEQW5n0pg3CM3Ri6A0gZ/
+	YDfjxBN/Ww1ybHkKHdIldQFMVwmJcOiLBctoA/uvEsj9PgplKNKJZFUDNwgJQ+84FrdvLftlsVh
+	TOXa9Y7Y3/YTbwMT75pdOb6rxqmovIM3kG+wyLyZ0bzr4SX3lXdEC6MB5pW70J/bZ2yOcuK8Lev
+	/dmN25bXYW7A9aj1A0xiLgumCytGkzKqFfLgrBB5WmDLlTIQXDpAWqyyBfa9hDEdpJo13+CrK5P
+	ATl1rnrFufRJ+CkyamP3kHjCpgmGpteLYV+qqIGM8JZMl30llvUO6uB2k5YT8atZvKgWHdjKL9n
+	8kFsdqkSQ4OhFSRSA8U8OOZmnlvM7/WgFqOMpvgmbNj09HYIxTvKdfosWITb0A7VUKgJw7Q2nHm
+	TEfNDY7KSAfaVAB+QGxXE5eFF9QtO1kXp/S40nnALnfBl16m5x41h/24nfSw==
+X-Google-Smtp-Source: AGHT+IHsrLiktElDl4VpBRWD7TSKCwrK/iXEsY4HhXbo8d2kQN4F0sY+95g5j41nDQTVNYF7qGlfkg==
+X-Received: by 2002:a17:903:2c06:b0:290:94ed:184c with SMTP id d9443c01a7336-29b6c3e86acmr69614135ad.15.1763831946402;
+        Sat, 22 Nov 2025 09:19:06 -0800 (PST)
+Received: from ?IPv6:2401:4900:8fcd:4575:1ad3:3d1a:3314:cdd0? ([2401:4900:8fcd:4575:1ad3:3d1a:3314:cdd0])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f024b7c5sm9536723b3a.43.2025.11.22.09.19.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Nov 2025 09:19:05 -0800 (PST)
+Message-ID: <b296730415a6b4e261d431bc6adf864ed3b2a630.camel@gmail.com>
+Subject: Re: [PATCH v2] crypto: asymmetric_keys: fix uninitialized pointers
+ with free attribute
+From: ally heev <allyheev@gmail.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>, David Howells
+ <dhowells@redhat.com>,  Lukas Wunner <lukas@wunner.de>, Ignat Korchagin
+ <ignat@cloudflare.com>, Herbert Xu	 <herbert@gondor.apana.org.au>, "David
+ S. Miller" <davem@davemloft.net>
+Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>
+Date: Sat, 22 Nov 2025 22:49:00 +0530
+In-Reply-To: <531dba90-247e-481a-a26b-2dc9e7927d6d@kernel.org>
+References: 
+	<20251111-aheev-uninitialized-free-attr-crypto-v2-1-33699a37a3ed@gmail.com>
+	 <531dba90-247e-481a-a26b-2dc9e7927d6d@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <7458cde1f481c8d8af2786ee64d2bffde5f0386c.1763700989.git.wqu@suse.com>
- <9523838F-B99E-4CC5-8434-B34B105FD08B@scientia.org> <bc5249ba-9c39-42b1-903d-e50375a433d2@suse.com>
- <3C200394-F95B-4D1C-9256-3718E331ED34@scientia.org> <5495561f-415d-4bb0-9cd4-4543c510f111@suse.com>
-In-Reply-To: <5495561f-415d-4bb0-9cd4-4543c510f111@suse.com>
-From: Neal Gompa <neal@gompa.dev>
-Date: Sat, 22 Nov 2025 09:36:03 -0500
-X-Gmail-Original-Message-ID: <CAEg-Je_3rtWr2P_j76792+s30VPn84sDv-u_61_vmLBUE0ztkg@mail.gmail.com>
-X-Gm-Features: AWmQ_bmqpnKk3EPf9MVQGz5yyOka6iv918VShrajeq5dDuRVH8lOvvN7LP780X0
-Message-ID: <CAEg-Je_3rtWr2P_j76792+s30VPn84sDv-u_61_vmLBUE0ztkg@mail.gmail.com>
-Subject: Re: [PATCH] btrfs-progs: docs: add warning for btrfs checksum features
-To: Qu Wenruo <wqu@suse.com>
-Cc: Christoph Anton Mitterer <calestyo@scientia.org>, linux-btrfs@vger.kernel.org, 
-	linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 21, 2025 at 1:44=E2=80=AFAM Qu Wenruo <wqu@suse.com> wrote:
->
->
->
-> =E5=9C=A8 2025/11/21 16:32, Christoph Anton Mitterer =E5=86=99=E9=81=93:
-> >
-> >
-> > On November 21, 2025 6:24:26 AM GMT+01:00, Qu Wenruo <wqu@suse.com> wro=
-te:
-> >> =E5=9C=A8 2025/11/21 15:47, Christoph Anton Mitterer =E5=86=99=E9=81=
-=93:
-> >>> Is that even the case when the wohle btrfs itself is encrypted, like =
-in dm-crypt (without AEAD or verity, but only a normal cipher like aes-xts-=
-plain64)?
-> >>> Wouldn't an attacker then neet to know how he can forge the right enc=
-rypted checksum?
-> >>
-> >> In that case the attacker won't even know it's a btrfs or not.
-> >
-> > I wouldn't be so sure about that, at least not depending on the threat =
-model.
-> > First, there's always the case of leaking meta data,... like people obs=
-erving the list or my access to Debian's packages archives (btrfs-progs) wo=
-uld e.g. know that there's a good chance I'm using btrfs.
-> >
-> > Also, an attacker might be able to make snapshots of the offline device=
- and see write patterns that may be typical for btrfs.
-> > Even with only a single snapshot being made, with the empty device not =
-randomised in advance, it might be clear which fs is used.
-> >
-> >
-> > But all that's anyway not the main point.
-> >
-> > Even if an attacker doesn't know what's in it,  he could try to silentl=
-y corrupt data or replace (encrypted)  blocks with such from an older snaps=
-hot... which would then perhaps decrypt to something non-gibberish.
->
-> Adding linux-crypto list for more feedback.
->
-> In that case, as long as the csum tree can not be modified, no matter
-> whatever algorithm is, btrfs can still detect something is modified.
->
+On Sat, 2025-11-22 at 15:25 +0100, Krzysztof Kozlowski wrote:
+> On 11/11/2025 14:36, Ally Heev wrote:
+> > Uninitialized pointers with `__free` attribute can cause undefined
+> > behavior as the memory assigned randomly to the pointer is freed
+> > automatically when the pointer goes out of scope.
+> >=20
+> > crypto/asymmetric_keys doesn't have any bugs related to this as of now,
+> > but, it is better to initialize and assign pointers with `__free`
+> > attribute in one statement to ensure proper scope-based cleanup
+> >=20
+> > Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > Closes: https://lore.kernel.org/all/aPiG_F5EBQUjZqsl@stanley.mountain/
+> > Signed-off-by: Ally Heev <allyheev@gmail.com>
+> > ---
+> > Changes in v2:
+> > - moved declarations to the top and initialized them with NULL
+>=20
+> Why? This is not the syntax we want for cleanup.h. Either initialize it
+> with proper constructor or don't use cleanup.h.
+>=20
+>=20
+> Best regards,
+> Krzysztof
 
-A few years back, the Fedora Btrfs folks debated whether we should
-switch the default away from crc32c to xxhash or anything else[1], and it
-basically came down to the performance hit being too significant to
-consider.
-Given that crc32c does the job in detecting tampering with it, and you
-can reinforce it with fsverity, I'm not too worried about it.
+This is the only one I missed reverting :(
+(after the disc=C2=A0https://lore.kernel.org/lkml/58fd478f408a34b578ee8d949=
+c5c4b4da4d4f41d.camel@HansenPartnership.com/)
 
-[1]: https://pagure.io/fedora-btrfs/project/issue/40
-
-
-
---
-=E7=9C=9F=E5=AE=9F=E3=81=AF=E3=81=84=E3=81=A4=E3=82=82=E4=B8=80=E3=81=A4=EF=
-=BC=81/ Always, there's only one truth!
+Regards,
+Ally
