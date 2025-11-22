@@ -1,63 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185E91917F1
-	for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 21:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6502220F2D
+	for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 22:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763845239; cv=none; b=UEkV2qNj8rGotehV8BWDyasjHFdsDpCaQKMNZMfp8FFlTdlJSnyUBUYHK+WEbiJfS/9CHEx77JjoapkxqDYQruHHRr8eU+aL9uWkF30QRkPgqmn69CHhmTpeeQ7eo9plGtBaYxb+hb8mGgxFH2bHob+9JgizcL3297DmZPi2wLY=
+	t=1763851677; cv=none; b=LHuMvisEsz3aBFQxzwNZduwlNNjrAv0zfBaGLJc2ENBjD0Rsd5DlI4qxUP4dSX9UQuDhwYNvmKyLquhpGiRRbNzTn2OFteo9QkhZv46FHSPoeXmgcmLHb8zQhGqy3VPfPLpqP6x1ButKhsUTd+nNHod2JXE1qgtgNoxDTIkewR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763845239; c=relaxed/simple;
-	bh=RdjaX2niye+QaA7f4+vmh/qanvjRwf5mmtfnOsMH620=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d/+IU9r6XdM0oNIp+fS2OT2Wi/ZqjS1d5wggK+tN4aSBfZjLZgLnil9vG3noG21PRpwFtYSwVv3EfX5bFQILEcGb4e0UmhT5Glqu14VQ3M8UuTyNQEn9R4x8EOIM+NmtOw6GMVQrvSMnVQf2iRxpM1qjiFDViH0lvi1qZid6v50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=cDWt4JFw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763851677; c=relaxed/simple;
+	bh=mDmOqDRRV1GxRTkt03uYnfvm5YBI/u/mWZasnkUTwrI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eqMx0ATyO9eAgm8yyaWYKa316lAasp9AImXBB5EGKXCeeSXxQf6MQd/UumainAb4Iu9UX76JRovqr0gqQVba13R4uIIw+3Hpi1Qx56uV44yywl+C0spky1Iaggv5yfjMP3t5pmFvqMa16qo6nz4qgTSrgsj0vkqH1KKrL2gyd4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4EYqLjM; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="cDWt4JFw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C22AC4CEF5
-	for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 21:00:38 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="cDWt4JFw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1763845236;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RdjaX2niye+QaA7f4+vmh/qanvjRwf5mmtfnOsMH620=;
-	b=cDWt4JFw8pI2q0gcrSPIqO2teetVxKnKPe57XDm2rkGIvJ2BKsc2xggNgBS7If79ZcByYj
-	UUoC2H3S5NKHZHPMgB+KH1w/Nvf5DAORrUDFTPY7hb3FHN+jlSSVIqx/+93GjHp91NFK+T
-	FeuVshc+zxIiFX/ioWDH9jKykRRw7bo=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 17815943 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
-	for <linux-crypto@vger.kernel.org>;
-	Sat, 22 Nov 2025 21:00:36 +0000 (UTC)
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-656d9230cf2so1501556eaf.1
-        for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 13:00:36 -0800 (PST)
-X-Gm-Message-State: AOJu0YwkajgwKcC5kk+qD3QUcyxOPBBMkj9W8tT7ckffMu6b0s9ssMga
-	/sgopIV7oj6eUZ31qzxvLNMuEUs6UCesfPlT38oNEcnlzsvRu4/XmEDcZaN4R26/CE48FRhImbD
-	Y0TLGCYHpBcnt4moGDABhhHzcf/DVGJM=
-X-Google-Smtp-Source: AGHT+IHhLYoQTOXsYDzBvDrhx/MSvI4agDaTEI5z0taFiCl8rX+zo7epzxpxtq3QIvy50SGXsWOw5WH5qgGfyHvcPLg=
-X-Received: by 2002:a05:6808:178b:b0:450:c648:4aeb with SMTP id
- 5614622812f47-45115b25a78mr2323855b6e.44.1763845235532; Sat, 22 Nov 2025
- 13:00:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4EYqLjM"
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-59583505988so4513588e87.1
+        for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 14:47:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763851674; x=1764456474; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mm9cJVhutkedd51ycbYwKmMqp19QwPFiX/ffFg8rVcg=;
+        b=m4EYqLjMnZAClasW5oW/RKRiG7pn1i/2sd87a2+bGT5arzuzX2s9OWunw3ssNpcdIL
+         Rt3hNDSuFUBrtfbXvhjdipl2gBlBuevvx/2V/Sci3GW099P+W5/rd7vFyuWpyVXP1yQP
+         MK62n9rzpZxAKODtmj7axGjtZm2iPhssZ7V5ietC61jcOyFvK9Nmes+GYZJ0bfVVY9W3
+         HhsNbNtfDCgWUxgyoFMe3TEbEmFHKPlLJzBCay6GBLVkLziLLWupjzRTYCBTQvVTCNtC
+         PCE0gN7ui5o9znFYb9NWADBrbgacrALeEnX1YBs7J3e4rCG9ErcZLONAjVpKnh7gKzq8
+         xDnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763851674; x=1764456474;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mm9cJVhutkedd51ycbYwKmMqp19QwPFiX/ffFg8rVcg=;
+        b=qI1HYMh6dPlrYRHy7hUxy0cwl5geHpUAQxo9HYdVtDnv5QmmclqNu7HsKplYM8+VlP
+         zMIHz8pxkRtAA1HXULoSDDSbD1bWvtcKlO5jXkvVUPjs4K7T8fgasfsWvBr2kTHz99K1
+         iZakFOruo7bTB0T90ygRtw6TFHqpmre8UYCkxDqebfRzBX8dCBoiQbGl1mq6vS4cffod
+         RWLqOg+/neEdSmzNru5XNmg3/YjZeL/BkDCLCeXLfuVgk+NLLHrcxalm1uYSMqtcA4Bc
+         LBEg9+lDZ+H5gFh/jT1yR2KSGfX6Rt0kkXa8/AFOgaru/2KZRX+QFKmKtJLmgffoxdmL
+         zxQg==
+X-Forwarded-Encrypted: i=1; AJvYcCUSzzPgWHwDCo/N8kPukrWSLQZ0dqYgkyTRwrId8QkHmr1JimWfXj3sSNMmmGmA+euQXh4kbyzsxjWarVk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz0d9VpJXttETLSNDNy5vpHaEMQyre12XN8gYj5KIrGO5756UC
+	a7n8qGqPKwlWHSVBS8D+rXP+NQgQTZfIR2Z1pVFzXDDMD6Sl6zHZeqYV
+X-Gm-Gg: ASbGnct4nLiEYkH7e/wvqs+Yw0cKsf3Ez6gPPcvFwPd6v5/19LD/y8P3/36CyQPzU6s
+	a9ZsBJPRKdxyyzPvAo5PnVYhC8GTp246kYDCZ7EqSEE8Cdnrh9fYKf/kGN1T92JjsdPGz0ZY31b
+	7dnZs/HT7wFRwZnHDl2pjOtx5AIuVJQeI+wFNe480bfWgpA7P3mbc/OxO1PJhwzRrYzrFZO5m+X
+	AuxkXV/v2gYUhbd+4oREbjcT77Z0CiCaJ/8ihEBZyX/xZROh3mOlcg93hHHiMAXayKBvHHzvGxo
+	FLNshEYyQBTexzOBdgz5LSpVatEuwMfHcENvQcW9UMaTwKwdjEbp6QNKh6RmTC3LZ4cS965wswN
+	LRb1Ix4b9XxzgMTAPLmOXpZqGovyIlvkGlVOEM87LlCXvLUfug8TPxyycwZ291DD4uY049xwW8z
+	jo7HaziU4m2w==
+X-Google-Smtp-Source: AGHT+IG25dEQnHwaBToxpvBjTeZ/3RB3yCymIb0k9rzfOt31nS8ruDCrSu8IePguUMWt0EMXA9m5xw==
+X-Received: by 2002:a05:6512:308c:b0:596:a000:596 with SMTP id 2adb3069b0e04-596a0000a2bmr3428587e87.10.1763851673743;
+        Sat, 22 Nov 2025 14:47:53 -0800 (PST)
+Received: from localhost ([109.167.240.218])
+        by smtp.gmail.com with UTF8SMTPSA id 2adb3069b0e04-5969dbc5988sm2742367e87.78.2025.11.22.14.47.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 22 Nov 2025 14:47:52 -0800 (PST)
+From: Askar Safin <safinaskar@gmail.com>
+To: mpatocka@redhat.com
+Cc: Dell.Client.Kernel@dell.com,
+	agk@redhat.com,
+	brauner@kernel.org,
+	dm-devel@lists.linux.dev,
+	ebiggers@kernel.org,
+	kix@kix.es,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-lvm@lists.linux.dev,
+	linux-mm@kvack.org,
+	linux-pm@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	lvm-devel@lists.linux.dev,
+	milan@mazyland.cz,
+	msnitzer@redhat.com,
+	mzxreary@0pointer.de,
+	nphamcs@gmail.com,
+	pavel@ucw.cz,
+	rafael@kernel.org,
+	ryncsn@gmail.com,
+	safinaskar@gmail.com,
+	torvalds@linux-foundation.org
+Subject: Re: [PATCH 1/2] pm-hibernate: flush disk cache when suspending
+Date: Sun, 23 Nov 2025 01:47:48 +0300
+Message-ID: <20251122224748.3724202-1-safinaskar@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <c44942f2-cf4d-04c2-908f-d16e2e60aae2@redhat.com>
+References: <c44942f2-cf4d-04c2-908f-d16e2e60aae2@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251122194206.31822-1-ebiggers@kernel.org>
-In-Reply-To: <20251122194206.31822-1-ebiggers@kernel.org>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Sat, 22 Nov 2025 22:00:27 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pvZLPKK=_Wa9+kCNejZ88grDnb5JS9=QvMrTQ0WeVsOw@mail.gmail.com>
-X-Gm-Features: AWmQ_bn1ZzeLHuRMqZ6nj3AH1LlwOlRr1TPSTeXuVGzgci7cSh4vrKZVIUr8xEc
-Message-ID: <CAHmME9pvZLPKK=_Wa9+kCNejZ88grDnb5JS9=QvMrTQ0WeVsOw@mail.gmail.com>
-Subject: Re: [PATCH 0/6] lib/crypto: More at_least decorations
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Ard Biesheuvel <ardb@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Mikulas Patocka <mpatocka@redhat.com>:
+> [PATCH 1/2] pm-hibernate: flush disk cache when suspending
+> 
+> There was reported failure that suspend doesn't work with dm-integrity.
+> The reason for the failure is that the suspend code doesn't issue the
+> FLUSH bio - the data still sits in the dm-integrity cache and they are
+> lost when poweroff happens.
+
+I tested this patchset (in Qemu). It works.
+
+Here is script I used for testing:
+
+https://zerobin.net/?66669be7d2404586#xWufhCq7zCoOk3LJcJCj7W4k3vYT3U4vhGutTN3p8m0=
+
+Here are logs:
+
+https://zerobin.net/?5d4a2abbad751890#WMcQl4FAZC9KqcAuJU3TSVr7wuVnPFwI7dlinA9QHOo=
+
+Tested-By: Askar Safin <safinaskar@gmail.com>
+
+There was no any reason to wait for me. You could easily test using script above.
+
+Also: Linux shows this scary message when booting in Qemu:
+
+[    0.512581] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+
+So, FUA is not supported? Does it mean that this patch is wrong, and works purely
+by chance?
+
+-- 
+Askar Safin
