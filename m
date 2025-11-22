@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9CE2C158E;
-	Sat, 22 Nov 2025 19:42:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB90D2C21FB;
+	Sat, 22 Nov 2025 19:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763840566; cv=none; b=Q3JOz2FEsbn8NYLba3y1mswNNRbKzBlauLI6WSh2Yjo2TYlVM7FeXQkmEhfCF0soo7XXsJzN8Ww7T7rkyspXDXuSB5vfXElEsQoH37YGFnDAe3/kG2diQU4a3c1LppGJKFgo8Fdhw+2pk6kpMR2ppVZbpo/zFLV0ulYjg7/4UqE=
+	t=1763840566; cv=none; b=b3TeKtpywP1TWdpHwG9xoxVqtePgOeOxKz07roqoI6h0gYDmvC3lmhicFyE/dY42iC5hEBhy6QOVPIs8FL53Sf3iyaQxcn3YOoNh8vK3XlxN6KHiO1emECUN91MnsATdPb+7tNimG7DpcKZFDNBe0xlbsLDxdNL+03cCZZjD6Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763840566; c=relaxed/simple;
-	bh=xpoNH4kgspUwPe1f6Y50HDV93L8GACvKyr/04iKSWdQ=;
+	bh=Vpv+tZscN2l9bt6vPiXuRUfDMu1WW0qW9PfdekwXokc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R+h/N1fdW6FEDsbApBrWm5Bq32YduCj8Wh8xuOHOFH7L3ltvIOaT/wrCTAwA6juW4GJNGDK3M6Qs1nXMR8pORNsOJiX/WSROzets20ypJn9pOWucoqCALJN4w9wIcoKNMOHPVTlKyCaSJ1yranmRIxqPe4ALc+lIbhcSw2PNpWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WpGZnv+F; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=reYuZdgfFWGomJh7tIzcPuzprfJyHGr9WMu8I6jj5Y0EkJZkXUBsWTAocnIpLB03idYRvNPpdUUTUXFQzqJPVH0PBupjyYsfb/sma5kmyRtMIOOLQ7B6KVsj0xRyu3bvSqS00ibqI3hvhnSUCv7h4RkwQOZwVT1Obaa/eGTAOps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MM74jTXR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WpGZnv+F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 049E6C19425;
-	Sat, 22 Nov 2025 19:42:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MM74jTXR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC97EC4CEF5;
+	Sat, 22 Nov 2025 19:42:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763840565;
-	bh=xpoNH4kgspUwPe1f6Y50HDV93L8GACvKyr/04iKSWdQ=;
+	s=k20201202; t=1763840566;
+	bh=Vpv+tZscN2l9bt6vPiXuRUfDMu1WW0qW9PfdekwXokc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WpGZnv+F+k2ve49gIwlvlJyas8dB989YMRzs+ISBFMte5p86OC95Mo5KD4rp3ugtb
-	 3SynOG7/VBP0tYPOoQRf1BxzB3zHn5fMEuhFIzFUfnl4EjczRvQbDHFz2jdaMULZt1
-	 Oft1MphBTtyZrCQvPIAaoSEh27i7GZylJfROU0ANzpZDrvbVT7YEwdQ0+mtZ4DEDut
-	 9oecUyKF2l4PJFEi/yYOFZ7/pfGNyhHOTvbqe7GMzNM6z0+hAHwmQJu+UUinNMxVtX
-	 VZPILtSJojMWkOD1Dzl/iB4KSNt1PcXxeHLJ5sM+7WC2kSCe8qN3n/6oaOw+hIkfD1
-	 6VruZDBdADDeQ==
+	b=MM74jTXRmc4CXrYu51xd7NPgkvyY2uCtaB98PufyxKjIO9AMqpvmO/MNWzn36v3Vp
+	 o8G4ahMH0RWzUaT7sndAv5Iqm0WRoZ/wpl/j6D1/sIzcJc7aAQRyctmnHDm5kRW4vH
+	 fTVMK0wt7gHskk0vVZF3pB5lkWsF6v/gd1Seb6EIT4HwOlaQE0E8MIuQDvj5yg2JJj
+	 12tDWXma/1Bo5UdLR2oO4rR+/EwXCuDTyafFP14gmMVGYtTtx16Wv2XTT1eJIdXpre
+	 J/pET1qo/JIx6FzHLLtWPa/S9oqcmafx5WXg+i7akBoxPBZVJxtHwJlgH7m7sLQUAz
+	 8mEg+HY3+Ti1g==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org,
 	Kees Cook <kees@kernel.org>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 2/6] lib/crypto: curve25519: Add at_least decoration to fixed-size array params
-Date: Sat, 22 Nov 2025 11:42:02 -0800
-Message-ID: <20251122194206.31822-3-ebiggers@kernel.org>
+Subject: [PATCH 3/6] lib/crypto: md5: Add at_least decoration to fixed-size array params
+Date: Sat, 22 Nov 2025 11:42:03 -0800
+Message-ID: <20251122194206.31822-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.2
 In-Reply-To: <20251122194206.31822-1-ebiggers@kernel.org>
 References: <20251122194206.31822-1-ebiggers@kernel.org>
@@ -50,61 +50,79 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 Add the at_least (i.e. 'static') decoration to the fixed-size array
-parameters of the curve25519 library functions.  This causes clang to
-warn when a too-small array of known size is passed.
+parameters of the md5 library functions.  This causes clang to warn when
+a too-small array of known size is passed.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- include/crypto/curve25519.h | 24 ++++++++++++++----------
- 1 file changed, 14 insertions(+), 10 deletions(-)
+ include/crypto/md5.h | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/include/crypto/curve25519.h b/include/crypto/curve25519.h
-index db63a5577c00..2362b48f8741 100644
---- a/include/crypto/curve25519.h
-+++ b/include/crypto/curve25519.h
-@@ -11,28 +11,32 @@
+diff --git a/include/crypto/md5.h b/include/crypto/md5.h
+index c9aa5c3abc53..c47aedfe67ec 100644
+--- a/include/crypto/md5.h
++++ b/include/crypto/md5.h
+@@ -74,21 +74,21 @@ void md5_update(struct md5_ctx *ctx, const u8 *data, size_t len);
+  *
+  * After finishing, this zeroizes @ctx.  So the caller does not need to do it.
+  *
+  * Context: Any context.
+  */
+-void md5_final(struct md5_ctx *ctx, u8 out[MD5_DIGEST_SIZE]);
++void md5_final(struct md5_ctx *ctx, u8 out[at_least MD5_DIGEST_SIZE]);
  
- enum curve25519_lengths {
- 	CURVE25519_KEY_SIZE = 32
- };
+ /**
+  * md5() - Compute MD5 message digest in one shot
+  * @data: the message data
+  * @len: the data length in bytes
+  * @out: (output) the resulting MD5 message digest
+  *
+  * Context: Any context.
+  */
+-void md5(const u8 *data, size_t len, u8 out[MD5_DIGEST_SIZE]);
++void md5(const u8 *data, size_t len, u8 out[at_least MD5_DIGEST_SIZE]);
  
--void curve25519_generic(u8 out[CURVE25519_KEY_SIZE],
--			const u8 scalar[CURVE25519_KEY_SIZE],
--			const u8 point[CURVE25519_KEY_SIZE]);
-+void curve25519_generic(u8 out[at_least CURVE25519_KEY_SIZE],
-+			const u8 scalar[at_least CURVE25519_KEY_SIZE],
-+			const u8 point[at_least CURVE25519_KEY_SIZE]);
+ /**
+  * struct hmac_md5_key - Prepared key for HMAC-MD5
+  * @istate: private
+  * @ostate: private
+@@ -171,11 +171,11 @@ static inline void hmac_md5_update(struct hmac_md5_ctx *ctx,
+  *
+  * After finishing, this zeroizes @ctx.  So the caller does not need to do it.
+  *
+  * Context: Any context.
+  */
+-void hmac_md5_final(struct hmac_md5_ctx *ctx, u8 out[MD5_DIGEST_SIZE]);
++void hmac_md5_final(struct hmac_md5_ctx *ctx, u8 out[at_least MD5_DIGEST_SIZE]);
  
--bool __must_check curve25519(u8 mypublic[CURVE25519_KEY_SIZE],
--			     const u8 secret[CURVE25519_KEY_SIZE],
--			     const u8 basepoint[CURVE25519_KEY_SIZE]);
-+bool __must_check
-+curve25519(u8 mypublic[at_least CURVE25519_KEY_SIZE],
-+	   const u8 secret[at_least CURVE25519_KEY_SIZE],
-+	   const u8 basepoint[at_least CURVE25519_KEY_SIZE]);
+ /**
+  * hmac_md5() - Compute HMAC-MD5 in one shot, using a prepared key
+  * @key: the prepared HMAC key
+  * @data: the message data
+@@ -185,11 +185,12 @@ void hmac_md5_final(struct hmac_md5_ctx *ctx, u8 out[MD5_DIGEST_SIZE]);
+  * If you're using the key only once, consider using hmac_md5_usingrawkey().
+  *
+  * Context: Any context.
+  */
+ void hmac_md5(const struct hmac_md5_key *key,
+-	      const u8 *data, size_t data_len, u8 out[MD5_DIGEST_SIZE]);
++	      const u8 *data, size_t data_len,
++	      u8 out[at_least MD5_DIGEST_SIZE]);
  
--bool __must_check curve25519_generate_public(u8 pub[CURVE25519_KEY_SIZE],
--					     const u8 secret[CURVE25519_KEY_SIZE]);
-+bool __must_check
-+curve25519_generate_public(u8 pub[at_least CURVE25519_KEY_SIZE],
-+			   const u8 secret[at_least CURVE25519_KEY_SIZE]);
+ /**
+  * hmac_md5_usingrawkey() - Compute HMAC-MD5 in one shot, using a raw key
+  * @raw_key: the raw HMAC-MD5 key
+  * @raw_key_len: the key length in bytes.  All key lengths are supported.
+@@ -202,8 +203,8 @@ void hmac_md5(const struct hmac_md5_key *key,
+  *
+  * Context: Any context.
+  */
+ void hmac_md5_usingrawkey(const u8 *raw_key, size_t raw_key_len,
+ 			  const u8 *data, size_t data_len,
+-			  u8 out[MD5_DIGEST_SIZE]);
++			  u8 out[at_least MD5_DIGEST_SIZE]);
  
--static inline void curve25519_clamp_secret(u8 secret[CURVE25519_KEY_SIZE])
-+static inline void
-+curve25519_clamp_secret(u8 secret[at_least CURVE25519_KEY_SIZE])
- {
- 	secret[0] &= 248;
- 	secret[31] = (secret[31] & 127) | 64;
- }
- 
--static inline void curve25519_generate_secret(u8 secret[CURVE25519_KEY_SIZE])
-+static inline void
-+curve25519_generate_secret(u8 secret[at_least CURVE25519_KEY_SIZE])
- {
- 	get_random_bytes_wait(secret, CURVE25519_KEY_SIZE);
- 	curve25519_clamp_secret(secret);
- }
- 
+ #endif /* _CRYPTO_MD5_H */
 -- 
 2.51.2
 
