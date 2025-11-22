@@ -1,47 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E4227472;
-	Sat, 22 Nov 2025 03:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC87018FC86;
+	Sat, 22 Nov 2025 03:14:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763780930; cv=none; b=J6U+fh1LIiWeLL3FORywFXRYjiXXoBmEBxeRC79BmMiGRJXWVYciZKyNJ0HKC4j+Br/8gONMNCNmppxmQnx3ButEeXXvENM+RWfL6MZRBZBDO5gnFAuAnk+XYX7iKXQOW12dfroek62GNqn4w0gj96qSaf2WMtAP6pN7k/drREU=
+	t=1763781250; cv=none; b=pn1hJ0TPHTLCoazKQK87J63VQhMPvurImatEmbTF82tz7N7LiBzhoHTMUEmWdoVW7vRVSnQhuSL7AUVGvd0pzdnI7ahhIVOQ3/ucHlr0GZ3k3WL1isukso72wb7kZfFafWj+W0hLXGcMed2QgAb78l+aGSQW64gaRLPvmub6X1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763780930; c=relaxed/simple;
-	bh=vN+FyIaICEY97nr+Et/CF8YrYu9I3L1ZwAPw9FvWsq0=;
+	s=arc-20240116; t=1763781250; c=relaxed/simple;
+	bh=xdQB9PdoUwbS8t+hlYddwX/EsBhUDL+GmA2KbkB7NqU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qBE7fuO3GBJyVdmD22Hgy/QJR20WUMdh0MU+eqbHTf6HvXvF6BEyVbfjqH726aaz70AqYy2gpryvuomEcXXoIxZm/OR3Jz3EuUkKlXLl6xO35xIbXfHYGF3AmoNouTEy4jlNjMbbppZQkvvfXMdLNFS2AAtCpXGIKcfrB0S0f/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=bR+tOO8H; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=c7TEaCdarRmtBh5biPzf1Csfkq7Ln6NEyXFLwsj2gMfTQ4TBFlWtPWv0o1UG5mUvzIcxakb7urMsOdPNivNOQHul9W7+YkjOxUIHGHyNdZ8KaVHsmEZlqnpFj5XE+mvPG/x5tRUSz4wLyYAPsz4G96wHKKvY0OzSo1FoHKFO/xA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=j+6cNb/6; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="bR+tOO8H"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="j+6cNb/6"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=RvB1V42cJPtuNjI9dynxdUi4q61WtZdQDqkBNhQkF20=; 
-	b=bR+tOO8H/kJFnhgXRH2F7JReQIFpq+lMrb8zNS2D5SZDIrX89JWMXessmMTeDMuxMnLnqzE2MJH
-	3P3AQAUIwIQyuwnwpX3elzULNSkf0J3XvBon+NNTPA2lqBhNEmnuhPOOg3JLMMNN2pe2vRrcAP+oQ
-	cSj1/GdbYsIeCIcRe1CAq3D8j2aXnM/Mi6aRB4AfFNveiql8FJi5nEUUMInigdC79HJLWMPXHvf5G
-	M0ZFsyui3r5Gk5VNq5oUadIh1ZrS4x/elGKPnyN6jO1EWnbsSo4xLn502HxXCVs8cKLji73ZO5A1u
-	z4IuyLbYfYeMfAK21FSqgRFsOvzbIVIPrIqw==;
+	from:content-type:reply-to; bh=YlKVwvw76AzWlf5cuuwrd7RFix8KbItA+lmDtN4DNMc=; 
+	b=j+6cNb/6W1jVQkb9hujfDbnwqgfBOD6cewU4utEKxmOy048zfF+U9iCytTbnJ6N/tR9y+G8JaQt
+	yKlr60GPAL2+cKV0dbnoEgGM9sPhX1ug7c2sDZzmAT4dOiO/9ZixeeIic7B++Cp/pFdfwGhxikPaI
+	nZboc79kXnYIPEDlWmJ+rjuQB7R1iR6LrqGSv6sBR9s4vB3R+9AIGJlZEIpotm2nWfzFcWukuR8et
+	0ogIYEnYtu1R7ZKnKRBkODZ2AGfyqegZ2FCvrb7049kl4K9AR+w81Lmh3vU6+8fifBEEeURHgYe8h
+	dFlPPpRdpT/rajv09wkk8/TR/oQ37ESYAjTw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vMdzJ-0056Qf-1P;
-	Sat, 22 Nov 2025 11:08:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 22 Nov 2025 11:08:37 +0800
-Date: Sat, 22 Nov 2025 11:08:37 +0800
+	id 1vMe4H-0056RV-2q;
+	Sat, 22 Nov 2025 11:13:46 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 22 Nov 2025 11:13:45 +0800
+Date: Sat, 22 Nov 2025 11:13:45 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: torvalds@linux-foundation.org, ebiggers@kernel.org, ardb@kernel.org,
-	kees@kernel.org, linux-crypto@vger.kernel.org,
+To: Haotian Zhang <vulab@iscas.ac.cn>
+Cc: jiajie.ho@starfivetech.com, william.qiu@starfivetech.com,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH libcrypto v2 2/3] compiler: introduce at_least parameter
- decoration pseudo keyword
-Message-ID: <aSEpNYgrYRGOihxy@gondor.apana.org.au>
-References: <20251120011022.1558674-2-Jason@zx2c4.com>
- <aSEj0GvbFjwlDbVM@gondor.apana.org.au>
- <CAHmME9oukFd4=9J2AHOi3-4Axpw2M9-hwM6PSzRtvH_iCxaFaA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: starfive: Correctly handle return of
+ sg_nents_for_len
+Message-ID: <aSEqaVkSZUgZ3iZD@gondor.apana.org.au>
+References: <20251110065438.898-1-vulab@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,35 +48,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHmME9oukFd4=9J2AHOi3-4Axpw2M9-hwM6PSzRtvH_iCxaFaA@mail.gmail.com>
+In-Reply-To: <20251110065438.898-1-vulab@iscas.ac.cn>
 
-On Sat, Nov 22, 2025 at 03:46:38AM +0100, Jason A. Donenfeld wrote:
->
-> Saw your reply to v1 and was thinking about that. Will do. Thanks for
-> pointing this out.
+On Mon, Nov 10, 2025 at 02:54:38PM +0800, Haotian Zhang wrote:
+> The return value of sg_nents_for_len was assigned to an unsigned long
+> in starfive_hash_digest, causing negative error codes to be converted
+> to large positive integers.
+> 
+> Add error checking for sg_nents_for_len and return immediately on
+> failure to prevent potential buffer overflows.
+> 
+> Fixes: 7883d1b28a2b ("crypto: starfive - Add hash and HMAC support")
+> Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
+> ---
+>  drivers/crypto/starfive/jh7110-hash.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 
-It seems that we need to bring the brackets back, because sparse
-won't take this either:
-
-int foo(int n, int a[n])
-{
-	return a[0]++;
-}
-
-But this seems to work:
-
-#ifdef __CHECKER__
-#define at_least(x)
-#else
-#define at_least(x) static x
-#endif
-
-int foo(int n, int a[at_least(n)])
-{
-	return a[0]++;
-}
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
