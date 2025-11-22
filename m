@@ -1,51 +1,51 @@
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F562EFD9E;
-	Sat, 22 Nov 2025 07:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B7A2F39BD;
+	Sat, 22 Nov 2025 07:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763797772; cv=none; b=CN+KonIPKu5hSOvDrV4phNpBYvYfyXXajo/MV9MZ8I5zbY4s/ppOgksZBNXu3c68v11/jpiDvbLsTH2SXDOE4mXV4Tu+rT5oxsAA4GOyTxd8LOkggB1eK5OhW+QiuW+vl/mwdKTFm0HugEcPETvxhBGbhw+CMsXkRduqs+AiMOI=
+	t=1763797773; cv=none; b=BM77CpfPA9faFYHOu3JoPQVAa4dwf1WAPt/V4vsNslps5+4fRZN6DYyl0qMNKjr43VLzKGVgCUzRPQpsESZbgmBpbVjOeqrrQggnIEas7QJUtd4wq0rIO8irxc/egfxP8vPO5t9HnVuMdlw02Vp8Z4CtbY804S5zFdefl7LMm4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763797772; c=relaxed/simple;
-	bh=K3fMXEs/AIjOZiYh+qj/M3wWSOKD5Ye/DP/wFbPfusE=;
+	s=arc-20240116; t=1763797773; c=relaxed/simple;
+	bh=iu+yAidXrHEug3y3V9cSpWGIIW9hNPdKZFe5IKKkHfE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QfnAZFocL/BxoCpfwoThNStuS/sspeDQesunsIuqsUkWHrc+jWzhHWRzZcwyivsOPjQc/rMntPJTZIVtrg10ew4EOK5YjsJlxztcSScYdJT5E8GBFlZeSYl1g6QyvU9eYXnlM7vcER8xdn/wy19wojkFqHXMU+b1cBJpMBDAhas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=42vVJSDo; arc=none smtp.client-ip=113.46.200.218
+	 MIME-Version:Content-Type; b=nBM/IqKLvazfqfjPfJudH9/9hp1qhmKVM9CcYoZRQXhCq5Uh9K0IteUIqRYIg1gzW16N99zvmUxA06U8zP7O4mulARpqO1QInP3EaEAND3YXM/1kZPZDgPG3MQb8w1EZFMNE7GbKUObG7miN2LhjKdXYY7CMkmnyd5mE89L7owA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=aNm0EI8b; arc=none smtp.client-ip=113.46.200.221
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="42vVJSDo"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="aNm0EI8b"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=7ElhesMM7hnWDMkwRJdjH2UufMRtu9tAkQWz5Sf9l/o=;
-	b=42vVJSDo7MWf8y8c5jWzmG2HFhsY1x/b1XModt6uaiAdzNwqfY2gKRKu7gLno+2O34+wV/cJk
-	bD1QBE5LJ3wO8wwmz2sk1FpDAF9vfSJLoX2tKqv/xbqXjassYkwbeC5YbHnG4SRv9puEJIxjQud
-	cE/UBV5xBi40pipOd9Sd0HI=
+	bh=JoI7cyZ+NnFFAdScLBhjUEGoGhJJ+1wW9RIBEXNcA3Y=;
+	b=aNm0EI8brhTaJm3jSNjdbHdNkb5ow1UZcG99+MwrSeJbIZ9cCva6u/8z8fb3ji99BZdEvtqyH
+	UY/qJ5bgt8MNwI1wTeX2HUZBhqJkdxP6FJsOzP+y6/QGTYomapIoBNxu/Hi/W0wDoh5Yfla0I0+
+	Dv6UUONR6PwJDEna5Ct8oH8=
 Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dD41P5pcGzpStc;
-	Sat, 22 Nov 2025 15:47:21 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 05946140203;
-	Sat, 22 Nov 2025 15:49:22 +0800 (CST)
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4dD41j4kMkzRhRN;
+	Sat, 22 Nov 2025 15:47:37 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 08522140203;
+	Sat, 22 Nov 2025 15:49:23 +0800 (CST)
 Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 22 Nov 2025 15:49:21 +0800
+ 15.2.1544.11; Sat, 22 Nov 2025 15:49:22 +0800
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 22 Nov 2025 15:49:21 +0800
+ 15.2.1544.11; Sat, 22 Nov 2025 15:49:22 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
 	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>, <lizhi206@huawei.com>,
 	<taoqi10@huawei.com>
-Subject: [PATCH v3 09/11] crypto: hisilicon/zip - support fallback for zip
-Date: Sat, 22 Nov 2025 15:49:14 +0800
-Message-ID: <20251122074916.2793717-10-huangchenghai2@huawei.com>
+Subject: [PATCH v3 11/11] crypto: hisilicon/sec2 - support skcipher/aead fallback for hardware queue unavailable
+Date: Sat, 22 Nov 2025 15:49:16 +0800
+Message-ID: <20251122074916.2793717-12-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20251122074916.2793717-1-huangchenghai2@huawei.com>
 References: <20251122074916.2793717-1-huangchenghai2@huawei.com>
@@ -60,144 +60,213 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
  kwepemq200001.china.huawei.com (7.202.195.16)
 
-When the hardware queue resource busy(no shareable queue)
-or memery alloc fail in initialization of acomp_alg, use
-soft algorithm to complete the work.
+From: Qi Tao <taoqi10@huawei.com>
 
-Fixes: 1a9e6f59caee ("crypto: hisilicon/zip - remove zlib and gzip")
+When all hardware queues are busy and no shareable queue,
+new processes fail to apply for queues. To avoid affecting
+tasks, support fallback mechanism when hardware queues are
+unavailable.
+
+Fixes: c16a70c1f253 ("crypto: hisilicon/sec - add new algorithm mode for AEAD")
+Signed-off-by: Qi Tao <taoqi10@huawei.com>
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/Kconfig          |  1 +
- drivers/crypto/hisilicon/zip/zip_crypto.c | 50 +++++++++++++++++++----
- 2 files changed, 43 insertions(+), 8 deletions(-)
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 62 ++++++++++++++++------
+ 1 file changed, 47 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index 4835bdebdbb3..a0cb1a8186ac 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -57,6 +57,7 @@ config CRYPTO_DEV_HISI_ZIP
- 	depends on UACCE || UACCE=n
- 	depends on ACPI
- 	select CRYPTO_DEV_HISI_QM
-+	select CRYPTO_DEFLATE
- 	help
- 	  Support for HiSilicon ZIP Driver
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index d09d081f42dc..c462b58d3034 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -663,10 +663,8 @@ static int sec_ctx_base_init(struct sec_ctx *ctx)
+ 	int i, ret;
  
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index e675269e2e02..e1d6a1e61724 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -84,6 +84,7 @@ struct hisi_zip_sqe_ops {
- struct hisi_zip_ctx {
- 	struct hisi_zip_qp_ctx qp_ctx[HZIP_CTX_Q_NUM];
- 	const struct hisi_zip_sqe_ops *ops;
-+	bool fallback;
- };
+ 	ctx->qps = sec_create_qps();
+-	if (!ctx->qps) {
+-		pr_err("Can not create sec qps!\n");
++	if (!ctx->qps)
+ 		return -ENODEV;
+-	}
  
- static int sgl_sge_nr_set(const char *val, const struct kernel_param *kp)
-@@ -110,6 +111,24 @@ static u16 sgl_sge_nr = HZIP_SGL_SGE_NR;
- module_param_cb(sgl_sge_nr, &sgl_sge_nr_ops, &sgl_sge_nr, 0444);
- MODULE_PARM_DESC(sgl_sge_nr, "Number of sge in sgl(1-255)");
- 
-+static int hisi_zip_fallback_do_work(struct acomp_req *acomp_req, bool is_decompress)
-+{
-+	ACOMP_FBREQ_ON_STACK(fbreq, acomp_req);
-+	int ret;
-+
-+	if (!is_decompress)
-+		ret = crypto_acomp_compress(fbreq);
-+	else
-+		ret = crypto_acomp_decompress(fbreq);
-+	if (ret) {
-+		pr_err("failed to do fallback work, ret=%d\n", ret);
-+		return ret;
-+	}
-+
-+	acomp_req->dlen = fbreq->dlen;
-+	return ret;
-+}
-+
- static struct hisi_zip_req *hisi_zip_create_req(struct hisi_zip_qp_ctx *qp_ctx,
- 						struct acomp_req *req)
+ 	sec = container_of(ctx->qps[0]->qm, struct sec_dev, qm);
+ 	ctx->sec = sec;
+@@ -702,6 +700,9 @@ static void sec_ctx_base_uninit(struct sec_ctx *ctx)
  {
-@@ -313,10 +332,15 @@ static int hisi_zip_acompress(struct acomp_req *acomp_req)
- {
- 	struct hisi_zip_ctx *ctx = crypto_tfm_ctx(acomp_req->base.tfm);
- 	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_COMP];
--	struct device *dev = &qp_ctx->qp->qm->pdev->dev;
- 	struct hisi_zip_req *req;
-+	struct device *dev;
- 	int ret;
+ 	int i;
  
-+	if (ctx->fallback)
-+		return hisi_zip_fallback_do_work(acomp_req, 0);
++	if (!ctx->qps)
++		return;
 +
-+	dev = &qp_ctx->qp->qm->pdev->dev;
-+
- 	req = hisi_zip_create_req(qp_ctx, acomp_req);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
-@@ -334,10 +358,15 @@ static int hisi_zip_adecompress(struct acomp_req *acomp_req)
- {
- 	struct hisi_zip_ctx *ctx = crypto_tfm_ctx(acomp_req->base.tfm);
- 	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_DECOMP];
--	struct device *dev = &qp_ctx->qp->qm->pdev->dev;
- 	struct hisi_zip_req *req;
-+	struct device *dev;
- 	int ret;
+ 	for (i = 0; i < ctx->sec->ctx_q_num; i++)
+ 		sec_release_qp_ctx(ctx, &ctx->qp_ctx[i]);
  
-+	if (ctx->fallback)
-+		return hisi_zip_fallback_do_work(acomp_req, 1);
+@@ -713,6 +714,9 @@ static int sec_cipher_init(struct sec_ctx *ctx)
+ {
+ 	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
+ 
++	if (!ctx->qps)
++		return 0;
 +
-+	dev = &qp_ctx->qp->qm->pdev->dev;
+ 	c_ctx->c_key = dma_alloc_coherent(ctx->dev, SEC_MAX_KEY_SIZE,
+ 					  &c_ctx->c_key_dma, GFP_KERNEL);
+ 	if (!c_ctx->c_key)
+@@ -725,6 +729,9 @@ static void sec_cipher_uninit(struct sec_ctx *ctx)
+ {
+ 	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
+ 
++	if (!ctx->qps)
++		return;
 +
- 	req = hisi_zip_create_req(qp_ctx, acomp_req);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
-@@ -512,7 +541,7 @@ static int hisi_zip_acomp_init(struct crypto_acomp *tfm)
- 	ret = hisi_zip_ctx_init(ctx, COMP_NAME_TO_TYPE(alg_name), tfm->base.node);
- 	if (ret) {
- 		pr_err("failed to init ctx (%d)!\n", ret);
--		return ret;
-+		goto switch_to_soft;
+ 	memzero_explicit(c_ctx->c_key, SEC_MAX_KEY_SIZE);
+ 	dma_free_coherent(ctx->dev, SEC_MAX_KEY_SIZE,
+ 			  c_ctx->c_key, c_ctx->c_key_dma);
+@@ -746,6 +753,9 @@ static void sec_auth_uninit(struct sec_ctx *ctx)
+ {
+ 	struct sec_auth_ctx *a_ctx = &ctx->a_ctx;
+ 
++	if (!ctx->qps)
++		return;
++
+ 	memzero_explicit(a_ctx->a_key, SEC_MAX_AKEY_SIZE);
+ 	dma_free_coherent(ctx->dev, SEC_MAX_AKEY_SIZE,
+ 			  a_ctx->a_key, a_ctx->a_key_dma);
+@@ -783,7 +793,7 @@ static int sec_skcipher_init(struct crypto_skcipher *tfm)
  	}
  
- 	dev = &ctx->qp_ctx[0].qp->qm->pdev->dev;
-@@ -537,16 +566,20 @@ static int hisi_zip_acomp_init(struct crypto_acomp *tfm)
- 	hisi_zip_release_req_q(ctx);
- err_ctx_exit:
- 	hisi_zip_ctx_exit(ctx);
+ 	ret = sec_ctx_base_init(ctx);
+-	if (ret)
++	if (ret && ret != -ENODEV)
+ 		return ret;
+ 
+ 	ret = sec_cipher_init(ctx);
+@@ -892,6 +902,9 @@ static int sec_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 	struct device *dev = ctx->dev;
+ 	int ret;
+ 
++	if (!ctx->qps)
++		goto set_soft_key;
++
+ 	if (c_mode == SEC_CMODE_XTS) {
+ 		ret = xts_verify_key(tfm, key, keylen);
+ 		if (ret) {
+@@ -922,13 +935,14 @@ static int sec_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 	}
+ 
+ 	memcpy(c_ctx->c_key, key, keylen);
+-	if (c_ctx->fbtfm) {
+-		ret = crypto_sync_skcipher_setkey(c_ctx->fbtfm, key, keylen);
+-		if (ret) {
+-			dev_err(dev, "failed to set fallback skcipher key!\n");
+-			return ret;
+-		}
++
++set_soft_key:
++	ret = crypto_sync_skcipher_setkey(c_ctx->fbtfm, key, keylen);
++	if (ret) {
++		dev_err(dev, "failed to set fallback skcipher key!\n");
++		return ret;
+ 	}
++
+ 	return 0;
+ }
+ 
+@@ -1392,6 +1406,9 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+ 	struct crypto_authenc_keys keys;
+ 	int ret;
+ 
++	if (!ctx->qps)
++		return sec_aead_fallback_setkey(a_ctx, tfm, key, keylen);
++
+ 	ctx->a_ctx.a_alg = a_alg;
+ 	ctx->c_ctx.c_alg = c_alg;
+ 	c_ctx->c_mode = c_mode;
+@@ -2048,6 +2065,9 @@ static int sec_skcipher_ctx_init(struct crypto_skcipher *tfm)
+ 	if (ret)
+ 		return ret;
+ 
++	if (!ctx->qps)
++		return 0;
++
+ 	if (ctx->sec->qm.ver < QM_HW_V3) {
+ 		ctx->type_supported = SEC_BD_TYPE2;
+ 		ctx->req_op = &sec_skcipher_req_ops;
+@@ -2056,7 +2076,7 @@ static int sec_skcipher_ctx_init(struct crypto_skcipher *tfm)
+ 		ctx->req_op = &sec_skcipher_req_ops_v3;
+ 	}
+ 
 -	return ret;
-+switch_to_soft:
-+	ctx->fallback = true;
 +	return 0;
  }
  
- static void hisi_zip_acomp_exit(struct crypto_acomp *tfm)
- {
- 	struct hisi_zip_ctx *ctx = crypto_tfm_ctx(&tfm->base);
+ static void sec_skcipher_ctx_exit(struct crypto_skcipher *tfm)
+@@ -2124,7 +2144,7 @@ static int sec_aead_ctx_init(struct crypto_aead *tfm, const char *hash_name)
+ 	int ret;
  
--	hisi_zip_release_sgl_pool(ctx);
--	hisi_zip_release_req_q(ctx);
--	hisi_zip_ctx_exit(ctx);
-+	if (!ctx->fallback) {
-+		hisi_zip_release_sgl_pool(ctx);
-+		hisi_zip_release_req_q(ctx);
-+		hisi_zip_ctx_exit(ctx);
-+	}
+ 	ret = sec_aead_init(tfm);
+-	if (ret) {
++	if (ret && ret != -ENODEV) {
+ 		pr_err("hisi_sec2: aead init error!\n");
+ 		return ret;
+ 	}
+@@ -2166,7 +2186,7 @@ static int sec_aead_xcm_ctx_init(struct crypto_aead *tfm)
+ 	int ret;
+ 
+ 	ret = sec_aead_init(tfm);
+-	if (ret) {
++	if (ret && ret != -ENODEV) {
+ 		dev_err(ctx->dev, "hisi_sec2: aead xcm init error!\n");
+ 		return ret;
+ 	}
+@@ -2311,6 +2331,9 @@ static int sec_skcipher_crypto(struct skcipher_request *sk_req, bool encrypt)
+ 	bool need_fallback = false;
+ 	int ret;
+ 
++	if (!ctx->qps)
++		goto soft_crypto;
++
+ 	if (!sk_req->cryptlen) {
+ 		if (ctx->c_ctx.c_mode == SEC_CMODE_XTS)
+ 			return -EINVAL;
+@@ -2328,9 +2351,12 @@ static int sec_skcipher_crypto(struct skcipher_request *sk_req, bool encrypt)
+ 		return -EINVAL;
+ 
+ 	if (unlikely(ctx->c_ctx.fallback || need_fallback))
+-		return sec_skcipher_soft_crypto(ctx, sk_req, encrypt);
++		goto soft_crypto;
+ 
+ 	return ctx->req_op->process(ctx, req);
++
++soft_crypto:
++	return sec_skcipher_soft_crypto(ctx, sk_req, encrypt);
  }
  
- static struct acomp_alg hisi_zip_acomp_deflate = {
-@@ -557,7 +590,8 @@ static struct acomp_alg hisi_zip_acomp_deflate = {
- 	.base			= {
- 		.cra_name		= "deflate",
- 		.cra_driver_name	= "hisi-deflate-acomp",
--		.cra_flags		= CRYPTO_ALG_ASYNC,
-+		.cra_flags		= CRYPTO_ALG_ASYNC |
-+					  CRYPTO_ALG_NEED_FALLBACK,
- 		.cra_module		= THIS_MODULE,
- 		.cra_priority		= HZIP_ALG_PRIORITY,
- 		.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
+ static int sec_skcipher_encrypt(struct skcipher_request *sk_req)
+@@ -2538,6 +2564,9 @@ static int sec_aead_crypto(struct aead_request *a_req, bool encrypt)
+ 	bool need_fallback = false;
+ 	int ret;
+ 
++	if (!ctx->qps)
++		goto soft_crypto;
++
+ 	req->flag = a_req->base.flags;
+ 	req->aead_req.aead_req = a_req;
+ 	req->c_req.encrypt = encrypt;
+@@ -2548,11 +2577,14 @@ static int sec_aead_crypto(struct aead_request *a_req, bool encrypt)
+ 	ret = sec_aead_param_check(ctx, req, &need_fallback);
+ 	if (unlikely(ret)) {
+ 		if (need_fallback)
+-			return sec_aead_soft_crypto(ctx, a_req, encrypt);
++			goto soft_crypto;
+ 		return -EINVAL;
+ 	}
+ 
+ 	return ctx->req_op->process(ctx, req);
++
++soft_crypto:
++	return sec_aead_soft_crypto(ctx, a_req, encrypt);
+ }
+ 
+ static int sec_aead_encrypt(struct aead_request *a_req)
 -- 
 2.33.0
 
