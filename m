@@ -1,51 +1,51 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6B72D9493;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1292DA771;
 	Sat, 22 Nov 2025 07:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763797769; cv=none; b=dOOnVzREMxe3MFFdQlDKSfE+HXy638lmNQNFufW549NFSDRLuCmjyJhB8fF7n9euskr1GnRUzbv2xB8KzJZoNUpoZCNm81o9ut1qSH2Kug/5jzL11zWo04Z6OAcjwnohvahLvlb0rifofh7NEgBGfCIVM7AkF6lCWSJz+YJGctM=
+	t=1763797770; cv=none; b=h5Bg/zPi2wyHmNeLlrhxNABxuqcpFuotcIN2L0VEw9GULdkbLr+Fem6rqbA2HUPscgJJwO/0EEmUbSva1SStpcMuF7FXveqA/r8ibT3AXg0rVR5Z6QGc11CnaAOrMENZxa5TwSBmFqaneW9X0VhXB0Z99vS8euYb+SA/Fd3lCvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763797769; c=relaxed/simple;
-	bh=ZNHCdJaA3afZTO4UAmrHRiw7G5rKI5FGEUItIxMSaww=;
+	s=arc-20240116; t=1763797770; c=relaxed/simple;
+	bh=gJ8erQE+7UFercg+aoPxAHJsyx438U7oaFkZ/uujdvk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m9Zi0Fqkfef61B1Th1r4qYVui6QIkqAiteNvOMa90mPjqbS+St/uyjtR97qDkrofkPB7Fp4AuX83mIOlrBwlqQtuWQoXNnwJwMiukNwS/zu1FcK0dcp34E3LZuhiEYVTICuwvZKPIXEcT1fdLAtp3Ja+Uwda0QEkQmdM9foCfdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=cy/wPIol; arc=none smtp.client-ip=113.46.200.220
+	 MIME-Version:Content-Type; b=YUB4DzGqTc8vvv2LSwFoUXt60PvzPLZX24gN9vfbgT5BVg07obO3xOW69NyvHqvi4uu1wfCFEK3rBDv++5n66k0EY2nRzGqa7v5Kif2Z7kovflQ38j5vjyW5kJ4My9jEjFgdrJ3V6z1LmrgEbZOBltqQmGgFdenlCs94Jd0QJU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Opg585aq; arc=none smtp.client-ip=113.46.200.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="cy/wPIol"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Opg585aq"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=YAR4Mw5sArcxSPcXElFn5EAVOS+ZDvZEjvDw+TPN/Jo=;
-	b=cy/wPIollasrRDWsRbvXju8fJ1JlEVXVPuvVn1V57VCpbyZMBPxTTxdm4VCu2QsM652TQfrz8
-	eN0tNyR7E0CWJzEMgTWIGga5dJB9B5agClHxHF8pnMoUCsJiMbBOmChdT5yzO1RL/ifOdDHDSsn
-	ErBHKwLp2zR0dfMGY3F5C00=
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4dD4210hWZz12LgP;
-	Sat, 22 Nov 2025 15:47:53 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 12DAF180B4E;
-	Sat, 22 Nov 2025 15:49:19 +0800 (CST)
+	bh=L2DZEZZNjXARR9fq2af6gMmZk/w8TLtCp1W8YSaru8M=;
+	b=Opg585aqdki2oUV6caKdZyIQM9s2yhyh001QdLpbx1gtrdmiIH852bQx9azqJeKRZYZZ5wVmY
+	UPeB6lBDhicUW93VS8hzc+3XGQfjKRl8KEN/gZdDNY6L7YIQrfxnECFSVrS4tCMdxN0B7OzzW/m
+	S0sLIbC+HkaKKXWsJJ1WFNA=
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dD41q0Fz6z1T4Hl;
+	Sat, 22 Nov 2025 15:47:43 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 29E74180479;
+	Sat, 22 Nov 2025 15:49:20 +0800 (CST)
 Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 22 Nov 2025 15:49:18 +0800
+ 15.2.1544.11; Sat, 22 Nov 2025 15:49:19 +0800
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 22 Nov 2025 15:49:18 +0800
+ 15.2.1544.11; Sat, 22 Nov 2025 15:49:19 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
 	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>, <lizhi206@huawei.com>,
 	<taoqi10@huawei.com>
-Subject: [PATCH v3 03/11] crypto: hisilicon/hpre: extend tag field to 64 bits for better performance
-Date: Sat, 22 Nov 2025 15:49:08 +0800
-Message-ID: <20251122074916.2793717-4-huangchenghai2@huawei.com>
+Subject: [PATCH v3 05/11] crypto: hisilicon/qm - centralize the sending locks of each module into qm
+Date: Sat, 22 Nov 2025 15:49:10 +0800
+Message-ID: <20251122074916.2793717-6-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20251122074916.2793717-1-huangchenghai2@huawei.com>
 References: <20251122074916.2793717-1-huangchenghai2@huawei.com>
@@ -60,333 +60,134 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
  kwepemq200001.china.huawei.com (7.202.195.16)
 
-From: lizhi <lizhi206@huawei.com>
+When a single queue used by multiple tfms, the protection of shared
+resources by individual module driver programs is no longer
+sufficient. The hisi_qp_send needs to be ensured by the lock in qp.
 
-This commit expands the tag field in hpre_sqe structure from 16-bit
-to 64-bit. The change enables storing request addresses directly
-in the tag field, allowing callback functions to access request messages
-without the previous indirection mechanism.
-
-By eliminating the need for lookup tables, this modification reduces lock
-contention and associated overhead, leading to improved efficiency and
-simplified code.
-
-Fixes: c8b4b477079d ("crypto: hisilicon - add HiSilicon HPRE accelerator")
-Signed-off-by: lizhi <lizhi206@huawei.com>
-Signed-off-by: Weili Qian <qianweili@huawei.com>
+Fixes: 5fdb4b345cfb ("crypto: hisilicon - add a lock for the qp send operation")
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre.h        |   5 +-
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 142 ++++----------------
- 2 files changed, 25 insertions(+), 122 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c |  4 ----
+ drivers/crypto/hisilicon/qm.c               | 16 ++++++++++++----
+ drivers/crypto/hisilicon/zip/zip_crypto.c   |  3 ---
+ include/linux/hisi_acc_qm.h                 |  1 +
+ 4 files changed, 13 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
-index 0f3ddbadbcf9..021dbd9a1d48 100644
---- a/drivers/crypto/hisilicon/hpre/hpre.h
-+++ b/drivers/crypto/hisilicon/hpre/hpre.h
-@@ -94,9 +94,8 @@ struct hpre_sqe {
- 	__le64 key;
- 	__le64 in;
- 	__le64 out;
--	__le16 tag;
--	__le16 resv2;
--#define _HPRE_SQE_ALIGN_EXT	7
-+	__le64 tag;
-+#define _HPRE_SQE_ALIGN_EXT	6
- 	__le32 rsvd1[_HPRE_SQE_ALIGN_EXT];
- };
- 
 diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 21ccf879f70c..4197281c8dff 100644
+index 4197281c8dff..220022ae7afb 100644
 --- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
 +++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -108,12 +108,10 @@ struct hpre_ecdh_ctx {
- struct hpre_ctx {
+@@ -109,7 +109,6 @@ struct hpre_ctx {
  	struct hisi_qp *qp;
  	struct device *dev;
--	struct hpre_asym_request **req_list;
  	struct hpre *hpre;
- 	spinlock_t req_lock;
+-	spinlock_t req_lock;
  	unsigned int key_sz;
  	bool crt_g2_mode;
--	struct idr req_idr;
  	union {
- 		struct hpre_rsa_ctx rsa;
- 		struct hpre_dh_ctx dh;
-@@ -136,7 +134,6 @@ struct hpre_asym_request {
- 		struct kpp_request *ecdh;
- 	} areq;
- 	int err;
--	int req_id;
- 	hpre_cb cb;
- 	struct timespec64 req_time;
- };
-@@ -151,58 +148,13 @@ static inline unsigned int hpre_align_pd(void)
- 	return (hpre_align_sz() - 1) & ~(crypto_tfm_ctx_alignment() - 1);
- }
- 
--static int hpre_alloc_req_id(struct hpre_ctx *ctx)
-+static void hpre_dfx_add_req_time(struct hpre_asym_request *hpre_req)
- {
--	unsigned long flags;
--	int id;
--
--	spin_lock_irqsave(&ctx->req_lock, flags);
--	id = idr_alloc(&ctx->req_idr, NULL, 0, ctx->qp->sq_depth, GFP_ATOMIC);
--	spin_unlock_irqrestore(&ctx->req_lock, flags);
--
--	return id;
--}
--
--static void hpre_free_req_id(struct hpre_ctx *ctx, int req_id)
--{
--	unsigned long flags;
--
--	spin_lock_irqsave(&ctx->req_lock, flags);
--	idr_remove(&ctx->req_idr, req_id);
--	spin_unlock_irqrestore(&ctx->req_lock, flags);
--}
--
--static int hpre_add_req_to_ctx(struct hpre_asym_request *hpre_req)
--{
--	struct hpre_ctx *ctx;
--	struct hpre_dfx *dfx;
--	int id;
--
--	ctx = hpre_req->ctx;
--	id = hpre_alloc_req_id(ctx);
--	if (unlikely(id < 0))
--		return -EINVAL;
--
--	ctx->req_list[id] = hpre_req;
--	hpre_req->req_id = id;
-+	struct hpre_ctx *ctx = hpre_req->ctx;
-+	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
- 
--	dfx = ctx->hpre->debug.dfx;
- 	if (atomic64_read(&dfx[HPRE_OVERTIME_THRHLD].value))
- 		ktime_get_ts64(&hpre_req->req_time);
--
--	return id;
--}
--
--static void hpre_rm_req_from_ctx(struct hpre_asym_request *hpre_req)
--{
--	struct hpre_ctx *ctx = hpre_req->ctx;
--	int id = hpre_req->req_id;
--
--	if (hpre_req->req_id >= 0) {
--		hpre_req->req_id = HPRE_INVLD_REQ_ID;
--		ctx->req_list[id] = NULL;
--		hpre_free_req_id(ctx, id);
--	}
- }
- 
- static struct hisi_qp *hpre_get_qp_and_start(u8 type)
-@@ -340,26 +292,19 @@ static void hpre_hw_data_clr_all(struct hpre_ctx *ctx,
- static int hpre_alg_res_post_hf(struct hpre_ctx *ctx, struct hpre_sqe *sqe,
- 				void **kreq)
- {
--	struct hpre_asym_request *req;
- 	unsigned int err, done, alg;
--	int id;
- 
- #define HPRE_NO_HW_ERR		0
- #define HPRE_HW_TASK_DONE	3
- #define HREE_HW_ERR_MASK	GENMASK(10, 0)
- #define HREE_SQE_DONE_MASK	GENMASK(1, 0)
- #define HREE_ALG_TYPE_MASK	GENMASK(4, 0)
--	id = (int)le16_to_cpu(sqe->tag);
--	req = ctx->req_list[id];
--	hpre_rm_req_from_ctx(req);
--	*kreq = req;
-+	*kreq = (void *)le64_to_cpu(sqe->tag);
- 
- 	err = (le32_to_cpu(sqe->dw0) >> HPRE_SQE_ALG_BITS) &
- 		HREE_HW_ERR_MASK;
--
- 	done = (le32_to_cpu(sqe->dw0) >> HPRE_SQE_DONE_SHIFT) &
- 		HREE_SQE_DONE_MASK;
--
- 	if (likely(err == HPRE_NO_HW_ERR && done == HPRE_HW_TASK_DONE))
- 		return 0;
- 
-@@ -370,34 +315,9 @@ static int hpre_alg_res_post_hf(struct hpre_ctx *ctx, struct hpre_sqe *sqe,
- 	return -EINVAL;
- }
- 
--static int hpre_ctx_set(struct hpre_ctx *ctx, struct hisi_qp *qp, int qlen)
--{
--	struct hpre *hpre;
--
--	if (!ctx || !qp || qlen < 0)
--		return -EINVAL;
--
--	spin_lock_init(&ctx->req_lock);
--	ctx->qp = qp;
--	ctx->dev = &qp->qm->pdev->dev;
--
--	hpre = container_of(ctx->qp->qm, struct hpre, qm);
--	ctx->hpre = hpre;
--	ctx->req_list = kcalloc(qlen, sizeof(void *), GFP_KERNEL);
--	if (!ctx->req_list)
--		return -ENOMEM;
--	ctx->key_sz = 0;
--	ctx->crt_g2_mode = false;
--	idr_init(&ctx->req_idr);
--
--	return 0;
--}
--
- static void hpre_ctx_clear(struct hpre_ctx *ctx, bool is_clear_all)
- {
- 	if (is_clear_all) {
--		idr_destroy(&ctx->req_idr);
--		kfree(ctx->req_list);
- 		hisi_qm_free_qps(&ctx->qp, 1);
- 	}
- 
-@@ -467,29 +387,22 @@ static void hpre_rsa_cb(struct hpre_ctx *ctx, void *resp)
- 
- static void hpre_alg_cb(struct hisi_qp *qp, void *resp)
- {
--	struct hpre_ctx *ctx = qp->qp_ctx;
--	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
-+	struct hpre_asym_request *h_req;
- 	struct hpre_sqe *sqe = resp;
--	struct hpre_asym_request *req = ctx->req_list[le16_to_cpu(sqe->tag)];
- 
--	if (unlikely(!req)) {
--		atomic64_inc(&dfx[HPRE_INVALID_REQ_CNT].value);
-+	h_req = (struct hpre_asym_request *)le64_to_cpu(sqe->tag);
-+	if (unlikely(!h_req)) {
-+		pr_err("Failed to get request, and qp_id is %u\n", qp->qp_id);
- 		return;
- 	}
- 
--	req->cb(ctx, resp);
--}
--
--static void hpre_stop_qp_and_put(struct hisi_qp *qp)
--{
--	hisi_qm_stop_qp(qp);
--	hisi_qm_free_qps(&qp, 1);
-+	h_req->cb(h_req->ctx, resp);
- }
- 
- static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
- {
- 	struct hisi_qp *qp;
--	int ret;
-+	struct hpre *hpre;
- 
- 	qp = hpre_get_qp_and_start(type);
- 	if (IS_ERR(qp))
-@@ -497,19 +410,21 @@ static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
+@@ -410,7 +409,6 @@ static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
  
  	qp->qp_ctx = ctx;
  	qp->req_cb = hpre_alg_cb;
-+	spin_lock_init(&ctx->req_lock);
-+	ctx->qp = qp;
-+	ctx->dev = &qp->qm->pdev->dev;
-+	hpre = container_of(ctx->qp->qm, struct hpre, qm);
-+	ctx->hpre = hpre;
-+	ctx->key_sz = 0;
-+	ctx->crt_g2_mode = false;
+-	spin_lock_init(&ctx->req_lock);
+ 	ctx->qp = qp;
+ 	ctx->dev = &qp->qm->pdev->dev;
+ 	hpre = container_of(ctx->qp->qm, struct hpre, qm);
+@@ -478,9 +476,7 @@ static int hpre_send(struct hpre_ctx *ctx, struct hpre_sqe *msg)
  
--	ret = hpre_ctx_set(ctx, qp, qp->sq_depth);
--	if (ret)
--		hpre_stop_qp_and_put(qp);
--
--	return ret;
-+	return 0;
- }
- 
- static int hpre_msg_request_set(struct hpre_ctx *ctx, void *req, bool is_rsa)
+ 	do {
+ 		atomic64_inc(&dfx[HPRE_SEND_CNT].value);
+-		spin_lock_bh(&ctx->req_lock);
+ 		ret = hisi_qp_send(ctx->qp, msg);
+-		spin_unlock_bh(&ctx->req_lock);
+ 		if (ret != -EBUSY)
+ 			break;
+ 		atomic64_inc(&dfx[HPRE_SEND_BUSY_CNT].value);
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 50c32e69bd28..3965c8d0993c 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -2369,26 +2369,33 @@ EXPORT_SYMBOL_GPL(hisi_qm_stop_qp);
+ int hisi_qp_send(struct hisi_qp *qp, const void *msg)
  {
- 	struct hpre_asym_request *h_req;
- 	struct hpre_sqe *msg;
--	int req_id;
- 	void *tmp;
+ 	struct hisi_qp_status *qp_status = &qp->qp_status;
+-	u16 sq_tail = qp_status->sq_tail;
+-	u16 sq_tail_next = (sq_tail + 1) % qp->sq_depth;
+-	void *sqe = qm_get_avail_sqe(qp);
++	u16 sq_tail, sq_tail_next;
++	void *sqe;
  
- 	if (is_rsa) {
-@@ -549,11 +464,8 @@ static int hpre_msg_request_set(struct hpre_ctx *ctx, void *req, bool is_rsa)
- 	msg->task_len1 = (ctx->key_sz >> HPRE_BITS_2_BYTES_SHIFT) - 1;
- 	h_req->ctx = ctx;
++	spin_lock_bh(&qp->qp_lock);
+ 	if (unlikely(atomic_read(&qp->qp_status.flags) == QP_STOP ||
+ 		     atomic_read(&qp->qm->status.flags) == QM_STOP ||
+ 		     qp->is_resetting)) {
++		spin_unlock_bh(&qp->qp_lock);
+ 		dev_info_ratelimited(&qp->qm->pdev->dev, "QP is stopped or resetting\n");
+ 		return -EAGAIN;
+ 	}
  
--	req_id = hpre_add_req_to_ctx(h_req);
--	if (req_id < 0)
--		return -EBUSY;
--
--	msg->tag = cpu_to_le16((u16)req_id);
-+	hpre_dfx_add_req_time(h_req);
-+	msg->tag = cpu_to_le64((uintptr_t)h_req);
+-	if (!sqe)
++	sqe = qm_get_avail_sqe(qp);
++	if (!sqe) {
++		spin_unlock_bh(&qp->qp_lock);
+ 		return -EBUSY;
++	}
+ 
++	sq_tail = qp_status->sq_tail;
++	sq_tail_next = (sq_tail + 1) % qp->sq_depth;
+ 	memcpy(sqe, msg, qp->qm->sqe_size);
+ 	qp->msg[sq_tail] = msg;
+ 
+ 	qm_db(qp->qm, qp->qp_id, QM_DOORBELL_CMD_SQ, sq_tail_next, 0);
+ 	atomic_inc(&qp->qp_status.used);
+ 	qp_status->sq_tail = sq_tail_next;
++	spin_unlock_bh(&qp->qp_lock);
  
  	return 0;
  }
-@@ -619,7 +531,6 @@ static int hpre_dh_compute_value(struct kpp_request *req)
- 		return -EINPROGRESS;
+@@ -2968,6 +2975,7 @@ static int hisi_qp_memory_init(struct hisi_qm *qm, size_t dma_size, int id,
+ 	qp->qm = qm;
+ 	qp->qp_id = id;
  
- clear_all:
--	hpre_rm_req_from_ctx(hpre_req);
- 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
++	spin_lock_init(&qp->qp_lock);
+ 	spin_lock_init(&qp->backlog.lock);
+ 	INIT_LIST_HEAD(&qp->backlog.list);
  
- 	return ret;
-@@ -828,7 +739,6 @@ static int hpre_rsa_enc(struct akcipher_request *req)
- 		return -EINPROGRESS;
- 
- clear_all:
--	hpre_rm_req_from_ctx(hpre_req);
- 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
- 
- 	return ret;
-@@ -883,7 +793,6 @@ static int hpre_rsa_dec(struct akcipher_request *req)
- 		return -EINPROGRESS;
- 
- clear_all:
--	hpre_rm_req_from_ctx(hpre_req);
- 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
- 
- 	return ret;
-@@ -1346,7 +1255,7 @@ static int hpre_ecdh_set_param(struct hpre_ctx *ctx, struct ecdh *params)
- 	return 0;
- }
- 
--static bool hpre_key_is_zero(char *key, unsigned short key_sz)
-+static bool hpre_key_is_zero(const char *key, unsigned short key_sz)
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index 8250a33ba586..2f9035c016f3 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -217,7 +217,6 @@ static int hisi_zip_do_work(struct hisi_zip_qp_ctx *qp_ctx,
  {
- 	int i;
+ 	struct hisi_acc_sgl_pool *pool = qp_ctx->sgl_pool;
+ 	struct hisi_zip_dfx *dfx = &qp_ctx->zip_dev->dfx;
+-	struct hisi_zip_req_q *req_q = &qp_ctx->req_q;
+ 	struct acomp_req *a_req = req->req;
+ 	struct hisi_qp *qp = qp_ctx->qp;
+ 	struct device *dev = &qp->qm->pdev->dev;
+@@ -250,9 +249,7 @@ static int hisi_zip_do_work(struct hisi_zip_qp_ctx *qp_ctx,
  
-@@ -1488,7 +1397,6 @@ static int hpre_ecdh_msg_request_set(struct hpre_ctx *ctx,
- {
- 	struct hpre_asym_request *h_req;
- 	struct hpre_sqe *msg;
--	int req_id;
- 	void *tmp;
+ 	/* send command to start a task */
+ 	atomic64_inc(&dfx->send_cnt);
+-	spin_lock_bh(&req_q->req_lock);
+ 	ret = hisi_qp_send(qp, &zip_sqe);
+-	spin_unlock_bh(&req_q->req_lock);
+ 	if (unlikely(ret < 0)) {
+ 		atomic64_inc(&dfx->send_busy_cnt);
+ 		ret = -EAGAIN;
+diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+index 4f83f0700990..75ae01ddaa1a 100644
+--- a/include/linux/hisi_acc_qm.h
++++ b/include/linux/hisi_acc_qm.h
+@@ -473,6 +473,7 @@ struct hisi_qp {
+ 	u16 pasid;
+ 	struct uacce_queue *uacce_q;
  
- 	if (req->dst_len < ctx->key_sz << 1) {
-@@ -1510,11 +1418,8 @@ static int hpre_ecdh_msg_request_set(struct hpre_ctx *ctx,
- 	msg->task_len1 = (ctx->key_sz >> HPRE_BITS_2_BYTES_SHIFT) - 1;
- 	h_req->ctx = ctx;
- 
--	req_id = hpre_add_req_to_ctx(h_req);
--	if (req_id < 0)
--		return -EBUSY;
--
--	msg->tag = cpu_to_le16((u16)req_id);
-+	hpre_dfx_add_req_time(h_req);
-+	msg->tag = cpu_to_le64((uintptr_t)h_req);
- 	return 0;
- }
- 
-@@ -1612,7 +1517,6 @@ static int hpre_ecdh_compute_value(struct kpp_request *req)
- 		return -EINPROGRESS;
- 
- clear_all:
--	hpre_rm_req_from_ctx(hpre_req);
- 	hpre_ecdh_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
- 	return ret;
- }
++	spinlock_t qp_lock;
+ 	struct instance_backlog backlog;
+ 	const void **msg;
+ };
 -- 
 2.33.0
 
