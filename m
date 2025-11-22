@@ -1,261 +1,298 @@
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012064.outbound.protection.outlook.com [40.93.195.64])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9203F1885A5;
-	Sat, 22 Nov 2025 03:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763782539; cv=fail; b=ZnLivptbJPLzhhdwwTt1wAtFg5Mh9eDqGhRGvJ8hQE8xL/bctf839jAxEh3MZKUudKGDjFyBZIxpkSpmjb8vssj8wtEj36+LCSqAZX/3WPc5ipL2taYCL3mWHtrBhIb1Ld1XNBionrvW3fXVqzLNBvpwWxabm8dElmlhSl4wvpI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763782539; c=relaxed/simple;
-	bh=2pCSYffIMh92yjQDZjcGHcIEjUhV/H6dESPnhfCTO3w=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ImlPsrdbLMrE8E/bSaLmxiP28bZeT8IsTGFxajHozvRvHT8yKSVvVgBotoWQSpRG5icfATnA0UyfSGRbwak1K4CpGuga6OxaG6G7hjofpUCtIXjU3edkYtDE5hbsnYaZj5rr4a0/AoZWjCF4pVEiw+Sikwe5beTJD3yLzhdCYm4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OQZs81sT; arc=fail smtp.client-ip=40.93.195.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACDAE1AA1D2;
+	Sat, 22 Nov 2025 07:49:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763797764; cv=none; b=BdOLFO3+4xsqLDGy5ozbhluOt/LHUY/AQ9fUigDu3ulfUOM4KnIqVhuzQaGZhdifYw4+mmmR/YG5FMj9pkKtSscsxJ4TOAFc/cuwlUQiXs3zdTpNzknPOMDZkP9saHQuXDdlfcJgcQ3KB3OrZuXgHq6KtZIhvvA0ByEdXnOj4cQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763797764; c=relaxed/simple;
+	bh=oWd+b1biUhr5+ZZe7pFkxU6fsYxi9jHmUJ5g0E0SlSg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d+4m9CUcJCSf+hQXvP530AsNNAl0SjM7SVMqyJWMXvPQsUuTApRQHqcLBYQCmkCos/6kFk4kCughhiOUZ5qk50ZITUtqzV8jx5g6kYCqaHh+O9jbbS50vsm3pEZjp+gWk65MSbAlSdD5KqhPoRPeXa8iEbKiuDHHs2qK5/gEEwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=YhzUe4y8; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OQZs81sT"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=J8UlLUj360TvqHbm7AXEbHLBOF4+tYKMGp2tUOwsDManfIeLYdm7wUlcdJMdif8Nv1UdTA1U+K46CuiGdazy1scsT7MFihYTVdF2emEdiIB3yJYxRS+AhF/AVaXLFsoMptz4RPe7OMGSAoVq1hkkJ8QkJNa/KDau1ZlEhvCeHuANKeyv27wiDvav8xRaI5yhBLG7A2dO7M8Af5+DGxmchmU/5paBt9AMtF9vk5fLtehBr+rNK8w31dDzjpgk2F9gNENWKNJ9n9gs6jPCWcLl4PMoNYRb19jEK3B62NmCFpPHfTXOvP/gf2Ou/0LUdShJvPLpsbX5pye8ydGhlmbR2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dnpyfTH4xBHFQa15Aek+yTRQYjmG9xx4YiIiplcYkLM=;
- b=o/SEpmwYxmsg/FrsAK7bjOaJUeY+nW0LoBAe1gT9vjs0zMyHoFj6LIvVOzlzqvG+5Pm6FJdyc6reJQeKRfXKI2b2r/d//DYnMZyqz1Rbm9iwzBwWEZtBnlUnCO+JbLNPfF1C/BcMki0sh+lmELr1l8MJ4yHx4igmFAgskD8a1WNYpVh10CiObZkiw4Swzh/ifBvlg7cKsB2vLEFRay+1FfI8SRZPyUfV+cXXRZhcohNt8/wN9oaUV9SP8BDI4wjNQtXCWNTCFI8LHYG4Cql433gAWEE8UyfVzjQ073Vqgi9SltXWcbUTEidlZzjgYUal0fLp+NL4/2WcywyiBtXIgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dnpyfTH4xBHFQa15Aek+yTRQYjmG9xx4YiIiplcYkLM=;
- b=OQZs81sT0yw5lF6dOoEYs+8IvQZaoSCOOAzlmu1KkVzWR7SwU9FUsAseLGGrgIn4Rx1dMY0FIuXlEz1tp7x/gvyZ0EEWiKNcGEhHXuP8nO6ScqB2gqwcgLeyqh0uWq8AXpDiYdXwVbJ5ZwCv6VqV141w6NS6YN8Lz3m7KF4IIRo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by CY8PR12MB7289.namprd12.prod.outlook.com (2603:10b6:930:56::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.14; Sat, 22 Nov
- 2025 03:35:31 +0000
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::1e6b:ca8b:7715:6fee]) by CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::1e6b:ca8b:7715:6fee%4]) with mapi id 15.20.9343.011; Sat, 22 Nov 2025
- 03:35:31 +0000
-Message-ID: <b56046b5-1fa2-404f-b99f-353ec8567621@amd.com>
-Date: Sat, 22 Nov 2025 14:35:03 +1100
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH kernel v2 0/5] PCI/TSM: Enabling core infrastructure on
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
- John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Ashish Kalra
- <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
- Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
- Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
- "Borislav Petkov (AMD)" <bp@alien8.de>, Kim Phillips <kim.phillips@amd.com>,
- Jerry Snitselaar <jsnitsel@redhat.com>, Vasant Hegde <vasant.hegde@amd.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Gao Shiyuan <gaoshiyuan@baidu.com>,
- Sean Christopherson <seanjc@google.com>, Nikunj A Dadhania <nikunj@amd.com>,
- Michael Roth <michael.roth@amd.com>, Amit Shah <amit.shah@amd.com>,
- Peter Gonda <pgonda@google.com>, iommu@lists.linux.dev,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- Dan Williams <dan.j.williams@intel.com>
-References: <20251121080629.444992-1-aik@amd.com>
-From: Alexey Kardashevskiy <aik@amd.com>
-Content-Language: en-US
-In-Reply-To: <20251121080629.444992-1-aik@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SY5P282CA0016.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:10:202::12) To CH3PR12MB9194.namprd12.prod.outlook.com
- (2603:10b6:610:19f::7)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="YhzUe4y8"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=GXQ1eFoWjwuKcbWdnV+rMruIPun7+UFKdLNIdyMG4BU=;
+	b=YhzUe4y84QdauGm0Pc7MtlTtlXt9kyDQjsyqnToA0dqTqV1NuZYCYNsWgGozCdBeYPJSghjBm
+	agMiZsKz/dLqeGEMiWVZLoq65YuInzwGverus75MFTOP/EOeaESR+qASYUCek9bZmNRa9TvhYy8
+	58l5al8iNJbHro7d7grTAyU=
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4dD41d6p85zmVYC;
+	Sat, 22 Nov 2025 15:47:33 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9D6B51A0188;
+	Sat, 22 Nov 2025 15:49:19 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 22 Nov 2025 15:49:19 +0800
+Received: from localhost.huawei.com (10.90.31.46) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 22 Nov 2025 15:49:18 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
+	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>, <lizhi206@huawei.com>,
+	<taoqi10@huawei.com>
+Subject: [PATCH v3 04/11] crypto: hisilicon/qm - enhance the configuration of req_type in queue attributes
+Date: Sat, 22 Nov 2025 15:49:09 +0800
+Message-ID: <20251122074916.2793717-5-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20251122074916.2793717-1-huangchenghai2@huawei.com>
+References: <20251122074916.2793717-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|CY8PR12MB7289:EE_
-X-MS-Office365-Filtering-Correlation-Id: fd3b65b6-1283-4669-78a0-08de29782f99
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?KzVKWFdtR3hpZWZNeGhSR0hkQjVkWHRscEg3bUZrU2p0VWlNT2wySDUwMW11?=
- =?utf-8?B?V3pvY3FsSjFpeWdJNXNqNlJMNHZQT3d1dEFjb0N6UFBFTjF0bmRKZTFZcm9I?=
- =?utf-8?B?M1hGR1pLKzhucEsxcFRCbU9HVUN4VXl3WHpoY1MzdmdlU3NIcGU0UVhTZlhL?=
- =?utf-8?B?NFBtNno1UHBhaWFvUmQreUVYaVpySmRHVzJ1YVBRMW9RcjUzZHFiZ2QvcTdK?=
- =?utf-8?B?VGZBNVZ5cHBkbjREQnE3VlBkd25US0lZUDlwNU9SRWxpa0FJUGVnREJxUTJI?=
- =?utf-8?B?RUF2d1VQbGdWNlpONjA1RmFTQ09LTktuQ1N6dmJQZFowZm0wcktlMDN6UC9Z?=
- =?utf-8?B?V05yaDRRLzA1S0JpVXI2YllMczRrbkNHaHBhQUVrVE50S3NnUUtGWUZ1aUhB?=
- =?utf-8?B?UnpTVGdVaDVPcGxzODR1RXlYd1Fia3ZNdFlrc3ZHTDdSbkxCOVdvU213MGJ1?=
- =?utf-8?B?WGVVZEVxMXVJWVBmeGErUnBQTU5jeGEyUUplbFRETlpVYWVXdmFtM3BWZHFu?=
- =?utf-8?B?NWxKWDY4SDhvd3hRcHcraVREVXZ6WW91N24xcDB2M25zSzRZbnV4YnZoZVJ0?=
- =?utf-8?B?V0JrekZ5ZVBUaThDbDZjSVh2QUFGeE9VdTh6TmtMK2x6a1JaREd2bVdvVFZi?=
- =?utf-8?B?NXB1VEFjUFg5VmhKNEoxcTNhN2lwMWE4TmNnTWZGTlZoeFBjbmw4cUZQbmJ5?=
- =?utf-8?B?QTVLQzVrT2ZYb0FuWk1nQVZUREtEa3dYdHNzTXozTktrbXlIaXFoQjZyNHdH?=
- =?utf-8?B?eWd5MlBJdGRRR2dVUERoRlFaL04yTkZ4ZzdhbjE5MmxiWGQrRmFvL3JBaXlO?=
- =?utf-8?B?Wnc4aEt4NGFpVVIwTlNUdzNKdHBZMW1GV1hPNGF3YW1DcUxCV3JLbmNxYVdY?=
- =?utf-8?B?WUtBanlRYmJnVVpXQksvWUJ1eTJHZ0ZiVFRHeGE2OGdwUXdhd3FsVW1IZ25y?=
- =?utf-8?B?ZGQ2NnBaUXNHdFZWM2VaSjhsL2ZmTGYwMlNjOXhtR0hwRER5N2M2cjJ4T0lY?=
- =?utf-8?B?R21nUWVVRzlGVmFmT3NSNzZ5bEVCSE5WRU5XZDVOWk90T3RhSWdseENETVRQ?=
- =?utf-8?B?QSt6Sk9QVWUrWlV4L0tYNEEzTS8yb2QvUU0rWlYxME8zc2JCMkpBQzZYSGVz?=
- =?utf-8?B?SWEwb3dMUnRjSWlnR3ZVNHh4ZjhJRTR6aHZUTEg3YXV5S2NyR2FLRjZqVlZY?=
- =?utf-8?B?L0tyTUdNY09YZVBBNE9sTDFFOHJjWTJxUWdweEtkUnJ1OTVmL2dvRExhWUE5?=
- =?utf-8?B?dTlLK3p2N2c5c05vU2xvUjhQR1VFdFpNaEU0MlRqWlNtbjEyckRQeXBEVVBm?=
- =?utf-8?B?YW5TcFJaRjBOZ09PYVpuVzI1dW1RMit0SzJKeVlCejE5TTl0UU9zTkUrZkJT?=
- =?utf-8?B?Vk9Yb1VHbjdhVzkzeENmeXREMWZ1VnpsZ2ZEeUtsQUpOZ0pzcjU3cmRrMnRX?=
- =?utf-8?B?SCs2bGJKdjJKdHRTd2NONHEvNFM2cmQrZjY3N3I3aEhxWmN5Ly9xWTVmdWky?=
- =?utf-8?B?ckJDZGhaWUVnMzhqZjlGdzZUODRoSFRhdkxpdnNGTjRiRmJYdW5WaVUzTktr?=
- =?utf-8?B?RmNra1FzZnA3QTduZlRMQWtWa2JHUmlTSWNyNVl5d3BIaEIwLzhxVmZTV1M3?=
- =?utf-8?B?RUVwRmtZMkI1aGJLczFLOGdmTFkyRWNqc1V3Y04zcG5WcDdNbCtnQnhuNndP?=
- =?utf-8?B?YzVjS2F0Z09uUmRzNC9mbms1RWpMN0kxWDlSS0Fha05LLzhMWXhldTVsSXJL?=
- =?utf-8?B?b3NmWDJzVjlic2U0R3NWbmc5Uk5GQUJWTFlVanpubnV1b3JoM2RXMU92aWNU?=
- =?utf-8?B?Vm9hdSsxVGVOU085MXNQclVrZzIwT1NaWlh4TnRQUXFxUW8wVWJGakpxRHZR?=
- =?utf-8?B?SmNkcUJJNEh5VVM2WVBtWDBmMjFLN251MlVnaFRwazBhR21yUFkyRmkvNWxo?=
- =?utf-8?B?SXFCNUxReXJwZDIzSUkyOU53WkNHTHZmZW5HN1RiMzhzZlI5aG5OVTVtcnRV?=
- =?utf-8?B?cjV5RHk4cDFBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eTJHNWkzK2l4MWFEQ056bWk4cThFTmNpcVE1bDJNQ3FTdmJicm9tUjNRSnhN?=
- =?utf-8?B?RUtrbXMrR0VwK3hSQVBhblBOSkk5NVRoMTM1S0xWOFBTS0JiOWdQeUpEQStn?=
- =?utf-8?B?YXpmT00rWWdiVExoNTJmclF0VFB0UktEM0IzWFF1Y3pQSzJVRUttSW1zb05o?=
- =?utf-8?B?NXljYmMzcytmV2xoWHRVUFlpcUtMSE1GaWN0VEhiYXZTaE9JTjZYWlBSWmNl?=
- =?utf-8?B?cXcveGMxbDkwNzdyRzljYzVPQXNBTzd5WVE2WVBTQTNieFNwUnBtMmlvM2tO?=
- =?utf-8?B?by9RTmtSUUsxak5GUjNUZitNNktrQ2VLOGNJQlRmaTlqaC8yZkVQcTFRUmFT?=
- =?utf-8?B?bWtrMHN5cWJBMWQrTzBwZFNiUnFHWVlMK0VXeExlNGZiTHczSEEwTlNOTUk5?=
- =?utf-8?B?cDFka2Rzd1pONEtzNm8vR2I1OEt0bzJTbEgzNWRlQ3Y3ZnJNeFhCaVJKeVRE?=
- =?utf-8?B?YnJ0dGtwVS9QbjhkRW5mTTZ5SE9rWVVQRFhtcWlaaWVrTVJkc0svemVyeEto?=
- =?utf-8?B?R25VNytxZVMybG1sVXU1R04wL08rYjcxa0hZMmFoNC94dFU1VDNLQy9IbUxh?=
- =?utf-8?B?MDhseTZQZno1UmNzSTk0U1BwMjBsNGRqMUVQTEYvUnRpWGJyY0VnWlo1K1FG?=
- =?utf-8?B?QUZxM0V4OGpnc3NKVjBPUkdUTC9PYk54cHk4M2xoWjNLUjFMaHovVHJOY3VZ?=
- =?utf-8?B?bHVnMFVVOW5VRmlJMnZRcUxoMFhydzk1Mkx6elB2SGt2L2ZHM2VXVHdUNHRG?=
- =?utf-8?B?Q1FYWG5jYnUvZ1o3R2g1QVJra3AxWnlrd052NWx6STFWSXA0VWdyVy9YaEd2?=
- =?utf-8?B?Ym1TV0EyNkVkVXYrcmYveThTc2krN2tQZ3ZkRUtZMHpHMW8rcTZDNFhhK2J0?=
- =?utf-8?B?N3M2QnhHTitya3pLcm92dWY1RVpNME1JaGIyTGx1MTlnNEd6djA5aCsxbElJ?=
- =?utf-8?B?dzdnNThsVllGUS80ZGw0T0VlL1ZzQ0dzMlFoek1RTVI5T2dESktaMlJmZW9w?=
- =?utf-8?B?dmRMWDhNZlY4Y09RanlZa2JicUYyL0lsb0FpQUF6YS9ETzY4NE5UZGRiUVI1?=
- =?utf-8?B?Q2R4aHFVM1QxZHY2VEZ2UHpQaUZFNDNzcFpoaXFtYzV1Wk1XK3lHd2tsdnhM?=
- =?utf-8?B?SVZRSythb2NJc09tWXVzS3A2c2l0NW0xMXFTb2QvSkpXRmhlY2dxVWppeTlm?=
- =?utf-8?B?clQvZjJJUDdoeWsrYlFOcGhsNUd4YnUxNTk2Zmo1NmlEcERFWnMyVGdxeGt2?=
- =?utf-8?B?alZGRXNDM1FGbjNMUDhUb0VMc3NyQUE2WnlNVWVjd2Y5UHFPUXNnNnNJWHNz?=
- =?utf-8?B?NkJJbUpBRm9lci9jcTZMU3pLNHk0YkF5bldHdDV1Y0gzNUdvdUpoMmpKa3FY?=
- =?utf-8?B?dmhIMlJPbm5zaTNtajFJZ1BKWVBjQzRrbzJ6VnhRNFlwRUJ4dllIQUQ5ajd2?=
- =?utf-8?B?by9CdEpBVHR3NzFmbk03aXJjR1NMTnVUNnF5d3Z5a0Z4QmRiOWoySW5UYnlr?=
- =?utf-8?B?UWtpQXJ0S2NxbHJXTUxOY1BJOHJ1S3N3TjBlZjloamNGU08zK0V3WTNWNmYv?=
- =?utf-8?B?VWlGNzBIVWtOblZKQzc3UnZYbVI5RTB1djlzTjN0NGliQ3B4KzVpaUI5NHE0?=
- =?utf-8?B?TktDQlFiWTd3ZldrZ09BUVo3ZkFVYUtWSWpjc2ZCQ0ZHdEtBZ1pJUDFEZXNH?=
- =?utf-8?B?Q0hLOUNXeW1yZ0ZuQmhOSG1hbG9lQ0hVcTE1MEVTMVNzNDlKOXltVFkwVW5B?=
- =?utf-8?B?WHNnVG5BZW9oc1hEZzZTanN4eVpHRy9WWXM3SFM3Y2IzbUpMMkxuWU9PaXJH?=
- =?utf-8?B?eTJlYjNBMlp0L3BmK1hFdzhIZmwxMi9DQ1RjOHl6VFdSQnkvTzZNb2lWc251?=
- =?utf-8?B?OUlDNFZuNmZMWkpoY3Ewa25kQXV0d0lpSTFqT2dJb0dQYWVBNEpsYVA0UHN5?=
- =?utf-8?B?elJmb29uMzE1T1g5NDE1NHdYY2J6bjhqemxvdWVJVkhSV1pUVmpDd1JGcVJH?=
- =?utf-8?B?T3BhV0xFay9udmR5dFdGSlI0WWtpL0F6dUhMTFJVdkRBaU5CVkJFeHQ3ZlAv?=
- =?utf-8?B?bmJRaG53OXo2cUt1bU1nRS9tWGZTQ09zd1V6THVLcm1iMlIrTlBabm5NbTVX?=
- =?utf-8?Q?0B8HHxIbic4m7WVNqsE3pVAtJ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd3b65b6-1283-4669-78a0-08de29782f99
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2025 03:35:31.2055
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2jmS3Mo4juAPZiAJ7gEqh7Kh6ORSgeiTrR3q7vDouOj1s+kjJPLqwaHW6AzY6KMQ5/YCPKLfDc3VPma8Nibv0w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7289
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
 
-I should have cc'ed linux-coco@lists.linux.dev. And vim ate "AMD" from the subject line. Should I repost now? Thanks,
+Originally, when a queue was requested, it could only be configured
+with the default algorithm type of 0. Now, when multiple tfms use
+the same queue, the queue must be selected based on its attributes
+to meet the requirements of tfm tasks. So the algorithm type
+attribute of queue need to be distinguished. Just like a queue used
+for compression in ZIP cannot be used for decompression tasks.
 
+Fixes: 3f1ec97aacf1 ("crypto: hisilicon/qm - Put device finding logic into QM")
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+Signed-off-by: Weili Qian <qianweili@huawei.com>
+---
+ drivers/crypto/hisilicon/hpre/hpre_main.c  |  2 +-
+ drivers/crypto/hisilicon/qm.c              |  8 ++++----
+ drivers/crypto/hisilicon/sec2/sec_crypto.c |  1 -
+ drivers/crypto/hisilicon/sec2/sec_main.c   | 21 ++++++++++++++++-----
+ drivers/crypto/hisilicon/zip/zip.h         |  2 +-
+ drivers/crypto/hisilicon/zip/zip_crypto.c  | 13 +++++++++----
+ drivers/crypto/hisilicon/zip/zip_main.c    |  4 ++--
+ include/linux/hisi_acc_qm.h                |  3 +--
+ 8 files changed, 34 insertions(+), 20 deletions(-)
 
-On 21/11/25 19:06, Alexey Kardashevskiy wrote:
-> Here are some patches to begin enabling SEV-TIO on AMD.
-> 
-> SEV-TIO allows guests to establish trust in a device that supports TEE
-> Device Interface Security Protocol (TDISP, defined in PCIe r6.0+) and
-> then interact with the device via private memory.
-> 
-> In order to streamline upstreaming process, a common TSM infrastructure
-> is being developed in collaboration with Intel+ARM+RiscV. There is
-> Documentation/driver-api/pci/tsm.rst with proposed phases:
-> 1. IDE: encrypt PCI, host only
-> 2. TDISP: lock + accept flow, host and guest, interface report
-> 3. Enable secure MMIO + DMA: IOMMUFD, KVM changes
-> 4. Device attestation: certificates, measurements
-> 
-> This is phase1 == IDE only.
-> 
-> SEV TIO spec:
-> https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/specifications/58271.pdf
-> 
-> Acronyms:
-> TEE - Trusted Execution Environments, a concept of managing trust
-> between the host and devices
-> TSM - TEE Security Manager (TSM), an entity which ensures security on
-> the host
-> PSP - AMD platform secure processor (also "ASP", "AMD-SP"), acts as TSM
-> on AMD.
-> SEV TIO - the TIO protocol implemented by the PSP and used by the host
-> GHCB - guest/host communication block - a protocol for guest-to-host
-> communication via a shared page
-> TDISP - TEE Device Interface Security Protocol (PCIe).
-> 
-> 
-> Flow:
-> - Boot host OS, load CCP which registers itself as a TSM
-> - PCI TSM creates sysfs nodes under "tsm" subdirectory in for all
->    TDISP-capable devices
-> - Enable IDE via "echo tsm0 >
->      /sys/bus/pci/devices/0000:e1:00.0/tsm/connect"
-> - observe "secure" in stream states in "lspci" for the rootport and endpoint
-> 
-> 
-> This is pushed out to
-> https://github.com/AMDESE/linux-kvm/commits/tsm-staging
-> 
-> The full "WIP" trees and configs are here:
-> https://github.com/AMDESE/AMDSEV/blob/tsm/stable-commits
-> 
-> 
-> The previous conversation is here:
-> https://lore.kernel.org/r/20251111063819.4098701-1-aik@amd.com
-> https://lore.kernel.org/r/20250218111017.491719-1-aik@amd.com
-> 
-> This is based on sha1
-> f7ae6d4ec652 Dan Williams "PCI/TSM: Add 'dsm' and 'bound' attributes for dependent functions".
-> 
-> Please comment. Thanks.
-> 
-> 
-> 
-> Alexey Kardashevskiy (5):
->    ccp: Make snp_reclaim_pages and __sev_do_cmd_locked public
->    psp-sev: Assign numbers to all status codes and add new
->    iommu/amd: Report SEV-TIO support
->    crypto: ccp: Enable SEV-TIO feature in the PSP when supported
->    crypto/ccp: Implement SEV-TIO PCIe IDE (phase1)
-> 
->   drivers/crypto/ccp/Kconfig          |   1 +
->   drivers/crypto/ccp/Makefile         |   8 +
->   drivers/crypto/ccp/sev-dev-tio.h    | 142 ++++
->   drivers/crypto/ccp/sev-dev.h        |   9 +
->   drivers/iommu/amd/amd_iommu_types.h |   1 +
->   include/linux/amd-iommu.h           |   2 +
->   include/linux/psp-sev.h             |  17 +-
->   include/uapi/linux/psp-sev.h        |  66 +-
->   drivers/crypto/ccp/sev-dev-tio.c    | 863 ++++++++++++++++++++
->   drivers/crypto/ccp/sev-dev-tsm.c    | 405 +++++++++
->   drivers/crypto/ccp/sev-dev.c        |  69 +-
->   drivers/iommu/amd/init.c            |   9 +
->   12 files changed, 1556 insertions(+), 36 deletions(-)
->   create mode 100644 drivers/crypto/ccp/sev-dev-tio.h
->   create mode 100644 drivers/crypto/ccp/sev-dev-tio.c
->   create mode 100644 drivers/crypto/ccp/sev-dev-tsm.c
-> 
-
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index b94fecd765ee..884d5d0afaf4 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -465,7 +465,7 @@ struct hisi_qp *hpre_create_qp(u8 type)
+ 	 * type: 0 - RSA/DH. algorithm supported in V2,
+ 	 *       1 - ECC algorithm in V3.
+ 	 */
+-	ret = hisi_qm_alloc_qps_node(&hpre_devices, 1, type, node, &qp);
++	ret = hisi_qm_alloc_qps_node(&hpre_devices, 1, &type, node, &qp);
+ 	if (!ret)
+ 		return qp;
+ 
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 4760551d4fa3..50c32e69bd28 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -3595,7 +3595,7 @@ static int hisi_qm_sort_devices(int node, struct list_head *head,
+  * not meet the requirements will return error.
+  */
+ int hisi_qm_alloc_qps_node(struct hisi_qm_list *qm_list, int qp_num,
+-			   u8 alg_type, int node, struct hisi_qp **qps)
++			   u8 *alg_type, int node, struct hisi_qp **qps)
+ {
+ 	struct hisi_qm_resource *tmp;
+ 	int ret = -ENODEV;
+@@ -3613,7 +3613,7 @@ int hisi_qm_alloc_qps_node(struct hisi_qm_list *qm_list, int qp_num,
+ 
+ 	list_for_each_entry(tmp, &head, list) {
+ 		for (i = 0; i < qp_num; i++) {
+-			qps[i] = hisi_qm_create_qp(tmp->qm, alg_type);
++			qps[i] = hisi_qm_create_qp(tmp->qm, alg_type[i]);
+ 			if (IS_ERR(qps[i])) {
+ 				hisi_qm_free_qps(qps, i);
+ 				break;
+@@ -3628,8 +3628,8 @@ int hisi_qm_alloc_qps_node(struct hisi_qm_list *qm_list, int qp_num,
+ 
+ 	mutex_unlock(&qm_list->lock);
+ 	if (ret)
+-		pr_info("Failed to create qps, node[%d], alg[%u], qp[%d]!\n",
+-			node, alg_type, qp_num);
++		pr_info("Failed to create qps, node[%d], qp[%d]!\n",
++			node, qp_num);
+ 
+ err:
+ 	free_list(&head);
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 4e41235116e1..364bd69c6088 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -626,7 +626,6 @@ static int sec_create_qp_ctx(struct sec_ctx *ctx, int qp_ctx_id)
+ 
+ 	qp_ctx = &ctx->qp_ctx[qp_ctx_id];
+ 	qp = ctx->qps[qp_ctx_id];
+-	qp->req_type = 0;
+ 	qp->qp_ctx = qp_ctx;
+ 	qp_ctx->qp = qp;
+ 	qp_ctx->ctx = ctx;
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 5eb2d6820742..7dd125f5f511 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -417,18 +417,29 @@ struct hisi_qp **sec_create_qps(void)
+ 	int node = cpu_to_node(raw_smp_processor_id());
+ 	u32 ctx_num = ctx_q_num;
+ 	struct hisi_qp **qps;
++	u8 *type;
+ 	int ret;
+ 
+ 	qps = kcalloc(ctx_num, sizeof(struct hisi_qp *), GFP_KERNEL);
+ 	if (!qps)
+ 		return NULL;
+ 
+-	ret = hisi_qm_alloc_qps_node(&sec_devices, ctx_num, 0, node, qps);
+-	if (!ret)
+-		return qps;
++	/* The type of SEC is all 0, so just allocated by kcalloc */
++	type = kcalloc(ctx_num, sizeof(u8), GFP_KERNEL);
++	if (!type) {
++		kfree(qps);
++		return NULL;
++	}
+ 
+-	kfree(qps);
+-	return NULL;
++	ret = hisi_qm_alloc_qps_node(&sec_devices, ctx_num, type, node, qps);
++	if (ret) {
++		kfree(type);
++		kfree(qps);
++		return NULL;
++	}
++
++	kfree(type);
++	return qps;
+ }
+ 
+ u64 sec_get_alg_bitmap(struct hisi_qm *qm, u32 high, u32 low)
+diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
+index 9fb2a9c01132..b83f228281ab 100644
+--- a/drivers/crypto/hisilicon/zip/zip.h
++++ b/drivers/crypto/hisilicon/zip/zip.h
+@@ -99,7 +99,7 @@ enum zip_cap_table_type {
+ 	ZIP_CORE5_BITMAP,
+ };
+ 
+-int zip_create_qps(struct hisi_qp **qps, int qp_num, int node);
++int zip_create_qps(struct hisi_qp **qps, int qp_num, int node, u8 *alg_type);
+ int hisi_zip_register_to_crypto(struct hisi_qm *qm);
+ void hisi_zip_unregister_from_crypto(struct hisi_qm *qm);
+ bool hisi_zip_alg_support(struct hisi_qm *qm, u32 alg);
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index b4a656e0177d..8250a33ba586 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -66,6 +66,7 @@ struct hisi_zip_qp_ctx {
+ 	struct hisi_acc_sgl_pool *sgl_pool;
+ 	struct hisi_zip *zip_dev;
+ 	struct hisi_zip_ctx *ctx;
++	u8 req_type;
+ };
+ 
+ struct hisi_zip_sqe_ops {
+@@ -245,7 +246,7 @@ static int hisi_zip_do_work(struct hisi_zip_qp_ctx *qp_ctx,
+ 		goto err_unmap_input;
+ 	}
+ 
+-	hisi_zip_fill_sqe(qp_ctx->ctx, &zip_sqe, qp->req_type, req);
++	hisi_zip_fill_sqe(qp_ctx->ctx, &zip_sqe, qp_ctx->req_type, req);
+ 
+ 	/* send command to start a task */
+ 	atomic64_inc(&dfx->send_cnt);
+@@ -360,7 +361,6 @@ static int hisi_zip_start_qp(struct hisi_qp *qp, struct hisi_zip_qp_ctx *qp_ctx,
+ 	struct device *dev = &qp->qm->pdev->dev;
+ 	int ret;
+ 
+-	qp->req_type = req_type;
+ 	qp->alg_type = alg_type;
+ 	qp->qp_ctx = qp_ctx;
+ 
+@@ -397,10 +397,15 @@ static int hisi_zip_ctx_init(struct hisi_zip_ctx *hisi_zip_ctx, u8 req_type, int
+ {
+ 	struct hisi_qp *qps[HZIP_CTX_Q_NUM] = { NULL };
+ 	struct hisi_zip_qp_ctx *qp_ctx;
++	u8 alg_type[HZIP_CTX_Q_NUM];
+ 	struct hisi_zip *hisi_zip;
+ 	int ret, i, j;
+ 
+-	ret = zip_create_qps(qps, HZIP_CTX_Q_NUM, node);
++	/* alg_type = 0 for compress, 1 for decompress in hw sqe */
++	for (i = 0; i < HZIP_CTX_Q_NUM; i++)
++		alg_type[i] = i;
++
++	ret = zip_create_qps(qps, HZIP_CTX_Q_NUM, node, alg_type);
+ 	if (ret) {
+ 		pr_err("failed to create zip qps (%d)!\n", ret);
+ 		return -ENODEV;
+@@ -409,7 +414,6 @@ static int hisi_zip_ctx_init(struct hisi_zip_ctx *hisi_zip_ctx, u8 req_type, int
+ 	hisi_zip = container_of(qps[0]->qm, struct hisi_zip, qm);
+ 
+ 	for (i = 0; i < HZIP_CTX_Q_NUM; i++) {
+-		/* alg_type = 0 for compress, 1 for decompress in hw sqe */
+ 		qp_ctx = &hisi_zip_ctx->qp_ctx[i];
+ 		qp_ctx->ctx = hisi_zip_ctx;
+ 		ret = hisi_zip_start_qp(qps[i], qp_ctx, i, req_type);
+@@ -422,6 +426,7 @@ static int hisi_zip_ctx_init(struct hisi_zip_ctx *hisi_zip_ctx, u8 req_type, int
+ 		}
+ 
+ 		qp_ctx->zip_dev = hisi_zip;
++		qp_ctx->req_type = req_type;
+ 	}
+ 
+ 	hisi_zip_ctx->ops = &hisi_zip_ops;
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 4fcbe6bada06..85b26ef17548 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -446,12 +446,12 @@ static const struct pci_device_id hisi_zip_dev_ids[] = {
+ };
+ MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
+ 
+-int zip_create_qps(struct hisi_qp **qps, int qp_num, int node)
++int zip_create_qps(struct hisi_qp **qps, int qp_num, int node, u8 *alg_type)
+ {
+ 	if (node == NUMA_NO_NODE)
+ 		node = cpu_to_node(raw_smp_processor_id());
+ 
+-	return hisi_qm_alloc_qps_node(&zip_devices, qp_num, 0, node, qps);
++	return hisi_qm_alloc_qps_node(&zip_devices, qp_num, alg_type, node, qps);
+ }
+ 
+ bool hisi_zip_alg_support(struct hisi_qm *qm, u32 alg)
+diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+index 2d0cc61ed886..4f83f0700990 100644
+--- a/include/linux/hisi_acc_qm.h
++++ b/include/linux/hisi_acc_qm.h
+@@ -454,7 +454,6 @@ struct hisi_qp {
+ 	u16 sq_depth;
+ 	u16 cq_depth;
+ 	u8 alg_type;
+-	u8 req_type;
+ 
+ 	struct qm_dma qdma;
+ 	void *sqe;
+@@ -580,7 +579,7 @@ struct hisi_acc_sgl_pool *hisi_acc_create_sgl_pool(struct device *dev,
+ void hisi_acc_free_sgl_pool(struct device *dev,
+ 			    struct hisi_acc_sgl_pool *pool);
+ int hisi_qm_alloc_qps_node(struct hisi_qm_list *qm_list, int qp_num,
+-			   u8 alg_type, int node, struct hisi_qp **qps);
++			   u8 *alg_type, int node, struct hisi_qp **qps);
+ void hisi_qm_free_qps(struct hisi_qp **qps, int qp_num);
+ void hisi_qm_dev_shutdown(struct pci_dev *pdev);
+ void hisi_qm_wait_task_finish(struct hisi_qm *qm, struct hisi_qm_list *qm_list);
 -- 
-Alexey
+2.33.0
 
