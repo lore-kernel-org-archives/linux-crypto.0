@@ -1,82 +1,168 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB1627C84B;
-	Sat, 22 Nov 2025 20:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7642848A8
+	for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 20:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763841847; cv=none; b=dY2643auJqB5cyok25NFj9j+KAMZEtL8NKGOhMQOUH69pnoV+VEU/wrm6b0WlC3NPjr2zqDD4j1jvrWfK22HRN13VaFB82JjUBR8zpqJ/tGaP8RpLqH/Gz2dMCLzuvHKTLxlxkINxqqB7EqaP6pVIazFrgGZhOElsyYRQX2U29A=
+	t=1763843639; cv=none; b=Ynw2UJ4iRQr6k5Cl89iIcSND1JoNVAZ8yrnT0PBhYEObONCf0e6qxQ7QK2t63dxi7RJmykno5VkIardApeA0nYsxeDknoUQV/imm4YkA8e/rIUpxI0UPW5g1nfEOHa/PPVVwGaVkQAWig+UkxueLLi47lJvUgDzc7RHkqsvt95g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763841847; c=relaxed/simple;
-	bh=QFyhjQf1/UtnGNQLYjfiqhZLLKYiFxKp7r+cJOl5kgg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fVp7WVcqOpp67KkdLlk62HP40zXIj5Dq2ugATLEaN3oGCZBdLrqhNOgfrvBRa7b/xkTmHy9Bei2qRbHtJcYD/fjuSMQvC/OUadVcPQqO0YUXzbpwf2jtFz2tjnxgQ/A4OKAtj/utF/JdS2FaDbggAlgNtOy5b+hZx35LI8ocXLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T0vc76Yd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763843639; c=relaxed/simple;
+	bh=NHaFMiF6dxiCU0vMg8q5qTDPlG31ZZujzGUesGhT5hQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OqfgAr3RYcKzHUABmOWlCvPUI0/O/bFzkefjEdQbJ3n0+4N/46mLO4PWdpZfzjHMh2bY4a5pzJpyhxAEY8KdtVnnyRlbLjdbAKcbw8Z4urXckjrHl4Ivz1VxlnYSr3JFRP38J9PcnB0u9DWKsQhlakNwSULZs6ycOX7kdrEWbpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WFKUqDUt; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T0vc76Yd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 964A1C4CEF5;
-	Sat, 22 Nov 2025 20:04:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763841844;
-	bh=QFyhjQf1/UtnGNQLYjfiqhZLLKYiFxKp7r+cJOl5kgg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T0vc76YdXc5FHwXZw3mavFyjX+g9LtP5LASkd8GKb4P4wp9J/u5+BQg2LWwRu4/i6
-	 /wQ1Sd1obxexpXEJg+80u1/LMu16WERGpczsqSXf7ApNYAuLr8De1FvuzCsBPVrO3n
-	 hM9lv+viYJODe5aUQQ5X3SrBL7YRG21DnFxYKI2LVlp0/SAC+BjURjluMm/azgDktP
-	 6pn4nywuomBVhq3+thQG7MAaJbdxCK+J8wlRXVSKpKR9w9Gv116AQYCfGrbv9KuUGJ
-	 2jnaMS3eeUlXd5Dz7+BZ4B65O33PHCRRHLF4QaZSeLtiA1M+5FY4fHBF5TmoazRxFD
-	 PEbruf25USaaw==
-Date: Sat, 22 Nov 2025 12:04:02 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: blake2b: Limit frame size workaround to GCC
- < 12.2 on i386
-Message-ID: <20251122200402.GD5803@quark>
-References: <20251122105530.441350-2-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WFKUqDUt"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-37b9728a353so32507751fa.0
+        for <linux-crypto@vger.kernel.org>; Sat, 22 Nov 2025 12:33:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763843636; x=1764448436; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dFn2EwqFqpnjkFoKzC+88UIKZbJzPZxsjNZNiF3KFj4=;
+        b=WFKUqDUtK3N3S7kIr3lO0eVi0KSOTQ4CydlfEdvVVcgXR93bkGwTgp1Eb7U5KxZPcS
+         CD+7IjinJCUKmvDPuMH1fYHjY5ywfX3qpRyuYmRbVawon+BnkzIwUB+m3+XVisxkjFi0
+         IPRbCVqbx5Bj+nEE53y0vsBITf5zXsktmqFFqy6VC+x5OistRVdLc8HXaI3peXm/eQWj
+         s9BWR3rS3vX+AcP81cogkDA+RU9tXthlONdwZ7+IVUu4f2n8g48xSoVWlKfFhU5vcoGj
+         LQYRUw6l1SUBaboWt6sMFdoUEKtVZPRgwVMiRhbv8PPgMRTZwn49bvlbr2+6bdrDZVFJ
+         DAMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763843636; x=1764448436;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dFn2EwqFqpnjkFoKzC+88UIKZbJzPZxsjNZNiF3KFj4=;
+        b=qjbHOo5nQuOxQWAN/r/uu42qXMdrAbp4fQtNanp3uG9+LGbMINJi37hZ1rbZZsPaAG
+         C+S2jTOJnQOaJ0cHxtWiz/s/cMS9iqdulLiFQ2BrFcPLtkWM9cQJg70uGhXkZaxsKyS3
+         2QAG/R8ZVSTLuASxQXBrRkbstvGvd5dEs+yOgPInFbqdGL/DBuen1JT8vLcdRKg185g7
+         Q+kUIpXnjnW68vme1lxTI788uJnHcZegmaYQZPbrL0NMircBLqyKLUDP7W1AtV7EEcFC
+         +mMBOzBhgVsJ4rCA5baRNPRfXZQfP+2Zm92xaDN33BZE28dhGIcNomOkrSvtLTD99j96
+         idJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUjGO5n/v6dNHkWiyLfEmLQu1sreWB7zf2NBMFfgfdR5vezWZcG9yiIebWhFMKM0ii4adsePgwDMIkZdUg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXZFE4Hk1OdelCbFle2NvlTn3zYTCpgRftpHDcPKTBEEviGRbI
+	SjriER96GuW3gf5kIbsApOY3Pic6X/6FY5LB1Q5Uz8C8eH7ad7hwiN1p
+X-Gm-Gg: ASbGnctzzhNTlNBg9d5l3LhVMcZCmRZfGsGR4t7GCfiyC3CQ9qil3+TS7NFkx1uwK1k
+	6g5JCsHZbxqTk4N4uo6DMnx3sxFW3F1CwBx3i9LDlrRnywhdTWYmT4yMU7gOk3wLiIWiGGcqDro
+	nME36+SIVuvMsVImwWf1dNS/D9dJ/gxGeeaz4IKOUAi9XEFqi0eTIR+7tw5Xp/jIjTjh5pzrITd
+	LdIN9gVpTk/g7yyLCExLvoEsgxyCMzLy+v+DtoAdTBwWtoRqrJivd5YPEVHuD2d62q4/vy+Teu7
+	UowAY8ORCnhRf9XqvSIv4MwBwspXfqlurpS26Pa0ZXix66e7F5RHZhJXFLFolbMoXo7OW/ZE2Pz
+	OlhgMOfF/4wI9es5ZJqQSNxnr7w07zIMJnd+2dX3ZTlaFEvq8FRPZUyF/BjbqMNnt0O7R3P3BuX
+	OpPWR3xcCe
+X-Google-Smtp-Source: AGHT+IFhSsUjwtf7XXEFFhGewe4/WzYwa1EvQXhZvrF755UE0d1dYIej0yvrkJ/oBfshVizcRSlPOQ==
+X-Received: by 2002:a05:651c:4416:10b0:37b:aac1:282e with SMTP id 38308e7fff4ca-37cd9287c95mr16773881fa.28.1763843635543;
+        Sat, 22 Nov 2025 12:33:55 -0800 (PST)
+Received: from localhost ([109.167.240.218])
+        by smtp.gmail.com with UTF8SMTPSA id 38308e7fff4ca-37cc6b597b2sm19299711fa.12.2025.11.22.12.33.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 22 Nov 2025 12:33:55 -0800 (PST)
+From: Askar Safin <safinaskar@gmail.com>
+To: mpatocka@redhat.com
+Cc: Dell.Client.Kernel@dell.com,
+	agk@redhat.com,
+	brauner@kernel.org,
+	dm-devel@lists.linux.dev,
+	ebiggers@kernel.org,
+	kix@kix.es,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-lvm@lists.linux.dev,
+	linux-mm@kvack.org,
+	linux-pm@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	lvm-devel@lists.linux.dev,
+	milan@mazyland.cz,
+	msnitzer@redhat.com,
+	mzxreary@0pointer.de,
+	nphamcs@gmail.com,
+	pavel@ucw.cz,
+	rafael@kernel.org,
+	ryncsn@gmail.com,
+	safinaskar@gmail.com,
+	torvalds@linux-foundation.org
+Subject: Re: [PATCH 1/2] pm-hibernate: flush disk cache when suspending
+Date: Sat, 22 Nov 2025 23:33:42 +0300
+Message-ID: <20251122203347.3484839-1-safinaskar@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <c44942f2-cf4d-04c2-908f-d16e2e60aae2@redhat.com>
+References: <c44942f2-cf4d-04c2-908f-d16e2e60aae2@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251122105530.441350-2-thorsten.blum@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, Nov 22, 2025 at 11:55:31AM +0100, Thorsten Blum wrote:
-> The GCC bug only occurred on i386 and has been resolved since GCC 12.2.
-> Limit the frame size workaround to GCC < 12.2 on i386.
+Mikulas Patocka <mpatocka@redhat.com>:
+> [PATCH 1/2] pm-hibernate: flush disk cache when suspending
 > 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  lib/crypto/Makefile | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-> index b5346cebbb55..5ee36a231484 100644
-> --- a/lib/crypto/Makefile
-> +++ b/lib/crypto/Makefile
-> @@ -33,7 +33,11 @@ obj-$(CONFIG_CRYPTO_LIB_GF128MUL)		+= gf128mul.o
->  
->  obj-$(CONFIG_CRYPTO_LIB_BLAKE2B) += libblake2b.o
->  libblake2b-y := blake2b.o
-> +ifeq ($(CONFIG_X86_32),y)
-> +ifeq ($(CONFIG_CC_IS_GCC)_$(call gcc-min-version, 120200),y_)
->  CFLAGS_blake2b.o := -Wframe-larger-than=4096 #  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105930
-> +endif # CONFIG_CC_IS_GCC
-> +endif # CONFIG_X86_32
+> There was reported failure that suspend doesn't work with dm-integrity.
+> The reason for the failure is that the suspend code doesn't issue the
+> FLUSH bio - the data still sits in the dm-integrity cache and they are
+> lost when poweroff happens.
 
-How about we do it without the nested ifeq?
+Your patchset is impossible to apply using "b4 shazam".
 
-ifeq ($(CONFIG_X86_32)$(CONFIG_CC_IS_GCC)_$(call gcc-min-version, 120200),yy_)
-CFLAGS_blake2b.o := -Wframe-larger-than=4096 #  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105930
-endif
+Here is what I get when I try to apply it using "b4 shazam":
 
-Also, according to the bugreport this was a regression in gcc 12.  With
-it having been fixed in 12.2, i.e. within the same gcc release series,
-is this workaround still worth carrying at all?
 
-- Eric
+d-user@comp:/tmp$ git clone --depth=1 git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+Cloning into 'linux'...
+remote: Enumerating objects: 96577, done.
+remote: Counting objects: 100% (96577/96577), done.
+remote: Compressing objects: 100% (93936/93936), done.
+remote: Total 96577 (delta 7530), reused 20945 (delta 1607), pack-reused 0 (from 0)
+Receiving objects: 100% (96577/96577), 267.21 MiB | 1.85 MiB/s, done.
+Resolving deltas: 100% (7530/7530), done.
+Updating files: 100% (91166/91166), done.
+d-user@comp:/tmp$ cd linux
+d-user@comp:/tmp/linux$ b4 shazam 'c44942f2-cf4d-04c2-908f-d16e2e60aae2@redhat.com'
+Grabbing thread from lore.kernel.org/all/c44942f2-cf4d-04c2-908f-d16e2e60aae2@redhat.com/t.mbox.gz
+Checking for newer revisions
+Grabbing search results from lore.kernel.org
+Analyzing 15 messages in the thread
+WARNING: duplicate messages found at index 1
+   Subject 1: pm-hibernate: flush block device cache when hibernating
+   Subject 2: pm-hibernate: flush disk cache when suspending
+  2 is not a reply... assume additional patch
+WARNING: duplicate messages found at index 2
+   Subject 1: swsusp: make it possible to hibernate to device mapper devices
+   Subject 2: pm-hibernate: flush disk cache when suspending
+  2 is not a reply... assume additional patch
+Checking attestation on all messages, may take a moment...
+---
+  ✓ [PATCH] pm-hibernate: flush block device cache when hibernating
+    ✓ Signed: DKIM/redhat.com
+  ✓ [PATCH RFC 2/2] swsusp: make it possible to hibernate to device mapper devices
+    ✓ Signed: DKIM/redhat.com
+  ✓ [PATCH 1/2] pm-hibernate: flush disk cache when suspending
+    ✓ Signed: DKIM/redhat.com
+  ERROR: missing [4/3]!
+---
+Total patches: 3
+---
+WARNING: Thread incomplete!
+Applying: pm-hibernate: flush block device cache when hibernating
+Applying: swsusp: make it possible to hibernate to device mapper devices
+Patch failed at 0002 swsusp: make it possible to hibernate to device mapper devices
+error: patch failed: kernel/power/swap.c:1591
+error: kernel/power/swap.c: patch does not apply
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config advice.mergeConflict false"
+
+
+It seems you should send patches not as a reply.
+
+But I will apply your patches anyway, no need to resubmit.
+
+-- 
+Askar Safin
