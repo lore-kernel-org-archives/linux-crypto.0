@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503A629B8DD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9CE2C158E;
 	Sat, 22 Nov 2025 19:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763840565; cv=none; b=XG+mE1Nj9TdC+AYZU2SmlbAqcgHjnUrm9YEAKKZNfpiIzBX+RhHK8sU3fD+hrTjj/1m1LfFl3e/2q/JsVsEWoi5VNHcmd6OJwJaf+yAMdqwD7vX4GPuUybj+/Qcygu8IO5QQyngSyflhOpmQc1zIN81sAV8e4uAsdGIVW+OrDHw=
+	t=1763840566; cv=none; b=Q3JOz2FEsbn8NYLba3y1mswNNRbKzBlauLI6WSh2Yjo2TYlVM7FeXQkmEhfCF0soo7XXsJzN8Ww7T7rkyspXDXuSB5vfXElEsQoH37YGFnDAe3/kG2diQU4a3c1LppGJKFgo8Fdhw+2pk6kpMR2ppVZbpo/zFLV0ulYjg7/4UqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763840565; c=relaxed/simple;
-	bh=j83Je7jbHX6b3mi+GQbOOK1HmWQTp2TsTLV/ZZ/fn/o=;
+	s=arc-20240116; t=1763840566; c=relaxed/simple;
+	bh=xpoNH4kgspUwPe1f6Y50HDV93L8GACvKyr/04iKSWdQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XoCYcYdZXBnbAF+gy+lnzR+SOuzkbqBmI6+Pjk0wz6RjDsYdRtgZUrcKtrvIY12HgppQzatKNYxZmJvb8B9PVn3TR2Ds8t7BXGHZ+G1nLh8jgL8ug0oeugL5WjWjkOcsWuriqJ99m6D493r0vzaCzzjZ1E6tTTlpxwEzyeyaD70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G4W3yqBt; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=R+h/N1fdW6FEDsbApBrWm5Bq32YduCj8Wh8xuOHOFH7L3ltvIOaT/wrCTAwA6juW4GJNGDK3M6Qs1nXMR8pORNsOJiX/WSROzets20ypJn9pOWucoqCALJN4w9wIcoKNMOHPVTlKyCaSJ1yranmRIxqPe4ALc+lIbhcSw2PNpWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WpGZnv+F; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G4W3yqBt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10905C19421;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WpGZnv+F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 049E6C19425;
 	Sat, 22 Nov 2025 19:42:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763840564;
-	bh=j83Je7jbHX6b3mi+GQbOOK1HmWQTp2TsTLV/ZZ/fn/o=;
+	s=k20201202; t=1763840565;
+	bh=xpoNH4kgspUwPe1f6Y50HDV93L8GACvKyr/04iKSWdQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=G4W3yqBtn7Z5PLcVMbiEmjrfCMq96oUq2hsggAGhOUMfuDvjZQ6FG8zJ7gxrClTac
-	 pcfhyLgy0MOkLTrjVWrN2zmh12B/DRMu/BCGqrI1J4u1rVfGZRAOtHBSEi6+4CkSFP
-	 U29Pp3awnqdmg+4nyOYmXUVl94nCv4RmL6wuUIIf5Hv352zN4XOVYgUSSp2h+E8Nl5
-	 f44FkNQS94ivvrVr6UVKrkIvDD9TZtw9x6JebhiWzBaaMWh0d0gy7bPe/meojh7e8Y
-	 4q1Pd0NYMHNEZLWv9VSAaLQ+oBH+sJ0kv4UUBFlLtBcZ2FBdq803fEHrvoWFi2QgAb
-	 7/e0hb4DVkk3A==
+	b=WpGZnv+F+k2ve49gIwlvlJyas8dB989YMRzs+ISBFMte5p86OC95Mo5KD4rp3ugtb
+	 3SynOG7/VBP0tYPOoQRf1BxzB3zHn5fMEuhFIzFUfnl4EjczRvQbDHFz2jdaMULZt1
+	 Oft1MphBTtyZrCQvPIAaoSEh27i7GZylJfROU0ANzpZDrvbVT7YEwdQ0+mtZ4DEDut
+	 9oecUyKF2l4PJFEi/yYOFZ7/pfGNyhHOTvbqe7GMzNM6z0+hAHwmQJu+UUinNMxVtX
+	 VZPILtSJojMWkOD1Dzl/iB4KSNt1PcXxeHLJ5sM+7WC2kSCe8qN3n/6oaOw+hIkfD1
+	 6VruZDBdADDeQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org,
 	Kees Cook <kees@kernel.org>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 1/6] lib/crypto: chacha: Add at_least decoration to fixed-size array params
-Date: Sat, 22 Nov 2025 11:42:01 -0800
-Message-ID: <20251122194206.31822-2-ebiggers@kernel.org>
+Subject: [PATCH 2/6] lib/crypto: curve25519: Add at_least decoration to fixed-size array params
+Date: Sat, 22 Nov 2025 11:42:02 -0800
+Message-ID: <20251122194206.31822-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.51.2
 In-Reply-To: <20251122194206.31822-1-ebiggers@kernel.org>
 References: <20251122194206.31822-1-ebiggers@kernel.org>
@@ -50,60 +50,61 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 Add the at_least (i.e. 'static') decoration to the fixed-size array
-parameters of the chacha library functions.  This causes clang to warn
-when a too-small array of known size is passed.
+parameters of the curve25519 library functions.  This causes clang to
+warn when a too-small array of known size is passed.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- include/crypto/chacha.h | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ include/crypto/curve25519.h | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/include/crypto/chacha.h b/include/crypto/chacha.h
-index 38e26dff27b0..1cc301a48469 100644
---- a/include/crypto/chacha.h
-+++ b/include/crypto/chacha.h
-@@ -36,22 +36,22 @@
- struct chacha_state {
- 	u32 x[CHACHA_STATE_WORDS];
+diff --git a/include/crypto/curve25519.h b/include/crypto/curve25519.h
+index db63a5577c00..2362b48f8741 100644
+--- a/include/crypto/curve25519.h
++++ b/include/crypto/curve25519.h
+@@ -11,28 +11,32 @@
+ 
+ enum curve25519_lengths {
+ 	CURVE25519_KEY_SIZE = 32
  };
  
- void chacha_block_generic(struct chacha_state *state,
--			  u8 out[CHACHA_BLOCK_SIZE], int nrounds);
-+			  u8 out[at_least CHACHA_BLOCK_SIZE], int nrounds);
- static inline void chacha20_block(struct chacha_state *state,
--				  u8 out[CHACHA_BLOCK_SIZE])
-+				  u8 out[at_least CHACHA_BLOCK_SIZE])
+-void curve25519_generic(u8 out[CURVE25519_KEY_SIZE],
+-			const u8 scalar[CURVE25519_KEY_SIZE],
+-			const u8 point[CURVE25519_KEY_SIZE]);
++void curve25519_generic(u8 out[at_least CURVE25519_KEY_SIZE],
++			const u8 scalar[at_least CURVE25519_KEY_SIZE],
++			const u8 point[at_least CURVE25519_KEY_SIZE]);
+ 
+-bool __must_check curve25519(u8 mypublic[CURVE25519_KEY_SIZE],
+-			     const u8 secret[CURVE25519_KEY_SIZE],
+-			     const u8 basepoint[CURVE25519_KEY_SIZE]);
++bool __must_check
++curve25519(u8 mypublic[at_least CURVE25519_KEY_SIZE],
++	   const u8 secret[at_least CURVE25519_KEY_SIZE],
++	   const u8 basepoint[at_least CURVE25519_KEY_SIZE]);
+ 
+-bool __must_check curve25519_generate_public(u8 pub[CURVE25519_KEY_SIZE],
+-					     const u8 secret[CURVE25519_KEY_SIZE]);
++bool __must_check
++curve25519_generate_public(u8 pub[at_least CURVE25519_KEY_SIZE],
++			   const u8 secret[at_least CURVE25519_KEY_SIZE]);
+ 
+-static inline void curve25519_clamp_secret(u8 secret[CURVE25519_KEY_SIZE])
++static inline void
++curve25519_clamp_secret(u8 secret[at_least CURVE25519_KEY_SIZE])
  {
- 	chacha_block_generic(state, out, 20);
+ 	secret[0] &= 248;
+ 	secret[31] = (secret[31] & 127) | 64;
  }
  
- void hchacha_block_generic(const struct chacha_state *state,
--			   u32 out[HCHACHA_OUT_WORDS], int nrounds);
-+			   u32 out[at_least HCHACHA_OUT_WORDS], int nrounds);
- 
- void hchacha_block(const struct chacha_state *state,
--		   u32 out[HCHACHA_OUT_WORDS], int nrounds);
-+		   u32 out[at_least HCHACHA_OUT_WORDS], int nrounds);
- 
- enum chacha_constants { /* expand 32-byte k */
- 	CHACHA_CONSTANT_EXPA = 0x61707865U,
- 	CHACHA_CONSTANT_ND_3 = 0x3320646eU,
- 	CHACHA_CONSTANT_2_BY = 0x79622d32U,
-@@ -65,12 +65,12 @@ static inline void chacha_init_consts(struct chacha_state *state)
- 	state->x[2]  = CHACHA_CONSTANT_2_BY;
- 	state->x[3]  = CHACHA_CONSTANT_TE_K;
+-static inline void curve25519_generate_secret(u8 secret[CURVE25519_KEY_SIZE])
++static inline void
++curve25519_generate_secret(u8 secret[at_least CURVE25519_KEY_SIZE])
+ {
+ 	get_random_bytes_wait(secret, CURVE25519_KEY_SIZE);
+ 	curve25519_clamp_secret(secret);
  }
  
- static inline void chacha_init(struct chacha_state *state,
--			       const u32 key[CHACHA_KEY_WORDS],
--			       const u8 iv[CHACHA_IV_SIZE])
-+			       const u32 key[at_least CHACHA_KEY_WORDS],
-+			       const u8 iv[at_least CHACHA_IV_SIZE])
- {
- 	chacha_init_consts(state);
- 	state->x[4]  = key[0];
- 	state->x[5]  = key[1];
- 	state->x[6]  = key[2];
 -- 
 2.51.2
 
