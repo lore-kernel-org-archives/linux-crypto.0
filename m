@@ -1,96 +1,66 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558D91F30C3;
-	Sun, 23 Nov 2025 04:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9AD153BED;
+	Sun, 23 Nov 2025 05:16:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763870543; cv=none; b=pfn99+8DZhrm8HCaBgO3TSg7E+XRblHp+kMFAmwQRkbZH7+PwK02NbN8PeBDx5kKFkSih0v1Aa5opOT+/nU7GY/YqzJGCxhRKnCMS/fgHrSRKIle5inMCsbx/cWJhQeaibCT4/a6bF7hR+pvdYOnoduBVhu+p5d6MEF6SC7KBWk=
+	t=1763874968; cv=none; b=YQY34i4btNff40gzxSjeTBcZ6GZfrRAfUMyf87xj6QFqOpM1qAfNYLS9P7stV3vTwH28r9qGPTxQ5BhFViAhjiqLdpx7OT+2Kobn8vUXk1wLSVBCDa+3tciXyN5akeSk+sLZrq8Rncn/90qsZbiNKvyOrNGn0royoeOd5vOxFWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763870543; c=relaxed/simple;
-	bh=OsF9dPiGydUb1fjm8xjTcrh4gguoIJyFvKzt3XGkjT4=;
+	s=arc-20240116; t=1763874968; c=relaxed/simple;
+	bh=Ahn+h/qSbOQlYlyd66UlXIhBgZecsVW+Vijrj/An1qg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N567lTQ4gstVcYj7PfL+CgBaoBGdJpGsHaC5syYTQlGF0iy/CdEloqUIte4ZuHhrP7k13yG90rH+C0IAGvwg5nEt5SiczQX4clmSUrpI99lLytzCmdiwpa2t4jv9KeUgktMadTZPAfGbEdjEi7XsQfnK1idjssjJtg3FMvunrtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIxtWAUE; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=flcooZ5fjeVFVueqvQnqIToOg8Fah/wkACvZBn2uArwIDSVQYxxIBlu3J/kVouadUAxp3ZbFnL60fRGQX3LNnZVXFSj3q9tblHKyt9r6O4yLaJH4dIBfBpuUp/kGsbbNI+GMzIiAkiNKQqlLDplbrFZOLqwy3qs9e89/b8qxBZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=ElKHoa58; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIxtWAUE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90FCBC116B1;
-	Sun, 23 Nov 2025 04:02:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763870542;
-	bh=OsF9dPiGydUb1fjm8xjTcrh4gguoIJyFvKzt3XGkjT4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VIxtWAUE0gjcsPieb3q8t7lfBREh+8Q3CBXR8fHcLDvW7MLMsr6f9M9RYZmkNjRVv
-	 gFNdnfuT6ydQoFIx2OmswbvDN8bmu+2BKYI5BoQIzwcHe1dkFQsmLrAqNNDVl2VXiM
-	 GheFMboiOQctW8RwSRkAk/0GLPBbUARnLwC6ZsnBrZKoc0iM+1zH8j4x4fxOe1TJso
-	 jQvVWGD2KaQ77rUINj63TusHzcv0oX7FrfjbZARL8CWrAShJbqXYTAcU4kpe6qFMcG
-	 1C3I56VijXpGOinoPtCbtlK+8YTHIOfLcv79S5joQBjuMxg5zKO8tJ2z2s/TtGI/aI
-	 mSztAOC48waoQ==
-Date: Sat, 22 Nov 2025 20:00:37 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ElKHoa58"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34CC3C116B1;
+	Sun, 23 Nov 2025 05:16:07 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ElKHoa58"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1763874964;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GYYfPom+bgLtWyVl1vkkPyjSVtRx1YlmM7DLhkj2D/s=;
+	b=ElKHoa5888K1DIkKrknVZT5jRP+34upjgfe7GRL6CgbLrzySiZninoW0fqpYyyXVotmaRE
+	ktg7WQ/Qmc+f0x/9dYjS9sX9BEok5GZd6PR5hxMRKEVfejyLbMlACi64WWE0+cAEnGXa1L
+	5q0v4h87rPMloUaoIGPtly2XMp5XPbI=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0088f830 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Sun, 23 Nov 2025 05:16:04 +0000 (UTC)
+Date: Sun, 23 Nov 2025 06:16:05 +0100
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>,
 	Linus Torvalds <torvalds@linux-foundation.org>
 Subject: Re: [PATCH 0/6] lib/crypto: More at_least decorations
-Message-ID: <20251123040037.GA42791@sol>
+Message-ID: <aSKYlZMAsOoA3yko@zx2c4.com>
 References: <20251122194206.31822-1-ebiggers@kernel.org>
+ <20251123040037.GA42791@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251122194206.31822-1-ebiggers@kernel.org>
+In-Reply-To: <20251123040037.GA42791@sol>
 
-On Sat, Nov 22, 2025 at 11:42:00AM -0800, Eric Biggers wrote:
-> This series depends on the 'at_least' macro added by
-> https://lore.kernel.org/r/20251122025510.1625066-4-Jason@zx2c4.com
-> It can also be retrieved from
-> 
->     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git more-at-least-decorations-v1
-> 
-> Add the at_least (i.e. 'static') decoration to the fixed-size array
-> parameters of more of the crypto library functions.  This causes clang
-> to generate a warning if a too-small array of known size is passed.
-> 
-> Eric Biggers (6):
->   lib/crypto: chacha: Add at_least decoration to fixed-size array params
->   lib/crypto: curve25519: Add at_least decoration to fixed-size array
->     params
->   lib/crypto: md5: Add at_least decoration to fixed-size array params
->   lib/crypto: poly1305: Add at_least decoration to fixed-size array
->     params
->   lib/crypto: sha1: Add at_least decoration to fixed-size array params
->   lib/crypto: sha2: Add at_least decoration to fixed-size array params
-> 
->  include/crypto/chacha.h     | 12 ++++-----
->  include/crypto/curve25519.h | 24 ++++++++++-------
->  include/crypto/md5.h        | 11 ++++----
->  include/crypto/poly1305.h   |  2 +-
->  include/crypto/sha1.h       | 12 +++++----
->  include/crypto/sha2.h       | 53 ++++++++++++++++++++++---------------
+On Sat, Nov 22, 2025 at 08:00:37PM -0800, Eric Biggers wrote:
+> We can make these crypto headers include <linux/compiler.h>.  But before
+> we do that, should we perhaps consider putting the definition of
+> 'at_least' in <linux/compiler_types.h> instead of in <linux/compiler.h>,
+> so that it becomes always available?  This is basically a core language
+> feature.  Maybe it belongs next to the definition of __counted_by, which
+> is another definition related to array bounds?
 
-It turns out this causes a build error when <crypto/poly1305.h>,
-<crypto/sha1.h>, or <crypto/sha2.h> is included before
-<linux/compiler.h>.
+This is indeed exactly what should be done. Do you want me to make a v4
+and you can rebase -next, or do you want to just fix this up on top?
 
-Jason's patch to <crypto/chacha20poly1305.h> is okay, because that one
-indirectly includes <linux/compiler.h> by chance.
-
-I thought <linux/compiler.h> already got included in everything via the
--include compiler flag.  But it's actually <linux/compiler_types.h>
-which works that way, not <linux/compiler.h> which is a regular header.
-
-We can make these crypto headers include <linux/compiler.h>.  But before
-we do that, should we perhaps consider putting the definition of
-'at_least' in <linux/compiler_types.h> instead of in <linux/compiler.h>,
-so that it becomes always available?  This is basically a core language
-feature.  Maybe it belongs next to the definition of __counted_by, which
-is another definition related to array bounds?
-
-- Eric
+Jason
