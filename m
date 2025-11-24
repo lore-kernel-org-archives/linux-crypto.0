@@ -1,118 +1,124 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2001D29A33E;
-	Mon, 24 Nov 2025 03:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0502BEC26;
+	Mon, 24 Nov 2025 05:09:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763955319; cv=none; b=qAsYpuYZgzreaPnEKi2C/0uOfnH8UqaiaNJgyFp3ZfJUqm+WnbUfebUl2eubLJFraJHiZ18W9cqnwlkCw7Wp6AjQ/rvunLDXnN0V9D/qthX+EpXDQGaCh+xRBQB/YvRqNgK5yRPS9KiEqgV5dTdmaNwfJySuUBHaVIfFkKfjItg=
+	t=1763960990; cv=none; b=lAVByjwo1Dnt5AbkYxZazmb6q449lOajzdNI/k47+xedCAYeJySyK1/+APV5zgBOLZlUecePYgDRG3otTESZV13ZgFj+DrmKewD6g8FYaSMa6/Dco1EnujGZf3YJP5g59odDCbUOmHve+62dyxJ3OZ6Scwh8tjd6e7agQQqz02w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763955319; c=relaxed/simple;
-	bh=S9lFNJ9CfbrYR5YWVjIHQAMZV1e7dV+3Pb1JXw9jOE8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=iwTIGSLm5malORKg/2PGjrNfhfaEYohK19HVjjr35d5j9/jxd4wleGUdvvsXPZtXu1CApXQc00VQCfSG4djbUYCFRTnNodOfNHRqdsOeFYhVnsVWJgTA/XFy0NjyA6RaJia4ifBxhElN6U9Eg4Z5x57TAsbNSaV8W97ChjqazOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=kQrZOO0E; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	s=arc-20240116; t=1763960990; c=relaxed/simple;
+	bh=1f1TOEQUVvDFuVUkDzaQkzB7ZSNkRXYGJwLUqEJeLgw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GmV53fvh7jW8d2ic2TC3Xhx5irAEirDl28KIHLLAUm9s5CtvjnxGDaJjfNv9PKld4edaxf+yACeingC4sGJJ+ilPcEbdlrxQeQ+16IiQesZSx52gBEcAhp0d26yWi6wdfs7DuLt9B1xvXkVvd90SfCWzq9x7qYSwhgAwWJ4m8qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IoqTl0tE; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="kQrZOO0E"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1763955314;
-	bh=ZQo6+GV86NUEzdDCnTQRDiAqq3DADF3mUe9iTWsCz3w=;
-	h=Date:From:To:Cc:Subject:From;
-	b=kQrZOO0EWN88xB4wxKoP9SelEiuY5zYqL7I1AlWCrWQg6mhJQORyTBG1he7znJ4ny
-	 BPfqSJd4J/g3DDCRXV6IdSTPekk0B4UpbdX0PYk7FK9gsdsOH/5UECCUDsfZ8LyDOa
-	 IsRJNC7aMQ4D64PeUIoNKLKmaIXVZgyeRrV/oQZw2+f8HnoX2vBTSrpQNhYLvEBt7N
-	 Rm1VXGZ2cfL/SkYzSRmwUQYosfDljxvhQjky10xxB7C7yE6XanL5X8wnsoRxXRTsYD
-	 FxuiD8eeX/iLG+/9uoXv7Ba6Dl6Q56NniBWVtlm9GWPwevrzElPoIqGUltTxHgNleQ
-	 7IqVfdwRLtp0g==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dFBKY3p30z4w8x;
-	Mon, 24 Nov 2025 14:35:13 +1100 (AEDT)
-Date: Mon, 24 Nov 2025 14:35:12 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld"
- <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Herbert Xu
- <herbert@gondor.apana.org.au>
-Cc: Linux Crypto List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing
- List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the libcrypto tree with the crypto tree
-Message-ID: <20251124143512.7e09c074@canb.auug.org.au>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IoqTl0tE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763960988; x=1795496988;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1f1TOEQUVvDFuVUkDzaQkzB7ZSNkRXYGJwLUqEJeLgw=;
+  b=IoqTl0tE6dhb/bIDAkx293PVVnWQ0V6k8Z2JIewXVtxVhqjY7h9zMd0a
+   i3EGRPwxIeExrcj6HzFMHBn/oXQKuXxwDPSHPTaoYSA0/y6uNUkpcNmaV
+   lfjCm+27r30j25EOIgb0v2pDCoywfEKbuVmt+ZhIOnH+iZ5/ZyY2Qn/hf
+   A5AkuYJMFGf7Uti0fhEl2k4mFDNVJlXppBnGIEMcnixWKHweENhaypvMP
+   8vl09oUSckwq30gMzSZydOkZMGAIMMct7foDzqOuvnuerUhGSW2N5OfBj
+   N9a56yqRezs4HBeWNvJMYZmr5EiAZyNTuM8ddYqBxwN1VNae2LEdAnGWh
+   g==;
+X-CSE-ConnectionGUID: +wxXSX0XRU+4oHLpKQZN3w==
+X-CSE-MsgGUID: Qus3Daa0QrmV+HM+22j9mg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11622"; a="65139512"
+X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
+   d="scan'208";a="65139512"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2025 21:09:47 -0800
+X-CSE-ConnectionGUID: adGQh+x5QImRTUk3QYC23w==
+X-CSE-MsgGUID: 61thK6UFQnGPplcka6S+xA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
+   d="scan'208";a="196516253"
+Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 23 Nov 2025 21:09:45 -0800
+Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vNOpa-000000000Or-3509;
+	Mon, 24 Nov 2025 05:09:42 +0000
+Date: Mon, 24 Nov 2025 13:08:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Mario Limonciello (AMD)" <superm1@kernel.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: oe-kbuild-all@lists.linux.dev, John Allen <john.allen@amd.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Hans de Goede <hansg@kernel.org>,
+	"(open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER)" <linux-crypto@vger.kernel.org>,
+	platform-driver-x86@vger.kernel.org,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>,
+	Lars Francke <lars.francke@gmail.com>
+Subject: Re: [PATCH 2/2] crypto: ccp - Add an S4 restore flow
+Message-ID: <202511241200.Pm3GIul3-lkp@intel.com>
+References: <20251119205942.3411155-3-superm1@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/b_tI+FK8DuxI0NP=T=sDvjz";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119205942.3411155-3-superm1@kernel.org>
 
---Sig_/b_tI+FK8DuxI0NP=T=sDvjz
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Mario,
 
-Hi all,
+kernel test robot noticed the following build errors:
 
-Today's linux-next merge of the libcrypto tree got a conflict in:
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on herbert-crypto-2.6/master linus/master v6.18-rc7 next-20251121]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-  arch/arm64/configs/defconfig
+url:    https://github.com/intel-lab-lkp/linux/commits/Mario-Limonciello-AMD/platform-x86-amd-pmf-Prevent-TEE-errors-after-hibernate/20251120-050203
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20251119205942.3411155-3-superm1%40kernel.org
+patch subject: [PATCH 2/2] crypto: ccp - Add an S4 restore flow
+config: i386-buildonly-randconfig-003-20251124 (https://download.01.org/0day-ci/archive/20251124/202511241200.Pm3GIul3-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251124/202511241200.Pm3GIul3-lkp@intel.com/reproduce)
 
-between commit:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511241200.Pm3GIul3-lkp@intel.com/
 
-  c7dcb041ce7d ("crypto: ansi_cprng - Remove unused ansi_cprng algorithm")
+All errors (new ones prefixed by >>):
 
-from the crypto tree and commit:
+   ld: drivers/crypto/ccp/sp-dev.o: in function `sp_restore':
+>> drivers/crypto/ccp/sp-dev.c:237:(.text+0x28f): undefined reference to `tee_restore'
 
-  1e29a750572a ("lib/crypto: arm64/sha3: Migrate optimized code into librar=
-y")
 
-from the libcrypto tree.
+vim +237 drivers/crypto/ccp/sp-dev.c
 
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
+   233	
+   234	int sp_restore(struct sp_device *sp)
+   235	{
+   236		if (sp->dev_vdata->psp_vdata->tee) {
+ > 237			int r = tee_restore(sp->psp_data);
+   238	
+   239			if (r)
+   240				return r;
+   241		}
+   242	
+   243		return sp_resume(sp);
+   244	}
+   245	
 
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/arm64/configs/defconfig
-index ea054634d157,20dd3a39faea..000000000000
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@@ -1868,9 -1783,10 +1868,9 @@@ CONFIG_CRYPTO_CHACHA20=3D
-  CONFIG_CRYPTO_BENCHMARK=3Dm
-  CONFIG_CRYPTO_ECHAINIV=3Dy
-  CONFIG_CRYPTO_MICHAEL_MIC=3Dm
-+ CONFIG_CRYPTO_SHA3=3Dm
- -CONFIG_CRYPTO_ANSI_CPRNG=3Dy
-  CONFIG_CRYPTO_USER_API_RNG=3Dm
-  CONFIG_CRYPTO_GHASH_ARM64_CE=3Dy
-- CONFIG_CRYPTO_SHA3_ARM64=3Dm
-  CONFIG_CRYPTO_SM3_ARM64_CE=3Dm
-  CONFIG_CRYPTO_AES_ARM64_CE_BLK=3Dy
-  CONFIG_CRYPTO_AES_ARM64_BS=3Dm
-
---Sig_/b_tI+FK8DuxI0NP=T=sDvjz
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmkj0nAACgkQAVBC80lX
-0GxNtwgAkm1YEwUL/hNqkyFxRs/yNaS3/6Cdz6R8d7sKaqC834SuMJEUF09TuDMg
-nq7iWgpz5FY3U0mrqUXyLKq96vtLD3iWfpMFpSScA2UtpyNrLElSeXdYqM3XhaAz
-Atpuvhyjew5dUJehXsoy4hFWwV1i+e0Istpu2CgGVprJ0lEYiSCCmu0BUAX7URC8
-LIfmOR8rzerHam31vIvPcTmHLPrhJtBQBHvz39+2hz70Xxz6JGmOiXaDglXf+dSa
-NESEyxm5fhh2dJremgBvoVwh4qPHjhOyYwLyT+DNYSx5O9vSfTFuPFcdORXgjklt
-YjlpLGJBbepqWC/bQRkierEW4mLThg==
-=USee
------END PGP SIGNATURE-----
-
---Sig_/b_tI+FK8DuxI0NP=T=sDvjz--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
