@@ -1,109 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE8F22B8CB;
-	Sun, 23 Nov 2025 21:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA88836D50C;
+	Mon, 24 Nov 2025 02:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763932403; cv=none; b=Zlsz3RzEzDCmUp6hDLmi9gbZ+HrVSdOrx4r21lYzJFo6QrbsrxYBegW9+t6S3Ph0qGZcBLeQvfTUw6h27q190Fx0oizGNR5zveXgSPIuUt1MiBx+BPYssZmv+KD4l8eHhVY1b5+NGkOoBayTWU+PYMP4mN7K8B1vvrXakOeqJmw=
+	t=1763949795; cv=none; b=qQ7VYAXpPEh/BLeTGTlvoZM3bqLvLZsMwpaUDawzV8rXsfqSPuE9RItrS9ShT6ob2QX8ZC4yuH7dQ3Pz0vtUuaJ6qDxgoXkfD6QENkUwo4WWtyxCmdxq+QUGOcueHP35ZV2baQ4IX9wfgNcg3kNXqUC9ALW+UYDPRr0iR7n0BF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763932403; c=relaxed/simple;
-	bh=qot9aKr8UhiKhpzlxqypF15YYXmUh4DbYwXC7f0sRvU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QPrVc5SZRmMEwtpBsuY1YeOLv8v6hA3zWaXjB8kyHOo7IzBct+ic18/mZqXAFWMX+G4nozM0qHeQmSfJhrVcUsGFPMXJ0OhKVdPbKO6rqCJqCJGKeXL4YAHY4MhmUEcFmlFzfEmNwsmXgeVAOxKM8JcJIU0ky9iNkDRYAdAMjMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gW61p4t6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763949795; c=relaxed/simple;
+	bh=5NRppy3W8zhGnNy+FYhR3FfKxiIHd65j4sERlc3zOzE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=l18Kq8r+2jIkPKhs19AddWkotDgLZtjoIU09SqBcDjNQqGRuaqMydhybo8Y0UcvM8jAA+KcGBQpOZvnNw4csuVLWMtlZmkDp/k4CgY8MVYibv+ukVI7ZbbkNizfaDdGAEU03hlp6aKXfHJ7KmZHZtFDcQ71+zQM/2aILBy2rjUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=pDecdpni; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gW61p4t6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAAC9C113D0;
-	Sun, 23 Nov 2025 21:13:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763932402;
-	bh=qot9aKr8UhiKhpzlxqypF15YYXmUh4DbYwXC7f0sRvU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gW61p4t6SnaxjJ811PhtLariE+r05qx9t/6jR045+2kDvX0xeZxCQQSVNyKe99iwL
-	 lGCXUdtf0JbsI4w703J3dfOqrHXAGNy/Z3IcbqkTmVPKSFHoXhpncJkq6jJnlv7oMZ
-	 5sDGxjJx10tdgjSVhL+Xmp3Wnao9pI5Fl02dIwKZ4owixsgCqttx4jJgyVW4gAXaYA
-	 wphube11A+hQqJ85lgPKTYn4p0tLiY5vSI6FxfblzF3rVcTucV02j99D+E8wmCkz8r
-	 5PRbWMZqvkYjShlxrjlq4bXUYdCdClRrmChBiWLQblhPf9KsV4jISsmxWxOHNOJz7F
-	 1J2X7F+1I6BVg==
-Date: Sun, 23 Nov 2025 14:13:17 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v2] lib/crypto: blake2b: Limit frame size workaround to
- GCC
-Message-ID: <20251123211317.GA3667167@ax162>
-References: <20251123182515.548471-3-thorsten.blum@linux.dev>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="pDecdpni"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=wPrsnTCw++0vxYv4JjRvCsKF0M6it0gN1Je20893Q64=;
+	b=pDecdpniZxDonAgHNexkx6XB5Qsho3ROBV4R2EgGGh8dp0p+lcXH6OTjndmNf2x9X1pycHHCK
+	VWg89xxEgeOnqY0hWYwBQDUXFsVGVo1B+3LtkfQgMcZPPALDNZdHEx+OFUwiY7Sq9MkhMLGT+xD
+	zHby9/7I1F1MFFg5ct2L51c=
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4dF8FB2FxlzmVCj;
+	Mon, 24 Nov 2025 10:01:18 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id 10181140155;
+	Mon, 24 Nov 2025 10:03:05 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 24 Nov 2025 10:03:04 +0800
+Subject: Re: [PATCH] crypto: hisilicon/qm - fix device leak on QoS updates
+To: Johan Hovold <johan@kernel.org>, Weili Qian <qianweili@huawei.com>, Zhou
+ Wang <wangzhou1@hisilicon.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+CC: Kai Ye <yekai13@huawei.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
+References: <20251121111130.25025-1-johan@kernel.org>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <f7a83c28-af17-7479-0b39-ff3b06ee4b8c@huawei.com>
+Date: Mon, 24 Nov 2025 10:03:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251123182515.548471-3-thorsten.blum@linux.dev>
+In-Reply-To: <20251121111130.25025-1-johan@kernel.org>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
-On Sun, Nov 23, 2025 at 07:25:17PM +0100, Thorsten Blum wrote:
-> The GCC regression only affected i386 and has been fixed since GCC 12.2.
-> However, modern GCC versions still generate large stack frames on other
-> architectures (e.g., 3440 bytes for blake2b_compress_generic() on m68k
-> with GCC 15.1.0). Clang handles these functions efficiently and should
-> work fine with the default warning threshold.
+On 2025/11/21 19:11, Johan Hovold wrote:
+> Make sure to drop the reference taken when looking up the PCI device on
+> QoS updates.
 > 
-> Limit the frame size workaround to GCC only.
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-
-Since the below comments are mostly nits:
-
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-
+> Fixes: 22d7a6c39cab ("crypto: hisilicon/qm - add pci bdf number check")
+> Cc: stable@vger.kernel.org	# 6.2
+> Cc: Kai Ye <yekai13@huawei.com>
+> Signed-off-by: Johan Hovold <johan@kernel.org>
 > ---
-> Changes in v2:
-> - Restrict frame size workaround to GCC independent of its version or
->   the architecture
-> - Update patch title and description
-> - Link to v1: https://lore.kernel.org/lkml/20251122105530.441350-2-thorsten.blum@linux.dev/
-> ---
->  lib/crypto/Makefile | 2 ++
->  1 file changed, 2 insertions(+)
+>  drivers/crypto/hisilicon/qm.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-> index b5346cebbb55..95a48393ffb4 100644
-> --- a/lib/crypto/Makefile
-> +++ b/lib/crypto/Makefile
-> @@ -33,7 +33,9 @@ obj-$(CONFIG_CRYPTO_LIB_GF128MUL)		+= gf128mul.o
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index a5b96adf2d1e..ef6fdcc3dbcb 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -3871,11 +3871,14 @@ static ssize_t qm_get_qos_value(struct hisi_qm *qm, const char *buf,
+>  	pdev = container_of(dev, struct pci_dev, dev);
+>  	if (pci_physfn(pdev) != qm->pdev) {
+>  		pci_err(qm->pdev, "the pdev input does not match the pf!\n");
+> +		put_device(dev);
+>  		return -EINVAL;
+>  	}
 >  
->  obj-$(CONFIG_CRYPTO_LIB_BLAKE2B) += libblake2b.o
->  libblake2b-y := blake2b.o
-> +ifeq ($(CONFIG_CC_IS_GCC),y)
-
-I tend to prefer
-
-  ifdef CONFIG_CC_IS_GCC
-
-when the symbol is bool since it is a little easier to understand.
-
-It may be worth a comment about the warnings on other architectures to
-help future travellers who may be tempted to remove this when the
-fixed GCC version of that bug report becomes the minimum.
-
->  CFLAGS_blake2b.o := -Wframe-larger-than=4096 #  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105930
-> +endif # CONFIG_CC_IS_GCC
-
-This conditional feels small enough that it does not need this marker
-but I guess that is maintainer preference.
-
->  ifeq ($(CONFIG_CRYPTO_LIB_BLAKE2B_ARCH),y)
->  CFLAGS_blake2b.o += -I$(src)/$(SRCARCH)
->  libblake2b-$(CONFIG_ARM) += arm/blake2b-neon-core.o
-> -- 
-> 2.51.1
+>  	*fun_index = pdev->devfn;
+>  
+> +	put_device(dev);
+> +
+>  	return 0;
+>  }
+>  
 > 
+
+This issue has already been fixed by the following patch:
+"[PATCH] crypto: hisilicon/qm - Fix device reference leak in qm_get_qos_value".
+
+Thanks.
+Longfang.
