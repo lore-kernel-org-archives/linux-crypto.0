@@ -1,147 +1,88 @@
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD712F49EC
-	for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2025 09:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EC62F49EC;
+	Mon, 24 Nov 2025 09:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763975347; cv=none; b=AzNYEl70T/S+GCLNrP8fTqwbYgo7xaKdcY2vObBPxUslPHrzwoR/n1OHxt1Au1wmduA0b+cxfHAPv3ak+Rzph3nDrPhOhcNJW6DrdZwaaumQTHlSXM9Uw3/DoG/BhfGtSXM3ISbz8VdaZNBsztze+3nyg/4xiq3N8Qg2wqS2zVc=
+	t=1763975495; cv=none; b=AWeS5x8gPs+8w5Mz2PrlvK655EwImYNL1dEyMDiNXGfABACQmPZyW/9fLCA2FAgMUHe+10K+CEvVwKCdhPcK8E7Zh2nMeTl25iMed3mivHCpTijDOusdtLn2/0oscFLMb/EL9a1Ja1BNMMf4pvdh1VSlaDs/rVZdoXqvB4y2mtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763975347; c=relaxed/simple;
-	bh=lixkuGWHEExktJChSw5/KftuzOdUuejcJ1G1r1Q/1Ww=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cYY2n9y3uTzLQot3nG2uTtt0ZssKGt9kQIdE15ycsE+TMCabUmSabr4+dZe1o/+CQ+i7T+n0kSdRRal/1Rq+O+9mdRSJZTuh58jj5LMnhtdV0y6PKJ04nDFIkVjZMF82nbP7Qd2WEBmf7aynaR2U92/8dxcUZ8+s5Rw/TH55RsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=PhJAeAU3; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
+	s=arc-20240116; t=1763975495; c=relaxed/simple;
+	bh=kxGpo/egBIFq7+bW7hMJPBwGl+t/HkgquWHWxMcBps0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Vg8ppLvA4mBv8PPyKYR2rSBp83bZh1QvIqiLBKdg3ShSUwVhtEuYFSTgsyamW1Tv68m7N0MMI2hV5v/k+5DMZine/VKTnROZu6xeKCgfN69q2R5yU+IpDSlPuhfBQnqITjVX4wclxeUMX4y4+eUkTNFCXTAuKiFwLXvjXYkatU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ebjjOIGG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="PhJAeAU3"
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <david.laight@runbox.com>)
-	id 1vNSZ6-002ZRz-Pm; Mon, 24 Nov 2025 10:08:56 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
-	 s=selector1; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
-	References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date;
-	bh=eGbnYzu/0fZhdMa02+0KV1H9vqvoF5RNx/fC04fnPQE=; b=PhJAeAU3Ll681gbQxK0nKaCKwx
-	BpQ7qauOym5GIWcmY8zJKZ8UwHHBzDM1KURBRCKPXY59U75TZ23BzkoLBaLGEQ3VA2cDR9rEUDssH
-	R2wgy5I6EwtDmsevIzQNLOqP6c7xzHx3pqUeYrY0orsmP97aGG0zbJWcWO1XsXQ0jHjbDQy3GRjig
-	nnmXU+zB6l/kyM+y34oSElNR94qpigsrd6F1Bpf3FrWHE8Pb+MzfK+D8RnZOFvaPomB6j4/c0etTI
-	+laAGzph25N+zKQq9xBOU0k63Gx0T98zh5OFjg3Thf7F/A5MfnyJCi94lRSQxBqGDeVTZsXecWlnw
-	SyL0Iq8w==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <david.laight@runbox.com>)
-	id 1vNSZ6-0001OW-4R; Mon, 24 Nov 2025 10:08:56 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vNSYy-008EoA-Iv; Mon, 24 Nov 2025 10:08:48 +0100
-Date: Mon, 24 Nov 2025 09:08:46 +0000
-From: david laight <david.laight@runbox.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>, "Jason A. Donenfeld"
- <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: blake2b: Limit frame size workaround to GCC
- < 12.2 on i386
-Message-ID: <20251124090846.18d02a78@pumpkin>
-In-Reply-To: <20251123202629.GA49083@sol>
-References: <20251122105530.441350-2-thorsten.blum@linux.dev>
-	<20251123092840.44c92841@pumpkin>
-	<0EA9C088-D1B1-4E6E-B42F-EFE9C69D1005@linux.dev>
-	<20251123185818.23ad5d3f@pumpkin>
-	<20251123202629.GA49083@sol>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ebjjOIGG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 218ABC4CEF1;
+	Mon, 24 Nov 2025 09:11:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763975495;
+	bh=kxGpo/egBIFq7+bW7hMJPBwGl+t/HkgquWHWxMcBps0=;
+	h=Date:From:To:Cc:Subject:From;
+	b=ebjjOIGGtmKWVy+EtYu4XZgPXZkbHhaEuF+1cCF7OYJPT3McEyBJRISrruMP4sO+r
+	 9YFgH4eIaDou+bCg2gfG+vBYtPu6GRSvYL/OfIT0+rGM5PZLsqPr8EwIBxzTt7wQLB
+	 PcFE+GkTDeyd4l/X5g968l00EL8JnJZfohYR+fguqP25XxZVa+5MhdeLzw+Hex8xJo
+	 y3U0TrC1lAyGNQB56PHSOfRcmT9qg8PMiRTu5k/nELgEiL+6ofbzJ53DKQWXEKUbP0
+	 LB7ziiPu2Eve/3UydhUfsC6vIGpfFB7AGhviGHSGN9m+CewCec0iNwtCclwr45V2/J
+	 Qm+HhPs6H5yOQ==
+Date: Mon, 24 Nov 2025 18:11:30 +0900
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Corentin Labbe <clabbe.montjoie@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Chen-Yu Tsai <wens@kernel.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH][next] crypto: sun8i-ss - Avoid
+ -Wflex-array-member-not-at-end warning
+Message-ID: <aSQhQh1xyp-zauPM@kspp>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Sun, 23 Nov 2025 12:26:29 -0800
-Eric Biggers <ebiggers@kernel.org> wrote:
+-Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+getting ready to enable it, globally.
 
-> On Sun, Nov 23, 2025 at 06:58:18PM +0000, david laight wrote:
-> > On Sun, 23 Nov 2025 18:00:01 +0100
-> > Thorsten Blum <thorsten.blum@linux.dev> wrote:
-> >   
-> > > On 23. Nov 2025, at 10:28, david laight wrote:  
-> > > > On Sat, 22 Nov 2025 11:55:31 +0100
-> > > > Thorsten Blum <thorsten.blum@linux.dev> wrote:
-> > > >     
-> > > >> The GCC bug only occurred on i386 and has been resolved since GCC 12.2.
-> > > >> Limit the frame size workaround to GCC < 12.2 on i386.
-> > > >> 
-> > > >> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> > > >> ---
-> > > >> lib/crypto/Makefile | 4 ++++
-> > > >> 1 file changed, 4 insertions(+)
-> > > >> 
-> > > >> diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-> > > >> index b5346cebbb55..5ee36a231484 100644
-> > > >> --- a/lib/crypto/Makefile
-> > > >> +++ b/lib/crypto/Makefile
-> > > >> @@ -33,7 +33,11 @@ obj-$(CONFIG_CRYPTO_LIB_GF128MUL) += gf128mul.o
-> > > >> 
-> > > >> obj-$(CONFIG_CRYPTO_LIB_BLAKE2B) += libblake2b.o
-> > > >> libblake2b-y := blake2b.o
-> > > >> +ifeq ($(CONFIG_X86_32),y)
-> > > >> +ifeq ($(CONFIG_CC_IS_GCC)_$(call gcc-min-version, 120200),y_)
-> > > >> CFLAGS_blake2b.o := -Wframe-larger-than=4096 #  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105930
-> > > >> +endif # CONFIG_CC_IS_GCC
-> > > >> +endif # CONFIG_X86_32    
-> > > > 
-> > > > Isn't that just going to cause a run-time stack overflow?    
-> > > 
-> > > My change doesn't cause a runtime stack overflow, it's just a compiler
-> > > warning. There's more information in commit 1d3551ced64e ("crypto:
-> > > blake2b: effectively disable frame size warning").
-> > > 
-> > > Given the kernel test robot results with GCC 15.1.0 on m68k, we should
-> > > probably make this conditional on GCC (any version). Clang produces much
-> > > smaller stack frames and should be fine with the default warning
-> > > threshold.  
-> > 
-> > But if anyone tries to run the kernel they'll need space for the '3k monster stack'.
-> > So changing the limit is 'fine' for a test build, but not for a proper build.
-> > (Yes this has been wrong since Linus did the original patch in 2022.)
-> > 
-> > Does allmodconfig set COMPILE_TEST ?
-> > If so that could be included in the conditional.
-> > 
-> > A more interesting question is whether the change can just be removed.
-> > I'd guess no one is actively using gcc 12.1 any more.  
-> 
-> How about we roll up the BLAKE2b rounds loop if !CONFIG_64BIT?
+Move the conflicting declaration to the end of the corresponding
+structure. Notice that `struct ahash_request` is a flexible structure,
+this is a structure that contains a flexible-array member.
 
-I do wonder about the real benefit of some of the massive loop unrolling
-that happens in a lot of these algorithms (not just blake2b).
-It might speed up (some) benchmarks, but the 'I-cache busting' effect
-may well some down any real uses - especially on small/moderate sized buffers.
-Loop unrolling is so 1980s...
+With these changes fix the following warning:
 
-And that is an entirely separate issue from any register spills.
-If the compiler is going to spill to stack the benefits of unrolling are
-likely to disappear - especially on a modern 'out of order' and 'multi issue'
-cpu.
-On x86 you normally get any 'loop control' for free, normal loop unrolling
-is pretty pointless except for very short loops (you can't do a 1 clock loop).
+drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h:251:30: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
 
-Register pressure on a 32bit cpu doing 64bit operations is immense.
-Worse for old architectures with very few registers - x86 can only hold
-three 64bit values in registers.
-So the compiler ends up spilling 'temporary' values from the middle of
-expressions as well as all obvious named variables.
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-So yes, rolling it up (or not unrolling it) on 32bit is a good idea.
-
-	David
-
-
-> 
-> - Eric
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
+index ae66eb45fb24..3fc86225edaf 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
+@@ -248,9 +248,11 @@ struct sun8i_ss_hash_tfm_ctx {
+ struct sun8i_ss_hash_reqctx {
+ 	struct sginfo t_src[MAX_SG];
+ 	struct sginfo t_dst[MAX_SG];
+-	struct ahash_request fallback_req;
+ 	u32 method;
+ 	int flow;
++
++	/* Must be last as it ends in a flexible-array member. */
++	struct ahash_request fallback_req;
+ };
+ 
+ /*
+-- 
+2.43.0
 
