@@ -1,124 +1,147 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0502BEC26;
-	Mon, 24 Nov 2025 05:09:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD712F49EC
+	for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2025 09:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763960990; cv=none; b=lAVByjwo1Dnt5AbkYxZazmb6q449lOajzdNI/k47+xedCAYeJySyK1/+APV5zgBOLZlUecePYgDRG3otTESZV13ZgFj+DrmKewD6g8FYaSMa6/Dco1EnujGZf3YJP5g59odDCbUOmHve+62dyxJ3OZ6Scwh8tjd6e7agQQqz02w=
+	t=1763975347; cv=none; b=AzNYEl70T/S+GCLNrP8fTqwbYgo7xaKdcY2vObBPxUslPHrzwoR/n1OHxt1Au1wmduA0b+cxfHAPv3ak+Rzph3nDrPhOhcNJW6DrdZwaaumQTHlSXM9Uw3/DoG/BhfGtSXM3ISbz8VdaZNBsztze+3nyg/4xiq3N8Qg2wqS2zVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763960990; c=relaxed/simple;
-	bh=1f1TOEQUVvDFuVUkDzaQkzB7ZSNkRXYGJwLUqEJeLgw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GmV53fvh7jW8d2ic2TC3Xhx5irAEirDl28KIHLLAUm9s5CtvjnxGDaJjfNv9PKld4edaxf+yACeingC4sGJJ+ilPcEbdlrxQeQ+16IiQesZSx52gBEcAhp0d26yWi6wdfs7DuLt9B1xvXkVvd90SfCWzq9x7qYSwhgAwWJ4m8qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IoqTl0tE; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1763975347; c=relaxed/simple;
+	bh=lixkuGWHEExktJChSw5/KftuzOdUuejcJ1G1r1Q/1Ww=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cYY2n9y3uTzLQot3nG2uTtt0ZssKGt9kQIdE15ycsE+TMCabUmSabr4+dZe1o/+CQ+i7T+n0kSdRRal/1Rq+O+9mdRSJZTuh58jj5LMnhtdV0y6PKJ04nDFIkVjZMF82nbP7Qd2WEBmf7aynaR2U92/8dxcUZ8+s5Rw/TH55RsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=PhJAeAU3; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IoqTl0tE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763960988; x=1795496988;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=1f1TOEQUVvDFuVUkDzaQkzB7ZSNkRXYGJwLUqEJeLgw=;
-  b=IoqTl0tE6dhb/bIDAkx293PVVnWQ0V6k8Z2JIewXVtxVhqjY7h9zMd0a
-   i3EGRPwxIeExrcj6HzFMHBn/oXQKuXxwDPSHPTaoYSA0/y6uNUkpcNmaV
-   lfjCm+27r30j25EOIgb0v2pDCoywfEKbuVmt+ZhIOnH+iZ5/ZyY2Qn/hf
-   A5AkuYJMFGf7Uti0fhEl2k4mFDNVJlXppBnGIEMcnixWKHweENhaypvMP
-   8vl09oUSckwq30gMzSZydOkZMGAIMMct7foDzqOuvnuerUhGSW2N5OfBj
-   N9a56yqRezs4HBeWNvJMYZmr5EiAZyNTuM8ddYqBxwN1VNae2LEdAnGWh
-   g==;
-X-CSE-ConnectionGUID: +wxXSX0XRU+4oHLpKQZN3w==
-X-CSE-MsgGUID: Qus3Daa0QrmV+HM+22j9mg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11622"; a="65139512"
-X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
-   d="scan'208";a="65139512"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2025 21:09:47 -0800
-X-CSE-ConnectionGUID: adGQh+x5QImRTUk3QYC23w==
-X-CSE-MsgGUID: 61thK6UFQnGPplcka6S+xA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
-   d="scan'208";a="196516253"
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 23 Nov 2025 21:09:45 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vNOpa-000000000Or-3509;
-	Mon, 24 Nov 2025 05:09:42 +0000
-Date: Mon, 24 Nov 2025 13:08:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Mario Limonciello (AMD)" <superm1@kernel.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: oe-kbuild-all@lists.linux.dev, John Allen <john.allen@amd.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Hans de Goede <hansg@kernel.org>,
-	"(open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER)" <linux-crypto@vger.kernel.org>,
-	platform-driver-x86@vger.kernel.org,
-	"Mario Limonciello (AMD)" <superm1@kernel.org>,
-	Lars Francke <lars.francke@gmail.com>
-Subject: Re: [PATCH 2/2] crypto: ccp - Add an S4 restore flow
-Message-ID: <202511241200.Pm3GIul3-lkp@intel.com>
-References: <20251119205942.3411155-3-superm1@kernel.org>
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="PhJAeAU3"
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <david.laight@runbox.com>)
+	id 1vNSZ6-002ZRz-Pm; Mon, 24 Nov 2025 10:08:56 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
+	 s=selector1; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
+	References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date;
+	bh=eGbnYzu/0fZhdMa02+0KV1H9vqvoF5RNx/fC04fnPQE=; b=PhJAeAU3Ll681gbQxK0nKaCKwx
+	BpQ7qauOym5GIWcmY8zJKZ8UwHHBzDM1KURBRCKPXY59U75TZ23BzkoLBaLGEQ3VA2cDR9rEUDssH
+	R2wgy5I6EwtDmsevIzQNLOqP6c7xzHx3pqUeYrY0orsmP97aGG0zbJWcWO1XsXQ0jHjbDQy3GRjig
+	nnmXU+zB6l/kyM+y34oSElNR94qpigsrd6F1Bpf3FrWHE8Pb+MzfK+D8RnZOFvaPomB6j4/c0etTI
+	+laAGzph25N+zKQq9xBOU0k63Gx0T98zh5OFjg3Thf7F/A5MfnyJCi94lRSQxBqGDeVTZsXecWlnw
+	SyL0Iq8w==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <david.laight@runbox.com>)
+	id 1vNSZ6-0001OW-4R; Mon, 24 Nov 2025 10:08:56 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vNSYy-008EoA-Iv; Mon, 24 Nov 2025 10:08:48 +0100
+Date: Mon, 24 Nov 2025 09:08:46 +0000
+From: david laight <david.laight@runbox.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>, "Jason A. Donenfeld"
+ <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] lib/crypto: blake2b: Limit frame size workaround to GCC
+ < 12.2 on i386
+Message-ID: <20251124090846.18d02a78@pumpkin>
+In-Reply-To: <20251123202629.GA49083@sol>
+References: <20251122105530.441350-2-thorsten.blum@linux.dev>
+	<20251123092840.44c92841@pumpkin>
+	<0EA9C088-D1B1-4E6E-B42F-EFE9C69D1005@linux.dev>
+	<20251123185818.23ad5d3f@pumpkin>
+	<20251123202629.GA49083@sol>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251119205942.3411155-3-superm1@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Mario,
+On Sun, 23 Nov 2025 12:26:29 -0800
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-kernel test robot noticed the following build errors:
+> On Sun, Nov 23, 2025 at 06:58:18PM +0000, david laight wrote:
+> > On Sun, 23 Nov 2025 18:00:01 +0100
+> > Thorsten Blum <thorsten.blum@linux.dev> wrote:
+> >   
+> > > On 23. Nov 2025, at 10:28, david laight wrote:  
+> > > > On Sat, 22 Nov 2025 11:55:31 +0100
+> > > > Thorsten Blum <thorsten.blum@linux.dev> wrote:
+> > > >     
+> > > >> The GCC bug only occurred on i386 and has been resolved since GCC 12.2.
+> > > >> Limit the frame size workaround to GCC < 12.2 on i386.
+> > > >> 
+> > > >> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> > > >> ---
+> > > >> lib/crypto/Makefile | 4 ++++
+> > > >> 1 file changed, 4 insertions(+)
+> > > >> 
+> > > >> diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+> > > >> index b5346cebbb55..5ee36a231484 100644
+> > > >> --- a/lib/crypto/Makefile
+> > > >> +++ b/lib/crypto/Makefile
+> > > >> @@ -33,7 +33,11 @@ obj-$(CONFIG_CRYPTO_LIB_GF128MUL) += gf128mul.o
+> > > >> 
+> > > >> obj-$(CONFIG_CRYPTO_LIB_BLAKE2B) += libblake2b.o
+> > > >> libblake2b-y := blake2b.o
+> > > >> +ifeq ($(CONFIG_X86_32),y)
+> > > >> +ifeq ($(CONFIG_CC_IS_GCC)_$(call gcc-min-version, 120200),y_)
+> > > >> CFLAGS_blake2b.o := -Wframe-larger-than=4096 #  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105930
+> > > >> +endif # CONFIG_CC_IS_GCC
+> > > >> +endif # CONFIG_X86_32    
+> > > > 
+> > > > Isn't that just going to cause a run-time stack overflow?    
+> > > 
+> > > My change doesn't cause a runtime stack overflow, it's just a compiler
+> > > warning. There's more information in commit 1d3551ced64e ("crypto:
+> > > blake2b: effectively disable frame size warning").
+> > > 
+> > > Given the kernel test robot results with GCC 15.1.0 on m68k, we should
+> > > probably make this conditional on GCC (any version). Clang produces much
+> > > smaller stack frames and should be fine with the default warning
+> > > threshold.  
+> > 
+> > But if anyone tries to run the kernel they'll need space for the '3k monster stack'.
+> > So changing the limit is 'fine' for a test build, but not for a proper build.
+> > (Yes this has been wrong since Linus did the original patch in 2022.)
+> > 
+> > Does allmodconfig set COMPILE_TEST ?
+> > If so that could be included in the conditional.
+> > 
+> > A more interesting question is whether the change can just be removed.
+> > I'd guess no one is actively using gcc 12.1 any more.  
+> 
+> How about we roll up the BLAKE2b rounds loop if !CONFIG_64BIT?
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master linus/master v6.18-rc7 next-20251121]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I do wonder about the real benefit of some of the massive loop unrolling
+that happens in a lot of these algorithms (not just blake2b).
+It might speed up (some) benchmarks, but the 'I-cache busting' effect
+may well some down any real uses - especially on small/moderate sized buffers.
+Loop unrolling is so 1980s...
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mario-Limonciello-AMD/platform-x86-amd-pmf-Prevent-TEE-errors-after-hibernate/20251120-050203
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20251119205942.3411155-3-superm1%40kernel.org
-patch subject: [PATCH 2/2] crypto: ccp - Add an S4 restore flow
-config: i386-buildonly-randconfig-003-20251124 (https://download.01.org/0day-ci/archive/20251124/202511241200.Pm3GIul3-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251124/202511241200.Pm3GIul3-lkp@intel.com/reproduce)
+And that is an entirely separate issue from any register spills.
+If the compiler is going to spill to stack the benefits of unrolling are
+likely to disappear - especially on a modern 'out of order' and 'multi issue'
+cpu.
+On x86 you normally get any 'loop control' for free, normal loop unrolling
+is pretty pointless except for very short loops (you can't do a 1 clock loop).
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511241200.Pm3GIul3-lkp@intel.com/
+Register pressure on a 32bit cpu doing 64bit operations is immense.
+Worse for old architectures with very few registers - x86 can only hold
+three 64bit values in registers.
+So the compiler ends up spilling 'temporary' values from the middle of
+expressions as well as all obvious named variables.
 
-All errors (new ones prefixed by >>):
+So yes, rolling it up (or not unrolling it) on 32bit is a good idea.
 
-   ld: drivers/crypto/ccp/sp-dev.o: in function `sp_restore':
->> drivers/crypto/ccp/sp-dev.c:237:(.text+0x28f): undefined reference to `tee_restore'
+	David
 
 
-vim +237 drivers/crypto/ccp/sp-dev.c
+> 
+> - Eric
 
-   233	
-   234	int sp_restore(struct sp_device *sp)
-   235	{
-   236		if (sp->dev_vdata->psp_vdata->tee) {
- > 237			int r = tee_restore(sp->psp_data);
-   238	
-   239			if (r)
-   240				return r;
-   241		}
-   242	
-   243		return sp_resume(sp);
-   244	}
-   245	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
