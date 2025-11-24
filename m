@@ -1,125 +1,88 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574D92C0F84;
-	Mon, 24 Nov 2025 17:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227FC3191C6
+	for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2025 18:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764006516; cv=none; b=YbSzFuR5Nb96FeRUSy3YHwiJ6cyyaW/+jL+mf64BwUTn/xSfRG79kmpn9W6PTuAZijAq/frnJI6HtIGBSCsv88k0HJkT+HHQ8+LJeBYsSY3w9MEq/BjOwdtq/lLzW+g/iNnHnrqjx5c2qAjYBrveoBP+J66VqMBPx1OIlC1OQfc=
+	t=1764007595; cv=none; b=sfEB51kpyeD7Znjj3JUB+CDyKKEaCQ5MAicH6tnrgVtBzdbOT3n+I5ecvb5coMSTYsVSl6wn6yLd41ZlPyo/2LXF9GlwnFYkVrDGbDyJsGJRvhXJfS7EOWrzbl/iteClxj4fovTzIdedlhVVpyaTV3U8Cv/nW9rV+wII00hgX10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764006516; c=relaxed/simple;
-	bh=ZMfp9MU43gbbsHJVljv1nrWxCaYgeHGHk75SKAtcBEI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n6w7PsYvx0BB4zER2x1vZx3Sd20hoSm8hhoRcacfgMfzsUbuvVgjLZwbmCI1VYDdBAKL4I9hnYQ9/zlnvf3qgQ1qjH3Ci8sgnOvIzNHcgMo0bm1kkBK2hqjpPMGbUP1ZSc7BzeDsLsIcDIh/9wCj+ZzNjBjoBScJfW8NTH+a3Qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FOHae+qG; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1764007595; c=relaxed/simple;
+	bh=4jyjA348Uccis+uPWmeHP3/Cr7AKyDETtMz1PjRInZ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YxxgWmecDT+wWMAKd/ne9bbS0Eqt0AvkowoaXYJcV5GOW5pbvVk1fcybcjPKx8Eb/Sq9DkLhZsfzLsjF3FouJ92Ctqlgwh8k4NAwadps4xlhVEamQlYT/pCgMuUx3hgxEUzEUXBosjSFTQiayVXS5dL7rDXkzTE6/YhuHxqt0XQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=bJfgEjmE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FOHae+qG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764006514; x=1795542514;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZMfp9MU43gbbsHJVljv1nrWxCaYgeHGHk75SKAtcBEI=;
-  b=FOHae+qGyjZak79NvA3WQNSE8rB/ipzKJ9QNVk+AIhHnf0XJzMDJRcZ6
-   yrkz90ZKbAW/n3ds9AUjhVuAwo8GNs+5Llx4SebV2YADi/A1fSTfPZk6F
-   t5tZTU2Hwzooa9ySvQPNIuL4D1F3WWnQHDyA9L9w1D3sBkvl3cJrrNhdJ
-   xr9ogkji1TJBYo/e2exFyztnLR7r3RVFoUmB3xdGTsdwszA+9RVEZU5rQ
-   8K7NxFbHpBHd36TJld6DbwwasMguX9BwnlE9eYRe3Txho62XGV+fTcaeq
-   bS2aB2MBZj3KQZzQhAlPpVvU/YYtAFgnd0IfWOy2NVGs/99W8rRYuGWiu
-   Q==;
-X-CSE-ConnectionGUID: VRFaLfsNTv2nu8G2UHJDnQ==
-X-CSE-MsgGUID: seE2lf0yQ3u9V3Xgi5ucgg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11623"; a="66050729"
-X-IronPort-AV: E=Sophos;i="6.20,223,1758610800"; 
-   d="scan'208";a="66050729"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 09:48:33 -0800
-X-CSE-ConnectionGUID: 7wgYsk0wQyGLB6sMISS2RA==
-X-CSE-MsgGUID: Ce6J77WjRE2IkJQjB3NoxA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,223,1758610800"; 
-   d="scan'208";a="215736574"
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 24 Nov 2025 09:48:30 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vNafr-000000000z7-2axH;
-	Mon, 24 Nov 2025 17:48:27 +0000
-Date: Tue, 25 Nov 2025 01:48:24 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>,
-	Greg Ungerer <gerg@linux-m68k.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>,
-	Frank Li <Frank.Li@nxp.com>
-Subject: Re: [PATCH v3 1/3] m68k: coldfire: Mark platform device resource
- arrays as const
-Message-ID: <202511250103.RMNoU3xH-lkp@intel.com>
-References: <20251124-b4-m5441x-add-rng-support-v3-1-f447251dad27@yoseli.org>
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="bJfgEjmE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82003C4AF09
+	for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2025 18:06:34 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="bJfgEjmE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1764007590;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zi2tifdlnm4pilxLA5hX4iEYZ93yOyBEU+BXbr3Wug0=;
+	b=bJfgEjmETChnLppoIv6NT9bWBm3wI4/mCbWKrAymfn1VES+mbp32JL97LFvDxqmeueLv4O
+	FFCaD69mAbNsuPwF201bdzYtwP4UDgBUR9ztYOjJUFiFK/o354Jg+YhauFgxFBxVQdw4eo
+	yqdJx45EXqfxaQG7IeR79zPkIMAkrHU=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 37074352 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
+	for <linux-crypto@vger.kernel.org>;
+	Mon, 24 Nov 2025 18:06:29 +0000 (UTC)
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7c7545310b8so2170497a34.1
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2025 10:06:29 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXqiTqLh3+g5+QWFao6RnWlzhPs92Ah/5Rd9BHN1aTpbWBsL3r+rsqPlvv78A0m14MlMCXYMYb88oiv0vw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiouPAL5dLvpBYPp2BeVvNeMwFo2aunVM2rYMenpNXCw7taYGK
+	0XBf3ZDqPZueGdiogq6YnO3kzpsnWYCFij+J6MGFy752a6UX1ZbpNeXR6z/D7kRhONSqnTuUzin
+	jHraGHmk8Y+CoGvwfYq9N99ADAxBg0fY=
+X-Google-Smtp-Source: AGHT+IG9yFbAB9mPY1ah1S5DbEkyC1/NUapcR00z5eBy/hk+C134+OhB4O0SLZVWNpbSJa6pmV5YrLb6e0Z4ZggBlyM=
+X-Received: by 2002:a05:6830:2644:b0:78a:8b0d:cd54 with SMTP id
+ 46e09a7af769-7c798cfe6a7mr7062422a34.34.1764007587801; Mon, 24 Nov 2025
+ 10:06:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251124-b4-m5441x-add-rng-support-v3-1-f447251dad27@yoseli.org>
+References: <20251120104439.2620205-6-dhowells@redhat.com> <20251120104439.2620205-1-dhowells@redhat.com>
+ <3374841.1763975577@warthog.procyon.org.uk> <20251124164914.GA6186@sol> <3647621.1764005088@warthog.procyon.org.uk>
+In-Reply-To: <3647621.1764005088@warthog.procyon.org.uk>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Mon, 24 Nov 2025 19:06:20 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pPWGKAdm83wKhc3iHCjgZ8gOtZnt=+6x5V6D1prMb2Gw@mail.gmail.com>
+X-Gm-Features: AWmQ_blyTgayiMTPgpS1b7DE0B0LOV2Mh4edriTwnBqHPtexJGQ8-Mu5aOF6q1A
+Message-ID: <CAHmME9pPWGKAdm83wKhc3iHCjgZ8gOtZnt=+6x5V6D1prMb2Gw@mail.gmail.com>
+Subject: Re: [PATCH v10 5/8] crypto: Add ML-DSA crypto_sig support
+To: David Howells <dhowells@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, Stephan Mueller <smueller@chronox.de>, Lukas Wunner <lukas@wunner.de>, 
+	Ignat Korchagin <ignat@cloudflare.com>, linux-crypto@vger.kernel.org, 
+	keyrings@vger.kernel.org, linux-modules@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jean-Michel,
+On Mon, Nov 24, 2025 at 6:25=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> > Still not really sure what the point is.  There's only one user of
+> > crypto_sig, and it could just call the ML-DSA functions directly.
+>
+> Is it your aim to kill off the crypto/ dir and all the (old) crypto API?
 
-kernel test robot noticed the following build warnings:
+Probably entirely killing off the old API is going to be fraught
+because its abstraction has leaked out to userspace. But to the extent
+we can minimize its use over time, I think that's a good thing. Even
+for crypto usages that generalize to a few different ciphers of one
+variety or another, I think being explicit about which ciphers and
+having purpose-built dispatchers is usually a better route.
 
-[auto build test WARNING on ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Jean-Michel-Hautbois/m68k-coldfire-Mark-platform-device-resource-arrays-as-const/20251124-210737
-base:   ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d
-patch link:    https://lore.kernel.org/r/20251124-b4-m5441x-add-rng-support-v3-1-f447251dad27%40yoseli.org
-patch subject: [PATCH v3 1/3] m68k: coldfire: Mark platform device resource arrays as const
-config: m68k-allnoconfig (https://download.01.org/0day-ci/archive/20251125/202511250103.RMNoU3xH-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251125/202511250103.RMNoU3xH-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511250103.RMNoU3xH-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> arch/m68k/coldfire/device.c:141:35: warning: initialization discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-     141 |         .resource               = mcf_fec0_resources,
-         |                                   ^~~~~~~~~~~~~~~~~~
-
-
-vim +/const +141 arch/m68k/coldfire/device.c
-
-b7ce7f0d0efc1a arch/m68k/platform/coldfire/device.c Greg Ungerer      2011-12-24  136  
-b7ce7f0d0efc1a arch/m68k/platform/coldfire/device.c Greg Ungerer      2011-12-24  137  static struct platform_device mcf_fec0 = {
-bea8bcb12da09b arch/m68k/platform/coldfire/device.c Steven King       2012-06-06  138  	.name			= FEC_NAME,
-b7ce7f0d0efc1a arch/m68k/platform/coldfire/device.c Greg Ungerer      2011-12-24  139  	.id			= 0,
-b7ce7f0d0efc1a arch/m68k/platform/coldfire/device.c Greg Ungerer      2011-12-24  140  	.num_resources		= ARRAY_SIZE(mcf_fec0_resources),
-b7ce7f0d0efc1a arch/m68k/platform/coldfire/device.c Greg Ungerer      2011-12-24 @141  	.resource		= mcf_fec0_resources,
-f61e64310b7573 arch/m68k/coldfire/device.c          Greg Ungerer      2018-03-28  142  	.dev = {
-f61e64310b7573 arch/m68k/coldfire/device.c          Greg Ungerer      2018-03-28  143  		.dma_mask		= &mcf_fec0.dev.coherent_dma_mask,
-f61e64310b7573 arch/m68k/coldfire/device.c          Greg Ungerer      2018-03-28  144  		.coherent_dma_mask	= DMA_BIT_MASK(32),
-f61e64310b7573 arch/m68k/coldfire/device.c          Greg Ungerer      2018-03-28  145  		.platform_data		= FEC_PDATA,
-f61e64310b7573 arch/m68k/coldfire/device.c          Greg Ungerer      2018-03-28  146  	}
-b7ce7f0d0efc1a arch/m68k/platform/coldfire/device.c Greg Ungerer      2011-12-24  147  };
-63a24cf8cc330e arch/m68k/coldfire/device.c          Antonio Quartulli 2024-10-29  148  #endif /* MCFFEC_BASE0 */
-b7ce7f0d0efc1a arch/m68k/platform/coldfire/device.c Greg Ungerer      2011-12-24  149  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Jason
