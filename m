@@ -1,321 +1,171 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010005.outbound.protection.outlook.com [52.101.193.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9F92F5A12
-	for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2025 09:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763975592; cv=none; b=uoe/NVraU47LplS1elSQJJzlnu6OvwwBvsXdRqO1VYK9bai/nGpp73CwNU3RwV1sSnLvCtRerUOOdEDcSFPp9+Vx3S0xN8SXErvjiYlyYJUVqNp33/FpS2nOP/bFz1ykAG0Rv70QRxNuR0sAq3sj/MD50QVW4DL5iQypjUBG668=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763975592; c=relaxed/simple;
-	bh=mMnVLuCXftagdG0NTHkbuuBvgharmyAiq+/MBIApwPE=;
-	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
-	 Date:Message-ID; b=g+5aEmxdQAGDD3lcm7Qx6IVWvSBMXuu/xmZoBotTdP3Yqe1jJLx5NAlFFMfDwhObLmZZDq2+eC5MqKJhZToS3MknVu8kUS4K/CyG9gMb1FvJc0h11lFK0GFBylUyX8JUaljpGLKsBctj21ToKeBKJoAxwPRG7/i+6FNOk/pfQM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TnJSi7ti; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAD82F5492;
+	Mon, 24 Nov 2025 09:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.5
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763977682; cv=fail; b=RgIVhuFBZIAv2vdzQauwtAvIKCMoAzOXcypregSNd69K0GK72ON//rJuUeAPGoiQvTFApoDAdneYQYYZNz0ZbQspJimgmcRAdCKy7PBfVXG8dq7BVfJQDiCpChfqpyqAu1kR0Hfyi3s7khm7j0PaNwaAEiSS2uSkrZdAXp/1EwU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763977682; c=relaxed/simple;
+	bh=UWmlhM95VfqVW8W+kyrHhdRbcaj7zB8BhKxwp3ZOfk8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=j45jaQoDl2GbTxtpfgPYD+05+/zdOW280p10c/2UQ29uq2WpcE5eAECqXrd3ag5CWsSLieMj/IT3ZYdw36b8BPUietfoKkg4bxWWFu4GfbrNrU5V0WQaQZfOKgD+NbcSkJd+KbiqY88YKBaUgQpfxB99zdWtVeVRsNzZRgt+M2Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ny+lHRqu; arc=fail smtp.client-ip=52.101.193.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TnJSi7ti"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763975589;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Grgderz4QxceWjw2z3CGqb7mO57qe11aGdbiTyRAyNQ=;
-	b=TnJSi7tiAAeJCmtcFXqDEp36REA8nPLpjwzUbzD9B7A6HtTYJ+S2ZHJNEdMbiIEt/9omHt
-	Jkuq3pibrIg8AI5LUj+XKY/Q39rfhM3I4WoWIE3ECO+RS3m2RkqOML4EgoORjRpem2you+
-	mR/+2esMS0XM98IP9Cavm1OxhB4dYek=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-460-aRXj-SCIMEeL_QC0KHZA-A-1; Mon,
- 24 Nov 2025 04:13:05 -0500
-X-MC-Unique: aRXj-SCIMEeL_QC0KHZA-A-1
-X-Mimecast-MFC-AGG-ID: aRXj-SCIMEeL_QC0KHZA-A_1763975583
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 21403180048E;
-	Mon, 24 Nov 2025 09:13:03 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EF4A41800576;
-	Mon, 24 Nov 2025 09:12:58 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20251120104439.2620205-6-dhowells@redhat.com>
-References: <20251120104439.2620205-6-dhowells@redhat.com> <20251120104439.2620205-1-dhowells@redhat.com>
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-    Eric Biggers <ebiggers@kernel.org>,
-    Luis Chamberlain <mcgrof@kernel.org>,
-    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
-    Sami Tolvanen <samitolvanen@google.com>,
-    "Jason A . Donenfeld" <Jason@zx2c4.com>,
-    Ard Biesheuvel <ardb@kernel.org>,
-    Stephan Mueller <smueller@chronox.de>,
-    Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>, linux-crypto@vger.kernel.org,
-    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 5/8] crypto: Add ML-DSA crypto_sig support
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ny+lHRqu"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PRlZ+XlR/5Ft45OAw8SIAj+cGHV1z3DdxTx9Vz1cPbvvXNSzRBbifOkQI47calV7Q9iWVxvOh2Coz7KbivRylbP8hgLLmhYrIDQQDfb24ir89WKGWZf8a2c9C/ycQ1TWCWF+TaWpixINh29Ngj3AraV4Aye5dZfuYDx8QxFHqjPIoXs5zAHQMxAEdW4oriVpyct6IB245TQMxmTaQuXS0fYCN6sf0NnKqt66GELyyxRB666nwHDlldtH7/v8jeYJYFo5SVCyN3TgXYIkDoSz1jV5Z8k3dWyXRSpmJlZL/NXmyuEyQ1S9OOTOQWzP2NRIg/Flyo0WCxA86xAjEg0WAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yLCu50CB/fDUp/vXBu32UYfbIbC/0TKnA8TugFqQGPU=;
+ b=gD87yJ2tEDCWiyCP64+/HofW43tt5IBE/B0oDFd926qPZo5BJlU1JSurSOTePhiOf1rZTBs8EiIM2BcOTVTIN5KXsHOjNLOcgUD+rmltKDn9lreQlOFK5l7/PnpFVmqNhLroQh5P9DhdBSKdBIxva6Y8tjvUK/iKr8LjnKQmKibhacyjBMSM4elgCvoATZ+IUsd+MF19Wqg46T/9+Mcb6/teRzf4XV5YTPOqYiIxV7SmbLv7FTALEBYdfx51NEUl3aIHNo9tqJ6tbsOLLtezXVGLWqsmqJKxIhVaXgIUFsXfGmrIjW8nsw5PXmUr9m4h3cYmGSp1GcGOOJ8t5hrlUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.195) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yLCu50CB/fDUp/vXBu32UYfbIbC/0TKnA8TugFqQGPU=;
+ b=ny+lHRqubnyaQCftF+exnq1SQY5oHYiFFvwsh0GKao9bbgUd7rjG4ZFTH6sG6a7s6klwm2K4OX9fK3DrDPNFC8OdJZbyi9+LmiLzyqpMVR5WLNU3wSNSv+GvrFWwvir7xulhKpKbH5CeogOriqV56fi4qAqza3Z3EdXy44HJLI8=
+Received: from SA1P222CA0174.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:3c3::23)
+ by PH5PR10MB997733.namprd10.prod.outlook.com (2603:10b6:510:34c::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.17; Mon, 24 Nov
+ 2025 09:47:58 +0000
+Received: from SA2PEPF00003F67.namprd04.prod.outlook.com
+ (2603:10b6:806:3c3:cafe::5) by SA1P222CA0174.outlook.office365.com
+ (2603:10b6:806:3c3::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.17 via Frontend Transport; Mon,
+ 24 Nov 2025 09:47:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
+Received: from lewvzet201.ext.ti.com (198.47.23.195) by
+ SA2PEPF00003F67.mail.protection.outlook.com (10.167.248.42) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9366.7 via Frontend Transport; Mon, 24 Nov 2025 09:47:58 +0000
+Received: from DLEE209.ent.ti.com (157.170.170.98) by lewvzet201.ext.ti.com
+ (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 24 Nov
+ 2025 03:47:57 -0600
+Received: from DLEE214.ent.ti.com (157.170.170.117) by DLEE209.ent.ti.com
+ (157.170.170.98) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 24 Nov
+ 2025 03:47:57 -0600
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE214.ent.ti.com
+ (157.170.170.117) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Mon, 24 Nov 2025 03:47:57 -0600
+Received: from [10.24.69.191] (pratham-workstation-pc.dhcp.ti.com [10.24.69.191])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 5AO9lsGv1745718;
+	Mon, 24 Nov 2025 03:47:55 -0600
+Message-ID: <890ea55e-c6b7-43ff-b9ca-423bb7fe4979@ti.com>
+Date: Mon, 24 Nov 2025 15:17:54 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3374840.1763975577.1@warthog.procyon.org.uk>
-Date: Mon, 24 Nov 2025 09:12:57 +0000
-Message-ID: <3374841.1763975577@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: ahash - Fix crypto_ahash_import with partial
+ block data
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "David S. Miller" <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Manorit Chawdhry <m-chawdhry@ti.com>, "Shiva
+ Tripathi" <s-tripathi1@ti.com>
+References: <20251113140634.1559529-1-t-pratham@ti.com>
+ <20251113140634.1559529-2-t-pratham@ti.com>
+ <aR_6Q4yjEzsQvm4c@gondor.apana.org.au>
+Content-Language: en-US
+From: T Pratham <t-pratham@ti.com>
+In-Reply-To: <aR_6Q4yjEzsQvm4c@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF00003F67:EE_|PH5PR10MB997733:EE_
+X-MS-Office365-Filtering-Correlation-Id: d49b8e68-2a98-4437-eb6e-08de2b3e8caa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?QUFxVThUMXBwTXFIeVA4ODEzYm5IcjcwVEE4bUxJQU90bGFpdEF3eS9ZOXhZ?=
+ =?utf-8?B?QXlwa2ZYNHpmaUkwc1ZVQXdsZDdJQnJ1a0MxTFlOUlpQbW9PRU5rN0hUZ0E4?=
+ =?utf-8?B?NFlSN1cxNmJhaGoxZCtDWjIrOWVnak5oWHhWd2YwakVTNXM5cFFYQldRK01i?=
+ =?utf-8?B?RHE1Y2sxblNrQVV0eEhVTklQcmRKd1dVMmR0dkpOY1p3V3BVd0NRRHl1QUov?=
+ =?utf-8?B?S280eDNPeldrRnIwUm1JYXFjbjFqcTc0M2IzY3Vub3VtNXRjK09DRnNxVlZu?=
+ =?utf-8?B?SDZZb0dYT2I3c0x6MkVTakFpcWRyTWhJV0pBNHh5K29hcmhiK0lNaFpxMmlK?=
+ =?utf-8?B?dEdGa2xuU1lqT1BlbGEvR2s0bjZ5L2gweFk2OS9UTlAxSWd4c3lJZURuYXhI?=
+ =?utf-8?B?b2ZsUUhEbWZMMDdFMXhNV0xucFM1TlNVU2xXenBnVkdoVU9uMEFmWStNQkZT?=
+ =?utf-8?B?dzBtWnhEd0Iyc29QU0tmRStXb0tobXpMUEJBdVpYdFgvQzM2ekgzSW5ZbFBL?=
+ =?utf-8?B?QjJtVFBSdDN4eGF0WjlhVFBOcWlPSkpmMENOK3E2NUJPVHBQUDJ0cVRMbXF6?=
+ =?utf-8?B?MkdYMFNDQ3M2MjNNTVJzemd6clN2UlpaY2crNDlueTZnM3NKdWlzYnhaT0ts?=
+ =?utf-8?B?dDBJMm80dzRCR0ZtWGJCZDFsc3JlSXlORzFkK1ZNWGtpcFhJNnRrdFpUMmVn?=
+ =?utf-8?B?M0Mvd0doOVNXL1pmR1JlR3JHdUl6RTlobCtsWVY0T3hzd2xzSHJhMVBNazho?=
+ =?utf-8?B?TTcrMGoweDdHcDB5KzM2YjNXZStDRmhCazRqRWJtTGFPcXdlS0ZwcUdiK3hB?=
+ =?utf-8?B?R0UvKzdieDFzVnNrNUt5eHExU25QUVRMOHdBUkRYTjRXTG4wT29SUEZObER6?=
+ =?utf-8?B?RzNrSEduRWgxOFp0TGplTXAyOTVPaUlia2xadTVkRnIvb1YxZmdsbzVCRWxY?=
+ =?utf-8?B?Zm5HMXd0R2doRzQwR1dPalZob3g3aytXMVhCZmtKVm15M3ErV3hKVy9MZWNQ?=
+ =?utf-8?B?NXV6S0NoOGpiR2F1dkxHcFZ4U0lQZC9zVDZOUHRyYTU4SmFacVhaRmZWR2dQ?=
+ =?utf-8?B?aHcyUzFqR282c1lyeTZJR1RvTFZjU3IvNUNTcWRmYVg4alJkdSsxTThMRVds?=
+ =?utf-8?B?WDdKM3lTRitFb21wakVXZmFEVEE0d0tKMzlxcWhFZjdGOVVmZGFQMEY0NEV1?=
+ =?utf-8?B?L3ZYb3lMVnlscnFyaHNtVGpSRkt0SFl0K3M0cDZEY0Y4NUJJWWFrVUhIQTJK?=
+ =?utf-8?B?UHliUmZUWGRjdHRuQ3IvVldXaWJCeGxxQ2QzT2paeWNXZi9CZE5Qc2NMQjVT?=
+ =?utf-8?B?WmtvbE1SU0FNR3p5M00zVlJIRzMwSUV3RWNld1Q3WWdyc0QxSk41cjRybEx0?=
+ =?utf-8?B?aXZDWDY4MUJkc1JGZGpBc1pseU1nNXZvTjhKVndBNXR5WG54eEM5Tkk0RGpt?=
+ =?utf-8?B?Z01RS29kSzAzWUh2SjEvb0lIbDFQai96SmJCR1pmZnVrYjMwR0NDZ0RiMGdP?=
+ =?utf-8?B?Wno3MWxXUXh3SUpPMkNxbS9qS1Z1MHJHcENRMEhUWFNaODBNaDVJQStDbVBp?=
+ =?utf-8?B?ZTNvVXVjSE9JM1paME5aSldHdm0zWUpyZkdFWVp0Q1VCeGZIclBqcmhwQXhD?=
+ =?utf-8?B?cmlCTWM4RTVYODVVZmJuVTRCWG5ITHJFQXBlbUxRaExZTFZjbWZqRWJ3T2Fw?=
+ =?utf-8?B?MERCNk1xNTBBM1Q2eUdMSzB0dGJHQklILzhTQUo4bnZnZU1yZGdEMXkrRkxh?=
+ =?utf-8?B?ekU4b3ZHVGs1amIvTkZGKzZPcU5hMXhpeFJlV21NbmNGRkhvdU5PcWFyNU5H?=
+ =?utf-8?B?ekRiQk1CVlpWbDN5TXFDbGY1eCtEcHNkOUhDUUxwbVlSVHNiaUNzQ0M0QW5F?=
+ =?utf-8?B?bUJTTGZSeUJJSzZiWkExWHFRKzlCeGtQOVFESG8rcTNselJwWWc0QjNIUkVx?=
+ =?utf-8?B?cXVGdGNqZE5HZlY3SDlqU1gyczUzdlZnLzNLRS9wTWlTUXdPR1h2SDVpU2VT?=
+ =?utf-8?B?L2FmWWNLSWZkeXd6Sy94anMrSHhBbG90THdOdW5OTmFYVEVlaHh6TjJWc2cx?=
+ =?utf-8?B?c0w2ZlQwZW8xVWVlRGVzTVR3Zis5YThpVUExeHNXdUNpTFk1ejBiazZkUGps?=
+ =?utf-8?Q?9wBM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2025 09:47:58.0417
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d49b8e68-2a98-4437-eb6e-08de2b3e8caa
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00003F67.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH5PR10MB997733
 
-Meh.  I forgot to git add crypto/mldsa.c.
+On 21/11/25 11:06, Herbert Xu wrote:
+> On Thu, Nov 13, 2025 at 07:30:12PM +0530, T Pratham wrote:
+>>
+> Restore the partial block buffer in crypto_ahash_import by copying
+> it.  Check whether the partial block buffer exceeds the maximum
+> size and return -EOVERFLOW if it does.
+> 
+> Zero the partial block buffer in crypto_ahash_import_core.
+> 
+> Reported-by: T Pratham <t-pratham@ti.com>
+> Fixes: 9d7a0ab1c753 ("crypto: ahash - Handle partial blocks in API")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
 
-David
----
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index bf8b8a60a0c0..45e376af02dc 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -344,6 +344,16 @@ config CRYPTO_ECRDSA
- 	  One of the Russian cryptographic standard algorithms (called GOST
- 	  algorithms). Only signature verification is implemented.
- 
-+config CRYPTO_MLDSA
-+	tristate "ML-DSA (Module-Lattice-Based Digital Signature Algorithm)"
-+	select CRYPTO_SIG
-+	select CRYPTO_LIB_MLDSA
-+	select CRYPTO_LIB_SHA3
-+	help
-+	  ML-DSA (Module-Lattice-Based Digital Signature Algorithm) (FIPS-204).
-+
-+	  Only signature verification is implemented.
-+
- endmenu
- 
- menu "Block ciphers"
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 093c56a45d3f..b181f8a54099 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -60,6 +60,8 @@ ecdsa_generic-y += ecdsa-p1363.o
- ecdsa_generic-y += ecdsasignature.asn1.o
- obj-$(CONFIG_CRYPTO_ECDSA) += ecdsa_generic.o
- 
-+obj-$(CONFIG_CRYPTO_MLDSA) += mldsa.o
-+
- crypto_acompress-y := acompress.o
- crypto_acompress-y += scompress.o
- obj-$(CONFIG_CRYPTO_ACOMP2) += crypto_acompress.o
-diff --git a/crypto/mldsa.c b/crypto/mldsa.c
-new file mode 100644
-index 000000000000..2146c774b5ca
---- /dev/null
-+++ b/crypto/mldsa.c
-@@ -0,0 +1,201 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * crypto_sig wrapper around ML-DSA library.
-+ */
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <crypto/internal/sig.h>
-+#include <crypto/mldsa.h>
-+
-+struct crypto_mldsa_ctx {
-+	u8 pk[MAX(MAX(MLDSA44_PUBLIC_KEY_SIZE,
-+		      MLDSA65_PUBLIC_KEY_SIZE),
-+		  MLDSA87_PUBLIC_KEY_SIZE)];
-+	unsigned int pk_len;
-+	enum mldsa_alg strength;
-+	u8 key_set;
-+};
-+
-+static int crypto_mldsa_sign(struct crypto_sig *tfm,
-+			     const void *msg, unsigned int msg_len,
-+			     void *sig, unsigned int sig_len)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int crypto_mldsa_verify(struct crypto_sig *tfm,
-+			       const void *sig, unsigned int sig_len,
-+			       const void *msg, unsigned int msg_len)
-+{
-+	const struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	if (unlikely(!ctx->key_set))
-+		return -EINVAL;
-+
-+	return mldsa_verify(ctx->strength, sig, sig_len, msg, msg_len,
-+			    ctx->pk, ctx->pk_len);
-+}
-+
-+static unsigned int crypto_mldsa_key_size(struct crypto_sig *tfm)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	switch (ctx->strength) {
-+	case MLDSA44:
-+		return MLDSA44_PUBLIC_KEY_SIZE;
-+	case MLDSA65:
-+		return MLDSA65_PUBLIC_KEY_SIZE;
-+	case MLDSA87:
-+		return MLDSA87_PUBLIC_KEY_SIZE;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return 0;
-+	}
-+}
-+
-+static int crypto_mldsa_set_pub_key(struct crypto_sig *tfm,
-+				    const void *key, unsigned int keylen)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+	unsigned int expected_len = crypto_mldsa_key_size(tfm);
-+
-+	if (keylen != expected_len)
-+		return -EINVAL;
-+
-+	ctx->pk_len = keylen;
-+	memcpy(ctx->pk, key, keylen);
-+	ctx->key_set = true;
-+	return 0;
-+}
-+
-+static int crypto_mldsa_set_priv_key(struct crypto_sig *tfm,
-+				     const void *key, unsigned int keylen)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static unsigned int crypto_mldsa_max_size(struct crypto_sig *tfm)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	switch (ctx->strength) {
-+	case MLDSA44:
-+		return MLDSA44_SIGNATURE_SIZE;
-+	case MLDSA65:
-+		return MLDSA65_SIGNATURE_SIZE;
-+	case MLDSA87:
-+		return MLDSA87_SIGNATURE_SIZE;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return 0;
-+	}
-+}
-+
-+static int crypto_mldsa44_alg_init(struct crypto_sig *tfm)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	ctx->strength = MLDSA44;
-+	ctx->key_set = false;
-+	return 0;
-+}
-+
-+static int crypto_mldsa65_alg_init(struct crypto_sig *tfm)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	ctx->strength = MLDSA65;
-+	ctx->key_set = false;
-+	return 0;
-+}
-+
-+static int crypto_mldsa87_alg_init(struct crypto_sig *tfm)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	ctx->strength = MLDSA87;
-+	ctx->key_set = false;
-+	return 0;
-+}
-+
-+static void crypto_mldsa_alg_exit(struct crypto_sig *tfm)
-+{
-+}
-+
-+static struct sig_alg crypto_mldsa_algs[] = {
-+	{
-+		.sign			= crypto_mldsa_sign,
-+		.verify			= crypto_mldsa_verify,
-+		.set_pub_key		= crypto_mldsa_set_pub_key,
-+		.set_priv_key		= crypto_mldsa_set_priv_key,
-+		.key_size		= crypto_mldsa_key_size,
-+		.max_size		= crypto_mldsa_max_size,
-+		.init			= crypto_mldsa44_alg_init,
-+		.exit			= crypto_mldsa_alg_exit,
-+		.base.cra_name		= "mldsa44",
-+		.base.cra_driver_name	= "mldsa44-lib",
-+		.base.cra_ctxsize	= sizeof(struct crypto_mldsa_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.base.cra_priority	= 5000,
-+	}, {
-+		.sign			= crypto_mldsa_sign,
-+		.verify			= crypto_mldsa_verify,
-+		.set_pub_key		= crypto_mldsa_set_pub_key,
-+		.set_priv_key		= crypto_mldsa_set_priv_key,
-+		.key_size		= crypto_mldsa_key_size,
-+		.max_size		= crypto_mldsa_max_size,
-+		.init			= crypto_mldsa65_alg_init,
-+		.exit			= crypto_mldsa_alg_exit,
-+		.base.cra_name		= "mldsa65",
-+		.base.cra_driver_name	= "mldsa65-lib",
-+		.base.cra_ctxsize	= sizeof(struct crypto_mldsa_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.base.cra_priority	= 5000,
-+	}, {
-+		.sign			= crypto_mldsa_sign,
-+		.verify			= crypto_mldsa_verify,
-+		.set_pub_key		= crypto_mldsa_set_pub_key,
-+		.set_priv_key		= crypto_mldsa_set_priv_key,
-+		.key_size		= crypto_mldsa_key_size,
-+		.max_size		= crypto_mldsa_max_size,
-+		.init			= crypto_mldsa87_alg_init,
-+		.exit			= crypto_mldsa_alg_exit,
-+		.base.cra_name		= "mldsa87",
-+		.base.cra_driver_name	= "mldsa87-lib",
-+		.base.cra_ctxsize	= sizeof(struct crypto_mldsa_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.base.cra_priority	= 5000,
-+	},
-+};
-+
-+static int __init mldsa_init(void)
-+{
-+	int ret, i;
-+
-+	for (i = 0; i < ARRAY_SIZE(crypto_mldsa_algs); i++) {
-+		ret = crypto_register_sig(&crypto_mldsa_algs[i]);
-+		if (ret < 0)
-+			goto error;
-+	}
-+	return 0;
-+
-+error:
-+	pr_err("Failed to register (%d)\n", ret);
-+	for (i--; i >= 0; i--)
-+		crypto_unregister_sig(&crypto_mldsa_algs[i]);
-+	return ret;
-+}
-+module_init(mldsa_init);
-+
-+static void mldsa_exit(void)
-+{
-+	for (int i = 0; i < ARRAY_SIZE(crypto_mldsa_algs); i++)
-+		crypto_unregister_sig(&crypto_mldsa_algs[i]);
-+}
-+module_exit(mldsa_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Crypto API support for ML-DSA signature verification");
-+MODULE_ALIAS_CRYPTO("mldsa44");
-+MODULE_ALIAS_CRYPTO("mldsa65");
-+MODULE_ALIAS_CRYPTO("mldsa87");
+This fixes the issue.
 
+Tested-by: T Pratham <t-pratham@ti.com>
+-- 
+Regards
+T Pratham <t-pratham@ti.com>
