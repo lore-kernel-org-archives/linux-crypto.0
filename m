@@ -1,93 +1,100 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3461032D0C0
-	for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2025 19:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9C332E122
+	for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2025 20:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764014067; cv=none; b=sS4Z+p9/OMjCz7TXES0EAiqXglKnK/Wc6NCpMICyAKoLZJpvLxIjPxm4dUDiSpQApAUTaAJyamaU4QHklTMSHgAYvB6XeBWDMRb6o1q+lFrjUtT+J8qlLHsNUgzQFIEyY8hfLXMcmavnhZj8TG5SkzPMbX4jdXIkcrSy41gahME=
+	t=1764015046; cv=none; b=Ezr6LwebB33W+sSqXtIleNcLbSY8Z9yIIv4dXNf8wgKzogisOqxzx5qEKk05mnjKCUTxG8DF+4QqKncodfELD1AXlvtj6XDCAS4AlIYQFzU9RHlx+9SddXK8jfzhZlIsTUKSwywlKL/PcjhTl57+lZeqm8YEUqt+KVy0R90YbTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764014067; c=relaxed/simple;
-	bh=Zm+q+l9qQx8Bba+OEMBC0euPoac6H638UyyPFc8BJZU=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=clZcdHzkOYtbO01Fq2BIsDFQHw/OX1mkX9m/l652/ORSoF+WLDJYGrtvINQQzxLoSGhN2Gnk9+wURe0dV2FRX6oGPJFBGtiPp2bbG8UUrV0SlZzaBfeQ9HVD74wg7SWXPy2NpROYt4gR/WlljoBY+Sc41WE/3W1pK0K/xpNT3mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SzyFR3oU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764015046; c=relaxed/simple;
+	bh=a+y4wukAA+1jMdGIq1khyra17EN9eXlmuIHqBxNOFXI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c7f6ouQlYRhZtA/PhsoM5Q5rLx6pzrHiU/bKOJHJJ4T+KeuM4WYurMQgvLmaBRJ2KzuKEB5gXdmwByK5a0puy/F8YQlIJ0oscv5uZ93+3b+9uDxjmkU+JhwtEbwwsUcj/g5jJ7CSgolABFLufFVTRuyqVJezNB8XV/YsndR/fnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=VMhEq6gV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SzyFR3oU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764014065;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="VMhEq6gV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01BD8C4CEFB
+	for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2025 20:10:45 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="VMhEq6gV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1764015042;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QkcIAl5r3oTz2YJkwOodI54A9txsGksKR1/Qewobb2Y=;
-	b=SzyFR3oUz/o3w+eoCOPrKc5l4TZ8DkKI8psMMlHEiEfSiyfpHdIhAebllwvBLZU1Nbu/ar
-	XC5EOt6e44yNn3V3vMbNXGaRl1v0JLi0QnPCf9vYDn7Il6EN0wn0EE8HABF5Ax8RqJf81A
-	OLBcBqFyD586FLn+Yky/nKV39dZbQKI=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-517-yADlOeZVMRSrgKh98eLfEw-1; Mon,
- 24 Nov 2025 14:54:22 -0500
-X-MC-Unique: yADlOeZVMRSrgKh98eLfEw-1
-X-Mimecast-MFC-AGG-ID: yADlOeZVMRSrgKh98eLfEw_1764014059
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1B34C18001D1;
-	Mon, 24 Nov 2025 19:54:19 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2C433195608E;
-	Mon, 24 Nov 2025 19:54:14 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHmME9pPWGKAdm83wKhc3iHCjgZ8gOtZnt=+6x5V6D1prMb2Gw@mail.gmail.com>
-References: <CAHmME9pPWGKAdm83wKhc3iHCjgZ8gOtZnt=+6x5V6D1prMb2Gw@mail.gmail.com> <20251120104439.2620205-6-dhowells@redhat.com> <20251120104439.2620205-1-dhowells@redhat.com> <3374841.1763975577@warthog.procyon.org.uk> <20251124164914.GA6186@sol> <3647621.1764005088@warthog.procyon.org.uk>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: dhowells@redhat.com, Eric Biggers <ebiggers@kernel.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Luis Chamberlain <mcgrof@kernel.org>,
-    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
-    Sami Tolvanen <samitolvanen@google.com>,
-    Ard Biesheuvel <ardb@kernel.org>,
-    Stephan Mueller <smueller@chronox.de>,
-    Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>, linux-crypto@vger.kernel.org,
-    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 5/8] crypto: Add ML-DSA crypto_sig support
+	bh=mTFGv5+irE+D76L/fX9guw9f5TEqeJ3z4SWDcVvUWIo=;
+	b=VMhEq6gVvDHlOeV0+1elngxiRSoRcfxWZ9Q++vtgmZTS4lEzULiheSU8ZDQR8yoULZNgmt
+	lehXD2uwWg7jHOekuWw5y1VI0Kf7F99x6K+6jkXb9zzewM5mlfj7EK1Z+khcZ2RaqS7FLC
+	hzVAibucSQVnSQKavvePRopgdo6Ciik=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e495c259 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
+	for <linux-crypto@vger.kernel.org>;
+	Mon, 24 Nov 2025 20:10:42 +0000 (UTC)
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7c75387bb27so1459276a34.1
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2025 12:10:40 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV/9cAG81Kwn6FBAf5atku6WtSNRTRarXKKt2am+V6+062ptl94c/7WRU7CTTVu6yw19btlJpxE5F5hL84=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywgczyoz6NmqFgR1JSTWUtiHpNEJTvghNVb5hgF9PW0ZpMYVltJ
+	Z+WZXMbfDUSnvymtoIKdla+r0r3YUqMC60uTxVcM8dn7ki7UuzXk7lcVvBSWu/LA20ziSBq35z/
+	6GxGm+kRvqDL6MvwnJsMvLc2VZi/0zCc=
+X-Google-Smtp-Source: AGHT+IEKUKzlPrtUzrUXVtGHzNIE1eu5x2hc3dhawKZInfj/tSJu3inQxzCC7kN8uLjnLqASm46j8mBNelKJmtIB0zo=
+X-Received: by 2002:a05:6830:2707:b0:7c7:63b6:89d3 with SMTP id
+ 46e09a7af769-7c798c4e5cdmr6068249a34.19.1764015040160; Mon, 24 Nov 2025
+ 12:10:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3649784.1764014053.1@warthog.procyon.org.uk>
-Date: Mon, 24 Nov 2025 19:54:13 +0000
-Message-ID: <3649785.1764014053@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+References: <20251120104439.2620205-6-dhowells@redhat.com> <20251120104439.2620205-1-dhowells@redhat.com>
+ <3374841.1763975577@warthog.procyon.org.uk> <20251124164914.GA6186@sol>
+ <3647621.1764005088@warthog.procyon.org.uk> <CAHmME9pPWGKAdm83wKhc3iHCjgZ8gOtZnt=+6x5V6D1prMb2Gw@mail.gmail.com>
+ <3649785.1764014053@warthog.procyon.org.uk>
+In-Reply-To: <3649785.1764014053@warthog.procyon.org.uk>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Mon, 24 Nov 2025 21:10:33 +0100
+X-Gmail-Original-Message-ID: <CAHmME9oK-e2BOXspf89McOFOiq8wp2-QgHsumK6r9kL5FyeMig@mail.gmail.com>
+X-Gm-Features: AWmQ_blCIU2n1jvry0DcRMfnDRkDga25_Z6D-iElikYXrDuFyUM1Dxycud3IZeQ
+Message-ID: <CAHmME9oK-e2BOXspf89McOFOiq8wp2-QgHsumK6r9kL5FyeMig@mail.gmail.com>
+Subject: Re: [PATCH v10 5/8] crypto: Add ML-DSA crypto_sig support
+To: David Howells <dhowells@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, Stephan Mueller <smueller@chronox.de>, Lukas Wunner <lukas@wunner.de>, 
+	Ignat Korchagin <ignat@cloudflare.com>, linux-crypto@vger.kernel.org, 
+	keyrings@vger.kernel.org, linux-modules@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-
-> > > Still not really sure what the point is.  There's only one user of
-> > > crypto_sig, and it could just call the ML-DSA functions directly.
+On Mon, Nov 24, 2025 at 8:54=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
+> > > > Still not really sure what the point is.  There's only one user of
+> > > > crypto_sig, and it could just call the ML-DSA functions directly.
+> > >
+> > > Is it your aim to kill off the crypto/ dir and all the (old) crypto A=
+PI?
 > >
-> > Is it your aim to kill off the crypto/ dir and all the (old) crypto API?
-> 
-> Probably entirely killing off the old API is going to be fraught
-> because its abstraction has leaked out to userspace. But to the extent
-> we can minimize its use over time, I think that's a good thing. Even
-> for crypto usages that generalize to a few different ciphers of one
-> variety or another, I think being explicit about which ciphers and
-> having purpose-built dispatchers is usually a better route.
+> > Probably entirely killing off the old API is going to be fraught
+> > because its abstraction has leaked out to userspace. But to the extent
+> > we can minimize its use over time, I think that's a good thing. Even
+> > for crypto usages that generalize to a few different ciphers of one
+> > variety or another, I think being explicit about which ciphers and
+> > having purpose-built dispatchers is usually a better route.
+>
+> How are you proposing handling the autoloading feature of the old API?
 
-How are you proposing handling the autoloading feature of the old API?
+I don't know. Not all features will have direct replacements. Not all
+usages will be replaced. Not all use cases benefit from being
+replaced. You asked if it was an "aim." I replied by telling you that
+I think killing it is going to be difficult, but that over time, usage
+will decline. I think that'll be a natural thing. For now, when
+something uses the library API, there's a pretty easy and obvious case
+to be made for it, as there are still such obvious low hanging use
+cases. I suppose in a while, we might run out of those perhaps. But
+that hasn't happened yet, I guess.
 
-David
-
+Jason
