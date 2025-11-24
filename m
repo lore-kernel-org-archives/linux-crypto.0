@@ -1,38 +1,39 @@
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A30B2E8E10;
-	Mon, 24 Nov 2025 13:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE781E4AF;
+	Mon, 24 Nov 2025 13:04:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763989457; cv=none; b=i6IqMy0BTtx+SBNX2Jwt5mgdekBSkCv1SuTlH/psWolw4+RvBt5gh09HNfVehaelKfMns9NEyrp1gMvj+u/cPAt5UPQZf8ooUumZ9o9+agH3fBWn5GLoBy/lyUctAEwDhf2dArD97MD4etOPIumTE1cb6MTqH4n8s6HtpDzSfgk=
+	t=1763989459; cv=none; b=NNDnzC9vi7odx1zB8rdh+jdAWPGRipLqldcM4unZvYc6suHQXNLMsVGhpNEKyzyyn/MDXU+sAlqACsLeHiTI7MT2cvmaYQBwnyUNH5QcqU+8QOTMvb2J01uZEw5FOXDHj9ZXW9JgzkWk5YAq5y7fuVKuxkbAa0TtemRbOWOxsxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763989457; c=relaxed/simple;
-	bh=0UAP833jY/lb8txc7zCx1KB4AkZTvgzHkZy42y98Tew=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lZlOLW8yHawdsaSkN7IUs6bTocU/GJ1TXr7ySUdA0K8d461gEEkFDYPID4qU0WXqGf+rE5F5nof7b226VLcm6gGfawec2lQsi4kbgmjvOcHIsEhFG9Gi/MuEDnI0OT25BnrOe7IMAclXqxCYQ8iAeHBod/IgPjVU0Iw1muIrS54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org; spf=pass smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=Zt4h9Xnc; arc=none smtp.client-ip=217.70.183.199
+	s=arc-20240116; t=1763989459; c=relaxed/simple;
+	bh=JckmVSzukyidG2dui/LSzqe71K/hORksPnHdkUfcy0s=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=V4uwEZY0Gj71zjZqQjz71RA3r6tYmXqItOI2bnnT/D0cwsh6CsWD8DnW5YQcpWCzM2zbjyTG6z+s7svTSHR5RdJvCk0cM/fy9kJ5aIMZ2OCVoMCF4N2YB3W4OHW8Ma4la1bEUhsjLF4QJ02rQHiJeN7iqRXc5iGU9VGeK0G0JfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org; spf=pass smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=HjKSXCJ+; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yoseli.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="Zt4h9Xnc"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3CCD644287;
-	Mon, 24 Nov 2025 13:04:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="HjKSXCJ+"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D9D63443F5;
+	Mon, 24 Nov 2025 13:04:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
-	t=1763989453;
+	t=1763989455;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Iz84JXpr1Wzt9qHfLXBjH0UwcZH1zgAuKf5TwypISLI=;
-	b=Zt4h9Xnc+VgkZ+ClQYTR6tf/8V365T0zZK/TVtsBVREhskVhXLeb0YvbgwGMnDNIN8eBZe
-	BoJRnoA76OHe92Pcw3tDIb5VVY6nOn8qCGWRLVqaTD9cpzEQWri1H52H7tTqvgTM5sqwwl
-	ji+nvZrUT9Z7QFL2vcLl1Q4Zq5oW3f9md+wm+RpJuYvhtjxkXhHy6LFrXmGrrCnYsQ4BCp
-	OiQ4p35od93O0+9a4d8vL4xSgYhnwaEiZOYMGgg6muUNa7TtaUTLxo0lSuyepjQZ4oRTam
-	SRBLcFXb+TCen7HjJ5xkAroshnwFlEXrsur1UNEpRE3E8hSkEPitE6M6iPK0AQ==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8jK/BJit61+AKutAJR0P94X+7KV8Ubt7aBKM7Qa21V0=;
+	b=HjKSXCJ+38Iqegz8ch4Vpn4xWfuf/j1Lb/GsEccKlsnHRrVAviKvgwEkZ6wC/Hf5OLe6IF
+	ZwfSpGNfcKl07b9dSxknfgsmGohxUlTWckd98JGhrHVTuo4iOUeupHTqz2cbAaY8WDbtKy
+	pjgRFw5z7vheRp0ATNicb1Mz8/sjnHz08d/w+p7UHq0u4dhR9+sSVjLzs26ByILIdOCvSm
+	HK+yb9hL9cohHyd81msZnEPPAYG8OU/F7jrLxTxrasJhiHe1bBwMRVb02N+78nFpUazGym
+	qm5rHBmX04c3nM7SMZtyGxkQE4u/LBAKYdf6pBzPjGq1dHLrXZ9j5tfpSz5oeg==
 From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-Subject: [PATCH v3 0/3] m68k: coldfire: Add RNG support and const
- qualifiers for MCF54418
-Date: Mon, 24 Nov 2025 14:04:05 +0100
-Message-Id: <20251124-b4-m5441x-add-rng-support-v3-0-f447251dad27@yoseli.org>
+Date: Mon, 24 Nov 2025 14:04:06 +0100
+Subject: [PATCH v3 1/3] m68k: coldfire: Mark platform device resource
+ arrays as const
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,11 +42,9 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAMVXJGkC/42NQQ6CMBBFr0Jm7Zi2FAVX3sOwaG2BSZQ2UyQQw
- t2tnMDle8l/f4PkmXyCW7EB+5kShTFDeSrgOZix90guMyihKinFFa3Gd6W1XNA4hzz2mD4xBp5
- QdM7WTgslhYG8j+w7Wo72o808UJoCr8fVrH72n+qsUGDXSHepq7pUtrmvIfkXnQP30O77/gW44
- mqfwwAAAA==
-X-Change-ID: 20251107-b4-m5441x-add-rng-support-0fdb8d40210a
+Message-Id: <20251124-b4-m5441x-add-rng-support-v3-1-f447251dad27@yoseli.org>
+References: <20251124-b4-m5441x-add-rng-support-v3-0-f447251dad27@yoseli.org>
+In-Reply-To: <20251124-b4-m5441x-add-rng-support-v3-0-f447251dad27@yoseli.org>
 To: Greg Ungerer <gerg@linux-m68k.org>, 
  Geert Uytterhoeven <geert@linux-m68k.org>, 
  Olivia Mackall <olivia@selenic.com>, 
@@ -59,68 +58,142 @@ Cc: linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org,
  Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>, 
  Frank Li <Frank.Li@nxp.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1763989450; l=2074;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1763989450; l=4439;
  i=jeanmichel.hautbois@yoseli.org; s=20240925; h=from:subject:message-id;
- bh=0UAP833jY/lb8txc7zCx1KB4AkZTvgzHkZy42y98Tew=;
- b=IOWyT2SHmlZDdAReG6ykhqIOoK01euZHGQiy2C+rgvsv+tKNJH6if5FdUVJ+ZQ/8I0educP0Z
- 8XDIw3GfNVzBvtAUKienQlIP7lEmgPrEZdRBNx8mGNJ7S3xfEngGXJU
+ bh=JckmVSzukyidG2dui/LSzqe71K/hORksPnHdkUfcy0s=;
+ b=L317WBNEiAsbe5JW5H6UDvOUD3cH2afXNSQ++LQh9y94DWqHfnbsyD2hV4Y8prnOqCOuH0WTr
+ dGO/wmJU+NaCG7uZB1liLyFqPgWKbrnepJnaZOwmQhUfIjUjp6IG1S8
 X-Developer-Key: i=jeanmichel.hautbois@yoseli.org; a=ed25519;
  pk=MsMTVmoV69wLIlSkHlFoACIMVNQFyvJzvsJSQsn/kq4=
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvfeekieejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhufffkfggtgfgvfevofesthejredtredtjeenucfhrhhomheplfgvrghnqdfoihgthhgvlhcujfgruhhtsghoihhsuceojhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgqeenucggtffrrghtthgvrhhnpeekkeevfeelffehgedvuefhieektdellefhffeuueffkefhueetudetkeevffegudenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemvgdtrgemudeileemjedugedtmeekkegsfeemheduheefmegtvdeigeemgehfsgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgdtrgemudeileemjedugedtmeekkegsfeemheduheefmegtvdeigeemgehfsgdphhgvlhhopeihohhsvghlihdqhihotghtohdrhihoshgvlhhirdhorhhgpdhmrghilhhfrhhomhepjhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgpdhnsggprhgtphhtthhopeduhedprhgtphhtthhopehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmq
- dhkvghrnhgvlheslhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehgvggvrhhtsehlihhnuhigqdhmieekkhdrohhrghdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepfhgvshhtvghvrghmsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhrgifnhhguhhosehkvghrnhgvlhdrohhrghdprhgtphhtthhopehsrdhhrghuvghrsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopehimhigsehlihhsthhsrdhlihhnuhigrdguvghv
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvfeekieejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthejredtredtjeenucfhrhhomheplfgvrghnqdfoihgthhgvlhcujfgruhhtsghoihhsuceojhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgqeenucggtffrrghtthgvrhhnpeffjefhtdelhffhheevheeutefghfefteeluedvudfhgeegteeitddtuefhhfelteenucfkphepvdgrtddumegvtdgrmeduieelmeejudegtdemkeeksgefmeehudehfeemtgdvieegmeegfhgsnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvtdgrmeduieelmeejudegtdemkeeksgefmeehudehfeemtgdvieegmeegfhgspdhhvghlohephihoshgvlhhiqdihohgtthhordihohhsvghlihdrohhrghdpmhgrihhlfhhrohhmpehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrghdpnhgspghrtghpthhtohepudehpdhrtghpthhtohepjhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhnvghlsehlihhsthhsrdhinhhfr
+ hgruggvrggurdhorhhgpdhrtghpthhtohepghgvvghrtheslhhinhhugidqmheikehkrdhorhhgpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehfvghsthgvvhgrmhesghhmrghilhdrtghomhdprhgtphhtthhopehshhgrfihnghhuoheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshdrhhgruhgvrhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtohepihhmgieslhhishhtshdrlhhinhhugidruggvvh
 X-GND-Sasl: jeanmichel.hautbois@yoseli.org
 
-This series adds support for the MCF54418 hardware random number generator
-(RNGB) and improves type safety for platform device resources.
+Add 'const' qualifier to all static resource arrays in device.c.
+These arrays are never modified at runtime, they are only read by
+platform device registration functions.
 
-The MCF54418 contains an RNGB hardware block compatible with the imx-rngc
-driver. This series enables its use by:
-- Adding platform device registration for the RNG hardware
-- Enabling the clock at platform initialization
-- Making the imx-rngc driver compatible with Coldfire's always-on clock
-model using devm_clk_get_optional()
-
-Additionally, following Frank Li's suggestion, all static resource array
-in arch/m68k/coldfire/device.c are marked const, moving them to read-only
-memory and aligning with kernel API expectations.
-
-Testing on DLC Next board shows:
-- Hardware RNG throughput: 26 MB/s
-- FIPS 140-2 quality: 0.2% failure rate (rng-tools)
-- Boot time improvement: CRNG initialization 7 seconds faster
-
+Suggested-by: Frank Li <Frank.Li@nxp.com>
 Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
 ---
-Changes in v3:
-- Depend on COLDFIRE is enough
-- Split the clock change in a dedicated commit
-- Link to v2: https://lore.kernel.org/r/20251107-b4-m5441x-add-rng-support-v2-0-f91d685832b9@yoseli.org
+ arch/m68k/coldfire/device.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-Changes in v2:
-- Split const qualifier changes into a separate patch as suggested by
-Frank Li
-- Mark all resource arrays (including RNG) as const in device.c
-- No functional changes to RNG implementation
+diff --git a/arch/m68k/coldfire/device.c b/arch/m68k/coldfire/device.c
+index b6958ec2a220cf91a78a14fc7fa18749451412f7..20adba27a687029ef53249bad71b342d563d612b 100644
+--- a/arch/m68k/coldfire/device.c
++++ b/arch/m68k/coldfire/device.c
+@@ -111,7 +111,7 @@ static struct fec_platform_data fec_pdata = {
+  *	block. It is Freescale's own hardware block. Some ColdFires
+  *	have 2 of these.
+  */
+-static struct resource mcf_fec0_resources[] = {
++static const struct resource mcf_fec0_resources[] = {
+ 	{
+ 		.start		= MCFFEC_BASE0,
+ 		.end		= MCFFEC_BASE0 + MCFFEC_SIZE0 - 1,
+@@ -148,7 +148,7 @@ static struct platform_device mcf_fec0 = {
+ #endif /* MCFFEC_BASE0 */
+ 
+ #ifdef MCFFEC_BASE1
+-static struct resource mcf_fec1_resources[] = {
++static const struct resource mcf_fec1_resources[] = {
+ 	{
+ 		.start		= MCFFEC_BASE1,
+ 		.end		= MCFFEC_BASE1 + MCFFEC_SIZE1 - 1,
+@@ -189,7 +189,7 @@ static struct platform_device mcf_fec1 = {
+  *	The ColdFire QSPI module is an SPI protocol hardware block used
+  *	on a number of different ColdFire CPUs.
+  */
+-static struct resource mcf_qspi_resources[] = {
++static const struct resource mcf_qspi_resources[] = {
+ 	{
+ 		.start		= MCFQSPI_BASE,
+ 		.end		= MCFQSPI_BASE + MCFQSPI_SIZE - 1,
+@@ -340,7 +340,7 @@ static struct platform_device mcf_qspi = {
+ #endif /* IS_ENABLED(CONFIG_SPI_COLDFIRE_QSPI) */
+ 
+ #if IS_ENABLED(CONFIG_I2C_IMX)
+-static struct resource mcf_i2c0_resources[] = {
++static const struct resource mcf_i2c0_resources[] = {
+ 	{
+ 		.start          = MCFI2C_BASE0,
+ 		.end            = MCFI2C_BASE0 + MCFI2C_SIZE0 - 1,
+@@ -361,7 +361,7 @@ static struct platform_device mcf_i2c0 = {
+ };
+ #ifdef MCFI2C_BASE1
+ 
+-static struct resource mcf_i2c1_resources[] = {
++static const struct resource mcf_i2c1_resources[] = {
+ 	{
+ 		.start          = MCFI2C_BASE1,
+ 		.end            = MCFI2C_BASE1 + MCFI2C_SIZE1 - 1,
+@@ -385,7 +385,7 @@ static struct platform_device mcf_i2c1 = {
+ 
+ #ifdef MCFI2C_BASE2
+ 
+-static struct resource mcf_i2c2_resources[] = {
++static const struct resource mcf_i2c2_resources[] = {
+ 	{
+ 		.start          = MCFI2C_BASE2,
+ 		.end            = MCFI2C_BASE2 + MCFI2C_SIZE2 - 1,
+@@ -409,7 +409,7 @@ static struct platform_device mcf_i2c2 = {
+ 
+ #ifdef MCFI2C_BASE3
+ 
+-static struct resource mcf_i2c3_resources[] = {
++static const struct resource mcf_i2c3_resources[] = {
+ 	{
+ 		.start          = MCFI2C_BASE3,
+ 		.end            = MCFI2C_BASE3 + MCFI2C_SIZE3 - 1,
+@@ -433,7 +433,7 @@ static struct platform_device mcf_i2c3 = {
+ 
+ #ifdef MCFI2C_BASE4
+ 
+-static struct resource mcf_i2c4_resources[] = {
++static const struct resource mcf_i2c4_resources[] = {
+ 	{
+ 		.start          = MCFI2C_BASE4,
+ 		.end            = MCFI2C_BASE4 + MCFI2C_SIZE4 - 1,
+@@ -457,7 +457,7 @@ static struct platform_device mcf_i2c4 = {
+ 
+ #ifdef MCFI2C_BASE5
+ 
+-static struct resource mcf_i2c5_resources[] = {
++static const struct resource mcf_i2c5_resources[] = {
+ 	{
+ 		.start          = MCFI2C_BASE5,
+ 		.end            = MCFI2C_BASE5 + MCFI2C_SIZE5 - 1,
+@@ -507,7 +507,7 @@ static struct mcf_edma_platform_data mcf_edma_data = {
+ 	.slavecnt		= ARRAY_SIZE(mcf_edma_map),
+ };
+ 
+-static struct resource mcf_edma_resources[] = {
++static const struct resource mcf_edma_resources[] = {
+ 	{
+ 		.start		= MCFEDMA_BASE,
+ 		.end		= MCFEDMA_BASE + MCFEDMA_SIZE - 1,
+@@ -560,7 +560,7 @@ static struct mcf_esdhc_platform_data mcf_esdhc_data = {
+ 	.cd_type = ESDHC_CD_NONE,
+ };
+ 
+-static struct resource mcf_esdhc_resources[] = {
++static const struct resource mcf_esdhc_resources[] = {
+ 	{
+ 		.start = MCFSDHC_BASE,
+ 		.end = MCFSDHC_BASE + MCFSDHC_SIZE - 1,
+@@ -590,7 +590,7 @@ static struct flexcan_platform_data mcf5441x_flexcan_info = {
+ 	.clock_frequency = 120000000,
+ };
+ 
+-static struct resource mcf5441x_flexcan0_resource[] = {
++static const struct resource mcf5441x_flexcan0_resource[] = {
+ 	{
+ 		.start = MCFFLEXCAN_BASE0,
+ 		.end = MCFFLEXCAN_BASE0 + MCFFLEXCAN_SIZE,
 
----
-Jean-Michel Hautbois (3):
-      m68k: coldfire: Mark platform device resource arrays as const
-      hwrng: imx-rngc: Use optional clock
-      m68k: coldfire: Add RNG support for MCF54418
-
- arch/m68k/coldfire/device.c       | 52 ++++++++++++++++++++++++++++++---------
- arch/m68k/coldfire/m5441x.c       |  2 +-
- arch/m68k/include/asm/m5441xsim.h |  9 +++++++
- drivers/char/hw_random/Kconfig    |  3 ++-
- drivers/char/hw_random/imx-rngc.c |  9 ++++++-
- 5 files changed, 60 insertions(+), 15 deletions(-)
----
-base-commit: ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d
-change-id: 20251107-b4-m5441x-add-rng-support-0fdb8d40210a
-
-Best regards,
 -- 
-Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+2.39.5
 
