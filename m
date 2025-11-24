@@ -1,83 +1,111 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECA52D593D
-	for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2025 20:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71C9123F431;
+	Mon, 24 Nov 2025 21:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764017042; cv=none; b=FkXJhIYBGdk/5Q0Mgoig89V/aM4NJxmgk50Y8ucEkdejMjibH8+G9ItGeVidwYq/fS1uWIwvTVeu8pusTME6YR+x+5hkyue00fJ4ggq2RnFyd74YqajMkFY2oNEWp0xixU97Hig4mOxyn/8uuWbf5FRTHxT5QP0bDd8DlvkxZAQ=
+	t=1764019148; cv=none; b=Axu4TWSEV1fX2OotGR0goo2zITr0oEI6xWZUh720h3UXdWrfdr6HFDUifokxUxCdgLj7qtNoIGlLwdw9ddtIDU42Yiq2qhg4lAGqDTta2gS7XioIkFpJtG3jaO8BAYMz8ihX/8NdYjwLE2cjB0YHxnnJs/JZpk8gJhIrWPScdWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764017042; c=relaxed/simple;
-	bh=RJ34FRF7FGg3+vVFmOGcJ+CKhErRprR4490B7OJanzw=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=lFCU9KpQojaLYO704Ujbmzsdj33tbxjHtEX0xrffBWXZPxBL6f3b/mTkB/PNGQcN4ikhOeYOfGuqwPN/PBnerL4h1q1MyokQgpD61yVd7ui/XLJQWbZqw41UDhFfRiBydPO8aRU7qNdUSIHwKfUUUkK7FClZGktb2aDDt/uQjzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GPWYbuJ/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764019148; c=relaxed/simple;
+	bh=CGeEtVCjqYIimB5aCikAfOkDAZV0eJ2oLPo8sqSy3dk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rd4N6eJfl5gnImHpJAppsmp32q9f34Vrmj3qDSGM/VsJoHTxe+WJM2A2xWsoX5KKs/phgNVnR79K7400wOoBITD57ckKU0jc/fNm7sL8/9e7Yf5RVXX1TkZaoQJDb031UwNW7VOC99THTQSo8wwpxTBZuwyb+t9KhQnFdZE87zM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iKQQobio; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPWYbuJ/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764017039;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EHke2mMBf9LSOWdNXkDmM7fIXvTthmtv6HRZAznbTZQ=;
-	b=GPWYbuJ/C3LUGX84lMIeC3nIMieuG6aBAcbWnFO0FmVNnD2MyfKEm89TtQv3ynttPlC5TL
-	ZpQAWg9ucPUZBuodUM3PWYQfPtEhgRtZ/C3FYXWoZYcANh31ZbmyX4MKVCqTiHNbair9fy
-	QaYXu4Dv6EWfxmr9BZ3wu55I2BTQcjg=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-460-GciO3M7hPaqBcqmZ9l-ZvA-1; Mon,
- 24 Nov 2025 15:43:56 -0500
-X-MC-Unique: GciO3M7hPaqBcqmZ9l-ZvA-1
-X-Mimecast-MFC-AGG-ID: GciO3M7hPaqBcqmZ9l-ZvA_1764017034
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0ECD01800343;
-	Mon, 24 Nov 2025 20:43:54 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 52BCD1800451;
-	Mon, 24 Nov 2025 20:43:50 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20251124202702.GA43598@google.com>
-References: <20251124202702.GA43598@google.com> <20251120104439.2620205-6-dhowells@redhat.com> <20251120104439.2620205-1-dhowells@redhat.com> <3374841.1763975577@warthog.procyon.org.uk> <20251124164914.GA6186@sol> <3647621.1764005088@warthog.procyon.org.uk> <CAHmME9pPWGKAdm83wKhc3iHCjgZ8gOtZnt=+6x5V6D1prMb2Gw@mail.gmail.com> <3649785.1764014053@warthog.procyon.org.uk> <CAHmME9oK-e2BOXspf89McOFOiq8wp2-QgHsumK6r9kL5FyeMig@mail.gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: dhowells@redhat.com, "Jason A. Donenfeld" <Jason@zx2c4.com>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Luis Chamberlain <mcgrof@kernel.org>,
-    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
-    Sami Tolvanen <samitolvanen@google.com>,
-    Ard Biesheuvel <ardb@kernel.org>,
-    Stephan Mueller <smueller@chronox.de>,
-    Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>, linux-crypto@vger.kernel.org,
-    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 5/8] crypto: Add ML-DSA crypto_sig support
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iKQQobio"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AF9EC4CEF1;
+	Mon, 24 Nov 2025 21:19:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764019147;
+	bh=CGeEtVCjqYIimB5aCikAfOkDAZV0eJ2oLPo8sqSy3dk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iKQQobioVZwyP4FRsKSwObsqeyBqwGykFvfOKCeEYTmnGgaR3tz05acHXpKFrqg6x
+	 tJSgkBF/pxCkzZM3szfVVkws76+AQa6VDwyYEmphMPgOLePAq4AwCb1Oq7knvHvJy0
+	 VfMIJs2T6XzlfCQ2BsGXkGMX2B/gRHhOVZ+qvjzEnWqeVkVKJwHCv/nHKCzg1z1EFA
+	 KoqOwbLJJ8cykIWM0cE0f8J2M1xzY8BZImvM+h+SYmkf8xjTu/Lsdr6c6WSG7KswKn
+	 L7zflFgLP6cp1Gw03bq6BEIuzdnVUuIelDh0iSHEZEzR84H9sIWnSOUnFhYaRqDMdw
+	 hjF6LYJ7D52RA==
+Message-ID: <6b177a8a-30a5-4210-8b5e-cbea5aef99fd@kernel.org>
+Date: Mon, 24 Nov 2025 22:19:02 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3651798.1764017029.1@warthog.procyon.org.uk>
-Date: Mon, 24 Nov 2025 20:43:49 +0000
-Message-ID: <3651799.1764017029@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] dt-bindings: crypto: qcom,prng: document x1e80100
+To: Harshal Dev <harshal.dev@oss.qualcomm.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251124-trng_dt_binding_x1e80100-v1-0-b4eafa0f1077@oss.qualcomm.com>
+ <20251124-trng_dt_binding_x1e80100-v1-1-b4eafa0f1077@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
+ QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
+ +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
+ ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
+ 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
+ hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
+ tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
+ 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
+ naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
+ hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
+ whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
+ qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
+ RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
+ Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
+ H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
+ dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
+ AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
+ jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
+ zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
+ XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
+In-Reply-To: <20251124-trng_dt_binding_x1e80100-v1-1-b4eafa0f1077@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Eric Biggers <ebiggers@kernel.org> wrote:
+On 24/11/2025 18:08, Harshal Dev wrote:
+> Document x1e80100 compatible for the True Random Number Generator.
+> 
+> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+> 
 
-> It should also become the recommended algorithm anyway, right?
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-It's used for more than just module signing.  IMA, for example.
-
-David
-
+Best regards,
+Krzysztof
