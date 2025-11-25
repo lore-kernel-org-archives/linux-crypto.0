@@ -1,49 +1,53 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F4D2741AC;
-	Tue, 25 Nov 2025 04:20:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BAA288D6;
+	Tue, 25 Nov 2025 04:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764044466; cv=none; b=VOvmHeca9cZXjYl9CxYkZpo9St/yjxmdXi30nipN7ES2ZUl53b4d5/aYh4FY2cjsoNd+T2RhdSauUFLMgQ+8RW351db1cz4+1O9WQS/92WxCEhYE4JwWaoPYGAhD/I5nA2Gb9P+fkyomawhM1/USnendapS6B66gQc5/W9ANtT8=
+	t=1764045076; cv=none; b=j3J+CaLJXeNb8bqawVL3DV16owkgTjpIrweInIt1GT9I9h6WiEVurWRTBwIe59aW+C0UpP+QCsrxqP1G6fXVvFot3r62DCXcQ/ubJPLr+QM8dYdn0//bwkmQ7boQETGC+SlvaPYQUSNldICwp+MhqDJnNi8QY25vWpMmvMVNTDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764044466; c=relaxed/simple;
-	bh=ce/lSRwIWXceeZyfPenIbqn34OQ0MJZm01CBiLmkpV4=;
+	s=arc-20240116; t=1764045076; c=relaxed/simple;
+	bh=8hb18tpyX5aLuMx/txnw3GHN1H/pPt8/p+1pxe2wZ38=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MbHlIog0J2XkG8EkXRzbigPDVIztwFUIJgmrWvfAiEmoc98oX5C/avg1HxxHPxGPql8wNhajXLw0XFYsqyRpDWa66Waji1mb8oVBG0JnQeumYl22bMOwEOSb9ynnISD7ou3re+fxc86aOOWTBSO+ML7cI09QsHKiywPOuEqCFLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Xluk0Iyk; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=C/UT9tG9RgV4VNhk/Q397DBg2K6Z1I5gZ7PGung5JZMK4U8xRESQl+ARxIFEynyfv2YiRX/nvBek6UPRoobnymNj4mtdoYvOa/xOomfFBFJXC7Jk8su1v+DCdB9fWF+EodUSS2FqKA2Jam5MeCiiBN0YjB15KuOrbk9dCKXri98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z/AsasmN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Xluk0Iyk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=GH3ppYV3iSuFNXRuBiLohj/P1RNXkLh0EExzM20knz4=; 
-	b=Xluk0IykmrjC/SMSyPOdyVd3xuMyLjqHHqoKQFs2GQ++kN0nocXHdmpe/d7MCZXviUsf33mYo8d
-	oy3cVcktlW2CDwCcEY+8lgUzYXhRezK5iK+1WrZZq5rRBPjAI6KN2nPp55FTtLdzjmfL5f9Ap0Zyq
-	Na91h6GalgsF7CxegqDk4ii0ESHdfvC8bGJP7CIm0DUV0BNK7kIArvAulId0qDcu09eHMoUStfPoK
-	CcbV0iSPyP3hZSKrcpVN/MsTTycW/hJ/LkuQsxXP8W59XnWs8xGx/mi5IjrnROvkyg1wFFbi5cV3v
-	FiJ4eVJlQHFe3IrhTXjmQ+J1dptEnAIVf4UA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vNkXu-005ka1-0W;
-	Tue, 25 Nov 2025 12:20:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 25 Nov 2025 12:20:54 +0800
-Date: Tue, 25 Nov 2025 12:20:54 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, Ruud.Derwig@synopsys.com,
-	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com,
-	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-Subject: Re: [PATCH v8 2/4] crypto: spacc - Add SPAcc ahash support
-Message-ID: <aSUuplXyzpFBQGuL@gondor.apana.org.au>
-References: <20251031044803.400524-1-pavitrakumarm@vayavyalabs.com>
- <20251031044803.400524-3-pavitrakumarm@vayavyalabs.com>
- <aQw-ugxNqclAqDkg@gondor.apana.org.au>
- <CALxtO0=LxXg6Cw+PKnPQLhurkPRxvTOn63pyK9gFFH=y+F=hBQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z/AsasmN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EC60C4CEF1;
+	Tue, 25 Nov 2025 04:31:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764045076;
+	bh=8hb18tpyX5aLuMx/txnw3GHN1H/pPt8/p+1pxe2wZ38=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Z/AsasmN4OwREeTA8aC7lt+morNoQxZQGwPmxdDCXYBuPjoOPGpkJaT0fFa/kcijQ
+	 3H8Y5dCI8HI/gk4JCPscf+tO/rkjqXtA/HhhE2i6RGKCsFpzvfVnfP66X8QRfFjw+E
+	 cJjqgELGbtpk1UNJrWrYNwnCFuA8zsZwxgblotoXlwFfk9T/bol1W4tr8Fi1ozoR5J
+	 sRKRboVa9PR5rUgw0S8VW2/IorqSDog139MFi4Ko2SmQq0NAZGq8NdZtLjiEOFWpN7
+	 0TYq5s65fj+ng+drBi8WXI3HQWlHLeWHnZz/lCrkDMW5Z+nk/TFADJKP5rXJaMe/eL
+	 ETk7osZmA+qag==
+Date: Mon, 24 Nov 2025 20:29:27 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
+	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] lib/crypto: Add ML-DSA verification support
+Message-ID: <20251125042927.GB1608@sol>
+References: <20251121005017.GD3532564@google.com>
+ <20251120003653.335863-2-ebiggers@kernel.org>
+ <20251120003653.335863-1-ebiggers@kernel.org>
+ <2624664.1763646918@warthog.procyon.org.uk>
+ <2755899.1763728901@warthog.procyon.org.uk>
+ <20251121171421.GA1737@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,20 +56,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALxtO0=LxXg6Cw+PKnPQLhurkPRxvTOn63pyK9gFFH=y+F=hBQ@mail.gmail.com>
+In-Reply-To: <20251121171421.GA1737@sol>
 
-On Fri, Nov 21, 2025 at 01:30:57PM +0530, Pavitrakumar Managutte wrote:
->
-> Whether there were any additional changes in the ahash API or fallback
-> handling between 6.17-rc1 and 6.18-rc1 that drivers should adapt to.
+On Fri, Nov 21, 2025 at 09:14:21AM -0800, Eric Biggers wrote:
+> However, unfortunately neither source explains it properly, and they
+> actually provide incorrect information.  The comment in the reference
+> code says the the input can be in "-2^{31}Q <= a <= Q*2^31", which isn't
+> quite correct; the upper bound is actually exclusive.  In my code, I
+> correctly document the upper bound as being exclusive.
 
-What failures did you see with 6.18?
+I opened https://github.com/pq-crystals/dilithium/issues/108 against the
+reference implementation.  So hopefully that comment will get fixed.
 
-Please try the latest cryptodev tree which fixed two problems with
-ahash import and export.
+> FIPS 204 documents the same incorrect interval, but then sort of gets
+> around it by only claiming that the output is less than 2q in absolute
+> value (rather than q) and also by not clarifying whether sign extension
+> is done.  They may have thought that sign extension shouldn't be done,
+> as you seem to have thought.  Either way, their explanation is
+> misleading.  The very-nearly-symmetric version that produces an output
+> less than q in absolute value is the logical version when working with
+> signed values, and it seems to be what the Dilithium authors intended.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I'm collecting the mistakes that I've found in FIPS 204 into a list,
+which I'll send in to NIST as an errata request at some point...
+
+- Eric
