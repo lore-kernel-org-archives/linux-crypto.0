@@ -1,117 +1,173 @@
-Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44154224AF2
-	for <linux-crypto@vger.kernel.org>; Tue, 25 Nov 2025 19:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6974A33B96F;
+	Tue, 25 Nov 2025 20:24:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764097523; cv=none; b=iT9DMWVRx2zqEi4CftYcXGWDA0T7Hn8b9bDkd9MyZQvawnNCr3DT3tCdutz5sdEpVaiYZoHEjgJwmrX5shKxasRbyqowR31/aPLlJ/FZcnTL5pNUqA1c5qzg3nVUAD5knfn7v60lqKxPBHBxH2OrsrcGmUCVfa/JtR+HWtiR+mI=
+	t=1764102262; cv=none; b=r2PaLlcD+u09tEoer+VZ0vJ1xEv8eDJ/WneNoH0mswR9D207jrvYWJMUa6z7ATHVaulvv84e3nCZ5QNz8mD5vORHmBZZgpFnOYxzQuBEKuxM0USQQUg6I37iITOJ9C7+gP+I/lI+van8xr+LrC/967zVPEa4cvU5v3xl10I4CQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764097523; c=relaxed/simple;
-	bh=QHPAH5dQHLvhxC4DA5235pvXPT1tBA9Br+P6aQDS5y0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dPq4qJNgin7hIpgtuQQ8r6GA//BO/EBwmWtkzpyPUQQjqYuJpkbGO7LttNXsz6T/K19qLk6hzNFBS9t1ANPDsqycS8hJxnTPQBO28cFnlMa7Ls+hREYGOXqfwwv5Z9MpWitTBuekl7XZZlW62vJVY7rFyEqKZXm1u8OWU1LlsQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=qhVJPlot; arc=none smtp.client-ip=198.37.111.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	s=arc-20240116; t=1764102262; c=relaxed/simple;
+	bh=IF3zxg6vSqG7eDpZdkTklgqMEg9K+BK9bCEP6T58x+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AajCogpB3KEOZvBBvahEWaUYcW7rE4NjCuc7uBL2BJiukJcGs3dn8z5gye8w8AtpxAbBSUrQJTgvZJ31egbWz8rbfO6g+tFYd2NU9vUhDNXSojbwlfG4NJK/JJ5Ip8X8dfjVcGcUj6rNaQzRJlhKszczwvpGtd4SrLVmz09vssk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dxNvE3xR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="qhVJPlot"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1764097521;
-	bh=QHPAH5dQHLvhxC4DA5235pvXPT1tBA9Br+P6aQDS5y0=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:From;
-	b=qhVJPlotQ/plyi+4zVtliQ8NEyQGuuTN2Q4neHeRz5fg448dmDXTPk/oBrpwnvGab
-	 tcUBfHQtwkwfABpyI7FBJxy3t+htiTCPfsSD9KlaLluU9h8ypxgrIdyBgP837AY+7a
-	 8So1z+aeXsk16cp1w3ShS+WmvLrURIT6bo5/Yhqc=
-Received: from lingrow.int.hansenpartnership.com (unknown [153.66.160.227])
-	by lamorak.hansenpartnership.com (Postfix) with ESMTP id 295461C015F;
-	Tue, 25 Nov 2025 14:05:21 -0500 (EST)
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: linux-crypto@vger.kernel.org
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dxNvE3xR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41346C4CEF1;
+	Tue, 25 Nov 2025 20:24:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764102261;
+	bh=IF3zxg6vSqG7eDpZdkTklgqMEg9K+BK9bCEP6T58x+w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dxNvE3xRvlOrasOVf9QYAZHjK1SBFVBxQMQKJEYCxcwq5Jl8DbEhuBwBA1fJPwxdk
+	 LSHJBdWPFm7V17BZ3FSo+mwlVg36hj40z/aQOZEP07QQlZ2kYySN6kKNF1yg9GQHbp
+	 dYkJZ/sL57g4Utj+6uS7HYhqLG03+rrFsKBgMgY9SeXSvfMQWbBcFaRrJY8spGM4q6
+	 0WiDbevs+Mk+1sCcJcceo827p6esezqmJTHHGMT3vitH3BBAj/e+HTw+dZIwDgkna7
+	 djejdJ3WgBgrKPmYvSZ5smEOXvCPjb0rh7raRSOrYV4eYpzUDIuqLMRCbHUlYv4RMZ
+	 dkrYWA0rDa9mQ==
+Date: Tue, 25 Nov 2025 20:24:19 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ignat Korchagin <ignat@cloudflare.com>
 Cc: David Howells <dhowells@redhat.com>,
-	Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-Subject: [PATCH 2/2] crypto: pkcs7: add tests for pkcs7_get_authattr
-Date: Tue, 25 Nov 2025 14:02:56 -0500
-Message-ID: <20251125190256.4034-3-James.Bottomley@HansenPartnership.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251125190256.4034-1-James.Bottomley@HansenPartnership.com>
-References: <20251125190256.4034-1-James.Bottomley@HansenPartnership.com>
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>,
+	Lukas Wunner <lukas@wunner.de>, linux-crypto@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 2/9] crypto: Add ML-DSA/Dilithium verify support
+Message-ID: <20251125202419.GB3061247@google.com>
+References: <20251117145606.2155773-1-dhowells@redhat.com>
+ <20251117145606.2155773-3-dhowells@redhat.com>
+ <20251117171003.GC1584@sol>
+ <CALrw=nG6X5Opjb1H4VVzCNpJ4QtmHUK3nQ1XQ5GKMvnE9NnZsQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALrw=nG6X5Opjb1H4VVzCNpJ4QtmHUK3nQ1XQ5GKMvnE9NnZsQ@mail.gmail.com>
 
-Add example code to the test module pkcs7_key_type.c that verifies a
-message and then pulls out a known authenticated attribute.
+On Tue, Nov 25, 2025 at 10:10:18AM +0000, Ignat Korchagin wrote:
+> Hi all,
+> 
+> On Mon, Nov 17, 2025 at 5:11 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > On Mon, Nov 17, 2025 at 02:55:51PM +0000, David Howells wrote:
+> > >  lib/crypto/Kconfig                            |   1 +
+> > >  lib/crypto/Makefile                           |   2 +
+> > >  lib/crypto/mldsa/Kconfig                      |  29 ++
+> > >  lib/crypto/mldsa/Makefile                     |  20 +
+> > >  lib/crypto/mldsa/crypto_mldsa_44.c            | 166 ++++++++
+> > >  lib/crypto/mldsa/crypto_mldsa_65.c            | 166 ++++++++
+> > >  lib/crypto/mldsa/crypto_mldsa_87.c            | 166 ++++++++
+> > >  lib/crypto/mldsa/dilithium.h                  | 304 ++++++++++++++
+> > >  lib/crypto/mldsa/dilithium_44.c               |  33 ++
+> > >  lib/crypto/mldsa/dilithium_44.h               | 291 ++++++++++++++
+> > >  lib/crypto/mldsa/dilithium_65.c               |  33 ++
+> > >  lib/crypto/mldsa/dilithium_65.h               | 291 ++++++++++++++
+> > >  lib/crypto/mldsa/dilithium_87.c               |  33 ++
+> > >  lib/crypto/mldsa/dilithium_87.h               | 291 ++++++++++++++
+> > >  lib/crypto/mldsa/dilithium_common.c           | 117 ++++++
+> > >  lib/crypto/mldsa/dilithium_debug.h            |  49 +++
+> > >  lib/crypto/mldsa/dilithium_ntt.c              |  89 +++++
+> > >  lib/crypto/mldsa/dilithium_ntt.h              |  35 ++
+> > >  lib/crypto/mldsa/dilithium_pack.h             | 119 ++++++
+> > >  lib/crypto/mldsa/dilithium_poly.c             | 377 ++++++++++++++++++
+> > >  lib/crypto/mldsa/dilithium_poly.h             | 181 +++++++++
+> > >  lib/crypto/mldsa/dilithium_poly_c.h           | 141 +++++++
+> > >  lib/crypto/mldsa/dilithium_poly_common.h      |  35 ++
+> > >  lib/crypto/mldsa/dilithium_polyvec.h          | 343 ++++++++++++++++
+> > >  lib/crypto/mldsa/dilithium_polyvec_c.h        |  81 ++++
+> > >  lib/crypto/mldsa/dilithium_reduce.h           |  85 ++++
+> > >  lib/crypto/mldsa/dilithium_rounding.c         | 128 ++++++
+> > >  lib/crypto/mldsa/dilithium_service_helpers.h  |  99 +++++
+> > >  lib/crypto/mldsa/dilithium_signature_c.c      | 279 +++++++++++++
+> > >  lib/crypto/mldsa/dilithium_signature_c.h      |  37 ++
+> > >  lib/crypto/mldsa/dilithium_signature_impl.h   | 370 +++++++++++++++++
+> > >  lib/crypto/mldsa/dilithium_type.h             | 108 +++++
+> > >  lib/crypto/mldsa/dilithium_zetas.c            |  68 ++++
+> > >  .../mldsa/signature_domain_separation.c       | 204 ++++++++++
+> > >  .../mldsa/signature_domain_separation.h       |  30 ++
+> > >  35 files changed, 4801 insertions(+)
+> >
+> > Over the past week I've been starting to review this massive addition.
+> >
+> > I don't think this is on the right track.  This implementation is really
+> > messy, with lots of unused functionality and unnecessary abstractions,
+> > and code that doesn't follow kernel conventions.
+> >
+> > In comparison, BoringSSL has an entire implementation of ML-DSA,
+> > *including key generation and signing*, in a bit over 3000 lines in one
+> > file.  But about half of that code is specific to key generation or
+> > signing, which the kernel doesn't need, so in principle
+> > verification-only shouldn't be much more than a thousand.  I find it to
+> > be much easier to understand than leancrypto as well.
+> >
+> > Historically we've had a lot of problems with people integrating code
+> > from external sources into the kernel, like mpi, with properly "owning"
+> > it because they feel like it's not their code and someone else is
+> > responsible.  I feel like that's going to be a big problem here.
+> >
+> > I think we can do better here and put together a smaller implementation
+> > for the kernel that we'll actually be able to maintain.
+> 
+> I was thinking about this lately for some time - even put forward a
+> small discussion proposal for upcoming Plumbers (which wasn't accepted
+> unfortunately). Should we consider somehow safely "outsourcing" at
+> least some (asymmetric - potentially slow anyway) crypto
+> implementations to userspace? Something similar to
+> request_module/request_firmware/request_key usermode helpers or an
+> io_uring interface or a crypto socket? This way we can bring any
+> well-maintained crypto library (and even multiple ones) to the kernel:
+>   * it can have any software license
+>   * can be written in any programming language
+>   * can use architecture vector instructions more easily
+>   * can have any certifications out of the box (looking at you - FIPS)
+>   * distros would have the ability to plug their own
+>   * maybe it can even do private key crypto (which I personally would
+> really like more support of and it would be acceptable to Herbert)
+> 
+> Given the past experience of RSA and mpi - it is not that difficult to
+> port something to the kernel, but quite hard to maintain it over time
+> in a secure manner. With a userspace approach the kernel can
+> piggy-back on proven vendors like any other piece of open source
+> software out there.
+> 
+> I understand that there probably still be a need for some in-kernel
+> crypto, so the proposal here is not to fully replace things, but
+> rather complement the current offerings with an interface, which could
+> enable faster adoption of newer (and more secure versions of existing)
+> crypto algorithms.
 
-Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership.com>
+The performance cost of that would be very high, so it would only have
+any chance at possibly being reasonable for some of the asymmetric
+algorithms.  It would also introduce reliability issues.
 
----
+I'll also note that the main reason that people seem to want private key
+operations in the kernel is for the keyctl() UAPIs for userspace, which
+is already a bad idea.  So I guess we end up with userspace calling into
+the kernel, which calls back into userspace to use some userspace crypto
+library which the original userspace program refused to use in the first
+place for some reason?  It makes no sense to me, sorry.
 
-I'm not convinced this needs adding, but it provided a convenient
-mechanism for testing the pcks7_get_authattr() call so I added it in
-case others find it useful.
----
- crypto/asymmetric_keys/pkcs7_key_type.c | 27 ++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+There is the opportunity to share more code with userspace projects at
+the source code level.  Just it doesn't always work out due to different
+languages, licences, requirements, conventions, and implementation
+qualities.  For ML-DSA verification I didn't see a good alternative to
+just writing it myself.  But in other cases a different conclusion could
+be reached.  The kernel uses a lot of the assembly files from
+CRYPTOGAMS, for example, and some of the Curve25519 code (including
+formally verified code) is imported from other sources.
 
-diff --git a/crypto/asymmetric_keys/pkcs7_key_type.c b/crypto/asymmetric_keys/pkcs7_key_type.c
-index b930d3bbf1af..d67bf1dc96b9 100644
---- a/crypto/asymmetric_keys/pkcs7_key_type.c
-+++ b/crypto/asymmetric_keys/pkcs7_key_type.c
-@@ -12,6 +12,7 @@
- #include <linux/verification.h>
- #include <linux/key-type.h>
- #include <keys/user-type.h>
-+#include <crypto/pkcs7.h>
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("PKCS#7 testing key type");
-@@ -51,16 +52,40 @@ static int pkcs7_view_content(void *ctx, const void *data, size_t len,
- static int pkcs7_preparse(struct key_preparsed_payload *prep)
- {
- 	enum key_being_used_for usage = pkcs7_usage;
-+	int ret;
-+	struct pkcs7_message *pkcs7;
-+	const void *data;
-+	size_t len;
- 
- 	if (usage >= NR__KEY_BEING_USED_FOR) {
- 		pr_err("Invalid usage type %d\n", usage);
- 		return -EINVAL;
- 	}
- 
--	return verify_pkcs7_signature(NULL, 0,
-+	ret = verify_pkcs7_signature(NULL, 0,
- 				      prep->data, prep->datalen,
- 				      VERIFY_USE_SECONDARY_KEYRING, usage,
- 				      pkcs7_view_content, prep);
-+	if (ret)
-+		return ret;
-+
-+	pkcs7 = pkcs7_parse_message(prep->data, prep->datalen);
-+	if (IS_ERR(pkcs7)) {
-+		pr_err("pkcs7 parse error\n");
-+		return PTR_ERR(pkcs7);
-+	}
-+
-+	ret = pkcs7_get_authattr(pkcs7, OID_messageDigest, &data, &len);
-+	if (ret) {
-+		pr_err("Failed to get message digest\n");
-+		goto out;
-+	}
-+
-+	pr_info("Correctly Got message hash, size=%ld\n", len);
-+
-+ out:
-+	pkcs7_free_message(pkcs7);
-+	return 0;
- }
- 
- /*
--- 
-2.51.0
-
+- Eric
