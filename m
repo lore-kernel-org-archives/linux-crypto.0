@@ -1,51 +1,49 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27915223DD6;
-	Tue, 25 Nov 2025 04:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F4D2741AC;
+	Tue, 25 Nov 2025 04:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764043960; cv=none; b=DL29tkuFa+haoL56w5p1Z3tgwyq71vxLhXYL3ucQMiWEIRdGkHT6JhHh/AXC7/YyJP5Itj+oOio0WmH7MwZgRz1SbedY65w2XiIC31xijiLEer78jPEtGZk4ex58VXg3Uealu2yiS/npfyaUaLoJrkBVd8rulNjAmbRcQLkLD5Y=
+	t=1764044466; cv=none; b=VOvmHeca9cZXjYl9CxYkZpo9St/yjxmdXi30nipN7ES2ZUl53b4d5/aYh4FY2cjsoNd+T2RhdSauUFLMgQ+8RW351db1cz4+1O9WQS/92WxCEhYE4JwWaoPYGAhD/I5nA2Gb9P+fkyomawhM1/USnendapS6B66gQc5/W9ANtT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764043960; c=relaxed/simple;
-	bh=STJQHSOBK3yqfPlM/sXNDIiTEw+NTeEwuEm+qbxT+3o=;
+	s=arc-20240116; t=1764044466; c=relaxed/simple;
+	bh=ce/lSRwIWXceeZyfPenIbqn34OQ0MJZm01CBiLmkpV4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SWXuHHqYBBHByFgBwRHpEPsbevccM+f+F5fkggOFukN6+QypEiFFOtotyjZ32dKuwOoyqpUVKlQ0QpTYD3E57rlhC2UiNdronJ9GzYoSV1f0qj05WL2sNn6z5aDr8Jj/aITanExHeBdnsKubLkndZ4ha6wNShEZwDTpZkJrvZO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F7qglHNC; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=MbHlIog0J2XkG8EkXRzbigPDVIztwFUIJgmrWvfAiEmoc98oX5C/avg1HxxHPxGPql8wNhajXLw0XFYsqyRpDWa66Waji1mb8oVBG0JnQeumYl22bMOwEOSb9ynnISD7ou3re+fxc86aOOWTBSO+ML7cI09QsHKiywPOuEqCFLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Xluk0Iyk; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F7qglHNC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2779CC4CEF1;
-	Tue, 25 Nov 2025 04:12:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764043959;
-	bh=STJQHSOBK3yqfPlM/sXNDIiTEw+NTeEwuEm+qbxT+3o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F7qglHNCuMu9DeRcfozB/MVSS7K5OvPpjcUnUWctBgO3xL7Ayj9QO+252T2wZXEdm
-	 YezsTJLqlLJN6Wn9H5w8GdjefmW+DE01q/iiSy4+WoLtsCV6ne3o2qrViI19AcYL3Z
-	 +YcH3yM3rnzujo4qGPCOGV4kaDWVhHMogGRNOK2oLeD3meN1sm4Ptx0eiogyMF/4i/
-	 LXTp0m2wzJEH7IjVkhnyJf1lskSrXcJ4gBjTmARMSOqGEx7SmcvRg01EnDxil8w90U
-	 GWHOjX9wT7YJ/1F0p9z66wYi6qjueD1xZOIWf+ZhClUbZ/caq28laXiNDBBIbchwUx
-	 u5JXYpkKRp02g==
-Date: Mon, 24 Nov 2025 20:10:50 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v9 2/9] crypto: Add ML-DSA/Dilithium verify support
-Message-ID: <20251125041050.GA1608@sol>
-References: <20251117145606.2155773-1-dhowells@redhat.com>
- <20251117145606.2155773-3-dhowells@redhat.com>
- <20251121013716.GE3532564@google.com>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Xluk0Iyk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=GH3ppYV3iSuFNXRuBiLohj/P1RNXkLh0EExzM20knz4=; 
+	b=Xluk0IykmrjC/SMSyPOdyVd3xuMyLjqHHqoKQFs2GQ++kN0nocXHdmpe/d7MCZXviUsf33mYo8d
+	oy3cVcktlW2CDwCcEY+8lgUzYXhRezK5iK+1WrZZq5rRBPjAI6KN2nPp55FTtLdzjmfL5f9Ap0Zyq
+	Na91h6GalgsF7CxegqDk4ii0ESHdfvC8bGJP7CIm0DUV0BNK7kIArvAulId0qDcu09eHMoUStfPoK
+	CcbV0iSPyP3hZSKrcpVN/MsTTycW/hJ/LkuQsxXP8W59XnWs8xGx/mi5IjrnROvkyg1wFFbi5cV3v
+	FiJ4eVJlQHFe3IrhTXjmQ+J1dptEnAIVf4UA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vNkXu-005ka1-0W;
+	Tue, 25 Nov 2025 12:20:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 25 Nov 2025 12:20:54 +0800
+Date: Tue, 25 Nov 2025 12:20:54 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com,
+	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+Subject: Re: [PATCH v8 2/4] crypto: spacc - Add SPAcc ahash support
+Message-ID: <aSUuplXyzpFBQGuL@gondor.apana.org.au>
+References: <20251031044803.400524-1-pavitrakumarm@vayavyalabs.com>
+ <20251031044803.400524-3-pavitrakumarm@vayavyalabs.com>
+ <aQw-ugxNqclAqDkg@gondor.apana.org.au>
+ <CALxtO0=LxXg6Cw+PKnPQLhurkPRxvTOn63pyK9gFFH=y+F=hBQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,68 +52,20 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251121013716.GE3532564@google.com>
+In-Reply-To: <CALxtO0=LxXg6Cw+PKnPQLhurkPRxvTOn63pyK9gFFH=y+F=hBQ@mail.gmail.com>
 
-On Fri, Nov 21, 2025 at 01:37:16AM +0000, Eric Biggers wrote:
-> On Mon, Nov 17, 2025 at 02:55:51PM +0000, David Howells wrote:
-> > +/*
-> > + * @brief poly_uniform - Sample polynomial with uniformly random coefficients
-> > + *			 in [0,Q-1] by performing rejection sampling on the
-> > + *			 output stream of SHAKE128(seed|nonce).
-> > + *
-> > + * @param [out] a pointer to output polynomial
-> > + * @param [in] seed byte array with seed of length DILITHIUM_SEEDBYTES
-> > + * @param [in] nonce 2-byte nonce
-> > + */
-> > +void poly_uniform(poly *a, const uint8_t seed[DILITHIUM_SEEDBYTES],
-> > +		  __le16 nonce, void *ws_buf)
-> > +{
-> > +	struct shake_ctx hash_ctx;
-> > +	unsigned int i, ctr, off;
-> > +	unsigned int buflen = POLY_UNIFORM_NBLOCKS * SHAKE128_BLOCK_SIZE;
-> > +	uint8_t *buf = ws_buf;
-> > +
-> > +	shake128_init(&hash_ctx);
-> > +	shake_update(&hash_ctx, seed, DILITHIUM_SEEDBYTES);
-> > +	shake_update(&hash_ctx, (uint8_t *)&nonce, sizeof(nonce));
-> > +	shake_squeeze(&hash_ctx, buf, buflen);
-> > +
-> > +	ctr = rej_uniform(a->coeffs, DILITHIUM_N, buf, buflen);
-> > +
-> > +	while (ctr < DILITHIUM_N) {
-> > +		off = buflen % 3;
-> > +		for (i = 0; i < off; ++i)
-> > +			buf[i] = buf[buflen - off + i];
-> > +
-> > +		shake_squeeze(&hash_ctx, buf + off, SHAKE128_BLOCK_SIZE);
-> > +		buflen = DILITHIUM_SEEDBYTES + off;
-> > +		ctr += rej_uniform(a->coeffs + ctr, DILITHIUM_N - ctr, buf,
-> > +				   buflen);
-> > +	}
-> > +
-> > +	shake_zeroize_ctx(&hash_ctx);
-> > +}
-> 
-> By the way, the above has a bug.  In the second and later squeezes, it
-> squeezes SHAKE128_BLOCK_SIZE (168) bytes, but then it uses only the
-> first DILITHIUM_SEEDBYTES (32) bytes.
-> 
-> Now, that 32 is on top of the 840-byte first squeeze, so there are 872
-> correct bytes which is enough for 290 samples.  So an incorrect matrix
-> would be generated only if more than 290 samples happen to be required
-> to get the 256 coefficients.  q / 2^23 = ~99.9% of coefficients are
-> accepted, so that number of rejections would be pretty unlikely.
-> 
-> Still, it's a bug.  Anyway, we're not going to use this code (we'll use
-> my code that does this correctly and in a simpler way), but I thought
-> I'd point it out so that Stephan can fix it.  This seems to be a
-> "leancrypto" specific bug.
-> 
-> Note: this feedback should not be taken as implying that I've reviewed
-> the entire 4800 lines of code.  I just happened to notice this.
+On Fri, Nov 21, 2025 at 01:30:57PM +0530, Pavitrakumar Managutte wrote:
+>
+> Whether there were any additional changes in the ahash API or fallback
+> handling between 6.17-rc1 and 6.18-rc1 that drivers should adapt to.
 
-No reply from Stephan yet, so to make sure this doesn't get missed I
-also opened an issue at
-https://github.com/smuellerDD/leancrypto/issues/42
+What failures did you see with 6.18?
 
-- Eric
+Please try the latest cryptodev tree which fixed two problems with
+ahash import and export.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
