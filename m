@@ -1,85 +1,102 @@
-Received: from akranes.kaiser.cx (akranes.kaiser.cx [152.53.16.207])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E195F232395;
-	Wed, 26 Nov 2025 20:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.53.16.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F2A16DEB0;
+	Wed, 26 Nov 2025 20:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764189063; cv=none; b=rcVvhrfXay6LMgSnkGUDWvnrlLL8tKtv7rWDGghc+drak0CclAYSKUbZUCnWMwoW3GVXmotikBEG9vjpBk0SGt4FknU95aSqBbjk4oZBUlKDLdBZEGEHRE1TmVGkIViPbopKNVPv1rkfWhcE1IlZFHTk8qfglyef+BybjXALib8=
+	t=1764189330; cv=none; b=n9mCM1dD5+TNV+FoRQFfQGgeZzIlYcPY45LLVVkcKjfQ+G3Y56EXzmxFYE71qtbWLMm0ItVCVrkBnIA7VPrIsErnZ0JVYYkjxl2mnmBYHwkCW3DH18IteOqTtcc77EZHQUR0jKrvA/MQCIlvFA43okneDhzLInRz2cZVQ3QGP3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764189063; c=relaxed/simple;
-	bh=pKETpT/qtE1W7EPF8Otd2b1X2DpkV2LH1hN1uUbdTHk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gM+8xf3UbHiyfUJ6LIdBq+/9XzbdLm0qVeqgN4p+0Zv04uTLTRbXoU4ZRZXi+6I/aKHWXgWgNSRrxUFhUiSlteKPaHADr656AtOyoKjW1pQAzcQc1zag0yVU3212l3LDC1wiKlS7SZeEi/0jzZ4cm3H2vsKizTKAjBri6qU3Uy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaiser.cx; spf=pass smtp.mailfrom=kaiser.cx; arc=none smtp.client-ip=152.53.16.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaiser.cx
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaiser.cx
-Received: from martin by akranes.kaiser.cx with local (Exim 4.96)
-	(envelope-from <martin@akranes.kaiser.cx>)
-	id 1vOM9P-009WC2-1t;
-	Wed, 26 Nov 2025 21:30:07 +0100
-Date: Wed, 26 Nov 2025 21:30:07 +0100
-From: Martin Kaiser <martin@kaiser.cx>
-To: Jean-Michel Hautbois via B4 Relay <devnull+jeanmichel.hautbois.yoseli.org@kernel.org>
-Cc: Greg Ungerer <gerg@linux-m68k.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, linux-m68k@lists.linux-m68k.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>,
-	Frank Li <Frank.Li@nxp.com>
-Subject: Re: [PATCH v4 1/2] hwrng: imx-rngc: Use optional clock
-Message-ID: <aSdjT9BLzGF3_5PB@akranes.kaiser.cx>
-References: <20251126-b4-m5441x-add-rng-support-v4-0-5309548c9555@yoseli.org>
- <20251126-b4-m5441x-add-rng-support-v4-1-5309548c9555@yoseli.org>
+	s=arc-20240116; t=1764189330; c=relaxed/simple;
+	bh=XJXE66Wg9ac+X/iLhsiFW1rK34eqy0iauMDUWn+fmr8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JfOfKmIe86qeBel9X9yPRrOVAB0ATCf75yYI9hi0H+eZQPNudypC5qCDFg7QasA4FadKWEd5P0lTRD+v8SBOZWabbHqrfQ3o0h8oTnfLXjlTgNrrPgdmuQqTrdET6lb6eQ9pEz3O3pPzG0GMkpk+xcGSF6Ouq3mHJBotIurgkPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b8mUqEse; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b8mUqEse"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5362C113D0;
+	Wed, 26 Nov 2025 20:35:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764189329;
+	bh=XJXE66Wg9ac+X/iLhsiFW1rK34eqy0iauMDUWn+fmr8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=b8mUqEse8DnSdJrOMofRe119XsNSgQIUnpxUvNUAOTUFo6y934EIL5ZRqpaMdvn8/
+	 dfcMdLewSY+8JQcFKMDpURiI4V2vSYM4rr4kYcyeO3bCOA/ki//hp94jauZ0kuY8uE
+	 i7ugGJENvuIdrMnTFAiLK5HpFzykIcdIVQAipJKKEpJQ/nhJ+JSRYDjmSCgQNOA4sI
+	 9fHiZxZPzfW742asHo2qKcT+yRa7QILKQIVy777Ec5K1ibXS0T0iphaecP9IrjURsp
+	 x9UVujD7c3FOGSDRtHBoSEW0w5KHGHl/ZtzVq06E25Wwkj31PpAWsiILfmdtWd5Odu
+	 zvGLNlgFHH0Hw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+	David Howells <dhowells@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	keyrings@vger.kernel.org,
+	linux-modules@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/2] lib/crypto: ML-DSA verification support
+Date: Wed, 26 Nov 2025 12:35:15 -0800
+Message-ID: <20251126203517.167040-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251126-b4-m5441x-add-rng-support-v4-1-5309548c9555@yoseli.org>
-Sender: "Martin Kaiser,,," <martin@akranes.kaiser.cx>
+Content-Transfer-Encoding: 8bit
 
-Thus wrote Jean-Michel Hautbois via B4 Relay (devnull+jeanmichel.hautbois.yoseli.org@kernel.org):
+This series is targeting libcrypto-next.  It can also be retrieved from:
 
-> From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git mldsa-v2
 
-> Change devm_clk_get() to devm_clk_get_optional() to support platforms
-> where the RNG clock is always enabled and not exposed via the clock
-> framework (such as ColdFire MCF54418).
+This series adds support for verifying ML-DSA signatures to lib/crypto/.
+Patch 1 is the ML-DSA implementation itself.  See that for full details.
+Patch 2 adds the KUnit test suite.
 
-> Reviewed-by: Frank Li <Frank.Li@nxp.com>
-> Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-> ---
->  drivers/char/hw_random/imx-rngc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+The initial use case for this will be kernel module signature
+verification.  For more details, see David Howells' patchset
+https://lore.kernel.org/linux-crypto/20251120104439.2620205-1-dhowells@redhat.com/
 
-> diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
-> index 241664a9b5d9..d6a847e48339 100644
-> --- a/drivers/char/hw_random/imx-rngc.c
-> +++ b/drivers/char/hw_random/imx-rngc.c
-> @@ -259,7 +259,7 @@ static int __init imx_rngc_probe(struct platform_device *pdev)
->  	if (IS_ERR(rngc->base))
->  		return PTR_ERR(rngc->base);
+Changed in v2:
+- Reworked the KUnit test suite
+- Improved commit messages and comments
+- Added missing MODULE_DESCRIPTION() and MODULE_LICENSE()
+- Made the return values of mldsa_verify() differentiate between an
+  input being malformed and the "real" signature check failing
+- Refactored w1 encoding into a helper function
+- Used kfree() instead of kfree_sensitive()
+- Avoided unusal C syntax by accessing the hint vector via 'u8 *'
+- Reworked use_hint() to be better optimized and documented
 
-> -	rngc->clk = devm_clk_get(&pdev->dev, NULL);
-> +	rngc->clk = devm_clk_get_optional(&pdev->dev, NULL);
->  	if (IS_ERR(rngc->clk))
->  		return dev_err_probe(&pdev->dev, PTR_ERR(rngc->clk), "Cannot get rng_clk\n");
+Eric Biggers (2):
+  lib/crypto: Add ML-DSA verification support
+  lib/crypto: tests: Add KUnit tests for ML-DSA verification
 
-The clock is not optional on a standard imx25 system. If it's missing in the
-device tree, the rngb will not work and we should not load the driver.
+ include/crypto/mldsa.h            |   53 +
+ lib/crypto/Kconfig                |    7 +
+ lib/crypto/Makefile               |    5 +
+ lib/crypto/mldsa.c                |  651 ++++++++++
+ lib/crypto/tests/Kconfig          |    9 +
+ lib/crypto/tests/Makefile         |    1 +
+ lib/crypto/tests/mldsa-testvecs.h | 1877 +++++++++++++++++++++++++++++
+ lib/crypto/tests/mldsa_kunit.c    |  381 ++++++
+ 8 files changed, 2984 insertions(+)
+ create mode 100644 include/crypto/mldsa.h
+ create mode 100644 lib/crypto/mldsa.c
+ create mode 100644 lib/crypto/tests/mldsa-testvecs.h
+ create mode 100644 lib/crypto/tests/mldsa_kunit.c
 
-Should we call devm_clk_get or devm_clk_get_optional, depending on the
-detected device?
 
-Best regards,
-Martin
+base-commit: c0127f3ad65e8b21752f7b4d7dbe7e4ab5b5c62d
+-- 
+2.52.0
+
