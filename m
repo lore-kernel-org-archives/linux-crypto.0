@@ -1,56 +1,80 @@
-Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91F433EB15
-	for <linux-crypto@vger.kernel.org>; Wed, 26 Nov 2025 17:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454F730C61C
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Nov 2025 18:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764179159; cv=none; b=e+ZZ+ImDKcDJZS6Cqnh8xl9yqwM+D/K/6JwazJmZYWiBD16u9tiFgBjWF9obOJ28S4AJrMBg7OKySUkOWE3YngqM4cICHyrBXMGe0B3DB8y+5v1jcTLSx1UeIkBF5bWX7sNrO8tA+cm2xi+fqBOuv+bK77LgawG9vrnw/Javgw4=
+	t=1764182163; cv=none; b=SiN/fPl9rsCPyUJqHxwg9Wo0deV1lz1yppMJH40nNkroBBhjVmfCHu62Oc4+XYYMAx48TqbuOmwGrZJ+52FdZnynxpEJfeQzIjFSP9VF9A5Hm73Ew+FFkDG6JPSnjNHecGbr32SNBNTnZknoxtYeW1zgQX6I5BgP3g49oiqbgx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764179159; c=relaxed/simple;
-	bh=vUq5eFdY0N0TqPtqIMgw+WFfqMWyHEEV9KaXIqA6lr4=;
+	s=arc-20240116; t=1764182163; c=relaxed/simple;
+	bh=l+UpyQQXX4ETUL7fz0/4jQ9/53R6ELtNZ9Z4xa9EpMc=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=YWlw+f99TmmGjIqI13PdQV07NZEjeiSV4hQ7MbJ+O44ZvheMdw+k9YBRVOv22TKX8znbSonJcTcku2qAOPGE+sblk6WyklNIxspXZbd0bbbsHusbE/LbikKjebEcN9D/tWRV5AGC36tzdmnLl9iistlG5agsWNYN9LMpiElMY3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=ZhKwxc2r; arc=none smtp.client-ip=198.37.111.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	 Content-Type:MIME-Version; b=NyhO0M45xWjwQMOLTuIJqiTj0a83PQ4VJptNpvb/cUDaPXx3xdc/d+r5SwG2dazZHWJMGgUSMmnkuSCEpql/895H+s1f70rLt1bat8sZfB5YlwP8mDQHXhwyQVCdBWqojhBhc0FLy/mwYU//gXpsZAiCBAxquNjweajJxQq/8vQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jPzA5Cqh; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ZhKwxc2r"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1764179155;
-	bh=vUq5eFdY0N0TqPtqIMgw+WFfqMWyHEEV9KaXIqA6lr4=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=ZhKwxc2riatfZDohny5lzE48FxvquLkqeY85oxuECYnOl9VvJJ9DjkVuBfF5ygezR
-	 po+4F2T6XDtDGyRJIgIvX2+3sG8MMKLqGJR+jfUw2iUTcI9LJYtrL6hOeEysal1GKz
-	 kdOse9YSpZDKu6QrIKOwbTQmtgw2qjvCq7M5RVoo=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 915D71C001D;
-	Wed, 26 Nov 2025 12:45:55 -0500 (EST)
-Message-ID: <537f108d7baa7d194b9ad3a62eb5e123cbaff23b.camel@HansenPartnership.com>
-Subject: Re: [PATCH 0/2] pkcs7: better handling of signed attributes
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: linux-crypto@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>, Blaise Boscaccy
-	 <bboscaccy@linux.microsoft.com>
-Date: Wed, 26 Nov 2025 12:45:54 -0500
-In-Reply-To: <20251125190256.4034-1-James.Bottomley@HansenPartnership.com>
-References: <20251125190256.4034-1-James.Bottomley@HansenPartnership.com>
-Autocrypt: addr=James.Bottomley@HansenPartnership.com;
- prefer-encrypt=mutual;
- keydata=mQENBE58FlABCADPM714lRLxGmba4JFjkocqpj1/6/Cx+IXezcS22azZetzCXDpm2MfNElecY3qkFjfnoffQiw5rrOO0/oRSATOh8+2fmJ6el7naRbDuh+i8lVESfdlkoqX57H5R8h/UTIp6gn1mpNlxjQv6QSZbl551zQ1nmkSVRbA5TbEp4br5GZeJ58esmYDCBwxuFTsSsdzbOBNthLcudWpJZHURfMc0ew24By1nldL9F37AktNcCipKpC2U0NtGlJjYPNSVXrCd1izxKmO7te7BLP+7B4DNj1VRnaf8X9+VIApCi/l4Kdx+ZR3aLTqSuNsIMmXUJ3T8JRl+ag7kby/KBp+0OpotABEBAAG0N0phbWVzIEJvdHRvbWxleSA8SmFtZXMuQm90dG9tbGV5QEhhbnNlblBhcnRuZXJzaGlwLmNvbT6JAVgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAhkBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmBLmY0FCRs1hL0ACgkQgUrkfCFIVNaEiQgAg18F4G7PGWQ68xqnIrccke7Reh5thjUz6kQIii6Dh64BDW6/UvXn20UxK2uSs/0TBLO81k1mV4c6rNE+H8b7IEjieGR9frBsp/+Q01JpToJfzzMUY7ZTDV1IXQZ+AY9L7vRzyimnJHx0Ba4JTlAyHB+Ly5i4Ab2+uZcnNfBXquWrG3oPWz+qPK88LJLya5Jxse1m1QT6R/isDuPivBzntLOooxPk+Cwf5sFAAJND+idTAzWzslexr9j7rtQ1UW6FjO4CvK9yVNz7dgG6FvEZl6J/HOr1rivtGgpCZTBzKNF8jg034n49zGfKkkzWLuXbPUOp3/oGfsKv8pnEu1c2GbQpSmFtZXMgQm90dG9tbGV5IDxqZWpiQGxpbnV4LnZuZXQuaWJtLmNvbT6JAVYEEwEIAEACGwMHCwkIBwMCAQYVC
-	AIJCgsEFgIDAQIeAQIXgBYhBNVgbnPItGJxvq2a34FK5HwhSFTWBQJgS5mXBQkbNYS9AAoJEIFK5HwhSFTWEYEH/1YZpV+1uCI2MVz0wTRlnO/3OW/xnyigrw+K4cuO7MToo0tHJb/qL9CBJ2ddG6q+GTnF5kqUe87t7M7rSrIcAkIZMbJmtIbKk0j5EstyYqlE1HzvpmssGpg/8uJBBuWbU35af1ubKCjUs1+974mYXkfLmS0a6h+cG7atVLmyClIc2frd3o0zHF9+E7BaB+HQzT4lheQAXv9KI+63ksnbBpcZnS44t6mi1lzUE65+Am1z+1KJurF2Qbj4AkICzJjJa0bXa9DmFunjPhLbCU160LppaG3OksxuNOTkGCo/tEotDOotZNBYejWaXN2nr9WrH5hDfQ5zLayfKMtLSd33T9u0IUphbWVzIEJvdHRvbWxleSA8amVqYkBrZXJuZWwub3JnPokBVQQTAQgAPwIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQTVYG5zyLRicb6tmt+BSuR8IUhU1gUCYEuZmAUJGzWEvQAKCRCBSuR8IUhU1gacCAC+QZN+RQd+FOoh5g884HQm8S07ON0/2EMiaXBiL6KQb5yP3w2PKEhug3+uPzugftUfgPEw6emRucrFFpwguhriGhB3pgWJIrTD4JUevrBgjEGOztJpbD73bLLyitSiPQZ6OFVOqIGhdqlc3n0qoNQ45n/w3LMVj6yP43SfBQeQGEdq4yHQxXPs0XQCbmr6Nf2p8mNsIKRYf90fCDmABH1lfZxoGJH/frQOBCJ9bMRNCNy+aFtjd5m8ka5M7gcDvM7TAsKhD5O5qFs4aJHGajF4gCGoWmXZGrISQvrNl9kWUhgsvoPqb2OTTeAQVRuV8C4FQamxzE3MRNH25j6s/qujtCRKYW1lcyBCb3R0b21sZXkgPGplamJAbGludXguaWJtLmNvbT6JAVQEEwEIAD
-	4CGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQTVYG5zyLRicb6tmt+BSuR8IUhU1gUCYEuZmQUJGzWEvQAKCRCBSuR8IUhU1kyHB/9VIOkf8RapONUdZ+7FgEpDgESE/y3coDeeb8jrtJyeefWCA0sWU8GSc9KMcMoSUetUreB+fukeVTe/f2NcJ87Bkq5jUEWff4qsbqf5PPM+wlD873StFc6mP8koy8bb7QcH3asH9fDFXUz7Oz5ubI0sE8+qD+Pdlk5qmLY5IiZ4D98V239nrKIhDymcuL7VztyWfdFSnbVXmumIpi79Ox536P2aMe3/v+1jAsFQOIjThMo/2xmLkQiyacB2veMcBzBkcair5WC7SBgrz2YsMCbC37X7crDWmCI3xEuwRAeDNpmxhVCb7jEvigNfRWQ4TYQADdC4KsilPfuW8Edk/8tPtCVKYW1lcyBCb3R0b21sZXkgPEpCb3R0b21sZXlAT2Rpbi5jb20+iQEfBDABAgAJBQJXI+B0Ah0gAAoJEIFK5HwhSFTWzkwH+gOg1UG/oB2lc0DF3lAJPloSIDBW38D3rezXTUiJtAhenWrH2Cl/ejznjdTukxOcuR1bV8zxR9Zs9jhUin2tgCCxIbrdvFIoYilMMRKcue1q0IYQHaqjd7ko8BHn9UysuX8qltJFar0BOClIlH95gdKWJbK46mw7bsXeD66N9IhAsOMJt6mSJmUdIOMuKy4dD4X3adegKMmoTRvHOndZQClTZHiYt5ECRPO534Lb/gyKAKQkFiwirsgx11ZSx3zGlw28brco6ohSLMBylna/Pbbn5hII86cjrCXWtQ4mE0Y6ofeFjpmMdfSRUxy6LHYd3fxVq9PoAJTv7vQ6bLTDFNa0KkphbWVzIEJvdHRvbWxleSA8SkJvdHRvbWxleUBQYXJhbGxlbHMuY29tPokBHwQwAQIACQUCVyPgjAIdIAAKCRCBSuR8IUhU1tXiB/9D9OOU8qB
-	CZPxkxB6ofp0j0pbZppRe6iCJ+btWBhSURz25DQzQNu5GVBRQt1Us6v3PPGU1cEWi5WL935nw+1hXPIVB3x8hElvdCO2aU61bMcpFd138AFHMHJ+emboKHblnhuY5+L1OlA1QmPw6wQooCor1h113lZiBZGrPFxjRYbWYVQmVaM6zhkiGgIkzQw/g9v57nAzYuBhFjnVHgmmu6/B0N8z6xD5sSPCZSjYSS38UG9w189S8HVr4eg54jReIEvLPRaxqVEnsoKmLisryyaw3EpqZcYAWoX0Am+58CXq3j5OvrCvbyqQIWFElba3Ka/oT7CnTdo/SUL/jPNobtCxKYW1lcyBCb3R0b21sZXkgPGplamJAaGFuc2VucGFydG5lcnNoaXAuY29tPokBVwQTAQgAQRYhBNVgbnPItGJxvq2a34FK5HwhSFTWBQJjg2eQAhsDBQkbNYS9BQsJCAcCAiICBhUKCQgLAgQWAgMBAh4HAheAAAoJEIFK5HwhSFTWbtAH/087y9vzXYAHMPbjd8etB/I3OEFKteFacXBRBRDKXI9ZqK5F/xvd1fuehwQWl2Y/sivD4cSAP0iM/rFOwv9GLyrr82pD/GV/+1iXt9kjlLY36/1U2qoyAczY+jsS72aZjWwcO7Og8IYTaRzlqif9Zpfj7Q0Q1e9SAefMlakI6dcZTSlZWaaXCefdPBCc7BZ0SFY4kIg0iqKaagdgQomwW61nJZ+woljMjgv3HKOkiJ+rcB/n+/moryd8RnDhNmvYASheazYvUwaF/aMj5rIb/0w5p6IbFax+wGF5RmH2U5NeUlhIkTodUF/P7g/cJf4HCL+RA1KU/xS9o8zrAOeut2+4UgRaZ7bmEwgqhkjOPQMBBwIDBH4GsIgL0yQij5S5ISDZmlR7qDQPcWUxMVx6zVPsAoITdjKFjaDmUATkS+l5zmiCrUBcJ6MBavPiYQ4kqn4/xwaJAbMEGAEIACYCGwIWIQTVYG5zyLRi
-	cb6tmt+BSuR8IUhU1gUCZag0LwUJDwLkSQCBdiAEGRMIAB0WIQTnYEDbdso9F2cI+arnQslM7pishQUCWme25gAKCRDnQslM7pishdi9AQDyOvLYOBkylBqiTlJrMnGCCsWgGZwPpKq3e3s7JQ/xBAEAlx29pPY5z0RLyIDUsjf9mtkSNTaeaQ6TIjDrFa+8XH8JEIFK5HwhSFTWkasH/j7LL9WH9dRfwfTwuMMj1/KGzjU/4KFIu4uKxDaevKpGS7sDx4F56mafCdGD8u4+ri6bJr/3mmuzIdyger0vJdRlTrnpX3ONXvR57p1JHgCljehE1ZB0RCzIk0vKhdt8+CDBQWfKbbKBTmzA7wR68raMQb2D7nQ9d0KXXbtr7Hag29yj92aUAZ/sFoe9RhDOcRUptdYyPKU1JHgJyc0Z7HwNjRSJ4lKJSKP+Px0/XxT3gV3LaDLtHuHa2IujLEAKcPzTr5DOV+xsgA3iSwTYI6H5aEe+ZRv/rA4sdjqRiVpo2d044aCUFUNQ3PiIHPAZR3KK5O64m6+BJMDXBvgSsMy4VgRaZ7clEggqhkjOPQMBBwIDBMfuMuE+PECbOoYjkD0Teno7TDbcgxJNgPV7Y2lQbNBnexMLOEY6/xJzRi1Xm/o9mOyZ+VIj8h4G5V/eWSntNkwDAQgHiQE8BBgBCAAmAhsMFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmWoNBwFCQ8C4/cACgkQgUrkfCFIVNZs4AgAnIjU1QEPLdpotiy3X01sKUO+hvcT3/Cd6g55sJyKJ5/U0o3f8fdSn6MWPhi1m62zbAxcLJFiTZ3OWNCZAMEvwHrXFb684Ey6yImQ9gm2dG2nVuCzr1+9gIaMSBeZ+4kUJqhdWSJjrNLQG38GbnBuYOJUD+x6oJ2AT10/mQfBVZ3qWDQXr/je2TSf0OIXaWyG6meG5yTqOEv0eaTH22yBb1nbodoZkmlMMb56jzRGZuorhFE06
-	N0Eb0kiGz5cCIrHZoH10dHWoa7/Z+AzfL0caOKjcmsnUPcmcrqmWzJTEibLA81z15GBCrldfQVt+dF7Us2kc0hKUgaWeI8Gv4CzwLkCDQRUdhaZARAApeF9gbNSBBudW8xeMQIiB/CZwK4VOEP7nGHZn3UsWemsvE9lvjbFzbqcIkbUp2V6ExM5tyEgzio2BavLe1ZJGHVaKkL3cKLABoYi/yBLEnogPFzzYfK2fdipm2G+GhLaqfDxtAQ7cqXeo1TCsZLSvjD+kLVV1TvKlaHS8tUCh2oUyR7fTbv6WHi5H8DLyR0Pnbt9E9/Gcs1j11JX+MWJ7jset2FVDsB5U1LM70AjhXiDiQCtNJzKaqKdMei8zazWS50iMKKeo4m/adWBjG/8ld3fQ7/Hcj6Opkh8xPaCnmgDZovYGavw4Am2tjRqE6G6rPQpS0we5I6lSsKNBP/2FhLmI9fnsBnZC1l1NrASRSX1BK0xf4LYB2Ww3fYQmbbApAUBbWZ/1aQoc2ECKbSK9iW0gfZ8rDggfMw8nzpmEEExl0hU6wtJLymyDV+QGoPx5KwYK/6qAUNJQInUYz8z2ERM/HOI09Zu3jiauFBDtouSIraX/2DDvTf7Lfe1+ihARFSlp64kEMAsjKutNBK2u5oj4H7hQ7zD+BvWLHxMgysOtYYtwggweOrM/k3RndsZ/z3nsGqF0ggct1VLuH2eznDksI+KkZ3Bg0WihQyJ7Z9omgaQAyRDFct+jnJsv2Iza+xIvPei+fpbGNAyFvj0e+TsZoQGcC34/ipGwze651UAEQEAAYkBHwQoAQIACQUCVT6BaAIdAwAKCRCBSuR8IUhU1p5QCAC7pgjOM17Hxwqz9mlGELilYqjzNPUoZt5xslcTFGxj/QWNzu0K8gEQPePnc5dTfumzWL077nxhdKYtoqwm2C6fOmXiJBZx6khBfRqctUvN2DlOB6dFf5I+1QT9TRBvceGzw01E4Gi0xjWKAB6OII
-	MAdnPcDVFzaXJdlAAJdjfg/lyJtAyxifflG8NnXJ3elwGqoBso84XBNWWzbc5VKmatzhYLOvXtfzDhu4mNPv/z7S1HTtRguI0NlH5RVBzSvfzybin9hysE3/+r3C0HJ2xiOHzucNAmG03aztzZYDMTbKQW4bQqeD5MJxT68vBYu8MtzfIe41lSLpb/qlwq1qg0iQElBBgBAgAPBQJUdhaZAhsMBQkA7U4AAAoJEIFK5HwhSFTW3YgH/AyJL2rlCvGrkLcas94ND9Pmn0cUlVrPl7wVGcIV+6I4nrw6u49TyqNMmsYam2YpjervJGgbvIbMzoHFCREi6R9XyUsw5w7GCRoWegw2blZYi5A52xe500+/RruG//MKfOtVUotu3N+u7FcXaYAg9gbYeGNZCV70vI+cnFgq0AEJRdjidzfCWVKPjafTo7jHeFxX7Q22kUfWOkMzzhoDbFg0jPhVYNiEXpNyXCwirzvKA7bvFwZPlRkbfihaiXDE7QKIUtQ10i5kw4C9rqDKwx8F0PaWDRF9gGaKd7/IJGHJaac/OcSJ36zxgkNgLsVX5GUroJ2GaZcR7W9Vppj5H+C4UgRkuRyTEwgqhkjOPQMBBwIDBOySomnsW2SkApXv1zUBaD38dFEj0LQeDEMdSE7bm1fnrdjAYt0f/CtbUUiDaPodQk2qeHzOP6wA/2K6rrjwNIWJAT0EGAEIACcDGyAEFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmWoM/gFCQSxfmUACgkQgUrkfCFIVNZhTgf/VQxtQ5rgu2aoXh2KOH6naGzPKDkYDJ/K7XCJAq3nJYEpYN8G+F8mL/ql0hrihAsHfjmoDOlt+INa3AcG3v0jDZIMEzmcjAlu7g5NcXS3kntcMHgw3dCgE9eYDaKGipUCubdXvBaZWU6AUlTldaB8FE6u7It7+UO+IW4/L+KpLYKs8V5POInu2rqahlm7vgxY5iv4Txz4EvCW2e4dAlG
-	8mT2Eh9SkH+YVOmaKsajgZgrBxA7fWmGoxXswEVxJIFj3vW7yNc0C5HaUdYa5iGOMs4kg2ht4s7yy7NRQuh7BifWjo6BQ6k4S1H+6axZucxhSV1L6zN9d+lr3Xo/vy1unzA==
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jPzA5Cqh"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-42b38693c4dso56969f8f.3
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Nov 2025 10:36:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764182160; x=1764786960; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=l+UpyQQXX4ETUL7fz0/4jQ9/53R6ELtNZ9Z4xa9EpMc=;
+        b=jPzA5Cqhmrbfgc+zL534Z/H4GkxyfEnDr5gk+XEtyfYWXbd+sNtIcjHRihNUVz+9iY
+         aM2Ah74wPTlcsiwgq6Z+FdZX3PS8PHm/Tp0t0vxz04YXWFEBofXKZzGx40LVw69icnrU
+         gp/R3C/D+FWBYLF8QzdiGSMID3CVCdlMoRjQfqOUHdVXpMCj1OaKmfiWPDOpHZz1YQDE
+         UMa4jcnYqp+9pBydFtdJRURgQA0VHaIsx+bE2lgNyh5FVcsqqfxKYXFG4UDufxOa9JQC
+         +dRGEdOG6cN9UWscoSOXbAyE0Fr8pw3Txged50rigpp0lVKV/GTggOXVpBV4kBEyIlFJ
+         9bFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764182160; x=1764786960;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l+UpyQQXX4ETUL7fz0/4jQ9/53R6ELtNZ9Z4xa9EpMc=;
+        b=BOVHFzOyk+LUBrV6+ADYTz0Ulcd3WL1bgXOAQgHIwAI1unWcnZ25BNiNfaKyu4TGyb
+         n65kC5d0VAtDCMi1W6bS8QKM3LdonDpEjf/+URrADtGuy1TOHyvmmN9kEeIaqDVEuzSx
+         ngOAfHLOzApJtnT7wWYK5Ty9p6L9YwsrpSrtfY22QV59essc8Vm07BOu01u5/9Gn+vQB
+         TkD/wuzrCchlH7IWP4LTJC1cjOsVUs28DIyezPagOFDHR4wyWd5dtUmilB+mErr477m7
+         Q/nSRfL99LrigVTqv3qyLI5JoiJADNtyPplDTW4kmvnJWywPdikOuLREXYHBqUVU+qiU
+         QJkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXI7YS1pJIjhpgST+SLShu9UbYzn7FuZy3CxrlxRPYO4rITF1/kUt0pxMdO7eTwP0dAktkno81AumRdH00=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yznb0PePrx1b621nniCUW1lO0+ypZWiK1E+w5e4qeXoduDq7NqC
+	/6EHNjDGuyPX5Z/rE+BX8N8E6u+oL4jHHOvGpJEt8+2jkx/WxVvrZBM5
+X-Gm-Gg: ASbGnctIKSCQmvPMh3mOvDVjNgi42mMeZ0f2NKybCdd1KJcT8blVQFlZur8AOKmPPk7
+	W+MR/sr4b6DxjGSTCur4IaAP6smE/WzbXTBbleCSLkL/FpYMy756+rqPiEQ6Pf5zYVFCF0TRbub
+	7DaCaPl4n8Zbm9NKaH3VQ4E1hVlG1gAS+t1PcIWaA2EJGxv0qUtUwJKVZeR3RQvhV+Go6h5fce5
+	wVPMc2MhMYZbQgF6Vh5onGn36bHhFejdHWx3JHRKzEPBcKyCP9iYgOunR5vmP4EjOEQohNFEpWm
+	moJPhMeAn650/7WqUDVSW7chpykdIe9yC8tgbrJeZsZC+Xma7j8GDbTkPEJdgViepCkimo66k+S
+	EMf9XzeAedu945+5uyDrX+INJbujJNEuW3CjXObdJbLSWCuiGN0RmlaMKZZR8Bd+YfehfVCbZWI
+	v3uVhPQERtSm1PWNbGqbVeCPk67pW/OFc8uQ==
+X-Google-Smtp-Source: AGHT+IEDaKLHkuJUlFxjTNYKXYKXILgs49wv90DIhz+B7Erbl6ou89i0ju5Aozc3Dud2Eq5F+/QLtQ==
+X-Received: by 2002:a05:6000:401f:b0:42b:2ac7:7942 with SMTP id ffacd0b85a97d-42e0f1e3433mr8676095f8f.5.1764182159355;
+        Wed, 26 Nov 2025 10:35:59 -0800 (PST)
+Received: from vitor-nb.Home (bl19-170-125.dsl.telepac.pt. [2.80.170.125])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fa3a6bsm41766947f8f.28.2025.11.26.10.35.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Nov 2025 10:35:58 -0800 (PST)
+Message-ID: <82e78d56c7df6e1f93de29f9b3a70f7c132603c4.camel@gmail.com>
+Subject: Re: CAAM RSA breaks cfg80211 certificate verification on iMX8QXP
+From: Vitor Soares <ivitro@gmail.com>
+To: Ahmad Fatoum <ahmad@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Cc: horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com, 
+ herbert@gondor.apana.org.au, john.ernberg@actia.se,
+ meenakshi.aggarwal@nxp.com
+Date: Wed, 26 Nov 2025 18:35:57 +0000
+In-Reply-To: <3d44957f-8c09-47f3-93e0-78a1d34adfd0@kernel.org>
+References: <b017b6260075f7ba11c52e71bcc5cebe427e020f.camel@gmail.com>
+	 <ac727d79bdd7e20bf390408e4fa4dfeadb4b8732.camel@gmail.com>
+	 <3d44957f-8c09-47f3-93e0-78a1d34adfd0@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -58,37 +82,142 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Tue, 2025-11-25 at 14:02 -0500, James Bottomley wrote:
-> Although the biggest use of signed attributes is PKCS#7 and X509
-> specific data, they can be added to a signature to support arbitrary
-> and verifiable objects.=C2=A0 This makes them particularly useful when yo=
-u
-> want to take an existing signature scheme and extend it with
-> additional (but always verified) data in such a way that it still
-> looks valid to both the old and new schemes.
+On Wed, 2025-11-26 at 13:59 +0100, Ahmad Fatoum wrote:
+> Hello Vitor,
+>=20
+> On 26.11.25 11:55, Vitor Soares wrote:
+> > ++imx@lists.linux.dev
+> >=20
+> > On Mon, 2025-11-24 at 19:03 +0000, Vitor Soares wrote:
+> > > I=E2=80=99m currently investigating an issue on our Colibri iMX8QXP S=
+oM running
+> > > kernel
+> > > 6.18-rc6 (also reproducible on v6.17), where cfg80211 fails to load t=
+he
+> > > compiled-in X.509 certificates used to verify the regulatory database
+> > > signature.
+> > >=20
+> > > During boot, I consistently see the following messages:
+> > > =C2=A0cfg80211: Loading compiled-in X.509 certificates for regulatory=
+ database
+> > > =C2=A0Problem loading in-kernel X.509 certificate (-22)
+> > > =C2=A0Problem loading in-kernel X.509 certificate (-22)
+> > > =C2=A0cfg80211: loaded regulatory.db is malformed or signature is
+> > > missing/invalid
+> > >=20
+> > > As part of the debugging process, I removed the CAAM crypto drivers a=
+nd
+> > > manually
+> > > reloaded cfg80211. In this configuration, the certificates load corre=
+ctly
+> > > and
+> > > the regulatory database is validated with no errors.
+> > >=20
+> > > With additional debugging enabled, I traced the failure to
+> > > crypto_sig_verify(),
+> > > which returns -22 (EINVAL).
+> > > At this stage, I=E2=80=99m trying to determine whether:
+> > > =C2=A0- This is a known issue involving cfg80211 certificate validati=
+on when
+> > > the
+> > > CAAM
+> > > hardware crypto engine is enabled on i.MX SoCs, or
+> > > =C2=A0- CAAM may be returning unexpected values to the X.509 verifica=
+tion
+> > > logic.
+> > >=20
+> > > If anyone has encountered similar behavior or can suggest areas to
+> > > investigate=E2=80=94particularly around CAAM=E2=80=94I would greatly =
+appreciate your
+> > > guidance.
+> > >=20
+> > > Thanks in advance for any insights,
+> > > V=C3=ADtor Soares
+> >=20
+> > Following up with additional debugging findings.
+> >=20
+> > I traced the -EINVAL to rsassa_pkcs1_verify() in the PKCS#1 v1.5
+> > verification
+> > path. The check that fails expects a leading 0x00 byte in the RSA outpu=
+t
+> > buffer.
+> > To investigate further, I poisoned the output buffer with 0xAA before t=
+he
+> > RSA
+> > operation. CAAM RSA operation returns success, but the output buffer is
+> > never
+> > written to.
+> >=20
+> > During debugging, I loaded cfg80211 multiple times and observed that
+> > sporadically one of the certificates gets verified correctly, but never
+> > both.
+> >=20
+> > I confirmed that other CAAM operations work correctly by testing hwrng =
+via
+> > /dev/hwrng, which produces valid random data.
+> >=20
+> > Given that CAAM reports success but does not populate the RSA output bu=
+ffer,
+> > the
+> > problem appears to be somewhere in the RSA execution flow (possibly in =
+how
+> > the
+> > result buffer is handled or returned), but I don=E2=80=99t have enough =
+insight into
+> > CAAM's RSA implementation or firmware interaction to pinpoint the exact
+> > cause.
+> >=20
+> > As noted previously, blacklisting caam_pkc to force rsa-generic resolve=
+s the
+> > issue.
+>=20
+> Just a shot in the dark, because I have no experience with i.MX8 beyond
+> i.MX8M:
+>=20
+> Is the CAAM cache-coherent on your SoC? If so does the DT specify dma-coh=
+erent
+> as it should? On i.MX8M, it's not cache-coherent, but on Layerscape it wa=
+s and
+> the mismatch with the DT leads to symptoms matching what you are observin=
+g.
+>=20
 
-There's a security problem in the patches in that if we're using the
-attribute for additional security, we must also verify it comes from a
-trusted signature.  The potential attack vector is that an attacker
-could take a validly signed pkcs7 and add their own signer info to it
-(which would validate but not back to a trusted key).  If they
-manipulate the pkcs7 so this appears first, we'd pull the trusted
-attribute the attacker has supplied, since we return after finding the
-first matching OID.  To fix this, I'm going to add a bool sinfo-
->verified argument which is set when the sinfo is verified against a
-kering and only trust sinfos in the attribute search if this tag is
-true.
+Thanks for the suggestion. I tested with dma-coherent added to the CAAM and=
+ job
+ring nodes but the issue persists.
+I traced through the DMA path in caampkc.c and confirmed:
 
-For the case where we only parse then get the OID (without a validation
-step, because the pkcs7 was previously validated but the pkcs7 object
-was lost), I'm going to add a new validate_pkcs7_trust() call that
-allows setting the sinfo->verified flag based on the trusted keyring
-... and thread this through system_keyring.c to avoid leaking the
-trusted keyrings.
+- dma_map_sg() is called in rsa_edesc_alloc() with DMA_FROM_DEVICE
+- dma_unmap_sg() is called in rsa_io_unmap() from rsa_pub_done() before
+completion
+- CAAM returns status err=3D0x00000000 (success)
+- dst_nents=3D1=20
 
-I'll post the v2 with all the new patches to do the above shortly.
+Yet the output buffer remains untouched (still contains my 0xAA poison patt=
+ern).
+The kernel DMA handling appears correct. CAAM accepts the job and reports
+success, but never writes the RSA result. Given that CAAM reports success b=
+ut
+does not populate the RSA output buffer, the problem appears to be somewher=
+e in
+the RSA execution flow (possibly in how the result buffer is handled or
+returned), but I don't have enough insight into CAAM's RSA implementation.
+
+> Off-topic remark: If you have performance comparison between running with=
+ and
+> without CAAM RSA acceleration, I'd be interested to hear about them.
+> At least for the hashing algorithms, using the Cortex-A53 (+ CE) CPU was =
+a lot
+> faster than bothering with the CAAM "acceleration".
+>=20
+
+I haven't done a kernel-level CAAM vs software RSA comparison, but OpenSSL =
+with
+ARM Crypto Extensions shows ~3100 verify ops/sec and ~80 sign ops/sec for R=
+SA
+2048 on the Cortex-A35.
 
 Regards,
+V=C3=ADtor
 
-James
 
