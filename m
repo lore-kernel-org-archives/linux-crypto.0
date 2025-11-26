@@ -1,223 +1,271 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail8.wdc04.mandrillapp.com (mail8.wdc04.mandrillapp.com [205.201.139.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454F730C61C
-	for <linux-crypto@vger.kernel.org>; Wed, 26 Nov 2025 18:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496DF3148BD
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Nov 2025 19:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.201.139.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764182163; cv=none; b=SiN/fPl9rsCPyUJqHxwg9Wo0deV1lz1yppMJH40nNkroBBhjVmfCHu62Oc4+XYYMAx48TqbuOmwGrZJ+52FdZnynxpEJfeQzIjFSP9VF9A5Hm73Ew+FFkDG6JPSnjNHecGbr32SNBNTnZknoxtYeW1zgQX6I5BgP3g49oiqbgx4=
+	t=1764184292; cv=none; b=hS0kjMP5sbLt0ABMuYBUa2Ll+3asMGrJhfiapBdRemE3lV7o4kzvHPnC/3cc8U32LhhcSOO/jajx4V4WGgNBZ9uNE00dqLobdefvQvl+1/+FfpgBkyJhvP7/i8DThLsqjO1OyxB16hncCc9MSmMhmfrwGbqYI9Cb8GsssMKsbhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764182163; c=relaxed/simple;
-	bh=l+UpyQQXX4ETUL7fz0/4jQ9/53R6ELtNZ9Z4xa9EpMc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=NyhO0M45xWjwQMOLTuIJqiTj0a83PQ4VJptNpvb/cUDaPXx3xdc/d+r5SwG2dazZHWJMGgUSMmnkuSCEpql/895H+s1f70rLt1bat8sZfB5YlwP8mDQHXhwyQVCdBWqojhBhc0FLy/mwYU//gXpsZAiCBAxquNjweajJxQq/8vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jPzA5Cqh; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764184292; c=relaxed/simple;
+	bh=nKeewWW3P5B4SMtRZCew3v4YB5Dt7pUrcKq0obyJyJ8=;
+	h=From:Subject:To:Cc:Message-Id:Date:MIME-Version:Content-Type; b=RtJlNkWcfAZL0Iq5vp48nwRHx4n8VqnF70Ux0WgiL8uWoxNO2rWpCqeWDcOHQJuM9e41efhdDPlbKQViPCpMO0iicq410pht9L/HiS2JJlu9E1DFDuHu3vrYgZnxKaKrqxKYudKnKOq7ctO/zS7Tbsi0Zy20StXxx5eo/3Ejh5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=DqeLr4IB; dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b=TNY4xOEf; arc=none smtp.client-ip=205.201.139.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jPzA5Cqh"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-42b38693c4dso56969f8f.3
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Nov 2025 10:36:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764182160; x=1764786960; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=l+UpyQQXX4ETUL7fz0/4jQ9/53R6ELtNZ9Z4xa9EpMc=;
-        b=jPzA5Cqhmrbfgc+zL534Z/H4GkxyfEnDr5gk+XEtyfYWXbd+sNtIcjHRihNUVz+9iY
-         aM2Ah74wPTlcsiwgq6Z+FdZX3PS8PHm/Tp0t0vxz04YXWFEBofXKZzGx40LVw69icnrU
-         gp/R3C/D+FWBYLF8QzdiGSMID3CVCdlMoRjQfqOUHdVXpMCj1OaKmfiWPDOpHZz1YQDE
-         UMa4jcnYqp+9pBydFtdJRURgQA0VHaIsx+bE2lgNyh5FVcsqqfxKYXFG4UDufxOa9JQC
-         +dRGEdOG6cN9UWscoSOXbAyE0Fr8pw3Txged50rigpp0lVKV/GTggOXVpBV4kBEyIlFJ
-         9bFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764182160; x=1764786960;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l+UpyQQXX4ETUL7fz0/4jQ9/53R6ELtNZ9Z4xa9EpMc=;
-        b=BOVHFzOyk+LUBrV6+ADYTz0Ulcd3WL1bgXOAQgHIwAI1unWcnZ25BNiNfaKyu4TGyb
-         n65kC5d0VAtDCMi1W6bS8QKM3LdonDpEjf/+URrADtGuy1TOHyvmmN9kEeIaqDVEuzSx
-         ngOAfHLOzApJtnT7wWYK5Ty9p6L9YwsrpSrtfY22QV59essc8Vm07BOu01u5/9Gn+vQB
-         TkD/wuzrCchlH7IWP4LTJC1cjOsVUs28DIyezPagOFDHR4wyWd5dtUmilB+mErr477m7
-         Q/nSRfL99LrigVTqv3qyLI5JoiJADNtyPplDTW4kmvnJWywPdikOuLREXYHBqUVU+qiU
-         QJkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXI7YS1pJIjhpgST+SLShu9UbYzn7FuZy3CxrlxRPYO4rITF1/kUt0pxMdO7eTwP0dAktkno81AumRdH00=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yznb0PePrx1b621nniCUW1lO0+ypZWiK1E+w5e4qeXoduDq7NqC
-	/6EHNjDGuyPX5Z/rE+BX8N8E6u+oL4jHHOvGpJEt8+2jkx/WxVvrZBM5
-X-Gm-Gg: ASbGnctIKSCQmvPMh3mOvDVjNgi42mMeZ0f2NKybCdd1KJcT8blVQFlZur8AOKmPPk7
-	W+MR/sr4b6DxjGSTCur4IaAP6smE/WzbXTBbleCSLkL/FpYMy756+rqPiEQ6Pf5zYVFCF0TRbub
-	7DaCaPl4n8Zbm9NKaH3VQ4E1hVlG1gAS+t1PcIWaA2EJGxv0qUtUwJKVZeR3RQvhV+Go6h5fce5
-	wVPMc2MhMYZbQgF6Vh5onGn36bHhFejdHWx3JHRKzEPBcKyCP9iYgOunR5vmP4EjOEQohNFEpWm
-	moJPhMeAn650/7WqUDVSW7chpykdIe9yC8tgbrJeZsZC+Xma7j8GDbTkPEJdgViepCkimo66k+S
-	EMf9XzeAedu945+5uyDrX+INJbujJNEuW3CjXObdJbLSWCuiGN0RmlaMKZZR8Bd+YfehfVCbZWI
-	v3uVhPQERtSm1PWNbGqbVeCPk67pW/OFc8uQ==
-X-Google-Smtp-Source: AGHT+IEDaKLHkuJUlFxjTNYKXYKXILgs49wv90DIhz+B7Erbl6ou89i0ju5Aozc3Dud2Eq5F+/QLtQ==
-X-Received: by 2002:a05:6000:401f:b0:42b:2ac7:7942 with SMTP id ffacd0b85a97d-42e0f1e3433mr8676095f8f.5.1764182159355;
-        Wed, 26 Nov 2025 10:35:59 -0800 (PST)
-Received: from vitor-nb.Home (bl19-170-125.dsl.telepac.pt. [2.80.170.125])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fa3a6bsm41766947f8f.28.2025.11.26.10.35.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 10:35:58 -0800 (PST)
-Message-ID: <82e78d56c7df6e1f93de29f9b3a70f7c132603c4.camel@gmail.com>
-Subject: Re: CAAM RSA breaks cfg80211 certificate verification on iMX8QXP
-From: Vitor Soares <ivitro@gmail.com>
-To: Ahmad Fatoum <ahmad@kernel.org>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, imx@lists.linux.dev
-Cc: horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com, 
- herbert@gondor.apana.org.au, john.ernberg@actia.se,
- meenakshi.aggarwal@nxp.com
-Date: Wed, 26 Nov 2025 18:35:57 +0000
-In-Reply-To: <3d44957f-8c09-47f3-93e0-78a1d34adfd0@kernel.org>
-References: <b017b6260075f7ba11c52e71bcc5cebe427e020f.camel@gmail.com>
-	 <ac727d79bdd7e20bf390408e4fa4dfeadb4b8732.camel@gmail.com>
-	 <3d44957f-8c09-47f3-93e0-78a1d34adfd0@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="DqeLr4IB";
+	dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b="TNY4xOEf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
+	s=mte1; t=1764184289; x=1764454289;
+	bh=/MREF0EwtVtv19KMTRgY9BsLCx0psIVUg7lgQIree34=;
+	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
+	b=DqeLr4IBdQZZzKS2yljRTJRoOoAla2HinxLrHPH2TOZDM147QW1IEfSLz/E72kKhn
+	 AKQ6hZOlQuRCWia2r1kOaQLTR4zwQA1PEAALhce65p5j4Uu+RhIWF+OXGEfpLGoOeG
+	 1HWKgW3kkTLGv37/lX3tOk6uRFSP59lLXDRACw5kENBHHnloqitwO7BOSRd7evYCLQ
+	 4derPje1pwm1ZGRlJ4YuGxLPkNRg/UTF3fGngHDm+5d8+pNNCiem5Dgr+2vqFLoAeQ
+	 fSM8yYGwwgzXim2r5tz+jZoDsAFtP9cqQpL8mQ4n2OCjRrlqGbAauvMBjhWSPFZ4RH
+	 Ttzcb7vpQ5cfg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
+	t=1764184289; x=1764444789; i=thomas.courrege@vates.tech;
+	bh=/MREF0EwtVtv19KMTRgY9BsLCx0psIVUg7lgQIree34=;
+	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
+	b=TNY4xOEfRuf3wxWo7tkQ29U3N7GqLeQ7VzRErZK5FHUWHJn8IkKY6o+flDTPSHL12
+	 XmgjPUGChdrszpjmt9s8y4pdAxp9vM9qAxSmikCaz7HT23kehhZTVXqquEohV85Qhu
+	 FgtCI5vnn4jvsBy/d7mi+Nfh4KaM0VEsgPD2Ou+CwVmEgcMdiAA+UEzYptEULdeaTo
+	 zKLGtOelcbkKCUXvukD1pqqRuGCDm3/KGfKTISisxfdGhRi0O0RAaJsS/49xlnxxz8
+	 iM1PnScFD4ZDFdvLBjlBQ0f0NSryJ8OVWTmKzOIPY/4jNjACHdqd5DvaeYz0S3KkGU
+	 +bRZAOzIKD7+A==
+Received: from pmta16.mandrill.prod.suw01.rsglab.com (localhost [127.0.0.1])
+	by mail8.wdc04.mandrillapp.com (Mailchimp) with ESMTP id 4dGq0x0hrrz3sNJBG
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Nov 2025 19:11:29 +0000 (GMT)
+From: "Thomas Courrege" <thomas.courrege@vates.tech>
+Subject: =?utf-8?Q?[PATCH]=20KVM:=20SEV:=20Add=20hypervisor=20report=20request=20for=20SNP=20guests?=
+Received: from [37.26.189.201] by mandrillapp.com id 8a7614c748464883b26c76badf299b8e; Wed, 26 Nov 2025 19:11:29 +0000
+X-Mailer: git-send-email 2.52.0
+X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
+X-Bm-Transport-Timestamp: 1764184286986
+To: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, ashish.kalra@amd.com, thomas.lendacky@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au
+Cc: thomas.courrege@vates.tech, x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Message-Id: <20251126191114.874779-1-thomas.courrege@vates.tech>
+X-Native-Encoded: 1
+X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.8a7614c748464883b26c76badf299b8e?=
+X-Mandrill-User: md_30504962
+Feedback-ID: 30504962:30504962.20251126:md
+Date: Wed, 26 Nov 2025 19:11:29 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2025-11-26 at 13:59 +0100, Ahmad Fatoum wrote:
-> Hello Vitor,
->=20
-> On 26.11.25 11:55, Vitor Soares wrote:
-> > ++imx@lists.linux.dev
-> >=20
-> > On Mon, 2025-11-24 at 19:03 +0000, Vitor Soares wrote:
-> > > I=E2=80=99m currently investigating an issue on our Colibri iMX8QXP S=
-oM running
-> > > kernel
-> > > 6.18-rc6 (also reproducible on v6.17), where cfg80211 fails to load t=
-he
-> > > compiled-in X.509 certificates used to verify the regulatory database
-> > > signature.
-> > >=20
-> > > During boot, I consistently see the following messages:
-> > > =C2=A0cfg80211: Loading compiled-in X.509 certificates for regulatory=
- database
-> > > =C2=A0Problem loading in-kernel X.509 certificate (-22)
-> > > =C2=A0Problem loading in-kernel X.509 certificate (-22)
-> > > =C2=A0cfg80211: loaded regulatory.db is malformed or signature is
-> > > missing/invalid
-> > >=20
-> > > As part of the debugging process, I removed the CAAM crypto drivers a=
-nd
-> > > manually
-> > > reloaded cfg80211. In this configuration, the certificates load corre=
-ctly
-> > > and
-> > > the regulatory database is validated with no errors.
-> > >=20
-> > > With additional debugging enabled, I traced the failure to
-> > > crypto_sig_verify(),
-> > > which returns -22 (EINVAL).
-> > > At this stage, I=E2=80=99m trying to determine whether:
-> > > =C2=A0- This is a known issue involving cfg80211 certificate validati=
-on when
-> > > the
-> > > CAAM
-> > > hardware crypto engine is enabled on i.MX SoCs, or
-> > > =C2=A0- CAAM may be returning unexpected values to the X.509 verifica=
-tion
-> > > logic.
-> > >=20
-> > > If anyone has encountered similar behavior or can suggest areas to
-> > > investigate=E2=80=94particularly around CAAM=E2=80=94I would greatly =
-appreciate your
-> > > guidance.
-> > >=20
-> > > Thanks in advance for any insights,
-> > > V=C3=ADtor Soares
-> >=20
-> > Following up with additional debugging findings.
-> >=20
-> > I traced the -EINVAL to rsassa_pkcs1_verify() in the PKCS#1 v1.5
-> > verification
-> > path. The check that fails expects a leading 0x00 byte in the RSA outpu=
-t
-> > buffer.
-> > To investigate further, I poisoned the output buffer with 0xAA before t=
-he
-> > RSA
-> > operation. CAAM RSA operation returns success, but the output buffer is
-> > never
-> > written to.
-> >=20
-> > During debugging, I loaded cfg80211 multiple times and observed that
-> > sporadically one of the certificates gets verified correctly, but never
-> > both.
-> >=20
-> > I confirmed that other CAAM operations work correctly by testing hwrng =
-via
-> > /dev/hwrng, which produces valid random data.
-> >=20
-> > Given that CAAM reports success but does not populate the RSA output bu=
-ffer,
-> > the
-> > problem appears to be somewhere in the RSA execution flow (possibly in =
-how
-> > the
-> > result buffer is handled or returned), but I don=E2=80=99t have enough =
-insight into
-> > CAAM's RSA implementation or firmware interaction to pinpoint the exact
-> > cause.
-> >=20
-> > As noted previously, blacklisting caam_pkc to force rsa-generic resolve=
-s the
-> > issue.
->=20
-> Just a shot in the dark, because I have no experience with i.MX8 beyond
-> i.MX8M:
->=20
-> Is the CAAM cache-coherent on your SoC? If so does the DT specify dma-coh=
-erent
-> as it should? On i.MX8M, it's not cache-coherent, but on Layerscape it wa=
-s and
-> the mismatch with the DT leads to symptoms matching what you are observin=
-g.
->=20
+Add support for retrieving the SEV-SNP attestation report via the
+SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
+ioctl for SNP guests.
 
-Thanks for the suggestion. I tested with dma-coherent added to the CAAM and=
- job
-ring nodes but the issue persists.
-I traced through the DMA path in caampkc.c and confirmed:
+Signed-off-by: Thomas Courrege <thomas.courrege@vates.tech>
+---
+ .../virt/kvm/x86/amd-memory-encryption.rst    | 18 ++++++
+ arch/x86/include/uapi/asm/kvm.h               |  7 +++
+ arch/x86/kvm/svm/sev.c                        | 60 +++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.c                  |  1 +
+ include/linux/psp-sev.h                       | 28 +++++++++
+ 5 files changed, 114 insertions(+)
 
-- dma_map_sg() is called in rsa_edesc_alloc() with DMA_FROM_DEVICE
-- dma_unmap_sg() is called in rsa_io_unmap() from rsa_pub_done() before
-completion
-- CAAM returns status err=3D0x00000000 (success)
-- dst_nents=3D1=20
-
-Yet the output buffer remains untouched (still contains my 0xAA poison patt=
-ern).
-The kernel DMA handling appears correct. CAAM accepts the job and reports
-success, but never writes the RSA result. Given that CAAM reports success b=
-ut
-does not populate the RSA output buffer, the problem appears to be somewher=
-e in
-the RSA execution flow (possibly in how the result buffer is handled or
-returned), but I don't have enough insight into CAAM's RSA implementation.
-
-> Off-topic remark: If you have performance comparison between running with=
- and
-> without CAAM RSA acceleration, I'd be interested to hear about them.
-> At least for the hashing algorithms, using the Cortex-A53 (+ CE) CPU was =
-a lot
-> faster than bothering with the CAAM "acceleration".
->=20
-
-I haven't done a kernel-level CAAM vs software RSA comparison, but OpenSSL =
-with
-ARM Crypto Extensions shows ~3100 verify ops/sec and ~80 sign ops/sec for R=
-SA
-2048 on the Cortex-A35.
-
-Regards,
-V=C3=ADtor
-
-
+diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+index 1ddb6a86ce7f..f473e9304634 100644
+--- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+@@ -572,6 +572,24 @@ Returns: 0 on success, -negative on error
+ See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
+ details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
+ 
++21. KVM_SEV_SNP_GET_HV_REPORT
++-----------------------------
++
++The KVM_SEV_SNP_GET_HV_REPORT command requests the hypervisor-generated
++SNP attestation report. This report is produced by the PSP using the
++HV-SIGNED key selected by the caller.
++
++Parameters (in): struct kvm_sev_snp_hv_report_req
++
++Returns:  0 on success, -negative on error
++
++::
++        struct kvm_sev_snp_hv_report_req {
++                __u8 key_sel;
++                __u64 report_uaddr;
++                __u64 report_len;
++        };
++
+ Device attribute API
+ ====================
+ 
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index d420c9c066d4..ff034668cac4 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -742,6 +742,7 @@ enum sev_cmd_id {
+ 	KVM_SEV_SNP_LAUNCH_START = 100,
+ 	KVM_SEV_SNP_LAUNCH_UPDATE,
+ 	KVM_SEV_SNP_LAUNCH_FINISH,
++	KVM_SEV_SNP_HV_REPORT_REQ,
+ 
+ 	KVM_SEV_NR_MAX,
+ };
+@@ -870,6 +871,12 @@ struct kvm_sev_receive_update_data {
+ 	__u32 pad2;
+ };
+ 
++struct kvm_sev_snp_hv_report_req {
++	__u8 key_sel;
++	__u64 report_uaddr;
++	__u64 report_len;
++};
++
+ struct kvm_sev_snp_launch_start {
+ 	__u64 policy;
+ 	__u8 gosvw[16];
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 0835c664fbfd..4ab572d970a4 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2253,6 +2253,63 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	return rc;
+ }
+ 
++static int sev_snp_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
++	struct sev_data_snp_hv_report_req data;
++	struct kvm_sev_snp_hv_report_req params;
++	void __user *u_report;
++	void __user *u_params = u64_to_user_ptr(argp->data);
++	struct sev_data_snp_msg_report_rsp *report_rsp = NULL;
++	int ret;
++
++	if (!sev_snp_guest(kvm))
++		return -ENOTTY;
++
++	if (copy_from_user(&params, u_params, sizeof(params)))
++		return -EFAULT;
++
++	/* A report uses 1184 bytes */
++	if (params.report_len < 1184)
++		return -ENOSPC;
++
++	memset(&data, 0, sizeof(data));
++
++	u_report = u64_to_user_ptr(params.report_uaddr);
++	if (!u_report)
++		return -EINVAL;
++
++	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	if (!report_rsp)
++		return -ENOMEM;
++
++	data.len = sizeof(data);
++	data.hv_report_paddr = __psp_pa(report_rsp);
++	data.key_sel = params.key_sel;
++
++	data.gctx_addr = __psp_pa(sev->snp_context);
++	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
++			    &argp->error);
++
++	if (ret)
++		goto e_free_rsp;
++
++	params.report_len = report_rsp->report_size;
++	if (copy_to_user(u_params, &params, sizeof(params)))
++		ret = -EFAULT;
++
++	if (params.report_len < report_rsp->report_size) {
++		ret = -ENOSPC;
++		/* report is located right after rsp */
++	} else if (copy_to_user(u_report, report_rsp + 1, report_rsp->report_size)) {
++		ret = -EFAULT;
++	}
++
++e_free_rsp:
++	snp_free_firmware_page(report_rsp);
++	return ret;
++}
++
+ struct sev_gmem_populate_args {
+ 	__u8 type;
+ 	int sev_fd;
+@@ -2664,6 +2721,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_SNP_LAUNCH_FINISH:
+ 		r = snp_launch_finish(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SNP_HV_REPORT_REQ:
++		r = sev_snp_report_request(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		goto out;
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 0d13d47c164b..5236d5ee19ac 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -251,6 +251,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
+ 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
+ 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
++	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
+ 	default:				return 0;
+ 	}
+ 
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index e0dbcb4b4fd9..c382edc8713a 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -91,6 +91,7 @@ enum sev_cmd {
+ 	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
+ 	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
+ 	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
++	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
+ 	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
+ 	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
+ 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
+@@ -554,6 +555,33 @@ struct sev_data_attestation_report {
+ 	u32 len;				/* In/Out */
+ } __packed;
+ 
++/**
++ * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
++ *
++ * @len: length of the command buffer in bytes
++ * @key_sel: Selects which key to use for generating the signature.
++ * @gctx_addr: System physical address of guest context page
++ * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
++ */
++struct sev_data_snp_hv_report_req {
++	u32 len;		/* In */
++	u32 key_sel:2;		/* In */
++	u32 rsvd:30;
++	u64 gctx_addr;		/* In */
++	u64 hv_report_paddr;	/* In */
++} __packed;
++/**
++ * struct sev_data_snp_msg_export_rsp
++ *
++ * @status: Status : 0h: Success. 16h: Invalid parameters.
++ * @report_size: Size in bytes of the attestation report
++ */
++struct sev_data_snp_msg_report_rsp {
++	u32 status;			/* Out */
++	u32 report_size;		/* Out */
++	u8 rsvd[24];
++} __packed;
++
+ /**
+  * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
+  *
+-- 
+2.52.0
