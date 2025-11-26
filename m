@@ -1,69 +1,85 @@
-Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39ACC3191C3;
-	Wed, 26 Nov 2025 08:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764146325; cv=none; b=IK6Ur61i/isEDLKcb8A3WI2QZuEaKu7p53MfYvks3sGF6ApMAs2870zUfpJSI6wMTf1ZjABZeBYVhnfr0QDEtlXmgH40BNb6gU8gke4mzhKNcuuU5iKQkkg52z+WTbtuna4zZOcZFnDdVxU7yicaQS+u6qUMou34K2eq/YBMBPA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764146325; c=relaxed/simple;
-	bh=uSB15mBgdtedYCIi4Tln5fcQp1Yto607yFcD4qgc1nI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sDCvP7N0lVYwEDQFcKIEFgzd48gGh7C0xh1DnQZ48yPkqFwoaf2OzAVW7JkHUpX1PQoGUhszr5uGnbRkETZjj9uDePUfMJh2OvRKuHWp6IjWfHuOUSleIi9LRPA8BDvqNYbcDHaO7MVeaGUpMZO3nYl/Pzgljl96SekgMu6ZMzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b=VPpBGfn0; arc=none smtp.client-ip=85.214.250.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b="VPpBGfn0"
-Received: from 8bytes.org (p549214ac.dip0.t-ipconnect.de [84.146.20.172])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.8bytes.org (Postfix) with ESMTPSA id B8A9A5BE7F;
-	Wed, 26 Nov 2025 09:38:40 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-	s=default; t=1764146320;
-	bh=uSB15mBgdtedYCIi4Tln5fcQp1Yto607yFcD4qgc1nI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VPpBGfn08CttZZhQCELHrXC6E1DQkGVsc+GlLDDobn3/njSAR1okVXlwDSvNW9dbt
-	 94XpOuyvvs+wJqXn2vNWD7sjoQlbha9rIZN/2uBV7p7i+8uzLZYo/mojjbqjZ1g8Op
-	 94okBTqL2AiIt33iBGOY2wMBE05/JLpZI5NzVF4IGI3kMaF1DijbNhIibNzb/09LsG
-	 sVCOBraD2WVbZNDjn9DgOfx8an8gZZbnN4sRVK/X/m+VnuF2QAoIZZpLRk7gtAD5KA
-	 1+AhA2symh6vCQovDVR/QeIjbgN0Hnn242c4+YCkDzxLUYRPA0OkcTLcuxo1sHHku+
-	 HxCpF/e+bXvyQ==
-Date: Wed, 26 Nov 2025 09:38:39 +0100
-From: Joerg Roedel <joro@8bytes.org>
-To: dan.j.williams@intel.com
-Cc: Alexey Kardashevskiy <aik@amd.com>, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>, 
-	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Ashish Kalra <ashish.kalra@amd.com>, 
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, Will Deacon <will@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, 
-	Kim Phillips <kim.phillips@amd.com>, Jerry Snitselaar <jsnitsel@redhat.com>, 
-	Vasant Hegde <vasant.hegde@amd.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Gao Shiyuan <gaoshiyuan@baidu.com>, Sean Christopherson <seanjc@google.com>, 
-	Nikunj A Dadhania <nikunj@amd.com>, Michael Roth <michael.roth@amd.com>, 
-	Amit Shah <amit.shah@amd.com>, Peter Gonda <pgonda@google.com>, iommu@lists.linux.dev
-Subject: Re: [PATCH kernel v2 0/5] PCI/TSM: Enabling core infrastructure on
-Message-ID: <hq6gtiznik5nfwd2bg7gtvm5qw3x5hc4a72s432snotfqyxmsk@jmfit3s6sxa4>
-References: <20251121080629.444992-1-aik@amd.com>
- <692613e0e0680_1981100d3@dwillia2-mobl4.notmuch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73AC42E88BB
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Nov 2025 09:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764150433; cv=none; b=d1pYZOhmKzZ6FCSdLUBTSW55TnYhZ9PbSN0vNzo+UsN2GX5y9Dx0Y6T3xaJA85JrrHkrM/dfvyarjzVGaD/xKpFL8bC0G71WGxsQivzbt0M6rYbDNuvlVTfSGPta76B9p7o62yP80aDMt2Vmc0sZN35AQ7b/hwhb2KIsPrnN28A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764150433; c=relaxed/simple;
+	bh=D8jihN4OFo3/AxsG+ckzMEMKh/2sCg0idCqrn9iSy9A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XKk2GxzrRnUk8YmesHs/bk3MskdEtQRVvnTng8Shsq0Wy/X7LUlrz9+JdZZrOvmGZBbiBM7v9xGFGYfWlObso5pVE74P3dBJ095Tz9m0qD2zj7wcs39Z7pPwGJ/4+qFMKpSOfI7nS/Qy6g8uS7nkCWbB2zxDFxoSEsEdDrNm5TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vuoUUpqh; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vuoUUpqh"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764150425;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=5KipOE7hgG8ZU8e64DnissczJCgqW99X/fGlWhtZnJc=;
+	b=vuoUUpqhYCTPvLr4Hn2AVuPyKhwRRzgX/Ku8Im0xfJkIloi2/tIvgSzO53iqKfeJO+NC4l
+	WkAx2CWgk6dRxqxbABW1ynV65JUsgLIlbKFay4SrjS/Y/HwKV1nNYtDDaCrSDiA2vmhoPl
+	vuauDdUF5eOw1f8/3IXM+srNvWYCjHM=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Lukasz Bartosik <lbartosik@marvell.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	stable@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: octeontx: Fix length check to avoid truncation in ucode_load_store
+Date: Wed, 26 Nov 2025 10:46:13 +0100
+Message-ID: <20251126094616.40932-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <692613e0e0680_1981100d3@dwillia2-mobl4.notmuch>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Nov 25, 2025 at 12:38:56PM -0800, dan.j.williams@intel.com wrote:
-> This looks ok to me. If the AMD IOMMU and CCP maintainers can give it an
-> ack I can queue this for v6.19, but let me know if the timing is too
-> tight and this needs to circle around for v6.20.
+OTX_CPT_UCODE_NAME_LENGTH limits the microcode name to 64 bytes. If a
+user writes a string of exactly 64 characters, the original code used
+'strlen(buf) > 64' to check the length, but then strscpy() copies only
+63 characters before adding a NUL terminator, silently truncating the
+copied string.
 
-For the IOMMU parts:
+Fix this off-by-one error by using 'count' directly for the length check
+to ensure long names are rejected early and copied without truncation.
 
-Acked-by: Joerg Roedel <joerg.roedel@amd.com>
+Cc: stable@vger.kernel.org
+Fixes: d9110b0b01ff ("crypto: marvell - add support for OCTEON TX CPT engine")
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
+index 9f5601c0280b..417a48f41350 100644
+--- a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
++++ b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
+@@ -1326,7 +1326,7 @@ static ssize_t ucode_load_store(struct device *dev,
+ 	int del_grp_idx = -1;
+ 	int ucode_idx = 0;
+ 
+-	if (strlen(buf) > OTX_CPT_UCODE_NAME_LENGTH)
++	if (count >= OTX_CPT_UCODE_NAME_LENGTH)
+ 		return -EINVAL;
+ 
+ 	eng_grps = container_of(attr, struct otx_cpt_eng_grps, ucode_load_attr);
+-- 
+Thorsten Blum <thorsten.blum@linux.dev>
+GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
 
