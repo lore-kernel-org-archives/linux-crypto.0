@@ -1,132 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1151328B70;
-	Wed, 26 Nov 2025 13:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED9A302CA2
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Nov 2025 13:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764162006; cv=none; b=J77mZH7JGGgfcIrbhk+FkrMHYFX2msQBNXz+ph8gz5hx/KA9E3Ke/bM3MAps8qaHTz9w9EvpBRsBH4eLoYi4C2993whAiXOxvUGlK5jNOe8mD8ERwSH/3sicNJFNg3B0XH6J3CkcJbps0dIL+fpKTZssj9MfPUmOs5xSWgsq5h8=
+	t=1764164558; cv=none; b=ftUaD172AvE5HfDXHlSjrDNlFctl/6FnelpqsoTKiGf8RxJUNTJhQfCpSYumenqIRETPoHHC4qw9Hd5YrzRYoFti9Up5FlBflqIbuASd5qMFIvLBm6hzsFVFUSh1FuvqANk+10IHjXgv7Y93SBByyS+u+kQk9RYhR92IlyTc+Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764162006; c=relaxed/simple;
-	bh=jUqpCDIZwPVSRPtJdQpy0TPLmnfdKzNPkcBe0a7YjD8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F5dIQX4ngMphOW3Y91LJ3vyUA/nsApZY76165M1RczW8lXAVJlbjyt0nEAMM+gXm3A476mTUyNqTZdPyBvdiIxQPeqsG7bmvwfPJrNgLEDUnPPTQXoAjD8GVETB3F9BbT+AC5gIla7sHKMMpqYzhrgqECcb/x2ERj6g9Fq12HpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UaRkS7kJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764164558; c=relaxed/simple;
+	bh=kL6gTk/zn8eSmSBFKolJt9AS/LSAf5Q6VzXUgZOK2gs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VxhY1HUQ3YF+4Fwgm+NYBL9Gm8EKGo7w+sF80WnsgSxiuQwgI6wdcc78yP4/qOxBgGeMnwy3hXxraL+rRqBdjU3lB21UdrJkxu95bjWAnCV+8YQc8KMtQh70p7v4OHmkYvhNdxbjUjJSZsLOhS3l4Z780GDhdlZusadlegU9QIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jw2AXfnR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UaRkS7kJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52E99C113D0;
-	Wed, 26 Nov 2025 13:00:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764162003;
-	bh=jUqpCDIZwPVSRPtJdQpy0TPLmnfdKzNPkcBe0a7YjD8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UaRkS7kJTFqy04jxn66rIXLVHe3E2T+WBadeFQZqU+QEeRTOTSQAeOpherpGuTZk6
-	 7vOl3RI25L3rxKsHhvPaUyqG5w7JxyWM+rUGJ8oWJ/Eblnri6zdhm0z2KBtKFZRhBW
-	 IlZ1WahRv3ueWBdlBQrLSQZohow/kazHl2KxyaeCIOvbmjMPw1jZVw4bPAVRt9TXkT
-	 ckFNMPmgSkUkUZMsG6kei7MQjbR7jwGrw13TymLUzISw1CAQ2STW/EIc1vXJnDTssK
-	 wE4VICScH5teXR8zQXWeCkhKppKFOtRYzla99oMe5kGi7r1evCuHUL125SgwNd+TZB
-	 P0e3FG+L1tz6A==
-Message-ID: <3d44957f-8c09-47f3-93e0-78a1d34adfd0@kernel.org>
-Date: Wed, 26 Nov 2025 13:59:59 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jw2AXfnR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764164556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pd8sCI+vzVwFpcNtUsv5ZNMe1abMa4r5lZFUnyCkmR8=;
+	b=Jw2AXfnRnBc/2Mb7DSBQ9zN5H5Nv4ztOEp5VyB7iO+W9AK4XX7Q10UReN31gFQV7b3QOkF
+	Lx3I3oWi0lFvZpVodVcbySKHDs5KWYdNppTR0JY9v0/LHpksyeLlRSjhid/HIoNBgw+mf/
+	3ODq82/8bHNM4jUHAsvKyFJmG+Q1LfE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-314-V97xpvFRPZChs6ur8MJe_Q-1; Wed,
+ 26 Nov 2025 08:42:31 -0500
+X-MC-Unique: V97xpvFRPZChs6ur8MJe_Q-1
+X-Mimecast-MFC-AGG-ID: V97xpvFRPZChs6ur8MJe_Q_1764164550
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EABDF19560B2;
+	Wed, 26 Nov 2025 13:42:29 +0000 (UTC)
+Received: from laptop.redhat.com (unknown [10.72.112.29])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 33A6D3001E83;
+	Wed, 26 Nov 2025 13:42:24 +0000 (UTC)
+From: Li Tian <litian@redhat.com>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Theodore Y . Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: [PATCH RFC] crypto/hkdf: Fix salt length short issue in FIPS mode
+Date: Wed, 26 Nov 2025 21:42:22 +0800
+Message-ID: <20251126134222.22083-1-litian@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: CAAM RSA breaks cfg80211 certificate verification on iMX8QXP
-To: Vitor Soares <ivitro@gmail.com>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, imx@lists.linux.dev
-Cc: horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
- herbert@gondor.apana.org.au, john.ernberg@actia.se,
- meenakshi.aggarwal@nxp.com
-References: <b017b6260075f7ba11c52e71bcc5cebe427e020f.camel@gmail.com>
- <ac727d79bdd7e20bf390408e4fa4dfeadb4b8732.camel@gmail.com>
-Content-Language: en-US
-From: Ahmad Fatoum <ahmad@kernel.org>
-In-Reply-To: <ac727d79bdd7e20bf390408e4fa4dfeadb4b8732.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hello Vitor,
+Under FIPS mode, the hkdf test fails because salt is required
+to be at least 32 bytes long. Pad salt with 0's.
 
-On 26.11.25 11:55, Vitor Soares wrote:
-> ++imx@lists.linux.dev
-> 
-> On Mon, 2025-11-24 at 19:03 +0000, Vitor Soares wrote:
->> I’m currently investigating an issue on our Colibri iMX8QXP SoM running kernel
->> 6.18-rc6 (also reproducible on v6.17), where cfg80211 fails to load the
->> compiled-in X.509 certificates used to verify the regulatory database
->> signature.
->>
->> During boot, I consistently see the following messages:
->>  cfg80211: Loading compiled-in X.509 certificates for regulatory database
->>  Problem loading in-kernel X.509 certificate (-22)
->>  Problem loading in-kernel X.509 certificate (-22)
->>  cfg80211: loaded regulatory.db is malformed or signature is missing/invalid
->>
->> As part of the debugging process, I removed the CAAM crypto drivers and
->> manually
->> reloaded cfg80211. In this configuration, the certificates load correctly and
->> the regulatory database is validated with no errors.
->>
->> With additional debugging enabled, I traced the failure to
->> crypto_sig_verify(),
->> which returns -22 (EINVAL).
->> At this stage, I’m trying to determine whether:
->>  - This is a known issue involving cfg80211 certificate validation when the
->> CAAM
->> hardware crypto engine is enabled on i.MX SoCs, or
->>  - CAAM may be returning unexpected values to the X.509 verification logic.
->>
->> If anyone has encountered similar behavior or can suggest areas to
->> investigate—particularly around CAAM—I would greatly appreciate your guidance.
->>
->> Thanks in advance for any insights,
->> Vítor Soares
-> 
-> Following up with additional debugging findings.
-> 
-> I traced the -EINVAL to rsassa_pkcs1_verify() in the PKCS#1 v1.5 verification
-> path. The check that fails expects a leading 0x00 byte in the RSA output buffer.
-> To investigate further, I poisoned the output buffer with 0xAA before the RSA
-> operation. CAAM RSA operation returns success, but the output buffer is never
-> written to.
-> 
-> During debugging, I loaded cfg80211 multiple times and observed that
-> sporadically one of the certificates gets verified correctly, but never both.
-> 
-> I confirmed that other CAAM operations work correctly by testing hwrng via
-> /dev/hwrng, which produces valid random data.
-> 
-> Given that CAAM reports success but does not populate the RSA output buffer, the
-> problem appears to be somewhere in the RSA execution flow (possibly in how the
-> result buffer is handled or returned), but I don’t have enough insight into
-> CAAM's RSA implementation or firmware interaction to pinpoint the exact cause.
-> 
-> As noted previously, blacklisting caam_pkc to force rsa-generic resolves the
-> issue.
+Signed-off-by: Li Tian <litian@redhat.com>
+---
+ crypto/hkdf.c         | 11 ++++++++++-
+ fs/crypto/hkdf.c      | 13 -------------
+ include/crypto/hkdf.h | 13 +++++++++++++
+ 3 files changed, 23 insertions(+), 14 deletions(-)
 
-Just a shot in the dark, because I have no experience with i.MX8 beyond i.MX8M:
-
-Is the CAAM cache-coherent on your SoC? If so does the DT specify dma-coherent
-as it should? On i.MX8M, it's not cache-coherent, but on Layerscape it was and
-the mismatch with the DT leads to symptoms matching what you are observing.
-
-Off-topic remark: If you have performance comparison between running with and
-without CAAM RSA acceleration, I'd be interested to hear about them.
-At least for the hashing algorithms, using the Cortex-A53 (+ CE) CPU was a lot
-faster than bothering with the CAAM "acceleration".
-
-Cheers,
-Ahmad
-
-
-
-> 
-> Regards,
-> Vítor
-> 
-> 
+diff --git a/crypto/hkdf.c b/crypto/hkdf.c
+index 82d1b32ca6ce..9af0ef4dfb35 100644
+--- a/crypto/hkdf.c
++++ b/crypto/hkdf.c
+@@ -46,6 +46,15 @@ int hkdf_extract(struct crypto_shash *hmac_tfm, const u8 *ikm,
+ 		 u8 *prk)
+ {
+ 	int err;
++	u8 tmp_salt[HKDF_HASHLEN];
++
++	if (saltlen < HKDF_HASHLEN) {
++		/* Copy salt and pad with zeros to HashLen */
++		memcpy(tmp_salt, salt, saltlen);
++		memset(tmp_salt + saltlen, 0, HKDF_HASHLEN - saltlen);
++		salt = tmp_salt;
++		saltlen = HKDF_HASHLEN;
++	}
+ 
+ 	err = crypto_shash_setkey(hmac_tfm, salt, saltlen);
+ 	if (!err)
+@@ -151,7 +160,7 @@ struct hkdf_testvec {
+  */
+ static const struct hkdf_testvec hkdf_sha256_tv[] = {
+ 	{
+-		.test = "basic hdkf test",
++		.test = "basic hkdf test",
+ 		.ikm  = "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
+ 			"\x0b\x0b\x0b\x0b\x0b\x0b",
+ 		.ikm_size = 22,
+diff --git a/fs/crypto/hkdf.c b/fs/crypto/hkdf.c
+index 706f56d0076e..5e4844c1d3d7 100644
+--- a/fs/crypto/hkdf.c
++++ b/fs/crypto/hkdf.c
+@@ -13,19 +13,6 @@
+ 
+ #include "fscrypt_private.h"
+ 
+-/*
+- * HKDF supports any unkeyed cryptographic hash algorithm, but fscrypt uses
+- * SHA-512 because it is well-established, secure, and reasonably efficient.
+- *
+- * HKDF-SHA256 was also considered, as its 256-bit security strength would be
+- * sufficient here.  A 512-bit security strength is "nice to have", though.
+- * Also, on 64-bit CPUs, SHA-512 is usually just as fast as SHA-256.  In the
+- * common case of deriving an AES-256-XTS key (512 bits), that can result in
+- * HKDF-SHA512 being much faster than HKDF-SHA256, as the longer digest size of
+- * SHA-512 causes HKDF-Expand to only need to do one iteration rather than two.
+- */
+-#define HKDF_HASHLEN		SHA512_DIGEST_SIZE
+-
+ /*
+  * HKDF consists of two steps:
+  *
+diff --git a/include/crypto/hkdf.h b/include/crypto/hkdf.h
+index 6a9678f508f5..7ef55ce875e2 100644
+--- a/include/crypto/hkdf.h
++++ b/include/crypto/hkdf.h
+@@ -11,6 +11,19 @@
+ 
+ #include <crypto/hash.h>
+ 
++/*
++ * HKDF supports any unkeyed cryptographic hash algorithm, but fscrypt uses
++ * SHA-512 because it is well-established, secure, and reasonably efficient.
++ *
++ * HKDF-SHA256 was also considered, as its 256-bit security strength would be
++ * sufficient here.  A 512-bit security strength is "nice to have", though.
++ * Also, on 64-bit CPUs, SHA-512 is usually just as fast as SHA-256.  In the
++ * common case of deriving an AES-256-XTS key (512 bits), that can result in
++ * HKDF-SHA512 being much faster than HKDF-SHA256, as the longer digest size of
++ * SHA-512 causes HKDF-Expand to only need to do one iteration rather than two.
++ */
++#define HKDF_HASHLEN            SHA512_DIGEST_SIZE
++
+ int hkdf_extract(struct crypto_shash *hmac_tfm, const u8 *ikm,
+ 		 unsigned int ikmlen, const u8 *salt, unsigned int saltlen,
+ 		 u8 *prk);
+-- 
+2.50.0
 
