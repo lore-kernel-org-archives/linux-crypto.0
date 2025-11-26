@@ -1,38 +1,41 @@
 Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF1E343D91
-	for <linux-crypto@vger.kernel.org>; Wed, 26 Nov 2025 20:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACFA3128D7
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Nov 2025 20:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764188651; cv=none; b=lGXM05MqeNlg8AQU01HQkwOQzf/GVwZIztvODaNxhlCo9jMjCHPF4GRgrOg4cV3WixIIAscxaWUk4nhZbm57wXQs1gMSSQaMnRwyfgqT68qUNGZOb6ydvfIvuxqDT+sB0b2tS2fOLh19m7Hrx/j0C0PBnPS1DtXP93i/2ZH8Rfw=
+	t=1764188699; cv=none; b=ZqsfcqnVaSlAdN/3VIcPXOWRaqVRAaHigkVLgyNFzL7h6fB5Yi6oHYZxzYQCksylDDN9kR318coJ0Cf0cESKAahIya6cRXBk6hox8qYh/S6jX//2JC5eheNfj255D0YXFihvhDQo26saA2/42D2Do66J3HnfztOmN27b4+o3J9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764188651; c=relaxed/simple;
-	bh=RRIzuZGlsuil50mvuB5KZKDLJ45aMmJiG+lun1Ss984=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JgHKOn3cowulMavyTl+zmGbMjOt+iK1Yu1CeNxZmS3NsCM8SAhwd6eigFzRA5dlpkXXlNIaODQr7aFXL8P72fZd7CDw1/Xaj5BmC9onFHoRvk3lTpBlfJ/hUnKJHN2JB74fGe30fF7T1oOKVbkAii4dZ6f7ZfJrnVCEvmXALSfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=sTNwcZ/R; arc=none smtp.client-ip=198.37.111.173
+	s=arc-20240116; t=1764188699; c=relaxed/simple;
+	bh=2wTii2pedSNLbTdEgS8mRXNGP6T5uZqKwhRfrlLdl3M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uTU/om3yGCtrTRVwz6cNm8cfYef83K67oa5K4mLaEtICeJnwFHvvtVjWhk9bVyWYZApquHqyHzIh9xHrP28F/wguYMkkNYC+Jy2anDfwRIPQEhPWba7IXvwSdG2UJ6ycVI92Qy7QVwV8YrVmppOq5E+F1eLIxsspxlTYIsaJeJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=hOwax353; arc=none smtp.client-ip=198.37.111.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="sTNwcZ/R"
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="hOwax353"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1764188648;
-	bh=RRIzuZGlsuil50mvuB5KZKDLJ45aMmJiG+lun1Ss984=;
-	h=From:To:Subject:Date:Message-ID:From;
-	b=sTNwcZ/Rsq0+tazCE/5o28+nPhOi77aib7+h+S9JIfgqKdcyxO8y5oLS4+dc1DVor
-	 FS1AToLAQ/h6T039ZJDhpawWZ2SeOX74CJGcpyTsjYKhWHOrZk+F/CIx2UYWE7xi/6
-	 lL7QpjjuvW9VC+YzuqurfNHD566fTY9nigvVYQfY=
+	d=hansenpartnership.com; s=20151216; t=1764188696;
+	bh=2wTii2pedSNLbTdEgS8mRXNGP6T5uZqKwhRfrlLdl3M=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:From;
+	b=hOwax353lTnpzOerel5U9QJLmpnnznz1fk/BN9D385RMc9Ir0Ssfz2KTjxbzKnFnj
+	 sZUqv2VbUUB+5tLkmoXe0SjVyZSKrHAGw4oOLNCJ5QOWedTjyNAEmSwT/lBxTaTcqD
+	 CgafNm1SRLiyYlNe9EJh3ChHBxCv8J5OojiYZlg4=
 Received: from lingrow.int.hansenpartnership.com (unknown [153.66.160.227])
-	by lamorak.hansenpartnership.com (Postfix) with ESMTP id 3223E1C01BC;
-	Wed, 26 Nov 2025 15:24:08 -0500 (EST)
+	by lamorak.hansenpartnership.com (Postfix) with ESMTP id 26BB81C01BC;
+	Wed, 26 Nov 2025 15:24:56 -0500 (EST)
 From: James Bottomley <James.Bottomley@HansenPartnership.com>
 To: linux-crypto@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
 	Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-Subject: [PATCH v2 0/5] pkcs7: better handling of signed attributes
-Date: Wed, 26 Nov 2025 15:24:00 -0500
-Message-ID: <20251126202405.23596-1-James.Bottomley@HansenPartnership.com>
+Subject: [PATCH v2 1/5] certs: break out pkcs7 check into its own function
+Date: Wed, 26 Nov 2025 15:24:01 -0500
+Message-ID: <20251126202405.23596-2-James.Bottomley@HansenPartnership.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251126202405.23596-1-James.Bottomley@HansenPartnership.com>
+References: <20251126202405.23596-1-James.Bottomley@HansenPartnership.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,65 +44,140 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Although the biggest use of signed attributes is PKCS#7 and X509
-specific data, they can be added to a signature to support arbitrary
-and verifiable objects.  This makes them particularly useful when you
-want to take an existing signature scheme and extend it with
-additional (but always verified) data in such a way that it still
-looks valid to both the old and new schemes.
+Add new validate_pkcs7_trust() function which can operate on the
+system keyrings and is simply some of the innards of
+verify_pkcs7_message_sig().
 
-To use a scheme like this to extend signatures requires that the
-authenticated attribute only be pulled out of a signer info that can
-be verified by one of the trusted keys, so the implementation loops
-over all signer infos, discarding those that haven't been verified and
-returns the first OID match it finds in the verified ones.  Note that
-if you reparse a pkcs7 it starts out with no trusted signer infos, and
-you must anchor trust by calling validate_pkcs7_trust() with the
-trusted keyring.
-
-The first three patches in this series are new to v2.  They add the
-new validate_pkcs7_trust() call, thread a verified flag through struct
-pkcs7_signer_info so we can tell which signers have been validated
-against the trusted keyring. And finally thread pkcs7_digest through
-the pkcs7_validate functions so they can operate on a plain parsed
-pkcs7 structure that hasn't gone through pkcs7_verify.  Note we could
-simply drop the last patch and insist that the pkcs7 be re-verified;
-it just looked a bit inefficient, especially as the default way of
-doing this (verify_pkcs7_signature() frees the pkcs7 structure before
-returning.
-
-The final two patches search for the authenticated attribute by OID,
-stopping at the first one it finds belonging to a verified signer
-info.  The final patch demonstrates how to use it.  I've added a check
-to show that if you don't in any way validate the pkcs7 then no signed
-attributes get returned.
-
-Regards,
-
-James
-
+Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership.com>
 ---
+ certs/system_keyring.c       | 76 +++++++++++++++++++++---------------
+ include/linux/verification.h |  2 +
+ 2 files changed, 47 insertions(+), 31 deletions(-)
 
-James Bottomley (5):
-  certs: break out pkcs7 check into its own function
-  crypto: pkcs7: add flag for validated trust on a signed info block
-  crypto: pkcs7: allow pkcs7_digest() to be called from pkcs7_trust
-  crypto: pkcs7: add ability to extract signed attributes by OID
-  crypto: pkcs7: add tests for pkcs7_get_authattr
-
- certs/system_keyring.c                  | 76 ++++++++++++---------
- crypto/asymmetric_keys/Makefile         |  4 +-
- crypto/asymmetric_keys/pkcs7_aa.asn1    | 18 +++++
- crypto/asymmetric_keys/pkcs7_key_type.c | 42 +++++++++++-
- crypto/asymmetric_keys/pkcs7_parser.c   | 87 +++++++++++++++++++++++++
- crypto/asymmetric_keys/pkcs7_parser.h   |  4 ++
- crypto/asymmetric_keys/pkcs7_trust.c    |  9 +++
- crypto/asymmetric_keys/pkcs7_verify.c   | 13 ++--
- include/crypto/pkcs7.h                  |  4 ++
- include/linux/verification.h            |  2 +
- 10 files changed, 222 insertions(+), 37 deletions(-)
- create mode 100644 crypto/asymmetric_keys/pkcs7_aa.asn1
-
+diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+index 9de610bf1f4b..807ab4a6fc7e 100644
+--- a/certs/system_keyring.c
++++ b/certs/system_keyring.c
+@@ -298,42 +298,19 @@ late_initcall(load_system_certificate_list);
+ #ifdef CONFIG_SYSTEM_DATA_VERIFICATION
+ 
+ /**
+- * verify_pkcs7_message_sig - Verify a PKCS#7-based signature on system data.
+- * @data: The data to be verified (NULL if expecting internal data).
+- * @len: Size of @data.
++ * validate_pkcs7_trust - add trust markers based on keyring
+  * @pkcs7: The PKCS#7 message that is the signature.
+  * @trusted_keys: Trusted keys to use (NULL for builtin trusted keys only,
+  *					(void *)1UL for all trusted keys).
+- * @usage: The use to which the key is being put.
+- * @view_content: Callback to gain access to content.
+- * @ctx: Context for callback.
+  */
+-int verify_pkcs7_message_sig(const void *data, size_t len,
+-			     struct pkcs7_message *pkcs7,
+-			     struct key *trusted_keys,
+-			     enum key_being_used_for usage,
+-			     int (*view_content)(void *ctx,
+-						 const void *data, size_t len,
+-						 size_t asn1hdrlen),
+-			     void *ctx)
++int validate_pkcs7_trust(struct pkcs7_message *pkcs7, struct key *trusted_keys)
+ {
+ 	int ret;
+ 
+-	/* The data should be detached - so we need to supply it. */
+-	if (data && pkcs7_supply_detached_data(pkcs7, data, len) < 0) {
+-		pr_err("PKCS#7 signature with non-detached data\n");
+-		ret = -EBADMSG;
+-		goto error;
+-	}
+-
+-	ret = pkcs7_verify(pkcs7, usage);
+-	if (ret < 0)
+-		goto error;
+-
+ 	ret = is_key_on_revocation_list(pkcs7);
+ 	if (ret != -ENOKEY) {
+ 		pr_devel("PKCS#7 key is on revocation list\n");
+-		goto error;
++		return ret;
+ 	}
+ 
+ 	if (!trusted_keys) {
+@@ -351,18 +328,55 @@ int verify_pkcs7_message_sig(const void *data, size_t len,
+ 		trusted_keys = NULL;
+ #endif
+ 		if (!trusted_keys) {
+-			ret = -ENOKEY;
+ 			pr_devel("PKCS#7 platform keyring is not available\n");
+-			goto error;
++			return -ENOKEY;
+ 		}
+ 	}
+ 	ret = pkcs7_validate_trust(pkcs7, trusted_keys);
+-	if (ret < 0) {
+-		if (ret == -ENOKEY)
+-			pr_devel("PKCS#7 signature not signed with a trusted key\n");
++	if (ret == -ENOKEY)
++		pr_devel("PKCS#7 signature not signed with a trusted key\n");
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(validate_pkcs7_trust);
++
++/**
++ * verify_pkcs7_message_sig - Verify a PKCS#7-based signature on system data.
++ * @data: The data to be verified (NULL if expecting internal data).
++ * @len: Size of @data.
++ * @pkcs7: The PKCS#7 message that is the signature.
++ * @trusted_keys: Trusted keys to use (NULL for builtin trusted keys only,
++ *					(void *)1UL for all trusted keys).
++ * @usage: The use to which the key is being put.
++ * @view_content: Callback to gain access to content.
++ * @ctx: Context for callback.
++ */
++int verify_pkcs7_message_sig(const void *data, size_t len,
++			     struct pkcs7_message *pkcs7,
++			     struct key *trusted_keys,
++			     enum key_being_used_for usage,
++			     int (*view_content)(void *ctx,
++						 const void *data, size_t len,
++						 size_t asn1hdrlen),
++			     void *ctx)
++{
++	int ret;
++
++	/* The data should be detached - so we need to supply it. */
++	if (data && pkcs7_supply_detached_data(pkcs7, data, len) < 0) {
++		pr_err("PKCS#7 signature with non-detached data\n");
++		ret = -EBADMSG;
+ 		goto error;
+ 	}
+ 
++	ret = pkcs7_verify(pkcs7, usage);
++	if (ret < 0)
++		goto error;
++
++	ret = validate_pkcs7_trust(pkcs7, trusted_keys);
++	if (ret < 0)
++		goto error;
++
+ 	if (view_content) {
+ 		size_t asn1hdrlen;
+ 
+diff --git a/include/linux/verification.h b/include/linux/verification.h
+index dec7f2beabfd..57f1460d36f1 100644
+--- a/include/linux/verification.h
++++ b/include/linux/verification.h
+@@ -44,6 +44,8 @@ enum key_being_used_for {
+ struct key;
+ struct pkcs7_message;
+ 
++extern int validate_pkcs7_trust(struct pkcs7_message *pkcs7,
++				struct key *trusted_keys);
+ extern int verify_pkcs7_signature(const void *data, size_t len,
+ 				  const void *raw_pkcs7, size_t pkcs7_len,
+ 				  struct key *trusted_keys,
 -- 
 2.51.0
 
