@@ -1,54 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA9129D265;
-	Wed, 26 Nov 2025 21:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 366DE1862A;
+	Thu, 27 Nov 2025 01:16:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764193336; cv=none; b=atbSKbcjtKLDlMlbxUpC/qMhyOHbVZ0gwX57FzqFHuZxgTlHLbAl3FX5tEN4AhSyXl8funnIoTHvrK5McOBGNEsrJghWNsTEkx5t+aAnu1hp+wwGv+BcLdlVRp41xzD+w1eqlamqKNJXawT8CJIL46TH47SOfZ9W5bTxcRZ27VI=
+	t=1764206195; cv=none; b=HqDVsWDoWZ5zR8mogl3yLcJ8MSPXJpkEo5Fg6MSdwrF3aiX+5cPpVW7MJd48t16ZoDty4XkVY+Kv8xm1GOs38oKzOft/jgcJna8DAhxXuxeymMtywAEiy3e2w5QiXs4LFHKqhaAjYcoNS+GguggzjVlIRd5Ma5ySJeQOPQtGuZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764193336; c=relaxed/simple;
-	bh=Zi/o6mieUOCUTETAmimj2DLyaQxOhpdsZQfmWHe2yFA=;
+	s=arc-20240116; t=1764206195; c=relaxed/simple;
+	bh=Mm4d8sgWM/bwoIOYBVbzEMdINLQqvtM8Ah4aTx1ffzQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CdhuBLrg05OrnEQhJ87UwC2BZ4nRoTg0NyS37A9qMCFuXQoi+Rf3GbI8DmbjkDba1BXHb3eD5aN3EM23VljLV2+hThhs3JmU9hYOxeh8j242ZyG1DljFmROx87wGcOu4LZ9DfGgscdh9cR6zGAqV0KoP2Nu1/Vy9hKlWV6iRlWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kp8Krux9; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=j8nNYOlC7JvsQYXkXapBo+Bzf7v1ol/x72oGRWd82JZxVZjOKl7/O10bPRR6sFbXIDR34qw6hqRWzOD1lPDj2qR/SnHxGdqoqr80topk1hz/zWt1cgdSKVpjcCwFLGBDdt1kK9Spzkk6wHVwnmUCFdruQGKaCb2zSFGcUN22zxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nFOJHP61; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kp8Krux9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5354C4CEF7;
-	Wed, 26 Nov 2025 21:42:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nFOJHP61"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 731F8C4CEF7;
+	Thu, 27 Nov 2025 01:16:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764193336;
-	bh=Zi/o6mieUOCUTETAmimj2DLyaQxOhpdsZQfmWHe2yFA=;
+	s=k20201202; t=1764206194;
+	bh=Mm4d8sgWM/bwoIOYBVbzEMdINLQqvtM8Ah4aTx1ffzQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kp8Krux9BVRY8kb0nbRPXUAxOEwXUfMppS4V+KyXbvk1nobapd2zVnbdj5XYImNSj
-	 oPmlUByfiPI+/F5bQ888LbhSFGb7XP+jQMw23IRaWXvw3IU2BIrmWBSs8+4X2oQnA9
-	 UcMMYsxllkG7oYdgm+grD/b1GPU3qRAFCGNoNwVpLB3q7JTSylvPxu6mNpuTTEwCJL
-	 clWrhGk2qlI/gC02qBuNvW3YulIed1RSCLGXBV+IP72QmakzsRKFmeCyoUAA5k9/rV
-	 ptHYQRNADHdkTLF5zDN9Y5w7UxoD7E8gfczyOjMkA50HJpN2l0zS7xamOwXBLTaqg2
-	 12rEBTuMYy1Jg==
-Date: Wed, 26 Nov 2025 13:42:09 -0800
+	b=nFOJHP61MmPR7T+vA4l3aw5a/El3eZsXIgo4Y5GvYJARUQg0AYQ/osSJHKmrgDH9p
+	 IZ7+PydSRCrE02/WM/sWksFcqebHELkFwMXvC0X7OD5nH6kW5sVF36mgjOXbCgD+rp
+	 ig6YkcKAh12s/Ci2C1tVUbR9Ta954RmN1I71bRd7bBQWGUbXCnBzGPwXd461Y5B42w
+	 l+3KLzSBBzTXWzd8jio3FPJay1eIpFOOrAceLucaot7aulVAmaIcTnCF6m8qk95RRl
+	 Olwdz7/REXyaFS8ZJEd9M9omPK0nwRT9d4wJGpXO6a3Locwadsykz+2LG28oLvMgSj
+	 bHDdJZIQBKuXg==
+Date: Wed, 26 Nov 2025 17:14:46 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: "Elliott, Robert (Servers)" <elliott@hpe.com>
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	David Howells <dhowells@redhat.com>,
+To: Li Tian <litian@redhat.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-	"linux-modules@vger.kernel.org" <linux-modules@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 1/2] lib/crypto: Add ML-DSA verification support
-Message-ID: <20251126214209.GA1697@quark>
-References: <20251126203517.167040-1-ebiggers@kernel.org>
- <20251126203517.167040-2-ebiggers@kernel.org>
- <IA4PR84MB4011F4D5B7EF52901829AD94ABDEA@IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM>
+	"David S . Miller" <davem@davemloft.net>,
+	"Theodore Y . Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: Re: [PATCH RFC] crypto/hkdf: Fix salt length short issue in FIPS mode
+Message-ID: <20251127011446.GA1548@sol>
+References: <20251126134222.22083-1-litian@redhat.com>
+ <20251126174158.GA71370@quark>
+ <CAHhBTWuOy1nC1rYqye8BzE+unoC+3M9Dsw+Mj54=3eeFwqyTXw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,61 +48,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <IA4PR84MB4011F4D5B7EF52901829AD94ABDEA@IA4PR84MB4011.NAMPRD84.PROD.OUTLOOK.COM>
+In-Reply-To: <CAHhBTWuOy1nC1rYqye8BzE+unoC+3M9Dsw+Mj54=3eeFwqyTXw@mail.gmail.com>
 
-On Wed, Nov 26, 2025 at 09:29:10PM +0000, Elliott, Robert (Servers) wrote:
+On Thu, Nov 27, 2025 at 09:10:45AM +0800, Li Tian wrote:
+> Eric,
 > 
+> Thanks for reviewing. Not just the salt_size=0 case, but several cases with
+> salt < 32 from my tests.
+> So simply skip those then?
 > 
-> > -----Original Message-----
-> > From: Eric Biggers <ebiggers@kernel.org>
-> > Subject: [PATCH v2 1/2] lib/crypto: Add ML-DSA verification support
-> ...
-> 
-> > +++ b/lib/crypto/mldsa.c
-> 
-> > +} mldsa_parameter_sets[] = {
-> > +	[MLDSA44] = {
-> > +		.ctilde_len = 32,
-> > +		.pk_len = MLDSA44_PUBLIC_KEY_SIZE,
-> > +		.sig_len = MLDSA44_SIGNATURE_SIZE,
-> > +	},
-> > +	[MLDSA65] = {
-> > +		.ctilde_len = 48,
-> > +		.pk_len = MLDSA65_PUBLIC_KEY_SIZE,
-> > +		.sig_len = MLDSA65_SIGNATURE_SIZE,
-> > +	},
-> > +	[MLDSA87] = {
-> > +		.ctilde_len = 64,
-> > +		.pk_len = MLDSA87_PUBLIC_KEY_SIZE,
-> > +		.sig_len = MLDSA87_SIGNATURE_SIZE,
-> > +	},
-> ...
-> > +	union {
-> ...
-> > +		/* The commitment hash.  Real length is params->ctilde_len */
-> > +		u8 ctildeprime[64];
-> > +	};
-> ...
-> > +	/* Recreate the challenge c from the signer's commitment hash. */
-> > +	sample_in_ball(&ws->c, ctilde, params->ctilde_len, params->tau,
-> > +		       &ws->shake);
-> ...
-> > +	/* Finish computing ctildeprime. */
-> > +	shake_squeeze(&ws->shake, ws->ctildeprime, params->ctilde_len);
-> ...
-> > +	/* Verify that ctilde == ctildeprime. */
-> > +	if (memcmp(ws->ctildeprime, ctilde, params->ctilde_len) != 0)
-> > +		return -EKEYREJECTED;
-> 
-> Is there any way to ensure that each ctilde_len value is <= 64
-> and <= the corresponding .sig_size value at compile time so there's
-> no risk of overflowing any buffers?
+> BR,
+> Li Tian
 
-Not at compile time, unless we do some fancy validation of each of the
-three ctilde_len values against the max3() of the signature lengths
-using macros.  It could be checked at runtime in a module_init function.
-Seems pointless though, given that these parameters are fixed in the
-ML-DSA specification.  The specification uses parameters that make sense
-and are consistent with each other.
+Why do you think the salt needs to be at least 32 bytes?
 
 - Eric
