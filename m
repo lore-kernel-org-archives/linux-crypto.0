@@ -1,107 +1,75 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6E22264B0;
-	Thu, 27 Nov 2025 03:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE965125A9;
+	Thu, 27 Nov 2025 03:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764213135; cv=none; b=fLi2KPd5YQ2i1A8LJvCFq6X2MYFWNx7VojgOuQRLw5pnaUcakcbl1naPHWL60gp2fwZIQbPv94+TuihQeEDjNufD24b09Pb/a9m3CzYuYlIma8cYHo4VZj4G+j7+Toi6AmeMAiXusbwwTAbkRuW966lOqfAUyerHN3wlQYkXWXI=
+	t=1764213932; cv=none; b=QBmNzh0ucxpUXJqeUpenBXVyA0T/OSzxTrnpZAvgPVZ/qKWQ9oqK9tFtGeVufAzSzKUFnq7fSnibhcMMH87r0s8/9EDuGbxtfVskH47Ovc1vTT3FhjxQYEpLdZQH6gSe6nNW+33GFO8UJeFFPRGM0GssoF/nw8h7Svh6GY0ofnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764213135; c=relaxed/simple;
-	bh=1jAV7+0GeJ1ZlQyWeJPPO6FPTp5rm5uEz0i5yZRIQvk=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=odlmcxLiXolH+PjtIg1niWv84bjZ5/Ooz8YO77tFyktSK02U2SiB1QeVCFPJghjNaJNCLWUCg8e9U1iaJPM7/Ox5382hQTh4NbknAuPQ2gAz83FY+9xU9Mq3SRKz1Z4BP9XN8M6Ok3wDZvMwNszSSLBv6hsKe0dcxBiaAGQSRqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8DxLvCHwSdpz5coAA--.21924S3;
-	Thu, 27 Nov 2025 11:12:07 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJDxaMCBwSdpGJ9AAQ--.19477S3;
-	Thu, 27 Nov 2025 11:12:04 +0800 (CST)
-Subject: Re: virtio-crypto: Inquiry about virtio crypto
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
- linux-kernel <linux-kernel@vger.kernel.org>,
- QEMU devel <qemu-devel@nongnu.org>
-References: <d4258604-e678-f975-0733-71190cf4067d@loongson.cn>
- <027ff08db97d414da0ccc24a439e75d0@huawei.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <42d33127-59dc-5f82-8fa8-6b154cde6dc6@loongson.cn>
-Date: Thu, 27 Nov 2025 11:09:35 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1764213932; c=relaxed/simple;
+	bh=L2d2NMOWG9lk1o/sFH9lobfJpwzbhYn824TIH9mqJfc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b0pPXfRx1VEwA0aNRvXkukDjHIiFD6jfq79slGM1stbxBBbIi+wisee7M7VRouVpxMknY95Mm+ihAZllChBzR0o1wR2Rgqeic5thl6mJ9VNvSrX5fSxqG0jOoV3kzGlMUoxnGfUYAJXVhEf0mBxaugYcH3V0ZS0zfnAWEaICql0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ynk85J9t; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ynk85J9t"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D6F1C4CEF7;
+	Thu, 27 Nov 2025 03:25:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764213932;
+	bh=L2d2NMOWG9lk1o/sFH9lobfJpwzbhYn824TIH9mqJfc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ynk85J9ttTA+NO5GOYTFqBeDl2GXGqqMKo/Eou5+/mr0Px40jAm96YdKerCuS+5Zp
+	 qtrdV7eQuHfrAowcEKMPgwVzGjYxybekSYdggJW+w4L5m4x32GC5jYTnde1jO7Acc9
+	 OsaVHMP22+2wxvG++UX8oI2U5e32oMLudyfbNcTwVU0e+7+5q96eX8uyLoAyBkUlu6
+	 +fqiEun8AF9nAyonB+F/Z3fAReAMZNVvjoNRji7tM5t9msfZ/tCKzxp9ZLjIsdgHqF
+	 +1MCI7AQywRkj752MLHkKt1ARxtIMwuzXrVMVCvdyBs/0no3RTNTcWpBe94GVZMdgN
+	 JjYmdBgAWtanA==
+Date: Wed, 26 Nov 2025 19:23:43 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Li Tian <litian@redhat.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	"Theodore Y . Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: Re: [PATCH RFC] crypto/hkdf: Fix salt length short issue in FIPS mode
+Message-ID: <20251127032343.GA60146@sol>
+References: <20251126134222.22083-1-litian@redhat.com>
+ <20251126174158.GA71370@quark>
+ <CAHhBTWuOy1nC1rYqye8BzE+unoC+3M9Dsw+Mj54=3eeFwqyTXw@mail.gmail.com>
+ <20251127011446.GA1548@sol>
+ <CAHhBTWsTqP3LzJV+=_usvttJcMFoLYSY5Sqt2H-U-oki3Hu0Mw@mail.gmail.com>
+ <20251127015141.GA29380@sol>
+ <CAHhBTWs6rWq2huD8Ech79OVOxK3v3ijU3KFFOGLQ+pr7277Vew@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <027ff08db97d414da0ccc24a439e75d0@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJDxaMCBwSdpGJ9AAQ--.19477S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7Cr1xCr1fuw4xGr4DAF4fWFX_yoW8Gr1xpF
-	93GFWFkayDGr1fCa4ktFy3CFW5Xa98CF13GrZrX348Gr98Cry8Kr12vr1jq3sxJF1rKF1q
-	qw4IgF10kr98ZFXCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUU9ab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
-	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE
-	14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
-	AE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E
-	14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4
-	CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4U
-	MIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
-	4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsG
-	vfC2KfnxnUUI43ZEXa7IU8P5r7UUUUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHhBTWs6rWq2huD8Ech79OVOxK3v3ijU3KFFOGLQ+pr7277Vew@mail.gmail.com>
 
+On Thu, Nov 27, 2025 at 11:11:29AM +0800, Li Tian wrote:
+> The error message I saw is `basic hdkf test(hmac(sha256-ni)): hkdf_extract
+> failed with -22`.
+> And I was looking at hmac.c that has `if (fips_enabled && (keylen < 112 /
+> 8))...` So I got the impression `crypto_shash_setkey(hmac_tfm, salt,
+> saltlen)` in hkdf_extract reached this failure.
 
+112 / 8 is 14, not 32.
 
-On 2025/11/27 上午10:56, Gonglei (Arei) wrote:
-> Hi,
-> 
->> -----Original Message-----
->> From: Bibo Mao <maobibo@loongson.cn>
->> Sent: Thursday, November 27, 2025 9:43 AM
->> To: Gonglei (Arei) <arei.gonglei@huawei.com>
->> Cc: linux-crypto@vger.kernel.org; virtualization@lists.linux.dev; linux-kernel
->> <linux-kernel@vger.kernel.org>; QEMU devel <qemu-devel@nongnu.org>
->> Subject: virtio-crypto: Inquiry about virtio crypto
->>
->> Hi gonglei,
->>
->>      I am investigating how to use HW crypto accelerator in VM. It seems that
->> virtio-crypto is one option, however only aes skcipher algo is supported and
-> 
-> Actually akcipher service had been supported by virtio-crypto in 2022.
-I am studying virtio-crypto and want to add sm4 algo with skcipher on 
-it. Hope to get some guidances and work together on it in future :)
+Also since v6.17, "hmac(sha256)" no longer uses crypto/hmac.c.  I forgot
+to put the keylen < 14 check in the new version in crypto/sha256.c.
+That means the test failure you're reporting was already fixed.
 
-Regards
-Bibo Mao
-> 
->> virtio-crypto device is not suggested by RHEL 10.
->>
->> https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html
->> /configuring_and_managing_linux_virtual_machines/feature-support-and-limit
->> ations-in-rhel-10-virtualization
->>
->>     I want to know what is the potential issued with virtio-crypto.
->>
-> 
-> This question is too big, maybe you'd better ask RHEL guys. :(
-> 
-> Regards,
-> -Gonglei
-> 
->> Regards
->> Bibo Mao
-> 
-> 
+If you'd prefer that it be broken again, we can add the key length check
+back in.  But this whole thing is just more evidence that it's incorrect
+anyway, and it needs to be up to the caller to do a check if it needs
+to.  In HKDF the secret is in the input keying material, not the salt.
 
+- Eric
