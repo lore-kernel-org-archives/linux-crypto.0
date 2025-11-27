@@ -1,83 +1,107 @@
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150C129B200;
-	Thu, 27 Nov 2025 02:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6E22264B0;
+	Thu, 27 Nov 2025 03:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764212222; cv=none; b=RNfJwxmuXR4xzwPt7r5OXAVXWZv1jCYvBXQognL0ckaTweTNj1p2EP7UbxVwAxij8i+QMbrxQxFgJjSeSfx6EtNpyqoDgQXRUbzNm6oKJN+THdk+CvWbKTlJa+QRSzI26VulotR6GPn0zCGti0ZERRCxMqBjvtV0gm9f2WtYAp4=
+	t=1764213135; cv=none; b=fLi2KPd5YQ2i1A8LJvCFq6X2MYFWNx7VojgOuQRLw5pnaUcakcbl1naPHWL60gp2fwZIQbPv94+TuihQeEDjNufD24b09Pb/a9m3CzYuYlIma8cYHo4VZj4G+j7+Toi6AmeMAiXusbwwTAbkRuW966lOqfAUyerHN3wlQYkXWXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764212222; c=relaxed/simple;
-	bh=Y7BxDbg4bdv4BDzf7rAkIcpMiEXK+EOaT5aAFRhGzKw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=iHmbsGDwA0rubiD0kVTCCaGcTlVYJH/JoKl/GeaKSSmc7Z9btQZlKxZiqxvZ4aqh5PJjIFypXRu0SwZ487SsozS39QQ2bq4ods1HnwUDqKaNL5ICxh//2tWcwWpWoo2MT1nvFzCYT+b9Gd6ok17N6qaLtzui9deXoz/BHStnEz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=vtlbnpr7; arc=none smtp.client-ip=113.46.200.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="vtlbnpr7"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=Y7BxDbg4bdv4BDzf7rAkIcpMiEXK+EOaT5aAFRhGzKw=;
-	b=vtlbnpr79vyLMfCWa3osxg5KQ0eywVNabCQb0hdJzsQ9KOO6GqDftXzubHsStWDitU02+LgWv
-	RWutGRlHR+6V2F4N4uFbCh9UIWV50hFqriQLyP4TFTuBXcodqrMWAJ7BjlvPNuwC6UGRJlIp2VA
-	z6AhgD0RVL19Tky0RW+NZDw=
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4dH1Hq29xKz1cyQN;
-	Thu, 27 Nov 2025 10:55:03 +0800 (CST)
-Received: from kwepemf500018.china.huawei.com (unknown [7.202.181.5])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0BDA41A016C;
-	Thu, 27 Nov 2025 10:56:52 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (7.185.36.61) by
- kwepemf500018.china.huawei.com (7.202.181.5) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 27 Nov 2025 10:56:51 +0800
-Received: from dggpemf200006.china.huawei.com ([7.185.36.61]) by
- dggpemf200006.china.huawei.com ([7.185.36.61]) with mapi id 15.02.1544.011;
- Thu, 27 Nov 2025 10:56:51 +0800
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-To: Bibo Mao <maobibo@loongson.cn>
-CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	linux-kernel <linux-kernel@vger.kernel.org>, QEMU devel
-	<qemu-devel@nongnu.org>
-Subject: RE: virtio-crypto: Inquiry about virtio crypto
-Thread-Topic: virtio-crypto: Inquiry about virtio crypto
-Thread-Index: AQHcXz+QGuy/j9piuEGQ/DhWNYsWN7UF0tvg
-Date: Thu, 27 Nov 2025 02:56:51 +0000
-Message-ID: <027ff08db97d414da0ccc24a439e75d0@huawei.com>
+	s=arc-20240116; t=1764213135; c=relaxed/simple;
+	bh=1jAV7+0GeJ1ZlQyWeJPPO6FPTp5rm5uEz0i5yZRIQvk=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=odlmcxLiXolH+PjtIg1niWv84bjZ5/Ooz8YO77tFyktSK02U2SiB1QeVCFPJghjNaJNCLWUCg8e9U1iaJPM7/Ox5382hQTh4NbknAuPQ2gAz83FY+9xU9Mq3SRKz1Z4BP9XN8M6Ok3wDZvMwNszSSLBv6hsKe0dcxBiaAGQSRqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8DxLvCHwSdpz5coAA--.21924S3;
+	Thu, 27 Nov 2025 11:12:07 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJDxaMCBwSdpGJ9AAQ--.19477S3;
+	Thu, 27 Nov 2025 11:12:04 +0800 (CST)
+Subject: Re: virtio-crypto: Inquiry about virtio crypto
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+ linux-kernel <linux-kernel@vger.kernel.org>,
+ QEMU devel <qemu-devel@nongnu.org>
 References: <d4258604-e678-f975-0733-71190cf4067d@loongson.cn>
-In-Reply-To: <d4258604-e678-f975-0733-71190cf4067d@loongson.cn>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <027ff08db97d414da0ccc24a439e75d0@huawei.com>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <42d33127-59dc-5f82-8fa8-6b154cde6dc6@loongson.cn>
+Date: Thu, 27 Nov 2025 11:09:35 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <027ff08db97d414da0ccc24a439e75d0@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJDxaMCBwSdpGJ9AAQ--.19477S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW7Cr1xCr1fuw4xGr4DAF4fWFX_yoW8Gr1xpF
+	93GFWFkayDGr1fCa4ktFy3CFW5Xa98CF13GrZrX348Gr98Cry8Kr12vr1jq3sxJF1rKF1q
+	qw4IgF10kr98ZFXCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUU9ab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
+	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE
+	14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
+	AE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E
+	14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4
+	CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4U
+	MIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
+	4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsG
+	vfC2KfnxnUUI43ZEXa7IU8P5r7UUUUU==
 
-SGksDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQmlibyBNYW8gPG1h
-b2JpYm9AbG9vbmdzb24uY24+DQo+IFNlbnQ6IFRodXJzZGF5LCBOb3ZlbWJlciAyNywgMjAyNSA5
-OjQzIEFNDQo+IFRvOiBHb25nbGVpIChBcmVpKSA8YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+DQo+
-IENjOiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyB2aXJ0dWFsaXphdGlvbkBsaXN0cy5s
-aW51eC5kZXY7IGxpbnV4LWtlcm5lbA0KPiA8bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZz47
-IFFFTVUgZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCj4gU3ViamVjdDogdmlydGlvLWNy
-eXB0bzogSW5xdWlyeSBhYm91dCB2aXJ0aW8gY3J5cHRvDQo+IA0KPiBIaSBnb25nbGVpLA0KPiAN
-Cj4gICAgIEkgYW0gaW52ZXN0aWdhdGluZyBob3cgdG8gdXNlIEhXIGNyeXB0byBhY2NlbGVyYXRv
-ciBpbiBWTS4gSXQgc2VlbXMgdGhhdA0KPiB2aXJ0aW8tY3J5cHRvIGlzIG9uZSBvcHRpb24sIGhv
-d2V2ZXIgb25seSBhZXMgc2tjaXBoZXIgYWxnbyBpcyBzdXBwb3J0ZWQgYW5kDQoNCkFjdHVhbGx5
-IGFrY2lwaGVyIHNlcnZpY2UgaGFkIGJlZW4gc3VwcG9ydGVkIGJ5IHZpcnRpby1jcnlwdG8gaW4g
-MjAyMi4NCg0KPiB2aXJ0aW8tY3J5cHRvIGRldmljZSBpcyBub3Qgc3VnZ2VzdGVkIGJ5IFJIRUwg
-MTAuDQo+IA0KPiBodHRwczovL2RvY3MucmVkaGF0LmNvbS9lbi9kb2N1bWVudGF0aW9uL3JlZF9o
-YXRfZW50ZXJwcmlzZV9saW51eC8xMC9odG1sDQo+IC9jb25maWd1cmluZ19hbmRfbWFuYWdpbmdf
-bGludXhfdmlydHVhbF9tYWNoaW5lcy9mZWF0dXJlLXN1cHBvcnQtYW5kLWxpbWl0DQo+IGF0aW9u
-cy1pbi1yaGVsLTEwLXZpcnR1YWxpemF0aW9uDQo+IA0KPiAgICBJIHdhbnQgdG8ga25vdyB3aGF0
-IGlzIHRoZSBwb3RlbnRpYWwgaXNzdWVkIHdpdGggdmlydGlvLWNyeXB0by4NCj4gDQoNClRoaXMg
-cXVlc3Rpb24gaXMgdG9vIGJpZywgbWF5YmUgeW91J2QgYmV0dGVyIGFzayBSSEVMIGd1eXMuIDoo
-DQoNClJlZ2FyZHMsDQotR29uZ2xlaQ0KDQo+IFJlZ2FyZHMNCj4gQmlibyBNYW8NCg0KDQo=
+
+
+On 2025/11/27 上午10:56, Gonglei (Arei) wrote:
+> Hi,
+> 
+>> -----Original Message-----
+>> From: Bibo Mao <maobibo@loongson.cn>
+>> Sent: Thursday, November 27, 2025 9:43 AM
+>> To: Gonglei (Arei) <arei.gonglei@huawei.com>
+>> Cc: linux-crypto@vger.kernel.org; virtualization@lists.linux.dev; linux-kernel
+>> <linux-kernel@vger.kernel.org>; QEMU devel <qemu-devel@nongnu.org>
+>> Subject: virtio-crypto: Inquiry about virtio crypto
+>>
+>> Hi gonglei,
+>>
+>>      I am investigating how to use HW crypto accelerator in VM. It seems that
+>> virtio-crypto is one option, however only aes skcipher algo is supported and
+> 
+> Actually akcipher service had been supported by virtio-crypto in 2022.
+I am studying virtio-crypto and want to add sm4 algo with skcipher on 
+it. Hope to get some guidances and work together on it in future :)
+
+Regards
+Bibo Mao
+> 
+>> virtio-crypto device is not suggested by RHEL 10.
+>>
+>> https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html
+>> /configuring_and_managing_linux_virtual_machines/feature-support-and-limit
+>> ations-in-rhel-10-virtualization
+>>
+>>     I want to know what is the potential issued with virtio-crypto.
+>>
+> 
+> This question is too big, maybe you'd better ask RHEL guys. :(
+> 
+> Regards,
+> -Gonglei
+> 
+>> Regards
+>> Bibo Mao
+> 
+> 
+
