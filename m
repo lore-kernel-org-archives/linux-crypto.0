@@ -1,69 +1,71 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D3F1F4CA9;
-	Thu, 27 Nov 2025 01:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA4F1E1A17;
+	Thu, 27 Nov 2025 01:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764207948; cv=none; b=Nvt1OW+jpyTLV+uAZUCKNR6TOrpn1U9iWe17m0QEwBMUgUX6Zp5m15Ge4jDY6Tdx+xrAj6FK8EkV0BSPGirflpIy/qiS5F+h5sx9q23i1C+17El58GiDQeURffFsETHWTe+u8e/L3bi9dazkJnqoNIJb7/tH8JdWHnQFrNszRKo=
+	t=1764208415; cv=none; b=Sx3FNurcm68SFwOr1QhWyt1xuuUBMrBNnE0nG4OC4PTgtC+ePmeeO27LK9Ktwm3I5gJyMwFYSAuIKhwUjECHhGy58vywwOXc05Fh7syDTcR0gAprDRI+B/LgTkDem51foiEha21AtXiJ+iFCzcayk7suUcEbaNHqxh5i46K5Zas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764207948; c=relaxed/simple;
-	bh=7zmgDxz3BNsU8+CzY8b8wvYlKheGihwr1LJC5MJWTNA=;
-	h=To:Cc:From:Subject:Message-ID:Date:MIME-Version:Content-Type; b=uj6+vLYr40iuQOFCBX2qr/s3JXxRJ8OSKcPRt4vKSb+NcUu6GGjsH8vAQ7ShWI7VtDNN0YCeaUb+3rRWEy9a9qOLfsyQ1qkkQqaqQdfMpdelIvzdCRKKNFva23ttaOrOAmywEtwvvj9O0jw3t2IQblkpvX/Rfy7/iQA1BujV5Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8CxJ9FBrSdp3pEoAA--.21115S3;
-	Thu, 27 Nov 2025 09:45:37 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJAxVOQ9rSdpJo9AAQ--.50365S3;
-	Thu, 27 Nov 2025 09:45:35 +0800 (CST)
-To: arei.gonglei@huawei.com
-Cc: linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kernel <linux-kernel@vger.kernel.org>,
- QEMU devel <qemu-devel@nongnu.org>
-From: Bibo Mao <maobibo@loongson.cn>
-Subject: virtio-crypto: Inquiry about virtio crypto
-Message-ID: <d4258604-e678-f975-0733-71190cf4067d@loongson.cn>
-Date: Thu, 27 Nov 2025 09:43:06 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1764208415; c=relaxed/simple;
+	bh=gV/ScPBZZNk5yz68ysPFBc/JvaoRbOE0FWA+8mjBR7g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dfFdxrERCYGhOpRyCifvuY1afeguHwNVzn/cHg/ptFNT8NdVxy+60ssQfNq1NgMIsQkbxO9+wAlOLox93GaDQ8CGj+By7OXQnmEGozmseGng5TzLOXPLst9TpRO1cgbkNQM6EBUh75B4NEUlTWTcdk2pNFQ9SLyDqV3iYVJXXF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pMO45soF; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pMO45soF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57FC1C4CEF8;
+	Thu, 27 Nov 2025 01:53:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764208415;
+	bh=gV/ScPBZZNk5yz68ysPFBc/JvaoRbOE0FWA+8mjBR7g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pMO45soFRSoHAqiA2BJCz2rFuUl/XQATA2O21WYKVy5uw3/wGwsyjB222dV/3ulIw
+	 yTuPriCn8BaZMc1yBtfEhVh2PyGcBSH1BpCDiNF5th/eYEez4cS46lq/B9tavGSHbq
+	 to0OPAz5P/bJkmtxjxfu05Awqem4w5r3dM5mGMGU4Zw2xzk8tONwPcqc/o7DUZMUPO
+	 /YGdGzH74g8UXzWj6Q/7Lnklwio8Q8f7uZmv+vqZ0C1M4Zz7ks5yyX9xThav3f86BX
+	 T3a26jfs8MdI+FJmTOk9RuD6EKeuzLfVCtt72rWhDec1yeli/9EbddICskaxR0Ts/8
+	 B2Lgxeu4t2HYw==
+Date: Wed, 26 Nov 2025 17:51:41 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Li Tian <litian@redhat.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	"Theodore Y . Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: Re: [PATCH RFC] crypto/hkdf: Fix salt length short issue in FIPS mode
+Message-ID: <20251127015141.GA29380@sol>
+References: <20251126134222.22083-1-litian@redhat.com>
+ <20251126174158.GA71370@quark>
+ <CAHhBTWuOy1nC1rYqye8BzE+unoC+3M9Dsw+Mj54=3eeFwqyTXw@mail.gmail.com>
+ <20251127011446.GA1548@sol>
+ <CAHhBTWsTqP3LzJV+=_usvttJcMFoLYSY5Sqt2H-U-oki3Hu0Mw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:qMiowJAxVOQ9rSdpJo9AAQ--.50365S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29K
-	BjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26c
-	xKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vE
-	j48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxV
-	AFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
-	wI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
-	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv
-	67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
-	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
-	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw
-	1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
-	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
-	1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8zw
-	Z7UUUUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHhBTWsTqP3LzJV+=_usvttJcMFoLYSY5Sqt2H-U-oki3Hu0Mw@mail.gmail.com>
 
-Hi gonglei,
+On Thu, Nov 27, 2025 at 09:24:43AM +0800, Li Tian wrote:
+> > Why do you think the salt needs to be at least 32 bytes?
+> 
+> Forgive my inaccuracy. Under FIPS, salt needs to be at least the hash length
+> (32bytes for sha256 and 64bytes for sha512) because NIST requires that the
+> HMAC key used in Extract has *full security strength*. 32 is just the
+> number I
+> tested with.
+> 
+> Li Tian
 
-    I am investigating how to use HW crypto accelerator in VM. It seems 
-that virtio-crypto is one option, however only aes skcipher algo is 
-supported and virtio-crypto device is not suggested by RHEL 10.
- 
-https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/configuring_and_managing_linux_virtual_machines/feature-support-and-limitations-in-rhel-10-virtualization
+It seems that you're confusing the salt with the input keying material.
+The entropy for the key comes from the input keying material.  The salt
+is a non-secret value that usually is just set to all-zeroes.  In fact,
+both users of HKDF in the kernel just set it to all-zeroes.
 
-   I want to know what is the potential issued with virtio-crypto.
-
-Regards
-Bibo Mao
-
+- Eric
