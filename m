@@ -1,44 +1,41 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A10233735
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Nov 2025 14:02:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778E03FBA7
+	for <linux-crypto@vger.kernel.org>; Thu, 27 Nov 2025 22:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764252146; cv=none; b=tKa/PqWEqIMaBUVxzYxGIHaC1fSoXCBDZ1nSEr67opdBMR1c/fMMNjP0imu1zlEZ3MX+VUVXxS9lMUsPHPWRpySQo71ONtB7fikDGzsRtcPTjiPiI/kysZfX/rgp/t1AQdtojvURZXw/66JWFEYGPnu9C51c+1LJB7k+w8nNcZA=
+	t=1764282090; cv=none; b=X7PKQlrC2XMlx7L/qbn0WzK4sMgdeDzLE8CqmUF/7tCQJhRBnmOfmOrUUW6/Ipg+fqWjt/TjCbMirWTppTk8WjpsHSGLWkcTzZHLT/cRvooPP7iyGhVq4eh4gJMyP0zVq2HepaH+Io1wWx/8ebJY8rOwO2By0diPqapSRDa836c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764252146; c=relaxed/simple;
-	bh=5PX/iIDfuyyYqIcNb75539//OPviUA5Wl1Nt5gOSfbI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cLeLM+0XIFiPUd7BL21Tr368t45apEm7S0krVvtX1oy4vGIyF7A9+h8bVSsVvkBIs3ClQ89UjJeJsgqA5LjiM/yBTlSFATkCQwOL10sg/JnKwoSOce3xLg+zyfoWcKgmHhPvHChg0Pu+CDDdoexIlr0euS5s+oUaZ1a+32GTv6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ECHHtHMT; arc=none smtp.client-ip=95.215.58.186
+	s=arc-20240116; t=1764282090; c=relaxed/simple;
+	bh=M/5ZsuPhtWKSXNAwlbB6SkkwZ5Rc4dja+fJ2BUUa+cw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IOFPVOp9QQPmARVHblVedmFGEPL6tP++VydCX8HsPy2AAO1iujpF6Mq6s3joGjbZWp9jFgpt3ngaCrSjySx5X0jEG0vLs+DlPVFOtNbQ4wHWT15Kd6M8o5CxB2rc0uNUBhAR5kMsKw/lIhagesQL3ZUYt52Ktwl4kpzGTmATHWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UBH9CIWE; arc=none smtp.client-ip=91.218.175.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ECHHtHMT"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UBH9CIWE"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1764252141;
+	t=1764282075;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=t9sx4anvo4lGCsssDz1Ke/5DwhTNNf3DFzIUDPTugwc=;
-	b=ECHHtHMTmmEI/ypGNIVfPDMrf26ZG8D1mUJsBi2cPzS4zFV3uvJna68XQjf7o/wiw+E2XM
-	ZAs4Qp1KItICUFe2dNrDoD6OP2yDWmJMAV3SpaVv1WNeSzHEQst35NgI9V2dK5dlemuPtH
-	VzLEXjs7rUvLYpzWaY8TWpQaU+t+Vjg=
+	bh=volo886vM580bKB0ZE0U770fPV3kAw+OiaDNJdnadMk=;
+	b=UBH9CIWEHmaez6RvzFuHAvRqYtZcy76vkgZAwrf4uveo31/ZbsGPhwjeskdHk5LP9VcrpJ
+	ZLialC6Q+cpBfwGAGI1Gr5+Yo3oAh/VZqA4uuT9L2gmk7EN6HrcEMhmW9wzd9RgL4jIjMd
+	Z6jviFcgBxQ1eAO5gyLFIbRgkocKbuQ=
 From: Thorsten Blum <thorsten.blum@linux.dev>
 To: Kristen Accardi <kristen.c.accardi@intel.com>,
 	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Kanchana P Sridhar <kanchana.p.sridhar@intel.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Tom Zanussi <tom.zanussi@linux.intel.com>
+	"David S. Miller" <davem@davemloft.net>
 Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	stable@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: iaa - Fix out-of-bounds index in find_empty_iaa_compression_mode
-Date: Thu, 27 Nov 2025 15:01:57 +0100
-Message-ID: <20251127140158.173840-1-thorsten.blum@linux.dev>
+Subject: [PATCH] crypto: iaa - Simplify init_iaa_device()
+Date: Thu, 27 Nov 2025 23:20:58 +0100
+Message-ID: <20251127222058.181047-1-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,47 +45,32 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The local variable 'i' is initialized with -EINVAL, but the for loop
-immediately overwrites it and -EINVAL is never returned.
+Return the result directly to simplify init_iaa_device().
 
-If no empty compression mode can be found, the function would return the
-out-of-bounds index IAA_COMP_MODES_MAX, which would cause an invalid
-array access in add_iaa_compression_mode().
-
-Fix both issues by returning either a valid index or -EINVAL.
-
-Cc: stable@vger.kernel.org
-Fixes: b190447e0fa3 ("crypto: iaa - Add compression mode management along with fixed mode")
 Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
 diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 23f585219fb4..8ee2a55ec449 100644
+index 23f585219fb4..a91d8cb83d57 100644
 --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
 +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -221,15 +221,13 @@ static struct iaa_compression_mode *iaa_compression_modes[IAA_COMP_MODES_MAX];
+@@ -544,13 +544,7 @@ static struct iaa_device *add_iaa_device(struct idxd_device *idxd)
  
- static int find_empty_iaa_compression_mode(void)
+ static int init_iaa_device(struct iaa_device *iaa_device, struct iaa_wq *iaa_wq)
  {
--	int i = -EINVAL;
-+	int i;
- 
--	for (i = 0; i < IAA_COMP_MODES_MAX; i++) {
--		if (iaa_compression_modes[i])
--			continue;
--		break;
--	}
-+	for (i = 0; i < IAA_COMP_MODES_MAX; i++)
-+		if (!iaa_compression_modes[i])
-+			return i;
- 
--	return i;
-+	return -EINVAL;
+-	int ret = 0;
+-
+-	ret = init_device_compression_modes(iaa_device, iaa_wq->wq);
+-	if (ret)
+-		return ret;
+-
+-	return ret;
++	return init_device_compression_modes(iaa_device, iaa_wq->wq);
  }
  
- static struct iaa_compression_mode *find_iaa_compression_mode(const char *name, int *idx)
+ static void del_iaa_device(struct iaa_device *iaa_device)
 -- 
 Thorsten Blum <thorsten.blum@linux.dev>
 GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
