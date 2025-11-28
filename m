@@ -1,41 +1,37 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778E03FBA7
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Nov 2025 22:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A46E2D027E;
+	Fri, 28 Nov 2025 07:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764282090; cv=none; b=X7PKQlrC2XMlx7L/qbn0WzK4sMgdeDzLE8CqmUF/7tCQJhRBnmOfmOrUUW6/Ipg+fqWjt/TjCbMirWTppTk8WjpsHSGLWkcTzZHLT/cRvooPP7iyGhVq4eh4gJMyP0zVq2HepaH+Io1wWx/8ebJY8rOwO2By0diPqapSRDa836c=
+	t=1764315619; cv=none; b=fZpl+E6/VdQl/5qsidFdEaF2hE/S5WZ23M5ST+MAxlDcWsaoyLCsFEmCdKWh3Jw2pkTidF2BQIq4S5rkRF5gTCvnCxezEaROy9046QxfcE83LBXgOUN0RoonkP9ViHoc9WO9GHqdN0S+U3NImxw+w+CPLRw6SLWQmP26nmp6kIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764282090; c=relaxed/simple;
-	bh=M/5ZsuPhtWKSXNAwlbB6SkkwZ5Rc4dja+fJ2BUUa+cw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IOFPVOp9QQPmARVHblVedmFGEPL6tP++VydCX8HsPy2AAO1iujpF6Mq6s3joGjbZWp9jFgpt3ngaCrSjySx5X0jEG0vLs+DlPVFOtNbQ4wHWT15Kd6M8o5CxB2rc0uNUBhAR5kMsKw/lIhagesQL3ZUYt52Ktwl4kpzGTmATHWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UBH9CIWE; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UBH9CIWE"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1764282075;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=volo886vM580bKB0ZE0U770fPV3kAw+OiaDNJdnadMk=;
-	b=UBH9CIWEHmaez6RvzFuHAvRqYtZcy76vkgZAwrf4uveo31/ZbsGPhwjeskdHk5LP9VcrpJ
-	ZLialC6Q+cpBfwGAGI1Gr5+Yo3oAh/VZqA4uuT9L2gmk7EN6HrcEMhmW9wzd9RgL4jIjMd
-	Z6jviFcgBxQ1eAO5gyLFIbRgkocKbuQ=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Kristen Accardi <kristen.c.accardi@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	s=arc-20240116; t=1764315619; c=relaxed/simple;
+	bh=9POnfd8KCgzKOXOKHiFhGQ3sA/OUBNdoOYdyxmsf4rk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TW0J0XNwQ8mJdNgsOxAUD0beAJ4xsey0yK3+mp9EiUOlFbcsfENZw0ZztEMWndZdqYoRj0aSBXYgOM9jr+Aty1KvzmbSmWq0h+NiPkwTmJhWS5qm4/XkMwgQcbV6udNo5DNC99SYln7WfeuiRckt2rtBy4X2Dgv8BpmKLm3AnpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8Cx77_VUSlpwgUpAA--.20515S3;
+	Fri, 28 Nov 2025 15:40:05 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowJDxrcHUUSlpw9hBAQ--.18805S2;
+	Fri, 28 Nov 2025 15:40:04 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Gonglei <arei.gonglei@huawei.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+Cc: virtualization@lists.linux.dev,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: iaa - Simplify init_iaa_device()
-Date: Thu, 27 Nov 2025 23:20:58 +0100
-Message-ID: <20251127222058.181047-1-thorsten.blum@linux.dev>
+Subject: [PATCH] crypto: virtio: Add spinlock protection with virtqueue notification
+Date: Fri, 28 Nov 2025 15:40:01 +0800
+Message-Id: <20251128074002.1149034-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,35 +39,54 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-CM-TRANSID:qMiowJDxrcHUUSlpw9hBAQ--.18805S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Return the result directly to simplify init_iaa_device().
+When VM boots with one virtio-crypto PCI device and builtin backend,
+execute openssl benchmark command with multiple processes, such as
+  openssl speed -evp aes-128-cbc -engine afalg  -seconds 10 -multi 32
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+openssl processes will hangup and there is error reported like this:
+  virtio_crypto virtio0: dataq.0:id 3 is not a head!
+
+It seems that the data virtqueue need protection when it is handled
+for virtio done notification. If the spinlock protection is added
+in virtcrypto_done_task(), openssl benchmark with multiple processes
+works well.
+
+Signed-off-by: Bibo Mao <maobibo@loongson.cn>
 ---
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ drivers/crypto/virtio/virtio_crypto_core.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 23f585219fb4..a91d8cb83d57 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -544,13 +544,7 @@ static struct iaa_device *add_iaa_device(struct idxd_device *idxd)
+diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
+index 3d241446099c..ccc6b5c1b24b 100644
+--- a/drivers/crypto/virtio/virtio_crypto_core.c
++++ b/drivers/crypto/virtio/virtio_crypto_core.c
+@@ -75,15 +75,20 @@ static void virtcrypto_done_task(unsigned long data)
+ 	struct data_queue *data_vq = (struct data_queue *)data;
+ 	struct virtqueue *vq = data_vq->vq;
+ 	struct virtio_crypto_request *vc_req;
++	unsigned long flags;
+ 	unsigned int len;
  
- static int init_iaa_device(struct iaa_device *iaa_device, struct iaa_wq *iaa_wq)
- {
--	int ret = 0;
--
--	ret = init_device_compression_modes(iaa_device, iaa_wq->wq);
--	if (ret)
--		return ret;
--
--	return ret;
-+	return init_device_compression_modes(iaa_device, iaa_wq->wq);
++	spin_lock_irqsave(&data_vq->lock, flags);
+ 	do {
+ 		virtqueue_disable_cb(vq);
+ 		while ((vc_req = virtqueue_get_buf(vq, &len)) != NULL) {
++			spin_unlock_irqrestore(&data_vq->lock, flags);
+ 			if (vc_req->alg_cb)
+ 				vc_req->alg_cb(vc_req, len);
++			spin_lock_irqsave(&data_vq->lock, flags);
+ 		}
+ 	} while (!virtqueue_enable_cb(vq));
++	spin_unlock_irqrestore(&data_vq->lock, flags);
  }
  
- static void del_iaa_device(struct iaa_device *iaa_device)
+ static void virtcrypto_dataq_callback(struct virtqueue *vq)
 -- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
+2.39.3
 
