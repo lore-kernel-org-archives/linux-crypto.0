@@ -1,100 +1,77 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F272405EB;
-	Fri, 28 Nov 2025 14:25:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1987B79CD;
+	Fri, 28 Nov 2025 16:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.145.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764339931; cv=fail; b=BSuzUoDTyFHPFsUSjoMcfgf1vnKYb8YTTRZSg1EL/iwdOPRq/COlGw3rFOfdcpUTjPIWK2gP4pNcKKDD/V6KzAopJ/7w3ulfZ8No2Y0q//pwRiUVFIxfRPrppaKBN1DwJdCFxNqv5QG+5Q6vRFqM6HQEBcutgH59pY0a2ImVq30=
+	t=1764346405; cv=fail; b=bsdCExIVu1lE1emmMRwUVqShDsiCy9rJzr3/1FYyh2nlRI9Ro8ZQlVMnBUDRzWIs9cKcqptPmy/zfReuJxU4X4BVu8B+EtSvPV2Ro9Xv2EJOfeUaFRgafJV4iEi96xsYUVjkvl2eHlwNxL2UGraUCqEoOKKtEvLTxIdNMpQ0vKw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764339931; c=relaxed/simple;
-	bh=RypCay/z/vxzMf8n0s4JTCsn+v1WkAgBCOfTZ227Hww=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Yp5v+M1IKJFFQBFnRrhRG55KTyzTkjHAZX5NfIT1OXTI9xxSkWkf+/lhDWHOuokWfYLbhrUlOisfFdsjZWzv3eB1kM/kQ15ilFY1gvX8is86lXdtJDUzgcpcKBN8kk4WwwjgPiAChsQOxFvieTVdPytd8/SdKnQbkNt2SIS7PFE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bsQ83pZX; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1764346405; c=relaxed/simple;
+	bh=LZatiwkXGpDNQp0fiOSYWJ6I5kcdiAxNmMXeHK2MxDI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=FozM7eVWc0zmLKVzKehFgb91w/CVi6BU2s5KRTJR0OvbwKZ1B2xxcHRmoflw+KUMfrcfZVJTzWlyJ7+rgF07hInvf2Q19r/V3rxJniTlNbhlebkSYdpW+VI9nKrgsZkvRIKEZh7As1HJ8AEg+dQ9cFavKazuDUb98z+mgzkcb2E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=gxARZo8J; arc=fail smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bsQ83pZX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764339930; x=1795875930;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=RypCay/z/vxzMf8n0s4JTCsn+v1WkAgBCOfTZ227Hww=;
-  b=bsQ83pZXOabjd7pKMlEdXjjCwvaMFL+y49Vri+MxvwuR69cDNbg7cA0u
-   17eZOEJoufQFyNCMpriv3ot1f1PC4tcZz45R6Ve7EW6tX+xzC901xIV3/
-   WyGzXIbk98f+xtS10s8E3lpnr5cF/MApMrTJKlfggrBxCM1wYYXJV0ACJ
-   RP1GoTz1n4Sv6+JG05jbSmXhi08hRgkOL1znhCzGtepHhQhCfjGk/cOvx
-   5HkzHlAhL3+BT55kGLzdBbuxLR6F8MqrBIc2LaGJSpbtnt2cNUZx4WN4k
-   KdyqNyn4BdAVY7JoI90jPUPujuArEC69sw6KtBsAEy8lH/zhDdtwxOLKw
-   g==;
-X-CSE-ConnectionGUID: GO0qMTnBR6qU2kXTholbHg==
-X-CSE-MsgGUID: csRwpTQXTGil8cEMd3e0xA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11626"; a="66410115"
-X-IronPort-AV: E=Sophos;i="6.20,234,1758610800"; 
-   d="scan'208";a="66410115"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2025 06:25:29 -0800
-X-CSE-ConnectionGUID: d/SvbiYBTS2DXHeRbH/hBA==
-X-CSE-MsgGUID: CA8js6IeStWS1Bf5VFJIkQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,234,1758610800"; 
-   d="scan'208";a="197810405"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2025 06:25:29 -0800
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Fri, 28 Nov 2025 06:25:27 -0800
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Fri, 28 Nov 2025 06:25:27 -0800
-Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.23) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Fri, 28 Nov 2025 06:25:27 -0800
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="gxARZo8J"
+Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ASBJsvT1974977;
+	Fri, 28 Nov 2025 08:13:18 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=eZnSuauRDmP/3vPB9OGvCAMGtWoPcY59Lia3EtRJ5X4=; b=gxARZo8JnkWq
+	DsTKMvMgRyUYLauk57H8OYx/oM4+mjlZ8dv/DsxlLWYbSN2qJVH0sU5Bj2hJENII
+	Q5QnVW36ir7F/X9BVqNuf4A4O6lTZ7c1X0yc6vPvgAfhTkhYJcuecfJPQd8KREco
+	uRXtaTwi/N6xY1Hopk7Lv1H7V89CCXEtfsxqbNq3Pu7XiRJQP7vCydhBIEyey05b
+	LHJ4yD9y06QU7+TxkCVCoQpTehkgWgORjtjrNweq3IruqmyFC0JAXdbw1y00XvUl
+	Qy3lmfGwm0IOD0wFJnRKejC5tmH4PcX6GaIgJc/lsaFEJgn962U73TM05DW1hMe4
+	vwYC3G2TSg==
+Received: from ph0pr06cu001.outbound.protection.outlook.com (mail-westus3azon11011050.outbound.protection.outlook.com [40.107.208.50])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4aqas31t9n-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 28 Nov 2025 08:13:18 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fSlGkAQ+rSfyG0GfClQ4JfsnKMSIWzfrcSmXIHc66UyBEP3fB+RiIW5iwF/OBR0lbht2lykdm6RG1KWbDfllIF7ZvsxZAuKWKu7fArhG38jbyUFvOCz0aNKqrsUldiV0zGjuYOE+dUQRbZmWwRJ2coU8OhpcC5a4eWEnnrBnv234ERjNnR3eGn/UVZGvzeAetIrr1aUcuLe+B8rLbEJ/Zg3PKrQaPlMHgztY3q4BpLJi4uYfc2Gz8YerZLO7GFlp4X5GIPGJzYQzXZIllYVkP49abQf1f0VZ7qo90zdZUxUl4Bq8yfvtw3rR9QehiUTw3F0aBJAlRnmlVO+5XFKvDQ==
+ b=QIDuwlEUGv8rNNq3wsOipJavpnyMYj4TA08xkOqwohRY3FUEvlpgJrTRnXSvv5uXOi6eELovYyhFuinE1wJZsdE2amjJ9wUynac0A8FxQnKYRF3RQXyX5yfonnHjUVRwXalKG2ikOx4cazeu5klixfKEtbJmZxRn73IPml6c7KLCsZ4f+GNjl8scypV7+m4TJgbVv/rTKHrF3TcLLy3SAHgf5W0JLuwBAUB5nI4X9B/T9c6Ayk/4oaawvp8J5sHueR+PZJh+uB1QICyx6L/FVz+dfAuF3J9njbxSKqQMVdZiItv+xR54U030pw9QtnbTHNB7zpymi6LrAmm2xjgDgQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7DBEjt0pM3ADd7YD3/DAQpM+ejETMY5cEUju/Bnnfn4=;
- b=wCFMTuiFDzFLcEf13yNwAx8vjHM9uSSXP5TC8hF+ls90rgUz5f/ld6PKwKzjn8lxsNnCngZ1eVFfDmNEFo3gCemdhCOGesfa7aJKuJCy+/PSCJaXvVPgx0R5G0uJaRIXzersqJM7jvMpNi5QyyryYLy5FonAb98U9skBBOHl6NdxEQGbx8adtTni5JGPWgxAoQKvz1PIRV6cDPJjEmMkQSnWTj02amWpwVklLR3LQTEUXxuziXZp2R7PoIV1O5m3tVstB9t/dY73621O0szUuRiPBnHMmJCpkX/Nj9hNZDI5QSfVd0rIbfsyW7z5V+xRMAbkQ7/hsF9L++XOlzOXUg==
+ bh=eZnSuauRDmP/3vPB9OGvCAMGtWoPcY59Lia3EtRJ5X4=;
+ b=rfBcypGetJlrW/GPXQgof2bAaZw0UrL4f7Rcvp5Pvewadd+0wQ3uD98orkMH8etS04E0t+YX6UMMHdww1EyX7JZkUMEPWW/msFGrwdDwjIxcn1ApiKcli3x+kr9vG0KCKaCBVTwaI9gZI1r3UdE08Lx6iUQpuYCQoSJHwb/DGn964MSMFyT8oBZIXL4sY4BY3MMUcleRUTmilBPnHyI5DO6A8PYgXS2U2Yx41zuq9ppjN+3SQHo27u+iVZXPVVXIwiZII7q7y5rsbXf8g8w7ZJL/4qFrdCpXzZdxt1/+Hblw99/H8i/neCzwJzQd7izLSGyJ8LT53q8YOmLCDBcxsQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by DS7PR11MB6150.namprd11.prod.outlook.com (2603:10b6:8:9d::19) with
+ smtp.mailfrom=meta.com; dmarc=pass action=none header.from=meta.com;
+ dkim=pass header.d=meta.com; arc=none
+Received: from LV3PR15MB6455.namprd15.prod.outlook.com (2603:10b6:408:1ad::10)
+ by PH0PR15MB4718.namprd15.prod.outlook.com (2603:10b6:510:8c::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Fri, 28 Nov
- 2025 14:25:24 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::22af:c9c9:3681:5201]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::22af:c9c9:3681:5201%5]) with mapi id 15.20.9366.012; Fri, 28 Nov 2025
- 14:25:23 +0000
-Date: Fri, 28 Nov 2025 14:25:14 +0000
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: <clm@fb.com>, <dsterba@suse.com>, <terrelln@fb.com>,
-	<herbert@gondor.apana.org.au>
-CC: <linux-btrfs@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<qat-linux@intel.com>, <cyan@meta.com>, <brian.will@intel.com>,
-	<weigang.li@intel.com>, <senozhatsky@chromium.org>
+ 2025 16:13:16 +0000
+Received: from LV3PR15MB6455.namprd15.prod.outlook.com
+ ([fe80::8102:bfca:2805:316e]) by LV3PR15MB6455.namprd15.prod.outlook.com
+ ([fe80::8102:bfca:2805:316e%5]) with mapi id 15.20.9366.009; Fri, 28 Nov 2025
+ 16:13:16 +0000
+Message-ID: <0405949e-a41a-4622-9c26-8f25b9561e1c@meta.com>
+Date: Fri, 28 Nov 2025 11:13:08 -0500
+User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC PATCH 00/16] btrfs: offload compression to hardware
  accelerators
-Message-ID: <aSmwygmtIVgfm+2o@gcabiddu-mobl.ger.corp.intel.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>, clm@fb.com,
+        dsterba@suse.com, terrelln@fb.com, herbert@gondor.apana.org.au
+Cc: linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        qat-linux@intel.com, cyan@meta.com, brian.will@intel.com,
+        weigang.li@intel.com, senozhatsky@chromium.org
 References: <20251128191531.1703018-1-giovanni.cabiddu@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251128191531.1703018-1-giovanni.cabiddu@intel.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DB9PR01CA0001.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:1d8::6) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+ <aSmwygmtIVgfm+2o@gcabiddu-mobl.ger.corp.intel.com>
+Content-Language: en-US
+From: Chris Mason <clm@meta.com>
+In-Reply-To: <aSmwygmtIVgfm+2o@gcabiddu-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL1PR13CA0192.namprd13.prod.outlook.com
+ (2603:10b6:208:2be::17) To LV3PR15MB6455.namprd15.prod.outlook.com
+ (2603:10b6:408:1ad::10)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -102,247 +79,122 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|DS7PR11MB6150:EE_
-X-MS-Office365-Filtering-Correlation-Id: 22901ddb-7741-4273-452c-08de2e89f7ea
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: LV3PR15MB6455:EE_|PH0PR15MB4718:EE_
+X-MS-Office365-Filtering-Correlation-Id: d26150dd-e5eb-46c0-3900-08de2e9909dc
+X-FB-Source: Internal
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?ltmEBpZ5+AX3VkoypEs11gEiZB6z+I2BLoCZCyCB1GjiG+G2FV0aZ3oUWtyS?=
- =?us-ascii?Q?6XmDQlsLZvSfBGRgBoIEZOQFIbg/mAgNKtNHVM84U6FYwx0iHyJoZUwNoBnb?=
- =?us-ascii?Q?kGstGkxgz5KvbXblrzGDgzw9o796TMOOGtpThoViTt3mV179vXzGhrNMJ0Jc?=
- =?us-ascii?Q?PH7745qNCdQF4xuDAG8MuTYLSAAUjAL14TYbP4FRQbtRBaYRdX743y/I2noG?=
- =?us-ascii?Q?L9JJZeQW87R0s8FKGjNhtvINzYoFf2jn7EiKW0d3c3Dcm+vLc2fq8VXjDgcy?=
- =?us-ascii?Q?qAypD1c760BejWX0Zo/VrNo/ovP+kMprb6VL54RbmGdinEjff80aOOGYAgvZ?=
- =?us-ascii?Q?Qt4+J0TNCa1gaQ0vBC0/IAtsflsKrP3yEd5CIbTgLE7KjR6+4pwsMExUNYnP?=
- =?us-ascii?Q?Zxwtz001RrmJ7uRUyFEyuEjtWe2OHjDqbgtSe6xvtRrg1daYN9PxjeF0qCNA?=
- =?us-ascii?Q?Qnd9yreIAAuxRiAnYZWiNuC1f+6mW+iraurL4PATX+VbKWIF5d3DeEB+48Am?=
- =?us-ascii?Q?Pj4qAjEZ4IDjUt1Pa9e1FI4FY4rwvnJ+k8R4NzP8CMZP+bjzzh57/3Bgged/?=
- =?us-ascii?Q?Gf4IREwkReGudJYM5q7F5bOReieIWuzqLjM6flX4N+MDpUJTLbl7DrxNMMoh?=
- =?us-ascii?Q?Xci9jBAjMJNBaVGtB0SCFjB5GcQQKc0TUB5waq0yZHlKDGI5/9lajRHyV2Vl?=
- =?us-ascii?Q?3niEinh3Gen/orGjGOtSjJHufstPiebAE0sMpFFOfFyWolS9yptma1Ina0fn?=
- =?us-ascii?Q?K11juRTzI4Z2mS+gdvfRZ0hsgtpFT3+JfOz5ArpHe1R5Shvf4DcoPkK+foVO?=
- =?us-ascii?Q?8I4st/5zMMTYhGu69gASMWR5fU9mzGI/UEPsPxI5orUJ0hKlBxIB8iHrNQCH?=
- =?us-ascii?Q?5JGKo7st9US4EQfIxa9ESHTWNevAqnX45WStQfMNwbO5nHXYBIWORAYcwlm7?=
- =?us-ascii?Q?AuIsr9FMygjNPYOzQ3Sl1zZLnf4htHO4Akq3O2heLTZ/6lD7xDFjrTRpry62?=
- =?us-ascii?Q?2zveK0IhChnk1yq1Ns0qPAR425vFhYFKvrccHXsI0mwCp2no493vej58qj/H?=
- =?us-ascii?Q?RxAxo0LEeGGMnNlVwGDUVsIjdIcgzxMAkzIzyAcD1DhBEQMT8kRHlh5rGZvy?=
- =?us-ascii?Q?Vy7N7WI6PZUyroVeMkmc9Ww5PjXyOuuOn1ZlIwPpy/puL3SoRKQYqOp+VD1r?=
- =?us-ascii?Q?IcT7MJLOjIra9JIDoOPxfKFBk63+YPER0GiSncroRSRp57i+dIo/Kx+XFL38?=
- =?us-ascii?Q?LyyNQcumnsPByZV++DqDdGvcSmVjZkEBJoYm5Dlj7pyOEEvLPSAas6n0BjXt?=
- =?us-ascii?Q?eLcdPGT9+lPyek16DbgxBY90a6Hj6+lYkqifxbWVrTK+7rJpua2IPT9uP4c0?=
- =?us-ascii?Q?OBf74DfBf2/8W2ph9zE9EkYUpyktQV1+6oxcZH3c6DwiJGkmgyxUGxasRj/B?=
- =?us-ascii?Q?u4AXxNmghMwwOs0wY59sEU6nyCvv/k3U4AWnOLYPW81V/TSuaxUKxA=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?R2paaDE1T0FxQVJDZ3lVeG9pdzhIbWNNVGJsRnhYWlA0MXRtT0Zodk5SUmZn?=
+ =?utf-8?B?TTV2SmhyU21LRldCcXFLY1plQk5COUJGcWRQdnYzVUJWNzI4djdkckRZRWFP?=
+ =?utf-8?B?clhtc1dEN1VNOFVFVmZMWENNdjBlNTdFUXpraUpOZFZBYjU5YldLNldPMUZC?=
+ =?utf-8?B?Z3FzRnJJWG5TSHhtRFVjeUtCWmRqSGVsTGt4V1JQODZidWU2T1cybUJuUVd0?=
+ =?utf-8?B?alF0RnF5RmJycDcyOW82QVAvS2lNRnF1Q1Yxa3BXZVI4RTRtaFZCemdjclMx?=
+ =?utf-8?B?UXRNbzBxak03ZzMxNWFHOVB2NVMrc055QytCQ29aQmhUQ2tNY2dWQVkzSG9Y?=
+ =?utf-8?B?bmxsZFMzY243Zk9mTnBSYythbFgwV3M5MytVRCtzTEFWVXN1b3g5a3VJQkVr?=
+ =?utf-8?B?NmhoUVVtcm5hS0VFSlV4bkF1SEZrRGZEK0xRMFUrQTRQM3I0cVBUTVR5ZytG?=
+ =?utf-8?B?ODZwdXVYUnJIZjladTRvOE9rc2J5MVJ6Y3p1WHJKakRIeUgzS1pXVzhrd0Nz?=
+ =?utf-8?B?VDhQOHdSVGw1dWlLZkgvVUxHdmFuM20yMFVvb2J4NmhkaXZPTS9nb01IN2pp?=
+ =?utf-8?B?ZWk5Vi9yME5JUXpyTnRZRWVvOWI5OXd1YlE2QmdzZyt6dlhJdG9uMys0NVor?=
+ =?utf-8?B?Q0FTYWlFRDZKRmE5R25oM0lFOEg5MWF5eVN0WlE0RTRxb3V5R01LWW9tUWdp?=
+ =?utf-8?B?UEJWb055S0VCYWg5ODRhc0c5TU9GUVVNUnhabGdMRmk3MHdPS0JUK0dRcll3?=
+ =?utf-8?B?elRZU0MvMWkzTDJvazhDdjlyVGkyTEtxQmcyL3lnWHRLT0syNTRYL010K09l?=
+ =?utf-8?B?RUY5dlBYS1BraTdoWjBUL3FnMW5yUjlna2kvbEVXcDFGWDVYZlN3Q25DQnRl?=
+ =?utf-8?B?a2dUSW11VXdCbUxFaWhncnRiWVZ3aFdEbk5OaGFOSEw2M3dYcGlqYjBHMzM0?=
+ =?utf-8?B?Q2czUVpFMVNqckNkbGpmRm8wRGlua3dLRXYzQ2JHNFVWeUcyekFPcVBwVDRX?=
+ =?utf-8?B?N2JTSDJyOGZsd3dzNG84RE5XZ0NEVW1mZjdrQVRKVUlxV2tRYk11bWYvS2tI?=
+ =?utf-8?B?VWx4TXJGV2NzSk9XdWlxVkh6bmt4cHF3RkowMHA3Y1ZrOFRHN2VWcHBmNE5X?=
+ =?utf-8?B?d2Zxek4vTC9Qc1VaQmdncUhtRFlEcW01eEppQVNPMUU3dVJhNlc5bU5pZFVS?=
+ =?utf-8?B?eXE1ellaRnVZUDJOZjdBTk9Cb2prd2xlT2YvWG9teUgxVHpvbGZjcjRUWW5y?=
+ =?utf-8?B?bW9xQnRKZWZxM0JyWVRRQ01PeHlnWEdJRWRWeUtkekNvZmlseS9GK0c2NVFv?=
+ =?utf-8?B?QVJ6bCtBdkZ2bzh4Tk9tSU5RZTYxRm4ySC9vNUVZN2xzM3pvMnBzSzhMWnlk?=
+ =?utf-8?B?TTB5MmhYdFlJSlJnZ2hzaHNDaTJJd3dISFAwRDRYRlJ4SXZOWG9NbG80S3dB?=
+ =?utf-8?B?MnNJQ29sK2J2Zitoemp2Zk81NlFVTnYydUdJRDlwREJFd08zRU5wNTZYTkJN?=
+ =?utf-8?B?NkJpTUxvV0FrQStsMThPK25WaEhLMzdSdld5Y0RPWFVhemFpeWN1NVgxNjhi?=
+ =?utf-8?B?S3k5V3dJNWM4TEIyYWdCb3lSZGJFdEpMbFpkZ3QvZER0bEFYNnB6TkJtZzB3?=
+ =?utf-8?B?NzRJZ053NnFwbmRFd3Z3VFBUUXpGUlNVT2F0dE1XY0tPc0UzU1BERnJyZ0hw?=
+ =?utf-8?B?eDVHeWp3NkdxZWJUbTV1Z2NzUDEvdnV4dzVVek9tQ2lBZEFNM1ZrMitJd0U5?=
+ =?utf-8?B?Q1dyM0ZUNlhveUd4djQ5SnZscEtmbStnLzFpcCt5RFdEbWpIMjhJUkFLWE9W?=
+ =?utf-8?B?bmlBUGlZc1BVNDBCZDVwUXp1NU1BRFNVSzg3a05nK0l4bitGN1kxNTNPYnNw?=
+ =?utf-8?B?ZERZQ1hzZDY0YnpreG8yZFQrV0Y1ei9HY3pUZGNMVkFLci9GYkJGYUFub2Fz?=
+ =?utf-8?Q?YFh/p/0HfyJhpyYYdv2zIcqXndm7iCu0?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR15MB6455.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?CKH9vZEC8bSNsczj/jZk6FCWWU53ky5bii1ZHLDnNFBPnZkOo06HHnZy2RWk?=
- =?us-ascii?Q?pQJHwEmzB+U37quBeK3/j/5xoBGqo0u6+rOWN+8VtrY2oW18iFoccf95wbBl?=
- =?us-ascii?Q?Z08uSmHttT2Wyyrz+HKA77lLtY6DHvIOU3EP1FKRauLhlN1pLopytBqpWCPv?=
- =?us-ascii?Q?Ztg9jKTeP8s3Y3oHivuDVsruoLCeDBRAlSKNNEZUdOoI7GOesCEPQg+aXIWo?=
- =?us-ascii?Q?4P88xzNGaesgDQFfhp69zBoOwLARYlP/PAyPvQ1ZL+tG01+Xm1xFA1jk1k2v?=
- =?us-ascii?Q?+7K/rsHkHGz6/ENrcf98hxV9smzWusePszVS1kLkMz6g0MLbJYY7s73Yg2fa?=
- =?us-ascii?Q?Sv6v+QqwXzmzqzcRN/DChx4zEUHR/EnebRkgRZEGkasA8YAwHzgsat/D2rHX?=
- =?us-ascii?Q?hTgVllV0BSFCU3kR0RYp1mSeokcYauEB/cn7+3JHM7KKHXzN6gGZrMrPPziD?=
- =?us-ascii?Q?Z10WtnimMRaXJaZhKEwLqLjUTfDDuDeTT/XuVJyRsfP8+w/uYmi9igBlvblH?=
- =?us-ascii?Q?/l/hWieNSlatxq7ouZpBy3kLOQ8EqpjC//yYOKnY1dFbNQLrCPYakswgpAqZ?=
- =?us-ascii?Q?u9YRTxQrSVZGw/XMzvGqZJ0+Oe9O2EkuLvvxKkdvtaYWXreonDbZLDApAT0Q?=
- =?us-ascii?Q?WWE7bX2DxKNGl1WEc10Dnt0RQrBxzdFaHdYAh4kDLSngeJxP0nKZmDCHKE9F?=
- =?us-ascii?Q?mP7Pw//i1JgSPyG4UhgL2TpHsAa0VZVTZPisU7baRir1kS4/G7DlmIvV6Yav?=
- =?us-ascii?Q?YPjksVOw3tpzQzmjlBg9sNtBzLs9yr1ptxhiwFz806Yf5z1+ezkDTvQHtOrM?=
- =?us-ascii?Q?WV4A8jbJU3ryFxpycbI9y/4GOBq0SgcsqpCYA3pFj/cPNkNXW5gunRuszAOO?=
- =?us-ascii?Q?uAE8xfmGilfiPMDLimF1kpj2uuBS0sBAoFAuFM3ZNXZwcUrghCidkvOo3KaB?=
- =?us-ascii?Q?v0z4J9wVZrBUvfXIMtcAgD7znokSrm6oXg/EIEZ6lQumJdiiPgkn4ECNfUuB?=
- =?us-ascii?Q?xYvXVr6XQK26G7Gvv90s/41zbuDR1A/AQGhkkANGkXNPlfL298x55nzvcrRv?=
- =?us-ascii?Q?8KnhgYPr3gqrD14X9ZeN5Jh63ZXtDoh9LgF46StAoEZ6YwmO7hz69JYnCLt4?=
- =?us-ascii?Q?7bEx2aPsbbA/tfrB60xlWuZpHcKOGGmFvc18+9duj2rGxAfd/GOLVSNuTxOu?=
- =?us-ascii?Q?jfjht4wZOOhDu8S/4vkPHQBqoljbq3nv/1Dj5IIl+r4HSHPkWFSz4Kodp5jP?=
- =?us-ascii?Q?UGbBrvpvcoxWSpHfRuPJ2X8xeCIdrpqYC8fTEYmb8JfCtgpe5d1pCE+05fyc?=
- =?us-ascii?Q?X809EFR1Gi587ST+UZxiRQyy6G+I5vDUeamg4RoScYTZMMUGJnY/B0XVEwiw?=
- =?us-ascii?Q?hqvQfhhUD699DVubkBa6DaSwRXdeXtecAQh5n4Q9HQay9fpjrFltfqixcX8h?=
- =?us-ascii?Q?ePYK+ZHN7DJ8htr6yZEjYwB+nK8lt3hbE3rx6lVRE5oBLToptwH6uM2VwpsI?=
- =?us-ascii?Q?ccthKZp/TzolTKRHyTYCc4f6fLOPziH4JCfMkfzXOarFqGg7xmX8GsjKZIJY?=
- =?us-ascii?Q?HuvUrdq8mOl2KnLb5QQIzhCHbyJYkpmbSYhTFfPlJV0NfgKqjC5CHGqHGATr?=
- =?us-ascii?Q?Qw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22901ddb-7741-4273-452c-08de2e89f7ea
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Y1RBaUxpSk9KOGptNXFQN3J0MGZPbkhpc0RDWVpFOWZPYngzeTRscDBrYm9V?=
+ =?utf-8?B?U21GdEw5Wm1QRkpmK0IyZDdNQ1VFSTZiNk04T0ZEdGpQK2xDbUxUWGdGbFQ5?=
+ =?utf-8?B?eHU1MWRnOWkyYVlhOFBXM1JqNzlUYkx0c0QydjFJblErOEpxRnYvUUt6Zzlu?=
+ =?utf-8?B?Q1dPdXpVSmVNa2F4QlZ2ODlybXlXZStVbTl4YjNpUHQ2enM5bklGaTBTZ1Mw?=
+ =?utf-8?B?RmVGZVAwcHBPWlpDaExZa2pEYkc0aHIvcERtVVVlR05wU3RqYVkrQVVBTlQ5?=
+ =?utf-8?B?SGVHdi9McWg5MENpS3F1UFNqMnhkeVJIek8rQkE1ZlN5MkczdndqQWc1dUU2?=
+ =?utf-8?B?c0lkVUFpWWMzZkg5THA0MWlYTFVSQitoZjNRUVBsNXpKL1JmLzRaV3FOblZC?=
+ =?utf-8?B?TDJhdU95WGdNdUVjcXpJZi8rdUExQmk2UmhQNCtLbitjWTZZZzN1Y0taVXdZ?=
+ =?utf-8?B?Q2pGNUY2TFdMTFozUTlid3FNRE1pWUJ5WXhNc3RHaGI5MnRFNU8vQVkvRGQ3?=
+ =?utf-8?B?TkhOaCs4dkJRMVdqMDY0dVBDRG1WUFZpT0lIUldEZ2Zzc1VtRHV2aG1PV0t2?=
+ =?utf-8?B?UjdnV1hqZlByanp3bmpqZ1lISllPRmhTcUg2M2JvQWFkWndIRTlIU05qOU9y?=
+ =?utf-8?B?a3FqQ1ZFMmJXejYxTFRyM0VlV2w3cy90VTV2Y1E0MWQ3eFdmRFFTSy9rQm9S?=
+ =?utf-8?B?TjdKcHBBck1GTllsWVFDdmUrYjkrRXM4ejNvWE5RNkUrYXdXVEUyZlB0SVdV?=
+ =?utf-8?B?czJQT3BlcUhDUHZTT0ZOUzNPemZ3L3o4WmVTcUNpSmY0SWpqQXRWWWhmOE5w?=
+ =?utf-8?B?NDhhL3RsVVkzSnFINkNGaFZReG0xY29YUUIyUGZoZWhXUkhEQXQ1SStia0Jn?=
+ =?utf-8?B?QytzQm9XUHVaVDBMYkhUdU1RYVg5OUpSVjJjVnE2Z0JJd2d5YS9KRHUyQXlJ?=
+ =?utf-8?B?anFzaDgvNy9OMkFXcStMckRSU1N2M25jMnNmMlNPSDh5ZTRFYnFDcEtPR01o?=
+ =?utf-8?B?QzFibHNOVjFvQTFibjF4UThwR3BCbUF0bWdMaFExZWd3U0ViWGRPVFZBZ1VW?=
+ =?utf-8?B?M1VEUklSZTdEdm5uVnJtNGJ6RUkyVEF4VzBqUEZYamptS3BVUEFSZUVseTJm?=
+ =?utf-8?B?RUZ3ZVRKdmI4MzdPQ0g3WWtzQ0ZjeUdJTVEzaFJYTFp5WTl6ZkVrSklpS1gz?=
+ =?utf-8?B?bG50VWxPalFtWFdiQWxwRTlUbXcrRFdWWGJHQ2RXYjY1MlBySUNzdVJrOWh4?=
+ =?utf-8?B?bTlHUDdFeXdvSmRKemZ0SDA5K0c2NldXUzI5T3ZldTJOMkd2b3U0ZmEybFJB?=
+ =?utf-8?B?V1dmbG1vb25yYVB5cURmOW1lQkdIVlNweGxjaGpUeHFmLzRKU2c5NEJaZVBH?=
+ =?utf-8?B?UGIrejlaOUhNY1dKcWg5YkN5K0FzUGw4bTNxME9hL3BYTkZOVjJWZkRjcDR0?=
+ =?utf-8?B?b2RaM3J3WEhyN1FQcVY4ay8wclAyUXZIWE9LSzF5T05zK1R0cVh4blFSaGM1?=
+ =?utf-8?B?MDQ2SW1FZXpLL3RHTWlYdFovS0R4SjBlbkVEU1ZKVjZSMVUybjIwSlozMmlj?=
+ =?utf-8?B?UTc4NGpkR2NhdzZ6eWlRV1Qrb1hvS2xiWUdvVnIwOWQ2dkNiM1htaVFnZy9D?=
+ =?utf-8?B?K0JJelhIUWlqa0JyaGhIMzdacTFZN3Zra0VhOVl0ZnVYRWhkNHJwc1Q4UGVn?=
+ =?utf-8?B?Y2pEMDB2VGRvUGwxdWtYMkRCZ1JZUUhFTDM5cmo5VWNJMjZ6WHBVS01YZmM5?=
+ =?utf-8?B?bWtGY1NSd2pkZ0pjU2J2OGVXbUFpbWg2YU0rQnNZVGhuMG1EWVdXWjZBZ05I?=
+ =?utf-8?B?eEVPZzNCUDYwVEl5eXN6UWZkdzBKZjdhblErUGxiMjRhcVgvS1phenZnQ2pl?=
+ =?utf-8?B?QkhlRnY3QnVSbFArNkpFK29XYjZpYkRWUEI0UnZRVVh1RTU0NG1KZlpNdVFp?=
+ =?utf-8?B?ZVEzSW8rb2JOdGN2d2J3dUptOEFtWWdXN2htb3N6eHJoc0puSjVHMkFBUnBZ?=
+ =?utf-8?B?V2gwc05uaVBVWXcwVjh0REMyM2pZbDdxNzljbXVXeFhkSHFHU21GYWxOMlFh?=
+ =?utf-8?B?U241OCs0eGwwL0JKckduWTJZdDc1Sy8rL0JKQkttazJ3clJUQjhXRk5ObUFa?=
+ =?utf-8?Q?vaqA=3D?=
+X-OriginatorOrg: meta.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d26150dd-e5eb-46c0-3900-08de2e9909dc
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR15MB6455.namprd15.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2025 14:25:23.9275
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2025 16:13:16.4918
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CiR2lRVD6XfPt4gj5lz0uwZ5nTWq/HbxwY7KSXK0DJ0D2vR0+Lu070YQOVeY9S7TJ1EwOlIFrKzwJ0ELmzzw5O+3KKsm7h8J2sYY8nCe0Ug=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6150
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: hShUsH+0FiCfnfidC1OjMx8dWytW66K0NeTomUDxdQkj2yxkiyycNRJZzBm3bYSy
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR15MB4718
+X-Proofpoint-ORIG-GUID: YFAivZV5S82CqYjOajuknQbCyBaD_6Qm
+X-Authority-Analysis: v=2.4 cv=NMvYOk6g c=1 sm=1 tr=0 ts=6929ca1e cx=c_pps
+ a=v7DXidBSvHT+GL4JoI7fUQ==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=4qWzBPTriSYewp5v3jUA:9 a=QEXdDO2ut3YA:10
+ a=Qzt0FRFQUfIA:10
+X-Proofpoint-GUID: YFAivZV5S82CqYjOajuknQbCyBaD_6Qm
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI4MDExOSBTYWx0ZWRfX+a5TCi39BW6n
+ /8Q5JpM25IbsC1IE4vPvY/fXSsVsbU225yYMq9GniKV4cWsmbZw4E5+pQC+vzhZc4NgvOdJ2ao3
+ WEhfv6XmXDu/fGmqLZHxI0W7OUtCFshbvLcK21PojORMUxIzd9rSTFFtF8yZWMs+dpOH880XJg/
+ PgFRKVmdOP3ROHJ/1LBtxR9SyU8K2RFcPt4DBhp22cNxxk+2TSSs+jMI9nuEMHKGbCr5iyGzMRG
+ hgoHkJ/+QblNTNKJSRte83T3VCT4LcnoU2+EO5qVCxlMwJGYWBHmxzAlkz36DSKWLmV6VlDyNdR
+ lOBNoL2tworiQMPgaIeePuBax2NI/KeZnVqr8kHzjJi3zE5HvV1tvcy/oGZ7/H7ZtVu5Czm45cx
+ KSMwB1bCnakTjPicVa+o2e/IixZvmg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-28_08,2025-11-27_02,2025-10-01_01
 
-Apologies, I just realized that there was a typo on one of the email
-addresses in the TO list (Chris Mason's).
-Let me know if I shall resend the series.
+On 11/28/25 9:25 AM, Giovanni Cabiddu wrote:
+> Apologies, I just realized that there was a typo on one of the email
+> addresses in the TO list (Chris Mason's).
+> Let me know if I shall resend the series.
+> 
 
--- 
-Giovanni
+Thanks, no need to resend just for my email.
 
-On Fri, Nov 28, 2025 at 07:04:48PM +0000, Giovanni Cabiddu wrote:
-> This patch series applies to:
->   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
-> 
-> This series adds support for hardware-accelerated compression and decompression
-> in BTRFS using the acomp APIs in the Crypto Framework.  While the
-> implementation is generic and should work with any acomp-compatible
-> implementation, the initial enablement targets Intel QAT devices.
-> 
-> Supported operations:
->   - zlib: compression and decompression (all QAT generations)
->   - zstd: compression only (GEN4 and GEN6)
-> 
-> This is a rework of the earlier RFC series [1].
-> 
-> Changes in this series:
->   1. Re-enable zlib-deflate in the Crypto API and QAT driver. These were
->      removed in [2] due to lack of in-kernel users. This series reverts
->      those commits to restore the functionality.
-> 
->   2. Add compression level support to the acomp framework. The core
->      implementation is from Herbert Xu [3]; I've rebased it and
->      addressed checkpatch style issues.
->      Compression levels are enabled in deflate, zstd, and the QAT driver.
-> 
->   3. Add compression offload to QAT accelerators in BTRFS using the acomp
->      layer enabled with runtime control via sysfs.
->      This feature is wrapped in CONFIG_BTRFS_EXPERIMENTAL.
-> 
-> Note that I included to this set also the bug fix `crypto: zstd - fix
-> double-free in per-CPU stream cleanup`, even if this is already merged
-> to crypto-2.6. This is just in case someone wants to test the series.
-> 
-> Feedback Requested:
->   1. General approach on integration of acomp with BTRFS
->   2. Folio-to-scatterlist conversion.
->      @Herbert, any thoughts on this? Would it make sense to do it in the
->      acomp layer instead?
->   3. Compression level changes.
->   4. Offload threshold strategy. Should acomp implementations report
->      optimal data size thresholds, possibly per compression level and
->      direction?
->   5. Optimizations on the LZ4s to sequences algorithm used for GEN4.
->      @Yann, any suggestions on how to improve it?
->   5. What benchmarks are required for acceptance?
-> 
-> Performance Results. I'm including here the results from the
-> **previous implementation**, just to have an idea of the performance.
-> I still need to formally benchmark the new implementation.
-> 
-> Benchmarked on a dual-socket Intel Xeon Platinum 8470N system:
->   - 512GB RAM (16x32GB DDR5 4800 MT/s)
->   - 4 NVMe drives (349.3GB Intel SSDPE21K375GA each)
->   - 2 QAT 4xxx devices (one per socket, compression-only configuration)
-> 
-> Test: 4 parallel processes writing 50GB each (Silesia corpus) to separate
-> drives
-> 
-> +---------------------------+---------+---------+---------+---------+
-> |                           | QAT-L9  | ZSTD-L3 | ZLIB-L3 | LZO-L1  |
-> +---------------------------+---------+---------+---------+---------+
-> | Disk Write TPUT (GiB/s)   | 6.5     | 5.2     | 2.2     | 6.5     |
-> +---------------------------+---------+---------+---------+---------+
-> | CPU utils %age @208 cores | 4.56%   | 15.67%  | 12.79%  | 19.85%  |
-> +---------------------------+---------+---------+---------+---------+
-> | Compression Ratio         | 34%     | 35%     | 37%     | 58%     |
-> +---------------------------+---------+---------+---------+---------+
-> 
-> Results: QAT zlib-deflate L9 achieves the best throughput with significantly
-> lower CPU utilization and provides better compression
-> ratio compared with software zstd-l3, zlib-l3 and lzo. 
-> 
-> Changes since v1:
->   - Addressed review comments from previous series.
->   - Refactored from zlib-specific to generic acomp implementation.
->   - Reworked to support folios instead of pages.
->   - Added support for zstd compression.
->   - Added runtime enable/disable via sysfs (/sys/fs/btrfs/$UUID/offload_compress).
->   - Moved buffer allocations from data path to workspace initialization
->   - Added compression level support.
-> 
-> [1] https://lore.kernel.org/all/20240426110941.5456-1-giovanni.cabiddu@intel.com/
-> [2] https://lore.kernel.org/all/ZO8ULhlJSrJ0Mcsx@gondor.apana.org.au/
-> [3] https://lore.kernel.org/all/cover.1716202860.git.herbert@gondor.apana.org.au/
-> 
-> Giovanni Cabiddu (12):
->   crypto: zstd - fix double-free in per-CPU stream cleanup
->   Revert "crypto: qat - remove unused macros in qat_comp_alg.c"
->   Revert "crypto: qat - Remove zlib-deflate"
->   crypto: qat - use memcpy_*_sglist() in zlib deflate
->   Revert "crypto: testmgr - Remove zlib-deflate"
->   crypto: deflate - add support for deflate rfc1950 (zlib)
->   crypto: acomp - add NUMA-aware stream allocation
->   crypto: deflate - add support for compression levels
->   crypto: qat - increase number of preallocated sgl descriptors
->   crypto: qat - add support for zstd
->   crypto: qat - add support for compression levels
->   btrfs: add compression hw-accelerated offload
-> 
-> Herbert Xu (3):
->   crypto: scomp - Add setparam interface
->   crypto: acomp - Add setparam interface
->   crypto: acomp - Add comp_params helpers
-> 
-> Suman Kumar Chakraborty (1):
->   crypto: zstd - add support for compression levels
-> 
->  crypto/842.c                                  |   4 +-
->  crypto/acompress.c                            | 133 +++-
->  crypto/compress.h                             |   9 +-
->  crypto/deflate.c                              | 118 ++-
->  crypto/lz4.c                                  |   4 +-
->  crypto/lz4hc.c                                |   4 +-
->  crypto/lzo-rle.c                              |   4 +-
->  crypto/lzo.c                                  |   4 +-
->  crypto/scompress.c                            |  43 +-
->  crypto/testmgr.c                              |  10 +
->  crypto/testmgr.h                              |  75 ++
->  crypto/zstd.c                                 |  48 +-
->  drivers/crypto/intel/qat/Kconfig              |   1 +
->  .../intel/qat/qat_420xx/adf_420xx_hw_data.c   |   1 +
->  .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |   1 +
->  .../intel/qat/qat_6xxx/adf_6xxx_hw_data.c     |  19 +-
->  drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
->  .../intel/qat/qat_common/adf_accel_devices.h  |   8 +-
->  .../intel/qat/qat_common/adf_common_drv.h     |   6 +-
->  drivers/crypto/intel/qat/qat_common/adf_dc.c  |   5 +-
->  drivers/crypto/intel/qat/qat_common/adf_dc.h  |   3 +-
->  .../intel/qat/qat_common/adf_gen2_hw_data.c   |  16 +-
->  .../intel/qat/qat_common/adf_gen4_hw_data.c   |  29 +-
->  .../crypto/intel/qat/qat_common/adf_init.c    |   6 +-
->  .../crypto/intel/qat/qat_common/icp_qat_fw.h  |   7 +
->  .../intel/qat/qat_common/icp_qat_fw_comp.h    |   2 +
->  .../crypto/intel/qat/qat_common/icp_qat_hw.h  |   3 +-
->  drivers/crypto/intel/qat/qat_common/qat_bl.h  |   2 +-
->  .../intel/qat/qat_common/qat_comp_algs.c      | 712 +++++++++++++++++-
->  .../intel/qat/qat_common/qat_comp_req.h       |  11 +
->  .../qat/qat_common/qat_comp_zstd_utils.c      | 120 +++
->  .../qat/qat_common/qat_comp_zstd_utils.h      |  13 +
->  .../intel/qat/qat_common/qat_compression.c    |  23 +-
->  fs/btrfs/Makefile                             |   2 +-
->  fs/btrfs/acomp.c                              | 470 ++++++++++++
->  fs/btrfs/acomp_workspace.h                    |  61 ++
->  fs/btrfs/compression.c                        |  66 ++
->  fs/btrfs/compression.h                        |  30 +
->  fs/btrfs/disk-io.c                            |   6 +
->  fs/btrfs/fs.h                                 |   8 +
->  fs/btrfs/sysfs.c                              |  29 +
->  fs/btrfs/zlib.c                               |  81 ++
->  fs/btrfs/zstd.c                               |  64 ++
->  include/crypto/acompress.h                    |  27 +
->  include/crypto/internal/acompress.h           |  15 +-
->  include/crypto/internal/scompress.h           |  27 +
->  46 files changed, 2253 insertions(+), 78 deletions(-)
->  create mode 100644 drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.c
->  create mode 100644 drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.h
->  create mode 100644 fs/btrfs/acomp.c
->  create mode 100644 fs/btrfs/acomp_workspace.h
-> 
-> 
-> base-commit: ebbdf6466b30e3b37f3b360826efd21f0633fb9e
-> -- 
-> 2.51.1
-> 
+-chris
