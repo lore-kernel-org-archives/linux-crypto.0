@@ -1,134 +1,103 @@
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BFC27280C;
-	Sun, 30 Nov 2025 10:27:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB8E27816C
+	for <linux-crypto@vger.kernel.org>; Sun, 30 Nov 2025 11:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764498434; cv=none; b=OzZ5/GF3P7cNJSbPOe4mMks67xPnfj8Jv3+OJyJOnY+jIutRY2DLNLASbkWjUV1hnB0nZn4xbNU8G4uZ26qBCpn+QFObT3QVvuLZ9xM4t978CZDjR3PoFNW1W8DdK9cpkY71v/qpSgVLzRt89GY0f8vB5MUYu5EA/dhwIYBYcN8=
+	t=1764500411; cv=none; b=nsPYRKWLXSxvi7LuchPDKbBLpwxz81rLiHBIQs4FOIqslKD8jj11tsiwNOPv1KHM8y1o+u85kWquwQ+hSHIC9fLXQey4xvj+jKP33P27Tcuymmy+4z6Q3Q4nsvErjQaiH81GKbJ+zrguIJvlLYsF19lSr2iaJLdOu1k9QGn5Vrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764498434; c=relaxed/simple;
-	bh=3NrcuQXbIeKjrVnAx0fKgVfx4csvw/5icuCBxU29K4M=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=g44hDNaJsBq+OFauiwwYx4QL57uzFr5wPkdH2vxNNOjgOwzVd8PkDI43unxFI9YLefZ/JXHAEeeL7uULiPg8rRbpeTk0GAV4hI1nger3oNd9zMD4Q1mx2lJK5rgQDQPBW3iETp9ClOW+FpD0x5k6Msbgvyjz75fP0/OGke7w6X0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [127.0.0.2] (unknown [114.241.82.59])
-	by APP-05 (Coremail) with SMTP id zQCowAAn72_YGyxp+SC3Ag--.48966S2;
-	Sun, 30 Nov 2025 18:26:32 +0800 (CST)
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-Date: Sun, 30 Nov 2025 18:23:50 +0800
-Subject: [PATCH] lib/crypto: riscv/chacha: Maintain a frame pointer
+	s=arc-20240116; t=1764500411; c=relaxed/simple;
+	bh=HcUSOr8pFH4bogJkhQNF+P8ZsaGFmP+aOBXx0g7EPSc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=phZwldLZFkun2rMw5VpzSbPsx14KRLYf0QPAm4lSR/qfwT4vb5KGyxBhm8t6unlFYC3AoAEoDNboAjfEpcPvOAXFMt0mpIyezthwKk93BjsmXad3V+ax5iydgg99PQ9mzM6BARlTwuccgEH2/zrWxfdMCO2qcHbVygB28iRmdWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GRxq55Pc; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GRxq55Pc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B7E5C2BC86
+	for <linux-crypto@vger.kernel.org>; Sun, 30 Nov 2025 11:00:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764500411;
+	bh=HcUSOr8pFH4bogJkhQNF+P8ZsaGFmP+aOBXx0g7EPSc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=GRxq55PcF8BjjIKQg260KKv10ONwrz4WHdb0xp9lPpnGTZRzK3l8OHvMzpUmRZyLR
+	 HfQ7IhDALrqMvTCiDxPUjlEjYHWL2cQDeKx1/YrorpFKeHnwPVBeqTcxgRVNtnm6ND
+	 8/4PM+oD+UwbnXwbEhQ34xYn7YFi2IZifej7HvyXdBKn7fBJHJbgRUcB7DE4VEhSCi
+	 mmpK7YIgGxMdAY7XTUBi00kWj/GkBvogvQVlAE12wXO5VeeHFyaE7QxIgHtXnU4pdD
+	 1YE2x6d6y66MABP2zI2uVBXyf+Gs6E4IcNqpIEZMW6sXSrf5rZDHPYFJnMqpLPYXDk
+	 gL+xb80EFmAkw==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59445ee9738so2595490e87.3
+        for <linux-crypto@vger.kernel.org>; Sun, 30 Nov 2025 03:00:11 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCW5PE9CYZwfDaP5mwD8r9q99RfCizJ0s15/lPHjKQdUhOJOOO9XEdhQLtl6gJqZNfBUKuJd1jjL4yKBR2g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJc3QWEdakRKTeSaS12QhaOg52E8BVHYY/kf5acByNHPNjm2nP
+	Cu8xewiWGrxC8Qu4B8GhuyGZuOc3bZf5DJ3323LZq+2ug4NnBifug/DcCFH+18iHgMerIU80r4o
+	rVoeZXmGd54oWy5axneQ1j04rXHsw6cM=
+X-Google-Smtp-Source: AGHT+IGnO6dzAJUT6KEbi1gvwpCyJ2aAu1tioQuHgoyT+Xl3tSHy8MSn/M+kly9aF3p55g1q1Jo0H+JQ11a6usKg+84=
+X-Received: by 2002:a05:6512:400c:b0:57b:7c83:d33b with SMTP id
+ 2adb3069b0e04-596a3eebe6emr11828773e87.47.1764500409472; Sun, 30 Nov 2025
+ 03:00:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251130-riscv-chacha_zvkb-fp-v1-1-68ef7a6d477a@iscas.ac.cn>
-X-B4-Tracking: v=1; b=H4sIADUbLGkC/yWM2wrCMBBEfyXssytNbEvor0iVJN3qIr0lNYgh/
- 26wMC9nhjkJAnmmAJ1I4Cly4GUuIE8C3NPMD0IeCoOqVCPlpULPwUUsW8n9G18WxxWbtq5p0Np
- Ko6BcV08jf/7aa3+wp+1d7PtRgjWB0C3TxHsnYnuWGr2Tt5Shz/kH4XDFGpYAAAA=
-X-Change-ID: 20251130-riscv-chacha_zvkb-fp-5644ed88b1a2
-To: Jerry Shih <jerry.shih@sifive.com>, Eric Biggers <ebiggers@kernel.org>, 
- "Jason A. Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, 
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
- Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>
-Cc: linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org, 
- linux-kernel@vger.kernel.org, Vivian Wang <wangruikang@iscas.ac.cn>
-X-Mailer: b4 0.14.3
-X-CM-TRANSID:zQCowAAn72_YGyxp+SC3Ag--.48966S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kw4ktF1DKw1fJw1rKry7Awb_yoW8ZrWDpF
-	yrXF92krW8tFZxCa9FkFy8trZ3AryIyFWfWa42qw15t3ykJr18AF9rZ3yfXF1fXFy8GF1D
-	Crn8C3Z5uryDXFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
-	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
-	8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFV
-	Cjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWl
-	x4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r
-	1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_
-	JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-	sGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+References: <b3cfcdac-0337-4db0-a611-258f2868855f@iscas.ac.cn>
+In-Reply-To: <b3cfcdac-0337-4db0-a611-258f2868855f@iscas.ac.cn>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Sun, 30 Nov 2025 11:59:58 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHesHJ2oFzGPewp2V=rA0-BU2Y_PffuDDhxioftOKZYHg@mail.gmail.com>
+X-Gm-Features: AWmQ_blFeYmAOJ2_ZzYIefdJJ1xBVOENLu514PKVIHtnJT_go-rPKsUWnojoXbc
+Message-ID: <CAMj1kXHesHJ2oFzGPewp2V=rA0-BU2Y_PffuDDhxioftOKZYHg@mail.gmail.com>
+Subject: Re: lib/crypto: riscv: crypto_zvkb crashes on selftest if no
+ misaligned vector support
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Jerry Shih <jerry.shih@sifive.com>, Eric Biggers <ebiggers@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	"Jason A. Donenfeld" <Jason@zx2c4.com>, Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, 
+	Alexandre Ghiti <alex@ghiti.fr>, "Martin K. Petersen" <martin.petersen@oracle.com>, Han Gao <gaohan@iscas.ac.cn>, 
+	linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-crypto_zvkb doesn't maintain a frame pointer and also uses s0, which
-means that if it crashes we don't get a stack trace. Modify prologue and
-epilogue to maintain a frame pointer as -fno-omit-frame-pointer would.
-Also reallocate registers to match.
+On Sun, 30 Nov 2025 at 10:13, Vivian Wang <wangruikang@iscas.ac.cn> wrote:
+>
+> Hi,
+>
+> We ran into a problem with chacha_zvkb, where having:
+>
+> - OpenSBI 1.7+ (for FWFT support)
+> - CRYPTO_CHACHA20POLY1305=y and CRYPTO_SELFTESTS=y (and deps, of course)
+> - Hardware with Zvkb support
+> - Hardware *without* misaligned vector load/store support
+>
+> Leads to a crash on boot during selftest on a vlsseg8e32.v instruction,
+> because it requires 4-byte alignment of the buffers.
+>
+> OpenSBI by default emulates vector misaligned operations, however Linux
+> explicitly disables it with SBI FWFT while not providing vector
+> misaligned emulation of its own.
+>
+> This can be reproduced by running everything in Spike without
+> --misaligned, and is reproducible on stable 6.17.9, 6.18-rc1 and
+> 6.18-rc7. See log at the end. Note that I had to fix chacha_zvkb
+> somewhat to have it retain a frame pointer to get a stack trace - patch
+> will be sent later.
+>
+> Setting cra_alignmask to 3 for everything in crypto/chacha.c "fixes"
+> this, but there seems to be no obvious way to say "if use_zvkb then
+> cra_alignmask = 3", and, not being familiar with the crypto API stuff, I
+> can't figure out a good way to say "if riscv then cra_alignmask = 3" either.
+>
+> AFAICT, this problem was missed from the very start since commit
+> bb54668837a0 ("crypto: riscv - add vector crypto accelerated ChaCha20").
+>
+> Please advise.
+>
 
-Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
----
-Found while diagnosing a crypto_zvkb "load address misaligned" crash [1]
+I'd suggest to only enable this version of the code if both Zicclsm
+and Zvkb are supported (assuming that Zicclsm is the extension that
+would result in these misaligned accesses to be permitted).
 
-[1]: https://lore.kernel.org/r/b3cfcdac-0337-4db0-a611-258f2868855f@iscas.ac.cn/
----
- lib/crypto/riscv/chacha-riscv64-zvkb.S | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/lib/crypto/riscv/chacha-riscv64-zvkb.S b/lib/crypto/riscv/chacha-riscv64-zvkb.S
-index b777d0b4e379..dc4e45759d14 100644
---- a/lib/crypto/riscv/chacha-riscv64-zvkb.S
-+++ b/lib/crypto/riscv/chacha-riscv64-zvkb.S
-@@ -60,7 +60,7 @@
- #define VL		t2
- #define STRIDE		t3
- #define ROUND_CTR	t4
--#define KEY0		s0
-+#define KEY0		t5
- #define KEY1		s1
- #define KEY2		s2
- #define KEY3		s3
-@@ -142,8 +142,7 @@
- // the original Salsa20 paper which uses a 64-bit counter in state->x[12..13].
- // The updated 32-bit counter is written back to state->x[12] before returning.
- SYM_FUNC_START(chacha_zvkb)
--	addi		sp, sp, -96
--	sd		s0, 0(sp)
-+	addi		sp, sp, -112
- 	sd		s1, 8(sp)
- 	sd		s2, 16(sp)
- 	sd		s3, 24(sp)
-@@ -155,6 +154,10 @@ SYM_FUNC_START(chacha_zvkb)
- 	sd		s9, 72(sp)
- 	sd		s10, 80(sp)
- 	sd		s11, 88(sp)
-+	sd		fp, 96(sp)
-+	sd		ra, 104(sp)
-+
-+	addi		fp, sp, 112
- 
- 	li		STRIDE, 64
- 
-@@ -280,7 +283,6 @@ SYM_FUNC_START(chacha_zvkb)
- 	bnez		NBLOCKS, .Lblock_loop
- 
- 	sw		COUNTER, 48(STATEP)
--	ld		s0, 0(sp)
- 	ld		s1, 8(sp)
- 	ld		s2, 16(sp)
- 	ld		s3, 24(sp)
-@@ -292,6 +294,7 @@ SYM_FUNC_START(chacha_zvkb)
- 	ld		s9, 72(sp)
- 	ld		s10, 80(sp)
- 	ld		s11, 88(sp)
--	addi		sp, sp, 96
-+	ld		fp, 96(sp)
-+	addi		sp, sp, 112
- 	ret
- SYM_FUNC_END(chacha_zvkb)
-
----
-base-commit: 3a8660878839faadb4f1a6dd72c3179c1df56787
-change-id: 20251130-riscv-chacha_zvkb-fp-5644ed88b1a2
-
-Best regards,
--- 
-Vivian "dramforever" Wang
-
+Playing with the cra_alignmask is likely insufficient, because it does
+not fix the use cases that call the library interface directly.
