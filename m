@@ -1,41 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467D620C488;
-	Sun, 30 Nov 2025 02:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C941E0DCB;
+	Sun, 30 Nov 2025 02:49:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764470752; cv=none; b=UPeWiSJc5QDWiDzdwY5nmZe28eGWr0zV9UN38W3/YEnPho+Yiip1PimmMLhpchbkvQ3dDLyHHfeTtCZARDHOC7FevC/YLtIopoqZU7uaHDYgLxhB/UiZl5+6BFfa1SnjsVZCc+XthNJht0jB6OxBidsndwD+6TJPfqlY98sooEE=
+	t=1764470949; cv=none; b=pObdepUv5IOv30H4ywuSobK6qS7xGx2ornbLrOvUWKVJYNUeYtO6zbgVNWKTHQT1U+DxVuphKIwsPojzVR99n93LT6A1+KIi+1JWOuhO4H5it7ImQqT7xdCplC3zqeCJOUvVc8WZN733oDGxNtwrn827OkfTX31vYywQc2GXtgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764470752; c=relaxed/simple;
-	bh=xOPrgR/E7zkysphxrXM23vcb2cJsIWMng0nnNmYt5fg=;
+	s=arc-20240116; t=1764470949; c=relaxed/simple;
+	bh=pg27yUJFtJXneU5qJim8ZDqOKEOE1LxwflkzOUfe8jk=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=gFJWt4UtNCmTgds3TjtO5UCn/t6MqT+J8oHqhgLaZaOZ7ru7f/REnnx6sHXckBkXv3lRvp5tQ6Hc21i4kZqeOMUmh0vSpJ0768OR0JdFRDZwVQeDXs9AXa6+Uf9vifICK53P/7F2f6hnLpcFmWPiV42/vzsY48GT+X89Zx8twpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qh0ImzzO; arc=none smtp.client-ip=10.30.226.201
+	 Content-Disposition; b=lXWgXUmLilFtA99gFhceBMXdywe5WK+7fKaaiS1jTDj7sE+pqmWb5v4s6+qCnz2lW+H2rMVhCbUCfIUW9Hh8+OafnjITy564L59pS2OPhPTqWY/7kckESW7zS/yIo3OxcDR04xQ9CBMoKxsB9lUDFeaPaTMqCW4R7qNdnok5M5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dw7kwXGr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qh0ImzzO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC004C4CEF7;
-	Sun, 30 Nov 2025 02:45:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dw7kwXGr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 251E2C4CEF7;
+	Sun, 30 Nov 2025 02:49:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764470752;
-	bh=xOPrgR/E7zkysphxrXM23vcb2cJsIWMng0nnNmYt5fg=;
+	s=k20201202; t=1764470949;
+	bh=pg27yUJFtJXneU5qJim8ZDqOKEOE1LxwflkzOUfe8jk=;
 	h=Date:From:To:Cc:Subject:From;
-	b=qh0ImzzOHqrh4HBCp2caT85dcCzIBWUXZbEmFY0LHCS3Fz3gyDKIlbJ5BLEPxk06q
-	 C7rR+H4yybsMsMVytBFOML5dSGf7HzGmwdINcdSt4XUiUeDtjwCDvnlF/TzV9OJF9o
-	 3RF6gQqQYakjM6iwIZK2g/xcpNa3b78Bj5TRtziThmhfs+2kyt3GEIg63BVYa93fWA
-	 KRUWywLoT5T4bSmdDvRt1gUMwSXJ+jR3EfLnW4oRWNe98SPkP4uINcD9ImTkpdQUrd
-	 hpO9rkP7Mx+55uliXJ7J45KdaRaKsVhHL0HtWtvqozY1/xjmpPCNjlTYnbxfozqpPz
-	 0idse887qalxQ==
-Date: Sat, 29 Nov 2025 18:44:01 -0800
+	b=Dw7kwXGr8lsUDdFuckWktcy4aJtBxLRSaPa0A/v2P8LbN0HCzHJNY1iQURoDY62H+
+	 sXEdEa0Y+U7ratCf2jtxL+G2Taqijje39c4Bn4ZZZ5KGDCU65mafdLm28TkZQLTTjM
+	 6iWIFcEVVwMYx2r29yoP3ssAMqnkKUL7vTW4hsO0wAPhSv9pZ+2u+n3NRTgZbNZMOl
+	 LDQcGU5yOrnQz+/1zJYJ9A5wfzIszrtR9vC0CISASxzEeu6noI8LHGSdVXmBYmdNIi
+	 MpHMJPbo7st5HxZVgFYGpNcju/bgHaZcOj81lFESlUnpnokKOesMXFhCnIe483MzSu
+	 LZSK9pgbnurfg==
+Date: Sat, 29 Nov 2025 18:47:19 -0800
 From: Eric Biggers <ebiggers@kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
+	x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Howells <dhowells@redhat.com>
-Subject: [GIT PULL] Crypto library tests for 6.19
-Message-ID: <20251130024401.GC12664@sol>
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [GIT PULL] AES-GCM optimizations for 6.19
+Message-ID: <20251130024719.GD12664@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,56 +44,54 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-This is based on the "Crypto library updates for 6.19" pull request.
+The following changes since commit dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa:
 
-The following changes since commit 2dbb6f4a25d38fcf7d6c1c682e45a13e6bbe9562:
-
-  fscrypt: Drop obsolete recommendation to enable optimized POLYVAL (2025-11-11 11:03:39 -0800)
+  Linux 6.18-rc3 (2025-10-26 15:59:49 -0700)
 
 are available in the Git repository at:
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-tests-for-linus
+  https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/aes-gcm-for-linus
 
-for you to fetch changes up to 578fe3ff3d5bc9d851d597bb12dd74c22ad55ff8:
+for you to fetch changes up to 0e253e250ed0e46f5ff6962c840157da9dab48cd:
 
-  crypto: testmgr - Remove polyval tests (2025-11-11 11:07:52 -0800)
-
-----------------------------------------------------------------
-
-- Add KUnit test suites for SHA-3, BLAKE2b, and POLYVAL. These are the
-  algorithms that have new crypto library interfaces this cycle.
-
-- Remove the crypto_shash POLYVAL tests. They're no longer needed
-  because POLYVAL support was removed from crypto_shash. Better
-  POLYVAL test coverage is now provided via the KUnit test suite.
+  crypto: x86/aes-gcm-vaes-avx2 - initialize full %rax return register (2025-11-03 09:07:57 -0800)
 
 ----------------------------------------------------------------
-David Howells (1):
-      lib/crypto: tests: Add SHA3 kunit tests
 
-Eric Biggers (4):
-      lib/crypto: tests: Add KUnit tests for BLAKE2b
-      lib/crypto: tests: Add additional SHAKE tests
-      lib/crypto: tests: Add KUnit tests for POLYVAL
-      crypto: testmgr - Remove polyval tests
+More optimizations and cleanups for the x86_64 AES-GCM code:
 
- Documentation/crypto/sha3.rst       |  11 +
- crypto/tcrypt.c                     |   4 -
- crypto/testmgr.c                    |   6 -
- crypto/testmgr.h                    | 171 ---------------
- lib/crypto/tests/Kconfig            |  29 +++
- lib/crypto/tests/Makefile           |   3 +
- lib/crypto/tests/blake2b-testvecs.h | 342 +++++++++++++++++++++++++++++
- lib/crypto/tests/blake2b_kunit.c    | 133 ++++++++++++
- lib/crypto/tests/polyval-testvecs.h | 186 ++++++++++++++++
- lib/crypto/tests/polyval_kunit.c    | 223 +++++++++++++++++++
- lib/crypto/tests/sha3-testvecs.h    | 249 +++++++++++++++++++++
- lib/crypto/tests/sha3_kunit.c       | 422 ++++++++++++++++++++++++++++++++++++
- scripts/crypto/gen-hash-testvecs.py | 101 +++++++--
- 13 files changed, 1682 insertions(+), 198 deletions(-)
- create mode 100644 lib/crypto/tests/blake2b-testvecs.h
- create mode 100644 lib/crypto/tests/blake2b_kunit.c
- create mode 100644 lib/crypto/tests/polyval-testvecs.h
- create mode 100644 lib/crypto/tests/polyval_kunit.c
- create mode 100644 lib/crypto/tests/sha3-testvecs.h
- create mode 100644 lib/crypto/tests/sha3_kunit.c
+- Add a VAES+AVX2 optimized implementation of AES-GCM. This is very
+  helpful on CPUs that have VAES but not AVX512, such as AMD Zen 3.
+
+- Make the VAES+AVX512 optimized implementation of AES-GCM handle
+  large amounts of associated data efficiently.
+
+- Remove the "avx10_256" implementation of AES-GCM. It's superseded by
+  the VAES+AVX2 optimized implementation.
+
+- Rename the "avx10_512" implementation to "avx512".
+
+Overall, this fills in a gap where AES-GCM wasn't fully optimized on
+some recent CPUs. It also drops code that won't be as useful as
+initially expected due to AVX10/256 being dropped from the AVX10 spec.
+
+----------------------------------------------------------------
+Eric Biggers (9):
+      crypto: x86/aes-gcm - add VAES+AVX2 optimized code
+      crypto: x86/aes-gcm - remove VAES+AVX10/256 optimized code
+      crypto: x86/aes-gcm - rename avx10 and avx10_512 to avx512
+      crypto: x86/aes-gcm - clean up AVX512 code to assume 512-bit vectors
+      crypto: x86/aes-gcm - reorder AVX512 precompute and aad_update functions
+      crypto: x86/aes-gcm - revise some comments in AVX512 code
+      crypto: x86/aes-gcm - optimize AVX512 precomputation of H^2 from H^1
+      crypto: x86/aes-gcm - optimize long AAD processing with AVX512
+      crypto: x86/aes-gcm-vaes-avx2 - initialize full %rax return register
+
+ arch/x86/crypto/Makefile                           |    5 +-
+ arch/x86/crypto/aes-gcm-aesni-x86_64.S             |   12 +-
+ arch/x86/crypto/aes-gcm-vaes-avx2.S                | 1146 ++++++++++++++++++++
+ ...es-gcm-avx10-x86_64.S => aes-gcm-vaes-avx512.S} |  722 ++++++------
+ arch/x86/crypto/aesni-intel_glue.c                 |  264 +++--
+ 5 files changed, 1663 insertions(+), 486 deletions(-)
+ create mode 100644 arch/x86/crypto/aes-gcm-vaes-avx2.S
+ rename arch/x86/crypto/{aes-gcm-avx10-x86_64.S => aes-gcm-vaes-avx512.S} (69%)
