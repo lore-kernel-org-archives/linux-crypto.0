@@ -1,121 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08E913A3ED;
-	Sun, 30 Nov 2025 19:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CCE781AA8;
+	Mon,  1 Dec 2025 01:51:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764529674; cv=none; b=D07G4o2qr3aUX1wpgPmKMETaAjy3jIF+Z0pgww+wr5ahAYecXTdWTfwX3ZSNfHTXI+5+XID92aFPsE2P/VTvCefxmaKQrhmewJqblBWUzw7Qvtg93dWwWxkZvhkZ+PaCwHdAUBVy4F+RGD3Rsu1OC2VNNCN5JP5qE97Jr7lOJ24=
+	t=1764553871; cv=none; b=nLJryYZJxOZAZWxRF/MZzkRImsKRSXCE5oszLDFTNKn3O7p53H/3U6PMmCnDTSewtf4cQZOBe6QUfiKzUcIbtozcSJ3tGaEuDQdyqaCiFmC2NGeZTYs6gJ5INL9uJSApWX1ikLJ3RplEKIV+Iwsg7WJU/X3QEI8N51t7qB4orC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764529674; c=relaxed/simple;
-	bh=LyS8TZOVxr4rQNbi7Nu//tsFFGALTqeYPgQi1HdllXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EJ4vpttMClkVfGBYZvbdAQ7MJDPe59cyH1DDQ9V5BaM93d20JAZEi3pHKzaa3Dv7picy+dwHRJ1g7baXk9HgLmBxyQF5D1f6MaDdXqVyQwehhFL87YQQ/qTfurnUTmdGrmeDzmPbK7LCiqZPMy3U0wqDlDiyYpL5S2UaHhGeXS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mu3gT8+5; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mu3gT8+5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CC40C4CEF8;
-	Sun, 30 Nov 2025 19:07:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764529672;
-	bh=LyS8TZOVxr4rQNbi7Nu//tsFFGALTqeYPgQi1HdllXc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mu3gT8+5+SDi6FjE/H1gPtOCd8cxyTAEO79V0X8CT9vzGKWi021+V/mOYnf+nw3QP
-	 ka6mIVjnAY7ZyP70tvBkk00LNLymkK5iRzrmsZuD8T1GIJ1GuYNT9FRCkfXyG9K4YJ
-	 x4+zc1uPS2CF9bx1a5iZR7mj3Jbis0YJvqxS217rWBLrwVWwkiGNqnFBz6YZjg0UMX
-	 tpypL0Ydl/nglOZeSiqvIUcBvphrcgLYQYLNIoqfpBF1aDVWSGQ0RXdB3k4M2fUfks
-	 LGQy1LIQsltE708qponAn84WMw7wcacKHSz0V0qE25xpGUR3x4y60XF/geHDLRXh4F
-	 9TdjduUaks+Dw==
-Date: Sun, 30 Nov 2025 11:06:01 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: "Becker, Hanno" <beckphan@amazon.co.uk>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-	"linux-modules@vger.kernel.org" <linux-modules@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"matthias@kannwischer.eu" <matthias@kannwischer.eu>
-Subject: Re: [PATCH 1/4] lib/crypto: Add ML-DSA verification support
-Message-ID: <20251130190601.GC1395@sol>
-References: <20251120003653.335863-1-ebiggers@kernel.org>
- <20251120003653.335863-2-ebiggers@kernel.org>
- <A7135B59-BAB5-451E-AD71-971F828054F0@amazon.co.uk>
- <20251130001911.GA12664@sol>
- <aSuYUDdlZvZrXuUo@zx2c4.com>
- <1CB2640E-B918-4C90-933D-61D5B1954E6C@amazon.co.uk>
+	s=arc-20240116; t=1764553871; c=relaxed/simple;
+	bh=ydpxYdtPlRbPFg5Dy8isLBpfWRko3ZXtiZyn2Fck67c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CbITKJZX3MUA6NTafZ227e/lgTWjygK/OQTsoh/TgX6VjkS+Rg4flEl8/rABrZHn2QMSYs2bDkbi5gTna+Lo+Qj7wJE4tlQyX3Myd5jno7n3MdBe2y5tErGh//t+44M7QsYxkfTsEuBVBAbwhtTvB+pMCmkvMzrBhYPfyGWuAsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.0.107] (unknown [114.241.82.59])
+	by APP-01 (Coremail) with SMTP id qwCowACXMNBm9CxpvfSvAg--.20391S2;
+	Mon, 01 Dec 2025 09:50:31 +0800 (CST)
+Message-ID: <c04ad49c-598d-4183-a9dd-00a7883e727a@iscas.ac.cn>
+Date: Mon, 1 Dec 2025 09:50:30 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1CB2640E-B918-4C90-933D-61D5B1954E6C@amazon.co.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] lib/crypto: riscv/chacha: Maintain a frame pointer
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Jerry Shih <jerry.shih@sifive.com>, "Jason A. Donenfeld"
+ <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>,
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+ linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20251130-riscv-chacha_zvkb-fp-v1-1-68ef7a6d477a@iscas.ac.cn>
+ <20251130182914.GA1395@sol>
+Content-Language: en-US
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <20251130182914.GA1395@sol>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:qwCowACXMNBm9CxpvfSvAg--.20391S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ur13WFyruFWrKrWDuFy5XFb_yoW8Ar4fpa
+	yfCFnYgr4DtrW7C3yxAF4rZF1fXr9a9Fy5CrWftw1rA34UJFy2vF17Kryruw1vkrW8Aw1j
+	yF45A3WDZrZ8ZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvCb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjc
+	xK6I8E87Iv6xkF7I0E14v26F4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
+	FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
+	0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY
+	04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
+	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
+	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
+	nxnUUI43ZEXa7IU56yI5UUUUU==
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-On Sun, Nov 30, 2025 at 07:15:22AM +0000, Becker, Hanno wrote:
-> > - Vector registers (e.g. AVX) can be used in the kernel only in some
-> >  contexts, and only when they are explicitly saved and restored.  So
-> >  we have to do our own integration of any code that uses them anyway.
-> >  There is also more overhead to each vector-optimized function than
-> >  there is in userspace, so very fine-grained optimization (e.g. as is
-> >  used in the Dilithium reference code) doesn't work too well.
-> 
-> That's very useful, can you say more? Would one want some sort of
-> configurable preamble/postamble in the top-level API which takes care of
-> the necessary save/restore logic?
-> 
-> What is the per-function overhead?
+On 12/1/25 02:29, Eric Biggers wrote:
+> On Sun, Nov 30, 2025 at 06:23:50PM +0800, Vivian Wang wrote:
+>> crypto_zvkb doesn't maintain a frame pointer and also uses s0, which
+>> means that if it crashes we don't get a stack trace. Modify prologue and
+>> epilogue to maintain a frame pointer as -fno-omit-frame-pointer would.
+>> Also reallocate registers to match.
+>>
+>> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+>> ---
+>> Found while diagnosing a crypto_zvkb "load address misaligned" crash [1]
+>>
+>> [1]: https://lore.kernel.org/r/b3cfcdac-0337-4db0-a611-258f2868855f@iscas.ac.cn/
+>> ---
+>>  lib/crypto/riscv/chacha-riscv64-zvkb.S | 13 ++++++++-----
+>>  1 file changed, 8 insertions(+), 5 deletions(-)
+> Do I understand correctly that the problem isn't so much that
+> crypto_zvkb() doesn't set up its own frame pointer, but rather it reuses
+> the frame pointer register (s0 i.e. fp) for other data?
+>
+> That's what we've seen on other architectures, like x86_64 with %rbp.
+> Assembly functions need to set their own frame pointer only if they call
+> other functions.  Otherwise, they can just run with their parent's frame
+> pointer.  However, in either case, they must not store other data in the
+> frame pointer register.
+>
+> Is that the case on RISC-V too?  If so, the appropriate fix is to just
+> stop using s0 for other data; we don't actually need to set up a frame
+> pointer.  (Note that none of the RISC-V crypto assembly code sets up
+> frame pointers.  So if that was an issue, it would affect every file.)
 
-It varies by architecture, but usually it looks something like:
+Thanks for the hint, I can confirm that indeed simply avoiding s0 also
+fixes the stack trace problem.
 
-    if (irq_fpu_usable()) {
-            kernel_fpu_begin();
-            avx_function();
-            kernel_fpu_end();
-    } else {
-            generic_function();
-    }
+I'll drop the rest of the patch for the next version.
 
-The overhead varies significantly by CPU, kernel config options, and
-whether it's the first use since the current task last entered the
-kernel.  But it can be up to a few hundred cycles.
+Vivian "dramforever" Wang
 
-> > Note that the kernel already has optimized Keccak code.  That already
-> > covers the most performance-critical part of ML-DSA.
-> 
-> No, this would need _batched_ Keccak. An ML-DSA implementation using
-> only 1x-Keccak will never have competitive performance. See
-> https://github.com/pq-code-package/mldsa-native/pull/754 for the
-> performance loss from using unbatched Keccak only, on a variety of
-> platforms; it's >2x for some.
-> 
-> In turn, if you want to integrate batched Keccak -- but perhaps only on
-> some platforms? -- you need to rewrite your entire code to make use of
-> it. That's not a simple change, and part of what I mean when I say that
-> the challenges are just deferred. Note that the official reference and
-> AVX2 implementations duck this problem by duplicating the code and
-> adjusting it, rather than looking for a common structure that could host
-> both 'plain' and batched Keccak. I assume the amount of code duplication
-> this brings would be unacceptable.
-
-At least in my code, only the matrix expansion code would need to change
-to take advantage of interleaved Keccak.  The fact that other
-implementations apparently are having trouble with this actually
-suggests to me that perhaps they're not good implementations to use.
-
-Anyway, no one has said they want this particular optimization in the
-kernel anyway.  And hopefully the future is native Keccak support
-anyway; s390 already has it, and (at least) RISC-V is working on it.
-
-- Eric
