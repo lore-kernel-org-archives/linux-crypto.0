@@ -1,91 +1,54 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907F1283C8E;
-	Mon,  1 Dec 2025 22:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764627522; cv=fail; b=mDGAHuBCwLd0/AHvaRWq7lzb6gVIKKGcG9uueB88U0hiMaeBO/aMko0R4wGv5Bqf0pNH3ionZqoyj5jW1Gkp6mqvASmI46TxPviqnGRKyxDHSAmYI6hDCUNBErZ+HXfxcSkFQY9BpjpBrBV6UsqaQRcs2GVuH5LwD0kOzVIGGPE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764627522; c=relaxed/simple;
-	bh=rxEMsZTBgcN9Zg15kbFsQVqbUgCbr+do6IZBBfeoar8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=nztgip6MNnGSl81X8i4tODiH3Pb9KbzX09+Lc5bFJpf3EtcQqTeirKEDFojyA38Oxf+p7fFJsFKr3vBCRQE3drrRFD2IggMBUAUMSYXoZutMGklLDxfoktIWVDwfQoXtqLJqP8miFGE20WWqzkUhULDWU45xUX1QjY4RXq1nY48=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eLxwgTH2; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCE6A288514;
+	Mon,  1 Dec 2025 23:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764630817; cv=none; b=iwzJ8HvnlfldBzEZtVsH/M3VyaQJEbGYAlSt+oBJyXd0NwUHy67LGDbG54zhveNCVfdQdfRwSMNYzyUOwmmemCBVzQF4b8wnzKJkDWLC7bsqwubYFF+WdxOQR/fe8flReDotdFeigmjZ1F0fYxrkn/y7CU9Zl9ohmzdYTR5CkbM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764630817; c=relaxed/simple;
+	bh=KdcmjWdxyYh1fN12xsOv0xv4JKHOmBBEXI4SGd7pN/w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mTpEa2vmgejb0+n9X3OFZOYYPYMTbvcXqDUI1DnUaLPZt59lqNqIcxjqrY9M6YqrDn8fkk4l7DEPUv+Pz59Cj5TypJh8IZYpJBEKixiGZo675Y12kHlhPr7Gy6eG+Z21lumBgu6Efa8y7uuZlwjIX5X4PnwjVTmLbC56Kbmz2ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com; spf=pass smtp.mailfrom=gmx.com; dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b=MTIUJFEm; arc=none smtp.client-ip=212.227.17.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eLxwgTH2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764627519; x=1796163519;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=rxEMsZTBgcN9Zg15kbFsQVqbUgCbr+do6IZBBfeoar8=;
-  b=eLxwgTH2DpxbNLLY2lmhmhCg1soUL7vad4gnFsI6232oHNdhUFnkX9kA
-   aIuqS63M+zJl8Af99dc6qbdIZNEh7/+3yLfq3XEr1b7mX+aymn4LQ3NGf
-   xhIlJZU4cDxhAclTpKtswdsA1AR7mNt6g6GwFkqAlFVXcHJesPePFikEz
-   53A7oicQDpaOz/CuXVjG761eKuW5nzJ87hHVlPoKOHolCEdLXemIGOVX3
-   YDi7+TRxynhBHZFRofjoN/YCIKAIfDV9colN4LAlY6MHayJza31Yf553P
-   83m+O6j3gXiCwgsUX3OIVun4v7L0/QatVakoRBZQDDjJgjp32mJDaJtwM
-   w==;
-X-CSE-ConnectionGUID: h1HARX6KSQau4pEMssEs4g==
-X-CSE-MsgGUID: Hl/RvKgGQBqIS+UiJNj1FQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="66658480"
-X-IronPort-AV: E=Sophos;i="6.20,241,1758610800"; 
-   d="scan'208";a="66658480"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2025 14:18:38 -0800
-X-CSE-ConnectionGUID: y9Xp4CodR8CpbgkHs0oWPA==
-X-CSE-MsgGUID: f3OES6ilRyWvbeiEHGTfRA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,241,1758610800"; 
-   d="scan'208";a="193866425"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2025 14:18:40 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 1 Dec 2025 14:18:39 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Mon, 1 Dec 2025 14:18:39 -0800
-Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.59) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 1 Dec 2025 14:18:39 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f7nlp58Zj41Y1h1hJcgXAXk9JU6cXGhjcWhQaMo3Imwo3ToMxuN/MzEGVkanWTgFTNtvtR3o/K4eob1KF2pjr6xI744yBzUqbT4G3kcidy9KK2bTlCUm2V/3OJc9QDdccEfOW2lA+fta7QL1gWpfyYfWvPgPNadT9e95xdMA4roJzWpSxCRsMQGowst1UMQBEVvftDd18dIcsweLLhlXESuOPYwV7FJXg+YGykzC0oyyblt2iED3GeokGqFmiUVA9XQfGHzeKGbRqFxem6hmiZYRI0QtdUQ64QKqiOJFWguKwmnD0baLywDntBfZWwi2SML8812eU4kI9Z65Y/YJxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4oZLCOYnbjba+AxbSgZHvO5Z23SZTBxFPXm1egnxliw=;
- b=oB8FAps90OJ+1a/dd8MzW5yLW/+QTMqfOYeKteItZSi6Wni3+FGW0DsXqRBAEi/OIc+N3EBU5WwXRcRZ4wn/vP+9oDMl6Foe/YOx//XnR3OSNrgHZYgu1FfrBoqr0Wh0eAM5CIz+dsUt7RAHN/O2uln/h9D7T+P8SBVh++GsL6ntCOAoqLwbKrJR9XXSiMorbN4Dhd+Me2YVSKLO7g+nAuG9wK5ZwIvTWvChPXtqj7zh7UkRgs7ohv+04VzDjQ6PqWKGevOWpk+IHmHEjg4oMkBoa4TIGKgb6FhmuPcZq/VZdZgFIXO1mJNIVnbN69WP8a5lQybO0GK62qETYat8aQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by PH7PR11MB5820.namprd11.prod.outlook.com (2603:10b6:510:133::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Mon, 1 Dec
- 2025 22:18:34 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::22af:c9c9:3681:5201]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::22af:c9c9:3681:5201%5]) with mapi id 15.20.9366.012; Mon, 1 Dec 2025
- 22:18:34 +0000
-Date: Mon, 1 Dec 2025 22:18:28 +0000
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: Qu Wenruo <quwenruo.btrfs@gmx.com>
-CC: <dsterba@suse.com>, <herbert@gondor.apana.org.au>, Qu Wenruo
-	<wqu@suse.com>, <clm@fb.com>, <terrelln@fb.com>,
-	<linux-btrfs@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<qat-linux@intel.com>, <cyan@meta.com>, <brian.will@intel.com>,
-	<weigang.li@intel.com>, <senozhatsky@chromium.org>
+	dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b="MTIUJFEm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.com;
+	s=s31663417; t=1764630812; x=1765235612; i=quwenruo.btrfs@gmx.com;
+	bh=DtBx52lwcA1ySQk3W33ssbuLMeHTKJW7lOhIgqQmTek=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=MTIUJFEmch0kahGPvHN/QYRrxtWYFeqtfaTH20p6aEuAMuhOz9/0Jh37hSgOKEzg
+	 m1yhDf5XRPdalKPCZdMpioV/JwJSoOL/2FFszMN6l6c8BMJvgQFsPnGGNAHRx0RNJ
+	 CH31MS2RA3mMPPoNi1qWCDBA01Uzk5fsHfkAf1scDmUbLOgsIInHu3dtX5g5GERBs
+	 T+elRITG8F7hsHMMZTKL7Xtw4wPwoMnr0pd4+AMtYqXeBRdnbqhqmmGm2HTsW8exq
+	 zAnpUo87r0iCo6Xs7unwjUYWwTl48IdkIoxrtI7RYEfde84Rldsj6tbnPb1BKzzs2
+	 ILg5qtq4VPzuh8EK0Q==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [172.16.0.229] ([159.196.52.54]) by mail.gmx.net (mrgmx104
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1Ml6m4-1vnQQR2srE-00cbro; Tue, 02
+ Dec 2025 00:13:32 +0100
+Message-ID: <e532ff5c-a5a6-4ebf-977a-721471594908@gmx.com>
+Date: Tue, 2 Dec 2025 09:43:24 +1030
+Precedence: bulk
+X-Mailing-List: linux-crypto@vger.kernel.org
+List-Id: <linux-crypto.vger.kernel.org>
+List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC PATCH 16/16] btrfs: add compression hw-accelerated offload
-Message-ID: <aS4UNIfxGK0y6HzO@gcabiddu-mobl.ger.corp.intel.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: dsterba@suse.com, herbert@gondor.apana.org.au, Qu Wenruo <wqu@suse.com>,
+ clm@fb.com, terrelln@fb.com, linux-btrfs@vger.kernel.org,
+ linux-crypto@vger.kernel.org, qat-linux@intel.com, cyan@meta.com,
+ brian.will@intel.com, weigang.li@intel.com, senozhatsky@chromium.org
 References: <20251128191531.1703018-1-giovanni.cabiddu@intel.com>
  <20251128191531.1703018-17-giovanni.cabiddu@intel.com>
  <1dc1adaf-635c-405b-84c9-97d9567f8c14@suse.com>
@@ -95,254 +58,247 @@ References: <20251128191531.1703018-1-giovanni.cabiddu@intel.com>
  <aS2nA8+YpNbKjXeo@gcabiddu-mobl.ger.corp.intel.com>
  <aS2v6g3f5nYi6hC+@gcabiddu-mobl.ger.corp.intel.com>
  <453951a9-0c8d-4e1a-be4f-2617c6a51fbe@gmx.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <453951a9-0c8d-4e1a-be4f-2617c6a51fbe@gmx.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DB8P191CA0025.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:10:130::35) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
-Precedence: bulk
-X-Mailing-List: linux-crypto@vger.kernel.org
-List-Id: <linux-crypto.vger.kernel.org>
-List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|PH7PR11MB5820:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4e8a6993-984b-4841-7d93-08de312790ea
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?QkUyamlWRWk5aTN1eHViZG1sRk5XSDhUUnlJU1FQYld0OWc5djRIRk9WMHJq?=
- =?utf-8?B?c0w3d1BrRnQ2OUp4TitmQkx1SmFwYnhwOVY5aTlIOFdhRi9SVHIrQlI0WC9Q?=
- =?utf-8?B?RzhTUlhlZEVPK0lZell0WFY3SjVTQStrZllicmZBbGw0N3ErUUV1K0dLVVJX?=
- =?utf-8?B?ZXdPbUhsSXNSR09WTUZVN2E5aXN6Q1NBYkh3eVdLYnhTOWg1UXFrQlAzQ283?=
- =?utf-8?B?NE1wd2dybW1MM1N3c1gyZllRT3RrWlJJeisxQzFaU2Q3UTNYc1pBYTY1T1JJ?=
- =?utf-8?B?eTRMa1UxM2ZQNERxS090QWdyM0IzVktub2RFc1Bkd0Z4ellSd29QOVpWK0kx?=
- =?utf-8?B?cUx4aEpORTB2WmZmM0J3dWVPZUxkeGlZTjczNVhMTjAyUUJNakwrRlM3VUdG?=
- =?utf-8?B?a0dveWQ2STYwRC9paTBUSTFaQTNaKy9EaGxMUTRVVDJTVHEvU1hoMTF3aEh0?=
- =?utf-8?B?dlBQcEwvR1ZKWjBLU25UTDByYmdRU3h4d011Ym5IdHI3Tlpxd25oT2h2RGV6?=
- =?utf-8?B?Z0JHTk1HQjdKRTg0ZWY3K01qWEVMQkVwN0MzMVFoN25OelFQZDM5UWZ3Qi9L?=
- =?utf-8?B?ZzNxb3lpKy9hRitPR3hPMlFaYlpnWjdtQVV2RkpHSkJGWitIT3dvVTB5OURl?=
- =?utf-8?B?cXJjTWFvSFlCUEhmRVZpNnB2U0FEU0g0UUFnKytLL3FTWnIyd1Rpdm15Z0sr?=
- =?utf-8?B?MzFKUGJObHRjbXE2VFFFSnVLS0JXdDhtREYrTmY1YkdTT1RGUnRoQjVKSVNm?=
- =?utf-8?B?VHVSclVQTENmRVhKWTM4YkNqMVJJVG5DcjNoUTJKWTZ6cm1VWUVEdWVPWkJW?=
- =?utf-8?B?WWdDNU85clFGMVYwcDlhK0ZQT2JxK2ZPZ0MveWpWSzVncnY0ZHhPS3VzeFVt?=
- =?utf-8?B?N1dBQ2l3cmxYRlZqNTl4eVplRWZVY3FHOXd4YXZzcmhrR3IwckIyVVk3VDJs?=
- =?utf-8?B?WGVpbHBwcG9URHdRY1NzOEFIRVF2VzJqSWJFV3J3bUlkSlJBd2tTNG9MWHhM?=
- =?utf-8?B?Tmx6ck4rRjhBT1RJMVBLL3BXWTk0ZWd0QTd4NDQ0em5PbUFuU01TQ0V2bTBO?=
- =?utf-8?B?cjR5TEthMjgzUjU1c0w1ZHJ6a2lKemlxaStyRFJMeVExeVIyaEd1SFFZZUNq?=
- =?utf-8?B?Z0lHK1NMTG9UNnhIbXpjWmlsOGFybml5Q2pGMGZIQnBOVndjc3pqOWJPamxY?=
- =?utf-8?B?dVU2SzZnbXhMN1RZMElDbVVvZGd0blRBbzBHNlljRUFUckZHY0NMaGsxWXFs?=
- =?utf-8?B?dGcvSjd2SUExTmYxaWk4NnBaUzNzalk3em43aVFYQVZDckhXeDhocjNOcVNN?=
- =?utf-8?B?YTlHR1lBbHdrYVpMUmJJdDN5RmVub3YrdFZWV0lNN1VnRVlhVFE2RWg1aDVB?=
- =?utf-8?B?WWpxK1c5UUYyd2loQXpoQXpxQ2FRQWRTRC9rVzRYaGZDaUQwWUU0ZzlpUHNp?=
- =?utf-8?B?cWcza3JCc3VNUGNoZnp0VGZ1ZDA2dWt5OTRvazBFQmIweGtHbWZoL0FTci9o?=
- =?utf-8?B?ZlpRdUhnejJwV0prTkhENXBKaWdvb0hkVUo1RUUxa0Rpb09SS3JLcXJ0TlIw?=
- =?utf-8?B?cGptOVl3WFYxcHU3akp3Ly9GQ1VqT1k5UE9NdHhOSzQ2MDZXd1Q3dTNVR3Rn?=
- =?utf-8?B?L00vazg2S09aeTJZZ0tURVdib3VFdlgxUUdlTWF4RHlOZjVLT3B4K09ndFZ1?=
- =?utf-8?B?NHVaQWJVT1JZczFPcE5QQnR5WGc2ano1Z2x3ZGEwa04wUXJJZm9vZ0pjVlJC?=
- =?utf-8?B?SnZ5L01BdmVNOU5BRzNENkpjdFpoQVpPM01MYkxkOTQxTGNzRGZmajk3LzFT?=
- =?utf-8?B?dFFmbXMyR2RDeExHZ2VvR1RYLzFXS2k2cTBNQ0h5RGlZdU43WGU0eHVCa1FO?=
- =?utf-8?B?Wjgwc05TdnhCbUdNMkNMK1pxcmtBM0haVFpXeUJ0SFhtVHlCOGdrYkZJcldu?=
- =?utf-8?Q?HqsEB/iMLpDPPv5gzQ7X42+hBfL0qYAQ?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZVVWUXcyOU1laVRxeExGbnVGdlA3blZhSkNwRU15LzJwVmJuQm5JclVQMitq?=
- =?utf-8?B?UE9WOGVPcGlYRVhGcnBOb3RTZGdOa3hjUStkcXFrWktRU3k3L3E4WGRIUCt6?=
- =?utf-8?B?R0pvUTFZbmRBUWkxTndBb0k5NzJMRjltVjRPODh3TFVxQXkxSGlFVVZIUXQ0?=
- =?utf-8?B?QlVrTEFBWmRyditSV3F6QnpvU3JBUGRFNk9ZTDQwZnlqOElqMjNqQUY1Mk5N?=
- =?utf-8?B?bW12cHZOMTAvbUJNQlV0QTRmM1h2VjlQQjdJdyt1WEtvZUl2Nm1wWTd3a0hy?=
- =?utf-8?B?NVpnbXZ0NkhQL2crV3JadlFXb01oU0k1cGJYL2ZsYTlqSXlEeithc0cwMzdy?=
- =?utf-8?B?dU1udXVmS3JKRTM4TFdMYzd3YUpoeGk4RFZMVWRNNENzZ3ptdzI5OEtsYnJa?=
- =?utf-8?B?OW14MDZXOEJuOXhFeVFENGdDUXBhbHZ6ZVNjVHZTaHJZS3drL2ltRGJTaStm?=
- =?utf-8?B?dnd0RldOazh1ZjUwQ2V4ekpKWUNUUUNkMjYwMTJET0pKZ3dYK3c4bi9hVGlT?=
- =?utf-8?B?TzBNU2huSUhESWhVWVBaM2dkWXhjNnpvblhqRjBZWjVXODdOMFFPaUpNYzZv?=
- =?utf-8?B?amhNUmUwVE5zSkpwSkFpcnFOUENSc0dUVWRMeVdXSlhtMmluR1prZm4vVGRJ?=
- =?utf-8?B?R1RPd1NCWHpKbHJaTDY0ay8yQzJjSE1IQWhuKzhCVTFkKzBMaVBWWFVCRHRM?=
- =?utf-8?B?R1pmQXM2YXh1cS9VQXgvV3V5Vkg0MlhYUE10VGNJa0svTDZIcGdPSlorckNH?=
- =?utf-8?B?VFpuZXVzSXdXSVBGeXdBejh4SmRPNjBQcHYvN2Q1ZTQzOW1pNGxQcVczdzdq?=
- =?utf-8?B?bVN5VFRIUmFzSGRVbVVzVzE3U0FPUXZXY3g2MnN3enNWN25OcjEyT3ZudFpz?=
- =?utf-8?B?bzM3VytER0pKd1BYUUc4MmNTZDZyMExNa0RsenR2QkVPemQ5VitKWUFyTkw2?=
- =?utf-8?B?alE5ZTFFenVpSmZwRW03RmsrMlQ2cm5sN0xpblJTTUJVaE9iUS9DWjRVZVFO?=
- =?utf-8?B?bXNSRlpWZ294Y3kvcVlKdjVvNHVZWmRibStrcEtjWjliWXNpYXhnalh3d0M4?=
- =?utf-8?B?ME4yQ1pLNjR4Zkg3QzdXMy96RzFpMmJteHhzZHZPTE5qaWtaQkh2ckllQVZw?=
- =?utf-8?B?MzQvVGFjUWpDVTJtUmJMdTk4OFhPODFIZWZoSjVib2d5R2lrVzNMMVRscm1W?=
- =?utf-8?B?a0pxcWxqbmc0Umx2TTRscGVIM2F5YjBoQ2tHUXFjK012UEp1Rlh2aElDNEZq?=
- =?utf-8?B?SHdPaFlKdVRhNERTdzR3RytISDRXUkQrRVVMS1JNaUg3YldCVzQ2Wk0rVGdy?=
- =?utf-8?B?OTlORDh4NkdhM0VXRXlWVG9aMzZFWXhhMkZiMHFHK3pDRlJLQ3dzem5qNERK?=
- =?utf-8?B?V2NyZFYrMG5KRytQdFozZm1QWitJdVRqRUZRcFNXS3NkbDkvUUt6ZmVTaEpO?=
- =?utf-8?B?M2pGN2x5bzFpWnNReGNPdlZ5RmRtTlZ6SDJHckNBdzQraFhFdXk2L1ZFblRX?=
- =?utf-8?B?WGs3K2hxWnFYR09nTDhibElZR2Y5VTk4SlJnYlFOOUNQanJSQnVEYlhHU1BE?=
- =?utf-8?B?bkhTeWM5K1dRSVFKdFcrdWNWUGhHS0JJRUV3dTJMT0dTbGczZm1xVU51YjI3?=
- =?utf-8?B?UG9SV25sQzRFcm5lbkNTVFZVdmRGc3FGeVVQRW9ydHMzUXR2d2lvYTkwbmhy?=
- =?utf-8?B?YXZOR0kwTGVSN29YSzFTSzN4UEdPM05tY015Uyt0cSt3R3RXRXE3MUxpSXpy?=
- =?utf-8?B?RkpDNUtEMkg2ZTVuc2U2ZDAxb1hieUdvb3R5alJYeTZNaUhBdnN3SWgwbndn?=
- =?utf-8?B?ZVNvV2pQOEVtSDRGZ1Fzak12Z1UzTmtSMUpCcTR0MXkyd2phalpyT0IzU0NZ?=
- =?utf-8?B?a0ovY2toQVQvSUFmVXVtK3lDc09kaVRJV3Q2THdMWmF5c1BTUndXbFVYT0lC?=
- =?utf-8?B?VHlvUFFZaG1SaFh0dCthbFk4elZuL0JKcGdkT2QrWEJ4akVqdG5sKzNvUGNm?=
- =?utf-8?B?b0V4U1BtTm9ySW1UNTlGVGNTKzhhcHdmdkxjbFhMVkhoMEppalVmeVp5ejVm?=
- =?utf-8?B?NVdFUDZob2VGaXB5U3F6TFFlMzZORkFXS3BrTGs4UEVhZzFuSFNjcFYyY2Yz?=
- =?utf-8?B?WDYyVnFoRHVCL3JRNnhYMkN3ZjduYUU3em5udGlTWDE2WlExMHpNOXh4Vm80?=
- =?utf-8?B?akE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e8a6993-984b-4841-7d93-08de312790ea
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2025 22:18:33.9987
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /w8yklzJcPcYh+AGz/M6Am7I5lxTHAzAS5r6fupcYePEiiOdazQtIrrulslzV/nC6olC1RMJODdNo/dadO5dz+L3URvqGyqjWJBZJAc6ihY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5820
-X-OriginatorOrg: intel.com
+ <aS4UNIfxGK0y6HzO@gcabiddu-mobl.ger.corp.intel.com>
+Content-Language: en-US
+From: Qu Wenruo <quwenruo.btrfs@gmx.com>
+Autocrypt: addr=quwenruo.btrfs@gmx.com; keydata=
+ xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
+ 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
+ 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
+ 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
+ gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
+ AAHNIlF1IFdlbnJ1byA8cXV3ZW5ydW8uYnRyZnNAZ214LmNvbT7CwJQEEwEIAD4CGwMFCwkI
+ BwIGFQgJCgsCBBYCAwECHgECF4AWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1YAUJEP5a
+ sQAKCRDCPZHzoSX+qF+mB/9gXu9C3BV0omDZBDWevJHxpWpOwQ8DxZEbk9b9LcrQlWdhFhyn
+ xi+l5lRziV9ZGyYXp7N35a9t7GQJndMCFUWYoEa+1NCuxDs6bslfrCaGEGG/+wd6oIPb85xo
+ naxnQ+SQtYLUFbU77WkUPaaIU8hH2BAfn9ZSDX9lIxheQE8ZYGGmo4wYpnN7/hSXALD7+oun
+ tZljjGNT1o+/B8WVZtw/YZuCuHgZeaFdhcV2jsz7+iGb+LsqzHuznrXqbyUQgQT9kn8ZYFNW
+ 7tf+LNxXuwedzRag4fxtR+5GVvJ41Oh/eygp8VqiMAtnFYaSlb9sjia1Mh+m+OBFeuXjgGlG
+ VvQFzsBNBFnVga8BCACqU+th4Esy/c8BnvliFAjAfpzhI1wH76FD1MJPmAhA3DnX5JDORcga
+ CbPEwhLj1xlwTgpeT+QfDmGJ5B5BlrrQFZVE1fChEjiJvyiSAO4yQPkrPVYTI7Xj34FnscPj
+ /IrRUUka68MlHxPtFnAHr25VIuOS41lmYKYNwPNLRz9Ik6DmeTG3WJO2BQRNvXA0pXrJH1fN
+ GSsRb+pKEKHKtL1803x71zQxCwLh+zLP1iXHVM5j8gX9zqupigQR/Cel2XPS44zWcDW8r7B0
+ q1eW4Jrv0x19p4P923voqn+joIAostyNTUjCeSrUdKth9jcdlam9X2DziA/DHDFfS5eq4fEv
+ ABEBAAHCwHwEGAEIACYCGwwWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1gQUJEP5a0gAK
+ CRDCPZHzoSX+qHGpB/kB8A7M7KGL5qzat+jBRoLwB0Y3Zax0QWuANVdZM3eJDlKJKJ4HKzjo
+ B2Pcn4JXL2apSan2uJftaMbNQbwotvabLXkE7cPpnppnBq7iovmBw++/d8zQjLQLWInQ5kNq
+ Vmi36kmq8o5c0f97QVjMryHlmSlEZ2Wwc1kURAe4lsRG2dNeAd4CAqmTw0cMIrR6R/Dpt3ma
+ +8oGXJOmwWuDFKNV4G2XLKcghqrtcRf2zAGNogg3KulCykHHripG3kPKsb7fYVcSQtlt5R6v
+ HZStaZBzw4PcDiaAF3pPDBd+0fIKS6BlpeNRSFG94RYrt84Qw77JWDOAZsyNfEIEE0J6LSR/
+In-Reply-To: <aS4UNIfxGK0y6HzO@gcabiddu-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:UnGX1S1Ou2WNV/ggnLUmTcJwSqz6q4TgL7AJCnZM7A1FS65wdBW
+ qgdghu5HQgTElZS4A/KsEVzEY/MI3JBjtMOKz7dGG6Rgx9XonzuoDE7P28xNu2UMU75i9gH
+ 9mC2obwqBLx0sVo+DQ37hsTvMneapfIaX6RRo2B6pujSso3UMf9cFWdSYTwpKjrShQ/AWih
+ AIwH7S1t/TWtIUwUnx5Zg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:ZmYhYL+sVCw=;CthVR2oailmNmSwQ31EW2MThlHJ
+ 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
+ fbe1/zJdHfvTqYPS9Z2zCo9SRXKt7cpVdHRdwm
 
-On Tue, Dec 02, 2025 at 07:27:18AM +1030, Qu Wenruo wrote:
-> 在 2025/12/2 01:40, Giovanni Cabiddu 写道:
-> > On Mon, Dec 01, 2025 at 02:32:35PM +0000, Giovanni Cabiddu wrote:
-> > > On Sat, Nov 29, 2025 at 10:53:02AM +1030, Qu Wenruo wrote:
-> > > > 
-> > > > 
-> > > > 在 2025/11/29 10:29, Qu Wenruo 写道:
-> > > > > 
-> > > > > 
-> > > > > 在 2025/11/29 09:10, Giovanni Cabiddu 写道:
-> > > > > > Thanks for your feedback, Qu Wenruo.
-> > > > > > 
-> > > > > > On Sat, Nov 29, 2025 at 08:25:30AM +1030, Qu Wenruo wrote:
-> > > > > [...]
-> > > > > > > Not an compression/crypto expert, thus just comment on the btrfs part.
-> > > > > > > 
-> > > > > > > sysfs is not a good long-term solution. Since it's already behind
-> > > > > > > experiemental flags, you can just enable it unconditionally (with proper
-> > > > > > > checks of-course).
-> > > > > > The reason for introducing a sysfs attribute is to allow disabling the
-> > > > > > feature to be able to unload the QAT driver or to assign a QAT device to
-> > > > > > user space for example to QATlib or DPDK.
-> > > > > > 
-> > > > > > In the initial implementation, there was no sysfs switch because the
-> > > > > > acomp tfm was allocated in the data path. With the current design,
-> > > > > > where the tfm is allocated in the workspace, the driver remains
-> > > > > > permanently in use.
-> > > > > > 
-> > > > > > Is there any other alternative to a sysfs attribute to dynamically
-> > > > > > enable/disable this feature?
-> > > > > 
-> > > > > For all needed compression algorithm modules are loaded at btrfs module
-> > > > > load time (not mount time), thus I was expecting the driver being there
-> > > > > until the btrfs module is removed from kernel.
-> > > > > 
-> > > > > This is a completely new use case. Have no good idea on this at all.
-> > > > > Never expected an accelerated algorithm would even get removed halfway.
-> > > To clarify, the sysfs switch does not disable the algorithms themselves,
-> > > it only controls whether acceleration of that algorithm is used, if
-> > > supported.  If enabled, the filesystem can offload operations to the
-> > > accelerator. If disabled, it performs them in software. The
-> > > implementation also handles the case where acceleration is disabled or
-> > > enabled while the filesystem is in use.
-> > > 
-> > > BTW, currently, the feature is disabled by default. If that is
-> > > not preferable, we can enable it by default.
-> > > 
-> > > > Personally speaking, I'd prefer the acomp API/internals to handle those
-> > > > hardware acceleration algorithms selection.
-> > > > 
-> > > > If every fs type utilizes this new accelerated path needs an interface to
-> > > > disable QAT acceleration, it doesn't look sane that one has to toggle every
-> > > > involved fs type to disable QAT acceleration.
-> > > > 
-> > > > Thus hiding the accelerated details behind common acomp API looks more sane.
-> > > Even if we hide these details behind the acomp API, we would still face
-> > > a similar issue with the current acomp algorithms. If we need to disable
-> > > compression acceleration, for example, to assign a QAT device to user
-> > > space, we would have to unmount the filesystem.
-> > > 
-> > > What's needed is an `acomp_alg` implementation that is independent of the
-> > > QAT driver (or any specific accelerator) and can transparently fall back
-> > > to software. We already have a software fallback in the QAT driver, but
-> > > as explained, that does not prevent unloading the driver or re-purposing
-> > > the device. @David and @Herbert, any thoughts?
-> > Perhaps I should clarify the use case to remove ambiguity.
-> > 
-> > I added the `enable/disable` switch to allow disabling acceleration on
-> > the QAT device so it can be reassigned to user space.  In the current
-> > design, the acomp tfm is allocated in the workspace and persists for the
-> > lifetime of the filesystem (unlike the previous preliminary version of
-> > this series where the acomp tfm was allocated in the datapath).
-> > This change was introduced after a review comment.
-> > 
-> > Here is what happens:
-> > 1. The acomp tfm is allocated as part of the compression workspace.
-> 
-> Not an expert on crypto, but I guess acomp is not able to really dynamically
-> queue the workload into different implementations, but has to determine it
-> at workspace allocation time due to the differences in
-> tfm/buffersize/scatter list size?
-Correct. There isn't an intermediate layer that can enqueue to a
-separate implementation. The enqueue to a separate implementation can be
-done in a specific implementation. The QAT driver does that to implement
-a fallback to software.
 
-> This may be unrealistic, but is it even feasible to hide QAT behind generic
-> acomp decompress/compress algorithm names.
-> Then only queue the workload to QAT devices when it's available?
-That is possible. It is possible to specify a generic algorithm name to
-crypto_alloc_acomp() and the implementation that has the highest
-priority will be selected.
 
-> Just like that we have several different implementation for RAID6 and can
-> select at module load time, but more dynamically in this case.
-> 
-> With runtime workload delivery, the removal of QAT device can be pretty
-> generic and transparent. Just mark the QAT device unavailable for new
-> workload, and wait for any existing workload to finish.
-> 
-> And this also makes btrfs part easier to implement, just add acomp interface
-> support, no special handling for QAT and acomp will select the best
-> implementation for us.
-> 
-> But for sure, this is just some wild idea from an uneducated non-crypto guy.
+=E5=9C=A8 2025/12/2 08:48, Giovanni Cabiddu =E5=86=99=E9=81=93:
+> On Tue, Dec 02, 2025 at 07:27:18AM +1030, Qu Wenruo wrote:
+[...]
+>>> Here is what happens:
+>>> 1. The acomp tfm is allocated as part of the compression workspace.
+>>
+>> Not an expert on crypto, but I guess acomp is not able to really dynami=
+cally
+>> queue the workload into different implementations, but has to determine=
+ it
+>> at workspace allocation time due to the differences in
+>> tfm/buffersize/scatter list size?
+> Correct. There isn't an intermediate layer that can enqueue to a
+> separate implementation. The enqueue to a separate implementation can be
+> done in a specific implementation. The QAT driver does that to implement
+> a fallback to software.
+>=20
+>> This may be unrealistic, but is it even feasible to hide QAT behind gen=
+eric
+>> acomp decompress/compress algorithm names.
+>> Then only queue the workload to QAT devices when it's available?
+> That is possible. It is possible to specify a generic algorithm name to
+> crypto_alloc_acomp() and the implementation that has the highest
+> priority will be selected.
 
-I'm trying to better understand the concern:
+I think it will be the best solution, and the most transparent one.
 
-Is the issue that QAT specific details are leaking into BTRFS?
-Or that we currently have two APIs performing similar functions being
-called (acomp and the sw libs)?
+>=20
+>> Just like that we have several different implementation for RAID6 and c=
+an
+>> select at module load time, but more dynamically in this case.
+>>
+>> With runtime workload delivery, the removal of QAT device can be pretty
+>> generic and transparent. Just mark the QAT device unavailable for new
+>> workload, and wait for any existing workload to finish.
+>>
+>> And this also makes btrfs part easier to implement, just add acomp inte=
+rface
+>> support, no special handling for QAT and acomp will select the best
+>> implementation for us.
+>>
+>> But for sure, this is just some wild idea from an uneducated non-crypto=
+ guy.
+>=20
+> I'm trying to better understand the concern:
+>=20
+> Is the issue that QAT specific details are leaking into BTRFS?
+> Or that we currently have two APIs performing similar functions being
+> called (acomp and the sw libs)?
+>=20
+> If it is the first case, the only QAT-related details exposed are:
+>=20
+>   * Offload threshold =E2=80=93 This can be hidden inside the implementa=
+tion of
+>     crypto_acomp_compress/decompress() in the QAT driver or exposed as a
+>     tfm attribute (that would be my preference), so we can decide early
+>     whether offloading makes sense without going throught the conversion=
+s
+>     between folios and scatterlists
 
-If it is the first case, the only QAT-related details exposed are:
+This part is fine, the practical threshold will be larger than 1024 and=20
+2048 anyway.
 
- * Offload threshold – This can be hidden inside the implementation of
-   crypto_acomp_compress/decompress() in the QAT driver or exposed as a
-   tfm attribute (that would be my preference), so we can decide early
-   whether offloading makes sense without going throught the conversions
-   between folios and scatterlists
+>=20
+>   * QAT implementation names, i.e.:
+>         static const char *zlib_acomp_alg_name =3D "qat_zlib_deflate";
+>         static const char *zstd_acomp_alg_name =3D "qat_zstd";
+>     We can use the generic names instead. If the returned implementation=
+ is
+>     software, we simply ignore it. This way we will enable all the devic=
+es
+>     that implement the acomp API, not only QAT. However, the risk is tes=
+ting.
+>     I won't be able to test such devices...
 
- * QAT implementation names, i.e.:
-       static const char *zlib_acomp_alg_name = "qat_zlib_deflate";
-       static const char *zstd_acomp_alg_name = "qat_zstd";
-   We can use the generic names instead. If the returned implementation is
-   software, we simply ignore it. This way we will enable all the devices
-   that implement the acomp API, not only QAT. However, the risk is testing.
-   I won't be able to test such devices...
+This is only a minor part of the concern.
 
-Beyond that, the BTRFS/acomp code can use a software backend without any
-changes.
+The other is the removal of QAT, which is implemented as a per-fs=20
+interface and fully exposed to btrfs.
+And that's really the only blockage to me.
 
-If the concern is about having two APIs, we could remove direct calls to
-the software libraries and rely only on acomp. One option might be to
-allocate two tfms in the workspace, one for software and one for the
-accelerator, since the software names are stable and hardcoded, and
-perform the switch.  However, the trend in the kernel nowadays is to
-prefer direct calls to the libraries, rather than going through the
-crypto layer.  That said, I still need a mechanism to indicate when the
-accelerator should not be used. (BTW, I saw David's email confirming
-that using sysfs for this is acceptable.)
+If QAT is the first one doing this, would there be another drive=20
+implementing the same interface for its removal in the future?
+To me this doesn't look to scale.
+
+
+And that also looks like a layer violation, exporting low-level crypto=20
+details into a fs, which shouldn't really care about the fast=20
+implementation or the details on how to remove a QAT device.
+
+Thus I really want to follow the RAID6 scheme, let RAID6 module to=20
+select the fastest one, btrfs just use the provide interface.
+(And add the missing part of dynamically remove one implementation at=20
+runtime)
+
+
+I understand your concern related to the QAT device removal, but=20
+considering the layer separation, QAT device removal would be better to=20
+be handled inside acomp layer, so that not every QAT user needs to=20
+implement a kill switch.
+
+Considering acomp is never designed with such runtime workload delivery,=
+=20
+this may be too much to ask though.
+
+>=20
+> Beyond that, the BTRFS/acomp code can use a software backend without any
+> changes.
+>=20
+> If the concern is about having two APIs, we could remove direct calls to
+> the software libraries and rely only on acomp.
+
+That's not a huge deal, at least not to me.
+
+I'm fine to have acomp interface with the existing interface, as long as=
+=20
+it provides better performance.
 
 Thanks,
+Qu
 
--- 
-Giovanni
+> One option might be to
+> allocate two tfms in the workspace, one for software and one for the
+> accelerator, since the software names are stable and hardcoded, and
+> perform the switch.  However, the trend in the kernel nowadays is to
+> prefer direct calls to the libraries, rather than going through the
+> crypto layer.  That said, I still need a mechanism to indicate when the
+> accelerator should not be used. (BTW, I saw David's email confirming
+> that using sysfs for this is acceptable.)
+>=20
+> Thanks,
+>=20
+
