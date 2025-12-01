@@ -1,122 +1,232 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011038.outbound.protection.outlook.com [40.93.194.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4820A36D507
-	for <linux-crypto@vger.kernel.org>; Mon,  1 Dec 2025 05:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764567587; cv=none; b=awq413/tJZwlNM4n8dywiC6yklNCKrC9K1HGEsZLbaO1P51iH5J9wJsb21zTSA5Q1BLKPdaVIVM4MY3qD7QTx3XL6XhhCiNdvabVYJybEKwGI9FdRaFavHB97JhJhDAI8YGkTMm68t3LhLMIG7brdVvoXF0hDg8Q8QlTQTL6QDI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764567587; c=relaxed/simple;
-	bh=Ao2BeZssoMFg0fnlF9J+ILrtBVo0HwPaumkMPOkL/YY=;
-	h=Message-ID:Date:MIME-Version:Subject:References:To:Cc:From:
-	 In-Reply-To:Content-Type; b=G9UOOc9GUAHFK5pFyNbl5Xw03tq/l+9f/ApUtZPsP8xPkqcKI8R1+iv9KWXI5ChjZjPYMjTp5DoU+Y720cGXHTjcAMhvF8/4jnsKBqMzINH/nRDWFGwRvXkcGT4FrqmDIZUz2r8hJMjKFmjugVNsj3/pHObSr48UhsGIKPhKIi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=THjiOg6P; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A171E868;
+	Mon,  1 Dec 2025 07:53:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.38
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764575641; cv=fail; b=cxmy1+OU+LuHJHZJ1+SBPJZYUsTenBg8NDmMuYdVq8qob5D6g1O+Jt6o1yqWqaqVomT4Nu3ujfEINpo3x4shQS1CIIboU0SO8uAOcAP1MZEISyNf5xXcofV5joHc+uoBhrgV8nBUsqY5sWIn6d9yNKEIftOPfWViT3bfLu5+LBM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764575641; c=relaxed/simple;
+	bh=9yrMiwuolCwqoFVPXXzVjBCMqGv3xJH1pXzzrPuLNkk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FlC6ivTSXXlbF8ckMOozXmBqEz3yclQ00v7j07ruvD9QlHVv9Un0g8KOhgQfdBHDfm3czBEgw+PyAEOW/PPSHzJGf05eDXkPI31HRZfFmIcPisocXRDEx2z5eaWehlgzO0b+G8DlJYyYAK3BiaJD4L4XeFk12PVr3ezyGC+2xRs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Vo//ry1/; arc=fail smtp.client-ip=40.93.194.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="THjiOg6P"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:Cc:To:References:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=HV19tRtEDdfrqeX2iUSZivHIZ2UHhEEW9OIHSsaAK9E=; b=THjiOg6Pz43c7QhbPky2TyNvOq
-	OKY699e1zK0K9fwsggDfCpNU2+QspGM3OmfdyLl2brUauG5UZwHCee3dYcaBltcuy2jtAU/J6iV1t
-	NcXhjH42TowXaXRzBuMyg7ObCms6xNalMcA7pHu9B/nAjaXYx9UImq4LllT+gjugOmkwrJrZAhJPX
-	FMQQx6TtgbmokKve8ikOPWIpgwN64TJt5MPEdq8NciAKTB5KOvLqO0+dXmxIbMXX2eUgbidPX1zul
-	m5AkIrrbczcIC/L/OMfPUNnrbrsBI2jrlvxBTZZEPtEAWTcGDX9P/qQJGT/3yWVTJPc/hfToTBIKp
-	II50PN8Q==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vPwdR-00000002wCy-2h1N;
-	Mon, 01 Dec 2025 05:39:41 +0000
-Message-ID: <db554bca-4d85-4243-9f38-bdbaa48cd080@infradead.org>
-Date: Sun, 30 Nov 2025 21:39:41 -0800
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Vo//ry1/"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bjkweozteBngbkyRITGjdJJlmXXgf/BXf/qqq7a61RgM1jDJYC82bmAw9oxaGmgIPJeUwmOLG3uF7jArkkaUxpz7uD7isq4FwdPKbt9s4meT+Q9nyvhM3qYt4qOggeyVG9BeAQvekzvhTskhpC0fM5dPjjV8CY/+FKe3GSAFFY1skOHYSy2cu9FEjoIMWFcPI2UUiwO857nVM0loF+5jfuDmBK/I99jT3f1/0Dsp6ftnhkg9FPGWM6roWLSRnBtX3iiqNpY1+ohZNTxxlz71TeaNfu/2dhriZ9S/YAbbRYa5ygkEJFQNuKgwhScj+WB7M5qLXZ6PNa2Cmas0lYBaMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cxmmKMj4hHeMUYsuIRxymCqyMMl443RvLWa+rGW3ggI=;
+ b=GPk7fDBuNdzxvf2s8VMs6gKjfTl9mWVz1OtIQ2CkHLFWkSSgkgM0f7jE1neS0bhJyBxOqkViQViYC2a5Pffm3AbWuzRcdZIr5XWuxXsQ8pB9K4Qqb6jPVa8EwQXNw3WKqjcYk9az9EKytM7pensL/kzWlO+wfkNSlwuHgnb7AC6Ex/JlAmTtYDvvVzmvXz0ODzWaf5mnHENJz+M1YZxu5bwkSr/yb8VDFoJtaP4oL49aVe28O7Uc3pIijKpW7KQsY6IajmELq1PrH2DakCTSlGLQJ9krXBD/CK83mY4jOJQOd6FsXKXxg1lOT7H7HyskyYOVRVtFCgIyAmDPjrYSWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cxmmKMj4hHeMUYsuIRxymCqyMMl443RvLWa+rGW3ggI=;
+ b=Vo//ry1/4iweiOhiLPtdNhl0v19t5HNvARSjcZOsAHo8mDqwAu4743vMPNj7eUwfsxb1myCiPTgekXqbc+YjpwwhvJ2iuEYlWgs7ceB52/0ggaHb60v5Y3b+MX7KhKCpQNkTJZXUQx36zcVl/ssxB0Y2tE00yCMxaIFPnLR4Vwk=
+Received: from MN2PR03CA0007.namprd03.prod.outlook.com (2603:10b6:208:23a::12)
+ by CH3PR12MB8281.namprd12.prod.outlook.com (2603:10b6:610:128::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Mon, 1 Dec
+ 2025 07:53:54 +0000
+Received: from BL02EPF00021F6F.namprd02.prod.outlook.com
+ (2603:10b6:208:23a:cafe::be) by MN2PR03CA0007.outlook.office365.com
+ (2603:10b6:208:23a::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.17 via Frontend Transport; Mon,
+ 1 Dec 2025 07:53:48 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BL02EPF00021F6F.mail.protection.outlook.com (10.167.249.11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9388.8 via Frontend Transport; Mon, 1 Dec 2025 07:53:54 +0000
+Received: from aiemdee.l.aik.id.au (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 1 Dec
+ 2025 01:53:47 -0600
+From: Alexey Kardashevskiy <aik@amd.com>
+To: <linux-crypto@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, Ashish Kalra <ashish.kalra@amd.com>, "Tom
+ Lendacky" <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>,
+	"Herbert Xu" <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, Dan Williams <dan.j.williams@intel.com>, "Borislav
+ Petkov (AMD)" <bp@alien8.de>, Alexey Kardashevskiy <aik@amd.com>,
+	<linux-coco@lists.linux.dev>, Srikanth Aithal <Srikanth.Aithal@amd.com>
+Subject: [PATCH kernel] crypto/ccp: Fix no-TSM build in SEV-TIO PCIe IDE
+Date: Mon, 1 Dec 2025 18:52:57 +1100
+Message-ID: <20251201075257.484492-1-aik@amd.com>
+X-Mailer: git-send-email 2.51.1
+In-Reply-To: <https://lore.kernel.org/r/ffbe5f5f-48c6-42b0-9f62-36fb0a4f67ab@amd.com>
+References: <https://lore.kernel.org/r/ffbe5f5f-48c6-42b0-9f62-36fb0a4f67ab@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?B?RndkOiBbUkVHUkVTU0lPTl0gbmV4dC9tYXN0ZXI6IChidWlsZCkg4oCY?=
- =?UTF-8?Q?sev=5Ftio=5Fpresent=E2=80=99_defined_but_not_used_=5B-Werror=3Dun?=
- =?UTF-8?Q?used-function=5D_i=2E=2E=2E?=
-References: <176456514339.2642.17409010068566138864@1ece3ece63ba>
-Content-Language: en-US
-To: Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc: Ashish Kalra <ashish.kalra@amd.com>,
- Tom Lendacky <thomas.lendacky@amd.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <176456514339.2642.17409010068566138864@1ece3ece63ba>
-X-Forwarded-Message-Id: <176456514339.2642.17409010068566138864@1ece3ece63ba>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Bad-Reply: References and In-Reply-To but no 'Re:' in Subject.
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF00021F6F:EE_|CH3PR12MB8281:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6692ac3e-f466-420f-dab6-08de30aec65f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?HPAT7qou3rHXEzAx/92eEjZ7WwPUHdL7okOBDObFxA/lx4PogXDg/HrxxsFU?=
+ =?us-ascii?Q?o+LtrMezGJ4M4J14QjE0/T8GzAtyLNiB7b5GN24Kxnz+fzUnJ87o7ulS1O4w?=
+ =?us-ascii?Q?sz/UWob9jZ8e+HmkcxVrMmvDZyPjhpxnzWtL0OvDI1+sgtjR6ac1xCNiLGIC?=
+ =?us-ascii?Q?96/MhYaAJEP2FC+y+M9cbHrfTF7Fg4Kelzz61s3+mvInGDFaTUIxZoJHGyQ4?=
+ =?us-ascii?Q?GzXxgWm1A1Yw7Shp2lv46geMWsi84DAA8hKJl14W2g5OmgNWvm5eFEQz+/bB?=
+ =?us-ascii?Q?5rpSL1ctFZFocnUo/Bx3dKMxBGgd/HcNL6W3WIp8BF9VZcoDkAZBccPcXuM1?=
+ =?us-ascii?Q?CHssUCTZR6mW/hRfiVVD/af182TL1p3yApJ6p5OYSoqhwmKTVfRdRVpJQYGV?=
+ =?us-ascii?Q?wac47pFZxQaDkVm/hIlc3QD679Ephzou0p4ecemiRjJzh4HRYqifbSvtKDC7?=
+ =?us-ascii?Q?I8dS1pAnYlt48kc5BgjqqycR6t+ZSNMnFlVoO+2WclsqZITGFgzPnEBtEmzs?=
+ =?us-ascii?Q?4VsRHnUl8rEa4AzAujBqQpjI9gfP+sMNeh+y3POoFJECTl9nfiHX2H3m3pDC?=
+ =?us-ascii?Q?PVhht34oMdg5UbXpwsrsPBMPD4tyepgZr/4WtWHD7qROtPQECByqCRgrjFyV?=
+ =?us-ascii?Q?hw8HSW887DxFQp4wYDhrOUi5W6DGO4ZlzO1MclqJdLW7EhLY0QATAtp7Ae6w?=
+ =?us-ascii?Q?U4Bspb3nz7crO5kd5zk9EYE88JGoNP3Unh7814z3Ilhmzzv88Bh+o3HnILKN?=
+ =?us-ascii?Q?EifPA5pVgJgB3eBxUsM5qSrQosDjcyV8wo+LKLsFd4vhtfst3QHqWMXvk2GT?=
+ =?us-ascii?Q?CznOhe6HuKr1njAAEFkRJYpx4wGvb3r2Mk5VdDU4uUn7i2gG5B1AoPuJrOuE?=
+ =?us-ascii?Q?EEMungX0BqRzAUDGocW1D1y4yMaz2yacue8DdhxWWtYFWS4La3RP/ORI7W/O?=
+ =?us-ascii?Q?BWt4PFhsA+/nUQIIkGnJMKtLudTQiSDm6LSo3s2ftdgIk7PvMBQhm2gd7115?=
+ =?us-ascii?Q?yoqDDdp+FaT7LYDorEuuqNzxgfZqteks54xX+sp5TV1hn3RgW5LtjUuFfF5T?=
+ =?us-ascii?Q?DJ80anndy5wVFjwxigr5Y7csSWk4kXHg0X3jF7QtXYew1trKe56BTi48fXX0?=
+ =?us-ascii?Q?8IMxuLUBhIAQHrD6m3SVTqC+3JJIOpMpRMQI6DVLk0yChBkpcD2HyDpXay1t?=
+ =?us-ascii?Q?RkKBNM40WlIsU3bp9Ae6+VXHXYBwBuUff+d8rvlNeq21P0qrmHmwsHxPBe/u?=
+ =?us-ascii?Q?R9R5mq/a9VU4Ug0QCy/2yr3Qv48dEIYcui0Wdo8qWtzgAaUmjW4msLbRhsRE?=
+ =?us-ascii?Q?+LV1ErKbJjUWDIftzaOMEACmv8qCeGXoIilkYDJXHDcoojg1YnUwXccdBngY?=
+ =?us-ascii?Q?FjNPS1yBMRY6YpeGAmAzJ+AevJ4qkNydLMfER5gBjhamRyp1G7K1PlEFAuak?=
+ =?us-ascii?Q?BxbjfaCOCW+2AG0CDG8HxBhikDEL5x1hgxHYhP5hNvsKKQxheucyAITuE+rB?=
+ =?us-ascii?Q?rtVv0RkMpUKqI4+TYA8RK5UMCG3ND6IQ4fzCNauDkQoqsb2IwRBu/OSdtJA8?=
+ =?us-ascii?Q?Sav8ljKd1MlDV0k/H0s=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2025 07:53:54.3365
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6692ac3e-f466-420f-dab6-08de30aec65f
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF00021F6F.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8281
 
+Here are some cleanups for disable TSM+IDE.
 
-I haven't looked at the kernel config, but it must be when
-CONFIG_PCI_TSM is not set/enabled.
-
-
--------- Forwarded Message --------
-Subject: [REGRESSION] next/master: (build) ‘sev_tio_present’ defined but not used [-Werror=unused-function] i...
-Date: Mon, 01 Dec 2025 04:59:03 -0000
-From: KernelCI bot <bot@kernelci.org>
-Reply-To: kernelci@lists.linux.dev
-To: kernelci-results@groups.io
-CC: regressions@lists.linux.dev, gus@collabora.com, linux-next@vger.kernel.org
-
-
-
-
-
-Hello,
-
-New build issue found on next/master:
-
+Fixes: 3532f6154971 ("crypto/ccp: Implement SEV-TIO PCIe IDE (phase1)")
+Reported-by: Srikanth Aithal <Srikanth.Aithal@amd.com>
+Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
 ---
- ‘sev_tio_present’ defined but not used [-Werror=unused-function] in drivers/crypto/ccp/sev-dev.o (drivers/crypto/ccp/sev-dev.c) [logspec:kbuild,kbuild.compiler.error]
+
+Better be just squashed into 3532f6154971 while it is in the next.
 ---
+ drivers/crypto/ccp/sev-dev-tio.h | 12 ------------
+ drivers/crypto/ccp/sev-dev.h     |  8 ++++++++
+ drivers/crypto/ccp/sev-dev.c     | 12 ++++--------
+ 3 files changed, 12 insertions(+), 20 deletions(-)
 
-- dashboard: https://d.kernelci.org/i/maestro:ce1c65862af14252fd16691d2f1397e0a5827d32
-- giturl: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
-- commit HEAD:  95cb2fd6ce0ad61af54191fe5ef271d7177f9c3a
-- tags: next-20251201
-
-Please include the KernelCI tag when submitting a fix:
-
-Reported-by: kernelci.org bot <bot@kernelci.org>
-
-
-Log excerpt:
-=====================================================
-drivers/crypto/ccp/sev-dev.c:1361:13: error: ‘sev_tio_present’ defined but not used [-Werror=unused-function]
- 1361 | static bool sev_tio_present(struct sev_device *sev)
-      |             ^~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-  AR      drivers/firmware/psci/built-in.a
-  CC      drivers/crypto/ccp/tee-dev.o
-
-=====================================================
-
-
-# Builds where the incident occurred:
-
-## cros://chromeos-6.12/x86_64/chromeos-amd-stoneyridge.flavour.config+lab-setup+x86-board+CONFIG_MODULE_COMPRESS=n+CONFIG_MODULE_COMPRESS_NONE=y on (x86_64):
-- compiler: gcc-14
-- config: https://files.kernelci.org/kbuild-gcc-14-x86-chromeos-amd-692d0f81f5b8743b1f6e0fde/.config
-- dashboard: https://d.kernelci.org/build/maestro:692d0f81f5b8743b1f6e0fde
-
-
-#kernelci issue maestro:ce1c65862af14252fd16691d2f1397e0a5827d32
-
---
-This is an experimental report format. Please send feedback in!
-Talk to us at kernelci@lists.linux.dev
-
-Made with love by the KernelCI team - https://kernelci.org
-
-
+diff --git a/drivers/crypto/ccp/sev-dev-tio.h b/drivers/crypto/ccp/sev-dev-tio.h
+index 7c42351210ef..71f232a2b08b 100644
+--- a/drivers/crypto/ccp/sev-dev-tio.h
++++ b/drivers/crypto/ccp/sev-dev-tio.h
+@@ -7,8 +7,6 @@
+ #include <linux/pci-ide.h>
+ #include <uapi/linux/psp-sev.h>
+ 
+-#if defined(CONFIG_CRYPTO_DEV_SP_PSP)
+-
+ struct sla_addr_t {
+ 	union {
+ 		u64 sla;
+@@ -129,14 +127,4 @@ int sev_tio_dev_connect(struct tsm_dsm_tio *dev_data, u8 tc_mask, u8 ids[8], u8
+ int sev_tio_dev_disconnect(struct tsm_dsm_tio *dev_data, bool force);
+ int sev_tio_dev_reclaim(struct tsm_dsm_tio *dev_data);
+ 
+-#endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
+-
+-#if defined(CONFIG_PCI_TSM)
+-void sev_tsm_init_locked(struct sev_device *sev, void *tio_status_page);
+-void sev_tsm_uninit(struct sev_device *sev);
+-int sev_tio_cmd_buffer_len(int cmd);
+-#else
+-static inline int sev_tio_cmd_buffer_len(int cmd) { return 0; }
+-#endif
+-
+ #endif	/* __PSP_SEV_TIO_H__ */
+diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+index dced4a8e9f01..d3e506206dbd 100644
+--- a/drivers/crypto/ccp/sev-dev.h
++++ b/drivers/crypto/ccp/sev-dev.h
+@@ -81,4 +81,12 @@ void sev_pci_exit(void);
+ struct page *snp_alloc_hv_fixed_pages(unsigned int num_2mb_pages);
+ void snp_free_hv_fixed_pages(struct page *page);
+ 
++#if defined(CONFIG_PCI_TSM)
++void sev_tsm_init_locked(struct sev_device *sev, void *tio_status_page);
++void sev_tsm_uninit(struct sev_device *sev);
++int sev_tio_cmd_buffer_len(int cmd);
++#else
++static inline int sev_tio_cmd_buffer_len(int cmd) { return 0; }
++#endif
++
+ #endif /* __SEV_DEV_H */
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 365867f381e9..67ea9b30159a 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -38,7 +38,6 @@
+ 
+ #include "psp-dev.h"
+ #include "sev-dev.h"
+-#include "sev-dev-tio.h"
+ 
+ #define DEVICE_NAME		"sev"
+ #define SEV_FW_FILE		"amd/sev.fw"
+@@ -1365,11 +1364,6 @@ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+ 	return 0;
+ }
+ 
+-static bool sev_tio_present(struct sev_device *sev)
+-{
+-	return (sev->snp_feat_info_0.ebx & SNP_SEV_TIO_SUPPORTED) != 0;
+-}
+-
+ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+ {
+ 	struct psp_device *psp = psp_master;
+@@ -1448,10 +1442,12 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+ 		data.list_paddr = __psp_pa(snp_range_list);
+ 
+ #if defined(CONFIG_PCI_TSM)
+-		data.tio_en = sev_tio_present(sev) &&
++		bool tio_supp = !!(sev->snp_feat_info_0.ebx & SNP_SEV_TIO_SUPPORTED);
++
++		data.tio_en = tio_supp &&
+ 			sev_tio_enabled && psp_init_on_probe &&
+ 			amd_iommu_sev_tio_supported();
+-		if (sev_tio_present(sev) && !psp_init_on_probe)
++		if (tio_supp && !psp_init_on_probe)
+ 			dev_warn(sev->dev, "SEV-TIO as incompatible with psp_init_on_probe=0\n");
+ #endif
+ 		cmd = SEV_CMD_SNP_INIT_EX;
 -- 
-~Randy
+2.51.1
+
