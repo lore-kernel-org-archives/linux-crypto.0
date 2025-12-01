@@ -1,251 +1,402 @@
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011016.outbound.protection.outlook.com [52.101.52.16])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B943523EABC;
-	Mon,  1 Dec 2025 08:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764576552; cv=fail; b=Xf5EBtCso4PrkOhqnafOt3MYReW2cVIdaTRD8KJQEbM2lUCtAdcSJCw1bMR5LNX25lgt9KmCHmKRCedGCDfyINQrNnoUoN52JPWrmj4Owp4tCbPfqYXpQ0v7QOj4IRlk2plHXZSZPi0xc/2OD+p9+Pr5QwvVk7HwoAmFJRk9+Bw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764576552; c=relaxed/simple;
-	bh=MbyYoq9t/SHXhsBMtgpJICZNP/lke8FhXaGV4DNYHPY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hL1fru7vF5INS5n3cL7VTEVpOWEAAWArgMm2XtouuWU0o2+PHrqBvwNTx1cV3UevugmOoPJs6y91SQrlMPIkvAh77Xp4NcYL9bl3mJuw5ZbBkLLD/vIw3cQyugZhPKLO9ts3OaidDU0fY1AJQVUYNnT6wgXi+JhjXkvrTg9P0t8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WFQnFF77; arc=fail smtp.client-ip=52.101.52.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77E128F5;
+	Mon,  1 Dec 2025 10:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764584199; cv=none; b=jRL+ja4spAteG5GDYDzzGc6mYPKLNUOduyDjMQ0br90RyyJiKhip8XFllZuxtbnCHAAN4zHZrXqNUNOavIazOVqQQAoSwL8nL++bdz444ehD4uUAxk8GdmuaLvB5zOWJ8XjGTQenZDeB2OGwwurM8+fC9gXnVaM/5tZJjSUtLbk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764584199; c=relaxed/simple;
+	bh=ym5O4vs3mIZONJWFDYfrqUMtb2wccjKFQ9GXWvCl3Uc=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=LXGeu0XGL7EC9e/cUm6BzwIZnB/lIZRoq0BhW7ItS+PB+Cr9Rw42NhYSXkdrk8JTpGYrru0gT5laMLBCi1LYJg0ETxnwyU11e0ySEMt0jNKUChJ7rW60PYuF6tV5vvMG2hl7Efy7VdQTt3P1AhLr49yIPGxOS8hTmPaIlfACxjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=cPqePVYe; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WFQnFF77"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=d1pHk2joQc7HsdtqUtcDZytsEk5nA/bR65Q8grkCsnZ4xRYc4g2RzbduA+8Lm+a6JmM/BQFkJ9Y0TIorOTT5Z6e72dF/pKT8gzwrmpzYDrVMzpnfmz0Z8WTLG32g1y8Rx5U3l2jtGFi1e7LV0TqKDUdotnPZhXDbBM2VWuf8EA9XWwQj6kQ/O4tuQyQVjkcOeN91Iis88OF6zeCqr8D/TZsb3/jKF6dxkTiPZPCR4/9w0xdXVUvugXG1tsQs9d724nFLa/8kCUQEc+EKzrqQDeIBAy8BvHA76NRAMmluMRWlW5ssgx/gHDvxLbHw7QzBZ1wI+uWoBsjVT+yFc0w36w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U8lVEtSR7h1/vIVih+UgDpEs8qcLr1iuUQkJ9hbjaZQ=;
- b=bW99wI3xF9dDHyLq9qL77t4OBLPV5eL7qgcPd4imbLpAxMjdy06ewwEdw2kB7cMwOC2AykjHXXVhEsSwtwgs9VSl532e2LKyOrcxvLOi/T7yUza+kI7Q+5bZz3SWbPCH2aJEotPN6Frz1Idty1REGFNgQkKWRQr1eNlRBT09dcHCw6dLkBsnteSUHzuLrA4zOL1myaF4Yd3e5krIjAiY7wujjiVEYlXnYs+jg5JYHrI6IsHaan452TGJW1vajk6pmKsHGOL9g+fNV9lhUe7SspUIwPe/aRe/qgXd45EgAGKPVfOlafXUER/2VJYKuS2XmFW9r2ybg0Kq8rj3sN53Zg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U8lVEtSR7h1/vIVih+UgDpEs8qcLr1iuUQkJ9hbjaZQ=;
- b=WFQnFF77yAnrk7kBIykWrNpRhRok6bHm9GWyHDCDytmILQu21VR6Izwn5gTIoVR8X3ERGPuIRMppGwEkcf9bGHuxm79lcL2UYDwt7aUR7+UmfqhjX8R0zPtCCPuL3KewTNkJKH3sF2FslrffK9wROjR+CiFx7suo+y4OjRqGuMQ=
-Received: from SJ0PR05CA0142.namprd05.prod.outlook.com (2603:10b6:a03:33d::27)
- by CY8PR12MB7290.namprd12.prod.outlook.com (2603:10b6:930:55::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Mon, 1 Dec
- 2025 08:09:06 +0000
-Received: from MWH0EPF000971E5.namprd02.prod.outlook.com
- (2603:10b6:a03:33d:cafe::a6) by SJ0PR05CA0142.outlook.office365.com
- (2603:10b6:a03:33d::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9388.9 via Frontend Transport; Mon, 1
- Dec 2025 08:08:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
-Received: from satlexmb08.amd.com (165.204.84.17) by
- MWH0EPF000971E5.mail.protection.outlook.com (10.167.243.73) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9388.8 via Frontend Transport; Mon, 1 Dec 2025 08:09:05 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Mon, 1 Dec
- 2025 02:09:05 -0600
-Received: from satlexmb08.amd.com (10.181.42.217) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 1 Dec
- 2025 02:09:05 -0600
-Received: from [172.31.185.117] (10.180.168.240) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Mon, 1 Dec 2025 00:09:01 -0800
-Message-ID: <1e930d39-164a-4ec3-9452-b8d084dfb133@amd.com>
-Date: Mon, 1 Dec 2025 13:39:00 +0530
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="cPqePVYe"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
+	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
+	references:reply-to; bh=NiTft28qzxGX1QOGSM8soqTvs10q6YaqGGJb9hDzLhk=; b=cPqeP
+	VYeddeqTLpsDQdUwqrb339zIYFX1on04f0HUhK2wSf+Ojh0s/+ZCSPsCjQu13DnqPnd1ReRMoctS3
+	aXxU+iRfaPyTPpvBRXlAGa/OmcxvAQID7fzq6dJ/LCt1yHFNKb4+sEE7cgZwaBqwwpK8TS/FGxUwe
+	5XlO5RnSGC0oaBrHSMq29Xm+0f02JshJtLF8merjz5dVJOhoxMF1abJ6156q7b1SxiwDRjkycgQWi
+	oC5IBHdaoiic8ogaeK3yMDkA2AWy1AMNCWNX1Ckv1UUft33UPcY7n2KqRe9qO0KO9IP5D80MzDh3X
+	/eq3J6/7fo163iapDDyBY1f0RnexA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vQ0x8-007BGT-2r;
+	Mon, 01 Dec 2025 18:16:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 01 Dec 2025 18:16:18 +0800
+Date: Mon, 1 Dec 2025 18:16:18 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Update for 6.19
+Message-ID: <aS1q8uJfxD8lTuLH@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kernel] crypto/ccp: Fix no-TSM build in SEV-TIO PCIe IDE
-To: Alexey Kardashevskiy <aik@amd.com>, <linux-crypto@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, Ashish Kalra <ashish.kalra@amd.com>, "Tom
- Lendacky" <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, Herbert
- Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
-	Dan Williams <dan.j.williams@intel.com>, "Borislav Petkov (AMD)"
-	<bp@alien8.de>, <linux-coco@lists.linux.dev>, Srikanth Aithal
-	<Srikanth.Aithal@amd.com>
-References: <https://lore.kernel.org/r/ffbe5f5f-48c6-42b0-9f62-36fb0a4f67ab@amd.com>
- <20251201075257.484492-1-aik@amd.com>
-Content-Language: en-US
-From: "Aithal, Srikanth" <sraithal@amd.com>
-In-Reply-To: <20251201075257.484492-1-aik@amd.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: None (SATLEXMB04.amd.com: sraithal@amd.com does not designate
- permitted sender hosts)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E5:EE_|CY8PR12MB7290:EE_
-X-MS-Office365-Filtering-Correlation-Id: 90ccafe5-7443-40a6-bdfd-08de30b0e5b3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UXZTQ2hRTDE0a3pkQVhveEptV1FOUXAxNDh2bEZOZUIzTHpEVEYvQm1nd2p4?=
- =?utf-8?B?L0dCeWhUeWFWMncvVnBNSXBCSEdFSlRaMlMwdTJaem0ya25EQk1VVlIwV3RK?=
- =?utf-8?B?U3VXNFA3TTFVOEs1TWc1bVNLK3Jac1JaY29jdG5FOVdMcVhTeE55RzhoeUFk?=
- =?utf-8?B?UGI5QmJsNy9ucFdibGszN29LTzJFZXJkTEFWMkx3cGw2UHFTNnhwMGZmOWVT?=
- =?utf-8?B?VjQ2WVB1RVdqQzl0UkdmZW1TWmFMcWNmTHl6c1FsYlhOVE5iUmdzVVBHSXVZ?=
- =?utf-8?B?SENoSW9qZDNRL0NhcDJMRzdJaUZQNEtiQSttUEpCMjdCUVBrcFp4RzJEZjlN?=
- =?utf-8?B?N1loRExUSVlzMjVXSGZibkcyUmJBQlI1Z2tQMXlkbkkxRDllMjUwZGxZMUM1?=
- =?utf-8?B?TVBUZy9qTGtxN0lielBTaFl0eVdyTFpGeWRhSzFBTE5ZNmZKVVdpQ0I3MkN5?=
- =?utf-8?B?QUtycTY0MlVOTitnSUx1RFBYamVKUHF0NkppWVJyUlRpWjE0emZkbk1vVFBK?=
- =?utf-8?B?WkkxWEJjZzZrNWxsQ2xVbUJxZ1h3NmY5by9tZEo2K3ZJVlB0c0h5bFN2RWx3?=
- =?utf-8?B?VHVadnh6M1VTMGlHTjN1M0FWcGJ3V0VVY0ovNHFJWXNBRkRxMkRwc0g0NnRV?=
- =?utf-8?B?T0x4NTdUaDEyNENJVmFza0hkMnVzMURBZnhxYkwzdWhxSjdQb3E5bFhkNmZr?=
- =?utf-8?B?NDlJaG5hSUF1RHRPREdobWxqczQzaTV1VWVsdW5qdmxBTkhhcFB1YUQxZTQ3?=
- =?utf-8?B?THAxdW9aYXN4V1JhbjhuQ3dKUlA5OUxObHdTWGs0TExTaEQvMkFSQUNKNUxF?=
- =?utf-8?B?Z0NmTHlsdzlaNjQxNDRXTVZsekx5N2pIWm5PUjgyZ2RldThpRXpnM204eVhP?=
- =?utf-8?B?dEVnQXVpVUUzSmZUdmVlVlRQc3M5L3d4eDF2eXp0WDhKL3A5SEkwVUlVelJF?=
- =?utf-8?B?VllROFp4YmlWTW5jTzhkcURvaGRheGpBWjZhQThnK2Q2WENZeFdoa0YxUmN0?=
- =?utf-8?B?SmUxRHJ3UHBxNDNSV0g1MEFVVjQ0OUxEVktvSnBIRVNZbm9oRjY5MUJ5OWJk?=
- =?utf-8?B?aEp4ZnpZUWRHNmxZeEt5M3haVjB0dHNleGR3Sk5qUEg1aHRjajhieENrQ1ly?=
- =?utf-8?B?RVJTRlZWQ0dydUxiQzZ3ZzhCMDZJc2lXeGFKeHNhTDRqbGp3OTgzMnRiZE52?=
- =?utf-8?B?OGtNRGZISkhWQ0VlSE9GUkpyTitETjZxdklYenhtS1R6ZkQvUENhZmFkc21S?=
- =?utf-8?B?T0pMRkNrZHB4SEw0a2RMNHJTQ09WSG9yT1BYYjYwM1I5QUQ5NFlCbnBEamYz?=
- =?utf-8?B?QUM5QVhIV3VxMzlRVUo5R3JaSDZSc1FFdTlWcXA5K0J2VVowak84YUgwS3FN?=
- =?utf-8?B?aGNlZndOd29jWVFQbWZyNEx2SVlJaGhIWS9ML2NNaWpISm9PNmQzMVRFVjFs?=
- =?utf-8?B?OVpRL1cwUFNwbGx6T2NXR3ZvZjVlNjNwUTM5b0hRYjBpYnpUMlp5OGhock9L?=
- =?utf-8?B?OVdHdFV3eVpmWHJRVkJ5VUxVaUtzSFBhcDU4VWdXWVA3MmZPQjYwdlA0WFVo?=
- =?utf-8?B?WmU0SnpZRVlWQStyQ3JuVGhCUkhDQUJjNG1qU21Da0RyRU5PM3JnbkptQTBX?=
- =?utf-8?B?ZUtaNS9XSzJXSS9MVS9aM3pHYmp1aVpCQjEyYVpTakEyK1BpL3JiYVorK3Nv?=
- =?utf-8?B?bHlJRUZlTU9uWTMwSE43VStZRGplQjRQT1JYYWtHOVhuY1RpOU5Nd0tlRHFT?=
- =?utf-8?B?LzdNOEVpTmJOVzRrYk5nQ1RtRG9nOEhBZGNENEZ5TVJ5K2x5QUFOaW9qbm40?=
- =?utf-8?B?RzZsNmJ2VEFjVEYwamdLS0JKMGFDTWNIS1RISWdMRjlOWTdmRHJMeGVmWnBl?=
- =?utf-8?B?RW1QMTNzTFZpMENTb3RrbDU1OE5uS2FvcU56dDRkVU1PTVNVQUJmSTVCTUtH?=
- =?utf-8?B?ZUpXQmJJcmhycGxwWXAyeE93VEJyblRySm42M2NsUVhMTEV3cHVCV2p5UHdi?=
- =?utf-8?B?TzdVR3VzZURIbjhmdUF4TUh2cG9ZYWVRNGJESkpFZ0RIZ2xpd2J3cWVwZ1V5?=
- =?utf-8?B?emdUZUtyVENUZ0poZ0J0TVgxcEYrbjA1akNGVkRUSWdvMlJuRXNGRFlJdzho?=
- =?utf-8?Q?RU3A=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2025 08:09:05.7998
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 90ccafe5-7443-40a6-bdfd-08de30b0e5b3
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E5.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7290
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 12/1/2025 1:22 PM, Alexey Kardashevskiy wrote:
-> Here are some cleanups for disable TSM+IDE.
-> 
-> Fixes: 3532f6154971 ("crypto/ccp: Implement SEV-TIO PCIe IDE (phase1)")
-> Reported-by: Srikanth Aithal <Srikanth.Aithal@amd.com>
-> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-> ---
-> 
-> Better be just squashed into 3532f6154971 while it is in the next.
-> ---
->   drivers/crypto/ccp/sev-dev-tio.h | 12 ------------
->   drivers/crypto/ccp/sev-dev.h     |  8 ++++++++
->   drivers/crypto/ccp/sev-dev.c     | 12 ++++--------
->   3 files changed, 12 insertions(+), 20 deletions(-)
-> 
-> diff --git a/drivers/crypto/ccp/sev-dev-tio.h b/drivers/crypto/ccp/sev-dev-tio.h
-> index 7c42351210ef..71f232a2b08b 100644
-> --- a/drivers/crypto/ccp/sev-dev-tio.h
-> +++ b/drivers/crypto/ccp/sev-dev-tio.h
-> @@ -7,8 +7,6 @@
->   #include <linux/pci-ide.h>
->   #include <uapi/linux/psp-sev.h>
->   
-> -#if defined(CONFIG_CRYPTO_DEV_SP_PSP)
-> -
->   struct sla_addr_t {
->   	union {
->   		u64 sla;
-> @@ -129,14 +127,4 @@ int sev_tio_dev_connect(struct tsm_dsm_tio *dev_data, u8 tc_mask, u8 ids[8], u8
->   int sev_tio_dev_disconnect(struct tsm_dsm_tio *dev_data, bool force);
->   int sev_tio_dev_reclaim(struct tsm_dsm_tio *dev_data);
->   
-> -#endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
-> -
-> -#if defined(CONFIG_PCI_TSM)
-> -void sev_tsm_init_locked(struct sev_device *sev, void *tio_status_page);
-> -void sev_tsm_uninit(struct sev_device *sev);
-> -int sev_tio_cmd_buffer_len(int cmd);
-> -#else
-> -static inline int sev_tio_cmd_buffer_len(int cmd) { return 0; }
-> -#endif
-> -
->   #endif	/* __PSP_SEV_TIO_H__ */
-> diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
-> index dced4a8e9f01..d3e506206dbd 100644
-> --- a/drivers/crypto/ccp/sev-dev.h
-> +++ b/drivers/crypto/ccp/sev-dev.h
-> @@ -81,4 +81,12 @@ void sev_pci_exit(void);
->   struct page *snp_alloc_hv_fixed_pages(unsigned int num_2mb_pages);
->   void snp_free_hv_fixed_pages(struct page *page);
->   
-> +#if defined(CONFIG_PCI_TSM)
-> +void sev_tsm_init_locked(struct sev_device *sev, void *tio_status_page);
-> +void sev_tsm_uninit(struct sev_device *sev);
-> +int sev_tio_cmd_buffer_len(int cmd);
-> +#else
-> +static inline int sev_tio_cmd_buffer_len(int cmd) { return 0; }
-> +#endif
-> +
->   #endif /* __SEV_DEV_H */
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 365867f381e9..67ea9b30159a 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -38,7 +38,6 @@
->   
->   #include "psp-dev.h"
->   #include "sev-dev.h"
-> -#include "sev-dev-tio.h"
->   
->   #define DEVICE_NAME		"sev"
->   #define SEV_FW_FILE		"amd/sev.fw"
-> @@ -1365,11 +1364,6 @@ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
->   	return 0;
->   }
->   
-> -static bool sev_tio_present(struct sev_device *sev)
-> -{
-> -	return (sev->snp_feat_info_0.ebx & SNP_SEV_TIO_SUPPORTED) != 0;
-> -}
-> -
->   static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
->   {
->   	struct psp_device *psp = psp_master;
-> @@ -1448,10 +1442,12 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
->   		data.list_paddr = __psp_pa(snp_range_list);
->   
->   #if defined(CONFIG_PCI_TSM)
-> -		data.tio_en = sev_tio_present(sev) &&
-> +		bool tio_supp = !!(sev->snp_feat_info_0.ebx & SNP_SEV_TIO_SUPPORTED);
-> +
-> +		data.tio_en = tio_supp &&
->   			sev_tio_enabled && psp_init_on_probe &&
->   			amd_iommu_sev_tio_supported();
-> -		if (sev_tio_present(sev) && !psp_init_on_probe)
-> +		if (tio_supp && !psp_init_on_probe)
->   			dev_warn(sev->dev, "SEV-TIO as incompatible with psp_init_on_probe=0\n");
->   #endif
->   		cmd = SEV_CMD_SNP_INIT_EX;
+Hi Linus:
 
-This fixes the issue. Thank you.
-Tested-by: Srikanth Aithal <Srikanth.Aithal@amd.com>
+The following changes since commit 3a8660878839faadb4f1a6dd72c3179c1df56787:
+
+  Linux 6.18-rc1 (2025-10-12 13:42:36 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.19-p1
+
+for you to fetch changes up to 48bc9da3c97c15f1ea24934bcb3b736acd30163d:
+
+  crypto: zstd - fix double-free in per-CPU stream cleanup (2025-12-01 18:05:07 +0800)
+
+----------------------------------------------------------------
+This update includes the following changes:
+
+API:
+
+- Rewrite memcpy_sglist from scratch.
+- Add on-stack AEAD request allocation.
+- Fix partial block processing in ahash.
+
+Algorithms:
+
+- Remove ansi_cprng.
+- Remove tcrypt tests for poly1305.
+- Fix EINPROGRESS processing in authenc.
+- Fix double-free in zstd.
+
+Drivers:
+
+- Use drbg ctr helper when reseeding xilinx-trng.
+- Add support for PCI device 0x115A to ccp.
+- Add support of paes in caam.
+- Add support for aes-xts in dthev2.
+
+Others:
+
+- Use likely in rhashtable lookup.
+- Fix lockdep false-positive in padata by removing a helper.
+----------------------------------------------------------------
+
+Ally Heev (1):
+      crypto: asymmetric_keys - fix uninitialized pointers with free attribute
+
+Bjorn Andersson (1):
+      crypto: qce - Provide dev_err_probe() status on DMA failure
+
+David Laight (4):
+      crypto: aesni - ctr_crypt() use min() instead of min_t()
+      hwrng: core - use min3() instead of nested min_t()
+      crypto: ccp - use min() instead of min_t()
+      crypto: lib/mpi - use min() instead of min_t()
+
+Eric Biggers (4):
+      crypto: ansi_cprng - Remove unused ansi_cprng algorithm
+      crypto: tcrypt - Remove unused poly1305 support
+      crypto: scatterwalk - Fix memcpy_sglist() to always succeed
+      Revert "crypto: scatterwalk - Move skcipher walk and use it for memcpy_sglist"
+
+Gaurav Kashyap (4):
+      dt-bindings: crypto: qcom,inline-crypto-engine: Document the kaanapali ICE
+      dt-bindings: crypto: qcom,prng: Document kaanapali RNG
+      dt-bindings: crypto: qcom-qce: Document the kaanapli crypto engine
+      crypto: qce - fix version check
+
+Giovanni Cabiddu (1):
+      crypto: zstd - fix double-free in per-CPU stream cleanup
+
+Gopi Krishna Menon (1):
+      docs: trusted-encrypted: fix htmldocs build error
+
+Guangshuo Li (1):
+      crypto: caam - Add check for kcalloc() in test_len()
+
+Gustavo A. R. Silva (1):
+      KEYS: Avoid -Wflex-array-member-not-at-end warning
+
+Haotian Zhang (2):
+      crypto: starfive - Correctly handle return of sg_nents_for_len
+      crypto: ccree - Correctly handle return of sg_nents_for_len
+
+Harsh Jain (4):
+      crypto: drbg - Export CTR DRBG DF functions
+      crypto: drbg - Replace AES cipher calls with library calls
+      crypto: xilinx-trng - Add CTR_DRBG DF processing of seed
+      crypto: xilinx - Use %pe to print PTR_ERR
+
+Herbert Xu (6):
+      crypto: authenc - Correctly pass EINPROGRESS back up to the caller
+      crypto: sun8i-ss - Move j init earlier in sun8i_ss_hash_run
+      KEYS: trusted: Pass argument by pointer in dump_options
+      crypto: drbg - Delete unused ctx from struct sdesc
+      crypto: ahash - Fix crypto_ahash_import with partial block data
+      crypto: ahash - Zero positive err value in ahash_update_finish
+
+Jonathan McDowell (1):
+      hwrng: core - Allow runtime disabling of the HW RNG
+
+Kael D'Alcamo (1):
+      dt-bindings: rng: microchip,pic32-rng: convert to DT schema
+
+Kanchana P Sridhar (1):
+      crypto: iaa - Request to add Kanchana P Sridhar to Maintainers.
+
+Karina Yankevich (2):
+      crypto: drbg - make drbg_{ctr_bcc,kcapi_sym}() return *void*
+      crypto: rockchip - drop redundant crypto_skcipher_ivsize() calls
+
+Krzysztof Kozlowski (6):
+      hwrng: bcm2835 - Move MODULE_DEVICE_TABLE() to table definition
+      hwrng: bcm2835 - Simplify with of_device_get_match_data()
+      crypto: artpec6 - Simplify with of_device_get_match_data()
+      crypto: ccp - Constify 'dev_vdata' member
+      crypto: ccp - Simplify with of_device_get_match_data()
+      crypto: cesa - Simplify with of_device_get_match_data()
+
+Marco Crivellari (3):
+      crypto: atmel-i2c - add WQ_PERCPU to alloc_workqueue users
+      crypto: cavium/nitrox - add WQ_PERCPU to alloc_workqueue users
+      crypto: qat - add WQ_PERCPU to alloc_workqueue users
+
+Mario Limonciello (AMD) (1):
+      crypto: ccp - Add support for PCI device 0x115A
+
+Meenakshi Aggarwal (3):
+      docs: trusted-encrypted: trusted-keys as protected keys
+      KEYS: trusted: caam based protected key
+      crypto: caam - Add support of paes algorithm
+
+Menglong Dong (1):
+      rhashtable: use likely for rhashtable lookup
+
+Rob Herring (Arm) (1):
+      dt-bindings: crypto: amd,ccp-seattle-v1a: Allow 'iommus' property
+
+Shivani Agarwal (1):
+      crypto: af_alg - zero initialize memory allocated via sock_kmalloc
+
+T Pratham (3):
+      crypto: aead - Fix reqsize handling
+      crypto: aead - Add support for on-stack AEAD req allocation
+      crypto: ti - Add support for AES-XTS in DTHEv2 driver
+
+Tetsuo Handa (1):
+      padata: remove __padata_list_init()
+
+Thorsten Blum (10):
+      crypto: fips - replace simple_strtol with kstrtoint to improve fips_enable
+      crypto: hifn_795x - replace simple_strtoul with kstrtouint
+      crypto: asymmetric_keys - prevent overflow in asymmetric_key_generate_id
+      keys: Annotate struct asymmetric_key_id with __counted_by
+      crypto: qat - use simple_strtoull to improve qat_uclo_parse_num
+      crypto: deflate - Use struct_size to improve deflate_alloc_stream
+      crypto: octeontx2 - Replace deprecated strcpy in cpt_ucode_load_fw
+      crypto: zstd - Annotate struct zstd_ctx with __counted_by
+      crypto: zstd - Remove unnecessary size_t cast
+      crypto: testmgr - Add missing DES weak and semi-weak key tests
+
+Zilin Guan (1):
+      crypto: iaa - Fix incorrect return value in save_iaa_wq()
+
+nieweiqiang (5):
+      crypto: hisilicon/qm - restore original qos values
+      crypto: hisilicon/qm - add the save operation of eqe and aeqe
+      crypto: hisilicon/qm - add concurrency protection for variable err_threshold
+      crypto: hisilicon/sgl - remove unnecessary checks for curr_hw_sgl error
+      crypto: hisilicon/qm - add missing default in switch in qm_vft_data_cfg
+
+ Documentation/crypto/userspace-if.rst              |   7 +-
+ .../bindings/crypto/amd,ccp-seattle-v1a.yaml       |   3 +
+ .../bindings/crypto/qcom,inline-crypto-engine.yaml |   1 +
+ .../devicetree/bindings/crypto/qcom,prng.yaml      |   1 +
+ .../devicetree/bindings/crypto/qcom-qce.yaml       |   1 +
+ .../bindings/rng/microchip,pic32-rng.txt           |  17 -
+ .../bindings/rng/microchip,pic32-rng.yaml          |  40 ++
+ Documentation/security/keys/trusted-encrypted.rst  |  88 +++-
+ MAINTAINERS                                        |   2 +-
+ arch/arm/configs/axm55xx_defconfig                 |   1 -
+ arch/arm/configs/clps711x_defconfig                |   1 -
+ arch/arm/configs/dove_defconfig                    |   1 -
+ arch/arm/configs/ep93xx_defconfig                  |   1 -
+ arch/arm/configs/jornada720_defconfig              |   1 -
+ arch/arm/configs/keystone_defconfig                |   1 -
+ arch/arm/configs/lpc32xx_defconfig                 |   1 -
+ arch/arm/configs/mmp2_defconfig                    |   1 -
+ arch/arm/configs/mv78xx0_defconfig                 |   1 -
+ arch/arm/configs/omap1_defconfig                   |   1 -
+ arch/arm/configs/orion5x_defconfig                 |   1 -
+ arch/arm/configs/pxa168_defconfig                  |   1 -
+ arch/arm/configs/pxa3xx_defconfig                  |   1 -
+ arch/arm/configs/pxa910_defconfig                  |   1 -
+ arch/arm/configs/spitz_defconfig                   |   1 -
+ arch/arm64/configs/defconfig                       |   1 -
+ arch/hexagon/configs/comet_defconfig               |   1 -
+ arch/m68k/configs/amcore_defconfig                 |   1 -
+ arch/m68k/configs/amiga_defconfig                  |   1 -
+ arch/m68k/configs/apollo_defconfig                 |   1 -
+ arch/m68k/configs/atari_defconfig                  |   1 -
+ arch/m68k/configs/bvme6000_defconfig               |   1 -
+ arch/m68k/configs/hp300_defconfig                  |   1 -
+ arch/m68k/configs/mac_defconfig                    |   1 -
+ arch/m68k/configs/multi_defconfig                  |   1 -
+ arch/m68k/configs/mvme147_defconfig                |   1 -
+ arch/m68k/configs/mvme16x_defconfig                |   1 -
+ arch/m68k/configs/q40_defconfig                    |   1 -
+ arch/m68k/configs/stmark2_defconfig                |   1 -
+ arch/m68k/configs/sun3_defconfig                   |   1 -
+ arch/m68k/configs/sun3x_defconfig                  |   1 -
+ arch/mips/configs/decstation_64_defconfig          |   1 -
+ arch/mips/configs/decstation_defconfig             |   1 -
+ arch/mips/configs/decstation_r4k_defconfig         |   1 -
+ arch/s390/configs/debug_defconfig                  |   1 -
+ arch/s390/configs/defconfig                        |   1 -
+ arch/sh/configs/ap325rxa_defconfig                 |   1 -
+ arch/sh/configs/apsh4a3a_defconfig                 |   1 -
+ arch/sh/configs/apsh4ad0a_defconfig                |   1 -
+ arch/sh/configs/dreamcast_defconfig                |   1 -
+ arch/sh/configs/ecovec24_defconfig                 |   1 -
+ arch/sh/configs/edosk7760_defconfig                |   1 -
+ arch/sh/configs/espt_defconfig                     |   1 -
+ arch/sh/configs/hp6xx_defconfig                    |   1 -
+ arch/sh/configs/landisk_defconfig                  |   1 -
+ arch/sh/configs/lboxre2_defconfig                  |   1 -
+ arch/sh/configs/migor_defconfig                    |   1 -
+ arch/sh/configs/r7780mp_defconfig                  |   1 -
+ arch/sh/configs/r7785rp_defconfig                  |   1 -
+ arch/sh/configs/rts7751r2d1_defconfig              |   1 -
+ arch/sh/configs/rts7751r2dplus_defconfig           |   1 -
+ arch/sh/configs/sdk7780_defconfig                  |   1 -
+ arch/sh/configs/sdk7786_defconfig                  |   1 -
+ arch/sh/configs/se7206_defconfig                   |   1 -
+ arch/sh/configs/se7343_defconfig                   |   1 -
+ arch/sh/configs/se7705_defconfig                   |   1 -
+ arch/sh/configs/se7712_defconfig                   |   1 -
+ arch/sh/configs/se7721_defconfig                   |   1 -
+ arch/sh/configs/se7722_defconfig                   |   1 -
+ arch/sh/configs/se7724_defconfig                   |   1 -
+ arch/sh/configs/se7750_defconfig                   |   1 -
+ arch/sh/configs/se7751_defconfig                   |   1 -
+ arch/sh/configs/se7780_defconfig                   |   1 -
+ arch/sh/configs/sh03_defconfig                     |   1 -
+ arch/sh/configs/sh2007_defconfig                   |   1 -
+ arch/sh/configs/sh7710voipgw_defconfig             |   1 -
+ arch/sh/configs/sh7757lcr_defconfig                |   1 -
+ arch/sh/configs/sh7763rdp_defconfig                |   1 -
+ arch/sh/configs/sh7785lcr_32bit_defconfig          |   1 -
+ arch/sh/configs/sh7785lcr_defconfig                |   1 -
+ arch/sh/configs/shmin_defconfig                    |   1 -
+ arch/sh/configs/shx3_defconfig                     |   1 -
+ arch/sh/configs/titan_defconfig                    |   1 -
+ arch/sh/configs/ul2_defconfig                      |   1 -
+ arch/sh/configs/urquell_defconfig                  |   1 -
+ arch/sparc/configs/sparc32_defconfig               |   1 -
+ arch/sparc/configs/sparc64_defconfig               |   1 -
+ arch/x86/crypto/aesni-intel_glue.c                 |   3 +-
+ arch/xtensa/configs/audio_kc705_defconfig          |   1 -
+ arch/xtensa/configs/generic_kc705_defconfig        |   1 -
+ arch/xtensa/configs/iss_defconfig                  |   1 -
+ arch/xtensa/configs/nommu_kc705_defconfig          |   1 -
+ arch/xtensa/configs/smp_lx200_defconfig            |   1 -
+ arch/xtensa/configs/virt_defconfig                 |   1 -
+ arch/xtensa/configs/xip_kc705_defconfig            |   1 -
+ crypto/Kconfig                                     |  21 +-
+ crypto/Makefile                                    |   3 +-
+ crypto/aead.c                                      |  20 +
+ crypto/af_alg.c                                    |   5 +-
+ crypto/ahash.c                                     |  18 +-
+ crypto/algif_hash.c                                |   3 +-
+ crypto/algif_rng.c                                 |   3 +-
+ crypto/ansi_cprng.c                                | 474 ---------------------
+ crypto/asymmetric_keys/asymmetric_type.c           |  12 +-
+ crypto/asymmetric_keys/restrict.c                  |   7 +-
+ crypto/asymmetric_keys/x509_cert_parser.c          |   2 +-
+ crypto/asymmetric_keys/x509_public_key.c           |   2 +-
+ crypto/authenc.c                                   |  75 ++--
+ crypto/deflate.c                                   |   3 +-
+ crypto/df_sp80090a.c                               | 232 ++++++++++
+ crypto/drbg.c                                      | 266 +-----------
+ crypto/fips.c                                      |   5 +-
+ crypto/scatterwalk.c                               | 343 ++++-----------
+ crypto/skcipher.c                                  | 261 +++++++++++-
+ crypto/tcrypt.c                                    |   8 -
+ crypto/tcrypt.h                                    |  18 -
+ crypto/testmgr.c                                   |  97 -----
+ crypto/testmgr.h                                   | 226 +++++-----
+ crypto/zstd.c                                      |  17 +-
+ drivers/char/hw_random/bcm2835-rng.c               |  11 +-
+ drivers/char/hw_random/core.c                      |  11 +-
+ drivers/crypto/Kconfig                             |   1 +
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c  |   2 +-
+ drivers/crypto/atmel-i2c.c                         |   2 +-
+ drivers/crypto/axis/artpec6_crypto.c               |   9 +-
+ drivers/crypto/caam/blob_gen.c                     |  86 +++-
+ drivers/crypto/caam/caamalg.c                      | 128 +++++-
+ drivers/crypto/caam/caamalg_desc.c                 |  87 +++-
+ drivers/crypto/caam/caamalg_desc.h                 |  13 +-
+ drivers/crypto/caam/caamrng.c                      |   4 +-
+ drivers/crypto/caam/desc.h                         |   9 +-
+ drivers/crypto/caam/desc_constr.h                  |   8 +-
+ drivers/crypto/cavium/nitrox/nitrox_mbx.c          |   2 +-
+ drivers/crypto/ccp/ccp-dev.c                       |   2 +-
+ drivers/crypto/ccp/sp-dev.h                        |   2 +-
+ drivers/crypto/ccp/sp-pci.c                        |  19 +
+ drivers/crypto/ccp/sp-platform.c                   |  17 +-
+ drivers/crypto/ccree/cc_buffer_mgr.c               |   6 +-
+ drivers/crypto/hifn_795x.c                         |   7 +-
+ drivers/crypto/hisilicon/qm.c                      |  55 ++-
+ drivers/crypto/hisilicon/sgl.c                     |   5 -
+ drivers/crypto/intel/iaa/iaa_crypto_main.c         |   2 +-
+ drivers/crypto/intel/qat/qat_common/adf_aer.c      |   4 +-
+ drivers/crypto/intel/qat/qat_common/adf_isr.c      |   3 +-
+ drivers/crypto/intel/qat/qat_common/adf_sriov.c    |   3 +-
+ drivers/crypto/intel/qat/qat_common/adf_vf_isr.c   |   3 +-
+ drivers/crypto/intel/qat/qat_common/qat_uclo.c     |  18 +-
+ drivers/crypto/marvell/cesa/cesa.c                 |   7 +-
+ .../crypto/marvell/octeontx2/otx2_cptpf_ucode.c    |   5 +-
+ drivers/crypto/qce/core.c                          |   3 +-
+ drivers/crypto/qce/dma.c                           |   6 +-
+ drivers/crypto/rockchip/rk3288_crypto_skcipher.c   |   3 +-
+ drivers/crypto/starfive/jh7110-hash.c              |   6 +-
+ drivers/crypto/ti/Kconfig                          |   1 +
+ drivers/crypto/ti/dthev2-aes.c                     | 139 +++++-
+ drivers/crypto/ti/dthev2-common.h                  |  10 +-
+ drivers/crypto/xilinx/xilinx-trng.c                |  39 +-
+ include/crypto/aead.h                              |  87 ++++
+ include/crypto/algapi.h                            |  12 +
+ include/crypto/df_sp80090a.h                       |  28 ++
+ include/crypto/drbg.h                              |  25 +-
+ include/crypto/internal/drbg.h                     |  54 +++
+ include/crypto/internal/skcipher.h                 |  48 ++-
+ include/crypto/rng.h                               |  11 +-
+ include/crypto/scatterwalk.h                       | 117 ++---
+ include/keys/asymmetric-type.h                     |   2 +-
+ include/linux/rhashtable.h                         |  70 ++-
+ include/soc/fsl/caam-blob.h                        |  26 ++
+ kernel/padata.c                                    |  12 +-
+ lib/crypto/mpi/mpicoder.c                          |   2 +-
+ security/keys/trusted-keys/trusted_caam.c          | 108 +++++
+ 170 files changed, 2027 insertions(+), 1681 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rng/microchip,pic32-rng.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/microchip,pic32-rng.yaml
+ delete mode 100644 crypto/ansi_cprng.c
+ create mode 100644 crypto/df_sp80090a.c
+ create mode 100644 include/crypto/df_sp80090a.h
+ create mode 100644 include/crypto/internal/drbg.h
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
