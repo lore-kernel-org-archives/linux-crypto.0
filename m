@@ -1,85 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2C9301460;
-	Tue,  2 Dec 2025 06:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789C0302745
+	for <linux-crypto@vger.kernel.org>; Tue,  2 Dec 2025 07:49:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764657176; cv=none; b=k6yzUQlwJkfMV67tQh6P7kqLDTJ/X1nHV+WZf6nFLi/i1NRn8wnIYb/70SiAzCDuPz6wPcv9XaE8NwCok88W+avrP7JNTDR7ViOoiMnx5XPjsgeMFvPDPBUkxqFWcFzL/ZmoyNOilGXE7e5wxLN8VscVedahoYJuoklF2W2xcAM=
+	t=1764661768; cv=none; b=ILAgBs0ldbNxSOKSgxcIaJnhaChP1Fz8u7QgexcjcwwvKAj0S7/D38EtmGaS/LECi0KNe6xKK+LYZVlSF7snh/rKiJEWvUJyKD2sF3sFywSnQxfX5xiHIyvSXWMyYkriuAF2uwTQEOOZOnPIQJLB9CwXcFhRGOfEhAv+dQqaC9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764657176; c=relaxed/simple;
-	bh=uq4FzFhbXgEfjRtm0v8jPvu/3eFqEqCLEHIabRwZTMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dNEVgXmAuWHSIq/G9PNCULkjG8tf2grN6fUa6K4ZHqNCryqL1dqCrIaAjdRnBOwFec4euHq4N2181aXLeZ4+cYB5ppQ17k6n/o+NDQETcgcfjrGHfA7zBoVBGyTJUVUoX4ZHeESlMd1MbmlSRdBnkrmPLSDZOS2V8D8lFzfgHQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JLuJ0Ckm; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764661768; c=relaxed/simple;
+	bh=3ssL8bEyPWOKoaGOkYPImlAucNDLLemdfe+CMvpPTnI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yt/VwG6RYCzdlnH+MiMVfLSXu4DRtQRslkLBCj+sfCsRlcq3uvpwbJPXg4YHxu3uxszn/fdeJiqhpMJUzG+iImeAFrj2kgdbvF9TlnwLwhARPrUdfvXVbRVSpxmzz/+gZ5DAMAoYIFBtESe+Ka3rnYHZ74AMKvlmmQJEq/3DWNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=G56JQVrJ; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JLuJ0Ckm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 154CDC4CEF1;
-	Tue,  2 Dec 2025 06:32:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764657175;
-	bh=uq4FzFhbXgEfjRtm0v8jPvu/3eFqEqCLEHIabRwZTMI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JLuJ0Ckm5IS7nlUqKLi3MCoZ31aWBOxanAN27rKbwY03DJG26511TZawyBvPHgKZK
-	 ZN6qa+FfikT8uVMcvZNDtWVjcj3CT2mdNqi+czrktL9QusIdMPELIwXmDPJffg+bpu
-	 KErw7lDbdliaGRVu8au8yuVGNxv8jf05s9D4Gwkd8GQg05Cg3SWlnFiQeakYaIcLSG
-	 8B7TQ7+cFtH3Fv/hdz3D30e3i9RLjKQVofjKv1ZkwrBEiCS0M5e+k/+4XgCFkz3Pxo
-	 ZGGraR5KWVe0hasmv4ivp55mSi3M4guLzpGpN52fd3fsQZDVsV/jMIilGy0eOsPbSi
-	 fqfo2lCAcUBbg==
-Date: Mon, 1 Dec 2025 22:31:03 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: Jerry Shih <jerry.shih@sifive.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] lib/crypto: riscv/chacha: Avoid s0/fp register
-Message-ID: <20251202063103.GA100366@sol>
-References: <20251202-riscv-chacha_zvkb-fp-v2-1-7bd00098c9dc@iscas.ac.cn>
- <20251202053119.GA1416@sol>
- <80cb6553-af8f-4fce-a010-dff3a33c3779@iscas.ac.cn>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G56JQVrJ"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5945510fd7aso4153536e87.0
+        for <linux-crypto@vger.kernel.org>; Mon, 01 Dec 2025 23:49:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1764661764; x=1765266564; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=3ssL8bEyPWOKoaGOkYPImlAucNDLLemdfe+CMvpPTnI=;
+        b=G56JQVrJVVTC32/dN8DSIoc2MWemv/RgDmFx0diOhyRGhUjjCpqi9AFNWPHMNwcOOV
+         ZfCopiOj2vnQiSKFnr30BbsXOxJT7lgIHkU9HPlojc7/WgHy2yJprImOJf23pFvU3+oA
+         HB5yj5xjmun8hSlZsEfyv6TRC3fYtaSkgYddqWAygTp+eFvLSRbdFzfD2eM7znnJk2oe
+         Sh7VejcydDKLg2P9yTIkhMXjHAcNl+2ftnl+Fgj/5pAmTdnDxK5FJviMcEefpT0cqqYT
+         WudfoajXDUS3ctSe+UwBQpYIPGRUcUiNFoODHhoXcMaelT1AJK7MTzLxR0++SJgt5Kxw
+         12uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764661764; x=1765266564;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3ssL8bEyPWOKoaGOkYPImlAucNDLLemdfe+CMvpPTnI=;
+        b=OlqrFlUaR8LROUevTXXzmuRigP2j9w/unP9X5RBb/bG66WwCpaKIt2KNLU7mvfyVbN
+         2OiW8h5T3bUFmePyCyJ0rmbCwoT7RajeEcAvQ6yDTyLw16r6YI5hkiawSq8zDrgyQiYs
+         TooV+p1+WNfs1Y4LRm3Iz3waZk347KobiIKPJe2UHC4KAc7QEZwnK0zlzxhvg4ZeY7qo
+         quDnv3o3yfVy4Ua/i4arjE8/ZeO9ndVs+x6AO6JXSMYcPrjWORxLcysFISw7lVrBVtaM
+         IgFbKFEnUH4KbDgCaDCCUU0Qsv4jlvHc235L9N9yFmjyJ0kHpUYcFXfVmQ0TY8KMxdVN
+         tWbA==
+X-Forwarded-Encrypted: i=1; AJvYcCVly7QgV2tJnUileJQj+rMAlUH3bJyzdhihPDgquQ4fBJ8ozg4L1dMe1FVsOCHze3nXb5idO4gciG7p/Jw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTk4b8tVRQxMoEOwI7kYcw6Ub5f+q7HckPfGdS2r4d3gnAdNic
+	L6fbiPcjh92lTI+KS4f/j/0LLX8WYOybPkcn1I2T97iYth2jE7rwfNExPhDAlPtwSnaG+RBLxFh
+	7x66Ja/RYgrF3Cb1mOrYIXC06CCTOlibvAiErHY1imA==
+X-Gm-Gg: ASbGncsurVjHmiLvlTtCqUEaHzP2i2O/DCeHnWYa9kd3G5Hiqnv6ooTaojeoTLF//ru
+	HCAxPb+Apg/vEoDCzgowz5tZ8TSXwHLdSRrzS9chguw/DBS7fkcOJtCk1iCdSqaSQ0uEw+c4EEH
+	LuNWZ6/hVaqlGmB8DE1eHcMGZxclgKdpDTsfzgi/DkWVfskg8b11sIDApP8nvengo4htLafj571
+	yoWXM3u+N3vchfOa/4Syk70Nqlc2pOHPlZQSmQjHeYmLBFsdgoA8+omfLQufzml39dRTNWgAGT8
+	Sk7zhQ==
+X-Google-Smtp-Source: AGHT+IE+yz7EtxuU4R0Z+yMEJon0dUDP1V0/7zbAWTSTets6jWiJ5CZoYJMUPsjFu6Ze3uig3kvBnRRWURwgxDkVfiI=
+X-Received: by 2002:a05:6512:398c:b0:594:34c4:a33a with SMTP id
+ 2adb3069b0e04-596b5058d8bmr9800256e87.19.1764661763459; Mon, 01 Dec 2025
+ 23:49:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <80cb6553-af8f-4fce-a010-dff3a33c3779@iscas.ac.cn>
+References: <20251202061256.4158641-1-huangchenghai2@huawei.com> <20251202061256.4158641-2-huangchenghai2@huawei.com>
+In-Reply-To: <20251202061256.4158641-2-huangchenghai2@huawei.com>
+From: Zhangfei Gao <zhangfei.gao@linaro.org>
+Date: Tue, 2 Dec 2025 15:49:12 +0800
+X-Gm-Features: AWmQ_bk_L0GqaaaLWeuZHXK7ksV37IDdZTRn1b7YZa384X77oIw4aeK2Cv-BGYI
+Message-ID: <CABQgh9E3vLSwxFzH8UaQN8icGENhbAjsGO5MHO-dZwHNXrXBkw@mail.gmail.com>
+Subject: Re: [PATCH v6 1/4] uacce: fix cdev handling in the cleanup path
+To: Chenghai Huang <huangchenghai2@huawei.com>
+Cc: gregkh@linuxfoundation.org, wangzhou1@hisilicon.com, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	fanghao11@huawei.com, shenyang39@huawei.com, liulongfang@huawei.com, 
+	qianweili@huawei.com, linwenkai6@hisilicon.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Dec 02, 2025 at 02:24:46PM +0800, Vivian Wang wrote:
-> On 12/2/25 13:31, Eric Biggers wrote:
-> > On Tue, Dec 02, 2025 at 01:25:07PM +0800, Vivian Wang wrote:
-> >> In chacha_zvkb, avoid using the s0 register, which is the frame pointer,
-> >> by reallocating KEY0 to t5. This makes stack traces available if e.g. a
-> >> crash happens in chacha_zvkb.
-> >>
-> >> No frame pointer maintenence is otherwise required since this is a leaf
-> >> function.
-> > maintenence => maintenance
-> >
-> Ouch... I swear I specifically checked this before sending, but
-> apparently didn't see this. Thanks for the catch.
-> 
-> >>  SYM_FUNC_START(chacha_zvkb)
-> >>  	addi		sp, sp, -96
-> >> -	sd		s0, 0(sp)
-> > I know it's annoying, but would you mind also changing the 96 to 88, and
-> > decreasing all the offsets by 8, so that we don't leave a hole in the
-> > stack where s0 used to be?  Likewise at the end of the function.
-> 
-> No can do. Stack alignment on RISC-V is 16 bytes, and 80 won't fit.
-> 
+On Tue, 2 Dec 2025 at 14:13, Chenghai Huang <huangchenghai2@huawei.com> wrote:
+>
+> From: Wenkai Lin <linwenkai6@hisilicon.com>
+>
+> When cdev_device_add fails, it internally releases the cdev memory,
+> and if cdev_device_del is then executed, it will cause a hang error.
+> To fix it, we check the return value of cdev_device_add() and clear
+> uacce->cdev to avoid calling cdev_device_del in the uacce_remove.
+>
+> Fixes: 015d239ac014 ("uacce: add uacce driver")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
+> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 
-Hmm, interesting.  It shouldn't actually matter, since this doesn't call
-any other function, but we might as well leave it at 96 then.  I don't
-think this was considered when any of the RISC-V crypto code was
-written, but fortunately this is the only one that uses the stack.
+Acked-by: Zhangfei Gao <zhangfei.gao@linaro.org>
 
-Anyway, I guess I'll apply this as-is then.
-
-- Eric
+Thanks
