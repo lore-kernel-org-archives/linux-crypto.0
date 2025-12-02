@@ -1,110 +1,77 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011033.outbound.protection.outlook.com [52.101.62.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7BC62DC352;
-	Tue,  2 Dec 2025 22:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB442F691E;
+	Tue,  2 Dec 2025 22:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.33
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764715112; cv=fail; b=brYOplQI4zapP//lOo9N9vlQ16s/2AqFF3d+rMMv4BMVI+7CGhDfdrXE9v1SH9VujOU5I/ry4ctl12pD+KFD6B1TpIp1qDgPH4k0cagqkORxMNvo6EowDNYvb9WtmUZ1V+sVnKQezrxDQcTv9P5F2UUsLwCy8q2+eGAZL4NCPAg=
+	t=1764715201; cv=fail; b=Td6KE4hkD37ZA8Mg58/ksmoQoyOz2PUHEgAxPy5wvV2RL2uOTchiSXhWsRtwuNeSfZRODCP3CUFFN0XQarM6dKPE5t+jlKEmCEtl4jFT4mypqks9pV8uQ35Dqvc/6xcniP6nMJ0QdJD+ygde2vojEkgra/AZlpUJK5kgcLnRIGI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764715112; c=relaxed/simple;
-	bh=EkJEhCsc8ilgJQFFPB5XwXFaWoZg5v/YsA7FS29Qazk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=puX/XwuxF4WS9NbevwViFouJ8Fypep+T8PzUNu3wcxlnFtOvCLTnhSeIFH789aXj0od5W1PBJwL1HhjKHXyM6kSeRUvhNqqHXGe8kZAMhy7dd8zQdqkqv+aL0B9PfOUcCaPhTC+ETB4WAY/Cwc1dMAN2Im7VX+xj4Qo2y6xm54I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l/f8jeu1; arc=fail smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1764715201; c=relaxed/simple;
+	bh=1oHsA+846kXfAyFBCb3PCU0qqaH0cIHmO92llbdGkIU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=PqsMS5z5tNtCFMqOVo8AdO3MHG+eY7tbx5efCJE8cOlbo5TOWqj0tW6d72N7ECSxqCG2PcLCRxxtKuSwK13+vd6bvgS1PzGr+0vwaNmHtE7HrFZZvvY7ICPYpYODQnCIbUC8O/5QxXJPoezIkdSRvVd4koRD0SesYZjApNQvMT8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=S/BwuIHN; arc=fail smtp.client-ip=52.101.62.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l/f8jeu1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764715111; x=1796251111;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=EkJEhCsc8ilgJQFFPB5XwXFaWoZg5v/YsA7FS29Qazk=;
-  b=l/f8jeu1jOil5nrn8S8Qrf6wrgv1eI3Kwx+ngSvF+KleoyFaj6v9kU1f
-   aDfmPl0ZgSEFrZl+VIRPX5csNzFtl34YStOPcO8vVRR0+9K2+XX6NvEb6
-   SxkJhWX7HDE2Sk9aCrrLLmchy4nIHkml2ZvvRRrTR2Vq3MbQ5eEX7SQOf
-   WEukrmfcVo9ymd8yJvhnCxh+q3yoVOZdyXZl6uU3LUR3vj3t59EdFHMRz
-   XFa6oQYNwZDDPfN6CHE6XGnFGHIrJWoCx1vZmfv+1025mXYA29nv3j5Nn
-   k31wkez99HkbaDPdPaIzWRfls+FWg2rWhyluC9qGpxjG/G/+/pS/TSb0E
-   A==;
-X-CSE-ConnectionGUID: YyixOa0gTRmu8LJjoEbFfA==
-X-CSE-MsgGUID: tQWkY09jT2i4LIOAuP6A8A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11631"; a="77807216"
-X-IronPort-AV: E=Sophos;i="6.20,244,1758610800"; 
-   d="scan'208";a="77807216"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 14:38:26 -0800
-X-CSE-ConnectionGUID: 1o20dtR5RNe3zp0iGqWP0g==
-X-CSE-MsgGUID: GHFj8hMfQTW3pWRx4XyPAg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,244,1758610800"; 
-   d="scan'208";a="217849097"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 14:38:25 -0800
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 2 Dec 2025 14:38:24 -0800
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Tue, 2 Dec 2025 14:38:24 -0800
-Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.61) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 2 Dec 2025 14:38:24 -0800
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="S/BwuIHN"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xsHGIP3S2GBD/RNOFvzCjJNFEe7qt9DvRF8KLY48wioai+kTjqoSRiYT8bFjFCbgJUGRH1cFPQMARqRF5OkfhqrU5nDKjtV1HNvwSZAt1m0lFl2nwN9kFrcc1i+xJvMxJ6FX1X01xbYGtnIpN/1Om99B6YktA3JoKkWb6LmM404CvVPARGcT49MCso6KKwqmBA+PIbstuRmbG76Ub46vG27yNsG/ZeJUZvD/EaLHXrztfKf3mXjzyJbkFsHg9a67qYFNvfNJRkhMTLawyNA2C7Pt9F8H8YN4B3f8cXMgsBPGCIyoxND+iK036JVNI0ATDodLIqHaKG2N7hHJhy8+yw==
+ b=hD6v/opEifOD2VkwR05hDX7/yqa8p14a3jQNCZOG6IQDzeyFup9oUYkErkKo1JZ3RnNm+T2LnczgMdUQBaEFXBzhTahyZHV8n3O0EX+ymTTMvpdeyG79UvT83sFlISn1yamCZA4BUJwh0qxRV/x1K3O6TcVmfPUkgjhWOvYkRoMI+bINCHBvx7IWSCAgsK5/c/V7ksgXhUfF+DtviB7QuX8BhosIfCDuMQjyLEC6HeRidKn0yCRiHIUZuMsblHMrNtIxl0pULBL3J5GQd9AQg093DQrCLCYaz6V/FvGk6LrtyDYteFmAZp2Mwze/t5K6mAo71Vgo1XkZuX82FuhIfA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bW9rG0qQ46C59354hO4BSLjZc5zQxh4p0r1A/C4Ec+I=;
- b=V0qoimf3Q8to78yXdFhis245qz3lBJKl66l3Tl4p/FBOreS9D76FYgS8hGI3l3951m9eQhZ+cSwOqu4XM2+t5K7zeriznwG47FQJqIXANwvOLeZl787D15xTHVQt694WHiuSFDl856txp+iOb9XBzEKFt6i7MR3MWoNVWUOAiFFnWLwPjgZlB0mM9z4zXcKq5/mhXzmgGDdzvJbBmFf+ns9Sj0kELbtRQO6KoYFSGI2xH3T6pmc1VBo8e3l/R4W1L1zUsJ7/fxl0Q4eERZfRadBLY5WWbeTbdzqE9lKEwWQuC+UX0VYEfyZFdAwdNcucUqyvAqT5RPOSE8rGaPwORg==
+ bh=47TLtDslAH0tYyEXYKOCgBiIEjKTcRdffhOXSAjLc50=;
+ b=qUbXXOvG43TKmTwPdA19Z2EN9wAeerdSXDGsE2DuZ8yZ6shrkkCymIDmrgfiPmIC5CyKOcPOMvRZ8FeE5b7h+upfUENZZ9/NIsgUmTgr/BQpNGNQVy3b4ZjSBW87oh95WZooux5OmFBIJ7gQVCYwtqYka671N/cL/w2ttnpjDjAV8wOaJXtJnk4gyeXvN4qLkYBGNIhgsfq3blKPcCiwMKMXjKsQE2m8ooxTfKRJAfUeNOFDRxaR2wP9VPFnUbV3ryFwqQkcmw918eYfAFwWXnIJce0L/vdIgfAqvsm8y4/0y/H8VGhkgfdM5oNWvIayWMfuH5dr9OFWESLKUJuosA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=47TLtDslAH0tYyEXYKOCgBiIEjKTcRdffhOXSAjLc50=;
+ b=S/BwuIHNbio49XslJYDR94emAaY1UMarypnjRM06r3pVjs5hKrU4aoPBZei45FVFhMRyTXIyJuF/v7PVSDgD1fwxT0H/ZslY6TKNDRjdV6krMpO3s39d4+8V5X5Gl6n1lWGykly0mGb75MXYDqSYGYuGYYzrg8cfSg+rpRE7Y3E=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by LV8PR11MB8698.namprd11.prod.outlook.com (2603:10b6:408:205::19) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by DS0PR12MB7656.namprd12.prod.outlook.com (2603:10b6:8:11f::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Tue, 2 Dec
- 2025 22:38:05 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::22af:c9c9:3681:5201]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::22af:c9c9:3681:5201%5]) with mapi id 15.20.9366.012; Tue, 2 Dec 2025
- 22:38:05 +0000
-Date: Tue, 2 Dec 2025 22:37:55 +0000
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: Qu Wenruo <quwenruo.btrfs@gmx.com>
-CC: <dsterba@suse.com>, <herbert@gondor.apana.org.au>, Qu Wenruo
-	<wqu@suse.com>, <clm@fb.com>, <terrelln@fb.com>,
-	<linux-btrfs@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<qat-linux@intel.com>, <cyan@meta.com>, <brian.will@intel.com>,
-	<weigang.li@intel.com>, <senozhatsky@chromium.org>
-Subject: Re: [RFC PATCH 16/16] btrfs: add compression hw-accelerated offload
-Message-ID: <aS9qQwPeM6UVvcQ+@gcabiddu-mobl.ger.corp.intel.com>
-References: <aSok4RiuQVZ8zckR@gcabiddu-mobl.ger.corp.intel.com>
- <0617afdf-14d4-4642-8298-69ef71f53b4d@gmx.com>
- <c4f89df0-9373-4329-9e61-9b5592ddc2f2@gmx.com>
- <aS2nA8+YpNbKjXeo@gcabiddu-mobl.ger.corp.intel.com>
- <aS2v6g3f5nYi6hC+@gcabiddu-mobl.ger.corp.intel.com>
- <453951a9-0c8d-4e1a-be4f-2617c6a51fbe@gmx.com>
- <aS4UNIfxGK0y6HzO@gcabiddu-mobl.ger.corp.intel.com>
- <e532ff5c-a5a6-4ebf-977a-721471594908@gmx.com>
- <aS8dNt3gCzlIxBIs@gcabiddu-mobl.ger.corp.intel.com>
- <0bd22b17-97e8-4b8f-a7a5-5e79d280c078@gmx.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
+ 2025 22:39:56 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad%5]) with mapi id 15.20.9366.012; Tue, 2 Dec 2025
+ 22:39:56 +0000
+Message-ID: <e98582db-39d6-4a09-8f9c-88b0aa0c4676@amd.com>
+Date: Tue, 2 Dec 2025 16:39:50 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kernel v3 4/4] crypto/ccp: Implement SEV-TIO PCIe IDE
+ (phase1)
+To: Alexey Kardashevskiy <aik@amd.com>, Tom Lendacky
+ <thomas.lendacky@amd.com>, linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, John Allen <john.allen@amd.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Joerg Roedel <joro@8bytes.org>,
+ Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Borislav Petkov <bp@suse.de>, "Borislav Petkov (AMD)" <bp@alien8.de>,
+ Dan Williams <dan.j.williams@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Jerry Snitselaar <jsnitsel@redhat.com>, Vasant Hegde <vasant.hegde@amd.com>,
+ Gao Shiyuan <gaoshiyuan@baidu.com>, Sean Christopherson <seanjc@google.com>,
+ Kim Phillips <kim.phillips@amd.com>, Nikunj A Dadhania <nikunj@amd.com>,
+ Michael Roth <michael.roth@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ iommu@lists.linux.dev, x86@kernel.org, linux-coco@lists.linux.dev
+References: <20251202024449.542361-1-aik@amd.com>
+ <20251202024449.542361-5-aik@amd.com>
+ <b6d45b8e-3eeb-4b96-b781-e0ad28861a2c@amd.com>
+ <36929d3e-b56c-4e65-9ec1-42fc52fdd962@amd.com>
+Content-Language: en-US
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <36929d3e-b56c-4e65-9ec1-42fc52fdd962@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <0bd22b17-97e8-4b8f-a7a5-5e79d280c078@gmx.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DUZPR01CA0034.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:468::10) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+X-ClientProxiedBy: SN6PR16CA0070.namprd16.prod.outlook.com
+ (2603:10b6:805:ca::47) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -112,217 +79,302 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|LV8PR11MB8698:EE_
-X-MS-Office365-Filtering-Correlation-Id: e32dfcce-f537-46b0-d942-08de31f37520
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|DS0PR12MB7656:EE_
+X-MS-Office365-Filtering-Correlation-Id: 13c3ebfe-7b66-4420-b503-08de31f3b778
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?OFBrQ25FaEFRNTZKYktBOEdxQ3lIR1B2bEtxeDNMKzIvckhmR2gvU3RtSmxs?=
- =?utf-8?B?cFRkY2RObk5xd2x5dmc4RGFORlFuRXFaMU02K3FVSE52UGFHNVExQjNDdmxt?=
- =?utf-8?B?M2dlUjVzWUdac093aWxtNGk5ZWNIMXovK05QdCtONDJNQnpmUzR2bnlPU0dO?=
- =?utf-8?B?MG8xZjZYYUlJc2tJbnVXOGNKRi9YTmhyUlB6MFc3YnpFaG53WndmQlNZdVJq?=
- =?utf-8?B?ai9FUXpEajdZdExMbHhUZ2laZ2E3RGdNQ0NReU1nNFE3UkpuTmF5V0RlTld1?=
- =?utf-8?B?V21XR25GZnU2OWNsM3BkMTZtYzk4ZHVPd0dPTlhoZTZqWDkzVHRTQ3JNV0tF?=
- =?utf-8?B?M1VheWt2OE02TU41QStVTGRtVGtJeVNZMUFZeUUwY3JvbXNmUVdHcmVRcEwr?=
- =?utf-8?B?T1hwVG9pb0x5SFUzZjVlRHZJSW8rWXlmQVIxdVltcnB4RHZUTmZqVFJneWQ1?=
- =?utf-8?B?VGtteTVKUGJLMzg1NnFKdDJqMllUd0ROY2hTMjdLMGRQczNKWHI4eE5WNDBs?=
- =?utf-8?B?TzNOdzVyZkpEUGlzREFRQk9jWGdqdTg3L0w5UG5uUm9ESkE0YXJuZ0VOallI?=
- =?utf-8?B?SW5oSkVkNmdlR0RGSUR2YVdZdmRlcE1rZE5uKzljNkpQT09qNXFSOGhJdjZh?=
- =?utf-8?B?NjVYb2h0T1V3bVpPOE15RHJmZHd2dVpCRk1GTzUzdzg1ai96L0hjN3NzVms1?=
- =?utf-8?B?Sk00RnVYeUZOb3J2enBWUEhkN2xqSGtta1dlMHRIWnFHOEF0TTRLRkFpR2pZ?=
- =?utf-8?B?c2NoMXQvelg4L1N2TFlCL0h1Uno1VjZKNStCVnYxQ1ZwY3pScnk0cW1yMlZo?=
- =?utf-8?B?RHI1dktDQTZBdGgxMVI5aGNZcnYvMFZoMlNJQ09tS3lDeVNVa3ZrSm9pZTdV?=
- =?utf-8?B?MUlwRU0rZ0d0UWdGdTdaL1poZEx4K3FhbXdhNjExWmMzNHNHQU5WcExJQmpZ?=
- =?utf-8?B?dk43NGl1bzNhMFZkbVNoN0hyamhJTnVGVWN5OVZSL3ZqWWpHS1BXbTh6MjZa?=
- =?utf-8?B?UGpCNkEweWlpcThIRjdNanV4eHhsWXV6OGFsWjJFaDNoS3ZkTGQ2RkJtUDRR?=
- =?utf-8?B?ZzEvWFl6OHZtVW9oWDZBTjNIZXB6WlFmQUhEMXAza1FldzAwQzRRVnlHdlVW?=
- =?utf-8?B?dGZaRFFDamx0a1UyQTZpNHFPaTBTNXdseHdZOEFPclhvaTJPQ3FmTWRlUmw4?=
- =?utf-8?B?ZUoyVXdBTjAzWUt5eFhDbExuck5ibUVMaHhkTlRSV3pTQVFnbjhBdUdrOFFz?=
- =?utf-8?B?Rkh6ODdnbDRCbXVQVWFXSk5mMFlRSVdFZGY4TVJKT3JKY2YwQU1FdHVFWFVa?=
- =?utf-8?B?QllER2prRmdjVEZwZUdIUnh5NE1qTHhaemI3THhBWUNHaXhKZmtWeW53UVcy?=
- =?utf-8?B?QUtCUy9Zbmh3Q2NiV3hZTHZxT1gxM3o0bTB1aGVoOU9YaFgveEtPbkIvM21n?=
- =?utf-8?B?OEpKY3NNaS8rR0ZHRTBvOFViakdmMHZlS2hrTHovWVdIdXppM3dFb3c2Rkhz?=
- =?utf-8?B?anNhaW1YSFd5SlhaKzlZbnBBZFphdHBmby9vVFRJQ2xiWllVQkxpQktlcEdV?=
- =?utf-8?B?Yi94RnRDZ2V3ZzVIVnd6V2dpU2kwWVovVCtIZnZ4akUxNXZZeWRnT01ObmVm?=
- =?utf-8?B?ZjBOSnJUVkt0eVVMYnNMRC91cUZUZVZCemRpWCtZbGZEK3JrMXVSY3VTVktL?=
- =?utf-8?B?OStDQk81T2FzRG9FM1BvV1JMNmhUaWVQZTJjYjhMQ0pvR1UvRDZ5ZHdjWVYx?=
- =?utf-8?B?SmxEZHJWeDdFTWJlVm04NU02TWJadGtRVDVhOEY5YWRISEF3b0xpbzEwcHNv?=
- =?utf-8?B?eHdQSjB4N0l2RittZzVUOFVXM0JCUm13eEEycjJhQ3VoN2oxYlFQZm9LWWtV?=
- =?utf-8?B?R0RSR0dxNGFJalhmWktIMiszeS9YNVNtWEVvQTV6cUdpSHY5R3dJaExpQXN3?=
- =?utf-8?Q?uZJaAPABufikQmrjDp6oZMNKday29sEf?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?QTVmZFREd0paTFFGWG1VWWFnRGpPVldqUHZhd0VsU0lIV1l5SHVRbktRSExL?=
+ =?utf-8?B?QUxSNTJKSjFIRnU5QzRsUGxGVHNmMkNyV01kQjkvTjRIRlJFVGpkRmNUbkZh?=
+ =?utf-8?B?ZzByKzhUVlk3VCs5SjZvR2V3TDM5akRnSXlIYzE2WDZ0bjJQQ0VPc0Y5TjQ1?=
+ =?utf-8?B?Ry8zWHMyV1BzVW9tbXRPY2FzQXZEUHpwWnRuMHc1bm8rdFJXWUFqNUswanB0?=
+ =?utf-8?B?R2xzOWN3ZmpValE2NFNhUE9oMC9yTkFBY3l2L0FZV2hmRDdZdk5wZzFSSHJk?=
+ =?utf-8?B?TlZJMVpKQ3p1a0FMbUtsdGhzYXIza3hDWVVmUWJaZzhiVHNJbGpnUUFKcTZW?=
+ =?utf-8?B?aHBEWWRoYVkvTS93SkwrMlh3SFQ4TUYwczMvMjZkRGRiUjVCcGoxRVlFdkhn?=
+ =?utf-8?B?VFZveUNWSGZnd0IzOHo4alJCZTBsQktLVnZSdXBTVFdWb2piaGJzd1lQeTBp?=
+ =?utf-8?B?cEpwYjFzYWF4dDNDemRncFhpSHdFLzMyTVVMSksyUWo3Y3Q0SVVpcUsrYU5P?=
+ =?utf-8?B?NVRaUWc5bTI0dXgwOFNDTmNRcnBIU2NCamdQazg4UmNhaHptbHJybUFFYmpt?=
+ =?utf-8?B?UmdXSmIzV2ltNzltRXBsdkhWckh0djZSSU1LR3FGNmdnVzl5SFFoNVZYb1g3?=
+ =?utf-8?B?WVpxZGtyQ1E2MGZWWWVlNWJlc3FOSUFhaVRoYm8vTk9uVkFCUUFpaVJNNHNa?=
+ =?utf-8?B?bVNGcXZBMDN5ckRkeUt5ZGhzVUdrM09YS2RPVmNxMFl5aWJ1amxBZ0I3OXNw?=
+ =?utf-8?B?aENjVmRyTGNGaURMUEE1My9UR0dOZ3VCelNyNFhPekRHWHhwSVdzUCs3TCtD?=
+ =?utf-8?B?WWZCRWhLbVFNdHZtais4aXFYell4RnBVUkt3QkNiZ1h5QWN6ZEpOdlVBNWY3?=
+ =?utf-8?B?aGt4elVDWXVIcm9wQ084NWxXSHBjWkd6UzdJUzNaUENjM1Q2QTEwWElEZFFk?=
+ =?utf-8?B?TjFYcFF1YkhYREd6cTZMM21nS0pCVVloTk9RRmVpN3c3OHdJd1YxMHVrK1BX?=
+ =?utf-8?B?Tm9vZWk4SnRGM0FhWFFsaDhoQXhiTHhmNUcxMlg2RWZWVERNaW1zOFZYSkVZ?=
+ =?utf-8?B?b1dZWjlQZGNqRjZ5M2U1Znk1TW9meGRNblh1RURGekRPNm4vN2F5VGVjRktI?=
+ =?utf-8?B?ZFVLQ1VSVnBsVC9yK1cvTWYxN2pib2xmQ1ZWTHBpOWEySWZYdlNOODVJaUlJ?=
+ =?utf-8?B?OUZqY2pYUXF3VGtHZDlsMkR6bysvTWI3ZjZ4b1JydC9KTzRRdkVmZ1FCNjRE?=
+ =?utf-8?B?Y3lBaXoyV1M2c3RKUDViY1E1VzIyYnVHSSs5bDFFSlgrY1o4SS9MWCtQcW4x?=
+ =?utf-8?B?Ym9XaGlFK0dDdnlETGR2dzIvMnNvSHk2Rk1zNnNrUndDM01VeFJ5eGdPMkhV?=
+ =?utf-8?B?emdIUW1qOGRRUmpuM1g3OGNINndZL1VFbWJRVDVSQ0wvcXFIbnVmTmlGNkM3?=
+ =?utf-8?B?eHZWL1N5QXR5ODRnK0ZWbFJsbE9QTVZNWTVzaWJ4eFhJMkhHNHdTYXFoRHVU?=
+ =?utf-8?B?NmhiVWdEL25GS3BUcHROVld3cTh4ODdENzM3SW15REJ3U3duc0hIV201d29P?=
+ =?utf-8?B?NzVNSkhQQmcwVjdKeGlvUGlxZHlZNVB0TW1ZZ0Y5aTBVL1pRL21yK3NUeUY1?=
+ =?utf-8?B?NVBCMk9KMVd1US9GWDBYbHYvUzZEbmdPWVdScExvMUsrSkoyVHUvSklWRUg2?=
+ =?utf-8?B?S0RFZjl3VzNWNVZUNU1sb3BHYUU1djFKZkdaTnNFa0RVZnlyS2hTb1VhV0tI?=
+ =?utf-8?B?VmhienhnaitpNGV3emUzbHR3cm1LcTMyZGlDV1h2cGZGQzFXTG1JdGV3VTJH?=
+ =?utf-8?B?VE5Uc2pmaUo3MFBBMDRVZnQ0L3RYbWdhazFiT3hvcFgvSm5kS2I3WnBmOWxS?=
+ =?utf-8?B?Mjd2aU5wbXAwb2VlN3FOTzkrN2RScC9rMTFlYzZxU0tEeEhNRjIxYVRNZkl0?=
+ =?utf-8?Q?aigRPpuPolV/NimcWYUX5ItvOfZVZLpQ?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NHE4SVVWanliS1lNbXZGSkU5M3JTQVVvZ3JPcUIwYkpidnpjcjRhSVkwZC9a?=
- =?utf-8?B?TnlJYU52aC9XVVkvZVFOYTJmYloyaG8xWlFXWTZNajk2L0wyRy94anVKV0hY?=
- =?utf-8?B?a0E5QWdQZU11Nzl6N3FVbjJOVjJKNERHTjRGbXV4VXZTYWR2cFplRUJURkRI?=
- =?utf-8?B?QkVxMFVvZGdoUmF4U2FsNDIzSVkxN2NKMHB5M3Y5ajRHdURINU9Ba1dWMk50?=
- =?utf-8?B?WERCSk0xdFNTSHlDL05Wd2YvdWhpVHdteElZcG5GbDRiMlhER294WTVYMEUz?=
- =?utf-8?B?anFFcHdiMkdNSVlYd3ZWMkhpYVZMR2tRa0VsQ2VJckZEdVdmTTFzMkI5NTJW?=
- =?utf-8?B?dU1aNVUwQWIxdXFhR011V1RWdGZneU1NbDZaWS8wdzg5ZEpvZlh1bHFNeFla?=
- =?utf-8?B?bERtZCtldGIvOTNVWmljWlRPNlVMVVRPY04ydXVnZ0hYNC9hSTJoZ2xVTEtx?=
- =?utf-8?B?Ykt5aXU4Y3VKeUhmQ0MrRTh6MEVwc0hocXJTUHRqTEdMck5rZ1hwOHI0UHNB?=
- =?utf-8?B?RVlVOTAzd1Rta0svTnBKbGU0VUw2OUx5TEZXR291R1VjMlA1bGdrcHdoY3dT?=
- =?utf-8?B?UE1hRktMMGFtZ2M2djhIQ21RM0t0Vkg0aUdoblJ2WDRPTXV2Uk1EVDBOdG1z?=
- =?utf-8?B?cnZ2dUExVEtVbnFBamg5SnVnRU1CTnpScGk5RnYyU2hmYTNsdThVMHQ0REE1?=
- =?utf-8?B?TnJRU1Q2UERxanNBak5PY3gyWUhNY0dOQVYyVmxFTUN4K0l6S0w4MkFLdlN2?=
- =?utf-8?B?U1pZMkJsUnI5YUlldzIvZ05PQzZUU3R0UG1Iek5FeTd4WS9tVnV6cXVpVzFF?=
- =?utf-8?B?bjJYQ0d4TnhKcGFKOEl6U2J5UjkxQy96dVBqbkxET0hxWk5FTzhiekhFSDVW?=
- =?utf-8?B?TnMybjdua1JXR2NNcVh0Vkp5SDVJbm5nQnd3ZGxyTnpvdFVnRVhSb1daSkNp?=
- =?utf-8?B?UUR0WlR5WGN0YWZGSVBBbVlxbnJ3OHlMcTVOTWUrNExKYkorbnlrallvT0VF?=
- =?utf-8?B?ZkFrZng1RmV3SE9IVWtSSjJ4ZWhKNzd1bm4vYTdWbHh5QnlPRUlHbVpWQVNZ?=
- =?utf-8?B?T3Boelh3U0lRcldOLzVlUzJOYlhiNXh0ejNtUjhhTEZvUE1TUTFTUnB0bVdM?=
- =?utf-8?B?dmZwbGpuNUUxdmkwSi9FTnJlSGxNTXNKYlNvcHRlNUVpUUFQVlZ3eHZLenhN?=
- =?utf-8?B?NW5uRVpXd080TWFhV1BUcUY3R1VJT0tneHpxSXZ5ZHRSSUtrMWZCcWphQzFV?=
- =?utf-8?B?b1hRWTQ3S0JZcmxXdWI5bFBJazRSa25SSE5qT25xNTZZRlNLV0daOG9xTWps?=
- =?utf-8?B?VHZOUlI2V2FwTUwwcEJZeEY3WkNvWGI4MFNaTk0rWWwwYzd5clA0aVNtQTVi?=
- =?utf-8?B?a3ZzQlRFbXU0TWpvWjhGaXEyN042a09jNEdUeENxRGFYR3JNSWtxdnFVbjBP?=
- =?utf-8?B?QytjNllhMW5rZ0puN1ZYUXNGTGNvcFdldTBBbHkvRGJienp6OVF0RW9nQ2RG?=
- =?utf-8?B?MkQvNk1PbmRMTFoxT2VMY3JLb2NNaUJIeDJocERmUFhqak9CbHpTVmNLYkpj?=
- =?utf-8?B?cnFRUzVBa2pCUXYyZGRSUy9lYmx2cHlORTFtdlo2bTNxUkE2TXQ3dCs3MWZJ?=
- =?utf-8?B?R2l5YzBpeVlLQkxRM1NpVlJkRW9FUmVqckRFb0hSZVZDNnl4bk4vZzg4YW5o?=
- =?utf-8?B?dnk5NUxJRUJMaFgwOVYzTktoTFZ2MzdvNDE2NXpOem1YajFCRFJrUitiTFNz?=
- =?utf-8?B?M0FwVDFKMjFBSGU3cllJM0p4WDEwSkI2bWlwWWZNWGhXZlh6Z05Lajc2ckh6?=
- =?utf-8?B?MFR4aDZicVZPc0duWHJ6Z3U5SWFqcXg2Q2JrN0ZOaTUvOFhHVXRuLzFFa3ZM?=
- =?utf-8?B?UDBkOHM4aDFjQ0hlRmh3ZG9BOFR5amVOL3dkUmk3c1llWXM2RUwyVktlL1Zj?=
- =?utf-8?B?M3UxVlUxM0ZtTUhLMU5jcjVKdzUxclFaTTk1QVRzdll1Mk4relFQLzV4N0Rj?=
- =?utf-8?B?RHlyMlFHZThWeHVaTG9takpYbmIxU0RSQkRUb1h4L2hpNlJVcHZPU0h5cW1V?=
- =?utf-8?B?RVJBbjc5b2IyT2ozS3hkMmlCdUxBYTd0NldSdStrMkoyTDMxdGJUYXJQeUh3?=
- =?utf-8?B?TXg1azdSbWZQWnc5ekRMSGIvZWhBOGp3eG13Y2xGaENpQzdaeVQ5L0tjcTZM?=
- =?utf-8?B?L3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e32dfcce-f537-46b0-d942-08de31f37520
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?b1ZBaDJ6Z3poQ0ZrYmpkTS9NbU1PQ1dkRnRlNTlYaWNuNStMZlBpamplUklq?=
+ =?utf-8?B?ZnliWUM4dUx5bmYxNklMcksxU0h6S1VoS2tHMisxZVhaRGg4R1lHM3Z0N1FI?=
+ =?utf-8?B?NnQ1MVNSTTU1eXJEeFFjODVST2NaUHBTM09ybmVJZG42SVhmQ1p6U1NFNkRn?=
+ =?utf-8?B?bExiZ2czZk9vQ1dDVjc3YXZUTnVIQmlrbWMxeEh3aVI4dnlBM3h3MlRtVDB3?=
+ =?utf-8?B?Mmh5WFFHeFpvajdkREhpMWJ6QnIyeHdxbk9NRS9tOUJsd1pCL1lwTXRFcmI5?=
+ =?utf-8?B?c2c1TlZWcFJTRWRHaEFOL0Z3ZUVPRnJsWlV3WkZYMFJCejJ5MkhRUDYvZWpI?=
+ =?utf-8?B?MHdmT3BhSmhpRUMrZWg3UC82MHlrdEMxak5oVHMxSjVQbTNOZlZnTE5hTHli?=
+ =?utf-8?B?ZWE5bjBuellnVy9UMFpyMndkdWZFT3VyV0ltZjlVSUJSNTN3TXRORUhzc0Vo?=
+ =?utf-8?B?T0l0TWlnZWRiTHIveG9EZWxxb0h3aGFyc0RxalhLejhHV0FiNWd3Mk51SllO?=
+ =?utf-8?B?SC9lTFlERVlvZWlBUTlvWFB1RlpWZ1E2Y0dsMUVUZGsxUWNvelVqN2Z3cnNC?=
+ =?utf-8?B?ckZLNXkwbnI4RXBESDREZHNiWnQrU1pVNFhYcHpFam9DR296cDBmSVJXNlVT?=
+ =?utf-8?B?LzQ5ZFUvTHFsSmcwcXA2RXdaVUxBaytpdjVBWXFZOFBaNXpNUFZ1djNBYzZ5?=
+ =?utf-8?B?RDV5eEF3dGJyb09qakV4cW9CVjRnY2twV3VDZHU1RkVIWi9LR09ZTHB4VTU3?=
+ =?utf-8?B?YUZsL215WlZLMnlDQW9BNUZ2RWpFdG1mMzBXVWxVOE5NY2lkOTdiSGI1UGRD?=
+ =?utf-8?B?ZVpJdFVYYStiVXhVU0JHK3orVWNYellFdm0xRHhnN1J0cTQ2RnlrTzg4Slc5?=
+ =?utf-8?B?VkJ2Vmt5YVhYZTNOMzY0c3hIQXFvTkgrdmw2NHhFeXFleWR2QnBaN1ZzblFr?=
+ =?utf-8?B?Y2x0Z2w4NG1vSGthZmgyMm1hT1RmTnRxYXpvUm1SY3dOdXRlZjh3RGg3Uk9s?=
+ =?utf-8?B?em5tbE9nSjltR08vVHBFU0t2K2x3NUI0NjF2R0pxbytBOHFTTzNpTm1KeEJI?=
+ =?utf-8?B?ZlN3eUlPVEY4L3ova29HL3Nocjh2TG9GY3Z3N3RSa1R3TUNqZWpKTTkwZE5l?=
+ =?utf-8?B?TDZZR29IZ0tzdUkyOE5xanlnbk5WaG5CK2RDZG9DQmNkYnMzYUhxUU5xTmxL?=
+ =?utf-8?B?VGJyT25jODNxeml2QXBhbW5Od0FabzA0U3NXSFFOQ2Y5cGJEMFFZbUFEcklG?=
+ =?utf-8?B?S1loZ1RJVGRsamk1SjcrejlBTFhHMDMvZXp4Yk5LTC9VaVV4clFpckVhTG5K?=
+ =?utf-8?B?SHlLOHBDK0FLRXhZUm9sL1FkaUhtQVl4MU5ORlJCUS9IVkFjZ3IzK2ZnWVpk?=
+ =?utf-8?B?QStwMWRrdU04SWNDbG8yanVqYXlIbDVGY1BoMHF4WTBhK2MxZ0RMNVA3TmUr?=
+ =?utf-8?B?OU95eWIxZzFhZDlNUTA2a09kb2trV24yajN4Mk5BZnFxR1V1THlBT0RXZzFO?=
+ =?utf-8?B?Wms4Q3JyRmUyU0sweTlrZzN6bUo1aURMRThoM3BVUEIvVFM4YnJxNkZjSXhu?=
+ =?utf-8?B?VUVtMU00UWxsem5MYjJBMkdya0xBVGNKbEwwV1RaNUFTWUZWc0krY1R1OWpT?=
+ =?utf-8?B?aXp1ejF4UVVCdVVpU0kvVHc5T1VaaU1TZVNyTjZ0a1VhL3ZRZi9nWEU0cmNF?=
+ =?utf-8?B?QklBOFBkNW9uL3hMUVpubFNYUU43dzVFMWMzemh6cFE4ZGFKV1B4eFlUTXNV?=
+ =?utf-8?B?N2Jqc21jWm5WT3pDV05iNDJUWXBhb2xnakgzQUhpdEs5V3ZaLzRRLzFUd1BM?=
+ =?utf-8?B?RXQ5UDZUd0lDWG1lamNQUDhxOUJJQXYzV0pMcFFEQ0t5RUs4NW4vS01SOG9W?=
+ =?utf-8?B?ME53MEIvVU9TTk8xNU9XOUxsallJSTU3OFQvUXczWEtjSXYwZkYzdUVFTTEv?=
+ =?utf-8?B?WjNJZW10THVQV3QzTlg1bGRNc3pYeVo4K3B4UXVCRkE4dDNTalB5WTJGN2Zl?=
+ =?utf-8?B?RTRTRzRjU3QrZ3FKeDAvOTNYTDlYWU5NSWRPeW1WNUxzcjJkSlA5ZHVTT3FC?=
+ =?utf-8?B?bnFWblZwdkxyclJjb2ZTUElUeWttMldJOGZBalU1ZTZTeFV0aEVmbm80YlRu?=
+ =?utf-8?Q?DQY6zLCg8ueT6FS5Xuc3GAhDv?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13c3ebfe-7b66-4420-b503-08de31f3b778
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2025 22:38:04.8415
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2025 22:39:56.0904
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MjLTU6EY0GV7kMt5wececb26h1Vu8LXlev7EGTlK4u2moRklmkb5CJdkepx0Dpv60pMtXKQpQz7jKu5EWrZPF7LGjHRjpbqhNzIQR81jebU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8698
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6DWstLvI0WEX89BQmo6ZgkdZ2YJKLaAPzq7H0iNGrtK/r/bhM6T4Xb7nL8G14oI8x3KogRtiVSQx1GO+dQthnw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7656
 
-On Wed, Dec 03, 2025 at 07:08:50AM +1030, Qu Wenruo wrote:
+
+
+On 12/2/2025 4:30 PM, Alexey Kardashevskiy wrote:
 > 
 > 
-> 在 2025/12/3 03:39, Giovanni Cabiddu 写道:
-> > On Tue, Dec 02, 2025 at 09:43:24AM +1030, Qu Wenruo wrote:
-> > > 
-> > > 
-> > > 在 2025/12/2 08:48, Giovanni Cabiddu 写道:
-> > > > On Tue, Dec 02, 2025 at 07:27:18AM +1030, Qu Wenruo wrote:
-> > > [...]
-> > > > > > Here is what happens:
-> > > > > > 1. The acomp tfm is allocated as part of the compression workspace.
-> > > > > 
-> > > > > Not an expert on crypto, but I guess acomp is not able to really dynamically
-> > > > > queue the workload into different implementations, but has to determine it
-> > > > > at workspace allocation time due to the differences in
-> > > > > tfm/buffersize/scatter list size?
-> > > > Correct. There isn't an intermediate layer that can enqueue to a
-> > > > separate implementation. The enqueue to a separate implementation can be
-> > > > done in a specific implementation. The QAT driver does that to implement
-> > > > a fallback to software.
-> > > > 
-> > > > > This may be unrealistic, but is it even feasible to hide QAT behind generic
-> > > > > acomp decompress/compress algorithm names.
-> > > > > Then only queue the workload to QAT devices when it's available?
-> > > > That is possible. It is possible to specify a generic algorithm name to
-> > > > crypto_alloc_acomp() and the implementation that has the highest
-> > > > priority will be selected.
-> > > 
-> > > I think it will be the best solution, and the most transparent one.
-> > > 
-> > > > 
-> > > > > Just like that we have several different implementation for RAID6 and can
-> > > > > select at module load time, but more dynamically in this case.
-> > > > > 
-> > > > > With runtime workload delivery, the removal of QAT device can be pretty
-> > > > > generic and transparent. Just mark the QAT device unavailable for new
-> > > > > workload, and wait for any existing workload to finish.
-> > > > > 
-> > > > > And this also makes btrfs part easier to implement, just add acomp interface
-> > > > > support, no special handling for QAT and acomp will select the best
-> > > > > implementation for us.
-> > > > > 
-> > > > > But for sure, this is just some wild idea from an uneducated non-crypto guy.
-> > > > 
-> > > > I'm trying to better understand the concern:
-> > > > 
-> > > > Is the issue that QAT specific details are leaking into BTRFS?
-> > > > Or that we currently have two APIs performing similar functions being
-> > > > called (acomp and the sw libs)?
-> > > > 
-> > > > If it is the first case, the only QAT-related details exposed are:
-> > > > 
-> > > >    * Offload threshold – This can be hidden inside the implementation of
-> > > >      crypto_acomp_compress/decompress() in the QAT driver or exposed as a
-> > > >      tfm attribute (that would be my preference), so we can decide early
-> > > >      whether offloading makes sense without going throught the conversions
-> > > >      between folios and scatterlists
-> > > 
-> > > This part is fine, the practical threshold will be larger than 1024 and 2048
-> > > anyway.
-> > > 
-> > > > 
-> > > >    * QAT implementation names, i.e.:
-> > > >          static const char *zlib_acomp_alg_name = "qat_zlib_deflate";
-> > > >          static const char *zstd_acomp_alg_name = "qat_zstd";
-> > > >      We can use the generic names instead. If the returned implementation is
-> > > >      software, we simply ignore it. This way we will enable all the devices
-> > > >      that implement the acomp API, not only QAT. However, the risk is testing.
-> > > >      I won't be able to test such devices...
-> > > 
-> > > This is only a minor part of the concern.
-> > > 
-> > > The other is the removal of QAT, which is implemented as a per-fs interface
-> > > and fully exposed to btrfs.
-> > > And that's really the only blockage to me.
-> > > 
-> > > If QAT is the first one doing this, would there be another drive
-> > > implementing the same interface for its removal in the future?
-> > > To me this doesn't look to scale.
-> > 
-> > I should have explained this better.
-> > 
-> > The switch is not QAT specific:
-> > 
-> >      /sys/fs/btrfs/<UUID>/offload_compress
-> > 
-> > It does not require any other compression engine that plugs into the
-> > acomp framework to implement anything.
-> > 
-> > Here's how it works:
-> > 
-> >    * If `offload_compress` is enabled, an acomp tfm is allocated. The tfm
-> >      allocation in the algorithm implementation typically increments the
-> >      reference count on the driver that provides the algorithm. At this
-> >      point, the hardware implementation of the algorithm is selected.
-> >      Compression/decompression is done through the acomp APIs.
-> > 
-> >    * If `offload_compress` is disabled, the acomp tfms in the workspace are
-> >      freed, and the software libraries are used instead.
-> > 
-> > So there is nothing QAT specific here. The mechanism is generic.
+> On 3/12/25 01:52, Tom Lendacky wrote:
+>> On 12/1/25 20:44, Alexey Kardashevskiy wrote:
+>>> Implement the SEV-TIO (Trusted I/O) firmware interface for PCIe TDISP
+>>> (Trust Domain In-Socket Protocol). This enables secure communication
+>>> between trusted domains and PCIe devices through the PSP (Platform
+>>> Security Processor).
+>>>
+>>> The implementation includes:
+>>> - Device Security Manager (DSM) operations for establishing secure links
+>>> - SPDM (Security Protocol and Data Model) over DOE (Data Object Exchange)
+>>> - IDE (Integrity Data Encryption) stream management for secure PCIe
+>>>
+>>> This module bridges the SEV firmware stack with the generic PCIe TSM
+>>> framework.
+>>>
+>>> This is phase1 as described in Documentation/driver-api/pci/tsm.rst.
+>>>
+>>> On AMD SEV, the AMD PSP firmware acts as TSM (manages the security/trust).
+>>> The CCP driver provides the interface to it and registers in the TSM
+>>> subsystem.
+>>>
+>>> Detect the PSP support (reported via FEATURE_INFO + SNP_PLATFORM_STATUS)
+>>> and enable SEV-TIO in the SNP_INIT_EX call if the hardware supports TIO.
+>>>
+>>> Implement SEV TIO PSP command wrappers in sev-dev-tio.c and store
+>>> the data in the SEV-TIO-specific structs.
+>>>
+>>> Implement TSM hooks and IDE setup in sev-dev-tsm.c.
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+>>
+>> Just some minor comments below. After those are addressed:
+>>
+>> For the ccp related changes in the whole series:
+>>
+>> Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 > 
-> But only QAT requires this, a "generic" mechanism only for QAT.
-If this solution is adopted for other accelerators, they will need it as
-well.
+> Dan did it right (thanks Dan!).
+> 
+> 
+>>
+>>> ---
+>>> Changes:
+>>> v2:
+>>> * moved declarations from sev-dev-tio.h to sev-dev.h
+>>> * removed include "sev-dev-tio.h" from sev-dev.c to fight errors when TSM is disabled
+>>> * converted /** to /* as these are part of any external API and trigger unwanted kerneldoc warnings
+>>> * got rid of ifdefs
+>>> * "select PCI_TSM" moved under CRYPTO_DEV_SP_PSP
+>>> * open coded SNP_SEV_TIO_SUPPORTED
+>>> * renamed tio_present to tio_supp to match the flag name
+>>> * merged "crypto: ccp: Enable SEV-TIO feature in the PSP when supported" to this one
+>>> ---
+>>>   drivers/crypto/ccp/Kconfig       |   1 +
+>>>   drivers/crypto/ccp/Makefile      |   4 +
+>>>   drivers/crypto/ccp/sev-dev-tio.h | 123 +++
+>>>   drivers/crypto/ccp/sev-dev.h     |   9 +
+>>>   include/linux/psp-sev.h          |  11 +-
+>>>   drivers/crypto/ccp/sev-dev-tio.c | 864 ++++++++++++++++++++
+>>>   drivers/crypto/ccp/sev-dev-tsm.c | 405 +++++++++
+>>>   drivers/crypto/ccp/sev-dev.c     |  51 +-
+>>>   8 files changed, 1465 insertions(+), 3 deletions(-)
+>>>
+>>
+>>> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+>>> index 9e0c16b36f9c..d6095d1467b3 100644
+>>> --- a/drivers/crypto/ccp/sev-dev.c
+>>> +++ b/drivers/crypto/ccp/sev-dev.c
+>>> @@ -75,6 +75,10 @@ static bool psp_init_on_probe = true;
+>>>   module_param(psp_init_on_probe, bool, 0444);
+>>>   MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initialized on module init. Else the PSP will be initialized on the first command requiring it");
+>>>   +static bool sev_tio_enabled = IS_ENABLED(CONFIG_PCI_TSM);
+>>> +module_param_named(tio, sev_tio_enabled, bool, 0444);
+>>> +MODULE_PARM_DESC(tio, "Enables TIO in SNP_INIT_EX");
+>>
+>> Hmmm... I thought you said you wanted to hide the module parameter if
+>> CONFIG_PCI_TSM isn't enabled. Either way, it's fine.
+> 
+> I did but you did not and I do not care that much :)
+> 
+>>
+>>> +
+>>>   MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
+>>>   MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
+>>>   MODULE_FIRMWARE("amd/amd_sev_fam19h_model0xh.sbin"); /* 3rd gen EPYC */
+>>> @@ -251,7 +255,7 @@ static int sev_cmd_buffer_len(int cmd)
+>>>       case SEV_CMD_SNP_COMMIT:        return sizeof(struct sev_data_snp_commit);
+>>>       case SEV_CMD_SNP_FEATURE_INFO:        return sizeof(struct sev_data_snp_feature_info);
+>>>       case SEV_CMD_SNP_VLEK_LOAD:        return sizeof(struct sev_user_data_snp_vlek_load);
+>>> -    default:                return 0;
+>>> +    default:                return sev_tio_cmd_buffer_len(cmd);
+>>>       }
+>>>         return 0;
+>>> @@ -1434,6 +1438,19 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+>>>           data.init_rmp = 1;
+>>>           data.list_paddr_en = 1;
+>>>           data.list_paddr = __psp_pa(snp_range_list);
+>>> +
+>>> +        bool tio_supp = !!(sev->snp_feat_info_0.ebx & SNP_SEV_TIO_SUPPORTED);
+>>
+>> Please put the variable definition at the top of the "if" block instead
+>> of in the middle of the code.
+>>> +
+>>> +        data.tio_en = tio_supp && sev_tio_enabled && amd_iommu_sev_tio_supported();
+>>
+>> Don't you still want to take CONFIG_PCI_TSM into account?
+>>
+>>     data.tio_en = IS_ENABLED(CONFIG_PCI_TSM) && tio_supp && sev_tio_enabled && amd_iommu_sev_tio_supported();
+>>
+>> or
+>>     if (IS_ENABLED(CONFIG_PCI_TSM)
+>>         data.tio_en = tio_supp && sev_tio_enabled && amd_iommu_sev_tio_supported();
+>>
+>> But if you change back to #ifdef the module parameter, then you won't
+>> need the IS_ENABLED() check here because sev_tio_enabled will be set
+>> based on CONFIG_PCI_TSM and will be false and not changeable if
+>> CONFIG_PCI_TSM is not y.
+> 
+> 
+> Ah true. I thought sev_tio_enabled=IS_ENABLED(CONFIG_PCI_TSM) does it but missed that sev_tio_enabled is exported as a parameter so not a constant at compile time.
+> 
+> 
+>>> +
+>>> +        /*
+>>> +         * When psp_init_on_probe is disabled, the userspace calling
+>>> +         * SEV ioctl can inadvertently shut down SNP and SEV-TIO causing
+>>> +         * unexpected state loss.
+>>> +         */
+>>
+>> After this is merged, lets see if sev_move_to_init_state() can be
+>> cleaned up to avoid this situation.
+> 
+> Do we want to keep psp_init_on_probe, why? Thanks,
+> 
 
-I tested sending traffic to another device that plugs into the acomp API
-(Intel IAA) and then tried removing the module while in-flight
-compression operations were ongoing. It was not possible to remove it
-(as expected!).
-
-IAA currently only implements deflate (not zlib-deflate), so it cannot
-be used for this specific case, but the same limitation applies. There
-are also other drivers in drivers/crypto, including non-Intel ones, that
-integrate with acomp for compression.
-
-So this is not QAT-specific. The problem exists for any accelerator using
-acomp when dynamic removal is required.
+I think we still need to support "psp_init_on_probe" to support deferred SEV initialization and continue supporting SEV INIT_EX.
 
 Thanks,
+Ashish
 
--- 
-Giovanni
+> 
+>>
+>> Thanks,
+>> Tom
+>>
+>>> +        if (data.tio_en && !psp_init_on_probe)
+>>> +            dev_warn(sev->dev, "SEV-TIO as incompatible with psp_init_on_probe=0\n");
+>>> +
+>>>           cmd = SEV_CMD_SNP_INIT_EX;
+>>>       } else {
+>>>           cmd = SEV_CMD_SNP_INIT;
+>>> @@ -1471,7 +1488,8 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+>>>         snp_hv_fixed_pages_state_update(sev, HV_FIXED);
+>>>       sev->snp_initialized = true;
+>>> -    dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
+>>> +    dev_dbg(sev->dev, "SEV-SNP firmware initialized, SEV-TIO is %s\n",
+>>> +        data.tio_en ? "enabled" : "disabled");
+>>>         dev_info(sev->dev, "SEV-SNP API:%d.%d build:%d\n", sev->api_major,
+>>>            sev->api_minor, sev->build);
+>>> @@ -1479,6 +1497,23 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+>>>       atomic_notifier_chain_register(&panic_notifier_list,
+>>>                          &snp_panic_notifier);
+>>>   +    if (data.tio_en) {
+>>> +        /*
+>>> +         * This executes with the sev_cmd_mutex held so down the stack
+>>> +         * snp_reclaim_pages(locked=false) might be needed (which is extremely
+>>> +         * unlikely) but will cause a deadlock.
+>>> +         * Instead of exporting __snp_alloc_firmware_pages(), allocate a page
+>>> +         * for this one call here.
+>>> +         */
+>>> +        void *tio_status = page_address(__snp_alloc_firmware_pages(
+>>> +            GFP_KERNEL_ACCOUNT | __GFP_ZERO, 0, true));
+>>> +
+>>> +        if (tio_status) {
+>>> +            sev_tsm_init_locked(sev, tio_status);
+>>> +            __snp_free_firmware_pages(virt_to_page(tio_status), 0, true);
+>>> +        }
+>>> +    }
+>>> +
+>>>       sev_es_tmr_size = SNP_TMR_SIZE;
+>>>         return 0;
+>>> @@ -2758,8 +2793,20 @@ static void __sev_firmware_shutdown(struct sev_device *sev, bool panic)
+>>>     static void sev_firmware_shutdown(struct sev_device *sev)
+>>>   {
+>>> +    /*
+>>> +     * Calling without sev_cmd_mutex held as TSM will likely try disconnecting
+>>> +     * IDE and this ends up calling sev_do_cmd() which locks sev_cmd_mutex.
+>>> +     */
+>>> +    if (sev->tio_status)
+>>> +        sev_tsm_uninit(sev);
+>>> +
+>>>       mutex_lock(&sev_cmd_mutex);
+>>> +
+>>>       __sev_firmware_shutdown(sev, false);
+>>> +
+>>> +    kfree(sev->tio_status);
+>>> +    sev->tio_status = NULL;
+>>> +
+>>>       mutex_unlock(&sev_cmd_mutex);
+>>>   }
+>>>   
+>>
+> 
