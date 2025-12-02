@@ -1,663 +1,223 @@
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011010.outbound.protection.outlook.com [52.101.62.10])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010028.outbound.protection.outlook.com [52.101.85.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6161EF0B9;
-	Tue,  2 Dec 2025 02:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519CA3597B;
+	Tue,  2 Dec 2025 02:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.28
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764641089; cv=fail; b=klZCSB/qEx/Dlmo3lzhGk6kz+JVX5g65XfFCmTGeVJljZzNGyMksI+7JPHnhESLTKVkN4GpR8fK4dNsiBTE3ta0K2IcVmWLjCF/EfmMIDX9agebfK53U1BenRw6i500WLciT4Ll5zjNex7YP6dLM/kMxonuOjvHnY/im2eFf8ec=
+	t=1764643556; cv=fail; b=NoDh3cKD4cKRnIYg5ARbREPAPUUBPUw1Q36ewTVTGBALC7y2k+zBKt+cZh6ch7bJz5u8IpPLoItiBFYbozp5gQBmDbl9fkDxJ1ffZI5q1CwOIRRKoo+y0677kunccxJNFcZZC7gFnzF2LlOLzgZs7wLjQbirvm47iNeJI5UBSiY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764641089; c=relaxed/simple;
-	bh=34kY064LV452XU/fXNco1PeX5gL4lEr1mnLr9a2L8YA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Pewe19/KsJWMxlXWHHM2r5QKl699ArxPHzj3bCrRfkOSzJMVKAFxYtW8yj8p4c+WtovzlKPKbx5srE2edQ86PdD2v90lLzg8OKWX9USY+oWm75ghn3tLueVgWHCzqcf3MpAsSV1LslRgqEqn9gkGMr5vZHVIxp/uACVr0/8/bU4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OyWEUx8m; arc=fail smtp.client-ip=52.101.62.10
+	s=arc-20240116; t=1764643556; c=relaxed/simple;
+	bh=vRj/N0mJXU+2YtMgMm0oZXE1zLKHm6NcQogcdznNdYg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Psvv+vJilhl8TItKwQ6wwpx8pr7sTDJ+9OSM7L6vX/I3LYKH0mYa+4q0SSri3oBUFwnn8ZFMTska0BLcKt9drTigrm6b81vylEuXSvIWtDGnLNtCHee0ZtZOAIsm5j1Msuk30BQexfS3S2Zv507ziXwJ6sBNSa0LGb7LAbQ9vNo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=dYY8QQKV; arc=fail smtp.client-ip=52.101.85.28
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OyWEUx8m"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="dYY8QQKV"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=j1zhE9Gr8FVc0eZg1r7eaPLorJCa++MKCt8KONZNdLObA4gICJvfG2BgYsauvmm5i1ahIs+E2ZkoT8uRx2kwzBZuZs4PlMNxjoI9xxi2LxWoMleDUYYecl7SmrpX3SjsEvLpG6atZGQFs9gH69rYjmC261E1x3upYJ0nDagutggSjYsNO5wTjCnoC4MwnCRq6V+BgMHVEALX8/xvcEZ98nuOBMqium2/s7mLIaiFm1M02jVtK/LSWPNa5/0embrIu/MNCbXli5XOd+X608KcE5K7+cM3PnRK++nett4KVGmP1UjUIPaa9RKkTM81mtAT5VMODEZM1JUo6UEsLst9bw==
+ b=Ch9MWp5kJKZKF6iw/arBZdLY3UpghEd7ue8bpHoDhd5NsKPjN6iRQB5wePzY2ioDMAkbrr9tQE2s2pDYnEYels4BCOJYTSwpu6f8R0OVMfAYoYJtktlhALGnLFBlVqZxyg1buwyCVWZ65sjdprtxeppMqNNGQyP2jWBNAR5Jlavd9BQQiJ6ocaq82Nt3u8nQTydX5bJKMm1VxGd41x1hQSQGv/+rfwYDe3TfgUoz00DoCGKmkpYQ69ZyYan2ri9t5hYzoAMMYwrwzbh8g/DAkaTHiCFcQjceU8b1Fi5MAvQ+JdSFEnsPdKzcXGS1XoQxORoBu5ehUTmoiwPq2a6WyA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9OHJbCs2e1Z4St54JAEF790186IKZhzj41u7ufkiXMw=;
- b=qxpd83LmNMGZnHItkEz+mr8EhNFiKxy48HDqiZui+CymVb+pxeJC6sjyBWU5o0s4eEPnkWylEwRM0BJZSBjoc+eCijDn4sYqRfh45o4TWX5srUfGjpGj8bXryyypGTE1Fpv3VJp3d1qaxiaRuiuuZhzepDIlmYaYUA2g1y8cYGzbxIThOcXPsotHMQHe/ltHiSHePgsXnKpmCGfYEYlDSesyhTjqva/ldQVvHqXcap2ha25OecuvbJmsOsYXlszG2HW6IMavrU1aXFsCCyELkEEC8xKLiJAO4IWZl4PggwC2/YPed8TpHjImXMiPJNsZI6ujTy8oVMl7mTTt+EhXsA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+ bh=6UE5Bu7pdMDUmMUBstAYhr683llJR92UiMcvAF8DXC4=;
+ b=SEpUVsAH7KAAE2YCtRRt1Q1kK7posAo0iK1T5gSbCe1INf2XY/WllipOYmzZbDNykG4bGJ4LcMz9nxd5twWYQEMLlLbSI436SBGXpmWrEY0X8oeBQb5tEaNQ/uRP2MIWvg3gSLxuCinxoO+RXVkqdiTNaQ8zaUj9BaREcZe8AN6b1q0HBFDrhHom/YZGhsxif/nOo9i6VwuEAxoCc1+RoUfJQMC8xmVtXaWh5UxpbKsJURAuH6kl9kYFTK2P9GGLovHCNVnb0S1oKTm38d339J1uOCAHDRlDxCNar/im6j8VMOchoqMR4ZvWItgPXMXvRoW5rMt1Hv6KIV03JLGYHw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9OHJbCs2e1Z4St54JAEF790186IKZhzj41u7ufkiXMw=;
- b=OyWEUx8m/TD9s/AyKXHa/QUPKl+JJGylZboGd3iWdRI+YPKLvDmjyXuVTBRdi97oXrHO0cN3rZraCry01+gFbMqSaFupGswnvCJebQtNoWcQ9MZY96ay30OmNqC9vdu4G8OoLnpqEYCXHhDL8n6dEbJyCcVG+zAG8G7Sdx5x24w=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by SJ2PR12MB9162.namprd12.prod.outlook.com (2603:10b6:a03:555::8) with
+ bh=6UE5Bu7pdMDUmMUBstAYhr683llJR92UiMcvAF8DXC4=;
+ b=dYY8QQKVmXz2y9oIy6ka4NdPp0YT1gH8pOPy/I7veRbsw1rJ1QeBsnBoYNg/nmg87731+rFWv5vBTcfg8Y74s2H38hg3E9VF+G+mtWhidgGKN9EaWRkUvHk9c99n2TOs/kCwxAdxFXclg5bCZtWTQJ3DR8OdIo7NWU+4V72nACs=
+Received: from SJ0PR05CA0007.namprd05.prod.outlook.com (2603:10b6:a03:33b::12)
+ by CY8PR12MB8362.namprd12.prod.outlook.com (2603:10b6:930:7e::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Tue, 2 Dec
- 2025 02:04:44 +0000
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::1e6b:ca8b:7715:6fee]) by CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::1e6b:ca8b:7715:6fee%4]) with mapi id 15.20.9366.012; Tue, 2 Dec 2025
- 02:04:43 +0000
-Message-ID: <de801efa-61fe-4540-8749-c3483e0f793e@amd.com>
-Date: Tue, 2 Dec 2025 13:04:24 +1100
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH kernel v2 5/5] crypto/ccp: Implement SEV-TIO PCIe IDE
- (phase1)
-To: Tom Lendacky <thomas.lendacky@amd.com>, linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org, John Allen <john.allen@amd.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Ashish Kalra
- <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
- Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
- Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
- "Borislav Petkov (AMD)" <bp@alien8.de>, Kim Phillips <kim.phillips@amd.com>,
- Jerry Snitselaar <jsnitsel@redhat.com>, Vasant Hegde <vasant.hegde@amd.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Gao Shiyuan <gaoshiyuan@baidu.com>,
- Sean Christopherson <seanjc@google.com>, Nikunj A Dadhania <nikunj@amd.com>,
- Michael Roth <michael.roth@amd.com>, Amit Shah <amit.shah@amd.com>,
- Peter Gonda <pgonda@google.com>, iommu@lists.linux.dev
-References: <20251121080629.444992-1-aik@amd.com>
- <20251121080629.444992-6-aik@amd.com>
- <fd5bdddc-fd22-4373-a8ff-3933c63cbacc@amd.com>
+ 2025 02:45:51 +0000
+Received: from SJ5PEPF000001EC.namprd05.prod.outlook.com
+ (2603:10b6:a03:33b:cafe::e1) by SJ0PR05CA0007.outlook.office365.com
+ (2603:10b6:a03:33b::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9388.9 via Frontend Transport; Tue, 2
+ Dec 2025 02:45:20 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SJ5PEPF000001EC.mail.protection.outlook.com (10.167.242.200) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9388.8 via Frontend Transport; Tue, 2 Dec 2025 02:45:50 +0000
+Received: from aiemdee.l.aik.id.au (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 1 Dec
+ 2025 20:45:37 -0600
 From: Alexey Kardashevskiy <aik@amd.com>
-Content-Language: en-US
-In-Reply-To: <fd5bdddc-fd22-4373-a8ff-3933c63cbacc@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SY4P282CA0010.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:10:a0::20) To CH3PR12MB9194.namprd12.prod.outlook.com
- (2603:10b6:610:19f::7)
+To: <linux-kernel@vger.kernel.org>
+CC: <linux-crypto@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, Ashish Kalra <ashish.kalra@amd.com>,
+	Joerg Roedel <joro@8bytes.org>, Suravee Suthikulpanit
+	<suravee.suthikulpanit@amd.com>, Will Deacon <will@kernel.org>, Robin Murphy
+	<robin.murphy@arm.com>, Borislav Petkov <bp@suse.de>, "Borislav Petkov (AMD)"
+	<bp@alien8.de>, Dan Williams <dan.j.williams@intel.com>, Jason Gunthorpe
+	<jgg@ziepe.ca>, Jerry Snitselaar <jsnitsel@redhat.com>, Vasant Hegde
+	<vasant.hegde@amd.com>, Gao Shiyuan <gaoshiyuan@baidu.com>, "Sean
+ Christopherson" <seanjc@google.com>, Kim Phillips <kim.phillips@amd.com>,
+	Nikunj A Dadhania <nikunj@amd.com>, Michael Roth <michael.roth@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, <iommu@lists.linux.dev>, "Alexey
+ Kardashevskiy" <aik@amd.com>, <x86@kernel.org>, <linux-coco@lists.linux.dev>
+Subject: [PATCH kernel v3 0/4] PCI/TSM: Enabling core infrastructure on AMD SEV TIO
+Date: Tue, 2 Dec 2025 13:44:45 +1100
+Message-ID: <20251202024449.542361-1-aik@amd.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|SJ2PR12MB9162:EE_
-X-MS-Office365-Filtering-Correlation-Id: 294cb75a-9226-4237-a334-08de314728f1
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001EC:EE_|CY8PR12MB8362:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6ee0734e-3107-40c4-e0f4-08de314ce7a1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|7416014|376014|1800799024|36860700013|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?anlod252K084ZGtOOFN3QWdvT3FCNGU3QU9LRkc2QkFIeUdBYVo1WTBzZGNa?=
- =?utf-8?B?REF0TmtJcTJ0WFFOaEFPRktKVVFDcTB4RUt4TlRQVzVqMHhQRTcwWDRzNm54?=
- =?utf-8?B?TVR4QStLdzM5NXloRk9kVzhEK05BVjAxS2U3MzM4SGtESlJ6TG91MityRW0w?=
- =?utf-8?B?WEtEQzE0USs0RFVmNzJhSjYvcWE4TEJXM2xsMlNVWHp1ZzJQQ2JFV21aa3J1?=
- =?utf-8?B?bU1ibWgwbDJnUjRCZ3loNWJTL3dxWnZzL3RaWEVCRUoxSUZrZDRkVWQyTnR5?=
- =?utf-8?B?dm9nb0t1Z3FoeDZuRXRmT2JmYTNhUGZ4eVJmeTdCM3FpT1c4OEJwbHg1WUpq?=
- =?utf-8?B?TWhGSkVVUDhBQmZPNHdIZDF0Ly9OdU9EdHkweEc1c1JMQnFzaEh3c2g2V290?=
- =?utf-8?B?dlVKNmIrYlVHQ1JwQTZHSmpaM2R0dURRNFBUL2lGNHBYbHh0QjJTTVJMV2M2?=
- =?utf-8?B?RmY2V0FBOTNIM1lvdVJJVmRrQUZhaklhYTByalVpQmJYL2FkQko4cnF2VFVI?=
- =?utf-8?B?czYzZ2VzTDYrL3krTXUwdEFjN1gxaWU0QVVmUjdOeDJoTVZhMFZ6bll2WDYy?=
- =?utf-8?B?NG9vOWhyM2h3QTM1VmJQeVV5UmZ1dG9qOS8vWGdzQ2VTWEpSb3lCVlk4MHVq?=
- =?utf-8?B?clh0N0h4aERQb2N5NGNET1o2aktiOUVZcmVVRVVsSk9oMXVnVzdiOURTeHlO?=
- =?utf-8?B?T0kwcnlNNVFaNHJVVFQ2eUtoTHNGY1NmdG9uVXVjQlZvbEhOWTRPUDZyck1l?=
- =?utf-8?B?YTY0R1duMWhmUHpLalpSeUxqREpyaTJpSk1sUDhIY3lBZXlYTDQzTXdVc05x?=
- =?utf-8?B?QkhaVVRMOE1PTU5MWHBZQmtoa2VRd2Z0QlZkbE1HdzNKOTlLZ3ZpM2J3dUN4?=
- =?utf-8?B?eVVPZEozdktWRG5ITlByQzgveW9kcDhBYmpoY2dvMzRFZWM2cDhjckV4YmN2?=
- =?utf-8?B?SmI4dkxhUFFJRHYrUStPakdmWVNYb0J4S3d0VGsrZ2ljdWZVYTZYZHNHdHF0?=
- =?utf-8?B?T01Pd3IyVjU3a0NUSjVXVGNsajEyNGRvQ3J1czdTMGJ6SCt1bU5sOURYdVFm?=
- =?utf-8?B?ODBkY0VESzJxMzkwdlg4cmRDNW5IV2kzNHdGWkVWVW1JMkVTOHZjN2d5Rkg4?=
- =?utf-8?B?bUFNc3NSN2ZjMW1QSlpGNE5sZnRkaXN2ZTVFVjhzUk9uZ0VTandDK0Zsb2lB?=
- =?utf-8?B?V292WTRTWTR2MjRTb1pkOW12WFJrYXlMajkrN3RVTjhLa1pUKzlTSDhXU3hL?=
- =?utf-8?B?OGIwY1paVnNuK3k3R0RJYkcwRkZPNXJXblFjVWF5ZHdPOGJyZUxGNHFmbEZ0?=
- =?utf-8?B?OHkzdCtRL2dSOW9talNERDJqWGFyd0txUytyL3pJZ1lRcHIxQnlNdnRlQ0p3?=
- =?utf-8?B?cGJTQUl4WGJSZXZJT1RMRjhyeUs3aFFoYlZkZnllOWgzdHArdC9qZ0dtNUVR?=
- =?utf-8?B?OHJlNlVWc2RGaGJFczhtNm43R0IwRWpwZnRvWmdSWkRmVUE1N0xjbG8yVVU1?=
- =?utf-8?B?eWtFd0pNTHVwYk54NEtUVUx0TndzckRJdzh6c1dmWXJ5Q2QwbEFNRXFnQUFC?=
- =?utf-8?B?T3Z3MkZldXAwamRra3ZtZEFPMU1WRE4yc0RtclZSRkdLOXhITnBxYjFxYjJX?=
- =?utf-8?B?ZDBpZ29DcHZFTVZES1k2dEF1U2RVWWlCNVQxYTBlNHB1a3phMllQVVhFNThu?=
- =?utf-8?B?dzN5aS95S2pDRkMyaWlGaytKcGZIYTM3d1NvS0h3MUxHMnkxQmJobktFS3RC?=
- =?utf-8?B?Z0xwUkVjdVRoOFRpREkwUFFINis4S1B0Q2NLbFV2RWtzS1BhN25QYWlVTURX?=
- =?utf-8?B?MGVaTUNJS1Q2eWhNNEZiZzZqdGUyTG51V29aZmpYQnExMHMxaXUweG05cGd0?=
- =?utf-8?B?MGVPbnZKdFlrN2YySFJzM2E4LzVnbkp1RWYxL3BNOFVEencydUdsdjNnakVq?=
- =?utf-8?Q?JMwuF1up32HPr2jLqx89ZLLXt7PjfFfx?=
+	=?us-ascii?Q?M7Rh0y79GM5H5ZRpnm2UV/3S+Jzn+EWQh04dovXnHIexOtp+o3Ii0ydYfHvs?=
+ =?us-ascii?Q?A3NVbbzvc3e4BXieLF2Pa/SAD+1aiVva1QraZBZn4qtMFwdB4XBKYxNSlKbu?=
+ =?us-ascii?Q?ty3cV5JUBTaZjSPLsXqZFkChkaiflsoUW48Z4sYaxxSBLOlcplr5Dk7l9+zR?=
+ =?us-ascii?Q?gC+8sTKFxNRkKlXekrDAuhSi95oq3bAPYboXb/8l0eRYTH5kz1ZobIf8/OCt?=
+ =?us-ascii?Q?X9CXPqJujVfhyqCf78xYYzKJEpF2VM/ivJXmmnItflGPVgbOkoAa4CSTKyFQ?=
+ =?us-ascii?Q?KKFKoEOCPx2WDJBOm2QmE5mQmRnj8rN8lMm0Mvx7sWtxyhhMCd443QgJ+6U1?=
+ =?us-ascii?Q?EjgNS3xPZBw3M9NbcrN+XjodfZtGl23XWHTnulmu6I3NODIXDEZyj30VH41r?=
+ =?us-ascii?Q?t/DSgfa/FCS78GbGyIXoHJc7fNaKOryZronfBho7i0zK0hJ6wQjXMvTi0r0f?=
+ =?us-ascii?Q?Z+l/vCoXDrnLMtagVRnSPOmupNt2ZoagJjg+jMESc/EcjFFs0oH9u724niBK?=
+ =?us-ascii?Q?G6qzuB7XfcPMzyxpIfNfXKMNbBUAZsD5dmGvSCNRi1e4r9+3ecNmu8K3LJCf?=
+ =?us-ascii?Q?GmXPcy+uS5LgNZSbTpWTe1WbHe3Mh7dXhjp4j1lzyTpdjIBZcIWWC8nUf0VS?=
+ =?us-ascii?Q?siVHSB+33VroriQOEJwaOfI8wwwcsmqszDN8kz0MfFC96kKvxVzVq/HlFD+e?=
+ =?us-ascii?Q?C7+y+Vuttjx8hJ8SgJ/g+pKeS3PXF+njEoFz+sAwJreZOe38Fd/NMOKJF/VG?=
+ =?us-ascii?Q?B8tO2rlM4+RJ99uTbQpl8HSy+DiCVzZ9Al24+v1pwCy2+UOR6t0eGl3Cyko6?=
+ =?us-ascii?Q?iNoLmMMXVz74K9HraBhXavUl9h1fALV11/8BTPh8Xp2PkNrtanPDP85XSXpV?=
+ =?us-ascii?Q?9nJMBup/wMqrbmdO46mmvcDYQ6bRujem6rCGnDHau4Yg7Wsc2q+pDonq57Cz?=
+ =?us-ascii?Q?Rse7UiLXKFuFjr3FVdJeSUNT+vd/78D6AfEKm784mQtRMh6rpcT5Gc3NhQkd?=
+ =?us-ascii?Q?jz/+PI5zWG2Ad32mKFuKRqrLfYf+czfh5S5mRDKetIoschemz2l3zDgW+IAu?=
+ =?us-ascii?Q?DtRhfWyaSCnuY2m0JZo2kUb0JzTKgzQTfbOlLU7sLDpt7IfENvmsR9ORjb16?=
+ =?us-ascii?Q?JlYbDML8ZtiwolW8c6qhbn6fpHWOwLNJktSTTVHbgj8Yvk5WJIy4v88d6c+S?=
+ =?us-ascii?Q?cAzqjZPVvRH87cNBQUKUeP1EUHEz2MI61yF9LbQW8KQA+VayZaVjMVBGY/ZR?=
+ =?us-ascii?Q?iu9nzhYz4V9qACmxJZbdVFcQdgG9A2V/eAkq70Zl4FtOuqMzdcgMjdWIVOod?=
+ =?us-ascii?Q?LOS6pppsswag94hXwnYDbxKYsnFdpoKeK2vMK3ipqSW5d+0eygV0G5uLE/Ju?=
+ =?us-ascii?Q?0ed1rErzcMcVrIrMi5pjOYqNFmCqriyjbF+LeyNIAhVLNWSbJZ6t2bswWSJb?=
+ =?us-ascii?Q?pTX/juqE/1g3NVQkgLDLwYxTodf66aa8Qq+8DaVjQ7OB8++qbpeDf/7jtdlU?=
+ =?us-ascii?Q?qNySwdgWDe+sB/GKLe0NmUuzYAKNJPoEcIcRXzmZ3il7L4jdHYbN/p+5d2s4?=
+ =?us-ascii?Q?sdI3J+rtAxQty1XbOkddl5yEYgDEyY3F6ACzvWSq?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UXZtci9kWTRkUGUycFVYNFlUZ3FUbFRla3RVdEtsVjlmVkxkcW5xSm0xTEEw?=
- =?utf-8?B?eHRKR2pvOHhhcDhPTmJnTDFuejRSL0lqWldXQ1h1aGFOODk3OGdnRGlpMjVq?=
- =?utf-8?B?VlBuUnAvQUdaaERsMjJOakk5VENhbHhENVd6cHNJZ3YwS2JUK0FKT1Uvd0dN?=
- =?utf-8?B?N0tuMEF4b2VSOS9KdXBvZ1FZRUJDNFVDMitPTHZDZDUvSGRudjJkK2x2ajhY?=
- =?utf-8?B?QTBCcFpoYk9YWExpSjk3UThZVFd3V2xOY05BRmF0QSt0eFR4cGliV3A3dWdr?=
- =?utf-8?B?WVBSRDBycCs3S3JqRk5pU1UwRmtYeG5KZ2MwRi9XaVUyZjh5eDBRNEI0R1Qv?=
- =?utf-8?B?bEd3ald2Ym4zRkJrV3p3Z1VVQ2pWWFB3RHFDa3gxUlZmektlTUkvYW9VcUVk?=
- =?utf-8?B?U2VzMXhxQUVxWlNsSlhtZ0trOVRmd3dFRjJES1FYZG56d3dPam83dE1WTkdv?=
- =?utf-8?B?WWNSRVhrbTBDNTdOUU1rYnNwZWhxYnBVQXpOQlowL0h2ZldZMTYvODVTWklL?=
- =?utf-8?B?YVNOYXB1bjRMN0N0Zm4reGpkQXcyOFhMQ01NS1VMeXFwQ2RHWUJHWXZsSzZv?=
- =?utf-8?B?ZzUzR3FWTEtaQ3RNeUJEbWhXUk9Eamp6dENWYThCdnB3R2I4QTB1dENlYzZG?=
- =?utf-8?B?TWs3eVlIV0luQ0xNVFU3NHhIWG1WZHk3citjdEdSTEpNYlJJVDlRSFdEdE02?=
- =?utf-8?B?WVk5UUxnQ0YrclVtaVdNQ2QrRnNoaUdPUGpwbUI4Tm8yVHA4STJxVWxqb2dO?=
- =?utf-8?B?Zyt4ZHRlYjJlMHRRV212ajNRcWFhTHFYMjRuUXRkQ0VvMVM0YXYvSGlVN25U?=
- =?utf-8?B?UTYzcVA2Mk92aUFxVXJSaXlWajg5QVZBT1hER3JHRlNsc2o3bjdSSUxrWHl0?=
- =?utf-8?B?Y05Xek10VFFUN25FNThFc1ZrdW9uS1NBVHg2a1U4WXFjNHFqYWhjYnFlK0x5?=
- =?utf-8?B?azJ5RkhPYVF5VFlBQjVzcHpnQTgvQkZ3aWRVaW5SSk53QlcvRE1vVk1ubU5B?=
- =?utf-8?B?TzBIa3hUVStHazV3cnRxYXVDWkF2bDhlRmxXMEZDNWpZTndFSVErWlRtclFR?=
- =?utf-8?B?VExjOGdjVWZqRmtwZkhoS0k0SE8wcXBzM3JIT3VjZ2xLSlNnK0psUGIwOG82?=
- =?utf-8?B?eTFibU5ydW1iVVJ1UmlDSjhhWnYyOUVCNklYNXQyZ2NrZTZCdTBtY0pCRG9D?=
- =?utf-8?B?RlpxRXNqUHRXb2dBeUg3bEdvVWoxaUNkT0Z3QUVKdXJ5ODhIQmE3ajJQRkNO?=
- =?utf-8?B?MmdibktobGdzeHdiMnZLSEJzRytYNlBrdHdDV0xnUnZhbkF5MisxK3EzT1A2?=
- =?utf-8?B?RVZGdWdjWjczS0hXZ1c5dEJQSG1YTWgyVHFRY282ZDdHRnBGYS9zcDE3V1M3?=
- =?utf-8?B?UTZxNDRaby9kb3Y3K0RLYjl5T0VKc0ZEanRJTDVIQS9pYjJCRVJaQTBzWmZo?=
- =?utf-8?B?QWVacC93bDQrRGI0ZWx0NHdXVndQNk02Wk5lSU5FS0c4S1I4Wk5xdnF2WWtm?=
- =?utf-8?B?UmMvMVJoUFRUOE9rNFRQdWZmRXVuNUxhT1I3ZGZiZzFoQ3plRkVnZ1FyV3Rw?=
- =?utf-8?B?QWsrSUNBaGZKNG53T0xlZkdNL1I3c1loY0V3L1JsS3ZHd09Za2dsK2VsZW9S?=
- =?utf-8?B?aGI3RCtFbkNHdjV2NnNvZW1icjFUWVgwZFU1NXF5TFZXY29IZ3VzRVI4RTNC?=
- =?utf-8?B?MmZQN1kvajVkc1VHMml6WmMxeUhxbEljOCtpZFAzK25hM0VNRE42aGpvc1F3?=
- =?utf-8?B?SmYyZ2s2c1VlRE9NcGdyZTFIT1FsKzJLd1h4V3RvOGpaNWhvNk05dnk3ME5m?=
- =?utf-8?B?MkllQUFpaXVyN0dxSFRZbkYraEI4enpSdnZSa2g4dXdWZ1VGWWF1YUx6UFFU?=
- =?utf-8?B?SlZOTUMrNUU5T3drNnR5RzNZeFNIRnRRN1BSd3Z4ZlZydlFqMUxCTGlQZ0R6?=
- =?utf-8?B?WmNlblhZb0hiOWZIaVlYcW03YlgxZGpiNFVVQlg4OEFFck13U3RNUldWSUtD?=
- =?utf-8?B?aXhJS2VuTW1OaHdXSFR1V0lRWDNjQ2JYSEw5TTJYZ0lsU0o3RTFCaTJZamN6?=
- =?utf-8?B?bHp3MjlMNVFTYUs5b2xjNjVCblNBcE41Y2FHRklaK0pSTnJCUDlnNGpqbGZh?=
- =?utf-8?Q?0kEt8W5yjUAowJsMXOAxdc5Zy?=
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(1800799024)(36860700013)(13003099007);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 294cb75a-9226-4237-a334-08de314728f1
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2025 02:04:43.6384
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2025 02:45:50.5268
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ee0734e-3107-40c4-e0f4-08de314ce7a1
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xMjaGLDOjAg1ak/vhuNGmABddEYBBPShKdw4Cmh1wS8ePPsPa/nYwv1oFdGI0xxxJvA7mk/N72yX+LZ7TJnoFg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9162
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001EC.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8362
+
+Here are some patches to begin enabling SEV-TIO on AMD.
+
+SEV-TIO allows guests to establish trust in a device that supports TEE
+Device Interface Security Protocol (TDISP, defined in PCIe r6.0+) and
+then interact with the device via private memory.
+
+In order to streamline upstreaming process, a common TSM infrastructure
+is being developed in collaboration with Intel+ARM+RiscV. There is
+Documentation/driver-api/pci/tsm.rst with proposed phases:
+1. IDE: encrypt PCI, host only
+2. TDISP: lock + accept flow, host and guest, interface report
+3. Enable secure MMIO + DMA: IOMMUFD, KVM changes
+4. Device attestation: certificates, measurements
+
+This is phase1 == IDE only.
+
+SEV TIO spec:
+https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/specifications/58271.pdf
+
+Acronyms:
+TEE - Trusted Execution Environments, a concept of managing trust
+between the host and devices
+TSM - TEE Security Manager (TSM), an entity which ensures security on
+the host
+PSP - AMD platform secure processor (also "ASP", "AMD-SP"), acts as TSM
+on AMD.
+SEV TIO - the TIO protocol implemented by the PSP and used by the host
+GHCB - guest/host communication block - a protocol for guest-to-host
+communication via a shared page
+TDISP - TEE Device Interface Security Protocol (PCIe).
 
 
 
-On 2/12/25 02:23, Tom Lendacky wrote:
-> On 11/21/25 02:06, Alexey Kardashevskiy wrote:
->> Implement the SEV-TIO (Trusted I/O) firmware interface for PCIe TDISP
->> (Trust Domain In-Socket Protocol). This enables secure communication
->> between trusted domains and PCIe devices through the PSP (Platform
->> Security Processor).
->>
->> The implementation includes:
->> - Device Security Manager (DSM) operations for establishing secure links
->> - SPDM (Security Protocol and Data Model) over DOE (Data Object Exchange)
->> - IDE (Integrity Data Encryption) stream management for secure PCIe
->>
->> This module bridges the SEV firmware stack with the generic PCIe TSM
->> framework.
->>
->> This is phase1 as described in Documentation/driver-api/pci/tsm.rst.
->>
->> On AMD SEV, the AMD PSP firmware acts as TSM (manages the security/trust).
->> The CCP driver provides the interface to it and registers in the TSM
->> subsystem.
->>
->> Implement SEV TIO PSP command wrappers in sev-dev-tio.c and store
->> the data in the SEV-TIO-specific structs.
->>
->> Implement TSM hooks and IDE setup in sev-dev-tsm.c.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
->> ---
->> Changes:
->> v2:
->> * address bunch of comments from v1 (almost all)
->> ---
->>   drivers/crypto/ccp/Kconfig       |   1 +
->>   drivers/crypto/ccp/Makefile      |   8 +
->>   drivers/crypto/ccp/sev-dev-tio.h | 142 ++++
->>   drivers/crypto/ccp/sev-dev.h     |   7 +
->>   include/linux/psp-sev.h          |   7 +
->>   drivers/crypto/ccp/sev-dev-tio.c | 863 ++++++++++++++++++++
->>   drivers/crypto/ccp/sev-dev-tsm.c | 405 +++++++++
->>   drivers/crypto/ccp/sev-dev.c     |  48 +-
->>   8 files changed, 1480 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
->> index f394e45e11ab..3e737d3e21c8 100644
->> --- a/drivers/crypto/ccp/Kconfig
->> +++ b/drivers/crypto/ccp/Kconfig
->> @@ -25,6 +25,7 @@ config CRYPTO_DEV_CCP_CRYPTO
->>   	default m
->>   	depends on CRYPTO_DEV_CCP_DD
->>   	depends on CRYPTO_DEV_SP_CCP
->> +	select PCI_TSM
-> 
-> This shouldn't be here. This is CCP related, not SEV related. This
-> should be moved under CRYPTO_DEV_SP_PSP.
-> 
->>   	select CRYPTO_HASH
->>   	select CRYPTO_SKCIPHER
->>   	select CRYPTO_AUTHENC
->> diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
->> index a9626b30044a..839df68b70ff 100644
->> --- a/drivers/crypto/ccp/Makefile
->> +++ b/drivers/crypto/ccp/Makefile
->> @@ -16,6 +16,14 @@ ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o \
->>                                      hsti.o \
->>                                      sfs.o
->>   
->> +ifeq ($(CONFIG_CRYPTO_DEV_SP_PSP)$(CONFIG_PCI_TSM),yy)
->> +ccp-y += sev-dev-tsm.o sev-dev-tio.o
->> +endif
->> +
->> +ifeq ($(CONFIG_CRYPTO_DEV_SP_PSP)$(CONFIG_PCI_TSM),my)
->> +ccp-m += sev-dev-tsm.o sev-dev-tio.o
->> +endif
->> +
-> 
-> Would it be clearer / cleaner to do:
-> 
-> ifeq ($(CONFIG_PCI_TSM),y)
-> ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += sev-dev-tsm.o sev-dev-tio.o
-> endif
-> 
->>   obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
->>   ccp-crypto-objs := ccp-crypto-main.o \
->>   		   ccp-crypto-aes.o \
->> diff --git a/drivers/crypto/ccp/sev-dev-tio.h b/drivers/crypto/ccp/sev-dev-tio.h
->> new file mode 100644
->> index 000000000000..7c42351210ef
->> --- /dev/null
->> +++ b/drivers/crypto/ccp/sev-dev-tio.h
->> @@ -0,0 +1,142 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +#ifndef __PSP_SEV_TIO_H__
->> +#define __PSP_SEV_TIO_H__
->> +
->> +#include <linux/pci-tsm.h>
->> +#include <linux/tsm.h>
->> +#include <linux/pci-ide.h>
->> +#include <uapi/linux/psp-sev.h>
->> +
->> +#if defined(CONFIG_CRYPTO_DEV_SP_PSP)
-> 
-> Since the TSM related files are included based on CONFIG_PCI_TSM,
-> shouldn't this use CONFIG_PCI_TSM?> +
->> +struct sla_addr_t {
->> +	union {
->> +		u64 sla;
->> +		struct {
->> +			u64 page_type:1;
->> +			u64 page_size:1;
->> +			u64 reserved1:10;
->> +			u64 pfn:40;
->> +			u64 reserved2:12;
-> 
-> 	u64 page_type	:1,
-> 	    page_size	:1,
-> 	    reserved1	:10,
-> 	    pfn		:40,
-> 	    reserved2	:12;
+Flow:
+- Boot host OS, load CCP which registers itself as a TSM
+- PCI TSM creates sysfs nodes under "tsm" subdirectory in for all
+  TDISP-capable devices
+- Enable IDE via "echo tsm0 >
+  /sys/bus/pci/devices/0000:e1:00.0/tsm/connect"
+- observe "secure" in stream states in "lspci" for the rootport and endpoint
 
-okay for formatting but...
+This is pushed out to
+https://github.com/AMDESE/linux-kvm/commits/tsm-staging
 
-> 
-> This makes it easier to understand. Please do this everywhere you define
-> bitfields.
-
-...I really want to keep the union here (do not care in other places though) for easier comparison of a whole structure.
+The full "WIP" trees and configs are here:
+https://github.com/AMDESE/AMDSEV/blob/tsm/stable-commits
 
 
-> 
->> +		};
->> +	};
->> +} __packed;
->> +
->> +#define SEV_TIO_MAX_COMMAND_LENGTH	128
->> +
->> +/* SPDM control structure for DOE */
->> +struct tsm_spdm {
->> +	unsigned long req_len;
->> +	void *req;
->> +	unsigned long rsp_len;
->> +	void *rsp;
->> +};
->> +
->> +/* Describes TIO device */
->> +struct tsm_dsm_tio {
->> +	u8 cert_slot;
->> +	struct sla_addr_t dev_ctx;
->> +	struct sla_addr_t req;
->> +	struct sla_addr_t resp;
->> +	struct sla_addr_t scratch;
->> +	struct sla_addr_t output;
->> +	size_t output_len;
->> +	size_t scratch_len;
->> +	struct tsm_spdm spdm;
->> +	struct sla_buffer_hdr *reqbuf; /* vmap'ed @req for DOE */
->> +	struct sla_buffer_hdr *respbuf; /* vmap'ed @resp for DOE */
->> +
->> +	int cmd;
->> +	int psp_ret;
->> +	u8 cmd_data[SEV_TIO_MAX_COMMAND_LENGTH];
->> +	void *data_pg; /* Data page for DEV_STATUS/TDI_STATUS/TDI_INFO/ASID_FENCE */
->> +
->> +#define TIO_IDE_MAX_TC	8
->> +	struct pci_ide *ide[TIO_IDE_MAX_TC];
->> +};
->> +
->> +/* Describes TSM structure for PF0 pointed by pci_dev->tsm */
->> +struct tio_dsm {
->> +	struct pci_tsm_pf0 tsm;
->> +	struct tsm_dsm_tio data;
->> +	struct sev_device *sev;
->> +};
->> +
->> +/* Data object IDs */
->> +#define SPDM_DOBJ_ID_NONE		0
->> +#define SPDM_DOBJ_ID_REQ		1
->> +#define SPDM_DOBJ_ID_RESP		2
->> +
->> +struct spdm_dobj_hdr {
->> +	u32 id;     /* Data object type identifier */
->> +	u32 length; /* Length of the data object, INCLUDING THIS HEADER */
->> +	union {
->> +		u16 ver; /* Version of the data object structure */
->> +		struct {
->> +			u8 minor;
->> +			u8 major;
->> +		} version;
->> +	};
->> +} __packed;
->> +
->> +/**
->> + * struct sev_tio_status - TIO_STATUS command's info_paddr buffer
->> + *
->> + * @length: Length of this structure in bytes
->> + * @tio_en: Indicates that SNP_INIT_EX initialized the RMP for SEV-TIO
->> + * @tio_init_done: Indicates TIO_INIT has been invoked
->> + * @spdm_req_size_min: Minimum SPDM request buffer size in bytes
->> + * @spdm_req_size_max: Maximum SPDM request buffer size in bytes
->> + * @spdm_scratch_size_min: Minimum SPDM scratch buffer size in bytes
->> + * @spdm_scratch_size_max: Maximum SPDM scratch buffer size in bytes
->> + * @spdm_out_size_min: Minimum SPDM output buffer size in bytes
->> + * @spdm_out_size_max: Maximum for the SPDM output buffer size in bytes
->> + * @spdm_rsp_size_min: Minimum SPDM response buffer size in bytes
->> + * @spdm_rsp_size_max: Maximum SPDM response buffer size in bytes
->> + * @devctx_size: Size of a device context buffer in bytes
->> + * @tdictx_size: Size of a TDI context buffer in bytes
->> + * @tio_crypto_alg: TIO crypto algorithms supported
->> + */
->> +struct sev_tio_status {
->> +	u32 length;
->> +	union {
->> +		u32 flags;
->> +		struct {
->> +			u32 tio_en:1;
->> +			u32 tio_init_done:1;
->> +		};
->> +	};
->> +	u32 spdm_req_size_min;
->> +	u32 spdm_req_size_max;
->> +	u32 spdm_scratch_size_min;
->> +	u32 spdm_scratch_size_max;
->> +	u32 spdm_out_size_min;
->> +	u32 spdm_out_size_max;
->> +	u32 spdm_rsp_size_min;
->> +	u32 spdm_rsp_size_max;
->> +	u32 devctx_size;
->> +	u32 tdictx_size;
->> +	u32 tio_crypto_alg;
->> +	u8 reserved[12];
->> +} __packed;
->> +
->> +int sev_tio_init_locked(void *tio_status_page);
->> +int sev_tio_continue(struct tsm_dsm_tio *dev_data);
->> +
->> +int sev_tio_dev_create(struct tsm_dsm_tio *dev_data, u16 device_id, u16 root_port_id,
->> +		       u8 segment_id);
->> +int sev_tio_dev_connect(struct tsm_dsm_tio *dev_data, u8 tc_mask, u8 ids[8], u8 cert_slot);
->> +int sev_tio_dev_disconnect(struct tsm_dsm_tio *dev_data, bool force);
->> +int sev_tio_dev_reclaim(struct tsm_dsm_tio *dev_data);
->> +
->> +#endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
->> +
->> +#if defined(CONFIG_PCI_TSM)
->> +void sev_tsm_init_locked(struct sev_device *sev, void *tio_status_page);
->> +void sev_tsm_uninit(struct sev_device *sev);
->> +int sev_tio_cmd_buffer_len(int cmd);
->> +#else
->> +static inline int sev_tio_cmd_buffer_len(int cmd) { return 0; }
->> +#endif
->> +
->> +#endif	/* __PSP_SEV_TIO_H__ */
->> diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
->> index b9029506383f..dced4a8e9f01 100644
->> --- a/drivers/crypto/ccp/sev-dev.h
->> +++ b/drivers/crypto/ccp/sev-dev.h
->> @@ -34,6 +34,8 @@ struct sev_misc_dev {
->>   	struct miscdevice misc;
->>   };
->>   
->> +struct sev_tio_status;
->> +
->>   struct sev_device {
->>   	struct device *dev;
->>   	struct psp_device *psp;
->> @@ -61,6 +63,11 @@ struct sev_device {
->>   
->>   	struct sev_user_data_snp_status snp_plat_status;
->>   	struct snp_feature_info snp_feat_info_0;
->> +
->> +#if defined(CONFIG_PCI_TSM)
->> +	struct tsm_dev *tsmdev;
->> +	struct sev_tio_status *tio_status;
->> +#endif
-> 
-> Do you need the #if here? Can this just be part of the sev_device struct
-> and just always NULL if CONFIG_PCI_TSM isn't set?
-> 
-> Is "struct tsm_dev" not defined if CONFIG_PCI_TSM isn't 'y'? I would
-> think it would be simpler for all to have that defined no matter what.
->>   };
->>   
->>   int sev_dev_init(struct psp_device *psp);
->> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
->> index c0c817ca3615..cce864dbf281 100644
->> --- a/include/linux/psp-sev.h
->> +++ b/include/linux/psp-sev.h
->> @@ -109,6 +109,13 @@ enum sev_cmd {
->>   	SEV_CMD_SNP_VLEK_LOAD		= 0x0CD,
->>   	SEV_CMD_SNP_FEATURE_INFO	= 0x0CE,
->>   
->> +	/* SEV-TIO commands */
->> +	SEV_CMD_TIO_STATUS		= 0x0D0,
->> +	SEV_CMD_TIO_INIT		= 0x0D1,
->> +	SEV_CMD_TIO_DEV_CREATE		= 0x0D2,
->> +	SEV_CMD_TIO_DEV_RECLAIM		= 0x0D3,
->> +	SEV_CMD_TIO_DEV_CONNECT		= 0x0D4,
->> +	SEV_CMD_TIO_DEV_DISCONNECT	= 0x0D5,
->>   	SEV_CMD_MAX,
->>   };
->>   
->> diff --git a/drivers/crypto/ccp/sev-dev-tio.c b/drivers/crypto/ccp/sev-dev-tio.c
->> new file mode 100644
->> index 000000000000..f7b2a515aae7
->> --- /dev/null
->> +++ b/drivers/crypto/ccp/sev-dev-tio.c
-> 
-> ...
-> 
->> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
->> index 2f1c9614d359..365867f381e9 100644
->> --- a/drivers/crypto/ccp/sev-dev.c
->> +++ b/drivers/crypto/ccp/sev-dev.c
->> @@ -38,6 +38,7 @@
->>   
->>   #include "psp-dev.h"
->>   #include "sev-dev.h"
->> +#include "sev-dev-tio.h"
->>   
->>   #define DEVICE_NAME		"sev"
->>   #define SEV_FW_FILE		"amd/sev.fw"
->> @@ -75,6 +76,12 @@ static bool psp_init_on_probe = true;
->>   module_param(psp_init_on_probe, bool, 0444);
->>   MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initialized on module init. Else the PSP will be initialized on the first command requiring it");
->>   
->> +#if defined(CONFIG_PCI_TSM)
-> 
-> Not sure the module parameter should be hidden in this case. But if you
-
-The module parameter won't do anything, why keep it exposed, only because of ifdefs?
+The previous conversation is here:
+https://lore.kernel.org/r/20251121080629.444992-1-aik@amd.com 
+https://lore.kernel.org/r/20251111063819.4098701-1-aik@amd.com
+https://lore.kernel.org/r/20250218111017.491719-1-aik@amd.com
 
 
-> do want it hidden, why not move the #if down one line so that
-> sev_tio_enabled is always defined. And then...
-> 
->> +static bool sev_tio_enabled = true;
-> 
-> static bool sev_tio_enabled = IS_ENABLED(CONFIG_PCI_TSM)
-> 
-> will give the proper default.
->> +module_param_named(tio, sev_tio_enabled, bool, 0444);
->> +MODULE_PARM_DESC(tio, "Enables TIO in SNP_INIT_EX");
->> +#endif
->> +
->>   MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
->>   MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
->>   MODULE_FIRMWARE("amd/amd_sev_fam19h_model0xh.sbin"); /* 3rd gen EPYC */
->> @@ -251,7 +258,7 @@ static int sev_cmd_buffer_len(int cmd)
->>   	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
->>   	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
->>   	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
->> -	default:				return 0;
->> +	default:				return sev_tio_cmd_buffer_len(cmd);
->>   	}
->>   
->>   	return 0;
->> @@ -1439,8 +1446,14 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
->>   		data.init_rmp = 1;
->>   		data.list_paddr_en = 1;
->>   		data.list_paddr = __psp_pa(snp_range_list);
->> +
->> +#if defined(CONFIG_PCI_TSM)
->>   		data.tio_en = sev_tio_present(sev) &&
->> +			sev_tio_enabled && psp_init_on_probe &&
-> 
-> Why add the psp_init_on_probe check here? Why is it not compatible?
-> psp_init_on_probe is for SEV and SEV-ES, not SNP.
-
-If psp_init_on_probe is not set, then systemd (or modprobe?) loads kvm_amd and at that point SEV init is delayed but SNP init is not so SEV-TIO gets enabled.
-
-Then, there is some systemd service in my test Ubuntu which:
-1) runs QEMU to discover something, with SEV enabled, that trigger SEV_PDH_CERT_EXPORT
-2) the kernel ioctl handler has to initialize SEV
-3) sev_move_to_init_state() returns shutdown_required=true (it does not distinguish SEV and SNP)
-4) the SEV_PDH_CERT_EXPORT handler shuts down both SEV and SNP (which includes SEV-TIO).
-
-The right thing to do is just not use psp_init_on_probe as it is really a debugging knob. But people are going to use it while DOWNLOAD_EX (which we need this psp_init_on_probe thing for) and SEV-TIO are still in their infancy. It took me half a day to sort this all in my head, hence the check.
-
-I will remove it from the above but leave the warning below and add the comment:
-
-/*
-  * When psp_init_on_probe is disabled, the userspace calling SEV ioctl
-  * can inadvertently shut down SNP and SEV-TIO during initialization,
-  * causing unexpected state loss.
-  */
+This is based on sha1
+f7ae6d4ec652 Dan Williams "PCI/TSM: Add 'dsm' and 'bound' attributes for dependent functions".
 
 
-> Instead of the #if, please use IS_ENABLED(CONFIG_PCI_TSM) so that the
-> #ifdefs can be eliminated from the code.
-> 
-> Having all these checks in sev_tio_supported() (comment from earlier
-> patch) will simplify things.
-
-I am open coding sev_tio_supported(), and ditching 4/5, seems pointless as hardly anyone will want to enable just TIO in the PSP without the host os support for it, right?
+Please comment. Thanks.
 
 
->>   			amd_iommu_sev_tio_supported();
->> +		if (sev_tio_present(sev) && !psp_init_on_probe)
->> +			dev_warn(sev->dev, "SEV-TIO as incompatible with psp_init_on_probe=0\n");
->> +#endif
->>   		cmd = SEV_CMD_SNP_INIT_EX;
->>   	} else {
->>   		cmd = SEV_CMD_SNP_INIT;
->> @@ -1487,6 +1500,24 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
->>   	atomic_notifier_chain_register(&panic_notifier_list,
->>   				       &snp_panic_notifier);
->>   
->> +#if defined(CONFIG_PCI_TSM)
-> 
-> Does this have to be here? If the functions are properly #ifdef'd in the
-> header file, then you won't have a compile issue and tio_en would only
-> be set if CONFIG_PCI_TSM is y.>>> +	if (data.tio_en) {
->> +		/*
->> +		 * This executes with the sev_cmd_mutex held so down the stack
->> +		 * snp_reclaim_pages(locked=false) might be needed (which is extremely
->> +		 * unlikely) but will cause a deadlock.
->> +		 * Instead of exporting __snp_alloc_firmware_pages(), allocate a page
->> +		 * for this one call here.
->> +		 */
->> +		void *tio_status = page_address(__snp_alloc_firmware_pages(
->> +			GFP_KERNEL_ACCOUNT | __GFP_ZERO, 0, true));
->> +
->> +		if (tio_status) {
->> +			sev_tsm_init_locked(sev, tio_status);
->> +			__snp_free_firmware_pages(virt_to_page(tio_status), 0, true);
->> +		}
->> +	}
->> +#endif
-> 
-> Add a blank line here.
-> 
->>   	sev_es_tmr_size = SNP_TMR_SIZE;
->>   
->>   	return 0;
->> @@ -2766,7 +2797,22 @@ static void __sev_firmware_shutdown(struct sev_device *sev, bool panic)
->>   
->>   static void sev_firmware_shutdown(struct sev_device *sev)
->>   {
->> +#if defined(CONFIG_PCI_TSM)
-> 
-> Ditto on the #if here. Shouldn't the function be properly ifdef'd in the
-> header file which would not require this?>> +	/*
->> +	 * Calling without sev_cmd_mutex held as TSM will likely try disconnecting
->> +	 * IDE and this ends up calling sev_do_cmd() which locks sev_cmd_mutex.
->> +	 */
->> +	if (sev->tio_status)
->> +		sev_tsm_uninit(sev);
-> 
-> Should this be part of __sev_firmware_shutdown() or
-> __sev_snp_shutdown_locked()?
 
-As the comment above explains, the sev_cmd_mutex is a problem. I'd have to have to modes of tsm::disconnect - one triggered by the user and called without sev_cmd_mutex, and the other one coming from here with sev_cmd_mutex.
+Alexey Kardashevskiy (4):
+  ccp: Make snp_reclaim_pages and __sev_do_cmd_locked public
+  psp-sev: Assign numbers to all status codes and add new
+  iommu/amd: Report SEV-TIO support
+  crypto/ccp: Implement SEV-TIO PCIe IDE (phase1)
 
-
-> 
->> +#endif
->> +
->>   	mutex_lock(&sev_cmd_mutex);
->> +
->> +#if defined(CONFIG_PCI_TSM)
-> 
-> Ditto here. Without CONFIG_PCI_TSM, sev->tio_status will be NULL
-> already, so kfree() will just return.
-
-The ifdef is here because there was one in sev-dev.h, I am dropping it now.
-
->> +	kfree(sev->tio_status);
->> +	sev->tio_status = NULL;
-> 
-> Wouldn't it be safer to do this after the call to
-> __sev_firmware_shutdown() in case that function some day needs to use
-> that structure?
-
-Uff. Right, __sev_firmware_shutdown() shuts down both SNP and SEV, I'll move that down.
-> 
-> Thanks,
-
-Thanks for the review!
-
-
-> Tom
-> 
->> +#endif
->> +
->>   	__sev_firmware_shutdown(sev, false);
->>   	mutex_unlock(&sev_cmd_mutex);
->>   }
-> 
+ drivers/crypto/ccp/Kconfig          |   1 +
+ drivers/crypto/ccp/Makefile         |   4 +
+ drivers/crypto/ccp/sev-dev-tio.h    | 123 +++
+ drivers/crypto/ccp/sev-dev.h        |  11 +
+ drivers/iommu/amd/amd_iommu_types.h |   1 +
+ include/linux/amd-iommu.h           |   2 +
+ include/linux/psp-sev.h             |  17 +-
+ include/uapi/linux/psp-sev.h        |  66 +-
+ drivers/crypto/ccp/sev-dev-tio.c    | 864 ++++++++++++++++++++
+ drivers/crypto/ccp/sev-dev-tsm.c    | 405 +++++++++
+ drivers/crypto/ccp/sev-dev.c        |  62 +-
+ drivers/iommu/amd/init.c            |   9 +
+ 12 files changed, 1529 insertions(+), 36 deletions(-)
+ create mode 100644 drivers/crypto/ccp/sev-dev-tio.h
+ create mode 100644 drivers/crypto/ccp/sev-dev-tio.c
+ create mode 100644 drivers/crypto/ccp/sev-dev-tsm.c
 
 -- 
-Alexey
+2.51.1
 
