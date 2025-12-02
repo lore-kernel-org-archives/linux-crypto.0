@@ -1,103 +1,108 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011032.outbound.protection.outlook.com [52.101.62.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D381A1F4190;
-	Tue,  2 Dec 2025 17:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374232DC761;
+	Tue,  2 Dec 2025 19:29:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764695984; cv=fail; b=SLcC5kdkK4VTBxogCgLSKQgb3S8Q5WUL2cDDwVkq/iygQalHUfs7jRWBOjvJ0a7iEr6ZO+tdRh/sddVUONSFGgA7jEAvJAwzQ8uFMudj0M47dPUNM5DsWM33VCIKIfkelKEurh8Hs4DbvPUsmw9PzHYK/CabgBIyj/MAu1no8DU=
+	t=1764703769; cv=fail; b=E7J96IZyQwF1YnJbzvD6EK9c/CISQ38Y8JabOX8uCrY8ZHyUye/dc/POGb5AhcupOPGS9b3wtMn4FW/TghJassMRS+VoQLVnvV/EVK8ozzoZhVX/WaN5dwO+KgN0okpdru/poV2uScAuxYh6kTdLQaRPoZMq5zxcIW4tRG3k2aE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764695984; c=relaxed/simple;
-	bh=0apFGSU8JEIJ783iHUZh3xOshw+MfV6IVfvbnyCwfJA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ZwivXmd+Q9NAGSu0Rxql6y1Svjh6wopZCO3KxLANKotAbM/ME5LlVeDye1iUVn42skc4juVvXegmEXrxhjpSlbpUQwvM+VcdNQRbpVCxyS2uBfKb0kjJA3WsVWtHgkUPQaLKJbzG5WgSXqU1WMOwf+7EbE6yl8eXkqFFyl4s5UI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JrGtW8g2; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1764703769; c=relaxed/simple;
+	bh=0ONQIjLo9dBlSOW5nfTI1mMfdxTN4BkTfk2WSCizbeU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=j2D7AIG29j3ZhrCuTV/m2G/IsFns3Gl/g1ru2BR05OLxvCJ2DlmoQn644lzoE5OJdTfDnfaoMcrJUUWNOcl0jBCytmODpad4NftiNyADMQ1LW4lQ9Dx2KOOeFee9s1sabTMAwf8i9PRktZ070+oifrqnqY/klbd9yuykgnxBJsQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=CwxbdsaW; arc=fail smtp.client-ip=52.101.62.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JrGtW8g2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764695983; x=1796231983;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=0apFGSU8JEIJ783iHUZh3xOshw+MfV6IVfvbnyCwfJA=;
-  b=JrGtW8g2iyBd8sM62LXZ0vk8M2Rumf7eQEEJB+Zl0758cmUWmbmcFjo2
-   coeRWHKBdFCHTxQcVbi4iQe6NdawEOGtVd0llAjXxyz6HkiZuWcUwO58P
-   Eeszjx56mMcvG0LrgMMg4aX6cXKHhIun2yzJQVTZrb48ZeNrTWp8wJrdH
-   DsYFUT9XgQTU/eueOYBA7K4RIlKfRl2aF6pgupflPFtlbQxKRmtva3dJa
-   5pOcOf+UCMaCtHzUeSTPb9p8JTsMgHl22U6nbcC8R35kFnNYmQg7BAc7/
-   ZJtcSnuHqVceUH+pm9FuUohf8lYquKj5AO+wczJlaHc1dXnzrOFMa7Zqb
-   w==;
-X-CSE-ConnectionGUID: xlResSKCQi2+/Ndf72BEHA==
-X-CSE-MsgGUID: C9gQ6bqxSXaJLYhgheM56Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="84069555"
-X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="84069555"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 09:19:42 -0800
-X-CSE-ConnectionGUID: zaI20U6CRmCw5IGKOL5qrQ==
-X-CSE-MsgGUID: 93iV5Q45QYqk+xXw+PZQww==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="225118735"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 09:19:42 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 2 Dec 2025 09:19:41 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Tue, 2 Dec 2025 09:19:41 -0800
-Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.57) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 2 Dec 2025 09:19:41 -0800
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="CwxbdsaW"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kmuCw1nC5e2IyWEpJY6quSgLlaKxHuAjyQSivUUK8eKVBhytSm+aIi4DTS59tK2FonjGpl5oMoMJRo0g67onSdi7asfMxj5DQVnguOJFbWQzUjeJIaOldlEd0FExmnW6+TPDUfJARF6vW/AG9kKFf1u53OSpFk5Txh+7c2biIaPyWWgQ2h76L+dUps7wxmdyUJ2DrDAOqYFgIjjCChEEMBP8dQoY4Gxp61IPBZHWieVOX/eVU95pGSH1X00eqEGTpIW1DZfA0IHzTrq4lm2ujxI9WZ4EgomEkZABSbfERKCjLQe93PbazIMzJKekQMv5Y0ZqaJZOWWmWyV9n8jL2pg==
+ b=hEWsYKvEHZm5YyKYAt0/PJZpme6dmxI/XoTRYtWAe1WKYlPiCMSqv4PAjvnw2XWzKkxdvV3g+OizfC6BLYetKLjLczvk6LvVnxv/i8vR37vr16eqEqy3tgtbzh+irX1VckhyJSYBOEm9KnqCRCWix9UDhvsk0BD0enSsU7tls/KNhi6TP7PwK+FGG0Ral28q4fFM9TeMKyXHtxm5j4HESwo2orfgFXEwkKoA+hhEyLL6DLI/ijtMj7ANosNOEnzqaQQZCMSLpv1+iXn/C6MWZSEmsYwuo/USUuxDAvzdUKraEgZRjy2Ta6NLJRrEOJjTW1/CpsIIs6QYUYwnfR5qMg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RaqWTFNgBbM/ky/VNXDdhtrAhN93YpmDN83ANBbZYxE=;
- b=nXcsutknwZP0GTF11Vqdal5JUNjcZqIJGHfvJKXJwbsEqQXUGYLrj0q92mLZIAVFCA3rExV7KqgWN91I7Do0JLBeYhkFnKtI56LN8X+iZflBUjjyEwv4oFbNSzxfaJDKidZFdeocyjxNnBdmb6GS+kVpuViI6RJECDr/O+fE+Hq4uJbV4g7E5/ioSfaVJTZrnKTEIIYyPWYvzziKs5Mb2ijDUf0HKK0nibwelXSfPgsa1rVogXniBQM78QhEhssRiI8aKJ9sk6gBEeMelnMqYxO8f6Y/VWSlrlbOZBJ8Q4hlciROXgukSjF2TKKX6WxKp/tdKVQVO0o03t9ceTYbtw==
+ bh=ziKaPpK7ywpRhoJ/CAPhtzT6BFznFssl9y7dZH7H10I=;
+ b=QFYJNtxFXbXe59z4UPja6m6Q25UcK95yyyvR3bfioeHA3/DV7R+ba5NbkDly7RFsElLYWksY60AOGB9bAIEezjWcXjwTA7o22bYLCLBYnys0h9WeT4++Kt2mUhAQoOH81eX/fW6hwP8nGxv+HH3xVN+6/Mqcr1Va9Yw7bwf8hHOaYx+MxnAg7lhp3qNwusl24O05qgdxr20CMNcg6owrC4tOsr5z8OAbCSv1qqKtXzVUE+i0mhjAkn1Do6KuN59xhWgSstsp+JQ5LTPh5QxQZXRS8qa059hLNlUht0pYAUENVFcLQ75R+Q7oGXUMmmzUASCe/GpBf2a3TMzXT84NXA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ziKaPpK7ywpRhoJ/CAPhtzT6BFznFssl9y7dZH7H10I=;
+ b=CwxbdsaWFSqMDU36kW7q7jvQOFPbveaRiVaks5kCG5I+ItTpaVEZ1vaoFnVW/CeZftt/EU4rI3g+jmyMWzTBAk1LXaPmsODp6TSYc5y8AsaNDMmXF8CkqUF3IdS9v8CCRSnnCQwB2nmPMosd/4rxYAqsxouO92Hphy1dFR9hxbs=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by SJ2PR11MB8422.namprd11.prod.outlook.com (2603:10b6:a03:542::14) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by SJ1PR12MB6340.namprd12.prod.outlook.com (2603:10b6:a03:453::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Tue, 2 Dec
- 2025 17:19:37 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::22af:c9c9:3681:5201]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::22af:c9c9:3681:5201%5]) with mapi id 15.20.9366.012; Tue, 2 Dec 2025
- 17:19:37 +0000
-Date: Tue, 2 Dec 2025 17:19:31 +0000
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: Jani Partanen <jiipee@sotapeli.fi>
-CC: Christoph Hellwig <hch@infradead.org>, <clm@fb.comi>, <dsterba@suse.com>,
-	<terrelln@fb.com>, <herbert@gondor.apana.org.au>,
-	<linux-btrfs@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<qat-linux@intel.com>, <cyan@meta.com>, <brian.will@intel.com>,
-	<weigang.li@intel.com>, <senozhatsky@chromium.org>
-Subject: Re: [RFC PATCH 00/16] btrfs: offload compression to hardware
- accelerators
-Message-ID: <aS8fo0h32Yp+ZSPV@gcabiddu-mobl.ger.corp.intel.com>
-References: <20251128191531.1703018-1-giovanni.cabiddu@intel.com>
- <aS6a_ae64D4MvBpW@infradead.org>
- <8d3e44b0-23d8-4493-8e7e-33bbe1d904ef@sotapeli.fi>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <8d3e44b0-23d8-4493-8e7e-33bbe1d904ef@sotapeli.fi>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DUZPR01CA0181.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b3::22) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+ 2025 19:29:24 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%3]) with mapi id 15.20.9366.012; Tue, 2 Dec 2025
+ 19:29:23 +0000
+Message-ID: <30242a68-25f5-4e92-b776-f3eb6f137c31@amd.com>
+Date: Tue, 2 Dec 2025 13:28:53 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
+To: Thomas Courrege <thomas.courrege@vates.tech>, pbonzini@redhat.com,
+ seanjc@google.com, corbet@lwn.net, ashish.kalra@amd.com, john.allen@amd.com,
+ herbert@gondor.apana.org.au, nikunj@amd.com
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+References: <20251201151940.172521-1-thomas.courrege@vates.tech>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Content-Language: en-US
+Autocrypt: addr=thomas.lendacky@amd.com; keydata=
+ xsFNBFaNZYkBEADxg5OW/ajpUG7zgnUQPsMqWPjeAxtu4YH3lCUjWWcbUgc2qDGAijsLTFv1
+ kEbaJdblwYs28z3chM7QkfCGMSM29JWR1fSwPH18WyAA84YtxfPD8bfb1Exwo0CRw1RLRScn
+ 6aJhsZJFLKyVeaPO1eequEsFQurRhLyAfgaH9iazmOVZZmxsGiNRJkQv4YnM2rZYi+4vWnxN
+ 1ebHf4S1puN0xzQsULhG3rUyV2uIsqBFtlxZ8/r9MwOJ2mvyTXHzHdJBViOalZAUo7VFt3Fb
+ aNkR5OR65eTL0ViQiRgFfPDBgkFCSlaxZvc7qSOcrhol160bK87qn0SbYLfplwiXZY/b/+ez
+ 0zBtIt+uhZJ38HnOLWdda/8kuLX3qhGL5aNz1AeqcE5TW4D8v9ndYeAXFhQI7kbOhr0ruUpA
+ udREH98EmVJsADuq0RBcIEkojnme4wVDoFt1EG93YOnqMuif76YGEl3iv9tYcESEeLNruDN6
+ LDbE8blkR3151tdg8IkgREJ+dK+q0p9UsGfdd+H7pni6Jjcxz8mjKCx6wAuzvArA0Ciq+Scg
+ hfIgoiYQegZjh2vF2lCUzWWatXJoy7IzeAB5LDl/E9vz72cVD8CwQZoEx4PCsHslVpW6A/6U
+ NRAz6ShU77jkoYoI4hoGC7qZcwy84mmJqRygFnb8dOjHI1KxqQARAQABzSZUb20gTGVuZGFj
+ a3kgPHRob21hcy5sZW5kYWNreUBhbWQuY29tPsLBmQQTAQoAQwIbIwcLCQgHAwIBBhUIAgkK
+ CwQWAgMBAh4BAheAAhkBFiEE3Vil58OMFCw3iBv13v+a5E8wTVMFAmkbaKgFCRZQah8ACgkQ
+ 3v+a5E8wTVPFyg//UYANiuHfxxJET8D6p/vIV0xYcf1SXCG78M+5amqcE/4cCIJWyAT3A1nP
+ zwyQIaIjUlGsXQtNgC1uVteCnMNJCjVQm0nLlJ9IVtXxzRg0QKjuSdZxuL5jrIon4xW9hTJR
+ 94i2v3Fx5UWyP2TB6qZOcB0jgh0l01GHF9/DVJbmQlpvQB4Z1uNv09Q7En6EXi28TSv0Ffd1
+ p8vKqxwz7CMeAeZpn5i7s1QE/mQtdkyAmhuGD12tNbWzFamrDD1Kq3Em4TIFko0+k5+oQAAf
+ JFaZc1c0D4GtXwvv4y+ssI0eZuOBXapUHeNNVf3JGuF6ZPLNPAe5gMQrmsJinEArVYRQCuDA
+ BZakbKw9YJpGhnSVeCl2zSHcVgXuDs4J2ONxdsGynYv5cjPb4XTYPaE1CZH7Vy1tqma8eErG
+ rcCyP1seloaC1UQcp8UDAyEaBjh3EqvTvgl+SppHz3im0gPJgR9km95BA8iGx9zqDuceATBc
+ +A007+XxdFIsifMGlus0DKPmNAJaLkEEUMedBBxH3bwQ+z8tmWHisCZQJpUeGkwttD1LK/xn
+ KRnu8AQpSJBB2oKAX1VtLRn8zLQdGmshxvsLUkKdrNE6NddhhfULqufNBqul0rrHGDdKdTLr
+ cK5o2dsf9WlC4dHU2PiXP7RCjs1E5Ke0ycShDbDY5Zeep/yhNWLOwU0EVo1liQEQAL7ybY01
+ hvEg6pOh2G1Q+/ZWmyii8xhQ0sPjvEXWb5MWvIh7RxD9V5Zv144EtbIABtR0Tws7xDObe7bb
+ r9nlSxZPur+JDsFmtywgkd778G0nDt3i7szqzcQPOcR03U7XPDTBJXDpNwVV+L8xvx5gsr2I
+ bhiBQd9iX8kap5k3I6wfBSZm1ZgWGQb2mbiuqODPzfzNdKr/MCtxWEsWOAf/ClFcyr+c/Eh2
+ +gXgC5Keh2ZIb/xO+1CrTC3Sg9l9Hs5DG3CplCbVKWmaL1y7mdCiSt2b/dXE0K1nJR9ZyRGO
+ lfwZw1aFPHT+Ay5p6rZGzadvu7ypBoTwp62R1o456js7CyIg81O61ojiDXLUGxZN/BEYNDC9
+ n9q1PyfMrD42LtvOP6ZRtBeSPEH5G/5pIt4FVit0Y4wTrpG7mjBM06kHd6V+pflB8GRxTq5M
+ 7mzLFjILUl9/BJjzYBzesspbeoT/G7e5JqbiLWXFYOeg6XJ/iOCMLdd9RL46JXYJsBZnjZD8
+ Rn6KVO7pqs5J9K/nJDVyCdf8JnYD5Rq6OOmgP/zDnbSUSOZWrHQWQ8v3Ef665jpoXNq+Zyob
+ pfbeihuWfBhprWUk0P/m+cnR2qeE4yXYl4qCcWAkRyGRu2zgIwXAOXCHTqy9TW10LGq1+04+
+ LmJHwpAABSLtr7Jgh4erWXi9mFoRABEBAAHCwXwEGAEKACYCGwwWIQTdWKXnw4wULDeIG/Xe
+ /5rkTzBNUwUCaRto5wUJFlBqXgAKCRDe/5rkTzBNUw4/EAClG106SeHXiJ+ka6aeHysDNVgZ
+ 8pUbB2f8dWI7kzD5AZ5kLENnsi1MzJRYBwtg/vVVorZh6tavUwcIvsao+TnV57gXAWr6sKIc
+ xyipxRVEXmHts22I6vL1DirLAoOLAwWilkM+JzbVE3MMvC+cCVnMzzchrMYDTqn1mjCCwiIe
+ u5oop+K/RgeHYPsraumyA9/kj8iazrLM+lORukCNM7+wlRClcY8TGX+VllANym9B6FMxsJ5z
+ Q7JeeXIgyGlcBRME+m3g40HfIl+zM674gjv2Lk+KjS759KlX27mQfgnAPX4tnjLcmpSQJ77I
+ Qg+Azi/Qloiw7L/WsmxEO5ureFgGIYDQQUeM1Qnk76K5Z3Nm8MLHtjw3Q7kXHrbYn7tfWh4B
+ 7w5Lwh6NoF88AGpUrosARVvIAd93oo0B9p40Or4c5Jao1qqsmmCCD0dl7WTJCboYTa2OWd99
+ oxS7ujw2t1WMPD0cmriyeaFZnT5cjGbhkA+uQGuT0dMQJdLqW3HRwWxyiGU/jZUFjHGFmUrj
+ qFAgP+x+ODm6/SYn0LE0VLbYuEGfyx5XcdNnSvww1NLUxSvuShcJMII0bSgP3+KJtFqrUx9z
+ l+/NCGvn/wMy6NpYUpRSOmsqVv0N71LbtXnHRrJ42LzWiRW2I5IWsb1TfdMAyVToHPNaEb0i
+ WiyqywZI5g==
+In-Reply-To: <20251201151940.172521-1-thomas.courrege@vates.tech>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA0PR11CA0163.namprd11.prod.outlook.com
+ (2603:10b6:806:1bb::18) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -105,141 +110,388 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|SJ2PR11MB8422:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2824045c-48ea-435d-2771-08de31c6f83d
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|SJ1PR12MB6340:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3ff04254-a0c3-4ff9-dbe2-08de31d9194b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?1qcxbG4GS1b3nqMNjQJF4OU0+N4zIjZ2+0Z9/4UnswTkorBL28KDVLjF/P8L?=
- =?us-ascii?Q?iniE5+D0Ri7U6U63AAq90JBIDD40MY+WFoCQYE3IWcPeWWxoqZoSaJ8bc5kz?=
- =?us-ascii?Q?/gPDsf/OgHL9lJpHDwAc7T2QbJImzFhruDK8GjdPcqYrN20HHYPG5FLrj6pT?=
- =?us-ascii?Q?CNGba5f0kcp+df4cSGyT1aAqCPFRPgaKHVbQ7gra6fX2DRoZPH09kPlHL1r7?=
- =?us-ascii?Q?bNI2CWVOoQYVqlG28nMSiF4UnRtimXiYlbm1KmMKoa6QqwNdd9pBRGPzwU3g?=
- =?us-ascii?Q?mg+KnPGn25Y8uuz6YeKDlm7piFs+RkRFrwnNn/WzAVodSDnNtinxrKZPogbt?=
- =?us-ascii?Q?T3Pd3SZL4wAi8qgyIImNxHhCb5yHJFl/sG5Rf2nheJtc3J0znvHg6pY8JuFl?=
- =?us-ascii?Q?hVOJPYwCBqq+05+8tSNUf7hURtpTYIZoz3LMGJdgTV0dUAy+5Zg4yqlLxYac?=
- =?us-ascii?Q?fUSaIAExJAS1rZSju/g4RqzcyHlWfRcUHo0hHWi/atBAv65vCdAeBd6a3PpT?=
- =?us-ascii?Q?KpVF1nFdNaQP0EJSrGD8Nk6+0pyLwtdFAK7vQT4nZBszsU0kfgEd2R1e/xF6?=
- =?us-ascii?Q?0rk4XTGzptDEIy+SdGWAyHtoHRtAlf9TxvRhF6hnXTN1NhNTYHF31eWIAoZR?=
- =?us-ascii?Q?R9Tbei/cO2j8lZmL23pWbBhCHKYXIuVUcZnNdtbq4qh+KAZo1qnKeZGPi/bd?=
- =?us-ascii?Q?02rAGNTgOyjmvpOULkoNhsdmjLSKsC2GVr0mY8iiWaCStro2T0P/BCbrRjwS?=
- =?us-ascii?Q?6M6ggq23KzVA5EGm5+MXXy32ncMV2/SW4Z/AIAHGkDkjL7BsH5AbSziMlLRF?=
- =?us-ascii?Q?lQaYo0zSBHFxXZHn5gVuc53cuq6K76uqHBXwLbHzi5VUAZbc/N8MdNs5Wmkm?=
- =?us-ascii?Q?dXB81t2bZ6hi6XmbI6gkiGciyNpUjdZMFYQaQG10LfzbMCY/nyS5pDLIYfH/?=
- =?us-ascii?Q?WICZJipPCvfqUoLNHqxPoh566LwckFb4YTSE3D+e2mUxX5aNVL9qsn+1Yv1t?=
- =?us-ascii?Q?BGCmHZDCQDCqzM+ZROK48LxbN4MbteexoiVwUwMtuQ17X0PphE4HA23yomWT?=
- =?us-ascii?Q?Yt1wCofClDsDPDbVHKG9pRzyD2acQ2uqhBVPkqO52/hag8BvtKvyCS7L1bOQ?=
- =?us-ascii?Q?qKoSsh39EaZEptoXcK8FoNb5UrttF0CRrwsGgQyl7O/9hTb81IIyvi7lOY14?=
- =?us-ascii?Q?Jy9BUGrrWud7uOoDvM1J/bs0gETMHwS1aTwOzM9D8EtIg7rCI8C0QxmQKPO4?=
- =?us-ascii?Q?mZXAE9wfewpMN1y2apfBql4fZ5UYA9dBSLxmtCco086KJ+eLdY4ekXeHXx4G?=
- =?us-ascii?Q?RR36lTwsg87qPuVYxdjAeChcWCXl3MU40WEloRjqfLLERRRP86uszVQEdf2l?=
- =?us-ascii?Q?Fz9GvLsdm7G0Z+uCU6mKRJoLymxX2Nx5omC2lc5+CTpDNZ3y8k3kg5/7tIRU?=
- =?us-ascii?Q?1vTJe+KHDyitb6etJx5veTCXnlerJAB7?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?YjNob0ZSUTZQM1M0TUNjSjYvUUxPYUUzNWEyeG9EamFxZkxaNGJxL0Z3TktU?=
+ =?utf-8?B?azlUMWtxcFRxMldTbGl0SDRqbmdaSndSNFhnNHNDS2tqaWxhcUFoV3ErMkl6?=
+ =?utf-8?B?ZHJSLzBOSlEyWDR1SVZaWk9NTzVpdmRrRWQyUGZmaVlrRzFOTlRkY3VBV1FB?=
+ =?utf-8?B?Y1hUekFRaWJ6Z1k0R1llbVltVnpiKzdUNzlqWmZqaE1oTUpOaFBGRS9DUlJ1?=
+ =?utf-8?B?KytuQVBHbHBIZjA1cE1GZXNXa2VaMC9EaDBiejFOZWlqN1RQRzNoTmI2T3Jy?=
+ =?utf-8?B?M0FiR0p1bkhoSVlQQmRzamNpOVIxRXNuVkpRY3NYTTRxd1NCTXRWU1JkRkdQ?=
+ =?utf-8?B?bjdnOS9JNEZ1YW15Tndla2YyK25rc1pldjlIVGdNSlBiNWJsNUlwbkNIMzNj?=
+ =?utf-8?B?Y3F6cXhJcVBwNnYxUlpkcCt4MUtnS1dJZ3E1c3dtNHhLd3FkZldOSUJTUjlH?=
+ =?utf-8?B?SXNBOXJLLy9sMVk5bFR2Sk9HWEo4dVdqVXAzdHlHbzlrYWxtVURYMVI0M0ta?=
+ =?utf-8?B?c1gwVE1mM1IwM2RnM3ExUEt0bmtKQ1cySjZLcnRoMzJESDVNRklTOGlHSWMx?=
+ =?utf-8?B?TjZxL2R3dlpsUFB2amxleHVWTDE1eEgwK045dG92ZHBOcVJHbVo0OHc1bktG?=
+ =?utf-8?B?ZFhZSXM4c01UT0ZpZlZCcDR3blRlc0VJTEFDNFRyZlZtdCtRaEFwc3JQS3NM?=
+ =?utf-8?B?ZWlJb0U4Mm1ia2ZhVXlZOC8rVFcvMTVRQ3ErSHJzSnRTUGs3ODBtOHdaYTdj?=
+ =?utf-8?B?anZmWmNRb0ovNUYzNk9FcDh6dmdHZC8yNDdkR0RzaFFkekFlSElsOVhtbi9G?=
+ =?utf-8?B?dDVaSkFHT1VZUDVWRWZ5V2V4R2J5VVQwNS95Wkx3R3U4YkpnRnVHRGRrL1lQ?=
+ =?utf-8?B?QVpReVpEeVRhYWpnTGhOem5laHh6WGV2bVVRTUsxQjNJNU1XZ2t1Y2FqVi9s?=
+ =?utf-8?B?Yk4xc0xpRUl2c1hDV2J3MDllUzlqQVgwSy90ck1yanZUSzNrMEg4ZG0xc3VM?=
+ =?utf-8?B?TDhhNHNtNDVDeFF0dzhDVGNUNElUZS9UZ3lzM2lNZTVaRnA4YWFPVStobmJ0?=
+ =?utf-8?B?RlNMSjg1VzhlVzhERjU4YXdlVmlFLzlMazlGTUcrMTRyOHFjbzFDSlVTYnJT?=
+ =?utf-8?B?b3QvbDEwY0pObGFwaEtrTk5RcUhOVXd4SjdsdUgvMFdpRVVLVWFyd0JUWGZa?=
+ =?utf-8?B?dTc3SW1NNmlUd2JUWFR6aU5tdkhjSkpBMXkrRTQvVS9FMGo0QndJajE4L0RC?=
+ =?utf-8?B?V1Z5ZlAxRERlUG5NMW9ISDNOV0ZETDF3SVdOMzB2RG10dDVRaVZHNkU0Y1Uy?=
+ =?utf-8?B?cG96NHd4NmdSWFgycklGUTZoWktYZE5tdTdKaytHTzdtZXVWcnpRRnFrQWpD?=
+ =?utf-8?B?L2ZBQkhvZjBxRmdyWEEydU1yWGJBZmVsdEE0Y3lrUkx4dkgvZ1h1YWpRbXBv?=
+ =?utf-8?B?Q29JUDZSZTRrLzFockEwcUM1SG9PM2FmWm05Q0c4UTRMS0NJS0xVL29ncnFR?=
+ =?utf-8?B?UmVzbFlObm03b2xnU0hWTWN0RE9yZFBqTlJlZmhKVzNVY1VvdHpMNHhRV1lo?=
+ =?utf-8?B?V0dQNGt3Y1djbjNwZVA5dzUvaUxndGVSTG44RnB2Ym8rVzFxYmN4TEIwcmRm?=
+ =?utf-8?B?NG9ZNEhZa1hOK2RFZGpiSW1sekFUTURVUS9ERjdya0hadFkzT2djZVliZmNi?=
+ =?utf-8?B?d2pYNWp3QnFXUWwyZ2M4d0c0T1NkWnFJQngxMzl6aWhiYVJpWHNUVlByeUxV?=
+ =?utf-8?B?MVpiMzB1ZlFUVi9Pd2M3N1VnVUlQd2Vxb3dnWE13dlVIV25tNDJSU3owVXlX?=
+ =?utf-8?B?VFduZWhsZjBLcXlFZ3pkWGNmYmFBNEtBVDQ2ZEgvS3ZpbTEzc2RyeHloZUwr?=
+ =?utf-8?B?aFpDaUJZeGoxZVBRc0ZsV1pkUEJnWHpKL3NuL2NDT1dpZElJT0pjV0Y1cm1I?=
+ =?utf-8?Q?JuGMkSn2elTrHr+VxgHbFcjuVor/x1ag?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?UtA3Hpebx7hga7tEnBjyAFF3y77LQrdeiesTe4FxXKf5oFYu1vttZM2EztV9?=
- =?us-ascii?Q?Wnn8Wuxdv+2N8li1Sufp0yIAbwkIclG/9uY2wYoI0OOg1K/zdApKi1jj+jD5?=
- =?us-ascii?Q?rbDo3M51zS5C3zzyIo1BWHJ/21cuyfiO+s6PLnT226vfLmu5PY3uiuK4SWWt?=
- =?us-ascii?Q?MYzmTB7VcN7KDpMmX8aWnU6T6kj1dSKDQZI0E1vOD9PX2lyLkMXMokxoFwPr?=
- =?us-ascii?Q?gJj2DcGutYbyFc1LCHKcyErHzKE4cVRYvB2CTvW0g1m4RN3Cp0qbGV9zlvSx?=
- =?us-ascii?Q?mEY4d9KBU9OdVwmOc8/GYbN6zdyukxMgNUA9+4CYeVgf5K3lL29P8EYDDkHX?=
- =?us-ascii?Q?qnxSw0g8agVFLQ1Y8CDeAc1OYdn3Q8It+URgVm7LgRksAjcnIl/I0MpjYNkb?=
- =?us-ascii?Q?IxDD2+P7olF7UtTeARmzSxHZZbN6G1yHBUqno4LrLIVrb2PHPVHg8rFE/zhf?=
- =?us-ascii?Q?QuRz2cNtPuqrB49fJSV9RmcMn375bbDdOIFyHfhV8MAsT/v8uI05e1jRHtQY?=
- =?us-ascii?Q?9dgCDm7AUMSMi4BdHEYyap4s7YghQ+UDdlPBWeAP0CchFpp+CdOqwaC8y7dI?=
- =?us-ascii?Q?RggJYwDdL0QQmsri+pf3NrJL78MN5WO4c4XXKunkRkPQmbLjBWt43p/Wt5K/?=
- =?us-ascii?Q?QCswExlMo+/30eOrmzbLV1oIWIOjCT5dM2/bGqiQiZwWVonDwwk/1q3ZoCOB?=
- =?us-ascii?Q?DmvXnvPzuFUwRyK+bqKvEFFS756iCjeAv35s2LCOFZoD6RTVbBuowsivpuPn?=
- =?us-ascii?Q?b3ch1hLPzfbok/9K2HdN9mUTt8g9fjmJpz3fbHnzDmJuA2oSBc8B6wbEAPVK?=
- =?us-ascii?Q?0u8RYfUYqWEVxbKo/OOI1E91o5vXQS4ydOTb/bqoT3AindfNj0SqxGY5f7cM?=
- =?us-ascii?Q?pQOeA7CtopD4N1pnQT2cr4vdMA0lblDR+p9DURv2qhRsSLSaEOpGCHcTcrxB?=
- =?us-ascii?Q?IN367j5vXGIrsc59eD27cNkU+obH7SCkyHSpl7hg8P17xQ0b4ZgLfw3JubQX?=
- =?us-ascii?Q?fmOJ7LYCj69aWdOTe8WMtT/Di2fHOCrWoasca6DBCJlSgT+LiZz1/jXwnm+c?=
- =?us-ascii?Q?SIw/PcNhFEgJSvh7KPagGILJihduiC8NpjX5DdEc7IkxKpEKqXY4kprHMhQr?=
- =?us-ascii?Q?F1JKaUrE+gsiRODvf010p9LjTKQYYLU/fhhIFvsB/UNfWImfPri+hmG44jFq?=
- =?us-ascii?Q?TWrM0AGMPKCwUt1etWAW+PTquPByD1lCyMMCQD0+SwFN52nxTVN67QfCrzLd?=
- =?us-ascii?Q?2gCkNsKB7WDhT+w98wqYfnWIjav+RoXFm1m40VRNwr0PDuEVlSGADltNdu/3?=
- =?us-ascii?Q?edURxm0Vpt1XcKXOEA+x9GnMrFHN+oOl193DhxFYRhPNuhWT1plvlry7jzdp?=
- =?us-ascii?Q?CJuTddTS6HuRPfIR4lbehtMiWgHhC3wiwTgbrNYQJhwDFOWIkdyNebaUWRu/?=
- =?us-ascii?Q?oP8oJ8cUDA1FQKMSy4FyJCgkqcuGXZqbk4i+VEwL5V+62xrBwc7YuR5bblsS?=
- =?us-ascii?Q?b2slLytOajgvrN68sY653ZxddyN+Dqnm194udMlzgJ1xMeaYb062WXQMZ0Xs?=
- =?us-ascii?Q?S6wJUL3a+p5exswSKh+n9tR6pxtvkD+HLwAJBJ0ixM2xlbSrYG9lkziEVnDm?=
- =?us-ascii?Q?nA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2824045c-48ea-435d-2771-08de31c6f83d
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?V1YxVGdoUjc1SnRWZXExUUEyYTVCM0RnamlzT2ljVExtcnJRS0VUdlNjakQr?=
+ =?utf-8?B?UjNFNWlVMUlFMWhOT1hseXlxaWpmNnhlMmFiYnBsUjNkanFSM2xqVXZvbTdv?=
+ =?utf-8?B?VFVPbmoxU0NETzZZeVRvS0dxY0t1dUs3SFVjUjJNYWkxQXJWMzlCRTBZMy9B?=
+ =?utf-8?B?dlpFUEkzQTc0MkI2SGxmVzJ2Q0hVb1QycllPOVFNdGp5UmNqRkFqeFF4ZzBq?=
+ =?utf-8?B?eXFVRjFac0FMckp3SlgwVlNZRVh4aWp5d2dLQWFBTHRadytGd281T1lDcnpH?=
+ =?utf-8?B?UmNiSjBYOHBYQnZtY0kySVdjQ3JLUU84TXVYaUFaUVkza3lJV3VNbGVkMkFC?=
+ =?utf-8?B?aUJGQmx2bVVqS1BEeW1hYnczNkJsUENISmtJaHFueDZXdHBFNWlQU2ZSN05N?=
+ =?utf-8?B?a08xRHJKaTlTMm9UWnJDN211S1FoeEFkZ3RRb29BVVpXcDJmejJtT0NUTVJC?=
+ =?utf-8?B?b2JMcjB2N3d3ZUhscU5mazNSdzFPSWo3Q3dUb0pIMXdUQnhYOTJ3aGdIcSts?=
+ =?utf-8?B?RE15RHo4eGRPU01VMUJqY2d5RFRFYjJUZnl4bExLeHJoRElXMTFNbTFuUDRT?=
+ =?utf-8?B?RjN1dlIwYnZYMmpacnZZSngxZmVTeTBReDV2U1FBNEgxdW8xeU93dzdORkNL?=
+ =?utf-8?B?NWQ5UlNzUTNjUGk5Q0wxSENkNk40MzVUNVVmT3JRampLUDZGYlVaanNoKzFh?=
+ =?utf-8?B?OWt0Y3k1eDV5QnZ0eXJvc0xuaFlhOVkrcGdMYmFOd2hkMVdQWVV5YTV5eXNp?=
+ =?utf-8?B?S1RjTGpxZ1BXdDI3cGZwS3ZDREZPRDFmblplTmJaZ2FPdzMxZEx1MXZwNDBI?=
+ =?utf-8?B?bWNyQzNRQWw3WmdQZFZFZU9yVFpMbldLR3A0RFFPaDVHU3VQSUZGbmFlVGRr?=
+ =?utf-8?B?Zm45SzBLNm5HaGFjZWJKTjQ1amUySEJQNDdSMnJKZ3czdC9yYXROL0RWSWRY?=
+ =?utf-8?B?WmdGL050VExyN0JoSVZPSFZRZzNVWmI2TDR3WVJjRHgxYUd2SCtjSnEzR0F2?=
+ =?utf-8?B?UFVPVzhwUW56cVVsVE45NXRmV1B0OUJyYXBISUsxUFhaQ2ovQVVsMUdVVlp5?=
+ =?utf-8?B?YzFqbXpOcUc5ZzA3S1B1OFB6ak93cFVvb3RCUmdmK1lreG1sVHNzbmhSdVJh?=
+ =?utf-8?B?a2ZzcUdtZTI2MDViZWJmaFlWWjZFZ0FTYUkvWEI2ZFU2Yk4xRTFCTTV2eW5m?=
+ =?utf-8?B?SjBnb1VJN1lsdGJuaEROVlhSbDRpK1lTaWZQNXM3TGdlSllCb3M2Nzd4YmNq?=
+ =?utf-8?B?em9YVWpjOVBLT0FQL2VsQ3kxVHZuMzVBL2dLUjd2bEphbTdaeEJQZjF0WnZq?=
+ =?utf-8?B?NXROek92WFk2TXhyR05YQ1RBWjJ3SzlvQnVENUdsMGN6S0RlY004WlRqeGJX?=
+ =?utf-8?B?Um5FWjVXQTZVMyt6dG1JY3Z3czh0V3dHL3FzMjRDL2F5czlnaFFWZ0lVVVJ4?=
+ =?utf-8?B?TW1pdVhjeHkyaXV2WnArL0g3N2FHRDA3N3E2eVFqaU1CVDRpQkZiTG1ZeTJT?=
+ =?utf-8?B?aXhWTEpKYjgwL0ZhRmx4N0dzb3drcTdOSWx0bjlSYkFqTzVJbGkvdWcwUi85?=
+ =?utf-8?B?Z2EwblBjanZNWDhENW5nSzc1dXJydVNDZ2FXTzBtWDhrSnVzQTZqTXgwL3pi?=
+ =?utf-8?B?dFlXcVFWallTSXJtMktQVzR6UU5LNHloWUJiaXg2YVArM2N5V0FsSlVtZTFu?=
+ =?utf-8?B?azZHQ09ORGVSdjJLd3J1OTZ4THpwYk1COURFN3VJZ2E4WXF3aThLTzJEVk5W?=
+ =?utf-8?B?d2Y2NC9NcWFSN2w0eEQydks0b1d1bWlkSE5rd3NkbEFOZTZwbDVBT292SkJQ?=
+ =?utf-8?B?bGt1QXpVYXVBVlFkU2p1RHdMRmZjRmVtRWVLWndYMDdaYXBJVGwvKzJqMXNm?=
+ =?utf-8?B?Sk4zeEtBU2V4S2k1TTNDZ1dHbUY4RHNwTjYvWnpNbWJVTFgwWTdidkdmWk5h?=
+ =?utf-8?B?NkdRU2duZXpOaWhLYk9XZzdqRXU5cVhzTkc3Vk9KNkdlZndZbzFicnNLb3RQ?=
+ =?utf-8?B?Y3BoZXllUXpMTTRhTU15eVUzOFZ3a01vM3dKclh6dXA1UjRlUnJGWk85MFlE?=
+ =?utf-8?B?LzFJMEwya1lpa2xvTE1jMUc2SHh5bEtQbGh1NG9tQ1JYUE5uTjE0bWJhKys1?=
+ =?utf-8?Q?MkF+XNIdv3TMsP7/5FsIhGIgA?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ff04254-a0c3-4ff9-dbe2-08de31d9194b
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2025 17:19:37.2869
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2025 19:29:23.7116
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uzBHqTD2LgmnE+zk7H9hu14n/xfEv/QtIK8BW/qjD3ynyqkVoHuQ+wQbC+MAOzBaxRfp99PytWJYwAKWr1YwdmdHpXuJ8U7Gz7ntjLCEvXA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8422
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: NbkfQONdiJEGGwXIvYLyT8Eq+wWcRi0i+Ct6O1AqeWIxvbJSX3mjA1qSgy/soB/NIscWLLF3ERjKfQvoe1nU3g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6340
 
-On Tue, Dec 02, 2025 at 05:46:29PM +0200, Jani Partanen wrote:
+On 12/1/25 09:19, Thomas Courrege wrote:
+> Add support for retrieving the SEV-SNP attestation report via the
+> SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
+> ioctl for SNP guests.
 > 
-> On 02/12/2025 9.53, Christoph Hellwig wrote:
-> > On Fri, Nov 28, 2025 at 07:04:48PM +0000, Giovanni Cabiddu wrote:
-> > > +---------------------------+---------+---------+---------+---------+
-> > > |                           | QAT-L9  | ZSTD-L3 | ZLIB-L3 | LZO-L1  |
-> > > +---------------------------+---------+---------+---------+---------+
-> > > | Disk Write TPUT (GiB/s)   | 6.5     | 5.2     | 2.2     | 6.5     |
-> > > +---------------------------+---------+---------+---------+---------+
-> > > | CPU utils %age @208 cores | 4.56%   | 15.67%  | 12.79%  | 19.85%  |
-> > > +---------------------------+---------+---------+---------+---------+
-> > > | Compression Ratio         | 34%     | 35%     | 37%     | 58%     |
-> > > +---------------------------+---------+---------+---------+---------+
-> > Is it just me, or do the numbers not look all that great at least
-> > when comparing to ZSTD-L3 and LZO-L1?  What are the decompression
-> > numbers?
-> > 
+> Signed-off-by: Thomas Courrege <thomas.courrege@vates.tech>
+> ---
+>  .../virt/kvm/x86/amd-memory-encryption.rst    | 25 ++++++++
+>  arch/x86/include/uapi/asm/kvm.h               |  7 +++
+>  arch/x86/kvm/svm/sev.c                        | 61 +++++++++++++++++++
+>  drivers/crypto/ccp/sev-dev.c                  |  1 +
+>  include/linux/psp-sev.h                       | 31 ++++++++++
+>  5 files changed, 125 insertions(+)
 > 
-> What makes you think so?
-> 
-> If CPU util numbers was single core %, then I would agree with you. But its
-> 208 cores so there is quite big saving, like over 20 cores saved if I have
-> understood this right.
+> diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> index 1ddb6a86ce7f..b3ee25718938 100644
+> --- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> @@ -572,6 +572,31 @@ Returns: 0 on success, -negative on error
+>  See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
+>  details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
+>  
+> +21. KVM_SEV_SNP_HV_REPORT_REQ
+> +-----------------------------
+> +
+> +The KVM_SEV_SNP_HV_REPORT_REQ command requests the hypervisor-generated
+> +SNP attestation report. This report is produced by the PSP using the
+> +HV-SIGNED key selected by the caller.
+> +
+> +The ``key_sel`` field indicates which key the platform will use to sign the
+> +report:
+> +  * ``0``: If VLEK is installed, sign with VLEK. Otherwise, sign with VCEK.
+> +  * ``1``: Sign with VCEK.
+> +  * ``2``: Sign with VLEK.
+> +  * Other values are reserved.
+> +
+> +Parameters (in): struct kvm_sev_snp_hv_report_req
+> +
+> +Returns:  0 on success, -negative on error
+> +
+> +::
+> +        struct kvm_sev_snp_hv_report_req {
+> +                __u8 key_sel;
+> +                __u64 report_uaddr;
+> +                __u64 report_len;
+> +        };
+> +
+>  Device attribute API
+>  ====================
+>  
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index d420c9c066d4..ff034668cac4 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -742,6 +742,7 @@ enum sev_cmd_id {
+>  	KVM_SEV_SNP_LAUNCH_START = 100,
+>  	KVM_SEV_SNP_LAUNCH_UPDATE,
+>  	KVM_SEV_SNP_LAUNCH_FINISH,
+> +	KVM_SEV_SNP_HV_REPORT_REQ,
+>  
+>  	KVM_SEV_NR_MAX,
+>  };
+> @@ -870,6 +871,12 @@ struct kvm_sev_receive_update_data {
+>  	__u32 pad2;
+>  };
+>  
+> +struct kvm_sev_snp_hv_report_req {
+> +	__u8 key_sel;
 
-Probably what triggered the question is that all compression ratios are
-similar, except for LZO.
+You should add 7 bytes of padding here.
 
-Also, in the previous version of the table I didn't specify that for QAT
-we are running ZLIB (even if this set supports ZSTD w/ QAT).
+> +	__u64 report_uaddr;
+> +	__u64 report_len;
 
-Here is the updated table:
+Additionally, there should be some padding at the end of the struct for
+future expansion/use (see the other structs for examples).
 
- +---------------------------+-------------+-----------+-----------+-----------+
- |                           | QAT-ZLIB-L9 | ZSTD-L3   | ZLIB-L3   | LZO-L1    |
- +---------------------------+-------------+-----------+-----------+-----------+
- | Disk Write TPUT (GiB/s)   | 6.5         | 5.2       | 2.2       | 6.5       |
- | (higher is better)        |             |           |           |           |
- +---------------------------+-------------+-----------+-----------+-----------+
- | CPU utils %age @208 cores | 4.56%       | 15.67%    | 12.79%    | 19.85%    |
- | (lower is better)         | ~9 cores    | ~33 cores | ~27 cores | ~41 cores |
- +---------------------------+-------------+-----------+-----------+-----------+
- | Compression Ratio         | 34%         | 35%       | 37%       | 58%       |
- | (lower is better)         |             |           |           |           |
- +---------------------------+-------------+-----------+-----------+-----------+
+> +};
+> +
+>  struct kvm_sev_snp_launch_start {
+>  	__u64 policy;
+>  	__u8 gosvw[16];
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 0835c664fbfd..62f17f4eab42 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2253,6 +2253,64 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	return rc;
+>  }
+>  
+> +static int sev_snp_hv_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +	struct sev_data_snp_msg_report_rsp *report_rsp = NULL;
+> +	struct sev_data_snp_hv_report_req data;
+> +	struct kvm_sev_snp_hv_report_req params;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+> +	void __user *u_report;
+> +	void __user *u_params = u64_to_user_ptr(argp->data);
+> +	int ret;
+> +
+> +	if (!sev_snp_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	if (copy_from_user(&params, u_params, sizeof(params)))
+> +		return -EFAULT;
+> +
+> +	if (params.report_len < SEV_SNP_ATTESTATION_REPORT_SIZE)
+> +		return -ENOSPC;
 
-Key takeaway: QAT offload aims to reduce CPU utilization while maintaining
-competitive throughput and compression ratio.
+See my comment below after the SEV_SNP_ATTESTATION_REPORT_SIZE #define.
+Here you should check that report_len is at least the size of the report
+response struct without the report, e.g., sizeof(*report_rsp).
 
-At a throughput of 6.5 GiB/s, QAT-ZLIB-L9 stores the data in significantly
-less space (compression ratio 34% vs 58%) and uses far less cores to do
-that (4.56% vs 19.85%) compared to SW-LZO-L1.
+> +
+> +	memset(&data, 0, sizeof(data));
 
-As for decompression:
-  * zlib offload supports both compression and decompression.
-  * zstd offload currently supports compression only; decompression
-    falls back to software.
+Should be able to do '= {0}' in the declaration and eliminate the memset.
 
-I'll share zstd and decompression benchmarks in a future revision once
-they pass internal approval. I will also include measurements for SW-ZLIB-L9
-for a direct comparison.
+> +
+> +	u_report = u64_to_user_ptr(params.report_uaddr);
+> +	if (!u_report)
+> +		return -EINVAL;
+> +
+> +	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +	if (!report_rsp)
+> +		return -ENOMEM;
+> +
+> +	data.len = sizeof(data);
+> +	data.hv_report_paddr = __psp_pa(report_rsp);
+> +	data.key_sel = params.key_sel;
+> +
+> +	data.gctx_addr = __psp_pa(sev->snp_context);
+
+Just set these in the order they are in the struct and without blank
+lines in between them, e.g.:
+
+	data.len = ...
+	data.key_sel = ...
+	data.gctx_paddr = ...
+	data.hv_report_paddr = ...
+
+> +	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
+> +			    &argp->error);
+> +
+
+Remove the blank line.
+
+> +	if (ret)
+> +		goto e_free_rsp;
+> +
+> +	params.report_len = report_rsp->report_size;
+> +	if (copy_to_user(u_params, &params, sizeof(params)))
+> +		ret = -EFAULT;
+
+Rather than updating the report_len, you should just include the full
+MSG_REPORT_RSP structure. The spec doesn't indicate if all failures will
+be reported via the command return code vs being in the status field of
+the response struct.
+
+The length check and copy size would then be:
+	sizeof(*report_rsp) + report_rsp->report_size
+
+Then if there isn't enough room you copy the 32 bytes of the report
+response struct that will indicate how much memory is needed.
+
+> +
+> +	if (params.report_len < report_rsp->report_size) {
+> +		ret = -ENOSPC;
+> +	} else if (copy_to_user(u_report, report_rsp + 1, report_rsp->report_size)) {
+> +		/* report is located right after rsp */
+> +		ret = -EFAULT;
+> +	}
+
+	rsp_size = sizeof(*report_rsp);
+	if (!report_rsp->status)
+		rsp_size += report_rsp->report_size;
+
+	if (params.report_len < rsp_size) {
+		rsp_size = sizeof(*report_rsp);
+		ret = -ENOSPC;
+	}
+
+	if (copy_to_user(u_report, report_rsp, rsp_size))
+		ret = -EFAULT;
+
+> +
+> +e_free_rsp:
+> +	/* contains sensitive data */
+> +	memzero_explicit(report_rsp, PAGE_SIZE);
+
+Does it? What is sensitive that needs to be cleared?
+
+> +	snp_free_firmware_page(report_rsp);
+> +	return ret;
+> +}
+> +
+>  struct sev_gmem_populate_args {
+>  	__u8 type;
+>  	int sev_fd;
+> @@ -2664,6 +2722,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  	case KVM_SEV_SNP_LAUNCH_FINISH:
+>  		r = snp_launch_finish(kvm, &sev_cmd);
+>  		break;
+> +	case KVM_SEV_SNP_HV_REPORT_REQ:
+> +		r = sev_snp_hv_report_request(kvm, &sev_cmd);
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		goto out;
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 0d13d47c164b..5236d5ee19ac 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -251,6 +251,7 @@ static int sev_cmd_buffer_len(int cmd)
+>  	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
+>  	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
+>  	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
+> +	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
+>  	default:				return 0;
+>  	}
+>  
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index e0dbcb4b4fd9..0e635feb7671 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -91,6 +91,7 @@ enum sev_cmd {
+>  	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
+>  	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
+>  	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
+> +	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
+>  	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
+>  	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
+>  	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
+> @@ -554,6 +555,36 @@ struct sev_data_attestation_report {
+>  	u32 len;				/* In/Out */
+>  } __packed;
+>  
+> +/**
+> + * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
+> + *
+> + * @len: length of the command buffer in bytes
+> + * @key_sel: Selects which key to use for generating the signature.
+> + * @gctx_addr: System physical address of guest context page
+> + * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
+> + */
+> +struct sev_data_snp_hv_report_req {
+> +	u32 len;		/* In */
+> +	u32 key_sel:2;		/* In */
+> +	u32 rsvd:30;
+
+Please use the following format for bitfields:
+
+	u32 key_sel	:2,
+	    rsvd	:30;
+
+It makes it easier to read/understand.
+
+> +	u64 gctx_addr;		/* In */
+> +	u64 hv_report_paddr;	/* In */
+> +} __packed;
+> +
+> +#define SEV_SNP_ATTESTATION_REPORT_SIZE 1184
+
+I don't think this should be specified as such in case anything changes
+in the future. Plan on just allocating a page like you already do. The
+SNP ABI does imply that the response can't cross a 4K boundary (similar
+to how the guest attestation response explicitly states that the
+response can't cross a 4K boundary). Only upon return of the report, do
+you then check the size and see if userspace has allocated enough memory.
+
+> +
+> +/**
+> + * struct sev_data_snp_msg_export_rsp
+> + *
+> + * @status: Status : 0h: Success. 16h: Invalid parameters.
+> + * @report_size: Size in bytes of the attestation report
+> + */
+> +struct sev_data_snp_msg_report_rsp {
+> +	u32 status;			/* Out */
+> +	u32 report_size;		/* Out */
+> +	u8 rsvd[24];
+
+You could add a u8 report[]; here to show that a variable size report
+follows.
 
 Thanks,
+Tom
 
--- 
-Giovanni
+> +} __packed;
+> +
+>  /**
+>   * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
+>   *
+
