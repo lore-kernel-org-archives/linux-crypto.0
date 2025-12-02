@@ -1,38 +1,38 @@
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D28A32FF664;
-	Tue,  2 Dec 2025 06:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D1B2FFDC0;
+	Tue,  2 Dec 2025 06:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764655985; cv=none; b=PqvhR7Dn9yOGbLXKUpXXFylItbnJvGtbue38lmCyHcofXO3Iq1ECIg2SnyPKpHZCvEB1fVQGjCTGhnjCPdQATTr0QFVyM+DBDlX1aLcWooQEqxdP+OSeRv/GUCh6Sh0T/GoCyC02oZUSkMMRQGpjy7J8VO2iLEiwCLHKNeP1AWs=
+	t=1764655987; cv=none; b=SRZytWuBX0H+zEQHgXsNJRYut/mud5GecAXXglwVFUGT8xFNwsA+0CCkt6B4Hmc1WkS4ul+qyey+p6fvaBI0PbkJ4c4BAMEs6CvP/51zQDNskVepW15mSXUS6HzVy6OFZ+vQJswAKXdF4R2LeewXvxsZOn5i9zCajItKmfZYmls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764655985; c=relaxed/simple;
-	bh=gnrhT/h0A8AV79o6VCRZ1fL2+CeNshbrYlrotkJIksI=;
+	s=arc-20240116; t=1764655987; c=relaxed/simple;
+	bh=8cz4FYVv7Tul+2qaKdfUaDELxdy1lI7cezs0+cLfksM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oZkV00QaPJABLoNYQWf+jjRDNSgScDJ/83XeYLCTrhiNlkLY6F8aHW1OuiEXy0VQ9EMLOGQuRdxtDjbzaX1mugO1Pml1m21HABh80uoSbZmrA9gL5w4Jf53laCkSXtTWqg6lVGPizqQ27SBZtvVFhRserpxiGyOttx0xRx1n+QY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=IMapymeC; arc=none smtp.client-ip=113.46.200.223
+	 MIME-Version:Content-Type; b=XgA+hIJjBqakuBb9QydBGLEjOBA16QZxLP8ucJlGakX0z57BUZDjmax1IE239SJXztU0n5tmIt7OhVNEPCD3TeJIU8E9vEbzRttC+wLbjphHTMZjVyRkXo6R6gpH60O0wcuMnUJYhxnNo8Ejam3YRKEDL0PU+7yPgKARvMcciDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=2i1SZOYb; arc=none smtp.client-ip=113.46.200.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="IMapymeC"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="2i1SZOYb"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=1Dm9bT+p9g52NqnB8W1+F9hfCBHyPZRbf4WhOd2TC04=;
-	b=IMapymeCniJqdB6LlgTw/Xyky4elwfmYgSbJpl0YYVLjKZAoH6rCMPS8Fa2pja319hIz5bxXI
-	6vf6ZP6GFoSxKDyFc0jejYrYqOyCmGN/BMwC9ExSxZMDfBBZr79aaDlqSolw2a4KpwoS0dlZ3TZ
-	MkyVWG9movvDrNIw3KfEZlM=
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4dL9Pl2ljXzmV7L;
-	Tue,  2 Dec 2025 14:11:07 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 08A22140143;
+	bh=zSNlfVRPlkcIXMnglekNZTymcG2mDkauZswbS9rUu5Y=;
+	b=2i1SZOYbvHNxzmM9PD4UH014FqoRwVyld04sC9y6iqz4sG3cgvwRcyrtP/T8mLoAvHUCJItni
+	yZYwBMoZLzfV7F4I7UFpwHtymGe619Bbkkg1svKlTcVUpbFApLiYpfX02NhwvyQhzHTBVudWKUk
+	R8PudPSg2bGaVZIFF1i/1r8=
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4dL9Pn4CYqz1K9Ck;
+	Tue,  2 Dec 2025 14:11:09 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6E41B14025A;
 	Tue,  2 Dec 2025 14:12:59 +0800 (CST)
 Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 2 Dec 2025 14:12:58 +0800
+ 15.2.1544.11; Tue, 2 Dec 2025 14:12:59 +0800
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -43,9 +43,9 @@ To: <gregkh@linuxfoundation.org>, <zhangfei.gao@linaro.org>,
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<fanghao11@huawei.com>, <shenyang39@huawei.com>, <liulongfang@huawei.com>,
 	<qianweili@huawei.com>, <linwenkai6@hisilicon.com>
-Subject: [PATCH v6 2/4] uacce: fix isolate sysfs check condition
-Date: Tue, 2 Dec 2025 14:12:54 +0800
-Message-ID: <20251202061256.4158641-3-huangchenghai2@huawei.com>
+Subject: [PATCH v6 3/4] uacce: implement mremap in uacce_vm_ops to return -EPERM
+Date: Tue, 2 Dec 2025 14:12:55 +0800
+Message-ID: <20251202061256.4158641-4-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20251202061256.4158641-1-huangchenghai2@huawei.com>
 References: <20251202061256.4158641-1-huangchenghai2@huawei.com>
@@ -60,21 +60,26 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
  kwepemq200001.china.huawei.com (7.202.195.16)
 
-uacce supports the device isolation feature. If the driver
-implements the isolate_err_threshold_read and
-isolate_err_threshold_write callback functions, uacce will create
-sysfs files now. Users can read and configure the isolation policy
-through sysfs. Currently, sysfs files are created as long as either
-isolate_err_threshold_read or isolate_err_threshold_write callback
-functions are present.
+From: Yang Shen <shenyang39@huawei.com>
 
-However, accessing a non-existent callback function may cause the
-system to crash. Therefore, intercept the creation of sysfs if
-neither read nor write exists; create sysfs if either is supported,
-but intercept unsupported operations at the call site.
+The current uacce_vm_ops does not support the mremap operation of
+vm_operations_struct. Implement .mremap to return -EPERM to remind
+users.
 
-Fixes: e3e289fbc0b5 ("uacce: supports device isolation feature")
+The reason we need to explicitly disable mremap is that when the
+driver does not implement .mremap, it uses the default mremap
+method. This could lead to a risk scenario:
+
+An application might first mmap address p1, then mremap to p2,
+followed by munmap(p1), and finally munmap(p2). Since the default
+mremap copies the original vma's vm_private_data (i.e., q) to the
+new vma, both munmap operations would trigger vma_close, causing
+q->qfr to be freed twice(qfr will be set to null here, so repeated
+release is ok).
+
+Fixes: 015d239ac014 ("uacce: add uacce driver")
 Cc: stable@vger.kernel.org
+Signed-off-by: Yang Shen <shenyang39@huawei.com>
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 Acked-by: Zhangfei Gao <zhangfei.gao@linaro.org>
 ---
@@ -82,29 +87,24 @@ Acked-by: Zhangfei Gao <zhangfei.gao@linaro.org>
  1 file changed, 6 insertions(+)
 
 diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-index 43d215fb8c73..b0b3c1562d52 100644
+index b0b3c1562d52..c061c6fa1c5e 100644
 --- a/drivers/misc/uacce/uacce.c
 +++ b/drivers/misc/uacce/uacce.c
-@@ -382,6 +382,9 @@ static ssize_t isolate_strategy_show(struct device *dev, struct device_attribute
- 	struct uacce_device *uacce = to_uacce_device(dev);
- 	u32 val;
+@@ -214,8 +214,14 @@ static void uacce_vma_close(struct vm_area_struct *vma)
+ 	}
+ }
  
-+	if (!uacce->ops->isolate_err_threshold_read)
-+		return -ENOENT;
++static int uacce_vma_mremap(struct vm_area_struct *area)
++{
++	return -EPERM;
++}
 +
- 	val = uacce->ops->isolate_err_threshold_read(uacce);
+ static const struct vm_operations_struct uacce_vm_ops = {
+ 	.close = uacce_vma_close,
++	.mremap = uacce_vma_mremap,
+ };
  
- 	return sysfs_emit(buf, "%u\n", val);
-@@ -394,6 +397,9 @@ static ssize_t isolate_strategy_store(struct device *dev, struct device_attribut
- 	unsigned long val;
- 	int ret;
- 
-+	if (!uacce->ops->isolate_err_threshold_write)
-+		return -ENOENT;
-+
- 	if (kstrtoul(buf, 0, &val) < 0)
- 		return -EINVAL;
- 
+ static int uacce_fops_mmap(struct file *filep, struct vm_area_struct *vma)
 -- 
 2.33.0
 
