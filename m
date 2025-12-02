@@ -1,106 +1,84 @@
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A153009E3;
-	Tue,  2 Dec 2025 06:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292692FFF89;
+	Tue,  2 Dec 2025 06:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764655991; cv=none; b=ORjD2pb1RD9KGxLfpZzUq4mD3gSgv8k2Xj8kAy9oq6gsGhVt8RP8gwywR8qYLAxMFdXcfk2lxi0QKvynL6SBgx54nksa+RUj2GDWnEFKpkxFP9aOBcEKgG6fkT1wa/3OQsoNunJSUQVhQkyiP89IXLR1yHP/Gb/LJvvnoeUSMl4=
+	t=1764656705; cv=none; b=qTI0HSmd0Js+VkHNNV6IplH6f4hEA0KOWzpYsY6LroRHxToF2tArvUgg/U7OC23krL3wjc+ELfQSjl9CWnW3GukwI+XORWy/W1VDzKinIPZUcpYHgj7APBJ/H+YES6qEyNHGKCyOnefwzPwLB5H5qcqfjyxOk3MXPGLBHhiNRys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764655991; c=relaxed/simple;
-	bh=oUvMlSGPUklubX7pMUj2K6ocNCj4Fmrys3oZaGVyZCk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NxJ0tkCwib2mT8sxRB0W4PiJOYQJpgn7Tdats/jn/DN0D/Y88+iBEkHkvrQm6+tDSBghaZOyBEsq752TJ4q4hAjTDJB/6OMw+YhaEr8RwmY9dG0CKhl5ANgK3stv+DluvXguC3Y273gd3XerEe0V3E0OCkUqB/ZmlZsdwBARzd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=gJx9SrP1; arc=none smtp.client-ip=113.46.200.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="gJx9SrP1"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=Z7G9BQ0ydyqiKjKK1XkGiJiClH35zTRc/fZlSb5dsLg=;
-	b=gJx9SrP17sqywA88CW1kzCAg3wzlNDtsAIKSTFaEUBDHZWNKNYyfHIrQvuhRIK6XFUgsucoQL
-	5Wt7dDF8a6zES8x+MbcRdfypw6VqXChIAwNgqdxwUHmLH+cDs4xaqjm+HseYk9xBuLvfth2eerJ
-	Vbn3zjzlcetWtnrKUe0XYZM=
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dL9PJ3y3MzpSwb;
-	Tue,  2 Dec 2025 14:10:44 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0037C180BD2;
-	Tue,  2 Dec 2025 14:13:02 +0800 (CST)
-Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 2 Dec 2025 14:12:58 +0800
-Received: from localhost.huawei.com (10.90.31.46) by
- kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 2 Dec 2025 14:12:57 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <gregkh@linuxfoundation.org>, <zhangfei.gao@linaro.org>,
-	<wangzhou1@hisilicon.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <shenyang39@huawei.com>, <liulongfang@huawei.com>,
-	<qianweili@huawei.com>, <linwenkai6@hisilicon.com>
-Subject: [PATCH v6 1/4] uacce: fix cdev handling in the cleanup path
-Date: Tue, 2 Dec 2025 14:12:53 +0800
-Message-ID: <20251202061256.4158641-2-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20251202061256.4158641-1-huangchenghai2@huawei.com>
-References: <20251202061256.4158641-1-huangchenghai2@huawei.com>
+	s=arc-20240116; t=1764656705; c=relaxed/simple;
+	bh=ckppSMB/ShTOuB5lgJCSTFQ7jzN/2iHVYT3QpUlK7vg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pW3EUZYroDdivynFmKNiH/z6Pq0lbNGJuwCZd+kwzNy0nrMZwfnO+v2dMWRrtyzKM8fdcCzvE6tqi0awrjbIexOyMPneSTjZaGWGenkvj10obSo/ArwFrDPjiyvdekHY9K9QHr2GT/JkS/l0oS2V0esxMzgPEbZaiC6WwJPJWLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.0.107] (unknown [114.241.82.59])
+	by APP-01 (Coremail) with SMTP id qwCowABn_cwuhi5pmijUAg--.285S2;
+	Tue, 02 Dec 2025 14:24:46 +0800 (CST)
+Message-ID: <80cb6553-af8f-4fce-a010-dff3a33c3779@iscas.ac.cn>
+Date: Tue, 2 Dec 2025 14:24:46 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemq200001.china.huawei.com (7.202.195.16)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] lib/crypto: riscv/chacha: Avoid s0/fp register
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Jerry Shih <jerry.shih@sifive.com>, "Jason A. Donenfeld"
+ <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>,
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+ linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20251202-riscv-chacha_zvkb-fp-v2-1-7bd00098c9dc@iscas.ac.cn>
+ <20251202053119.GA1416@sol>
+Content-Language: en-US
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <20251202053119.GA1416@sol>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:qwCowABn_cwuhi5pmijUAg--.285S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZFWDKr1xJw15tr1kGry3Arb_yoWfGrbEvr
+	WYyrn7Cwn8WFnrtFyjkr4UtrWDGw1fWFyIgryrXwsrKrW8Zan5Zr1kZrn5Aw1Sqw42yF9F
+	kr98Jay3W34a9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbskYjsxI4VWkCwAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I
+	6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
+	8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0
+	cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4
+	A2jsIEc7CjxVAFwI0_Cr1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8Jw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l
+	c7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73Uj
+	IFyTuYvjxU2VbyDUUUU
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-From: Wenkai Lin <linwenkai6@hisilicon.com>
+On 12/2/25 13:31, Eric Biggers wrote:
+> On Tue, Dec 02, 2025 at 01:25:07PM +0800, Vivian Wang wrote:
+>> In chacha_zvkb, avoid using the s0 register, which is the frame pointer,
+>> by reallocating KEY0 to t5. This makes stack traces available if e.g. a
+>> crash happens in chacha_zvkb.
+>>
+>> No frame pointer maintenence is otherwise required since this is a leaf
+>> function.
+> maintenence => maintenance
+>
+Ouch... I swear I specifically checked this before sending, but
+apparently didn't see this. Thanks for the catch.
 
-When cdev_device_add fails, it internally releases the cdev memory,
-and if cdev_device_del is then executed, it will cause a hang error.
-To fix it, we check the return value of cdev_device_add() and clear
-uacce->cdev to avoid calling cdev_device_del in the uacce_remove.
+>>  SYM_FUNC_START(chacha_zvkb)
+>>  	addi		sp, sp, -96
+>> -	sd		s0, 0(sp)
+> I know it's annoying, but would you mind also changing the 96 to 88, and
+> decreasing all the offsets by 8, so that we don't leave a hole in the
+> stack where s0 used to be?  Likewise at the end of the function.
 
-Fixes: 015d239ac014 ("uacce: add uacce driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
----
- drivers/misc/uacce/uacce.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-index 42e7d2a2a90c..43d215fb8c73 100644
---- a/drivers/misc/uacce/uacce.c
-+++ b/drivers/misc/uacce/uacce.c
-@@ -519,6 +519,8 @@ EXPORT_SYMBOL_GPL(uacce_alloc);
-  */
- int uacce_register(struct uacce_device *uacce)
- {
-+	int ret;
-+
- 	if (!uacce)
- 		return -ENODEV;
- 
-@@ -529,7 +531,11 @@ int uacce_register(struct uacce_device *uacce)
- 	uacce->cdev->ops = &uacce_fops;
- 	uacce->cdev->owner = THIS_MODULE;
- 
--	return cdev_device_add(uacce->cdev, &uacce->dev);
-+	ret = cdev_device_add(uacce->cdev, &uacce->dev);
-+	if (ret)
-+		uacce->cdev = NULL;
-+
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(uacce_register);
- 
--- 
-2.33.0
+No can do. Stack alignment on RISC-V is 16 bytes, and 80 won't fit.
 
