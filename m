@@ -1,222 +1,214 @@
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117DAE555;
-	Tue,  2 Dec 2025 23:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A171BC2A
+	for <linux-crypto@vger.kernel.org>; Wed,  3 Dec 2025 01:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764716421; cv=none; b=TrREm+w5AnlWYW7RHkUOmdUQ/SUgK67nD1jtquZn1DNt8YSpxobxvVfS/+tL+uAyoAsfG1ZR1GZ1h1fkYzS/LPpBd7uwI4Qmx8HfQXZms2G4BHdo++NgjRBtyxs8Nn0GtTKWZ9HhNx+HiXS7br6ivrHgpnfIkvm+BTqESjDY9fA=
+	t=1764727049; cv=none; b=YLzuWkFXrdQBCGnTFpFgmLAc8PRhfB8XxVlc6saCuSKyse3l8XBpfHFC6nnA+b+bU5y6KX93yoxjYaWc7WLaoqT8VDTK2yy8VucLg4J6PTQgDy8+YVoTu/+YinSkuhZKy7/QP28uFjUZCfvjRyw85LWa+DKaWpEJv0MjiefSIzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764716421; c=relaxed/simple;
-	bh=uLQ79qfXiToHSw/KLhJO1U15ORfz05ux3TyIYajAAyk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jqYMkWCxQ/AKuzRITHo85xiGT0nmGrS6iyDTX0Da7tdeU7Bdo21OuiBM3wifi0jIRd25uGtDCuhrI76vMswRb2xO7VDi++jFhMuiJCZl1iisgIFqSCHEFhcl/6/w1rlajPZhkQ81gItZspAhpqW9KOBR4KHVCdS8qWbC2DDfY2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com; spf=pass smtp.mailfrom=gmx.com; dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b=HNGgeLKu; arc=none smtp.client-ip=212.227.17.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b="HNGgeLKu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.com;
-	s=s31663417; t=1764716403; x=1765321203; i=quwenruo.btrfs@gmx.com;
-	bh=uLQ79qfXiToHSw/KLhJO1U15ORfz05ux3TyIYajAAyk=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=HNGgeLKuv98ZJ7ISzalGY0HjojvXqLs0NN6GGcnAksTYqFG/BqY/BqnfAmCdGI7m
-	 6P0p86ly/Ih3xx4kmM9NXfSHPgehJSfGduhXmwJTVQKtnoyCxllNzm/YGt+LrOghY
-	 BlG/JfJqq/sUQxxwAidJL6Ge6yUaCEWwwWWXGXhBSJYr49FYBLlL3TL3bW7OE/WSh
-	 6m0VsjFAY38/nL4SJbCWcwFICQWDWzQuIIcI0Asf+t+c7CaJ5vcwoMRv83rPRYOdK
-	 X0PsBY8gBQ7undRfc1BKr1I/J/o9f9c2aIlBow6+Nx4i1o5veJ6hpVac7J9bWW2v6
-	 lv/MPm2vkxNl2hV8ug==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [172.16.0.229] ([159.196.52.54]) by mail.gmx.net (mrgmx104
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1My36N-1wHi8L457v-01892r; Wed, 03
- Dec 2025 00:00:03 +0100
-Message-ID: <789ad2e4-ce6f-40fe-8e56-9bbfdc86e29f@gmx.com>
-Date: Wed, 3 Dec 2025 09:29:55 +1030
+	s=arc-20240116; t=1764727049; c=relaxed/simple;
+	bh=+6t665L7JElpLOaVjFqHc+JPAwrJCKZ5m+0YDlZlEVk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ihF949QUw6jEq2iYAEvQ3rwKDT2B6oYy7FUAEiFqI8rIY1RlAQrCp85tdGgvWAMpES7f9nXmq6EVieacvxcCKa7U47RMcP6vELu331KHyWVv06OZXNzH7Zp8oUuwi4Ir6dppaouOVlXv6fsUiGuVkVlb9TWUOzUTD3abSZlsvDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-6574b639289so3197387eaf.1
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Dec 2025 17:57:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764727046; x=1765331846;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hLYlxtksAUO/eEHSHZ/6FbrzuglQbbR4CCaUse6Bb74=;
+        b=fOi6HE6m6yYBkx2Om5crne/vN0hIZVCSdCO8yk3tjcYM7BN9Q6s63yzrORJf+P2ve5
+         B64hXSMem1Os/DFDDHajmQaW++/lReTupl3XsJDz0visM1rVajDKkO19TxT29wFMfmf+
+         +/OgSXQm9lUj+H3B/KQD5scl0/2DzYlZlaipKAvMWCZ8Q9GeEVOq9KxzIvMIN3MDJ0Pz
+         vvH1W6tezLi+5YEE0BaKT/kjd4ZAhsIIps05hyoVqhVx9YQcofy6tvH8QfsAIDbVOcnm
+         8CQIt19LFOxB4XGYH6kenybeEv5etghr605gpFKiOtsNT6QjMY1xth1eu5Crs/Ofv0iC
+         hVZg==
+X-Forwarded-Encrypted: i=1; AJvYcCVE9x8EfjzmdEsPb7NANn7MXneTkBrfaXNUCabwkBXNq06JlTaFW8ivMHd3uNC3kB858JNLiZpykpHG4zk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxi8UA8d6yXJJgx/2JGr9yq6I1NwG1bbVbZikcSsrOt/SUKM/Rd
+	wZZi0XhqYyB5okw02jqkxXEGuefsWmFM/j9/Wk3frkC/KhfzOEk+wcybJkZqN7OxBdv77oXfzBi
+	bpNPvhLUtaYKZ9LRcFZDnj/2+L7uqasDCMY0HSI/NxnEeJSbKXv7CWJNAoJE=
+X-Google-Smtp-Source: AGHT+IGa8pL5m5ewYmYgBeQ5nguUiVBpoaKYGf1+lKXmP+2AEgrh0FTTEVg1/MhztW1zBSuJ+aewZLrLnM9gauGox70xKcqfmHzG
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 16/16] btrfs: add compression hw-accelerated offload
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: dsterba@suse.com, herbert@gondor.apana.org.au, Qu Wenruo <wqu@suse.com>,
- clm@fb.com, terrelln@fb.com, linux-btrfs@vger.kernel.org,
- linux-crypto@vger.kernel.org, qat-linux@intel.com, cyan@meta.com,
- brian.will@intel.com, weigang.li@intel.com, senozhatsky@chromium.org
-References: <aSok4RiuQVZ8zckR@gcabiddu-mobl.ger.corp.intel.com>
- <0617afdf-14d4-4642-8298-69ef71f53b4d@gmx.com>
- <c4f89df0-9373-4329-9e61-9b5592ddc2f2@gmx.com>
- <aS2nA8+YpNbKjXeo@gcabiddu-mobl.ger.corp.intel.com>
- <aS2v6g3f5nYi6hC+@gcabiddu-mobl.ger.corp.intel.com>
- <453951a9-0c8d-4e1a-be4f-2617c6a51fbe@gmx.com>
- <aS4UNIfxGK0y6HzO@gcabiddu-mobl.ger.corp.intel.com>
- <e532ff5c-a5a6-4ebf-977a-721471594908@gmx.com>
- <aS8dNt3gCzlIxBIs@gcabiddu-mobl.ger.corp.intel.com>
- <0bd22b17-97e8-4b8f-a7a5-5e79d280c078@gmx.com>
- <aS9qQwPeM6UVvcQ+@gcabiddu-mobl.ger.corp.intel.com>
-Content-Language: en-US
-From: Qu Wenruo <quwenruo.btrfs@gmx.com>
-Autocrypt: addr=quwenruo.btrfs@gmx.com; keydata=
- xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
- 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
- 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
- 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
- gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
- AAHNIlF1IFdlbnJ1byA8cXV3ZW5ydW8uYnRyZnNAZ214LmNvbT7CwJQEEwEIAD4CGwMFCwkI
- BwIGFQgJCgsCBBYCAwECHgECF4AWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1YAUJEP5a
- sQAKCRDCPZHzoSX+qF+mB/9gXu9C3BV0omDZBDWevJHxpWpOwQ8DxZEbk9b9LcrQlWdhFhyn
- xi+l5lRziV9ZGyYXp7N35a9t7GQJndMCFUWYoEa+1NCuxDs6bslfrCaGEGG/+wd6oIPb85xo
- naxnQ+SQtYLUFbU77WkUPaaIU8hH2BAfn9ZSDX9lIxheQE8ZYGGmo4wYpnN7/hSXALD7+oun
- tZljjGNT1o+/B8WVZtw/YZuCuHgZeaFdhcV2jsz7+iGb+LsqzHuznrXqbyUQgQT9kn8ZYFNW
- 7tf+LNxXuwedzRag4fxtR+5GVvJ41Oh/eygp8VqiMAtnFYaSlb9sjia1Mh+m+OBFeuXjgGlG
- VvQFzsBNBFnVga8BCACqU+th4Esy/c8BnvliFAjAfpzhI1wH76FD1MJPmAhA3DnX5JDORcga
- CbPEwhLj1xlwTgpeT+QfDmGJ5B5BlrrQFZVE1fChEjiJvyiSAO4yQPkrPVYTI7Xj34FnscPj
- /IrRUUka68MlHxPtFnAHr25VIuOS41lmYKYNwPNLRz9Ik6DmeTG3WJO2BQRNvXA0pXrJH1fN
- GSsRb+pKEKHKtL1803x71zQxCwLh+zLP1iXHVM5j8gX9zqupigQR/Cel2XPS44zWcDW8r7B0
- q1eW4Jrv0x19p4P923voqn+joIAostyNTUjCeSrUdKth9jcdlam9X2DziA/DHDFfS5eq4fEv
- ABEBAAHCwHwEGAEIACYCGwwWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1gQUJEP5a0gAK
- CRDCPZHzoSX+qHGpB/kB8A7M7KGL5qzat+jBRoLwB0Y3Zax0QWuANVdZM3eJDlKJKJ4HKzjo
- B2Pcn4JXL2apSan2uJftaMbNQbwotvabLXkE7cPpnppnBq7iovmBw++/d8zQjLQLWInQ5kNq
- Vmi36kmq8o5c0f97QVjMryHlmSlEZ2Wwc1kURAe4lsRG2dNeAd4CAqmTw0cMIrR6R/Dpt3ma
- +8oGXJOmwWuDFKNV4G2XLKcghqrtcRf2zAGNogg3KulCykHHripG3kPKsb7fYVcSQtlt5R6v
- HZStaZBzw4PcDiaAF3pPDBd+0fIKS6BlpeNRSFG94RYrt84Qw77JWDOAZsyNfEIEE0J6LSR/
-In-Reply-To: <aS9qQwPeM6UVvcQ+@gcabiddu-mobl.ger.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:xh6MFSy+GAzDrrTV+BqpK4Rf/BGbB/TfP2bXX2kbJ52Csc2p8zn
- VD/QQ3dj7nVz00l+OMC2CEk+N9DDS8OnKSrpoGko7zrI+6yGteIrBDsOUIWum1UEtnBCcyp
- W2+e61Wog18evBOzwHkFKDI3dzMpHT8kILZUY5Ltl73wl+880O1n6kC7qi95cs6cBlTQbvo
- Mu/KTiCtOi+qUUgzn7e/w==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:uBoj6SMxrCY=;xUG17OIkU9zt7PfKS5mEGgmFVOL
- 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
+X-Received: by 2002:a05:6808:1c05:b0:453:f62:dddc with SMTP id
+ 5614622812f47-4536e3a415cmr300036b6e.7.1764727046475; Tue, 02 Dec 2025
+ 17:57:26 -0800 (PST)
+Date: Tue, 02 Dec 2025 17:57:26 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <692f9906.a70a0220.d98e3.01ae.GAE@google.com>
+Subject: [syzbot] [crypto?] KMSAN: uninit-value in adiantum_crypt
+From: syzbot <syzbot+703d8a2cd20971854b06@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-[...]
->>> So there is nothing QAT specific here. The mechanism is generic.
->>
->> But only QAT requires this, a "generic" mechanism only for QAT.
-> If this solution is adopted for other accelerators, they will need it as
-> well.
+Hello,
 
-Does this sound sane to you? Every future acomp user needs to implement=20
-a removal? At least it doesn't sound sane to me.
+syzbot found the following issue on:
 
->=20
-> I tested sending traffic to another device that plugs into the acomp API
-> (Intel IAA) and then tried removing the module while in-flight
-> compression operations were ongoing. It was not possible to remove it
-> (as expected!).
+HEAD commit:    6cf62f0174de Merge tag 'char-misc-6.18-rc8' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1727df42580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=61a9bf3cc5d17a01
+dashboard link: https://syzkaller.appspot.com/bug?extid=703d8a2cd20971854b06
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13bfa112580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=169e422c580000
 
-I know, but that doesn't mean it's the correct way to go.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fb216361ff9c/disk-6cf62f01.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/eb55e25eb970/vmlinux-6cf62f01.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5110f00a1a4e/bzImage-6cf62f01.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/7a62729c5268/mount_0.gz
+  fsck result: OK (log: https://syzkaller.appspot.com/x/fsck.log?x=16dd8112580000)
 
-You're pushing for a workaround of QAT into an acomp user, completely=20
-breaking the layer separation.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+703d8a2cd20971854b06@syzkaller.appspotmail.com
 
-If the current acomp layer can't handle this feature (dynamically=20
-deliver to different implementation), then please add such feature to=20
-acomp layer.
+=====================================================
+BUG: KMSAN: uninit-value in subshift lib/crypto/aes.c:150 [inline]
+BUG: KMSAN: uninit-value in aes_encrypt+0x1239/0x1960 lib/crypto/aes.c:283
+ subshift lib/crypto/aes.c:150 [inline]
+ aes_encrypt+0x1239/0x1960 lib/crypto/aes.c:283
+ aesti_encrypt+0x7d/0xf0 crypto/aes_ti.c:31
+ cipher_crypt_one+0x120/0x2e0 crypto/cipher.c:75
+ crypto_cipher_encrypt_one+0x33/0x40 crypto/cipher.c:82
+ adiantum_crypt+0x939/0xe60 crypto/adiantum.c:383
+ adiantum_encrypt+0x33/0x40 crypto/adiantum.c:419
+ crypto_skcipher_encrypt+0x18a/0x1e0 crypto/skcipher.c:195
+ fscrypt_crypt_data_unit+0x38e/0x590 fs/crypto/crypto.c:139
+ fscrypt_encrypt_pagecache_blocks+0x430/0x900 fs/crypto/crypto.c:197
+ ext4_bio_write_folio+0x1383/0x30d0 fs/ext4/page-io.c:552
+ mpage_submit_folio fs/ext4/inode.c:2080 [inline]
+ mpage_map_and_submit_buffers fs/ext4/inode.c:2324 [inline]
+ mpage_map_and_submit_extent fs/ext4/inode.c:2514 [inline]
+ ext4_do_writepages+0x3c08/0x8020 fs/ext4/inode.c:2931
+ ext4_writepages+0x338/0x870 fs/ext4/inode.c:3025
+ do_writepages+0x3f2/0x860 mm/page-writeback.c:2604
+ __writeback_single_inode+0x101/0x1190 fs/fs-writeback.c:1719
+ writeback_sb_inodes+0xac1/0x1cb0 fs/fs-writeback.c:2015
+ wb_writeback+0x4ce/0xc00 fs/fs-writeback.c:2195
+ wb_do_writeback fs/fs-writeback.c:2342 [inline]
+ wb_workfn+0x397/0x1910 fs/fs-writeback.c:2382
+ process_one_work kernel/workqueue.c:3263 [inline]
+ process_scheduled_works+0xb91/0x1d80 kernel/workqueue.c:3346
+ worker_thread+0xedf/0x1590 kernel/workqueue.c:3427
+ kthread+0xd5c/0xf00 kernel/kthread.c:463
+ ret_from_fork+0x1f5/0x4c0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
->=20
-> IAA currently only implements deflate (not zlib-deflate), so it cannot
-> be used for this specific case, but the same limitation applies. There
-> are also other drivers in drivers/crypto, including non-Intel ones, that
-> integrate with acomp for compression.
->=20
-> So this is not QAT-specific. The problem exists for any accelerator usin=
-g
-> acomp when dynamic removal is required.
+Uninit was stored to memory at:
+ le128_add crypto/adiantum.c:191 [inline]
+ adiantum_crypt+0xcf7/0xe60 crypto/adiantum.c:379
+ adiantum_encrypt+0x33/0x40 crypto/adiantum.c:419
+ crypto_skcipher_encrypt+0x18a/0x1e0 crypto/skcipher.c:195
+ fscrypt_crypt_data_unit+0x38e/0x590 fs/crypto/crypto.c:139
+ fscrypt_encrypt_pagecache_blocks+0x430/0x900 fs/crypto/crypto.c:197
+ ext4_bio_write_folio+0x1383/0x30d0 fs/ext4/page-io.c:552
+ mpage_submit_folio fs/ext4/inode.c:2080 [inline]
+ mpage_map_and_submit_buffers fs/ext4/inode.c:2324 [inline]
+ mpage_map_and_submit_extent fs/ext4/inode.c:2514 [inline]
+ ext4_do_writepages+0x3c08/0x8020 fs/ext4/inode.c:2931
+ ext4_writepages+0x338/0x870 fs/ext4/inode.c:3025
+ do_writepages+0x3f2/0x860 mm/page-writeback.c:2604
+ __writeback_single_inode+0x101/0x1190 fs/fs-writeback.c:1719
+ writeback_sb_inodes+0xac1/0x1cb0 fs/fs-writeback.c:2015
+ wb_writeback+0x4ce/0xc00 fs/fs-writeback.c:2195
+ wb_do_writeback fs/fs-writeback.c:2342 [inline]
+ wb_workfn+0x397/0x1910 fs/fs-writeback.c:2382
+ process_one_work kernel/workqueue.c:3263 [inline]
+ process_scheduled_works+0xb91/0x1d80 kernel/workqueue.c:3346
+ worker_thread+0xedf/0x1590 kernel/workqueue.c:3427
+ kthread+0xd5c/0xf00 kernel/kthread.c:463
+ ret_from_fork+0x1f5/0x4c0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
-Then please give an example where such removal is needed in the existing=
-=20
-code.
+Uninit was stored to memory at:
+ adiantum_crypt+0x531/0xe60 crypto/adiantum.c:368
+ adiantum_encrypt+0x33/0x40 crypto/adiantum.c:419
+ crypto_skcipher_encrypt+0x18a/0x1e0 crypto/skcipher.c:195
+ fscrypt_crypt_data_unit+0x38e/0x590 fs/crypto/crypto.c:139
+ fscrypt_encrypt_pagecache_blocks+0x430/0x900 fs/crypto/crypto.c:197
+ ext4_bio_write_folio+0x1383/0x30d0 fs/ext4/page-io.c:552
+ mpage_submit_folio fs/ext4/inode.c:2080 [inline]
+ mpage_map_and_submit_buffers fs/ext4/inode.c:2324 [inline]
+ mpage_map_and_submit_extent fs/ext4/inode.c:2514 [inline]
+ ext4_do_writepages+0x3c08/0x8020 fs/ext4/inode.c:2931
+ ext4_writepages+0x338/0x870 fs/ext4/inode.c:3025
+ do_writepages+0x3f2/0x860 mm/page-writeback.c:2604
+ __writeback_single_inode+0x101/0x1190 fs/fs-writeback.c:1719
+ writeback_sb_inodes+0xac1/0x1cb0 fs/fs-writeback.c:2015
+ wb_writeback+0x4ce/0xc00 fs/fs-writeback.c:2195
+ wb_do_writeback fs/fs-writeback.c:2342 [inline]
+ wb_workfn+0x397/0x1910 fs/fs-writeback.c:2382
+ process_one_work kernel/workqueue.c:3263 [inline]
+ process_scheduled_works+0xb91/0x1d80 kernel/workqueue.c:3346
+ worker_thread+0xedf/0x1590 kernel/workqueue.c:3427
+ kthread+0xd5c/0xf00 kernel/kthread.c:463
+ ret_from_fork+0x1f5/0x4c0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
-I tried searching for those acomp users, but none of them seems to need=20
-bother the removal of an implementation.
+Uninit was created at:
+ __alloc_frozen_pages_noprof+0x689/0xf00 mm/page_alloc.c:5201
+ alloc_pages_mpol+0x328/0x860 mm/mempolicy.c:2416
+ alloc_frozen_pages_noprof mm/mempolicy.c:2487 [inline]
+ alloc_pages_noprof mm/mempolicy.c:2507 [inline]
+ folio_alloc_noprof+0x109/0x360 mm/mempolicy.c:2517
+ filemap_alloc_folio_noprof+0x9d/0x420 mm/filemap.c:1020
+ __filemap_get_folio+0xb45/0x1930 mm/filemap.c:2012
+ write_begin_get_folio include/linux/pagemap.h:784 [inline]
+ ext4_write_begin+0x6d9/0x2d70 fs/ext4/inode.c:1318
+ ext4_da_write_begin+0x77c/0x1490 fs/ext4/inode.c:3129
+ generic_perform_write+0x365/0x1050 mm/filemap.c:4255
+ ext4_buffered_write_iter+0x61a/0xce0 fs/ext4/file.c:299
+ ext4_file_write_iter+0x2a2/0x3d90 fs/ext4/file.c:-1
+ new_sync_write fs/read_write.c:593 [inline]
+ vfs_write+0xbe2/0x15d0 fs/read_write.c:686
+ ksys_pwrite64 fs/read_write.c:793 [inline]
+ __do_sys_pwrite64 fs/read_write.c:801 [inline]
+ __se_sys_pwrite64 fs/read_write.c:798 [inline]
+ __x64_sys_pwrite64+0x2ab/0x3b0 fs/read_write.c:798
+ x64_sys_call+0xe77/0x3e30 arch/x86/include/generated/asm/syscalls_64.h:19
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Again, if QAT requires a new ability (dynamic removal) from acomp, add=20
-it into acomp not the acomp user.
+CPU: 1 UID: 0 PID: 3651 Comm: kworker/u8:15 Not tainted syzkaller #0 PREEMPT(none) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+Workqueue: writeback wb_workfn (flush-7:0)
+=====================================================
 
-Thanks,
-Qu
 
->=20
-> Thanks,
->=20
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
