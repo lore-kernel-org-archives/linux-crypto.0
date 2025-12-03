@@ -1,85 +1,70 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E4E2FFF83
-	for <linux-crypto@vger.kernel.org>; Wed,  3 Dec 2025 14:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC64933E36A
+	for <linux-crypto@vger.kernel.org>; Wed,  3 Dec 2025 16:38:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764772846; cv=none; b=DkrhhmxZCqpvAK4RS6AEmdQUxnQGx9kLD7GusUm3nI99PaTB/vU531VU+czO660ow4zNt9WmNgKdf3aZCnKGjiZD5FyG03EcCrs5wvpa5pawvNhDAqDAJwH5HjYkMDcNEAiOe85pvDted25urc6EzfoOExvkziLP5PnLYwB14Cc=
+	t=1764779894; cv=none; b=Nb5oOF634/zZLjdQb6BehBqYfup5hpq/HdhVuRNNHyfXEc71hfMhUtjlLJb4DEddfJk5LY4UNW83uQodPyAEGgRx2pQWUfazg0mqlS4i7bFF/wYEZueraTlaNlBg6tYYOs4g7GWj+35j6TP397nUBwb/Gu/nr/kjgKMnC6RwjUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764772846; c=relaxed/simple;
-	bh=sni84eXEYd+de2L/vVmmutjA/aIPRSlalbCS50kC3+w=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=mV5wL6/yMcx4Svzf3y/Ra/9tmp+s3s77uZC34PyZzKuwh7h5kS2KkPQTOFJAxehBEj+PTq4LM/ytbgJHMjloLulr4rTzBe7N6RkZUqViMwgmS3urmmY2PV+3GHsXifRgsMaQIuKa1B6zjOK+OMrAtctw5GzRPB7/pHA8vvyGPek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R6jnDYim; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764779894; c=relaxed/simple;
+	bh=FsnD99zCt0OJVlSqJHF7KG4E83p7vHtZLxom3RUz8OM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RTT5a41cA07zQ2lVVg+pQlQdkqvp2qiSEhL3TXHOn54oEB6atzBR0i1YEgHsKyioKlpUXIu9BJE7fYSfhb/aw1EW2g+LiT9YiwtFGQUJHwR71rSpX8D9uluEeaur4H563xRLVh28Zs9Bpb3AexF92l6X+sZCSrytjOJ0Yv4CCXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DTWFG44a; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R6jnDYim"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764772844;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sni84eXEYd+de2L/vVmmutjA/aIPRSlalbCS50kC3+w=;
-	b=R6jnDYimBpSMe+aUM7h6uIsgOyK6JHCVzazw3qD7ubc6xZY3FJprPib47N8R6LAk/jVaJm
-	vJx1RNurwvaXGwftPrYQTJU6cbvI8gtsyIdQGprq+ruRgX/iqh8qZUsj15tOOYkCckP60B
-	N7eletx2kpG1llmH5G1AtMeyyMeymOE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-549-t8h2yfuzPCq4fDB4xJVCDw-1; Wed,
- 03 Dec 2025 09:40:37 -0500
-X-MC-Unique: t8h2yfuzPCq4fDB4xJVCDw-1
-X-Mimecast-MFC-AGG-ID: t8h2yfuzPCq4fDB4xJVCDw_1764772835
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 300BF1800358;
-	Wed,  3 Dec 2025 14:40:35 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B001530001A2;
-	Wed,  3 Dec 2025 14:40:30 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <94cb715bd8782b93e10a285c6dc6ec58@linux.ibm.com>
-References: <94cb715bd8782b93e10a285c6dc6ec58@linux.ibm.com> <20251203072844.484893-1-ebiggers@kernel.org>
-To: freude@linux.ibm.com
-Cc: dhowells@redhat.com, Eric Biggers <ebiggers@kernel.org>,
-    linux-crypto@vger.kernel.org,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Luis Chamberlain <mcgrof@kernel.org>,
-    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
-    Sami Tolvanen <samitolvanen@google.com>,
-    "Jason A . Donenfeld" <Jason@zx2c4.com>,
-    Ard Biesheuvel <ardb@kernel.org>,
-    Stephan Mueller <smueller@chronox.de>,
-    Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
-    linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/2] lib/crypto: ML-DSA verification support
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DTWFG44a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9993EC116C6;
+	Wed,  3 Dec 2025 16:38:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764779894;
+	bh=FsnD99zCt0OJVlSqJHF7KG4E83p7vHtZLxom3RUz8OM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=DTWFG44aQJFOJxI7XP/wH1CBRkvxvKjmtqw/u7JQ+pARjE9iAp65qiyUkFi2K88bJ
+	 NbngfVYoDpAKD3caJwGCeHSl3nj8PRwAFe3oeldyqzB1WqkpzSMDCLopQY1rgy4fV9
+	 DWjwUMRcXrdUhpV0D/2RyXyssXzNF33eElmpso83TYMLriG8V7RC8Ydbrqzqa4yqCB
+	 8c04+yGeGZEbvcV+zJGbov4x9tYIttL8reSmbXNdTy8stl1SbK5zQ7VeHOUEvMzfJk
+	 o/49Flg4w/zAthEjOTmmAbiXCF2SJqgTmsYB0rzpDp2dp9QVyIUZZbCi9Y8/JnQdEv
+	 3lIW6xT9wZ2kQ==
+From: Ard Biesheuvel <ardb@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 0/2] crypto/arm64: Reduce stack bloat from scoped ksimd
+Date: Wed,  3 Dec 2025 17:38:04 +0100
+Message-ID: <20251203163803.157541-4-ardb@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1937479.1764772829.1@warthog.procyon.org.uk>
-Date: Wed, 03 Dec 2025 14:40:29 +0000
-Message-ID: <1937480.1764772829@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=822; i=ardb@kernel.org; h=from:subject; bh=FsnD99zCt0OJVlSqJHF7KG4E83p7vHtZLxom3RUz8OM=; b=owGbwMvMwCVmkMcZplerG8N4Wi2JIdMgPedxcdP5pb78S4Wenj766Ejx8Z5klV67F1PvzliWc rfEKk2go5SFQYyLQVZMkUVg9t93O09PlKp1niULM4eVCWQIAxenAEzkQBTD/7I8b6nmZe9/fKz7 N4tr4dp/2cwLLprW6/tK+hs+kr+W28LIMC+69Y1cjWiG34r5y8+yn/t/JVRFT8ZGXXhW0SHZ5wm 1TAA=
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+Content-Transfer-Encoding: 8bit
 
-Harald Freudenberger <freude@linux.ibm.com> wrote:
+Arnd reports that the new scoped ksimd changes result in excessive stack
+bloat in the XTS routines in some cases. Fix this for AES-XTS and
+SM4-XTS.
 
-> ERROR: modpost: module mldsa_kunit uses symbol mldsa_use_hint from namespace
-> EXPORTED_FOR_KUNIT_TESTING, but does not import it.
+Note that the offending patches went in via the libcrypto tree, so these
+changes should either go via the same route, or wait for -rc1
 
-Change EXPORT_SYMBOL_FOR_KUNIT() in patch 1 to EXPORT_SYMBOL_GPL().
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
 
-David
+Ard Biesheuvel (2):
+  crypto/arm64: aes/xts - Using single ksimd scope to reduce stack bloat
+  crypto/arm64: sm4/xts: Merge ksimd scopes to reduce stack bloat
+
+ arch/arm64/crypto/aes-glue.c        | 75 ++++++++++----------
+ arch/arm64/crypto/aes-neonbs-glue.c | 44 ++++++------
+ arch/arm64/crypto/sm4-ce-glue.c     | 42 ++++++-----
+ 3 files changed, 77 insertions(+), 84 deletions(-)
+
+-- 
+2.47.3
 
