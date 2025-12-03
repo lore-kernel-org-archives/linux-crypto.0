@@ -1,82 +1,208 @@
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478342F25FE
-	for <linux-crypto@vger.kernel.org>; Wed,  3 Dec 2025 11:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBB138D;
+	Wed,  3 Dec 2025 12:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764762356; cv=none; b=dxm8zw78uT3BSltY98T3qnB2AW/kQCC1MQMAo219oJjeDWGJc3NBaoE/u3VCjY9OphAhgo2EOt+zHWesVf3yozXkmz+B6wyRtGS3MQDDUDg+oQODAfQ7bLaddkjOHJdBNUoF5eVuWzbS00OZRGMsy7QztH0xNc0hyqQUbr6fAsc=
+	t=1764764159; cv=none; b=Er+rljw5ubhGXG1yhi2mndO0W+3dX1a5Yvq0vKPv6YfR4ETjeDdCUqi5i45XXh/e6dy4obb5bEqR0Dl4zuqg220viCkxOepI89d04m1mkOTqZYuTPXQfzhhCOaXnB7Z0z/Y3nV2j7wKmW4ljSf8J4Ij1Q9E4EVenIpKGiZY0iyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764762356; c=relaxed/simple;
-	bh=jfvwANw8GGCqWqo0EONSZfGmof/FFpic3hgfJnrQewA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=RCl8UTScurK3pxgB9jopRTo5X+A2d0J0iI6KUU2pMhNb5+DSlhcaV1Him2LE2ADExc1nkWENskLSU/YhxaNBeqqA5MNwoTRo/abgUAxN2FnUshi3hAob9tc/j6TQOfffrlTiBZXEeZ5iqjlZgg/z1ttqp4pBc7Smi4sp3pTGWaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NJEu/Dgb; arc=none smtp.client-ip=74.125.224.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJEu/Dgb"
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-6443b62daf6so102803d50.0
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Dec 2025 03:45:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764762354; x=1765367154; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jfvwANw8GGCqWqo0EONSZfGmof/FFpic3hgfJnrQewA=;
-        b=NJEu/DgbLyc1l5ReFmZi/I2c3FbEgmnsZbRqgb+xCHjYxiCu6EOip6W9aHy+mT49cf
-         /VSIck/LZutkUDAZ9y7hbYzlGgm6fLClopm1rJaLUdmiPTonNOUjane+1SsEccJ7znky
-         poggxx5Io2fPjl3b9pGJVJLmjyXIU/vsAOsyUwE/YhJcYblsdsr1MpgGQKxqtux310d1
-         V5u3yzP1uh/6Gwgo7s/knsDwHjPN6a17MLKrAjJn2spLpI9ftPYOKT2iCTT1uDjrZePi
-         Q+N1ugicQ10PwSMI+LiS983gxlCvi6B5X493q4rqGa+dQX93o8yQZ232mcEmpXNQWkF9
-         1RbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764762354; x=1765367154;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jfvwANw8GGCqWqo0EONSZfGmof/FFpic3hgfJnrQewA=;
-        b=EnEL5AAFyIfRB6CFE9SEh4YE2ihgJ7UpQ5tpla8k3FOWWNmyygivm6/b1AD3Omfn7F
-         K3POmlUJOTP0Y2+DUs4cGfApt5NcE1r+ebowbLfqQRw11UCMrRo6TgNfCkVV/fVK2f3j
-         bE/7OfsLsptcucdC+2J3iU2pRWFKiLTaLdtl0MUkJsVom3gMM0Yc+Fx7j3ohlHVIUL2Z
-         I8SgIvFtAKpjUI7d3X60dR9penjfyyxsXbZYB4zmR0brcf9srt6WMsuhbEs4ENaehAga
-         ydEDzxiL0jlUWJrx/nHtyUUVbw2XcXrYPEa6D4akVt8Cmur6N0RbfhTrRT7QesyI2wmi
-         +I7A==
-X-Forwarded-Encrypted: i=1; AJvYcCXU0WyNryGg20cK0I6R+jrutSO9gBqNoluDEMgHPc1ySfu+m1lsNfEqTHvRsu183CIE6FKeQgkypgiQcKU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2GiK7mLvpJL5KAqNZXbLKtoT6OB5dSnBHrsBvKrxL/8P40abw
-	WNwINw33INi16pSxOAi2taCLLNy45vQ+WfImmlfjeaHFe77ay3nMSu0JoJka8PD2cmnvWe7A9cZ
-	dZMy21PKlj0x19bpOk6zR286BiEGGbiQ=
-X-Gm-Gg: ASbGncvhAuDw6nz3fpBMPfbadayf7M+5ColuHH8BrFeqEE7KMz2nWLh038raxbxwv7Z
-	/LzkgTaFzrj9e1shq6ZUStF0u8CaQSgUoSAeawJT2a1bP5A4gVOdynrETrXYoDQvHNEpYdx/suI
-	2TWQmj4QBwv4TR3x6e+mehnbQ1k3r0AZMKHB6B+WfGbdTHyCDPsMo24C20vr3C3mnkA/eXeR79S
-	VPi2P9rAoR1YqSSOd9PA9XB/4rVq9+X9ejGKux5SdMMzO+kkrFttU7Hse8TwO+xFo5bBuTxgC7G
-	ZFUxRd+SgQ==
-X-Google-Smtp-Source: AGHT+IEzU9CLw4PO4lmYYb5juhpUEGTESsPrMuN6tZE9k8WytumrivMEP4GUWCLQ68YIJ8LPazd59Iywcm9CqJaSUrA=
-X-Received: by 2002:a05:690e:128e:b0:641:f5bc:6947 with SMTP id
- 956f58d0204a3-64437073804mr1442037d50.75.1764762354130; Wed, 03 Dec 2025
- 03:45:54 -0800 (PST)
+	s=arc-20240116; t=1764764159; c=relaxed/simple;
+	bh=uqJL9FFx4SSTFGQ6utymUEwOosWqYj0K1wfyPjvnJeU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LmU6p7FYY4iJ3MBsexAjbN7ZwB48jtG3x5wp/f3GEDeFXte9iixkTsSx1IAuRI1hw9PhgRykB2XfxtBSVrL51DIg5XGJA+OBwL2Bc7xKbLZOSpsOJ861HZmcSjGpR0E6iPNRv5ML8VgECU0xLoyFuemOSJ3IcCx9mH0IOCdjyd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D009C4CEFB;
+	Wed,  3 Dec 2025 12:15:55 +0000 (UTC)
+Message-ID: <bd25e903-30fc-4905-986c-96d1b42e9f02@linux-m68k.org>
+Date: Wed, 3 Dec 2025 22:15:52 +1000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251203031118.32421-1-dqfext@gmail.com>
-In-Reply-To: <20251203031118.32421-1-dqfext@gmail.com>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Wed, 3 Dec 2025 19:45:43 +0800
-X-Gm-Features: AWmQ_bmfGntaecZ1RTUsCEUg4Yl3KtYpBbTaL8cy1gSBY1rv4jjjOQZWeIddQrs
-Message-ID: <CALW65jZw0O4-_=koAWz_F=wv33vFZy8nkQs-RHjEczRv6ZDiVg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: eip93: fix sleep inside spinlock
-To: Christian Marangi <ansuelsmth@gmail.com>, Antoine Tenart <atenart@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Richard van Schagen <vschagen@icloud.com>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/2] m68k: coldfire: Add RNG support for MCF54418
+To: jeanmichel.hautbois@yoseli.org, Geert Uytterhoeven
+ <geert@linux-m68k.org>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>
+Cc: linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, imx@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, Frank Li <Frank.Li@nxp.com>
+References: <20251126-b4-m5441x-add-rng-support-v4-0-5309548c9555@yoseli.org>
+ <20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org>
+Content-Language: en-US
+From: Greg Ungerer <gerg@linux-m68k.org>
+In-Reply-To: <20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Please disregard the patch, as I found out the issue is that
-crypto_async_request can be in an atomic context, so the driver is not
-allowed to sleep unless CRYPTO_TFM_REQ_MAY_SLEEP is set.
-I'll send v2 with an updated message.
+Hi Jean-Michel,
 
-Regards,
-Qingfang
+On 26/11/25 17:08, Jean-Michel Hautbois via B4 Relay wrote:
+> From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+> 
+> Add support for the hardware Random Number Generator (RNGB) found on
+> MCF54418 ColdFire processors with clock enabled at platform
+> initialization.
+> 
+> The RNGB block is compatible with the imx-rngc driver.
+> 
+> Reviewed-by: Frank Li <Frank.Li@nxp.com>
+> Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+> ---
+>   arch/m68k/coldfire/device.c       | 28 ++++++++++++++++++++++++++++
+>   arch/m68k/coldfire/m5441x.c       |  2 +-
+>   arch/m68k/include/asm/m5441xsim.h |  9 +++++++++
+>   drivers/char/hw_random/Kconfig    |  3 ++-
+>   drivers/char/hw_random/imx-rngc.c |  7 +++++++
+>   5 files changed, 47 insertions(+), 2 deletions(-)
+
+I am happy with the ColdFire arch parts, so from me:
+
+     Acked-by: Greg Ungerer <gerg@linux-m68k.org>
+
+I don't mind taking this commit via the m68knommu git tree if the hw_rng
+maintainers are ok with that. Otherwise if you break out the arch/m68k
+parts I can apply those on their own.
+
+Regards
+Greg
+
+
+
+> diff --git a/arch/m68k/coldfire/device.c b/arch/m68k/coldfire/device.c
+> index b6958ec2a220..9d8f844e319a 100644
+> --- a/arch/m68k/coldfire/device.c
+> +++ b/arch/m68k/coldfire/device.c
+> @@ -622,6 +622,31 @@ static struct platform_device mcf_flexcan0 = {
+>   };
+>   #endif /* MCFFLEXCAN_SIZE */
+>   
+> +#ifdef MCF_RNG_BASE
+> +/*
+> + * Random Number Generator (RNG) - only on MCF54418
+> + */
+> +static struct resource mcf_rng_resource[] = {
+> +	{
+> +		.start = MCF_RNG_BASE,
+> +		.end   = MCF_RNG_BASE + MCF_RNG_SIZE - 1,
+> +		.flags = IORESOURCE_MEM,
+> +	},
+> +	{
+> +		.start = MCF_IRQ_RNG,
+> +		.end   = MCF_IRQ_RNG,
+> +		.flags = IORESOURCE_IRQ,
+> +	},
+> +};
+> +
+> +static struct platform_device mcf_rng = {
+> +	.name           = "imx-rngc",
+> +	.id             = -1,
+> +	.num_resources  = ARRAY_SIZE(mcf_rng_resource),
+> +	.resource       = mcf_rng_resource,
+> +};
+> +#endif /* MCF_RNG_BASE */
+> +
+>   static struct platform_device *mcf_devices[] __initdata = {
+>   	&mcf_uart,
+>   #ifdef MCFFEC_BASE0
+> @@ -660,6 +685,9 @@ static struct platform_device *mcf_devices[] __initdata = {
+>   #ifdef MCFFLEXCAN_SIZE
+>   	&mcf_flexcan0,
+>   #endif
+> +#ifdef MCF_RNG_BASE
+> +	&mcf_rng,
+> +#endif
+>   };
+>   
+>   /*
+> diff --git a/arch/m68k/coldfire/m5441x.c b/arch/m68k/coldfire/m5441x.c
+> index 7a25cfc7ac07..ab5b00637237 100644
+> --- a/arch/m68k/coldfire/m5441x.c
+> +++ b/arch/m68k/coldfire/m5441x.c
+> @@ -158,6 +158,7 @@ static struct clk * const enable_clks[] __initconst = {
+>   	&__clk_0_33, /* pit.1 */
+>   	&__clk_0_37, /* eport */
+>   	&__clk_0_48, /* pll */
+> +	&__clk_0_49, /* rng */
+>   	&__clk_0_51, /* esdhc */
+>   
+>   	&__clk_1_36, /* CCM/reset module/Power management */
+> @@ -179,7 +180,6 @@ static struct clk * const disable_clks[] __initconst = {
+>   	&__clk_0_44, /* usb otg */
+>   	&__clk_0_45, /* usb host */
+>   	&__clk_0_47, /* ssi.0 */
+> -	&__clk_0_49, /* rng */
+>   	&__clk_0_50, /* ssi.1 */
+>   	&__clk_0_53, /* enet-fec */
+>   	&__clk_0_54, /* enet-fec */
+> diff --git a/arch/m68k/include/asm/m5441xsim.h b/arch/m68k/include/asm/m5441xsim.h
+> index f48cf63bd782..dd64cdfcad3e 100644
+> --- a/arch/m68k/include/asm/m5441xsim.h
+> +++ b/arch/m68k/include/asm/m5441xsim.h
+> @@ -198,6 +198,15 @@
+>   #define MCFRTC_SIZE		(0xfc0a8840 - 0xfc0a8000)
+>   #define MCF_IRQ_RTC		(MCFINT2_VECBASE + MCFINT2_RTC)
+>   
+> +/*
+> + *  Random Number Generator (RNG) Module.
+> + *  Note: Only present in MCF54418, not in MCF54410/54415/54417
+> + */
+> +#define MCF_RNG_BASE		0xfc0c4000
+> +#define MCF_RNG_SIZE		0x1c
+> +#define MCFINT2_RNG		28
+> +#define MCF_IRQ_RNG		(MCFINT2_VECBASE + MCFINT2_RNG)
+> +
+>   /*
+>    *  GPIO Module.
+>    */
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> index 492a2a61a65b..2f301e43db84 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -270,12 +270,13 @@ config HW_RANDOM_MXC_RNGA
+>   config HW_RANDOM_IMX_RNGC
+>   	tristate "Freescale i.MX RNGC Random Number Generator"
+>   	depends on HAS_IOMEM
+> -	depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL || COMPILE_TEST
+> +	depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL || COLDFIRE || COMPILE_TEST
+>   	default HW_RANDOM
+>   	help
+>   	  This driver provides kernel-side support for the Random Number
+>   	  Generator Version C hardware found on some Freescale i.MX
+>   	  processors. Version B is also supported by this driver.
+> +	  Also supports RNGB on Freescale MCF54418 (Coldfire V4e).
+>   
+>   	  To compile this driver as a module, choose M here: the
+>   	  module will be called imx-rngc.
+> diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+> index d6a847e48339..44f20a05de0a 100644
+> --- a/drivers/char/hw_random/imx-rngc.c
+> +++ b/drivers/char/hw_random/imx-rngc.c
+> @@ -353,12 +353,19 @@ static const struct of_device_id imx_rngc_dt_ids[] = {
+>   };
+>   MODULE_DEVICE_TABLE(of, imx_rngc_dt_ids);
+>   
+> +static const struct platform_device_id imx_rngc_devtype[] = {
+> +	{ .name = "imx-rngc" },
+> +	{ /* sentinel */ }
+> +};
+> +MODULE_DEVICE_TABLE(platform, imx_rngc_devtype);
+> +
+>   static struct platform_driver imx_rngc_driver = {
+>   	.driver = {
+>   		.name = KBUILD_MODNAME,
+>   		.pm = pm_ptr(&imx_rngc_pm_ops),
+>   		.of_match_table = imx_rngc_dt_ids,
+>   	},
+> +	.id_table = imx_rngc_devtype,
+>   };
+>   
+>   module_platform_driver_probe(imx_rngc_driver, imx_rngc_probe);
+> 
+
