@@ -1,63 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2EA826ED5D;
-	Wed,  3 Dec 2025 03:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AB21BC2A;
+	Wed,  3 Dec 2025 03:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764731692; cv=none; b=nuPPBn0fsv1vHC1kTWt6OOU6DfeKGH+Me0vrCs3IWYGvAol+GmWZtfkPDm725EeZzIfdaKZ2CkzDHoUFpGLdfFuu9ZRcc2p6SKlwJw5cPWn3zqjMndjzoxDF07tlWphX9aVrx7EKwFYGQNTG2FbJqkqmRXeAqYacWpYi6WUgEaM=
+	t=1764731947; cv=none; b=IvLPHXNHgXnVeqLgErHetr/WIwAqDEV6viBiQjpxMqYJYHV2rYxwuRwIm62Exwr8JcRY9mPri6/8ldqgkNShXpfdo1pO0W5aZXuo6408swlrJjrF8NdGTHdjbYnuCgkHUaGR9y4qoYw3m1Dv1/XtzUw4DStPEYo2sI3hl9fUbLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764731692; c=relaxed/simple;
-	bh=GKQ2ak6q4t30pRCw2QUUMC0EJMIeKYrUpbmi3ltyMUg=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=o8nZkJobDAVBWJ431mcZtE2RLRkDkKC8qLcKrh812GT9MPeCCD1tT3ul0zs3VV5BQc+7Z9bxoC7r8UQ7/K7tMn7Lfz6LvvFbJMYxAlaAgh9v+iRxVaUKVLJrTx+wRgNTEWxeM/zM+ZsnqbqJxaU03K17+zPPGyQn0sLd+MKTvsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQw426jp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764731947; c=relaxed/simple;
+	bh=ULWsoHB44epi2/ZleJGYGNAUAK4cCs0hxt1ionS3+CA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g7MiSWAWK5nroH9hJuxaVrawtQm2t//F+V4ThtE1ZBeu6rk00YL1PI3qUAFzQnVPvO+kYnwydL5iritX/21LBSv7rcslm1CplC/YuxqUR5nLglaABRL4AdJZENQNLueEw1H9/AB2GFrHlYnU72+a4eQLfHzlkqM6WDHfwPc5cxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JVPKlwEF; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQw426jp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C08E0C4CEFB;
-	Wed,  3 Dec 2025 03:14:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764731691;
-	bh=GKQ2ak6q4t30pRCw2QUUMC0EJMIeKYrUpbmi3ltyMUg=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=gQw426jpYHGM+OrO4B9Obv5z5mpF/ZLR2p2VvXN4gCJtLKsfH4DjswjJmiGiXKfNz
-	 c0z6P2HBEnVO9GH84Y1vqmDm9/dImwuQ1fWGIWvgLcymKUA8WxH8ipV/uXeCfKAFPi
-	 QaATm3Jto+MUGoyJus20+qkqd6xU4Zl8vRp/1AMfvCsgP/bRSQmKcrC0/dHZU2/x1Z
-	 V6NZNt2KXlYohVBbJa+FUGuqyKllj8ZssrK61/4EHBUbfhEehbqn7sD1hSxRAkgSpO
-	 lf9e+uWQTSKXcEK0yOWjTQMBJtLKymRhKZCGa697e5Fmu5pdzPfGk5jvXmOQP5oNXr
-	 j2nkcdAaPh6nA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B8C53A72A63;
-	Wed,  3 Dec 2025 03:11:52 +0000 (UTC)
-Subject: Re: [GIT PULL] arm64 FPSIMD buffer on-stack for 6.19
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20251130030105.GF12664@sol>
-References: <20251130030105.GF12664@sol>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20251130030105.GF12664@sol>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/fpsimd-on-stack-for-linus
-X-PR-Tracked-Commit-Id: 5dc8d277520be6f0be11f36712e557167b3964c8
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: f617d24606553159a271f43e36d1c71a4c317e48
-Message-Id: <176473151071.3498170.16297964704270989529.pr-tracker-bot@kernel.org>
-Date: Wed, 03 Dec 2025 03:11:50 +0000
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Jonathan Cameron <jonathan.cameron@huawei.com>, Kees Cook <kees@kernel.org>, Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, Mark Brown <broonie@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JVPKlwEF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764731945; x=1796267945;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ULWsoHB44epi2/ZleJGYGNAUAK4cCs0hxt1ionS3+CA=;
+  b=JVPKlwEFEWc9TSRUqilK6aKynueYTzP7UYl5WPNBXBM3nOuHmtQHpCmb
+   23aEhvh9wuw7aX0809XCtThTKcglz3i0OJoaUWwYAcJTwTBnbea2bKZj8
+   lNef+DYKEBl2PLN/VX1UmuW7G4sp6WMfc3Ys8Gmg2zYDTKGsTX7X8G6dp
+   cBJnjR57YW4jfHOj2T5qriqfrbq43DpvUloY6g1TVRjl4wA6g/OulY+XS
+   yd/Pg20JNTKfIFeOXtw2+kaL4/OTg/LE4cx4fPyk+DKWKtlOHvCiWxwaL
+   cgRvFOFyEaJheL56mJCrGnWnPgjSLKwjMhDkTzMaA8V42QRtGx/f499sg
+   g==;
+X-CSE-ConnectionGUID: zZ3MKt5hTRaNEcLKkHOmMw==
+X-CSE-MsgGUID: j7ISG1kCRt6IsLBdwGhKIw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11631"; a="65721132"
+X-IronPort-AV: E=Sophos;i="6.20,244,1758610800"; 
+   d="scan'208";a="65721132"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 19:19:05 -0800
+X-CSE-ConnectionGUID: EV4JCPUaRbmtB5pak/0+LA==
+X-CSE-MsgGUID: C5RzoMg4SweQ78fHGdK0qA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,244,1758610800"; 
+   d="scan'208";a="194444999"
+Received: from dwillia2-desk.jf.intel.com ([10.88.27.145])
+  by fmviesa006.fm.intel.com with ESMTP; 02 Dec 2025 19:19:04 -0800
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-coco@lists.linux.dev,
+	kernel test robot <lkp@intel.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>
+Subject: [PATCH] crypto/ccp: Fix CONFIG_PCI=n build
+Date: Tue,  2 Dec 2025 19:19:48 -0800
+Message-ID: <20251203031948.2471431-1-dan.j.williams@intel.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Sat, 29 Nov 2025 19:01:05 -0800:
+It turns out that the PCI driver for ccp is unconditionally built into the
+kernel in the CONFIG_PCI=y case. This means that the new SEV-TIO support
+needs an explicit dependency on PCI to avoid build errors when
+CONFIG_CRYPTO_DEV_SP_PSP=y and CONFIG_PCI=n.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/fpsimd-on-stack-for-linus
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: http://lore.kernel.org/202512030743.6pVPA4sx-lkp@intel.com
+Cc: Alexey Kardashevskiy <aik@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: John Allen <john.allen@amd.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+---
+ drivers/crypto/ccp/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/f617d24606553159a271f43e36d1c71a4c317e48
+diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
+index e2b127f0986b..f16a0f611317 100644
+--- a/drivers/crypto/ccp/Kconfig
++++ b/drivers/crypto/ccp/Kconfig
+@@ -39,7 +39,7 @@ config CRYPTO_DEV_SP_PSP
+ 	bool "Platform Security Processor (PSP) device"
+ 	default y
+ 	depends on CRYPTO_DEV_CCP_DD && X86_64 && AMD_IOMMU
+-	select PCI_TSM
++	select PCI_TSM if PCI
+ 	help
+ 	 Provide support for the AMD Platform Security Processor (PSP).
+ 	 The PSP is a dedicated processor that provides support for key
 
-Thank you!
-
+base-commit: f7ae6d4ec6520a901787cbab273983e96d8516da
+prerequisite-patch-id: 085ed7fc143cfcfd0418527cfad03db88d4b64ec
+prerequisite-patch-id: c1d1a6d802b3b4bfffb9f45fc5ac6a9a1b5e361d
+prerequisite-patch-id: 44c6ea6fb683418ae67ff3efdb0c07fda013e6b2
+prerequisite-patch-id: 407daf59d54ecebcb7fefd22a5b5833e03c038e4
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.51.1
+
