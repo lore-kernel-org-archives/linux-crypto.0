@@ -1,136 +1,82 @@
-Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C322DE707;
-	Wed,  3 Dec 2025 10:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478342F25FE
+	for <linux-crypto@vger.kernel.org>; Wed,  3 Dec 2025 11:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764759275; cv=none; b=eTMh5eYPcfHDwYiQnPixLXitW4FsiZ7LWNcmOT5UIEMc+BfkmJg/2+q67n3l0rkPON4a4+b9szkxukr6TpkU3UNnXCbD3FLjnf7OgnfsdbWXWeXjbaqgvUKMzPssXBotMW8Rh8jF6YGbFAMezpjpvQaRC/VqwCDcTfqUFej7L7I=
+	t=1764762356; cv=none; b=dxm8zw78uT3BSltY98T3qnB2AW/kQCC1MQMAo219oJjeDWGJc3NBaoE/u3VCjY9OphAhgo2EOt+zHWesVf3yozXkmz+B6wyRtGS3MQDDUDg+oQODAfQ7bLaddkjOHJdBNUoF5eVuWzbS00OZRGMsy7QztH0xNc0hyqQUbr6fAsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764759275; c=relaxed/simple;
-	bh=zlku+hEAoDWyukBBVx477+OkecSYeuAuCSlqe8H5itw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VTHbIJUevPeQCeAwA3oITYJGLiHwfgmWaGsVKSUQH8hlAZRHDn7vyDIgHQT8r5d2m4OSm9JGDTQidB62o89LE833xuLzKRkEK+kIYnLsge+05it4UQDduRZ9PihMmMf6ql/2LkN+MsnwX+AmfhAAo1L4RKTQF+foRpEdGHdgJAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
-Received: from [192.168.10.94] (unknown [39.110.247.193])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by psionic.psi5.com (Postfix) with ESMTPSA id 0E35C3F11A;
-	Wed,  3 Dec 2025 11:47:13 +0100 (CET)
-Message-ID: <9d7b182e-9da7-458f-b913-14eee415359d@hogyros.de>
-Date: Wed, 3 Dec 2025 19:47:11 +0900
+	s=arc-20240116; t=1764762356; c=relaxed/simple;
+	bh=jfvwANw8GGCqWqo0EONSZfGmof/FFpic3hgfJnrQewA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=RCl8UTScurK3pxgB9jopRTo5X+A2d0J0iI6KUU2pMhNb5+DSlhcaV1Him2LE2ADExc1nkWENskLSU/YhxaNBeqqA5MNwoTRo/abgUAxN2FnUshi3hAob9tc/j6TQOfffrlTiBZXEeZ5iqjlZgg/z1ttqp4pBc7Smi4sp3pTGWaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NJEu/Dgb; arc=none smtp.client-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJEu/Dgb"
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-6443b62daf6so102803d50.0
+        for <linux-crypto@vger.kernel.org>; Wed, 03 Dec 2025 03:45:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764762354; x=1765367154; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jfvwANw8GGCqWqo0EONSZfGmof/FFpic3hgfJnrQewA=;
+        b=NJEu/DgbLyc1l5ReFmZi/I2c3FbEgmnsZbRqgb+xCHjYxiCu6EOip6W9aHy+mT49cf
+         /VSIck/LZutkUDAZ9y7hbYzlGgm6fLClopm1rJaLUdmiPTonNOUjane+1SsEccJ7znky
+         poggxx5Io2fPjl3b9pGJVJLmjyXIU/vsAOsyUwE/YhJcYblsdsr1MpgGQKxqtux310d1
+         V5u3yzP1uh/6Gwgo7s/knsDwHjPN6a17MLKrAjJn2spLpI9ftPYOKT2iCTT1uDjrZePi
+         Q+N1ugicQ10PwSMI+LiS983gxlCvi6B5X493q4rqGa+dQX93o8yQZ232mcEmpXNQWkF9
+         1RbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764762354; x=1765367154;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jfvwANw8GGCqWqo0EONSZfGmof/FFpic3hgfJnrQewA=;
+        b=EnEL5AAFyIfRB6CFE9SEh4YE2ihgJ7UpQ5tpla8k3FOWWNmyygivm6/b1AD3Omfn7F
+         K3POmlUJOTP0Y2+DUs4cGfApt5NcE1r+ebowbLfqQRw11UCMrRo6TgNfCkVV/fVK2f3j
+         bE/7OfsLsptcucdC+2J3iU2pRWFKiLTaLdtl0MUkJsVom3gMM0Yc+Fx7j3ohlHVIUL2Z
+         I8SgIvFtAKpjUI7d3X60dR9penjfyyxsXbZYB4zmR0brcf9srt6WMsuhbEs4ENaehAga
+         ydEDzxiL0jlUWJrx/nHtyUUVbw2XcXrYPEa6D4akVt8Cmur6N0RbfhTrRT7QesyI2wmi
+         +I7A==
+X-Forwarded-Encrypted: i=1; AJvYcCXU0WyNryGg20cK0I6R+jrutSO9gBqNoluDEMgHPc1ySfu+m1lsNfEqTHvRsu183CIE6FKeQgkypgiQcKU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2GiK7mLvpJL5KAqNZXbLKtoT6OB5dSnBHrsBvKrxL/8P40abw
+	WNwINw33INi16pSxOAi2taCLLNy45vQ+WfImmlfjeaHFe77ay3nMSu0JoJka8PD2cmnvWe7A9cZ
+	dZMy21PKlj0x19bpOk6zR286BiEGGbiQ=
+X-Gm-Gg: ASbGncvhAuDw6nz3fpBMPfbadayf7M+5ColuHH8BrFeqEE7KMz2nWLh038raxbxwv7Z
+	/LzkgTaFzrj9e1shq6ZUStF0u8CaQSgUoSAeawJT2a1bP5A4gVOdynrETrXYoDQvHNEpYdx/suI
+	2TWQmj4QBwv4TR3x6e+mehnbQ1k3r0AZMKHB6B+WfGbdTHyCDPsMo24C20vr3C3mnkA/eXeR79S
+	VPi2P9rAoR1YqSSOd9PA9XB/4rVq9+X9ejGKux5SdMMzO+kkrFttU7Hse8TwO+xFo5bBuTxgC7G
+	ZFUxRd+SgQ==
+X-Google-Smtp-Source: AGHT+IEzU9CLw4PO4lmYYb5juhpUEGTESsPrMuN6tZE9k8WytumrivMEP4GUWCLQ68YIJ8LPazd59Iywcm9CqJaSUrA=
+X-Received: by 2002:a05:690e:128e:b0:641:f5bc:6947 with SMTP id
+ 956f58d0204a3-64437073804mr1442037d50.75.1764762354130; Wed, 03 Dec 2025
+ 03:45:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 00/16] btrfs: offload compression to hardware
- accelerators
-To: Christoph Hellwig <hch@infradead.org>, Jani Partanen <jiipee@sotapeli.fi>
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>, clm@fb.com,
- dsterba@suse.com, terrelln@fb.com, herbert@gondor.apana.org.au,
- linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org,
- qat-linux@intel.com, cyan@meta.com, brian.will@intel.com,
- weigang.li@intel.com, senozhatsky@chromium.org
-References: <20251128191531.1703018-1-giovanni.cabiddu@intel.com>
- <aS6a_ae64D4MvBpW@infradead.org>
- <8d3e44b0-23d8-4493-8e7e-33bbe1d904ef@sotapeli.fi>
- <aS_f9axsi0QmmhiL@infradead.org>
-Content-Language: en-US
-From: Simon Richter <Simon.Richter@hogyros.de>
-In-Reply-To: <aS_f9axsi0QmmhiL@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20251203031118.32421-1-dqfext@gmail.com>
+In-Reply-To: <20251203031118.32421-1-dqfext@gmail.com>
+From: Qingfang Deng <dqfext@gmail.com>
+Date: Wed, 3 Dec 2025 19:45:43 +0800
+X-Gm-Features: AWmQ_bmfGntaecZ1RTUsCEUg4Yl3KtYpBbTaL8cy1gSBY1rv4jjjOQZWeIddQrs
+Message-ID: <CALW65jZw0O4-_=koAWz_F=wv33vFZy8nkQs-RHjEczRv6ZDiVg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: eip93: fix sleep inside spinlock
+To: Christian Marangi <ansuelsmth@gmail.com>, Antoine Tenart <atenart@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Richard van Schagen <vschagen@icloud.com>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Please disregard the patch, as I found out the issue is that
+crypto_async_request can be in an atomic context, so the driver is not
+allowed to sleep unless CRYPTO_TFM_REQ_MAY_SLEEP is set.
+I'll send v2 with an updated message.
 
-On 12/3/25 4:00 PM, Christoph Hellwig wrote:
-
-> Well, if you compared QAT-L9 to LZO-L1 specifically:
-
-FWIW I think the same infrastructure is useful for nx-gzip on POWER9+, 
-which is a definite win:
-
-1. With 4 GiB of random data, effectively uncompressible:
-
-$ time nx_gzip -c test.bin >test.bin.nxgz
-real    0m4.716s
-user    0m1.381s
-sys     0m2.237s
-
-$ time gzip -c test.bin >test.bin.gz
-real    2m58.536s
-user    2m56.098s
-sys     0m2.084s
-
-2. With 4 GiB of NUL bytes:
-
-$ time nx_gzip -c zero.bin >zero.bin.nxgz
-real    0m0.855s
-user    0m0.613s
-sys     0m0.241s
-
-$ time gzip -c zero.bin >zero.bin.gz
-real    0m25.944s
-user    0m25.600s
-sys     0m0.336s
-
-This includes quite a bit of overhead because we're commanding the 
-coprocessor from a userspace library with a zlib compatible interface, 
-so there is syscall overhead for reading, poking the coprocessor and 
-writing, and the blocks submitted aren't as large as they could be, so 
-I'd expect an acomp module running before transferring data to userspace 
-to be a bit faster still.
-
-Unpacking is quite a bit faster as well, to the point where unpacking 
-the compressed block of 4GiB NUL bytes is faster than reading 4 GiB from 
-/dev/zero for me.
-
-For acomp, I pretty much always expect offloading to be worth the 
-overhead if hardware is available, simply because working with 
-bitstreams is awkward on any architecture that isn't specifically 
-designed for it, and when an algorithm requires building a dictionary, 
-gathering statistics and two-pass processing, that becomes even more 
-visible.
-
-For ahash/acrypt, there is a trade-off here, and where it is depends on 
-CPU features, the overhead of offloading, the overhead of receiving the 
-result, and how much of that overhead can be mitigated by submitting a 
-batch of operations.
-
-For the latter, we also need a better submission interface that actually 
-allows large batches, and submitters to use that.
-
-Much of the discussion about hardware offload has been circular -- no 
-one is submitting large requests because for CPU based implementations 
-there is no benefit in doing so (it just makes the interface more 
-complex), and hardware based implementations are sequentially processing 
-one small request at a time because no one is submitting larger batches, 
-and as a result we can't see a lot of performance improvements.
-
-As an example of interface pain points: ahash has synchronous 
-import/export functions, and no way for the driver to indicate that the 
-result buffer must be reachable by DMA as well, so even with a mailbox 
-interface that allows me to submit operations with low overhead, I need 
-to synthesize state readbacks into an auxiliary buffer and request an 
-interrupt to be delivered after each "update" operation, simply so I can 
-have the state available in case it is requested, while normally I would 
-only generate an interrupt after an "export" or "final" operation is 
-completed (and also rate-limit these).
-
-There's a lot of additional things that I think a good API would allow, 
-such as directly feeding data from mass storage to a coprocessor if they 
-have compatible interfaces -- since the initial fetch is asynchronous 
-anyway, the offload overhead becomes even less relevant then.
-
-I also think that zswap is going to be an important use case here, and 
-there has been quite a bit of discussion about large folios and batching 
-requests here. It would be cool if QAT or nx-gzip could be plugged into 
-zswap.
-
-    Simon
+Regards,
+Qingfang
