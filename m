@@ -1,101 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB2914A8E
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Dec 2025 09:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910E13314D2;
+	Thu,  4 Dec 2025 09:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764839158; cv=none; b=ihM/P4EghUS/kawTYtGRCcqz3uRcPkdUUs4d6IlC3ZyCbSlbmwdn7kuvc/zZPinHwbZBPkgj651ycntiNkn262BAd9ddosQS8VReVULmahb/wxn0GnuvgXxSHk+83d6rCUbAeZocZ6BiW/tIVb14HWbmfaQHNkMoem6scZ5UAR4=
+	t=1764842378; cv=none; b=LolhN8DxJ1MFWA9xp4x5w6q8Gsori86XKuf8OEpycDctkYjdksh01nXsV4oMIEoxjkH5Nc/4/6ho/Buig30aj+YZIcdD2TFd7KpQl9uLKrtH7gNWoa8dkxuzk+PVKMLN0KltSt144LY+EcTlZ4PxmaDEpcbqxvMUPgiz70ZJUfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764839158; c=relaxed/simple;
-	bh=GCL5jXS0EWcBqxkM9ix5SqD/peOH1ocZzOuyjFc7+/8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LTwQdPOH3NESTt07O9BdDtZHYc/xyGrzo4GEoY694RVvc6KU4CMTShinQQRPOWjrhKMrJs3Vt+9Wf6DgV120w73xXC7FCLT/Kvy05s6QD/BtL8A0vIUbDetO8OcGLMPBL1NuLNmwKoNyHIKb0Z5O3J0I2gnP3+m7zwhJ3WD2nas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bsLKGmut; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764842378; c=relaxed/simple;
+	bh=bKQ1aSb+kxRbljnBy/GEZgzfWtGnkxP+MuD+2XGeYhE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DHkixlP9y4yE1z+4voR+/UfqfFzgvSgxtn7Gq+zI5IyyIwfEabluSxu+cgEZdWw2HgUmLtK65b57LP9G7BZWsI3Uenvlks1I3T1GQvZZfr3LOgJUow1ZfW11h9aa2IM+hHBt3W36KEOvzlWZcSWe/2Q9hpM11Ew9fNv8pKmo8L4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BKLDIdoU; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bsLKGmut"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C357C19421
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Dec 2025 09:05:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764839158;
-	bh=GCL5jXS0EWcBqxkM9ix5SqD/peOH1ocZzOuyjFc7+/8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=bsLKGmut2lytHh1imaA0AWD9JMeYW1e0Ut+9Qkb0ckmMhe/+KdOmXxhlte2mqSZOE
-	 2vezaEOHp8q+OiImruutQFB4+bPLz/6kGNkGBSwdkIPbDI5i1w1gx1SZu6ozx39ru4
-	 PGFLkSHe/ROqnsPAcbWkAGcJAXhaKo4XfcmkQtr8DMugBrk6qRcStyiSe3xv/kXSBE
-	 LqPXpgTSETypsAaEvrrqJDLs/iWW7aCP/WEh4hU7g9Q/i3tWCweoN+2h9WEmj5o7sj
-	 OH4rnTpDJgNBFRIj78Z8HVxn3JxXl9AIv1I9oy/vR6XR0aqY5ZYvkKgMKtXsUR/+if
-	 MVigyJerVIv3Q==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5943d20f352so771544e87.0
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Dec 2025 01:05:58 -0800 (PST)
-X-Gm-Message-State: AOJu0YwCwXQurQTIWIMK5r8/vQTl5LdQ4YWWaygSlmyDkls863Gsi+cs
-	UIi4OCifNN7mZH4WiokVw3CDPRqr5FxtZf8brr/UG0g+RKY49pgleui87xnwBhUm0cCM7ShHN82
-	BKVQHgkosZdBeWZY8chCV7KGgYisV2I4=
-X-Google-Smtp-Source: AGHT+IEGK9HunF3J8NKfW8zNwREws0bdp4j+4ft/E55sPoVqyzuQASL+rCBKvzFwZAD5noNNAckZ+zFsDWX0d382A8w=
-X-Received: by 2002:a05:6512:4028:b0:594:314d:fa8d with SMTP id
- 2adb3069b0e04-597d3f90ff1mr2042098e87.26.1764839156715; Thu, 04 Dec 2025
- 01:05:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BKLDIdoU"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=uW1SLGbAr1/8Oln+k28NcAw2m07zsFZY10hIvhWXZOM=; b=BKLDIdoUpaCgKn1hygv8LyXWVL
+	KcTUdRqshjeypbVXWksfk6CluU3LC3aswAJClPm10K1HUCIjX95pl4PREaDUy+P96E2fc2RC3zAIn
+	l+tDDFPCskLQCQCITcsyAl5pnLf2hn0A2KVHFqAUrY4W/xZ+lB5umghTKBeP6Ho4NzYKvEXUnYyGm
+	63lG4yNO9aJvgySRstnx5t4F5TB7SsDHIaLW6TRTiEc1FeYRZzdK7iAxFIBQA9h/HlMhMJvClthTF
+	+vLg7TMombo+d/svNLf2YDdKhS4vL2/J9HMvPJlm1eG2oypN/zl2PW0HIocjxzGlGpZXWolOZ1kcT
+	qiBTLZgw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vR67Y-00000007oTF-1TKA;
+	Thu, 04 Dec 2025 09:59:32 +0000
+Date: Thu, 4 Dec 2025 01:59:32 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Jani Partanen <jiipee@sotapeli.fi>, clm@fb.com, dsterba@suse.com,
+	terrelln@fb.com, herbert@gondor.apana.org.au,
+	linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org,
+	qat-linux@intel.com, cyan@meta.com, brian.will@intel.com,
+	weigang.li@intel.com, senozhatsky@chromium.org
+Subject: Re: [RFC PATCH 00/16] btrfs: offload compression to hardware
+ accelerators
+Message-ID: <aTFbhOZKFy1SfoiH@infradead.org>
+References: <20251128191531.1703018-1-giovanni.cabiddu@intel.com>
+ <aS6a_ae64D4MvBpW@infradead.org>
+ <8d3e44b0-23d8-4493-8e7e-33bbe1d904ef@sotapeli.fi>
+ <aS_f9axsi0QmmhiL@infradead.org>
+ <aTANwYrQi5MwRyUQ@gcabiddu-mobl.ger.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251203190652.144076-1-ebiggers@kernel.org>
-In-Reply-To: <20251203190652.144076-1-ebiggers@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 4 Dec 2025 10:05:45 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXHkm=vgeymc6qSGtJRfY5AjhJhYJ7+ZD0OFdLw12vFE4w@mail.gmail.com>
-X-Gm-Features: AWmQ_blLg6vIT1RB55E509U8ahXy3IsX69zlpaht5KNbncen2voJD3i-7TizW2s
-Message-ID: <CAMj1kXHkm=vgeymc6qSGtJRfY5AjhJhYJ7+ZD0OFdLw12vFE4w@mail.gmail.com>
-Subject: Re: [PATCH] lib/crypto: blake2b: Roll up BLAKE2b round loop on 32-bit
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Thorsten Blum <thorsten.blum@linux.dev>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, David Laight <david.laight@runbox.com>, 
-	David Sterba <dsterba@suse.com>, llvm@lists.linux.dev, linux-btrfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aTANwYrQi5MwRyUQ@gcabiddu-mobl.ger.corp.intel.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, 3 Dec 2025 at 20:09, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> BLAKE2b has a state of 16 64-bit words.  Add the message data in and
-> there are 32 64-bit words.  With the current code where all the rounds
-> are unrolled to enable constant-folding of the blake2b_sigma values,
-> this results in a very large code size on 32-bit kernels, including a
-> recurring issue where gcc uses a large amount of stack.
->
-> There's just not much benefit to this unrolling when the code is already
-> so large.  Let's roll up the rounds when !CONFIG_64BIT.  Then, remove
-> the now-unnecessary override of the stack frame size warning.
->
-> Code size improvements for blake2b_compress_generic():
->
->                   Size before (bytes)    Size after (bytes)
->                   -------------------    ------------------
->     i386, gcc           27584                 3632
->     i386, clang         18208                 3248
->     arm32, gcc          19912                 2860
->     arm32, clang        21336                 3344
->
-> Running the BLAKE2b benchmark on a !CONFIG_64BIT kernel on an x86_64
-> processor shows a 16384B throughput change of 351 => 340 MB/s (gcc) or
-> 442 MB/s => 375 MB/s (clang).  So clearly not much of a slowdown either.
-> But also that microbenchmark also effectively disregards cache usage,
-> which is important in practice and is far better in the smaller code.
->
-> Note: If we rolled up the loop on x86_64 too, the change would be
-> 7024 bytes => 1584 bytes and 1960 MB/s => 1396 MB/s (gcc), or
-> 6848 bytes => 1696 bytes and 1920 MB/s => 1263 MB/s (clang).
-> Maybe still worth it, though not quite as clearly beneficial.
->
-> Fixes: 91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->  lib/crypto/Makefile  |  1 -
->  lib/crypto/blake2b.c | 25 +++++++++++++------------
->  2 files changed, 13 insertions(+), 13 deletions(-)
->
+On Wed, Dec 03, 2025 at 10:15:29AM +0000, Giovanni Cabiddu wrote:
+> The compression ratio with QAT-ZLIB-L9 is close to SW-ZSTD-L3 (lower is better).
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+Oh, right, this makes the numbers looks much better.
+
+> > All the while you significantly complicate the code.
+> The changes in BTRFS are about 800 LOC and the core logic is straightforward:
+> convert folios to scatterlists and invoke the acomp APIs for offloading
+> compression/decompression.
+
+That is quite a bit of code.  Even more so given that we're really
+trying to kill the spread of scatterlists.
+
+I think a better argument could be made it we had a generic compression
+API that doesn't require structures like the scatterlist and handles
+software compression without significant slowdowns.  I.e. something
+replacing the btrfs internal method table for the different algorithms.
+
+
