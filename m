@@ -1,178 +1,177 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3112EA178;
-	Thu,  4 Dec 2025 11:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EABFE19E839
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Dec 2025 12:46:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764849317; cv=none; b=aOkmTw7deX9v3USvaw34zX04EmHZ75xC4dkoDGqBTxbahuSPrvLeZI4qDZWe9pVbDdvf2d/OsgGv+FmEvEqUO7AuRtALr7LXOF7AKmRLzdVx5d0ADMXlUB908Vmpv3fZr/PwJ/d8Q0jnvnCHQOOS3jQXqhdwZf+ZP23QHDHghiI=
+	t=1764852380; cv=none; b=RUabf+ppcOsB2YM5u2MYs0H54hHGOIiHVTIj4wNl0KNXH/lokQkJWvjpKgd9Oa9fXtE0PcbeV6QAZGSXfTiuumj/L9AmkELM87E5HRUkzLIcklUIYZ9TWUd5khSJIp+KwMI59gspAZx+tKxfVjMPcWy8mKs5WBVvaC4PAvjmPGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764849317; c=relaxed/simple;
-	bh=knj7HqTWx+35wRL4iceOrKx/Kxi98HH6ILBHP5DVjeA=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=F1y2uaw7jp+ocFtuDpj2Fu6qYVE+AA7eCIHfu8y8DFesw28scQBf56EgIfdAUSygSxuUY+l+p3l5fI7nm6NvlEWuZfS10ZClGaMrbz86Dp2ArU1/Ri+MgnzoJ0wszxhOBCDov5EtJ2cPjb23TP1B/zL065HrIBHo4M3NgfU6qxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8DxM9CWdjFpsQsrAA--.27780S3;
-	Thu, 04 Dec 2025 19:55:02 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJCxH8KPdjFpym1FAQ--.64190S3;
-	Thu, 04 Dec 2025 19:54:57 +0800 (CST)
-Subject: Re: [PATCH v2 9/9] crypto: virtio: Add ecb aes algo support
-To: "Michael S. Tsirkin" <mst@redhat.com>
+	s=arc-20240116; t=1764852380; c=relaxed/simple;
+	bh=k2d6AKIbxjDNvI+iSHhx9EKEQwXZyEmjVW0faFK8DDo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q05sjqh+nWpd7H+b0Oa37cMq4DKgH8V4c2XpLVF1aSSp7kFFghQJEANMeBSo1vgBlzSiJBJbIfNvnsE3Y9PNMkFFCbA9kotOAHOdpC7GPk3wakUFKnpJNKerUYgbDr2N2Z0V4nRrwmiTfnWpQGp0/xAfn0Q20RLKrboC7gHOxgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FNSQV8/X; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=LbLMUcER; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FNSQV8/X";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="LbLMUcER"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764852377;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CeTXlItwEjkfILL3F/GDxGRgx6cCYk34DZi75wL0heE=;
+	b=FNSQV8/X1OGjMC52XOhLrTjNDJY1E2ZNMcQY8gNtjY70lEY9IBPDhVJJC5FeZNMaRbAGFu
+	lc7gobhdHi5StKhIkPj4FCpsXtilXWphLNUeXgPxs9bKvHk+GBy0h+vkWCxTe8FiR1Aai2
+	5o93i2JWz0D8wchT3cNAO7gGW/wbZ+Q=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-576-ZGvWL3YiPWO3WY5sBx91Dg-1; Thu, 04 Dec 2025 07:46:16 -0500
+X-MC-Unique: ZGvWL3YiPWO3WY5sBx91Dg-1
+X-Mimecast-MFC-AGG-ID: ZGvWL3YiPWO3WY5sBx91Dg_1764852376
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4776079ada3so7437805e9.1
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Dec 2025 04:46:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764852375; x=1765457175; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CeTXlItwEjkfILL3F/GDxGRgx6cCYk34DZi75wL0heE=;
+        b=LbLMUcERsZLPqCq98VaOBYwQSAJVGkptJpsfDPzsQm+mzPxRA66LRDbXMl8CsMu0ur
+         Qz4yW5daZ4pbtr+gVs9W1Lo0FOdkHa95mYo0CoPcXBhJpjqeH8FYFVsUVbpSWfLFG43j
+         +wW/DTWhkqb0v8Bz+n7fejuMYxakV72LquJHc12Lb+AXZt8d6eoPMDSG+4j0n8RLQYAg
+         udS9knLfSo70Lv2f4gbRvsmBhMl3rAjk5uYkfGKBO0XdZW6LeAc1foqZCESqCSfBfUgc
+         Xhgftz/EyWIs2hRABVFruDprPwMQ4t/wq78IyT94eoo3YQYNmXk5tjp5V0w3jPXmeI1V
+         ZUQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764852375; x=1765457175;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CeTXlItwEjkfILL3F/GDxGRgx6cCYk34DZi75wL0heE=;
+        b=tvIgn8cEBmmisFxSJHCJsikE32cm+RYLJoR75PSQ7YCGOk3AODxpQBW8nkyuohEg98
+         8OpIZOcg1x2jVdakRsJjKho5jkfRAGtzsF4Jjl1KJ8Ce/KiSYnXyGfymr8oTuyoVNKYZ
+         UvfDaeFUYcoQjWrK40IQh02dPW4aVFevAlNPbq+2XBvhfsC7YBpADE2d3jTfTzemR98r
+         1odJEgnQNTeshkk/sC/YRW3C5FjK1/R79oRJDxWlrRZOkqSoNX3OdIrTP1jxiTFJXpDu
+         qRMCqQ44ISL5mJVUhwnvW2BK6rYGl5iyyXQL6Q9AeryatI/co+l+yosmYDt7ebmCCThl
+         jKMg==
+X-Forwarded-Encrypted: i=1; AJvYcCWaAcaGhE3Ri/Mi3OKkqy5dES1hBv4p+cIEF5RdbPZyPjVJBi7H6CRfNHQGzGpOBB2rgTBQbZSYp9ywHYo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtH74RuDjA+TbUJ03iUEZp4hJlmiWlWJyfmFmA5K7z9y/4OC1g
+	c4JhanLasQKFAC0XzOk4XwTI+3+PhoY2HjUCCKZ5p3CMTSFlrZ8UqjJhIHkk3C+6EXe8Oe7nPmN
+	Ggy/QvnaLPhrGRn5VHHJUuIp3m/EoYg2A/Fj9X+XcEU9J6dfXChdOSYEVlaTVHNzPNQ==
+X-Gm-Gg: ASbGncsI1+tV8+VpI8wAO3CG4NvIDc89ABcmov5M+oC0OB6ZJawWNzvffBaQgFrh1NN
+	Np1hizi5YGnOrHLS71DA+omf25EKDh+YT+HXkdYxeUpnb71CjoiGbyyr+2Ek5s1kY8CunvNCz0h
+	/gejow3VKRVq6PuWIMgFHmGOE7hBgATFyiCubnTmSBX0Lh4Fkepupwb2N5a6aQq87P5DVQnej3t
+	kcF73serIpgV67Q5Q2hs8HO2xJboglwRDxXVBhykzyUa/HM3/anpec7AUoOG+urdKquoI/QOl9g
+	FIOZAc/zTYy+wEG/BrOxrA+j2hrC7JvTP4PTD97PnmVU6fFffmHa1FO6uKybFdDCC8Icqoiwsqh
+	l23oAOxTvfyWLPDD60jxid/Epwei5+Zp5GA==
+X-Received: by 2002:a05:600c:548a:b0:45d:d1a3:ba6a with SMTP id 5b1f17b1804b1-4792f39cb06mr27308965e9.33.1764852375518;
+        Thu, 04 Dec 2025 04:46:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEeqahDkXcX70vDduTq7HLlftnPzdScbCOHAGJylBXRuVjbzCCIVcrHwCKumENhm/jymdPb+A==
+X-Received: by 2002:a05:600c:548a:b0:45d:d1a3:ba6a with SMTP id 5b1f17b1804b1-4792f39cb06mr27308625e9.33.1764852375047;
+        Thu, 04 Dec 2025 04:46:15 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-38-228.inter.net.il. [80.230.38.228])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4792b1522e6sm37484525e9.13.2025.12.04.04.46.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Dec 2025 04:46:14 -0800 (PST)
+Date: Thu, 4 Dec 2025 07:46:11 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Bibo Mao <maobibo@loongson.cn>
 Cc: Gonglei <arei.gonglei@huawei.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=c3=a9rez?=
- <eperezma@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, virtualization@lists.linux.dev,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250701030842.1136519-1-maobibo@loongson.cn=20251204112227.2659404-1-maobibo@loongson.cn>
- <20251204112612.2659650-1-maobibo@loongson.cn>
- <20251204064220-mutt-send-email-mst@kernel.org>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <a3b6458d-9b36-ab11-1f95-6697d788a3de@loongson.cn>
-Date: Thu, 4 Dec 2025 19:52:27 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	virtualization@lists.linux.dev, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 6/9] crypto: virtio: Add req_data with structure
+ virtio_crypto_sym_request
+Message-ID: <20251204074310-mutt-send-email-mst@kernel.org>
+References: <20251204112227.2659404-1-maobibo@loongson.cn>
+ <20251204112227.2659404-7-maobibo@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20251204064220-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJCxH8KPdjFpym1FAQ--.64190S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxXF1rXrWDZF48GFyrGry8Zwc_yoWrAF15pr
-	n0krZ3JryUJF17K3s5XF4rWrWrC39xCw43Jr4rWr1xGFnavrs3Wr17AryYkrsxtF1UG3W8
-	Kr4kurnI9ws0kFXCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUU
-	UUU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251204112227.2659404-7-maobibo@loongson.cn>
 
-
-
-On 2025/12/4 下午7:43, Michael S. Tsirkin wrote:
-> On Thu, Dec 04, 2025 at 07:26:11PM +0800, Bibo Mao wrote:
->> ECB AES also is added here, its ivsize is zero and name is different
->> compared with CBC AES algo.
->>
->> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+On Thu, Dec 04, 2025 at 07:22:23PM +0800, Bibo Mao wrote:
+> With normal encrypt/decrypt workflow, req_data with struct type
+> virtio_crypto_op_data_req will be allocated. Here put req_data in
+> virtio_crypto_sym_request, it is pre-allocated when encrypt/decrypt
+> interface is called.
 > 
-> you did not post the cover letter, so the mail thread is malformed.
-Sorry for the trouble, my mail server has problem to send multiple mails 
-in batch mode with git send-email command.
-
-Please ignore it, will sent it tomorrow to avoid extra confusion, sorry 
-for the noise again.
-
-Regards
-Bibo Mao
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+>  drivers/crypto/virtio/virtio_crypto_core.c          |  3 ++-
+>  drivers/crypto/virtio/virtio_crypto_skcipher_algs.c | 12 +++---------
+>  2 files changed, 5 insertions(+), 10 deletions(-)
 > 
->> ---
->>   .../virtio/virtio_crypto_skcipher_algs.c      | 74 +++++++++++++------
->>   1 file changed, 50 insertions(+), 24 deletions(-)
->>
->> diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
->> index b4b79121c37c..9b4ba6a6b9cf 100644
->> --- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
->> +++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
->> @@ -559,31 +559,57 @@ static void virtio_crypto_skcipher_finalize_req(
->>   					   req, err);
->>   }
->>   
->> -static struct virtio_crypto_algo virtio_crypto_algs[] = { {
->> -	.algonum = VIRTIO_CRYPTO_CIPHER_AES_CBC,
->> -	.service = VIRTIO_CRYPTO_SERVICE_CIPHER,
->> -	.algo.base = {
->> -		.base.cra_name		= "cbc(aes)",
->> -		.base.cra_driver_name	= "virtio_crypto_aes_cbc",
->> -		.base.cra_priority	= 150,
->> -		.base.cra_flags		= CRYPTO_ALG_ASYNC |
->> -					  CRYPTO_ALG_ALLOCATES_MEMORY,
->> -		.base.cra_blocksize	= AES_BLOCK_SIZE,
->> -		.base.cra_ctxsize	= sizeof(struct virtio_crypto_skcipher_ctx),
->> -		.base.cra_module	= THIS_MODULE,
->> -		.init			= virtio_crypto_skcipher_init,
->> -		.exit			= virtio_crypto_skcipher_exit,
->> -		.setkey			= virtio_crypto_skcipher_setkey,
->> -		.decrypt		= virtio_crypto_skcipher_decrypt,
->> -		.encrypt		= virtio_crypto_skcipher_encrypt,
->> -		.min_keysize		= AES_MIN_KEY_SIZE,
->> -		.max_keysize		= AES_MAX_KEY_SIZE,
->> -		.ivsize			= AES_BLOCK_SIZE,
->> +static struct virtio_crypto_algo virtio_crypto_algs[] = {
->> +	{
->> +		.algonum = VIRTIO_CRYPTO_CIPHER_AES_CBC,
->> +		.service = VIRTIO_CRYPTO_SERVICE_CIPHER,
->> +		.algo.base = {
->> +			.base.cra_name		= "cbc(aes)",
->> +			.base.cra_driver_name	= "virtio_crypto_aes_cbc",
->> +			.base.cra_priority	= 150,
->> +			.base.cra_flags		= CRYPTO_ALG_ASYNC |
->> +				CRYPTO_ALG_ALLOCATES_MEMORY,
->> +			.base.cra_blocksize	= AES_BLOCK_SIZE,
->> +			.base.cra_ctxsize	= sizeof(struct virtio_crypto_skcipher_ctx),
->> +			.base.cra_module	= THIS_MODULE,
->> +			.init			= virtio_crypto_skcipher_init,
->> +			.exit			= virtio_crypto_skcipher_exit,
->> +			.setkey			= virtio_crypto_skcipher_setkey,
->> +			.decrypt		= virtio_crypto_skcipher_decrypt,
->> +			.encrypt		= virtio_crypto_skcipher_encrypt,
->> +			.min_keysize		= AES_MIN_KEY_SIZE,
->> +			.max_keysize		= AES_MAX_KEY_SIZE,
->> +			.ivsize			= AES_BLOCK_SIZE,
->> +		},
->> +		.algo.op = {
->> +			.do_one_request = virtio_crypto_skcipher_crypt_req,
->> +		},
->>   	},
->> -	.algo.op = {
->> -		.do_one_request = virtio_crypto_skcipher_crypt_req,
->> -	},
->> -} };
->> +	{
->> +		.algonum = VIRTIO_CRYPTO_CIPHER_AES_ECB,
->> +		.service = VIRTIO_CRYPTO_SERVICE_CIPHER,
->> +		.algo.base = {
->> +			.base.cra_name		= "ecb(aes)",
->> +			.base.cra_driver_name	= "virtio_crypto_aes_ecb",
->> +			.base.cra_priority	= 150,
->> +			.base.cra_flags		= CRYPTO_ALG_ASYNC |
->> +				CRYPTO_ALG_ALLOCATES_MEMORY,
->> +			.base.cra_blocksize	= AES_BLOCK_SIZE,
->> +			.base.cra_ctxsize	= sizeof(struct virtio_crypto_skcipher_ctx),
->> +			.base.cra_module	= THIS_MODULE,
->> +			.init			= virtio_crypto_skcipher_init,
->> +			.exit			= virtio_crypto_skcipher_exit,
->> +			.setkey			= virtio_crypto_skcipher_setkey,
->> +			.decrypt		= virtio_crypto_skcipher_decrypt,
->> +			.encrypt		= virtio_crypto_skcipher_encrypt,
->> +			.min_keysize		= AES_MIN_KEY_SIZE,
->> +			.max_keysize		= AES_MAX_KEY_SIZE,
->> +		},
->> +		.algo.op = {
->> +			.do_one_request = virtio_crypto_skcipher_crypt_req,
->> +		},
->> +	}
->> +};
->>   
->>   int virtio_crypto_skcipher_algs_register(struct virtio_crypto *vcrypto)
->>   {
->> -- 
->> 2.39.3
+> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
+> index ccc6b5c1b24b..e60ad1d94e7f 100644
+> --- a/drivers/crypto/virtio/virtio_crypto_core.c
+> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
+> @@ -17,7 +17,8 @@ void
+>  virtcrypto_clear_request(struct virtio_crypto_request *vc_req)
+>  {
+>  	if (vc_req) {
+> -		kfree_sensitive(vc_req->req_data);
+> +		if (vc_req->req_data)
+> +			kfree_sensitive(vc_req->req_data);
+
+kfree of NULL is a nop, why make this change?
+
+>  		kfree(vc_req->sgs);
+>  	}
+>  }
+> diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+> index 7b3f21a40d78..a7c7c726e6d9 100644
+> --- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+> +++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+> @@ -26,6 +26,7 @@ struct virtio_crypto_skcipher_ctx {
+>  
+>  struct virtio_crypto_sym_request {
+>  	struct virtio_crypto_request base;
+> +	struct virtio_crypto_op_data_req req_data;
+>  
+>  	/* Cipher or aead */
+>  	uint32_t type;
+> @@ -350,14 +351,8 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
+>  	if (!sgs)
+>  		return -ENOMEM;
+>  
+> -	req_data = kzalloc_node(sizeof(*req_data), GFP_KERNEL,
+> -				dev_to_node(&vcrypto->vdev->dev));
+> -	if (!req_data) {
+> -		kfree(sgs);
+> -		return -ENOMEM;
+> -	}
+> -
+> -	vc_req->req_data = req_data;
+> +	req_data = &vc_sym_req->req_data;
+> +	vc_req->req_data = NULL;
+>  	vc_sym_req->type = VIRTIO_CRYPTO_SYM_OP_CIPHER;
+>  	/* Head of operation */
+>  	if (vc_sym_req->encrypt) {
+> @@ -450,7 +445,6 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
+>  free_iv:
+>  	kfree_sensitive(iv);
+>  free:
+> -	kfree_sensitive(req_data);
+
+
+So the request is no longer erased with memset on error. Is that not
+a problem?
+
+>  	kfree(sgs);
+>  	return err;
+>  }
+> -- 
+> 2.39.3
 
