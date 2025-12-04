@@ -1,121 +1,113 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAEF2D8DA8
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Dec 2025 17:10:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7573590A8;
+	Thu,  4 Dec 2025 17:56:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764868244; cv=none; b=l+4YydWBSekc3rU5ydGgBrrRV9N5gZq1OZ0YNI9d/+F3UJG3iDitwbjRd5SixtLvODK+omfFjewv1909tZrRF3xAYSV/TMeCMvt+El0JEkey/RBDWV8+C9b8evpx38OGbWLmnCX2r0aRUXns3FAz8ft3I2ei0BIfBojh+mNypE0=
+	t=1764870996; cv=none; b=Cxc4Wz6nmpij1qyUqSCqThOo2pDTTJ4hMAKEXkB5qmBJ2O2qDue9JGelM2evT2+heLNoTMkr4zuYgAIhQwjibkX/AiWhxILarzXk3nZso2WBPerJiRIC204EXK9aMua5w+EE6Gf1AbmT+PUO3CnzTVKqvrqrXoItiI18uaAawng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764868244; c=relaxed/simple;
-	bh=Luu0dLPCGlCn7g8rOb8w3AI39PT79ZYzQ5Pim7OffGo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YdoCZoeXxJ1aREm/ZPw7RlwdVwRI8aBvj37nYlDZv/2t1sl+JfgMcRNRztbbfKn+L45nTNtxs/BmpDHVQtyKZiRIR0m13h98X310YZm8m3vqsPBzeIjwUe3fOFpu8twuYBMnKBdfnPGfELo+b1GgHzZDOO2RdZH0r9nd1eiO+h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEhsPLea; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764870996; c=relaxed/simple;
+	bh=Y67mCM2J3w0NkgoU35NJtGTTjLQ/aE6Qb68AttzNry8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XPBPidJSZR99zboPYz56lMAMuSxsZ3Whcm8/ED19FRBEAFbgXMWH87wwFVEJb8XeL1zDBQFsCoPRc+Ke+qmCHNmyZBVClja4uw0D58QmFQzfu+HQJi2/p5onkpJWh3KyTIRAV4vrBE8B5toh80tpIFElgt08nY0B06ExvvJtC5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=Z+TlQCDv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEhsPLea"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b739ef3f739so195895766b.1
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Dec 2025 09:10:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764868240; x=1765473040; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Luu0dLPCGlCn7g8rOb8w3AI39PT79ZYzQ5Pim7OffGo=;
-        b=dEhsPLeaxY3zdt6Dx1ZDPvbuUTkEE5jL+UH5JNb9cKejUUVAwwBVqcI2Ncv4n326NA
-         V83oAl83X0+mUMLTMZLeNXjhyzEmeE2JPLcFcKx9/V6XxG+ARfUdfA5IaT0+why4W3n7
-         WT/RHKbDTSBzmXj8gtTI1JiIQ722SNlfK6inzjgfvjH5DLRx7MoffJhldayD+nVKB0Zx
-         LB2SXVSzCr6BA5V6VtKb5r2KmSJ/YeaZ4ifvp08fBlE/Ee4f7I8i5Tw5ww6Xiu5TEWtN
-         LJqlnp5x9aswQJQP30+lFf5kbSnqgj5Wjn0vbAi6NijoB3snlunlSsK7wLkbEI7mPZVN
-         gZ2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764868240; x=1765473040;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Luu0dLPCGlCn7g8rOb8w3AI39PT79ZYzQ5Pim7OffGo=;
-        b=Vag3o0AGRNQaPOzwzeKXCuYojradF8yszoCrA5LZQttdb8U9PIdAFdcNkwkxS9BcoY
-         Dd5ugVcFEN7hAhuZgR26kSYLU24XE+mlCnfmCHCnkslrQqLkEoAfTp71OvixMIBtPrrC
-         eZ411w6ItW0tkJXUFRDNBaHqqS10lmFWsr5/bI1UKFRYHqUbXyQDJFbcyvOphe1JJW+n
-         UcSspPcXG9HZQ47U3g+v7O7n6cN9rbgGmgdRfYeK5Fb8Ss4ZxB5sBG659Z+fSX6bOEX4
-         Slgcbl44c7sXVgOUESMRZIoRALe/lQDTCF1/fklkwzNbg+hC7iYE/+uY1C7znUolvtHB
-         2hWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX1P7EYBrEDbk2vVlzLSVn1SWsY6QpkD3duwtiIz2LBe/CFeYfHl9djq3Cw2loarEqIz28yVF5NI9CM67k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPbieBqhYC9Vx4pNlBs8z5xrWzIpc/NDDhAfP/H1GEJq27Ntez
-	IaIWPdcb7VZNMWcH2S3HzzZ+802Z8tYRLjKwwO7H6mJ+0HY4Yubp++HvMz27bfxBon0cad7/dEM
-	K4Fvb4InjtS6nhxgOgIRC6Mkxplm3wfU=
-X-Gm-Gg: ASbGncsCdtS/WOz8Na87bnmknQ00YXX+3Uia+UrFQy77Xt/lVrfaU9BmUWHe64oa0+6
-	1iv9aoBiTk15fxm19bkNS76Oso5mQPsLFnkO2ZOf0tTgPZxXotzTLuNgzHiGBRCPut5F/3uII8W
-	FmmkLeALzDtLKhQJjL1/aO4ANtLpirTGhOoyuiIfGdGogz2ZeiwJ/ALJOrgh8f06EiGCeGAvpME
-	UAQdgk+EOEQ4ZEy0HQdw/O2dbO3VGXDrYsk06epGIjOL32EFc2KptpeGmd9Y5Z3IUaUTymVi625
-	kbs6WksRGLJe5lG40uwhAPlS5VVjoP4DktAbRC8DJXG1GFzhQMzLvTVAd/PmwjBe6vaVQXU=
-X-Google-Smtp-Source: AGHT+IEYKHVXa85Li2pElk6yFv5g6STpHzlef/8H62UofABcN9oQ3Wj+xk/v4+/gcktKR5nlyxnkhnAfTauuSY9u0Fc=
-X-Received: by 2002:a17:907:7f12:b0:b73:4aa5:35e5 with SMTP id
- a640c23a62f3a-b79ec3f09c1mr410215466b.7.1764868239255; Thu, 04 Dec 2025
- 09:10:39 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Z+TlQCDv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18E3FC4CEFB;
+	Thu,  4 Dec 2025 17:56:34 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Z+TlQCDv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1764870993;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GFbzxkSrJd1dNRLfLuJo7Vt6+b5SM48dzQKQwuXhvkY=;
+	b=Z+TlQCDvBsRYa2dHOClBOVZTNdHKuZ23UdH7fR4LQ4+qA03gMr5gNzw/LzYPcRy82fBLQP
+	SWosfDeydtmAvKQaGjaA21ypEvuleZ246JIobBorqdrSb2ypT1Dfaei3parH5Xg6ZPc8dU
+	fnOJpyK8qyN4YQbFicNuP/2f4QlEN58=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c077b8d9 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Thu, 4 Dec 2025 17:56:33 +0000 (UTC)
+Date: Thu, 4 Dec 2025 12:56:32 -0500
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	David Laight <david.laight@runbox.com>,
+	David Sterba <dsterba@suse.com>, llvm@lists.linux.dev,
+	linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH] lib/crypto: blake2b: Roll up BLAKE2b round loop on 32-bit
+Message-ID: <aTHLUIjqCHlRs8rr@zx2c4.com>
+References: <20251203190652.144076-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251204141250.21114-1-ethan.w.s.graham@gmail.com>
- <20251204141250.21114-10-ethan.w.s.graham@gmail.com> <CAHp75VfSkDvWVqi+W2iLJZhfe9+ZqSvTEN7Lh-JQbyKjPO6p_A@mail.gmail.com>
- <CANpmjNMQDs8egBfCMH_Nx7gdfxP+N40Lf6eD=-25afeTcbRS+Q@mail.gmail.com>
- <CAHp75VfsD5Yj1_JcXS5gxnN3XpLjuA7nKTZMmMHB_q-qD2E8SA@mail.gmail.com> <CANpmjNOKBw9qN4zwLzCsOkZUBegzU0eRTBmbt1z3WFvXOP+6ew@mail.gmail.com>
-In-Reply-To: <CANpmjNOKBw9qN4zwLzCsOkZUBegzU0eRTBmbt1z3WFvXOP+6ew@mail.gmail.com>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Thu, 4 Dec 2025 19:10:03 +0200
-X-Gm-Features: AWmQ_bmM6LnwCv_8DkzClBvkpIFbzUw_4DvWZVBU7sLi5C0dPTkjJPGuyU2cHmI
-Message-ID: <CAHp75Vd9VOH2zHFmoU5rrQCRqJSBG2UDCfKgvOR6hwavDVqHeQ@mail.gmail.com>
-Subject: Re: [PATCH 09/10] drivers/auxdisplay: add a KFuzzTest for parse_xy()
-To: Marco Elver <elver@google.com>
-Cc: Ethan Graham <ethan.w.s.graham@gmail.com>, glider@google.com, andreyknvl@gmail.com, 
-	andy@kernel.org, brauner@kernel.org, brendan.higgins@linux.dev, 
-	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com, 
-	dvyukov@google.com, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
-	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
-	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, lukas@wunner.de, shuah@kernel.org, sj@kernel.org, 
-	tarasmadan@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251203190652.144076-1-ebiggers@kernel.org>
 
-On Thu, Dec 4, 2025 at 5:36=E2=80=AFPM Marco Elver <elver@google.com> wrote=
-:
-> On Thu, 4 Dec 2025 at 16:34, Andy Shevchenko <andy.shevchenko@gmail.com> =
-wrote:
-> > On Thu, Dec 4, 2025 at 5:33=E2=80=AFPM Marco Elver <elver@google.com> w=
-rote:
-> > > On Thu, 4 Dec 2025 at 16:26, Andy Shevchenko <andy.shevchenko@gmail.c=
-om> wrote:
+On Wed, Dec 03, 2025 at 11:06:52AM -0800, Eric Biggers wrote:
+>  	G(r, 4, v[0], v[ 5], v[10], v[15]); \
+>  	G(r, 5, v[1], v[ 6], v[11], v[12]); \
+>  	G(r, 6, v[2], v[ 7], v[ 8], v[13]); \
+>  	G(r, 7, v[3], v[ 4], v[ 9], v[14]); \
+>  } while (0)
+> -		ROUND(0);
+> -		ROUND(1);
+> -		ROUND(2);
+> -		ROUND(3);
+> -		ROUND(4);
+> -		ROUND(5);
+> -		ROUND(6);
+> -		ROUND(7);
+> -		ROUND(8);
+> -		ROUND(9);
+> -		ROUND(10);
+> -		ROUND(11);
+> +
+> +#ifdef CONFIG_64BIT
+> +		/*
+> +		 * Unroll the rounds loop to enable constant-folding of the
+> +		 * blake2b_sigma values.  Seems worthwhile on 64-bit kernels.
+> +		 * Not worthwhile on 32-bit kernels because the code size is
+> +		 * already so large there due to BLAKE2b using 64-bit words.
+> +		 */
+> +		unrolled_full
+> +#endif
+> +		for (int r = 0; r < 12; r++)
+> +			ROUND(r);
+>  
+>  #undef G
+>  #undef ROUND
 
-[..]
+Since you're now using `unrolled_full`, ROUND doesn't need to be a macro
+anymore. You can just do:
 
-> > > > > Signed-off-by: Ethan Graham <ethangraham@google.com>
-> > > > > Signed-off-by: Ethan Graham <ethan.w.s.graham@gmail.com>
-> > > >
-> > > > I believe one of two SoBs is enough.
-> > >
-> > > Per my interpretation of
-> > > https://docs.kernel.org/process/submitting-patches.html#developer-s-c=
-ertificate-of-origin-1-1
-> > > it's required where the affiliation/identity of the author has
-> > > changed; it's as if another developer picked up the series and
-> > > continues improving it.
-> >
-> > Since the original address does not exist, the Originally-by: or free
-> > text in the commit message / cover letter should be enough.
->
-> The original copyright still applies, and the SOB captures that.
+  unrolled_full
+  for (int r = 0; r < 12; r++) {
+    G(r, 0, v[0], v[ 4], v[ 8], v[12]);
+    G(r, 1, v[1], v[ 5], v[ 9], v[13]);
+    G(r, 2, v[2], v[ 6], v[10], v[14]);
+    G(r, 3, v[3], v[ 7], v[11], v[15]);
+    G(r, 4, v[0], v[ 5], v[10], v[15]);
+    G(r, 5, v[1], v[ 6], v[11], v[12]);
+    G(r, 6, v[2], v[ 7], v[ 8], v[13]);
+    G(r, 7, v[3], v[ 4], v[ 9], v[14]);
+  }
 
-The problem is that you put a non-existing person there. Make sure
-emails are not bouncing and I will not object (however, I just saw
-Greg's reply).
+Likewise, you can simplify the blake2s implementation in the same way
+(but don't make the unrolled_full conditional there, obviously).
+`unrolled_full` seems like a nice way of doing this compared to macros.
 
---=20
-With Best Regards,
-Andy Shevchenko
+Jason
