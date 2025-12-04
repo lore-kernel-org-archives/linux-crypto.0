@@ -1,75 +1,75 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBFB1283C87
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Dec 2025 15:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4B926B777
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Dec 2025 15:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764861458; cv=none; b=r+sBuiLvJhILrmPxY9YDDEY1QQMexL5EhK+6AxrTZ0QI7+KKkaTfPyjAj5L6kXWMtQHwQjQZf8mNEE2/VMFd2qft5mig3y9ANu8It7Ol8lHpI7ebHYatn74yapy/QnvNCVEmfKRBMEX2ZyWk2tgQRThCUdM6p4z7wnd1zHZBkww=
+	t=1764862005; cv=none; b=B3r5HNx50qAp4CguHAw38ALbe2aF++uJqtzDq+F/WqNSh8po6YdpbTzKYPEQf4QG3vlQgaaqgsvuQ/K4FfbtDhqSyz/fRRy+Mo4NUFWw9U6wFuA+j5rIu2EtilYw5/8jCkp/ZCkHmhhC4XP1uAGQc6vMTLdIo4TG8+mWnFz1tdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764861458; c=relaxed/simple;
-	bh=PhfUA5Q1PPXBmZWMZUohVdeqsdpscP4peWDyn7gSQaM=;
+	s=arc-20240116; t=1764862005; c=relaxed/simple;
+	bh=EHJ/Uvi1Nnp5iTXNu29uC7C+96Kv3WpdEYpqBQ6/1ZM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pG7zgSbde/joIWg4IxYuSd8NcLmCVsKIdD9m8pYixj3zWsAvKjz2s0ryQiJZ+snZ3XrPxqucDiN8duJNpBNedgzw2eQzz5+S9QD7iBuREBZnO1Z6AibL9OIRl20vHLNvlmYwqh69iMmB5Fif/GztLCONfrP7q5JtSqq+h1KGcts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=We+U7MFL; arc=none smtp.client-ip=209.85.128.42
+	 To:Cc:Content-Type; b=CoaD5vU362ud1gpHNcjFXYdhB9ad/PTgGYoJY/x7XpLmv1qr6vDrh5/OjHLgbsg9nCiqn5ZxigCk4Pd+GTrUpjgAAm1MLVt46nIORizM3hanx1VJPUQQ/I7fwpiv6xTnFh5LxAJjEphuTjSfAtoH5HKTT6+vZ6ihDyBcun+S9LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gFcixpaG; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="We+U7MFL"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47789cd2083so6928165e9.2
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Dec 2025 07:17:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gFcixpaG"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b7633027cb2so175586166b.1
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Dec 2025 07:26:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764861455; x=1765466255; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764862001; x=1765466801; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WSesA1513PF1RTOpQ3ExDpK6F+FkeLsbkbgvrO0OXrA=;
-        b=We+U7MFLHX+nD7wnFAsFui0yjjDFIpWta4n+X65HStxzF9rfSH74FWL/WpasOl4vFZ
-         pf+mF4rv9MQ72+Ia26W/quQ2rdcjwxayLq2PL1cM5eAgQK4tZYW/PZD6UVvtQkPu7vdc
-         JG4tki+hJgT1kd/ntxIamVEgxtU35DbKp9CZE0LUl2UGNU8TdE6SBZFHK8wORpuCusHs
-         fPbGO+Jjhggfjkc6pkqiFeRmTdOpTNfa5vaD8Y5A/LD4hmV605kxLZ6VGAcKy7iuXE4G
-         CEPEWgwH+2LMtmpNG3r6SAwZdNA1JeNc908AfL5wakFdHeF/E8wVdWC100NaasogMNZZ
-         g4BA==
+        bh=hRDq8VRZX7ObisK4LUGIJP6XjIFCzmZAVr9+RtuDKSA=;
+        b=gFcixpaGtpew+3ZmTL7QV/kw3nLtMLDpQrwweu2iElPG+eEylYEwwydGUFHkY0rsJp
+         VG7bnY5Zw6KVCuXCvOV1LrhS5VZQnmTI9FCXRnA5jd71NUEk26xFTwuZT9XPi3VGaWuf
+         zOUeiPJo/9T58xYpjnbMQ2lW5FoPOJcmp5q1ufIjeeC3x3tG8iTJpdwrPnNlvsNuG+C+
+         9QYgjrbJ4strXWa7B82dj9KnEcMYBkF730jc4v/uKTHyE7FZy35TqEMLCc8EbnYL46s0
+         Yy26f5wE4LW0CBVrI6rvAqKix/mUHFCJHLt4RoQxRrY2/OdnCLzXIFfhM/sCXk8Wi/um
+         5lfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764861455; x=1765466255;
+        d=1e100.net; s=20230601; t=1764862001; x=1765466801;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=WSesA1513PF1RTOpQ3ExDpK6F+FkeLsbkbgvrO0OXrA=;
-        b=D3WuT/K/PUOOS9MemOR0CZMrJY+kMcMLgjGZqwBA8atO1nTpG6MeMpT7nGo8SlEKbf
-         TDjU03+h+yfY+kIVsJW+5QDEaXI8BXM25M0k0PpRxmMdsPeFp7Ldml+lUh25AQkX3oPq
-         +bPaGX1xDD9VdEFx+orLWsuck0mWhywyAb0gh6xwQeUQzj0eGdSr8LbOG7zH5Q6ADvQh
-         T7tIlEagzExytiwq4grDbgknW3Ob65DrCjY89s0lSwQpGGQ3pVsoEH6fQbIk8g4RFnTm
-         sHTAplAOswlz6Kzez8kG4pzAHmH5N3RWzH101b+W2lEGzW4mEoRuOn2BhvqO3pJqKBvM
-         n7Yw==
-X-Forwarded-Encrypted: i=1; AJvYcCVBEZyDU1hdYuq643UtuKivszQyMWib0FpyOQ+sYuX/pZSIqSC9vqVrzjYK+CVjqfEi7Lhv/DS76RIIVI8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzP82ZGr0WVgqUbGzpMEuzJBjbSVWnESQcbPIfM2MeKhb1SyI1d
-	f6ZTQRcb00E/GSRwZJ9R4cAHPjpzOmIM6lssrReipYiJND6ucMy+wr0+CfpdCaAwjGEXcMDTiFr
-	/Wyt753wNwPfcJv/hrvKayQsqE0mxYo4=
-X-Gm-Gg: ASbGncsUVarytlFTBqtqIIYAAd9LGvL14P/A60wH/gYtsgIN/gaddbMv87K0ntZ+kpp
-	mTm9NWX3EHapBfyAJoFP8SvOH+4hv0YIrIo07jNVuMCwz2Wn4gFR5ZhA28avr+6T9VX6NyUjJkd
-	u1t8pkhsgs1pVrYwJfiDjIcYWzx36J1BwFNAcsv7Jx3LoPSi/CK/QD/KVv32XkY8XkmRSbZ5BA7
-	KuYKoCAgyeYdfLH9yZFjXtxYmf7wIUGC6lgXNdAy+nqw8a/VNHyND8E9f085V7CzfLytBJHZuHe
-	n9644cE5bencyG8MLko9aviPckZP
-X-Google-Smtp-Source: AGHT+IGPH0EJYdbaBhvurzXK12QLylFM9zsem4O87iZvWi2X0pfwfrJuILFzMv5S3tf5HYvfRFYstYyfwHvXAaGIFpU=
-X-Received: by 2002:a05:600c:3b05:b0:477:582e:7a81 with SMTP id
- 5b1f17b1804b1-4792aed9ab8mr67560995e9.4.1764861454794; Thu, 04 Dec 2025
- 07:17:34 -0800 (PST)
+        bh=hRDq8VRZX7ObisK4LUGIJP6XjIFCzmZAVr9+RtuDKSA=;
+        b=NIn3m1Sta2mGQXRMlwoggcl3xzCVzQYbGRvisAhjqhld8T92aNrS5/p1UR8euTO5l6
+         UxdJ1wxqNQVZcwm5VaXForIu6vCY+Bnp37K3eX1EUPM+6U8nLpl184O+PbgPDXaoYAhG
+         qxLaCJ5gfeBQu/IRz4USKT0xPAg5JaC6XMtUHX54m0sChzXNT9r2s6dA+bB+SD6GXe1t
+         8lFgiD8zPCJYoo1DoHjdwan6ggWAU443QEVBDb9VMh5h1CJYwcgazYqtjiFODYiAZbaE
+         6nwUSnvSkCVFT2kpZZtO/HG6PqpBccd+pHwkEx9esAHJCjJRskCw3cYZ2HYei3vm8H5P
+         N2yg==
+X-Forwarded-Encrypted: i=1; AJvYcCXaf3iL9TxW20FMucNToPL0JWNgJAQayvXbqd/zvAtTOXSQfk/r6UhEsCk7G+pkzFV6tsvM/Cdh9b59Vbk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4uo08rhL4gQ8fVJqeZcYZj1VltVJPMUiXvU93Y0sn4wnX+aAA
+	Qbhb6/p3gI3j0ghUHGDu3EuDntGDRfaK962e2KgNwknQSXizUVg/Xm+d4+nxh4oW4SkPoH/0FiN
+	J9wOdcm8+M7kxeiGpGzOlbCQxP87zePY=
+X-Gm-Gg: ASbGncs7JanNQRdBao9Aa6BTPU0djaj6JSPmUtyPudfIIliuFbs296x3QL5ND7DAY6w
+	umkzttJsHU8AKYviKJyXe7XgrIqVhUy4FuCEbHuLGMZ6vWa3wyx94zIYecsbx49twnJWt1PW0fL
+	I6k2FIomKSEbL1WTx+aqotf5NfIHo4AAm7Fj3t30GJE/l7yZFq2rwXMpipmMbWoIkofi4MmXhFW
+	SGZYBdB6Je/qQ953bnotcAMDdpBk7R7WQS8i/5IPV8Att9pmeh4qbDCbCwKINaeMKuyH4NT2hcL
+	kdFM/eoSAlWs+8Z3HD6L1tvIBKxOvkxj+xWtjpsYRn/k2mXZ+18Rd1p2AfiRSthIGQTQuMg=
+X-Google-Smtp-Source: AGHT+IHf4+6vdMmQuH6atM/AUDdteHFf5jPA5YYue6DOqMU4c8+wmNtqOkyMXD6oyoIIyUvm8ALQ6uS3zQy9c2rbSf4=
+X-Received: by 2002:a17:906:6a09:b0:b73:210a:44e with SMTP id
+ a640c23a62f3a-b79dc51af33mr666433666b.30.1764862001190; Thu, 04 Dec 2025
+ 07:26:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251204141250.21114-1-ethan.w.s.graham@gmail.com> <20251204141250.21114-2-ethan.w.s.graham@gmail.com>
-In-Reply-To: <20251204141250.21114-2-ethan.w.s.graham@gmail.com>
-From: Andrey Konovalov <andreyknvl@gmail.com>
-Date: Thu, 4 Dec 2025 16:17:23 +0100
-X-Gm-Features: AWmQ_blzpwZ5TwYvwfzPgYjtrBP8LQtIvLje7Y_oBdFacKxiRRQT788M4KRtDnc
-Message-ID: <CA+fCnZcvuXR3R-mG1EfztGx5Qvs1U92kuyYEypRJ4tnF=oG04A@mail.gmail.com>
-Subject: Re: [PATCH 01/10] mm/kasan: implement kasan_poison_range
+References: <20251204141250.21114-1-ethan.w.s.graham@gmail.com> <20251204141250.21114-10-ethan.w.s.graham@gmail.com>
+In-Reply-To: <20251204141250.21114-10-ethan.w.s.graham@gmail.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Thu, 4 Dec 2025 17:26:05 +0200
+X-Gm-Features: AWmQ_bmIoeQpAWoaWpHaqI6dnG4PTWdKQq3rnGgG66adF0zPHqO5BwO2Z5x6PEQ
+Message-ID: <CAHp75VfSkDvWVqi+W2iLJZhfe9+ZqSvTEN7Lh-JQbyKjPO6p_A@mail.gmail.com>
+Subject: Re: [PATCH 09/10] drivers/auxdisplay: add a KFuzzTest for parse_xy()
 To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: glider@google.com, andy@kernel.org, andy.shevchenko@gmail.com, 
+Cc: glider@google.com, andreyknvl@gmail.com, andy@kernel.org, 
 	brauner@kernel.org, brendan.higgins@linux.dev, davem@davemloft.net, 
 	davidgow@google.com, dhowells@redhat.com, dvyukov@google.com, 
 	elver@google.com, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
@@ -81,139 +81,108 @@ Cc: glider@google.com, andy@kernel.org, andy.shevchenko@gmail.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 4, 2025 at 3:13=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gmail=
+On Thu, Dec 4, 2025 at 4:13=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gmail=
 .com> wrote:
 >
 > From: Ethan Graham <ethangraham@google.com>
 >
-> Introduce a new helper function, kasan_poison_range(), to encapsulate
-> the logic for poisoning an arbitrary memory range of a given size, and
-> expose it publically in <include/linux/kasan.h>.
+> Add a KFuzzTest fuzzer for the parse_xy() function, located in a new
+> file under /drivers/auxdisplay/tests.
+
+drivers/...
+
+(no leading /)
+
+> To validate the correctness and effectiveness of this KFuzzTest target,
+> a bug was injected into parse_xy() like so:
 >
-> This is a preparatory change for the upcoming KFuzzTest patches, which
-> requires the ability to poison the inter-region padding in its input
-> buffers.
+> drivers/auxdisplay/charlcd.c:179
+> - s =3D p;
+> + s =3D p + 1;
 >
-> No functional change to any other subsystem is intended by this commit.
->
+> Although a simple off-by-one bug, it requires a specific input sequence
+> in order to trigger it, thus demonstrating the power of pairing
+> KFuzzTest with a coverage-guided fuzzer like syzkaller.
+
+fuzzers
+
 > Signed-off-by: Ethan Graham <ethangraham@google.com>
 > Signed-off-by: Ethan Graham <ethan.w.s.graham@gmail.com>
-> Reviewed-by: Alexander Potapenko <glider@google.com>
->
-> ---
-> PR v3:
-> - Move kasan_poison_range into mm/kasan/common.c so that it is built
->   with HW_TAGS mode enabled.
-> - Add a runtime check for kasan_enabled() in kasan_poison_range.
-> - Add two WARN_ON()s in kasan_poison_range when the input is invalid.
-> PR v1:
-> - Enforce KASAN_GRANULE_SIZE alignment for the end of the range in
->   kasan_poison_range(), and return -EINVAL when this isn't respected.
-> ---
-> ---
->  include/linux/kasan.h | 11 +++++++++++
->  mm/kasan/common.c     | 37 +++++++++++++++++++++++++++++++++++++
->  2 files changed, 48 insertions(+)
->
-> diff --git a/include/linux/kasan.h b/include/linux/kasan.h
-> index 890011071f2b..cd6cdf732378 100644
-> --- a/include/linux/kasan.h
-> +++ b/include/linux/kasan.h
-> @@ -102,6 +102,16 @@ static inline bool kasan_has_integrated_init(void)
->  }
->
->  #ifdef CONFIG_KASAN
-> +
-> +/**
-> + * kasan_poison_range - poison the memory range [@addr, @addr + @size)
+
+I believe one of two SoBs is enough.
+
+> Acked-by: Alexander Potapenko <glider@google.com>
+
+...
+
+> --- a/drivers/auxdisplay/Makefile
+> +++ b/drivers/auxdisplay/Makefile
+> @@ -6,6 +6,9 @@
+>  obj-$(CONFIG_ARM_CHARLCD)      +=3D arm-charlcd.o
+>  obj-$(CONFIG_CFAG12864B)       +=3D cfag12864b.o cfag12864bfb.o
+>  obj-$(CONFIG_CHARLCD)          +=3D charlcd.o
+> +ifeq ($(CONFIG_KFUZZTEST),y)
+> +CFLAGS_charlcd.o +=3D -include $(src)/tests/charlcd_kfuzz.c
+> +endif
+>  obj-$(CONFIG_HD44780_COMMON)   +=3D hd44780_common.o
+>  obj-$(CONFIG_HD44780)          +=3D hd44780.o
+>  obj-$(CONFIG_HT16K33)          +=3D ht16k33.o
+
+Yes, this level of intrusion is fine to me.
+
+...
+
+> +++ b/drivers/auxdisplay/tests/charlcd_kfuzz.c
+
+So, this will require it to be expanded each time we want to add
+coverage. Can this be actually generated based on the C
+(preprocessed?) level of prototypes listed? Ideally I would like to
+see only some small meta-data and then the fuzzer should create the
+object based on the profile of the module.
+
+Input like:
+
+bool parse_xy(const char *s $nonnull$, unsigned long *x $nonnull$,
+unsigned long *y $nonnull$)
+Or even with the expected ranges, and then you can generate a code
+that tests the behaviour inside given ranges and outside, including
+invalid input, etc.
+
+But okay, the below seems not too big enough.
+
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * charlcd KFuzzTest target
 > + *
-> + * The exact behavior is subject to alignment with KASAN_GRANULE_SIZE, d=
-efined
-> + * in <mm/kasan/kasan.h>: if @start is unaligned, the initial partial gr=
-anule
-> + * at the beginning of the range is only poisoned if CONFIG_KASAN_GENERI=
-C=3Dy.
-
-You can also mention that @addr + @size must be aligned.
-
+> + * Copyright 2025 Google LLC
 > + */
-> +int kasan_poison_range(const void *addr, size_t size);
+> +#include <linux/kfuzztest.h>
 > +
->  void __kasan_unpoison_range(const void *addr, size_t size);
->  static __always_inline void kasan_unpoison_range(const void *addr, size_=
-t size)
->  {
-> @@ -402,6 +412,7 @@ static __always_inline bool kasan_check_byte(const vo=
-id *addr)
->
->  #else /* CONFIG_KASAN */
->
-> +static inline int kasan_poison_range(const void *start, size_t size) { r=
-eturn 0; }
->  static inline void kasan_unpoison_range(const void *address, size_t size=
-) {}
->  static inline void kasan_poison_pages(struct page *page, unsigned int or=
-der,
->                                       bool init) {}
-> diff --git a/mm/kasan/common.c b/mm/kasan/common.c
-> index 9142964ab9c9..c83579ef37c6 100644
-> --- a/mm/kasan/common.c
-> +++ b/mm/kasan/common.c
-> @@ -570,3 +570,40 @@ bool __kasan_check_byte(const void *address, unsigne=
-d long ip)
->         }
->         return true;
->  }
-> +
-> +int kasan_poison_range(const void *addr, size_t size)
+> +struct parse_xy_arg {
+> +       const char *s;
+> +};
+
+> +static bool parse_xy(const char *s, unsigned long *x, unsigned long *y);
+
+Is it still needed?
+
+I mean, can we make sure that include in this case works as tail one
+and not head, because otherwise we would need to add the respective
+includes, i.e. for bool type here, which is missing. Also I *hope&
+that kfuzztest.h is NOT Yet Another Include EVERYTHING type of
+headers. Otherwise it breaks the whole idea behind modularity of the
+headers.
+
+> +FUZZ_TEST(test_parse_xy, struct parse_xy_arg)
 > +{
-> +       uintptr_t start_addr =3D (uintptr_t)addr;
-> +       uintptr_t head_granule_start;
-> +       uintptr_t poison_body_start;
-> +       uintptr_t poison_body_end;
-> +       size_t head_prefix_size;
-> +       uintptr_t end_addr;
+> +       unsigned long x, y;
 > +
-> +       if (!kasan_enabled())
-> +               return 0;
-
-Please move this check to include/linux/kasan.h; see how
-kasan_unpoison_range() is implemented. Otherwise eventually these
-checks start creeping into lower level functions and the logic of
-checking when and whether KASAN is enabled becomes a mess.
-
-> +
-> +       end_addr =3D start_addr + size;
-> +       if (WARN_ON(end_addr % KASAN_GRANULE_SIZE))
-> +               return -EINVAL;
-> +
-> +       if (WARN_ON(start_addr >=3D end_addr))
-> +               return -EINVAL;
-> +
-> +       head_granule_start =3D ALIGN_DOWN(start_addr, KASAN_GRANULE_SIZE)=
-;
-> +       head_prefix_size =3D start_addr - head_granule_start;
-> +
-> +       if (IS_ENABLED(CONFIG_KASAN_GENERIC) && head_prefix_size > 0)
-> +               kasan_poison_last_granule((void *)head_granule_start,
-> +                                         head_prefix_size);
-
-As I mentioned before, please rename kasan_poison_last_granule() to
-kasan_poison_granule() (or maybe even kasan_poison_partial_granule?).
-Here the granule being poisoned is not the last one.
-
-
-> +
-> +       poison_body_start =3D ALIGN(start_addr, KASAN_GRANULE_SIZE);
-> +       poison_body_end =3D end_addr;
-> +
-> +       if (poison_body_start < poison_body_end)
-> +               kasan_poison((void *)poison_body_start,
-> +                            poison_body_end - poison_body_start,
-> +                            KASAN_SLAB_REDZONE, false);
-> +       return 0;
+> +       KFUZZTEST_EXPECT_NOT_NULL(parse_xy_arg, s);
+> +       KFUZZTEST_ANNOTATE_STRING(parse_xy_arg, s);
+> +       parse_xy(arg->s, &x, &y);
 > +}
-> +EXPORT_SYMBOL(kasan_poison_range);
-> --
-> 2.51.0
->
+
+
+--=20
+With Best Regards,
+Andy Shevchenko
