@@ -1,97 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD8F2F25E1
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Dec 2025 16:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAEF2D8DA8
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Dec 2025 17:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764865708; cv=none; b=IouJlQj9eBt8RN8QxIXmA64FJ+zju8FYP1PmYq2Z8OimB1NLg+u+Bgu7BZqRJTognnXYZCNwj/ybcrP9A5rGx/nHhKLZdk5876J2fH6kOWOe1SL83bJ0Om9VLZjQCoLyxqdJfbGdbGtrU+s/majjX0dn+DtLTsQeVOt8wrYzi8A=
+	t=1764868244; cv=none; b=l+4YydWBSekc3rU5ydGgBrrRV9N5gZq1OZ0YNI9d/+F3UJG3iDitwbjRd5SixtLvODK+omfFjewv1909tZrRF3xAYSV/TMeCMvt+El0JEkey/RBDWV8+C9b8evpx38OGbWLmnCX2r0aRUXns3FAz8ft3I2ei0BIfBojh+mNypE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764865708; c=relaxed/simple;
-	bh=j5XgDut8Jh1yOBUGeAP7WAC4k+EHrnpB2QuBKNomiHY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=btl+7vvJr9FWYih3P0UVmGH7QTcOlLW3f0b1uITGo1y5v+cRGHa0axX6LNYC0v7CZk7ALPZX4fs+bWHExCLgpdPoZShmzDTrModDvWWvoXd2l0acv3itYycSrAptIUDD8J0TrNfdkIGS8Rue4L1F/pflaOaIXSrpahbplssV0KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z0hGZn2k; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764868244; c=relaxed/simple;
+	bh=Luu0dLPCGlCn7g8rOb8w3AI39PT79ZYzQ5Pim7OffGo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YdoCZoeXxJ1aREm/ZPw7RlwdVwRI8aBvj37nYlDZv/2t1sl+JfgMcRNRztbbfKn+L45nTNtxs/BmpDHVQtyKZiRIR0m13h98X310YZm8m3vqsPBzeIjwUe3fOFpu8twuYBMnKBdfnPGfELo+b1GgHzZDOO2RdZH0r9nd1eiO+h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEhsPLea; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z0hGZn2k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79365C4CEFB;
-	Thu,  4 Dec 2025 16:28:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764865706;
-	bh=j5XgDut8Jh1yOBUGeAP7WAC4k+EHrnpB2QuBKNomiHY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Z0hGZn2kNBdkc7f594EH++IfFxSu7b57KV/sMuVakNlZ5u/hrtZq6S48xIcPMPrwi
-	 dvq+18F3QxhmHb22a4W3ZBBFjkrKqJX2D1ecpS30VXm+sESjvbG2Tvgz2QK9Hv+7vq
-	 3iCXYnQZ5iRl96u67unbDTOQF5yDxwH4TQlsllrdHOIKZX3nUS1HKTKEDOmEf9F7P1
-	 zHuBW624NkeCNaOstdSircbCW/fHWiDQ3o1bgv5rWMACYc+sZKubRawM+WclK+ZuGd
-	 sDi5mU8FPRb8qa+VFBCE2h7QJYR321AuWvdgOIRr2CrxSICAYj288jYl7w0XD4rMXV
-	 FAtfzwxN1mSGA==
-From: Ard Biesheuvel <ardb@kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Kees Cook <keescook@chromium.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Justin Stitt <justinstitt@google.com>
-Subject: [PATCH] arm64/simd: Avoid pointless clearing of FP/SIMD buffer
-Date: Thu,  4 Dec 2025 17:28:15 +0100
-Message-ID: <20251204162815.522879-2-ardb@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEhsPLea"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b739ef3f739so195895766b.1
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Dec 2025 09:10:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764868240; x=1765473040; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Luu0dLPCGlCn7g8rOb8w3AI39PT79ZYzQ5Pim7OffGo=;
+        b=dEhsPLeaxY3zdt6Dx1ZDPvbuUTkEE5jL+UH5JNb9cKejUUVAwwBVqcI2Ncv4n326NA
+         V83oAl83X0+mUMLTMZLeNXjhyzEmeE2JPLcFcKx9/V6XxG+ARfUdfA5IaT0+why4W3n7
+         WT/RHKbDTSBzmXj8gtTI1JiIQ722SNlfK6inzjgfvjH5DLRx7MoffJhldayD+nVKB0Zx
+         LB2SXVSzCr6BA5V6VtKb5r2KmSJ/YeaZ4ifvp08fBlE/Ee4f7I8i5Tw5ww6Xiu5TEWtN
+         LJqlnp5x9aswQJQP30+lFf5kbSnqgj5Wjn0vbAi6NijoB3snlunlSsK7wLkbEI7mPZVN
+         gZ2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764868240; x=1765473040;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Luu0dLPCGlCn7g8rOb8w3AI39PT79ZYzQ5Pim7OffGo=;
+        b=Vag3o0AGRNQaPOzwzeKXCuYojradF8yszoCrA5LZQttdb8U9PIdAFdcNkwkxS9BcoY
+         Dd5ugVcFEN7hAhuZgR26kSYLU24XE+mlCnfmCHCnkslrQqLkEoAfTp71OvixMIBtPrrC
+         eZ411w6ItW0tkJXUFRDNBaHqqS10lmFWsr5/bI1UKFRYHqUbXyQDJFbcyvOphe1JJW+n
+         UcSspPcXG9HZQ47U3g+v7O7n6cN9rbgGmgdRfYeK5Fb8Ss4ZxB5sBG659Z+fSX6bOEX4
+         Slgcbl44c7sXVgOUESMRZIoRALe/lQDTCF1/fklkwzNbg+hC7iYE/+uY1C7znUolvtHB
+         2hWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX1P7EYBrEDbk2vVlzLSVn1SWsY6QpkD3duwtiIz2LBe/CFeYfHl9djq3Cw2loarEqIz28yVF5NI9CM67k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPbieBqhYC9Vx4pNlBs8z5xrWzIpc/NDDhAfP/H1GEJq27Ntez
+	IaIWPdcb7VZNMWcH2S3HzzZ+802Z8tYRLjKwwO7H6mJ+0HY4Yubp++HvMz27bfxBon0cad7/dEM
+	K4Fvb4InjtS6nhxgOgIRC6Mkxplm3wfU=
+X-Gm-Gg: ASbGncsCdtS/WOz8Na87bnmknQ00YXX+3Uia+UrFQy77Xt/lVrfaU9BmUWHe64oa0+6
+	1iv9aoBiTk15fxm19bkNS76Oso5mQPsLFnkO2ZOf0tTgPZxXotzTLuNgzHiGBRCPut5F/3uII8W
+	FmmkLeALzDtLKhQJjL1/aO4ANtLpirTGhOoyuiIfGdGogz2ZeiwJ/ALJOrgh8f06EiGCeGAvpME
+	UAQdgk+EOEQ4ZEy0HQdw/O2dbO3VGXDrYsk06epGIjOL32EFc2KptpeGmd9Y5Z3IUaUTymVi625
+	kbs6WksRGLJe5lG40uwhAPlS5VVjoP4DktAbRC8DJXG1GFzhQMzLvTVAd/PmwjBe6vaVQXU=
+X-Google-Smtp-Source: AGHT+IEYKHVXa85Li2pElk6yFv5g6STpHzlef/8H62UofABcN9oQ3Wj+xk/v4+/gcktKR5nlyxnkhnAfTauuSY9u0Fc=
+X-Received: by 2002:a17:907:7f12:b0:b73:4aa5:35e5 with SMTP id
+ a640c23a62f3a-b79ec3f09c1mr410215466b.7.1764868239255; Thu, 04 Dec 2025
+ 09:10:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1891; i=ardb@kernel.org; h=from:subject; bh=j5XgDut8Jh1yOBUGeAP7WAC4k+EHrnpB2QuBKNomiHY=; b=owGbwMvMwCVmkMcZplerG8N4Wi2JIdNw2/zjsX9eZSTu27h3RtW9Nv2qtMtRK9qv5sQdtJrSX c1gdqa0o5SFQYyLQVZMkUVg9t93O09PlKp1niULM4eVCWQIAxenAEwkJIrhr/iv2P2PsoTz55dn LL7NUuJ39PYs2wrB63+mmHKbzJ7CsJzhD4+Sv8PXalnHKQc+z33iuZ6Z2/rVCfcFoWxy2ZH39hc vYQYA
-X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-Content-Transfer-Encoding: 8bit
+References: <20251204141250.21114-1-ethan.w.s.graham@gmail.com>
+ <20251204141250.21114-10-ethan.w.s.graham@gmail.com> <CAHp75VfSkDvWVqi+W2iLJZhfe9+ZqSvTEN7Lh-JQbyKjPO6p_A@mail.gmail.com>
+ <CANpmjNMQDs8egBfCMH_Nx7gdfxP+N40Lf6eD=-25afeTcbRS+Q@mail.gmail.com>
+ <CAHp75VfsD5Yj1_JcXS5gxnN3XpLjuA7nKTZMmMHB_q-qD2E8SA@mail.gmail.com> <CANpmjNOKBw9qN4zwLzCsOkZUBegzU0eRTBmbt1z3WFvXOP+6ew@mail.gmail.com>
+In-Reply-To: <CANpmjNOKBw9qN4zwLzCsOkZUBegzU0eRTBmbt1z3WFvXOP+6ew@mail.gmail.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Thu, 4 Dec 2025 19:10:03 +0200
+X-Gm-Features: AWmQ_bmM6LnwCv_8DkzClBvkpIFbzUw_4DvWZVBU7sLi5C0dPTkjJPGuyU2cHmI
+Message-ID: <CAHp75Vd9VOH2zHFmoU5rrQCRqJSBG2UDCfKgvOR6hwavDVqHeQ@mail.gmail.com>
+Subject: Re: [PATCH 09/10] drivers/auxdisplay: add a KFuzzTest for parse_xy()
+To: Marco Elver <elver@google.com>
+Cc: Ethan Graham <ethan.w.s.graham@gmail.com>, glider@google.com, andreyknvl@gmail.com, 
+	andy@kernel.org, brauner@kernel.org, brendan.higgins@linux.dev, 
+	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com, 
+	dvyukov@google.com, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
+	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
+	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, lukas@wunner.de, shuah@kernel.org, sj@kernel.org, 
+	tarasmadan@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The buffer provided to kernel_neon_begin() is only used if the task is
-scheduled out while the FP/SIMD is in use by the kernel, or when such a
-section is interrupted by a softirq that also uses the FP/SIMD.
+On Thu, Dec 4, 2025 at 5:36=E2=80=AFPM Marco Elver <elver@google.com> wrote=
+:
+> On Thu, 4 Dec 2025 at 16:34, Andy Shevchenko <andy.shevchenko@gmail.com> =
+wrote:
+> > On Thu, Dec 4, 2025 at 5:33=E2=80=AFPM Marco Elver <elver@google.com> w=
+rote:
+> > > On Thu, 4 Dec 2025 at 16:26, Andy Shevchenko <andy.shevchenko@gmail.c=
+om> wrote:
 
-IOW, this happens rarely, and even if it happened often, there is still
-no reason for this buffer to be cleared beforehand, which happens by
-default when using a compiler that supports -ftrivial-auto-var-init.
+[..]
 
-So mark the buffer as __uninitialized. Given that this is a variable
-attribute not a type attribute, this requires that the expression is
-tweaked a bit.
+> > > > > Signed-off-by: Ethan Graham <ethangraham@google.com>
+> > > > > Signed-off-by: Ethan Graham <ethan.w.s.graham@gmail.com>
+> > > >
+> > > > I believe one of two SoBs is enough.
+> > >
+> > > Per my interpretation of
+> > > https://docs.kernel.org/process/submitting-patches.html#developer-s-c=
+ertificate-of-origin-1-1
+> > > it's required where the affiliation/identity of the author has
+> > > changed; it's as if another developer picked up the series and
+> > > continues improving it.
+> >
+> > Since the original address does not exist, the Originally-by: or free
+> > text in the commit message / cover letter should be enough.
+>
+> The original copyright still applies, and the SOB captures that.
 
-Cc: Will Deacon <will@kernel.org>,
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Justin Stitt <justinstitt@google.com>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- arch/arm64/include/asm/simd.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+The problem is that you put a non-existing person there. Make sure
+emails are not bouncing and I will not object (however, I just saw
+Greg's reply).
 
-The issue here is that returning a pointer to an automatic variable as
-it goes out of scope is slightly dodgy, especially in the context of
-__attribute__((cleanup())), on which the scoped guard API relies
-heavily. However, in this case it should be safe, given that this
-expression is the input to the guarded variable type's constructor.
-
-It is definitely not pretty, though, so hopefully here is a better way
-to attach this.
-
-diff --git a/arch/arm64/include/asm/simd.h b/arch/arm64/include/asm/simd.h
-index 0941f6f58a14..825b7fe94003 100644
---- a/arch/arm64/include/asm/simd.h
-+++ b/arch/arm64/include/asm/simd.h
-@@ -48,6 +48,7 @@ DEFINE_LOCK_GUARD_1(ksimd,
- 		    kernel_neon_begin(_T->lock),
- 		    kernel_neon_end(_T->lock))
- 
--#define scoped_ksimd()	scoped_guard(ksimd, &(struct user_fpsimd_state){})
-+#define scoped_ksimd()	\
-+	scoped_guard(ksimd, ({ struct user_fpsimd_state __uninitialized s; &s; }))
- 
- #endif
--- 
-2.47.3
-
+--=20
+With Best Regards,
+Andy Shevchenko
