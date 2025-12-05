@@ -1,218 +1,411 @@
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013064.outbound.protection.outlook.com [40.93.196.64])
+Received: from devnull.danielhodges.dev (vps-2f6e086e.vps.ovh.us [135.148.138.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3377934B194;
-	Fri,  5 Dec 2025 17:15:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764954919; cv=fail; b=bJL4UbC00kZ6/M3gAV8ytGYqfVFpsDYqY76Sa8dNKXuVGBDiHjXD4OT3LILxQrjkYEnF2zXPtOq2sZI60u3FKnOlRCVjsSwNJFRZgyg6uFxqE0uEKrfBoGRhyEWU9qvIopKeXMCVE80n8nJGU1U0DRXXkI+y9XbX1bDiXFjNWiY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764954919; c=relaxed/simple;
-	bh=vCSI74Le58DnHo2apCNViGMgVC0x/Ymz5Ly4hlat8t0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eNfAT3MM0mq6lzCL+Bt7oKwzX7gKiJob+zruoI7VtgBJBsjhi1rsRMQB6LXf8GeBqsa2EQwwV9E7LjKpqaFJVNx3y66fweigxo+ng8IuJL0SwEYd3k+BcZ5g+p9j/NR2UsInBazsE6G2MLand8a5BWsbs0N2Qr9dpG+zF+RGDoU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=eqJIRSV1; arc=fail smtp.client-ip=40.93.196.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E909B244670;
+	Fri,  5 Dec 2025 17:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.148.138.8
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764956394; cv=none; b=M8n8odrNwPJJiu/5b5R3QKGmYVGBoVc+XTtF6ZabqPMD9qnOLbpXxTC4+ue5iJR/x7r8ITe/krnaDJ+8sAD1+GYtoJLuUkZVk9q9xP70QLgjQuMm0W4Hy7XUa8/3BABqHe0E2AOHziMS+TIvQRfwJtzptgi5BKBhjR7uslnXH+g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764956394; c=relaxed/simple;
+	bh=rr2dodnmQBE//RZi6sTrV0pfjiVKjY3nNryi+9fRQJg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=CzjJPEBaKeFfvdeYeFHtDAQpJhMsH4aF8NmQK4ZAGHZRXE5uWOW6IxSPWOniakkXs1xDz9vbyCfPBbFW72yFzMxYcrVPVreD1a7tgGPi8OJKyUuga1hPWiNYSBPY1Z2cr6eX/e68E2GIJCl4kJzFYH+ssCzxCy1CTwAxFDn9C2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=ANG7bZMn; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=P6I8YcNo; arc=none smtp.client-ip=135.148.138.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danielhodges.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="eqJIRSV1"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=c1Y16cc962QddVC9VEQvvPtsC3qWIf+6NmshUOovkOlTels8V4dLJuKHjbGUMzrF0JdPGZ7r++XPt4a/zR66tDsR9WwGq6yoKauoIminWjZlgxdLDJGLnE4XlOL4pIiBSQAS8ONwV5bMEWHxcGyLC+PBxQGLhX1HScbCuCpVKjjRjPZnuxuVI/qRU0wcXnsqwR4b6G62SFRGUQEiPE6JLJzzW0MZe0yRu/cMzrt1t7ARPlCBhlNlZia1D0PFzSvqAR4RBYAmhj+zaNGUM65DcerIlWH0QQrHbmTJoVcAMPmjnW2oSnidGboArt3kKgs1NIkndfTn5hATtVuUS+Oypw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vCSI74Le58DnHo2apCNViGMgVC0x/Ymz5Ly4hlat8t0=;
- b=T1bCeBZL3TLvARA28cuM5N8S015xfCuFHt8m9d7JQ8zbT+FDQNRbkWFixqA6w+Q6UVWhXWg2JhnaKvEYAaZJ2Gi+3VWUeSHx4fAdhK/upPu9IpF8sBKcZ3fTqCG1odG8pbWUVqifulUlKuTxzKMUe7UlJYTKvTnQuT1LEGMmMlFAo+8g8QV+8ItXZatEmf6WSjwVPKyEsD2RNrICHbthGB3KQKutaru63pe4xj4ld/kff9CNMLD+c9zbV7PBF9JAmb5qcqzZeGwkrtEX95HX1vguPjNS7v5dyqknfY70/7rsH5ZywytBxrSd+dUqg31o/DRcIF+6vnlqf4pnqUFEYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vCSI74Le58DnHo2apCNViGMgVC0x/Ymz5Ly4hlat8t0=;
- b=eqJIRSV166HghXzpQe4H0DHORTBXdkslwZAuohMijT7hDbOrdEssOTBi0IopITKdKExesXoZ4IL0du1m1cHQ+xYcZpoNGAT8CCLkUMdwMML5CWss4FNXY3EEMYmStquFGkKYUoV3P7vrnnFxStBeq1hp2IGXno+V+Xll02VkmxpXAXQ2YNNvQBSEfY3R14ii0fxqbWhfmSWT5wOtSsUA9cVZBreD18I893GbpVdlOVdR36IxtEgnE1epQPuFymhfnpp8clMFEzOUiFBddh01c8lnjL5t08SzYUIV84ZrwAVqke8JhKetv6YhXRT1CTY3pWOEgDADbrYQXyC/hCrfgg==
-Received: from MN2PR12MB3022.namprd12.prod.outlook.com (2603:10b6:208:ce::32)
- by IA1PR12MB7711.namprd12.prod.outlook.com (2603:10b6:208:421::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.12; Fri, 5 Dec
- 2025 17:15:14 +0000
-Received: from MN2PR12MB3022.namprd12.prod.outlook.com
- ([fe80::7074:6611:e437:bab9]) by MN2PR12MB3022.namprd12.prod.outlook.com
- ([fe80::7074:6611:e437:bab9%6]) with mapi id 15.20.9388.003; Fri, 5 Dec 2025
- 17:15:14 +0000
-From: Ron Li <xiangrongl@nvidia.com>
-To: Hans de Goede <hansg@kernel.org>, "ilpo.jarvinen@linux.intel.com"
-	<ilpo.jarvinen@linux.intel.com>, Vadim Pasternak <vadimp@nvidia.com>,
-	"alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>, Khalil Blaiech
-	<kblaiech@nvidia.com>, David Thompson <davthompson@nvidia.com>
-CC: "platform-driver-x86@vger.kernel.org"
-	<platform-driver-x86@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>
-Subject: RE: [PATCH v3 2/3] platform/mellanox/mlxbf_pka: Add userspace PKA
- ring device interface
-Thread-Topic: [PATCH v3 2/3] platform/mellanox/mlxbf_pka: Add userspace PKA
- ring device interface
-Thread-Index: AQHcKZ8NLdiowY6PpkewaQI9nVsWLrT6hYQAgBk7wBA=
-Date: Fri, 5 Dec 2025 17:15:13 +0000
-Message-ID:
- <MN2PR12MB30228850A78FCEE1FB3BF394A9A7A@MN2PR12MB3022.namprd12.prod.outlook.com>
-References: <20250919195132.1088515-1-xiangrongl@nvidia.com>
- <20250919195132.1088515-3-xiangrongl@nvidia.com>
- <fab52b36-496b-41c3-9adc-cb4e26e91e53@kernel.org>
-In-Reply-To: <fab52b36-496b-41c3-9adc-cb4e26e91e53@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN2PR12MB3022:EE_|IA1PR12MB7711:EE_
-x-ms-office365-filtering-correlation-id: e45234d3-fda8-4814-05c5-08de3421dac4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700021;
-x-microsoft-antispam-message-info:
- =?utf-8?B?WTFQaElUMEY5L1V1RVJHRW9KWDVCVk5ScENleWVMK2psdGg0emp4RzZGem8w?=
- =?utf-8?B?TGhueUFxdFlQS1QrUkpMd1JESVd3c08rd09ZU1pqUDlwamxtalZabVlJQXpV?=
- =?utf-8?B?N0IzRUMvS1p4T0V6amtSb3d5NVhWMUI4cS9ZN3lSQzVBZEhDTHRDZmhWQ0N5?=
- =?utf-8?B?RDRpSVNMNnVLMG93cDdqMVpEOW80WWQzQkpJN1lBeDROSFp5WjVXVkJ1cXls?=
- =?utf-8?B?Vzh3NDQ0M2ZJbC9aQmJUSU5LZU10akdPdFh5NVY3ekVSSEp4cUdZdFNmT3pN?=
- =?utf-8?B?VUFiRE9Nck5IUEVRTngxS29xRUZJcmFIcHROTUc2UUZveGIreU54VExFMzVo?=
- =?utf-8?B?NHV0OVNxbVkrRFl3ZHBNWkwxYTNVdHg2bDJWcGUyYml6Z3lwRjdRRk9JMzk1?=
- =?utf-8?B?ZG9sdkJJdXp2b3JUYlFYRUtPSG14UW8zOTVEN2Z4bFVCbUdzWnJQWXloNXcx?=
- =?utf-8?B?djliYXEwR1hxZ1FYY3NEMmZiL3EvekpyVjIrd0Nxb0ZQa2N4OTZzUGVQR1VQ?=
- =?utf-8?B?aGRsMDRSbCs3Y3J4K09RNHFPckRPMy9ab0dlQ0JveXBOd1NrZlhsTytLd3NB?=
- =?utf-8?B?VFdxMFhKK1R1NzRYZzh2a09MTlZzRUI0Q2QvMCsxem1VQWRIL2wvWU9zZkNj?=
- =?utf-8?B?dUxUL3BDUytCZ041Ym52cVE0MVUrQXJVWWdvTmZneXJnSmEyOGFDNTJjeXlv?=
- =?utf-8?B?QlZrWG1Fa3lwRVZsS3pVQzQzWWs5U1ZCcEVTSEVuc1VQU0pRTHdieGRmckV0?=
- =?utf-8?B?L3FtOURPT2N2MGd0aEUrVDF1clRuSmFoV3lzN1o1YVZGTXNXTnRSQlR6UFJW?=
- =?utf-8?B?dzlIMlhFbGhhTWdhZmNNeHZXYzZieFU5bFdBTllmL3BCSFcwVjlyRlU3N2Fi?=
- =?utf-8?B?SG01aVRLYlJOdjh6cXo3L3pzVnB3bHVtUEhvS1pHV2ZwbkhKci9DYjcwZ3hO?=
- =?utf-8?B?QTRzc3RuaVptd1RnMGtWM1IyQU5Bb0NoRGprZ1VRZG8xN053Vk5KdHg0Rkh2?=
- =?utf-8?B?dnlzWjBkTUNRbFZZZlBsZ1VHV1lzdGY5bmZHRytpK2hId2M3bUVlRjhQMFcr?=
- =?utf-8?B?MlVkcHp1RmdRR29QeE9xeGRDSDNFU0I2OXFXbXhDWlNCOXhZNWEyMk1OUW5a?=
- =?utf-8?B?c1pkZ2pDY2VqWVR5cU82Q2NxQmVrODJ6MGdFUjJRVlZZQWxmb2RzeituSktp?=
- =?utf-8?B?clM5YzZhZ3JmNG5hQUN1QmRWTklOVFcvZVV5a0I5RGxCZnBXTEJiTkNFTytO?=
- =?utf-8?B?b0lrWjU5N3A1eDB4OXZMOHp1Y0YvM2dCdW8vbWpUcC9CRGJFdWdvcnpYeDZQ?=
- =?utf-8?B?V3gyQXB3cnB2dTBzVmtmaDM1YVlwYW9kVnlUM3dyVFY4RUxPNXVMcW5LcGl4?=
- =?utf-8?B?b0lQWisrRlpLRldybC91WnorTytxSXpmNW5Jd1laU0dxQ1ZYRjA5YitnTVAz?=
- =?utf-8?B?ZWJMYm9rMjh6eUV0QzhFb3NjUVVaZnh6aVpkTDNqQUNFZkNwKzl1aUFrRStZ?=
- =?utf-8?B?VW81NXpyWEtoMjN0dCtad2VDd0hrNnhvOWl5YWZZUWMxT3hLR0dWSXJTTzNW?=
- =?utf-8?B?Y2c0Zm93TXlrQ2liTE1uT201NXlFYXlZM0tleUU2Nit4eFIvTVBJZHR1dDJX?=
- =?utf-8?B?NXhuQWJJSm1mNElxcGJvanRTaGdRUloxek01M3d2cEtxa1AyVFM1U3NNa3d5?=
- =?utf-8?B?bjFnVm8ydkZDZlgzWmttWm84ZDNWVzVwSEN4MmZhM25ZSG44bzVlSzNDS3dV?=
- =?utf-8?B?MzdtUGxhY3NnMmFKWUNRVlErZndmczV4R3ZzeW1YWW11T21yQVRhUmlRUTA0?=
- =?utf-8?B?aUZCQlpmZE9pRnlvdld4VWQwSTB3eEhiSHpDZDRadVp4TjZaMHlPbEVrcGFl?=
- =?utf-8?B?b2VCMVZxTTRhbXcwOFR5bWdlNnFHVWxXeDFVRE1oSk5aOHJZV3dVS0EzMld3?=
- =?utf-8?B?bkZ1WUFOa1VWVjlRdkFBVmFGRk9ybTZocWhuTStsZFkxejJad3gzLzEramVr?=
- =?utf-8?B?VURLWFIveHlNK25RRUFEaGczWE91VWRQSjRqbTlMRnVQZ2NhT1loQmErWitQ?=
- =?utf-8?Q?4tDKRO?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3022.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?Q3FvRzMzS3hpRDhoaWxNQXhpSUlOY3FQUGdHSDNaVVBIaisrckNXcjlsd2xp?=
- =?utf-8?B?M0xkRTliWTZLWGF0QnlPd2V6RDEyV2RHajA1MmI5bG5QME4wZmdsK0x2SWdk?=
- =?utf-8?B?cm1MemJYSGhsQ0QyWHNBallUSkc2eXZkdDM5ZlFRZkFQWmxqd2xGYkJHUWlZ?=
- =?utf-8?B?Vkt0YWF3eG9HUU9BUlgyZXZadE1vemVGZitWTTAwN0o5Y1ByWDJLVXpsbnZL?=
- =?utf-8?B?QzZZTEY0b3NsNEprZEtYbmZZN2tTOXRnZmJpQTM0RFZML1F6S3NUbDE5Wkd6?=
- =?utf-8?B?WnBLbDVqdWxiSnpqdXg4MHdXZ24wY2xhRHg0VUhBWXlsc1lOQWJDODU1ZFBZ?=
- =?utf-8?B?SWhlS2ZQVUdOZUdTbGdvZWMxa1ZkK0M4WkhodWtBdVZ5RFVYZTh3RHlKWkZq?=
- =?utf-8?B?cGxLTTV0V2swckk4TXNCbHlXeTZ3WFkwYU5GTkVTaEpVMm4rT1RHZmt4dFc4?=
- =?utf-8?B?aDdrZENpR2hnRzdiRlRrUUFXZGlJaU1aODBUT284Nkt0eWg0UWR0dDBNQjZ6?=
- =?utf-8?B?UlhoSWIyUlVBOFhBZGFJZ1FmTzZ3SFFxTE56YjBhbWM2akliaWhKczZxZi91?=
- =?utf-8?B?VkZHYnNnc0FycDl1bXF6NlcwVjRock1mT3N3WXZLTldJcEhyQWRLNmNUeFE2?=
- =?utf-8?B?WVdxRllWWm1OekZWa1p3N2tYMEJ2OERFekYvcitPZElUVzhuRzBpVVdvZFpw?=
- =?utf-8?B?cGFNbFR2WDA4Q2tpYjZlVG9EL3c3VzBTb2VtSXBQcjZiRm1YVjYvWlpndEUy?=
- =?utf-8?B?RGxUS3FlZThPY2NtQUEyU0FIWVdBamNmb3NhWTl1N3Y3M0d4TlNHNTlpUFk1?=
- =?utf-8?B?QTkwR200VXpDNnl4TW5Pb1VKdEF5VWRxOHN1T1JWbUZmcG8vSjZxR2ZuRlJh?=
- =?utf-8?B?cFVBbTM0NlRTT2ViY0xkYmJGTGpXRDBCZGxYQmp4a0ZQVjZKbFAvbXpmWGti?=
- =?utf-8?B?MTl5V3UvbHdIczFkVVNYWWZlUUdXaW1qNDBQb2l0MGdYb2dDMHVTL1VxQjQw?=
- =?utf-8?B?bXRZUW5LWnNPT1VXeHJjNTl2TnhZUitLcjcxR01IWlRjeUp0Ti9tZDd6TWt0?=
- =?utf-8?B?WGNtZlhFWG9jM2xQVWZVM0VKT05zSWIzOTN3S0M4LysxRUxXYnZ2bnVsNVA2?=
- =?utf-8?B?cnZNWGNCM3FGUUtKeis2NWwxT0N4d3JPTFFkanNoQ21meU5id0NOTFNIaldn?=
- =?utf-8?B?VXBnMFl6S09KWFNmNDBQejcvQTRHakR4c1Q0Nk5OWWVFaHVRZFBuVVV6YTBi?=
- =?utf-8?B?MG51dG5TbFd0ZHZWclJCWGd5YVVHamRXaHhkeWZTRW9WYklDZWhnUlNQTjgy?=
- =?utf-8?B?QjJIbFFPa3l5aFBIWnRweHhVREpkeFcrQ0U5NXhoaXZ6N1pocmxFTVNCRHVS?=
- =?utf-8?B?NUp4YXJ3YkNBd09ka3FFNG9NWVMwY1p1STI5S2ZsbUFUMm41U0NVT2pJZGc3?=
- =?utf-8?B?YUk3UFRYSFcvblBiSHBtSDBYNUYyWGhkY3d5ZFNLLzZhcmNUTDErT2ZhVzJY?=
- =?utf-8?B?KzY0YkM4amUxZDQ4amVMeisxWTk5T0tBcG5UbEMzazNRUXR6QW5CNWtPQjd5?=
- =?utf-8?B?eSt2M1p3VHNUYSt6UkdINk9KQUlreVBtb2NGbGQ3VDRkTXJVOUoxNFB6UC9V?=
- =?utf-8?B?VzNoNnJKV1BsRlZaOFVsTGJpc2N0UWxqbGkzU3FPaFdLaTBIM1hmeVBtUHNW?=
- =?utf-8?B?eVNXK3JQQXFsZVdLeTUvNjYrUWpOSDY4TXY1amt6QURTRVNWS2hEQ3RWN3pS?=
- =?utf-8?B?blFKSSt4S3FpRkxaVVg2WHVIK1Q1aXh0WTI4Y2psMHgxNGRrQ2tnMEYvY281?=
- =?utf-8?B?enpxUklFcThVZVJkMWhoZWFmVmdvMEF1VVM1MmlQR3RCTUw5a3R6MzMxdWE5?=
- =?utf-8?B?YlZibllvMWFwQkxiMis4RHFGY3kzcmNMSU5uR2ZNMWExazBDMU1CVTNnbm5t?=
- =?utf-8?B?R2FTa3MzSlM3OXdoc2pkZFYzUDVkcmpnSTdRa1JCajZGY0dsN0NOdGp2cVh0?=
- =?utf-8?B?ZS9Jb1VkZ016aSs4WkxoQ0FhRnVVQmZwQkV5N1hxSmlSeDE4d1R6UDAyM1lN?=
- =?utf-8?B?cnR3WVc2ZjV4dmd0ZGF2b29zQkZLenZuclNjSUF6WmJVNlBrcGdYbThUbUF1?=
- =?utf-8?Q?dpQ8fyQLcRG7DbAIiqBbOm+ep?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="ANG7bZMn";
+	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="P6I8YcNo"
+DKIM-Signature: v=1; a=rsa-sha256; s=202510r; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Date:Subject:To:From; t=1764956365; bh=KVUhcg73/TqA3EpqJ1rA7Fv
+	3Jp/HbsvMpxg1pjeiYFE=; b=ANG7bZMn68WxI9tnEBKlqM4eDtnbfh/OIDT1ujXykzHvqNeC9T
+	x+leEuz/z1/HI2LznLoogmT+ssmku9EPAH0zMNVPOeLCSjW+o6wWr35v9kWD6D2pLXtE6cgyZdA
+	bW/ZTpqYuh0arAcVvRt9jRIwbWDP0+f2Jb+Ybx1Aeh8hPIZDmOQv8PpHR654aMWisya7EoV/X+n
+	6OiQhqy/RghV8Ic8PJ1n4bxRuBDCYBAOXD3bUMh8br8uiJcCfE3wTvyc8sw2xbWs+ccufn/2AIb
+	HIER48BpeYAoIXy8X/r2FcoD3kmkMvDB2t6ncgfvFch6fpFyCAVZQAM2vYIaNf9le5w==;
+DKIM-Signature: v=1; a=ed25519-sha256; s=202510e; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Date:Subject:To:From; t=1764956365; bh=KVUhcg73/TqA3EpqJ1rA7Fv
+	3Jp/HbsvMpxg1pjeiYFE=; b=P6I8YcNozYkbW6lFa59A+Y4N691E6Rq10/Rr7UB2AII+CXyEbl
+	vo6bK0TXL2XJO8zRnkaLs+JiEAkYUAvU1PCA==;
+From: Daniel Hodges <git@danielhodges.dev>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	vadim.fedorenko@linux.dev
+Cc: martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	shuah@kernel.org,
+	bpf@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daniel Hodges <git@danielhodges.dev>
+Subject: [PATCH bpf-next v2 3/5] selftests/bpf: Add tests for bpf_crypto_hash kfunc
+Date: Fri,  5 Dec 2025 12:39:21 -0500
+Message-ID: <20251205173923.31740-4-git@danielhodges.dev>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251205173923.31740-1-git@danielhodges.dev>
+References: <20251205173923.31740-1-git@danielhodges.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3022.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e45234d3-fda8-4814-05c5-08de3421dac4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2025 17:15:14.1449
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZWQdpJ0TzlZHKwFi9bCxRr+HKun3gcGNQS+Ho6EIKsxQnw9HncCwKQ//meiP5WIhyxS7EKcx12boVKZECGWvZQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7711
+Content-Transfer-Encoding: 8bit
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSGFucyBkZSBHb2VkZSA8
-aGFuc2dAa2VybmVsLm9yZz4NCj4gU2VudDogV2VkbmVzZGF5LCBOb3ZlbWJlciAxOSwgMjAyNSAx
-MDo1MiBBTQ0KPiBUbzogUm9uIExpIDx4aWFuZ3JvbmdsQG52aWRpYS5jb20+OyBpbHBvLmphcnZp
-bmVuQGxpbnV4LmludGVsLmNvbTsgVmFkaW0NCj4gUGFzdGVybmFrIDx2YWRpbXBAbnZpZGlhLmNv
-bT47IGFsb2suYS50aXdhcmlAb3JhY2xlLmNvbTsgS2hhbGlsIEJsYWllY2gNCj4gPGtibGFpZWNo
-QG52aWRpYS5jb20+OyBEYXZpZCBUaG9tcHNvbiA8ZGF2dGhvbXBzb25AbnZpZGlhLmNvbT4NCj4g
-Q2M6IHBsYXRmb3JtLWRyaXZlci14ODZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdl
-ci5rZXJuZWwub3JnOyBsaW51eC0NCj4gY3J5cHRvQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0
-OiBSZTogW1BBVENIIHYzIDIvM10gcGxhdGZvcm0vbWVsbGFub3gvbWx4YmZfcGthOiBBZGQgdXNl
-cnNwYWNlDQo+IFBLQSByaW5nIGRldmljZSBpbnRlcmZhY2UNCj4gDQo+IEV4dGVybmFsIGVtYWls
-OiBVc2UgY2F1dGlvbiBvcGVuaW5nIGxpbmtzIG9yIGF0dGFjaG1lbnRzDQo+IA0KPiANCj4gSGks
-DQo+IA0KPiBPbiAxOS1TZXAtMjUgOTo1MSBQTSwgUm9uIExpIHdyb3RlOg0KPiA+IEV4cG9zZSBl
-YWNoIEJsdWVGaWVsZCBQS0EgcmluZyBhcyBhIGNoYXJhY3RlciBkZXZpY2UgZm9yIHVzZXJzcGFj
-ZSBvZmZsb2FkLg0KPiA+IFRoaXMgZm9jdXNlcyBvbiBwZXItcmluZyByZXNvdXJjZXMsIGxheW91
-dCwgYW5kIGNvbnRyb2wsIHdpdGhvdXQgaW4ta2VybmVsDQo+ID4gY3J5cHRvIGFsZ29yaXRobXMu
-DQo+ID4NCj4gPiAtIENyZWF0ZSByaW5nIGRldmljZSBub2RlcyBhbmQgbGlmZWN5Y2xlOiBvcGVu
-L2Nsb3NlLCBtbWFwLCBpb2N0bA0KPiA+IC0gUGFydGl0aW9uIDE2S0IgV2luZG93IFJBTSBwZXIg
-cmluZyAoMUtCIGNtZCwgMUtCIHJlc3VsdCwgMTRLQiB2ZWN0b3JzKQ0KPiA+IC0gUHJvZ3JhbSBy
-aW5nIGluZm8gd29yZHMgKGNtZC9yc2x0IGJhc2VzLCBzaXplLCBob3N0X2Rlc2Nfc2l6ZSwgaW4t
-b3JkZXIpDQo+ID4gLSBQcm92aWRlIFVBUEkgaW9jdGxzOg0KPiA+ICAgLSBNTFhCRl9QS0FfUklO
-R19HRVRfUkVHSU9OX0lORk8NCj4gPiAgIC0gTUxYQkZfUEtBX0dFVF9SSU5HX0lORk8NCj4gPiAg
-IC0gTUxYQkZfUEtBX0NMRUFSX1JJTkdfQ09VTlRFUlMNCj4gPiAtIEFDUEktYmFzZWQgcHJvYmUg
-Zm9yIEJGMS9CRjIvQkYzIGFuZCBwZXItc2hpbSByaW5nIHNldHVwDQo+ID4gLSBEb2N1bWVudCBk
-ZXZpY2UvcmluZyBpZGVudGlmaWVycyBhbmQgaW50ZXJmYWNlIGluIHN5c2ZzIEFCSQ0KPiANCj4g
-SU1ITyB5b3UgcmVhbGx5IHNob3VsZCB1c2UgdGhlIHN0YW5kYXJkIGh3LWFjY2VsIGNyeXB0byBr
-ZXJuZWwgQVBJcw0KPiBmb3IgdGhpcyBhbmQgbm90IGludHJvZHVjZSBhIHNldCBvZiBjdXN0b20g
-aW9jdGxzLg0KPiANCj4gSSBndWVzcyBhbiBleGNlcHRpb24gY2FuIGJlIG1hZGUgaWY6DQo+IA0K
-PiAxLiBZb3UgY2FuIG1vdGl2YXRlIHdoeSB1c2luZyB0aGUgc3RhbmRhcmQgaHctYWNjZWwgY3J5
-cHRvIGtlcm5lbCBBUElzIHdpbGwNCj4gICAgbm90IHdvcmsgZm9yIHlvdXIgdXNlLWNhc2U7ICph
-bmQqDQo+IDIuIFlvdSBjYW4gZ2V0IGFuIGFjayBmcm9tIG9uZSBvZiB0aGUgbGludXgtY3J5cHRv
-IE1BSU5UQUlORVJzIGZvciBkb2luZyB0aGlzDQo+ICAgIG91dHNpZGUgb2YgdGhlIGNyeXB0byBz
-dWJzeXN0ZW1zLg0KPiANCj4gU29ycnksIGJ1dCB3ZSBjYW5ub3QgbWVyZ2UgdGhlc2UgcGF0Y2hl
-cyBhZGRpbmcgdGhpcyBjdXN0b20gY3J5cHRvIEFQSQ0KPiB1bmRlciBkcml2ZXJzL3BsYXRmb3Jt
-L21lbGxhbm94IHdpdGhvdXQgZXhwbGljaXQgcGVybWlzc2lvbiB0byBkZXZpYXRlDQo+IGZyb20g
-dGhlIHN0YW5kYXJkIGNyeXB0byBBUElzIGJ5IHRoZSBsaW51eC1jcnlwdG8gTUFJTlRBSU5FUnMu
-DQo+IA0KPiBSZWdhcmRzLA0KPiANCj4gSGFucw0KDQpIZWxsbyBsaW51eC1jcnlwdG8gbWFpbnRh
-aW5lcnMsDQpQbGVhc2UgcmV2aWV3IHRoZSBqdXN0aWZpY2F0aW9ucyBmb3IgYXZvaWRpbmcgdGhl
-IENyeXB0byBBUEkgZm9yIHRoZSBQS0EgZHJpdmVyOg0KLSBPdXIgcHJpbWFyeSBjb25zdW1lcnMg
-YXJlIHVzZXLigJFzcGFjZSBUTFMgc3RhY2tzIChPcGVuU1NML0JvcmluZ1NTTCkuIFRoZSB1c2Vy
-4oCRc3BhY2UgQUZfQUxHIGludGVyZmFjZSBkb2VzIG5vdCBleHBvc2UgYXN5bW1ldHJpYyBhbGdv
-cml0aG1zIChEb2N1bWVudGF0aW9uL2NyeXB0by91c2Vyc3BhY2UtaWYucnN0KSwgc28gaXQgd291
-bGRu4oCZdCByZWFjaCB0aG9zZSBjb25zdW1lcnMuDQotIEFkZGl0aW9uYWxseSwgcm91dGluZyB0
-aHJvdWdoIENyeXB0byBBUEkgYWRkcyBleHRyYSBjb3BpZXMvY29udGV4dCBob3BzIHRoYXQgcmVn
-cmVzcyBvdXIgaGFuZHNoYWtlIGxhdGVuY3kgYW5kIGJhdGNoZWQgdGhyb3VnaHB1dCB0YXJnZXRz
-IGNvbXBhcmVkIHRvIHRoZSBkaXJlY3QsIHplcm/igJFjb3B5IHF1ZXVlIFVBUEkuDQoNClBsZWFz
-ZSBhZHZpc2UgaWYgdGhlIHJldmlldyBwcm9jZWR1cmUgY2FuIHByb2NlZWQuDQoNClRoYW5rcw0K
-Um9uDQo=
+Add selftests to validate the bpf_crypto_hash works properly. The tests
+verify both correct functionality and proper error handling.
+
+Test Data:
+All tests use the well-known NIST test vector input "abc" and validate
+against the standardized expected outputs for each algorithm. This ensures
+the BPF kfunc wrappers correctly delegate to the kernel crypto library.
+
+Signed-off-by: Daniel Hodges <git@danielhodges.dev>
+---
+ tools/testing/selftests/bpf/config            |   2 +
+ .../selftests/bpf/prog_tests/crypto_hash.c    | 158 ++++++++++++++++++
+ .../testing/selftests/bpf/progs/crypto_hash.c | 141 ++++++++++++++++
+ 3 files changed, 301 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/crypto_hash.c
+ create mode 100644 tools/testing/selftests/bpf/progs/crypto_hash.c
+
+diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
+index 558839e3c185..d168b3073cba 100644
+--- a/tools/testing/selftests/bpf/config
++++ b/tools/testing/selftests/bpf/config
+@@ -12,7 +12,9 @@ CONFIG_BPF_SYSCALL=y
+ # CONFIG_BPF_UNPRIV_DEFAULT_OFF is not set
+ CONFIG_CGROUP_BPF=y
+ CONFIG_CRYPTO_HMAC=y
++CONFIG_CRYPTO_HASH2=y
+ CONFIG_CRYPTO_SHA256=y
++CONFIG_CRYPTO_SHA512=y
+ CONFIG_CRYPTO_USER_API=y
+ CONFIG_CRYPTO_USER_API_HASH=y
+ CONFIG_CRYPTO_USER_API_SKCIPHER=y
+diff --git a/tools/testing/selftests/bpf/prog_tests/crypto_hash.c b/tools/testing/selftests/bpf/prog_tests/crypto_hash.c
+new file mode 100644
+index 000000000000..f1495ea85aae
+--- /dev/null
++++ b/tools/testing/selftests/bpf/prog_tests/crypto_hash.c
+@@ -0,0 +1,158 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <test_progs.h>
++#include <errno.h>
++#include "crypto_hash.skel.h"
++
++/* NIST test vectors for SHA-256("abc") */
++static const unsigned char expected_sha256[32] = {
++	0xba, 0x78, 0x16, 0xbf, 0x8f, 0x01, 0xcf, 0xea,
++	0x41, 0x41, 0x40, 0xde, 0x5d, 0xae, 0x22, 0x23,
++	0xb0, 0x03, 0x61, 0xa3, 0x96, 0x17, 0x7a, 0x9c,
++	0xb4, 0x10, 0xff, 0x61, 0xf2, 0x00, 0x15, 0xad
++};
++
++/* NIST test vectors for SHA-384("abc") */
++static const unsigned char expected_sha384[48] = {
++	0xcb, 0x00, 0x75, 0x3f, 0x45, 0xa3, 0x5e, 0x8b,
++	0xb5, 0xa0, 0x3d, 0x69, 0x9a, 0xc6, 0x50, 0x07,
++	0x27, 0x2c, 0x32, 0xab, 0x0e, 0xde, 0xd1, 0x63,
++	0x1a, 0x8b, 0x60, 0x5a, 0x43, 0xff, 0x5b, 0xed,
++	0x80, 0x86, 0x07, 0x2b, 0xa1, 0xe7, 0xcc, 0x23,
++	0x58, 0xba, 0xec, 0xa1, 0x34, 0xc8, 0x25, 0xa7
++};
++
++/* NIST test vectors for SHA-512("abc") */
++static const unsigned char expected_sha512[64] = {
++	0xdd, 0xaf, 0x35, 0xa1, 0x93, 0x61, 0x7a, 0xba,
++	0xcc, 0x41, 0x73, 0x49, 0xae, 0x20, 0x41, 0x31,
++	0x12, 0xe6, 0xfa, 0x4e, 0x89, 0xa9, 0x7e, 0xa2,
++	0x0a, 0x9e, 0xee, 0xe6, 0x4b, 0x55, 0xd3, 0x9a,
++	0x21, 0x92, 0x99, 0x2a, 0x27, 0x4f, 0xc1, 0xa8,
++	0x36, 0xba, 0x3c, 0x23, 0xa3, 0xfe, 0xeb, 0xbd,
++	0x45, 0x4d, 0x44, 0x23, 0x64, 0x3c, 0xe8, 0x0e,
++	0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f
++};
++
++static void test_sha256_basic(void)
++{
++	struct crypto_hash *skel;
++	int err, prog_fd;
++
++	LIBBPF_OPTS(bpf_test_run_opts, topts);
++
++	skel = crypto_hash__open_and_load();
++	if (!skel) {
++		/* Skip if kfuncs not available (CONFIG_CRYPTO_HASH2 not set) */
++		if (errno == ENOENT || errno == EINVAL) {
++			test__skip();
++			return;
++		}
++		ASSERT_OK_PTR(skel, "crypto_hash__open_and_load");
++		return;
++	}
++
++	prog_fd = bpf_program__fd(skel->progs.test_sha256);
++	err = bpf_prog_test_run_opts(prog_fd, &topts);
++	ASSERT_OK(err, "test_sha256");
++	ASSERT_EQ(skel->data->sha256_status, 0, "sha256_status");
++	ASSERT_EQ(memcmp(skel->bss->sha256_output, expected_sha256, 32), 0,
++		  "sha256_output_match");
++
++	crypto_hash__destroy(skel);
++}
++
++static void test_sha384_basic(void)
++{
++	struct crypto_hash *skel;
++	int err, prog_fd;
++
++	LIBBPF_OPTS(bpf_test_run_opts, topts);
++
++	skel = crypto_hash__open_and_load();
++	if (!skel) {
++		/* Skip if kfuncs not available (CONFIG_CRYPTO_HASH2 not set) */
++		if (errno == ENOENT || errno == EINVAL) {
++			test__skip();
++			return;
++		}
++		ASSERT_OK_PTR(skel, "crypto_hash__open_and_load");
++		return;
++	}
++
++	/* Run SHA-384 test */
++	prog_fd = bpf_program__fd(skel->progs.test_sha384);
++	err = bpf_prog_test_run_opts(prog_fd, &topts);
++	ASSERT_OK(err, "test_sha384");
++	ASSERT_EQ(skel->data->sha384_status, 0, "sha384_status");
++	ASSERT_EQ(memcmp(skel->bss->sha384_output, expected_sha384, 48), 0,
++		  "sha384_output_match");
++
++	crypto_hash__destroy(skel);
++}
++
++static void test_sha512_basic(void)
++{
++	struct crypto_hash *skel;
++	int err, prog_fd;
++
++	LIBBPF_OPTS(bpf_test_run_opts, topts);
++
++	skel = crypto_hash__open_and_load();
++	if (!skel) {
++		/* Skip if kfuncs not available (CONFIG_CRYPTO_HASH2 not set) */
++		if (errno == ENOENT || errno == EINVAL) {
++			test__skip();
++			return;
++		}
++		ASSERT_OK_PTR(skel, "crypto_hash__open_and_load");
++		return;
++	}
++
++	prog_fd = bpf_program__fd(skel->progs.test_sha512);
++	err = bpf_prog_test_run_opts(prog_fd, &topts);
++	ASSERT_OK(err, "test_sha512");
++	ASSERT_EQ(skel->data->sha512_status, 0, "sha512_status");
++	ASSERT_EQ(memcmp(skel->bss->sha512_output, expected_sha512, 64), 0,
++		  "sha512_output_match");
++
++	crypto_hash__destroy(skel);
++}
++
++static void test_sha256_invalid_params(void)
++{
++	struct crypto_hash *skel;
++	int err, prog_fd;
++
++	LIBBPF_OPTS(bpf_test_run_opts, topts);
++
++	skel = crypto_hash__open_and_load();
++	if (!skel) {
++		/* Skip if kfuncs not available (CONFIG_CRYPTO_HASH2 not set) */
++		if (errno == ENOENT || errno == EINVAL) {
++			test__skip();
++			return;
++		}
++		ASSERT_OK_PTR(skel, "crypto_hash__open_and_load");
++		return;
++	}
++
++	prog_fd = bpf_program__fd(skel->progs.test_sha256_zero_len);
++	err = bpf_prog_test_run_opts(prog_fd, &topts);
++	ASSERT_OK(err, "test_zero_len");
++	ASSERT_EQ(skel->data->sha256_status, 0, "zero_len_rejected");
++
++	crypto_hash__destroy(skel);
++}
++
++void test_crypto_hash(void)
++{
++	if (test__start_subtest("sha256_basic"))
++		test_sha256_basic();
++	if (test__start_subtest("sha384_basic"))
++		test_sha384_basic();
++	if (test__start_subtest("sha512_basic"))
++		test_sha512_basic();
++	if (test__start_subtest("sha256_invalid_params"))
++		test_sha256_invalid_params();
++}
+diff --git a/tools/testing/selftests/bpf/progs/crypto_hash.c b/tools/testing/selftests/bpf/progs/crypto_hash.c
+new file mode 100644
+index 000000000000..cbb9ccecc697
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/crypto_hash.c
+@@ -0,0 +1,141 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include "vmlinux.h"
++#include <bpf/bpf_helpers.h>
++#include "bpf_misc.h"
++#include "bpf_kfuncs.h"
++
++unsigned char test_input[3] = "abc";
++
++/* Expected SHA-256 hash of "abc" */
++/* ba7816bf 8f01cfea 414140de 5dae2223 b00361a3 96177a9c b410ff61 f20015ad */
++unsigned char expected_sha256[32] = {
++	0xba, 0x78, 0x16, 0xbf, 0x8f, 0x01, 0xcf, 0xea,
++	0x41, 0x41, 0x40, 0xde, 0x5d, 0xae, 0x22, 0x23,
++	0xb0, 0x03, 0x61, 0xa3, 0x96, 0x17, 0x7a, 0x9c,
++	0xb4, 0x10, 0xff, 0x61, 0xf2, 0x00, 0x15, 0xad
++};
++
++/* Output buffers for test results */
++unsigned char sha256_output[32] = {};
++unsigned char sha384_output[48] = {};
++unsigned char sha512_output[64] = {};
++
++int sha256_status = -1;
++int sha384_status = -1;
++int sha512_status = -1;
++
++/* Declare the crypto kfuncs */
++extern struct bpf_crypto_ctx *bpf_crypto_ctx_create(const struct bpf_crypto_params *params,
++						     u32 params__sz, int *err) __ksym;
++extern void bpf_crypto_ctx_release(struct bpf_crypto_ctx *ctx) __ksym;
++extern int bpf_crypto_hash(struct bpf_crypto_ctx *ctx, const struct bpf_dynptr *data,
++			   const struct bpf_dynptr *out) __ksym;
++
++SEC("syscall")
++int test_sha256(void *ctx)
++{
++	struct bpf_dynptr input_ptr, output_ptr;
++	struct bpf_crypto_ctx *hash_ctx;
++	struct bpf_crypto_params params = {
++		.type = "hash",
++		.algo = "sha256",
++		.key_len = 0,
++	};
++	int err = 0;
++
++	hash_ctx = bpf_crypto_ctx_create(&params, sizeof(params), &err);
++	if (!hash_ctx) {
++		sha256_status = err;
++		return 0;
++	}
++
++	bpf_dynptr_from_mem(test_input, sizeof(test_input), 0, &input_ptr);
++	bpf_dynptr_from_mem(sha256_output, sizeof(sha256_output), 0, &output_ptr);
++
++	sha256_status = bpf_crypto_hash(hash_ctx, &input_ptr, &output_ptr);
++	bpf_crypto_ctx_release(hash_ctx);
++	return 0;
++}
++
++SEC("syscall")
++int test_sha384(void *ctx)
++{
++	struct bpf_dynptr input_ptr, output_ptr;
++	struct bpf_crypto_ctx *hash_ctx;
++	struct bpf_crypto_params params = {
++		.type = "hash",
++		.algo = "sha384",
++		.key_len = 0,
++	};
++	int err = 0;
++
++	hash_ctx = bpf_crypto_ctx_create(&params, sizeof(params), &err);
++	if (!hash_ctx) {
++		sha384_status = err;
++		return 0;
++	}
++
++	bpf_dynptr_from_mem(test_input, sizeof(test_input), 0, &input_ptr);
++	bpf_dynptr_from_mem(sha384_output, sizeof(sha384_output), 0, &output_ptr);
++
++	sha384_status = bpf_crypto_hash(hash_ctx, &input_ptr, &output_ptr);
++	bpf_crypto_ctx_release(hash_ctx);
++	return 0;
++}
++
++SEC("syscall")
++int test_sha512(void *ctx)
++{
++	struct bpf_dynptr input_ptr, output_ptr;
++	struct bpf_crypto_ctx *hash_ctx;
++	struct bpf_crypto_params params = {
++		.type = "hash",
++		.algo = "sha512",
++		.key_len = 0,
++	};
++	int err = 0;
++
++	hash_ctx = bpf_crypto_ctx_create(&params, sizeof(params), &err);
++	if (!hash_ctx) {
++		sha512_status = err;
++		return 0;
++	}
++
++	bpf_dynptr_from_mem(test_input, sizeof(test_input), 0, &input_ptr);
++	bpf_dynptr_from_mem(sha512_output, sizeof(sha512_output), 0, &output_ptr);
++
++	sha512_status = bpf_crypto_hash(hash_ctx, &input_ptr, &output_ptr);
++	bpf_crypto_ctx_release(hash_ctx);
++	return 0;
++}
++
++SEC("syscall")
++int test_sha256_zero_len(void *ctx)
++{
++	struct bpf_dynptr input_ptr, output_ptr;
++	struct bpf_crypto_ctx *hash_ctx;
++	struct bpf_crypto_params params = {
++		.type = "hash",
++		.algo = "sha256",
++		.key_len = 0,
++	};
++	int err = 0;
++	int ret;
++
++	hash_ctx = bpf_crypto_ctx_create(&params, sizeof(params), &err);
++	if (!hash_ctx) {
++		sha256_status = err;
++		return 0;
++	}
++
++	bpf_dynptr_from_mem(test_input, 0, 0, &input_ptr);
++	bpf_dynptr_from_mem(sha256_output, sizeof(sha256_output), 0, &output_ptr);
++
++	ret = bpf_crypto_hash(hash_ctx, &input_ptr, &output_ptr);
++	sha256_status = (ret == -22) ? 0 : ret;
++	bpf_crypto_ctx_release(hash_ctx);
++	return 0;
++}
++
++char __license[] SEC("license") = "GPL";
+-- 
+2.51.0
+
