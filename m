@@ -1,134 +1,140 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3D91C5D77
-	for <linux-crypto@vger.kernel.org>; Fri,  5 Dec 2025 08:13:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F02430170F
+	for <linux-crypto@vger.kernel.org>; Fri,  5 Dec 2025 10:51:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764922440; cv=none; b=nc9/fh8hZOgozHx0IMY49WzSAgpahSx8L7Wko6KHqioQju4x8egHh+wZfDHlV2z9CpvAA0SvdNgc9vTwIzTa4bEEoC+QOi532sQFQw9W8DcfRGyYH0bk8RVIvOGcqAXyEWQ2pL8QN11doxH3sn8k2pduhpSLPqfxO8iG2BtcoCA=
+	t=1764931901; cv=none; b=ri67cqFKU6yczZTcae2rxeJj+E6Oxlg2LkFe5gXHeyZZBkG8a/iIxownDqLp06OJhC8RqqPAiZqrJmLGVy3l8p8ARdhESxmaLM/5Ze1xg/Tpusjp/s99dNayWaZR/4G+OV9/yxqbKAaVmj5qMvyzC25LxuuMwMHzQ02bvYvZKpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764922440; c=relaxed/simple;
-	bh=ju7JY4UeryL2eAre+8vh1xSEmLaVUzDSMO5aHr1fGik=;
+	s=arc-20240116; t=1764931901; c=relaxed/simple;
+	bh=TeTh/DGtE8wt6e7+QS1xYcwiuRkgQqDik3m2yeeTOwk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kvIJZrKgihqpPgvOzdn1iCP6xmAht/PUn7v0z3lJYUXDV4yth0JUTDZPukCH8yqMDPhjMToTBoQiU7dgwp4vpq3/0VAyCqDzM4Fc5S4dagBGi4IaZBgc/nNA3ppCxDx8+LpHn2ke4bavbxxHZMz9RRWT8qrGRY6n4oATdQp0U7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fnSiQ+iC; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=W7INtqXCk1qd/KhozKG0/cnpfZylTmdAh4iKO3E/q5GkBKRL7BT/xB5GTwUBfYefiFQVQnNYStL+SRa9jZBCzdBX7CjzTRsPTitb6hMtQX62ofamfzjfiT6q4eKbDZhGVdARuAaagmKDG6ViUc6INznAEtsB83SzdIN34o/v0/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kHr2FyMn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fnSiQ+iC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3125C4AF09
-	for <linux-crypto@vger.kernel.org>; Fri,  5 Dec 2025 08:13:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kHr2FyMn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52422C4CEF1
+	for <linux-crypto@vger.kernel.org>; Fri,  5 Dec 2025 10:51:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764922438;
-	bh=ju7JY4UeryL2eAre+8vh1xSEmLaVUzDSMO5aHr1fGik=;
+	s=k20201202; t=1764931900;
+	bh=TeTh/DGtE8wt6e7+QS1xYcwiuRkgQqDik3m2yeeTOwk=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=fnSiQ+iCZojlF+XDj1m5+W8RbNDZ9YhevDC42uyADsI8BgxlBlJobX1erc7NfWh1S
-	 0+DNcYeWuHjsILtI33zAsNZ/W5v8UOhzkP7mSGEa6676KOtIIr6XO3m/OWSpZarIbE
-	 R3JUqcxYAqvXqLjlMa6prE0IbSOHFnrhbSwZpAOn8jwcPW2Asgp1JN53Ngp0/m8wp9
-	 /lXBsShx7BD65HA63rcT+ugjQcgyJUy+N9q3qyMoGY17pfWOn31zNvnujyGkY9Itg6
-	 rNObV/qBA1z7axrTAKcToEgySlvqH/vtlK64Yf/0XzxBfJ4iAvSwInpxuNntGe9Tnc
-	 TQIPeHCbAFTjQ==
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5957753e0efso1819077e87.1
-        for <linux-crypto@vger.kernel.org>; Fri, 05 Dec 2025 00:13:58 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV1GbF0TzXA0U+HufZaD/A+xmWCjIZnf1aGmpwYfgziGxyaUKMAoXU2SiFRfaV2Ocl0nAslPnMsgyGfOlg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuBt+qH27M7JJmGYVWmdNPgBuIFRa7N8e9i2asHdDLqkcciji+
-	mqbCkXCXyOhPVkvHgD/r/V+Kq03AnmL+Yl0YtNSV+i/HUpTTBzRUlMoEyDS46Tv2uDK2We/6A7f
-	pcNo7ZW/I3JWtMhreH30L8aWlbXJg31Y=
-X-Google-Smtp-Source: AGHT+IHFr1pioy7T4dGDdvXbjllkJmwH7DYy8+khq+vuZNcLpr/IYp4ClSKWBYAqKOT4Hik4/6/FGWo2ye4F1a+U4g4=
-X-Received: by 2002:a05:6512:e8a:b0:594:74f9:3b3 with SMTP id
- 2adb3069b0e04-597d3fafdd8mr3496744e87.29.1764922437162; Fri, 05 Dec 2025
- 00:13:57 -0800 (PST)
+	b=kHr2FyMnT8jsTtyDw7gLbbU4rpISzrpemIjY4t+hn7vgLCbN0pGzjnqPvheHo8tgx
+	 2ShWkg5mgv+YVLZADKN6XEU27I2DjCzcEZy1/OO/6qUzPlbBPIX3cs1b8Q3wSqxi7g
+	 BBNjMeMbKSb5T8Mm4wnYFqZT6nOYWhYzlPxWjCoEG9ezMdbkGpBwCSqU29/OKpwKxy
+	 TMxZGBUxTQPUINM/EfCivquVNerzvOfRVVLTA2fzTeNGWqEUCY41774MR+REf8sP4G
+	 HZ9z8JDIZpyNUzrJg9sVe/7WCv8dtlzpt9wonpfk0hTfwLgMsJk6L5CYE90C4fjzTm
+	 VmrOMfs+tLoNQ==
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5958232f806so2118592e87.0
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Dec 2025 02:51:40 -0800 (PST)
+X-Gm-Message-State: AOJu0YyoknnFGT3wS8xAH+o/iK5ddFFuKuo95ZT7ijJHJ8XmUxcGIz7Q
+	ICOsmFLdS3DhPm0ty3pjf84gIFK7LD5EDX0shnMIRpkO3JJqUz7IXwUvSAl5SPBzPTqv8lQDh7V
+	r62hvvqqGZiJl/WjCZUf9LT9yW4DjIfw=
+X-Google-Smtp-Source: AGHT+IHugUh2Ue4jiaGwd84QsUTuDKQmkvPCnOdPs/IvzYLsK8r+jBLME+aAjUNl97yzsdV+X+9n6Aqf0fDQa5bAFPE=
+X-Received: by 2002:a05:6512:10c1:b0:594:2f1a:6ff0 with SMTP id
+ 2adb3069b0e04-597d3f010ffmr3779903e87.9.1764931898633; Fri, 05 Dec 2025
+ 02:51:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251204162815.522879-2-ardb@kernel.org> <20251205064809.GA26371@sol>
-In-Reply-To: <20251205064809.GA26371@sol>
+References: <20251205051155.25274-1-ebiggers@kernel.org>
+In-Reply-To: <20251205051155.25274-1-ebiggers@kernel.org>
 From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 5 Dec 2025 09:13:46 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXE8qn7MSY1A31CrHRSxw+NXqNGLo=FLo4D-COMhxPAMiw@mail.gmail.com>
-X-Gm-Features: AWmQ_bkLvyxuy46AibQu26n751P_heeUmfYSPQbayiew0ssc4Yee2kk-EHyBaus
-Message-ID: <CAMj1kXE8qn7MSY1A31CrHRSxw+NXqNGLo=FLo4D-COMhxPAMiw@mail.gmail.com>
-Subject: Re: [PATCH] arm64/simd: Avoid pointless clearing of FP/SIMD buffer
+Date: Fri, 5 Dec 2025 11:51:26 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEKvMC4pbDiMexs9TST5oo+5ujsgRnLEHSz==9GfSmRDw@mail.gmail.com>
+X-Gm-Features: AWmQ_bnIV6duVhP8mgR7RVTcYgAevcWISs_pAcDLmSAWRJUy94NeDLZnPZOm9Ro
+Message-ID: <CAMj1kXEKvMC4pbDiMexs9TST5oo+5ujsgRnLEHSz==9GfSmRDw@mail.gmail.com>
+Subject: Re: [PATCH] lib/crypto: blake2s: Replace manual unrolling with unrolled_full
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, 
-	Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Kees Cook <keescook@chromium.org>, Justin Stitt <justinstitt@google.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>
 Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 5 Dec 2025 at 07:50, Eric Biggers <ebiggers@kernel.org> wrote:
+On Fri, 5 Dec 2025 at 06:15, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> On Thu, Dec 04, 2025 at 05:28:15PM +0100, Ard Biesheuvel wrote:
-> > The buffer provided to kernel_neon_begin() is only used if the task is
-> > scheduled out while the FP/SIMD is in use by the kernel, or when such a
-> > section is interrupted by a softirq that also uses the FP/SIMD.
-> >
-> > IOW, this happens rarely, and even if it happened often, there is still
-> > no reason for this buffer to be cleared beforehand, which happens by
-> > default when using a compiler that supports -ftrivial-auto-var-init.
-> >
-> > So mark the buffer as __uninitialized. Given that this is a variable
-> > attribute not a type attribute, this requires that the expression is
-> > tweaked a bit.
-> >
-> > Cc: Will Deacon <will@kernel.org>,
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>,
-> > Cc: Kees Cook <keescook@chromium.org>
-> > Cc: Eric Biggers <ebiggers@kernel.org>
-> > Cc: Justin Stitt <justinstitt@google.com>
-> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/simd.h | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > The issue here is that returning a pointer to an automatic variable as
-> > it goes out of scope is slightly dodgy, especially in the context of
-> > __attribute__((cleanup())), on which the scoped guard API relies
-> > heavily. However, in this case it should be safe, given that this
-> > expression is the input to the guarded variable type's constructor.
-> >
-> > It is definitely not pretty, though, so hopefully here is a better way
-> > to attach this.
-> >
-> > diff --git a/arch/arm64/include/asm/simd.h b/arch/arm64/include/asm/simd.h
-> > index 0941f6f58a14..825b7fe94003 100644
-> > --- a/arch/arm64/include/asm/simd.h
-> > +++ b/arch/arm64/include/asm/simd.h
-> > @@ -48,6 +48,7 @@ DEFINE_LOCK_GUARD_1(ksimd,
-> >                   kernel_neon_begin(_T->lock),
-> >                   kernel_neon_end(_T->lock))
-> >
-> > -#define scoped_ksimd()       scoped_guard(ksimd, &(struct user_fpsimd_state){})
-> > +#define scoped_ksimd()       \
-> > +     scoped_guard(ksimd, ({ struct user_fpsimd_state __uninitialized s; &s; }))
+> As we're doing in the BLAKE2b code, use unrolled_full to make the
+> compiler handle the loop unrolling.  This simplifies the code slightly.
+> The generated object code is nearly the same with both gcc and clang.
 >
-> Ick.  I should have looked at the generated code more closely.
->
-> It's actually worse than you describe, because the zeroing is there even
-> without CONFIG_INIT_STACK_ALL_ZERO=y, simply because the
-> user_fpsimd_state struct is declared using a compound literal.
->
-> I'm afraid that this patch probably isn't a good idea, as it relies on
-> undefined behavior.  Before this patch, the user_fpsimd_state is
-> declared using a compound literal, which takes on its enclosing scope,
-> i.e. the 'for' statement generated by scoped_guard().  After this patch,
-> it's in a new inner scope, and the pointer to it escapes from it.
->
-> Unfortunately I don't think there's any way to solve this while keeping
-> the scoped_ksimd() API as-is.
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>  lib/crypto/blake2s.c | 38 ++++++++++++++++----------------------
+>  1 file changed, 16 insertions(+), 22 deletions(-)
 >
 
-How about
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
---- a/arch/arm64/include/asm/simd.h
-+++ b/arch/arm64/include/asm/simd.h
-@@ -48,6 +48,8 @@ DEFINE_LOCK_GUARD_1(ksimd,
-                    kernel_neon_begin(_T->lock),
-                    kernel_neon_end(_T->lock))
-
--#define scoped_ksimd() scoped_guard(ksimd, &(struct user_fpsimd_state){})
-+#define scoped_ksimd()         __scoped_ksimd(__UNIQUE_ID(fpsimd_state))
-+#define __scoped_ksimd(id)     struct user_fpsimd_state __uninitialized id; \
-+                               scoped_guard(ksimd, &id)
-
- #endif
+> diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
+> index 6182c21ed943..71578a084742 100644
+> --- a/lib/crypto/blake2s.c
+> +++ b/lib/crypto/blake2s.c
+> @@ -12,10 +12,11 @@
+>  #include <linux/bug.h>
+>  #include <linux/export.h>
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+>  #include <linux/string.h>
+> +#include <linux/unroll.h>
+>  #include <linux/types.h>
+>
+>  static const u8 blake2s_sigma[10][16] = {
+>         { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+>         { 14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3 },
+> @@ -69,33 +70,26 @@ blake2s_compress_generic(struct blake2s_ctx *ctx,
+>         d = ror32(d ^ a, 8); \
+>         c += d; \
+>         b = ror32(b ^ c, 7); \
+>  } while (0)
+>
+> -#define ROUND(r) do { \
+> -       G(r, 0, v[0], v[ 4], v[ 8], v[12]); \
+> -       G(r, 1, v[1], v[ 5], v[ 9], v[13]); \
+> -       G(r, 2, v[2], v[ 6], v[10], v[14]); \
+> -       G(r, 3, v[3], v[ 7], v[11], v[15]); \
+> -       G(r, 4, v[0], v[ 5], v[10], v[15]); \
+> -       G(r, 5, v[1], v[ 6], v[11], v[12]); \
+> -       G(r, 6, v[2], v[ 7], v[ 8], v[13]); \
+> -       G(r, 7, v[3], v[ 4], v[ 9], v[14]); \
+> -} while (0)
+> -               ROUND(0);
+> -               ROUND(1);
+> -               ROUND(2);
+> -               ROUND(3);
+> -               ROUND(4);
+> -               ROUND(5);
+> -               ROUND(6);
+> -               ROUND(7);
+> -               ROUND(8);
+> -               ROUND(9);
+> -
+> +               /*
+> +                * Unroll the rounds loop to enable constant-folding of the
+> +                * blake2s_sigma values.
+> +                */
+> +               unrolled_full
+> +               for (int r = 0; r < 10; r++) {
+> +                       G(r, 0, v[0], v[4], v[8], v[12]);
+> +                       G(r, 1, v[1], v[5], v[9], v[13]);
+> +                       G(r, 2, v[2], v[6], v[10], v[14]);
+> +                       G(r, 3, v[3], v[7], v[11], v[15]);
+> +                       G(r, 4, v[0], v[5], v[10], v[15]);
+> +                       G(r, 5, v[1], v[6], v[11], v[12]);
+> +                       G(r, 6, v[2], v[7], v[8], v[13]);
+> +                       G(r, 7, v[3], v[4], v[9], v[14]);
+> +               }
+>  #undef G
+> -#undef ROUND
+>
+>                 for (i = 0; i < 8; ++i)
+>                         ctx->h[i] ^= v[i] ^ v[i + 8];
+>
+>                 data += BLAKE2S_BLOCK_SIZE;
+>
+> base-commit: 43dfc13ca972988e620a6edb72956981b75ab6b0
+> --
+> 2.52.0
+>
