@@ -1,126 +1,163 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE0030CD81
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Dec 2025 21:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB075464F;
+	Fri,  5 Dec 2025 01:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764884342; cv=none; b=ctGKdLipOwfecnki+t+1dg4bchMWrQGfbK+ke+51hZqI2utwTZJ1D156dXZWznHGeE/jMafEgisUdQ6Q/frXvK/A6iWhcRkm2wWLX5aGbyhS+2zykOgwg7WliuyV1QVYfdRhoxw8Hyb73/uSr67R+h+/acdUjt9qgngxPjVXhhY=
+	t=1764897710; cv=none; b=RXoIez+/jIVC58WpgaGnxpvCy3yVfBUiIHze1oHbJ6s87pHRIZ/w032B2E9/b1joV/2Vtf2Pz/enl/LKrOrr+eFiEaQ2eOv/5diZEe3/eH+NLs/TBZosWVuYPKegHARxJz9MnHw/7EysjVcag8cQMYUURu/tpTuYQWWj77WxFNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764884342; c=relaxed/simple;
-	bh=7a4apymdvLMzvSssxC4jYelA1RIA+3s9lZemZv4hiVM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E4YqpHtMDTW6030FtjMm0BsOPBy70+lI90A02a0/t6yfNVF+Wz5mMwgStx9PpSSX5oJH/SvACD2JBjlw6fp2Y7OxkzcwwaeZXKX5KjGDjbJBev8Awto99n1+GJxGLk+/ojzyrUvfpdXhYDevadM16vJIjei2m3o7c9hBJtRt2Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VgROTT6i; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VgROTT6i"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7aab061e7cbso1658573b3a.1
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Dec 2025 13:39:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764884339; x=1765489139; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7a4apymdvLMzvSssxC4jYelA1RIA+3s9lZemZv4hiVM=;
-        b=VgROTT6iCbymOwdWe88ItMImSnd/3klSljVqvueoiceuL9xfYAp2jEUrfe1udBpNaM
-         3PA0vJkcscc8oTOwnOnT5CACoXdnJtRdaVmuSk9fnmuGyLzhpZxXKkzYFj0xzITC4SgT
-         0wE98MfNqRGXpR7u/En8Elii8u1ko4b1dl7MsGbNxtEwvI5cRnTEG+J2sY6M/VsLLRQI
-         H21xP0x9VaifT72XCGdVi0G1/h2vScSxA9CVNZUq2ZqjRcFT1zOzRcEtFZs0JbMDuyxM
-         pcKP4oI7tQzzaXsmLay6tVCf2FOu5p2zz4NTKCNMPVi0yde7XNgxhqFPC18vseQGbIQx
-         jrww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764884340; x=1765489140;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7a4apymdvLMzvSssxC4jYelA1RIA+3s9lZemZv4hiVM=;
-        b=q5rzjoXIzIf1yhR7U6zdA+qI06D1OvrrNjmqnRIAqkUjVh6VoHek3lrzhsBvJtL4FE
-         yyqoyscejpwDAP+wG+jWRSSf31xsgCZIr/VsAOiic4eIJiNvm/l8BPFqdJRPv9Q2oxIs
-         vuCp6GCMd21JSHTgd3/WJxMz9InS1xD5GWnjVCZEFBHhXiOlqz/U5QLTNSfvJVH3JCFV
-         TU53N7JmbwnapfFdxx3vCt/5dUG9lhEhNlTfeqllA5V/WMm9yaQJayBuFCfESgWl7FTC
-         q592AUPTOrPe/5KBb3xW2FVrvQv2E0f4lSs/9r6VMVde4M91eqWBRnix50a+WtlHcBAQ
-         /zJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWji1poL6JqsA/BdEJjk4B6P3uwRv2omYkpOnzvxDinRJ3sA9t29uCcfnpSg1lltP79L9l4964o2+PbDEk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeW3tRIZI49xmIfMQ8ZiXNpfKoGWnLJV+veh01Chx96nScY+1C
-	7/IeBuElqIBSiJv8ZSZlLJ3VV448AZXzPYixSb/x4CyrIFvwl11bzoRZGOfRd4oUW38C3wPqtRo
-	68eNppA/OwZf7kHkX2DxYB2drbJGOnPs=
-X-Gm-Gg: ASbGncvZ8BO4dnMA45TnJssHqm2VQgbj4ibbKG1dWhxnNfsIjNKQBWI5QtIMDlCjIAU
-	x+Zme9C6++jql/TQxVX6ceUX1raxueitKhvoLEZfkbl0GMr7bkSF7vIcNKLVz5e0VRHZKAxH3bH
-	ZkIauh4Ffm0H0z0iqw1Oa7JP0MwkBMuWDPn+DkaVfgEdZeXmjJLrbFlTlZOcUk0wQ8K8r+wBMaI
-	Y5e16d7w3a8w7RDmtN9FnYVnb7CopsjB0n1F8WkeWRrJDcORLKXj0H3nQYbK+1TNUsm1ZqJUU0o
-	kz3siTw=
-X-Google-Smtp-Source: AGHT+IECekJX45uTX+rdJAmlqhj0+olEbSOJgBEbG8bNxunXp+W3mrNWLKVJtLnQ1vPBK4dnSvd+pVp/HLiKh/idEFw=
-X-Received: by 2002:a05:7022:410:b0:11b:82b8:40ae with SMTP id
- a92af1059eb24-11df0c48844mr6019656c88.18.1764884339502; Thu, 04 Dec 2025
- 13:38:59 -0800 (PST)
+	s=arc-20240116; t=1764897710; c=relaxed/simple;
+	bh=YwsG+rsrE/QM63dSd55mNebPJVlyXb85SzzErly9REY=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=KIgCjmfN7M4jAaXUuo9m+UIU9rIW3/HOsPqLD8GyRqOuVBNhzM25ywKtL5QKJsA6ovlPN9BIo6aLgRhHXLEcRQk3mvJq2jNHUhYQxuk0lvbJAVyViLsvEP1DTSCudhY6lcmiTTd9usjDImN8alJXfySq6c+bLWcAboCtEIbKT1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8BxG9KpMzJpAD8rAA--.25538S3;
+	Fri, 05 Dec 2025 09:21:45 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJBxzsGlMzJpwKZFAQ--.25707S3;
+	Fri, 05 Dec 2025 09:21:43 +0800 (CST)
+Subject: Re: [PATCH v2 7/9] crypto: virtio: Add IV buffer in structure
+ virtio_crypto_sym_request
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Gonglei <arei.gonglei@huawei.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=c3=a9rez?=
+ <eperezma@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, virtualization@lists.linux.dev,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250701030842.1136519-1-maobibo@loongson.cn=20251204112227.2659404-1-maobibo@loongson.cn>
+ <20251204112502.2659544-1-maobibo@loongson.cn>
+ <20251204074712-mutt-send-email-mst@kernel.org>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <4cf8befc-465c-e9de-ab12-9d0d8ca40d1f@loongson.cn>
+Date: Fri, 5 Dec 2025 09:19:12 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251204141250.21114-1-ethan.w.s.graham@gmail.com>
- <20251204141250.21114-10-ethan.w.s.graham@gmail.com> <CAHp75VfSkDvWVqi+W2iLJZhfe9+ZqSvTEN7Lh-JQbyKjPO6p_A@mail.gmail.com>
- <CANpmjNMQDs8egBfCMH_Nx7gdfxP+N40Lf6eD=-25afeTcbRS+Q@mail.gmail.com>
- <CAHp75VfsD5Yj1_JcXS5gxnN3XpLjuA7nKTZMmMHB_q-qD2E8SA@mail.gmail.com>
- <CANpmjNOKBw9qN4zwLzCsOkZUBegzU0eRTBmbt1z3WFvXOP+6ew@mail.gmail.com> <CAHp75Vd9VOH2zHFmoU5rrQCRqJSBG2UDCfKgvOR6hwavDVqHeQ@mail.gmail.com>
-In-Reply-To: <CAHp75Vd9VOH2zHFmoU5rrQCRqJSBG2UDCfKgvOR6hwavDVqHeQ@mail.gmail.com>
-From: Ethan Graham <ethan.w.s.graham@gmail.com>
-Date: Thu, 4 Dec 2025 22:38:47 +0100
-X-Gm-Features: AWmQ_bkrTLjU1bji3dq_q0_9aUL2KpYGKaTrBSm-1EAw-k6T0Q2iOVkzFyxbFXs
-Message-ID: <CANgxf6woLz0VBnmFqrhwQiLwrQkb5oLb+1tHoOU5+aN=a21k8Q@mail.gmail.com>
-Subject: Re: [PATCH 09/10] drivers/auxdisplay: add a KFuzzTest for parse_xy()
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Marco Elver <elver@google.com>, glider@google.com, andreyknvl@gmail.com, 
-	andy@kernel.org, brauner@kernel.org, brendan.higgins@linux.dev, 
-	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com, 
-	dvyukov@google.com, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
-	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
-	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, lukas@wunner.de, shuah@kernel.org, sj@kernel.org, 
-	tarasmadan@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20251204074712-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJBxzsGlMzJpwKZFAQ--.25707S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxZFWrWw13ur45CF4xCr4DAwc_yoW5uFWDpr
+	s0ka93KrW8Jr17Ga4FqF1rXa4fuFZ0v3WxWr4ruFyfGrnIvrn7Wr17CFyjvF4SyF1UGr4U
+	Cr4v93yj9F1DCFXCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
+	twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l
+	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+	42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
 
-On Thu, Dec 4, 2025 at 6:10=E2=80=AFPM Andy Shevchenko
-<andy.shevchenko@gmail.com> wrote:
->
-> On Thu, Dec 4, 2025 at 5:36=E2=80=AFPM Marco Elver <elver@google.com> wro=
-te:
-> > On Thu, 4 Dec 2025 at 16:34, Andy Shevchenko <andy.shevchenko@gmail.com=
-> wrote:
-> > > On Thu, Dec 4, 2025 at 5:33=E2=80=AFPM Marco Elver <elver@google.com>=
- wrote:
-> > > > On Thu, 4 Dec 2025 at 16:26, Andy Shevchenko <andy.shevchenko@gmail=
-.com> wrote:
->
-> [..]
->
-> > > > > > Signed-off-by: Ethan Graham <ethangraham@google.com>
-> > > > > > Signed-off-by: Ethan Graham <ethan.w.s.graham@gmail.com>
-> > > > >
-> > > > > I believe one of two SoBs is enough.
-> > > >
-> > > > Per my interpretation of
-> > > > https://docs.kernel.org/process/submitting-patches.html#developer-s=
--certificate-of-origin-1-1
-> > > > it's required where the affiliation/identity of the author has
-> > > > changed; it's as if another developer picked up the series and
-> > > > continues improving it.
-> > >
-> > > Since the original address does not exist, the Originally-by: or free
-> > > text in the commit message / cover letter should be enough.
-> >
-> > The original copyright still applies, and the SOB captures that.
->
-> The problem is that you put a non-existing person there. Make sure
-> emails are not bouncing and I will not object (however, I just saw
-> Greg's reply).
 
-Understood. I'll stick to the single SoB in the next version as Greg
-suggested.
 
-This address is permanent, so there won't be any bouncing issues.
+On 2025/12/4 下午8:48, Michael S. Tsirkin wrote:
+> On Thu, Dec 04, 2025 at 07:25:02PM +0800, Bibo Mao wrote:
+>> Add IV buffer in structure virtio_crypto_sym_request to avoid unnecessary
+>> IV buffer allocation in encrypt/decrypt process. And IV buffer is cleared
+>> when encrypt/decrypt is finished.
+>>
+>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>> ---
+>>   .../virtio/virtio_crypto_skcipher_algs.c      | 20 +++++++------------
+>>   1 file changed, 7 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+>> index a7c7c726e6d9..c911b7ba8f13 100644
+>> --- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+>> +++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+>> @@ -30,9 +30,9 @@ struct virtio_crypto_sym_request {
+>>   
+>>   	/* Cipher or aead */
+>>   	uint32_t type;
+>> -	uint8_t *iv;
+>>   	/* Encryption? */
+>>   	bool encrypt;
+>> +	uint8_t iv[0];
+>>   };
+>>   
+>>   struct virtio_crypto_algo {
+>> @@ -402,12 +402,7 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
+>>   	 * Avoid to do DMA from the stack, switch to using
+>>   	 * dynamically-allocated for the IV
+>>   	 */
+>> -	iv = kzalloc_node(ivsize, GFP_ATOMIC,
+>> -				dev_to_node(&vcrypto->vdev->dev));
+>> -	if (!iv) {
+>> -		err = -ENOMEM;
+>> -		goto free;
+>> -	}
+>> +	iv = vc_sym_req->iv;
+>>   	memcpy(iv, req->iv, ivsize);
+>>   	if (!vc_sym_req->encrypt)
+>>   		scatterwalk_map_and_copy(req->iv, req->src,
+>> @@ -416,7 +411,6 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
+>>   
+>>   	sg_init_one(&iv_sg, iv, ivsize);
+>>   	sgs[num_out++] = &iv_sg;
+>> -	vc_sym_req->iv = iv;
+>>   
+>>   	/* Source data */
+>>   	for (sg = req->src; src_nents; sg = sg_next(sg), src_nents--)
+>> @@ -438,12 +432,10 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
+>>   	virtqueue_kick(data_vq->vq);
+>>   	spin_unlock_irqrestore(&data_vq->lock, flags);
+>>   	if (unlikely(err < 0))
+>> -		goto free_iv;
+>> +		goto free;
+>>   
+>>   	return 0;
+>>   
+>> -free_iv:
+>> -	kfree_sensitive(iv);
+> 
+> so iv is no longer cleared on error. problem?
+yes, it is a problem, IV buffer should be cleared on error.
+Will fix on next version.
+
+Regards
+Bibo Mao
+> 
+>>   free:
+>>   	kfree(sgs);
+>>   	return err;
+>> @@ -501,8 +493,10 @@ static int virtio_crypto_skcipher_init(struct crypto_skcipher *tfm)
+>>   {
+>>   	struct virtio_crypto_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+>>   	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+>> +	int size;
+>>   
+>> -	crypto_skcipher_set_reqsize(tfm, sizeof(struct virtio_crypto_sym_request));
+>> +	size = sizeof(struct virtio_crypto_sym_request) + crypto_skcipher_ivsize(tfm);
+>> +	crypto_skcipher_set_reqsize(tfm, size);
+>>   	ctx->alg = container_of(alg, struct virtio_crypto_algo, algo.base);
+>>   
+>>   	return 0;
+>> @@ -552,7 +546,7 @@ static void virtio_crypto_skcipher_finalize_req(
+>>   		scatterwalk_map_and_copy(req->iv, req->dst,
+>>   					 req->cryptlen - ivsize,
+>>   					 ivsize, 0);
+>> -	kfree_sensitive(vc_sym_req->iv);
+>> +	memzero_explicit(vc_sym_req->iv, ivsize);
+>>   	virtcrypto_clear_request(&vc_sym_req->base);
+>>   
+>>   	crypto_finalize_skcipher_request(vc_sym_req->base.dataq->engine,
+>> -- 
+>> 2.39.3
+> 
+
