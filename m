@@ -1,49 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF2378F2E;
-	Fri,  5 Dec 2025 05:05:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5488821;
+	Fri,  5 Dec 2025 05:15:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764911143; cv=none; b=HGm2RtxgF22uttnalgJUBd31Xi+jnhiYrCCdF7smxM0KIZzQw3flR9Ga7p8rxBicRjQ2DQWJVgKU2AS5j0r3ZAOGRRQKkV5tVUgRIYPHAW5itOpGjb8cB/2L1fXULQ/TyWVHannuxCAMTQ6JMruvzqYmjqX1FP3K0yZYy/4U2ZQ=
+	t=1764911726; cv=none; b=J4LeSUfUh3ouSWl91MCjnBKfBW5D6uU0hIgfKL5pQO9qBjRsZh7XDGOvQYGBVRnak+T53iqQLVw/ZJgyd10XsZt9HRmiGJooX+JA/IPjntcYEpwN60DcPgxll4UBMKYVc666B3Y/SUbIA0/mG0zSimS6CSpxbFcOxBoQIdP7lvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764911143; c=relaxed/simple;
-	bh=ONwT4dJ8vrsFPPa33jduMzaQRuPORhk3QQYmMZPBe88=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q7hALwPs7jo1oagWAQl5RV+yOKSxGcioRI9zpp+QeX9aUPbVFDc5lc5gNe23XoEWx6WgI41ULRljkWKZDAIWQ4iBrKFmlvC1jzWhp9X04NZRkmEpWuhv1TKUR/MqOT9gSRacUAC4t8WWf5TZYgENOo+CFQSWkjsyqpuOCl/b1i8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hv46VaZr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764911726; c=relaxed/simple;
+	bh=xgHhtZumvdjfgw+FiqO7QtO6dDqWlaj3bgYCiBCj0QA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DOQKHabIvp8g/6o9vcxf5U+k+QMF9S4n4FKCHqz6+W/ogCCxsoMY1HBqdkMxTycAB8qe9EKnKKhIUzurD8ah5SEIm1r6c0KTFPXrCex7+yctLlFpSj2+BSdCMqunJ5coK33nYq2s83lcemUd4MboMARRB1dg0QrEOSuo1NHEr9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WnRFy2bZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hv46VaZr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEED4C4CEF1;
-	Fri,  5 Dec 2025 05:05:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WnRFy2bZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32207C4CEF1;
+	Fri,  5 Dec 2025 05:15:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764911143;
-	bh=ONwT4dJ8vrsFPPa33jduMzaQRuPORhk3QQYmMZPBe88=;
+	s=k20201202; t=1764911725;
+	bh=xgHhtZumvdjfgw+FiqO7QtO6dDqWlaj3bgYCiBCj0QA=;
 	h=From:To:Cc:Subject:Date:From;
-	b=hv46VaZrhakZWAuAg+EBqLARnXJsP1ypdRAionvLU6nWeqCS1qheCuxeDr4ArlcYL
-	 DPtLQuHDTaNOKgf4yGDGzr4ofxZvK/9oBysl8u4lL3v80yfpNZt8rv4KfxPXuHBcjU
-	 verKlb+611ALgJBGnD431hKR88Q/8aUh41BPkT8avlM37j/dbtxLY4YphCOLdCBwTu
-	 vH2BQUVQCoUj1ngsfLxrx+A6YM9JCZFw0C6JPNjFEldJtxb4DyX6qGS/9ddsPRqUn9
-	 Bennugml6CXO3lKLhn7vouWvnq6ZsI88O8dA5rWVCxvfZauO2/5jtdTW2McdXF9CQt
-	 suxRaokWHd0+g==
+	b=WnRFy2bZBYkn0rxbOzfHdmHS4BUIb9vTylqt2xskQGg+7zm0bLm7Ek168t/+8nyFQ
+	 uBlBUXb/v7CLxhZLF4lIvawzZmdCSl7fnC0uyjL5fvcYnov9k6MO2nqj3L5isgGdoK
+	 Div1vM7pDWCUlLEc83Thg3PyC/RUTZ+cGld3X/QiGFRCO3QYSTOU2xUBCE7WNZMvDx
+	 ZaMyVKUBBH6TpNV9NRDMjCPZVvhs2Dv33C5Wu5NvP0Wd1ER3rZQ5ImBwaMDo9caKND
+	 J3MnCtX5vzROZlkmhWCwRZPX6xFVAajVKxMwHbWEsBNzKPXsu+9uRmoGSjrYhObK7V
+	 MHVBqU0zqZrVQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Thorsten Blum <thorsten.blum@linux.dev>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	David Laight <david.laight@runbox.com>,
-	David Sterba <dsterba@suse.com>,
-	llvm@lists.linux.dev,
-	linux-btrfs@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2] lib/crypto: blake2b: Roll up BLAKE2b round loop on 32-bit
-Date: Thu,  4 Dec 2025 21:03:30 -0800
-Message-ID: <20251205050330.89704-1-ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: blake2s: Replace manual unrolling with unrolled_full
+Date: Thu,  4 Dec 2025 21:11:55 -0800
+Message-ID: <20251205051155.25274-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -53,69 +44,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-BLAKE2b has a state of 16 64-bit words.  Add the message data in and
-there are 32 64-bit words.  With the current code where all the rounds
-are unrolled to enable constant-folding of the blake2b_sigma values,
-this results in a very large code size on 32-bit kernels, including a
-recurring issue where gcc uses a large amount of stack.
+As we're doing in the BLAKE2b code, use unrolled_full to make the
+compiler handle the loop unrolling.  This simplifies the code slightly.
+The generated object code is nearly the same with both gcc and clang.
 
-There's just not much benefit to this unrolling when the code is already
-so large.  Let's roll up the rounds when !CONFIG_64BIT.
-
-To avoid having to duplicate the code, just write code once using a
-loop, and conditionally use 'unrolled_full' from <linux/unroll.h>.
-
-Then, fold the now-unneeded ROUND() macro into the loop.  Finally, also
-remove the now-unneeded override of the stack frame size warning.
-
-Code size improvements for blake2b_compress_generic():
-
-                  Size before (bytes)    Size after (bytes)
-                  -------------------    ------------------
-    i386, gcc           27584                 3632
-    i386, clang         18208                 3248
-    arm32, gcc          19912                 2860
-    arm32, clang        21336                 3344
-
-Running the BLAKE2b benchmark on a !CONFIG_64BIT kernel on an x86_64
-processor shows a 16384B throughput change of 351 => 340 MB/s (gcc) or
-442 MB/s => 375 MB/s (clang).  So clearly not much of a slowdown either.
-But also that microbenchmark also effectively disregards cache usage,
-which is important in practice and is far better in the smaller code.
-
-Note: If we rolled up the loop on x86_64 too, the change would be
-7024 bytes => 1584 bytes and 1960 MB/s => 1396 MB/s (gcc), or
-6848 bytes => 1696 bytes and 1920 MB/s => 1263 MB/s (clang).
-Maybe still worth it, though not quite as clearly beneficial.
-
-Fixes: 91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/Makefile  |  1 -
- lib/crypto/blake2b.c | 44 ++++++++++++++++++++------------------------
- 2 files changed, 20 insertions(+), 25 deletions(-)
+ lib/crypto/blake2s.c | 38 ++++++++++++++++----------------------
+ 1 file changed, 16 insertions(+), 22 deletions(-)
 
-diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-index b5346cebbb55..330ab65b29c4 100644
---- a/lib/crypto/Makefile
-+++ b/lib/crypto/Makefile
-@@ -31,11 +31,10 @@ obj-$(CONFIG_CRYPTO_LIB_GF128MUL)		+= gf128mul.o
- 
- ################################################################################
- 
- obj-$(CONFIG_CRYPTO_LIB_BLAKE2B) += libblake2b.o
- libblake2b-y := blake2b.o
--CFLAGS_blake2b.o := -Wframe-larger-than=4096 #  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105930
- ifeq ($(CONFIG_CRYPTO_LIB_BLAKE2B_ARCH),y)
- CFLAGS_blake2b.o += -I$(src)/$(SRCARCH)
- libblake2b-$(CONFIG_ARM) += arm/blake2b-neon-core.o
- endif # CONFIG_CRYPTO_LIB_BLAKE2B_ARCH
- 
-diff --git a/lib/crypto/blake2b.c b/lib/crypto/blake2b.c
-index 09c6d65d8a6e..581b7f8486fa 100644
---- a/lib/crypto/blake2b.c
-+++ b/lib/crypto/blake2b.c
+diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
+index 6182c21ed943..71578a084742 100644
+--- a/lib/crypto/blake2s.c
++++ b/lib/crypto/blake2s.c
 @@ -12,10 +12,11 @@
  #include <linux/bug.h>
  #include <linux/export.h>
@@ -125,13 +66,13 @@ index 09c6d65d8a6e..581b7f8486fa 100644
 +#include <linux/unroll.h>
  #include <linux/types.h>
  
- static const u8 blake2b_sigma[12][16] = {
+ static const u8 blake2s_sigma[10][16] = {
  	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
  	{ 14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3 },
-@@ -71,35 +72,30 @@ blake2b_compress_generic(struct blake2b_ctx *ctx,
- 	d = ror64(d ^ a, 16); \
+@@ -69,33 +70,26 @@ blake2s_compress_generic(struct blake2s_ctx *ctx,
+ 	d = ror32(d ^ a, 8); \
  	c += d; \
- 	b = ror64(b ^ c, 63); \
+ 	b = ror32(b ^ c, 7); \
  } while (0)
  
 -#define ROUND(r) do { \
@@ -154,19 +95,13 @@ index 09c6d65d8a6e..581b7f8486fa 100644
 -		ROUND(7);
 -		ROUND(8);
 -		ROUND(9);
--		ROUND(10);
--		ROUND(11);
 -
-+#ifdef CONFIG_64BIT
 +		/*
 +		 * Unroll the rounds loop to enable constant-folding of the
-+		 * blake2b_sigma values.  Seems worthwhile on 64-bit kernels.
-+		 * Not worthwhile on 32-bit kernels because the code size is
-+		 * already so large there due to BLAKE2b using 64-bit words.
++		 * blake2s_sigma values.
 +		 */
 +		unrolled_full
-+#endif
-+		for (int r = 0; r < 12; r++) {
++		for (int r = 0; r < 10; r++) {
 +			G(r, 0, v[0], v[4], v[8], v[12]);
 +			G(r, 1, v[1], v[5], v[9], v[13]);
 +			G(r, 2, v[2], v[6], v[10], v[14]);
@@ -182,9 +117,9 @@ index 09c6d65d8a6e..581b7f8486fa 100644
  		for (i = 0; i < 8; ++i)
  			ctx->h[i] ^= v[i] ^ v[i + 8];
  
- 		data += BLAKE2B_BLOCK_SIZE;
+ 		data += BLAKE2S_BLOCK_SIZE;
 
-base-commit: 3f9f0252130e7dd60d41be0802bf58f6471c691d
+base-commit: 43dfc13ca972988e620a6edb72956981b75ab6b0
 -- 
 2.52.0
 
