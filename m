@@ -1,162 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0CC32FA24
-	for <linux-crypto@vger.kernel.org>; Fri,  5 Dec 2025 13:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1780E185B48;
+	Fri,  5 Dec 2025 14:16:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764943172; cv=none; b=NOwSzzKIR3OvLchqCforZNV3aMWq+91Nziv0eL5C7vAD5LT6aTRshh1TGRAHn82H+h13Py6Ch95GxIgZnJYY/MMX4Kj3eV5Uwt5IGwoxoO19UcyS5KFLijZpB7ScD6IseCkSwFnHDyva8Z1fzRjaONR4wOFt3XZXZQOMksmZ9K4=
+	t=1764944226; cv=none; b=qrXCoBOJNgp/zF8wG4DoXydeqimQW/o6OsVcxfbIdJOmFWvtLuUppsKpdERtid0wvoBfe0+Qyo3GReii2w4ET67RpvdGdK4kxwJQGwtfiRClkPuiT6ar3gTwq1McWAe/WB+OXnjvHpmxzGUtAXmF0B82jh7nYet+MIvCjt/jb/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764943172; c=relaxed/simple;
-	bh=4IXfqyjXtHK9jCKM3TtYWBqAAZ/9LBL9OTlbhk3UYKs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=btDTZXUriC4SIcYzrtqpAqhSvPeClu21X0RcuHQxy51DsdGJ6XhkNFajN4/bYS5rHAqqt5WRLlWOIE16jNoI14FwrmExLOm5RZV5dCjjHBp195jhR3j9rl1onD3ywimWtk0xMtjyQHzCB4tApc8TOuR/S/nfGtoHoCHpvYJssR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dFrlkz+v; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764944226; c=relaxed/simple;
+	bh=OKCW5cDl1+0RGMsHm7AvZSsrkSH8zbzs/RY3A2Fhwys=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Jh8OyB+Se/K42KwNA0T0D2kfPeSayR78DNr3IRH4DS7Kl9SPvtw4g5qYrXPPI+hFjd0RaxNO8eKELbpmokMTq0iP7NPr4EQZ+ybS3w0g/smG2GZxPZZ93+TAJpNeldx7g2Bp/LFH5J8K//PM0Q0ruFSh6FzxKJ/svYwF9L17ATQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=YP8j3FNJ; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dFrlkz+v"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA917C4CEF1;
-	Fri,  5 Dec 2025 13:59:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764943171;
-	bh=4IXfqyjXtHK9jCKM3TtYWBqAAZ/9LBL9OTlbhk3UYKs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dFrlkz+vPNLVd9tp/GICOAtq8DpktjY24MWU4BBdeQ4OyZ0OFkiu5GdFLZ7XdgdiI
-	 mZN03eNgisHNmtfB0rp42GKZyzN3NlbUCW22EAaKsJlIA7Gb5r+jbBVOX4yzRg42si
-	 f+8Ov9e5IWwO7l6boLys/mNUk1M9uic1AlTMhtOw9geh61gnbZF45SwYU9nf/xWBYD
-	 cHQ86b1UvzcFbUhK1rrU05VP3VHMhKhMsrE0L69Nj9bvRvTJtYU+Gas5desrQnal5w
-	 lyfA01pZvXLuwCr0J+p9zEqjITOCoTjtZp4/SDg72tfw3iFrLduzHS+afuWFvv1Adu
-	 L6r2WV6EVwP3g==
-Date: Fri, 5 Dec 2025 13:59:26 +0000
-From: Daniel Thompson <danielt@kernel.org>
-To: Alejandro Colomar <alx@kernel.org>
-Cc: jason@zx2c4.com, ardb+git@google.com, ardb@kernel.org, arnd@arndb.de,
-	ebiggers@kernel.org, kees@kernel.org, linux-crypto@vger.kernel.org,
-	torvalds@linux-foundation.org
-Subject: Re: [RFC PATCH] libcrypto/chachapoly: Use strict typing for fixed
- size array arguments
-Message-ID: <aTLlPhIAbQZqOVjb@aspen.lan>
-References: <aRi6zrH3sGyTZcmf@zx2c4.com>
- <sjyh6hnw54pwzwyzegoaq3lu7g7hnvneq3bkc5cvno7chnfkv5@lz4dwbsv3zsf>
- <aTByNvAYRhZI07cJ@aspen.lan>
- <o3yq4m3ihmynvcrrp6u2xshngxtgso2cqrdhfazyxxm7udvs46@wzyl6qu4lmqt>
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="YP8j3FNJ"
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <david.laight@runbox.com>)
+	id 1vRWcB-0041WR-OL; Fri, 05 Dec 2025 15:16:55 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
+	 s=selector2; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
+	References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date;
+	bh=Fy+YJPeJ4mI8qzgXHembqRChAk+0MsyrPaoiU7cZm54=; b=YP8j3FNJlHy87EcfeYDWLKs4yP
+	34duV/JXVGGbByC3nkUUXtTXX5KSDl/yNrdoFpL6SpLKCz4u0QhQ2BFZnpzuLnp/U/RFtApoiaqnS
+	o2RRC0i+nWYU67Vq547TKCCEEkcSS+a+dbEz1BM+mt4fIqb0yf+htgudcccVGh2LqrrBEkSS6ssw2
+	uqDP82IaLdwajns12/5g0AvCCj/K/GdqOl1WP2aNFRSHVqxyFs8p4i0jtnm7bj8pe9z7w6U/9n64e
+	sz4O4IVfAXAE9tNqxKKosPTZwRzeBRYuBoacL08fFK35m05+TUH2riQ8Z8pzKgqCGQOMUwwo5quA3
+	K+zUR5MQ==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <david.laight@runbox.com>)
+	id 1vRWcA-0001DL-LW; Fri, 05 Dec 2025 15:16:54 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vRWc3-0033Iy-9e; Fri, 05 Dec 2025 15:16:47 +0100
+Date: Fri, 5 Dec 2025 14:16:44 +0000
+From: david laight <david.laight@runbox.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard
+ Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Thorsten Blum
+ <thorsten.blum@linux.dev>, Nathan Chancellor <nathan@kernel.org>, Nick
+ Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling
+ <morbo@google.com>, Justin Stitt <justinstitt@google.com>, David Sterba
+ <dsterba@suse.com>, llvm@lists.linux.dev, linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH] lib/crypto: blake2b: Roll up BLAKE2b round loop on
+ 32-bit
+Message-ID: <20251205141644.313404db@pumpkin>
+In-Reply-To: <20251203190652.144076-1-ebiggers@kernel.org>
+References: <20251203190652.144076-1-ebiggers@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <o3yq4m3ihmynvcrrp6u2xshngxtgso2cqrdhfazyxxm7udvs46@wzyl6qu4lmqt>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Dec 03, 2025 at 07:01:39PM +0100, Alejandro Colomar wrote:
-> Hi Daniel,
->
-> On Wed, Dec 03, 2025 at 05:24:06PM +0000, Daniel Thompson wrote:
-> [...]
-> > > Be careful about [static n].  It has implications that you're probably
-> > > not aware of.  Also, it doesn't have some implications you might expect
-> > > from it.
-> > >
-> > > -  [static n] on an argument implies __attribute__((nonnull())) on that
-> > >    argument; it means that the argument can't be null.  You may want to
-> > >    make sure you're using -fno-delete-null-pointer-checks if you use
-> > >    [static n].
-> > >
-> > > -  [static n] implies that n>0.  You should make sure that n>0, or UB
-> > >    would be triggered.
-> > >
-> > > -  [n] means two promises traditionally:
-> > >    -  The caller will provide at least n elements.
-> > >    -  The callee will use no more than n elements.
-> > >    However, [static n] only carries the first promise.  According to
-> > >    ISO C, the callee may access elements beyond that.
-> >
-> > This description implies that [n] carries promises that [static n] does
-> > not. However you are comparing the "traditional" behaviour (that is
-> > well beyond the scope of the standard) on one side with ISO C behaviour
-> > on the other.
-> >
-> > It makes sense to compare ISO C behavior for [n] (where neither of the
-> > above promises applies) with ISO C behaviour for [static n]...
->
-> Clang seems to implement the ISO C behavior, so in retrospective, the
-> comparison I did seems appropriate.  By moving from the GCC/traditional
-> behavior to the Clang/ISO one, a project would be lowering quality.
+On Wed,  3 Dec 2025 11:06:52 -0800
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-I'm still rather dubious about confusing the optimization opportunities
-afforded by the ISO C standard with the diagnostic messages that both
-gcc and clang can produce (and are beyond the scope of the standard).
+> BLAKE2b has a state of 16 64-bit words.  Add the message data in and
+> there are 32 64-bit words.  With the current code where all the rounds
+> are unrolled to enable constant-folding of the blake2b_sigma values,
+> this results in a very large code size on 32-bit kernels, including a
+> recurring issue where gcc uses a large amount of stack.
+> 
+> There's just not much benefit to this unrolling when the code is already
+> so large.  Let's roll up the rounds when !CONFIG_64BIT.  Then, remove
+> the now-unnecessary override of the stack frame size warning.
+> 
+> Code size improvements for blake2b_compress_generic():
+> 
+>                   Size before (bytes)    Size after (bytes)
+>                   -------------------    ------------------
+>     i386, gcc           27584                 3632
+>     i386, clang         18208                 3248
+>     arm32, gcc          19912                 2860
+>     arm32, clang        21336                 3344
+> 
+> Running the BLAKE2b benchmark on a !CONFIG_64BIT kernel on an x86_64
+> processor shows a 16384B throughput change of 351 => 340 MB/s (gcc) or
+> 442 MB/s => 375 MB/s (clang).  So clearly not much of a slowdown either.
+> But also that microbenchmark also effectively disregards cache usage,
+> which is important in practice and is far better in the smaller code.
 
-However, let's agree to disagree on that, since it doesn't change the
-outcome: it *is* useful to compare the behaviour of the two compilers.
+Any idea how many clocks those are for each G() ?
+That number would give an idea of the actual 'quality' of the code.
 
+A quick count shows 14 alu operations with a register dependency
+chain length of 12.
+So however hard you try G() will take 12 clocks (on 64bit) provided
+all the instructions have no extra result latency (probably true).
+That means there is plenty of time for two memory reads for each of the
+m[*b2b_sigma++] accesses (including the increment).
+On x86-64 there aren't enough registers to hold all of v[], so there also
+need to be another 4 reads and writes for each G().
+Total 8 memory reads, 4 memory writes and 12 alu clocks - shouldn't be
+too hard to get that to run in 12 clocks.
 
-> Plus, there's still the issues about n>0 and nonnullness.
->
-> The only reason why it makes some sense to use [static n] in the kernel
-> is because it's moving from no-rules to some rules.  But the real
-> problem here is that the kernel needs to turn GCC's -Wstringop-overflow
-> off, and that's what the kernel do some effort to re-enable.
->
-> If you show a minimal reproducer of what the problem is with
-> -Wstringop-overflow, I may be able to help with that.
+Because of the long register dependency chain there will be gains from
+running two G() in parallel.
+I don't think you'll get two to run in 12 clocks on x86-64.
+While two reads and a write can be done in each clock on later cpu it
+definitely needs a 'following wind'.
+Arm-64 is another matter, that should be able to hold all of v[] in
+registers throughout.
+(Although the memcpy(v, ctx->h, 64) probably needs replacing with 8
+separate assignments.)
 
-I'm not 100% caught up on the history but I think this was the issue
-that prompted -Wstringop-overflow to be disabled by default (and
-includes a minimal reproducer):
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=113214
+Note that executing two G() in parallel probably requires the source
+interleave the instructions for the two G() rather than relying on the
+cpu's 'out of order execution' to do all the work
+(Intel cpu might manage it...).
 
+While all that is a lot of changes to get right, I suspect that just:
+	const u8 *b2b_sigma = blake2b_sigma[0];
 
-> In general, [static n] is bogus and never to be used, except temporarily
-> while other issues get fixed, like in this case.
->
-> > >    GCC, as a quality implementation, enforces the second promise too,
-> > >    but this is not portable; you should make sure that all supported
-> > >    compilers enforces that as an extension.
-> >
-> > ... and equally it makes sense to compare the gcc/clang warnings for
-> > [n] versus [static n] as recommended here.
->
-> Clang is really bad at both [n] and [static n].  If you need to rely on
-> clang for array bounds, you're screwed.
+#define G(a, b, c, d) \
+	a += b + m[b2b_sigma[0]];
+	...
+	a += b + m[b2b_sigma[1]];
+	b2b_sigma += 2;
+	...
 
-What do you mean by clang is really bad at [static n]? Most of this
-thread is based on the observation that clang gives *useful*
-diagnostics for [static n] that are not issued for [n].
+will remove almost all the benefit from unrolling the 'ROUND' loop.
+Especially since the loop termination condition can use b2b_sigma.
 
+Everything except x86 will also benefit from multiplying all of
+blake2b_sigma by 8 and doing *(u64 *)((u8)m + b2b_sigma[0]) for
+the accesses.
 
-> > However it should not be motivated by [static n] carrying few promises
-> > than [n], especially given gcc/clang's enforcement of the promises is
-> > a best effort static check that won't cover all cases anyway.
->
-> GCC is quite good at those diagnostics; it might not cover all cases,
-> but that's better than what ISO or Clang will promise.
+32bit is another matter entirely.
+I think gcc can handle u64 as either a pair of 32bit values or as
+a register-pair (so pairs of simode ops, or single dimode ones).
+The code seems better if you stop it doing the latter, but breathe
+on something that joins up the two parts and you are stuck with it.
 
-gcc certainly can generate warnings we don't get with clang, so it's
-just a question of whether the false positives are enough to stop it
-from being quite good!
+I can't help thinking that swapping the order of the bit-pairs in the
+index to v[] would make it easier to write ROUND() as a real loop.
+The code size (and I-cache) reduction might make up for any losses,
+especially since the code is really memory limited (because of the
+accesses to v[]) rather than alu limited - so a few more alu
+instructions may make little difference.
 
-I was curious is anything has changed in the last two years so I
-compiled v6.18 allmodconfig with -Wstringop-overflow (without the
-thread sanitizer which causes the known problem mentioned above
-right the way up to gcc-15.2). I ran check across five architectures
-(arm64, arm, riscv, s390 & x86) since we know there have been
-architecture dependant differences. Not all the builds have gone
-through but unless there are regressions in newer compilers then
-I've only seen two -Wstringop-overflow warnings.
+	David
 
-First is a clear false positive (of the "if something impossible
-happens then something bad might happen" variety) which, happily, is
-only triggered on gcc-12/aarch64 and appears to be fixed from gcc-13
-onward.
-
-Second isn't a kernel bug but it's arguably not a false positive
-either. I think it could be reasonably fixed with source code changes.
-See https://elixir.bootlin.com/linux/v6.18/source/net/sctp/auth.c#L645
-
-Overall I'll look a little deeper to try and see if there are any
-other ways to break -Werror builds with gcc-13 or later.
-
-
-Daniel.
