@@ -1,50 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FBC275861;
-	Fri,  5 Dec 2025 04:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685074A35;
+	Fri,  5 Dec 2025 05:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764909679; cv=none; b=lBmi5jnaL8o5VJhqFKChpYYqSMKiA2WwjfwCo0sY5nRtu1zVmiPw2OnpaxXB/JFOApFYlDDxSC62J7kxxOc2DRfCKib3G8BGSxJWB4tPuOjzHdfhLwOolKm/lsP15qxyaeLo+IJAujP1PBK7p2fKkskKbgRDvb7AQPD+eppMrPk=
+	t=1764910844; cv=none; b=gJijnegDFPXB2keQj+q5xKqjn0vccsTxoLRD3i+Sly49jbR5GGwbUvx9QdQmcMDXlXUDXGDKtJRLdC5fgjVFBgXGJC7WzcEjUUPWBsgtpN2W6QDFZN5xnesj9p77GKOZS9+n6DPTIyzIZvnB5ZnBLKvJrs78BCvDtk1Zkpj+73o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764909679; c=relaxed/simple;
-	bh=GdEhun3cR/92HV9I3xif4vkj50h42eNKF9Jmt5SKwaw=;
+	s=arc-20240116; t=1764910844; c=relaxed/simple;
+	bh=kN54tH5UrzydrUIGyDiyvO626n7A2/Oz/NhOOG2V9uo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hIw0tBC+NQQGKL8ejfHQhpH4wugMVnSRwJSUs26bvVlzRCpd/X7+p0YBfRR3EnTU9Gk7YMEvWh2Xtc7twtyC6zPDjwKg7OohfFtCFB7PilGGb8AGBv5nojWntxEXaXtFB95AT8hKv3hzHM0G208ktxmtXiQBeSdPsqo+WuRVQRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jaZN2bLL; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=YcoYq5U7yeRf6oRh/A3HDhDDITVwnChrMxaZRSrR1c/M0NM/9pNZ6dPHHn/Y4iyqwd/iOmCLuuKxzNs2Lh7S/qYmQOA64REskcnTdLm+ga5ziv9RqqBPF6D9l7RJXs0D4X9WrCa04R7ZMJt01eNsPAyaAdwXVvC25PrZGacpXXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AkPaTak3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jaZN2bLL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7529CC4CEF1;
-	Fri,  5 Dec 2025 04:41:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AkPaTak3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B4DDC4CEF1;
+	Fri,  5 Dec 2025 05:00:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764909678;
-	bh=GdEhun3cR/92HV9I3xif4vkj50h42eNKF9Jmt5SKwaw=;
+	s=k20201202; t=1764910843;
+	bh=kN54tH5UrzydrUIGyDiyvO626n7A2/Oz/NhOOG2V9uo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jaZN2bLLhUud8G1DgWgzUjUfmjiP1OM0+DAGo1kjyTO9Xmj2eHjbBPc/0FsISYlFV
-	 NdxdC9+FXaH9hU1b3Pl9aMDjSLxRbgM0b45/AHxepqSU2bEQp59JFyYKYUDb/qsUXL
-	 bwpN9DRnuBwxZ0W0w5rMpWpr8y+prn4m/l+jSoSEOqz4alwI02h216p5uagmET5zxp
-	 gwGe+R9jpZ+boVmJYe/yOAkFzUi6fDHwSVC9zyIs694hHH0SxlPc+EFfsykJc4RdVL
-	 1Ml/DW+Zni7a49xx5Pb2GlxE7GZDELVxmmPChUDvKvc/lYpgBBEAoyWFcyv58UxWkE
-	 5UNIsU8JTtoaw==
-Date: Thu, 4 Dec 2025 20:39:24 -0800
+	b=AkPaTak3ZhHP1f+KoGz8dNjzJ8iJT1MsTDqr1g3aFKyt7ycZdmRkipFP1sXE7wNzm
+	 agTsoiz1AN1CccSikYvT1IzMAoT7HfaW/xAg06FZIsJ3vaFnhr4ySK3LZpzGplyF1n
+	 UxyhRjzE1MA6y5qRnBYziheLyTMPGGPjWMr9ai/fGBcH4v5jrrlYNdR0rmzM/JDLlq
+	 9CvyDVC0zU1n2Ywl4GXsmcu7CNMhj6XZnbKaraxJVTdVdNNMJhnhUjOdwyO6r4QpGF
+	 lDiIzxBXFwX+eBQ9Vvb+m3IdOiKEQ29pL+r1IDesQlHek58VDtymtzqyTbHYAKQsXn
+	 itJbU8oHJNWtg==
+Date: Thu, 4 Dec 2025 20:58:49 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	linux-perf-users@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	James Clark <james.clark@linaro.org>,
-	Fangrui Song <maskray@sourceware.org>,
-	Pablo Galindo <pablogsal@gmail.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] perf genelf: Switch from SHA-1 to BLAKE2s for build ID
- generation
-Message-ID: <20251205043924.GA6421@sol>
-References: <20251205043121.62356-1-ebiggers@kernel.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	David Laight <david.laight@runbox.com>,
+	David Sterba <dsterba@suse.com>, llvm@lists.linux.dev,
+	linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH] lib/crypto: blake2b: Roll up BLAKE2b round loop on 32-bit
+Message-ID: <20251205045849.GB6421@sol>
+References: <20251203190652.144076-1-ebiggers@kernel.org>
+ <aTHLUIjqCHlRs8rr@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,24 +52,62 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251205043121.62356-1-ebiggers@kernel.org>
+In-Reply-To: <aTHLUIjqCHlRs8rr@zx2c4.com>
 
-On Thu, Dec 04, 2025 at 08:31:21PM -0800, Eric Biggers wrote:
-> ---
->  tools/perf/tests/util.c   |  78 ++++++++++++--------
->  tools/perf/util/Build     |   2 +-
->  tools/perf/util/blake2s.c | 151 ++++++++++++++++++++++++++++++++++++++
->  tools/perf/util/blake2s.h |  73 ++++++++++++++++++
->  tools/perf/util/genelf.c  |  58 +++++++--------
->  tools/perf/util/sha1.c    |  97 ------------------------
->  tools/perf/util/sha1.h    |   6 --
->  7 files changed, 302 insertions(+), 163 deletions(-)
->  create mode 100644 tools/perf/util/blake2s.c
->  create mode 100644 tools/perf/util/blake2s.h
->  delete mode 100644 tools/perf/util/sha1.c
->  delete mode 100644 tools/perf/util/sha1.h
+On Thu, Dec 04, 2025 at 12:56:32PM -0500, Jason A. Donenfeld wrote:
+> On Wed, Dec 03, 2025 at 11:06:52AM -0800, Eric Biggers wrote:
+> >  	G(r, 4, v[0], v[ 5], v[10], v[15]); \
+> >  	G(r, 5, v[1], v[ 6], v[11], v[12]); \
+> >  	G(r, 6, v[2], v[ 7], v[ 8], v[13]); \
+> >  	G(r, 7, v[3], v[ 4], v[ 9], v[14]); \
+> >  } while (0)
+> > -		ROUND(0);
+> > -		ROUND(1);
+> > -		ROUND(2);
+> > -		ROUND(3);
+> > -		ROUND(4);
+> > -		ROUND(5);
+> > -		ROUND(6);
+> > -		ROUND(7);
+> > -		ROUND(8);
+> > -		ROUND(9);
+> > -		ROUND(10);
+> > -		ROUND(11);
+> > +
+> > +#ifdef CONFIG_64BIT
+> > +		/*
+> > +		 * Unroll the rounds loop to enable constant-folding of the
+> > +		 * blake2b_sigma values.  Seems worthwhile on 64-bit kernels.
+> > +		 * Not worthwhile on 32-bit kernels because the code size is
+> > +		 * already so large there due to BLAKE2b using 64-bit words.
+> > +		 */
+> > +		unrolled_full
+> > +#endif
+> > +		for (int r = 0; r < 12; r++)
+> > +			ROUND(r);
+> >  
+> >  #undef G
+> >  #undef ROUND
+> 
+> Since you're now using `unrolled_full`, ROUND doesn't need to be a macro
+> anymore. You can just do:
+> 
+>   unrolled_full
+>   for (int r = 0; r < 12; r++) {
+>     G(r, 0, v[0], v[ 4], v[ 8], v[12]);
+>     G(r, 1, v[1], v[ 5], v[ 9], v[13]);
+>     G(r, 2, v[2], v[ 6], v[10], v[14]);
+>     G(r, 3, v[3], v[ 7], v[11], v[15]);
+>     G(r, 4, v[0], v[ 5], v[10], v[15]);
+>     G(r, 5, v[1], v[ 6], v[11], v[12]);
+>     G(r, 6, v[2], v[ 7], v[ 8], v[13]);
+>     G(r, 7, v[3], v[ 4], v[ 9], v[14]);
+>   }
+> 
+> Likewise, you can simplify the blake2s implementation in the same way
+> (but don't make the unrolled_full conditional there, obviously).
+> `unrolled_full` seems like a nice way of doing this compared to macros.
 
-Forgot to mention: this applies to next-20251204, or alternatively to
-the latest perf-tools-next (d509d14fff783969904954eaf5d94f092c6fce19)
+Yes, good idea.  I'll do that.
 
 - Eric
