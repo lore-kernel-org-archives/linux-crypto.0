@@ -1,136 +1,162 @@
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE62225A645
-	for <linux-crypto@vger.kernel.org>; Fri,  5 Dec 2025 13:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0CC32FA24
+	for <linux-crypto@vger.kernel.org>; Fri,  5 Dec 2025 13:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764940001; cv=none; b=kgRopDOgdyv6Mrmb0VpF6vi09895e74/cm7fM6g8FLd/dK7YPgfTVPe/XqsAjqfjBnkzTSlmjtCypAth7sYVONHl3TpIHHfZBRO998NCGq98HWi+6q4StRD4dw0O1tH3/vtyO/Fbi6AqpxM9MLBnENHDVogTAroPqj1l1O1/Sbk=
+	t=1764943172; cv=none; b=NOwSzzKIR3OvLchqCforZNV3aMWq+91Nziv0eL5C7vAD5LT6aTRshh1TGRAHn82H+h13Py6Ch95GxIgZnJYY/MMX4Kj3eV5Uwt5IGwoxoO19UcyS5KFLijZpB7ScD6IseCkSwFnHDyva8Z1fzRjaONR4wOFt3XZXZQOMksmZ9K4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764940001; c=relaxed/simple;
-	bh=1EBb19I7TXyr0Wc23Pl3IU7EwdnF5SMRtXHCjSD0p9o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MdMEYpCAXvkuY5nWpHqYk/LYSigjexsCmmwn9efI5pYqIiM9vWDIXEko5EaQowU4/KzcowhyTk6InLKzZGKfy3Rf2DYcfGVJmZXiPs1nZZ3op0siwgo70GJcEMvvlDyBvpUBGhV/BBL1rCAGOFCnBaP3bKdGCThpdMMLKw0YDMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gompa.dev; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gompa.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-657230e45e8so1598998eaf.1
-        for <linux-crypto@vger.kernel.org>; Fri, 05 Dec 2025 05:06:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764939997; x=1765544797;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=aMjf00fvZ2LGfiVehlweJ/JHTaRsyCeBS7wev6/MCNc=;
-        b=YewqzRrGBsAyKH3epV3T/OFkCxxrNy4gn23P0VozU06jGMhJqcuchpjmzqX/HVTojh
-         Ib0MhB6D5Ovel9XKwDpsTqwkplVTfiu9UvyAHsVmh5qMLDBcAIeJGDlrpnzbyDSvup5p
-         461XbD3LCHprM7H0+KJWtqmRn32nhbHvJNVCzOPqtKBeaoJseD03vOqbYhd4PIIxHI9G
-         VEcBH5PzR7wDqXrIZybPk9eZ8A83E1vR8zRNPJuJWLwu3jLD+/KRJAjauKOy0bMgW6oZ
-         HBtc5hQKvb90wVaUdCftkp8LEZ8+fOTVDX88rHhK8ggF/yc0cuTx0+2GIYglt7SMe9/r
-         GHKw==
-X-Forwarded-Encrypted: i=1; AJvYcCW5Y60aj00UxRX/3mQqIQQAL8mGXXF3h9W/UG7CspCkBbHKZmjjnBgzxn8NY5SR7Mp/uXpcUYKoUn7jI9I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOnWtJyF+7k67mtjjUtTLP7EEvDkCNGcBWef2aPD3fc2hYkMbE
-	G6NHv2Se34we9y8+BSSPZXc+eaBsHIRPI7auLjenCuZcLcfib61cHNglZiKNVQ==
-X-Gm-Gg: ASbGncsQufQI6ghfpjysShEsw46kG2W50oY25dR9vmsjtYbk7ipiYvg3xAgbS37cEUl
-	/aSusMV10ksc6Uo3kkGcg2RvVr6cfryyP4L0qDvN4GP6oNQtz0GHP53boEs4m423nRoJUhccTTz
-	vzstvRukNFjC4KuY/q3bREgCymKPAhLmNrHpICuwiaQ7InTTT7W60wYUoplxQaL4R8ODLztoC+Y
-	FQyGwzgkMW2x37+bwzTlc1HpQrLdFu1C7XHqpZnJ1BSncut+gi+byahAbx1RsCdmRdZglLq6UAv
-	2UICGgtPpVhB66d4j2Fx+WYhk2BvhNXNGxQRaQfpWUVCzczeOvDby0/pTXDt0q8rO9EUzVTGbPF
-	XdY2q4NWESkHvW8aMR2QPNp5b71+pL8iSIGXg9YlhntIZFVWfhis1KRXBPX37Tc3WIEmkzZJOZP
-	CZlRM91p1dn5DNfVegUAgAwzYGHarqasARnLnimHxcpeRk8Zd3m7ox6f13L0EaKi/SKp7ayzxn
-X-Google-Smtp-Source: AGHT+IFKEKkXzGJMiUuoIWpJeLSSUZ3tx5WrjCRb/GojVzHuD5PCFtW2cwxcm/h+yDGGuGRRMxv4ZA==
-X-Received: by 2002:a05:6808:13cf:b0:450:d4b5:3527 with SMTP id 5614622812f47-45378f717cemr3659112b6e.24.1764939996888;
-        Fri, 05 Dec 2025 05:06:36 -0800 (PST)
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com. [209.85.210.53])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3f50b584778sm3266286fac.16.2025.12.05.05.06.36
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Dec 2025 05:06:36 -0800 (PST)
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7c77ed036c3so1994730a34.0
-        for <linux-crypto@vger.kernel.org>; Fri, 05 Dec 2025 05:06:36 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUK9gfuKeHYlNG3AU8J8Lgk27/SGERmv21CjLNZMuIRaQNC0iTFJTNR6F2kjU1pt0JOEyUbfEowOV95jsM=@vger.kernel.org
-X-Received: by 2002:a05:6830:310c:b0:7c7:26e:4686 with SMTP id
- 46e09a7af769-7c957c0afe7mr6091417a34.5.1764939996182; Fri, 05 Dec 2025
- 05:06:36 -0800 (PST)
+	s=arc-20240116; t=1764943172; c=relaxed/simple;
+	bh=4IXfqyjXtHK9jCKM3TtYWBqAAZ/9LBL9OTlbhk3UYKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=btDTZXUriC4SIcYzrtqpAqhSvPeClu21X0RcuHQxy51DsdGJ6XhkNFajN4/bYS5rHAqqt5WRLlWOIE16jNoI14FwrmExLOm5RZV5dCjjHBp195jhR3j9rl1onD3ywimWtk0xMtjyQHzCB4tApc8TOuR/S/nfGtoHoCHpvYJssR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dFrlkz+v; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dFrlkz+v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA917C4CEF1;
+	Fri,  5 Dec 2025 13:59:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764943171;
+	bh=4IXfqyjXtHK9jCKM3TtYWBqAAZ/9LBL9OTlbhk3UYKs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dFrlkz+vPNLVd9tp/GICOAtq8DpktjY24MWU4BBdeQ4OyZ0OFkiu5GdFLZ7XdgdiI
+	 mZN03eNgisHNmtfB0rp42GKZyzN3NlbUCW22EAaKsJlIA7Gb5r+jbBVOX4yzRg42si
+	 f+8Ov9e5IWwO7l6boLys/mNUk1M9uic1AlTMhtOw9geh61gnbZF45SwYU9nf/xWBYD
+	 cHQ86b1UvzcFbUhK1rrU05VP3VHMhKhMsrE0L69Nj9bvRvTJtYU+Gas5desrQnal5w
+	 lyfA01pZvXLuwCr0J+p9zEqjITOCoTjtZp4/SDg72tfw3iFrLduzHS+afuWFvv1Adu
+	 L6r2WV6EVwP3g==
+Date: Fri, 5 Dec 2025 13:59:26 +0000
+From: Daniel Thompson <danielt@kernel.org>
+To: Alejandro Colomar <alx@kernel.org>
+Cc: jason@zx2c4.com, ardb+git@google.com, ardb@kernel.org, arnd@arndb.de,
+	ebiggers@kernel.org, kees@kernel.org, linux-crypto@vger.kernel.org,
+	torvalds@linux-foundation.org
+Subject: Re: [RFC PATCH] libcrypto/chachapoly: Use strict typing for fixed
+ size array arguments
+Message-ID: <aTLlPhIAbQZqOVjb@aspen.lan>
+References: <aRi6zrH3sGyTZcmf@zx2c4.com>
+ <sjyh6hnw54pwzwyzegoaq3lu7g7hnvneq3bkc5cvno7chnfkv5@lz4dwbsv3zsf>
+ <aTByNvAYRhZI07cJ@aspen.lan>
+ <o3yq4m3ihmynvcrrp6u2xshngxtgso2cqrdhfazyxxm7udvs46@wzyl6qu4lmqt>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251205070454.118592-1-ebiggers@kernel.org>
-In-Reply-To: <20251205070454.118592-1-ebiggers@kernel.org>
-From: Neal Gompa <neal@gompa.dev>
-Date: Fri, 5 Dec 2025 08:05:59 -0500
-X-Gmail-Original-Message-ID: <CAEg-Je_4-vcyTg+aYA3nTsQ9ekBBZ1h89u9Qk_ZGQ_mGS_5Y4A@mail.gmail.com>
-X-Gm-Features: AWmQ_bnWVIauyhohzQgsmdPw2A8fSpbERJ7LqNlJnEyvjZSg3WiSLOfT0DPM3mM
-Message-ID: <CAEg-Je_4-vcyTg+aYA3nTsQ9ekBBZ1h89u9Qk_ZGQ_mGS_5Y4A@mail.gmail.com>
-Subject: Re: [PATCH v2] btrfs: switch to library APIs for checksums
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>, Chris Mason <clm@fb.com>, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Ard Biesheuvel <ardb@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <o3yq4m3ihmynvcrrp6u2xshngxtgso2cqrdhfazyxxm7udvs46@wzyl6qu4lmqt>
 
-On Fri, Dec 5, 2025 at 2:21=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> w=
-rote:
+On Wed, Dec 03, 2025 at 07:01:39PM +0100, Alejandro Colomar wrote:
+> Hi Daniel,
 >
-> Make btrfs use the library APIs instead of crypto_shash, for all
-> checksum computations.  This has many benefits:
+> On Wed, Dec 03, 2025 at 05:24:06PM +0000, Daniel Thompson wrote:
+> [...]
+> > > Be careful about [static n].  It has implications that you're probably
+> > > not aware of.  Also, it doesn't have some implications you might expect
+> > > from it.
+> > >
+> > > -  [static n] on an argument implies __attribute__((nonnull())) on that
+> > >    argument; it means that the argument can't be null.  You may want to
+> > >    make sure you're using -fno-delete-null-pointer-checks if you use
+> > >    [static n].
+> > >
+> > > -  [static n] implies that n>0.  You should make sure that n>0, or UB
+> > >    would be triggered.
+> > >
+> > > -  [n] means two promises traditionally:
+> > >    -  The caller will provide at least n elements.
+> > >    -  The callee will use no more than n elements.
+> > >    However, [static n] only carries the first promise.  According to
+> > >    ISO C, the callee may access elements beyond that.
+> >
+> > This description implies that [n] carries promises that [static n] does
+> > not. However you are comparing the "traditional" behaviour (that is
+> > well beyond the scope of the standard) on one side with ISO C behaviour
+> > on the other.
+> >
+> > It makes sense to compare ISO C behavior for [n] (where neither of the
+> > above promises applies) with ISO C behaviour for [static n]...
 >
-> - Allows future checksum types, e.g. XXH3 or CRC64, to be more easily
->   supported.  Only a library API will be needed, not crypto_shash too.
->
-> - Eliminates the overhead of the generic crypto layer, including an
->   indirect call for every function call and other API overhead.  A
->   microbenchmark of btrfs_check_read_bio() with crc32c checksums shows a
->   speedup from 658 cycles to 608 cycles per 4096-byte block.
->
-> - Decreases the stack usage of btrfs by reducing the size of checksum
->   contexts from 384 bytes to 240 bytes, and by eliminating the need for
->   some functions to declare a checksum context at all.
->
-> - Increases reliability.  The library functions always succeed and
->   return void.  In contrast, crypto_shash can fail and return errors.
->   Also, the library functions are guaranteed to be available when btrfs
->   is loaded; there's no longer any need to use module softdeps to try to
->   work around the crypto modules sometimes not being loaded.
->
-> - Fixes a bug where blake2b checksums didn't work on kernels booted with
->   fips=3D1.  Since btrfs checksums are for integrity only, it's fine for
->   them to use non-FIPS-approved algorithms.
->
-> Note that with having to handle 4 algorithms instead of just 1-2, this
-> commit does result in a slightly positive diffstat.  That being said,
-> this wouldn't have been the case if btrfs had actually checked for
-> errors from crypto_shash, which technically it should have been doing.
->
-> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->
-> v2: rebased onto latest mainline, now that both the crypto library and
->     btrfs pull requests for 6.19 have been merged
->
->  fs/btrfs/Kconfig       |  8 ++--
->  fs/btrfs/compression.c |  1 -
->  fs/btrfs/disk-io.c     | 68 ++++++++----------------------
->  fs/btrfs/file-item.c   |  4 --
->  fs/btrfs/fs.c          | 96 ++++++++++++++++++++++++++++++++++++------
->  fs/btrfs/fs.h          | 23 +++++++---
->  fs/btrfs/inode.c       | 10 ++---
->  fs/btrfs/scrub.c       | 16 +++----
->  fs/btrfs/super.c       |  4 --
->  fs/btrfs/sysfs.c       |  6 +--
->  10 files changed, 133 insertions(+), 103 deletions(-)
->
+> Clang seems to implement the ISO C behavior, so in retrospective, the
+> comparison I did seems appropriate.  By moving from the GCC/traditional
+> behavior to the Clang/ISO one, a project would be lowering quality.
 
-This patch looks reasonable to me and seems to work as expected.
+I'm still rather dubious about confusing the optimization opportunities
+afforded by the ISO C standard with the diagnostic messages that both
+gcc and clang can produce (and are beyond the scope of the standard).
 
-Reviewed-by: Neal Gompa <neal@gompa.dev>
+However, let's agree to disagree on that, since it doesn't change the
+outcome: it *is* useful to compare the behaviour of the two compilers.
 
 
---=20
-=E7=9C=9F=E5=AE=9F=E3=81=AF=E3=81=84=E3=81=A4=E3=82=82=E4=B8=80=E3=81=A4=EF=
-=BC=81/ Always, there's only one truth!
+> Plus, there's still the issues about n>0 and nonnullness.
+>
+> The only reason why it makes some sense to use [static n] in the kernel
+> is because it's moving from no-rules to some rules.  But the real
+> problem here is that the kernel needs to turn GCC's -Wstringop-overflow
+> off, and that's what the kernel do some effort to re-enable.
+>
+> If you show a minimal reproducer of what the problem is with
+> -Wstringop-overflow, I may be able to help with that.
+
+I'm not 100% caught up on the history but I think this was the issue
+that prompted -Wstringop-overflow to be disabled by default (and
+includes a minimal reproducer):
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=113214
+
+
+> In general, [static n] is bogus and never to be used, except temporarily
+> while other issues get fixed, like in this case.
+>
+> > >    GCC, as a quality implementation, enforces the second promise too,
+> > >    but this is not portable; you should make sure that all supported
+> > >    compilers enforces that as an extension.
+> >
+> > ... and equally it makes sense to compare the gcc/clang warnings for
+> > [n] versus [static n] as recommended here.
+>
+> Clang is really bad at both [n] and [static n].  If you need to rely on
+> clang for array bounds, you're screwed.
+
+What do you mean by clang is really bad at [static n]? Most of this
+thread is based on the observation that clang gives *useful*
+diagnostics for [static n] that are not issued for [n].
+
+
+> > However it should not be motivated by [static n] carrying few promises
+> > than [n], especially given gcc/clang's enforcement of the promises is
+> > a best effort static check that won't cover all cases anyway.
+>
+> GCC is quite good at those diagnostics; it might not cover all cases,
+> but that's better than what ISO or Clang will promise.
+
+gcc certainly can generate warnings we don't get with clang, so it's
+just a question of whether the false positives are enough to stop it
+from being quite good!
+
+I was curious is anything has changed in the last two years so I
+compiled v6.18 allmodconfig with -Wstringop-overflow (without the
+thread sanitizer which causes the known problem mentioned above
+right the way up to gcc-15.2). I ran check across five architectures
+(arm64, arm, riscv, s390 & x86) since we know there have been
+architecture dependant differences. Not all the builds have gone
+through but unless there are regressions in newer compilers then
+I've only seen two -Wstringop-overflow warnings.
+
+First is a clear false positive (of the "if something impossible
+happens then something bad might happen" variety) which, happily, is
+only triggered on gcc-12/aarch64 and appears to be fixed from gcc-13
+onward.
+
+Second isn't a kernel bug but it's arguably not a false positive
+either. I think it could be reasonably fixed with source code changes.
+See https://elixir.bootlin.com/linux/v6.18/source/net/sctp/auth.c#L645
+
+Overall I'll look a little deeper to try and see if there are any
+other ways to break -Werror builds with gcc-13 or later.
+
+
+Daniel.
