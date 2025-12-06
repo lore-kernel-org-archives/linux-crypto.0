@@ -1,102 +1,50 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6BF153598
-	for <linux-crypto@vger.kernel.org>; Sat,  6 Dec 2025 11:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A621DEFE9;
+	Sat,  6 Dec 2025 19:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765021551; cv=none; b=X6RTSpb7VF0L50zdydPHTB/vguKluvQvgjFqmqOyEaRbkFj3aIYSnTXZFuCOGGHA5tMNpHECfBQs4xqFN/eHubBL2rMdF0rm3kDP325P44boOiMKru2FnDni+NV/k4QQuO9BmcrUVpJxPyVnOW+Nh6UDIycFqt5Xd8WYtCtRMzw=
+	t=1765051017; cv=none; b=rbTHptzOUYE7i1y+VLwhETFPLjfhKBXdMbYVBsVttSijUwojqsGq60wr7p36znLkGFx2vy5jIiaYW8aoBCt3QHtEL7p1xCsOmCpACaNz7CetnGfu1HZohJLxdSA9qdz6dosJdpHy1v2yhIwEgyyDIpzkRsoDCPnentVtq0aKUzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765021551; c=relaxed/simple;
-	bh=yfJjYI1TKTl+dZ7vuy+EKk5k/Wwc7PCUSaLTtm6n/TY=;
+	s=arc-20240116; t=1765051017; c=relaxed/simple;
+	bh=9FQJgpJnEx4MT5jkFe9SlUQLuoOyH3jpPlTZf50X1Aw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RoCgNKW12xkQWITG2vp75DP/C1v80KZOkZ2paByeTIoLxMmA9s+kUdINR+v1vPjvRcb9OS/o45fgZl7otNcexAatxcR97HycXQVuFDoC9OgHA/bbpErKiQgcLOHgN2TE5pyWzfnfa5zfFscLS6a+tdW1z/nFDOH9SSjHh15MS5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZyOzA7pe; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=HaLm6bdZ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=uD93X2gwZOmiLd2tlmt+K4P5C7dE5EhYOZS96VrDewFPyoXih3vLWTjQ15XCAaYzmeBO4Oueh75kcrLcShRSIudMPS2ElREPR4BaIq4xSV1fQbrJS5YXQXrM6/6hFOW3igcJZFGWIA2OlM0LtqKh86n4alkq+MGF1HDvbrcuqA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIwGAS70; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZyOzA7pe";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="HaLm6bdZ"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B64dlZO1620974
-	for <linux-crypto@vger.kernel.org>; Sat, 6 Dec 2025 11:45:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=Qd3aBq0UymBii6ZFMhW0qvHm
-	kEhMp8LfhgbHB7N8EfQ=; b=ZyOzA7peZHV4/z2NAtE5wgB8cBXN9TpCFGUdoahZ
-	1MhxL98urs58pWFrqkOP3Av/NXo/N2NOFNrvUJajZS911nC9OsuQ391rYqLhSXqu
-	4VYdIxXEiTvCcCIXyW+ap5dd+TsquG4n1x5/HTBRRCK1b3JTLmVKO6e4ct5wF1xI
-	b2noMPAuSwKT49IYhUVhJ3xzwRehNwKoz5T35XEoSTsqzPQ4K0XAnEetQijpwkPq
-	GfrFA1obaGec582kqqyqQIUsw4rLD/V8j7wPsEUUU1rDO9stkb32CHXRrCYMrt6V
-	ylYRnP9FmUbZUhWY+54oSEmDUAnEwXpCaXg9cORy9fbgSA==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4avdnjrj3m-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Sat, 06 Dec 2025 11:45:48 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8b5c811d951so91421885a.2
-        for <linux-crypto@vger.kernel.org>; Sat, 06 Dec 2025 03:45:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1765021548; x=1765626348; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qd3aBq0UymBii6ZFMhW0qvHmkEhMp8LfhgbHB7N8EfQ=;
-        b=HaLm6bdZP2VYR77HcOq7ui2e4kK0EBKXPAJZEqGiM/dC/kp9f0qAKJcLcL3BUR8rj1
-         LT1ty5EMm1K9sNfoEfYbsaRij9KmMGbekpIZRm6K+RbhEd/fwdwWKylZ7cjmTATGdle9
-         MPzvSkqMrK7n/XH/xjnqioQ8+VJzJTno+w9s/FOEFw7LPJ0kv9lkLvJU5k7BcTKe7JHy
-         GrHw+l6Y0LT9yaqF3u5VYMWr62Z3p8wigBWh8jHPkaoaNmO+x4c2/DoT36/bNDQEbNmA
-         a5n8umnTxs4cZih21srC9KWfaznpWlMST0jqS8r8JXZMeK8/9fJvZYoALYTidKLDlzyD
-         vovg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765021548; x=1765626348;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qd3aBq0UymBii6ZFMhW0qvHmkEhMp8LfhgbHB7N8EfQ=;
-        b=ju3tgPyYfQhEJ76uyPmtaT7gMtRu0dF3TkM0IKweSfVj7Uq6QyeZJV+1FCWyECfkG4
-         gtfvRTMt+hU7HHbzeZ84VEaI/PY1rXrNkTDPF4Ef9ALql6ro2k/UoXy9NAfrjFVewJZf
-         RUmb+DezEWc2V26J11Xc0cXJ6QN4VslLz7OwuxOURCZCkdUUyICy26DqfaY3cXO4CuRy
-         MeuOZckpxXKjBZ6tGKlXuHTU0b5dutMkjN4ALSXzRauyHJ1SswOYxpP9884Ha6MfISew
-         czETVhuGIFZSeXvgnU1ryug5Td0mcGuEwSwNxczYQ6J4jVIUhcgec7c+wdnbSYKxzWYp
-         KC4g==
-X-Forwarded-Encrypted: i=1; AJvYcCVE+szvHhyqTMYiFWsJX4Jg98OvuU+C3kCTEPyaHFjl9LjyZJHv6Ple9RYq+NVWOJEN9RWLK80HnDnG/zU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+ELSpCdul4DI8is/ot9VLDCMvSjRZq0F7/xyXa21vWi2Ufc0u
-	cF5ecMGgdT/OoC0xlg3fFkp2rplgahziY36VqQg7/auvQr3JjE3jCvGAWUrrIJuJCP+E5o2s61h
-	I+VDvODoRf/KqqdSGFqQDpBW85NZzerZt65n62ckvogrc7VjV9EzqfpmRjQrqklUbkVI=
-X-Gm-Gg: ASbGncvYZ5jSEQ/K3gyvLUkZMQQAXs6CYfFXONbsBFmVqHogOEkaqGr+7VJzIaxhohL
-	JaeTJljZjn9ISMaS2f6P9LhEY1ZVa9AwfWbyQkhn0SEoww7GuIyG4xNW7fW4HzrwZdVB7RgnG+K
-	ossZicm6ej6/fRQLKCHCdOkQHTsF2J13Pd6QwOPxqL13KtTynYRi6Sg+GgxQtHAYrkBtXoVgrJM
-	psHtBB+yUT6go0MXlFv7Pv0doDemLFO8ZYzb0+kep7NCuzUNuIbgjlsgNaaAeyRPYzAJ7uhtaWb
-	iRLaYQwXP9xDI4+D8JzY8N80A7rNonagp7WX0/a6NSauXFJoiytnBRlXgkRpQeevCk9tF4pSpff
-	7vsei5swK/jvg3qasUooRlLodbeRgrzyFcomYnAAK9Mb7wy/5Bmqm9oEfOH00g243okpryWeaY3
-	9ltAom6xP6vsim1Orl5bOiQas=
-X-Received: by 2002:a05:620a:5cc1:b0:8b2:f228:ed73 with SMTP id af79cd13be357-8b6a2348d63mr208849485a.7.1765021547762;
-        Sat, 06 Dec 2025 03:45:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF7lhRj80fCQhRwzG8Sy9MVABWIaWuDqVkUzPeyO/wCFqFIdnng6bpykxGDH3HN12wdPzhmBQ==
-X-Received: by 2002:a05:620a:5cc1:b0:8b2:f228:ed73 with SMTP id af79cd13be357-8b6a2348d63mr208847785a.7.1765021547290;
-        Sat, 06 Dec 2025 03:45:47 -0800 (PST)
-Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-37e70660c43sm21834671fa.47.2025.12.06.03.45.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Dec 2025 03:45:46 -0800 (PST)
-Date: Sat, 6 Dec 2025 13:45:44 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Udit Tiwari <quic_utiwari@quicinc.com>,
-        Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
-        Md Sadre Alam <mdalam@qti.qualcomm.com>,
-        Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v9 11/11] crypto: qce - Switch to using BAM DMA for
- crypto I/O
-Message-ID: <2rua7crcsdwikakbchbsmzbcwkofzwwbujskknub42hpkxjlsu@owqmdyl2gyuv>
-References: <20251128-qcom-qce-cmd-descr-v9-0-9a5f72b89722@linaro.org>
- <20251128-qcom-qce-cmd-descr-v9-11-9a5f72b89722@linaro.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIwGAS70"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DFC0C4CEF5;
+	Sat,  6 Dec 2025 19:56:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765051017;
+	bh=9FQJgpJnEx4MT5jkFe9SlUQLuoOyH3jpPlTZf50X1Aw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vIwGAS70bO+OLLE6QI5bj+RkMZJVjc/ISZoeOFDhx2XbWXGUskJUyc9vaUfvFBWqj
+	 fvdTtV3Jyf7JeDdbscPMBOfXtcgt2/TJyEad3UEm55z8MST7JOlbvYaSTMjTzZMF/v
+	 A4L9zqZ4DQ++FcDNkIRso7ouUNOTAQJck/JpAL042RpxyK8/d+dSpGpaUeX4OwpmUD
+	 Kx5W6Vyl667/1UBsHVArfvrbONXb7uxTEy26ff5LJ+9JUB24nwdDfcVUQGKli5aACl
+	 eT7t/jrmHF/SNCxMBHVirzboVMuIgN3mPkg+NVq2bU2U7LUwST/EYqk9fmOJgKeaip
+	 K3lrXHryD+1Ww==
+Date: Sat, 6 Dec 2025 11:56:55 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Vivian Wang <wangruikang@iscas.ac.cn>,
+	Jerry Shih <jerry.shih@sifive.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Han Gao <gaohan@iscas.ac.cn>, linux-crypto@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: lib/crypto: riscv: crypto_zvkb crashes on selftest if no
+ misaligned vector support
+Message-ID: <20251206195655.GA4665@quark>
+References: <b3cfcdac-0337-4db0-a611-258f2868855f@iscas.ac.cn>
+ <CAMj1kXHesHJ2oFzGPewp2V=rA0-BU2Y_PffuDDhxioftOKZYHg@mail.gmail.com>
+ <20251130184341.GB1395@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -105,49 +53,95 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251128-qcom-qce-cmd-descr-v9-11-9a5f72b89722@linaro.org>
-X-Proofpoint-GUID: 0S6LTXhK0HwaLW3pSuYf6MKl5AgvSDss
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjA2MDA5NSBTYWx0ZWRfXyo4wDneMOUcg
- DAxP7PtUXuYqtWAYK0fq+zvFKEs41eIuXbLNWZGyjrbprxtWbG98lKG4WTu+WKL7ktXyWh/mUJL
- a3BpZarTPSGodqOIYNoVjlUlw4YIKl45VuRzXqbz1xUaKuCP4Ixu4R6OwIQTJIDCl6V1Zg+mGz1
- wyf5U7oYgKBFhhz/r7Z8VDU0UJEImsTK7D0UGkOn+M1GN47ZKyRFsUIdofgMIxh/8Q1Y/F/iV9W
- 6sGC36cuoIjU3BkDdpK/JFRpnYgB1FxitvLZQifj1aFefusqwD4v+px1BXyzyKNjubGjjiIiz7Q
- n6V+g074J3rSmZsvg9blEhbWbAEvOwkZbp//1PHttzizWK9KdRQi096CACRFeE3nwDmyQqCbort
- l2/Z/isxaNjdmd+JKLyYhmvemsq5nA==
-X-Authority-Analysis: v=2.4 cv=RvbI7SmK c=1 sm=1 tr=0 ts=6934176d cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=KKAkSRfTAAAA:8 a=EUspDBNiAAAA:8 a=RpWgtCqNgKFi5XhArUUA:9 a=CjuIK1q_8ugA:10
- a=NFOGd7dJGGMPyQGDc5-O:22 a=cvBusfyB2V15izCimMoJ:22
-X-Proofpoint-ORIG-GUID: 0S6LTXhK0HwaLW3pSuYf6MKl5AgvSDss
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-06_02,2025-12-04_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 spamscore=0 adultscore=0 clxscore=1015 bulkscore=0
- malwarescore=0 phishscore=0 impostorscore=0 lowpriorityscore=0
- priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
- definitions=main-2512060095
+In-Reply-To: <20251130184341.GB1395@sol>
 
-On Fri, Nov 28, 2025 at 12:44:09PM +0100, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Sun, Nov 30, 2025 at 10:43:41AM -0800, Eric Biggers wrote:
+> On Sun, Nov 30, 2025 at 11:59:58AM +0100, Ard Biesheuvel wrote:
+> > On Sun, 30 Nov 2025 at 10:13, Vivian Wang <wangruikang@iscas.ac.cn> wrote:
+> > >
+> > > Hi,
+> > >
+> > > We ran into a problem with chacha_zvkb, where having:
+> > >
+> > > - OpenSBI 1.7+ (for FWFT support)
+> > > - CRYPTO_CHACHA20POLY1305=y and CRYPTO_SELFTESTS=y (and deps, of course)
+> > > - Hardware with Zvkb support
+> > > - Hardware *without* misaligned vector load/store support
+> > >
+> > > Leads to a crash on boot during selftest on a vlsseg8e32.v instruction,
+> > > because it requires 4-byte alignment of the buffers.
+> > >
+> > > OpenSBI by default emulates vector misaligned operations, however Linux
+> > > explicitly disables it with SBI FWFT while not providing vector
+> > > misaligned emulation of its own.
+> > >
+> > > This can be reproduced by running everything in Spike without
+> > > --misaligned, and is reproducible on stable 6.17.9, 6.18-rc1 and
+> > > 6.18-rc7. See log at the end. Note that I had to fix chacha_zvkb
+> > > somewhat to have it retain a frame pointer to get a stack trace - patch
+> > > will be sent later.
+> > >
+> > > Setting cra_alignmask to 3 for everything in crypto/chacha.c "fixes"
+> > > this, but there seems to be no obvious way to say "if use_zvkb then
+> > > cra_alignmask = 3", and, not being familiar with the crypto API stuff, I
+> > > can't figure out a good way to say "if riscv then cra_alignmask = 3" either.
+> > >
+> > > AFAICT, this problem was missed from the very start since commit
+> > > bb54668837a0 ("crypto: riscv - add vector crypto accelerated ChaCha20").
+> > >
+> > > Please advise.
+> > >
+> > 
+> > I'd suggest to only enable this version of the code if both Zicclsm
+> > and Zvkb are supported (assuming that Zicclsm is the extension that
+> > would result in these misaligned accesses to be permitted).
+> > 
+> > Playing with the cra_alignmask is likely insufficient, because it does
+> > not fix the use cases that call the library interface directly.
 > 
-> With everything else in place, we can now switch to actually using the
-> BAM DMA for register I/O with DMA engine locking.
+> Yes, we should make all the RISC-V vector crypto code (i.e., anything in
+> lib/crypto/riscv/ and arch/riscv/crypto/ that uses vector instructions)
+> be enabled only when the CPU supports fast misaligned vector accesses.
+> That was the original intent, but it seems the check never actually made
+> it into the code because it predated the core RISC-V support for
+> detecting that capability.
 > 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  drivers/crypto/qce/aead.c     | 10 ++++++++++
->  drivers/crypto/qce/common.c   | 21 ++++++++++-----------
->  drivers/crypto/qce/sha.c      |  8 ++++++++
->  drivers/crypto/qce/skcipher.c |  7 +++++++
->  4 files changed, 35 insertions(+), 11 deletions(-)
+> That support later got added by the following commit:
 > 
+>     commit e7c9d66e313bc0f7cb185c4972c3c9383a0da70f
+>     Author: Jesse Taube <jesse@rivosinc.com>
+>     Date:   Thu Oct 17 12:00:22 2024 -0700
+> 
+>         RISC-V: Report vector unaligned access speed hwprobe
+> 
+> Note that Zicclsm is supposedly not the correct thing to check.  See
+> https://lore.kernel.org/linux-riscv/20231122-displace-reformat-9ca68c3dc66c@spud/
+> 
+> It looks like all the RISC-V crypto code needs to check for
+> this_cpu_read(vector_misaligned_access) ==
+> RISCV_HWPROBE_MISALIGNED_VECTOR_FAST.
+> But it may be in need of a helper function.
+> 
+> Any volunteers?  Again, many files need this, not just the ChaCha code.
 
-Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Looking into this a bit more, on RISC-V the kernel actually checks and
+records the vector misaligned access speed on each online CPU.  So not
+only is RISC-V fragmented in whether this is supported in general, but
+it can also be fragmented between different CPUs on the same system.
 
+This means that the status of whether vector misaligned accesses are
+supported and fast can change as CPUs go online and offline.
 
--- 
-With best wishes
-Dmitry
+Indeed, there's already a corresponding static key for scalar misaligned
+accesses that gets turned on and off as CPUs go online and offline.
+
+But there's none for vector.  And this approach seems fundamentally
+broken anyway, as it means that support for misaligned accesses can get
+pulled out from underneath users.
+
+I think we'll just need to make the RISC-V crypto code conditional on
+CONFIG_RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS=y.  Having this info be
+statically known, like it is on the other architectures, is the only
+reasonable way to do it.
+
+- Eric
