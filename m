@@ -1,100 +1,127 @@
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595F81EB5FD;
-	Fri,  5 Dec 2025 22:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9B11F2BA4
+	for <linux-crypto@vger.kernel.org>; Sat,  6 Dec 2025 01:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764972277; cv=none; b=Ic+gGgFq7a4o9d2iO8CcuBm7a1D6i9zgF+tn7qmygD0cmiI1JopuF/k1zsbOUdXsgGU4ucBT03xkY2DH8cdUqNsGQ0CLBEDcjwbj3hk6iUC4CbZMiBlR+C400EGoRqjwpV44Oygy9xFGyPPfcKroZPSATFqAkMEfMyTMfI8dcew=
+	t=1764982860; cv=none; b=U3O66Xgf4JuATxaqHZLJC0A5C5u6vAiZiYAxAJrDmARVCvr3TNUjlBbf7Hks1Yn+7z/nEZ2VgtPleLhdn9+TuuPRkv7pWE8LC9zz6RNzotzXhDvt0pF2d3539wd4rWowur0TVpM9oGHo+vcPFBxGbzK5EZA35W8xiXN1+X6Izfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764972277; c=relaxed/simple;
-	bh=n65s71kz7Rx5F46SSZquv1oVQQt8CVM0M5EFe9ZAmJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J7uLTQeSmHLw6DF1l+vbRbqZTREQRquCOcsDbj0mePjt9eslSNU47ap/f93XKnNl5E+VHZ+p0SYKWEtRpC5cudeYs+5pHGDGY9/sc46xMnFe7gjpsVuO5Euccvkum1TESGbnqHYti+lwkTwGTs2RX8wqYSfWVHep49+C9zVJvTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=FpFyLJDK; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
+	s=arc-20240116; t=1764982860; c=relaxed/simple;
+	bh=J+fhDaXwYCVeolnHJqphArpPI9eh8evErlD9axz1MAw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AZuttAMRm5dcqVNkFZdeWktjMqG8bQFcn7fCiasKSlB5k5558Y2Ej+QPYxGgWI6WXY0Vd9pPFpcIkiu3Na2kd7pVHwCiLvB/Di8HyH4cO8nexWxBVdlK71xdkC8c7JYhMlFGZ+OATjRhqpMCMywfox3eMOdhj/ESNfw+QD4qTmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qnzulgv+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="FpFyLJDK"
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <david.laight@runbox.com>)
-	id 1vRduf-0052m2-4l; Fri, 05 Dec 2025 23:04:29 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
-	 s=selector2; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
-	References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date;
-	bh=VKRmWJJRTmmp/YjxC8OXm6NkYoeSnkf9tDFkckwjyQE=; b=FpFyLJDKpcYOizY+oXsmE0wvZn
-	TPCC8CTmb8jCnax7OOceN1vL2jzi4lDpkKwQq4KBSFkD7IvDhH58+uAz/7TYldaryriVfkR0z23MV
-	mtXtxvaryMsqYaDh9O3VOfRzs6x3mHSNk/dPQG9r5tedgZROtiZTm1reaNCyDoAbCm78E7hUSnWgq
-	J1ASOYvuvQF4EqVni/H3WEH07FlxUygQbuCXNU2nTiQlDCU1Cb/2i8nMa4lkcoQvZiax1QnXtxbrg
-	WB80vJqQQRGLQx09V/y3k6LRlCndfCjA346mjjlboF1qP1PpJLShaooTxLEl/kPJW56NidTq9a5/z
-	im1KwQZA==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <david.laight@runbox.com>)
-	id 1vRdud-0003KC-Ul; Fri, 05 Dec 2025 23:04:28 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vRduQ-003vlU-TM; Fri, 05 Dec 2025 23:04:15 +0100
-Date: Fri, 5 Dec 2025 22:04:12 +0000
-From: david laight <david.laight@runbox.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard
- Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Thorsten Blum
- <thorsten.blum@linux.dev>, Nathan Chancellor <nathan@kernel.org>, Nick
- Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>, David Sterba
- <dsterba@suse.com>, llvm@lists.linux.dev, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: blake2b: Roll up BLAKE2b round loop on
- 32-bit
-Message-ID: <20251205220412.5bf42699@pumpkin>
-In-Reply-To: <20251205201411.GA1954@quark>
-References: <20251203190652.144076-1-ebiggers@kernel.org>
-	<20251205141644.313404db@pumpkin>
-	<20251205201411.GA1954@quark>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qnzulgv+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4C89C19425
+	for <linux-crypto@vger.kernel.org>; Sat,  6 Dec 2025 01:00:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764982859;
+	bh=J+fhDaXwYCVeolnHJqphArpPI9eh8evErlD9axz1MAw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Qnzulgv+tx1SX+gb3y7ZAkb/WuMLbtEGT3HPvy9ftP9wrCUPKCyiVbF9bEuXSKx7l
+	 B9QUHtEKZuHbYDRWGb7ALnLK/5L5ggWPQaMsc7GdZ+3tdnx5S4IQCdGCDaoDZog7n5
+	 tH3I2q7UPnKqeFPHl6vqP5ClsCXmCfZTqhLjeoEb0KT+2Rbo/9TDjK9Qt/WtwlFmVJ
+	 CFfp2y8C/9rHTM3RG4RT25rSRFhBd8dfT4ad3fFSDDceleOQkWiHrOYy7GwLstrVkC
+	 Ci1iHNn4yi5mJ5G38s8jB3erYnayOkqV3yNiUz1EVBt4Ly3VFr8NDpRGyfnGu4clet
+	 pfL13MDrGKrvQ==
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4ee1939e70bso21701921cf.3
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Dec 2025 17:00:59 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVtcIyI3JAt+EGVco6856wD5ks0lTM4AutHCkoR395Z4tMHyW3dWoXRI4DbKN5mnYuxObAp7i0LGVxjEPM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwngWC8Uvwl9Izh0WvnpbHfovqtBRcebt3+uP5COoUhHlOrjEJn
+	V9QNx1Nv1HCNkA4JjcbPXVxuwA+FUcUr5N//bGwdPHXzSagVAByAb77B/e13xHVVyQusuSUNOfX
+	LPw5TEuJ/cyaprs7HirW4b78PRQrdJrY=
+X-Google-Smtp-Source: AGHT+IGn2O6tFzSRWYNTMScR/52ZmXcrwxYz1GxPPNjvV5SR/F37LjxKdbUrGm55UrwcWcNQj1E2ievJ16SKdJy2FS0=
+X-Received: by 2002:ac8:5d07:0:b0:4ed:af7b:69cf with SMTP id
+ d75a77b69052e-4f03fe35945mr17379821cf.37.1764982858626; Fri, 05 Dec 2025
+ 17:00:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20251205173923.31740-1-git@danielhodges.dev> <20251205173923.31740-2-git@danielhodges.dev>
+In-Reply-To: <20251205173923.31740-2-git@danielhodges.dev>
+From: Song Liu <song@kernel.org>
+Date: Fri, 5 Dec 2025 17:00:47 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW4VJCsVKFeyH78XcHudk2RCPWp3EgAUGNEZsUXzdhHHxQ@mail.gmail.com>
+X-Gm-Features: AWmQ_blGuzTaHdY2NfSViIYZKRdY3NEPQG8pgPpjCooOxctA71waN5ucdvC4R00
+Message-ID: <CAPhsuW4VJCsVKFeyH78XcHudk2RCPWp3EgAUGNEZsUXzdhHHxQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 1/5] crypto: Add BPF hash algorithm type
+ registration module
+To: Daniel Hodges <git@danielhodges.dev>
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	vadim.fedorenko@linux.dev, martin.lau@linux.dev, eddyz87@gmail.com, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, shuah@kernel.org, 
+	bpf@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 5 Dec 2025 12:14:11 -0800
-Eric Biggers <ebiggers@kernel.org> wrote:
+On Fri, Dec 5, 2025 at 9:40=E2=80=AFAM Daniel Hodges <git@danielhodges.dev>=
+ wrote:
+>
+> Add bpf_crypto_shash module that registers a hash type with the BPF
+> crypto infrastructure, enabling BPF programs to access kernel hash
+> algorithms through a unified interface.
+>
+> Update the bpf_crypto_type interface with hash-specific callbacks:
+>    - alloc_tfm: Allocates crypto_shash context with proper descriptor siz=
+e
+>    - free_tfm: Releases hash transform and context memory
+>    - has_algo: Checks algorithm availability via crypto_has_shash()
+>    - hash: Performs single-shot hashing via crypto_shash_digest()
+>    - digestsize: Returns the output size for the hash algorithm
+>    - get_flags: Exposes transform flags to BPF programs
+>
+> Update bpf_shash_ctx to contain crypto_shash transform and shash_desc
+> descriptor to accommodate algorithm-specific descriptor requirements.
+>
+> Signed-off-by: Daniel Hodges <git@danielhodges.dev>
+> ---
+>  crypto/Makefile           |  3 ++
+>  crypto/bpf_crypto_shash.c | 94 +++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 97 insertions(+)
+>  create mode 100644 crypto/bpf_crypto_shash.c
+>
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index 16a35649dd91..853dff375906 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -30,6 +30,9 @@ obj-$(CONFIG_CRYPTO_ECHAINIV) +=3D echainiv.o
+>  crypto_hash-y +=3D ahash.o
+>  crypto_hash-y +=3D shash.o
+>  obj-$(CONFIG_CRYPTO_HASH2) +=3D crypto_hash.o
+> +ifeq ($(CONFIG_BPF_SYSCALL),y)
+> +obj-$(CONFIG_CRYPTO_HASH2) +=3D bpf_crypto_shash.o
+> +endif
+>
+>  obj-$(CONFIG_CRYPTO_AKCIPHER2) +=3D akcipher.o
+>  obj-$(CONFIG_CRYPTO_SIG2) +=3D sig.o
+> diff --git a/crypto/bpf_crypto_shash.c b/crypto/bpf_crypto_shash.c
+> new file mode 100644
+> index 000000000000..39032e7dd602
+> --- /dev/null
+> +++ b/crypto/bpf_crypto_shash.c
+> @@ -0,0 +1,94 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +#include <linux/types.h>
+> +#include <linux/module.h>
+> +#include <linux/bpf_crypto.h>
+> +#include <crypto/hash.h>
+> +
+> +struct bpf_shash_ctx {
+> +       struct crypto_shash *tfm;
+> +       struct shash_desc desc;
+> +};
 
-> On Fri, Dec 05, 2025 at 02:16:44PM +0000, david laight wrote:
-> > Note that executing two G() in parallel probably requires the source
-> > interleave the instructions for the two G() rather than relying on the
-> > cpu's 'out of order execution' to do all the work
-> > (Intel cpu might manage it...).  
-> 
-> I actually tried that earlier, and it didn't help.  Either the compiler
-> interleaved the calculations already, or the CPU did, or both.
+Instead of adding bpf_shash_ctx and bpf_ecdsa_ctx, can we extend
+bpf_crypto_ctx to cover all hash and ECDSA? bpf_crypto_ctx has a
+const pointer to bpf_crypto_type, so this should be possible?
 
-Or they are never interleaved and doing that didn't help.
-
-> It definitely could use some more investigation to better understand
-> exactly what is going on, though.
-> 
-> You're welcome to take a closer look, if you're interested.
-
-I might try calling the code from my 'clock counting' wrapper.
-That is good enough to see the data dependency of a 'div' instruction
-and the effect of branch misses due to taking a different path from
-the previous call (about 20 clocks on a zen-5).
-
-Did you notice that 'u64 t[2];' is a 128bit 'byte counter' for the
-buffer being processed!
-I doubt 32bit needs that many bits :-)
-
-	David
-
-> 
-> - Eric
-> 
-
+Thanks,
+Song
