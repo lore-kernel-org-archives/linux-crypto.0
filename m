@@ -1,33 +1,33 @@
 Received: from devnull.danielhodges.dev (vps-2f6e086e.vps.ovh.us [135.148.138.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3A6288C24;
-	Mon,  8 Dec 2025 03:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C0F2E718F;
+	Mon,  8 Dec 2025 03:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.148.138.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765163049; cv=none; b=DAHl6BYhbrRiABX/aCQGn0VfHWMRR6XL93ri3Bs3+GCd1jUySdG8zN5tic/Q8QPQtzTR4i+dZOydwRzz6Oo2vAMBg8c+kmbKR6rKkccUZ/qBVejOTmX2xnk2Jq+DCiFlFnzznIDxUFqwCTdXUYppwnYCywvQguIu6JwwNReCL8E=
+	t=1765163051; cv=none; b=MAgC9vDiYpDgi2dAPxBiS1rxZ9m8SxlgsQoesMYjKanowiJzasfndNFa0kXg6DVo1kqgxIIUYgvIEqJL+UPXasxURBc7tfsdGrcNpQIKZaJHTNnCiqOqLaoa5opRP1uyyZywMwS8QGpuWcks6oaJ41JY6b29W7gQqsR2YtTmEek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765163049; c=relaxed/simple;
-	bh=gQSrJ6sLZR0UgasAXOI6aGw7bjQJLmMSnSI/FV6E+24=;
+	s=arc-20240116; t=1765163051; c=relaxed/simple;
+	bh=1Wdws3rSUg0cgncQNyaYBymwVayZ8eyd4lqJC50mDXw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GWx3OMgi40G91aUjOG1cRZU64qP21BtQfxHdjzyZoM4U9bMe8hklrDmLTeIH9hJi5Cl2whOaLG2YyAOgNg1p0+j+ai9PQub8hbbH44ZB8teCTD5LI7ZySdxKrUSLaRKU91VYnMsNLM0N13UxqDfqExUamJCKRKPIcRNLi/69GhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=pEeqIsqf; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=YqfWEdp4; arc=none smtp.client-ip=135.148.138.8
+	 MIME-Version; b=uibjgVQ8EyDM9y9h9vfUO7SALq7wVhwux+Nc9aYoF1/7ISUdcvQt2+C1SNTCCnosEOSu/5Qd9bbDdoGZQuhJL2NsJU4El6ElRM0HtGliDMpt78PKtGRLaY7LyPqEIFGinrBnTPpWgm30PmVyhdOPFC3NU+8vlQf92n3+cjTrDOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=EkoG0xG0; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=8oaGoBfE; arc=none smtp.client-ip=135.148.138.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danielhodges.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="pEeqIsqf";
-	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="YqfWEdp4"
+	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="EkoG0xG0";
+	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="8oaGoBfE"
 DKIM-Signature: v=1; a=rsa-sha256; s=202510r; d=danielhodges.dev; c=relaxed/relaxed;
-	h=Message-ID:Date:Subject:To:From; t=1765162878; bh=lhHuv3JHJ5ECsH2LZI0gvI2
-	/2V1KyyLs/oMt1+jySa4=; b=pEeqIsqfCJxF73WuXHU4EQCRtKb4Fqo2A7uKR8gu+pjxDfdWcf
-	Ab9hLS3cTcYmrBnv6V9S3AbwQduskOs7bkZ2XonykUEpCuI4qdk7WLEM5tZrKvUH4ezXih/mDz0
-	xyM+yrE1UykswLuAL2/zxZouqSEmGcs0/+JR4BavQBjriJJztICUcwWeaRp7T5f+/8WsBKFQ/aa
-	+2+rk6IedhhLBdRrmvtOpbyz8IHSfpMbpHR0yWt1j75OH4lu+3w5BlfguuI83muDuhWRES00BkJ
-	6OEYCK+UuLfsaxDO/DXCTpgIdUZo374e0a6sxsNs0zPfudsRQID9REKYJRzIKWn+m5g==;
+	h=Message-ID:Date:Subject:To:From; t=1765162878; bh=zOp4T9zCz3QlaABPvs8kAp+
+	zpb43ZQBrNe9fNd6xE+s=; b=EkoG0xG0Foi4+Ss5+PJ7EtnyjXIa5YjplziY39I54iZQJ3tDeq
+	UdE4ashl5htiRljttH/lrfaTj1AmF6jdObcXZvY6zOg2wC9TuSV3gB/3j2ZK0FL+6KShIEKJV+u
+	ywJy+YQiYFJCAWw5gS9Rm1vlkQCLn8yYeGjYnnW323sW4wYrGls7oDQiZyXN736jHGu5uurlXPC
+	eaF5ODtgikO5/k3N1NWZ0kOtTnRN1ImI+ouTDPuYVztZI8gX/iorw8dRe6WjM7bw72eJFDp6TwR
+	n6G4eo6E2wFZ7jf/NeltwyArePduxaK6wr7KweaFzjEwytn1jShbpy1IptxAWmAsKkQ==;
 DKIM-Signature: v=1; a=ed25519-sha256; s=202510e; d=danielhodges.dev; c=relaxed/relaxed;
-	h=Message-ID:Date:Subject:To:From; t=1765162878; bh=lhHuv3JHJ5ECsH2LZI0gvI2
-	/2V1KyyLs/oMt1+jySa4=; b=YqfWEdp4f/mMP756r/IuzD489o8vUEUD7HEq9FE4bUNv7pzVQv
-	ZXMzEaazMdiaTSOZhAv9/Y1Z+fbdjVKJ1ZAA==;
+	h=Message-ID:Date:Subject:To:From; t=1765162878; bh=zOp4T9zCz3QlaABPvs8kAp+
+	zpb43ZQBrNe9fNd6xE+s=; b=8oaGoBfEylU0QuXgS6OsrBoh31rymjUTRcikkfKBGPpR587yE8
+	ONbGMD6jENv5sK69He7nXcZsD43OWmrJnsAQ==;
 From: Daniel Hodges <git@danielhodges.dev>
 To: bpf@vger.kernel.org
 Cc: ast@kernel.org,
@@ -50,9 +50,9 @@ Cc: ast@kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Daniel Hodges <git@danielhodges.dev>
-Subject: [PATCH bpf-next v3 3/6] bpf: Add SHA hash kfunc for cryptographic hashing
-Date: Sun,  7 Dec 2025 22:01:14 -0500
-Message-ID: <20251208030117.18892-4-git@danielhodges.dev>
+Subject: [PATCH bpf-next v3 5/6] bpf: Add ECDSA signature verification kfuncs
+Date: Sun,  7 Dec 2025 22:01:16 -0500
+Message-ID: <20251208030117.18892-6-git@danielhodges.dev>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251208030117.18892-1-git@danielhodges.dev>
 References: <20251208030117.18892-1-git@danielhodges.dev>
@@ -64,144 +64,310 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Extend bpf_crypto_type structure with hash operations:
- - hash(): Performs hashing operation
- - digestsize(): Returns hash output size
+Add context-based ECDSA signature verification kfuncs:
+- bpf_ecdsa_ctx_create(): Creates reusable ECDSA context with public key
+- bpf_ecdsa_verify(): Verifies signatures using the context
+- bpf_ecdsa_ctx_acquire(): Increments context reference count
+- bpf_ecdsa_ctx_release(): Releases context with RCU safety
 
-Update bpf_crypto_ctx_create() to support keyless operations:
- - Hash algorithms don't require keys, unlike ciphers
- - Only validates key presence if type->setkey is defined
- - Conditionally sets IV/state length for cipher operations only
-
-Add bpf_crypto_hash() kfunc that works with any hash algorithm
-registered in the kernel's crypto API through the BPF crypto type
-system. This enables BPF programs to compute cryptographic hashes for
-use cases such as content verification, integrity checking, and data
-authentication.
+The ECDSA implementation supports NIST curves (P-256, P-384, P-521) and
+uses the kernel's crypto_sig API. Public keys must be in uncompressed
+format (0x04 || x || y), and signatures are in r || s format.
 
 Signed-off-by: Daniel Hodges <git@danielhodges.dev>
 ---
- kernel/bpf/crypto.c | 76 ++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 68 insertions(+), 8 deletions(-)
+ kernel/bpf/crypto.c | 230 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 230 insertions(+)
 
 diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
-index 83c4d9943084..47e6a43a46d4 100644
+index 47e6a43a46d4..138abe58e87e 100644
 --- a/kernel/bpf/crypto.c
 +++ b/kernel/bpf/crypto.c
-@@ -171,7 +171,12 @@ bpf_crypto_ctx_create(const struct bpf_crypto_params *params, u32 params__sz,
- 		goto err_module_put;
- 	}
+@@ -9,6 +9,7 @@
+ #include <linux/scatterlist.h>
+ #include <linux/skbuff.h>
+ #include <crypto/skcipher.h>
++#include <crypto/sig.h>
  
--	if (!params->key_len || params->key_len > sizeof(params->key)) {
-+	/* Hash operations don't require a key, but cipher operations do */
-+	if (params->key_len > sizeof(params->key)) {
-+		*err = -EINVAL;
-+		goto err_module_put;
-+	}
-+	if (!params->key_len && type->setkey) {
- 		*err = -EINVAL;
- 		goto err_module_put;
- 	}
-@@ -195,16 +200,19 @@ bpf_crypto_ctx_create(const struct bpf_crypto_params *params, u32 params__sz,
- 			goto err_free_tfm;
- 	}
+ struct bpf_crypto_type_list {
+ 	const struct bpf_crypto_type *type;
+@@ -57,6 +58,21 @@ struct bpf_crypto_ctx {
+ 	refcount_t usage;
+ };
  
--	*err = type->setkey(ctx->tfm, params->key, params->key_len);
--	if (*err)
--		goto err_free_tfm;
-+	if (params->key_len) {
-+		*err = type->setkey(ctx->tfm, params->key, params->key_len);
-+		if (*err)
-+			goto err_free_tfm;
- 
--	if (type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY) {
--		*err = -EINVAL;
--		goto err_free_tfm;
-+		if (type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY) {
-+			*err = -EINVAL;
-+			goto err_free_tfm;
-+		}
- 	}
- 
--	ctx->siv_len = type->ivsize(ctx->tfm) + type->statesize(ctx->tfm);
-+	if (type->ivsize && type->statesize)
-+		ctx->siv_len = type->ivsize(ctx->tfm) + type->statesize(ctx->tfm);
- 
- 	refcount_set(&ctx->usage, 1);
- 
-@@ -343,6 +351,54 @@ __bpf_kfunc int bpf_crypto_encrypt(struct bpf_crypto_ctx *ctx,
- 	return bpf_crypto_crypt(ctx, src_kern, dst_kern, siv_kern, false);
- }
- 
-+#if IS_ENABLED(CONFIG_CRYPTO_HASH2)
++#if IS_ENABLED(CONFIG_CRYPTO_ECDSA)
 +/**
-+ * bpf_crypto_hash() - Compute hash using configured context
-+ * @ctx:	The crypto context being used. The ctx must be a trusted pointer.
-+ * @data:	bpf_dynptr to the input data to hash. Must be a trusted pointer.
-+ * @out:	bpf_dynptr to the output buffer. Must be a trusted pointer.
-+ *
-+ * Computes hash of the input data using the crypto context. The output buffer
-+ * must be at least as large as the digest size of the hash algorithm.
++ * struct bpf_ecdsa_ctx - refcounted BPF ECDSA context structure
++ * @tfm:	The crypto_sig transform for ECDSA operations
++ * @rcu:	The RCU head used to free the context with RCU safety
++ * @usage:	Object reference counter. When the refcount goes to 0, the
++ *		memory is released with RCU safety.
 + */
-+__bpf_kfunc int bpf_crypto_hash(struct bpf_crypto_ctx *ctx,
-+				const struct bpf_dynptr *data,
-+				const struct bpf_dynptr *out)
++struct bpf_ecdsa_ctx {
++	struct crypto_sig *tfm;
++	struct rcu_head rcu;
++	refcount_t usage;
++};
++#endif
++
+ int bpf_crypto_register_type(const struct bpf_crypto_type *type)
+ {
+ 	struct bpf_crypto_type_list *node;
+@@ -399,12 +415,206 @@ __bpf_kfunc int bpf_crypto_hash(struct bpf_crypto_ctx *ctx,
+ }
+ #endif /* CONFIG_CRYPTO_HASH2 */
+ 
++#if IS_ENABLED(CONFIG_CRYPTO_ECDSA)
++/**
++ * bpf_ecdsa_ctx_create() - Create a BPF ECDSA verification context
++ * @algo_name: bpf_dynptr to the algorithm name (e.g., "p1363(ecdsa-nist-p256)")
++ * @public_key: bpf_dynptr to the public key in uncompressed format (0x04 || x || y)
++ *              Must be 65 bytes for P-256, 97 for P-384, 133 for P-521
++ * @err: Pointer to store error code on failure
++ *
++ * Creates an ECDSA verification context that can be reused for multiple
++ * signature verifications. This function uses GFP_KERNEL allocation and
++ * can only be called from sleepable BPF programs. Uses bpf_dynptr to ensure
++ * safe memory access without risk of page faults.
++ */
++__bpf_kfunc struct bpf_ecdsa_ctx *
++bpf_ecdsa_ctx_create(const struct bpf_dynptr *algo_name,
++		     const struct bpf_dynptr *public_key, int *err)
 +{
-+	const struct bpf_dynptr_kern *data_kern = (struct bpf_dynptr_kern *)data;
-+	const struct bpf_dynptr_kern *out_kern = (struct bpf_dynptr_kern *)out;
-+	u64 data_len, out_len;
-+	const u8 *data_ptr;
-+	u8 *out_ptr;
++	const struct bpf_dynptr_kern *algo_kern = (struct bpf_dynptr_kern *)algo_name;
++	const struct bpf_dynptr_kern *key_kern = (struct bpf_dynptr_kern *)public_key;
++	struct bpf_ecdsa_ctx *ctx;
++	const char *algo_ptr;
++	const u8 *key_ptr;
++	u32 algo_len, key_len;
++	char algo[64];
++	int ret;
 +
-+	if (!ctx->type->hash)
-+		return -EOPNOTSUPP;
++	if (!err)
++		return NULL;
 +
-+	data_len = __bpf_dynptr_size(data_kern);
-+	out_len = __bpf_dynptr_size(out_kern);
++	algo_len = __bpf_dynptr_size(algo_kern);
++	key_len = __bpf_dynptr_size(key_kern);
 +
-+	if (data_len == 0)
-+		return -EINVAL;
++	if (algo_len == 0 || algo_len >= sizeof(algo)) {
++		*err = -EINVAL;
++		return NULL;
++	}
 +
-+	if (!ctx->type->digestsize)
-+		return -EOPNOTSUPP;
++	if (key_len < 65) {
++		*err = -EINVAL;
++		return NULL;
++	}
 +
-+	unsigned int digestsize = ctx->type->digestsize(ctx->tfm);
-+	if (out_len < digestsize)
-+		return -EINVAL;
++	algo_ptr = __bpf_dynptr_data(algo_kern, algo_len);
++	if (!algo_ptr) {
++		*err = -EINVAL;
++		return NULL;
++	}
 +
-+	data_ptr = __bpf_dynptr_data(data_kern, data_len);
-+	if (!data_ptr)
-+		return -EINVAL;
++	key_ptr = __bpf_dynptr_data(key_kern, key_len);
++	if (!key_ptr) {
++		*err = -EINVAL;
++		return NULL;
++	}
 +
-+	out_ptr = __bpf_dynptr_data_rw(out_kern, out_len);
-+	if (!out_ptr)
-+		return -EINVAL;
++	if (key_ptr[0] != 0x04) {
++		*err = -EINVAL;
++		return NULL;
++	}
 +
-+	return ctx->type->hash(ctx->tfm, data_ptr, out_ptr, data_len);
++	memcpy(algo, algo_ptr, algo_len);
++	algo[algo_len] = '\0';
++
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	if (!ctx) {
++		*err = -ENOMEM;
++		return NULL;
++	}
++
++	ctx->tfm = crypto_alloc_sig(algo, 0, 0);
++	if (IS_ERR(ctx->tfm)) {
++		*err = PTR_ERR(ctx->tfm);
++		kfree(ctx);
++		return NULL;
++	}
++
++	ret = crypto_sig_set_pubkey(ctx->tfm, key_ptr, key_len);
++	if (ret) {
++		*err = ret;
++		crypto_free_sig(ctx->tfm);
++		kfree(ctx);
++		return NULL;
++	}
++
++	refcount_set(&ctx->usage, 1);
++	*err = 0;
++	return ctx;
 +}
-+#endif /* CONFIG_CRYPTO_HASH2 */
++
++/**
++ * bpf_ecdsa_verify() - Verify ECDSA signature using pre-allocated context
++ * @ctx: ECDSA context created by bpf_ecdsa_ctx_create()
++ * @message: bpf_dynptr to the message hash to verify. Must be a trusted pointer.
++ * @signature: bpf_dynptr to the ECDSA signature in r || s format. Must be a trusted pointer.
++ *             Must be 64 bytes for P-256, 96 for P-384, 132 for P-521
++ *
++ * Verifies an ECDSA signature using a pre-allocated context. This function
++ * does not allocate memory and can be used in non-sleepable BPF programs.
++ * Uses bpf_dynptr to ensure safe memory access without risk of page faults.
++ */
++__bpf_kfunc int bpf_ecdsa_verify(struct bpf_ecdsa_ctx *ctx,
++				 const struct bpf_dynptr *message,
++				 const struct bpf_dynptr *signature)
++{
++	const struct bpf_dynptr_kern *msg_kern = (struct bpf_dynptr_kern *)message;
++	const struct bpf_dynptr_kern *sig_kern = (struct bpf_dynptr_kern *)signature;
++	const u8 *msg_ptr, *sig_ptr;
++	u32 msg_len, sig_len;
++
++	if (!ctx)
++		return -EINVAL;
++
++	msg_len = __bpf_dynptr_size(msg_kern);
++	sig_len = __bpf_dynptr_size(sig_kern);
++
++	if (msg_len == 0 || sig_len == 0)
++		return -EINVAL;
++
++	msg_ptr = __bpf_dynptr_data(msg_kern, msg_len);
++	if (!msg_ptr)
++		return -EINVAL;
++
++	sig_ptr = __bpf_dynptr_data(sig_kern, sig_len);
++	if (!sig_ptr)
++		return -EINVAL;
++
++	return crypto_sig_verify(ctx->tfm, sig_ptr, sig_len, msg_ptr, msg_len);
++}
++
++__bpf_kfunc struct bpf_ecdsa_ctx *
++bpf_ecdsa_ctx_acquire(struct bpf_ecdsa_ctx *ctx)
++{
++	if (!refcount_inc_not_zero(&ctx->usage))
++		return NULL;
++	return ctx;
++}
++
++static void ecdsa_free_cb(struct rcu_head *head)
++{
++	struct bpf_ecdsa_ctx *ctx = container_of(head, struct bpf_ecdsa_ctx, rcu);
++
++	crypto_free_sig(ctx->tfm);
++	kfree(ctx);
++}
++
++__bpf_kfunc void bpf_ecdsa_ctx_release(struct bpf_ecdsa_ctx *ctx)
++{
++	if (refcount_dec_and_test(&ctx->usage))
++		call_rcu(&ctx->rcu, ecdsa_free_cb);
++}
++
++/**
++ * bpf_ecdsa_keysize() - Get the key size for ECDSA context
++ * @ctx: ECDSA context
++ *
++ * Returns: Key size in bits, or negative error code on failure
++ */
++__bpf_kfunc int bpf_ecdsa_keysize(struct bpf_ecdsa_ctx *ctx)
++{
++	if (!ctx)
++		return -EINVAL;
++
++	return crypto_sig_keysize(ctx->tfm);
++}
++
++/**
++ * bpf_ecdsa_digestsize() - Get the maximum digest size for ECDSA context
++ * @ctx: ECDSA context
++ */
++__bpf_kfunc int bpf_ecdsa_digestsize(struct bpf_ecdsa_ctx *ctx)
++{
++	if (!ctx)
++		return -EINVAL;
++
++	return crypto_sig_digestsize(ctx->tfm);
++}
++
++/**
++ * bpf_ecdsa_maxsize() - Get the maximum signature size for ECDSA context
++ * @ctx: ECDSA context
++ */
++__bpf_kfunc int bpf_ecdsa_maxsize(struct bpf_ecdsa_ctx *ctx)
++{
++	if (!ctx)
++		return -EINVAL;
++
++	return crypto_sig_maxsize(ctx->tfm);
++}
++#endif /* CONFIG_CRYPTO_ECDSA */
 +
  __bpf_kfunc_end_defs();
  
  BTF_KFUNCS_START(crypt_init_kfunc_btf_ids)
-@@ -359,6 +415,9 @@ static const struct btf_kfunc_id_set crypt_init_kfunc_set = {
- BTF_KFUNCS_START(crypt_kfunc_btf_ids)
- BTF_ID_FLAGS(func, bpf_crypto_decrypt, KF_RCU)
- BTF_ID_FLAGS(func, bpf_crypto_encrypt, KF_RCU)
-+#if IS_ENABLED(CONFIG_CRYPTO_HASH2)
-+BTF_ID_FLAGS(func, bpf_crypto_hash, KF_RCU)
+ BTF_ID_FLAGS(func, bpf_crypto_ctx_create, KF_ACQUIRE | KF_RET_NULL | KF_SLEEPABLE)
+ BTF_ID_FLAGS(func, bpf_crypto_ctx_release, KF_RELEASE)
+ BTF_ID_FLAGS(func, bpf_crypto_ctx_acquire, KF_ACQUIRE | KF_RCU | KF_RET_NULL)
++#if IS_ENABLED(CONFIG_CRYPTO_ECDSA)
++BTF_ID_FLAGS(func, bpf_ecdsa_ctx_create, KF_ACQUIRE | KF_RET_NULL | KF_SLEEPABLE)
++BTF_ID_FLAGS(func, bpf_ecdsa_ctx_release, KF_RELEASE)
++BTF_ID_FLAGS(func, bpf_ecdsa_ctx_acquire, KF_ACQUIRE | KF_RCU | KF_RET_NULL)
++#endif
+ BTF_KFUNCS_END(crypt_init_kfunc_btf_ids)
+ 
+ static const struct btf_kfunc_id_set crypt_init_kfunc_set = {
+@@ -418,6 +628,12 @@ BTF_ID_FLAGS(func, bpf_crypto_encrypt, KF_RCU)
+ #if IS_ENABLED(CONFIG_CRYPTO_HASH2)
+ BTF_ID_FLAGS(func, bpf_crypto_hash, KF_RCU)
+ #endif
++#if IS_ENABLED(CONFIG_CRYPTO_ECDSA)
++BTF_ID_FLAGS(func, bpf_ecdsa_verify, 0)
++BTF_ID_FLAGS(func, bpf_ecdsa_keysize, 0)
++BTF_ID_FLAGS(func, bpf_ecdsa_digestsize, 0)
++BTF_ID_FLAGS(func, bpf_ecdsa_maxsize, 0)
 +#endif
  BTF_KFUNCS_END(crypt_kfunc_btf_ids)
  
  static const struct btf_kfunc_id_set crypt_kfunc_set = {
-@@ -383,6 +442,7 @@ static int __init crypto_kfunc_init(void)
+@@ -428,6 +644,10 @@ static const struct btf_kfunc_id_set crypt_kfunc_set = {
+ BTF_ID_LIST(bpf_crypto_dtor_ids)
+ BTF_ID(struct, bpf_crypto_ctx)
+ BTF_ID(func, bpf_crypto_ctx_release)
++#if IS_ENABLED(CONFIG_CRYPTO_ECDSA)
++BTF_ID(struct, bpf_ecdsa_ctx)
++BTF_ID(func, bpf_ecdsa_ctx_release)
++#endif
+ 
+ static int __init crypto_kfunc_init(void)
+ {
+@@ -437,6 +657,12 @@ static int __init crypto_kfunc_init(void)
+ 			.btf_id	      = bpf_crypto_dtor_ids[0],
+ 			.kfunc_btf_id = bpf_crypto_dtor_ids[1]
+ 		},
++#if IS_ENABLED(CONFIG_CRYPTO_ECDSA)
++		{
++			.btf_id       = bpf_crypto_dtor_ids[2],
++			.kfunc_btf_id = bpf_crypto_dtor_ids[3]
++		},
++#endif
+ 	};
+ 
  	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &crypt_kfunc_set);
- 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &crypt_kfunc_set);
- 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &crypt_kfunc_set);
-+	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SYSCALL, &crypt_kfunc_set);
+@@ -445,6 +671,10 @@ static int __init crypto_kfunc_init(void)
+ 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SYSCALL, &crypt_kfunc_set);
  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SYSCALL,
  					       &crypt_init_kfunc_set);
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS,
++					       &crypt_init_kfunc_set);
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP,
++					       &crypt_init_kfunc_set);
  	return  ret ?: register_btf_id_dtor_kfuncs(bpf_crypto_dtors,
+ 						   ARRAY_SIZE(bpf_crypto_dtors),
+ 						   THIS_MODULE);
 -- 
 2.51.0
 
