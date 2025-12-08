@@ -1,44 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C56527FD51;
-	Mon,  8 Dec 2025 23:09:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC96231A23;
+	Mon,  8 Dec 2025 23:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765235354; cv=none; b=Nhc8JhTA3+UMZ+ptzzJg4ajKu3orHKrvFMd9BL70ROhbY10BGd/akYIzeZMzF4qH/gwoG+czf/b3XT6phKcImnnZV/uWHG4Sw+HG+E2wLHQgUBc1mwFmTDC87W3UllWYKWKs4jcmkiB64OYbOMSU2VPIU9ctRxaijs45P0t36E0=
+	t=1765235383; cv=none; b=mhHtogpKLSQO7opyvngT448hK8IkD1e0Fhv5AVWiRp655RGuNa2Wv5htqq5XOIYiiRDBZAQjKm381QBV6e8OAKa4uEdcrXsHmhLpAE/v0ra3celFyd99t+L96brL3XzzBN31aWQKoJ8HgQ+7cNt3OH83nUmU04/iV+AodDqu2I0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765235354; c=relaxed/simple;
-	bh=akhtEbJUiRojKJtbftuWFnBF21f5LJGNssVKktpsdgI=;
+	s=arc-20240116; t=1765235383; c=relaxed/simple;
+	bh=Niaz3OcyWSvPRamO7EM3GBNmwSKLzayrhD3s1w1flwE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AKWqWDbSAb8fhQQruwaLlx4ETS+YiJsgW1Eq81AuSwmV6QoW3OKN7VNLkMgbToiUXq01RoZ7c13ZVLWc0qLlnOey1AvKwbp9NgozNCa7w2ejovdxLxElafnNZvIzEhJ2X56MvZdi8Wc6A1qE3Hsg4tmnCHkzRO3j0dAR6j4MK3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PquNqk8s; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=CEKngomtk+r3XoVYtHjalz3JniLsonvkIFxjUrkJLRDREbvqr5bcjJ/eOqoJy29SFmXvqRnZbX7CjK4ZecwcjbdmsuQros+7vQxRsYpMwhGnwmNb8Wrv31P0U8baxna1Unu7xJ8hhe/sAdfAgf4E9pYaqb0NjeC40aRTWun+sbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MTSpj3xy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PquNqk8s"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C05AC4CEF1;
-	Mon,  8 Dec 2025 23:09:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MTSpj3xy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAE73C4CEF1;
+	Mon,  8 Dec 2025 23:09:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765235353;
-	bh=akhtEbJUiRojKJtbftuWFnBF21f5LJGNssVKktpsdgI=;
+	s=k20201202; t=1765235383;
+	bh=Niaz3OcyWSvPRamO7EM3GBNmwSKLzayrhD3s1w1flwE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PquNqk8stkQH3T6tYxNjnUGKCwEWKuga1Zdbz1UStzQZYMR9qhhn8PCafJNcMFXW1
-	 OQVMlLkM/tzEPo5X+2IVJpcgNzIGCGQraCHumowp795cNudgPFdI/r/sGGqUwWVW0G
-	 KicMoKbigreyVm/RIqMB6IpZZz3h6U0JMGamWDsk7B8ynHwjRy6NwykC/NUlAAfovX
-	 jkwIMzdwFN61JqkSJ3xpYee8KdBkBr6KG/tfjps6OAxiVqVrpav9eMfGy2jY7h1+x2
-	 aidY4AZbU8BUgnKvA8vJF4e274Ekab7Gz3LcMQrm/OKG/hjDcrYhyFYkMBRGCAQjTq
-	 CnX3RgziD8t8A==
-Date: Mon, 8 Dec 2025 15:09:11 -0800
+	b=MTSpj3xyjjSbLZM1CNLcX4tZbJVrhLIpcC0UFb2X/3jpkCEEnCWToZDrDVWXNP0eq
+	 PrliHsn7YP+n5w4KcoqUSM6KBPVBTkL4fV9n1QuIpSqa4m+moJEO8MdSIDst6FG51O
+	 bZPurH8gFvWBv9K2BKd/DpsKH3yJkWyBm8Kyn0hWTAoGLXwrtQyFZL4nKBWnFs237M
+	 FIQOuwPlBRe0dhUh98yZLh0ckC38aZRwLYUfitw8LDs0JRPwswKsNUda8txeVcgk5S
+	 frzvAREFqLH7FfutqIxS/zoGFZrvorln6IRSRTVwrjXZ/9nzHKZ4Idh8/V3ZgnnZBb
+	 +2crndx5xb0ug==
+Date: Mon, 8 Dec 2025 15:09:41 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: Jerry Shih <jerry.shih@sifive.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] lib/crypto: riscv/chacha: Avoid s0/fp register
-Message-ID: <20251208230911.GA1853@quark>
-References: <20251202-riscv-chacha_zvkb-fp-v2-1-7bd00098c9dc@iscas.ac.cn>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	David Laight <david.laight@runbox.com>,
+	David Sterba <dsterba@suse.com>, llvm@lists.linux.dev,
+	linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v2] lib/crypto: blake2b: Roll up BLAKE2b round loop on
+ 32-bit
+Message-ID: <20251208230941.GB1853@quark>
+References: <20251205050330.89704-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,24 +52,47 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251202-riscv-chacha_zvkb-fp-v2-1-7bd00098c9dc@iscas.ac.cn>
+In-Reply-To: <20251205050330.89704-1-ebiggers@kernel.org>
 
-On Tue, Dec 02, 2025 at 01:25:07PM +0800, Vivian Wang wrote:
-> In chacha_zvkb, avoid using the s0 register, which is the frame pointer,
-> by reallocating KEY0 to t5. This makes stack traces available if e.g. a
-> crash happens in chacha_zvkb.
+On Thu, Dec 04, 2025 at 09:03:30PM -0800, Eric Biggers wrote:
+> BLAKE2b has a state of 16 64-bit words.  Add the message data in and
+> there are 32 64-bit words.  With the current code where all the rounds
+> are unrolled to enable constant-folding of the blake2b_sigma values,
+> this results in a very large code size on 32-bit kernels, including a
+> recurring issue where gcc uses a large amount of stack.
 > 
-> No frame pointer maintenence is otherwise required since this is a leaf
-> function.
+> There's just not much benefit to this unrolling when the code is already
+> so large.  Let's roll up the rounds when !CONFIG_64BIT.
 > 
-> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
-> ---
-> Changes in v2:
-> - Remove frame pointer maintenance, and simply avoid touching s0. Since
->   this is a leaf function, this also allows unwinding to work.
-> - Link to v1: https://lore.kernel.org/r/20251130-riscv-chacha_zvkb-fp-v1-1-68ef7a6d477a@iscas.ac.cn
-> ---
+> To avoid having to duplicate the code, just write code once using a
+> loop, and conditionally use 'unrolled_full' from <linux/unroll.h>.
 > 
+> Then, fold the now-unneeded ROUND() macro into the loop.  Finally, also
+> remove the now-unneeded override of the stack frame size warning.
+> 
+> Code size improvements for blake2b_compress_generic():
+> 
+>                   Size before (bytes)    Size after (bytes)
+>                   -------------------    ------------------
+>     i386, gcc           27584                 3632
+>     i386, clang         18208                 3248
+>     arm32, gcc          19912                 2860
+>     arm32, clang        21336                 3344
+> 
+> Running the BLAKE2b benchmark on a !CONFIG_64BIT kernel on an x86_64
+> processor shows a 16384B throughput change of 351 => 340 MB/s (gcc) or
+> 442 MB/s => 375 MB/s (clang).  So clearly not much of a slowdown either.
+> But also that microbenchmark also effectively disregards cache usage,
+> which is important in practice and is far better in the smaller code.
+> 
+> Note: If we rolled up the loop on x86_64 too, the change would be
+> 7024 bytes => 1584 bytes and 1960 MB/s => 1396 MB/s (gcc), or
+> 6848 bytes => 1696 bytes and 1920 MB/s => 1263 MB/s (clang).
+> Maybe still worth it, though not quite as clearly beneficial.
+> 
+> Fixes: 91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
+> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
 Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
 
