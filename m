@@ -1,69 +1,49 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from devnull.danielhodges.dev (vps-2f6e086e.vps.ovh.us [135.148.138.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC39AD4B;
-	Mon,  8 Dec 2025 00:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D98020C00A;
+	Mon,  8 Dec 2025 01:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.148.138.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765155526; cv=none; b=YYL4KWsO0qCAu6CMZh96Kol1u9tYk3GClT0Xbg06F3PQOG0kWPO0szY9XLa93u/QHLjs56VKNL4MV616PvtRtY/cbSWZYHKAn7FmmluEUK7pD7LLgcfaerZFk8zItSgl6BwiRuZMPrrL3lum2P8rvK/dwZaEg1puIL8y1BgNMIY=
+	t=1765157345; cv=none; b=bURen5ZLxc/rN2ZpUHKySR/jF55ajrtSyst/GLDr+HfBNJ6QK9aBhjhfl8zGsMxyTv5Rw3tQtTPCB7YNLQvWzO3schdSk5VmrhqoEoFz614+5v8v5iEtRPRJD/swYx/W8LLlrvKjht4dZuSf+XI9pjAnhg4N4epPE15BXu21Mmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765155526; c=relaxed/simple;
-	bh=AuVsZDC9lU7lEds0aHXmR4LfwJLUrfxrrmaf8c36yhk=;
+	s=arc-20240116; t=1765157345; c=relaxed/simple;
+	bh=/vCeJPmwLRTPe+QTThJ+UHIm5tpmjt9KiVsy5jcRHOk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qUWWAujFVkP2H6dyTRc5Mt3QxHiqO88Sx3R4R0a2/+zPCUzsz1CVgyqHX1eJc0Oz+ceUidNvNqraW6oXdhEjMwPqJXHQXjzdQnU5U4Ie3GWYKiiz54Z7t5C4a2Dnm2Ok8p2RWQOMPd1aVWJpQTW2DlgBAEAEIvmRIt1q9TbuX/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jJTyYo1r; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=An28KizN9StikHB9t5OrCpdPArvt7WNX1zwd5qegE4/R0Ww66gAfMpeR07AR5KdVwYAK/f2dln6nChdnYSVmAgkqgPgOYw1Vf5SKkDH766zV8LcH7xSUZ7izougzrzGs9tNMznIJninKFaWCtn6DwIjZbQUSl5lDzYEf1mtKdFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=PcGAOgUa; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=tZITcM/8; arc=none smtp.client-ip=135.148.138.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danielhodges.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jJTyYo1r"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765155526; x=1796691526;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=AuVsZDC9lU7lEds0aHXmR4LfwJLUrfxrrmaf8c36yhk=;
-  b=jJTyYo1rxEYTdki0+ZpzbgVZAAQg5SQ0icVgi9CS/U0HXSuF+UpkKtpw
-   D1goQ5YZP+OfebwWHRU/jSkMf6BFHUaPjRzsvNxRjCoXkz8dfDQDHmVzD
-   BSA5tNEWvIkEoB3Im+rd69OxVnxBOq42anxD/T1rH9dZEc43lV5tSgMeD
-   FqYuAb5kSjOcOMrOt0bKVeY3+NBe35R7tDWm5KxO0QPHhGvFjtGUoFwSC
-   wZv8VFpr0nrLCl1gjP6T0o0I4D3bu4H8duhrifsQ00h789+ICXxc+SVoz
-   udpzp7kG45md51l4nUyxzjCCO1zsnNcYqn2LZW6VAoacu4RaYTX9xDxjK
-   Q==;
-X-CSE-ConnectionGUID: GRlsRopfQ1y0mkNiln5Smw==
-X-CSE-MsgGUID: 3hhe3QfQSXGGSq3B/ffjPw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11635"; a="77419568"
-X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
-   d="scan'208";a="77419568"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2025 16:58:45 -0800
-X-CSE-ConnectionGUID: BKqEMDGdRcSJTkPM7/7ErA==
-X-CSE-MsgGUID: 7D6Fkr6YT/a08RrtUmbsOg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
-   d="scan'208";a="195827665"
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 07 Dec 2025 16:58:38 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vSPaF-00000000Jkf-2Xiw;
-	Mon, 08 Dec 2025 00:58:35 +0000
-Date: Mon, 8 Dec 2025 08:58:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ethan Graham <ethan.w.s.graham@gmail.com>, glider@google.com
-Cc: oe-kbuild-all@lists.linux.dev, andreyknvl@gmail.com, andy@kernel.org,
-	andy.shevchenko@gmail.com, brauner@kernel.org,
-	brendan.higgins@linux.dev, davem@davemloft.net, davidgow@google.com,
-	dhowells@redhat.com, dvyukov@google.com, elver@google.com,
-	herbert@gondor.apana.org.au, ignat@cloudflare.com, jack@suse.cz,
-	jannh@google.com, johannes@sipsolutions.net,
-	kasan-dev@googlegroups.com, kees@kernel.org,
-	kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lukas@wunner.de,
-	rmoar@google.com, shuah@kernel.org, sj@kernel.org,
-	tarasmadan@google.com, Ethan Graham <ethangraham@google.com>
-Subject: Re: [PATCH 09/10] drivers/auxdisplay: add a KFuzzTest for parse_xy()
-Message-ID: <202512080828.Gxjg6av3-lkp@intel.com>
-References: <20251204141250.21114-10-ethan.w.s.graham@gmail.com>
+	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="PcGAOgUa";
+	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="tZITcM/8"
+DKIM-Signature: v=1; a=rsa-sha256; s=202510r; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Subject:To:From:Date; t=1765157336; bh=9OzgqW7eCOiZnkL0fut6f21
+	0Lss6sJuynW09nbHpU6A=; b=PcGAOgUaJnipx42FL+r6bA2M1m3aLZsTe4vIPKZlOjNLFA9PES
+	yXNXsdic1DRsQ72yOBfW9Snss/XjQYOZtJy+OLTUSc6HiLjx6jNLUeZ2ettk8eoTOQrF2rIRLfl
+	c/lXjokdBzSOIQyKo+g1hhPpnZdfUgIGrDN4NQu64+uHUZcfKBd9sDoCo+GIo/Cw/29Ec1rlu04
+	VIUTnJXBrGmGBak/uDpf5bV+/natyuEmcM2ebSWTwd0gFnpPgZBXg2xBYCtYsXnvoc0YlDnEMo5
+	RlgdVkSW4BG6iVl5jrWBs1I/0yo6wwmST9zjRoht1/8lbNJvAdiiJxM5tcVlofMthig==;
+DKIM-Signature: v=1; a=ed25519-sha256; s=202510e; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Subject:To:From:Date; t=1765157336; bh=9OzgqW7eCOiZnkL0fut6f21
+	0Lss6sJuynW09nbHpU6A=; b=tZITcM/8rz1y+PEyLBWgfENlG7DpH2sq/2+YJASjVOL0OXcOdH
+	qr3rf3w9+PhJKvlk0cYlEYLKssm6BvEnySBQ==;
+Date: Sun, 7 Dec 2025 20:28:55 -0500
+From: Daniel Hodges <daniel@danielhodges.dev>
+To: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
+Cc: Daniel Hodges <git@danielhodges.dev>, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, vadim.fedorenko@linux.dev, 
+	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, 
+	jolsa@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	shuah@kernel.org, bpf@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2 2/5] bpf: Add SHA hash kfunc for
+ cryptographic hashing
+Message-ID: <y3i7w7bi4hozfjj3yzhfuvzagj4tkhd2czkwlkcj3jlyfvgoi3@cjypa2yl4t2u>
+References: <20251205173923.31740-1-git@danielhodges.dev>
+ <20251205173923.31740-3-git@danielhodges.dev>
+ <276ec0e0-2576-4595-a713-02a9223b6aa3@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -72,38 +52,116 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251204141250.21114-10-ethan.w.s.graham@gmail.com>
+In-Reply-To: <276ec0e0-2576-4595-a713-02a9223b6aa3@gmail.com>
 
-Hi Ethan,
+On Fri, Dec 05, 2025 at 06:50:48PM +0000, Mykyta Yatsenko wrote:
+> On 12/5/25 17:39, Daniel Hodges wrote:
+> > Extend bpf_crypto_type structure with hash operations:
+> >   - hash(): Performs hashing operation
+> >   - digestsize(): Returns hash output size
+> > 
+> > Update bpf_crypto_ctx_create() to support keyless operations:
+> >   - Hash algorithms don't require keys, unlike ciphers
+> >   - Only validates key presence if type->setkey is defined
+> >   - Conditionally sets IV/state length for cipher operations only
+> > 
+> > Add bpf_crypto_hash() kfunc that works with any hash algorithm
+> > registered in the kernel's crypto API through the BPF crypto type
+> > system. This enables BPF programs to compute cryptographic hashes for
+> > use cases such as content verification, integrity checking, and data
+> > authentication.
+> > 
+> > Signed-off-by: Daniel Hodges <git@danielhodges.dev>
+> > ---
+> >   include/linux/bpf_crypto.h |  2 +
+> >   kernel/bpf/crypto.c        | 76 ++++++++++++++++++++++++++++++++++----
+> >   2 files changed, 70 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/include/linux/bpf_crypto.h b/include/linux/bpf_crypto.h
+> > index a41e71d4e2d9..c84371cc4e47 100644
+> > --- a/include/linux/bpf_crypto.h
+> > +++ b/include/linux/bpf_crypto.h
+> > @@ -11,8 +11,10 @@ struct bpf_crypto_type {
+> >   	int (*setauthsize)(void *tfm, unsigned int authsize);
+> >   	int (*encrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
+> >   	int (*decrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
+> > +	int (*hash)(void *tfm, const u8 *data, u8 *out, unsigned int len);
+> >   	unsigned int (*ivsize)(void *tfm);
+> >   	unsigned int (*statesize)(void *tfm);
+> > +	unsigned int (*digestsize)(void *tfm);
+> >   	u32 (*get_flags)(void *tfm);
+> >   	struct module *owner;
+> >   	char name[14];
+> > diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
+> > index 83c4d9943084..95625c7ffb1a 100644
+> > --- a/kernel/bpf/crypto.c
+> > +++ b/kernel/bpf/crypto.c
+> > @@ -171,7 +171,12 @@ bpf_crypto_ctx_create(const struct bpf_crypto_params *params, u32 params__sz,
+> >   		goto err_module_put;
+> >   	}
+> > -	if (!params->key_len || params->key_len > sizeof(params->key)) {
+> > +	/* Hash operations don't require a key, but cipher operations do */
+> > +	if (params->key_len > sizeof(params->key)) {
+> > +		*err = -EINVAL;
+> > +		goto err_module_put;
+> > +	}
+> > +	if (!params->key_len && type->setkey) {
+> >   		*err = -EINVAL;
+> >   		goto err_module_put;
+> >   	}
+> > @@ -195,16 +200,19 @@ bpf_crypto_ctx_create(const struct bpf_crypto_params *params, u32 params__sz,
+> >   			goto err_free_tfm;
+> >   	}
+> > -	*err = type->setkey(ctx->tfm, params->key, params->key_len);
+> > -	if (*err)
+> > -		goto err_free_tfm;
+> > +	if (params->key_len) {
+> > +		*err = type->setkey(ctx->tfm, params->key, params->key_len);
+> > +		if (*err)
+> > +			goto err_free_tfm;
+> > -	if (type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY) {
+> > -		*err = -EINVAL;
+> > -		goto err_free_tfm;
+> > +		if (type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY) {
+> > +			*err = -EINVAL;
+> > +			goto err_free_tfm;
+> > +		}
+> >   	}
+> > -	ctx->siv_len = type->ivsize(ctx->tfm) + type->statesize(ctx->tfm);
+> > +	if (type->ivsize && type->statesize)
+> > +		ctx->siv_len = type->ivsize(ctx->tfm) + type->statesize(ctx->tfm);
+> >   	refcount_set(&ctx->usage, 1);
+> > @@ -343,6 +351,54 @@ __bpf_kfunc int bpf_crypto_encrypt(struct bpf_crypto_ctx *ctx,
+> >   	return bpf_crypto_crypt(ctx, src_kern, dst_kern, siv_kern, false);
+> >   }
+> > +#if IS_ENABLED(CONFIG_CRYPTO_HASH2)
+> > +/**
+> > + * bpf_crypto_hash() - Compute hash using configured context
+> > + * @ctx:	The crypto context being used. The ctx must be a trusted pointer.
+> > + * @data:	bpf_dynptr to the input data to hash. Must be a trusted pointer.
+> > + * @out:	bpf_dynptr to the output buffer. Must be a trusted pointer.
+> > + *
+> > + * Computes hash of the input data using the crypto context. The output buffer
+> > + * must be at least as large as the digest size of the hash algorithm.
+> > + */
+> > +__bpf_kfunc int bpf_crypto_hash(struct bpf_crypto_ctx *ctx,
+> > +				const struct bpf_dynptr *data,
+> > +				const struct bpf_dynptr *out)
+> > +{
+> > +	const struct bpf_dynptr_kern *data_kern = (struct bpf_dynptr_kern *)data;
+> > +	const struct bpf_dynptr_kern *out_kern = (struct bpf_dynptr_kern *)out;
+> > +	u32 data_len, out_len;
+> > +	const u8 *data_ptr;
+> > +	u8 *out_ptr;
+> > +
+> > +	if (!ctx->type->hash)
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	data_len = __bpf_dynptr_size(data_kern);
+> > +	out_len = __bpf_dynptr_size(out_kern);
+> __bpf_dynptr_size() returns u64, as well as __bpf_dynptr_data_rw()
+> takes u64 as length parameter, it may be worth using that type for
+> data_len and out_len.
 
-kernel test robot noticed the following build errors:
 
-[auto build test ERROR on akpm-mm/mm-nonmm-unstable]
-[also build test ERROR on herbert-cryptodev-2.6/master herbert-crypto-2.6/master linus/master v6.18]
-[cannot apply to next-20251205]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Ethan-Graham/mm-kasan-implement-kasan_poison_range/20251204-222307
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
-patch link:    https://lore.kernel.org/r/20251204141250.21114-10-ethan.w.s.graham%40gmail.com
-patch subject: [PATCH 09/10] drivers/auxdisplay: add a KFuzzTest for parse_xy()
-config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20251208/202512080828.Gxjg6av3-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251208/202512080828.Gxjg6av3-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512080828.Gxjg6av3-lkp@intel.com/
-
-All errors (new ones prefixed by >>, old ones prefixed by <<):
-
->> ERROR: modpost: "kfuzztest_write_cb_common" [drivers/auxdisplay/charlcd.ko] undefined!
->> ERROR: modpost: "kfuzztest_parse_and_relocate" [drivers/auxdisplay/charlcd.ko] undefined!
->> ERROR: modpost: "record_invocation" [drivers/auxdisplay/charlcd.ko] undefined!
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Yeah, that makes sense, will queue that up.
