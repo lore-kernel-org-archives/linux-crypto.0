@@ -1,206 +1,116 @@
-Received: from devnull.danielhodges.dev (vps-2f6e086e.vps.ovh.us [135.148.138.8])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F3D1C5D57;
-	Mon,  8 Dec 2025 03:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.148.138.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872362309AA;
+	Mon,  8 Dec 2025 03:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765163063; cv=none; b=PU3C9FHsCfNdN85iahbeavLkHDsV+3rL0x5Ud/8cbCe/fOroGzHihUXmZw0LwO78Z3VhUw0DLk0EYkrPdUZq1q40swBACxhl9HxjFzdoClbnbZmsiFvkBJ6iPVCmY7FcJCzdBa5a0mQi74M2iv4Q+lAKo7VQV2/BIud6w2wKN3M=
+	t=1765164270; cv=none; b=ZRrmEKQT1xoC7Kqq1PQzxYLzVt1X3AEtXGN2NHn/0CWjWwDjJgrmgrDSmW3bmXUV6/fbBnPhwMhiQFIU9KeRrwjqwKthe2BI3cbMxU5YNcGls6mmm6yrNlPrgDVApmuN10/vIR7sJ7IILGRqIVw+gVvPLfxKeOjtdZBF2k6F6rA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765163063; c=relaxed/simple;
-	bh=n/6Ij5wpcMBoeeRl+pQHtqgU6qo0CnrWCwQwPDxpMPI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rjq3lwTcj461RHEqh25cmV/YUx2HZKD+WosQYLNslVA0S9FIJ573CKJlIcq0k/AMhSmhl9/B+pJpRRABGrab1h3gda8NdxbeqsotJpzQBtINlklxlg19Hg9f3OpC2iM60Qt+v+7ch1C84kczVGMPl4vtbpECYBOfkdqJz6J/Yc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=W64enURy; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=KjuYF8ul; arc=none smtp.client-ip=135.148.138.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danielhodges.dev
+	s=arc-20240116; t=1765164270; c=relaxed/simple;
+	bh=Pvrc4FadI4rh0F3zdUo69p2LT9Q3nnmRn/wVsyq7fes=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fBjST/EFj95MOYPKDf2aWPhntl3t319AnGg3AQ3MifVBh2n6oJJNSQ6IUYBg9wS4TGJbSX4tgkGkfquMtQjlh+iHt/9/+ccXRmHrR+dFaEOzmFnimMLICSzMC93jBGjHAAfaB+xJtdzdRqEkBn1fXROE4BDtMC+gfgC1wwrtuxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=j00J0/IH; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="W64enURy";
-	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="KjuYF8ul"
-DKIM-Signature: v=1; a=rsa-sha256; s=202510r; d=danielhodges.dev; c=relaxed/relaxed;
-	h=Message-ID:Date:Subject:To:From; t=1765162878; bh=T6p27ig63eCdRe1ACpmWrHV
-	14KHrG/tKLWuIaAZSrIk=; b=W64enURypkwIcJp/oBE5gqx2UVQaPrt9mf6LgWSLqG5SmtYUWV
-	NP8wo/ZbylnGhTN4nGK5TLWEsnSH1QkGgzH90nJXZfwQ3fYY6Qhpp3URF5jXEpdXl2SsqTFudYT
-	Bz12kxR4dM0Dvq1xYCMX11ZtHETJF2i0wy1iNIzws04s90pi9FCQEsL/iwq/N+kAK0MdmuzTuPG
-	xX+byUIF+Q1tj79fE0dHArxQ6HnumpM9R/gsGTgL/Hnk2txsIPlYh4BBjGL2hqE4pAyBpZNLpZd
-	sEFbWOLAgd5lMrV7oKws0NmSsldOKk9dxuYkxaz9VyY9fDueV/4nvEdI/U6DIKAF+Jg==;
-DKIM-Signature: v=1; a=ed25519-sha256; s=202510e; d=danielhodges.dev; c=relaxed/relaxed;
-	h=Message-ID:Date:Subject:To:From; t=1765162878; bh=T6p27ig63eCdRe1ACpmWrHV
-	14KHrG/tKLWuIaAZSrIk=; b=KjuYF8ulHMhpsh9PpsQb7QiU3kS3MoP1vCJCzqQtC7zsD/XvfJ
-	bIRs/k+GfAhx08PvTIICyHStUJsW/rcPUOAA==;
-From: Daniel Hodges <git@danielhodges.dev>
-To: bpf@vger.kernel.org
-Cc: ast@kernel.org,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	vadim.fedorenko@linux.dev,
-	song@kernel.org,
-	yatsenko@meta.com,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	yonghong.song@linux.dev,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Daniel Hodges <git@danielhodges.dev>
-Subject: [PATCH bpf-next v3 2/6] crypto: Add BPF hash algorithm type registration module
-Date: Sun,  7 Dec 2025 22:01:13 -0500
-Message-ID: <20251208030117.18892-3-git@danielhodges.dev>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251208030117.18892-1-git@danielhodges.dev>
-References: <20251208030117.18892-1-git@danielhodges.dev>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="j00J0/IH"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=xgnn6MwSl2S/6LuXc1sx4ksRMJ6UXHwQQO3rL1/acEI=; 
+	b=j00J0/IHH6pOHYr1EdBh3Pfn8wlSyxziIWLWdek3IBYXF/P9SrYAS3Gs51jEyFdh4bjSifxC5jv
+	ii/aC2PJTyv2sutj7cdM1hTQDoP11Fm7e8tRWpwlKpbH3qbQyXE9iJaiBJTT9/oEt8Qqh5dj2jl/A
+	sFjnI0WvAu3E5l4ciYVVvKt9wuMZmGO/nQt5qlvI2+wbpFMOuwABCwOoaul2lAm0svQMCmIOHK8Iu
+	LObyEF8YMbjrRvOIDBI5CnA5xXUkOe0fFG6nup7EtGu1xBcvk+jf7XHzMwvlD43xzEKTsaReTdJsb
+	64CGxDvsyKlgTkA/Ye8oSpj2YQV0I0VR1a+Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vSRqn-008iGp-1h;
+	Mon, 08 Dec 2025 11:23:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 08 Dec 2025 11:23:49 +0800
+Date: Mon, 8 Dec 2025 11:23:49 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, SeongJae Park <sj@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+	"nphamcs@gmail.com" <nphamcs@gmail.com>,
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"21cnbao@gmail.com" <21cnbao@gmail.com>,
+	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+	"kasong@tencent.com" <kasong@tencent.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"ebiggers@google.com" <ebiggers@google.com>,
+	"surenb@google.com" <surenb@google.com>,
+	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
+	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
+	"Gopal, Vinodh" <vinodh.gopal@intel.com>
+Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
+ compress batching of large folios.
+Message-ID: <aTZExW2LgFNTfwVJ@gondor.apana.org.au>
+References: <20251104091235.8793-1-kanchana.p.sridhar@intel.com>
+ <20251104091235.8793-23-kanchana.p.sridhar@intel.com>
+ <q54bjetgzmwbsqpgbuuovdmcwxjwmtowwgsv7p3ykbodhxpvc7@6mqmz6ji4jja>
+ <SJ2PR11MB8472011B61F644D4662FE980C9CDA@SJ2PR11MB8472.namprd11.prod.outlook.com>
+ <ifqmrypobhqxlkh734md5it22vggmkvqo2t2uy7hgch5hmlyln@flqi75fwmfd4>
+ <SJ2PR11MB8472610CE6EF5BA83BCC8D2EC9CAA@SJ2PR11MB8472.namprd11.prod.outlook.com>
+ <ygtejnrci7cnjkpomoqhz3jdtryjffmk3o2avatjppylirbbem@qppr4eybud47>
+ <aSaUUez5J1w5WyE-@gondor.apana.org.au>
+ <j7vaexpi3lmheowozkymesvekasccdgnxijjip66ryngj66llf@kolcsjasxxdy>
+ <SA1PR11MB8476756D7255F1EA1EBE322AC9DEA@SA1PR11MB8476.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SA1PR11MB8476756D7255F1EA1EBE322AC9DEA@SA1PR11MB8476.namprd11.prod.outlook.com>
 
-Add bpf_crypto_shash module that registers a hash type with the BPF
-crypto infrastructure, enabling BPF programs to access kernel hash
-algorithms through a unified interface.
+On Wed, Nov 26, 2025 at 08:05:40PM +0000, Sridhar, Kanchana P wrote:
+>
+> Herbert, to make sure I understand, will you be implementing all of these
+> features in crypto_acomp for software compressors? I would appreciate it
+> if you can clarify:
+> 
+> 1) Error & compressed length propagation to the dst sg->length only for
+>     non-batching compressors.
+>     a) For batching compressors, this wouldn't apply since errors could occur
+>         for any page in the batch, and the first page (dst sg->length) could have
+>         successfully compressed.
 
-Update the bpf_crypto_type interface with hash-specific callbacks:
-   - alloc_tfm: Allocates crypto_shash context with proper descriptor size
-   - free_tfm: Releases hash transform and context memory
-   - has_algo: Checks algorithm availability via crypto_has_shash()
-   - hash: Performs single-shot hashing via crypto_shash_digest()
-   - digestsize: Returns the output size for the hash algorithm
-   - get_flags: Exposes transform flags to BPF programs
+This would be the first step.
 
-Update bpf_shash_ctx to contain crypto_shash transform and shash_desc
-descriptor to accommodate algorithm-specific descriptor requirements.
+> 2) Will you also be handling the case where zswap can send an SG list batch
+>      with multiple pages to a non-batching compressor, and the crypto_acomp
+>      API will internally compress each page sequentially, propagate
+>      errors/compress lengths before returning?
+>         
+> If so, this would really standardize the code in zswap for batching and
+> non-batching compressors.
 
-Signed-off-by: Daniel Hodges <git@danielhodges.dev>
----
- crypto/Makefile           |  3 ++
- crypto/bpf_crypto_shash.c | 95 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 98 insertions(+)
- create mode 100644 crypto/bpf_crypto_shash.c
+Yes this will be done as the next step.  My understanding is that
+your patch-set doesn't require this yet as all non-batching compressors
+will have a batch size of 1.
 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 16a35649dd91..853dff375906 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -30,6 +30,9 @@ obj-$(CONFIG_CRYPTO_ECHAINIV) += echainiv.o
- crypto_hash-y += ahash.o
- crypto_hash-y += shash.o
- obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
-+ifeq ($(CONFIG_BPF_SYSCALL),y)
-+obj-$(CONFIG_CRYPTO_HASH2) += bpf_crypto_shash.o
-+endif
- 
- obj-$(CONFIG_CRYPTO_AKCIPHER2) += akcipher.o
- obj-$(CONFIG_CRYPTO_SIG2) += sig.o
-diff --git a/crypto/bpf_crypto_shash.c b/crypto/bpf_crypto_shash.c
-new file mode 100644
-index 000000000000..95c178ec0ce8
---- /dev/null
-+++ b/crypto/bpf_crypto_shash.c
-@@ -0,0 +1,95 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
-+#include <linux/types.h>
-+#include <linux/module.h>
-+#include <linux/bpf_crypto.h>
-+#include <crypto/hash.h>
-+
-+struct bpf_shash_ctx {
-+	struct crypto_shash *tfm;
-+	struct shash_desc desc;
-+};
-+
-+static void *bpf_crypto_shash_alloc_tfm(const char *algo)
-+{
-+	struct bpf_shash_ctx *ctx;
-+	struct crypto_shash *tfm;
-+
-+	tfm = crypto_alloc_shash(algo, 0, 0);
-+	if (IS_ERR(tfm))
-+		return tfm;
-+
-+	ctx = kzalloc(sizeof(*ctx) + crypto_shash_descsize(tfm), GFP_KERNEL);
-+	if (!ctx) {
-+		crypto_free_shash(tfm);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	ctx->tfm = tfm;
-+	ctx->desc.tfm = tfm;
-+
-+	return ctx;
-+}
-+
-+static void bpf_crypto_shash_free_tfm(void *tfm)
-+{
-+	struct bpf_shash_ctx *ctx = tfm;
-+
-+	crypto_free_shash(ctx->tfm);
-+	kfree(ctx);
-+}
-+
-+static int bpf_crypto_shash_has_algo(const char *algo)
-+{
-+	return crypto_has_shash(algo, 0, 0);
-+}
-+
-+static int bpf_crypto_shash_hash(void *tfm, const u8 *data, u8 *out,
-+				 unsigned int len)
-+{
-+	struct bpf_shash_ctx *ctx = tfm;
-+
-+	return crypto_shash_digest(&ctx->desc, data, len, out);
-+}
-+
-+static unsigned int bpf_crypto_shash_digestsize(void *tfm)
-+{
-+	struct bpf_shash_ctx *ctx = tfm;
-+
-+	return crypto_shash_digestsize(ctx->tfm);
-+}
-+
-+static u32 bpf_crypto_shash_get_flags(void *tfm)
-+{
-+	struct bpf_shash_ctx *ctx = tfm;
-+
-+	return crypto_shash_get_flags(ctx->tfm);
-+}
-+
-+static const struct bpf_crypto_type bpf_crypto_shash_type = {
-+	.alloc_tfm	= bpf_crypto_shash_alloc_tfm,
-+	.free_tfm	= bpf_crypto_shash_free_tfm,
-+	.has_algo	= bpf_crypto_shash_has_algo,
-+	.hash		= bpf_crypto_shash_hash,
-+	.digestsize	= bpf_crypto_shash_digestsize,
-+	.get_flags	= bpf_crypto_shash_get_flags,
-+	.owner		= THIS_MODULE,
-+	.name		= "hash",
-+};
-+
-+static int __init bpf_crypto_shash_init(void)
-+{
-+	return bpf_crypto_register_type(&bpf_crypto_shash_type);
-+}
-+
-+static void __exit bpf_crypto_shash_exit(void)
-+{
-+	int err = bpf_crypto_unregister_type(&bpf_crypto_shash_type);
-+
-+	WARN_ON_ONCE(err);
-+}
-+
-+module_init(bpf_crypto_shash_init);
-+module_exit(bpf_crypto_shash_exit);
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Hash algorithm support for BPF");
+But yes this certainly will be extended, not just with sequential
+processing, but we could also use pcrypt/cryptd to parallelise the
+compression across CPUs.
+
+Cheers,
 -- 
-2.51.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
