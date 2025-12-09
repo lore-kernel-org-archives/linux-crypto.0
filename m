@@ -1,173 +1,74 @@
-Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A3628642D
-	for <linux-crypto@vger.kernel.org>; Tue,  9 Dec 2025 11:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E9726F443
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Dec 2025 15:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765278499; cv=none; b=EDvZ+s43HA1uWjH3zgERFpg61K5E4VJ/O/T5uPb+GD1QeD+Xrbo+NomgXRCSlTYITc7acbPe3B+K+i9+rgoM+AjtEYMYr1Mok1pU3CT/hpLH+LdVwNqdpTMs22bGAXSdknH0ivI8cf6s5MUwCBkwywMc5sj/+1qXr0iQvYH5COQ=
+	t=1765294273; cv=none; b=fDOcbxbxktkJjUDkaRRfCRPGBzqG0AGCzsTXbBrc0/09X+EfSujSoIKLt9NXCV5mNbqsRtBqGRBJlfGOyFO4LF3ftQTj0QhJWTqan1sgNobkVNH4Hl0CHukO5eSDkYCrliJ9yrFk2iDaTYS8wgUSDmwv39iJL338Nh4NoBHxkOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765278499; c=relaxed/simple;
-	bh=shT9tBjI8TIw5ux+mXWY7mqDfAQyY5tU76iB6CNoC1o=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=cvhn+DQ9NRTodW83yj/Qx/IsVb6qr+xjg86bkDcZE38BdLwXrGA/lQR83Juqohxh3OVaDhJ1r2DqLugl6tBUbXhTEMPvD7n8Jr3kI7gXVAD47+RSjl8vK7W/AhaeKs/E0e5p0sXLiqXH7RIn8nupYbCbYXzv6AdvVJJMBB7+xQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-656bc3a7ab3so8365789eaf.2
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Dec 2025 03:08:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765278497; x=1765883297;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Xw/E3Vy0/7x6YxsDXNwWvkMieu2C5D/ay1KNYrFPxM=;
-        b=FCmayWum0VFKR2SDravs5vHIf9amn3ZhUjXPSd7oR4ObbiuTbvzLZj1YzkXz+hHJ0/
-         e+c2Mj6r9Fh9FnvKaKmajuCzoIRKsO0HFX/EoF3hmhFnxtkYZlnvg64CvlgWvVnHDmJj
-         yGlI/XEah4f8D1GMHTWUa8XHS1DF4btsY9g5qm5fkmW+Vc+Jb4ni6rKGLVhetMU7i1n5
-         /VvT9FyN0h5PsHOKGQEcx8gDGU7B1f+DC2/tM/WoR3iAzsfHmTvXuLkt8QUvccM47aq9
-         3iUpNbPToAx5wgGJ6RAt2tvWTkmX+FTIg3euJ8JvkhEde8UlGu2LkQ032voho9j+KtmT
-         FqIg==
-X-Forwarded-Encrypted: i=1; AJvYcCXB7VZi7qrslWm3TN4MsXWL4WQ8AsVIehBAfub1wxcBurnw7uw4fpZhJ2i0Pb9ZTVJo+lCfPJ+E5xH+xEA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyiixjPO92pcspaTulNGf2c7d1ecbbsk5dhvEoRkQ426YzoAht
-	UkbM6JhVD+B2orhy62fTOmJ2Ia7bYcYpGCORvEheNcoBTTP8QLVErR4q8kgYH2f2pf7ZHCGQllI
-	+QyMk0eIX1cOkRe3VdyQ8UlUxUnMy0ibzWjC30MlNDUDzc+tb8+hcMjUvJCY=
-X-Google-Smtp-Source: AGHT+IG4WyPj9QFKCe40E58n+5dRuWKZAw89JrJTWJ6KuTr2vVvl3fO8VBeUHSBc4VUe7YhqveZVwlBUZGtZuYjryAm7S+lni48s
+	s=arc-20240116; t=1765294273; c=relaxed/simple;
+	bh=bJN65gY6giKFu5Hrvj15qyRLsJ7kUce0SDLwJOguP6Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dkbg3ga4u8s7N3e+GSjsrngmtrXn8/gyyEq8qF3HYgUz9gGCZTskUtXVOCFRl/C844se8wooNUaDnejOOjZRM13CaW+m8RPuhMxldiMU8zs+I5jdd6k0fgpYobvAZJvWlz4QM9RACn/moF6R+k7Cs0aGxmbnpqd3Va5SAZE0fKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GX7JYClW; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GX7JYClW"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1765294257;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QogldAY8o/J4mynBEBOsNtgJwwEQdVm7q8XblZZv1qI=;
+	b=GX7JYClWzmtOeVO6OqYsIw7zNEUpFv5bv1kPpdmFi1TTbACgauTfHtDX65qSOg1trrtN/+
+	eIzDDrpFQcTd2hJzpoZolcxwWLtQooO3hcUeQVaqvYCoU2tzf+krYeyfC8Uamow5J1O+fN
+	E8hSOUUn0d/YFEZDLGBXBfhDauNXyxQ=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: scompress - Remove forward declaration of crypto_scomp_show
+Date: Tue,  9 Dec 2025 16:30:43 +0100
+Message-ID: <20251209153044.432883-1-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1388:b0:659:9a49:8f9c with SMTP id
- 006d021491bc7-6599a8cd164mr4480509eaf.21.1765278497044; Tue, 09 Dec 2025
- 03:08:17 -0800 (PST)
-Date: Tue, 09 Dec 2025 03:08:17 -0800
-In-Reply-To: <68ee633c.050a0220.1186a4.002a.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69380321.050a0220.1ff09b.0000.GAE@google.com>
-Subject: Re: [syzbot] [ext4] [fscrypt] KMSAN: uninit-value in fscrypt_crypt_data_unit
-From: syzbot <syzbot+7add5c56bc2a14145d20@syzkaller.appspotmail.com>
-To: davem@davemloft.net, ebiggers@kernel.org, herbert@gondor.apana.org.au, 
-	jaegeuk@kernel.org, linux-crypto@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, tytso@mit.edu
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-syzbot has found a reproducer for the following issue on:
+Add the __maybe_unused attribute to the crypto_scomp_show() definition
+and remove the now-unnecessary forward declaration.
 
-HEAD commit:    a110f942672c Merge tag 'pinctrl-v6.19-1' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17495992580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=10d58c94af5f9772
-dashboard link: https://syzkaller.appspot.com/bug?extid=7add5c56bc2a14145d20
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1122aec2580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14012a1a580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/905b868d0b1d/disk-a110f942.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/aa7281cd9720/vmlinux-a110f942.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1420de8a7da2/bzImage-a110f942.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/1e40f788aa89/mount_0.gz
-  fsck result: OK (log: https://syzkaller.appspot.com/x/fsck.log?x=1622aec2580000)
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7add5c56bc2a14145d20@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in subshift lib/crypto/aes.c:150 [inline]
-BUG: KMSAN: uninit-value in aes_encrypt+0x1239/0x1960 lib/crypto/aes.c:283
- subshift lib/crypto/aes.c:150 [inline]
- aes_encrypt+0x1239/0x1960 lib/crypto/aes.c:283
- aesti_encrypt+0x7d/0xf0 crypto/aes_ti.c:31
- crypto_ecb_crypt crypto/ecb.c:23 [inline]
- crypto_ecb_encrypt2+0x142/0x300 crypto/ecb.c:40
- crypto_lskcipher_crypt_sg+0x3ac/0x930 crypto/lskcipher.c:188
- crypto_lskcipher_encrypt_sg+0x8b/0xc0 crypto/lskcipher.c:207
- crypto_skcipher_encrypt+0x111/0x1e0 crypto/skcipher.c:443
- xts_encrypt+0x2e1/0x570 crypto/xts.c:269
- crypto_skcipher_encrypt+0x18a/0x1e0 crypto/skcipher.c:444
- fscrypt_crypt_data_unit+0x38e/0x590 fs/crypto/crypto.c:139
- fscrypt_encrypt_pagecache_blocks+0x430/0x900 fs/crypto/crypto.c:197
- ext4_bio_write_folio+0x1383/0x30d0 fs/ext4/page-io.c:552
- mpage_submit_folio+0x399/0x3d0 fs/ext4/inode.c:2087
- mpage_process_page_bufs+0xaef/0xf50 fs/ext4/inode.c:2198
- mpage_prepare_extent_to_map+0x175d/0x2660 fs/ext4/inode.c:2737
- ext4_do_writepages+0x1aa1/0x77a0 fs/ext4/inode.c:2930
- ext4_writepages+0x338/0x870 fs/ext4/inode.c:3026
- do_writepages+0x3f2/0x860 mm/page-writeback.c:2598
- __writeback_single_inode+0x101/0x1190 fs/fs-writeback.c:1737
- writeback_sb_inodes+0xb2d/0x1f10 fs/fs-writeback.c:2030
- wb_writeback+0x4ce/0xc00 fs/fs-writeback.c:2216
- wb_do_writeback fs/fs-writeback.c:2363 [inline]
- wb_workfn+0x397/0x1910 fs/fs-writeback.c:2403
- process_one_work kernel/workqueue.c:3257 [inline]
- process_scheduled_works+0xb91/0x1d80 kernel/workqueue.c:3340
- worker_thread+0xedf/0x1590 kernel/workqueue.c:3421
- kthread+0xd5c/0xf00 kernel/kthread.c:463
- ret_from_fork+0x208/0x710 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-
-Uninit was stored to memory at:
- le128_xor include/crypto/b128ops.h:69 [inline]
- xts_xor_tweak+0x566/0xbd0 crypto/xts.c:123
- xts_xor_tweak_pre crypto/xts.c:135 [inline]
- xts_encrypt+0x278/0x570 crypto/xts.c:268
- crypto_skcipher_encrypt+0x18a/0x1e0 crypto/skcipher.c:444
- fscrypt_crypt_data_unit+0x38e/0x590 fs/crypto/crypto.c:139
- fscrypt_encrypt_pagecache_blocks+0x430/0x900 fs/crypto/crypto.c:197
- ext4_bio_write_folio+0x1383/0x30d0 fs/ext4/page-io.c:552
- mpage_submit_folio+0x399/0x3d0 fs/ext4/inode.c:2087
- mpage_process_page_bufs+0xaef/0xf50 fs/ext4/inode.c:2198
- mpage_prepare_extent_to_map+0x175d/0x2660 fs/ext4/inode.c:2737
- ext4_do_writepages+0x1aa1/0x77a0 fs/ext4/inode.c:2930
- ext4_writepages+0x338/0x870 fs/ext4/inode.c:3026
- do_writepages+0x3f2/0x860 mm/page-writeback.c:2598
- __writeback_single_inode+0x101/0x1190 fs/fs-writeback.c:1737
- writeback_sb_inodes+0xb2d/0x1f10 fs/fs-writeback.c:2030
- wb_writeback+0x4ce/0xc00 fs/fs-writeback.c:2216
- wb_do_writeback fs/fs-writeback.c:2363 [inline]
- wb_workfn+0x397/0x1910 fs/fs-writeback.c:2403
- process_one_work kernel/workqueue.c:3257 [inline]
- process_scheduled_works+0xb91/0x1d80 kernel/workqueue.c:3340
- worker_thread+0xedf/0x1590 kernel/workqueue.c:3421
- kthread+0xd5c/0xf00 kernel/kthread.c:463
- ret_from_fork+0x208/0x710 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-
-Uninit was created at:
- __alloc_frozen_pages_noprof+0x421/0xab0 mm/page_alloc.c:5233
- alloc_pages_mpol+0x328/0x860 mm/mempolicy.c:2486
- alloc_frozen_pages_noprof mm/mempolicy.c:2557 [inline]
- alloc_pages_noprof mm/mempolicy.c:2577 [inline]
- folio_alloc_noprof+0x109/0x360 mm/mempolicy.c:2587
- filemap_alloc_folio_noprof+0xda/0x480 mm/filemap.c:1013
- __filemap_get_folio_mpol+0xb4f/0x1960 mm/filemap.c:2006
- __filemap_get_folio include/linux/pagemap.h:763 [inline]
- write_begin_get_folio include/linux/pagemap.h:789 [inline]
- ext4_write_begin+0x6d3/0x2d70 fs/ext4/inode.c:1323
- generic_perform_write+0x365/0x1050 mm/filemap.c:4314
- ext4_buffered_write_iter+0x61a/0xce0 fs/ext4/file.c:299
- ext4_file_write_iter+0x2a2/0x3d90 fs/ext4/file.c:-1
- aio_write+0x704/0xa10 fs/aio.c:1634
- __io_submit_one fs/aio.c:-1 [inline]
- io_submit_one+0x260e/0x3450 fs/aio.c:2053
- __do_sys_io_submit fs/aio.c:2112 [inline]
- __se_sys_io_submit+0x27c/0x6a0 fs/aio.c:2082
- __x64_sys_io_submit+0x97/0xe0 fs/aio.c:2082
- x64_sys_call+0x3b5f/0x3e70 arch/x86/include/generated/asm/syscalls_64.h:210
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 1 UID: 0 PID: 1143 Comm: kworker/u8:8 Not tainted syzkaller #0 PREEMPT(none) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Workqueue: writeback wb_workfn (flush-7:0)
-=====================================================
-
-
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ crypto/scompress.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/crypto/scompress.c b/crypto/scompress.c
+index 1a7ed8ae65b0..70ceb2fe3d7f 100644
+--- a/crypto/scompress.c
++++ b/crypto/scompress.c
+@@ -58,10 +58,8 @@ static int __maybe_unused crypto_scomp_report(
+ 		       sizeof(rscomp), &rscomp);
+ }
+ 
+-static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
+-	__maybe_unused;
+-
+-static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
++static void __maybe_unused crypto_scomp_show(struct seq_file *m,
++					     struct crypto_alg *alg)
+ {
+ 	seq_puts(m, "type         : scomp\n");
+ }
+-- 
+Thorsten Blum <thorsten.blum@linux.dev>
+GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
+
