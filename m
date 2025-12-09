@@ -1,154 +1,128 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A281A3154
-	for <linux-crypto@vger.kernel.org>; Tue,  9 Dec 2025 17:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50363054C7
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Dec 2025 19:36:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765301529; cv=none; b=QMGFTfBdBviuwiVA+iAq6Bhz7VxrmGPaj6Itto1ANj+pY9jlaz4G2OqphxQb9C9KN8DWJt/HZjyCozOfKa4mfffjbUC/a0e9VkazvfdGs8+Pw2+uHqwdAuOTFjB/qZEE4MUq4fS4Y+WwojZzwFtdvEYmePrdV+Qtv9WybwunAxw=
+	t=1765309001; cv=none; b=exqI+qy/TJmtKZO382uDccJZxcxBUQ6O/xkhKPJZopn886MoX4QxO9ftTK0+AYbF+q2OyutKUY1trSvdkJ+IbIHm3ugUZcEhFwF0QQQOU7zTyY8Hoazpkxo3NAazK+PDz2iZSEPLMBcZ9YysP7B53kjYY5Blyl4JVNhh1eRJ8/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765301529; c=relaxed/simple;
-	bh=okhRmd0k9JrXvX7ahpAZVBy5qCLwEZ9tzVAP7xD7ZzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TX7Fh3J46VYABjF00wn4I6sBBU0kZpfum6XYH1kLS8lNfj6IPkbK+8otfLaUXTJ3BKMakFN5goGcENSeiN7zYDxA/34aslz2m+3xG05PFz9y+HG+42+XH5eZD2cYanxP/dgFC7TYIeOjhSBFu0jeiv4kF96p/a/ijZMimjFUf8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oro8iw+y; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1765309001; c=relaxed/simple;
+	bh=XxkXDA7gnyPd9eZkgVBPV6Ob4QQwfW59MXLLyyVUHWw=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To; b=TVUoNa8RgDpZF0CcT8hXjdgxAkRzufeexQzpk9wcYbXenyeHZiB+aJ4B9kRSjUWKxEL3UcCwkpLn97C+nJgCn61JcUar9glGiDr/IE23DbaOA9/D3f8KWpjGIZJ7GQ9OIQimOts/qYj0WAvTnCsL3C77Mx4WyqLh4r0E0x8qS/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow-tech.com; spf=pass smtp.mailfrom=cknow-tech.com; dkim=pass (2048-bit key) header.d=cknow-tech.com header.i=@cknow-tech.com header.b=m5ketdiI; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow-tech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow-tech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oro8iw+y"
-Date: Tue, 9 Dec 2025 17:31:35 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765301513;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k0r6smmgNfGvVjQrSAgG2MQSRnerif7fVYwrIvFf+EA=;
-	b=oro8iw+yCYsySwiIDvfYRW4SEi3cU6GqUjVPipwHfrmZXzH2l7EayPnm2QMKAVWOAA78pM
-	1jteLiceqnsVJ9Yo+w2/Ug+vi/qfA2Vz6soCMohKlCVg7Mqa/Y+Fg3hPCMRRVhmflXlGcW
-	tgEdAAkMz9bGWBBRsSJg/339Rs1Atpg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	SeongJae Park <sj@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org" <hannes@cmpxchg.org>, 
-	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
-	"kasong@tencent.com" <kasong@tencent.com>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com" <clabbe@baylibre.com>, 
-	"ardb@kernel.org" <ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
-	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>, "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, 
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
- compress batching of large folios.
-Message-ID: <bfkkizyjmfulkzxgf45l7tjsnudtyutnenyngzw7l4tmmugo3k@zr2wg2xqh3uv>
-References: <aSaUUez5J1w5WyE-@gondor.apana.org.au>
- <j7vaexpi3lmheowozkymesvekasccdgnxijjip66ryngj66llf@kolcsjasxxdy>
- <SA1PR11MB8476756D7255F1EA1EBE322AC9DEA@SA1PR11MB8476.namprd11.prod.outlook.com>
- <aTZExW2LgFNTfwVJ@gondor.apana.org.au>
- <SJ2PR11MB8472529E92EC003D956DF530C9A2A@SJ2PR11MB8472.namprd11.prod.outlook.com>
- <aTZS4RKR3Zci8d_I@gondor.apana.org.au>
- <qux3i5m4weedza76ynfmjmtvt4whnkk3itwpuolozfvk3cg6ud@rylhkigmqn7t>
- <aTeKNEX5stqjG55i@gondor.apana.org.au>
- <j7rqzweklga72b7hdebljs7nziz7bs7kzvevkuhnbwi3uespkt@rmkdqlpku2gh>
- <SJ2PR11MB8472CE03A67C1161469CDE9EC9A3A@SJ2PR11MB8472.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=cknow-tech.com header.i=@cknow-tech.com header.b="m5ketdiI"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SJ2PR11MB8472CE03A67C1161469CDE9EC9A3A@SJ2PR11MB8472.namprd11.prod.outlook.com>
+Mime-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow-tech.com;
+	s=key1; t=1765308994;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HKPFIYCR+ZJv7w5p0UHlLNtuIAEwTPk2t63quVSSOzc=;
+	b=m5ketdiIJNKB+fbuCFxWvrlW0LPwZG0Qp4xBdp6vNK4Jecp/DeDBGEUPPF+Sie/x7NtTun
+	zxYfMpaVt+3VNUwWk29RX/tCsSkxJ7fPE2px69mR1zDNhba4tPwmIfT/mvK/WDfZdJhsWK
+	zjDRK93Moh1daU+76XeVmy3Ekx+dBUParH1fKBedC//IbLsHKc53qVct+V/iL8usQpD6ja
+	NhBuodiuukKtSL+oZbgnRhzJZOEnpqBUkP656P65Hp8CZN+LvINav6n6AY1HleYUgOoZav
+	sqrJm7CkERFqZxwm0lQSnNRr2LuNhRa547x8HF9enj96NryqUOdegaMMH+wvuQ==
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 09 Dec 2025 20:36:32 +0100
+Message-Id: <DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com>
+Subject: ERROR: alg: shash: ghash-neon test failed (wrong result) on test
+ vector 1, cfg="init+update+final aligned buffer"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Diederik de Haas" <diederik@cknow-tech.com>
+To: <linux-crypto@vger.kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Dec 09, 2025 at 05:21:06PM +0000, Sridhar, Kanchana P wrote:
-> 
-> > -----Original Message-----
-> > From: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > Sent: Tuesday, December 9, 2025 8:55 AM
-> > To: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>; SeongJae Park
-> > <sj@kernel.org>; linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> > hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
-> > usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
-> > ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
-> > senozhatsky@chromium.org; kasong@tencent.com; linux-
-> > crypto@vger.kernel.org; davem@davemloft.net; clabbe@baylibre.com;
-> > ardb@kernel.org; ebiggers@google.com; surenb@google.com; Accardi,
-> > Kristen C <kristen.c.accardi@intel.com>; Gomes, Vinicius
-> > <vinicius.gomes@intel.com>; Feghali, Wajdi K <wajdi.k.feghali@intel.com>;
-> > Gopal, Vinodh <vinodh.gopal@intel.com>
-> > Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
-> > compress batching of large folios.
-> > 
-> > On Tue, Dec 09, 2025 at 10:32:20AM +0800, Herbert Xu wrote:
-> > > On Tue, Dec 09, 2025 at 01:15:02AM +0000, Yosry Ahmed wrote:
-> > > >
-> > > > Just to clarify, does this mean that zswap can pass a batch of (eight)
-> > > > pages to the acomp API, and get the results for the batch uniformly
-> > > > whether or not the underlying compressor supports batching?
-> > >
-> > > Correct.  In fact I'd like to remove the batch size exposure to zswap
-> > > altogether.  zswap should just pass along whatever maximum number of
-> > > pages that is convenient to itself.
-> > 
-> > I think exposing the batch size is still useful as a hint for zswap. In
-> > the current series, zswap allocates as many per-CPU buffers as the
-> > compressor's batch size, so no extra buffers for non-batching
-> > compressors (including SW compressors).
-> > 
-> > If we use the same batch size regardless, we'll have to always allocate
-> > 8 (or N) per-CPU buffers, for little to no benefit on non-batching
-> > compressors.
-> > 
-> > So we still want the batch size on the zswap side, but we want the
-> > crypto API to be uniform whether or not the compressor supports
-> > batching.
-> 
-> Thanks Yosry, you bring up a good point. I currently have the outer for
-> loop in zswap_compress() due to the above constraint. For non-batching
-> compressors, we allocate only one per-CPU buffer. Hence, we need to
-> call crypto_acomp_compress() and write the compressed data to the
-> zs_poll for each page in the batch. Wouldn't we need to allocate
-> 8 per-CPU buffers for non-batching compressors if we want zswap to
-> send a batch of 8 pages uniformly to the crypto API, so that
-> zswap_compress() can store the 8 pages in zs_pool after the crypto
-> API returns?
+Hi,
 
-Ugh, yes.. I don't think we want to burn 7 extra pages per-CPU for SW
-compressors.
+With either 6.18-rc1 or -rc2 I saw the above error in dmesg:
+https://paste.sr.ht/~diederik/54ed00a4cdcf5f9285674cf940d53a1ffd7ecc4f
+and then the stack trace in the dmesg warnings.
 
-I think the cleanest way to handle this would be to:
-- Rename zswap_compress() to __zswap_compress(), and make it handle a
-  given batch size (which would be 1 or 8).
-- Introduce zswap_compress() as a wrapper that breaks down the folio
-  into batches and loops over them, passing them to __zswap_compress().
-- __zswap_compress() has a single unified path (e.g. for compressed
-  length and error handling), regardless of the batch size.
+This was on a (Rockchip based) PineTab2 (rk3566) on arm64.
+Didn't have time to report it then and then it seems like the error was
+gone with 6.18-rc5, so I assumed it was fixed*.
 
-Can this be done with the current acomp API? I think all we really need
-is to be able to pass in a batch of size N (which can be 1), and read
-the error and compressed length in a single way. This is my main problem
-with the current patch.
+Then I started up an Raspberry Pi 3B+ (also arm64) with Debian's 6.17.9
+kernel ... and I saw that error again. I also tried Debian's 6.17.2 and
+my own 6.18(.0) kernel and they also showed that error.
 
-In the future, if it's beneifical for some SW compressors to batch
-compressions, we can look into optimizations for the per-CPU buffers to
-avoid allocating 8 pages per-CPU (e.g. shared page pool), or make this
-opt-in for certain SW compressors that justify the cost.
+So I guess there is an actual problem?
+For completeness, the error and warnings (incl stack trace) on 6.17.9:
 
-> 
-> Thanks,
-> Kanchana
-> 
-> > 
-> > >
-> > > Cheers,
-> > > --
-> > > Email: Herbert Xu <herbert@gondor.apana.org.au>
-> > > Home Page: http://gondor.apana.org.au/~herbert/
-> > > PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+```
+[   21.438404] alg: shash: ghash-neon test failed (wrong result) on test ve=
+ctor 1, cfg=3D"init+update+final aligned buffer"
+[   21.448906] alg: self-tests for ghash using ghash-neon failed (rc=3D-22)
+[   21.448927] ------------[ cut here ]------------
+[   21.460059] alg: self-tests for ghash using ghash-neon failed (rc=3D-22)
+[   21.460231] WARNING: CPU: 0 PID: 650 at crypto/testmgr.c:5827 alg_test+0=
+x92c/0x950
+[   21.474266] Modules linked in: ghash_ce gf128mul gcm ccm algif_aead des_=
+generic libdes rfcomm algif_skcipher bnep aes_neon_blk md4 algif_hash af_al=
+g evdev vc4 snd_soc_hdmi_codec brcmfmac_wcc snd_soc_core btsdio nls_ascii s=
+nd_compress brcmfmac microchip nls_cp437 bcm2835_v4l2(C) snd_pcm_dmaengine =
+drm_exec brcmutil hci_uart bcm2835_mmal_vchiq(C) drm_display_helper vfat bt=
+qca fat videobuf2_vmalloc lan78xx btrtl cfg80211 videobuf2_memops cec video=
+buf2_v4l2 phylink btintel rc_core of_mdio btbcm videodev drm_client_lib fix=
+ed_phy fwnode_mdio drm_dma_helper snd_bcm2835(C) libphy videobuf2_common sn=
+d_pcm bluetooth mdio_bus mc drm_kms_helper snd_timer snd cpufreq_dt soundco=
+re ecdh_generic rfkill raspberrypi_cpufreq pwrseq_core ledtrig_default_on b=
+cm2835_thermal vchiq(C) pwm_bcm2835 bcm2835_rng leds_gpio pkcs8_key_parser =
+drm efi_pstore configfs nfnetlink autofs4 ext4 crc16 mbcache jbd2 crc32c_cr=
+yptoapi onboard_usb_dev dwc2 udc_core usbcore sdhci_iproc sdhci_pltfm sdhci=
+ bcm2835_wdt usb_common bcm2835 phy_generic i2c_bcm2835
+[   21.565523] CPU: 0 UID: 0 PID: 650 Comm: cryptomgr_test Tainted: G      =
+   C          6.17.9+deb14-arm64 #1 PREEMPTLAZY  Debian 6.17.9-1
+[   21.577700] Tainted: [C]=3DCRAP
+[   21.580655] Hardware name: Raspberry Pi 3 Model B Plus Rev 1.3 (DT)
+[   21.587014] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=
+=3D--)
+[   21.594062] pc : alg_test+0x92c/0x950
+[   21.597746] lr : alg_test+0x92c/0x950
+[   21.601446] sp : ffff800081413d20
+[   21.604793] x29: ffff800081413dd0 x28: 0000000000000111 x27: 00000000fff=
+fffea
+[   21.612030] x26: 0000000000000088 x25: ffffb3112dfa7d48 x24: 00000000fff=
+fffff
+[   21.621241] x23: 0000000000000089 x22: 000000000104000e x21: ffff0000063=
+20e00
+[   21.629874] x20: ffffb3112f6d0000 x19: ffffb3112dfa9f48 x18: 00000000000=
+00000
+[   21.638500] x17: 726f746365762074 x16: ffffb3112d52c1a8 x15: ffffb3112f1=
+b45e0
+[   21.647115] x14: ffffb3112f0d7480 x13: 00000000000000c0 x12: 00000004ff2=
+01560
+[   21.655729] x11: 00000000000000c0 x10: 0000000000000d40 x9 : ffffb3112cf=
+28078
+[   21.664327] x8 : ffff00000575dda0 x7 : 0000000000000004 x6 : 00000000000=
+00000
+[   21.672936] x5 : 0000000000000000 x4 : ffff00000575d000 x3 : ffff000004a=
+d2800
+[   21.681520] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff0000057=
+5d000
+[   21.690116] Call trace:
+[   21.693925]  alg_test+0x92c/0x950 (P)
+[   21.698952]  cryptomgr_test+0x2c/0x58
+[   21.703972]  kthread+0x148/0x240
+[   21.708535]  ret_from_fork+0x10/0x20
+[   21.713440] ---[ end trace 0000000000000000 ]---
+```
+
+Hopefully this'll tell you where the (likely) problem is at.
+
+Cheers,
+  Diederik
+
+*) Reading my own comment from that paste ... I possibly switched to an
+'rkbin' based U-Boot and that's why I didn't see it anymore
