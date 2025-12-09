@@ -1,49 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098382F5A1A;
-	Tue,  9 Dec 2025 23:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAE71A0BD0;
+	Tue,  9 Dec 2025 23:24:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765321930; cv=none; b=S1vvng2CFHFpm5kXsh5ZsdBJ7+nX4DjjV0LV6jx0bNTuFkIBJr2nH4/dtoiuH2tdRlEZLZBpv70SkjfosnnXhJKLXy54xSGeZGMi+VwKItcXJgx2cc3DvnYD+FPSmg7E0wdRi70znwvZn7dPmD3BOff1q1SCLz5OQOEJKDhoXC4=
+	t=1765322698; cv=none; b=FKrCLjZpxDofjbCT2SQCvRFQqa3pMIucdAkrobdGKrB7fLsamtlPyuIMgVZXCNdkd0st8bPVSxo91ZZX0mOPoU+muHgJnTrqemKQjAgux05rzllf1S7GmJt7R/kBOl6CP1xAxIedPNiuy6L0g0yuFqkhzlQSE7+f1UNBYTqibNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765321930; c=relaxed/simple;
-	bh=dOAJWjzwU/24sx5t+aWrT0lj9C4TaECJbxIz9cLUCfk=;
+	s=arc-20240116; t=1765322698; c=relaxed/simple;
+	bh=NwixsbyN0vRkVzF50eT+kmqTqkAD/i/3MpDi2cl1Xtg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hWTOhRAvbH89RyKtxhUjvwFuBZbHOjQQJRsI09uvU1gk/5jNiQ9TA6LN1zbI7HXGZ4ZAMicykNkJ/HDaSvg/IHYSztxtnXNCUQYhjHA28YHHTIWw8vtixwhwWSdqtERrBh05eZwTHmqXMPIVUiL16TRB5tIjcoID6c686AIuar4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MH5f5neb; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=QBIJg01PgyRjtAsRD9JnJpXQu/znAWFPFNQ2349ZLaidm1sXTRrka/ScpWHI9bDL0CKF0Ts/C7RArCzjadSMeorGD0idhCYgpdj10Ez57pFtq56fUCbUbHZRg0NQree7q11A55G9b3a7dLNJIfrWEVnehYilLgbFK71eYwQR+R4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=QFf6fJj3; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MH5f5neb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEB47C4CEF5;
-	Tue,  9 Dec 2025 23:12:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765321929;
-	bh=dOAJWjzwU/24sx5t+aWrT0lj9C4TaECJbxIz9cLUCfk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MH5f5nebthMzdcO/r0VOSjY+F+5gNezwlJuKLAfEsQkLR1sIsrqMvmJKmUds5+FCP
-	 sYVbwqG4LLuxzvCjlkI+WJWz5CSae2qUD7FYTP+gTcDKVyYQSma3r+YpyLRgGc3Q65
-	 ZPQU515jPo78fRNM+qbfyDuZzsvK2zD9zvNoEYTAJR21WfPelH5K7boV2LYKmdSGJZ
-	 dcnJsus1wS7JRgSmcVuh55ZcY1I/hvDxoQGBT0+QV0V1LXBlk1+xKbBBo09tPBqAMz
-	 05VyZcqL+azb23iF5rixFnAPAdUzyU44hYZuxh646/RfG9fbvdNplyR1JPWbgfCugq
-	 8DsZ1j2XpU3GQ==
-Date: Tue, 9 Dec 2025 15:12:07 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="QFf6fJj3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=1u3OlWaahLtO9NoZXjfgTMx2QYqqlSsbjYBcPVq2h2E=; 
+	b=QFf6fJj34Unm/pgYLMhFQZ0drNCKLXD0WqoWSyezxh9yP/e5aL/gWlb3TOzQtf2yPsq7FTeTIPG
+	ju8lKL7Esqfi2H1Lj4CMu/bcSljLmF5JscKn7O6doxEgRpatal/fRkwLdLILeu4n6gFroswF0FN1c
+	bi8aP6oCcZCUoXN9+BiLisjRQdUu8m12PZKE6AyNzhBqxem1NzBhZKGMZ8V7mxwCCO0hr9HOivzk9
+	8oX5c+lsCkM9mqMa9PHeT+m6n37Qz1N8ICpmOOE60dUtReWyoOgL0McOIYwe/q5efvK2nsftu09Kj
+	eu6m1I4CInyXMiA5comAEcWDkzcpBA7j75XQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vT74J-00995H-0L;
+	Wed, 10 Dec 2025 07:24:32 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Dec 2025 07:24:31 +0800
+Date: Wed, 10 Dec 2025 07:24:31 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Vivian Wang <wangruikang@iscas.ac.cn>,
-	Jerry Shih <jerry.shih@sifive.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Han Gao <gaohan@iscas.ac.cn>, linux-riscv@lists.infradead.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: riscv: Depend on
- RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS
-Message-ID: <20251209231207.GD54030@quark>
-References: <20251206213750.81474-1-ebiggers@kernel.org>
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org,
+	Diederik de Haas <diederik@cknow-tech.com>
+Subject: Re: [PATCH] crypto: arm64/ghash - Fix incorrect output from
+ ghash-neon
+Message-ID: <aTivr6JtPIxFmKLS@gondor.apana.org.au>
+References: <DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com>
+ <20251209223417.112294-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,39 +51,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251206213750.81474-1-ebiggers@kernel.org>
+In-Reply-To: <20251209223417.112294-1-ebiggers@kernel.org>
 
-On Sat, Dec 06, 2025 at 01:37:50PM -0800, Eric Biggers wrote:
-> Replace the RISCV_ISA_V dependency of the RISC-V crypto code with
-> RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS, which implies RISCV_ISA_V as
-> well as vector unaligned accesses being efficient.
+On Tue, Dec 09, 2025 at 02:34:17PM -0800, Eric Biggers wrote:
+> Commit 9a7c987fb92b ("crypto: arm64/ghash - Use API partial block
+> handling") made ghash_finup() pass the wrong buffer to
+> ghash_do_simd_update().  As a result, ghash-neon now produces incorrect
+> outputs when the message length isn't divisible by 16 bytes.  Fix this.
 > 
-> This is necessary because this code assumes that vector unaligned
-> accesses are supported and are efficient.  (It does so to avoid having
-> to use lots of extra vsetvli instructions to switch the element width
-> back and forth between 8 and either 32 or 64.)
+> (I didn't notice this earlier because this code is reached only on CPUs
+> that support NEON but not PMULL.  I haven't yet found a way to get
+> qemu-system-aarch64 to emulate that configuration.)
 > 
-> This was omitted from the code originally just because the RISC-V kernel
-> support for detecting this feature didn't exist yet.  Support has now
-> been added, but it's fragmented into per-CPU runtime detection, a
-> command-line parameter, and a kconfig option.  The kconfig option is the
-> only reasonable way to do it, though, so let's just rely on that.
-> 
-> Fixes: eb24af5d7a05 ("crypto: riscv - add vector crypto accelerated AES-{ECB,CBC,CTR,XTS}")
-> Fixes: bb54668837a0 ("crypto: riscv - add vector crypto accelerated ChaCha20")
-> Fixes: 600a3853dfa0 ("crypto: riscv - add vector crypto accelerated GHASH")
-> Fixes: 8c8e40470ffe ("crypto: riscv - add vector crypto accelerated SHA-{256,224}")
-> Fixes: b3415925a08b ("crypto: riscv - add vector crypto accelerated SHA-{512,384}")
-> Fixes: 563a5255afa2 ("crypto: riscv - add vector crypto accelerated SM3")
-> Fixes: b8d06352bbf3 ("crypto: riscv - add vector crypto accelerated SM4")
+> Fixes: 9a7c987fb92b ("crypto: arm64/ghash - Use API partial block handling")
 > Cc: stable@vger.kernel.org
+> Reported-by: Diederik de Haas <diederik@cknow-tech.com>
+> Closes: https://lore.kernel.org/linux-crypto/DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com/
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+> 
+> If it's okay, I'd like to just take this via libcrypto-fixes.
+> 
+>  arch/arm64/crypto/ghash-ce-glue.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
+Thanks for catching this!
 
-I also added:
-
-    Reported-by: Vivian Wang <wangruikang@iscas.ac.cn>
-    Closes: https://lore.kernel.org/r/b3cfcdac-0337-4db0-a611-258f2868855f@iscas.ac.cn/
-
-- Eric
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
