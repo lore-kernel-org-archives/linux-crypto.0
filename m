@@ -1,124 +1,97 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 567452D46B1;
-	Tue,  9 Dec 2025 02:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6527217D2;
+	Tue,  9 Dec 2025 02:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765247350; cv=none; b=N/dqCpbN7LPBRif3VJOcOiOGSGTlHqWbK/cZulkuneXpsI/r/t9Txn81SwcqXmZYw3b8LF3JQLrHGkE77Pi2AXZzL6ZviFJz043NcZbN9SRBuqK8UUAZadEMPPX1AdZknM9ZmXvNrigNI7ttZaKmBVlCgtxQZSovqWR68xVmXDA=
+	t=1765247576; cv=none; b=heOmGoMjXlUhssjyCy17cfKrzHNyHpA0kJnW1aBMgj65r1KFexnfWHuImetARBxfLbcfUQp5Tq0ByhOkO542ILJLNhmIYGVZhkhagaxD0C87MY5U6i4JFLMJ2GdzmNlo/fhvk7b1RQ0R8y4gtRGfPgGt49Q6zeQLaSptDqANyMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765247350; c=relaxed/simple;
-	bh=+KL9fTpXu7Z2+XIHxUTheNx7elf32qY3ioCOHY97eeA=;
-	h=Subject:From:To:Cc:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=dbD26xOkh7K1pOFsuXCmmXt1Cr9CLR5dRcWbR/GrPJT+MoqW3V2aP+DK8c+z9eks7b4hmJwpLV5kNpgw94JwJskOPrLu4E1uZmG+0A1eBP9xw180Gv9OgCeX3f3/4NRNtS5W9cfuq/NvSAei4flq9RQhk1TfS698YgxgTf6AFVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Cxbb9yiTdpXYMsAA--.29204S3;
-	Tue, 09 Dec 2025 10:29:06 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJCxocJwiTdpIUJHAQ--.54594S3;
-	Tue, 09 Dec 2025 10:29:06 +0800 (CST)
-Subject: Re: [PATCH v3 01/10] crypto: virtio: Add spinlock protection with
- virtqueue notification
-From: Bibo Mao <maobibo@loongson.cn>
-To: Gonglei <arei.gonglei@huawei.com>, "Michael S . Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=c3=a9rez?=
- <eperezma@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- wangyangxin <wangyangxin1@huawei.com>
-Cc: virtualization@lists.linux.dev, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251209015951.4174743-1-maobibo@loongson.cn>
- <20251209015951.4174743-2-maobibo@loongson.cn>
-Message-ID: <832af71e-c4a1-6745-bae0-ba77f8a66142@loongson.cn>
-Date: Tue, 9 Dec 2025 10:26:34 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1765247576; c=relaxed/simple;
+	bh=aZwYVUDw6YBffU7mDHMNI6dVNGxgYj7dcZKNti7q9V8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dRB6cK6dy1sGPHsXuWGfTKM+z44tVQpzmomLsiljSb+U2X2TvtChSL1jVq0j8faH+qPVxHIpRagt6r2UnNI30OQzjr5dNWrlSijbQ2LGPZ4hYk9KTFSJ+4lmPAYbwEreukL/LNKu4dmSLpkZg5dt4n0A+xMy7PVBfV2tFwgSmL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=gnjL+27L; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="gnjL+27L"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=wZLjNoakVV6bFoonKXxZ2uN/OSTmU5GF66yNKZJxxOs=; 
+	b=gnjL+27Lnwc//Pp4AsBRMlTPIpwoztS0SHJEc1yNf09XrIKkzhVBpfYKziPJ/wUrylumg4Phn+u
+	VRerEwMBQVN3OvAuVmXUnsgxwVQflVtTgaOnUGBWe6LtCTI9OO05N7tvQdIlRhoYfwO6CFBlUWakM
+	0HMPZs7RITXd2p7N6GUaMO0GESc6MsoANjD92lgJucMZPA7l+vPNS6rP4qGPUfNJM8giuz1XDuIwl
+	oGaSBr6bg6g5vHnHUUGgaYM62UgXft8lerbubZinUhMGJPymUatyNxl6pRokIw1YBmXEa6mW8HG5W
+	xMJmYDX8XpcwGVLHfv0DXSXHyP1IczXXW6ig==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vSnWW-008wNt-34;
+	Tue, 09 Dec 2025 10:32:22 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 09 Dec 2025 10:32:20 +0800
+Date: Tue, 9 Dec 2025 10:32:20 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>,
+	SeongJae Park <sj@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+	"nphamcs@gmail.com" <nphamcs@gmail.com>,
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"21cnbao@gmail.com" <21cnbao@gmail.com>,
+	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+	"kasong@tencent.com" <kasong@tencent.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"ebiggers@google.com" <ebiggers@google.com>,
+	"surenb@google.com" <surenb@google.com>,
+	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
+	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
+	"Gopal, Vinodh" <vinodh.gopal@intel.com>
+Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
+ compress batching of large folios.
+Message-ID: <aTeKNEX5stqjG55i@gondor.apana.org.au>
+References: <ifqmrypobhqxlkh734md5it22vggmkvqo2t2uy7hgch5hmlyln@flqi75fwmfd4>
+ <SJ2PR11MB8472610CE6EF5BA83BCC8D2EC9CAA@SJ2PR11MB8472.namprd11.prod.outlook.com>
+ <ygtejnrci7cnjkpomoqhz3jdtryjffmk3o2avatjppylirbbem@qppr4eybud47>
+ <aSaUUez5J1w5WyE-@gondor.apana.org.au>
+ <j7vaexpi3lmheowozkymesvekasccdgnxijjip66ryngj66llf@kolcsjasxxdy>
+ <SA1PR11MB8476756D7255F1EA1EBE322AC9DEA@SA1PR11MB8476.namprd11.prod.outlook.com>
+ <aTZExW2LgFNTfwVJ@gondor.apana.org.au>
+ <SJ2PR11MB8472529E92EC003D956DF530C9A2A@SJ2PR11MB8472.namprd11.prod.outlook.com>
+ <aTZS4RKR3Zci8d_I@gondor.apana.org.au>
+ <qux3i5m4weedza76ynfmjmtvt4whnkk3itwpuolozfvk3cg6ud@rylhkigmqn7t>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20251209015951.4174743-2-maobibo@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJCxocJwiTdpIUJHAQ--.54594S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7ZF1ktw4UKw1UtFW7WFykJFc_yoW8tr47pF
-	WDJFWYyrWUXrW8KayxJF18WFWUu3srury7ZrWxWayDGwn0yF1kWry7Ary09F42yF1rtF47
-	JrZ5A3s0qF9ruagCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
-	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
-	twAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
-	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l
-	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
-	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4SoGDUUUU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <qux3i5m4weedza76ynfmjmtvt4whnkk3itwpuolozfvk3cg6ud@rylhkigmqn7t>
 
-oops, the cover letter is missing again since I forgot to add 
-linux-kernel@vger.kernel.org in cc list manually and command 
-"scripts/get_maintainer.pl --nogit --nogit-fallback --norolestats" has 
-no any effect on cover letter :(
+On Tue, Dec 09, 2025 at 01:15:02AM +0000, Yosry Ahmed wrote:
+> 
+> Just to clarify, does this mean that zswap can pass a batch of (eight)
+> pages to the acomp API, and get the results for the batch uniformly
+> whether or not the underlying compressor supports batching?
 
-please ignore this patch set.
+Correct.  In fact I'd like to remove the batch size exposure to zswap
+altogether.  zswap should just pass along whatever maximum number of
+pages that is convenient to itself.
 
-Regards
-Bibo Mao
-
-On 2025/12/9 上午9:59, Bibo Mao wrote:
-> When VM boots with one virtio-crypto PCI device and builtin backend,
-> run openssl benchmark command with multiple processes, such as
->    openssl speed -evp aes-128-cbc -engine afalg  -seconds 10 -multi 32
-> 
-> openssl processes will hangup and there is error reported like this:
->   virtio_crypto virtio0: dataq.0:id 3 is not a head!
-> 
-> It seems that the data virtqueue need protection when it is handled
-> for virtio done notification. If the spinlock protection is added
-> in virtcrypto_done_task(), openssl benchmark with multiple processes
-> works well.
-> 
-> Fixes: fed93fb62e05 ("crypto: virtio - Handle dataq logic with tasklet")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> ---
->   drivers/crypto/virtio/virtio_crypto_core.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
-> index 3d241446099c..ccc6b5c1b24b 100644
-> --- a/drivers/crypto/virtio/virtio_crypto_core.c
-> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
-> @@ -75,15 +75,20 @@ static void virtcrypto_done_task(unsigned long data)
->   	struct data_queue *data_vq = (struct data_queue *)data;
->   	struct virtqueue *vq = data_vq->vq;
->   	struct virtio_crypto_request *vc_req;
-> +	unsigned long flags;
->   	unsigned int len;
->   
-> +	spin_lock_irqsave(&data_vq->lock, flags);
->   	do {
->   		virtqueue_disable_cb(vq);
->   		while ((vc_req = virtqueue_get_buf(vq, &len)) != NULL) {
-> +			spin_unlock_irqrestore(&data_vq->lock, flags);
->   			if (vc_req->alg_cb)
->   				vc_req->alg_cb(vc_req, len);
-> +			spin_lock_irqsave(&data_vq->lock, flags);
->   		}
->   	} while (!virtqueue_enable_cb(vq));
-> +	spin_unlock_irqrestore(&data_vq->lock, flags);
->   }
->   
->   static void virtcrypto_dataq_callback(struct virtqueue *vq)
-> 
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
