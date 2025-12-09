@@ -1,152 +1,173 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25AE19CCF7;
-	Tue,  9 Dec 2025 07:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A3628642D
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Dec 2025 11:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765264809; cv=none; b=lBwFuvzjAXS1wndkqW35ixy7ifzYQiCldK/gXgY1/9QqOvihFOsjf8CdgLitRp+DXA2bk6/xab3bppEpEwo7I9jR+029fC6LjXs1L1F5iTgFGtPtVWPCOMWYjVsJGv4j0EANScjMWQOUbQaS6ANqIBlVtnWqBT8VwqsN13tn5WU=
+	t=1765278499; cv=none; b=EDvZ+s43HA1uWjH3zgERFpg61K5E4VJ/O/T5uPb+GD1QeD+Xrbo+NomgXRCSlTYITc7acbPe3B+K+i9+rgoM+AjtEYMYr1Mok1pU3CT/hpLH+LdVwNqdpTMs22bGAXSdknH0ivI8cf6s5MUwCBkwywMc5sj/+1qXr0iQvYH5COQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765264809; c=relaxed/simple;
-	bh=2+RBfirrXuFnkMRxDw7t0EtfDZroa6uDXyUspwpTeIU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a96dkxOQClkof4kcvL77GbAJ6Uou34WKxUZm/wGMBX3LcrOfGMJGRYC2MrN5gLLUltAtBktZ7wKQ3tnavb03VIv8MwneZS3b0EBaLRa/++QpivpTpu/uqpwU8jmENsKNC6QrAoUvCRHrUelBA29k9faL/PHvKFXiTLRwAWapM8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/jVDiia; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/jVDiia"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 137C4C4CEFB;
-	Tue,  9 Dec 2025 07:20:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765264809;
-	bh=2+RBfirrXuFnkMRxDw7t0EtfDZroa6uDXyUspwpTeIU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n/jVDiia6Xt689ozubWpINb6zPps2GAGN4ovKR+yZJbb1pZ3FqoiGlaESeOnFGwnC
-	 oFohj1jB3EQDwexnuAimLRCSTAIkMcqqUUp/Ppk00eblJIMiI/hUSM5ZqNuoxKDqZy
-	 qgunAerivYkbJNWMeG6MbaGPRLrk4rTDm8kPpdrvVO6pUGQ3o1l5c+0pYQxttsTsb0
-	 s+gzBg72oPYzw/GIwTiMssFxRpmpM6CU76gMyTDS9l6ARdgm0Y7ac8cxoaqmsswcKH
-	 AwmLtUYjLUKVPw9RIwCOxo2ni4xc0MAgPG9bSbJcD8Qiv+TID/luQz8wBjVO8pFKff
-	 fxdkxqKFXombQ==
-Date: Tue, 9 Dec 2025 08:20:01 +0100
-From: Niklas Cassel <cassel@kernel.org>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: Vinod Koul <vkoul@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Koichiro Den <den@valinux.co.jp>, dmaengine@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org, mhi@lists.linux.dev,
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev
-Subject: Re: [PATCH 0/8] dmaengine: Add new API to combine onfiguration and
- descriptor preparation
-Message-ID: <aTfNoU6fKBOcjL5j@ryzen>
-References: <20251208-dma_prep_config-v1-0-53490c5e1e2a@nxp.com>
+	s=arc-20240116; t=1765278499; c=relaxed/simple;
+	bh=shT9tBjI8TIw5ux+mXWY7mqDfAQyY5tU76iB6CNoC1o=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=cvhn+DQ9NRTodW83yj/Qx/IsVb6qr+xjg86bkDcZE38BdLwXrGA/lQR83Juqohxh3OVaDhJ1r2DqLugl6tBUbXhTEMPvD7n8Jr3kI7gXVAD47+RSjl8vK7W/AhaeKs/E0e5p0sXLiqXH7RIn8nupYbCbYXzv6AdvVJJMBB7+xQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-656bc3a7ab3so8365789eaf.2
+        for <linux-crypto@vger.kernel.org>; Tue, 09 Dec 2025 03:08:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765278497; x=1765883297;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Xw/E3Vy0/7x6YxsDXNwWvkMieu2C5D/ay1KNYrFPxM=;
+        b=FCmayWum0VFKR2SDravs5vHIf9amn3ZhUjXPSd7oR4ObbiuTbvzLZj1YzkXz+hHJ0/
+         e+c2Mj6r9Fh9FnvKaKmajuCzoIRKsO0HFX/EoF3hmhFnxtkYZlnvg64CvlgWvVnHDmJj
+         yGlI/XEah4f8D1GMHTWUa8XHS1DF4btsY9g5qm5fkmW+Vc+Jb4ni6rKGLVhetMU7i1n5
+         /VvT9FyN0h5PsHOKGQEcx8gDGU7B1f+DC2/tM/WoR3iAzsfHmTvXuLkt8QUvccM47aq9
+         3iUpNbPToAx5wgGJ6RAt2tvWTkmX+FTIg3euJ8JvkhEde8UlGu2LkQ032voho9j+KtmT
+         FqIg==
+X-Forwarded-Encrypted: i=1; AJvYcCXB7VZi7qrslWm3TN4MsXWL4WQ8AsVIehBAfub1wxcBurnw7uw4fpZhJ2i0Pb9ZTVJo+lCfPJ+E5xH+xEA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyiixjPO92pcspaTulNGf2c7d1ecbbsk5dhvEoRkQ426YzoAht
+	UkbM6JhVD+B2orhy62fTOmJ2Ia7bYcYpGCORvEheNcoBTTP8QLVErR4q8kgYH2f2pf7ZHCGQllI
+	+QyMk0eIX1cOkRe3VdyQ8UlUxUnMy0ibzWjC30MlNDUDzc+tb8+hcMjUvJCY=
+X-Google-Smtp-Source: AGHT+IG4WyPj9QFKCe40E58n+5dRuWKZAw89JrJTWJ6KuTr2vVvl3fO8VBeUHSBc4VUe7YhqveZVwlBUZGtZuYjryAm7S+lni48s
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251208-dma_prep_config-v1-0-53490c5e1e2a@nxp.com>
+X-Received: by 2002:a05:6820:1388:b0:659:9a49:8f9c with SMTP id
+ 006d021491bc7-6599a8cd164mr4480509eaf.21.1765278497044; Tue, 09 Dec 2025
+ 03:08:17 -0800 (PST)
+Date: Tue, 09 Dec 2025 03:08:17 -0800
+In-Reply-To: <68ee633c.050a0220.1186a4.002a.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69380321.050a0220.1ff09b.0000.GAE@google.com>
+Subject: Re: [syzbot] [ext4] [fscrypt] KMSAN: uninit-value in fscrypt_crypt_data_unit
+From: syzbot <syzbot+7add5c56bc2a14145d20@syzkaller.appspotmail.com>
+To: davem@davemloft.net, ebiggers@kernel.org, herbert@gondor.apana.org.au, 
+	jaegeuk@kernel.org, linux-crypto@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, tytso@mit.edu
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Dec 08, 2025 at 12:09:39PM -0500, Frank Li wrote:
-> Frank Li (8):
->       dmaengine: Add API to combine configuration and preparation (sg and single)
->       PCI: endpoint: pci-epf-test: use new DMA API to simple code
->       dmaengine: dw-edma: Use new .device_prep_slave_sg_config() callback
->       dmaengine: dw-edma: Pass dma_slave_config to dw_edma_device_transfer()
->       nvmet: pci-epf: Remove unnecessary dmaengine_terminate_sync() on each DMA transfer
->       nvmet: pci-epf: Use dmaengine_prep_slave_single_config() API
->       PCI: epf-mhi:Using new API dmaengine_prep_slave_single_config() to simple code.
->       crypto: atmel: Use dmaengine_prep_slave_single_config() API
-> 
->  drivers/crypto/atmel-aes.c                    | 10 ++---
->  drivers/dma/dw-edma/dw-edma-core.c            | 38 +++++++++++-----
->  drivers/nvme/target/pci-epf.c                 | 21 +++------
->  drivers/pci/endpoint/functions/pci-epf-mhi.c  | 52 +++++++---------------
->  drivers/pci/endpoint/functions/pci-epf-test.c |  8 +---
->  include/linux/dmaengine.h                     | 64 ++++++++++++++++++++++++---
->  6 files changed, 111 insertions(+), 82 deletions(-)
-> ---
-> base-commit: bc04acf4aeca588496124a6cf54bfce3db327039
-> change-id: 20251204-dma_prep_config-654170d245a2
+syzbot has found a reproducer for the following issue on:
 
-For the series (tested using drivers/nvme/target/pci-epf.c):
-Tested-by: Niklas Cassel <cassel@kernel.org>
+HEAD commit:    a110f942672c Merge tag 'pinctrl-v6.19-1' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17495992580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=10d58c94af5f9772
+dashboard link: https://syzkaller.appspot.com/bug?extid=7add5c56bc2a14145d20
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1122aec2580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14012a1a580000
 
-Mainline:
-  Rnd read,    4KB,  QD=1, 1 job :  IOPS=5721, BW=22.3MiB/s (23.4MB/s)
-  Rnd read,    4KB, QD=32, 1 job :  IOPS=51.8k, BW=202MiB/s (212MB/s)
-  Rnd read,    4KB, QD=32, 4 jobs:  IOPS=109k, BW=426MiB/s (447MB/s)
-  Rnd read,  128KB,  QD=1, 1 job :  IOPS=2678, BW=335MiB/s (351MB/s)
-  Rnd read,  128KB, QD=32, 1 job :  IOPS=19.1k, BW=2388MiB/s (2504MB/s)
-  Rnd read,  128KB, QD=32, 4 jobs:  IOPS=18.1k, BW=2258MiB/s (2368MB/s)
-  Rnd read,  512KB,  QD=1, 1 job :  IOPS=1388, BW=694MiB/s (728MB/s)
-  Rnd read,  512KB, QD=32, 1 job :  IOPS=4554, BW=2277MiB/s (2388MB/s)
-  Rnd read,  512KB, QD=32, 4 jobs:  IOPS=4516, BW=2258MiB/s (2368MB/s)
-  Rnd write,   4KB,  QD=1, 1 job :  IOPS=4679, BW=18.3MiB/s (19.2MB/s)
-  Rnd write,   4KB, QD=32, 1 job :  IOPS=35.1k, BW=137MiB/s (144MB/s)
-  Rnd write,   4KB, QD=32, 4 jobs:  IOPS=33.7k, BW=132MiB/s (138MB/s)
-  Rnd write, 128KB,  QD=1, 1 job :  IOPS=2490, BW=311MiB/s (326MB/s)
-  Rnd write, 128KB, QD=32, 1 job :  IOPS=4964, BW=621MiB/s (651MB/s)
-  Rnd write, 128KB, QD=32, 4 jobs:  IOPS=4966, BW=621MiB/s (651MB/s)
-  Seq read,  128KB,  QD=1, 1 job :  IOPS=2586, BW=323MiB/s (339MB/s)
-  Seq read,  128KB, QD=32, 1 job :  IOPS=17.5k, BW=2190MiB/s (2296MB/s)
-  Seq read,  512KB,  QD=1, 1 job :  IOPS=1614, BW=807MiB/s (847MB/s)
-  Seq read,  512KB, QD=32, 1 job :  IOPS=4540, BW=2270MiB/s (2381MB/s)
-  Seq read,    1MB, QD=32, 1 job :  IOPS=2283, BW=2284MiB/s (2395MB/s)
-  Seq write, 128KB,  QD=1, 1 job :  IOPS=2313, BW=289MiB/s (303MB/s)
-  Seq write, 128KB, QD=32, 1 job :  IOPS=4948, BW=619MiB/s (649MB/s)
-  Seq write, 512KB,  QD=1, 1 job :  IOPS=901, BW=451MiB/s (473MB/s)
-  Seq write, 512KB, QD=32, 1 job :  IOPS=1289, BW=645MiB/s (676MB/s)
-  Seq write,   1MB, QD=32, 1 job :  IOPS=632, BW=633MiB/s (663MB/s)
-  Rnd rdwr, 4K..1MB, QD=8, 4 jobs:  IOPS=1756, BW=880MiB/s (923MB/s)
- IOPS=1767, BW=886MiB/s (929MB/s)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/905b868d0b1d/disk-a110f942.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/aa7281cd9720/vmlinux-a110f942.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1420de8a7da2/bzImage-a110f942.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/1e40f788aa89/mount_0.gz
+  fsck result: OK (log: https://syzkaller.appspot.com/x/fsck.log?x=1622aec2580000)
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+7add5c56bc2a14145d20@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in subshift lib/crypto/aes.c:150 [inline]
+BUG: KMSAN: uninit-value in aes_encrypt+0x1239/0x1960 lib/crypto/aes.c:283
+ subshift lib/crypto/aes.c:150 [inline]
+ aes_encrypt+0x1239/0x1960 lib/crypto/aes.c:283
+ aesti_encrypt+0x7d/0xf0 crypto/aes_ti.c:31
+ crypto_ecb_crypt crypto/ecb.c:23 [inline]
+ crypto_ecb_encrypt2+0x142/0x300 crypto/ecb.c:40
+ crypto_lskcipher_crypt_sg+0x3ac/0x930 crypto/lskcipher.c:188
+ crypto_lskcipher_encrypt_sg+0x8b/0xc0 crypto/lskcipher.c:207
+ crypto_skcipher_encrypt+0x111/0x1e0 crypto/skcipher.c:443
+ xts_encrypt+0x2e1/0x570 crypto/xts.c:269
+ crypto_skcipher_encrypt+0x18a/0x1e0 crypto/skcipher.c:444
+ fscrypt_crypt_data_unit+0x38e/0x590 fs/crypto/crypto.c:139
+ fscrypt_encrypt_pagecache_blocks+0x430/0x900 fs/crypto/crypto.c:197
+ ext4_bio_write_folio+0x1383/0x30d0 fs/ext4/page-io.c:552
+ mpage_submit_folio+0x399/0x3d0 fs/ext4/inode.c:2087
+ mpage_process_page_bufs+0xaef/0xf50 fs/ext4/inode.c:2198
+ mpage_prepare_extent_to_map+0x175d/0x2660 fs/ext4/inode.c:2737
+ ext4_do_writepages+0x1aa1/0x77a0 fs/ext4/inode.c:2930
+ ext4_writepages+0x338/0x870 fs/ext4/inode.c:3026
+ do_writepages+0x3f2/0x860 mm/page-writeback.c:2598
+ __writeback_single_inode+0x101/0x1190 fs/fs-writeback.c:1737
+ writeback_sb_inodes+0xb2d/0x1f10 fs/fs-writeback.c:2030
+ wb_writeback+0x4ce/0xc00 fs/fs-writeback.c:2216
+ wb_do_writeback fs/fs-writeback.c:2363 [inline]
+ wb_workfn+0x397/0x1910 fs/fs-writeback.c:2403
+ process_one_work kernel/workqueue.c:3257 [inline]
+ process_scheduled_works+0xb91/0x1d80 kernel/workqueue.c:3340
+ worker_thread+0xedf/0x1590 kernel/workqueue.c:3421
+ kthread+0xd5c/0xf00 kernel/kthread.c:463
+ ret_from_fork+0x208/0x710 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+
+Uninit was stored to memory at:
+ le128_xor include/crypto/b128ops.h:69 [inline]
+ xts_xor_tweak+0x566/0xbd0 crypto/xts.c:123
+ xts_xor_tweak_pre crypto/xts.c:135 [inline]
+ xts_encrypt+0x278/0x570 crypto/xts.c:268
+ crypto_skcipher_encrypt+0x18a/0x1e0 crypto/skcipher.c:444
+ fscrypt_crypt_data_unit+0x38e/0x590 fs/crypto/crypto.c:139
+ fscrypt_encrypt_pagecache_blocks+0x430/0x900 fs/crypto/crypto.c:197
+ ext4_bio_write_folio+0x1383/0x30d0 fs/ext4/page-io.c:552
+ mpage_submit_folio+0x399/0x3d0 fs/ext4/inode.c:2087
+ mpage_process_page_bufs+0xaef/0xf50 fs/ext4/inode.c:2198
+ mpage_prepare_extent_to_map+0x175d/0x2660 fs/ext4/inode.c:2737
+ ext4_do_writepages+0x1aa1/0x77a0 fs/ext4/inode.c:2930
+ ext4_writepages+0x338/0x870 fs/ext4/inode.c:3026
+ do_writepages+0x3f2/0x860 mm/page-writeback.c:2598
+ __writeback_single_inode+0x101/0x1190 fs/fs-writeback.c:1737
+ writeback_sb_inodes+0xb2d/0x1f10 fs/fs-writeback.c:2030
+ wb_writeback+0x4ce/0xc00 fs/fs-writeback.c:2216
+ wb_do_writeback fs/fs-writeback.c:2363 [inline]
+ wb_workfn+0x397/0x1910 fs/fs-writeback.c:2403
+ process_one_work kernel/workqueue.c:3257 [inline]
+ process_scheduled_works+0xb91/0x1d80 kernel/workqueue.c:3340
+ worker_thread+0xedf/0x1590 kernel/workqueue.c:3421
+ kthread+0xd5c/0xf00 kernel/kthread.c:463
+ ret_from_fork+0x208/0x710 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+
+Uninit was created at:
+ __alloc_frozen_pages_noprof+0x421/0xab0 mm/page_alloc.c:5233
+ alloc_pages_mpol+0x328/0x860 mm/mempolicy.c:2486
+ alloc_frozen_pages_noprof mm/mempolicy.c:2557 [inline]
+ alloc_pages_noprof mm/mempolicy.c:2577 [inline]
+ folio_alloc_noprof+0x109/0x360 mm/mempolicy.c:2587
+ filemap_alloc_folio_noprof+0xda/0x480 mm/filemap.c:1013
+ __filemap_get_folio_mpol+0xb4f/0x1960 mm/filemap.c:2006
+ __filemap_get_folio include/linux/pagemap.h:763 [inline]
+ write_begin_get_folio include/linux/pagemap.h:789 [inline]
+ ext4_write_begin+0x6d3/0x2d70 fs/ext4/inode.c:1323
+ generic_perform_write+0x365/0x1050 mm/filemap.c:4314
+ ext4_buffered_write_iter+0x61a/0xce0 fs/ext4/file.c:299
+ ext4_file_write_iter+0x2a2/0x3d90 fs/ext4/file.c:-1
+ aio_write+0x704/0xa10 fs/aio.c:1634
+ __io_submit_one fs/aio.c:-1 [inline]
+ io_submit_one+0x260e/0x3450 fs/aio.c:2053
+ __do_sys_io_submit fs/aio.c:2112 [inline]
+ __se_sys_io_submit+0x27c/0x6a0 fs/aio.c:2082
+ __x64_sys_io_submit+0x97/0xe0 fs/aio.c:2082
+ x64_sys_call+0x3b5f/0x3e70 arch/x86/include/generated/asm/syscalls_64.h:210
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 1 UID: 0 PID: 1143 Comm: kworker/u8:8 Not tainted syzkaller #0 PREEMPT(none) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+Workqueue: writeback wb_workfn (flush-7:0)
+=====================================================
 
 
-Mainline + this series applied:
-  Rnd read,    4KB,  QD=1, 1 job :  IOPS=3681, BW=14.4MiB/s (15.1MB/s)
-  Rnd read,    4KB, QD=32, 1 job :  IOPS=54.8k, BW=214MiB/s (224MB/s)
-  Rnd read,    4KB, QD=32, 4 jobs:  IOPS=123k, BW=479MiB/s (502MB/s)
-  Rnd read,  128KB,  QD=1, 1 job :  IOPS=2132, BW=267MiB/s (280MB/s)
-  Rnd read,  128KB, QD=32, 1 job :  IOPS=19.0k, BW=2369MiB/s (2485MB/s)
-  Rnd read,  128KB, QD=32, 4 jobs:  IOPS=18.7k, BW=2341MiB/s (2454MB/s)
-  Rnd read,  512KB,  QD=1, 1 job :  IOPS=1135, BW=568MiB/s (595MB/s)
-  Rnd read,  512KB, QD=32, 1 job :  IOPS=4546, BW=2273MiB/s (2384MB/s)
-  Rnd read,  512KB, QD=32, 4 jobs:  IOPS=4708, BW=2354MiB/s (2469MB/s)
-  Rnd write,   4KB,  QD=1, 1 job :  IOPS=3369, BW=13.2MiB/s (13.8MB/s)
-  Rnd write,   4KB, QD=32, 1 job :  IOPS=31.7k, BW=124MiB/s (130MB/s)
-  Rnd write,   4KB, QD=32, 4 jobs:  IOPS=31.1k, BW=122MiB/s (127MB/s)
-  Rnd write, 128KB,  QD=1, 1 job :  IOPS=1820, BW=228MiB/s (239MB/s)
-  Rnd write, 128KB, QD=32, 1 job :  IOPS=5703, BW=713MiB/s (748MB/s)
-  Rnd write, 128KB, QD=32, 4 jobs:  IOPS=5813, BW=727MiB/s (762MB/s)
-  Seq read,  128KB,  QD=1, 1 job :  IOPS=1958, BW=245MiB/s (257MB/s)
-  Seq read,  128KB, QD=32, 1 job :  IOPS=18.8k, BW=2345MiB/s (2459MB/s)
-  Seq read,  512KB,  QD=1, 1 job :  IOPS=1319, BW=660MiB/s (692MB/s)
-  Seq read,  512KB, QD=32, 1 job :  IOPS=4542, BW=2271MiB/s (2382MB/s)
-  Seq read,    1MB, QD=32, 1 job :  IOPS=2325, BW=2325MiB/s (2438MB/s)
-  Seq write, 128KB,  QD=1, 1 job :  IOPS=2174, BW=272MiB/s (285MB/s)
-  Seq write, 128KB, QD=32, 1 job :  IOPS=5697, BW=712MiB/s (747MB/s)
-  Seq write, 512KB,  QD=1, 1 job :  IOPS=1035, BW=518MiB/s (543MB/s)
-  Seq write, 512KB, QD=32, 1 job :  IOPS=1462, BW=731MiB/s (767MB/s)
-  Seq write,   1MB, QD=32, 1 job :  IOPS=720, BW=721MiB/s (756MB/s)
-  Rnd rdwr, 4K..1MB, QD=8, 4 jobs:  IOPS=2029, BW=1018MiB/s (1067MB/s)
- IOPS=2037, BW=1023MiB/s (1072MB/s)
-
-
-Small performance boost, but I think the nicest thing with this series is
-to be able to remove the ugly mutex in pci-epf.c.
-
-
-Kind regards,
-Niklas
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
