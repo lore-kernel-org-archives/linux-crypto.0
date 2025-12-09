@@ -1,97 +1,127 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6527217D2;
-	Tue,  9 Dec 2025 02:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455673FFD
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Dec 2025 03:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765247576; cv=none; b=heOmGoMjXlUhssjyCy17cfKrzHNyHpA0kJnW1aBMgj65r1KFexnfWHuImetARBxfLbcfUQp5Tq0ByhOkO542ILJLNhmIYGVZhkhagaxD0C87MY5U6i4JFLMJ2GdzmNlo/fhvk7b1RQ0R8y4gtRGfPgGt49Q6zeQLaSptDqANyMg=
+	t=1765252731; cv=none; b=FEcuwv9vKscPMQiZYI3LjKoAmkIRWGz+Z/eLX2yNkas5Mz97XDNAA9D6gImEwgOCcjUz7MSoikW73qLJhR6vi06UaJ+jR2FTT2pvNUDmig9BelZKWECycBUnAPxZyfD+RsP1efTvqqRRV3LYAg/iyVw21/1A5jYG2hFZC0Go3CA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765247576; c=relaxed/simple;
-	bh=aZwYVUDw6YBffU7mDHMNI6dVNGxgYj7dcZKNti7q9V8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dRB6cK6dy1sGPHsXuWGfTKM+z44tVQpzmomLsiljSb+U2X2TvtChSL1jVq0j8faH+qPVxHIpRagt6r2UnNI30OQzjr5dNWrlSijbQ2LGPZ4hYk9KTFSJ+4lmPAYbwEreukL/LNKu4dmSLpkZg5dt4n0A+xMy7PVBfV2tFwgSmL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=gnjL+27L; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1765252731; c=relaxed/simple;
+	bh=xrL0b3D0tLMVgulX0p18WGlj1rRG8WCU53TVha/dRDI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KI9wqT0N3T4SnX8zqZ1rr7qMq3RAoUNLWnf+evH5Xn6Em2p6g9iIr7qhklkKfNxRMUfvVutQ43fLRtLO9O4KUewAxrEK8dlJ8or/c2MxsadYidiprHm2jjLcZuaFmATvc7j0ltItLCano6w7MpkOoXDBO/G4G9WooOG7NSTRowE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=J8nSU464; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="gnjL+27L"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=wZLjNoakVV6bFoonKXxZ2uN/OSTmU5GF66yNKZJxxOs=; 
-	b=gnjL+27Lnwc//Pp4AsBRMlTPIpwoztS0SHJEc1yNf09XrIKkzhVBpfYKziPJ/wUrylumg4Phn+u
-	VRerEwMBQVN3OvAuVmXUnsgxwVQflVtTgaOnUGBWe6LtCTI9OO05N7tvQdIlRhoYfwO6CFBlUWakM
-	0HMPZs7RITXd2p7N6GUaMO0GESc6MsoANjD92lgJucMZPA7l+vPNS6rP4qGPUfNJM8giuz1XDuIwl
-	oGaSBr6bg6g5vHnHUUGgaYM62UgXft8lerbubZinUhMGJPymUatyNxl6pRokIw1YBmXEa6mW8HG5W
-	xMJmYDX8XpcwGVLHfv0DXSXHyP1IczXXW6ig==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vSnWW-008wNt-34;
-	Tue, 09 Dec 2025 10:32:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 09 Dec 2025 10:32:20 +0800
-Date: Tue, 9 Dec 2025 10:32:20 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>,
-	SeongJae Park <sj@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
-	"nphamcs@gmail.com" <nphamcs@gmail.com>,
-	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"21cnbao@gmail.com" <21cnbao@gmail.com>,
-	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-	"kasong@tencent.com" <kasong@tencent.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"ebiggers@google.com" <ebiggers@google.com>,
-	"surenb@google.com" <surenb@google.com>,
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
- compress batching of large folios.
-Message-ID: <aTeKNEX5stqjG55i@gondor.apana.org.au>
-References: <ifqmrypobhqxlkh734md5it22vggmkvqo2t2uy7hgch5hmlyln@flqi75fwmfd4>
- <SJ2PR11MB8472610CE6EF5BA83BCC8D2EC9CAA@SJ2PR11MB8472.namprd11.prod.outlook.com>
- <ygtejnrci7cnjkpomoqhz3jdtryjffmk3o2avatjppylirbbem@qppr4eybud47>
- <aSaUUez5J1w5WyE-@gondor.apana.org.au>
- <j7vaexpi3lmheowozkymesvekasccdgnxijjip66ryngj66llf@kolcsjasxxdy>
- <SA1PR11MB8476756D7255F1EA1EBE322AC9DEA@SA1PR11MB8476.namprd11.prod.outlook.com>
- <aTZExW2LgFNTfwVJ@gondor.apana.org.au>
- <SJ2PR11MB8472529E92EC003D956DF530C9A2A@SJ2PR11MB8472.namprd11.prod.outlook.com>
- <aTZS4RKR3Zci8d_I@gondor.apana.org.au>
- <qux3i5m4weedza76ynfmjmtvt4whnkk3itwpuolozfvk3cg6ud@rylhkigmqn7t>
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="J8nSU464"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-37b99da107cso47153261fa.1
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Dec 2025 19:58:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1765252727; x=1765857527; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=68/wGPpw31Zsca7N/+VQlyekwf34nB7RqEj959Ic/fA=;
+        b=J8nSU464x2i20JnaVJ5XkxFky4b3EzonDEEFa5fbpBCHwikGHqjb2xMeryMN/g8jBn
+         YHq0hSnZT3yLoEas5HT5DqwdMJiuQVZ56HP3mVwwXJxosyMupvAb8KAVaF4Adw4Lzd24
+         S3t8SDy4fN1QUiIIkGOiQA/1cEEANc3cTI/p0f9xtKlfpk2Fqm7VQpULI4lqdIJeLFOn
+         8RojMRkOAgWxER7TQLu899bYx/toq+7TEj+Xkl2iHhxxdcgUALNyQyQm94nlqWMV27fL
+         UpdDV/IGrtMmxUewMH6OQNocXC+I60VpRosfXe4d097FtQOpWIOb27WigTeT+qqno5hw
+         aomQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765252727; x=1765857527;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=68/wGPpw31Zsca7N/+VQlyekwf34nB7RqEj959Ic/fA=;
+        b=HD8TVwfe4cZccR5RaezDQFm4rqrupZx1fy/KmcwmYr1HeDT6J+napb/izyIUhZucMu
+         c9RPBdb9gzoFDPRqJBuRsXVxmtylY8RcCQLkZeVweYdyCyjRf/L2F270XyH1HNKkIPtC
+         ifN7IQQUoi7mo9cpmPoOFFlN3bpd0EgS8wUbcUMXglZ5Qcn6gTU6qVu2qIip0K6zQAir
+         FsejS08QnLM76SBKqdsAHd3FdzHR0yAt47f91I7WgdQf/0Sl7slGfBGWoD0AMYN5aR7W
+         UccRNVqaaRpwcBeODMtkDh+WNE2mDYVgh9GgaoRv1Xdjxi1V8RIgQBAnwn27VFd/nTCV
+         FlyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWu7wTD60bPhIexkYViNUyU4cyeNZY5DluMyixT3opJg/rnhmao9T1WdQDhRI9V/rGvF9yOjR391OWyVjE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGKJikJMR04KpNFp2Xr7IKRlXaQQk665RCVaSSuFUFaJyO0ogv
+	YYjiBsBbhcReFalViW2M9HraKPaHO/nzzEhndVjuYrxjXv6HDtUN4h2oyJqP7x8gdjwISPDFH2Z
+	RDrQBbEluTrdQRptDDAnA0fnFbkhtAOtfhzeW5HezNg==
+X-Gm-Gg: ASbGncteU1E2kXawDsz3s6kYfhMm5eUWQJd97fEqxWGKPN3/uXZb5tgo4ppNB2qePde
+	8OT756q/t8E4WCkva4+F39/0HX3KmK9x2ytfheAWAjbjpOyO1hyAIlA/iPKleQxNZeJzcdN8xzW
+	6d2IdtshfUU86K5z5U8QmwuUPdYj2bt1CLe6XlmP+gqJyRM73GmesrM4lpPSRn1bhEMixYR6mkT
+	+yQ8roChqcn0cJN6zO3TDLEcAT3beIBE3rBdvzqSHE6//mdkGbnFv3Skn71S7JpRaEtQOomO21n
+	68HU0Sh0JiDz3Pwm7CxQKorNl+/Q1GyNdszAckAQRybgFXg/BjrntXzR7vc=
+X-Google-Smtp-Source: AGHT+IH53WqkegnmUuZtSz3OxfPTw0gXTVMOxw+PpQSsNiistyltCGiN5RmD6N+zp9c/bk3NrIul642oWgUASFoHLMY=
+X-Received: by 2002:a2e:a9a9:0:b0:378:ea85:7f06 with SMTP id
+ 38308e7fff4ca-37ed83c443amr26245881fa.36.1765252727360; Mon, 08 Dec 2025
+ 19:58:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <qux3i5m4weedza76ynfmjmtvt4whnkk3itwpuolozfvk3cg6ud@rylhkigmqn7t>
+References: <20251202-riscv-chacha_zvkb-fp-v2-1-7bd00098c9dc@iscas.ac.cn>
+ <20251202053119.GA1416@sol> <80cb6553-af8f-4fce-a010-dff3a33c3779@iscas.ac.cn>
+ <20251202063103.GA100366@sol>
+In-Reply-To: <20251202063103.GA100366@sol>
+From: Jerry Shih <jerry.shih@sifive.com>
+Date: Tue, 9 Dec 2025 11:58:35 +0800
+X-Gm-Features: AQt7F2pLuo8DbBX8z9TNAwyIqxu_BbB3rPdB4AVoLwpPolWPdQVYum8-_cu6fbk
+Message-ID: <CABO+C-DAuguO4svhi4o5ZgybizzgnADRbzJWZNBTb4-096c10g@mail.gmail.com>
+Subject: Re: [PATCH v2] lib/crypto: riscv/chacha: Avoid s0/fp register
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Vivian Wang <wangruikang@iscas.ac.cn>, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, linux-crypto@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 09, 2025 at 01:15:02AM +0000, Yosry Ahmed wrote:
-> 
-> Just to clarify, does this mean that zswap can pass a batch of (eight)
-> pages to the acomp API, and get the results for the batch uniformly
-> whether or not the underlying compressor supports batching?
+On Tue, Dec 2, 2025 at 2:32=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> w=
+rote:
+>
+> On Tue, Dec 02, 2025 at 02:24:46PM +0800, Vivian Wang wrote:
+> > On 12/2/25 13:31, Eric Biggers wrote:
+> > > On Tue, Dec 02, 2025 at 01:25:07PM +0800, Vivian Wang wrote:
+> > >> In chacha_zvkb, avoid using the s0 register, which is the frame poin=
+ter,
+> > >> by reallocating KEY0 to t5. This makes stack traces available if e.g=
+. a
+> > >> crash happens in chacha_zvkb.
+> > >>
+> > >> No frame pointer maintenence is otherwise required since this is a l=
+eaf
+> > >> function.
+> > > maintenence =3D> maintenance
+> > >
+> > Ouch... I swear I specifically checked this before sending, but
+> > apparently didn't see this. Thanks for the catch.
+> >
+> > >>  SYM_FUNC_START(chacha_zvkb)
+> > >>    addi            sp, sp, -96
+> > >> -  sd              s0, 0(sp)
+> > > I know it's annoying, but would you mind also changing the 96 to 88, =
+and
+> > > decreasing all the offsets by 8, so that we don't leave a hole in the
+> > > stack where s0 used to be?  Likewise at the end of the function.
+> >
+> > No can do. Stack alignment on RISC-V is 16 bytes, and 80 won't fit.
+> >
+>
+> Hmm, interesting.  It shouldn't actually matter, since this doesn't call
+> any other function, but we might as well leave it at 96 then.  I don't
+> think this was considered when any of the RISC-V crypto code was
+> written, but fortunately this is the only one that uses the stack.
+>
+> Anyway, I guess I'll apply this as-is then.
+>
+> - Eric
 
-Correct.  In fact I'd like to remove the batch size exposure to zswap
-altogether.  zswap should just pass along whatever maximum number of
-pages that is convenient to itself.
+The 16-byte stack alignment is in RISC-V calling convention:
+https://riscv.org/wp-content/uploads/2024/12/riscv-calling.pdf
+It says:
+In the standard RISC-V calling convention, the stack grows downward
+and the stack pointer is always kept 16-byte aligned.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-Jerry
