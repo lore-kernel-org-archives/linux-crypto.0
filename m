@@ -1,95 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E572DECC6;
-	Tue,  9 Dec 2025 22:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F345021FF48;
+	Tue,  9 Dec 2025 22:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765319707; cv=none; b=FqWK+Z3xdCS88ny8IOv0Itc82RIuD+gMvU2fEBBE6gmlIAo0k195c9Qm7xNlihTt5cXyMEZacm8I6qf8RNeQUq+/tYLfC3kX2a08gNYJjpSWT7llJuPm3QHZlgQRaeVQai+eQ1ztOkP42JgN45wYVRCQVhPgvn6D6QSiRadaaIo=
+	t=1765320846; cv=none; b=gRV7meGMfnfeQ+UX+3ZrgtKKYXGSZCxtajMmQsKLfYaHrnkxtLyiQmR1ZFREXlzANpyp0Ib1ymVukZtSw0Z0SzA+TxzCshttUYOWW33SXxP8uHCQo9gLWz/epZysS71tdqqvywOWhc6udNCmSBh8hgAlY2Ch5L6jlDOioKtyei0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765319707; c=relaxed/simple;
-	bh=E3ZY5GrmUasYc7LNtlvHAHgQyO5fJCHZUGxegGCcdyY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=blHGGkSvGuT14/xaW7/EiouCevIunVnlwY5rZ5g508bY38bHwA0r2q7kO59ee7St6NBsrg+Jvd5bZZyyLeHe5Fw2hRLfysZMGR9D4XfjXWzAIDUqQLJuA6Zcott/QaxgK7OtruJnI0IQdy7whFUh0ddw0f81PoY1DTlx7zrmFB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K6pKhJtk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765320846; c=relaxed/simple;
+	bh=nNcZbBu3Hgen6E5pf5lr4Ktz9w1aWYdcK4Dw7Sufh0c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rjAbFfEyABjKFtKWIScbqCH/Jxl6VNUTWAedQUFihBAIIJCu/DamrcO8IwR4Cf+QH4IvgOBq+m742UKm95IkHKTrnC96QLsUB7s/1TO4Nqovzjkrsdu/hUswZDE6AZxDOs1WR7apLKIh6qS6ITh9lz9IZOoOIjMv5w66KXKa66k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=anJmVC/i; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K6pKhJtk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66852C4CEF5;
-	Tue,  9 Dec 2025 22:35:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="anJmVC/i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D370AC4CEF5;
+	Tue,  9 Dec 2025 22:54:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765319706;
-	bh=E3ZY5GrmUasYc7LNtlvHAHgQyO5fJCHZUGxegGCcdyY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=K6pKhJtk2coLOHazLr8r43p7gqFd3uwLSXvX+usbee0GsRzK+15Dz46TSOkyIuH2f
-	 TmXKb2aqvW2Lsp78EASY9/Xc0kpETlELrBgOqwPmg81ODw53Od1mLvm68Q2fkDwh9g
-	 nJfC3xMVHPpjPtQOBRT3tmOOulYiqs65R1T4LKejfx8C4dpr5FRBTQQnmDi3QUCBPR
-	 iOjFtXojHwCOwN877kZTE4QXBoHUHhRfKCUPw0lwYNhekNUVIXiuQsfLIli09izfIx
-	 w7Y0MRe/uYko2LAcSth729Fg8bN6BXbOcByHOjmxNY5/QLKT5OGfllbjO59GFjF++W
-	 fly38mbKT4Y2Q==
+	s=k20201202; t=1765320844;
+	bh=nNcZbBu3Hgen6E5pf5lr4Ktz9w1aWYdcK4Dw7Sufh0c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=anJmVC/i7fZSXZmb8wFcS04Z0ycgmp3yjGi5HZKjUU6/hsgNaVdyNvFNmdT0XCZqI
+	 n7Z+HsRfAez7XH4m0yXXqMH4TYeeltb63c0vMVEcoXIPma4vXIFXYdXhHmyWQZ1dA2
+	 2SQ2ALq/HQ4PL0wvmJuwq8Imy7Vx7AcPhMf70ew4jR1KNzijRILGvSvlKpMSd9gsLv
+	 J0CtNfqkEerbs96tYhif6b9tC6H6Qy+HKe7xoiXp1wx6a3rqVo+GH4E6tD1uNLPlB6
+	 NPBMZpwfj56yMTrQy6ZzV/NxfaInFm8eUgK3lcBZjCmxaTDe+UgO5M5O3pIi6cf9Ac
+	 aC4qHXAmqBzug==
+Date: Tue, 9 Dec 2025 14:54:01 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+To: Li Tian <litian@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org,
-	Eric Biggers <ebiggers@kernel.org>,
-	stable@vger.kernel.org,
-	Diederik de Haas <diederik@cknow-tech.com>
-Subject: [PATCH] crypto: arm64/ghash - Fix incorrect output from ghash-neon
-Date: Tue,  9 Dec 2025 14:34:17 -0800
-Message-ID: <20251209223417.112294-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com>
-References: <DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com>
+	"David S . Miller" <davem@davemloft.net>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH RFC] crypto/hkdf: Skip tests with keys too short in FIPS
+ mode
+Message-ID: <20251209225401.GA54030@quark>
+References: <20251205113136.17920-1-litian@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251205113136.17920-1-litian@redhat.com>
 
-Commit 9a7c987fb92b ("crypto: arm64/ghash - Use API partial block
-handling") made ghash_finup() pass the wrong buffer to
-ghash_do_simd_update().  As a result, ghash-neon now produces incorrect
-outputs when the message length isn't divisible by 16 bytes.  Fix this.
+On Fri, Dec 05, 2025 at 07:31:36PM +0800, Li Tian wrote:
+> FIPS mode mandates the keys to _setkey should be longer than 14 bytes.
+> It's up to the callers to not use keys too short.
+> 
+> Signed-off-by: Li Tian <litian@redhat.com>
+> ---
+>  crypto/hkdf.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/crypto/hkdf.c b/crypto/hkdf.c
+> index 82d1b32ca6ce..73d318f3f677 100644
+> --- a/crypto/hkdf.c
+> +++ b/crypto/hkdf.c
+> @@ -10,6 +10,7 @@
+>  #include <crypto/internal/hash.h>
+>  #include <crypto/sha2.h>
+>  #include <crypto/hkdf.h>
+> +#include <linux/fips.h>
+>  #include <linux/module.h>
+>  
+>  /*
+> @@ -462,7 +463,12 @@ static const struct hkdf_testvec hkdf_sha512_tv[] = {
+>  };
+>  
+>  static int hkdf_test(const char *shash, const struct hkdf_testvec *tv)
+> -{	struct crypto_shash *tfm = NULL;
+> +{
+> +	/* Skip the tests with keys too short in FIPS mode */
+> +	if (fips_enabled && (tv->salt_size < 112 / 8))
+> +		return 0;
+> +
 
-(I didn't notice this earlier because this code is reached only on CPUs
-that support NEON but not PMULL.  I haven't yet found a way to get
-qemu-system-aarch64 to emulate that configuration.)
+As I've explained before, in HKDF the secret is in the input keying
+material, not the salt.
 
-Fixes: 9a7c987fb92b ("crypto: arm64/ghash - Use API partial block handling")
-Cc: stable@vger.kernel.org
-Reported-by: Diederik de Haas <diederik@cknow-tech.com>
-Closes: https://lore.kernel.org/linux-crypto/DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com/
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
+What problem are you trying to solve?
 
-If it's okay, I'd like to just take this via libcrypto-fixes.
-
- arch/arm64/crypto/ghash-ce-glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-index 7951557a285a..ef249d06c92c 100644
---- a/arch/arm64/crypto/ghash-ce-glue.c
-+++ b/arch/arm64/crypto/ghash-ce-glue.c
-@@ -131,11 +131,11 @@ static int ghash_finup(struct shash_desc *desc, const u8 *src,
- 
- 	if (len) {
- 		u8 buf[GHASH_BLOCK_SIZE] = {};
- 
- 		memcpy(buf, src, len);
--		ghash_do_simd_update(1, ctx->digest, src, key, NULL,
-+		ghash_do_simd_update(1, ctx->digest, buf, key, NULL,
- 				     pmull_ghash_update_p8);
- 		memzero_explicit(buf, sizeof(buf));
- 	}
- 	return ghash_export(desc, dst);
- }
-
-base-commit: 7a3984bbd69055898add0fe22445f99435f33450
--- 
-2.52.0
-
+- Eric
