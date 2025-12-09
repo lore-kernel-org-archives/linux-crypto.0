@@ -1,166 +1,95 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A2E306D36
-	for <linux-crypto@vger.kernel.org>; Tue,  9 Dec 2025 19:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E572DECC6;
+	Tue,  9 Dec 2025 22:35:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765309675; cv=none; b=imKraQITWI9CZa/yKF0zLNzpyGHqordfOIAB/04idAMqqpGK7otOHKt24nQCjwuTCdgLXQniLmM02ALmdbSgrhZMvwq3Dcw7WAjB3oZbLWoRBNsSIYXedViOOgLxxJ0XcJujJF6yQi0bTWeJ74xKgxMzUbVh/nOuToavKQC/Srk=
+	t=1765319707; cv=none; b=FqWK+Z3xdCS88ny8IOv0Itc82RIuD+gMvU2fEBBE6gmlIAo0k195c9Qm7xNlihTt5cXyMEZacm8I6qf8RNeQUq+/tYLfC3kX2a08gNYJjpSWT7llJuPm3QHZlgQRaeVQai+eQ1ztOkP42JgN45wYVRCQVhPgvn6D6QSiRadaaIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765309675; c=relaxed/simple;
-	bh=SAyiJFE/CVVyKvKLFXt2Ns5XrAAwFArlarC48tBkS54=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tdfc5wS+XHk+hOBCxtSLIDbIsbLxJjaOkVTaj7CYpd4Qn+BurzKev8Db/SW4DHpcDeM/J4Nl8EcI0dNFoW+iCPsqXaFUCm/2chGnTotTXVtIqNeTnQTv3TZToiQM3JkeZBbW/LztIQgqD/TdBk9c4YY1eUiNBioRn2bh0OgmO3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=T1xM30D9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/JaEk3a3; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=T1xM30D9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/JaEk3a3; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1765319707; c=relaxed/simple;
+	bh=E3ZY5GrmUasYc7LNtlvHAHgQyO5fJCHZUGxegGCcdyY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=blHGGkSvGuT14/xaW7/EiouCevIunVnlwY5rZ5g508bY38bHwA0r2q7kO59ee7St6NBsrg+Jvd5bZZyyLeHe5Fw2hRLfysZMGR9D4XfjXWzAIDUqQLJuA6Zcott/QaxgK7OtruJnI0IQdy7whFUh0ddw0f81PoY1DTlx7zrmFB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K6pKhJtk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="T1xM30D9";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/JaEk3a3";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="T1xM30D9";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/JaEk3a3"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 5428133884;
-	Tue,  9 Dec 2025 19:47:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1765309670;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cXVuBjckK48BjvpDH3j/HiP15BLaUidVBNBHe9Ak5SI=;
-	b=T1xM30D9TCpI7Xw5gHcPIf0Ecxdpo2Z/T1HitnXIirGpayLbfmeSNjJzR+XaEWdcgCkXTC
-	vZ4D1+mR6LDthh/ECTRsTZ2dneX3myobPAcRlE0ZMXhwL1S0BdkT7PUC6alf2h/KNKrRkG
-	NKElxaqzLK9Im6mWHqmL2ABBjLqKGm8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1765309670;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cXVuBjckK48BjvpDH3j/HiP15BLaUidVBNBHe9Ak5SI=;
-	b=/JaEk3a35hYGDvkFEaVm79gVf8PR/K2F/ZSWf/B5u5XrTSAyKodTbiIuogMlAWfHOxpWjy
-	NgHjtUytqOm0t0AA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=T1xM30D9;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b="/JaEk3a3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1765309670;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cXVuBjckK48BjvpDH3j/HiP15BLaUidVBNBHe9Ak5SI=;
-	b=T1xM30D9TCpI7Xw5gHcPIf0Ecxdpo2Z/T1HitnXIirGpayLbfmeSNjJzR+XaEWdcgCkXTC
-	vZ4D1+mR6LDthh/ECTRsTZ2dneX3myobPAcRlE0ZMXhwL1S0BdkT7PUC6alf2h/KNKrRkG
-	NKElxaqzLK9Im6mWHqmL2ABBjLqKGm8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1765309670;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cXVuBjckK48BjvpDH3j/HiP15BLaUidVBNBHe9Ak5SI=;
-	b=/JaEk3a35hYGDvkFEaVm79gVf8PR/K2F/ZSWf/B5u5XrTSAyKodTbiIuogMlAWfHOxpWjy
-	NgHjtUytqOm0t0AA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 331DA3EA63;
-	Tue,  9 Dec 2025 19:47:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Qdj2C+Z8OGnOdgAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Tue, 09 Dec 2025 19:47:50 +0000
-Date: Tue, 9 Dec 2025 20:47:49 +0100
-From: David Sterba <dsterba@suse.cz>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
-	Chris Mason <clm@fb.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v2] btrfs: switch to library APIs for checksums
-Message-ID: <20251209194748.GH4859@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20251205070454.118592-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K6pKhJtk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66852C4CEF5;
+	Tue,  9 Dec 2025 22:35:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765319706;
+	bh=E3ZY5GrmUasYc7LNtlvHAHgQyO5fJCHZUGxegGCcdyY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=K6pKhJtk2coLOHazLr8r43p7gqFd3uwLSXvX+usbee0GsRzK+15Dz46TSOkyIuH2f
+	 TmXKb2aqvW2Lsp78EASY9/Xc0kpETlELrBgOqwPmg81ODw53Od1mLvm68Q2fkDwh9g
+	 nJfC3xMVHPpjPtQOBRT3tmOOulYiqs65R1T4LKejfx8C4dpr5FRBTQQnmDi3QUCBPR
+	 iOjFtXojHwCOwN877kZTE4QXBoHUHhRfKCUPw0lwYNhekNUVIXiuQsfLIli09izfIx
+	 w7Y0MRe/uYko2LAcSth729Fg8bN6BXbOcByHOjmxNY5/QLKT5OGfllbjO59GFjF++W
+	 fly38mbKT4Y2Q==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-arm-kernel@lists.infradead.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	stable@vger.kernel.org,
+	Diederik de Haas <diederik@cknow-tech.com>
+Subject: [PATCH] crypto: arm64/ghash - Fix incorrect output from ghash-neon
+Date: Tue,  9 Dec 2025 14:34:17 -0800
+Message-ID: <20251209223417.112294-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com>
+References: <DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251205070454.118592-1-ebiggers@kernel.org>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Flag: NO
-X-Spam-Score: -4.21
-X-Rspamd-Queue-Id: 5428133884
-X-Spamd-Result: default: False [-4.21 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	URIBL_BLOCKED(0.00)[suse.cz:dkim,suse.cz:replyto,twin.jikos.cz:mid,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	ARC_NA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.cz:dkim,suse.cz:replyto,twin.jikos.cz:mid]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 04, 2025 at 11:04:54PM -0800, Eric Biggers wrote:
-> Make btrfs use the library APIs instead of crypto_shash, for all
-> checksum computations.  This has many benefits:
-> 
-> - Allows future checksum types, e.g. XXH3 or CRC64, to be more easily
->   supported.  Only a library API will be needed, not crypto_shash too.
-> 
-> - Eliminates the overhead of the generic crypto layer, including an
->   indirect call for every function call and other API overhead.  A
->   microbenchmark of btrfs_check_read_bio() with crc32c checksums shows a
->   speedup from 658 cycles to 608 cycles per 4096-byte block.
-> 
-> - Decreases the stack usage of btrfs by reducing the size of checksum
->   contexts from 384 bytes to 240 bytes, and by eliminating the need for
->   some functions to declare a checksum context at all.
-> 
-> - Increases reliability.  The library functions always succeed and
->   return void.  In contrast, crypto_shash can fail and return errors.
->   Also, the library functions are guaranteed to be available when btrfs
->   is loaded; there's no longer any need to use module softdeps to try to
->   work around the crypto modules sometimes not being loaded.
-> 
-> - Fixes a bug where blake2b checksums didn't work on kernels booted with
->   fips=1.  Since btrfs checksums are for integrity only, it's fine for
->   them to use non-FIPS-approved algorithms.
-> 
-> Note that with having to handle 4 algorithms instead of just 1-2, this
-> commit does result in a slightly positive diffstat.  That being said,
-> this wouldn't have been the case if btrfs had actually checked for
-> errors from crypto_shash, which technically it should have been doing.
-> 
-> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
-> 
-> v2: rebased onto latest mainline, now that both the crypto library and
->     btrfs pull requests for 6.19 have been merged
+Commit 9a7c987fb92b ("crypto: arm64/ghash - Use API partial block
+handling") made ghash_finup() pass the wrong buffer to
+ghash_do_simd_update().  As a result, ghash-neon now produces incorrect
+outputs when the message length isn't divisible by 16 bytes.  Fix this.
 
-Added to for-next as we're now based on recent master, thanks.
+(I didn't notice this earlier because this code is reached only on CPUs
+that support NEON but not PMULL.  I haven't yet found a way to get
+qemu-system-aarch64 to emulate that configuration.)
+
+Fixes: 9a7c987fb92b ("crypto: arm64/ghash - Use API partial block handling")
+Cc: stable@vger.kernel.org
+Reported-by: Diederik de Haas <diederik@cknow-tech.com>
+Closes: https://lore.kernel.org/linux-crypto/DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com/
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+
+If it's okay, I'd like to just take this via libcrypto-fixes.
+
+ arch/arm64/crypto/ghash-ce-glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
+index 7951557a285a..ef249d06c92c 100644
+--- a/arch/arm64/crypto/ghash-ce-glue.c
++++ b/arch/arm64/crypto/ghash-ce-glue.c
+@@ -131,11 +131,11 @@ static int ghash_finup(struct shash_desc *desc, const u8 *src,
+ 
+ 	if (len) {
+ 		u8 buf[GHASH_BLOCK_SIZE] = {};
+ 
+ 		memcpy(buf, src, len);
+-		ghash_do_simd_update(1, ctx->digest, src, key, NULL,
++		ghash_do_simd_update(1, ctx->digest, buf, key, NULL,
+ 				     pmull_ghash_update_p8);
+ 		memzero_explicit(buf, sizeof(buf));
+ 	}
+ 	return ghash_export(desc, dst);
+ }
+
+base-commit: 7a3984bbd69055898add0fe22445f99435f33450
+-- 
+2.52.0
+
