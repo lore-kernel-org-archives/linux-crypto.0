@@ -1,23 +1,23 @@
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28272417C3;
-	Tue,  9 Dec 2025 02:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1668301705;
+	Tue,  9 Dec 2025 02:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765247003; cv=none; b=ldVvVka6oHInrllG501rLC5SVWsiMlzqqK7C6xhQnkPnRHVvStr2UorcxbGUZg4wRSkw67U3gDl4AdWIyjnuH9+lmzz3DseKT+whQVyRFd2S2hZMZqvSTqhgMdEOdm5SdKZU3IVYKJOJTWlApeTq7q1AW0YYWwD9re9tkdrrxzY=
+	t=1765247005; cv=none; b=jjPZCnnVBPBR2fwuE6FUqzE59PbnfSqq0FcHkUKx9eowIAdBpp5ysl69fXWS35QDcaoApdDNnHsScnQplNFR8osaqYcKgCCIkRHdMydtQaD27xZiLeaUE2woeZkbkIHLaO3N7BSQ7+KHPDol5Ky+xFfz3y6ii0626nIUtjGDiu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765247003; c=relaxed/simple;
-	bh=JWwaJBFy5oIvmdtqhh5mZ0Gbwalk+2T00rI/ggDjVuU=;
+	s=arc-20240116; t=1765247005; c=relaxed/simple;
+	bh=1UhYwSPdYu3p8N92u33jtXlRnLQIOHWDGq0+ij+jLiA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IOR3iJlNfKRJSBe0A1kVV6PIIdxU/bBQst+XkJrsJq6eJ5TXs36AZcSvnoSi3c9DCu58urAIdQ/G9+bBP2sF3UcDJ9JcPI+oEMpUxgzrZ0uRMqbef4+jBnXYpHIVmC1DLbyTmrCIJUuBi873/yeJL4lZBfICSQ9KJnCsn6IVGQY=
+	 MIME-Version; b=LsAdSqJjOxtXw3NmOzzuz2P6KrnJO6MjZdvWVfNrxgy3GtOyJXwQQM51XAwqCvwsdGmrnMY68r2KI5Uj4hm+3WN5DLR81ZvXex2KlU1ChqoleZjcN6HktRSI7QL8hkUx0kIm9SFyXQgNKddhxUxTEdEk9Kj4YHprV0MTeNjwH4g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8Cxrr8ViDdpxoIsAA--.28623S3;
-	Tue, 09 Dec 2025 10:23:17 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8Bx378XiDdp1IIsAA--.28299S3;
+	Tue, 09 Dec 2025 10:23:19 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.213])
-	by front1 (Coremail) with SMTP id qMiowJBxicAPiDdpzEFHAQ--.36100S2;
-	Tue, 09 Dec 2025 10:23:11 +0800 (CST)
+	by front1 (Coremail) with SMTP id qMiowJBxicAPiDdpzEFHAQ--.36100S4;
+	Tue, 09 Dec 2025 10:23:18 +0800 (CST)
 From: Bibo Mao <maobibo@loongson.cn>
 To: Gonglei <arei.gonglei@huawei.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
@@ -30,9 +30,9 @@ Cc: kvm@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
 	virtualization@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 04/10] crypto: virtio: Add algo pointer in virtio_crypto_skcipher_ctx
-Date: Tue,  9 Dec 2025 10:22:52 +0800
-Message-Id: <20251209022258.4183415-5-maobibo@loongson.cn>
+Subject: [PATCH v3 06/10] crypto: virtio: Remove AES specified marcro AES_BLOCK_SIZE
+Date: Tue,  9 Dec 2025 10:22:54 +0800
+Message-Id: <20251209022258.4183415-7-maobibo@loongson.cn>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20251209022258.4183415-1-maobibo@loongson.cn>
 References: <20251209022258.4183415-1-maobibo@loongson.cn>
@@ -43,98 +43,86 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBxicAPiDdpzEFHAQ--.36100S2
+X-CM-TRANSID:qMiowJBxicAPiDdpzEFHAQ--.36100S4
 X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
 X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
 	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
 	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Structure virtio_crypto_skcipher_ctx is allocated together with
-crypto_skcipher, and skcipher_alg is set in strucutre crypto_skcipher
-when it is created.
-
-Here add virtio_crypto_algo pointer in virtio_crypto_skcipher_ctx and
-set it in function virtio_crypto_skcipher_init(). So crypto service
-and algo can be acquired from virtio_crypto_algo pointer.
+Macro AES_BLOCK_SIZE is meaningful only for algo AES, replace it
+with generic API crypto_skcipher_blocksize(), so that new algo can
+be added in later.
 
 Signed-off-by: Bibo Mao <maobibo@loongson.cn>
 ---
- .../virtio/virtio_crypto_skcipher_algs.c      | 20 ++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ .../crypto/virtio/virtio_crypto_skcipher_algs.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
-index 11053d1786d4..8a139de3d064 100644
+index 682d192a4ed7..788d2d4a9b83 100644
 --- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
 +++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
-@@ -15,9 +15,11 @@
- #include "virtio_crypto_common.h"
+@@ -416,8 +416,8 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
+ 	memcpy(iv, req->iv, ivsize);
+ 	if (!vc_sym_req->encrypt)
+ 		scatterwalk_map_and_copy(req->iv, req->src,
+-					 req->cryptlen - AES_BLOCK_SIZE,
+-					 AES_BLOCK_SIZE, 0);
++					 req->cryptlen - ivsize,
++					 ivsize, 0);
  
- 
-+struct virtio_crypto_algo;
- struct virtio_crypto_skcipher_ctx {
- 	struct virtio_crypto *vcrypto;
- 
-+	struct virtio_crypto_algo *alg;
- 	struct virtio_crypto_sym_session_info enc_sess_info;
- 	struct virtio_crypto_sym_session_info dec_sess_info;
- };
-@@ -108,9 +110,7 @@ virtio_crypto_alg_validate_key(int key_len, uint32_t *alg)
- 
- static int virtio_crypto_alg_skcipher_init_session(
- 		struct virtio_crypto_skcipher_ctx *ctx,
--		uint32_t alg, const uint8_t *key,
--		unsigned int keylen,
--		int encrypt)
-+		const uint8_t *key, unsigned int keylen, int encrypt)
+ 	sg_init_one(&iv_sg, iv, ivsize);
+ 	sgs[num_out++] = &iv_sg;
+@@ -459,6 +459,7 @@ static int virtio_crypto_skcipher_encrypt(struct skcipher_request *req)
  {
- 	struct scatterlist outhdr, key_sg, inhdr, *sgs[3];
- 	struct virtio_crypto *vcrypto = ctx->vcrypto;
-@@ -140,7 +140,7 @@ static int virtio_crypto_alg_skcipher_init_session(
- 	/* Pad ctrl header */
- 	ctrl = &vc_ctrl_req->ctrl;
- 	ctrl->header.opcode = cpu_to_le32(VIRTIO_CRYPTO_CIPHER_CREATE_SESSION);
--	ctrl->header.algo = cpu_to_le32(alg);
-+	ctrl->header.algo = cpu_to_le32(ctx->alg->algonum);
- 	/* Set the default dataqueue id to 0 */
- 	ctrl->header.queue_id = 0;
+ 	struct crypto_skcipher *atfm = crypto_skcipher_reqtfm(req);
+ 	struct virtio_crypto_skcipher_ctx *ctx = crypto_skcipher_ctx(atfm);
++	unsigned int blocksize = crypto_skcipher_blocksize(atfm);
+ 	struct virtio_crypto_sym_request *vc_sym_req =
+ 				skcipher_request_ctx(req);
+ 	struct virtio_crypto_request *vc_req = &vc_sym_req->base;
+@@ -468,7 +469,7 @@ static int virtio_crypto_skcipher_encrypt(struct skcipher_request *req)
  
-@@ -261,13 +261,11 @@ static int virtio_crypto_alg_skcipher_init_sessions(
+ 	if (!req->cryptlen)
+ 		return 0;
+-	if (req->cryptlen % AES_BLOCK_SIZE)
++	if (req->cryptlen % blocksize)
  		return -EINVAL;
  
- 	/* Create encryption session */
--	ret = virtio_crypto_alg_skcipher_init_session(ctx,
--			alg, key, keylen, 1);
-+	ret = virtio_crypto_alg_skcipher_init_session(ctx, key, keylen, 1);
- 	if (ret)
- 		return ret;
- 	/* Create decryption session */
--	ret = virtio_crypto_alg_skcipher_init_session(ctx,
--			alg, key, keylen, 0);
-+	ret = virtio_crypto_alg_skcipher_init_session(ctx, key, keylen, 0);
- 	if (ret) {
- 		virtio_crypto_alg_skcipher_close_session(ctx, 1);
- 		return ret;
-@@ -293,7 +291,7 @@ static int virtio_crypto_skcipher_setkey(struct crypto_skcipher *tfm,
- 		int node = virtio_crypto_get_current_node();
- 		struct virtio_crypto *vcrypto =
- 				      virtcrypto_get_dev_node(node,
--				      VIRTIO_CRYPTO_SERVICE_CIPHER, alg);
-+				      ctx->alg->service, ctx->alg->algonum);
- 		if (!vcrypto) {
- 			pr_err("virtio_crypto: Could not find a virtio device in the system or unsupported algo\n");
- 			return -ENODEV;
-@@ -509,7 +507,11 @@ static int virtio_crypto_skcipher_decrypt(struct skcipher_request *req)
- 
- static int virtio_crypto_skcipher_init(struct crypto_skcipher *tfm)
+ 	vc_req->dataq = data_vq;
+@@ -482,6 +483,7 @@ static int virtio_crypto_skcipher_decrypt(struct skcipher_request *req)
  {
-+	struct virtio_crypto_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
-+
- 	crypto_skcipher_set_reqsize(tfm, sizeof(struct virtio_crypto_sym_request));
-+	ctx->alg = container_of(alg, struct virtio_crypto_algo, algo.base);
+ 	struct crypto_skcipher *atfm = crypto_skcipher_reqtfm(req);
+ 	struct virtio_crypto_skcipher_ctx *ctx = crypto_skcipher_ctx(atfm);
++	unsigned int blocksize = crypto_skcipher_blocksize(atfm);
+ 	struct virtio_crypto_sym_request *vc_sym_req =
+ 				skcipher_request_ctx(req);
+ 	struct virtio_crypto_request *vc_req = &vc_sym_req->base;
+@@ -491,7 +493,7 @@ static int virtio_crypto_skcipher_decrypt(struct skcipher_request *req)
  
- 	return 0;
- }
+ 	if (!req->cryptlen)
+ 		return 0;
+-	if (req->cryptlen % AES_BLOCK_SIZE)
++	if (req->cryptlen % blocksize)
+ 		return -EINVAL;
+ 
+ 	vc_req->dataq = data_vq;
+@@ -547,10 +549,13 @@ static void virtio_crypto_skcipher_finalize_req(
+ 	struct skcipher_request *req,
+ 	int err)
+ {
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
++
+ 	if (vc_sym_req->encrypt)
+ 		scatterwalk_map_and_copy(req->iv, req->dst,
+-					 req->cryptlen - AES_BLOCK_SIZE,
+-					 AES_BLOCK_SIZE, 0);
++					 req->cryptlen - ivsize,
++					 ivsize, 0);
+ 	kfree_sensitive(vc_sym_req->iv);
+ 	virtcrypto_clear_request(&vc_sym_req->base);
+ 
 -- 
 2.39.3
 
