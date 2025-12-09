@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBCB430100E;
-	Tue,  9 Dec 2025 01:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EED30100E;
+	Tue,  9 Dec 2025 01:58:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765245490; cv=none; b=d5sEPs4qKOq14TLw576VyvuMptrevbMTiyi3Ptfs07ksI3sPvspWvdaPqdCXYMaJciwfr00I0D4g74iTu0lEWZDFbeSJo10gk0PjrGNYSKTZt8x5qpe2i0afqviWQImy6RrzkPUmt7WR1zeMVzJluHsm9pV2IF6JL969oKzEYxo=
+	t=1765245490; cv=none; b=kQGPM6mT5BFfhsK8SfFn5qPPduTM9WM9nNo5nxR2cP5kdTAub7xrFstT+5cNMljVlMBEHUT5NsAzlKpPZJbQp6KIleHuOB/XdtFyB3cwoRWfqxvP/o34zwX4nIRC+p0ZJ7GGJGXzEpMQhs+G9aLRLarqU6wVA6WiCQEteWT6ZQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1765245490; c=relaxed/simple;
-	bh=lBZr6D2e5n0xBHE1F51j1RsG0jR805ve81yaxuG4wgU=;
+	bh=cm/t/nkJi4XYRjRg4UCoPHKxHiy1d6tYPHHSUQ8dOvU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aTC3xXQt7x+7VOV2FDj5Hi7q5sm4HPbJskbIVTvo3dS4KyQEc048qF2jJjry94BeSN3FseZY+g49gSBr8g9OHJnii86y8CTGvsb4ye9oMYAeXq8Ev1BJcgLj3SYwdp6VoWjFGELiAzcaSEdjdx6GNEjKsz//le/RArRIOP1i1jM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fuZfdhDb; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=UQflHfW3kfolmXXuP/tazA1SAUaz9EUB85AJ9EbPKNy+iZH25YXRMQlyOPbkFBmXuOsMLqpRW/ikPGMJgr8Osj/Reqs4zyO3HhsAi/HP5w7iwRbJ2mCHHak1ZcOfe47V3mPm6dNS9Wx4jvIjl7M6xd+vcKgRS95diHTmET2nSE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ti7VhSlp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fuZfdhDb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C8D5C19422;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ti7VhSlp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAD0DC113D0;
 	Tue,  9 Dec 2025 01:58:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765245489;
-	bh=lBZr6D2e5n0xBHE1F51j1RsG0jR805ve81yaxuG4wgU=;
+	s=k20201202; t=1765245490;
+	bh=cm/t/nkJi4XYRjRg4UCoPHKxHiy1d6tYPHHSUQ8dOvU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fuZfdhDbNAwsAyMOHDCUfzqXfQzFmezNl8aRFiEphNlIX1gW2MSc257JGc4FGrPQc
-	 giMvZ1WQxw9hpQJcYsTHYCv7uNrxHI/WUdZU3utxzpyrIa5FGxupSvQ/l3urp0eKj5
-	 D+7tTfZggmvDryLUKIFisxHtMX5AgfhpxgORfeBvy+xntmiwuy3YCjiOJCCJaB/Su/
-	 JGQt9iaFjruNqK36eBXLnuSRvSkUnbe/rhd8XyHDy2D6TfNYrTetnojX5b683OP1n2
-	 R2EQZTLHIXkbLYdJ+kSTkZMpAwsKD0vjAkUba7uKFggwNolXSDi2OPSY857jDozVsp
-	 GvOn2UCndbNMw==
+	b=ti7VhSlpTCoG9v8pESxdWtbucHbx8i721vNs0MyWltgqI9JV19ycEreUoC4ap/CZv
+	 TETCMDULIe2d6vGnmBABELWREowkwFLDQ1jOJsDOjQY0I8D9f3CUyl0nfVDiXzyBep
+	 OJSh7mXktSp3Ogh0Yxtv0zNHnTvYqT9ac1vMsI45X0MZOhdRvWzupzidgo89Jaqec7
+	 wVRRblwkOXuQA7Et8J4QPl9jKboqCCD6jal+DdI/Q/1VWXj5pZUmjfLbzwtbV0i1RD
+	 AWdOy4YApEsI+g69pU8cDCjZJZlVq0OS2pRFZbvbTG31AzcGzZ4N1H/yLkU9ZjeUY7
+	 a99k/ZWxPdOdw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: Peter Zijlstra <peterz@infradead.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -43,9 +43,9 @@ Cc: Mark Rutland <mark.rutland@arm.com>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	linux-crypto@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 2/3] perf genelf: Switch from SHA-1 to BLAKE2s for build ID generation
-Date: Mon,  8 Dec 2025 17:57:28 -0800
-Message-ID: <20251209015729.23253-3-ebiggers@kernel.org>
+Subject: [PATCH v2 3/3] perf util: Remove SHA-1 code
+Date: Mon,  8 Dec 2025 17:57:29 -0800
+Message-ID: <20251209015729.23253-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251209015729.23253-1-ebiggers@kernel.org>
 References: <20251209015729.23253-1-ebiggers@kernel.org>
@@ -57,207 +57,241 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Recent patches [1] [2] added an implementation of SHA-1 to perf and made
-it be used for build ID generation.
-
-I had understood the choice of SHA-1, which is a legacy algorithm, to be
-for backwards compatibility.
-
-It turns out, though, that there's no backwards compatibility
-requirement here other than the size of the build ID field, which is
-fixed at 20 bytes.  Not only did the hash algorithm already change (from
-MD5 to SHA-1), but the inputs to the hash changed too: from
-'load_addr || code' to just 'code', and now again to
-'code || symtab || strsym' [3].  Different linkers generate different
-build IDs, with the LLVM linker using BLAKE3 hashes for example [4].
-
-Therefore, we might as well switch to a more modern algorithm.  Let's go
-with BLAKE2s.  It's faster than SHA-1, isn't cryptographically broken,
-is easier to implement than BLAKE3, and the kernel's implementation in
-lib/crypto/blake2s.c is easily borrowed.  It also natively supports
-variable-length hashes, so it can directly produce the needed 20 bytes.
-
-Also make the following additional improvements:
-
-- Hash the three inputs incrementally, so they don't all have to be
-  concatenated into one buffer.
-
-- Add tag/length prefixes to each of the three inputs, so that distinct
-  input tuples reliably result in distinct hashes.
-
-[1] https://lore.kernel.org/linux-perf-users/20250521225307.743726-1-yuzhuo@google.com/
-[2] https://lore.kernel.org/linux-perf-users/20250625202311.23244-1-ebiggers@kernel.org/
-[3] https://lore.kernel.org/linux-perf-users/20251125080748.461014-1-namhyung@kernel.org/
-[4] https://github.com/llvm/llvm-project/commit/d3e5b6f7539b86995aef6e2075c1edb3059385ce
+Now that the SHA-1 code is no longer used, remove it.
 
 Tested-by: Ian Rogers <irogers@google.com>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- tools/perf/util/genelf.c | 58 +++++++++++++++++++---------------------
- 1 file changed, 28 insertions(+), 30 deletions(-)
+ tools/perf/tests/util.c | 49 ---------------------
+ tools/perf/util/Build   |  1 -
+ tools/perf/util/sha1.c  | 97 -----------------------------------------
+ tools/perf/util/sha1.h  |  6 ---
+ 4 files changed, 153 deletions(-)
+ delete mode 100644 tools/perf/util/sha1.c
+ delete mode 100644 tools/perf/util/sha1.h
 
-diff --git a/tools/perf/util/genelf.c b/tools/perf/util/genelf.c
-index a1cd5196f4ec..14882def9704 100644
---- a/tools/perf/util/genelf.c
-+++ b/tools/perf/util/genelf.c
-@@ -16,12 +16,12 @@
- #include <err.h>
- #ifdef HAVE_LIBDW_SUPPORT
- #include <dwarf.h>
- #endif
+diff --git a/tools/perf/tests/util.c b/tools/perf/tests/util.c
+index efc3e4e4c6fa..bf2c5b133884 100644
+--- a/tools/perf/tests/util.c
++++ b/tools/perf/tests/util.c
+@@ -1,10 +1,9 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #include "tests.h"
+ #include "util/blake2s.h"
+ #include "util/debug.h"
+-#include "util/sha1.h"
  
-+#include "blake2s.h"
- #include "genelf.h"
--#include "sha1.h"
- #include "../util/jitdump.h"
  #include <linux/compiler.h>
+ #include <stdlib.h>
+ #include <string2.h>
  
- #ifndef NT_GNU_BUILD_ID
- #define NT_GNU_BUILD_ID 3
-@@ -49,11 +49,11 @@ static char shd_string_table[] = {
- };
+@@ -16,52 +15,10 @@ static int test_strreplace(char needle, const char *haystack,
  
- static struct buildid_note {
- 	Elf_Note desc;		/* descsz: size of build-id, must be multiple of 4 */
- 	char	 name[4];	/* GNU\0 */
--	u8	 build_id[SHA1_DIGEST_SIZE];
-+	u8	 build_id[20];
- } bnote;
+ 	free(new);
+ 	return ret == 0;
+ }
  
- static Elf_Sym symtab[]={
- 	/* symbol 0 MUST be the undefined symbol */
- 	{ .st_name  = 0, /* index in sym_string table */
-@@ -150,13 +150,32 @@ jit_add_eh_frame_info(Elf *e, void* unwinding, uint64_t unwinding_header_size,
- 	shdr->sh_entsize = 0;
+-#define MAX_LEN 512
+-
+-/* Test sha1() for all lengths from 0 to MAX_LEN inclusively. */
+-static int test_sha1(void)
+-{
+-	u8 data[MAX_LEN];
+-	size_t digests_size = (MAX_LEN + 1) * SHA1_DIGEST_SIZE;
+-	u8 *digests;
+-	u8 digest_of_digests[SHA1_DIGEST_SIZE];
+-	/*
+-	 * The correctness of this value was verified by running this test with
+-	 * sha1() replaced by OpenSSL's SHA1().
+-	 */
+-	static const u8 expected_digest_of_digests[SHA1_DIGEST_SIZE] = {
+-		0x74, 0xcd, 0x4c, 0xb9, 0xd8, 0xa6, 0xd5, 0x95, 0x22, 0x8b,
+-		0x7e, 0xd6, 0x8b, 0x7e, 0x46, 0x95, 0x31, 0x9b, 0xa2, 0x43,
+-	};
+-	size_t i;
+-
+-	digests = malloc(digests_size);
+-	TEST_ASSERT_VAL("failed to allocate digests", digests != NULL);
+-
+-	/* Generate MAX_LEN bytes of data. */
+-	for (i = 0; i < MAX_LEN; i++)
+-		data[i] = i;
+-
+-	/* Calculate a SHA-1 for each length 0 through MAX_LEN inclusively. */
+-	for (i = 0; i <= MAX_LEN; i++)
+-		sha1(data, i, &digests[i * SHA1_DIGEST_SIZE]);
+-
+-	/* Calculate digest of all digests calculated above. */
+-	sha1(digests, digests_size, digest_of_digests);
+-
+-	free(digests);
+-
+-	/* Check for the expected result. */
+-	TEST_ASSERT_VAL("wrong output from sha1()",
+-			memcmp(digest_of_digests, expected_digest_of_digests,
+-			       SHA1_DIGEST_SIZE) == 0);
+-	return 0;
+-}
+-
+ /* Maximum data length tested by test_blake2s() */
+ #define MAX_DATA_LEN 512
  
+ /*
+  * Hash length tested by test_blake2s().  BLAKE2s supports variable-length
+@@ -129,22 +86,16 @@ static int test_blake2s(void)
  	return 0;
  }
  
-+enum {
-+	TAG_CODE = 0,
-+	TAG_SYMTAB = 1,
-+	TAG_STRSYM = 2,
-+};
-+
-+/*
-+ * Update the hash using the given data, also prepending a (tag, len) prefix to
-+ * ensure that distinct input tuples reliably result in distinct hashes.
-+ */
-+static void blake2s_update_tagged(struct blake2s_ctx *ctx, int tag,
-+				  const void *data, size_t len)
-+{
-+	u64 prefix = ((u64)tag << 56) | len;
-+
-+	blake2s_update(ctx, (const u8 *)&prefix, sizeof(prefix));
-+	blake2s_update(ctx, data, len);
-+}
-+
- /*
-  * fd: file descriptor open for writing for the output file
-- * load_addr: code load address (could be zero, just used for buildid)
-+ * load_addr: code load address (could be zero)
-  * sym: function name (for native code - used as the symbol)
-  * code: the native code
-  * csize: the code size in bytes
-  */
- int
-@@ -171,12 +190,11 @@ jit_write_elf(int fd, uint64_t load_addr __maybe_unused, const char *sym,
- 	Elf_Ehdr *ehdr;
- 	Elf_Phdr *phdr;
- 	Elf_Shdr *shdr;
- 	uint64_t eh_frame_base_offset;
- 	char *strsym = NULL;
--	void *build_id_data = NULL, *tmp;
--	int build_id_data_len;
-+	struct blake2s_ctx ctx;
- 	int symlen;
- 	int retval = -1;
+ static int test__util(struct test_suite *t __maybe_unused, int subtest __maybe_unused)
+ {
+-	int ret;
+-
+ 	TEST_ASSERT_VAL("empty string", test_strreplace(' ', "", "123", ""));
+ 	TEST_ASSERT_VAL("no match", test_strreplace('5', "123", "4", "123"));
+ 	TEST_ASSERT_VAL("replace 1", test_strreplace('3', "123", "4", "124"));
+ 	TEST_ASSERT_VAL("replace 2", test_strreplace('a', "abcabc", "ef", "efbcefbc"));
+ 	TEST_ASSERT_VAL("replace long", test_strreplace('a', "abcabc", "longlong",
+ 							"longlongbclonglongbc"));
  
- 	if (elf_version(EV_CURRENT) == EV_NONE) {
- 		warnx("ELF initialization failed");
-@@ -251,17 +269,12 @@ jit_write_elf(int fd, uint64_t load_addr __maybe_unused, const char *sym,
- 	shdr->sh_type = SHT_PROGBITS;
- 	shdr->sh_addr = GEN_ELF_TEXT_OFFSET;
- 	shdr->sh_flags = SHF_EXECINSTR | SHF_ALLOC;
- 	shdr->sh_entsize = 0;
- 
--	build_id_data = malloc(csize);
--	if (build_id_data == NULL) {
--		warnx("cannot allocate build-id data");
--		goto error;
--	}
--	memcpy(build_id_data, code, csize);
--	build_id_data_len = csize;
-+	blake2s_init(&ctx, sizeof(bnote.build_id));
-+	blake2s_update_tagged(&ctx, TAG_CODE, code, csize);
- 
- 	/*
- 	 * Setup .eh_frame_hdr and .eh_frame
- 	 */
- 	if (unwinding) {
-@@ -342,18 +355,11 @@ jit_write_elf(int fd, uint64_t load_addr __maybe_unused, const char *sym,
- 	shdr->sh_type = SHT_SYMTAB;
- 	shdr->sh_flags = 0;
- 	shdr->sh_entsize = sizeof(Elf_Sym);
- 	shdr->sh_link = unwinding ? 6 : 4; /* index of .strtab section */
- 
--	tmp = realloc(build_id_data, build_id_data_len + sizeof(symtab));
--	if (tmp == NULL) {
--		warnx("cannot allocate build-id data");
--		goto error;
--	}
--	memcpy(tmp + build_id_data_len, symtab, sizeof(symtab));
--	build_id_data = tmp;
--	build_id_data_len += sizeof(symtab);
-+	blake2s_update_tagged(&ctx, TAG_SYMTAB, symtab, sizeof(symtab));
- 
- 	/*
- 	 * setup symbols string table
- 	 * 2 = 1 for 0 in 1st entry, 1 for the 0 at end of symbol for 2nd entry
- 	 */
-@@ -393,18 +399,11 @@ jit_write_elf(int fd, uint64_t load_addr __maybe_unused, const char *sym,
- 	shdr->sh_name = 25; /* offset in shd_string_table */
- 	shdr->sh_type = SHT_STRTAB;
- 	shdr->sh_flags = 0;
- 	shdr->sh_entsize = 0;
- 
--	tmp = realloc(build_id_data, build_id_data_len + symlen);
--	if (tmp == NULL) {
--		warnx("cannot allocate build-id data");
--		goto error;
--	}
--	memcpy(tmp + build_id_data_len, strsym, symlen);
--	build_id_data = tmp;
--	build_id_data_len += symlen;
-+	blake2s_update_tagged(&ctx, TAG_STRSYM, strsym, symlen);
- 
- 	/*
- 	 * setup build-id section
- 	 */
- 	scn = elf_newscn(e);
-@@ -420,11 +419,11 @@ jit_write_elf(int fd, uint64_t load_addr __maybe_unused, const char *sym,
- 	}
- 
- 	/*
- 	 * build-id generation
- 	 */
--	sha1(build_id_data, build_id_data_len, bnote.build_id);
-+	blake2s_final(&ctx, bnote.build_id);
- 	bnote.desc.namesz = sizeof(bnote.name); /* must include 0 termination */
- 	bnote.desc.descsz = sizeof(bnote.build_id);
- 	bnote.desc.type   = NT_GNU_BUILD_ID;
- 	strcpy(bnote.name, "GNU");
- 
-@@ -465,9 +464,8 @@ jit_write_elf(int fd, uint64_t load_addr __maybe_unused, const char *sym,
- 	retval = 0;
- error:
- 	(void)elf_end(e);
- 
- 	free(strsym);
--	free(build_id_data);
- 
- 	return retval;
+-	ret = test_sha1();
+-	if (ret != TEST_OK)
+-		return ret;
+-
+ 	return test_blake2s();
  }
+ 
+ DEFINE_SUITE("util", util);
+diff --git a/tools/perf/util/Build b/tools/perf/util/Build
+index b500053332d2..2a9f3d015c1d 100644
+--- a/tools/perf/util/Build
++++ b/tools/perf/util/Build
+@@ -42,11 +42,10 @@ perf-util-y += rlimit.o
+ perf-util-y += argv_split.o
+ perf-util-y += rbtree.o
+ perf-util-y += libstring.o
+ perf-util-y += bitmap.o
+ perf-util-y += hweight.o
+-perf-util-y += sha1.o
+ perf-util-y += smt.o
+ perf-util-y += strbuf.o
+ perf-util-y += string.o
+ perf-util-y += strlist.o
+ perf-util-y += strfilter.o
+diff --git a/tools/perf/util/sha1.c b/tools/perf/util/sha1.c
+deleted file mode 100644
+index 7032fa4ff3fd..000000000000
+--- a/tools/perf/util/sha1.c
++++ /dev/null
+@@ -1,97 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * SHA-1 message digest algorithm
+- *
+- * Copyright 2025 Google LLC
+- */
+-#include <linux/bitops.h>
+-#include <linux/kernel.h>
+-#include <linux/unaligned.h>
+-#include <string.h>
+-
+-#include "sha1.h"
+-
+-#define SHA1_BLOCK_SIZE 64
+-
+-static const u32 sha1_K[4] = { 0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xCA62C1D6 };
+-
+-#define SHA1_ROUND(i, a, b, c, d, e)                                          \
+-	do {                                                                  \
+-		if ((i) >= 16)                                                \
+-			w[i] = rol32(w[(i) - 16] ^ w[(i) - 14] ^ w[(i) - 8] ^ \
+-					     w[(i) - 3],                      \
+-				     1);                                      \
+-		e += w[i] + rol32(a, 5) + sha1_K[(i) / 20];                   \
+-		if ((i) < 20)                                                 \
+-			e += (b & (c ^ d)) ^ d;                               \
+-		else if ((i) < 40 || (i) >= 60)                               \
+-			e += b ^ c ^ d;                                       \
+-		else                                                          \
+-			e += (c & d) ^ (b & (c ^ d));                         \
+-		b = rol32(b, 30);                                             \
+-		/* The new (a, b, c, d, e) is the old (e, a, b, c, d). */     \
+-	} while (0)
+-
+-#define SHA1_5ROUNDS(i)                             \
+-	do {                                        \
+-		SHA1_ROUND((i) + 0, a, b, c, d, e); \
+-		SHA1_ROUND((i) + 1, e, a, b, c, d); \
+-		SHA1_ROUND((i) + 2, d, e, a, b, c); \
+-		SHA1_ROUND((i) + 3, c, d, e, a, b); \
+-		SHA1_ROUND((i) + 4, b, c, d, e, a); \
+-	} while (0)
+-
+-#define SHA1_20ROUNDS(i)                \
+-	do {                            \
+-		SHA1_5ROUNDS((i) + 0);  \
+-		SHA1_5ROUNDS((i) + 5);  \
+-		SHA1_5ROUNDS((i) + 10); \
+-		SHA1_5ROUNDS((i) + 15); \
+-	} while (0)
+-
+-static void sha1_blocks(u32 h[5], const u8 *data, size_t nblocks)
+-{
+-	while (nblocks--) {
+-		u32 a = h[0];
+-		u32 b = h[1];
+-		u32 c = h[2];
+-		u32 d = h[3];
+-		u32 e = h[4];
+-		u32 w[80];
+-
+-		for (int i = 0; i < 16; i++)
+-			w[i] = get_unaligned_be32(&data[i * 4]);
+-		SHA1_20ROUNDS(0);
+-		SHA1_20ROUNDS(20);
+-		SHA1_20ROUNDS(40);
+-		SHA1_20ROUNDS(60);
+-
+-		h[0] += a;
+-		h[1] += b;
+-		h[2] += c;
+-		h[3] += d;
+-		h[4] += e;
+-		data += SHA1_BLOCK_SIZE;
+-	}
+-}
+-
+-/* Calculate the SHA-1 message digest of the given data. */
+-void sha1(const void *data, size_t len, u8 out[SHA1_DIGEST_SIZE])
+-{
+-	u32 h[5] = { 0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476,
+-		     0xC3D2E1F0 };
+-	u8 final_data[2 * SHA1_BLOCK_SIZE] = { 0 };
+-	size_t final_len = len % SHA1_BLOCK_SIZE;
+-
+-	sha1_blocks(h, data, len / SHA1_BLOCK_SIZE);
+-
+-	memcpy(final_data, data + len - final_len, final_len);
+-	final_data[final_len] = 0x80;
+-	final_len = round_up(final_len + 9, SHA1_BLOCK_SIZE);
+-	put_unaligned_be64((u64)len * 8, &final_data[final_len - 8]);
+-
+-	sha1_blocks(h, final_data, final_len / SHA1_BLOCK_SIZE);
+-
+-	for (int i = 0; i < 5; i++)
+-		put_unaligned_be32(h[i], &out[i * 4]);
+-}
+diff --git a/tools/perf/util/sha1.h b/tools/perf/util/sha1.h
+deleted file mode 100644
+index e92c9966e1d5..000000000000
+--- a/tools/perf/util/sha1.h
++++ /dev/null
+@@ -1,6 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
+-#include <linux/types.h>
+-
+-#define SHA1_DIGEST_SIZE 20
+-
+-void sha1(const void *data, size_t len, u8 out[SHA1_DIGEST_SIZE]);
 -- 
 2.52.0
 
