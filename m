@@ -1,104 +1,75 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45129225390
-	for <linux-crypto@vger.kernel.org>; Wed, 10 Dec 2025 04:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AEB1A238C;
+	Wed, 10 Dec 2025 04:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765339300; cv=none; b=E9Zb/27PUojPpQnfQ3GCvLbkU8mLz9P2POEcQCc6Kp8dS5unriez+bQhMKdpxAbFb8awpwBq0giWAsxNNzjIr5GYdLXgRbDr4IwnLqK4cKrBaoRUfOwh0kkyOxje+4scLZDcqUO1YzwZwAtRY8wJU/avxCMg2VtFOnqX3bRfQ3g=
+	t=1765340928; cv=none; b=jtFzjv99SJ2KOYjW1sNi1Qq0+yk7QwIoit6x0diKhj1pxKU5lHdEmD4k4bbOAs+cVLq/1tcNMIR4lj8uDhxI9WfbQO7ub8fQHsoxdDR+Declq2BQjwjSzjb2ybmI+hrM/sbgMmmACSZgp7HJsHotyHcCxfJv/tdfwMzoiC4ukxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765339300; c=relaxed/simple;
-	bh=VtECjHUO3xGDK9B/G9gi6XQmOhondkiYl15lGVWWDj8=;
+	s=arc-20240116; t=1765340928; c=relaxed/simple;
+	bh=6CM4F46MgFVj+IAUwJx1StxTG2QH6cDSf5deviCIHiA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HfslJ/jACoBq5wKPyCNEmOmB6Qba4ce8A43Yn2g1i7ypHni0N8d4j3bX3rkZPBprufw2fq5cz7Up/1uo5VeJyoCvyJSkb4SnTuyV6J+5TkhOR75UwHvLGUNujHTFXygfdB66B/kDtvgQkgrL4N3oeHIeZUVGKhje7ic6eEYNq3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=JjcHBXKU; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Wb8AEiDA; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=k/+A6kP80qCqwOyQhrXSK/fTLnjp2N2807j0HQ9/hQ/7oYMK0Yaq1K4BCaxvicTI+HMLwFOKqGP0izPjeCPZvOFw9JLrozM85YDN0FaO3np+3ynjUpd3RmTORrqeAVs0nRFY5WfCh7F/du2woToJ7fmHKhpBl3FBVc311E/vk04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=o5UKxnlY; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="JjcHBXKU";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Wb8AEiDA"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BA3LRmn1810558
-	for <linux-crypto@vger.kernel.org>; Wed, 10 Dec 2025 04:01:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=MqiK2oV4ydfSYTKR7Zx8jO1z
-	t60wSHlnWIxEEXBfXUM=; b=JjcHBXKU77FDyu/9srzsR2eJZHcVGnZAIAVSJvWU
-	8iuzpG7i1SzOJhvPML7i27o94CyGCZwxUCIm02Bvq91Ux6XvfqqRMX+XB0bNHyHA
-	CG+HY5f3MiIDUlDp701lzkPBa0RabAmiyNuhFe8mMEnNH1NqS9MBbyxGnFfKs9DW
-	fLaRnL6EX9i5XfLdgrvIoqBI9eIk9ffLlbkoNB4IzfJ3Eag55Ywy7fS8qy4G1auN
-	PIddMznblOcGAbWa0I7qLkBIqhx0iZ9btO+IChPDGsEpUaa/XbW5QJV3mwCknSOS
-	WZcmmaqYTWL1HGtClSBBDa1dKZWjep18cmk1qpysenY4Yw==
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4axm9catec-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Wed, 10 Dec 2025 04:01:38 +0000 (GMT)
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4ee0193a239so72068131cf.0
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Dec 2025 20:01:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1765339297; x=1765944097; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MqiK2oV4ydfSYTKR7Zx8jO1zt60wSHlnWIxEEXBfXUM=;
-        b=Wb8AEiDATruQhaYECrk0DWRN9XzUP2bl7k2UPD0UiYb0814CeN4t2iTHaB2I3GRIwA
-         iCDcyy0w3aIOfjrVp58TulHKkRbaJ7ibBXTiL6vyyp3yfCUMAFJyT9Rp0jBM2ePSlVgb
-         D8P3YameJ2/M0pdTp1FBA4LHxvcsMEGLO9ugMEFFUj6RZWZsfdgox6tGrZ7n3ipIVIat
-         10n/XIKKuhBODke83pPEB6coICDRJekIJGecjyvxXmqdB5WFWnaztdQAu9sTwmPJJtI5
-         PiUrCxyRAZlOB0iDcdFNXirmeBxe9ouNDprjdRjafGiuM4KIIK+xsoURyaviXRJRWz62
-         JkiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765339297; x=1765944097;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MqiK2oV4ydfSYTKR7Zx8jO1zt60wSHlnWIxEEXBfXUM=;
-        b=BsQLEWXXLjSpK+IhDleD2rRnsC8x6iFzzphjdUQ09O96kRdGA9gQI3X9MXPYXvL62q
-         N11nSBxJ3NUPdpqSLW9EyNF1mLt4nNzXWpbMS6rh+bdrDvBx31G3LmoinIIgfcSJ3Zo/
-         voHDGAPrtXHuAjwNO3M6pqEKmPqQcsX7lrZ9pvnc9wfdanP+iQIHMeAih6/nx4otccF5
-         OSuaAfCIO+6dxCi1nEflqjET18Lw5JgQvNDrq+FWE3NwwE1Ik4tCNNhf/pCsUAw8r0dF
-         JRBJaAn6uhuknHFTnyN/wlcTdAp9z/3K8yxYAKITDkg/BwQY0urV1aMmHqYZrmUbmkfw
-         TEIw==
-X-Forwarded-Encrypted: i=1; AJvYcCXJwmAjCfjdBfuJ5bt8INjSxYZqhsgFCrS7vdMzjUalon/Xf+uO7B/QJzkllYfeD75VUYdA+p/EFn4HThI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlmcR+HI24UM7Oh2jUEB8qJMdv1LCj6Rc8TqCLlYi4gychAonC
-	HjaWqMpEPbRJf5bZXpjyNIulqHK32Vr7JZFtu9/VESN+Ef45HhFvfK5yjNDv00gDN2sqK59SDSN
-	t0EeYAmJ52Y0lqk6Xpu1WffoeH1rrgnfhSi96C1MAONMhFq3YGluXL42SvnGMgDcaltg=
-X-Gm-Gg: ASbGncu0e46SKvW32XYC/CdFAxKtaB9e/mZd5Cxo0EU/u2qtSmEmWBP1Q0OW6JXA/Pw
-	W4ZEah6Vp6nn/gRWZ4Nd1Y/WTc3l6+8ull/n54yKnRN88D/rQGI7TxerJ7HoxfwwxBUlcbUrtCn
-	QZgo0YsIzoVyyxalmzN6eYGKMH44GnMBRzIzbjTymiPL3AU8Stxo26EqD1IPUWJBRIPCMgAIP4f
-	OgOMs5ucfQOQOx3ypQSfLvvQM2mpnQcHrUix9Q3jTRusFr1tPKk1tjJdib/y5Cjug6yf2cv05Q2
-	wpKa4cuZ317QZiaxJjjRG52PPHjwUNX73PpolLtD/+zQngXtCfZmNSIGEVgXEdDiquX8ogfHuwp
-	jg0h9AJOf3seDN4ORMAVyDonXFnckDD2ZCwDNic6T1nVBkbMXiMkT/Bp5yv8B7/kpOhSg8fHq1S
-	YK7Yi+/98Q6Mk1S8kZSyysodw=
-X-Received: by 2002:a05:622a:188d:b0:4ee:2080:2597 with SMTP id d75a77b69052e-4f1b1a846cdmr13831361cf.38.1765339297543;
-        Tue, 09 Dec 2025 20:01:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFR6q8iXUcqUwTpaJVE3qBT3yDxxuu4wFZVSU6r3pLHR6MDtUDQJs8YgKtaZD9Q1cInJatE+g==
-X-Received: by 2002:a05:622a:188d:b0:4ee:2080:2597 with SMTP id d75a77b69052e-4f1b1a846cdmr13830901cf.38.1765339296829;
-        Tue, 09 Dec 2025 20:01:36 -0800 (PST)
-Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-597d7b1a7c5sm5946794e87.11.2025.12.09.20.01.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Dec 2025 20:01:35 -0800 (PST)
-Date: Wed, 10 Dec 2025 06:01:33 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Luca Weiss <luca.weiss@fairphone.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Vinod Koul <vkoul@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 9/9] arm64: dts: qcom: Add The Fairphone (Gen. 6)
-Message-ID: <ysncf5bdxklhcuvxunmzd3gudx3qt6oq4ihzip6afb3fg5z27s@eonocdzxxw6f>
-References: <20251210-sm7635-fp6-initial-v4-0-b05fddd8b45c@fairphone.com>
- <20251210-sm7635-fp6-initial-v4-9-b05fddd8b45c@fairphone.com>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="o5UKxnlY"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=OQfWpBVkXWRGjFGQWDDm62eANx/f67q4RwxOcophSOU=; 
+	b=o5UKxnlYep7lSUUwWim+bLfjwfHoogk/yS8buh8k6PyJYw1yI5o6xGQ9xBQJDxaxqQANVQFK9MS
+	505DVNridkct6fi2LwX+dcbHT8Zq4RsmktcnEUAPY3riX3DBGZH7Ai/GcTpRKQy0Mi00E0yi5iH4f
+	p93hlXyZI+84CNmdpT0aQeXxiOHQCTm1OI6FTDYurbMnxQiyRk69S8QsxiikKc/9vf9jAZufSJ2bP
+	TmGRNBGWpDmHcaMRlezqlqasklsa5QitG7FAfkkEqVYQD+AnxHXVxQqU93AFSElFdXBpuKrNqakad
+	pA+tUWzUMnBJfYiaNNefDxgrZU6Zoe9o5blQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vTBoB-009Bre-0u;
+	Wed, 10 Dec 2025 12:28:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Dec 2025 12:28:11 +0800
+Date: Wed, 10 Dec 2025 12:28:11 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>,
+	SeongJae Park <sj@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+	"nphamcs@gmail.com" <nphamcs@gmail.com>,
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"21cnbao@gmail.com" <21cnbao@gmail.com>,
+	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+	"kasong@tencent.com" <kasong@tencent.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"ebiggers@google.com" <ebiggers@google.com>,
+	"surenb@google.com" <surenb@google.com>,
+	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
+	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
+	"Gopal, Vinodh" <vinodh.gopal@intel.com>
+Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
+ compress batching of large folios.
+Message-ID: <aTj22_idykAfpDNw@gondor.apana.org.au>
+References: <j7vaexpi3lmheowozkymesvekasccdgnxijjip66ryngj66llf@kolcsjasxxdy>
+ <SA1PR11MB8476756D7255F1EA1EBE322AC9DEA@SA1PR11MB8476.namprd11.prod.outlook.com>
+ <aTZExW2LgFNTfwVJ@gondor.apana.org.au>
+ <SJ2PR11MB8472529E92EC003D956DF530C9A2A@SJ2PR11MB8472.namprd11.prod.outlook.com>
+ <aTZS4RKR3Zci8d_I@gondor.apana.org.au>
+ <qux3i5m4weedza76ynfmjmtvt4whnkk3itwpuolozfvk3cg6ud@rylhkigmqn7t>
+ <aTeKNEX5stqjG55i@gondor.apana.org.au>
+ <j7rqzweklga72b7hdebljs7nziz7bs7kzvevkuhnbwi3uespkt@rmkdqlpku2gh>
+ <SJ2PR11MB8472CE03A67C1161469CDE9EC9A3A@SJ2PR11MB8472.namprd11.prod.outlook.com>
+ <bfkkizyjmfulkzxgf45l7tjsnudtyutnenyngzw7l4tmmugo3k@zr2wg2xqh3uv>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -107,54 +78,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251210-sm7635-fp6-initial-v4-9-b05fddd8b45c@fairphone.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjEwMDAzMiBTYWx0ZWRfX+9thjGpIGenz
- FsR/B1rmEB67vatmpU0yHfeoeq3Vqodirys1tCOF9Ob6WMCmd4JOg4FmrqOjqgOWzw/SOU15MDL
- DnTOV8xdGpoBADK+Y4IzQPQFYbLZhV7mhqu2C+bCNGomlowvpP6A/8MqyBsTtXoBfWs8uIt3Waq
- qUhNFMMEi65AH64nqMXoa6NvKWM0ml90F0GMKwfuSZYbSEKZSI2ZYsQlV74CJ8JomyjMAPHK0Ir
- DAjBpQHdWqXpoauPK+kaZ2GgyBK2OKrpi5DINaHRRd3XaWN6U84tHc3ZxV+NLM4ePPekastyM32
- urTUL6LBzNfgfsDI/m6DlwY+WraqaU/5g59EOMlPfilmSEBEJuBjSt0jUgPLyd6D3jQSKS6TGcp
- Tz8RYmH+fIA46BWZtXACORUcItxcDA==
-X-Proofpoint-ORIG-GUID: i92-Un3PVHfW9q-1lyuLcY0fknZMIN_-
-X-Authority-Analysis: v=2.4 cv=Vcj6/Vp9 c=1 sm=1 tr=0 ts=6938f0a2 cx=c_pps
- a=JbAStetqSzwMeJznSMzCyw==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=6H0WHjuAAAAA:8 a=EUspDBNiAAAA:8 a=9_MgF4w4W-WW1lAcsO4A:9 a=CjuIK1q_8ugA:10
- a=zgiPjhLxNE0A:10 a=uxP6HrT_eTzRwkO_Te1X:22 a=Soq9LBFxuPC4vsCAQt-j:22
-X-Proofpoint-GUID: i92-Un3PVHfW9q-1lyuLcY0fknZMIN_-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-09_05,2025-12-09_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 clxscore=1015 malwarescore=0 impostorscore=0 suspectscore=0
- adultscore=0 priorityscore=1501 bulkscore=0 spamscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512100032
+In-Reply-To: <bfkkizyjmfulkzxgf45l7tjsnudtyutnenyngzw7l4tmmugo3k@zr2wg2xqh3uv>
 
-On Wed, Dec 10, 2025 at 10:43:33AM +0900, Luca Weiss wrote:
-> Add a devicetree for The Fairphone (Gen. 6) smartphone, which is based
-> on the Milos/SM7635 SoC.
-> 
-> Supported functionality as of this initial submission:
-> * Debug UART
-> * Regulators (PM7550, PM8550VS, PMR735B, PM8008)
-> * Remoteprocs (ADSP, CDSP, MPSS, WPSS)
-> * Power Button, Volume Keys, Switch
-> * PMIC-GLINK (Charger, Fuel gauge, USB-C mode switching)
-> * Camera flash/torch LED
-> * SD card
-> * USB
-> 
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> ---
->  arch/arm64/boot/dts/qcom/Makefile                |   1 +
->  arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts | 790 +++++++++++++++++++++++
->  2 files changed, 791 insertions(+)
-> 
+On Tue, Dec 09, 2025 at 05:31:35PM +0000, Yosry Ahmed wrote:
+>
+> Ugh, yes.. I don't think we want to burn 7 extra pages per-CPU for SW
+> compressors.
 
-Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+OK so the consensus is that we're keeping the visible batch size
+attribute for now, which will be set to 1 for everything but iaa.
 
+So for now I'm going to just provide a trivial acomp fallback so
+that non-batching algorithms conform to the batching calling
+convention for a batch size of 1.
 
+Cheers,
 -- 
-With best wishes
-Dmitry
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
