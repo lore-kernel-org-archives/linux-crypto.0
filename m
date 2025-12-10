@@ -1,60 +1,108 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E7B2FD7D2
-	for <linux-crypto@vger.kernel.org>; Wed, 10 Dec 2025 16:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7032431283A
+	for <linux-crypto@vger.kernel.org>; Wed, 10 Dec 2025 16:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765382534; cv=none; b=Pt7IlEGVBl4sb/5kFJ9gAsK28xfVARkQOJPnFGMRIjn9Gx+2A96BU/UNMwqWKPToz1Fnv7PajfcXz3i5wJt22ELzLKUkcVm6BH+PrSj2O9u1HgU2BJ9Q2UfW2gpvhAo6nTWbNKohNOtGHnplt9QnUoFhQugybawQC4U2etDR+Hg=
+	t=1765383509; cv=none; b=j7p5Qdv0W7tJDw2Q4E8UlPz/wlmpi5sNpP/tDUM+NA/4uITDHFsHzTRNHmPqOu4PRM+yPdP5OzkLLKqTmXnnRMvHaKxLs3GszTUmxB/x0sVD0OG+yeC9faUMFTTeDRlFE7gUW7rKC8R+dsEG4dcsx9egPlh0CbEA3B347DbOTvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765382534; c=relaxed/simple;
-	bh=hF5rSjk1M61DJETn2Ptd9E4Evxhs55n7pt+Lct5jdf0=;
+	s=arc-20240116; t=1765383509; c=relaxed/simple;
+	bh=8fukvFVHvNsSJut9kyMPtVjty3xkgDR42FqSOIyq0Vs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LCSDNt0RdGyQ7PaDNYEfFWF3RDmGIlAKGFOUPP3tk4NIpDq9VYJ8Y4kcPoxkb9C3PE49XKAz3MQDyyMp3k/P9ZAuhITXX9gEK/UTk/X9thM+eEPLVmCCRbyHJFinQA/hq0nF74qAG7pBfz59VdVLCr+Y02uJXFoqjZ3rFcES2pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qo5LTV5m; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=mB+gD7v3IZSVIeXZTTx12yWSvtjp9FeAmd22vS6ToL0kAlsukozsd5CQPKsKXhPRAaWiY1W7GUN6YLLhNZcEBt6owpkJJ/nIkMXoWeX1HKxu26Z3lR4CfWDwSQ6xE0yHwZHT2lXO6dYjjpESFwzIpSXzqQXpF820S/BahkiFtZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Knpx6Ys; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qo5LTV5m"
-Date: Wed, 10 Dec 2025 16:01:49 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765382521;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dWoR7UIzQcb07jlgSZ/0O0cJ2y2/O3Euwx3b+WfcfL8=;
-	b=qo5LTV5mTOnx7nIoTU+LKhYwSrfrTkAeZCQdagkhS+BEeI3hmFSvbe/JuD6qH6K8chR8R3
-	JWnrrO9QyYWYXi0+9vxUEWAAKORhM7fnlO68nFiwGNndu2k6Jqdm76GEv6NLru2zruclAg
-	vHX1YivYOm6Ckn6M6wHoanBUEQQjQZc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	SeongJae Park <sj@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org" <hannes@cmpxchg.org>, 
-	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
-	"kasong@tencent.com" <kasong@tencent.com>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com" <clabbe@baylibre.com>, 
-	"ardb@kernel.org" <ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
-	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>, "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, 
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
- compress batching of large folios.
-Message-ID: <yhecgcnt52hnsyf23p576mz2mlnffqrluikwzv6tdn3bnmzumc@thpyltdpxtjq>
-References: <SA1PR11MB8476756D7255F1EA1EBE322AC9DEA@SA1PR11MB8476.namprd11.prod.outlook.com>
- <aTZExW2LgFNTfwVJ@gondor.apana.org.au>
- <SJ2PR11MB8472529E92EC003D956DF530C9A2A@SJ2PR11MB8472.namprd11.prod.outlook.com>
- <aTZS4RKR3Zci8d_I@gondor.apana.org.au>
- <qux3i5m4weedza76ynfmjmtvt4whnkk3itwpuolozfvk3cg6ud@rylhkigmqn7t>
- <aTeKNEX5stqjG55i@gondor.apana.org.au>
- <j7rqzweklga72b7hdebljs7nziz7bs7kzvevkuhnbwi3uespkt@rmkdqlpku2gh>
- <SJ2PR11MB8472CE03A67C1161469CDE9EC9A3A@SJ2PR11MB8472.namprd11.prod.outlook.com>
- <bfkkizyjmfulkzxgf45l7tjsnudtyutnenyngzw7l4tmmugo3k@zr2wg2xqh3uv>
- <SJ2PR11MB8472D347836B6CA3FEB0CDEEC9A3A@SJ2PR11MB8472.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Knpx6Ys"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-477b91680f8so77529085e9.0
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Dec 2025 08:18:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765383506; x=1765988306; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5R7EEgKhSIj0MssK61oG5hvlzLQojw/c9iQ7wtMJnfU=;
+        b=4Knpx6Ys5jZM/3xzn4TkUlQ5MOn07tNXFGzWuQHetRSxVoOxFT3OFL1dI6aUzMhyEu
+         xnYtbM7h+xr7oTrp7lflQAsqfG0dB83aJPa0N0Lzyw30KdGksmfQW3kYujbtnt3DkuVA
+         fwmEmugctaKD9pNusDQNeXd1UfmY+fHvGPOWDw8BAfKfkIxSgy+w8UbI4YYUCqj4I6jX
+         aI8c6m7cRh6B35onFu9uYiBhaBJoI1i9z8h4Mkeyxj9du9M621C5tHRNfX5XJmAb/f0q
+         TuIXXyB2cjbM17BbTAqn37phQDIzp91gAiU1SG6JW6826VDNB+PT3RdVCI3rvFZjl/bg
+         gWLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765383506; x=1765988306;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5R7EEgKhSIj0MssK61oG5hvlzLQojw/c9iQ7wtMJnfU=;
+        b=vADNLQQkgbTAMICdHllZDMPwvbsLlN/Nw6FnR7Ywceffoap/LczVHLkseaNRsxpso2
+         aESbIOh8EgM6TmTFx7MgY6q373ymFsghR2eOmyt991K7rUC4UO6C/+vLe83Cb0RpedNI
+         3g0AIFMEX3bMUuRvcbF88P7cXB9G68684PBPkb1oGWBo8YwlLcLclGWs+6YkdoTp+ieY
+         QvfH5pE5Z+c8y5z+Yc8wYqFdUIriJepNYyqvlPGtNzcwX0Ew/Lo69QjUgTK94LNID6rJ
+         TbtYi14Fcal6Qx4D5nk3vUudFCcGPMYvOsLfjvejFi1Tlv/t228jtfrE+uqUecSmjm+Y
+         L27A==
+X-Forwarded-Encrypted: i=1; AJvYcCUKWVybdiYthUIeIZDxW4Yi9OZzZAI5bAIap6aCk2rCVH6gAiOTQ8EhQ3d8Nguk0L/VvIcQRHk49Glutbw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywjz5QlOVpVwFPay/F+9Ye/fvm4ppRXvd1q8LTkEMEE1T3ShkPW
+	n+O8NCyeNeDwzs+HBC2iS0+vxiCQPlL3QyZ70S4ScSWtVE8OaVAdJeWEvTGebgVM3A==
+X-Gm-Gg: ASbGncvCWSR9OP0sTY0UbJnAIQecQ7OU389gGgWM75iMvHPxdOHQ9/9yMxZw/qhi5oo
+	vvvpEirqlpwcHAxzhHEUdqr7apLk66VYGXHZWfl61P9V7+BmZWP3WxUPTE8VYYdlWTMtmgplSmz
+	+LHl0TDC6Fyy/rwj0YNI5dL7/e4mybATvPGF8nYSgG/dLTsobcg1NtZqSV7d9ob9Qpy54efLvtT
+	FTd/WOGtdt4p8DqZQJ3vP9sf/tVN77BYRBKfxn/U+NGWWd6pPHT+qBRPj7Rg6ZDKo2QTHAzzprq
+	38oGGZN4w3+zAedJISeg4RopSGI3ttFmPkVWEofWUm+C9sXwXoWJYv9jLjsxeN1gteh2tuYoDOa
+	zuu6yJ186Z8GdVGsc1kQvTOmNt+QZ7O4a3WR0ybd/WTu/JF2pL9zS6Zai+aAvF3b8alThd3zLSP
+	PQKdsOKSI0/lVs8sGsGUR7Jop+z7RHWZatDndDFpKGa1n5zaA=
+X-Google-Smtp-Source: AGHT+IE5gG+0fezF5tzXHFusF2dBV52zxvrbxnDDqwGYfilnFo0IcpTyJU4lWfuQsZFtfQAM3eL7LQ==
+X-Received: by 2002:a05:600c:687:b0:46e:59bd:f7d3 with SMTP id 5b1f17b1804b1-47a83cc5528mr15763325e9.20.1765383505415;
+        Wed, 10 Dec 2025 08:18:25 -0800 (PST)
+Received: from elver.google.com ([2a00:79e0:2834:9:edfc:ec3:194e:c3b3])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a7d3a75a3sm45109085e9.6.2025.12.10.08.18.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Dec 2025 08:18:24 -0800 (PST)
+Date: Wed, 10 Dec 2025 17:18:16 +0100
+From: Marco Elver <elver@google.com>
+To: Peter Zijlstra <peterz@infradead.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	Chris Li <sparse@chrisli.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+	linux-sparse@vger.kernel.org, linux-wireless@vger.kernel.org,
+	llvm@lists.linux.dev, rcu@vger.kernel.org
+Subject: Re: [PATCH v4 00/35] Compiler-Based Context- and Locking-Analysis
+Message-ID: <aTmdSMuP0LUAdfO_@elver.google.com>
+References: <20251120145835.3833031-2-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -63,177 +111,92 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SJ2PR11MB8472D347836B6CA3FEB0CDEEC9A3A@SJ2PR11MB8472.namprd11.prod.outlook.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20251120145835.3833031-2-elver@google.com>
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-On Tue, Dec 09, 2025 at 07:38:20PM +0000, Sridhar, Kanchana P wrote:
+All,
+
+On Thu, Nov 20, 2025 at 03:49PM +0100, Marco Elver wrote:
+> Context Analysis is a language extension, which enables statically
+> checking that required contexts are active (or inactive) by acquiring
+> and releasing user-definable "context guards". An obvious application is
+> lock-safety checking for the kernel's various synchronization primitives
+> (each of which represents a "context guard"), and checking that locking
+> rules are not violated.
+[...] 
+> A Clang version that supports `-Wthread-safety-pointer` and the new
+> alias-analysis of context-guard pointers is required (from this version
+> onwards):
 > 
-> > -----Original Message-----
-> > From: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > Sent: Tuesday, December 9, 2025 9:32 AM
-> > To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>; SeongJae Park
-> > <sj@kernel.org>; linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> > hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
-> > usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
-> > ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
-> > senozhatsky@chromium.org; kasong@tencent.com; linux-
-> > crypto@vger.kernel.org; davem@davemloft.net; clabbe@baylibre.com;
-> > ardb@kernel.org; ebiggers@google.com; surenb@google.com; Accardi,
-> > Kristen C <kristen.c.accardi@intel.com>; Gomes, Vinicius
-> > <vinicius.gomes@intel.com>; Feghali, Wajdi K <wajdi.k.feghali@intel.com>;
-> > Gopal, Vinodh <vinodh.gopal@intel.com>
-> > Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
-> > compress batching of large folios.
-> > 
-> > On Tue, Dec 09, 2025 at 05:21:06PM +0000, Sridhar, Kanchana P wrote:
-> > >
-> > > > -----Original Message-----
-> > > > From: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > > > Sent: Tuesday, December 9, 2025 8:55 AM
-> > > > To: Herbert Xu <herbert@gondor.apana.org.au>
-> > > > Cc: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>; SeongJae Park
-> > > > <sj@kernel.org>; linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> > > > hannes@cmpxchg.org; nphamcs@gmail.com;
-> > chengming.zhou@linux.dev;
-> > > > usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
-> > > > ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
-> > > > senozhatsky@chromium.org; kasong@tencent.com; linux-
-> > > > crypto@vger.kernel.org; davem@davemloft.net; clabbe@baylibre.com;
-> > > > ardb@kernel.org; ebiggers@google.com; surenb@google.com; Accardi,
-> > > > Kristen C <kristen.c.accardi@intel.com>; Gomes, Vinicius
-> > > > <vinicius.gomes@intel.com>; Feghali, Wajdi K
-> > <wajdi.k.feghali@intel.com>;
-> > > > Gopal, Vinodh <vinodh.gopal@intel.com>
-> > > > Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress()
-> > with
-> > > > compress batching of large folios.
-> > > >
-> > > > On Tue, Dec 09, 2025 at 10:32:20AM +0800, Herbert Xu wrote:
-> > > > > On Tue, Dec 09, 2025 at 01:15:02AM +0000, Yosry Ahmed wrote:
-> > > > > >
-> > > > > > Just to clarify, does this mean that zswap can pass a batch of (eight)
-> > > > > > pages to the acomp API, and get the results for the batch uniformly
-> > > > > > whether or not the underlying compressor supports batching?
-> > > > >
-> > > > > Correct.  In fact I'd like to remove the batch size exposure to zswap
-> > > > > altogether.  zswap should just pass along whatever maximum number of
-> > > > > pages that is convenient to itself.
-> > > >
-> > > > I think exposing the batch size is still useful as a hint for zswap. In
-> > > > the current series, zswap allocates as many per-CPU buffers as the
-> > > > compressor's batch size, so no extra buffers for non-batching
-> > > > compressors (including SW compressors).
-> > > >
-> > > > If we use the same batch size regardless, we'll have to always allocate
-> > > > 8 (or N) per-CPU buffers, for little to no benefit on non-batching
-> > > > compressors.
-> > > >
-> > > > So we still want the batch size on the zswap side, but we want the
-> > > > crypto API to be uniform whether or not the compressor supports
-> > > > batching.
-> > >
-> > > Thanks Yosry, you bring up a good point. I currently have the outer for
-> > > loop in zswap_compress() due to the above constraint. For non-batching
-> > > compressors, we allocate only one per-CPU buffer. Hence, we need to
-> > > call crypto_acomp_compress() and write the compressed data to the
-> > > zs_poll for each page in the batch. Wouldn't we need to allocate
-> > > 8 per-CPU buffers for non-batching compressors if we want zswap to
-> > > send a batch of 8 pages uniformly to the crypto API, so that
-> > > zswap_compress() can store the 8 pages in zs_pool after the crypto
-> > > API returns?
-> > 
-> > Ugh, yes.. I don't think we want to burn 7 extra pages per-CPU for SW
-> > compressors.
-> > 
-> > I think the cleanest way to handle this would be to:
-> > - Rename zswap_compress() to __zswap_compress(), and make it handle a
-> >   given batch size (which would be 1 or 8).
-> > - Introduce zswap_compress() as a wrapper that breaks down the folio
-> >   into batches and loops over them, passing them to __zswap_compress().
-> > - __zswap_compress() has a single unified path (e.g. for compressed
-> >   length and error handling), regardless of the batch size.
-> > 
-> > Can this be done with the current acomp API? I think all we really need
-> > is to be able to pass in a batch of size N (which can be 1), and read
-> > the error and compressed length in a single way. This is my main problem
-> > with the current patch.
+> 	https://github.com/llvm/llvm-project/commit/7ccb5c08f0685d4787f12c3224a72f0650c5865e
 > 
-> Once Herbert gives us the crypto_acomp modification for non-batching
-> compressors to set the acomp_req->dst->length to the
-> compressed length/error value, I think the same could be accomplished
-> with the current patch, since I will be able to delete the "errp". IOW, I think
-> a simplification is possible without introducing __zswap_compress(). The
-> code will look seamless for non-batching and batching compressors, and the
-> distinction will be made apparent by the outer for loop that iterates over
-> the batch based on the pool->compr_batch_size in the current patch.
-
-I think moving the outer loop outside to a wrapper could make the
-function digestable without nested loops.
-
+> The minimum required release version will be Clang 22.
 > 
-> Alternately, we could introduce the __zswap_compress() that abstracts
-> one single iteration through the outer for loop: it compresses 1 or 8 pages
-> as a "batch". However, the distinction would still need to be made for
-> non-batching vs. batching compressors in the zswap_compress() wrapper:
-> both for sending the pool->compr_batch_size # of pages to
-> __zswap_compress() and for iterating over the single/multiple dst buffers
-> to write to zs_pool (the latter could be done within __zswap_compress(),
-> but the point remains: we would need to distinguish in one or the other).
-
-Not sure what you mean by the latter. IIUC, for all compressors
-__zswap_compress() would iterate over the dst buffers and write to
-zs_pool, whether the number of dst buffers is 1 or 8. So there wouldn't
-be any different handling in __zswap_compress(), right?
-
-That's my whole motivation for introducing a wrapper that abstracts away
-the batching size.
-
+> This series is also available at this Git tree:
 > 
-> It could be argued that keeping the seamless-ness in handling the calls to
-> crypto based on the pool->compr_batch_size and the logical distinctions
-> imposed by this in iterating over the output SG lists/buffers, would be
-> cleaner being self-contained in zswap_compress(). We already have a
-> zswap_store_pages() that processes the folio in batches. Maybe minimizing
-> the functions that do batch processing could be cleaner?
+> 	https://git.kernel.org/pub/scm/linux/kernel/git/melver/linux.git/log/?h=ctx-analysis/dev
+[...] 
 
-Yeah it's not great that we'll end up with zswap_store_pages() splitting
-the folio into batches of 8, then zswap_compress() further splitting
-them into compression batches -- but we'll have that anyway. Whether
-it's inside zswap_compress() or a wrapper doesn't make things much
-different imo.
+I realize that I sent this series at the end of the last release cycle,
+and now we're in the merge window, along with LPC going on -- so it
+wasn't the best timing (however, it might be something to discuss at
+LPC, too :-) .. I'm attending virtually, however :-/).
 
-Also, splitting the folio differently at different levels make semantic
-sense. zswap_store_pages() splits it into batches of 8, because this is
-what zswap handles (mainly to avoid dynamically allocating things like
-entries). zswap_compress() will split it further if the underlying
-compressor prefers that, to avoid allocating many buffer pages. So I
-think it kinda makes sense.
+How to proceed?
 
-In the future, we can revisit the split in zswap_compress() if we have a
-good case for batching compression for SW (e.g. compress every 8 pages
-as a single unit), or if we can optimize the per-CPU buffers somehow.
+I'll be preparing a rebased and retested version of all this when
+v6.19-rc1 is out. One outstanding recommendation from Linus was to
+investigate compile-times, but as-is, it's unclear there's any notable
+overhead per brief investigation: https://lore.kernel.org/all/aR-plHrWDMqRRlcI@elver.google.com/
 
-> 
-> In any case, let me know which would be preferable.
-> 
-> Thanks,
-> Kanchana
-> 
-> > 
-> > In the future, if it's beneifical for some SW compressors to batch
-> > compressions, we can look into optimizations for the per-CPU buffers to
-> > avoid allocating 8 pages per-CPU (e.g. shared page pool), or make this
-> > opt-in for certain SW compressors that justify the cost.
-> > 
-> > >
-> > > Thanks,
-> > > Kanchana
-> > >
-> > > >
-> > > > >
-> > > > > Cheers,
-> > > > > --
-> > > > > Email: Herbert Xu <herbert@gondor.apana.org.au>
-> > > > > Home Page: http://gondor.apana.org.au/~herbert/
-> > > > > PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+From what I can tell most of this has to go through the locking tree,
+given the potential for conflict there. However, it is possible to split
+this up as follows:
+
+Batch 1:
+
+>   compiler_types: Move lock checking attributes to
+>     compiler-context-analysis.h
+>   compiler-context-analysis: Add infrastructure for Context Analysis
+>     with Clang
+>   compiler-context-analysis: Add test stub
+>   Documentation: Add documentation for Compiler-Based Context Analysis
+>   checkpatch: Warn about context_unsafe() without comment
+>   cleanup: Basic compatibility with context analysis
+>   lockdep: Annotate lockdep assertions for context analysis
+>   locking/rwlock, spinlock: Support Clang's context analysis
+>   compiler-context-analysis: Change __cond_acquires to take return value
+>   locking/mutex: Support Clang's context analysis
+>   locking/seqlock: Support Clang's context analysis
+>   bit_spinlock: Include missing <asm/processor.h>
+>   bit_spinlock: Support Clang's context analysis
+>   rcu: Support Clang's context analysis
+>   srcu: Support Clang's context analysis
+>   kref: Add context-analysis annotations
+>   locking/rwsem: Support Clang's context analysis
+>   locking/local_lock: Include missing headers
+>   locking/local_lock: Support Clang's context analysis
+>   locking/ww_mutex: Support Clang's context analysis
+>   debugfs: Make debugfs_cancellation a context guard struct
+>   compiler-context-analysis: Remove Sparse support
+>   compiler-context-analysis: Remove __cond_lock() function-like helper
+>   compiler-context-analysis: Introduce header suppressions
+>   compiler: Let data_race() imply disabled context analysis
+>   MAINTAINERS: Add entry for Context Analysis
+
+Batch 2: Everything below this can wait for the initial support in
+mainline, at which point subsystem maintainers can pick them up if
+deemed appropriate.
+
+>   kfence: Enable context analysis
+>   kcov: Enable context analysis
+>   kcsan: Enable context analysis
+>   stackdepot: Enable context analysis
+>   rhashtable: Enable context analysis
+>   printk: Move locking annotation to printk.c
+>   security/tomoyo: Enable context analysis
+>   crypto: Enable context analysis
+>   sched: Enable context analysis for core.c and fair.c
+
+Thanks,
+	-- Marco
