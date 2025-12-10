@@ -1,78 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E016370808;
-	Wed, 10 Dec 2025 00:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A6B2D27E;
+	Wed, 10 Dec 2025 01:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765326631; cv=none; b=LS7bpHPE9Im5ssQw8mKytD5iQzrE5UugVzvk5G3X+20aQPtTqesyZsNxIz7iNUJ8BQlLo/Xedj5F/KylmBc0mFGiMbt5kib5myItMK+Y5b6pThzbNHgVaCBgNkeoae4MPTtOP2Zvhd94FsLFeYc26s+iDXafT2XQCkxXWHHcr6k=
+	t=1765329790; cv=none; b=j3fRid3l4PoobNFNQ1US+QVYE4yi1rCr2XeC0Ogyk3qJ+dslafolevtik+99UpcDNtiGTDvlywQ+w6qpu9xsbb7WUD6/+odYEKhAVkbJsTpNgG5JNY4SSYfHsgiPHG3mcMHQNcxj1sV02W0hFEADqkb5H/vGByVCmfezhxkaoXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765326631; c=relaxed/simple;
-	bh=TmJNhm+njmALNP3L4ljbZmBzGPihgoVSO4K2zy5v3ig=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EE2pAkb7B7vbJGdD9qOyuY7FigQNQg9Ic9gxvoe62KdqEQDql7wquSod7C1fN6sd+gZgyv1wCpvm8B7KlJwV2+wO32VQNbxJZ2VmJColI04+9+Zz3PN9ctwC3wG6YwfAYAcyXoegfU2rv2RLU0K4KU7HOThJ8+Kt5Bqqpi48iwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R8XbRskD; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8XbRskD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F205C4CEF5;
-	Wed, 10 Dec 2025 00:30:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765326630;
-	bh=TmJNhm+njmALNP3L4ljbZmBzGPihgoVSO4K2zy5v3ig=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R8XbRskDJulZRK8C6nooZbSqEgU+UpEp+g+eU99P+IUAB2IiXMmk4J3wDPvTZJtcx
-	 uvhwRvzwaz/x5qzVLm+yMR3BrozWVHrya/vFtP/+0+Z/9agSRJJk17n2m72cvG6BZO
-	 XVAkeXyf5XNLxTzi0FM91j1V9/+eFG9wqF7XOpG3e4rj3ill/PQi8tMHUIEkNqFMy0
-	 rEh2nW6TDLoZKVckOm+kneWHOUDKIf43rXZQjL/39xaTmQpSuMYiOnJvmBjc14eSGc
-	 C6kNZcdeyeasQIqWwEKas8/xbx7iLCJX9o8rQ6sNum+qqSOZzCoxAEi1Ct3w6HQ2P3
-	 cgDSi9tEXL3kw==
-Date: Wed, 10 Dec 2025 00:30:28 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org,
-	Diederik de Haas <diederik@cknow-tech.com>
-Subject: Re: [PATCH] crypto: arm64/ghash - Fix incorrect output from
- ghash-neon
-Message-ID: <20251210003028.GA1783653@google.com>
-References: <DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com>
- <20251209223417.112294-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1765329790; c=relaxed/simple;
+	bh=Qv8YDGmmLNOkB0lVK0IzQRVilt9yUNepwbuNtrvlqyY=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=BbC6pGSzx3dn90Urk6+7w9WDjx+CkKbyknwg5P0qsbzq7sqPJ13y2Q+BR3qeSjK8nU2GS+3q8ORHCAehUxf1DBJzJfA3nOZ9dA9wtNRQw8zT2WGcigD8tvY6i1lFKErgBC+AI2N2rImpYxCDV1sjIZffZT67469LFhV0OOmQox0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8AxTNJuyzhp6twsAA--.26154S3;
+	Wed, 10 Dec 2025 09:22:54 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJBxicBqyzhppaFHAQ--.37056S3;
+	Wed, 10 Dec 2025 09:22:52 +0800 (CST)
+Subject: Re: [PATCH v3 02/10] crypto: virtio: Remove duplicated virtqueue_kick
+ in virtio_crypto_skcipher_crypt_req
+To: Jason Wang <jasowang@redhat.com>
+Cc: Gonglei <arei.gonglei@huawei.com>, "Michael S . Tsirkin"
+ <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, virtualization@lists.linux.dev,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251209015951.4174743-1-maobibo@loongson.cn>
+ <20251209015951.4174743-3-maobibo@loongson.cn>
+ <CACGkMEs8E9DYzmZ8k4fH7h=fxC07wMsHizyDAE3wiKmQhkW3Uw@mail.gmail.com>
+ <CACGkMEviPVi+nJvS6rU55vF8xk08kAkr6ja0tYZp3BHJK=LtJQ@mail.gmail.com>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <f56218d3-b1c2-5ff8-a0c2-33683c3caef8@loongson.cn>
+Date: Wed, 10 Dec 2025 09:20:20 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251209223417.112294-1-ebiggers@kernel.org>
+In-Reply-To: <CACGkMEviPVi+nJvS6rU55vF8xk08kAkr6ja0tYZp3BHJK=LtJQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJBxicBqyzhppaFHAQ--.37056S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj9xXoW7Xw1rKryrKF13KF45Kr15GFX_yoW3uwbEqr
+	sFkwsY9w1kGrn7AF4qvFZxJrn2g3W8AF98tw4UX3WSqas8GanxWFn2grn7Gr13JFWxCrn0
+	kws3t34rCw129osvyTuYvTs0mTUanT9S1TB71UUUUj7qnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbDkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4j6F4UM28EF7xvwVC2z280aVCY1x0267AKxVW8
+	JVW8Jr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
+	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
+	McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7
+	I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCF
+	x2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r
+	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
+	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr
+	0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
+	0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
 
-On Tue, Dec 09, 2025 at 02:34:17PM -0800, Eric Biggers wrote:
-> Commit 9a7c987fb92b ("crypto: arm64/ghash - Use API partial block
-> handling") made ghash_finup() pass the wrong buffer to
-> ghash_do_simd_update().  As a result, ghash-neon now produces incorrect
-> outputs when the message length isn't divisible by 16 bytes.  Fix this.
-> 
-> (I didn't notice this earlier because this code is reached only on CPUs
-> that support NEON but not PMULL.  I haven't yet found a way to get
-> qemu-system-aarch64 to emulate that configuration.)
-> 
-> Fixes: 9a7c987fb92b ("crypto: arm64/ghash - Use API partial block handling")
-> Cc: stable@vger.kernel.org
-> Reported-by: Diederik de Haas <diederik@cknow-tech.com>
-> Closes: https://lore.kernel.org/linux-crypto/DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com/
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
-> 
-> If it's okay, I'd like to just take this via libcrypto-fixes.
-> 
->  arch/arm64/crypto/ghash-ce-glue.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
 
-(As always, additional reviews/acks still appreciated!)
+On 2025/12/9 下午12:32, Jason Wang wrote:
+> On Tue, Dec 9, 2025 at 12:31 PM Jason Wang <jasowang@redhat.com> wrote:
+>>
+>> On Tue, Dec 9, 2025 at 10:00 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>
+>>> With function virtio_crypto_skcipher_crypt_req(), there is already
+>>> virtqueue_kick() call with spinlock held in funtion
+>>
+>> A typo should be "function".
+Good catch, will correct this.
+>>
+>>> __virtio_crypto_skcipher_do_req(). Remove duplicated virtqueue_kick()
+>>> function call here.
+>>>
+>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>>
+>> Acked-by: Jason Wang <jasowang@redhat.com>
+> 
+> Btw.
+> 
+> I think this probably deserved a stable tag as well as the
+> virtqueue_kick is not synchronized here?
+sure, will do in next version.
 
-- Eric
+Regards
+Bibo Mao
+> 
+>>
+>> Thanks
+> 
+> Thanks
+> 
+
