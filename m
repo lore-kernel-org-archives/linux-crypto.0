@@ -1,151 +1,88 @@
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF9530149C;
-	Thu, 11 Dec 2025 08:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D16303C85
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Dec 2025 08:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765443116; cv=none; b=mmkaTS1a30I7Ad2ygyXVMmwletC4lOskwWReYx2vzDnK9hjLAgH8eUkIwSe1fQXoZNglV1C6iv/cDZtYcV8RMEffoX+UDTZRxJ9eIbd+ENKEregYO24PehCpZT6EQ92DH/4av9u4Oe0KvECeuTWHzmxCEMAd1kfNBgAXC8eSWlg=
+	t=1765443225; cv=none; b=Xym/LlCIdcVW0Tdf4s6ADZKrHIC1s0LFOhgQF/XGzP/Rn87n3S0K1P8pt1gktCqtsRaobgTtt5pWNm3rRgiAvW0jgJHJYvn6pWpBM3PIyHs4IQCp92CN6emvJb3ORwq7xfQ+GKcdfWLE/B9oj+gP9leqnTdGf+qfzHxURds1ltg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765443116; c=relaxed/simple;
-	bh=5nJRX8cBMM5cpww6xJMJgmgVNn29qROHtAouR2sAhjw=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=WDh9jT7s5e3+5Y3i7G807N9F7Pk+a90Q1QvB5alh9MyNaXjzXyN/m73m0bMtDZRhqW46XYgePxmM9frw0qgBA/QHXtc9AcUxFi2EQvcTbsV58z414CNBU5mnet62xk7CPRMLrF6xu9zkaTAKwAhqk7TFfj/gqkDOqgSvT505yyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=bqC5HF97; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+	s=arc-20240116; t=1765443225; c=relaxed/simple;
+	bh=pOFcKPk5DQIfMlC2wHMkmX070SjBf47kHS0w4TqaQv8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lMVKL3H0n0zcrOTJJZ3wYVWH0QLvEXjWD56RlfD4Ji0S15Bxyb6R645jdc60FY7YhVUGyGCsHYUWd3Py80iTmV1gVT9H1/b5EKrWNhoBDvoNd1kk05LfkSWmCX0UT1biC/y6+MjXVw2JC9WKIVy9qym999EcMj3QN7L98aeUBLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HhTnm4SQ; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="bqC5HF97"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1765442785;
-	bh=e/DM6Sr1SqiFaFi6So6itNGziX/g9agVvmrw9nqOKwk=;
-	h=From:Subject:Date:To:Cc;
-	b=bqC5HF97IEXGGiwn8BjKImcZTCClNnB5F20Ne02GYuzhc+xDMiDRF+Z09oKeAgrrL
-	 jLJwO0XqylJgqUw5ZMQxQBGVLJk8bZNZm//deP56z5ytmmRPS1z919GTDPdpgieASR
-	 wQj3FYYvWzGaCnsX7lvoNg6pAbH8wMrWcz+aeqHbvZsOqDZNdr6zUbki4wtinbPe/p
-	 YEMg+SviXUlGezg5bkwlU/iDzeNrtJ4W0Viu8jpT69TRVD/cg7WOIPEiaS8gkz2iCb
-	 W68/0xn4kthIfGBvzsjLKS29+37YApjp2QqNC4f8WR7bnVOuDqSn7QTMljkot5glDw
-	 DoCvbsMthhpKQ==
-Received: from [127.0.1.1] (fs98a57d9c.tkyc007.ap.nuro.jp [152.165.125.156])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 490B164DF5;
-	Thu, 11 Dec 2025 16:46:19 +0800 (AWST)
-From: Andrew Jeffery <andrew@codeconstruct.com.au>
-Subject: [PATCH RFC 00/16] Eliminate warnings for AST2500 and AST2600 EVB
- devicetrees
-Date: Thu, 11 Dec 2025 17:45:42 +0900
-Message-Id: <20251211-dev-dt-warnings-all-v1-0-21b18b9ada77@codeconstruct.com.au>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HhTnm4SQ"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1765443211;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wGL7AIJxmq201kkii3CXEVTm6gVDaQiDrS4KCLR0obs=;
+	b=HhTnm4SQPrHpqnArhhmkiVdZ/XJSdy0J8d/zjaxhmoHitTOax5ViYpczSkiRCLzjfH1QHF
+	8xxnsWTS8Dqc+wvYD9piDhXbj8OiuXAUinLkTQdDTb/A++FtpDdkXYNLBUQHERjsAdNFyA
+	aSf4MpLfDGpQHxZd+ZWv4ZmHJgfaNIk=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] crypto: scompress - Use crypto_unregister_scomps in crypto_register_scomps
+Date: Thu, 11 Dec 2025 09:52:51 +0100
+Message-ID: <20251211085251.799114-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIALeEOmkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1NDI0ND3ZTUMt2UEt3yxKK8zLz0Yt3EnBzdpBRTC1OTJAOTFDMDJaDOgqL
- UtMwKsKnRSkFuzkqxtbUAFLhwe2oAAAA=
-X-Change-ID: 20251211-dev-dt-warnings-all-bd5854b04d60
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Linus Walleij <linusw@kernel.org>
-Cc: Joel Stanley <joel@jms.id.au>, linux-hwmon@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
- openbmc@lists.ozlabs.org, linux-gpio@vger.kernel.org, 
- linux-mmc@vger.kernel.org, linux-crypto@vger.kernel.org, 
- linux-iio@vger.kernel.org, Andrew Jeffery <andrew@codeconstruct.com.au>
-X-Mailer: b4 0.14.3
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi all,
+Replace the for loop with a call to crypto_unregister_scomps(). Return
+'ret' immediately and remove the goto statement to simplify the error
+handling code.  No functional changes.
 
-This series removes the remaining warnings produced by `make
-CHECK_DTBS=y ...` for the AST2500 and AST2600 EVBs and their related
-DTSIs. The tidy-up has the usual benefit of making it clear to
-contributors that any warnings are likely their own to fix before their
-patches will be considered for merging.
-
-I've framed it as an RFC with all patches contained in the one series
-so the goal is clear, we can see what's needed to reach it, and we can
-decide whether and how it should be split or merged going forward.
-
-As it stands there's little in the way of code change, except to
-pinctrl (though also not much there). As such I've included the
-binding maintainers and subsystem lists as recipients but not yet Cc'ed
-subsystem maintainers directly because there are quite a few and I hope
-to avoid mostly uninteresting patches being a source of irritation.
-
-The patches fall into several groups:
-
-Patch 1:
-  Rob's conversion of the PWM/tach binding to DT schema with fixes
-  applied for the license and typos identified by Krzysztof.
-
-Patches 2-5:
-  Fixes for the warnings related to the LPC and pinctrl nodes, touching
-  relevant drivers and the devicetrees.
-
-  I expect that if this approach is acceptable that we'll need to split
-  application of the patches across successive release cycles, with the
-  driver changes going in first.
-
-Patches 6-8:
-  Fix MMC/SDHCI warnings, touching the relevant binding and devicetrees
-
-Patches 9-10:
-  Clarify the relationships between the ACRY and AHB controller
-
-Patches 11-16:
-  The remaining pieces that eliminate the warnings
-
-I'm at plumbers so don't have hardware on hand to test with, but some
-brief smoke tests under qemu look okay. Given that it's all RFC that
-should be enough for the moment. I'll do more testing after discussions
-and when I have boards at hand.
-
-Please review!
-
-Andrew
-
-Signed-off-by: Andrew Jeffery <andrew@codeconstruct.com.au>
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
-Andrew Jeffery (15):
-      pinctrl: aspeed: g5: Constrain LPC binding revision workaround to AST2500
-      pinctrl: aspeed: g5: Allow use of LPC node instead of LPC host controller
-      ARM: dts: aspeed: g5: Use LPC phandle for pinctrl aspeed,external-nodes
-      ARM: dts: aspeed: Remove unspecified LPC host controller node
-      dt-bindings: mmc: Switch ref to sdhci-common.yaml
-      ARM: dts: aspeed: Remove sdhci-drive-type property from AST2600 EVB
-      ARM: dts: aspeed: Use specified wp-inverted property for AST2600 EVB
-      dt-bindings: bus: aspeed: Require syscon for AST2600 AHB controller
-      dt-bindings: crypto: Document aspeed,ahbc property for Aspeed ACRY
-      ARM: dts: aspeed: Drop syscon compatible from EDAC in g6 dtsi
-      ARM: dts: aspeed: g6: Drop unspecified aspeed,ast2600-udma node
-      ARM: dts: aspeed: ast2600-evb: Tidy up A0 work-around for UART5
-      dt-bindings: iio: adc: Allow interrupts property for AST2600
-      ARM: dts: aspeed: g6: Drop clocks property from arm,armv7-timer
-      dt-bindings: mfd: Document smp-memram node for AST2600 SCU
-
-Rob Herring (Arm) (1):
-      dt-bindings: hwmon: Convert aspeed,ast2400-pwm-tacho to DT schema
-
- .../bindings/bus/aspeed,ast2600-ahbc.yaml          |   8 +-
- .../bindings/crypto/aspeed,ast2600-acry.yaml       |   7 ++
- .../bindings/hwmon/aspeed,ast2400-pwm-tacho.yaml   | 106 +++++++++++++++++++++
- .../devicetree/bindings/hwmon/aspeed-pwm-tacho.txt |  73 --------------
- .../bindings/iio/adc/aspeed,ast2600-adc.yaml       |   3 +
- .../bindings/mfd/aspeed,ast2x00-scu.yaml           |  18 ++++
- .../devicetree/bindings/mmc/aspeed,sdhci.yaml      |   2 +-
- arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts    |   7 +-
- .../dts/aspeed/aspeed-bmc-facebook-clemente.dts    |   4 -
- arch/arm/boot/dts/aspeed/aspeed-g4.dtsi            |   5 -
- arch/arm/boot/dts/aspeed/aspeed-g5.dtsi            |   8 +-
- arch/arm/boot/dts/aspeed/aspeed-g6.dtsi            |  17 +---
- drivers/pinctrl/aspeed/pinctrl-aspeed-g5.c         |  32 ++++---
- 13 files changed, 165 insertions(+), 125 deletions(-)
+Changes in v2:
+- Leave crypto_unregister_scomps() as is (Herbert)
+- Link to v1: https://lore.kernel.org/lkml/20251210132548.569689-2-thorsten.blum@linux.dev/
 ---
-base-commit: 5ce74bc1b7cb2732b22f9c93082545bc655d6547
-change-id: 20251211-dev-dt-warnings-all-bd5854b04d60
+ crypto/scompress.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-Best regards,
+diff --git a/crypto/scompress.c b/crypto/scompress.c
+index 1a7ed8ae65b0..8d70c5ec6f8b 100644
+--- a/crypto/scompress.c
++++ b/crypto/scompress.c
+@@ -383,17 +383,13 @@ int crypto_register_scomps(struct scomp_alg *algs, int count)
+ 
+ 	for (i = 0; i < count; i++) {
+ 		ret = crypto_register_scomp(&algs[i]);
+-		if (ret)
+-			goto err;
++		if (ret) {
++			crypto_unregister_scomps(algs, i);
++			return ret;
++		}
+ 	}
+ 
+ 	return 0;
+-
+-err:
+-	for (--i; i >= 0; --i)
+-		crypto_unregister_scomp(&algs[i]);
+-
+-	return ret;
+ }
+ EXPORT_SYMBOL_GPL(crypto_register_scomps);
+ 
 -- 
-Andrew Jeffery <andrew@codeconstruct.com.au>
+Thorsten Blum <thorsten.blum@linux.dev>
+GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
 
