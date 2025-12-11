@@ -1,143 +1,123 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034123161B5
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Dec 2025 17:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE0B219E8;
+	Thu, 11 Dec 2025 18:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765473364; cv=none; b=lDsrgHVMh1ECNzKbTMA3rV2J5Xpjr43CQQMNDkWhWpQ/YBou24DqNi/N4Il+XGZcAYWyqV/mGIVo2yecp1iqptT/QdHDS/sI+NR+RL/Qp8NnFY9K3q4SB3NRvgwjxRzqCmlBud+l4DXyngMrb95JXx2L6ZQSrXlaZo+ACCDkIBs=
+	t=1765479137; cv=none; b=MabSrJbu8+C27mpUEF9A2LtaWX5Zfi1OkfspGI2BDItEvG4nDbSilkSO6px2Vk2+D+t76T6KPkEuzxhSWBzObAoeSuj5yruLyPCEMohP+v176dV5leirldMEi39y0oCBtHAxAVn7JxQVQc6t2bNvSYCEJ2v64vFG+1CEs9mRz2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765473364; c=relaxed/simple;
-	bh=9/MWuHZltbfrljfghNMjsFGbpJYDdAIf/qKdNwaHWyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ne0TSkt4CW90jZ8JrJqxED/NEh7SdwL3FAScrGfHu08pbUXOHpPdmRZnBnl7OuIKNK4GLtu36RLJFbCa0wFvGOlObE8+3O9vm4Nkl81pWCWcDyM8x4Q84wMcPnXV95KYNc9LAgYqpZ7xFZh1xSRS5as1aqbQU9/EZjOQTiqiT/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=gdrL7IIc; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1765479137; c=relaxed/simple;
+	bh=3B2pYeSknCcH/qVrOhc07l3Yj5jufNXm8jjHx+ZCGgc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=et6P3B7uhhEcWkOg147B9QX5ok6DDMq5V6zwdGu+RD4WJoKXUPDxza1SjYN3G2Nlbac+vAV0xZp5KesnKj5A8PkYrx9rmmPVPZ03qiwJ5ZxTN2cJXLR4jaUHxVJDzguppU2ZPiq0ZQxe0tKuacY0pOtkzqpePoGJaD07VThsAUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lD8Ay6CM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="gdrL7IIc"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-42e2e3c3a83so177005f8f.1
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Dec 2025 09:16:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765473359; x=1766078159; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I4l2h6ylecBmmb2NFGzo9KVhF/u4WxGR1OPEqHGghSQ=;
-        b=gdrL7IIcidOpr5xYgEdPCULyHIwZL9xLmvlYt6Arnkhx+CQH7SXWRQWsAnUs3V/PSv
-         FkkD7KsXJfAmMIkJILTionY53sn8jYQO45CKuHGwPoKIX9CMtaOiYRzdFTXauES33Mo8
-         T51CInjnhD5zdEN8gqhEQtBxHk4W/mGyqqdXCF+1Ex6vqZfdt6ajBJC6pUHoba8Fm2nV
-         VbQhNYakG8LWalF/5qCnTLIjeHqkRDb75biC1CGt0jx+YkowovjIr8dpuHX5SaC2BLI/
-         THtYO9AUW4nUCVwCNfOxuDkWiikFIit08KjxybeRyTqe8DoiQPK1HqOBCetOG6dX5EZn
-         G4Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765473359; x=1766078159;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=I4l2h6ylecBmmb2NFGzo9KVhF/u4WxGR1OPEqHGghSQ=;
-        b=FjgPaRYVyYjBJxuN2sABfhkDFVsb51sgz+MCwH5ACQo7kqd2qPu8bscejoqH0Vd3++
-         07dAHS9ruLY10hF6mZUaBKyWXlV9opHvl29ck205NNLUqVZhF2KENLMl7SHwW6z9x911
-         LMc9J0QuOSzxm/DylCaqp/E2ftI+Ej88cZCAgGOECNX8IZBNdF8O0hJtIaWWigRVqtmp
-         2akdjqZKaAeq7z6QE0a0oXdCaHES8Ut5vLlZCMUX8DuWCT4LX4KhFXSMRTB+jr3ayDdu
-         PbjARson2s+gvi3pxPew8Hp3updsAlHxW6obz57y0MKINC8osKb9cHoyOnMnuVffz4Ff
-         AeJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWUr3y7qRViDTcazvEofs/GIWiwBPwUfP/cJgILETmVNDjMBOkLz+CM2CjFp4jDoxL0sWgycqH52uqkk/w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+/cCW4XM3MhJWG0sjkLHyQkKIyX075gt4aIv/eGEMKi/cwMBU
-	D/pZHOG93KJqpjoAoakbG3GZaw7tYOSK//1qWKU4nBS9ZdS0IambF2Mev0+OQjK3VR0=
-X-Gm-Gg: AY/fxX7ElP6aZq2iKVzf8t82XU4rwHfSxhkbpjPAougfiSjNDVfUimnzMq3Bn1SxacE
-	YbZR0Qs7kS21HIInPU+9U5xHmYC7xq0bfD/k1dBAoajNET58wQ0dt7nVze5WVSCuVa53i+8Bh/2
-	oqENCL2eG7exxPGxaDuyXqbtTpZKd66Nc35At5Kua8KtSfnxGCvoggdYxMb5ecKOgXAjVyp3IFc
-	PRnXlL+K0lrbnoUZJJBbd29mmMjbYAlLOAqy1DKlBb7Zk9ReLD8iDSCsk8MygSJRBkk7UsE6Equ
-	xweY3yMNeea7RwMDA1uiVeWdD/rgMNWHY+jMrawZypTPD1uebgQipkIG22ceP5YlDJVBGULm7AM
-	YJQLDClMnkqmciPwOcKIJIkQCRDy3enIxwnJgJ+NkrO2SVx7MNjCbaX089zl1IFWpOhkjOVVGwQ
-	VFvjMxkKYmOe3vRzQdAeG45VAncir3qX6+4ob9Az1aPP/2lgX1FpeTStzSSEwI62FijiQ4x1i7+
-	H0=
-X-Google-Smtp-Source: AGHT+IHznnkl74xT2z8JC40wM/v7wIF0q/FLhgvdfq6Hs39to3yRCTNdr19bDlPbZFNrY6LaQx6MyQ==
-X-Received: by 2002:a05:6000:4308:b0:42b:2c53:3aa8 with SMTP id ffacd0b85a97d-42fa3af8df1mr6951355f8f.37.1765473359065;
-        Thu, 11 Dec 2025 09:15:59 -0800 (PST)
-Received: from localhost (p200300f65f006608b66517f2bd017279.dip0.t-ipconnect.de. [2003:f6:5f00:6608:b665:17f2:bd01:7279])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-42fa8a702a1sm7588863f8f.13.2025.12.11.09.15.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Dec 2025 09:15:58 -0800 (PST)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Jens Wiklander <jens.wiklander@linaro.org>,
-	Sumit Garg <sumit.garg@kernel.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: op-tee@lists.trustedfirmware.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 05/17] hwrng: optee - Make use of tee bus methods
-Date: Thu, 11 Dec 2025 18:14:59 +0100
-Message-ID:  <83301effbb923117122f5f076edbfdad1f947386.1765472125.git.u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
-References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lD8Ay6CM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 909FFC4CEFB;
+	Thu, 11 Dec 2025 18:52:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765479136;
+	bh=3B2pYeSknCcH/qVrOhc07l3Yj5jufNXm8jjHx+ZCGgc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lD8Ay6CMWUKkmTuMG1DQJEva3yejQtNO53s3WXh8E7GIGIKdoBOaAbT9o6K1PnFA5
+	 jdN5gVQJsWoVf0WFpwyrLqYqC2Dw5HnzQXlfFa440KZNFH3zEANTom9Iy1MEyrXze1
+	 Ig1LrOmYRJyAGHQWYqnvsUhehGJqFODBqK0rFoMU5CgMenlCM/k8uF2RZg3DxHT0WB
+	 gN9DqVqxaSJnr4eyvcgT9DxVLEEQ14mQh64gBYSne1XHiKjnxhMWxBgt9nptHvfCUc
+	 F3jXJ7e6Thevn0Cw0K95r30Vx3fRAe6YmTqRVz2tYXPLu+VJYYf+Mg4XRIw7DyQyDe
+	 4+Fg064FPnyxA==
+Date: Thu, 11 Dec 2025 10:52:15 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: syzbot <syzbot+7add5c56bc2a14145d20@syzkaller.appspotmail.com>,
+	davem@davemloft.net, herbert@gondor.apana.org.au,
+	jaegeuk@kernel.org, linux-crypto@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+	tytso@mit.edu, Neal Gompa <neal@gompa.dev>
+Subject: Re: [syzbot] [ext4] [fscrypt] KMSAN: uninit-value in
+ fscrypt_crypt_data_unit
+Message-ID: <20251211185215.GM94594@frogsfrogsfrogs>
+References: <68ee633c.050a0220.1186a4.002a.GAE@google.com>
+ <69380321.050a0220.1ff09b.0000.GAE@google.com>
+ <20251210022202.GB4128@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1830; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=9/MWuHZltbfrljfghNMjsFGbpJYDdAIf/qKdNwaHWyQ=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBpOvwglYVLSe7x2hJUzJuiko+CB65bc9zowSFvy IrqbvBxWmWJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaTr8IAAKCRCPgPtYfRL+ TjUkB/0RRiOrgJTBYNMrNgeZXzR7aDDF6ecj9C1B+6tXZ7EDmvu8w1XfWPampNGADTlFFns02Y2 LcJ0fjr5W8rEgvvRvmeDkmqIlZDW1J7Z9k0ShbGUoFVmleBaweG7398LO15X4tX3jJcOBzM94+f CfiOZAwcVz/lm2J3pH1msmxQJRWnmsB4T2q1dcBBMcwK+fH38MUrcB9sQ0VujUDfH4GGttfGC0B tIGIcWaG0JZeEBzxS3WiBsIiiZBFQeYyMtV5HaGpas8QjbvkfSJlACbwShtObNGb5zbOpskW+qR rZZE6YursT3IFX7j7pUMcFZthadnRzFHjaS0aAf/8pw+LVJe
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251210022202.GB4128@sol>
 
-The tee bus got dedicated callbacks for probe and remove.
-Make use of these. This fixes a runtime warning about the driver needing
-to be converted to the bus methods.
+On Tue, Dec 09, 2025 at 06:22:02PM -0800, Eric Biggers wrote:
+> On Tue, Dec 09, 2025 at 03:08:17AM -0800, syzbot wrote:
+> > syzbot has found a reproducer for the following issue on:
+> > 
+> > HEAD commit:    a110f942672c Merge tag 'pinctrl-v6.19-1' of git://git.kern..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=17495992580000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=10d58c94af5f9772
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=7add5c56bc2a14145d20
+> > compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1122aec2580000
+> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14012a1a580000
+> 
+> Simplified reproducer:
+> 
+>     rm -f image
+>     mkdir -p mnt
+>     mkfs.ext4 -O encrypt -b 1024 image 1M
+>     mount image mnt -o test_dummy_encryption
+>     dd if=/dev/urandom of=mnt/file bs=1 seek=1024 count=1
+>     sync
+> 
+> It causes ext4 to encrypt uninitialized memory:
+> 
+>     BUG: KMSAN: uninit-value in crypto_aes_encrypt+0x511b/0x5260
+>     [...]
+>     fscrypt_encrypt_pagecache_blocks+0x309/0x6c0
+>     ext4_bio_write_folio+0xd2f/0x2210
+>     [...]
+> 
+> ext4_bio_write_folio() has:
+> 
+> 	/*
+> 	 * If any blocks are being written to an encrypted file, encrypt them
+> 	 * into a bounce page.  For simplicity, just encrypt until the last
+> 	 * block which might be needed.  This may cause some unneeded blocks
+> 	 * (e.g. holes) to be unnecessarily encrypted, but this is rare and
+> 	 * can't happen in the common case of blocksize == PAGE_SIZE.
+> 	 */
+> 	if (fscrypt_inode_uses_fs_layer_crypto(inode)) {
+> 		gfp_t gfp_flags = GFP_NOFS;
+> 		unsigned int enc_bytes = round_up(len, i_blocksize(inode));
+> 
+> So I think that if a non-first block in a page is being written to disk
+> and all preceding blocks in the page are holes, the (uninitialized)
+> sections of the page corresponding to the holes are being encrypted too.
+> 
+> This is probably "benign", as ext4 doesn't do anything with the
+> encrypted uninitialized data.  (Also note that this issue can occur only
+> when block_size < PAGE_SIZE.)
+> 
+> I'm not yet sure how to proceed here.  We could make ext4 be more
+> selective about encrypting the exact set of blocks in the page that are
+> being written.  That would require support in fs/crypto/ for that.  We
+> could use kmsan_unpoison_memory() to just suppress the warning.
+> 
+> Or, we could go forward with removing support for the "fs-layer crypto"
+> from ext4 and only support blk-crypto (relying on blk-crypto-fallback
+> for the software fallback).  The blk-crypto code path doesn't have this
+> problem since it more closely ties the encryption to the actual write.
+> It also works better with folios.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
----
- drivers/char/hw_random/optee-rng.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+Hey waitaminute, are you planning to withdraw fscrypt from ext4?
 
-diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
-index 6ee748c0cf57..5a3fa0b38497 100644
---- a/drivers/char/hw_random/optee-rng.c
-+++ b/drivers/char/hw_random/optee-rng.c
-@@ -211,9 +211,9 @@ static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
- 		return 0;
- }
- 
--static int optee_rng_probe(struct device *dev)
-+static int optee_rng_probe(struct tee_client_device *rng_device)
- {
--	struct tee_client_device *rng_device = to_tee_client_device(dev);
-+	struct device *dev = &rng_device->dev;
- 	int ret = 0, err = -ENODEV;
- 	struct tee_ioctl_open_session_arg sess_arg;
- 
-@@ -261,12 +261,10 @@ static int optee_rng_probe(struct device *dev)
- 	return err;
- }
- 
--static int optee_rng_remove(struct device *dev)
-+static void optee_rng_remove(struct tee_client_device *tee_dev)
- {
- 	tee_client_close_session(pvt_data.ctx, pvt_data.session_id);
- 	tee_client_close_context(pvt_data.ctx);
--
--	return 0;
- }
- 
- static const struct tee_client_device_id optee_rng_id_table[] = {
-@@ -278,11 +276,11 @@ static const struct tee_client_device_id optee_rng_id_table[] = {
- MODULE_DEVICE_TABLE(tee, optee_rng_id_table);
- 
- static struct tee_client_driver optee_rng_driver = {
-+	.probe		= optee_rng_probe,
-+	.remove		= optee_rng_remove,
- 	.id_table	= optee_rng_id_table,
- 	.driver		= {
- 		.name		= DRIVER_NAME,
--		.probe		= optee_rng_probe,
--		.remove		= optee_rng_remove,
- 	},
- };
- 
--- 
-2.47.3
+(I might just not know enough about what blk-crypto is)
 
+--D
+
+> - Eric
+> 
