@@ -1,127 +1,151 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F09B2D948D
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Dec 2025 11:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DFF207A0B;
+	Thu, 11 Dec 2025 11:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765452750; cv=none; b=IV4g117CcSCJeMG6Ybk0aipt8TMgsH7sSY8Io3VUtN8+6Zx/OgHPT+lxnE01dkb+zIEC+xWeMRkjh0rn0J2K/ZC4LOAwZ11W2Ih0tF4tCpcX+EA6sB2OSgNkag1/Ajb8/H6J6TV1QT4cuYr7smY/xIszkERwe/cMqkrlvyISGm4=
+	t=1765453412; cv=none; b=F8mtUd3qGDyPChqNgqSHVPsUBT0JoKtBCIn+6X0g2OBmh+bpxoB8Gc9Zgcpz9b7H5EO0dcIdVFjMyqqexY6YU6aCVxUTVYrONHziyCGlJyrk09JOSGgruRx9XKmmiBkhrUH7QkiHGAWJW4JPXYv8Y/5GG59DnYyX2tcHklYoa54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765452750; c=relaxed/simple;
-	bh=POzzpg6IYRZPIIqbdlvOsPFON8CAFCtqiOP8BsCzG6o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=loeX84VemPHqHhc3llRKFY9pHqwExskifqGLUDFSm9eE1/5Q1uL3cEaFdarSdnN7HYCDrBvGRwn4zYlVDwoco+nF3Suv6RTCM351x6HzO1W1wQzJryixxisN57cBzY1Y74h4HrUJznwSmpSaCKjZ+E4lMC+MVPv3B0ObM7zGl6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NtJnTaGk; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1765453412; c=relaxed/simple;
+	bh=a2q48itQxZLgJRwc9Vpxeep9OU7oiyd6Ljz+SYhIGZE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q59qW3y7TPs6jvdqehhHb7FIyoOMnIjx3Xb/wi4I9Rk7V1PV4Wcsz5B8KKY5Vkt/AZ8wu0JfTlamDYEN7eK4eiXPSQu0RktVY/LNKJyMjW/sDxQQms2xO5XbGD1fky8q0kzhBNU916ZNcVukKseEuQR1vXgtnEIFQZoYCYv0hho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gC2D4Nn6; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NtJnTaGk"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-78a712cfbc0so9670127b3.1
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Dec 2025 03:32:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1765452747; x=1766057547; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=tsAQFyywzgQt8hTuOma0wGcWOIPVIjI9LIgrRTCikK4=;
-        b=NtJnTaGkvuf9r5BFmo4AYj1CaI/INFVazyoJJPcv6K82v1KZBH+lOmxmhfMbLhLfcr
-         uVe7oFkhwFobKOHzwGE63T2H9L27wdtFG+lP/ffLqN/Mwa1j979U38NfyOSHMXS4xV3U
-         OrdQcgWaJj8CfZdVsKjpGx41q+OVZcHd3SbAOyBbBmsyNmFmA0CWANT/ZLsn+l6reRO1
-         iDromQMSouYwyd7ZM/RM76HLP6f9e1+BLAwv/74l3krLepSOQYcYDlUObFz9s5MOBoxu
-         N2kKHOYjrMvzXu+SXOX2XqGew8KU/TGDHnk00b1SzSh5f5/FiQLTSjZ2VPcdWiI9COTz
-         Jxlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765452747; x=1766057547;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tsAQFyywzgQt8hTuOma0wGcWOIPVIjI9LIgrRTCikK4=;
-        b=B4d0BoHuaOx3BAOb04fm3LtQAUI62Nh958b/K/NzWWonz0Vty/IpFsUiseNLIxrQSo
-         oa1BGLWO4aZ+7qfHeIKfoehgk/GuYSb7ccfCSfdx0FkRQyeuQlHaWZqh3tJO2KIen4AI
-         3BNcPfakfTit+9tLIhSTHtQyfJZ+2slK6l55sIS7SKJrt0BSIUDBC2oIeukqHC2iWmP6
-         1Mwr9JYmMQc2/29/nxsfty4dM5XVldBs4OGC4iNs+dHni0gLo186U2B8t5OiBUA0gnuC
-         oZsMjN/Z9INDUuZPy5jr1SvoRQZq9jsGPfSXJKo1nv9HxLXwg8zH9Dlj7lAt4UPzUg7O
-         wVCw==
-X-Forwarded-Encrypted: i=1; AJvYcCWGHbwzWDBrG+5TUWv2dq5YE0Zh8mbiEsJL3idoMCOoJE4p6e6n5CZn3+O/ode/z0uGaulRa0WxpdB0wF8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzwlc8jA4WFNvIAVGIos/bHGzfBCGvWuMXh/gmxV+8I4XIcChXK
-	CRtGWNmE57GeaK0xJhpzS8iW92ta4B4BN9/3Umd8sMpVLTqdApHQM9Vi4w+p/ANauGP/liKGkVs
-	0Ez+bXv96Sn6hUAzY97QZThFGKzUCC/Q3OaFiwWJ05A==
-X-Gm-Gg: AY/fxX6VLELZuqBSKOdUCnyB40GEGCT2pTVAY/iVhwXp3yzZLtODK30hdWNY7qAoYEs
-	bJvK9iIymKFjno1EcI8pjAGl326rFuXI3MVLPI9EZl+Lb3RwO1h2ZeHMoW7gyTliMnTETJt+DC7
-	MSnf63CO/hV9OcazW6xla5NAnZte5U90KeG5TKfFVZJJ8U0hEmJxZNDy8ibL3oNqr3RplmbLzZx
-	ygZl7Qap5JY0wCVc8Raw2EydRbwmdcvJFIWPbMG3lNcUOjr/wEi2x65neQPVckZLbGkB955jqJ8
-	mC3Pta8=
-X-Google-Smtp-Source: AGHT+IGi8FI7tue2F1muYiYdXCcwa1VCSq2fLFaLgh7A0p4DE+EvhP5UsxEj9lkt3uuk+LvjC2KVDNW0gmzNrvJK74w=
-X-Received: by 2002:a05:690c:45c5:b0:787:bf16:d489 with SMTP id
- 00721157ae682-78ca64495eamr51688117b3.62.1765452747098; Thu, 11 Dec 2025
- 03:32:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gC2D4Nn6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=uQ1t1in3MNz+55jGFoFlKgze5NqUmk6ITua4X7r2Yeo=; b=gC2D4Nn6TBsE1we2zbHDdyJ5qr
+	5r1+OVFGLSNem72JBqMo7iaGapPFi38ZsC431uA0Y92pG++DHkKwM6qgaxASR7JF02WkWrLSxu5+T
+	N3/tUOuTVCAuPcWK7WW4QJzL5miwWBfBEAMHMwQukxzLV6StP8KclJid86BDcgk1KFVqtTOelz1kd
+	TolBaeGejJh9I7Y8FKRhnFLoXnHKynMZ8pOcGBXC/qbeFfGKC2iBQZuL3ekazEAAlTEOBWJm7fS8T
+	J3o7cDROPeRxtK+aKww43zCeRFqCeJc5r66NPdNWBNRSxKG6yWR1CYSIMJYOGRg0Rqn2M6aowIXJf
+	TJ3ogtvg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vTf4Z-0000000EBFr-2coJ;
+	Thu, 11 Dec 2025 11:43:03 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 29E1230301A; Thu, 11 Dec 2025 12:43:02 +0100 (CET)
+Date: Thu, 11 Dec 2025 12:43:02 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Marco Elver <elver@google.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	Chris Li <sparse@chrisli.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+	linux-sparse@vger.kernel.org, linux-wireless@vger.kernel.org,
+	llvm@lists.linux.dev, rcu@vger.kernel.org
+Subject: Re: [PATCH v4 07/35] lockdep: Annotate lockdep assertions for
+ context analysis
+Message-ID: <20251211114302.GC3911114@noisy.programming.kicks-ass.net>
+References: <20251120145835.3833031-2-elver@google.com>
+ <20251120151033.3840508-7-elver@google.com>
+ <20251120151033.3840508-8-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251211-dev-dt-warnings-all-v1-0-21b18b9ada77@codeconstruct.com.au>
- <20251211-dev-dt-warnings-all-v1-8-21b18b9ada77@codeconstruct.com.au>
-In-Reply-To: <20251211-dev-dt-warnings-all-v1-8-21b18b9ada77@codeconstruct.com.au>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Thu, 11 Dec 2025 12:31:50 +0100
-X-Gm-Features: AQt7F2pk6E2fyrBRST0HoIuBOhvmNQUfLJiP182o7R-P0Ig55Fk3IUyQwfYuHbU
-Message-ID: <CAPDyKFpQXYFFrZ-unVxa9m2+tKLEyFZyo7Tv7JD_7vTbqqfmDQ@mail.gmail.com>
-Subject: Re: [PATCH RFC 08/16] ARM: dts: aspeed: Use specified wp-inverted
- property for AST2600 EVB
-To: Andrew Jeffery <andrew@codeconstruct.com.au>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Linus Walleij <linusw@kernel.org>, Joel Stanley <joel@jms.id.au>, 
-	linux-hwmon@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org, 
-	linux-kernel@vger.kernel.org, openbmc@lists.ozlabs.org, 
-	linux-gpio@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-iio@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251120151033.3840508-8-elver@google.com>
 
-On Thu, 11 Dec 2025 at 09:47, Andrew Jeffery
-<andrew@codeconstruct.com.au> wrote:
->
-> While sdhci-pltfm supports sdhci,wp-inverted, it also supports
-> the un-prefixed and specified wp-inverted property. Switch the EVB
-> devicetree to use the specified property to remove warnings when
-> checking the DTB.
->
-> Signed-off-by: Andrew Jeffery <andrew@codeconstruct.com.au>
+On Thu, Nov 20, 2025 at 04:09:32PM +0100, Marco Elver wrote:
 
-FWIW:
+>  include/linux/lockdep.h | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
+> index 67964dc4db95..2c99a6823161 100644
+> --- a/include/linux/lockdep.h
+> +++ b/include/linux/lockdep.h
+> @@ -282,16 +282,16 @@ extern void lock_unpin_lock(struct lockdep_map *lock, struct pin_cookie);
+>  	do { WARN_ON_ONCE(debug_locks && !(cond)); } while (0)
 
-Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+Since I typically read patches without first reading the Changelog --
+because when I read the code later, I also don't see changelogs.
 
+I must admit to getting most terribly confused here -- *again*, as I
+then search back to previous discussions and found I was previously also
+confused.
 
-> ---
->  arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts b/arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts
-> index 3eba676e57f1..c51977dcb56b 100644
-> --- a/arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts
-> +++ b/arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts
-> @@ -315,7 +315,7 @@ &sdhci0 {
->         bus-width = <4>;
->         max-frequency = <100000000>;
->         sdhci-caps-mask = <0x7 0x0>;
-> -       sdhci,wp-inverted;
-> +       wp-inverted;
->         vmmc-supply = <&vcc_sdhci0>;
->         vqmmc-supply = <&vccq_sdhci0>;
->         clk-phase-sd-hs = <7>, <200>;
-> @@ -326,7 +326,7 @@ &sdhci1 {
->         bus-width = <4>;
->         max-frequency = <100000000>;
->         sdhci-caps-mask = <0x7 0x0>;
-> -       sdhci,wp-inverted;
-> +       wp-inverted;
->         vmmc-supply = <&vcc_sdhci1>;
->         vqmmc-supply = <&vccq_sdhci1>;
->         clk-phase-sd-hs = <7>, <200>;
->
-> --
-> 2.47.3
->
->
+As such, I think we want a comment here that explains that assume_ctx
+thing.
+
+It is *NOT* (as the clang naming suggests) an assertion of holding the
+lock (which is requires_ctx), but rather an annotation that forces the
+ctx to be considered held.
+
+>  
+>  #define lockdep_assert_held(l)		\
+> -	lockdep_assert(lockdep_is_held(l) != LOCK_STATE_NOT_HELD)
+> +	do { lockdep_assert(lockdep_is_held(l) != LOCK_STATE_NOT_HELD); __assume_ctx_guard(l); } while (0)
+>  
+>  #define lockdep_assert_not_held(l)	\
+>  	lockdep_assert(lockdep_is_held(l) != LOCK_STATE_HELD)
+>  
+>  #define lockdep_assert_held_write(l)	\
+> -	lockdep_assert(lockdep_is_held_type(l, 0))
+> +	do { lockdep_assert(lockdep_is_held_type(l, 0)); __assume_ctx_guard(l); } while (0)
+>  
+>  #define lockdep_assert_held_read(l)	\
+> -	lockdep_assert(lockdep_is_held_type(l, 1))
+> +	do { lockdep_assert(lockdep_is_held_type(l, 1)); __assume_shared_ctx_guard(l); } while (0)
+>  
+>  #define lockdep_assert_held_once(l)		\
+>  	lockdep_assert_once(lockdep_is_held(l) != LOCK_STATE_NOT_HELD)
+> @@ -389,10 +389,10 @@ extern int lockdep_is_held(const void *);
+>  #define lockdep_assert(c)			do { } while (0)
+>  #define lockdep_assert_once(c)			do { } while (0)
+>  
+> -#define lockdep_assert_held(l)			do { (void)(l); } while (0)
+> +#define lockdep_assert_held(l)			__assume_ctx_guard(l)
+>  #define lockdep_assert_not_held(l)		do { (void)(l); } while (0)
+> -#define lockdep_assert_held_write(l)		do { (void)(l); } while (0)
+> -#define lockdep_assert_held_read(l)		do { (void)(l); } while (0)
+> +#define lockdep_assert_held_write(l)		__assume_ctx_guard(l)
+> +#define lockdep_assert_held_read(l)		__assume_shared_ctx_guard(l)
+>  #define lockdep_assert_held_once(l)		do { (void)(l); } while (0)
+>  #define lockdep_assert_none_held_once()	do { } while (0)
+>  
+> -- 
+> 2.52.0.rc1.455.g30608eb744-goog
+> 
