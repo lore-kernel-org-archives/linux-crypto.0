@@ -1,59 +1,59 @@
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AFD3093C7
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Dec 2025 13:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E56303CB0
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Dec 2025 13:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765459209; cv=none; b=UB3nVeZah61mESTEdA23eN/8Ca3CxzQAvBTaVMm1l3nEk5tg001wfA2ix0oIyf/1Hs+5POAmYSTo+BYdrM8Y4Uz1Lfj6z5Em/BhTy+ax/ZgSSlgsFnsYSTquEQBEycgAkV2t0H3TKySGooOPOtOiKOI5ndSfdSodN6dxitZr5DA=
+	t=1765459539; cv=none; b=rydmU6YwhWkwndAeVPPChrMQlrM3cUoqfvOlLUBlMpprbOai8oo0AtBJjnmsT3k8QFUamGsIhi0fgw1X1zOk7SeMIVpCiHonM7yiEoxqtEQ9ePFVcYzJcJ+9fWRd/BNwUPxT4tWZ6H7J3e+XNqBuSXrJHr5o0vWPA54r58CR80c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765459209; c=relaxed/simple;
-	bh=xRpDisg42q3mlm2OwRhnv/Ng4aisbLnak6Lk2WbPerY=;
+	s=arc-20240116; t=1765459539; c=relaxed/simple;
+	bh=4koDoOQRFcQ8EnbnmmJvgwasJ9ijqSyJnmmWmgQ4c2s=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=prSx9U3MAuE1Q8drn+nzHwdzSNH/gdwfO61EsDsW04uo5m3lWcysX6fDn+WRm6sFSnXIF84Xi42lp6Su5INJ0Ub+Uo/OEfXDVaubs7cdusyd1JUe2VGHWKNAWa2kypwVyRwnwBe87NX8Tt4YIHWU3xOv/b88sdUEJfZPFsCx0LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HflTkvn8; arc=none smtp.client-ip=209.85.128.170
+	 To:Cc:Content-Type; b=C/lBrGkkKNzfMZ8r7NS9XdEhxylaqxznGcKnL0f4FkMYRb2NcfYlVB0fo9SNG0tI/OCmqqqi2+SlD11/MwIVEvos/0BOWLVtFcEOXyEOeMj9pD+y10nPHwWUXPXFXSMj7LTYSxmmPsfTsqMV9h3joJ0Llv6DPKmARhuA0R0Scbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S3sYjDGk; arc=none smtp.client-ip=74.125.224.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HflTkvn8"
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-78c5b5c1eccso1098557b3.1
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Dec 2025 05:20:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S3sYjDGk"
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-6420c0cf4abso59326d50.1
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Dec 2025 05:25:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765459207; x=1766064007; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765459537; x=1766064337; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=aINMqpJxr1DSJJ7CC9TS1ttoat4qqoJbgL8dBerwdo8=;
-        b=HflTkvn8hEQ5fY2RqhhszTXvTmLEvYgLZxCMcnDSLfuaLZuIErpFKXRxgf+UuHaC0O
-         ZWeKNTs7qu+FT9MSt5UmeiYJQKzWSBhC49Im5iu+3YkzkxQJhXdRdqpSfKuiJ0WxI64c
-         kPOlp4Q3bHCs0CYCUUh/Qt6ROZppFoOT9wu966KN8irGVJ58lhvNKcFIWsNtE19V++73
-         OzRACFkmqDfIBaa2T9UEy6OzZdNiqJoxxuSB3FFZjmsiv7nibC0FHtgSTm4nffmNRTv/
-         M/Dgzvj4OkQWQV3C3r/DSGsRc6QP/dXuVQAJsTnrvMWXM2YYqklOjG4eMkTYB2TDgvWU
-         Ghlw==
+        bh=bWA/kjxAjN+uRNvgRsuZ3C4JKMpyTL0y62dCZ1FivCw=;
+        b=S3sYjDGkvoZmbdvrKBBU43ykeWBEyeIUzGZ1bUJYcShsHuHKiW4SEI2gYcMdxdZWwk
+         2aA7slM8MmQr4oatTRXGZSDUu9aaPNBM5UXKIo4tZu3aBCHtdy1H/9eebAGdUo6qgX8L
+         DvHj6zwUMUlBjO2u0UJVOCuNjgIiGKpFJ3xkH9rQCWgifZulMuykpqPtovrI/gQQK4fX
+         tWozvIJabkt3lh8qlKQzKY5OQDpzBc2BgZrGHZlvzzLYrhdrhOMCB5DCqM/inYUnmrTm
+         BOMqEJRR2hhdiarGzrCSpdsUJZAL7hGLrXSyYC+4RigvkTH6UsHPfhyza3j2GXbJnMLT
+         uY7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765459207; x=1766064007;
+        d=1e100.net; s=20230601; t=1765459537; x=1766064337;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aINMqpJxr1DSJJ7CC9TS1ttoat4qqoJbgL8dBerwdo8=;
-        b=Sk6cHNmBT8OwHmblP7IQ/Ime3PWGtSmX8asoB1vUDO1/ZyJ20mjzxU8TyVUN6zTogz
-         sBhOlx0NY/8vX4W2Nwtk3ISXZQ1N8cKmSDiHUXEBdKRpAPXElkXJsc2t8NvxWYR79EFk
-         mDQGJGR7O1ocuhXF23fS1idEDmGHh0poWlMrryTrePjl7tOTKAiXFIveUuHOQVAFp+Yn
-         bYtVKUohp/As2YeY8/IKhZN63a8geXI4JN6dDeeyxCcmN+RQwygJT38Iodzj3aSx7sOD
-         qDC5H2gr7b00YTCYzndCrgC2ML9mXrtwkBLmhmKBzlhbbrfR/pAQkkZ/8xje9zR6TuuJ
-         gIhA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/zG/cU2JAgYd3jM3S9U6pI4j40JMQP6dNdRaazD5oTDlWAyoqeEXEGXmrwsyqgc3cAvYerCNDdyz5jAA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUhN5V/O59Hwly18coM3MS9rdIect94ZLI+7K6hiT1eTQILnLU
-	wPIFTcDkltuH4Q4WgXHmsI84pdaxBYmyHWMX3c+RThA8XYnMGuvBBA0gf8x2Vp+Nnx240j8Lwkc
-	P/5q1BItSZDpZzT9QsgNmyXUcERz/hBi+Jptzgmh5
-X-Gm-Gg: AY/fxX4F/cIKuhSEFd0Ch872bnUQYnKL+uyKXiUpdxQKDUsWfWx1CHNzlVAS7IUWvyc
-	tJ8BzJgowKIpfkoX6UdgNfA9vBmDomPhuYg5ZCx1frlXNQxV6YGxA9ZqWYzUDw10qSlg+/OxX1M
-	298UOhB6CMDHihouRq6yp2v52e669hDmqCXrDwTqfdNv2qFE6AW1Hg5t3ZjYOsUfnKwh2JrA14P
-	YiHxEdcLmPcEgDv2VbjwEOGHAkdrRMwkwEZ+V7QKncu9/jVDABaqSDxwrbGUMwdh3glgfbL3ahc
-	3JEXaY9jR+Espcpzv3PnzHzfHn8LxJYtxSE=
-X-Google-Smtp-Source: AGHT+IGU9q+gRj8IYb1h4AykO50aa48oSg8Xgu9uuuuWfwfeI68H5yAO2hlPZXd3hwVQKsk/WdTiuzJsjMsANS/WvBA=
-X-Received: by 2002:a05:690c:14:b0:78c:3835:496a with SMTP id
- 00721157ae682-78d6dfa0ba0mr18429857b3.24.1765459206488; Thu, 11 Dec 2025
- 05:20:06 -0800 (PST)
+        bh=bWA/kjxAjN+uRNvgRsuZ3C4JKMpyTL0y62dCZ1FivCw=;
+        b=BJdbaJt6FObgtG1srBUk0uh6jBH//Co/OKKTD8mSr35BM6shWnWrPH+TZpNok2/D5n
+         g8PnQ5C94eIw3lmA+PEp8iIi0aoXL5GQ7tAQ2Zu3A68XUDzoAx5BgUuIYUepTQL1cf1Y
+         ZoJwV5MYtR+LfJurZqCpzf4WG2DghQInXRTCIjtuBLyo2lCiOnGYDYKKFbAv47VtLRDk
+         xVPdFBaSpYfnvWopKKz5KSAqMMHAfzkVY5VO6iDy5eAAI8mqq62dQI+gZUgX1UFCihtz
+         arVOx6TaHG5fc8gmb7mZdfbB+1TvBYsBqyshB2AzYwD2qkNXY6j2lGx+WZwHRef62nsx
+         Jadw==
+X-Forwarded-Encrypted: i=1; AJvYcCU63H+pfW7q3TtwiX5hzsp9sGvHUYiJe3zx5w+DZiwqIE4lw/Q9BGpz9rCYiRyyrAc30Dg26xhysrV8vq0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWV8b3M0xKcxWaZxNt79FHC8C8+zvTycPrGcpYH+ZOgjrt7T2D
+	JWkiGZQty8K+3v/NYKEiesJWaIzp40opz+j24MAsjiFZ79pDt3lGg4fKiFH5YtUGoHtnXbL0aBJ
+	cTnXW12qu/Iu1RbklkwjsmduyDNrsU2R3IOvFrWl2
+X-Gm-Gg: AY/fxX5X9ETRgN1DsU8D7YMYR9ccD8zSCysxrwyRAAjEcKm2Ae54P05wnhBFBFNKVjz
+	IK/scM0/ZN/sj+rRO+tctzypoPdhYsUtS/jmRvbYLXy5mxbUbH0UXlmcQ+kFgVjoD/nT461848K
+	AC8iP2Qg7lCCDpKtbDgfMPq1cazVudahFC0JK8ORCpEHU7tZiUlByYj1FqlVrmNjKqZi6d6v6Sx
+	OnU1HmuflTh7rKG6UrNodwDhqmT6GMwmqmyAnl5zdeoXk8DKNpIm8CPJC3SVTOW2dm3P2bIbNz4
+	NVtJOOOV5M79aMo4hL/RBzGUlwEHfNMz23Q=
+X-Google-Smtp-Source: AGHT+IGPj4VYuvzobJuySeUtMjR2owpUV9b14snNLjzBypYDLw2+crQYToZkiUGcBVWZIJW//ll4Or+5K7PYShnu4As=
+X-Received: by 2002:a53:d01b:0:b0:643:1a78:4492 with SMTP id
+ 956f58d0204a3-6446eb6016cmr3860639d50.81.1765459536448; Thu, 11 Dec 2025
+ 05:25:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,13 +61,13 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20251120145835.3833031-2-elver@google.com> <20251120151033.3840508-7-elver@google.com>
- <20251211121659.GH3911114@noisy.programming.kicks-ass.net>
-In-Reply-To: <20251211121659.GH3911114@noisy.programming.kicks-ass.net>
+ <20251120151033.3840508-8-elver@google.com> <20251211114302.GC3911114@noisy.programming.kicks-ass.net>
+In-Reply-To: <20251211114302.GC3911114@noisy.programming.kicks-ass.net>
 From: Marco Elver <elver@google.com>
-Date: Thu, 11 Dec 2025 14:19:28 +0100
-X-Gm-Features: AQt7F2pfFUoFUVEdkJ6Nswms767xMhA__DttYAE1PqX0AgFhiN8dcasmhdnfxEw
-Message-ID: <CANpmjNOmAYFj518rH0FdPp=cqK8EeKEgh1ok_zFUwHU5Fu92=w@mail.gmail.com>
-Subject: Re: [PATCH v4 06/35] cleanup: Basic compatibility with context analysis
+Date: Thu, 11 Dec 2025 14:24:57 +0100
+X-Gm-Features: AQt7F2r5KNsATXW8d-J0gXHLFG6W_D0lOL42kIv9mnu54Km1ZPN_9U9TSDd09do
+Message-ID: <CANpmjNObaGarY1_niCkgEXMNm2bLAVwKwQsLVYekE=Ce6y3ehQ@mail.gmail.com>
+Subject: Re: [PATCH v4 07/35] lockdep: Annotate lockdep assertions for context analysis
 To: Peter Zijlstra <peterz@infradead.org>
 Cc: Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>, 
 	Will Deacon <will@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
@@ -94,64 +94,34 @@ Cc: Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
 	linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 11 Dec 2025 at 13:17, Peter Zijlstra <peterz@infradead.org> wrote:
+On Thu, 11 Dec 2025 at 12:43, Peter Zijlstra <peterz@infradead.org> wrote:
 >
-> On Thu, Nov 20, 2025 at 04:09:31PM +0100, Marco Elver wrote:
-> > Introduce basic compatibility with cleanup.h infrastructure: introduce
-> > DECLARE_LOCK_GUARD_*_ATTRS() helpers to add attributes to constructors
-> > and destructors respectively.
+> On Thu, Nov 20, 2025 at 04:09:32PM +0100, Marco Elver wrote:
+>
+> >  include/linux/lockdep.h | 12 ++++++------
+> >  1 file changed, 6 insertions(+), 6 deletions(-)
 > >
-> > Note: Due to the scoped cleanup helpers used for lock guards wrapping
-> > acquire and release around their own constructors/destructors that store
-> > pointers to the passed locks in a separate struct, we currently cannot
-> > accurately annotate *destructors* which lock was released. While it's
-> > possible to annotate the constructor to say which lock was acquired,
-> > that alone would result in false positives claiming the lock was not
-> > released on function return.
-> >
-> > Instead, to avoid false positives, we can claim that the constructor
-> > "assumes" that the taken lock is held via __assumes_ctx_guard().
-
-
-> Moo, so the alias analysis didn't help here?
-
-Unfortunately no, because intra-procedural alias analysis for these
-kinds of diagnostics is infeasible. The compiler can only safely
-perform alias analysis for local variables that do not escape the
-function. The layers of wrapping here make this a bit tricky.
-
-The compiler (unlike before) is now able to deal with things like:
-{
-    spinlock_t *lock_scope __attribute__((cleanup(spin_unlock))) = &lock;
-    spin_lock(&lock);  // lock through &lock
-    ... critical section ...
-}  // unlock through lock_scope (alias -> &lock)
-
-> What is the scope of this __assumes_ctx stuff? The way it is used in the
-> lock initializes seems to suggest it escapes scope. But then something
-> like:
-
-It escapes scope.
-
->         scoped_guard (mutex, &foo) {
->                 ...
->         }
->         // context analysis would still assume foo held
+> > diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
+> > index 67964dc4db95..2c99a6823161 100644
+> > --- a/include/linux/lockdep.h
+> > +++ b/include/linux/lockdep.h
+> > @@ -282,16 +282,16 @@ extern void lock_unpin_lock(struct lockdep_map *lock, struct pin_cookie);
+> >       do { WARN_ON_ONCE(debug_locks && !(cond)); } while (0)
 >
-> is somewhat sub-optimal, no?
-
-Correct. We're trading false negatives over false positives at this
-point, just to get things to compile cleanly.
-
-> > Better support for Linux's scoped guard design could be added in
-> > future if deemed critical.
+> Since I typically read patches without first reading the Changelog --
+> because when I read the code later, I also don't see changelogs.
 >
-> I would think so, per the above I don't think this is 'right'.
+> I must admit to getting most terribly confused here -- *again*, as I
+> then search back to previous discussions and found I was previously also
+> confused.
+>
+> As such, I think we want a comment here that explains that assume_ctx
+> thing.
+>
+> It is *NOT* (as the clang naming suggests) an assertion of holding the
+> lock (which is requires_ctx), but rather an annotation that forces the
+> ctx to be considered held.
 
-It's not sound, but we'll avoid false positives for the time being.
-Maybe we can wrangle the jigsaw of macros to let it correctly acquire
-and then release (via a 2nd cleanup function), it might be as simple
-as marking the 'constructor' with the right __acquires(..), and then
-have a 2nd __attribute__((cleanup)) variable that just does a no-op
-release via __release(..) so we get the already supported pattern
-above.
+Noted. I'll add some appropriate wording above the
+__assumes_ctx_guard() attribute, so this is not lost in the commit
+logs.
