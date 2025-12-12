@@ -1,46 +1,66 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE556317711;
-	Fri, 12 Dec 2025 15:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFBE324B3B;
+	Fri, 12 Dec 2025 15:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765551995; cv=none; b=GnkUrA7lJS4ubdmSqTRKixbuF1dWjE96P3oS3lsXepHeHx7Tpf7WQfL9/rd/F3gcQLjerxvlRWEwSUXgYCOXZ35FEL3H2MH9g1t4HkwuOKG/EXYROvvkjJSQ41DESPHTuj8Hn5qVMZ4wVjY1p+BFydsPDKOBEhhVL5Z6Gz4qoTw=
+	t=1765552204; cv=none; b=PXqjJu/2CY7sQtrb5SWvHUggidHxxkVbdrPRR2NOMZJ+gOcZaQiyUESo+xuyb0pb34Ne8j1CmqFhzeJ0vD8GpNHckY8QJaSg8YEPBTlNukbW2uqjcmZz/UVY0S6g/+zPlVu7VqAd6CKy3Yjpg32XMY2gafTP/ilm979fgGVpYY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765551995; c=relaxed/simple;
-	bh=i6MeqSZJJ3hHFz2r4+e4b3P7T9WrW1v1WkoNCvc0ZZk=;
+	s=arc-20240116; t=1765552204; c=relaxed/simple;
+	bh=/PV0STkfCTyJm8MYDNV3QyZprEtTCeBMOcB7Z0OOTeA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jU/4OtiGJUaK9erzQhnxsTTqpImo8kYeDRU7j6ghrNmF7Svl0/pOVpf5R1vE4om2BWy0bxIWPz+T2cBNZpLHQ365C6HA0go7sdqxXgE01YEl2wsn5xHvBS2tw01uSuRyBHWHFVy4nCOyYv/lVTph7HYLGkhGxdjFu2VsuQR6eYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PNpBb7ZG; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=R+2M2GfAhbOu/otjGuJQ8hKLI0WbJ3XLEn+KJ/xOD0dbuZ95vvDyOuU3Pu/0o7sUF9a346LrMdu1S44jK8Z43k3bEQm01U7ViK4xszOF52Nm05pjE/wQMtKku39wHY3pBmT3FrCihwZ3b/psXSYMdpOWFeRCd4E7B3NC6PVGHwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VKdLNQVV; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PNpBb7ZG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12611C4CEF1;
-	Fri, 12 Dec 2025 15:06:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765551994;
-	bh=i6MeqSZJJ3hHFz2r4+e4b3P7T9WrW1v1WkoNCvc0ZZk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PNpBb7ZGqIVlmaf47k6ev2T4JjXdjAO+tcbKShFJsIO55k3KtGbE03/P7Svf3km2w
-	 N7HxOvFwRaYla6WM589pL2VAM0U9dkquInkkqDc4rd5cwldPZhGPVk6YjPrL5BfTkw
-	 OMrXAPXy/3HJ9MxzbyS7SeN2BzR/tFLC1uSU6dV72zAX6zZq+182FPtOI7Ulu6JyaQ
-	 v6Hl59jMGME7mGMvO7nAvG2EoQDbMGCC+PLsGJXMz0B6b2YoQJQQDJMgWrF++vtmBy
-	 mh3LZTJwv+O+R+frS4ZeyU+/czISRuySQ/llWCRnjLNvM+tqiSK517M7+UjOikTVk1
-	 r8da6U0nOJsZg==
-Date: Fri, 12 Dec 2025 09:06:31 -0600
-From: Rob Herring <robh@kernel.org>
-To: Andrew Jeffery <andrew@codeconstruct.com.au>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Linus Walleij <linusw@kernel.org>, Joel Stanley <joel@jms.id.au>,
-	linux-hwmon@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org, openbmc@lists.ozlabs.org,
-	linux-gpio@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-iio@vger.kernel.org
-Subject: Re: [PATCH RFC 00/16] Eliminate warnings for AST2500 and AST2600 EVB
- devicetrees
-Message-ID: <20251212150631.GA3997751-robh@kernel.org>
-References: <20251211-dev-dt-warnings-all-v1-0-21b18b9ada77@codeconstruct.com.au>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VKdLNQVV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765552203; x=1797088203;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/PV0STkfCTyJm8MYDNV3QyZprEtTCeBMOcB7Z0OOTeA=;
+  b=VKdLNQVVtlpIb2Rq2dVF7aQp/n7Vye1aM17XLstvJTk1BPJpQr8sPFWC
+   1MiKLu6QZn4sRcolb0SlMqCRJmVIM9j2/ZVx3jLaaFGpa3dPChIf+nfet
+   RsWtEn+qYLglalL4uVrTFbdmNtxibn42ZoZ4K/f2kdKjf0hbLw6M8rz9E
+   M+ROo8I88cuZjRbO8f/rrLK66+/tjNL3SiKUkCiaBKVpwEUeBUIypqlBK
+   /ADIJSYVOYHfMiWRn3wgWwjntycEFczfjjNaQMEHazf8Z8FnO9VmFG8lO
+   DwMiEyZlf3Ngp5Sw5DyZutch+qMBe2WoyJoGNAF+DReA1PY/XmFf0o15h
+   A==;
+X-CSE-ConnectionGUID: CBPDp7hAQdW8r1yxTc3zXA==
+X-CSE-MsgGUID: X8WrPom1SR6+3c2o2IX6sg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11640"; a="67430972"
+X-IronPort-AV: E=Sophos;i="6.21,144,1763452800"; 
+   d="scan'208";a="67430972"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2025 07:10:02 -0800
+X-CSE-ConnectionGUID: RL4aPco+TpyRA01jwc33Yw==
+X-CSE-MsgGUID: w9WQhZahTXmmhDgvv8vikQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,144,1763452800"; 
+   d="scan'208";a="197380979"
+Received: from cpetruta-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.181])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2025 07:09:55 -0800
+Date: Fri, 12 Dec 2025 17:09:52 +0200
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Ethan Graham <ethan.w.s.graham@gmail.com>, glider@google.com,
+	andreyknvl@gmail.com, andy@kernel.org, andy.shevchenko@gmail.com,
+	brauner@kernel.org, brendan.higgins@linux.dev, davem@davemloft.net,
+	davidgow@google.com, dhowells@redhat.com, dvyukov@google.com,
+	elver@google.com, herbert@gondor.apana.org.au, ignat@cloudflare.com,
+	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net,
+	kasan-dev@googlegroups.com, kees@kernel.org,
+	kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lukas@wunner.de,
+	rmoar@google.com, shuah@kernel.org, sj@kernel.org,
+	tarasmadan@google.com, da.gomez@kernel.org, julia.lawall@inria.fr
+Subject: Re: [PATCH v3 00/10] KFuzzTest: a new kernel fuzzing framework
+Message-ID: <aTwwQLc0HjR_GbTY@smile.fi.intel.com>
+References: <20251204141250.21114-1-ethan.w.s.graham@gmail.com>
+ <aTvLyFsE55MR0kHo@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,58 +69,24 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251211-dev-dt-warnings-all-v1-0-21b18b9ada77@codeconstruct.com.au>
+In-Reply-To: <aTvLyFsE55MR0kHo@bombadil.infradead.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Thu, Dec 11, 2025 at 05:45:42PM +0900, Andrew Jeffery wrote:
-> Hi all,
+On Fri, Dec 12, 2025 at 12:01:12AM -0800, Luis Chamberlain wrote:
+> On Thu, Dec 04, 2025 at 03:12:39PM +0100, Ethan Graham wrote:
+> > This patch series introduces KFuzzTest, a lightweight framework for
+> > creating in-kernel fuzz targets for internal kernel functions.
 > 
-> This series removes the remaining warnings produced by `make
-> CHECK_DTBS=y ...` for the AST2500 and AST2600 EVBs and their related
-> DTSIs. The tidy-up has the usual benefit of making it clear to
-> contributors that any warnings are likely their own to fix before their
-> patches will be considered for merging.
-> 
-> I've framed it as an RFC with all patches contained in the one series
-> so the goal is clear, we can see what's needed to reach it, and we can
-> decide whether and how it should be split or merged going forward.
-> 
-> As it stands there's little in the way of code change, except to
-> pinctrl (though also not much there). As such I've included the
-> binding maintainers and subsystem lists as recipients but not yet Cc'ed
-> subsystem maintainers directly because there are quite a few and I hope
-> to avoid mostly uninteresting patches being a source of irritation.
-> 
-> The patches fall into several groups:
-> 
-> Patch 1:
->   Rob's conversion of the PWM/tach binding to DT schema with fixes
->   applied for the license and typos identified by Krzysztof.
-> 
-> Patches 2-5:
->   Fixes for the warnings related to the LPC and pinctrl nodes, touching
->   relevant drivers and the devicetrees.
-> 
->   I expect that if this approach is acceptable that we'll need to split
->   application of the patches across successive release cycles, with the
->   driver changes going in first.
-> 
-> Patches 6-8:
->   Fix MMC/SDHCI warnings, touching the relevant binding and devicetrees
-> 
-> Patches 9-10:
->   Clarify the relationships between the ACRY and AHB controller
-> 
-> Patches 11-16:
->   The remaining pieces that eliminate the warnings
+> As discussed just now at LPC, I suspected we could simplify this with
+> Cocccinelle. The below patch applies on top of this series to prove
+> that and lets us scale out fuzzing targets with Coccinelle.
 
-Don't you see warnings for at25:
+That's nice! Much better than having tons of files being developed and
+stitched in Makefile:s.
 
-     89 (atmel,at25): 'size' is a required property
-     89 (atmel,at25): 'pagesize' is a required property
-     89 (atmel,at25): 'address-width' is a required property
+-- 
+With Best Regards,
+Andy Shevchenko
 
-These are due to using the deprecated (since 2012) at25,byte-len, 
-at25,addr-mode, and at25,page-size properties. I think it has been long 
-enough you can just replace them with the new ones.
 
-Rob
