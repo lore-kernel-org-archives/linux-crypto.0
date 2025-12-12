@@ -1,152 +1,95 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail186-20.suw21.mandrillapp.com (mail186-20.suw21.mandrillapp.com [198.2.186.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4D730DD2F
-	for <linux-crypto@vger.kernel.org>; Fri, 12 Dec 2025 10:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B9F31984C
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Dec 2025 10:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.2.186.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765534569; cv=none; b=RVz+B6Z+rDwI3cBZRx8ZNcqFM8k/n7JdnsYWxSMLaw35qlnN/b791C1CVdfr+ZIHSP9W9HmdJFsO2jOQrWP0+bOdQszd0YnBMx2xmCETOspWKiEcwlqMzhSHpnMcw0tvYnH59Zusldq8C7WIASkGIOt94+TkxvCGM/0AEDfckqA=
+	t=1765534747; cv=none; b=GXjRDg64RF6wTyxOHmqI9qa7pn3/Zu7Rxq31JTreZvmaUnZlCZXns+nBRno3lEvU8pYmge3Yev4ncqFfth9dWTeodbY6d+0rmbT7eC6IwzfW2jxi3cO3wh/q8KOmaykHCsBn8hc0WHG4SjsFWdftDrXDu3X8tBBKyxM3KdahmQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765534569; c=relaxed/simple;
-	bh=Yy8AVUr1WzoEhC0gwViTyIIecU1pDeO+TdO72jBT6kg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=upW/oLr6nZwED4QWsWAro8eLE1Yya3YMd0tNe7RMYte3W+3CiTILWVX2ab3KiJiwQBuDrTYMEJZiBa0FM36qHsjG9WX0VMMHQJqHBnfPqcVqq56/xTyyieK5TBCZSlVnX54ZH3iyeSc9qdLG5HKEYpJC14JeAhvVwFRajeaOz3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kbkpTIwj; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1765534747; c=relaxed/simple;
+	bh=l9zKCV2yslm3kqZyRH27hTvQR4vlRU6gyly5D+xtdQc=;
+	h=From:Subject:Message-Id:To:Cc:References:In-Reply-To:Date:
+	 MIME-Version:Content-Type; b=NHpm20i0qj12Hk+SVOXuivLavXBldshNXjD5XEaCkoE4t5pSKhpRQ2O2i/Uv1XtXudZz/Qjk0Y6deiQ247/RKyPX4qJcFftnP4crcDC3mZz/4c4x+yIw6k32M93GDJlcvCft/FSNm9l+7xUte4kgAh4ilan+9dM/D2tuKxABXbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=AEZmXPBK; dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b=pG0l6bf3; arc=none smtp.client-ip=198.2.186.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kbkpTIwj"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-bc09b3d3b06so626674a12.2
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Dec 2025 02:16:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765534567; x=1766139367; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yy8AVUr1WzoEhC0gwViTyIIecU1pDeO+TdO72jBT6kg=;
-        b=kbkpTIwjpQS8ePNpRzQzmqynFKNs7/NxFbTXEqQxrUChBOEd0ClCuYdBQSv/22spWQ
-         Mlau/Z1r7/t8B4xFGTNsO12c5ZTlO8IX7JmdNjWmjdVZ/Jjmk3SOeb81vSBizctBon6C
-         b9PSWBQffnaVrZsxTpaFewgJOaV8M65WyBFjjc/d5LNfdNJtX504o4PmkXzgy9+JGpaR
-         p+BOqszpjmfwPdF9SWGeFROnU0ow5OvvXnKcQ2WceWvfngjFOxfI5+Rs21yMoX+9CWFu
-         9Pv3ZqG+EuPi3/Br8MUwkjm1WFmizI4Ur371xJf7pXnmBlKHwciyx1Eiw/6wKklL/E6/
-         Jp7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765534567; x=1766139367;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Yy8AVUr1WzoEhC0gwViTyIIecU1pDeO+TdO72jBT6kg=;
-        b=uvAawOVMuvOs87uMrto7o4NYkv4YCBL7HMV8uwWeeTnRCSNK9F+Prt4zAvfkTTNc/s
-         9pMCQHVCWqhUQJTo9BX66Hd2HxJOIyl5bCmufy95rEkfL2vDFHzIKarsi4Nm3eit4a7G
-         wNtkKjfD2BpAeyUOUTSj/Rfp0lTJsf1mQQEvtQ7TnguYYd9iXast2xdCC/gOatEOZL3K
-         h9PmPXtt1HuiMFsPtftXe0r5oesotxf9cxN1WbKyVGjQ5Rx3sMn5gLWT3gRi015GtiGp
-         oO4yt1leYq4vPK9tPvKenx25Ypn58dTlAuFXN5ugpPi7vA6FKvWIzNqbERA+5D4RQg+6
-         ZSUA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCJH6U4WCwp3/d9YfbiO9GoRhVcwxsnK+KFDYV7qPsAAkAX0n2iV15chqcfl+m5DjJTF5a4nOubMdZat0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2vBkr8s4rqNTJXeu4GZkbs/VQC5UEwVN7P0x3XDxIaaidIbdW
-	w6qdgfuRa9Oh0pIUeOsBL1p+UJ0kwH4YeX0JUnJYv6PeuDsts2UpUoOvEdADElAHz3PkbySziK7
-	eP8O+35lQYXUeH7lhL8Aa0g+r8i25KODFbRggdt5Z
-X-Gm-Gg: AY/fxX7g1XE7sml6fOXyNd8Oux5lBwCCO1AgOXVBLHWRL6eZBaQyksSQP7yfoktcb6t
-	gaGyLo68G+YA6f6nKCe9A6SRDrBfTC3l/gpkaem8Mzifh4bsllo7MgZwGOfGzPpJxx6KiAs9Qs9
-	mwABYqXh1qva0UeJ0/2Z6J5ftfxBlZ9yvp1YFJlnzLx6Totx0LDKXud/7ytEgqwtX49uPCuBjsI
-	1vC4yVVfKcY60CS8lKmnYRe9S0Lf5gHHruXdt71BXKYhH9FN7Ehk0cFRH/LfQHsX2Id8RO77/Rv
-	t/moZPsBRDhKImtfRLbcaNEzVTLimAXo5BhQ4w==
-X-Google-Smtp-Source: AGHT+IH8fq53xzz4VEeZIfjpPn2aDZft0vSRUPpE08Jgar7Bwxv93jAlmI/oD2Bc5sYJ04yKuPnrNx+rDd5kmEFlwB8=
-X-Received: by 2002:a05:7300:2aa5:b0:2ab:ca55:89b4 with SMTP id
- 5a478bee46e88-2ac303f2fbcmr872533eec.43.1765534566419; Fri, 12 Dec 2025
- 02:16:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="AEZmXPBK";
+	dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b="pG0l6bf3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
+	s=mte1; t=1765534744; x=1765804744;
+	bh=l9zKCV2yslm3kqZyRH27hTvQR4vlRU6gyly5D+xtdQc=;
+	h=From:Subject:Message-Id:To:Cc:References:In-Reply-To:Feedback-ID:
+	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
+	 Subject:From;
+	b=AEZmXPBKTSH1bbpvWr8TSXNG6Hmom6M2Qp5isNQViHyF/f2gIroCS5/UgJlCU/o6V
+	 8PPamgOTSC1v5HB/roqUyP3dEQB8TDl5+gQiwNvbFLe4aj4BedbWX3+olFm8JUa8Qi
+	 mewCQquh11OyJq2PHLH0cEz/+O/m21KzReb1WUQfGqj9SCDoBtrc0K1bkGZ7K/hXRf
+	 qJ8rMoIHZKG0mDEbiFm6MmSbISsO/6E7pH8xePrs5P/3OK7t9cO8WytXyBdO6SmcX1
+	 pmpc0EfFAVH5XJaPu/cNHLsd8+hfZF69nafrlJbUatWv+tbY4cc15wLZeoCpnhdINL
+	 T93UADlh0rzBQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
+	t=1765534744; x=1765795244; i=thomas.courrege@vates.tech;
+	bh=l9zKCV2yslm3kqZyRH27hTvQR4vlRU6gyly5D+xtdQc=;
+	h=From:Subject:Message-Id:To:Cc:References:In-Reply-To:Feedback-ID:
+	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
+	 Subject:From;
+	b=pG0l6bf34yMMnnSp5G5+oIu8vB062t4yyEzBjNCvHztr5N6EdT7Om3RBX9CS31lq/
+	 qO4A6Gxfqf/sQdgdE2oz32fcte33feqGDvtcK4OxUEqPZN8DWQ9esrexGnmQneIDN6
+	 Lka3L8xjZ7FWYP9W3JRSJS7fPMSZp1NWKI49DMkKOrukSgXMG+b5/TwmcwqF60RcBz
+	 THUZiEjw++tY5+zutsT8arfyMYwYJjl5iEJWpiFsuPpVwUaJKR88Xdx0kAlKmA+nlY
+	 WoZLRZG1xMuCi42po+VAVZgYHW1ZQ151PUwLJ3RU2WJYHokP0Gt5E/Kf3sdgIU3/uB
+	 sizHOfeMPeKRQ==
+Received: from pmta10.mandrill.prod.suw01.rsglab.com (localhost [127.0.0.1])
+	by mail186-20.suw21.mandrillapp.com (Mailchimp) with ESMTP id 4dSQRD4BnBzFCWsFK
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Dec 2025 10:19:04 +0000 (GMT)
+From: "Thomas Courrege" <thomas.courrege@vates.tech>
+Subject: =?utf-8?Q?Re:=20[PATCH=20v2]=20KVM:=20SEV:=20Add=20KVM=5FSEV=5FSNP=5FHV=5FREPORT=5FREQ=20command?=
+Received: from [37.26.189.201] by mandrillapp.com id 659ffc3f895e44a98d1a7968970a007f; Fri, 12 Dec 2025 10:19:04 +0000
+X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
+X-Bm-Transport-Timestamp: 1765534743899
+Message-Id: <4fa34bbd-ca16-4f19-8822-d72297375c7d@vates.tech>
+To: "Tom Lendacky" <thomas.lendacky@amd.com>, pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, ashish.kalra@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au, nikunj@amd.com
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20251201151940.172521-1-thomas.courrege@vates.tech> <30242a68-25f5-4e92-b776-f3eb6f137c31@amd.com> <85baa45b-0fb9-43fb-9f87-9b0036e08f56@vates.tech> <7b3c264c-03bb-4dc5-b5c6-24fb0bd179cf@amd.com>
+In-Reply-To: <7b3c264c-03bb-4dc5-b5c6-24fb0bd179cf@amd.com>
+X-Native-Encoded: 1
+X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.659ffc3f895e44a98d1a7968970a007f?=
+X-Mandrill-User: md_30504962
+Feedback-ID: 30504962:30504962.20251212:md
+Date: Fri, 12 Dec 2025 10:19:04 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251120145835.3833031-2-elver@google.com> <20251120151033.3840508-7-elver@google.com>
- <20251211121659.GH3911114@noisy.programming.kicks-ass.net>
- <CANpmjNOmAYFj518rH0FdPp=cqK8EeKEgh1ok_zFUwHU5Fu92=w@mail.gmail.com> <20251212094352.GL3911114@noisy.programming.kicks-ass.net>
-In-Reply-To: <20251212094352.GL3911114@noisy.programming.kicks-ass.net>
-From: Marco Elver <elver@google.com>
-Date: Fri, 12 Dec 2025 11:15:29 +0100
-X-Gm-Features: AQt7F2qb9ENq_mtkRfqCrKNBJnxHOwKNFDuSBIrcF4bjbeWckbG0712gmoUp-Ao
-Message-ID: <CANpmjNP=s33L6LgYWHygEuLtWTq-s2n4yFDvvGcF3HjbGH+hqw@mail.gmail.com>
-Subject: Re: [PATCH v4 06/35] cleanup: Basic compatibility with context analysis
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>, 
-	Will Deacon <will@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Chris Li <sparse@chrisli.org>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>, 
-	Eric Dumazet <edumazet@google.com>, Frederic Weisbecker <frederic@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>, 
-	Joel Fernandes <joelagnelf@nvidia.com>, Johannes Berg <johannes.berg@intel.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Josh Triplett <josh@joshtriplett.org>, 
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>, 
-	Kentaro Takeda <takedakn@nttdata.co.jp>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Thomas Gleixner <tglx@linutronix.de>, 
-	Thomas Graf <tgraf@suug.ch>, Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, 
-	kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, linux-sparse@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 12 Dec 2025 at 10:43, Peter Zijlstra <peterz@infradead.org> wrote:
-[..]
-> > Correct. We're trading false negatives over false positives at this
-> > point, just to get things to compile cleanly.
->
-> Right, and this all 'works' right up to the point someone sticks a
-> must_not_hold somewhere.
->
-> > > > Better support for Linux's scoped guard design could be added in
-> > > > future if deemed critical.
-> > >
-> > > I would think so, per the above I don't think this is 'right'.
-> >
-> > It's not sound, but we'll avoid false positives for the time being.
-> > Maybe we can wrangle the jigsaw of macros to let it correctly acquire
-> > and then release (via a 2nd cleanup function), it might be as simple
-> > as marking the 'constructor' with the right __acquires(..), and then
-> > have a 2nd __attribute__((cleanup)) variable that just does a no-op
-> > release via __release(..) so we get the already supported pattern
-> > above.
->
-> Right, like I mentioned in my previous email; it would be lovely if at
-> the very least __always_inline would get a *very* early pass such that
-> the above could be resolved without inter-procedural bits. I really
-> don't consider an __always_inline as another procedure.
->
-> Because as I already noted yesterday, cleanup is now all
-> __always_inline, and as such *should* all end up in the one function.
->
-> But yes, if we can get a magical mash-up of __cleanup and __release (let
-> it be knows as __release_on_cleanup ?) that might also work I suppose.
-> But I vastly prefer __always_inline actually 'working' ;-)
 
-The truth is that __always_inline working in this way is currently
-infeasible. Clang and LLVM's architecture simply disallow this today:
-the semantic analysis that -Wthread-safety does happens over the AST,
-whereas always_inline is processed by early passes in the middle-end
-already within LLVM's pipeline, well after semantic analysis. There's
-a complexity budget limit for semantic analysis (type checking,
-warnings, assorted other errors), and path-sensitive &
-intra-procedural analysis over the plain AST is outside that budget.
-Which is why tools like clang-analyzer exist (symbolic execution),
-where it's possible to afford that complexity since that's not
-something that runs for a normal compile.
+On 12/5/25 3:28 PM, Tom Lendacky wrote:
+> On 12/4/25 07:21, Thomas Courrege wrote:
+>> On 12/2/25 8:29 PM, Tom Lendacky wrote:
+>>
+>>>> +
+>>>> +e_free_rsp:
+>>>> +=09/* contains sensitive data */
+>>>> +=09memzero_explicit(report_rsp, PAGE_SIZE);
+>>> Does it? What is sensitive that needs to be cleared?
+>> Combine with others reports, it could allow to do an inventory of the gu=
+ests,
+>> which ones share the same author, measurement, policy...
+>> It is not needed, but generating a report is not a common operation so
+>> performance is not an issue here. What do you think is the best to do ?
+> Can't userspace do that just by generating/requesting reports? If there
+> are no keys, IVs, secrets, etc. in the memory, I don't see what the
+> memzero_explicit() is accomplishing. Maybe I'm missing something here and
+> others may have different advice.
+You're right, and there's no warranty the userspace will memzero the report
+And the SEV report isn't memzero too
 
-I think I've pushed the current version of Clang's -Wthread-safety
-already far beyond what folks were thinking is possible (a variant of
-alias analysis), but even my healthy disregard for the impossible
-tells me that making path-sensitive intra-procedural analysis even if
-just for __always_inline functions is quite possibly a fool's errand.
+Thanks,=C2=A0
+Thomas
 
-So either we get it to work with what we have, or give up.
-
-Thanks,
--- Marco
