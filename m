@@ -1,62 +1,46 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7895E2D7DE6;
-	Fri, 12 Dec 2025 05:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F50248F6A;
+	Fri, 12 Dec 2025 05:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765517012; cv=none; b=iU/iebskgvtuJAWEybf97yT1eKjd4yegOORh5p9XsECKwL821YuIWbUGgi395h17XUgzQx+zZSw6GL/WXL0EW5QkdakS2quyKQx+YDdYwNNATh3AzqZomUKEkXbCJ/04u7COsQ42RYUYbhpH8AHImP7LLjSCJQ0DL6YArGm8syU=
+	t=1765518027; cv=none; b=HEXlg9V8bBji2nIgULTt5EXvuHy0g7rOczF9qvHcrUTf9Zq/s82U2u0NvOCctaGEgEuYTF7d+z80EBfReus6UHKZuIyq6hGZcm4AO4A9MbC+KfYZnZOEi8lg/Kk/IxhcuFYT6wquzGWm/R5Gw9U1ZOdCFE7tum3F2hYbRYkfUIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765517012; c=relaxed/simple;
-	bh=m74I6Bvib2CIovtwKp7KyYPQ9tJgDXGU5el4QgpfVco=;
+	s=arc-20240116; t=1765518027; c=relaxed/simple;
+	bh=9lv9rkuazkepyHsEe5BLEaVyoz3/43JZv/bu12Tj3Pw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=REDJ12sRi1e2hG8V9bp+LLKvCGfjWEnOrAB5PjNkRKQFCqdANJOm6h7diY8UIw/1z4q2fQI57NdeaSzwh6f+LkHRz93gG1vaTQw6EJ6ZpWc73ZkAU+ZuaVdNfMc9u8B7827zlkUJdahvIzAPzuN7jwRGwq46JIkORVZSdJQsJAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mU5XSJ1x; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=QYLKCPMKOQgfIJ6Xm0sX9H3Mu4jlnWisEJmfJdRxJ+OH3goCS085XTcRjcsaGoRd2jTv3w3VHMJhc3u496dfdy3r03GHH1ylpleAu256vH0735UApM1yffh7njtmvdDILZRJ9bbrThd2NgwAcXu+OsTxD7FfC953u1yVu1YL53Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gU1t6+ZT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mU5XSJ1x"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765517011; x=1797053011;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=m74I6Bvib2CIovtwKp7KyYPQ9tJgDXGU5el4QgpfVco=;
-  b=mU5XSJ1xnVU5LPd/DmCpAD+xJQ0nEUgcMCqCuZPXKLv6LszT+7xWwMTN
-   M0qNBTX5PjJb0l3yFgXiQO0trwLkmoOq838cIy05f8KaD3g+10VXCFY1K
-   kOtA6bQs2Ct8I5qbFrf5SZ09D3ghJ39uVVcY9hM7gkDJZuSKh/zfmvoqR
-   XkMYmKQxkwm5hlYTXmaPODF2Hy/dUCt4bxDobQxkNaNSVi5NrUv2+cjAO
-   acneUvHZiT4OqEqg6aNpD//a1VwuusFrMUxU4hz0AxTPHEL+0YQfTBYwX
-   rwIhkuUNcNVT4q7MzVkXcBLM13IyelUNPxIn2MFq8cClkFve7Q5ASxT2d
-   w==;
-X-CSE-ConnectionGUID: YNYN2P1PQKinVA1/KRM9NQ==
-X-CSE-MsgGUID: Fi34Je51S3WzsvGL8e0Cnw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11639"; a="78615697"
-X-IronPort-AV: E=Sophos;i="6.21,141,1763452800"; 
-   d="scan'208";a="78615697"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2025 21:23:28 -0800
-X-CSE-ConnectionGUID: KrxP/FzGQtaHRq6HfwPmjg==
-X-CSE-MsgGUID: CGNRnWs7T9Oq6dLLnt89bQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,141,1763452800"; 
-   d="scan'208";a="234390040"
-Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 11 Dec 2025 21:23:26 -0800
-Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vTvch-000000005aH-1QJD;
-	Fri, 12 Dec 2025 05:23:23 +0000
-Date: Fri, 12 Dec 2025 13:22:27 +0800
-From: kernel test robot <lkp@intel.com>
-To: Haotian Zhang <vulab@iscas.ac.cn>, ansuelsmth@gmail.com,
-	olivia@selenic.com, herbert@gondor.apana.org.au
-Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Haotian Zhang <vulab@iscas.ac.cn>
-Subject: Re: [PATCH] hwrng: airoha: Fix wait_for_completion_timeout return
- value check
-Message-ID: <202512121309.biSQJ5fC-lkp@intel.com>
-References: <20251208080836.1010-1-vulab@iscas.ac.cn>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gU1t6+ZT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CED84C4CEF1;
+	Fri, 12 Dec 2025 05:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765518027;
+	bh=9lv9rkuazkepyHsEe5BLEaVyoz3/43JZv/bu12Tj3Pw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gU1t6+ZT6MpXHesyb60y9ESy+M0WLM/LGl+C8zwHBP8gCj7BFHJe8cTFyBDZpOWED
+	 rTZ9xNdh1WZYbH55D6EBrU+HjJF19JicUvKbHRXNrHCxiYra6uzhwNQp++nHMAMpe2
+	 oa3HlQvAug8WzEjKVoW7SqivNTfO6pbnPih/kdLg1Yyr48spmJhC8O2pAJLFkUa8B/
+	 mrfvZl8ZdzAXejidtkcaUhXD2KfUnjOJEFdrBeav3JDFHON3hlbdGZIfozwdz2vD+s
+	 2CDcghZSN3VBQmA1wRBCx7OXYMvDMoZhvX2QlWZlY76RgZtt9ygmsTPyIjTaF2Bj7G
+	 6D9RcMVU5BFTg==
+Date: Thu, 11 Dec 2025 21:40:20 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Diederik de Haas <diederik@cknow-tech.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: arm64/ghash - Fix incorrect output from
+ ghash-neon
+Message-ID: <20251212054020.GB4838@sol>
+References: <DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com>
+ <20251209223417.112294-1-ebiggers@kernel.org>
+ <DEUFDH7FJURL.3J0FN5I19VV8F@cknow-tech.com>
+ <CAMj1kXEQkB9MWB+PAi4XE_MuBt0ScitxTsKMDo1-7Cp-=xXOpw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -65,89 +49,52 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251208080836.1010-1-vulab@iscas.ac.cn>
+In-Reply-To: <CAMj1kXEQkB9MWB+PAi4XE_MuBt0ScitxTsKMDo1-7Cp-=xXOpw@mail.gmail.com>
 
-Hi Haotian,
+On Wed, Dec 10, 2025 at 06:31:44PM +0900, Ard Biesheuvel wrote:
+> On Wed, 10 Dec 2025 at 18:22, Diederik de Haas <diederik@cknow-tech.com> wrote:
+> >
+> > On Tue Dec 9, 2025 at 11:34 PM CET, Eric Biggers wrote:
+> > > Commit 9a7c987fb92b ("crypto: arm64/ghash - Use API partial block
+> > > handling") made ghash_finup() pass the wrong buffer to
+> > > ghash_do_simd_update().  As a result, ghash-neon now produces incorrect
+> > > outputs when the message length isn't divisible by 16 bytes.  Fix this.
+> >
+> > I was hoping to not have to do a 'git bisect', but this is much better
+> > :-D I can confirm that this patch fixes the error I was seeing, so
+> >
+> > Tested-by: Diederik de Haas <diederik@cknow-tech.com>
+> >
+> > > (I didn't notice this earlier because this code is reached only on CPUs
+> > > that support NEON but not PMULL.  I haven't yet found a way to get
+> > > qemu-system-aarch64 to emulate that configuration.)
+> >
+> > https://www.qemu.org/docs/master/system/arm/raspi.html indicates it can
+> > emulate various Raspberry Pi models. I've only tested it with RPi 3B+
+> > (bc of its wifi+bt chip), but I wouldn't be surprised if all RPi models
+> > would have this problem? Dunno if QEMU emulates that though.
+> >
+> 
+> All 64-bit RPi models except the RPi5 are affected by this, as those
+> do not implement the crypto extensions. So I would expect QEMU to do
+> the same.
+> 
+> It would be nice, though, if we could emulate this on the mach-virt
+> machine model too. It should be fairly trivial to do, so if there is
+> demand for this I can look into it.
 
-kernel test robot noticed the following build warnings:
+I'm definitely interested in it.  I'm already testing multiple "-cpu"
+options, and it's easy to add more.
 
-[auto build test WARNING on char-misc/char-misc-testing]
-[also build test WARNING on char-misc/char-misc-next char-misc/char-misc-linus linus/master v6.18 next-20251212]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+With qemu-system-aarch64 I'm currently only using "-M virt", since the
+other machine models I've tried don't boot with arm64 defconfig,
+including "-M raspi3b" and "-M raspi4b".
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Haotian-Zhang/hwrng-airoha-Fix-wait_for_completion_timeout-return-value-check/20251208-161314
-base:   char-misc/char-misc-testing
-patch link:    https://lore.kernel.org/r/20251208080836.1010-1-vulab%40iscas.ac.cn
-patch subject: [PATCH] hwrng: airoha: Fix wait_for_completion_timeout return value check
-config: arm-randconfig-r072-20251210 (https://download.01.org/0day-ci/archive/20251212/202512121309.biSQJ5fC-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 12.5.0
+There may be some tricks I'm missing.  Regardless, expanding the
+selection of available CPUs for "-M virt" would be helpful.  Either by
+adding "real" CPUs that have "interesting" combinations of features, or
+by just allowing turning features off like
+"-cpu max,aes=off,pmull=off,sha256=off".  (Certain features like sve can
+already be turned off in that way, but not the ones relevant to us.)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512121309.biSQJ5fC-lkp@intel.com/
-
-New smatch warnings:
-drivers/char/hw_random/airoha-trng.c:108 airoha_trng_init() warn: unsigned 'ret' is never less than zero.
-
-Old smatch warnings:
-drivers/char/hw_random/airoha-trng.c:117 airoha_trng_init() warn: unsigned 'ret' is never less than zero.
-
-vim +/ret +108 drivers/char/hw_random/airoha-trng.c
-
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   75  
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   76  static int airoha_trng_init(struct hwrng *rng)
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   77  {
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   78  	struct airoha_trng *trng = container_of(rng, struct airoha_trng, rng);
-cd62dba83f93a0 Haotian Zhang     2025-12-08   79  	unsigned long ret;
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   80  	u32 val;
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   81  
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   82  	val = readl(trng->base + TRNG_NS_SEK_AND_DAT_EN);
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   83  	val |= RNG_EN;
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   84  	writel(val, trng->base + TRNG_NS_SEK_AND_DAT_EN);
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   85  
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   86  	/* Set out of SW Reset */
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   87  	airoha_trng_irq_unmask(trng);
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   88  	writel(0, trng->base + TRNG_HEALTH_TEST_SW_RST);
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   89  
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   90  	ret = wait_for_completion_timeout(&trng->rng_op_done, BUSY_LOOP_TIMEOUT);
-cd62dba83f93a0 Haotian Zhang     2025-12-08   91  	if (ret == 0) {
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   92  		dev_err(trng->dev, "Timeout waiting for Health Check\n");
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   93  		airoha_trng_irq_mask(trng);
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   94  		return -ENODEV;
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   95  	}
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   96  
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   97  	/* Check if Health Test Failed */
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   98  	val = readl(trng->base + TRNG_HEALTH_TEST_STATUS);
-e53ca8efcc5ec1 Christian Marangi 2024-10-17   99  	if (val & (RST_STARTUP_AP_TEST_FAIL | RST_STARTUP_RC_TEST_FAIL)) {
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  100  		dev_err(trng->dev, "Health Check fail: %s test fail\n",
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  101  			val & RST_STARTUP_AP_TEST_FAIL ? "AP" : "RC");
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  102  		return -ENODEV;
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  103  	}
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  104  
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  105  	/* Check if IP is ready */
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  106  	ret = readl_poll_timeout(trng->base + TRNG_IP_RDY, val,
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  107  				 val & SAMPLE_RDY, 10, 1000);
-e53ca8efcc5ec1 Christian Marangi 2024-10-17 @108  	if (ret < 0) {
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  109  		dev_err(trng->dev, "Timeout waiting for IP ready");
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  110  		return -ENODEV;
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  111  	}
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  112  
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  113  	/* CNT_TRANS must be 0x80 for IP to be considered ready */
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  114  	ret = readl_poll_timeout(trng->base + TRNG_IP_RDY, val,
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  115  				 FIELD_GET(CNT_TRANS, val) == TRNG_CNT_TRANS_VALID,
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  116  				 10, 1000);
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  117  	if (ret < 0) {
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  118  		dev_err(trng->dev, "Timeout waiting for IP ready");
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  119  		return -ENODEV;
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  120  	}
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  121  
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  122  	return 0;
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  123  }
-e53ca8efcc5ec1 Christian Marangi 2024-10-17  124  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+- Eric
