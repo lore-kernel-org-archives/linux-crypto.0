@@ -1,90 +1,250 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D26299AA3
-	for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 12:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103F9331A40
+	for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 13:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765801607; cv=none; b=nc0TEVFPtV1e2TvxRoYYihXOkFQAeWoPqlT+BuCe019nt5UCNYiVIgWjWgO3Lmg6tiAqcq3aMSkIviTdW8ldfuycBpJotHRfaGpGCy3PXVr7d0OvBsvmL4QB1yJx710/UBzW6ljk4V3nirtGFQG28ZdycK72mg38iDORwovqtTM=
+	t=1765805944; cv=none; b=VGrKfkZn5ONpTWm1YnF6vx0WfXsIDtWPSNO2lSaasro/bWXanNhaK5MlP5KfXv5bNg18BJtAKxW3msuaT1vvgMMU5JCNaUOVNZDeIhEFUiv1appjp/04uxic0W2yTwvFz4EysRrUorbJzQfzbFbRnK6UaAqUnxL5g4bRT2TMwnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765801607; c=relaxed/simple;
-	bh=XBGKZ/ITWegS8/ZOHvxWMsrdL4N3bSH2oHummdA8vgo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T2l0NZiulyEnEd6FUMGO+2exXaifSTBRTH6HqWADyrqOKUYz5EPsp2jZqbqNKkuqkWxwkRM9I9jKDvpMMwT13/X8pO+S2QovHuyAaryk2BOGSq5es6CMro/B0I9bMDohLpcUVbjmnjxJPrk+1gIJth/Iltf9cHZVUehSh7byoIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AaU3J27r; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1765805944; c=relaxed/simple;
+	bh=0RJ8hn5UA+jBMKgL2vexCP4P2w3UyioHPbHfmWoCqpY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZyItWbHFF7PR8K2xiIrJEIacA5rj4SJMnwdTsDJDMZMbF/PvHT22FD+hyAu3TnybOoAcl7wVaLGyZYIT7b/1a3tMVhp9f23etK25OfEixbhd/NeSfte6FPgTJ492vzxWK+ovxRnqcI/RvFM3rS4H2xvIVP93fs4yiQYA5X8/m2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EuTucd9g; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AaU3J27r"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765801599;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MW5H/hhDK3ViWMzsjxgvpJkjVz/r8K1RDrjdz24ubXo=;
-	b=AaU3J27rkREZl98Fuz8kBeSs0paOtwoJjMtSFpYDTVgQEpmFGYWpGR3rXw6ceyov3Y/9qm
-	OY0/F6dQWIYhP8oz1uMp2LSILnqqd1bK7xqRYZFI6JsuwXOxTjcu2sbINdVuV8ODIPTUA5
-	XQy1x9Q+Yl/hoQT0EdK30skNyPv4dtY=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EuTucd9g"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42e2d52c24dso1782733f8f.1
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 05:39:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765805940; x=1766410740; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HP7wXZoAxj3YG64MFXhffqc9TkW1sld9ucKsb/6ZFh4=;
+        b=EuTucd9gZXbKS7k60S0O8+xmk6dWUzB6AJNJfJNSq4hCCI494y+YN2Qq1M2nPeZ7g5
+         LuU9h8ECct3c3zuO/9QgMVnrnXkzRJgRH9odpRxmaXJoMbbzxmLzBsdBkzCWalcMs8O0
+         +pwkeU2qKXOJUaNXpoOP02zQ1tVD8s9wko/KZIUVdb/UfaM7zYH212hBjrcuW4FJgH1J
+         hgW7iydeQCYKyq0iu2CmX9VQvEb5jf024NaEH6kA/hPoU5u67Btd0n6K9BJ3Wwyep1ZS
+         JZOqh1SL51X9kUXVjf42jy+x53KVKkGyUDYet3sxooMjnwhSTE0cGLmWT8n+j33oro1t
+         wdDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765805940; x=1766410740;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HP7wXZoAxj3YG64MFXhffqc9TkW1sld9ucKsb/6ZFh4=;
+        b=iu9RVYrbw6i+rPtsKPTkxmUCuFmx10ivYwUtTjoidw9ANw4FtInsk1SR/fI5/XCdfX
+         FOsoEeytobaY/wasOy4sgTMUKCkxZTc0bKuXuCzM8aErIE+Cheh4nCEpGwLBiKaKHArH
+         x51Nc2eKAnoMFJUGVgFPAo2CvtAtqx8l+yS9ilvihjygX7jvfbAk1XBQ9U0oFQvr6W0R
+         37D89GOr/i85Wf+RIT/Hcsnvt0GYJHgSuf640uYA6p3QgIlJFDuil7VpMvDEfdp6U+HM
+         vzBPdm0Wq3/gHkWqJZJTpSnvTiK6lSi51zTVb8CzyhB+gzE3jFVw6OyWdcROjK/3MzhR
+         A+6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUNLO80CKQ9kY5NiywhxCO31oYJ3YxPjNx3iJ/KbCFeDoznDiE4dD3/IOxzE19w3fTbkBSTskgR2FO0ufg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzsvwAdZYkAKytOXUqK29jZaKhshszLCoPg2hOej3jXGRUZn38
+	05BuMry6fNcG5yzFQ2rzeAhnFnakyb9nkUrSOUkW7ecywif7vPh04+iCqTJ0UMGFbw==
+X-Gm-Gg: AY/fxX7xYzAf5r31bdtByPZcFNHVfYqlaTpya3hYXCg6sxWJdtHzzNYAuAv4P52xyPc
+	aY1j5ao4UnDkmmWA3izOx+eQIwtx0Ym4SG6kXU7ZUzXo+gT9GOPxrapsdLOhAjrnZIxugn9n64s
+	LBGw0PykLR3Bh33vx8dTlRDrDXmLGrhYvKNCxIhjAA5b3Cim52AWmK0cj17uFKvUsYRffdD/mls
+	/HJq9D6Y5MRFg8WDFyRn9Jyo/pgvl1liXOVwwA4zCDP6Vmzo2TBzSSmnWFz4t+W7ouw1MPLnTWz
+	rdr3G2SlzIQxO2QTybmTU+DM6PYs9GvRJ6kXKlYH7BxLodhKWx+v6htQdOmx2BpzuvJSsHD1Cxx
+	MhUGhBFAjBbYBPX3wVg9K7tvTFT6id4b8CHevcrYGQ4HNxhsExZSo6jpb5306tCVKyBJbFx5WYM
+	BE3v2V7KfxFJeEECxQ+bwA05zliZYcq/u+bKlfOuxUGoNay+Jm
+X-Google-Smtp-Source: AGHT+IH6RRE6qce8+BKlIh2iGfXIIE/0drfAuueOfe5s5dH/DcFdShyJ99GxaUFmEfIgshY9jhag6g==
+X-Received: by 2002:a05:6000:310f:b0:430:f7dc:7e8e with SMTP id ffacd0b85a97d-430f7dc809cmr4594614f8f.34.1765805939977;
+        Mon, 15 Dec 2025 05:38:59 -0800 (PST)
+Received: from elver.google.com ([2a00:79e0:2834:9:5741:4422:4d1d:b335])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42fb68866f3sm21319081f8f.36.2025.12.15.05.38.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Dec 2025 05:38:59 -0800 (PST)
+Date: Mon, 15 Dec 2025 14:38:52 +0100
+From: Marco Elver <elver@google.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	Chris Li <sparse@chrisli.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: octeontx2 - Use sysfs_emit in sysfs show functions
-Date: Mon, 15 Dec 2025 13:26:05 +0100
-Message-ID: <20251215122608.385276-3-thorsten.blum@linux.dev>
+	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+	linux-sparse@vger.kernel.org, linux-wireless@vger.kernel.org,
+	llvm@lists.linux.dev, rcu@vger.kernel.org
+Subject: Re: [PATCH v4 06/35] cleanup: Basic compatibility with context
+ analysis
+Message-ID: <aUAPbFJSv0alh_ix@elver.google.com>
+References: <20251120145835.3833031-2-elver@google.com>
+ <20251120151033.3840508-7-elver@google.com>
+ <20251211121659.GH3911114@noisy.programming.kicks-ass.net>
+ <CANpmjNOmAYFj518rH0FdPp=cqK8EeKEgh1ok_zFUwHU5Fu92=w@mail.gmail.com>
+ <20251212094352.GL3911114@noisy.programming.kicks-ass.net>
+ <CANpmjNP=s33L6LgYWHygEuLtWTq-s2n4yFDvvGcF3HjbGH+hqw@mail.gmail.com>
+ <20251212110928.GP3911114@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251212110928.GP3911114@noisy.programming.kicks-ass.net>
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-Replace sprintf() with sysfs_emit() in sso_pf_func_ovrd_show() and
-kvf_limits_show(). sysfs_emit() is preferred for formatting sysfs output
-as it performs proper bounds checking.  No functional changes.
+On Fri, Dec 12, 2025 at 12:09PM +0100, Peter Zijlstra wrote:
+> On Fri, Dec 12, 2025 at 11:15:29AM +0100, Marco Elver wrote:
+> > On Fri, 12 Dec 2025 at 10:43, Peter Zijlstra <peterz@infradead.org> wrote:
+> > [..]
+> > > > Correct. We're trading false negatives over false positives at this
+> > > > point, just to get things to compile cleanly.
+> > >
+> > > Right, and this all 'works' right up to the point someone sticks a
+> > > must_not_hold somewhere.
+> > >
+> > > > > > Better support for Linux's scoped guard design could be added in
+> > > > > > future if deemed critical.
+> > > > >
+> > > > > I would think so, per the above I don't think this is 'right'.
+> > > >
+> > > > It's not sound, but we'll avoid false positives for the time being.
+> > > > Maybe we can wrangle the jigsaw of macros to let it correctly acquire
+> > > > and then release (via a 2nd cleanup function), it might be as simple
+> > > > as marking the 'constructor' with the right __acquires(..), and then
+> > > > have a 2nd __attribute__((cleanup)) variable that just does a no-op
+> > > > release via __release(..) so we get the already supported pattern
+> > > > above.
+> > >
+> > > Right, like I mentioned in my previous email; it would be lovely if at
+> > > the very least __always_inline would get a *very* early pass such that
+> > > the above could be resolved without inter-procedural bits. I really
+> > > don't consider an __always_inline as another procedure.
+> > >
+> > > Because as I already noted yesterday, cleanup is now all
+> > > __always_inline, and as such *should* all end up in the one function.
+> > >
+> > > But yes, if we can get a magical mash-up of __cleanup and __release (let
+> > > it be knows as __release_on_cleanup ?) that might also work I suppose.
+> > > But I vastly prefer __always_inline actually 'working' ;-)
+> > 
+> > The truth is that __always_inline working in this way is currently
+> > infeasible. Clang and LLVM's architecture simply disallow this today:
+> > the semantic analysis that -Wthread-safety does happens over the AST,
+> > whereas always_inline is processed by early passes in the middle-end
+> > already within LLVM's pipeline, well after semantic analysis. There's
+> > a complexity budget limit for semantic analysis (type checking,
+> > warnings, assorted other errors), and path-sensitive &
+> > intra-procedural analysis over the plain AST is outside that budget.
+> > Which is why tools like clang-analyzer exist (symbolic execution),
+> > where it's possible to afford that complexity since that's not
+> > something that runs for a normal compile.
+> > 
+> > I think I've pushed the current version of Clang's -Wthread-safety
+> > already far beyond what folks were thinking is possible (a variant of
+> > alias analysis), but even my healthy disregard for the impossible
+> > tells me that making path-sensitive intra-procedural analysis even if
+> > just for __always_inline functions is quite possibly a fool's errand.
+> 
+> Well, I had to propose it. Gotta push the envelope :-)
+> 
+> > So either we get it to work with what we have, or give up.
+> 
+> So I think as is, we can start. But I really do want the cleanup thing
+> sorted, even if just with that __release_on_cleanup mashup or so.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Working on rebasing this to v6.19-rc1 and saw this new scoped seqlock
+abstraction. For that one I was able to make it work like I thought we
+could (below). Some awkwardness is required to make it work in
+for-loops, which only let you define variables with the same type.
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-index 1c5c262af48d..f54f90588d86 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-@@ -2,6 +2,7 @@
- /* Copyright (C) 2020 Marvell. */
+For <linux/cleanup.h> it needs some more thought due to extra levels of
+indirection.
+
+------ >8 ------
+
+diff --git a/include/linux/seqlock.h b/include/linux/seqlock.h
+index b5563dc83aba..5162962b4b26 100644
+--- a/include/linux/seqlock.h
++++ b/include/linux/seqlock.h
+@@ -1249,6 +1249,7 @@ struct ss_tmp {
+ };
  
- #include <linux/firmware.h>
-+#include <linux/sysfs.h>
- #include "otx2_cpt_hw_types.h"
- #include "otx2_cpt_common.h"
- #include "otx2_cpt_devlink.h"
-@@ -507,7 +508,7 @@ static ssize_t sso_pf_func_ovrd_show(struct device *dev,
+ static __always_inline void __scoped_seqlock_cleanup(struct ss_tmp *sst)
++	__no_context_analysis
  {
- 	struct otx2_cptpf_dev *cptpf = dev_get_drvdata(dev);
+ 	if (sst->lock)
+ 		spin_unlock(sst->lock);
+@@ -1278,6 +1279,7 @@ extern void __scoped_seqlock_bug(void);
  
--	return sprintf(buf, "%d\n", cptpf->sso_pf_func_ovrd);
-+	return sysfs_emit(buf, "%d\n", cptpf->sso_pf_func_ovrd);
+ static __always_inline void
+ __scoped_seqlock_next(struct ss_tmp *sst, seqlock_t *lock, enum ss_state target)
++	__no_context_analysis
+ {
+ 	switch (sst->state) {
+ 	case ss_done:
+@@ -1320,9 +1322,18 @@ __scoped_seqlock_next(struct ss_tmp *sst, seqlock_t *lock, enum ss_state target)
+ 	}
  }
  
- static ssize_t sso_pf_func_ovrd_store(struct device *dev,
-@@ -533,7 +534,7 @@ static ssize_t kvf_limits_show(struct device *dev,
- {
- 	struct otx2_cptpf_dev *cptpf = dev_get_drvdata(dev);
++/*
++ * Context analysis helper to release seqlock at the end of the for-scope; the
++ * alias analysis of the compiler will recognize that the pointer @s is is an
++ * alias to @_seqlock passed to read_seqbegin(_seqlock) below.
++ */
++static __always_inline void __scoped_seqlock_cleanup_ctx(struct ss_tmp **s)
++	__releases_shared(*((seqlock_t **)s)) __no_context_analysis {}
++
+ #define __scoped_seqlock_read(_seqlock, _target, _s)			\
+ 	for (struct ss_tmp _s __cleanup(__scoped_seqlock_cleanup) =	\
+-	     { .state = ss_lockless, .data = read_seqbegin(_seqlock) };	\
++	     { .state = ss_lockless, .data = read_seqbegin(_seqlock) }, \
++	     *__UNIQUE_ID(ctx) __cleanup(__scoped_seqlock_cleanup_ctx) = (struct ss_tmp *)_seqlock; \
+ 	     _s.state != ss_done;					\
+ 	     __scoped_seqlock_next(&_s, _seqlock, _target))
  
--	return sprintf(buf, "%d\n", cptpf->kvf_limits);
-+	return sysfs_emit(buf, "%d\n", cptpf->kvf_limits);
+diff --git a/lib/test_context-analysis.c b/lib/test_context-analysis.c
+index 4612025a1065..3f72b1ab2300 100644
+--- a/lib/test_context-analysis.c
++++ b/lib/test_context-analysis.c
+@@ -261,6 +261,13 @@ static void __used test_seqlock_writer(struct test_seqlock_data *d)
+ 	write_sequnlock_irqrestore(&d->sl, flags);
  }
  
- static ssize_t kvf_limits_store(struct device *dev,
--- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
-
++static void __used test_seqlock_scoped(struct test_seqlock_data *d)
++{
++	scoped_seqlock_read (&d->sl, ss_lockless) {
++		(void)d->counter;
++	}
++}
++
+ struct test_rwsem_data {
+ 	struct rw_semaphore sem;
+ 	int counter __guarded_by(&sem);
