@@ -1,52 +1,52 @@
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81DB32E696;
-	Mon, 15 Dec 2025 23:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B624A32B9AA;
+	Mon, 15 Dec 2025 23:42:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765842151; cv=none; b=gjc5mYTEjQbpl0VkOSQHAgYyNWpoXvZQkVL5trfWd0K7zAyjjmx0z9CrZmyq4CvSOa5Jojaje/17Aqbj6IpcO0qZ1TtP/np348hZXNydywZkv/MFKdEQNGkSYi44PjHyFVYSvm3v4/JqI73SAZ1AYUo7BKWeLcwtEMgG32aKSXY=
+	t=1765842162; cv=none; b=QWOP42X0ysfCsLaoMedyf1RpowfcBWlbdAuCA68vGVYDsvbMTdTIg+r/aNuQE2gZ/9EhdXMJoqNTSnZd1Jj9ed3amtCndHK4oB5SnJq2oku3JbXRK+VScbsDy3epCu5UWg40y3DqDEF4+GfDDviN77TAL48/kNn7bxdeEMuUBBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765842151; c=relaxed/simple;
-	bh=98gryRFauHD7qweNk4xNF7tvgz/RfU2w0X85bhaby78=;
+	s=arc-20240116; t=1765842162; c=relaxed/simple;
+	bh=7LJJEHJ6NN+UBKQrcFX7zAoU4q1/IHE4dAarA1PzQCY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pac+K3ihQXPDtxLqVzoF9og9rmoXtmfL4a3p9rGQxv+VlWce4KZz8N+7CCO8J/G2033+hzlUBDgSQaMOLSX6nUvDuP4mozmf7xAJ9dVfxxn/E18CDHmjJ9IWkkOaQrbc7V/0P/AwMFDxA4eqebsb38ulB4i53AY8Rv1XrgN8QdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=U3XOGdBk; arc=none smtp.client-ip=205.220.165.32
+	 MIME-Version; b=khqMnwC8E24Eklm4PBYRk4EylQ3rxvDeahuzJXqB3Scev6q3b7TJOGHawwX0EEM1pQD0ttupHBDJokDN33s51UpAMvE2jHQLqa7M1zN/r6SZNpkA4THPCLYZ5fnecBKyObSBKgp+CqEYGCTY53Gp3B5CVK+wZ5tE89QqUGlow5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=SqjoxRdO; arc=none smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="U3XOGdBk"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BFJC9kk2885755;
-	Mon, 15 Dec 2025 23:41:49 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="SqjoxRdO"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BFJC47e2788343;
+	Mon, 15 Dec 2025 23:41:41 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=M8+fJ
-	RN/y992LnvFxhjE4a/BegdJK//9MUX29+x3gZg=; b=U3XOGdBkhKjhwGAJqfZSa
-	LshEd+Ed9tPgpcPIQLuVP6V6yx2R+IGJOm9zZplx/DZXhZ1G8eaCuxGkOf3gWmT5
-	rCfJ+5OqnCeNTtV32lgGCgIDUOQVCtI5H2DO9tOQVkj0GEa2tGt5yPO85FManbK1
-	wVP7xDH7Pp9TnCSnZ1QhcbGjUrbpotQ0kaxpuWHDATCVeIxmxxTWtU9Z1AGwTnkr
-	DVSi81DqevHAk1ST5x8oKM1Q0EMA+kTNIwguOcjdb7Yg6ggp/8K5nK6l1R0+OuD0
-	udIw+vgC3TBHvErtUlYw5h38+j8l7MbcRECO7XqTrIHPtnHBUKaWPPjgx5UjfJLa
-	A==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4b1015u194-1
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=lxPoz
+	mTfEztdP2kf7k8psJZLAewCgMEY9vm17wI4UoQ=; b=SqjoxRdO0kJCsc8V0wSlQ
+	7l8/oaqjlmEt9WRKTrN6gKg/EReN471QO1/qTSNvE08KYcTYuLKzx//ajATne6kr
+	zd9NWR2WowxAUG0KxM1vFaVpA+f3ZLeqIhU68cPvKcYZxCzGu4i/FfcROeQqnl19
+	OKvUcTF4cxJum66P8v97kGNeJaF/w2plFl9ZMn+eRsX6P/CbyEaguNSdGXFrkTdd
+	1IxyOSbF7Ym7W0JZSD3mUBQlEvT6+apK1/OcZ7NYGGaPBLjQzSpJbSklmKgn9PjE
+	Sa6mVNJPTkijjPOx1dkqQvEhcNt6J4OHSw9wpsHOl9J2uwTDhXICxjvtl1uqQr3Z
+	w==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4b10prk14h-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 15 Dec 2025 23:41:49 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5BFMVrxD025010;
-	Mon, 15 Dec 2025 23:41:48 GMT
+	Mon, 15 Dec 2025 23:41:40 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5BFL609e024479;
+	Mon, 15 Dec 2025 23:41:40 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4b0xk9j8jc-1
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4b0xk9t90g-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 15 Dec 2025 23:41:48 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5BFNflPP007113;
-	Mon, 15 Dec 2025 23:41:47 GMT
+	Mon, 15 Dec 2025 23:41:40 +0000
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5BFNfdlF030553;
+	Mon, 15 Dec 2025 23:41:39 GMT
 Received: from bur-virt-x6-2-100.us.oracle.com (bur-virt-x6-2-100.us.oracle.com [10.153.92.40])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4b0xk9j8h9-1
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4b0xk9t8y9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 15 Dec 2025 23:41:47 +0000
+	Mon, 15 Dec 2025 23:41:39 +0000
 From: Ross Philipson <ross.philipson@oracle.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org,
         linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -62,9 +62,9 @@ Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
         dwmw2@infradead.org, baolu.lu@linux.intel.com,
         kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
         trenchboot-devel@googlegroups.com
-Subject: [PATCH v15 28/28] x86/efi: EFI stub DRTM launch support for Secure Launch
-Date: Mon, 15 Dec 2025 15:33:16 -0800
-Message-ID: <20251215233316.1076248-29-ross.philipson@oracle.com>
+Subject: [PATCH v15 26/28] x86/reboot: Secure Launch SEXIT support on reboot paths
+Date: Mon, 15 Dec 2025 15:33:14 -0800
+Message-ID: <20251215233316.1076248-27-ross.philipson@oracle.com>
 X-Mailer: git-send-email 2.43.7
 In-Reply-To: <20251215233316.1076248-1-ross.philipson@oracle.com>
 References: <20251215233316.1076248-1-ross.philipson@oracle.com>
@@ -78,180 +78,93 @@ Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-15_05,2025-12-15_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 spamscore=0
- bulkscore=0 suspectscore=0 phishscore=0 mlxlogscore=999 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 bulkscore=0
+ suspectscore=0 phishscore=0 adultscore=0 mlxlogscore=999 mlxscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
  definitions=main-2512150204
-X-Proofpoint-GUID: S3-F52aIXQmqNN7zR9luY9IdQwtz0QiE
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE1MDIwNCBTYWx0ZWRfXz8ftYOC1ESpC
- MzJtfhcvryBZAM8pTJ9EzPY2rEgrzfTuppOJQhr2zFC+NuJhFckYSItKfnUzVqnwIqLnPU3A89z
- ZImt8Tx8hl6Zjdr63UsdjwRmAE9RhFhZcdHgp2+cs3wXJa/11YbTOumsZFlMYRIlLJ8mJNWOY79
- Xt3NLxk1ICc583DMkZa1zUaFbBjXN9rfsltpBzYZ1tbQK+ewkR03vYqGLAiWutxcvnd0FoV6tHb
- FiA0t43nQL5ilX+VTcPxuunyp/XmAMdZKYrpRUm18tlv8pZkHaJznbRro43TwkUUS8jkOGsuHnt
- v+kDLhL6LHD9SvSqL/b/x2HWkz3TtWGqfPdZ+MBEIugGkSGaXFBiIM6mxpbAMD0yYat8f5N1aQV
- lqvFqsFlZ6Nweo4M36BlJFlMVezXzw==
-X-Authority-Analysis: v=2.4 cv=GbUaXAXL c=1 sm=1 tr=0 ts=69409cbd b=1 cx=c_pps
- a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
- a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8 a=VwQbUJbxAAAA:8
- a=mErUaaQqPOyLTE2wGXUA:9
-X-Proofpoint-ORIG-GUID: S3-F52aIXQmqNN7zR9luY9IdQwtz0QiE
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE1MDIwNCBTYWx0ZWRfX6bmXC1p55Kh/
+ CfYpKdRrnPuQz1CeFkvkdovvoF/mXdPtBhm2bnaEmSNuxuapBqPcKcRlEsZA81/dlgbsznIFnCg
+ dFkbbP7/1QYpk6gsqCm5RN1iu2jodq00N24spA206yXEKAkv+OOG+lnEsoAuUC71uLoTLC6HVHl
+ GjpfYoa9o4MYdGPSiiwNyrPdHDfmaW57aBRWjQPMZGnbxLYAEG3wdkVIVyOKNor2dF80yoHlGXe
+ kaYdFkVibhQuvsjVcTpY6QdlpCn7cBJCJM5tvWYa+NzeB73k54p1peyzsrexjhFbgb+wpDNK/Fg
+ vF6KHAiAGK0r9L77H5tIsy6/89qCX12sWm+kO09C4JzkmM4Eno2Ye9mSNm0RfPSOnuytzmLC6L4
+ U3SUHDOEIMpBF22ZGn4MweUHY1rEcA==
+X-Proofpoint-GUID: VhoepOIlXnL9UnCBcbwy61aTfxl7VuwO
+X-Proofpoint-ORIG-GUID: VhoepOIlXnL9UnCBcbwy61aTfxl7VuwO
+X-Authority-Analysis: v=2.4 cv=dParWeZb c=1 sm=1 tr=0 ts=69409cb5 cx=c_pps
+ a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8 a=UN5060LkAAAA:8
+ a=9nggSWBoCkqLOezBdQMA:9 a=E6eXv-vVeS7VqOnxGRGn:22
 
-This support allows the DRTM launch to be initiated after an EFI stub
-launch of the Linux kernel is done. This is accomplished by providing
-a handler to jump to when a Secure Launch is in progress. This has to be
-called after the EFI stub does Exit Boot Services.
+If the MLE kernel is being powered off, rebooted or halted,
+then SEXIT must be called. Note that the GETSEC[SEXIT] leaf
+can only be called after a machine_shutdown() has been done on
+these paths. The machine_shutdown() is not called on a few paths
+like when poweroff action does not have a poweroff callback (into
+ACPI code) or when an emergency reset is done. In these cases,
+just the TXT registers are finalized but SEXIT is skipped.
 
 Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
 ---
- drivers/firmware/efi/libstub/efistub.h  |   8 ++
- drivers/firmware/efi/libstub/x86-stub.c | 100 ++++++++++++++++++++++++
- 2 files changed, 108 insertions(+)
+ arch/x86/kernel/reboot.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/drivers/firmware/efi/libstub/efistub.h b/drivers/firmware/efi/libstub/efistub.h
-index f5ba032863a9..6e4cbf02500b 100644
---- a/drivers/firmware/efi/libstub/efistub.h
-+++ b/drivers/firmware/efi/libstub/efistub.h
-@@ -135,6 +135,14 @@ void efi_set_u64_split(u64 data, u32 *lo, u32 *hi)
- 	*hi = upper_32_bits(data);
- }
- 
-+static inline
-+void efi_set_u64_form(u32 lo, u32 hi, u64 *data)
-+{
-+	u64 upper = hi;
-+
-+	*data = lo | upper << 32;
-+}
-+
- /*
-  * Allocation types for calls to boottime->allocate_pages.
-  */
-diff --git a/drivers/firmware/efi/libstub/x86-stub.c b/drivers/firmware/efi/libstub/x86-stub.c
-index 761121a77f9e..e664dfddc173 100644
---- a/drivers/firmware/efi/libstub/x86-stub.c
-+++ b/drivers/firmware/efi/libstub/x86-stub.c
-@@ -9,6 +9,8 @@
- #include <linux/efi.h>
- #include <linux/pci.h>
- #include <linux/stddef.h>
-+#include <linux/slr_table.h>
+diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
+index 964f6b0a3d68..b1e6c1972f0b 100644
+--- a/arch/x86/kernel/reboot.c
++++ b/arch/x86/kernel/reboot.c
+@@ -13,6 +13,7 @@
+ #include <linux/objtool.h>
+ #include <linux/pgtable.h>
+ #include <linux/kexec.h>
 +#include <linux/slaunch.h>
+ #include <acpi/reboot.h>
+ #include <asm/io.h>
+ #include <asm/apic.h>
+@@ -778,6 +779,12 @@ static void native_machine_restart(char *__unused)
  
- #include <asm/efi.h>
- #include <asm/e820/types.h>
-@@ -795,6 +797,101 @@ static efi_status_t efi_decompress_kernel(unsigned long *kernel_entry,
- 						  kernel_inittext_size);
+ 	if (!reboot_force)
+ 		machine_shutdown();
++	/*
++	 * The comments for slaunch_finalize() provides the explanation for the
++	 * conditions required to do the SEXIT op reflected in the conditional
++	 * parameter do_sexit.
++	 */
++	slaunch_finalize(!reboot_force);
+ 	__machine_emergency_restart(0);
  }
  
-+#if (IS_ENABLED(CONFIG_SECURE_LAUNCH))
-+
-+static bool efi_secure_launch_update_boot_params(struct slr_table *slrt,
-+						 struct boot_params *boot_params)
-+{
-+	struct slr_entry_intel_info *txt_info;
-+	struct slr_entry_policy *policy;
-+	bool updated = false;
-+	int i;
-+
-+	txt_info = slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_INTEL_INFO);
-+	if (!txt_info)
-+		return false;
-+
-+	txt_info->boot_params_addr = (u64)boot_params;
-+
-+	policy = slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_ENTRY_POLICY);
-+	if (!policy)
-+		return false;
-+
-+	for (i = 0; i < policy->nr_entries; i++) {
-+		if (policy->policy_entries[i].entity_type == SLR_ET_BOOT_PARAMS) {
-+			policy->policy_entries[i].entity = (u64)boot_params;
-+			updated = true;
-+			break;
-+		}
-+	}
-+
-+	/*
-+	 * If this is a PE entry into EFI stub the mocked up boot params will
-+	 * be missing some of the setup header data needed for the second stage
-+	 * of the Secure Launch boot.
-+	 */
-+	if (image) {
-+		struct setup_header *hdr = (struct setup_header *)((u8 *)image->image_base +
-+					    offsetof(struct boot_params, hdr));
-+		u64 cmdline_ptr;
-+
-+		boot_params->hdr.setup_sects = hdr->setup_sects;
-+		boot_params->hdr.syssize = hdr->syssize;
-+		boot_params->hdr.version = hdr->version;
-+		boot_params->hdr.loadflags = hdr->loadflags;
-+		boot_params->hdr.kernel_alignment = hdr->kernel_alignment;
-+		boot_params->hdr.min_alignment = hdr->min_alignment;
-+		boot_params->hdr.xloadflags = hdr->xloadflags;
-+		boot_params->hdr.init_size = hdr->init_size;
-+		boot_params->hdr.kernel_info_offset = hdr->kernel_info_offset;
-+		efi_set_u64_form(boot_params->hdr.cmd_line_ptr, boot_params->ext_cmd_line_ptr,
-+				 &cmdline_ptr);
-+		boot_params->hdr.cmdline_size = strlen((const char *)cmdline_ptr);
-+	}
-+
-+	return updated;
-+}
-+
-+static void efi_secure_launch(struct boot_params *boot_params)
-+{
-+	struct slr_entry_dl_info *dlinfo;
-+	efi_guid_t guid = SLR_TABLE_GUID;
-+	dl_handler_func handler_callback;
-+	struct slr_table *slrt;
-+
-+	/*
-+	 * The presence of this table indicated a Secure Launch
-+	 * is being requested.
-+	 */
-+	slrt = (struct slr_table *)get_efi_config_table(guid);
-+	if (!slrt || slrt->magic != SLR_TABLE_MAGIC)
-+		return;
-+
-+	/*
-+	 * Since the EFI stub library creates its own boot_params on entry, the
-+	 * SLRT and TXT heap have to be updated with this version.
-+	 */
-+	if (!efi_secure_launch_update_boot_params(slrt, boot_params))
-+		return;
-+
-+	/* Jump through DL stub to initiate Secure Launch */
-+	dlinfo = slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_DL_INFO);
-+
-+	handler_callback = (dl_handler_func)dlinfo->dl_handler;
-+
-+	handler_callback(&dlinfo->bl_context);
-+
-+	unreachable();
-+}
-+
-+#else
-+
-+static void efi_secure_launch(struct boot_params *boot_params)
-+{
-+}
-+
-+#endif /* IS_ENABLED(CONFIG_SECURE_LAUNCH) */
-+
- static void __noreturn enter_kernel(unsigned long kernel_addr,
- 				    struct boot_params *boot_params)
- {
-@@ -929,6 +1026,9 @@ void __noreturn efi_stub_entry(efi_handle_t handle,
- 		goto fail;
- 	}
+@@ -788,6 +795,8 @@ static void native_machine_halt(void)
  
-+	/* If a Secure Launch is in progress, this never returns */
-+	efi_secure_launch(boot_params);
+ 	tboot_shutdown(TB_SHUTDOWN_HALT);
+ 
++	slaunch_finalize(1);
 +
- 	/*
- 	 * Call the SEV init code while still running with the firmware's
- 	 * GDT/IDT, so #VC exceptions will be handled by EFI.
+ 	stop_this_cpu(NULL);
+ }
+ 
+@@ -796,8 +805,12 @@ static void native_machine_power_off(void)
+ 	if (kernel_can_power_off()) {
+ 		if (!reboot_force)
+ 			machine_shutdown();
++		slaunch_finalize(!reboot_force);
+ 		do_kernel_power_off();
++	} else {
++		slaunch_finalize(0);
+ 	}
++
+ 	/* A fallback in case there is no PM info available */
+ 	tboot_shutdown(TB_SHUTDOWN_HALT);
+ }
+@@ -825,6 +838,7 @@ void machine_shutdown(void)
+ 
+ void machine_emergency_restart(void)
+ {
++	slaunch_finalize(0);
+ 	__machine_emergency_restart(1);
+ }
+ 
 -- 
 2.43.7
 
