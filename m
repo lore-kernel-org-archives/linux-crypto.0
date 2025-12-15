@@ -1,144 +1,286 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail186-20.suw21.mandrillapp.com (mail186-20.suw21.mandrillapp.com [198.2.186.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A88C33D6DB
-	for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 14:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3414430BB88
+	for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 14:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.2.186.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765808268; cv=none; b=GPIAeQP/5JwN/BgyFlBk8mneklxvXxmmvbm/fHi7j+NJ/1oiIBW3VyqR+egWs24OiLItdw4u31WFs3pBkoKl/YhavVcO0ozWHcXOBhM+AHnoWDSqG3bEj2KqeeezvZlYULJEbbBjxk7aTvSjuXZ1y7Pb0TxdnwuUGxHfpAP5y/I=
+	t=1765808835; cv=none; b=fSbUNIg8cYUYPzjNRk662yEOdJb5N8uTfXVXBV8S8FkKtStcLTOBzK+WW3prlSsT/2XoTqbWDsGxZK8mewZpdPLgK9nFu34udDZxPURGAwe2zBsXs62Uve+6/mYEXFZjUe5dsboBH4tpjWhoPwIlJ1sdbVeL2ZrEePzGbWCZvYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765808268; c=relaxed/simple;
-	bh=1uJJpA9Ql9BbSXGSv2HLkK7u07CA6mF+itptx+5e3Xs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sIIPnIcB2a9zqpqoVr6S6Zt8+7uwpmkqI8NQ2aKWOBOttMVOZIvBIeeQpTWAthYQB4WLrrOvm90gANtdTWMdRJcvnBegREOJBa8ufilUEEFgEUohpL9Y6PCI0rG9ISBa8wu6VPUmZqPOHejsejGEvdPYuFtLb19LR3A5Q5Ub8rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=Ugxs9h9H; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1765808835; c=relaxed/simple;
+	bh=Xsq5EDj6JfdjBo56zuK3UD6TH0S3xwNLkauF1xvaPg8=;
+	h=From:Subject:To:Cc:Message-Id:Date:MIME-Version:Content-Type; b=V4Svtst84pW/9SCZrRvcJCqMD3NTaU8NuAMwu6WIPTmFDGdb8Eqh7qA8dYUSz08xc0E0uhzms9J5f0FS9srf0W2xqO3pp8WmGaSR44g32UJaMAe55JoAJi/JgkiZTjZWwy/wYqPZ13UyqDo770/LNo1aOO101afSEIhP2vMe5Ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=PryMCp9m; dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b=dfhJb4mR; arc=none smtp.client-ip=198.2.186.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="Ugxs9h9H"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b75c7cb722aso688929566b.1
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 06:17:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765808262; x=1766413062; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QIUQR9A1vYIw9QlcE/Qa0VTdIdcn5aCO46D96t68m0E=;
-        b=Ugxs9h9Hu14Zr8d6axdt8o7D8NR++TA/EqsmVSN1W5KjJ4/8lcRl5QHu/R+TShngmF
-         5+mOpQmpRwD1dCLCiyR+ext32DdGM9ix7WVY++3fYMNNL4EJdMuqE8kfUEeRChv30SGg
-         DwjWJgTJqik3RlGq0D4wWw2ur7flrQh0RrLyZlSRnbJpqYbX4GZU2dvl1cv6r2Bf0BXT
-         xIkkxrzXCNRMM6/FuR5AFJbxe99kYxYTiPuvkFkePsfH28g5H5OGnM9yLkASWFz26IlY
-         X/uIYiPfY3FYbZYGvYu09GyAO5kwGh8oRB6jmb7rUYK9QQLvqi3RsXwtsWPWBR20ugxW
-         RGEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765808262; x=1766413062;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QIUQR9A1vYIw9QlcE/Qa0VTdIdcn5aCO46D96t68m0E=;
-        b=sepH5bUcVWNqrdOnAPrYsZK7Nq6k0SBFZHwP02hKmZe3CTzQUknTUqhjVjCNiLMFGZ
-         d7sm+cWFLAhpJW+SVgjl4rUKBTnN/sp+y/OYaYST/YxoJa1VkA8YJ4HRDDtjQi+BF1M2
-         UyPt1CYkwjAV8SZXzgwcBicsISyhLLt7VgkTuGsh3LucqC2tg8y18fMbr+nO10JmDwzd
-         H2wFBzEnmTyFffzetsRr8rdqu4/SIaJiajNTwEzi6jjARwcYpY9IRcbNy70UNykTPyGi
-         IudHCzxTyf4HTIVD7V4/UZMA289t2FE/qnOd5Pl9AHfR3WdkTVBpX4U4cTG+ss+gjb50
-         YpKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXAW6Boyk+WnJ43E1kgDRRoBJ7cI+wPwTq4pJntKCFbEzuFpGSkoSTJcG+D6//vvltaMieYNvpXysfIU6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiEHOuuxM6xQFyT7Y2H++GbyS8V2xzDSUlow9EgTGlqknX4mf2
-	znj3A3EqGY+2rWDI51dsTKEYFyCjRe63iB7tbikEi6hxf/HjOTuI4IqGkKoRhidHE4c=
-X-Gm-Gg: AY/fxX4D2QkEpGMERbGEeTuRuMCmtJ4XkjvqdZ7PEoAijdD4BRT4+f73cN2//wg/5Y7
-	LxQBfeNECFBJ+G2tJ5KG+wHTEtN6Smcn8+xJrCuirnHLN67bb9jBMyAnDeX+mBO7yb8SC0VlguK
-	Bebe8vbt+ypFXPoyMAl4yEV59SgnoM9iPsNsUhn/webeVEqCX9AzYv3uQC9PExJAejAXsH8p7Ga
-	I1F6nbou6akga4xgxAri+UVC4vaVFp0IzyrwyjqcdOC1IqlUvLDdfqGzi41JLptm1dEB2gfo9xq
-	NWQh5viKNXEABrvx3a2qF2d18HHz2lVGBnRJruZLtV8OAeP90T4CM4H6sUi2fOjiAEZTeIIMcif
-	b7l42SnDuc82xXp1rkbhfnfhmk3FCjM5CZ/bjfksTDQhz3ZXMFEGKDL1MUp9CM9bPFmr7RLQ+/0
-	totANdmdpwg6gHZkLhhq9R8DvY87dPPJpRu6yOlVKK4jOVfs3pW6ox3HbiFw==
-X-Google-Smtp-Source: AGHT+IGgNV09AuYgsqnGmm65Wezv684KCpS+08Dd8VMBIrTAAoyAJyvM9gNMVpz7WAarxXBPjKme+g==
-X-Received: by 2002:a17:907:1c0b:b0:b7a:1be1:984 with SMTP id a640c23a62f3a-b7d23a912c7mr1001442866b.64.1765808262516;
-        Mon, 15 Dec 2025 06:17:42 -0800 (PST)
-Received: from localhost (ip-046-005-122-062.um12.pools.vodafone-ip.de. [46.5.122.62])
-        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-6498204fbb3sm13523420a12.8.2025.12.15.06.17.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 06:17:42 -0800 (PST)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Jens Wiklander <jens.wiklander@linaro.org>,
-	Sumit Garg <sumit.garg@kernel.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: op-tee@lists.trustedfirmware.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>
-Subject: [PATCH v2 05/17] hwrng: optee - Make use of tee bus methods
-Date: Mon, 15 Dec 2025 15:16:35 +0100
-Message-ID:  <170dceec036ffe468a1f9f26fa08ac9e157ada29.1765791463.git.u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
-References: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
+	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="PryMCp9m";
+	dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b="dfhJb4mR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
+	s=mte1; t=1765807778; x=1766077778;
+	bh=Y0vmCttgVu2ttB7leVpGoBwWuJAwz/ma4WmOx09m+TY=;
+	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
+	b=PryMCp9mHpP/8AlSSJwoXHKkrTOfsZxV1QiwP2bZo+wIudDrK42Yu4e0MsKu01obZ
+	 +PLjT/z+2rsPqdtTCzU2V0VgV9seINMKUutmnyZk4bxfE8XfD7yQ/izQvKMtJJuD5R
+	 xpY/tADK8+XpqMZyOecYt1wlB/16D5kotVamdSekzb83n27smhJAZXV9Dqy6RBSGsA
+	 jPodOr2pLDde6iLkeHgEQ6+bnZHwBIbhbg2/KYN4xZgeNwPY/PaYQhxUZ1kisOmXhk
+	 w3MCNeNOxA1UTt92PoN5cUvMWbDTXQwr1NUcbBzVlH/dd9uwgaI0rQCvjxq5Lgmkh3
+	 0Kgu8LyqFdYgw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
+	t=1765807778; x=1766068278; i=thomas.courrege@vates.tech;
+	bh=Y0vmCttgVu2ttB7leVpGoBwWuJAwz/ma4WmOx09m+TY=;
+	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
+	b=dfhJb4mRNKd1gKrxPsy1X9z+oLryktSS64AvtM57CgKJLHi/VR7lpPUEvk6Lsu5pn
+	 TnQHCJREBvhff2GHVAm1s5pctl4FhzqisxCEjZKcR2FtoRqsAfaA5eL1/xF1wTETve
+	 32ukPlwo4HvivYuXcGI/GRMeTItElnP/Eg4QCSmcpicyHqZ91sZcYNFjoEGanSqu2M
+	 hzmUCiyKFLJeWq7OEqa66EEDeQ3g+y2TOuvS/Zbfegf1K9UjZZxNgep5jwL5EQSM3Q
+	 Adpmh6KwN/tA0YD/2uqgmcIhIEi0OhdmTs3p1vvNY5ouV5mb1OhYWOHOzd3JXOOui3
+	 G4T7aVHyy6ZnA==
+Received: from pmta10.mandrill.prod.suw01.rsglab.com (localhost [127.0.0.1])
+	by mail186-20.suw21.mandrillapp.com (Mailchimp) with ESMTP id 4dVMPt0N86zFCWqfd
+	for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 14:09:38 +0000 (GMT)
+From: "Thomas Courrege" <thomas.courrege@vates.tech>
+Subject: =?utf-8?Q?[PATCH=20v3]=20KVM:=20SEV:=20Add=20KVM=5FSEV=5FSNP=5FHV=5FREPORT=5FREQ=20command?=
+Received: from [37.26.189.201] by mandrillapp.com id 07511c038109413485978fe042592cd0; Mon, 15 Dec 2025 14:09:37 +0000
+X-Mailer: git-send-email 2.52.0
+X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
+X-Bm-Transport-Timestamp: 1765807777356
+To: ashish.kalra@amd.com, corbet@lwn.net, herbert@gondor.apana.org.au, john.allen@amd.com, nikunj@amd.com, pbonzini@redhat.com, seanjc@google.com, thomas.lendacky@amd.com
+Cc: thomas.courrege@vates.tech, kvm@vger.kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
+Message-Id: <20251215140926.2820110-1-thomas.courrege@vates.tech>
+X-Native-Encoded: 1
+X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.07511c038109413485978fe042592cd0?=
+X-Mandrill-User: md_30504962
+Feedback-ID: 30504962:30504962.20251215:md
+Date: Mon, 15 Dec 2025 14:09:37 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1885; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=1uJJpA9Ql9BbSXGSv2HLkK7u07CA6mF+itptx+5e3Xs=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBpQBhXu4/bwtxASM5yQ5sR2LOaNmcTkAhZ5XaYd riWdpm51lGJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaUAYVwAKCRCPgPtYfRL+ TiHYB/0Rn5IqZ2NZ5jNZ7qhs3+bCUIODZ5brLERcCe++79d/CFyEMLoIbkC7IrHhW/w6rf8d5ec P3QZ4XFV36zh0ByWKjm37dnphaan9VGVrf3AOnvcgTNpNtFsFzh70z9s8VN9xvgRW5tbAllBM7f fd6pZoiQz7yXeDj/OkdNa8vtTlSqOpTihSEM6wu3U97yq1lWfdiYBrT8Gjj3IP4VXRlPbVJHG44 3sLs6/eDddZUsq1L/LxYImmr8SVdBeskUGgqQufZsne2BQzMWhpxd2mBDY1olq/Bx/0yevHUr7Z CvGicBaxS9KGPVUHWdtAeD3h/4gmlwcbWLWHtXpWAJX/J/l4
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-The tee bus got dedicated callbacks for probe and remove.
-Make use of these. This fixes a runtime warning about the driver needing
-to be converted to the bus methods.
+Add support for retrieving the SEV-SNP attestation report via the
+SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
+ioctl for SNP guests.
 
-Reviewed-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+Signed-off-by: Thomas Courrege <thomas.courrege@vates.tech>
 ---
- drivers/char/hw_random/optee-rng.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ .../virt/kvm/x86/amd-memory-encryption.rst    | 27 ++++++++
+ arch/x86/include/uapi/asm/kvm.h               |  9 +++
+ arch/x86/kvm/svm/sev.c                        | 61 +++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.c                  |  1 +
+ include/linux/psp-sev.h                       | 31 ++++++++++
+ 5 files changed, 129 insertions(+)
 
-diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
-index 6ee748c0cf57..5a3fa0b38497 100644
---- a/drivers/char/hw_random/optee-rng.c
-+++ b/drivers/char/hw_random/optee-rng.c
-@@ -211,9 +211,9 @@ static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
- 		return 0;
- }
+diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+index 1ddb6a86ce7f..083ed487764e 100644
+--- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+@@ -572,6 +572,33 @@ Returns: 0 on success, -negative on error
+ See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
+ details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
  
--static int optee_rng_probe(struct device *dev)
-+static int optee_rng_probe(struct tee_client_device *rng_device)
- {
--	struct tee_client_device *rng_device = to_tee_client_device(dev);
-+	struct device *dev = &rng_device->dev;
- 	int ret = 0, err = -ENODEV;
- 	struct tee_ioctl_open_session_arg sess_arg;
++21. KVM_SEV_SNP_HV_REPORT_REQ
++-----------------------------
++
++The KVM_SEV_SNP_HV_REPORT_REQ command requests the hypervisor-generated
++SNP attestation report. This report is produced by the PSP using the
++HV-SIGNED key selected by the caller.
++
++The ``key_sel`` field indicates which key the platform will use to sign the
++report:
++  * ``0``: If VLEK is installed, sign with VLEK. Otherwise, sign with VCEK.
++  * ``1``: Sign with VCEK.
++  * ``2``: Sign with VLEK.
++  * Other values are reserved.
++
++Parameters (in): struct kvm_sev_snp_hv_report_req
++
++Returns:  0 on success, -negative on error
++
++::
++        struct kvm_sev_snp_hv_report_req {
++                __u64 report_uaddr;
++                __u64 report_len;
++                __u8 key_sel;
++                __u8 pad0[7];
++                __u64 pad1[4];
++        };
++
+ Device attribute API
+ ====================
  
-@@ -261,12 +261,10 @@ static int optee_rng_probe(struct device *dev)
- 	return err;
- }
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 7ceff6583652..464146bed784 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -743,6 +743,7 @@ enum sev_cmd_id {
+ 	KVM_SEV_SNP_LAUNCH_START = 100,
+ 	KVM_SEV_SNP_LAUNCH_UPDATE,
+ 	KVM_SEV_SNP_LAUNCH_FINISH,
++	KVM_SEV_SNP_HV_REPORT_REQ,
  
--static int optee_rng_remove(struct device *dev)
-+static void optee_rng_remove(struct tee_client_device *tee_dev)
- {
- 	tee_client_close_session(pvt_data.ctx, pvt_data.session_id);
- 	tee_client_close_context(pvt_data.ctx);
--
--	return 0;
- }
- 
- static const struct tee_client_device_id optee_rng_id_table[] = {
-@@ -278,11 +276,11 @@ static const struct tee_client_device_id optee_rng_id_table[] = {
- MODULE_DEVICE_TABLE(tee, optee_rng_id_table);
- 
- static struct tee_client_driver optee_rng_driver = {
-+	.probe		= optee_rng_probe,
-+	.remove		= optee_rng_remove,
- 	.id_table	= optee_rng_id_table,
- 	.driver		= {
- 		.name		= DRIVER_NAME,
--		.probe		= optee_rng_probe,
--		.remove		= optee_rng_remove,
- 	},
+ 	KVM_SEV_NR_MAX,
+ };
+@@ -871,6 +872,14 @@ struct kvm_sev_receive_update_data {
+ 	__u32 pad2;
  };
  
++struct kvm_sev_snp_hv_report_req {
++	__u64 report_uaddr;
++	__u64 report_len;
++	__u8 key_sel;
++	__u8 pad0[7];
++	__u64 pad1[4];
++};
++
+ struct kvm_sev_snp_launch_start {
+ 	__u64 policy;
+ 	__u8 gosvw[16];
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index f59c65abe3cf..da8d0e13d4ac 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2261,6 +2261,64 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	return rc;
+ }
+ 
++static int sev_snp_hv_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	struct sev_data_snp_msg_report_rsp *report_rsp = NULL;
++	struct sev_data_snp_hv_report_req data;
++	struct kvm_sev_snp_hv_report_req params;
++	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
++	void __user *u_report;
++	void __user *u_params = u64_to_user_ptr(argp->data);
++	size_t rsp_size = sizeof(*report_rsp);
++	int ret;
++
++	if (!sev_snp_guest(kvm))
++		return -ENOTTY;
++	if (copy_from_user(&params, u_params, sizeof(params)))
++		return -EFAULT;
++	printk("params.report_len: %llu\n", params.report_len);
++
++	if (params.report_len < rsp_size)
++		return -ENOSPC;
++
++	u_report = u64_to_user_ptr(params.report_uaddr);
++	if (!u_report)
++		return -EINVAL;
++
++	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	if (!report_rsp)
++		return -ENOMEM;
++
++	data.len = sizeof(data);
++	data.key_sel = params.key_sel;
++	data.gctx_addr = __psp_pa(sev->snp_context);
++	data.hv_report_paddr = __psp_pa(report_rsp);
++
++	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
++				&argp->error);
++	if (ret)
++		goto e_free_rsp;
++
++	if (!report_rsp->status)
++	rsp_size += report_rsp->report_size;
++
++	if (params.report_len < rsp_size) {
++		rsp_size = sizeof(*report_rsp);
++		ret = -ENOSPC;
++	}
++
++	if (copy_to_user(u_report, report_rsp, rsp_size))
++		ret = -EFAULT;
++
++	params.report_len = sizeof(*report_rsp) + report_rsp->report_size;
++	if (copy_to_user(u_params, &params, sizeof(params)))
++		ret = -EFAULT;
++
++e_free_rsp:
++	snp_free_firmware_page(report_rsp);
++	return ret;
++}
++
+ struct sev_gmem_populate_args {
+ 	__u8 type;
+ 	int sev_fd;
+@@ -2672,6 +2730,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_SNP_LAUNCH_FINISH:
+ 		r = snp_launch_finish(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SNP_HV_REPORT_REQ:
++		r = sev_snp_hv_report_request(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		goto out;
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 956ea609d0cc..5dd7c3f0d50d 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -259,6 +259,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
+ 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
+ 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
++	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
+ 	default:				return sev_tio_cmd_buffer_len(cmd);
+ 	}
+ 
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 69ffa4b4d1fa..c651a400d124 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -124,6 +124,7 @@ enum sev_cmd {
+ 	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
+ 	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
+ 	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
++	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
+ 	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
+ 	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
+ 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
+@@ -594,6 +595,36 @@ struct sev_data_attestation_report {
+ 	u32 len;				/* In/Out */
+ } __packed;
+ 
++/**
++ * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
++ *
++ * @len: length of the command buffer in bytes
++ * @key_sel: Selects which key to use for generating the signature.
++ * @gctx_addr: System physical address of guest context page
++ * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
++ */
++struct sev_data_snp_hv_report_req {
++	u32 len;		/* In */
++	u32 key_sel	:2,	/* In */
++	    rsvd	:30;
++	u64 gctx_addr;		/* In */
++	u64 hv_report_paddr;	/* In */
++} __packed;
++
++/**
++ * struct sev_data_snp_msg_export_rsp
++ *
++ * @status: Status : 0h: Success. 16h: Invalid parameters.
++ * @report_size: Size in bytes of the attestation report
++ * @report: attestation report
++ */
++struct sev_data_snp_msg_report_rsp {
++	u32 status;			/* Out */
++	u32 report_size;		/* Out */
++	u8 rsvd[24];
++	u8 report[];
++} __packed;
++
+ /**
+  * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
+  *
 -- 
-2.47.3
-
+2.52.0
