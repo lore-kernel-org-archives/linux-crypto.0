@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF9F3126DF;
-	Mon, 15 Dec 2025 07:26:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43269313261;
+	Mon, 15 Dec 2025 07:27:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765783596; cv=none; b=WNKYmVsWhVvbHkLW/3zPJAy80m/2DV4sE2VLiqhVvSYQx0wfhcI/AH9I+Yg6WQRVCddeSWpzcgk8gyQhSolZ0ID7e3aItNEFuX4ORvZDba5nhZ2MlROUlwEjQJxbfnZlYUEBEO/RuUUA+y2SLvSfeRJpWycdp2CtjxiyTl2k5uQ=
+	t=1765783654; cv=none; b=s5dJKCKfHonb8JMiX/jYlxYcR2nGlXqkaCUZP5oSiaNBdYg1h2Mqe2HVV7FQaf9HpHBlhf6hcfl9jV88VyK1S5VosCc50yr32Nz9C2jbg2pyjXP3hbP7vgZjvbk0ceYbKmHxfo7Kk0jGgOk+vcx3jiLy/UR3wmAc4kx2K1FC4ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765783596; c=relaxed/simple;
-	bh=adTi4XQQUTGymDm5WX6G+3RmsZRhvswJ8uqLtFBbcD4=;
+	s=arc-20240116; t=1765783654; c=relaxed/simple;
+	bh=pn4RUOECBeVYRLP+Yv3nGf565EQFyqgDPcA79qQqQkg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n4b+0G/M+HJBR2BwFVgvKuSg8lOI0855pWfA+jkb2xgDfrH2jxsE3U5OmEXcUBeMytzUTGT85cF7VNrkxOXcAfFTl+d5mN4A6isjps4ZshdDAS6UdyE6DTmANWq7S0eSI74JCjPJTPFoWoMTezSoOcQ4Bn5T38X7zBRIUzN2yZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TpF2IC4S; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=YMDy98MNAyO7/8C4yRK2Dz7KrEn5eu2sy+Raqemy8b54wWyyg2xYWUFw3Sfpghl13rn6znT7o65AnE6cVYLU8Tnl9prMoB7lturYcEcgmECEYoSgrpH91umbCxc7b8Rh5P7eIqs0ZAhsAgPE3QbjCEaXA74jcrHJqOL32jeDUvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fhwv5XeK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TpF2IC4S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CC89C4CEF5;
-	Mon, 15 Dec 2025 07:26:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fhwv5XeK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A48AC4CEF5;
+	Mon, 15 Dec 2025 07:27:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765783596;
-	bh=adTi4XQQUTGymDm5WX6G+3RmsZRhvswJ8uqLtFBbcD4=;
+	s=k20201202; t=1765783653;
+	bh=pn4RUOECBeVYRLP+Yv3nGf565EQFyqgDPcA79qQqQkg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TpF2IC4S4wICHQTWovp22HK6/b8SoyK20DBohUd6xMEG/R3ZZchat3YL7ibYptPHp
-	 N/deQiqZLO3f6FuOqIPar8jUlKvFUkAewQLkm8Qx5Uu94CwMpMGmn563Dn73+NY3Pc
-	 hHRRb+mYKKpjkRwNZ/S03NJqrrN6HTxT8suVM6dJ6gKW7UyLdns1D59c9z3bRitQSK
-	 bbTTjkyh9Fbmqm9hjAgAmESVF/veiCU1lXRfC/x1DYlBDA44ti3+6+Q1e0qR53ap1A
-	 fu5TXJDLmtTIAbvspZeS45gI+G6Sv/8FHtohcAArqeHdYBzrhk3KOdVOwxig8kLEFc
-	 nC2K+64DZU3iQ==
-Date: Mon, 15 Dec 2025 16:26:30 +0900
+	b=fhwv5XeK3kHHrv6jleo/yJ23crb4Tyk3vjjiXde3HvfewyM/FyZEdRzQxsHFvKCIH
+	 +g/5Tnr+AaNYeRxsrj/XLiSv9pGs72kbsGl5OsHYzUG2npx21/IWuHvXriaY1DnmUW
+	 199NqQP80GYzlT4j5q5Gqxl84f8t/PwcS7JcXfJjuimIUA865J+a/u6n+Q/YWBl6+T
+	 jGCTU4oy9+9iZcqTQS/TpE0U2reQ6TK3qEEwcsJcBMc4YjNVecpwGXiF+GUDaVptVg
+	 +e9QRmUQ/+yq2Ag7wW0RzkUCDXZNxgjvw+wKe0AOSz38QiBCShZg+23MA9N3Fv4cgO
+	 XHDbaeVzo7n8w==
+Date: Mon, 15 Dec 2025 16:27:28 +0900
 From: Sumit Garg <sumit.garg@kernel.org>
 To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
 Cc: Jens Wiklander <jens.wiklander@linaro.org>,
@@ -34,11 +34,10 @@ Cc: Jens Wiklander <jens.wiklander@linaro.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	op-tee@lists.trustedfirmware.org, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 04/17] hwrng: optee - Make use of
- module_tee_client_driver()
-Message-ID: <aT-4Ju_vgEf2JGC4@sumit-X1>
+Subject: Re: [PATCH v1 05/17] hwrng: optee - Make use of tee bus methods
+Message-ID: <aT-4YLINRTXamLfI@sumit-X1>
 References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
- <a2560b5a16c01dc1f63437ce0d60b3ee9c7cb3b8.1765472125.git.u.kleine-koenig@baylibre.com>
+ <83301effbb923117122f5f076edbfdad1f947386.1765472125.git.u.kleine-koenig@baylibre.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,56 +47,69 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <a2560b5a16c01dc1f63437ce0d60b3ee9c7cb3b8.1765472125.git.u.kleine-koenig@baylibre.com>
+In-Reply-To: <83301effbb923117122f5f076edbfdad1f947386.1765472125.git.u.kleine-koenig@baylibre.com>
 
 nit for subject: s/hwrng: optee -/hwrng: optee:/
 
-On Thu, Dec 11, 2025 at 06:14:58PM +0100, Uwe Kleine-König wrote:
-> Reduce boilerplate by using the newly introduced module_tee_client_driver().
-> That takes care of assigning the driver's bus, so the explicit assigning
-> in this driver can be dropped.
+On Thu, Dec 11, 2025 at 06:14:59PM +0100, Uwe Kleine-König wrote:
+> The tee bus got dedicated callbacks for probe and remove.
+> Make use of these. This fixes a runtime warning about the driver needing
+> to be converted to the bus methods.
 > 
 > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
 > ---
->  drivers/char/hw_random/optee-rng.c | 14 +-------------
->  1 file changed, 1 insertion(+), 13 deletions(-)
->
+>  drivers/char/hw_random/optee-rng.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
 
 Reviewed-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
 
 -Sumit
 
+> 
 > diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
-> index 96b5d546d136..6ee748c0cf57 100644
+> index 6ee748c0cf57..5a3fa0b38497 100644
 > --- a/drivers/char/hw_random/optee-rng.c
 > +++ b/drivers/char/hw_random/optee-rng.c
-> @@ -281,24 +281,12 @@ static struct tee_client_driver optee_rng_driver = {
+> @@ -211,9 +211,9 @@ static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
+>  		return 0;
+>  }
+>  
+> -static int optee_rng_probe(struct device *dev)
+> +static int optee_rng_probe(struct tee_client_device *rng_device)
+>  {
+> -	struct tee_client_device *rng_device = to_tee_client_device(dev);
+> +	struct device *dev = &rng_device->dev;
+>  	int ret = 0, err = -ENODEV;
+>  	struct tee_ioctl_open_session_arg sess_arg;
+>  
+> @@ -261,12 +261,10 @@ static int optee_rng_probe(struct device *dev)
+>  	return err;
+>  }
+>  
+> -static int optee_rng_remove(struct device *dev)
+> +static void optee_rng_remove(struct tee_client_device *tee_dev)
+>  {
+>  	tee_client_close_session(pvt_data.ctx, pvt_data.session_id);
+>  	tee_client_close_context(pvt_data.ctx);
+> -
+> -	return 0;
+>  }
+>  
+>  static const struct tee_client_device_id optee_rng_id_table[] = {
+> @@ -278,11 +276,11 @@ static const struct tee_client_device_id optee_rng_id_table[] = {
+>  MODULE_DEVICE_TABLE(tee, optee_rng_id_table);
+>  
+>  static struct tee_client_driver optee_rng_driver = {
+> +	.probe		= optee_rng_probe,
+> +	.remove		= optee_rng_remove,
 >  	.id_table	= optee_rng_id_table,
 >  	.driver		= {
 >  		.name		= DRIVER_NAME,
-> -		.bus		= &tee_bus_type,
->  		.probe		= optee_rng_probe,
->  		.remove		= optee_rng_remove,
+> -		.probe		= optee_rng_probe,
+> -		.remove		= optee_rng_remove,
 >  	},
 >  };
 >  
-> -static int __init optee_rng_mod_init(void)
-> -{
-> -	return driver_register(&optee_rng_driver.driver);
-> -}
-> -
-> -static void __exit optee_rng_mod_exit(void)
-> -{
-> -	driver_unregister(&optee_rng_driver.driver);
-> -}
-> -
-> -module_init(optee_rng_mod_init);
-> -module_exit(optee_rng_mod_exit);
-> +module_tee_client_driver(optee_rng_driver);
->  
->  MODULE_LICENSE("GPL v2");
->  MODULE_AUTHOR("Sumit Garg <sumit.garg@linaro.org>");
 > -- 
 > 2.47.3
-> 
 > 
