@@ -1,250 +1,285 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail187-17.suw11.mandrillapp.com (mail187-17.suw11.mandrillapp.com [198.2.187.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103F9331A40
-	for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 13:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0550733A6FB
+	for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 14:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.2.187.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765805944; cv=none; b=VGrKfkZn5ONpTWm1YnF6vx0WfXsIDtWPSNO2lSaasro/bWXanNhaK5MlP5KfXv5bNg18BJtAKxW3msuaT1vvgMMU5JCNaUOVNZDeIhEFUiv1appjp/04uxic0W2yTwvFz4EysRrUorbJzQfzbFbRnK6UaAqUnxL5g4bRT2TMwnY=
+	t=1765808071; cv=none; b=gU95SGtxcRYM+V68p1TW/IY5V70wdOd9sFs7XqUv7bQ05b6oCk/Xm9DWQW+qJSIbjU3JFsJbCgfPMvrdUYuRO7VW7Tk7v6dzo8GxTvOe5bR1cAjDmAjMBvSkcgkJ5UOZxhj85NkW7LFXtzAbSClWU5FqJEh6zyc5CnfKptF8Eko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765805944; c=relaxed/simple;
-	bh=0RJ8hn5UA+jBMKgL2vexCP4P2w3UyioHPbHfmWoCqpY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZyItWbHFF7PR8K2xiIrJEIacA5rj4SJMnwdTsDJDMZMbF/PvHT22FD+hyAu3TnybOoAcl7wVaLGyZYIT7b/1a3tMVhp9f23etK25OfEixbhd/NeSfte6FPgTJ492vzxWK+ovxRnqcI/RvFM3rS4H2xvIVP93fs4yiQYA5X8/m2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EuTucd9g; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1765808071; c=relaxed/simple;
+	bh=r4pR/WZWgxpWH4YZ0HxKYJaXnqglOE1l6sGyaVhvDZQ=;
+	h=From:Subject:To:Cc:Message-Id:Date:MIME-Version:Content-Type; b=Pl2U/cQHxysVYaIY/lgvG1odoQnDCC+46Ew8GfYUuHd4u8YWpCZxv1If3U69YiqOn82xzaFZ50j3KzaGlgjnTgR36gjUwWgYlee8I1yH6/uoQwzkjE0heiTtgnCLk44/f3tu9a20sql/ved9q5/KEei3Z5Pikpth5OrRI6k4vnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=jGllSDAK; dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b=Q/iO2aXO; arc=none smtp.client-ip=198.2.187.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EuTucd9g"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42e2d52c24dso1782733f8f.1
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 05:39:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765805940; x=1766410740; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HP7wXZoAxj3YG64MFXhffqc9TkW1sld9ucKsb/6ZFh4=;
-        b=EuTucd9gZXbKS7k60S0O8+xmk6dWUzB6AJNJfJNSq4hCCI494y+YN2Qq1M2nPeZ7g5
-         LuU9h8ECct3c3zuO/9QgMVnrnXkzRJgRH9odpRxmaXJoMbbzxmLzBsdBkzCWalcMs8O0
-         +pwkeU2qKXOJUaNXpoOP02zQ1tVD8s9wko/KZIUVdb/UfaM7zYH212hBjrcuW4FJgH1J
-         hgW7iydeQCYKyq0iu2CmX9VQvEb5jf024NaEH6kA/hPoU5u67Btd0n6K9BJ3Wwyep1ZS
-         JZOqh1SL51X9kUXVjf42jy+x53KVKkGyUDYet3sxooMjnwhSTE0cGLmWT8n+j33oro1t
-         wdDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765805940; x=1766410740;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=HP7wXZoAxj3YG64MFXhffqc9TkW1sld9ucKsb/6ZFh4=;
-        b=iu9RVYrbw6i+rPtsKPTkxmUCuFmx10ivYwUtTjoidw9ANw4FtInsk1SR/fI5/XCdfX
-         FOsoEeytobaY/wasOy4sgTMUKCkxZTc0bKuXuCzM8aErIE+Cheh4nCEpGwLBiKaKHArH
-         x51Nc2eKAnoMFJUGVgFPAo2CvtAtqx8l+yS9ilvihjygX7jvfbAk1XBQ9U0oFQvr6W0R
-         37D89GOr/i85Wf+RIT/Hcsnvt0GYJHgSuf640uYA6p3QgIlJFDuil7VpMvDEfdp6U+HM
-         vzBPdm0Wq3/gHkWqJZJTpSnvTiK6lSi51zTVb8CzyhB+gzE3jFVw6OyWdcROjK/3MzhR
-         A+6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUNLO80CKQ9kY5NiywhxCO31oYJ3YxPjNx3iJ/KbCFeDoznDiE4dD3/IOxzE19w3fTbkBSTskgR2FO0ufg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzsvwAdZYkAKytOXUqK29jZaKhshszLCoPg2hOej3jXGRUZn38
-	05BuMry6fNcG5yzFQ2rzeAhnFnakyb9nkUrSOUkW7ecywif7vPh04+iCqTJ0UMGFbw==
-X-Gm-Gg: AY/fxX7xYzAf5r31bdtByPZcFNHVfYqlaTpya3hYXCg6sxWJdtHzzNYAuAv4P52xyPc
-	aY1j5ao4UnDkmmWA3izOx+eQIwtx0Ym4SG6kXU7ZUzXo+gT9GOPxrapsdLOhAjrnZIxugn9n64s
-	LBGw0PykLR3Bh33vx8dTlRDrDXmLGrhYvKNCxIhjAA5b3Cim52AWmK0cj17uFKvUsYRffdD/mls
-	/HJq9D6Y5MRFg8WDFyRn9Jyo/pgvl1liXOVwwA4zCDP6Vmzo2TBzSSmnWFz4t+W7ouw1MPLnTWz
-	rdr3G2SlzIQxO2QTybmTU+DM6PYs9GvRJ6kXKlYH7BxLodhKWx+v6htQdOmx2BpzuvJSsHD1Cxx
-	MhUGhBFAjBbYBPX3wVg9K7tvTFT6id4b8CHevcrYGQ4HNxhsExZSo6jpb5306tCVKyBJbFx5WYM
-	BE3v2V7KfxFJeEECxQ+bwA05zliZYcq/u+bKlfOuxUGoNay+Jm
-X-Google-Smtp-Source: AGHT+IH6RRE6qce8+BKlIh2iGfXIIE/0drfAuueOfe5s5dH/DcFdShyJ99GxaUFmEfIgshY9jhag6g==
-X-Received: by 2002:a05:6000:310f:b0:430:f7dc:7e8e with SMTP id ffacd0b85a97d-430f7dc809cmr4594614f8f.34.1765805939977;
-        Mon, 15 Dec 2025 05:38:59 -0800 (PST)
-Received: from elver.google.com ([2a00:79e0:2834:9:5741:4422:4d1d:b335])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42fb68866f3sm21319081f8f.36.2025.12.15.05.38.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 05:38:59 -0800 (PST)
-Date: Mon, 15 Dec 2025 14:38:52 +0100
-From: Marco Elver <elver@google.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-	Chris Li <sparse@chrisli.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Alexander Potapenko <glider@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Kentaro Takeda <takedakn@nttdata.co.jp>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
-	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-	linux-sparse@vger.kernel.org, linux-wireless@vger.kernel.org,
-	llvm@lists.linux.dev, rcu@vger.kernel.org
-Subject: Re: [PATCH v4 06/35] cleanup: Basic compatibility with context
- analysis
-Message-ID: <aUAPbFJSv0alh_ix@elver.google.com>
-References: <20251120145835.3833031-2-elver@google.com>
- <20251120151033.3840508-7-elver@google.com>
- <20251211121659.GH3911114@noisy.programming.kicks-ass.net>
- <CANpmjNOmAYFj518rH0FdPp=cqK8EeKEgh1ok_zFUwHU5Fu92=w@mail.gmail.com>
- <20251212094352.GL3911114@noisy.programming.kicks-ass.net>
- <CANpmjNP=s33L6LgYWHygEuLtWTq-s2n4yFDvvGcF3HjbGH+hqw@mail.gmail.com>
- <20251212110928.GP3911114@noisy.programming.kicks-ass.net>
+	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="jGllSDAK";
+	dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b="Q/iO2aXO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
+	s=mte1; t=1765808069; x=1766078069;
+	bh=MQWFgBdoUX1kknCFzw0JsezB1mvx5zyVSGtfO5OP/iE=;
+	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
+	b=jGllSDAKrGdCf6k1BpPnf3wIEyOGlVtDkO2Z9lbRLagXAIw+klaTxf2P5wPhFu+wv
+	 x3GARbACpkXuRaWNSppa7dNpu0TuMn5bduhOb28yWSvbTFoSJttwR1dOEcQEgVeAhx
+	 hkq9vigei0iDDXuAnEpr+hV3q6HY0VaYftacN4ThuYD22tYyoxxL6F+AuqHIJW91pA
+	 QgmX95cJKOA7VHyS/gXUFupYM+R2Ysd2YtmNCVl0YUctB1WvO3Tgvyqxo3LV04I+3A
+	 4ffUM3FcOu4mbI+g98YsGXULP2m8GRLBatr6pxaXyr97WhZmPjWCHRWSbeGJBiwkRH
+	 EP8wZxKPX1C3A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
+	t=1765808069; x=1766068569; i=thomas.courrege@vates.tech;
+	bh=MQWFgBdoUX1kknCFzw0JsezB1mvx5zyVSGtfO5OP/iE=;
+	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
+	b=Q/iO2aXOcIVt+PnazbkMiKw54+AJrk8A2Qo6ckKlK3dmfOE++lpXVx8j8lQnV/Iyp
+	 1i0A3MX7mYh7tinNLgQXWZRoX2ZvZL+gdCg9o5TEGn8VcXEaQn0xAjc2PJRXOxk2dS
+	 CVTdupxLtkOi5dDN2XG0gJAQrnuP25gRlvZs7l01hGkThtt9cpC1Q73tF5N4x7vhqb
+	 ipYEsBDKk7fs8ZTzSJKYMU/l7BDHMSHhjuVrTOoV0nDO44L9LKwem7uhni+3Ch7YV7
+	 OUm92inCuWc9N5m0v+fgDMSt12Q7r+XRb320WPtxdmasGzefv2tLWeP3eKDzQqfrn0
+	 rUwdnWORxKkgA==
+Received: from pmta09.mandrill.prod.suw01.rsglab.com (localhost [127.0.0.1])
+	by mail187-17.suw11.mandrillapp.com (Mailchimp) with ESMTP id 4dVMWT0crtzRKVFXv
+	for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 14:14:29 +0000 (GMT)
+From: "Thomas Courrege" <thomas.courrege@vates.tech>
+Subject: =?utf-8?Q?[PATCH=20v3]=20KVM:=20SEV:=20Add=20KVM=5FSEV=5FSNP=5FHV=5FREPORT=5FREQ=20command?=
+Received: from [37.26.189.201] by mandrillapp.com id 5ae4059d44794185ba00ec745c629ef8; Mon, 15 Dec 2025 14:14:29 +0000
+X-Mailer: git-send-email 2.52.0
+X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
+X-Bm-Transport-Timestamp: 1765808068580
+To: ashish.kalra@amd.com, corbet@lwn.net, herbert@gondor.apana.org.au, john.allen@amd.com, nikunj@amd.com, pbonzini@redhat.com, seanjc@google.com, thomas.lendacky@amd.com
+Cc: kvm@vger.kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, "Thomas Courrege" <thomas.courrege@vates.tech>
+Message-Id: <20251215141417.2821412-1-thomas.courrege@vates.tech>
+X-Native-Encoded: 1
+X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.5ae4059d44794185ba00ec745c629ef8?=
+X-Mandrill-User: md_30504962
+Feedback-ID: 30504962:30504962.20251215:md
+Date: Mon, 15 Dec 2025 14:14:29 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251212110928.GP3911114@noisy.programming.kicks-ass.net>
-User-Agent: Mutt/2.2.13 (2024-03-09)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 12, 2025 at 12:09PM +0100, Peter Zijlstra wrote:
-> On Fri, Dec 12, 2025 at 11:15:29AM +0100, Marco Elver wrote:
-> > On Fri, 12 Dec 2025 at 10:43, Peter Zijlstra <peterz@infradead.org> wrote:
-> > [..]
-> > > > Correct. We're trading false negatives over false positives at this
-> > > > point, just to get things to compile cleanly.
-> > >
-> > > Right, and this all 'works' right up to the point someone sticks a
-> > > must_not_hold somewhere.
-> > >
-> > > > > > Better support for Linux's scoped guard design could be added in
-> > > > > > future if deemed critical.
-> > > > >
-> > > > > I would think so, per the above I don't think this is 'right'.
-> > > >
-> > > > It's not sound, but we'll avoid false positives for the time being.
-> > > > Maybe we can wrangle the jigsaw of macros to let it correctly acquire
-> > > > and then release (via a 2nd cleanup function), it might be as simple
-> > > > as marking the 'constructor' with the right __acquires(..), and then
-> > > > have a 2nd __attribute__((cleanup)) variable that just does a no-op
-> > > > release via __release(..) so we get the already supported pattern
-> > > > above.
-> > >
-> > > Right, like I mentioned in my previous email; it would be lovely if at
-> > > the very least __always_inline would get a *very* early pass such that
-> > > the above could be resolved without inter-procedural bits. I really
-> > > don't consider an __always_inline as another procedure.
-> > >
-> > > Because as I already noted yesterday, cleanup is now all
-> > > __always_inline, and as such *should* all end up in the one function.
-> > >
-> > > But yes, if we can get a magical mash-up of __cleanup and __release (let
-> > > it be knows as __release_on_cleanup ?) that might also work I suppose.
-> > > But I vastly prefer __always_inline actually 'working' ;-)
-> > 
-> > The truth is that __always_inline working in this way is currently
-> > infeasible. Clang and LLVM's architecture simply disallow this today:
-> > the semantic analysis that -Wthread-safety does happens over the AST,
-> > whereas always_inline is processed by early passes in the middle-end
-> > already within LLVM's pipeline, well after semantic analysis. There's
-> > a complexity budget limit for semantic analysis (type checking,
-> > warnings, assorted other errors), and path-sensitive &
-> > intra-procedural analysis over the plain AST is outside that budget.
-> > Which is why tools like clang-analyzer exist (symbolic execution),
-> > where it's possible to afford that complexity since that's not
-> > something that runs for a normal compile.
-> > 
-> > I think I've pushed the current version of Clang's -Wthread-safety
-> > already far beyond what folks were thinking is possible (a variant of
-> > alias analysis), but even my healthy disregard for the impossible
-> > tells me that making path-sensitive intra-procedural analysis even if
-> > just for __always_inline functions is quite possibly a fool's errand.
-> 
-> Well, I had to propose it. Gotta push the envelope :-)
-> 
-> > So either we get it to work with what we have, or give up.
-> 
-> So I think as is, we can start. But I really do want the cleanup thing
-> sorted, even if just with that __release_on_cleanup mashup or so.
+Add support for retrieving the SEV-SNP attestation report via the
+SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
+ioctl for SNP guests.
 
-Working on rebasing this to v6.19-rc1 and saw this new scoped seqlock
-abstraction. For that one I was able to make it work like I thought we
-could (below). Some awkwardness is required to make it work in
-for-loops, which only let you define variables with the same type.
+Signed-off-by: Thomas Courrege <thomas.courrege@vates.tech>
+---
+ .../virt/kvm/x86/amd-memory-encryption.rst    | 27 +++++++++
+ arch/x86/include/uapi/asm/kvm.h               |  9 +++
+ arch/x86/kvm/svm/sev.c                        | 60 +++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.c                  |  1 +
+ include/linux/psp-sev.h                       | 31 ++++++++++
+ 5 files changed, 128 insertions(+)
 
-For <linux/cleanup.h> it needs some more thought due to extra levels of
-indirection.
-
------- >8 ------
-
-diff --git a/include/linux/seqlock.h b/include/linux/seqlock.h
-index b5563dc83aba..5162962b4b26 100644
---- a/include/linux/seqlock.h
-+++ b/include/linux/seqlock.h
-@@ -1249,6 +1249,7 @@ struct ss_tmp {
+diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+index 1ddb6a86ce7f..083ed487764e 100644
+--- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+@@ -572,6 +572,33 @@ Returns: 0 on success, -negative on error
+ See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
+ details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
+ 
++21. KVM_SEV_SNP_HV_REPORT_REQ
++-----------------------------
++
++The KVM_SEV_SNP_HV_REPORT_REQ command requests the hypervisor-generated
++SNP attestation report. This report is produced by the PSP using the
++HV-SIGNED key selected by the caller.
++
++The ``key_sel`` field indicates which key the platform will use to sign the
++report:
++  * ``0``: If VLEK is installed, sign with VLEK. Otherwise, sign with VCEK.
++  * ``1``: Sign with VCEK.
++  * ``2``: Sign with VLEK.
++  * Other values are reserved.
++
++Parameters (in): struct kvm_sev_snp_hv_report_req
++
++Returns:  0 on success, -negative on error
++
++::
++        struct kvm_sev_snp_hv_report_req {
++                __u64 report_uaddr;
++                __u64 report_len;
++                __u8 key_sel;
++                __u8 pad0[7];
++                __u64 pad1[4];
++        };
++
+ Device attribute API
+ ====================
+ 
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 7ceff6583652..464146bed784 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -743,6 +743,7 @@ enum sev_cmd_id {
+ 	KVM_SEV_SNP_LAUNCH_START = 100,
+ 	KVM_SEV_SNP_LAUNCH_UPDATE,
+ 	KVM_SEV_SNP_LAUNCH_FINISH,
++	KVM_SEV_SNP_HV_REPORT_REQ,
+ 
+ 	KVM_SEV_NR_MAX,
+ };
+@@ -871,6 +872,14 @@ struct kvm_sev_receive_update_data {
+ 	__u32 pad2;
  };
  
- static __always_inline void __scoped_seqlock_cleanup(struct ss_tmp *sst)
-+	__no_context_analysis
- {
- 	if (sst->lock)
- 		spin_unlock(sst->lock);
-@@ -1278,6 +1279,7 @@ extern void __scoped_seqlock_bug(void);
- 
- static __always_inline void
- __scoped_seqlock_next(struct ss_tmp *sst, seqlock_t *lock, enum ss_state target)
-+	__no_context_analysis
- {
- 	switch (sst->state) {
- 	case ss_done:
-@@ -1320,9 +1322,18 @@ __scoped_seqlock_next(struct ss_tmp *sst, seqlock_t *lock, enum ss_state target)
- 	}
- }
- 
-+/*
-+ * Context analysis helper to release seqlock at the end of the for-scope; the
-+ * alias analysis of the compiler will recognize that the pointer @s is is an
-+ * alias to @_seqlock passed to read_seqbegin(_seqlock) below.
-+ */
-+static __always_inline void __scoped_seqlock_cleanup_ctx(struct ss_tmp **s)
-+	__releases_shared(*((seqlock_t **)s)) __no_context_analysis {}
++struct kvm_sev_snp_hv_report_req {
++	__u64 report_uaddr;
++	__u64 report_len;
++	__u8 key_sel;
++	__u8 pad0[7];
++	__u64 pad1[4];
++};
 +
- #define __scoped_seqlock_read(_seqlock, _target, _s)			\
- 	for (struct ss_tmp _s __cleanup(__scoped_seqlock_cleanup) =	\
--	     { .state = ss_lockless, .data = read_seqbegin(_seqlock) };	\
-+	     { .state = ss_lockless, .data = read_seqbegin(_seqlock) }, \
-+	     *__UNIQUE_ID(ctx) __cleanup(__scoped_seqlock_cleanup_ctx) = (struct ss_tmp *)_seqlock; \
- 	     _s.state != ss_done;					\
- 	     __scoped_seqlock_next(&_s, _seqlock, _target))
- 
-diff --git a/lib/test_context-analysis.c b/lib/test_context-analysis.c
-index 4612025a1065..3f72b1ab2300 100644
---- a/lib/test_context-analysis.c
-+++ b/lib/test_context-analysis.c
-@@ -261,6 +261,13 @@ static void __used test_seqlock_writer(struct test_seqlock_data *d)
- 	write_sequnlock_irqrestore(&d->sl, flags);
+ struct kvm_sev_snp_launch_start {
+ 	__u64 policy;
+ 	__u8 gosvw[16];
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index f59c65abe3cf..ba7a07d132ff 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2261,6 +2261,63 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	return rc;
  }
  
-+static void __used test_seqlock_scoped(struct test_seqlock_data *d)
++static int sev_snp_hv_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
 +{
-+	scoped_seqlock_read (&d->sl, ss_lockless) {
-+		(void)d->counter;
++	struct sev_data_snp_msg_report_rsp *report_rsp = NULL;
++	struct sev_data_snp_hv_report_req data;
++	struct kvm_sev_snp_hv_report_req params;
++	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
++	void __user *u_report;
++	void __user *u_params = u64_to_user_ptr(argp->data);
++	size_t rsp_size = sizeof(*report_rsp);
++	int ret;
++
++	if (!sev_snp_guest(kvm))
++		return -ENOTTY;
++	if (copy_from_user(&params, u_params, sizeof(params)))
++		return -EFAULT;
++
++	if (params.report_len < rsp_size)
++		return -ENOSPC;
++
++	u_report = u64_to_user_ptr(params.report_uaddr);
++	if (!u_report)
++		return -EINVAL;
++
++	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	if (!report_rsp)
++		return -ENOMEM;
++
++	data.len = sizeof(data);
++	data.key_sel = params.key_sel;
++	data.gctx_addr = __psp_pa(sev->snp_context);
++	data.hv_report_paddr = __psp_pa(report_rsp);
++
++	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
++				&argp->error);
++	if (ret)
++		goto e_free_rsp;
++
++	if (!report_rsp->status)
++		rsp_size += report_rsp->report_size;
++
++	if (params.report_len < rsp_size) {
++		rsp_size = sizeof(*report_rsp);
++		ret = -ENOSPC;
 +	}
++
++	if (copy_to_user(u_report, report_rsp, rsp_size))
++		ret = -EFAULT;
++
++	params.report_len = sizeof(*report_rsp) + report_rsp->report_size;
++	if (copy_to_user(u_params, &params, sizeof(params)))
++		ret = -EFAULT;
++
++e_free_rsp:
++	snp_free_firmware_page(report_rsp);
++	return ret;
 +}
 +
- struct test_rwsem_data {
- 	struct rw_semaphore sem;
- 	int counter __guarded_by(&sem);
+ struct sev_gmem_populate_args {
+ 	__u8 type;
+ 	int sev_fd;
+@@ -2672,6 +2729,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_SNP_LAUNCH_FINISH:
+ 		r = snp_launch_finish(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SNP_HV_REPORT_REQ:
++		r = sev_snp_hv_report_request(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		goto out;
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 956ea609d0cc..5dd7c3f0d50d 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -259,6 +259,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
+ 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
+ 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
++	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
+ 	default:				return sev_tio_cmd_buffer_len(cmd);
+ 	}
+ 
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 69ffa4b4d1fa..c651a400d124 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -124,6 +124,7 @@ enum sev_cmd {
+ 	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
+ 	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
+ 	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
++	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
+ 	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
+ 	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
+ 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
+@@ -594,6 +595,36 @@ struct sev_data_attestation_report {
+ 	u32 len;				/* In/Out */
+ } __packed;
+ 
++/**
++ * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
++ *
++ * @len: length of the command buffer in bytes
++ * @key_sel: Selects which key to use for generating the signature.
++ * @gctx_addr: System physical address of guest context page
++ * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
++ */
++struct sev_data_snp_hv_report_req {
++	u32 len;		/* In */
++	u32 key_sel	:2,	/* In */
++	    rsvd	:30;
++	u64 gctx_addr;		/* In */
++	u64 hv_report_paddr;	/* In */
++} __packed;
++
++/**
++ * struct sev_data_snp_msg_export_rsp
++ *
++ * @status: Status : 0h: Success. 16h: Invalid parameters.
++ * @report_size: Size in bytes of the attestation report
++ * @report: attestation report
++ */
++struct sev_data_snp_msg_report_rsp {
++	u32 status;			/* Out */
++	u32 report_size;		/* Out */
++	u8 rsvd[24];
++	u8 report[];
++} __packed;
++
+ /**
+  * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
+  *
+-- 
+2.52.0
