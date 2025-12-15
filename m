@@ -1,52 +1,52 @@
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170A833345A;
-	Mon, 15 Dec 2025 23:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349CE336ED1;
+	Mon, 15 Dec 2025 23:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765842136; cv=none; b=j0aBr7IYdbSZl/PAkwmKKFvfREWPez7xBjr0e+9r1P4tS/clSGR1FRMws6sBAHNKSMbCLTOXvgnYe8X4QuAx1nuCoNAtA1YOYRrBieCKdL+UQ0Nea8YXGw/Ve+sFEyKO2bQfOoRhqrkv6yEzFO7pWm24NocliRyduPwD43AIU6w=
+	t=1765842136; cv=none; b=jwzOeIfZbgkdMvwlNpwLNULn/HSpkLzyNAfyhKnI4A7j2kyGfyHO4nQJKK6MoWiCAMOvA37sUBZB3HkoCw1+6r1p1SsD9cLtAeKAX7LkKcWQbQAXAIJZ9NFPXqWHBRl4r9+lNm7ayBLCd2MreGQv5ZdaOJtfJNvMqXWAC2xkcoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1765842136; c=relaxed/simple;
-	bh=zoSvZf28/wV6V2JcLlahz6tV+kJa7cly+9bBUOs4QwI=;
+	bh=kwc6IcMM5wvToqeTkhGDg8JNjHNDJfY+2AYJk3jCqIs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KZRL6MnIpxqM9gWCE/Ph2XoNyq446C7ng3h+8DjYd93Lx7eOjAVcx6jKHma/zdfoRpsYl+X12EDcB1cYSbXS/Fqxi/JSxzoVh6bIN9XBe5YDyZZA30hTYp5KGxqtTLkRIicNWoshBXdxvg054QiXwavqH/9SLEUhlW9x+vJn/4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=msSYqonk; arc=none smtp.client-ip=205.220.177.32
+	 MIME-Version; b=p8VDBpU47YU30K3FDO9XLfRIOBidiXfHCfYAEHppDn5+zdQt97AvKC8cdNrmhmMr98c1sg0ulu/oHfBDuKwc9GQDgwCsBHzSvxPSbDCAxey4SfzaRzSRHTlJEaQuB5QNfEFemryhSPgTUsjkTGoqJy3WPBuE1Gn5OahtXFi7Mkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=AMjcoxVJ; arc=none smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="msSYqonk"
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BFJC6YZ2796089;
-	Mon, 15 Dec 2025 23:41:27 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AMjcoxVJ"
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BFJCIiZ2859372;
+	Mon, 15 Dec 2025 23:41:01 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=3sUBC
-	sYAlO5x9EnsMKXdqUbtIolLR4uCpsIYhSxPacg=; b=msSYqonkuYG/w1qXwIc9i
-	LLg3xWJNcQLEZPJcTPK62MDcaL7KheNlih9LcNO6vOYdeaY8lPRME6x+IbM1pLyr
-	ogKbOBcFJTyXPO1JpGeSW6MTOW71dVeo+hxKm37hgMz2qJxb25MilgN2UEAasaP5
-	fj4hOE1qhI3Kb5U+k5MAxPy56nQrLmOyXwlcZyvMafzBZP+Lvd7+o0p5z80E94oP
-	qT+rCrFVlnwu9HxPNdc99f7gb5+mSg2tqLtM06a1312KvCur3e0LRxqItP9t8wfb
-	HRjSkzAIjLfsMrw4eJFGZ84nJpT6rIsqMp6K2ukNCagS0kUAcxiNyu5ZV5FPfI0h
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=OMFly
+	L/wiM/BIWX7Ku8AARzuRyfqmOM+RjpJD/TJIRw=; b=AMjcoxVJv8Y0S9W7B9fPS
+	KWV5ca5Rn6EedrjOlW57rOYfBEFAnvwmLssmC3NkpE8IE2jqtHk8Urp/Szr4VnH2
+	Baqm+btfhPD19MblIgAQWRgzqBYvrA+ZQ4VwfpB5i6FKLXjyFLo8IB0D9/Rg2ydk
+	8s31CGPXsr1m9mnBJQ2sdPrqWJnu2HWFAGFUouTdUXWR3GZPxkt+ZMPd102ary5x
+	SaSN7l+3R+q0Jfr4/quU8gyZomAoKXke4b5sigQ395QHAd3vSnL5yxd8uQ9ogTKG
+	UoDjI0mUqPtWTBQqS5HqqlJmCd30M+HULwA7vH66h9QNDfkVsoTUrRFW5V1iHs/2
 	A==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4b0xja3198-1
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4b0yrujyxv-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 15 Dec 2025 23:41:27 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5BFMTJlh024572;
-	Mon, 15 Dec 2025 23:41:26 GMT
+	Mon, 15 Dec 2025 23:41:01 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5BFLJnF0022770;
+	Mon, 15 Dec 2025 23:41:00 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4b0xk9t8vn-1
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4b0xkjkcdq-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 15 Dec 2025 23:41:26 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5BFNeaGh028457;
-	Mon, 15 Dec 2025 23:41:25 GMT
+	Mon, 15 Dec 2025 23:41:00 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5BFNeu3P010824;
+	Mon, 15 Dec 2025 23:40:59 GMT
 Received: from bur-virt-x6-2-100.us.oracle.com (bur-virt-x6-2-100.us.oracle.com [10.153.92.40])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4b0xk9t8uf-1
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4b0xkjkcdb-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 15 Dec 2025 23:41:25 +0000
+	Mon, 15 Dec 2025 23:40:59 +0000
 From: Ross Philipson <ross.philipson@oracle.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org,
         linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -62,9 +62,9 @@ Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
         dwmw2@infradead.org, baolu.lu@linux.intel.com,
         kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
         trenchboot-devel@googlegroups.com
-Subject: [PATCH v15 23/28] x86: Secure Launch kernel late boot stub
-Date: Mon, 15 Dec 2025 15:33:11 -0800
-Message-ID: <20251215233316.1076248-24-ross.philipson@oracle.com>
+Subject: [PATCH v15 17/28] x86: Add early SHA-1 support for Secure Launch early measurements
+Date: Mon, 15 Dec 2025 15:33:05 -0800
+Message-ID: <20251215233316.1076248-18-ross.philipson@oracle.com>
 X-Mailer: git-send-email 2.43.7
 In-Reply-To: <20251215233316.1076248-1-ross.philipson@oracle.com>
 References: <20251215233316.1076248-1-ross.philipson@oracle.com>
@@ -78,625 +78,76 @@ Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-15_05,2025-12-15_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 bulkscore=0
- suspectscore=0 phishscore=0 adultscore=0 mlxlogscore=999 mlxscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0 adultscore=0
+ mlxscore=0 malwarescore=0 mlxlogscore=999 phishscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
  definitions=main-2512150204
-X-Authority-Analysis: v=2.4 cv=TbWbdBQh c=1 sm=1 tr=0 ts=69409ca7 cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=QyXUC8HyAAAA:8 a=UN5060LkAAAA:8
- a=yPCof4ZbAAAA:8 a=EZo8ngq_X3CZJZrCgssA:9 a=ovlJmbFUFQdC8h9b:21
- a=E6eXv-vVeS7VqOnxGRGn:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE1MDIwNCBTYWx0ZWRfX+mpqaaV2I3Cd
- bbbqGkju6dBWHTi/LzPiFg/D6GH9qA0dpw5nBMpiPBUOI8o6/9lgO8Tpc5gbS3obGKW5F88yitz
- KpDpEzm2Q2yLSF1fNBjExNvv+dZTb8lpKcwmUd24OYKVVJb8nZSJpc/4aSkRwcys3RQbmC2+t4B
- 9Ycl0dY5lor/tB61X1NK/aacKB+vUQyVmyOb1Gd0pKnHAXeXU8AoMxOskvVNyhq15hUI81qWjCn
- shHwi4TUH+uvERAAqM+BfNPBJwz5DO0SuGXOVv5BtTD56v5nPkWdo/OjyT/EWkcrRX1TlTJAFzk
- VMH8UfmfCNyeTaKBdOj4wcMJrbY3s8gXFdI3wj/Chr3ETUlwj98kNXI5CaSpjQTVy+nCdLDjpHC
- JOV7DLZxcKVCIwm+BBJvGHer1cP5tA==
-X-Proofpoint-ORIG-GUID: TtBeGqajt9GRgAHUlyOsmnSel32oH3s2
-X-Proofpoint-GUID: TtBeGqajt9GRgAHUlyOsmnSel32oH3s2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE1MDIwNCBTYWx0ZWRfX+7AlQAOepJ2V
+ gekVgXA0s3kuhFlnv0tSJS+CdZJtQV6M46lT8tVGENHdYEHtk1JQZxUa935lMmy1c5vgawTTN8X
+ YrpwSILLQnEOAmwwp9Z2br0EcF/4t3PTkPtJfgINmxG7NQZq/WvDkctpY47A7Xf6ZuGD7XzbE2U
+ gR1D8759RqnS5OodlRlPcZNwSk7n208fxrUdEaFrylhzfaKf8LuQLgcb5hMGMdMHzvvPrhLx00p
+ ehPjsYHtur4GvNbhV5wv2FZ/co39pY2NU92IFzqj4/bCqBIAFmnJyOSASS9aoMwzruYs6S7obCW
+ Xk7FkQI6vcPlajs1o4dtzIwdF6v9bvntzpOopEPaKrLr84X25jp1ajxpXg9u7cbO/eH/PM0LW5p
+ T/qvnmnGnG/Zx2by8W362KtP9LrkKULr0bbZotaX/eIWZLVfNmw=
+X-Authority-Analysis: v=2.4 cv=TL9Iilla c=1 sm=1 tr=0 ts=69409c8d b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=UN5060LkAAAA:8 a=yPCof4ZbAAAA:8
+ a=FMA3igD34ZM5tMG_usoA:9 a=E6eXv-vVeS7VqOnxGRGn:22 cc=ntf awl=host:13654
+X-Proofpoint-GUID: quJzcWfx7Dd30r4aywsmOfxCJIXRy10y
+X-Proofpoint-ORIG-GUID: quJzcWfx7Dd30r4aywsmOfxCJIXRy10y
 
-The routine slaunch_setup() is called out of the x86 specific setup_arch()
-routine during early kernel boot. After determining what platform is
-present, various operations specific to that platform occur. This
-includes finalizing setting for the platform late launch and verifying
-that memory protections are in place.
+From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
 
-Intel VT-d/IOMMU hardware provides special registers called Protected
-Memory Regions (PMRs) that allow all memory to be protected from
-DMA during a TXT DRTM launch. This coverage is validated during the
-late setup process to ensure DMA protection is in place prior to
-the IOMMUs being initialized and configured by the mainline kernel.
-See the Intel Trusted Execution Technology - Measured Launch Environment
-Developer's Guide for more details:
+Secure Launch is written to be compliant with the Intel TXT Measured Launch
+Developer's Guide. The MLE Guide dictates that the system can be configured to
+use both the SHA-1 and SHA-2 hashing algorithms.
 
-https://www.intel.com/content/dam/www/public/us/en/documents/guides/intel-txt-software-development-guide.pdf
+Regardless of the preference towards SHA-2, if the firmware elected to start
+with the SHA-1 and SHA-2 banks active and the dynamic launch was configured to
+include SHA-1, Secure Launch is obligated to record measurements for all
+algorithms requested in the launch configuration.
 
-In addition this routine reserves key memory regions used by Secure Launch
-(e.g. the TXT heap, AP startup block etc) as well as fetching values needed
-later from the TXT heap and SLRT.
+The user environment or the integrity management does not desire to use SHA-1,
+it is free to just ignore the SHA-1 bank in any integrity operation with the
+TPM. If there is a larger concern about the SHA-1 bank being active, it is free
+to deliberately cap the SHA-1 PCRs, recording the event in the D-RTM log.
 
 Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
 Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
 ---
- arch/x86/kernel/Makefile   |   1 +
- arch/x86/kernel/setup.c    |   3 +
- arch/x86/kernel/slaunch.c  | 509 +++++++++++++++++++++++++++++++++++++
- drivers/iommu/intel/dmar.c |   4 +
- 4 files changed, 517 insertions(+)
- create mode 100644 arch/x86/kernel/slaunch.c
+ arch/x86/boot/compressed/Makefile | 4 ++++
+ arch/x86/boot/compressed/sha1.c   | 7 +++++++
+ 2 files changed, 11 insertions(+)
+ create mode 100644 arch/x86/boot/compressed/sha1.c
 
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index bc184dd38d99..36ea2c12deed 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -82,6 +82,7 @@ obj-$(CONFIG_X86_32)		+= tls.o
- obj-$(CONFIG_IA32_EMULATION)	+= tls.o
- obj-y				+= step.o
- obj-$(CONFIG_INTEL_TXT)		+= tboot.o
-+obj-$(CONFIG_SECURE_LAUNCH)	+= slaunch.o
- obj-$(CONFIG_ISA_DMA_API)	+= i8237.o
- obj-y				+= stacktrace.o
- obj-y				+= cpu/
-diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
-index 1b2edd07a3e1..7c027cd1bd38 100644
---- a/arch/x86/kernel/setup.c
-+++ b/arch/x86/kernel/setup.c
-@@ -24,6 +24,7 @@
- #include <linux/static_call.h>
- #include <linux/swiotlb.h>
- #include <linux/tboot.h>
-+#include <linux/slaunch.h>
- #include <linux/usb/xhci-dbgp.h>
- #include <linux/vmalloc.h>
+diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+index 74657589264d..69592146ced7 100644
+--- a/arch/x86/boot/compressed/Makefile
++++ b/arch/x86/boot/compressed/Makefile
+@@ -112,6 +112,10 @@ ifdef CONFIG_EFI_SBAT
+ $(obj)/sbat.o: $(CONFIG_EFI_SBAT_FILE)
+ endif
  
-@@ -1025,6 +1026,8 @@ void __init setup_arch(char **cmdline_p)
- 	early_gart_iommu_check();
- #endif
- 
-+	slaunch_setup();
++slaunch-objs += $(obj)/sha1.o
 +
- 	/*
- 	 * partially used pages are not usable - thus
- 	 * we are rounding upwards:
-diff --git a/arch/x86/kernel/slaunch.c b/arch/x86/kernel/slaunch.c
++vmlinux-objs-$(CONFIG_SECURE_LAUNCH) += $(slaunch-objs)
++
+ $(obj)/vmlinux: $(vmlinux-objs-y) $(vmlinux-libs-y) FORCE
+ 	$(call if_changed,ld)
+ 
+diff --git a/arch/x86/boot/compressed/sha1.c b/arch/x86/boot/compressed/sha1.c
 new file mode 100644
-index 000000000000..6958734fe5e9
+index 000000000000..dd1b4cf5caf5
 --- /dev/null
-+++ b/arch/x86/kernel/slaunch.c
-@@ -0,0 +1,509 @@
++++ b/arch/x86/boot/compressed/sha1.c
+@@ -0,0 +1,7 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Secure Launch late validation/setup and finalization support.
-+ *
-+ * Copyright (c) 2025, Oracle and/or its affiliates.
++ * Copyright (c) 2025 Apertus Solutions, LLC.
 + */
 +
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/linkage.h>
-+#include <linux/mm.h>
-+#include <linux/io.h>
-+#include <linux/uaccess.h>
-+#include <linux/security.h>
-+#include <linux/memblock.h>
-+#include <asm/segment.h>
-+#include <asm/sections.h>
-+#include <asm/tlbflush.h>
-+#include <asm/e820/api.h>
-+#include <asm/setup.h>
-+#include <asm/realmode.h>
-+#include <linux/slr_table.h>
-+#include <linux/slaunch.h>
-+
-+static u32 sl_flags __ro_after_init;
-+static struct sl_ap_wake_info ap_wake_info __ro_after_init;
-+static u64 evtlog_addr __ro_after_init;
-+static u32 evtlog_size __ro_after_init;
-+static u64 vtd_pmr_lo_size __ro_after_init;
-+
-+/* This should be plenty of room */
-+static u8 txt_dmar[PAGE_SIZE] __aligned(16);
-+
-+/*
-+ * Get the Secure Launch flags that indicate what kind of launch is being done.
-+ * E.g. a TXT launch is in progress or no Secure Launch is happening.
-+ */
-+u32 slaunch_get_flags(void)
-+{
-+	return sl_flags;
-+}
-+
-+/*
-+ * Return the AP wakeup information used in the SMP boot code to start up
-+ * the APs that are parked using MONITOR/MWAIT.
-+ */
-+struct sl_ap_wake_info *slaunch_get_ap_wake_info(void)
-+{
-+	return &ap_wake_info;
-+}
-+
-+/*
-+ * On Intel platforms, TXT passes a safe copy of the DMAR ACPI table to the
-+ * DRTM. The DRTM is supposed to use this instead of the one found in the
-+ * ACPI tables.
-+ */
-+struct acpi_table_header *slaunch_get_dmar_table(struct acpi_table_header *dmar)
-+{
-+	/* The DMAR is only stashed and provided via TXT on Intel systems */
-+	if (memcmp(txt_dmar, "DMAR", 4))
-+		return dmar;
-+
-+	return (struct acpi_table_header *)(txt_dmar);
-+}
-+
-+/*
-+ * If running within a TXT established DRTM, this is the proper way to reset
-+ * the system if a failure occurs or a security issue is found.
-+ */
-+static void __noreturn slaunch_txt_reset(void __iomem *txt, const char *msg, u64 error)
-+{
-+	u64 one = 1, val;
-+
-+	pr_err("%s", msg);
-+
-+	/*
-+	 * This performs a TXT reset with a sticky error code. The reads of
-+	 * TXT_CR_E2STS act as barriers.
-+	 */
-+	memcpy_toio(txt + TXT_CR_ERRORCODE, &error, sizeof(error));
-+	memcpy_fromio(&val, txt + TXT_CR_E2STS, sizeof(val));
-+	memcpy_toio(txt + TXT_CR_CMD_NO_SECRETS, &one, sizeof(one));
-+	memcpy_fromio(&val, txt + TXT_CR_E2STS, sizeof(val));
-+	memcpy_toio(txt + TXT_CR_CMD_UNLOCK_MEM_CONFIG, &one, sizeof(one));
-+	memcpy_fromio(&val, txt + TXT_CR_E2STS, sizeof(val));
-+	memcpy_toio(txt + TXT_CR_CMD_RESET, &one, sizeof(one));
-+
-+	for ( ; ; )
-+		asm volatile ("hlt");
-+
-+	unreachable();
-+}
-+
-+/*
-+ * Handle fatal errors during DRTM initialization.
-+ */
-+void __noreturn slaunch_reset(void *ctx, const char *msg, u64 error)
-+{
-+	if (slaunch_is_txt_launch())
-+		slaunch_txt_reset(ctx, msg, error);
-+
-+	/* Generic handler for x86 */
-+	pr_err("Secure Launch: %s - error: 0x%llx", msg, error);
-+	asm volatile ("ud2");
-+
-+	unreachable();
-+}
-+
-+/*
-+ * The TXT heap is too big to map all at once with early_ioremap
-+ * so it is done a table at a time.
-+ */
-+static void __init *txt_early_get_heap_table(void __iomem *txt, u32 type,
-+					     u32 bytes)
-+{
-+	u64 base, size, offset = 0;
-+	void *heap;
-+	int i;
-+
-+	if (type > TXT_SINIT_TABLE_MAX)
-+		slaunch_reset(txt, "Error invalid table type for early heap walk\n", SL_ERROR_HEAP_WALK);
-+
-+	memcpy_fromio(&base, txt + TXT_CR_HEAP_BASE, sizeof(base));
-+	memcpy_fromio(&size, txt + TXT_CR_HEAP_SIZE, sizeof(size));
-+
-+	/* Iterate over heap tables looking for table of "type" */
-+	for (i = 0; i < type; i++) {
-+		base += offset;
-+		heap = early_memremap(base, sizeof(u64));
-+		if (!heap)
-+			slaunch_reset(txt, "Error early_memremap of heap for heap walk\n", SL_ERROR_HEAP_MAP);
-+
-+		offset = *((u64 *)heap);
-+
-+		/*
-+		 * After the first iteration, any offset of zero is invalid and
-+		 * implies the TXT heap is corrupted.
-+		 */
-+		if (!offset)
-+			slaunch_reset(txt, "Error invalid 0 offset in heap walk\n", SL_ERROR_HEAP_ZERO_OFFSET);
-+
-+		early_memunmap(heap, sizeof(u64));
-+	}
-+
-+	/* Skip the size field at the head of each table */
-+	base += sizeof(u64);
-+	heap = early_memremap(base, bytes);
-+	if (!heap)
-+		slaunch_reset(txt, "Error early_memremap of heap section\n", SL_ERROR_HEAP_MAP);
-+
-+	return heap;
-+}
-+
-+static void __init txt_early_put_heap_table(void *addr, unsigned long size)
-+{
-+	early_memunmap(addr, size);
-+}
-+
-+/*
-+ * TXT uses a special set of VTd registers to protect all of memory from DMA
-+ * until the IOMMU can be programmed to protect memory. There is the low
-+ * memory PMR that can protect all memory up to 4G. The high memory PRM can
-+ * be setup to protect all memory beyond 4Gb. Validate that these values cover
-+ * what is expected.
-+ */
-+static void __init slaunch_verify_pmrs(void __iomem *txt)
-+{
-+	struct txt_os_sinit_data *os_sinit_data;
-+	u32 field_offset, err = 0;
-+	const char *errmsg = "";
-+	unsigned long last_pfn;
-+
-+	field_offset = offsetof(struct txt_os_sinit_data, lcp_po_base);
-+	os_sinit_data = txt_early_get_heap_table(txt, TXT_OS_SINIT_DATA_TABLE,
-+						 field_offset);
-+
-+	/* Save a copy */
-+	vtd_pmr_lo_size = os_sinit_data->vtd_pmr_lo_size;
-+
-+	last_pfn = e820__end_of_ram_pfn();
-+
-+	/*
-+	 * First make sure the hi PMR covers all memory above 4G. In the
-+	 * unlikely case where there is < 4G on the system, the hi PMR will
-+	 * not be set.
-+	 */
-+	if (os_sinit_data->vtd_pmr_hi_base != 0x0ULL) {
-+		if (os_sinit_data->vtd_pmr_hi_base != 0x100000000ULL) {
-+			err = SL_ERROR_HI_PMR_BASE;
-+			errmsg =  "Error hi PMR base\n";
-+			goto out;
-+		}
-+
-+		if (PFN_PHYS(last_pfn) > os_sinit_data->vtd_pmr_hi_base +
-+		    os_sinit_data->vtd_pmr_hi_size) {
-+			err = SL_ERROR_HI_PMR_SIZE;
-+			errmsg = "Error hi PMR size\n";
-+			goto out;
-+		}
-+	}
-+
-+	/*
-+	 * Lo PMR base should always be 0. This was already checked in
-+	 * early stub.
-+	 */
-+
-+	/*
-+	 * Check that if the kernel was loaded below 4G, that it is protected
-+	 * by the lo PMR. Note this is the decompressed kernel. The ACM would
-+	 * have ensured the compressed kernel (the MLE image) was protected.
-+	 */
-+	if (__pa_symbol(_end) < 0x100000000ULL && __pa_symbol(_end) > os_sinit_data->vtd_pmr_lo_size) {
-+		err = SL_ERROR_LO_PMR_MLE;
-+		errmsg = "Error lo PMR does not cover MLE kernel\n";
-+	}
-+
-+	/*
-+	 * Other regions of interest like boot param, AP wake block, cmdline
-+	 * already checked for PMR coverage in the early stub code.
-+	 */
-+
-+out:
-+	txt_early_put_heap_table(os_sinit_data, field_offset);
-+
-+	if (err)
-+		slaunch_reset(txt, errmsg, err);
-+}
-+
-+static void __init slaunch_txt_reserve_range(u64 base, u64 size)
-+{
-+	int type;
-+
-+	type = e820__get_entry_type(base, base + size - 1);
-+	if (type == E820_TYPE_RAM) {
-+		pr_info("memblock reserve base: %llx size: %llx\n", base, size);
-+		memblock_reserve(base, size);
-+	}
-+}
-+
-+/*
-+ * For Intel, certain regions of memory must be marked as reserved by putting
-+ * them on the memblock reserved list if they are not already e820 reserved.
-+ * This includes:
-+ *  - The TXT HEAP
-+ *  - The ACM area
-+ *  - The TXT private register bank
-+ *  - The MDR list sent to the MLE by the ACM (see TXT specification)
-+ *  (Normally the above are properly reserved by firmware but if it was not
-+ *  done, reserve them now)
-+ *  - The AP wake block
-+ *  - TPM log external to the TXT heap
-+ *
-+ * Also if the low PMR doesn't cover all memory < 4G, any RAM regions above
-+ * the low PMR must be reserved too.
-+ */
-+static void __init slaunch_txt_reserve(void __iomem *txt)
-+{
-+	struct txt_sinit_memory_descriptor_record *mdr;
-+	struct txt_sinit_mle_data *sinit_mle_data;
-+	u64 base, size, heap_base, heap_size;
-+	u32 mdrnum, mdroffset, mdrslen;
-+	u32 field_offset, i;
-+	void *mdrs;
-+
-+	base = TXT_PRIV_CONFIG_REGS_BASE;
-+	size = TXT_PUB_CONFIG_REGS_BASE - TXT_PRIV_CONFIG_REGS_BASE;
-+	slaunch_txt_reserve_range(base, size);
-+
-+	memcpy_fromio(&heap_base, txt + TXT_CR_HEAP_BASE, sizeof(heap_base));
-+	memcpy_fromio(&heap_size, txt + TXT_CR_HEAP_SIZE, sizeof(heap_size));
-+	slaunch_txt_reserve_range(heap_base, heap_size);
-+
-+	memcpy_fromio(&base, txt + TXT_CR_SINIT_BASE, sizeof(base));
-+	memcpy_fromio(&size, txt + TXT_CR_SINIT_SIZE, sizeof(size));
-+	slaunch_txt_reserve_range(base, size);
-+
-+	field_offset = offsetof(struct txt_sinit_mle_data,
-+				sinit_vtd_dmar_table_size);
-+	sinit_mle_data = txt_early_get_heap_table(txt, TXT_SINIT_MLE_DATA_TABLE,
-+						  field_offset);
-+
-+	mdrnum = sinit_mle_data->num_of_sinit_mdrs;
-+	mdroffset = sinit_mle_data->sinit_mdrs_table_offset;
-+
-+	txt_early_put_heap_table(sinit_mle_data, field_offset);
-+
-+	if (!mdrnum)
-+		goto nomdr;
-+
-+	mdrslen = mdrnum * sizeof(*mdr);
-+
-+	mdrs = txt_early_get_heap_table(txt, TXT_SINIT_MLE_DATA_TABLE,
-+					mdroffset + mdrslen - 8);
-+
-+	mdr = mdrs + mdroffset - 8;
-+
-+	for (i = 0; i < mdrnum; i++, mdr++) {
-+		/* Spec says some entries can have length 0, ignore them */
-+		if (mdr->type > 0 && mdr->length > 0)
-+			slaunch_txt_reserve_range(mdr->address, mdr->length);
-+	}
-+
-+	txt_early_put_heap_table(mdrs, mdroffset + mdrslen - 8);
-+
-+nomdr:
-+	slaunch_txt_reserve_range(ap_wake_info.ap_wake_block,
-+				  ap_wake_info.ap_wake_block_size);
-+
-+	/*
-+	 * Earlier checks ensured that the event log was properly situated
-+	 * either inside the TXT heap or outside. This is a check to see if the
-+	 * event log needs to be reserved. If it is in the TXT heap, it is
-+	 * already reserved.
-+	 */
-+	if (evtlog_addr < heap_base || evtlog_addr > (heap_base + heap_size))
-+		slaunch_txt_reserve_range(evtlog_addr, evtlog_size);
-+
-+	for (i = 0; i < e820_table->nr_entries; i++) {
-+		base = e820_table->entries[i].addr;
-+		size = e820_table->entries[i].size;
-+		if (base >= vtd_pmr_lo_size && base < 0x100000000ULL)
-+			slaunch_txt_reserve_range(base, size);
-+		else if (base < vtd_pmr_lo_size && base + size > vtd_pmr_lo_size)
-+			slaunch_txt_reserve_range(vtd_pmr_lo_size,
-+						  base + size - vtd_pmr_lo_size);
-+	}
-+}
-+
-+/*
-+ * TXT stashes a safe copy of the DMAR ACPI table to prevent tampering.
-+ * It is stored in the TXT heap. Fetch it from there and make it available
-+ * to the IOMMU driver.
-+ */
-+static void __init slaunch_copy_dmar_table(void __iomem *txt)
-+{
-+	struct txt_sinit_mle_data *sinit_mle_data;
-+	u32 field_offset, dmar_size, dmar_offset;
-+	void *dmar;
-+
-+	field_offset = offsetof(struct txt_sinit_mle_data,
-+				processor_scrtm_status);
-+	sinit_mle_data = txt_early_get_heap_table(txt, TXT_SINIT_MLE_DATA_TABLE,
-+						  field_offset);
-+
-+	dmar_size = sinit_mle_data->sinit_vtd_dmar_table_size;
-+	dmar_offset = sinit_mle_data->sinit_vtd_dmar_table_offset;
-+
-+	txt_early_put_heap_table(sinit_mle_data, field_offset);
-+
-+	if (!dmar_size || !dmar_offset)
-+		slaunch_reset(txt, "Error invalid DMAR table values\n", SL_ERROR_HEAP_INVALID_DMAR);
-+
-+	if (unlikely(dmar_size > PAGE_SIZE))
-+		slaunch_reset(txt, "Error DMAR too big to store\n", SL_ERROR_HEAP_DMAR_SIZE);
-+
-+	dmar = txt_early_get_heap_table(txt, TXT_SINIT_MLE_DATA_TABLE,
-+					dmar_offset + dmar_size - 8);
-+	if (!dmar)
-+		slaunch_reset(txt, "Error early_ioremap of DMAR\n", SL_ERROR_HEAP_DMAR_MAP);
-+
-+	memcpy(txt_dmar, dmar + dmar_offset - 8, dmar_size);
-+
-+	txt_early_put_heap_table(dmar, dmar_offset + dmar_size - 8);
-+}
-+
-+/*
-+ * The location of the safe AP wake code block is stored in the TXT heap.
-+ * Fetch needed values here in the early init code for later use in SMP
-+ * startup.
-+ *
-+ * Also get the TPM event log values are in the SLRT and have to be fetched.
-+ * They will be put on the memblock reserve list later.
-+ */
-+static void __init slaunch_fetch_values(void __iomem *txt)
-+{
-+	struct txt_os_mle_data *os_mle_data;
-+	struct slr_entry_log_info *log_info;
-+	u8 *jmp_offset, *stacks_offset;
-+	struct slr_table *slrt;
-+	u32 size;
-+
-+	os_mle_data = txt_early_get_heap_table(txt, TXT_OS_MLE_DATA_TABLE,
-+					       sizeof(*os_mle_data));
-+
-+	ap_wake_info.ap_wake_block = os_mle_data->ap_wake_block;
-+	ap_wake_info.ap_wake_block_size = os_mle_data->ap_wake_block_size;
-+
-+	jmp_offset = os_mle_data->mle_scratch + SL_SCRATCH_AP_JMP_OFFSET;
-+	ap_wake_info.ap_jmp_offset = *((u32 *)jmp_offset);
-+
-+	stacks_offset = os_mle_data->mle_scratch + SL_SCRATCH_AP_STACKS_OFFSET;
-+	ap_wake_info.ap_stacks_offset = *((u32 *)stacks_offset);
-+
-+	slrt = (struct slr_table *)early_memremap(os_mle_data->slrt, sizeof(*slrt));
-+	if (!slrt)
-+		slaunch_reset(txt, "Error early_memremap of SLRT failed\n", SL_ERROR_SLRT_MAP);
-+
-+	size = slrt->size;
-+	early_memunmap(slrt, sizeof(*slrt));
-+
-+	slrt = (struct slr_table *)early_memremap(os_mle_data->slrt, size);
-+	if (!slrt)
-+		slaunch_reset(txt, "Error early_memremap of SLRT failed\n", SL_ERROR_SLRT_MAP);
-+
-+	log_info = slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_LOG_INFO);
-+
-+	if (!log_info)
-+		slaunch_reset(txt, "SLRT missing logging info entry\n", SL_ERROR_SLRT_MISSING_ENTRY);
-+
-+	evtlog_addr = log_info->addr;
-+	evtlog_size = log_info->size;
-+
-+	early_memunmap(slrt, size);
-+
-+	txt_early_put_heap_table(os_mle_data, sizeof(*os_mle_data));
-+}
-+
-+/*
-+ * Intel TXT specific late stub setup and validation called from within
-+ * x86 specific setup_arch().
-+ */
-+static void __init slaunch_setup_txt(void)
-+{
-+	u64 one = TXT_REGVALUE_ONE, val;
-+	void __iomem *txt;
-+
-+	/*
-+	 * See if SENTER was done by reading the status register in the
-+	 * public space. If the public register space cannot be read, TXT may
-+	 * be disabled.
-+	 */
-+	txt = early_ioremap(TXT_PUB_CONFIG_REGS_BASE,
-+			    TXT_NR_CONFIG_PAGES * PAGE_SIZE);
-+	if (!txt)
-+		panic("Error early_ioremap in TXT setup failed\n");
-+
-+	memcpy_fromio(&val, txt + TXT_CR_STS, sizeof(val));
-+	early_iounmap(txt, TXT_NR_CONFIG_PAGES * PAGE_SIZE);
-+
-+	/* SENTER should have been done */
-+	if (!(val & TXT_SENTER_DONE_STS))
-+		panic("Error TXT.STS SENTER_DONE not set\n");
-+
-+	/* SEXIT should have been cleared */
-+	if (val & TXT_SEXIT_DONE_STS)
-+		panic("Error TXT.STS SEXIT_DONE set\n");
-+
-+	/* Now we want to use the private register space */
-+	txt = early_ioremap(TXT_PRIV_CONFIG_REGS_BASE,
-+			    TXT_NR_CONFIG_PAGES * PAGE_SIZE);
-+	if (!txt) {
-+		/* This is really bad, no where to go from here */
-+		panic("Error early_ioremap of TXT priv registers\n");
-+	}
-+
-+	/*
-+	 * Try to read the Intel VID from the TXT private registers to see if
-+	 * TXT measured launch happened properly and the private space is
-+	 * available.
-+	 */
-+	memcpy_fromio(&val, txt + TXT_CR_DIDVID, sizeof(val));
-+	if ((val & 0xffff) != 0x8086) {
-+		/*
-+		 * Can't do a proper TXT reset since it appears something is
-+		 * wrong even though SENTER happened and it should be in SMX
-+		 * mode.
-+		 */
-+		panic("Invalid TXT vendor ID, not in SMX mode\n");
-+	}
-+
-+	/* Set flags so subsequent code knows the status of the launch */
-+	sl_flags |= (SL_FLAG_ACTIVE | SL_FLAG_ARCH_TXT);
-+
-+	/*
-+	 * Reading the proper DIDVID from the private register space means we
-+	 * are in SMX mode and private registers are open for read/write.
-+	 */
-+
-+	/* On Intel, have to handle TPM localities via TXT */
-+	memcpy_toio(txt + TXT_CR_CMD_SECRETS, &one, sizeof(one));
-+	memcpy_fromio(&val, txt + TXT_CR_E2STS, sizeof(val));
-+	memcpy_toio(txt + TXT_CR_CMD_OPEN_LOCALITY1, &one, sizeof(one));
-+	memcpy_fromio(&val, txt + TXT_CR_E2STS, sizeof(val));
-+
-+	slaunch_fetch_values(txt);
-+
-+	slaunch_verify_pmrs(txt);
-+
-+	slaunch_txt_reserve(txt);
-+
-+	slaunch_copy_dmar_table(txt);
-+
-+	early_iounmap(txt, TXT_NR_CONFIG_PAGES * PAGE_SIZE);
-+
-+	pr_info("Intel TXT setup complete\n");
-+}
-+
-+void __init slaunch_setup(void)
-+{
-+	/*
-+	 * If booted through secure launch entry point, the loadflags
-+	 * option will be set.
-+	 */
-+	if (!(boot_params.hdr.loadflags & SLAUNCH_FLAG))
-+		return;
-+
-+	if (boot_cpu_has(X86_FEATURE_SMX))
-+		slaunch_setup_txt();
-+}
-diff --git a/drivers/iommu/intel/dmar.c b/drivers/iommu/intel/dmar.c
-index ec975c73cfe6..51b9b4c72924 100644
---- a/drivers/iommu/intel/dmar.c
-+++ b/drivers/iommu/intel/dmar.c
-@@ -28,6 +28,7 @@
- #include <linux/iommu.h>
- #include <linux/numa.h>
- #include <linux/limits.h>
-+#include <linux/slaunch.h>
- #include <asm/irq_remapping.h>
- 
- #include "iommu.h"
-@@ -661,6 +662,9 @@ parse_dmar_table(void)
- 	 */
- 	dmar_tbl = tboot_get_dmar_table(dmar_tbl);
- 
-+	/* If Secure Launch is active, it has similar logic */
-+	dmar_tbl = slaunch_get_dmar_table(dmar_tbl);
-+
- 	dmar = (struct acpi_table_dmar *)dmar_tbl;
- 	if (!dmar)
- 		return -ENODEV;
++#undef CONFIG_CRYPTO_LIB_SHA1_ARCH
++#include "../../../../lib/crypto/sha1.c"
 -- 
 2.43.7
 
