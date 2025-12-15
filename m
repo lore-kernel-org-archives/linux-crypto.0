@@ -1,286 +1,185 @@
-Received: from mail186-20.suw21.mandrillapp.com (mail186-20.suw21.mandrillapp.com [198.2.186.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3414430BB88
-	for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 14:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.2.186.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE9830BB93;
+	Mon, 15 Dec 2025 14:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765808835; cv=none; b=fSbUNIg8cYUYPzjNRk662yEOdJb5N8uTfXVXBV8S8FkKtStcLTOBzK+WW3prlSsT/2XoTqbWDsGxZK8mewZpdPLgK9nFu34udDZxPURGAwe2zBsXs62Uve+6/mYEXFZjUe5dsboBH4tpjWhoPwIlJ1sdbVeL2ZrEePzGbWCZvYc=
+	t=1765810634; cv=none; b=rGVfDrcduJPPO6ZXuf6J+YqiAtqs3VaSROgiMoBdXbmGdHLVe1eCQpyTo3ZnYmeV+OA8LOdjrxKPFBDZE6DSZ6OX+wcgb2yLj8BthOOq7gWe5ZsvjRVxMX/PPE/rjYmT1rGwtT6aSs3a/Q0c325nToK4CPpv6HNWfPPrr/aHhlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765808835; c=relaxed/simple;
-	bh=Xsq5EDj6JfdjBo56zuK3UD6TH0S3xwNLkauF1xvaPg8=;
-	h=From:Subject:To:Cc:Message-Id:Date:MIME-Version:Content-Type; b=V4Svtst84pW/9SCZrRvcJCqMD3NTaU8NuAMwu6WIPTmFDGdb8Eqh7qA8dYUSz08xc0E0uhzms9J5f0FS9srf0W2xqO3pp8WmGaSR44g32UJaMAe55JoAJi/JgkiZTjZWwy/wYqPZ13UyqDo770/LNo1aOO101afSEIhP2vMe5Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=PryMCp9m; dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b=dfhJb4mR; arc=none smtp.client-ip=198.2.186.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
+	s=arc-20240116; t=1765810634; c=relaxed/simple;
+	bh=Kt88zhRCNvKhnHZ6We6BuoYnSr4Gk584iz2cd6VF5uQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DxTjeT9w9j/xJ+F0yVD8A6HDXBAMZht95bnD/oue6Xgd8AA/E1Y/AYrwQi78d6ZiNn8UZSO8pEG65GoXRYnW3X7/NShdCP1y+77T5OTLTOXJ6KHvRzZs+joANYAcXrf/NusZn02xO6idxqxLmkY3eIiX67FpKfajumn7Yodkg3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K88WwpD0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="PryMCp9m";
-	dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b="dfhJb4mR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
-	s=mte1; t=1765807778; x=1766077778;
-	bh=Y0vmCttgVu2ttB7leVpGoBwWuJAwz/ma4WmOx09m+TY=;
-	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
-	b=PryMCp9mHpP/8AlSSJwoXHKkrTOfsZxV1QiwP2bZo+wIudDrK42Yu4e0MsKu01obZ
-	 +PLjT/z+2rsPqdtTCzU2V0VgV9seINMKUutmnyZk4bxfE8XfD7yQ/izQvKMtJJuD5R
-	 xpY/tADK8+XpqMZyOecYt1wlB/16D5kotVamdSekzb83n27smhJAZXV9Dqy6RBSGsA
-	 jPodOr2pLDde6iLkeHgEQ6+bnZHwBIbhbg2/KYN4xZgeNwPY/PaYQhxUZ1kisOmXhk
-	 w3MCNeNOxA1UTt92PoN5cUvMWbDTXQwr1NUcbBzVlH/dd9uwgaI0rQCvjxq5Lgmkh3
-	 0Kgu8LyqFdYgw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
-	t=1765807778; x=1766068278; i=thomas.courrege@vates.tech;
-	bh=Y0vmCttgVu2ttB7leVpGoBwWuJAwz/ma4WmOx09m+TY=;
-	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
-	b=dfhJb4mRNKd1gKrxPsy1X9z+oLryktSS64AvtM57CgKJLHi/VR7lpPUEvk6Lsu5pn
-	 TnQHCJREBvhff2GHVAm1s5pctl4FhzqisxCEjZKcR2FtoRqsAfaA5eL1/xF1wTETve
-	 32ukPlwo4HvivYuXcGI/GRMeTItElnP/Eg4QCSmcpicyHqZ91sZcYNFjoEGanSqu2M
-	 hzmUCiyKFLJeWq7OEqa66EEDeQ3g+y2TOuvS/Zbfegf1K9UjZZxNgep5jwL5EQSM3Q
-	 Adpmh6KwN/tA0YD/2uqgmcIhIEi0OhdmTs3p1vvNY5ouV5mb1OhYWOHOzd3JXOOui3
-	 G4T7aVHyy6ZnA==
-Received: from pmta10.mandrill.prod.suw01.rsglab.com (localhost [127.0.0.1])
-	by mail186-20.suw21.mandrillapp.com (Mailchimp) with ESMTP id 4dVMPt0N86zFCWqfd
-	for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 14:09:38 +0000 (GMT)
-From: "Thomas Courrege" <thomas.courrege@vates.tech>
-Subject: =?utf-8?Q?[PATCH=20v3]=20KVM:=20SEV:=20Add=20KVM=5FSEV=5FSNP=5FHV=5FREPORT=5FREQ=20command?=
-Received: from [37.26.189.201] by mandrillapp.com id 07511c038109413485978fe042592cd0; Mon, 15 Dec 2025 14:09:37 +0000
-X-Mailer: git-send-email 2.52.0
-X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
-X-Bm-Transport-Timestamp: 1765807777356
-To: ashish.kalra@amd.com, corbet@lwn.net, herbert@gondor.apana.org.au, john.allen@amd.com, nikunj@amd.com, pbonzini@redhat.com, seanjc@google.com, thomas.lendacky@amd.com
-Cc: thomas.courrege@vates.tech, kvm@vger.kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
-Message-Id: <20251215140926.2820110-1-thomas.courrege@vates.tech>
-X-Native-Encoded: 1
-X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.07511c038109413485978fe042592cd0?=
-X-Mandrill-User: md_30504962
-Feedback-ID: 30504962:30504962.20251215:md
-Date: Mon, 15 Dec 2025 14:09:37 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K88WwpD0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6013EC4CEF5;
+	Mon, 15 Dec 2025 14:57:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765810634;
+	bh=Kt88zhRCNvKhnHZ6We6BuoYnSr4Gk584iz2cd6VF5uQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=K88WwpD0wRLQeqVwyfD+kVA+3i4pDK/G9ax2o6KgYXcjVTZdgBib3RND7kxspv2x/
+	 NdORB7gNumsqaYtGymequ/z3C614njL2fllWG4byTddAk9vH/sJAyQnJ3hz/+atA29
+	 LKiVraA+9n9Q32kcXQYGgICTxYGJPEsZPVEu/lbnZm1E+zax4ttg/G3EhJ4D29Tkix
+	 3rdVt4q+V+2Lg2QEdWVeUzbTuqtaBkfe5wLVCn3ab3YhiONTbvcp+vBqDE6kbLqEW8
+	 EJr5SV/oihmd7DKM3S+zdk6MxPiA94UmagZsGxRKyFlGh3X1X9QbX2Fyzr8SoMWKt7
+	 W2Ix5BFLqi6kw==
+Message-ID: <583f8d99-22b4-45cf-a5a3-b63e99cc966e@kernel.org>
+Date: Mon, 15 Dec 2025 08:57:12 -0600
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 5/5] crypto: ccp - Send PSP_CMD_TEE_RING_DESTROY when
+ PSP_CMD_TEE_RING_INIT fails
+To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+ Rijo Thomas <Rijo-john.Thomas@amd.com>, John Allen <john.allen@amd.com>,
+ "David S . Miller" <davem@davemloft.net>, Hans de Goede <hansg@kernel.org>,
+ "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER"
+ <linux-crypto@vger.kernel.org>,
+ "open list:AMD PMF DRIVER" <platform-driver-x86@vger.kernel.org>,
+ Lars Francke <lars.francke@gmail.com>, Yijun Shen <Yijun.Shen@dell.com>
+References: <20251214191213.154021-1-superm1@kernel.org>
+ <20251214191213.154021-6-superm1@kernel.org>
+ <53f2736f-39b7-b041-ea02-372618df5de3@linux.intel.com>
+Content-Language: en-US
+From: Mario Limonciello <superm1@kernel.org>
+In-Reply-To: <53f2736f-39b7-b041-ea02-372618df5de3@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Add support for retrieving the SEV-SNP attestation report via the
-SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
-ioctl for SNP guests.
+On 12/15/25 6:01 AM, Ilpo Järvinen wrote:
+> On Sun, 14 Dec 2025, Mario Limonciello (AMD) wrote:
+> 
+>> The hibernate resume sequence involves loading a resume kernel that is just
+>> used for loading the hibernate image before shifting back to the existing
+>> kernel.
+>>
+>> During that hibernate resume sequence the resume kernel may have loaded
+>> the ccp driver.  If this happens the resume kernel will also have called
+>> PSP_CMD_TEE_RING_INIT but it will never have called
+>> PSP_CMD_TEE_RING_DESTROY.
+>>
+>> This is problematic because the existing kernel needs to re-initialize the
+>> ring.  One could argue that the existing kernel should call destroy
+>> as part of restore() but there is no guarantee that the resume kernel did
+>> or didn't load the ccp driver.  There is also no callback opportunity for
+>> the resume kernel to destroy before handing back control to the existing
+>> kernel.
+>>
+>> Similar problems could potentially exist with the use of kdump and
+>> crash handling. I actually reproduced this issue like this:
+>>
+>> 1) rmmod ccp
+>> 2) hibernate the system
+>> 3) resume the system
+>> 4) modprobe ccp
+>>
+>> The resume kernel will have loaded ccp but never destroyed and then when
+>> I try to modprobe it fails.
+>>
+>> Because of these possible cases add a flow that checks the error code from
+>> the PSP_CMD_TEE_RING_INIT call and tries to call PSP_CMD_TEE_RING_DESTROY
+>> if it failed.  If this succeeds then call PSP_CMD_TEE_RING_INIT again.
+>>
+>> Fixes: f892a21f51162 ("crypto: ccp - use generic power management")
+>> Reported-by: Lars Francke <lars.francke@gmail.com>
+>> Closes: https://lore.kernel.org/platform-driver-x86/CAD-Ua_gfJnQSo8ucS_7ZwzuhoBRJ14zXP7s8b-zX3ZcxcyWePw@mail.gmail.com/
+>> Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
+>> ---
+>> v3:
+>>   * Add a comment (Tom)
+>>   * Add a define for busy condition (Shyam)
+>>   * Rename label (Shyam)
+>>   * Upgrade message to info (Shyam)
+>>   * Use a helper that validates result for destroy command (Shyam)
+>> ---
+>>   drivers/crypto/ccp/tee-dev.c | 12 ++++++++++++
+>>   include/linux/psp.h          |  2 ++
+>>   2 files changed, 14 insertions(+)
+>>
+>> diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
+>> index ef1430f86ad62..9edb220abbc1a 100644
+>> --- a/drivers/crypto/ccp/tee-dev.c
+>> +++ b/drivers/crypto/ccp/tee-dev.c
+>> @@ -113,6 +113,7 @@ static int tee_init_ring(struct psp_tee_device *tee)
+>>   {
+>>   	int ring_size = MAX_RING_BUFFER_ENTRIES * sizeof(struct tee_ring_cmd);
+>>   	struct tee_init_ring_cmd *cmd;
+>> +	bool retry = false;
+>>   	unsigned int reg;
+>>   	int ret;
+>>   
+>> @@ -135,6 +136,7 @@ static int tee_init_ring(struct psp_tee_device *tee)
+>>   	/* Send command buffer details to Trusted OS by writing to
+>>   	 * CPU-PSP message registers
+>>   	 */
+>> +retry_init:
+>>   	ret = psp_mailbox_command(tee->psp, PSP_CMD_TEE_RING_INIT, cmd,
+>>   				  TEE_DEFAULT_CMD_TIMEOUT, &reg);
+>>   	if (ret) {
+>> @@ -145,6 +147,16 @@ static int tee_init_ring(struct psp_tee_device *tee)
+>>   	}
+>>   
+>>   	if (FIELD_GET(PSP_CMDRESP_STS, reg)) {
+>> +		/*
+>> +		 * During the hibernate resume sequence driver may have gotten loaded
+>> +		 * but the ring not properly destroyed. If the ring doesn't work, try
+>> +		 * to destroy and re-init once.
+>> +		 */
+>> +		if (!retry && FIELD_GET(PSP_CMDRESP_STS, reg) == PSP_TEE_STATUS_RING_BUSY) {
+>> +			dev_info(tee->dev, "tee: ring init command failed with busy status, retrying\n");
+>> +			if (tee_send_destroy_cmd(tee))
+>> +				goto retry_init;
+>> +		}
+>>   		dev_err(tee->dev, "tee: ring init command failed (%#010lx)\n",
+>>   			FIELD_GET(PSP_CMDRESP_STS, reg));
+>>   		tee_free_ring(tee);
+>> diff --git a/include/linux/psp.h b/include/linux/psp.h
+>> index 92e60aeef21e1..a329148e3684b 100644
+>> --- a/include/linux/psp.h
+>> +++ b/include/linux/psp.h
+>> @@ -23,6 +23,8 @@
+>>   #define PSP_CMDRESP_RECOVERY	BIT(30)
+>>   #define PSP_CMDRESP_RESP	BIT(31)
+>>   
+>> +#define PSP_TEE_STATUS_RING_BUSY 0x0000000d  /* Ring already initialized */
+> 
+> It would be better to have this right underneath PSP_CMDRESP_STS (you
+> can use one extra space to indent different from the mask and bits).
+> 
+> Also, there's inconsistency in STS vs STATUS in the naming.
 
-Signed-off-by: Thomas Courrege <thomas.courrege@vates.tech>
----
- .../virt/kvm/x86/amd-memory-encryption.rst    | 27 ++++++++
- arch/x86/include/uapi/asm/kvm.h               |  9 +++
- arch/x86/kvm/svm/sev.c                        | 61 +++++++++++++++++++
- drivers/crypto/ccp/sev-dev.c                  |  1 +
- include/linux/psp-sev.h                       | 31 ++++++++++
- 5 files changed, 129 insertions(+)
+OK - to make sure I get it like you are suggesting for next spin, you 
+mean like this right?
 
-diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-index 1ddb6a86ce7f..083ed487764e 100644
---- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-+++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-@@ -572,6 +572,33 @@ Returns: 0 on success, -negative on error
- See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
- details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
- 
-+21. KVM_SEV_SNP_HV_REPORT_REQ
-+-----------------------------
-+
-+The KVM_SEV_SNP_HV_REPORT_REQ command requests the hypervisor-generated
-+SNP attestation report. This report is produced by the PSP using the
-+HV-SIGNED key selected by the caller.
-+
-+The ``key_sel`` field indicates which key the platform will use to sign the
-+report:
-+  * ``0``: If VLEK is installed, sign with VLEK. Otherwise, sign with VCEK.
-+  * ``1``: Sign with VCEK.
-+  * ``2``: Sign with VLEK.
-+  * Other values are reserved.
-+
-+Parameters (in): struct kvm_sev_snp_hv_report_req
-+
-+Returns:  0 on success, -negative on error
-+
-+::
-+        struct kvm_sev_snp_hv_report_req {
-+                __u64 report_uaddr;
-+                __u64 report_len;
-+                __u8 key_sel;
-+                __u8 pad0[7];
-+                __u64 pad1[4];
-+        };
-+
- Device attribute API
- ====================
- 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 7ceff6583652..464146bed784 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -743,6 +743,7 @@ enum sev_cmd_id {
- 	KVM_SEV_SNP_LAUNCH_START = 100,
- 	KVM_SEV_SNP_LAUNCH_UPDATE,
- 	KVM_SEV_SNP_LAUNCH_FINISH,
-+	KVM_SEV_SNP_HV_REPORT_REQ,
- 
- 	KVM_SEV_NR_MAX,
- };
-@@ -871,6 +872,14 @@ struct kvm_sev_receive_update_data {
- 	__u32 pad2;
- };
- 
-+struct kvm_sev_snp_hv_report_req {
-+	__u64 report_uaddr;
-+	__u64 report_len;
-+	__u8 key_sel;
-+	__u8 pad0[7];
-+	__u64 pad1[4];
-+};
-+
- struct kvm_sev_snp_launch_start {
- 	__u64 policy;
- 	__u8 gosvw[16];
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f59c65abe3cf..da8d0e13d4ac 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2261,6 +2261,64 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	return rc;
- }
- 
-+static int sev_snp_hv_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
-+{
-+	struct sev_data_snp_msg_report_rsp *report_rsp = NULL;
-+	struct sev_data_snp_hv_report_req data;
-+	struct kvm_sev_snp_hv_report_req params;
-+	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
-+	void __user *u_report;
-+	void __user *u_params = u64_to_user_ptr(argp->data);
-+	size_t rsp_size = sizeof(*report_rsp);
-+	int ret;
-+
-+	if (!sev_snp_guest(kvm))
-+		return -ENOTTY;
-+	if (copy_from_user(&params, u_params, sizeof(params)))
-+		return -EFAULT;
-+	printk("params.report_len: %llu\n", params.report_len);
-+
-+	if (params.report_len < rsp_size)
-+		return -ENOSPC;
-+
-+	u_report = u64_to_user_ptr(params.report_uaddr);
-+	if (!u_report)
-+		return -EINVAL;
-+
-+	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+	if (!report_rsp)
-+		return -ENOMEM;
-+
-+	data.len = sizeof(data);
-+	data.key_sel = params.key_sel;
-+	data.gctx_addr = __psp_pa(sev->snp_context);
-+	data.hv_report_paddr = __psp_pa(report_rsp);
-+
-+	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
-+				&argp->error);
-+	if (ret)
-+		goto e_free_rsp;
-+
-+	if (!report_rsp->status)
-+	rsp_size += report_rsp->report_size;
-+
-+	if (params.report_len < rsp_size) {
-+		rsp_size = sizeof(*report_rsp);
-+		ret = -ENOSPC;
-+	}
-+
-+	if (copy_to_user(u_report, report_rsp, rsp_size))
-+		ret = -EFAULT;
-+
-+	params.report_len = sizeof(*report_rsp) + report_rsp->report_size;
-+	if (copy_to_user(u_params, &params, sizeof(params)))
-+		ret = -EFAULT;
-+
-+e_free_rsp:
-+	snp_free_firmware_page(report_rsp);
-+	return ret;
-+}
-+
- struct sev_gmem_populate_args {
- 	__u8 type;
- 	int sev_fd;
-@@ -2672,6 +2730,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
- 	case KVM_SEV_SNP_LAUNCH_FINISH:
- 		r = snp_launch_finish(kvm, &sev_cmd);
- 		break;
-+	case KVM_SEV_SNP_HV_REPORT_REQ:
-+		r = sev_snp_hv_report_request(kvm, &sev_cmd);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		goto out;
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 956ea609d0cc..5dd7c3f0d50d 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -259,6 +259,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
- 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
- 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
-+	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
- 	default:				return sev_tio_cmd_buffer_len(cmd);
- 	}
- 
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 69ffa4b4d1fa..c651a400d124 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -124,6 +124,7 @@ enum sev_cmd {
- 	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
- 	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
- 	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
-+	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
- 	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
- 	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
- 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
-@@ -594,6 +595,36 @@ struct sev_data_attestation_report {
- 	u32 len;				/* In/Out */
- } __packed;
- 
-+/**
-+ * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
-+ *
-+ * @len: length of the command buffer in bytes
-+ * @key_sel: Selects which key to use for generating the signature.
-+ * @gctx_addr: System physical address of guest context page
-+ * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
-+ */
-+struct sev_data_snp_hv_report_req {
-+	u32 len;		/* In */
-+	u32 key_sel	:2,	/* In */
-+	    rsvd	:30;
-+	u64 gctx_addr;		/* In */
-+	u64 hv_report_paddr;	/* In */
-+} __packed;
-+
-+/**
-+ * struct sev_data_snp_msg_export_rsp
-+ *
-+ * @status: Status : 0h: Success. 16h: Invalid parameters.
-+ * @report_size: Size in bytes of the attestation report
-+ * @report: attestation report
-+ */
-+struct sev_data_snp_msg_report_rsp {
-+	u32 status;			/* Out */
-+	u32 report_size;		/* Out */
-+	u8 rsvd[24];
-+	u8 report[];
-+} __packed;
-+
- /**
-  * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
-  *
--- 
-2.52.0
+diff --git a/include/linux/psp.h b/include/linux/psp.h
+index 92e60aeef21e..b337dcce1e99 100644
+--- a/include/linux/psp.h
++++ b/include/linux/psp.h
+@@ -18,6 +18,7 @@
+   * and should include an appropriate local definition in their source 
+file.
+   */
+  #define PSP_CMDRESP_STS                GENMASK(15, 0)
++#define  PSP_TEE_STS_RING_BUSY 0x0000000d  /* Ring already initialized */
+  #define PSP_CMDRESP_CMD                GENMASK(23, 16)
+  #define PSP_CMDRESP_RESERVED   GENMASK(29, 24)
+  #define PSP_CMDRESP_RECOVERY   BIT(30)
+
+> 
+>> +
+>>   #define PSP_DRBL_MSG		PSP_CMDRESP_CMD
+>>   #define PSP_DRBL_RING		BIT(0)
+>>   
+>>
+> 
+
