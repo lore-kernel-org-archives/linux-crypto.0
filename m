@@ -1,155 +1,170 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562FE329E5B;
-	Tue, 16 Dec 2025 15:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFF333A9C8;
+	Tue, 16 Dec 2025 15:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765897862; cv=none; b=YstLVBBEvDnb20bz4bpD82QkGTgPK53+wRYp2YBbICTWCrVHl++D2r81BR6vt/aiG40hY1Mq9Ub/1dj42USRg1VgDqaCwMZgY9Kw0wZo83rxlMAU/Ms+cbMFA69hIujHLk03QKY9duDVfHQAYHRoQrfnRMjZ5RD0fGfTfEnybTw=
+	t=1765899791; cv=none; b=jFx16sM4G3oV8wRQZtDM28olO2KI6AK04bA9QEJKTURZfihoZdkrhTJNvR9tr0bw1x/ARTiqSwzJxvQRORn4QYoNQJcjRAkj7UX7YUh5DSU5iN4obR54eH0OwhGIXAO25O6v4DM3MWNdxYkzs4zW+SYOGRDChzq3+wmmKXheVUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765897862; c=relaxed/simple;
-	bh=0wUOhvNJfmtyqd/XorY2juPcs4vJJ/uawdDjV9JrIeg=;
+	s=arc-20240116; t=1765899791; c=relaxed/simple;
+	bh=ZJTJypfLe1H/1AUEwksCTkMoXxELG4u7pdR81YdX+EQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UeCZtUL4MIlUpJZ3XxX7Zqa5F+WyDCJOEVyeTO78CGPNR4h5uDnB0yBpt/yPWrqZETQsxqlfImVQfTrkanAQAPEqLxxMM5P1XQdeX+hk9CH3dZJzgacZvOXkaloSY2bePBV3TDZG1fSWe/amlAAhVh4s+3sTA0Ql4iFb7zcF55c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D28rT3n9; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=g2OAq1Q1Sik+S0NaYMQJROBwVSeIjutu+8mAB1ulQ6S7GW1EBGXwsGSVS7qvqs1Nqq7kl+LO3FixlFKAC481+yOLtKyHYbs07QbEem9K4GRpWBhSxee4SRtorDbg4ezYoYeDbOfNHoVvaIjsLjEaikkuE6eBJQt1q7/qj0K/aJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=avTeetSC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D28rT3n9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62D93C4CEF1;
-	Tue, 16 Dec 2025 15:11:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="avTeetSC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD8A9C4CEF1;
+	Tue, 16 Dec 2025 15:43:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765897861;
-	bh=0wUOhvNJfmtyqd/XorY2juPcs4vJJ/uawdDjV9JrIeg=;
+	s=k20201202; t=1765899791;
+	bh=ZJTJypfLe1H/1AUEwksCTkMoXxELG4u7pdR81YdX+EQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D28rT3n9BsdrjFbjDLVxceXWFhcNG6oWjyTtEhA5F2agEMD2XYsxjUgOE3VqeonBy
-	 Vh4mset5E38dINz639V8ciWcs+6TQ4sDMvY0LS2bz4AjWNfpq5WDAtaD2naCoeyJg3
-	 QFz1CoxLoNHrT19AK2Cqdr5f5kPn8psBzgSg4NyNy6fNja7wZBbsigV2GoJyBg12k4
-	 JIJdWn6q/zm6QNXqibVglaDXO4PCuEFDRNX/x/2I08hbeBMBz2cNml60yHGWbqQlIY
-	 NjjIw/r7Iy+T9DmmD+oytSU9pCoqmPDT8D0N1aKRkvjXcQJdTZqyaozn0CeQ58lgIJ
-	 SeXmannxsGH7w==
-Date: Tue, 16 Dec 2025 20:40:58 +0530
+	b=avTeetSCg2f1iVCLtIL2eMD8lxo6IXEVPcYP29oezKOpSlnYbzQvySLzpryda+R1A
+	 ew6Qmjryuhzff4o2BNqhJbYikZ/FxB9nsZ+SVx/fEVe4+Vk8KAAXNTxXKgB1dOxfC6
+	 74+SKOUxUYH7bvsWWQn3Q5qwYcHK43xEPD2CbWjHDldkEanlq21fmXVgnU0XBWMqbv
+	 BNwMTA5V4T1ZdwdXE45rLHOcG/cKJ0JLceGyQuUmh04zLBAqknv3qYM1zyCFIEZrg6
+	 xNyoNgN2Bk8xHpe+jauDCs8GKdRJcRNBlYtSaJq0IBEmiVa1MMIQaZqoQDY1frH7eC
+	 nyyoTKRn0yS8A==
+Date: Tue, 16 Dec 2025 21:13:07 +0530
 From: Vinod Koul <vkoul@kernel.org>
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
+To: Frank Li <Frank.li@nxp.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Udit Tiwari <quic_utiwari@quicinc.com>,
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
-	Md Sadre Alam <mdalam@qti.qualcomm.com>,
-	Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v9 03/11] dmaengine: qcom: bam_dma: implement support for
- BAM locking
-Message-ID: <aUF2gj_0svpygHmD@vaman>
-References: <20251128-qcom-qce-cmd-descr-v9-0-9a5f72b89722@linaro.org>
- <20251128-qcom-qce-cmd-descr-v9-3-9a5f72b89722@linaro.org>
- <aUFX14nz8cQj8EIb@vaman>
- <CAMRc=MetbSuaU9VpK7CTio4kt-1pkwEFecARv7ROWDH_yq63OQ@mail.gmail.com>
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Koichiro Den <den@valinux.co.jp>, Niklas Cassel <cassel@kernel.org>,
+	dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+	mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	imx@lists.linux.dev
+Subject: Re: [PATCH 0/8] dmaengine: Add new API to combine onfiguration and
+ descriptor preparation
+Message-ID: <aUF-C8iUCs-dYXGm@vaman>
+References: <20251208-dma_prep_config-v1-0-53490c5e1e2a@nxp.com>
+ <aUFUX0e_h7RGAecz@vaman>
+ <aUF2SX/6bV2lHtF0@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=MetbSuaU9VpK7CTio4kt-1pkwEFecARv7ROWDH_yq63OQ@mail.gmail.com>
+In-Reply-To: <aUF2SX/6bV2lHtF0@lizhi-Precision-Tower-5810>
 
-On 16-12-25, 16:00, Bartosz Golaszewski wrote:
-> On Tue, Dec 16, 2025 at 2:00 PM Vinod Koul <vkoul@kernel.org> wrote:
+On 16-12-25, 10:10, Frank Li wrote:
+> On Tue, Dec 16, 2025 at 06:15:19PM +0530, Vinod Koul wrote:
+> > On 08-12-25, 12:09, Frank Li wrote:
 > >
-> > On 28-11-25, 12:44, Bartosz Golaszewski wrote:
-> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > Spell check on subject please :-)
+> >
+> > > Previously, configuration and preparation required two separate calls. This
+> > > works well when configuration is done only once during initialization.
 > > >
-> > > Use metadata operations in DMA descriptors to allow BAM users to pass
-> > > additional information to the engine. To that end: define a new
-> > > structure - struct bam_desc_metadata - as a medium and define two new
-> > > commands: for locking and unlocking the BAM respectively. Handle the
-> > > locking in the .attach() callback.
+> > > However, in cases where the burst length or source/destination address must
+> > > be adjusted for each transfer, calling two functions is verbose.
 > > >
-> > > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > > 	if (dmaengine_slave_config(chan, &sconf)) {
+> > > 		dev_err(dev, "DMA slave config fail\n");
+> > > 		return -EIO;
+> > > 	}
+> > >
+> > > 	tx = dmaengine_prep_slave_single(chan, dma_local, len, dir, flags);
+> > >
+> > > After new API added
+> > >
+> > > 	tx = dmaengine_prep_slave_single(chan, dma_local, len, dir, flags, &sconf);
+> >
+> > Nak, we cant change the API like this.
+> 
+> Sorry, it is typo here. in patch
+> 	dmaengine_prep_slave_single_config(chan, dma_local, len, dir, flags, &sconf);
+> 
+> > I agree that you can add a new way to call dmaengine_slave_config() and
+> > dmaengine_prep_slave_single() together.
+> > maybe dmaengine_prep_config_perip_single() (yes we can go away with slave, but
+> > cant drop it, as absence means something else entire).
+> 
+> how about dmaengine_prep_peripheral_single() and dmaengine_prep_peripheral_sg()
+> to align recent added "dmaengine_prep_peripheral_dma_vec()"
+
+It doesnt imply config has been done, how does it differ from usual
+prep_ calls. I see confusions can be caused!
+
+> I think "peripheral" also is reduntant. dmaengine_prep_single() and
+> dmaengine_prep_sg() should be enough because
+
+Then you are missing the basic premises of dmaengine that we have memcpy
+ops and peripheral dma ops (aka slave) Absence of peripheral always
+implies that it is memcpy
+
+> - dmaengine_prep_dma_cyclic() is actually work with prepiperial FIFO
+> - some prepierial FIFO work like memory, by use shared memory method, like
+> PCIe map windows.
+> - argument: config and dir already passdown information to indicate if it
+> is device preiperial. So needn't indicate at function name.
+> - maybe later extend to support mem to mem by config becuase adjust burst
+> size for difference alignment or difference bus fabric port to optimaze
+> performance.
+> 
+> Frank
+> 
+> >
+> > I would like to retain the dmaengine_prep_slave_single() as an API for
+> > users to call and invoke. There are users who configure channel once as
+> > well
+> >
+> > >
+> > > Additional, prevous two calls requires additional locking to ensure both
+> > > steps complete atomically.
+> > >
+> > >     mutex_lock()
+> > >     dmaengine_slave_config()
+> > >     dmaengine_prep_slave_single()
+> > >     mutex_unlock()
+> > >
+> > > after new API added, mutex lock can be moved. See patch
+> > >      nvmet: pci-epf: Use dmaengine_prep_slave_single_config() API
+> > >
+> > > Signed-off-by: Frank Li <Frank.Li@nxp.com>
 > > > ---
-> > >  drivers/dma/qcom/bam_dma.c       | 59 +++++++++++++++++++++++++++++++++++++++-
-> > >  include/linux/dma/qcom_bam_dma.h | 12 ++++++++
-> > >  2 files changed, 70 insertions(+), 1 deletion(-)
+> > > Frank Li (8):
+> > >       dmaengine: Add API to combine configuration and preparation (sg and single)
+> > >       PCI: endpoint: pci-epf-test: use new DMA API to simple code
+> > >       dmaengine: dw-edma: Use new .device_prep_slave_sg_config() callback
+> > >       dmaengine: dw-edma: Pass dma_slave_config to dw_edma_device_transfer()
+> > >       nvmet: pci-epf: Remove unnecessary dmaengine_terminate_sync() on each DMA transfer
+> > >       nvmet: pci-epf: Use dmaengine_prep_slave_single_config() API
+> > >       PCI: epf-mhi:Using new API dmaengine_prep_slave_single_config() to simple code.
+> > >       crypto: atmel: Use dmaengine_prep_slave_single_config() API
 > > >
-> > > diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
-> > > index c9ae1fffe44d79c5eb59b8bbf7f147a8fa3aa0bd..d1dc80b29818897b333cd223ec7306a169cc51fd 100644
-> > > --- a/drivers/dma/qcom/bam_dma.c
-> > > +++ b/drivers/dma/qcom/bam_dma.c
-> > > @@ -30,6 +30,7 @@
-> > >  #include <linux/module.h>
-> > >  #include <linux/interrupt.h>
-> > >  #include <linux/dma-mapping.h>
-> > > +#include <linux/dma/qcom_bam_dma.h>
-> > >  #include <linux/scatterlist.h>
-> > >  #include <linux/device.h>
-> > >  #include <linux/platform_device.h>
-> > > @@ -391,6 +392,8 @@ struct bam_chan {
-> > >       struct list_head desc_list;
+> > >  drivers/crypto/atmel-aes.c                    | 10 ++---
+> > >  drivers/dma/dw-edma/dw-edma-core.c            | 38 +++++++++++-----
+> > >  drivers/nvme/target/pci-epf.c                 | 21 +++------
+> > >  drivers/pci/endpoint/functions/pci-epf-mhi.c  | 52 +++++++---------------
+> > >  drivers/pci/endpoint/functions/pci-epf-test.c |  8 +---
+> > >  include/linux/dmaengine.h                     | 64 ++++++++++++++++++++++++---
+> > >  6 files changed, 111 insertions(+), 82 deletions(-)
+> > > ---
+> > > base-commit: bc04acf4aeca588496124a6cf54bfce3db327039
+> > > change-id: 20251204-dma_prep_config-654170d245a2
 > > >
-> > >       struct list_head node;
-> > > +
-> > > +     bool bam_locked;
-> > >  };
-> > >
-> > >  static inline struct bam_chan *to_bam_chan(struct dma_chan *common)
-> > > @@ -655,6 +658,53 @@ static int bam_slave_config(struct dma_chan *chan,
-> > >       return 0;
-> > >  }
-> > >
-> > > +static int bam_metadata_attach(struct dma_async_tx_descriptor *desc, void *data, size_t len)
-> > > +{
-> > > +     struct virt_dma_desc *vd = container_of(desc, struct virt_dma_desc, tx);
-> > > +     struct bam_async_desc *async_desc = container_of(vd, struct bam_async_desc,  vd);
-> > > +     struct bam_desc_hw *hw_desc = async_desc->desc;
-> > > +     struct bam_desc_metadata *metadata = data;
-> > > +     struct bam_chan *bchan = to_bam_chan(metadata->chan);
-> > > +     struct bam_device *bdev = bchan->bdev;
-> > > +
-> > > +     if (!data)
-> > > +             return -EINVAL;
-> > > +
-> > > +     if (metadata->op == BAM_META_CMD_LOCK || metadata->op == BAM_META_CMD_UNLOCK) {
-> > > +             if (!bdev->dev_data->bam_pipe_lock)
-> > > +                     return -EOPNOTSUPP;
-> > > +
-> > > +             /* Expecting a dummy write when locking, only one descriptor allowed. */
-> > > +             if (async_desc->num_desc != 1)
-> > > +                     return -EINVAL;
-> > > +     }
-> > > +
-> > > +     switch (metadata->op) {
-> > > +     case BAM_META_CMD_LOCK:
-> > > +             if (bchan->bam_locked)
-> > > +                     return -EBUSY;
-> > > +
-> > > +             hw_desc->flags |= DESC_FLAG_LOCK;
+> > > Best regards,
+> > > --
+> > > Frank Li <Frank.Li@nxp.com>
 > >
-> > Why does this flag imply for the hardware.
-
-s/Why/What !
-> 
-> Please rephrase, I don't get what you mean.
-
-I am trying to understand what the flag refers to and why do you need
-this.. What is the problem that lock tries to solve
-
-> >
-> > I do not like the interface designed here. This is overloading. Can we
-> > look at doing something better here.
-> >
-> 
-> It used to be a generic flag in dmaengine visible for all users.
-> Dmitry argued that it's too Qualcomm-specific for a generic flag and
-> suggested using the metadata to hide the communication between the QCE
-> and BAM drivers. I'm open to other suggestions but it has to be a bit
-> more specific than "do something better". :)
-> 
-> Bartosz
+> > --
+> > ~Vinod
 
 -- 
 ~Vinod
