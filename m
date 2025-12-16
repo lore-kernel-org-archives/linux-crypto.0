@@ -1,130 +1,134 @@
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE69221FB8;
-	Tue, 16 Dec 2025 16:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FD023BF9B
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 16:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765902546; cv=none; b=btqXWhUkjD5FFzWRCDV9f03TSV5SkcO/u7HkFo4tfy2JqNCYnzSkhig1sLsf7KB2uJgGgSShFOCEm9m+P1Ga4IMe42jerhogZWsmVw4CgfN/8t1H/IZ7LgcQGPrWwOsIq4WHXjrNJJfIf+wjq3Wjd7X88nbou66+mTJFp9wPbmU=
+	t=1765904109; cv=none; b=eXug604sjePdMVilQ3US3PQCsyt+/RzoXV4PCXpg/6b71Uv0RON72484nAelrOBadED+brINSFozzzJ+P60ulDiuQu21NNGeFjF8x7UFvnNY+vnjXNIwWc+8Muo1R/r7HUkX4YZKDHX5HCNwHyKnmY/X2Jsw6MKg2gBT8I6xPqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765902546; c=relaxed/simple;
-	bh=2Q+qK2NqcPX9cbzhyXO64+yCRyf/DbYINlYSrayO9q0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z4ctGdMIY9Jo67541CekSbPi7+FJiV6Umozw64XlRGQEeWX6SsNy/WE4/ot21kUxv1SNsaz+WnmDsha/pmD7170G0k2Me6p4steDa0uTzq4kXsiRZ1xrBo1NvUqkQQEiB7OPInznUA7al+KGPMbtFxR2MkquqG2q/IFbbFmeqWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JdmxJGyQ; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1765904109; c=relaxed/simple;
+	bh=UN+I8vzJ8cwqizu/csjxQGAMQDSJQX7rflsi34zqodk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Rr13xKt2VBZ2uPclj7Wops51LLKU2Kl0lxrbCaO5OLQe5Sv7/OVbfiHHEv86XE5izL17tYIbiONXcrQsrNMnVlhY6b+kzbEYwPMv/W1MIbOyDOmZaGA23MRmT/L68RK94ng4b4n9z3IxNNiVBxmgOXBSPcZM7NztmXAb5iMCYmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=p2nctEGS; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JdmxJGyQ"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id AC1D5C1A580;
-	Tue, 16 Dec 2025 16:28:37 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 150F96071C;
-	Tue, 16 Dec 2025 16:29:02 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B6A63119A9036;
-	Tue, 16 Dec 2025 17:28:41 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1765902535; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=WDH8v49meu1cbdbqCsHVd8Ol6TU4lh3FhMKZUYOzIyw=;
-	b=JdmxJGyQPl89ZvAe+i5sgqoeA7jQmxJWnBAIHwZxcehomzVI9qb40ttSy9cx0wRqbThzlq
-	lHAyEaQZl2k3DPsEQjC65K+IuLFg7sKNjqiBePyTq7VviJcrRHiM9bN2eMTapQXooL3Lmu
-	joBBSrhkICZtvT6a/2rKkS5eNphmHSGwgOESA/7qal3nmlbmOmLz+W6tugpU9vkYI95Zr+
-	oxUYy7GXXT1YkRVynXnWByxfKZ94QxEpAfuHNh8d9Ac3oWCQsqX4988ORYKqvM0U/YQqfL
-	3mBQCk3ssFunMThFAA4+VRHjyfUtDGefOn2sRBJLRZ0Frk8p1CsW+dFfmlCeIg==
-Date: Tue, 16 Dec 2025 17:28:41 +0100
-From: Alexandre Belloni <alexandre.belloni@bootlin.com>
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
-	Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
-	UNGLinuxDriver@microchip.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, vkoul@kernel.org, linux@roeck-us.net,
-	andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linusw@kernel.org, olivia@selenic.com, radu_nicolae.pirea@upb.ro,
-	richard.genoud@bootlin.com, gregkh@linuxfoundation.org,
-	jirislaby@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
-	richardcochran@gmail.com, wsa+renesas@sang-engineering.com,
-	romain.sioen@microchip.com, Ryan.Wanner@microchip.com,
-	lars.povlsen@microchip.com, tudor.ambarus@linaro.org,
-	charan.pedumuru@microchip.com, kavyasree.kotagiri@microchip.com,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-clk@vger.kernel.org, mwalle@kernel.org,
-	luka.perkov@sartura.hr
-Subject: Re: [PATCH v2 04/19] dt-bindings: arm: move AT91 to generic
- Microchip binding
-Message-ID: <202512161628415e9896d1@mail.local>
-References: <20251215163820.1584926-1-robert.marko@sartura.hr>
- <20251215163820.1584926-4-robert.marko@sartura.hr>
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="p2nctEGS"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-64175dfc338so6864283a12.0
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 08:55:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sartura.hr; s=sartura; t=1765904106; x=1766508906; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UN+I8vzJ8cwqizu/csjxQGAMQDSJQX7rflsi34zqodk=;
+        b=p2nctEGSNrBNH4w0gv/yBfai7zSBJT37Uc/6sCOChec1JnUq/nw1WTcH4vymi0Gysn
+         AroI/pZ8T3uPg5QkGXajLuB2WTjrAnztoLvBwRjqyRxmsBdcDCAW7YCLK+qAy3YVpRm5
+         0jIkBfTX0ws4dfu2mNth8gjTjWhMx2EZQOKy6QhhKNirbkDGS7qdWp8SyOJJBY5ST3/z
+         gC/oZXzU3ZyGWPCk/JG9jpo9Vkqgmrtj44yEOluChgE7zG0ptlixUvmEO84b9YPhYhTg
+         blywLMj7i/cbZeihiF4uHL5VtC3JYGC1MiBUPlqXRuBI1Jo8lJ3VlO+hLQD3TfNz6+g/
+         TiLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765904106; x=1766508906;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=UN+I8vzJ8cwqizu/csjxQGAMQDSJQX7rflsi34zqodk=;
+        b=lWoTI55YHwQI422H9DpN0dUFuCjJmUkC7zYKWz1BsPmkfYOzdOJVl00Jm3Ikrt4Zr/
+         K57y0Pa/y8Ac0+Msu/xg8YRKPx6SawsiEdy/UmkFAuUSI5/3UqmquBiJrz1bqBaA5AXP
+         u+9IM51ZmPWjQjseSVK4Eh+7ku3RhZlmzXSMcMWqKfMAgSzSX1MNae+wdscguPkBIuCH
+         wMTdwpGnJw3bYJ+z1xzqRCgpb6Wb5dRW5pVnzGmKDN2kdL790TReIEEm0YJYEV/aEbzH
+         TD9b1MxcPSmYqDT6oFpC7gzSRSeZ9DlWEcDzB1lt8POMIo5swyYKfgQkaOcdZsoVylVG
+         UhBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUM7q2Au+QpVPE1jKBQQwy4MTfOs920W3V6C0wyJ01QrQ0Y7Km819pU7myPvn0kvn5aQ86sWGAhI0dj8lE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOkndWlJfaM+AMO/JRssq/O0sIlmLMHV3UgVoAS4ftXT9LlpQq
+	KKfED8uvqZDiVG0gkpxYxoBKHn+VxORCtFFHn4OFGXRFLpwgJZB/GBMLDk8r0wCw8DUlUfaLeqW
+	A3gOJLc93C2neBLQfmh27h/d/3BhPEAWptTT3CsbSRA==
+X-Gm-Gg: AY/fxX4t6W7gWqqYizMS1xfaYrD4mKq/RasBXG4rFhhBQNT2lv1huggMTvuLVmFJdFT
+	nEiXfYmyHaVSDOTZBRQFRdjtr1j2kWkllyvOwwI7h7Q5rSeU+pBgclZzSa84vYhjkae0YRG8juk
+	zUVs5WCLv2RzJwa2cL0DLuCUMQJuVYtmullQhMIcBtZAqB9zp9+51LPr6D6DNZ0w3KP/eFxwZJw
+	8z6KYsbyrfIaXFDPsHpoEOITMKJnz1j4bQUp1gwBxlz0VNS7Rnic9rkJr6uo2yWPPwUbPyB
+X-Google-Smtp-Source: AGHT+IHss9Bd1xLNKBKVvo2auf8JouoGjNJ+pij6L9GBIFkYaw2yQJkBsu5mTJ8ApxjlWW3ipaEa8krFjlxvR+te8cI=
+X-Received: by 2002:a05:6402:430c:b0:64b:3a8d:8f2f with SMTP id
+ 4fb4d7f45d1cf-64b3a8d8f4amr1282460a12.8.1765904105940; Tue, 16 Dec 2025
+ 08:55:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251215163820.1584926-4-robert.marko@sartura.hr>
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-4-robert.marko@sartura.hr> <39d5371a-ed3e-4262-9cc9-e76c039f352c@kernel.org>
+In-Reply-To: <39d5371a-ed3e-4262-9cc9-e76c039f352c@kernel.org>
+From: Robert Marko <robert.marko@sartura.hr>
+Date: Tue, 16 Dec 2025 17:54:55 +0100
+X-Gm-Features: AQt7F2pB7VocjSO0euYm2JMWHk2AXNZHaLhwttYBwdz_DAq0CW2nlyHeH65guEQ
+Message-ID: <CA+HBbNEsXG64L26S-78A4E9dUOnfdtTEQoifiv5Y16_oQeiiHw@mail.gmail.com>
+Subject: Re: [PATCH v2 04/19] dt-bindings: arm: move AT91 to generic Microchip binding
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
+	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com, 
+	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, 
+	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org, 
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com, 
+	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com, 
+	sboyd@kernel.org, richardcochran@gmail.com, wsa+renesas@sang-engineering.com, 
+	romain.sioen@microchip.com, Ryan.Wanner@microchip.com, 
+	lars.povlsen@microchip.com, tudor.ambarus@linaro.org, 
+	charan.pedumuru@microchip.com, kavyasree.kotagiri@microchip.com, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, mwalle@kernel.org, 
+	luka.perkov@sartura.hr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 15/12/2025 17:35:21+0100, Robert Marko wrote:
-> Create a new binding file named microchip.yaml, to which all Microchip
-> based devices will be moved to.
-> 
-> Start by moving AT91, next will be SparX-5.
+On Tue, Dec 16, 2025 at 4:56=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
+g> wrote:
+>
+> On 15/12/2025 17:35, Robert Marko wrote:
+> > Create a new binding file named microchip.yaml, to which all Microchip
+> > based devices will be moved to.
+> >
+> > Start by moving AT91, next will be SparX-5.
+>
+>
+> I don't understand why. Previous layout was correct.
 
-Both lines of SoCs are designed by different business units and are
-wildly different and while both business units are currently owned by
-the same company, there are no guarantees this will stay this way so I
-would simply avoid merging both.
+Hi Krzysztof,
 
-> 
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> ---
->  .../bindings/arm/{atmel-at91.yaml => microchip.yaml}       | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
->  rename Documentation/devicetree/bindings/arm/{atmel-at91.yaml => microchip.yaml} (98%)
-> 
-> diff --git a/Documentation/devicetree/bindings/arm/atmel-at91.yaml b/Documentation/devicetree/bindings/arm/microchip.yaml
-> similarity index 98%
-> rename from Documentation/devicetree/bindings/arm/atmel-at91.yaml
-> rename to Documentation/devicetree/bindings/arm/microchip.yaml
-> index 88edca9b84d2..3c76f5b585fc 100644
-> --- a/Documentation/devicetree/bindings/arm/atmel-at91.yaml
-> +++ b/Documentation/devicetree/bindings/arm/microchip.yaml
-> @@ -1,19 +1,16 @@
->  # SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->  %YAML 1.2
->  ---
-> -$id: http://devicetree.org/schemas/arm/atmel-at91.yaml#
-> +$id: http://devicetree.org/schemas/arm/microchip.yaml#
->  $schema: http://devicetree.org/meta-schemas/core.yaml#
->  
-> -title: Atmel AT91.
-> +title: Microchip platforms
->  
->  maintainers:
->    - Alexandre Belloni <alexandre.belloni@bootlin.com>
->    - Claudiu Beznea <claudiu.beznea@microchip.com>
->    - Nicolas Ferre <nicolas.ferre@microchip.com>
->  
-> -description: |
-> -  Boards with a SoC of the Atmel AT91 or SMART family shall have the following
-> -
->  properties:
->    $nodename:
->      const: '/'
-> -- 
-> 2.52.0
-> 
+In v1, I sent the LAN969x series as a separate binding, but Conor then
+requested that
+they should be merged into a generic binding, and LAN969x added to the
+generic binding [1].
 
--- 
-Alexandre Belloni, co-owner and COO, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+[1] https://patchwork.kernel.org/project/linux-arm-kernel/patch/20251203122=
+313.1287950-2-robert.marko@sartura.hr/
+
+Regards,
+Robert
+
+>
+> Best regards,
+> Krzysztof
+
+
+
+--=20
+Robert Marko
+Staff Embedded Linux Engineer
+Sartura d.d.
+Lendavska ulica 16a
+10000 Zagreb, Croatia
+Email: robert.marko@sartura.hr
+Web: www.sartura.hr
