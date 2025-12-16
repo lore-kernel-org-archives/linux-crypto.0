@@ -1,117 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C4B322B62
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 22:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A0933D6DB;
+	Tue, 16 Dec 2025 22:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765924535; cv=none; b=AiS6qStUvYSGLQKz0PdCRUj859mT7tFK3oCuRr2mQGAeJtZOI3Qj6D34uaG4TgJ9PGyKLXKEtSWwOU7y+DZnwZO4Xbw9LRw63qDGBnPjZqNWfS3a9P96ibwpZcrIDSiUfjXrrMCPbrIj8llC4PflH4m9q9caup05oig+V84LgFg=
+	t=1765924863; cv=none; b=sVjiJvl+I8jqu5jpErSDc9sfBd0TnIwILJ6mi8doXVp+TOs1KoMRAbVCPcVQnNo0joeR4BUA8Mx/OPeKdolaD8an/i1RJBb6hlfpE/Zdv7u3YSBgi9Xq8CRUtk79TFKIgQ9xVNDUwOxqzGAQvVgKpHkMZZHQC51UUfRj1cu7OBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765924535; c=relaxed/simple;
-	bh=czyYHRS63XCenO0w0GUKXH28DzdMgrammOLJASI/vGo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YNE1GnePILKJHhODMkQV9t9AvHeQ3q/0rrVgKdrEteuL7eSWq5hNFsRtW3pMm12N//naTNgE7QT09iAeZIouSUpkA3zVKDB2BWsrdyZOoS8cwc6+CHmIsO+8xhmuI0Tmv9jMLMcUwma/wq43cSDW+Rp+nV16wo9KG5KZQvTIx8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RKl/8QNt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765924863; c=relaxed/simple;
+	bh=F4nBlBidqUY4wHY3UGyVfOGJUkba0Ns3cRLyrEueVek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rs0qznhrVTuogcAOaNG3gaJ2MIf2cvfS/XR46kEiQoJqDxNTIr+hwhXIlzsC1CjlZNaQEWfDzU6I35FhdTZUwem04t5MV5KrvPYt5vf2JQTvyHWHnS9HSkKG7Wl9yCdyNch8n2Jrhb5Yo9e0tRg5Td7CS8O+7k161WUr/9uSYCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gEz+VZQ6; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RKl/8QNt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34454C19422
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 22:35:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765924535;
-	bh=czyYHRS63XCenO0w0GUKXH28DzdMgrammOLJASI/vGo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=RKl/8QNtPcyroMjYJBWHMeeUdN+gUTJgu1o0FfOuHD7c7/WRyPy71xjvEd+mKQNwh
-	 g1MgjhHnHu74oHjyONO/1fM5DzTEEan+crk5ILnqsF1NRYbVl1R6fOEpyz2DOSV/qg
-	 EOorPj45VoogdDcLI2TQQ+rvyDf71FmOmD4tyotfTS1M7tfYxnSBIXUjRFKwE/EtQr
-	 e8SZomf8FLwX46CJyn5NBBra+11nZmZT1+YDaLUXhEBzJeUvuyPvnOGXCwWDd1W+vj
-	 AGeM6j2kZ//xFwKHZPVzkkbe7+Z29MOyQCxL7sWJhTaXWKbSyPrBcjwYFRpkdarbmc
-	 H+vPheeBLnZGg==
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-88a347c424aso35340136d6.0
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 14:35:35 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUT7uwhFkmXhMNTg1h6KQJmw28RD+eJmJNuouHzp1nWEVGbw5cznBz4TsmZxTAD7MuFFM3zp+iMOYN+CEM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2kLLTjb8RpzsZAaKk3EoHYNHZHiL43PDwA/3mcz7ipFOeCEhN
-	DaiCyTSS9uY2dOiZjdegdxByMDzT9ZZwDT2ilbpjtRVG8l4hTyp+K3Lh422G8fOpsjIkm2llalh
-	dyixHl620XxdRQ3IHoYHnUDAhddfLfsI=
-X-Google-Smtp-Source: AGHT+IFz5ZjeW33eep+I2TgddDjdwVyMg5n9B2cfhADNZvODCb2I/BAuA+yW3Xv7A3GiqJ4+10phrkX9Tnum/+suErk=
-X-Received: by 2002:a05:6214:5c03:b0:880:3e03:3939 with SMTP id
- 6a1803df08f44-8887e16e24fmr247957316d6.64.1765924534387; Tue, 16 Dec 2025
- 14:35:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gEz+VZQ6"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id A083BC1A589;
+	Tue, 16 Dec 2025 22:40:34 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 209CB6071C;
+	Tue, 16 Dec 2025 22:40:59 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 02EF2102F01D0;
+	Tue, 16 Dec 2025 23:40:46 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1765924853; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=p40JSqlhbKdTItQZ+N/qAEwTU4k0uQat5nJYxSbGhm4=;
+	b=gEz+VZQ6ruzh1HRxC6RBi7LjHCvppYTRhjSCI+zapFY1BzdKjLykGIsoA+5dBrQxDW8p3m
+	OO1KwL8BA9dUrfh/AdzYfd9Y0GtQTaE7Qx9epEG776yjviUNFaOmfXz0auLuvfgyGfZBs4
+	jg8UrJJR7F8+UxRR9S+lpyS5W0Lo9j+3mteypwPXsIov4vyid4eYLE1VneqbZCqE4y9mir
+	O9MX7eg1GKbkCaKcv88nJ1IEgNOswmDwo9Eb6quJhGj+1ooWoNYiiC50Dnga3zaMrim7JD
+	qqxuFChNMU86OjnuZ0tHCLLnG2SD3rpM14oOugDkAu14dGdUJzv2QVmksSuuqg==
+Date: Tue, 16 Dec 2025 23:40:46 +0100
+From: Alexandre Belloni <alexandre.belloni@bootlin.com>
+To: Conor Dooley <conor@kernel.org>
+Cc: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org,
+	nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
+	UNGLinuxDriver@microchip.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, vkoul@kernel.org, linux@roeck-us.net,
+	andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linusw@kernel.org, olivia@selenic.com, radu_nicolae.pirea@upb.ro,
+	richard.genoud@bootlin.com, gregkh@linuxfoundation.org,
+	jirislaby@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
+	richardcochran@gmail.com, wsa+renesas@sang-engineering.com,
+	romain.sioen@microchip.com, Ryan.Wanner@microchip.com,
+	lars.povlsen@microchip.com, tudor.ambarus@linaro.org,
+	charan.pedumuru@microchip.com, kavyasree.kotagiri@microchip.com,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-clk@vger.kernel.org, mwalle@kernel.org,
+	luka.perkov@sartura.hr
+Subject: Re: [PATCH v2 04/19] dt-bindings: arm: move AT91 to generic
+ Microchip binding
+Message-ID: <2025121622404642e6f789@mail.local>
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-4-robert.marko@sartura.hr>
+ <202512161628415e9896d1@mail.local>
+ <CA+HBbNFG+xNokn5VY5G6Cgh41NZ=KteRi0D9c0B15xb77mzv8w@mail.gmail.com>
+ <202512161726449fe42d71@mail.local>
+ <20251216-underarm-trapped-626f16d856f5@spud>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251208030117.18892-1-git@danielhodges.dev> <20251208030117.18892-6-git@danielhodges.dev>
-In-Reply-To: <20251208030117.18892-6-git@danielhodges.dev>
-From: Song Liu <song@kernel.org>
-Date: Wed, 17 Dec 2025 07:35:22 +0900
-X-Gmail-Original-Message-ID: <CAPhsuW5OKja2U5x-X_N_F7DN7D_RAZYf9ryoMb4RBHtKKSidhw@mail.gmail.com>
-X-Gm-Features: AQt7F2pQgGvpbiEFuf2dY0FESexCpC01QqhZkEXtdKJIyoLAtx09Eo6pMKaNpPI
-Message-ID: <CAPhsuW5OKja2U5x-X_N_F7DN7D_RAZYf9ryoMb4RBHtKKSidhw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 5/6] bpf: Add ECDSA signature verification kfuncs
-To: Daniel Hodges <git@danielhodges.dev>
-Cc: bpf@vger.kernel.org, ast@kernel.org, andrii@kernel.org, 
-	daniel@iogearbox.net, vadim.fedorenko@linux.dev, yatsenko@meta.com, 
-	martin.lau@linux.dev, eddyz87@gmail.com, haoluo@google.com, jolsa@kernel.org, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	yonghong.song@linux.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251216-underarm-trapped-626f16d856f5@spud>
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Mon, Dec 8, 2025 at 5:43=E2=80=AFPM Daniel Hodges <git@danielhodges.dev>=
- wrote:
->
-> Add context-based ECDSA signature verification kfuncs:
-> - bpf_ecdsa_ctx_create(): Creates reusable ECDSA context with public key
-> - bpf_ecdsa_verify(): Verifies signatures using the context
-> - bpf_ecdsa_ctx_acquire(): Increments context reference count
-> - bpf_ecdsa_ctx_release(): Releases context with RCU safety
->
-> The ECDSA implementation supports NIST curves (P-256, P-384, P-521) and
-> uses the kernel's crypto_sig API. Public keys must be in uncompressed
-> format (0x04 || x || y), and signatures are in r || s format.
->
-> Signed-off-by: Daniel Hodges <git@danielhodges.dev>
-> ---
->  kernel/bpf/crypto.c | 230 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 230 insertions(+)
->
-> diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
-> index 47e6a43a46d4..138abe58e87e 100644
-> --- a/kernel/bpf/crypto.c
-> +++ b/kernel/bpf/crypto.c
-> @@ -9,6 +9,7 @@
->  #include <linux/scatterlist.h>
->  #include <linux/skbuff.h>
->  #include <crypto/skcipher.h>
-> +#include <crypto/sig.h>
->
->  struct bpf_crypto_type_list {
->         const struct bpf_crypto_type *type;
-> @@ -57,6 +58,21 @@ struct bpf_crypto_ctx {
->         refcount_t usage;
->  };
->
-> +#if IS_ENABLED(CONFIG_CRYPTO_ECDSA)
-> +/**
-> + * struct bpf_ecdsa_ctx - refcounted BPF ECDSA context structure
-> + * @tfm:       The crypto_sig transform for ECDSA operations
-> + * @rcu:       The RCU head used to free the context with RCU safety
-> + * @usage:     Object reference counter. When the refcount goes to 0, th=
-e
-> + *             memory is released with RCU safety.
-> + */
-> +struct bpf_ecdsa_ctx {
-> +       struct crypto_sig *tfm;
-> +       struct rcu_head rcu;
-> +       refcount_t usage;
-> +};
-> +#endif
+On 16/12/2025 19:21:27+0000, Conor Dooley wrote:
+> On Tue, Dec 16, 2025 at 06:26:44PM +0100, Alexandre Belloni wrote:
+> > On 16/12/2025 17:56:20+0100, Robert Marko wrote:
+> > > On Tue, Dec 16, 2025 at 5:29 PM Alexandre Belloni
+> > > <alexandre.belloni@bootlin.com> wrote:
+> > > >
+> > > > On 15/12/2025 17:35:21+0100, Robert Marko wrote:
+> > > > > Create a new binding file named microchip.yaml, to which all Microchip
+> > > > > based devices will be moved to.
+> > > > >
+> > > > > Start by moving AT91, next will be SparX-5.
+> > > >
+> > > > Both lines of SoCs are designed by different business units and are
+> > > > wildly different and while both business units are currently owned by
+> > > > the same company, there are no guarantees this will stay this way so I
+> > > > would simply avoid merging both.
+> > > 
+> > > Hi Alexandre,
+> > > 
+> > > The merge was requested by Conor instead of adding a new binding for LAN969x [1]
+> > > 
+> > > [1] https://patchwork.kernel.org/project/linux-arm-kernel/patch/20251203122313.1287950-2-robert.marko@sartura.hr/
+> > > 
+> > 
+> > I would still keep them separate, SparX-5 is closer to what is
+> > devicetree/bindings/mips/mscc.txt than to any atmel descended SoCs.
+> 
+> If you don't want the sparx-5 stuff in with the atmel bits, that's fine,
+> but I stand over my comments about this lan969x stuff not getting a file
+> of its own.
+> Probably that means putting it in the atmel file, alongside the lan966x
+> boards that are in there at the moment.
 
-Can we use bpf_crypto_ctx for ECDSA?
+I'm fine with this.
 
-Thanks,
-Song
+-- 
+Alexandre Belloni, co-owner and COO, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
