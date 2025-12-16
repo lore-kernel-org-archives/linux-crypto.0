@@ -1,138 +1,117 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF612BEFE3;
-	Tue, 16 Dec 2025 22:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C4B322B62
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 22:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765924364; cv=none; b=prVuAjvkkeV+QxRO2rOnN7CEMX6OZ4P9xsIYFO0ikmvsh1umTZLXP8p4LX/cm0RNeSbOO6iVQteUsUkugOp/03m76nBulxE+X/vLOHC549sUN3atd5f/YmRg49BQ56vSqzahL1O//cQZjE/bG2H3y9bxlfxIHTXrap7Q7NLQUJ0=
+	t=1765924535; cv=none; b=AiS6qStUvYSGLQKz0PdCRUj859mT7tFK3oCuRr2mQGAeJtZOI3Qj6D34uaG4TgJ9PGyKLXKEtSWwOU7y+DZnwZO4Xbw9LRw63qDGBnPjZqNWfS3a9P96ibwpZcrIDSiUfjXrrMCPbrIj8llC4PflH4m9q9caup05oig+V84LgFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765924364; c=relaxed/simple;
-	bh=lh/uVY9FnhSIXA6wN5XWkYu0pJ2ZX6BJre7epZlSNUY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tdULAFvEyqNtvM1VXBKZ6oasuUL3aC6p+RTefB5JAyBX0dlB9rrTl00PhUUQlRBy6Os92ma0Ig8439Z6w948NlzB26DH20wKKnaqcJUaZwlNk+/n9aqzM7J4ePiORSBGAmZgleym/BmE5p4rp1F1KkWtv9H6cGvMIuWjHBQCboQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NYSZr5Jg; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1765924535; c=relaxed/simple;
+	bh=czyYHRS63XCenO0w0GUKXH28DzdMgrammOLJASI/vGo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YNE1GnePILKJHhODMkQV9t9AvHeQ3q/0rrVgKdrEteuL7eSWq5hNFsRtW3pMm12N//naTNgE7QT09iAeZIouSUpkA3zVKDB2BWsrdyZOoS8cwc6+CHmIsO+8xhmuI0Tmv9jMLMcUwma/wq43cSDW+Rp+nV16wo9KG5KZQvTIx8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RKl/8QNt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NYSZr5Jg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765924353; x=1797460353;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=lh/uVY9FnhSIXA6wN5XWkYu0pJ2ZX6BJre7epZlSNUY=;
-  b=NYSZr5JgRoCsbaKJWL3GNtf6umWCNmn3RRdZElol2YXqVVkuPp80wDFY
-   YjO/lMTfMpBiymtERL0iPIHeNLlb7Xbf6RVIL+2SAEnaHkadR/5Wx1ABO
-   lK9fsuccuLvGJDcycrJjpcXN0kKF1waw27QS67Ns5vey0WepOEJVuWUV4
-   qDQ1QoD5hCHvELLu6y8NQct7hAEH8GeUjcxMoUr+Vv1Z4NH17BC9utBXo
-   TzNzlSga4qUoAaJiQefFUiq3cnSTnyLZMiPvvTgVzyvYhP4hiopuHbpmQ
-   aZZP+JVGF9Y/R8o1prXK8vfs4JdBvrtMuv061n72EhM/M0Nf86xv+AKXu
-   Q==;
-X-CSE-ConnectionGUID: FtuZiAEqTESEq1Lrk10yFA==
-X-CSE-MsgGUID: QFGOLNHrRryUTNbjwwDb+g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11644"; a="55427479"
-X-IronPort-AV: E=Sophos;i="6.21,154,1763452800"; 
-   d="scan'208";a="55427479"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2025 14:32:31 -0800
-X-CSE-ConnectionGUID: BqZjr3JNRYWOf+Dimt0+Aw==
-X-CSE-MsgGUID: FIkHPVcST0GPR3E6ocv8pw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,154,1763452800"; 
-   d="scan'208";a="228831610"
-Received: from ssimmeri-mobl2.amr.corp.intel.com (HELO [10.125.110.199]) ([10.125.110.199])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2025 14:32:31 -0800
-Message-ID: <5c4734af-d72c-4b1d-9d2f-8c07d4c0dd6d@intel.com>
-Date: Tue, 16 Dec 2025 14:32:30 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RKl/8QNt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34454C19422
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 22:35:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765924535;
+	bh=czyYHRS63XCenO0w0GUKXH28DzdMgrammOLJASI/vGo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=RKl/8QNtPcyroMjYJBWHMeeUdN+gUTJgu1o0FfOuHD7c7/WRyPy71xjvEd+mKQNwh
+	 g1MgjhHnHu74oHjyONO/1fM5DzTEEan+crk5ILnqsF1NRYbVl1R6fOEpyz2DOSV/qg
+	 EOorPj45VoogdDcLI2TQQ+rvyDf71FmOmD4tyotfTS1M7tfYxnSBIXUjRFKwE/EtQr
+	 e8SZomf8FLwX46CJyn5NBBra+11nZmZT1+YDaLUXhEBzJeUvuyPvnOGXCwWDd1W+vj
+	 AGeM6j2kZ//xFwKHZPVzkkbe7+Z29MOyQCxL7sWJhTaXWKbSyPrBcjwYFRpkdarbmc
+	 H+vPheeBLnZGg==
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-88a347c424aso35340136d6.0
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 14:35:35 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUT7uwhFkmXhMNTg1h6KQJmw28RD+eJmJNuouHzp1nWEVGbw5cznBz4TsmZxTAD7MuFFM3zp+iMOYN+CEM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2kLLTjb8RpzsZAaKk3EoHYNHZHiL43PDwA/3mcz7ipFOeCEhN
+	DaiCyTSS9uY2dOiZjdegdxByMDzT9ZZwDT2ilbpjtRVG8l4hTyp+K3Lh422G8fOpsjIkm2llalh
+	dyixHl620XxdRQ3IHoYHnUDAhddfLfsI=
+X-Google-Smtp-Source: AGHT+IFz5ZjeW33eep+I2TgddDjdwVyMg5n9B2cfhADNZvODCb2I/BAuA+yW3Xv7A3GiqJ4+10phrkX9Tnum/+suErk=
+X-Received: by 2002:a05:6214:5c03:b0:880:3e03:3939 with SMTP id
+ 6a1803df08f44-8887e16e24fmr247957316d6.64.1765924534387; Tue, 16 Dec 2025
+ 14:35:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 22/28] x86: Secure Launch kernel early boot stub
-To: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, iommu@lists.linux.dev
-Cc: dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, ardb@kernel.org,
- mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
- nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
- corbet@lwn.net, ebiederm@xmission.com, dwmw2@infradead.org,
- baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
- andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
-References: <20251215233316.1076248-1-ross.philipson@oracle.com>
- <20251215233316.1076248-23-ross.philipson@oracle.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20251215233316.1076248-23-ross.philipson@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251208030117.18892-1-git@danielhodges.dev> <20251208030117.18892-6-git@danielhodges.dev>
+In-Reply-To: <20251208030117.18892-6-git@danielhodges.dev>
+From: Song Liu <song@kernel.org>
+Date: Wed, 17 Dec 2025 07:35:22 +0900
+X-Gmail-Original-Message-ID: <CAPhsuW5OKja2U5x-X_N_F7DN7D_RAZYf9ryoMb4RBHtKKSidhw@mail.gmail.com>
+X-Gm-Features: AQt7F2pQgGvpbiEFuf2dY0FESexCpC01QqhZkEXtdKJIyoLAtx09Eo6pMKaNpPI
+Message-ID: <CAPhsuW5OKja2U5x-X_N_F7DN7D_RAZYf9ryoMb4RBHtKKSidhw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 5/6] bpf: Add ECDSA signature verification kfuncs
+To: Daniel Hodges <git@danielhodges.dev>
+Cc: bpf@vger.kernel.org, ast@kernel.org, andrii@kernel.org, 
+	daniel@iogearbox.net, vadim.fedorenko@linux.dev, yatsenko@meta.com, 
+	martin.lau@linux.dev, eddyz87@gmail.com, haoluo@google.com, jolsa@kernel.org, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	yonghong.song@linux.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/15/25 15:33, Ross Philipson wrote:
-> +static u64 sl_txt_read(u32 reg)
-> +{
-> +	return readq((void *)(u64)(TXT_PRIV_CONFIG_REGS_BASE + reg));
-> +}
-> +
-> +static void sl_txt_write(u32 reg, u64 val)
-> +{
-> +	writeq(val, (void *)(u64)(TXT_PRIV_CONFIG_REGS_BASE + reg));
-> +}
+On Mon, Dec 8, 2025 at 5:43=E2=80=AFPM Daniel Hodges <git@danielhodges.dev>=
+ wrote:
+>
+> Add context-based ECDSA signature verification kfuncs:
+> - bpf_ecdsa_ctx_create(): Creates reusable ECDSA context with public key
+> - bpf_ecdsa_verify(): Verifies signatures using the context
+> - bpf_ecdsa_ctx_acquire(): Increments context reference count
+> - bpf_ecdsa_ctx_release(): Releases context with RCU safety
+>
+> The ECDSA implementation supports NIST curves (P-256, P-384, P-521) and
+> uses the kernel's crypto_sig API. Public keys must be in uncompressed
+> format (0x04 || x || y), and signatures are in r || s format.
+>
+> Signed-off-by: Daniel Hodges <git@danielhodges.dev>
+> ---
+>  kernel/bpf/crypto.c | 230 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 230 insertions(+)
+>
+> diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
+> index 47e6a43a46d4..138abe58e87e 100644
+> --- a/kernel/bpf/crypto.c
+> +++ b/kernel/bpf/crypto.c
+> @@ -9,6 +9,7 @@
+>  #include <linux/scatterlist.h>
+>  #include <linux/skbuff.h>
+>  #include <crypto/skcipher.h>
+> +#include <crypto/sig.h>
+>
+>  struct bpf_crypto_type_list {
+>         const struct bpf_crypto_type *type;
+> @@ -57,6 +58,21 @@ struct bpf_crypto_ctx {
+>         refcount_t usage;
+>  };
+>
+> +#if IS_ENABLED(CONFIG_CRYPTO_ECDSA)
+> +/**
+> + * struct bpf_ecdsa_ctx - refcounted BPF ECDSA context structure
+> + * @tfm:       The crypto_sig transform for ECDSA operations
+> + * @rcu:       The RCU head used to free the context with RCU safety
+> + * @usage:     Object reference counter. When the refcount goes to 0, th=
+e
+> + *             memory is released with RCU safety.
+> + */
+> +struct bpf_ecdsa_ctx {
+> +       struct crypto_sig *tfm;
+> +       struct rcu_head rcu;
+> +       refcount_t usage;
+> +};
+> +#endif
 
-Man, that's a lot of casting. If TXT_PRIV_CONFIG_REGS_BASE were just a
-pointer to being with, it could be:
+Can we use bpf_crypto_ctx for ECDSA?
 
-	writeq(val, TXT_PRIV_CONFIG_REGS_BASE + reg);
-
-Right?
-
-This _looks_ like it was just written and then had casts added to it
-until it compiled.
+Thanks,
+Song
