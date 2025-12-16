@@ -1,126 +1,136 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1335C2EFD9E
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 17:03:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165113A1E8E;
+	Tue, 16 Dec 2025 17:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765904594; cv=none; b=A6wqjQPhTIWPN41G57J0tq0+w/H7fKtfv3CwxQQRwvOeRQESjBHmW7pWJAGgCS73cpbQmuBIjEqGgG5CtQHR1oyymvHyr1a9KsuxTsC2vW/LULqlyZe+YF8tFARNFoW4x4w39I6kDjG+M90BcadGkUOKPLVTSDj1aWOgfd32WKU=
+	t=1765905482; cv=none; b=dRqxTIfM7sVVPn1N4zJFpXmeZbvLzYeI2KxRqe6UyPOd9cNb+tQ+KXAJx1rpw06hxRpTZUiv0kOdxX6zkm6RC223hb/VxE1ML59bqrrO28UAH/nLyjlMsjWP0E+SP3RV+CAL3g+tx2JpU1aQGvKLr/Zp1dzkjLnQ5CpwYIkbLkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765904594; c=relaxed/simple;
-	bh=F5ummgPhzVwfH3aJi4+uY671i9nGNbXpL0FkgxynloY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r6+NWjqrOVRLyrV/LbUMCzdvxDu66hOb35A4ofnX5FsW7SEmVqx9FdcKShhFFWiJuUnlS3nZ1UV5NgnGLtEY9vmDY712zGFiDpkSedBOp64pSKZc5wEvSXKOaANBZEl5+V6gPa/vR5A9mW+cLrIa9VfcqhklNoHY5LvHkdMXVpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=HUR0c1oP; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+	s=arc-20240116; t=1765905482; c=relaxed/simple;
+	bh=cppGG9PT+JpiVSfKeuzy9K48JaGezXDa3T4Yw7/QjLM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EUwLg5Woq+qGxztFBNIJR0pYysNiCVthb1oGSGlT2gaG8qooQgm5WEF0SkDn5ovnph7DCjvZjAAmyzU9xQ2JPyosYRGhameol7v1YcKBx4gYw/MvLPgnOvfiOw50J66hNtGBUKs56F0MbnRfHjGfD6tvAxzHZ1wkcLi+YJayw7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J9Z0adoY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="HUR0c1oP"
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-641977dc00fso7686300a12.1
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 09:03:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1765904589; x=1766509389; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F5ummgPhzVwfH3aJi4+uY671i9nGNbXpL0FkgxynloY=;
-        b=HUR0c1oP2r19YIGGQc967WfYD/smuI0IJPFKrMRJYAdsvIaZyCJkMtulHBsm50ODwb
-         JauGSBBPrDXsSq6QkLWzTbFOO2IIL4lhNSXyLb8MqULUXURDfgh4GPvBYCnxfqO/uGNH
-         M7T/KWr9FIkE5Oj2EjHFjl5VFswk6OifRQzQIZh7me8snBfVDzURqctiIcbpDzzWfl/X
-         ALEri3nkrW2HWDbC3o0fNTuIobUwibSu89QPHCHEcc1P1KG8qKwBmI39JeSZVzimFedS
-         2b5iNPv4DU/s9e6srUZGkRWZB64tCxPJenC/s7w0P87DEsXXQyZLfIfqFHTWLG0iZxY6
-         DQ9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765904589; x=1766509389;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=F5ummgPhzVwfH3aJi4+uY671i9nGNbXpL0FkgxynloY=;
-        b=nRG+VQAoTS+Z6YJliK4RZwXryIp1K2zWN3ojv96lcI/ptmLga31O3PlNyQMfZY0dWm
-         xI8CFxH0QWLSMOq8jWLJg4UPfKn/Fm5D0xWyeIo2kK5rkZhJ5uejBZmoNgqznT+oDro3
-         4vTZiRT/NuegIY+4x6GCVgk4x5Y4Y3ZDQwoAEanFF8ME+UXlznyBSqrXSlRvUyjg+jvc
-         /ZcVovMqoj9vWXliHDgZj8r/bmOzI8bWqfKR1HjcAghai/l+RN0i/2aMWn+OR1NL5XTx
-         PX6A6NTHnCQ3PAagM//HOjekYOKi9wakrKYOmuYtZoqOaxF8VT3AQ7eOF+4y5xfDM+7i
-         ozCA==
-X-Forwarded-Encrypted: i=1; AJvYcCXFfyIRfqqCANKL2uR/IWqkW0VZIQZrnA1fkD7ykRu2ub1KI2qIUX97ORNvhaXMCTMa3NDe2DaPZ0SPHd0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwsgmHcSZQ9UByCc7bzPGPivBSX7Q7zlWzIJLt7VL1fxnkvR/p
-	D02ExY6eUu8hqLx7B1nBddvGKXFI1cgbasFy8aa0HVrSbnUvnrg1p4VfQiFm6U4LI1EQpx6ZhL3
-	Wjk55PkMH+0v2lbf+w8p1bAMhvXONehFxy3Lm7mHnoQ==
-X-Gm-Gg: AY/fxX5rwZXe49CToD622EZFUIfxFwLEFR3MFt4kBK1xqvidpzuExhU4hTm7aNTGBuP
-	Hs/BQ3Kawe4XSEZYusD1lhNp0XzeRksI8zGtyjC1kwjCmwe4hWBwkwf8PAY6158973t7loVDk98
-	VHea/baqymBgQq7USUiOpTq9s4JWc1F9CXIB3gLzmsaB8qIYaGapacDU+FlESawpGaoOF9p89aF
-	32q9Axzi7wqCRp4KSkvN5SI6qHkT8a66ivXgmzSH81zsMAdGlYusnYiVvaeO16atJ98NMjr
-X-Google-Smtp-Source: AGHT+IFN/waKvJ1dk6OhR5cf+U/bNCur64fqPTgP6eIpNT5zthYFXF01jY49UDISUGnP6m+DUwrvZmTGOhEzi55R+Mg=
-X-Received: by 2002:a05:6402:1ed1:b0:647:532f:8efc with SMTP id
- 4fb4d7f45d1cf-6499b31266bmr15476133a12.33.1765904588965; Tue, 16 Dec 2025
- 09:03:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J9Z0adoY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3909C113D0;
+	Tue, 16 Dec 2025 17:18:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765905481;
+	bh=cppGG9PT+JpiVSfKeuzy9K48JaGezXDa3T4Yw7/QjLM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=J9Z0adoYBmlbmaIqmD79zYatnS+Nt9uvNPpMDj8zX/H9mOuYbV48DmY7Rh8YVw9qd
+	 kPaz6lUutNxyvoq7ZvVMPOvsgYTAzuBlktLuvQ5j5I6V5g7piqDfxgXGt8ewBWaV99
+	 KVhZfzc6hJz1AFyIDWQlGEPMQlWZ23GklILkeYlwlpyezVASDJn8Y3tC+h9+7ViXMV
+	 F6TWaAZvDP6hyZlZdErrsnkbI/f8almng8GM1fBYyZOmchVnX0pKgBMiqUi4HiCeSf
+	 uiFFuy6zg2Y5TNiUPlnOgcsviidlVs2UFXR0qo2C805X9YA13sjqyc7PDY5fLzXDrQ
+	 dyBmhKeBtDjFQ==
+Date: Tue, 16 Dec 2025 22:47:57 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Frank Li <Frank.li@nxp.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Koichiro Den <den@valinux.co.jp>, Niklas Cassel <cassel@kernel.org>,
+	dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+	mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	imx@lists.linux.dev
+Subject: Re: [PATCH 0/8] dmaengine: Add new API to combine onfiguration and
+ descriptor preparation
+Message-ID: <aUGURVuW33WSTuyI@vaman>
+References: <20251208-dma_prep_config-v1-0-53490c5e1e2a@nxp.com>
+ <aUFUX0e_h7RGAecz@vaman>
+ <aUF2SX/6bV2lHtF0@lizhi-Precision-Tower-5810>
+ <aUF-C8iUCs-dYXGm@vaman>
+ <aUGA7tmDYm1MhRXn@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251215163820.1584926-1-robert.marko@sartura.hr>
- <20251215163820.1584926-3-robert.marko@sartura.hr> <d9665340-5a96-4105-88e9-ec14a715df5a@kernel.org>
-In-Reply-To: <d9665340-5a96-4105-88e9-ec14a715df5a@kernel.org>
-From: Robert Marko <robert.marko@sartura.hr>
-Date: Tue, 16 Dec 2025 18:02:57 +0100
-X-Gm-Features: AQt7F2rU23EYA-TATIPjguH2zW0uOL-rOKCV2dD8OGkl08WLSt_IEutVu0MO3jw
-Message-ID: <CA+HBbNF2EeP=miC9GpEm2HpPTmZAefV2fwxKjm0vHB6tj_1usQ@mail.gmail.com>
-Subject: Re: [PATCH v2 03/19] dt-bindings: arm: AT91: relicense to dual GPL-2.0/BSD-2-Clause
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
-	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com, 
-	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, 
-	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org, 
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com, 
-	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
-	gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com, 
-	sboyd@kernel.org, richardcochran@gmail.com, wsa+renesas@sang-engineering.com, 
-	romain.sioen@microchip.com, Ryan.Wanner@microchip.com, 
-	lars.povlsen@microchip.com, tudor.ambarus@linaro.org, 
-	charan.pedumuru@microchip.com, kavyasree.kotagiri@microchip.com, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, mwalle@kernel.org, 
-	luka.perkov@sartura.hr
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aUGA7tmDYm1MhRXn@lizhi-Precision-Tower-5810>
 
-On Tue, Dec 16, 2025 at 4:55=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
-g> wrote:
->
-> On 15/12/2025 17:35, Robert Marko wrote:
-> > As it is preferred to have bindings dual licensed, lets relicense the A=
-T91
-> > bindings from GPL-2.0 only to GPL-2.0/BSD-2 Clause.
+On 16-12-25, 10:55, Frank Li wrote:
+> On Tue, Dec 16, 2025 at 09:13:07PM +0530, Vinod Koul wrote:
+> > On 16-12-25, 10:10, Frank Li wrote:
+> > > On Tue, Dec 16, 2025 at 06:15:19PM +0530, Vinod Koul wrote:
+> > > > On 08-12-25, 12:09, Frank Li wrote:
+> > > >
+> > > > Spell check on subject please :-)
+> > > >
+> > > > > Previously, configuration and preparation required two separate calls. This
+> > > > > works well when configuration is done only once during initialization.
+> > > > >
+> > > > > However, in cases where the burst length or source/destination address must
+> > > > > be adjusted for each transfer, calling two functions is verbose.
+> > > > >
+> > > > > 	if (dmaengine_slave_config(chan, &sconf)) {
+> > > > > 		dev_err(dev, "DMA slave config fail\n");
+> > > > > 		return -EIO;
+> > > > > 	}
+> > > > >
+> > > > > 	tx = dmaengine_prep_slave_single(chan, dma_local, len, dir, flags);
+> > > > >
+> > > > > After new API added
+> > > > >
+> > > > > 	tx = dmaengine_prep_slave_single(chan, dma_local, len, dir, flags, &sconf);
+> > > >
+> > > > Nak, we cant change the API like this.
+> > >
+> > > Sorry, it is typo here. in patch
+> > > 	dmaengine_prep_slave_single_config(chan, dma_local, len, dir, flags, &sconf);
+> > >
+> > > > I agree that you can add a new way to call dmaengine_slave_config() and
+> > > > dmaengine_prep_slave_single() together.
+> > > > maybe dmaengine_prep_config_perip_single() (yes we can go away with slave, but
+> > > > cant drop it, as absence means something else entire).
+> > >
+> > > how about dmaengine_prep_peripheral_single() and dmaengine_prep_peripheral_sg()
+> > > to align recent added "dmaengine_prep_peripheral_dma_vec()"
 > >
-> > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
->
-> You need all contributors to ack this...
+> > It doesnt imply config has been done, how does it differ from usual
+> > prep_ calls. I see confusions can be caused!
+> 
+> dmaengine_prep_peripheral_single(.., &sconf) and
+> dmaengine_prep_peripheral_sg(..., &sconf).
+> 
+> The above two funcitions have pass down &sconf.
+> 
+> The usual prep_ call have not sconf argument, which need depend on previous
+> config.
+> 
+> further, If passdown NULL for config, it means use previuos config.
 
-I understand, all of the contributors were CC-ed.
+I know it is bit longer but somehow I would feel better for the API to
+imply config as well please
 
-Regards,
-Robert
+> 
+> >
+> > > I think "peripheral" also is reduntant. dmaengine_prep_single() and
+> > > dmaengine_prep_sg() should be enough because
+> >
+> > Then you are missing the basic premises of dmaengine that we have memcpy
+> > ops and peripheral dma ops (aka slave) Absence of peripheral always
+> > implies that it is memcpy
+> 
+> Okay, it is not big deal. is dmaengine_prep_dma_cyclic() exception? which
+> have not "peripheral" or "slave", but it is not for memcpy.
 
->
-> Best regards,
-> Krzysztof
+Cyclic by definition implies a cyclic dma over a peripheral
 
-
-
---=20
-Robert Marko
-Staff Embedded Linux Engineer
-Sartura d.d.
-Lendavska ulica 16a
-10000 Zagreb, Croatia
-Email: robert.marko@sartura.hr
-Web: www.sartura.hr
+-- 
+~Vinod
