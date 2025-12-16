@@ -1,132 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E977E339874;
-	Tue, 16 Dec 2025 13:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89538354AF1;
+	Tue, 16 Dec 2025 13:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765890012; cv=none; b=RU8awzhCciVLPEsSsOmxry3hq40wD438XqONaSWJZjrIi2wVNevjH9Er5t49zfuEBvBYQjliTEfqqsKI16A9h2Xslf9Io1KQEaRYmeTcDD7trWtSlyVkKtvBSVInI3r+5d4w49tJ5aAiF+Ralv+KOpvH+5/sSTtb04kPEYiseK4=
+	t=1765890711; cv=none; b=JJqjVcrzVs6ePmYLduXmlxXfnRcZNuN0e89qpUznwgkDPFJjFeqn3DZV3e2pdY4I/B+RgMHli6ReqCEZZkb0za/mqCIUgP38fP/PQzSYY7TkWxFRn3XytXs9fllG6I7M+3pEXFGU6q457V8W8/fOATc9Mp1YGcxGL4ropPps7rE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765890012; c=relaxed/simple;
-	bh=mQBluV4vo6oktVQMR47MWjsZkZHvF2VHMeD3tqW78+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ixXeHfbuFKK+5n3BrvNZYDNvh99QjjE76B/RRgAAoM9hPDwWMiqJ3m13jDQoBKnm5v9u8J6kNOkAIIbJaydCwVgoAa+H/zf4k1hjATfxEETS6+4aQ2r8/mlxyZpi6PweM+AQjzvA9mnQtMvgcaT1pG7insxGj+wbi98bmsfjxlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d/mH6mX0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765890711; c=relaxed/simple;
+	bh=uK7rtQd0fuH8HIq2iyTTKTpcKJsEkMoXU53XE1O8rzg=;
+	h=From:Date:Content-Type:MIME-Version:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=WjqNvnPVSnnLYiNDt9GKiqMAKsWDOG/gLl3KPDJ8QB7RZCSLCzVw1Z6uGsIVJrJKVreTbmuj7Kx7qRtlcKRDF6le3uEkRXGbxKKR7iHhCIHBTZ7EQqDQ9Jn1go3aD7Zm0KsRDqI/fv5sK2ufufz8docbp0UhoOQH0To2SvwJUOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fFwjwqyl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d/mH6mX0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E575C4CEF1;
-	Tue, 16 Dec 2025 13:00:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFwjwqyl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB05BC19423;
+	Tue, 16 Dec 2025 13:11:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765890011;
-	bh=mQBluV4vo6oktVQMR47MWjsZkZHvF2VHMeD3tqW78+Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d/mH6mX0eV2p9m7sYxhd3qcf37tLj1VmfJt7vEv1GsrZWMEkcY1dHcUW73Z60Nzds
-	 cWCIqM4gY0hwzYxK5rT52lPxMBFfIv9esPpLkPVpFRQp6t56HAnArMzaOtuxGZzxft
-	 OsMqKHkYP1TwMTdsFqEHM3Usjhg475XALpCMK/pUFaGAW20gLipDJqU0UCzratyv7N
-	 mBXvX6HS9s+6xpRIeGW/mgZOqB8vCGfvvkH1Rdt1jDmBVC0kV02cbZ6vClscrWkzc9
-	 sFBlYPqiOSqMahw2Yz3H2ISEjmR68Q0yTx2t02J/BlYQldHlj5cMMqYA/kx1J52gk7
-	 BUSGWdUOsjmRQ==
-Date: Tue, 16 Dec 2025 18:30:07 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Udit Tiwari <quic_utiwari@quicinc.com>,
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
-	Md Sadre Alam <mdalam@qti.qualcomm.com>,
-	Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v9 03/11] dmaengine: qcom: bam_dma: implement support for
- BAM locking
-Message-ID: <aUFX14nz8cQj8EIb@vaman>
-References: <20251128-qcom-qce-cmd-descr-v9-0-9a5f72b89722@linaro.org>
- <20251128-qcom-qce-cmd-descr-v9-3-9a5f72b89722@linaro.org>
+	s=k20201202; t=1765890711;
+	bh=uK7rtQd0fuH8HIq2iyTTKTpcKJsEkMoXU53XE1O8rzg=;
+	h=From:Date:Cc:To:In-Reply-To:References:Subject:From;
+	b=fFwjwqyl4XciRQVPx8XogJowdRcsdYKb/ioKdv1BlYgi1o+jrg3aT4TAjJOxcokcI
+	 QsSoL7E/aTwp0Xx89fUuxiHPnEWOL+3YP75h9bjRELSdSMWlSEQ92eq4Dd4ceSznxM
+	 FA0++iF6bDiu+t9pjncqus1HTUPK3svYbIJYzU9lKuMSr/WEguQljrDJAZRNzhNg42
+	 v7hCHoWhSvks4wsNhavYOp/zj1CynIbu8P4b+tzQRYE66RX9T0NwB8sBSiXWwnDEBo
+	 MIlWjd8LzSrypRzNesJoMN6k5blOrxuig+/T5bgwizw08Jd3RqQ5mQlMx9Ug7dba8M
+	 js45kMZa3qkiw==
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 16 Dec 2025 07:11:49 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251128-qcom-qce-cmd-descr-v9-3-9a5f72b89722@linaro.org>
+Cc: netdev@vger.kernel.org, linusw@kernel.org, vkoul@kernel.org, 
+ pabeni@redhat.com, jirislaby@kernel.org, lars.povlsen@microchip.com, 
+ linux-arm-kernel@lists.infradead.org, claudiu.beznea@tuxon.dev, 
+ kuba@kernel.org, mturquette@baylibre.com, Steen.Hegelund@microchip.com, 
+ mwalle@kernel.org, tudor.ambarus@linaro.org, devicetree@vger.kernel.org, 
+ UNGLinuxDriver@microchip.com, edumazet@google.com, 
+ linux-clk@vger.kernel.org, andi.shyti@kernel.org, olivia@selenic.com, 
+ conor+dt@kernel.org, luka.perkov@sartura.hr, richard.genoud@bootlin.com, 
+ linux-hwmon@vger.kernel.org, krzk+dt@kernel.org, 
+ wsa+renesas@sang-engineering.com, Ryan.Wanner@microchip.com, 
+ linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+ alexandre.belloni@bootlin.com, lee@kernel.org, linux@roeck-us.net, 
+ davem@davemloft.net, gregkh@linuxfoundation.org, 
+ kavyasree.kotagiri@microchip.com, nicolas.ferre@microchip.com, 
+ andrew+netdev@lunn.ch, romain.sioen@microchip.com, sboyd@kernel.org, 
+ linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
+ linux-serial@vger.kernel.org, daniel.machon@microchip.com, 
+ dmaengine@vger.kernel.org, richardcochran@gmail.com, 
+ herbert@gondor.apana.org.au, charan.pedumuru@microchip.com, 
+ linux-crypto@vger.kernel.org, linux-i2c@vger.kernel.org, 
+ radu_nicolae.pirea@upb.ro
+To: Robert Marko <robert.marko@sartura.hr>
+In-Reply-To: <20251215163820.1584926-1-robert.marko@sartura.hr>
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+Message-Id: <176589052274.1815136.7513475493879599819.robh@kernel.org>
+Subject: Re: [PATCH v2 01/19] include: dt-bindings: add LAN969x clock
+ bindings
 
-On 28-11-25, 12:44, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
+On Mon, 15 Dec 2025 17:35:18 +0100, Robert Marko wrote:
+> Add the required LAN969x clock bindings.
 > 
-> Use metadata operations in DMA descriptors to allow BAM users to pass
-> additional information to the engine. To that end: define a new
-> structure - struct bam_desc_metadata - as a medium and define two new
-> commands: for locking and unlocking the BAM respectively. Handle the
-> locking in the .attach() callback.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 > ---
->  drivers/dma/qcom/bam_dma.c       | 59 +++++++++++++++++++++++++++++++++++++++-
->  include/linux/dma/qcom_bam_dma.h | 12 ++++++++
->  2 files changed, 70 insertions(+), 1 deletion(-)
+> Changes in v2:
+> * Rename file to microchip,lan9691.h
 > 
-> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
-> index c9ae1fffe44d79c5eb59b8bbf7f147a8fa3aa0bd..d1dc80b29818897b333cd223ec7306a169cc51fd 100644
-> --- a/drivers/dma/qcom/bam_dma.c
-> +++ b/drivers/dma/qcom/bam_dma.c
-> @@ -30,6 +30,7 @@
->  #include <linux/module.h>
->  #include <linux/interrupt.h>
->  #include <linux/dma-mapping.h>
-> +#include <linux/dma/qcom_bam_dma.h>
->  #include <linux/scatterlist.h>
->  #include <linux/device.h>
->  #include <linux/platform_device.h>
-> @@ -391,6 +392,8 @@ struct bam_chan {
->  	struct list_head desc_list;
->  
->  	struct list_head node;
-> +
-> +	bool bam_locked;
->  };
->  
->  static inline struct bam_chan *to_bam_chan(struct dma_chan *common)
-> @@ -655,6 +658,53 @@ static int bam_slave_config(struct dma_chan *chan,
->  	return 0;
->  }
->  
-> +static int bam_metadata_attach(struct dma_async_tx_descriptor *desc, void *data, size_t len)
-> +{
-> +	struct virt_dma_desc *vd = container_of(desc, struct virt_dma_desc, tx);
-> +	struct bam_async_desc *async_desc = container_of(vd, struct bam_async_desc,  vd);
-> +	struct bam_desc_hw *hw_desc = async_desc->desc;
-> +	struct bam_desc_metadata *metadata = data;
-> +	struct bam_chan *bchan = to_bam_chan(metadata->chan);
-> +	struct bam_device *bdev = bchan->bdev;
-> +
-> +	if (!data)
-> +		return -EINVAL;
-> +
-> +	if (metadata->op == BAM_META_CMD_LOCK || metadata->op == BAM_META_CMD_UNLOCK) {
-> +		if (!bdev->dev_data->bam_pipe_lock)
-> +			return -EOPNOTSUPP;
-> +
-> +		/* Expecting a dummy write when locking, only one descriptor allowed. */
-> +		if (async_desc->num_desc != 1)
-> +			return -EINVAL;
-> +	}
-> +
-> +	switch (metadata->op) {
-> +	case BAM_META_CMD_LOCK:
-> +		if (bchan->bam_locked)
-> +			return -EBUSY;
-> +
-> +		hw_desc->flags |= DESC_FLAG_LOCK;
+>  include/dt-bindings/clock/microchip,lan9691.h | 24 +++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+>  create mode 100644 include/dt-bindings/clock/microchip,lan9691.h
+> 
 
-Why does this flag imply for the hardware.
 
-I do not like the interface designed here. This is overloading. Can we
-look at doing something better here.
+My bot found new DTB warnings on the .dts files added or changed in this
+series.
 
--- 
-~Vinod
+Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+are fixed by another series. Ultimately, it is up to the platform
+maintainer whether these warnings are acceptable or not. No need to reply
+unless the platform maintainer has comments.
+
+If you already ran DT checks and didn't see these error(s), then
+make sure dt-schema is up to date:
+
+  pip3 install dtschema --upgrade
+
+
+This patch series was applied (using b4) to base:
+ Base: attempting to guess base-commit...
+ Base: tags/next-20251215 (best guess, 14/15 blobs matched)
+ Base: tags/next-20251215 (use --merge-base to override)
+
+If this is not the correct base, please add 'base-commit' tag
+(or use b4 which does this automatically)
+
+New warnings running 'make CHECK_DTBS=y for arch/arm64/boot/dts/microchip/' for 20251215163820.1584926-1-robert.marko@sartura.hr:
+
+arch/arm64/boot/dts/microchip/sparx5_pcb135_emmc.dtb: / (microchip,sparx5-pcb135): compatible: ['microchip,sparx5-pcb135', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb135'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
+	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
+arch/arm64/boot/dts/microchip/sparx5_pcb135.dtb: / (microchip,sparx5-pcb135): compatible: ['microchip,sparx5-pcb135', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb135'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
+	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
+arch/arm64/boot/dts/microchip/sparx5_pcb134.dtb: / (microchip,sparx5-pcb134): compatible: ['microchip,sparx5-pcb134', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb134'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
+	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
+arch/arm64/boot/dts/microchip/sparx5_pcb134_emmc.dtb: / (microchip,sparx5-pcb134): compatible: ['microchip,sparx5-pcb134', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb134'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
+	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
+arch/arm64/boot/dts/microchip/sparx5_pcb125.dtb: / (microchip,sparx5-pcb125): compatible: ['microchip,sparx5-pcb125', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb125'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
+	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
+
+
+
+
+
