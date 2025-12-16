@@ -1,120 +1,198 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89538354AF1;
-	Tue, 16 Dec 2025 13:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA2433EC
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 13:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765890711; cv=none; b=JJqjVcrzVs6ePmYLduXmlxXfnRcZNuN0e89qpUznwgkDPFJjFeqn3DZV3e2pdY4I/B+RgMHli6ReqCEZZkb0za/mqCIUgP38fP/PQzSYY7TkWxFRn3XytXs9fllG6I7M+3pEXFGU6q457V8W8/fOATc9Mp1YGcxGL4ropPps7rE=
+	t=1765891413; cv=none; b=S0N8SXsgQpCIKnftzhmaMqJDAz3SADiqI60+Pkc2oyw+OQ1AHZ+XC1lv47LImH6zdnaX8AJ1Zbi2QaR/2mUf96i8YVCbqPgN5rwm9//Mj+lhr00s8AiE+VKVjNFFRM704+qE05InEcvdDL890pe48t0Mn5/dBDkP9qGIPgepaiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765890711; c=relaxed/simple;
-	bh=uK7rtQd0fuH8HIq2iyTTKTpcKJsEkMoXU53XE1O8rzg=;
-	h=From:Date:Content-Type:MIME-Version:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=WjqNvnPVSnnLYiNDt9GKiqMAKsWDOG/gLl3KPDJ8QB7RZCSLCzVw1Z6uGsIVJrJKVreTbmuj7Kx7qRtlcKRDF6le3uEkRXGbxKKR7iHhCIHBTZ7EQqDQ9Jn1go3aD7Zm0KsRDqI/fv5sK2ufufz8docbp0UhoOQH0To2SvwJUOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fFwjwqyl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765891413; c=relaxed/simple;
+	bh=QV+61qVpdqsPiaPbfd08qHh+TzoR572QyzT9O2x4KLc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KdcB9wlK++lAxme9QKkaF2v+TsyX7Wai+eXBgt3MqqMLpabBmnSR0c5u760uuR7oaWsg5E9Zp1guStVLWwuf9Cr36ziLROvBeX22V1sB1sjCX6GxNQvS9ApB2FfWh2AEBpiLeI03ps70GS1FlAI54EnxwZRC8zoulo0kAw/emPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KYuw7Bzr; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFwjwqyl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB05BC19423;
-	Tue, 16 Dec 2025 13:11:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765890711;
-	bh=uK7rtQd0fuH8HIq2iyTTKTpcKJsEkMoXU53XE1O8rzg=;
-	h=From:Date:Cc:To:In-Reply-To:References:Subject:From;
-	b=fFwjwqyl4XciRQVPx8XogJowdRcsdYKb/ioKdv1BlYgi1o+jrg3aT4TAjJOxcokcI
-	 QsSoL7E/aTwp0Xx89fUuxiHPnEWOL+3YP75h9bjRELSdSMWlSEQ92eq4Dd4ceSznxM
-	 FA0++iF6bDiu+t9pjncqus1HTUPK3svYbIJYzU9lKuMSr/WEguQljrDJAZRNzhNg42
-	 v7hCHoWhSvks4wsNhavYOp/zj1CynIbu8P4b+tzQRYE66RX9T0NwB8sBSiXWwnDEBo
-	 MIlWjd8LzSrypRzNesJoMN6k5blOrxuig+/T5bgwizw08Jd3RqQ5mQlMx9Ug7dba8M
-	 js45kMZa3qkiw==
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 16 Dec 2025 07:11:49 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KYuw7Bzr"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4779ce2a624so50097905e9.2
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 05:23:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765891409; x=1766496209; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uDxfhRBysj2yPZBzYVVRhpxcjKV0qpQrPWWhDK3SHYM=;
+        b=KYuw7BzrbUMfAKbOrOhWuTPHNWxxKEuwVW5dWYZPtJMU5wFJ1ufOC3qIcc9YEVlOqj
+         dG9J5HE9tepzKCWwwLO3OPYZUZ6EaQ9SBMurPmSp4BobCl4IPxkRSOO5xlCYmbYe840P
+         DjojpISFW0m4/JTJzh6uejvlgxhDhW6lGqJIyr4oz+QGg29jbm2tnhtxKbf46uYt3YaL
+         2V25zRNAFnI99YuGgxMOomP54DQkqGG0VRwW1m9/Ifp4m1GxUi+/aXwg9WpGGKGZ+8sh
+         rAhIfIAc/U+0vyz00zPjagXYFm7Y6De8r+BO54KxfD0TKnLlTsTreMxoPdffsg3hzkGY
+         scqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765891409; x=1766496209;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uDxfhRBysj2yPZBzYVVRhpxcjKV0qpQrPWWhDK3SHYM=;
+        b=gWpMcZbQFjESaezAvW1yTSwezWbTCPYHlWO8rGgJiHquGoftYIKBwlE+Y+mb047aXs
+         e5XdPe9sZ0/B0IDuds1dv1CZvpsT2yhmsZYBXIPQsu7Mp7Gsb9wf+i1bOIRJlo7n9+mV
+         LL6GiN2ckzwNT/BnKCZXPdqPBx8yovIkTwHpvGgJCoXkiDelA9J0beql2NlkK1lW9J0F
+         bHtCzZICmmk56ZG8XYu3gHVfNokRWKgAkWiAeHBUpzIP0gTBUS+7V9spOXgNcmfHPima
+         AnXIOLyk15n3s3ZWEE2CWHzPp1xZ28bxLBJlRPSyV7ZFr12GLOrP+yAyjxMD0lUBpEG7
+         w8Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCVb8WXQ21XOdhLZFvogD34YqMU+CKeFs8YoprZ56aWYHDDdQR+qsvBn4w4+dbfmM6gwTkJ64nWkS76JCrU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgXP0ZFwqTbjSoPeWL43kRr/zDxH7xXHyY5iHaqV6K5vdNsnFQ
+	h9x/S9SJJxV2jW9ECgvq9ps5pHHnV9D7e46DO9haGS1oZMRYjOCDjLSS/mErC13SAg==
+X-Gm-Gg: AY/fxX5hZRlJszkcRS9+UpRSpY8t0qjVslX3tlhDIioTB9Pint0E03jg8UTjxQESsjL
+	WAkcEOw8HzCNGtIpRoAu8B31HAbvfmy/Q1zl5lLPhkf1IADMJ1NJdM0/aR+G0vZ1AShFdTBaQGx
+	5anUaii7SOCu5X5XYXOXMfbFn5KxBlWLpAh5wYCMaHdR81n6DJbSUGHbG0Y5iUDVFGNTghPsC3q
+	aiHbYYMic71Fk0refDy7foEP0bMDLVBxMmg6Q6ZNWQgf6IeeCz+JbXzVXf+B7Pq28Tr6mh3j30m
+	mv5aMjfM8BmMSk+K55f6wlK/Ca3+0LcjpF3c/6pxe97czhNyGLoEthjGBiJaelfGQ5vxFyEeZ9y
+	N+W0wTyXaplOPGPLQd7j82JU5VF7WukT1btYjORhr4/WX7qfE9Hj4zjTZjqwsdGttqlEvVcswcy
+	86TqD5VdCHoHWDtT4joM8T8iefERFscjNV+lnH6nFkA6kbbcn9
+X-Google-Smtp-Source: AGHT+IHeQgMekTiUSXYyDxvkGceEMaJToW+cfsdKtACjSuXcP89Hj1YmnWwqaTNfU+el5KGHlOYfZQ==
+X-Received: by 2002:a05:600c:4f90:b0:477:6d96:b3e5 with SMTP id 5b1f17b1804b1-47a8f8ab02bmr133331835e9.7.1765891408469;
+        Tue, 16 Dec 2025 05:23:28 -0800 (PST)
+Received: from elver.google.com ([2a00:79e0:2834:9:ea4c:b2a8:24a4:9ce9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47bd8f86b83sm10764215e9.2.2025.12.16.05.23.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 05:23:27 -0800 (PST)
+Date: Tue, 16 Dec 2025 14:23:19 +0100
+From: Marco Elver <elver@google.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	Chris Li <sparse@chrisli.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+	linux-sparse@vger.kernel.org, linux-wireless@vger.kernel.org,
+	llvm@lists.linux.dev, rcu@vger.kernel.org
+Subject: Re: [PATCH v4 06/35] cleanup: Basic compatibility with context
+ analysis
+Message-ID: <aUFdRzx1dxRx1Uqa@elver.google.com>
+References: <20251120145835.3833031-2-elver@google.com>
+ <20251120151033.3840508-7-elver@google.com>
+ <20251211121659.GH3911114@noisy.programming.kicks-ass.net>
+ <CANpmjNOmAYFj518rH0FdPp=cqK8EeKEgh1ok_zFUwHU5Fu92=w@mail.gmail.com>
+ <20251212094352.GL3911114@noisy.programming.kicks-ass.net>
+ <CANpmjNP=s33L6LgYWHygEuLtWTq-s2n4yFDvvGcF3HjbGH+hqw@mail.gmail.com>
+ <20251212110928.GP3911114@noisy.programming.kicks-ass.net>
+ <aUAPbFJSv0alh_ix@elver.google.com>
+ <20251216123211.GT3707837@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Cc: netdev@vger.kernel.org, linusw@kernel.org, vkoul@kernel.org, 
- pabeni@redhat.com, jirislaby@kernel.org, lars.povlsen@microchip.com, 
- linux-arm-kernel@lists.infradead.org, claudiu.beznea@tuxon.dev, 
- kuba@kernel.org, mturquette@baylibre.com, Steen.Hegelund@microchip.com, 
- mwalle@kernel.org, tudor.ambarus@linaro.org, devicetree@vger.kernel.org, 
- UNGLinuxDriver@microchip.com, edumazet@google.com, 
- linux-clk@vger.kernel.org, andi.shyti@kernel.org, olivia@selenic.com, 
- conor+dt@kernel.org, luka.perkov@sartura.hr, richard.genoud@bootlin.com, 
- linux-hwmon@vger.kernel.org, krzk+dt@kernel.org, 
- wsa+renesas@sang-engineering.com, Ryan.Wanner@microchip.com, 
- linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
- alexandre.belloni@bootlin.com, lee@kernel.org, linux@roeck-us.net, 
- davem@davemloft.net, gregkh@linuxfoundation.org, 
- kavyasree.kotagiri@microchip.com, nicolas.ferre@microchip.com, 
- andrew+netdev@lunn.ch, romain.sioen@microchip.com, sboyd@kernel.org, 
- linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
- linux-serial@vger.kernel.org, daniel.machon@microchip.com, 
- dmaengine@vger.kernel.org, richardcochran@gmail.com, 
- herbert@gondor.apana.org.au, charan.pedumuru@microchip.com, 
- linux-crypto@vger.kernel.org, linux-i2c@vger.kernel.org, 
- radu_nicolae.pirea@upb.ro
-To: Robert Marko <robert.marko@sartura.hr>
-In-Reply-To: <20251215163820.1584926-1-robert.marko@sartura.hr>
-References: <20251215163820.1584926-1-robert.marko@sartura.hr>
-Message-Id: <176589052274.1815136.7513475493879599819.robh@kernel.org>
-Subject: Re: [PATCH v2 01/19] include: dt-bindings: add LAN969x clock
- bindings
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251216123211.GT3707837@noisy.programming.kicks-ass.net>
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-
-On Mon, 15 Dec 2025 17:35:18 +0100, Robert Marko wrote:
-> Add the required LAN969x clock bindings.
+On Tue, Dec 16, 2025 at 01:32PM +0100, Peter Zijlstra wrote:
+> On Mon, Dec 15, 2025 at 02:38:52PM +0100, Marco Elver wrote:
 > 
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> ---
-> Changes in v2:
-> * Rename file to microchip,lan9691.h
+> > Working on rebasing this to v6.19-rc1 and saw this new scoped seqlock
+> > abstraction. For that one I was able to make it work like I thought we
+> > could (below). Some awkwardness is required to make it work in
+> > for-loops, which only let you define variables with the same type.
 > 
->  include/dt-bindings/clock/microchip,lan9691.h | 24 +++++++++++++++++++
->  1 file changed, 24 insertions(+)
->  create mode 100644 include/dt-bindings/clock/microchip,lan9691.h
+> > 
+> > diff --git a/include/linux/seqlock.h b/include/linux/seqlock.h
+> > index b5563dc83aba..5162962b4b26 100644
+> > --- a/include/linux/seqlock.h
+> > +++ b/include/linux/seqlock.h
+> > @@ -1249,6 +1249,7 @@ struct ss_tmp {
+> >  };
+> >  
+> >  static __always_inline void __scoped_seqlock_cleanup(struct ss_tmp *sst)
+> > +	__no_context_analysis
+> >  {
+> >  	if (sst->lock)
+> >  		spin_unlock(sst->lock);
+> > @@ -1278,6 +1279,7 @@ extern void __scoped_seqlock_bug(void);
+> >  
+> >  static __always_inline void
+> >  __scoped_seqlock_next(struct ss_tmp *sst, seqlock_t *lock, enum ss_state target)
+> > +	__no_context_analysis
+> >  {
+> >  	switch (sst->state) {
+> >  	case ss_done:
+> > @@ -1320,9 +1322,18 @@ __scoped_seqlock_next(struct ss_tmp *sst, seqlock_t *lock, enum ss_state target)
+> >  	}
+> >  }
+> >  
+> > +/*
+> > + * Context analysis helper to release seqlock at the end of the for-scope; the
+> > + * alias analysis of the compiler will recognize that the pointer @s is is an
+> > + * alias to @_seqlock passed to read_seqbegin(_seqlock) below.
+> > + */
+> > +static __always_inline void __scoped_seqlock_cleanup_ctx(struct ss_tmp **s)
+> > +	__releases_shared(*((seqlock_t **)s)) __no_context_analysis {}
+> > +
+> >  #define __scoped_seqlock_read(_seqlock, _target, _s)			\
+> >  	for (struct ss_tmp _s __cleanup(__scoped_seqlock_cleanup) =	\
+> > -	     { .state = ss_lockless, .data = read_seqbegin(_seqlock) };	\
+> > +	     { .state = ss_lockless, .data = read_seqbegin(_seqlock) }, \
+> > +	     *__UNIQUE_ID(ctx) __cleanup(__scoped_seqlock_cleanup_ctx) = (struct ss_tmp *)_seqlock; \
+> >  	     _s.state != ss_done;					\
+> >  	     __scoped_seqlock_next(&_s, _seqlock, _target))
+> >  
 > 
+> I am ever so confused.. where is the __acquire_shared(), in read_seqbegin() ?
 
+Ah this is just a diff on top of this v4 series. The read_seqbegin()
+already had it:
 
-My bot found new DTB warnings on the .dts files added or changed in this
-series.
+	static inline unsigned read_seqbegin(const seqlock_t *sl)
+		__acquires_shared(sl) __no_context_analysis
+	{
 
-Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-are fixed by another series. Ultimately, it is up to the platform
-maintainer whether these warnings are acceptable or not. No need to reply
-unless the platform maintainer has comments.
+> Also, why do we need this second variable with cleanup; can't the
+> existing __scoped_seqlock_cleanup() get the __releases_shared()
+> attribute?
 
-If you already ran DT checks and didn't see these error(s), then
-make sure dt-schema is up to date:
+The existing __scoped_seqlock_cleanup() receives &_s (struct ss_tmp *),
+and we can't refer to the _seqlock from __scoped_seqlock_cleanup(). Even
+if I create a member seqlock_t* ss_tmp::seqlock and initialize it with
+_seqlock, the compiler can't track that the member would be an alias of
+_seqlock. The function __scoped_seqlock_next() does receive _seqlock to
+effectively release it executes for every loop, so there'd be a "lock
+imbalance" in the compiler's eyes.
 
-  pip3 install dtschema --upgrade
-
-
-This patch series was applied (using b4) to base:
- Base: attempting to guess base-commit...
- Base: tags/next-20251215 (best guess, 14/15 blobs matched)
- Base: tags/next-20251215 (use --merge-base to override)
-
-If this is not the correct base, please add 'base-commit' tag
-(or use b4 which does this automatically)
-
-New warnings running 'make CHECK_DTBS=y for arch/arm64/boot/dts/microchip/' for 20251215163820.1584926-1-robert.marko@sartura.hr:
-
-arch/arm64/boot/dts/microchip/sparx5_pcb135_emmc.dtb: / (microchip,sparx5-pcb135): compatible: ['microchip,sparx5-pcb135', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb135'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
-	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
-arch/arm64/boot/dts/microchip/sparx5_pcb135.dtb: / (microchip,sparx5-pcb135): compatible: ['microchip,sparx5-pcb135', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb135'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
-	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
-arch/arm64/boot/dts/microchip/sparx5_pcb134.dtb: / (microchip,sparx5-pcb134): compatible: ['microchip,sparx5-pcb134', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb134'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
-	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
-arch/arm64/boot/dts/microchip/sparx5_pcb134_emmc.dtb: / (microchip,sparx5-pcb134): compatible: ['microchip,sparx5-pcb134', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb134'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
-	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
-arch/arm64/boot/dts/microchip/sparx5_pcb125.dtb: / (microchip,sparx5-pcb125): compatible: ['microchip,sparx5-pcb125', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb125'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
-	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
-
-
-
-
-
+So having the direct alias (even if we cast it to make it work in the
+single-statement multi-definition, the compiler doesn't care) is
+required for it to work.
