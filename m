@@ -1,248 +1,124 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AF3212552
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 07:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB9F2E0902
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 08:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765870734; cv=none; b=bBfCSVDYjJ/XfqVKepsOOuJ/oKJWGkt6rYNKg9v/dWJ816FfSo1X+Ofm6v8ULP9Wwjwo3Jr/Gbm8VM8Lm/0n+wOm551d6J78LbA9H6jmKmuHxN/CmCR+xob+CePf5qllADtAhIVy6fMlYDwTz3sCZNIcH33Wtt37/EuEa8cNhvE=
+	t=1765872935; cv=none; b=OtHzpx9bL51W3o2JL17yAhH+cgWqtBYe2R/pCJ/sZUx+6v+yvm/jMa9TgeQ6Xd6fOgNmjIpwC4JDYqfklPH3OzBZK935tG/WIpNjPw4h+NHl6jmNXYyrXxNg0mX3b0KyNKVQzlR3ou7/knaLS7pkwEvQFryM3Qa7AgJsJ1ufEmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765870734; c=relaxed/simple;
-	bh=EVtYPoSK83Vy1+h2LJvKFGGxMbDwlr5oVrnogUjKJi4=;
+	s=arc-20240116; t=1765872935; c=relaxed/simple;
+	bh=8WZ8g0mEy7Er2G04e2JUBtm/40jHjH98gpeADHyNXhE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QuB7As1G731Ah3NPeQlqJgdP5bH9UQfQnwRZLKSWvGYP796QR1Bsw1wArNeSavJGV7Bg4s77+xRT1WQdr1yq7/6QOQb9cVfLX/w83CnMLwmUOCXvo8bb20nFtrM1rdN7GkdzFVb96xsPhRaZ/x9V+e8wxE83gLFTSUfX/cViBC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=XTFIjUfv; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Y2IlkbVO; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	 To:Cc:Content-Type; b=CFoYUJGUj6ClVK6alZUKKUxV2Ci45XkPVHcVRA2iiZBzBMWfh2GbOI7GDzeq2SSEqPyBKBCtl8MBD5D1ohJnmowxjON8+huuWz4uzRIEPlT6khfmKH4ge/lVcxrDkH9uIVICvSO1P6PYHcz+Czd754ahYxMZJhtgClijONOt7AI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pyFSCL7G; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="XTFIjUfv";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Y2IlkbVO"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BG5INUY175693
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 07:38:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	7YmBFkv7BIT1XO2FEXzhMg2xQ1XFzff8WD9iA8ZhYH0=; b=XTFIjUfvzx+0WxwS
-	dxYZGhHRtRb7qI1JBA4pcqy6vbKSOyzJdExYWJot4nyNC5bP1PQTwaol4/9nrFRR
-	cNpfYq+0xplBniApzuR6QM64JR4xlSIG1ySWQmd+F+q6RI4c/HRYUQu+unYmDuNv
-	ovH/RzLAz31fw6dCPurnScEOA3yMEOiKC7huhtgQOpmNCpjlfq4Dztq5qNeiqYLY
-	jHTLvHGqClBMGi7s6HFS3MNm4vkXZAJdCNq/6X4u1Sqy1Q4F4BpI2jYe9sKTsM8i
-	1uZY0wuJCCs9kowVxYLa+FqZz23OiYWlzDcNPQ/wsbuvItrhExVtvoTS5xD/yNst
-	ibD+sw==
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4b2kmm3f63-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 07:38:51 +0000 (GMT)
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-bdced916ad0so7775040a12.0
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Dec 2025 23:38:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1765870731; x=1766475531; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7YmBFkv7BIT1XO2FEXzhMg2xQ1XFzff8WD9iA8ZhYH0=;
-        b=Y2IlkbVOZfKbmsmiUf21URSRg7ynnteK+KhpgS3bYxSgc9IrUARfongdPfiSez9o2i
-         /TSF2dTtYlztiimvLDhH41ux18V6DMvVZsUgU8mfoehTZwOwNToMghR8w4QU4m7m2agn
-         XAbF5r0+Ko9LN5UTcj4PMz8fL0mRvXaWmccqOT0vaSG77pnaj0+1RPp1WI/d1NRjdgA6
-         G3tvfFfKx26EKigXqtSzGA5bwZ4GXeMpEytgk0aYIJLtRpugnVNv+tAT1QH4Q2hQQPJ6
-         RDNI1NNyzuLultZCuAEqQ55l6bxvnl3Rm+crEUfJCoUFQLUgCAo/px54SsX+9EzjuL6P
-         eSCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765870731; x=1766475531;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7YmBFkv7BIT1XO2FEXzhMg2xQ1XFzff8WD9iA8ZhYH0=;
-        b=HmRR5CNIQ0tYel0HG9bsSP+6a0Naqd0hVaN8WNjnvJYrs4LgoQ6o6Fb/oFQsqIOvGa
-         ArRA7d3JA0kRtt4XAjNdTxh2gWBV4O49R8CT0ODwwRyx7mOd5AGr+vWTR067op3z1RBn
-         8P03foz/1XXJs0xa6pIB0Vw3dqZMNUi/hNlrhue4wuZuh8fmZYceDCpKXokK94Qp2FoL
-         TfRiGV64gKrPcUNWSX+zh/hPvIdW+U3Sd506qc92//4BIyxobZPQweMzClYsbddaN6Xp
-         pX6CPs8OPmH2tenmXik+YuIGRMVetoPrm5T567mgHC0rpDY1ozQcBdz4GuidpX8SWmIr
-         uxfw==
-X-Forwarded-Encrypted: i=1; AJvYcCV0nxw0eB5+pQn2jJrXyZ89TLOElWHkQqrRF5Gcp6kTleD0gl9X0mbiQzOIWfqIy3jLvGWhH+c1dNJ1u7k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxECNRHJBNjTMtqZP7dJiUMa+fst4SyABriPk39pQmxoi53EnZZ
-	3q9dmjJ1jOU6BREat+HdyFjBKpl7Xk62jNZ3RljKIPgxGKn3MW8P6LeDOCrD75H0mhUw6GeBp8t
-	TKj34Nc28DxKjNkgW1o0Asghb0Zynhmnbh2VVWA7hsidiFNSYcEb5pFCUl02CGiNaEkVzn67Dkp
-	+O8LSPYGH/GJm5WRJQxNt7NlN9qF1rvLnnIsmsDEH+Dg==
-X-Gm-Gg: AY/fxX5+FIUumVT7X8vhoq85pbbfQ9kxvHUd78vDuai+U4wreuKzCIjVIj3/nErQacN
-	JC1d4RfVVHInbCSyfJvf9H9M+RV8l4tby9SN3jIOH/f5aa+irHgT9m8imetA9Kh6rDbW2fbNG+9
-	QmV00jkmElDAI8swC4KJO9mOQSnmXkNG/t7vtQkzftadOv4YhadVny04KHp3eWpJS8ymU=
-X-Received: by 2002:a05:7300:2a9b:b0:2a4:3593:6453 with SMTP id 5a478bee46e88-2ac2f85e872mr8049905eec.3.1765870731069;
-        Mon, 15 Dec 2025 23:38:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFgAxeScCHPFScnumP+kyrXe4heJGwYVQRSxj+hObliMSDxJWWHv5hYUxaMExJMrxhceQO+g6cVj0vLQa5OEdY=
-X-Received: by 2002:a05:7300:2a9b:b0:2a4:3593:6453 with SMTP id
- 5a478bee46e88-2ac2f85e872mr8049887eec.3.1765870730525; Mon, 15 Dec 2025
- 23:38:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pyFSCL7G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FC9FC16AAE
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 08:15:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765872935;
+	bh=8WZ8g0mEy7Er2G04e2JUBtm/40jHjH98gpeADHyNXhE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=pyFSCL7GgqVhLbXa23lLjElfLh7TXxsMghJEwKpU9kVAOwuJArRA8eInWC9RGImCw
+	 FDC96m2XWA7cQtTOlR0cGbBWCaaE48b4umCh4WxHzlFV1sqJ+jPeYiPfEzH2rqvMtP
+	 uC2xAXAJbCx+oCS/+2Pn7zRy8JdD1jVAIZAaaEfCcC40iOfq9uAhonwFceHam5ZHjM
+	 jxg6VtvXxQYDxxnLt/ZzEu5LNwCXc8pSBCUG5slq/oWvHI5LIXQmmRVxmts179y4Ky
+	 hl3WlSALUH+ScpWRJ1wcYa/oy6Bar+S71JgebrZ/4lVbPxUbqJfYLma7+xNqFpG4A/
+	 3GE/uoZQPRe6w==
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7f121c00dedso5321896b3a.0
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 00:15:35 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVHvm/sr8ISgpc/QM3p5HkApDgcJo3E4KTUyLfoziqdZrl7kSx2Z92lImAVRXObPNcJ0JAT+07VgDQaG7c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAPEvErTFcX9N+tSBYd7m0sFLuXIhdDC28VjLS9g2mf39jPeJw
+	CoSqfar1L6YgVguTlcAy5JZL1Dmz5a0vRW+Nfi+RkkHenPBN2tzm5iYDVZzquj/+ltHdMwjZcob
+	cd/wP830BIfDrgL8bknyY6bm69+VR5DA=
+X-Google-Smtp-Source: AGHT+IF+nSHWTz8ec1cHbhpAFGpdip3Xir5QUqV2r4tGwxPTtzoVhw3Dt2GTzD3aYLJg7Rgnn+OPW44rF20NqRmFkic=
+X-Received: by 2002:a05:6a20:a128:b0:358:dc7d:a2be with SMTP id
+ adf61e73a8af0-369addc8fb9mr13155966637.17.1765872934696; Tue, 16 Dec 2025
+ 00:15:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
- <aT--ox375kg2Mzh-@sumit-X1> <dhunzydod4d7vj73llpuqemxb5er2ja4emxusr66irwf77jhhb@es4yd2axzl25>
-In-Reply-To: <dhunzydod4d7vj73llpuqemxb5er2ja4emxusr66irwf77jhhb@es4yd2axzl25>
-From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-Date: Tue, 16 Dec 2025 13:08:38 +0530
-X-Gm-Features: AQt7F2pIGEo3k7l40jiSNtQzSXPgQLv36wLttu_75OXJz9aTmVe9GGZBfjh5ELU
-Message-ID: <CAGptzHOOqLhBnAXDURAzkgckUvRr__UuF1S_7MLV0u-ZxYEdyA@mail.gmail.com>
-Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver callbacks
-To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-Cc: Sumit Garg <sumit.garg@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Michael Chan <michael.chan@broadcom.com>,
-        Pavan Chebbi <pavan.chebbi@broadcom.com>,
-        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>, Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
-        Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-rtc@vger.kernel.org, linux-efi@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org,
-        Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org,
-        netdev@vger.kernel.org, linux-mips@vger.kernel.org,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
+References: <DETXT7QI62KE.F3CGH2VWX1SC@cknow-tech.com> <20251209223417.112294-1-ebiggers@kernel.org>
+ <DEUFDH7FJURL.3J0FN5I19VV8F@cknow-tech.com> <CAMj1kXEQkB9MWB+PAi4XE_MuBt0ScitxTsKMDo1-7Cp-=xXOpw@mail.gmail.com>
+ <20251212054020.GB4838@sol> <CAMj1kXHVq1NWA28jKxBrHHi1JOPoGXEamC7uMgTOmFwzmcYxRA@mail.gmail.com>
+ <20251215201611.GB10539@google.com>
+In-Reply-To: <20251215201611.GB10539@google.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 16 Dec 2025 09:15:21 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGQvjcN7gEH_fsxQ-0KW7_Mj93i0LQ8aT6WQTCPiMMcQA@mail.gmail.com>
+X-Gm-Features: AQt7F2o-6y27Rl5dgpbF5DqaZ0Tye3uoKErnof0JTlUHQQ7ApPmcPSBBL8_U4C8
+Message-ID: <CAMj1kXGQvjcN7gEH_fsxQ-0KW7_Mj93i0LQ8aT6WQTCPiMMcQA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm64/ghash - Fix incorrect output from ghash-neon
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Diederik de Haas <diederik@cknow-tech.com>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, linux-arm-kernel@lists.infradead.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE2MDA2MiBTYWx0ZWRfX8A+5mWlZQpdL
- opjSuVXwatcUm/1DvFIGDrspa4LmwvHJEShsK4dkDTgoDIgyyXGtLMtfJkehLRmKZnUucywyKv6
- BYjgb/oxkcFbRphoFUiBuxAGX3sy0kxDgBzJYP2zshFB59rDCZgJvGveRAnJgpGZUePiSzu8S34
- lO2RaDRScAtd116zWgLryfNhF02XoqlJWQ+SP3L2PYyP+1IpTA9cwX9rPOqK9JLl1NsNf7+w/RG
- i7BmVA+0ecAKxs9H6YVOteLTpWlGTRyRDEb7J0lC43ev63riJcfXMUg+NjwhSXLFmaGsoCamlRq
- NgrAnfKBFd341kgc8L+iWT920R01cVvaFpYBuqGuh2fJtJUTqbksq5K318/KpyF7LdACcoGAsSc
- c/zaU7EvSYJYmTC7fw7kkU9bBJcJxQ==
-X-Proofpoint-GUID: zyXlKwOc0NoqjMVhMX0ukRe_WZmXn8TG
-X-Proofpoint-ORIG-GUID: zyXlKwOc0NoqjMVhMX0ukRe_WZmXn8TG
-X-Authority-Analysis: v=2.4 cv=EcTFgfmC c=1 sm=1 tr=0 ts=69410c8c cx=c_pps
- a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=IpJZQVW2AAAA:8
- a=sfbzD7rgGHNppxHmi9UA:9 a=QEXdDO2ut3YA:10 a=x9snwWr2DeNwDh03kgHS:22
- a=IawgGOuG5U0WyFbmm1f5:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-16_01,2025-12-15_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 lowpriorityscore=0 clxscore=1011 phishscore=0 adultscore=0
- bulkscore=0 priorityscore=1501 suspectscore=0 spamscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512160062
 
-Hi Uwe,
-
-On Mon, Dec 15, 2025 at 3:02=E2=80=AFPM Uwe Kleine-K=C3=B6nig
-<u.kleine-koenig@baylibre.com> wrote:
+On Mon, 15 Dec 2025 at 21:16, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> Hello Sumit,
->
-> On Mon, Dec 15, 2025 at 04:54:11PM +0900, Sumit Garg wrote:
-> > On Thu, Dec 11, 2025 at 06:14:54PM +0100, Uwe Kleine-K=C3=B6nig wrote:
-> > > Hello,
+> On Mon, Dec 15, 2025 at 04:54:34PM +0900, Ard Biesheuvel wrote:
+> > > > All 64-bit RPi models except the RPi5 are affected by this, as those
+> > > > do not implement the crypto extensions. So I would expect QEMU to do
+> > > > the same.
+> > > >
+> > > > It would be nice, though, if we could emulate this on the mach-virt
+> > > > machine model too. It should be fairly trivial to do, so if there is
+> > > > demand for this I can look into it.
 > > >
-> > > the objective of this series is to make tee driver stop using callbac=
-ks
-> > > in struct device_driver. These were superseded by bus methods in 2006
-> > > (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
-> > > methods.")) but nobody cared to convert all subsystems accordingly.
+> > > I'm definitely interested in it.  I'm already testing multiple "-cpu"
+> > > options, and it's easy to add more.
 > > >
-> > > Here the tee drivers are converted. The first commit is somewhat
-> > > unrelated, but simplifies the conversion (and the drivers). It
-> > > introduces driver registration helpers that care about setting the bu=
-s
-> > > and owner. (The latter is missing in all drivers, so by using these
-> > > helpers the drivers become more correct.)
+> > > With qemu-system-aarch64 I'm currently only using "-M virt", since the
+> > > other machine models I've tried don't boot with arm64 defconfig,
+> > > including "-M raspi3b" and "-M raspi4b".
 > > >
-> > > The patches #4 - #17 depend on the first two, so if they should be
-> > > applied to their respective subsystem trees these must contain the fi=
-rst
-> > > two patches first.
-> >
-> > Thanks Uwe for your efforts to clean up the boilerplate code for TEE bu=
-s
-> > drivers.
->
-> Thanks for your feedback. I will prepare a v2 and address your comments
-> (whitespace issues and wrong callback in the shutdown method).
->
-> > > Note that after patch #2 is applied, unconverted drivers provoke a
-> > > warning in driver_register(), so it would be good for the user
-> > > experience if the whole series goes in during a single merge window.
-> >
-> > +1
-> >
-> > I suggest the whole series goes via the Jens tree since there shouldn't
-> > be any chances for conflict here.
-> >
-> > > So
-> > > I guess an immutable branch containing the frist three patches that c=
-an
-> > > be merged into the other subsystem trees would be sensible.
-> > >
-> > > After all patches are applied, tee_bus_type can be made private to
-> > > drivers/tee as it's not used in other places any more.
+> > > There may be some tricks I'm missing.  Regardless, expanding the
+> > > selection of available CPUs for "-M virt" would be helpful.  Either by
+> > > adding "real" CPUs that have "interesting" combinations of features, or
+> > > by just allowing turning features off like
+> > > "-cpu max,aes=off,pmull=off,sha256=off".  (Certain features like sve can
+> > > already be turned off in that way, but not the ones relevant to us.)
 > > >
 > >
-> > Feel free to make the tee_bus_type private as the last patch in the ser=
-ies
-> > such that any followup driver follows this clean approach.
+> > There are some architectural rules around which combinations of crypto
+> > extensions are permitted:
+> > - PMULL implies AES, and there is no way for the ID registers to
+> > describe a CPU that has PMULL but not AES
+> > - SHA256 implies SHA1 (but the ID register fields are independent)
+> > - SHA3 and SHA512 both imply SHA256+SHA1
+> > - SVE versions are not allowed to be implemented unless the plain NEON
+> > version is implemented as well
+> > -  FEAT_Crypto has different meanings for v8.0, v8.2 and v9.x
+> >
+> > So it would be much easier, also in terms of future maintenance, to
+> > have a simple 'crypto=off' setting that applies to all emulated CPU
+> > models, given that disabling all crypto on any given compliant CPU
+> > will never result in something that the architecture does not permit.
+> >
+> > Would that work for you?
 >
-> There is a bit more to do for that than I'm willing to invest. With my
-> patch series applied `tee_bus_type` is still used in
-> drivers/tee/optee/device.c and drivers/tee/tee_core.c.
-
-Oh I see, I guess we need to come with some helpers around device
-register/unregister from TEE subsystem as well. Let's plan that for a
-followup patch-set, I don't want this patch-set to be bloated more.
-
-> Maybe it's
-> sensible to merge these two files into a single one.
-
-It's not possible as the design for TEE bus is to have TEE
-implementation drivers like OP-TEE, AMD-TEE, TS-TEE, QTEE and so on to
-register devices on the bus.
-
+> I thought it had been established that the "crypto" grouping of features
+> (as implemented by gcc and clang) doesn't reflect the actual hardware
+> feature fields and is misleading because additional crypto extensions
+> continue to be added.
 >
-> The things I wonder about additionally are:
+> I'm not sure that applies here, but just something to consider.
 >
->  - if CONFIG_OPTEE=3Dn and CONFIG_TEE=3Dy|m the tee bus is only used for
->    drivers but not devices.
 
-Yeah since the devices are rather added by the TEE implementation driver.
+You are right, this is why 'crypto=on' can never mean anything other
+than 'do not disable the crypto extensions that this particular CPU
+type provides' But that does not mean 'crypto=off' is equally
+problematic.
 
+> There's certainly no need to support emulating combinations of features
+> that no hardware actually implements.  So yes, if that means "crypto" is
+> the right choice, that sounds fine.
 >
->  - optee_register_device() calls device_create_file() on
->    &optee_device->dev after device_register(&optee_device->dev).
->    (Attention half-knowledge!) I think device_create_file() should not
->    be called on an already registered device (or you have to send a
->    uevent afterwards). This should probably use type attribute groups.
->    (Or the need_supplicant attribute should be dropped as it isn't very
->    useful. This would maybe be considered an ABI change however.)
 
-The reasoning for this attribute should be explained by commit:
-7269cba53d90 ("tee: optee: Fix supplicant based device enumeration").
-In summary it's due to a weird dependency for devices we have with the
-user-space daemon: tee-supplicant.
-
->
->  - Why does optee_probe() in drivers/tee/optee/smc_abi.c unregister all
->    optee devices in its error path (optee_unregister_devices())?
-
-This is mostly to take care of if any device got registered before the
-failure occured. Let me know if you have a better way to address that.
-
--Sumit
+OK, I'll have a stab at that and cc you on the patches.
