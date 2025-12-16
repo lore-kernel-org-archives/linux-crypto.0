@@ -1,121 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939792C21FC;
-	Tue, 16 Dec 2025 17:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B195533D6D9;
+	Tue, 16 Dec 2025 18:02:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765906603; cv=none; b=AUJ6SoOWgAd4r2NLNTG6yE+PuOrc+MU12JfpCV4fMm/n9PZVhgEAeQ/xpK/K4bvnmLDrXbH7YMSm3Hl3XR02lmjzESTq73tsHUtGdY4K8mYGaB9bbwdfxc1+/1/TZ7gND+KatSfo8TUXXem6NoiDuKVgMNU5hgRzYq2B1sZszxQ=
+	t=1765908167; cv=none; b=KsfkFMqbB9t4Ry7E9IRFxNs/OznfaxMldJe+8txIRD5SeppCde/oVnI9+AMo2GwRGsiwiT80yR7lXAK2uAbK300VKSEghadGIDoccmn1ZfJtBAcqNhIlB/h1Dqtf0pTAt+AXVK7eTZsQWJOC82fySkcCaRt+I9aDXoupCly0RO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765906603; c=relaxed/simple;
-	bh=zOFcVEtlCCznFZ/0DXCrBRMUQm0xlBq4aQ4km3Nl4FU=;
+	s=arc-20240116; t=1765908167; c=relaxed/simple;
+	bh=T6gPHTjw/Zx9+KYa1PVLgBTG1KiKarM9imEmVw16l40=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YzO+6LEIdzzJkrDD8hGcsWOR+GYUqSc+x7eRN+mdOY3gJh3QOHkED4Q+4I9yuK2VnHHm1vZiVjnPZkusBjxTlxSfU2T2HrTZAQtrN3aqVY+HLVTmGsg7yRX0xUupN97DnZtgc9RPtU/WOv+tSvcrZBJYOZfw2QvPaLj2uPI01vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KT27MiOq; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zj/c8brpO/w9SJgH3+ATmMSIlq1Ey+0+WixgNU792ht7In8YTsw5I7yjhK16X3YfSHwnwlsINecRBPvv6q+VIXjBX4Ur3CMP10Kux7MAY9bOOF6nBBY1l3qV0VSSz5nQPv9+OAkubt2Y5bBg60PvqRsJNchi4qP8C49gSe52ZbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m175OY8u; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KT27MiOq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFE09C4CEFB;
-	Tue, 16 Dec 2025 17:36:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m175OY8u"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0F88C4CEF1;
+	Tue, 16 Dec 2025 18:02:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765906603;
-	bh=zOFcVEtlCCznFZ/0DXCrBRMUQm0xlBq4aQ4km3Nl4FU=;
+	s=k20201202; t=1765908167;
+	bh=T6gPHTjw/Zx9+KYa1PVLgBTG1KiKarM9imEmVw16l40=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KT27MiOqvS2CiNhpmgDh3jdyqT6cTHnyoJQ9nk5BIRxvboSECw/Z1ijC7RKKgoXAm
-	 w1M8h9XfXLjn6ebs6He+wB7e5+kN1P3jGhybEp4qcYU2DkQwncORg4OS5VKfc7+Osq
-	 W+a+m2b299ff7kVJbC87sjRLT4tTHPx0q3hqfGqOSiRTzIK8cy+kLwpC4b+BWMbhKF
-	 ZfYvsHs4KczXTSEYfukbzklKQU3C9adSoQbyeYUhk4rxbBt2W/c9qVQZT1cq3+Y1xt
-	 xFF4jO1G7ztVd+m9yugNtQoJY7KMYpsoidm4p7jdqIEktCuQpPAf1wKHw7XzFIJqH2
-	 OSCSv8skG94zg==
-Date: Tue, 16 Dec 2025 17:36:31 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org,
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com,
-	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
-	gregkh@linuxfoundation.org, jirislaby@kernel.org,
-	mturquette@baylibre.com, sboyd@kernel.org, richardcochran@gmail.com,
-	wsa+renesas@sang-engineering.com, romain.sioen@microchip.com,
-	Ryan.Wanner@microchip.com, lars.povlsen@microchip.com,
-	tudor.ambarus@linaro.org, charan.pedumuru@microchip.com,
-	kavyasree.kotagiri@microchip.com, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org,
-	netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-clk@vger.kernel.org,
-	mwalle@kernel.org, luka.perkov@sartura.hr
-Subject: Re: [PATCH v2 13/19] dt-bindings: dma: atmel: add
- microchip,lan9691-dma
-Message-ID: <20251216-cassette-skid-cc209a9c3ded@spud>
-References: <20251215163820.1584926-1-robert.marko@sartura.hr>
- <20251215163820.1584926-13-robert.marko@sartura.hr>
+	b=m175OY8uOWKAP+3NifWFKTo6rWIJTvA7rUy/4goI+e9lbbYGYRhRSFgVEjyeMfhML
+	 VeQ0UIQRmWZNtV1chxxoeDk0T8kFoggt7oNNchJkLb0KA7x3qgG4abeTwdcc81/WzQ
+	 R4kUdE9o21XeBSrdAVbTwR8DiAiDrx2lIVQAvgiD9Y9iqxrQAVTJYwM5zz/Udm028z
+	 +i96S5Zpk9m2KlYUOigOV9kyxbTd32giZS5Y76AxqGJZig+rE0zHlTgSWjIamMI/vw
+	 oQhTepYoF5yWSo/HMnVVTtM8o2hDLFboUkWDdo/FYl7KKBBVqY47y35H0ipaMBoicw
+	 8v9PKkqwlsJzA==
+Date: Tue, 16 Dec 2025 18:02:45 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: "Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 0/3] Implementation of Ascon-Hash256
+Message-ID: <20251216180245.GD10539@google.com>
+References: <20251215-ascon_hash256-v1-0-24ae735e571e@kriptograf.id>
+ <20251215201932.GC10539@google.com>
+ <7920c742b3be0723119e19e323dc92bc@kriptograf.id>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Pqck0FjEcpen1/ot"
-Content-Disposition: inline
-In-Reply-To: <20251215163820.1584926-13-robert.marko@sartura.hr>
-
-
---Pqck0FjEcpen1/ot
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <7920c742b3be0723119e19e323dc92bc@kriptograf.id>
 
-On Mon, Dec 15, 2025 at 05:35:30PM +0100, Robert Marko wrote:
-> Document Microchip LAN969x DMA compatible which is compatible to SAMA7G5.
->=20
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> ---
->  Documentation/devicetree/bindings/dma/atmel,sama5d4-dma.yaml | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/dma/atmel,sama5d4-dma.yaml=
- b/Documentation/devicetree/bindings/dma/atmel,sama5d4-dma.yaml
-> index 73fc13b902b3..b0802265cb55 100644
-> --- a/Documentation/devicetree/bindings/dma/atmel,sama5d4-dma.yaml
-> +++ b/Documentation/devicetree/bindings/dma/atmel,sama5d4-dma.yaml
-> @@ -32,6 +32,10 @@ properties:
->                - microchip,sam9x60-dma
->                - microchip,sam9x7-dma
->            - const: atmel,sama5d4-dma
+On Tue, Dec 16, 2025 at 01:27:17PM +0700, Rusydi H. Makarim wrote:
+> While no direct in-kernel use as of now
 
-> +      - items:
-> +          - enum:
-> +              - microchip,lan9691-dma
-> +          - const: microchip,sama7g5-dma
->        - items:
->            - const: microchip,sama7d65-dma
+Thanks for confirming.  We only add algorithms when there is a real
+user, so it's best to hold off on this for now.
 
-These two should be merged into an enum, they're both single-item falling
-back to sama7g5.
-pw-bot: changes-requested
-
->            - const: microchip,sama7g5-dma
-> --=20
-> 2.52.0
->=20
-
---Pqck0FjEcpen1/ot
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaUGYnwAKCRB4tDGHoIJi
-0nYCAQDU3J3Krob2l2qR5EC8gEeegRo58LGtAuvkNFTuEuSWCQEAqYzGWdeC6tir
-6LKDQv0205TRThhsWgO61ffssMlQAAU=
-=iMhx
------END PGP SIGNATURE-----
-
---Pqck0FjEcpen1/ot--
+- Eric
