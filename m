@@ -1,161 +1,164 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BD2342506
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 12:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67013342169
+	for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 12:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765973682; cv=none; b=WloBfUJyySJ3uhz8qErvoxktq2i4urKbjIPbaqn+lInFMeuC7ckdyWzM0i32O+pvYmzi7Bfl1WlyFyGMuAW6y+i+l7UoRDeAQkcsarfdwTIkSgRAbYOIksiKpGSFr66wzTvIoGZ1o1ONDYkjYIE73b5eiKk3FfWLLuCKBZXvV0E=
+	t=1765974840; cv=none; b=TbFJbavmpGXCbNXSSKa0YBI1L+q1neSquD1tCanoBC0Okczv2Hqif9I208koFuAOo/bnEDiRA3TA9B74FFeGv7VctOKdaqr3yGBhKDhFTlxn7Vp2Gm3WF5s3V3Fa4crZWErqBqUKM+iatS4TEW/rSOLm9NT3ooKozOtsx5g4qdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765973682; c=relaxed/simple;
-	bh=FOhOqH7toKWDzEVlR9pUeDZO7isCrYW9YHhCfh7mb4I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aqcGmM6EhmkbpmsPeGdJqIGcNCHGOIStccrS5Eq36eH/Fjj3iIq8Bc6rZekpcV/2Cghhd27ahnSpdt5BZgYqbFTSX15mEPtz5i3XHx9MocnKtmElGS5PAsZ4XtFlrKtTwZmuMt7u5OpNrxSdRb8ISg9nlLob6hOF44m994T02aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZFrSypy5; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=DzNcqd9w; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1765974840; c=relaxed/simple;
+	bh=s8GEKXnaSXfLaP2KVal8xoX7Yub2x5YeO61XyI9SmwQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=vDZDKTHKJKB1ue6PaCbdKWLm3sUEc9wnhtSMOk7pK5mEULUXNkbnC/xuptbSWOCrmVtf1mHqcwGNXCG1Xsbj9EVq27uKUD7OBirubo+II6/mCOyqabuPDrIKlfvxihQYwk+XEClnRdQmcO/99qXb8DO2WHFYOLeyihaNJGU3wFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=A2rYCXgU; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZFrSypy5";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="DzNcqd9w"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BHCDTSV3031902
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 12:14:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	TiIbU7CAhhv+5oiifZDjVX1Qm9RbZdgxoYbJ4QOuiwo=; b=ZFrSypy5utuA2YbI
-	hI8cL76CIrAck3oThQeoP95f1+GFPSx7sQFPCz3grsZ/eH91tuvM0GyS+Wk+ANJs
-	74NsKs1oenO2QQtHFUvYJuEW3/gyAt00nQnwYoSKip3Hw/dCkREL2hs+CBFHh4+l
-	Uv5oyCqzcWOB6rLSfOxpF0aI514PvPGy5QnZl62UJmumw8zZbPOLhAmVdQG6Vxx6
-	GNa2JUE6llKuxKckHwVDRBUnimC+CNsD5HquA56ZqKzcz0sMFV4DTxs0bc3NKmJ1
-	1rjtN/CyTXi+yIBveOlLhaCbiZJGReais+zPbBPh8nN72tIcExM1htXrOb5C5/yo
-	XkcCjw==
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4b3jgq9vgh-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 12:14:37 +0000 (GMT)
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4ed83a05863so17634541cf.2
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 04:14:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="A2rYCXgU"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b7697e8b01aso1029269666b.2
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 04:33:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1765973677; x=1766578477; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TiIbU7CAhhv+5oiifZDjVX1Qm9RbZdgxoYbJ4QOuiwo=;
-        b=DzNcqd9wdgg91+8wciqJ6aareK7wxNv10+40Afrcnrjou/bR6VvbcHEX2V4QivL/nY
-         Azf4Sl/DcLhMIAkBMk9CMaL+UgvuQezeQfND+fGgId4S4X6j4XXsKNLhz+JGxyDr9N2Y
-         V3fmoWG/AE/6bKp/YJ075YMLPVRmi9cggXDtoIkmSACeBHPF7L8UZd5GI68MaK5dyHEs
-         ryBDIOVPoeswan38pxfwpRHadyRcdHvpKFs0SI/4vz9nGMwOBxjpSB0TDZ1cJEjUR9jE
-         qbi9I0VwTwwjnEPQ4tPRhstU+gWNBh8kx/aTR65n9g9wGJmCO5fgNizoI6BHexlZXoRI
-         fKsQ==
+        d=sartura.hr; s=sartura; t=1765974835; x=1766579635; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s8GEKXnaSXfLaP2KVal8xoX7Yub2x5YeO61XyI9SmwQ=;
+        b=A2rYCXgUYr9ALJpNgKYHWr7vJr+BFYlLRilkjQiry5X9M3LQQ88mX4hFh1RagqJ6lZ
+         uLtt7f7uVrILg7+B+4YELj4FONtVCFqJA7XwsLHNNYAUI6dirg68L6UOFtUVg/pflSZn
+         976Z2ay8EvD2m28JR88LPxi35onEJ8E+FN4FGVILCcgQKmTMqb22K5nAnVyqmLxQDd6O
+         LbFKdJDvIY/Y8kWMUSdGNCbLVuKFxZCVvOnWjidEXE282hJwaojoXOnOsdvcE8Yo8AOE
+         MRm/wjI6RrNDNxlhO3goPl87r39rYRTEA/cEsAWTInxIkFYA/Fm8IQlepQjUUy1g/gnO
+         RIDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765973677; x=1766578477;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TiIbU7CAhhv+5oiifZDjVX1Qm9RbZdgxoYbJ4QOuiwo=;
-        b=lVyIgnEUDCrGaogbxuHRXfMu8TOF4xFNhPnR06HUR5ns/ng/98nH9tJLM9FSQVV2fi
-         ZCiTRjxFs3FrdNnx/lhqeFwjcVUPLXo/68klAOji4Q9PriZx589N26nzZEb1PKncFGzj
-         GQs6Emwl0Ahx5ks9lXF1UxwZK3QWs2/sZv3eqW6T0mgX+A7pRNeIl+F1JqXADWZkHReU
-         ZiU969AZN7OmBZ4ibyENrOwcMNUuYOzlPvneSDqhzer0AZqU15ptYVxxcHjLHyUErj/k
-         n/B/fJpG0vodkAGmEMwm65Uo+faL5KDoE0DytvA5pg1lsk+gA9gl9V7YjIYvHyw/3240
-         feww==
-X-Forwarded-Encrypted: i=1; AJvYcCXnn6g+B+0MuRI4L6ADiAa643q617BXeFo3tkfn2LRPE+HJtjDNPNxhSTgzZznTpxhiZvxKK/QOWG3re+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7fqxENf8mRSddqUIaStMczZePHX2mdVZTLewILO4Z6v3DxIQ3
-	AIOyRfO44yY5783StZKHQawaowQ8MzfaZo6oC33Zyqrr/LvLGVh18j2HLMugNHUaQlJ/L7wOr39
-	dhSvpT8Ta8Y+pLmsEonFFJyfzB+h5gFXgcw2Sv0QQyNM+LzShtLKeSSByi9DFQWzM4Jk=
-X-Gm-Gg: AY/fxX4yAy1ZSQ9NMxmoBb4QWfU7J8HYNoSCzSyA4gOWbtJjdpCvHUkYvG60fp6WJRX
-	LSa8ZZktA1030TJveYdwU7X9wDtZSOh8NHU/HGb7qotBbWXmtasEqeffryCvO/9PzemTodjGnEV
-	CPX/Xo1ZvjSjhmO5F511zD3C4MshUAMoszzGoNz7z8td/x7CZq4sLaiCCPuiWccwSJ9V7k3nleE
-	sxKtJwdYDj2oT2VabZTZ8ojC6qDLVD3IBxlybHenvbZzduVu382K1fiEuGRq8FiYGv4g14ZUfcr
-	Xy5YRqXqJb2I9O91ANy2hOUl92PF6C51PVhGmv/I+RGk25sOnkahQZgHnuqrB7WP7BbO+NAz9Ja
-	zoX47JMG4rZuw3/bmxuA8mrPPkBUx1amAV3Ka6fYUeidjfMk7ELupHwuYkd8uwhGEzg==
-X-Received: by 2002:a05:622a:610:b0:4ec:f9c2:c200 with SMTP id d75a77b69052e-4f1d0655504mr188695321cf.11.1765973677018;
-        Wed, 17 Dec 2025 04:14:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEXVGpRhIxu3Mf8+ixHHNkLitg1sBzNFn+khIqfYf9Z5J9ROjGkK+V2r9lo/OeYRDeOI3YbBw==
-X-Received: by 2002:a05:622a:610:b0:4ec:f9c2:c200 with SMTP id d75a77b69052e-4f1d0655504mr188695061cf.11.1765973676600;
-        Wed, 17 Dec 2025 04:14:36 -0800 (PST)
-Received: from [192.168.119.72] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cfa2ed80dsm1945925566b.16.2025.12.17.04.14.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Dec 2025 04:14:36 -0800 (PST)
-Message-ID: <8466d783-faf4-4b33-8822-1477cbdec288@oss.qualcomm.com>
-Date: Wed, 17 Dec 2025 13:14:33 +0100
+        d=1e100.net; s=20230601; t=1765974835; x=1766579635;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=s8GEKXnaSXfLaP2KVal8xoX7Yub2x5YeO61XyI9SmwQ=;
+        b=P5mrt6WyOPFeNoTQFebt6PQlSMhpHL4HPNPqTIhv5HSeMkkpWZEvyo/0KsSrTFdTk6
+         fv81wJMKZ1WRnL90fM7X0G7ci0/xAnRKRD48ApbijBunzgF7TWYIfYSWISFb9Z2kHFoX
+         W9oaLH/zSzCxMN4zpeHTaB3ZIQt+v0E5rcdhFsTWBy/ASUE8ttTdJGABQQLaFhbt+JQ4
+         x4XlGb/GPxT3qlxBk3RsLikgC9hT67UrAF6a+AXh9EYCmhVZpTeVWgeqphuZ/Rm5y9FT
+         OZB/aB6yaw4EOzO5rLt3E0BVr50rE8UDMH/ar8jegJlQxntcibfhadygAHznXq6qIU7W
+         Uq2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVdWZ71vT94QK8vj2XdsTRhEd5Em0nB2UouH19SEuzUd8dCqrLoXU9NZomYwbGyevGquozO7FjPwW8XvHA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxu1YfSUn05vKEWD3aBUqn8JWja53rdMByaSvMBP5CJhXVd5pi8
+	ZuMEI+MNFjLMSQXKtgC9f/k2Hn7y/KkRFHks7WF4p02OGtZssDLN/9hwY2T203izGOEaH64PUvh
+	s/emvduKALBbd2J3LY3BL3CmL1FSAtBPH+whCOKjTRQ==
+X-Gm-Gg: AY/fxX4sxHBxJpJRNBydP2s+hb+SPg3Lmzg6xEpK6uiMZltskhM4jF9TGY+1uZL6Y/h
+	KOeqkBjn9ACOt5bIn6IvxIF0OqHfLfFkxUudJOyLym5dJAs/0lVA3MA/xTV7H0g1GZwi0yYx4p3
+	LHLAxWeWsPtqe1BtDK6IIpT7j/L0/Y+MY7v4vQIB0asW1DAg+kQa5J8tYBPlouTezDvGYGbEnom
+	ujItqUL4uejQ2qEo0omTYYB5j+qTU5bQoZrJ/Xt0czCk3VQyDkw7rh2WMQXd/quEjFWgNCXypz+
+	CPBLYEMb+95peGirLulrfZ5aRlOHSJKdaVVqxwp8gVhMprYgHOMj
+X-Google-Smtp-Source: AGHT+IE7Hjde/+kkViqYv1A0LhGo3fNDzXkWHEO+dWmCgW+32Gp4be+4LUgDpSNymwFzE86qvkEGL0RYLcWs3u76qoo=
+X-Received: by 2002:a17:907:3d43:b0:b7c:e320:5250 with SMTP id
+ a640c23a62f3a-b7d238ebd71mr1711209066b.7.1765974834580; Wed, 17 Dec 2025
+ 04:33:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 9/9] arm64: dts: qcom: Add The Fairphone (Gen. 6)
-To: Luca Weiss <luca.weiss@fairphone.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Vinod Koul <vkoul@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Bjorn Andersson
- <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-References: <20251210-sm7635-fp6-initial-v4-0-b05fddd8b45c@fairphone.com>
- <20251210-sm7635-fp6-initial-v4-9-b05fddd8b45c@fairphone.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20251210-sm7635-fp6-initial-v4-9-b05fddd8b45c@fairphone.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=VLjQXtPX c=1 sm=1 tr=0 ts=69429ead cx=c_pps
- a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=6H0WHjuAAAAA:8 a=EUspDBNiAAAA:8
- a=deFlHvtSqnmsrBg3ijIA:9 a=QEXdDO2ut3YA:10 a=zgiPjhLxNE0A:10
- a=a_PwQJl-kcHnX1M80qC6:22 a=Soq9LBFxuPC4vsCAQt-j:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE3MDA5NSBTYWx0ZWRfX12SzOb3LMyko
- dvu5DQMMR+BOAwAqENEYZbsRaS7wAwFL0bBnNS/0zvA6tIPHgIF0cIu358nny5KgyCS8nqeCeb7
- QF4yHBiiaKVMnY4dpoSePkeLjLGk+g66UhznJaFiZqT0zz37+AK9G59Qs9U8doEJTrjT/garu9/
- L1oya9tLkLs550GPxDfu3JvrYibB0wDinRiU9+U8PgQF0BW5AzVKqpNK22QFz1V0Fg7iEbucQV4
- Ni5L/hYtDYl+NqfaZ7U9CVQX7xBt28GviSTCI7B5x5erVnjUMi2RtwK1SCdnbzb5PwTVo6MQE+M
- QNT6iAX9lRdLRyj9mayTyb4v8ipq2JURxs+rgL/Q3CMZb9XO2MvThyTMJYfTJ5REm32UnGRghF0
- D8SZV24kXpvqcoSfh1RICNGJvDleUA==
-X-Proofpoint-ORIG-GUID: 2KQfuJ1a_bStVUKQ9iDjXmSMc9oLzSGs
-X-Proofpoint-GUID: 2KQfuJ1a_bStVUKQ9iDjXmSMc9oLzSGs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-17_01,2025-12-16_05,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 adultscore=0 suspectscore=0 bulkscore=0 malwarescore=0
- priorityscore=1501 impostorscore=0 clxscore=1015 lowpriorityscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
- definitions=main-2512170095
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-4-robert.marko@sartura.hr> <202512161628415e9896d1@mail.local>
+ <CA+HBbNFG+xNokn5VY5G6Cgh41NZ=KteRi0D9c0B15xb77mzv8w@mail.gmail.com>
+ <202512161726449fe42d71@mail.local> <20251216-underarm-trapped-626f16d856f5@spud>
+ <2025121622404642e6f789@mail.local>
+In-Reply-To: <2025121622404642e6f789@mail.local>
+From: Robert Marko <robert.marko@sartura.hr>
+Date: Wed, 17 Dec 2025 13:33:42 +0100
+X-Gm-Features: AQt7F2rRCO2ytZ0VdvYzTGe4b0Ox8AKF-v29YqVKrXuogSLDfcjlg9rn0S9yxlg
+Message-ID: <CA+HBbNGPWcwzCSGbMCU-n8Y+g6SjBSKcS7p6Mmrn3gFCWCSCeA@mail.gmail.com>
+Subject: Re: [PATCH v2 04/19] dt-bindings: arm: move AT91 to generic Microchip binding
+To: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: Conor Dooley <conor@kernel.org>, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, 
+	Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
+	UNGLinuxDriver@microchip.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, vkoul@kernel.org, linux@roeck-us.net, 
+	andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linusw@kernel.org, 
+	olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com, 
+	sboyd@kernel.org, richardcochran@gmail.com, wsa+renesas@sang-engineering.com, 
+	romain.sioen@microchip.com, Ryan.Wanner@microchip.com, 
+	lars.povlsen@microchip.com, tudor.ambarus@linaro.org, 
+	kavyasree.kotagiri@microchip.com, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-clk@vger.kernel.org, mwalle@kernel.org, luka.perkov@sartura.hr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/10/25 2:43 AM, Luca Weiss wrote:
-> Add a devicetree for The Fairphone (Gen. 6) smartphone, which is based
-> on the Milos/SM7635 SoC.
-> 
-> Supported functionality as of this initial submission:
-> * Debug UART
-> * Regulators (PM7550, PM8550VS, PMR735B, PM8008)
-> * Remoteprocs (ADSP, CDSP, MPSS, WPSS)
-> * Power Button, Volume Keys, Switch
-> * PMIC-GLINK (Charger, Fuel gauge, USB-C mode switching)
-> * Camera flash/torch LED
-> * SD card
-> * USB
-> 
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> ---
+On Tue, Dec 16, 2025 at 11:40=E2=80=AFPM Alexandre Belloni
+<alexandre.belloni@bootlin.com> wrote:
+>
+> On 16/12/2025 19:21:27+0000, Conor Dooley wrote:
+> > On Tue, Dec 16, 2025 at 06:26:44PM +0100, Alexandre Belloni wrote:
+> > > On 16/12/2025 17:56:20+0100, Robert Marko wrote:
+> > > > On Tue, Dec 16, 2025 at 5:29=E2=80=AFPM Alexandre Belloni
+> > > > <alexandre.belloni@bootlin.com> wrote:
+> > > > >
+> > > > > On 15/12/2025 17:35:21+0100, Robert Marko wrote:
+> > > > > > Create a new binding file named microchip.yaml, to which all Mi=
+crochip
+> > > > > > based devices will be moved to.
+> > > > > >
+> > > > > > Start by moving AT91, next will be SparX-5.
+> > > > >
+> > > > > Both lines of SoCs are designed by different business units and a=
+re
+> > > > > wildly different and while both business units are currently owne=
+d by
+> > > > > the same company, there are no guarantees this will stay this way=
+ so I
+> > > > > would simply avoid merging both.
+> > > >
+> > > > Hi Alexandre,
+> > > >
+> > > > The merge was requested by Conor instead of adding a new binding fo=
+r LAN969x [1]
+> > > >
+> > > > [1] https://patchwork.kernel.org/project/linux-arm-kernel/patch/202=
+51203122313.1287950-2-robert.marko@sartura.hr/
+> > > >
+> > >
+> > > I would still keep them separate, SparX-5 is closer to what is
+> > > devicetree/bindings/mips/mscc.txt than to any atmel descended SoCs.
+> >
+> > If you don't want the sparx-5 stuff in with the atmel bits, that's fine=
+,
+> > but I stand over my comments about this lan969x stuff not getting a fil=
+e
+> > of its own.
+> > Probably that means putting it in the atmel file, alongside the lan966x
+> > boards that are in there at the moment.
+>
+> I'm fine with this.
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Works for me, will switch to it in v3.
 
-Konrad
+Regards,
+Robert
+
+>
+> --
+> Alexandre Belloni, co-owner and COO, Bootlin
+> Embedded Linux and Kernel engineering
+> https://bootlin.com
+
+
+
+--=20
+Robert Marko
+Staff Embedded Linux Engineer
+Sartura d.d.
+Lendavska ulica 16a
+10000 Zagreb, Croatia
+Email: robert.marko@sartura.hr
+Web: www.sartura.hr
