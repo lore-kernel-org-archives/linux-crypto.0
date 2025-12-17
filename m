@@ -1,139 +1,80 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC14130594E
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 20:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2806F3A1E8B;
+	Wed, 17 Dec 2025 22:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766002970; cv=none; b=oC6h/SXPHFg28dnnI5wE/NuDk2YC0k6hpxVNwuWNDSiGElBUdWfBL3Gls9VwGwVH/bYefZLynkQgWORhdwZyRoCHSTLfo4CCgK2IZy7R/zcCrlBKmBo+HBMur2CVxrNofbwxX5PHlgi+qIl6RyWNsIOjzr2lIFuWkuXQYb+6I/M=
+	t=1766008861; cv=none; b=kkJ3zMPWh3UnjLGnb3H8xmuoxVVFMHi0Ub+urysIaK311ZRgNFGFS8x8Bcbq8xDv0ecOoD6ehCpPN9ATOKZePoiBXdggy5AxjGvupSoDgqJjBgJqXLeLqwI+DiDuWN7WQKSh03cqKIQv9diJmUFVoP1RX1JQWgDc7RyNyWB9AU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766002970; c=relaxed/simple;
-	bh=mkNJZYFTHBvQPZKS7HMXQ8mfo6SsJN+SM2B1D0Q7FLw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cQFq9CFmXX3cNwh4/wnQsI9wcZb8nJgNEMM9dqEWPHWbHZr/jQ28kgAm0Goto57xInPbDarrEEj2cg8EL4alHjcntpdi81VT56x4FvO6nDK5fn+fblxJQ5KOVdM5cVXLHmxrT4vzpFuu5/h42eZ2w0hnpOH3/XOp0oHx9uJBUlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from wasted (213.87.162.109) by msexch01.omp.ru (10.188.4.12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 17 Dec
- 2025 23:22:40 +0300
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>
-CC: Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: [PATCH 3/3] crypto: drbg - make drbg_get_random_bytes() return *void*
-Date: Wed, 17 Dec 2025 23:21:45 +0300
-Message-ID: <20251217202148.22887-4-s.shtylyov@omp.ru>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251217202148.22887-1-s.shtylyov@omp.ru>
-References: <20251217202148.22887-1-s.shtylyov@omp.ru>
+	s=arc-20240116; t=1766008861; c=relaxed/simple;
+	bh=fzcRsvXylZN9aaLtqwzTReh1wZfElthhV45WDpSLtLM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jyuubBEny0KLgYy4W/5+HMQjYevBiiKPAOzShk01bvRz5rlVAK1qSKjQOkSiGYJX6hLYY4CO6Zcj8VOsVeaYLRfcfEMFYYnDi3ql69GUm8KQitEZy0cMj4SeqxhzKWhvyqiFwYYwwcL4Qw4INVZJuiAr1qh1aT9ZY4JHhMo5xHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=fApoOOfA; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="fApoOOfA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1766008855;
+	bh=fzcRsvXylZN9aaLtqwzTReh1wZfElthhV45WDpSLtLM=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=fApoOOfAOl/WLHh2U99ktvCT0tJMUee5y+YJOw2D6yPmlO3QXfrC4pXyDavNvNOFQ
+	 0ZrLl2bX3drG8K46ydoTHG/YL8MJMBt3Pe/eVVR1eqZnijWe1OvGNMSVrM8q7bfXJs
+	 brC4+s/JlkwpbSiFhenmsEWkVTI5ibT6QqI+0gUr7p0qDPwDtBCBsWoXwo43xF/+vi
+	 lMW7yiKE8BHSKDNwW7TiyML1D20eSbBYZFMhNZ2ZHfluXXf1HbQdQv358qvwkwywKt
+	 VaVXXCJC+ozudhxI89GAzXLN1F4yrkcFrCPjXWe8s43Y7u44/mfwV4Ignyu/jXDdJn
+	 fUSaF6GA/zSUg==
+Received: from [192.168.68.115] (unknown [180.150.112.216])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 5400D7C1B2;
+	Thu, 18 Dec 2025 06:00:54 +0800 (AWST)
+Message-ID: <d6046a94820cda6bfcc3953d6c737152a9f0cf37.camel@codeconstruct.com.au>
+Subject: Re: [PATCH RFC 01/16] dt-bindings: hwmon: Convert
+ aspeed,ast2400-pwm-tacho to DT schema
+From: Andrew Jeffery <andrew@codeconstruct.com.au>
+To: Rob Herring <robh@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>,  Linus Walleij <linusw@kernel.org>, Joel Stanley
+ <joel@jms.id.au>, linux-hwmon@vger.kernel.org, 	devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, 	linux-aspeed@lists.ozlabs.org,
+ linux-kernel@vger.kernel.org, 	openbmc@lists.ozlabs.org,
+ linux-gpio@vger.kernel.org, linux-mmc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-iio@vger.kernel.org
+Date: Thu, 18 Dec 2025 08:30:51 +1030
+In-Reply-To: <CAL_JsqJUaKKsJ8BCNbVXe4vLVsQ2Av7VuWqf9DnUKHeLzLb8NQ@mail.gmail.com>
+References: 
+	<20251211-dev-dt-warnings-all-v1-0-21b18b9ada77@codeconstruct.com.au>
+	 <20251211-dev-dt-warnings-all-v1-1-21b18b9ada77@codeconstruct.com.au>
+	 <CAL_JsqJUaKKsJ8BCNbVXe4vLVsQ2Av7VuWqf9DnUKHeLzLb8NQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 12/17/2025 20:04:01
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 199084 [Dec 17 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.20
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 86 0.3.86
- 47cb2a3d3f5c7e795bff2d0998e8c196722872ab
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.162.109 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.162.109 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.162.109
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 12/17/2025 20:06:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 12/17/2025 5:16:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Now that drbg_get_random_bytes() always returns 0, checking its result at
-the call sites stopped to make sense -- make this function return *void*
-instead of *int*...
+On Wed, 2025-12-17 at 09:37 -0600, Rob Herring wrote:
+> On Thu, Dec 11, 2025 at 2:46=E2=80=AFAM Andrew Jeffery
+> <andrew@codeconstruct.com.au> wrote:
+> >=20
+> > From: "Rob Herring (Arm)" <robh@kernel.org>
+> >=20
+> > Convert the ASpeed fan controller binding to DT schema format.
+> >=20
+> > The '#cooling-cells' value used is 1 rather than 2. '#size-cells' is 0
+> > rather 1.
+>=20
+> Okay, I can't figure out why I thought '#cooling-cells' needed to be 1
+> here. I don't see that anywhere in the tree. The driver for sure only
+> supports 2, so anything that's not is an error in any case.
 
-Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
----
- crypto/drbg.c | 17 +++++------------
- 1 file changed, 5 insertions(+), 12 deletions(-)
+Yeah, I'd started doing some digging to understand your statement about
+it needing to be 1 but hadn't got to the bottom of it.
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 72d1d130dcc8..9a2af599ead1 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -842,15 +842,13 @@ static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
- 	return ret;
- }
- 
--static inline int drbg_get_random_bytes(struct drbg_state *drbg,
--					unsigned char *entropy,
--					unsigned int entropylen)
-+static inline void drbg_get_random_bytes(struct drbg_state *drbg,
-+					 unsigned char *entropy,
-+					 unsigned int entropylen)
- {
- 	do
- 		get_random_bytes(entropy, entropylen);
- 	while (!drbg_fips_continuous_test(drbg, entropy));
--
--	return 0;
- }
- 
- static int drbg_seed_from_random(struct drbg_state *drbg)
-@@ -867,13 +865,10 @@ static int drbg_seed_from_random(struct drbg_state *drbg)
- 	drbg_string_fill(&data, entropy, entropylen);
- 	list_add_tail(&data.list, &seedlist);
- 
--	ret = drbg_get_random_bytes(drbg, entropy, entropylen);
--	if (ret)
--		goto out;
-+	drbg_get_random_bytes(drbg, entropy, entropylen);
- 
- 	ret = __drbg_seed(drbg, &seedlist, true, DRBG_SEED_STATE_FULL);
- 
--out:
- 	memzero_explicit(entropy, entropylen);
- 	return ret;
- }
-@@ -948,9 +943,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 		if (!rng_is_initialized())
- 			new_seed_state = DRBG_SEED_STATE_PARTIAL;
- 
--		ret = drbg_get_random_bytes(drbg, entropy, entropylen);
--		if (ret)
--			goto out;
-+		drbg_get_random_bytes(drbg, entropy, entropylen);
- 
- 		if (!drbg->jent) {
- 			drbg_string_fill(&data1, entropy, entropylen);
--- 
-2.52.0
+If it can be 2 then great, I can fix up the #size-cells and resend.
+
+Andrew
