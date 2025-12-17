@@ -1,50 +1,61 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28301200113;
-	Wed, 17 Dec 2025 04:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D1D1BEF8A;
+	Wed, 17 Dec 2025 05:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765947426; cv=none; b=ZFd+hDaHNaiwGnVtgIXpOHDWNYr0MPFGgOQr4f6ULLqWYfs7gFxYIF5TvDqui4WnkcJIIZUyL8Qz6+7so4pu37Cl5zhJmu2s1dXMkVGRRW4X5pVoSOUgO3eYv02CCH2DXZy0/6xlShSNEAIh4JFGpOy6huUvhgtvKxdPiQE1s/Y=
+	t=1765948232; cv=none; b=iaKrufj689Jt3FdEUBGs/k0W8c7jPsnF5eVdJ0vgfePm4lZdP4kYopG/TdzD9pc5wDH46Uc8cUruWmprC5/k3a0I1Mlujkkr0HcMzHv6A1X0SRPpJJG663K0pg8KayYBhzf6sAB4hoobG5zthuP5KUCRHx0ZU07jyM7XesGASdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765947426; c=relaxed/simple;
-	bh=1txrclJv0snf0X4fkmGoGtwG4/0N9D8XeCZ9KOjm7k0=;
+	s=arc-20240116; t=1765948232; c=relaxed/simple;
+	bh=bLaK2gFWACWyalrEyaiMmZm2YYU4Bq1urmASnlDm6Os=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rGbt7R3C5/MGkM+EWEqmBZ89/fQMKkl7t9E5buPwiJpb/CQD0itqz/02kGrWew/U9Onv1ZE/N4TzhgQacCBKY96JwmdCb8kIM980yp40dt53cZI1u/Ld6MvOa/rEQmgdHDVnCh7ASXuvLXA25sBdzbXYbWZJWBDtoID57LmmF88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=egBew8Hx; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=lMvYE7ZyFPFtIz+qYF9MKWRqBHxRIhj8qjKrs8kjCdxiiIH7lM865R8op07J1Q/lAFTdd8jIjrJfzkJZJfzPTHogaPY+qpNcp3W0ASKOYQRcChs4tUdf/3MeTAZ9T7xuyaSkcUSXIu4WK3Ntmj1bhSe99MVmY84HiH1c+Ujo/pU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BcJmWWfK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="egBew8Hx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=P22O/raoZyiNHVBGA9XGwwnTDLiTCFxywjwLpPif188=; 
-	b=egBew8HxCLvqFRxGmbireQSMmUIsNcA+aVulzocclGcnBj8Ew5a73TyEhKmXsKHonzLWaRaP1e7
-	JC+6w5smex6V6Bssoit+IjQfb5zkD64+OSnjlkQeWSdYzulflGnuACH70/tW5DXO7xJCmfk54Is+p
-	8QjBgdYEppmtFwW3MoAKloaYTroMlZV4E4BqCsvRYut6Avf2Ffc2NG7taUCFwAwnCx6yAqcQQxLFP
-	BBQGcjfA7SFiCO7W4Kb3CUOQRIgpBfjHtKgcVvWwHSSC2WKjO6MP8qKhrg7NEPF/rLoMFOhDKqju8
-	N3lVXppcdh/1KFyixFmWIuz0XUdG/TxHX98Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vVjaa-00Ahv1-1t;
-	Wed, 17 Dec 2025 12:56:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 17 Dec 2025 12:56:40 +0800
-Date: Wed, 17 Dec 2025 12:56:40 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: AlanSong-oc <AlanSong-oc@zhaoxin.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, larryw3i <larryw3i@yeah.net>,
-	stable@vger.kernel.org, CobeChen@zhaoxin.com, GeorgeXue@zhaoxin.com,
-	HansHu@zhaoxin.com, LeoLiu-oc@zhaoxin.com, TonyWWang-oc@zhaoxin.com,
-	YunShen@zhaoxin.com
-Subject: Re: [PATCH] crypto: padlock-sha - Disable broken driver
-Message-ID: <aUI4CGp6kK7mxgEr@gondor.apana.org.au>
-References: <3af01fec-b4d3-4d0c-9450-2b722d4bbe39@yeah.net>
- <20251116183926.3969-1-ebiggers@kernel.org>
- <aRvpWqwQhndipqx-@gondor.apana.org.au>
- <20251118040244.GB3993@sol>
- <cd6a8143-f93a-4843-b8f6-dbff645c7555@zhaoxin.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BcJmWWfK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C1DCC19421;
+	Wed, 17 Dec 2025 05:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765948231;
+	bh=bLaK2gFWACWyalrEyaiMmZm2YYU4Bq1urmASnlDm6Os=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BcJmWWfK33MwnybWoQwekHilGr5zCy1560YIq82bx13SaA1+NQhhGq6QhzHPOtbEe
+	 g76xucoHWrhcqeg8jb5VE05l6kNRJqy8dzrHM71a0cQhnkMbxx8WNSdtD/xq6p5DJh
+	 bLHZ6CrHbnrrdiA/lniK+9rvYDMqboXAwilsS0aU54t6HtaaMkb9cupJ0QxHomVxV2
+	 yEKUZaMdsykL/s2wdfPiua3AQCBlcTtdYyxETlm+DBvrPfzz8JejKbsd8W5e+SNrmX
+	 GIQpG0as5/ipXXQUCNwIQXZKMAJ3whyWGdWsrBeHqTqlltwGj8NOqaddzfTt/pb5xg
+	 F3WTKkjID57OQ==
+Date: Wed, 17 Dec 2025 10:40:28 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Frank Li <Frank.li@nxp.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Koichiro Den <den@valinux.co.jp>, Niklas Cassel <cassel@kernel.org>,
+	dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+	mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	imx@lists.linux.dev
+Subject: Re: [PATCH 0/8] dmaengine: Add new API to combine onfiguration and
+ descriptor preparation
+Message-ID: <aUI7RJvQUx3m2IRf@vaman>
+References: <20251208-dma_prep_config-v1-0-53490c5e1e2a@nxp.com>
+ <aUFUX0e_h7RGAecz@vaman>
+ <aUF2SX/6bV2lHtF0@lizhi-Precision-Tower-5810>
+ <aUF-C8iUCs-dYXGm@vaman>
+ <aUGA7tmDYm1MhRXn@lizhi-Precision-Tower-5810>
+ <aUGURVuW33WSTuyI@vaman>
+ <aUGWtarjFNNy2KyZ@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,22 +64,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cd6a8143-f93a-4843-b8f6-dbff645c7555@zhaoxin.com>
+In-Reply-To: <aUGWtarjFNNy2KyZ@lizhi-Precision-Tower-5810>
 
-On Wed, Dec 17, 2025 at 12:30:57PM +0800, AlanSong-oc wrote:
->
-> Given the lack of a verification platform for the current padlock-sha
-> driver, and the fact that these CPUs are rarely used today, extending
-> the existing padlock-sha driver to support the ZHAOXIN platform is very
-> difficult. To address the issues encountered when using the padlock-sha
-> driver on the ZHAOXIN platform, would it be acceptable to submit a
-> completely new driver that aligns with the previous advice?
+On 16-12-25, 12:28, Frank Li wrote:
+> On Tue, Dec 16, 2025 at 10:47:57PM +0530, Vinod Koul wrote:
+> > On 16-12-25, 10:55, Frank Li wrote:
+> > > The usual prep_ call have not sconf argument, which need depend on previous
+> > > config.
+> > >
+> > > further, If passdown NULL for config, it means use previuos config.
+> >
+> > I know it is bit longer but somehow I would feel better for the API to
+> > imply config as well please
+> 
+> I can use you suggested dmaengine_prep_config_perip_single().
+> 
+> But how about use dmaengine_prep_config_single(), which little bit shorter
+> and use "config" to imply it is for periperal? (similar to cyclic case?)
 
-Perhaps it would be easier if you just added Zhaoxin support to
-lib/crypto instead?
+Yes that is a good idea. config does imply peripheral cases. Please make
+sure API documentation marks that clearly
 
-Cheers,
+BR
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+~Vinod
