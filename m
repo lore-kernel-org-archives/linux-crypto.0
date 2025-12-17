@@ -1,166 +1,154 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86537313264;
-	Wed, 17 Dec 2025 07:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41BB83375CB
+	for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 08:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765958157; cv=none; b=Wr7408CjKwmcJb9V3lDsIgh+isc/oxglNPgVFZEHgE5iSK2NlJ4QdEALWQUtXD3ISyfP3ofnAN2bVgYQAW7rXwrML1+64ybWzbLGQjnFuwmV/GBbXZW4l7FKzhM5Tt6OSM7yEAbYKWRVfFVKS214s+keNPq7ksuQbkhGp97Ybmg=
+	t=1765959709; cv=none; b=eSAyqyUt/Uag782uAfzvHMPYrKva0ROgT07Bkibsum/mzuW95ynAQQU7zjklUPS17T94trRMPv4k2Q4M4CLxj2iuQYnxpA8GBzGY5Fqqj5q3n5aSOxQPxLLB2/EswXtP2Xaxpg9BxSQqirAY5F9rFf1fHlwxZkrJa3GZwN2Z9fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765958157; c=relaxed/simple;
-	bh=Xo9c1qEYiQMSvCEooBFQkEOr2bYPsShQNIttr2X1DG8=;
+	s=arc-20240116; t=1765959709; c=relaxed/simple;
+	bh=WuQeI+WkXQSWQInmvdcHjxfQ36N4wXa/UmX/Y1u7BWc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WPfMXK5DTKOSa1/ubqkw3Ft5S8CalKuzCjpDHdalvaDGTOPIiY2p/khF+VfurDoyQ7uaIYNz03ILYAZNU/WUiSKP3FVbMwyx63BtozfF6gmMOeWQjLrIFHSdHZ23qCFOOOZr+ZPAa+9yaJthxSa0sH+7akvrRkIRAiE2dSwhdK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ELlSPoe4; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=pDkxeYY7I5Zp+1bPKzu4+5trt2OlTwezDvQ8O/nKSIbGeGRVUvhhzLePDq6do9rL9QMtmn3mISKhph9qpMebE0fiwFslf9E2R2LEZnFdL1QOualrSB8UlsbVQMB8XSn00VLFctFi93d5ekBvUpzSOpN+mOVu2RxLmIBaFl4Z3Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=tKg28GRE; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ELlSPoe4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69B78C4CEF5;
-	Wed, 17 Dec 2025 07:55:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765958157;
-	bh=Xo9c1qEYiQMSvCEooBFQkEOr2bYPsShQNIttr2X1DG8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ELlSPoe46Vp/wKpVK3LLNZx61ZRTeN9a8aiwZ+dBOq6JSgu8lT1rxJ3wY80rxeXhw
-	 OZrPCLpEBFk6TLKFBA5pONUweIEe6/iPED+L08U/dXepE25vl89hRZiQ/FCns7UqdC
-	 coya/6tg0ImJ/cGQDCryPzjE8vQi9Nqu3aUuHEAmYgRVp1m3qEkelGkvr/TPOrnFV9
-	 yhPHmKfYuEbW8BihXNYfIx3rYzf4yaVAhlcte6H35pz0VG5SbKINKXAIGTAmOGvHIK
-	 XqbbXlo5Mxru1Gcnu0BaAUfhCIDC3t50dTRFkXYmmP/w7QngJootP/5QLOgvwTke2k
-	 Z91VDTNTIflIw==
-Date: Wed, 17 Dec 2025 13:25:39 +0530
-From: Sumit Garg <sumit.garg@kernel.org>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
-Cc: Sumit Garg <sumit.garg@oss.qualcomm.com>,
-	Jens Wiklander <jens.wiklander@linaro.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	David Howells <dhowells@redhat.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-rtc@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Cristian Marussi <cristian.marussi@arm.com>,
-	arm-scmi@vger.kernel.org, netdev@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-integrity@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
-	Jason Gunthorpe <jgg@ziepe.ca>
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="tKg28GRE"
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b736ffc531fso1069535366b.1
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 00:21:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765959703; x=1766564503; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b+Q8ghXVyCQDXjBoffiftwRpwO3ivtFGMCLgHbR9KKc=;
+        b=tKg28GREQe5lulh5QpQRqYXGF/NStwtvQV/wsg7RPUMi5PZwIT8kfVKdqo83NPM54J
+         1KerTy2h4+3tvbMX8ysqEA7rUpVCC+Ii+aDny/tIB6E3QUNXTCPCSew0Bs/F2hQ3ojUx
+         aF3DQIaaywmS8xePYp9DtxBHL9pw6W9uP3eatkQX25U+n9FHWnGDVW2lcsgbhjGWeEpF
+         n0KxcxSvPydtKAIeuCAW20YFG48YVsH0oDpFE3MVarShjFIfbgi34+LQzIgHH2cTuh+t
+         SElz7H4lJ8YbuprC3vrWpJjTR5p8zh4i+hzMb58wcNU/mrHDS917566dJsiSsgzEYmMB
+         /XVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765959703; x=1766564503;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b+Q8ghXVyCQDXjBoffiftwRpwO3ivtFGMCLgHbR9KKc=;
+        b=EJNuxbZIOaARHRDF4MGUePh8tZO4g3G3Kmp2Oq9DdD5ZdMHhiKAw6dItnwv6COhzrP
+         zFdwyw3M+iqz959Lpp8X8tj6bq2ozYt69iEx6hGYLWiFvMSonULm3m/Xg/xzCgj/Yy64
+         4E3bTekeNyhgtQovQjP4Zh2nGkoo6/6cbnjyftfo1NvVmTRLFUlK4S2LoKLCkuhek6ci
+         shZg9CzsI5bFd8/ZSN4/9+Auuj9h1Wh1x7/VqEBZ16NyKDn72cUOFSAM62l5V5YRg+ty
+         Ac8hmtdv/U7WLhymbgxxFxmPP2VRHbQ+BXzEqwR051h7KX723/fUbCxLkDuEdF6JMRVg
+         iefw==
+X-Forwarded-Encrypted: i=1; AJvYcCUt42UIg8JgYYNVyrUf6JAO1FbCSDnEBxHUHMaCmbBHMokxs5imAky4yNfqcT6j0XmCRwfHzshsF8DQQzI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBqkYo5zDd8AaKhx2DHpgxpNcyk54tCiaqtgbygAVAvZmQUIIg
+	hkjdrDFKTixZTMBW7T2o4YZ39bN+eHUOaZ+Pe6t68Y2EXobZMB+F7yUvEXHUjMTCvEA=
+X-Gm-Gg: AY/fxX7AlmFhZTl4BnX0EEO3ybaGEU10CxHeMXDgC1h9uNZVObDlwPk1drCdJHgUBWr
+	5lDhtBI1BePl5O89un6KMJ/s1EHjRgXb9YzAu86mgNBaYum6y7d1OvZhVxbQSJRXi8eEQ55KMGq
+	X50T7Dwb8QuluSESsyjXh2n/a3r6SrooFLP3sm+Ew64aQ1r0ygDHSpsxswd0c317EcfQ+8WrsAc
+	6xolVo4P/iK9H34CkewMTdFaJSWRCJAuMmPnVsP6couAhv9C/xGKgDovBM/W23phnOsNwlKR4xQ
+	IQlVNGHniCb5Dq/Z/kO5p2xuQgBs9uCaZ3l5SX2XBWzO4LM9hzmWCbBwsaaML3hOyWBXGKlGLh4
+	HZk2t1PbYeqdtNK7Slb59iqmbb6xlvMP/yqHnM+1FUgf81j4qJ8/oZk2K7xVHYhBTVOyWotZv7y
+	9HEbHiereppWBAyXyc
+X-Google-Smtp-Source: AGHT+IFCoak6awfsvNzuanPNEFvtnm4npy82/7GDiD4hlE+WRwlv0VOch5efQB3V/p3Rq/g2NEI9Nw==
+X-Received: by 2002:a17:907:d94:b0:b73:5f5e:574d with SMTP id a640c23a62f3a-b7d23a89c52mr1790501866b.59.1765959703434;
+        Wed, 17 Dec 2025 00:21:43 -0800 (PST)
+Received: from localhost ([2a02:8071:b783:6940:1d24:d58d:2b65:c291])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b7ffacd9192sm337793366b.70.2025.12.17.00.21.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Dec 2025 00:21:42 -0800 (PST)
+Date: Wed, 17 Dec 2025 09:21:41 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Sumit Garg <sumit.garg@kernel.org>
+Cc: Sumit Garg <sumit.garg@oss.qualcomm.com>, 
+	Jens Wiklander <jens.wiklander@linaro.org>, Olivia Mackall <olivia@selenic.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, James Bottomley <James.Bottomley@hansenpartnership.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
+	David Howells <dhowells@redhat.com>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+	Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org, linux-efi@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
 Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
  callbacks
-Message-ID: <aUJh--HGVeJWIilS@sumit-xelite>
+Message-ID: <max5wxkcjjvnftwfwgymybwbnvf5s3ytwpy4oo5i74kfvnav4m@m2wasqyxsf4h>
 References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
  <aT--ox375kg2Mzh-@sumit-X1>
  <dhunzydod4d7vj73llpuqemxb5er2ja4emxusr66irwf77jhhb@es4yd2axzl25>
  <CAGptzHOOqLhBnAXDURAzkgckUvRr__UuF1S_7MLV0u-ZxYEdyA@mail.gmail.com>
  <ayebinxqpcnl7hpa35ytrudiy7j75u5bdk3enlirkp5pevppeg@6mx6a5fwymwf>
+ <aUJh--HGVeJWIilS@sumit-xelite>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="p6kfp3quyfb6lwgz"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ayebinxqpcnl7hpa35ytrudiy7j75u5bdk3enlirkp5pevppeg@6mx6a5fwymwf>
+In-Reply-To: <aUJh--HGVeJWIilS@sumit-xelite>
 
-On Tue, Dec 16, 2025 at 12:08:38PM +0100, Uwe Kleine-König wrote:
-> Hello,
-> 
-> On Tue, Dec 16, 2025 at 01:08:38PM +0530, Sumit Garg wrote:
-> > On Mon, Dec 15, 2025 at 3:02 PM Uwe Kleine-König
-> > <u.kleine-koenig@baylibre.com> wrote:
-> > > On Mon, Dec 15, 2025 at 04:54:11PM +0900, Sumit Garg wrote:
-> > > > Feel free to make the tee_bus_type private as the last patch in the series
-> > > > such that any followup driver follows this clean approach.
-> > >
-> > > There is a bit more to do for that than I'm willing to invest. With my
-> > > patch series applied `tee_bus_type` is still used in
-> > > drivers/tee/optee/device.c and drivers/tee/tee_core.c.
-> > 
-> > Oh I see, I guess we need to come with some helpers around device
-> > register/unregister from TEE subsystem as well. Let's plan that for a
-> > followup patch-set, I don't want this patch-set to be bloated more.
-> 
-> Don't consider me in for that. But it sounds like a nice addition.
->
 
-No worries, the current cleanup is fine for now.
+--p6kfp3quyfb6lwgz
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
+ callbacks
+MIME-Version: 1.0
 
-> > > Maybe it's
-> > > sensible to merge these two files into a single one.
-> > 
-> > It's not possible as the design for TEE bus is to have TEE
-> > implementation drivers like OP-TEE, AMD-TEE, TS-TEE, QTEE and so on to
-> > register devices on the bus.
-> 
-> So only OP-TEE uses the bus for devices and the other *-TEE don't. Also
-> sounds like something worth to be fixed.
+Hello Sumit,
 
-The TEE bus is common for all the TEE implementation drivers which need
-to support kernel TEE client drivers. I am aware there will be QTEE and
-TS-TEE from past discussion that they will be exposing devices on the
-TEE bus.
+On Wed, Dec 17, 2025 at 01:25:39PM +0530, Sumit Garg wrote:
+> On Tue, Dec 16, 2025 at 12:08:38PM +0100, Uwe Kleine-K=C3=B6nig wrote:
+> > On Tue, Dec 16, 2025 at 01:08:38PM +0530, Sumit Garg wrote:
+> > > On Mon, Dec 15, 2025 at 3:02=E2=80=AFPM Uwe Kleine-K=C3=B6nig
+> > > <u.kleine-koenig@baylibre.com> wrote:
+> > > >  - Why does optee_probe() in drivers/tee/optee/smc_abi.c unregister=
+ all
+> > > >    optee devices in its error path (optee_unregister_devices())?
+> > >=20
+> > > This is mostly to take care of if any device got registered before the
+> > > failure occured. Let me know if you have a better way to address that.
+> >=20
+> > Without understanding the tee stuff, I'd say: Don't bother and only undo
+> > the things that probe did before the failure.
+>=20
+> True, but this is special case where if there is any leftover device
+> registered from the TEE implementation then it is likely going to cause
+> the corresponding kernel client driver crash.
 
-> 
-> > > The things I wonder about additionally are:
-> > >
-> > >  - if CONFIG_OPTEE=n and CONFIG_TEE=y|m the tee bus is only used for
-> > >    drivers but not devices.
-> > 
-> > Yeah since the devices are rather added by the TEE implementation driver.
-> > 
-> > >
-> > >  - optee_register_device() calls device_create_file() on
-> > >    &optee_device->dev after device_register(&optee_device->dev).
-> > >    (Attention half-knowledge!) I think device_create_file() should not
-> > >    be called on an already registered device (or you have to send a
-> > >    uevent afterwards). This should probably use type attribute groups.
-> > >    (Or the need_supplicant attribute should be dropped as it isn't very
-> > >    useful. This would maybe be considered an ABI change however.)
-> > 
-> > The reasoning for this attribute should be explained by commit:
-> > 7269cba53d90 ("tee: optee: Fix supplicant based device enumeration").
-> > In summary it's due to a weird dependency for devices we have with the
-> > user-space daemon: tee-supplicant.
-> 
-> From reading that once I don't understand it. (But no need to explain
-> :-)
-> 
-> Still the file should better be added before device_add() is called.
+You are aware that this is racy? So if a driver crashes e.g. after
+teedev_close_context() it might happen that it is registered just after
+optee_unregister_devices() returns.
 
-Noted, let me see if I can get to fix this until someone jumps in before
-me.
+Best regards
+Uwe
 
-> 
-> > >  - Why does optee_probe() in drivers/tee/optee/smc_abi.c unregister all
-> > >    optee devices in its error path (optee_unregister_devices())?
-> > 
-> > This is mostly to take care of if any device got registered before the
-> > failure occured. Let me know if you have a better way to address that.
-> 
-> Without understanding the tee stuff, I'd say: Don't bother and only undo
-> the things that probe did before the failure.
-> 
+--p6kfp3quyfb6lwgz
+Content-Type: application/pgp-signature; name="signature.asc"
 
-True, but this is special case where if there is any leftover device
-registered from the TEE implementation then it is likely going to cause
-the corresponding kernel client driver crash.
+-----BEGIN PGP SIGNATURE-----
 
--Sumit
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmlCaBIACgkQj4D7WH0S
+/k7jZwf/S32gHxmpuL9ts6Dq9pI9CDW9KNDwfTzIptzaNQEofHnz2Ph9Ejs/bZAl
+1skNWxxt2vGIVP016BxUqi9V0RyKNUV0GCk23ZMdeGE09A47y9N0bT00HDJrrZYp
+FYCoNNwL8vICQzfAti/0+DHGI1uHwrXCwQWf/VaNggCAhb3eTCfcmUtogT7hhbtH
++6bLk0/LEYmrIg1pkq6m4Y4vxBOEwnSZVDa4/15mxJ7jExJeoQmha2Y2whq5WZtY
+TEMgHL6KNg7ifbee+/Y0HUJizQ45rf4pJo2bvrbwXc+3KaEqfzNpD3jKVcKJSNBx
+jL7uprws5c1kFtHG4vp8QjaZRNJtpw==
+=trcC
+-----END PGP SIGNATURE-----
+
+--p6kfp3quyfb6lwgz--
