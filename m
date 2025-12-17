@@ -1,108 +1,148 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B5A8821
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 00:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D04D1EE7B7
+	for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 01:09:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765930147; cv=none; b=N7eHnnDNQoBHWAU3p3bwk5w2fzkW/xjlyFMU3Qe1dhL/ebuyNoWg9f3+/sqRV3uDO5Lgdjd2Uh7nIE2rwTF+IB/cy9+CU+sQJJ2i92NHBLZ/qfYad0uR3HrG697qZVo0D8d0evVB2pM/nDVVRF+ji8K9FygtQaUHFki9OFe31nQ=
+	t=1765933794; cv=none; b=KyFAGg2yu7eP09nwrum/oXS0kSjN/Oki4DFTBEihm/kYIkiFN0JkPtxvQ0RSd84K3+7Dvv4dDY3WUJkP+L/vTcnT43weeP43SablxKGt9Ea0WPT3nKltHriJU7DQ+asyYcgvn7CF1qPEjylP5BokAqEWYGAKEYJvNp6RlW3m0QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765930147; c=relaxed/simple;
-	bh=8zobOYD4U2IZu/IcNw1UhYqwT+XwT5RbnISKri0zFqk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PzKnJ1Zf/1EQVT8p2TgIW56mgpJ5xqKgLGcWS7TsPNHRdnUBldbSfbKEkoE9xxsuv3R+W7yfK7kJkwlihc0onhyNW/00N2Z1gh9kbaY+/fhn2kNeoYPRD1WLS97HMrpBOJ835ejhpl7Dh4R2uniAg1rhdAweLvV6GjdFOyr6/9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eg/lDeOf; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tCilhyWL; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1765933794; c=relaxed/simple;
+	bh=pL22TsrtuXZBSzafO+zjFl7qzfncOK7EzR22IjIJGI8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Me1cSP58JybOy9BQ9VwkgJ5FVVgIF24zOM2vSzSXyo72ttaauB5z5wbVxessTxMRMDIsIHKqDrou5eRTysknpB6+glmT1F7hxhLu/V3YggFePd7+0k8ap9/QXK3dDDdcREBF1uRpeGPgn4dtiBQl4NKWzOHArcrdVIPOogPloAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=illinois.edu; spf=pass smtp.mailfrom=illinois.edu; dkim=pass (2048-bit key) header.d=illinois-edu.20230601.gappssmtp.com header.i=@illinois-edu.20230601.gappssmtp.com header.b=NIQI46RA; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=illinois.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=illinois.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eg/lDeOf";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tCilhyWL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765930144;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8zobOYD4U2IZu/IcNw1UhYqwT+XwT5RbnISKri0zFqk=;
-	b=Eg/lDeOfRhJvhU2NsNj4cVjtH7IM3ouKh95jxZfUrArUxhnnwPZgHrA8t0uI80W3aL03FT
-	R41Fq9YdVPWnNc8wsED7wVCO/JqeIRvhnsolkXdMinFWLpq1wJHMLLUhEPSgikfBOHDB5c
-	gevTTqwqS/FdxNFDmAzR4WXTNqR4qK8=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-B_4LRKZcOp6M4R4ovDd84Q-1; Tue, 16 Dec 2025 19:09:02 -0500
-X-MC-Unique: B_4LRKZcOp6M4R4ovDd84Q-1
-X-Mimecast-MFC-AGG-ID: B_4LRKZcOp6M4R4ovDd84Q_1765930141
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-59591ff7dc0so74378e87.0
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 16:09:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=illinois-edu.20230601.gappssmtp.com header.i=@illinois-edu.20230601.gappssmtp.com header.b="NIQI46RA"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-8888a444300so39067786d6.1
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Dec 2025 17:09:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765930141; x=1766534941; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=illinois-edu.20230601.gappssmtp.com; s=20230601; t=1765933791; x=1766538591; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8zobOYD4U2IZu/IcNw1UhYqwT+XwT5RbnISKri0zFqk=;
-        b=tCilhyWL0xTzKfd3F7LBuD2M3tkMM8K31f1U1Qrl7UvqBcGa5pRiWrvF+OnzuKyVj2
-         6A9ScXfzg+hYMyaR4hIOqrBuT7DpNr8FP6Vv4myBeGMCEl+I+WkQesBIwgZ8EOIep5aa
-         6WNADDpMiL+WcvPs50kPzz/phHX2iW1yChSllclI8CBa0Zu/q1Ga386c7jVGALVQMvdb
-         lwsvOCBG8YhY0XR9LhI5PMcKddWLgQPh5hYS/52wWKdud0pA/g545JsK37ZBb+lZ8Axn
-         2ZrwIxVWc7KIBFEx/LyV7T7zgogl7uM9Cz75BVLM3xmiLM9NYNG7Hzl5VTjGqYJ3w7lC
-         CU7w==
+        bh=zZf/eYpssSDfJG49JiyiKh6ythPIDtWBJCMznOyLz/w=;
+        b=NIQI46RA/5trR3iiRu+Ns2HWsBvw/A9Q+Ne0eXMIhKxb9iR0Oh+Iu36olqRMh7yD4I
+         aberLKUuDIyEb+KeGOS3l8Ey7GoCMUOPQpWiSazIBXOoC82XuYVuvOJl6RIYS3APp++W
+         06izVHBRPRzC34dK5x6FMerFXs32+6M70u5fyG8c5KwQMlCooVeuyEJ39PUiYnOs3NNg
+         vh1PvIejIUsP/fLaNG/zedNNak3VM1/SblYi1ET0hIdth2jOxGZhmnG6SxDBh4Gcgypt
+         N1yn88J5Az7k14GD+saf9oTiovDNLpbUKMjW3BXylWw6mV2SFpbV/JqiifFtd76AP+pt
+         l06g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765930141; x=1766534941;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1765933791; x=1766538591;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=8zobOYD4U2IZu/IcNw1UhYqwT+XwT5RbnISKri0zFqk=;
-        b=T2CsTxJLTxB+nGbvI9ZR8aS4gwg/fMiHuOb21IssAMk31rk00gz5XR4jlFu8q7L8Ta
-         2rRlZ28a0Yg1BAJsTsq1/QrxrFA4nnv+sA7oPlF7vgeS89Xw+N+cAuX0OI8SXcjCtbIO
-         yfRQZIc9ACn/uCeZ2j9a1zY4ShmVlSasYop5SmoLq1h12Sufxasb47nIBsuMMV0nBzPX
-         kgQY7j9gpMuSq+gTUamdkW5DBGylpOO5SZ7eAtoeJZDueR6x6ztQyAHRZvTnoolqCRLF
-         QjUQEWTUMj5jHuwmyrC6orjlKouyYr28IdrPVgh/W2QHM/AfVi/mBAaE4PGnUvZhYn9S
-         fthA==
-X-Forwarded-Encrypted: i=1; AJvYcCU96len3b+YWahyZbCuHvnmOvrykXLW+i9mgVJgE2rHKdrfifeA00tBX0Jcf5NORY4igPeOa/lvJ5PY5W0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJglzhWxVCbwM7oJ6I42iHnOhK++TkIAZLEUs82fhcvl9bqDbc
-	WdRpV9iC2YVnNkkYiV0rEJ61U1qSldtDuSj2TVZJNMcCj7o53l9+IpKMfEt2s2L8RHI4NVgjK2G
-	cP1AhAx9l4RpwxR6i9ykuyMDYQYJc+NsOFmRNd4MvNLV5CIkXetrlHGGXlqVEpjCPHtNQ1kTfHt
-	lq9m9oT+KiJDyIxCV+HdIYvrq5PWAvor8GW3OOsmsA
-X-Gm-Gg: AY/fxX6nojAnjRn4lnpwSlSrx3p/6PMxdhsyUrHA4gcjfxFcO4Y1zOrY5suIFmnOCsk
-	TXv2cV4c/tMdUGAYpXm9J7xyCV6Zco5UZMNyelOzpuWoaRD7N0p4XJEAQoB4NCUvdQukM8e109u
-	s25xpGTk7AzvK+EULNmBQJHN0nfEtrWimrikHr1ggAel3ew4xMtic7S5ExsnU2rPji1Oc=
-X-Received: by 2002:a05:6512:10d4:b0:598:fbc5:aeaf with SMTP id 2adb3069b0e04-598fbc5afc7mr5165665e87.7.1765930141062;
-        Tue, 16 Dec 2025 16:09:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE5vz6PJf7q23xZ6gDMOqkMCey44MGj83spbpbX0uyRftW8nwS7rjua0KCcxc/ReO+GzZ4+ZdFjUgTsUb6wMzE=
-X-Received: by 2002:a05:6512:10d4:b0:598:fbc5:aeaf with SMTP id
- 2adb3069b0e04-598fbc5afc7mr5165656e87.7.1765930140652; Tue, 16 Dec 2025
- 16:09:00 -0800 (PST)
+        bh=zZf/eYpssSDfJG49JiyiKh6ythPIDtWBJCMznOyLz/w=;
+        b=OCZOpBAKtSR21xIrY4ZVedQSGutHcHiATzJmkc9m4ux+KPRiDi4FE85z72VGlVyrMN
+         zsaoUXgljh61dOz43zbijadBuBeHiwFN5iSwv/h+t3o9/zX3QmXRrDdUbX06ItPsUuLH
+         zuXySVnxgMP4irNDgFUG6/iw6W5CBZqJ0hlO/EKK3zDMeJxYOU3XEYmA4ssxB0sRuggn
+         u/GFIvjCD48VmdOWk+ox2C5CI1giKCjr3f2vDGAqNXJ5v5KwEwvwMgvQOqHydaXtF3Qk
+         07pwd5i84jwaObtaiqspGaqefoVPlFg+cZWsBt4WCwKaX5a9jJbmcodYqpDUQozgWDZa
+         r9mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWLEUrOQjpSXno1PnWUJMzYx7SXlJTQ64k6rV0XVPe0oiB0aSTvkpk/0tepP0FdhQssyPCUhTfrBNYKOHA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWrZ0eiU5YOP7ZkTW/1yFlqYYN72zM9vSaghGew5YvF8/i1RB4
+	NFar6aeVJPXUY1/EZyfzo7hLZq1JfMP+GIcCj/THBLioMfuj5SxVObHzShPWzfBuuw==
+X-Gm-Gg: AY/fxX4EiZuSCe9hPkSL31JuDSBjXAb6ctsfIjZgkAErV2BH7J32b2DmTwKG/V6A1PU
+	vpXrF9TFZ/8nUXYxo2TDDWZCbjtOFBvQCRFOtuWgle7Koehh/etzK8ex/cda+sXJj2byUrr3Eoi
+	WPLMjT0QljDe4nBnwyixx2Ss3X3DU9FpMt9aBMKVOfM2yrFTD23sv15OzTyakqA55yIObX4e+m0
+	s+6JWQIVyklb/LQdKZbZuvL9XsbcQYXiiochqEKiBqQlLr+Xs4J80j33qSC16oOx8ffqs4cUmUd
+	acJrJFvFRtwvopQ0GLDn+Nt2+HmKXFhU2eoCzn2j0gXRuNkGZyo7oggrrgAOuQJwkOpJXkxu7DD
+	pBe2qm194jrBj/xyTaGikhNQ9QVBH6Th/ne+47261F6GusXjzG9rNthJCPQxMRLMieqrpajnhKS
+	QBqiO0HZoNOeU9p6zvdpzwairC760qSU2f4WLXpV53m5ZJ7vDs+Q4Iot4YyZfEzy6xzLdu4N3gX
+	ORIZTSqM6SETQWWvwbqk1okDga2NNGsuxVfXg==
+X-Google-Smtp-Source: AGHT+IGjDFK1S6VyM/fYfOLilAfvt70skQ1RowZxJxQP6nlHFavUZNX8qMKoQ5ih8VuDr+Ib7S1xwQ==
+X-Received: by 2002:a05:6214:509b:b0:793:dce5:4540 with SMTP id 6a1803df08f44-8887dfec0a2mr293576516d6.2.1765933791524;
+        Tue, 16 Dec 2025 17:09:51 -0800 (PST)
+Received: from wirelessprv-10-192-243-69.near.illinois.edu (mobile-130-126-255-83.near.illinois.edu. [130.126.255.83])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8be31c75b79sm290605685a.53.2025.12.16.17.09.49
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 16 Dec 2025 17:09:51 -0800 (PST)
+From: Wentao Zhang <wentaoz5@illinois.edu>
+To: ethan.w.s.graham@gmail.com
+Cc: andreyknvl@gmail.com,
+	andy.shevchenko@gmail.com,
+	andy@kernel.org,
+	brauner@kernel.org,
+	brendan.higgins@linux.dev,
+	davem@davemloft.net,
+	davidgow@google.com,
+	dhowells@redhat.com,
+	dvyukov@google.com,
+	elver@google.com,
+	glider@google.com,
+	herbert@gondor.apana.org.au,
+	ignat@cloudflare.com,
+	jack@suse.cz,
+	jannh@google.com,
+	johannes@sipsolutions.net,
+	kasan-dev@googlegroups.com,
+	kees@kernel.org,
+	kunit-dev@googlegroups.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	lukas@wunner.de,
+	rmoar@google.com,
+	shuah@kernel.org,
+	sj@kernel.org,
+	tarasmadan@google.com,
+	Wentao Zhang <wentaoz5@illinois.edu>
+Subject: Re: [PATCH v3 00/10] KFuzzTest: a new kernel fuzzing framework
+Date: Tue, 16 Dec 2025 19:08:53 -0600
+Message-Id: <20251217010853.54863-1-wentaoz5@illinois.edu>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20251204141250.21114-1-ethan.w.s.graham@gmail.com>
+References: <20251204141250.21114-1-ethan.w.s.graham@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251205113136.17920-1-litian@redhat.com> <20251209225401.GA54030@quark>
-In-Reply-To: <20251209225401.GA54030@quark>
-From: Li Tian <litian@redhat.com>
-Date: Wed, 17 Dec 2025 08:08:48 +0800
-X-Gm-Features: AQt7F2r7sjIHhJYn8u10_JDVPCQH3hjWfeyIsntNusdnk53bfMv35yKRtdOuKZg
-Message-ID: <CAHhBTWuXQY5CBLTT+-+WsTDw6Pua=Kt-4Mrj6+qiEjKEi+SSSQ@mail.gmail.com>
-Subject: Re: [PATCH RFC] crypto/hkdf: Skip tests with keys too short in FIPS mode
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Simo Sorce <ssorce@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 10, 2025 at 6:54=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
-wrote:
-> What problem are you trying to solve?
+Hi Ethan,
 
-Eric, as you've said "keylen < 14 check in the new version in
-crypto/sha256.c." was forgotten.
-IMHO, it deserves recovery in terms of FIPS. And by the time the check
-is restored, the hkdf_test
-cases failure will likely surface again. Hence the skipping in this proposa=
-l.
+This looks interesting!
 
-Li Tian
+On Thu,  4 Dec 2025 15:12:39 +0100, Ethan Graham <ethan.w.s.graham@gmail.com> wrote:
+> This patch series introduces KFuzzTest, a lightweight framework for
+> creating in-kernel fuzz targets for internal kernel functions.
+>
+> The primary motivation for KFuzzTest is to simplify the fuzzing of
+> low-level, relatively stateless functions (e.g., data parsers, format
 
+Do you have any idea how this could be extended to target more stateful
+functions?
+
+> converters) that are difficult to exercise effectively from the syscall
+> boundary. It is intended for in-situ fuzzing of kernel code without
+> requiring that it be built as a separate userspace library or that its
+> dependencies be stubbed out. Using a simple macro-based API, developers
+> can add a new fuzz target with minimal boilerplate code.
+>
+> The core design consists of three main parts:
+> 1. The `FUZZ_TEST(name, struct_type)` and `FUZZ_TEST_SIMPLE(name)`
+>    macros that allow developers to easily define a fuzz test.
+> 2. A binary input format that allows a userspace fuzzer to serialize
+>    complex, pointer-rich C structures into a single buffer.
+> 3. Metadata for test targets, constraints, and annotations, which is
+>    emitted into dedicated ELF sections to allow for discovery and
+>    inspection by userspace tools. These are found in
+>    ".kfuzztest_{targets, constraints, annotations}".
+>
+> As of September 2025, syzkaller supports KFuzzTest targets out of the
+> box, and without requiring any hand-written descriptions - the fuzz
+
+Do you happen to have some numbers on coverage, convergence time etc.
+before and after KFuzzTest?
+
+Thanks,
+Wentao
+
+> target and its constraints + annotations are the sole source of truth.
+>
+[snip]
