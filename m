@@ -1,43 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B9228695;
-	Thu, 18 Dec 2025 19:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263282D7387;
+	Thu, 18 Dec 2025 19:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766084775; cv=none; b=K9kwhnDQW8YKaB6LnAtQbTWoQOdxc2GXwAv+H+B5NngjZjifzctpHz/f9DcThApFNALN1pdwgQGw2TRZ9wXSMiMMUg1gcQ6LfL0ocSxV6SAMFHIep/zmehEs/ZIsGAU3o8uj9KMCftZ2LBR7bIs83cF5i7j/i3g0qbgJHuMczHE=
+	t=1766084897; cv=none; b=V/uDh4soK1R59kpy8KVoJRuW6+lQb3v7Oou5/w+bLar+BC4rmJFKQDFWBeajOkF8iO2hnaNC727uCFvdF/QlEv3MnMf1xI4kAjnO+FhzIG6fAXguZ9D8c8F3oTtJtKu4fSWt5rmPQfRTGAxJ1F2rp55OUOSanVeIN3hgq0wQvYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766084775; c=relaxed/simple;
-	bh=hcPZnrm8YPqK45k98pFrwJEZ6Doc8/FaNbmeUK/pRcs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=KnQdSLVC8Mu2E3Z4eKgrRCNNaSKbN7v1JB7aMgwv/2ZMb9bydhFxx+3QC+JRxyTbwQXFJfAYk+qTu4Sks885Aullr79ZclCxNSqK+LY4SYz5jUbnnBbYD6Hsr0cyLqOQ3i/gUl9CoExxIg/ABt73UelYhwmRQOhpaTT/UYNMjsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OmfKrH3s; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1766084897; c=relaxed/simple;
+	bh=Z9a4e2kqMkKgECN326Qvq7UbuTUqk+wZb7MlxJlWTR4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XFCwg2FtC3qLYEAgNwe9f/WBxdnAnYbQLkhqNgwfKfFb8VAzTVQJF6isUifEGSfJG2DDs8HDTMtUc1fEsebReS8O8oxT7jXTn7hb4mMDnfk2Wf34pc3KN6CnzxS0r1o7soPQks8pmKKq9kDccN5pe8r0R5AARai8kfBcJTj0nFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TVt7IRjs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OmfKrH3s"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1CE2C4CEFB;
-	Thu, 18 Dec 2025 19:06:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TVt7IRjs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5813BC4CEFB;
+	Thu, 18 Dec 2025 19:08:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766084775;
-	bh=hcPZnrm8YPqK45k98pFrwJEZ6Doc8/FaNbmeUK/pRcs=;
-	h=Date:From:To:Cc:Subject:From;
-	b=OmfKrH3sdzJSRkoXJ83lIbxEEMpI6kqcJN5wTqrQCjc8uVBzAFXNvdaY2k/5B8wRD
-	 8m7kisIx5Shmacsr1hm2rcWM17HR55lMyEyhLyIWTv0xYtBj9O6siyRJaz/csdGpg6
-	 X5JvayyvvvE5/vZd/zCDjEaM6BsHDbz64oLnyaz/dr1nDW/s6vIMMOQKh3Lg6v26OF
-	 APPJGQ45a46r8pjFrxYH+CX8SmgvstwEYFV+VMWV3IeMXYph7o0WY3mHouwnGZZElL
-	 mEuKn/LCsdq/8EyHMfThGZK+gqeLvLnmWv2O3+ckjrjFa58dhRBZN8yHVc4KLHn4iV
-	 pIt8OgedhaW8Q==
-Date: Thu, 18 Dec 2025 11:06:06 -0800
+	s=k20201202; t=1766084896;
+	bh=Z9a4e2kqMkKgECN326Qvq7UbuTUqk+wZb7MlxJlWTR4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TVt7IRjs2ghTWN3c/22Tqxzt7YfvoutHaPj12OH2pkrYO0vk7kdjC1PcIN3tbB8jx
+	 saNOCAOq1OkKPa6P3kT1vqi+EGUX3VOKj25mztYDS+7+S1g+mNPD2p9EbKXfxdEyPE
+	 pPCT7Y6SXCKA9irZLQ8j2wjwLOHurx3Lw79KgxSXDrb57WfAlxu8vZVKfJ1fpwsaug
+	 5mBinKohEUuxMrO9B0eBjiE0nH3RWbdJwMTNs1OgL6O6Ct6Hk+dEo+Fq7pgIiELPWj
+	 LSakdMvRzAC40tGgo3jrVCZik7E+2oN9buaWBIY2PUAy4SxRJEEyddTXD/mo/Gps8s
+	 BEW4+wBo38ikg==
+Date: Thu, 18 Dec 2025 11:08:07 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+To: linux-crypto@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Charles Mirabile <cmirabil@redhat.com>,
-	Kees Cook <keescook@chromium.org>, Will Deacon <will@kernel.org>
-Subject: [GIT PULL] Crypto library fixes for v6.19-rc2
-Message-ID: <20251218190606.GB21380@sol>
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
+	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 0/2] lib/crypto: ML-DSA verification support
+Message-ID: <20251218190807.GC21380@sol>
+References: <20251214181712.29132-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,34 +52,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20251214181712.29132-1-ebiggers@kernel.org>
 
-The following changes since commit 8f0b4cce4481fb22653697cced8d0d04027cb1e8:
+On Sun, Dec 14, 2025 at 10:17:10AM -0800, Eric Biggers wrote:
+> This series can also be retrieved from:
+> 
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git mldsa-v4
+> 
+> This series adds support for verifying ML-DSA signatures to lib/crypto/.
+> Patch 1 is the ML-DSA implementation itself.  See that for full details.
+> Patch 2 adds the KUnit test suite.
+> 
+> The initial use case for this will be kernel module signature
+> verification.  For more details, see David Howells' patchset
+> https://lore.kernel.org/linux-crypto/20251120104439.2620205-1-dhowells@redhat.com/
+> 
+> Note: I'm planning to apply this to libcrypto-next for 6.20.
 
-  Linux 6.19-rc1 (2025-12-14 16:05:07 +1200)
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-fixes-for-linus
-
-for you to fetch changes up to 5a0b1882506858b12cc77f0e2439a5f3c5052761:
-
-  lib/crypto: riscv: Add poly1305-core.S to .gitignore (2025-12-14 10:18:22 -0800)
-
-----------------------------------------------------------------
-
- - Fix a performance issue with the scoped_ksimd() macro (new in 6.19)
-   where it unnecessarily initialized the entire fpsimd state.
-
- - Add a missing gitignore entry for a generated file added in 6.18.
-
-----------------------------------------------------------------
-Ard Biesheuvel (1):
-      arm64/simd: Avoid pointless clearing of FP/SIMD buffer
-
-Charles Mirabile (1):
-      lib/crypto: riscv: Add poly1305-core.S to .gitignore
-
- arch/arm64/include/asm/simd.h | 9 ++++++++-
- lib/crypto/riscv/.gitignore   | 2 ++
- 2 files changed, 10 insertions(+), 1 deletion(-)
- create mode 100644 lib/crypto/riscv/.gitignore
+- Eric
