@@ -1,75 +1,76 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B002749CB
-	for <linux-crypto@vger.kernel.org>; Thu, 18 Dec 2025 10:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A842C2DECCC
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Dec 2025 10:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766052069; cv=none; b=YfbjxCHT8f3WanJkOcm1AvzBL/ZN/n46P8/J7zHwmOZrFeSi/mVTxSUemCLpErOR5airAdtBnG6K0KGKTJWO88ZEl/Wo8u55ySnLLLYQJWdoa/TCvoPNZ4tqDLXRSYyKZ+VQgn7NIEfF5q/kKthqVbscp3VmKOaLQttisKE5Qss=
+	t=1766052886; cv=none; b=aNTwgNmE33ewhPnmLZQDy51zFnWXChFafXAi9FhqqBr7tpIBTKavWJ3xvSEznAWKlVvFhfuzRUbKzmj+DlgBYpDEGrpxw70MMC816YQ0yDcwaV4LbxP38KOtQgIuKKCXc5xCbzidQirk+F2XMTbjF/UEoYzZsRGzwq/W7hDrFW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766052069; c=relaxed/simple;
-	bh=rV8tz1xEO+OL+dWcYOVwQ13qgwbEK1Y/uc6HUrd0jAw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DBquc3E0aBUKrctWO3wZeQ9DfBOgeOECUxte2Qhdov6qFoiMChHBEzXVC9v91ioQl6D41RcIozWYfxep4p/iSYr1eV1Pt3MVQYmRjPyJyZMNa0Rh27HUCX/NjsRpbWkKC1533AYDSIititWEOegN2xu2xpiNVIdmPoMl1KmRTBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZstoOiwe; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1766052886; c=relaxed/simple;
+	bh=/LQwIN5wlDT3DeC5MfHp3EzOwAe5nS+RTb7aby2JQAA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bT6j+gu7S0PcPGNlHVu1vsmT/KV5od9HphN7UO83mMTLCySgmTFOlQS9B7qKSB7hi3njBJf2AnI3qWQK1bjajUaMqQ4bv8niLCA5VhikXgKpmobDzrxCOfDOPEVKoYlDLGQ1RxxUXXExSzU1THtz1PP8KbyMsCnNfKRJZtyQtLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MgVp4Jwl; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZstoOiwe"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42fb8aa0c3eso55155f8f.3
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Dec 2025 02:01:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MgVp4Jwl"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-42fb8aa0c3eso57407f8f.3
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Dec 2025 02:14:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766052066; x=1766656866; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1766052883; x=1766657683; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hyH9mCD6aBkhmQ77FdDtNB7q53LN9kNu+qw1jW9m6CA=;
-        b=ZstoOiwe0CccgebBMueeefr7J6tu3cXAKuGWkYpj9Aq0f692ShtXMbbzBLJ2gqZyUI
-         kBNwWriTOwuEXJv1pxTA32cVXUuR2Vp0VgCfKwktLEqpusvwr1bzbW/xS55VEM0litCI
-         ZZed4H1FgJaau/NPsTMmbdlaUsXp8qyIOE7aaaQ/Dw0hVsfcMOImW7zzX9fT7Jan5r+8
-         u4Ej6eYSNTI8g4gjqu29d7hKkrXTr+wHO1RBLZgS3SuJC3/2r/0iSEX9Q3QEhHgKFLYT
-         c7CrvYKwpEJMQXsocn/G++UJN5MuSSWGKkfptj8aoRUJ/0MAAtLhcyfffO11rob5VV1m
-         +moA==
+        bh=u+BV8l6bI5r75JWl7N88tV1hGPdzJiaxJxIZtgFdDj0=;
+        b=MgVp4JwlFL6Ap48pi4nIVkjPRNw2kWUFmWvDsxZGoh0iMLv2MMnaawT1iLe6E9R940
+         LguuTlTwy+bLOtCbu0CA16teAob+ycOH5AWXT8B/0M67O31LvcEJ82yriTLQLyomIlZi
+         8kl1lP0+nxOEwT+8y0adYdTTxWTxmsUcA74VL7psVL17SZV/Cz4hxUMRPby6FlJdqTXR
+         DAAL0JVvPBTkY7gSn2PqqjYAUQU8wi64qIY9QJg3+P3x8okH0c8KMZt5XFixbIF9Xd+o
+         guOATW1jKHQN2KWSWtGebFw9X7Q8XTXKJiRNk8FbpdOsVhKkPSlTWdXTsEuhewQ8Rs7J
+         7xEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766052066; x=1766656866;
+        d=1e100.net; s=20230601; t=1766052883; x=1766657683;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hyH9mCD6aBkhmQ77FdDtNB7q53LN9kNu+qw1jW9m6CA=;
-        b=DpCYF47sU3B5YL2WbRDQXJKQnmSS+ATJ7w07CGYu70330nCRzX0PLwTIT++Sm46CCT
-         75KsnXfrRUbKVw01hc93MQ66izNJcwKdkEa/OQOuuEYjc1CR6kdijXIp8Os3N+4b0EOO
-         GQtwVDcFC5q56hEV6Uy0vwePBOy3AfZKdemswAQxVtVA8N9qSYuBJkEz1azjbm67wcYN
-         2BlE83iOPQOtnbro54gxAV9RXsJZZDeKu4/miziFvCfQkI2exgoQ9rnpPU2vkFDsqt1i
-         o7QziWlGtZRAu0FK6Q4s0hyrQjOPkGNkZiFD5BRggGoLq0pq8rL0fRXM2QOdIYxdow9t
-         O1WA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOrfYsBYdtDL6076wt3njkg1SjJV6igvd33O/vvRSFXE6BC39ec7oS1uL4Ovr9RzLREhIQ+Y2lMPurI7s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2ZICeIfTIE8t7i43Cq75CwZ+a8MPFjIJjZxdhPB2pL58tfHQr
-	jS0989LDumst6KFu0fHCqVqy6mnvfWTt0H+mnSzdE+UqPNZ1SXvvuqtQ
-X-Gm-Gg: AY/fxX7IbZc7t+aV5Wt5qj6e6wShH2JFfw7bly9jDyCYm3pygBRZpGoP73n2udR5HVj
-	yNzV5yNwhDP1Gl1gAIhCBMQXLP+8YZVpX2X14P37FQrOX8B87BVDLdWdDXtPW1Vsl4c5v4h2jWI
-	Js8GEC0xcJVVw0HwIE1+ULUVPv6GqKtJR2KJBH1c7MWy/2TT+Nl5w5YtLy9BDBEU0/K/cHwl9mA
-	RpgufYrqQZn7VHmTow79EsZUWCYlH1Zj8iS1D5ACzdr9hZaqlH3HFdH6nvKEpivhkwi8FIS0jmP
-	uxl33h07o8dNZq/kuW5Iqs7bTPztiCN+mBYDifyyU4JyWBgB2UDd+pFRttMiJATPYl8Sx+E4D3p
-	/wWF/Ipa8wj+LIK20G4wi7DpQUtBlB1NRZ+1O3ILTkFYqkPc9p3RMN1ilDyqpzi9xM6WVR9oozd
-	nfTqGbp3J9+BVP4YXmEL7i3Pjo9tRizz4clBUXkbbbhFGOiDfmrMzCdZnNYmzCXiGe4Y+vIM594
-	rdzuw==
-X-Google-Smtp-Source: AGHT+IH2kKiYVsC8VRgBFg/O6dYGfFsrX+sxtbv8Pi0OZYXzYmUTA43kfU9pFEM/m3xMKliT2y9c0Q==
-X-Received: by 2002:a5d:5d85:0:b0:42b:3e20:f1b1 with SMTP id ffacd0b85a97d-4324667044bmr1118271f8f.2.1766052066121;
-        Thu, 18 Dec 2025 02:01:06 -0800 (PST)
+        bh=u+BV8l6bI5r75JWl7N88tV1hGPdzJiaxJxIZtgFdDj0=;
+        b=Kc+aR3Lq+UH2rNEiSkWH+jlt8Yeu3PDHAVzFoxXNVYt6u5hrqUY4ORKCdVA4xN4imT
+         iW+sarmqbagydH+DiDCsSTohTCItbeUE8SnpdCJyUHC0VyvMJiC+7fQISwppaKH2uwNa
+         M5oBzSwJOGuAz0Jjlc8+ht6fTrkBwXFOYceleuz7OxaWeKijZct1Ew/hnZ0SRajHLzWO
+         LwzYLTNQMq9GL5/d7E7o+OXbZEcfoORM7UR9ateQXS/BSPgK4Gc2jHjARMgXj2UQtvDz
+         IHpL35OUXA9tSyftCtkhjxeM8Z1FIKp0DIJJHgjdkb7PM+mO7OeaZppwd3f9RUGU531m
+         3skA==
+X-Forwarded-Encrypted: i=1; AJvYcCVPHa9ueHC2cPUqKcMWO3XnH/ULi8QZeZQyZ7Yp+2kYaOGjXTw53M1k1MF3gKl749qeSY6zTn5om6BRhkw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywf/w2fQlD1RD90eBMl+WXTQ1LL3qO5yFZMD1s3lUorGkPeLygn
+	Wi63McnmvN7bXXUlsK+8dzku9cMUElWJ8yaM35Ozc4mqsf2i6PS8gWqg
+X-Gm-Gg: AY/fxX5o+AnTKUvJSFRx34S8GRaTHxpEoNyV2QPchQEHmvglqj0z9+7d1P2c/y41tua
+	HsJOQnkMuJevi5OD+XyhG7ObkkQFnUPR40X6JnrxgBtC4DDY6iamMEpQWnL/fTHI67t0LMrbrbx
+	Uj45TyZZ3ZZF/M1yNuq7a5/I/HwZuESYFbt6MsgrHJa2gqz4oACCzYATBCTZwxMzGUuidvPm8Vo
+	JLIhWAZPROULxKH6gvdWN0s9OaoOzlpHnISWwkKBUfwakslAcz0S3yHRGqW70YDtpqMKp+WwDMN
+	sxQvmxsIuY34qQIBbfgM0EZytuXiiL3cY7gktYWWzMnuXF2gEgQgha5gKE3vkW2TGK7bDOwWB3n
+	2NdQqAO6eIYmWtcalfWtxzWwM5gmskOZkQdjYRr5VbTUcVpf/06aDze+8OYqsgDB1aaW1RQjmUa
+	s9d0QTMK2Nnp9PzfPEwb73PusgjlpOq/4lxho2BwVeIhn4fppzu41J0KlNKv0gTQWDMvvriY86Q
+	nenOA==
+X-Google-Smtp-Source: AGHT+IEKMCe5QBZ+35evyA/8GhIHDGFGP5Us3fk7XArqpUIxN3OzD4eo78lOUdTRsUAazuLA1fpTHA==
+X-Received: by 2002:a05:600c:c491:b0:477:5b01:7d49 with SMTP id 5b1f17b1804b1-47ce8777481mr4442265e9.4.1766052882893;
+        Thu, 18 Dec 2025 02:14:42 -0800 (PST)
 Received: from thomas-precision3591.. (cust-east-par-46-193-67-14.cust.wifirst.net. [46.193.67.14])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-43244999336sm4025225f8f.36.2025.12.18.02.01.05
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-47be274e407sm35914865e9.8.2025.12.18.02.14.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Dec 2025 02:01:05 -0800 (PST)
+        Thu, 18 Dec 2025 02:14:42 -0800 (PST)
 From: Thomas Fourier <fourier.thomas@gmail.com>
 To: 
 Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	George Cherian <gcherian@marvell.com>,
+	Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Daney <david.daney@cavium.com>,
+	Lukasz Bartosik <lbartosik@marvell.com>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: cavium: fix dma_free_coherent() size
-Date: Thu, 18 Dec 2025 10:56:45 +0100
-Message-ID: <20251218095647.45214-2-fourier.thomas@gmail.com>
+Subject: [PATCH] crypto: marvell: fix dma_free_coherent() size
+Date: Thu, 18 Dec 2025 11:12:57 +0100
+Message-ID: <20251218101259.47931-2-fourier.thomas@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -80,26 +81,26 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 The size of the buffer in alloc_command_queues() is
-curr->size + CPT_NEXT_CHUNK_PTR_SIZE, so used that length for
+curr->size + OTX_CPT_NEXT_CHUNK_PTR_SIZE, so used that length for
 dma_free_coherent().
 
-Fixes: c694b233295b ("crypto: cavium - Add the Virtual Function driver for CPT")
+Fixes: 10b4f09491bf ("crypto: marvell - add the Virtual Function driver for CPT")
 Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
 ---
- drivers/crypto/cavium/cpt/cptvf_main.c | 3 ++-
+ drivers/crypto/marvell/octeontx/otx_cptvf_main.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/cavium/cpt/cptvf_main.c b/drivers/crypto/cavium/cpt/cptvf_main.c
-index c246920e6f54..bccd680c7f7e 100644
---- a/drivers/crypto/cavium/cpt/cptvf_main.c
-+++ b/drivers/crypto/cavium/cpt/cptvf_main.c
-@@ -180,7 +180,8 @@ static void free_command_queues(struct cpt_vf *cptvf,
+diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_main.c b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
+index 88a41d1ca5f6..6c0bfb3ea1c9 100644
+--- a/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
++++ b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
+@@ -168,7 +168,8 @@ static void free_command_queues(struct otx_cptvf *cptvf,
+ 			chunk = list_first_entry(&cqinfo->queue[i].chead,
+ 					struct otx_cpt_cmd_chunk, nextchunk);
  
- 		hlist_for_each_entry_safe(chunk, node, &cqinfo->queue[i].chead,
- 					  nextchunk) {
 -			dma_free_coherent(&pdev->dev, chunk->size,
 +			dma_free_coherent(&pdev->dev,
-+					  chunk->size + CPT_NEXT_CHUNK_PTR_SIZE,
++					  chunk->size + OTX_CPT_NEXT_CHUNK_PTR_SIZE,
  					  chunk->head,
  					  chunk->dma_addr);
  			chunk->head = NULL;
