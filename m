@@ -1,203 +1,178 @@
-Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2274933A704;
-	Thu, 18 Dec 2025 13:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6173451D4;
+	Thu, 18 Dec 2025 13:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766065512; cv=none; b=kO1VaZUKOI3JASJ7o/HFIYQKRjxyYmQYMhes8X9BkK2q8IGarOSyZbSaecChALAULj59to38MBMxw13fSng3cNdAbpxPL+rMJB30Jq3d9BW+aVsePgMpv7zKrIf9c0c7LgugyoMdJXaxMxlyZk+I3wu3ADvfP7TE9NmTDwNqS6g=
+	t=1766066035; cv=none; b=NZj4SwPVukajfbGdsmCD1LRKxdV9cP+rQoIRa6iMXrHz2Yh2mYOI5d+MPXFmQ9UEcQ8od/rG/NIVYLjIts6V0h+7lUwoBBh/ZhSYGIY2U+Z2hLx1WKUYrYY58nmZ64yKmzR/cMeeNrIkr2Nw9dq2bk9q1Jr0QHnXOB4OgECCwuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766065512; c=relaxed/simple;
-	bh=S2ZOsoHSvSPD2qOHStkOoj4DDCRo0E0CZZ9H9M2Wqvc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E+bJM2OG3UN094BwbjfN7I/lrnqwR8wK/jx/4QLnF6GqYNSwEL7viPCftEhHtL0rlzA0XvOTH277pG3FPIHX9XBEvNRF6ixIzp1AoKZe4igJ0zSxpHaDIGoJQvuh7KyNXwt2zZRtsXbJWDOD3UJ2boK+ldjtvkJ2C0gTVuKXK8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=6S1tbZ8B; arc=none smtp.client-ip=113.46.200.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1766066035; c=relaxed/simple;
+	bh=Gb408fVHMLonuRAakmkxdDWU8SK3ZsmJh94vFt7tIrA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sy5Kps4BUbytZho+L8HpW9BKnfO5Kj85SwMDBJSWLpyo3JS/FoTKpi4++TuNbNHmGfkQg1aEcyUyOKlFe2i7BMVn3fkicvH9mI+UboBNz0T4Ngr42S9ec8TdeLxeNjYErKwmtIcrU83JuJAsAxnk0UptTg02W6FLPtT8AHJZ+tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=qFohZZY8; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="6S1tbZ8B"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=NEIAocZX7oeYU53yZMufqMy2MJZzfMbXu7TR9A1HIz0=;
-	b=6S1tbZ8Bf4a5ttzyIl+fT7wqM6eTx8qoHooaKL93yamZs1sjsn8bCAD0lDyxvsYT899oxGzCm
-	jnv/FW6kydARL68Aw2Qs7Y9nXDusz28SkxLvkyO+eWXaZZMEATdWxeAgA+vb/NQpUbGGUEOVkfG
-	hXIVWzN40AvOg6uwE2qInw0=
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dXBgX1gynznTXC;
-	Thu, 18 Dec 2025 21:42:48 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 02B7F1402C4;
-	Thu, 18 Dec 2025 21:45:01 +0800 (CST)
-Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 18 Dec 2025 21:44:57 +0800
-Received: from localhost.huawei.com (10.90.31.46) by
- kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 18 Dec 2025 21:44:57 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
-	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>, <lizhi206@huawei.com>,
-	<taoqi10@huawei.com>
-Subject: [PATCH v4 09/11] crypto: hisilicon/zip - support fallback for zip
-Date: Thu, 18 Dec 2025 21:44:50 +0800
-Message-ID: <20251218134452.1125469-10-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20251218134452.1125469-1-huangchenghai2@huawei.com>
-References: <20251218134452.1125469-1-huangchenghai2@huawei.com>
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="qFohZZY8"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id D8E6D4E41C86;
+	Thu, 18 Dec 2025 13:53:48 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id A4BEE606B6;
+	Thu, 18 Dec 2025 13:53:48 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 66249102F0B2D;
+	Thu, 18 Dec 2025 14:53:33 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1766066026; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=RhgSGQYStNGcdPoB3dTlM/CB5TE2tva/NS/z3ptd3wM=;
+	b=qFohZZY8adtmwbRo28+tcgXOIuD5T9ZV6GmStiiS0ZAEXQPvVe9Zcnoe53YsCQv7j9c1kT
+	pTrvVf3pcUkunP7HW/oQvdBg/Lk3nsGsCiYCx3SHIHn49cINe+SDypYYTUNdpwsJxK0JVh
+	ocSroqcU2Nk7str55AMgKkPgbWDRxk2+yhvbttnAqOzQlGRqdP2i4+xde+ODjyK3Zpm5be
+	ZSBh2N3dOdtUob6QOjlSHuVExl0oaNjoD8HBgFGaCPqRDPAFBwnRVvZxfM0UXeEISM/0Op
+	YG/ULfUWn7tCLkV8LWmaP9dHfiDTFdsnlQ2sM6hNfJi3OczZvwptkZvMOkvVJQ==
+Date: Thu, 18 Dec 2025 14:53:32 +0100
+From: Alexandre Belloni <alexandre.belloni@bootlin.com>
+To: Jens Wiklander <jens.wiklander@linaro.org>
+Cc: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Garg <sumit.garg@kernel.org>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	David Howells <dhowells@redhat.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-efi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Cristian Marussi <cristian.marussi@arm.com>,
+	arm-scmi@vger.kernel.org, linux-mips@vger.kernel.org,
+	netdev@vger.kernel.org, linux-integrity@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v2 00/17] tee: Use bus callbacks instead of driver
+ callbacks
+Message-ID: <20251218135332f323fa91@mail.local>
+References: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
+ <CAHUa44FrDZbvRvfN8obf80_k=Eqxe9YxHpjaE5jU7nkxPUwfag@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemq200001.china.huawei.com (7.202.195.16)
+In-Reply-To: <CAHUa44FrDZbvRvfN8obf80_k=Eqxe9YxHpjaE5jU7nkxPUwfag@mail.gmail.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-When the hardware queue resource busy(no shareable queue)
-or memery alloc fail in initialization of acomp_alg, use
-soft algorithm to complete the work.
+On 18/12/2025 08:21:27+0100, Jens Wiklander wrote:
+> Hi,
+> 
+> On Mon, Dec 15, 2025 at 3:17 PM Uwe Kleine-König
+> <u.kleine-koenig@baylibre.com> wrote:
+> >
+> > Hello,
+> >
+> > the objective of this series is to make tee driver stop using callbacks
+> > in struct device_driver. These were superseded by bus methods in 2006
+> > (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
+> > methods.")) but nobody cared to convert all subsystems accordingly.
+> >
+> > Here the tee drivers are converted. The first commit is somewhat
+> > unrelated, but simplifies the conversion (and the drivers). It
+> > introduces driver registration helpers that care about setting the bus
+> > and owner. (The latter is missing in all drivers, so by using these
+> > helpers the drivers become more correct.)
+> >
+> > v1 of this series is available at
+> > https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koenig@baylibre.com
+> >
+> > Changes since v1:
+> >
+> >  - rebase to v6.19-rc1 (no conflicts)
+> >  - add tags received so far
+> >  - fix whitespace issues pointed out by Sumit Garg
+> >  - fix shutdown callback to shutdown and not remove
+> >
+> > As already noted in v1's cover letter, this series should go in during a
+> > single merge window as there are runtime warnings when the series is
+> > only applied partially. Sumit Garg suggested to apply the whole series
+> > via Jens Wiklander's tree.
+> > If this is done the dependencies in this series are honored, in case the
+> > plan changes: Patches #4 - #17 depend on the first two.
+> >
+> > Note this series is only build tested.
+> >
+> > Uwe Kleine-König (17):
+> >   tee: Add some helpers to reduce boilerplate for tee client drivers
+> >   tee: Add probe, remove and shutdown bus callbacks to tee_client_driver
+> >   tee: Adapt documentation to cover recent additions
+> >   hwrng: optee - Make use of module_tee_client_driver()
+> >   hwrng: optee - Make use of tee bus methods
+> >   rtc: optee: Migrate to use tee specific driver registration function
+> >   rtc: optee: Make use of tee bus methods
+> >   efi: stmm: Make use of module_tee_client_driver()
+> >   efi: stmm: Make use of tee bus methods
+> >   firmware: arm_scmi: optee: Make use of module_tee_client_driver()
+> >   firmware: arm_scmi: Make use of tee bus methods
+> >   firmware: tee_bnxt: Make use of module_tee_client_driver()
+> >   firmware: tee_bnxt: Make use of tee bus methods
+> >   KEYS: trusted: Migrate to use tee specific driver registration
+> >     function
+> >   KEYS: trusted: Make use of tee bus methods
+> >   tpm/tpm_ftpm_tee: Make use of tee specific driver registration
+> >   tpm/tpm_ftpm_tee: Make use of tee bus methods
+> >
+> >  Documentation/driver-api/tee.rst             | 18 +----
+> >  drivers/char/hw_random/optee-rng.c           | 26 ++----
+> >  drivers/char/tpm/tpm_ftpm_tee.c              | 31 +++++---
+> >  drivers/firmware/arm_scmi/transports/optee.c | 32 +++-----
+> >  drivers/firmware/broadcom/tee_bnxt_fw.c      | 30 ++-----
+> >  drivers/firmware/efi/stmm/tee_stmm_efi.c     | 25 ++----
+> >  drivers/rtc/rtc-optee.c                      | 27 ++-----
+> >  drivers/tee/tee_core.c                       | 84 ++++++++++++++++++++
+> >  include/linux/tee_drv.h                      | 12 +++
+> >  security/keys/trusted-keys/trusted_tee.c     | 17 ++--
+> >  10 files changed, 164 insertions(+), 138 deletions(-)
+> >
+> > base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+> > --
+> > 2.47.3
+> >
+> 
+> Thank you for the nice cleanup, Uwe.
+> 
+> I've applied patch 1-3 to the branch tee_bus_callback_for_6.20 in my
+> tree at https://git.kernel.org/pub/scm/linux/kernel/git/jenswi/linux-tee.git/
+> 
+> The branch is based on v6.19-rc1, and I'll try to keep it stable for
+> others to depend on, if needed. Let's see if we can agree on taking
+> the remaining patches via that branch.
 
-Fixes: 1a9e6f59caee ("crypto: hisilicon/zip - remove zlib and gzip")
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
----
- drivers/crypto/hisilicon/Kconfig          |  1 +
- drivers/crypto/hisilicon/zip/zip_crypto.c | 50 +++++++++++++++++++----
- 2 files changed, 43 insertions(+), 8 deletions(-)
+6 and 7 can go through your branch.
 
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index 4835bdebdbb3..a0cb1a8186ac 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -57,6 +57,7 @@ config CRYPTO_DEV_HISI_ZIP
- 	depends on UACCE || UACCE=n
- 	depends on ACPI
- 	select CRYPTO_DEV_HISI_QM
-+	select CRYPTO_DEFLATE
- 	help
- 	  Support for HiSilicon ZIP Driver
- 
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index 108ab667131d..e140d4f8afe0 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -84,6 +84,7 @@ struct hisi_zip_sqe_ops {
- struct hisi_zip_ctx {
- 	struct hisi_zip_qp_ctx qp_ctx[HZIP_CTX_Q_NUM];
- 	const struct hisi_zip_sqe_ops *ops;
-+	bool fallback;
- };
- 
- static int sgl_sge_nr_set(const char *val, const struct kernel_param *kp)
-@@ -110,6 +111,24 @@ static u16 sgl_sge_nr = HZIP_SGL_SGE_NR;
- module_param_cb(sgl_sge_nr, &sgl_sge_nr_ops, &sgl_sge_nr, 0444);
- MODULE_PARM_DESC(sgl_sge_nr, "Number of sge in sgl(1-255)");
- 
-+static int hisi_zip_fallback_do_work(struct acomp_req *acomp_req, bool is_decompress)
-+{
-+	ACOMP_FBREQ_ON_STACK(fbreq, acomp_req);
-+	int ret;
-+
-+	if (!is_decompress)
-+		ret = crypto_acomp_compress(fbreq);
-+	else
-+		ret = crypto_acomp_decompress(fbreq);
-+	if (ret) {
-+		pr_err("failed to do fallback work, ret=%d\n", ret);
-+		return ret;
-+	}
-+
-+	acomp_req->dlen = fbreq->dlen;
-+	return ret;
-+}
-+
- static struct hisi_zip_req *hisi_zip_create_req(struct hisi_zip_qp_ctx *qp_ctx,
- 						struct acomp_req *req)
- {
-@@ -313,10 +332,15 @@ static int hisi_zip_acompress(struct acomp_req *acomp_req)
- {
- 	struct hisi_zip_ctx *ctx = crypto_tfm_ctx(acomp_req->base.tfm);
- 	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_COMP];
--	struct device *dev = &qp_ctx->qp->qm->pdev->dev;
- 	struct hisi_zip_req *req;
-+	struct device *dev;
- 	int ret;
- 
-+	if (ctx->fallback)
-+		return hisi_zip_fallback_do_work(acomp_req, 0);
-+
-+	dev = &qp_ctx->qp->qm->pdev->dev;
-+
- 	req = hisi_zip_create_req(qp_ctx, acomp_req);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
-@@ -334,10 +358,15 @@ static int hisi_zip_adecompress(struct acomp_req *acomp_req)
- {
- 	struct hisi_zip_ctx *ctx = crypto_tfm_ctx(acomp_req->base.tfm);
- 	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_DECOMP];
--	struct device *dev = &qp_ctx->qp->qm->pdev->dev;
- 	struct hisi_zip_req *req;
-+	struct device *dev;
- 	int ret;
- 
-+	if (ctx->fallback)
-+		return hisi_zip_fallback_do_work(acomp_req, 1);
-+
-+	dev = &qp_ctx->qp->qm->pdev->dev;
-+
- 	req = hisi_zip_create_req(qp_ctx, acomp_req);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
-@@ -515,7 +544,7 @@ static int hisi_zip_acomp_init(struct crypto_acomp *tfm)
- 	ret = hisi_zip_ctx_init(ctx, COMP_NAME_TO_TYPE(alg_name), tfm->base.node);
- 	if (ret) {
- 		pr_err("failed to init ctx (%d)!\n", ret);
--		return ret;
-+		goto switch_to_soft;
- 	}
- 
- 	dev = &ctx->qp_ctx[0].qp->qm->pdev->dev;
-@@ -540,16 +569,20 @@ static int hisi_zip_acomp_init(struct crypto_acomp *tfm)
- 	hisi_zip_release_req_q(ctx);
- err_ctx_exit:
- 	hisi_zip_ctx_exit(ctx);
--	return ret;
-+switch_to_soft:
-+	ctx->fallback = true;
-+	return 0;
- }
- 
- static void hisi_zip_acomp_exit(struct crypto_acomp *tfm)
- {
- 	struct hisi_zip_ctx *ctx = crypto_tfm_ctx(&tfm->base);
- 
--	hisi_zip_release_sgl_pool(ctx);
--	hisi_zip_release_req_q(ctx);
--	hisi_zip_ctx_exit(ctx);
-+	if (!ctx->fallback) {
-+		hisi_zip_release_sgl_pool(ctx);
-+		hisi_zip_release_req_q(ctx);
-+		hisi_zip_ctx_exit(ctx);
-+	}
- }
- 
- static struct acomp_alg hisi_zip_acomp_deflate = {
-@@ -560,7 +593,8 @@ static struct acomp_alg hisi_zip_acomp_deflate = {
- 	.base			= {
- 		.cra_name		= "deflate",
- 		.cra_driver_name	= "hisi-deflate-acomp",
--		.cra_flags		= CRYPTO_ALG_ASYNC,
-+		.cra_flags		= CRYPTO_ALG_ASYNC |
-+					  CRYPTO_ALG_NEED_FALLBACK,
- 		.cra_module		= THIS_MODULE,
- 		.cra_priority		= HZIP_ALG_PRIORITY,
- 		.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
 -- 
-2.33.0
-
+Alexandre Belloni, co-owner and COO, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
