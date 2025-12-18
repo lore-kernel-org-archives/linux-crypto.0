@@ -1,51 +1,51 @@
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B55933859E;
-	Thu, 18 Dec 2025 13:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D73337BB5;
+	Thu, 18 Dec 2025 13:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766065509; cv=none; b=lNlKmlqAP0mCLpVuGJwijbSC96MgV8iH8sXAJq8jMrACNY4bHZ21Ms8gwdthEgRh6uRf/93HQ/C4u5+VXF2yt7CnecomoOoJx9Bq14p/RUPyx2PaX8wbQtxnDx48jNtlUPnsCjbBUyE97DfA2fCaDjpNwYW5zK5A1UMsyvodbR4=
+	t=1766065510; cv=none; b=uhquxPQcO2G4nSQEC6wtFiNk8y/Ni3jhqEPwwzQuQJAfsoy9R+NK1ffjXBG7R2b1WQ6Rf/8ncOIcSrlv9B7zJrbPlaT5x0f4vZ4TCIdBf1SlgA2THIvd4eKbwsTbBcXRdnNeVxbe9P2Zd0uBgXWUYib/cPbwoTFm9QZJgP4Lkhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766065509; c=relaxed/simple;
-	bh=mSye3qnlvOebZSXiqeWKYC+qtSaRFbrcAzQZKFLKuwM=;
+	s=arc-20240116; t=1766065510; c=relaxed/simple;
+	bh=k3PYUYldUkanueYrxhEs6PniLYm1z8jMAYgNS2K3c0s=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RtX4WardePMWZQDESImLVm/doPPF1v2gdbj4Kz56gxlS7SsL0Ps/gOLB+fcBCxWeZYDP/tJomg4lB0YwKLf5COh38subD3LxX/+5flJbgHRaeWNY/h4v7K6koSW/dnYEL1lxL6bWICP+mOhyMmc7xvJ5//BTGIWUCZaCuFKEJe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Ma3hBV4j; arc=none smtp.client-ip=113.46.200.219
+	 MIME-Version:Content-Type; b=OAO6wirfiCDlOCMwJxJo47x0uURPxbdlY6UqnhoibOjlSUJCBU40qnheFs/4BRtO41iqtDRpioPqY59fAiGlsSd52nvV1rGeAiR94/UW2Dms1tH3O4LyPibwUeKOYexxEyKNVnluawuuVFgIyduADnkn6vhyJOZArGJk56IMbDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=0bwocHr9; arc=none smtp.client-ip=113.46.200.223
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Ma3hBV4j"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="0bwocHr9"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=vsyyawiBG4oO/Nn3Wp36udYzgMco5diEhLn5kz7oQSI=;
-	b=Ma3hBV4jJBkeBLHlXLOOD56oXmDPfzRyct9U+y6lxSdx0GiNEADQqvdeWOUWgp/OsVHrmqRGj
-	tHFcVwRnZ1Z/om9ZvGa3oiY+yWkjnyhSYWVf1z5HMzSQdLphvRxOKOGeTe6/Y0LDrIHi86KgVl5
-	4kNpO4ZAwC/RnVoTAnVgD8s=
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4dXBgc21vyz1prMt;
-	Thu, 18 Dec 2025 21:42:52 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0B8EA180BCD;
-	Thu, 18 Dec 2025 21:44:55 +0800 (CST)
+	bh=EVgLOcV4IdojDzzGUqNKzPkGJA5NdIs2RtJoshkEBuc=;
+	b=0bwocHr9qLh0iZfJcUdXGA4rMo93F5EP7hILnwje6kcR/F0saF+2KEzCC/1ST6e/dPNOVuIXh
+	aTqThLWspby+MeiS3e+pEPGv35V7x3ZFKal573HtrR0vJhxzGv0Qh2KdacyUgKWos7/mG8MEdGT
+	2B/g2e8IORshKUDRBVJ9wdA=
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4dXBfS6zpGzmV69;
+	Thu, 18 Dec 2025 21:41:52 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 042711400F4;
+	Thu, 18 Dec 2025 21:44:57 +0800 (CST)
 Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 18 Dec 2025 21:44:54 +0800
+ 15.2.1544.11; Thu, 18 Dec 2025 21:44:56 +0800
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 18 Dec 2025 21:44:54 +0800
+ 15.2.1544.11; Thu, 18 Dec 2025 21:44:56 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
 	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>, <lizhi206@huawei.com>,
 	<taoqi10@huawei.com>
-Subject: [PATCH v4 02/11] crypto: hisilicon/sec - move backlog management to qp and store sqe in qp for callback
-Date: Thu, 18 Dec 2025 21:44:43 +0800
-Message-ID: <20251218134452.1125469-3-huangchenghai2@huawei.com>
+Subject: [PATCH v4 07/11] crypto: hisilicon/qm - add reference counting to queues for tfm kernel reuse
+Date: Thu, 18 Dec 2025 21:44:48 +0800
+Message-ID: <20251218134452.1125469-8-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20251218134452.1125469-1-huangchenghai2@huawei.com>
 References: <20251218134452.1125469-1-huangchenghai2@huawei.com>
@@ -60,356 +60,170 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
  kwepemq200001.china.huawei.com (7.202.195.16)
 
-When multiple tfm use a same qp, the backlog data should be managed
-centrally by the qp, rather than in the qp_ctx of each req.
+Add reference counting to queues. When all queues are occupied, tfm
+will reuse queues with the same algorithm type that have already
+been allocated in the kernel. The corresponding queue will be
+released when the reference count reaches 1.
 
-Additionally, since SEC_BD_TYPE1 and SEC_BD_TYPE2 cannot use the
-tag of the sqe to carry the virtual address of the req, the sent
-sqe is stored in the qp. This allows the callback function to get
-the req address. To handle the differences between hardware types,
-the callback functions are split into two separate implementations.
-
-Fixes: f0ae287c5045 ("crypto: hisilicon/sec2 - implement full backlog mode for sec")
+Reviewed-by: Longfang Liu <liulongfang@huawei.com>
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c              | 20 ++++-
- drivers/crypto/hisilicon/sec2/sec.h        |  7 --
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 88 +++++++++++-----------
- include/linux/hisi_acc_qm.h                |  8 ++
- 4 files changed, 69 insertions(+), 54 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 65 +++++++++++++++++++++++++++--------
+ include/linux/hisi_acc_qm.h   |  1 +
+ 2 files changed, 52 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 56bbb46f1877..4760551d4fa3 100644
+index 4cdb443e2889..3883b6176213 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -2219,6 +2219,7 @@ static void qp_stop_fail_cb(struct hisi_qp *qp)
- 	for (i = 0; i < qp_used; i++) {
- 		pos = (i + cur_head) % sq_depth;
- 		qp->req_cb(qp, qp->sqe + (u32)(qm->sqe_size * pos));
-+		qm_cq_head_update(qp);
- 		atomic_dec(&qp->qp_status.used);
- 	}
+@@ -2002,7 +2002,38 @@ static void hisi_qm_unset_hw_reset(struct hisi_qp *qp)
+ 	*addr = 0;
  }
-@@ -2383,6 +2384,7 @@ int hisi_qp_send(struct hisi_qp *qp, const void *msg)
- 		return -EBUSY;
  
- 	memcpy(sqe, msg, qp->qm->sqe_size);
-+	qp->msg[sq_tail] = msg;
- 
- 	qm_db(qp->qm, qp->qp_id, QM_DOORBELL_CMD_SQ, sq_tail_next, 0);
- 	atomic_inc(&qp->qp_status.used);
-@@ -2919,12 +2921,13 @@ EXPORT_SYMBOL_GPL(hisi_qm_wait_task_finish);
- static void hisi_qp_memory_uninit(struct hisi_qm *qm, int num)
- {
- 	struct device *dev = &qm->pdev->dev;
--	struct qm_dma *qdma;
+-static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type)
++static struct hisi_qp *find_shareable_qp(struct hisi_qm *qm, u8 alg_type, bool is_in_kernel)
++{
++	struct device *dev = &qm->pdev->dev;
++	struct hisi_qp *share_qp = NULL;
 +	struct hisi_qp *qp;
- 	int i;
- 
- 	for (i = num - 1; i >= 0; i--) {
--		qdma = &qm->qp_array[i].qdma;
--		dma_free_coherent(dev, qdma->size, qdma->va, qdma->dma);
++	u32 ref_count = ~0;
++	int i;
++
++	if (!is_in_kernel)
++		goto queues_busy;
++
++	for (i = 0; i < qm->qp_num; i++) {
 +		qp = &qm->qp_array[i];
-+		dma_free_coherent(dev, qp->qdma.size, qp->qdma.va, qp->qdma.dma);
-+		kfree(qp->msg);
- 		kfree(qm->poll_data[i].qp_finish_id);
- 	}
- 
-@@ -2946,10 +2949,14 @@ static int hisi_qp_memory_init(struct hisi_qm *qm, size_t dma_size, int id,
- 		return -ENOMEM;
- 
- 	qp = &qm->qp_array[id];
-+	qp->msg = kmalloc_array(sq_depth, sizeof(void *), GFP_KERNEL);
-+	if (!qp->msg)
-+		goto err_free_qp_finish_id;
++		if (qp->is_in_kernel && qp->alg_type == alg_type && qp->ref_count < ref_count) {
++			ref_count = qp->ref_count;
++			share_qp = qp;
++		}
++	}
 +
- 	qp->qdma.va = dma_alloc_coherent(dev, dma_size, &qp->qdma.dma,
- 					 GFP_KERNEL);
- 	if (!qp->qdma.va)
--		goto err_free_qp_finish_id;
-+		goto err_free_qp_msg;
- 
- 	qp->sqe = qp->qdma.va;
- 	qp->sqe_dma = qp->qdma.dma;
-@@ -2961,8 +2968,13 @@ static int hisi_qp_memory_init(struct hisi_qm *qm, size_t dma_size, int id,
- 	qp->qm = qm;
- 	qp->qp_id = id;
- 
-+	spin_lock_init(&qp->backlog.lock);
-+	INIT_LIST_HEAD(&qp->backlog.list);
++	if (share_qp) {
++		share_qp->ref_count++;
++		return share_qp;
++	}
 +
- 	return 0;
- 
-+err_free_qp_msg:
-+	kfree(qp->msg);
- err_free_qp_finish_id:
- 	kfree(qm->poll_data[id].qp_finish_id);
- 	return ret;
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 81d0beda93b2..0710977861f3 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -82,11 +82,6 @@ struct sec_aead_req {
- 	__u8 out_mac_buf[SEC_MAX_MAC_LEN];
- };
- 
--struct sec_instance_backlog {
--	struct list_head list;
--	spinlock_t lock;
--};
--
- /* SEC request of Crypto */
- struct sec_req {
- 	union {
-@@ -112,7 +107,6 @@ struct sec_req {
- 	bool use_pbuf;
- 
- 	struct list_head list;
--	struct sec_instance_backlog *backlog;
- 	struct sec_request_buf buf;
- };
- 
-@@ -172,7 +166,6 @@ struct sec_qp_ctx {
- 	spinlock_t id_lock;
- 	struct hisi_acc_sgl_pool *c_in_pool;
- 	struct hisi_acc_sgl_pool *c_out_pool;
--	struct sec_instance_backlog backlog;
- 	u16 send_head;
- };
- 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 31590d01139a..4e41235116e1 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -54,7 +54,6 @@
- #define SEC_AUTH_CIPHER_V3	0x40
- #define SEC_FLAG_OFFSET		7
- #define SEC_FLAG_MASK		0x0780
--#define SEC_TYPE_MASK		0x0F
- #define SEC_DONE_MASK		0x0001
- #define SEC_ICV_MASK		0x000E
- 
-@@ -148,7 +147,7 @@ static void sec_free_req_id(struct sec_req *req)
- 	spin_unlock_bh(&qp_ctx->id_lock);
- }
- 
--static u8 pre_parse_finished_bd(struct bd_status *status, void *resp)
-+static void pre_parse_finished_bd(struct bd_status *status, void *resp)
- {
- 	struct sec_sqe *bd = resp;
- 
-@@ -158,11 +157,9 @@ static u8 pre_parse_finished_bd(struct bd_status *status, void *resp)
- 					SEC_FLAG_MASK) >> SEC_FLAG_OFFSET;
- 	status->tag = le16_to_cpu(bd->type2.tag);
- 	status->err_type = bd->type2.error_type;
--
--	return bd->type_cipher_auth & SEC_TYPE_MASK;
- }
- 
--static u8 pre_parse_finished_bd3(struct bd_status *status, void *resp)
-+static void pre_parse_finished_bd3(struct bd_status *status, void *resp)
- {
- 	struct sec_sqe3 *bd3 = resp;
- 
-@@ -172,8 +169,6 @@ static u8 pre_parse_finished_bd3(struct bd_status *status, void *resp)
- 					SEC_FLAG_MASK) >> SEC_FLAG_OFFSET;
- 	status->tag = le64_to_cpu(bd3->tag);
- 	status->err_type = bd3->error_type;
--
--	return le32_to_cpu(bd3->bd_param) & SEC_TYPE_MASK;
- }
- 
- static int sec_cb_status_check(struct sec_req *req,
-@@ -244,7 +239,7 @@ static void sec_alg_send_backlog_soft(struct sec_ctx *ctx, struct sec_qp_ctx *qp
- 	struct sec_req *req, *tmp;
- 	int ret;
- 
--	list_for_each_entry_safe(req, tmp, &qp_ctx->backlog.list, list) {
-+	list_for_each_entry_safe(req, tmp, &qp_ctx->qp->backlog.list, list) {
- 		list_del(&req->list);
- 		ctx->req_op->buf_unmap(ctx, req);
- 		if (req->req_id >= 0)
-@@ -265,11 +260,12 @@ static void sec_alg_send_backlog_soft(struct sec_ctx *ctx, struct sec_qp_ctx *qp
- 
- static void sec_alg_send_backlog(struct sec_ctx *ctx, struct sec_qp_ctx *qp_ctx)
- {
-+	struct hisi_qp *qp = qp_ctx->qp;
- 	struct sec_req *req, *tmp;
- 	int ret;
- 
--	spin_lock_bh(&qp_ctx->backlog.lock);
--	list_for_each_entry_safe(req, tmp, &qp_ctx->backlog.list, list) {
-+	spin_lock_bh(&qp->backlog.lock);
-+	list_for_each_entry_safe(req, tmp, &qp->backlog.list, list) {
- 		ret = qp_send_message(req);
- 		switch (ret) {
- 		case -EINPROGRESS:
-@@ -287,42 +283,46 @@ static void sec_alg_send_backlog(struct sec_ctx *ctx, struct sec_qp_ctx *qp_ctx)
- 	}
- 
- unlock:
--	spin_unlock_bh(&qp_ctx->backlog.lock);
-+	spin_unlock_bh(&qp->backlog.lock);
- }
- 
- static void sec_req_cb(struct hisi_qp *qp, void *resp)
- {
--	struct sec_qp_ctx *qp_ctx = qp->qp_ctx;
--	struct sec_dfx *dfx = &qp_ctx->ctx->sec->debug.dfx;
--	u8 type_supported = qp_ctx->ctx->type_supported;
-+	const struct sec_sqe *sqe = qp->msg[qp->qp_status.cq_head];
-+	struct sec_req *req = container_of(sqe, struct sec_req, sec_sqe);
-+	struct sec_ctx *ctx = req->ctx;
-+	struct sec_dfx *dfx = &ctx->sec->debug.dfx;
- 	struct bd_status status;
--	struct sec_ctx *ctx;
--	struct sec_req *req;
- 	int err;
--	u8 type;
- 
--	if (type_supported == SEC_BD_TYPE2) {
--		type = pre_parse_finished_bd(&status, resp);
--		req = qp_ctx->req_list[status.tag];
--	} else {
--		type = pre_parse_finished_bd3(&status, resp);
--		req = (void *)(uintptr_t)status.tag;
--	}
-+	pre_parse_finished_bd(&status, resp);
- 
--	if (unlikely(type != type_supported)) {
--		atomic64_inc(&dfx->err_bd_cnt);
--		pr_err("err bd type [%u]\n", type);
--		return;
--	}
-+	req->err_type = status.err_type;
-+	err = sec_cb_status_check(req, &status);
-+	if (err)
-+		atomic64_inc(&dfx->done_flag_cnt);
- 
--	if (unlikely(!req)) {
--		atomic64_inc(&dfx->invalid_req_cnt);
--		atomic_inc(&qp->qp_status.used);
--		return;
--	}
-+	atomic64_inc(&dfx->recv_cnt);
- 
-+	ctx->req_op->buf_unmap(ctx, req);
-+	ctx->req_op->callback(ctx, req, err);
++queues_busy:
++	dev_info_ratelimited(dev, "All %u queues of QM are busy and no shareable queue\n",
++			     qm->qp_num);
++	atomic64_inc(&qm->debug.dfx.create_qp_err_cnt);
++	return ERR_PTR(-EBUSY);
 +}
 +
-+static void sec_req_cb3(struct hisi_qp *qp, void *resp)
-+{
-+	struct bd_status status;
-+	struct sec_ctx *ctx;
-+	struct sec_dfx *dfx;
-+	struct sec_req *req;
-+	int err;
-+
-+	pre_parse_finished_bd3(&status, resp);
-+
-+	req = (void *)(uintptr_t)status.tag;
- 	req->err_type = status.err_type;
- 	ctx = req->ctx;
-+	dfx = &ctx->sec->debug.dfx;
-+
- 	err = sec_cb_status_check(req, &status);
- 	if (err)
- 		atomic64_inc(&dfx->done_flag_cnt);
-@@ -330,7 +330,6 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
- 	atomic64_inc(&dfx->recv_cnt);
- 
- 	ctx->req_op->buf_unmap(ctx, req);
--
- 	ctx->req_op->callback(ctx, req, err);
- }
- 
-@@ -348,8 +347,10 @@ static int sec_alg_send_message_retry(struct sec_req *req)
- 
- static int sec_alg_try_enqueue(struct sec_req *req)
++static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type, bool is_in_kernel)
  {
-+	struct hisi_qp *qp = req->qp_ctx->qp;
-+
- 	/* Check if any request is already backlogged */
--	if (!list_empty(&req->backlog->list))
-+	if (!list_empty(&qp->backlog.list))
- 		return -EBUSY;
+ 	struct device *dev = &qm->pdev->dev;
+ 	struct hisi_qp *qp;
+@@ -2013,12 +2044,9 @@ static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type)
+ 		return ERR_PTR(-EPERM);
+ 	}
  
- 	/* Try to enqueue to HW ring */
-@@ -359,17 +360,18 @@ static int sec_alg_try_enqueue(struct sec_req *req)
+-	if (qm->qp_in_used == qm->qp_num) {
+-		dev_info_ratelimited(dev, "All %u queues of QM are busy!\n",
+-				     qm->qp_num);
+-		atomic64_inc(&qm->debug.dfx.create_qp_err_cnt);
+-		return ERR_PTR(-EBUSY);
+-	}
++	/* Try to find a shareable queue when all queues are busy */
++	if (qm->qp_in_used == qm->qp_num)
++		return find_shareable_qp(qm, alg_type, is_in_kernel);
  
- static int sec_alg_send_message_maybacklog(struct sec_req *req)
- {
-+	struct hisi_qp *qp = req->qp_ctx->qp;
- 	int ret;
+ 	qp_id = idr_alloc_cyclic(&qm->qp_idr, NULL, 0, qm->qp_num, GFP_ATOMIC);
+ 	if (qp_id < 0) {
+@@ -2034,10 +2062,10 @@ static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type)
  
- 	ret = sec_alg_try_enqueue(req);
- 	if (ret != -EBUSY)
- 		return ret;
+ 	qp->event_cb = NULL;
+ 	qp->req_cb = NULL;
+-	qp->qp_id = qp_id;
+ 	qp->alg_type = alg_type;
+-	qp->is_in_kernel = true;
++	qp->is_in_kernel = is_in_kernel;
+ 	qm->qp_in_used++;
++	qp->ref_count = 1;
  
--	spin_lock_bh(&req->backlog->lock);
-+	spin_lock_bh(&qp->backlog.lock);
- 	ret = sec_alg_try_enqueue(req);
- 	if (ret == -EBUSY)
--		list_add_tail(&req->list, &req->backlog->list);
--	spin_unlock_bh(&req->backlog->lock);
-+		list_add_tail(&req->list, &qp->backlog.list);
-+	spin_unlock_bh(&qp->backlog.lock);
- 
- 	return ret;
+ 	return qp;
  }
-@@ -629,13 +631,14 @@ static int sec_create_qp_ctx(struct sec_ctx *ctx, int qp_ctx_id)
- 	qp_ctx->qp = qp;
- 	qp_ctx->ctx = ctx;
+@@ -2059,7 +2087,7 @@ static struct hisi_qp *hisi_qm_create_qp(struct hisi_qm *qm, u8 alg_type)
+ 		return ERR_PTR(ret);
  
--	qp->req_cb = sec_req_cb;
-+	if (ctx->type_supported == SEC_BD_TYPE3)
-+		qp->req_cb = sec_req_cb3;
-+	else
-+		qp->req_cb = sec_req_cb;
+ 	down_write(&qm->qps_lock);
+-	qp = qm_create_qp_nolock(qm, alg_type);
++	qp = qm_create_qp_nolock(qm, alg_type, false);
+ 	up_write(&qm->qps_lock);
  
- 	spin_lock_init(&qp_ctx->req_lock);
- 	idr_init(&qp_ctx->req_idr);
--	spin_lock_init(&qp_ctx->backlog.lock);
- 	spin_lock_init(&qp_ctx->id_lock);
--	INIT_LIST_HEAD(&qp_ctx->backlog.list);
- 	qp_ctx->send_head = 0;
- 
- 	ret = sec_alloc_qp_ctx_resource(ctx, qp_ctx);
-@@ -1952,7 +1955,6 @@ static int sec_request_init(struct sec_ctx *ctx, struct sec_req *req)
- 	} while (req->req_id < 0 && ++i < ctx->sec->ctx_q_num);
- 
- 	req->qp_ctx = qp_ctx;
--	req->backlog = &qp_ctx->backlog;
+ 	if (IS_ERR(qp))
+@@ -2458,7 +2486,6 @@ static int hisi_qm_uacce_get_queue(struct uacce_device *uacce,
+ 	qp->uacce_q = q;
+ 	qp->event_cb = qm_qp_event_notifier;
+ 	qp->pasid = arg;
+-	qp->is_in_kernel = false;
  
  	return 0;
  }
+@@ -3532,6 +3559,9 @@ static void qm_release_qp_nolock(struct hisi_qp *qp)
+ {
+ 	struct hisi_qm *qm = qp->qm;
+ 
++	if (--qp->ref_count)
++		return;
++
+ 	qm->qp_in_used--;
+ 	idr_remove(&qm->qp_idr, qp->qp_id);
+ }
+@@ -3551,7 +3581,9 @@ void hisi_qm_free_qps(struct hisi_qp **qps, int qp_num)
+ 	down_write(&qps[0]->qm->qps_lock);
+ 
+ 	for (i = qp_num - 1; i >= 0; i--) {
+-		qm_stop_qp_nolock(qps[i]);
++		if (qps[i]->ref_count == 1)
++			qm_stop_qp_nolock(qps[i]);
++
+ 		qm_release_qp_nolock(qps[i]);
+ 	}
+ 
+@@ -3580,12 +3612,15 @@ static int qm_get_and_start_qp(struct hisi_qm *qm, int qp_num, struct hisi_qp **
+ 
+ 	down_write(&qm->qps_lock);
+ 	for (i = 0; i < qp_num; i++) {
+-		qps[i] = qm_create_qp_nolock(qm, alg_type[i]);
++		qps[i] = qm_create_qp_nolock(qm, alg_type[i], true);
+ 		if (IS_ERR(qps[i])) {
+ 			ret = -ENODEV;
+ 			goto stop_and_free;
+ 		}
+ 
++		if (qps[i]->ref_count != 1)
++			continue;
++
+ 		ret = qm_start_qp_nolock(qps[i], 0);
+ 		if (ret) {
+ 			qm_release_qp_nolock(qps[i]);
+@@ -3598,7 +3633,9 @@ static int qm_get_and_start_qp(struct hisi_qm *qm, int qp_num, struct hisi_qp **
+ 
+ stop_and_free:
+ 	for (i--; i >= 0; i--) {
+-		qm_stop_qp_nolock(qps[i]);
++		if (qps[i]->ref_count == 1)
++			qm_stop_qp_nolock(qps[i]);
++
+ 		qm_release_qp_nolock(qps[i]);
+ 	}
+ 	up_write(&qm->qps_lock);
 diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-index c4690e365ade..2d0cc61ed886 100644
+index 4cf418a41fe4..26032d98e9bd 100644
 --- a/include/linux/hisi_acc_qm.h
 +++ b/include/linux/hisi_acc_qm.h
-@@ -444,6 +444,11 @@ struct hisi_qp_ops {
- 	int (*fill_sqe)(void *sqe, void *q_parm, void *d_parm);
- };
- 
-+struct instance_backlog {
-+	struct list_head list;
-+	spinlock_t lock;
-+};
-+
- struct hisi_qp {
- 	u32 qp_id;
- 	u16 sq_depth;
-@@ -468,6 +473,9 @@ struct hisi_qp {
- 	bool is_in_kernel;
+@@ -472,6 +472,7 @@ struct hisi_qp {
  	u16 pasid;
  	struct uacce_queue *uacce_q;
-+
-+	struct instance_backlog backlog;
-+	const void **msg;
- };
  
- static inline int vfs_num_set(const char *val, const struct kernel_param *kp)
++	u32 ref_count;
+ 	spinlock_t qp_lock;
+ 	struct instance_backlog backlog;
+ 	const void **msg;
 -- 
 2.33.0
 
