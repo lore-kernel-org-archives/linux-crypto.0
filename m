@@ -1,183 +1,108 @@
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B23330B3B
-	for <linux-crypto@vger.kernel.org>; Thu, 18 Dec 2025 07:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B002749CB
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Dec 2025 10:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766042505; cv=none; b=FvEUd8mEJkB+QurljEV0h3edAwup04t+DsmklBkNcdLy24I2hfkUgBNNSdWwsKhs370741+bgrZubvJ6BEFhs3CY9v3nWP5Giu2LvQ+SgZNEuWBql5qfPPpoH1YiUUroiQlGbk+3VdgekmyfOu1NB2/WjXpGxmD2H3EdF1SkdDE=
+	t=1766052069; cv=none; b=YfbjxCHT8f3WanJkOcm1AvzBL/ZN/n46P8/J7zHwmOZrFeSi/mVTxSUemCLpErOR5airAdtBnG6K0KGKTJWO88ZEl/Wo8u55ySnLLLYQJWdoa/TCvoPNZ4tqDLXRSYyKZ+VQgn7NIEfF5q/kKthqVbscp3VmKOaLQttisKE5Qss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766042505; c=relaxed/simple;
-	bh=oRDVeoSH7AN/+1EKf418Edx8/qjw/FEB71Hmt8IhBro=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZJIgjNSkw0GtzsmS9npIIzbqR8oui5jz8TiEx4oxdpltIm0jWJjiAp8qZwDci1J0cH8nKC36Gln1hyvOlsPnKS6gYxZq7hi2esqB0RdpfiJj/Ry3gkgMB0fWHg5nS1VCPW1XnxpVlXEFOS4RgtNLwJ2oNvwDDyh2mlsQ++JAzD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hFvxQjnf; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1766052069; c=relaxed/simple;
+	bh=rV8tz1xEO+OL+dWcYOVwQ13qgwbEK1Y/uc6HUrd0jAw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DBquc3E0aBUKrctWO3wZeQ9DfBOgeOECUxte2Qhdov6qFoiMChHBEzXVC9v91ioQl6D41RcIozWYfxep4p/iSYr1eV1Pt3MVQYmRjPyJyZMNa0Rh27HUCX/NjsRpbWkKC1533AYDSIititWEOegN2xu2xpiNVIdmPoMl1KmRTBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZstoOiwe; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hFvxQjnf"
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-65b73eacdfcso54702eaf.2
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 23:21:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZstoOiwe"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42fb8aa0c3eso55155f8f.3
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Dec 2025 02:01:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1766042501; x=1766647301; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u95c9TyT1XdaOnIyGBwMeLSiKMNJeuqg+7XxBfANtKE=;
-        b=hFvxQjnfCf2CUAqy40N2AHyq5MIDA0GgC5LKgr2+oJWxzVnQ/H2BlDj/PRT3fjn6YS
-         6uoMn7+YEL0+8O2LkRt30f+/2R5PDahttu121Fq4t7CeI0ECWbcDX44yZNP52rNK3/eA
-         fPojzuLnONspq5CUtSTCNO3/tkNye7HZkr84BB+Y/ocSOeYeJ03l/SmFCJB5qTJptZdQ
-         RbLfAkSfM0ummJWRnc7E8aYHqgmwBJNI/c/pFs/M401mDi2bS0euznuCTV9DcKpXnQ1t
-         H/xEDBrHcjuX6fA2f9gHgqEpAJVqBMy72GfMnDPZoRbg6fOFBpJbmBiSpijWbwGJ9Uu8
-         +Vxg==
+        d=gmail.com; s=20230601; t=1766052066; x=1766656866; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hyH9mCD6aBkhmQ77FdDtNB7q53LN9kNu+qw1jW9m6CA=;
+        b=ZstoOiwe0CccgebBMueeefr7J6tu3cXAKuGWkYpj9Aq0f692ShtXMbbzBLJ2gqZyUI
+         kBNwWriTOwuEXJv1pxTA32cVXUuR2Vp0VgCfKwktLEqpusvwr1bzbW/xS55VEM0litCI
+         ZZed4H1FgJaau/NPsTMmbdlaUsXp8qyIOE7aaaQ/Dw0hVsfcMOImW7zzX9fT7Jan5r+8
+         u4Ej6eYSNTI8g4gjqu29d7hKkrXTr+wHO1RBLZgS3SuJC3/2r/0iSEX9Q3QEhHgKFLYT
+         c7CrvYKwpEJMQXsocn/G++UJN5MuSSWGKkfptj8aoRUJ/0MAAtLhcyfffO11rob5VV1m
+         +moA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766042501; x=1766647301;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=u95c9TyT1XdaOnIyGBwMeLSiKMNJeuqg+7XxBfANtKE=;
-        b=pkNKVFffs+jPAcPXIU1oOt9s3qx3GLbAL/P9g93PzcayaOwJ8j29pg4dOi5IZC+nP8
-         1lT68bL3yYKQkSrl4wVMAL8RmrDHRztAX/LhUApOR09olbGbQY5Njqs+1g0nx0MOcqlZ
-         EewFfJsiU62K4YUU0q3XE3XOZgOP4WO2atnt6FQEIHQSqEIzvjNUaE+EPt/Jlbjlpd66
-         6MgMxyiT5FDsLen9DkhLy+U0bHHzhCbuPX3eJ6e+g+X5+pis+OYp6hI4Odbb7Ayi7VF0
-         oHv5J0dx8kjZFkyyRV0XITAyhyrlxb/FjRZvT3rbo4DCZYaY/06bi+ESex48Hy6SrgxD
-         63eA==
-X-Forwarded-Encrypted: i=1; AJvYcCUB7q1xfVRJhk0yBExPxU2BBO4yThOEthXpqLPqXA1drNBddqmM8JAzMTh/BxXGIVjBrPvC98O3//OTq5U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySIMhAu1P7Ges06/7gqYtaoeEfQKqu0tLXxKA1WBLpup9T7EDN
-	sHGaQLpt8fCOpP7AVB+1H7OFnCsqN0w/GaRK4emkJQAtBcFYTmxCGsKEnUsWwSuW1xTEVmCDZm1
-	HV3Cfdm5tLHLrt+hdTuucrAYo3FiWbdgOXN9orQbhbw==
-X-Gm-Gg: AY/fxX5FRZs5u+QSpWGf6xoJv8l9eUCvUVXFzK5AeFBwEpwitDl2gqtcDa5L94AOS3y
-	OEGES2BSdcsGegSBGx+HaS6M742woYlaAvButCqhKmhpdEPRo84uLHK76i80/fUjDqywRTNIUYC
-	yQmV3EM7wpQ7K3DhY1RgSxOGoM++8KHd1w+E3/CFIn4tXN3vziNi1UnwnE+jQVgPsDQt67vBENX
-	Ifv2OdAyLlt4uqZgREbmcDExbW7wHqCc5afoOD3IQHg5AVdr4aD4nXqc4xXa+nLY7jDxFIkRX2R
-	Vrp5je2ZDKPoblagvmOAK4p8wQ==
-X-Google-Smtp-Source: AGHT+IHdzsrnh67Z+uk7sg0iAMocZMySikku48EGz5g7L5MG+hq7iSRlseyY2l5vM8LHePwozU/hD6rMNUuAq73AgFc=
-X-Received: by 2002:a05:6820:828:b0:65c:f41b:7119 with SMTP id
- 006d021491bc7-65cf41b750emr1784992eaf.5.1766042500598; Wed, 17 Dec 2025
- 23:21:40 -0800 (PST)
+        d=1e100.net; s=20230601; t=1766052066; x=1766656866;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hyH9mCD6aBkhmQ77FdDtNB7q53LN9kNu+qw1jW9m6CA=;
+        b=DpCYF47sU3B5YL2WbRDQXJKQnmSS+ATJ7w07CGYu70330nCRzX0PLwTIT++Sm46CCT
+         75KsnXfrRUbKVw01hc93MQ66izNJcwKdkEa/OQOuuEYjc1CR6kdijXIp8Os3N+4b0EOO
+         GQtwVDcFC5q56hEV6Uy0vwePBOy3AfZKdemswAQxVtVA8N9qSYuBJkEz1azjbm67wcYN
+         2BlE83iOPQOtnbro54gxAV9RXsJZZDeKu4/miziFvCfQkI2exgoQ9rnpPU2vkFDsqt1i
+         o7QziWlGtZRAu0FK6Q4s0hyrQjOPkGNkZiFD5BRggGoLq0pq8rL0fRXM2QOdIYxdow9t
+         O1WA==
+X-Forwarded-Encrypted: i=1; AJvYcCVOrfYsBYdtDL6076wt3njkg1SjJV6igvd33O/vvRSFXE6BC39ec7oS1uL4Ovr9RzLREhIQ+Y2lMPurI7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2ZICeIfTIE8t7i43Cq75CwZ+a8MPFjIJjZxdhPB2pL58tfHQr
+	jS0989LDumst6KFu0fHCqVqy6mnvfWTt0H+mnSzdE+UqPNZ1SXvvuqtQ
+X-Gm-Gg: AY/fxX7IbZc7t+aV5Wt5qj6e6wShH2JFfw7bly9jDyCYm3pygBRZpGoP73n2udR5HVj
+	yNzV5yNwhDP1Gl1gAIhCBMQXLP+8YZVpX2X14P37FQrOX8B87BVDLdWdDXtPW1Vsl4c5v4h2jWI
+	Js8GEC0xcJVVw0HwIE1+ULUVPv6GqKtJR2KJBH1c7MWy/2TT+Nl5w5YtLy9BDBEU0/K/cHwl9mA
+	RpgufYrqQZn7VHmTow79EsZUWCYlH1Zj8iS1D5ACzdr9hZaqlH3HFdH6nvKEpivhkwi8FIS0jmP
+	uxl33h07o8dNZq/kuW5Iqs7bTPztiCN+mBYDifyyU4JyWBgB2UDd+pFRttMiJATPYl8Sx+E4D3p
+	/wWF/Ipa8wj+LIK20G4wi7DpQUtBlB1NRZ+1O3ILTkFYqkPc9p3RMN1ilDyqpzi9xM6WVR9oozd
+	nfTqGbp3J9+BVP4YXmEL7i3Pjo9tRizz4clBUXkbbbhFGOiDfmrMzCdZnNYmzCXiGe4Y+vIM594
+	rdzuw==
+X-Google-Smtp-Source: AGHT+IH2kKiYVsC8VRgBFg/O6dYGfFsrX+sxtbv8Pi0OZYXzYmUTA43kfU9pFEM/m3xMKliT2y9c0Q==
+X-Received: by 2002:a5d:5d85:0:b0:42b:3e20:f1b1 with SMTP id ffacd0b85a97d-4324667044bmr1118271f8f.2.1766052066121;
+        Thu, 18 Dec 2025 02:01:06 -0800 (PST)
+Received: from thomas-precision3591.. (cust-east-par-46-193-67-14.cust.wifirst.net. [46.193.67.14])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-43244999336sm4025225f8f.36.2025.12.18.02.01.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Dec 2025 02:01:05 -0800 (PST)
+From: Thomas Fourier <fourier.thomas@gmail.com>
+To: 
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
+	George Cherian <gcherian@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Daney <david.daney@cavium.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: cavium: fix dma_free_coherent() size
+Date: Thu, 18 Dec 2025 10:56:45 +0100
+Message-ID: <20251218095647.45214-2-fourier.thomas@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
-In-Reply-To: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
-From: Jens Wiklander <jens.wiklander@linaro.org>
-Date: Thu, 18 Dec 2025 08:21:27 +0100
-X-Gm-Features: AQt7F2r_j21Nqcv1IzhOT6jk9UPtvnwA1D3etXiTv5WveGJRYXXMC9qqoGF_Yc4
-Message-ID: <CAHUa44FrDZbvRvfN8obf80_k=Eqxe9YxHpjaE5jU7nkxPUwfag@mail.gmail.com>
-Subject: Re: [PATCH v2 00/17] tee: Use bus callbacks instead of driver callbacks
-To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Sumit Garg <sumit.garg@kernel.org>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Sumit Garg <sumit.garg@oss.qualcomm.com>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
-	=?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, 
-	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
-	James Bottomley <James.Bottomley@hansenpartnership.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-efi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, 
-	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, 
-	linux-mips@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi,
+The size of the buffer in alloc_command_queues() is
+curr->size + CPT_NEXT_CHUNK_PTR_SIZE, so used that length for
+dma_free_coherent().
 
-On Mon, Dec 15, 2025 at 3:17=E2=80=AFPM Uwe Kleine-K=C3=B6nig
-<u.kleine-koenig@baylibre.com> wrote:
->
-> Hello,
->
-> the objective of this series is to make tee driver stop using callbacks
-> in struct device_driver. These were superseded by bus methods in 2006
-> (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
-> methods.")) but nobody cared to convert all subsystems accordingly.
->
-> Here the tee drivers are converted. The first commit is somewhat
-> unrelated, but simplifies the conversion (and the drivers). It
-> introduces driver registration helpers that care about setting the bus
-> and owner. (The latter is missing in all drivers, so by using these
-> helpers the drivers become more correct.)
->
-> v1 of this series is available at
-> https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koenig@baylibre=
-.com
->
-> Changes since v1:
->
->  - rebase to v6.19-rc1 (no conflicts)
->  - add tags received so far
->  - fix whitespace issues pointed out by Sumit Garg
->  - fix shutdown callback to shutdown and not remove
->
-> As already noted in v1's cover letter, this series should go in during a
-> single merge window as there are runtime warnings when the series is
-> only applied partially. Sumit Garg suggested to apply the whole series
-> via Jens Wiklander's tree.
-> If this is done the dependencies in this series are honored, in case the
-> plan changes: Patches #4 - #17 depend on the first two.
->
-> Note this series is only build tested.
->
-> Uwe Kleine-K=C3=B6nig (17):
->   tee: Add some helpers to reduce boilerplate for tee client drivers
->   tee: Add probe, remove and shutdown bus callbacks to tee_client_driver
->   tee: Adapt documentation to cover recent additions
->   hwrng: optee - Make use of module_tee_client_driver()
->   hwrng: optee - Make use of tee bus methods
->   rtc: optee: Migrate to use tee specific driver registration function
->   rtc: optee: Make use of tee bus methods
->   efi: stmm: Make use of module_tee_client_driver()
->   efi: stmm: Make use of tee bus methods
->   firmware: arm_scmi: optee: Make use of module_tee_client_driver()
->   firmware: arm_scmi: Make use of tee bus methods
->   firmware: tee_bnxt: Make use of module_tee_client_driver()
->   firmware: tee_bnxt: Make use of tee bus methods
->   KEYS: trusted: Migrate to use tee specific driver registration
->     function
->   KEYS: trusted: Make use of tee bus methods
->   tpm/tpm_ftpm_tee: Make use of tee specific driver registration
->   tpm/tpm_ftpm_tee: Make use of tee bus methods
->
->  Documentation/driver-api/tee.rst             | 18 +----
->  drivers/char/hw_random/optee-rng.c           | 26 ++----
->  drivers/char/tpm/tpm_ftpm_tee.c              | 31 +++++---
->  drivers/firmware/arm_scmi/transports/optee.c | 32 +++-----
->  drivers/firmware/broadcom/tee_bnxt_fw.c      | 30 ++-----
->  drivers/firmware/efi/stmm/tee_stmm_efi.c     | 25 ++----
->  drivers/rtc/rtc-optee.c                      | 27 ++-----
->  drivers/tee/tee_core.c                       | 84 ++++++++++++++++++++
->  include/linux/tee_drv.h                      | 12 +++
->  security/keys/trusted-keys/trusted_tee.c     | 17 ++--
->  10 files changed, 164 insertions(+), 138 deletions(-)
->
-> base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
-> --
-> 2.47.3
->
+Fixes: c694b233295b ("crypto: cavium - Add the Virtual Function driver for CPT")
+Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+---
+ drivers/crypto/cavium/cpt/cptvf_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Thank you for the nice cleanup, Uwe.
+diff --git a/drivers/crypto/cavium/cpt/cptvf_main.c b/drivers/crypto/cavium/cpt/cptvf_main.c
+index c246920e6f54..bccd680c7f7e 100644
+--- a/drivers/crypto/cavium/cpt/cptvf_main.c
++++ b/drivers/crypto/cavium/cpt/cptvf_main.c
+@@ -180,7 +180,8 @@ static void free_command_queues(struct cpt_vf *cptvf,
+ 
+ 		hlist_for_each_entry_safe(chunk, node, &cqinfo->queue[i].chead,
+ 					  nextchunk) {
+-			dma_free_coherent(&pdev->dev, chunk->size,
++			dma_free_coherent(&pdev->dev,
++					  chunk->size + CPT_NEXT_CHUNK_PTR_SIZE,
+ 					  chunk->head,
+ 					  chunk->dma_addr);
+ 			chunk->head = NULL;
+-- 
+2.43.0
 
-I've applied patch 1-3 to the branch tee_bus_callback_for_6.20 in my
-tree at https://git.kernel.org/pub/scm/linux/kernel/git/jenswi/linux-tee.gi=
-t/
-
-The branch is based on v6.19-rc1, and I'll try to keep it stable for
-others to depend on, if needed. Let's see if we can agree on taking
-the remaining patches via that branch.
-
-Cheers,
-Jens
