@@ -1,88 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A133101A6;
-	Wed, 17 Dec 2025 23:57:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100171BC41;
+	Thu, 18 Dec 2025 03:48:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766015867; cv=none; b=P9DFcyCam3tO9uik/YcaXjfNgUBRSQxziPUscboWhvFUF0LQ77Pf7QaKYL+lD2oT5P7imuucYxKtDg1Hbzyyq22g/SfbAsw2JGe+0vm1PEBjk80uLu5/xS/v258A9JhKCMpocbTguzP6pgm7BDAzXci1kPsVPNs20i+sYyhWZtU=
+	t=1766029736; cv=none; b=QVjQBPOpuyQgqirvTsri3WRFhT3wwnz53ok8mCjL8eWCR65agC1Lo/uAqmO7ZNXXIE1/TfoCPO8pHyxMEuYaY+yS7eqfLsjeFU8y5UEIqodthdWtst9jLvuPItSCJtCMZzlhb0qHtePJb+bnLn+keWww7RoyTmifmNl07jXseAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766015867; c=relaxed/simple;
-	bh=0MQVXoPZt5do7P7n7SWEqJce27v0zvKvJL9bInS7rq8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZV7VyIv2cRbWIos8tbU9w25WWL18iPq5jGvGE7UjrhefK30kK/dDFt+A1nRhVm6aB4JtYwV9MOBqBeqZvkC9LRdZOyBWkA95qAv5/jZjxFZ+jjtDtlhyqJnl9F1NScSN9cVowZTOiU9q1haK5S/Kx8P80GYkZUtUr7XieVBMG5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tmvs+vBw; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tmvs+vBw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2DD9C116B1;
-	Wed, 17 Dec 2025 23:57:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766015867;
-	bh=0MQVXoPZt5do7P7n7SWEqJce27v0zvKvJL9bInS7rq8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Tmvs+vBwefHZC9rjP+BGSEP17ne6/SUGvmaWPwJBCbaZDsD6B0hD5asyuttFy8DDB
-	 dcepLRaU0vSmdShbQQ08Ha2vL4NikBEfQrAauMYcdwbIW3isXkeAG0vodfXAKqtlOH
-	 K2FcjPDA4jvy13wI5uFtP457OWac2Hp9yJz5rxHl7MU1FomkqFpHWqvUU19ngGE5Wp
-	 JyA0dmvPcR/cw3WbdmMdmF5ZVCVxlW3UZlUWqkn30iqNi+iOhUGJ8HjIRv6O8Lw57F
-	 tz9XdIE717X1a2YUKkqX/j96+ytsa7zSj+zglN5rpms/D/xHvGaXj+ookfgsWd+Bu5
-	 5EzV2ZdNf9p5A==
-Date: Wed, 17 Dec 2025 23:57:45 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ross Philipson <ross.philipson@oracle.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Jason@zx2c4.com, ardb@kernel.org, dpsmith@apertussolutions.com,
-	kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
-	trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH] crypto: lib/sha1 - use __DISABLE_EXPORTS for SHA1 library
-Message-ID: <20251217235745.GB89113@google.com>
-References: <20251217233826.1761939-1-ross.philipson@oracle.com>
+	s=arc-20240116; t=1766029736; c=relaxed/simple;
+	bh=wjhukzpgs+nKN0frMUJJQ6K21ijDNh4XlpkkPYIBn74=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AIfVeJaOu6LAqTZ7PQRsOLiY28z0SzX8SaT/16IZpcd+0B9DiDPAYsgCoIZLUesNt84FUbrV6meUra3PHTyPnumRcYu9+0j/w2jMX69c1hf+MN+SA9Oohy8Q8Rbo1EwxXe+TahjHFfIc1jDBbT6dAl6/f3ctS0OckHm2CvNz0lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8DxvsOgeUNpZVwAAA--.1747S3;
+	Thu, 18 Dec 2025 11:48:48 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowJBx68GfeUNpvy4BAA--.2184S2;
+	Thu, 18 Dec 2025 11:48:48 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Gonglei <arei.gonglei@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH v4 0/9] crypto: virtio: Some bugfix and enhancement
+Date: Thu, 18 Dec 2025 11:48:37 +0800
+Message-Id: <20251218034846.948860-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251217233826.1761939-1-ross.philipson@oracle.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJBx68GfeUNpvy4BAA--.2184S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On Wed, Dec 17, 2025 at 03:38:26PM -0800, Ross Philipson wrote:
-> Allow the SHA1 library code in lib/crypto/sha1.c to be used in a pre-boot
-> environments. Use the __DISABLE_EXPORTS macro to disable function exports and
-> define the proper values for that environment as was done earlier for SHA256.
-> 
-> This issue was brought up during the review of the Secure Launch v15 patches
-> that use SHA1 in a pre-boot environment (link in tags below). This is being
-> sent as a standalone patch to address this.
-> 
-> Link: https://lore.kernel.org/r/20251216002150.GA11579@quark
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
-> ---
->  lib/crypto/sha1.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/crypto/sha1.c b/lib/crypto/sha1.c
-> index 52788278cd17..e5a9e1361058 100644
-> --- a/lib/crypto/sha1.c
-> +++ b/lib/crypto/sha1.c
-> @@ -154,7 +154,7 @@ static void __maybe_unused sha1_blocks_generic(struct sha1_block_state *state,
->  	memzero_explicit(workspace, sizeof(workspace));
->  }
->  
-> -#ifdef CONFIG_CRYPTO_LIB_SHA1_ARCH
-> +#if defined(CONFIG_CRYPTO_LIB_SHA1_ARCH) && !defined(__DISABLE_EXPORTS)
->  #include "sha1.h" /* $(SRCARCH)/sha1.h */
->  #else
->  #define sha1_blocks sha1_blocks_generic
+There is problem when multiple processes add encrypt/decrypt requests
+with virtio crypto device and spinlock is missing with command response
+handling. Also there is duplicated virtqueue_kick() without lock hold.
 
-Shouldn't this be part of the patchset that needs this?
+Here these two issues are fixed and the others are code clean up, such as
+use common APIs for block size and iv size etc.
 
-Also, when __DISABLE_EXPORTS is defined, only the functionality actually
-used by pre-boot environments should be included.  HMAC support for
-example probably isn't needed.
+---
+v3 ... v4:
+  1. Remove patch 10 which adds ECB AES algo, since application and qemu
+     backend emulation is not ready for ECB AES algo.
+  2. Add Cc stable tag with patch 2 which removes duplicated
+     virtqueue_kick() without lock hold.
 
-The commit title is also misleading.  How about:
-"lib/crypto: sha1: Add support for pre-boot environments".
+v2 ... v3:
+  1. Remove NULL checking with req_data where kfree() is called, since
+     NULL pointer is workable with kfree() API.
+  2. In patch 7 and patch 8, req_data and IV buffer which are preallocated
+     are sensitive data, memzero_explicit() is used even on error path
+     handling.
+  3. Remove duplicated virtqueue_kick() in new patch 2, since it is
+     already called in previous __virtio_crypto_skcipher_do_req().
 
-- Eric
+v1 ... v2:
+  1. Add Fixes tag with patch 1.
+  2. Add new patch 2 - patch 9 to add ecb aes algo support.
+---
+Bibo Mao (9):
+  crypto: virtio: Add spinlock protection with virtqueue notification
+  crypto: virtio: Remove duplicated virtqueue_kick in
+    virtio_crypto_skcipher_crypt_req
+  crypto: virtio: Replace package id with numa node id
+  crypto: virtio: Add algo pointer in virtio_crypto_skcipher_ctx
+  crypto: virtio: Use generic API aes_check_keylen()
+  crypto: virtio: Remove AES specified marcro AES_BLOCK_SIZE
+  crypto: virtio: Add req_data with structure virtio_crypto_sym_request
+  crypto: virtio: Add IV buffer in structure virtio_crypto_sym_request
+  crypto: virtio: Add skcipher support without IV
+
+ drivers/crypto/virtio/virtio_crypto_common.h  |   2 +-
+ drivers/crypto/virtio/virtio_crypto_core.c    |   5 +
+ .../virtio/virtio_crypto_skcipher_algs.c      | 113 +++++++++---------
+ 3 files changed, 62 insertions(+), 58 deletions(-)
+
+
+base-commit: ea1013c1539270e372fc99854bc6e4d94eaeff66
+-- 
+2.39.3
+
