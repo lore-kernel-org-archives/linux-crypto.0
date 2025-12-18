@@ -1,51 +1,51 @@
 Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A077F337B9A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A080F337B9C;
 	Thu, 18 Dec 2025 13:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766065506; cv=none; b=NvlJIHSZSvuV+qmtfMoVA/IYx+CTQFUjWUishRzCnjIIIILn4Upmok2bB1rquvh5Ur4i/kC2PIGQevxIGqwZ1QJnR3ZH4OI9Oba3uW7gWeuoL6wPgkFrdMwYm7NVswxRCMQ7aqMgmqGLQrwQt6NK+mQcnF3tRDkw5CWBqHig/bw=
+	t=1766065506; cv=none; b=KcnWI3PVTQdW8efI+Stzeh7SK9yevnhlBf7jYuiGzu0z0Iw3OXOvS2200Cu7ilKt4KYGHuOqSIryShjAcfitM5rljH7cazLZKx18JkmqAQCV+eGnx5PeWJ5yI68upQolFxtlrqen77FdNhYSd+/FHQLlBeHwAkSXZOQayVppUf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1766065506; c=relaxed/simple;
-	bh=ZNHCdJaA3afZTO4UAmrHRiw7G5rKI5FGEUItIxMSaww=;
+	bh=yr0ZXn13CINwy9rHCCcnJPrmodqcDnw4nR1KXqK8+6s=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IN7ARafwElD5D761gmOS5k/79Vu/+IbyPZzfC+XrAZtrfiRxDateRyPbDG2B+N4S31jfRi7bKvY6TKlIlBagH0+frm5HmFBXBuZAJnqrtyFsIVoj7eyrGv/eCHJE4pSo+gZLZqCE0Sl9m/ej+lrxMpaY85uC98QAAayakjfh3OA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=cy/wPIol; arc=none smtp.client-ip=113.46.200.224
+	 MIME-Version:Content-Type; b=la948A4lpnuX+VI3N0u4tEeI/hkzd77DDyE0ZxeN9q4eAnHBthgPMrKXQxpSUtBfyJpV/yBtS287idLYAEngt3ldbz8X61CltfaMtrC1tDNzTZnTzHige0p2MvLQQFlbVkXkmeXMEyhl0XU9uJUkYX/7SFT+gpmiDnCVvrLlRSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=WsgJUcHU; arc=none smtp.client-ip=113.46.200.224
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="cy/wPIol"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="WsgJUcHU"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=YAR4Mw5sArcxSPcXElFn5EAVOS+ZDvZEjvDw+TPN/Jo=;
-	b=cy/wPIollasrRDWsRbvXju8fJ1JlEVXVPuvVn1V57VCpbyZMBPxTTxdm4VCu2QsM652TQfrz8
-	eN0tNyR7E0CWJzEMgTWIGga5dJB9B5agClHxHF8pnMoUCsJiMbBOmChdT5yzO1RL/ifOdDHDSsn
-	ErBHKwLp2zR0dfMGY3F5C00=
+	bh=RvGsiRPrcfloe4O4c5Ztr1+tn4vf0Hnpkkn8mbqVKJ8=;
+	b=WsgJUcHUTKBLjbVBIpH+Ogkhpa1psl+AN5TkKvNROYsSoXH0yoywOJux9+1WMmjhm5GDG//VV
+	/KWdaEZ1K9UVMcZc67bJMs6hFePtqfX9zQbIVhuoW+29PQCJ/sAZvzZCl3QLUcE9voAvUfQj7Lb
+	IfPnromUBOTQfKDscA07A44=
 Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4dXBfZ0QPnz1cyPb;
+	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4dXBfZ14hvz1cyPb;
 	Thu, 18 Dec 2025 21:41:58 +0800 (CST)
 Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id E703014033F;
-	Thu, 18 Dec 2025 21:45:00 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 0A3DA1403A1;
+	Thu, 18 Dec 2025 21:45:01 +0800 (CST)
 Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
  dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 18 Dec 2025 21:44:55 +0800
+ 15.2.1544.11; Thu, 18 Dec 2025 21:44:57 +0800
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 18 Dec 2025 21:44:54 +0800
+ 15.2.1544.11; Thu, 18 Dec 2025 21:44:57 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
 	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>, <lizhi206@huawei.com>,
 	<taoqi10@huawei.com>
-Subject: [PATCH v4 03/11] crypto: hisilicon/hpre: extend tag field to 64 bits for better performance
-Date: Thu, 18 Dec 2025 21:44:44 +0800
-Message-ID: <20251218134452.1125469-4-huangchenghai2@huawei.com>
+Subject: [PATCH v4 10/11] crypto: hisilicon/hpre - support the hpre algorithm fallback
+Date: Thu, 18 Dec 2025 21:44:51 +0800
+Message-ID: <20251218134452.1125469-11-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20251218134452.1125469-1-huangchenghai2@huawei.com>
 References: <20251218134452.1125469-1-huangchenghai2@huawei.com>
@@ -60,333 +60,521 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
  kwepemq200001.china.huawei.com (7.202.195.16)
 
-From: lizhi <lizhi206@huawei.com>
+From: Weili Qian <qianweili@huawei.com>
 
-This commit expands the tag field in hpre_sqe structure from 16-bit
-to 64-bit. The change enables storing request addresses directly
-in the tag field, allowing callback functions to access request messages
-without the previous indirection mechanism.
+When all hardware queues are busy and no shareable queue,
+new processes fail to apply for queues. To avoid affecting
+tasks, support fallback mechanism when hardware queues are
+unavailable.
 
-By eliminating the need for lookup tables, this modification reduces lock
-contention and associated overhead, leading to improved efficiency and
-simplified code.
+HPRE driver supports DH algorithm, limited to prime numbers up to 4K.
+It supports prime numbers larger than 4K via fallback mechanism.
 
-Fixes: c8b4b477079d ("crypto: hisilicon - add HiSilicon HPRE accelerator")
-Signed-off-by: lizhi <lizhi206@huawei.com>
+Fixes: 05e7b906aa7c ("crypto: hisilicon/hpre - add 'ECDH' algorithm")
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre.h        |   5 +-
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 142 ++++----------------
- 2 files changed, 25 insertions(+), 122 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 238 ++++++++++++++++----
+ 1 file changed, 199 insertions(+), 39 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
-index 0f3ddbadbcf9..021dbd9a1d48 100644
---- a/drivers/crypto/hisilicon/hpre/hpre.h
-+++ b/drivers/crypto/hisilicon/hpre/hpre.h
-@@ -94,9 +94,8 @@ struct hpre_sqe {
- 	__le64 key;
- 	__le64 in;
- 	__le64 out;
--	__le16 tag;
--	__le16 resv2;
--#define _HPRE_SQE_ALIGN_EXT	7
-+	__le64 tag;
-+#define _HPRE_SQE_ALIGN_EXT	6
- 	__le32 rsvd1[_HPRE_SQE_ALIGN_EXT];
- };
- 
 diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 21ccf879f70c..4197281c8dff 100644
+index f410e610eaba..839c1f677143 100644
 --- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
 +++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -108,12 +108,10 @@ struct hpre_ecdh_ctx {
- struct hpre_ctx {
- 	struct hisi_qp *qp;
- 	struct device *dev;
--	struct hpre_asym_request **req_list;
- 	struct hpre *hpre;
- 	spinlock_t req_lock;
- 	unsigned int key_sz;
- 	bool crt_g2_mode;
--	struct idr req_idr;
- 	union {
- 		struct hpre_rsa_ctx rsa;
- 		struct hpre_dh_ctx dh;
-@@ -136,7 +134,6 @@ struct hpre_asym_request {
- 		struct kpp_request *ecdh;
- 	} areq;
- 	int err;
--	int req_id;
- 	hpre_cb cb;
- 	struct timespec64 req_time;
+@@ -93,6 +93,7 @@ struct hpre_dh_ctx {
+ 
+ 	char *g; /* m */
+ 	dma_addr_t dma_g;
++	struct crypto_kpp *soft_tfm;
  };
-@@ -151,58 +148,13 @@ static inline unsigned int hpre_align_pd(void)
- 	return (hpre_align_sz() - 1) & ~(crypto_tfm_ctx_alignment() - 1);
- }
  
--static int hpre_alloc_req_id(struct hpre_ctx *ctx)
-+static void hpre_dfx_add_req_time(struct hpre_asym_request *hpre_req)
- {
--	unsigned long flags;
--	int id;
--
--	spin_lock_irqsave(&ctx->req_lock, flags);
--	id = idr_alloc(&ctx->req_idr, NULL, 0, ctx->qp->sq_depth, GFP_ATOMIC);
--	spin_unlock_irqrestore(&ctx->req_lock, flags);
--
--	return id;
--}
--
--static void hpre_free_req_id(struct hpre_ctx *ctx, int req_id)
--{
--	unsigned long flags;
--
--	spin_lock_irqsave(&ctx->req_lock, flags);
--	idr_remove(&ctx->req_idr, req_id);
--	spin_unlock_irqrestore(&ctx->req_lock, flags);
--}
--
--static int hpre_add_req_to_ctx(struct hpre_asym_request *hpre_req)
--{
--	struct hpre_ctx *ctx;
--	struct hpre_dfx *dfx;
--	int id;
--
--	ctx = hpre_req->ctx;
--	id = hpre_alloc_req_id(ctx);
--	if (unlikely(id < 0))
--		return -EINVAL;
--
--	ctx->req_list[id] = hpre_req;
--	hpre_req->req_id = id;
-+	struct hpre_ctx *ctx = hpre_req->ctx;
-+	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
+ struct hpre_ecdh_ctx {
+@@ -103,6 +104,7 @@ struct hpre_ecdh_ctx {
+ 	/* low address: x->y */
+ 	unsigned char *g;
+ 	dma_addr_t dma_g;
++	struct crypto_kpp *soft_tfm;
+ };
  
--	dfx = ctx->hpre->debug.dfx;
- 	if (atomic64_read(&dfx[HPRE_OVERTIME_THRHLD].value))
- 		ktime_get_ts64(&hpre_req->req_time);
--
--	return id;
--}
--
--static void hpre_rm_req_from_ctx(struct hpre_asym_request *hpre_req)
--{
--	struct hpre_ctx *ctx = hpre_req->ctx;
--	int id = hpre_req->req_id;
--
--	if (hpre_req->req_id >= 0) {
--		hpre_req->req_id = HPRE_INVLD_REQ_ID;
--		ctx->req_list[id] = NULL;
--		hpre_free_req_id(ctx, id);
--	}
- }
+ struct hpre_ctx {
+@@ -120,6 +122,7 @@ struct hpre_ctx {
+ 	unsigned int curve_id;
+ 	/* for high performance core */
+ 	u8 enable_hpcore;
++	bool fallback;
+ };
  
- static struct hisi_qp *hpre_get_qp_and_start(u8 type)
-@@ -340,26 +292,19 @@ static void hpre_hw_data_clr_all(struct hpre_ctx *ctx,
- static int hpre_alg_res_post_hf(struct hpre_ctx *ctx, struct hpre_sqe *sqe,
- 				void **kreq)
- {
--	struct hpre_asym_request *req;
- 	unsigned int err, done, alg;
--	int id;
+ struct hpre_asym_request {
+@@ -382,8 +385,10 @@ static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
+ 	struct hpre *hpre;
  
- #define HPRE_NO_HW_ERR		0
- #define HPRE_HW_TASK_DONE	3
- #define HREE_HW_ERR_MASK	GENMASK(10, 0)
- #define HREE_SQE_DONE_MASK	GENMASK(1, 0)
- #define HREE_ALG_TYPE_MASK	GENMASK(4, 0)
--	id = (int)le16_to_cpu(sqe->tag);
--	req = ctx->req_list[id];
--	hpre_rm_req_from_ctx(req);
--	*kreq = req;
-+	*kreq = (void *)le64_to_cpu(sqe->tag);
+ 	qp = hpre_create_qp(type);
+-	if (!qp)
++	if (!qp) {
++		ctx->qp = NULL;
+ 		return -ENODEV;
++	}
  
- 	err = (le32_to_cpu(sqe->dw0) >> HPRE_SQE_ALG_BITS) &
- 		HREE_HW_ERR_MASK;
--
- 	done = (le32_to_cpu(sqe->dw0) >> HPRE_SQE_DONE_SHIFT) &
- 		HREE_SQE_DONE_MASK;
--
- 	if (likely(err == HPRE_NO_HW_ERR && done == HPRE_HW_TASK_DONE))
- 		return 0;
- 
-@@ -370,34 +315,9 @@ static int hpre_alg_res_post_hf(struct hpre_ctx *ctx, struct hpre_sqe *sqe,
- 	return -EINVAL;
- }
- 
--static int hpre_ctx_set(struct hpre_ctx *ctx, struct hisi_qp *qp, int qlen)
--{
--	struct hpre *hpre;
--
--	if (!ctx || !qp || qlen < 0)
--		return -EINVAL;
--
--	spin_lock_init(&ctx->req_lock);
--	ctx->qp = qp;
--	ctx->dev = &qp->qm->pdev->dev;
--
--	hpre = container_of(ctx->qp->qm, struct hpre, qm);
--	ctx->hpre = hpre;
--	ctx->req_list = kcalloc(qlen, sizeof(void *), GFP_KERNEL);
--	if (!ctx->req_list)
--		return -ENOMEM;
--	ctx->key_sz = 0;
--	ctx->crt_g2_mode = false;
--	idr_init(&ctx->req_idr);
--
--	return 0;
--}
--
- static void hpre_ctx_clear(struct hpre_ctx *ctx, bool is_clear_all)
- {
- 	if (is_clear_all) {
--		idr_destroy(&ctx->req_idr);
--		kfree(ctx->req_list);
- 		hisi_qm_free_qps(&ctx->qp, 1);
- 	}
- 
-@@ -467,29 +387,22 @@ static void hpre_rsa_cb(struct hpre_ctx *ctx, void *resp)
- 
- static void hpre_alg_cb(struct hisi_qp *qp, void *resp)
- {
--	struct hpre_ctx *ctx = qp->qp_ctx;
--	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
-+	struct hpre_asym_request *h_req;
- 	struct hpre_sqe *sqe = resp;
--	struct hpre_asym_request *req = ctx->req_list[le16_to_cpu(sqe->tag)];
- 
--	if (unlikely(!req)) {
--		atomic64_inc(&dfx[HPRE_INVALID_REQ_CNT].value);
-+	h_req = (struct hpre_asym_request *)le64_to_cpu(sqe->tag);
-+	if (unlikely(!h_req)) {
-+		pr_err("Failed to get request, and qp_id is %u\n", qp->qp_id);
- 		return;
- 	}
- 
--	req->cb(ctx, resp);
--}
--
--static void hpre_stop_qp_and_put(struct hisi_qp *qp)
--{
--	hisi_qm_stop_qp(qp);
--	hisi_qm_free_qps(&qp, 1);
-+	h_req->cb(h_req->ctx, resp);
- }
- 
- static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
- {
- 	struct hisi_qp *qp;
--	int ret;
-+	struct hpre *hpre;
- 
- 	qp = hpre_get_qp_and_start(type);
- 	if (IS_ERR(qp))
-@@ -497,19 +410,21 @@ static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
- 
- 	qp->qp_ctx = ctx;
  	qp->req_cb = hpre_alg_cb;
-+	spin_lock_init(&ctx->req_lock);
-+	ctx->qp = qp;
-+	ctx->dev = &qp->qm->pdev->dev;
-+	hpre = container_of(ctx->qp->qm, struct hpre, qm);
-+	ctx->hpre = hpre;
-+	ctx->key_sz = 0;
-+	ctx->crt_g2_mode = false;
+ 	ctx->qp = qp;
+@@ -509,6 +514,48 @@ static int hpre_dh_compute_value(struct kpp_request *req)
+ 	return ret;
+ }
  
--	ret = hpre_ctx_set(ctx, qp, qp->sq_depth);
--	if (ret)
--		hpre_stop_qp_and_put(qp);
++static struct kpp_request *hpre_dh_prepare_fb_req(struct kpp_request *req)
++{
++	struct kpp_request *fb_req = kpp_request_ctx(req);
++	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
++	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
++
++	kpp_request_set_tfm(fb_req, ctx->dh.soft_tfm);
++	kpp_request_set_callback(fb_req, req->base.flags, req->base.complete, req->base.data);
++	kpp_request_set_input(fb_req, req->src, req->src_len);
++	kpp_request_set_output(fb_req, req->dst, req->dst_len);
++
++	return fb_req;
++}
++
++static int hpre_dh_generate_public_key(struct kpp_request *req)
++{
++	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
++	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
++	struct kpp_request *fb_req;
++
++	if (ctx->fallback) {
++		fb_req = hpre_dh_prepare_fb_req(req);
++		return crypto_kpp_generate_public_key(fb_req);
++	}
++
++	return hpre_dh_compute_value(req);
++}
++
++static int hpre_dh_compute_shared_secret(struct kpp_request *req)
++{
++	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
++	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
++	struct kpp_request *fb_req;
++
++	if (ctx->fallback) {
++		fb_req = hpre_dh_prepare_fb_req(req);
++		return crypto_kpp_compute_shared_secret(fb_req);
++	}
++
++	return hpre_dh_compute_value(req);
++}
++
+ static int hpre_is_dh_params_length_valid(unsigned int key_sz)
+ {
+ #define _HPRE_DH_GRP1		768
+@@ -535,13 +582,6 @@ static int hpre_dh_set_params(struct hpre_ctx *ctx, struct dh *params)
+ 	struct device *dev = ctx->dev;
+ 	unsigned int sz;
+ 
+-	if (params->p_size > HPRE_DH_MAX_P_SZ)
+-		return -EINVAL;
 -
+-	if (hpre_is_dh_params_length_valid(params->p_size <<
+-					   HPRE_BITS_2_BYTES_SHIFT))
+-		return -EINVAL;
+-
+ 	sz = ctx->key_sz = params->p_size;
+ 	ctx->dh.xa_p = dma_alloc_coherent(dev, sz << 1,
+ 					  &ctx->dh.dma_xa_p, GFP_KERNEL);
+@@ -574,6 +614,9 @@ static void hpre_dh_clear_ctx(struct hpre_ctx *ctx, bool is_clear_all)
+ 	struct device *dev = ctx->dev;
+ 	unsigned int sz = ctx->key_sz;
+ 
++	if (!ctx->qp)
++		return;
++
+ 	if (ctx->dh.g) {
+ 		dma_free_coherent(dev, sz, ctx->dh.g, ctx->dh.dma_g);
+ 		ctx->dh.g = NULL;
+@@ -599,6 +642,13 @@ static int hpre_dh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ 	if (crypto_dh_decode_key(buf, len, &params) < 0)
+ 		return -EINVAL;
+ 
++	if (!ctx->qp)
++		goto set_soft_secret;
++
++	if (hpre_is_dh_params_length_valid(params.p_size <<
++					   HPRE_BITS_2_BYTES_SHIFT))
++		goto set_soft_secret;
++
+ 	/* Free old secret if any */
+ 	hpre_dh_clear_ctx(ctx, false);
+ 
+@@ -609,27 +659,55 @@ static int hpre_dh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ 	memcpy(ctx->dh.xa_p + (ctx->key_sz - params.key_size), params.key,
+ 	       params.key_size);
+ 
++	ctx->fallback = false;
+ 	return 0;
+ 
+ err_clear_ctx:
+ 	hpre_dh_clear_ctx(ctx, false);
+ 	return ret;
++set_soft_secret:
++	ctx->fallback = true;
++	return crypto_kpp_set_secret(ctx->dh.soft_tfm, buf, len);
+ }
+ 
+ static unsigned int hpre_dh_max_size(struct crypto_kpp *tfm)
+ {
+ 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
+ 
++	if (ctx->fallback)
++		return crypto_kpp_maxsize(ctx->dh.soft_tfm);
++
+ 	return ctx->key_sz;
+ }
+ 
+ static int hpre_dh_init_tfm(struct crypto_kpp *tfm)
+ {
+ 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
++	const char *alg = kpp_alg_name(tfm);
++	unsigned int reqsize;
++	int ret;
++
++	ctx->dh.soft_tfm = crypto_alloc_kpp(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(ctx->dh.soft_tfm)) {
++		pr_err("Failed to alloc dh tfm!\n");
++		return PTR_ERR(ctx->dh.soft_tfm);
++	}
++
++	crypto_kpp_set_flags(ctx->dh.soft_tfm, crypto_kpp_get_flags(tfm));
++
++	reqsize = max(sizeof(struct hpre_asym_request) + hpre_align_pd(),
++		      sizeof(struct kpp_request) + crypto_kpp_reqsize(ctx->dh.soft_tfm));
++	kpp_set_reqsize(tfm, reqsize);
+ 
+-	kpp_set_reqsize(tfm, sizeof(struct hpre_asym_request) + hpre_align_pd());
++	ret = hpre_ctx_init(ctx, HPRE_V2_ALG_TYPE);
++	if (ret && ret != -ENODEV) {
++		crypto_free_kpp(ctx->dh.soft_tfm);
++		return ret;
++	} else if (ret == -ENODEV) {
++		ctx->fallback = true;
++	}
+ 
+-	return hpre_ctx_init(ctx, HPRE_V2_ALG_TYPE);
++	return 0;
+ }
+ 
+ static void hpre_dh_exit_tfm(struct crypto_kpp *tfm)
+@@ -637,6 +715,7 @@ static void hpre_dh_exit_tfm(struct crypto_kpp *tfm)
+ 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
+ 
+ 	hpre_dh_clear_ctx(ctx, true);
++	crypto_free_kpp(ctx->dh.soft_tfm);
+ }
+ 
+ static void hpre_rsa_drop_leading_zeros(const char **ptr, size_t *len)
+@@ -676,9 +755,8 @@ static int hpre_rsa_enc(struct akcipher_request *req)
+ 	struct hpre_sqe *msg = &hpre_req->req;
+ 	int ret;
+ 
+-	/* For 512 and 1536 bits key size, use soft tfm instead */
+-	if (ctx->key_sz == HPRE_RSA_512BITS_KSZ ||
+-	    ctx->key_sz == HPRE_RSA_1536BITS_KSZ) {
++	/* For unsupported key size and unavailable devices, use soft tfm instead */
++	if (ctx->fallback) {
+ 		akcipher_request_set_tfm(req, ctx->rsa.soft_tfm);
+ 		ret = crypto_akcipher_encrypt(req);
+ 		akcipher_request_set_tfm(req, tfm);
+@@ -723,9 +801,8 @@ static int hpre_rsa_dec(struct akcipher_request *req)
+ 	struct hpre_sqe *msg = &hpre_req->req;
+ 	int ret;
+ 
+-	/* For 512 and 1536 bits key size, use soft tfm instead */
+-	if (ctx->key_sz == HPRE_RSA_512BITS_KSZ ||
+-	    ctx->key_sz == HPRE_RSA_1536BITS_KSZ) {
++	/* For unsupported key size and unavailable devices, use soft tfm instead */
++	if (ctx->fallback) {
+ 		akcipher_request_set_tfm(req, ctx->rsa.soft_tfm);
+ 		ret = crypto_akcipher_decrypt(req);
+ 		akcipher_request_set_tfm(req, tfm);
+@@ -778,8 +855,10 @@ static int hpre_rsa_set_n(struct hpre_ctx *ctx, const char *value,
+ 	ctx->key_sz = vlen;
+ 
+ 	/* if invalid key size provided, we use software tfm */
+-	if (!hpre_rsa_key_size_is_support(ctx->key_sz))
++	if (!hpre_rsa_key_size_is_support(ctx->key_sz)) {
++		ctx->fallback = true;
+ 		return 0;
++	}
+ 
+ 	ctx->rsa.pubkey = dma_alloc_coherent(ctx->dev, vlen << 1,
+ 					     &ctx->rsa.dma_pubkey,
+@@ -914,6 +993,9 @@ static void hpre_rsa_clear_ctx(struct hpre_ctx *ctx, bool is_clear_all)
+ 	unsigned int half_key_sz = ctx->key_sz >> 1;
+ 	struct device *dev = ctx->dev;
+ 
++	if (!ctx->qp)
++		return;
++
+ 	if (ctx->rsa.pubkey) {
+ 		dma_free_coherent(dev, ctx->key_sz << 1,
+ 				  ctx->rsa.pubkey, ctx->rsa.dma_pubkey);
+@@ -993,6 +1075,7 @@ static int hpre_rsa_setkey(struct hpre_ctx *ctx, const void *key,
+ 		goto free;
+ 	}
+ 
++	ctx->fallback = false;
+ 	return 0;
+ 
+ free:
+@@ -1010,6 +1093,9 @@ static int hpre_rsa_setpubkey(struct crypto_akcipher *tfm, const void *key,
+ 	if (ret)
+ 		return ret;
+ 
++	if (!ctx->qp)
++		return 0;
++
+ 	return hpre_rsa_setkey(ctx, key, keylen, false);
+ }
+ 
+@@ -1023,6 +1109,9 @@ static int hpre_rsa_setprivkey(struct crypto_akcipher *tfm, const void *key,
+ 	if (ret)
+ 		return ret;
+ 
++	if (!ctx->qp)
++		return 0;
++
+ 	return hpre_rsa_setkey(ctx, key, keylen, true);
+ }
+ 
+@@ -1030,9 +1119,8 @@ static unsigned int hpre_rsa_max_size(struct crypto_akcipher *tfm)
+ {
+ 	struct hpre_ctx *ctx = akcipher_tfm_ctx(tfm);
+ 
+-	/* For 512 and 1536 bits key size, use soft tfm instead */
+-	if (ctx->key_sz == HPRE_RSA_512BITS_KSZ ||
+-	    ctx->key_sz == HPRE_RSA_1536BITS_KSZ)
++	/* For unsupported key size and unavailable devices, use soft tfm instead */
++	if (ctx->fallback)
+ 		return crypto_akcipher_maxsize(ctx->rsa.soft_tfm);
+ 
+ 	return ctx->key_sz;
+@@ -1053,10 +1141,14 @@ static int hpre_rsa_init_tfm(struct crypto_akcipher *tfm)
+ 				  hpre_align_pd());
+ 
+ 	ret = hpre_ctx_init(ctx, HPRE_V2_ALG_TYPE);
+-	if (ret)
++	if (ret && ret != -ENODEV) {
+ 		crypto_free_akcipher(ctx->rsa.soft_tfm);
++		return ret;
++	} else if (ret == -ENODEV) {
++		ctx->fallback = true;
++	}
+ 
 -	return ret;
 +	return 0;
  }
  
- static int hpre_msg_request_set(struct hpre_ctx *ctx, void *req, bool is_rsa)
+ static void hpre_rsa_exit_tfm(struct crypto_akcipher *tfm)
+@@ -1260,6 +1352,9 @@ static int hpre_ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ 	struct ecdh params;
+ 	int ret;
+ 
++	if (ctx->fallback)
++		return crypto_kpp_set_secret(ctx->ecdh.soft_tfm, buf, len);
++
+ 	if (crypto_ecdh_decode_key(buf, len, &params) < 0) {
+ 		dev_err(dev, "failed to decode ecdh key!\n");
+ 		return -EINVAL;
+@@ -1485,23 +1580,82 @@ static int hpre_ecdh_compute_value(struct kpp_request *req)
+ 	return ret;
+ }
+ 
++static int hpre_ecdh_generate_public_key(struct kpp_request *req)
++{
++	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
++	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
++	int ret;
++
++	if (ctx->fallback) {
++		kpp_request_set_tfm(req, ctx->ecdh.soft_tfm);
++		ret = crypto_kpp_generate_public_key(req);
++		kpp_request_set_tfm(req, tfm);
++		return ret;
++	}
++
++	return hpre_ecdh_compute_value(req);
++}
++
++static int hpre_ecdh_compute_shared_secret(struct kpp_request *req)
++{
++	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
++	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
++	int ret;
++
++	if (ctx->fallback) {
++		kpp_request_set_tfm(req, ctx->ecdh.soft_tfm);
++		ret = crypto_kpp_compute_shared_secret(req);
++		kpp_request_set_tfm(req, tfm);
++		return ret;
++	}
++
++	return hpre_ecdh_compute_value(req);
++}
++
+ static unsigned int hpre_ecdh_max_size(struct crypto_kpp *tfm)
  {
- 	struct hpre_asym_request *h_req;
- 	struct hpre_sqe *msg;
--	int req_id;
- 	void *tmp;
+ 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
  
- 	if (is_rsa) {
-@@ -549,11 +464,8 @@ static int hpre_msg_request_set(struct hpre_ctx *ctx, void *req, bool is_rsa)
- 	msg->task_len1 = (ctx->key_sz >> HPRE_BITS_2_BYTES_SHIFT) - 1;
- 	h_req->ctx = ctx;
++	if (ctx->fallback)
++		return crypto_kpp_maxsize(ctx->ecdh.soft_tfm);
++
+ 	/* max size is the pub_key_size, include x and y */
+ 	return ctx->key_sz << 1;
+ }
  
--	req_id = hpre_add_req_to_ctx(h_req);
--	if (req_id < 0)
--		return -EBUSY;
++static int hpre_ecdh_init_tfm(struct crypto_kpp *tfm)
++{
++	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
++	const char *alg = kpp_alg_name(tfm);
++	int ret;
++
++	ret = hpre_ctx_init(ctx, HPRE_V3_ECC_ALG_TYPE);
++	if (!ret) {
++		kpp_set_reqsize(tfm, sizeof(struct hpre_asym_request) + hpre_align_pd());
++		return 0;
++	} else if (ret && ret != -ENODEV) {
++		return ret;
++	}
++
++	ctx->ecdh.soft_tfm = crypto_alloc_kpp(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(ctx->ecdh.soft_tfm)) {
++		pr_err("Failed to alloc %s tfm!\n", alg);
++		return PTR_ERR(ctx->ecdh.soft_tfm);
++	}
++
++	crypto_kpp_set_flags(ctx->ecdh.soft_tfm, crypto_kpp_get_flags(tfm));
++	ctx->fallback = true;
++
++	return 0;
++}
++
+ static int hpre_ecdh_nist_p192_init_tfm(struct crypto_kpp *tfm)
+ {
+ 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
+ 
+ 	ctx->curve_id = ECC_CURVE_NIST_P192;
+ 
+-	kpp_set_reqsize(tfm, sizeof(struct hpre_asym_request) + hpre_align_pd());
 -
--	msg->tag = cpu_to_le16((u16)req_id);
-+	hpre_dfx_add_req_time(h_req);
-+	msg->tag = cpu_to_le64((uintptr_t)h_req);
- 
- 	return 0;
- }
-@@ -619,7 +531,6 @@ static int hpre_dh_compute_value(struct kpp_request *req)
- 		return -EINPROGRESS;
- 
- clear_all:
--	hpre_rm_req_from_ctx(hpre_req);
- 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
- 
- 	return ret;
-@@ -828,7 +739,6 @@ static int hpre_rsa_enc(struct akcipher_request *req)
- 		return -EINPROGRESS;
- 
- clear_all:
--	hpre_rm_req_from_ctx(hpre_req);
- 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
- 
- 	return ret;
-@@ -883,7 +793,6 @@ static int hpre_rsa_dec(struct akcipher_request *req)
- 		return -EINPROGRESS;
- 
- clear_all:
--	hpre_rm_req_from_ctx(hpre_req);
- 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
- 
- 	return ret;
-@@ -1346,7 +1255,7 @@ static int hpre_ecdh_set_param(struct hpre_ctx *ctx, struct ecdh *params)
- 	return 0;
+-	return hpre_ctx_init(ctx, HPRE_V3_ECC_ALG_TYPE);
++	return hpre_ecdh_init_tfm(tfm);
  }
  
--static bool hpre_key_is_zero(char *key, unsigned short key_sz)
-+static bool hpre_key_is_zero(const char *key, unsigned short key_sz)
- {
- 	int i;
+ static int hpre_ecdh_nist_p256_init_tfm(struct crypto_kpp *tfm)
+@@ -1511,9 +1665,7 @@ static int hpre_ecdh_nist_p256_init_tfm(struct crypto_kpp *tfm)
+ 	ctx->curve_id = ECC_CURVE_NIST_P256;
+ 	ctx->enable_hpcore = 1;
  
-@@ -1488,7 +1397,6 @@ static int hpre_ecdh_msg_request_set(struct hpre_ctx *ctx,
- {
- 	struct hpre_asym_request *h_req;
- 	struct hpre_sqe *msg;
--	int req_id;
- 	void *tmp;
- 
- 	if (req->dst_len < ctx->key_sz << 1) {
-@@ -1510,11 +1418,8 @@ static int hpre_ecdh_msg_request_set(struct hpre_ctx *ctx,
- 	msg->task_len1 = (ctx->key_sz >> HPRE_BITS_2_BYTES_SHIFT) - 1;
- 	h_req->ctx = ctx;
- 
--	req_id = hpre_add_req_to_ctx(h_req);
--	if (req_id < 0)
--		return -EBUSY;
+-	kpp_set_reqsize(tfm, sizeof(struct hpre_asym_request) + hpre_align_pd());
 -
--	msg->tag = cpu_to_le16((u16)req_id);
-+	hpre_dfx_add_req_time(h_req);
-+	msg->tag = cpu_to_le64((uintptr_t)h_req);
- 	return 0;
+-	return hpre_ctx_init(ctx, HPRE_V3_ECC_ALG_TYPE);
++	return hpre_ecdh_init_tfm(tfm);
  }
  
-@@ -1612,7 +1517,6 @@ static int hpre_ecdh_compute_value(struct kpp_request *req)
- 		return -EINPROGRESS;
+ static int hpre_ecdh_nist_p384_init_tfm(struct crypto_kpp *tfm)
+@@ -1522,15 +1674,18 @@ static int hpre_ecdh_nist_p384_init_tfm(struct crypto_kpp *tfm)
  
- clear_all:
--	hpre_rm_req_from_ctx(hpre_req);
- 	hpre_ecdh_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
- 	return ret;
+ 	ctx->curve_id = ECC_CURVE_NIST_P384;
+ 
+-	kpp_set_reqsize(tfm, sizeof(struct hpre_asym_request) + hpre_align_pd());
+-
+-	return hpre_ctx_init(ctx, HPRE_V3_ECC_ALG_TYPE);
++	return hpre_ecdh_init_tfm(tfm);
  }
+ 
+ static void hpre_ecdh_exit_tfm(struct crypto_kpp *tfm)
+ {
+ 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
+ 
++	if (ctx->fallback) {
++		crypto_free_kpp(ctx->ecdh.soft_tfm);
++		return;
++	}
++
+ 	hpre_ecc_clear_ctx(ctx, true);
+ }
+ 
+@@ -1548,13 +1703,14 @@ static struct akcipher_alg rsa = {
+ 		.cra_name = "rsa",
+ 		.cra_driver_name = "hpre-rsa",
+ 		.cra_module = THIS_MODULE,
++		.cra_flags = CRYPTO_ALG_NEED_FALLBACK,
+ 	},
+ };
+ 
+ static struct kpp_alg dh = {
+ 	.set_secret = hpre_dh_set_secret,
+-	.generate_public_key = hpre_dh_compute_value,
+-	.compute_shared_secret = hpre_dh_compute_value,
++	.generate_public_key = hpre_dh_generate_public_key,
++	.compute_shared_secret = hpre_dh_compute_shared_secret,
+ 	.max_size = hpre_dh_max_size,
+ 	.init = hpre_dh_init_tfm,
+ 	.exit = hpre_dh_exit_tfm,
+@@ -1564,14 +1720,15 @@ static struct kpp_alg dh = {
+ 		.cra_name = "dh",
+ 		.cra_driver_name = "hpre-dh",
+ 		.cra_module = THIS_MODULE,
++		.cra_flags = CRYPTO_ALG_NEED_FALLBACK,
+ 	},
+ };
+ 
+ static struct kpp_alg ecdh_curves[] = {
+ 	{
+ 		.set_secret = hpre_ecdh_set_secret,
+-		.generate_public_key = hpre_ecdh_compute_value,
+-		.compute_shared_secret = hpre_ecdh_compute_value,
++		.generate_public_key = hpre_ecdh_generate_public_key,
++		.compute_shared_secret = hpre_ecdh_compute_shared_secret,
+ 		.max_size = hpre_ecdh_max_size,
+ 		.init = hpre_ecdh_nist_p192_init_tfm,
+ 		.exit = hpre_ecdh_exit_tfm,
+@@ -1581,11 +1738,12 @@ static struct kpp_alg ecdh_curves[] = {
+ 			.cra_name = "ecdh-nist-p192",
+ 			.cra_driver_name = "hpre-ecdh-nist-p192",
+ 			.cra_module = THIS_MODULE,
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK,
+ 		},
+ 	}, {
+ 		.set_secret = hpre_ecdh_set_secret,
+-		.generate_public_key = hpre_ecdh_compute_value,
+-		.compute_shared_secret = hpre_ecdh_compute_value,
++		.generate_public_key = hpre_ecdh_generate_public_key,
++		.compute_shared_secret = hpre_ecdh_compute_shared_secret,
+ 		.max_size = hpre_ecdh_max_size,
+ 		.init = hpre_ecdh_nist_p256_init_tfm,
+ 		.exit = hpre_ecdh_exit_tfm,
+@@ -1595,11 +1753,12 @@ static struct kpp_alg ecdh_curves[] = {
+ 			.cra_name = "ecdh-nist-p256",
+ 			.cra_driver_name = "hpre-ecdh-nist-p256",
+ 			.cra_module = THIS_MODULE,
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK,
+ 		},
+ 	}, {
+ 		.set_secret = hpre_ecdh_set_secret,
+-		.generate_public_key = hpre_ecdh_compute_value,
+-		.compute_shared_secret = hpre_ecdh_compute_value,
++		.generate_public_key = hpre_ecdh_generate_public_key,
++		.compute_shared_secret = hpre_ecdh_compute_shared_secret,
+ 		.max_size = hpre_ecdh_max_size,
+ 		.init = hpre_ecdh_nist_p384_init_tfm,
+ 		.exit = hpre_ecdh_exit_tfm,
+@@ -1609,6 +1768,7 @@ static struct kpp_alg ecdh_curves[] = {
+ 			.cra_name = "ecdh-nist-p384",
+ 			.cra_driver_name = "hpre-ecdh-nist-p384",
+ 			.cra_module = THIS_MODULE,
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK,
+ 		},
+ 	}
+ };
 -- 
 2.33.0
 
