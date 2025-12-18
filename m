@@ -1,51 +1,51 @@
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A213376BC;
-	Thu, 18 Dec 2025 13:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A077F337B9A;
+	Thu, 18 Dec 2025 13:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766065505; cv=none; b=sgRq/wVMPJM/9LN6kv12UikBo8K9aOVGiwnyXOLy/uiw0TJM6eRuPgdqZSrQlObxBcpwLuuoysUvf1m7dCg8saOtKaPmsC6USw7IEILMklc24D7zDRhpk/RWl+tCu5RX9fQ0v4xKS93HMlaxdjr5ITkoCBIhxJmE7WUVXtyarMc=
+	t=1766065506; cv=none; b=NvlJIHSZSvuV+qmtfMoVA/IYx+CTQFUjWUishRzCnjIIIILn4Upmok2bB1rquvh5Ur4i/kC2PIGQevxIGqwZ1QJnR3ZH4OI9Oba3uW7gWeuoL6wPgkFrdMwYm7NVswxRCMQ7aqMgmqGLQrwQt6NK+mQcnF3tRDkw5CWBqHig/bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766065505; c=relaxed/simple;
-	bh=iu+yAidXrHEug3y3V9cSpWGIIW9hNPdKZFe5IKKkHfE=;
+	s=arc-20240116; t=1766065506; c=relaxed/simple;
+	bh=ZNHCdJaA3afZTO4UAmrHRiw7G5rKI5FGEUItIxMSaww=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H9EDMBDRniGnhyuvds8Cc0dzI9yjr3KEMbU5UtsXopCDcZsCJSFnr3zaACjFO86QFOAT/m1PeM1/1iyNUl33Te8RvBscfXm7ffkl9F3WteHycHrcpdAapdprOSRMn9jVLfhD+Ef2n/DqnCmQYUuKy6g8VwMKfxYTrXM6dhAhaqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=aNm0EI8b; arc=none smtp.client-ip=113.46.200.221
+	 MIME-Version:Content-Type; b=IN7ARafwElD5D761gmOS5k/79Vu/+IbyPZzfC+XrAZtrfiRxDateRyPbDG2B+N4S31jfRi7bKvY6TKlIlBagH0+frm5HmFBXBuZAJnqrtyFsIVoj7eyrGv/eCHJE4pSo+gZLZqCE0Sl9m/ej+lrxMpaY85uC98QAAayakjfh3OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=cy/wPIol; arc=none smtp.client-ip=113.46.200.224
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="aNm0EI8b"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="cy/wPIol"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=JoI7cyZ+NnFFAdScLBhjUEGoGhJJ+1wW9RIBEXNcA3Y=;
-	b=aNm0EI8brhTaJm3jSNjdbHdNkb5ow1UZcG99+MwrSeJbIZ9cCva6u/8z8fb3ji99BZdEvtqyH
-	UY/qJ5bgt8MNwI1wTeX2HUZBhqJkdxP6FJsOzP+y6/QGTYomapIoBNxu/Hi/W0wDoh5Yfla0I0+
-	Dv6UUONR6PwJDEna5Ct8oH8=
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4dXBfV6k3dzRhRm;
-	Thu, 18 Dec 2025 21:41:54 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id AB058180BCD;
-	Thu, 18 Dec 2025 21:44:58 +0800 (CST)
+	bh=YAR4Mw5sArcxSPcXElFn5EAVOS+ZDvZEjvDw+TPN/Jo=;
+	b=cy/wPIollasrRDWsRbvXju8fJ1JlEVXVPuvVn1V57VCpbyZMBPxTTxdm4VCu2QsM652TQfrz8
+	eN0tNyR7E0CWJzEMgTWIGga5dJB9B5agClHxHF8pnMoUCsJiMbBOmChdT5yzO1RL/ifOdDHDSsn
+	ErBHKwLp2zR0dfMGY3F5C00=
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4dXBfZ0QPnz1cyPb;
+	Thu, 18 Dec 2025 21:41:58 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id E703014033F;
+	Thu, 18 Dec 2025 21:45:00 +0800 (CST)
 Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 18 Dec 2025 21:44:58 +0800
+ 15.2.1544.11; Thu, 18 Dec 2025 21:44:55 +0800
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 18 Dec 2025 21:44:57 +0800
+ 15.2.1544.11; Thu, 18 Dec 2025 21:44:54 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
 	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>, <lizhi206@huawei.com>,
 	<taoqi10@huawei.com>
-Subject: [PATCH v4 11/11] crypto: hisilicon/sec2 - support skcipher/aead fallback for hardware queue unavailable
-Date: Thu, 18 Dec 2025 21:44:52 +0800
-Message-ID: <20251218134452.1125469-12-huangchenghai2@huawei.com>
+Subject: [PATCH v4 03/11] crypto: hisilicon/hpre: extend tag field to 64 bits for better performance
+Date: Thu, 18 Dec 2025 21:44:44 +0800
+Message-ID: <20251218134452.1125469-4-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20251218134452.1125469-1-huangchenghai2@huawei.com>
 References: <20251218134452.1125469-1-huangchenghai2@huawei.com>
@@ -60,213 +60,333 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
  kwepemq200001.china.huawei.com (7.202.195.16)
 
-From: Qi Tao <taoqi10@huawei.com>
+From: lizhi <lizhi206@huawei.com>
 
-When all hardware queues are busy and no shareable queue,
-new processes fail to apply for queues. To avoid affecting
-tasks, support fallback mechanism when hardware queues are
-unavailable.
+This commit expands the tag field in hpre_sqe structure from 16-bit
+to 64-bit. The change enables storing request addresses directly
+in the tag field, allowing callback functions to access request messages
+without the previous indirection mechanism.
 
-Fixes: c16a70c1f253 ("crypto: hisilicon/sec - add new algorithm mode for AEAD")
-Signed-off-by: Qi Tao <taoqi10@huawei.com>
+By eliminating the need for lookup tables, this modification reduces lock
+contention and associated overhead, leading to improved efficiency and
+simplified code.
+
+Fixes: c8b4b477079d ("crypto: hisilicon - add HiSilicon HPRE accelerator")
+Signed-off-by: lizhi <lizhi206@huawei.com>
+Signed-off-by: Weili Qian <qianweili@huawei.com>
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 62 ++++++++++++++++------
- 1 file changed, 47 insertions(+), 15 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre.h        |   5 +-
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 142 ++++----------------
+ 2 files changed, 25 insertions(+), 122 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index d09d081f42dc..c462b58d3034 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -663,10 +663,8 @@ static int sec_ctx_base_init(struct sec_ctx *ctx)
- 	int i, ret;
+diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
+index 0f3ddbadbcf9..021dbd9a1d48 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre.h
++++ b/drivers/crypto/hisilicon/hpre/hpre.h
+@@ -94,9 +94,8 @@ struct hpre_sqe {
+ 	__le64 key;
+ 	__le64 in;
+ 	__le64 out;
+-	__le16 tag;
+-	__le16 resv2;
+-#define _HPRE_SQE_ALIGN_EXT	7
++	__le64 tag;
++#define _HPRE_SQE_ALIGN_EXT	6
+ 	__le32 rsvd1[_HPRE_SQE_ALIGN_EXT];
+ };
  
- 	ctx->qps = sec_create_qps();
--	if (!ctx->qps) {
--		pr_err("Can not create sec qps!\n");
-+	if (!ctx->qps)
- 		return -ENODEV;
--	}
- 
- 	sec = container_of(ctx->qps[0]->qm, struct sec_dev, qm);
- 	ctx->sec = sec;
-@@ -702,6 +700,9 @@ static void sec_ctx_base_uninit(struct sec_ctx *ctx)
- {
- 	int i;
- 
-+	if (!ctx->qps)
-+		return;
-+
- 	for (i = 0; i < ctx->sec->ctx_q_num; i++)
- 		sec_release_qp_ctx(ctx, &ctx->qp_ctx[i]);
- 
-@@ -713,6 +714,9 @@ static int sec_cipher_init(struct sec_ctx *ctx)
- {
- 	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
- 
-+	if (!ctx->qps)
-+		return 0;
-+
- 	c_ctx->c_key = dma_alloc_coherent(ctx->dev, SEC_MAX_KEY_SIZE,
- 					  &c_ctx->c_key_dma, GFP_KERNEL);
- 	if (!c_ctx->c_key)
-@@ -725,6 +729,9 @@ static void sec_cipher_uninit(struct sec_ctx *ctx)
- {
- 	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
- 
-+	if (!ctx->qps)
-+		return;
-+
- 	memzero_explicit(c_ctx->c_key, SEC_MAX_KEY_SIZE);
- 	dma_free_coherent(ctx->dev, SEC_MAX_KEY_SIZE,
- 			  c_ctx->c_key, c_ctx->c_key_dma);
-@@ -746,6 +753,9 @@ static void sec_auth_uninit(struct sec_ctx *ctx)
- {
- 	struct sec_auth_ctx *a_ctx = &ctx->a_ctx;
- 
-+	if (!ctx->qps)
-+		return;
-+
- 	memzero_explicit(a_ctx->a_key, SEC_MAX_AKEY_SIZE);
- 	dma_free_coherent(ctx->dev, SEC_MAX_AKEY_SIZE,
- 			  a_ctx->a_key, a_ctx->a_key_dma);
-@@ -783,7 +793,7 @@ static int sec_skcipher_init(struct crypto_skcipher *tfm)
- 	}
- 
- 	ret = sec_ctx_base_init(ctx);
--	if (ret)
-+	if (ret && ret != -ENODEV)
- 		return ret;
- 
- 	ret = sec_cipher_init(ctx);
-@@ -892,6 +902,9 @@ static int sec_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	struct device *dev = ctx->dev;
- 	int ret;
- 
-+	if (!ctx->qps)
-+		goto set_soft_key;
-+
- 	if (c_mode == SEC_CMODE_XTS) {
- 		ret = xts_verify_key(tfm, key, keylen);
- 		if (ret) {
-@@ -922,13 +935,14 @@ static int sec_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	}
- 
- 	memcpy(c_ctx->c_key, key, keylen);
--	if (c_ctx->fbtfm) {
--		ret = crypto_sync_skcipher_setkey(c_ctx->fbtfm, key, keylen);
--		if (ret) {
--			dev_err(dev, "failed to set fallback skcipher key!\n");
--			return ret;
--		}
-+
-+set_soft_key:
-+	ret = crypto_sync_skcipher_setkey(c_ctx->fbtfm, key, keylen);
-+	if (ret) {
-+		dev_err(dev, "failed to set fallback skcipher key!\n");
-+		return ret;
- 	}
-+
- 	return 0;
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index 21ccf879f70c..4197281c8dff 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -108,12 +108,10 @@ struct hpre_ecdh_ctx {
+ struct hpre_ctx {
+ 	struct hisi_qp *qp;
+ 	struct device *dev;
+-	struct hpre_asym_request **req_list;
+ 	struct hpre *hpre;
+ 	spinlock_t req_lock;
+ 	unsigned int key_sz;
+ 	bool crt_g2_mode;
+-	struct idr req_idr;
+ 	union {
+ 		struct hpre_rsa_ctx rsa;
+ 		struct hpre_dh_ctx dh;
+@@ -136,7 +134,6 @@ struct hpre_asym_request {
+ 		struct kpp_request *ecdh;
+ 	} areq;
+ 	int err;
+-	int req_id;
+ 	hpre_cb cb;
+ 	struct timespec64 req_time;
+ };
+@@ -151,58 +148,13 @@ static inline unsigned int hpre_align_pd(void)
+ 	return (hpre_align_sz() - 1) & ~(crypto_tfm_ctx_alignment() - 1);
  }
  
-@@ -1392,6 +1406,9 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- 	struct crypto_authenc_keys keys;
- 	int ret;
+-static int hpre_alloc_req_id(struct hpre_ctx *ctx)
++static void hpre_dfx_add_req_time(struct hpre_asym_request *hpre_req)
+ {
+-	unsigned long flags;
+-	int id;
+-
+-	spin_lock_irqsave(&ctx->req_lock, flags);
+-	id = idr_alloc(&ctx->req_idr, NULL, 0, ctx->qp->sq_depth, GFP_ATOMIC);
+-	spin_unlock_irqrestore(&ctx->req_lock, flags);
+-
+-	return id;
+-}
+-
+-static void hpre_free_req_id(struct hpre_ctx *ctx, int req_id)
+-{
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&ctx->req_lock, flags);
+-	idr_remove(&ctx->req_idr, req_id);
+-	spin_unlock_irqrestore(&ctx->req_lock, flags);
+-}
+-
+-static int hpre_add_req_to_ctx(struct hpre_asym_request *hpre_req)
+-{
+-	struct hpre_ctx *ctx;
+-	struct hpre_dfx *dfx;
+-	int id;
+-
+-	ctx = hpre_req->ctx;
+-	id = hpre_alloc_req_id(ctx);
+-	if (unlikely(id < 0))
+-		return -EINVAL;
+-
+-	ctx->req_list[id] = hpre_req;
+-	hpre_req->req_id = id;
++	struct hpre_ctx *ctx = hpre_req->ctx;
++	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
  
-+	if (!ctx->qps)
-+		return sec_aead_fallback_setkey(a_ctx, tfm, key, keylen);
-+
- 	ctx->a_ctx.a_alg = a_alg;
- 	ctx->c_ctx.c_alg = c_alg;
- 	c_ctx->c_mode = c_mode;
-@@ -2048,6 +2065,9 @@ static int sec_skcipher_ctx_init(struct crypto_skcipher *tfm)
- 	if (ret)
- 		return ret;
+-	dfx = ctx->hpre->debug.dfx;
+ 	if (atomic64_read(&dfx[HPRE_OVERTIME_THRHLD].value))
+ 		ktime_get_ts64(&hpre_req->req_time);
+-
+-	return id;
+-}
+-
+-static void hpre_rm_req_from_ctx(struct hpre_asym_request *hpre_req)
+-{
+-	struct hpre_ctx *ctx = hpre_req->ctx;
+-	int id = hpre_req->req_id;
+-
+-	if (hpre_req->req_id >= 0) {
+-		hpre_req->req_id = HPRE_INVLD_REQ_ID;
+-		ctx->req_list[id] = NULL;
+-		hpre_free_req_id(ctx, id);
+-	}
+ }
  
-+	if (!ctx->qps)
-+		return 0;
-+
- 	if (ctx->sec->qm.ver < QM_HW_V3) {
- 		ctx->type_supported = SEC_BD_TYPE2;
- 		ctx->req_op = &sec_skcipher_req_ops;
-@@ -2056,7 +2076,7 @@ static int sec_skcipher_ctx_init(struct crypto_skcipher *tfm)
- 		ctx->req_op = &sec_skcipher_req_ops_v3;
+ static struct hisi_qp *hpre_get_qp_and_start(u8 type)
+@@ -340,26 +292,19 @@ static void hpre_hw_data_clr_all(struct hpre_ctx *ctx,
+ static int hpre_alg_res_post_hf(struct hpre_ctx *ctx, struct hpre_sqe *sqe,
+ 				void **kreq)
+ {
+-	struct hpre_asym_request *req;
+ 	unsigned int err, done, alg;
+-	int id;
+ 
+ #define HPRE_NO_HW_ERR		0
+ #define HPRE_HW_TASK_DONE	3
+ #define HREE_HW_ERR_MASK	GENMASK(10, 0)
+ #define HREE_SQE_DONE_MASK	GENMASK(1, 0)
+ #define HREE_ALG_TYPE_MASK	GENMASK(4, 0)
+-	id = (int)le16_to_cpu(sqe->tag);
+-	req = ctx->req_list[id];
+-	hpre_rm_req_from_ctx(req);
+-	*kreq = req;
++	*kreq = (void *)le64_to_cpu(sqe->tag);
+ 
+ 	err = (le32_to_cpu(sqe->dw0) >> HPRE_SQE_ALG_BITS) &
+ 		HREE_HW_ERR_MASK;
+-
+ 	done = (le32_to_cpu(sqe->dw0) >> HPRE_SQE_DONE_SHIFT) &
+ 		HREE_SQE_DONE_MASK;
+-
+ 	if (likely(err == HPRE_NO_HW_ERR && done == HPRE_HW_TASK_DONE))
+ 		return 0;
+ 
+@@ -370,34 +315,9 @@ static int hpre_alg_res_post_hf(struct hpre_ctx *ctx, struct hpre_sqe *sqe,
+ 	return -EINVAL;
+ }
+ 
+-static int hpre_ctx_set(struct hpre_ctx *ctx, struct hisi_qp *qp, int qlen)
+-{
+-	struct hpre *hpre;
+-
+-	if (!ctx || !qp || qlen < 0)
+-		return -EINVAL;
+-
+-	spin_lock_init(&ctx->req_lock);
+-	ctx->qp = qp;
+-	ctx->dev = &qp->qm->pdev->dev;
+-
+-	hpre = container_of(ctx->qp->qm, struct hpre, qm);
+-	ctx->hpre = hpre;
+-	ctx->req_list = kcalloc(qlen, sizeof(void *), GFP_KERNEL);
+-	if (!ctx->req_list)
+-		return -ENOMEM;
+-	ctx->key_sz = 0;
+-	ctx->crt_g2_mode = false;
+-	idr_init(&ctx->req_idr);
+-
+-	return 0;
+-}
+-
+ static void hpre_ctx_clear(struct hpre_ctx *ctx, bool is_clear_all)
+ {
+ 	if (is_clear_all) {
+-		idr_destroy(&ctx->req_idr);
+-		kfree(ctx->req_list);
+ 		hisi_qm_free_qps(&ctx->qp, 1);
  	}
  
+@@ -467,29 +387,22 @@ static void hpre_rsa_cb(struct hpre_ctx *ctx, void *resp)
+ 
+ static void hpre_alg_cb(struct hisi_qp *qp, void *resp)
+ {
+-	struct hpre_ctx *ctx = qp->qp_ctx;
+-	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
++	struct hpre_asym_request *h_req;
+ 	struct hpre_sqe *sqe = resp;
+-	struct hpre_asym_request *req = ctx->req_list[le16_to_cpu(sqe->tag)];
+ 
+-	if (unlikely(!req)) {
+-		atomic64_inc(&dfx[HPRE_INVALID_REQ_CNT].value);
++	h_req = (struct hpre_asym_request *)le64_to_cpu(sqe->tag);
++	if (unlikely(!h_req)) {
++		pr_err("Failed to get request, and qp_id is %u\n", qp->qp_id);
+ 		return;
+ 	}
+ 
+-	req->cb(ctx, resp);
+-}
+-
+-static void hpre_stop_qp_and_put(struct hisi_qp *qp)
+-{
+-	hisi_qm_stop_qp(qp);
+-	hisi_qm_free_qps(&qp, 1);
++	h_req->cb(h_req->ctx, resp);
+ }
+ 
+ static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
+ {
+ 	struct hisi_qp *qp;
+-	int ret;
++	struct hpre *hpre;
+ 
+ 	qp = hpre_get_qp_and_start(type);
+ 	if (IS_ERR(qp))
+@@ -497,19 +410,21 @@ static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
+ 
+ 	qp->qp_ctx = ctx;
+ 	qp->req_cb = hpre_alg_cb;
++	spin_lock_init(&ctx->req_lock);
++	ctx->qp = qp;
++	ctx->dev = &qp->qm->pdev->dev;
++	hpre = container_of(ctx->qp->qm, struct hpre, qm);
++	ctx->hpre = hpre;
++	ctx->key_sz = 0;
++	ctx->crt_g2_mode = false;
+ 
+-	ret = hpre_ctx_set(ctx, qp, qp->sq_depth);
+-	if (ret)
+-		hpre_stop_qp_and_put(qp);
+-
 -	return ret;
 +	return 0;
  }
  
- static void sec_skcipher_ctx_exit(struct crypto_skcipher *tfm)
-@@ -2124,7 +2144,7 @@ static int sec_aead_ctx_init(struct crypto_aead *tfm, const char *hash_name)
- 	int ret;
+ static int hpre_msg_request_set(struct hpre_ctx *ctx, void *req, bool is_rsa)
+ {
+ 	struct hpre_asym_request *h_req;
+ 	struct hpre_sqe *msg;
+-	int req_id;
+ 	void *tmp;
  
- 	ret = sec_aead_init(tfm);
--	if (ret) {
-+	if (ret && ret != -ENODEV) {
- 		pr_err("hisi_sec2: aead init error!\n");
- 		return ret;
- 	}
-@@ -2166,7 +2186,7 @@ static int sec_aead_xcm_ctx_init(struct crypto_aead *tfm)
- 	int ret;
+ 	if (is_rsa) {
+@@ -549,11 +464,8 @@ static int hpre_msg_request_set(struct hpre_ctx *ctx, void *req, bool is_rsa)
+ 	msg->task_len1 = (ctx->key_sz >> HPRE_BITS_2_BYTES_SHIFT) - 1;
+ 	h_req->ctx = ctx;
  
- 	ret = sec_aead_init(tfm);
--	if (ret) {
-+	if (ret && ret != -ENODEV) {
- 		dev_err(ctx->dev, "hisi_sec2: aead xcm init error!\n");
- 		return ret;
- 	}
-@@ -2311,6 +2331,9 @@ static int sec_skcipher_crypto(struct skcipher_request *sk_req, bool encrypt)
- 	bool need_fallback = false;
- 	int ret;
+-	req_id = hpre_add_req_to_ctx(h_req);
+-	if (req_id < 0)
+-		return -EBUSY;
+-
+-	msg->tag = cpu_to_le16((u16)req_id);
++	hpre_dfx_add_req_time(h_req);
++	msg->tag = cpu_to_le64((uintptr_t)h_req);
  
-+	if (!ctx->qps)
-+		goto soft_crypto;
-+
- 	if (!sk_req->cryptlen) {
- 		if (ctx->c_ctx.c_mode == SEC_CMODE_XTS)
- 			return -EINVAL;
-@@ -2328,9 +2351,12 @@ static int sec_skcipher_crypto(struct skcipher_request *sk_req, bool encrypt)
- 		return -EINVAL;
+ 	return 0;
+ }
+@@ -619,7 +531,6 @@ static int hpre_dh_compute_value(struct kpp_request *req)
+ 		return -EINPROGRESS;
  
- 	if (unlikely(ctx->c_ctx.fallback || need_fallback))
--		return sec_skcipher_soft_crypto(ctx, sk_req, encrypt);
-+		goto soft_crypto;
+ clear_all:
+-	hpre_rm_req_from_ctx(hpre_req);
+ 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
  
- 	return ctx->req_op->process(ctx, req);
-+
-+soft_crypto:
-+	return sec_skcipher_soft_crypto(ctx, sk_req, encrypt);
+ 	return ret;
+@@ -828,7 +739,6 @@ static int hpre_rsa_enc(struct akcipher_request *req)
+ 		return -EINPROGRESS;
+ 
+ clear_all:
+-	hpre_rm_req_from_ctx(hpre_req);
+ 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
+ 
+ 	return ret;
+@@ -883,7 +793,6 @@ static int hpre_rsa_dec(struct akcipher_request *req)
+ 		return -EINPROGRESS;
+ 
+ clear_all:
+-	hpre_rm_req_from_ctx(hpre_req);
+ 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
+ 
+ 	return ret;
+@@ -1346,7 +1255,7 @@ static int hpre_ecdh_set_param(struct hpre_ctx *ctx, struct ecdh *params)
+ 	return 0;
  }
  
- static int sec_skcipher_encrypt(struct skcipher_request *sk_req)
-@@ -2538,6 +2564,9 @@ static int sec_aead_crypto(struct aead_request *a_req, bool encrypt)
- 	bool need_fallback = false;
- 	int ret;
+-static bool hpre_key_is_zero(char *key, unsigned short key_sz)
++static bool hpre_key_is_zero(const char *key, unsigned short key_sz)
+ {
+ 	int i;
  
-+	if (!ctx->qps)
-+		goto soft_crypto;
-+
- 	req->flag = a_req->base.flags;
- 	req->aead_req.aead_req = a_req;
- 	req->c_req.encrypt = encrypt;
-@@ -2548,11 +2577,14 @@ static int sec_aead_crypto(struct aead_request *a_req, bool encrypt)
- 	ret = sec_aead_param_check(ctx, req, &need_fallback);
- 	if (unlikely(ret)) {
- 		if (need_fallback)
--			return sec_aead_soft_crypto(ctx, a_req, encrypt);
-+			goto soft_crypto;
- 		return -EINVAL;
- 	}
+@@ -1488,7 +1397,6 @@ static int hpre_ecdh_msg_request_set(struct hpre_ctx *ctx,
+ {
+ 	struct hpre_asym_request *h_req;
+ 	struct hpre_sqe *msg;
+-	int req_id;
+ 	void *tmp;
  
- 	return ctx->req_op->process(ctx, req);
-+
-+soft_crypto:
-+	return sec_aead_soft_crypto(ctx, a_req, encrypt);
+ 	if (req->dst_len < ctx->key_sz << 1) {
+@@ -1510,11 +1418,8 @@ static int hpre_ecdh_msg_request_set(struct hpre_ctx *ctx,
+ 	msg->task_len1 = (ctx->key_sz >> HPRE_BITS_2_BYTES_SHIFT) - 1;
+ 	h_req->ctx = ctx;
+ 
+-	req_id = hpre_add_req_to_ctx(h_req);
+-	if (req_id < 0)
+-		return -EBUSY;
+-
+-	msg->tag = cpu_to_le16((u16)req_id);
++	hpre_dfx_add_req_time(h_req);
++	msg->tag = cpu_to_le64((uintptr_t)h_req);
+ 	return 0;
  }
  
- static int sec_aead_encrypt(struct aead_request *a_req)
+@@ -1612,7 +1517,6 @@ static int hpre_ecdh_compute_value(struct kpp_request *req)
+ 		return -EINPROGRESS;
+ 
+ clear_all:
+-	hpre_rm_req_from_ctx(hpre_req);
+ 	hpre_ecdh_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
+ 	return ret;
+ }
 -- 
 2.33.0
 
