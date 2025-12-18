@@ -1,117 +1,183 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15ECF2BEC57
-	for <linux-crypto@vger.kernel.org>; Thu, 18 Dec 2025 03:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B23330B3B
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Dec 2025 07:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766029981; cv=none; b=QyG1Cp7PI2KZogRAhmglwgQTFpHKc7hw6lTNLrjhs+4vDFBLe4lNjxsKL2CRP38eWe2/67KVidZ2k4JnAVIJBjvv7xutTudfeNMWERA+npV0Wo0jhLmzW8BqY+n0c3zvhZdGeQjHY6AcU/pnqT+mv2YDdaeaaQkX+uYzPHjEt9I=
+	t=1766042505; cv=none; b=FvEUd8mEJkB+QurljEV0h3edAwup04t+DsmklBkNcdLy24I2hfkUgBNNSdWwsKhs370741+bgrZubvJ6BEFhs3CY9v3nWP5Giu2LvQ+SgZNEuWBql5qfPPpoH1YiUUroiQlGbk+3VdgekmyfOu1NB2/WjXpGxmD2H3EdF1SkdDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766029981; c=relaxed/simple;
-	bh=QMWBJBUexqbwWDfCPvN8knkhyI690YN3Qu8L+4wssTM=;
+	s=arc-20240116; t=1766042505; c=relaxed/simple;
+	bh=oRDVeoSH7AN/+1EKf418Edx8/qjw/FEB71Hmt8IhBro=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cL0rdjEP/ye9o0z8QxO+PTTEjYVj7UwRtOUUrOE2ZYK5Ya000j7FHJpJJBBp99YXpgIb37egFg7OIK8qYkgYhUSCO0XL3ZY+5ArKDyl6dDTHLx6hAA2i2RT35GjdHtE+7WG1CTO/G2i6OpdUdULEicuw7KW1lMPhsc3X2E1N+XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QK40YqQ3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=k+e+s4HN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=ZJIgjNSkw0GtzsmS9npIIzbqR8oui5jz8TiEx4oxdpltIm0jWJjiAp8qZwDci1J0cH8nKC36Gln1hyvOlsPnKS6gYxZq7hi2esqB0RdpfiJj/Ry3gkgMB0fWHg5nS1VCPW1XnxpVlXEFOS4RgtNLwJ2oNvwDDyh2mlsQ++JAzD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hFvxQjnf; arc=none smtp.client-ip=209.85.161.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QK40YqQ3";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="k+e+s4HN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766029976;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QMWBJBUexqbwWDfCPvN8knkhyI690YN3Qu8L+4wssTM=;
-	b=QK40YqQ39mPPKK0GAiQv6RT4DB7A0rVH3wbASKq+8q3cUBfjuMhLXQrAIwlBF08HaJnm9r
-	oZYJZ6y+jZyp11E8QTt9CdWIRoWeJ8OWHY7KPbO7kJvy9xtcjhUWsm5P4MBz5iSd7IJE2Y
-	X2NeFlBHPquo6qDCrgNCIQeyG0lX0EI=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-676-t6qerKr6Mu6G9P8shnWuTQ-1; Wed, 17 Dec 2025 22:52:55 -0500
-X-MC-Unique: t6qerKr6Mu6G9P8shnWuTQ-1
-X-Mimecast-MFC-AGG-ID: t6qerKr6Mu6G9P8shnWuTQ_1766029974
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2a0a0bad5dfso4438835ad.0
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 19:52:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hFvxQjnf"
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-65b73eacdfcso54702eaf.2
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Dec 2025 23:21:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766029974; x=1766634774; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1766042501; x=1766647301; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QMWBJBUexqbwWDfCPvN8knkhyI690YN3Qu8L+4wssTM=;
-        b=k+e+s4HNnZewU/pX5QWpphFgZNQnFcYBTaNVpMVZctsfx918Jny2rX2lMe07sh93w7
-         MNZxOWBt3AH04y6Yw5MgM73QcTXHs3UwqQUZ5l6UZo3V2LrBMTHgjb8rkAjrsD42Hoh4
-         THK8dAXe3b9kwMoyunySKb0qOwyKjyocY1SxzIL8jDn8NAtfmQqpFNgcWHNeM86aSSkd
-         gPw1y7hh82DYhbfUM2fDCLITX28gqLwwsSP8eTnN82a5+WDTsAeVnWQUs+/8LBZFXG+J
-         KsgNbtQTwOhubNL2KlJQXo1nzdcQI1IjnKVHFrxRvhcSabSiFvE9rQMX/AXIkKuwwckj
-         Q+Tg==
+        bh=u95c9TyT1XdaOnIyGBwMeLSiKMNJeuqg+7XxBfANtKE=;
+        b=hFvxQjnfCf2CUAqy40N2AHyq5MIDA0GgC5LKgr2+oJWxzVnQ/H2BlDj/PRT3fjn6YS
+         6uoMn7+YEL0+8O2LkRt30f+/2R5PDahttu121Fq4t7CeI0ECWbcDX44yZNP52rNK3/eA
+         fPojzuLnONspq5CUtSTCNO3/tkNye7HZkr84BB+Y/ocSOeYeJ03l/SmFCJB5qTJptZdQ
+         RbLfAkSfM0ummJWRnc7E8aYHqgmwBJNI/c/pFs/M401mDi2bS0euznuCTV9DcKpXnQ1t
+         H/xEDBrHcjuX6fA2f9gHgqEpAJVqBMy72GfMnDPZoRbg6fOFBpJbmBiSpijWbwGJ9Uu8
+         +Vxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766029974; x=1766634774;
+        d=1e100.net; s=20230601; t=1766042501; x=1766647301;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QMWBJBUexqbwWDfCPvN8knkhyI690YN3Qu8L+4wssTM=;
-        b=jjmW0Zk43ASMJ3PTgnuTv7MsHekmE8EzGxyc9bDYdlCsTSAK541T7UtK4OZ+HEzri0
-         B7RpwFcnj0qDOaSob/VlG5Gr7bwU3dBw+Wg9seBEWtxxKiY58UUIg8AmFmwrbzyQgJce
-         I52qCg+ivegykBNWZ8GBPdraWIPHOkk+nJ9CcHpbfZw8UjwcJd2BggRlkZnrgyA/FdoK
-         9ybgOIlK26SUZyzZdjOjZrtiD7Co8rmte5yBSW+qNnxZS5BYFqqMTjP/hWUiMsEonExH
-         z+kQVNeWWFbUIGuniRaKxVn7Gbzhfzz9nPs2HrpSqHESCSsZqItETG5r8x86D7TZ8ZVq
-         0NKA==
-X-Forwarded-Encrypted: i=1; AJvYcCULzt8posWqP2a9iE+nSKomBxFggx2qZxSMorNZiVHueu48qd9nBvAKou5QwH3fZUeUENv51BAY7NYHj7E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyltpCW9so1f6wPbVQwQ/twoEGI4XMjbCDFApj6gT39eOod7YqB
-	komrd07E2e/MJsMOy2xYV/k7uPutj3ibpxlEVqmor4S1/l0Mtih0h3Jbb3dxy3KYWUK+AQkbP3H
-	YhKZraB5lQqDNqwCBRqyHQAq7OFYJKR+T/e2TZJnNCBGRegskF3zp8Y6EeT2xYy7uQiqaptcSD5
-	rKKbAAkCz2E2JE6+LYxFM5vmxz375Hruh4aWu1xeDj
-X-Gm-Gg: AY/fxX5pddrrpd6wKboetKklZklXRWqK9Sl276KQRpQrY0KJBnlVqpKaUnn3tF5+qF4
-	SmBOckRzWUijMpJJJEgqeHWuE23x59htCClGOWfCsQSdIgs0VWW2KoqZlu4SL/RNj3Mx0hRII0h
-	/ibv/HiL72PqzNbzGKBJoaeKLWm8QbBppaov5LHZ+0TBFtGT4nKC9ZNQ+4O8PYHxEzdRg=
-X-Received: by 2002:a17:903:1aac:b0:298:5fde:5a93 with SMTP id d9443c01a7336-29f23c677edmr196912205ad.32.1766029974597;
-        Wed, 17 Dec 2025 19:52:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHw9DNEwmWjxWfi+F7K4n2BB/diI3M5uZKNjbX0bS9zDqcVCQPXZbRoNc0uTilQyHet8P2VB9LVOiFRTvTgn7U=
-X-Received: by 2002:a17:903:1aac:b0:298:5fde:5a93 with SMTP id
- d9443c01a7336-29f23c677edmr196912045ad.32.1766029974179; Wed, 17 Dec 2025
- 19:52:54 -0800 (PST)
+        bh=u95c9TyT1XdaOnIyGBwMeLSiKMNJeuqg+7XxBfANtKE=;
+        b=pkNKVFffs+jPAcPXIU1oOt9s3qx3GLbAL/P9g93PzcayaOwJ8j29pg4dOi5IZC+nP8
+         1lT68bL3yYKQkSrl4wVMAL8RmrDHRztAX/LhUApOR09olbGbQY5Njqs+1g0nx0MOcqlZ
+         EewFfJsiU62K4YUU0q3XE3XOZgOP4WO2atnt6FQEIHQSqEIzvjNUaE+EPt/Jlbjlpd66
+         6MgMxyiT5FDsLen9DkhLy+U0bHHzhCbuPX3eJ6e+g+X5+pis+OYp6hI4Odbb7Ayi7VF0
+         oHv5J0dx8kjZFkyyRV0XITAyhyrlxb/FjRZvT3rbo4DCZYaY/06bi+ESex48Hy6SrgxD
+         63eA==
+X-Forwarded-Encrypted: i=1; AJvYcCUB7q1xfVRJhk0yBExPxU2BBO4yThOEthXpqLPqXA1drNBddqmM8JAzMTh/BxXGIVjBrPvC98O3//OTq5U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySIMhAu1P7Ges06/7gqYtaoeEfQKqu0tLXxKA1WBLpup9T7EDN
+	sHGaQLpt8fCOpP7AVB+1H7OFnCsqN0w/GaRK4emkJQAtBcFYTmxCGsKEnUsWwSuW1xTEVmCDZm1
+	HV3Cfdm5tLHLrt+hdTuucrAYo3FiWbdgOXN9orQbhbw==
+X-Gm-Gg: AY/fxX5FRZs5u+QSpWGf6xoJv8l9eUCvUVXFzK5AeFBwEpwitDl2gqtcDa5L94AOS3y
+	OEGES2BSdcsGegSBGx+HaS6M742woYlaAvButCqhKmhpdEPRo84uLHK76i80/fUjDqywRTNIUYC
+	yQmV3EM7wpQ7K3DhY1RgSxOGoM++8KHd1w+E3/CFIn4tXN3vziNi1UnwnE+jQVgPsDQt67vBENX
+	Ifv2OdAyLlt4uqZgREbmcDExbW7wHqCc5afoOD3IQHg5AVdr4aD4nXqc4xXa+nLY7jDxFIkRX2R
+	Vrp5je2ZDKPoblagvmOAK4p8wQ==
+X-Google-Smtp-Source: AGHT+IHdzsrnh67Z+uk7sg0iAMocZMySikku48EGz5g7L5MG+hq7iSRlseyY2l5vM8LHePwozU/hD6rMNUuAq73AgFc=
+X-Received: by 2002:a05:6820:828:b0:65c:f41b:7119 with SMTP id
+ 006d021491bc7-65cf41b750emr1784992eaf.5.1766042500598; Wed, 17 Dec 2025
+ 23:21:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251218034846.948860-1-maobibo@loongson.cn> <20251218034846.948860-3-maobibo@loongson.cn>
-In-Reply-To: <20251218034846.948860-3-maobibo@loongson.cn>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 18 Dec 2025 11:52:42 +0800
-X-Gm-Features: AQt7F2qn7yrgQLTm-jx-zOUUwaHI5CYNjj2jNdNQeouWQKRiXmdxNRu5gCHge8I
-Message-ID: <CACGkMEv-zTNkyxQHx5v5FGZE12SHib_73Lf10wF50_7B1WrPbg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/9] crypto: virtio: Remove duplicated virtqueue_kick
- in virtio_crypto_skcipher_crypt_req
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Gonglei <arei.gonglei@huawei.com>, "Michael S . Tsirkin" <mst@redhat.com>, 
-	Eric Biggers <ebiggers@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, stable@vger.kernel.org, 
-	virtualization@lists.linux.dev
+References: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
+In-Reply-To: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
+From: Jens Wiklander <jens.wiklander@linaro.org>
+Date: Thu, 18 Dec 2025 08:21:27 +0100
+X-Gm-Features: AQt7F2r_j21Nqcv1IzhOT6jk9UPtvnwA1D3etXiTv5WveGJRYXXMC9qqoGF_Yc4
+Message-ID: <CAHUa44FrDZbvRvfN8obf80_k=Eqxe9YxHpjaE5jU7nkxPUwfag@mail.gmail.com>
+Subject: Re: [PATCH v2 00/17] tee: Use bus callbacks instead of driver callbacks
+To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Sumit Garg <sumit.garg@kernel.org>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Sumit Garg <sumit.garg@oss.qualcomm.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	=?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, 
+	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, 
+	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, 
+	linux-mips@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 18, 2025 at 11:49=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wro=
-te:
+Hi,
+
+On Mon, Dec 15, 2025 at 3:17=E2=80=AFPM Uwe Kleine-K=C3=B6nig
+<u.kleine-koenig@baylibre.com> wrote:
 >
-> With function virtio_crypto_skcipher_crypt_req(), there is already
-> virtqueue_kick() call with spinlock held in function
-> __virtio_crypto_skcipher_do_req(). Remove duplicated virtqueue_kick()
-> function call here.
+> Hello,
 >
-> Fixes: d79b5d0bbf2e ("crypto: virtio - support crypto engine framework")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> ---
+> the objective of this series is to make tee driver stop using callbacks
+> in struct device_driver. These were superseded by bus methods in 2006
+> (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
+> methods.")) but nobody cared to convert all subsystems accordingly.
+>
+> Here the tee drivers are converted. The first commit is somewhat
+> unrelated, but simplifies the conversion (and the drivers). It
+> introduces driver registration helpers that care about setting the bus
+> and owner. (The latter is missing in all drivers, so by using these
+> helpers the drivers become more correct.)
+>
+> v1 of this series is available at
+> https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koenig@baylibre=
+.com
+>
+> Changes since v1:
+>
+>  - rebase to v6.19-rc1 (no conflicts)
+>  - add tags received so far
+>  - fix whitespace issues pointed out by Sumit Garg
+>  - fix shutdown callback to shutdown and not remove
+>
+> As already noted in v1's cover letter, this series should go in during a
+> single merge window as there are runtime warnings when the series is
+> only applied partially. Sumit Garg suggested to apply the whole series
+> via Jens Wiklander's tree.
+> If this is done the dependencies in this series are honored, in case the
+> plan changes: Patches #4 - #17 depend on the first two.
+>
+> Note this series is only build tested.
+>
+> Uwe Kleine-K=C3=B6nig (17):
+>   tee: Add some helpers to reduce boilerplate for tee client drivers
+>   tee: Add probe, remove and shutdown bus callbacks to tee_client_driver
+>   tee: Adapt documentation to cover recent additions
+>   hwrng: optee - Make use of module_tee_client_driver()
+>   hwrng: optee - Make use of tee bus methods
+>   rtc: optee: Migrate to use tee specific driver registration function
+>   rtc: optee: Make use of tee bus methods
+>   efi: stmm: Make use of module_tee_client_driver()
+>   efi: stmm: Make use of tee bus methods
+>   firmware: arm_scmi: optee: Make use of module_tee_client_driver()
+>   firmware: arm_scmi: Make use of tee bus methods
+>   firmware: tee_bnxt: Make use of module_tee_client_driver()
+>   firmware: tee_bnxt: Make use of tee bus methods
+>   KEYS: trusted: Migrate to use tee specific driver registration
+>     function
+>   KEYS: trusted: Make use of tee bus methods
+>   tpm/tpm_ftpm_tee: Make use of tee specific driver registration
+>   tpm/tpm_ftpm_tee: Make use of tee bus methods
+>
+>  Documentation/driver-api/tee.rst             | 18 +----
+>  drivers/char/hw_random/optee-rng.c           | 26 ++----
+>  drivers/char/tpm/tpm_ftpm_tee.c              | 31 +++++---
+>  drivers/firmware/arm_scmi/transports/optee.c | 32 +++-----
+>  drivers/firmware/broadcom/tee_bnxt_fw.c      | 30 ++-----
+>  drivers/firmware/efi/stmm/tee_stmm_efi.c     | 25 ++----
+>  drivers/rtc/rtc-optee.c                      | 27 ++-----
+>  drivers/tee/tee_core.c                       | 84 ++++++++++++++++++++
+>  include/linux/tee_drv.h                      | 12 +++
+>  security/keys/trusted-keys/trusted_tee.c     | 17 ++--
+>  10 files changed, 164 insertions(+), 138 deletions(-)
+>
+> base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+> --
+> 2.47.3
+>
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Thank you for the nice cleanup, Uwe.
 
-Thanks
+I've applied patch 1-3 to the branch tee_bus_callback_for_6.20 in my
+tree at https://git.kernel.org/pub/scm/linux/kernel/git/jenswi/linux-tee.gi=
+t/
 
+The branch is based on v6.19-rc1, and I'll try to keep it stable for
+others to depend on, if needed. Let's see if we can agree on taking
+the remaining patches via that branch.
+
+Cheers,
+Jens
