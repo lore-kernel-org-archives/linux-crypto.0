@@ -1,126 +1,73 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC2F7405A;
-	Fri, 19 Dec 2025 04:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54DCD2749C5;
+	Fri, 19 Dec 2025 06:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766118594; cv=none; b=CUB+gwIDDu3eErYIru0EkxssmzD0qIxQn74FRBlmAkZjh3Q6qPev5+YK2rZRtyjrlexcusRLUDIDY1/HOaeFwIPFiKtv91YD9VolOgO3GQG9XdSkOqAggWnyZRtXy8qwiQJlEpm5SCMnxhBNE/rMngU29jukQVZOy3TLMNB6EYI=
+	t=1766125345; cv=none; b=WMWlgzNrPgYBhEqPOYg8uChmGj77KsHMQgvrKxceX7PHsLtFKOU4bbBUw6mqr+/vXQ3CkjZUYA3DLKEgaCh4rdLQ2P1KrvdOsvTuk/3TFZ11zPFRaR7koxsM8CgmzEU1figi3/CgPNK8JvW27fYv3LoHHLM6NeRtHY++RcxJeGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766118594; c=relaxed/simple;
-	bh=tI+x0eCt5Jk0AIqnw9KGquZ/jqfDBwv7KX4+L3F8dt8=;
+	s=arc-20240116; t=1766125345; c=relaxed/simple;
+	bh=KjPAmDyxut7IXcApPB6WRZxT0G7td6sf7nanu8aDTsA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=meC8lUtOWnwvSx0OfO9atyJlmzKwCFVmO5ddWE0XrfE6w6+H2Qaq9OyIORqw3/W2geZXg5jL5NqQxXl5VcNU6A41IYVYiVuIa0Fm5vQ516Y1ZKE3oy4AuL6i7JTZ4OfZNgTUIvGTyPBLIJUGqFrXTVhRxn4AvrroLQnKOFn9bd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ip6215jE; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=En/+uDQ04mf3ZHdBn4bOF/8YIqDa34ShAoDVKmgEXmIdOBrahbUSgbT02/VB6SHPeQ4x6JfW3V/hYs+y1OaZIoACp2lfzw9x82pyGJd5sdQZOoxmL91oa4XVDrTQhNm/K12IQEAtFfI7wp7Mw0QcJT+7ZBJVakYps3KgpKKGs5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ENnGgPvQ; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ip6215jE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766118593; x=1797654593;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tI+x0eCt5Jk0AIqnw9KGquZ/jqfDBwv7KX4+L3F8dt8=;
-  b=ip6215jE3MpEqiJYxqxdesiCfImd23ohfYJSsqEys2jnCaSMhJ9n2Fr2
-   57tsbsqadN6Ez+mU3vxP87kVQOViA6OUaRU0nIhIUYP1maxz0iZTrAXvx
-   uJ/0MyO7b7jR41DKd99rhRtBrY8BOJP8cWvtVurbDCbXdvGf4XKCgAzzb
-   obsC8M1BvzHmL52YrXh6ak4iBap0RkA4ttAaCIq2O1Y4O0mzAZQlAT41S
-   XNQDSPI6+e9ua20GnlWnfguLyko2C1sOf6sG0tHFfMZGWjvTiXvFZvIG0
-   BpuTL+nd1hR2d2nZSrWawCCJ64nkETY/iFNxIshrPjNAYBIRaXNybqEpg
-   A==;
-X-CSE-ConnectionGUID: 0xXwAxNzQP68OVK0ghWJsg==
-X-CSE-MsgGUID: fQ9mDoAAQoyn09a5CmHOtg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11646"; a="85666127"
-X-IronPort-AV: E=Sophos;i="6.21,159,1763452800"; 
-   d="scan'208";a="85666127"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2025 20:29:52 -0800
-X-CSE-ConnectionGUID: c7W7TVl6Rx67mKtgG3hQrA==
-X-CSE-MsgGUID: k7h3XoBJQzCGu4K+mE5Ogw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,159,1763452800"; 
-   d="scan'208";a="197914218"
-Received: from lkp-server01.sh.intel.com (HELO 0d09efa1b85f) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 18 Dec 2025 20:29:49 -0800
-Received: from kbuild by 0d09efa1b85f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vWS7e-0000000030L-01B1;
-	Fri, 19 Dec 2025 04:29:46 +0000
-Date: Fri, 19 Dec 2025 12:29:29 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	"Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>
-Subject: Re: [PATCH 1/3] lib/crypto: Add KUnit test vectors for Ascon-Hash256
-Message-ID: <202512191115.8pVsYusz-lkp@intel.com>
-References: <20251215-ascon_hash256-v1-1-24ae735e571e@kriptograf.id>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ENnGgPvQ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=W0MN6pUFNVtsOI+Zv3JYyUrXeCxmmFLgM9vFQUhlADw=; 
+	b=ENnGgPvQ6zoEsTz+ORcYvVV/fbBV5FLiqhmPNMgE2V0f/D4u2DOBkWlKFmhfd8K2uapISLk09NL
+	HaRfGs5tR5BcSlZQ+0iJFsOT9vcSxjGzv/6FeX/kNo/dWfuuKXQ4OseBb473WCX4mAW8Ba3vY6cdX
+	4L3oX01y4AZB2XZWNNadrnWPY2nofZS4HeAyY0Pv+ItiKgoLIY+WADjVrW7L65yCh9pgq+fKmIbL3
+	s8IIqEjU6MM2LV58t7lL4Xl9CpmTsm4gGKnJdv2S8Lbt/mcTD3fAtCe8BFdGj2wn2BQXRySzgHKrT
+	jriX6jztWYmMGBFKr4FVu2nOXFswnRYiAtaw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vWTsO-00BEDw-0W;
+	Fri, 19 Dec 2025 14:22:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 Dec 2025 14:22:08 +0800
+Date: Fri, 19 Dec 2025 14:22:08 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
+Cc: Jens Wiklander <jens.wiklander@linaro.org>,
+	Sumit Garg <sumit.garg@kernel.org>,
+	Olivia Mackall <olivia@selenic.com>,
+	op-tee@lists.trustedfirmware.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: Re: [PATCH v2 04/17] hwrng: optee - Make use of
+ module_tee_client_driver()
+Message-ID: <aUTvENaCfiURNyFg@gondor.apana.org.au>
+References: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
+ <d0074b2e05cfb78ce5e95c875731e784bef52411.1765791463.git.u.kleine-koenig@baylibre.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20251215-ascon_hash256-v1-1-24ae735e571e@kriptograf.id>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d0074b2e05cfb78ce5e95c875731e784bef52411.1765791463.git.u.kleine-koenig@baylibre.com>
 
-Hi Rusydi,
+On Mon, Dec 15, 2025 at 03:16:34PM +0100, Uwe Kleine-König wrote:
+> Reduce boilerplate by using the newly introduced module_tee_client_driver().
+> That takes care of assigning the driver's bus, so the explicit assigning
+> in this driver can be dropped.
+> 
+> Reviewed-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+> ---
+>  drivers/char/hw_random/optee-rng.c | 14 +-------------
+>  1 file changed, 1 insertion(+), 13 deletions(-)
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on ebiggers/libcrypto-next]
-[also build test WARNING on ebiggers/libcrypto-fixes linus/master v6.19-rc1 next-20251218]
-[cannot apply to herbert-cryptodev-2.6/master herbert-crypto-2.6/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Rusydi-H-Makarim/lib-crypto-Initial-implementation-of-Ascon-Hash256/20251215-165442
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git libcrypto-next
-patch link:    https://lore.kernel.org/r/20251215-ascon_hash256-v1-1-24ae735e571e%40kriptograf.id
-patch subject: [PATCH 1/3] lib/crypto: Add KUnit test vectors for Ascon-Hash256
-config: parisc-randconfig-001-20251216 (https://download.01.org/0day-ci/archive/20251219/202512191115.8pVsYusz-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 11.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251219/202512191115.8pVsYusz-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512191115.8pVsYusz-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from lib/crypto/tests/ascon_hash_kunit.c:6:
->> include/crypto/ascon_hash.h:24:18: warning: 'ascon_p_rndc' defined but not used [-Wunused-const-variable=]
-      24 | static const u64 ascon_p_rndc[] = {
-         |                  ^~~~~~~~~~~~
-
-
-vim +/ascon_p_rndc +24 include/crypto/ascon_hash.h
-
-    18	
-    19	/*
-    20	 * The standard of Ascon permutation in NIST SP 800-232 specifies 16 round
-    21	 * constants to accomodate potential functionality extensions in the future
-    22	 * (see page 2).
-    23	 */
-  > 24	static const u64 ascon_p_rndc[] = {
-    25		0x000000000000003cULL, 0x000000000000002dULL, 0x000000000000001eULL,
-    26		0x000000000000000fULL, 0x00000000000000f0ULL, 0x00000000000000e1ULL,
-    27		0x00000000000000d2ULL, 0x00000000000000c3ULL, 0x00000000000000b4ULL,
-    28		0x00000000000000a5ULL, 0x0000000000000096ULL, 0x0000000000000087ULL,
-    29		0x0000000000000078ULL, 0x0000000000000069ULL, 0x000000000000005aULL,
-    30		0x000000000000004bULL,
-    31	};
-    32	
-
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
