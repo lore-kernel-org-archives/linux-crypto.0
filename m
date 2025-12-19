@@ -1,68 +1,214 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8FD14F112;
-	Fri, 19 Dec 2025 07:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1873A2D6E75
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 08:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766128217; cv=none; b=kfrC2KnOT6JDAXPKrlvKgnGIe0fiJjew8KVnu6Kk+5rHOFevJythIF3nlIAjHD3dkIla0rEGBC68ID+5+e+gpYt8IdHUxGyP1TLxvgs0v9/AOv/aynf+zz4r68GX0/TH+LLyzFu91nqRXKANbrJsKSIN5n4wMzqzG/XGWqsVKx4=
+	t=1766131734; cv=none; b=RZssx5PMqxZFE8rdWXRctiGpQikdnLit/1/fnoFzJydJAnfDC89Oi/qBeBbRz2vYI1qF4oxHOzYVkS81HI5zz26eMRKePBOY3aTcme0PWAz7PiftsLTuQxrNnTRlTqgSMmbdRP5o+4f/ES0Kx2rMqz2K32dESDfV/pOfB8bvUDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766128217; c=relaxed/simple;
-	bh=tthodktePkZw6QWs36L2wTy3x3xoJzO7EagOdaEqud4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qxrCGBMNq/YNpFAJImgW4YfZcNxtPU59ef1ORSZvM880kTHn7r9bDjzLuRc9L+wj9OZIF1OjdOgYa8KSZTQU5/fUNmlZh0ODagiiTcbHLQnFye2coUTuYw11jFWwNTcxdaxKhh7J/FRfjeRITTMGxtSB4Cuk6Fly/MdQpzqHnZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=SxVjGFwW; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1766131734; c=relaxed/simple;
+	bh=c08HL3X0gS3Tir32FNsPBvq2tRvqI6vCoJ/9N8wTGuc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=k1Oo6CAX6mHiY5Jc9Veh0h7Ayt72oFtHJJpzozB4TfbcPMyxxi1X/DR38Lq8mfMDkja82iM+nOyYo2Znh55ngWNo539IUCqxF5gFNzYmMmDMHm4G4NH3mlX7TQHXO2UKSVv9YBosYGJkNtMNXsY4KCPChqCGMo/04JBqCtwqjqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1RHQoupV; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="SxVjGFwW"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=0IdTEIJic/n+vUotbAdvyVrSN8GI4BHbcbwGgmGsDX4=; 
-	b=SxVjGFwW7PDfb6EtVylzQLHOgQPASbXYqZ6QHZNjB4Biw5DnA5At9V42nsiFPfMIo31Pg/0iVsj
-	1+bGae7zxqRRgT1OsnzqdOZuCa7BOdf0A/yb9+dwUz99buiGx/ZMxrjhDsuixIDYr/VmO0eDPnkUw
-	ZM8B14tDyp36LP14fp0mI0iaOhq3EJ6m2eu/TheMXwjtUQ99oL7qLsC9N+M5tfehj33PXDRH9HWp5
-	LfIuNULsrOVFcZ41E+V+PyiNseIQ/Y4gZtFP34fCIHRinj/Pg1B6NTXpOMIly+SeHBjbm7s2Wv2hD
-	gIFo6wcewiqt9QVR1ZEpop0IELug2lYSz/eA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vWUcq-00BEkB-1A;
-	Fri, 19 Dec 2025 15:10:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 Dec 2025 15:10:08 +0800
-Date: Fri, 19 Dec 2025 15:10:08 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: algapi - Use crypto_unregister_algs in
- crypto_register_algs
-Message-ID: <aUT6UC1WmtiDCmXl@gondor.apana.org.au>
-References: <20251211101555.802559-1-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1RHQoupV"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7ba9c366057so4304783b3a.1
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 00:08:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1766131732; x=1766736532; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CVYP3bSK2KuLrEmdKNykpHO/s/KahanlguSoTHltRDI=;
+        b=1RHQoupVcIUAoTzzmPCpT4LeNSNBCfkZLwNOMXXFGFK7ioYGn6rHOv/24EdsNL9xB1
+         5lsyrSdlv+4NCtW/SoYo6KjqRASMOddodfIv3bPFM6waEV44agYvZMa9ibvMIKDrQXZ0
+         DzW7Isj5xEmyuAuowlzrVw30XM0l4ftQiXl1R1Qz4woKdrqFffHWeCAR4pQjk59QPRM8
+         WiFlyKoFATjJaRnmeDOLz/IrjpLrMU+AbMJHJMOdXCQcH7LZm/UP9cUQUJVKHg6mSom4
+         VcBI0SDgqvfPLZhzZrG7POirNRmSfu8FO59SnJOa2NJrss4AK9UNepfsQd2be9y8XsvY
+         a5Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766131732; x=1766736532;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CVYP3bSK2KuLrEmdKNykpHO/s/KahanlguSoTHltRDI=;
+        b=ZXoRzGq+nEhPERs4zSF7Z7oEuTvstrRlf+I14mVX/KiKMjVqxKBTHgMHiE78TPXlZO
+         fCjmMpzXjT6MS7lzPU9jkIlY/tlRv4iIdASZfwqApaBRhtPBVNM4WUQo+c5v+0kuOQbQ
+         UGHn1wtbmUpfFULnD+1/HPcAbVJrlbvTcPWPDFBaFCS2rCEvAmcrAas0jLtKHWlfPRFm
+         /Clxmhwz5PTCxxRL+Xws00vQYXSED+drGON6VNTKf3RR9D2uQQ73dUcQVT7AWy6My2L4
+         3ma++7iYZ6/DSUxsX6Lbepd0ZracMfj1vc3hzMc2buvv8RfZuGmLaiOkM8kGm3MuAmsT
+         5Q6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX86ByniugvoswPE8FWab4ilFF+zCEtZghgkmjT273t9V9NVw+T1dQBvABR6yz4524Ey987nJ1que1hRuc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzz2S18xSqBP+IFzxv6wonzvESpSpoMLDcmQGcQMDdr4aoTPURm
+	Lkl9BGQrDfb8Z7pDJ0I5pV917Q0MvukfAlr1kW6youTMQCq4MmPe3HqY0UyG0l+ZyuluiXLjwlY
+	a5t9SukvDqHd6yQ==
+X-Google-Smtp-Source: AGHT+IF1HWHkidomjHSYrLOWRhyEBQjZoXpv/inqUNzrJu7XY2pVFTmtxyYaUnlT82pi8CaiMhNQXsM7MCuS1Q==
+X-Received: from pfbk28.prod.google.com ([2002:a05:6a00:b01c:b0:7c2:a212:2b32])
+ (user=davidgow job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:3385:b0:7ab:5e68:e204 with SMTP id d2e1a72fcca58-7ff650cdf7amr2113593b3a.29.1766131732390;
+ Fri, 19 Dec 2025 00:08:52 -0800 (PST)
+Date: Fri, 19 Dec 2025 16:08:48 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251211101555.802559-1-thorsten.blum@linux.dev>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.322.g1dd061c0dc-goog
+Message-ID: <20251219080850.921416-1-davidgow@google.com>
+Subject: [PATCH] kunit: Enforce task execution in {soft,hard}irq contexts
+From: David Gow <davidgow@google.com>
+To: Eric Biggers <ebiggers@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	Rae Moar <raemoar63@gmail.com>, Shuah Khan <skhan@linuxfoundation.org>
+Cc: David Gow <davidgow@google.com>, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Dec 11, 2025 at 11:15:55AM +0100, Thorsten Blum wrote:
-> Replace the for loop with a call to crypto_unregister_algs(). Return
-> 'ret' immediately and remove the goto statement to simplify the error
-> handling code.
-> 
-> In crypto_unregister_algs(), unregister the algorithms in reverse order.
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  crypto/algapi.c | 14 +++++---------
->  1 file changed, 5 insertions(+), 9 deletions(-)
+The kunit_run_irq_test() helper allows a function to be run in hardirq
+and softirq contexts (in addition to the task context). It does this by
+running the user-provided function concurrently in the three contexts,
+until either a timeout has expired or a number of iterations have
+completed in the normal task context.
 
-Patch applied.  Thanks.
+However, on setups where the initialisation of the hardirq and softirq
+contexts (or, indeed, the scheduling of those tasks) is significantly
+slower than the function execution, it's possible for that number of
+iterations to be exceeded before any runs in irq contexts actually
+occur. This occurs with the polyval.test_polyval_preparekey_in_irqs
+test, which runs 20000 iterations of the relatively fast preparekey
+function, and therefore fails often under many UML, 32-bit arm, m68k and
+other environments.
+
+Instead, ensure that the max_iterations limit counts executions in all
+three contexts, and requires at least one of each. This will cause the
+test to continue iterating until at least the irq contexts have been
+tested, or the 1s wall-clock limit has been exceeded. This causes the
+test to pass in all of my environments.
+
+In so doing, we also update the task counters to atomic ints, to better
+match both the 'int' max_iterations input, and to ensure they are
+correctly updated across contexts.
+
+Finally, we also fix a few potential assertion messages to be
+less-specific to the original crypto usecases.
+
+Fixes: b41dc83f0790 ("kunit, lib/crypto: Move run_irq_test() to common header")
+Signed-off-by: David Gow <davidgow@google.com>
+---
+ include/kunit/run-in-irq-context.h | 41 ++++++++++++++++++++----------
+ 1 file changed, 28 insertions(+), 13 deletions(-)
+
+diff --git a/include/kunit/run-in-irq-context.h b/include/kunit/run-in-irq-context.h
+index 108e96433ea4..4d25aee0de6e 100644
+--- a/include/kunit/run-in-irq-context.h
++++ b/include/kunit/run-in-irq-context.h
+@@ -20,8 +20,8 @@ struct kunit_irq_test_state {
+ 	bool task_func_reported_failure;
+ 	bool hardirq_func_reported_failure;
+ 	bool softirq_func_reported_failure;
+-	unsigned long hardirq_func_calls;
+-	unsigned long softirq_func_calls;
++	atomic_t hardirq_func_calls;
++	atomic_t softirq_func_calls;
+ 	struct hrtimer timer;
+ 	struct work_struct bh_work;
+ };
+@@ -32,7 +32,7 @@ static enum hrtimer_restart kunit_irq_test_timer_func(struct hrtimer *timer)
+ 		container_of(timer, typeof(*state), timer);
+ 
+ 	WARN_ON_ONCE(!in_hardirq());
+-	state->hardirq_func_calls++;
++	atomic_inc(&state->hardirq_func_calls);
+ 
+ 	if (!state->func(state->test_specific_state))
+ 		state->hardirq_func_reported_failure = true;
+@@ -48,7 +48,7 @@ static void kunit_irq_test_bh_work_func(struct work_struct *work)
+ 		container_of(work, typeof(*state), bh_work);
+ 
+ 	WARN_ON_ONCE(!in_serving_softirq());
+-	state->softirq_func_calls++;
++	atomic_inc(&state->softirq_func_calls);
+ 
+ 	if (!state->func(state->test_specific_state))
+ 		state->softirq_func_reported_failure = true;
+@@ -59,7 +59,10 @@ static void kunit_irq_test_bh_work_func(struct work_struct *work)
+  * hardirq context concurrently, and reports a failure to KUnit if any
+  * invocation of @func in any context returns false.  @func is passed
+  * @test_specific_state as its argument.  At most 3 invocations of @func will
+- * run concurrently: one in each of task, softirq, and hardirq context.
++ * run concurrently: one in each of task, softirq, and hardirq context. @func
++ * will continue running until either @max_iterations calls have been made (so
++ * long as at least one each runs in task, softirq, and hardirq contexts), or
++ * one second has passed.
+  *
+  * The main purpose of this interrupt context testing is to validate fallback
+  * code paths that run in contexts where the normal code path cannot be used,
+@@ -85,6 +88,10 @@ static inline void kunit_run_irq_test(struct kunit *test, bool (*func)(void *),
+ 		.test_specific_state = test_specific_state,
+ 	};
+ 	unsigned long end_jiffies;
++	int hardirq_calls, softirq_calls;
++	bool allctx = false;
++
++	max_iterations = 1;
+ 
+ 	/*
+ 	 * Set up a hrtimer (the way we access hardirq context) and a work
+@@ -94,14 +101,22 @@ static inline void kunit_run_irq_test(struct kunit *test, bool (*func)(void *),
+ 			       CLOCK_MONOTONIC, HRTIMER_MODE_REL_HARD);
+ 	INIT_WORK_ONSTACK(&state.bh_work, kunit_irq_test_bh_work_func);
+ 
+-	/* Run for up to max_iterations or 1 second, whichever comes first. */
++	/* Run for up to max_iterations (including at least one task, softirq,
++	 * and hardirq), or 1 second, whichever comes first.
++	 */
+ 	end_jiffies = jiffies + HZ;
+ 	hrtimer_start(&state.timer, KUNIT_IRQ_TEST_HRTIMER_INTERVAL,
+ 		      HRTIMER_MODE_REL_HARD);
+-	for (int i = 0; i < max_iterations && !time_after(jiffies, end_jiffies);
+-	     i++) {
++	for (int task_calls = 0, calls = 0;
++			((calls < max_iterations) || !allctx) && !time_after(jiffies, end_jiffies);
++			task_calls++) {
+ 		if (!func(test_specific_state))
+ 			state.task_func_reported_failure = true;
++
++		hardirq_calls = atomic_read(&state.hardirq_func_calls);
++		softirq_calls = atomic_read(&state.softirq_func_calls);
++		calls = task_calls + hardirq_calls + softirq_calls;
++		allctx = (task_calls > 0) && (hardirq_calls > 0) && (softirq_calls > 0);
+ 	}
+ 
+ 	/* Cancel the timer and work. */
+@@ -109,21 +124,21 @@ static inline void kunit_run_irq_test(struct kunit *test, bool (*func)(void *),
+ 	flush_work(&state.bh_work);
+ 
+ 	/* Sanity check: the timer and BH functions should have been run. */
+-	KUNIT_EXPECT_GT_MSG(test, state.hardirq_func_calls, 0,
++	KUNIT_EXPECT_GT_MSG(test, atomic_read(&state.hardirq_func_calls), 0,
+ 			    "Timer function was not called");
+-	KUNIT_EXPECT_GT_MSG(test, state.softirq_func_calls, 0,
++	KUNIT_EXPECT_GT_MSG(test, atomic_read(&state.softirq_func_calls), 0,
+ 			    "BH work function was not called");
+ 
+ 	/* Check for incorrect hash values reported from any context. */
+ 	KUNIT_EXPECT_FALSE_MSG(
+ 		test, state.task_func_reported_failure,
+-		"Incorrect hash values reported from task context");
++		"Failure reported from task context");
+ 	KUNIT_EXPECT_FALSE_MSG(
+ 		test, state.hardirq_func_reported_failure,
+-		"Incorrect hash values reported from hardirq context");
++		"Failure reported from hardirq context");
+ 	KUNIT_EXPECT_FALSE_MSG(
+ 		test, state.softirq_func_reported_failure,
+-		"Incorrect hash values reported from softirq context");
++		"Failure reported from softirq context");
+ }
+ 
+ #endif /* _KUNIT_RUN_IN_IRQ_CONTEXT_H */
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.52.0.322.g1dd061c0dc-goog
+
