@@ -1,43 +1,69 @@
-Received: from sender4-of-o50.zoho.com (sender4-of-o50.zoho.com [136.143.188.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com [209.85.210.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFEFA304976;
-	Fri, 19 Dec 2025 21:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766179652; cv=pass; b=MSUDCutRx+430SAu7MHCLJ8aYlNYfOLhXSYRKUzNIyoeKxFMwGr3bmapIa3v/Xcy0kxeZDRK814X+lw8KTfs68SRjEGMh0+aXPpZNE/J09Ogcl+Cdhn6ht52sPPP227LTc8P/IKJxisS0AL3C6xhTPdqVXTJKHPMI3TdTuYlavc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766179652; c=relaxed/simple;
-	bh=/KdBLu3zLIn3vMbwoWA7KwHaiELSeLp1z4W3gn1njws=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=az+ip4YPj8Ob79HVm6dXysC3V/sa805/UDBuAW03yhlVI5akPQ1Db/x4DjOjxVmaOcUGMlbOnuxeWh/PfkLI3GD0fMPNqKUubk9FgOzgiF0FAWHGvpVALvOkZIBjSPcjouKzao7CrznDdKBtXsVFut+O9vVli7QYDU5ar4gE7kk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com; spf=pass smtp.mailfrom=apertussolutions.com; dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b=EHw8A+Hx; arc=pass smtp.client-ip=136.143.188.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=apertussolutions.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A2A33C193
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 21:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.194
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766179734; cv=none; b=jCMTKLnGNIolVhUXR/2+cqODk31Fz5c378+49eKZkkUSyxJ4tkvtSfTYt1N1T/6lBpOPaevuwM1a+h8JbWIRo3XXfohYMvn2UxlFOxnG1ayLxhOXfRVY30NUveRZCqiWjn6LyBt17+4XKJuUCPGnBnivzAhpwpeu8vLHcDPy4Fo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766179734; c=relaxed/simple;
+	bh=9qdyLYhk6D9KpgNEc9lTRHJNMgr66Y5zIziSEMCrXTM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AyiiP+lcKI9VoPhyOHfSNvQ/jfgazDJ5y+2ft85t7ibIJ00CQy9/hyvJIXyCEiRfZkjn6xQpOYcsk3mRCL1keDrf4W0yfOlSxmJtoLkFPs6cfXBPk0l3I3wYeU1Q18mvldexc+/VMGU0W74EK5ISND31rEEOf/Zm2NEVKonHSkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RMtyxVaH; arc=none smtp.client-ip=209.85.210.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b="EHw8A+Hx"
-ARC-Seal: i=1; a=rsa-sha256; t=1766179569; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=XPk0Sln3Cy5qk9DCbfpON90DRrJ6nI9A6vUs+SDznVkOPF+0/KPsmXq9b9DDLc6G7FyU9F0CJt5VdkipC61Tei3S1DepoHDKMSB/wa2v9KRUb9My7p/5zHLBW0qRwtrPr9SufQtphsiNXeZQiLxYJ9H+5FZQbYi9qJSWKunnNjw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1766179569; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=1ksQG2W08myKpheAB5+lngG8EZBBbzC4ZDZ4Ho0k7yk=; 
-	b=HHVC7hMBfBO846ScF3bcXEHdCW2AJdpkSX1+Km6al2QM4b7oRgPtjjGMrZRAwh5WlSjVAOXmyUdSTN9Li2b/cTPSg+suLtNT0t3rwlYlwliPjw17QP4i47ZCByfWQDxeh730ZvkQm2tgepZ45g5KibgWi2FxQ/jEV0HTbDrKJTI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=apertussolutions.com;
-	spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
-	dmarc=pass header.from=<dpsmith@apertussolutions.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1766179569;
-	s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
-	h=Message-ID:Date:Date:MIME-Version:From:From:Subject:Subject:To:To:Cc:Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=1ksQG2W08myKpheAB5+lngG8EZBBbzC4ZDZ4Ho0k7yk=;
-	b=EHw8A+Hx1IszIEM+SW2HJBnE2oDNbQgT9FR2t1QSNOin+e1UbG5VkGGIH85bazia
-	mcgs4w2xqMOHq6EQHfPnSgU1DLIxdXTY0aLA1V0H8NrITQ6SXGv6YwAcPw2Mt5z7DpN
-	a0wdNOlnOWMU3TV6djzu7cPpRXAjLpHsQ1z+BoW0=
-Received: by mx.zohomail.com with SMTPS id 1766179565947257.12757632667626;
-	Fri, 19 Dec 2025 13:26:05 -0800 (PST)
-Message-ID: <62227ed3-3804-4795-93c9-ce2bbad3f2a7@apertussolutions.com>
-Date: Fri, 19 Dec 2025 16:26:02 -0500
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RMtyxVaH"
+Received: by mail-pf1-f194.google.com with SMTP id d2e1a72fcca58-7ba55660769so1867339b3a.1
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 13:28:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766179731; x=1766784531; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9qdyLYhk6D9KpgNEc9lTRHJNMgr66Y5zIziSEMCrXTM=;
+        b=RMtyxVaHlb4x5czCBEyOx56xfjT+RNoyzgmUIOLM8rQyyjHAn8b14RHWVg+U9yECU2
+         DNet9BX2LSDx+fbfhj2eagJwVgKFUN3paA/J0jVpzr17MqrPGIkC8uWMpzr25M5n/Svh
+         riLL7VUKYl3lLur1iiIDnUxqZzSyVldJOlWErwA4BYTCmBjZa+IIIv/4tggBwnPyd5N1
+         4sP+EomK5LaRfaouO3drpoA8BG7gNbSc2L4KFhFCx08iZDlPsih1J+3De+KvkTA6nBjx
+         xSBUnB9EV5NlQAOueOI5ovsh9ZrpK2mKI2rYqZMt2HvppVyMTV6Z5xJIcetFL+mvKY9C
+         JWsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766179731; x=1766784531;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9qdyLYhk6D9KpgNEc9lTRHJNMgr66Y5zIziSEMCrXTM=;
+        b=kyvBDg+LIiFkqDo7rIPsatXkSg9VhFwoHiKaICQVf81OjbVrUV+WSrSfXL3yw63v7b
+         QBYuPwiRC7W3tpnHtbSx7d6Gc3nnof7veWFXBqFczoYvmslD1+AGMfgTco1KzDLnsVui
+         RaHcSlGSuSK1VawlYgAwGnShAVMlAF4fmC49SNAqb6vlA/7V6zKjdPSGFEeVFTBl+S3A
+         3Lw+OTlbGtg0UItKFlEnNyEUTaJ8yco0xacCejUXkSTjamDk2p4ynLLRgNj84GY2ZA10
+         iSOx6wMDvyPx4ue6Wwk2pgRxg/lrBj2H4OHm2usYKWCG4cpHkN6il7jxu+b8upcGu9dg
+         smSw==
+X-Forwarded-Encrypted: i=1; AJvYcCXmbVxGEp4DhIFOyxLOOJWXGnxGqGGEXZUO9c9nL/uhIG66RHVtodFUf2Fp1xkIrQtSkcodfHv3i2rjLaQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZbCPXGsYRJBkBogof+fjqiBSENQuo+WxSmvalSHk0UAoJzHyQ
+	goNbkBhUy6iJ1UumF0tbk1Ou25CX42wre20V0PhCPI8mgkXI69B+kqeI
+X-Gm-Gg: AY/fxX4uWZG/fKfFWJ9rjd3f3mBB+uJZ8t7+68LGwQK16JXnUvc+YFooCD2T/3L7W5d
+	588D4E4+SQ5/DGOdZur+p0jmCu+XHN7sjKrCpbbcQjUmWrln784pgW5wwOV8yoOMRrCni4PcxwN
+	JMZG6z/onAyZLzZqQxlBw3r/Szp1N2otG7PBZ7UpIB/9DiHGzoidEOXPNdIJr+psuwHNAqtjeL8
+	EwuToe6Txs48Qnj5y9Qa01FkP8U+5la0nQK0znhzFZTT3/a6gC9Evd+kBQaJLj8MCONjY8Odwx0
+	o3tfLz/a5pvsEtoFS4xS+lw1vJr0/+SIE5ezeJAMsTqp6bFeT6wFToYOdw4zeymLiX7sw6qEpky
+	z9Dyc54KDa5sXXumcZedrvb9+t795uGWKpRka+LpYgE5M1jVEMqt83AaEiA41rvBW8EeZwrrzMK
+	XQKerPPj8JWuI/P4fIXMChQahnHJygHPYr74pNuNRLshKmiU1mzmI3uPAtZ1gEf2ZiQ2NrOw8gc
+	H54fZOAFObmv+DnPVuGr5Yf7wQvFPdLaENJyR+T/LYUiD0wiLP7DMbXQfZNazSVDoquddwnCo8d
+	YfY=
+X-Google-Smtp-Source: AGHT+IFntC97OMoIKW8iak4Csi+Sa/wJHZS2qz46SkDovenEuEnw3BILL/ha2LHm12T/rhrLMeYBbA==
+X-Received: by 2002:a05:7022:6988:b0:119:e56b:91ed with SMTP id a92af1059eb24-121722e01c2mr4354548c88.30.1766179731046;
+        Fri, 19 Dec 2025 13:28:51 -0800 (PST)
+Received: from ?IPV6:2a00:79e0:2e7c:8:5874:79f3:80da:a7a3? ([2a00:79e0:2e7c:8:5874:79f3:80da:a7a3])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1217254cd77sm12305503c88.14.2025.12.19.13.28.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Dec 2025 13:28:50 -0800 (PST)
+Message-ID: <ecb35204-ea13-488b-8d60-e21d4812902a@gmail.com>
+Date: Fri, 19 Dec 2025 14:28:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,219 +71,59 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
-Subject: Re: [PATCH v15 19/28] x86/tpm: Early TPM PCR extending driver
-To: Dave Hansen <dave.hansen@intel.com>,
- Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, iommu@lists.linux.dev
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
- dave.hansen@linux.intel.com, ardb@kernel.org, mjg59@srcf.ucam.org,
- James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, jarkko@kernel.org,
- jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu,
- herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
- ebiederm@xmission.com, dwmw2@infradead.org, baolu.lu@linux.intel.com,
- kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
- trenchboot-devel@googlegroups.com
-References: <20251215233316.1076248-1-ross.philipson@oracle.com>
- <20251215233316.1076248-20-ross.philipson@oracle.com>
- <56929e8b-a7cf-4390-b4ec-0b4c2c32b311@intel.com>
+Subject: Re: [PATCH v5 07/36] lockdep: Annotate lockdep assertions for context
+ analysis
+To: Marco Elver <elver@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+ Chris Li <sparse@chrisli.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>,
+ Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>,
+ Eric Dumazet <edumazet@google.com>, Frederic Weisbecker
+ <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Ian Rogers <irogers@google.com>,
+ Jann Horn <jannh@google.com>, Joel Fernandes <joelagnelf@nvidia.com>,
+ Johannes Berg <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>,
+ Josh Triplett <josh@joshtriplett.org>, Justin Stitt
+ <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+ Kentaro Takeda <takedakn@nttdata.co.jp>,
+ Lukas Bulwahn <lukas.bulwahn@gmail.com>, Mark Rutland
+ <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+ Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+ Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>,
+ kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-security-module@vger.kernel.org, linux-sparse@vger.kernel.org,
+ linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
+References: <20251219154418.3592607-1-elver@google.com>
+ <20251219154418.3592607-8-elver@google.com>
+ <cdde6c60-7f6f-4715-a249-5aab39438b57@acm.org>
+ <CANpmjNPJXVtZgT96PP--eNAkHNOvw1MrYzWt5f2aA0LUeK8iGA@mail.gmail.com>
 Content-Language: en-US
-Autocrypt: addr=dpsmith@apertussolutions.com; keydata=
- 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
-In-Reply-To: <56929e8b-a7cf-4390-b4ec-0b4c2c32b311@intel.com>
+From: Bart Van Assche <bart.vanassche@gmail.com>
+In-Reply-To: <CANpmjNPJXVtZgT96PP--eNAkHNOvw1MrYzWt5f2aA0LUeK8iGA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
 
-Hey Dave!
+On 12/19/25 2:16 PM, Marco Elver wrote:
+> It's basically an escape hatch to defer to dynamic analysis where the
+> limits of the static analysis are reached.
 
-On 12/16/25 16:53, Dave Hansen wrote:
-> I'm mostly spot-checking this to see what kind of shape it's in and how
-> much work and diligence has been applied in the last 8 months since v14.
-> 
-> On 12/15/25 15:33, Ross Philipson wrote:
-> ...
->> The driver could be extended for further operations if needed. This
->> TPM dirver implementation relies as much as possible on existing mainline
-> 
-> <sigh>
-> 
-> v15 and no spell checking. :(
-> 
->> --- /dev/null
->> +++ b/arch/x86/boot/compressed/early_tpm_extend.c
->> @@ -0,0 +1,601 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Copyright (c) 2010-2012 United States Government, as represented by
->> + * the Secretary of Defense.  All rights reserved.
-> 
-> IANAL, but this looks fishy.
-> 
-> It's theoretically fine to go grab random code off the Internet and
-> submit it to the kernel, given the correct license. But I do want to
-> know what its story is and where it came from.
+That's not how lockdep_assert_held() is used in the kernel. This macro
+is more often than not used to document assumptions that can be verified
+at compile time.
 
+This patch seems like a step in the wrong direction to me because it
+*suppresses* compile time analysis compile-time analysis is useful. I
+think that this patch either should be dropped or that the __assume()
+annotations should be changed into __must_hold() annotations.
 
-Let me provide some context as to the code origin. Ross, before joining 
-Oracle, and I have a long history of working with DRTM/Intel TXT within 
-Xen. When it was requested to go back to sending the measurements to the 
-TPM in the setup kernel, we needed to find a minimal code base to 
-provide the command buffer packing until the TPM driver could be fully 
-refactored. We knew that Xen's vtpm framework provided a simple macro 
-system to provide contextual TPM command buffer packing. We decided this 
-would be a lightweight choice that would be easy to cut down to only 
-what is needed to handle the very few TPM commands we will need to send. 
-And to that extent, there have been internal reviews that have reduced 
-the amount of that original code.
-
-> I also seem to remember that there are special rules around the US
-> federal government's inability to hold copyrights. This seems worth at
-> least a mention ... somewhere.
-
-IANAL either, but in general the safest/correct approach is to retain 
-any CRs placed on the code being reused, and the above is the CR on the 
-source from the Xen tree.
-
-> This is helpful, for instance:
-> 
->> + * based off of the original tools/vtpm_manager code base which is:
->> + * Copyright (c) 2005, Intel Corp.
->> + * All rights reserved.
-> 
-> so thanks for that one.
-
-That's the origin of all the code reuse, we can do an review to see if 
-any of the code that originated from the USG code is still present.
-
->> + * Redistribution and use in source and binary forms, with or without
->> + * modification, are permitted provided that the following conditions
->> + * are met:
->> + *
->> + *   * Redistributions of source code must retain the above copyright
->> + *     notice, this list of conditions and the following disclaimer.
->> + *   * Redistributions in binary form must reproduce the above
->> + *     copyright notice, this list of conditions and the following
->> + *     disclaimer in the documentation and/or other materials provided
->> + *     with the distribution.
->> + *   * Neither the name of Intel Corporation nor the names of its
->> + *     contributors may be used to endorse or promote products derived
->> + *     from this software without specific prior written permission.
->> + *
->> + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
->> + * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
->> + * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
->> + * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
->> + * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
->> + * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
->> + * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
->> + * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
->> + * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
->> + * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
->> + * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
->> + * OF THE POSSIBILITY OF SUCH DAMAGE.
->> + */
-> 
-> Also, IANAL, but this looks BSD-ish.
-> 
-> I would have kinda expected the SPDX header to say BSD-blah-blah and not
-> GPL-2.0-only.
-> 
-> I'd really appreciate if you could go have a huddle with your corporate
-> Open Source folks and make sure this is all proper. To me, it looks
-> fishy at _best_.
-> 
-> ...
->> +/*
->> + * We're far too early to calibrate time.  Assume a 5GHz processor (the upper
->> + * end of the Fam19h range), which causes us to be wrong in the safe direction
->> + * on slower systems.
->> + */
-> 
-> https://docs.kernel.org/process/maintainer-tip.html#changelog
-> 
-> Imperative voice please.
-> 
-> ...
->> +static int __tis_recv_data(struct tpm_chip *chip, u8 *buf, int count)
->> +{
->> +	int size = 0;
->> +	int burstcnt;
->> +
->> +	while (size < count && __tis_wait_for_stat(chip, TPM_STS_DATA_AVAIL | TPM_STS_VALID, chip->timeout_c) == 0) {
->> +		burstcnt = __tis_get_burstcount(chip);
->> +
->> +		for ( ; burstcnt > 0 && size < count; --burstcnt)
->> +			buf[size++] = tpm_read8(chip, TPM_DATA_FIFO(chip->locality));
->> +	}
->> +
->> +	return size;
->> +}
->> +
->> +/**
->> + * tpm_tis_check_locality - Check if the given locality is the active one
->> + * @chip:	The TPM chip instance
->> + * @loc:	The locality to check
->> + *
->> + * Return: true - locality active, false - not active
->> + */
->> +bool tpm_tis_check_locality(struct tpm_chip *chip, int loc)
->> +{
->> +	if ((tpm_read8(chip, TPM_ACCESS(loc)) & (TPM_ACCESS_ACTIVE_LOCALITY | TPM_ACCESS_VALID)) == (TPM_ACCESS_ACTIVE_LOCALITY | TPM_ACCESS_VALID)) {
->> +		chip->locality = loc;
->> +		return true;
->> +	}
->> +
->> +	return false;
->> +}
->> +
->> +/**
->> + * tpm_tis_release_locality - Release the active locality
->> + * @chip:	The TPM chip instance
->> + */
->> +void tpm_tis_release_locality(struct tpm_chip *chip)
->> +{
->> +	if ((tpm_read8(chip, TPM_ACCESS(chip->locality)) & (TPM_ACCESS_REQUEST_PENDING | TPM_ACCESS_VALID)) == (TPM_ACCESS_REQUEST_PENDING | TPM_ACCESS_VALID))
->> +		tpm_write8(chip, TPM_ACCESS(chip->locality), TPM_ACCESS_RELINQUISH_LOCALITY);
->> +
->> +	chip->locality = 0;
->> +}
-> 
-> I guess some folks aren't enforcing the 80-column limits. But this is
-> not even close. It's almost 80x2.
-> 
-> Has there even been an attempt to make this conform to kernel coding
-> style? What other checkpatch.pl warnings are being ignored?
-
-
+Bart.
