@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20FE834EEF5
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 15:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B84934F469
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 15:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766159245; cv=none; b=N97KwUv1JfX99dnTrGikyH4qRqSRHJCEmvymdrTEth049hYflgP9bzW3JVKdDyMBAfBcGGf8K/28xOw3U73rMywgtoXbSBjAK2dmNb+oypJEYRNg7t8ZZb6P5pgY7//TS/tCoi1lnSl/HTv6LHETFVupVhSpvE78kPo9GmmG6X4=
+	t=1766159249; cv=none; b=JEmG969rHtQyayD6katkvMBsUR0Zh2TKgbge4gJTqBEZXY9ecMjd/I0chrHsX41rTftL4wzo9lF0X9TA9dTyxd63L7duAPLCtEYZAG784R9cI9QYakvXrrbrP34LCCnayhjJnRrdja8i4ImVHo6o0UpFuKLh9/IS2Xn/wsW7LUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766159245; c=relaxed/simple;
-	bh=07w1iVYLGApit8bkKyeu1U8F4tG4DfRO81UX3zlTOc4=;
+	s=arc-20240116; t=1766159249; c=relaxed/simple;
+	bh=Xhk0xsW0tGqUud5kt1c33VabY4PrqeJpXHkHXkMftFw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lxHwousEQ5fXmm/PZoK7fXGug3/DNToIX63XWQe8ZjsAdvC++gSKQtQp+3m7pKRV2+3tvzWQPUBqbFM8WgrrKGri/2aa0BpxX+KPLSDxahAnIYzKh/Cuu83LOv7ja569oGJyFzonhHRQwthy++K8cFeT1vBQtA4ubMOb3aYoU6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P86/6nzl; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=PIYvzSpGu7qqqxTn9IgamlknQbs5DxwCMOfYf5l9clabv1axACJDT9fc08OlKJ0riCuJv6fRK0ozJvAX6I01UIEekraYhXAS3QIHP22anwWiiOq/ZPzXYLCX7Ta3Ub5TT+wVVh+3T+FXBaL419FpcFQxaUK+zKrHkpzLaJMwBcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qwpJpKhO; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P86/6nzl"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4779981523fso21292235e9.2
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 07:47:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qwpJpKhO"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-430fc83f58dso1056051f8f.2
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 07:47:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766159241; x=1766764041; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1766159246; x=1766764046; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cIl6hRG6VWUZ3266tGTJDIxO3xjvOCdXIFgWS7XA8vA=;
-        b=P86/6nzl5y7+cFjhmeHObiYlOOElSRsuccmSPB+P7BRhmIcqR445imUvqWiW1ot9io
-         lkyxaS3hXABicsWrv9ZDHjs7vCD7kHbn0m7WncnMUsUcf8hb0qmwCrj8UcYtozobplbm
-         heY6uknojggO0hjzkGlBN2/lHBR8k2qECmZ3hpiMIgEk/pBxok/nCOfO07r7iil8bsru
-         s7rtvr4JJIutjG1jkreHfuUOcfXGWAGK2iMY8cVpTn44Yjr0e30h5cJWW3yfS2dpp74s
-         yWF4fKa3ZoFXifFvWZs58DDxAl0v7HE6Hzn5HgDaSnFwYXCp19KroisNHHO4iNGHNfrH
-         mxuA==
+        bh=OO33/jJhJQVIdzyn/h7cV8sb9potmD4v/pwOWqkGaBs=;
+        b=qwpJpKhOLpgQLLRzDYwf4fl2yOTMVAck6fCMfPA3LxKY1lbNJ89HDgEqGqx+Aa+AgK
+         cwslZ5c5jXP92pYuzRSb5rr8Q819WPijZDTHrEruZuPzuk5mZytFn7mwyPncNjhsMcrm
+         qk5gNQs5RU4yabggbxdCSQlbLbdkdOTv7lT3lUb1X/Pmp3ugS8Pd8B97bHmADjXrD+2s
+         6Aw2PD3TY9EHQcWfbSvQ5M/tRTopBe+KKuAK5GZ9c8wm+EO8iWtp8/vLYLAJybGzboDD
+         kKA7lZz8vj1FZdRjtS1s00mvnX1hLZ2F/tOwW2Qf6qiV1Kkn2rBM80Yswpu3y5v0a+Mh
+         1ggw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766159241; x=1766764041;
+        d=1e100.net; s=20230601; t=1766159246; x=1766764046;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cIl6hRG6VWUZ3266tGTJDIxO3xjvOCdXIFgWS7XA8vA=;
-        b=ZI11ZILMVW3AMiVlb13LSCfmFPHGuPhBuqdEKWjAe8xsnzXrjPDMDmw6ACsZiSXVzI
-         KevnJZax9UgeMjTMYSdiu+wnx6JhVu6zq53sgtptm/wzKN6/57/gEXynDw0KKqUdqm9J
-         x5jiHZhxzpNgCeraLOO6atZpRdjhkSuQpzRLLnKB9o5Hscj6jWYefMLZ4zowZGeeY6Ti
-         X6iQwIy2/qBaKg7PJoif/iXVV7dlCABAvYHDN0QaA/LuFpGKFrh7veBW1yD13fWSmQEy
-         kLmOn50c6uPExMdq31yUvIbgyBxzUDl5cgR2sVVZguRMiaIA/Jaa3k7Kwm5/wAmcd/2w
-         /Dsw==
-X-Forwarded-Encrypted: i=1; AJvYcCUVxfQhVFjbCSKATMXIWmsjNodkK32gHdGJUEo49KI/My0/8gQQOtAiIRjh6Fp3TvZJVPywe/ByhXPuOg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNV9dhARk5xsMj26m4CgpQStk8ngzRCVlFIqORl2GtwuuCCVhv
-	UXpSOEFg44W0duNv0nyq5amPaPw01SdxobYjRilFAwPfWYlhF0Sx70Tza0EZjAjc/eELLRct1tk
-	Glg==
-X-Google-Smtp-Source: AGHT+IHUYWBrpeCypfdMxgfNzjmtc9mmMvSwDnVKS4eDk2yh+EmJ7zT/5eTOcBjrkNmlHr6bTJLq31xqdQ==
-X-Received: from wmxb5-n2.prod.google.com ([2002:a05:600d:8445:20b0:477:3fdf:4c24])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:8484:b0:477:b642:9dbf
- with SMTP id 5b1f17b1804b1-47d195c1cebmr30959435e9.32.1766159241428; Fri, 19
- Dec 2025 07:47:21 -0800 (PST)
-Date: Fri, 19 Dec 2025 16:40:18 +0100
+        bh=OO33/jJhJQVIdzyn/h7cV8sb9potmD4v/pwOWqkGaBs=;
+        b=BawZHLO6y81R6c0xt7b1AfCujG0cAREaGnp4kMGV54LGDY79kHCd0Ws8ax+Z4MVsK0
+         5IbrA311azri1wo+/x68TEqzwyN/53kTpQuzJkmB3mwwMLEyplKVKahBUWpCX6OCZ8Iq
+         PBTpx2LowROUYVvOrMiaSNNiK78F/Y4ozEVbEkrFh8ss63l9sjeOriezHJM/8qmzp9CU
+         IMUZImGKsozmm+Q9ojDCWJ94yJbeuMllakQGkRki8OKxUZsBB6qrOExpw/RpNOfnKwoe
+         XDUtoEYmMsZzTFuwkb0CkjyIwL0vsHzho535LcglGlhM68xcFwSGZHUK4lypaQ3GNdq/
+         HUTg==
+X-Forwarded-Encrypted: i=1; AJvYcCXpdIW45L+I9eMEMkVEOe6fvlHKdNhxkWhbh6nC8U0QaHAgvqQC4t1pxZ/9nop4N6sHpxrnilcukYsvo1I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1iPbA2H6a/+ZTshR6AB1blp+yvVuO6CCH3T8ylNAY/UmAel5i
+	5+rtn7+g77M8dmiL/HI3zDtjHK5Peq4dojCIhK+fTeQkckcYzhaMcNuyBggD6P5+YOSqxN0mqYR
+	CFg==
+X-Google-Smtp-Source: AGHT+IFerDd1vd4X97dkJpWHrvPSjwQcqOjMG8Z0RXSvdbWhPjy9O9psZiuBXvn9GzAtKPBtfUrWDqrhqg==
+X-Received: from wrbbs1.prod.google.com ([2002:a05:6000:701:b0:42b:2aa2:e459])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2303:b0:429:b9bc:e81a
+ with SMTP id ffacd0b85a97d-4324e458883mr2916935f8f.0.1766159245502; Fri, 19
+ Dec 2025 07:47:25 -0800 (PST)
+Date: Fri, 19 Dec 2025 16:40:19 +0100
 In-Reply-To: <20251219154418.3592607-1-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251219154418.3592607-1-elver@google.com>
 X-Mailer: git-send-email 2.52.0.322.g1dd061c0dc-goog
-Message-ID: <20251219154418.3592607-30-elver@google.com>
-Subject: [PATCH v5 29/36] kcov: Enable context analysis
+Message-ID: <20251219154418.3592607-31-elver@google.com>
+Subject: [PATCH v5 30/36] kcsan: Enable context analysis
 From: Marco Elver <elver@google.com>
 To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, 
 	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>
@@ -87,175 +87,106 @@ Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenry
 	linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Enable context analysis for the KCOV subsystem.
+Enable context analysis for the KCSAN subsystem.
 
 Signed-off-by: Marco Elver <elver@google.com>
 ---
 v4:
-* Fix new temporary variable type.
 * Rename capability -> context analysis.
 
-v2:
-* Remove disable/enable_context_analysis() around headers.
+v3:
+* New patch.
 ---
- kernel/Makefile |  2 ++
- kernel/kcov.c   | 36 +++++++++++++++++++++++++-----------
- 2 files changed, 27 insertions(+), 11 deletions(-)
+ kernel/kcsan/Makefile |  2 ++
+ kernel/kcsan/report.c | 11 ++++++++---
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/kernel/Makefile b/kernel/Makefile
-index e83669841b8c..6785982013dc 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -43,6 +43,8 @@ KASAN_SANITIZE_kcov.o := n
- KCSAN_SANITIZE_kcov.o := n
- UBSAN_SANITIZE_kcov.o := n
- KMSAN_SANITIZE_kcov.o := n
+diff --git a/kernel/kcsan/Makefile b/kernel/kcsan/Makefile
+index a45f3dfc8d14..824f30c93252 100644
+--- a/kernel/kcsan/Makefile
++++ b/kernel/kcsan/Makefile
+@@ -1,4 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
++CONTEXT_ANALYSIS := y
 +
-+CONTEXT_ANALYSIS_kcov.o := y
- CFLAGS_kcov.o := $(call cc-option, -fno-conserve-stack) -fno-stack-protector
- 
- obj-y += sched/
-diff --git a/kernel/kcov.c b/kernel/kcov.c
-index 6563141f5de9..6cbc6e2d8aee 100644
---- a/kernel/kcov.c
-+++ b/kernel/kcov.c
-@@ -55,13 +55,13 @@ struct kcov {
- 	refcount_t		refcount;
- 	/* The lock protects mode, size, area and t. */
- 	spinlock_t		lock;
--	enum kcov_mode		mode;
-+	enum kcov_mode		mode __guarded_by(&lock);
- 	/* Size of arena (in long's). */
--	unsigned int		size;
-+	unsigned int		size __guarded_by(&lock);
- 	/* Coverage buffer shared with user space. */
--	void			*area;
-+	void			*area __guarded_by(&lock);
- 	/* Task for which we collect coverage, or NULL. */
--	struct task_struct	*t;
-+	struct task_struct	*t __guarded_by(&lock);
- 	/* Collecting coverage from remote (background) threads. */
- 	bool			remote;
- 	/* Size of remote area (in long's). */
-@@ -391,6 +391,7 @@ void kcov_task_init(struct task_struct *t)
- }
- 
- static void kcov_reset(struct kcov *kcov)
-+	__must_hold(&kcov->lock)
- {
- 	kcov->t = NULL;
- 	kcov->mode = KCOV_MODE_INIT;
-@@ -400,6 +401,7 @@ static void kcov_reset(struct kcov *kcov)
- }
- 
- static void kcov_remote_reset(struct kcov *kcov)
-+	__must_hold(&kcov->lock)
- {
- 	int bkt;
- 	struct kcov_remote *remote;
-@@ -419,6 +421,7 @@ static void kcov_remote_reset(struct kcov *kcov)
- }
- 
- static void kcov_disable(struct task_struct *t, struct kcov *kcov)
-+	__must_hold(&kcov->lock)
- {
- 	kcov_task_reset(t);
- 	if (kcov->remote)
-@@ -435,8 +438,11 @@ static void kcov_get(struct kcov *kcov)
- static void kcov_put(struct kcov *kcov)
- {
- 	if (refcount_dec_and_test(&kcov->refcount)) {
--		kcov_remote_reset(kcov);
--		vfree(kcov->area);
-+		/* Context-safety: no references left, object being destroyed. */
-+		context_unsafe(
-+			kcov_remote_reset(kcov);
-+			vfree(kcov->area);
-+		);
- 		kfree(kcov);
- 	}
- }
-@@ -491,6 +497,7 @@ static int kcov_mmap(struct file *filep, struct vm_area_struct *vma)
- 	unsigned long size, off;
- 	struct page *page;
- 	unsigned long flags;
-+	void *area;
- 
- 	spin_lock_irqsave(&kcov->lock, flags);
- 	size = kcov->size * sizeof(unsigned long);
-@@ -499,10 +506,11 @@ static int kcov_mmap(struct file *filep, struct vm_area_struct *vma)
- 		res = -EINVAL;
- 		goto exit;
- 	}
-+	area = kcov->area;
- 	spin_unlock_irqrestore(&kcov->lock, flags);
- 	vm_flags_set(vma, VM_DONTEXPAND);
- 	for (off = 0; off < size; off += PAGE_SIZE) {
--		page = vmalloc_to_page(kcov->area + off);
-+		page = vmalloc_to_page(area + off);
- 		res = vm_insert_page(vma, vma->vm_start + off, page);
- 		if (res) {
- 			pr_warn_once("kcov: vm_insert_page() failed\n");
-@@ -522,10 +530,10 @@ static int kcov_open(struct inode *inode, struct file *filep)
- 	kcov = kzalloc(sizeof(*kcov), GFP_KERNEL);
- 	if (!kcov)
- 		return -ENOMEM;
-+	spin_lock_init(&kcov->lock);
- 	kcov->mode = KCOV_MODE_DISABLED;
- 	kcov->sequence = 1;
- 	refcount_set(&kcov->refcount, 1);
--	spin_lock_init(&kcov->lock);
- 	filep->private_data = kcov;
- 	return nonseekable_open(inode, filep);
- }
-@@ -556,6 +564,7 @@ static int kcov_get_mode(unsigned long arg)
-  * vmalloc fault handling path is instrumented.
+ KCSAN_SANITIZE := n
+ KCOV_INSTRUMENT := n
+ UBSAN_SANITIZE := n
+diff --git a/kernel/kcsan/report.c b/kernel/kcsan/report.c
+index e95ce7d7a76e..11a48b78f8d1 100644
+--- a/kernel/kcsan/report.c
++++ b/kernel/kcsan/report.c
+@@ -116,6 +116,7 @@ static DEFINE_RAW_SPINLOCK(report_lock);
+  * been reported since (now - KCSAN_REPORT_ONCE_IN_MS).
   */
- static void kcov_fault_in_area(struct kcov *kcov)
-+	__must_hold(&kcov->lock)
+ static bool rate_limit_report(unsigned long frame1, unsigned long frame2)
++	__must_hold(&report_lock)
  {
- 	unsigned long stride = PAGE_SIZE / sizeof(unsigned long);
- 	unsigned long *area = kcov->area;
-@@ -584,6 +593,7 @@ static inline bool kcov_check_handle(u64 handle, bool common_valid,
+ 	struct report_time *use_entry = &report_times[0];
+ 	unsigned long invalid_before;
+@@ -366,6 +367,7 @@ static int sym_strcmp(void *addr1, void *addr2)
  
- static int kcov_ioctl_locked(struct kcov *kcov, unsigned int cmd,
- 			     unsigned long arg)
-+	__must_hold(&kcov->lock)
+ static void
+ print_stack_trace(unsigned long stack_entries[], int num_entries, unsigned long reordered_to)
++	__must_hold(&report_lock)
  {
- 	struct task_struct *t;
- 	unsigned long flags, unused;
-@@ -814,6 +824,7 @@ static inline bool kcov_mode_enabled(unsigned int mode)
+ 	stack_trace_print(stack_entries, num_entries, 0);
+ 	if (reordered_to)
+@@ -373,6 +375,7 @@ print_stack_trace(unsigned long stack_entries[], int num_entries, unsigned long
  }
  
- static void kcov_remote_softirq_start(struct task_struct *t)
-+	__must_hold(&kcov_percpu_data.lock)
+ static void print_verbose_info(struct task_struct *task)
++	__must_hold(&report_lock)
  {
- 	struct kcov_percpu_data *data = this_cpu_ptr(&kcov_percpu_data);
- 	unsigned int mode;
-@@ -831,6 +842,7 @@ static void kcov_remote_softirq_start(struct task_struct *t)
+ 	if (!task)
+ 		return;
+@@ -389,6 +392,7 @@ static void print_report(enum kcsan_value_change value_change,
+ 			 const struct access_info *ai,
+ 			 struct other_info *other_info,
+ 			 u64 old, u64 new, u64 mask)
++	__must_hold(&report_lock)
+ {
+ 	unsigned long reordered_to = 0;
+ 	unsigned long stack_entries[NUM_STACK_ENTRIES] = { 0 };
+@@ -496,6 +500,7 @@ static void print_report(enum kcsan_value_change value_change,
  }
  
- static void kcov_remote_softirq_stop(struct task_struct *t)
-+	__must_hold(&kcov_percpu_data.lock)
+ static void release_report(unsigned long *flags, struct other_info *other_info)
++	__releases(&report_lock)
  {
- 	struct kcov_percpu_data *data = this_cpu_ptr(&kcov_percpu_data);
- 
-@@ -896,10 +908,12 @@ void kcov_remote_start(u64 handle)
- 	/* Put in kcov_remote_stop(). */
- 	kcov_get(kcov);
  	/*
--	 * Read kcov fields before unlock to prevent races with
--	 * KCOV_DISABLE / kcov_remote_reset().
-+	 * Read kcov fields before unlocking kcov_remote_lock to prevent races
-+	 * with KCOV_DISABLE and kcov_remote_reset(); cannot acquire kcov->lock
-+	 * here, because it might lead to deadlock given kcov_remote_lock is
-+	 * acquired _after_ kcov->lock elsewhere.
- 	 */
--	mode = kcov->mode;
-+	mode = context_unsafe(kcov->mode);
- 	sequence = kcov->sequence;
- 	if (in_task()) {
- 		size = kcov->remote_size;
+ 	 * Use size to denote valid/invalid, since KCSAN entirely ignores
+@@ -507,13 +512,11 @@ static void release_report(unsigned long *flags, struct other_info *other_info)
+ 
+ /*
+  * Sets @other_info->task and awaits consumption of @other_info.
+- *
+- * Precondition: report_lock is held.
+- * Postcondition: report_lock is held.
+  */
+ static void set_other_info_task_blocking(unsigned long *flags,
+ 					 const struct access_info *ai,
+ 					 struct other_info *other_info)
++	__must_hold(&report_lock)
+ {
+ 	/*
+ 	 * We may be instrumenting a code-path where current->state is already
+@@ -572,6 +575,7 @@ static void set_other_info_task_blocking(unsigned long *flags,
+ static void prepare_report_producer(unsigned long *flags,
+ 				    const struct access_info *ai,
+ 				    struct other_info *other_info)
++	__must_not_hold(&report_lock)
+ {
+ 	raw_spin_lock_irqsave(&report_lock, *flags);
+ 
+@@ -603,6 +607,7 @@ static void prepare_report_producer(unsigned long *flags,
+ static bool prepare_report_consumer(unsigned long *flags,
+ 				    const struct access_info *ai,
+ 				    struct other_info *other_info)
++	__cond_acquires(true, &report_lock)
+ {
+ 
+ 	raw_spin_lock_irqsave(&report_lock, *flags);
 -- 
 2.52.0.322.g1dd061c0dc-goog
 
