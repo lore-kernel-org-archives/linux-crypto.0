@@ -1,41 +1,41 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4B533A9F9;
-	Fri, 19 Dec 2025 14:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053AF33A9C4
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 14:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766155910; cv=none; b=il/4s8pNxtL/CprVm/CNmYopsVXNaeLnvk7J86f00c+AVrq2F4w1qyzw5UtxGaj2KTWaZMAEL9dkc7QWWAzmc52UdKYqd8lWLWBLdvgK5c7IhnQMIq4rnKMUdwgw+bshEWSGKbQDK+I2vWn41ZCPb0K1OLGVE/wcDrI3cErMmdU=
+	t=1766155911; cv=none; b=tOr3E348Cg74nbypb1L8SdFtakXzr7oQ+0GFsyCm8jNAOmaE1Yb3BlDmw/qgFRmzyWy/VJsiDtKO3qhrDRLdubF/C5l+bWxRYAv1meLjQSF+Gh2aTtnb4oI0pMFLcteSODfNEldb9KCHkO/wPerWNOAfXbdN22D/wtztxk9Saqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766155910; c=relaxed/simple;
-	bh=8kd9eRqsuZhwL9ohEWlSfovF8KaKTzdEtx2iRoGiZd0=;
+	s=arc-20240116; t=1766155911; c=relaxed/simple;
+	bh=7K9g/y2VPlRnWHhvkJjzCWrLc+MC7PWX3De99gB3sV8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fey1cxo51mhx5gJ4xZqFZVdqgk25khSGMZkZji9z3rSQ5zBi7rpK7SBnByNYCuAFN5MLm0Cz2MR5gZCL9xR8iI56uyFTNN0WHUUSwg7RNb6MqANm+r/Vf/Idt9VfR8lrvkAByG5pKSnoiEO9elp8T/Bo5+NcyzN/L6iBZ4FiKH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hKOZBUX7; arc=none smtp.client-ip=91.218.175.188
+	 MIME-Version; b=bd5vDfjIZnWlfsXSNg/0dTfaYlGXwgck7GT8Z32e/Sb12eDJgbSSkSFgpBGcTwKMASp0axZZmo+mr2a8U3Ozvdr0BgVT9s4u1gZN55lUDgr/QVkuGT+T/gKrYt+1vyThfIyAc8OUI2/KoozBl38pR9E1JwoQb6kwadnhwRWltwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BY9VGMQC; arc=none smtp.client-ip=91.218.175.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hKOZBUX7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BY9VGMQC"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766155906;
+	t=1766155907;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=plKTm7kBvAdGtcnlL8hmrbTTZDSkKvIsT/4vTR17Mgw=;
-	b=hKOZBUX7CoaRNG1lMa5bxgfO/fGL0nk+iFwzzA9vxmXOIPwhwwDbv0FUlLO9hsneK1ZFvL
-	TUynmITXQ2bhGmyJegJI1Bu4d3PFDrseddTtsuJ1T/bhnw+yhGQGdU+Zi88S8wj8pNppfs
-	04s2CwSM4duzRGXNv+dYuVml2TuNVNE=
+	bh=Xn3obJvOjfZoo+hUjansuWJp2nk8MblmyaKHgSIsFcE=;
+	b=BY9VGMQCwIDo1SVgslgaiEP27zIoCZXWcFgGIjI7+yozUFvSTqjweHygKtgb+MJzhn6dqt
+	bbOD6s5hlcDSp25ImJujL0oddxMg3dXtJeb4bm9SDC/4LZ4sqnbPJZOvAJXOk6zh4XRPlN
+	DOLPMjJN2MtxkKKWcwCVjltV2k9Iz3o=
 From: Thorsten Blum <thorsten.blum@linux.dev>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Cc: Thorsten Blum <thorsten.blum@linux.dev>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 5/6] crypto: lskcipher - Use unregister_lskciphers in register_lskciphers
-Date: Fri, 19 Dec 2025 15:51:21 +0100
-Message-ID: <20251219145124.36792-5-thorsten.blum@linux.dev>
+Subject: [PATCH 6/6] crypto: engine - Use unregister_* in register_{aeads,ahashes,skciphers}
+Date: Fri, 19 Dec 2025 15:51:22 +0100
+Message-ID: <20251219145124.36792-6-thorsten.blum@linux.dev>
 In-Reply-To: <20251219145124.36792-1-thorsten.blum@linux.dev>
 References: <20251219145124.36792-1-thorsten.blum@linux.dev>
 Precedence: bulk
@@ -47,27 +47,28 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Replace the for loop with a call to crypto_unregister_lskciphers().
-Return 'ret' immediately and remove the goto statement to simplify the
-error handling code.  No functional changes.
+Replace the for loops with calls to unregister_aeads(),
+unregister_ahashes(), and unregister_skciphers(), respectively. Return
+'ret' immediately and remove the goto statements to simplify the error
+handling code.  No functional changes.
 
 Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- crypto/lskcipher.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ crypto/crypto_engine.c | 33 ++++++++++++---------------------
+ 1 file changed, 12 insertions(+), 21 deletions(-)
 
-diff --git a/crypto/lskcipher.c b/crypto/lskcipher.c
-index c2e2c38b5aa8..bb166250b732 100644
---- a/crypto/lskcipher.c
-+++ b/crypto/lskcipher.c
-@@ -384,17 +384,13 @@ int crypto_register_lskciphers(struct lskcipher_alg *algs, int count)
+diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
+index 18e1689efe12..e124bb773958 100644
+--- a/crypto/crypto_engine.c
++++ b/crypto/crypto_engine.c
+@@ -524,16 +524,13 @@ int crypto_engine_register_aeads(struct aead_engine_alg *algs, int count)
  
  	for (i = 0; i < count; i++) {
- 		ret = crypto_register_lskcipher(&algs[i]);
+ 		ret = crypto_engine_register_aead(&algs[i]);
 -		if (ret)
 -			goto err;
 +		if (ret) {
-+			crypto_unregister_lskciphers(algs, i);
++			crypto_engine_unregister_aeads(algs, i);
 +			return ret;
 +		}
  	}
@@ -75,12 +76,53 @@ index c2e2c38b5aa8..bb166250b732 100644
  	return 0;
 -
 -err:
--	for (--i; i >= 0; --i)
--		crypto_unregister_lskcipher(&algs[i]);
+-	crypto_engine_unregister_aeads(algs, i);
 -
 -	return ret;
  }
- EXPORT_SYMBOL_GPL(crypto_register_lskciphers);
+ EXPORT_SYMBOL_GPL(crypto_engine_register_aeads);
+ 
+@@ -566,16 +563,13 @@ int crypto_engine_register_ahashes(struct ahash_engine_alg *algs, int count)
+ 
+ 	for (i = 0; i < count; i++) {
+ 		ret = crypto_engine_register_ahash(&algs[i]);
+-		if (ret)
+-			goto err;
++		if (ret) {
++			crypto_engine_unregister_ahashes(algs, i);
++			return ret;
++		}
+ 	}
+ 
+ 	return 0;
+-
+-err:
+-	crypto_engine_unregister_ahashes(algs, i);
+-
+-	return ret;
+ }
+ EXPORT_SYMBOL_GPL(crypto_engine_register_ahashes);
+ 
+@@ -638,16 +632,13 @@ int crypto_engine_register_skciphers(struct skcipher_engine_alg *algs,
+ 
+ 	for (i = 0; i < count; i++) {
+ 		ret = crypto_engine_register_skcipher(&algs[i]);
+-		if (ret)
+-			goto err;
++		if (ret) {
++			crypto_engine_unregister_skciphers(algs, i);
++			return ret;
++		}
+ 	}
+ 
+ 	return 0;
+-
+-err:
+-	crypto_engine_unregister_skciphers(algs, i);
+-
+-	return ret;
+ }
+ EXPORT_SYMBOL_GPL(crypto_engine_register_skciphers);
  
 -- 
 Thorsten Blum <thorsten.blum@linux.dev>
