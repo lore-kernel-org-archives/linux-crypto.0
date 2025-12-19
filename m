@@ -1,83 +1,83 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3DAE1F17E8;
-	Fri, 19 Dec 2025 03:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2DB1F17E8;
+	Fri, 19 Dec 2025 03:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766115344; cv=none; b=jqx6aohk2vfJx84drBU4rwug3PrxwYwNM8C6+weidUIaE+p6orMEUMRbi3R9nffDLSP7TISeuVPZmJIvyDBgp7f6fTU28oD2huJkKj1qKn3C9hiqTVNTCDCrM4C1fIRAbC9RhZ6wx3BpjyxoTge8amoBVWEZzrVLcgsJONJai0o=
+	t=1766115386; cv=none; b=sAHrWPXEmRZJx4T/Q5TBsJug83P0SVICjW+2n137DHO4VxuLb/pJiL0//QO7gezMVCDMly805yPMbyKm2RMLEEY+ugHCYKKTZ71yQvHRFOfSYQ2H2bvY2vC9JKvxcpNZiYEswjjcqSfpwFMH5a7P+SrHGc0iv91pKGEbvjatEdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766115344; c=relaxed/simple;
-	bh=74vJrN3KnthL4brOBqNVSN2MUKWj7lS9SCILQELXKZU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TevwRjErY7CkG48iWkVM1UA1yTEgW4H9mevx9cCqznyVemkU+k6VBYA4RyfMWGxRQK7B1snoLBT57GvOKRVUDn0xM/np5TscCEwDzpXQ9/n1DMB2EFNW+e8+lcXkgcjtHLZYbB+ZE2CyPYmgoluj33s2f+cCaH7G46N5r5Nyp7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=BpdeKBz1; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1766115386; c=relaxed/simple;
+	bh=zFpXXP7cU6IkB5MCQiEHuRwi8PYp09TwKsz5sIvDpbU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=K6hV+sTslLxDbRhUctKtfYCWZcqcShoRqIeJmoSwatExFxkVxJUonvzp0KlGLlp7WMF2YWgy1hPO9ZEF53eDs4V9pFnIFpOr3jtofGm2Drx/QeesQJuj//PdX+N332GTyCabWSci0iPo4YgB8/oDe/L3SRXX6GawNXEcPQPm6Dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=kKkiDc2T; arc=none smtp.client-ip=113.46.200.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="BpdeKBz1"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=1vpLG2xCKwKkUhQAxR9QJDnM8LdIuHlyBTs/ApoYfJg=; 
-	b=BpdeKBz1cp7osWVKXwJgNSp1AGdJkYFp71VRqYS16kfQgnxNKJBJIAbR54B0AJTxgz7TfYexWEp
-	lv5mlnmb+WTaC+UI7v/53XOGxr1SdFOsFovEPe8yQhaSQrOV0Hxgyut9jfz94a4HKH+9yORdgvdR9
-	RrqWIKzuo7P64iNYGWqVEasyFu+GkABI3JFki53SakEST1ffwDbLqxDamB5Wlv5tKWzvsWS76eJ2v
-	pRpLJF9sQV1/PxKp7bFN3WAwSunAOCpNx0OoDeTufJ9L68ay0AiUHI5jvdrG2CzcuKoJI/UeVuEz/
-	8FxAcVv54IVioanN3PT1y++JB3fb2YdZUXKA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vWRH8-00BD02-0M;
-	Fri, 19 Dec 2025 11:35:31 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 Dec 2025 11:35:30 +0800
-Date: Fri, 19 Dec 2025 11:35:30 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: jeanmichel.hautbois@yoseli.org
-Cc: Greg Ungerer <gerg@linux-m68k.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, linux-m68k@lists.linux-m68k.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Frank Li <Frank.Li@nxp.com>
-Subject: Re: [PATCH v4 2/2] m68k: coldfire: Add RNG support for MCF54418
-Message-ID: <aUTIAicJiTxKHJb7@gondor.apana.org.au>
-References: <20251126-b4-m5441x-add-rng-support-v4-0-5309548c9555@yoseli.org>
- <20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="kKkiDc2T"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=/UTMaJTAr4b4MOP9bjT6A9SSDWe8Bs4J6adAfBsWNGg=;
+	b=kKkiDc2Thmebd1Lb1SDQVbGQNJKyxa+NjeHzuQpwQUUqzj1d+8TS6c4YMjsI0oGHSQecnaKu7
+	nNsEvkn6oSK1VnCfUARO0jfssRnR3wPQOrxPgWKo/rnS32Iohx1xGL9hEEXPQ/BgD2TZ2hrRIOK
+	z+jjP8shoi9BOtNhdwGYtGc=
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dXY5m4KKyzKm5C;
+	Fri, 19 Dec 2025 11:33:16 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0AAD0140119;
+	Fri, 19 Dec 2025 11:36:21 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 19 Dec 2025 11:36:20 +0800
+Received: from localhost.huawei.com (10.90.31.46) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 19 Dec 2025 11:36:20 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<yuzenghui@huawei.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>
+Subject: [PATCH] crypto: hisilicon/sgl - fix inconsistent map/unmap direction issue
+Date: Fri, 19 Dec 2025 11:36:19 +0800
+Message-ID: <20251219033619.1871450-1-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
 
-On Wed, Nov 26, 2025 at 08:08:10AM +0100, Jean-Michel Hautbois via B4 Relay wrote:
-> From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-> 
-> Add support for the hardware Random Number Generator (RNGB) found on
-> MCF54418 ColdFire processors with clock enabled at platform
-> initialization.
-> 
-> The RNGB block is compatible with the imx-rngc driver.
-> 
-> Reviewed-by: Frank Li <Frank.Li@nxp.com>
-> Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-> ---
->  arch/m68k/coldfire/device.c       | 28 ++++++++++++++++++++++++++++
->  arch/m68k/coldfire/m5441x.c       |  2 +-
->  arch/m68k/include/asm/m5441xsim.h |  9 +++++++++
->  drivers/char/hw_random/Kconfig    |  3 ++-
->  drivers/char/hw_random/imx-rngc.c |  7 +++++++
->  5 files changed, 47 insertions(+), 2 deletions(-)
+Ensure that the direction for dma_map_sg and dma_unmap_sg is
+consistent.
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Fixes: 2566de3e06a3 ("crypto: hisilicon - Use fine grained DMA mapping direction")
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+---
+ drivers/crypto/hisilicon/sgl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
+index 24c7b6ab285b..d41b34405c21 100644
+--- a/drivers/crypto/hisilicon/sgl.c
++++ b/drivers/crypto/hisilicon/sgl.c
+@@ -260,7 +260,7 @@ hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev, struct scatterlist *sgl,
+ 	return curr_hw_sgl;
+ 
+ err_unmap:
+-	dma_unmap_sg(dev, sgl, sg_n, DMA_BIDIRECTIONAL);
++	dma_unmap_sg(dev, sgl, sg_n, dir);
+ 
+ 	return ERR_PTR(ret);
+ }
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.33.0
+
