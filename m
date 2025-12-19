@@ -1,124 +1,84 @@
-Received: from mail-ed1-f67.google.com (mail-ed1-f67.google.com [209.85.208.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878492FF15E
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 13:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16F7339B4A
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 14:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766149437; cv=none; b=SnpPjdnFI8koMNmqVrO/jbTGrOGZbkg60UWsU4uSIfK8Yj1/GI8UcAOS9SA+nVRuhXz6LErNha7DhlGsFrJITJUkD0qbS3wY/RvCdDeJ7lp/8TUGibPdSijnYtN9JPB874xwbqnAGiIvGZRPZplgHUAMkDFCLj2Z4lvSmKYHBD8=
+	t=1766155907; cv=none; b=tHeL7JdwMqRXtKhnBk1lv5VHV20VSeXlFGSmUAdi+yQbz2g7+lVC6RzUaQby36jcfCWNiB+rOLH79wjaKMXWEdVRiia3HI0+3XOBKrA8SHFlVHWLZTlN+eZSBqTaSIKzxVYAZyS1lufzUvpKx7Gzi/bda9Gt73F1PNCIZ3+9odQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766149437; c=relaxed/simple;
-	bh=EE/IMt3bWpzuwoh4Y4VtblwKWctMNVKGBDh9u8GUYg4=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=Qmbb7Ixx36W1okf4WLEJ3fSa2lcALeTYSOoFs+cIIEQo0C+ObRJ4000wr5djFu2A9b6qiJ3gHYBRDU96G/imLDdNkapLdX29oPsFL89b21UYFb0Z70P5cclTG3PQhJ1z3XlL0OffdcLtR7NSTadHY6T/WfdyN55xt87Zsc1hhr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=rdkQli19; arc=none smtp.client-ip=209.85.208.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+	s=arc-20240116; t=1766155907; c=relaxed/simple;
+	bh=sMGUIoQxg3G664STiv430sfu1xKgYecR9VNdQ9rtbvQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uefRSxXGsNeTSfeGgjf6aOahrvpdhh6vMkOrfZjTEWzkL++6uaeqKSd40zjqfA9H0FPTpV4GGuQJhX227bl/xDu+ll8PWYXarFHaV+IePTxD7nd6JAsaaQ4oCnGa9F1f82j3B5ZYFntmdTlo0p2F0TPkXdPqKQqF0YTvcGjqDcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IErtSfYR; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="rdkQli19"
-Received: by mail-ed1-f67.google.com with SMTP id 4fb4d7f45d1cf-64bea6c5819so394275a12.3
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 05:03:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1766149434; x=1766754234; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9xYZmg2CKda72uPjDDhOOvObRBbG4YdmNuqSLpmH/Go=;
-        b=rdkQli19NK7ZEFHBRsA5+cEoaTtjs0dkJIY4AiX/DVUiiCUmYs6ErlxDUXa1ZNQPV/
-         Fwj7zF+TZE3+sx6a5lBgBF+lLAkpjj+eKs42IIyJLTP4AjRzaaCGVVAg8G2w2JofOQ61
-         OqOi4XmIKyot0DosmjRoIM9NvTnQ/QkiQnYjf3mM0+fMHyK/2Gr0NPpNZ1ILuzpXGclf
-         4hvOGVA8nUKkH9tUXicpXtcDK3vOdZC0/epBjlorfgUOzVI6d7pJx1+pfi4GHt3XN5MR
-         knAIyiWTFDad2ZGMGOvR02ssNj9LxLxU0f6uW4oBjqumk6ixccZj9TTAoqFC3zCXooV1
-         c9Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766149434; x=1766754234;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9xYZmg2CKda72uPjDDhOOvObRBbG4YdmNuqSLpmH/Go=;
-        b=oI046ADNZ8Ls4bly/G5NuwtxAmGYrQ8ZiCMZh0D/3YQbkM/b035k/KF+GIh3rJ/HUp
-         25dzVBFKV7ls/xPKI4HAfu2l6oXDvSTLR7EN0gSKgg+Aokb0zu+Q4bv4kdF2TgbtxfjZ
-         tdqJlblVGjSBCkCihoza2hFj4dh+4E6XxIJiJoLw5cy7bNAHlF0JmxyuM+xHBweFPIDS
-         UiHfipGX0nhGcVdAhFSOVuwwlzi3XG0/BsJonb3LLooZ/E9ZryORaa0QaftjtKbWWpMi
-         b7jhioFlTRcqliAofB0vS+QWXbIgDyY7q7V0qfL8NuBNFBRITckA92Rf7M7UQClyPZTF
-         jeOg==
-X-Forwarded-Encrypted: i=1; AJvYcCWmt8uz8z1SS3VtBXgVDk/0EjpadDodg8G6C4beJkshP1987CdSVppWQUbquuRWPjGHaFnoG5RJuNVWaMM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3n1zXdIOBC6K1fmBQLin8E5ahnArOiBxAU3RudoJRndebX7g/
-	7ficeh8Y07P04g8dontwf27VYm8LG0qBYoMLCFTBW8vKA1u59im1JaXzZhPW8QqczZw=
-X-Gm-Gg: AY/fxX5aXQzWX+RMQk1baGU8RICIZ0k2Y3BCa9C6bWD5pWTRcW1x6zk3bekFzn4PQ+m
-	1VlTm96OxWxBK9G4EI6rOzKjgLg60G1HWTBRXT7a7zuPBhoNgZgtKLAgJr6sAHEazbH3+/+JBQ/
-	UtSiy8CiQIQzXRQmRjpAHyQ2UB7HGwDSuep2UaCNlG3HO3iNfwEFwEmiI86HdMUZi3hL53/bLeo
-	A0Gr53DS34Dfq3F+FhD7fTQSy6ULcvEohoi8jBTuoKTLjNZJLH2IOatItOZtLjX5xJVtJVH/ML2
-	8HoX0wZ6ldqJOcEhK5xBhnCtmOEI11NcLMyJ+W5lkIzO/CaXbKVoIiMgK4b4L0e+Il5xRZKECAY
-	x1eISa/WHK+OwvOWxLBo6eMkXx/DU8zepLSPKPNFLLnuh+f62jTnATopg6Ju3jtdiE7ehRQq1uo
-	InEG8FGi2Faog1U5jJL93fB0BzIJBZ4mZW63SsqYNygORulf/e7xjCVNb3HfyM4eU8rCsf2itmY
-	Vo4t6LUqealRAVRclhKqBIX
-X-Google-Smtp-Source: AGHT+IEUfFWnQG7RAyzRaKjx7Ol55uUIMDfqgbftEXKGsTsm+LxGEOqp3Py4SFBBhTsoJjx3bbI4nA==
-X-Received: by 2002:a17:907:7ea2:b0:b79:a827:4c4a with SMTP id a640c23a62f3a-b8036f1308cmr281276266b.15.1766149433565;
-        Fri, 19 Dec 2025 05:03:53 -0800 (PST)
-Received: from localhost (2001-1c00-3b89-c600-71a4-084f-6409-1447.cable.dynamic.v6.ziggo.nl. [2001:1c00:3b89:c600:71a4:84f:6409:1447])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037f0cb27sm221143266b.51.2025.12.19.05.03.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Dec 2025 05:03:53 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IErtSfYR"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766155897;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iboLvR4FYE8AnCSTwKUHIL0JFFQep9MPw9WsziO1mR8=;
+	b=IErtSfYR1w9t937yJQdIU+KyUyVc1HGvkyPFNKc1JbQQM8iGkboqVmO6K1F++vQd5fBJhd
+	ZrTto0fHiKmtWcOjCZ5gfBE6rfFBA+E8gFTW1bNEuRd5EtJJ0A2TpgR5BYk4jZ7wpZSrwp
+	9u5EskNGBMYPIp/4TGCfHpgFyGARK84=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/6] crypto: acomp - Use unregister_acomps in register_acomps
+Date: Fri, 19 Dec 2025 15:51:17 +0100
+Message-ID: <20251219145124.36792-1-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 19 Dec 2025 14:03:52 +0100
-Message-Id: <DF27Q0DG1UZG.1Q5HP9SBKYBT0@fairphone.com>
-Cc: <~postmarketos/upstreaming@lists.sr.ht>, <phone-devel@vger.kernel.org>,
- <linux-pm@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
- <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v4 2/9] dt-bindings: crypto: qcom,prng: document Milos
-From: "Luca Weiss" <luca.weiss@fairphone.com>
-To: "Luca Weiss" <luca.weiss@fairphone.com>, "Rafael J. Wysocki"
- <rafael@kernel.org>, "Viresh Kumar" <viresh.kumar@linaro.org>, "Rob
- Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>, "Manivannan Sadhasivam"
- <mani@kernel.org>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David S.
- Miller" <davem@davemloft.net>, "Vinod Koul" <vkoul@kernel.org>, "Thomas
- Gleixner" <tglx@linutronix.de>, "Bjorn Andersson" <andersson@kernel.org>,
- "Konrad Dybcio" <konradybcio@kernel.org>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20251210-sm7635-fp6-initial-v4-0-b05fddd8b45c@fairphone.com>
- <20251210-sm7635-fp6-initial-v4-2-b05fddd8b45c@fairphone.com>
-In-Reply-To: <20251210-sm7635-fp6-initial-v4-2-b05fddd8b45c@fairphone.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Herbert,
+Replace the for loop with a call to crypto_unregister_acomps(). Return
+'ret' immediately and remove the goto statement to simplify the error
+handling code.  No functional changes.
 
-On Wed Dec 10, 2025 at 2:43 AM CET, Luca Weiss wrote:
-> Document Milos SoC compatible for the True Random Number Generator.
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ crypto/acompress.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-Could you please pick this patch up? It's been on the lists since months
-and blocking this series from landing.
-
-Regards
-Luca
-
->
-> Acked-by: Rob Herring (Arm) <robh@kernel.org>
-> Reviewed-by: Bjorn Andersson <andersson@kernel.org>
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> ---
->  Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml b/Do=
-cumentation/devicetree/bindings/crypto/qcom,prng.yaml
-> index 597441d94cf1..a9674e29144e 100644
-> --- a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-> @@ -21,6 +21,7 @@ properties:
->                - qcom,ipq5424-trng
->                - qcom,ipq9574-trng
->                - qcom,kaanapali-trng
-> +              - qcom,milos-trng
->                - qcom,qcs615-trng
->                - qcom,qcs8300-trng
->                - qcom,sa8255p-trng
+diff --git a/crypto/acompress.c b/crypto/acompress.c
+index be28cbfd22e3..b353615fe265 100644
+--- a/crypto/acompress.c
++++ b/crypto/acompress.c
+@@ -337,17 +337,13 @@ int crypto_register_acomps(struct acomp_alg *algs, int count)
+ 
+ 	for (i = 0; i < count; i++) {
+ 		ret = crypto_register_acomp(&algs[i]);
+-		if (ret)
+-			goto err;
++		if (ret) {
++			crypto_unregister_acomps(algs, i);
++			return ret;
++		}
+ 	}
+ 
+ 	return 0;
+-
+-err:
+-	for (--i; i >= 0; --i)
+-		crypto_unregister_acomp(&algs[i]);
+-
+-	return ret;
+ }
+ EXPORT_SYMBOL_GPL(crypto_register_acomps);
+ 
+-- 
+Thorsten Blum <thorsten.blum@linux.dev>
+GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
 
