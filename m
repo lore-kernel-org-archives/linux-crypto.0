@@ -1,77 +1,228 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FDD2FF150;
-	Fri, 19 Dec 2025 08:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84AFD2C0323
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 08:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766132009; cv=none; b=m+nTGLRiEGvXsSD+qYXaPfY+Ga48aljsa1Fexd6gMdBLmVDz2eKLFNKa0sejCtwl28sKWhrd6kKReadLUQmmg8fieL4LegWanGoLOLSRWy6OHdoFY6qSMuvxLPp5VF35aMazTT2YB5K1F7gry6TU/8zkFQ1ADeQ5yFodMtAFmmw=
+	t=1766134303; cv=none; b=ixNr2dsaCpni9NI3nauWx78Kqp3Su67Hk48eax2DVkKqocexjFvUkgj7ydIJnwTxyOsjvjEvJnMIu3FZu0W7lkXwOxBwl63sBhqu8i/DoqxaqfUjddxs6rD3lNsZKbQYRO7j9GWGWnkX8VqWi30gLaT2qQxDd5VmbyNXU+w2RzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766132009; c=relaxed/simple;
-	bh=kgtkqQanSlE0c9RUER2tUM0+KsbsX/FrAzeTetm0HOU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bIxhrCdlEa4kqBtP5dQ8aqO6ZwSOf8+g18Qnls6lA4jnHZRZEjlRDBuhbsZBC8mSMRRoZ3BpPp0Cjvg/ZuSFe/kn2M23X8o9HFF7gmjAi3TvVX8McehcCHaZXXUACkYoTy878Cls+CPSWbU//R/SDiY9eCYxBvhK4ceInd2SFsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rjo1Kry+; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rjo1Kry+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AEE7C16AAE;
-	Fri, 19 Dec 2025 08:13:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766132009;
-	bh=kgtkqQanSlE0c9RUER2tUM0+KsbsX/FrAzeTetm0HOU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rjo1Kry+fyYxnQI8brBvI4faz6fFRHFUKZwKsbJmi/bnGKuJnZeCNKKrkfleufCKE
-	 BlaiYb2d24In68vTs+3OZwNd2bu+DHBmLIdBTLVF/UYIUXYyL6lfLzFxTxJUJc409o
-	 u1zFXAho4yQcC8rFaaGtK2mhAtGIpS9Yu866IRUY4xV8ORDWvn5+1fglkALBe53vL8
-	 Jz7ikJva87HnFbKzvwIasggjTLM/HXPy7wWktD2QZ1lTM+3GUngVNe6yjCaUgwAEjW
-	 KNTOtJ0Ei3181Y3kMhs3XCJH4+d7KQ9ZGhuEf/Zh5JLx6Jlik3PhWUeBv2wQZ0D2Hh
-	 0VJP5bK2lVoSQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B912380AA50;
-	Fri, 19 Dec 2025 08:10:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1766134303; c=relaxed/simple;
+	bh=i/p/4SjGCovxYuZ9aK6SDChjICmirAQTsCu65QnDMTQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MLA1M7mZhU6xLmzsd/u+b9p+vtmq53U/QQS3mh+ikaOn1hBeyqxpZCJgRc184tyGqfWPClH0mSFn0kfOdIGEFLioekeyir/kv6WIYxztjDFwpHh7YsvhBjzQNKP60a4Js8ueLxJ3x4YpCsxvPt0T5zxBsG+iuQ3DlvnGbXyXlb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1766134287-1eb14e3d88fb020001-Xm9f1P
+Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx2.zhaoxin.com with ESMTP id uWVV1OaiKtvPHcge (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Fri, 19 Dec 2025 16:51:27 +0800 (CST)
+X-Barracuda-Envelope-From: AlanSong-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+Received: from ZXSHMBX1.zhaoxin.com (10.28.252.163) by ZXSHMBX3.zhaoxin.com
+ (10.28.252.165) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.59; Fri, 19 Dec
+ 2025 16:51:27 +0800
+Received: from ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85]) by
+ ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85%7]) with mapi id
+ 15.01.2507.059; Fri, 19 Dec 2025 16:51:27 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+Received: from DESKTOP-A4I8D8T.zhaoxin.com (10.32.65.156) by
+ ZXBJMBX02.zhaoxin.com (10.29.252.6) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.59; Fri, 19 Dec 2025 16:03:48 +0800
+From: AlanSong-oc <AlanSong-oc@zhaoxin.com>
+To: <herbert@gondor.apana.org.au>, <ebiggers@kernel.org>, <Jason@zx2c4.com>,
+	<ardb@kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <CobeChen@zhaoxin.com>, <TonyWWang-oc@zhaoxin.com>, <YunShen@zhaoxin.com>,
+	<GeorgeXue@zhaoxin.com>, <LeoLiu-oc@zhaoxin.com>, <HansHu@zhaoxin.com>,
+	AlanSong-oc <AlanSong-oc@zhaoxin.com>
+Subject: [PATCH v2 1/2] lib/crypto: x86/sha1: PHE Extensions optimized SHA1 transform function
+Date: Fri, 19 Dec 2025 16:03:05 +0800
+X-ASG-Orig-Subj: [PATCH v2 1/2] lib/crypto: x86/sha1: PHE Extensions optimized SHA1 transform function
+Message-ID: <aa8ed72a109480887bdb3f3b36af372eadf0e499.1766131281.git.AlanSong-oc@zhaoxin.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <cover.1766131281.git.AlanSong-oc@zhaoxin.com>
+References: <cover.1766131281.git.AlanSong-oc@zhaoxin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] lib/crypto: riscv/chacha: Avoid s0/fp register
-From: patchwork-bot+linux-riscv@kernel.org
-Message-Id: 
- <176613181802.3684357.12542900768855708596.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Dec 2025 08:10:18 +0000
-References: <20251202-riscv-chacha_zvkb-fp-v2-1-7bd00098c9dc@iscas.ac.cn>
-In-Reply-To: <20251202-riscv-chacha_zvkb-fp-v2-1-7bd00098c9dc@iscas.ac.cn>
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: linux-riscv@lists.infradead.org, jerry.shih@sifive.com,
- ebiggers@kernel.org, Jason@zx2c4.com, ardb@kernel.org, pjw@kernel.org,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
+ ZXBJMBX02.zhaoxin.com (10.29.252.6)
+X-Moderation-Data: 12/19/2025 4:51:25 PM
+X-Barracuda-Connect: ZXSHMBX3.zhaoxin.com[10.28.252.165]
+X-Barracuda-Start-Time: 1766134287
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 6036
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.151782
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-Hello:
+Zhaoxin CPUs have implemented the SHA(Secure Hash Algorithm) as its CPU
+instructions by PHE(Padlock Hash Engine) Extensions, including XSHA1,
+XSHA256, XSHA384 and XSHA512 instructions.
 
-This patch was applied to riscv/linux.git (fixes)
-by Eric Biggers <ebiggers@kernel.org>:
+With the help of implementation of SHA in hardware instead of software,
+can develop applications with higher performance, more security and more
+flexibility.
 
-On Tue, 02 Dec 2025 13:25:07 +0800 you wrote:
-> In chacha_zvkb, avoid using the s0 register, which is the frame pointer,
-> by reallocating KEY0 to t5. This makes stack traces available if e.g. a
-> crash happens in chacha_zvkb.
-> 
-> No frame pointer maintenence is otherwise required since this is a leaf
-> function.
-> 
-> [...]
+This patch includes the XSHA1 instruction optimized implementation of
+SHA-1 transform function.
 
-Here is the summary with links:
-  - [v2] lib/crypto: riscv/chacha: Avoid s0/fp register
-    https://git.kernel.org/riscv/c/43169328c7b4
+Signed-off-by: AlanSong-oc <AlanSong-oc@zhaoxin.com>
+---
+ lib/crypto/Makefile           |  3 +-
+ lib/crypto/x86/sha1-phe-asm.S | 71 +++++++++++++++++++++++++++++++++++
+ lib/crypto/x86/sha1.h         | 20 ++++++++++
+ 3 files changed, 93 insertions(+), 1 deletion(-)
+ create mode 100644 lib/crypto/x86/sha1-phe-asm.S
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+index d2845b214..069069377 100644
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -205,7 +205,8 @@ endif
+ libsha1-$(CONFIG_SPARC) +=3D sparc/sha1_asm.o
+ libsha1-$(CONFIG_X86) +=3D x86/sha1-ssse3-and-avx.o \
+ 			 x86/sha1-avx2-asm.o \
+-			 x86/sha1-ni-asm.o
++			 x86/sha1-ni-asm.o \
++			 x86/sha1-phe-asm.o
+ endif # CONFIG_CRYPTO_LIB_SHA1_ARCH
+=20
+ ##########################################################################=
+######
+diff --git a/lib/crypto/x86/sha1-phe-asm.S b/lib/crypto/x86/sha1-phe-asm.S
+new file mode 100644
+index 000000000..eff086104
+--- /dev/null
++++ b/lib/crypto/x86/sha1-phe-asm.S
+@@ -0,0 +1,71 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * PHE Extensions optimized implementation of a SHA-1 update function
++ *
++ * This file is provided under a dual BSD/GPLv2 license.  When using or
++ * redistributing this file, you may do so under either license.
++ *
++ * GPL LICENSE SUMMARY
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of version 2 of the GNU General Public License as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * BSD LICENSE
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 	* Redistributions of source code must retain the above copyright
++ * 	  notice, this list of conditions and the following disclaimer.
++ * 	* Redistributions in binary form must reproduce the above copyright
++ * 	  notice, this list of conditions and the following disclaimer in
++ * 	  the documentation and/or other materials provided with the
++ * 	  distribution.
++ * 	* Neither the name of Intel Corporation nor the names of its
++ * 	  contributors may be used to endorse or promote products derived
++ * 	  from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ */
++
++#include <linux/linkage.h>
++
++/*
++ * PHE Extensions optimized implementation of a SHA-1 block function
++ *
++ * This function takes a pointer to the current SHA-1 state, a pointer to =
+the
++ * input data, and the number of 64-byte blocks to process.  The number of
++ * blocks to process is assumed to be nonzero.  Once all blocks have been
++ * processed, the state is updated with the new state.  This function only
++ * processes complete blocks.  State initialization, buffering of partial
++ * blocks, and digest finalization are expected to be handled elsewhere.
++ *
++ * void sha1_transform_phe(u8 *state, const u8 *data, size_t nblocks)
++ */
++.text
++SYM_FUNC_START(sha1_transform_phe)
++	mov		$-1, %rax
++	mov		%rdx, %rcx
++
++	.byte	0xf3,0x0f,0xa6,0xc8
++
++	RET
++SYM_FUNC_END(sha1_transform_phe)
+diff --git a/lib/crypto/x86/sha1.h b/lib/crypto/x86/sha1.h
+index c48a0131f..670109c79 100644
+--- a/lib/crypto/x86/sha1.h
++++ b/lib/crypto/x86/sha1.h
+@@ -48,6 +48,23 @@ static void sha1_blocks_avx2(struct sha1_block_state *st=
+ate,
+ 	}
+ }
+=20
++#define PHE_ALIGNMENT 16
++asmlinkage void sha1_transform_phe(u8 *state, const u8 *data, size_t nbloc=
+ks);
++static void sha1_blocks_phe(struct sha1_block_state *state,
++			     const u8 *data, size_t nblocks)
++{
++	/*
++	 * XSHA1 requires %edi to point to a 32-byte, 16-byte-aligned
++	 * buffer on Zhaoxin processors.
++	 */
++	u8 buf[32 + PHE_ALIGNMENT - 1];
++	u8 *dst =3D PTR_ALIGN(&buf[0], PHE_ALIGNMENT);
++
++	memcpy(dst, (u8 *)(state), SHA1_DIGEST_SIZE);
++	sha1_transform_phe(dst, data, nblocks);
++	memcpy((u8 *)(state), dst, SHA1_DIGEST_SIZE);
++}
++
+ static void sha1_blocks(struct sha1_block_state *state,
+ 			const u8 *data, size_t nblocks)
+ {
+@@ -59,6 +76,9 @@ static void sha1_mod_init_arch(void)
+ {
+ 	if (boot_cpu_has(X86_FEATURE_SHA_NI)) {
+ 		static_call_update(sha1_blocks_x86, sha1_blocks_ni);
++	} else if (boot_cpu_has(X86_FEATURE_PHE) && boot_cpu_has(X86_FEATURE_PHE_=
+EN)) {
++		if (cpu_data(0).x86 >=3D 0x07)
++			static_call_update(sha1_blocks_x86, sha1_blocks_phe);
+ 	} else if (cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				     NULL) &&
+ 		   boot_cpu_has(X86_FEATURE_AVX)) {
+--=20
+2.34.1
 
