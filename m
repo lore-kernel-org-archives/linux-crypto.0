@@ -1,83 +1,126 @@
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2DB1F17E8;
-	Fri, 19 Dec 2025 03:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC2F7405A;
+	Fri, 19 Dec 2025 04:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766115386; cv=none; b=sAHrWPXEmRZJx4T/Q5TBsJug83P0SVICjW+2n137DHO4VxuLb/pJiL0//QO7gezMVCDMly805yPMbyKm2RMLEEY+ugHCYKKTZ71yQvHRFOfSYQ2H2bvY2vC9JKvxcpNZiYEswjjcqSfpwFMH5a7P+SrHGc0iv91pKGEbvjatEdQ=
+	t=1766118594; cv=none; b=CUB+gwIDDu3eErYIru0EkxssmzD0qIxQn74FRBlmAkZjh3Q6qPev5+YK2rZRtyjrlexcusRLUDIDY1/HOaeFwIPFiKtv91YD9VolOgO3GQG9XdSkOqAggWnyZRtXy8qwiQJlEpm5SCMnxhBNE/rMngU29jukQVZOy3TLMNB6EYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766115386; c=relaxed/simple;
-	bh=zFpXXP7cU6IkB5MCQiEHuRwi8PYp09TwKsz5sIvDpbU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=K6hV+sTslLxDbRhUctKtfYCWZcqcShoRqIeJmoSwatExFxkVxJUonvzp0KlGLlp7WMF2YWgy1hPO9ZEF53eDs4V9pFnIFpOr3jtofGm2Drx/QeesQJuj//PdX+N332GTyCabWSci0iPo4YgB8/oDe/L3SRXX6GawNXEcPQPm6Dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=kKkiDc2T; arc=none smtp.client-ip=113.46.200.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1766118594; c=relaxed/simple;
+	bh=tI+x0eCt5Jk0AIqnw9KGquZ/jqfDBwv7KX4+L3F8dt8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=meC8lUtOWnwvSx0OfO9atyJlmzKwCFVmO5ddWE0XrfE6w6+H2Qaq9OyIORqw3/W2geZXg5jL5NqQxXl5VcNU6A41IYVYiVuIa0Fm5vQ516Y1ZKE3oy4AuL6i7JTZ4OfZNgTUIvGTyPBLIJUGqFrXTVhRxn4AvrroLQnKOFn9bd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ip6215jE; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="kKkiDc2T"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=/UTMaJTAr4b4MOP9bjT6A9SSDWe8Bs4J6adAfBsWNGg=;
-	b=kKkiDc2Thmebd1Lb1SDQVbGQNJKyxa+NjeHzuQpwQUUqzj1d+8TS6c4YMjsI0oGHSQecnaKu7
-	nNsEvkn6oSK1VnCfUARO0jfssRnR3wPQOrxPgWKo/rnS32Iohx1xGL9hEEXPQ/BgD2TZ2hrRIOK
-	z+jjP8shoi9BOtNhdwGYtGc=
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dXY5m4KKyzKm5C;
-	Fri, 19 Dec 2025 11:33:16 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0AAD0140119;
-	Fri, 19 Dec 2025 11:36:21 +0800 (CST)
-Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 19 Dec 2025 11:36:20 +0800
-Received: from localhost.huawei.com (10.90.31.46) by
- kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 19 Dec 2025 11:36:20 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<yuzenghui@huawei.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>
-Subject: [PATCH] crypto: hisilicon/sgl - fix inconsistent map/unmap direction issue
-Date: Fri, 19 Dec 2025 11:36:19 +0800
-Message-ID: <20251219033619.1871450-1-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ip6215jE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766118593; x=1797654593;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tI+x0eCt5Jk0AIqnw9KGquZ/jqfDBwv7KX4+L3F8dt8=;
+  b=ip6215jE3MpEqiJYxqxdesiCfImd23ohfYJSsqEys2jnCaSMhJ9n2Fr2
+   57tsbsqadN6Ez+mU3vxP87kVQOViA6OUaRU0nIhIUYP1maxz0iZTrAXvx
+   uJ/0MyO7b7jR41DKd99rhRtBrY8BOJP8cWvtVurbDCbXdvGf4XKCgAzzb
+   obsC8M1BvzHmL52YrXh6ak4iBap0RkA4ttAaCIq2O1Y4O0mzAZQlAT41S
+   XNQDSPI6+e9ua20GnlWnfguLyko2C1sOf6sG0tHFfMZGWjvTiXvFZvIG0
+   BpuTL+nd1hR2d2nZSrWawCCJ64nkETY/iFNxIshrPjNAYBIRaXNybqEpg
+   A==;
+X-CSE-ConnectionGUID: 0xXwAxNzQP68OVK0ghWJsg==
+X-CSE-MsgGUID: fQ9mDoAAQoyn09a5CmHOtg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11646"; a="85666127"
+X-IronPort-AV: E=Sophos;i="6.21,159,1763452800"; 
+   d="scan'208";a="85666127"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2025 20:29:52 -0800
+X-CSE-ConnectionGUID: c7W7TVl6Rx67mKtgG3hQrA==
+X-CSE-MsgGUID: k7h3XoBJQzCGu4K+mE5Ogw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,159,1763452800"; 
+   d="scan'208";a="197914218"
+Received: from lkp-server01.sh.intel.com (HELO 0d09efa1b85f) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 18 Dec 2025 20:29:49 -0800
+Received: from kbuild by 0d09efa1b85f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vWS7e-0000000030L-01B1;
+	Fri, 19 Dec 2025 04:29:46 +0000
+Date: Fri, 19 Dec 2025 12:29:29 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	"Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>
+Subject: Re: [PATCH 1/3] lib/crypto: Add KUnit test vectors for Ascon-Hash256
+Message-ID: <202512191115.8pVsYusz-lkp@intel.com>
+References: <20251215-ascon_hash256-v1-1-24ae735e571e@kriptograf.id>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemq200001.china.huawei.com (7.202.195.16)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251215-ascon_hash256-v1-1-24ae735e571e@kriptograf.id>
 
-Ensure that the direction for dma_map_sg and dma_unmap_sg is
-consistent.
+Hi Rusydi,
 
-Fixes: 2566de3e06a3 ("crypto: hisilicon - Use fine grained DMA mapping direction")
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
----
- drivers/crypto/hisilicon/sgl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
-index 24c7b6ab285b..d41b34405c21 100644
---- a/drivers/crypto/hisilicon/sgl.c
-+++ b/drivers/crypto/hisilicon/sgl.c
-@@ -260,7 +260,7 @@ hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev, struct scatterlist *sgl,
- 	return curr_hw_sgl;
- 
- err_unmap:
--	dma_unmap_sg(dev, sgl, sg_n, DMA_BIDIRECTIONAL);
-+	dma_unmap_sg(dev, sgl, sg_n, dir);
- 
- 	return ERR_PTR(ret);
- }
+[auto build test WARNING on ebiggers/libcrypto-next]
+[also build test WARNING on ebiggers/libcrypto-fixes linus/master v6.19-rc1 next-20251218]
+[cannot apply to herbert-cryptodev-2.6/master herbert-crypto-2.6/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Rusydi-H-Makarim/lib-crypto-Initial-implementation-of-Ascon-Hash256/20251215-165442
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git libcrypto-next
+patch link:    https://lore.kernel.org/r/20251215-ascon_hash256-v1-1-24ae735e571e%40kriptograf.id
+patch subject: [PATCH 1/3] lib/crypto: Add KUnit test vectors for Ascon-Hash256
+config: parisc-randconfig-001-20251216 (https://download.01.org/0day-ci/archive/20251219/202512191115.8pVsYusz-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 11.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251219/202512191115.8pVsYusz-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512191115.8pVsYusz-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from lib/crypto/tests/ascon_hash_kunit.c:6:
+>> include/crypto/ascon_hash.h:24:18: warning: 'ascon_p_rndc' defined but not used [-Wunused-const-variable=]
+      24 | static const u64 ascon_p_rndc[] = {
+         |                  ^~~~~~~~~~~~
+
+
+vim +/ascon_p_rndc +24 include/crypto/ascon_hash.h
+
+    18	
+    19	/*
+    20	 * The standard of Ascon permutation in NIST SP 800-232 specifies 16 round
+    21	 * constants to accomodate potential functionality extensions in the future
+    22	 * (see page 2).
+    23	 */
+  > 24	static const u64 ascon_p_rndc[] = {
+    25		0x000000000000003cULL, 0x000000000000002dULL, 0x000000000000001eULL,
+    26		0x000000000000000fULL, 0x00000000000000f0ULL, 0x00000000000000e1ULL,
+    27		0x00000000000000d2ULL, 0x00000000000000c3ULL, 0x00000000000000b4ULL,
+    28		0x00000000000000a5ULL, 0x0000000000000096ULL, 0x0000000000000087ULL,
+    29		0x0000000000000078ULL, 0x0000000000000069ULL, 0x000000000000005aULL,
+    30		0x000000000000004bULL,
+    31	};
+    32	
+
 -- 
-2.33.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
