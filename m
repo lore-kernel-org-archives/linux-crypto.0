@@ -1,167 +1,478 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799AD340D86
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 15:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42B8339701
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 15:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766157989; cv=none; b=p8nxfBonJlmtCWLqOEpkBpqecWdM1wm4VzcTn7+0HDIvAhr7JeoZUCk9uISbV7Zh0aj+Y71B1xPiTJMnWqLaYuBzmCYH+pjp4Aa8lL4oblkQJhrj8OdjuWQ0lcQvoR5+7L9DGJdAXXO3fFb3W1LaOJDOHQHhiwuoquQfY13eGsg=
+	t=1766159113; cv=none; b=Vw3Mww0q1sIB8leolP8411OtpO2oZrk/P/BT/Y5q1ZnNXDzLotPIj7+bPu/qd/nKjbRiXHWfKGAsODG9BmNH9Q5Bt6C1bxQBSxOhBaN1V9vL30dqLZNqUugEU9NjhC0PUHg7pDOPcSGzJlAcUFJleeUtQVmIyKkchD3MXHeQHK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766157989; c=relaxed/simple;
-	bh=wlXqp8KfUthtA6YHPBmwca3I80pTZ/s2jvPFev9qqwo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t7BRA9FamGwfM8scqJECAss+aAJMqpUAdTzXlPMlgbSZvU9kh4GMeowJZEoXCUdmmQVNdErPRW7BS+Ea3oQp1E4ZgHJlHiGuSSGXM8q0FPQQokph55WSeCvrJQ4Sk6/sCXpssrd8WUrJdYexNBej2/rnF3jaSEQizsdWofx3plo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=R3/X1Ce3; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1766159113; c=relaxed/simple;
+	bh=jxRVFkcZ/dQRiG15u55eeTK008jHW8Kue4PgzUH7FSw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=dk+7oHiiYtpQlksNVCm7WDbJmLjfRm7gfVTYbpjjNEDs20NtwzCx42PrszoCMsxIxGXyndXhyJYJzMfbnXJuBSroCyUG4hgiIvivZ76C44rViJhlKOV+td1+17tn/sVDiUbcTjLRKPuFwDIU5o0aqpke1Ov7QYtUr9Lbk1aHzwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BFS2xZ3t; arc=none smtp.client-ip=209.85.218.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="R3/X1Ce3"
-Date: Fri, 19 Dec 2025 15:26:04 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766157974;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AV6l+3QPJOj+3ABXPS+GUdyLpMiv6Gbs09n7zqVMbwA=;
-	b=R3/X1Ce3qK0UY2cGkwZriN0mfPxH7BKu3e44uRo1xI2IeUOmIIQ/OHYjE17tya25yQ16fD
-	EVaqs/Rb2QvpXVI0fWgrlr5x/wta6dnXtWIJMgQMbqHaku2y1+RHbC0nGQW0Wlw73BK2ev
-	irSs4A8Ao67m4tnsTzJYxkz0cJiNhFc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org" <hannes@cmpxchg.org>, 
-	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
-	"sj@kernel.org" <sj@kernel.org>, "kasong@tencent.com" <kasong@tencent.com>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com" <clabbe@baylibre.com>, 
-	"ardb@kernel.org" <ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
-	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>, "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, 
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
- compress batching of large folios.
-Message-ID: <uqznqihjuyfk3ifyxsjwp6x7nvk2vloinody6fomfuqepfu64n@25yboetztah3>
-References: <20251104091235.8793-1-kanchana.p.sridhar@intel.com>
- <20251104091235.8793-23-kanchana.p.sridhar@intel.com>
- <q54bjetgzmwbsqpgbuuovdmcwxjwmtowwgsv7p3ykbodhxpvc7@6mqmz6ji4jja>
- <SJ2PR11MB8472011B61F644D4662FE980C9CDA@SJ2PR11MB8472.namprd11.prod.outlook.com>
- <vc65dxjoledwtojbcdgyxh2xt3hhlqrzgxcnbgufji7sgnhkus@fqkcflhwbags>
- <SJ2PR11MB847267511A5B6CF9EBFA1A0DC9A9A@SJ2PR11MB8472.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BFS2xZ3t"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b8012f5f7a3so187334166b.2
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2025 07:45:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1766159106; x=1766763906; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DevBKjiUQ1DYWG4NWpg0hsHH+Nds87DWeoh34BFlORw=;
+        b=BFS2xZ3tStdDArYGUn6oQWgX/2EmhKRK/AkrV9C6FmO1Cbd3AbyvjQCZSPloeSCTyV
+         8anarT5xZ0GeqE93kw5+kGx8JDUQrNi0L6PQ0KntS/NGnHNuBa8L+FhPuJUgAwcnhGUa
+         1+xgdIiOQqPcCiHHssirZ6IwhFpJ1K/tLcGZC+st+3YCM5ff7t429MYroAGR84s/eBC/
+         j7WV9oie4HDA7FqmPSNLwvElGdYbiyZIPZ26qrVkMmNBoVXhjRTynudK5tOB594ob5zr
+         TW+mDf4KN+OoOC19VQFaAwskXHqHXeStGl+OWc1EjrpPIwYCdzlvJKI2YEOOnmYuN8H6
+         CibQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766159106; x=1766763906;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DevBKjiUQ1DYWG4NWpg0hsHH+Nds87DWeoh34BFlORw=;
+        b=lof7SInjmg2VkWkFSBDq6V+zmMpmVj2TP/QwkAwV3jQhlJnEpSBFLPZ/JbNfomKJS5
+         VikSqxeXHQUovS5JuDRqsSi23/If3yRqzQ9yKkqlcW3UNP2T2ABrASp7UMZZbPjDDtzp
+         i+G+uvHZuTMWApUjziUso8J9XKJOxgMNA4uBQrdt7LpgMFNfEDTNx4pd90icvqwEr1cw
+         Sfi550QuetYsEp5eYea0qnK6gvg5lvovEtinvSuHheP//4qDcLI7e6wUZZR+zSgzYo7Z
+         n+CtV72rrjy/O+yawgnEnaHXm/r/WHCaYxJdcFJJWNUbE4j6uOIrurLexYJ/8PQ2G/P+
+         hHrA==
+X-Forwarded-Encrypted: i=1; AJvYcCUkbgTG4lLoBwrkAa59V89U+YYtiwf4OxCN3/jI/nToZTd1MWAzV+WNrugvY4R80NXV+/tNOFqZ651Le1E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzv2K3X5kwGp0AZJHgPEjE/rRTdN+ge1JbCnDb4g8hNZzHzrxZa
+	Bfcy4fum0FNOTVSM3mKekgHHPLTgTjNKQ8euKMLu1sIIjKbO8bWWQ1WoR3yfTJr9OfvnjTzxwZ8
+	hLA==
+X-Google-Smtp-Source: AGHT+IHtV88uBWdFWDpxHAn+aJGoZ7Ne2Qv7ftKEp6v1rUUmlYkJyqA6HCtPYVARKi6mxF17jdhYcvZpxA==
+X-Received: from edya2.prod.google.com ([2002:aa7:cf02:0:b0:64b:a037:21b4])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:2d08:b0:b72:af1f:af7d
+ with SMTP id a640c23a62f3a-b8036f608aemr336350066b.29.1766159106427; Fri, 19
+ Dec 2025 07:45:06 -0800 (PST)
+Date: Fri, 19 Dec 2025 16:39:49 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SJ2PR11MB847267511A5B6CF9EBFA1A0DC9A9A@SJ2PR11MB8472.namprd11.prod.outlook.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.322.g1dd061c0dc-goog
+Message-ID: <20251219154418.3592607-1-elver@google.com>
+Subject: [PATCH v5 00/36] Compiler-Based Context- and Locking-Analysis
+From: Marco Elver <elver@google.com>
+To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>, 
+	Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, 
+	Chris Li <sparse@chrisli.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>, 
+	Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Ian Rogers <irogers@google.com>, 
+	Jann Horn <jannh@google.com>, Joel Fernandes <joelagnelf@nvidia.com>, 
+	Johannes Berg <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Josh Triplett <josh@joshtriplett.org>, Justin Stitt <justinstitt@google.com>, 
+	Kees Cook <kees@kernel.org>, Kentaro Takeda <takedakn@nttdata.co.jp>, 
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, Thomas Gleixner <tglx@linutronix.de>, 
+	Thomas Graf <tgraf@suug.ch>, Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, 
+	kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-sparse@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Dec 19, 2025 at 02:29:15AM +0000, Sridhar, Kanchana P wrote:
-> 
-> > -----Original Message-----
-> > From: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > Sent: Thursday, November 13, 2025 4:46 PM
-> > To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
-> > Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> > hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
-> > usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
-> > ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
-> > senozhatsky@chromium.org; sj@kernel.org; kasong@tencent.com; linux-
-> > crypto@vger.kernel.org; herbert@gondor.apana.org.au;
-> > davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
-> > ebiggers@google.com; surenb@google.com; Accardi, Kristen C
-> > <kristen.c.accardi@intel.com>; Gomes, Vinicius <vinicius.gomes@intel.com>;
-> > Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
-> > <vinodh.gopal@intel.com>
-> > Subject: Re: [PATCH v13 22/22] mm: zswap: Batched zswap_compress() with
-> > compress batching of large folios.
-> [...]
-> > > > > Architectural considerations for the zswap batching framework:
-> > > > >
-> > > >
-> > ==============================================================
-> > > > > We have designed the zswap batching framework to be
-> > > > > hardware-agnostic. It has no dependencies on Intel-specific features
-> > and
-> > > > > can be leveraged by any hardware accelerator or software-based
-> > > > > compressor. In other words, the framework is open and inclusive by
-> > > > > design.
-> > > > >
-> > > > > Other ongoing work that can use batching:
-> > > > > =========================================
-> > > > > This patch-series demonstrates the performance benefits of compress
-> > > > > batching when used in zswap_store() of large folios. shrink_folio_list()
-> > > > > "reclaim batching" of any-order folios is the major next work that uses
-> > > > > the zswap compress batching framework: our testing of
-> > kernel_compilation
-> > > > > with writeback and the zswap shrinker indicates 10X fewer pages get
-> > > > > written back when we reclaim 32 folios as a batch, as compared to one
-> > > > > folio at a time: this is with deflate-iaa and with zstd. We expect to
-> > > > > submit a patch-series with this data and the resulting performance
-> > > > > improvements shortly. Reclaim batching relieves memory pressure
-> > faster
-> > > > > than reclaiming one folio at a time, hence alleviates the need to scan
-> > > > > slab memory for writeback.
-> > > > >
-> > > > > Nhat has given ideas on using batching with the ongoing kcompressd
-> > work,
-> > > > > as well as beneficially using decompression batching & block IO batching
-> > > > > to improve zswap writeback efficiency.
-> > > > >
-> > > > > Experiments that combine zswap compress batching, reclaim batching,
-> > > > > swapin_readahead() decompression batching of prefetched pages, and
-> > > > > writeback batching show that 0 pages are written back with deflate-iaa
-> > > > > and zstd. For comparison, the baselines for these compressors see
-> > > > > 200K-800K pages written to disk (kernel compilation 'allmod' config).
-> > > > >
-> > > > > To summarize, these are future clients of the batching framework:
-> > > > >
-> > > > >    - shrink_folio_list() reclaim batching of multiple folios:
-> > > > >        Implemented, will submit patch-series.
-> > > > >    - zswap writeback with decompress batching:
-> > > > >        Implemented, will submit patch-series.
-> > > > >    - zram:
-> > > > >        Implemented, will submit patch-series.
-> > > > >    - kcompressd:
-> > > > >        Not yet implemented.
-> > > > >    - file systems:
-> > > > >        Not yet implemented.
-> > > > >    - swapin_readahead() decompression batching of prefetched pages:
-> > > > >        Implemented, will submit patch-series.
-> > > > >
-> > > > > Additionally, any place we have folios that need to be compressed, can
-> > > > > potentially be parallelized.
-> 
-> [...]
-> 
-> > For example, you should remove mentions of ongoing work and future work,
-> > simply because things change and they may not land. Just briefly
-> > mentioning that there are future use cases (with maybe an example) is
-> > sufficient.
-> 
-> Hi Yosry,
-> 
-> The mentions of ongoing/future work were included as per Andrew's suggestion.
-> Hence, I would like to keep these in the commit log. Hope this is Ok with you?
+Context Analysis is a language extension, which enables statically
+checking that required contexts are active (or inactive) by acquiring
+and releasing user-definable "context locks". An obvious application is
+lock-safety checking for the kernel's various synchronization primitives
+(each of which represents a "context lock"), and checking that locking
+rules are not violated.
 
-We can keep them, but not in the detail they are currently in, and
-avoiding mentioning what is implemented or not implemented yet because
-it's not very relevant to the patch imo.
+The feature requires Clang 22 (unreleased) or later. Clang originally
+called the feature "Thread Safety Analysis" [1]. This was later changed
+and the feature became more flexible, gaining the ability to define
+custom "capabilities". Its foundations can be found in "Capability
+Systems" [2], used to specify the permissibility of operations to depend
+on some "capability" being held (or not held).
 
-So maybe focus on the fact that the compression batching can be used for
-other use cases like batching decompression in zswap writeback, batching
-compression in zram, batch compression of different folios during
-reclaim, etc -- without going too much into detail because these details
-will probably change when these extensions are proposed.
+Because the feature is not just able to express "capabilities" related
+to synchronization primitives, and "capability" is already overloaded in
+the kernel, the naming chosen for the kernel departs from Clang's
+"Thread Safety" and "capability" nomenclature; we refer to the feature
+as "Context Analysis" to avoid confusion. The internal implementation
+still makes references to Clang's terminology in a few places, such as
+`-Wthread-safety` being the warning option that also still appears in
+diagnostic messages.
 
+Additional details can be found in the added kernel-doc documentation.
+An LWN article covered v2 of the series: https://lwn.net/Articles/1012990/
 
-> 
-> Thanks,
-> Kanchana
-> 
+ [1] https://clang.llvm.org/docs/ThreadSafetyAnalysis.html
+ [2] https://www.cs.cornell.edu/talc/papers/capabilities.pdf
+
+=== Design ===
+
+Prior art exists in the form of Sparse's Context Tracking. Locking
+annotations on functions already exist sparsely, so the concept of
+analyzing locking rules is not foreign to the kernel's codebase.
+
+However, Clang's analysis is more complete vs. Sparse's, with the
+typical trade-offs in static analysis: improved completeness is
+sacrificed for more possible false positives or additional annotations
+required by the programmer. Numerous options exist to disable or opt out
+certain code from analysis.
+
+This series initially aimed to retain compatibility with Sparse, which
+can provide tree-wide analysis of a subset of the context analysis
+introduced, but it was later decided to drop Sparse compatibility. For
+the most part, the new (and old) keywords used for annotations remain
+the same, and many of the pre-existing annotations remain valid.
+
+One big question is how to enable this feature, given we end up with a
+new dialect of C; two approaches have been considered:
+
+  A. Tree-wide all-or-nothing approach. This approach requires tree-wide
+     changes, adding annotations or selective opt-outs. Making more
+     primitives context-analysis aware increases churn where maintainers
+     are unfamiliar with the feature and the analysis is unable to deal
+     with complex code patterns as-is.
+
+Because we can't change the programming language (even if from one C
+dialect to another) of the kernel overnight, a different approach might
+cause less friction.
+
+  B. A selective, incremental, and much less intrusive approach.
+     Maintainers of subsystems opt in their modules or directories into
+     context analysis (via Makefile):
+
+       CONTEXT_ANALYSIS_foo.o := y	# foo.o only
+       CONTEXT_ANALYSIS := y  		# all TUs
+
+     Most (eventually all) synchronization primitives, and more
+     context locks including ones that track "irq disabled",
+     "preemption" disabled, etc. could be supported.
+
+The approach taken by this series is B. This ensures that only
+subsystems where maintainers are willing to deal with any warnings are
+opted-in. Introducing the feature can be done incrementally, without
+large tree-wide changes and adding numerous opt-outs and annotations to
+the majority of code.
+
+  Note: Bart Van Assche concurrently worked on enabling -Wthread-safety:
+  https://lore.kernel.org/all/20250206175114.1974171-1-bvanassche@acm.org/
+  Bart's work has shown what it might take to go with approach A
+  (tree-wide, restricted to 'mutex' usage). This has shown that the
+  analysis finds real issues when applied to enough subsystems!  We hope
+  this serves as motivation to eventually enable the analysis in as many
+  subsystems as possible, particularly subsystems that are not as easily
+  tested by CI systems and test robots.
+
+=== Initial Uses ===
+
+With this initial series, the following synchronization primitives are
+supported: `raw_spinlock_t`, `spinlock_t`, `rwlock_t`, `mutex`,
+`seqlock_t`, `bit_spinlock`, RCU, SRCU (`srcu_struct`), `rw_semaphore`,
+`local_lock_t`, `ww_mutex`.
+
+To demonstrate use of the feature on real kernel code, the series also
+enables context analysis for the following subsystems:
+
+	* kernel/kcov
+	* kernel/kcsan
+	* kernel/sched/
+	* lib/rhashtable
+	* lib/stackdepot
+	* mm/kfence
+	* security/tomoyo
+    	* crypto/
+
+The initial benefits are static detection of violations of locking
+rules. As more context locks are supported, we would see more static
+checking beyond what regular C can provide, all while remaining easy
+(and quick) to use via the Clang compiler.
+
+  Note: The kernel already provides dynamic analysis tools Lockdep and
+  KCSAN for lock-safety checking and data-race detection respectively.
+  Unlike those, Clang's context analysis is a compile-time static
+  analysis with no runtime impact. The static analysis complements
+  existing dynamic analysis tools, as it may catch some issues before
+  even getting into a running kernel, but is *not* a replacement for
+  whole-kernel testing with the dynamic analysis tools enabled!
+
+=== Appendix ===
+
+A Clang version that supports `-Wthread-safety-pointer` and the new
+alias-analysis of context lock pointers is required (from this version
+onwards):
+
+	https://github.com/llvm/llvm-project/commit/7ccb5c08f0685d4787f12c3224a72f0650c5865e
+
+The minimum required release version will be Clang 22.
+
+This series is also available at this Git tree:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/melver/linux.git/log/?h=ctx-analysis/dev
+
+The feature itself is usable when all patches up to the "MAINTAINERS"
+patch are applied; the subsequent "enablement" patches are optional and
+could be applied by the respective maintainers to their own tree after
+the context analysis infrastructure is available.
+
+=== Changelog ===
+
+v5:
+
+  - Rename "context guard" -> "context lock".
+
+  - Rework cleanup.h support to properly release at scope guard end.
+
+  - Use new cleanup.h helpers to properly support scoped lock guards.
+
+  - Support new scoped_seqlock_read().
+
+  - Also remove include/linux/lockref.h's deprecated use of __cond_lock().
+
+  - Fix invalid __releases/__acquires in um skas/mm_id.h header
+    (transitively included through mm_types.h which is included by
+    subsystems that may want to enable context analysis).
+
+  - Better document Clang's `assert_capability` attribute.
+
+  - Rebase on v6.19-rc1.
+
+v4: https://lore.kernel.org/all/20251120145835.3833031-2-elver@google.com/
+
+  - Rename capability -> context analysis, per Linus's suggestion:
+    https://lore.kernel.org/all/CAHk-=wgd-Wcp0GpYaQnU7S9ci+FvFmaNw1gm75mzf0ZWdNLxvw@mail.gmail.com/
+
+  - Minor fixes.
+
+v3: https://lore.kernel.org/all/20250918140451.1289454-1-elver@google.com/
+
+  - Bump min. Clang version to 22+ (unreleased), which now supports:
+
+	* re-entrancy via __attribute__((reentrant_capability));
+	* basic form of capability alias analysis - which is the
+	  biggest improvement since v2.
+
+    This was the result of conclusions from this discussion:
+    https://lore.kernel.org/all/CANpmjNPquO=W1JAh1FNQb8pMQjgeZAKCPQUAd7qUg=5pjJ6x=Q@mail.gmail.com/
+
+  - Rename __asserts_cap/__assert_cap to __assumes_cap/__assume_cap.
+
+  - Switch to DECLARE_LOCK_GUARD_1_ATTRS().
+
+  - Add __acquire_ret and __acquire_shared_ret helper macros - can be
+    used to define function-like macros that return objects which
+    contains a held capabilities. Works now because of capability alias
+    analysis.
+
+  - Add capability_unsafe_alias() helper, where the analysis rightfully
+    points out we're doing strange things with aliases but we don't
+    care.
+
+  - Support multi-argument attributes.
+
+  - Enable for kernel/sched/{core,fair}.c, kernel/kcsan.
+  - Drop drivers/tty changes (revisit later).
+
+v2: https://lore.kernel.org/all/20250304092417.2873893-1-elver@google.com/
+
+  - Remove Sparse context tracking support - after the introduction of
+    Clang support, so that backports can skip removal of Sparse support.
+
+  - Remove __cond_lock() function-like helper.
+
+  - ww_mutex support.
+
+  - -Wthread-safety-addressof was reworked and committed in upstream
+    Clang as -Wthread-safety-pointer.
+
+  - Make __cond_acquires() and __cond_acquires_shared() take abstract
+    value, since compiler only cares about zero and non-zero.
+
+  - Rename __var_guarded_by to simply __guarded_by. Initially the idea
+    was to be explicit about if the variable itself or the pointed-to
+    data is guarded, but in the long-term, making this shorter might be
+    better.
+
+  - Likewise rename __ref_guarded_by to __pt_guarded_by.
+
+  - Introduce common header warning suppressions - this is a better
+    solution than guarding header inclusions with disable_ +
+    enable_capability_analysis(). Header suppressions are disabled when
+    selecting CONFIG_WARN_CAPABILITY_ANALYSIS_ALL=y. This bumps the
+    minimum Clang version required to 20+.
+
+  - Make the data_race() macro imply disabled capability analysis.
+    Writing capability_unsafe(data_race(..)) is unnecessarily verbose
+    and data_race() on its own already indicates something subtly unsafe
+    is happening.  This change was made after analysis of a finding in
+    security/tomoyo.
+
+  - Enable analysis in the following subsystems as additional examples
+    of larger subsystem. Where it was obvious, the __guarded_by
+    attribute was added to lock-guarded variables to improve coverage.
+
+    	* drivers/tty
+	* security/tomoyo
+    	* crypto/
+
+RFC v1: https://lore.kernel.org/lkml/20250206181711.1902989-1-elver@google.com
+
+Marco Elver (36):
+  compiler_types: Move lock checking attributes to
+    compiler-context-analysis.h
+  compiler-context-analysis: Add infrastructure for Context Analysis
+    with Clang
+  compiler-context-analysis: Add test stub
+  Documentation: Add documentation for Compiler-Based Context Analysis
+  checkpatch: Warn about context_unsafe() without comment
+  cleanup: Basic compatibility with context analysis
+  lockdep: Annotate lockdep assertions for context analysis
+  locking/rwlock, spinlock: Support Clang's context analysis
+  compiler-context-analysis: Change __cond_acquires to take return value
+  locking/mutex: Support Clang's context analysis
+  locking/seqlock: Support Clang's context analysis
+  bit_spinlock: Include missing <asm/processor.h>
+  bit_spinlock: Support Clang's context analysis
+  rcu: Support Clang's context analysis
+  srcu: Support Clang's context analysis
+  kref: Add context-analysis annotations
+  locking/rwsem: Support Clang's context analysis
+  locking/local_lock: Include missing headers
+  locking/local_lock: Support Clang's context analysis
+  locking/ww_mutex: Support Clang's context analysis
+  debugfs: Make debugfs_cancellation a context lock struct
+  um: Fix incorrect __acquires/__releases annotations
+  compiler-context-analysis: Remove Sparse support
+  compiler-context-analysis: Remove __cond_lock() function-like helper
+  compiler-context-analysis: Introduce header suppressions
+  compiler: Let data_race() imply disabled context analysis
+  MAINTAINERS: Add entry for Context Analysis
+  kfence: Enable context analysis
+  kcov: Enable context analysis
+  kcsan: Enable context analysis
+  stackdepot: Enable context analysis
+  rhashtable: Enable context analysis
+  printk: Move locking annotation to printk.c
+  security/tomoyo: Enable context analysis
+  crypto: Enable context analysis
+  sched: Enable context analysis for core.c and fair.c
+
+ Documentation/dev-tools/context-analysis.rst  | 145 +++++
+ Documentation/dev-tools/index.rst             |   1 +
+ Documentation/dev-tools/sparse.rst            |  19 -
+ Documentation/mm/process_addrs.rst            |   6 +-
+ MAINTAINERS                                   |  11 +
+ Makefile                                      |   1 +
+ arch/um/include/shared/skas/mm_id.h           |   5 +-
+ arch/um/kernel/skas/mmu.c                     |  13 +-
+ crypto/Makefile                               |   2 +
+ crypto/acompress.c                            |   6 +-
+ crypto/algapi.c                               |   2 +
+ crypto/api.c                                  |   1 +
+ crypto/crypto_engine.c                        |   2 +-
+ crypto/drbg.c                                 |   5 +
+ crypto/internal.h                             |   2 +-
+ crypto/proc.c                                 |   3 +
+ crypto/scompress.c                            |  24 +-
+ .../net/wireless/intel/iwlwifi/iwl-trans.c    |   4 +-
+ .../net/wireless/intel/iwlwifi/iwl-trans.h    |   6 +-
+ .../intel/iwlwifi/pcie/gen1_2/internal.h      |   5 +-
+ .../intel/iwlwifi/pcie/gen1_2/trans.c         |   4 +-
+ fs/dlm/lock.c                                 |   2 +-
+ include/crypto/internal/acompress.h           |   7 +-
+ include/crypto/internal/engine.h              |   2 +-
+ include/linux/bit_spinlock.h                  |  24 +-
+ include/linux/cleanup.h                       |  50 ++
+ include/linux/compiler-context-analysis.h     | 441 +++++++++++++
+ include/linux/compiler.h                      |   2 +
+ include/linux/compiler_types.h                |  18 +-
+ include/linux/console.h                       |   4 +-
+ include/linux/debugfs.h                       |  12 +-
+ include/linux/kref.h                          |   2 +
+ include/linux/list_bl.h                       |   2 +
+ include/linux/local_lock.h                    |  51 +-
+ include/linux/local_lock_internal.h           |  73 ++-
+ include/linux/lockdep.h                       |  12 +-
+ include/linux/lockref.h                       |   4 +-
+ include/linux/mm.h                            |  33 +-
+ include/linux/mutex.h                         |  38 +-
+ include/linux/mutex_types.h                   |   4 +-
+ include/linux/rcupdate.h                      |  90 +--
+ include/linux/refcount.h                      |   6 +-
+ include/linux/rhashtable.h                    |  16 +-
+ include/linux/rwlock.h                        |  22 +-
+ include/linux/rwlock_api_smp.h                |  43 +-
+ include/linux/rwlock_rt.h                     |  44 +-
+ include/linux/rwlock_types.h                  |  10 +-
+ include/linux/rwsem.h                         |  76 ++-
+ include/linux/sched.h                         |   6 +-
+ include/linux/sched/signal.h                  |  16 +-
+ include/linux/sched/task.h                    |   6 +-
+ include/linux/sched/wake_q.h                  |   3 +
+ include/linux/seqlock.h                       |  38 +-
+ include/linux/seqlock_types.h                 |   5 +-
+ include/linux/spinlock.h                      | 112 +++-
+ include/linux/spinlock_api_smp.h              |  34 +-
+ include/linux/spinlock_api_up.h               | 112 +++-
+ include/linux/spinlock_rt.h                   |  37 +-
+ include/linux/spinlock_types.h                |  10 +-
+ include/linux/spinlock_types_raw.h            |   5 +-
+ include/linux/srcu.h                          |  73 ++-
+ include/linux/srcutiny.h                      |   6 +
+ include/linux/srcutree.h                      |  10 +-
+ include/linux/ww_mutex.h                      |  22 +-
+ kernel/Makefile                               |   2 +
+ kernel/kcov.c                                 |  36 +-
+ kernel/kcsan/Makefile                         |   2 +
+ kernel/kcsan/report.c                         |  11 +-
+ kernel/printk/printk.c                        |   2 +
+ kernel/sched/Makefile                         |   3 +
+ kernel/sched/core.c                           |  89 ++-
+ kernel/sched/fair.c                           |   7 +-
+ kernel/sched/sched.h                          | 126 +++-
+ kernel/signal.c                               |   4 +-
+ kernel/time/posix-timers.c                    |  13 +-
+ lib/Kconfig.debug                             |  44 ++
+ lib/Makefile                                  |   6 +
+ lib/dec_and_lock.c                            |   8 +-
+ lib/lockref.c                                 |   1 -
+ lib/rhashtable.c                              |   5 +-
+ lib/stackdepot.c                              |  20 +-
+ lib/test_context-analysis.c                   | 604 ++++++++++++++++++
+ mm/kfence/Makefile                            |   2 +
+ mm/kfence/core.c                              |  20 +-
+ mm/kfence/kfence.h                            |  14 +-
+ mm/kfence/report.c                            |   4 +-
+ mm/memory.c                                   |   4 +-
+ mm/pgtable-generic.c                          |  19 +-
+ net/ipv4/tcp_sigpool.c                        |   2 +-
+ scripts/Makefile.context-analysis             |  11 +
+ scripts/Makefile.lib                          |  10 +
+ scripts/checkpatch.pl                         |   7 +
+ scripts/context-analysis-suppression.txt      |  33 +
+ security/tomoyo/Makefile                      |   2 +
+ security/tomoyo/common.c                      |  52 +-
+ security/tomoyo/common.h                      |  77 +--
+ security/tomoyo/domain.c                      |   1 +
+ security/tomoyo/environ.c                     |   1 +
+ security/tomoyo/file.c                        |   5 +
+ security/tomoyo/gc.c                          |  28 +-
+ security/tomoyo/mount.c                       |   2 +
+ security/tomoyo/network.c                     |   3 +
+ tools/include/linux/compiler_types.h          |   2 -
+ 103 files changed, 2523 insertions(+), 609 deletions(-)
+ create mode 100644 Documentation/dev-tools/context-analysis.rst
+ create mode 100644 include/linux/compiler-context-analysis.h
+ create mode 100644 lib/test_context-analysis.c
+ create mode 100644 scripts/Makefile.context-analysis
+ create mode 100644 scripts/context-analysis-suppression.txt
+
+-- 
+2.52.0.322.g1dd061c0dc-goog
