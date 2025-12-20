@@ -1,46 +1,46 @@
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010008.outbound.protection.outlook.com [52.101.193.8])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011009.outbound.protection.outlook.com [52.101.52.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42A72D1907;
-	Sat, 20 Dec 2025 16:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219982D12E7;
+	Sat, 20 Dec 2025 16:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.9
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766246403; cv=fail; b=EA+2XlX1nDRrsDbJExR/d5r9TnMyV9IFpMvGwgUNviAunNGerviU7DOVy9HD8vvV+FTUGcjeFiIYZB+GUC9/lm5Hub0uNzfdIgv/rfquXAamMV9yJoK9KB4PXJBpcS2ZcbI//gahd+1mYCZ5zNGvWOuDw9Fx1l0gtSqqqJxixk8=
+	t=1766246404; cv=fail; b=Rckc3ANv9JQTG2e0lT9g2K2HDNk/wA0t5w1GYZ/IISxBfPr+8H73AO1uFSXGhgb5h5yUc5ogPicZ4VgwMPIizYGzXPXHq/02MK1YJso0o4w57F3rvih699q9l4LbpX/YAq5J15O9wSZV0aeTdz44hVo5wPVEoubcZH/kJp6TEPI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766246403; c=relaxed/simple;
-	bh=6aF6YdHnhqihgi2wCBXenzqws4KpvJ6omSvI6lYoVFY=;
+	s=arc-20240116; t=1766246404; c=relaxed/simple;
+	bh=J+I/zWo1jb/kyhnKOfPZbfezuxLvEpHKtWJ/she3T8s=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qrf2cMk3Tpdi7srJU660nh90ggAYRfPiIm5r4zeup5EVmk7+7za6rZQBMWBjRaUDnygoTkqbCdJj1snqmjz8R9fghlT1hxCOMFeDGTgGYqyIRUvKO4oy3mXB8fCXPpblvqeQ5RwQnQxV2qJ205e6LO8c8aqp1A2bFVsDhtvPq7w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Hn+2QXUE; arc=fail smtp.client-ip=52.101.193.8
+	 MIME-Version:Content-Type; b=Ub+vK07FCRs+s47sZoGSndS6r52YxV3x55ReDTd3TpP6ZUycEHfdn2B/3icwZa10lJHY8vWi8/Xr2xJKyrQQI1BEi8Sy35yeEar1Ho0qi8tMIiYNpgXN45WXVSLjWaC1f2zvMA9Z00XfkEG6ItswE1BdIUni1fWexe0EVraiehs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=KCpU8F0q; arc=fail smtp.client-ip=52.101.52.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Hn+2QXUE"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="KCpU8F0q"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ya8M5y0oFV+NCS9q/tkqP2EpQ1u14cgGBcVCNjwHJ/7FE4/H8OKDmCkTBTKnHjmgmocqanuT6SRCbly7sroUBYa1GqGtmLgz2Qkmn5d5NB5/ctkxlN8FUinUAj1xR07nVmvg4aJYylw5s3y4Tsnigw6b/B7lBdga5Pot22/nenRvfc/I3hbunkjoXY+bNMvCzXF64420Ilpk5cSTbsUtVvR4jfbTqtFkAf4bhuGrNP90CPlEjBpzIvA0c0/aHpeDsp9zLFZf8ajRgVHdDr995eHA6eJsQ59IZN75DZKT7LFqrLxXwr3zDZ8w32AnSCqqOXqbEbC66oafvVmErxtw/g==
+ b=fmrrfDsS2uj5+nRFqn8IuFx8Ast4pf7KFq9/AjlZ8rEvrsNDD2+xjFOyGbuF2JTUSf/vXcbMiy00s6fAn42tiH7+MZQHYx+ZgzzUMtOvflEhUpR+kFTX5aQ33DSVRmnyNQNaMXp1YTkrd2v3zs5GzDjzyft+sVPDEoqhH0tVVn+J++Z+X+j5DOA/abcEQekJdZ5zsj8FkKMUTF6TJDGIiL+3QjZX9Cc/4bOIZwE0c8vwMw9pbijSgxolnQyu0qUfBtmPGhYCrvLitpW+/7pG8FJDLyhcgE4G+NBLIVHFtau5hU8XvnnypIS5rvOFd6UfXRbM/kp/vGGtQoZ/J3PG9w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m4/0UuRr7BMUSSuQ/IxhAfyUArAjOet52JyEYoTFHwQ=;
- b=WtFXcm2KP+nI2t0mYCFh6y6sAETf3Xh4gizntj7NFp3RbwD7fFoT7tpsSlLEt/+LhD2lZA7hEqCImBvf1Cz3nshMXev4qXY69MaTzr4/kpCJz9KeVrCfzs9MNq1QhEcHFX6zl3U5Oj60KdibUqQ+TN5yHomx7edy2EEigO+zEdPDfwIs1w6CQZnxx6Aw0rzGPyWLfm8uVJW2WyehJSY0TfxC0zIyZCGGc5f+tmIu9vWDn3rp1psFNLr+Htk7vJYBM+T0tCkU/Ths60rK4ujnU+5Uh1meL40cHyhCBWbJjlna5gaPPcynFf2NQcm3hG0m3QELsjdH8S+8yYZ+IDdlDQ==
+ bh=fznMF4q7MfTMFKdLBrdCQ/BI45CmfICzQCqPSksg5YA=;
+ b=yWa3qjtlfxzh75HBJyjNHFuMCN9XAb5EMSjbBWYkUbRdVyCpsiOgXUpwlXonb4iaN9tN6YTpi+qFth4Jsg/KuB4MKtmbQPsY6VUB0IPtcvtix0Doh1GRAf2ooYPpcZ61vkudpjzW1bDz2jXO8/J/fJgBXlICSOn8DAos1uJFa+32IY0NY4be/PbIlMuM6aZJ23l1ptuJOoVjt9tmdRyYbC9RM2NDYxifvZszTslmhldP2HXQQ1InQcJyUZS4dgWNSI4lxS3teqUXNqjhX9PBMMXr4XMnOfvEMeKxlSJb4rjXD7IVDWpS5hZ85R/LaMRx2p+u8DkLbVNgcF0zRbhE+g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m4/0UuRr7BMUSSuQ/IxhAfyUArAjOet52JyEYoTFHwQ=;
- b=Hn+2QXUEqAzgcDmYJOg9gmF/e7Olxi0JmWsglo+96zWMyZ7+pzoGFBO0l/iWVQhUBtuPc+sCrRgrDapb7e7+moiafzRwGN9EO+vTEl7ZAsK8wSDTjtkXtfacfGCxKpLBDNVBN3oRDnimJxL90Bv5BVtJ2M2MnsEnXeCsf4qQwDA=
-Received: from PH0PR07CA0081.namprd07.prod.outlook.com (2603:10b6:510:f::26)
- by LV3PR12MB9165.namprd12.prod.outlook.com (2603:10b6:408:19f::10) with
+ bh=fznMF4q7MfTMFKdLBrdCQ/BI45CmfICzQCqPSksg5YA=;
+ b=KCpU8F0qkLgBH/GhpJl2DK5QvxlnkSC1e+jOL6lh4SfOwKn99qhnmFDZf0JDJ6blkw/hbC6UeGbgeMknbNm2I3eKZjfDzRLSfatzWDIpdidE7akFX6ADrDqssS1+szYuvkK3yD1FeVaHga9A6Rs62DMABotoUTzjxkLq2tSheDg=
+Received: from PH5P220CA0002.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:34a::17)
+ by SN7PR12MB6816.namprd12.prod.outlook.com (2603:10b6:806:264::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.10; Sat, 20 Dec
- 2025 15:59:54 +0000
-Received: from CY4PEPF0000EE37.namprd05.prod.outlook.com
- (2603:10b6:510:f:cafe::32) by PH0PR07CA0081.outlook.office365.com
- (2603:10b6:510:f::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.9; Sat, 20 Dec
+ 2025 15:59:58 +0000
+Received: from CY4PEPF0000EE32.namprd05.prod.outlook.com
+ (2603:10b6:510:34a:cafe::12) by PH5P220CA0002.outlook.office365.com
+ (2603:10b6:510:34a::17) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9434.10 via Frontend Transport; Sat,
- 20 Dec 2025 15:59:54 +0000
+ 20 Dec 2025 16:00:16 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,16 +48,16 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
 Received: from satlexmb08.amd.com (165.204.84.17) by
- CY4PEPF0000EE37.mail.protection.outlook.com (10.167.242.43) with Microsoft
+ CY4PEPF0000EE32.mail.protection.outlook.com (10.167.242.38) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9456.9 via Frontend Transport; Sat, 20 Dec 2025 15:59:54 +0000
+ 15.20.9434.6 via Frontend Transport; Sat, 20 Dec 2025 15:59:57 +0000
 Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb08.amd.com
  (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Sat, 20 Dec
- 2025 09:59:53 -0600
+ 2025 09:59:57 -0600
 Received: from xhdharshj40.xilinx.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Sat, 20 Dec 2025 07:59:50 -0800
+ Transport; Sat, 20 Dec 2025 07:59:54 -0800
 From: Harsh Jain <h.jain@amd.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
@@ -66,9 +66,9 @@ To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<michal.simek@amd.com>, <linux-arm-kernel@lists.infradead.org>,
 	<jay.buddhabhatti@amd.com>
 CC: Harsh Jain <h.jain@amd.com>
-Subject: [PATCH v2 10/14] crypto: xilinx: Replace zynqmp prefix with xilinx
-Date: Sat, 20 Dec 2025 21:29:01 +0530
-Message-ID: <20251220155905.346790-11-h.jain@amd.com>
+Subject: [PATCH v2 11/14] crypto: zynqmp-aes-gcm: Change coherent DMA to streaming DMA API
+Date: Sat, 20 Dec 2025 21:29:02 +0530
+Message-ID: <20251220155905.346790-12-h.jain@amd.com>
 X-Mailer: git-send-email 2.49.1
 In-Reply-To: <20251220155905.346790-1-h.jain@amd.com>
 References: <20251220155905.346790-1-h.jain@amd.com>
@@ -82,478 +82,236 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE37:EE_|LV3PR12MB9165:EE_
-X-MS-Office365-Filtering-Correlation-Id: fadd0ab1-18ec-4fcd-60ea-08de3fe0d0df
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE32:EE_|SN7PR12MB6816:EE_
+X-MS-Office365-Filtering-Correlation-Id: a29542a6-2101-44d3-c19e-08de3fe0d2fb
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026|921020;
+	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?3nG8buZCwPK7Zyggq/gVzDMESG2e2EVncJcpcqJoxZmenRLP/ezaFgc9SttA?=
- =?us-ascii?Q?LLNetktcQfeovDlfrD51UpPn6pXGdWpw08vCs9UelTBifKaQLHluZjzcAMWW?=
- =?us-ascii?Q?Vx1mKxHHZU1dtEq6c8FPZ2A6pjlHfN/8zvPdwMrUkt/HRD64HydnwbioXf4S?=
- =?us-ascii?Q?n/wkDcQMY1beRIy/b72o9Kj+UXZnT+k1JBn2gF8K9pM8uariEdstGZEUKj0F?=
- =?us-ascii?Q?fDCn/tRqFAegfO3f+/vqnXyh9ChKQshQvD2hjFeO0anwG+z/O0JCkL9sTpre?=
- =?us-ascii?Q?WyzjGf/q7nsm7InNBJ0LxZ+LTllsQ+i6ptX/W7TeoVkCPn+UsRglINP/6m/V?=
- =?us-ascii?Q?GuhwbumsKa7e4ECBFQpXlPn97rFsxAezPkIgr6sumVfgW3dnWAsfsMHGwFhe?=
- =?us-ascii?Q?BcP9eSZgFvq3uxbb54sG3ooMNXYdAfbzZEMNPYayJHUYr52/KbBppLFvgpmE?=
- =?us-ascii?Q?V3bW86Zq6w0dbMPoaDwh6CQUl2A5WBDjZf/rf31zoJl3zM1hhgQHKNza1w5y?=
- =?us-ascii?Q?e2G9GZR+u3cZ36YmSOYfnxHnK/1wErQjGDY0q0H2ae3TG5DmZYHY2F/ltL42?=
- =?us-ascii?Q?wETNGtYiP6cKl5fvgMJqqiRiLqxTSVqElCiRhkhMbA3P41GshdwzNjYv/DGh?=
- =?us-ascii?Q?cixQMQs+2hQLFe+ZmpQq4zcmEw17owMxTUi23n//ZnEtWNmn5B+ZxdEDg/Fd?=
- =?us-ascii?Q?bwSxy37UZKJKkYQNDJDC5j+NoqNeb7UhwVtRR7X9ulNGG2WZ9qhDuwsKuCZB?=
- =?us-ascii?Q?Pa1Kp1MxKyh575eie5LjsWIGIw/YNeTxm79GgEfi90F5bzC3eegN0cohgrB/?=
- =?us-ascii?Q?pZfRGRox9ZTqOU5wR88bx4akROb/DvCgwJsQYJ1ffcqy9h5Bx80MNyii/f/i?=
- =?us-ascii?Q?nD888G/xgBfF5PpocJSVTNKH5m86rOR/8qBCMpxQ2wQbsCKJBw1pKoByxzkx?=
- =?us-ascii?Q?XPVkTcMlfwY3fvk52Bd8Fzx17GU7hikMz5ngF18QS0UkCfnP0jiUHoemVTEH?=
- =?us-ascii?Q?++JEkXpKtAQfO+vunFFnSdQU49kAtMnLX7T9PxfOaG1+VP+zIvI41ekVy3fZ?=
- =?us-ascii?Q?8B8Ez5+9hL5DaadzSrUWUabBkSwdOR+KahDgPUwK4t9SHU3EZb0fJBY9V12o?=
- =?us-ascii?Q?hRLZzgf1l9ocPeyJb8lszXA0Xf7Xr6830JeKbWYTW332MccaWZLDzQNS0SFH?=
- =?us-ascii?Q?LKLz5xYh7DNBSQPl6SQTNpPhrg0ZZxH5S76YKE7o21UMtmnSkxZPWn06Y4/x?=
- =?us-ascii?Q?0epBxWCRqq6Ncse2jUFohAoVj/WsnS4Qlnnl1T4jYPAAFFOS1voq2zZtbfF9?=
- =?us-ascii?Q?Ej6Vq6d3jJxgWCSniGBMCU2uGw9isNhcg3Lg1GmMKPxn/u8BZrShXy9Atbqs?=
- =?us-ascii?Q?OVmPZ2gJ0drndWaqI9HJg8eQCQIbks2xLX8e+8FZmwY//0OWVbqJy5FDfwaD?=
- =?us-ascii?Q?6+kwUjBdfwaxqNarFMs0hPtOXkxkKxNL03Y8hWiB5O8FKeD/YBSzMXOcVYey?=
- =?us-ascii?Q?fxV7F1zIhZ2nb7rIV6rVV38oNH8exHLnj12MeKDvmW8KxH6ks3CFUUV57PY5?=
- =?us-ascii?Q?qXNe33Idatbm2VYu4ogkHpn2hVaybvwXEbg4ZnWM?=
+	=?us-ascii?Q?1/ExgNb/hwU7xMVCWE+9tfv5BLTUjp34+aX06Ao5s+j0LeP3Lf+n4ThjwDMi?=
+ =?us-ascii?Q?l2Lw8onf3EDjAsLr+EM8KZTJz2z6dy7urhWgNq5PmE9DeuBHF+GeI1GaZJQt?=
+ =?us-ascii?Q?QIlq5tsqEAJoklDKIF4PqzX95YiH581ifZjOhgYgUK28qZPnm9Pu6IkQ9JAV?=
+ =?us-ascii?Q?OOTKLxfmPview7LqxU57get3VVVI/kcnIlDHvR2dmVZ4MHTfbVrkq2TWbrtm?=
+ =?us-ascii?Q?M1z/KpcspL8vFRdM9JDGnClk6i2WsbLoybjHlZu63YY1bEuhLo6yKb9rodH9?=
+ =?us-ascii?Q?gff1tT8fZCJiRH+AEPomQXWFd6EaApFAy/qt4P5Vc5I4YlFDAbM5xEW+PCVK?=
+ =?us-ascii?Q?fHZtvXJVKsJNXtG1AgS2QObvvrLB28pJbHVt0NCp8xM68X8olN87ha0XdDHx?=
+ =?us-ascii?Q?LeWnZ/lJ0OTOW6HUgDv6c9TCHOzQomNLH4LFwf7+d1anxoUh1LbyAUWQEMR5?=
+ =?us-ascii?Q?tgcsoA4fYW3YWJCgaAsTNQMm+koiH5MAw+z1sZksC8WBgjX3tnWuWa9YZuI2?=
+ =?us-ascii?Q?ceA6KywtlCPJLMcu0T8xWA6p20K3CHIkwIcu3KUVVK7U6Dvk/6Isqx0T4zop?=
+ =?us-ascii?Q?IGYwUQ0dG19EmwHaDcj/4RV0rnxQNQ1xi8uke9QDfbaKLwozDH+685qqq2g0?=
+ =?us-ascii?Q?R9Twdf0SIpX+jAGzUwj+Nfe7omEurZxxFp14QNEStveuy4B/FEXeBrEYmRLz?=
+ =?us-ascii?Q?yLHN8adq7MTEbnxMQ8SsGTfjEFm7nSO/PRumaIpp0uCxjNNMjOjaFKljfOZX?=
+ =?us-ascii?Q?JMuzkkEc7+qPux8x1T3/uOgtfYqOzKCos1kzfjiyD55iVn3XI2GN9j/z+SQF?=
+ =?us-ascii?Q?cbwdZJj8vagvregNwy6zQdh+9Uk2G0llP90hEKDFKK3wELI3oZ1LK4ssD8Ev?=
+ =?us-ascii?Q?UbF609IgZ5YrbmQDLlzgWKbWe3RYD34LVLwHrPiL8fXNBPxPt3pOLl4XLEqy?=
+ =?us-ascii?Q?vhCposoJ9giIGYSTmEEJ7/OcOSE1XgklAo2yBFTIXTuBLNADJv+KRXXUCwv2?=
+ =?us-ascii?Q?2xurCEsxeiFL8mmu/VU46Z3zaqFm6GdbE892xWhTeLJ7nqkcT1tiCpuIyBdS?=
+ =?us-ascii?Q?azb3uE3VioktIKMEi4LlTvbxlC/ZZCKHLDSyDmV4CM5QGoa/KpMMaFvUal1x?=
+ =?us-ascii?Q?ZWoCjLYg2M9uvFxBIg+datccIovoKzYHBDu/tNOBKY/Q4kTZQ5/lBE2Ktb1x?=
+ =?us-ascii?Q?eF2X+S//l/kX9cxD5r0i0Umt1CaFIU2BF7sq9zC6/U11Ua9jgKl+RKFKnbSZ?=
+ =?us-ascii?Q?0PjAxHMw7TWEes1GNnmkIUfxxNXKp4v5OHaRNea2MUDqFQwRrmQrXEWk6zTi?=
+ =?us-ascii?Q?4QUe2vbSIv4MR+iPkU29vqLYKtCp1fzXqORfT3y558biu9QZL8Ay/7MY+H3D?=
+ =?us-ascii?Q?aMQs7XLCkSTilQcB9mUr/qSusa78uSFt92mnNR7r5+k/11qMLB+rX2Umbo3M?=
+ =?us-ascii?Q?zilQueudU/JP3Jkjw/K6gbAkqvq+mZmbsN9XtdMeCZSi2HZ02gYar21d+D8l?=
+ =?us-ascii?Q?W0G4h5G3ePdYghNgRG7G2JZmYM5PJTVHTDOP3YUYxDZSyrwHy5DcQ6MzejeR?=
+ =?us-ascii?Q?ZEusG2gzEXwAcBtuFsO8enB1aGgaVZRdJGZTS1S8?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026)(921020);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2025 15:59:54.1838
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2025 15:59:57.7264
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: fadd0ab1-18ec-4fcd-60ea-08de3fe0d0df
+X-MS-Exchange-CrossTenant-Network-Message-Id: a29542a6-2101-44d3-c19e-08de3fe0d2fb
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE37.namprd05.prod.outlook.com
+	CY4PEPF0000EE32.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9165
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6816
 
-Replace zynqmp with xilinx to have more generic name.
+Update the driver to use streaming DMA API.
 
 Signed-off-by: Harsh Jain <h.jain@amd.com>
 ---
- drivers/crypto/xilinx/zynqmp-aes-gcm.c | 140 ++++++++++++-------------
- 1 file changed, 69 insertions(+), 71 deletions(-)
+ drivers/crypto/xilinx/zynqmp-aes-gcm.c | 94 ++++++++++++++++----------
+ 1 file changed, 58 insertions(+), 36 deletions(-)
 
 diff --git a/drivers/crypto/xilinx/zynqmp-aes-gcm.c b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-index 179595b24f4f..34dbb8b7d3a8 100644
+index 34dbb8b7d3a8..c2563c6837e4 100644
 --- a/drivers/crypto/xilinx/zynqmp-aes-gcm.c
 +++ b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-@@ -19,10 +19,8 @@
- #include <linux/string.h>
+@@ -69,8 +69,8 @@ struct zynqmp_aead_hw_req {
  
- #define ZYNQMP_DMA_BIT_MASK	32U
--
--#define ZYNQMP_AES_KEY_SIZE		AES_KEYSIZE_256
--#define ZYNQMP_AES_AUTH_SIZE		16U
--#define ZYNQMP_AES_BLK_SIZE		1U
-+#define XILINX_AES_AUTH_SIZE		16U
-+#define XILINX_AES_BLK_SIZE		1U
- #define ZYNQMP_AES_MIN_INPUT_BLK_SIZE	4U
- #define ZYNQMP_AES_WORD_LEN		4U
- 
-@@ -31,9 +29,9 @@
- #define ZYNQMP_AES_PUF_NOT_PROGRAMMED	0xE300
- #define XILINX_KEY_MAGIC		0x3EA0
- 
--enum zynqmp_aead_op {
--	ZYNQMP_AES_DECRYPT = 0,
--	ZYNQMP_AES_ENCRYPT
-+enum xilinx_aead_op {
-+	XILINX_AES_DECRYPT = 0,
-+	XILINX_AES_ENCRYPT
- };
- 
- enum zynqmp_aead_keysrc {
-@@ -69,9 +67,9 @@ struct zynqmp_aead_hw_req {
- 	u64 keysrc;
- };
- 
--struct zynqmp_aead_tfm_ctx {
-+struct xilinx_aead_tfm_ctx {
+ struct xilinx_aead_tfm_ctx {
  	struct device *dev;
--	u8 key[ZYNQMP_AES_KEY_SIZE];
-+	u8 key[AES_KEYSIZE_256];
- 	u8 *iv;
+-	u8 key[AES_KEYSIZE_256];
+-	u8 *iv;
++	dma_addr_t key_dma_addr;
++	u8 *key;
  	u32 keylen;
  	u32 authsize;
-@@ -79,8 +77,8 @@ struct zynqmp_aead_tfm_ctx {
- 	struct crypto_aead *fbk_cipher;
- };
- 
--struct zynqmp_aead_req_ctx {
--	enum zynqmp_aead_op op;
-+struct xilinx_aead_req_ctx {
-+	enum xilinx_aead_op op;
- };
- 
- static struct xilinx_aead_dev *aead_dev;
-@@ -88,8 +86,8 @@ static struct xilinx_aead_dev *aead_dev;
- static int zynqmp_aes_aead_cipher(struct aead_request *req)
- {
+ 	u8 keysrc;
+@@ -88,39 +88,38 @@ static int zynqmp_aes_aead_cipher(struct aead_request *req)
  	struct crypto_aead *aead = crypto_aead_reqtfm(req);
--	struct zynqmp_aead_tfm_ctx *tfm_ctx = crypto_aead_ctx(aead);
--	struct zynqmp_aead_req_ctx *rq_ctx = aead_request_ctx(req);
-+	struct xilinx_aead_tfm_ctx *tfm_ctx = crypto_aead_ctx(aead);
-+	struct xilinx_aead_req_ctx *rq_ctx = aead_request_ctx(req);
+ 	struct xilinx_aead_tfm_ctx *tfm_ctx = crypto_aead_ctx(aead);
+ 	struct xilinx_aead_req_ctx *rq_ctx = aead_request_ctx(req);
++	dma_addr_t dma_addr_data, dma_addr_hw_req;
  	struct device *dev = tfm_ctx->dev;
  	struct zynqmp_aead_hw_req *hwreq;
- 	dma_addr_t dma_addr_data, dma_addr_hw_req;
-@@ -100,7 +98,7 @@ static int zynqmp_aes_aead_cipher(struct aead_request *req)
+-	dma_addr_t dma_addr_data, dma_addr_hw_req;
+ 	unsigned int data_size;
+ 	unsigned int status;
+ 	int ret;
+ 	size_t dma_size;
++	void *dmabuf;
  	char *kbuf;
  
- 	if (tfm_ctx->keysrc == ZYNQMP_AES_KUP_KEY)
--		dma_size = req->cryptlen + ZYNQMP_AES_KEY_SIZE
-+		dma_size = req->cryptlen + AES_KEYSIZE_256
- 			   + GCM_AES_IV_SIZE;
- 	else
- 		dma_size = req->cryptlen + GCM_AES_IV_SIZE;
-@@ -126,14 +124,14 @@ static int zynqmp_aes_aead_cipher(struct aead_request *req)
+-	if (tfm_ctx->keysrc == ZYNQMP_AES_KUP_KEY)
+-		dma_size = req->cryptlen + AES_KEYSIZE_256
+-			   + GCM_AES_IV_SIZE;
+-	else
+-		dma_size = req->cryptlen + GCM_AES_IV_SIZE;
+-
+-	kbuf = dma_alloc_coherent(dev, dma_size, &dma_addr_data, GFP_KERNEL);
++	dma_size = req->cryptlen + XILINX_AES_AUTH_SIZE;
++	kbuf = kmalloc(dma_size, GFP_KERNEL);
+ 	if (!kbuf)
+ 		return -ENOMEM;
+ 
+-	hwreq = dma_alloc_coherent(dev, sizeof(struct zynqmp_aead_hw_req),
+-				   &dma_addr_hw_req, GFP_KERNEL);
+-	if (!hwreq) {
+-		dma_free_coherent(dev, dma_size, kbuf, dma_addr_data);
++	dmabuf = kmalloc(sizeof(*hwreq) + GCM_AES_IV_SIZE, GFP_KERNEL);
++	if (!dmabuf) {
++		kfree(kbuf);
+ 		return -ENOMEM;
+ 	}
+-
++	hwreq = dmabuf;
+ 	data_size = req->cryptlen;
+ 	scatterwalk_map_and_copy(kbuf, req->src, 0, req->cryptlen, 0);
+-	memcpy(kbuf + data_size, req->iv, GCM_AES_IV_SIZE);
++	memcpy(dmabuf + sizeof(struct zynqmp_aead_hw_req), req->iv, GCM_AES_IV_SIZE);
++	dma_addr_data = dma_map_single(dev, kbuf, dma_size, DMA_BIDIRECTIONAL);
++	if (unlikely(dma_mapping_error(dev, dma_addr_data))) {
++		ret = -ENOMEM;
++		goto freemem;
++	}
+ 
+ 	hwreq->src = dma_addr_data;
+ 	hwreq->dst = dma_addr_data;
+-	hwreq->iv = hwreq->src + data_size;
  	hwreq->keysrc = tfm_ctx->keysrc;
  	hwreq->op = rq_ctx->op;
  
--	if (hwreq->op == ZYNQMP_AES_ENCRYPT)
-+	if (hwreq->op == XILINX_AES_ENCRYPT)
- 		hwreq->size = data_size;
+@@ -129,17 +128,26 @@ static int zynqmp_aes_aead_cipher(struct aead_request *req)
  	else
--		hwreq->size = data_size - ZYNQMP_AES_AUTH_SIZE;
-+		hwreq->size = data_size - XILINX_AES_AUTH_SIZE;
+ 		hwreq->size = data_size - XILINX_AES_AUTH_SIZE;
  
- 	if (hwreq->keysrc == ZYNQMP_AES_KUP_KEY) {
- 		memcpy(kbuf + data_size + GCM_AES_IV_SIZE,
--		       tfm_ctx->key, ZYNQMP_AES_KEY_SIZE);
-+		       tfm_ctx->key, AES_KEYSIZE_256);
+-	if (hwreq->keysrc == ZYNQMP_AES_KUP_KEY) {
+-		memcpy(kbuf + data_size + GCM_AES_IV_SIZE,
+-		       tfm_ctx->key, AES_KEYSIZE_256);
+-
+-		hwreq->key = hwreq->src + data_size + GCM_AES_IV_SIZE;
+-	} else {
++	if (hwreq->keysrc == ZYNQMP_AES_KUP_KEY)
++		hwreq->key = tfm_ctx->key_dma_addr;
++	else
+ 		hwreq->key = 0;
+-	}
  
- 		hwreq->key = hwreq->src + data_size + GCM_AES_IV_SIZE;
- 	} else {
-@@ -162,10 +160,10 @@ static int zynqmp_aes_aead_cipher(struct aead_request *req)
- 			break;
- 		}
- 	} else {
--		if (hwreq->op == ZYNQMP_AES_ENCRYPT)
-+		if (hwreq->op == XILINX_AES_ENCRYPT)
- 			data_size = data_size + crypto_aead_authsize(aead);
- 		else
--			data_size = data_size - ZYNQMP_AES_AUTH_SIZE;
-+			data_size = data_size - XILINX_AES_AUTH_SIZE;
++	dma_addr_hw_req = dma_map_single(dev, dmabuf, sizeof(struct zynqmp_aead_hw_req) +
++					 GCM_AES_IV_SIZE,
++					 DMA_TO_DEVICE);
++	if (unlikely(dma_mapping_error(dev, dma_addr_hw_req))) {
++		ret = -ENOMEM;
++		dma_unmap_single(dev, dma_addr_data, dma_size, DMA_BIDIRECTIONAL);
++		goto freemem;
++	}
++	hwreq->iv = dma_addr_hw_req + sizeof(struct zynqmp_aead_hw_req);
++	dma_sync_single_for_device(dev, dma_addr_hw_req, sizeof(struct zynqmp_aead_hw_req) +
++				   GCM_AES_IV_SIZE, DMA_TO_DEVICE);
+ 	ret = zynqmp_pm_aes_engine(dma_addr_hw_req, &status);
+-
++	dma_unmap_single(dev, dma_addr_hw_req, sizeof(struct zynqmp_aead_hw_req) + GCM_AES_IV_SIZE,
++			 DMA_TO_DEVICE);
++	dma_unmap_single(dev, dma_addr_data, dma_size, DMA_BIDIRECTIONAL);
+ 	if (ret) {
+ 		dev_err(dev, "ERROR: AES PM API failed\n");
+ 	} else if (status) {
+@@ -170,15 +178,11 @@ static int zynqmp_aes_aead_cipher(struct aead_request *req)
+ 		ret = 0;
+ 	}
  
- 		sg_copy_from_buffer(req->dst, sg_nents(req->dst),
- 				    kbuf, data_size);
-@@ -185,12 +183,12 @@ static int zynqmp_aes_aead_cipher(struct aead_request *req)
+-	if (kbuf) {
+-		memzero_explicit(kbuf, dma_size);
+-		dma_free_coherent(dev, dma_size, kbuf, dma_addr_data);
+-	}
+-	if (hwreq) {
+-		memzero_explicit(hwreq, sizeof(struct zynqmp_aead_hw_req));
+-		dma_free_coherent(dev, sizeof(struct zynqmp_aead_hw_req),
+-				  hwreq, dma_addr_hw_req);
+-	}
++freemem:
++	memzero_explicit(kbuf, dma_size);
++	kfree(kbuf);
++	memzero_explicit(dmabuf, sizeof(struct zynqmp_aead_hw_req) + GCM_AES_IV_SIZE);
++	kfree(dmabuf);
+ 
  	return ret;
  }
+@@ -231,6 +235,9 @@ static int zynqmp_aes_aead_setkey(struct crypto_aead *aead, const u8 *key,
  
--static int zynqmp_fallback_check(struct zynqmp_aead_tfm_ctx *tfm_ctx,
-+static int zynqmp_fallback_check(struct xilinx_aead_tfm_ctx *tfm_ctx,
- 				 struct aead_request *req)
- {
--	struct zynqmp_aead_req_ctx *rq_ctx = aead_request_ctx(req);
-+	struct xilinx_aead_req_ctx *rq_ctx = aead_request_ctx(req);
- 
--	if (tfm_ctx->authsize != ZYNQMP_AES_AUTH_SIZE && rq_ctx->op == ZYNQMP_AES_DECRYPT)
-+	if (tfm_ctx->authsize != XILINX_AES_AUTH_SIZE && rq_ctx->op == XILINX_AES_DECRYPT)
- 		return 1;
- 
- 	if (req->assoclen != 0 ||
-@@ -203,14 +201,14 @@ static int zynqmp_fallback_check(struct zynqmp_aead_tfm_ctx *tfm_ctx,
- 	if ((req->cryptlen % ZYNQMP_AES_WORD_LEN) != 0)
- 		return 1;
- 
--	if (rq_ctx->op == ZYNQMP_AES_DECRYPT &&
--	    req->cryptlen <= ZYNQMP_AES_AUTH_SIZE)
-+	if (rq_ctx->op == XILINX_AES_DECRYPT &&
-+	    req->cryptlen <= XILINX_AES_AUTH_SIZE)
- 		return 1;
- 
- 	return 0;
- }
- 
--static int zynqmp_handle_aes_req(struct crypto_engine *engine, void *req)
-+static int xilinx_handle_aes_req(struct crypto_engine *engine, void *req)
- {
- 	struct aead_request *areq =
- 				container_of(req, struct aead_request, base);
-@@ -228,10 +226,10 @@ static int zynqmp_aes_aead_setkey(struct crypto_aead *aead, const u8 *key,
- 				  unsigned int keylen)
- {
- 	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
--	struct zynqmp_aead_tfm_ctx *tfm_ctx = crypto_tfm_ctx(tfm);
-+	struct xilinx_aead_tfm_ctx *tfm_ctx = crypto_tfm_ctx(tfm);
- 	int err;
- 
--	if (keylen == ZYNQMP_AES_KEY_SIZE) {
-+	if (keylen == AES_KEYSIZE_256) {
+ 	if (keylen == AES_KEYSIZE_256) {
  		memcpy(tfm_ctx->key, key, keylen);
++		dma_sync_single_for_device(tfm_ctx->dev, tfm_ctx->key_dma_addr,
++					   AES_KEYSIZE_256,
++					   DMA_TO_DEVICE);
  	}
  
-@@ -252,7 +250,7 @@ static int zynqmp_paes_aead_setkey(struct crypto_aead *aead, const u8 *key,
- 				   unsigned int keylen)
- {
- 	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
--	struct zynqmp_aead_tfm_ctx *tfm_ctx = crypto_tfm_ctx(tfm);
-+	struct xilinx_aead_tfm_ctx *tfm_ctx = crypto_tfm_ctx(tfm);
- 	struct xilinx_hwkey_info hwkey;
- 	unsigned char keysrc;
- 	int err = -EINVAL;
-@@ -273,12 +271,12 @@ static int zynqmp_paes_aead_setkey(struct crypto_aead *aead, const u8 *key,
- 	return err;
- }
- 
--static int zynqmp_aes_aead_setauthsize(struct crypto_aead *aead,
-+static int xilinx_aes_aead_setauthsize(struct crypto_aead *aead,
- 				       unsigned int authsize)
- {
- 	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
--	struct zynqmp_aead_tfm_ctx *tfm_ctx =
--			(struct zynqmp_aead_tfm_ctx *)crypto_tfm_ctx(tfm);
-+	struct xilinx_aead_tfm_ctx *tfm_ctx =
-+			(struct xilinx_aead_tfm_ctx *)crypto_tfm_ctx(tfm);
- 
- 	tfm_ctx->authsize = authsize;
- 	return tfm_ctx->fbk_cipher ? crypto_aead_setauthsize(tfm_ctx->fbk_cipher, authsize) : 0;
-@@ -288,7 +286,7 @@ static int xilinx_aes_fallback_crypt(struct aead_request *req, bool encrypt)
- {
- 	struct aead_request *subreq = aead_request_ctx(req);
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
--	struct zynqmp_aead_tfm_ctx *tfm_ctx = crypto_aead_ctx(aead);
-+	struct xilinx_aead_tfm_ctx *tfm_ctx = crypto_aead_ctx(aead);
- 
- 	aead_request_set_tfm(subreq, tfm_ctx->fbk_cipher);
- 	aead_request_set_callback(subreq, req->base.flags, NULL, NULL);
-@@ -301,9 +299,9 @@ static int xilinx_aes_fallback_crypt(struct aead_request *req, bool encrypt)
- 
- static int zynqmp_aes_aead_encrypt(struct aead_request *req)
- {
--	struct zynqmp_aead_req_ctx *rq_ctx = aead_request_ctx(req);
-+	struct xilinx_aead_req_ctx *rq_ctx = aead_request_ctx(req);
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
--	struct zynqmp_aead_tfm_ctx *tfm_ctx = crypto_aead_ctx(aead);
-+	struct xilinx_aead_tfm_ctx *tfm_ctx = crypto_aead_ctx(aead);
- 	struct aead_alg *alg = crypto_aead_alg(aead);
- 	struct xilinx_aead_alg *drv_ctx;
- 	int err;
-@@ -313,7 +311,7 @@ static int zynqmp_aes_aead_encrypt(struct aead_request *req)
- 	    tfm_ctx->keylen == sizeof(struct xilinx_hwkey_info))
- 		return -EINVAL;
- 
--	rq_ctx->op = ZYNQMP_AES_ENCRYPT;
-+	rq_ctx->op = XILINX_AES_ENCRYPT;
- 	err = zynqmp_fallback_check(tfm_ctx, req);
- 	if (err && tfm_ctx->keysrc != ZYNQMP_AES_KUP_KEY)
- 		return -EOPNOTSUPP;
-@@ -326,14 +324,14 @@ static int zynqmp_aes_aead_encrypt(struct aead_request *req)
- 
- static int zynqmp_aes_aead_decrypt(struct aead_request *req)
- {
--	struct zynqmp_aead_req_ctx *rq_ctx = aead_request_ctx(req);
-+	struct xilinx_aead_req_ctx *rq_ctx = aead_request_ctx(req);
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
--	struct zynqmp_aead_tfm_ctx *tfm_ctx = crypto_aead_ctx(aead);
-+	struct xilinx_aead_tfm_ctx *tfm_ctx = crypto_aead_ctx(aead);
- 	struct aead_alg *alg = crypto_aead_alg(aead);
- 	struct xilinx_aead_alg *drv_ctx;
- 	int err;
- 
--	rq_ctx->op = ZYNQMP_AES_DECRYPT;
-+	rq_ctx->op = XILINX_AES_DECRYPT;
- 	drv_ctx = container_of(alg, struct xilinx_aead_alg, aead.base);
- 	if (tfm_ctx->keysrc == ZYNQMP_AES_KUP_KEY &&
- 	    tfm_ctx->keylen == sizeof(struct xilinx_hwkey_info))
-@@ -350,7 +348,7 @@ static int zynqmp_aes_aead_decrypt(struct aead_request *req)
- static int xilinx_paes_aead_init(struct crypto_aead *aead)
- {
- 	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
--	struct zynqmp_aead_tfm_ctx *tfm_ctx = crypto_tfm_ctx(tfm);
-+	struct xilinx_aead_tfm_ctx *tfm_ctx = crypto_tfm_ctx(tfm);
- 	struct xilinx_aead_alg *drv_alg;
- 	struct aead_alg *alg = crypto_aead_alg(aead);
- 
-@@ -359,16 +357,16 @@ static int xilinx_paes_aead_init(struct crypto_aead *aead)
+ 	tfm_ctx->fbk_cipher->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
+@@ -355,7 +362,7 @@ static int xilinx_paes_aead_init(struct crypto_aead *aead)
+ 	drv_alg = container_of(alg, struct xilinx_aead_alg, aead.base);
+ 	tfm_ctx->dev = drv_alg->aead_dev->dev;
  	tfm_ctx->keylen = 0;
- 
+-
++	tfm_ctx->key = NULL;
  	tfm_ctx->fbk_cipher = NULL;
--	crypto_aead_set_reqsize(aead, sizeof(struct zynqmp_aead_req_ctx));
-+	crypto_aead_set_reqsize(aead, sizeof(struct xilinx_aead_req_ctx));
+ 	crypto_aead_set_reqsize(aead, sizeof(struct xilinx_aead_req_ctx));
  
- 	return 0;
- }
- 
--static int zynqmp_aes_aead_init(struct crypto_aead *aead)
-+static int xilinx_aes_aead_init(struct crypto_aead *aead)
- {
- 	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
--	struct zynqmp_aead_tfm_ctx *tfm_ctx =
--		(struct zynqmp_aead_tfm_ctx *)crypto_tfm_ctx(tfm);
-+	struct xilinx_aead_tfm_ctx *tfm_ctx =
-+		(struct xilinx_aead_tfm_ctx *)crypto_tfm_ctx(tfm);
- 	struct xilinx_aead_alg *drv_ctx;
- 	struct aead_alg *alg = crypto_aead_alg(aead);
- 
-@@ -387,7 +385,7 @@ static int zynqmp_aes_aead_init(struct crypto_aead *aead)
+@@ -383,7 +390,20 @@ static int xilinx_aes_aead_init(struct crypto_aead *aead)
+ 		       __func__, drv_ctx->aead.base.base.cra_name);
+ 		return PTR_ERR(tfm_ctx->fbk_cipher);
  	}
- 
+-
++	tfm_ctx->key = kmalloc(AES_KEYSIZE_256, GFP_KERNEL);
++	if (!tfm_ctx->key) {
++		crypto_free_aead(tfm_ctx->fbk_cipher);
++		return -ENOMEM;
++	}
++	tfm_ctx->key_dma_addr = dma_map_single(tfm_ctx->dev, tfm_ctx->key,
++					       AES_KEYSIZE_256,
++					       DMA_TO_DEVICE);
++	if (unlikely(dma_mapping_error(tfm_ctx->dev, tfm_ctx->key_dma_addr))) {
++		kfree(tfm_ctx->key);
++		crypto_free_aead(tfm_ctx->fbk_cipher);
++		tfm_ctx->fbk_cipher = NULL;
++		return -ENOMEM;
++	}
  	crypto_aead_set_reqsize(aead,
--				max(sizeof(struct zynqmp_aead_req_ctx),
-+				max(sizeof(struct xilinx_aead_req_ctx),
+ 				max(sizeof(struct xilinx_aead_req_ctx),
  				    sizeof(struct aead_request) +
- 				    crypto_aead_reqsize(tfm_ctx->fbk_cipher)));
- 	return 0;
-@@ -396,35 +394,35 @@ static int zynqmp_aes_aead_init(struct crypto_aead *aead)
- static void xilinx_paes_aead_exit(struct crypto_aead *aead)
- {
- 	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
--	struct zynqmp_aead_tfm_ctx *tfm_ctx = crypto_tfm_ctx(tfm);
-+	struct xilinx_aead_tfm_ctx *tfm_ctx = crypto_tfm_ctx(tfm);
+@@ -405,6 +425,8 @@ static void xilinx_aes_aead_exit(struct crypto_aead *aead)
+ 	struct xilinx_aead_tfm_ctx *tfm_ctx =
+ 			(struct xilinx_aead_tfm_ctx *)crypto_tfm_ctx(tfm);
  
--	memzero_explicit(tfm_ctx, sizeof(struct zynqmp_aead_tfm_ctx));
-+	memzero_explicit(tfm_ctx, sizeof(struct xilinx_aead_tfm_ctx));
- }
- 
--static void zynqmp_aes_aead_exit(struct crypto_aead *aead)
-+static void xilinx_aes_aead_exit(struct crypto_aead *aead)
- {
- 	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
--	struct zynqmp_aead_tfm_ctx *tfm_ctx =
--			(struct zynqmp_aead_tfm_ctx *)crypto_tfm_ctx(tfm);
-+	struct xilinx_aead_tfm_ctx *tfm_ctx =
-+			(struct xilinx_aead_tfm_ctx *)crypto_tfm_ctx(tfm);
- 
++	dma_unmap_single(tfm_ctx->dev, tfm_ctx->key_dma_addr, AES_KEYSIZE_256, DMA_TO_DEVICE);
++	kfree(tfm_ctx->key);
  	if (tfm_ctx->fbk_cipher) {
  		crypto_free_aead(tfm_ctx->fbk_cipher);
  		tfm_ctx->fbk_cipher = NULL;
- 	}
--	memzero_explicit(tfm_ctx, sizeof(struct zynqmp_aead_tfm_ctx));
-+	memzero_explicit(tfm_ctx, sizeof(struct xilinx_aead_tfm_ctx));
- }
- 
- static struct xilinx_aead_alg zynqmp_aes_algs[] = {
- 	{
- 		.aead.base = {
- 			.setkey		= zynqmp_aes_aead_setkey,
--			.setauthsize	= zynqmp_aes_aead_setauthsize,
-+			.setauthsize	= xilinx_aes_aead_setauthsize,
- 			.encrypt	= zynqmp_aes_aead_encrypt,
- 			.decrypt	= zynqmp_aes_aead_decrypt,
--			.init		= zynqmp_aes_aead_init,
--			.exit		= zynqmp_aes_aead_exit,
-+			.init		= xilinx_aes_aead_init,
-+			.exit		= xilinx_aes_aead_exit,
- 			.ivsize		= GCM_AES_IV_SIZE,
--			.maxauthsize	= ZYNQMP_AES_AUTH_SIZE,
-+			.maxauthsize	= XILINX_AES_AUTH_SIZE,
- 			.base = {
- 				.cra_name		= "gcm(aes)",
- 				.cra_driver_name	= "xilinx-zynqmp-aes-gcm",
-@@ -434,26 +432,26 @@ static struct xilinx_aead_alg zynqmp_aes_algs[] = {
- 				CRYPTO_ALG_ALLOCATES_MEMORY |
- 				CRYPTO_ALG_KERN_DRIVER_ONLY |
- 				CRYPTO_ALG_NEED_FALLBACK,
--			.cra_blocksize		= ZYNQMP_AES_BLK_SIZE,
--			.cra_ctxsize		= sizeof(struct zynqmp_aead_tfm_ctx),
-+			.cra_blocksize		= XILINX_AES_BLK_SIZE,
-+			.cra_ctxsize		= sizeof(struct xilinx_aead_tfm_ctx),
- 			.cra_module		= THIS_MODULE,
- 			}
- 		},
- 		.aead.op = {
--			.do_one_request = zynqmp_handle_aes_req,
-+			.do_one_request = xilinx_handle_aes_req,
- 		},
- 		.dma_bit_mask = ZYNQMP_DMA_BIT_MASK,
- 	},
- 	{
- 		.aead.base = {
- 			.setkey		= zynqmp_paes_aead_setkey,
--			.setauthsize	= zynqmp_aes_aead_setauthsize,
-+			.setauthsize	= xilinx_aes_aead_setauthsize,
- 			.encrypt	= zynqmp_aes_aead_encrypt,
- 			.decrypt	= zynqmp_aes_aead_decrypt,
- 			.init		= xilinx_paes_aead_init,
- 			.exit		= xilinx_paes_aead_exit,
- 			.ivsize		= GCM_AES_IV_SIZE,
--			.maxauthsize	= ZYNQMP_AES_AUTH_SIZE,
-+			.maxauthsize	= XILINX_AES_AUTH_SIZE,
- 			.base = {
- 				.cra_name		= "gcm(paes)",
- 				.cra_driver_name	= "xilinx-zynqmp-paes-gcm",
-@@ -462,13 +460,13 @@ static struct xilinx_aead_alg zynqmp_aes_algs[] = {
- 				CRYPTO_ALG_ASYNC |
- 				CRYPTO_ALG_ALLOCATES_MEMORY |
- 				CRYPTO_ALG_KERN_DRIVER_ONLY,
--			.cra_blocksize		= ZYNQMP_AES_BLK_SIZE,
--			.cra_ctxsize		= sizeof(struct zynqmp_aead_tfm_ctx),
-+			.cra_blocksize		= XILINX_AES_BLK_SIZE,
-+			.cra_ctxsize		= sizeof(struct xilinx_aead_tfm_ctx),
- 			.cra_module		= THIS_MODULE,
- 			}
- 		},
- 		.aead.op = {
--			.do_one_request = zynqmp_handle_aes_req,
-+			.do_one_request = xilinx_handle_aes_req,
- 		},
- 		.dma_bit_mask = ZYNQMP_DMA_BIT_MASK,
- 	},
-@@ -484,7 +482,7 @@ static struct xlnx_feature aes_feature_map[] = {
- 	{ /* sentinel */ }
- };
- 
--static int zynqmp_aes_aead_probe(struct platform_device *pdev)
-+static int xilinx_aes_aead_probe(struct platform_device *pdev)
- {
- 	struct xilinx_aead_alg *aead_algs;
- 	struct device *dev = &pdev->dev;
-@@ -548,7 +546,7 @@ static int zynqmp_aes_aead_probe(struct platform_device *pdev)
- 	return err;
- }
- 
--static void zynqmp_aes_aead_remove(struct platform_device *pdev)
-+static void xilinx_aes_aead_remove(struct platform_device *pdev)
- {
- 	aead_dev = platform_get_drvdata(pdev);
- 	crypto_engine_exit(aead_dev->engine);
-@@ -558,9 +556,9 @@ static void zynqmp_aes_aead_remove(struct platform_device *pdev)
- 	 aead_dev = NULL;
- }
- 
--static struct platform_driver zynqmp_aes_driver = {
--	.probe	= zynqmp_aes_aead_probe,
--	.remove = zynqmp_aes_aead_remove,
-+static struct platform_driver xilinx_aes_driver = {
-+	.probe	= xilinx_aes_aead_probe,
-+	.remove = xilinx_aes_aead_remove,
- 	.driver = {
- 		.name		= "zynqmp-aes",
- 	},
-@@ -572,15 +570,15 @@ static int __init aes_driver_init(void)
- {
- 	int ret;
- 
--	ret = platform_driver_register(&zynqmp_aes_driver);
-+	ret = platform_driver_register(&xilinx_aes_driver);
- 	if (ret)
- 		return ret;
- 
--	platform_dev = platform_device_register_simple(zynqmp_aes_driver.driver.name,
-+	platform_dev = platform_device_register_simple(xilinx_aes_driver.driver.name,
- 						       0, NULL, 0);
- 	if (IS_ERR(platform_dev)) {
- 		ret = PTR_ERR(platform_dev);
--		platform_driver_unregister(&zynqmp_aes_driver);
-+		platform_driver_unregister(&xilinx_aes_driver);
- 	}
- 
- 	return ret;
-@@ -589,7 +587,7 @@ static int __init aes_driver_init(void)
- static void __exit aes_driver_exit(void)
- {
- 	platform_device_unregister(platform_dev);
--	platform_driver_unregister(&zynqmp_aes_driver);
-+	platform_driver_unregister(&xilinx_aes_driver);
- }
- 
- module_init(aes_driver_init);
 -- 
 2.49.1
 
