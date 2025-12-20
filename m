@@ -1,66 +1,67 @@
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010059.outbound.protection.outlook.com [52.101.193.59])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011016.outbound.protection.outlook.com [40.93.194.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F1E2C11ED;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D8F2D3737;
 	Sat, 20 Dec 2025 15:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.59
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766246382; cv=fail; b=oTC41dXvW5wgJCvntDLLXZbZm3H0f1r/kbe+wnX13QQxM3PQ4EpBwRiYJOG5ysbtlw2n5zhqxp9ky68PBhiqYUTcYxffEbyu/nD+LxysKpjQVwsuMtj9dqQk1rb5/7NSigGR7iCfq+x+eTuXag8kwEnlWCvsRjo6ynvwYO+Th6U=
+	t=1766246382; cv=fail; b=Cb5brlwBic4flBpfgm/jM16WdMmNg4R7o34/+3Lsh/WfE6fzeDNFEmyd0bd+Y32P9KLW56P0vxMunyFkyB/o6JHTgtJgUKzFsTRV+nTEI3r3PSxo55LjyvigyS4iDI39c6fMq61D0js4oAOz3AE8BDvQ2JGNjugGP7B+AModEC4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1766246382; c=relaxed/simple;
-	bh=10kRaqs2fsS/WiDUyhRcsgNgohjatwuylhvtEbwbWU0=;
+	bh=NqH2kSzw+JYkMvua2p5v5z0aPKcjoThfhdpbhMAVn1A=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HO/1r+8dBHC/ZVQrBPOq4AC8KAymBtd6U6B5hbSsXNdJV8n565BpWKOYBBtNffzAkovMjs+8WWjjq9X1Y1HeqCQfiN/2N8ylM01Okp7fVu5OYR3b0HEm7uXlsfC1q5yP1tmM6FR+oBNYAWqPZ56/fvszF/fKCrzvR22a3ExKJIc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=d3/sD1Oi; arc=fail smtp.client-ip=52.101.193.59
+	 MIME-Version:Content-Type; b=DUt8wZcSArh9KjxRwsXhzbU6Kl0s+CbqQeFx7x22oKEcxLYf6TKpuMJtiQhedaKBCAn2HpVMWbYCMz+Ggx+W52czofdFfFpR1d6hDMsD+4JtOXgpxPvdMl7DZNfahUNBOdMiua/C8LKa1C9/TsoyPdPo69ijPQuiTRGmwuKiEBU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=t89qnMYA; arc=fail smtp.client-ip=40.93.194.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="d3/sD1Oi"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="t89qnMYA"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QuyKXt9VdF0dVnz+TkbrRMwppo/QUQVYTmlLKakZNPBfes9aax2MJtzZEk31ANI7cyOmtAE45E76Zwml3HaoNZLnRsKICUb8Ie5ILfdxF06BRlb3wHxpTWQPBGoFWBDIoyHqtetvQmQkfiGqbSMf3oB6VkxhMVnaxI7YC/bwvFU4mpTtdXQ7/CzHJturIzv6IOugkAnNz7sU59UrCD7OmwlvxroU1MEvsegyQuNdo/E+0/Vek6I4BGVBwZsbNXruZ8nQiQzvTPQloiQn/vZiiEugMHxLhG7V/fTV2/wwn8J5h8A94xaYDri4YtpkFaqjsrXN0KGZrS8PPUAOIPNJqg==
+ b=uY8eH2udI5WFNxJT4EeTW1DoEWIHVWDAbm8/db18QbWUIoUQmmwLePeSCnOEDcCjHB4b6J6ucjQcy8QC+qntILkVTK8EMc5UCEcKrkc9Aq/bVn1ZSUt7K1+CHARDgRz1O0fo1J/2xgxAU42LGMIjPzOmQyK1vvdi43MbYJNcrFanoVJFdaUE6a1pbx2m0Df0u7UyOLDsAe2ETh2llzUBD+8MtptDq3ed8bnHd8r7lpT9XwTi8ZHnNHVSoWHNbsH34ZvoX6M1J108+7udChZYEOgxOE1jKedkX48oRxU2taAv4QgKCtck7HboeLWztafjBwpmTjvHJA7xWLBxzMU8OA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NWMNnbEGzYOm1zfhzgwhb54fQbaXZ1zvEy/txL90oDQ=;
- b=KOvWef0GQY/+YdbimMMecYynds5oh/GTpjCgi+OGb2ok5Vtx/EZpAv2IR5YhnuOcO/G6nlClfEf0di6JdqEKHv78PNVdcLt3UfWhONV5A1lJN64V8c6bioUyYp4YecVRo92SvJYDEu3z1Zs5N2ZGa8Vds1GQtEe/1Fyf/3NqaOqO4UItusGpvkJlCO/CCpBBVRZp5md9jilyX0BBg5MMiNhN0+00yw+8kJgdh1BKPqt2qPiV3vrqVHQyYgwo0wBxFSfMSK1v51QgdR/pKjeuOdVsXE7BepR5PyR0/Ocz7zZIVe/WYMMJYfnnNqDPuMch++jMSTh4Te4ICWIMFIJ8Gw==
+ bh=/hXY/Xgwn2ah/OT2EVksB0yo1qCE1vpluyQy4Uj7mR4=;
+ b=ZtdxfZff5MQZ4r/yM1zsRhoK+Z4QnQWoq7HppjvY6lG64QPiVZ+I/UE76SS1mI6R8ks9ed3mR2yucQhO9gKOZKPFGH2Jt/Sl65Wyy+DjqAMbwiOMRy4SmJoaA3WvjU8YZRwkKtWseNdTj9+YAjPKvGN+SuJ78/h72CejK8ll4wnk7XjNU/otIq02LIgx3/QD9teaKvw1RLiERK7IgqitGRd5chjv05nyhCycubHCm8R+s8wDX1X/XWxmeb5BkXyEeDBX/hZRX6WlliSeAUVkGDjam9k9EGpovwWJARR7n88u7VoKXG1CtxB0M22YRh3L90NJA8xEhnuuDhUGeErJCA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NWMNnbEGzYOm1zfhzgwhb54fQbaXZ1zvEy/txL90oDQ=;
- b=d3/sD1OiFTkci172wh9adA+aqesWND8G5KnBSkDEOCc3R2PgRNZHcnQqxcSglymuIJyOpodSDLuvU2Z5XNv8Cy5a58Z5WH5LrSJBMP36jNlZN6clo1/+UZlf15m4oWArtfKw2YjU+10p4I9f2Xu2XDqVNMl6pKu75NaQY7IrSWY=
-Received: from SA0PR13CA0003.namprd13.prod.outlook.com (2603:10b6:806:130::8)
- by DS0PR12MB8069.namprd12.prod.outlook.com (2603:10b6:8:f0::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9434.9; Sat, 20 Dec 2025 15:59:36 +0000
-Received: from SA2PEPF00003F61.namprd04.prod.outlook.com
- (2603:10b6:806:130:cafe::f4) by SA0PR13CA0003.outlook.office365.com
- (2603:10b6:806:130::8) with Microsoft SMTP Server (version=TLS1_3,
+ bh=/hXY/Xgwn2ah/OT2EVksB0yo1qCE1vpluyQy4Uj7mR4=;
+ b=t89qnMYAdxz8M2bVD/DBH3ul2p4VkQCOenvvcX6Jxu/vOP0F39anx+q6NwoPTI3vFrUl2lNaNETMwcAN3UiVxQDwUGdKWi7OHwGA7GzwkQtMYw8Xq71MaVQrjiulDeTxDbGOBtp1FcEfBTX2GZ8Poz9TVXRLS2qy/Id907p373o=
+Received: from PH3PEPF0000409E.namprd05.prod.outlook.com (2603:10b6:518:1::4e)
+ by PH7PR12MB8053.namprd12.prod.outlook.com (2603:10b6:510:279::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.9; Sat, 20 Dec
+ 2025 15:59:33 +0000
+Received: from CY4PEPF0000EE36.namprd05.prod.outlook.com
+ (2a01:111:f403:f912::2) by PH3PEPF0000409E.outlook.office365.com
+ (2603:1036:903:49::3) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9456.8 via Frontend Transport; Sat,
- 20 Dec 2025 15:59:36 +0000
+ 20 Dec 2025 15:59:33 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SA2PEPF00003F61.mail.protection.outlook.com (10.167.248.36) with Microsoft
+ client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
+Received: from satlexmb08.amd.com (165.204.84.17) by
+ CY4PEPF0000EE36.mail.protection.outlook.com (10.167.242.42) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9434.6 via Frontend Transport; Sat, 20 Dec 2025 15:59:36 +0000
-Received: from satlexmb10.amd.com (10.181.42.219) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9434.6 via Frontend Transport; Sat, 20 Dec 2025 15:59:32 +0000
+Received: from satlexmb10.amd.com (10.181.42.219) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Sat, 20 Dec
- 2025 09:59:35 -0600
+ 2025 09:59:32 -0600
 Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb10.amd.com
  (10.181.42.219) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Sat, 20 Dec
- 2025 09:59:35 -0600
+ 2025 09:59:31 -0600
 Received: from xhdharshj40.xilinx.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Sat, 20 Dec 2025 07:59:32 -0800
+ Transport; Sat, 20 Dec 2025 07:59:28 -0800
 From: Harsh Jain <h.jain@amd.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
@@ -68,10 +69,11 @@ To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<mounika.botcha@amd.com>, <sarat.chand.savitala@amd.com>,
 	<michal.simek@amd.com>, <linux-arm-kernel@lists.infradead.org>,
 	<jay.buddhabhatti@amd.com>
-CC: Harsh Jain <h.jain@amd.com>
-Subject: [PATCH v2 05/14] crypto: zynqmp-aes-gcm: Update probe to self discover the device
-Date: Sat, 20 Dec 2025 21:28:56 +0530
-Message-ID: <20251220155905.346790-6-h.jain@amd.com>
+CC: Harsh Jain <h.jain@amd.com>, Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v2 04/14] dt-bindings: crypto: Mark zynqmp-aes as Deprecated
+Date: Sat, 20 Dec 2025 21:28:55 +0530
+Message-ID: <20251220155905.346790-5-h.jain@amd.com>
 X-Mailer: git-send-email 2.49.1
 In-Reply-To: <20251220155905.346790-1-h.jain@amd.com>
 References: <20251220155905.346790-1-h.jain@amd.com>
@@ -85,210 +87,89 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F61:EE_|DS0PR12MB8069:EE_
-X-MS-Office365-Filtering-Correlation-Id: 03256c83-5f2c-4fc4-c682-08de3fe0c633
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE36:EE_|PH7PR12MB8053:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4a1b26c9-8ad2-4d89-5158-08de3fe0c42b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024|921020;
+	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Swj5Bv3Jirqm46HYWUNcduIgYtzvKBeiRe4uZo3fk5ND3g96xR0Pur6RiKra?=
- =?us-ascii?Q?fKGgHGmNpdEukLGlpewFP6IMe1NGlLE6kg4H5Q51PkjYHanXBJ8Y7Tjk9Jao?=
- =?us-ascii?Q?uJpE1CuMO9wOOIrCZkAVcXw38cu87Y/tKq/leGPncdLnPeCG0Q1bf8oahAmd?=
- =?us-ascii?Q?hSLCi0uHzqi4k5jiGe9xXGKT754UVc6PQh/Wh3qf1CavzJIdVRwlIPdytXaU?=
- =?us-ascii?Q?+idFsbDxIQp8DHbvH4R4astcTNWWLp2S3eo+Sa/6cGEpTxW7Q0qr6J63GhYv?=
- =?us-ascii?Q?fx6/e50KqOw8lv28e4vGY6VBCVOcNiQM7IbmBuYQRtN9bX1TmxPueRgY4/mu?=
- =?us-ascii?Q?+iZvF5QkQQF8XKKz2MQON+8wv7XdtdjmMOGG0hE8OISUkV90xWbWX1EDVqq6?=
- =?us-ascii?Q?KEGobxLNdqef9BxJy264aXWflRvZI1h3lPzodgpYxmUk92SAoQwwbmL7zHp8?=
- =?us-ascii?Q?73az1MyhHyy9Xdajfvd22N6tYUub3sB0TlI04ZwD+KX5bVEx/Kct2kE/BJtl?=
- =?us-ascii?Q?O0J8R+b7kxd/FAPd3w7BQGIKyEWYEkV5DgEYFaduOaYD93LlW+Nem87zUwg2?=
- =?us-ascii?Q?ulCYH3OhZ+a8TEWe9ECkeXy7QqljTAEQ3OxECVTJ1pOaGdxKHzPIaBNzJTW3?=
- =?us-ascii?Q?435FKlOWtmjkIRWzE3f56wGOoznjjsN0PQPJu31w2+fQ+FXjGUqWs9Tb/MhC?=
- =?us-ascii?Q?LfbiXUwapFGU/29sbTTa8DJTWCV4q0HJ2Y9gQzNkw1uP5nIZqfHQ8215bhIl?=
- =?us-ascii?Q?OKK0Z9UstP6IRC4ouOjm2puidOdiNqykjnBtsEh4643b5opp6nyssqf6SL6B?=
- =?us-ascii?Q?8Nm/Q+ZdNDxgQJz0MSq4vTd/qCj9pKNi9C7uWlLVhovzPYSyU19lzChC/xmF?=
- =?us-ascii?Q?ZEtCgGyTHbI79izOkItMWvRTeM3xw6E8vr8aa3jQZ3VyjYGHXyU5Kp33TV9+?=
- =?us-ascii?Q?a2xiaUCGfHco10aKtGXEsjSLDpOi+/fHsniKS1ovgPy1W/itXU9cBlLsGEbR?=
- =?us-ascii?Q?Q0kRQqILeVnBdOPj2IVHKl0ls4pu9G6HxvtL7Q16rhfSsXr4nS/lzMb18DoC?=
- =?us-ascii?Q?rrgpoF+weSNU9/tCDGGlhb9+n6h67rFynC3bBjQX2dz9W6ON/qdOnPTZTy6R?=
- =?us-ascii?Q?PSl/lfSaTg/WV9tHWeoL6ROjd/DhgH2IGcyaaxaUlIgzOVO6l0qCyMcsEvzG?=
- =?us-ascii?Q?RkvsQgPA6cplTPRPs0XLvfDJOVgkQF3Hl0Nz7T5vmYJ+liiWBzaT28oPP92C?=
- =?us-ascii?Q?UrB2RYoGNRXep335oVKpJL2MmohsVbCNNhKWkzMVN3cMF2gxB4PG/kpbOdb3?=
- =?us-ascii?Q?nR/hz+dXP1AU1eFWEq082tToMcWXQ+ABS1CLHWuJh/Xa7Dviz0gpkohTSVUg?=
- =?us-ascii?Q?kWIQ5BI5BNTFoxi0z6ZOOsmDEFZ+Nj6ykahackKNrhDC8UVJcfWGMmhq5zaP?=
- =?us-ascii?Q?+PD3LllVLkucgMEgqS4CFjM96SnxUT9aKic6fAt1fec4Ow67LOYmy+68nIe/?=
- =?us-ascii?Q?OKYQcfmHT3fNr7FtAo07T+NgU1+7n4hkh3EYnvnMzGFzpDJ1DBain6dVkTss?=
- =?us-ascii?Q?57B+AY5hHCMNBDUnFExtSUweNQxH087tKU0i12oy?=
+	=?us-ascii?Q?+kKXox4kpDmTqeIHt2G2PJ+5tSW6jNwnabi7WNv+nYR6pulGZF6t4RfWVNuf?=
+ =?us-ascii?Q?5HPNv2atjeSNYmvFzlzwile1lz8wf6bZV9JFZt6jvVhcGgBK8lPEBoHLnhyF?=
+ =?us-ascii?Q?nTJg8cBDkMJU3Ci2Mg1+Q/kETl2vadIl4lWUsPs3xzjUiOjgBhSyrAOui3Yt?=
+ =?us-ascii?Q?IZ9r34Rw6vg1Z/mz1aHu42JvtLjMBOiL2oNEp5zYMoNgyNf1OfRtZ36XEnyW?=
+ =?us-ascii?Q?oUt1EPM4pcwG4DNg3mkDf8+oH+YVQX+NWh9wvnNprpM7M/h6WTw1Lp1Gu4Uc?=
+ =?us-ascii?Q?4GMRcyqAsD+jfeGnxd2wpKlrQ1UF9Xwx+dxv2FD5B9IY49I+5D0uf6Wk6Pi4?=
+ =?us-ascii?Q?OsK7wnl3REGfBF/z32oYqd0NWJIpHMm5zIeREAm9Hdiw940gCw+mzPyrGcmf?=
+ =?us-ascii?Q?jM+b+5U16mzC85IGiy7fy+zJi1K5DNAj9TITrHBRDFHrSwBfsrzlWE383UR3?=
+ =?us-ascii?Q?+g/xLjzxOoiCcd+yA2ymSBSRrrNGktykqeotPVCQcrALJTktKzHUAaps4G8Q?=
+ =?us-ascii?Q?b0cWPelsbFRLBBL97TBylHJkuh908tixj3ehnOyVZEN1MNHWU9FGpBYM+gSv?=
+ =?us-ascii?Q?ORUxtDgj+p9L0pRCreXJO2LJ9Jg65CZaaPvlYMu+B+6uWKijPXXqeX/n0LzR?=
+ =?us-ascii?Q?npDNh1taPI7gMOp0QBL3XoDo/IeLaal7ySPsYQDm6sVwIGzDev/2/M+w3hKq?=
+ =?us-ascii?Q?/FSwFix7dZakiN2gGWthCMFH32479rA6PtMMD580XMaxTsFmd5167gJ8Gyir?=
+ =?us-ascii?Q?XCde7XkMGikIliV7aMZ2iWP4iwMer7FEfM3YazPT7R9BOLLDbyPY0Gy9x5tO?=
+ =?us-ascii?Q?M4IhJtTIA6b4OnVE9cMlmtftTaoDkxPptNFAheDeg75VeU379nQXFBgjh6Dn?=
+ =?us-ascii?Q?nPHR6CcL+rgGbYlalNwqdnZn6hFZD3nK39Wv5d3A6/3dL7cKfrapZyZ//m6W?=
+ =?us-ascii?Q?JGJcCDdihZdLXnhbuH18LCit8OGZ+AQKa9HG1pP+LRN2Pp2eilmt1vC9oRz6?=
+ =?us-ascii?Q?Js0i1XUAplMR8PTIgHNqvGXgSWHs1RGnHRHsfOvk2C7YsRgE9ob2qGRmhA8/?=
+ =?us-ascii?Q?7k2DuFeJVeXwjgvoVENjMckrxiplr1XNw9c3ROxUd6RT2u8k9dIduREEtnv2?=
+ =?us-ascii?Q?28K8PSYCCJbVxjf1KEeyFI+3j6hndZgz9mwIjjc8ah89fDuzCVtIDhMwr7CB?=
+ =?us-ascii?Q?y3Y4T1UF1ApA642KXAmgNTflh8576+upYO0kee/8xWoPnZMK0LcyIwJMnn/N?=
+ =?us-ascii?Q?SHI5erHwo9BF+l8wbA/TVxnw2YslaxN+neU9m+Nulmdc/YBs/xlkydC7ZHOx?=
+ =?us-ascii?Q?IOV07OF9brBnyhsrVRS2Gq7Q8sdKg15Jm7phzjWxwehWWNTmUDCePId17UD3?=
+ =?us-ascii?Q?W4KHlRvrfIgRQC0k4fZELAYkyDFsK9+z3wMnVDoubcDCPk2uraperoDxoG5I?=
+ =?us-ascii?Q?bBBsYvo1qelDfklZKamSihINvsWNb3JqR4YnsLHrqEKPF2V/jmV8H6FE5kwq?=
+ =?us-ascii?Q?eOifggxmJ1FXrr4kz/MavA4YQOfH36tICOsnzPUs4FISoCSd6I1EbbUWRlfb?=
+ =?us-ascii?Q?U6nAqXejaAv2RWApTZ6y6jXqKnDCVKUwlmL7M0vP?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024)(921020);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2025 15:59:36.3079
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2025 15:59:32.8711
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 03256c83-5f2c-4fc4-c682-08de3fe0c633
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a1b26c9-8ad2-4d89-5158-08de3fe0c42b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F61.namprd04.prod.outlook.com
+	CY4PEPF0000EE36.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8069
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8053
 
-Update driver to self discover the device.
+zynqmp-aes-gcm updated to self discover, corresponding dt binding
+can be mark deprecated.
 
 Signed-off-by: Harsh Jain <h.jain@amd.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- drivers/crypto/xilinx/zynqmp-aes-gcm.c | 86 +++++++++++++++++++-------
- 1 file changed, 62 insertions(+), 24 deletions(-)
+ Documentation/devicetree/bindings/crypto/xlnx,zynqmp-aes.yaml   | 2 ++
+ .../bindings/firmware/xilinx/xlnx,zynqmp-firmware.yaml          | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/drivers/crypto/xilinx/zynqmp-aes-gcm.c b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-index 3ce1319d1a1a..04473ed9f08d 100644
---- a/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-+++ b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-@@ -346,7 +346,7 @@ static void zynqmp_aes_aead_exit(struct crypto_aead *aead)
- 	memzero_explicit(tfm_ctx, sizeof(struct zynqmp_aead_tfm_ctx));
- }
+diff --git a/Documentation/devicetree/bindings/crypto/xlnx,zynqmp-aes.yaml b/Documentation/devicetree/bindings/crypto/xlnx,zynqmp-aes.yaml
+index 8aead97a585b..20134d1d0f49 100644
+--- a/Documentation/devicetree/bindings/crypto/xlnx,zynqmp-aes.yaml
++++ b/Documentation/devicetree/bindings/crypto/xlnx,zynqmp-aes.yaml
+@@ -14,6 +14,8 @@ description: |
+   The ZynqMP AES-GCM hardened cryptographic accelerator is used to
+   encrypt or decrypt the data with provided key and initialization vector.
  
--static struct zynqmp_aead_drv_ctx aes_drv_ctx = {
-+static struct zynqmp_aead_drv_ctx zynqmp_aes_drv_ctx = {
- 	.aead.base = {
- 		.setkey		= zynqmp_aes_aead_setkey,
- 		.setauthsize	= zynqmp_aes_aead_setauthsize,
-@@ -375,74 +375,112 @@ static struct zynqmp_aead_drv_ctx aes_drv_ctx = {
- 	},
- };
- 
-+static struct xlnx_feature aes_feature_map[] = {
-+	{
-+		.family = PM_ZYNQMP_FAMILY_CODE,
-+		.feature_id = PM_SECURE_AES,
-+		.data = &zynqmp_aes_drv_ctx,
-+	},
-+	{ /* sentinel */ }
-+};
++deprecated: true
 +
- static int zynqmp_aes_aead_probe(struct platform_device *pdev)
- {
-+	struct zynqmp_aead_drv_ctx *aes_drv_ctx;
- 	struct device *dev = &pdev->dev;
- 	int err;
+ properties:
+   compatible:
+     const: xlnx,zynqmp-aes
+diff --git a/Documentation/devicetree/bindings/firmware/xilinx/xlnx,zynqmp-firmware.yaml b/Documentation/devicetree/bindings/firmware/xilinx/xlnx,zynqmp-firmware.yaml
+index ab8f32c440df..9b6066c7ffe4 100644
+--- a/Documentation/devicetree/bindings/firmware/xilinx/xlnx,zynqmp-firmware.yaml
++++ b/Documentation/devicetree/bindings/firmware/xilinx/xlnx,zynqmp-firmware.yaml
+@@ -104,6 +104,7 @@ properties:
+       used to encrypt or decrypt the data with provided key and initialization
+       vector.
+     type: object
++    deprecated: true
  
-+	/* Verify the hardware is present */
-+	aes_drv_ctx = xlnx_get_crypto_dev_data(aes_feature_map);
-+	if (IS_ERR(aes_drv_ctx)) {
-+		dev_err(dev, "AES is not supported on the platform\n");
-+		return PTR_ERR(aes_drv_ctx);
-+	}
-+
- 	/* ZynqMP AES driver supports only one instance */
--	if (!aes_drv_ctx.dev)
--		aes_drv_ctx.dev = dev;
-+	if (!aes_drv_ctx->dev)
-+		aes_drv_ctx->dev = dev;
- 	else
- 		return -ENODEV;
- 
-+	platform_set_drvdata(pdev, aes_drv_ctx);
- 	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(ZYNQMP_DMA_BIT_MASK));
- 	if (err < 0) {
- 		dev_err(dev, "No usable DMA configuration\n");
- 		return err;
- 	}
- 
--	aes_drv_ctx.engine = crypto_engine_alloc_init(dev, 1);
--	if (!aes_drv_ctx.engine) {
-+	aes_drv_ctx->engine = crypto_engine_alloc_init(dev, 1);
-+	if (!aes_drv_ctx->engine) {
- 		dev_err(dev, "Cannot alloc AES engine\n");
- 		err = -ENOMEM;
- 		goto err_engine;
- 	}
- 
--	err = crypto_engine_start(aes_drv_ctx.engine);
-+	err = crypto_engine_start(aes_drv_ctx->engine);
- 	if (err) {
- 		dev_err(dev, "Cannot start AES engine\n");
- 		goto err_engine;
- 	}
- 
--	err = crypto_engine_register_aead(&aes_drv_ctx.aead);
-+	err = crypto_engine_register_aead(&aes_drv_ctx->aead);
- 	if (err < 0) {
- 		dev_err(dev, "Failed to register AEAD alg.\n");
--		goto err_aead;
-+		goto err_engine;
- 	}
- 	return 0;
- 
--err_aead:
--	crypto_engine_unregister_aead(&aes_drv_ctx.aead);
--
- err_engine:
--	if (aes_drv_ctx.engine)
--		crypto_engine_exit(aes_drv_ctx.engine);
-+	if (aes_drv_ctx->engine)
-+		crypto_engine_exit(aes_drv_ctx->engine);
- 
- 	return err;
- }
- 
- static void zynqmp_aes_aead_remove(struct platform_device *pdev)
- {
--	crypto_engine_exit(aes_drv_ctx.engine);
--	crypto_engine_unregister_aead(&aes_drv_ctx.aead);
--}
-+	struct zynqmp_aead_drv_ctx *aes_drv_ctx;
- 
--static const struct of_device_id zynqmp_aes_dt_ids[] = {
--	{ .compatible = "xlnx,zynqmp-aes" },
--	{ /* sentinel */ }
--};
--MODULE_DEVICE_TABLE(of, zynqmp_aes_dt_ids);
-+	aes_drv_ctx = platform_get_drvdata(pdev);
-+	crypto_engine_exit(aes_drv_ctx->engine);
-+	crypto_engine_unregister_aead(&aes_drv_ctx->aead);
-+}
- 
- static struct platform_driver zynqmp_aes_driver = {
- 	.probe	= zynqmp_aes_aead_probe,
- 	.remove = zynqmp_aes_aead_remove,
- 	.driver = {
- 		.name		= "zynqmp-aes",
--		.of_match_table = zynqmp_aes_dt_ids,
- 	},
- };
- 
--module_platform_driver(zynqmp_aes_driver);
--MODULE_DESCRIPTION("Xilinx ZynqMP AES Driver");
-+static struct platform_device *platform_dev;
-+
-+static int __init aes_driver_init(void)
-+{
-+	int ret;
-+
-+	ret = platform_driver_register(&zynqmp_aes_driver);
-+	if (ret)
-+		return ret;
-+
-+	platform_dev = platform_device_register_simple(zynqmp_aes_driver.driver.name,
-+						       0, NULL, 0);
-+	if (IS_ERR(platform_dev)) {
-+		ret = PTR_ERR(platform_dev);
-+		platform_driver_unregister(&zynqmp_aes_driver);
-+	}
-+
-+	return ret;
-+}
-+
-+static void __exit aes_driver_exit(void)
-+{
-+	platform_device_unregister(platform_dev);
-+	platform_driver_unregister(&zynqmp_aes_driver);
-+}
-+
-+module_init(aes_driver_init);
-+module_exit(aes_driver_exit);
-+MODULE_DESCRIPTION("zynqmp aes-gcm hardware acceleration support.");
- MODULE_LICENSE("GPL");
+ required:
+   - compatible
 -- 
 2.49.1
 
