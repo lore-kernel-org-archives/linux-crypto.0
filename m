@@ -1,182 +1,96 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A43B2F746D
-	for <linux-crypto@vger.kernel.org>; Mon, 22 Dec 2025 19:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E9A2F3C22;
+	Mon, 22 Dec 2025 20:22:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766433449; cv=none; b=ozTS4Hrp6WANrieLxgQqo6/CX7p+5AKTemGq4NDK49JBYVMXP2pzWmQApTvyvGPkWhq/cYkaibcFRFl3Ro6dPzqztIGNAJMelIjTPDr73RD6Au8LaxnuaaMigZo4EDcYxoUMwkEg8Cdmdh0mWqaLzvk2J2WzM+5jPa0phHpK6U0=
+	t=1766434923; cv=none; b=Ncni4KftfQE+PcwBHZqbd+u23J7dizbCOoDujTFt8K7hEiwZP/09FXPCnuXoXXGVxXUnkBD34Iqzd4S8WCQ4o3/sEv2d6eEDoekIpWf+dAZaxMEFH6dt63pVKaBH2h2dujXXZCECuII5I9TK/gVEvuHxc/nzHuMb7FyVr0RHApg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766433449; c=relaxed/simple;
-	bh=gqq7zNg4tUJJ0SmUCTR/rfb6bSKF7C5JMh5yMLNWhsw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pgWLhntH6sCY8LXX+wXWJTMHmtO81WWMQHDuxmd8s7TQXio+TfhbLAaCakIbRs9HKvHpTruQmiT1bL/YoYmx5AL6IwTDUPWD2Q8J8XM+kygYe8qTJ+zoZrNePUJVGzi25VrQ9epHJpIpVelyK0Ltg4xOZfjpmYZ3LBrkZs4OQlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=pFZJUB+P; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+	s=arc-20240116; t=1766434923; c=relaxed/simple;
+	bh=il/A5ESFB43qQCBJVEVMQsv6iZegOJ25F7KaRc3mwr0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AoV7UhRPrtTPgk+DZuKbI1F6Ml277eUMGIR2KqvKifsPcTLy7WyyLA9UTCRkKl+PgkqBFEfp2BZZ0xXuoiuWCcJSvkmg78wtgLZFb3l6881Bz/QhtkMRZNVkxA7UBXIQvSq6ETeiXZSY/d07FOp01SBb02rJmPDT7dseYJ2GI5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IArCkOoJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="pFZJUB+P"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b7277324054so715170066b.0
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Dec 2025 11:57:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1766433445; x=1767038245; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h1Ffz7SUjA9uiSla9hHoS8dAeCi7tewQV/vP2Eehn8A=;
-        b=pFZJUB+PHZWLjPcQpowiytkshEGhxGj5eXPYicVBekCOyv5edtd/D/8QBRD4WducvS
-         rVpLJLuIAiUIWS2Km205Ah9T/sgmRQOZ9OER7gw0sEWH7OPUrzpo5AnmT6KDq00vmhqT
-         rBAs+UNDSUzDVSyWeqrZ7/t88wbpQXA7+rjHwGcjOD8V5mBeydw3VSesk/wA0KPiQC2/
-         tjj+RokSHTTJfyDwGuAWCGrrUkqM8ridBPmhsAs205vnT73lATgHhsCYpiusiPmgDrnx
-         3SiCZo4Noj8qZLChLZyEKiDBavbPc5IJU72tnwwaSUuh+9kbmKY3J/twONeia8BofiN+
-         Y9Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766433445; x=1767038245;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=h1Ffz7SUjA9uiSla9hHoS8dAeCi7tewQV/vP2Eehn8A=;
-        b=Q4lQReo9QLM8zdLjlejSJSDXvkjwazRKcfW7gXFu+qFWXBdmMiDtdu3Bdm5YDmjMUZ
-         3M2y7Ppp5qB4B86LQgiliYs0c6p7+rHs+W5YdXWXUunxGiySoBavPtAzbdHTipMCoMpU
-         EIrjrg7tFbDZuhxEuNrjtlxeH4N5LGQMuRVvD3mGs+ctYHhMyKc3LlAys5YhtoccLMDZ
-         9S9ec7iCm0jz4G7WEIhauXkZaVMq+Kas4uQsp0/oL6wpAtwiq1btfy8Youk42LpEhCKc
-         5+cInMxefIQWbsdEvV8R2044adCXr8G5+oBRZ1+zJ44BGM9ToFBcO134WbqG3FEjqcHz
-         CYcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVVHOteGaL+nMvs9HfdDDWEO2iNzf58h15Vu60H0gUHJSBUAqYcyBY/X2P3LqwcyJ3V4fENYwvTbU+UU4o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUMhAVtsRqqGJp7prnAjBfwFnK9s1RVoJ//POmKRKDY0a7N5qa
-	2CuplJQ7aghiSIo+yWrT7o1TT1Bv85lPMI0kKeEhFqsPiDFAKmll+TL6BbYpRSr3K5EuzqK10J4
-	iUawDDuxnhtOp6SDLB8OgZm/MlDVHnLisamOxe+kqBg==
-X-Gm-Gg: AY/fxX4NxaTucwuBFcb1aw1et7RxDZJ4KQELPqhruNIxCpbEXB7QSWUz60jIzBtSBQZ
-	3XV92Pp/vm8uXBXtVLkoliv+fsL5ND8NDRe0A0IivcsLgt9BxtRE8M9Z9QWOVaOH1YH1gCQ7bnA
-	XKUjW++XeGQYPxFAQyhebRYrGxFZwhP43wsyl8fuU2fT086zPv0Ci53Sinl8tSdPsrMZXXV5MHB
-	CuykTg/5Pv1O0NxboOuT3FjPF+mFnO2DGdI6KwsQ68V7IunXTSm9Nxuajx0oE3TX7MOXyDSRnG/
-	WQ2SuEGLphhBOfm19HfSbuNAEl/se5cxw65CR/J5eaHb0nLnsQ==
-X-Google-Smtp-Source: AGHT+IEdtGGJL6owR7mmmwSv2zTvtla84ek3MFk4eZNiNP2lYiWN2sfcs6M8h0fxDoYpaxxvqE+4ieXBeUSoFs/4WBA=
-X-Received: by 2002:a17:907:3ccb:b0:b73:8cea:62bb with SMTP id
- a640c23a62f3a-b80371a3d87mr1355933366b.31.1766433444769; Mon, 22 Dec 2025
- 11:57:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IArCkOoJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 459CFC16AAE;
+	Mon, 22 Dec 2025 20:22:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766434922;
+	bh=il/A5ESFB43qQCBJVEVMQsv6iZegOJ25F7KaRc3mwr0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IArCkOoJyawG/2YzChOl+4dQroQYKMbFOB8CeNQq7fKKfnBsmTpwufvwdaQ4OYR/s
+	 5b5JJH8nBoE+G2o3v3S7mUqHiT+sRCWi2s1DqVMPWu2Vuvp2eVJko9yHAOIcwKI3jz
+	 VHxM8Pl0p5SD8Ym6J3NDDRJV5vJGS9bVjT0gzyA/nd2vKy6adefXyOzrYCSafDEl+f
+	 6oHt7KFJzNhYuBC22SYHw1VkVubPwr/LoTkQHKcsSFpB8qfJ8DnnsHria2NXTeECmw
+	 rMMVgXLwOscZwwaHJ6zc8l8DCva9t5Hz/EBWEqKcw22Ur/yKFwVwMFRxx9COfyabDP
+	 nkVL8kUuFsM7A==
+Date: Mon, 22 Dec 2025 12:22:00 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Gow <davidgow@google.com>
+Cc: Brendan Higgins <brendan.higgins@linux.dev>,
+	Rae Moar <raemoar63@gmail.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2] kunit: Enforce task execution in {soft,hard}irq
+ contexts
+Message-ID: <20251222202200.GA2188@quark>
+References: <20251219085259.1163048-1-davidgow@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251215163820.1584926-1-robert.marko@sartura.hr>
- <20251215163820.1584926-16-robert.marko@sartura.hr> <20251216-payback-ceremony-cfb7adad8ef1@spud>
-In-Reply-To: <20251216-payback-ceremony-cfb7adad8ef1@spud>
-From: Robert Marko <robert.marko@sartura.hr>
-Date: Mon, 22 Dec 2025 20:57:14 +0100
-X-Gm-Features: AQt7F2rDm7ZgyJ9ixNo09GJcdYbsF1DFNHNC0FIPR01SjncTPp1tTulCOrRyRyg
-Message-ID: <CA+HBbNESUZ6KB0BbpZUMfh1rjZTZMgY1SwmFQbx+CRP+a_1x9g@mail.gmail.com>
-Subject: Re: [PATCH v2 16/19] dt-bindings: pinctrl: pinctrl-microchip-sgpio:
- add LAN969x
-To: Conor Dooley <conor@kernel.org>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
-	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com, 
-	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, 
-	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org, 
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com, 
-	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
-	gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com, 
-	sboyd@kernel.org, richardcochran@gmail.com, wsa+renesas@sang-engineering.com, 
-	romain.sioen@microchip.com, Ryan.Wanner@microchip.com, 
-	lars.povlsen@microchip.com, tudor.ambarus@linaro.org, 
-	charan.pedumuru@microchip.com, kavyasree.kotagiri@microchip.com, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, mwalle@kernel.org, 
-	luka.perkov@sartura.hr
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251219085259.1163048-1-davidgow@google.com>
 
-On Tue, Dec 16, 2025 at 6:34=E2=80=AFPM Conor Dooley <conor@kernel.org> wro=
-te:
->
-> On Mon, Dec 15, 2025 at 05:35:33PM +0100, Robert Marko wrote:
-> > Document LAN969x compatibles for SGPIO.
-> >
-> > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> > ---
-> >  .../pinctrl/microchip,sparx5-sgpio.yaml       | 20 ++++++++++++++-----
-> >  1 file changed, 15 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/Documentation/devicetree/bindings/pinctrl/microchip,sparx5=
--sgpio.yaml b/Documentation/devicetree/bindings/pinctrl/microchip,sparx5-sg=
-pio.yaml
-> > index fa47732d7cef..9fbbafcdc063 100644
-> > --- a/Documentation/devicetree/bindings/pinctrl/microchip,sparx5-sgpio.=
-yaml
-> > +++ b/Documentation/devicetree/bindings/pinctrl/microchip,sparx5-sgpio.=
-yaml
-> > @@ -21,10 +21,15 @@ properties:
-> >      pattern: '^gpio@[0-9a-f]+$'
-> >
-> >    compatible:
-> > -    enum:
-> > -      - microchip,sparx5-sgpio
-> > -      - mscc,ocelot-sgpio
-> > -      - mscc,luton-sgpio
-> > +    oneOf:
-> > +      - enum:
-> > +          - microchip,sparx5-sgpio
-> > +          - mscc,ocelot-sgpio
-> > +          - mscc,luton-sgpio
-> > +      - items:
-> > +          - enum:
-> > +              - microchip,lan9691-sgpio
-> > +          - const: microchip,sparx5-sgpio
-> >
-> >    '#address-cells':
-> >      const: 1
-> > @@ -80,7 +85,12 @@ patternProperties:
-> >      type: object
-> >      properties:
-> >        compatible:
-> > -        const: microchip,sparx5-sgpio-bank
->
-> This should just be able to become "compatible: contains: const: microchi=
-p,sparx5-sgpio-bank.
-> pw-bot: changes-requested
+On Fri, Dec 19, 2025 at 04:52:58PM +0800, David Gow wrote:
+> The kunit_run_irq_test() helper allows a function to be run in hardirq
+> and softirq contexts (in addition to the task context). It does this by
+> running the user-provided function concurrently in the three contexts,
+> until either a timeout has expired or a number of iterations have
+> completed in the normal task context.
+> 
+> However, on setups where the initialisation of the hardirq and softirq
+> contexts (or, indeed, the scheduling of those tasks) is significantly
+> slower than the function execution, it's possible for that number of
+> iterations to be exceeded before any runs in irq contexts actually
+> occur. This occurs with the polyval.test_polyval_preparekey_in_irqs
+> test, which runs 20000 iterations of the relatively fast preparekey
+> function, and therefore fails often under many UML, 32-bit arm, m68k and
+> other environments.
+> 
+> Instead, ensure that the max_iterations limit counts executions in all
+> three contexts, and requires at least one of each. This will cause the
+> test to continue iterating until at least the irq contexts have been
+> tested, or the 1s wall-clock limit has been exceeded. This causes the
+> test to pass in all of my environments.
+> 
+> In so doing, we also update the task counters to atomic ints, to better
+> match both the 'int' max_iterations input, and to ensure they are
+> correctly updated across contexts.
+> 
+> Finally, we also fix a few potential assertion messages to be
+> less-specific to the original crypto usecases.
+> 
+> Fixes: b41dc83f0790 ("kunit, lib/crypto: Move run_irq_test() to common header")
+> Signed-off-by: David Gow <davidgow@google.com>
+> ---
+> 
+> Changes since v1:
+> https://lore.kernel.org/all/20251219080850.921416-1-davidgow@google.com/
+> - Remove a leftover debug line which forced max_iterations to 1.
+> 
+> 
+>  include/kunit/run-in-irq-context.h | 39 ++++++++++++++++++++----------
+>  1 file changed, 26 insertions(+), 13 deletions(-)
 
-Hi Conor,
-I have tried using contains, but it would fail to match with the
-following error:
-arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dtb:
-/axi/gpio@e2010230/gpio@0: failed to match any schema with compatible:
-['microchip,lan9691-sgpio-bank', 'microchip,sparx5-sgpio-bank']
-arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dtb:
-/axi/gpio@e2010230/gpio@1: failed to match any schema with compatible:
-['microchip,lan9691-sgpio-bank', 'microchip,sparx5-sgpio-bank']
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
 
-Regards,
-Robert
->
-> > +        oneOf:
-> > +          - items:
-> > +              - enum:
-> > +                  - microchip,lan9691-sgpio-bank
-> > +              - const: microchip,sparx5-sgpio-bank
-> > +          - const: microchip,sparx5-sgpio-bank
-> >
-> >        reg:
-> >          description: |
-> > --
-> > 2.52.0
-> >
+Thanks!
 
-
-
---=20
-Robert Marko
-Staff Embedded Linux Engineer
-Sartura d.d.
-Lendavska ulica 16a
-10000 Zagreb, Croatia
-Email: robert.marko@sartura.hr
-Web: www.sartura.hr
+- Eric
