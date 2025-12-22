@@ -1,196 +1,191 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EA432D0E2
-	for <linux-crypto@vger.kernel.org>; Mon, 22 Dec 2025 10:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9453148A6
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Dec 2025 15:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766400315; cv=none; b=WFr1wBzsNbhOmNO/ldNZAYr7pJnJtjVZhsj+o9DJPJTI+HbE3XdxCcfsREnxYUilwZILckwGjS9q4D6woSMYwdC7bPoSkfEH5BQ9Kswkcw6DfsAo5AHELkc3k7plqmjCDMNBM1qdXgkDr+2kEBGC5speQN6fy8R/Jbk2nVRqzQc=
+	t=1766415808; cv=none; b=R71Xfc+UvMRCZI3gv3VnkXtHf6u4kPvOwA6J1wRCb6EX8CrpTRn8ZHFdXYXazdOxTzcCwbtSR1p8WIzJfwKpMmrJ7YAdqe0KE7zkjeNtlFX6xrXBoMTuENOVSOuwvKQRYGfKH+wG5vfNY4S1254u6RoxB43v1Yam+mXhyqkz33Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766400315; c=relaxed/simple;
-	bh=EcEp6slUSjT1wp31kXYtT+57gC5ajQ5IJ2hZHtNkfXY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jn2wYxhQlqjDT1h6PJPnZzkzKjyah6BPiCOa60HuwSp3OnxsdYb3T79VbKKBMftceqR+YX4qHUL4dpRkAItzv0oZl3s2N5++sW53agGqj8Hkzq9spaVVkxrbp9bgKTB+lxwhHgAto00UUXkusZuvAscfdg0U4q2vG2VmKr4nu9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jJCwWTaO; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1766415808; c=relaxed/simple;
+	bh=t4rsFnGUzeD1KMwXT4iUUV1jriowknwgJrrHKVJFd1U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uf0Kf65PHVe6cv6Rz16igM0CM2Do0F14eSYfKyNN8OSR8IalK24zBJSbXcuo+RcNc6R7hHpG1HZFl+8SEnLiZ8p48fynAJ1Asu15zYc+ZToSTNG8dTHku0K3I1j0nQ6zgfuwyXEjYBpkBimdbE3oa3lNx5aHSCYNj6jHE7IhXFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WOoHCwzG; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jJCwWTaO"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766400310;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=aIywFLL1y3f/yJcgjB7UBK26VXtrZ8Ijc4u4Sn0lBD0=;
-	b=jJCwWTaOgL92UJAeeQgt429Oadtdf8HTif2lwZrDGcNstyuAHvKyykBhnJtCDcsvK6xoGH
-	eXlS8RGexr/PAWs7/HWmQRUNh3Ak0Arw9ACJhpcPXKJztXY31geuog6CUKXSE0l0f7NZGX
-	dfTTkXd4fiT5sPQXO3blC8a+bT73YUQ=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Neil Horman <nhorman@tuxdriver.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto - remove unnecessary forward declarations
-Date: Mon, 22 Dec 2025 11:44:55 +0100
-Message-ID: <20251222104457.635513-1-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOoHCwzG"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47755de027eso23677845e9.0
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Dec 2025 07:03:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766415805; x=1767020605; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/BovpYoyCqPQI6cHyERY9sM0XnG6cSj0PGe1+XI7CW4=;
+        b=WOoHCwzGZ6bdrRKq4+mJbZErvy050GBq3ODQnyT2b98CYCFzmxsGtrerYm83L3vQ1h
+         nb+ImkQODzhldr1p5CdHJYvqO8TzsbOHtQPfReqTsYSNqUmzO+jdBEt0f9ZURDM0Qe2S
+         EaXHqCyM/q9wI+4z6NKWAe/f+AZ4SdZUdaKf18HFxX0zwKB+mqc3E8tLp8kVML9LVgXH
+         qCX7wOop5DS+/BoiX3g4PtamFhrmHC3FYth8ncqjcq23baT9Qud42aZ0A251mbqBg4R6
+         RKVPLfWLqCJDsd6Tign3NwSWwLVRDtPZltGSK0kNR7pWa/aOHVAURoKyJhCa6f2A9qNX
+         fy5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766415805; x=1767020605;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/BovpYoyCqPQI6cHyERY9sM0XnG6cSj0PGe1+XI7CW4=;
+        b=jJnWmrbIG3lCt79SLgmyAhFGLFyWKPQ7mBXqmdNRjzxQgSSMUmnDj4fXLzUyQ3XGSy
+         7hYi5XddRT5oT8jUblmD+iPQ6KfTqrKBohqNeOUP/1+8VYaKDLb+F/KAjW6zRL4I35ox
+         oNHmrf0vPqarPtz1sypcIZfSmiHwmrPgHH7+tZOTkdpsH175hh/EVzjSpN45V7yLPOvc
+         hsdLp2+X5VvSEldBM9Jn4UGGPI0YTpRACu+dWS8tnm2DC0mPwQgzH6libRUHlkLD4dSj
+         iIeSFPsfptzE9sId18LQkcJhspvQSsSB6f9+v1LuayEW5YqS+E/cEba1pCJihTMFPnyZ
+         HfRA==
+X-Forwarded-Encrypted: i=1; AJvYcCUF78FQa1JCEMj5P7FVX536vYUoj1W1Q1GgrfWjKevvjH1g/6ZoaJvbOq43Jps0XxTr/q/+goPpzGlgTrk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2ZDlxU9slN81rvdWpfTwszl6ar2ivcBDyDigKshhjvcLDjhzR
+	0iNXLm1bAuViljzkm0p2hK17gZVzGKMpTju77dq7U7xkWJn5UG4thDG2
+X-Gm-Gg: AY/fxX4Ik6mtDQH+G/f0jBklyB3GwIz1jkprmFC3RivKLZLiN3z2g+wKYySuBi3xHdU
+	0g5ZUuJgIIDIjfItO89iuDcNcYhl1Lk5FQD05NZmfT/xRNE34WxPkogKoHvgZ9kKQDAYWbAjVJG
+	DFnNuqtFt/kurKnHjROhGFdzyEzlE3jnazxuExQq8JexhzYk6WqbHIqjfQXDDckndpycGd+tmZD
+	3G1UDai792n46vwjKpHfiz2BSDfCfgHZz43XIIMFA3DkWbyGOoCgUY5Yiyh0UGBX9H1PactJE2L
+	mgESAIESTEg3wtSjoc1Jtd9UxarX6qknkIWVcxj+MIiqW2wRnNswcdejF4Duv3V/HtpBvy7ghNx
+	C3J+DZuuPSNVpGc4N4O8NlH7E+6Mbz1nxxi1McDCFj1w8mOOdw5t9Ek2dQDEQ0i+UMNfAjdw0wr
+	9wQA5gxAHZ+8fpBG0=
+X-Google-Smtp-Source: AGHT+IFJuusyQ+1Mz3/8tYi1eqLylmqECFtDDXhQgv1q9fY01NTCrKY3AspjaGJTpIOiZ62UGg1d9Q==
+X-Received: by 2002:a05:600c:4fce:b0:47a:935f:61a0 with SMTP id 5b1f17b1804b1-47d194c659emr102417425e9.0.1766415804486;
+        Mon, 22 Dec 2025 07:03:24 -0800 (PST)
+Received: from [192.168.1.27] ([176.74.141.242])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4325dbc522esm11740249f8f.11.2025.12.22.07.03.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Dec 2025 07:03:24 -0800 (PST)
+Message-ID: <86300955-72e4-42d5-892d-f49bdf14441e@gmail.com>
+Date: Mon, 22 Dec 2025 16:03:22 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 2/2] swsusp: make it possible to hibernate to device
+ mapper devices
+To: Askar Safin <safinaskar@gmail.com>, mpatocka@redhat.com
+Cc: Dell.Client.Kernel@dell.com, dm-devel@lists.linux.dev,
+ linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-lvm@lists.linux.dev, linux-mm@kvack.org,
+ linux-pm@vger.kernel.org, linux-raid@vger.kernel.org,
+ lvm-devel@lists.linux.dev, pavel@ucw.cz, rafael@kernel.org
+References: <b32d0701-4399-9c5d-ecc8-071162df97a7@redhat.com>
+ <20251217231837.157443-1-safinaskar@gmail.com>
+Content-Language: en-US
+From: Milan Broz <gmazyland@gmail.com>
+Autocrypt: addr=gmazyland@gmail.com; keydata=
+ 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
+In-Reply-To: <20251217231837.157443-1-safinaskar@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add the __maybe_unused attribute to the function definitions and remove
-the now-unnecessary forward declarations.
+On 12/18/25 12:18 AM, Askar Safin wrote:
+> Mikulas Patocka <mpatocka@redhat.com>:
+>> Askar Safin requires swap and hibernation on the dm-integrity device mapper
+>> target because he needs to protect his data.
+> 
+> Hi, Mikulas, Milan and others.
+> 
+> I'm running swap on dm-integrity for 40 days.
+> 
+> It runs mostly without problems.
+> 
+> But yesterday my screen freezed for 4 minutes. And then continued to work
+> normally.
+> 
+> So, may I ask again a question: is swap on dm-integrity supposed to work
+> at all? (I. e. swap partition on top of dm-integrity partition on top of
+> actual disk partition.) (I'm talking about swap here, not about hibernation.)
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- crypto/acompress.c | 6 ++----
- crypto/aead.c      | 5 ++---
- crypto/ahash.c     | 5 ++---
- crypto/akcipher.c  | 6 ++----
- crypto/kpp.c       | 6 ++----
- crypto/rng.c       | 5 ++---
- crypto/shash.c     | 5 ++---
- crypto/skcipher.c  | 5 ++---
- 8 files changed, 16 insertions(+), 27 deletions(-)
+Hi,
 
-diff --git a/crypto/acompress.c b/crypto/acompress.c
-index be28cbfd22e3..9320a3947263 100644
---- a/crypto/acompress.c
-+++ b/crypto/acompress.c
-@@ -60,10 +60,8 @@ static int __maybe_unused crypto_acomp_report(
- 	return nla_put(skb, CRYPTOCFGA_REPORT_ACOMP, sizeof(racomp), &racomp);
- }
- 
--static void crypto_acomp_show(struct seq_file *m, struct crypto_alg *alg)
--	__maybe_unused;
--
--static void crypto_acomp_show(struct seq_file *m, struct crypto_alg *alg)
-+static void __maybe_unused crypto_acomp_show(struct seq_file *m,
-+					     struct crypto_alg *alg)
- {
- 	seq_puts(m, "type         : acomp\n");
- }
-diff --git a/crypto/aead.c b/crypto/aead.c
-index 08d44c5e5c33..e009937bf3a5 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -151,9 +151,8 @@ static int __maybe_unused crypto_aead_report(
- 	return nla_put(skb, CRYPTOCFGA_REPORT_AEAD, sizeof(raead), &raead);
- }
- 
--static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
--	__maybe_unused;
--static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
-+static void __maybe_unused crypto_aead_show(struct seq_file *m,
-+					    struct crypto_alg *alg)
- {
- 	struct aead_alg *aead = container_of(alg, struct aead_alg, base);
- 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 66492ae75fcf..1abfbb7ab486 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -801,9 +801,8 @@ static int __maybe_unused crypto_ahash_report(
- 	return nla_put(skb, CRYPTOCFGA_REPORT_HASH, sizeof(rhash), &rhash);
- }
- 
--static void crypto_ahash_show(struct seq_file *m, struct crypto_alg *alg)
--	__maybe_unused;
--static void crypto_ahash_show(struct seq_file *m, struct crypto_alg *alg)
-+static void __maybe_unused crypto_ahash_show(struct seq_file *m,
-+					     struct crypto_alg *alg)
- {
- 	seq_printf(m, "type         : ahash\n");
- 	seq_printf(m, "async        : %s\n",
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index a36f50c83827..dfe87b3ce183 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -46,10 +46,8 @@ static int __maybe_unused crypto_akcipher_report(
- 		       sizeof(rakcipher), &rakcipher);
- }
- 
--static void crypto_akcipher_show(struct seq_file *m, struct crypto_alg *alg)
--	__maybe_unused;
--
--static void crypto_akcipher_show(struct seq_file *m, struct crypto_alg *alg)
-+static void __maybe_unused crypto_akcipher_show(struct seq_file *m,
-+						struct crypto_alg *alg)
- {
- 	seq_puts(m, "type         : akcipher\n");
- }
-diff --git a/crypto/kpp.c b/crypto/kpp.c
-index 2e0cefe7a25f..7451d39a7ad8 100644
---- a/crypto/kpp.c
-+++ b/crypto/kpp.c
-@@ -29,10 +29,8 @@ static int __maybe_unused crypto_kpp_report(
- 	return nla_put(skb, CRYPTOCFGA_REPORT_KPP, sizeof(rkpp), &rkpp);
- }
- 
--static void crypto_kpp_show(struct seq_file *m, struct crypto_alg *alg)
--	__maybe_unused;
--
--static void crypto_kpp_show(struct seq_file *m, struct crypto_alg *alg)
-+static void __maybe_unused crypto_kpp_show(struct seq_file *m,
-+					   struct crypto_alg *alg)
- {
- 	seq_puts(m, "type         : kpp\n");
- }
-diff --git a/crypto/rng.c b/crypto/rng.c
-index ee1768c5a400..5982dcea1010 100644
---- a/crypto/rng.c
-+++ b/crypto/rng.c
-@@ -77,9 +77,8 @@ static int __maybe_unused crypto_rng_report(
- 	return nla_put(skb, CRYPTOCFGA_REPORT_RNG, sizeof(rrng), &rrng);
- }
- 
--static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
--	__maybe_unused;
--static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
-+static void __maybe_unused crypto_rng_show(struct seq_file *m,
-+					   struct crypto_alg *alg)
- {
- 	seq_printf(m, "type         : rng\n");
- 	seq_printf(m, "seedsize     : %u\n", seedsize(alg));
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 4721f5f134f4..0dab800c48ee 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -346,9 +346,8 @@ static int __maybe_unused crypto_shash_report(
- 	return nla_put(skb, CRYPTOCFGA_REPORT_HASH, sizeof(rhash), &rhash);
- }
- 
--static void crypto_shash_show(struct seq_file *m, struct crypto_alg *alg)
--	__maybe_unused;
--static void crypto_shash_show(struct seq_file *m, struct crypto_alg *alg)
-+static void __maybe_unused crypto_shash_show(struct seq_file *m,
-+					     struct crypto_alg *alg)
- {
- 	struct shash_alg *salg = __crypto_shash_alg(alg);
- 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 14a820cb06c7..d62c6a360413 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -570,9 +570,8 @@ static void crypto_skcipher_free_instance(struct crypto_instance *inst)
- 	skcipher->free(skcipher);
- }
- 
--static void crypto_skcipher_show(struct seq_file *m, struct crypto_alg *alg)
--	__maybe_unused;
--static void crypto_skcipher_show(struct seq_file *m, struct crypto_alg *alg)
-+static void __maybe_unused crypto_skcipher_show(struct seq_file *m,
-+						struct crypto_alg *alg)
- {
- 	struct skcipher_alg *skcipher = __crypto_skcipher_alg(alg);
- 
--- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
+I am not sure if Mikulas is available; maybe it's better to try again
+in January...
+
+Anyway, my understanding is that all device-mapper targets use mempools,
+which should ensure that they can process even under memory pressure.
+
+AFAIK, swap over a device-mapper target (any target!) with a real block device
+should be ok. The problematic part is stacking over a filesystem (through a loop)
+as Mikulas mentioned.
+
+If I interpret Mikulas' answer correctly, it is the filesystem that could
+allocate memory here, and it deadlocks because of it (as it is swap itself).
+So I believe it can happen with other DM targets too.
+(If I am mistaken, please correct me.)
+
+I wish it could work, but I do not understand kernel details anymore here.
+It seems we are still in "a little walled gardens" communication issues
+among various kernel subsystems, as one of the former maintainers said :-)
+
+But you asked about a real block device, so it should work.
+I guess it is just another bug you see...
+
+Milan
+> 
+> Mikulas Patocka said here https://lore.kernel.org/all/3f3d871a-6a86-354f-f83d-a871793a4a47@redhat.com/ :
+> 
+>> Encrypted swap file is not supposed to work. It uses the loop device that
+>> routes the requests to a filesystem and the filesystem needs to allocate
+>> memory to process requests.
+> 
+>> So, this is what happened to you - the machine runs out of memory, it
+>> needs to swap out some pages, dm-crypt encrypts the pages and generates
+>> write bios, the write bios are directed to the loop device, the loop
+>> device directs them to the filesystem, the filesystem attempts to allocate
+>> more memory => deadlock.
+> 
+> Does the same apply to dm-integrity?
+> 
+> I. e. is it possible that write to dm-integrity will lead to allocation?
+> 
 
