@@ -1,101 +1,107 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB03634AB04
-	for <linux-crypto@vger.kernel.org>; Tue, 23 Dec 2025 01:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281FF1758B;
+	Tue, 23 Dec 2025 01:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766454091; cv=none; b=UlvlCPtk5E3x/8xX/LPq8CkD1+KnuS+G1rrgETis4oGJygoIg/LRDNph5MzEH3gtIz55EJzjGPEpWMxHz4AHuzenR5a27nKKB7vpTRFf4ALnjPq7e2yK4dlIfDkLfF95BE50J1Iw/BpWshtuYCD+WBVMeo+8reF2JbN5ZlSlWBg=
+	t=1766454399; cv=none; b=SIvNKP6CncQVL9RfrE1lw4c+RTPpNQBvAZZOXJSlMbXMmm2xxuQoyv/PVnb+j3lvHPM924ZLFid54ojFz3wIk4AzE8rHcg1zklJ/HUfaeJGpSPvhHOkwDTE34p2QDMUoUnmVl6MoziQ3zAdGwDcq2TuK5Xssv51AECj8im3ZXO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766454091; c=relaxed/simple;
-	bh=Dw1tVh0CmnWqKDbnt9xHH3i4dpkMlWgLPtv4rSVZoxQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wb1+Ru68OjCEY7d198CYqso/1y2KJ5dEqbaigI8DO+78twc6/phQpAlrVRB9uUPOFe4NUsbNxaONFIkzbIHUVlHqlxOUpBTcwGnY9ZgYDICEgs6l3YhDEzuKvZ7lfWPYOr/CCpy6E0HjrJPwxjs4ATU+e4RNb+zYnCXnUPhossI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfOsId7s; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1766454399; c=relaxed/simple;
+	bh=hCSMdRUmkfdljkcGOweHKmihno3/TCMzGpUDkPq10Ao=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Hw0ZFtv4iFrdQ/VFRQPVWAul1/4otbgrcm6AePWn+shEcs6fUuc/z9OCO3VwGKovO+zxXmhnxCA9cVHE/CITVAWk7eizC/5a+b3w2q37E0uCPp77Ng6QG3GtykOolchkd+ZEG6hmi67CgrzZ2S9Nl7kNqQVKKlt3xtLTgxfyomg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=NxwAzCG7; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfOsId7s"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-594270ec7f9so5340029e87.3
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Dec 2025 17:41:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766454088; x=1767058888; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uzc2azkAT7+UZs63CJT4nkeSpZYqRpvq+hUurVd9/nU=;
-        b=OfOsId7sIcDGQy2pTh1vUpxLeUMu89wMN8s4Lk5g1kjn6irxsnAKWeUrpNqRGyoG36
-         KeetWAt4xPplCAfvWllRU2qX5LiXDYmB4HICp0vluIlAJj36byf5FlO7IURPnAFcLIfz
-         EdOrskXj59Xi4pyqUHPyuUwgjUIFaXZtWIz1k+TrIRp3q+8hANEkpNpTzlkL1uX3AgQ0
-         ZClbOvf3LRxSqsQg1qNBWzRHYzc57vVVkz/mG+VKQYTkkt3PAwUnDwDy8f5K8XKVszoR
-         AeOMq3ZA8JcsAWy+d3QFwQ9mUBT9ymlXsOOpr25TL6BQd5Dr8Z9ZO80mclH1UxWOzlrI
-         yN2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766454088; x=1767058888;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Uzc2azkAT7+UZs63CJT4nkeSpZYqRpvq+hUurVd9/nU=;
-        b=b5pVK/ojEjrB9Fp1iYHMnjsXlwBGp7vGq3+a24jrTWY4O7LURmTLtGsy9uDWcifG0c
-         U4KBFav2tdaCQlxm6O++PLJxWRKo3FAD3BcG00A9aNnJ8140q7CGmV6AycX/Fd3LXh6S
-         dZinGyizZ/ZCk0oEDDIQRQLgzQb25RySlJk7Si/S0z1BeCxja7abEKkgLpvDdCsm72e8
-         NnQBhxZ9NrL0BEUR4cXCTJZvb6mmK3ya3PnNJ+5riHap0XqUK1n3qMxjFVoVyKMj9qjd
-         UAzykd9YW+kb9ZfpnE6jyOJQjUfHobWD7QIZZFgz/hJJcfLBzSpt0lLqi/usF2nIjb9P
-         wCqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkdBK8fWsS2dVWCoNIjz3F1WsIoASIb+eems5jKiWI8yLy9tlJOBfiLoqa7ity4338iaf0vAaQo6Q6V3A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yya+xxUSZ2+dLp3dTcA3EjqHzRG27dEgg/pMBL3sYPBO7C6mHS9
-	od4k8RU3OnOCDROPEi2thC5/mUwO9KfaWN242vifNC9O90vTRArKSW4A
-X-Gm-Gg: AY/fxX6b+02HEylQeOmYnWfoCmWBY9A/3SD6keXk5VqVdHUyDc0oABdX0Sfkl55hqgi
-	1fFm3hQAWN3Ezr+erQcZT693JDcJxT32PozAcuJa2dZtNkb2JEWImsao4jlpkZge64pwqYIdw5z
-	dcGk6NHmcUPpOEUehLsCzwapOrS16mgnroI46ipL3MhVWIxOAIgC2cU9N08BC+D1uJ8VmldHKqs
-	HCd4v0jgDKEOu1re0i1gnXabBcbYcTNCGtBpzb9+b9Wg6ygD/+SQ/OlgxL7kDwS7LCvj/LG4eI5
-	jCkIKFldBO3sPadwf8IvS0ZIAOFCoaktDChNenh/sTE7f85EE+w6DmNtPmRH5Gm1qR0vrT9jNAg
-	WkOR71ndhmTl4kWFmhYFfk9Dl9IXjA1s95yOaS+bXEo/1JPWeHFoR7mw8mhznW9PNRSH04yZnTV
-	vYkq+wNcsh
-X-Google-Smtp-Source: AGHT+IHWUix04V1tUMjJhj8LmwIJFsrYjMJ2eegt/yizChdKwHOARh8H0MmDtl7KvKnzF0od4dTcxA==
-X-Received: by 2002:a05:6512:234b:b0:59a:123e:69ab with SMTP id 2adb3069b0e04-59a17d08c20mr4858078e87.10.1766454087534;
-        Mon, 22 Dec 2025 17:41:27 -0800 (PST)
-Received: from localhost ([194.190.17.114])
-        by smtp.gmail.com with UTF8SMTPSA id 2adb3069b0e04-59a185d5ea6sm3600776e87.5.2025.12.22.17.41.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Dec 2025 17:41:27 -0800 (PST)
-From: Askar Safin <safinaskar@gmail.com>
-To: gmazyland@gmail.com
-Cc: Dell.Client.Kernel@dell.com,
-	dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-lvm@lists.linux.dev,
-	linux-mm@kvack.org,
-	linux-pm@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	lvm-devel@lists.linux.dev,
-	mpatocka@redhat.com,
-	pavel@ucw.cz,
-	rafael@kernel.org
-Subject: Re: [RFC PATCH 2/2] swsusp: make it possible to hibernate to device mapper devices
-Date: Tue, 23 Dec 2025 04:41:14 +0300
-Message-ID: <20251223014114.2193668-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <86300955-72e4-42d5-892d-f49bdf14441e@gmail.com>
-References: <86300955-72e4-42d5-892d-f49bdf14441e@gmail.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="NxwAzCG7"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=MNIJ7aJgF66Wvcfuj2QZg8E0oO/L+5983FBE+sXS0TQ=;
+	b=NxwAzCG79tnmU1V/sE4gi2gNNChcj5oh8adQQG8HMXkUkYUUluFIk6xlz3NKVlFtkoUarJJIb
+	L60GqYPw0jiJhBtXfwJ816G7qmNglzHA4Rm8GCsCVhhCA6NHZ+bq2vKYq45iIdxOIVyk5layL9x
+	rR9XQxhLLv25vAEYbLcbcs8=
+Received: from mail.maildlp.com (unknown [172.19.163.214])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4dZyTD38rWz1K98s;
+	Tue, 23 Dec 2025 09:43:28 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 85CF04056C;
+	Tue, 23 Dec 2025 09:46:32 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 23 Dec 2025 09:46:32 +0800
+Received: from [10.67.120.171] (10.67.120.171) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 23 Dec 2025 09:46:31 +0800
+Message-ID: <cde67fee-c90a-437e-a8be-a27865f8a2ed@huawei.com>
+Date: Tue, 23 Dec 2025 09:46:31 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: hisilicon/qm - fix incorrect judgment in
+ qm_get_complete_eqe_num()
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: <davem@davemloft.net>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <liulongfang@huawei.com>,
+	<qianweili@huawei.com>, <linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>
+References: <20251120132124.1779549-1-huangchenghai2@huawei.com>
+ <aUT3IW8vlYKwWDt2@gondor.apana.org.au>
+ <9e9b2fc3-7d6b-4ac2-86fe-2d88fbd2ca44@huawei.com>
+ <aUjHoK9DoVIJj6oP@gondor.apana.org.au>
+From: huangchenghai <huangchenghai2@huawei.com>
+Content-Language: en-US
+In-Reply-To: <aUjHoK9DoVIJj6oP@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
 
-Milan Broz <gmazyland@gmail.com>:
-> Anyway, my understanding is that all device-mapper targets use mempools,
-> which should ensure that they can process even under memory pressure.
 
-Also, I don't understand how mempools help here.
+在 2025/12/22 12:22, Herbert Xu 写道:
+> On Mon, Dec 22, 2025 at 11:00:28AM +0800, huangchenghai wrote:
+>> 在 2025/12/19 14:56, Herbert Xu 写道:
+>>> On Thu, Nov 20, 2025 at 09:21:24PM +0800, Chenghai Huang wrote:
+>>>> In qm_get_complete_eqe_num(), the function entry has already
+>>>> checked whether the interrupt is valid, so the interrupt event
+>>>> can be processed directly. Currently, the interrupt valid bit is
+>>>> being checked again redundantly, and no interrupt processing is
+>>>> performed. Therefore, the loop condition should be modified to
+>>>> directly process the interrupt event, and use do while instead of
+>>>> the current while loop, because the condition is always satisfied
+>>>> on the first iteration.
+>>>>
+>>>> Fixes: f5a332980a68 ("crypto: hisilicon/qm - add the save operation of eqe and aeqe")
+>>>> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+>>>> ---
+>>>>    drivers/crypto/hisilicon/qm.c | 9 ++++-----
+>>>>    1 file changed, 4 insertions(+), 5 deletions(-)
+>>> Patch applied.  Thanks.
+>> This patch addresses an issue specific to version 6.19.
+>>
+>> Could you please help including this patch in the 6.19?
+> The patch looked like a clean-up rather than a bug fix.
+>
+> Could you please explain how it makes any difference at all?
+>
+> Thanks,
 
-As well as I understand, allocation from mempool is still real allocation
-if mempool's own reserve is over.
+Commit f5a332980a68 ("crypto: hisilicon/qm - add the save operation of 
+eqe and aeqe")
 
--- 
-Askar Safin
+introduced an incorrect condition check, which prevents
+
+the while loop from being entered to handle interrupt tasks.
+
+Normally, the code should enter the while loop to process these tasks.
+
+
+Chenghai
+
