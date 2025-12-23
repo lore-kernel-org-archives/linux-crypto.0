@@ -1,109 +1,151 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D513009C7
-	for <linux-crypto@vger.kernel.org>; Tue, 23 Dec 2025 06:34:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878F534EF05
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Dec 2025 10:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766471648; cv=none; b=KW0mCJMvX/RpGHjvIX6cfzB22dne1wd9vnBINyOf5uKQyO27nbzbvuNCNhEtwuQFRNKa9Et7cGZouv3aBLgaC6dA60QYWO6lLvp/i844MCuzKbvxlgKC3vwbOwa63+YAMoPhkMrMXtizicUlDL8Cn0j023W7Ya5sueyVr6vAwnc=
+	t=1766486113; cv=none; b=Nt9GgqLMhAzDC4hbTBM3AwB+LpbygCfGEIi3wiYOgvedr5xcP0Rhz0E75R8fuvCNHvQnOjtHcSyLPnkoCE6VP5RzqVO/TMpN2SxVKmIMm5MCfLWbSXAUS1NrXUofGOUSJDV/WKCAcY9S0kJd6Irw9CJCBSdKy/owCzjwAlbfr5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766471648; c=relaxed/simple;
-	bh=zQMCxWwv+vy2hbOmutXkA1vn5ZNuVRvD6yhOueNtNZU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B6g6ep+BK0fh8ipUPW+MoISSwiWYI6yORU/yq1/SzChz3k4vOUUg/qgY/YhnSemWD0HpW1b1sB9v629+gVTZhb9wSfWnVWfcy6cOn+Kobz7i6pKibtMW3hMwThNpOGjZwbLzGKItic1TtbktWdt9wFm8VPVrN8sQlRYRZmDH+d8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WwAmUTBH; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1766486113; c=relaxed/simple;
+	bh=nhnhn/ujbA1yivMUlMSXRd1v6Sz4LmmXkvWUytEJhUI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PAH6rOX+1awbRjYsjCv9weEVkgpvKDqh9MzI+r47BZ+yPOxPDwEH+WYzFwdMWxVkRf9YWRKpFoisU4MKXPB6Mqmo+rBlx4PTLxxQLA2zIsuwNjYOXIzsECvM4+34tuCFiiypvjnB1cZg1Tqftf4r1H+/A0W1oDczl5/DUptVG/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=GF2uS7wi; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WwAmUTBH"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-37b95f87d4eso40780381fa.1
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Dec 2025 22:34:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="GF2uS7wi"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b73a9592fb8so913593366b.1
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Dec 2025 02:35:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766471644; x=1767076444; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=sartura.hr; s=sartura; t=1766486106; x=1767090906; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=048jzD37H8lsx/zZlGI/PEx4g5lnBiNM8RokzD3mdsY=;
-        b=WwAmUTBH+Z8XRKtBCqY+p4vhvOZdSmb+n+f1cbt8viJVJQHBr5U0jo/4s6d7qWWbBf
-         m0+yEyt1/jvRcNLPLCeivO4iEJDrI+k3zJ4jS2PQa2ZNeiL1Tlbub2tME3cf4CpV5t5x
-         y2v7G9wdrigZhwrK4c7Yef+E/fzqp/cS5XJetFqG4hBREaOaTvMWzFG+nlcM12NpLnyV
-         bWftFqc5KSBKZ0BFk6cyJPxHYk5+KPRoe6KeznkQ0/TJBWIgfaUW2op7B7NEb1bQFuep
-         6NgElzoJ6xi+uJ6OfcZAZFe+8coZdOUBZ5vF3OSWtmJtAEFFTI3kGZUoLI04b5pvc8/0
-         nauA==
+        bh=SWwHgDUayFaSdSqe2T6d6UFJFmjd2ZLae5KHc+yXH7I=;
+        b=GF2uS7wiRyhBmf1kLR0gIF3Rip3N0z7rurwMgvhBqXkpElhZHM//c4ztfkOfl34VXQ
+         1X14GkorXLzezj84xr2Y/dQLW+EfbQhQVOVhtnuM3M454FOIn2PNXJXS36N8bH/whQBV
+         zY0fHit1GfAmUbUyKlPfmB88R6AoVgxYJryPviR3Xhc9pr/mmX1utNgHaFZ5HiT/+TFT
+         EPfJeiatuCcTI+Wko2Rrfq/cDBpi0ycNUhFAp5hGmFIf/u3Ol72pdr/MxF3qgwek5A2i
+         SlQTW3sCFS0UxINftvR9ief03PbV1fiyjZferC+QgdFvMpknr46FIg9k8YC+cFlkaq8w
+         fJHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766471644; x=1767076444;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1766486106; x=1767090906;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=048jzD37H8lsx/zZlGI/PEx4g5lnBiNM8RokzD3mdsY=;
-        b=JSSvHNZQyvrJDF1WZZJhZnPs7WmtBvP0nXKsdUZkLS/zG7ECPx2b6fXxDmDXPS7vss
-         WtN1Vu9aAWM6La4Zq1zt0765EoG1uFnM9c2ufOU06wT8LjZ1agjN6KnSqvZJ1iZHzuZg
-         CgyE3jW0uvV0WhCU4xPBVcJTw76DEEC9bBRtk36HDfN9MJfh595VsWDJjImyb7jVcf15
-         ZJhTx0rsB7YcaNWFiNVyFhpk2EaG5Jw1c6yIaAeqk5/Sdip/HPgE30cxJfwP1QRgjxtZ
-         K0T6i/qBDHp3kiWSrXEhqouzVHZiwD43BKr6Bf2slK695f+uRYpkmGGyc3ghtz5MwAVa
-         E3VA==
-X-Forwarded-Encrypted: i=1; AJvYcCVM3qPQKZw8+cC01pChN3lA8PZXnF1qgC/NYsLhi7A6wNNCwupWVHutbiqPsqO0C77g+mhsgbJ5u2gGMrE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy55zGMwssY1H0dpc9lVWGRDn6Q6RfdNaebmyT/biY2JUJqZK7b
-	TYCOlSSKVPAchblpg6CMulsUryE3dagbss5eGlULO573hWGcSobMJo8YVp2hNsFu
-X-Gm-Gg: AY/fxX7T8ZaJXqi16RkZvIcgSCy/R4xXJ4u5tKVo0It8jSPaSfQvl+7F7NXHgcds+IN
-	bQPSNL/BoedDRwO19a/35ikSVczGdH0qo7x12adTNpL7HZxDlGwMI1513ev7KkAoeLf+/mYL6Ax
-	+kWC87fc+zT9avttH1nq0mmlFdNl2+NBKtS+S605enMPAENPbq4IdqBXbPiKIyzmW9BT3ugW5kB
-	7A/uH9aL14M0pYJGI+kO4uAAxxwFnHAwjtIKZIgU2jqJRekjdR+hACuKng0MfFG0xuJPTy3qk0t
-	dvMvcLwuz8ekxGNOKtp3gnYdTFE8R/aCSBVXCriPvPGFDeN9/oilqC0T3O4/gq8AaV3WJTpv/md
-	JXXAbPiYAer9cjQ/TPUbdbCYvIKuzaeDUgcYumgBVKVRi2WF7YK5agB6aXV6bxv5yw6CESPXyte
-	nOEuDGgtWzEwxjDc5faAE=
-X-Google-Smtp-Source: AGHT+IFaFE0nlDnowk+Ou3U+M9eX56ZCvZ4aEX/mIAF0sQ5oS0z9Fh1vnyWDY8DQIpJC2t19J66zfQ==
-X-Received: by 2002:a05:651c:1506:b0:378:e055:3150 with SMTP id 38308e7fff4ca-38121566b66mr43783861fa.5.1766471643890;
-        Mon, 22 Dec 2025 22:34:03 -0800 (PST)
-Received: from localhost ([194.190.17.114])
-        by smtp.gmail.com with UTF8SMTPSA id 38308e7fff4ca-381224de6eesm33742031fa.6.2025.12.22.22.34.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Dec 2025 22:34:03 -0800 (PST)
-From: Askar Safin <safinaskar@gmail.com>
-To: gmazyland@gmail.com
-Cc: Dell.Client.Kernel@dell.com,
-	dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-lvm@lists.linux.dev,
-	linux-mm@kvack.org,
-	linux-pm@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	lvm-devel@lists.linux.dev,
-	mpatocka@redhat.com,
-	pavel@ucw.cz,
-	rafael@kernel.org,
-	safinaskar@gmail.com
-Subject: Re: [RFC PATCH 2/2] swsusp: make it possible to hibernate to device mapper devices
-Date: Tue, 23 Dec 2025 09:33:55 +0300
-Message-ID: <20251223063355.2740782-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <86300955-72e4-42d5-892d-f49bdf14441e@gmail.com>
-References: <86300955-72e4-42d5-892d-f49bdf14441e@gmail.com>
+        bh=SWwHgDUayFaSdSqe2T6d6UFJFmjd2ZLae5KHc+yXH7I=;
+        b=VoTOs1I4IcOD7eA9jgkCOCgwa8bIS+oaMnY1eRGMdq50kf9gGVl4G3JyWPhp++zwCh
+         UbmjX0X7PcwUPEWsPRrss8ZJ3WfLzAm7/JeMyJ30KNWu/weSvd3fRLSTGGifUv9LwAlx
+         a5pZXF5NKXwgyfQQ6ahnC7sxUdimwANLmpvhlBQCKGgvf981eWjZUn2/rAJ6tpLzSb9T
+         KUbCpLUgNGdJCjF6lAqSNnwr4Ym8Anb9A78Z8htjYD4tqpesRze0MWFm7dBv9+zkBTK1
+         Acqs4jT3WeB47LjGSSXiJ0Jn2mRkWpN/6l3sWjC/1gJxbty689oSx8V+ZuFt0e2G1FEJ
+         Chpw==
+X-Forwarded-Encrypted: i=1; AJvYcCXLO376Hr69bKo/UeYJdZBuq4lnHy9W6rcUMWHlPy24AFH8bUcVfXS078EKTRnVGwfWl3xgqgvz5w4qxIw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlwIlxBsywfygtPol6skr7RkBlH9oW73eDiDgmhstk9mMwBs3m
+	fJHL8LkZxlQvT5EEeKOG39C7HaQMpPtHytdc2p3jnVfuRmSVDPay9qj0AOHfCxaUp/4mzVd5Wym
+	in/Ir2VjEi8zB+voJ+u5ugrg8fMHKqJs3bS7ceZrrUQ==
+X-Gm-Gg: AY/fxX5vHkoaq8NKTRp4dBwE0ZeQvdP1utYSodCM7ZPrZPQ09X3uJnM/V8J5HFFgKw6
+	6uBAPq8/cqeHqfBA3g0+J3OrATe1vw7c1PUWHcXrEbyqb5Y5zMikyanY9ooBiXlDjPb4UJMc7qW
+	24DLPk+HSRDeJVDU+ncA5x3fOl8EFynbN3OGgGZ2E8l/xi49iIickGLGCQ1TpUrp0lUEylhjbG+
+	GZWCUBOj0ZRiyt11XI23vcHNyi5xswMwkef/LR/r2sIKa5OqqLvduEfEh+AHYZGmNcNzYMuq6ei
+	kDBaomnac/FcFMnJd5qtP10PFQU/niVID2ga4OzaLGIDSvlOyg==
+X-Google-Smtp-Source: AGHT+IEJHssgBNa10sdxlMZ0RfBcXjnBKXrp4KRUpqNBX0cKMLRNtJZXOvlDmXwgBRgg1wr13xel6K2BxjWOkHuOL+E=
+X-Received: by 2002:a17:907:a45:b0:b81:ec7c:31fd with SMTP id
+ a640c23a62f3a-b81ec7c321bmr332573366b.13.1766486105902; Tue, 23 Dec 2025
+ 02:35:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-18-robert.marko@sartura.hr> <20251216-endorse-password-ae692dda5a9c@spud>
+In-Reply-To: <20251216-endorse-password-ae692dda5a9c@spud>
+From: Robert Marko <robert.marko@sartura.hr>
+Date: Tue, 23 Dec 2025 11:34:55 +0100
+X-Gm-Features: AQt7F2rp1ybXWw2BWzfekoJJeczrMeV1nO2lvHuguNeXKU1awsBcuKjFcFE-_B8
+Message-ID: <CA+HBbNF-=W7A3Joftsqn+A6s170sqOZ77jpS105s5HPqkskQzA@mail.gmail.com>
+Subject: Re: [PATCH v2 18/19] dt-bindings: arm: microchip: document EV23X71A board
+To: Conor Dooley <conor@kernel.org>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
+	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com, 
+	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, 
+	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org, 
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com, 
+	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com, 
+	sboyd@kernel.org, richardcochran@gmail.com, wsa+renesas@sang-engineering.com, 
+	romain.sioen@microchip.com, Ryan.Wanner@microchip.com, 
+	lars.povlsen@microchip.com, tudor.ambarus@linaro.org, 
+	kavyasree.kotagiri@microchip.com, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-clk@vger.kernel.org, mwalle@kernel.org, luka.perkov@sartura.hr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Milan Broz <gmazyland@gmail.com>:
-> Anyway, my understanding is that all device-mapper targets use mempools,
-> which should ensure that they can process even under memory pressure.
+On Tue, Dec 16, 2025 at 6:32=E2=80=AFPM Conor Dooley <conor@kernel.org> wro=
+te:
+>
+> On Mon, Dec 15, 2025 at 05:35:35PM +0100, Robert Marko wrote:
+> > Microchip EV23X71A board is an LAN9696 based evaluation board.
+> >
+> > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> > ---
+> >  Documentation/devicetree/bindings/arm/microchip.yaml | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> >
+> > diff --git a/Documentation/devicetree/bindings/arm/microchip.yaml b/Doc=
+umentation/devicetree/bindings/arm/microchip.yaml
+> > index 910ecc11d5d7..b20441edaac7 100644
+> > --- a/Documentation/devicetree/bindings/arm/microchip.yaml
+> > +++ b/Documentation/devicetree/bindings/arm/microchip.yaml
+> > @@ -239,6 +239,14 @@ properties:
+> >            - const: microchip,lan9668
+> >            - const: microchip,lan966
+> >
+> > +      - description: The LAN969x EVB (EV23X71A) is a 24x 1G + 4x 10G
+> > +          Ethernet development system board.
+> > +      - items:
+> > +          - enum:
+> > +              - microchip,ev23x71a
+> > +              - microchip,lan9696
+>
+> This looks wrong, unless "microchip,lan9696" is a board (which I suspect
+> it isn't).
 
-Okay, I just read some more code and docs.
+Hi,
+No, LAN9696 is the exact SoC SKU used on the board.
+I will drop it in v3.
 
-dm-integrity fortunately uses bufio for checksums only.
+Regards
+Robert
+>
+> > +          - const: microchip,lan9691
+> > +
+> >        - description: The Sparx5 pcb125 board is a modular board,
+> >            which has both spi-nor and eMMC storage. The modular design
+> >            allows for connection of different network ports.
+> > --
+> > 2.52.0
+> >
 
-And bufio allocates memory without __GFP_IO (thus allocation should not
-lead to recursion). And bufio claims that "dm-bufio is resistant to allocation failures":
-https://elixir.bootlin.com/linux/v6.19-rc2/source/drivers/md/dm-bufio.c#L1603 .
 
-This still seems to be fragile.
 
-So I will change mode to 'D' and hope for the best. :)
-
--- 
-Askar Safin
+--=20
+Robert Marko
+Staff Embedded Linux Engineer
+Sartura d.d.
+Lendavska ulica 16a
+10000 Zagreb, Croatia
+Email: robert.marko@sartura.hr
+Web: www.sartura.hr
