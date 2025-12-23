@@ -1,89 +1,127 @@
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4020334372;
-	Tue, 23 Dec 2025 12:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E171DE4CE;
+	Tue, 23 Dec 2025 14:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766493432; cv=none; b=TnPbni6pbOetojivg3KsiE64keT3S/IQ1u7ernBys7UR5jlyRPL6iz3L9i6gLK5b3QzcZlahAsfN6RDpbMEntipmrcvkY4/fEwxyt86w1KTnz6zviMGi2I/lW2EW8mk+7Pn4T3DhO5Gu4kMlGtySmU74an3t7/qxyoIJXQ4ABkg=
+	t=1766501031; cv=none; b=diOwc07pYdXh/CE6PdckCZ+vuIr2S1DP7rpnEXSrcnEwec5mo7V89RloxCP01LztlMCLs18rTEAd496xWPsmWSIK2XpfKWUKTUbLAQZU9zkKIUwdbnPrK1DhdgU4uHbg87+T21A7vvmH3R4JkGUNcwwWw1KGYX9OwMVAqjKDJQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766493432; c=relaxed/simple;
-	bh=U0mlBN/a9wqcJASzRDO6wPqklOXQbPIDla5bEny9SuM=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=qG7yo0pF88lP0WZkK7pJvKt9VQrWFT6x01vrbR/r9pSDPMkQXxjcJmxXMUqGiXwRHK2/usYcEFA1ZIr3nFk3D/AZM6smBfctJ18m5fofgUQJmvM5+PTBGeAQ6qgfXoixm7IESmkqPZ2sMwsFXGFajH9YW3tMP+2bjTM1TbcoMUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=UschpVYa; arc=none smtp.client-ip=113.46.200.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1766501031; c=relaxed/simple;
+	bh=dB/+cWWuWt5zZaOF4WBQgVGeqRwXMeabHbV/nLVmbvY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=afUMqXPURdEdsimcOfigUyw5QTDYU7iMSSmt2aHwZ7z7fgWsfGcWOSA9xefcJgLg7etEHbptUaWlqGnFyqaj8YIapBwr8GRVcwqRgZU/lJmBtdyO53iND/d2BoxdzRg8ANHYnonqNf/hLURzHfmK2YT0k/Zmab1RHv7W2ALggcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MfAKWHuF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="UschpVYa"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=4eMQndOFhFyDdiBLQYcmtuiUxJsRkqaeHDw00uhkZjY=;
-	b=UschpVYavj7ulCG+2AsQNwg+707gf8EUgyRHt9hOsM4BensGDSQXA49o83FRi5j/YuWjo7S2Z
-	9inVBRRzv1DzSTebFWxsl/C3xXq7CI8ZRuy6wIJDNJG9PV4HIozaPcrd0Aic8tD0iAXgzdYOxty
-	DYSCdnabxWsxDUWkr9YXMM0=
-Received: from mail.maildlp.com (unknown [172.19.163.214])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4dbDvm6Gsyz1cyPx;
-	Tue, 23 Dec 2025 20:33:56 +0800 (CST)
-Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
-	by mail.maildlp.com (Postfix) with ESMTPS id C09494056C;
-	Tue, 23 Dec 2025 20:37:02 +0800 (CST)
-Received: from [10.174.178.219] (10.174.178.219) by
- kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 23 Dec 2025 20:37:01 +0800
-Subject: Re: [PATCH] crypto: hisilicon/sgl - fix inconsistent map/unmap
- direction issue
-To: Chenghai Huang <huangchenghai2@huawei.com>
-CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>
-References: <20251219033619.1871450-1-huangchenghai2@huawei.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <7569c3cd-92ea-81c1-b57e-cebcacee66e7@huawei.com>
-Date: Tue, 23 Dec 2025 20:37:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MfAKWHuF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 193F0C113D0;
+	Tue, 23 Dec 2025 14:43:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766501030;
+	bh=dB/+cWWuWt5zZaOF4WBQgVGeqRwXMeabHbV/nLVmbvY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MfAKWHuFbtD0xW1u7oSpiVKbCSBZjKXbHZgHHl/15nnW/uyFFf4XJP00SoR3z9JdD
+	 rYuxJy4cH27U8+zKbhG9PznjFiDGu1ksCvBhMD3oJNWdMMZASOUQMjEAt3urdm9mD/
+	 bHhglQTjnotVIWBdxXhf5rB20ugMOrsi+w8SGJeJyft2KAgP42HsndKPDkA3fEyKC6
+	 qrkF48gedAccR7Gu+3jMczbHecCVYIrFS8TL1t1oj9DsyxGEVyc/jq3ddSmGNNhEcq
+	 iXl7U4o2uZdWtSEG6/m1F/+GqTMGBBhPJN8lA5bBa172Z5ogGGJV9RTOqtTP98FPAF
+	 hNURvzP+WpGwQ==
+Date: Tue, 23 Dec 2025 14:43:39 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
+	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com,
+	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
+	gregkh@linuxfoundation.org, jirislaby@kernel.org,
+	mturquette@baylibre.com, sboyd@kernel.org, richardcochran@gmail.com,
+	wsa+renesas@sang-engineering.com, romain.sioen@microchip.com,
+	Ryan.Wanner@microchip.com, lars.povlsen@microchip.com,
+	tudor.ambarus@linaro.org, kavyasree.kotagiri@microchip.com,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-clk@vger.kernel.org, mwalle@kernel.org,
+	luka.perkov@sartura.hr
+Subject: Re: [PATCH v2 18/19] dt-bindings: arm: microchip: document EV23X71A
+ board
+Message-ID: <20251223-chrome-simile-8cf1e9afe155@spud>
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-18-robert.marko@sartura.hr>
+ <20251216-endorse-password-ae692dda5a9c@spud>
+ <CA+HBbNF-=W7A3Joftsqn+A6s170sqOZ77jpS105s5HPqkskQzA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20251219033619.1871450-1-huangchenghai2@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemk200017.china.huawei.com (7.202.194.83)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pLErx9Z52ADLmcrz"
+Content-Disposition: inline
+In-Reply-To: <CA+HBbNF-=W7A3Joftsqn+A6s170sqOZ77jpS105s5HPqkskQzA@mail.gmail.com>
 
-On 2025/12/19 11:36, Chenghai Huang wrote:
-> Ensure that the direction for dma_map_sg and dma_unmap_sg is
-> consistent.
-> 
-> Fixes: 2566de3e06a3 ("crypto: hisilicon - Use fine grained DMA mapping direction")
-> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
-> ---
->  drivers/crypto/hisilicon/sgl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
-> index 24c7b6ab285b..d41b34405c21 100644
-> --- a/drivers/crypto/hisilicon/sgl.c
-> +++ b/drivers/crypto/hisilicon/sgl.c
-> @@ -260,7 +260,7 @@ hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev, struct scatterlist *sgl,
->  	return curr_hw_sgl;
->  
->  err_unmap:
-> -	dma_unmap_sg(dev, sgl, sg_n, DMA_BIDIRECTIONAL);
-> +	dma_unmap_sg(dev, sgl, sg_n, dir);
->  
->  	return ERR_PTR(ret);
->  }
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+--pLErx9Z52ADLmcrz
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for fixing it!
+On Tue, Dec 23, 2025 at 11:34:55AM +0100, Robert Marko wrote:
+> On Tue, Dec 16, 2025 at 6:32=E2=80=AFPM Conor Dooley <conor@kernel.org> w=
+rote:
+> >
+> > On Mon, Dec 15, 2025 at 05:35:35PM +0100, Robert Marko wrote:
+> > > Microchip EV23X71A board is an LAN9696 based evaluation board.
+> > >
+> > > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> > > ---
+> > >  Documentation/devicetree/bindings/arm/microchip.yaml | 8 ++++++++
+> > >  1 file changed, 8 insertions(+)
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/arm/microchip.yaml b/D=
+ocumentation/devicetree/bindings/arm/microchip.yaml
+> > > index 910ecc11d5d7..b20441edaac7 100644
+> > > --- a/Documentation/devicetree/bindings/arm/microchip.yaml
+> > > +++ b/Documentation/devicetree/bindings/arm/microchip.yaml
+> > > @@ -239,6 +239,14 @@ properties:
+> > >            - const: microchip,lan9668
+> > >            - const: microchip,lan966
+> > >
+> > > +      - description: The LAN969x EVB (EV23X71A) is a 24x 1G + 4x 10G
+> > > +          Ethernet development system board.
+> > > +      - items:
+> > > +          - enum:
+> > > +              - microchip,ev23x71a
+> > > +              - microchip,lan9696
+> >
+> > This looks wrong, unless "microchip,lan9696" is a board (which I suspect
+> > it isn't).
+>=20
+> Hi,
+> No, LAN9696 is the exact SoC SKU used on the board.
+> I will drop it in v3.
 
-Zenghui
+Instead of dropping it, this should become an items list with 3 consts I
+think.
+
+--pLErx9Z52ADLmcrz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaUqqhAAKCRB4tDGHoIJi
+0kmEAPwMbSydapbKFensNMM3LBSQavqvbhont2R2vwPmXc9oUAEA++sW5lHhwJ+e
+9LfhPrkmqekkXDEYUUHTET78Ply7Xgw=
+=FgUt
+-----END PGP SIGNATURE-----
+
+--pLErx9Z52ADLmcrz--
