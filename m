@@ -1,78 +1,130 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B9F35958;
-	Wed, 24 Dec 2025 02:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6F032ED5D
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Dec 2025 08:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766544731; cv=none; b=a3bdh6HmOSRS+x3zsIPwZ9t3uRrNFFPhroEDFIBoVeGwBGKSpj2NO6RJhxHcXHmkZ3mO2Yxm/Cj0HzYSiqYbvrt9IJyX2Y2Q6TpN+5drH3nbhoRPF4S3XIIzx6FgOeMENfxAzGIsU3nsOE12OhUjDHwFCvYTGuvtKoJpp5pQ6DQ=
+	t=1766566700; cv=none; b=qDeLnAqOPlWdukBMuhcdtkIfKRUyuwhZDtUjt0D2FGnBrVI9JttpGBkG0jV1MHbT/NSX5zJxppoD3V+bm5JemxwggwJjj4R8OJ5gnAVlq9OPVCeI6JgKREiG0xwBt4rYvy2ML3P9x9v+loARNwlivPgexEAhEg417pjHDhpWNBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766544731; c=relaxed/simple;
-	bh=rIobMIBytxHqliigfzI/GoLxJcNn2KjKt33gsAm/H9w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rJ96I6eRCwQ7g24z1bT8HXDAGr7fmrBtr7EyWj3RkScERKS0LFH8Fx0/WV47lxH8Ue8J3TbtU1RBKHMtKy6n8DlvPAYK6O7pkE+4Vx0sW6rCbkwy5iVfdeSpiFPE2lpjAFdvFFcdRhSht0EWFeBA3VWizowSd60scrxBTzQ9ouw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=qik3LBnb; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1766566700; c=relaxed/simple;
+	bh=Agykw1UWdIlmNGGbRoXH+kiyz33Jt+a4FoRWg6PklU4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VDGJ9Hn6f3v600DYjQeuJJ+3DnuJBo6kLx0v5Ta4x5lle3TT54UfJcFy3cWG2x0Rdt7F4ZCqG4SEYlLtjW7MplPvZERX9VJGgwHoUEkNR16zocVgZZaRgD8wVjv2rfp7Npr0UcrdzHcfutrprg8YsCjcTplTyAqH7duP4g7CqLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uk8aS6CN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="qik3LBnb"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=/yPp9KdF5LmumiXREGGXTUo1GNMfe5ZLLyTJFeO5TDs=; 
-	b=qik3LBnb2NJ3H6tqyq/kmCsfxwxdUdbbbVGoa/5PJuGeG8UjEd/U7LtelUxRXJQ9zCucF+tdR1X
-	m7EDSUxIzBvtOsZUIi7+uYkjdj5zwDCikEZ/6l8rVFICcbQ/+3koW7rSHNHeRsxI0pI5valbPEb5u
-	JrIRjy1o4Wx+6C7QdzInDJqRGdFGeY1ptkEDZhbRXYvoLm9wqYFdRz95m2RL0YIwrLyh1pBOSekm+
-	SH7pLtuKM85qUAZs8VNSUCA8GAajJoVHjzspzKZK8bPf9Bgynw2ZRYvSMCM/78BNWA4OdFkr0QE7d
-	gWUe1aMQC+c2QWn0yV60OuQ1m8tCW2OqQT5w==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vYEyr-00CFU7-05;
-	Wed, 24 Dec 2025 10:52:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 24 Dec 2025 10:52:05 +0800
-Date: Wed, 24 Dec 2025 10:52:05 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: huangchenghai <huangchenghai2@huawei.com>
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, liulongfang@huawei.com,
-	qianweili@huawei.com, linwenkai6@hisilicon.com,
-	wangzhou1@hisilicon.com
-Subject: Re: [PATCH] crypto: hisilicon/qm - fix incorrect judgment in
- qm_get_complete_eqe_num()
-Message-ID: <aUtVVZq-Jfmse8OI@gondor.apana.org.au>
-References: <20251120132124.1779549-1-huangchenghai2@huawei.com>
- <aUT3IW8vlYKwWDt2@gondor.apana.org.au>
- <9e9b2fc3-7d6b-4ac2-86fe-2d88fbd2ca44@huawei.com>
- <aUjHoK9DoVIJj6oP@gondor.apana.org.au>
- <cde67fee-c90a-437e-a8be-a27865f8a2ed@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uk8aS6CN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26138C19423
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Dec 2025 08:58:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766566700;
+	bh=Agykw1UWdIlmNGGbRoXH+kiyz33Jt+a4FoRWg6PklU4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Uk8aS6CNHa2N9goRBT70lisCoGZ/qslnwI/4uAOjYVi6An1lxsPrxD/36VGZnKGKv
+	 M0gfjH0vjkwRugI3jokP4VNSKo0lMjcMD/U25o2KA+rX9/z/yloiIdFKOOoxuD8SiB
+	 y051UzPLRvcLRURh44irYqegoUz4a4MKcruFAFeqZZzrlDy4rbrX9qHLkzaIZ8iKho
+	 fbH9Lhg8dnQ4uSjTc3+vnFJtxCXNnygVfUEmZt2anTbBQIeo5+oKELZm7odFlWA/Oe
+	 IMTkg/+sopwcg7WM8Myrw2U8cfKHcyade3Tzgp3BoEg8fikYJeT+tcdXSqUZRlIorI
+	 yKFWHGZNbombg==
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-37bac34346dso42652231fa.2
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Dec 2025 00:58:20 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWNbwiXGPDvbZpBAAV+3w5Qb93mM+j4dnDzGu5OKdnjv6l7P4STh5Rg0BIA1NOszJQNSN//Uh1MZFj9k9Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqEDNQhYHu2a9t41lluwxzng8dvS/62uf4tysDVfg6EW5henx8
+	fkwZ8xx/PbeMUfMZfQzWMygELHB2q4mzHCxoF4l52XguBUSrSdVK4VBotDG7fEaeRSshiNurKeZ
+	AcnyaqaL5nc+Hr2M8no5PHtQWiO+092RMKFfdfjDngA==
+X-Google-Smtp-Source: AGHT+IEingVT+n+8YdVgTso4ZzTuzbOc22MHQbhbirPXhrT8luipXdASVItpQL6PNdBu/f24535BGV92RvU1trjKZ4c=
+X-Received: by 2002:a05:651c:1541:b0:37f:aa44:2cd6 with SMTP id
+ 38308e7fff4ca-38121614ef5mr54061241fa.28.1766566698742; Wed, 24 Dec 2025
+ 00:58:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cde67fee-c90a-437e-a8be-a27865f8a2ed@huawei.com>
+References: <20251128-qcom-qce-cmd-descr-v9-0-9a5f72b89722@linaro.org>
+ <20251128-qcom-qce-cmd-descr-v9-3-9a5f72b89722@linaro.org>
+ <aUFX14nz8cQj8EIb@vaman> <CAMRc=MetbSuaU9VpK7CTio4kt-1pkwEFecARv7ROWDH_yq63OQ@mail.gmail.com>
+ <aUF2gj_0svpygHmD@vaman> <CAMRc=McO-Fbb=O3VjFk5C14CD6oVA4UmLroN4_ddCVxtfxr03A@mail.gmail.com>
+ <aUpyrIvu_kG7DtQm@vaman> <CAMRc=Md6ucK-TAmtvWMmUGX1KuVE9Wj_z4i7_-Gc7YXP=Omtcw@mail.gmail.com>
+ <c2ctqk7z6n5mmrr2namz4psmpcohefyv6qu6gkycqykzgdpz2u@2qwils6lwwz4>
+In-Reply-To: <c2ctqk7z6n5mmrr2namz4psmpcohefyv6qu6gkycqykzgdpz2u@2qwils6lwwz4>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Wed, 24 Dec 2025 09:58:05 +0100
+X-Gmail-Original-Message-ID: <CAMRc=Md8nAVWvKK=Vib7TKVzC15M4FmET7TCCdrdS74DKQQjzg@mail.gmail.com>
+X-Gm-Features: AQt7F2qHo8ax2BJ5527NPXgH7eTCAHicS5tGpM49gAynivHaNzKegq2WIJRBUwc
+Message-ID: <CAMRc=Md8nAVWvKK=Vib7TKVzC15M4FmET7TCCdrdS74DKQQjzg@mail.gmail.com>
+Subject: Re: [PATCH v9 03/11] dmaengine: qcom: bam_dma: implement support for
+ BAM locking
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
+	Daniel Perez-Zoghbi <dperezzo@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
+	Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 23, 2025 at 09:46:31AM +0800, huangchenghai wrote:
+On Tue, Dec 23, 2025 at 9:19=E2=80=AFPM Dmitry Baryshkov
+<dmitry.baryshkov@oss.qualcomm.com> wrote:
 >
-> Commit f5a332980a68 ("crypto: hisilicon/qm - add the save operation of eqe
-> and aeqe")
-> 
-> introduced an incorrect condition check, which prevents
-> 
-> the while loop from being entered to handle interrupt tasks.
-> 
-> Normally, the code should enter the while loop to process these tasks.
+> On Tue, Dec 23, 2025 at 01:35:30PM +0100, Bartosz Golaszewski wrote:
+> > On Tue, Dec 23, 2025 at 11:45=E2=80=AFAM Vinod Koul <vkoul@kernel.org> =
+wrote:
+> > >
+> > > On 17-12-25, 15:31, Bartosz Golaszewski wrote:
+> > > > On Tue, Dec 16, 2025 at 4:11=E2=80=AFPM Vinod Koul <vkoul@kernel.or=
+g> wrote:
+> > >
+> > > > >
+> > > > > I am trying to understand what the flag refers to and why do you =
+need
+> > > > > this.. What is the problem that lock tries to solve
+> > > > >
+> > > >
+> > > > In the DRM use-case the TA will use the QCE simultaneously with lin=
+ux.
+> > >
+> > > TA..?
+> >
+> > Trusted Application, the one to which we offload the decryption of the
+> > stream. That's not really relevant though.
+> >
+> > >
+> > > > It will perform register I/O with DMA using the BAM locking mechani=
+sm
+> > > > for synchronization. Currently linux doesn't use BAM locking and is
+> > > > using CPU for register I/O so trying to access locked registers wil=
+l
+> > > > result in external abort. I'm trying to make the QCE driver use DMA
+> > > > for register I/O AND use BAM locking. To that end: we need to pass
+> > > > information about wanting the command descriptor to contain the
+> > > > LOCK/UNLOCK flag (this is what we set here in the hardware descript=
+or)
+> > > > from the QCE driver to the BAM driver. I initially used a global fl=
+ag.
+> > > > Dmitry said it's too Qualcomm-specific and to use metadata instead.
+> > > > This is what I did in this version.
+> > >
+> > > Okay, how will client figure out should it set the lock or not? What =
+are
+> > > the conditions where the lock is set or not set by client..?
+> > >
+> >
+> > I'm not sure what you refer to as "client". The user of the BAM engine
+> > - the crypto driver? If so - we convert it to always lock/unlock
+> > assuming the TA *may* use it and it's better to be safe. Other users
+> > are not affected.
+>
+> Just to confirm, we support QCE since IPQ4019 and MSM8996. Is lock
+> semantics supported on those platforms?
+>
 
-I see.  The original patch description threw me off as I thought
-the loop condition was simply redundant, rather than inverted :)
+Yes, locking is supported on BAM since version 1.4. The only user of
+this feature right now is the crypto engine and even on IPQ4019 and
+MSM8996 the crypto BAM is version 1.7.
 
-I will add this for 6.19.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Bartosz
