@@ -1,41 +1,40 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15AC5464D
-	for <linux-crypto@vger.kernel.org>; Fri, 26 Dec 2025 00:38:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EF410E3
+	for <linux-crypto@vger.kernel.org>; Fri, 26 Dec 2025 00:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766709519; cv=none; b=DdLD1144ofe2vEdKmoN+Z6f/ReKccFWi2Gk1eEb1twFvKMSirfsN96M2g9ggqGw6L6unRYq/493jOX+SdwCwzDiBoXeFbyq3aOC1u91PAFbFRNqbKJfHmMKDfaiod7eACgpt7kctGRqFmjWc59LOjLwqEDyRggdkOoOdHe2ML/0=
+	t=1766709520; cv=none; b=dRrL8LMBY8DrTb2qW7EA3jQI6HVjyNN1D0NOGJ3nbjKw4E3v2SWYpjxD2Lsw86JtzvA6Jp7Q9XsYXznDgSRIQIx1gnZ8niZTGpMrzz7kLQtvTNLhGAXqfaeDOorD7VNcaB/UoRA6+WyHtdArfoNSDPkvxWkMhFcyOOzjeFvHBvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766709519; c=relaxed/simple;
-	bh=P2E41+jB7chfJxVv0QbxiYnG1IOSZ9kULiROpAN8asI=;
-	h=Date:Message-ID:In-Reply-To:References:From:Subject:To:Cc; b=DVvun7W1JCXv2f55KuRz8delAVGpjufoeX9nbiGte4SGQNk2hw94CkgFkc9/61OmaMQI4FN6/NS/w4OEtFsBBLN61V3xi3OHyKK7TvCdMVHlzlTY4z/PgtejOXcsRGHVEfOQ7mqmPuHyzxJ6JrpNTcSbd+ZN0NHCQRQciKmTd7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=YuO7IYGf; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1766709520; c=relaxed/simple;
+	bh=A2aqbJ/gxOHq+PdOw00dvo2hkkqQhOJr86ESqRDO0AQ=;
+	h=Date:Message-ID:In-Reply-To:References:From:Subject:To:Cc; b=mnIULsIT3IobqUuMRz7SEhVW/iuM8vVIBOKC1n5zzfycEsT37TLE1gjXVVzttVEXGeBYWay57S3m9sIFJg47mHSo6DmaY3rAF5tRocINl7pvHiKJxAgLvYxiW9tX280+iCTdYHfyHi1sIZj9gCf7PiWJgPKUVV0w7eWrd5Y+TwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=NplpmI47; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="YuO7IYGf"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="NplpmI47"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=Cc:To:Subject:From:References:In-Reply-To:
 	Message-ID:Date:cc:to:subject:message-id:date:from:content-type:mime-version:
-	reply-to; bh=y8VLx11pNosaPBbmk98BXJQc1kgij7aVUDvbrn8CCG4=; b=YuO7IYGfWTgmZ+xw
-	z/lmYVYrwk5/pfcuAg9y+UZbAK72OzXmLiCgE9qx2Yu+wHwUpEdlN4qlBkq+Fq40M+xyY9ooJU48R
-	NG1l+91SE01zqC+pf3onw5jDgAR7/w4IuR0UbToFmlJ/nsyzyBVEgk8d0IxlHhbwgy72SvjOCIrFW
-	a8hLJkFUzW2lgjhuHgXkgiNrz7AI9oIi9UCvJMKOojbUpWfU5x7W7CCJ8LrBmcR0FUL8MEVYnZKt3
-	Idzs3YSAntlDnqASyzgNhye4jFLqoTurhvyEumnv+4vrAkK7XFTYJp87fI15ERpV5SZ51OB7GdhPz
-	FpmIU1KkO5Yb4KenZQ==;
+	reply-to; bh=ojir2qU/0QMQ1JvI7qWaceIfsgwkcbc/6wy+wIgu9Uc=; b=NplpmI47ANRFrTYt
+	CwMuTxBXZIQ/+HUKtuF3JoY1MoICD2vc5dBi3cF5YUgl4KVvLcCiUVruKHjJ6Kk3IP2t6VVrohJ/A
+	py9VrnyV9EKDG59Y1u9JY/hh9CgcMWuTQEsySGss8iR8fh16KDysXKUVJRRa8JfpiE+C7ZBlib9pp
+	kZUYdDdCUTH4L2CR8lC6XRM8Vy+IYBlcPgjhPp3tpAzTElpb5aosXOsNpeIPNycXCQE5jeny0P4M8
+	YF4rxbK8Xat4DlL5iR0hbKAS3d0Y3nPPCv1+aZN4aRYuQ2folSdzo1RhenLCOSkxWAPlEmJnJ0tNy
+	aKRxzaxBac19XhkFXw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vYvqb-00CY7e-15;
-	Fri, 26 Dec 2025 08:38:26 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Dec 2025 08:38:25 +0800
-Date: Fri, 26 Dec 2025 08:38:25 +0800
-Message-ID: <9565daceae6efbac8ba35c291e7f9370ecfc83d6.1766709379.git.herbert@gondor.apana.org.au>
+	id 1vYvqd-00CY7q-27;
+	Fri, 26 Dec 2025 08:38:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Dec 2025 08:38:27 +0800
+Date: Fri, 26 Dec 2025 08:38:27 +0800
+Message-ID: <0533ee1ec37d82fd22a74921cf6a1f3dc9d022b0.1766709379.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1766709379.git.herbert@gondor.apana.org.au>
 References: <cover.1766709379.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/3] crypto: acomp - Define a unit_size in struct acomp_req to
- enable batching.
+Subject: [PATCH 2/3] crypto: acomp - Add bit to indicate segmentation support
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: yosry.ahmed@linux.dev, nphamcs@gmail.com, chengming.zhou@linux.dev, Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 Precedence: bulk
@@ -44,94 +43,63 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+Add a bit to the crypto_alg flags to indicate support for segmentation.
+Also add a helper for acomp to test whether a given tfm supports
+segmentation.
 
-We add a new @unit_size data member to struct acomp_req along with a
-helper function acomp_request_set_unit_size() for kernel modules to set
-the unit size to use while breaking down the request's src/dst
-scatterlists.
-
-An acomp_alg can implement batching by using the @req->unit_size to
-break down the SG lists passed in via @req->dst and/or @req->src, to
-submit individual @req->slen/@req->unit_size compress jobs or
-@req->dlen/@req->unit_size decompress jobs, for batch compression and
-batch decompression respectively.
-
-In case of batch compression, the folio's pages for the batch can be
-retrieved from the @req->src scatterlist by using an struct sg_page_iter
-after determining the number of pages as @req->slen/@req->unit_size.
-
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- include/crypto/acompress.h | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ include/crypto/algapi.h             | 5 +++++
+ include/crypto/internal/acompress.h | 5 +++++
+ include/linux/crypto.h              | 3 +++
+ 3 files changed, 13 insertions(+)
 
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-index 9eacb9fa375d..0f1334168f1b 100644
---- a/include/crypto/acompress.h
-+++ b/include/crypto/acompress.h
-@@ -79,6 +79,7 @@ struct acomp_req_chain {
-  * @dvirt:	Destination virtual address
-  * @slen:	Size of the input buffer
-  * @dlen:	Size of the output buffer and number of bytes produced
-+ * @unit_size:  Unit size for the request for use in batching
-  * @chain:	Private API code data, do not use
-  * @__ctx:	Start of private context data
-  */
-@@ -94,6 +95,7 @@ struct acomp_req {
- 	};
- 	unsigned int slen;
- 	unsigned int dlen;
-+	unsigned int unit_size;
- 
- 	struct acomp_req_chain chain;
- 
-@@ -328,9 +330,43 @@ static inline void acomp_request_set_callback(struct acomp_req *req,
- {
- 	flgs &= ~CRYPTO_ACOMP_REQ_PRIVATE;
- 	flgs |= req->base.flags & CRYPTO_ACOMP_REQ_PRIVATE;
-+	req->unit_size = 0;
- 	crypto_request_set_callback(&req->base, flgs, cmpl, data);
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 05deea9dac5e..7d406cfe5751 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -280,6 +280,11 @@ static inline bool crypto_tfm_req_virt(struct crypto_tfm *tfm)
+ 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_REQ_VIRT;
  }
  
-+/**
-+ * acomp_request_set_unit_size() -- Sets the unit size for the request.
-+ *
-+ * As suggested by Herbert Xu, this is a new helper function that enables
-+ * batching for zswap, IPComp, etc.
-+ *
-+ * Example usage model:
-+ *
-+ * A module like zswap that wants to use batch compression of @nr_pages with
-+ * crypto_acomp must create an output SG table for the batch, initialized to
-+ * contain @nr_pages SG lists. Each scatterlist is mapped to the nth
-+ * destination buffer for the batch.
-+ *
-+ * An acomp_alg can implement batching by using the @req->unit_size to
-+ * break down the SG lists passed in via @req->dst and/or @req->src, to
-+ * submit individual @req->slen/@req->unit_size compress jobs or
-+ * @req->dlen/@req->unit_size decompress jobs, for batch compression and
-+ * batch decompression respectively.
-+ *
-+ * This API must be called after acomp_request_set_callback(),
-+ * which sets @req->unit_size to 0.
-+ *
-+ * @du would be PAGE_SIZE for zswap, it could be the MTU for IPsec.
-+ *
-+ * @req:	asynchronous compress request
-+ * @du:		data unit size of the input buffer scatterlist.
-+ */
-+static inline void acomp_request_set_unit_size(struct acomp_req *req,
-+					       unsigned int du)
++static inline bool crypto_tfm_req_seg(struct crypto_tfm *tfm)
 +{
-+	req->unit_size = du;
++	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_REQ_SEG;
 +}
 +
- /**
-  * acomp_request_set_params() -- Sets request parameters
-  *
+ static inline u32 crypto_request_flags(struct crypto_async_request *req)
+ {
+ 	return req->flags & ~CRYPTO_TFM_REQ_ON_STACK;
+diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
+index 2d97440028ff..366dbdb987e8 100644
+--- a/include/crypto/internal/acompress.h
++++ b/include/crypto/internal/acompress.h
+@@ -188,6 +188,11 @@ static inline bool crypto_acomp_req_virt(struct crypto_acomp *tfm)
+ 	return crypto_tfm_req_virt(&tfm->base);
+ }
+ 
++static inline bool crypto_acomp_req_seg(struct crypto_acomp *tfm)
++{
++	return crypto_tfm_req_seg(&tfm->base);
++}
++
+ void crypto_acomp_free_streams(struct crypto_acomp_streams *s);
+ int crypto_acomp_alloc_streams(struct crypto_acomp_streams *s);
+ 
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index a2137e19be7d..89b9c3f87f4d 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -139,6 +139,9 @@
+ /* Set if the algorithm cannot have a fallback (e.g., phmac). */
+ #define CRYPTO_ALG_NO_FALLBACK		0x00080000
+ 
++/* Set if the algorithm supports segmentation. */
++#define CRYPTO_ALG_REQ_SEG		0x00100000
++
+ /* The high bits 0xff000000 are reserved for type-specific flags. */
+ 
+ /*
 -- 
 2.47.3
 
