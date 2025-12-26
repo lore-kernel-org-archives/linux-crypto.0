@@ -1,72 +1,66 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E02199EAD;
-	Thu, 25 Dec 2025 20:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FADA1C695
+	for <linux-crypto@vger.kernel.org>; Fri, 26 Dec 2025 00:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766694755; cv=none; b=Mf0kOTQmJPcrnNWLyGq51zyoRZ3gBF6k1aZv8+4Sihogbobtsbng1+WEF6+zGkN/m5D+1RQamRluNsLxYsqRI9EP5dJpQTj8KcM5et2pqEV5Rz72YvQM/V0boqLL+m2DSRL3ybldM2bwCOwYKhGrGlv0F+8MhcTHVDPLc4bpz2M=
+	t=1766709517; cv=none; b=eax3DTOJx+rTFiQIrImAFjLNnouxdyHz3jan9pyrsQnNNNyWf82JBDDByjueZ2oqMPfu0qRJ7ipExQu/Qanw/JKSy+hvgaC9Prz4BHrf+ETtlssy1mVR3fm1O6tPN1iF9s+sHoEPaOtQAF+xq0lt1lZ0ytwHNmUVGRZX6NGJIP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766694755; c=relaxed/simple;
-	bh=OlMwKRemqpxu1qixxaUujZZmxWqSk+fU5T6TjQIfHes=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dldVZvODbPjl2lPSJGOkeRC9SNyn2aEMQWmeQuQ/Olb26j6ti0rROgbWqmQ05JC8sAE+anPUnkycR7YOKQ4emaS2cDInD3CpFmTqRqL5d7LOeweRC80wBXTvdO7WKA5cg0KXk86iAMX2rEZuM6gHqC8cRc/cJaGslNrBr7hmJ5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D6VDcYXt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1766709517; c=relaxed/simple;
+	bh=1U1BeDwk8rP0Kx+H6mfGncFfE5g7C2FhV8hvC1vcYyo=;
+	h=Date:Message-ID:From:Subject:To:Cc; b=jDhG6GUEJVlYIeXmfjU1Zfbirysa5X7nTQT1xxzS4JOjCGMtinr22nO6JfuhR+HJBEcJBfvsU4WWu5egvLQMDwN/ijK0UMvH0O+m9hrkU1o5kdsYcQGfa599V7EqM2PxuyhBggEN2VTqp8Xy1rZ8zyWThdANzH1uViexmeTqg48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=NxMW8Qsx; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6VDcYXt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E902FC4CEF1;
-	Thu, 25 Dec 2025 20:32:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766694754;
-	bh=OlMwKRemqpxu1qixxaUujZZmxWqSk+fU5T6TjQIfHes=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D6VDcYXtHs6fSm0cvzASNAmckB9F9WPZrJj6GFS1DWeG5AyUtnRS+HTxeEn3lfE0j
-	 X0mk5OLc648E+zRf8EuPlbe4TQjE9uTUaOHE2z+vIO9ZWoFEXzjBUIHF9CG4dzPQve
-	 v83KQkZpwBtEZofvB9fY2BqXuG53ojlepTiUErcgXxbaMiU8EDiz5Q7rpj3SvwxMIA
-	 wcqT0kw6j7feBvZO7hZ35tl45EOx8RVFm5K59tqICB2GXAgBdzsEOQf6hJnpK1sT9v
-	 SP56DGjvycoPe2bHyASKmklE74IU5IZSqnnfhTjhhOa8oWJicVV2cLVw9to6ctdIHr
-	 qTvx4sCsAld6A==
-Date: Thu, 25 Dec 2025 21:32:31 +0100
-From: Andi Shyti <andi.shyti@kernel.org>
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, lee@kernel.org, 
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	linusw@kernel.org, Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
-	UNGLinuxDriver@microchip.com, olivia@selenic.com, radu_nicolae.pirea@upb.ro, 
-	richard.genoud@bootlin.com, gregkh@linuxfoundation.org, jirislaby@kernel.org, 
-	broonie@kernel.org, mturquette@baylibre.com, sboyd@kernel.org, 
-	lars.povlsen@microchip.com, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-clk@vger.kernel.org, luka.perkov@sartura.hr, 
-	Conor Dooley <conor.dooley@microchip.com>
-Subject: Re: [PATCH v3 06/15] dt-bindings: i2c: atmel,at91sam: add
- microchip,lan9691-i2c
-Message-ID: <plir5hx4hpgrj4emspyu3wyvpnax6zz6tlattwq4l2ye3hohkr@ysbjwf2p53lh>
-References: <20251223201921.1332786-1-robert.marko@sartura.hr>
- <20251223201921.1332786-7-robert.marko@sartura.hr>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="NxMW8Qsx"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=Cc:To:Subject:From:Message-ID:Date:cc:to:
+	subject:message-id:date:from:content-type:in-reply-to:references:mime-version
+	:reply-to; bh=sDXtI5CIaDi4PBETsXiFYDaLVc3DtB6P0GruglBPDmc=; b=NxMW8QsxPQtNHWu
+	eylMzF5LV3ZuBB9dsQvIDE/GU08Om5K53QYNKU9oP1dxEiXWWp0JCqA1UrQRB7hhq6LE5y4P57cBf
+	HdLJnHD/w0f4MnJ5aSgoV5AZoSdfzWnyUNo07xvx+rD7/ZeSXE5/mdbwHtbM6hjZBWVP7AFI5ijay
+	zxgh44nQuj/LF1V3b9ZseLJQGr3fK0wX+UpWJdQTXeOj5G+NqKh64x1SOJR+IqULofK++tEsppMht
+	ch4d8JGHdn0ywXpj9iWMzLcbdJlMdoBxOXLDkN+m3TiNJYKwTXy2sLOIl0QglehHdC4+jXv8QSl3r
+	GNe26oBe7xJnDSmzS8w==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vYvqZ-00CY7W-01;
+	Fri, 26 Dec 2025 08:38:24 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Dec 2025 08:38:22 +0800
+Date: Fri, 26 Dec 2025 08:38:22 +0800
+Message-ID: <cover.1766709379.git.herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 0/3] crypto: acomp - Add segmentation API for compression
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: yosry.ahmed@linux.dev, nphamcs@gmail.com, chengming.zhou@linux.dev, Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251223201921.1332786-7-robert.marko@sartura.hr>
 
-Hi Robert,
+This patch adds segmentation support for compression and provides a
+wrapper for existing algorithms so that they can accept a single
+segment while returning the compressed length or error through
+the dst SG list length.
 
-On Tue, Dec 23, 2025 at 09:16:17PM +0100, Robert Marko wrote:
-> Document Microchip LAN969x I2C compatible.
-> 
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Herbert Xu (2):
+  crypto: acomp - Add bit to indicate segmentation support
+  crypto: acomp - Add trivial segmentation wrapper
 
-Acked-by: Andi Shyti <andi.shyti@kernel.org>
+Kanchana P Sridhar (1):
+  crypto: acomp - Define a unit_size in struct acomp_req to enable
+    batching.
 
-Thanks,
-Andi
+ crypto/acompress.c                  | 25 ++++++++++++++++---
+ include/crypto/acompress.h          | 37 +++++++++++++++++++++++++++++
+ include/crypto/algapi.h             |  5 ++++
+ include/crypto/internal/acompress.h |  5 ++++
+ include/linux/crypto.h              |  3 +++
+ 5 files changed, 72 insertions(+), 3 deletions(-)
+
+-- 
+2.47.3
+
