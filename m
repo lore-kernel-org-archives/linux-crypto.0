@@ -1,120 +1,112 @@
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B6123BD1A;
-	Fri, 26 Dec 2025 20:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9CC92853E9;
+	Sat, 27 Dec 2025 11:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766780699; cv=none; b=JuyPnAzz4rUvcqgvy0TS59RlPXtd2HTS7k24V0WngGd4KB46K8Hteup/gkTaYguJYbB/4UiXA9awwOzKmFJvfAwezOgrdEfbo7onMJe3UQ8auz6+1SobYEwijbIYyotq+kINjlXoLYEaox4GS2UGlE0OmP4M01pLLM98rMvsZDU=
+	t=1766834242; cv=none; b=uhe4DrJrk75m79+0UDM0BwCiS6ANvW8eGqYX61HQFEfOkNRvX2TeCyB52HECIZmkz9gpit9gLJBJZPpNBOm9V3HX24+XspYGkYfS8WhsqYG1ki22Y153sU81Fz3neAv+zZJS1aer2zUhlDQRjfymETOPyL6SLa1BDrPQ8tuDHWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766780699; c=relaxed/simple;
-	bh=nvlLVnvatpqwgOjAS/q3NGOgoHfMJaX/ZS0arCm25vI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nvQcohrjGRg1sS3EclKo/yq0t/TcyBvx0NnA7KK1/pA0efHzHVrxoTCN5hBsEF2/PEcUzwWuR5b93S0QirqAo7CicHh337YDxlRlthG1uzJO4GFP0wRxu7k+vdCBpYDAXoCmcmSsRfgz3jqRJStJhmnovqrN68Guy+os9K5pwK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=JT6QTaUX; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
+	s=arc-20240116; t=1766834242; c=relaxed/simple;
+	bh=mkTJBdGWaaGFXpk4ABan/EOXP8frmcAGWpzfe9DTQsY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RHdvuj2XjjAJUdzKsASVVjPnTmzXKv0m8dNl+CQdZxXSe1HLlFDbCXsKPV9eUur4dK/dm3kgTtrZHXIVqPBY4YsorIRmVKlu4yv2Nh+vm21pp69jPbjnRQ5XWJmIQCxnoGdp3RNTprAbmc/9KYc2Fx9On5/StfvYvCH++XGaa0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mp7Vf87Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="JT6QTaUX"
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <david.laight@runbox.com>)
-	id 1vZEMf-004Zab-3V; Fri, 26 Dec 2025 21:24:45 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
-	 s=selector2; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
-	References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date;
-	bh=i1GRlWCzDCZz3wdSHgzwoDEJfj5lb11Zn8FwETxb/9c=; b=JT6QTaUXUK+E4xcKu7QGqIZCOa
-	TKrrz8OrTaQqR+6vp6Me/XQ5GevgJZn0yZyHvJ9bkASBio+x6/RWP1EEXF0vpSLNH7M8LPlVrcXzG
-	3p9/33+lbiQ/aMuWhlCSXdYTz1yFWwpot82lX3fMA+4MbHPrjPma/oJ/hBpMz9atpp7zp79D68Ykj
-	N+6GXhcLYnvK7rtT19eq9dxr1ZziF3EEa+hm3F/hDNF7x8zY+9nV1ctacLh3EKAzgorMuLSQU3dgx
-	HMqLG837EHQT5/bLHjq8qGQnwZ6YuZizsmRsXhb6coKVtbQI/Ts1B2huGfAO+yFMxGzXaRnW/ooW+
-	lyPkVvDA==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <david.laight@runbox.com>)
-	id 1vZEMd-0008Sz-UA; Fri, 26 Dec 2025 21:24:44 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vZEMV-00H1T6-CE; Fri, 26 Dec 2025 21:24:35 +0100
-Date: Fri, 26 Dec 2025 20:24:33 +0000
-From: david laight <david.laight@runbox.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard
- Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Thorsten Blum
- <thorsten.blum@linux.dev>, Nathan Chancellor <nathan@kernel.org>, Nick
- Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>, David Sterba
- <dsterba@suse.com>, llvm@lists.linux.dev, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: blake2b: Roll up BLAKE2b round loop on
- 32-bit
-Message-ID: <20251226202433.107af09a@pumpkin>
-In-Reply-To: <20251205201411.GA1954@quark>
-References: <20251203190652.144076-1-ebiggers@kernel.org>
-	<20251205141644.313404db@pumpkin>
-	<20251205201411.GA1954@quark>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mp7Vf87Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F9FCC4CEF1;
+	Sat, 27 Dec 2025 11:17:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766834241;
+	bh=mkTJBdGWaaGFXpk4ABan/EOXP8frmcAGWpzfe9DTQsY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mp7Vf87QB6NclKUBLSZgG25HwjCXi0w1BFQg/Xi32LC2n/3/VELl6cCodVL+Uaohv
+	 knt2f4OAFECmBI2yR6QaJKc4Fu3a0RgdjeQelMCbEngpVtwWKTYTsHw2W1Iz+bxEWv
+	 0zWs04mKwiyvgUvPwIasj1QjjKsDJq89hdt7OjelzvGxzL+3ihvEu5fdHBabQtgXr8
+	 DllSXXTp5/+fVCOegZ18LBeyKqUAgJDvKyYQhRds9kFnFYu05Qmf5FSqSpvj2eGiJS
+	 UXpqSihw//fBPaMJNj+nca6ZTcB88RkYwMxJpkTmCUhvWbKSEP90A++xF9C0FO43Cv
+	 F68a/aRlgpAVQ==
+Date: Sat, 27 Dec 2025 12:17:18 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org, 
+	krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com, 
+	claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	vkoul@kernel.org, andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linusw@kernel.org, 
+	Steen.Hegelund@microchip.com, daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
+	olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, broonie@kernel.org, 
+	mturquette@baylibre.com, sboyd@kernel.org, lars.povlsen@microchip.com, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-clk@vger.kernel.org, luka.perkov@sartura.hr
+Subject: Re: [PATCH v3 01/15] include: dt-bindings: add LAN969x clock bindings
+Message-ID: <20251227-splendid-striped-starfish-ece074@quoll>
+References: <20251223201921.1332786-1-robert.marko@sartura.hr>
+ <20251223201921.1332786-2-robert.marko@sartura.hr>
+ <20251224-berserk-mackerel-of-snow-4cae54@quoll>
+ <CA+HBbNGym6Q9b166n-P=h_JssOHm0yfyL73JZ+G9P81muK=g4A@mail.gmail.com>
+ <78bf252c-fd5e-4a36-b1a3-ca8ed26fde7a@kernel.org>
+ <CA+HBbNG+ZVD6grGDp32Ninx7H1AyEbGvP0nwc0zUv94tOV8hYg@mail.gmail.com>
+ <d210552f-c8bf-4084-9317-b743075d9946@kernel.org>
+ <2025122516245554f59e2e@mail.local>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <2025122516245554f59e2e@mail.local>
 
-On Fri, 5 Dec 2025 12:14:11 -0800
-Eric Biggers <ebiggers@kernel.org> wrote:
+On Thu, Dec 25, 2025 at 05:24:55PM +0100, Alexandre Belloni wrote:
+> On 25/12/2025 09:47:34+0100, Krzysztof Kozlowski wrote:
+> > On 24/12/2025 15:01, Robert Marko wrote:
+> > > On Wed, Dec 24, 2025 at 2:05=E2=80=AFPM Krzysztof Kozlowski <krzk@ker=
+nel.org> wrote:
+> > >>
+> > >> On 24/12/2025 11:30, Robert Marko wrote:
+> > >>> On Wed, Dec 24, 2025 at 11:21=E2=80=AFAM Krzysztof Kozlowski <krzk@=
+kernel.org> wrote:
+> > >>>>
+> > >>>> On Tue, Dec 23, 2025 at 09:16:12PM +0100, Robert Marko wrote:
+> > >>>>> Add the required LAN969x clock bindings.
+> > >>>>
+> > >>>> I do not see clock bindings actually here. Where is the actual bin=
+ding?
+> > >>>> Commit msg does not help me at all to understand why you are doing=
+ this
+> > >>>> without actual required bindings.
+> > >>>
+> > >>> I guess it is a bit confusing, there is no schema here, these are t=
+he
+> > >>> clock indexes that
+> > >>> reside in dt-bindings and are used by the SoC DTSI.
+> > >>
+> > >> I understand as not used by drivers? Then no ABI and there is no poi=
+nt
+> > >> in putting them into bindings.
+> > >=20
+> > > It is not included by the driver directly, but it requires these exact
+> > > indexes to be passed
+> > > so its effectively ABI.
+> >=20
+> > How it requires the exact index? In what way? I do not see anything in
+> > the gck driver using/relying on these values. Nothing. Please point me
+> > to the line which directly uses these values.... or how many times I
+> > will need to write this is not ABI?
+> >=20
+>=20
+> The index here is the exact id that needs to be set in the PMC_PCR
+> register and so it is dictated by the hardware.
 
-> On Fri, Dec 05, 2025 at 02:16:44PM +0000, david laight wrote:
-> > Note that executing two G() in parallel probably requires the source
-> > interleave the instructions for the two G() rather than relying on the
-> > cpu's 'out of order execution' to do all the work
-> > (Intel cpu might manage it...).  
-> 
-> I actually tried that earlier, and it didn't help.  Either the compiler
-> interleaved the calculations already, or the CPU did, or both.
-> 
-> It definitely could use some more investigation to better understand
-> exactly what is going on, though.
-> 
-> You're welcome to take a closer look, if you're interested.
+So not a binding between Linux and DTS.
 
-I had a quick look at the objdump output for the 'not unrolled loop'
-of blake2s on x86-64 compiled with gcc 12.2.
-The generated code seemed reasonable.
-A single register tracked the array of offsets for the data buffer.
-So on x86 there was a read of the offset then nn(%rsp,%reg,4) to
-get the value (%reg,8 for blake2b).
-There weren't many spills to stack, I suspect that 14 of the v[]
-were assigned to registers - but didn't analyse the entire loop.
-The fully unrolled loop is harder to read, but one of the v[] still
-needs spilling to stack.
-
-Each 1/2G has at least one memory read and seven ALU operations.
-The Intel cpu (Haswell onwards) can execute 4 ALU instructions
-every clock - so however well the multiple G get scheduled each
-1/2G will be (pretty much) two clocks.
-That really means it should be possible to include the second
-memory read (for the not-unrolled loop) without slowing things down.
-Even if the nn(%rsp,%reg,8) needs an extra ALU operations the change
-shouldn't be massive.
-
-Which makes be wonder whether the slowdown for rolling-up the loop
-is due to data cache effects rather than actual ALU instructions.
-
-Of course this is x86 and the nn(%rsp,%reg,8) addressing mode helps.
-Otherwise you'd want to multiply the offsets by 8 and, ideally, add
-in the stack offset of the data[] array allowing the simpler (%sp,%reg)
-addressing mode.
-
-I've still not done any timings, on holiday with the wrong computers.
-
-	David
-
-
-> 
-> - Eric
-> 
+Best regards,
+Krzysztof
 
