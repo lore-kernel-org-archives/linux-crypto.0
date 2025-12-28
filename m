@@ -1,102 +1,342 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0AA3A1E7C
-	for <linux-crypto@vger.kernel.org>; Sun, 28 Dec 2025 00:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E815DDF76
+	for <linux-crypto@vger.kernel.org>; Sun, 28 Dec 2025 01:35:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766880068; cv=none; b=DinR4Vz6z4jcCFoDH3b5CkWQFdkewTkkmrFLP4RC7zjsGMQMyz1i55BTeDCfIx96GKzKqtx5Bq38C3tAFPK02vpTguBAexMB2fThf46QjsR/341NCK5WCv3BKGsXUmhJhkfcTg/Re3tX9b2iu9gzbv4qqffyGC3BRao1tXOWaBI=
+	t=1766885711; cv=none; b=mA0AOHedQhgrok7b18DOKxb8neCedNGwMlI604o+U+2eti5qFz8wAVpFoW3K5/+CxgyTkgFkox/xUWJ9Db5O+CAXYQO9v1qVVyKoejkAzwtVMfQJqlYJAdTI+U7wRMc5CVOGvkJcX6beuGzaykVwX62dB/bq0FQjpgXduL1Fd3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766880068; c=relaxed/simple;
-	bh=KceAPIc48hxqgo6yTY/rZVbmzsMjQ7ZKU0RmTg2rG0o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G3ysyA+pZzwXGBqqjqiUtg5qjN9BwTx5HW/qGbpCBROw3uZyPDVD03b7iXJBS7WqqBxu+f0pWwrQoBV8uWyq8WQhhhkIAoQdAVp05s84DUw7+kNVtykcO/SNq6Ec43CilMKTBdNNSgUjSIQc1IKcMsjelOmVKbkjPvX2KdUKnHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fC4tduyh; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1766885711; c=relaxed/simple;
+	bh=fmmL9HWmaEP0RpNRgy/s+tq2xpNI8J68pezMwOFzmxI=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=loBxKswbH7gSJMKAVAaXQ33sLVLn8HiTdzGy1+sp4gN+2jsSUT9WIBUDtezi5xktHdP6txVv5wglh840F9nncqhy66oRcD5FhqqJxxQQaLkfXTh6y5VQ8sbE0i1RqrQAP00d9oRANsWbOvUUerV1jqaQOM9unPeCRniTJrJU7s8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q8MO9Mbi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fC4tduyh"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4eda057f3c0so91397541cf.2
-        for <linux-crypto@vger.kernel.org>; Sat, 27 Dec 2025 16:01:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766880066; x=1767484866; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jN+Xgh+BGKXL1cd1fC7WVWdvAsrIpESsHFXVEg3fNAc=;
-        b=fC4tduyhxuEVDo9mkn/r4eCgSIpvy5WnbOdrD8rAwZALseR1PMOlzHi/B85eZ1UfsA
-         7thPQa/Bf46AUS40rKTI+T6o1i60+UP5RNZR5M5xLpbUSWRsxpjodhuZJNwMMFMRfItX
-         JKLNF2z0G0LPzg4TioKhajbIUm4MbpFE8Mqwh/OPFd1pjf+7phvSROCzf+LhBaeb/aTD
-         x2Ej/iUE66w+4HyIlCL4suhJI2ldZxno9xjWhZXtXR5yvjuKIkuHlKarOgnnTxKhEwcg
-         S0DtouCJF6YPp/W6p3Y6uvbmrGE9BZ2s3Crtk3hNRuttiwMn8397tTZI2d7PGu4WImPa
-         6vPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766880066; x=1767484866;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jN+Xgh+BGKXL1cd1fC7WVWdvAsrIpESsHFXVEg3fNAc=;
-        b=IYwp9ph9e4Pug+nyThl8eo+YR/qNOD2QcbcVuHBmcBMqO8MOifh8p07koXpm2ErB8q
-         LZU7aaE4DhwmdXvBmlX1HdhhRfaXzAIzWaHUW6jJqdz2ZBYbk4JehlU5UsiDG5w1TwYC
-         bHFoEQB3pVa8eTPFSexhDxDAHoDixJZtCnv5K0Q/IrlSeSHxj3h3JhmH5a1sATMfkYSX
-         XOAkRYftKy6jesD+HFRJtT6EQb5aEAuJavvQ9iKxlhoVU+2w/rUbXKs7FdWSlCeKEeG8
-         0ZbHX8QmX95PkMFMPvnpDIRQzvL6WIYJzAg8ePVTLAc0bTu4Aanojbi2hNx4els+GQSD
-         DEOg==
-X-Forwarded-Encrypted: i=1; AJvYcCUiINTl/aopuJyxauQot2da4mwXhBpf0GrC9jUhOrB5zkbOfhlA0KuYfZcP6mY7SSTN8zUZ/9rXzhPPtEg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0cpd04PCoDq/2NcUuQGHvfN/NrTohgDehvvzldX88jgl5Sb0l
-	8to21dzD8NUDACA/ARj4u8RtKmBH4LBmzXpGcv+aWIOQ5OiCNwYfP8CI
-X-Gm-Gg: AY/fxX5xj8XYuaCA5Mzw35sEPcKD/0xdncMhat31+inZZfxVi7+Bu8gl8tdg1OaZBXP
-	FIl1A8QeKpp+VgLOMUoB4GwPgKtl8wI3LERI+sjA6QRw03Kls1cd4423FGCfIUmO1TB9+t0TApJ
-	ocxfk8m88r0ARjOglPc6nTd8BVmeLRjLOVnHdewvz1pfzF7wvaPZ1w8TQo24wDQx2vyBUnnzyb4
-	mkeUHgi80zj5/1M9qVvZ4UKxeavjicYUyMJnXTPKnywus0g9S1ymcf6QIsM8F+Ctfh8E/OXAnT2
-	ahcREhzeR8UfOT/Ai3uNMwZ6w5imL7nQm4VekAgpMarUYGoE4baw+zO5in/hodWxJxej/A5zKEn
-	B64FvyZRYXdeUFqn7gs11QtfwihyVJuxi5R83ty1O28loqqy4XV8LwYh6dxUW4y/n/0Gwh0rQw4
-	nY+Yjubfvd5ndxi9G0jqCFxMbMB23ZQOtq5s/kXuWztlpPNQrgWVi5bqkYzSFbRnkxZyhjxA+3d
-	fMk9G0C7bmH35+y2NOBA/gkqJnJcv3BDe6ObQ1+2yG//RxSGEwPvj+C9dBuOLFqFIieeCEW+APS
-	kXOB3reVEJlkCd0iZaj/VU8=
-X-Google-Smtp-Source: AGHT+IEuGf6f8YWf761Bu76xMAgDfzllU840RSiZ24ZlP0EI4cqzLjSg+Vfh/8QEP/PUpuL35u19WQ==
-X-Received: by 2002:a05:622a:4c86:b0:4ee:1db1:a60f with SMTP id d75a77b69052e-4f4abcd08b2mr374289321cf.16.1766880066161;
-        Sat, 27 Dec 2025 16:01:06 -0800 (PST)
-Received: from KernDev.mynetworksettings.com (pool-108-51-198-109.washdc.fios.verizon.net. [108.51.198.109])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f4ad519939sm191612881cf.2.2025.12.27.16.01.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Dec 2025 16:01:05 -0800 (PST)
-From: Alexander Bendezu <alexanderbendezu10@gmail.com>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Alexander Bendezu <alexanderbendezu10@gmail.com>
-Subject: [PATCH] crypto: blowfish - fix typo in comment
-Date: Sun, 28 Dec 2025 00:01:01 +0000
-Message-ID: <20251228000101.12139-1-alexanderbendezu10@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q8MO9Mbi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5488DC4AF09;
+	Sun, 28 Dec 2025 01:35:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766885710;
+	bh=fmmL9HWmaEP0RpNRgy/s+tq2xpNI8J68pezMwOFzmxI=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=Q8MO9Mbi7XByFoaz2a7mljf25Df9eQB4eBBoZh4FpC5aOcCciBhX/Jk2ZbGh9q0Cw
+	 SG+hVyLS5CZGRSXc755xUUAjL6swepGU7J6BU2UFAA5O1ms0nt2H4eXDsmOr3qOJVt
+	 KHoST4X6W/TykEw1n7/ZB+e+e5fuxCy3KpDafr1NgbWMhzSnLY4Jvnk54MXI7AL5zi
+	 0kqwWq6gPg+2ymeVdmcpZ8hZ0vDnZEakMxVOOSl0QOPe8OeRdLwQ6yDHeaGoRdFKU9
+	 d3LY0boRst6Ys7KJCS4stESyRc5WK8rZg5vh0vDc2vCY0Ub6Ko9VVO9dfHilOssixs
+	 QG8WXohOdU9yw==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 5E8FFF4006D;
+	Sat, 27 Dec 2025 20:35:09 -0500 (EST)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Sat, 27 Dec 2025 20:35:09 -0500
+X-ME-Sender: <xms:TYlQaS-WyhfecsiVxzdTx1uLzxMx5e8UH4r4rjRSjxcO5r_gpWt_FA>
+    <xme:TYlQadj_EjV93WhkBb3jj09JXh4am0_-49eu7_1BzFYgoUe7X0aMZe8TRWExYmtMk
+    lTBKdGqJ0zWYPUdPr390DgmIXmV7IGYU_FMRczrlnHUDno9i7niw6cl>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdejvdelhecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdevhhhutghk
+    ucfnvghvvghrfdcuoegtvghlsehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvghrnh
+    ephfffkefffedtgfehieevkeduuefhvdejvdefvdeuuddvgeelkeegtefgudfhfeelnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheptghhuhgtkh
+    hlvghvvghrodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieefgeelleel
+    heelqdefvdelkeeggedvfedqtggvlheppehkvghrnhgvlhdrohhrghesfhgrshhtmhgrih
+    hlrdgtohhmpdhnsggprhgtphhtthhopeekpdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopehnvghilhessghrohifnhdrnhgrmhgvpdhrtghpthhtohepsggtohguughinhhgse
+    hhrghmmhgvrhhsphgrtggvrdgtohhmpdhrtghpthhtoheprghnnhgrsehkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehjlhgrhihtohhnsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehtrhhonhgumhihsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegthhhutghkrdhl
+    vghvvghrsehorhgrtghlvgdrtghomhdprhgtphhtthhopehlihhnuhigqdgtrhihphhtoh
+    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhnfhhssehv
+    ghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:TYlQacePlnO67dou49AyNRundh8Ey-3nEmKXyQ-3QmrFMACxRB-lWg>
+    <xmx:TYlQaaP_c3p4LvTHX8dfK0uwj7zldYoDvHxjWSjGyYFASH-zBCPPag>
+    <xmx:TYlQafuaF-Lrq8eeX7CJxU1Ggbsat6cpEgfJJ7nOAun0AggZht0RfA>
+    <xmx:TYlQaTBfYjVYbvo5Gzt2DYRQGKV_bom3R9LCz224Qpef_g3HpKj-iw>
+    <xmx:TYlQaWZ8xQOsokuRklQXTQXWnZ9ZOnnsQwyy-0xfrKbsP9CQFoq2ck6X>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 37CBB780054; Sat, 27 Dec 2025 20:35:09 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-ThreadId: AvjXdGNJ2cw-
+Date: Sat, 27 Dec 2025 20:34:18 -0500
+From: "Chuck Lever" <cel@kernel.org>
+To: "Benjamin Coddington" <bcodding@hammerspace.com>,
+ "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
+ NeilBrown <neil@brown.name>, "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>
+Cc: linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org
+Message-Id: <bc74d1a3-d128-486e-939a-f7b3dc560931@app.fastmail.com>
+In-Reply-To: 
+ <0688787cf4764d5add06c8ef1fecc9ea549573d7.1766848778.git.bcodding@hammerspace.com>
+References: <cover.1766848778.git.bcodding@hammerspace.com>
+ <0688787cf4764d5add06c8ef1fecc9ea549573d7.1766848778.git.bcodding@hammerspace.com>
+Subject: Re: [PATCH v1 6/7] NFSD: Add filehandle crypto functions and helpers
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Fix spelling mistake in comment: endianess -> endianness
 
-Signed-off-by: Alexander Bendezu <alexanderbendezu10@gmail.com>
----
- crypto/blowfish_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/blowfish_common.c b/crypto/blowfish_common.c
-index c0208ce269a3..de9ec610125c 100644
---- a/crypto/blowfish_common.c
-+++ b/crypto/blowfish_common.c
-@@ -306,7 +306,7 @@ static const u32 bf_sbox[256 * 4] = {
- 
- /*
-  * The blowfish encipher, processes 64-bit blocks.
-- * NOTE: This function MUSTN'T respect endianess
-+ * NOTE: This function MUSTN'T respect endianness
-  */
- static void encrypt_block(struct bf_ctx *bctx, u32 *dst, u32 *src)
- {
+On Sat, Dec 27, 2025, at 12:04 PM, Benjamin Coddington wrote:
+> In order to improve the security of knfsd servers, create a method to
+> encrypt and decrypt filehandles.
+>
+> Filehandle encryption begins by checking for an allocated encfh_buf for
+> each knfsd thread.  It not yet allocated, nfsd performs JIT alloation and
+> proceeds to encrypt or decrypt.
+>
+> In order to increase entropy, filehandles are encrypted in two passes.  In
+> the first pass, the fileid is expanded to the AES block size and encrypted
+> with the server's key and a salt from the fsid.  In the second pass, the
+> entirety of the filehandle is encrypted starting with the block containing
+> the results of the first pass.  Decryption reverses this operation.
+>
+> This approach ensures that the same fileid values are encrypted differently
+> for differing fsid values.  This protects against comparisons between the
+> same fileids across different exports that may not be encrypted, which
+> could ease the discovery of the server's private key.  Additionally, it
+> allows the fsid to be encrypted uniquely for each filehandle.
+>
+> The filehandle's auth_type is used to indicate that a filehandle has been
+> encrypted.
+>
+> Signed-off-by: Benjamin Coddington <bcodding@hammerspace.com>
+> ---
+>  fs/nfsd/nfsfh.c | 165 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/nfsd/nfsfh.h |  13 ++++
+>  2 files changed, 178 insertions(+)
+>
+> diff --git a/fs/nfsd/nfsfh.c b/fs/nfsd/nfsfh.c
+> index ed85dd43da18..86bdced0f905 100644
+> --- a/fs/nfsd/nfsfh.c
+> +++ b/fs/nfsd/nfsfh.c
+> @@ -11,6 +11,7 @@
+>  #include <linux/exportfs.h>
+> 
+>  #include <linux/sunrpc/svcauth_gss.h>
+> +#include <crypto/skcipher.h>
+>  #include "nfsd.h"
+>  #include "vfs.h"
+>  #include "auth.h"
+> @@ -137,6 +138,170 @@ static inline __be32 check_pseudo_root(struct 
+> dentry *dentry,
+>  	return nfs_ok;
+>  }
+> 
+> +static int fh_crypto_init(struct svc_rqst *rqstp)
+> +{
+> +	struct encfh_buf *fh_encfh = (struct encfh_buf *)rqstp->rq_crypto;
+> +
+> +	/* This knfsd has not allocated buffers and reqest yet: */
+> +	if (!fh_encfh) {
+> +		struct nfsd_net *nn = net_generic(SVC_NET(rqstp), nfsd_net_id);
+> +
+> +		fh_encfh = kmalloc(sizeof(struct encfh_buf), GFP_KERNEL);
+> +		if (!fh_encfh)
+> +			return -ENOMEM;
+> +
+> +		skcipher_request_set_sync_tfm(&fh_encfh->req, nn->encfh_tfm);
+> +		rqstp->rq_crypto = fh_encfh;
+> +	}
+> +	memset(fh_encfh->a_buf, 0, NFS4_FHSIZE);
+> +	memset(fh_encfh->b_buf, 0, NFS4_FHSIZE);
+> +	return 0;
+> +}
+> +
+> +static int fh_crypto(struct svc_fh *fhp, bool encrypting)
+> +{
+> +	struct encfh_buf *encfh = (struct encfh_buf *)fhp->fh_rqstp->rq_crypto;
+> +	int err, pad, hash_size, fileid_offset;
+> +	struct knfsd_fh *fh = &fhp->fh_handle;
+> +	struct scatterlist fh_sgl[2];
+> +	struct scatterlist hash_sg;
+> +	u8 *a_buf = encfh->a_buf;
+> +	u8 *b_buf = encfh->b_buf;
+> +	u8 iv[16];
+> +
+> +	/* blocksize */
+> +	int bs = crypto_sync_skcipher_blocksize(
+> +				crypto_sync_skcipher_reqtfm(&encfh->req));
+> +
+> +	/* always renew as it gets transformed: */
+> +	memset(iv, 0, sizeof(iv));
+> +
+> +	fileid_offset = fh_fileid_offset(fh);
+> +	sg_init_table(fh_sgl, 2);
+> +
+> +	if (encrypting) {
+> +		/* encryption */
+> +		memcpy(&a_buf[fileid_offset], &fh->fh_raw[fileid_offset],
+> +				fh->fh_size - fileid_offset);
+> +		memcpy(b_buf, fh->fh_raw, fileid_offset);
+> +
+> +		/* encrypt the fileid using the fsid as iv: */
+> +		memcpy(iv, fh_fsid(fh), min(sizeof(iv), key_len(fh->fh_fsid_type)));
+> +
+> +		/* pad out the fileid to block size */
+> +		hash_size = fh_fileid_len(fh);
+> +		pad = (bs - (hash_size & (bs - 1))) & (bs - 1);
+> +		hash_size += pad;
+> +
+> +		sg_set_buf(&fh_sgl[0], &a_buf[fileid_offset], hash_size);
+> +		sg_mark_end(&fh_sgl[1]);  /* don't need sg1 yet */
+> +		sg_init_one(&hash_sg, &b_buf[fileid_offset], hash_size);
+> +
+> +		skcipher_request_set_crypt(&encfh->req, fh_sgl, &hash_sg, hash_size, iv);
+> +		err = crypto_skcipher_encrypt(&encfh->req);
+> +		if (err)
+> +			goto out;
+> +
+> +		/* encrypt the fsid + fileid with zero iv, starting with the last
+> +		 * block of the hashed fileid */
+> +		memset(iv, 0, sizeof(iv));
+> +
+> +		/* calculate the new padding: */
+> +		hash_size += key_len(fh->fh_fsid_type) + 4;
+> +		pad = (bs - (hash_size & (bs - 1))) & (bs - 1);
+> +		hash_size += pad;
+> +
+> +		sg_unmark_end(&fh_sgl[1]); /* now we use it */
+> +		sg_set_buf(&fh_sgl[0], &b_buf[hash_size-bs], bs);
+> +		sg_set_buf(&fh_sgl[1], b_buf, hash_size-bs);
+> +		sg_init_one(&hash_sg, a_buf, hash_size);
+> +
+> +		skcipher_request_set_crypt(&encfh->req, fh_sgl, &hash_sg, hash_size, iv);
+> +		err = crypto_skcipher_encrypt(&encfh->req);
+> +
+> +		if (!err) {
+> +			memcpy(&fh->fh_raw[4], a_buf, hash_size);
+> +			fh->fh_auth_type = FH_AT_ENCRYPTED;
+> +			fh->fh_fileid_type = fh->fh_size; /* we'll use this in decryption */
+> +			fh->fh_size = hash_size + 4;
+> +		}
+> +	} else {
+> +		/* decryption */
+> +		int fh_size = fh->fh_size - 4;
+> +		memcpy(b_buf, &fh->fh_raw[4], fh_size);
+> +
+> +		/* first, we decode starting with the last hashed block and zero iv */
+> +		hash_size = fh_size;
+> +		sg_set_buf(&fh_sgl[0], &a_buf[fh_size - bs], bs);
+> +		sg_set_buf(&fh_sgl[1], a_buf, fh_size - bs);
+> +		sg_init_one(&hash_sg, b_buf, fh_size);
+> +
+> +		skcipher_request_set_crypt(&encfh->req, &hash_sg, fh_sgl, hash_size, iv);
+> +		err = crypto_skcipher_decrypt(&encfh->req);
+> +		if (err)
+> +			goto out;
+> +
+> +		/* Now we're dealing with the original fh_size: */
+> +		fh_size = fh->fh_fileid_type;
+> +
+> +		/* a_buf now has the decrypted fsid and header: */
+> +		memcpy(fh->fh_raw, a_buf, fileid_offset);
+> +
+> +		/* now we set the iv to the decrypted fsid value */
+> +		memset(iv, 0, sizeof(iv));;
+> +		memcpy(iv, &a_buf[4], min(sizeof(iv), key_len(fh->fh_fsid_type)));
+> +
+> +		/* align to block size */
+> +		hash_size = fh_size - fileid_offset;
+> +		pad = (bs - (hash_size & (bs - 1))) & (bs - 1);
+> +		hash_size += pad;
+> +
+> +		/* decrypt only the fileid: */
+> +		sg_set_buf(&fh_sgl[0], &b_buf[fileid_offset], hash_size);
+> +		sg_mark_end(&fh_sgl[1]);
+> +		sg_init_one(&hash_sg, &a_buf[fileid_offset], hash_size);
+> +
+> +		skcipher_request_set_crypt(&encfh->req, &hash_sg, fh_sgl, hash_size, iv);
+> +		err = crypto_skcipher_decrypt(&encfh->req);
+> +
+> +		if (!err) {
+> +			fh->fh_size = fh_size;
+> +			/* copy in the fileid */
+> +			memcpy(&fh->fh_raw[fileid_offset], &b_buf[fileid_offset], hash_size);
+> +			/* trim the leftover hash padding */
+> +			memset(&fh->fh_raw[fh->fh_size], 0, NFS4_FHSIZE - fh->fh_size);
+> +		}
+> +	}
+> +	// add a tracepoint to show the error;
+> +	// if decrypting, we want nfserr_badhandle
+> +out:
+> +	return err;
+> +}
+> +
+> +/* we should never get here without calling fh_init first */
+> +int fh_encrypt(struct svc_fh *fhp)
+> +{
+> +	if (!(fhp->fh_export->ex_flags & NFSEXP_ENCRYPT_FH))
+> +		return 0;
+> +
+> +	if (fh_crypto_init(fhp->fh_rqstp))
+> +		return -ENOMEM;
+> +
+> +	return fh_crypto(fhp, true);
+> +}
+> +
+> +/* Lets try to decrypt, no matter the export setting */
+> +static int fh_decrypt(struct svc_fh *fhp)
+> +{
+> +	if (fhp->fh_handle.fh_auth_type != FH_AT_ENCRYPTED)
+> +		return 0;
+> +
+> +	if (fh_crypto_init(fhp->fh_rqstp))
+> +		return -ENOMEM;
+> +
+> +	return fh_crypto(fhp, false);
+> +}
+> +
+>  /*
+>   * Use the given filehandle to look up the corresponding export and
+>   * dentry.  On success, the results are used to set fh_export and
+> diff --git a/fs/nfsd/nfsfh.h b/fs/nfsd/nfsfh.h
+> index f29bb09af242..786f34e72304 100644
+> --- a/fs/nfsd/nfsfh.h
+> +++ b/fs/nfsd/nfsfh.h
+> @@ -60,6 +60,9 @@ struct knfsd_fh {
+>  #define fh_fsid_type		fh_raw[2]
+>  #define fh_fileid_type		fh_raw[3]
+> 
+> +#define FH_AT_PLAIN		0
+> +#define FH_AT_ENCRYPTED	1
+> +
+>  static inline u32 *fh_fsid(const struct knfsd_fh *fh)
+>  {
+>  	return (u32 *)&fh->fh_raw[4];
+> @@ -284,6 +287,16 @@ static inline bool fh_fsid_match(const struct 
+> knfsd_fh *fh1,
+>  	return true;
+>  }
+> 
+> +static inline size_t fh_fileid_offset(const struct knfsd_fh *fh)
+> +{
+> +	return key_len(fh->fh_fsid_type) + 4;
+> +}
+> +
+> +static inline size_t fh_fileid_len(const struct knfsd_fh *fh)
+> +{
+> +	return fh->fh_size - fh_fileid_offset(fh);
+> +}
+> +
+>  /**
+>   * fh_want_write - Get write access to an export
+>   * @fhp: File handle of file to be written
+> -- 
+> 2.50.1
+
+I'd feel more comfortable if the crypto community had a look
+to ensure that we're utilizing the APIs in the most efficient
+way possible. Adding linux-crypto ...
+
+
 -- 
-2.43.0
-
+Chuck Lever
