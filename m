@@ -1,112 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9CC92853E9;
-	Sat, 27 Dec 2025 11:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0AA3A1E7C
+	for <linux-crypto@vger.kernel.org>; Sun, 28 Dec 2025 00:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766834242; cv=none; b=uhe4DrJrk75m79+0UDM0BwCiS6ANvW8eGqYX61HQFEfOkNRvX2TeCyB52HECIZmkz9gpit9gLJBJZPpNBOm9V3HX24+XspYGkYfS8WhsqYG1ki22Y153sU81Fz3neAv+zZJS1aer2zUhlDQRjfymETOPyL6SLa1BDrPQ8tuDHWE=
+	t=1766880068; cv=none; b=DinR4Vz6z4jcCFoDH3b5CkWQFdkewTkkmrFLP4RC7zjsGMQMyz1i55BTeDCfIx96GKzKqtx5Bq38C3tAFPK02vpTguBAexMB2fThf46QjsR/341NCK5WCv3BKGsXUmhJhkfcTg/Re3tX9b2iu9gzbv4qqffyGC3BRao1tXOWaBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766834242; c=relaxed/simple;
-	bh=mkTJBdGWaaGFXpk4ABan/EOXP8frmcAGWpzfe9DTQsY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RHdvuj2XjjAJUdzKsASVVjPnTmzXKv0m8dNl+CQdZxXSe1HLlFDbCXsKPV9eUur4dK/dm3kgTtrZHXIVqPBY4YsorIRmVKlu4yv2Nh+vm21pp69jPbjnRQ5XWJmIQCxnoGdp3RNTprAbmc/9KYc2Fx9On5/StfvYvCH++XGaa0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mp7Vf87Q; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1766880068; c=relaxed/simple;
+	bh=KceAPIc48hxqgo6yTY/rZVbmzsMjQ7ZKU0RmTg2rG0o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G3ysyA+pZzwXGBqqjqiUtg5qjN9BwTx5HW/qGbpCBROw3uZyPDVD03b7iXJBS7WqqBxu+f0pWwrQoBV8uWyq8WQhhhkIAoQdAVp05s84DUw7+kNVtykcO/SNq6Ec43CilMKTBdNNSgUjSIQc1IKcMsjelOmVKbkjPvX2KdUKnHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fC4tduyh; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mp7Vf87Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F9FCC4CEF1;
-	Sat, 27 Dec 2025 11:17:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766834241;
-	bh=mkTJBdGWaaGFXpk4ABan/EOXP8frmcAGWpzfe9DTQsY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mp7Vf87QB6NclKUBLSZgG25HwjCXi0w1BFQg/Xi32LC2n/3/VELl6cCodVL+Uaohv
-	 knt2f4OAFECmBI2yR6QaJKc4Fu3a0RgdjeQelMCbEngpVtwWKTYTsHw2W1Iz+bxEWv
-	 0zWs04mKwiyvgUvPwIasj1QjjKsDJq89hdt7OjelzvGxzL+3ihvEu5fdHBabQtgXr8
-	 DllSXXTp5/+fVCOegZ18LBeyKqUAgJDvKyYQhRds9kFnFYu05Qmf5FSqSpvj2eGiJS
-	 UXpqSihw//fBPaMJNj+nca6ZTcB88RkYwMxJpkTmCUhvWbKSEP90A++xF9C0FO43Cv
-	 F68a/aRlgpAVQ==
-Date: Sat, 27 Dec 2025 12:17:18 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Alexandre Belloni <alexandre.belloni@bootlin.com>
-Cc: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org, 
-	krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com, 
-	claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	vkoul@kernel.org, andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linusw@kernel.org, 
-	Steen.Hegelund@microchip.com, daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
-	olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
-	gregkh@linuxfoundation.org, jirislaby@kernel.org, broonie@kernel.org, 
-	mturquette@baylibre.com, sboyd@kernel.org, lars.povlsen@microchip.com, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-clk@vger.kernel.org, luka.perkov@sartura.hr
-Subject: Re: [PATCH v3 01/15] include: dt-bindings: add LAN969x clock bindings
-Message-ID: <20251227-splendid-striped-starfish-ece074@quoll>
-References: <20251223201921.1332786-1-robert.marko@sartura.hr>
- <20251223201921.1332786-2-robert.marko@sartura.hr>
- <20251224-berserk-mackerel-of-snow-4cae54@quoll>
- <CA+HBbNGym6Q9b166n-P=h_JssOHm0yfyL73JZ+G9P81muK=g4A@mail.gmail.com>
- <78bf252c-fd5e-4a36-b1a3-ca8ed26fde7a@kernel.org>
- <CA+HBbNG+ZVD6grGDp32Ninx7H1AyEbGvP0nwc0zUv94tOV8hYg@mail.gmail.com>
- <d210552f-c8bf-4084-9317-b743075d9946@kernel.org>
- <2025122516245554f59e2e@mail.local>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fC4tduyh"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4eda057f3c0so91397541cf.2
+        for <linux-crypto@vger.kernel.org>; Sat, 27 Dec 2025 16:01:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766880066; x=1767484866; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jN+Xgh+BGKXL1cd1fC7WVWdvAsrIpESsHFXVEg3fNAc=;
+        b=fC4tduyhxuEVDo9mkn/r4eCgSIpvy5WnbOdrD8rAwZALseR1PMOlzHi/B85eZ1UfsA
+         7thPQa/Bf46AUS40rKTI+T6o1i60+UP5RNZR5M5xLpbUSWRsxpjodhuZJNwMMFMRfItX
+         JKLNF2z0G0LPzg4TioKhajbIUm4MbpFE8Mqwh/OPFd1pjf+7phvSROCzf+LhBaeb/aTD
+         x2Ej/iUE66w+4HyIlCL4suhJI2ldZxno9xjWhZXtXR5yvjuKIkuHlKarOgnnTxKhEwcg
+         S0DtouCJF6YPp/W6p3Y6uvbmrGE9BZ2s3Crtk3hNRuttiwMn8397tTZI2d7PGu4WImPa
+         6vPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766880066; x=1767484866;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jN+Xgh+BGKXL1cd1fC7WVWdvAsrIpESsHFXVEg3fNAc=;
+        b=IYwp9ph9e4Pug+nyThl8eo+YR/qNOD2QcbcVuHBmcBMqO8MOifh8p07koXpm2ErB8q
+         LZU7aaE4DhwmdXvBmlX1HdhhRfaXzAIzWaHUW6jJqdz2ZBYbk4JehlU5UsiDG5w1TwYC
+         bHFoEQB3pVa8eTPFSexhDxDAHoDixJZtCnv5K0Q/IrlSeSHxj3h3JhmH5a1sATMfkYSX
+         XOAkRYftKy6jesD+HFRJtT6EQb5aEAuJavvQ9iKxlhoVU+2w/rUbXKs7FdWSlCeKEeG8
+         0ZbHX8QmX95PkMFMPvnpDIRQzvL6WIYJzAg8ePVTLAc0bTu4Aanojbi2hNx4els+GQSD
+         DEOg==
+X-Forwarded-Encrypted: i=1; AJvYcCUiINTl/aopuJyxauQot2da4mwXhBpf0GrC9jUhOrB5zkbOfhlA0KuYfZcP6mY7SSTN8zUZ/9rXzhPPtEg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0cpd04PCoDq/2NcUuQGHvfN/NrTohgDehvvzldX88jgl5Sb0l
+	8to21dzD8NUDACA/ARj4u8RtKmBH4LBmzXpGcv+aWIOQ5OiCNwYfP8CI
+X-Gm-Gg: AY/fxX5xj8XYuaCA5Mzw35sEPcKD/0xdncMhat31+inZZfxVi7+Bu8gl8tdg1OaZBXP
+	FIl1A8QeKpp+VgLOMUoB4GwPgKtl8wI3LERI+sjA6QRw03Kls1cd4423FGCfIUmO1TB9+t0TApJ
+	ocxfk8m88r0ARjOglPc6nTd8BVmeLRjLOVnHdewvz1pfzF7wvaPZ1w8TQo24wDQx2vyBUnnzyb4
+	mkeUHgi80zj5/1M9qVvZ4UKxeavjicYUyMJnXTPKnywus0g9S1ymcf6QIsM8F+Ctfh8E/OXAnT2
+	ahcREhzeR8UfOT/Ai3uNMwZ6w5imL7nQm4VekAgpMarUYGoE4baw+zO5in/hodWxJxej/A5zKEn
+	B64FvyZRYXdeUFqn7gs11QtfwihyVJuxi5R83ty1O28loqqy4XV8LwYh6dxUW4y/n/0Gwh0rQw4
+	nY+Yjubfvd5ndxi9G0jqCFxMbMB23ZQOtq5s/kXuWztlpPNQrgWVi5bqkYzSFbRnkxZyhjxA+3d
+	fMk9G0C7bmH35+y2NOBA/gkqJnJcv3BDe6ObQ1+2yG//RxSGEwPvj+C9dBuOLFqFIieeCEW+APS
+	kXOB3reVEJlkCd0iZaj/VU8=
+X-Google-Smtp-Source: AGHT+IEuGf6f8YWf761Bu76xMAgDfzllU840RSiZ24ZlP0EI4cqzLjSg+Vfh/8QEP/PUpuL35u19WQ==
+X-Received: by 2002:a05:622a:4c86:b0:4ee:1db1:a60f with SMTP id d75a77b69052e-4f4abcd08b2mr374289321cf.16.1766880066161;
+        Sat, 27 Dec 2025 16:01:06 -0800 (PST)
+Received: from KernDev.mynetworksettings.com (pool-108-51-198-109.washdc.fios.verizon.net. [108.51.198.109])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f4ad519939sm191612881cf.2.2025.12.27.16.01.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Dec 2025 16:01:05 -0800 (PST)
+From: Alexander Bendezu <alexanderbendezu10@gmail.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Alexander Bendezu <alexanderbendezu10@gmail.com>
+Subject: [PATCH] crypto: blowfish - fix typo in comment
+Date: Sun, 28 Dec 2025 00:01:01 +0000
+Message-ID: <20251228000101.12139-1-alexanderbendezu10@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <2025122516245554f59e2e@mail.local>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 25, 2025 at 05:24:55PM +0100, Alexandre Belloni wrote:
-> On 25/12/2025 09:47:34+0100, Krzysztof Kozlowski wrote:
-> > On 24/12/2025 15:01, Robert Marko wrote:
-> > > On Wed, Dec 24, 2025 at 2:05=E2=80=AFPM Krzysztof Kozlowski <krzk@ker=
-nel.org> wrote:
-> > >>
-> > >> On 24/12/2025 11:30, Robert Marko wrote:
-> > >>> On Wed, Dec 24, 2025 at 11:21=E2=80=AFAM Krzysztof Kozlowski <krzk@=
-kernel.org> wrote:
-> > >>>>
-> > >>>> On Tue, Dec 23, 2025 at 09:16:12PM +0100, Robert Marko wrote:
-> > >>>>> Add the required LAN969x clock bindings.
-> > >>>>
-> > >>>> I do not see clock bindings actually here. Where is the actual bin=
-ding?
-> > >>>> Commit msg does not help me at all to understand why you are doing=
- this
-> > >>>> without actual required bindings.
-> > >>>
-> > >>> I guess it is a bit confusing, there is no schema here, these are t=
-he
-> > >>> clock indexes that
-> > >>> reside in dt-bindings and are used by the SoC DTSI.
-> > >>
-> > >> I understand as not used by drivers? Then no ABI and there is no poi=
-nt
-> > >> in putting them into bindings.
-> > >=20
-> > > It is not included by the driver directly, but it requires these exact
-> > > indexes to be passed
-> > > so its effectively ABI.
-> >=20
-> > How it requires the exact index? In what way? I do not see anything in
-> > the gck driver using/relying on these values. Nothing. Please point me
-> > to the line which directly uses these values.... or how many times I
-> > will need to write this is not ABI?
-> >=20
->=20
-> The index here is the exact id that needs to be set in the PMC_PCR
-> register and so it is dictated by the hardware.
+Fix spelling mistake in comment: endianess -> endianness
 
-So not a binding between Linux and DTS.
+Signed-off-by: Alexander Bendezu <alexanderbendezu10@gmail.com>
+---
+ crypto/blowfish_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Best regards,
-Krzysztof
+diff --git a/crypto/blowfish_common.c b/crypto/blowfish_common.c
+index c0208ce269a3..de9ec610125c 100644
+--- a/crypto/blowfish_common.c
++++ b/crypto/blowfish_common.c
+@@ -306,7 +306,7 @@ static const u32 bf_sbox[256 * 4] = {
+ 
+ /*
+  * The blowfish encipher, processes 64-bit blocks.
+- * NOTE: This function MUSTN'T respect endianess
++ * NOTE: This function MUSTN'T respect endianness
+  */
+ static void encrypt_block(struct bf_ctx *bctx, u32 *dst, u32 *src)
+ {
+-- 
+2.43.0
 
