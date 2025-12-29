@@ -1,45 +1,43 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76FC43FC2;
-	Sun, 28 Dec 2025 20:45:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4BE43AA6;
+	Mon, 29 Dec 2025 00:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766954717; cv=none; b=OYuQ79kuFK140GUGGPS6YYpbSUaJuzrxxuCuZVTs5xKVmqJouhFpknXvqcN+72IPzdLF+xebJah3hrhFx9i+mhSa0Tmif4LGkIJkB7WfV8hxYJnNbYErZnNlB9lj/TSdAzcGm2jZNw+qj8GSgPPJ5LhM4c0g+BGk6+UglnDbdso=
+	t=1766968384; cv=none; b=myMaOg4ztun8ME/zx7uOY2ufEbdL2KgFqbZYf8Upqfq+DTL53wYsVmOeZ8EgiyAUiWXaQ5e1iElwxwT75mcKi8pWoHx0VlBj6boWwppSMY0RqBE+7X18LU8TbI7Tj+CwAEQriTnO5qjQb1bsnPtd9S1SedUVoEieFaP5ujXJkbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766954717; c=relaxed/simple;
-	bh=iu3tGLV3+4eizoTjWi/r1lxrmVab5NJ8O7FuAdLrCBo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XVat8not7mFasTBgv3rAqdpw5YZTFsNrC7XgUhbfRv4OCwjqC40uQFn3XeHFpLUE90ArvM0Q66mp8G4Jo/gBSgnKtv8bZrm1R4toCImrO/S/l68eC325diaG1q/NYS9sYa/2arCvzm6cgQsSm3HaTK3bbDpMJ7Q4a0XS8z+/lAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kpwv3GIo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1766968384; c=relaxed/simple;
+	bh=7TMxsq78OrqAdUrAqhUXnoJMMU2LcVBro/m7gtHli3k=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ABtFYDcJFpc+rkrPmyxRk49VExykBfPmhr+r5b2ZJo9bFWqfV22jzVGC0jp9h7jMo31BN67EcHSPW6bF2pgr6eE+cye0FwR0XW1CMB2yN1Y2L9JqxLrBRyT/pAAFX49S0gmPJyWxaV/w30kTn9CZR0zrO2+NrePKttBv6ISsqWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=NinxZEH3; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kpwv3GIo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A295C4CEFB;
-	Sun, 28 Dec 2025 20:45:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766954716;
-	bh=iu3tGLV3+4eizoTjWi/r1lxrmVab5NJ8O7FuAdLrCBo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kpwv3GIoFaAMVm/bRXJtB6l7+fDURG7WELDZLUw3A+GohCfD6KCovQjTjd5NAKHdK
-	 Dkl3KXntOlSVntPPBS5kh0k9oALj9cBUSv45yFXLTaSelAvPfkNEGXL3tcUN24CF8n
-	 EFzFGtjGSpXeoiGQ59ZKVM3dWUAbKucv+RXNVNYRVDb2V0A6SzheuHWFVX6JoVAYVu
-	 cN28exr3iy9M4YSNO+cZCKUhVKumoDfG13zBaLo7Xwoa1t6AQg2/vuEOAKrRj6X2rs
-	 8GHT20lkN34+unj24qSg1jMX1hIif8puiKjGCCXrf4irt0o7U9Rx9J7TMnCOYMWYCC
-	 WDwRtK1nleQzA==
-Date: Sun, 28 Dec 2025 12:45:14 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Chuck Lever <cel@kernel.org>
-Cc: Benjamin Coddington <bcodding@hammerspace.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>, linux-nfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v1 6/7] NFSD: Add filehandle crypto functions and helpers
-Message-ID: <20251228204514.GC2431@quark>
-References: <cover.1766848778.git.bcodding@hammerspace.com>
- <0688787cf4764d5add06c8ef1fecc9ea549573d7.1766848778.git.bcodding@hammerspace.com>
- <bc74d1a3-d128-486e-939a-f7b3dc560931@app.fastmail.com>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="NinxZEH3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
+	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
+	references:reply-to; bh=9qDyA8LUs1Ztc/ROPgYY6rKDGk8erPkliU0g18dguPM=; b=NinxZ
+	EH3lDKmO+Kmwgv1lPq1Du/WohNEW6CU7Cby1wBoVNGp+vUPr1eanwOxyv5Kk3hhYoMiHBMrleT9Lh
+	QocjdEd4vnDxKqMjFdMLl6TiJiIXU5/03dmG0md8Jl/qDDYqmDrI/nGDVjvtomWCwm48VjBzUJV+k
+	uRMDfWEKhbxDUywlcxaCZKSJABx+rLBgAKcizO8eypVOJP2UWcgNrfjcasEcoGNRdpunOHlZtt49y
+	PWYHzLLfh50gAjnKfnxTPhBrQnN3sBOtSwiGMkHnYEntnFai2gimcCtDH3PTJCdhiBOnuecTXcGX3
+	vCEpG0y76FAhO77FoXlPUabdOzL3w==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1va1Bl-00D06i-1C;
+	Mon, 29 Dec 2025 08:32:46 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 29 Dec 2025 08:32:45 +0800
+Date: Mon, 29 Dec 2025 08:32:45 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.19
+Message-ID: <aVHMLaTgxU8eBdub@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,33 +46,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bc74d1a3-d128-486e-939a-f7b3dc560931@app.fastmail.com>
 
-On Sat, Dec 27, 2025 at 08:34:18PM -0500, Chuck Lever wrote:
-> I'd feel more comfortable if the crypto community had a look
-> to ensure that we're utilizing the APIs in the most efficient
-> way possible. Adding linux-crypto ...
+Hi Linus:
 
-Many crypto algorithms (especially hash algorithms and MACs) have
-library APIs now.  They're much easier to use than the traditional APIs.
+The following changes since commit 8f0b4cce4481fb22653697cced8d0d04027cb1e8:
 
-But it's too soon to be discussing which API to use.  Looking at the
-whole series in lore, there doesn't seem to be any explanation of what
-problem this series is trying to solve and how cryptography is being
-used to solve that problem.
+  Linux 6.19-rc1 (2025-12-14 16:05:07 +1200)
 
-The choice of AES-CBC encryption is unusual.  It's unlikely to be an
-appropriate choice for the problem.
+are available in the Git repository at:
 
-I suspect you're really looking to protect the authenticity of the file
-handles, not their confidentiality; i.e., you'd like to prevent clients
-from constructing their own file handles.  In that case you'd probably
-need a MAC, such as SipHash or HMAC-SHA256.  This would be similar to
-the kernel's existing implementations of TCP SYN and SCTP cookies: the
-system sends out cookies that encode some information, and it uses a MAC
-to verify that any received cookie is a previously sent one.
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.19-p2
 
-But that's just what I suspect.  I can't know for sure since this series
-doesn't provide any context about what it's trying to achieve.
+for you to fetch changes up to b74fd80d7fe578898a76344064d2678ce1efda61:
 
-- Eric
+  crypto: hisilicon/qm - fix incorrect judgment in qm_get_complete_eqe_num() (2025-12-19 14:47:46 +0800)
+
+----------------------------------------------------------------
+This push contains the following changes:
+
+- Fix UAF in seqiv.
+- Fix regression in hisilicon.
+----------------------------------------------------------------
+
+Chenghai Huang (1):
+      crypto: hisilicon/qm - fix incorrect judgment in qm_get_complete_eqe_num()
+
+Herbert Xu (1):
+      crypto: seqiv - Do not use req->iv after crypto_aead_encrypt
+
+ crypto/seqiv.c                | 8 +++++---
+ drivers/crypto/hisilicon/qm.c | 9 ++++-----
+ 2 files changed, 9 insertions(+), 8 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
