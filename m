@@ -1,43 +1,42 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4BE43AA6;
-	Mon, 29 Dec 2025 00:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8132AD20
+	for <linux-crypto@vger.kernel.org>; Mon, 29 Dec 2025 00:48:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766968384; cv=none; b=myMaOg4ztun8ME/zx7uOY2ufEbdL2KgFqbZYf8Upqfq+DTL53wYsVmOeZ8EgiyAUiWXaQ5e1iElwxwT75mcKi8pWoHx0VlBj6boWwppSMY0RqBE+7X18LU8TbI7Tj+CwAEQriTnO5qjQb1bsnPtd9S1SedUVoEieFaP5ujXJkbg=
+	t=1766969297; cv=none; b=czsIK3vC4KNbSYrvuBLsHJ38waPXvZR+5xGNR3S9TgePna2A1C6nUgBB+r/UJHGVHhpQZv1TC9IfThXKgFYAHMI7KFmjOSBqFeK1IlNl9+5WxdTUCeDRUqHFm+WUrrj6LeLYWGbGkQh58hq1KRBbwna8qkLal1jvHN2SEW6pCvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766968384; c=relaxed/simple;
-	bh=7TMxsq78OrqAdUrAqhUXnoJMMU2LcVBro/m7gtHli3k=;
+	s=arc-20240116; t=1766969297; c=relaxed/simple;
+	bh=/alkfRv202IYaK6W1P2JLq9smyYJFeOtqOd4B5ACbOs=;
 	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ABtFYDcJFpc+rkrPmyxRk49VExykBfPmhr+r5b2ZJo9bFWqfV22jzVGC0jp9h7jMo31BN67EcHSPW6bF2pgr6eE+cye0FwR0XW1CMB2yN1Y2L9JqxLrBRyT/pAAFX49S0gmPJyWxaV/w30kTn9CZR0zrO2+NrePKttBv6ISsqWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=NinxZEH3; arc=none smtp.client-ip=180.181.231.80
+	 Content-Disposition; b=DULpJPklqRyXQvdCOcYwrgjLU1qgcyiSSbECUGUTeJCe97Igq/lvSYdsolU55hTHCCe1I3MZnzvprvkLy4N+e+qPKUk8SPjG73IvUtOyE2LYXtBC8teMkWmNEXXpUqc+bjpqxJB5oggK/qlbEQVW0vUPy92Tn5f357up00Stt/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=g0TkTen5; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="NinxZEH3"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="g0TkTen5"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
 	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
-	references:reply-to; bh=9qDyA8LUs1Ztc/ROPgYY6rKDGk8erPkliU0g18dguPM=; b=NinxZ
-	EH3lDKmO+Kmwgv1lPq1Du/WohNEW6CU7Cby1wBoVNGp+vUPr1eanwOxyv5Kk3hhYoMiHBMrleT9Lh
-	QocjdEd4vnDxKqMjFdMLl6TiJiIXU5/03dmG0md8Jl/qDDYqmDrI/nGDVjvtomWCwm48VjBzUJV+k
-	uRMDfWEKhbxDUywlcxaCZKSJABx+rLBgAKcizO8eypVOJP2UWcgNrfjcasEcoGNRdpunOHlZtt49y
-	PWYHzLLfh50gAjnKfnxTPhBrQnN3sBOtSwiGMkHnYEntnFai2gimcCtDH3PTJCdhiBOnuecTXcGX3
-	vCEpG0y76FAhO77FoXlPUabdOzL3w==;
+	references:reply-to; bh=uQ2kM76lsRxba84vR4LlsXETBHtqNJqudJeXA+fpnEc=; b=g0TkT
+	en5SiybLiBaI/qo/AkRdvOWX8QhCmGLjzRttMpW7hMqMZBipE9aEZ8l3p0tKGcoYU6H219pw/wmeq
+	zFupO+afF8Bt6k4U/DUuHh3zBIf2WvycaqF18HdPk+89HccHx/iYIxCSTLzbFpyf24bON68D5y4k8
+	yb6ajjgD8OchXmXkFSxYT8HK1GCyRqIcYovrHDXfimxWln9qjckx7fxvzrRWoZcV3BfdOQ3plGlwq
+	nJsgbvZN2gnEbTi8JpSoUnZ2EbUKfmscpbTipXMh1FLrEEF7apS2o4NyvyDun8gqOY7nkrRdiSH0c
+	MOYdnibwVH0GWzswD3t/PmZu0P/yg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1va1Bl-00D06i-1C;
-	Mon, 29 Dec 2025 08:32:46 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 29 Dec 2025 08:32:45 +0800
-Date: Mon, 29 Dec 2025 08:32:45 +0800
+	id 1va1Qf-00D0BQ-2d;
+	Mon, 29 Dec 2025 08:48:10 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 29 Dec 2025 08:48:09 +0800
+Date: Mon, 29 Dec 2025 08:48:09 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.19
-Message-ID: <aVHMLaTgxU8eBdub@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>
+Subject: crypto: ccp - Use NULL instead of plain 0
+Message-ID: <aVHPyZIUZFLMdNYU@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,38 +46,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Hi Linus:
+Use NULL instead of 0 as the null pointer.
 
-The following changes since commit 8f0b4cce4481fb22653697cced8d0d04027cb1e8:
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-  Linux 6.19-rc1 (2025-12-14 16:05:07 +1200)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.19-p2
-
-for you to fetch changes up to b74fd80d7fe578898a76344064d2678ce1efda61:
-
-  crypto: hisilicon/qm - fix incorrect judgment in qm_get_complete_eqe_num() (2025-12-19 14:47:46 +0800)
-
-----------------------------------------------------------------
-This push contains the following changes:
-
-- Fix UAF in seqiv.
-- Fix regression in hisilicon.
-----------------------------------------------------------------
-
-Chenghai Huang (1):
-      crypto: hisilicon/qm - fix incorrect judgment in qm_get_complete_eqe_num()
-
-Herbert Xu (1):
-      crypto: seqiv - Do not use req->iv after crypto_aead_encrypt
-
- crypto/seqiv.c                | 8 +++++---
- drivers/crypto/hisilicon/qm.c | 9 ++++-----
- 2 files changed, 9 insertions(+), 8 deletions(-)
-
-Thanks,
+diff --git a/drivers/crypto/ccp/sev-dev-tsm.c b/drivers/crypto/ccp/sev-dev-tsm.c
+index ea29cd5d0ff9..5fd5a8fc60ed 100644
+--- a/drivers/crypto/ccp/sev-dev-tsm.c
++++ b/drivers/crypto/ccp/sev-dev-tsm.c
+@@ -241,7 +241,7 @@ static struct pci_tsm *dsm_probe(struct tsm_dev *tsmdev, struct pci_dev *pdev)
+ 
+ 	if (is_pci_tsm_pf0(pdev))
+ 		return tio_pf0_probe(pdev, sev);
+-	return 0;
++	return NULL;
+ }
+ 
+ static void dsm_remove(struct pci_tsm *tsm)
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
