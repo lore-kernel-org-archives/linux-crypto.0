@@ -1,72 +1,130 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7731A8F84
-	for <linux-crypto@vger.kernel.org>; Mon, 29 Dec 2025 00:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C72A199237;
+	Mon, 29 Dec 2025 02:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766969498; cv=none; b=fOeVMDGhykGUNvkfEnd+2G0VoyppUs3epeXvH03JbQI9b3sZN8SpmUs+biY6dTTKM6cQjN2kyaJouCRHLjgK1BQoJO/aRenzXb/COOMNZYWyVmsLfEdy624meNRRjN5uDHupM3PYnWeMkUeSPqa04pR3HY5t0pQsXItKnAk1QFI=
+	t=1766974317; cv=none; b=D/3bRioKCJUQlyQf99vdiZud/KXMrsYA3qCdYb1HVsSBqy+V/pZWWfkLLnOKzv2/8KcUcZzUEkS77HBGF2jKKyphVz1U7cc1uAmT/r+DwcD4hwpDTHjALb/FWMnk6XNFmQs12HoqUw3RuQuOXTFYbCco3dndjR0GUqSg0d8X+kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766969498; c=relaxed/simple;
-	bh=taaluATutcNrELB61lIcorYtLAfGntpQ2UsKqfOgpQ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D3UETVocS/Kk74Nd1r70hi5TTQ9OQQ4pn1BWDHHZLjtn7jZXRgBn2uT25P6awaKzlwdOKx4qT6tuw1LItn578wdDOlXk8tE39HUS3yQh0wxxDKkHUr98a9itG6aDiwFnxwEj3YY0LZGO+Zvs2YykMmkFlM06j06Rh25vvPy9KGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=WV1u4K8f; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="WV1u4K8f"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=20XY5DbQ7wDO0BZizRlWD1naiLGDp7vX9D4+DGUmpQ8=; 
-	b=WV1u4K8fne7fEQV8qDA0nleYDU+h9q0eNVzdVV7YcIpsMW3nc31w2fSn1PTUczDXU0eaj37ZX3F
-	X3nBnyaRbDDyb4Ha9+/z5JqfdKhFOIHtyI7XbiS/dX6iujOsw7WoWcG/t6xHXVrL+S/4NbWMCe6Nx
-	Rdnsk4CzNbgZdTk082+CmRcx3yfeQYVEsW9gqpT5c6tLAToPHGDt6dt7G63rzMAR+V5RWLW0nGzCu
-	tqtWBJSK/hxlrPzCWUDa9GvMYIF6R6+AsudL78BNV8mYYtq642WDn2Wd2shu61757oTUWFZSTm1il
-	kKsdjIGTZqGfmetHyNxDxdaeUblEbgAEiRWg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1va1Tq-00D0GL-1S;
-	Mon, 29 Dec 2025 08:51:27 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 29 Dec 2025 08:51:26 +0800
-Date: Mon, 29 Dec 2025 08:51:26 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 0/3] Several simplifications in the DRBG driver
-Message-ID: <aVHQjt-m0BMNa1yv@gondor.apana.org.au>
-References: <20251217202148.22887-1-s.shtylyov@omp.ru>
+	s=arc-20240116; t=1766974317; c=relaxed/simple;
+	bh=Q9aVLo3e1IvFQCGDV4P+l27KBvVPVbPaYfVufsCCI7c=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=FbKunRTue/llqanmPgyLNsTm//q0FYfoEILXPJ/0eSVbjjGTl3Hizn5Lbmh9BR7uioQ+E0uRwqvPjUrGBtCtdr5fWrGQYrXFsTynYeR6VyRnu11DjMO3em26ZC9tEr1lEhJyvQwoVqob9cBzVNeXKF8B0P0636A5dMSJPCjagIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Axz8Ne41Fp1fYDAA--.12814S3;
+	Mon, 29 Dec 2025 10:11:42 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJDxD8Na41FpbAQGAA--.16832S3;
+	Mon, 29 Dec 2025 10:11:40 +0800 (CST)
+Subject: Re: [PATCH v4 0/9] crypto: virtio: Some bugfix and enhancement
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: Gonglei <arei.gonglei@huawei.com>, Jason Wang <jasowang@redhat.com>,
+ Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20251218034846.948860-1-maobibo@loongson.cn>
+ <20251226094413-mutt-send-email-mst@kernel.org>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <6bf766f5-1f77-0d71-2970-46cbe5512233@loongson.cn>
+Date: Mon, 29 Dec 2025 10:09:07 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251217202148.22887-1-s.shtylyov@omp.ru>
+In-Reply-To: <20251226094413-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJDxD8Na41FpbAQGAA--.16832S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxWw4UZF47uFWUuw1UGw4kAFc_yoW5Jw4UpF
+	W5tFsayrWUGr17WFyfXa48Kry5Ca9xCryagr4fXr1Fkrn0qr97Xr12yw48uFy7JF1rJ3sr
+	JrW8Xryj9F1DuFXCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr1j6F4UJwAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
+	Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48J
+	MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcpBTUUUUU
 
-On Wed, Dec 17, 2025 at 11:21:42PM +0300, Sergey Shtylyov wrote:
-> First Simplify drbg_fips_continuous_test(), then drbg_get_random_bytes(),
-> and then its callers...
-> 
-> The patches below were made against the master branch of Herbert Xu's
-> cryptodev-2.6.git repo.
-> 
-> Sergey Shtylyov (3):
->   crypto: drbg - kill useless variable in drbg_fips_continuous_test()
->   crypto: drbg - make drbg_fips_continuous_test() return bool
->   crypto: drbg - make drbg_get_random_bytes() return *void*
-> 
->  crypto/drbg.c | 49 +++++++++++++++++--------------------------------
->  1 file changed, 17 insertions(+), 32 deletions(-)
-> 
-> -- 
-> 2.52.0
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+On 2025/12/26 下午10:45, Michael S. Tsirkin wrote:
+> On Thu, Dec 18, 2025 at 11:48:37AM +0800, Bibo Mao wrote:
+>> There is problem when multiple processes add encrypt/decrypt requests
+>> with virtio crypto device and spinlock is missing with command response
+>> handling. Also there is duplicated virtqueue_kick() without lock hold.
+>>
+>> Here these two issues are fixed and the others are code clean up, such as
+>> use common APIs for block size and iv size etc.
+> 
+> series:
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> but you did not CC maintainers, you really should if you want this
+> applied.
+Oh, sorry, it is the first time I send patch relative with crypto 
+subsystem.
+
+Add Herbert and David, need I send a fresh version?
+
+Regards
+Bibo Mao
+> 
+>> ---
+>> v3 ... v4:
+>>    1. Remove patch 10 which adds ECB AES algo, since application and qemu
+>>       backend emulation is not ready for ECB AES algo.
+>>    2. Add Cc stable tag with patch 2 which removes duplicated
+>>       virtqueue_kick() without lock hold.
+>>
+>> v2 ... v3:
+>>    1. Remove NULL checking with req_data where kfree() is called, since
+>>       NULL pointer is workable with kfree() API.
+>>    2. In patch 7 and patch 8, req_data and IV buffer which are preallocated
+>>       are sensitive data, memzero_explicit() is used even on error path
+>>       handling.
+>>    3. Remove duplicated virtqueue_kick() in new patch 2, since it is
+>>       already called in previous __virtio_crypto_skcipher_do_req().
+>>
+>> v1 ... v2:
+>>    1. Add Fixes tag with patch 1.
+>>    2. Add new patch 2 - patch 9 to add ecb aes algo support.
+>> ---
+>> Bibo Mao (9):
+>>    crypto: virtio: Add spinlock protection with virtqueue notification
+>>    crypto: virtio: Remove duplicated virtqueue_kick in
+>>      virtio_crypto_skcipher_crypt_req
+>>    crypto: virtio: Replace package id with numa node id
+>>    crypto: virtio: Add algo pointer in virtio_crypto_skcipher_ctx
+>>    crypto: virtio: Use generic API aes_check_keylen()
+>>    crypto: virtio: Remove AES specified marcro AES_BLOCK_SIZE
+>>    crypto: virtio: Add req_data with structure virtio_crypto_sym_request
+>>    crypto: virtio: Add IV buffer in structure virtio_crypto_sym_request
+>>    crypto: virtio: Add skcipher support without IV
+>>
+>>   drivers/crypto/virtio/virtio_crypto_common.h  |   2 +-
+>>   drivers/crypto/virtio/virtio_crypto_core.c    |   5 +
+>>   .../virtio/virtio_crypto_skcipher_algs.c      | 113 +++++++++---------
+>>   3 files changed, 62 insertions(+), 58 deletions(-)
+>>
+>>
+>> base-commit: ea1013c1539270e372fc99854bc6e4d94eaeff66
+>> -- 
+>> 2.39.3
+
