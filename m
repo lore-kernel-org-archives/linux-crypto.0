@@ -1,44 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C5A2D7BF;
-	Mon, 29 Dec 2025 00:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94071C3C1F
+	for <linux-crypto@vger.kernel.org>; Mon, 29 Dec 2025 00:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766969474; cv=none; b=qPk1oHIsE2FA20GHbBm5XbPdu1p/bRopGlcYNFhCFzQ1SRgK/I6n+B39Kz6GfA0uNqgDxQ1QfVAWT/zs2wtdGiB9ZPp2jK9dYAyBBW03to+QFAKcTrR2jXfuYj6JBLX0ma8id5jMbTSAi6R7sHfSSkKyskzDblVe3CSUCr3AllM=
+	t=1766969485; cv=none; b=oWyBXLZ/4wMI8WZVJFS2s6csnNEEn3rcct+9uAYRkadoDngk0UJOhGlrjgTQ8EcOhQfe+p9eWoQpbxanmlPAycswWh2f/5RmGwjzw4ZhKOeDH4ID6QD6/+W3fXBqp1zz4NM/mBuhnrQzz/SseL+1X8IBIRj9Euh5B+h/fBN7gNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766969474; c=relaxed/simple;
-	bh=w/exPul4glVIoVpy5gQygksF3C89vafNuI7+mXCotbY=;
+	s=arc-20240116; t=1766969485; c=relaxed/simple;
+	bh=p4O8ISQM31ErcjrKzTUEbgzDBh8W0IYYwiVuwojfDlE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rr1KgJH5iZt5hXShWUaojuTC26eG2896VexSVc7HrUO6XPvihbE2ms6eZWAc6McxObmtGcpGddCHqE2nW/Y+OxQuN7uXB0lkLcdKEFQVIHwi6lC0Y/DcinSG9BsEGbE/p4CAxJnbZe2HVtivW8ZExrMkDINbDNB2RwnPiK9v3vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=SfePWMsJ; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=HkuYEO8EYo1LqVe45ibIsLKmkdEALb2hh2SjVNH2PyUGET/6LYyfUmT2s8hH/k9YFpAUVMjBllPJpI1/6tN7UPtN9K1PpQ760rl5VgrPRrnMqU5dZAGFPubwmZw6uqzOPuhAns9+4GINo7LovlVMtogkv3ovtT5J21bFjGrSwD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=jRNNAlie; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="SfePWMsJ"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="jRNNAlie"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=n0G05CBcludsDcS5c+gNE2zdaEpSorjyYo6DuuodMl4=; 
-	b=SfePWMsJv57apzxQ1qUnIU252bV1763rcOsuFote7FRo82Z2WC1dmvjQzQzwtwNgkSnlTb6r53f
-	ElOhWBYfDaadVrnVFwCmjxwYyD/25QraUcF93NFk0lHXWBeLXw1B5BZRG0pzJIoVUdBtUCIieCf/Y
-	2HbYj+7DR3rlA96QLsTN367EZW9NPkjP9W0USYdnuirUe46eoTjiOPV+w4GJFI/cwMs8STg2kVEFi
-	4w+5giaQ75/E8rjVoHJF0YMZWwaHWbY9eoQveuX8//Rstmvj+Q03qM4H1cTZsX12hN6/ifOrhP5sO
-	v0S8coexlmsGJ9AYgqV8fZ04B0lYdlLI8FJw==;
+	from:content-type:reply-to; bh=VW7unnbNNxEA1OSbvuw5N82Fi2nwKDNKUSAlwWP66lg=; 
+	b=jRNNAlie2DoR/x96w8Hv4B8+e7Ox/u08kGGBrCn1128xj/YeMjjbug9yIL+1Sa0FjAugSUTYf/I
+	HXi54sW+dShS3Bual4KhSBuyNXmPjGCFmwt8FQUCOG8M7t3FkA8+I3s4e6r/N/FEezUq7yqnchYGt
+	QaOviwVmKYUte3BAngxCzO7TwLseuXI1B1SzDM28IzYTrofaRzTBe+07V34p8vla23tLsNUjVRNrW
+	IrKTv35/ZKL4DgVSHRoQVP563HLjq5ee2CdM2a9ZOyolfPhogH/aQErAGZMEFFlFgSTuQ91x41F20
+	bgwwB6F/ETbv3vLvbSZ0BWIcIZ7psJvPByuQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1va1TU-00D0Fj-2Q;
-	Mon, 29 Dec 2025 08:51:05 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 29 Dec 2025 08:51:04 +0800
-Date: Mon, 29 Dec 2025 08:51:04 +0800
+	id 1va1Th-00D0Fq-13;
+	Mon, 29 Dec 2025 08:51:18 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 29 Dec 2025 08:51:17 +0800
+Date: Mon, 29 Dec 2025 08:51:17 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: khazad - simplify return statement in
- khazad_mod_init
-Message-ID: <aVHQeAF9So391tbP@gondor.apana.org.au>
-References: <20251216145536.44670-1-thorsten.blum@linux.dev>
+To: Harshita Bhilwaria <harshita.bhilwaria@intel.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
+Subject: Re: [PATCH] crypto: qat - fix duplicate restarting msg during AER
+ error
+Message-ID: <aVHQhcnyMp_nBstl@gondor.apana.org.au>
+References: <20251217054606.430300-1-harshita.bhilwaria@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,16 +46,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251216145536.44670-1-thorsten.blum@linux.dev>
+In-Reply-To: <20251217054606.430300-1-harshita.bhilwaria@intel.com>
 
-On Tue, Dec 16, 2025 at 03:55:35PM +0100, Thorsten Blum wrote:
-> Return the result of calling crypto_register_alg() directly and remove
-> the local return variable.
+On Wed, Dec 17, 2025 at 11:16:06AM +0530, Harshita Bhilwaria wrote:
+> The restarting message from PF to VF is sent twice during AER error
+> handling: once from adf_error_detected() and again from
+> adf_disable_sriov().
+> This causes userspace subservices to shutdown unexpectedly when they
+> receive a duplicate restarting message after already being restarted.
 > 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> Avoid calling adf_pf2vf_notify_restarting() and
+> adf_pf2vf_wait_for_restarting_complete() from adf_error_detected() so
+> that the restarting msg is sent only once from PF to VF.
+> 
+> Fixes: 9567d3dc760931 ("crypto: qat - improve aer error reset handling")
+> Signed-off-by: Harshita Bhilwaria <harshita.bhilwaria@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
+> Reviewed-by: Ravikumar PM <ravikumar.pm@intel.com>
+> Reviewed-by: Srikanth Thokala <srikanth.thokala@intel.com>
 > ---
->  crypto/khazad.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
+>  drivers/crypto/intel/qat/qat_common/adf_aer.c | 2 --
+>  1 file changed, 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
