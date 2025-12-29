@@ -1,130 +1,63 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C72A199237;
-	Mon, 29 Dec 2025 02:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2A628E59E;
+	Mon, 29 Dec 2025 06:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766974317; cv=none; b=D/3bRioKCJUQlyQf99vdiZud/KXMrsYA3qCdYb1HVsSBqy+V/pZWWfkLLnOKzv2/8KcUcZzUEkS77HBGF2jKKyphVz1U7cc1uAmT/r+DwcD4hwpDTHjALb/FWMnk6XNFmQs12HoqUw3RuQuOXTFYbCco3dndjR0GUqSg0d8X+kc=
+	t=1766989114; cv=none; b=djOB7GeRDZBjrh45OYdcewTjrX4g1Ts+cMeLyhQZGOXuiJFKJqvlpxf7EuMrPRV92t7raixzscrm7n/hh4IQVSuxCSzwRddTZ6gMFH5zK8FIZXroWagUH2Q5FZ4i0pLjixAFZUNWWC+tb6HR1aAQ+EP/57uNMxal1ctRp7KkHGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766974317; c=relaxed/simple;
-	bh=Q9aVLo3e1IvFQCGDV4P+l27KBvVPVbPaYfVufsCCI7c=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=FbKunRTue/llqanmPgyLNsTm//q0FYfoEILXPJ/0eSVbjjGTl3Hizn5Lbmh9BR7uioQ+E0uRwqvPjUrGBtCtdr5fWrGQYrXFsTynYeR6VyRnu11DjMO3em26ZC9tEr1lEhJyvQwoVqob9cBzVNeXKF8B0P0636A5dMSJPCjagIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Axz8Ne41Fp1fYDAA--.12814S3;
-	Mon, 29 Dec 2025 10:11:42 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJDxD8Na41FpbAQGAA--.16832S3;
-	Mon, 29 Dec 2025 10:11:40 +0800 (CST)
-Subject: Re: [PATCH v4 0/9] crypto: virtio: Some bugfix and enhancement
-To: "Michael S. Tsirkin" <mst@redhat.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>
-Cc: Gonglei <arei.gonglei@huawei.com>, Jason Wang <jasowang@redhat.com>,
- Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <20251218034846.948860-1-maobibo@loongson.cn>
- <20251226094413-mutt-send-email-mst@kernel.org>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <6bf766f5-1f77-0d71-2970-46cbe5512233@loongson.cn>
-Date: Mon, 29 Dec 2025 10:09:07 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1766989114; c=relaxed/simple;
+	bh=qstDeCUOmR4RHhq/vy9KlElVzvnKkiBYsEDby/4nMLc=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=TKpuS4viOcsmg38zhD2IKgf+Y/xJeDGYL3cl2NCJcu3fPZIVyIdEx0YtrEsw0mfFdIg4n4Wh0V9lLlmD0PL4SA0gE60Fc/VBjpdkuxG7zPD5dz7P5mNwoaBu6HqswB6rsOAhARjyW+IEqOh4qTc7C7A94FwfnLcARSs2jDyrfMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dQ2zJt4M; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dQ2zJt4M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35120C4CEF7;
+	Mon, 29 Dec 2025 06:18:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766989112;
+	bh=qstDeCUOmR4RHhq/vy9KlElVzvnKkiBYsEDby/4nMLc=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=dQ2zJt4MXHophB9CHAFA7YFtQniUbtnxdGvNJn3y4Ls/MOC2LlfoHY3bW8yWAQR1j
+	 d6KiH/bX63h+FtDoePUD+jQ23ZYfmlbWKM/FMf+RLo03aB48lceVz0iODeHjJSjm98
+	 JPiUHJYa8LX0yvzv+D1U+gwT69fZJyY5u59G8mLDUGy6CuVeEM4zVJ2SiUOki59Qzv
+	 k1QbtUdgb5EMRxglp3tbCci5braIRW8dKF/HGZse18hQogtZc11HWL1mROjLQHEgFh
+	 8Pq0gtN74PMMpQzYQ1i3gXs1ziOc5j26y3PGb2BosMexHzKctmSHqi0E2hkdCOnMnp
+	 17bFvoPsx8hrA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3DB0E3808200;
+	Mon, 29 Dec 2025 06:15:16 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.19
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <aVHMLaTgxU8eBdub@gondor.apana.org.au>
+References: <aVHMLaTgxU8eBdub@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <aVHMLaTgxU8eBdub@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.19-p2
+X-PR-Tracked-Commit-Id: b74fd80d7fe578898a76344064d2678ce1efda61
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: a69eddfd171f5570f5c7b333e41f3dead26ce859
+Message-Id: <176698891475.2860963.5575527961980430682.pr-tracker-bot@kernel.org>
+Date: Mon, 29 Dec 2025 06:15:14 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20251226094413-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJDxD8Na41FpbAQGAA--.16832S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxWw4UZF47uFWUuw1UGw4kAFc_yoW5Jw4UpF
-	W5tFsayrWUGr17WFyfXa48Kry5Ca9xCryagr4fXr1Fkrn0qr97Xr12yw48uFy7JF1rJ3sr
-	JrW8Xryj9F1DuFXCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr1j6F4UJwAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
-	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
-	Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
-	CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48J
-	MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcpBTUUUUU
 
+The pull request you sent on Mon, 29 Dec 2025 08:32:45 +0800:
 
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.19-p2
 
-On 2025/12/26 下午10:45, Michael S. Tsirkin wrote:
-> On Thu, Dec 18, 2025 at 11:48:37AM +0800, Bibo Mao wrote:
->> There is problem when multiple processes add encrypt/decrypt requests
->> with virtio crypto device and spinlock is missing with command response
->> handling. Also there is duplicated virtqueue_kick() without lock hold.
->>
->> Here these two issues are fixed and the others are code clean up, such as
->> use common APIs for block size and iv size etc.
-> 
-> series:
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> but you did not CC maintainers, you really should if you want this
-> applied.
-Oh, sorry, it is the first time I send patch relative with crypto 
-subsystem.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/a69eddfd171f5570f5c7b333e41f3dead26ce859
 
-Add Herbert and David, need I send a fresh version?
+Thank you!
 
-Regards
-Bibo Mao
-> 
->> ---
->> v3 ... v4:
->>    1. Remove patch 10 which adds ECB AES algo, since application and qemu
->>       backend emulation is not ready for ECB AES algo.
->>    2. Add Cc stable tag with patch 2 which removes duplicated
->>       virtqueue_kick() without lock hold.
->>
->> v2 ... v3:
->>    1. Remove NULL checking with req_data where kfree() is called, since
->>       NULL pointer is workable with kfree() API.
->>    2. In patch 7 and patch 8, req_data and IV buffer which are preallocated
->>       are sensitive data, memzero_explicit() is used even on error path
->>       handling.
->>    3. Remove duplicated virtqueue_kick() in new patch 2, since it is
->>       already called in previous __virtio_crypto_skcipher_do_req().
->>
->> v1 ... v2:
->>    1. Add Fixes tag with patch 1.
->>    2. Add new patch 2 - patch 9 to add ecb aes algo support.
->> ---
->> Bibo Mao (9):
->>    crypto: virtio: Add spinlock protection with virtqueue notification
->>    crypto: virtio: Remove duplicated virtqueue_kick in
->>      virtio_crypto_skcipher_crypt_req
->>    crypto: virtio: Replace package id with numa node id
->>    crypto: virtio: Add algo pointer in virtio_crypto_skcipher_ctx
->>    crypto: virtio: Use generic API aes_check_keylen()
->>    crypto: virtio: Remove AES specified marcro AES_BLOCK_SIZE
->>    crypto: virtio: Add req_data with structure virtio_crypto_sym_request
->>    crypto: virtio: Add IV buffer in structure virtio_crypto_sym_request
->>    crypto: virtio: Add skcipher support without IV
->>
->>   drivers/crypto/virtio/virtio_crypto_common.h  |   2 +-
->>   drivers/crypto/virtio/virtio_crypto_core.c    |   5 +
->>   .../virtio/virtio_crypto_skcipher_algs.c      | 113 +++++++++---------
->>   3 files changed, 62 insertions(+), 58 deletions(-)
->>
->>
->> base-commit: ea1013c1539270e372fc99854bc6e4d94eaeff66
->> -- 
->> 2.39.3
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
