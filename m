@@ -1,112 +1,134 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D860A24A046;
-	Mon, 29 Dec 2025 22:39:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5011A9F83
+	for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 07:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767047948; cv=none; b=pfvBH8gO5/k0v3jDyH/O/dm0rsRs1bdDs28X9rBX6NSi+3K8aVe2ItvsKj8vCjaJKXiwXfXy+UEApgwxAMdZflb5aAyXAXCRFjyhZsHKZkgBKDM8cTImKFNWzHZL6FNkVDKnKZVKBEB32Q6UL0d1AOM0qAw8QhU6a32Eqyotd/U=
+	t=1767079973; cv=none; b=Wmbe6CVxKQf/qWGh0HSZ8RFztZuWzfSnweiaj+5lBXwbAKNM2P2FYc2CuNyaQ2iwzfs/uHoKcvweiVx8nHQdgW9hml+CWpwlOCfCNa02SN2DDlBz3yhphX/FR2vpRf+99CCW9E6shkGFMz6ai4xtuuFe8eg/yHIk5qRNekZcXxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767047948; c=relaxed/simple;
-	bh=G9tQ0hkFSi73XXtRzgVQUNRUaxJUsQu73ITJfWZswWI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j29lAkz+Az3shvnOqMJMqfJQrNg/mAiRGW+HBECxyzN4F3rwl10AtHzI2WnEM4d5MXZeNYwZoDTh51qMSqw1dPHI1cgCtlm932kC8ZLkqNKTCgISq6iHPBiE1ydDwMUxrkSKYRRAOmOCjeoihT0TLozoJYoVHodPKwHHKnbj/sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=loI30cCv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767079973; c=relaxed/simple;
+	bh=PMKKvUea0kfyrhbIk4q/v1rBSxtKehQKLlnj4y8Z/aU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=HvwJo7tuoGO2Ne3YSN8E4S2N4SMWkgmx/BwDbTH09QS57MOjtiCONKv3DllY6IKmEu/lKFtV2Tfzvf39IayTPFBNg452npuCHvVcnW1bsNYDmqgRHGusocMJSNo2rbM8fYC+LTxA12RbcBcJmwciHXb2h65GWjDXTsC5/NrJ9UE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=quora.org; spf=pass smtp.mailfrom=quora.org; dkim=pass (1024-bit key) header.d=quora.org header.i=@quora.org header.b=iNW/YqV1; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=quora.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quora.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="loI30cCv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 338F1C4CEF7;
-	Mon, 29 Dec 2025 22:39:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767047947;
-	bh=G9tQ0hkFSi73XXtRzgVQUNRUaxJUsQu73ITJfWZswWI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=loI30cCvRXDdija63qGpBf6jdiWTTQes9pMyumpng4P/dbw61ZpvjYJ4rq0RoZowf
-	 Z6YAgMalwlkoYsR6R0/FbXBWJuUPejONQrm3vrdj/ZZgaivNDzFGER6WFXxnlxoJGT
-	 Clo9JPNd6SpBGBKDiNtdGeItv1w3Z0S1aEVTTQHCESH9qB7Bp4s7sPJrurWuByP1HW
-	 4xgXeh9XKUMu1YdJqzEm5Kg8UJfZthYrfX+IYrTJeW3Xa+MMweDAClNANJW491iy48
-	 c9JB9Agz6ixnvqKv+cMEvWM+CM3UjEWaJXTZRbH8m0cCTQZM3R3vBY1eS8dS8t8uPQ
-	 ggfweNn/n7Mng==
-From: Eric Biggers <ebiggers@kernel.org>
-To: stable@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Vivian Wang <wangruikang@iscas.ac.cn>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 6.12] lib/crypto: riscv/chacha: Avoid s0/fp register
-Date: Mon, 29 Dec 2025 14:37:29 -0800
-Message-ID: <20251229223729.99861-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (1024-bit key) header.d=quora.org header.i=@quora.org header.b="iNW/YqV1"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-34ccb7ad166so8986834a91.2
+        for <linux-crypto@vger.kernel.org>; Mon, 29 Dec 2025 23:32:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=quora.org; s=google; t=1767079971; x=1767684771; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uUlwbZW0uW61EHDljdHe2pJ1CLNsAKPuwyaTtJu+Xxg=;
+        b=iNW/YqV1r4VsnmNzonrL61YmhEtbccjVufo+MN16uaTJ1OVv+7T+a36XTuioKDzZS/
+         FnSjdSqmhOp4CggvkMyiGktSClvN9MvAIMjcfTx3dyWzabpamjt4/BiQrti+wf4UjWm1
+         gjDYV4oWm6a2NSBiDYF15OPQbIjtADEajum/c=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767079971; x=1767684771;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uUlwbZW0uW61EHDljdHe2pJ1CLNsAKPuwyaTtJu+Xxg=;
+        b=DUIDN5hiCt27xU1Oj66vBJCrrMx1KzPOPXbe3CtSLfufQfbq52CCs3ikZy0snuXY8F
+         M74U658NZQjVEpRIO38ZXPhjTUyCBEt3ra2MCUnM+nGLBngWXl0hW6+nyviqEB4fyepj
+         jkuA+BNhJFIx4rXr5UhxrrfRleMcj5xCHfrk9EucrtSAiKirjSBMs3/1Zy7zp+d2AaQi
+         eEHt8PDRz5W1Ios0oD6oszITmbMT1w4nH7LvWM5Bds5ypcWFXZYpOa/Qh3O7r/IK60P/
+         95UjmWLsUR2G2yhrn+XyNjxOu0HXzPcB/5Ano2Sb5k4B8RHR2KvEPg9wqzEbLI41gvhi
+         PAKQ==
+X-Gm-Message-State: AOJu0YxSvb6Td3AhbPPDLRvsj+F8iQONtfM9t1RXHb5Hd+m72Jc84h5t
+	lxvrdDr5KWNx4soH7xmSGvGNh/DOveSW4YKnNhidK5GehzTWSyim4QD8I/h9LnjbB2bPiW5UayD
+	4sDIZm84B6RtDBjXjlEvgAuEzTeZvsAI3IpcWSWU3JA==
+X-Gm-Gg: AY/fxX5nmPAkhJMwijmLTLy5H3gCY0AkYjjAueS4mXHrgen9Ckujxm2jHKIK2wMBctt
+	WahYdZBqI37m66RPz/aC7x71+DjnrL4oCMzhPOKP/afKtWL7Cn/rjKa3TFlKlrplZTWi64Tbtu5
+	1Surs8K2ApnIt4me5GdBJuAT518qzcuJAUhGyg7Q+J2T97606cXpgdIIHb77inK0jRLHbPa4l8R
+	GUE2Csnktddc3nQlsXeuOn3gmZmTONGA4K1uOaLhyjNeMHVXqBnU8PcivZJIptgkbibTFC4oyCW
+	chRRqIqaBiJB3SWu4u9DZZTULDn2EZOGymDM71f8Yowld9JvAoRnRJJEqyFAYWWQK4yqxK1OrEu
+	z8MGP3031YIfIMgDVmQU3OjlA2yU1E5s/YNW/9VTfHzwp4tHcRi76LPapFPBGHAzUYWXo7BtC67
+	Pwc9qOs+WzlRL2+X8hmiUfLl1qGB2Pi4ZHrQbT
+X-Google-Smtp-Source: AGHT+IGvvN8950IcxWSAGFszSo61RThFiea1HZ/e8OEQ8iDZeLrg5FZril2MJ6rC900uvnTRwWQJjqP7J5SU9YNlQD0=
+X-Received: by 2002:a17:90b:46:b0:349:3fe8:e7de with SMTP id
+ 98e67ed59e1d1-34e921e64efmr26816988a91.28.1767079970865; Mon, 29 Dec 2025
+ 23:32:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Daniel J Blueman <daniel@quora.org>
+Date: Tue, 30 Dec 2025 15:32:39 +0800
+X-Gm-Features: AQt7F2qQuHOLaSvJRm8YddNridShG0vgGiBNRUOEwwhrLLjlLwgis4V9k5MPrVI
+Message-ID: <CAMVG2svM0G-=OZidTONdP6V7AjKiLLLYgwjZZC_fU7_pWa=zXQ@mail.gmail.com>
+Subject: [6.19-rc3] xxhash invalid access during BTRFS mount
+To: David Sterba <dsterba@suse.com>, Chris Mason <clm@fb.com>, 
+	Linux BTRFS <linux-btrfs@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, Linux Kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Vivian Wang <wangruikang@iscas.ac.cn>
+Hi Dave, Chris et al,
 
-commit 43169328c7b4623b54b7713ec68479cebda5465f upstream.
+When mounting a BTRFS filesystem on 6.19-rc3 on ARM64 using xxhash
+checksumming and KASAN, I see invalid access:
 
-In chacha_zvkb, avoid using the s0 register, which is the frame pointer,
-by reallocating KEY0 to t5. This makes stack traces available if e.g. a
-crash happens in chacha_zvkb.
+BTRFS info (device nvme0n1p5): first mount of filesystem
+f99f2753-0283-4f93-8f5d-7a9f59f148cc
+BTRFS info (device nvme0n1p5): using xxhash64 (xxhash64-generic)
+checksum algorithm
+==================================================================
+BUG: KASAN: invalid-access in xxh64_update (lib/xxhash.c:143 lib/xxhash.c:283)
+Read of size 8 at addr 21ff000802247000 by task kworker/u48:3/48
+Pointer tag: [21], memory tag: [c0]
 
-No frame pointer maintenance is otherwise required since this is a leaf
-function.
+CPU: 1 UID: 0 PID: 48 Comm: kworker/u48:3 Tainted: G      E
+6.19.0-rc3 #19 PREEMPTLAZY
+Tainted: [E]=UNSIGNED_MODULE
+Hardware name: LENOVO 83ED/LNVNB161216, BIOS NHCN60WW 09/11/2025
+Workqueue: btrfs-endio-meta simple_end_io_work
+Call trace:
+show_stack (arch/arm64/kernel/stacktrace.c:501) (C)
+dump_stack_lvl (lib/dump_stack.c:122)
+print_address_description.isra.0 (mm/kasan/report.c:379)
+print_report (mm/kasan/report.c:450 (discriminator 1)
+mm/kasan/report.c:483 (discriminator 1))
+kasan_report (mm/kasan/report.c:597)
+kasan_check_range (mm/kasan/sw_tags.c:86 (discriminator 1))
+__hwasan_loadN_noabort (mm/kasan/sw_tags.c:158)
+xxh64_update (lib/xxhash.c:143 lib/xxhash.c:283)
+xxhash64_update (crypto/xxhash_generic.c:49)
+crypto_shash_finup (crypto/shash.c:123 (discriminator 1))
+csum_tree_block (fs/btrfs/disk-io.c:110 (discriminator 3))
+btrfs_validate_extent_buffer (fs/btrfs/disk-io.c:404)
+end_bbio_meta_read (fs/btrfs/extent_io.c:3822 (discriminator 1))
+btrfs_bio_end_io (fs/btrfs/bio.c:146)
+simple_end_io_work (fs/btrfs/bio.c:382)
+process_one_work (./arch/arm64/include/asm/jump_label.h:36
+./include/trace/events/workqueue.h:110 kernel/workqueue.c:3262)
+worker_thread (kernel/workqueue.c:3334 (discriminator 2)
+kernel/workqueue.c:3421 (discriminator 2))
+kthread (kernel/kthread.c:463)
+ret_from_fork (arch/arm64/kernel/entry.S:861)
 
-Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
-Fixes: bb54668837a0 ("crypto: riscv - add vector crypto accelerated ChaCha20")
-Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/r/20251202-riscv-chacha_zvkb-fp-v2-1-7bd00098c9dc@iscas.ac.cn
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- arch/riscv/crypto/chacha-riscv64-zvkb.S | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+The buggy address belongs to the physical page:
+page: refcount:2 mapcount:0 mapping:00000000973bd0ac index:0x9731 pfn:0x882247
+memcg:aaff000800ae1b00
+aops:btree_aops ino:1
+flags: 0x47e400000004020(lru|private|node=0|zone=2|kasantag=0x3f)
+raw: 047e400000004020 fffffdffe0089188 fffffdffe0089208 ccff000814148300
+raw: 0000000000009731 10ff0008493322d0 00000002ffffffff aaff000800ae1b00
+page dumped because: kasan: bad access detected
 
-diff --git a/arch/riscv/crypto/chacha-riscv64-zvkb.S b/arch/riscv/crypto/chacha-riscv64-zvkb.S
-index bf057737ac69..fbef93503571 100644
---- a/arch/riscv/crypto/chacha-riscv64-zvkb.S
-+++ b/arch/riscv/crypto/chacha-riscv64-zvkb.S
-@@ -58,11 +58,12 @@
- #define CONSTS3		t0
- #define TMP		t1
- #define VL		t2
- #define STRIDE		t3
- #define NROUNDS		t4
--#define KEY0		s0
-+#define KEY0		t5
-+// Avoid s0/fp to allow for unwinding
- #define KEY1		s1
- #define KEY2		s2
- #define KEY3		s3
- #define KEY4		s4
- #define KEY5		s5
-@@ -139,11 +140,10 @@
- // The counter is treated as 32-bit, following the RFC7539 convention.
- SYM_FUNC_START(chacha20_zvkb)
- 	srli		LEN, LEN, 6	// Bytes to blocks
- 
- 	addi		sp, sp, -96
--	sd		s0, 0(sp)
- 	sd		s1, 8(sp)
- 	sd		s2, 16(sp)
- 	sd		s3, 24(sp)
- 	sd		s4, 32(sp)
- 	sd		s5, 40(sp)
-@@ -275,11 +275,10 @@ SYM_FUNC_START(chacha20_zvkb)
- 	slli		TMP, VL, 6
- 	add		OUTP, OUTP, TMP
- 	add		INP, INP, TMP
- 	bnez		LEN, .Lblock_loop
- 
--	ld		s0, 0(sp)
- 	ld		s1, 8(sp)
- 	ld		s2, 16(sp)
- 	ld		s3, 24(sp)
- 	ld		s4, 32(sp)
- 	ld		s5, 40(sp)
+Memory state around the buggy address:
+ffff000802246e00: 21 21 21 21 21 21 21 21 21 21 21 21 21 21 21 21
+ffff000802246f00: 21 21 21 21 21 21 21 21 21 21 21 21 21 21 21 21
+>ffff000802247000: c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0
+^
+ffff000802247100: c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0
+ffff000802247200: c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0
 
-base-commit: 567bd8cbc2fe6b28b78864cbbbc41b0d405eb83c
--- 
-2.52.0
+Let me know for any further testing or debug.
 
+Thanks,
+  Dan
+--
+Daniel J Blueman
