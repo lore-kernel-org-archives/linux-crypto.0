@@ -1,80 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99121242935;
-	Tue, 30 Dec 2025 18:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C47283FEE
+	for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 21:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767117993; cv=none; b=HGXGAbN+X5mymUQ8gHVg7ramgs5Wv0DPzM6S1Iki2YPzHna+Y9v98McsvgETfJNrAirSglxbCbFdsFlwjI8sv0W8j+T2KydaXVeH5p4k4eVPNjxqK89z7fnrrfjhxI5A2eaCCPXg1LhQ7ZWXlcd7LhhMj6cPDO0PNNbeg/tmzNk=
+	t=1767131049; cv=none; b=bqiyNIlRyLKzCOlgTJseS9JmhLfE8MwjHYCWUJSbfwi6/gQuxaWbXhHG2wuVyRY+nNbKO5gIYPAH8Y9ji3gJVLtvHho7EVe4XRu7pDWsz2cFKwWsxhzGGSWhpBGf1PgUm7j0nmjau3XLJIJHtnrflWvB5MQM+zAS+54wqM5xt60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767117993; c=relaxed/simple;
-	bh=+mZ2BSG8Mo/7t6pCnAocYIY+9a/YSRxQPsfDZwP6lI8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kBBfiieqd4XasHq6tVzFyW9LzK0B/NeVunw5iUYBmybYuUt197vdnp5vrmfTnE6vGpODGz3ztDFv3hmdZwq3dIxPlCzWIxxIrxJpW6Z7JITR86FnABxZa2suuPgFg+bWQDAiUL84X4pk3QIowH+9bmCrEJBhz/9oPNnJwvz29Yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TnAphv0B; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767131049; c=relaxed/simple;
+	bh=AQgq9nmb7fCxLefy9wdLBHIwFb24gWOpAgXCoBOOx4o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZCBXi6j6TRInNzrSQ8Tfacba7fFBmDbSXMSFrv3sY8yRvwSdYH8N7VW83edLQPPS66vCZtWdH/HE2n84dmjfOSDAXQJwo1kV1bz7ipcxan1z3sFKX5dSslNCM2FOPkFrL0nK8O22E9pWxSwrPtZemlVMxDZTubtt1xBL/g65Wbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=ZZSKHEIx; arc=none smtp.client-ip=212.77.101.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TnAphv0B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D38C4CEFB;
-	Tue, 30 Dec 2025 18:06:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767117993;
-	bh=+mZ2BSG8Mo/7t6pCnAocYIY+9a/YSRxQPsfDZwP6lI8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TnAphv0B8FtOm3V3/J/xA4md6HvcO0RI7LhtjTixEFWoixXCzDO0IAujqQVLnllOv
-	 0jGx9RP58yCr81eA/hxp+CWpMUCxj/5XWjj2Agm37F3dM12xuM4s/7vJwqhl3CQ+Jp
-	 KFqk1dqNiAQtDEUdAzvsb6zm/W0i8Tp8xi7pb1O6dUEn/hUhyKmLm4jTcX1KrJkoSi
-	 RiqOUTv5h7UervvaA1pcwasBEwBWD1bICWOom/h4D4SM5ezakBx9beiiK979Kzyc41
-	 6uulURq3HYMtSiPsHPaX4lREJ0IdVGgpFmpq5ROLATAnKBs4IHllkMkLHZFLbtQPJH
-	 qLplRteSg0EbA==
-Date: Tue, 30 Dec 2025 12:06:32 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: daniel.machon@microchip.com, radu_nicolae.pirea@upb.ro,
-	linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org,
-	jirislaby@kernel.org, conor+dt@kernel.org,
-	alexandre.belloni@bootlin.com, andi.shyti@kernel.org,
-	olivia@selenic.com, linux-spi@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
-	dmaengine@vger.kernel.org, andrew+netdev@lunn.ch,
-	krzk+dt@kernel.org, nicolas.ferre@microchip.com, linusw@kernel.org,
-	lars.povlsen@microchip.com, pabeni@redhat.com,
-	richard.genoud@bootlin.com, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	claudiu.beznea@tuxon.dev, linux-gpio@vger.kernel.org,
-	Steen.Hegelund@microchip.com, broonie@kernel.org,
-	luka.perkov@sartura.hr, edumazet@google.com,
-	herbert@gondor.apana.org.au, lee@kernel.org, kuba@kernel.org,
-	vkoul@kernel.org, UNGLinuxDriver@microchip.com,
-	linux-serial@vger.kernel.org
-Subject: Re: [PATCH v4 09/15] dt-bindings: dma: atmel: add
- microchip,lan9691-dma
-Message-ID: <176711799188.884536.16157476210751555846.robh@kernel.org>
-References: <20251229184004.571837-1-robert.marko@sartura.hr>
- <20251229184004.571837-10-robert.marko@sartura.hr>
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="ZZSKHEIx"
+Received: (wp-smtpd smtp.wp.pl 29609 invoked from network); 30 Dec 2025 22:17:23 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1767129443; bh=7hKCbRNRCq/8uK8IHfOlY3vk1bSvTtwXNHKdRBGAAgQ=;
+          h=From:To:Cc:Subject;
+          b=ZZSKHEIxAUIeGO2QT0iEYaCvG8jgBstYm30muMoh1O6QYr6NknpJFhwFVUwcqTyDk
+           51Tw9G/hAewlMN+l8PisK630UKRmDrV65+enYxvoNdSa6ejB2Q8Tn+NqmaNCm1iF1t
+           UK6Y7ziTqK8f9i9ZEGeZtGmf/Hmeg93qJQQA80kKnZxQmvGyQx54jIlxpM/wNNEVhL
+           ewsE2mmszenqF0fXcAdA1oLTO+TPmjeQkjMOljTwvLngMsG1s3Q7zoI7mnHtTZ8QUB
+           HZwNISAZxf4B19h3MkUOb8aKjPOxcrzqSd4NvnHYZDCsuS1dphwTaaZyOd1rWJ5KBn
+           cqfFTkXMUmUgg==
+Received: from 83.5.157.18.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.5.157.18])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <ansuelsmth@gmail.com>; 30 Dec 2025 22:17:23 +0100
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: ansuelsmth@gmail.com,
+	atenart@kernel.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	vschagen@icloud.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
+Subject: [PATCH] crypto: inside-secure/eip93 - fix kernel panic in driver detach
+Date: Tue, 30 Dec 2025 22:17:17 +0100
+Message-ID: <20251230211721.1110174-1-olek2@wp.pl>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251229184004.571837-10-robert.marko@sartura.hr>
+Content-Transfer-Encoding: 8bit
+X-WP-DKIM-Status: good (id: wp.pl)                                                      
+X-WP-MailID: c1eb65b8a4aeef560a51a8bee05ecb10
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000007 [AaQR]                               
 
+During driver detach, the same hash algorithm is unregistered multiple
+times due to a wrong iterator.
 
-On Mon, 29 Dec 2025 19:37:50 +0100, Robert Marko wrote:
-> Document Microchip LAN969x DMA compatible which is compatible to SAMA7G5.
-> 
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> ---
-> Changes in v3:
-> * Merged with microchip,sama7d65-dma since that also falls back to
-> microchip,sama7g5-dma
-> 
->  Documentation/devicetree/bindings/dma/atmel,sama5d4-dma.yaml | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
+Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+---
+ drivers/crypto/inside-secure/eip93/eip93-main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/drivers/crypto/inside-secure/eip93/eip93-main.c
+index 0b38a567da0e..3cdc3308dcac 100644
+--- a/drivers/crypto/inside-secure/eip93/eip93-main.c
++++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
+@@ -90,7 +90,7 @@ static void eip93_unregister_algs(unsigned int i)
+ 			crypto_unregister_aead(&eip93_algs[j]->alg.aead);
+ 			break;
+ 		case EIP93_ALG_TYPE_HASH:
+-			crypto_unregister_ahash(&eip93_algs[i]->alg.ahash);
++			crypto_unregister_ahash(&eip93_algs[j]->alg.ahash);
+ 			break;
+ 		}
+ 	}
+-- 
+2.47.3
 
