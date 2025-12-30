@@ -1,82 +1,82 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D4C2505B2
-	for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 10:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6E12DFF1D
+	for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 10:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767089762; cv=none; b=GFYxZ72y19UwfM9iwOBdYw42L6gr701MAy7XNS/SNFddtom84KofPqVGBO/tgac+X7TeN7fFy34V506GAABnK/dTABWFf1U2hw3n6stdv4Raa9GUD/nBMXyJpz79Dpl59OZehcZVYbbgSLAHQA9Teq1zAVJ28py3pz5qbS1J+Bw=
+	t=1767089767; cv=none; b=XWGl8CNFzlhvIhDCRZnp+0txqVAvvtyqFde+TyAAxFebIqEaVXDH4ykuZA+YgnZ88Ca6pEyolgQ1OWxAnzPuCEvOeE03lCYt4AkCiXowQu7Hl3nHfKeoetIqQQM4l5tiK7Qk7KbfB6OE2CB4MT8Y5ZupdIUZG+NuZxuUoIZBk+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767089762; c=relaxed/simple;
-	bh=PKPLA1kpbL7fJYEUVDcqch/rjberNxsCb/G2InoSmIU=;
+	s=arc-20240116; t=1767089767; c=relaxed/simple;
+	bh=3EF4beueqssYSrJr7jAiyWtRxi/ynmIi31SbgxtAbxk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tdn01je4C8Sq+F47nkZ1+c4PQqDIghzMXPfYkZCLPXIbVyM022UGP8D407yoawnqbneAw43hHs1fsrEI8T5Rp7IWJuZZOfAqhKyYcIUCeFlZNe4HmPHmLWElbGLyM19SSiWGrxhq5Nh+zn9EtgVpbBqDDxm7zvIr2lo9Oz2tf7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hzo/ukVG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZviZVR0u; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=gTSovoY5g3kcmZ89zl8wkyHrUREygdKiBKqLK21rFPzflw0PS2KPqM/KvqjrFTmZiBwji9di349Ra6HE2ls094lyc5Xyciy8tcp3V78NJnwgKCuSA0BF3d0dhWcG3FmbBUv1dHg2ziPwhkTfHufsTteSvz/3a1A1vXA+ARD+14Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f3l+yGxi; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z7FQ8isQ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hzo/ukVG";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZviZVR0u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f3l+yGxi";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z7FQ8isQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767089759;
+	s=mimecast20190719; t=1767089765;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vlUDEgWO93Cmk0Xa8O4C3C5KUT8jOBeRcuReRJ9yK0k=;
-	b=Hzo/ukVGpCpZFTerO6TPVTUe75x9pQ1BR1LptdEzWoyEQ/osq2e8qbvA7igncJP60Lnn8M
-	cAmlIoq9purJRZszQ7iImNMTkvCoPlaZd4humItpsA8OY7yk+kDS7DCURt5KOhFT3wU3pq
-	/MrPGTP9IJ8w/QKJNIwqFSmI5wmFvcc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=jlkdUJvLxIuG9RkypEQ1odBgc8hsD/vyeqVzWJtThQg=;
+	b=f3l+yGxi+96trfuT0Q9P98vl1dnYa+2T6xzDNpKpdOzPCus6zu93ULTJJ3Liiq6kkMPG7J
+	Nkk5yhuJcMbxXs/AfFmO1uVAGLVpE8DEz/oTEkmYJeRT4ErA/RX23HMUTUnbBUWjCj2txh
+	N/U9EqTw8i7jrVg8vYHTdpff9GBp0E0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-Oj5aoL1LOE2mnwgwBHG1wQ-1; Tue, 30 Dec 2025 05:15:58 -0500
-X-MC-Unique: Oj5aoL1LOE2mnwgwBHG1wQ-1
-X-Mimecast-MFC-AGG-ID: Oj5aoL1LOE2mnwgwBHG1wQ_1767089757
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477c49f273fso125578585e9.3
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 02:15:58 -0800 (PST)
+ us-mta-154-6-z70EmiMgKhbRuB0OWhtg-1; Tue, 30 Dec 2025 05:16:01 -0500
+X-MC-Unique: 6-z70EmiMgKhbRuB0OWhtg-1
+X-Mimecast-MFC-AGG-ID: 6-z70EmiMgKhbRuB0OWhtg_1767089761
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-430fdaba167so5224331f8f.3
+        for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 02:16:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767089757; x=1767694557; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1767089760; x=1767694560; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vlUDEgWO93Cmk0Xa8O4C3C5KUT8jOBeRcuReRJ9yK0k=;
-        b=ZviZVR0uqwFPJZivYXOhQ8AGvYAcXNGBSibAk7l/oSytGm4r+M2JydcqprJdVhVB+i
-         ZIT2OgPtUxe4Ig/8PWscY5IluLSBlXeJMmo+M56+KQ6c49gz2d2R7M70UIA+wjl3sUEv
-         9DMWprpyUREi6QHA3BAWnf8/4i8ze2sC62tcCLFtwzaJTOjTblCtfgXkdREJ9nHMD/06
-         Ztkp862/yqlkCUXHjZQ3n0HMHaYrj9VVf1a8iVtpAbXtdj4Iiyfu5/PERkeOruvDUwWd
-         FjsncdDmsrzS2crWBCEZC6A1v6x2xG2aNO2eHqDBYyRno+5IpaPdaciAPF6ItsqB1e6t
-         PySA==
+        bh=jlkdUJvLxIuG9RkypEQ1odBgc8hsD/vyeqVzWJtThQg=;
+        b=Z7FQ8isQq14I1KaSH1zw/UXjxfl4vbX2ZEFt82yb0xF9HrF5cGDa24nsifnCDpFx+d
+         ZJVEGcAaQcquK7ruSxLov+mmtNZm6Z1cY1l5h155mMjVQFrApi3LDOd28jAvqGiPFSet
+         LdpFwLkIn/ZjyF4pQkW4zmY53q3amnxzSS9IUxJai+v6NViiTMCFUhYnCxRcxm5uZESt
+         Aw1V9bQXYW7Fl52Vl/JGM8eclURT8majQKzcf5P/SfKE9+ou1xx5sGSTMLsUXNKdhfjL
+         R5z2Dr7EADU/6enDMzGahCI5t7S/9eDh/HfytF8+YyTZ1fvM3mPQmNW/lQt+yUskX7rr
+         0rRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767089757; x=1767694557;
+        d=1e100.net; s=20230601; t=1767089760; x=1767694560;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vlUDEgWO93Cmk0Xa8O4C3C5KUT8jOBeRcuReRJ9yK0k=;
-        b=Hp+LbFhQsNtw61skt1hSfoJ6/TuY3kALtr6mQZMgiJEIaeb7gIMPRrcXvkRvu4/qHf
-         ax9QCdJj+OiIBwijstZF9iuZ25WNcpcM4fse+F5Ds4FDImmU8gtb1vtr0OeeH0SEaJjq
-         q+4+RWWSQd53Mr/bZYasPhIzZ5HDm2fSxjqoKvzJ7gU8xU+N4P7p1qG7On22/r3JPpB9
-         oCxy94AmE1QpesT7aKEFuSdvnIkmzHD6v3eOF+a27njvEO4QUSLtTMVk7J3u/pCaWaIU
-         DnJfknf+GwzBTTeL9ExjjDgxciD+F5OkyUxFF7+DgFeuUz3eN3BwAEcUb83USJlutMIg
-         aPOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWRIA7CO/COl6tL+rGLt12TNeSPDFlP6BsA+AQk/kFdxIW1naeoz7b3o+Lfir1UKUP1yiYy6fB6EpMh3WY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIvWqwgiwtiwReqs4dOP9UGU9HkaNAC1nRrzvwd1ewurYdaJlz
-	HKGrvPiyE2EqcPfR6EaUR78WCU7WGoYeLXPP+iTfianNf/Oq/CYNj2y3mZ/ZBggOT6qwSGSHT2E
-	JDbofNjknim7R89OC8fHWseZ1YzdU9K/C9Q9qQV4d0SV8/qfW7CLI/tXWSlJIKOONEw==
-X-Gm-Gg: AY/fxX5GLv0Q4cPW/99FqIzIb3WIxJv4UG1hBKjZOifjku8SRfTmF+g42YzZ40Sgs/W
-	xKuuhn2s24tCk50u7OlAuD7rRbM9q+H/Yayf8rU5WPLZnkIzLh2pIydZnMoMEdtc6s4pGLpwCl3
-	88qckuuOujYHcQn2Qn/JNk3J9w8Z5VWzMwEXl2MCQv9lcqZ/eiFheVpgVF57EATzZi9VI23l0Ru
-	P7iylJ2nuZBJwTIaT3z2dZ61VR/dKaJjVJxZqw3YFYqyXrNbKTZwrax8zWa41/i3ELQ11d0gSYC
-	joxjswXPkVn0gxehJAnQ9szrum+vCpPMVBqc3a0I1aEKzPlAtWuTnXPu7VRlIBPEDXCwZ6/syWB
-	UFV9dVLcY6++Ej3vwLGxM7TnNYFlB38Lc9w==
-X-Received: by 2002:a05:600c:3b0e:b0:477:b0b9:3129 with SMTP id 5b1f17b1804b1-47d1955b7d1mr374948075e9.3.1767089757019;
-        Tue, 30 Dec 2025 02:15:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFcsewURuffZ55cO3Q+sj2TN55Hu1ppUSdeqHbu2iFeBFoCSmT0tG7gytPk3ITCZSUZTYC9tQ==
-X-Received: by 2002:a05:600c:3b0e:b0:477:b0b9:3129 with SMTP id 5b1f17b1804b1-47d1955b7d1mr374947795e9.3.1767089756491;
-        Tue, 30 Dec 2025 02:15:56 -0800 (PST)
+        bh=jlkdUJvLxIuG9RkypEQ1odBgc8hsD/vyeqVzWJtThQg=;
+        b=i3LsnLOi3PaakghYJ1APRhuGz4KAVZHK2+5Sa5mzntrcJk50bcw3cc1UqJZ/FpqEM0
+         TpPOlY1iizXl8k6RTDljyjyo9ihfpoCyRmRCAYFWfE4J2uluMdj498optCXVtysTNLPl
+         HY1PoI9wK7YLPhyqpYp4F4ec420lDxZrUbldG9jRax8l6e6OatU3qOhJfBVg90wogzrZ
+         HvyS9/b9BwLw88AMC+Q3WJ2eBx7I1tApZ0BIHw4VxCjOfQksFZdqsGqYNmjpfIqpv0a9
+         r6ETLgXTafDbEk+JHJizBM1NcUsWQ+sQ/rslcr5okprf1N5C6YgMD8dhZBzJQAjfx9P0
+         Ik4w==
+X-Forwarded-Encrypted: i=1; AJvYcCXiFhcojhhhVQAxLJk2I0cjRFyDcxlRZNp5ARE4H3z3MvgDxwBw9A0l3VbW9A1rKLxpKiJEQV2hXfYjAKc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwsdiOAcpGgQrvUdwn6DzMC2FT5YioGDuaiiFb1lDeZG2NhTj1
+	3UPoUY0sfuhdzS/T02JwmuNE39r+50KSaXsn+uNg9ZkrI0WzFLkzudfnmbc0dzi8UqIrt6fq6UB
+	j2uyHSc4Inl02YBT1ObD0Bgv2H9p0IFqd7g2FLJ8H5QLMihW2ELNpnSNWgiUpYrj0Bg==
+X-Gm-Gg: AY/fxX74NUmMhQEkx880RALRqFDSC5S7NUE9N13m1cedoyIyRTwQzdLcPdDKIekbOR0
+	Gr+LLSRLo8vEEPMJxjOr245ACXLM9zrVNNaMTZXDifrZLA+4tgnKsHKYxz6zwoWv5eD5eZio5EW
+	yf0U3eAWB6L3rXSEGS6+l7VMd8j1QpRlq9ZezYkeZFKXFO1NxUcDKa+6XohW9G+U/wOijP3iYRi
+	g+qis4cDNfQvloJQ2lgEBGg48BczKF+0nvIKzgB6RBq+AEADOsE3CIMFZmVQbuC5YQaifZKoAXa
+	5SMhtQfjfaodv15+w/7wUqPvWd5XcnAPKy4KHSznfbd9TGF3lgScm9+7ZxMBUclH2FBsGhkXXs2
+	gGNWrg41UeZKVCZjxHJBoyN7aqVAequPwwQ==
+X-Received: by 2002:a05:6000:2906:b0:430:fd84:3171 with SMTP id ffacd0b85a97d-4324e4c9e98mr39750106f8f.22.1767089760409;
+        Tue, 30 Dec 2025 02:16:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHondA4WovcXdLOT45Lj3uVr7rduhIOKgQxT45AJwE7sF5CS5LqWM7ii/WKiPGqmcKK8QLbHQ==
+X-Received: by 2002:a05:6000:2906:b0:430:fd84:3171 with SMTP id ffacd0b85a97d-4324e4c9e98mr39750079f8f.22.1767089759925;
+        Tue, 30 Dec 2025 02:15:59 -0800 (PST)
 Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3a6c6ebsm263705445e9.4.2025.12.30.02.15.53
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea830fesm68448837f8f.20.2025.12.30.02.15.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Dec 2025 02:15:56 -0800 (PST)
-Date: Tue, 30 Dec 2025 05:15:53 -0500
+        Tue, 30 Dec 2025 02:15:59 -0800 (PST)
+Date: Tue, 30 Dec 2025 05:15:56 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
@@ -101,8 +101,8 @@ Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
 	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
 	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
 	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH RFC 03/13] dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
-Message-ID: <1f271a22a3aae6afb97c5f9ae35b1802eaa036a7.1767089672.git.mst@redhat.com>
+Subject: [PATCH RFC 04/13] docs: dma-api: document DMA_ATTR_CPU_CACHE_CLEAN
+Message-ID: <818c7ea78e43b93d1bb3995738a217e5e414e208.1767089672.git.mst@redhat.com>
 References: <cover.1767089672.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -116,55 +116,31 @@ In-Reply-To: <cover.1767089672.git.mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 
-When multiple small DMA_FROM_DEVICE or DMA_BIDIRECTIONAL buffers share a
-cacheline, and DMA_API_DEBUG is enabled, we get this warning:
-	cacheline tracking EEXIST, overlapping mappings aren't
-supported.
-
-This is because when one of the mappings is removed, while another
-one is active, CPU might write into the buffer.
-
-Add an attribute for the driver to promise not to do this,
-making the overlapping safe, and suppressing the warning.
+Document DMA_ATTR_CPU_CACHE_CLEAN as implemented in the
+previous patch.
 
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/linux/dma-mapping.h | 7 +++++++
- kernel/dma/debug.c          | 3 ++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ Documentation/core-api/dma-attributes.rst | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-index 47b7de3786a1..8216a86cd0c2 100644
---- a/include/linux/dma-mapping.h
-+++ b/include/linux/dma-mapping.h
-@@ -78,6 +78,13 @@
-  */
- #define DMA_ATTR_MMIO		(1UL << 10)
- 
-+/*
-+ * DMA_ATTR_CPU_CACHE_CLEAN: Indicates the CPU will not dirty any cacheline
-+ * overlapping this buffer while it is mapped for DMA. All mappings sharing
-+ * a cacheline must have this attribute for this to be considered safe.
-+ */
-+#define DMA_ATTR_CPU_CACHE_CLEAN	(1UL << 11)
+diff --git a/Documentation/core-api/dma-attributes.rst b/Documentation/core-api/dma-attributes.rst
+index 0bdc2be65e57..1d7bfad73b1c 100644
+--- a/Documentation/core-api/dma-attributes.rst
++++ b/Documentation/core-api/dma-attributes.rst
+@@ -148,3 +148,12 @@ DMA_ATTR_MMIO is appropriate.
+ For architectures that require cache flushing for DMA coherence
+ DMA_ATTR_MMIO will not perform any cache flushing. The address
+ provided must never be mapped cacheable into the CPU.
 +
- /*
-  * A dma_addr_t can hold any valid DMA or bus address for the platform.  It can
-  * be given to a device to use as a DMA source or target.  It is specific to a
-diff --git a/kernel/dma/debug.c b/kernel/dma/debug.c
-index 138ede653de4..7e66d863d573 100644
---- a/kernel/dma/debug.c
-+++ b/kernel/dma/debug.c
-@@ -595,7 +595,8 @@ static void add_dma_entry(struct dma_debug_entry *entry, unsigned long attrs)
- 	if (rc == -ENOMEM) {
- 		pr_err_once("cacheline tracking ENOMEM, dma-debug disabled\n");
- 		global_disable = true;
--	} else if (rc == -EEXIST && !(attrs & DMA_ATTR_SKIP_CPU_SYNC) &&
-+	} else if (rc == -EEXIST &&
-+		   !(attrs & (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_CPU_CACHE_CLEAN)) &&
- 		   !(IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) &&
- 		     is_swiotlb_active(entry->dev))) {
- 		err_printk(entry->dev, entry,
++DMA_ATTR_CPU_CACHE_CLEAN
++------------------------
++
++This attribute indicates the CPU will not dirty any cacheline overlapping this
++DMA_FROM_DEVICE/DMA_BIDIRECTIONAL buffer while it is mapped. This allows
++multiple small buffers to safely share a cacheline without risk of data
++corruption, suppressing DMA debug warnings about overlapping mappings.
++All mappings sharing a cacheline should have this attribute.
 -- 
 MST
 
