@@ -1,224 +1,165 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252C723D2B4
-	for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 09:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6691E5B9A
+	for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 10:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767086940; cv=none; b=OKfybYQUSupcYqbd4TY9j/0e7/CqP6Pt8vFUiKfIFaQeLMp8SERffs5eipteVrs4o6ZrlhgV+k7EiCtwnev9+Mk9Z8DoT5R0FQhZF5Y4CYZWeDq+vBbkOLhHgKkI/YqHAChOKm/gCXIZCiT/D2Z31gYB2Au4Xzx4t1IeJbfwqPo=
+	t=1767089752; cv=none; b=FbTsEtg9toYsxltqR1h3NSQrSPaewIDww/mvwMajXlIbmkKn+lRGekHCB3GGCdZqLf9K3msz9oDrvR7bZxbr0pp0e79v+WdHOV80OLW2GEDEYT3VeJzFafrvMFbSfFp94t6baFIk+nrgKYojunLm2WUJpSoNKEoaKmwa4zYAZ74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767086940; c=relaxed/simple;
-	bh=qwEC++WqbmApjnu9M18nBdbcimANwczQYugUDf9TvGI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Tp4SAVHteA6f5jO2mWDP24aB0Ypr7NNQTCvXN9Ob/ZJ4dTe+CbrO3NaFBBPRNaax87hNEVFcA6TJPbl4QFv7JKZdL2katG3HYKvnVNqED9pCQboKXrtEY1plYQYiH842FAx+uMaieyNI6+uMH36p3Fk4FkR9piM5szB75F8OmEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=V8A12BD+; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1767089752; c=relaxed/simple;
+	bh=LCt+6pV3SVXX+jVlhPofZ+B+PV2iA9I/7Ha5xrB3hCU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=St36WZMtz/9pEpuo79Y2iDmEGsM7VnOB6T//K9X5fbLNq4xnCPdqXEbefTbMHin/jg2ssrNKcvdWHVvJZpC1wt+ITr19ip1t0PYFmBbUDaMqw1KzUbMvmICGZHalFeKvUWzyJ4Aqft78Sbd+fi+P/xo4Ws5Kg5J83PY1OCjg4V4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P0yYMVW3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bQ/HbEYj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="V8A12BD+"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-430f5ecaa08so3989312f8f.3
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 01:28:57 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P0yYMVW3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bQ/HbEYj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767089749;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=QPeHJm+twCiufdOXqLeCn+SgUmZXimx3Kj8OMbSgWcg=;
+	b=P0yYMVW35jxYgBF3YWX+d5Ks1WvgEpHVbY7hSsHdHk78Zw0WyrCeBBSmS2yyK5oTbRjjF3
+	I2ThzC+UAqPDYagw+qh9Y0x6x56cCzUJauXeqWrqndmgRCxf/08HSGzrcABR2iQB8QGVxM
+	4lSXGaXGdADw9gUk4PbTfeYlI1of3DM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-538-tabXZhawOF-a6a6BDMLwXg-1; Tue, 30 Dec 2025 05:15:47 -0500
+X-MC-Unique: tabXZhawOF-a6a6BDMLwXg-1
+X-Mimecast-MFC-AGG-ID: tabXZhawOF-a6a6BDMLwXg_1767089747
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42fb1c2c403so6233554f8f.3
+        for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 02:15:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1767086936; x=1767691736; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4cdJvd80CA2U8O7Elv/zvHD/XQgNTh189/MTpXl/jBU=;
-        b=V8A12BD+1w/HZQCZns2y7HjdOvCuYPW4RcDNP6CokFOMdMr1Z22IlM5yM+vBQ2Glue
-         plKo4BGdOcIVXfXcF9fN+mU3X6e8a7jcQKTbUkpNdbpLY09imR24V0IVuKS3/pW9N2Q3
-         jtNLL81C22s1ENTtGvz60CpsOrmpf6+MQZ587Ar1OAT8swFIf2zvh1Z6AqXIH1+favDH
-         UgRgamNwSxg/KrI9cKEf2v7m521SX7bNT8nW+5qbIBSq7ARFa65dfnSFG7jEKm+68f3X
-         VVSWsE9020jUxrUC8FpUHG0fU5UdL1qQwyIGxdwoHj1QJ8QJR89ZZREzuCCnX/IIzboB
-         QS8g==
+        d=redhat.com; s=google; t=1767089747; x=1767694547; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QPeHJm+twCiufdOXqLeCn+SgUmZXimx3Kj8OMbSgWcg=;
+        b=bQ/HbEYjNkNw4GOqt29NjfpwNJkMUoztoEvr64Ppr8lbJ3224HO5X8wrOAe+mil+Pz
+         Tz1I0PKlgmqhMtQFmBGBSCLC/Omr1qWBkrAkVME27WwwXQ/vtgA7j1IqAHRWqRWFRl2G
+         /ns5g2z/FMVxRZEozM550fAkUewyL5nAUJj1T5/Z70GbdMjHTHLhG7+DiZfqEvKPctjV
+         KVM6uHGAP0ULWx1FjNINl3cd7Gcx7vwi7I/xJ84jnZygb5VPe50x62PvVKLT60UjIM3v
+         mGBb0I2g9F9gw0qbl+/IdaOhP4baFcH3/2DCOkfKmwfkVjObQk103KmD6GGz0GXvuTFS
+         a/QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767086936; x=1767691736;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4cdJvd80CA2U8O7Elv/zvHD/XQgNTh189/MTpXl/jBU=;
-        b=a3YRgn9KhajRzMsFdHP787JOQMkb/3JBBfqvu5vcO8LQygxbOFgijwKbQynk3XEZIu
-         CBbRAtOvoGCcy+i9oDpGG7IYnz4lfR8szZwyFT3yFHMi2F0p+rqeEvb/SBPHpttgJgiu
-         Qd0T9qDz3LjvvPtTbk/oyfDK7QtZu7PEWaWMAr4wUbGtgYFr/H6s0YZwXF1yYZ6DHLRJ
-         rVKPnM+sme2gxHaQxzeg5fPgsustY9qYBd8AgF5l8Idhls8uCC9orxx1N6AMs6CvBQYM
-         4rNB3DPVGVEjo94tGpwjs1UlN+Zi4YbfqlFAY6ZNc14HXUHdSqsznnHeG5EaxO7tSBvH
-         Xu/A==
-X-Gm-Message-State: AOJu0YzFVAviMIcbZaCynV5j97OlxNFj11iS6nl5LDGNz7wWOWhJoX7Q
-	sYowPxgjel90/4WvdSO5nAYoUXk3XeNGVa8rT1vyBGycQQFGoqL9CG1KcNVwdpRSvp8=
-X-Gm-Gg: AY/fxX5YKYI4+Q2/HJG1xAgdHT1RBSTrBc6JC5rfAo4qSm16IWTUfRsYj1sOfLqbo/k
-	JWDZVQr6f8rC6FfOdpVnMz+xTH0zzNO0ujeBwckWae3VReOoOVgjsqema/XPooVpQs1Ntecg0x2
-	fpPxwmmtlHdJAq9CkIIZgMIKs+gS+NhEKpHJFaonOxMa2HK9pSFU5tw8wcpSVWpKmZmaSF9UzNK
-	X3PukhgOLvloNsac3R9suX5RrkSlxj0zcUER2pUjy7UMpi33rdDwCHSsXuRpT4M8+6EDB0k2Lnv
-	DLLcGGAKtvgubZ96JHgKtFCw9W6lX9UwmOGV4Aa5q1VsJnKbc6Kc9dnu/+73SFzwGjDkqgxWK7b
-	EFoPd3tvbOea9AvCr9JUXbyiEAgpwr40MNVLlJqtxrud3p0iDl9nK3m1z92XZzeK24Lbk56eJIK
-	jzKfrNouKacxSNk5XR+zmd0nrzKD2CLu5mZhoVtUI=
-X-Google-Smtp-Source: AGHT+IFqk/T48cnag1G9B75GgfDYvKfty2XjdqVXm7/5MkcznRAMR+VBAz5h6d6frga2FaR9257mng==
-X-Received: by 2002:a05:600c:1c29:b0:46e:37a7:48d1 with SMTP id 5b1f17b1804b1-47d1959d4bamr436496335e9.34.1767086936398;
-        Tue, 30 Dec 2025 01:28:56 -0800 (PST)
-Received: from ?IPV6:2403:580d:fda1::299? (2403-580d-fda1--299.ip6.aussiebb.net. [2403:580d:fda1::299])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34ebab97affsm10524918a91.4.2025.12.30.01.28.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Dec 2025 01:28:55 -0800 (PST)
-Message-ID: <642a3e9a-f3f1-4673-8e06-d997b342e96b@suse.com>
-Date: Tue, 30 Dec 2025 19:58:50 +1030
+        d=1e100.net; s=20230601; t=1767089747; x=1767694547;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QPeHJm+twCiufdOXqLeCn+SgUmZXimx3Kj8OMbSgWcg=;
+        b=TMZGmi3/W5rgSUPW0jhYyIuSI///dpcYxH+MeIWndGKbQZebABpcxKYIQMd+CTlHRU
+         Yv6euadN9FSq+6bnolzWsjht77AAb2qIQc97JLirYrEkFcsEG4rQLOY8TnFaRspwf6YF
+         0yNE8OSGoM0WQQECcEwMn9oCfkMPuhBDcwrwBHYmQxTqrxVL1AiZsyOHqnu8C13Dl2T2
+         mRVuuV8ZuvFRSuRCg0MXvqmQgMHQR6f/Y5DiQQrtVwWrD9/jyavc6ETAykeDR1+jwxwR
+         ygywltNU3K5eiDbFO/xVWMLJKLda/CXrl7E1vvOkeC7ARz8/S+y2lxIlW6Q/YMVMKIqW
+         ZGmw==
+X-Forwarded-Encrypted: i=1; AJvYcCXe3wN/ZUQJvYLLRn441PRUmxFZcgPM3ks2e3MXXZj9qyQAlwCROMeq8haffFmu72z7g8zMmruPzn4ZW5Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlaSPZ/Gu1RKBBl8wggyJuhEjc7TW6i5bGzQ2R0meY+jqE5Ks/
+	PVBLRSssfVqJDBFflLg5/VAU7wHXWlYbgGDdG27m7o430QeI5Ej4mE3npi++p7zPSZDeaEFcDou
+	NeNMHOhN+xoM3YLBVQzgFNvVZssM5B9Nu0Qk5EuhkN5hXloOmtd2vlPXoH925umhwUw==
+X-Gm-Gg: AY/fxX7BysLQQFHFL21LnrQml2MDnYlXCQpWijppYtGzbMzHrDJT+MUI8j/yG7/TGtt
+	OjHueJrcLYLmbp0IcxtIzAt1A4923VOgJlRcpxLEwgXOPIEBcjlefOGCeKvwTn5XbcQY4KQ1sns
+	Ha9ruQ411O+eV+44q3mu49ITCK5kxx0MCW+xgtzmrON5eVTiBWWJcZ1OC1YGvgxinXDH50V8jWc
+	JaRcFm+VcuMAKDgnjq5qSwc/of8dLbVdn7R0z+zKnOXOnQ9bUNQZCuoWwWv7IUrFUNU81tNYdDq
+	40CbBzx15NuP6xZ0QUdEkZaYS5UMvddmx6ajgtft2Dmq7NJALoqocVQrl4PVNUwzUBvlRejyHff
+	pFciV82uHa8p48LfyVTPL0zEQ8AhWBqgzQQ==
+X-Received: by 2002:a05:6000:2503:b0:431:a33:d872 with SMTP id ffacd0b85a97d-4324e4c1219mr30005611f8f.8.1767089746612;
+        Tue, 30 Dec 2025 02:15:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEbvOFHJ91a0TKLxq+k7tMABBS8U1GQCYZPCELRU5Zsc1Gaj+GYCwYcD6RmChYOtX8+5x3fqQ==
+X-Received: by 2002:a05:6000:2503:b0:431:a33:d872 with SMTP id ffacd0b85a97d-4324e4c1219mr30005566f8f.8.1767089746108;
+        Tue, 30 Dec 2025 02:15:46 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324e9ba877sm67681523f8f.0.2025.12.30.02.15.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Dec 2025 02:15:45 -0800 (PST)
+Date: Tue, 30 Dec 2025 05:15:42 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH RFC 00/13] fix DMA aligment issues around virtio
+Message-ID: <cover.1767089672.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [6.19-rc3] xxhash invalid access during BTRFS mount
-From: Qu Wenruo <wqu@suse.com>
-To: Daniel J Blueman <daniel@quora.org>, David Sterba <dsterba@suse.com>,
- Chris Mason <clm@fb.com>, Linux BTRFS <linux-btrfs@vger.kernel.org>
-Cc: linux-crypto@vger.kernel.org, Linux Kernel <linux-kernel@vger.kernel.org>
-References: <CAMVG2svM0G-=OZidTONdP6V7AjKiLLLYgwjZZC_fU7_pWa=zXQ@mail.gmail.com>
- <01d84dae-1354-4cd5-97ce-4b64a396316a@suse.com>
-Content-Language: en-US
-Autocrypt: addr=wqu@suse.com; keydata=
- xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
- 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
- 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
- 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
- gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
- AAHNGFF1IFdlbnJ1byA8d3F1QHN1c2UuY29tPsLAlAQTAQgAPgIbAwULCQgHAgYVCAkKCwIE
- FgIDAQIeAQIXgBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXVgBQkQ/lqxAAoJEMI9kfOh
- Jf6o+jIH/2KhFmyOw4XWAYbnnijuYqb/obGae8HhcJO2KIGcxbsinK+KQFTSZnkFxnbsQ+VY
- fvtWBHGt8WfHcNmfjdejmy9si2jyy8smQV2jiB60a8iqQXGmsrkuR+AM2V360oEbMF3gVvim
- 2VSX2IiW9KERuhifjseNV1HLk0SHw5NnXiWh1THTqtvFFY+CwnLN2GqiMaSLF6gATW05/sEd
- V17MdI1z4+WSk7D57FlLjp50F3ow2WJtXwG8yG8d6S40dytZpH9iFuk12Sbg7lrtQxPPOIEU
- rpmZLfCNJJoZj603613w/M8EiZw6MohzikTWcFc55RLYJPBWQ+9puZtx1DopW2jOwE0EWdWB
- rwEIAKpT62HgSzL9zwGe+WIUCMB+nOEjXAfvoUPUwk+YCEDcOdfkkM5FyBoJs8TCEuPXGXBO
- Cl5P5B8OYYnkHkGWutAVlUTV8KESOIm/KJIA7jJA+Ss9VhMjtePfgWexw+P8itFRSRrrwyUf
- E+0WcAevblUi45LjWWZgpg3A80tHP0iToOZ5MbdYk7YFBE29cDSleskfV80ZKxFv6koQocq0
- vXzTfHvXNDELAuH7Ms/WJcdUzmPyBf3Oq6mKBBH8J6XZc9LjjNZwNbyvsHSrV5bgmu/THX2n
- g/3be+iqf6OggCiy3I1NSMJ5KtR0q2H2Nx2Vqb1fYPOID8McMV9Ll6rh8S8AEQEAAcLAfAQY
- AQgAJgIbDBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXWBBQkQ/lrSAAoJEMI9kfOhJf6o
- cakH+QHwDszsoYvmrNq36MFGgvAHRjdlrHRBa4A1V1kzd4kOUokongcrOOgHY9yfglcvZqlJ
- qfa4l+1oxs1BvCi29psteQTtw+memmcGruKi+YHD7793zNCMtAtYidDmQ2pWaLfqSaryjlzR
- /3tBWMyvIeWZKURnZbBzWRREB7iWxEbZ014B3gICqZPDRwwitHpH8Om3eZr7ygZck6bBa4MU
- o1XgbZcspyCGqu1xF/bMAY2iCDcq6ULKQceuKkbeQ8qxvt9hVxJC2W3lHq8dlK1pkHPDg9wO
- JoAXek8MF37R8gpLoGWl41FIUb3hFiu3zhDDvslYM4BmzI18QgQTQnotJH8=
-In-Reply-To: <01d84dae-1354-4cd5-97ce-4b64a396316a@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
 
+Cong Wang reported dma debug warnings with virtio-vsock
+and proposed a patch, see:
 
-在 2025/12/30 19:26, Qu Wenruo 写道:
-> 
-> 
-> 在 2025/12/30 18:02, Daniel J Blueman 写道:
->> Hi Dave, Chris et al,
->>
->> When mounting a BTRFS filesystem on 6.19-rc3 on ARM64 using xxhash
->> checksumming and KASAN, I see invalid access:
-> 
-> Mind to share the page size? As aarch64 has 3 different supported pages 
-> size (4K, 16K, 64K).
-> 
-> I'll give it a try on that branch. Although on my rc1 based development 
-> branch it looks OK so far.
+https://lore.kernel.org/all/20251228015451.1253271-1-xiyou.wangcong@gmail.com/
 
-Tried both 4K and 64K page size with KASAN enabled, all on 6.19-rc3 tag, 
-no reproduce on newly created fs with xxhash.
+however, the issue is more widespread.
+This is an attempt to fix it systematically.
+Note: i2c and gio might also be affected, I am still looking
+into it. Help from maintainers welcome.
 
-My environment is aarch64 VM on Orion O6 board.
+Early RFC, compile tested only. Sending for early feedback/flames.
+Cursor/claude used liberally mostly for refactoring, and english.
 
-The xxhash implementation is the same xxhash64-generic:
+DMA maintainers, could you please confirm the DMA core changes
+are ok with you?
 
-[   17.035933] BTRFS: device fsid 260364b9-d059-410c-92de-56243c346d6d 
-devid 1 transid 8 /dev/mapper/test-scratch1 (253:2) scanned by mount (629)
-[   17.038033] BTRFS info (device dm-2): first mount of filesystem 
-260364b9-d059-410c-92de-56243c346d6d
-[   17.038645] BTRFS info (device dm-2): using xxhash64 
-(xxhash64-generic) checksum algorithm
-[   17.041303] BTRFS info (device dm-2): checking UUID tree
-[   17.041390] BTRFS info (device dm-2): turning on async discard
-[   17.041393] BTRFS info (device dm-2): enabling free space tree
-[   19.032109] BTRFS info (device dm-2): last unmount of filesystem 
-260364b9-d059-410c-92de-56243c346d6d
+Thanks!
 
-So there maybe something else involved, either related to the fs or the 
-hardware.
 
-Thanks,
-Qu
+Michael S. Tsirkin (13):
+  dma-mapping: add __dma_from_device_align_begin/end
+  docs: dma-api: document __dma_align_begin/end
+  dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
+  docs: dma-api: document DMA_ATTR_CPU_CACHE_CLEAN
+  dma-debug: track cache clean flag in entries
+  virtio: add virtqueue_add_inbuf_cache_clean API
+  vsock/virtio: fix DMA alignment for event_list
+  vsock/virtio: use virtqueue_add_inbuf_cache_clean for events
+  virtio_input: fix DMA alignment for evts
+  virtio_scsi: fix DMA cacheline issues for events
+  virtio-rng: fix DMA alignment for data buffer
+  virtio_input: use virtqueue_add_inbuf_cache_clean for events
+  vsock/virtio: reorder fields to reduce struct padding
 
-> 
-> 
-> And is this KASAN triggered for this particular fs or all any btrfs (no 
-> matter csum)?
-> 
-> Thanks,
-> Qu
-> 
->>
->> BTRFS info (device nvme0n1p5): first mount of filesystem
->> f99f2753-0283-4f93-8f5d-7a9f59f148cc
->> BTRFS info (device nvme0n1p5): using xxhash64 (xxhash64-generic)
->> checksum algorithm
->> ==================================================================
->> BUG: KASAN: invalid-access in xxh64_update (lib/xxhash.c:143 lib/ 
->> xxhash.c:283)
->> Read of size 8 at addr 21ff000802247000 by task kworker/u48:3/48
->> Pointer tag: [21], memory tag: [c0]
->>
->> CPU: 1 UID: 0 PID: 48 Comm: kworker/u48:3 Tainted: G      E
->> 6.19.0-rc3 #19 PREEMPTLAZY
->> Tainted: [E]=UNSIGNED_MODULE
->> Hardware name: LENOVO 83ED/LNVNB161216, BIOS NHCN60WW 09/11/2025
->> Workqueue: btrfs-endio-meta simple_end_io_work
->> Call trace:
->> show_stack (arch/arm64/kernel/stacktrace.c:501) (C)
->> dump_stack_lvl (lib/dump_stack.c:122)
->> print_address_description.isra.0 (mm/kasan/report.c:379)
->> print_report (mm/kasan/report.c:450 (discriminator 1)
->> mm/kasan/report.c:483 (discriminator 1))
->> kasan_report (mm/kasan/report.c:597)
->> kasan_check_range (mm/kasan/sw_tags.c:86 (discriminator 1))
->> __hwasan_loadN_noabort (mm/kasan/sw_tags.c:158)
->> xxh64_update (lib/xxhash.c:143 lib/xxhash.c:283)
->> xxhash64_update (crypto/xxhash_generic.c:49)
->> crypto_shash_finup (crypto/shash.c:123 (discriminator 1))
->> csum_tree_block (fs/btrfs/disk-io.c:110 (discriminator 3))
->> btrfs_validate_extent_buffer (fs/btrfs/disk-io.c:404)
->> end_bbio_meta_read (fs/btrfs/extent_io.c:3822 (discriminator 1))
->> btrfs_bio_end_io (fs/btrfs/bio.c:146)
->> simple_end_io_work (fs/btrfs/bio.c:382)
->> process_one_work (./arch/arm64/include/asm/jump_label.h:36
->> ./include/trace/events/workqueue.h:110 kernel/workqueue.c:3262)
->> worker_thread (kernel/workqueue.c:3334 (discriminator 2)
->> kernel/workqueue.c:3421 (discriminator 2))
->> kthread (kernel/kthread.c:463)
->> ret_from_fork (arch/arm64/kernel/entry.S:861)
->>
->> The buggy address belongs to the physical page:
->> page: refcount:2 mapcount:0 mapping:00000000973bd0ac index:0x9731 
->> pfn:0x882247
->> memcg:aaff000800ae1b00
->> aops:btree_aops ino:1
->> flags: 0x47e400000004020(lru|private|node=0|zone=2|kasantag=0x3f)
->> raw: 047e400000004020 fffffdffe0089188 fffffdffe0089208 ccff000814148300
->> raw: 0000000000009731 10ff0008493322d0 00000002ffffffff aaff000800ae1b00
->> page dumped because: kasan: bad access detected
->>
->> Memory state around the buggy address:
->> ffff000802246e00: 21 21 21 21 21 21 21 21 21 21 21 21 21 21 21 21
->> ffff000802246f00: 21 21 21 21 21 21 21 21 21 21 21 21 21 21 21 21
->>> ffff000802247000: c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0
->> ^
->> ffff000802247100: c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0
->> ffff000802247200: c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0 c0
->>
->> Let me know for any further testing or debug.
->>
->> Thanks,
->>    Dan
->> -- 
->> Daniel J Blueman
->>
-> 
-> 
+ Documentation/core-api/dma-api-howto.rst  | 42 +++++++++++++
+ Documentation/core-api/dma-attributes.rst |  9 +++
+ drivers/char/hw_random/virtio-rng.c       |  2 +
+ drivers/scsi/virtio_scsi.c                | 18 ++++--
+ drivers/virtio/virtio_input.c             |  5 +-
+ drivers/virtio/virtio_ring.c              | 72 +++++++++++++++++------
+ include/linux/dma-mapping.h               | 17 ++++++
+ include/linux/virtio.h                    |  5 ++
+ kernel/dma/debug.c                        | 26 ++++++--
+ net/vmw_vsock/virtio_transport.c          |  8 ++-
+ 10 files changed, 172 insertions(+), 32 deletions(-)
+
+-- 
+MST
 
