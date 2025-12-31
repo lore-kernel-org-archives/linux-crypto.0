@@ -1,93 +1,79 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CDA242D72
-	for <linux-crypto@vger.kernel.org>; Wed, 31 Dec 2025 21:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8502B2FFF9F
+	for <linux-crypto@vger.kernel.org>; Wed, 31 Dec 2025 21:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767215221; cv=none; b=bR//tggOtVwftBaKBLRZqJv3d85MK56jfSVLjyH4rBWgKqBR1xwrX5BQ4y1m2RnoR2540UmW84CmIAeS7i6j7u3HeYOZZn/4N/NEek4qbiFClC/+cQhNpDVwo+yN7TydLhTL1d+ZhLX1ntc55QGc982JwhYLTD8wEEsLIr1yieE=
+	t=1767217047; cv=none; b=CICYcFXYp46kA9NwnS3NYtw/OwCeuK8dHbeOzcufX2vDVnbQE0OlDQWY3GB62HZEWW4rLESMsMKOXNfzkHKIwNWYbrb1wwPGDzQeqU+U95isrhlalSULJq6h4uuIMTmb0LX5KjbCL6WeKvalQH1hLT396OsCEM7ytuT0xiIOOM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767215221; c=relaxed/simple;
-	bh=hXY0z2RTCx2IayzS/hr4AMGX/MGY2zH4FaDqoTXDYfc=;
+	s=arc-20240116; t=1767217047; c=relaxed/simple;
+	bh=3Rfnf2qhGGwgV00DUgX+jw89Q5Q97DzPe9bYdiAb1ps=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vqvb+8EREdkkoJmKrjNgEyDALgrlMv1UfkAjPp84G48aCZ42I/msqt6ypt2qrP2ySnUyIj5ofae1RUNVd8vahXbpMp4nRUUIDYcHVizro0H3m95YNnXrJmt2K7ybQoFzSVrprdZAG0p7/0HIXTHSNwT8OdK98kBUSVPOrh6R9zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GKpB9CQs; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=QKF5wIFuX5j2Kvw4LiRW/FHRTbGYD+GtUQxbDeq6kPyaS2/J0Y/bJbWho7FBIt3cLKF0R/6l0HvESOjTbRE0yXmwnBEU1grj/BVcy8LYXv+9Nf9CR05XjzCrt33m7q4Fh8a7uKV5eqFSy7vha7he4OtiLbDRVd0PPC8qveyImRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S/myJmuv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GKpB9CQs"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-34f0bc64a27so2719543a91.1
-        for <linux-crypto@vger.kernel.org>; Wed, 31 Dec 2025 13:07:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767215219; x=1767820019; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K1ZWaanXm47B26qX7kDszQnTW7zmwL2leOV+Pb1tK7Q=;
-        b=GKpB9CQstUvnPpXg05poBihyKlHyIMBFRBidE9alLUMu/xklJ92r1MQvUldbhUbNqa
-         hTqjPTIuuj/W/8/K4bwcB1+2/dF5GMzbr5T6tTwQAjTjgGbH6xMp3LvSuw8jX3bNNPqH
-         jk0lJSNagJWUdeclvO4tu2reS1odic8a1UlUCAqlzxrMMJ/6cF3Pr0JB+FMHaFYKaAvg
-         rEJQm8lL5GegHYSB3H509h5dJjAM6AG850kyHpBMTJLgBpuBGybeHiowYLt9G9jUSZjM
-         4SN2hCHnaxbgT0MWVX/SSBivSj9wD+5NGVWGoR1cNkkMQ/JlCCaLhN80e4/SjuEV2HRR
-         c6ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767215219; x=1767820019;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=K1ZWaanXm47B26qX7kDszQnTW7zmwL2leOV+Pb1tK7Q=;
-        b=tukUZe6IoUDg+2ahmQp0tKrHCAtrf3TzduocdyW3HPqDKX6R4NW7fOdRFdHLXhlJYQ
-         pk+Jb0GZ6dVEOYejGIRf0GErzF0QACAKtFr370eAcPExpIwbwYGG+SrZVlTuZSAJ5n6P
-         eEwwGVDh4nrK5zOZz2wPMkhnftITW1PIy+G6CrAJb3Ku4m9zd6A4v8+pNUi45IcoH60o
-         XsrhrR3mM53NCERvPAZ9YlZrwT+WmJII6107IObVPOvSFu0EpKgtp3xQ+cUJw9/tpTn/
-         B7ILD6xumZjQ4xfT31miQA2A5LMzq9kHHax0OuIVsXGd62m/fnJIkXTgLPc65eqoefG9
-         DVIA==
-X-Gm-Message-State: AOJu0Yy7KL0BZPgCsZ3/qBXxFs9oV8jqK62Y99iSTQmgatHo4URX2Ivp
-	DDhIqcA9DCdNzKnUBJuv7Is32/a6cn9h1G478LnTcNOVKh+4zGtttpS44/2l0iiBLD/h+PNPolS
-	xwR4TYUAxpwAA7tqqvU7t0XJp82gkw50=
-X-Gm-Gg: AY/fxX53MdpGzs1AT/4vxFFGDMSe8v9GiaX21fYs2kmMyMO1KmuhdgZouLMejs2HtHd
-	EKw8bUApWui/GCc8UlVJzM+vv30OPGWFDwS9TA5xPaJniOI2PUMZ4UPbbX2QyXoqnMf+GRjGHZj
-	Ysu8MeC5pX+igc3+jBRzgsqpC5rmbP1cdB9R8BGur/2BF62sC27zFfgkTxKjwwshYmqDEU5PX2D
-	TmuXhTl85Dqqi7VqM50mm5OkUIRJsoNvg4BpkBQehuF62yZWmOCHID6IGTYigVH7td6/Ww2ww==
-X-Google-Smtp-Source: AGHT+IHOH80RBheEwq7MKA7j9OO9E8H4gjMPZ0bsCxBVyZD1vWpOCOlwCy1ssnvYJm5Gza9MA6LpjuUCPW5TpvAOPv8=
-X-Received: by 2002:a17:90b:2585:b0:340:ecad:414 with SMTP id
- 98e67ed59e1d1-34e921e7557mr35034139a91.27.1767215219482; Wed, 31 Dec 2025
- 13:06:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S/myJmuv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F35FC19425
+	for <linux-crypto@vger.kernel.org>; Wed, 31 Dec 2025 21:37:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767217047;
+	bh=3Rfnf2qhGGwgV00DUgX+jw89Q5Q97DzPe9bYdiAb1ps=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=S/myJmuvkQhoJ8EppRf3vex1oHqN6qlqOFLVY9fq6nDRgajD26aH7kRPXmgv928XN
+	 DF+TI78MG0UkXzZMdQuw/GlDgWSTvvxshjuoWDv9HPqT/ygN9fSm4tM6/4gtAfbWRo
+	 QzgG3od32ACcdrA4U/CqlZorWWrLyM+hVKKc9JprOQAISIoIWyWLrac6n3tEKlvdbz
+	 pn7SDd/cIIVAUBaCaNAtbKkHkMk4EWxb3ubqdSGLJYW7BHJG77tQL9PBBKd5n9kxil
+	 vefx2gkquaNmsHtp/u9YwXN07/1/wFU4m8CwszxqBuN+8dVBrt7VZWgJ48dhsHZj/v
+	 RFgKGQWveyeJQ==
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-786d1658793so98451907b3.1
+        for <linux-crypto@vger.kernel.org>; Wed, 31 Dec 2025 13:37:27 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCX0jOiPQeEvxRHGOJk+XOamnKXydUmMS4scQXue6Th7gNNGeR+54e6dg6F3YeTkXed9WBwF8mCpohMJcZI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxJg4/UZchaHOmkTtHfYxzkhDpqAWzlr6rdytmsnUei8oQWmtN
+	AgvVTY3XobgkYH9dDegG3Jm5+m3euNsN5vh2Ut8MvHX/YhI+27W6v03KMXwl2dPNNRWtxmYNk2G
+	kLhRkDxYolhlOfRSY+jeOJkeq07Y+x2Q=
+X-Google-Smtp-Source: AGHT+IHHeH8zJG7rfiI2GFfedkzIC0YK/SbYafxSnkK2MFdRLnSCHEYor5QZDiE7b0zGilhY27fuPDjyGexn5uPgcoQ=
+X-Received: by 2002:a05:690c:3803:b0:78f:984b:4bb5 with SMTP id
+ 00721157ae682-78fb40c5f09mr590051547b3.64.1767217046540; Wed, 31 Dec 2025
+ 13:37:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <3c52d1ab5bf6f591c4cc04061e6d35b8830599fd.1765748549.git.lucien.xin@gmail.com>
- <aUJKjXoro9erJgSG@gondor.apana.org.au> <CADvbK_e1b1uF9izfeV3KOuEOckCBXnFKL4NRjb3ZGHih7F89hA@mail.gmail.com>
- <aUijI8zYq31rSY16@gondor.apana.org.au>
-In-Reply-To: <aUijI8zYq31rSY16@gondor.apana.org.au>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 31 Dec 2025 16:06:48 -0500
-X-Gm-Features: AQt7F2ojQJIJfBbSB4eqhmV1MU8SsLDNhOj1bzBasJwAQ_WMrog8dRksO-3d95o
-Message-ID: <CADvbK_dORpkN7Gu-xP7WyEcCJmzn6Cr-Fu5_1aHB5Bp=Ahzcrw@mail.gmail.com>
-Subject: Re: [v2 PATCH] crypto: seqiv - Do not use req->iv after crypto_aead_encrypt
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"David S . Miller" <davem@davemloft.net>, Steffen Klassert <steffen.klassert@secunet.com>
+References: <20251211-dev-dt-warnings-all-v1-0-21b18b9ada77@codeconstruct.com.au>
+ <20251211-dev-dt-warnings-all-v1-2-21b18b9ada77@codeconstruct.com.au>
+In-Reply-To: <20251211-dev-dt-warnings-all-v1-2-21b18b9ada77@codeconstruct.com.au>
+From: Linus Walleij <linusw@kernel.org>
+Date: Wed, 31 Dec 2025 22:37:15 +0100
+X-Gmail-Original-Message-ID: <CAD++jLmNGrDt3_w=DFnBnjEuz3LN-=uc1o9KHv1j=4gbGPoPQg@mail.gmail.com>
+X-Gm-Features: AQt7F2oNijhkSY2l2xLUahhHBTqPWX5BBKamnMGV8HdX2c29O6a9KTnJl-DXNNE
+Message-ID: <CAD++jLmNGrDt3_w=DFnBnjEuz3LN-=uc1o9KHv1j=4gbGPoPQg@mail.gmail.com>
+Subject: Re: [PATCH RFC 02/16] pinctrl: aspeed: g5: Constrain LPC binding
+ revision workaround to AST2500
+To: Andrew Jeffery <andrew@codeconstruct.com.au>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Joel Stanley <joel@jms.id.au>, linux-hwmon@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
+	openbmc@lists.ozlabs.org, linux-gpio@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-iio@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 21, 2025 at 8:47=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> On Fri, Dec 19, 2025 at 12:58:49PM -0500, Xin Long wrote:
-> >
-> > Which upstream git repo will this patch be applied to?
->
-> I intend to push this to Linus for 6.19.
->
-BTW, Do you think it might have the similar issue in essiv_aead_crypt()?
+On Thu, Dec 11, 2025 at 9:46=E2=80=AFAM Andrew Jeffery
+<andrew@codeconstruct.com.au> wrote:
 
-        if (rctx->assoc && err !=3D -EINPROGRESS && err !=3D -EBUSY)
-                kfree(rctx->assoc);
+> Discovering a phandle to an AST2400 or AST2600 LPC node indicates an
+> error for the purpose of the AST2500 pinctrl driver.
+>
+> Signed-off-by: Andrew Jeffery <andrew@codeconstruct.com.au>
 
-since rctx comes from req.
+Reviewed-by: Linus Walleij <linusw@kernel.org>
 
-Thanks.
+Also pretty obviously correct, can't I just apply this one?
+
+Yours,
+Linus Walleij
