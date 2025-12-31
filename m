@@ -1,218 +1,185 @@
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE6A2A1BA
-	for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 23:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E81245008
+	for <linux-crypto@vger.kernel.org>; Wed, 31 Dec 2025 03:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767138752; cv=none; b=Xa2F2mTLcX51UFzBK3Ni7eBpyOMWsnA4jTyHcxjDYIqubBU6v4b1/vQPzoGDIb97O1DlCkzz5w1zt+0hSGVVFKsMMDvbKPuULxXUSy0+EFtDJKbDUKNgwf45z9eZwMYBOK5fefMeA3/y1ugMBmkT00LwTlOxvZMAV3+cCGhTdPE=
+	t=1767151774; cv=none; b=YCeVWbR+az1TXnUGFtOo7myR2l4hD/WriAUdZzfYdD9jf1PKLeG1WEUkcoP9/PxIPaA4VAxIlII5xFD6S+DrbBMrIox4hjMO/eLKwemE7dfNPKXQn3EFq4aSO07XGODREAX1k5BWhsGprv6oCXJp1QSxNMFxHEMTHXE4Gm7VmOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767138752; c=relaxed/simple;
-	bh=Yj+1kBT/xzBsmsLD/iNchYPF23fp+YZZBWM7ypXQ6Hg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mH6sFutABs3vCWB3RCGQe77f/y8tp6rANi8kQL8ZTKvklfhY04O9NUip2wctOSjwp1yiftMTb7u1aR/NrEoHhdmYt9/u9pcWG/Tpqd9dcdSPAJJOSEzTYuoIUO2meODmD/7SbKI+602Eh7WMGXCaV1PihQBsxPFMUNiJ8fqwkxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=STtIoNEE; arc=none smtp.client-ip=212.77.101.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+	s=arc-20240116; t=1767151774; c=relaxed/simple;
+	bh=FUWNh/5USFJVyFMB8cd+IQmb8lMJXdQe4wT4iDgdXb4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VENkca5P5EQA4NGDRniEVvYKmtg1N14aozVck26hneH0csJgh07HpXAMbR3nA4hJ0bIx9vF8XbtPbW2M880ipnTmTEkQPtnXilxhRAZ6H7RblJQyNCm36EyZRuaUcJfq3S80e/5boZYqlD+hmT9EsvDUtOE5RnWQ3LkWV1F4hZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=quora.org; spf=pass smtp.mailfrom=quora.org; dkim=pass (1024-bit key) header.d=quora.org header.i=@quora.org header.b=C5GLj/Ib; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=quora.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quora.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="STtIoNEE"
-Received: (wp-smtpd smtp.wp.pl 10168 invoked from network); 31 Dec 2025 00:52:25 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1767138745; bh=2V/j4nTU5LxxzBYu2oXs3k3yGpEUDph8mKEMwSjdXfI=;
-          h=From:To:Cc:Subject;
-          b=STtIoNEEIJyHhD9sAE6oKpK0pJRyZER+ZFQdfX9fuYnz4wOtJfxmPJee5vuElr2Bd
-           Zjj3cWJgnbinTCeKIuNMiDiIFfRzZODu5Ph5Q3cYGzRubGODiJSnD9TZTbpv1KgSZl
-           zWkdnMgC/M6l5/dhtN6W4WnMQEUYiPGVYeMgE0HfpzZq/5FqKiAVZFBS6gfkKctj/G
-           KhFki+LlBIy65wuS/slfUHbAf3e9m1HgZ1qgailwqlzU94MUR/uk5cT74aFmk8EmSR
-           h6dmFrwLB5A+PDfsJoWjWsdCfWQOa2YaGoBnKJoKux82A/D2kCQb4tqT7wS2xs94u/
-           +YvE7FxSRaTGg==
-Received: from 83.5.157.18.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.5.157.18])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <ansuelsmth@gmail.com>; 31 Dec 2025 00:52:25 +0100
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: ansuelsmth@gmail.com,
-	atenart@kernel.org,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	vschagen@icloud.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH] crypto: inside-secure/eip93 - unregister only available algorithm
-Date: Wed, 31 Dec 2025 00:51:57 +0100
-Message-ID: <20251230235222.2113987-1-olek2@wp.pl>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (1024-bit key) header.d=quora.org header.i=@quora.org header.b="C5GLj/Ib"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7b75e366866so4702622b3a.2
+        for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2025 19:29:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=quora.org; s=google; t=1767151773; x=1767756573; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G67kP4OfpSHo7OALeELs+cnY6p+mrOe1CzAdcBKGxJg=;
+        b=C5GLj/Ib1049RwMxW6Bmp6w46s9b0h7hoaa/uWsX/S7WEGcAd/nDZnDdHpaGI92Y/W
+         Rl6UcHTMuwVa28wK3iMlsquBqYQdw8N3R7mA8vmr0sIODIK8KFZsjQ0N50zc0uxZp0yS
+         BiJO3oVfWCI1cfKwExswJ5ORHrwNA/0z79UiM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767151773; x=1767756573;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=G67kP4OfpSHo7OALeELs+cnY6p+mrOe1CzAdcBKGxJg=;
+        b=L8+nur4e8C0tzzP8+zY0FKdtwRny2lX7thRbEY18NtZ2OMHL6KbHCFdZhSMxpaUoFA
+         Dg5iUcQ7seN7nSQ84qqyrgWilmkwJDEaZHs9MQZbKQUCtZqWR/U6ibRrksOUI+3itF5q
+         ZlDTbMLgXOlgzB5T7ctLMRT5QffXsopPGriF1o4gZnhPFF0gaUuVB90s47vIAqfjX72T
+         tsE/JtRLLogDtClccNxs8Tnl3BLFtGPO66kHzE3kMgtNlXF4znQbYXK5iW2Y7mYMxq2p
+         KPIjQQ1/0EshtHceEkhNldYZchLRINxDx+j/jJvdoNhZvClxVHffPs46S5q5RmLoogll
+         pMiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVOx5GAgIMPRt6p4gOilKrQg+IVVYRXs8Tr8NyX6OBLfJskeXlFu2RgXcg4TYVcBKLrQUmRbt8ZMh50VZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7wHQpZvk9cYMeVOEUjqD6ZUGhazas0CGU9dmrKs386hMs97Q0
+	PVgrhl1erD16SmKEPid1g55iX/nqEft2PlzZ6kGJzgjSMFEzqOdnFcYpofGjEKTfX1L6/JQ4vn1
+	/pVOc0ab/1BeXK2gPlr+fMZterllSS6nREuQ+LHI8PA==
+X-Gm-Gg: AY/fxX65HpEeJo3HOE5HxYCh2Xh8APjXo1nmpiBVUKqTDZxZXBWYYup+pqDJ3vzzysi
+	Rtv4kqZVRxWBm0adphbsCGaG1b9+DPUL/8VxxJDjTv+1EZY+6NHqF7xdJz7DXOq7TVb5BbFMJly
+	Ga2clFPS9c3nMfzTZbTHKm/WzN9pYgknoZMaJuqpAdrqR32NkPcf8sC/xTDLP76muWKZBcJ40P7
+	tWshROjoCy+6rSqT9qkKrR4FKSQafEHOTl/VeEMXpPEDmkGN10ZqBMWFUcTc5Y7Zf333SdadAzI
+	iTx8DCnkeyzxACRl3zQPmKOHdUqnnbXffy2y/a0KEsd5Jsnfbitg38NLBZPzN2JJ2Xa/AwYtlXz
+	whkheQ81Re5gJrvGOh/ORuCgLQ0IldWX7+t7hxa7PbRxLvkWNn9ZpPX3SxM26KLLlOQosZuDKGZ
+	oauOdq/JknfKZkbuaI3bunkUOdHWwWyti9T8y8
+X-Google-Smtp-Source: AGHT+IFBZRVcxGLTGWxMS4UwhBBlidjXf0waQm1UjqTuUpn5WDs9/I39O8HqjrVHvmgaGKiBM2FMfXOwCxGzXAaIxK4=
+X-Received: by 2002:a05:6a20:2584:b0:35f:b243:46cb with SMTP id
+ adf61e73a8af0-376a75e793dmr34924153637.12.1767151772779; Tue, 30 Dec 2025
+ 19:29:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: 40b4068a9f09c1d9b430ab71df20e0df
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000007 [cfRB]                               
+References: <CAMVG2svM0G-=OZidTONdP6V7AjKiLLLYgwjZZC_fU7_pWa=zXQ@mail.gmail.com>
+ <01d84dae-1354-4cd5-97ce-4b64a396316a@suse.com> <642a3e9a-f3f1-4673-8e06-d997b342e96b@suse.com>
+In-Reply-To: <642a3e9a-f3f1-4673-8e06-d997b342e96b@suse.com>
+From: Daniel J Blueman <daniel@quora.org>
+Date: Wed, 31 Dec 2025 11:29:21 +0800
+X-Gm-Features: AQt7F2ofFVt5VnckQkFFfjA_Gx7RA7HP0MVRsu_4qEI5AFJmBtF9jr5EQ6Eq6FI
+Message-ID: <CAMVG2suYnp-D9EX0dHB5daYOLT++v_kvyY8wV-r6g36T6DZhzg@mail.gmail.com>
+Subject: Re: [6.19-rc3] xxhash invalid access during BTRFS mount
+To: Qu Wenruo <wqu@suse.com>
+Cc: David Sterba <dsterba@suse.com>, Chris Mason <clm@fb.com>, 
+	Linux BTRFS <linux-btrfs@vger.kernel.org>, linux-crypto@vger.kernel.org, 
+	Linux Kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-EIP93 has an options register. This register indicates which crypto
-algorithms are implemented in silicon. Supported algorithms are
-registered on this basis. Unregister algorithms on the same basis.
-Currently, all algorithms are unregistered, even those not supported
-by HW. This results in panic on platforms that don't have all options
-implemented in silicon.
+On Tue, 30 Dec 2025 at 17:28, Qu Wenruo <wqu@suse.com> wrote:
+> =E5=9C=A8 2025/12/30 19:26, Qu Wenruo =E5=86=99=E9=81=93:
+> > =E5=9C=A8 2025/12/30 18:02, Daniel J Blueman =E5=86=99=E9=81=93:
+> >> When mounting a BTRFS filesystem on 6.19-rc3 on ARM64 using xxhash
+> >> checksumming and KASAN, I see invalid access:
+> >
+> > Mind to share the page size? As aarch64 has 3 different supported pages
+> > size (4K, 16K, 64K).
+> >
+> > I'll give it a try on that branch. Although on my rc1 based development
+> > branch it looks OK so far.
+>
+> Tried both 4K and 64K page size with KASAN enabled, all on 6.19-rc3 tag,
+> no reproduce on newly created fs with xxhash.
+>
+> My environment is aarch64 VM on Orion O6 board.
+>
+> The xxhash implementation is the same xxhash64-generic:
+>
+> [   17.035933] BTRFS: device fsid 260364b9-d059-410c-92de-56243c346d6d
+> devid 1 transid 8 /dev/mapper/test-scratch1 (253:2) scanned by mount (629=
+)
+> [   17.038033] BTRFS info (device dm-2): first mount of filesystem
+> 260364b9-d059-410c-92de-56243c346d6d
+> [   17.038645] BTRFS info (device dm-2): using xxhash64
+> (xxhash64-generic) checksum algorithm
+> [   17.041303] BTRFS info (device dm-2): checking UUID tree
+> [   17.041390] BTRFS info (device dm-2): turning on async discard
+> [   17.041393] BTRFS info (device dm-2): enabling free space tree
+> [   19.032109] BTRFS info (device dm-2): last unmount of filesystem
+> 260364b9-d059-410c-92de-56243c346d6d
+>
+> So there maybe something else involved, either related to the fs or the
+> hardware.
 
-Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
----
- .../crypto/inside-secure/eip93/eip93-main.c   | 107 ++++++++++--------
- 1 file changed, 61 insertions(+), 46 deletions(-)
+Thanks for checking Wenruo!
 
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/drivers/crypto/inside-secure/eip93/eip93-main.c
-index 3cdc3308dcac..dfac2b23e2d9 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-main.c
-+++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
-@@ -77,11 +77,65 @@ inline void eip93_irq_clear(struct eip93_device *eip93, u32 mask)
- 	__raw_writel(mask, eip93->base + EIP93_REG_INT_CLR);
- }
- 
--static void eip93_unregister_algs(unsigned int i)
-+static int eip93_algo_is_supported(struct eip93_alg_template *eip93_algo,
-+				   u32 supported_algo_flags)
-+{
-+	u32 alg_flags = eip93_algo->flags;
-+
-+	if ((IS_DES(alg_flags) || IS_3DES(alg_flags)) &&
-+	    !(supported_algo_flags & EIP93_PE_OPTION_TDES))
-+		return 0;
-+
-+	if (IS_AES(alg_flags)) {
-+		if (!(supported_algo_flags & EIP93_PE_OPTION_AES))
-+			return 0;
-+
-+		if (!IS_HMAC(alg_flags)) {
-+			if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY128)
-+				eip93_algo->alg.skcipher.max_keysize =
-+					AES_KEYSIZE_128;
-+
-+			if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY192)
-+				eip93_algo->alg.skcipher.max_keysize =
-+					AES_KEYSIZE_192;
-+
-+			if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY256)
-+				eip93_algo->alg.skcipher.max_keysize =
-+					AES_KEYSIZE_256;
-+
-+			if (IS_RFC3686(alg_flags))
-+				eip93_algo->alg.skcipher.max_keysize +=
-+					CTR_RFC3686_NONCE_SIZE;
-+		}
-+	}
-+
-+	if (IS_HASH_MD5(alg_flags) &&
-+	    !(supported_algo_flags & EIP93_PE_OPTION_MD5))
-+		return 0;
-+
-+	if (IS_HASH_SHA1(alg_flags) &&
-+	    !(supported_algo_flags & EIP93_PE_OPTION_SHA_1))
-+		return 0;
-+
-+	if (IS_HASH_SHA224(alg_flags) &&
-+	    !(supported_algo_flags & EIP93_PE_OPTION_SHA_224))
-+		return 0;
-+
-+	if (IS_HASH_SHA256(alg_flags) &&
-+	    !(supported_algo_flags & EIP93_PE_OPTION_SHA_256))
-+		return 0;
-+
-+	return 1;
-+}
-+
-+static void eip93_unregister_algs(u32 supported_algo_flags, unsigned int i)
- {
- 	unsigned int j;
- 
- 	for (j = 0; j < i; j++) {
-+		if (!eip93_algo_is_supported(eip93_algs[j], supported_algo_flags))
-+			continue;
-+
- 		switch (eip93_algs[j]->type) {
- 		case EIP93_ALG_TYPE_SKCIPHER:
- 			crypto_unregister_skcipher(&eip93_algs[j]->alg.skcipher);
-@@ -102,51 +156,9 @@ static int eip93_register_algs(struct eip93_device *eip93, u32 supported_algo_fl
- 	int ret = 0;
- 
- 	for (i = 0; i < ARRAY_SIZE(eip93_algs); i++) {
--		u32 alg_flags = eip93_algs[i]->flags;
--
- 		eip93_algs[i]->eip93 = eip93;
- 
--		if ((IS_DES(alg_flags) || IS_3DES(alg_flags)) &&
--		    !(supported_algo_flags & EIP93_PE_OPTION_TDES))
--			continue;
--
--		if (IS_AES(alg_flags)) {
--			if (!(supported_algo_flags & EIP93_PE_OPTION_AES))
--				continue;
--
--			if (!IS_HMAC(alg_flags)) {
--				if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY128)
--					eip93_algs[i]->alg.skcipher.max_keysize =
--						AES_KEYSIZE_128;
--
--				if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY192)
--					eip93_algs[i]->alg.skcipher.max_keysize =
--						AES_KEYSIZE_192;
--
--				if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY256)
--					eip93_algs[i]->alg.skcipher.max_keysize =
--						AES_KEYSIZE_256;
--
--				if (IS_RFC3686(alg_flags))
--					eip93_algs[i]->alg.skcipher.max_keysize +=
--						CTR_RFC3686_NONCE_SIZE;
--			}
--		}
--
--		if (IS_HASH_MD5(alg_flags) &&
--		    !(supported_algo_flags & EIP93_PE_OPTION_MD5))
--			continue;
--
--		if (IS_HASH_SHA1(alg_flags) &&
--		    !(supported_algo_flags & EIP93_PE_OPTION_SHA_1))
--			continue;
--
--		if (IS_HASH_SHA224(alg_flags) &&
--		    !(supported_algo_flags & EIP93_PE_OPTION_SHA_224))
--			continue;
--
--		if (IS_HASH_SHA256(alg_flags) &&
--		    !(supported_algo_flags & EIP93_PE_OPTION_SHA_256))
-+		if (!eip93_algo_is_supported(eip93_algs[i], supported_algo_flags))
- 			continue;
- 
- 		switch (eip93_algs[i]->type) {
-@@ -167,7 +179,7 @@ static int eip93_register_algs(struct eip93_device *eip93, u32 supported_algo_fl
- 	return 0;
- 
- fail:
--	eip93_unregister_algs(i);
-+	eip93_unregister_algs(supported_algo_flags, i);
- 
- 	return ret;
- }
-@@ -469,8 +481,11 @@ static int eip93_crypto_probe(struct platform_device *pdev)
- static void eip93_crypto_remove(struct platform_device *pdev)
- {
- 	struct eip93_device *eip93 = platform_get_drvdata(pdev);
-+	u32 algo_flags;
-+
-+	algo_flags = readl(eip93->base + EIP93_REG_PE_OPTION_1);
- 
--	eip93_unregister_algs(ARRAY_SIZE(eip93_algs));
-+	eip93_unregister_algs(algo_flags, ARRAY_SIZE(eip93_algs));
- 	eip93_cleanup(eip93);
- }
- 
--- 
-2.47.3
+With KASAN_GENERIC or KASAN_HW_TAGS, I don't see "kasan:
+KernelAddressSanitizer initialized", so please ensure you are using
+KASAN_SW_TAGS, KASAN_OUTLINE and 4KB pages. Full config at
+https://gist.github.com/dblueman/cb4113f2cf880520081cf3f7c8dae13f
 
+Also ensure your mount options resolve similar to
+"rw,relatime,compress=3Dzstd:3,ssd,discard=3Dasync,space_cache=3Dv2,subvoli=
+d=3D5,subvol=3D/".
+
+Failing that, let me know of any significant filesystem differences from:
+# btrfs inspect-internal dump-super /dev/nvme0n1p5
+superblock: bytenr=3D65536, device=3D/dev/nvme0n1p5
+---------------------------------------------------------
+csum_type        1 (xxhash64)
+csum_size        8
+csum            0x97ec1a3695ae35d0 [match]
+bytenr            65536
+flags            0x1
+            ( WRITTEN )
+magic            _BHRfS_M [match]
+fsid            f99f2753-0283-4f93-8f5d-7a9f59f148cc
+metadata_uuid        00000000-0000-0000-0000-000000000000
+label
+generation        34305
+root            586579968
+sys_array_size        129
+chunk_root_generation    33351
+root_level        0
+chunk_root        19357892608
+chunk_root_level    0
+log_root        0
+log_root_transid (deprecated)    0
+log_root_level        0
+total_bytes        83886080000
+bytes_used        14462930944
+sectorsize        4096
+nodesize        16384
+leafsize (deprecated)    16384
+stripesize        4096
+root_dir        6
+num_devices        1
+compat_flags        0x0
+compat_ro_flags        0x3
+            ( FREE_SPACE_TREE |
+              FREE_SPACE_TREE_VALID )
+incompat_flags        0x361
+            ( MIXED_BACKREF |
+              BIG_METADATA |
+              EXTENDED_IREF |
+              SKINNY_METADATA |
+              NO_HOLES )
+cache_generation    0
+uuid_tree_generation    34305
+dev_item.uuid        86166b5f-2258-4ab9-aac6-0d0e37ffbdb6
+dev_item.fsid        f99f2753-0283-4f93-8f5d-7a9f59f148cc [match]
+dev_item.type        0
+dev_item.total_bytes    83886080000
+dev_item.bytes_used    22624075776
+dev_item.io_align    4096
+dev_item.io_width    4096
+dev_item.sector_size    4096
+dev_item.devid        1
+dev_item.dev_group    0
+dev_item.seek_speed    0
+dev_item.bandwidth    0
+dev_item.generation    0
+
+Thanks,
+  Dan
+--
+Daniel J Blueman
