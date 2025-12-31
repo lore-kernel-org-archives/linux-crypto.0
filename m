@@ -1,520 +1,158 @@
-Received: from bonobo.aspen.relay.mailchannels.net (bonobo.aspen.relay.mailchannels.net [23.83.221.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72BA52AE99;
-	Wed, 31 Dec 2025 09:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.221.22
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767174070; cv=pass; b=CDBDdIcSKM2AJ0u/XWz5vIgkQyoN++JwXC6ESGpgrypr6kFwtXzosxTNdZodzT3qMtRKk9SpxfVjloZF2QSX2uBWebTf1Z5SCB0NWGUJBuKYOV7adaPh6RRvIubZ27Ge6i2+W99wpNp6ldTBJb6tdjJTDcrBM/afX5mfoLjY4WQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767174070; c=relaxed/simple;
-	bh=KSaUIgL77CYjxLfEWsrB5KlYUd87jiUBImscuVSEPbo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=r5uaied3Cgx/TCxsHH7CL0YQsSCTnMofchOLf6kmWT6ji4Z+eqtHe5fqfIIIcc2rKMkSsSuRowISbP04QpkFsHn8tlfa7tn0E90oT+hDH/Fw8k3FAGNCnmwGpGhkOCMMzfxmZitvhYCa8Jl8fuiBtPu/dqxm2lyLDPb3T7cnau0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kriptograf.id; spf=pass smtp.mailfrom=kriptograf.id; dkim=pass (2048-bit key) header.d=kriptograf.id header.i=@kriptograf.id header.b=IEsKqqSh; arc=pass smtp.client-ip=23.83.221.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kriptograf.id
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kriptograf.id
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A3C1E0DCB
+	for <linux-crypto@vger.kernel.org>; Wed, 31 Dec 2025 13:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767186756; cv=none; b=gwScU6f8FAJR9wnlCSx9MkaD+L5/aSWV5PhuWd6PbEc/FE1Ma2Req1Fntx4wN/x3o1fQSCaGMadQPpDtd5+IIVUjXCx41n2e1bqANSyVpHxHKniRenlvGHDE9wOzn3K/XyS3+jXmwoKooVMZsPEBHdRuRZs432QihJ+xEauDka8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767186756; c=relaxed/simple;
+	bh=+Rj9uS/xKO+b+rZgqDTkOPQ7AM9H+O0zY3sW6JnGIaQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HUJ657lZ7AV2UjjbdmZDQjqTMvMelCaVEq4yGJd/rWNDb5seuYq1v7xhmmVzeXYJP2QRJxqEwUfefUK7rp++q0rvgg88DH01sw0dZ2ghafZR5bXw3O3emtcO3VxXWIa3sIys070E7yT0ebSw/i7NePEIPZmY42TgBnRmkl8mEDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=SiNOf5hC; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kriptograf.id header.i=@kriptograf.id header.b="IEsKqqSh"
-X-Sender-Id: nlkw2k8yjw|x-authuser|rusydi.makarim@kriptograf.id
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 918A61614FD;
-	Wed, 31 Dec 2025 09:25:18 +0000 (UTC)
-Received: from vittoria.id.domainesia.com (100-107-79-208.trex-nlb.outbound.svc.cluster.local [100.107.79.208])
-	(Authenticated sender: nlkw2k8yjw)
-	by relay.mailchannels.net (Postfix) with ESMTPA id EFEDE16210C;
-	Wed, 31 Dec 2025 09:25:15 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; d=mailchannels.net; s=arc-2022; cv=none;
-	t=1767173118;
-	b=nVCff0sWOYdkYXTt3Av/kyB1tXtykMIjIy/nWk/bYRMRCr4ixM8h3pBiyfgIys9+luF+0g
-	MO5/GSHvFctq56572rhKx0ArdwzyZzILSLTap6G7fDJp4AI7CXx6MTuH5R2R8uUIaOIdlQ
-	pW1Vz0WRPjnpCiOVCWhxi0GbbC07AEZJnxHaFgPoFr5g3j784rg5J+daM6/rvKQmAz9Pbp
-	sNl3EvLC1JtrWZD9uoYP/0RgK6CF0hqTKltnJoOjnPzx6QYlObwRCK/fXr6pEZb4hs4w14
-	mrxTErktru/hoxEc0v4dUCcRAvOz6Tj8sryiiwFxUmza1tqjb/dcVrEPT+NuLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1767173118;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=+36DFckqx+G1CdC60LCVJiNVSZDjLP/1mvomvNCogY4=;
-	b=Ed6oXuYqhd8OohpV5qsy1jV9v7IMhyJ/2/0wL2FA/+iRRtWFpif3SoWWe7Tz2kEzCtVYVa
-	Q7nxcooA3IKnFvVSYurDKLVEWqENh9Ljw062ZpCXJrU54Z628qhGSXAhamBni6xEDFYCVX
-	M5IIJCp1zFpNGRefoMtA/k7yp8obJRHU/M3KYiDMWk8p3M8e+3EhO7memJWxp03+v49uEL
-	pzpC6S8rmhtdMA8mCc7DaVclmOD8Y3dCooWihQC4COJrBQuqDNaJbf5HdHokY3z02jBbQb
-	1xDZiPhqJwJ207dNtMoaQakogc9z9CYgxorpE4tDpnHJt5u0EZpVtttFMLJmjA==
-ARC-Authentication-Results: i=1;
-	rspamd-69599c6f48-klbvj;
-	auth=pass smtp.auth=nlkw2k8yjw smtp.mailfrom=rusydi.makarim@kriptograf.id
-X-Sender-Id: nlkw2k8yjw|x-authuser|rusydi.makarim@kriptograf.id
-X-MC-Relay: Junk
-X-MailChannels-SenderId: nlkw2k8yjw|x-authuser|rusydi.makarim@kriptograf.id
-X-MailChannels-Auth-Id: nlkw2k8yjw
-X-Name-Sponge: 65cc109f2c9052c1_1767173118535_3237255704
-X-MC-Loop-Signature: 1767173118535:1524764886
-X-MC-Ingress-Time: 1767173118534
-Received: from vittoria.id.domainesia.com (vittoria.id.domainesia.com
- [36.50.77.81])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.107.79.208 (trex/7.1.3);
-	Wed, 31 Dec 2025 09:25:18 +0000
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=kriptograf.id; s=default; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+36DFckqx+G1CdC60LCVJiNVSZDjLP/1mvomvNCogY4=; b=IEsKqqShODBbdEluX1Uzk8eU0K
-	nh+G1I4+Mzqz/8iZQ6Mqqq8ncqVJBjgG2GXZojPdvgPTCNyxWuRYQ/+qH5IQNGMljJRxiddH/3O96
-	4QQMYlGSfS7TB5Zj9EZERvsQAI3BH+pLQ70GTNoyG2kpkFuVJVV2oHQcYvAzlXhW6lht4F2caGmiP
-	0wxlmRovjwgPb0jfk1JVAEDbC8EYF+sGCx24X63Tz5wjkYQiys+QLevIHfr8OMh4bHZrTTVwATwes
-	Sv6//3oMhItNpTiezIpjVHH2hoTaiWY+n8MsNpBM/0kAKkcMeobJHUoDSOYR+wDe7Hb0Abj5OAZYq
-	CmCt0n7A==;
-Received: from [182.253.89.89] (port=29807 helo=Rusydis-MacBook-Air.local)
-	by vittoria.id.domainesia.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.99)
-	(envelope-from <rusydi.makarim@kriptograf.id>)
-	id 1vasSA-0000000B53Y-0HH5;
-	Wed, 31 Dec 2025 16:25:12 +0700
-From: "Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>
-Date: Wed, 31 Dec 2025 16:25:35 +0700
-Subject: [PATCH v2 1/3] lib/crypto: Add KUnit test vectors for
- Ascon-Hash256
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="SiNOf5hC"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-47d538fafdfso3024575e9.1
+        for <linux-crypto@vger.kernel.org>; Wed, 31 Dec 2025 05:12:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1767186751; x=1767791551; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fke3G5rSH2WPZ2DuQdyfqEfEpoI6l76uJNtI0EpEhAo=;
+        b=SiNOf5hCQAQ9lih0xDGV7gjR7CfpmOO8AB3s9IeITfpaC328pdo654nC3FNIfPPnYB
+         fkd5qD9q+HvWSq536C6BhTSPieAbHLipRfLKE21iDDYtDmghplktpIhdpDtdORPciAcZ
+         LQpQ8PKMM8Q6/YUI7t1QvsKoPzRYURS1J27f9/F31nTEFyFQlVX8XQzAr1xtRLQ39GkB
+         REQ15nkajDKe1xg9zkDXa/UH9tt1LtbNShtNDDvRc1UpIXkWn8dwnUZCTvot/hexmBta
+         XggYEqQC1GM23pJ7GQgNCAuwh+5a70MQJiobGXUg7XwbkgAb1lDG3040If49qmyX801q
+         2gDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767186751; x=1767791551;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Fke3G5rSH2WPZ2DuQdyfqEfEpoI6l76uJNtI0EpEhAo=;
+        b=abkpLndpV4m68gu7if1a1Pblk6dTBcIjNFXfhQOt70Dls4b40lMqBTlqRqQJGqAkzY
+         lGIWC0ITHrrt4iiQ+nOKDyPJkcqjSQV8ltlDTTT0KW9LJYHmZ6EP/29oXv2TRbac/nNt
+         U08OXx7pCVkJ/BZhyAak94TjCp8GC532YWp2iFX7TrMDnBfR5ul/nKX7+KKCvo1LcYKM
+         JEuUz0sRzF016PH4+Paqpvd4p8zyvuB3XR0TxBfJwasNNtcZvEyqMQX7iu0+Qhw16h47
+         t6fKbUToez/54zvGtfkQkj4A6UCxcdeP5SkQgZFLDbwcWGbzbU7lRrTFlnjgcdIaKMkZ
+         ouRA==
+X-Forwarded-Encrypted: i=1; AJvYcCW8R1fMPmaxYIHub17b6Su6wdXpaaIDP/NGanwVHf1XH7AeZzscGCpXVC0OVg8RlCjsQhN9f5RSwob+rXc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxqs0AL1MIM8LLvKIJDmsTxQTFcaBpgFWrKled5YqhvXXq4yp7I
+	Pi3QgsapSMWS/YEdG/3xQ5zXsqZGdtR0U1RU0CWfmEJF2MUeTkZXANcemPL4e2/CCQw=
+X-Gm-Gg: AY/fxX4qUpQI8sObzx+F9ZmUoC9ML6a0ToUmUOLIgvLv7axCL81oViBcbYhCC+OZBJn
+	czcWd8gFJjORBKeC6X3vTjXy9LGciU3Qdmt1J2dqw06uvmGWCN8XJW+9Af+LPGcdbLfzLwfSY1b
+	xXAMQqiiY+bB/SCTcPINmOtP6fn2kcWKtCpjF/fkiwrU7EdKtfFt3TTQHV2yrR9inUN7zQ1Si+c
+	mzqskRwglEqFEXJsxT6GY/4SiJQ16cB9eCanCDGEufWAHenIKaf+2njwQi7JDUMGaUpIfAE2CAI
+	7bG0hwD6smStccFli5FImSvdkI7WYupvjZTc+rkYYLVVeHiE/SJj7WfIIyVN6Be2IPJ00d4nnbI
+	aWe/1Zy6t9vq+CU5+uJcxjrmAlQp46qmMVkhObQwKNVftgPyxKaA5cpTVBigC1V8QFbVLcJdqDw
+	kQlVkE5Es55fqF2ACLsxfxEIZA0wY/UAKf1YmBNGFk1P3HW5xTHQPqlKO16JCsF69pGRi4lGgIm
+	rWO
+X-Google-Smtp-Source: AGHT+IF4mp6GOV5G6x95wPZOhGbqasawR+ZO3M57T/TzQMfUeMdF8kArZ+ePMOUwA5I3JuKmTuDssg==
+X-Received: by 2002:a05:600c:3e0b:b0:477:9c73:268a with SMTP id 5b1f17b1804b1-47d195b3d55mr287631655e9.6.1767186751342;
+        Wed, 31 Dec 2025 05:12:31 -0800 (PST)
+Received: from mordecai (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3a20af0sm269524875e9.4.2025.12.31.05.12.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Dec 2025 05:12:30 -0800 (PST)
+Date: Wed, 31 Dec 2025 14:12:24 +0100
+From: Petr Tesarik <ptesarik@suse.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Eugenio =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella
+ <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Leon Romanovsky
+ <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+ iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH RFC 00/13] fix DMA aligment issues around virtio
+Message-ID: <20251231141224.56d4ce56@mordecai>
+In-Reply-To: <cover.1767089672.git.mst@redhat.com>
+References: <cover.1767089672.git.mst@redhat.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251231-ascon_hash256-v2-1-ffc88a0bab4d@kriptograf.id>
-References: <20251231-ascon_hash256-v2-0-ffc88a0bab4d@kriptograf.id>
-In-Reply-To: <20251231-ascon_hash256-v2-0-ffc88a0bab4d@kriptograf.id>
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Biggers <ebiggers@kernel.org>, 
- "Jason A. Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
- "Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>
-X-Mailer: b4 0.14.3
-X-AuthUser: rusydi.makarim@kriptograf.id
 
-Add test vectors to test the implementation correctness.
-The test vectors are generated using the Python reference
-implementation in https://github.com/meichlseder/pyascon.
-The messages are generated using the method rand_bytes()
-in scripts/crypto/gen-hash-testvecs.py.
+On Tue, 30 Dec 2025 05:15:42 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Signed-off-by: Rusydi H. Makarim <rusydi.makarim@kriptograf.id>
----
- include/crypto/ascon_hash.h            |  84 ++++++++++++
- lib/crypto/tests/Kconfig               |   9 ++
- lib/crypto/tests/Makefile              |   1 +
- lib/crypto/tests/ascon_hash-testvecs.h | 235 +++++++++++++++++++++++++++++++++
- lib/crypto/tests/ascon_hash_kunit.c    |  33 +++++
- 5 files changed, 362 insertions(+)
+> Cong Wang reported dma debug warnings with virtio-vsock
+> and proposed a patch, see:
+> 
+> https://lore.kernel.org/all/20251228015451.1253271-1-xiyou.wangcong@gmail.com/
+> 
+> however, the issue is more widespread.
+> This is an attempt to fix it systematically.
+> Note: i2c and gio might also be affected, I am still looking
+> into it. Help from maintainers welcome.
+> 
+> Early RFC, compile tested only. Sending for early feedback/flames.
+> Cursor/claude used liberally mostly for refactoring, and english.
+> 
+> DMA maintainers, could you please confirm the DMA core changes
+> are ok with you?
 
-diff --git a/include/crypto/ascon_hash.h b/include/crypto/ascon_hash.h
-new file mode 100644
-index 000000000000..a99ea458a9cc
---- /dev/null
-+++ b/include/crypto/ascon_hash.h
-@@ -0,0 +1,84 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Common values for Ascon-Hash family of algorithms as defined in
-+ * NIST SP 800-232 https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-232.pdf
-+ */
-+#ifndef _CRYPTO_ASCON_HASH_H_
-+#define _CRYPTO_ASCON_HASH_H_
-+
-+#include <linux/types.h>
-+
-+#define ASCON_STATE_SIZE	40
-+#define ASCON_STATE_WORDS	5
-+
-+#define ASCON_HASH256_DIGEST_SIZE	32
-+#define ASCON_HASH256_BLOCK_SIZE	8
-+#define ASCON_HASH256_RATE		8
-+#define ASCON_HASH256_IV		0x0000080100CC0002ULL
-+
-+
-+/*
-+ * State for Ascon-p[320] permutation: 5 64-bit words
-+ */
-+struct ascon_state {
-+	union {
-+		__le64 words[ASCON_STATE_WORDS];
-+		u8 bytes[ASCON_STATE_SIZE];
-+		u64 native_words[ASCON_STATE_WORDS];
-+	};
-+};
-+
-+/* Internal context */
-+struct __ascon_hash_ctx {
-+	struct ascon_state state;
-+	u8 absorb_offset;
-+};
-+
-+/**
-+ * struct ascon_hash256_ctx - Context for Ascon-Hash256
-+ * @ctx: private
-+ */
-+struct ascon_hash256_ctx {
-+	struct __ascon_hash_ctx ctx;
-+};
-+
-+
-+/**
-+ * ascon_hash256_init() - Initialize a context for Ascon-Hash256
-+ * @ctx: The context to initialize
-+ *
-+ * This begins a new Ascon-Hash256 message digest computation.
-+ */
-+void ascon_hash256_init(struct ascon_hash256_ctx *ctx);
-+
-+/**
-+ * ascon_hash256_update() - Update an Ascon-Hash256 digest context with input data
-+ * @ctx: The context to update; must have been initialized
-+ * @in: The input data
-+ * @in_len: Length of the input data in bytes
-+ */
-+void ascon_hash256_update(struct ascon_hash256_ctx *ctx, const u8 *in,
-+			  size_t in_len);
-+
-+/**
-+ * ascon_hash256_final() - Finish computing an Ascon-Hash256 message digest
-+ * @ctx: The context to finalize; must have been initialized
-+ * @out: (output) The resulting Ascon-Hash256 message digest, matching the init
-+ *       function that was called.
-+ */
-+void ascon_hash256_final(struct ascon_hash256_ctx *ctx,
-+			 u8 out[ASCON_HASH256_DIGEST_SIZE]);
-+
-+/**
-+ * ascon_hash256() - Compute Ascon-Hash256 digest in one shot
-+ * @in: The input data to be digested
-+ * @in_len: Length of the input data in bytes
-+ * @out: The buffer into which the digest will be stored
-+ *
-+ * Convenience function that computes an Ascon-Hash256 digest. Use this instead of
-+ * the incremental API if you are able to provide all the input at once.
-+ */
-+void ascon_hash256(const u8 *in, size_t in_len,
-+		   u8 out[ASCON_HASH256_DIGEST_SIZE]);
-+
-+#endif
-diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index 61d435c450bb..e9d10c580ffe 100644
---- a/lib/crypto/tests/Kconfig
-+++ b/lib/crypto/tests/Kconfig
-@@ -101,6 +101,15 @@ config CRYPTO_LIB_SHA3_KUNIT_TEST
- 	  including SHA3-224, SHA3-256, SHA3-384, SHA3-512, SHAKE128 and
- 	  SHAKE256.
- 
-+config CRYPTO_LIB_ASCON_HASH_KUNIT_TEST
-+	tristate "KUnit tests for Ascon-Hash" if !KUNIT_ALL_TESTS
-+	depends on KUNIT
-+	default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
-+	select CRYPTO_LIB_BENCHMARK_VISIBLE
-+	select CRYPTO_LIB_ASCON_HASH
-+	help
-+	  KUnit tests for the Ascon-Hash256 cryptographic has functions.
-+
- config CRYPTO_LIB_BENCHMARK_VISIBLE
- 	bool
- 
-diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
-index 5109a0651925..59c4f4ef5b22 100644
---- a/lib/crypto/tests/Makefile
-+++ b/lib/crypto/tests/Makefile
-@@ -10,3 +10,4 @@ obj-$(CONFIG_CRYPTO_LIB_SHA1_KUNIT_TEST) += sha1_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_SHA256_KUNIT_TEST) += sha224_kunit.o sha256_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_SHA512_KUNIT_TEST) += sha384_kunit.o sha512_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_SHA3_KUNIT_TEST) += sha3_kunit.o
-+obj-$(CONFIG_CRYPTO_LIB_ASCON_HASH_KUNIT_TEST) += ascon_hash_kunit.o
-diff --git a/lib/crypto/tests/ascon_hash-testvecs.h b/lib/crypto/tests/ascon_hash-testvecs.h
-new file mode 100644
-index 000000000000..b5c0edcf61e6
---- /dev/null
-+++ b/lib/crypto/tests/ascon_hash-testvecs.h
-@@ -0,0 +1,235 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * The test vectors are generated using the Python reference implementation
-+ * in https://github.com/meichlseder/pyascon/tree/master with messages from
-+ * the method rand_bytes() in scripts/crypto/gen-hash-testvecs.py
-+ */
-+
-+static const struct {
-+	size_t data_len;
-+	u8 digest[ASCON_HASH256_DIGEST_SIZE];
-+} hash_testvecs[] = {
-+	{
-+		.data_len = 0,
-+		.digest = {
-+			0x0b, 0x3b, 0xe5, 0x85, 0x0f, 0x2f, 0x6b, 0x98,
-+			0xca, 0xf2, 0x9f, 0x8f, 0xde, 0xa8, 0x9b, 0x64,
-+			0xa1, 0xfa, 0x70, 0xaa, 0x24, 0x9b, 0x8f, 0x83,
-+			0x9b, 0xd5, 0x3b, 0xaa, 0x30, 0x4d, 0x92, 0xb2,
-+		},
-+	},
-+	{
-+		.data_len = 1,
-+		.digest = {
-+			0xb9, 0xaa, 0x10, 0x34, 0x7a, 0x2e, 0x62, 0x01,
-+			0x01, 0xcf, 0xbd, 0x55, 0x8e, 0x8d, 0x85, 0xda,
-+			0x97, 0xe8, 0xd0, 0x5c, 0xbf, 0xf3, 0x19, 0xf7,
-+			0x54, 0xcd, 0x32, 0xc0, 0xd0, 0x06, 0x72, 0x62,
-+		},
-+	},
-+	{
-+		.data_len = 2,
-+		.digest = {
-+			0xd9, 0x6b, 0x24, 0xe8, 0x0e, 0xaf, 0xd7, 0x43,
-+			0x02, 0x76, 0x7e, 0xc3, 0x66, 0xfa, 0x15, 0x69,
-+			0xe8, 0x86, 0x3b, 0xcd, 0x3b, 0xa4, 0xda, 0x77,
-+			0xf5, 0xc0, 0x9d, 0x01, 0x8e, 0x9c, 0xae, 0xcd,
-+		},
-+	},
-+	{
-+		.data_len = 3,
-+		.digest = {
-+			0xaa, 0x09, 0xac, 0xf6, 0x0f, 0xa1, 0x54, 0xee,
-+			0x5c, 0xe6, 0xf9, 0x44, 0xa8, 0x9f, 0xdb, 0x35,
-+			0x68, 0x3b, 0x85, 0x15, 0x2f, 0x54, 0x51, 0x7d,
-+			0x05, 0x1e, 0xff, 0x4c, 0x23, 0xa3, 0x46, 0x59,
-+		},
-+	},
-+	{
-+		.data_len = 16,
-+		.digest = {
-+			0xba, 0xc9, 0x62, 0x49, 0xba, 0x78, 0x92, 0x5f,
-+			0xa8, 0xa9, 0xd3, 0x47, 0x60, 0x09, 0x1e, 0xdb,
-+			0x23, 0x38, 0x2f, 0x43, 0x6a, 0x0f, 0x2f, 0xc8,
-+			0x33, 0x9c, 0xdb, 0x9e, 0x38, 0x8f, 0xb0, 0x8a
-+		},
-+	},
-+	{
-+		.data_len = 32,
-+		.digest = {
-+			0x57, 0x6c, 0x66, 0xd5, 0xac, 0x36, 0xd2, 0xda,
-+			0x14, 0x4f, 0x6e, 0x84, 0xab, 0xc9, 0xd5, 0x9e,
-+			0xe4, 0xb2, 0x22, 0x4a, 0x8c, 0x3c, 0xf2, 0xf3,
-+			0x2d, 0xbc, 0x6c, 0x96, 0xa0, 0xd4, 0xaf, 0xd3
-+		},
-+	},
-+	{
-+		.data_len = 48,
-+		.digest = {
-+			0x7e, 0x2e, 0xa5, 0x76, 0x69, 0xc9, 0xf1, 0x49,
-+			0xb3, 0x89, 0x53, 0xca, 0x8f, 0x27, 0x6b, 0x89,
-+			0xdc, 0x92, 0x5b, 0x48, 0x90, 0x8f, 0x19, 0x7c,
-+			0xf2, 0x29, 0xa9, 0xde, 0x59, 0x9e, 0x81, 0x27
-+		},
-+	},
-+	{
-+		.data_len = 49,
-+		.digest = {
-+			0xb5, 0x75, 0xe9, 0xd8, 0x67, 0x75, 0xe2, 0x29,
-+			0x3b, 0xff, 0x82, 0x14, 0x06, 0xcf, 0x00, 0x4a,
-+			0xb2, 0x53, 0x01, 0x6e, 0x03, 0x86, 0xa6, 0x69,
-+			0xe3, 0x64, 0x97, 0x56, 0x25, 0x5b, 0xec, 0x4e
-+		},
-+	},
-+	{
-+		.data_len = 63,
-+		.digest = {
-+			0xb3, 0x37, 0xbf, 0xff, 0xf8, 0x0b, 0x2b, 0xd7,
-+			0x81, 0x4c, 0xce, 0x9f, 0x4b, 0xa9, 0x71, 0x3c,
-+			0x93, 0x75, 0x04, 0x2d, 0x21, 0x66, 0x10, 0x58,
-+			0x38, 0x4e, 0xf5, 0xd7, 0xeb, 0xb4, 0xae, 0x62
-+		},
-+	},
-+	{
-+		.data_len = 64,
-+		.digest = {
-+			0x57, 0xfc, 0x23, 0x3d, 0xf3, 0x48, 0xcc, 0xd2,
-+			0x41, 0x39, 0xd8, 0x1c, 0x05, 0x5b, 0xa4, 0x63,
-+			0x51, 0x0a, 0x77, 0x8e, 0xb5, 0x11, 0x17, 0xd6,
-+			0xeb, 0x54, 0x15, 0xae, 0xb8, 0x2d, 0xd3, 0x5f
-+		},
-+	},
-+	{
-+		.data_len = 65,
-+		.digest = {
-+			0xae, 0x4c, 0xaa, 0x95, 0x86, 0x9c, 0xf2, 0x79,
-+			0x57, 0x9a, 0xc9, 0x62, 0x8e, 0x60, 0xc4, 0xc8,
-+			0x09, 0x3c, 0xc3, 0xbb, 0xdf, 0x35, 0x96, 0x51,
-+			0x5d, 0x80, 0x9a, 0x00, 0x6a, 0xfb, 0xb6, 0xa2
-+		},
-+	},
-+	{
-+		.data_len = 127,
-+		.digest = {
-+			0x31, 0x4f, 0xfc, 0x1f, 0xb9, 0xc7, 0x30, 0x36,
-+			0xc5, 0x5c, 0x1d, 0x85, 0x50, 0x4d, 0x96, 0x57,
-+			0xeb, 0x75, 0xa4, 0xe0, 0x64, 0x89, 0x84, 0xa5,
-+			0x34, 0x34, 0x6d, 0x0e, 0xbb, 0x74, 0x3a, 0x48
-+		},
-+	},
-+	{
-+		.data_len = 128,
-+		.digest = {
-+			0x2d, 0x39, 0xbb, 0x6d, 0xef, 0x31, 0x8f, 0x5a,
-+			0xec, 0x5a, 0xf5, 0x86, 0xee, 0xec, 0x26, 0x1a,
-+			0xc8, 0x38, 0x40, 0xdd, 0xf0, 0xa6, 0xf0, 0x5f,
-+			0xf8, 0x92, 0x14, 0x23, 0x40, 0x48, 0x1b, 0x18
-+		},
-+	},
-+	{
-+		.data_len = 129,
-+		.digest = {
-+			0x97, 0xfc, 0xe5, 0xca, 0xa3, 0x62, 0xae, 0xa1,
-+			0x3e, 0x62, 0xd6, 0x46, 0x55, 0x50, 0x26, 0xa7,
-+			0x33, 0x36, 0x87, 0x68, 0xbc, 0x26, 0x70, 0x05,
-+			0x49, 0x83, 0x9c, 0x68, 0x24, 0x1c, 0x3c, 0x44
-+		},
-+	},
-+	{
-+		.data_len = 256,
-+		.digest = {
-+			0x7d, 0x0c, 0x6d, 0xfb, 0x6b, 0x19, 0xc1, 0xe1,
-+			0xa3, 0xd4, 0x2a, 0xae, 0x5a, 0xad, 0xaa, 0xc5,
-+			0xeb, 0xa6, 0xb2, 0x72, 0xc5, 0x75, 0x9f, 0x27,
-+			0x12, 0xd7, 0x7b, 0xb3, 0xc5, 0xb7, 0x2a, 0xe3
-+		},
-+	},
-+	{
-+		.data_len = 511,
-+		.digest = {
-+			0x32, 0x12, 0xb7, 0x28, 0xc2, 0xbc, 0xe7, 0x38,
-+			0x8d, 0x0e, 0x52, 0x34, 0x1a, 0xbc, 0xb0, 0xde,
-+			0x45, 0x2b, 0x08, 0x41, 0x23, 0xcf, 0x32, 0x7f,
-+			0xd5, 0xa7, 0x2f, 0x99, 0xc6, 0xf6, 0x54, 0x33
-+		},
-+	},
-+	{
-+		.data_len = 513,
-+		.digest = {
-+			0x6b, 0x15, 0x49, 0x95, 0x0d, 0xfc, 0x26, 0x1d,
-+			0xc5, 0x01, 0x55, 0x5e, 0x0c, 0x7c, 0x80, 0x57,
-+			0xbe, 0xce, 0x04, 0x8e, 0x8e, 0x2e, 0x8a, 0xe8,
-+			0xeb, 0x2e, 0x89, 0x4b, 0x6c, 0xea, 0x78, 0x71
-+		},
-+	},
-+	{
-+		.data_len = 1000,
-+		.digest = {
-+			0x13, 0x16, 0x77, 0xd5, 0x37, 0x7a, 0x8a, 0x02,
-+			0x68, 0xd9, 0xd5, 0x51, 0xf4, 0x08, 0x7c, 0xe0,
-+			0xad, 0xa1, 0x61, 0x17, 0x15, 0x57, 0xd8, 0xb6,
-+			0x55, 0xee, 0xbb, 0x96, 0xcd, 0xdd, 0xd2, 0x0d
-+		},
-+	},
-+	{
-+		.data_len = 3333,
-+		.digest = {
-+			0x28, 0x15, 0xde, 0x05, 0x06, 0x68, 0xbc, 0xfe,
-+			0xb1, 0x07, 0x72, 0x26, 0xa2, 0x31, 0x8f, 0xe0,
-+			0xe9, 0x1a, 0x36, 0x00, 0x51, 0xd8, 0x85, 0xc9,
-+			0xb9, 0x67, 0x55, 0x93, 0xe3, 0x02, 0x02, 0x5c
-+		},
-+	},
-+	{
-+		.data_len = 4096,
-+		.digest = {
-+			0x9b, 0x12, 0x0c, 0x12, 0xca, 0x22, 0x84, 0xd3,
-+			0xc1, 0x5b, 0x0f, 0x2d, 0xee, 0x58, 0xc4, 0x67,
-+			0x03, 0xf7, 0x6c, 0x28, 0xfa, 0xd1, 0x5d, 0x85,
-+			0xd9, 0x4b, 0x4f, 0xb2, 0x8c, 0x36, 0x35, 0x53
-+		},
-+	},
-+	{
-+		.data_len = 4128,
-+		.digest = {
-+			0xe4, 0x4d, 0x10, 0xb1, 0x02, 0x62, 0x86, 0xca,
-+			0x65, 0x0b, 0xcd, 0xe3, 0x62, 0x96, 0x67, 0xfc,
-+			0x59, 0x12, 0x1d, 0x44, 0xed, 0x7b, 0xfb, 0x87,
-+			0x82, 0xca, 0xdb, 0xcb, 0xe1, 0x93, 0xaa, 0xa6
-+		},
-+	},
-+	{
-+		.data_len = 4160,
-+		.digest = {
-+			0xe3, 0x03, 0x5e, 0x95, 0x5d, 0xf0, 0x6b, 0xe2,
-+			0x30, 0x01, 0x56, 0xf2, 0x6b, 0x18, 0x15, 0xf4,
-+			0xa0, 0x42, 0x33, 0xc4, 0x0b, 0xb9, 0xc2, 0xad,
-+			0x98, 0xe7, 0x53, 0x2c, 0x8e, 0x8a, 0x1c, 0x02
-+		},
-+	},
-+	{
-+		.data_len = 4224,
-+		.digest = {
-+			0x22, 0x2b, 0x62, 0x2c, 0x21, 0x61, 0xd1, 0x23,
-+			0x92, 0x9c, 0x8d, 0x07, 0x48, 0x4a, 0x25, 0x16,
-+			0x34, 0x6f, 0x74, 0x3f, 0xbe, 0xf4, 0x7c, 0x1b,
-+			0xea, 0xb9, 0x2a, 0x36, 0xc7, 0x3c, 0x1a, 0x32
-+		},
-+	},
-+	{
-+		.data_len = 16384,
-+		.digest = {
-+			0xe9, 0xe2, 0x04, 0xa1, 0x93, 0x8a, 0x7d, 0x6b,
-+			0x18, 0x64, 0x38, 0xc5, 0x88, 0x41, 0x98, 0x68,
-+			0xaf, 0xc3, 0xbb, 0xa5, 0x5f, 0x92, 0x12, 0xcb,
-+			0x0e, 0x31, 0xdf, 0xe9, 0xc1, 0xfb, 0x5a, 0x23
-+		},
-+	},
-+};
-+
-+static const u8 hash_testvec_consolidated[ASCON_HASH256_DIGEST_SIZE] = {
-+	0x48, 0xae, 0x81, 0x92, 0x91, 0xc4, 0x32, 0xba,
-+	0xe4, 0x96, 0x5d, 0xb7, 0xf1, 0xb6, 0xad, 0x10,
-+	0xae, 0x09, 0x4a, 0x0b, 0xe1, 0xa7, 0x59, 0xa4,
-+	0xfd, 0xcb, 0x47, 0x28, 0xfc, 0x0a, 0x34, 0x26,
-+};
-diff --git a/lib/crypto/tests/ascon_hash_kunit.c b/lib/crypto/tests/ascon_hash_kunit.c
-new file mode 100644
-index 000000000000..2ca15dbab2cb
---- /dev/null
-+++ b/lib/crypto/tests/ascon_hash_kunit.c
-@@ -0,0 +1,33 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Copyright 2025 Rusydi H. Makarim <rusydi.makarim@kriptograf.id>
-+ */
-+
-+#include <crypto/ascon_hash.h>
-+#include "ascon_hash-testvecs.h"
-+
-+#define HASH		ascon_hash256
-+#define HASH_CTX	ascon_hash256_ctx
-+#define HASH_SIZE	ASCON_HASH256_DIGEST_SIZE
-+#define HASH_INIT	ascon_hash256_init
-+#define HASH_UPDATE	ascon_hash256_update
-+#define HASH_FINAL	ascon_hash256_final
-+
-+#include "hash-test-template.h"
-+
-+static struct kunit_case hash_test_cases[] = {
-+	HASH_KUNIT_CASES,
-+	KUNIT_CASE(benchmark_hash),
-+	{},
-+};
-+
-+static struct kunit_suite hash_test_suite = {
-+	.name = "ascon_hash256",
-+	.test_cases = hash_test_cases,
-+	.suite_init = hash_suite_init,
-+	.suite_exit = hash_suite_exit,
-+};
-+kunit_test_suite(hash_test_suite);
-+
-+MODULE_DESCRIPTION("KUnit tests and benchmark for Ascon-Hash256");
-+MODULE_LICENSE("GPL");
+Before anyone else runs into the same issue as I did: This patch series
+does not apply cleanly unless you first apply commit b148e85c918a
+("virtio_ring: switch to use vring_virtqueue for virtqueue_add
+variants") from the mst/vhost/vhost branch.
 
--- 
-2.52.0
+But if you go to the trouble of adding the mst/vhost remote, then the
+above-mentioned branch also contains this patch series, and it's
+probably the best place to find the patched code...
+
+Now, let me set out for review.
+
+Petr T
+
+> Thanks!
+> 
+> 
+> Michael S. Tsirkin (13):
+>   dma-mapping: add __dma_from_device_align_begin/end
+>   docs: dma-api: document __dma_align_begin/end
+>   dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
+>   docs: dma-api: document DMA_ATTR_CPU_CACHE_CLEAN
+>   dma-debug: track cache clean flag in entries
+>   virtio: add virtqueue_add_inbuf_cache_clean API
+>   vsock/virtio: fix DMA alignment for event_list
+>   vsock/virtio: use virtqueue_add_inbuf_cache_clean for events
+>   virtio_input: fix DMA alignment for evts
+>   virtio_scsi: fix DMA cacheline issues for events
+>   virtio-rng: fix DMA alignment for data buffer
+>   virtio_input: use virtqueue_add_inbuf_cache_clean for events
+>   vsock/virtio: reorder fields to reduce struct padding
+> 
+>  Documentation/core-api/dma-api-howto.rst  | 42 +++++++++++++
+>  Documentation/core-api/dma-attributes.rst |  9 +++
+>  drivers/char/hw_random/virtio-rng.c       |  2 +
+>  drivers/scsi/virtio_scsi.c                | 18 ++++--
+>  drivers/virtio/virtio_input.c             |  5 +-
+>  drivers/virtio/virtio_ring.c              | 72 +++++++++++++++++------
+>  include/linux/dma-mapping.h               | 17 ++++++
+>  include/linux/virtio.h                    |  5 ++
+>  kernel/dma/debug.c                        | 26 ++++++--
+>  net/vmw_vsock/virtio_transport.c          |  8 ++-
+>  10 files changed, 172 insertions(+), 32 deletions(-)
+> 
 
