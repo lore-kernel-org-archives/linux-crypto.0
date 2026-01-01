@@ -1,85 +1,105 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F0A224AF1;
-	Thu,  1 Jan 2026 17:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C532627AC54;
+	Thu,  1 Jan 2026 21:06:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767289316; cv=none; b=NrTyiQWRpofLmJkcT0La0zOE28btIyA8GiYS41FfWN2bUbicL5plMTG4zofHuO57L7lxfkfV2P2JcEHzg4b1abYwHYSCacd+mNCdPRNCBHrn1mAK34pKKVDIN4eR5SX3/kIf5m5Jws3f4UcU9Lt8JbJYQ1Ncz+9kxAoR8DwuRHs=
+	t=1767301578; cv=none; b=SQetfAwfHj11DnobLY0E6r3VEICSBIGmEqvBrxHmt5deXaZTegIu4n5V4GIIEpFRKzrHqgiCzc38x51TQG1ymW/w60VPDPZfoA+r6EkC6K/BTuWpAe9WYOiVAnfGcNIArqN4fE/KZIkOzUKWBW4ktbR1ZfD0VHhdek8ag+WQ+s4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767289316; c=relaxed/simple;
-	bh=Zv64SapDen5kzKJuMbMGdMPYfIhGVyuPqNwGNzVunrE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=m8XXNr8BZpXXMzhYmKYONw+6diQPTE2tmAiOrPA10aUOjHf0VqhKjWujHUTpVEZDL7AS7gOnMaqcOLUnTu8S+7psaPd5C0YHYkcT88CDc4+ID2tQ+cUeiPXt3ViuUM91MgxHYjGmtZECWjHMJ7rl/2QSSljpS8uFuhKKqLRs9FY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ER9t7cAl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767301578; c=relaxed/simple;
+	bh=oYZ8qN7r/Vce8vyh0wt64dIntHwYfuvzlNnHfe4bxIg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jiBASCYJXn6+1qUK0elaoaQGhfDBApIYu8CTtjeL84ZH5ORwXVJ0qz8rLQBkFOhlRIIRG4koRPirKPJzBhecpaTw0CulQKUYSD7TMj7/yKDjI7XJf9VZ6twhFH/BMgpV0zJgY8O9WJs78f8LT7Qk9k35/U53yFgAjOdq2jajZCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i6ef21rz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ER9t7cAl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 455F6C4CEF7;
-	Thu,  1 Jan 2026 17:41:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i6ef21rz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1200FC4CEF7;
+	Thu,  1 Jan 2026 21:06:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767289315;
-	bh=Zv64SapDen5kzKJuMbMGdMPYfIhGVyuPqNwGNzVunrE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=ER9t7cAlj7MqNGXcP5YMCKuLDsKR9w84FCNrArooQFtHOjmbI/DfZrwYQE1VvulF8
-	 DZFaUNowxcdH965RH9OZgKQAcXSyG2w5/MG46R88qAOCABM+8kP/0TVLa6bD4kqL4E
-	 GriArNDwSzEGl3tltbYRZxoiNQGRjqyqUKNmhJI/GVdl1unkW+vYqi+lKLebLH9/PR
-	 Dtcrikk7oRT/GK4vdCGlBPTHnucq204vQ6dfb87P8u4v7kGhQl1vvcSbNh3KTThJRG
-	 FNP98/I/YiWCMXFsPA0TvmzkGoFOTDL9lb8djzInRuDqu1+qcPkf+hK4tlCEL93Sf5
-	 VUXlu59t8g4hA==
-From: Vinod Koul <vkoul@kernel.org>
-To: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
- nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
- claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
- andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch, 
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linusw@kernel.org, 
- Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
- UNGLinuxDriver@microchip.com, olivia@selenic.com, radu_nicolae.pirea@upb.ro, 
- richard.genoud@bootlin.com, gregkh@linuxfoundation.org, 
- jirislaby@kernel.org, broonie@kernel.org, lars.povlsen@microchip.com, 
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
- dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, 
- netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
- linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, 
- linux-usb@vger.kernel.org, Robert Marko <robert.marko@sartura.hr>
-Cc: luka.perkov@sartura.hr
-In-Reply-To: <20251229184004.571837-1-robert.marko@sartura.hr>
-References: <20251229184004.571837-1-robert.marko@sartura.hr>
-Subject: Re: (subset) [PATCH v4 00/15] Add support for Microchip LAN969x
-Message-Id: <176728930591.239406.10977505367349763113.b4-ty@kernel.org>
-Date: Thu, 01 Jan 2026 23:11:45 +0530
+	s=k20201202; t=1767301578;
+	bh=oYZ8qN7r/Vce8vyh0wt64dIntHwYfuvzlNnHfe4bxIg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i6ef21rz9LGykSMSL5Krw6aO1G9snHyR6AGXfkn20QR8vpBSrdNf2Fvbp8Ja+PjHq
+	 BupvOXSQHojH7ZALfeHtMCE2yliJDk164JUws3MqY0qj1qX0prGUVP8avS6uASfMIg
+	 c7a1E/qNT2rQupdLASfNArOR3sIsjbIVUrXTyoDiPehcnSstnMnoYWNt5+T7966gIh
+	 /hEzkCK2o1n0uAXFpR/CHHUiBHQj7SwIKTyudpTseQslaxlmpfhRJ+Syrx/LGbJx4C
+	 uStgQGmgAGZD5dCmWzraxb/8OuOzWV3aa5vMfCD0/S6ypFhljnmQX4pTf12di/8jmZ
+	 rTJEQJDBs6/4A==
+Date: Thu, 1 Jan 2026 13:06:02 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: "Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 0/3] Implementation of Ascon-Hash256
+Message-ID: <20260101210602.GA6718@sol>
+References: <20251215-ascon_hash256-v1-0-24ae735e571e@kriptograf.id>
+ <20251215201932.GC10539@google.com>
+ <7920c742b3be0723119e19e323dc92bc@kriptograf.id>
+ <20251216180245.GD10539@google.com>
+ <bb05699bc7922bb3668082367b4750f2@kriptograf.id>
+ <20251217040617.GA3424@sol>
+ <aVTq6HaRr4G2gmho@Rusydis-MacBook-Air.local>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aVTq6HaRr4G2gmho@Rusydis-MacBook-Air.local>
 
-
-On Mon, 29 Dec 2025 19:37:41 +0100, Robert Marko wrote:
-> This series adds support for the Microchip LAN969x switch SoC family.
+On Wed, Dec 31, 2025 at 04:20:40PM +0700, Rusydi H. Makarim wrote:
+> On Tue, Dec 16, 2025 at 08:06:17PM -0800, Eric Biggers wrote:
+> > On Wed, Dec 17, 2025 at 10:33:22AM +0700, Rusydi H. Makarim wrote:
+> > > On 2025-12-17 01:02, Eric Biggers wrote:
+> > > > On Tue, Dec 16, 2025 at 01:27:17PM +0700, Rusydi H. Makarim wrote:
+> > > > > While no direct in-kernel use as of now
+> > > > 
+> > > > Thanks for confirming.  We only add algorithms when there is a real
+> > > > user, so it's best to hold off on this for now.
+> > > > 
+> > > > - Eric
+> > > 
+> > > Rather than leaving this work idle, would it be better to move the
+> > > implementation entirely into the Crypto API ?
+> > 
+> > No, that's actually the most problematic part because it would put it in
+> > the name-based registry and become impossible to change later.
+> > 
+> > There's a large maintenance cost to supporting algorithms.  We've
+> > learned this the hard way.  In the past the requirements to add new
+> > algorithms to the kernel were much more relaxed, and as a result, the
+> > Linux kernel community has ended up wasting lots of time maintaining
+> > unused, unnecessary, or insecure code.
+> > 
+> > Just recently I removed a couple algorithms (keywrap and vmac).  Looking
+> > back in more detail, there was actually never any use case presented for
+> > their inclusion, and they were never used.  So all the effort spent
+> > reviewing and maintaining that code was just wasted.  We could have just
+> > never added them in the first place and saved tons of time.
 > 
-> Series is a bit long since after discussions in previous versions, it was
-> recommended[1][2] to add SoC specific compatibles for device nodes so it
-> includes the required bindings updates.
-> 
-> [1] https://lore.kernel.org/all/20251203-splendor-cubbyhole-eda2d6982b46@spud/
-> [2] https://lore.kernel.org/all/173412c8-c2fb-4c38-8de7-5b1c2eebdbf9@microchip.com/
-> [3] https://lore.kernel.org/all/20251203-duly-leotard-86b83bd840c6@spud/
-> [4] https://lore.kernel.org/all/756ead5d-8c9b-480d-8ae5-71667575ab7c@kernel.org/
-> 
-> [...]
+> Looking at both lib/crypto/ and crypto/ directories, I initially did not
+> have an impression that mandatory in-kernel use of a cryptographic hash
+> function is a strict requirement for its inclusion in the linux kernel.
 
-Applied, thanks!
+It's no different from any other Linux kernel feature.
 
-[09/15] dt-bindings: dma: atmel: add microchip,lan9691-dma
-        commit: c47422f4d0a26b25ff59709921eaaf8f916eec7d
+> On the other hand, I am also keen to see its possible use cases in the linux
+> kernel. Ascon-Hash256 specifically can be an alternative to SHA-256. For
+> instance, it can be an additional option of hash function in fs-verity for
+> processors with no SHA256 dedicated instructions. If that something that
+> interests you, I am open for further discussion.
 
-Best regards,
--- 
-~Vinod
+I haven't actually seen any demand for alternative hash functions in
+fs-verity.  Though, dm-verity is sometimes used with BLAKE2b for the
+reason you mention.  But this also means the kernel crypto subsystem
+already has alternatives to SHA-256.  With that being the case, it's not
+clear that adding another one would bring anything new to the table.
+How does the performance compare with BLAKE2s and BLAKE2b?
 
-
+- Eric
