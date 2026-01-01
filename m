@@ -1,108 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEDE481B1;
-	Thu,  1 Jan 2026 12:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2792DCF43
+	for <linux-crypto@vger.kernel.org>; Thu,  1 Jan 2026 15:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767268835; cv=none; b=JCVXupQcQydnqZn7xq59baBKf+wHLfOceBIAsED2yilFg6MRkYKj6Fvv1Ni3v4ikaWW53HtNORGdIiiO++HhI2YsDxcUfXjuek39wcwtH9GD7TTJlqZgrAKLVlO496iQcQThruc+1fjcX9a2xeAZp4VBIb8iWB623fUJmLrRnVk=
+	t=1767281137; cv=none; b=cjkGUSsgqTNjrEiZILljtg72LBmC8KG99RXCQDjffCvHWOvW1vFviCLNTjgrtVqWkTVax2N1ZLB/Ex36RsX/6OM+dL2U9qDBC8wx364C8oSJdg4gojwqH9TXAkAJ/AKHUkDE2EItrUvkvS2rW+FLRhFmOiTvM5VgvFqOQUs7ScY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767268835; c=relaxed/simple;
-	bh=QzKh6f7nUY47srlYNQnBRLEB0H4I9ghlJ3SDVOEKV78=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UNTeld/szhNUnEdtB8dKMp2d0LB/Mug/Mbix7im8cUwU2JPkCY59NGjP88Q9EYX2V1E2xVAC/c+5YxZQoZrbQj9XnzfGI4UJg7zfHYg654mJDxEq7OqX+3S4ZP2zzYhcjsW6O5zl2P3zcWdFFQBHU1JuBzqzedgbIe5FwEyiyMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A3/UTAVS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767281137; c=relaxed/simple;
+	bh=LMlq2a9gTuEw8Co5G0N97vzBPXZyqODH/bjDHkikJnQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nNu6NXMGBMp0YhWr3j761yDmVNFTa7lUZt3wgGiHEBKBKLKFMNqfbxk0wCMZQ48jMVUcGi/pEgcllwQBNBNLWBvkGGTPGlH+FKceti+vHYsQxO85vaScSvZ1n5Wupz9Y6EiKc7Bu3bGUuKDtxVlzJ0tQeLpk5MUQS4A5hXQ3DsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=LvLFAdZp; arc=none smtp.client-ip=212.77.101.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A3/UTAVS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A523DC4CEF7;
-	Thu,  1 Jan 2026 12:00:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767268834;
-	bh=QzKh6f7nUY47srlYNQnBRLEB0H4I9ghlJ3SDVOEKV78=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A3/UTAVS0ACod3pYkZFw5A8GpoGh3CQJhNkjPw58DvLwUY+JSSwebwX1+kD2Jpqvg
-	 Ba/FzZsgqiHUyrecxLgYBQOxYMxur8RJZvrkBmS38cUMRnfWEX75zavxJvrLd35pZ8
-	 3kOMRcqennrMYCcNLamZTDzgS1LiTW7kQkI7LoqDBM80xfJvbA2RTZgpOExuOmeczx
-	 K3g1oUZn7DqlKdqAP4jbNR9xoPvR3p/z1RbEmNRi/oFSDJZqNLh0C1RGbxL3Eoxf7W
-	 gVSfiKLP+3REy4xROxQuFxSnLzlBfrFaS86oaN5BNBssWgtcX8yaV7+TmNTV3eDExU
-	 46xxKJR518rng==
-Date: Thu, 1 Jan 2026 17:30:30 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Udit Tiwari <quic_utiwari@quicinc.com>,
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
-	Md Sadre Alam <mdalam@qti.qualcomm.com>,
-	Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v9 03/11] dmaengine: qcom: bam_dma: implement support for
- BAM locking
-Message-ID: <aVZh3hb32r1oVcwG@vaman>
-References: <20251128-qcom-qce-cmd-descr-v9-0-9a5f72b89722@linaro.org>
- <20251128-qcom-qce-cmd-descr-v9-3-9a5f72b89722@linaro.org>
- <aUFX14nz8cQj8EIb@vaman>
- <CAMRc=MetbSuaU9VpK7CTio4kt-1pkwEFecARv7ROWDH_yq63OQ@mail.gmail.com>
- <aUF2gj_0svpygHmD@vaman>
- <CAMRc=McO-Fbb=O3VjFk5C14CD6oVA4UmLroN4_ddCVxtfxr03A@mail.gmail.com>
- <aUpyrIvu_kG7DtQm@vaman>
- <CAMRc=Md6ucK-TAmtvWMmUGX1KuVE9Wj_z4i7_-Gc7YXP=Omtcw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="LvLFAdZp"
+Received: (wp-smtpd smtp.wp.pl 14939 invoked from network); 1 Jan 2026 16:25:25 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1767281125; bh=7cu7M1If+mjSSs4ioK+w09azy9ovawcK5+/YpibqgM8=;
+          h=From:To:Cc:Subject;
+          b=LvLFAdZpWUUMzDA1zgdW/FuMCUj5cWqFvhVhdkXXnRl/Br308jaaXsJYTQ7B5SkFV
+           47tdbVTJ6JeVs0M/OadAyrbgRssQAlIqs9oOvQNDPCmVlBQdFhGxFD2inRall3ljLT
+           8epU2JFardX/h21XNYysMIB2Rrp/mJueNWtw+ekaiZDtd5hC/sYIMglegFIbYpaMMK
+           fGydhGRq04BAQc+GvDR5Oa7p7IHkPITJKXr7vsYevtLkctdzWEWXjMBWoHF0irUu4f
+           9zFmf1+WLMbDDye/hs7abx7uG75iwzXyAccHUvmdgdnyUaldW54E+4+riQgnf4iuHS
+           Fb5g7gHvWLzPg==
+Received: from 83.5.157.18.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.5.157.18])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <herbert@gondor.apana.org.au>; 1 Jan 2026 16:25:25 +0100
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
+Subject: [PATCH] crypto: testmgr - allow authenc(sha224,rfc3686) variant in fips mode
+Date: Thu,  1 Jan 2026 16:25:18 +0100
+Message-ID: <20260101152522.1147262-1-olek2@wp.pl>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=Md6ucK-TAmtvWMmUGX1KuVE9Wj_z4i7_-Gc7YXP=Omtcw@mail.gmail.com>
+X-WP-DKIM-Status: good (id: wp.pl)                                                      
+X-WP-MailID: 52d700e05a9885415d344fe1ce7cddfa
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000007 [YbRR]                               
 
-On 23-12-25, 13:35, Bartosz Golaszewski wrote:
-> On Tue, Dec 23, 2025 at 11:45 AM Vinod Koul <vkoul@kernel.org> wrote:
-> >
-> > On 17-12-25, 15:31, Bartosz Golaszewski wrote:
-> > > On Tue, Dec 16, 2025 at 4:11 PM Vinod Koul <vkoul@kernel.org> wrote:
-> >
-> > > >
-> > > > I am trying to understand what the flag refers to and why do you need
-> > > > this.. What is the problem that lock tries to solve
-> > > >
-> > >
-> > > In the DRM use-case the TA will use the QCE simultaneously with linux.
-> >
-> > TA..?
-> 
-> Trusted Application, the one to which we offload the decryption of the
-> stream. That's not really relevant though.
-> 
-> >
-> > > It will perform register I/O with DMA using the BAM locking mechanism
-> > > for synchronization. Currently linux doesn't use BAM locking and is
-> > > using CPU for register I/O so trying to access locked registers will
-> > > result in external abort. I'm trying to make the QCE driver use DMA
-> > > for register I/O AND use BAM locking. To that end: we need to pass
-> > > information about wanting the command descriptor to contain the
-> > > LOCK/UNLOCK flag (this is what we set here in the hardware descriptor)
-> > > from the QCE driver to the BAM driver. I initially used a global flag.
-> > > Dmitry said it's too Qualcomm-specific and to use metadata instead.
-> > > This is what I did in this version.
-> >
-> > Okay, how will client figure out should it set the lock or not? What are
-> > the conditions where the lock is set or not set by client..?
-> >
-> 
-> I'm not sure what you refer to as "client". The user of the BAM engine
-> - the crypto driver? If so - we convert it to always lock/unlock
-> assuming the TA *may* use it and it's better to be safe. Other users
-> are not affected.
+The remaining combinations of AES-CTR-RFC3686 and SHA* have already been
+marked as allowed in 8888690ef5f7. This commit does the same for SHA224.
 
-Client are users of dmaengine. So how does the crypto driver figure out
-when to lock/unlock. Why not do this always...?
+rfc3686(ctr(aes)) is already marked fips compliant,
+so these should be fine.
 
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+---
+ crypto/testmgr.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index a302be53896d..5bae4871690f 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4137,6 +4137,10 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.aead = __VECS(hmac_sha224_des3_ede_cbc_tv_temp)
+ 		}
++	}, {
++		.alg = "authenc(hmac(sha224),rfc3686(ctr(aes)))",
++		.test = alg_test_null,
++		.fips_allowed = 1,
+ 	}, {
+ 		.alg = "authenc(hmac(sha256),cbc(aes))",
+ 		.generic_driver = "authenc(hmac-sha256-lib,cbc(aes-generic))",
 -- 
-~Vinod
+2.47.3
+
