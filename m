@@ -1,111 +1,106 @@
-Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D51296BDB
-	for <linux-crypto@vger.kernel.org>; Fri,  2 Jan 2026 15:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17472D2382;
+	Fri,  2 Jan 2026 16:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767369237; cv=none; b=gH//iX7w/d4KpDEiBdnQL3LtlSRrj2EsPivHLZn7xKnAQXYE6u+VD6ELDVt/b6/eRUPxAjYTZWsBFj++NP3+p6jBJ494ARmRiXhWprf63/3IUmQIaFslD8lnp8l1t3DsnoaHQaY2henaCyOdvC8iircB9Nvca4B7j89T9ZFjEak=
+	t=1767373150; cv=none; b=gOz2vxrYsIW3sevtL7am5uwWB0/hvm/tx46TptQX6b0KEJ5RoZ9CZt9OqybMPWqyDaG3irMKxrwz9lUePlw34yEm0e7GnkJid7/4xsjeeTGkf7MKsFgHjGz35vXRuEQDJnw45P2UBWNImQIyI4gVFUWFvl4/Hf1B4iUyACqbmSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767369237; c=relaxed/simple;
-	bh=EAmGXJhS+kV/8kTjvDsx6PH6pL66FGnsepLKxD69+3w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uKOx/kjaHzUrmZel/GARyjfSUF+jYKljmawv9f1zOGb9U52o86Jy8cuwIzwt+JXMxHBCamT2Ge912q49I9VD6rY+ETrWeK3IVqFzYCVPFakNIkEy5MJFtMLVfFLSfTHsaGCxArvGwmbZOvxol/XajMQ2u89rzwIs2yfdZMbBqWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=oOYRycXC; arc=none smtp.client-ip=212.77.101.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+	s=arc-20240116; t=1767373150; c=relaxed/simple;
+	bh=93aTDd4xZDg4fITRXyUcXLnUNcewMkg/U29u/qTvrYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JDF3XKRg4RLsDb8ryX67BuqZ3tZ/4LbzBI6hY0rZWNzsThII5QKQTvTulxxIb2K0ZdOemxUl8Pb9Y9Ib7o2ChsfG7rxDGm8FYASWgHfRWKaU3xAwbNoF8Xx5ivtEeplWxCpTv05Hoe0n2nfFfS8piqfLfSo2ndz+L1uMLpYuXCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MuckP2vU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="oOYRycXC"
-Received: (wp-smtpd smtp.wp.pl 32318 invoked from network); 2 Jan 2026 16:53:47 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1767369227; bh=TTGeIMt25YFQMOKiNe5dlnsk2HQeFBOtHs64bmOahIU=;
-          h=From:To:Cc:Subject;
-          b=oOYRycXCsRyk+B/Ca18edU2AKKDlzAzcLRAB4fvsVuhdQedWv9wCd2GYSs0z4gdgT
-           W0x0l52G/q4Qyx1xulNw3ma7UgLk6emEu7eoQCERSlLVv+VC9/sY6gMjZCluOwnjXO
-           lvOaOWapATbMIvat+NpA9EPnyTGuW/DYENZOpGGQfSIxkzK5uTwDY8g16I5TYpGOaZ
-           HP5iwuyibqgc6+PQLYSuPxkoFfbO0r1cKqbtE2ilPG/geG0L+eCSh9fuhJO1tShFh8
-           RVmszpbUJz5ENLQ0M5X8+0QUMKYLsSpV1peBHCP0PdWSR4slIxQJOY62NZgAmVn7uy
-           vCnOipsR4BT2w==
-Received: from 83.5.157.18.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.5.157.18])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <benjamin.larsson@genexis.eu>; 2 Jan 2026 16:53:47 +0100
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: benjamin.larsson@genexis.eu,
-	chester.a.unal@arinc9.com,
-	davem@davemloft.net,
-	angelogioacchino.delregno@collabora.com,
-	ansuelsmth@gmail.com,
-	conor+dt@kernel.org,
-	herbert@gondor.apana.org.au,
-	krzk+dt@kernel.org,
-	matthias.bgg@gmail.com,
-	robh@kernel.org,
-	sergio.paracuellos@gmail.com,
-	tsbogend@alpha.franken.de,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	linux-mips@vger.kernel.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH v3 3/3] mips: dts: ralink: mt7621: add crypto offload support
-Date: Fri,  2 Jan 2026 16:47:35 +0100
-Message-ID: <20260102155341.3682013-3-olek2@wp.pl>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260102155341.3682013-1-olek2@wp.pl>
-References: <20260102155341.3682013-1-olek2@wp.pl>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MuckP2vU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95DBDC116B1;
+	Fri,  2 Jan 2026 16:59:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767373149;
+	bh=93aTDd4xZDg4fITRXyUcXLnUNcewMkg/U29u/qTvrYo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MuckP2vUP8cLx7Ib/Y4DR2nTgxjUeC60wDuQymfnPAuug2l71KreoB2UK8KpCxNJ4
+	 wBG0NYqQZO+d7WHQrCVMo/nfazHfDttpHdoLZv75qg9Ua/o3b3cRLMtPJEGVJhJGuI
+	 iLxEVe6cEqnyHxqiM+G15M9yEkrPbI0QRSkJp1bKA7O5Dm3YAvR+xTS/d2cyVcHQbl
+	 dTpW1Cq0XXJlDVkLw9VaZE/8jCWuT8+Vwp5NMxcZoGNxJrSFGxA+ShacAd/2PiCsKZ
+	 kjglGj/dDvs7hvOq2+KCtP90Dl6G86hlOyfJ7Mmh+MoYr91FJhcxWaoYRb3JNsyKze
+	 Rt3XghPTVjzWA==
+Date: Fri, 2 Jan 2026 22:29:05 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Udit Tiwari <quic_utiwari@quicinc.com>,
+	Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
+	Md Sadre Alam <mdalam@qti.qualcomm.com>,
+	Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v9 03/11] dmaengine: qcom: bam_dma: implement support for
+ BAM locking
+Message-ID: <aVf5WUe9cAXZHxPJ@vaman>
+References: <20251128-qcom-qce-cmd-descr-v9-0-9a5f72b89722@linaro.org>
+ <20251128-qcom-qce-cmd-descr-v9-3-9a5f72b89722@linaro.org>
+ <aUFX14nz8cQj8EIb@vaman>
+ <CAMRc=MetbSuaU9VpK7CTio4kt-1pkwEFecARv7ROWDH_yq63OQ@mail.gmail.com>
+ <aUF2gj_0svpygHmD@vaman>
+ <CAMRc=McO-Fbb=O3VjFk5C14CD6oVA4UmLroN4_ddCVxtfxr03A@mail.gmail.com>
+ <aUpyrIvu_kG7DtQm@vaman>
+ <CAMRc=Md6ucK-TAmtvWMmUGX1KuVE9Wj_z4i7_-Gc7YXP=Omtcw@mail.gmail.com>
+ <aVZh3hb32r1oVcwG@vaman>
+ <CAMRc=MePAVMZPju6rZsyQMir4CkQi+FEqbC++omQtVQC1rHBVg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: 7b471dd560ee9b622f99c1c75cb1178e
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000000 [8SOE]                               
+In-Reply-To: <CAMRc=MePAVMZPju6rZsyQMir4CkQi+FEqbC++omQtVQC1rHBVg@mail.gmail.com>
 
-Add support for the built-in cryptographic accelerator. This accelerator
-supports 3DES, AES (128/192/256 bit), ARC4, MD5, SHA1, SHA224, and SHA256.
-It also supports full IPSEC, SRTP and TLS offload.
+On 02-01-26, 10:26, Bartosz Golaszewski wrote:
+> On Thu, Jan 1, 2026 at 1:00 PM Vinod Koul <vkoul@kernel.org> wrote:
+> >
+> > > >
+> > > > > It will perform register I/O with DMA using the BAM locking mechanism
+> > > > > for synchronization. Currently linux doesn't use BAM locking and is
+> > > > > using CPU for register I/O so trying to access locked registers will
+> > > > > result in external abort. I'm trying to make the QCE driver use DMA
+> > > > > for register I/O AND use BAM locking. To that end: we need to pass
+> > > > > information about wanting the command descriptor to contain the
+> > > > > LOCK/UNLOCK flag (this is what we set here in the hardware descriptor)
+> > > > > from the QCE driver to the BAM driver. I initially used a global flag.
+> > > > > Dmitry said it's too Qualcomm-specific and to use metadata instead.
+> > > > > This is what I did in this version.
+> > > >
+> > > > Okay, how will client figure out should it set the lock or not? What are
+> > > > the conditions where the lock is set or not set by client..?
+> > > >
+> > >
+> > > I'm not sure what you refer to as "client". The user of the BAM engine
+> > > - the crypto driver? If so - we convert it to always lock/unlock
+> > > assuming the TA *may* use it and it's better to be safe. Other users
+> > > are not affected.
+> >
+> > Client are users of dmaengine. So how does the crypto driver figure out
+> > when to lock/unlock. Why not do this always...?
+> >
+> 
+> It *does* do it always. We assume the TA may be doing it so the crypto
+> driver is converted to *always* perform register I/O with DMA *and* to
+> always lock the BAM for each transaction later in the series. This is
+> why Dmitry inquired whether all the HW with upstream support actually
+> supports the lock semantics.
 
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
----
-v3:
-- Add reset line and clock gate
-- Change commit description
-- Wrap long line
----
- arch/mips/boot/dts/ralink/mt7621.dtsi | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Okay then why do we need an API?
 
-diff --git a/arch/mips/boot/dts/ralink/mt7621.dtsi b/arch/mips/boot/dts/ralink/mt7621.dtsi
-index 0704eab4a80b..e1047dd861c0 100644
---- a/arch/mips/boot/dts/ralink/mt7621.dtsi
-+++ b/arch/mips/boot/dts/ralink/mt7621.dtsi
-@@ -361,6 +361,19 @@ cdmm: cdmm@1fbf8000 {
- 		reg = <0x1fbf8000 0x8000>;
- 	};
- 
-+	crypto@1e004000 {
-+		compatible = "mediatek,mt7621-eip93",
-+			     "inside-secure,safexcel-eip93ies";
-+		reg = <0x1e004000 0x1000>;
-+
-+		clocks = <&sysc MT7621_CLK_CRYPTO>;
-+
-+		interrupt-parent = <&gic>;
-+		interrupts = <GIC_SHARED 19 IRQ_TYPE_LEVEL_HIGH>;
-+
-+		resets = <&sysc MT7621_RST_CRYPTO>;
-+	};
-+
- 	ethernet: ethernet@1e100000 {
- 		compatible = "mediatek,mt7621-eth";
- 		reg = <0x1e100000 0x10000>;
+Just lock it always and set the bits in the dma driver
+
 -- 
-2.47.3
-
+~Vinod
