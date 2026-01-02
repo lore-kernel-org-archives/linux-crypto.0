@@ -1,167 +1,108 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68EEF2D5C83
-	for <linux-crypto@vger.kernel.org>; Fri,  2 Jan 2026 08:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0112C2C3271
+	for <linux-crypto@vger.kernel.org>; Fri,  2 Jan 2026 09:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767341707; cv=none; b=qM4wrwQJqDjIxa5wAzVSfKqXDOBfjXUvAzTQGIawnEjoEOkgfRF3ocUJmQadTeRbZoD2FF12AP53uo+I+a7XbPG1gXAiuwQTMiXLnm9qUv49bzfgzyWSuUz5SSo+LtB81o3Se8TWGgVWCDUsgIMeCOAXu+1acHNGdOAzmRZr09Q=
+	t=1767346024; cv=none; b=cb2Al4gRRjuh9ie+levz36fPDITy9mx0uv59U7YJGbd8lWuJeRqy0l1+63XsyN7lQCn6pvhPb9pctZSrZs3HO+uihdIZj1P9R37igV7Qd6CiGfA5eY1FuB2LnAFCWg4y18xGHsqhP2i8oq/t7T6RGY5f33EUnsv8dmFspjc4+m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767341707; c=relaxed/simple;
-	bh=pR9J2JcpyuSslYDA7lsLX4ZhILZRZva1Jx7LQCRL2xc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bo9VcTY6+fiQVK43tNWQVbJp54c6p/3D6i8gQ16FcTQP4pcOy4J/qkuNbJGYAJl5Q7TM1j/B8YKTB2PPeXpo7Np/Z6HR2Ml8G/LEKb77pDsg1VID6Q5HkOlUzS2Nzf9kTtBBIXvggrFPIQk83FWGRqRGKBXfXtYD3eJZjpcDNJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YA76nKi/; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1767346024; c=relaxed/simple;
+	bh=zhOdsilIOpFy7RE9BrjIwOGH+E2b1jt2eSTpNCSig2k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jFJFYJx0fL0qmLRtte4N+zCtrLMQS7narNCNMie5BDt6P/15jS6LUyVepafKYajV793z6hOpVvYy1OrDmuXNI5PMKePOmb/Tzv98AX6heAcdlq4ZDxiAfaZW1oI4t3hdhaXu7OvgCLtoIQ177Gcnc5vuSYRS1dpYrJ2k8P9TZ9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bcGZrTP1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YA76nKi/"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-477aa91e75dso12208645e9.3
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Jan 2026 00:15:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1767341702; x=1767946502; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7B5OROvqw/DgiaRfLYZJf4GjF/wj6CLJOtpsQ8Z+Uq0=;
-        b=YA76nKi/w+4r6QrU3u2zf5Le8V9XRZBLFbZgcDqg8nvt9MckDoEaO8By8k5rFaH2zj
-         M6FOWUp+8LwZBjF7Ct+EYIO0kH0S0v+Pr9wSVpl4cXLp1lFB/7/Pb3+7EkRYFZ3ouqef
-         b8TA2l7ZzYNtFHMUb7pVDcW0ZmWyV8GwubCAvrstaOiHAncUBTCHGnjdqJUtd1u693Nf
-         pm12hnFgGAbipqxoZBPGus+ExXjFykcTzIXHpoBAw8wzK/IcFi5XxjN/gsygR6pDcVF0
-         P1iYMU4BuJYFaPN7BknV7Vy3fKB9GXy/u40sq+1UrdlhP1knI9/5NYPkaXLxDyogj33o
-         q9Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767341702; x=1767946502;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7B5OROvqw/DgiaRfLYZJf4GjF/wj6CLJOtpsQ8Z+Uq0=;
-        b=ssN4AQxDIp5GKqTj6gvgpQkF8XzoDIQbZK2YYpcMH2qR2snGVNOOni4/zRzg4CajqB
-         gHWWKg5WybGfanFyr0yqVhdlDDdiiduHNbuzCbOVm1+i359ouWSVXmej0R07mAiRWQpU
-         0GZzdUsT69tebz5ZTLWnapmHq8Q4FcD9i/Bt+BGMYyEbsvjePUkK8V88HR3Zi8IIugTe
-         m1hqv27lNhDQKiiVojMR9G+az4CakeG6w9unrhucISJWagJfNYOeKdDyuNArzTGuAwBJ
-         oyVKn+Sp2wzJtVdXo3A7seWFswf1ZM9DNsW9I3ok/qO20k9GeIEkuLiOsKf8sQtoBO5w
-         TQdw==
-X-Forwarded-Encrypted: i=1; AJvYcCUvdCCnpBmWyER4ibF57lBtjX/dwJsDrQ2yp9QaxBTFK4r7Vvmu7gNfJC398hdHbjBQcviJRn7tRqpVcVU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNuvF/MmyouHIv1STOLZMRfBiX1kW9cXsHfbDhKBTmlms25+pN
-	t0uyyeHmXe6XEJWkxg6Bb3dlZT2A9e7AzZMUNMYjYQpY3VrGPPziBp7+UpCoUzZ5Hjc=
-X-Gm-Gg: AY/fxX5+kUZKL8/zij3mPWU3GcaK5oFW0RgZDNmRK/Sq2QlUbu29MeRqMUOMKI+Qkg9
-	45rFtKhsV1Hczxfx+/ltlZZ+9tSiquCv5+YOseaslXNlS98SZl6yiljvpgqfVqP3IRcpdZjyUOx
-	NWvity5io7FOhchHff1/CUCnUeUJlepLyoatevVPQUhYDMlaBMy+eo64PPJoq4CJr+EkZypmXLI
-	YAnDtqOysdB8z5xgLS+VLcFZvEYLCpotLoJCxS4d7qdVyt72tvIxQbqv0U+G2yG7yfrGOOuPmY9
-	4GZQ7pUkdoru7PuTpRyi/+yWqtTruhRGu9I3RawAxiJEbseVMH7s8e0p9OTlgV9Xmz3lUYWS76P
-	IrR9yBQ3A6UQAp2FRekxeFuOzlC7rpXRQHw4t3kedzaP0M0J8e4PBzz8uurqLAxzIakLGkdE/IY
-	7ZblYige081vKpCGF8kE+JWspCYlQTwA3r73E04V380zwKh5mD8wTUJdH7IiDEeZ69LtloiUCcu
-	Kk3
-X-Google-Smtp-Source: AGHT+IEG7/UqWg/6ELIcyq0mVb3xfMQn4RI8cpiRrR5W4zXnA35xM+TJgjTRoe1XllkShxIti5fDKg==
-X-Received: by 2002:a05:600c:3151:b0:477:a203:66dd with SMTP id 5b1f17b1804b1-47d197f69demr322547935e9.2.1767341702410;
-        Fri, 02 Jan 2026 00:15:02 -0800 (PST)
-Received: from mordecai (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be27b0d5asm792930555e9.13.2026.01.02.00.15.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jan 2026 00:15:01 -0800 (PST)
-Date: Fri, 2 Jan 2026 09:14:59 +0100
-From: Petr Tesarik <ptesarik@suse.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Eugenio =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "James E.J. Bottomley"
- <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella
- <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Leon Romanovsky
- <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
- virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
- iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC 01/13] dma-mapping: add
- __dma_from_device_align_begin/end
-Message-ID: <20260102091459.6bec60c2@mordecai>
-In-Reply-To: <20251231154722-mutt-send-email-mst@kernel.org>
-References: <cover.1767089672.git.mst@redhat.com>
-	<ca12c790f6dee2ca0e24f16c0ebf3591867ddc4a.1767089672.git.mst@redhat.com>
-	<20251231150159.1779b585@mordecai>
-	<20251231154722-mutt-send-email-mst@kernel.org>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-suse-linux-gnu)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bcGZrTP1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3172C2BCB2
+	for <linux-crypto@vger.kernel.org>; Fri,  2 Jan 2026 09:27:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767346023;
+	bh=zhOdsilIOpFy7RE9BrjIwOGH+E2b1jt2eSTpNCSig2k=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=bcGZrTP1czIbKinXhirw5u1G2cgaQ0imIvOr7jlOhlKwDTDRPNVPYJhxTsxXWPzhl
+	 tyHtGIyOqUNBWggexEd13+l2thCqqwnweO19qSUhc0vRovllz1SxmJY8s8JosMhWeH
+	 B6RFnSVkn8SoXrrn9zPwcXcP+6HKvatgmQAu+NR5cKmO6gDbL72kCmf1vlT/GctgQd
+	 FKv3Pqu6TK1nW0LcUIic8H+8oRKcuD7e/TL6mD+KLgrcJDCGgIDh/EOHl2BDPUbl3o
+	 WO0qMD0qty30EEfVKY+p8fQHzwouftoDHMb+zKQlCpkyXgE8RcTs5g5yvCqo0JLCx1
+	 L7CKe/b1vaEPQ==
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5957d7e0bf3so11450028e87.0
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Jan 2026 01:27:03 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVHbL6CZabrUL37rvBXo6Ta7mvMDMFrhTrfohnfE3sE6xCkn1xcs4y4z+z/bcalinSZxTx2QoSpzmSLCVk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztHZJeAYvaxrT/GlcwFxtqLeFTbjbCsXvN3yKGc77JS596gWV+
+	7FHnM7GQXs8UUuOPcihkAMxygh3GXVfxPRr+8Lgot6P85JX1NXXSepFvhsoL2uQ0Yx7dfwO61US
+	kTuvIOfqaD8sEtGl1nkv+Dod1eoNZOwv3qzUMM/rp4Q==
+X-Google-Smtp-Source: AGHT+IGS6HyGkOxL4zMMncygsftVJSozubE2oliBcuDCo0C8dufE1QbfRsrXj1oTZQ3PuFzr/9pnA6p2PmqiWL0TJ2U=
+X-Received: by 2002:a05:6512:3408:b0:59b:2086:2c with SMTP id
+ 2adb3069b0e04-59b2086022fmr7537605e87.8.1767346022140; Fri, 02 Jan 2026
+ 01:27:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20251128-qcom-qce-cmd-descr-v9-0-9a5f72b89722@linaro.org>
+ <20251128-qcom-qce-cmd-descr-v9-3-9a5f72b89722@linaro.org>
+ <aUFX14nz8cQj8EIb@vaman> <CAMRc=MetbSuaU9VpK7CTio4kt-1pkwEFecARv7ROWDH_yq63OQ@mail.gmail.com>
+ <aUF2gj_0svpygHmD@vaman> <CAMRc=McO-Fbb=O3VjFk5C14CD6oVA4UmLroN4_ddCVxtfxr03A@mail.gmail.com>
+ <aUpyrIvu_kG7DtQm@vaman> <CAMRc=Md6ucK-TAmtvWMmUGX1KuVE9Wj_z4i7_-Gc7YXP=Omtcw@mail.gmail.com>
+ <aVZh3hb32r1oVcwG@vaman>
+In-Reply-To: <aVZh3hb32r1oVcwG@vaman>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Fri, 2 Jan 2026 10:26:49 +0100
+X-Gmail-Original-Message-ID: <CAMRc=MePAVMZPju6rZsyQMir4CkQi+FEqbC++omQtVQC1rHBVg@mail.gmail.com>
+X-Gm-Features: AQt7F2pObE1W--bUw5Y840QtJiQ3WP88EyUtNwKC7BerIjnzNxXQ-dH1OgcfROM
+Message-ID: <CAMRc=MePAVMZPju6rZsyQMir4CkQi+FEqbC++omQtVQC1rHBVg@mail.gmail.com>
+Subject: Re: [PATCH v9 03/11] dmaengine: qcom: bam_dma: implement support for
+ BAM locking
+To: Vinod Koul <vkoul@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Thara Gopinath <thara.gopinath@gmail.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Udit Tiwari <quic_utiwari@quicinc.com>, Daniel Perez-Zoghbi <dperezzo@quicinc.com>, 
+	Md Sadre Alam <mdalam@qti.qualcomm.com>, Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 31 Dec 2025 15:48:26 -0500
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Thu, Jan 1, 2026 at 1:00=E2=80=AFPM Vinod Koul <vkoul@kernel.org> wrote:
+>
+> > >
+> > > > It will perform register I/O with DMA using the BAM locking mechani=
+sm
+> > > > for synchronization. Currently linux doesn't use BAM locking and is
+> > > > using CPU for register I/O so trying to access locked registers wil=
+l
+> > > > result in external abort. I'm trying to make the QCE driver use DMA
+> > > > for register I/O AND use BAM locking. To that end: we need to pass
+> > > > information about wanting the command descriptor to contain the
+> > > > LOCK/UNLOCK flag (this is what we set here in the hardware descript=
+or)
+> > > > from the QCE driver to the BAM driver. I initially used a global fl=
+ag.
+> > > > Dmitry said it's too Qualcomm-specific and to use metadata instead.
+> > > > This is what I did in this version.
+> > >
+> > > Okay, how will client figure out should it set the lock or not? What =
+are
+> > > the conditions where the lock is set or not set by client..?
+> > >
+> >
+> > I'm not sure what you refer to as "client". The user of the BAM engine
+> > - the crypto driver? If so - we convert it to always lock/unlock
+> > assuming the TA *may* use it and it's better to be safe. Other users
+> > are not affected.
+>
+> Client are users of dmaengine. So how does the crypto driver figure out
+> when to lock/unlock. Why not do this always...?
+>
 
-> On Wed, Dec 31, 2025 at 03:01:59PM +0100, Petr Tesarik wrote:
-> > On Tue, 30 Dec 2025 05:15:46 -0500
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > When a structure contains a buffer that DMA writes to alongside fields
-> > > that the CPU writes to, cache line sharing between the DMA buffer and
-> > > CPU-written fields can cause data corruption on non-cache-coherent
-> > > platforms.
-> > > 
-> > > Add __dma_from_device_aligned_begin/__dma_from_device_aligned_end
-> > > annotations to ensure proper alignment to prevent this:
-> > > 
-> > > struct my_device {
-> > > 	spinlock_t lock1;
-> > > 	__dma_from_device_aligned_begin char dma_buffer1[16];
-> > > 	char dma_buffer2[16];
-> > > 	__dma_from_device_aligned_end spinlock_t lock2;
-> > > };
-> > > 
-> > > When the DMA buffer is the last field in the structure, just
-> > > __dma_from_device_aligned_begin is enough - the compiler's struct
-> > > padding protects the tail:
-> > > 
-> > > struct my_device {
-> > > 	spinlock_t lock;
-> > > 	struct mutex mlock;
-> > > 	__dma_from_device_aligned_begin char dma_buffer1[16];
-> > > 	char dma_buffer2[16];
-> > > };  
-> > 
-> > This works, but it's a bit hard to read. Can we reuse the
-> > __cacheline_group_{begin, end}() macros from <linux/cache.h>?
-> > Something like this:
-> > 
-> > #define __dma_from_device_group_begin(GROUP)			\
-> > 	__cacheline_group_begin(GROUP)				\
-> > 	____dma_from_device_aligned
-> > #define __dma_from_device_group_end(GROUP)			\
-> > 	__cacheline_group_end(GROUP)				\
-> > 	____dma_from_device_aligned
-> > 
-> > And used like this (the "rxbuf" group id was chosen arbitrarily):
-> > 
-> > struct my_device {
-> > 	spinlock_t lock1;
-> > 	__dma_from_device_group_begin(rxbuf);
-> > 	char dma_buffer1[16];
-> > 	char dma_buffer2[16];
-> > 	__dma_from_device_group_end(rxbuf);
-> > 	spinlock_t lock2;
-> > };
-> > 
-> > Petr T  
-> 
-> Made this change, and pushed out to my tree.
-> 
-> I'll post the new version in a couple of days, if no other issues
-> surface.
+It *does* do it always. We assume the TA may be doing it so the crypto
+driver is converted to *always* perform register I/O with DMA *and* to
+always lock the BAM for each transaction later in the series. This is
+why Dmitry inquired whether all the HW with upstream support actually
+supports the lock semantics.
 
-FTR except my (non-critical) suggestions for PATCH 5/13, the updated
-series looks good to me.
-
-Thank you!
-
-Petr T
+Bart
