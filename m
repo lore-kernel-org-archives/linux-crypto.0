@@ -1,139 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74F742049
-	for <linux-crypto@vger.kernel.org>; Fri,  2 Jan 2026 13:28:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712EB295DBD
+	for <linux-crypto@vger.kernel.org>; Fri,  2 Jan 2026 15:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767360497; cv=none; b=nLRoHkdhP0xFi3MF2BxIjokWU8KEuiJR7tkkMYf9EzB0sj9C5OjBdwvx/kBAVYBocP+/H012PDqe5YhZoVzsBrdij4OWIiXSOmzYNjGFUnvg1LBKpEWntsSRALctudqv+7Nq08ssYwCmystBBwjVGqFCRZpij54yTPX0G7WyQyU=
+	t=1767369229; cv=none; b=EP5Uqp4egy4kKfO39WvTKNp9bf0dfi74JiMK+VvtQ1v9nIzg30bbfcGyHl7Wkdw/v3UQI8za8H1qxlQRrqc9AmTEasJUT/6+eFSGH8wDFjysfv9QepGqr+oIZiG9K7b6NxgXO9KsBBnYEbA45oGOrCHXRDgGG4gjPE8HAQc9W+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767360497; c=relaxed/simple;
-	bh=caKMln/4An5074vy/0LbmODygrWbyLltEqRTVzyaZyo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VRwKIJthPo9dB1HDRNpEChlwodvA0Xn7LRmrZLY07XSgc+Ikx5j5ZMGQtMbyJUiVd0kAsonMQ1y2R0P4pFQCWiLiVqK43vJbbo9xaNUCHlUrMFHcdqp4kJ8PzXG7OkRLJIiFZGqutpJ5iAD3Gh8J7mfV27gKm2mpHoLl2Y7uUBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/LYyrVW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767369229; c=relaxed/simple;
+	bh=xYFasRoR+6RdmuU/wFqbhiWKC3YOQUdmKUnzDEjQxaE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OKp3SYEr9Wenb6VMX0cGgfVNLHkGEyGlEQILaPIVWxR+gGyjWOKw1y1Y30G0uQLSAB8W8qy7omMMWNivtXcnhCGreZZOo9zbl7xXbtn4uR4v6EDjt9HoWIXUHO4W2iNKX11Tqe2UR9MHJ+dIZ5/YdCOjJEuebV2+CN0tegL/XHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=Ui8rzs67; arc=none smtp.client-ip=212.77.101.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/LYyrVW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5022AC19424
-	for <linux-crypto@vger.kernel.org>; Fri,  2 Jan 2026 13:28:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767360497;
-	bh=caKMln/4An5074vy/0LbmODygrWbyLltEqRTVzyaZyo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=j/LYyrVWYBX6/xiFBJCYzPt2mAjHPCdML6RZHqYxHB3JLuG+XVa48k+IbFa1/ydYH
-	 yzLWkGX2d/nsNwNLBfGEKgQx/Y31IcJRJytcsUrwFYWxV4I4ndl8HDE1gsWW9D+fsW
-	 tkOdzT6QA4VM80ok+nOp6C16Iy1MKAT95Q/2l9114MivMXUzbox1yPNxO2sfnrqTwX
-	 pm8UKITq5tQDOE65/Qnd0pkfKV9M7ZB31pmItU0vWSV/qe8rZrpUm2qM/b1BHC1YYp
-	 F/QZg0d4SfPs97bZzrucZYLPyO4UX37A651XQnEg9dQ930Z2nK3qcF40HhLqhQRSeU
-	 h/5hZzEbjYRDQ==
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-598efcf3a89so11885594e87.1
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Jan 2026 05:28:17 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCX23D4/H/qFG9mlwpOCk4n1bgAAOQNp/TvJuhnUnWB9x9ZiO+CqaILbPkT1WW9PInLcpJkew8TSp/cFrKo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeslfvT05D0K+hA0nP8Bdldq+XJ5mwOmjFvOR7qktDFRAO3gAx
-	L1IpX2NK7IMjg8DADMMLTTRks9xfgvKvxfVgWakdLSc6dKmWNf1UMRA9T1acZrKE6Pigr8sqTOR
-	F+0vA8Jivo5BCdYVljnmWY3ynSxBfn3B8fJ2mq1Xh9A==
-X-Google-Smtp-Source: AGHT+IHHF6srkWGBj0h2W2m125Q8RRqweGoiS7tVO11k+MLcdE1dgvfbJ2DaGFg9ECUq+/XShJKxHMrRpS3Ip55rUHI=
-X-Received: by 2002:a05:6512:398c:b0:594:522d:68f4 with SMTP id
- 2adb3069b0e04-59a17de2c1amr14462802e87.28.1767360495900; Fri, 02 Jan 2026
- 05:28:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="Ui8rzs67"
+Received: (wp-smtpd smtp.wp.pl 29423 invoked from network); 2 Jan 2026 16:53:44 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1767369224; bh=pTuvYWbsPdbCKoL0+Bab+OPewJBz4FpesHrWJNueagQ=;
+          h=From:To:Cc:Subject;
+          b=Ui8rzs67kt4mvHrJbA0Y23pDGSbSH0U1gS/l242uXZFivJI04Oj05OinXHpaAwW13
+           h3KsB/0u86qYqxar4NWTkAw/w0lRMcOiyN+NRH8T2am/yqmEWRLSuTZGbSj7AtumGS
+           Jj5utxYFUiX6JH8+WLjYN8sTMZN0mf1cR758tOtww6ZWMa9mKPKPMhoV9WvverYZ65
+           6A2WWyJT5BevqxpyqwF0pW4bE+nI8EYwa5r2xVI0uedsigQ/pUl3D34ar8rltLRV4t
+           gBrI9w0Pcii7jV+fRohH+V2XIVIVVnhH5N9k3jfJcUnkjXfXo5Q+GI5ogDwBbH0bVi
+           P0yTQrh1XeMkw==
+Received: from 83.5.157.18.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.5.157.18])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <benjamin.larsson@genexis.eu>; 2 Jan 2026 16:53:44 +0100
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: benjamin.larsson@genexis.eu,
+	chester.a.unal@arinc9.com,
+	davem@davemloft.net,
+	angelogioacchino.delregno@collabora.com,
+	ansuelsmth@gmail.com,
+	conor+dt@kernel.org,
+	herbert@gondor.apana.org.au,
+	krzk+dt@kernel.org,
+	matthias.bgg@gmail.com,
+	robh@kernel.org,
+	sergio.paracuellos@gmail.com,
+	tsbogend@alpha.franken.de,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-mips@vger.kernel.org
+Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
+Subject: [PATCH v3 2/3] dt-bindings: crypto: eip93: add support for Mediatek MT7621 SoC
+Date: Fri,  2 Jan 2026 16:47:34 +0100
+Message-ID: <20260102155341.3682013-2-olek2@wp.pl>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260102155341.3682013-1-olek2@wp.pl>
+References: <20260102155341.3682013-1-olek2@wp.pl>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1767089672.git.mst@redhat.com> <55e9351282f530e2302e11497c6339c4a2e74471.1767112757.git.mst@redhat.com>
- <CAMRc=MfWX5CZ6GL0ph1g-KupBS3gaztk=VxTnfC1QwUvQmuZrg@mail.gmail.com> <20260102080135-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20260102080135-mutt-send-email-mst@kernel.org>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Fri, 2 Jan 2026 14:27:50 +0100
-X-Gmail-Original-Message-ID: <CAMRc=MdWWQihgt8haFYxSh7MgUoBuf3ZkBA6cbErSVNmAtb8Mw@mail.gmail.com>
-X-Gm-Features: AQt7F2qkcWsOmteak3UHSQG8tO-rpcwm3KC2_8dv0RlxH64IzhKa8xcVzXSnZm4
-Message-ID: <CAMRc=MdWWQihgt8haFYxSh7MgUoBuf3ZkBA6cbErSVNmAtb8Mw@mail.gmail.com>
-Subject: Re: [PATCH RFC 15/13] gpio: virtio: reorder fields to reduce struct padding
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Petr Tesarik <ptesarik@suse.com>, Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org, 
-	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	"Enrico Weigelt, metux IT consult" <info@metux.net>, Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linusw@kernel.org>, 
-	linux-gpio@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-WP-DKIM-Status: good (id: wp.pl)                                                      
+X-WP-MailID: de0ba326c9d18cadba17ff32d4687418
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000009 [ofrU]                               
 
-On Fri, Jan 2, 2026 at 2:02=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->
-> On Fri, Jan 02, 2026 at 12:47:04PM +0000, Bartosz Golaszewski wrote:
-> > On Tue, 30 Dec 2025 17:40:33 +0100, "Michael S. Tsirkin" <mst@redhat.co=
-m> said:
-> > > Reorder struct virtio_gpio_line fields to place the DMA buffers (req/=
-res)
-> > > last. This eliminates the need for __dma_from_device_aligned_end padd=
-ing
-> > > after the DMA buffer, since struct tail padding naturally protects it=
-,
-> > > making the struct a bit smaller.
-> > >
-> > > Size reduction estimation when ARCH_DMA_MINALIGN=3D128:
-> > > - request is 8 bytes
-> > > - response is 2 bytes
-> > > - removing _end saves up to 128-6=3D122 bytes padding to align rxlen =
-field
-> > >
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >  drivers/gpio/gpio-virtio.c | 5 ++---
-> > >  1 file changed, 2 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
-> > > index 32b578b46df8..8b30a94e4625 100644
-> > > --- a/drivers/gpio/gpio-virtio.c
-> > > +++ b/drivers/gpio/gpio-virtio.c
-> > > @@ -26,12 +26,11 @@ struct virtio_gpio_line {
-> > >     struct mutex lock; /* Protects line operation */
-> > >     struct completion completion;
-> > >
-> > > +   unsigned int rxlen;
-> > > +
-> > >     __dma_from_device_aligned_begin
-> > >     struct virtio_gpio_request req;
-> > >     struct virtio_gpio_response res;
-> > > -
-> > > -   __dma_from_device_aligned_end
-> > > -   unsigned int rxlen;
-> > >  };
-> > >
-> > >  struct vgpio_irq_line {
-> > > --
-> > > MST
-> > >
-> > >
-> >
-> > Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
->
-> Thanks! There's a new API as suggested by Petr so these patches got chang=
-ed,
-> but the same idea. Do you want me to carry your ack or you prefer to
-> re-review?
->
-> --
-> MST
->
+Add compatible for Mediatek MT7621 SoC. The implementation is exactly the
+same os in the Airoha SoC.
 
-I'll take a second look. Can you Cc me on all the key patches - like
-the ones introducing new APIs? I needed to grab it from lore this
-time.
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+---
+v3:
+- Use enum
+v2:
+- Corrected commit description
+---
+ .../bindings/crypto/inside-secure,safexcel-eip93.yaml         | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Bart
+diff --git a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
+index c6c99c08dc68..acd7c68178dc 100644
+--- a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
++++ b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
+@@ -31,7 +31,9 @@ properties:
+   compatible:
+     oneOf:
+       - items:
+-          - const: airoha,en7581-eip93
++          - enum:
++            - airoha,en7581-eip93
++            - mediatek,mt7621-eip93
+           - const: inside-secure,safexcel-eip93ies
+       - items:
+           - not: {}
+-- 
+2.47.3
+
