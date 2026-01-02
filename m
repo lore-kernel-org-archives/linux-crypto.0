@@ -1,34 +1,35 @@
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.10])
+Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0AA298CAB
-	for <linux-crypto@vger.kernel.org>; Fri,  2 Jan 2026 15:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D51296BDB
+	for <linux-crypto@vger.kernel.org>; Fri,  2 Jan 2026 15:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767369233; cv=none; b=A2Rtuf2H58r0Sq0Uf9NlkjKa5txxvq2tPMAG2npXxG+QI/JPjMBdL9igNiPYwVpoqdjTvOVccGe5I5p6AbPwSYE0B/LKAvbEBxz/Pyh5TCBPbcOllMZio61DgO8jSDK6VhZSg60a9wOzFFf5NEck52dFd27mWO/p7ZE8DyW+2kQ=
+	t=1767369237; cv=none; b=gH//iX7w/d4KpDEiBdnQL3LtlSRrj2EsPivHLZn7xKnAQXYE6u+VD6ELDVt/b6/eRUPxAjYTZWsBFj++NP3+p6jBJ494ARmRiXhWprf63/3IUmQIaFslD8lnp8l1t3DsnoaHQaY2henaCyOdvC8iircB9Nvca4B7j89T9ZFjEak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767369233; c=relaxed/simple;
-	bh=9EDlYW/0LZfKdgYmF6M0FwqP3StJLTF62r4cHGVRrPk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W6+Ctnd/t2AbgxFcSKzELgYTtuRkqqb4/gO2NrMJJxpWMhHDy+yX8p0K4TPWFKJYJMVA3Z694rLcCmjTB26WWtsjFmuB0Ls0Fccez2NhZunovY5nZZB1p+YP6ylvGB8ZCipqVLgktZ7W3NtpamtzVge2CrS10+CUmnv02LSMifo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=wsnC3jaC; arc=none smtp.client-ip=212.77.101.10
+	s=arc-20240116; t=1767369237; c=relaxed/simple;
+	bh=EAmGXJhS+kV/8kTjvDsx6PH6pL66FGnsepLKxD69+3w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uKOx/kjaHzUrmZel/GARyjfSUF+jYKljmawv9f1zOGb9U52o86Jy8cuwIzwt+JXMxHBCamT2Ge912q49I9VD6rY+ETrWeK3IVqFzYCVPFakNIkEy5MJFtMLVfFLSfTHsaGCxArvGwmbZOvxol/XajMQ2u89rzwIs2yfdZMbBqWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=oOYRycXC; arc=none smtp.client-ip=212.77.101.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="wsnC3jaC"
-Received: (wp-smtpd smtp.wp.pl 27487 invoked from network); 2 Jan 2026 16:53:42 +0100
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="oOYRycXC"
+Received: (wp-smtpd smtp.wp.pl 32318 invoked from network); 2 Jan 2026 16:53:47 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1767369222; bh=pRXKKDZvWwJE0OYBlGbJ1CNY/8nw7dOoKs0YtDMUS1E=;
+          t=1767369227; bh=TTGeIMt25YFQMOKiNe5dlnsk2HQeFBOtHs64bmOahIU=;
           h=From:To:Cc:Subject;
-          b=wsnC3jaCLgQp/yVY5DchfJcu6eLbbhhuaB0l20xYlHBuuYH61frnWYuQZQV5ElqZq
-           FOAVPof4sWOtNrK/oUsgfGusJb6XX1EBj4HQ4qhSevIGN9WmPrHTP+bOc6s9RWsFw4
-           PBDuGRGhrusKNkfawrjlLbCJZ0/pGyvBMXIrYO01xXVjhoCHCpo1GfIjc4AKTh+esn
-           jWIo10vHmF0hyOcZiKWUnwuDy2BRevOs4T6RVVcpNoAVXGOsILqKV8dWQ9FfAHCOxF
-           aSdJj00AN5qhaNkLyem0LcgmAG6siuSH2x+IjDT2jKU74ViI25PDA1QEIQMAE67Yww
-           qPlBC9AHLjwCg==
+          b=oOYRycXCsRyk+B/Ca18edU2AKKDlzAzcLRAB4fvsVuhdQedWv9wCd2GYSs0z4gdgT
+           W0x0l52G/q4Qyx1xulNw3ma7UgLk6emEu7eoQCERSlLVv+VC9/sY6gMjZCluOwnjXO
+           lvOaOWapATbMIvat+NpA9EPnyTGuW/DYENZOpGGQfSIxkzK5uTwDY8g16I5TYpGOaZ
+           HP5iwuyibqgc6+PQLYSuPxkoFfbO0r1cKqbtE2ilPG/geG0L+eCSh9fuhJO1tShFh8
+           RVmszpbUJz5ENLQ0M5X8+0QUMKYLsSpV1peBHCP0PdWSR4slIxQJOY62NZgAmVn7uy
+           vCnOipsR4BT2w==
 Received: from 83.5.157.18.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.5.157.18])
           (envelope-sender <olek2@wp.pl>)
           by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <benjamin.larsson@genexis.eu>; 2 Jan 2026 16:53:42 +0100
+          for <benjamin.larsson@genexis.eu>; 2 Jan 2026 16:53:47 +0100
 From: Aleksander Jan Bajkowski <olek2@wp.pl>
 To: benjamin.larsson@genexis.eu,
 	chester.a.unal@arinc9.com,
@@ -49,10 +50,12 @@ To: benjamin.larsson@genexis.eu,
 	linux-mediatek@lists.infradead.org,
 	linux-mips@vger.kernel.org
 Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH v3 1/3] dt-bindings: crypto: eip93: add clock gate and reset line
-Date: Fri,  2 Jan 2026 16:47:33 +0100
-Message-ID: <20260102155341.3682013-1-olek2@wp.pl>
+Subject: [PATCH v3 3/3] mips: dts: ralink: mt7621: add crypto offload support
+Date: Fri,  2 Jan 2026 16:47:35 +0100
+Message-ID: <20260102155341.3682013-3-olek2@wp.pl>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260102155341.3682013-1-olek2@wp.pl>
+References: <20260102155341.3682013-1-olek2@wp.pl>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,60 +64,48 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: df5d0ea41a222bf13e7a762f03b71f91
+X-WP-MailID: 7b471dd560ee9b622f99c1c75cb1178e
 X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000007 [8RRh]                               
+X-WP-SPAM: NO 0000000 [8SOE]                               
 
-Add the clock gate and reset line, both of which are available
-on the Airoha AN7581.
+Add support for the built-in cryptographic accelerator. This accelerator
+supports 3DES, AES (128/192/256 bit), ARC4, MD5, SHA1, SHA224, and SHA256.
+It also supports full IPSEC, SRTP and TLS offload.
 
 Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
 ---
 v3:
-- introduce patch
+- Add reset line and clock gate
+- Change commit description
+- Wrap long line
 ---
- .../crypto/inside-secure,safexcel-eip93.yaml       | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ arch/mips/boot/dts/ralink/mt7621.dtsi | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
-index 997bf9717f9e..c6c99c08dc68 100644
---- a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
-+++ b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
-@@ -48,20 +48,34 @@ properties:
-   interrupts:
-     maxItems: 1
+diff --git a/arch/mips/boot/dts/ralink/mt7621.dtsi b/arch/mips/boot/dts/ralink/mt7621.dtsi
+index 0704eab4a80b..e1047dd861c0 100644
+--- a/arch/mips/boot/dts/ralink/mt7621.dtsi
++++ b/arch/mips/boot/dts/ralink/mt7621.dtsi
+@@ -361,6 +361,19 @@ cdmm: cdmm@1fbf8000 {
+ 		reg = <0x1fbf8000 0x8000>;
+ 	};
  
-+  clocks:
-+    maxItems: 1
++	crypto@1e004000 {
++		compatible = "mediatek,mt7621-eip93",
++			     "inside-secure,safexcel-eip93ies";
++		reg = <0x1e004000 0x1000>;
 +
-+  resets:
-+    maxItems: 1
++		clocks = <&sysc MT7621_CLK_CRYPTO>;
 +
- required:
-   - compatible
-   - reg
-   - interrupts
-+  - clocks
-+  - resets
- 
- additionalProperties: false
- 
- examples:
-   - |
-+    #include <dt-bindings/clock/en7523-clk.h>
-     #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/reset/airoha,en7581-reset.h>
- 
-     crypto@1e004000 {
-       compatible = "airoha,en7581-eip93", "inside-secure,safexcel-eip93ies";
-       reg = <0x1fb70000 0x1000>;
- 
-+      clocks = <&scuclk EN7523_CLK_CRYPTO>;
++		interrupt-parent = <&gic>;
++		interrupts = <GIC_SHARED 19 IRQ_TYPE_LEVEL_HIGH>;
 +
-       interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
++		resets = <&sysc MT7621_RST_CRYPTO>;
++	};
 +
-+      resets = <&scuclk EN7581_CRYPTO_RST>;
-     };
+ 	ethernet: ethernet@1e100000 {
+ 		compatible = "mediatek,mt7621-eth";
+ 		reg = <0x1e100000 0x10000>;
 -- 
 2.47.3
 
