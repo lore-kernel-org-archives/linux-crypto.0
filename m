@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7451E325732;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0152B327209;
 	Mon,  5 Jan 2026 05:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767590094; cv=none; b=n030c8EqmhxJe3I+1AUJSMXszU1vpRPImZ7rWKA42B9fX7AsS8BE+Co20FNLlkaKxsZ7g36IrWF0WTADalmJz7pWKl9p4xpXaHr9mhxlEGqdV6OkwKTPeqHIosMrhMIAeBewHRYuw1D4moLdr+dZRQj9BAI1VY9krNYUi8oBti4=
+	t=1767590095; cv=none; b=uDY/5BV2AzTyuG0KonhigfI+Hvtt4z9GnV2ewGhsDQJhw3lDzRYUM6yYh+DIxOZnLYI04OuEckK8zWxMlnbZ2YuQoWMd6doXo7dd3vDIwkAY+zi0Jbhq1UhFhWXmKjNrjrXwvNREH7euUuE7gvuqFuu38ScntqhRoDdaGTpM/40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767590094; c=relaxed/simple;
-	bh=NaJeCMt68rOEMjT7oGa1VxCfK2+6f9/LQJxPSOh0Gn4=;
+	s=arc-20240116; t=1767590095; c=relaxed/simple;
+	bh=r+Qzw8crmbVQ6JrhV/JdglMrrXxEutC0ymCPwabmY4M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fgcJss0UB7aMUwzgz4N94caezfQ0WJwRS9qs8RPlFq36s7Jb8JaBGZFwNiTBfROcAoKbPE7pywj9i1k8iAqaVf3CJeK4gRV/c8euiKwpgAaJOGRMbOUbNot1cX0sUTXha6PGSQ6gmMxHAucbGkR3IiciOOaV32bo7LWGtmR+gKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=igzB1iG3; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=N9jDx9EwQLjwcy8zdeo9hysmmpBCpVYvu4ts/R+GtGy6JPT3HAFlJROIuxPd2gds2YstvyrEQlHgWZRiBBv8kJa3Nj8D6R4XvmPXXwXoaGukFPkbUz8RLeQsKjEP/LNOGMFN9nCOWNs+2aoVLDuKBJHh7FtwItxLsm1I52SbOQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ha2Mg2lm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="igzB1iG3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9360AC19424;
-	Mon,  5 Jan 2026 05:14:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ha2Mg2lm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A5DAC116D0;
+	Mon,  5 Jan 2026 05:14:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1767590094;
-	bh=NaJeCMt68rOEMjT7oGa1VxCfK2+6f9/LQJxPSOh0Gn4=;
+	bh=r+Qzw8crmbVQ6JrhV/JdglMrrXxEutC0ymCPwabmY4M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=igzB1iG36I5ddwcCBE6IyNjLvWLYZddcUzh3vYUDSgjc80fDHOeJgz4Ttks7krqct
-	 Xaj+2+Pd+DV44mOpYKoOdnjBs63BiWnHvapVzcjGu4Lueu2IvUOOJLTjDWT7qdeS+0
-	 r2Wqpt2qb3tX0hWPzIB9Sl/T2zeTBmaSX2YRUxnTSWGcH7egQzFmEw1xenEG2kRiN3
-	 sr1FQe6dnkZ70RTBR6ok0orcHW3XKrfBwnq7jWs/q9gtch1mvSPjAPzIUciiTs2LiM
-	 vcQCl+yMtyokIL//1b7maM2ojnVhXhqx8Ol3cvyjugy8onEJpcWWz4iUR479Pbfeb4
-	 c6dikBpXXTx7Q==
+	b=Ha2Mg2lmVEyVLJsqAxVeeF3Hs64jrH9zp2Xowl6MfoO/WjdTlOUp7UNsCTZkTJtfU
+	 2AYsyz02/MC1BAUuUuoBZAAKn6CAkbwzdKIP9v/9RaFaVlsPUTBR1Woohd2oKK9FMO
+	 5Rot1rQ1o2dNTQtuIt/afr1Uq6xrxjiZyQ+IT5GvmdQgtjAHrsK8GdwhELc8E7+eRv
+	 9pHjeEyKHYLlQcEY3FNTJCSA4nzsOny+dsca1a4hl1RnrQpY5UnvlJGyvhEzgNgW8y
+	 /GwmtZUqbDRE9WdmGEsKpgpkR36Z61nAyxx0OD8nadJY+jrz/URE7Bdw4del+ewJqI
+	 vkYTEb2DdJScQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Holger Dengler <dengler@linux.ibm.com>,
 	Harald Freudenberger <freude@linux.ibm.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 06/36] crypto: arm64/aes - Select CRYPTO_LIB_SHA256 from correct places
-Date: Sun,  4 Jan 2026 21:12:39 -0800
-Message-ID: <20260105051311.1607207-7-ebiggers@kernel.org>
+Subject: [PATCH 07/36] crypto: aegis - Switch from crypto_ft_tab[] to aes_enc_tab[]
+Date: Sun,  4 Jan 2026 21:12:40 -0800
+Message-ID: <20260105051311.1607207-8-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260105051311.1607207-1-ebiggers@kernel.org>
 References: <20260105051311.1607207-1-ebiggers@kernel.org>
@@ -55,58 +55,50 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The call to sha256() occurs in code that is built when either
-CRYPTO_AES_ARM64_CE_BLK or CRYPTO_AES_ARM64_NEON_BLK.  The option
-CRYPTO_AES_ARM64 is unrelated, notwithstanding its documentation.  I'll
-be removing CRYPTO_AES_ARM64 soon anyway, but before doing that, fix
-where CRYPTO_LIB_SHA256 is selected from.
+Instead of crypto_ft_tab[0] from aes_generic.c, use aes_enc_tab from
+lib/crypto/aes.c.  These contain the same data, so the result is the
+same.  This will allow aes_generic.c to eventually be removed.
 
-Fixes: 01834444d972 ("crypto: arm64/aes - use SHA-256 library instead of crypto_shash")
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/arm64/crypto/Kconfig | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ crypto/Kconfig | 2 +-
+ crypto/aegis.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index da1c9ea8ea83..4453dff8f0c1 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -38,11 +38,10 @@ config CRYPTO_SM3_ARM64_CE
- 	  - ARMv8.2 Crypto Extensions
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 12a87f7cf150..443fe8e016fd 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -764,11 +764,11 @@ endmenu
+ menu "AEAD (authenticated encryption with associated data) ciphers"
  
- config CRYPTO_AES_ARM64
- 	tristate "Ciphers: AES, modes: ECB, CBC, CTR, CTS, XCTR, XTS"
- 	select CRYPTO_AES
--	select CRYPTO_LIB_SHA256
+ config CRYPTO_AEGIS128
+ 	tristate "AEGIS-128"
+ 	select CRYPTO_AEAD
+-	select CRYPTO_AES  # for AES S-box tables
++	select CRYPTO_LIB_AES  # for AES S-box tables
  	help
- 	  Block ciphers: AES cipher algorithms (FIPS-197)
- 	  Length-preserving ciphers: AES with ECB, CBC, CTR, CTS,
- 	    XCTR, and XTS modes
- 	  AEAD cipher: AES with CBC, ESSIV, and SHA-256
-@@ -64,10 +63,11 @@ config CRYPTO_AES_ARM64_CE
- config CRYPTO_AES_ARM64_CE_BLK
- 	tristate "Ciphers: AES, modes: ECB/CBC/CTR/XTS (ARMv8 Crypto Extensions)"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_AES_ARM64_CE
-+	select CRYPTO_LIB_SHA256
- 	help
- 	  Length-preserving ciphers: AES cipher algorithms (FIPS-197)
- 	  with block cipher modes:
- 	  - ECB (Electronic Codebook) mode (NIST SP800-38A)
- 	  - CBC (Cipher Block Chaining) mode (NIST SP800-38A)
-@@ -81,10 +81,11 @@ config CRYPTO_AES_ARM64_CE_BLK
- config CRYPTO_AES_ARM64_NEON_BLK
- 	tristate "Ciphers: AES, modes: ECB/CBC/CTR/XTS (NEON)"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_AES
-+	select CRYPTO_LIB_SHA256
- 	help
- 	  Length-preserving ciphers: AES cipher algorithms (FIPS-197)
- 	  with block cipher modes:
- 	  - ECB (Electronic Codebook) mode (NIST SP800-38A)
- 	  - CBC (Cipher Block Chaining) mode (NIST SP800-38A)
+ 	  AEGIS-128 AEAD algorithm
+ 
+ config CRYPTO_AEGIS128_SIMD
+ 	bool "AEGIS-128 (arm NEON, arm64 NEON)"
+diff --git a/crypto/aegis.h b/crypto/aegis.h
+index 6ef9c174c973..ffcf8e85ea69 100644
+--- a/crypto/aegis.h
++++ b/crypto/aegis.h
+@@ -60,11 +60,11 @@ static __always_inline void crypto_aegis_block_and(union aegis_block *dst,
+ static __always_inline void crypto_aegis_aesenc(union aegis_block *dst,
+ 						const union aegis_block *src,
+ 						const union aegis_block *key)
+ {
+ 	const u8  *s  = src->bytes;
+-	const u32 *t = crypto_ft_tab[0];
++	const u32 *t = aes_enc_tab;
+ 	u32 d0, d1, d2, d3;
+ 
+ 	d0 = t[s[ 0]] ^ rol32(t[s[ 5]], 8) ^ rol32(t[s[10]], 16) ^ rol32(t[s[15]], 24);
+ 	d1 = t[s[ 4]] ^ rol32(t[s[ 9]], 8) ^ rol32(t[s[14]], 16) ^ rol32(t[s[ 3]], 24);
+ 	d2 = t[s[ 8]] ^ rol32(t[s[13]], 8) ^ rol32(t[s[ 2]], 16) ^ rol32(t[s[ 7]], 24);
 -- 
 2.52.0
 
