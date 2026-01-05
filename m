@@ -1,173 +1,152 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F8A322B61;
-	Mon,  5 Jan 2026 17:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207D029DB65;
+	Mon,  5 Jan 2026 17:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767632934; cv=none; b=FK4hVqsTWt3m0RF7JvNrYo5xgoMsD41wBd/5GptrltrO18rmHtB8buzYpKHnAq8doCNsRhHWuQowb3mYMmpYfD3t6XFRpytE2VIC9Bc8XhY1Fcc49k/m2gjn5gWyeH6LVav+rlFqPRmDJXOUkRjxBkFYbBRLNob4hN7yzeg04/g=
+	t=1767633797; cv=none; b=etTzBgPjAKVAuvnpALrNzAiyynCSfOBu0Cv4ugTXIDWFn1dBA1SetvepWfwd8S6UqNv7Vrbx8ffqEZXObLxM0Mu0o/yEJnI+U9V9WkCDMLuRX9rDphzZujD51o/JN4WVxczl3XWkybkANNTHaw7N4xctsQKXGY31K1g1QgGzEhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767632934; c=relaxed/simple;
-	bh=zLtKDWIHIKIks+W4Di7QBPv1ZllrLij0cdaPxpe1wPE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nqXCcCVUESHqx8LnlMWwhfxflofkxJtpXhiVppFCCI4wcKro/kTnjIR8YiH86Qs2jgNxdZrz37mNKKnH2ssAQhPjcRwcdBhrwfv+HXehlRzZ9awYKN1sPce1A8E4LrdgPho+El2EN+lHEujSHv03Ptq955gwhyXEjXBaGZjkk0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NCuf6r+9; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1767633797; c=relaxed/simple;
+	bh=38rlMGT2vLZ4jHbteDpjbYVnn+hcEmJ/7bHs93EBK4k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eKtAJd0W/cxs+7b1OvjBBS44eophdnVm8T8CVWyTgTS3G3yC+y9erc9dts7FDwd9b4mnhdTMVK/0FM/M/rLPkSSMfEcJhWgXONbpCLMkMz2pFxA6gnyE/c7Dn6OXqqlgoUGoNIBAHzS0C1XHqnxzdPpuGkOGrHd6xjj+KLQDw2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EsEMOUDz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NCuf6r+9"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 605EVMmT026728;
-	Mon, 5 Jan 2026 17:08:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=eSIhhO
-	ciMRazXcXzkqLXlhyNQaedGTmPkztvFRGJIKw=; b=NCuf6r+9w+dFQ8hls3ORyz
-	xjUwokYkXbpdsLQFF8+b6t7/OjQytFlx6bAyOhacS1JluABHrxgefQICnfLOc11Q
-	nKe8hTQFaVZ9GXy+NM+qBrAuiWxo7lLkHVWTaSPt59F9XXBRJoJx8fAwwakIf7HG
-	kdBfz/lkAlI6QjM3bQn9Jjg0AcFRf61NryKvEu6yoHfwa5N8N2/yHnoFoFQyZmoP
-	WDjeUdNE49jHqSvaMzPKJIIDN5P0sb1qLIMbgKCm+LwmdQZrq4Bk5TzTO5Ge8R5j
-	3LzZlF3ngFw9AuYR3TEgCNeKiPK6df0pQbviZT7IOiqKdC7kPJNYT82/ee5GGhGg
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4betm70cw1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Jan 2026 17:08:34 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 605Ge3CJ023487;
-	Mon, 5 Jan 2026 17:08:33 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4bg3rm3n96-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Jan 2026 17:08:32 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 605H8WkR58524130
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 5 Jan 2026 17:08:32 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8441F58059;
-	Mon,  5 Jan 2026 17:08:32 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D1D1C58058;
-	Mon,  5 Jan 2026 17:08:31 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  5 Jan 2026 17:08:31 +0000 (GMT)
-Message-ID: <0c62719b-adef-4796-ae15-07467de478c8@linux.ibm.com>
-Date: Mon, 5 Jan 2026 12:08:31 -0500
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EsEMOUDz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D05CC116D0;
+	Mon,  5 Jan 2026 17:23:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767633796;
+	bh=38rlMGT2vLZ4jHbteDpjbYVnn+hcEmJ/7bHs93EBK4k=;
+	h=From:To:Cc:Subject:Date:From;
+	b=EsEMOUDzSFua3O7TgMRiZLGamCd/ucvZG/TWkHGGATgOV0IccuqpW9mThp7Fes0gc
+	 eC9m0bE5P/xdH4e1aE2G5023RHvpZ/2zNZ4n996cjWtvAfOTH1a5FE9f4qQnPisXGH
+	 vmkVzNnqAiGmIDC3kcW0iU0aVA9txIKvVN5pjct9DPgfh70a3snc4n1zqARNZT0OBd
+	 kc3lYaKX3hwvveb38KragQ0zkvZe2aWbzBPbrRKcw7gbAOrQBArpfs2eY5NKi2Guid
+	 7bE89oYsv9xnarVdNy/Y1FdPkHuWRSDxFqpOWitGkLvJlQ3GoRZKG6T7Gdf8X/06Jm
+	 n0woaIrLAC65Q==
+From: Tycho Andersen <tycho@kernel.org>
+To: Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Tycho Andersen (AMD)" <tycho@kernel.org>,
+	Alexey Kardashevskiy <aik@amd.com>
+Subject: [PATCH 1/2] crypto: ccp - Fix a case where SNP_SHUTDOWN is missed
+Date: Mon,  5 Jan 2026 10:22:17 -0700
+Message-ID: <20260105172218.39993-1-tycho@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: ecc - Streamline alloc_point and remove
- {alloc,free}_digits_space
-To: Thorsten Blum <thorsten.blum@linux.dev>, Lukas Wunner <lukas@wunner.de>,
-        Ignat Korchagin <ignat@cloudflare.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251218212713.1616-2-thorsten.blum@linux.dev>
-Content-Language: en-US
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <20251218212713.1616-2-thorsten.blum@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=OdmVzxTY c=1 sm=1 tr=0 ts=695bf012 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=9jGYZitoDxUW5FyFbrIA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: hPwKx5WiEt73ys4qxKOD8Az9QRHJlaAs
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA1MDE0NyBTYWx0ZWRfXysoknPGpu/pn
- NEjHxcIU8sduDQSOP1cBGmBflK1GtVMSMBvVL825IJzVARHhyoYdGx9b2tt1Mhi/n5MVARTK7/4
- 09UQWppu2yrw+CVTje8WyB72TmyH2GpE1JyYAmhurlznnF3RXmyr7gUubsb36LJ5lwvlzEzYfw+
- yRz5V1rdee/Gv8yCqq5+ErXxFrP5+PtnVwYCi47iVSbt/9+oYcsQE3um8/dOIuMYhsp8F9ZVTK8
- ryIvU1weRJ1jVJQ/0g1DKUa7BGpwSRo8UlGujDGbQZehgbVamOTUo3VS9oDC3pqFciC5qiGKFWO
- H6wX8OX4pDyKAP2ceKdWCp6sarBIdHyubNYjDT6lkQazwsmfTmk8yppAqCweqAU+O5u2bS3drPd
- 1YrvADgWpcNu+7xTehFO1vD5oL2ZvndyKDhgH7oTX+mj3Zdr4tcxJoPOn1hE9Oiw3F/dkAXUmzY
- rrnT5cyrlKxbHIRQJwA==
-X-Proofpoint-ORIG-GUID: hPwKx5WiEt73ys4qxKOD8Az9QRHJlaAs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-05_01,2026-01-05_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 clxscore=1011 phishscore=0 malwarescore=0 adultscore=0
- lowpriorityscore=0 priorityscore=1501 impostorscore=0 bulkscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2512120000
- definitions=main-2601050147
+Content-Transfer-Encoding: 8bit
 
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
+If page reclaim fails in sev_ioctl_do_snp_platform_status() and SNP was
+moved from UNINIT to INIT for the function, SNP is not moved back to
+UNINIT state. Additionally, SNP is not required to be initialized in order
+to execute the SNP_PLATFORM_STATUS command, so don't attempt to move to
+INIT state and let SNP_PLATFORM_STATUS report the status as is.
 
-On 12/18/25 4:27 PM, Thorsten Blum wrote:
-> Check 'ndigits' before allocating 'struct ecc_point' to return early if
-> needed. Inline the code from and remove ecc_alloc_digits_space() and
-> ecc_free_digits_space(), respectively.
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->   crypto/ecc.c | 27 +++++++++------------------
->   1 file changed, 9 insertions(+), 18 deletions(-)
-> 
-> diff --git a/crypto/ecc.c b/crypto/ecc.c
-> index 6cf9a945fc6c..9b8e4ba9719a 100644
-> --- a/crypto/ecc.c
-> +++ b/crypto/ecc.c
-> @@ -90,33 +90,24 @@ void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
->   }
->   EXPORT_SYMBOL(ecc_digits_from_bytes);
->   
-> -static u64 *ecc_alloc_digits_space(unsigned int ndigits)
-> +struct ecc_point *ecc_alloc_point(unsigned int ndigits)
->   {
-> -	size_t len = ndigits * sizeof(u64);
-> +	struct ecc_point *p;
-> +	size_t ndigits_sz;
->   
-> -	if (!len)
-> +	if (!ndigits)
->   		return NULL;
->   
-> -	return kmalloc(len, GFP_KERNEL);
-> -}
-> -
-> -static void ecc_free_digits_space(u64 *space)
-> -{
-> -	kfree_sensitive(space);
-> -}
-> -
-> -struct ecc_point *ecc_alloc_point(unsigned int ndigits)
-> -{
-> -	struct ecc_point *p = kmalloc(sizeof(*p), GFP_KERNEL);
-> -
-> +	p = kmalloc(sizeof(*p), GFP_KERNEL);
->   	if (!p)
->   		return NULL;
->   
-> -	p->x = ecc_alloc_digits_space(ndigits);
-> +	ndigits_sz = ndigits * sizeof(u64);
-> +	p->x = kmalloc(ndigits_sz, GFP_KERNEL);
->   	if (!p->x)
->   		goto err_alloc_x;
->   
-> -	p->y = ecc_alloc_digits_space(ndigits);
-> +	p->y = kmalloc(ndigits_sz, GFP_KERNEL);
->   	if (!p->y)
->   		goto err_alloc_y;
->   
-> @@ -125,7 +116,7 @@ struct ecc_point *ecc_alloc_point(unsigned int ndigits)
->   	return p;
->   
->   err_alloc_y:
-> -	ecc_free_digits_space(p->x);
-> +	kfree_sensitive(p->x);
+Fixes: ceac7fb89e8d ("crypto: ccp - Ensure implicit SEV/SNP init and shutdown in ioctls")
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Reviewed-by: Tycho Andersen (AMD) <tycho@kernel.org>
+Reviewed-by: Alexey Kardashevskiy <aik@amd.com>
+Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
+---
+ drivers/crypto/ccp/sev-dev.c | 46 ++++++++++++++++++------------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
 
-With no data in the buffer a kfree() should be sufficient.
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 956ea609d0cc..6e6011e363e3 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -2378,11 +2378,10 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+-	bool shutdown_required = false;
+ 	struct sev_data_snp_addr buf;
+ 	struct page *status_page;
+-	int ret, error;
+ 	void *data;
++	int ret;
+ 
+ 	if (!argp->data)
+ 		return -EINVAL;
+@@ -2393,31 +2392,35 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+ 
+ 	data = page_address(status_page);
+ 
+-	if (!sev->snp_initialized) {
+-		ret = snp_move_to_init_state(argp, &shutdown_required);
+-		if (ret)
+-			goto cleanup;
+-	}
+-
+ 	/*
+-	 * Firmware expects status page to be in firmware-owned state, otherwise
+-	 * it will report firmware error code INVALID_PAGE_STATE (0x1A).
++	 * SNP_PLATFORM_STATUS can be executed in any SNP state. But if executed
++	 * when SNP has been initialized, the status page must be firmware-owned.
+ 	 */
+-	if (rmp_mark_pages_firmware(__pa(data), 1, true)) {
+-		ret = -EFAULT;
+-		goto cleanup;
++	if (sev->snp_initialized) {
++		/*
++		 * Firmware expects the status page to be in Firmware state,
++		 * otherwise it will report an error INVALID_PAGE_STATE.
++		 */
++		if (rmp_mark_pages_firmware(__pa(data), 1, true)) {
++			ret = -EFAULT;
++			goto cleanup;
++		}
+ 	}
+ 
+ 	buf.address = __psp_pa(data);
+ 	ret = __sev_do_cmd_locked(SEV_CMD_SNP_PLATFORM_STATUS, &buf, &argp->error);
+ 
+-	/*
+-	 * Status page will be transitioned to Reclaim state upon success, or
+-	 * left in Firmware state in failure. Use snp_reclaim_pages() to
+-	 * transition either case back to Hypervisor-owned state.
+-	 */
+-	if (snp_reclaim_pages(__pa(data), 1, true))
+-		return -EFAULT;
++	if (sev->snp_initialized) {
++		/*
++		 * The status page will be in Reclaim state on success, or left
++		 * in Firmware state on failure. Use snp_reclaim_pages() to
++		 * transition either case back to Hypervisor-owned state.
++		 */
++		if (snp_reclaim_pages(__pa(data), 1, true)) {
++			snp_leak_pages(__page_to_pfn(status_page), 1);
++			return -EFAULT;
++		}
++	}
+ 
+ 	if (ret)
+ 		goto cleanup;
+@@ -2427,9 +2430,6 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+ 		ret = -EFAULT;
+ 
+ cleanup:
+-	if (shutdown_required)
+-		__sev_snp_shutdown_locked(&error, false);
+-
+ 	__free_pages(status_page, 0);
+ 	return ret;
+ }
 
->   err_alloc_x:
->   	kfree(p);
->   	return NULL;
+base-commit: 3609fa95fb0f2c1b099e69e56634edb8fc03f87c
+-- 
+2.52.0
 
