@@ -1,88 +1,169 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132FA1E3DF7;
-	Mon,  5 Jan 2026 08:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3215B2D7DD7
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Jan 2026 08:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767601302; cv=none; b=e8oeBgqlUhx3aQp67TOYpLd4YV1HEMdhoV9SV2ECKdZVr+9lW8TBcdfFrUm3WP81fjj6OCjZq5zbvSB9JAPYxnqY5oITyEW9ilfWlPF0MVan2U7lHJ3wxiWBVn30re34doNP2ZX+loNNnva2Y1s/lrOr1ypiO8wVTLJKZCF2rxo=
+	t=1767601380; cv=none; b=B+XFRMAUWSYKncr9XlujyPczdKEwDam5ah1MnJKZ/51PyBa+qGS2J1LvIrLGV5lC0OI8KPjsMeQVmsD1f8fCLkzEalgzA6mae/TrUGn1o7Fu1kyL3myBXqpGblO4Q+lEZnn3yiJelu7Dz44u56lI4nXzq/Y3aVcs+HdVpdvf+pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767601302; c=relaxed/simple;
-	bh=pzNN45vfkXr1RPUBI6KmJfUB8k1HbHBXCQstcnguEYs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X2hkAylfVqENPKtFesRl87QsMA5aziyFRvbQX1xDJGNVV/nxGLs7tIZyfOLRKjL7e2aL242XvZmXbXPoaKwV8SWMrFmOuobNTLxCmJwkOzvd2WkwZAKRiJkotknMgHalKFNv+fHKAJIuxOr8gQjqsWwU22YhuaawqHzHlLyZWBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dqzFMntG; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=zxo48jSG; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1767601380; c=relaxed/simple;
+	bh=1rF+5o+RxfvaZWaK/37ivP7Ic43xgdCjtd7a083Lyfc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Nas3WRBmyvApbTyNTfcvqwNcjj/s/jNgDQg2Er2IfS4IADgT09IhIBpECK7L2/GUX6mycGZljF77iNwpZ+UMorNnAKE5cA81PQJJEH9ianWB0BoglWHkb8A9dW2BgoVwfqdwh0yCroEdG9Qhis3o3ei87X9SWouXR8GlHwpNdEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OVpQPRID; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aFnAwaAK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dqzFMntG";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zxo48jSG"
-Date: Mon, 5 Jan 2026 09:21:32 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1767601297;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVpQPRID";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aFnAwaAK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767601377;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PR1oU9VKOy/F8fVKY6y8SKt+SSbfQRO8I/mYAyWRNPs=;
-	b=dqzFMntGuqY9FOKdA5Mmqc0jGzur9h5ZdPKouby+M5w+QSZQ1lBqCnml5icAZ0C4WmUG+A
-	H0kSrmtr0u4qs4nuNmrzvGSlASZT5uc708bxI4AUgxPLoFfpKQbog6uyN4DsB91VkXXKJe
-	N6YJIrY9k6TAlAvLOPT0sOroZvSkQfPkrMrGBwdpQpvLSR4kzNJuJ1e2S+JUO1bTlgMLYv
-	nh94tt94TA6Fox2nrS2eQk5AdRiTWIACu3sBlkuQKVKQ+mbungITQb/8sKY52O4ptgTCob
-	UcffgD+mz2IhB0ir3clBXsS0t4NgW7lZ7Wq2GZFdwqa8Oh5iH4Eo+/zkAjEmqA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1767601297;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PR1oU9VKOy/F8fVKY6y8SKt+SSbfQRO8I/mYAyWRNPs=;
-	b=zxo48jSG29LHlvI6PEikRbIskNKLrs4WtT3vSDqF4A1eubexBcwGuI6etfZ/GFAfOimzGt
-	j8NJox7iS+tc6QBA==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, 
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: tests: polyval_kunit: Increase iterations
- for preparekey in IRQs
-Message-ID: <20260105092043-d18628ec-a42a-490b-8bbf-d611dd5afb5a@linutronix.de>
-References: <20260102-kunit-polyval-fix-v1-1-5313b5a65f35@linutronix.de>
- <20260102182748.GB2294@sol>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=++MSvPbbaixtOH+VkhbpdT2tKuVIlO7zEYO24bBcB2o=;
+	b=OVpQPRIDj5fXqBg9A/hP4xVzLw8MYfD0RyVh4Bk3mpjidMcWQVlxb6UWCkDP88f6dbWF3F
+	SvhRQ9LrJEXf8a4sePL5O5s/gicfHgSC7GHHwSCZoSo54sbVX2pEdbD1EQjHEf1CDNwLaQ
+	fzhYe/ROFifr2sDRbPyDY0j+oMXFN/U=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-689-hGlLbU7ePvyfkEShwMJO0w-1; Mon, 05 Jan 2026 03:22:55 -0500
+X-MC-Unique: hGlLbU7ePvyfkEShwMJO0w-1
+X-Mimecast-MFC-AGG-ID: hGlLbU7ePvyfkEShwMJO0w_1767601374
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4779ecc3cc8so96506625e9.3
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Jan 2026 00:22:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767601374; x=1768206174; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=++MSvPbbaixtOH+VkhbpdT2tKuVIlO7zEYO24bBcB2o=;
+        b=aFnAwaAKLu7zAhMf+1ZJkNmIT145xhfGYevQ+uwx4Dua/sOWHk6GFH5sAFW7CCCMFZ
+         0cya9z65tmnNTyvX8ggutiwfatl5uHID38vuE/UmtJgcJ4jlVipRomZHHhHg4cIFInDR
+         6fxzl+4UMlWcfjaV+B80TtPV4bNU/SlsWfmvdpHWeonjuIye9gFLQHa5ezv0cGiFYn1M
+         uPIv55VhcCeX+mAns+hZrOKdH37ATwCzhEooCCd6oH/t8AoUlfs90mZBEvbeNgJbXLLq
+         GSSl7PCZXbESwGZq0n141aAGd5Eg/NVjFtyyDdOp5ijpOTk8+jF8eE6VPD6Wf6vrFLzF
+         aNPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767601374; x=1768206174;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=++MSvPbbaixtOH+VkhbpdT2tKuVIlO7zEYO24bBcB2o=;
+        b=PxB6oHcOO01axEMdA8PNe9qS7m/zfgSksoVDMFHTjxjFhcTNvnab6B4P2CAlbbI7dT
+         g+YnJ5rnIKLCCpcaQMnFZiBXSu+0H+u24hOEGe5tWvnk5r7w8jJ0hNZ3eH9OCR7GLTAp
+         2EuTOF90LEJRMFXoX3aY4ISduYvdxsT8X6dlUcMSPiQYL6G1b+C4e0VFEcVyNKwWDKe7
+         WJsfMhpUE13KOeRmpsKfM4Op1gh0gN7Xwu+MfqGl301qbY+w0Hst4sMiN73iUsPoTmGF
+         eItZ8YEkejZ9XwIlXzjzLH7b2tv0ZW08COpnp5gSZKyUXuSd5kLURtmIenfixlwNF9gB
+         KYBg==
+X-Forwarded-Encrypted: i=1; AJvYcCVnjUSlezRCZk2md1DcS4FeNnSKdVROkbl4Q/OHK/OMfaWh6u5wlPwnuBeQbzAsV9bwodW8hPM/T/atLdc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrPETWuGI1ijlzAJea7OK5Fd6c8tIV78o6b/79ShYmeWiLLdmW
+	pYGmZzcHeif5fqX1wEkU254S2MhTR9wjTdwXDarrBs3Hi2z6V9vUsl1qU7NncF47xAJSg+/0kmt
+	lxwTaa3HyxzD5DGRpSr1DFm7OMb4rm4lESuj+xooTaCAdKZ/G8Feybd+PEVSVGhsddg==
+X-Gm-Gg: AY/fxX5sG1/Af/Ly5XgE0gSlZmyLtHfF0p0YIPTVu7V7LwpkzsmT/ISZo8BDGX0/hGu
+	3xXYJYYvQBtuD/xc6pbQBGNWUN4fLcLRb8hLacqgtfXVSamIx7lvyG2LBfJNswjNgzzQXvLhM4+
+	6hIEiOGcHMMsZvC3ECVLOf8/EQS4gpTlB1AQJ+gOOdMaQcnQQyM5LQZanXcfPzfLEBTrYSosdqs
+	xsZK8OUh3H5AHBTxphaTicI06OcFk+ZtuXN2GqI2T2dHkxz+CBoUvBFN9WLjGq2a8dwQwHpwZOJ
+	eqx2yYD4bAdYgAm38rHYI3lrdFN6hWrsQs0uFItXDwjyWQPVxW7V2pW5AcuzLQzI+jFtom85ZLu
+	OEB9vnDhRD6CwbefrKM5tnk2rpip27g6QBQ==
+X-Received: by 2002:a05:600c:4ed2:b0:475:e067:f23d with SMTP id 5b1f17b1804b1-47d1959eaaemr640737365e9.25.1767601374444;
+        Mon, 05 Jan 2026 00:22:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEXw2Pw2EoWGIJB0fy/EdgimCoNIlh1q5tf6OTMnGxG74FiSYxf17YyIIU15mHj+ck3a5eDtg==
+X-Received: by 2002:a05:600c:4ed2:b0:475:e067:f23d with SMTP id 5b1f17b1804b1-47d1959eaaemr640737005e9.25.1767601373905;
+        Mon, 05 Jan 2026 00:22:53 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d6ba30531sm56554215e9.1.2026.01.05.00.22.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 00:22:53 -0800 (PST)
+Date: Mon, 5 Jan 2026 03:22:50 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v2 00/15] fix DMA aligment issues around virtio
+Message-ID: <cover.1767601130.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260102182748.GB2294@sol>
-
-On Fri, Jan 02, 2026 at 10:27:48AM -0800, Eric Biggers wrote:
-> On Fri, Jan 02, 2026 at 08:32:03AM +0100, Thomas Weiﬂschuh wrote:
-> > On my development machine the generic, memcpy()-only implementation of
-> > polyval_preparekey() is too fast for the IRQ workers to actually fire.
-> > The test fails.
-> > 
-> > Increase the iterations to make the test more robust.
-> > The test will run for a maximum of one second in any case.
-> > 
-> > Fixes: b3aed551b3fc ("lib/crypto: tests: Add KUnit tests for POLYVAL")
-> > Signed-off-by: Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
-> 
-> Glad to see that people are running these tests!  I actually already
-> applied
-> https://lore.kernel.org/linux-crypto/20251219085259.1163048-1-davidgow@google.com/
-> for this issue, which should be sufficient by itself.
-
-That works, too. Thanks!
-
-> Might be worth
-> increasing the iteration count as well, but I'd like to check whether
-> any other tests could use a similar change as well.
-
-No other one of the default tests failed for me in a similar way.
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
 
-Thomas
+Cong Wang reported dma debug warnings with virtio-vsock
+and proposed a patch, see:
+
+https://lore.kernel.org/all/20251228015451.1253271-1-xiyou.wangcong@gmail.com/
+
+however, the issue is more widespread.
+This is an attempt to fix it systematically.
+Note: i2c and gio might also be affected, I am still looking
+into it. Help from maintainers welcome.
+
+Lightly tested.  Cursor/claude used liberally, mostly for
+refactoring/API updates/English.
+
+DMA maintainers, could you please confirm the DMA core changes
+are ok with you?
+
+Thanks!
+
+
+Michael S. Tsirkin (15):
+  dma-mapping: add __dma_from_device_group_begin()/end()
+  docs: dma-api: document __dma_from_device_group_begin()/end()
+  dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
+  docs: dma-api: document DMA_ATTR_CPU_CACHE_CLEAN
+  dma-debug: track cache clean flag in entries
+  virtio: add virtqueue_add_inbuf_cache_clean API
+  vsock/virtio: fix DMA alignment for event_list
+  vsock/virtio: use virtqueue_add_inbuf_cache_clean for events
+  virtio_input: fix DMA alignment for evts
+  virtio_scsi: fix DMA cacheline issues for events
+  virtio-rng: fix DMA alignment for data buffer
+  virtio_input: use virtqueue_add_inbuf_cache_clean for events
+  vsock/virtio: reorder fields to reduce padding
+  gpio: virtio: fix DMA alignment
+  gpio: virtio: reorder fields to reduce struct padding
+
+ Documentation/core-api/dma-api-howto.rst  | 52 ++++++++++++++
+ Documentation/core-api/dma-attributes.rst |  9 +++
+ drivers/char/hw_random/virtio-rng.c       |  3 +
+ drivers/gpio/gpio-virtio.c                | 15 ++--
+ drivers/scsi/virtio_scsi.c                | 17 +++--
+ drivers/virtio/virtio_input.c             |  5 +-
+ drivers/virtio/virtio_ring.c              | 83 ++++++++++++++++-------
+ include/linux/dma-mapping.h               | 20 ++++++
+ include/linux/virtio.h                    |  5 ++
+ kernel/dma/debug.c                        | 28 ++++++--
+ net/vmw_vsock/virtio_transport.c          |  8 ++-
+ 11 files changed, 205 insertions(+), 40 deletions(-)
+
+-- 
+MST
+
