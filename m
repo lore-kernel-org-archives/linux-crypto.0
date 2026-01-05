@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B5932AABD;
-	Mon,  5 Jan 2026 05:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B24A326D62;
+	Mon,  5 Jan 2026 05:15:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767590106; cv=none; b=oWfxGIm0cn+E5nEaCMzR67D1VzRJbsHaGDlsA9akmOG0fcDzIx/oT8A57/GJOm90Li4jV14TypydUknuJJsLcqNiEKFF5HaLLuY+aw8BaEaMrWE7dGzHApc4AlaaAGs3m5tw/i0AlDY6mYxgRiFUFOuAx4P3Ab3FadwuwcDurEs=
+	t=1767590106; cv=none; b=twnpI5ZWaq5VLj6uxbZ/pLFFPLLp74DCxcbZMJPI8G1YKBqRjaEIsdo1XH5bGijSg/Y5QsXatAEXxYrUpSvvgFOIhp2AlKwHLboCcYkUBval7jV+pgjmq+97gBIwytUbA/yhhCMDS79PrlJlf3/NGPg4S5NfTOwvl1uAx5FJtKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767590106; c=relaxed/simple;
-	bh=4EW0N35+HHe/JqWcRGzDlUw5apTDeyYhZ2K2O9GZlcs=;
+	bh=32kb2l0NMdpg22PqusIRxtEfgY/UOrZtqLBmf/rQszE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B2j1wwJC4iWS6qngcqfd9sp8EeEF4kLUS/+8Qz77H8WQOh6/UZOrAo5/IJhil6SXf+ramm8GYpnFHAOlVGK/KujOjh2Ipgv7j+YQJtCxFw38cCFYXYYUHjCMLaLfSNI205f46WVKXfvol9Jbz5lMUjM8fWaxD88znqu5JDpzhgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vEUIRbux; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=PllWRSosw4M5wGXXrrymPv6PxRtan6u1c4Kr0W2IStz3dJdHu1H2DGtTl38CM3jKe67Zfit43JWHT7rFb3T//RoIiSgu3tkz6hssfowhP4yGUQxRX3krEN70BbFypo4h9L6v8R2NxPM6pvk3ULkXFc3xgDDP4dlb6RsRme5/NMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qcVBpCYW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vEUIRbux"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED002C116D0;
-	Mon,  5 Jan 2026 05:15:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qcVBpCYW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5352C19425;
+	Mon,  5 Jan 2026 05:15:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767590105;
-	bh=4EW0N35+HHe/JqWcRGzDlUw5apTDeyYhZ2K2O9GZlcs=;
+	s=k20201202; t=1767590106;
+	bh=32kb2l0NMdpg22PqusIRxtEfgY/UOrZtqLBmf/rQszE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=vEUIRbuxPtyDpcgmvaJX3BlnFYwziFzZ5LfbmtiO1eZS18vDNbYb6RE8wz6jnFJBr
-	 kvSoc+6RJvlqMWm6zGwwF3J8K9CRcgRwTFqq5ruJiQHv9pKFl6sisZiRTmU5umyMV6
-	 5y/D8y9+nH/tgL9Zzp8ALotiaPDgASAI8NUwirGnKJt0rW0IFK0YFO4Kwq/4OiZeaA
-	 qpBlNBlePkfHmuyQURnujm3lufzjXc0b8jB0p/K4gDvjHb7mJ6JjrKq79aDQ2hjan6
-	 vDml3XCcwpnT15sp+GsYP8x5G92t4t4yFwKshaqoy+fQHo6AU+dXUug8XcyQd//w8l
-	 9Nt6JW399D6kA==
+	b=qcVBpCYWjV2xse6dJQSomMH+1tsEuVvo82gcrovtJCAgJJDeXu5vrEAro7enrzEhB
+	 DaxHZ0LdmShaUjawHJZMDqG1bXV0tmx4L5DZkVyFwzPAg0m+bv5fKBQKvlHMl88xDs
+	 X0bHKanr2bLut60x824nG+hHVBE/pMXERweo8wrFEZNRR7eW0jpLtumEYksHpL/wBs
+	 /5m5BvyGThfyHEVhFdRbdn8+vdrhOWgKyvSzJuMUCnFPE9oJooOmrKheKw40lTqJIp
+	 0KFxGE6yoUtIrHoPV9/b1L6A8yT8uANGcjgZNyzRziawi+WbznGyyN50gHxJio+67d
+	 zWINIa5JFDduQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Holger Dengler <dengler@linux.ibm.com>,
 	Harald Freudenberger <freude@linux.ibm.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 22/36] staging: rtl8723bs: core: Use new AES library API
-Date: Sun,  4 Jan 2026 21:12:55 -0800
-Message-ID: <20260105051311.1607207-23-ebiggers@kernel.org>
+Subject: [PATCH 23/36] crypto: arm/ghash - Use new AES library API
+Date: Sun,  4 Jan 2026 21:12:56 -0800
+Message-ID: <20260105051311.1607207-24-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260105051311.1607207-1-ebiggers@kernel.org>
 References: <20260105051311.1607207-1-ebiggers@kernel.org>
@@ -66,87 +66,47 @@ callers of the old aes_encrypt() have been updated.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- drivers/staging/rtl8723bs/core/rtw_security.c | 20 +++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ arch/arm/crypto/ghash-ce-glue.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/staging/rtl8723bs/core/rtw_security.c b/drivers/staging/rtl8723bs/core/rtw_security.c
-index 2f941ffbd465..79825324e70f 100644
---- a/drivers/staging/rtl8723bs/core/rtw_security.c
-+++ b/drivers/staging/rtl8723bs/core/rtw_security.c
-@@ -635,15 +635,15 @@ u32 rtw_tkip_decrypt(struct adapter *padapter, u8 *precvframe)
- /* Performs a 128 bit AES encrypt with  */
- /* 128 bit data.                        */
- /****************************************/
- static void aes128k128d(u8 *key, u8 *data, u8 *ciphertext)
- {
--	struct crypto_aes_ctx ctx;
-+	struct aes_enckey aes;
+diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
+index a52dcc8c1e33..9ab03bce352d 100644
+--- a/arch/arm/crypto/ghash-ce-glue.c
++++ b/arch/arm/crypto/ghash-ce-glue.c
+@@ -202,24 +202,28 @@ int pmull_gcm_dec_final(int bytes, u64 dg[], char *tag,
  
--	aes_expandkey(&ctx, key, 16);
--	aes_encrypt(&ctx, ciphertext, data);
--	memzero_explicit(&ctx, sizeof(ctx));
-+	aes_prepareenckey(&aes, key, 16);
-+	aes_encrypt_new(&aes, ciphertext, data);
-+	memzero_explicit(&aes, sizeof(aes));
- }
- 
- /************************************************/
- /* construct_mic_iv()                           */
- /* Builds the MIC IV from header fields and PN  */
-@@ -1404,17 +1404,17 @@ static void gf_mulx(u8 *pad)
-  * (SP) 800-38B.
-  */
- static int omac1_aes_128_vector(u8 *key, size_t num_elem,
- 				u8 *addr[], size_t *len, u8 *mac)
+ static int gcm_aes_setkey(struct crypto_aead *tfm, const u8 *inkey,
+ 			  unsigned int keylen)
  {
--	struct crypto_aes_ctx ctx;
-+	struct aes_enckey aes;
- 	u8 cbc[AES_BLOCK_SIZE], pad[AES_BLOCK_SIZE];
- 	u8 *pos, *end;
- 	size_t i, e, left, total_len;
+ 	struct gcm_key *ctx = crypto_aead_ctx(tfm);
+-	struct crypto_aes_ctx aes_ctx;
++	struct aes_enckey aes_key;
+ 	be128 h, k;
  	int ret;
  
--	ret = aes_expandkey(&ctx, key, 16);
-+	ret = aes_prepareenckey(&aes, key, 16);
+-	ret = aes_expandkey(&aes_ctx, inkey, keylen);
++	ret = aes_prepareenckey(&aes_key, inkey, keylen);
  	if (ret)
- 		return -1;
- 	memset(cbc, 0, AES_BLOCK_SIZE);
+ 		return -EINVAL;
  
- 	total_len = 0;
-@@ -1434,16 +1434,16 @@ static int omac1_aes_128_vector(u8 *key, size_t num_elem,
- 				pos = addr[e];
- 				end = pos + len[e];
- 			}
- 		}
- 		if (left > AES_BLOCK_SIZE)
--			aes_encrypt(&ctx, cbc, cbc);
-+			aes_encrypt_new(&aes, cbc, cbc);
- 		left -= AES_BLOCK_SIZE;
- 	}
+-	aes_encrypt(&aes_ctx, (u8 *)&k, (u8[AES_BLOCK_SIZE]){});
++	aes_encrypt_new(&aes_key, (u8 *)&k, (u8[AES_BLOCK_SIZE]){});
  
- 	memset(pad, 0, AES_BLOCK_SIZE);
--	aes_encrypt(&ctx, pad, pad);
-+	aes_encrypt_new(&aes, pad, pad);
- 	gf_mulx(pad);
+-	memcpy(ctx->rk, aes_ctx.key_enc, sizeof(ctx->rk));
++	/*
++	 * Note: this assumes that the arm implementation of the AES library
++	 * stores the standard round keys in k.rndkeys.
++	 */
++	memcpy(ctx->rk, aes_key.k.rndkeys, sizeof(ctx->rk));
+ 	ctx->rounds = 6 + keylen / 4;
  
- 	if (left || total_len == 0) {
- 		for (i = 0; i < left; i++) {
- 			cbc[i] ^= *pos++;
-@@ -1457,12 +1457,12 @@ static int omac1_aes_128_vector(u8 *key, size_t num_elem,
- 		gf_mulx(pad);
- 	}
+-	memzero_explicit(&aes_ctx, sizeof(aes_ctx));
++	memzero_explicit(&aes_key, sizeof(aes_key));
  
- 	for (i = 0; i < AES_BLOCK_SIZE; i++)
- 		pad[i] ^= cbc[i];
--	aes_encrypt(&ctx, pad, mac);
--	memzero_explicit(&ctx, sizeof(ctx));
-+	aes_encrypt_new(&aes, pad, mac);
-+	memzero_explicit(&aes, sizeof(aes));
- 	return 0;
- }
+ 	ghash_reflect(ctx->h[0], &k);
  
- /**
-  * omac1_aes_128 - One-Key CBC MAC (OMAC1) hash with AES-128 (aka AES-CMAC)
+ 	h = k;
+ 	gf128mul_lle(&h, &k);
 -- 
 2.52.0
 
