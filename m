@@ -1,47 +1,42 @@
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.9])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B332F2D8DC3
-	for <linux-crypto@vger.kernel.org>; Mon,  5 Jan 2026 20:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA5E3043D7
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Jan 2026 22:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767645739; cv=none; b=fPkLsxuQINV/tsG5OHocVU1Ifd3byQadh+RDaeH0vfl0G0CUi1cNbu4q2I7y9PLxCL437COuDXwB58oZGo5mpLJQlUMdMnxEV55Y2WAsHXLjIjOAk756EXKMTrE43Kq0yuc6c5kfTjq049i4TnIiBEpeWklxNJH6H1jWeRkIcz0=
+	t=1767651755; cv=none; b=KpsZUyqiOl01Q9HIq/LIoFvM5k2oHLd8TvkTU2WzHEXvtU64drBXvBMPAMp2XAZx7K610goGz1kOEhbFZgegAtkoszzSyBKvNWXlVavki/8SzTC1vY0iWrojlISuBNQeEyIH46BGGULS0N5rTuJmZ1EaZN3NoMPfpfuNT+IMhxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767645739; c=relaxed/simple;
-	bh=rZaKdT7REU/v1FQ0Q18s6fICKFuqwy+AacWHDVMQX5Q=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=bfZdbRfNL2PwEq0PZnYwzIx0c/xy8CGjcPV7dw4tTWY45ZAXx7tM8NHj05X3qkLtKI7Q9r35S9uy/H0Zxinc4AtuPYp0uxK3HgePYeVNg0iypaTPvpDGLDXWOB76LZpvpQ7MFGJnaU14fQ9hH+LLxppeK0xaPMHXaqFi/OXZLco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=dYSve3an; arc=none smtp.client-ip=212.77.101.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+	s=arc-20240116; t=1767651755; c=relaxed/simple;
+	bh=r5W9d40G5AuKgv87aPARsunwPDjNwkkKqA98+DDLtUM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LYkqC2FWKZZKMpZB3TfKADz+kPDCXlf7MyoPZvlSitiiTRKKrAcsrhxPW35O98HwxJIenWICy4xoXZnVlhDl9cPQXC7qUaH/nrAqgFt7HkfgBmqXKuuO+SrjQ7RahL0P2yBvKA8CXEiEyfWDhDiK5iC6wuICpU/pXoh9pBNntk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mEGZjqOu; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="dYSve3an"
-Received: (wp-smtpd smtp.wp.pl 13219 invoked from network); 5 Jan 2026 21:42:06 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1767645726; bh=Kb2XNoHQRT4LpxJhS8GdX9iYmZhFzAz/9dDLUJhtd98=;
-          h=From:To:Subject;
-          b=dYSve3ansBCww6paYg83InU6mb26Fll+dqqgTHS+h/rp8StMb685H+9hycHkftoZL
-           2tpVEr3toACar8xN9VbGBAc1K/ovzmHySzGqFU1UTD8K3tTzzpQ9BgBSurrxTUbAXH
-           Nj4YSgcRbtoq6m7LdSkti754hzMMnNI5UIqI3mTFtksHPpHoBV4cvvBk3BrkpLzRp6
-           ig9D5UkloMb0LTEjmZ6dS8K2VPK8sTiapg+ULNEPQ27aGO4EsbrfoRfWkrqhiotjYT
-           tJIvotzzgVQnsyZnL6VQNSYO18aHtAs+uFd6DME5Jf1WboqSdJVvU/29K1vS9XWYJh
-           Gq3huAvEmgWWA==
-Received: from 83.5.241.112.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.5.241.112])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <benjamin.larsson@genexis.eu>; 5 Jan 2026 21:42:06 +0100
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: benjamin.larsson@genexis.eu,
-	olivia@selenic.com,
-	herbert@gondor.apana.org.au,
-	olek2@wp.pl,
-	martin@kaiser.cx,
-	ansuelsmth@gmail.com,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mEGZjqOu"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767651741;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ucZqVZC4tj8BYD+s0sAKwmTXmnLha4jMjy2ZZhDmCao=;
+	b=mEGZjqOuVJgQORmP7Ya0eqATxgUajzQ4uagVGIDfV49jEp7rdls5LdLmjpgiJzrhPia4+u
+	HuepzugOFK9ISGlzOl5My0/YDN1BfaJc3iiXfw66pbZjzxSejacf7apghD3bTSp58zZE6z
+	xZin7lSLWbH5nmOSPTGOEKwa+VdIWh4=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] hwrng: airoha set rng quality to 900
-Date: Mon,  5 Jan 2026 21:41:49 +0100
-Message-ID: <20260105204204.2430571-1-olek2@wp.pl>
-X-Mailer: git-send-email 2.47.3
+Subject: [PATCH v2] crypto: ecc - Streamline alloc_point and remove {alloc,free}_digits_space
+Date: Mon,  5 Jan 2026 23:21:53 +0100
+Message-ID: <20260105222153.3249-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,63 +44,77 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-WP-MailID: ebf74c62ddf4bb8f02e4a410b70d961b
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 000000A [IVN0]                               
+X-Migadu-Flow: FLOW_OUT
 
-Airoha uses RAW mode to collect noise from the TRNG. These appear to
-be unprocessed oscillations from the tero loop. For this reason, they
-do not have a perfect distribution and entropy. Simple noise compression
-reduces its size by 9%, so setting the quality to 900 seems reasonable.
-The same value is used by the downstream driver.
+Check 'ndigits' before allocating 'struct ecc_point' to return early if
+needed. Inline the code from and remove ecc_alloc_digits_space() and
+ecc_free_digits_space(), respectively.
 
-Compare the size before and after compression:
-$ ls -l random_airoha*
--rw-r--r-- 1 aleksander aleksander 76546048 Jan  3 23:43 random_airoha
--rw-rw-r-- 1 aleksander aleksander 69783562 Jan  5 20:23 random_airoha.zip
-
-FIPS test results:
-$ cat random_airoha | rngtest -c 10000
-rngtest 2.6
-Copyright (c) 2004 by Henrique de Moraes Holschuh
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-rngtest: starting FIPS tests...
-rngtest: bits received from input: 200000032
-rngtest: FIPS 140-2 successes: 0
-rngtest: FIPS 140-2 failures: 10000
-rngtest: FIPS 140-2(2001-10-10) Monobit: 9957
-rngtest: FIPS 140-2(2001-10-10) Poker: 10000
-rngtest: FIPS 140-2(2001-10-10) Runs: 10000
-rngtest: FIPS 140-2(2001-10-10) Long run: 4249
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=953.674; avg=27698.935; max=19073.486)Mibits/s
-rngtest: FIPS tests speed: (min=59.791; avg=298.028; max=328.853)Mibits/s
-rngtest: Program run time: 647638 microseconds
-
-In general, these data look like real noise, but with lower entropy
-than expected.
-
-Fixes: e53ca8efcc5e ("hwrng: airoha - add support for Airoha EN7581 TRNG")
-Suggested-by: Benjamin Larsson <benjamin.larsson@genexis.eu>
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- drivers/char/hw_random/airoha-trng.c | 1 +
- 1 file changed, 1 insertion(+)
+Changes in v2:
+- Use kfree() instead of kfree_sensitive() as suggested by Stefan
+- Link to v1: https://lore.kernel.org/lkml/20251218212713.1616-2-thorsten.blum@linux.dev/
+---
+ crypto/ecc.c | 27 +++++++++------------------
+ 1 file changed, 9 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/char/hw_random/airoha-trng.c b/drivers/char/hw_random/airoha-trng.c
-index 1dbfa9505c21..9a648f6d9fd4 100644
---- a/drivers/char/hw_random/airoha-trng.c
-+++ b/drivers/char/hw_random/airoha-trng.c
-@@ -212,6 +212,7 @@ static int airoha_trng_probe(struct platform_device *pdev)
- 	trng->rng.init = airoha_trng_init;
- 	trng->rng.cleanup = airoha_trng_cleanup;
- 	trng->rng.read = airoha_trng_read;
-+	trng->rng.quality = 900;
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index 6cf9a945fc6c..2808b3d5f483 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -90,33 +90,24 @@ void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
+ }
+ EXPORT_SYMBOL(ecc_digits_from_bytes);
  
- 	ret = devm_hwrng_register(dev, &trng->rng);
- 	if (ret) {
+-static u64 *ecc_alloc_digits_space(unsigned int ndigits)
++struct ecc_point *ecc_alloc_point(unsigned int ndigits)
+ {
+-	size_t len = ndigits * sizeof(u64);
++	struct ecc_point *p;
++	size_t ndigits_sz;
+ 
+-	if (!len)
++	if (!ndigits)
+ 		return NULL;
+ 
+-	return kmalloc(len, GFP_KERNEL);
+-}
+-
+-static void ecc_free_digits_space(u64 *space)
+-{
+-	kfree_sensitive(space);
+-}
+-
+-struct ecc_point *ecc_alloc_point(unsigned int ndigits)
+-{
+-	struct ecc_point *p = kmalloc(sizeof(*p), GFP_KERNEL);
+-
++	p = kmalloc(sizeof(*p), GFP_KERNEL);
+ 	if (!p)
+ 		return NULL;
+ 
+-	p->x = ecc_alloc_digits_space(ndigits);
++	ndigits_sz = ndigits * sizeof(u64);
++	p->x = kmalloc(ndigits_sz, GFP_KERNEL);
+ 	if (!p->x)
+ 		goto err_alloc_x;
+ 
+-	p->y = ecc_alloc_digits_space(ndigits);
++	p->y = kmalloc(ndigits_sz, GFP_KERNEL);
+ 	if (!p->y)
+ 		goto err_alloc_y;
+ 
+@@ -125,7 +116,7 @@ struct ecc_point *ecc_alloc_point(unsigned int ndigits)
+ 	return p;
+ 
+ err_alloc_y:
+-	ecc_free_digits_space(p->x);
++	kfree(p->x);
+ err_alloc_x:
+ 	kfree(p);
+ 	return NULL;
 -- 
-2.47.3
+Thorsten Blum <thorsten.blum@linux.dev>
+GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
 
