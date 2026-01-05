@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888553271F9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA24932E125;
 	Mon,  5 Jan 2026 05:15:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767590110; cv=none; b=jwIYbC67ERDWIsA1yx6sScq8K7z/TJ4egzGx5qSkvZ9FYi5+AlM3dQ7shinO4eMRzZwvBayMEDBvJ9kyUKQ7CW3/GgoUrnxovLPjK84nXfLS7Vs8/mzDbmJyantXC9QJbMPwosAbiQTQnLlDonrwCoStJ9zKqg/3lrJipTHduX0=
+	t=1767590110; cv=none; b=OIOA7daTamRgv6fy5VhWGDC5gw6BJTeDff59+v0uDn4dMkx5VWZGuRHySrp6TnTQdEFwPlXA9SOR03YT9LGV6OYI0AXaU+iaJCU4RrkyZc30KLpMUdmxyxIVpiCGz0WdcwhPeLNNrKr1NdQMJtxVXkbuNoUqSx6DSybLSfpEMdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767590110; c=relaxed/simple;
-	bh=yGIaxcng6n8wc5xfXbnVvv5URGfOLLLe5pVyE1kX70M=;
+	bh=wJDXqC34yYbvhYsjXLh3aBT4XgX45/Dw2oMXNDtWJxs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FA57Guyjyn3oLCc+ndW3WBwY2ZU4yjksi31LkXPrdGyW6WklXwYonpi9uqJ8o+Rk2Y6cMuY9gl9kSCNoZI/eiyuvYH+EBy9YYAzoox4GBGARio2V69S6rT1c2UBnqSFiZPWUGd4xfoJt8Nq9Azz+S0WmXIwJkxOJk0VbWKmNmpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sz5LJlri; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Ca8TLvshx9IrN6ofLC5accSxlTQXDmHcdG5PMU69p5559ZUFpRqj2J6JdG0NhlE+jzBzMCi0H8VkhhU1FKqZMksbslyUuShylmYoWz54VsKcT3w9R4nLLoifB+RDghKnNVorKQ1c8gSp1H8SVAZujzXUjI0GNyTvkoNbPI+qCRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ugWHcdh9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sz5LJlri"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9725AC2BCB1;
-	Mon,  5 Jan 2026 05:15:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ugWHcdh9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32E8FC16AAE;
+	Mon,  5 Jan 2026 05:15:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1767590110;
-	bh=yGIaxcng6n8wc5xfXbnVvv5URGfOLLLe5pVyE1kX70M=;
+	bh=wJDXqC34yYbvhYsjXLh3aBT4XgX45/Dw2oMXNDtWJxs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Sz5LJlribQv/qfBDCLYmwt3t5BFepIAgZ+w2NFCILT7dQqvP11OqbP4JknllO5U/p
-	 zvrPcqKTAdIP5WrWqyq9uNWaOKUqiaE2t5Wgx1OP6gBFMSJzCtZZB3fArKOf1xSddd
-	 s8PN7gBLLRAsD6akgD9JFCEIKqnxr19DESAVlCbogsaYrOg927rcDJOAD6I7xkhBkI
-	 6eQ3kGXGhjCEe8C4inb9UFPS9xiw31VIZhuhxnVkAlxgtoPIRF0dfKBpI5ZpaJ3Fni
-	 aNnaTN97kLXT/sBs/c2kxNx/cYSdWsudxMQTDQ+hyc4zd/ZWoio003S7Fb4YQlEwXM
-	 2qbAn9B1d0diw==
+	b=ugWHcdh9H6hslbELP/jQ/VQWg2OOEnEpq/0dOSFZZZEme57Vm3GP3y/p2XJG0opYU
+	 n1fhH4gacjYDS+yJC/HYO2wpAbLsrEqTfS6Lku2oj2LNYuKriMPCaGuv76SbJI1hXP
+	 EgzM01ml3xAxLOBfVDnB+N3ALk3bOZaZS8q9E50zodYv6ZzmXuETAgi0QsyWt1noMF
+	 gqhTG8KhKYOIFzVmbjF0XCmfP4MTjihuoEnxAZXSotq6Bm0jxoMw/wtpNKyD3isWjo
+	 ASrD95sschq8Acya4r1tH0D2sej5xmER57xSb61zGzWVPy/WuaR3bROzCQU2MtI4dF
+	 KtK7n14G/QxeA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Holger Dengler <dengler@linux.ibm.com>,
 	Harald Freudenberger <freude@linux.ibm.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 29/36] crypto: drbg - Use new AES library API
-Date: Sun,  4 Jan 2026 21:13:02 -0800
-Message-ID: <20260105051311.1607207-30-ebiggers@kernel.org>
+Subject: [PATCH 30/36] crypto: inside-secure - Use new AES library API
+Date: Sun,  4 Jan 2026 21:13:03 -0800
+Message-ID: <20260105051311.1607207-31-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260105051311.1607207-1-ebiggers@kernel.org>
 References: <20260105051311.1607207-1-ebiggers@kernel.org>
@@ -61,245 +61,161 @@ eliminates the unnecessary computation and caching of the decryption
 round keys.  The new AES en/decryption functions are also much faster
 and use AES instructions when supported by the CPU.
 
+Note that this driver used crypto_aes_ctx::key_enc, but only to access
+the copy of the raw key that is stored at the beginning of the expanded
+key.  To eliminate the dependency on this field, instead just access the
+raw key directly, which is already available in the relevant functions.
+
 Note: aes_encrypt_new() will be renamed to aes_encrypt() once all
 callers of the old aes_encrypt() have been updated.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/df_sp80090a.c                | 30 ++++++++++-------------------
- crypto/drbg.c                       | 12 ++++++------
- drivers/crypto/xilinx/xilinx-trng.c |  8 ++++----
- include/crypto/df_sp80090a.h        |  2 +-
- 4 files changed, 21 insertions(+), 31 deletions(-)
+ .../crypto/inside-secure/safexcel_cipher.c    | 14 ++++-----
+ drivers/crypto/inside-secure/safexcel_hash.c  | 30 +++++++++----------
+ 2 files changed, 21 insertions(+), 23 deletions(-)
 
-diff --git a/crypto/df_sp80090a.c b/crypto/df_sp80090a.c
-index dc63b31a93fc..5686d37ebba2 100644
---- a/crypto/df_sp80090a.c
-+++ b/crypto/df_sp80090a.c
-@@ -12,31 +12,21 @@
- #include <linux/string.h>
- #include <crypto/aes.h>
- #include <crypto/df_sp80090a.h>
- #include <crypto/internal/drbg.h>
- 
--static void drbg_kcapi_symsetkey(struct crypto_aes_ctx *aesctx,
--				 const unsigned char *key,
--				 u8 keylen);
--static void drbg_kcapi_symsetkey(struct crypto_aes_ctx *aesctx,
--				 const unsigned char *key, u8 keylen)
--{
--	aes_expandkey(aesctx, key, keylen);
--}
--
--static void drbg_kcapi_sym(struct crypto_aes_ctx *aesctx,
--			   unsigned char *outval,
-+static void drbg_kcapi_sym(struct aes_enckey *aeskey, unsigned char *outval,
- 			   const struct drbg_string *in, u8 blocklen_bytes)
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 919e5a2cab95..eb4e0dc38b7f 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -2505,37 +2505,35 @@ static int safexcel_aead_gcm_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 				    unsigned int len)
  {
- 	/* there is only component in *in */
- 	BUG_ON(in->len < blocklen_bytes);
--	aes_encrypt(aesctx, outval, in->buf);
-+	aes_encrypt_new(aeskey, outval, in->buf);
- }
+ 	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
+ 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct safexcel_crypto_priv *priv = ctx->base.priv;
+-	struct crypto_aes_ctx aes;
++	struct aes_enckey aes;
+ 	u32 hashkey[AES_BLOCK_SIZE >> 2];
+ 	int ret, i;
  
- /* BCC function for CTR DRBG as defined in 10.4.3 */
+-	ret = aes_expandkey(&aes, key, len);
+-	if (ret) {
+-		memzero_explicit(&aes, sizeof(aes));
++	ret = aes_prepareenckey(&aes, key, len);
++	if (ret)
+ 		return ret;
+-	}
  
--static void drbg_ctr_bcc(struct crypto_aes_ctx *aesctx,
-+static void drbg_ctr_bcc(struct aes_enckey *aeskey,
- 			 unsigned char *out, const unsigned char *key,
- 			 struct list_head *in,
- 			 u8 blocklen_bytes,
- 			 u8 keylen)
- {
-@@ -45,30 +35,30 @@ static void drbg_ctr_bcc(struct crypto_aes_ctx *aesctx,
- 	short cnt = 0;
- 
- 	drbg_string_fill(&data, out, blocklen_bytes);
- 
- 	/* 10.4.3 step 2 / 4 */
--	drbg_kcapi_symsetkey(aesctx, key, keylen);
-+	aes_prepareenckey(aeskey, key, keylen);
- 	list_for_each_entry(curr, in, list) {
- 		const unsigned char *pos = curr->buf;
- 		size_t len = curr->len;
- 		/* 10.4.3 step 4.1 */
- 		while (len) {
- 			/* 10.4.3 step 4.2 */
- 			if (blocklen_bytes == cnt) {
- 				cnt = 0;
--				drbg_kcapi_sym(aesctx, out, &data, blocklen_bytes);
-+				drbg_kcapi_sym(aeskey, out, &data, blocklen_bytes);
+ 	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma) {
+ 		for (i = 0; i < len / sizeof(u32); i++) {
+-			if (le32_to_cpu(ctx->key[i]) != aes.key_enc[i]) {
++			if (ctx->key[i] != get_unaligned((__le32 *)key + i)) {
+ 				ctx->base.needs_inv = true;
+ 				break;
  			}
- 			out[cnt] ^= *pos;
- 			pos++;
- 			cnt++;
- 			len--;
  		}
  	}
- 	/* 10.4.3 step 4.2 for last block */
- 	if (cnt)
--		drbg_kcapi_sym(aesctx, out, &data, blocklen_bytes);
-+		drbg_kcapi_sym(aeskey, out, &data, blocklen_bytes);
- }
  
- /*
-  * scratchpad usage: drbg_ctr_update is interlinked with crypto_drbg_ctr_df
-  * (and drbg_ctr_bcc, but this function does not need any temporary buffers),
-@@ -108,11 +98,11 @@ static void drbg_ctr_bcc(struct crypto_aes_ctx *aesctx,
-  *			possibilities.
-  * refer to crypto_drbg_ctr_df_datalen() to get required length
-  */
+ 	for (i = 0; i < len / sizeof(u32); i++)
+-		ctx->key[i] = cpu_to_le32(aes.key_enc[i]);
++		ctx->key[i] = get_unaligned((__le32 *)key + i);
  
- /* Derivation Function for CTR DRBG as defined in 10.4.2 */
--int crypto_drbg_ctr_df(struct crypto_aes_ctx *aesctx,
-+int crypto_drbg_ctr_df(struct aes_enckey *aeskey,
- 		       unsigned char *df_data, size_t bytes_to_return,
- 		       struct list_head *seedlist,
- 		       u8 blocklen_bytes,
- 		       u8 statelen)
- {
-@@ -185,11 +175,11 @@ int crypto_drbg_ctr_df(struct crypto_aes_ctx *aesctx,
- 		 * holds zeros after allocation -- even the increment of i
- 		 * is irrelevant as the increment remains within length of i
- 		 */
- 		drbg_cpu_to_be32(i, iv);
- 		/* 10.4.2 step 9.2 -- BCC and concatenation with temp */
--		drbg_ctr_bcc(aesctx, temp + templen, K, &bcc_list,
-+		drbg_ctr_bcc(aeskey, temp + templen, K, &bcc_list,
- 			     blocklen_bytes, keylen);
- 		/* 10.4.2 step 9.3 */
- 		i++;
- 		templen += blocklen_bytes;
- 	}
-@@ -199,19 +189,19 @@ int crypto_drbg_ctr_df(struct crypto_aes_ctx *aesctx,
- 	drbg_string_fill(&cipherin, X, blocklen_bytes);
+ 	ctx->key_len = len;
  
- 	/* 10.4.2 step 12: overwriting of outval is implemented in next step */
+ 	/* Compute hash key by encrypting zeroes with cipher key */
+ 	memset(hashkey, 0, AES_BLOCK_SIZE);
+-	aes_encrypt(&aes, (u8 *)hashkey, (u8 *)hashkey);
++	aes_encrypt_new(&aes, (u8 *)hashkey, (u8 *)hashkey);
  
- 	/* 10.4.2 step 13 */
--	drbg_kcapi_symsetkey(aesctx, temp, keylen);
-+	aes_prepareenckey(aeskey, temp, keylen);
- 	while (generated_len < bytes_to_return) {
- 		short blocklen = 0;
- 		/*
- 		 * 10.4.2 step 13.1: the truncation of the key length is
- 		 * implicit as the key is only drbg_blocklen in size based on
- 		 * the implementation of the cipher function callback
- 		 */
--		drbg_kcapi_sym(aesctx, X, &cipherin, blocklen_bytes);
-+		drbg_kcapi_sym(aeskey, X, &cipherin, blocklen_bytes);
- 		blocklen = (blocklen_bytes <
- 				(bytes_to_return - generated_len)) ?
- 			    blocklen_bytes :
- 				(bytes_to_return - generated_len);
- 		/* 10.4.2 step 13.2 and 14 */
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 1d433dae9955..85cc4549bd58 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1503,13 +1503,13 @@ static int drbg_kcapi_hash(struct drbg_state *drbg, unsigned char *outval,
- #endif /* (CONFIG_CRYPTO_DRBG_HASH || CONFIG_CRYPTO_DRBG_HMAC) */
+ 	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma) {
+ 		for (i = 0; i < AES_BLOCK_SIZE / sizeof(u32); i++) {
+ 			if (be32_to_cpu(ctx->base.ipad.be[i]) != hashkey[i]) {
+ 				ctx->base.needs_inv = true;
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index ef0ba4832928..dae10d0066d7 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -28,11 +28,11 @@ struct safexcel_ahash_ctx {
+ 	bool cbcmac;
+ 	bool do_fallback;
+ 	bool fb_init_done;
+ 	bool fb_do_setkey;
  
- #ifdef CONFIG_CRYPTO_DRBG_CTR
- static int drbg_fini_sym_kernel(struct drbg_state *drbg)
- {
--	struct crypto_aes_ctx *aesctx =	(struct crypto_aes_ctx *)drbg->priv_data;
-+	struct aes_enckey *aeskey = drbg->priv_data;
- 
--	kfree(aesctx);
-+	kfree(aeskey);
- 	drbg->priv_data = NULL;
- 
- 	if (drbg->ctr_handle)
- 		crypto_free_skcipher(drbg->ctr_handle);
- 	drbg->ctr_handle = NULL;
-@@ -1524,20 +1524,20 @@ static int drbg_fini_sym_kernel(struct drbg_state *drbg)
- 	return 0;
- }
- 
- static int drbg_init_sym_kernel(struct drbg_state *drbg)
- {
--	struct crypto_aes_ctx *aesctx;
-+	struct aes_enckey *aeskey;
- 	struct crypto_skcipher *sk_tfm;
- 	struct skcipher_request *req;
- 	unsigned int alignmask;
- 	char ctr_name[CRYPTO_MAX_ALG_NAME];
- 
--	aesctx = kzalloc(sizeof(*aesctx), GFP_KERNEL);
--	if (!aesctx)
-+	aeskey = kzalloc(sizeof(*aeskey), GFP_KERNEL);
-+	if (!aeskey)
- 		return -ENOMEM;
--	drbg->priv_data = aesctx;
-+	drbg->priv_data = aeskey;
- 
- 	if (snprintf(ctr_name, CRYPTO_MAX_ALG_NAME, "ctr(%s)",
- 	    drbg->core->backend_cra_name) >= CRYPTO_MAX_ALG_NAME) {
- 		drbg_fini_sym_kernel(drbg);
- 		return -EINVAL;
-diff --git a/drivers/crypto/xilinx/xilinx-trng.c b/drivers/crypto/xilinx/xilinx-trng.c
-index db0fbb28ff32..5276ac2d82bb 100644
---- a/drivers/crypto/xilinx/xilinx-trng.c
-+++ b/drivers/crypto/xilinx/xilinx-trng.c
-@@ -58,11 +58,11 @@
- 
- struct xilinx_rng {
- 	void __iomem *rng_base;
- 	struct device *dev;
- 	unsigned char *scratchpadbuf;
--	struct crypto_aes_ctx *aesctx;
-+	struct aes_enckey *aeskey;
- 	struct mutex lock;	/* Protect access to TRNG device */
- 	struct hwrng trng;
+-	struct crypto_aes_ctx *aes;
++	struct aes_enckey *aes;
+ 	struct crypto_ahash *fback;
+ 	struct crypto_shash *shpre;
+ 	struct shash_desc *shdesc;
  };
  
- struct xilinx_rng_ctx {
-@@ -196,11 +196,11 @@ static int xtrng_reseed_internal(struct xilinx_rng *rng)
+@@ -820,11 +820,11 @@ static int safexcel_ahash_final(struct ahash_request *areq)
  
- 	/* collect random data to use it as entropy (input for DF) */
- 	ret = xtrng_collect_random_data(rng, entropy, TRNG_SEED_LEN_BYTES, true);
- 	if (ret != TRNG_SEED_LEN_BYTES)
- 		return -EINVAL;
--	ret = crypto_drbg_ctr_df(rng->aesctx, rng->scratchpadbuf,
-+	ret = crypto_drbg_ctr_df(rng->aeskey, rng->scratchpadbuf,
- 				 TRNG_SEED_LEN_BYTES, &seedlist, AES_BLOCK_SIZE,
- 				 TRNG_SEED_LEN_BYTES);
+ 			/* K3 */
+ 			result[i] = swab32(ctx->base.ipad.word[i + 4]);
+ 		}
+ 		areq->result[0] ^= 0x80;			// 10- padding
+-		aes_encrypt(ctx->aes, areq->result, areq->result);
++		aes_encrypt_new(ctx->aes, areq->result, areq->result);
+ 		return 0;
+ 	} else if (unlikely(req->hmac &&
+ 			    (req->len == req->block_sz) &&
+ 			    !areq->nbytes)) {
+ 		/*
+@@ -1974,27 +1974,27 @@ static int safexcel_xcbcmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+ {
+ 	struct safexcel_ahash_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
+ 	u32 key_tmp[3 * AES_BLOCK_SIZE / sizeof(u32)];
+ 	int ret, i;
+ 
+-	ret = aes_expandkey(ctx->aes, key, len);
++	ret = aes_prepareenckey(ctx->aes, key, len);
  	if (ret)
  		return ret;
  
-@@ -347,12 +347,12 @@ static int xtrng_probe(struct platform_device *pdev)
- 	if (IS_ERR(rng->rng_base)) {
- 		dev_err(&pdev->dev, "Failed to map resource %pe\n", rng->rng_base);
- 		return PTR_ERR(rng->rng_base);
- 	}
+ 	/* precompute the XCBC key material */
+-	aes_encrypt(ctx->aes, (u8 *)key_tmp + 2 * AES_BLOCK_SIZE,
+-		    "\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1");
+-	aes_encrypt(ctx->aes, (u8 *)key_tmp,
+-		    "\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2");
+-	aes_encrypt(ctx->aes, (u8 *)key_tmp + AES_BLOCK_SIZE,
+-		    "\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3");
++	aes_encrypt_new(ctx->aes, (u8 *)key_tmp + 2 * AES_BLOCK_SIZE,
++			"\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1");
++	aes_encrypt_new(ctx->aes, (u8 *)key_tmp,
++			"\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2\x2");
++	aes_encrypt_new(ctx->aes, (u8 *)key_tmp + AES_BLOCK_SIZE,
++			"\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3");
+ 	for (i = 0; i < 3 * AES_BLOCK_SIZE / sizeof(u32); i++)
+ 		ctx->base.ipad.word[i] = swab32(key_tmp[i]);
  
--	rng->aesctx = devm_kzalloc(&pdev->dev, sizeof(*rng->aesctx), GFP_KERNEL);
--	if (!rng->aesctx)
-+	rng->aeskey = devm_kzalloc(&pdev->dev, sizeof(*rng->aeskey), GFP_KERNEL);
-+	if (!rng->aeskey)
- 		return -ENOMEM;
+-	ret = aes_expandkey(ctx->aes,
+-			    (u8 *)key_tmp + 2 * AES_BLOCK_SIZE,
+-			    AES_MIN_KEY_SIZE);
++	ret = aes_prepareenckey(ctx->aes,
++				(u8 *)key_tmp + 2 * AES_BLOCK_SIZE,
++				AES_MIN_KEY_SIZE);
+ 	if (ret)
+ 		return ret;
  
- 	sb_size = crypto_drbg_ctr_df_datalen(TRNG_SEED_LEN_BYTES, AES_BLOCK_SIZE);
- 	rng->scratchpadbuf = devm_kzalloc(&pdev->dev, sb_size, GFP_KERNEL);
- 	if (!rng->scratchpadbuf) {
-diff --git a/include/crypto/df_sp80090a.h b/include/crypto/df_sp80090a.h
-index 6b25305fe611..cb5d6fe15d40 100644
---- a/include/crypto/df_sp80090a.h
-+++ b/include/crypto/df_sp80090a.h
-@@ -16,11 +16,11 @@ static inline int crypto_drbg_ctr_df_datalen(u8 statelen, u8 blocklen)
- 		blocklen +      /* pad */
- 		blocklen +      /* iv */
- 		statelen + blocklen;  /* temp */
- }
+ 	ctx->alg    = CONTEXT_CONTROL_CRYPTO_ALG_XCBC128;
+ 	ctx->key_sz = AES_MIN_KEY_SIZE + 2 * AES_BLOCK_SIZE;
+@@ -2060,21 +2060,21 @@ static int safexcel_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 	u64 _const[2];
+ 	u8 msb_mask, gfmask;
+ 	int ret, i;
  
--int crypto_drbg_ctr_df(struct crypto_aes_ctx *aes,
-+int crypto_drbg_ctr_df(struct aes_enckey *aes,
- 		       unsigned char *df_data,
- 		       size_t bytes_to_return,
- 		       struct list_head *seedlist,
- 		       u8 blocklen_bytes,
- 		       u8 statelen);
+ 	/* precompute the CMAC key material */
+-	ret = aes_expandkey(ctx->aes, key, len);
++	ret = aes_prepareenckey(ctx->aes, key, len);
+ 	if (ret)
+ 		return ret;
+ 
+ 	for (i = 0; i < len / sizeof(u32); i++)
+-		ctx->base.ipad.word[i + 8] = swab32(ctx->aes->key_enc[i]);
++		ctx->base.ipad.word[i + 8] = get_unaligned_be32(&key[4 * i]);
+ 
+ 	/* code below borrowed from crypto/cmac.c */
+ 	/* encrypt the zero block */
+ 	memset(consts, 0, AES_BLOCK_SIZE);
+-	aes_encrypt(ctx->aes, (u8 *)consts, (u8 *)consts);
++	aes_encrypt_new(ctx->aes, (u8 *)consts, (u8 *)consts);
+ 
+ 	gfmask = 0x87;
+ 	_const[0] = be64_to_cpu(consts[1]);
+ 	_const[1] = be64_to_cpu(consts[0]);
+ 
 -- 
 2.52.0
 
