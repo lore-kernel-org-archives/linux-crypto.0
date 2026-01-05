@@ -1,127 +1,140 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4670033F8DC;
-	Tue,  6 Jan 2026 13:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2242882A1
+	for <linux-crypto@vger.kernel.org>; Tue,  6 Jan 2026 14:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767706970; cv=none; b=nan2YvgWuHo+yv4i8XJ8l6jx85fvEeoySglS65ScfAWDo4HtPunSRp0BbQMWg3XJbeMXPaMM7MaHkckdGUTGOLaqVHCAZwAG80E4KgNwHEeV/0FfsYfTNHOWDnIMPWB4srMMIwOcHFmxnHouSfrox0XQfxchebAY66QAFqlou3A=
+	t=1767709424; cv=none; b=EFfFJS/aXHw9c3YFUKy7iSNzoQbM50Y2t1EjrMjb9RXKUwxnsCxqOr/EYITjHWGTMwLgqSxwopcVySStaSCEXRoVJkjJ4ea7naS9TDnYyZ+cmcqSoOoMVgzl5hzyqkF9dnyTzjA3NRAAtBiJw6JDCsdPiNYjwa/dxOOibmvLx9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767706970; c=relaxed/simple;
-	bh=/ypj9IGr9SpILRjmMB7Es04MpkJP3Q2y17MtgZNQWGQ=;
+	s=arc-20240116; t=1767709424; c=relaxed/simple;
+	bh=lVULV5GfaJFN2tASGfIP17U8gJhLLwXEwGtmS7IVzcI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rJVMND4Eu9aZfQdlJqeHJmxMUEHrb3HsRxQyRu/LtiPW6Lss+ILP5WGX2ZnLJ1fGZjf9MS35gBgSLtcdu33uluGLAFwdIYJg8vQ0KfDduOEFllBox0IdCZM/K4m5owTRXUEI7aNoEy+AZ2o4rEo2Xhju6YXiayrrxKGWbaexexk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZuoNGfi5; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=A9xRmbeWp63zsbHMf0Klj07UzmQ41Xo+xPqyq/7+kM1QSykab7o8lf0+Ld1nDd9JU5rVQ2MHe5I/4ZLJ4lBxEiIfXj1laxLp3wHMyd3mdzCVZMaV5BG/+b8BnVQXwmWauiCwUV51Tjcb31BTvLwtQSP+YZ5CZAYWbcMhr1OclZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KgQ2TVFX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZuoNGfi5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767706970; x=1799242970;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/ypj9IGr9SpILRjmMB7Es04MpkJP3Q2y17MtgZNQWGQ=;
-  b=ZuoNGfi5frsJLrbz9EXqGut8sTFMizDVHbpI+eJF/1osnsF3R/1+tuDJ
-   cBNQKnll/o9z5YECKrn/CJCVlS3DRmMThouSN12YS1K3T/tCPL31NKeU/
-   M2zkZMrqpwFd1Hw78yw7Fa6b8Ln7CbLWWUzn6ndxIq++RqcXpFZgd2cEW
-   a6OhfuiWa79qYd70sY0C+l/WNFkPbBiO8uZe4miYM76dQWacp5FbObTLL
-   HmIhAd6AELg6z1BrxSxboFhqv2+oqxjOaCOy9cBiUaxJZujfGzYvwIHd6
-   3l4XZEPKmHBZ9SV4cuEAjPGj0t786OBwNjowphFCFapkVOp8WKVZC1gHT
-   g==;
-X-CSE-ConnectionGUID: XnAc8mLMT0amZoedL8zoAw==
-X-CSE-MsgGUID: b9a+JfN5RNS0JojDG86dDw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11663"; a="79375096"
-X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="79375096"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 05:42:49 -0800
-X-CSE-ConnectionGUID: 2XRiPS6RSOidjwAP96ISog==
-X-CSE-MsgGUID: PaBKRFjjSvCwPVhjPh6Ueg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="240150728"
-Received: from igk-lkp-server01.igk.intel.com (HELO 92b2e8bd97aa) ([10.211.93.152])
-  by orviesa001.jf.intel.com with ESMTP; 06 Jan 2026 05:42:46 -0800
-Received: from kbuild by 92b2e8bd97aa with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vd7Kd-000000001J7-1lTF;
-	Tue, 06 Jan 2026 13:42:43 +0000
-Date: Tue, 6 Jan 2026 14:42:34 +0100
-From: kernel test robot <lkp@intel.com>
-To: "Mario Limonciello (AMD)" <superm1@kernel.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KgQ2TVFX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767709421;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0OqzwyCKSkjy5BfIhkLbUQnq0t0kB+MbQfPUkbaaRNY=;
+	b=KgQ2TVFXG9XBymsZDrHLteM6kvW3U4AEtbf7D9dyRV3tA9Up+eWZIRIzqSH6rMWbgn2NBd
+	fUhkxeqVmU/rqC8Xo2oyGuItSv94wcZnVC1trW7x5Mz0OK/E7oU1AZA6xFIKUKWyGuGxwe
+	MEgWW8zlNkyPU2uG7aYMPLV2hDGmXwQ=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-119-bni8fjkMOieXIdoRKDxuwg-1; Tue,
+ 06 Jan 2026 09:23:39 -0500
+X-MC-Unique: bni8fjkMOieXIdoRKDxuwg-1
+X-Mimecast-MFC-AGG-ID: bni8fjkMOieXIdoRKDxuwg_1767709416
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 343971955F3E;
+	Tue,  6 Jan 2026 14:23:32 +0000 (UTC)
+Received: from localhost (unknown [10.2.16.158])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DB52419560AB;
+	Tue,  6 Jan 2026 14:23:29 +0000 (UTC)
+Date: Mon, 5 Jan 2026 13:19:39 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Rijo Thomas <Rijo-john.Thomas@amd.com>
-Cc: oe-kbuild-all@lists.linux.dev, John Allen <john.allen@amd.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Hans de Goede <hansg@kernel.org>,
-	"(open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER)" <linux-crypto@vger.kernel.org>,
-	platform-driver-x86@vger.kernel.org,
-	Lars Francke <lars.francke@gmail.com>,
-	Yijun Shen <Yijun.Shen@dell.com>,
-	"Mario Limonciello (AMD)" <superm1@kernel.org>
-Subject: Re: [PATCH v4 3/5] crypto: ccp - Add an S4 restore flow
-Message-ID: <202601061453.8zskdbs5-lkp@intel.com>
-References: <20260106045423.55190-4-superm1@kernel.org>
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 10/15] virtio_scsi: fix DMA cacheline issues for events
+Message-ID: <20260105181939.GA59391@fedora>
+References: <cover.1767601130.git.mst@redhat.com>
+ <8801aeef7576a155299f19b6887682dd3a272aba.1767601130.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="TgzbTybhuc4Vbyp1"
+Content-Disposition: inline
+In-Reply-To: <8801aeef7576a155299f19b6887682dd3a272aba.1767601130.git.mst@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+
+
+--TgzbTybhuc4Vbyp1
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260106045423.55190-4-superm1@kernel.org>
+Content-Transfer-Encoding: quoted-printable
 
-Hi Mario,
+On Mon, Jan 05, 2026 at 03:23:29AM -0500, Michael S. Tsirkin wrote:
+> @@ -61,7 +62,7 @@ struct virtio_scsi_cmd {
+> =20
+>  struct virtio_scsi_event_node {
+>  	struct virtio_scsi *vscsi;
+> -	struct virtio_scsi_event event;
+> +	struct virtio_scsi_event *event;
+>  	struct work_struct work;
+>  };
+> =20
+> @@ -89,6 +90,11 @@ struct virtio_scsi {
+> =20
+>  	struct virtio_scsi_vq ctrl_vq;
+>  	struct virtio_scsi_vq event_vq;
+> +
+> +	__dma_from_device_group_begin();
+> +	struct virtio_scsi_event events[VIRTIO_SCSI_EVENT_LEN];
+> +	__dma_from_device_group_end();
 
-kernel test robot noticed the following build warnings:
+If the device emits two events in rapid succession, could the CPU see
+stale data for the second event because it already holds the cache line
+for reading the first event?
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master linus/master v6.16-rc1 next-20260106]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+In other words, it's not obvious to me that the DMA warnings are indeed
+spurious and should be silenced here.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mario-Limonciello-AMD/platform-x86-amd-pmf-Prevent-TEE-errors-after-hibernate/20260106-130236
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20260106045423.55190-4-superm1%40kernel.org
-patch subject: [PATCH v4 3/5] crypto: ccp - Add an S4 restore flow
-config: x86_64-rhel-9.4-kunit (https://download.01.org/0day-ci/archive/20260106/202601061453.8zskdbs5-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260106/202601061453.8zskdbs5-lkp@intel.com/reproduce)
+It seems safer and simpler to align and pad the struct virtio_scsi_event
+field in struct virtio_scsi_event_node rather than packing these structs
+into a single array here they might share cache lines.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601061453.8zskdbs5-lkp@intel.com/
+Stefan
 
-All warnings (new ones prefixed by >>):
+--TgzbTybhuc4Vbyp1
+Content-Type: application/pgp-signature; name=signature.asc
 
-   drivers/crypto/ccp/psp-dev.c: In function 'psp_restore':
->> drivers/crypto/ccp/psp-dev.c:357:13: warning: variable 'ret' set but not used [-Wunused-but-set-variable]
-     357 |         int ret = 0;
-         |             ^~~
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmlcALoACgkQnKSrs4Gr
+c8hxKAgAntRCUOkAR5sJ85qdfsRgS5doxT9/NXPvgLJJuioZ7uhZ5gZoJlDI03Jd
+hAhz7RZQq0egV90TXQcX+aVTCMEoVFBZs9myLPSn3+P2aJI58FiFGQtA0EmzWkA5
+sjTyB+Fn5GvsA5yoatFgYoqr0Fc6xPDTWWkgqMkg2nmMjdbnR9taetiYfcW8FdHu
+eZmLE0d8xc2KhR/HMfz11L+fk1oXF94bZyqM98sOXkzqWgXK0vyd4UK/atflMQMv
+QInPClb3ErPbr27EQixAwC6yR40bvPArKxVFbJEYWYm1uP4fprxUVZD6VfmeTMZZ
+vJCcbmW4I0BK/ICRg+hCVzw3tAAmjg==
+=RvL+
+-----END PGP SIGNATURE-----
 
-vim +/ret +357 drivers/crypto/ccp/psp-dev.c
+--TgzbTybhuc4Vbyp1--
 
-   353	
-   354	int psp_restore(struct sp_device *sp)
-   355	{
-   356		struct psp_device *psp = sp->psp_data;
- > 357		int ret = 0;
-   358	
-   359		if (psp->tee_data)
-   360			ret = tee_restore(psp);
-   361	
-   362		return 0;
-   363	}
-   364	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
