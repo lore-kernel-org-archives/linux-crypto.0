@@ -1,188 +1,189 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011060.outbound.protection.outlook.com [40.107.208.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D051D332EB7
-	for <linux-crypto@vger.kernel.org>; Mon,  5 Jan 2026 15:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767626580; cv=none; b=pPdPLOaW4gOO0mp/2Dcly4SAAtvfQPxh3TucUTa7UeU7E6rhJrqLZq+cHFstJRntyVyz2tz0vx1a7o4BhbDVT8uM+kDR4xvxEwR93BcoxRKNdl8uloVpErHpIcSRucNAerijKufIFm+4CiDo7qNpsDCJgRniS/4SPqMdSp2qdM0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767626580; c=relaxed/simple;
-	bh=dbX9nHJ5REzRp8QaFOHK2ee2n38HwBnQPeTWNbT3JoQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J/tCTvWKKSa5ARVQG2wTHK2VPT6Jc5pIFiOpqPjhG2/7r4sTjuXmuwfWfousLsL3WpX8LVjWF8zOwvpK6lTNcPktQ+vjh+K1eAtYFqL6agEshBzx4ZSdqgssa5C1WPeDaWCQKmSGj2A4ScgWBjGN7Qtc0oCT+w5elMczPj7w9Pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JjV32HBU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E361E5B88;
+	Mon,  5 Jan 2026 15:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767627630; cv=fail; b=Sv2ckUa1g/osTKbvE53WrF7Y7KXHVQAplWzI9JlyeuwEjkPoSHjGO/dF3ywd+o4Taz09QdiY6ZF9w1uNOUwrvn84k2AAeqi1h7mppFP7H1NuVVb19bwWJNE9U5bec1OIuRN+n09dd8ZzsNEntlX14sTeNUqHtYxQh6O2AAspzJg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767627630; c=relaxed/simple;
+	bh=8M/oqfH0zPJ0o/KmqXOvo8ZRHJvoDqPvZv8zVzxlPRw=;
+	h=Message-ID:Date:To:Cc:References:Subject:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=LZ2ZHI8cEpWwtoL87AaSC5iGHLUuSzKhNJOluxAEohiMSFAnvfziNv8gMPh+HUSrd6MwZ9meCbTSHXEflSDLTGmYD6VLHPA/dIFptgusNywVKr0GL53OSxbTa809zv0pv5Cq5G1Wj04HPfpK7GL87tnbvxbumHGPwIosDQINwhc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=citrix.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=Gy7TVWzG; arc=fail smtp.client-ip=40.107.208.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=citrix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JjV32HBU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767626577;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e9kgzsLwkkfNxmetAJNcral3H3dTIGoaCL0v9z96wpg=;
-	b=JjV32HBUh39x0lUNBzv4Vxqd0r4LQTpmtLvYXvqFKT658p1u+n26MEfp6xSS/o+fCYI1jw
-	LbQ4kizhPdgUfqkdD91y8de8zhXjWlEf2vbmITyWodgmmyP0Twxz20E2FCftI8rEGNgINx
-	U6aGJcip5tgZISBKOetRcAy1gqc90JQ=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-26-KQWT_SDsNDmINssT8d_tdA-1; Mon,
- 05 Jan 2026 10:22:50 -0500
-X-MC-Unique: KQWT_SDsNDmINssT8d_tdA-1
-X-Mimecast-MFC-AGG-ID: KQWT_SDsNDmINssT8d_tdA_1767626568
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 90468195609D;
-	Mon,  5 Jan 2026 15:22:48 +0000 (UTC)
-Received: from warthog.procyon.org.uk.com (unknown [10.42.28.4])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AE50419560AB;
-	Mon,  5 Jan 2026 15:22:44 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>
-Cc: David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>,
-	linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v11 8/8] modsign: Enable RSASSA-PSS module signing
-Date: Mon,  5 Jan 2026 15:21:33 +0000
-Message-ID: <20260105152145.1801972-9-dhowells@redhat.com>
-In-Reply-To: <20260105152145.1801972-1-dhowells@redhat.com>
-References: <20260105152145.1801972-1-dhowells@redhat.com>
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Gy7TVWzG"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=f0xDPFJA+gkPK0NGVT8mkux7honSQr78A2FVu+0AmpxVmaBaEn1RPeimeATcdDkQrfPuyY8wWqLZ7DhH5wfVUz9E7y7IIUmGgDgLwB7Tpx94GKqydM7nkg4VInG7DJmHGsHee2212VMpui4rWs5jKuejnNi/8EWO4TD4TiGdb3MfsRlSvbs8lUHJK6+BtCIyR5HV/+yi+/mLVaBJQCzr0oyTo/9KcqhMViZ1q0tFX1ZCpfknsczId2VCwZGH2sma4xNfeW+gmV9/fp0lNtrcof5gCvLlD5ofQSoiOUk9gSWUytCLVbW3tbuoiHvkVVYn+LiScBjD9AZ6etPVRglccg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K/SyEFboBJRMVI1zenrCqgDw4qYn0/JfuIpdzYy39LA=;
+ b=QhooKH0JPyuRbeETE2jNMFFx6pyuxC/pcH5+VBo8az5gtXV8Sg5nlp7PJy8zQSYjrVhqTfRK1bYluOWPZZCofmiYW2cRy8s+WORDhA2B2VIPxucRfik8oCDo1sNh6SLRvtb4JkDwzVUWOpVYCN0yrwVJhiOMC5ABFKDOMtQEQbGe/9dBL+Ke0kd0bXjxPOoyfBGVNHrZ1RwNf3DF4kInxkJcy8SGfCPhrVsJxfPdpOSS/3QeYz2oN+gXetSHhuKaRucMkfdLXUowprZfFKsXT/qDK1Rj08JozKphd4hDWfNxLulZdIiiEQd88H98yoCc9fowWqfE6DowXlNkLTp0ig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
+ dkim=pass header.d=citrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=citrix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K/SyEFboBJRMVI1zenrCqgDw4qYn0/JfuIpdzYy39LA=;
+ b=Gy7TVWzGQWZkXXUV5/o8XHxG/tSFfcQ2n0AGjpb8JpIsuihxu2rV5ZMuFfazTmcEgNaSaCewjiDfYMX6BM1DYg2SnrYrnHlZRyd32EDZDx6Y/u2XBqz1gLD5/YMtkA0ps5q4H/q4MA8XxFj6oP8ziC83Jjf5zgO+Werx9XW7bHw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=citrix.com;
+Received: from CH8PR03MB8275.namprd03.prod.outlook.com (2603:10b6:610:2b9::7)
+ by PH8PR03MB989118.namprd03.prod.outlook.com (2603:10b6:510:3a9::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.4; Mon, 5 Jan
+ 2026 15:40:27 +0000
+Received: from CH8PR03MB8275.namprd03.prod.outlook.com
+ ([fe80::a70d:dc32:bba8:ce37]) by CH8PR03MB8275.namprd03.prod.outlook.com
+ ([fe80::a70d:dc32:bba8:ce37%4]) with mapi id 15.20.9478.004; Mon, 5 Jan 2026
+ 15:40:26 +0000
+Message-ID: <859377de-cb72-4e87-8ee5-97f8c58a5720@citrix.com>
+Date: Mon, 5 Jan 2026 15:40:22 +0000
+User-Agent: Mozilla Thunderbird
+To: ebiggers@kernel.org
+Cc: Andrew Cooper <andrew.cooper3@citrix.com>, Jason@zx2c4.com,
+ ardb@kernel.org, dengler@linux.ibm.com, freude@linux.ibm.com,
+ herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org, x86@kernel.org
+References: <20260105051311.1607207-20-ebiggers@kernel.org>
+Subject: Re: [PATCH 19/36] Bluetooth: SMP: Use new AES library API
+Content-Language: en-GB
+From: Andrew Cooper <andrew.cooper3@citrix.com>
+In-Reply-To: <20260105051311.1607207-20-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO4P123CA0594.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:295::23) To IA1PR03MB8288.namprd03.prod.outlook.com
+ (2603:10b6:208:59e::6)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH8PR03MB8275:EE_|PH8PR03MB989118:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6f0b81cd-66ac-4829-82a1-08de4c70bf4a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZGNHT1dZRmJQeDloNFRxNE9LRWxORUdNcDRidWhEQ3dGdkNMR3Vtb01YZnF0?=
+ =?utf-8?B?OTd0emxWSG5OckhWRVNCSXF1c3pGZjU2UmhQakNDeHYydXVWY09nVjc2VlRT?=
+ =?utf-8?B?cldsZndaTmg1bjlTSkRIb0hMMy9yOWtYSjgrK3V1cFdQRGtTRCt1M2hpbzN3?=
+ =?utf-8?B?Vy91SzFDNmJobHJoclFNM240bDEzUmtFRFpiR000UTkxWDc1blpVQm1EUlNV?=
+ =?utf-8?B?UzAxRGt2d2FnYmhvVm5lQ1Fhdm00ODByTkE3SjRHbkhhYWhmSUNEaEFXVFRL?=
+ =?utf-8?B?NUlIUmRZM0tJbElsQ3p6Z21xL3plbFZ1V3RPRG53ZVlxR0ZFNlhFTzZXMjFD?=
+ =?utf-8?B?Z00vc0xaWjVwNGltcjVuYWtQbnp3UmlCeWhNSmtIWU1jM01rMml6bzFMaEs1?=
+ =?utf-8?B?Tk5NYldaVU1vbHl2RFl5bzJOakZJblZ2K2MvZzNZeDNXajZ1TUZLSXJLNFQy?=
+ =?utf-8?B?eXZWaklKUjdNOUpxSjRSZDlIZ2JiVFVzVFJSOW1WK2dsQWl0QVhlVkI0YXpa?=
+ =?utf-8?B?K21zQjlnUkVNQlI0MHIzRGl6YlJSaU5RZStRRGQ3SnJkcnJnRVl3cTlzT2RJ?=
+ =?utf-8?B?VFZJcFlFWTUzQVd2eUl5TktCUzVwTE5CSU9uMU92YTlMaXlTYjdiTnMvVVdh?=
+ =?utf-8?B?R3pMQ1lrcUQ5K05LZDMwUVlZQnE1bjFEeElRQzhLd3NTTkl4eEtQb1hDamk0?=
+ =?utf-8?B?dS9zcEFxVjk0WWIrUGt5Tnc1NmhocHZaVlpuRnIvei9CK09zcy8vNGFHWGI5?=
+ =?utf-8?B?NnlnR1JubWhXSWxsVWpUS1NYbTlKckhFaFFvZU5QWW1WNnI2WmpWNHpEVHVS?=
+ =?utf-8?B?N3N6VmxvNmFtT055TmRWdVJxUEdBTHNHb05uUFdDRkIxc0JYUUI4aTdRZHRX?=
+ =?utf-8?B?WGV4Z2gwbWRHNGRENTBuNGNMTm92YUI3eTh0eGVpK2Y0YVNsQ212UDV3eFAw?=
+ =?utf-8?B?akZBYkd4N1V0QnRvcCtsZkthUzZwZDBVaDNOeXNnK0p1WFJ6Z2JZZFdYZ0Zs?=
+ =?utf-8?B?RXJoenNBNElxdlRya2hPUkJJZzg2REhLeElZRmVIQ25hU05YQ29TWTM1TkV2?=
+ =?utf-8?B?d3RGTE9SWGduSGN1VlE2M0w3dW40TU5XNGNHSGdpVEV0K1dDMDVZS0dSbVFF?=
+ =?utf-8?B?TXZVM2QwUlBUMmpodWxPdEo2aU11MGFibkdObVhCMTArS3didTlXV2s3bGdi?=
+ =?utf-8?B?TVhRSzlpSnVGMDVLcFJYcUJ3WHoya01VaWx3NFFMazV5ODFzcVFLS1RvSEMv?=
+ =?utf-8?B?c3drVjZsRmlJbnJaN2dtdVhidmovYjVQNUxPMThzdmNweHp0QTB5K3VScnVI?=
+ =?utf-8?B?VTcvMlJDSS9wTDBKbXNGT3VCZkJwYUhFbkUxa3dMQVJGdnhBZVlicU8rdUd0?=
+ =?utf-8?B?S0FtOVBESzlVSXpYYkw0c1VmaWNzenU1cXhJc25YN2lWYWttbWRBMjJLTlQ1?=
+ =?utf-8?B?ZnAveGVFZDNwV0xxVGJrUmNVWFpObXIxTnZsTFNONDhXenZJUGp3L2pGbGxl?=
+ =?utf-8?B?UE5BcENoaE5XcnBKaXFyNzAzTW05T1BJTWxaL1RqODZ2NVdtOE1LdWhqb1p4?=
+ =?utf-8?B?ZHFxTDU0QkwzdUE5aVMvcjNHYzRaZjZZOUo4MnFrbEttcDhpaThhanRrMzFM?=
+ =?utf-8?B?RW9WNlcvZmZTbjhpWkE3WHNLcGFITGFXYVYxTjN5NXdaeG9yNUFGOEVqTy96?=
+ =?utf-8?B?VHArSVNPMmpXU1dnaEtoWHArVk04bjBpc2hqaXB3WVV5ZHlWZjhweHlHSDZx?=
+ =?utf-8?B?dCtHVFVZOC9VcVp3L2J2NWdlNTV1NU1xVnFtUUZlZ2NoeTMwbG1XN1F0bXVG?=
+ =?utf-8?B?QzdaSEQ3VW1ZU2huQ21lTzVMNmY2c1dlNXVZYUlLcTNiYTYrNWVMbWM0ZXpx?=
+ =?utf-8?B?THFxa1ExcllDQk9VdmZYL1ppVjV3SE1Ga3lqVjJBWkdWYXNYRTU5UGJUbnRP?=
+ =?utf-8?Q?waZAuU/QC9qktBZpMPwquqw/EEZ5P/hN?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH8PR03MB8275.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?V2FRT3k4M2l3Rm00R1psTkZBem8zZUJESmxRYnlhN1o1WFNrK0s0d1Y4MUJ1?=
+ =?utf-8?B?QVdZZUJKa1d5R2tOMUE2L3JyT3MyUUE3WitaRVhOR09ZTlJSNm1CdEpVN2w3?=
+ =?utf-8?B?N2pKMzcxSnZWV2xQVmNXL2VXMkpxK2JESERZZ3lqK294aWhpd25qMTJEek1I?=
+ =?utf-8?B?bjZvR1JjN0lFOWR3MkVPbXB3RTJCSkhuOVhuK3l3eXNSaW9HU2FPblhCb2Ni?=
+ =?utf-8?B?TllobWRkekRqS29RN0dVdXhzQ1p6NjZRZVR6UmR0ZjVNcTdudFk4YjdzTWRj?=
+ =?utf-8?B?dG05YlQyVndPVzV5ZEdUamhEY214Qm8ycHVoU3dCSFZQVWxTaW85S3I3YVg4?=
+ =?utf-8?B?OHNHb2Z6TDRxbmZDNWZ3QlRVU2pvTnk1MWkzRmtJQnRoZWw3TzM1RE16elhP?=
+ =?utf-8?B?dmhabkdpVWp4cmZpQTNFT2tadk9oL2FnV2tUc0duVzc4dFB4VUxHK0xPLzVU?=
+ =?utf-8?B?dUNhcUlMN1Zhc2YyUVkyK2VqNGQ3alB2YndxdmF6R2JNdUNxZ2llaW1rZmJi?=
+ =?utf-8?B?UGlrZ21WMmtjNGFXNzNrS0VDK0E2cERma0JHMXQ3NDdFVXdBd1NBYlNxbk0x?=
+ =?utf-8?B?eXpHa2hQcTY2MGZBNWpSeHVzZ0p2UmppSnllbjBDeWwwd1ZhN3Zjd3kzQ1Z1?=
+ =?utf-8?B?Nm9jLzdLZUlLQVBMV0dtUXcrMWJzK21jL2tWUm5GVGJvdGF1SEFZUXZjNDZ2?=
+ =?utf-8?B?Z2JIaXR3K1MzR3pYMk83SFAzbWN5dlJuK2ZxRXBrWmIrek5QQ3ZYTlBlcXAw?=
+ =?utf-8?B?ZWlQR0ljT2RQbFF2cUFQdUdpOTE5eTlQU3M2T0F3dlRUVXA3akJKMmV5T2FE?=
+ =?utf-8?B?WmRrVWo3TGhOUkNHRkxCeWd2YXIrWGlWSzlYVnRISkFMNkhsZDJhSVh5U3kv?=
+ =?utf-8?B?c0M1RXZNY0gwL0ZLd1gvNjUvc0pJV3BwcXF6djYzbEQ4eWdtQjRrb0lKd1Ny?=
+ =?utf-8?B?dDZEbThBZGI1eFBxYVlsSjJJeWdZOTZVVTdJd1VxZ1dQK01jekJZRUxlMlNk?=
+ =?utf-8?B?NVdhSi9tYjdXNkN6SERqYjZVdTBsMkM1WUJWRFl3OTU5bEk2QUN4VWQvaXpn?=
+ =?utf-8?B?N1ZPUzN1dlA0MFdlSGRyQlNPcHMzNG81TVhwSjd6czduRndLb1M5eURMT3By?=
+ =?utf-8?B?eTRwR2dNUG5zYkJMeUs0ejRRZlUzbVEyS3JoVEViTU5FakZOVVh0elJmd3hQ?=
+ =?utf-8?B?N2R1MlNZRFBYYVhkT1NoanBjYS80SjFLS09lamVyNEg0K1dDd0pPTHdHNDNY?=
+ =?utf-8?B?RkhVQ2xVTlhWMjdrMFhCK0h4Y0lSQlQxM1JJM3hIMXVpeFh6MXZsSkJGS3Yz?=
+ =?utf-8?B?ZlNHbUVEOHk0aFJSMmJRS1VDWkFscjhONHBzYUg3dFZGYmJsaWtxTjdBbzMv?=
+ =?utf-8?B?eWgvbkltVFFCd0NFY0lzWDRSbkFxRkdiM1hpTWlOdzMvWnJnTG9oLzVDYXB4?=
+ =?utf-8?B?b1JRNFduaFY0aTBXbTlmRFJJUTFJNGttWTJwYk4zQ3N4RzVacEx6NzJUZlA4?=
+ =?utf-8?B?WndIQkdWOEhUTjJzdStKR3lxbXhYaGM3U1FCZjdDaS8xNEhVcmo2cG9sNmhh?=
+ =?utf-8?B?VnFEVyt6ZHZpWVpINlZVaXZkcUlNNkIxYjFZdzZndjNaeVd2bDVMWTc3b1Rn?=
+ =?utf-8?B?ZTJTR1RHVE5MSHczRzFyUWowYXB4WEh6cTkraEI3ZUt1S0ZOamJsNVpxZzRE?=
+ =?utf-8?B?QUdHanJIcFMzdDVEa3dlRm5JeUkzQUxXUjdxNnV6NWo0R3IyY0ZodFR2eWhJ?=
+ =?utf-8?B?aWJwN2dDUHh6bkxPcGs3RkxmZlVYY3Z0c29pR2pCU0JFZWdHcDROcjhPb1lJ?=
+ =?utf-8?B?K0hrZDN0cHo4aC9LVVFMaXIrQTg2dGhIY2Voa2wwV090TWp2UVk5Ly9CTTV4?=
+ =?utf-8?B?N1gvcjZwVG96ZnpKWjJHRFhvQkFqYWE5eHVWai9jdm5tSVJmdUlTRm5lRHRB?=
+ =?utf-8?B?SFBGWCswNTdIbkczQXR5RTYxbUJKc0RLMGZ2bXA1azFidldOTWkzUm82UC8x?=
+ =?utf-8?B?ZnErbFF0NWtWSnZ2TUs1K09pcFZnNitEWWQ2ZkJ5U29RdS93N2NnY292UXFM?=
+ =?utf-8?B?TFZ5NFVDc0ZTc3lnY2tQc2s4WWFvTnVJaDJ6SDNReHVpZmVUMkpDRmhnMVF3?=
+ =?utf-8?B?dGdrU0pNb2UyUXNiK3dEVWVsSUM2UUdER0dZV2g2enY2aGVlTDZvd3RaNjZF?=
+ =?utf-8?B?QUFXYnZZY2V2WEFxekNqN0NyNCsxNkpiYjdJblZvekRnV2pQVmlFODZacC9J?=
+ =?utf-8?B?ZnhTTDBrekJyUUlvWHFML0krTWQ0V3gwOFVJUWorRTFXc3ZKelduN1lWY3NH?=
+ =?utf-8?B?UitrZGhsYnVMcmFSVjJOWFYxYU1Nd2M2RGRpN3d3T3ZIRWc0VFRVdz09?=
+X-OriginatorOrg: citrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f0b81cd-66ac-4829-82a1-08de4c70bf4a
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR03MB8288.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2026 15:40:26.8428
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ypj4k0v0cQBN6pfz9bvMZ6cHe6UtKlueBfPooMiaNJ5GH0YtZwxoppOzD390pdBWw8Q8QsynKRSr/H8Bjou9fQzAssoZtBH3LLclDBCUfTw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR03MB989118
 
-Add support for RSASSA-PSS signatures (RFC8017) for use with module signing
-and other public key cryptography done by the kernel.
+>  	/* Most significant octet of plaintextData corresponds to data[0] */
+>  	swap_buf(r, data, 16);
+>  
+> - aes_encrypt(&ctx, data, data); + aes_encrypt_new(&aes, data, data);
 
-Note that only signature verification is supported by the kernel.
+One thing you might want to consider, which reduces the churn in the series.
 
-Note further that this alters some of the same code as the MLDSA support,
-so that needs to be applied first to avoid conflicts.
+You can use _Generic() to do type-based dispatch on the first pointer. 
+Something like this:
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Lukas Wunner <lukas@wunner.de>
-cc: Ignat Korchagin <ignat@cloudflare.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: keyrings@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
----
- certs/Kconfig       |  6 ++++++
- certs/Makefile      |  1 +
- scripts/sign-file.c | 39 +++++++++++++++++++++++++++++++++++++--
- 3 files changed, 44 insertions(+), 2 deletions(-)
+void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in);
+void aes_encrypt_new(aes_encrypt_arg key, u8 out[at_least AES_BLOCK_SIZE],
+             const u8 in[at_least AES_BLOCK_SIZE]);
 
-diff --git a/certs/Kconfig b/certs/Kconfig
-index 94b086684d07..beb8991ad761 100644
---- a/certs/Kconfig
-+++ b/certs/Kconfig
-@@ -27,6 +27,12 @@ config MODULE_SIG_KEY_TYPE_RSA
- 	help
- 	 Use an RSA key for module signing.
- 
-+config MODULE_SIG_KEY_TYPE_RSASSA_PSS
-+	bool "RSASSA-PSS"
-+	select CRYPTO_RSA
-+	help
-+	 Use an RSASSA-PSS key for module signing.
-+
- config MODULE_SIG_KEY_TYPE_ECDSA
- 	bool "ECDSA"
- 	select CRYPTO_ECDSA
-diff --git a/certs/Makefile b/certs/Makefile
-index 3ee1960f9f4a..3b5a3a303f4c 100644
---- a/certs/Makefile
-+++ b/certs/Makefile
-@@ -42,6 +42,7 @@ targets += x509_certificate_list
- # boolean option and we unfortunately can't make it depend on !RANDCONFIG.
- ifeq ($(CONFIG_MODULE_SIG_KEY),certs/signing_key.pem)
- 
-+keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_RSASSA_PSS) := -newkey rsassa-pss
- keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ECDSA) := -newkey ec -pkeyopt ec_paramgen_curve:secp384r1
- keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_44) := -newkey ml-dsa-44
- keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_65) := -newkey ml-dsa-65
-diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-index b726581075f9..ca605095194e 100644
---- a/scripts/sign-file.c
-+++ b/scripts/sign-file.c
-@@ -233,6 +233,7 @@ int main(int argc, char **argv)
- 	EVP_PKEY *private_key;
- #ifndef USE_PKCS7
- 	CMS_ContentInfo *cms = NULL;
-+	CMS_SignerInfo *signer;
- 	unsigned int use_keyid = 0;
- #else
- 	PKCS7 *pkcs7 = NULL;
-@@ -329,13 +330,47 @@ int main(int argc, char **argv)
- 		    !EVP_PKEY_is_a(private_key, "ML-DSA-65") &&
- 		    !EVP_PKEY_is_a(private_key, "ML-DSA-87"))
- 			flags |= use_signed_attrs;
-+		if (EVP_PKEY_is_a(private_key, "RSASSA-PSS"))
-+			flags |= CMS_KEY_PARAM;
-+	if (EVP_PKEY_is_a(private_key, "RSASSA-PSS")) {
-+			EVP_PKEY_CTX *pkctx;
-+			char mdname[1024] = {};
-+
-+			pkctx = EVP_PKEY_CTX_new(private_key, NULL);
-+
-+			ERR(!EVP_PKEY_sign_init(pkctx), "EVP_PKEY_sign_init");
-+			ERR(!EVP_PKEY_CTX_set_rsa_padding(pkctx, RSA_PKCS1_PSS_PADDING),
-+			    "EVP_PKEY_CTX_set_rsa_padding");
-+			ERR(!EVP_PKEY_CTX_set_rsa_mgf1_md_name(pkctx, hash_algo, NULL),
-+			    "EVP_PKEY_CTX_set_rsa_mgf1_md_name");
-+
-+			ERR(!EVP_PKEY_CTX_get_rsa_mgf1_md_name(pkctx, mdname, sizeof(mdname)),
-+			    "EVP_PKEY_CTX_get_rsa_mgf1_md_name");
-+			printf("RSASSA-PSS %s\n", mdname);
-+		}
- 
- 		/* Load the signature message from the digest buffer. */
- 		cms = CMS_sign(NULL, NULL, NULL, NULL, flags);
- 		ERR(!cms, "CMS_sign");
- 
--		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo, flags),
--		    "CMS_add1_signer");
-+		signer = CMS_add1_signer(cms, x509, private_key, digest_algo, flags);
-+		ERR(!signer, "CMS_add1_signer");
-+
-+		if (EVP_PKEY_is_a(private_key, "RSASSA-PSS")) {
-+			EVP_PKEY_CTX *pkctx;
-+			char mdname[1024] = {};
-+
-+			pkctx = CMS_SignerInfo_get0_pkey_ctx(signer);
-+			ERR(!EVP_PKEY_CTX_set_rsa_padding(pkctx, RSA_PKCS1_PSS_PADDING),
-+			    "EVP_PKEY_CTX_set_rsa_padding");
-+			ERR(!EVP_PKEY_CTX_set_rsa_mgf1_md_name(pkctx, hash_algo, NULL),
-+			    "EVP_PKEY_CTX_set_rsa_mgf1_md_name");
-+
-+			ERR(!EVP_PKEY_CTX_get_rsa_mgf1_md_name(pkctx, mdname, sizeof(mdname)),
-+			    "EVP_PKEY_CTX_get_rsa_mgf1_md_name");
-+			printf("RSASSA-PSS %s\n", mdname);
-+		}
-+
- 		ERR(CMS_final(cms, bm, NULL, flags) != 1,
- 		    "CMS_final");
- 
+#define aes_encrypt(ctx, out, in)                                       \
+    _Generic(ctx,                                                       \
+             const struct crypto_aes_ctx *: aes_encrypt(ctx, out, in),  \
+             aes_encrypt_arg: aes_encrypt_new(ctx, out, in))
 
+
+i.e. it keeps the _new()-ism in a single header, without needing to
+change the drivers a second time.
+
+~Andrew
