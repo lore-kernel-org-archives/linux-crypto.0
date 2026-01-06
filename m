@@ -1,198 +1,127 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05D33375CD;
-	Tue,  6 Jan 2026 13:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4670033F8DC;
+	Tue,  6 Jan 2026 13:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767706836; cv=none; b=pgUBMMlC68D2yd6ZdK9ZDmcstQank6i+kc7vl2IAfCEalOpOg9pgqEnjvGop/xymVb5s3ILxMlTrtwUW/h5+/fErQcn5j4rZGntov4rWeVlrEbQUHp31xvTsOPFBUJ66PUdGYkudy7fyLNn2tyAi3B1kXSBn4tX9yvGUrCeryL8=
+	t=1767706970; cv=none; b=nan2YvgWuHo+yv4i8XJ8l6jx85fvEeoySglS65ScfAWDo4HtPunSRp0BbQMWg3XJbeMXPaMM7MaHkckdGUTGOLaqVHCAZwAG80E4KgNwHEeV/0FfsYfTNHOWDnIMPWB4srMMIwOcHFmxnHouSfrox0XQfxchebAY66QAFqlou3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767706836; c=relaxed/simple;
-	bh=riYTKJoFQ1Amngen0HhfQApbfcrmFFwHT6saLPWenhg=;
+	s=arc-20240116; t=1767706970; c=relaxed/simple;
+	bh=/ypj9IGr9SpILRjmMB7Es04MpkJP3Q2y17MtgZNQWGQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LxKIvuKSh9bsY+tZnvXYnwJqi90/AXcRxfDQoTGWcsSGUKFkdcQsx8JlALIqmIlvKl4AjftaZfJZc86/kvtoiBxWQsSiOF7UNpisFYgHpjaTy6ijU6R3cfW+CWf0sscRzgH0jNmImpaLuZoKYiXZQlbio/2ujD0xDn8/UXBy1qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA5E7497;
-	Tue,  6 Jan 2026 05:40:24 -0800 (PST)
-Received: from bogus (e133711.arm.com [10.1.197.51])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1D1043F6A8;
-	Tue,  6 Jan 2026 05:40:25 -0800 (PST)
-Date: Tue, 6 Jan 2026 13:40:23 +0000
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Jens Wiklander <jens.wiklander@linaro.org>
-Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Garg <sumit.garg@kernel.org>,
-	Olivia Mackall <olivia@selenic.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=rJVMND4Eu9aZfQdlJqeHJmxMUEHrb3HsRxQyRu/LtiPW6Lss+ILP5WGX2ZnLJ1fGZjf9MS35gBgSLtcdu33uluGLAFwdIYJg8vQ0KfDduOEFllBox0IdCZM/K4m5owTRXUEI7aNoEy+AZ2o4rEo2Xhju6YXiayrrxKGWbaexexk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZuoNGfi5; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZuoNGfi5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767706970; x=1799242970;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/ypj9IGr9SpILRjmMB7Es04MpkJP3Q2y17MtgZNQWGQ=;
+  b=ZuoNGfi5frsJLrbz9EXqGut8sTFMizDVHbpI+eJF/1osnsF3R/1+tuDJ
+   cBNQKnll/o9z5YECKrn/CJCVlS3DRmMThouSN12YS1K3T/tCPL31NKeU/
+   M2zkZMrqpwFd1Hw78yw7Fa6b8Ln7CbLWWUzn6ndxIq++RqcXpFZgd2cEW
+   a6OhfuiWa79qYd70sY0C+l/WNFkPbBiO8uZe4miYM76dQWacp5FbObTLL
+   HmIhAd6AELg6z1BrxSxboFhqv2+oqxjOaCOy9cBiUaxJZujfGzYvwIHd6
+   3l4XZEPKmHBZ9SV4cuEAjPGj0t786OBwNjowphFCFapkVOp8WKVZC1gHT
+   g==;
+X-CSE-ConnectionGUID: XnAc8mLMT0amZoedL8zoAw==
+X-CSE-MsgGUID: b9a+JfN5RNS0JojDG86dDw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11663"; a="79375096"
+X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
+   d="scan'208";a="79375096"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 05:42:49 -0800
+X-CSE-ConnectionGUID: 2XRiPS6RSOidjwAP96ISog==
+X-CSE-MsgGUID: PaBKRFjjSvCwPVhjPh6Ueg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
+   d="scan'208";a="240150728"
+Received: from igk-lkp-server01.igk.intel.com (HELO 92b2e8bd97aa) ([10.211.93.152])
+  by orviesa001.jf.intel.com with ESMTP; 06 Jan 2026 05:42:46 -0800
+Received: from kbuild by 92b2e8bd97aa with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vd7Kd-000000001J7-1lTF;
+	Tue, 06 Jan 2026 13:42:43 +0000
+Date: Tue, 6 Jan 2026 14:42:34 +0100
+From: kernel test robot <lkp@intel.com>
+To: "Mario Limonciello (AMD)" <superm1@kernel.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	David Howells <dhowells@redhat.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-efi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Cristian Marussi <cristian.marussi@arm.com>,
-	arm-scmi@vger.kernel.org, linux-mips@vger.kernel.org,
-	netdev@vger.kernel.org, linux-integrity@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
-	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v2 00/17] tee: Use bus callbacks instead of driver
- callbacks
-Message-ID: <aV0Qx5BOso5co3tm@bogus>
-References: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
- <CAHUa44FrDZbvRvfN8obf80_k=Eqxe9YxHpjaE5jU7nkxPUwfag@mail.gmail.com>
- <20251218135332f323fa91@mail.local>
- <CAHUa44GpW5aO26GDyL9RZub9vVYvVcJ7etwO0yXBN_mUi0W4AA@mail.gmail.com>
- <CAHUa44HqRbCJTXsrTCm0G5iwtkQtq+Si=yOspCjpAn-N2uVSVg@mail.gmail.com>
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Rijo Thomas <Rijo-john.Thomas@amd.com>
+Cc: oe-kbuild-all@lists.linux.dev, John Allen <john.allen@amd.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Hans de Goede <hansg@kernel.org>,
+	"(open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER)" <linux-crypto@vger.kernel.org>,
+	platform-driver-x86@vger.kernel.org,
+	Lars Francke <lars.francke@gmail.com>,
+	Yijun Shen <Yijun.Shen@dell.com>,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>
+Subject: Re: [PATCH v4 3/5] crypto: ccp - Add an S4 restore flow
+Message-ID: <202601061453.8zskdbs5-lkp@intel.com>
+References: <20260106045423.55190-4-superm1@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHUa44HqRbCJTXsrTCm0G5iwtkQtq+Si=yOspCjpAn-N2uVSVg@mail.gmail.com>
+In-Reply-To: <20260106045423.55190-4-superm1@kernel.org>
 
-On Mon, Jan 05, 2026 at 10:16:09AM +0100, Jens Wiklander wrote:
-> Hi,
-> 
-> On Thu, Dec 18, 2025 at 5:29 PM Jens Wiklander
-> <jens.wiklander@linaro.org> wrote:
-> >
-> > On Thu, Dec 18, 2025 at 2:53 PM Alexandre Belloni
-> > <alexandre.belloni@bootlin.com> wrote:
-> > >
-> > > On 18/12/2025 08:21:27+0100, Jens Wiklander wrote:
-> > > > Hi,
-> > > >
-> > > > On Mon, Dec 15, 2025 at 3:17 PM Uwe Kleine-König
-> > > > <u.kleine-koenig@baylibre.com> wrote:
-> > > > >
-> > > > > Hello,
-> > > > >
-> > > > > the objective of this series is to make tee driver stop using callbacks
-> > > > > in struct device_driver. These were superseded by bus methods in 2006
-> > > > > (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
-> > > > > methods.")) but nobody cared to convert all subsystems accordingly.
-> > > > >
-> > > > > Here the tee drivers are converted. The first commit is somewhat
-> > > > > unrelated, but simplifies the conversion (and the drivers). It
-> > > > > introduces driver registration helpers that care about setting the bus
-> > > > > and owner. (The latter is missing in all drivers, so by using these
-> > > > > helpers the drivers become more correct.)
-> > > > >
-> > > > > v1 of this series is available at
-> > > > > https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koenig@baylibre.com
-> > > > >
-> > > > > Changes since v1:
-> > > > >
-> > > > >  - rebase to v6.19-rc1 (no conflicts)
-> > > > >  - add tags received so far
-> > > > >  - fix whitespace issues pointed out by Sumit Garg
-> > > > >  - fix shutdown callback to shutdown and not remove
-> > > > >
-> > > > > As already noted in v1's cover letter, this series should go in during a
-> > > > > single merge window as there are runtime warnings when the series is
-> > > > > only applied partially. Sumit Garg suggested to apply the whole series
-> > > > > via Jens Wiklander's tree.
-> > > > > If this is done the dependencies in this series are honored, in case the
-> > > > > plan changes: Patches #4 - #17 depend on the first two.
-> > > > >
-> > > > > Note this series is only build tested.
-> > > > >
-> > > > > Uwe Kleine-König (17):
-> > > > >   tee: Add some helpers to reduce boilerplate for tee client drivers
-> > > > >   tee: Add probe, remove and shutdown bus callbacks to tee_client_driver
-> > > > >   tee: Adapt documentation to cover recent additions
-> > > > >   hwrng: optee - Make use of module_tee_client_driver()
-> > > > >   hwrng: optee - Make use of tee bus methods
-> > > > >   rtc: optee: Migrate to use tee specific driver registration function
-> > > > >   rtc: optee: Make use of tee bus methods
-> > > > >   efi: stmm: Make use of module_tee_client_driver()
-> > > > >   efi: stmm: Make use of tee bus methods
-> > > > >   firmware: arm_scmi: optee: Make use of module_tee_client_driver()
-> > > > >   firmware: arm_scmi: Make use of tee bus methods
-> > > > >   firmware: tee_bnxt: Make use of module_tee_client_driver()
-> > > > >   firmware: tee_bnxt: Make use of tee bus methods
-> > > > >   KEYS: trusted: Migrate to use tee specific driver registration
-> > > > >     function
-> > > > >   KEYS: trusted: Make use of tee bus methods
-> > > > >   tpm/tpm_ftpm_tee: Make use of tee specific driver registration
-> > > > >   tpm/tpm_ftpm_tee: Make use of tee bus methods
-> > > > >
-> > > > >  Documentation/driver-api/tee.rst             | 18 +----
-> > > > >  drivers/char/hw_random/optee-rng.c           | 26 ++----
-> > > > >  drivers/char/tpm/tpm_ftpm_tee.c              | 31 +++++---
-> > > > >  drivers/firmware/arm_scmi/transports/optee.c | 32 +++-----
-> > > > >  drivers/firmware/broadcom/tee_bnxt_fw.c      | 30 ++-----
-> > > > >  drivers/firmware/efi/stmm/tee_stmm_efi.c     | 25 ++----
-> > > > >  drivers/rtc/rtc-optee.c                      | 27 ++-----
-> > > > >  drivers/tee/tee_core.c                       | 84 ++++++++++++++++++++
-> > > > >  include/linux/tee_drv.h                      | 12 +++
-> > > > >  security/keys/trusted-keys/trusted_tee.c     | 17 ++--
-> > > > >  10 files changed, 164 insertions(+), 138 deletions(-)
-> > > > >
-> > > > > base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
-> > > > > --
-> > > > > 2.47.3
-> > > > >
-> > > >
-> > > > Thank you for the nice cleanup, Uwe.
-> > > >
-> > > > I've applied patch 1-3 to the branch tee_bus_callback_for_6.20 in my
-> > > > tree at https://git.kernel.org/pub/scm/linux/kernel/git/jenswi/linux-tee.git/
-> > > >
-> > > > The branch is based on v6.19-rc1, and I'll try to keep it stable for
-> > > > others to depend on, if needed. Let's see if we can agree on taking
-> > > > the remaining patches via that branch.
-> > >
-> > > 6 and 7 can go through your branch.
-> >
-> > Good, I've added them to my branch now.
-> 
-> This entire patch set should go in during a single merge window. I
-> will not send any pull request until I'm sure all patches will be
-> merged.
-> 
-> So far (if I'm not mistaken), only the patches I've already added to
-> next have appeared next. I can take the rest of the patches, too, but
-> I need OK for the following:
-> 
+Hi Mario,
 
-[...]
+kernel test robot noticed the following build warnings:
 
-> 
-> Sudeep, you seem happy with the following patches
-> - firmware: arm_scmi: optee: Make use of module_tee_client_driver()
-> - firmware: arm_scmi: Make use of tee bus methods
-> OK if I take them via my tree, or would you rather take them yourself?
->
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master linus/master v6.16-rc1 next-20260106]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I am happy if you want to take all of them in one go. I think I have
-already acked it. Please shout if you need anything else from me, happy to
-help in anyway to make it easier to handle this change set.
+url:    https://github.com/intel-lab-lkp/linux/commits/Mario-Limonciello-AMD/platform-x86-amd-pmf-Prevent-TEE-errors-after-hibernate/20260106-130236
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20260106045423.55190-4-superm1%40kernel.org
+patch subject: [PATCH v4 3/5] crypto: ccp - Add an S4 restore flow
+config: x86_64-rhel-9.4-kunit (https://download.01.org/0day-ci/archive/20260106/202601061453.8zskdbs5-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260106/202601061453.8zskdbs5-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601061453.8zskdbs5-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/crypto/ccp/psp-dev.c: In function 'psp_restore':
+>> drivers/crypto/ccp/psp-dev.c:357:13: warning: variable 'ret' set but not used [-Wunused-but-set-variable]
+     357 |         int ret = 0;
+         |             ^~~
+
+
+vim +/ret +357 drivers/crypto/ccp/psp-dev.c
+
+   353	
+   354	int psp_restore(struct sp_device *sp)
+   355	{
+   356		struct psp_device *psp = sp->psp_data;
+ > 357		int ret = 0;
+   358	
+   359		if (psp->tee_data)
+   360			ret = tee_restore(psp);
+   361	
+   362		return 0;
+   363	}
+   364	
 
 -- 
-Regards,
-Sudeep
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
