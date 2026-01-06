@@ -1,160 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D7E29B200;
-	Tue,  6 Jan 2026 04:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFE929BDB1;
+	Tue,  6 Jan 2026 05:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767675290; cv=none; b=rGH2bBOSd2Fpp70zNyj2IXkB/vzum1vpj2QLjAjeOQ2xdoqv0YIPI2iqDgjlDGjrfBULuGml+XkZNawdKu/Fc5BIS2IQiO9A0t37/pckU92ig0VE5L1JksNrxk+IBUE3goUvX9jXXUf6wThEbBU3JVDmFYhFTsJ2+Wn2RsiBVxw=
+	t=1767676304; cv=none; b=TeXDM62cYT6fAiX6FAPqP4SkmiLIp6z24WsqSkg2ucmakgYMfMRTtcO2ik5Cp6goqhyeNpmy/nRHHbzGSyozeH68GQE3OlD3/Qk43l5Hc5Sn0BvKNXVftG+APE/MKME0OwUZSLqe1/F1MDKrZ2eLT8fyMP7twllER2U8MfUPCIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767675290; c=relaxed/simple;
-	bh=DTlFMoVilhV/FLeEwG7XEdkFKSPZAjHouUnTDFEHaQo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WqS/TpT0nKK55SqROlpqtZzgu/2zuoT2bxarRkMHJ/mSv+t9yVkqV44ExSjmmgSbJ7Gqim5YcuA/Bpal3mesC0jTUxpAtBz8sHhLh5+HuulWjGCLmJ0b3Uj1PI47+6FzYmbcvch/AF40C7wAccEW9BxrgmTgkqi0zvYI4RY1jU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eajNNoCA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767676304; c=relaxed/simple;
+	bh=MeOgU2HeYQTOFxvAKe6Pe9Z3WRZHdgp6s14oa7RIzAY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=EmsJdDxZFwoCvDeFGEKPMOEGRHF8NDY+VM/HM1rIpjHxI4zH/rO2FcrjxE254Yg7S7ELoWo5w2B2amQl8xf0/IwTCB1WB+HZlRC84wVFasaPy/qvVyjKTjvfN9oLG5jSXATx3LnsY04ujMxQajvFpE1dx5bvtVRY2z1AL3cFYPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=mG8hQxYD; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eajNNoCA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C599C116C6;
-	Tue,  6 Jan 2026 04:54:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767675289;
-	bh=DTlFMoVilhV/FLeEwG7XEdkFKSPZAjHouUnTDFEHaQo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eajNNoCA5pf1BxipARgX8lJQ7upQhHn4Yn3PztHMl1YkavZPJBojQXRaT7fcYUBPo
-	 UB5/zV44jC1TOnvxvu0x6IsVqJ2fT/8Il4Z+bkxtpzJaddpNtBS04RV7dxdjUPMjSM
-	 J2zR3H2w62e7BiOg0DfEqjpvxc/prq1mlORIS6gJiXQNDb4WsjJz5CaIKNHWgIvKc/
-	 1yBMNAsBxBzijPvYBR34oqWM59dNMB5Oo5apdUMIB1sDCXXtAOXWYujF2svWoVSTsO
-	 paiLmdD1jNp0UWzfnycqiIZdAtdojM5z6rETq8h7q3HrQVSbTXk7sSgfxhA7xYcxQ6
-	 46wB9Nz2wECxw==
-From: "Mario Limonciello (AMD)" <superm1@kernel.org>
-To: Tom Lendacky <thomas.lendacky@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Rijo Thomas <Rijo-john.Thomas@amd.com>
-Cc: John Allen <john.allen@amd.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Hans de Goede <hansg@kernel.org>,
-	linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER),
-	platform-driver-x86@vger.kernel.org (open list:AMD PMF DRIVER),
-	Lars Francke <lars.francke@gmail.com>,
-	Yijun Shen <Yijun.Shen@dell.com>,
-	"Mario Limonciello (AMD)" <superm1@kernel.org>,
-	Yijun Shen <Yijun.Shen@Dell.com>
-Subject: [PATCH v4 5/5] crypto: ccp - Send PSP_CMD_TEE_RING_DESTROY when PSP_CMD_TEE_RING_INIT fails
-Date: Mon,  5 Jan 2026 22:54:23 -0600
-Message-ID: <20260106045423.55190-6-superm1@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260106045423.55190-1-superm1@kernel.org>
-References: <20260106045423.55190-1-superm1@kernel.org>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mG8hQxYD"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6063R0Hw529766;
+	Tue, 6 Jan 2026 05:11:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	DhK0OvXcW0x+DJMxcMruZCbOIvsE1qca4ehQ64wghkE=; b=mG8hQxYDVvIZWSHP
+	Dff4MqLSoPLWSjF4v3ytMhKHHUBr2K4u6b1bQzmqUiURQmtp4WKB8ai2sGxU5uCL
+	Oeg26CGDOb9ujDuDdqiXaBt3dLtMhoL+JGJ/hB1G5yiVuPpIHvBzMCIQOfedYXHH
+	iVi7JjPMguAHTfBrQBbFETkOUtXuc8KAdL9Mwdg31KLPPCltqWhqB0Bcpld+RvvC
+	fUiTJsK+1m2S7lujgdBv+Sx9dgWm5wgbA555sDy7UHdZisQWA0Z3MWZW9J+PNCmC
+	IGJF5NCK+kWBSpaeOM+McxdCe0L1rAkWygC7ucsEWJdbNyq7xjj+Woiq3NpCD6eS
+	K3+rfw==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bggqu1uq9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Jan 2026 05:11:37 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 6065BaeH030628
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 6 Jan 2026 05:11:36 GMT
+Received: from [10.218.1.24] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 5 Jan
+ 2026 21:11:33 -0800
+Message-ID: <ec9e420a-932d-4265-8cac-dee003933898@quicinc.com>
+Date: Tue, 6 Jan 2026 10:41:20 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5] crypto: qce - Add runtime PM and interconnect
+ bandwidth scaling support
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        <herbert@gondor.apana.org.au>, <thara.gopinath@gmail.com>,
+        <davem@davemloft.net>
+CC: <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_neersoni@quicinc.com>
+References: <20251120062443.2016084-1-quic_utiwari@quicinc.com>
+ <a2c6cbdb-a114-423f-a315-6e5e9ab84e5a@oss.qualcomm.com>
+Content-Language: en-US
+From: Udit Tiwari <quic_utiwari@quicinc.com>
+In-Reply-To: <a2c6cbdb-a114-423f-a315-6e5e9ab84e5a@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA2MDA0MSBTYWx0ZWRfX6ZTprt+tpwlN
+ 16jLjBxBfWnAK0ahmQHORf+morRDL3KuPnCg5FQGZj+4NnSQUN9q/Qo6LCFB5rnRBO7n/5jGTdR
+ yaGkeLg+RFj/b2DoGY0yF93t78Hue4Ct2OIJYBDpsHSN1Npwn0Q0ekf+lIQCrEk9i+0JOp3y/Ke
+ diBiAqYNfyHkk+Caiywet512IUWUHwgTNxdLn4//blLM0rd7m633fhl8wNZwf+nNRTh/mRAX8Pf
+ wbcuSNEPoca5lFp56ofDiClyDvR7VLtIZ1pddbzhof2u+EMo+w3dMGs2t/zc2psJm4NN2QG/EyP
+ B3rLDyUT9PBnB1sq1VBy8rHTokI5M2s9F3SXMBD/asj/kEl8IBwuYp7An2M6DkG0NANwHeebIme
+ tGKIheGFmyG35+K6aDHtVwj5vphw3QYMsKUPTd0lhE+ovTEiqtwhqilT/95ETRFBRs9bPdIVA+I
+ 15fJnNYSyz/+pjKpYfg==
+X-Proofpoint-ORIG-GUID: epd_anbIQ1cKMAdDNmlATPrRySZSN6gd
+X-Authority-Analysis: v=2.4 cv=fr/RpV4f c=1 sm=1 tr=0 ts=695c9989 cx=c_pps
+ a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=COk6AnOGAAAA:8 a=S-ec_UsR21Fgmf9DpLIA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: epd_anbIQ1cKMAdDNmlATPrRySZSN6gd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-05_02,2026-01-05_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 adultscore=0 spamscore=0 priorityscore=1501
+ impostorscore=0 bulkscore=0 clxscore=1015 phishscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2512120000 definitions=main-2601060041
 
-The hibernate resume sequence involves loading a resume kernel that is just
-used for loading the hibernate image before shifting back to the existing
-kernel.
 
-During that hibernate resume sequence the resume kernel may have loaded
-the ccp driver.  If this happens the resume kernel will also have called
-PSP_CMD_TEE_RING_INIT but it will never have called
-PSP_CMD_TEE_RING_DESTROY.
 
-This is problematic because the existing kernel needs to re-initialize the
-ring.  One could argue that the existing kernel should call destroy
-as part of restore() but there is no guarantee that the resume kernel did
-or didn't load the ccp driver.  There is also no callback opportunity for
-the resume kernel to destroy before handing back control to the existing
-kernel.
+On 12/5/2025 4:59 PM, Konrad Dybcio wrote:
+> On 11/20/25 7:24 AM, quic_utiwari@quicinc.com wrote:
+>> From: Udit Tiwari <quic_utiwari@quicinc.com>
+>>
+>> The Qualcomm Crypto Engine (QCE) driver currently lacks support for
+>> runtime power management (PM) and interconnect bandwidth control.
+>> As a result, the hardware remains fully powered and clocks stay
+>> enabled even when the device is idle. Additionally, static
+>> interconnect bandwidth votes are held indefinitely, preventing the
+>> system from reclaiming unused bandwidth.
+> 
+> [...]
+> 
+>> @@ -90,13 +93,17 @@ static int qce_handle_queue(struct qce_device *qce,
+>>   	struct crypto_async_request *async_req, *backlog;
+>>   	int ret = 0, err;
+>>   
+>> +	ret = pm_runtime_resume_and_get(qce->dev);
+>> +	if (ret < 0)
+>> +		return ret;
+>> +
+> 
+> This is quite new, but maybe we could use
+> 
+> ACQUIRE(pm_runtime_active_try, pm)(qce->dev);
+> ret = ACQUIRE_ERR(pm_runtime_active_auto_try, &pm)
+> if (ret)
+> 	return ret;
+> 
+> and drop the goto-s
+> 
+> Konrad
 
-Similar problems could potentially exist with the use of kdump and
-crash handling. I actually reproduced this issue like this:
+Thanks for the review and suggestion konrad.
 
-1) rmmod ccp
-2) hibernate the system
-3) resume the system
-4) modprobe ccp
+The optimization you proposed is more of an incremental refinement 
+rather than a functional fix, and I’d prefer to keep this patch focused 
+so it’s easier to review and backport. Would it be acceptable to merge 
+this as-is and handle that optimization in a small follow-up patch?
 
-The resume kernel will have loaded ccp but never destroyed and then when
-I try to modprobe it fails.
+If you consider it a hard requirement for this series, I can rework it, 
+but my preference is to land the functional PM support first and then 
+iterate.
 
-Because of these possible cases add a flow that checks the error code from
-the PSP_CMD_TEE_RING_INIT call and tries to call PSP_CMD_TEE_RING_DESTROY
-if it failed.  If this succeeds then call PSP_CMD_TEE_RING_INIT again.
-
-Fixes: f892a21f51162 ("crypto: ccp - use generic power management")
-Reported-by: Lars Francke <lars.francke@gmail.com>
-Closes: https://lore.kernel.org/platform-driver-x86/CAD-Ua_gfJnQSo8ucS_7ZwzuhoBRJ14zXP7s8b-zX3ZcxcyWePw@mail.gmail.com/
-Tested-by: Yijun Shen <Yijun.Shen@Dell.com>
-Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
----
-v4:
- * Add tag (Yijun)
- * Move and rename PSP_TEE_STS_RING_BUSY (Ilpo)
-v3:
- * Add a comment (Tom)
- * Add a define for busy condition (Shyam)
- * Rename label (Shyam)
- * Upgrade message to info (Shyam)
- * Use a helper that validates result for destroy command (Shyam)
----
- drivers/crypto/ccp/tee-dev.c | 12 ++++++++++++
- include/linux/psp.h          |  1 +
- 2 files changed, 13 insertions(+)
-
-diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
-index ef1430f86ad62..ea9b94d5b10ba 100644
---- a/drivers/crypto/ccp/tee-dev.c
-+++ b/drivers/crypto/ccp/tee-dev.c
-@@ -113,6 +113,7 @@ static int tee_init_ring(struct psp_tee_device *tee)
- {
- 	int ring_size = MAX_RING_BUFFER_ENTRIES * sizeof(struct tee_ring_cmd);
- 	struct tee_init_ring_cmd *cmd;
-+	bool retry = false;
- 	unsigned int reg;
- 	int ret;
- 
-@@ -135,6 +136,7 @@ static int tee_init_ring(struct psp_tee_device *tee)
- 	/* Send command buffer details to Trusted OS by writing to
- 	 * CPU-PSP message registers
- 	 */
-+retry_init:
- 	ret = psp_mailbox_command(tee->psp, PSP_CMD_TEE_RING_INIT, cmd,
- 				  TEE_DEFAULT_CMD_TIMEOUT, &reg);
- 	if (ret) {
-@@ -145,6 +147,16 @@ static int tee_init_ring(struct psp_tee_device *tee)
- 	}
- 
- 	if (FIELD_GET(PSP_CMDRESP_STS, reg)) {
-+		/*
-+		 * During the hibernate resume sequence driver may have gotten loaded
-+		 * but the ring not properly destroyed. If the ring doesn't work, try
-+		 * to destroy and re-init once.
-+		 */
-+		if (!retry && FIELD_GET(PSP_CMDRESP_STS, reg) == PSP_TEE_STS_RING_BUSY) {
-+			dev_info(tee->dev, "tee: ring init command failed with busy status, retrying\n");
-+			if (tee_send_destroy_cmd(tee))
-+				goto retry_init;
-+		}
- 		dev_err(tee->dev, "tee: ring init command failed (%#010lx)\n",
- 			FIELD_GET(PSP_CMDRESP_STS, reg));
- 		tee_free_ring(tee);
-diff --git a/include/linux/psp.h b/include/linux/psp.h
-index 92e60aeef21e1..b337dcce1e991 100644
---- a/include/linux/psp.h
-+++ b/include/linux/psp.h
-@@ -18,6 +18,7 @@
-  * and should include an appropriate local definition in their source file.
-  */
- #define PSP_CMDRESP_STS		GENMASK(15, 0)
-+#define  PSP_TEE_STS_RING_BUSY 0x0000000d  /* Ring already initialized */
- #define PSP_CMDRESP_CMD		GENMASK(23, 16)
- #define PSP_CMDRESP_RESERVED	GENMASK(29, 24)
- #define PSP_CMDRESP_RECOVERY	BIT(30)
--- 
-2.43.0
-
+Best regards,
+Udit
