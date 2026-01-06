@@ -1,98 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A50305057;
-	Mon,  5 Jan 2026 22:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A894230270;
+	Tue,  6 Jan 2026 02:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767653411; cv=none; b=jJG9V9l/L42cBRcf1b92zvO1ay2DQ385lBiyNW5Ttn9K9QZ0a/gjSO3rRejon3pJQjnpH32KvhaAIEvCF2/mx+02Ecwju4AF4ZDcjLahOclNK8BMPZyquw3P3O1E6KJ4oBG/B4juH4qyO3FrTpq4jk+fZ4So9DwIYw2ZnJBnyMg=
+	t=1767667145; cv=none; b=ipHSqVcwpi5I8rNKfI4umRyP2iRxflSfrPq2Nxb20Ifj12lXrZKlhV2MhYlaq0wLDJuvHWCBN7fU9Fp9HWnbVUq6BV/Kly4iBXPAmmZiERlETFJNQs0OWRDk3tT/wy0/NNmwp5q+4f+78MyscqGmb17T4Oy5G+V7zCXRiok5q4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767653411; c=relaxed/simple;
-	bh=31D6qoX8lgsXUYGBg7xPU+7XAZ30YbSieRYrZ/lfYKI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kS0jnvDhCwjmtzmdvAHz7FHzxatgCxgFO9ubBGqchPxsLbtyiFqZ1U96AyUwEaBvlAAvbBp1HZjaMFT+uGMXAW6AOvvOKCM0JEGgl/TOJJuFi9kcnaVbko+mEkllWuTJ1BmrdGrKHr3fWWPDB3t0SRBSAHQAJHYnpKWS2v4xdYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ewhgjP4j; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767667145; c=relaxed/simple;
+	bh=IqgTM7rDXt06+VW2Qq4b8Cf0D1LzDC8iYuGc6dmp3IM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=hfFp7sePkbfoAEgP0nAtrNfFsrLw2/lY+TNALmT+YJjzQcNk/Vri3JpY6qM0IzqDttgtBekI0b0APYAiPk1AlciCKA3kwKHWHPo2yaYNo59tnwWdCGhMUw2Qk8G5XlJ6hVCGbDH3D6qBMAgiclTTD9qcxJlvX80muAYTx16158M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=o4AMp07c; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ewhgjP4j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61D73C16AAE;
-	Mon,  5 Jan 2026 22:50:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767653410;
-	bh=31D6qoX8lgsXUYGBg7xPU+7XAZ30YbSieRYrZ/lfYKI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ewhgjP4jI4POND3+QAJ8bXdQIBgP3tHufyiYg0J/QT7F80ckP4QsLTwewu2TlNJDy
-	 q/8BBmefcnK+e3rJ9jnTqmTMnJN323LktWsth/y1zhUArwP+6Z9OQJtmz+9YZ01haO
-	 MhFFawTYQIiDXZ0V7dm5hhQtDrKrp5xzJrbX1HLilog6J/NoqivdJkL03fwKycqoHE
-	 xf+A6ccdXmIUgIedcxqcIVqmYemPtsKQ4WMZSwo7L5X15o+zh0dW8dbLvGGczr8iax
-	 BTYBT+tm87xCTpYmxIuERoxF6GOUJBDUJSIppFZwqmzAWc23uSwQkNHjkQy/XS2oLU
-	 qGTMXvo2lGJUA==
-From: Bjorn Andersson <andersson@kernel.org>
-To: "Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Vinod Koul <vkoul@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Luca Weiss <luca.weiss@fairphone.com>
-Cc: ~postmarketos/upstreaming@lists.sr.ht,
-	phone-devel@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: (subset) [PATCH v4 0/9] Various dt-bindings for Milos and The Fairphone (Gen. 6) addition
-Date: Mon,  5 Jan 2026 16:50:06 -0600
-Message-ID: <176765340206.2986820.1001501110439471396.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251210-sm7635-fp6-initial-v4-0-b05fddd8b45c@fairphone.com>
-References: <20251210-sm7635-fp6-initial-v4-0-b05fddd8b45c@fairphone.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="o4AMp07c"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=eUJqBj6o1yLo7PGZNNapVkv03nS/Y313TuX0KxvwUtM=;
+	b=o4AMp07cqIQZWFgGXa/vAEhEEOclZgQn7hxry/cDxK3KuaMXtckFMIwmCpQmAKD0aMeIqgE8s
+	6vEbKA2KfUX92jNNqmwgUbeL4zCz0sV14bmU4EbSZ+D366PUkiiFGmkG1JLxu9Kmn5rvwiSLG2j
+	krzbcxHkZHAPPE4wuL2CvFg=
+Received: from mail.maildlp.com (unknown [172.19.163.214])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dlZzD61V5znTwP;
+	Tue,  6 Jan 2026 10:35:52 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id DAE5540539;
+	Tue,  6 Jan 2026 10:38:57 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 6 Jan 2026 10:38:47 +0800
+Received: from [10.67.120.171] (10.67.120.171) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 6 Jan 2026 10:38:47 +0800
+Message-ID: <828e0dcd-ae17-448b-ba33-97603031fc60@huawei.com>
+Date: Tue, 6 Jan 2026 10:38:46 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 0/4] uacce: driver fixes for memory leaks and state
+ management
+From: huangchenghai <huangchenghai2@huawei.com>
+To: <gregkh@linuxfoundation.org>, <zhangfei.gao@linaro.org>,
+	<wangzhou1@hisilicon.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <shenyang39@huawei.com>, <liulongfang@huawei.com>,
+	<qianweili@huawei.com>, <linwenkai6@hisilicon.com>
+References: <20251202061256.4158641-1-huangchenghai2@huawei.com>
+Content-Language: en-US
+In-Reply-To: <20251202061256.4158641-1-huangchenghai2@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
+
+Kindly ping for this fix.
 
 
-On Wed, 10 Dec 2025 10:43:24 +0900, Luca Weiss wrote:
-> Document various bits of the Milos SoC in the dt-bindings, which don't
-> really need any other changes.
-> 
-> @Rob: Please pick up the cpufreq, crypto, and pdc dt-bindings, they've
-> been on the list since many months and weren't picked up by any
-> maintainers, so it would be nice if you could take them through your
-> tree. The patch for arm/qcom.yaml will be handled by Bjorn I think.
-> 
-> [...]
+Cheers,
+Chenghai
 
-Applied, thanks!
-
-[2/9] dt-bindings: crypto: qcom,prng: document Milos
-      commit: f50da52e5b2ed73913cc6d0db7c81cd33ced3ae7
-[3/9] dt-bindings: qcom,pdc: document the Milos Power Domain Controller
-      commit: 42f2799124a4d0081b0c8c50980e37769e8d6880
-[4/9] dt-bindings: arm: qcom: Add Milos and The Fairphone (Gen. 6)
-      commit: d88771fda13f2e97a056d471b7b7c11bd17da148
-[5/9] arm64: dts: qcom: pm8550vs: Disable different PMIC SIDs by default
-      commit: 446f4802aa6eb972718b8708188df533b38dbabe
-[6/9] arm64: dts: qcom: Add PM7550 PMIC
-      commit: 57e89dfdfa28810f8c1a44bdd301fca287ff83d1
-[7/9] arm64: dts: qcom: Add PMIV0104 PMIC
-      commit: 8f42f255dfb80e57af98191e7a4e18f7d1cdcb7e
-[8/9] arm64: dts: qcom: Add initial Milos dtsi
-      commit: d9d59d105f98665187d90a49d9099675491990f6
-[9/9] arm64: dts: qcom: Add The Fairphone (Gen. 6)
-      commit: e25834d7691f0661fa9700c167c48d18752f62bf
-
-Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+在 2025/12/2 14:12, Chenghai Huang 写道:
+> This patch series addresses several issues in the uacce:
+> 1.Fix cdev handling in the cleanup path.
+> 2.Fix sysfs file creation conditions.
+> 3.Add error reporting for unsupported mremap operations.
+> 4.Ensuring safe queue release with proper state management.
+>
+> ---
+> Changes in v6:
+> - In patch 1, if cdev_device_add() fails, it will automatically free the cdev, however,
+>    we need to set uacce->cdev to NULL to prevent cdev_device_del() from being called.
+> - Link to v5: https://lore.kernel.org/all/20251111093536.3729-1-huangchenghai2@huawei.com/
+>
+> Changes in v5:
+> - There is no memory leak issue when cdev_device_add fails, but it is necessary
+>    to check a flag to avoid calling cdev_device_del during abnormal exit.
+> - Link to v4: https://lore.kernel.org/all/20251022021149.1771168-1-huangchenghai2@huawei.com/
+>
+> Changes in v4:
+> - Revert the interception of sysfs creation for isolate_strategy.
+> - Link to v3: https://lore.kernel.org/all/20251021135003.786588-1-huangchenghai2@huawei.com/
+>
+> Changes in v3:
+> - Move the checks for the 'isolate_strategy_show' and
+>    'isolate_strategy_store' functions to their respective call sites.
+> - Use kobject_put to release the cdev memory instead of modifying
+>    cdev to be a static structure member.
+> - Link to v2: https://lore.kernel.org/all/20250916144811.1799687-1-huangchenghai2@huawei.com/
+>
+> Changes in v2:
+> - Use cdev_init to allocate cdev memory to ensure that memory leaks
+>    are avoided.
+> - Supplement the reason for intercepting the remapping operation.
+> - Add "cc: stable@vger.kernel.org" to paths with fixed.
+> - Link to v1: https://lore.kernel.org/all/20250822103904.3776304-1-huangchenghai2@huawei.com/
+>
+> Chenghai Huang (2):
+>    uacce: fix isolate sysfs check condition
+>    uacce: ensure safe queue release with state management
+>
+> Wenkai Lin (1):
+>    uacce: fix cdev handling in the cleanup path
+>
+> Yang Shen (1):
+>    uacce: implement mremap in uacce_vm_ops to return -EPERM
+>
+>   drivers/misc/uacce/uacce.c | 48 +++++++++++++++++++++++++++++++-------
+>   1 file changed, 40 insertions(+), 8 deletions(-)
+>
