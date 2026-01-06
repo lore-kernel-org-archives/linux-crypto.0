@@ -1,117 +1,123 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2963009C1;
-	Tue,  6 Jan 2026 06:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE10F20C00C;
+	Tue,  6 Jan 2026 08:03:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767682717; cv=none; b=cnU5FThlLyYF5k6JMBFmkwKIcMdobPhz4m+5PK9an800499sN0u3emGvXMS3GtxqPoF3BY9ZOMTr0c/UrAjEOeIw2TrXd5J7BJvSFB6nTRkYUSliST17+Cu7kVpEQRmPzQBILNXeYt4SHm1bVzM+exgcVzpSpzTQPk/dQVNx5Ik=
+	t=1767686591; cv=none; b=Wzm0FzSi2LQ6PIBunxHCcw5wUdSkoqdCBmmKllhbhwmiNBxwMFsG6kQ4sttvmqi7o/EcMlSQJiWvzeCtNFakIBsVnSYutGtSfpKcXe8bNO5HgwKl6dHphd6XVJ/8tOmiuHGz4JH61qgimgUap5cePxA61RqfxcX6L9l7v2gCulU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767682717; c=relaxed/simple;
-	bh=QQtOk2YRE84AoYQ+kSLZyLAyg4ikVDFr3IES1pY5ozA=;
+	s=arc-20240116; t=1767686591; c=relaxed/simple;
+	bh=39mtTD1mKtUBs1ueaRg937mqdeu4uq3k6CxZDHkqtPk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kelyriLihvhEfn3FBmwnxP+T0oO3UP6MM4zoJYVf7BxamgWa00+LMs83kBCYkb/Wv7iABT3e4o6GCW+5Ka3SOI2A75Sma+B/yLvmnD1hrgIqlxjrEw+WPWBRbbkeO3eSz8wcvFqF4vXIVV3oyHqtpxSnOtM9QYoBWznZi+8DKBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gH/mbhwW; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=fukyH2uS0FSqgcfM879zUceaa+5tyuQUcchh5bmBf3wyKWprZQDIZQXPaAqpEcDVqumBrInc0GEUB6hW7yA/mNx6ZOmHc1q35rNpP/C3540XTieYA2x4koyOpEk53eqo45TwPOUADXICAc6JKuzsRNkVd9CRQFjegOjN1/3C4Pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b7ZoPwzf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gH/mbhwW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 076F4C116C6;
-	Tue,  6 Jan 2026 06:58:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b7ZoPwzf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6635C116C6;
+	Tue,  6 Jan 2026 08:03:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767682716;
-	bh=QQtOk2YRE84AoYQ+kSLZyLAyg4ikVDFr3IES1pY5ozA=;
+	s=k20201202; t=1767686590;
+	bh=39mtTD1mKtUBs1ueaRg937mqdeu4uq3k6CxZDHkqtPk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gH/mbhwWcmbSviWB2aCXqeJKPYzexAoK01Yg6s6cLwpp5mznoR4J9YtzBX0+JaB2Q
-	 RGzl1CWYt5ctBprLFLGJSvPejfop4znvHRnWwqgqpJHcHC0j9ob/Np83XrO9+Cl3TX
-	 VS8m3uLgzCzbvtCwipbPzokR0Dek9Wxm/0Ippytis8vLZ/I6x2I70gfKMwQbmEhFro
-	 NAdguE5T18zqwp0QS2kDwlBde/OWsN6qjyPmGKZIp7wCv7/K32g7gRemPHItu6WY9g
-	 OF83QkAKrc+JLLzKj3XjbpThHQLvD4g3n1HMYbOp1iZmU15u/EOi4JVaYquL+5oCoh
-	 XLNrjl71mrNfw==
-Date: Mon, 5 Jan 2026 22:58:17 -0800
+	b=b7ZoPwzfnmcabNZsXhhFPkC0diNTcbxD8MOxWwMcIR/D0rfnIcat+g9pKl3D4vNR8
+	 p8eE3YSZadhKUqx9GtmY6slFcA+wwf2J0zl8waciGXk0txzdYSJXkag4jGw7NzIEBN
+	 R5qVh8gAYMRiPLwh62oWiz1lUlVGvsRaCcbxXB76h6blFAxh0Ywu5PR44n3fmcoC21
+	 XWCx3T+Gd/5jijysHW6D+l4yPhy2J6ypLMLYrDMOuOYyVS7HS/e9i29GPQjPoG5w/y
+	 n5+3xJI2ity3YIpNwBZMmfYaC8SfT/W2UI5RiEAPnjyEgfNKmNRdBwMuKFFHHGdIp1
+	 gdgZ6mgUBy+3Q==
+Date: Tue, 6 Jan 2026 00:02:51 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Andrew Cooper <andrew.cooper3@citrix.com>, Jason@zx2c4.com,
-	ardb@kernel.org, dengler@linux.ibm.com, freude@linux.ibm.com,
-	herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org,
-	x86@kernel.org
-Subject: Re: [PATCH 19/36] Bluetooth: SMP: Use new AES library API
-Message-ID: <20260106065817.GB2630@sol>
-References: <20260105051311.1607207-20-ebiggers@kernel.org>
- <859377de-cb72-4e87-8ee5-97f8c58a5720@citrix.com>
- <20260105190503.53cc31dd@pumpkin>
+To: David Howells <dhowells@redhat.com>
+Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@cloudflare.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v11 3/8] pkcs7, x509: Add ML-DSA support
+Message-ID: <20260106080251.GD2630@sol>
+References: <20260105152145.1801972-1-dhowells@redhat.com>
+ <20260105152145.1801972-4-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260105190503.53cc31dd@pumpkin>
+In-Reply-To: <20260105152145.1801972-4-dhowells@redhat.com>
 
-On Mon, Jan 05, 2026 at 07:05:03PM +0000, David Laight wrote:
-> On Mon, 5 Jan 2026 15:40:22 +0000
-> Andrew Cooper <andrew.cooper3@citrix.com> wrote:
+On Mon, Jan 05, 2026 at 03:21:28PM +0000, David Howells wrote:
+> Add support for ML-DSA keys and signatures to the PKCS#7 and X.509
+> implementations.
 > 
-> > >  	/* Most significant octet of plaintextData corresponds to data[0] */
-> > >  	swap_buf(r, data, 16);
-> > >  
-> > > - aes_encrypt(&ctx, data, data); + aes_encrypt_new(&aes, data, data);  
-> > 
-> > One thing you might want to consider, which reduces the churn in the series.
-> > 
-> > You can use _Generic() to do type-based dispatch on the first pointer. 
-> > Something like this:
-> > 
-> > void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in);
-> > void aes_encrypt_new(aes_encrypt_arg key, u8 out[at_least AES_BLOCK_SIZE],
-> >              const u8 in[at_least AES_BLOCK_SIZE]);
-> > 
-> > #define aes_encrypt(ctx, out, in)                                       \
-> >     _Generic(ctx,                                                       \
-> >              const struct crypto_aes_ctx *: aes_encrypt(ctx, out, in),  \
-> >              aes_encrypt_arg: aes_encrypt_new(ctx, out, in))
-> > 
-> > 
-> > i.e. it keeps the _new()-ism in a single header, without needing to
-> > change the drivers a second time.
-> 
-> You'll need to cast the 'ctx' argument in both calls.
-> All the code in an _Generic() must compile cleanly in all the cases.
-> (Totally annoying....)
-> 
-> 	David
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Lukas Wunner <lukas@wunner.de>
+> cc: Ignat Korchagin <ignat@cloudflare.com>
+> cc: Stephan Mueller <smueller@chronox.de>
+> cc: Eric Biggers <ebiggers@kernel.org>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: keyrings@vger.kernel.org
+> cc: linux-crypto@vger.kernel.org
+> ---
+>  crypto/asymmetric_keys/pkcs7_parser.c     | 15 ++++++++++++++
+>  crypto/asymmetric_keys/public_key.c       |  7 +++++++
+>  crypto/asymmetric_keys/x509_cert_parser.c | 24 +++++++++++++++++++++++
+>  include/linux/oid_registry.h              |  5 +++++
+>  4 files changed, 51 insertions(+)
 
-It seems it would actually have to be:
+This "PKCS#7" (really CMS -- the kernel misleadingly uses the old name)
+stuff is really hard to understand.  I'm trying to understand what
+message you're actually passing to mldsa_verify().  That's kind of the
+whole point, after all.
 
-#define aes_encrypt(key, out, in) \
-_Generic(key, \
-	 struct crypto_aes_ctx *: aes_encrypt_old((const struct crypto_aes_ctx *)key, out, in), \
-	 const struct crypto_aes_ctx *: aes_encrypt_old((const struct crypto_aes_ctx *)key, out, in), \
-	 struct aes_enckey *: aes_encrypt_new((const struct aes_enckey *)key, out, in), \
-	 const struct aes_enckey *: aes_encrypt_new((const struct aes_enckey *)key, out, in), \
-	 struct aes_key *: aes_encrypt_new((const struct aes_key *)key, out, in), \
-	 const struct aes_key *: aes_encrypt_new((const struct aes_key *)key, out, in))
+The message comes from the byte array public_key_signature::digest
+(which is misleadingly named, as it's not always a digest).  In turn,
+that comes from the following:
 
-#define aes_decrypt(key, out, in) \
-_Generic(key, \
-	 struct crypto_aes_ctx *: aes_decrypt_old((const struct crypto_aes_ctx *)key, out, in), \
-	 const struct crypto_aes_ctx *: aes_decrypt_old((const struct crypto_aes_ctx *)key, out, in), \
-	 struct aes_key *: aes_decrypt_new((const struct aes_key *)key, out, in), \
-	 const struct aes_key *: aes_decrypt_new((const struct aes_key *)key, out, in))
+1.) If the CMS object doesn't include signed attributes, then it's a
+    digest of the real message the caller provided.
 
-Note that both const and non-const args need to be handled.
+2.) If the CMS object includes signed attributes, then the message is
+    the signed attributes as a byte array.  The signed attributes are
+    required to include a message digest attribute whose value matches a
+    digest of the real message the caller provided.
 
-It also doesn't work for any callers passing a 'void *' or
-'const void *' and relying on an implicit cast.  I didn't notice any,
-but that needs to be considered too.
+In either (1) or (2), the digest algorithm used comes from the CMS
+object itself, from SignerInfo::digestAlgorithm.  The kernel allows
+SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SM3, Streebog-256,
+Streebog-512, SHA3-256, SHA3-384, and SHA3-512.
 
-I guess maybe it would still be worth it to avoid the "*_new" name
-temporarily leaking into too many files.  (It goes away by the end of
-the series anyway.)  It's just not quite as simple as you're suggesting,
-and all the callers have to be checked for compatibility with it.
+So, a couple issues.  First, case (1) isn't actually compatible with
+RFC 9882 (https://datatracker.ietf.org/doc/rfc9882/) which is the
+specification for ML-DSA support in CMS.  RFC 9882 is clear that if
+there are no signed attributes, then the ML-DSA signature is computed
+directly over the signed-data, not over a digest of it.
+
+That needs to either be implemented correctly, or not at all.  (If only
+(2) is actually needed, then "not at all" probably would be preferable.)
+
+Second, because the digest algorithm comes from the untrusted signature
+object and the kernel is allowing different many digest algorithms,
+attackers are free to search for preimages across algorithms.  For
+example, if an attacker can find a Streebog-512 digest that matches a
+particular SHA-512 digest that was used in a valid signature, they could
+forge signatures.  This would only require a weakness in Streebog-512.
+
+While the root cause of this seems to be a flaw in CMS itself, it can be
+mitigated by more strictly limiting the allowed digest algorithms.  The
+kernel already does this for the existing signature algorithms.
+
+For simplicity and to avoid this issue entirely, I suggest just allowing
+SHA-512 only.  That's the only one that RFC 9882 says MUST be supported
+with ML-DSA.
 
 - Eric
