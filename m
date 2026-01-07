@@ -1,210 +1,98 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B5539E194
-	for <linux-crypto@vger.kernel.org>; Wed,  7 Jan 2026 16:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF8B318B86;
+	Wed,  7 Jan 2026 18:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767803929; cv=none; b=eQBa1YElBy2jlsjzdIdtogd+dWR+YZ/6EPcFhJ0Z3+ItMqoqbcPVa+ytxJJVKYxMrVKihMPuKITSsvQnkr/AP6GwZ7ujA1ioAzWPTvTjGPzr+BGTLYtV4aKJtueB6lWrT3zgHrt8p8M5nAOpO4iVriGZNMF/DxtCYT8R1yGdUDk=
+	t=1767809471; cv=none; b=Z+uvfrrfL8OeUZ/eCphl17TipAOrutMWaMkkqaSVnaj2W2xjCdsH4AhDPZPVIo1rbQ4Jm9G5tWQKMBGHRCRqkll3Mtx7olsdFdNMS0p1bj1u1FUZuVOaKwiYBsg1YNZ+LzSF5zG8JY0NRHP7fj4XXb6eIOyQonQGmLKGQft0efU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767803929; c=relaxed/simple;
-	bh=fRsEUwtHorbtdkW1jrhWLB7v+CG3d0JqqtIPkpcXTO8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XNF1oc7ZOu6c1eTCDRYjmfA2Qwu+5AoanMovixgpxEyELriwDWxglpYRttnUmZYh2GdUHc2PTWvJX3WKTXXYzYqGEnIquUY6Zw+iY/kmGb+ScoAV7wnmtAEvyVhLvVKytSobziG/pmicJ4iIMNxN8ZHjQFVGjFosh08OaxftLuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=GWYT5nx1; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+	s=arc-20240116; t=1767809471; c=relaxed/simple;
+	bh=yTNbHm4Elx5+p4958R6MqgcPSCwr1JI4nhgkqFvSTQk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ullz0+xaSQQl8kfqBKBhxXehs3uf6htcOZz8vFBsxxa5WxjmyPmJS85AdNOUVbZ7kZqRFhDHxwPJZcghJAEncH9exxoMLQib4QPLARiIhCQumQ0YOQhkVueYobO+7rJLlol9xFmeYelBspkXTVElYp4U3IjtnVxsid4VOuwLOZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cfK1G1cT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="GWYT5nx1"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-598f81d090cso2347601e87.2
-        for <linux-crypto@vger.kernel.org>; Wed, 07 Jan 2026 08:38:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1767803918; x=1768408718; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kW846dKKsvB937IYHg57MK2wxwUFHhgVJ3+JvFFPElU=;
-        b=GWYT5nx1llV/EqfT4RHaicIR7DWQtgQWlM4MD41cV13TQzyXKOY6iIvNneHhNIz0l/
-         XtRYEgEXhABOna1O1qkZuGF1YOHz+Fmaagzeo1ZrJOMnbYoYXi3YsKKw7FVFVY7K6Exv
-         ya67yUf6xx5g5L5fr9Qma8xViIoVKFCIvSSOfnoZhbj/nuBcXXxCxF9bDSxk6ma0ePp/
-         tcBjKgDX9xPe+Duydnu2ogF0FdFvwtmuDu0a8KsXevk/v3dvnA2QZSJgw3U4QbJuZXjm
-         Kl1qRNEx6KjFI3kZxnFev8+lunxJCJH5jnYTxNvPuABEA/R0OV0slKHFYK0h+lPvIcrs
-         uY5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767803918; x=1768408718;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kW846dKKsvB937IYHg57MK2wxwUFHhgVJ3+JvFFPElU=;
-        b=BDRUZgrj5cBc+q4t6KxaOggIqDNqcUSRK6QerD/zwnOPyvzrXRjjCk+jN1ApCcmTNq
-         jKq1HUAmiW83FZoIaYlq4z964fxWWjxtb6/P0aJJaVozJubOl7a5LgFqM0kStVz3VstL
-         1M88vG1BPKZaZHlMY4GAhqQdv6AvS8cXJtkSh4iiJ0Ap6zSWQhuSahGCdJczYluSYBIw
-         WltGG79aUMMIsYgvuLrCb2QLbnaVBLUvMRYLB64LTiTJFfGN95rQNnshwlyWFqkeh3Tw
-         yYWiJPVP6Aj4ELCdMRQGbEXhheuryFslyt2Uz1794/qwL1kM3GzgKcWM3Vqnm6M9YU6G
-         zVIA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6Nj9sd44sEx9AjM7yvI0AIUo1dcW8sXb0v7c6LHjfhbDDQGZAVAltsaugGPhTUZf3rU3EZNXsgBEAn7k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyt8eRlEWO0o6sK3RyrEnOUrPmrbPh+GSXJlhYlijt0SXgji75d
-	vobM0up+eY2yddfOgijkirBxXdAC1g2LzTKurIjxn8S83HCMUG5w4LWj8LOJwa4SPXeMrMK+VWl
-	318SdGpTaRTocGNzytkh94Vf/llkffpzokm1bBv+gkg==
-X-Gm-Gg: AY/fxX6bFkTRHvqItaeiJM6h1tkpcMEScU3nEQEdLw43t824lm6IhAvPCf6y6yUYSSx
-	UW7r0XKmUxeIGzs1+6iR6etnq0pK7f6gC1Ynms99CkhUUpEDDyTKVp6dyUAkYJeEUTKAJDECkJg
-	YHZBukPqX1qLNxf8kzK4pvMf7YLGZLgAT3tYowmGLik4NGxr6n20jsyRaubrWEygg+I64quloST
-	N1cI9pjRP4mtWN4WyDzT0N3X1Yo8Ww6Sw7i95tvV+HVMCip/gACjDzeY++hkJWquF3BJDrJl3u+
-	YE9Y2ONhwy1wCQ==
-X-Google-Smtp-Source: AGHT+IGLoWHGzRMHY6PpbgP44tMsQvOWECFXE6pLJTWOIJxsRLSDUETFtqlqqwHRUPWy9MfLR1uDc+QiEDzeOSFRbv4=
-X-Received: by 2002:ac2:4e12:0:b0:594:2e7b:6f9 with SMTP id
- 2adb3069b0e04-59b6f047f08mr1233343e87.27.1767803918457; Wed, 07 Jan 2026
- 08:38:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cfK1G1cT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8804DC4CEF1;
+	Wed,  7 Jan 2026 18:11:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767809471;
+	bh=yTNbHm4Elx5+p4958R6MqgcPSCwr1JI4nhgkqFvSTQk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cfK1G1cTgD2fle+eiVWG8uWGL3DLjptNzOtIstqyjt6/KrCcdkcRIYkLMAFg5sqfU
+	 23DJAQ6Ihpdb0VBgZEj5n4w3P/+Tfctp8rOxcqAdwIfRgsibuGYiVVhEMNkpf5BavK
+	 hAE9zfUD/PvELOxL1BnKLd1mySP9UBmDoUgW70rAsQSmNsdrNvRd3AB9QCLwRqAK+j
+	 oxVc3cTy7pQnwCk8nZBquR6VX65USIoYM8/BhK/axE/pa5A6txZuUFQ/C+KsYl/Wdl
+	 MWyiwSl+/46epZ2ay12CbjJus5BTD4FfLSnKm9atA3rN+Tu5UGRZsB7JumYPu4T/PH
+	 iTN8bHn/qzmQA==
+Date: Wed, 7 Jan 2026 19:11:07 +0100
+From: Andi Shyti <andi.shyti@kernel.org>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, lee@kernel.org, 
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linusw@kernel.org, Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
+	UNGLinuxDriver@microchip.com, olivia@selenic.com, radu_nicolae.pirea@upb.ro, 
+	richard.genoud@bootlin.com, gregkh@linuxfoundation.org, jirislaby@kernel.org, 
+	broonie@kernel.org, lars.povlsen@microchip.com, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, 
+	linux-usb@vger.kernel.org, luka.perkov@sartura.hr, 
+	Conor Dooley <conor.dooley@microchip.com>
+Subject: Re: [PATCH v4 05/15] dt-bindings: i2c: atmel,at91sam: add
+ microchip,lan9691-i2c
+Message-ID: <aV6hp9_AbKm9IAP9@zenone.zhora.eu>
+References: <20251229184004.571837-1-robert.marko@sartura.hr>
+ <20251229184004.571837-6-robert.marko@sartura.hr>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260105152145.1801972-1-dhowells@redhat.com> <20260105152145.1801972-9-dhowells@redhat.com>
-In-Reply-To: <20260105152145.1801972-9-dhowells@redhat.com>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Wed, 7 Jan 2026 16:38:27 +0000
-X-Gm-Features: AQt7F2p43GDavepwZCl172aMay7N5leyGJ_l1NOUP-m5QhxfdGJ64MkgnawivDo
-Message-ID: <CALrw=nEkbXMLfTR9tHLZchz-UsdzCQK_27QJYv=LuEOX2=6TBQ@mail.gmail.com>
-Subject: Re: [PATCH v11 8/8] modsign: Enable RSASSA-PSS module signing
-To: David Howells <dhowells@redhat.com>
-Cc: Lukas Wunner <lukas@wunner.de>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Eric Biggers <ebiggers@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
-	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Stephan Mueller <smueller@chronox.de>, 
-	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org, 
-	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251229184004.571837-6-robert.marko@sartura.hr>
 
-On Mon, Jan 5, 2026 at 3:22=E2=80=AFPM David Howells <dhowells@redhat.com> =
-wrote:
->
-> Add support for RSASSA-PSS signatures (RFC8017) for use with module signi=
-ng
-> and other public key cryptography done by the kernel.
->
-> Note that only signature verification is supported by the kernel.
->
-> Note further that this alters some of the same code as the MLDSA support,
-> so that needs to be applied first to avoid conflicts.
->
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Lukas Wunner <lukas@wunner.de>
-> cc: Ignat Korchagin <ignat@cloudflare.com>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: keyrings@vger.kernel.org
-> cc: linux-crypto@vger.kernel.org
+Hi Robert,
+
+On Mon, Dec 29, 2025 at 07:37:46PM +0100, Robert Marko wrote:
+> Document Microchip LAN969x I2C compatible.
+> 
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> Acked-by: Andi Shyti <andi.shyti@kernel.org>
+
+Just this patch merged to i2c/i2c-host.
+
+Thanks,
+Andi
+
 > ---
->  certs/Kconfig       |  6 ++++++
->  certs/Makefile      |  1 +
->  scripts/sign-file.c | 39 +++++++++++++++++++++++++++++++++++++--
->  3 files changed, 44 insertions(+), 2 deletions(-)
->
-> diff --git a/certs/Kconfig b/certs/Kconfig
-> index 94b086684d07..beb8991ad761 100644
-> --- a/certs/Kconfig
-> +++ b/certs/Kconfig
-> @@ -27,6 +27,12 @@ config MODULE_SIG_KEY_TYPE_RSA
->         help
->          Use an RSA key for module signing.
->
-> +config MODULE_SIG_KEY_TYPE_RSASSA_PSS
-> +       bool "RSASSA-PSS"
-> +       select CRYPTO_RSA
-> +       help
-> +        Use an RSASSA-PSS key for module signing.
-> +
->  config MODULE_SIG_KEY_TYPE_ECDSA
->         bool "ECDSA"
->         select CRYPTO_ECDSA
-> diff --git a/certs/Makefile b/certs/Makefile
-> index 3ee1960f9f4a..3b5a3a303f4c 100644
-> --- a/certs/Makefile
-> +++ b/certs/Makefile
-> @@ -42,6 +42,7 @@ targets +=3D x509_certificate_list
->  # boolean option and we unfortunately can't make it depend on !RANDCONFI=
-G.
->  ifeq ($(CONFIG_MODULE_SIG_KEY),certs/signing_key.pem)
->
-> +keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_RSASSA_PSS) :=3D -newkey rsassa-pss
->  keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ECDSA) :=3D -newkey ec -pkeyopt ec_=
-paramgen_curve:secp384r1
->  keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_44) :=3D -newkey ml-dsa-44
->  keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_65) :=3D -newkey ml-dsa-65
-> diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-> index b726581075f9..ca605095194e 100644
-> --- a/scripts/sign-file.c
-> +++ b/scripts/sign-file.c
-> @@ -233,6 +233,7 @@ int main(int argc, char **argv)
->         EVP_PKEY *private_key;
->  #ifndef USE_PKCS7
->         CMS_ContentInfo *cms =3D NULL;
-> +       CMS_SignerInfo *signer;
->         unsigned int use_keyid =3D 0;
->  #else
->         PKCS7 *pkcs7 =3D NULL;
-> @@ -329,13 +330,47 @@ int main(int argc, char **argv)
->                     !EVP_PKEY_is_a(private_key, "ML-DSA-65") &&
->                     !EVP_PKEY_is_a(private_key, "ML-DSA-87"))
->                         flags |=3D use_signed_attrs;
-> +               if (EVP_PKEY_is_a(private_key, "RSASSA-PSS"))
-> +                       flags |=3D CMS_KEY_PARAM;
-> +       if (EVP_PKEY_is_a(private_key, "RSASSA-PSS")) {
-> +                       EVP_PKEY_CTX *pkctx;
-> +                       char mdname[1024] =3D {};
-> +
-> +                       pkctx =3D EVP_PKEY_CTX_new(private_key, NULL);
-> +
-> +                       ERR(!EVP_PKEY_sign_init(pkctx), "EVP_PKEY_sign_in=
-it");
-> +                       ERR(!EVP_PKEY_CTX_set_rsa_padding(pkctx, RSA_PKCS=
-1_PSS_PADDING),
-> +                           "EVP_PKEY_CTX_set_rsa_padding");
-> +                       ERR(!EVP_PKEY_CTX_set_rsa_mgf1_md_name(pkctx, has=
-h_algo, NULL),
-> +                           "EVP_PKEY_CTX_set_rsa_mgf1_md_name");
-> +
-> +                       ERR(!EVP_PKEY_CTX_get_rsa_mgf1_md_name(pkctx, mdn=
-ame, sizeof(mdname)),
-> +                           "EVP_PKEY_CTX_get_rsa_mgf1_md_name");
-> +                       printf("RSASSA-PSS %s\n", mdname);
-> +               }
->
->                 /* Load the signature message from the digest buffer. */
->                 cms =3D CMS_sign(NULL, NULL, NULL, NULL, flags);
->                 ERR(!cms, "CMS_sign");
->
-> -               ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo,=
- flags),
-> -                   "CMS_add1_signer");
-> +               signer =3D CMS_add1_signer(cms, x509, private_key, digest=
-_algo, flags);
-> +               ERR(!signer, "CMS_add1_signer");
-> +
-> +               if (EVP_PKEY_is_a(private_key, "RSASSA-PSS")) {
-> +                       EVP_PKEY_CTX *pkctx;
-> +                       char mdname[1024] =3D {};
-> +
-> +                       pkctx =3D CMS_SignerInfo_get0_pkey_ctx(signer);
-> +                       ERR(!EVP_PKEY_CTX_set_rsa_padding(pkctx, RSA_PKCS=
-1_PSS_PADDING),
-> +                           "EVP_PKEY_CTX_set_rsa_padding");
-> +                       ERR(!EVP_PKEY_CTX_set_rsa_mgf1_md_name(pkctx, has=
-h_algo, NULL),
-> +                           "EVP_PKEY_CTX_set_rsa_mgf1_md_name");
-> +
-> +                       ERR(!EVP_PKEY_CTX_get_rsa_mgf1_md_name(pkctx, mdn=
-ame, sizeof(mdname)),
-> +                           "EVP_PKEY_CTX_get_rsa_mgf1_md_name");
-> +                       printf("RSASSA-PSS %s\n", mdname);
-> +               }
-> +
->                 ERR(CMS_final(cms, bm, NULL, flags) !=3D 1,
->                     "CMS_final");
->
->
-
-Reviewed-by: Ignat Korchagin <ignat@cloudflare.com>
+> Changes in v4:
+> * Pick Acked-by from Andi
+> 
+> Changes in v3:
+> * Pick Acked-by from Conor
+> 
+>  Documentation/devicetree/bindings/i2c/atmel,at91sam-i2c.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/i2c/atmel,at91sam-i2c.yaml b/Documentation/devicetree/bindings/i2c/atmel,at91sam-i2c.yaml
+> index e61cdb5b16ef..c83674c3183b 100644
+> --- a/Documentation/devicetree/bindings/i2c/atmel,at91sam-i2c.yaml
+> +++ b/Documentation/devicetree/bindings/i2c/atmel,at91sam-i2c.yaml
+> @@ -26,6 +26,7 @@ properties:
+>                - microchip,sam9x60-i2c
+>        - items:
+>            - enum:
+> +              - microchip,lan9691-i2c
+>                - microchip,sama7d65-i2c
+>                - microchip,sama7g5-i2c
+>                - microchip,sam9x7-i2c
+> -- 
+> 2.52.0
+> 
