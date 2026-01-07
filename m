@@ -1,100 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A691F94A;
-	Wed,  7 Jan 2026 05:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BF427FB3E;
+	Wed,  7 Jan 2026 07:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767763332; cv=none; b=TapMD6jl9saRIbACC0jlXk82L/T/1nCTJVF+YuuPqnR9nhACBb/OPjw4sEGl6bP9gL54vP1k+hebthTkPDdBgs4veIS2S9ZQIe2Vi8dJrwA7t4zMSDsN46I+mXWOSV1mTrHdGhzG9EqwHfZWVapC8OgAent8oZu23MEn0NgtSaM=
+	t=1767771740; cv=none; b=KI1gSEPuxPkdYSIRM1fdSnZ+D1BKgiZyGNvQ/8wQjGcgxVRCx9qBJm7x21nZjP0zBScwBHxmtOET3TYXRVJ013VoRr0mvhoD6LgMO7EXjYpxYG0eLHLKIJkCHg6sI00hC7Jm6bEUJHMTOKij+mfkiYkyJD5z315UxUf3GOkMBPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767763332; c=relaxed/simple;
-	bh=vIYnVUMUYdu4oyLCEJ94b9A9n9eIvaOTcOWPENRlRoU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OBEbnbGn7e9nPRZbodPrjj/SyS7X7umu21KEFQEvbvZrjLkSQQARiSWQTYspbXiO2kcXwldkQKFqd/CVNYJZONL6ewkj/rEEDHSRei7waDHF+XRM2DAI9d5h0ZHdP4LDh0STD0eNe9JdjcYtMSBxk6/HVKsjuQEBLY26Ncy8elQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PX9yaTiE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767771740; c=relaxed/simple;
+	bh=JXoDBPW8yLgJ3fVQbb+crMkwRdSBf4wjOq2wiCU1hz8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h8aMeNIvQEfiKcbFA70ccwn1gs/ULeI9q3tKM8dunQY+WoNewhKvVSF0xJXUQE+fH0Mc3EUcGHeQ2bNsL1CUX9Yh6HehInOPGouEDLOL40caBf+W0jZ98Py/gzVm94k1Q2LYXgZ2QSbuYtlp6cncyqhiJGeRnOxoTgqOvvizAzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bFsXPVWQ; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PX9yaTiE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05C02C4CEF7;
-	Wed,  7 Jan 2026 05:22:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767763331;
-	bh=vIYnVUMUYdu4oyLCEJ94b9A9n9eIvaOTcOWPENRlRoU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PX9yaTiE+kqsedhEPVD3hq5LTBM762y0hiZTWfIgL6unEsJrOP9r9i//eCG3/9B/v
-	 nqkA33FwKbSgBB5gUn6dnCoyybH6u8cGTd6bVRu8iSosnWHIKFfdFLefdZ6D/lvPL1
-	 t2LjO+T09jmuB1hdjU5WmEgCzRxWP8CqU9Rii8Cz7g7kbZIcvQhdvupaGv9h3tlDBW
-	 LzRDnW3dhOvqrENbat+S5OKyKxAgmmKblTNHqCL0n1k5/KInhrDMtEu5UvU6X01tOa
-	 O7XyOtE2V3cUnKhtnAUiCsh35IV7XizET8w4zsBRFy5udWN0Bas2AdCKYe9t1+BO5r
-	 nxau9qdiMtejw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>,
-	stable@vger.kernel.org,
-	Qingfang Deng <dqfext@gmail.com>
-Subject: [PATCH] lib/crypto: aes: Fix missing MMU protection for AES S-box
-Date: Tue,  6 Jan 2026 21:20:23 -0800
-Message-ID: <20260107052023.174620-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bFsXPVWQ"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 606JHNFG010621;
+	Wed, 7 Jan 2026 07:41:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=1OZUwc
+	KFlVEp1Wy+fiQBJUjbSRrLG01ise870K7kToI=; b=bFsXPVWQffGEjgz43qR9SU
+	oK9i1gKcGibfmctolAf0Q95wRmnUngUTNHd2zM2G59babPu8XdgILHMZoDz0wTAq
+	4eYjSWZgPNgZWVYDTk+OnX/6LCj5+1HiBQ/iP/uakjlCDMjjRGVBsfez5YEDAbXO
+	/cxf/ovbbw7QTTH/ZgMhjz10jPo4lJbKXYM40fkI70r7pVtga2xeU1Vi249nCNK4
+	KaHEo1JhOt7nZ/TTwFjtbW4SoR59yMc9EOw/EB/PI5a86kvDMKfglBi5kb05SFED
+	GVS7bn13G3twfi4Y3S0a7SRsE3R8CbgFviQmZjdfEB1rnMvxqrwaawJSzuiM3WDw
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4beshexq7s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 Jan 2026 07:41:05 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 6073cmdh005264;
+	Wed, 7 Jan 2026 07:41:05 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4bfexk7rkb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 Jan 2026 07:41:04 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6077f2aR16122176
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 7 Jan 2026 07:41:03 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CF7732004E;
+	Wed,  7 Jan 2026 07:41:02 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8A3312004B;
+	Wed,  7 Jan 2026 07:41:02 +0000 (GMT)
+Received: from [9.111.198.188] (unknown [9.111.198.188])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  7 Jan 2026 07:41:02 +0000 (GMT)
+Message-ID: <167cbd49-e0ba-4b1d-a724-e64ab6ee863c@linux.ibm.com>
+Date: Wed, 7 Jan 2026 08:41:02 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 15/36] lib/crypto: s390/aes: Migrate optimized code into
+ library
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        linux-crypto@vger.kernel.org
+References: <20260105051311.1607207-1-ebiggers@kernel.org>
+ <20260105051311.1607207-16-ebiggers@kernel.org>
+From: Holger Dengler <dengler@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <20260105051311.1607207-16-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA3MDA1NyBTYWx0ZWRfX2Ar3kzLBShn/
+ kdRHVYkMALEAtFOLTrFv3UfaLcyHGNcf2FudjUR/NeyXQ7HAsrwQwlYZneMJ2N2uGvAupQRk1e/
+ TSguKGdM8P/wi3igdzTYXCbt1TuRtcriMIpKGz1q+34bvm2mFZxURCDAEFZ7ryUhKJA/DdD2MAp
+ 3o8LQKFDglWsyiT4LMj68s0SN7DVxC4u641BbU+DyD+pblgwJ0jw1Pe5/qmd6ArnP1Z100oAPvL
+ a6Add51rNovhsAzGHW4iUYS/l7vtFWxtXxTJVz7G0slY/W7koj28QBNWoTI0rf38mxOrTtj1UCV
+ N+zXBL+vzIKjyQNF3RLFspYinN9vgfuVJpQ0nkXy/1ShtyuR4fKH4FNlzq/G6QmdwxV0SdyQavG
+ GIgvHZEtzy4g9sk9HKKrGeBGxWK2zEF1eq+89TivB8tIEmzU7X8E2C3eipi9+Bwb9ZDpNNfyMTV
+ 7YxdoBUyksPo7u0Y7Rw==
+X-Proofpoint-GUID: ucJZtlyWTiqD4d7TJcTXL99WK-bHXMG1
+X-Proofpoint-ORIG-GUID: ucJZtlyWTiqD4d7TJcTXL99WK-bHXMG1
+X-Authority-Analysis: v=2.4 cv=AOkvhdoa c=1 sm=1 tr=0 ts=695e0e11 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=w46-cfdy0MOtRbFV-QQA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-06_03,2026-01-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 spamscore=0 adultscore=0 malwarescore=0 impostorscore=0
+ clxscore=1011 suspectscore=0 bulkscore=0 phishscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2512120000 definitions=main-2601070057
 
-__cacheline_aligned puts the data in the ".data..cacheline_aligned"
-section, which isn't marked read-only i.e. it doesn't receive MMU
-protection.  Replace it with ____cacheline_aligned which does the right
-thing and just aligns the data while keeping it in ".rodata".
+Hi Eric,
 
-Fixes: b5e0b032b6c3 ("crypto: aes - add generic time invariant AES cipher")
-Cc: stable@vger.kernel.org
-Reported-by: Qingfang Deng <dqfext@gmail.com>
-Closes: https://lore.kernel.org/r/20260105074712.498-1-dqfext@gmail.com/
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
+first of all: happy New Year! ANd thanks for the series.
 
-This patch is targeting libcrypto-fixes
+On 05/01/2026 06:12, Eric Biggers wrote:
+> Implement aes_preparekey_arch(), aes_encrypt_arch(), and 
+> aes_decrypt_arch() using the CPACF AES instructions.
 
- lib/crypto/aes.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I'm not sure, it it makes sense to implement this on s390 at all. The CPACF
+instructions cover full modes of operations and are optimized to process more
+than one cipher-block-size (*). For single-block operations, the performance
+might be worth than using the generic functions. I will look into it and do
+some performance tests. If there is a possibility to plug-in to the level
+where the modes of operation are implemented, it would make much more sense
+for s390.
 
-diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
-index b57fda3460f1..102aaa76bc8d 100644
---- a/lib/crypto/aes.c
-+++ b/lib/crypto/aes.c
-@@ -11,11 +11,11 @@
- 
- /*
-  * Emit the sbox as volatile const to prevent the compiler from doing
-  * constant folding on sbox references involving fixed indexes.
-  */
--static volatile const u8 __cacheline_aligned aes_sbox[] = {
-+static volatile const u8 ____cacheline_aligned aes_sbox[] = {
- 	0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
- 	0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
- 	0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
- 	0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
- 	0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc,
-@@ -46,11 +46,11 @@ static volatile const u8 __cacheline_aligned aes_sbox[] = {
- 	0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
- 	0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
- 	0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16,
- };
- 
--static volatile const u8 __cacheline_aligned aes_inv_sbox[] = {
-+static volatile const u8 ____cacheline_aligned aes_inv_sbox[] = {
- 	0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38,
- 	0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
- 	0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87,
- 	0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb,
- 	0x54, 0x7b, 0x94, 0x32, 0xa6, 0xc2, 0x23, 0x3d,
+(*) Yes, it's a bit uncommon, but the CPACF instructions on s390 can process
+multiple block with a single instruction call! They are so called long running
+instructions.
 
-base-commit: fdfa4339e805276a458a5df9d6caf0b43ad4c439
--- 
-2.52.0
+> Then, remove the superseded "aes-s390" crypto_cipher.
+> 
+> The result is that both the AES library and crypto_cipher APIs use the 
+> CPACF AES instructions, whereas previously only crypto_cipher did (and it 
+> wasn't enabled by default, which this commit fixes as well).
+> 
+> Note that this preserves the optimization where the AES key is stored in 
+> raw form rather than expanded form.  CPACF just takes the raw key.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org> --- arch/s390/crypto/
+
+-- Mit freundlichen Grüßen / Kind regards
+Holger Dengler
+--
+IBM Systems, Linux on IBM Z Development
+dengler@linux.ibm.com
 
