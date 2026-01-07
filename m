@@ -1,79 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF942701B8;
-	Wed,  7 Jan 2026 03:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E30226C3A2
+	for <linux-crypto@vger.kernel.org>; Wed,  7 Jan 2026 03:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767757444; cv=none; b=R+peziFQUCIGLBVF06E7TCDNwVYqvW8DrRIYa4RG4oxVJy8c7+0YvfFqa0nJBx4t6/ZzZTvmbQydK+hZNM0I14XptEFBFDm9k57EuO55C2a51AOgKEiS32n/Sz8v6RLmGwctS13qYd5jeSx81nbvMX1FAoorQtRBKTW6/L2MtZg=
+	t=1767757729; cv=none; b=UNPxKERK9XXmMiBnGhrIonkIYyr+tP6mXgTa0o29sVmUu87dtGC5Fs+gXSTR6jtQ29JN0QOqVq/F83Xfx2mXzpHZiBH0HRtuWP9fSh0VvdHnQwJS01+XOjvvkowT01gmKeWLeeUpNV5lt2M4qAzgEfKbhKEIk/HiIb9o4gwHpJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767757444; c=relaxed/simple;
-	bh=sBKLtZcr+zaiVvTAgHdnxk7H8Fjq981FTI154iwY78M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FQrb/b2HrhbNjWWaXHI3Lh7jv6o6i+feGFDHc3XLT8dkfm170jlmTTam+bTeix2AFJcZaBFLeMEhSfxyv2LB3Bx414Qdw5EyEqg8awvLS2m3d71vkZxglPuWv+lQRHPiN9WWkF9pInRzleSSEEdMaahPhGY+RKiXTgSU7w+GIHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pavmsgoj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767757729; c=relaxed/simple;
+	bh=7b6FVIVpJo+xA4SNmeOUyxog3DMDCGrnHY6W6wXIjPI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=g7Q3rdxzLzBB+QXomN/HhIFnkA293SoIppNDH2FCNwJr73JPbWnvdwCzRdXT/fyhGZu3uHdrGca2jeBgBwpdRoSrG6wZuUyc+h7F0w6af9ufcdRBa7nI96oD6Uqk/FjgDVwjFzEhjbcX+Hsyq3sVoKNFnDYJ/DNU4dAyKV7xPKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iuyPj14X; arc=none smtp.client-ip=74.125.82.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pavmsgoj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B4FEC4CEF7;
-	Wed,  7 Jan 2026 03:44:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767757441;
-	bh=sBKLtZcr+zaiVvTAgHdnxk7H8Fjq981FTI154iwY78M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pavmsgojqnpACVUZ1lCW6VcJTVI5dm6dJ2xOI8nOTeHaquVaZAGa+refu4OZB0RGk
-	 wPb3ZwRFKqYkxPk2PuIjn0kruNDLebLgicfVdZ2XARYGzMZrR7y3/QtZQtjivu/n3a
-	 PDedjJ/DHBeqA5iWt8PPpBaLwfaV90bcALPCxQZvSO3xnS7RsZ7UDbmOXjqLqknhto
-	 w4KGECh2AkaFoVEYhXZ3SKhC0bYMWeJAfX7LxgPcl8qb1j1yle+1ESc+Zle6lrhi0R
-	 Yqg3UzO4mn+3XfmqZ9s7sF/7hC3JSafvd1drMz4BBVZ0VGr2zHlXLKEgKgO9XmcXGa
-	 lsVZXTRrYFQuA==
-Date: Tue, 6 Jan 2026 19:43:41 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Jie Zhan <zhanjie9@hisilicon.com>
-Cc: ardb@kernel.org, dhowells@redhat.com, linux-kernel@vger.kernel.org,
-	linuxarm@huawei.com, jonathan.cameron@huawei.com,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: tests: Fix syntax error for old python
- versions
-Message-ID: <20260107034341.GB2283@sol>
-References: <20260107015829.2000699-1-zhanjie9@hisilicon.com>
- <20260107033018.GA2283@sol>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iuyPj14X"
+Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-2ae38f81be1so1083801eec.0
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Jan 2026 19:48:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767757726; x=1768362526; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lVfOOsMtVesahSpJ7NzEZB2a7bFJ+2QiFmRNgCZu9gM=;
+        b=iuyPj14XKkoWH9MWkyK+ItoYjysm2xwZQnqd3XHofHxkQDmMGac9oSzcLBYDBeqLtz
+         rM7Y05s+Vp6JPcTNmWjefnB/fGHoe5JvPk4EfglNeWSJ2uMUZ3hNg2M4jQmaQCVwWHwp
+         PGn3RUeyEAQNdEzO2/KVXwyL7JmHDrVE+K0Ku6AXrcedu6MmC7f7MYeRluE5+IoOQ0gE
+         M3aTso69uZ2l50bovlSz+mHhtXJXkrK/nwTmuyToO6Vm0V7sg7wCAM2ZIhjKOUJrY95g
+         RPMB5Gryt3l8LxiQDX/ReWMNTbZuoWRjqyfyqMQEanatzzhStz8WxxAuXQT6R1EpDCLR
+         8CwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767757726; x=1768362526;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lVfOOsMtVesahSpJ7NzEZB2a7bFJ+2QiFmRNgCZu9gM=;
+        b=mW4WjjqdxetLpqdgPZI78v+27ZdV+2XICUJD44ceV0LunTf4ou6nLtMtCEYpTB2vTW
+         yMPlW93BEzO6Ouid4rW1GE9oX0+M4o1UgIK+HfOTnyIjyK3Hx9hWdir/rVl1secWMt2C
+         UWeqJI93Fei/wZyPbjjt/vyLGYMOKwdUZcHFsgli8vGXtbAxLQC5ShtDi4yliy6AK7Gi
+         Q8uEfiM7L7wjtQqYaeuqi0maGcVS9IoqKZbElRviCb3v7/ECHpvMkl6JNnCmpYuGJQT2
+         fiD5RGldEVCgXqb12YUJrGfxLopr0oIUljP7FYrz81Qx0/DjU1z6JXxBoIlzh3eNT71O
+         b/TA==
+X-Gm-Message-State: AOJu0YwGcPMq0RT91gtC20ewGWccay5QpXZ6BWcNYwACpCu2DDv+BXEx
+	sblE8I96lCcjGu47xkka12fE0YW+gtXSqJDbDvfQzC+qzJWdSFdy10lF
+X-Gm-Gg: AY/fxX7XimUqip9B2WJKoHy+PE8BkIrQvSTyaZn8z4ZLVQp8o2IfSKl9psJy3dtG/PC
+	BqULUm0WPdHyMHI9ON02SG2R6et/8Y3LJLa5pk5+N/DsAkCUGPSwNhFSHx8ixDaKY++K1fT2eMh
+	ULpqumScfkNxQRm9L9sjp412FSq8q9AGdxtyL3X4GpIrISm4Ahv0t8+DL/Vg8hC7UQUgf0AcGnQ
+	PU4HsMaeuwWvjpzCdn3Se8tnY7wsEiyoyKgs7mQ5oBSBHDZ1a+mWAWgLvIZ0RjrHymtq6hK8wiB
+	KKGJkzg5N1Hdwi6aPY6pJv6tQkidfJJX1grwsPyjhJSdK1ds2IWfEGRtgwe81H4d7hOxT/LLpGM
+	5/jdo5xPzpaWmFuZpVZwD+sH+3u6Ovoq/+TIudpM1/TFoNQTBtTNt82XTOazy/us=
+X-Google-Smtp-Source: AGHT+IH/ZbpZvf+ufhdSrgq15FQAA5DMOGdsUeBWMvuc3LZNVn+XAns8eGMqcOV8TZ1Q54ktkq+I7A==
+X-Received: by 2002:a05:7301:578d:b0:2a4:3593:c7c5 with SMTP id 5a478bee46e88-2b17d1f058bmr978905eec.5.1767757725777;
+        Tue, 06 Jan 2026 19:48:45 -0800 (PST)
+Received: from gmail.com ([2a09:bac5:1f0d:28::4:33f])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b1707b2256sm5392191eec.25.2026.01.06.19.48.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jan 2026 19:48:45 -0800 (PST)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-arm-kernel@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org,
+	x86@kernel.org,
+	Holger Dengler <dengler@linux.ibm.com>,
+	Harald Freudenberger <freude@linux.ibm.com>
+Subject: Re: [PATCH 30/36] crypto: inside-secure - Use new AES library API
+Date: Wed,  7 Jan 2026 11:48:33 +0800
+Message-ID: <20260107034834.1447-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260105051311.1607207-31-ebiggers@kernel.org>
+References: <20260105051311.1607207-1-ebiggers@kernel.org> <20260105051311.1607207-31-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260107033018.GA2283@sol>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 06, 2026 at 07:30:19PM -0800, Eric Biggers wrote:
-> On Wed, Jan 07, 2026 at 09:58:29AM +0800, Jie Zhan wrote:
-> > 'make binrpm-pkg' throws me this error, with Python 3.9:
-> > 
-> > *** Error compiling '.../gen-hash-testvecs.py'...
-> >   File ".../scripts/crypto/gen-hash-testvecs.py", line 121
-> >     return f'{alg.upper().replace('-', '_')}_DIGEST_SIZE'
-> >                                    ^
-> > SyntaxError: f-string: unmatched '('
-> > 
-> > Old python versions, presumably <= 3.11, can't resolve these quotes.
-> > 
-> > Fix it with double quotes for compatibility.
-> > 
-> > Fixes: 15c64c47e484 ("lib/crypto: tests: Add SHA3 kunit tests")
-> > Signed-off-by: Jie Zhan <zhanjie9@hisilicon.com>
-> > ---
-> >  scripts/crypto/gen-hash-testvecs.py | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> I'll apply this, but it's weird that 'make binrpm-pkg' is doing anything
-> with this script.  It's not executed during the kernel build process.
-> It's only run manually to generate some files that are checked in
-> elsewhere in the tree.
-> 
-> - Eric
+On Sun,  4 Jan 2026 21:13:03 -0800, Eric Biggers wrote:
+> --- a/drivers/crypto/inside-secure/safexcel_cipher.c
+> +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+> @@ -2505,37 +2505,35 @@ static int safexcel_aead_gcm_setkey(struct crypto_aead *ctfm, const u8 *key,
+>  				    unsigned int len)
+>  {
+>  	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
+>  	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+>  	struct safexcel_crypto_priv *priv = ctx->base.priv;
+> -	struct crypto_aes_ctx aes;
+> +	struct aes_enckey aes;
+>  	u32 hashkey[AES_BLOCK_SIZE >> 2];
+>  	int ret, i;
+>  
+> -	ret = aes_expandkey(&aes, key, len);
+> -	if (ret) {
+> -		memzero_explicit(&aes, sizeof(aes));
+> +	ret = aes_prepareenckey(&aes, key, len);
+> +	if (ret)
+>  		return ret;
+> -	}
+>  
+>  	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma) {
+>  		for (i = 0; i < len / sizeof(u32); i++) {
+> -			if (le32_to_cpu(ctx->key[i]) != aes.key_enc[i]) {
+> +			if (ctx->key[i] != get_unaligned((__le32 *)key + i)) {
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
+"key" is big-endian. Casting it to __le32 does not seem correct.
+Did you mean "get_unaligned_le32", which also convert the endianness?
 
-- Eric
+>  				ctx->base.needs_inv = true;
+>  				break;
+>  			}
+>  		}
+>  	}
+>  
+>  	for (i = 0; i < len / sizeof(u32); i++)
+> -		ctx->key[i] = cpu_to_le32(aes.key_enc[i]);
+> +		ctx->key[i] = get_unaligned((__le32 *)key + i);
+
+Same here.
+
+>  
+>  	ctx->key_len = len;
+>  
+>  	/* Compute hash key by encrypting zeroes with cipher key */
+>  	memset(hashkey, 0, AES_BLOCK_SIZE);
+> -	aes_encrypt(&aes, (u8 *)hashkey, (u8 *)hashkey);
+> +	aes_encrypt_new(&aes, (u8 *)hashkey, (u8 *)hashkey);
+>  
+>  	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma) {
+>  		for (i = 0; i < AES_BLOCK_SIZE / sizeof(u32); i++) {
+>  			if (be32_to_cpu(ctx->base.ipad.be[i]) != hashkey[i]) {
+>  				ctx->base.needs_inv = true;
