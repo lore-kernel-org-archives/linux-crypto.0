@@ -1,117 +1,341 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D4C3081AD;
-	Wed,  7 Jan 2026 14:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2C93446C5
+	for <linux-crypto@vger.kernel.org>; Wed,  7 Jan 2026 14:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767795559; cv=none; b=KY+SUv9Gse9qhJlKgDDjEdYv5QBHtTv/a6Qk16qS5jc1N6PejDU9tJXJ9m1JvOG3eqDuVLx6bsSE09x7vF73pUvd+bnL6s4gyuqcKp7ZENpB+6So9oCxT+915OaR/etGVnG3h82fOVMAr5uZdY08T52UeVWK86xtPXRPMCByg3s=
+	t=1767795855; cv=none; b=W6Mo82stk7EPuScqREOt82nRnrXeG3EEBiAgeCh/59Uf7v6ME9tQHr0EUIWj6vBIwiKkq+Tb8eZD9CDkF6HTmvA6nCUvdQt5UVaBZs/DoNKBP2NVwPV+NpTUQdlFNd2LsT6wgJuQoqsUnYJ3/XvCc023m42DxSzKdKm6s0bg0TA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767795559; c=relaxed/simple;
-	bh=NrKcL0K9ADZrDd40Kubu2XrKTn83JBz7p/hudoTIFHw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iPbVr0V6yjwBTbvcawTgZpLcntcYp32213UJFMoCHUBO48bGua0LyGDc+hhrHVAfPdYYIBC2k9sibDXwZNSnQqqp0xXT17QZVZRkz9X/5j1mFoeXwSL2csGCfPeasNILFObxM+G0LvECLSxmoRujwvjQgFvol7IYYX70fMP/U0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ff2XA2uk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767795855; c=relaxed/simple;
+	bh=1NyDTV+QeKS+GoljArocQbp81Y7Q+EJ7UIi07NAHbi8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=apUKcxXEHMk0xpIUEz30RywdoBmxV1dmCMNEA1JltDPLWlERj5qFMScf/6F9ykqof+/zZinTuSW3yWFV1kj4hE54VI31SHSWQh8Yrq+KrUB2nL5ybsCYUEhH58YQshCOKL5jdg3gYV/V/+eyYOHmIPw8re6TQj00GFOh+HvGvJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=fail smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=J6KL3eXy; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ff2XA2uk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05293C4CEF1;
-	Wed,  7 Jan 2026 14:19:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767795559;
-	bh=NrKcL0K9ADZrDd40Kubu2XrKTn83JBz7p/hudoTIFHw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ff2XA2uknvs1WDIcNLPV/0KOKg+KJ9M5ydg9C31mg/NhaMX4Q6vujWS/UcJ1WTfTm
-	 w+QAjvsHC/Xo+q8f8RUmE9n+gF5XpwvTfjj2IQKfK0k8GUmFyGFsBhVn14qpmbZMUV
-	 b0tnzuyS/g0dXndOU9iIkpxUK32DWcQ20//a0GUYo1WPvw4O6Dnci/YRSV3WnuNMR8
-	 /1sBiqfEw1Rfz7pRg26G2ObP1ASzp201ffnIJsfAGno2G22ajMsMa2K008S5lF9bbu
-	 nP84YrGX0g4oqfQSu6mAohVZjchDtoui2kiLSd2N4rduxy2DDsQ6QoC4DZhZ3bxiPC
-	 5J4RbQdCgYNQA==
-Message-ID: <00cbcb95-2bd4-4a15-a250-963af30076b6@kernel.org>
-Date: Wed, 7 Jan 2026 15:19:13 +0100
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="J6KL3eXy"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-595819064cdso1499168e87.0
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Jan 2026 06:24:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1767795851; x=1768400651; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nuwWbehwvV7avh9lROjzqp+ZoFWxp7GeiaNyFlNZXIc=;
+        b=J6KL3eXyxhWVq0notlBBSywsHua2pZ1GYRSA4RH4pU8VKeUN9ANnfisgHF5uFw6AAN
+         lDt7lnmVjyRzsugcio0h6/CkMKee7hOHNGNmh0Y94io7W1YQ5l082J2RiPjBqL8RLy8w
+         3XmKpDLZsZMMmz24HwEu2gY0MCaTDA8AnQeoJCAjmBEu/efDWl6BRfmFowgPpGWao3XD
+         gO0xLnpJ4GZz50XOEVfs95CL5qC7d2KPIIDiXo4i9Z5mVNxdcWNhk05wfVH/H5xGVLWJ
+         rdVJe1ePw3sye2MVQHKXu7sSZ25H6kmnNq8DryYJ1eELUX5MSSO7NrLB0WNeqT+/j80Z
+         WsUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767795851; x=1768400651;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=nuwWbehwvV7avh9lROjzqp+ZoFWxp7GeiaNyFlNZXIc=;
+        b=RSkc8tdPYTgicrThfgFTlVzqVcN6ypz8OLo0mBYVhJvMjxUfoSiQhoPNPByaTbBD2W
+         pJIxsmpXAnhkqWsA8PDeOlxSOuf2P64AqI+SVX5DUdlxStd251Hs3vqy3N2ysIGkTvNY
+         jcz2v66Xj3QCutR6J1AGxEuEwPNqEPrXnNwG4JhcSfxEkOer8T9Z4zgex4ENBFXPxxJd
+         GMVo2PUR7YZfPTcLkvHnBU0aXi24EXAb+bgL7nmE7f/L6KYSpHK84uVH3eesd76PDHaT
+         YkWwY/wZ8QKXF8W6irow5GqZjRmODmpP6pqMU9tzrSNeX9lQXPLgKOOh6R6T354v/urk
+         D2RA==
+X-Forwarded-Encrypted: i=1; AJvYcCU05PD0pY5KZxKy8htHILKNh0tNoumxfmNUclvrgmwrVGWC3xp2Sllb3/8xjgzNTd5qEcyflYJvvtnVSt8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7DIFKM3kTFq42unhNJlud18biWAWSCj3ZWG2cQq9Jom0Lsb7F
+	y//PWiAXEFJnH2L14LpbhcYHVtYWLg35vUbQenTFVJtFxjV+KDkwLjtC4h2sfow79vSvaW4EPCL
+	evFfdyOEWf8qd7duEoX77DjekFaiE29yhr0Wj4dU8kw==
+X-Gm-Gg: AY/fxX5NwVGhb1pJXvvoGxjKf4Kf5nLrJz5tTvlvdyLhcg67x/pSkJY+9fPyf20sp97
+	O51BvW4nO5P+5mD3tKV1u49uU+5/esPJWF1UfED2piXp2I79SAACQ7Vn2wEIcijuz0KJZQX55Nx
+	731pxjhHcroKSOwlgxbxaerQuv13PCQMZlMbn2E37C3lJ1L7ksPvUzAlW+4ZbE9RnI0b4n/OcOi
+	X83jELAYH3Cxcf9tMBeQI8mFR/rgvc0l0pQYbK1dGdA8AtagI8aHLlzYz/+D2+jh6baHsrDNf1n
+	wvBCKZumtDyjXA==
+X-Google-Smtp-Source: AGHT+IHdSPcZIvSn6a8aPJJ8FK2xjEqy8Ke28u5UZ+8XEpc0l5rOwf+iWQZ0EBNd9iJyMo+KwuhLZJOhbTPAbKfw94I=
+X-Received: by 2002:a05:6512:3ba7:b0:595:9195:338f with SMTP id
+ 2adb3069b0e04-59b6eb6b29dmr885391e87.23.1767795850606; Wed, 07 Jan 2026
+ 06:24:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/6] dt-bindings: phy: qcom,sc8280xp-qmp-ufs-phy: document
- the Milos QMP UFS PHY
-To: Luca Weiss <luca.weiss@fairphone.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>,
- Bart Van Assche <bvanassche@acm.org>, Vinod Koul <vkoul@kernel.org>,
- Neil Armstrong <neil.armstrong@linaro.org>,
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-phy@lists.infradead.org
-References: <20260107-milos-ufs-v1-0-6982ab20d0ac@fairphone.com>
- <20260107-milos-ufs-v1-3-6982ab20d0ac@fairphone.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260107-milos-ufs-v1-3-6982ab20d0ac@fairphone.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260105152145.1801972-1-dhowells@redhat.com> <20260105152145.1801972-6-dhowells@redhat.com>
+In-Reply-To: <20260105152145.1801972-6-dhowells@redhat.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Wed, 7 Jan 2026 14:23:58 +0000
+X-Gm-Features: AQt7F2oANTpmBIEId1fXP6-7B2OlGJuWFeUPHu3yiPwPtiGF-_xCSvXRgOafBRg
+Message-ID: <CALrw=nGjpmPh6YNPJf-=0P5=RVs+zWz5cza4xrm-AKK3VDkOng@mail.gmail.com>
+Subject: Re: [PATCH v11 5/8] crypto: Add supplementary info param to
+ asymmetric key signature verification
+To: David Howells <dhowells@redhat.com>
+Cc: Lukas Wunner <lukas@wunner.de>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Eric Biggers <ebiggers@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Stephan Mueller <smueller@chronox.de>, 
+	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 07/01/2026 09:05, Luca Weiss wrote:
-> Document the QMP UFS PHY on the Milos SoC.
-> 
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+On Mon, Jan 5, 2026 at 3:22=E2=80=AFPM David Howells <dhowells@redhat.com> =
+wrote:
+>
+> Add a supplementary information parameter to the asymmetric key signature
+> verification API, in particular crypto_sig_verify() and sig_alg::verify.
+> This takes the form of a printable string containing of key=3Dval element=
+s.
+>
+> This is needed as some algorithms require additional metadata
+> (e.g. RSASSA-PSS) and this extra metadata is included in the X.509
+> certificates and PKCS#7 messages.  Furthermore, keyctl(KEYCTL_PKEY_VERIFY=
+)
+> already allows for this to be passed to the kernel, as do the _SIGN,
+> _ENCRYPT and _DECRYPT keyctls.
+>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Lukas Wunner <lukas@wunner.de>
+> cc: Ignat Korchagin <ignat@cloudflare.com>
+> cc: keyrings@vger.kernel.org
+> cc: linux-crypto@vger.kernel.org
 > ---
->  Documentation/devicetree/bindings/phy/qcom,sc8280xp-qmp-ufs-phy.yaml | 2 ++
->  1 file changed, 2 insertions(+)
+>  crypto/asymmetric_keys/asymmetric_type.c | 1 +
+>  crypto/asymmetric_keys/public_key.c      | 2 +-
+>  crypto/asymmetric_keys/signature.c       | 1 +
+>  crypto/ecdsa-p1363.c                     | 5 +++--
+>  crypto/ecdsa-x962.c                      | 5 +++--
+>  crypto/ecdsa.c                           | 3 ++-
+>  crypto/ecrdsa.c                          | 3 ++-
+>  crypto/mldsa.c                           | 3 ++-
+>  crypto/rsassa-pkcs1.c                    | 3 ++-
+>  crypto/sig.c                             | 3 ++-
+>  include/crypto/public_key.h              | 1 +
+>  include/crypto/sig.h                     | 9 ++++++---
+>  12 files changed, 26 insertions(+), 13 deletions(-)
+>
+> diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric=
+_keys/asymmetric_type.c
+> index 348966ea2175..dad4f0edfa25 100644
+> --- a/crypto/asymmetric_keys/asymmetric_type.c
+> +++ b/crypto/asymmetric_keys/asymmetric_type.c
+> @@ -596,6 +596,7 @@ static int asymmetric_key_verify_signature(struct ker=
+nel_pkey_params *params,
+>                 .digest_size    =3D params->in_len,
+>                 .encoding       =3D params->encoding,
+>                 .hash_algo      =3D params->hash_algo,
+> +               .info           =3D params->info,
+>                 .digest         =3D (void *)in,
+>                 .s              =3D (void *)in2,
+>         };
+> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys=
+/public_key.c
+> index ed6b4b5ae4ef..61dc4f626620 100644
+> --- a/crypto/asymmetric_keys/public_key.c
+> +++ b/crypto/asymmetric_keys/public_key.c
+> @@ -433,7 +433,7 @@ int public_key_verify_signature(const struct public_k=
+ey *pkey,
+>                 goto error_free_key;
+>
+>         ret =3D crypto_sig_verify(tfm, sig->s, sig->s_size,
+> -                               sig->digest, sig->digest_size);
+> +                               sig->digest, sig->digest_size, sig->info)=
+;
+>
+>  error_free_key:
+>         kfree_sensitive(key);
+> diff --git a/crypto/asymmetric_keys/signature.c b/crypto/asymmetric_keys/=
+signature.c
+> index 041d04b5c953..26c0c0112ac4 100644
+> --- a/crypto/asymmetric_keys/signature.c
+> +++ b/crypto/asymmetric_keys/signature.c
+> @@ -29,6 +29,7 @@ void public_key_signature_free(struct public_key_signat=
+ure *sig)
+>                         kfree(sig->auth_ids[i]);
+>                 kfree(sig->s);
+>                 kfree(sig->digest);
+> +               kfree(sig->info);
+>                 kfree(sig);
+>         }
+>  }
+> diff --git a/crypto/ecdsa-p1363.c b/crypto/ecdsa-p1363.c
+> index e0c55c64711c..fa987dba1213 100644
+> --- a/crypto/ecdsa-p1363.c
+> +++ b/crypto/ecdsa-p1363.c
+> @@ -18,7 +18,8 @@ struct ecdsa_p1363_ctx {
+>
+>  static int ecdsa_p1363_verify(struct crypto_sig *tfm,
+>                               const void *src, unsigned int slen,
+> -                             const void *digest, unsigned int dlen)
+> +                             const void *digest, unsigned int dlen,
+> +                             const char *info)
+>  {
+>         struct ecdsa_p1363_ctx *ctx =3D crypto_sig_ctx(tfm);
+>         unsigned int keylen =3D DIV_ROUND_UP_POW2(crypto_sig_keysize(ctx-=
+>child),
+> @@ -32,7 +33,7 @@ static int ecdsa_p1363_verify(struct crypto_sig *tfm,
+>         ecc_digits_from_bytes(src, keylen, sig.r, ndigits);
+>         ecc_digits_from_bytes(src + keylen, keylen, sig.s, ndigits);
+>
+> -       return crypto_sig_verify(ctx->child, &sig, sizeof(sig), digest, d=
+len);
+> +       return crypto_sig_verify(ctx->child, &sig, sizeof(sig), digest, d=
+len, info);
+>  }
+>
+>  static unsigned int ecdsa_p1363_key_size(struct crypto_sig *tfm)
+> diff --git a/crypto/ecdsa-x962.c b/crypto/ecdsa-x962.c
+> index ee71594d10a0..5d7f1078989c 100644
+> --- a/crypto/ecdsa-x962.c
+> +++ b/crypto/ecdsa-x962.c
+> @@ -75,7 +75,8 @@ int ecdsa_get_signature_s(void *context, size_t hdrlen,=
+ unsigned char tag,
+>
+>  static int ecdsa_x962_verify(struct crypto_sig *tfm,
+>                              const void *src, unsigned int slen,
+> -                            const void *digest, unsigned int dlen)
+> +                            const void *digest, unsigned int dlen,
+> +                            const char *info)
+>  {
+>         struct ecdsa_x962_ctx *ctx =3D crypto_sig_ctx(tfm);
+>         struct ecdsa_x962_signature_ctx sig_ctx;
+> @@ -89,7 +90,7 @@ static int ecdsa_x962_verify(struct crypto_sig *tfm,
+>                 return err;
+>
+>         return crypto_sig_verify(ctx->child, &sig_ctx.sig, sizeof(sig_ctx=
+.sig),
+> -                                digest, dlen);
+> +                                digest, dlen, info);
+>  }
+>
+>  static unsigned int ecdsa_x962_key_size(struct crypto_sig *tfm)
+> diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
+> index ce8e4364842f..144fd6b9168b 100644
+> --- a/crypto/ecdsa.c
+> +++ b/crypto/ecdsa.c
+> @@ -65,7 +65,8 @@ static int _ecdsa_verify(struct ecc_ctx *ctx, const u64=
+ *hash, const u64 *r, con
+>   */
+>  static int ecdsa_verify(struct crypto_sig *tfm,
+>                         const void *src, unsigned int slen,
+> -                       const void *digest, unsigned int dlen)
+> +                       const void *digest, unsigned int dlen,
+> +                       const char *info)
+>  {
+>         struct ecc_ctx *ctx =3D crypto_sig_ctx(tfm);
+>         size_t bufsize =3D ctx->curve->g.ndigits * sizeof(u64);
+> diff --git a/crypto/ecrdsa.c b/crypto/ecrdsa.c
+> index 2c0602f0cd40..59f2d5bb3be4 100644
+> --- a/crypto/ecrdsa.c
+> +++ b/crypto/ecrdsa.c
+> @@ -69,7 +69,8 @@ static const struct ecc_curve *get_curve_by_oid(enum OI=
+D oid)
+>
+>  static int ecrdsa_verify(struct crypto_sig *tfm,
+>                          const void *src, unsigned int slen,
+> -                        const void *digest, unsigned int dlen)
+> +                        const void *digest, unsigned int dlen,
+> +                        const char *info)
+>  {
+>         struct ecrdsa_ctx *ctx =3D crypto_sig_ctx(tfm);
+>         unsigned int ndigits =3D dlen / sizeof(u64);
+> diff --git a/crypto/mldsa.c b/crypto/mldsa.c
+> index 2146c774b5ca..ba071d030ab0 100644
+> --- a/crypto/mldsa.c
+> +++ b/crypto/mldsa.c
+> @@ -25,7 +25,8 @@ static int crypto_mldsa_sign(struct crypto_sig *tfm,
+>
+>  static int crypto_mldsa_verify(struct crypto_sig *tfm,
+>                                const void *sig, unsigned int sig_len,
+> -                              const void *msg, unsigned int msg_len)
+> +                              const void *msg, unsigned int msg_len,
+> +                              const char *info)
+>  {
+>         const struct crypto_mldsa_ctx *ctx =3D crypto_sig_ctx(tfm);
+>
+> diff --git a/crypto/rsassa-pkcs1.c b/crypto/rsassa-pkcs1.c
+> index 94fa5e9600e7..6283050e609a 100644
+> --- a/crypto/rsassa-pkcs1.c
+> +++ b/crypto/rsassa-pkcs1.c
+> @@ -215,7 +215,8 @@ static int rsassa_pkcs1_sign(struct crypto_sig *tfm,
+>
+>  static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
+>                                const void *src, unsigned int slen,
+> -                              const void *digest, unsigned int dlen)
+> +                              const void *digest, unsigned int dlen,
+> +                              const char *info)
+>  {
+>         struct sig_instance *inst =3D sig_alg_instance(tfm);
+>         struct rsassa_pkcs1_inst_ctx *ictx =3D sig_instance_ctx(inst);
+> diff --git a/crypto/sig.c b/crypto/sig.c
+> index beba745b6405..c56fea3a53ae 100644
+> --- a/crypto/sig.c
+> +++ b/crypto/sig.c
+> @@ -92,7 +92,8 @@ static int sig_default_sign(struct crypto_sig *tfm,
+>
+>  static int sig_default_verify(struct crypto_sig *tfm,
+>                               const void *src, unsigned int slen,
+> -                             const void *dst, unsigned int dlen)
+> +                             const void *dst, unsigned int dlen,
+> +                             const char *info)
+>  {
+>         return -ENOSYS;
+>  }
+> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+> index e4ec8003a3a4..1e9a1e4e9916 100644
+> --- a/include/crypto/public_key.h
+> +++ b/include/crypto/public_key.h
+> @@ -47,6 +47,7 @@ struct public_key_signature {
+>         u32 s_size;             /* Number of bytes in signature */
+>         u32 digest_size;        /* Number of bytes in digest */
+>         bool algo_does_hash;    /* Public key algo does its own hashing *=
+/
+> +       char *info;             /* Supplementary parameters */
+>         const char *pkey_algo;
+>         const char *hash_algo;
+>         const char *encoding;
+> diff --git a/include/crypto/sig.h b/include/crypto/sig.h
+> index fa6dafafab3f..885fa6487780 100644
+> --- a/include/crypto/sig.h
+> +++ b/include/crypto/sig.h
+> @@ -56,7 +56,8 @@ struct sig_alg {
+>                     void *dst, unsigned int dlen);
+>         int (*verify)(struct crypto_sig *tfm,
+>                       const void *src, unsigned int slen,
+> -                     const void *digest, unsigned int dlen);
+> +                     const void *digest, unsigned int dlen,
+> +                     const char *info);
+>         int (*set_pub_key)(struct crypto_sig *tfm,
+>                            const void *key, unsigned int keylen);
+>         int (*set_priv_key)(struct crypto_sig *tfm,
+> @@ -209,16 +210,18 @@ static inline int crypto_sig_sign(struct crypto_sig=
+ *tfm,
+>   * @slen:      source length
+>   * @digest:    digest
+>   * @dlen:      digest length
+> + * @info:      Additional parameters as a set of k=3Dv
+>   *
+>   * Return: zero on verification success; error code in case of error.
+>   */
+>  static inline int crypto_sig_verify(struct crypto_sig *tfm,
+>                                     const void *src, unsigned int slen,
+> -                                   const void *digest, unsigned int dlen=
+)
+> +                                   const void *digest, unsigned int dlen=
+,
+> +                                   const char *info)
+>  {
+>         struct sig_alg *alg =3D crypto_sig_alg(tfm);
+>
+> -       return alg->verify(tfm, src, slen, digest, dlen);
+> +       return alg->verify(tfm, src, slen, digest, dlen, info);
+>  }
+>
+>  /**
+>
 
-
-
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-
-Best regards,
-Krzysztof
+Reviewed-by: Ignat Korchagin <ignat@cloudflare.com>
