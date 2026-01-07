@@ -1,84 +1,86 @@
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0509D2D97B9
-	for <linux-crypto@vger.kernel.org>; Wed,  7 Jan 2026 09:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A506D3093DE
+	for <linux-crypto@vger.kernel.org>; Wed,  7 Jan 2026 09:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767778591; cv=none; b=IQ5risxloVwPGUx7HvhBdmAy/Vzl2IoQb18dU1/dBuHB1IiDxTE30ZrgfcI+1dLXGgULgCRpsXCVAT3gWT8oAODWAjStkaZdLO1aOzGbV0LKPMkvt8TiswHleeGm4BGJ9vDk9EPyWYvQDAu7Of935AbXzyNrcdeVFWU4GVhxNXw=
+	t=1767778715; cv=none; b=HRgUQMmo4aZMiAiNKh/Qv09+2goNSIB/v1d/GKbNqEJjsPNikJYAYbcc0Sa7iFakytWZolNszLUcB/ziszBS+I9ntHBkaVMlxd4xevyUswe2QGN9wupQWundSO9t3LzVrM9WSW5yhEzH+z0XnxvcgKFrkDVuZBbDp9X+5NXYj88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767778591; c=relaxed/simple;
-	bh=BvNOm3NYbiU+ikXbwLgo3IoCKmUPU46BKkQ49BFiqJ8=;
+	s=arc-20240116; t=1767778715; c=relaxed/simple;
+	bh=eHItNXSuFuiIX4AdsQWnDjqU/WQZ3vk3O/CYr5Z0/cA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ONQ525G9l2Qm8aImctaEYqO/N4ZeN/746rXBbbZ+YvtofL/tTwg93+psdV+0cRNO0kWi+/Qu/SlW4i9+NwW4B+5EKxv1NpoRSCNyTS6MKtahdb/mmW5Rm2fi57WS8gBpFtm8ljIb6Km/ISWa0fwmUZTDH+Jek/BnyfEJ/D5HFKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PhseDA4r; arc=none smtp.client-ip=209.85.160.50
+	 To:Cc:Content-Type; b=Ioay0XR0u+iSn13mdhqbMUEo2w+n9XdD1t2FS2rfyzpeWGu7ci/SUET/tx8QRlG2G1+rn6Am0jhjAiZy8dVbgNguMLaFuRbl86ere9Lp9OEDp7FO4YuHlqtPPY71lFmdgWnyRnHzYhRn931L9QhEOeqQQTTvYyDyp1J0b3fPMxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PsB5UQYB; arc=none smtp.client-ip=209.85.161.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PhseDA4r"
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-3ed15120e55so1301125fac.2
-        for <linux-crypto@vger.kernel.org>; Wed, 07 Jan 2026 01:36:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PsB5UQYB"
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-659848c994bso930924eaf.3
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Jan 2026 01:38:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1767778587; x=1768383387; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1767778710; x=1768383510; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GAJ5e65k3z1Bl84v4hSYV5jHbNZ5QqotFXMyK4sLylU=;
-        b=PhseDA4rqOuGczQm8OI6ScQU96wNFWhck5YtuZvI3HSw+b+MsyyRb890d3laSxoB3e
-         QFMpjN6aTvp+kbwyhLQo2J9od15tVdqXeg59qbxlSb2KYBiiePlcD4da/NZp15pAKkBy
-         Mk1tudHrk3NEZlkxU0REHb8ECZjHYoNl+keMpMdQ8J1+7BWavYQN1EE+0Q2ZubgyH3cb
-         9q7tX7boJlgSoFQqNjwa2K7JwHtBqMT7CB+3UG+mFjwSA01TAfkwDnk4noi5e4tQfzrH
-         kz3GB4HSeiNTKvHacsIsX4s+4xZ7qV5xS1hoE6TuLlj8MomLoCEBFuyuvnfIZdE9Vpkz
-         rY3w==
+        bh=lzcLdE5lW6KjrMioL4MVcYHG8ltNGC1zHqzO2YGzVIs=;
+        b=PsB5UQYBAZoi7z0hWcL+39f21zYQ6lVLIsVZh77ruPXbOslr7D9WUJ/9vNWIrXg43d
+         Lq1EKfflcFKl+wiiJ6WxKEfmAQVRmJuXVP9I3tht1b47lQnOJRJagdFBnzAcxA/bd0k0
+         ad9/Nqt53Hk5crV2ZW08Cq9hylzWf93Vdo7CtTKI55fG78WhNPJXB8qhVem5nztZ1KEZ
+         KMR1N0TDldtdHdnpKu64je8P/kcOwl+bMag3AGPdcrG8iBtRsvhM+p4Pxm5HN19quSvK
+         yl/GY0LO/wJ8F4uuILMzNPZS0AvVQ1MHFgw+a8+Bsb+fucCdHOIbDc+ApTBPL4j9ovCJ
+         LaUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767778587; x=1768383387;
+        d=1e100.net; s=20230601; t=1767778710; x=1768383510;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=GAJ5e65k3z1Bl84v4hSYV5jHbNZ5QqotFXMyK4sLylU=;
-        b=irV8thTcmdZ0ORYTZN+cTNifNLFWQZfB6qcFNVbwsj+EV+dZrfvbVnzFEd/CkM0ZF5
-         XJD9Kx5tz+N1Cc1uo1Vx1nue3UUh6Vj5tVPCplZi4H1fekeC+j2YFtrIHanf0BgpyNvK
-         r1syjMThACaMczAkFtsY7F7Fsy/+lLM/87jNXZRZ6hcFfMDyu/mbLX9HUc52jTBQcCq3
-         4uO6reEH/HoZwqokk+9GG4Lzqbok09SyXL+ZMM4bJ4ZnYp2xB+5h0wWOi58H4etUN+MK
-         43TCTOvXwDUfLOIXjD0mG7ROB3zwcitDT5QwxCiSuILDmK7OInrMZL0B3s0h6dQ/+dWW
-         wwQw==
-X-Forwarded-Encrypted: i=1; AJvYcCVfyLXiBfdt2+SPCoqVlOSZHsprtG36I4BtET5j//Ps5yWe675n/Nk4k6qgPCxKwT6/+ufUKKFMoAneg4I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygpcjrpygkcYGoNyconf1jF39q1L+RS2b+3AEbpaALb3r2zRRx
-	9xbkEVy7izE1LzsrxX+Jy4bV9Y/pRDlu6ofjpb6fwTviDJ5/ukxDBxK5I8UuNnXlMVri5FoH8mZ
-	eGy6BwOIrtAj2QNXLigmcgmDS//+MrngiWyH1RZyWpw==
-X-Gm-Gg: AY/fxX6wKT5bHSRAt5UEBACDy4FISt99uMTmOeGxn5y85o2O0OiXVY2Wgizx/Lf6ynx
-	W0zeSg/6WEqacTAEKpgZteoBP4aoSspXpT2Hp72QSuRRk+2o4vy5eQIjs0nPCzxyZegyOKOwR4E
-	N09beFhfehBDdvm9uAZw4A5t+wRXJRXbroFwcSg/ZXsi/NMBF+5Gx5Pi/jbLAF6PS0d0QJa6Yk+
-	9eXTf1/4h+zqrvZsJjdh76Xc8Rz+GX77cZIKrQb9ZLRscagyliNVOruYAHP48FWXto1gzt3Z4Nq
-	Xj8UZ7sE8+oTJNyLvmtgrYr0BA==
-X-Google-Smtp-Source: AGHT+IH8mMrbtH032ZDWJFlkRThntfnwmPEqUqd2JDeL8NGsufG7LDpL42U7yHJF4QJdKPnzDUAc6fHTBjr7gAIIOLU=
-X-Received: by 2002:a4a:ba13:0:b0:659:9a49:8f89 with SMTP id
- 006d021491bc7-65f55085418mr579167eaf.78.1767778586821; Wed, 07 Jan 2026
- 01:36:26 -0800 (PST)
+        bh=lzcLdE5lW6KjrMioL4MVcYHG8ltNGC1zHqzO2YGzVIs=;
+        b=pbdXWdsvg+bOoY7pVtiqzgGf14pLTolWUVlRbMwWb8qBFlK5z/q+bJtbWF/V/6RyYm
+         KykObuEzYso/l8BRJXchZZz4PcDQ3LVvEQHO3x/w2viYUc1GINsQo9HTT4+g5ywv8Q5K
+         G3llmtW7dXTXWeMPL6hE2UfRGlvRiUqt/D4W0HdMjmorospw0Jwv4BeuK7cgzxT+IJlM
+         X1oigX7BEuBENIrPBr6mtOkVkGUJ/fToZ/eRonD2eC/XLi1Ueh41DHmOeAVliZwy+MwP
+         85JrRrk3Os+r87NrR3ge+i45h9Yx0LUXI97bzt7lZE8pQOa9LvqPja2dHytWBiMQaEbY
+         rFQA==
+X-Forwarded-Encrypted: i=1; AJvYcCWBFCMqpf0b8aAURSAo9SpNz2rUlXyVw34Y/5cchrU5NDgg/YaUtIzoS98Sp53ODPHSWUFLc292K9nJRog=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzwCFD7UISdN1hwNVJvCdcacN/1JdDRyMiXdLsFgmaRmCOYgg8
+	sdb44ReC0Myhv+Rkd7t6bT1Kw8wZFj2BEf2Zb/kInlmTN5UrW2lPVNPhRIttht7FKGbePjfFXaV
+	songSRFDOuAARyd9B69mxyyF+8VWDP1l0N1+f1uwB2Q==
+X-Gm-Gg: AY/fxX4klJHK6cfiU50O7i0qBxLec/fo7U5OkRGbegRv92G7cSbzgkb98v3vyg9/o+d
+	cEeY1OeiYC8UuLjiV6L/oHJggxD+xWvm5w9B4mOo0MoTwN3EVDMHHiFZH62i6DiD2z4n81XE7f8
+	U4X2M16HCdAOFH3z0ixkH3/G5DDv/P6Fg1UPs2kKKZFycrhKyRiLhvDjxDhRtDD7QvueH4cq9wQ
+	b8kb/a+r/PYmGgWKmf3jM/e2WlxzNmnCrsFPuuu2A4adnNyDtbdnQcCTlSeqMWofjGAdK9WWN4c
+	Xlxqev7OopeMB/SjgSvxDZvidg==
+X-Google-Smtp-Source: AGHT+IHSj3fyWcR8PeI71mFrFGfZpz1gtYlT37IzGcQAYuwipaKr7ifaf9acDpnsMoegGnuUM/krqm4/4tHZyu+YBdY=
+X-Received: by 2002:a05:6820:f02e:b0:659:9a49:8ff0 with SMTP id
+ 006d021491bc7-65f54ef5252mr794898eaf.29.1767778710402; Wed, 07 Jan 2026
+ 01:38:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1765791463.git.u.kleine-koenig@baylibre.com> <d14a9c41-9df7-438f-bb58-097644d5d93f@nvidia.com>
-In-Reply-To: <d14a9c41-9df7-438f-bb58-097644d5d93f@nvidia.com>
+References: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
+ <CAHUa44FrDZbvRvfN8obf80_k=Eqxe9YxHpjaE5jU7nkxPUwfag@mail.gmail.com>
+ <20251218135332f323fa91@mail.local> <CAHUa44GpW5aO26GDyL9RZub9vVYvVcJ7etwO0yXBN_mUi0W4AA@mail.gmail.com>
+ <CAHUa44HqRbCJTXsrTCm0G5iwtkQtq+Si=yOspCjpAn-N2uVSVg@mail.gmail.com> <aV0Qx5BOso5co3tm@bogus>
+In-Reply-To: <aV0Qx5BOso5co3tm@bogus>
 From: Jens Wiklander <jens.wiklander@linaro.org>
-Date: Wed, 7 Jan 2026 10:36:15 +0100
-X-Gm-Features: AQt7F2pWAOmWwJm8vdt2KOCYOYr18EvzYgjBZjv21zyTW_ttRjt9UA8BFElgUTo
-Message-ID: <CAHUa44Hhyz_zF5JtCz00YqbgoPTLK2iS7NBT8UwOLpAz=3VZAA@mail.gmail.com>
+Date: Wed, 7 Jan 2026 10:38:19 +0100
+X-Gm-Features: AQt7F2rcNsjXN7djR70fxjzIrnv1VtdzPp10juTq1vFrm5vuVSwDuqGbqR3kJLk
+Message-ID: <CAHUa44FhRO0AO3nDXSoZ7O_9T3EFB47D34zRooCTd6fhXFzxXw@mail.gmail.com>
 Subject: Re: [PATCH v2 00/17] tee: Use bus callbacks instead of driver callbacks
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
+To: Sudeep Holla <sudeep.holla@arm.com>
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
 	Jonathan Corbet <corbet@lwn.net>, Sumit Garg <sumit.garg@kernel.org>, 
 	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
 	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Sumit Garg <sumit.garg@oss.qualcomm.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Sumit Garg <sumit.garg@oss.qualcomm.com>, 
 	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
-	=?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, 
 	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
 	James Bottomley <James.Bottomley@hansenpartnership.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
 	Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>, 
@@ -91,99 +93,157 @@ Cc: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
 	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, 
 	linux-mips@vger.kernel.org, netdev@vger.kernel.org, 
 	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>, 
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jon,
+On Tue, Jan 6, 2026 at 2:40=E2=80=AFPM Sudeep Holla <sudeep.holla@arm.com> =
+wrote:
+>
+> On Mon, Jan 05, 2026 at 10:16:09AM +0100, Jens Wiklander wrote:
+> > Hi,
+> >
+> > On Thu, Dec 18, 2025 at 5:29=E2=80=AFPM Jens Wiklander
+> > <jens.wiklander@linaro.org> wrote:
+> > >
+> > > On Thu, Dec 18, 2025 at 2:53=E2=80=AFPM Alexandre Belloni
+> > > <alexandre.belloni@bootlin.com> wrote:
+> > > >
+> > > > On 18/12/2025 08:21:27+0100, Jens Wiklander wrote:
+> > > > > Hi,
+> > > > >
+> > > > > On Mon, Dec 15, 2025 at 3:17=E2=80=AFPM Uwe Kleine-K=C3=B6nig
+> > > > > <u.kleine-koenig@baylibre.com> wrote:
+> > > > > >
+> > > > > > Hello,
+> > > > > >
+> > > > > > the objective of this series is to make tee driver stop using c=
+allbacks
+> > > > > > in struct device_driver. These were superseded by bus methods i=
+n 2006
+> > > > > > (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shut=
+down
+> > > > > > methods.")) but nobody cared to convert all subsystems accordin=
+gly.
+> > > > > >
+> > > > > > Here the tee drivers are converted. The first commit is somewha=
+t
+> > > > > > unrelated, but simplifies the conversion (and the drivers). It
+> > > > > > introduces driver registration helpers that care about setting =
+the bus
+> > > > > > and owner. (The latter is missing in all drivers, so by using t=
+hese
+> > > > > > helpers the drivers become more correct.)
+> > > > > >
+> > > > > > v1 of this series is available at
+> > > > > > https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koeni=
+g@baylibre.com
+> > > > > >
+> > > > > > Changes since v1:
+> > > > > >
+> > > > > >  - rebase to v6.19-rc1 (no conflicts)
+> > > > > >  - add tags received so far
+> > > > > >  - fix whitespace issues pointed out by Sumit Garg
+> > > > > >  - fix shutdown callback to shutdown and not remove
+> > > > > >
+> > > > > > As already noted in v1's cover letter, this series should go in=
+ during a
+> > > > > > single merge window as there are runtime warnings when the seri=
+es is
+> > > > > > only applied partially. Sumit Garg suggested to apply the whole=
+ series
+> > > > > > via Jens Wiklander's tree.
+> > > > > > If this is done the dependencies in this series are honored, in=
+ case the
+> > > > > > plan changes: Patches #4 - #17 depend on the first two.
+> > > > > >
+> > > > > > Note this series is only build tested.
+> > > > > >
+> > > > > > Uwe Kleine-K=C3=B6nig (17):
+> > > > > >   tee: Add some helpers to reduce boilerplate for tee client dr=
+ivers
+> > > > > >   tee: Add probe, remove and shutdown bus callbacks to tee_clie=
+nt_driver
+> > > > > >   tee: Adapt documentation to cover recent additions
+> > > > > >   hwrng: optee - Make use of module_tee_client_driver()
+> > > > > >   hwrng: optee - Make use of tee bus methods
+> > > > > >   rtc: optee: Migrate to use tee specific driver registration f=
+unction
+> > > > > >   rtc: optee: Make use of tee bus methods
+> > > > > >   efi: stmm: Make use of module_tee_client_driver()
+> > > > > >   efi: stmm: Make use of tee bus methods
+> > > > > >   firmware: arm_scmi: optee: Make use of module_tee_client_driv=
+er()
+> > > > > >   firmware: arm_scmi: Make use of tee bus methods
+> > > > > >   firmware: tee_bnxt: Make use of module_tee_client_driver()
+> > > > > >   firmware: tee_bnxt: Make use of tee bus methods
+> > > > > >   KEYS: trusted: Migrate to use tee specific driver registratio=
+n
+> > > > > >     function
+> > > > > >   KEYS: trusted: Make use of tee bus methods
+> > > > > >   tpm/tpm_ftpm_tee: Make use of tee specific driver registratio=
+n
+> > > > > >   tpm/tpm_ftpm_tee: Make use of tee bus methods
+> > > > > >
+> > > > > >  Documentation/driver-api/tee.rst             | 18 +----
+> > > > > >  drivers/char/hw_random/optee-rng.c           | 26 ++----
+> > > > > >  drivers/char/tpm/tpm_ftpm_tee.c              | 31 +++++---
+> > > > > >  drivers/firmware/arm_scmi/transports/optee.c | 32 +++-----
+> > > > > >  drivers/firmware/broadcom/tee_bnxt_fw.c      | 30 ++-----
+> > > > > >  drivers/firmware/efi/stmm/tee_stmm_efi.c     | 25 ++----
+> > > > > >  drivers/rtc/rtc-optee.c                      | 27 ++-----
+> > > > > >  drivers/tee/tee_core.c                       | 84 ++++++++++++=
+++++++++
+> > > > > >  include/linux/tee_drv.h                      | 12 +++
+> > > > > >  security/keys/trusted-keys/trusted_tee.c     | 17 ++--
+> > > > > >  10 files changed, 164 insertions(+), 138 deletions(-)
+> > > > > >
+> > > > > > base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+> > > > > > --
+> > > > > > 2.47.3
+> > > > > >
+> > > > >
+> > > > > Thank you for the nice cleanup, Uwe.
+> > > > >
+> > > > > I've applied patch 1-3 to the branch tee_bus_callback_for_6.20 in=
+ my
+> > > > > tree at https://git.kernel.org/pub/scm/linux/kernel/git/jenswi/li=
+nux-tee.git/
+> > > > >
+> > > > > The branch is based on v6.19-rc1, and I'll try to keep it stable =
+for
+> > > > > others to depend on, if needed. Let's see if we can agree on taki=
+ng
+> > > > > the remaining patches via that branch.
+> > > >
+> > > > 6 and 7 can go through your branch.
+> > >
+> > > Good, I've added them to my branch now.
+> >
+> > This entire patch set should go in during a single merge window. I
+> > will not send any pull request until I'm sure all patches will be
+> > merged.
+> >
+> > So far (if I'm not mistaken), only the patches I've already added to
+> > next have appeared next. I can take the rest of the patches, too, but
+> > I need OK for the following:
+> >
+>
+> [...]
+>
+> >
+> > Sudeep, you seem happy with the following patches
+> > - firmware: arm_scmi: optee: Make use of module_tee_client_driver()
+> > - firmware: arm_scmi: Make use of tee bus methods
+> > OK if I take them via my tree, or would you rather take them yourself?
+> >
+>
+> I am happy if you want to take all of them in one go. I think I have
+> already acked it. Please shout if you need anything else from me, happy t=
+o
+> help in anyway to make it easier to handle this change set.
 
-On Tue, Jan 6, 2026 at 10:40=E2=80=AFAM Jon Hunter <jonathanh@nvidia.com> w=
-rote:
->
-> Hi Uwe,
->
-> On 15/12/2025 14:16, Uwe Kleine-K=C3=B6nig wrote:
-> > Hello,
-> >
-> > the objective of this series is to make tee driver stop using callbacks
-> > in struct device_driver. These were superseded by bus methods in 2006
-> > (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
-> > methods.")) but nobody cared to convert all subsystems accordingly.
-> >
-> > Here the tee drivers are converted. The first commit is somewhat
-> > unrelated, but simplifies the conversion (and the drivers). It
-> > introduces driver registration helpers that care about setting the bus
-> > and owner. (The latter is missing in all drivers, so by using these
-> > helpers the drivers become more correct.)
-> >
-> > v1 of this series is available at
-> > https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koenig@baylib=
-re.com
-> >
-> > Changes since v1:
-> >
-> >   - rebase to v6.19-rc1 (no conflicts)
-> >   - add tags received so far
-> >   - fix whitespace issues pointed out by Sumit Garg
-> >   - fix shutdown callback to shutdown and not remove
-> >
-> > As already noted in v1's cover letter, this series should go in during =
-a
-> > single merge window as there are runtime warnings when the series is
-> > only applied partially. Sumit Garg suggested to apply the whole series
-> > via Jens Wiklander's tree.
-> > If this is done the dependencies in this series are honored, in case th=
-e
-> > plan changes: Patches #4 - #17 depend on the first two.
-> >
-> > Note this series is only build tested.
-> >
-> > Uwe Kleine-K=C3=B6nig (17):
-> >    tee: Add some helpers to reduce boilerplate for tee client drivers
-> >    tee: Add probe, remove and shutdown bus callbacks to tee_client_driv=
-er
-> >    tee: Adapt documentation to cover recent additions
-> >    hwrng: optee - Make use of module_tee_client_driver()
-> >    hwrng: optee - Make use of tee bus methods
-> >    rtc: optee: Migrate to use tee specific driver registration function
-> >    rtc: optee: Make use of tee bus methods
-> >    efi: stmm: Make use of module_tee_client_driver()
-> >    efi: stmm: Make use of tee bus methods
-> >    firmware: arm_scmi: optee: Make use of module_tee_client_driver()
-> >    firmware: arm_scmi: Make use of tee bus methods
-> >    firmware: tee_bnxt: Make use of module_tee_client_driver()
-> >    firmware: tee_bnxt: Make use of tee bus methods
-> >    KEYS: trusted: Migrate to use tee specific driver registration
-> >      function
-> >    KEYS: trusted: Make use of tee bus methods
-> >    tpm/tpm_ftpm_tee: Make use of tee specific driver registration
-> >    tpm/tpm_ftpm_tee: Make use of tee bus methods
->
->
-> On the next-20260105 I am seeing the following warnings ...
->
->   WARNING KERN Driver 'optee-rng' needs updating - please use bus_type me=
-thods
->   WARNING KERN Driver 'scmi-optee' needs updating - please use bus_type m=
-ethods
->   WARNING KERN Driver 'tee_bnxt_fw' needs updating - please use bus_type =
-methods
->
-> I bisected the first warning and this point to the following
-> commit ...
->
-> # first bad commit: [a707eda330b932bcf698be9460e54e2f389e24b7] tee: Add s=
-ome helpers to reduce boilerplate for tee client drivers
->
-> I have not bisected the others, but guess they are related
-> to this series. Do you observe the same?
+Thanks, I've applied all the patches in the series now, since it
+otherwise causes warnings during boot.
 
-Yes, I see the same.
-
-I'm sorry, I didn't realize that someone might bisect this when I took
-only a few of the patches into next. I've applied all the patches in
-this series now.
-
-Thanks,
-Jens
+/Jens
