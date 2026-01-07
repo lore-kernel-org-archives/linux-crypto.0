@@ -1,285 +1,189 @@
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012018.outbound.protection.outlook.com [52.101.43.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82A92F746D;
-	Wed,  7 Jan 2026 09:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767776707; cv=fail; b=too1uT0Qij1M3XOeFDls0oQOkPvZ2ibHEF1rPWMYJxDz4F9QZjcNeCNjoRk46Pa+FYARsJ5UJN6BxnWygGrSELH7gz96fxYeKG2myzYWJzVGlP6RitFCsYdxaU+SYbpnI2fRe1WBRxkSe1aopTS7M8h83f5SNtdHLZ/68J/ZukA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767776707; c=relaxed/simple;
-	bh=osD+sB01UqEABGx8/cB5IUMbZmz1LyjAmod3EPwzMKU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iKIRXaIICvUO7NEn7pqyIwljv5VfjekcRxxfxe9yRAPUNtDLFxhqThvcLxk/BpCzXPYLl9r4fXUBxyqp8uJnqmbErH0moNjWFfrv7ug7Z8YXBYCf/CAYyEBGGl9jgv87lbhp6XjGb0zTdkebUP2a64KwceE/NYQNOhzUcG2Xch4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OQ8zTl+c; arc=fail smtp.client-ip=52.101.43.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0509D2D97B9
+	for <linux-crypto@vger.kernel.org>; Wed,  7 Jan 2026 09:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767778591; cv=none; b=IQ5risxloVwPGUx7HvhBdmAy/Vzl2IoQb18dU1/dBuHB1IiDxTE30ZrgfcI+1dLXGgULgCRpsXCVAT3gWT8oAODWAjStkaZdLO1aOzGbV0LKPMkvt8TiswHleeGm4BGJ9vDk9EPyWYvQDAu7Of935AbXzyNrcdeVFWU4GVhxNXw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767778591; c=relaxed/simple;
+	bh=BvNOm3NYbiU+ikXbwLgo3IoCKmUPU46BKkQ49BFiqJ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ONQ525G9l2Qm8aImctaEYqO/N4ZeN/746rXBbbZ+YvtofL/tTwg93+psdV+0cRNO0kWi+/Qu/SlW4i9+NwW4B+5EKxv1NpoRSCNyTS6MKtahdb/mmW5Rm2fi57WS8gBpFtm8ljIb6Km/ISWa0fwmUZTDH+Jek/BnyfEJ/D5HFKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PhseDA4r; arc=none smtp.client-ip=209.85.160.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OQ8zTl+c"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=guayUciyxeL4o3GpeRGFtEfus2Zck+RlPBFLzpoDkg25R2qeGDZfz+27SE2d2wmYn+NPN6c0+cWrs7O4Hr7K+US3jehglvtuSqcXgOSDFPp0b/AqJ8ec855IulPxhHnOSFlzKIi21xMlyUNzAgBfhlXNGoPQ1btUKIugoTNCS56+LE8CGt/CvT+C3QcrlW1YJaajUsniH7W1TSqmLsdr+Kwia+FNN7R4gpnPtTr96SngkX2tLg1QVv92Ei2T1BveXpLpJjkxnw5wQVkdZ8qhLaGbutj8iAhkdaSkFipxV5l4yY5qq5vyo/Tf74T0H4qO2zjC79mEKlxPOsQlKY8ZZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QBrrFMiGJzbP6MsBwL/5j9HJcFvmzr5HZ3F9U/6/WDU=;
- b=bkl2kzWe4zOk3w0Rz+M9kco6k7D8vqEiiBUJHy/mvsnz/ITAda1vM/7ONC1lfCLwsd3KwvjwtLzBgBiSsmKbibHRrwybmkq8CU1980GbJzY+xCb2VVBWvzpVPqy0KU3NvtLd83dPj+pY2PPMooss4CQwlO15C9jh60Bg+W0DF7Q2GdNCMYBFI3sInSiVv96ijDmIug10vcvv/Yz0hW8++MnvE2M17FUo6XDmiPENAd0CO9d9zqw/laimjbJXngO0dKMefWtQmZBxax1q4MhLT9FsxRsoH7tELWxLs61r2tVv5dyShh9CXU0Kgu2yvJAcFwjZsK+v7SNN492bwppKjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QBrrFMiGJzbP6MsBwL/5j9HJcFvmzr5HZ3F9U/6/WDU=;
- b=OQ8zTl+chmsYIQU2kK3FcR90WqvQQXE2e9mb29u/nVmHGBT3qbZeL9H/OgQgWiqmy3k9aT+jVrQ3WjUGEr88zUX+38okBiQTerTn5TgjjMQ4enRv2c6vm6U2gmN25cj4Yy0+csPn0hS3c1gkUgIDvIQ/zkDQ51rnHy9l7iLRkeI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5176.namprd12.prod.outlook.com (2603:10b6:208:311::19)
- by MW4PR12MB6897.namprd12.prod.outlook.com (2603:10b6:303:20a::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Wed, 7 Jan
- 2026 09:05:02 +0000
-Received: from BL1PR12MB5176.namprd12.prod.outlook.com
- ([fe80::91cb:8f10:c6d2:d683]) by BL1PR12MB5176.namprd12.prod.outlook.com
- ([fe80::91cb:8f10:c6d2:d683%5]) with mapi id 15.20.9478.004; Wed, 7 Jan 2026
- 09:05:02 +0000
-Message-ID: <f1cb81b7-5aab-48d0-99ce-5f971f5d2fa7@amd.com>
-Date: Wed, 7 Jan 2026 14:34:57 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/5] crypto: ccp - Send PSP_CMD_TEE_RING_DESTROY when
- PSP_CMD_TEE_RING_INIT fails
-To: "Mario Limonciello (AMD)" <superm1@kernel.org>,
- "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- "Thomas, Rijo-john" <Rijo-john.Thomas@amd.com>
-Cc: "Allen, John" <John.Allen@amd.com>, "David S . Miller"
- <davem@davemloft.net>, Hans de Goede <hansg@kernel.org>,
- "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER"
- <linux-crypto@vger.kernel.org>,
- "open list:AMD PMF DRIVER" <platform-driver-x86@vger.kernel.org>,
- Lars Francke <lars.francke@gmail.com>, Yijun Shen <Yijun.Shen@dell.com>
-References: <20260106045423.55190-1-superm1@kernel.org>
- <20260106045423.55190-6-superm1@kernel.org>
-Content-Language: en-US
-From: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-In-Reply-To: <20260106045423.55190-6-superm1@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0242.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:21a::8) To BL1PR12MB5176.namprd12.prod.outlook.com
- (2603:10b6:208:311::19)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PhseDA4r"
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-3ed15120e55so1301125fac.2
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Jan 2026 01:36:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1767778587; x=1768383387; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GAJ5e65k3z1Bl84v4hSYV5jHbNZ5QqotFXMyK4sLylU=;
+        b=PhseDA4rqOuGczQm8OI6ScQU96wNFWhck5YtuZvI3HSw+b+MsyyRb890d3laSxoB3e
+         QFMpjN6aTvp+kbwyhLQo2J9od15tVdqXeg59qbxlSb2KYBiiePlcD4da/NZp15pAKkBy
+         Mk1tudHrk3NEZlkxU0REHb8ECZjHYoNl+keMpMdQ8J1+7BWavYQN1EE+0Q2ZubgyH3cb
+         9q7tX7boJlgSoFQqNjwa2K7JwHtBqMT7CB+3UG+mFjwSA01TAfkwDnk4noi5e4tQfzrH
+         kz3GB4HSeiNTKvHacsIsX4s+4xZ7qV5xS1hoE6TuLlj8MomLoCEBFuyuvnfIZdE9Vpkz
+         rY3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767778587; x=1768383387;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GAJ5e65k3z1Bl84v4hSYV5jHbNZ5QqotFXMyK4sLylU=;
+        b=irV8thTcmdZ0ORYTZN+cTNifNLFWQZfB6qcFNVbwsj+EV+dZrfvbVnzFEd/CkM0ZF5
+         XJD9Kx5tz+N1Cc1uo1Vx1nue3UUh6Vj5tVPCplZi4H1fekeC+j2YFtrIHanf0BgpyNvK
+         r1syjMThACaMczAkFtsY7F7Fsy/+lLM/87jNXZRZ6hcFfMDyu/mbLX9HUc52jTBQcCq3
+         4uO6reEH/HoZwqokk+9GG4Lzqbok09SyXL+ZMM4bJ4ZnYp2xB+5h0wWOi58H4etUN+MK
+         43TCTOvXwDUfLOIXjD0mG7ROB3zwcitDT5QwxCiSuILDmK7OInrMZL0B3s0h6dQ/+dWW
+         wwQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVfyLXiBfdt2+SPCoqVlOSZHsprtG36I4BtET5j//Ps5yWe675n/Nk4k6qgPCxKwT6/+ufUKKFMoAneg4I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygpcjrpygkcYGoNyconf1jF39q1L+RS2b+3AEbpaALb3r2zRRx
+	9xbkEVy7izE1LzsrxX+Jy4bV9Y/pRDlu6ofjpb6fwTviDJ5/ukxDBxK5I8UuNnXlMVri5FoH8mZ
+	eGy6BwOIrtAj2QNXLigmcgmDS//+MrngiWyH1RZyWpw==
+X-Gm-Gg: AY/fxX6wKT5bHSRAt5UEBACDy4FISt99uMTmOeGxn5y85o2O0OiXVY2Wgizx/Lf6ynx
+	W0zeSg/6WEqacTAEKpgZteoBP4aoSspXpT2Hp72QSuRRk+2o4vy5eQIjs0nPCzxyZegyOKOwR4E
+	N09beFhfehBDdvm9uAZw4A5t+wRXJRXbroFwcSg/ZXsi/NMBF+5Gx5Pi/jbLAF6PS0d0QJa6Yk+
+	9eXTf1/4h+zqrvZsJjdh76Xc8Rz+GX77cZIKrQb9ZLRscagyliNVOruYAHP48FWXto1gzt3Z4Nq
+	Xj8UZ7sE8+oTJNyLvmtgrYr0BA==
+X-Google-Smtp-Source: AGHT+IH8mMrbtH032ZDWJFlkRThntfnwmPEqUqd2JDeL8NGsufG7LDpL42U7yHJF4QJdKPnzDUAc6fHTBjr7gAIIOLU=
+X-Received: by 2002:a4a:ba13:0:b0:659:9a49:8f89 with SMTP id
+ 006d021491bc7-65f55085418mr579167eaf.78.1767778586821; Wed, 07 Jan 2026
+ 01:36:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5176:EE_|MW4PR12MB6897:EE_
-X-MS-Office365-Filtering-Correlation-Id: bbc9ef2a-e23e-4154-371e-08de4dcbd773
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Q3hZQ2QzV2U3dG5QaU41Y2E1ZUU0Z1ZmRjNCUnBMbjBwQ240alVFZHB0UHZR?=
- =?utf-8?B?ZWVSZlR5WEZiOTVTSW10QUM3cGJ5eUVDM05BcFhrZGdJNjlzMjJzOHlLTGJ1?=
- =?utf-8?B?bnloU1RkQW9vZytRczI1ZWNraHZRdWlhRzQ2NXRHdld3ZlRkaS8yQzh4QmM5?=
- =?utf-8?B?NGFaWGtMM3M1SU56SUlXRzl6Tk9maWhLeVV5dC9aMTVzNU8xdm1oSWIwcWtC?=
- =?utf-8?B?UEFuenc1WS9vcWJYZ0k4bWVXT1JObzRmeG9yalNBaFhkdlFJWDR2MG5kNkVJ?=
- =?utf-8?B?VHQyRkJyMDZydVJPSndOdnFTdVNlcWl6Q2gxeXpoTjA4cEZHSzA2ckgxRi9W?=
- =?utf-8?B?VTZRSy9NUFZkRm1TajhIdHlBWWlNN1laSE4vTFA4dm44RXREM0NXMGUvdFp0?=
- =?utf-8?B?RWtqcXhkdUdUT2dqd0V6Qi91VzR3MVRaMzF0RUdRRDA4VmhPMHNRZVdpMWVO?=
- =?utf-8?B?YnZPd2RsQnV0dHcvWG01M3pZeVlzc2VncjJEQlkxREJUUWlicy83SE54ZHNK?=
- =?utf-8?B?ZDZJcFhSZHg3V0RRMExwengvZThYLzZZMUtiV2FQUEZBOTZBdkdQSHZZMGxx?=
- =?utf-8?B?eVczVnh6bmRwL1BGcDVKOEdtUVc2WmJkWlNXRnZHUEZub0QwMkZTbWhrTFQ5?=
- =?utf-8?B?VzkwaGFueEgzWXBNRFlGSVNSVnUrT042bXd3YmpzSXpyY3dIemNHTjNJSXo2?=
- =?utf-8?B?N0ViMlI3K0lEcndsOGpyMWpuMEZYNXc0b1FWcDNOYy9xTmdGR3pSSnp0Z21t?=
- =?utf-8?B?S21Ub1RuZUZRQ0Q4Uk1sRnJlcTZqT1QzN29QYzZNNTU1MlQ5L1dtbXRLWkF1?=
- =?utf-8?B?c0dHSkRJWkZ4TURuNjRzU0EzLzczcklaKzNoenE5clptWWNYNmhmZmU0TXgr?=
- =?utf-8?B?SEFCVHE1aG1GZHVQSWJHb3FxVzdNd21tU01Ja0J1Y3VvVWlzOFR6VlUwSzFp?=
- =?utf-8?B?QmV1UmgzMjh3ZC9SUWlsalhmSDd1RDBlWU00aTArMDUrc21DVWFFeUY3dUVw?=
- =?utf-8?B?SlRiS3ZUQTZTQjRaSnBsKzdscnhxbldwemErSFJVOTFFalZIam1sM2RRays3?=
- =?utf-8?B?UnRHd2tzNGhOUjVTSURSM3NDT2lzam9pMldpTkcwSjhXd1ZmMTFadXA2NWJP?=
- =?utf-8?B?UUpHUzVlZHNQQ01CZk9ydjJHVlQrVkxsMEFJOGptVThzcWNhZVh1NnNEZmVG?=
- =?utf-8?B?clhTTDVGUGpkVXpVOGJTSzZzWUw5cVpJVE95YjVSUzBtM1pEM3lHWEc5UFdB?=
- =?utf-8?B?Smw0bGlTa1EvY3VjNFVDWEpPcU5PUU52dUgrOFJsbWtHM3FSUUxWbHExSFk2?=
- =?utf-8?B?SlM3OXFmSXI5dURXdmNKbXBQampPcGxhRnNMSmdNQ21UZ3h6M2p6NUFDOXhn?=
- =?utf-8?B?elczSGxtOTB2VUZjNTluRkYxNWl6WXAzRFcxa3lwc0NuT0xITzhjRnV1ZThI?=
- =?utf-8?B?MnF0S01EWThBL0EzOVh6SU42NVZDbUQxS1dxRTlBK1pzVmFzbDBha0hUNU14?=
- =?utf-8?B?TWNCUzdZNWU4bTVGdGxGZWN1cFRCZE9xYVBueElHbmNScnpIcmhBZDBXb1hD?=
- =?utf-8?B?MWlJbExBUG0wZUhackZySmFpMzdQK2ZoTDNqdlVnVmRqdWJyZjJJazgzaEhP?=
- =?utf-8?B?SEU1Ni9HeldpaEorRTkza1JwdjhsV2czbVZZbFMyNkhQVHJKK3NIWnprVFJr?=
- =?utf-8?B?bmFYOE1RMGFPZzh2TDN1OFpUbW9kcDRGWmhoSVRCWm1SOUZjTmsvdkNNdXdm?=
- =?utf-8?B?ZUJvQ1hkZFRrSU15T3RuTUNwMGhSRCsxMWRFVHhCYzJOZC9nb1NWVHF4UTRk?=
- =?utf-8?B?ZmNEN1FEM3dKbUp4Q3hYaGc3WXlEdm5COHFjVXhyV2g0VmFISXFkUVg2QmVX?=
- =?utf-8?B?TklOdnV1ME1mSENjeExRK2Y5ZlkrTVFKMDY1WmtzYlZEWVlLcHhVQ1B3OVE2?=
- =?utf-8?B?YzF6VjAwK21UcVBERVlpRExHUnhSU0J3NWljMjhhbC9YZ3ZwR2YrdFoyZW5r?=
- =?utf-8?B?bGl0VlBZbHlBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5176.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eWdCTW12ZG5iN1dNSG9aNDVxWmxlVVJ0Wjh6ZGd6ZE9kdXV2YUQ4MldvYjEz?=
- =?utf-8?B?dTlJZnpCYVoxeFpZN2R3c2pXMzEwN3k3SDN0Y3llYmVXMGx1MzVhZnpnb3pW?=
- =?utf-8?B?THh4amVGbXprUlJrTy8wbVk2ZGZZNDNjdHRlQld5MkhqNTJ2bmt6UDJXUk8r?=
- =?utf-8?B?WUg2U0pKR25jS25aZEMvTjVSTGpNaGJDcHR6eE1jdHY5MktVSEtadHM1bHps?=
- =?utf-8?B?VndTVkFOQmc2eUN2bWI3aUtTclp2N2lyMXNBekh2SDhUL2NteTFrcVFLd1Ar?=
- =?utf-8?B?cktCNnRmSnBWRWNWblNnQnNpZ0UxNG1GWTFWTlhkUjBCTE9FaHFQcTFSaDdt?=
- =?utf-8?B?VG5EOFZ5Q1laU0QwVHNCUnZjd0JaUGtSaHR6WTBBMllka3h6VlFEdEN4YXds?=
- =?utf-8?B?d2FEWXJmZE9OUVYyZkgreEN5MDZzd0srNi9yMlE1ejdsZDVmZm9QMXZBaGlG?=
- =?utf-8?B?TWlxdEJxUjRqUktqTE5zbFVaZmdHM2dLOFRkalMvVHVnMkdBL1FHbWVLbVBS?=
- =?utf-8?B?a0c5M2xISmswNmQ0QUJqUXdYWnFNa2JDZTF1ZmhYeWtVS2FYQ3lFMkthaHZB?=
- =?utf-8?B?YlNlbFpWQU9teFRBb2ZzNEpEbzJIcnE0VDUyaXNub0FJVXBRL0RoNnJWem5n?=
- =?utf-8?B?NzJHUmJ1Z0R0S0M4ZFVJRU40dGtxcHNGNnlnYlRwNWk5MmZ5SzdGR0xOOC9F?=
- =?utf-8?B?TFhPdXAzdEFkeGMzNk5aOHhteldRQ09SU0k3N082RjRCaWxNWElvNlVoZXdR?=
- =?utf-8?B?SnBqUkkwZzY5RU9hZ0JSWG4vbVhUVW1vRDRjRzB5Q0dFUjBLSnhLOXV4aTFD?=
- =?utf-8?B?bU1Tc1VuYmMyOFJPeFVnSXR5Skw4YUF1UHNjRCtIMUZaRFpiYmViOHd4R2JQ?=
- =?utf-8?B?MS9YNlVySi9wQVFLTG9pS3lCT2RBbzAyeVZvMEEvL2VtYkVnZ0lyazBQdll5?=
- =?utf-8?B?MktQUEZncStOWTVYUzAvMCtJZ1pIMkJSVDBqNW8zSmt0UXhnOXUxcnE3UnJC?=
- =?utf-8?B?a2UyWVp0ZmFBaU5Dc2tnWitWazdURVl5SjFyZ0JwdUNSZVZoUDdRek5ULzJG?=
- =?utf-8?B?L2RqY1BYdDJ2MytEQzNXbmphb1l5MmFtWVJMelo1cjRRRFZNQ2N5K3MvemRX?=
- =?utf-8?B?ZW9QVmcvdktVWXJQUjg1eThMSWg1dkdRdXZ5djhjRk9UNDJLa2swaTJiWlhy?=
- =?utf-8?B?dHJsaEZOYkp4KzAwR0pKQ045N1NISFBmOEtIc04rQ2daK2srWmRnbmpLdUFy?=
- =?utf-8?B?Ykkzb2VMTFdZTXNCajFGSVZON0VZUTkycm9WVEVBWXQrVllPbXlBY1pONVhn?=
- =?utf-8?B?aENHa3ljNzBaVlZEclF0R1kvb1hrRGRCSWFaUTEydndyZ2gwVDgxV1ladE5W?=
- =?utf-8?B?RVZjeDAxdEZxMXYwZ0JJVjBQQlRwdSs4YjhwZzlrR3QvZHBpNWlDb3JmVTFR?=
- =?utf-8?B?QmM5THQ0c1JiTW0vNm4xN1IwOTZvT2xzcmMyVHpRTEZPOUlueVJwcDZLTVJs?=
- =?utf-8?B?Ni9aY3lPVTUvaDRkZnhtdlJiVWVXcy9pVHRNckZBK0o2ZURaVlZONUhhVHk3?=
- =?utf-8?B?d2dNUlFsU2dZQkowQXIyYnZJRUd3WmNWK3ZVRnhYUTNCZERzbTc3ZG1EaWM3?=
- =?utf-8?B?cllzWThwT3lrUWtHWndrdVNlWkdQeTlOTXdqUzZwa2ZtaWt3RGdMeXd0N2JB?=
- =?utf-8?B?UzdPS21OcWdKQ0hCb2hPb0RRNWZZWnloUlZNamlhdTY5N0pBYWFIMFhvRE45?=
- =?utf-8?B?SFR1amlINkRNMXdKSkpySFFJcW9lM0ltZEUyQUtzZ3JIYUZaY1JnZ2Q5TjRX?=
- =?utf-8?B?b3c3VXB1VHF2MmhMQ0xLVjFIWmVCdkpLUUpMeUNaVXV3NnVOdytPYnc5V0ty?=
- =?utf-8?B?eS83TEFJaTJCRmN4akFJV2FLOFdvK25lckwyWWxDcGlGYXFLUUs2ZGg2Qnla?=
- =?utf-8?B?Q2tRMENGQStscGY1Sk5ySnZIMDN2M0kxc1M4UXRHSVhiOE9iOVFWL25ybXZH?=
- =?utf-8?B?TkpncERNRmdUSGQ1UDEvUU9MWjlZb1pPTUIxR2h3dndxZ3RYMU9UTVFtVzJN?=
- =?utf-8?B?OXRDVklKZFdFSXdIQ0FSVzhoaE91b0NXMGlUZXcxS05ldjUwSjBZN2RiU3I2?=
- =?utf-8?B?WkF3MkMxSWxrbmtjYURIdXl2dUFIZTI1dmp4cy9QK2hKZzB6Q2tGSEVXZEpK?=
- =?utf-8?B?RXpId0lKU0I2YXp5d1ZldmlQa0VWZTR2NEcxcnRUdFF0REx4b0kyZjNPaGZB?=
- =?utf-8?B?Wm9aNGhoam5LZXcyME9BbVoweWtYMG1WRU1CUmpKWVpaamdtMlREbFdzczdk?=
- =?utf-8?B?d2ZUdU95YTBtNHg1Y2NsNk0yUUxRLzlWcWF3RGdJaXQ1Q0x1RElydz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbc9ef2a-e23e-4154-371e-08de4dcbd773
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5176.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2026 09:05:02.4495
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AhwsLuHxyuY5xCg4qu5idDuCwiq/yxaeQeXy2nOCJBP2zNRcTS17SLqgAhhHYD5FI8ABURMryVESGS1QpZTDVw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6897
+References: <cover.1765791463.git.u.kleine-koenig@baylibre.com> <d14a9c41-9df7-438f-bb58-097644d5d93f@nvidia.com>
+In-Reply-To: <d14a9c41-9df7-438f-bb58-097644d5d93f@nvidia.com>
+From: Jens Wiklander <jens.wiklander@linaro.org>
+Date: Wed, 7 Jan 2026 10:36:15 +0100
+X-Gm-Features: AQt7F2pWAOmWwJm8vdt2KOCYOYr18EvzYgjBZjv21zyTW_ttRjt9UA8BFElgUTo
+Message-ID: <CAHUa44Hhyz_zF5JtCz00YqbgoPTLK2iS7NBT8UwOLpAz=3VZAA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/17] tee: Use bus callbacks instead of driver callbacks
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Sumit Garg <sumit.garg@kernel.org>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Sumit Garg <sumit.garg@oss.qualcomm.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	=?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, 
+	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, 
+	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, 
+	linux-mips@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>, 
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Jon,
 
+On Tue, Jan 6, 2026 at 10:40=E2=80=AFAM Jon Hunter <jonathanh@nvidia.com> w=
+rote:
+>
+> Hi Uwe,
+>
+> On 15/12/2025 14:16, Uwe Kleine-K=C3=B6nig wrote:
+> > Hello,
+> >
+> > the objective of this series is to make tee driver stop using callbacks
+> > in struct device_driver. These were superseded by bus methods in 2006
+> > (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
+> > methods.")) but nobody cared to convert all subsystems accordingly.
+> >
+> > Here the tee drivers are converted. The first commit is somewhat
+> > unrelated, but simplifies the conversion (and the drivers). It
+> > introduces driver registration helpers that care about setting the bus
+> > and owner. (The latter is missing in all drivers, so by using these
+> > helpers the drivers become more correct.)
+> >
+> > v1 of this series is available at
+> > https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koenig@baylib=
+re.com
+> >
+> > Changes since v1:
+> >
+> >   - rebase to v6.19-rc1 (no conflicts)
+> >   - add tags received so far
+> >   - fix whitespace issues pointed out by Sumit Garg
+> >   - fix shutdown callback to shutdown and not remove
+> >
+> > As already noted in v1's cover letter, this series should go in during =
+a
+> > single merge window as there are runtime warnings when the series is
+> > only applied partially. Sumit Garg suggested to apply the whole series
+> > via Jens Wiklander's tree.
+> > If this is done the dependencies in this series are honored, in case th=
+e
+> > plan changes: Patches #4 - #17 depend on the first two.
+> >
+> > Note this series is only build tested.
+> >
+> > Uwe Kleine-K=C3=B6nig (17):
+> >    tee: Add some helpers to reduce boilerplate for tee client drivers
+> >    tee: Add probe, remove and shutdown bus callbacks to tee_client_driv=
+er
+> >    tee: Adapt documentation to cover recent additions
+> >    hwrng: optee - Make use of module_tee_client_driver()
+> >    hwrng: optee - Make use of tee bus methods
+> >    rtc: optee: Migrate to use tee specific driver registration function
+> >    rtc: optee: Make use of tee bus methods
+> >    efi: stmm: Make use of module_tee_client_driver()
+> >    efi: stmm: Make use of tee bus methods
+> >    firmware: arm_scmi: optee: Make use of module_tee_client_driver()
+> >    firmware: arm_scmi: Make use of tee bus methods
+> >    firmware: tee_bnxt: Make use of module_tee_client_driver()
+> >    firmware: tee_bnxt: Make use of tee bus methods
+> >    KEYS: trusted: Migrate to use tee specific driver registration
+> >      function
+> >    KEYS: trusted: Make use of tee bus methods
+> >    tpm/tpm_ftpm_tee: Make use of tee specific driver registration
+> >    tpm/tpm_ftpm_tee: Make use of tee bus methods
+>
+>
+> On the next-20260105 I am seeing the following warnings ...
+>
+>   WARNING KERN Driver 'optee-rng' needs updating - please use bus_type me=
+thods
+>   WARNING KERN Driver 'scmi-optee' needs updating - please use bus_type m=
+ethods
+>   WARNING KERN Driver 'tee_bnxt_fw' needs updating - please use bus_type =
+methods
+>
+> I bisected the first warning and this point to the following
+> commit ...
+>
+> # first bad commit: [a707eda330b932bcf698be9460e54e2f389e24b7] tee: Add s=
+ome helpers to reduce boilerplate for tee client drivers
+>
+> I have not bisected the others, but guess they are related
+> to this series. Do you observe the same?
 
-On 1/6/2026 10:24, Mario Limonciello (AMD) wrote:
-> The hibernate resume sequence involves loading a resume kernel that is just
-> used for loading the hibernate image before shifting back to the existing
-> kernel.
-> 
-> During that hibernate resume sequence the resume kernel may have loaded
-> the ccp driver.  If this happens the resume kernel will also have called
-> PSP_CMD_TEE_RING_INIT but it will never have called
-> PSP_CMD_TEE_RING_DESTROY.
-> 
-> This is problematic because the existing kernel needs to re-initialize the
-> ring.  One could argue that the existing kernel should call destroy
-> as part of restore() but there is no guarantee that the resume kernel did
-> or didn't load the ccp driver.  There is also no callback opportunity for
-> the resume kernel to destroy before handing back control to the existing
-> kernel.
-> 
-> Similar problems could potentially exist with the use of kdump and
-> crash handling. I actually reproduced this issue like this:
-> 
-> 1) rmmod ccp
-> 2) hibernate the system
-> 3) resume the system
-> 4) modprobe ccp
-> 
-> The resume kernel will have loaded ccp but never destroyed and then when
-> I try to modprobe it fails.
-> 
-> Because of these possible cases add a flow that checks the error code from
-> the PSP_CMD_TEE_RING_INIT call and tries to call PSP_CMD_TEE_RING_DESTROY
-> if it failed.  If this succeeds then call PSP_CMD_TEE_RING_INIT again.
-> 
-> Fixes: f892a21f51162 ("crypto: ccp - use generic power management")
-> Reported-by: Lars Francke <lars.francke@gmail.com>
-> Closes: https://lore.kernel.org/platform-driver-x86/CAD-Ua_gfJnQSo8ucS_7ZwzuhoBRJ14zXP7s8b-zX3ZcxcyWePw@mail.gmail.com/
-> Tested-by: Yijun Shen <Yijun.Shen@Dell.com>
-> Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
-> ---
-> v4:
->  * Add tag (Yijun)
->  * Move and rename PSP_TEE_STS_RING_BUSY (Ilpo)
-> v3:
->  * Add a comment (Tom)
->  * Add a define for busy condition (Shyam)
->  * Rename label (Shyam)
->  * Upgrade message to info (Shyam)
->  * Use a helper that validates result for destroy command (Shyam)
-> ---
->  drivers/crypto/ccp/tee-dev.c | 12 ++++++++++++
->  include/linux/psp.h          |  1 +
->  2 files changed, 13 insertions(+)
-> 
-> diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
-> index ef1430f86ad62..ea9b94d5b10ba 100644
-> --- a/drivers/crypto/ccp/tee-dev.c
-> +++ b/drivers/crypto/ccp/tee-dev.c
-> @@ -113,6 +113,7 @@ static int tee_init_ring(struct psp_tee_device *tee)
->  {
->  	int ring_size = MAX_RING_BUFFER_ENTRIES * sizeof(struct tee_ring_cmd);
->  	struct tee_init_ring_cmd *cmd;
-> +	bool retry = false;
->  	unsigned int reg;
->  	int ret;
->  
-> @@ -135,6 +136,7 @@ static int tee_init_ring(struct psp_tee_device *tee)
->  	/* Send command buffer details to Trusted OS by writing to
->  	 * CPU-PSP message registers
->  	 */
-> +retry_init:
->  	ret = psp_mailbox_command(tee->psp, PSP_CMD_TEE_RING_INIT, cmd,
->  				  TEE_DEFAULT_CMD_TIMEOUT, &reg);
->  	if (ret) {
-> @@ -145,6 +147,16 @@ static int tee_init_ring(struct psp_tee_device *tee)
->  	}
->  
->  	if (FIELD_GET(PSP_CMDRESP_STS, reg)) {
-> +		/*
-> +		 * During the hibernate resume sequence driver may have gotten loaded
-> +		 * but the ring not properly destroyed. If the ring doesn't work, try
-> +		 * to destroy and re-init once.
-> +		 */
-> +		if (!retry && FIELD_GET(PSP_CMDRESP_STS, reg) == PSP_TEE_STS_RING_BUSY) {
-> +			dev_info(tee->dev, "tee: ring init command failed with busy status, retrying\n");
-> +			if (tee_send_destroy_cmd(tee))
+Yes, I see the same.
 
-so it becomes infinite retry? I think we need to set the retry flag to
-true to indicate that ring busy.
-
-> +				goto retry_init;
-> +		}
->  		dev_err(tee->dev, "tee: ring init command failed (%#010lx)\n",
->  			FIELD_GET(PSP_CMDRESP_STS, reg));
->  		tee_free_ring(tee);
-> diff --git a/include/linux/psp.h b/include/linux/psp.h
-> index 92e60aeef21e1..b337dcce1e991 100644
-> --- a/include/linux/psp.h
-> +++ b/include/linux/psp.h
-> @@ -18,6 +18,7 @@
->   * and should include an appropriate local definition in their source file.
->   */
->  #define PSP_CMDRESP_STS		GENMASK(15, 0)
-> +#define  PSP_TEE_STS_RING_BUSY 0x0000000d  /* Ring already initialized */
-
-additional spaces between the macro names.
+I'm sorry, I didn't realize that someone might bisect this when I took
+only a few of the patches into next. I've applied all the patches in
+this series now.
 
 Thanks,
-Shyam
-
->  #define PSP_CMDRESP_CMD		GENMASK(23, 16)
->  #define PSP_CMDRESP_RESERVED	GENMASK(29, 24)
->  #define PSP_CMDRESP_RECOVERY	BIT(30)
-
+Jens
