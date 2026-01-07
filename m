@@ -1,221 +1,111 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF07032A3FD
-	for <linux-crypto@vger.kernel.org>; Wed,  7 Jan 2026 13:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B843432ED2C
+	for <linux-crypto@vger.kernel.org>; Wed,  7 Jan 2026 13:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767794018; cv=none; b=FI/0K8CgSru+eHhGPjNoPLtUwaidXW0m9ucfaqoUP8XGfQJcsuZ1Mxn0BYxTwm2H7iAPA+92EyCBUVen1LsobuOzJjVG64zS9KhYL4eiIMlEnexKVpKsVKukbtY/ngZtSbmpLRT47r66cOjHJvugTIZx3Q1mTA318+UnD1di7eM=
+	t=1767794020; cv=none; b=WF8boe03rkAJLVo03pKnwq6TDfKV6O93ZMdgQHWJJO8AgUzkC38tMaD9/gSx9wfNTKZV22gf/D2eieiuqhDbfiHW0rPQ4eibUfNm3JPF5xP0x9l8JsYj2So2qcqTlhAyXns2xsFc7jv0M6rXwrs1U1CrDzcd2V0sgyYRpkYgDro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767794018; c=relaxed/simple;
-	bh=QDC8fAkpuLJNm2CjBuxTCKz5by93qeEHT4fCaNyzUbw=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ogYz1eyt9LmZ+14zOHYJXO+CqEhwFixc+sULgx0SS7WoStDBuWDb0Ekw715qqxKzt96/LGh7UnkN878GbriIrSB5QE68E1Z+TCY344AqLaUb47pw39mg1qD2QaMIWf0Q2NwAMxjo+p2wRJvYSMV8pHcDWDZjLZ5hJqfDQWCFlXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=U2P/RfYr; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1767794020; c=relaxed/simple;
+	bh=Saoed4Dc0jee0b/UVY9YgHw7inzzEj3jNE7uJVi9Qqc=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=MlvxNQP7YeXpMXxRLV8IsY2DlQY1ZrPw2yjHQY2ScglGrH5pdmx1azfIEv4xwPTHy3OL+eVi0bgBYPucWhzS+q9ga8QfsZ6Tez9E99d4LXTnUyT7/kGGSkGik0vXfetFU16JV51b+sL+lxFPIfJfxM6BYRcvztYQBMDhXn1R3fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z/HZXvtI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U2P/RfYr"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-47d1d8a49f5so14182605e9.3
-        for <linux-crypto@vger.kernel.org>; Wed, 07 Jan 2026 05:53:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1767794014; x=1768398814; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2PPmOlHHmb/B+RyLKIMZJ6qeJLZRe+/pRm6RubVwI5k=;
-        b=U2P/RfYryQwYRq1wuZGa25ky58pj1z/w4pVTW5+H2ho4kITzgYXWOn0a3j96dQFned
-         vWIKe5+B+XQEGDEqVldbmMVp9f1IweqgOa4x4a/OX6MGworfpStKpXW093Hfsf1uJ8wD
-         UYpMtX/5wQEcFjn4+kmCZrTQoOsHIZq74R4STKvKB9cfHsc/gqtf1TIm3wCfC1o1Jxrw
-         EoktVo2WdjekH5l9DleY9OqrtYODxS+6XlwOya6VrMI6XnH8/YE32tJLS6U0BKeyF4Oe
-         rYUDl4vPLLtf+bhbW4w2d9lO4imp4B5W6iIvzanSBrs/5RNGZq4xA2wAgtaYOXeuLtqT
-         7swg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767794014; x=1768398814;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2PPmOlHHmb/B+RyLKIMZJ6qeJLZRe+/pRm6RubVwI5k=;
-        b=u3bz3XrUrkW6O3DT97V3bwi9m2LcXg0aX0/Wr7h/Min3TO/Je1UR2t8ulU49LRQbFr
-         KGRZMIdCqcbZxLXtvX/3XORjyzxDkeDqdYjPienk6qHgFGO/NpNJzeAFmMGSMVfxJlLW
-         HQkuKmAdOvQvraHJjgp+UY0NR5/n4tkuogaTHJPcj/0wzsFhX4LxKanBIkgD054s8knA
-         pl2/ervdX2yRygijbZXGxC87OUzS8/Yic14PRTg/TmRJ5SyBeOW57qMfTbNy6jv64WCf
-         TdKGDpnzFb/ubvoWhO6MSqfLjkPePUwHBL7mK3dIitmYrDaL98bGON6Er1fAZjApNmOe
-         vYqA==
-X-Forwarded-Encrypted: i=1; AJvYcCWfPcC2TeMFwwLzZjvIvOsyr6xOTDqQMNl7Lpe5mlYW/1bU8KZmHDrULE/k7MhKQ1vMPQmBFwLfUPNKVkg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxbhaj/CaaBgKNtPb2eQ1kTgEZ7xg3j02EyMENk0pmJ8po4pl8g
-	lhYNKR+BtGLqcMnq4XmON+IRERjwxuaqoQ4E5R6VCk2NHKip54Yz/5Jl7i6eNyGu+m0=
-X-Gm-Gg: AY/fxX5JRsX1bzp8KCYSNCzEaAwEdZVlvd6Sohitmr28jPBpa0D2RkJRO3iaG6bRN+2
-	N95AImjF3z2bcyej0R3b8XTELc9TO5orz5ZkQbyA71yTAwTAak+TGSz7snarM4iNsroDJu367IC
-	gHmtwV178trORVp98SeRONEy4fDh4EU4XmRQxFiKW8MTTHkh/NeF6s3WY2UfODKv2dPJBUlT7xT
-	u+/8gna4t5PPL+C9ORD5/qNFQvnk3r/BXpEz2saBWsKdC/ZqYGe7fBmdsMDd5vCBCoN/x3EX1Ov
-	zLlL2+VXrY+LMKWyQ+8CZLcnFTp97IRRYQQuJlzk+u9+GNdeK9VYC3jbAXWYncBenIPdoDM01g1
-	tJjZKN2V3SxUcveQMYzw0RUlPTP7+4tPHLmZOcFQ+IGBm2a64aK3IJRt8/+MvvCfzqk0Pn1+EjW
-	qphIwgqqi6sG9zcpVa/9cOFe8pK+w+2zNIgNb5qbS+fYyrOqFimhqITQdiEfaDtaE=
-X-Google-Smtp-Source: AGHT+IFUA5vh7AafgOW//OBUIb/fgC/LgcjIFr0sUp94lRbcr5Desv09dz0w5OtTNI6i8HI4JrREVQ==
-X-Received: by 2002:a05:600c:1f8c:b0:477:7d94:5d0e with SMTP id 5b1f17b1804b1-47d84b40955mr30210945e9.27.1767794013703;
-        Wed, 07 Jan 2026 05:53:33 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:3d9:2080:2542:a09c:d0d8:7a1f? ([2a01:e0a:3d9:2080:2542:a09c:d0d8:7a1f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d86637b90sm15127055e9.2.2026.01.07.05.53.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jan 2026 05:53:33 -0800 (PST)
-Message-ID: <2486dc4b-71f3-4cd9-8139-b397407d7e4d@linaro.org>
-Date: Wed, 7 Jan 2026 14:53:32 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/HZXvtI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767794016;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Vrzn+Ssn7p217lIFP+Z2b99FMmHrz8aKK4bxB98oF7g=;
+	b=Z/HZXvtI2Cy0ajw22KE1ZAvWsxTgQVU+6mNUOafpOTo/IHzyij5hl1jb5SCX2ApGY+fX6a
+	XXz+4KSCLmJ4TViI2wW2LbaZn92ssjidSbJnFOJzRWMaKVSb2VFaybK7ztynt5zCNw/ARe
+	qtyz3cezNfbYbZEpWalj6FnsUnVp04k=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-275-8Lk2NEKkMymD6xf9Lhi8pA-1; Wed,
+ 07 Jan 2026 08:53:32 -0500
+X-MC-Unique: 8Lk2NEKkMymD6xf9Lhi8pA-1
+X-Mimecast-MFC-AGG-ID: 8Lk2NEKkMymD6xf9Lhi8pA_1767794010
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 89EEB18002C2;
+	Wed,  7 Jan 2026 13:53:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 43EF818004D8;
+	Wed,  7 Jan 2026 13:53:25 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CALrw=nFj9OEsREJ8Kxox3U6N8y=e00ZawxEkCPOb5-6_k=7+nQ@mail.gmail.com>
+References: <CALrw=nFj9OEsREJ8Kxox3U6N8y=e00ZawxEkCPOb5-6_k=7+nQ@mail.gmail.com> <20260105152145.1801972-1-dhowells@redhat.com> <20260105152145.1801972-3-dhowells@redhat.com>
+To: Ignat Korchagin <ignat@cloudflare.com>
+Cc: dhowells@redhat.com, Lukas Wunner <lukas@wunner.de>,
+    Jarkko Sakkinen <jarkko@kernel.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Eric Biggers <ebiggers@kernel.org>,
+    Luis Chamberlain <mcgrof@kernel.org>,
+    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
+    Sami Tolvanen <samitolvanen@google.com>,
+    "Jason A . Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
+    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v11 2/8] pkcs7: Allow the signing algo to calculate the digest itself
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Neil Armstrong <neil.armstrong@linaro.org>
-Reply-To: Neil Armstrong <neil.armstrong@linaro.org>
-Subject: Re: [PATCH 5/6] arm64: dts: qcom: milos: Add UFS nodes
-To: Luca Weiss <luca.weiss@fairphone.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>,
- Bart Van Assche <bvanassche@acm.org>, Vinod Koul <vkoul@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-phy@lists.infradead.org
-References: <20260107-milos-ufs-v1-0-6982ab20d0ac@fairphone.com>
- <20260107-milos-ufs-v1-5-6982ab20d0ac@fairphone.com>
-Content-Language: en-US, fr
-Autocrypt: addr=neil.armstrong@linaro.org; keydata=
- xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
- GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
- BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
- qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
- 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
- AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
- OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
- Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
- YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
- GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
- UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
- GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
- yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
- QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
- SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
- 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
- Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
- oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
- M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
- 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
- KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
- 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
- QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
-Organization: Linaro
-In-Reply-To: <20260107-milos-ufs-v1-5-6982ab20d0ac@fairphone.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2366239.1767794004.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 07 Jan 2026 13:53:24 +0000
+Message-ID: <2366240.1767794004@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Hi,
+Ignat Korchagin <ignat@cloudflare.com> wrote:
 
-On 1/7/26 09:05, Luca Weiss wrote:
-> Add the nodes for the UFS PHY and UFS host controller, along with the
-> ICE used for UFS.
-> 
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> ---
->   arch/arm64/boot/dts/qcom/milos.dtsi | 127 +++++++++++++++++++++++++++++++++++-
->   1 file changed, 124 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/milos.dtsi b/arch/arm64/boot/dts/qcom/milos.dtsi
-> index e1a51d43943f..0f69deabb60c 100644
-> --- a/arch/arm64/boot/dts/qcom/milos.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/milos.dtsi
-> @@ -797,9 +797,9 @@ gcc: clock-controller@100000 {
->   				 <&sleep_clk>,
->   				 <0>, /* pcie_0_pipe_clk */
->   				 <0>, /* pcie_1_pipe_clk */
-> -				 <0>, /* ufs_phy_rx_symbol_0_clk */
-> -				 <0>, /* ufs_phy_rx_symbol_1_clk */
-> -				 <0>, /* ufs_phy_tx_symbol_0_clk */
-> +				 <&ufs_mem_phy 0>,
-> +				 <&ufs_mem_phy 1>,
-> +				 <&ufs_mem_phy 2>,
->   				 <0>; /* usb3_phy_wrapper_gcc_usb30_pipe_clk */
->   
->   			#clock-cells = <1>;
-> @@ -1151,6 +1151,127 @@ aggre2_noc: interconnect@1700000 {
->   			qcom,bcm-voters = <&apps_bcm_voter>;
->   		};
->   
-> +		ufs_mem_phy: phy@1d80000 {
-> +			compatible = "qcom,milos-qmp-ufs-phy";
-> +			reg = <0x0 0x01d80000 0x0 0x2000>;
-> +
-> +			clocks = <&rpmhcc RPMH_CXO_CLK>,
-> +				 <&gcc GCC_UFS_PHY_PHY_AUX_CLK>,
-> +				 <&tcsr TCSR_UFS_CLKREF_EN>;
-> +			clock-names = "ref",
-> +				      "ref_aux",
-> +				      "qref";
-> +
-> +			resets = <&ufs_mem_hc 0>;
-> +			reset-names = "ufsphy";
-> +
-> +			power-domains = <&gcc UFS_MEM_PHY_GDSC>;
-> +
-> +			#clock-cells = <1>;
-> +			#phy-cells = <0>;
-> +
-> +			status = "disabled";
-> +		};
-> +
-> +		ufs_mem_hc: ufshc@1d84000 {
-> +			compatible = "qcom,milos-ufshc", "qcom,ufshc", "jedec,ufs-2.0";
-> +			reg = <0x0 0x01d84000 0x0 0x3000>;
-> +
-> +			interrupts = <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH 0>;
-> +
-> +			clocks = <&gcc GCC_UFS_PHY_AXI_CLK>,
-> +				 <&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
-> +				 <&gcc GCC_UFS_PHY_AHB_CLK>,
-> +				 <&gcc GCC_UFS_PHY_UNIPRO_CORE_CLK>,
-> +				 <&tcsr TCSR_UFS_PAD_CLKREF_EN>,
-> +				 <&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
-> +				 <&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
-> +				 <&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
-> +			clock-names = "core_clk",
-> +				      "bus_aggr_clk",
-> +				      "iface_clk",
-> +				      "core_clk_unipro",
-> +				      "ref_clk",
-> +				      "tx_lane0_sync_clk",
-> +				      "rx_lane0_sync_clk",
-> +				      "rx_lane1_sync_clk";
-> +
-> +			resets = <&gcc GCC_UFS_PHY_BCR>;
-> +			reset-names = "rst";
-> +
-> +			interconnects = <&aggre1_noc MASTER_UFS_MEM QCOM_ICC_TAG_ALWAYS
-> +					 &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>,
-> +					<&gem_noc MASTER_APPSS_PROC QCOM_ICC_TAG_ACTIVE_ONLY
-> +					 &cnoc_cfg SLAVE_UFS_MEM_CFG QCOM_ICC_TAG_ACTIVE_ONLY>;
-> +			interconnect-names = "ufs-ddr",
-> +					     "cpu-ufs";
-> +
-> +			power-domains = <&gcc UFS_PHY_GDSC>;
-> +			required-opps = <&rpmhpd_opp_nom>;
-> +
-> +			operating-points-v2 = <&ufs_opp_table>;
-> +
-> +			iommus = <&apps_smmu 0x60 0>;
+> > +                       ret =3D -ENOMEM;
+> > +                       sig->digest =3D kmalloc(umax(sinfo->authattrs_=
+len, sig->digest_size),
+> > +                                             GFP_KERNEL);
+> =
 
-dma-coherent ?
+> Can we refactor this so we allocate the right size from the start.
 
-and no MCQ support ?
+The problem is that we don't know the right size until we've tried parsing=
+ it.
 
-<snip>
+> Alternatively, should we just unconditionally use this approach
+> "overallocating" some times?
 
-Thanks,
-Neil
+In some ways, what I'd rather do is push the hash calculation down into th=
+e
+crypto/ layer for all public key algos.
+
+Also, we probably don't actually need to copy the authattrs, just retain a
+pointer into the source buffer and the length since we don't intend to kee=
+p
+the digest around beyond the verification procedure.  So I might be able t=
+o
+get away with just a flag saying I don't need to free it.
+
+However, there's an intermediate hash if there are authattrs, so I will ne=
+ed
+to store that somewhere - though that could be allocated on demand.
+
+David
+
