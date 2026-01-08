@@ -1,38 +1,38 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE3C38B99E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE48F280309;
 	Thu,  8 Jan 2026 11:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767870161; cv=none; b=rR1X3JMBw4vJoJeH7QW6Zk8n7aqNYDiUC2k9Uz/Oe29ISmFdre6A2LdPWRfl3907MCg3PLZd5QqPSGkGJ93lt5Qk83kXr0hh9TFqVGcmQxDCrnXzbjQOEAhwvuyFD1e41+/AcV8Y3/r+Kqkv5XVWCkpdr/ninEb1j+SH1qcLy8E=
+	t=1767870162; cv=none; b=hmP6oGV7SVwPcO9PWX4zRK/w9wniESh5xBY82i2sLWD0Xy2bV3XTug8NtIFP/VFcuB1FBajqcYUjqiCpUX+v7Akxf7/1PKDG4iN51SR4c/nSDTPdNwrVOkrqJq8HIz4oFoR3RygxtOfCclmBBdLlmrKgmsZ3QBjVO3AyJB/r5Lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767870161; c=relaxed/simple;
-	bh=FgDwPYPu4XP815gYCnlu4ei2ijDYZBkFZkwZ1M4VH5g=;
+	s=arc-20240116; t=1767870162; c=relaxed/simple;
+	bh=SVu3UQUP3zJMwteVTk/VX4i8DbMJ2CCZ0oIXKhXaKOE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lIn0bEHvZX/qUAJ3enc9k7B3/NjKFN5V/r1zQ8nOj1xXeovgLTHiW4E4FwuI4E71N03gZyaR9A3e6rI73P0kwgbwp1xd6uiqTA3LrJIWNZOd2nOhewr3MCCUFMceVLw0UlDwcN3+VojHqQYGyub0UEettk3Yi/7+EFYn+KoofYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=LK6J9AAB; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version; b=ZMFlLCKPue8ZADhHcAlknANBkeBNBQl5xJ87BFZyTy2ytXZ5VHstm6kdLAozRV7tfY22uHL0dsodXhtSzR8Xrwhpi/V/pujzZ5Ial1QbtLYhM9qL658kdwbD46by83gwP5E5zD4sSKZ47twsJrMRIgkzkt7S9SRqPQVgH8fJQI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=S59zDiu4; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="LK6J9AAB"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="S59zDiu4"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1767870149;
-	bh=FgDwPYPu4XP815gYCnlu4ei2ijDYZBkFZkwZ1M4VH5g=;
+	s=mail; t=1767870150;
+	bh=SVu3UQUP3zJMwteVTk/VX4i8DbMJ2CCZ0oIXKhXaKOE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LK6J9AAB5I5iOpJhNKmrWMzuhnPsw0Obn1cRP55CpWrjQidssTCKwrD+Q7SFzHQex
-	 3hU90X/52QdOZIAH0eGE1sjm5C1zXveD6jlaWSfzFgiWz02vmMSuLhmqQfeBR0SVaS
-	 +5qEI58uUZA79OsvXqGIFcxC4dEkuGF0u6L+CN5g97AUf/k5L+9an7NmUfUYQe4l2c
-	 tSgVIoysVsGMVJF9aKFPmEPJdYdBm3B2cd63CJVUHwMYteZ7YvdHG0gLDmtyPV5H+f
-	 N8JvnmX9M2LzrLNLto3iJrU42FSyi6KGTsLY5YTZefituntFor+qvJj8EW6Ld+uAC7
-	 uoYL8f7o3xB+g==
+	b=S59zDiu4fIt8gfIdKDLAGYlneok9In+4XOVaEIsqpMY3dPK/eNJpNBq0PvMV8GBdK
+	 yXshoeqOuTXxmxwnkbBinjcdsgLjkRxoywT7s2KPe+VyAG0J0b/Gm2h/rmow6nSBD/
+	 JStpXc+YuGZKpzNoENX5iRaPLiXr9gwSxDLAF8bNtLoLLUcMyYgntxNzfKLY4CqdUR
+	 6G/ldA73AssDIUS/IVh7kVfRkk9PHJ6KPsjvacltMZBfv5kPdPi1iht/qEq9+/zhAK
+	 6biR4S/ELH/n3IT9bbpRMIfii4ZYodln6w3Hngnqb1jKx3nit5Au/cFnP9TIw8/39h
+	 dm2yagH1bmGGw==
 Received: from IcarusMOD.eternityproject.eu (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id BDCC917E11FB;
-	Thu,  8 Jan 2026 12:02:28 +0100 (CET)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8201517E150E;
+	Thu,  8 Jan 2026 12:02:29 +0100 (CET)
 From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 To: krzk+dt@kernel.org
 Cc: herbert@gondor.apana.org.au,
@@ -51,9 +51,9 @@ Cc: herbert@gondor.apana.org.au,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
 	kernel@collabora.com
-Subject: [PATCH 1/4] dt-bindings: crypto: inside-secure,safexcel: Mandate only ring IRQs
-Date: Thu,  8 Jan 2026 12:02:20 +0100
-Message-ID: <20260108110223.20008-2-angelogioacchino.delregno@collabora.com>
+Subject: [PATCH 2/4] dt-bindings: crypto: inside-secure,safexcel: Add SoC compatibles
+Date: Thu,  8 Jan 2026 12:02:21 +0100
+Message-ID: <20260108110223.20008-3-angelogioacchino.delregno@collabora.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260108110223.20008-1-angelogioacchino.delregno@collabora.com>
 References: <20260108110223.20008-1-angelogioacchino.delregno@collabora.com>
@@ -65,37 +65,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Not all IP implementations of EIP97 and EIP197 have the EIP and
-MEM interrupts hooked up to the SoC, and those are not required
-for functionality as status for both can be polled (and anyway
-there's even no real need to poll, but that's another story).
-
-As an example of this, the MediaTek MT7968A and MT7986B SoCs do
-not have those two interrupts hooked up to their irq controlller.
-
-For this reason, make the EIP and MEM interrupt optional.
+Add SoC specific compatibles for the SafeXcel crypto engine,
+including one for the EIP197B used by Marvell Armada CP110 and
+and two for the EIP97IES used by Marvell Armada 3700 and by
+MediaTek MT7986.
 
 Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 ---
- .../devicetree/bindings/crypto/inside-secure,safexcel.yaml      | 2 ++
- 1 file changed, 2 insertions(+)
+ .../bindings/crypto/inside-secure,safexcel.yaml           | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel.yaml b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel.yaml
-index 343e2d04c797..22025b23d580 100644
+index 22025b23d580..736d675e19ed 100644
 --- a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel.yaml
 +++ b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel.yaml
-@@ -26,9 +26,11 @@ properties:
-     maxItems: 1
- 
-   interrupts:
-+    minItems: 4
-     maxItems: 6
- 
-   interrupt-names:
-+    minItems: 4
-     items:
-       - const: ring0
-       - const: ring1
+@@ -12,6 +12,14 @@ maintainers:
+ properties:
+   compatible:
+     oneOf:
++      - items:
++        - const: marvell,armada-cp110-crypto
++        - const: inside-secure,safexcel-eip197b
++      - items:
++        - enum:
++          - marvell,armada-3700-crypto
++          - mediatek,mt7986-crypto
++        - const: inside-secure,safexcel-eip97ies
+       - const: inside-secure,safexcel-eip197b
+       - const: inside-secure,safexcel-eip197d
+       - const: inside-secure,safexcel-eip97ies
 -- 
 2.52.0
 
