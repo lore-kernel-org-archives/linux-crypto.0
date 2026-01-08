@@ -1,108 +1,116 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6A23A640B;
-	Thu,  8 Jan 2026 11:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6347E352C5F
+	for <linux-crypto@vger.kernel.org>; Thu,  8 Jan 2026 11:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767870163; cv=none; b=ZmhGlI0UD8eqoCOn1WXVOpVIbBxC2Zp4d9guiafIjFZ4eTJu4Wj0NMidQsZDNRf+lFNVzBNWOzmcQnyQB1O/OgOfFKq+za1vREb82AxP6x+jfWrBuZcXCk2idtMG/gP2Mm0dBiMA2g16lClSfAnTVkwXvMefmz/wOjxEeTAR5rU=
+	t=1767871109; cv=none; b=Lic1FEtXn+tOCCR9z0L3i6jnwsjV4RuuTbfaGeRCTRs7420CCuMLtVpKKi3pJYmld1Do/sgmtOpZv+Xx6YXVrXCxnekbCZCPzj2uCaYiXrK6tNKyXDrq/6nYZ9Ec/kbzfKgsRRKg7GXDo8yX8lFl/t6Z7qvwFDEbneArHr4zkXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767870163; c=relaxed/simple;
-	bh=gw1VaxWzqkyKrA2KxIUxIvewB29jkb6zfBD6Cnr2AVI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OigubWvLcZdZzbfVfqX68GbQBQRRhiL9D0zWQrNRKK+GJ1GwJRzu1dCEZvV9N908MkzAdUOQowWD7t+WF8VeLfIaWwiUkQDSwpDQvWgSfPXKJWwGHIsaS6RbYJJjA9ucypL508vnR9FHQWnupiSnPaJsMYwpya1ij1n3ejtykuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=ST55Cl/b; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1767871109; c=relaxed/simple;
+	bh=VpDKvPaUx6cNZ4vYu7itFP8eZbOdqv/lfWhWVNX9fIs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TuEc7uB8LNPOyn9Q9ZLkCYcnjW6z0cEZbllA4coMVW6ujmgqH6mIJLyUIH+MWkrMCYxaYi9XG9nMDK/43w8O49uEdtLLWFnn0Y5SIr2y/u6WWUDSUjtSZIWOYIy6wjKrj0WFYW/Gik69U13zpDEm/SzHkkmD7P4SjrqhAzE+o8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKrFN2xD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="ST55Cl/b"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1767870150;
-	bh=gw1VaxWzqkyKrA2KxIUxIvewB29jkb6zfBD6Cnr2AVI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ST55Cl/be8Fa/ix2tx495kwY7maMiNlOVgAfRBDwMT/EbwANxJbtE7qMSdG4JunKA
-	 vD1WBXNOVPku7kPatEmReCNA7MEM4E19JGCHGFHtR9Kn+l6FpGvIthi39x+ZcH51BU
-	 YAQt2Vvebpu3cMxTNEIT5CJ3WTcahG+JKY6s9F2lms8k65cP0D+6Ek1zIUqHkMEAvV
-	 JAtgd+uMOclMrNnPUetWYcn93kzwvb897z2ljNyJfllLvecWki7RKh2XuyyPDgrqJB
-	 yU+Zw+rWzTyVIzozFUMtZTy8/BBktKCBI5lqBVzPtCoyixLTVjoHDuJZdwWMThZNy6
-	 89ib0hnK7LKlw==
-Received: from IcarusMOD.eternityproject.eu (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 476B217E1529;
-	Thu,  8 Jan 2026 12:02:30 +0100 (CET)
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-To: krzk+dt@kernel.org
-Cc: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	robh@kernel.org,
-	conor+dt@kernel.org,
-	andrew@lunn.ch,
-	gregory.clement@bootlin.com,
-	sebastian.hesselbarth@gmail.com,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	atenart@kernel.org,
-	linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	kernel@collabora.com
-Subject: [PATCH 3/4] arm64: dts: marvell: Add SoC specific compatibles to SafeXcel crypto
-Date: Thu,  8 Jan 2026 12:02:22 +0100
-Message-ID: <20260108110223.20008-4-angelogioacchino.delregno@collabora.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260108110223.20008-1-angelogioacchino.delregno@collabora.com>
-References: <20260108110223.20008-1-angelogioacchino.delregno@collabora.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKrFN2xD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98531C19422
+	for <linux-crypto@vger.kernel.org>; Thu,  8 Jan 2026 11:18:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767871108;
+	bh=VpDKvPaUx6cNZ4vYu7itFP8eZbOdqv/lfWhWVNX9fIs=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=FKrFN2xD2ADoANZ95fpEAwuMc7tCXesfeWHPmH04OC7rEd2MZQW2jT/xb2KR8zLgw
+	 0tm2GeyG6lnEEoQGOH2RjPfP0TnprZLL7YkO3PtGW/GtelIsuselBcb4O01F+uE8gj
+	 hYg3pWpa/Swf9xlmEN1Ix6o2DvG2BSqwG8LYKxeC2NU75vrXqJNkDp0+7jVZpxM2UD
+	 1GWiNDkDln0/kfnIuXxrZ29WwD7NVyhv0FbJXvNitrIgepOPKFJ3VzGzdvDjGkQcB5
+	 cLqi578mGu24fQpK3Z0PL/YKoewQ5tcmIoKsJ3uO27jt3/zPGxNVdE80vgFUgz59vH
+	 Ve1mTUk8LeN5g==
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2a0bae9aca3so23051185ad.3
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Jan 2026 03:18:28 -0800 (PST)
+X-Gm-Message-State: AOJu0YzzO1y4+4ZC75KlW8Cj0sYfwOQfmiwuYqleb3cPUd0poD5I/c3r
+	dDp4v7kStJHhlb2Aqst/pKazt2dtfFGWJ20jUqPLIvsHTH7gNE+yCz9Y7gjRkky2oeLjNqasjKs
+	mhSLcPZujK6HXeQDGYMVLxbAua/mlePU=
+X-Google-Smtp-Source: AGHT+IF1qiNf1y52mI5Zwar63TQL83t5OGZvo+C+hx6OKT6cTCR8dn+q3XVA2VQufc3U10kFhcBPlIyNYQSkqkyZ12U=
+X-Received: by 2002:a17:902:f54f:b0:298:29e0:5f32 with SMTP id
+ d9443c01a7336-2a3ee451ec2mr52902105ad.15.1767871108173; Thu, 08 Jan 2026
+ 03:18:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260107052023.174620-1-ebiggers@kernel.org>
+In-Reply-To: <20260107052023.174620-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 8 Jan 2026 12:18:16 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEXyDN+uZHuNKQ9YuaezHeQhp8+Hsu1n67zLk9MSv+L4g@mail.gmail.com>
+X-Gm-Features: AQt7F2o2V2O1M9W2awFPviAiDkbkrja1Wr6gBaYYf5jNLofZorvceIO4r_TtIS8
+Message-ID: <CAMj1kXEXyDN+uZHuNKQ9YuaezHeQhp8+Hsu1n67zLk9MSv+L4g@mail.gmail.com>
+Subject: Re: [PATCH] lib/crypto: aes: Fix missing MMU protection for AES S-box
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, stable@vger.kernel.org, 
+	Qingfang Deng <dqfext@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Following the changes in the binding for the SafeXcel crypto
-engine, add SoC specific compatibles to the existing nodes in
-Armada 37xx and CP11x.
+On Wed, 7 Jan 2026 at 06:22, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> __cacheline_aligned puts the data in the ".data..cacheline_aligned"
+> section, which isn't marked read-only i.e. it doesn't receive MMU
+> protection.  Replace it with ____cacheline_aligned which does the right
+> thing and just aligns the data while keeping it in ".rodata".
+>
+> Fixes: b5e0b032b6c3 ("crypto: aes - add generic time invariant AES cipher")
+> Cc: stable@vger.kernel.org
+> Reported-by: Qingfang Deng <dqfext@gmail.com>
+> Closes: https://lore.kernel.org/r/20260105074712.498-1-dqfext@gmail.com/
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>
+> This patch is targeting libcrypto-fixes
+>
+>  lib/crypto/aes.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
 
-Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
----
- arch/arm64/boot/dts/marvell/armada-37xx.dtsi  | 3 ++-
- arch/arm64/boot/dts/marvell/armada-cp11x.dtsi | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Oops
 
-diff --git a/arch/arm64/boot/dts/marvell/armada-37xx.dtsi b/arch/arm64/boot/dts/marvell/armada-37xx.dtsi
-index c612317043ea..87f9367aec12 100644
---- a/arch/arm64/boot/dts/marvell/armada-37xx.dtsi
-+++ b/arch/arm64/boot/dts/marvell/armada-37xx.dtsi
-@@ -427,7 +427,8 @@ xor11 {
- 			};
- 
- 			crypto: crypto@90000 {
--				compatible = "inside-secure,safexcel-eip97ies";
-+				compatible = "marvell,armada-3700-crypto",
-+					     "inside-secure,safexcel-eip97ies";
- 				reg = <0x90000 0x20000>;
- 				interrupts = <GIC_SPI 20 IRQ_TYPE_LEVEL_HIGH>,
- 					     <GIC_SPI 21 IRQ_TYPE_LEVEL_HIGH>,
-diff --git a/arch/arm64/boot/dts/marvell/armada-cp11x.dtsi b/arch/arm64/boot/dts/marvell/armada-cp11x.dtsi
-index d9d409eac259..39599171d51b 100644
---- a/arch/arm64/boot/dts/marvell/armada-cp11x.dtsi
-+++ b/arch/arm64/boot/dts/marvell/armada-cp11x.dtsi
-@@ -512,7 +512,8 @@ CP11X_LABEL(sdhci0): mmc@780000 {
- 		};
- 
- 		CP11X_LABEL(crypto): crypto@800000 {
--			compatible = "inside-secure,safexcel-eip197b";
-+			compatible = "marvell,armada-cp110-crypto",
-+				     "inside-secure,safexcel-eip197b";
- 			reg = <0x800000 0x200000>;
- 			interrupts = <88 IRQ_TYPE_LEVEL_HIGH>,
- 				<89 IRQ_TYPE_LEVEL_HIGH>,
--- 
-2.52.0
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
+> diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
+> index b57fda3460f1..102aaa76bc8d 100644
+> --- a/lib/crypto/aes.c
+> +++ b/lib/crypto/aes.c
+> @@ -11,11 +11,11 @@
+>
+>  /*
+>   * Emit the sbox as volatile const to prevent the compiler from doing
+>   * constant folding on sbox references involving fixed indexes.
+>   */
+> -static volatile const u8 __cacheline_aligned aes_sbox[] = {
+> +static volatile const u8 ____cacheline_aligned aes_sbox[] = {
+>         0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
+>         0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+>         0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
+>         0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+>         0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc,
+> @@ -46,11 +46,11 @@ static volatile const u8 __cacheline_aligned aes_sbox[] = {
+>         0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+>         0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
+>         0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16,
+>  };
+>
+> -static volatile const u8 __cacheline_aligned aes_inv_sbox[] = {
+> +static volatile const u8 ____cacheline_aligned aes_inv_sbox[] = {
+>         0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38,
+>         0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
+>         0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87,
+>         0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb,
+>         0x54, 0x7b, 0x94, 0x32, 0xa6, 0xc2, 0x23, 0x3d,
+>
+> base-commit: fdfa4339e805276a458a5df9d6caf0b43ad4c439
+> --
+> 2.52.0
+>
