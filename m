@@ -1,91 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA083B9608;
-	Thu,  8 Jan 2026 12:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6D438B7D1
+	for <linux-crypto@vger.kernel.org>; Thu,  8 Jan 2026 12:59:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767876027; cv=none; b=WmAgoenqwx9ymiYMsOgkAx0WZ5TQIQNNzsZBmijs4SFFjrFfZIsA3zu2t9h1+CrnKIxz1iLEe4toL8vdK/3Z0nGZXBDeSWUiWMULW06unouET9nC5ivCEOj/0f+dZohml0czk+BhzM4ZdKWJJH5is00GvfuW1O8R7x4Di0xa/zY=
+	t=1767877175; cv=none; b=giT00g8PmPMQNB5/rsNytrBFCq1cFDnLd4BGBB8Ud0c3WXY6H71G7b0+9bgH88abFP3ko4OtD/fUH2Rl0fmFWd8VRnNxPTaHhtaEiwPhOMG4NG9/+gHiYyIjSw/3L58BHdeiX9ci1tbMuw9LuSE6SsxTE7iEeYPH+xEw3stee2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767876027; c=relaxed/simple;
-	bh=g8rW71nJKgp3ELmmfnnyuEMXLvCZWj1pOr+SOf92ZPc=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=UyzHV0KHlAVjwO29/G7Pz+EYbJCQdw46kR88xistx5xjBb2svvJmwLY58uj7Le7XsQVSkl5IzxBi9N8n4yM5dJs44c8QzH2t5nYpVvXMDe3ibHhr/vaUYKrc7B+DFKrMCEIfuU57AhefF7JL4z5LeWw+3kMJa8IUfjPDKtWDfow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hcn62jzy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767877175; c=relaxed/simple;
+	bh=18WWCjK5uRjL2olTa1iGNdhtGtcDRKsvvzJu8hPc9fM=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=sMz/q5kCltH31WMhU88iU2WD4/ty4SgmnrGC0HxvCHc+tnPl33ehJ2xUyoxgD8+6jou9PKLCiPG7WO8FzZoOHbQyYzkOH06TVW+8ipsHpKQ/OAVrzljoa2PT14axTdqeJLh1pdnk60jfXjrbg1FV5WoT9Sxyl3g8gw/ftP7wqjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bSdDTm1h; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hcn62jzy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55FE8C19421;
-	Thu,  8 Jan 2026 12:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767876026;
-	bh=g8rW71nJKgp3ELmmfnnyuEMXLvCZWj1pOr+SOf92ZPc=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=Hcn62jzyajIv8HuVtK5cuHKrKkmRX+9TueZ6Zzaj/42oTxVwR/kO0Yt6AdPC8fHx1
-	 4JpNYRXT8Y8SCVGq4oadCZryu51+7wr4PCgX9DBMB9j+V6DVbgwaEZfd7siscVJTvA
-	 Bo2Ys4eP//eHIQoyazz9eBi68OiGKlSNogy44CAGdfNb+Ktm7amLfSnE05tnKiby0l
-	 vdUdXk2vC7mjIiCsu2Te2Ng2GwKH0Ap6gZV6oL/QUR9GY5EWObUh6wHxesRC7SX35y
-	 efOyz7yM44k0iaD5GHvi3zNt6vpMmsNMs48dfy+KsVQf28jgOEEZ1TCwZy0eBII+WN
-	 qmWuUW5QGZR4A==
-Date: Thu, 08 Jan 2026 06:40:25 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bSdDTm1h"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767877172;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6tQKj5VL5m7x4z2sWqdHCKJpBbowO2LzE5Mj6nNallc=;
+	b=bSdDTm1hIRhPdIKSY38lyByKF1Ko0xhgMcpDjGdjU4qkYBAhtk8OwI0eGnUVvnUb/2mCAA
+	iVdjtNdbZpwvn1TNB8l0pe+KfY68Ecb12YXeJGE3Ct2b/thvp4pIGSgS8neQHoPq0BbvF0
+	kXXSkzoOSzpjVVQLeBXmshUFGxPcdhQ=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-102-F-tWggeSN9elGONc19tWrQ-1; Thu,
+ 08 Jan 2026 07:59:29 -0500
+X-MC-Unique: F-tWggeSN9elGONc19tWrQ-1
+X-Mimecast-MFC-AGG-ID: F-tWggeSN9elGONc19tWrQ_1767877167
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F14F41954B0B;
+	Thu,  8 Jan 2026 12:59:26 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1423B30002D8;
+	Thu,  8 Jan 2026 12:59:22 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <2366240.1767794004@warthog.procyon.org.uk>
+References: <2366240.1767794004@warthog.procyon.org.uk> <CALrw=nFj9OEsREJ8Kxox3U6N8y=e00ZawxEkCPOb5-6_k=7+nQ@mail.gmail.com> <20260105152145.1801972-1-dhowells@redhat.com> <20260105152145.1801972-3-dhowells@redhat.com>
+To: Ignat Korchagin <ignat@cloudflare.com>
+Cc: dhowells@redhat.com, Lukas Wunner <lukas@wunner.de>,
+    Jarkko Sakkinen <jarkko@kernel.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Eric Biggers <ebiggers@kernel.org>,
+    Luis Chamberlain <mcgrof@kernel.org>,
+    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
+    Sami Tolvanen <samitolvanen@google.com>,
+    "Jason A . Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
+    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v11 2/8] pkcs7: Allow the signing algo to calculate the digest itself
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
- davem@davemloft.net, krzk+dt@kernel.org, linux-kernel@vger.kernel.org, 
- herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, kernel@collabora.com, 
- conor+dt@kernel.org, sebastian.hesselbarth@gmail.com, atenart@kernel.org, 
- andrew@lunn.ch, matthias.bgg@gmail.com, gregory.clement@bootlin.com
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-In-Reply-To: <20260108110223.20008-3-angelogioacchino.delregno@collabora.com>
-References: <20260108110223.20008-1-angelogioacchino.delregno@collabora.com>
- <20260108110223.20008-3-angelogioacchino.delregno@collabora.com>
-Message-Id: <176787602550.3796160.16323970790591047960.robh@kernel.org>
-Subject: Re: [PATCH 2/4] dt-bindings: crypto: inside-secure,safexcel: Add
- SoC compatibles
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2727728.1767877161.1@warthog.procyon.org.uk>
+Date: Thu, 08 Jan 2026 12:59:21 +0000
+Message-ID: <2727729.1767877161@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
+David Howells <dhowells@redhat.com> wrote:
 
-On Thu, 08 Jan 2026 12:02:21 +0100, AngeloGioacchino Del Regno wrote:
-> Add SoC specific compatibles for the SafeXcel crypto engine,
-> including one for the EIP197B used by Marvell Armada CP110 and
-> and two for the EIP97IES used by Marvell Armada 3700 and by
-> MediaTek MT7986.
-> 
-> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-> ---
->  .../bindings/crypto/inside-secure,safexcel.yaml           | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
+> Also, we probably don't actually need to copy the authattrs, just retain a
+> pointer into the source buffer and the length since we don't intend to keep
+> the digest around beyond the verification procedure.  So I might be able to
+> get away with just a flag saying I don't need to free it.
 
-My bot found errors running 'make dt_binding_check' on your patch:
+Actually, we probably do need to copy it.  The problem is that we have to
+modify the tag on the authenticatedAttributes (PKCS#7)/signedAttrs (CMS) blob
+before we digest it, e.g. in pkcs7_digest():
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/crypto/inside-secure,safexcel.yaml:16:9: [warning] wrong indentation: expected 10 but found 8 (indentation)
-./Documentation/devicetree/bindings/crypto/inside-secure,safexcel.yaml:19:9: [warning] wrong indentation: expected 10 but found 8 (indentation)
-./Documentation/devicetree/bindings/crypto/inside-secure,safexcel.yaml:20:11: [warning] wrong indentation: expected 12 but found 10 (indentation)
+	memcpy(sig->digest, sinfo->authattrs, sinfo->authattrs_len);
+	((u8 *)sig->digest)[0] = ASN1_CONS_BIT | ASN1_SET;
 
-dtschema/dtc warnings/errors:
+as specified in RFC9882 and other places:
 
-doc reference errors (make refcheckdocs):
+	3.2.  Signature Generation and Verification
+	...
+	When signed attributes are included, ML-DSA (pure mode) signatures are
+	computed over the complete DER encoding of the SignedAttrs value
+	contained in the SignerInfo's signedAttrs field.  As described in
+	Section 5.4 of [RFC5652], this encoding includes the tag and length
+	octets, but an EXPLICIT SET OF tag is used rather than the IMPLICIT
+	[0] tag that appears in the final message. ...
 
-See https://patchwork.kernel.org/project/devicetree/patch/20260108110223.20008-3-angelogioacchino.delregno@collabora.com
+We might be able to get away with modifying it in place - but I don't know
+that that's true for all users.
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+David
 
