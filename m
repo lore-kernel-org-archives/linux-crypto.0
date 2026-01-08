@@ -1,215 +1,72 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E116524466C
-	for <linux-crypto@vger.kernel.org>; Thu,  8 Jan 2026 14:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8ED1DE8A4;
+	Thu,  8 Jan 2026 14:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767883536; cv=none; b=f3welsqgKxnLLIto2nNZ+yt5ArBQrtSm+geHEsMBIhwQvRuOs4TcsRo95ylYBsxu7/FJ6RHDyWgIKrvHx+xFTI8rN3S/8F01rvD3d/aFDnWpF6jytjAFVCwTz9wnWmHAFpCsHDBjmEXfLiNWuVFKDfD4VfRm2ADlcqssyNx39xo=
+	t=1767883966; cv=none; b=WXwhGS/3VqARYo42Yha3dWXx/L7pbJoiMOjf8PpjCnuy9teSnIZrApRJ3YRnBbL71D95XrxdqkqVr+7RL/UpLIQpGfX6YixXC4AFbY57tmahQhacT98VdLt/FXBTho6SMfnkRKEmtsrcuAKQBuXLl4KQHBh1HwqnUZxmbOyLhFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767883536; c=relaxed/simple;
-	bh=ScTKP+c2rR672BgupG9wm67XF9gVvJQXcIgn+/1V/bU=;
+	s=arc-20240116; t=1767883966; c=relaxed/simple;
+	bh=REctfFUcNFnjAlrVe1U10jUaKWccUMTijX0We6uL7+U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bQKqby6BHi/V9alueVyLh9q0xnOHhxG2IrODI1gy/AuZ1e2B0R/hqGBjHeOwb1bjmLMhAZVIw+Wd/olThEBNRvyUsgzjYJMaQb+nLMim1dqm0dS5/lYZvrInFQGXr7cgVWGvXLQFIdD2iyB2GIw/bDapE2Lr5p+YanGhkg6wXWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=biC90KAV; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gQQ6ujfu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=enTrHAryQ7PpkmqgQhPcg7gbPKBD3aT3/RbdOFbsVoMgowwJjQ1gtWsuU8r3J+bZr8f0ZxuEMPzC+jrM61YiaI4D+mgFTi8hYNlNJ+Wu+RC/AXAoEzx+1Z0e2pBVyBbG4Qs2AQ0dOQTmwZOu+7rL5cyi5fSrRhl+vx0xBAVSedw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sfgH9SDD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="biC90KAV";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gQQ6ujfu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767883532;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WfT1Va6tq1fm9ghByqfjKPhOxaDhZdEa8+dMcUknkTw=;
-	b=biC90KAV076DZk/5bSAuvtYuAJyOcgOIVbe7WCp8M8NM2HB4CtpNjBj2BBPNnrYtXKNH5i
-	BWs2QAA7aLysHC4pH+AyNrNw/shq4Or2sGktiOD8r5O20uZCPs97fgINf4XTsrNnKfWVtJ
-	Zu9o4tOeJmkBhQFPUjJ9XmHedtmthQo=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-541-wTvGWXZYPwavq0-uvLIumA-1; Thu, 08 Jan 2026 09:45:31 -0500
-X-MC-Unique: wTvGWXZYPwavq0-uvLIumA-1
-X-Mimecast-MFC-AGG-ID: wTvGWXZYPwavq0-uvLIumA_1767883530
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b7cea4b3f15so492510166b.3
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Jan 2026 06:45:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767883530; x=1768488330; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WfT1Va6tq1fm9ghByqfjKPhOxaDhZdEa8+dMcUknkTw=;
-        b=gQQ6ujfuJzml/KBLnIXj54BCYc2nxgPB9t6/LuLljS1IStToOxMznbLUwwhwhude1h
-         LajIcqp998QUdwdsmhb/KJumfrf3fXJjcJmMb3DBzxNEJb4GMI0/oU0SAdU6OPukTRCG
-         57y21KggPCE37un7p2LPQlbGx/Ls1HMBrivsc3J48sCUGcl1c2BwYRp2xFw47Swya7/H
-         kf3UQnb8AM2jqE/Ab4ApPIRojNXxeWq844Hde4dt+QyqwwW+QNHNGgMCLTHakCDo/qcc
-         YbBQ9lVJq3s7930WfljUVMOt+BSdMWh4G0xXChs6jn2Nj65FMbNI2Ca5jv83uCN6TN7t
-         LuWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767883530; x=1768488330;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WfT1Va6tq1fm9ghByqfjKPhOxaDhZdEa8+dMcUknkTw=;
-        b=QOJLJPOSzmr2WCvztzw4RRJx17akZr0s3xa1O6szd15CkHDuTe1kqgT02qTemNDIIw
-         pZKP7mpru+ThjQLEUNO/O+sjXmXcSSt6JMRoDRRpmJ12vZFCM+MMThWU1t6TqarpIwh7
-         MYZhsAMGht5/MJfoYz+d4KuSVPDm07MTMVJgAEkfvVbRIkw4ZRpfFMFeIENYTbPCbu/a
-         wEeD0pEYumxZC9XOXXdthW9o/kbQCfWqLggh4mZNDnqwN8rV+sDzgfuigJOxKJxl3EYR
-         9WZnA4GFcXDcWU+csA7VMlj8uq3who5uoVgAz69x3iQk/D80nhtRIQeBhSBf9vdgO3OX
-         9DVg==
-X-Forwarded-Encrypted: i=1; AJvYcCXyddoM3XrKzcagLU2ExCuEGEvzvPtKJSYwGlmNHxY1KisCr2rV1wO7hC5kcEVm4B8o34v2nIJfhtOZeCY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgdCIKckVV833KXPXAFkt2Rp+S4JgNgr40WswQ1eP/GaXVUREY
-	vjf6sPGY5NHWV13HIxddAZAwOPBJqn544NHnDoP469gUbpz+ZSpqcp63Yk7wIfbxpqktD0Cu9qz
-	2XJtoPFXP7wtf5y4n5EWo0mX7TQtx4xFMpt4zXbG3Dg820+gHgLk79bE67JPyEQvncw==
-X-Gm-Gg: AY/fxX6xEYmoLi+Ialxp4kZX+ZUNnDirQAF8WtBiUULT7tjpWhZpiWRCLG7dkA8pF1Z
-	1MBkzV1rt9KKJ06ylVAlHEt3IkV4O/jhEBYL6h+7mwHvleGfWM5TlDoRPCYiwllTfK3k/K7XDh1
-	dF1oOPNu2lkM78fasU8durEMoqw1FsbvIAyj43Jxgkv8kCrf8na7hxtgkV4STYvsfegYqQp5vTF
-	VLHQMM8cUF9CraVtxqWwEbqQr8TPNmz8jnziXdDsmrLAZBb2AJCpmFEWz0go/5eZMT4VCxV3Qbc
-	D7W1OthfqJGiA8lpEdMrWdXI7MVW0lQUNb/9aFp9yFgBHdZpjw4Tc5YZg/VgLAlI57Qu/Lt8Y2a
-	sxf8Lg8W6r+h2UBew
-X-Received: by 2002:a17:906:c103:b0:b79:e974:4060 with SMTP id a640c23a62f3a-b8444fd41a2mr660535766b.48.1767883530438;
-        Thu, 08 Jan 2026 06:45:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEy4t9xkgOZMs7kPUcCm9yBAey59kExadAcY+9phGlSdjSpATKGUSBjtzXbWCkzKn2HKwCwkQ==
-X-Received: by 2002:a17:906:c103:b0:b79:e974:4060 with SMTP id a640c23a62f3a-b8444fd41a2mr660529166b.48.1767883529753;
-        Thu, 08 Jan 2026 06:45:29 -0800 (PST)
-Received: from sgarzare-redhat ([193.207.223.215])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a564255sm848076466b.63.2026.01.08.06.45.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 06:45:28 -0800 (PST)
-Date: Thu, 8 Jan 2026 15:45:20 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Robin Murphy <robin.murphy@arm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Petr Tesarik <ptesarik@suse.com>, Leon Romanovsky <leon@kernel.org>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev, linux-scsi@vger.kernel.org, 
-	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 13/15] vsock/virtio: reorder fields to reduce padding
-Message-ID: <aV_Cr_f47qqc2JoP@sgarzare-redhat>
-References: <cover.1767601130.git.mst@redhat.com>
- <fdc1da263186274b37cdf7660c0d1e8793f8fe40.1767601130.git.mst@redhat.com>
- <aV-6gniRnZlNvkwc@sgarzare-redhat>
- <20260108091514-mutt-send-email-mst@kernel.org>
- <aV-9F42fMfKGP4Rg@sgarzare-redhat>
- <20260108092931-mutt-send-email-mst@kernel.org>
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sfgH9SDD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5RMxX8fLudzgzeaK8Hxa/jVqGVI3C6mJxtJKkvtOXWM=; b=sfgH9SDDp9NHn9HDL2Qa5RRGQb
+	aPYiNW/CMH3y50KuXB+F2eWH7m7hdmM0w52cPzR7Q1QsnMLcmcVPA7ahlWtSmWQUj+blZ58Vyb7si
+	sqBUI5kxMY7in/N15dSdqgbEKH6i+xi3qVaSVfTxcHlkOsdfrXYghOf4y73nwWWFlNrU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vdrNE-001xse-J5; Thu, 08 Jan 2026 15:52:28 +0100
+Date: Thu, 8 Jan 2026 15:52:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: krzk+dt@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
+	robh@kernel.org, conor+dt@kernel.org, gregory.clement@bootlin.com,
+	sebastian.hesselbarth@gmail.com, matthias.bgg@gmail.com,
+	atenart@kernel.org, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, kernel@collabora.com
+Subject: Re: [PATCH 1/4] dt-bindings: crypto: inside-secure,safexcel: Mandate
+ only ring IRQs
+Message-ID: <c65c2f98-7530-470c-b288-d135fd621005@lunn.ch>
+References: <20260108110223.20008-1-angelogioacchino.delregno@collabora.com>
+ <20260108110223.20008-2-angelogioacchino.delregno@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260108092931-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20260108110223.20008-2-angelogioacchino.delregno@collabora.com>
 
-On Thu, Jan 08, 2026 at 09:32:23AM -0500, Michael S. Tsirkin wrote:
->On Thu, Jan 08, 2026 at 03:27:04PM +0100, Stefano Garzarella wrote:
->> On Thu, Jan 08, 2026 at 09:17:49AM -0500, Michael S. Tsirkin wrote:
->> > On Thu, Jan 08, 2026 at 03:11:36PM +0100, Stefano Garzarella wrote:
->> > > On Mon, Jan 05, 2026 at 03:23:41AM -0500, Michael S. Tsirkin wrote:
->> > > > Reorder struct virtio_vsock fields to place the DMA buffer (event_list)
->> > > > last. This eliminates the padding from aligning the struct size on
->> > > > ARCH_DMA_MINALIGN.
->> > > >
->> > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> > > > ---
->> > > > net/vmw_vsock/virtio_transport.c | 8 +++++---
->> > > > 1 file changed, 5 insertions(+), 3 deletions(-)
->> > > >
->> > > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->> > > > index ef983c36cb66..964d25e11858 100644
->> > > > --- a/net/vmw_vsock/virtio_transport.c
->> > > > +++ b/net/vmw_vsock/virtio_transport.c
->> > > > @@ -60,9 +60,7 @@ struct virtio_vsock {
->> > > > 	 */
->> > > > 	struct mutex event_lock;
->> > > > 	bool event_run;
->> > > > -	__dma_from_device_group_begin();
->> > > > -	struct virtio_vsock_event event_list[8];
->> > > > -	__dma_from_device_group_end();
->> > > > +
->> > > > 	u32 guest_cid;
->> > > > 	bool seqpacket_allow;
->> > > >
->> > > > @@ -76,6 +74,10 @@ struct virtio_vsock {
->> > > > 	 */
->> > > > 	struct scatterlist *out_sgs[MAX_SKB_FRAGS + 1];
->> > > > 	struct scatterlist out_bufs[MAX_SKB_FRAGS + 1];
->> > > > +
->> > >
->> > > IIUC we would like to have these fields always on the bottom of this struct,
->> > > so would be better to add a comment here to make sure we will not add other
->> > > fields in the future after this?
->> >
->> > not necessarily - you can add fields after, too - it's just that
->> > __dma_from_device_group_begin already adds a bunch of padding, so adding
->> > fields in this padding is cheaper.
->> >
->>
->> Okay, I see.
->>
->> >
->> > do we really need to add comments to teach people about the art of
->> > struct packing?
->>
->> I can do it later if you prefer, I don't want to block this work, but yes,
->> I'd prefer to have a comment because otherwise I'll have to ask every time
->> to avoid, especially for new contributors xD
->
->On the one hand you are right on the other I don't want it
->duplicated each time __dma_from_device_group_begin is invoked.
+On Thu, Jan 08, 2026 at 12:02:20PM +0100, AngeloGioacchino Del Regno wrote:
+> Not all IP implementations of EIP97 and EIP197 have the EIP and
+> MEM interrupts hooked up to the SoC, and those are not required
+> for functionality as status for both can be polled (and anyway
+> there's even no real need to poll, but that's another story).
+> 
+> As an example of this, the MediaTek MT7968A and MT7986B SoCs do
+> not have those two interrupts hooked up to their irq controlller.
+> 
+> For this reason, make the EIP and MEM interrupt optional.
 
-yeah, I see.
+It seems like the order of these patches is the wrong way around. You
+should first add the device specific compatibles, and then update the
+constrains based on those compatibles, so that the marvell variants
+continue to require 6 interrupts, but the mediatek versions only
+require 4.
 
->Pls come up with something you like, and we'll discuss.
-
-sure, I'll check a bit similar cases to have some inspiration.
-
->
->> >
->> > > Maybe we should also add a comment about the `ev`nt_lock`
->> > > requirement we
->> > > have in the section above.
->> > >
->> > > Thanks,
->> > > Stefano
->> >
->> > hmm which requirement do you mean?
->>
->> That `event_list` must be accessed with `event_lock`.
->>
->> So maybe we can move also `event_lock` and `event_run`, so we can just move
->> that comment. I mean something like this:
->>
->>
->> @@ -74,6 +67,15 @@ struct virtio_vsock {
->>          */
->>         struct scatterlist *out_sgs[MAX_SKB_FRAGS + 1];
->>         struct scatterlist out_bufs[MAX_SKB_FRAGS + 1];
->> +
->> +       /* The following fields are protected by event_lock.
->> +        * vqs[VSOCK_VQ_EVENT] must be accessed with event_lock held.
->> +        */
->> +       struct mutex event_lock;
->> +       bool event_run;
->> +       __dma_from_device_group_begin();
->> +       struct virtio_vsock_event event_list[8];
->> +       __dma_from_device_group_end();
->>  };
->>
->>  static u32 virtio_transport_get_local_cid(void)
->
->Yea this makes sense.
-
-Thanks for that!
-Stefano
-
+	Andrew
