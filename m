@@ -1,94 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92854A4154
-	for <linux-crypto@vger.kernel.org>; Thu,  8 Jan 2026 11:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E359466FF2;
+	Thu,  8 Jan 2026 11:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767871161; cv=none; b=DhMY2xui4xhr6X1efxmyqPT/aiGuB5hz3h8nDpGYGNued9CDc/hR1aqjRGbv881916tet2itiGU7SFqhX8NtW0UldMUreG28DqBDkUBbB1n5ft0UhbXIY1GAI3z9CPIJlTK5M7Tb04sGvqGe8Nh/EA5lJxvauYfxkggvR3phRwU=
+	t=1767871462; cv=none; b=DJyvS7IpT7IRVv5ZxFfHmAm77yBsog34UwvYsHepuGPF45AchpJbrPChbeS4N/laVTrbf/ZRBTDXYPexPZ6+PM4mv9KjaCWiZo+4O1kUic8+TRh311deZ0g3eUZtVbx5sMQKMH9j7u5IEFwOHSGmENkPMqy32m3u3c8jgQEDk3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767871161; c=relaxed/simple;
-	bh=HcZkxh8oUR6R4IPWY9mg6EQFirGkv4mv4d16ug+zMMo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=As8dPpP/7zW/FVO1cN/ObDsTTdkMnif9RwoTyVSi1+SfU5qAdkCQ1X4YCaEgDUIBd9zW6z+j6RXHUQ1v+Ap3ctL0HCs5pwIp62f0bGRn1cFx917JX2/mPc1Z4WTwrUhHXkjAOiFnEJsfDyZjjTvbSZMidFQLOJfXvVF5llOynd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXz4tjEL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767871462; c=relaxed/simple;
+	bh=3aPn4Nyb5dJ3/lKeV8jT93iQ3qzkUHNcE3PnCr/yoRo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DM9EPzsKiP1sx8Hw+e88Q93ix9hMnRIMAoC55dVvip6fe13uFw+ISmdGxnpUUA00TaxqRsjABFRE9hgzZG4KW49aYLI8eig7+txQ4mMq9yC91UazVEYq/K/mFdT+ri9Lf6VbSenmgrADYA4jNT5OwyFEUY7KkRrdcgIUDw4Pq4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qsL0LlKP; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXz4tjEL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BAC8C19424
-	for <linux-crypto@vger.kernel.org>; Thu,  8 Jan 2026 11:19:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767871161;
-	bh=HcZkxh8oUR6R4IPWY9mg6EQFirGkv4mv4d16ug+zMMo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=pXz4tjELQ2b0XE7huzKy1IjXEqMQUy8H4nnivl+CeBJtvo0U11HH1zRFSlX0wT4MM
-	 iWzX793GM4zVI3dcJzAiAAysgXJbW2KR5QyGs+TaON4UCSjPU6Tv8QJkO4UkxoVfnx
-	 pvXE6YE0d58j5dFHchTk+fCBs2BgJ7OsWv0lZHBtcckXaDFfsj4oQrvlTydCWDlsIh
-	 /w0raeKh1opeIg7ug3F4Ke6vIle25fN4SjZ8JFc26DDoyopGnAgIHvvS1FPTGjqrrU
-	 9vFjJZ41+uKxcUhCvwvTzKcP6wNfbeOYiSED8ystJxsoExh7SCrJkFLkLq6cNodE3d
-	 5htcY05Y6p1fA==
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-34c708702dfso2032029a91.1
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Jan 2026 03:19:21 -0800 (PST)
-X-Gm-Message-State: AOJu0Yzjo1Ffg9EO0AKIDUZib/SNGzdEgmXJmX406AaFw4KWb9mPJyoN
-	YUKcHzfimiVqBpqSxEjpj3DM7P1KnRB86zc5QSU/3t6pj7CPmq3YTHGlHYsB5ubVBVyfUaYA/pq
-	v3IAooYpvgKc/t5lV9iJg4X7Nxh4CaTw=
-X-Google-Smtp-Source: AGHT+IHejcWTbI1yANyDoNP1uKqjrifLJ5oaExqhHccCohbl7Zxq+NgqaLjAx6/EO65SPs3XIUmUgYV54HbTD83grv0=
-X-Received: by 2002:a17:90a:fc48:b0:340:5c27:a096 with SMTP id
- 98e67ed59e1d1-34f68c023d4mr6012737a91.6.1767871160604; Thu, 08 Jan 2026
- 03:19:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qsL0LlKP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=raykClked1/JLJCbQnf4hmphE07lLLn7ScKUbMKwTGo=; b=qsL0LlKPeCPKDLe8Zmz0BbHHT9
+	UUd44siueHFgPdRTDy1FUnJp0QKfamSiAxrBgrCFknIBEALVSkRpZVLrrjaDqqgFpf3sCkFjTKXjm
+	9eBhSS7Bs/XX4T3QWY9YY1A9UM+5tCHhSLx4YGnj6Q2etJ+O6UF46rkClwnmleNBXY3ZBn5nOLXYu
+	Sb4mSTXYriev5CZ9uQom3K42OujBuIIlkN2tyNPDBvBrIJISddqK3ycDfQ6mz8Z5M48a6otV5Ie/G
+	7GKEcfnSoGYHrDVDSgGCRJzXaTr4E+HLiR6iBF5gN+hpcC7hlYkOO/l2ubXEhv0+axOAmW4X5EJyu
+	ukFIjcYg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vdo7h-0000000D2FP-0ABB;
+	Thu, 08 Jan 2026 11:24:13 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id DCCE6300E8E; Thu, 08 Jan 2026 12:24:11 +0100 (CET)
+Date: Thu, 8 Jan 2026 12:24:11 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: =?utf-8?B?546L5b+X?= <wangzhi_xd@stu.xidian.edu.cn>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	syzkaller-bugs@googlegroups.com, security@kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [syzbot] BUG: KASAN: slab-use-after-free in
+ mutex_optimistic_spin via adf_ctl_ioctl
+Message-ID: <20260108112411.GI272712@noisy.programming.kicks-ass.net>
+References: <7b50a9a8.abb1.19b9b902fae.Coremail.wangzhi_xd@stu.xidian.edu.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260107033948.29368-1-ebiggers@kernel.org>
-In-Reply-To: <20260107033948.29368-1-ebiggers@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 8 Jan 2026 12:19:09 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXEZ36WjQ7Pcc7H+DCdQU6Nrx-jvFKq-72WmEPtzJRMGkQ@mail.gmail.com>
-X-Gm-Features: AQt7F2oSsFQLuM6ESwWtoJF4MFRXOesXonNNQzR7GVU-wX8XjLvK1nMwabauCK4
-Message-ID: <CAMj1kXEZ36WjQ7Pcc7H+DCdQU6Nrx-jvFKq-72WmEPtzJRMGkQ@mail.gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: add test vector generation scripts to
- "CRYPTO LIBRARY"
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7b50a9a8.abb1.19b9b902fae.Coremail.wangzhi_xd@stu.xidian.edu.cn>
 
-On Wed, 7 Jan 2026 at 04:40, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> The scripts in scripts/crypto/ are used to generate files in
-> lib/crypto/, so they should be included in "CRYPTO LIBRARY".
->
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+On Thu, Jan 08, 2026 at 11:04:36AM +0800, 王志 wrote:
+> syzbot has found the following issue on:
+> 
+> HEAD commit:    6.18.0 (custom build)
+> git tree:       linux-stable
+> console output: (see below)
+> kernel config:  (attached)
+> 
 > ---
->
-> This patch is targeting libcrypto-fixes
->
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
->
+> 
+> QAT: failed to copy from user cfg_data.
+> c6xxvf 0000:00:05.0: Starting acceleration device qat_dev0.
+> ==================================================================
+> BUG: KASAN: slab-use-after-free in owner_on_cpu home/wmy/Fuzzer/third_tool/linux-6.18/include/linux/sched.h:2282 [inline]
+> BUG: KASAN: slab-use-after-free in mutex_can_spin_on_owner home/wmy/Fuzzer/third_tool/linux-6.18/kernel/locking/mutex.c:397 [inline]
+> BUG: KASAN: slab-use-after-free in mutex_optimistic_spin home/wmy/Fuzzer/third_tool/linux-6.18/kernel/locking/mutex.c:440 [inline]
+> BUG: KASAN: slab-use-after-free in __mutex_lock_common home/wmy/Fuzzer/third_tool/linux-6.18/kernel/locking/mutex.c:602 [inline]
+> BUG: KASAN: slab-use-after-free in __mutex_lock+0xd0a/0x1160 home/wmy/Fuzzer/third_tool/linux-6.18/kernel/locking/mutex.c:760
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> Allocated by task 150:
 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 765ad2daa218..87d97df65959 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -6703,10 +6703,11 @@ M:      Ard Biesheuvel <ardb@kernel.org>
->  L:     linux-crypto@vger.kernel.org
->  S:     Maintained
->  T:     git https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git libcrypto-next
->  T:     git https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git libcrypto-fixes
->  F:     lib/crypto/
-> +F:     scripts/crypto/
->
->  CRYPTO SPEED TEST COMPARE
->  M:     Wang Jinchao <wangjinchao@xfusion.com>
->  L:     linux-crypto@vger.kernel.org
->  S:     Maintained
->
-> base-commit: 9ace4753a5202b02191d54e9fdf7f9e3d02b85eb
-> --
-> 2.52.0
->
+>  getname_flags.part.0+0x50/0x560 home/wmy/Fuzzer/third_tool/linux-6.18/fs/namei.c:146
+>  getname_flags+0x9a/0xe0 home/wmy/Fuzzer/third_tool/linux-6.18/include/linux/audit.h:345
+>  getname home/wmy/Fuzzer/third_tool/linux-6.18/include/linux/fs.h:2924 [inline]
+
+> 
+> Freed by task 150:
+
+>  putname.part.0+0x120/0x160 home/wmy/Fuzzer/third_tool/linux-6.18/fs/namei.c:297
+>  putname+0x41/0x50 home/wmy/Fuzzer/third_tool/linux-6.18/include/linux/err.h:84
+
+> The buggy address belongs to the object at ffff888104e04400
+>  which belongs to the cache names_cache of size 4096
+
+So how again is mutex->owner a names_cache object? This seems to suggest
+something has gone terribly wrong somewhere.
