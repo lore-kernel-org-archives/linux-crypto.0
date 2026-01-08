@@ -1,125 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED21832ED34;
-	Thu,  8 Jan 2026 20:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FDD2F39B5;
+	Thu,  8 Jan 2026 22:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767904001; cv=none; b=OGDKQ+OMsuCjLC2ta2eR3/vTIZm8+Xf26woVC5NQrWydmLvBsEKoeH56uJpaI+pArXZTRNdxikgpweFXqSMzH1wX951icDK1tlV8ueKT++Afzh/7NABHmufKALxIaXtrXj6F1LxcF9CrGZqZLqaAudIFAIEfgkfS09HzSrC9PA0=
+	t=1767910254; cv=none; b=eIjfP4fuQlK47m4pGdvOrFJNWmLKHkqjTAS9ZUfygYbPxgTE9x/N69MkA4P9dlzFCu1zxK6VLL+3d7MDrHQQAlnRR4TkTaaRAb7qKQNJycwkW9OOmPRhxsOrCVfk5mWW2vCt0LSZ53jNDFi5LYqSIIxzQWGwpForbymN9R/VEUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767904001; c=relaxed/simple;
-	bh=Lbm1wO5Em7fQQ3GgNoKyxmZwFi9cEzaK6DxC0Hi/YDo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YQsVkqPCXJtp+SiiYHVk8zBUczVKRMu9RqyAuFGYuDIv0VV3xMzYQU8I+ml1RZNFf5dfmDMQuH5i6FiHeCRaO3yDXJxm89s6PMMX4FMPRkSVn0BxYTEl8FFJK8m9a9SSH78V1Qhp3u5IeHFkDafLrT/WVDMhGPrSwc6bSOQyZFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EyNigXEX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767910254; c=relaxed/simple;
+	bh=Zrh6g3iqQucP/rJuVPvG/r1wbhapoAMvUjp8oSDN/3U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZGxoPMA4sgdkuxU2OlMaha98jEK/GGGw9tbduEwb1fVYq+Jy7o7aaUSx9ezZ3XtxxGexGNALlqAiGwVHC9k5YQOviddeW+O11yiFgTCHrLPc014sNo1Vu3QLdp12VmkvJMvUkRk5x3V3N5QuYgS6d/1/QPdggZaFxotPPEmlQng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=y3DnIpMC; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EyNigXEX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38C48C116C6;
-	Thu,  8 Jan 2026 20:26:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767904000;
-	bh=Lbm1wO5Em7fQQ3GgNoKyxmZwFi9cEzaK6DxC0Hi/YDo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EyNigXEX0DLMaJG0OfQR4OzGuk/of9r8RZK5qiWkOnEYPPsqT0sO1q1s17KEOINIa
-	 NBWSlBfPlmpONGDNCI9fjxzMZ/y80VPpOFRdXRRSXCarUm+xRxIyCQyBO2jMrr/Pje
-	 0xSy3IPcI6jBuNEU0eiYYB2+/koWhKmP6dZuRJsMN9+a79OGGH37b3RJ/9LQes/OUF
-	 mnBoRj1PnxeL4FC9HPYLvmsv6ugYHZMjQ8aen4EJS9tGlvv2R26hZgQdr3CTeZlyOS
-	 YqTHMwNzv2jbc77JdR4R84tXkpLq9i5xMwKqrJCMQwpE/B+HX3bhXiAuLk2eXY560K
-	 X0Kk2IgVhopmQ==
-Date: Thu, 8 Jan 2026 12:26:18 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, x86@kernel.org,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Harald Freudenberger <freude@linux.ibm.com>
-Subject: Re: [PATCH 00/36] AES library improvements
-Message-ID: <20260108202618.GA2687@sol>
-References: <20260105051311.1607207-1-ebiggers@kernel.org>
- <CAMj1kXGRTfyXPD3+Ravr7O5ZUMAUeabQw455sW5g7aRy3BU+2Q@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="y3DnIpMC"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4dnJxx5cFFz1XT1Z9;
+	Thu,  8 Jan 2026 22:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1767910237; x=1770502238; bh=9wcZSTi8w0Set4rh18vUE4zP
+	r/D6QOeIA+Se4D2Yz7E=; b=y3DnIpMCSQnKfEQcNUdJmBRbcLno92oeKfo+WMYi
+	GH7blNKN0irLymfpBF3Hg2QDn+bUOND9Ph7+2f+3JOuxuWVyZeHsX/eUX6nr4u42
+	Xo2+GsL+38yL5abFm2PTOhHHNbpFxaViFrEYePNdHtMs7t66UhI3rEcsqAbQ0git
+	yvIzwW2Puf3sh2g2Yh6ypqckaBLqa3pUBV8iuttx96qnQS6WndngwpK8KdYd2a1p
+	gWKipnbDHZpiaajmh8SgTT8KCPLDjeAtbIOlGRsmWTvjAkHdDpnNsQrr3OZChyg8
+	yuKl6RyxlRCmlJ0VSvSzQ99QFu2RTNvj4T9gnBxHCvPCnw==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 2VIQQt_5Aq81; Thu,  8 Jan 2026 22:10:37 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4dnJxZ1xlYz1XZYyy;
+	Thu,  8 Jan 2026 22:10:26 +0000 (UTC)
+Message-ID: <57062131-e79e-42c2-aa0b-8f931cb8cac2@acm.org>
+Date: Thu, 8 Jan 2026 14:10:25 -0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXGRTfyXPD3+Ravr7O5ZUMAUeabQw455sW5g7aRy3BU+2Q@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 10/36] locking/mutex: Support Clang's context analysis
+To: Marco Elver <elver@google.com>, Peter Zijlstra <peterz@infradead.org>,
+ Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
+ Will Deacon <will@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+ Chris Li <sparse@chrisli.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>,
+ Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>,
+ Eric Dumazet <edumazet@google.com>, Frederic Weisbecker
+ <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Ian Rogers <irogers@google.com>,
+ Jann Horn <jannh@google.com>, Joel Fernandes <joelagnelf@nvidia.com>,
+ Johannes Berg <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>,
+ Josh Triplett <josh@joshtriplett.org>, Justin Stitt
+ <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+ Kentaro Takeda <takedakn@nttdata.co.jp>,
+ Lukas Bulwahn <lukas.bulwahn@gmail.com>, Mark Rutland
+ <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+ Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+ Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>,
+ kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-security-module@vger.kernel.org, linux-sparse@vger.kernel.org,
+ linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
+References: <20251219154418.3592607-1-elver@google.com>
+ <20251219154418.3592607-11-elver@google.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20251219154418.3592607-11-elver@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 08, 2026 at 12:32:00PM +0100, Ard Biesheuvel wrote:
-> On Mon, 5 Jan 2026 at 06:14, Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > This series applies to libcrypto-next.  It can also be retrieved from:
-> >
-> >     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git aes-lib-v1
-> >
-> > This series makes three main improvements to the kernel's AES library:
-> >
-> >   1. Make it use the kernel's existing architecture-optimized AES code,
-> >      including AES instructions, when available.  Previously, only the
-> >      traditional crypto API gave access to the optimized AES code.
-> >      (As a reminder, AES instructions typically make AES over 10 times
-> >      as fast as the generic code.  They also make it constant-time.)
-> >
-> >   2. Support preparing an AES key for only the forward direction of the
-> >      block cipher, using about half as much memory.  This is a helpful
-> >      optimization for many common AES modes of operation.  It also helps
-> >      keep structs small enough to be allocated on the stack, especially
-> >      considering potential future library APIs for AES modes.
-> >
-> >   3. Replace the library's generic AES implementation with a much faster
-> >      one that is almost as fast as "aes-generic", while still keeping
-> >      the table size reasonably small and maintaining some constant-time
-> >      hardening.  This allows removing "aes-generic", unifying the
-> >      current two generic AES implementations in the kernel tree.
-> >
-> 
-> Architectures that support memory operands will be impacted by
-> dropping the pre-rotated lookup tables, especially if they have few
-> GPRs.
-> 
-> I suspect that doesn't really matter in practice: if your pre-AESNI
-> IA-32 workload has a bottleneck on "aes-generic", you would have
-> probably moved it to a different machine by now. But the performance
-> delta will likely be noticeable so it is something that deserves a
-> mention.
+On 12/19/25 8:39 AM, Marco Elver wrote:
+> diff --git a/include/linux/mutex.h b/include/linux/mutex.h
+> index bf535f0118bb..89977c215cbd 100644
+> --- a/include/linux/mutex.h
+> +++ b/include/linux/mutex.h
+> @@ -62,6 +62,7 @@ do {									\
+>   	static struct lock_class_key __key;				\
+>   									\
+>   	__mutex_init((mutex), #mutex, &__key);				\
+> +	__assume_ctx_lock(mutex);					\
+>   } while (0)
 
-Sure.  I only claimed that the new implementation is "almost as fast" as
-aes-generic, not "as fast".
+The above type of change probably will have to be reverted. If I enable
+context analysis for the entire kernel tree, drivers/base/devcoredump.c
+doesn't build. The following error is reported:
 
-By the way, these are the results I get for crypto_cipher_encrypt_one()
-and crypto_cipher_decrypt_one() (averaged together) in a loop on an i386
-kernel patched to not use AES-NI:
+drivers/base/devcoredump.c:406:2: error: acquiring mutex '_res->mutex' 
+that is already held [-Werror,-Wthread-safety-analysis]
+   406 |         mutex_lock(&devcd->mutex);
+       |         ^
 
-    aes-fixed-time: 77 MB/s
-    aes-generic: 192 MB/s
-    aes-lib: 185 MB/s
+dev_coredumpm_timeout() calls mutex_init() and mutex_lock() from the 
+same function. The above type of change breaks compilation of all code
+that initializes and locks a synchronization object from the same
+function. My understanding of dev_coredumpm_timeout() is that there is a
+good reason for calling both mutex_init() and mutex_lock() from that
+function. Possible solutions are disabling context analysis for that
+function or removing __assume_ctx_lock() again from mutex_init(). Does
+anyone want to share their opinion about this?
 
-I'm not sure how relevant these are, considering that this was collected
-on a modern CPU, not one of the (very) old ones that would actually be
-running i386 non-AESNI code.  But if they are even vaguely
-representative, this suggests the new code does quite well: little
-slowdown over aes-generic, while adding some constant-time hardening
-(which arguably was an undeserved shortcut to not include before) and
-also using a lot less dcache.
+Thanks,
 
-At the same time, there's clearly a large speedup vs. aes-fixed-time.
-So this will actually be a significant performance improvement on
-systems that were using aes-fixed-time.  Many people may have been doing
-that unintentionally, due to it being set to a higher priority than
-aes-generic in the crypto_cipher API.
-
-I'll also note that the state of the art for parallelizable AES modes on
-CPUs without AES instructions is bit-slicing with vector registers.  The
-kernel has such code for arm and arm64, but not for x86.  If x86 without
-AES-NI was actually important, we should be adding that.  But it seems
-clear that x86 CPUs have moved on, and hardly anyone cares anymore.  If
-for now we can just provide something that's almost as fast as before
-(and maybe even a lot faster in some cases!), that seems fine.
-
-- Eric
+Bart.
