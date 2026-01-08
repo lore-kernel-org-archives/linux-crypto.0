@@ -1,91 +1,106 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E359466FF2;
-	Thu,  8 Jan 2026 11:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46AA3A9014
+	for <linux-crypto@vger.kernel.org>; Thu,  8 Jan 2026 11:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767871462; cv=none; b=DJyvS7IpT7IRVv5ZxFfHmAm77yBsog34UwvYsHepuGPF45AchpJbrPChbeS4N/laVTrbf/ZRBTDXYPexPZ6+PM4mv9KjaCWiZo+4O1kUic8+TRh311deZ0g3eUZtVbx5sMQKMH9j7u5IEFwOHSGmENkPMqy32m3u3c8jgQEDk3Y=
+	t=1767871788; cv=none; b=H9yGTF0h+wYXJsN1/gDe9+TQAHO8i7buPIXkAsyBC9kKE/Blyf87YFHplOdJhQlfnF905TjoUsBh46wFqQqQnU7nvtKzGXh1l8sX7PBQUg7Uxs4ll4XfZ6iYaJbT/drAOEA81QIW9QKDQCAV0cuo9DTYYbjzijxPlLIX9ovfjls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767871462; c=relaxed/simple;
-	bh=3aPn4Nyb5dJ3/lKeV8jT93iQ3qzkUHNcE3PnCr/yoRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DM9EPzsKiP1sx8Hw+e88Q93ix9hMnRIMAoC55dVvip6fe13uFw+ISmdGxnpUUA00TaxqRsjABFRE9hgzZG4KW49aYLI8eig7+txQ4mMq9yC91UazVEYq/K/mFdT+ri9Lf6VbSenmgrADYA4jNT5OwyFEUY7KkRrdcgIUDw4Pq4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qsL0LlKP; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1767871788; c=relaxed/simple;
+	bh=DgkWQnj485Cdlj0s6OaAmvJGF615eW9UFZIJZgLGdOs=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=N4u/lPLdNTduVeSpa6wQ8mB4w64xgttsb8tKqin6HJPWAmbsvFKRX7fdRQ+Mgdq2q9h9dYUiCxPjsrgZd8X/JBEBmQ+JzkIIChrY1iFh4K8cojTaezU0id97vLN3Pb9dsZALWJ5ZCFvF9V1num/NfTKlWMOA0oZs2SroXX07gSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c3Ke/fFM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qsL0LlKP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=raykClked1/JLJCbQnf4hmphE07lLLn7ScKUbMKwTGo=; b=qsL0LlKPeCPKDLe8Zmz0BbHHT9
-	UUd44siueHFgPdRTDy1FUnJp0QKfamSiAxrBgrCFknIBEALVSkRpZVLrrjaDqqgFpf3sCkFjTKXjm
-	9eBhSS7Bs/XX4T3QWY9YY1A9UM+5tCHhSLx4YGnj6Q2etJ+O6UF46rkClwnmleNBXY3ZBn5nOLXYu
-	Sb4mSTXYriev5CZ9uQom3K42OujBuIIlkN2tyNPDBvBrIJISddqK3ycDfQ6mz8Z5M48a6otV5Ie/G
-	7GKEcfnSoGYHrDVDSgGCRJzXaTr4E+HLiR6iBF5gN+hpcC7hlYkOO/l2ubXEhv0+axOAmW4X5EJyu
-	ukFIjcYg==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vdo7h-0000000D2FP-0ABB;
-	Thu, 08 Jan 2026 11:24:13 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id DCCE6300E8E; Thu, 08 Jan 2026 12:24:11 +0100 (CET)
-Date: Thu, 8 Jan 2026 12:24:11 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: =?utf-8?B?546L5b+X?= <wangzhi_xd@stu.xidian.edu.cn>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	syzkaller-bugs@googlegroups.com, security@kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [syzbot] BUG: KASAN: slab-use-after-free in
- mutex_optimistic_spin via adf_ctl_ioctl
-Message-ID: <20260108112411.GI272712@noisy.programming.kicks-ass.net>
-References: <7b50a9a8.abb1.19b9b902fae.Coremail.wangzhi_xd@stu.xidian.edu.cn>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c3Ke/fFM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767871784;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BY4QFtk8w05Z2iDasTM1yxyFxo3qpga8FzQxbaR04dE=;
+	b=c3Ke/fFMCc6szmYsUf3LybrBr1DfKJs0H9pg8Q/UnzUyPTUxBoCxryemFt209uvBJmT/Ww
+	JRsH6L0FsfrzmwNPoby6ygEUkVCpzQ7lalVEupo0BjyhrnroTLdxDEYJbcwFsKya1kZkYE
+	SL9s5UfzEkmhKgHt7Dpjzn7VA8udtCU=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-322-0DGUIbRDOL2xf5vLaO_vQg-1; Thu,
+ 08 Jan 2026 06:29:39 -0500
+X-MC-Unique: 0DGUIbRDOL2xf5vLaO_vQg-1
+X-Mimecast-MFC-AGG-ID: 0DGUIbRDOL2xf5vLaO_vQg_1767871777
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8FF5318005B6;
+	Thu,  8 Jan 2026 11:29:36 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7598430002D1;
+	Thu,  8 Jan 2026 11:29:31 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CALrw=nHhs61yqkLkK9F4UGU_ujnniMzrkbhjRDc+Aa69XTFTvg@mail.gmail.com>
+References: <CALrw=nHhs61yqkLkK9F4UGU_ujnniMzrkbhjRDc+Aa69XTFTvg@mail.gmail.com> <20260105152145.1801972-1-dhowells@redhat.com> <20260105152145.1801972-7-dhowells@redhat.com>
+To: Ignat Korchagin <ignat@cloudflare.com>
+Cc: dhowells@redhat.com, Lukas Wunner <lukas@wunner.de>,
+    Jarkko Sakkinen <jarkko@kernel.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Eric Biggers <ebiggers@kernel.org>,
+    Luis Chamberlain <mcgrof@kernel.org>,
+    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
+    Sami Tolvanen <samitolvanen@google.com>,
+    "Jason A . Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
+    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
+    linux-kernel@vger.kernel.org,
+    Tadeusz Struk <tadeusz.struk@intel.com>,
+    "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH v11 6/8] crypto: Add RSASSA-PSS support
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7b50a9a8.abb1.19b9b902fae.Coremail.wangzhi_xd@stu.xidian.edu.cn>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2708429.1767871770.1@warthog.procyon.org.uk>
+Date: Thu, 08 Jan 2026 11:29:30 +0000
+Message-ID: <2708430.1767871770@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, Jan 08, 2026 at 11:04:36AM +0800, 王志 wrote:
-> syzbot has found the following issue on:
+Ignat Korchagin <ignat@cloudflare.com> wrote:
+
+> A lot of pointers and arithmetic here. Wouldn't it be easier to do
+> something like in [1]?
+
+Fair point.
+
+> > +DEFINE_FREE(crypto_free_shash, struct crypto_shash*,
+> > +           if (!IS_ERR_OR_NULL(_T)) { crypto_free_shash(_T); });
 > 
-> HEAD commit:    6.18.0 (custom build)
-> git tree:       linux-stable
-> console output: (see below)
-> kernel config:  (attached)
+> Is this useful enough to go into some commonly used header for shash?
+
+Maybe - I guess there's no actual cost to doing so as it generates an inline
+function.
+
+> > +       struct crypto_shash *hash_tfm __free(crypto_free_shash) = NULL;
+> > +       struct shash_desc *Hash __free(kfree) = NULL;
 > 
-> ---
-> 
-> QAT: failed to copy from user cfg_data.
-> c6xxvf 0000:00:05.0: Starting acceleration device qat_dev0.
-> ==================================================================
-> BUG: KASAN: slab-use-after-free in owner_on_cpu home/wmy/Fuzzer/third_tool/linux-6.18/include/linux/sched.h:2282 [inline]
-> BUG: KASAN: slab-use-after-free in mutex_can_spin_on_owner home/wmy/Fuzzer/third_tool/linux-6.18/kernel/locking/mutex.c:397 [inline]
-> BUG: KASAN: slab-use-after-free in mutex_optimistic_spin home/wmy/Fuzzer/third_tool/linux-6.18/kernel/locking/mutex.c:440 [inline]
-> BUG: KASAN: slab-use-after-free in __mutex_lock_common home/wmy/Fuzzer/third_tool/linux-6.18/kernel/locking/mutex.c:602 [inline]
-> BUG: KASAN: slab-use-after-free in __mutex_lock+0xd0a/0x1160 home/wmy/Fuzzer/third_tool/linux-6.18/kernel/locking/mutex.c:760
+> So even though x509/pkcs7 code now has a counterexample (partially due
+> to my fault) seems the consensus [2] is to declare and initialise the
+> variable with the __free attribute at the same time meaning it is OK
+> to declare the variables later and not follow the "declaration at the
+> top" rule.
 
-> Allocated by task 150:
+Ok, I'll move the decls.
 
->  getname_flags.part.0+0x50/0x560 home/wmy/Fuzzer/third_tool/linux-6.18/fs/namei.c:146
->  getname_flags+0x9a/0xe0 home/wmy/Fuzzer/third_tool/linux-6.18/include/linux/audit.h:345
->  getname home/wmy/Fuzzer/third_tool/linux-6.18/include/linux/fs.h:2924 [inline]
+David
 
-> 
-> Freed by task 150:
-
->  putname.part.0+0x120/0x160 home/wmy/Fuzzer/third_tool/linux-6.18/fs/namei.c:297
->  putname+0x41/0x50 home/wmy/Fuzzer/third_tool/linux-6.18/include/linux/err.h:84
-
-> The buggy address belongs to the object at ffff888104e04400
->  which belongs to the cache names_cache of size 4096
-
-So how again is mutex->owner a names_cache object? This seems to suggest
-something has gone terribly wrong somewhere.
