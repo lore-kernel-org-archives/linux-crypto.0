@@ -1,113 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A6C35E536
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 14:15:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7535A2E8B94
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 14:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767968152; cv=none; b=MSxB1g+RM3blRZ12G9W+0WUibMcmj69vW554Mq/T+kWyg9CsR98k6CcPLHfl+dAlQUmOroHZLqhObh06sS+GEW4WJ0b2ftPSof3M9F92PL6eNUzyPyf6bOl4eRLnJxX/27m2tFCqWW5dpbvrYFnz7I8L1FqyHm42pEd8EG3ALgw=
+	t=1767968577; cv=none; b=d40uTH0Tfhn1q6LbQk3OqpndmOx55nicZTsFK0Pt8gowYfoE4IEFJO4tRIrlljL7tnWLwWQxBNimjoVOY7cy07n7Tjcrm79S4+Mw560LQp2am9S71TuNPJOwCYsj76lp6izpUUMxqDdaxam3ig9ywIC0mhL7ZXD7pF0RQJZtWX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767968152; c=relaxed/simple;
-	bh=LEkB5xtHjXVuFngpe1PCgKH2zts37TIIn2uF2x0GoHA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=erV7298nC3BT/AxL4J2/HDnE2WLR1G1obX1ITPECrkQhIXYl3kH2j49KZ6XPcMhUIwHuzkag7kbt78vYh/QheuK2J11o3CuPbMzN2+yWDAs7D86zq/bjnIsxZSPbU8CqOUrV3jZlMWwEYvLB9NEhDJHoRTJMx6E99qGhZmaHK+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cOo7l5zc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767968577; c=relaxed/simple;
+	bh=ldpV63w1H5Mk2/xAqTHpntSFzVm3q22QRe7D4olLOkU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pux58lC55Jirfl+QuOEseIFixURRx2GG/wJRaieyFR+e6powaxUZWjEBK4bTKx3KCyXSi9uQ7cRlVZRGNmg7nhI9yj98p5WnbrjyYOy3CSjXMtjJDumNk5rynLtS4LqYuuJTp7Kn1gfm5UI7H83e1j5g62KReqrI2Ka2cu6EtkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SvjBQCu6; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cOo7l5zc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC7CDC2BCB1
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 14:15:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767968151;
-	bh=LEkB5xtHjXVuFngpe1PCgKH2zts37TIIn2uF2x0GoHA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=cOo7l5zcVTtSK8d8ZoTvhHMZ+7r8uJ5wqzr4r0b762f/oSwo5sTMbf3PEl1eTQZdB
-	 IvWvKGMgeq3/30kAiV/uEgD4pn8dx//EsSEigWkZsN4Fmut4XXWA2hOEJqN375YqTS
-	 SOGIZLBmj+Sjb4ECAWRxEu/pZW8kcdt53t01cCBSJwDyzryPI5px0vXYIzBvA9GEqP
-	 0Tv5X4AWL0Sxb09I6GvH1Vuvb2gWzh5DsK8pXApt1MJuXj9v9rxmFSGr4P1YFg5ML8
-	 pfai91JtK3wie4Vuz5MrUEnrzxNfyq1Q8Lh6zPWFc7Iljdw0qAadgaBxgTltPCrfKL
-	 3AmWZgO0PQgXA==
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-383153e06d6so12869411fa.0
-        for <linux-crypto@vger.kernel.org>; Fri, 09 Jan 2026 06:15:51 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWBlCqhKTeT3RglswbSh6D4KgpDbuOfzeV7kaIwBpUK51qbZ/9A4+cPnOsMwpIwNI5jpeFTyDN+jSYRAig=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEHsdTSQ4EMi2lkcHCn6AfIE0USdlmVZxgTNqiPnOwBzNjzCzt
-	y+u42qnR9H4UMZRjTP8V2mYzMkex+EU3uVNQv9+qQr0jPQWjvPV/YPoZ7h54NrfNGV7FV4o2AE4
-	DAcYQjjMAIlQuP/X3t7uio74HBU4eDJmMFzLJqPmZ9A==
-X-Google-Smtp-Source: AGHT+IEjHf4XcU+bJuvypnOrwB1YOTeQllVX+zgkrui63UfDLj395Ntw/Lg3Gd2DnCc1/V002jcYulQEX3HszG3lhfY=
-X-Received: by 2002:a05:651c:507:b0:383:24fe:4eaf with SMTP id
- 38308e7fff4ca-38324fe5240mr4126731fa.30.1767968150320; Fri, 09 Jan 2026
- 06:15:50 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SvjBQCu6"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767968573;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jPCJvVh7QKX2iSMtWwv7GRsl36Brtuua2rgRr5lzIng=;
+	b=SvjBQCu6HinEYypeIlRCycdHJPXWxUEM9YhGoWwPsDqgIQIyPIOkVozJQWtRaDb7pJ2IyQ
+	Z+F3Xr7/AuwBsEjdt7I6UhgkYoj+f7MW5/kxaS7GFypiyqbDYvNvBmtK6fTCCH0u37c8rc
+	FVISSmfcWOZE21+gm6wl1tNTf5zaRBo=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: stm32 - Remove unnecessary checks before calling memcpy
+Date: Fri,  9 Jan 2026 15:20:36 +0100
+Message-ID: <20260109142039.220729-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aUFX14nz8cQj8EIb@vaman> <CAMRc=MetbSuaU9VpK7CTio4kt-1pkwEFecARv7ROWDH_yq63OQ@mail.gmail.com>
- <aUF2gj_0svpygHmD@vaman> <CAMRc=McO-Fbb=O3VjFk5C14CD6oVA4UmLroN4_ddCVxtfxr03A@mail.gmail.com>
- <aUpyrIvu_kG7DtQm@vaman> <CAMRc=Md6ucK-TAmtvWMmUGX1KuVE9Wj_z4i7_-Gc7YXP=Omtcw@mail.gmail.com>
- <aVZh3hb32r1oVcwG@vaman> <CAMRc=MePAVMZPju6rZsyQMir4CkQi+FEqbC++omQtVQC1rHBVg@mail.gmail.com>
- <aVf5WUe9cAXZHxPJ@vaman> <CAMRc=Mdaucen4=QACDAGMuwTR1L5224S0erfC0fA7yzVzMha_Q@mail.gmail.com>
- <aWBndOfbtweRr0uS@vaman>
-In-Reply-To: <aWBndOfbtweRr0uS@vaman>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Fri, 9 Jan 2026 15:15:38 +0100
-X-Gmail-Original-Message-ID: <CAMRc=McPz+W4GOCbNMx-tpSav3+wuUrLT2CF5FhoV5U29oiK6A@mail.gmail.com>
-X-Gm-Features: AQt7F2rb9IR691hbgnp1FtGr7o2dONlDtlFsUGEVpYxhopq1kqU8-3RQfgdAT9Y
-Message-ID: <CAMRc=McPz+W4GOCbNMx-tpSav3+wuUrLT2CF5FhoV5U29oiK6A@mail.gmail.com>
-Subject: Re: [PATCH v9 03/11] dmaengine: qcom: bam_dma: implement support for
- BAM locking
-To: Vinod Koul <vkoul@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Thara Gopinath <thara.gopinath@gmail.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Udit Tiwari <quic_utiwari@quicinc.com>, Daniel Perez-Zoghbi <dperezzo@quicinc.com>, 
-	Md Sadre Alam <mdalam@qti.qualcomm.com>, Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Jan 9, 2026 at 3:27=E2=80=AFAM Vinod Koul <vkoul@kernel.org> wrote:
->
-> >
-> > We need an API because we send a locking descriptor, then a regular
-> > descriptor (or descriptors) for the actual transaction(s) and then an
-> > unlocking descriptor. It's a thing the user of the DMA engine needs to
-> > decide on, not the DMA engine itself.
->
-> I think downstream sends lock descriptor always. What is the harm in
-> doing that every time if we go down that path?
+memcpy() can be safely called with size 0, which is a no-op. Remove the
+unnecessary checks before calling memcpy().
 
-No, in downstream it too depends on the user setting the right bits.
-Currently the only user of the BAM locking downstream is the NAND
-driver. I don't think the code where the crypto driver uses it is
-public yet.
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/stm32/stm32-hash.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-And yes, there is harm - it slightly impacts performance. For QCE it
-doesn't really matter as any users wanting to offload skcipher or SHA
-are better off using the Arm Crypto Extensions anyway as they are
-faster by an order of magnitude (!). It's also the default upstream,
-where the priorities are set such that the ARM CEs are preferred over
-the QCE. QCE however, is able to coordinate with the TrustZone and
-will be used to support the DRM use-cases.
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index a4436728b0db..d60147a7594e 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -1115,8 +1115,7 @@ static int stm32_hash_copy_sgs(struct stm32_hash_request_ctx *rctx,
+ 		return -ENOMEM;
+ 	}
+ 
+-	if (state->bufcnt)
+-		memcpy(buf, rctx->hdev->xmit_buf, state->bufcnt);
++	memcpy(buf, rctx->hdev->xmit_buf, state->bufcnt);
+ 
+ 	scatterwalk_map_and_copy(buf + state->bufcnt, sg, rctx->offset,
+ 				 min(new_len, rctx->total) - state->bufcnt, 0);
+@@ -1300,8 +1299,7 @@ static int stm32_hash_prepare_request(struct ahash_request *req)
+ 	}
+ 
+ 	/* copy buffer in a temporary one that is used for sg alignment */
+-	if (state->bufcnt)
+-		memcpy(hdev->xmit_buf, state->buffer, state->bufcnt);
++	memcpy(hdev->xmit_buf, state->buffer, state->bufcnt);
+ 
+ 	ret = stm32_hash_align_sgs(req->src, nbytes, bs, init, final, rctx);
+ 	if (ret)
+-- 
+Thorsten Blum <thorsten.blum@linux.dev>
+GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
 
-I prefer to avoid impacting any other users of BAM DMA.
-
-> Reg Dmitry question above, this is dma hw capability, how will client
-> know if it has to lock on older rev of hardware or not...?
->
-> > Also: only the crypto engine needs it for now, not all the other users
-> > of the BAM engine.
->
-
-Trying to set the lock/unlock bits will make
-dmaengine_desc_attach_metadata() fail if HW does not support it.
-
-> But they might eventually right?
->
-
-Yes, and they will already have the interface to do it - in the form
-of descriptor metadata.
-
-Thanks,
-Bartosz
