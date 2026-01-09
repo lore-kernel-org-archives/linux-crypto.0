@@ -1,77 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CD135C1BB
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 13:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A6C35E536
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 14:15:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767965654; cv=none; b=D2IAkPvQQhQPIrnt4bc10q9C6Tnqa7wySjHe5lBZFDuqDvOQMzQiwqP9QeivteXVkHi7iNld9N7FiaU3P1zPWiQ46ixgI9xBZGjoNYaZg9opD8DySUB6utzz92ks0mQdaF87bV6yztBdXZPKhdnOyjfNDjeuse3ZRk/HcDv/aNQ=
+	t=1767968152; cv=none; b=MSxB1g+RM3blRZ12G9W+0WUibMcmj69vW554Mq/T+kWyg9CsR98k6CcPLHfl+dAlQUmOroHZLqhObh06sS+GEW4WJ0b2ftPSof3M9F92PL6eNUzyPyf6bOl4eRLnJxX/27m2tFCqWW5dpbvrYFnz7I8L1FqyHm42pEd8EG3ALgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767965654; c=relaxed/simple;
-	bh=qWzvjygcuLwzEIaEHIXEz9SaaWzpXF20ANBBtTSJsrI=;
+	s=arc-20240116; t=1767968152; c=relaxed/simple;
+	bh=LEkB5xtHjXVuFngpe1PCgKH2zts37TIIn2uF2x0GoHA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CCSfBzwrxoS5kve4cLQkbfiby6/hX/ET/OcbRmbY6nGYEjkDOETQnG7l7Il5ZegDOFFWV5i3iCP4V5gezkBkxyoK0Rd55fJsBdObmqAC9Sy6OTbUVwx0A7A8Lxv6Wv4K9B7DEE1sW2X1iHswaDi56mRgafpwvIKT8+rPdZjfxso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXlvPg28; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=erV7298nC3BT/AxL4J2/HDnE2WLR1G1obX1ITPECrkQhIXYl3kH2j49KZ6XPcMhUIwHuzkag7kbt78vYh/QheuK2J11o3CuPbMzN2+yWDAs7D86zq/bjnIsxZSPbU8CqOUrV3jZlMWwEYvLB9NEhDJHoRTJMx6E99qGhZmaHK+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cOo7l5zc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXlvPg28"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00C32C19422
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 13:34:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cOo7l5zc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC7CDC2BCB1
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 14:15:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767965654;
-	bh=qWzvjygcuLwzEIaEHIXEz9SaaWzpXF20ANBBtTSJsrI=;
+	s=k20201202; t=1767968151;
+	bh=LEkB5xtHjXVuFngpe1PCgKH2zts37TIIn2uF2x0GoHA=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=pXlvPg28ROYATVopjWOzBg5vR6kEbc/rx+T7qI0QvP2SRipywjvuMEbt9KtaaxSYT
-	 xe41Bh4rKblR4UC3fgonuJIUAP1Scoti7w7lySstIJj1IljhPDfFwqgyMSZ5hkLhkV
-	 hDwAKsaAklZBG6nfOBwnm/d727a3L+w3tVOlc3+2qmrFxxXMG9NSreOu1PRx0ID/T5
-	 Sk06jar9d7TVaM5zvynCh40hUwRb9JggexRF+5nrKi96yMZ7+CqICc69PeGzLkg8zg
-	 xqItjYKcEsy1nJZ42n/xGyGJudNUYjzO3ZEDujQGxtFPI33Kj01chsyagXJ1g1FxNG
-	 AfDuGE1XUDtzQ==
-Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-640c9c85255so4634272d50.3
-        for <linux-crypto@vger.kernel.org>; Fri, 09 Jan 2026 05:34:13 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU8/3lGZv1axDqludyawoim8ZYBEB4WfXv4k5QLscEeA2dZKznWTfSR6VrTDJ45GTZ5m9Jd4ko8NPYluM4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhUeMix+nru9U3SbD5wUqDAgX4VBFx7aYpGkBGLho3qVvlkcPc
-	eKSRBfMUZQTt7LKV71zT1r3oAISuJkGLzOVMQnt4nV1RskH2Y41FVF/gPozyXsUODsC1zoQjoI0
-	E93vxDImhxgTZS0hBJeM3DaoMypHi60Y=
-X-Google-Smtp-Source: AGHT+IFesI9TgGv8pGaGDvBFA25rqPyYSWQ/7ybS7ei3jmEtj0pUiPwxVn1yVv3/z2opC7z47lsPIXjgx7XM38IPl5Y=
-X-Received: by 2002:a05:690e:118e:b0:640:d31d:6ed4 with SMTP id
- 956f58d0204a3-64716c67b91mr8452143d50.51.1767965653394; Fri, 09 Jan 2026
- 05:34:13 -0800 (PST)
+	b=cOo7l5zcVTtSK8d8ZoTvhHMZ+7r8uJ5wqzr4r0b762f/oSwo5sTMbf3PEl1eTQZdB
+	 IvWvKGMgeq3/30kAiV/uEgD4pn8dx//EsSEigWkZsN4Fmut4XXWA2hOEJqN375YqTS
+	 SOGIZLBmj+Sjb4ECAWRxEu/pZW8kcdt53t01cCBSJwDyzryPI5px0vXYIzBvA9GEqP
+	 0Tv5X4AWL0Sxb09I6GvH1Vuvb2gWzh5DsK8pXApt1MJuXj9v9rxmFSGr4P1YFg5ML8
+	 pfai91JtK3wie4Vuz5MrUEnrzxNfyq1Q8Lh6zPWFc7Iljdw0qAadgaBxgTltPCrfKL
+	 3AmWZgO0PQgXA==
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-383153e06d6so12869411fa.0
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Jan 2026 06:15:51 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWBlCqhKTeT3RglswbSh6D4KgpDbuOfzeV7kaIwBpUK51qbZ/9A4+cPnOsMwpIwNI5jpeFTyDN+jSYRAig=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEHsdTSQ4EMi2lkcHCn6AfIE0USdlmVZxgTNqiPnOwBzNjzCzt
+	y+u42qnR9H4UMZRjTP8V2mYzMkex+EU3uVNQv9+qQr0jPQWjvPV/YPoZ7h54NrfNGV7FV4o2AE4
+	DAcYQjjMAIlQuP/X3t7uio74HBU4eDJmMFzLJqPmZ9A==
+X-Google-Smtp-Source: AGHT+IEjHf4XcU+bJuvypnOrwB1YOTeQllVX+zgkrui63UfDLj395Ntw/Lg3Gd2DnCc1/V002jcYulQEX3HszG3lhfY=
+X-Received: by 2002:a05:651c:507:b0:383:24fe:4eaf with SMTP id
+ 38308e7fff4ca-38324fe5240mr4126731fa.30.1767968150320; Fri, 09 Jan 2026
+ 06:15:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251211-dev-dt-warnings-all-v1-0-21b18b9ada77@codeconstruct.com.au>
- <20251211-dev-dt-warnings-all-v1-2-21b18b9ada77@codeconstruct.com.au>
-In-Reply-To: <20251211-dev-dt-warnings-all-v1-2-21b18b9ada77@codeconstruct.com.au>
-From: Linus Walleij <linusw@kernel.org>
-Date: Fri, 9 Jan 2026 14:34:02 +0100
-X-Gmail-Original-Message-ID: <CAD++jLk=9P3SaPgeuD46O_-D5xTKXiefRKenq2w8HVcv5rUdxw@mail.gmail.com>
-X-Gm-Features: AZwV_QjuVx1piuHcehHbUq1Xzc5Kt25GKCC_RKdVxx8gfqJ7sqje1Z1f8fkkuKU
-Message-ID: <CAD++jLk=9P3SaPgeuD46O_-D5xTKXiefRKenq2w8HVcv5rUdxw@mail.gmail.com>
-Subject: Re: [PATCH RFC 02/16] pinctrl: aspeed: g5: Constrain LPC binding
- revision workaround to AST2500
-To: Andrew Jeffery <andrew@codeconstruct.com.au>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Joel Stanley <joel@jms.id.au>, linux-hwmon@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
-	openbmc@lists.ozlabs.org, linux-gpio@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-iio@vger.kernel.org
+References: <aUFX14nz8cQj8EIb@vaman> <CAMRc=MetbSuaU9VpK7CTio4kt-1pkwEFecARv7ROWDH_yq63OQ@mail.gmail.com>
+ <aUF2gj_0svpygHmD@vaman> <CAMRc=McO-Fbb=O3VjFk5C14CD6oVA4UmLroN4_ddCVxtfxr03A@mail.gmail.com>
+ <aUpyrIvu_kG7DtQm@vaman> <CAMRc=Md6ucK-TAmtvWMmUGX1KuVE9Wj_z4i7_-Gc7YXP=Omtcw@mail.gmail.com>
+ <aVZh3hb32r1oVcwG@vaman> <CAMRc=MePAVMZPju6rZsyQMir4CkQi+FEqbC++omQtVQC1rHBVg@mail.gmail.com>
+ <aVf5WUe9cAXZHxPJ@vaman> <CAMRc=Mdaucen4=QACDAGMuwTR1L5224S0erfC0fA7yzVzMha_Q@mail.gmail.com>
+ <aWBndOfbtweRr0uS@vaman>
+In-Reply-To: <aWBndOfbtweRr0uS@vaman>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Fri, 9 Jan 2026 15:15:38 +0100
+X-Gmail-Original-Message-ID: <CAMRc=McPz+W4GOCbNMx-tpSav3+wuUrLT2CF5FhoV5U29oiK6A@mail.gmail.com>
+X-Gm-Features: AQt7F2rb9IR691hbgnp1FtGr7o2dONlDtlFsUGEVpYxhopq1kqU8-3RQfgdAT9Y
+Message-ID: <CAMRc=McPz+W4GOCbNMx-tpSav3+wuUrLT2CF5FhoV5U29oiK6A@mail.gmail.com>
+Subject: Re: [PATCH v9 03/11] dmaengine: qcom: bam_dma: implement support for
+ BAM locking
+To: Vinod Koul <vkoul@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Thara Gopinath <thara.gopinath@gmail.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Udit Tiwari <quic_utiwari@quicinc.com>, Daniel Perez-Zoghbi <dperezzo@quicinc.com>, 
+	Md Sadre Alam <mdalam@qti.qualcomm.com>, Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 11, 2025 at 9:46=E2=80=AFAM Andrew Jeffery
-<andrew@codeconstruct.com.au> wrote:
-
-> Discovering a phandle to an AST2400 or AST2600 LPC node indicates an
-> error for the purpose of the AST2500 pinctrl driver.
+On Fri, Jan 9, 2026 at 3:27=E2=80=AFAM Vinod Koul <vkoul@kernel.org> wrote:
 >
-> Signed-off-by: Andrew Jeffery <andrew@codeconstruct.com.au>
+> >
+> > We need an API because we send a locking descriptor, then a regular
+> > descriptor (or descriptors) for the actual transaction(s) and then an
+> > unlocking descriptor. It's a thing the user of the DMA engine needs to
+> > decide on, not the DMA engine itself.
+>
+> I think downstream sends lock descriptor always. What is the harm in
+> doing that every time if we go down that path?
 
-Patch applied for Linux 7.0!
+No, in downstream it too depends on the user setting the right bits.
+Currently the only user of the BAM locking downstream is the NAND
+driver. I don't think the code where the crypto driver uses it is
+public yet.
 
-Yours,
-Linus Walleij
+And yes, there is harm - it slightly impacts performance. For QCE it
+doesn't really matter as any users wanting to offload skcipher or SHA
+are better off using the Arm Crypto Extensions anyway as they are
+faster by an order of magnitude (!). It's also the default upstream,
+where the priorities are set such that the ARM CEs are preferred over
+the QCE. QCE however, is able to coordinate with the TrustZone and
+will be used to support the DRM use-cases.
+
+I prefer to avoid impacting any other users of BAM DMA.
+
+> Reg Dmitry question above, this is dma hw capability, how will client
+> know if it has to lock on older rev of hardware or not...?
+>
+> > Also: only the crypto engine needs it for now, not all the other users
+> > of the BAM engine.
+>
+
+Trying to set the lock/unlock bits will make
+dmaengine_desc_attach_metadata() fail if HW does not support it.
+
+> But they might eventually right?
+>
+
+Yes, and they will already have the interface to do it - in the form
+of descriptor metadata.
+
+Thanks,
+Bartosz
