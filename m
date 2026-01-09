@@ -1,80 +1,125 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58E627465C;
-	Fri,  9 Jan 2026 02:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9A727465C;
+	Fri,  9 Jan 2026 02:27:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767925511; cv=none; b=cJtCoJxhqJ8MTPaPq6V9a7IxO4wEx+jlp6cB/ZOLqHR/GiCrbLYsFda+TzNUXNS3r/KBn3cKNts74ROYfCrLIFmsU12mJUVGDni6aSSw5+zn6mjkewJz8q6bdZvnKDnk33yEZXqh7StPbROl8id/pprzK/tMihJVgLWE4Vzr+XQ=
+	t=1767925623; cv=none; b=K3tK6R1k2WZGmf+VbxO43/wjV7i1hQbfly44r6wxYUYiaJqumeIh1TL84hcwqKUMQOaMzjol2kyl2c2CXJA0qBXJN+a31t6D1OYufjib/os7DeUy1iFz9+7tFTuMaif28Us70wF388OXmRxD0rUyB/Q7kthT9iY1U2Otu0lzWj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767925511; c=relaxed/simple;
-	bh=A2krHkn8X4+Jv8UItV5AxUM4bYo9yx+73yu9Ai7PPw8=;
+	s=arc-20240116; t=1767925623; c=relaxed/simple;
+	bh=/KCBLBLcf8r3a6KZVBsohReOTxRXrhQzCRY4NGlW7B4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GsTZrBbhFR1nn8eHQGUUmikcXAGy7js2E6VW0omE5EsEsKswSCBGucVhN/o92V2knsLSckIp5UlVNIhbVXq6fjTKwaWw4HVpDwm2YDgR6sRMm826KPPSHJGsD+4j3Mhca0PAqb9/GPiWo0vaXLJiiHtNcFIFYLenJYb4b6ja8Bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GR2cSOsK; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZddQZL/q043WgXdDa8YqqzD05EwPpigogflcm0pel09ehKGIPb15fpAieatXyA/VOIiZIE7kgjQktFC6Seu+/Zv7fntexMufCd5p2xcAeHwBiKSRoK4sOSH087nthfRyay7jZLJxi4103BN4ibANOksgdnjekjBjY+HW46UNbRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IWo19iZR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GR2cSOsK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06E96C116C6;
-	Fri,  9 Jan 2026 02:25:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IWo19iZR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CFA3C116C6;
+	Fri,  9 Jan 2026 02:27:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767925511;
-	bh=A2krHkn8X4+Jv8UItV5AxUM4bYo9yx+73yu9Ai7PPw8=;
+	s=k20201202; t=1767925623;
+	bh=/KCBLBLcf8r3a6KZVBsohReOTxRXrhQzCRY4NGlW7B4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GR2cSOsKGwmd7srtQ/lds2ntI5U2AKLp1yKaICvylFnBKI+JWNA/KbJl73C/cLTfQ
-	 boQfcGhiU7YvDkyAHfoNY9AfawEzkb3m5nVTJaGhp7/D+uuYDzShxupRW7UNOuwOmp
-	 GgWAS8/e3dFSt3iGv3ZHx2CrD17JypVU7/tT8/qfSpk8vX9jnQbxWor9+9uZ+FVzKc
-	 6Txdu8L5sLpoCesdX470Kxzsp1jjIJkMU324z1ZfOAmFAWFFv7jbZAfCEzT1EUFJfW
-	 YMNuITUKE6Bf//AIsD5RoCH6pcU5iG/SpXtXPQEP2L5ZG27fLF5m72dzmTxdnbCMmW
-	 036dA+yUD5i8A==
-Date: Thu, 8 Jan 2026 18:24:48 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	linux-perf-users@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	James Clark <james.clark@linaro.org>,
-	Fangrui Song <maskray@sourceware.org>,
-	Pablo Galindo <pablogsal@gmail.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] perf genelf: BLAKE2s build ID generation
-Message-ID: <20260109022448.GA2790@sol>
-References: <20251209015729.23253-1-ebiggers@kernel.org>
+	b=IWo19iZR88K61uonWjHoiG/CqWm+XACaOk5i/YW6xUWS3iDgl+Wfj/NbhlcZBOs1p
+	 RO2bOuVi3/L8/HueszuU/KPHcEH6BqVRZh9oj+Fn0uLKkl5akavXkDOy/EBhOHVt1G
+	 sqbsxwk/aTJUayCQC8eHwUPT4RkFvn1ldmgOZxC8VH2WBRlqqspcXNEU3lBvyUNbL2
+	 gI2xOkbrGGwrUyBi/TR0fknoE7yYezRGOEXbOsBskSwcR43ZvuDZXbUMjy3nZK3gpU
+	 gnYbiFjA5al3cMVS4MXRC8gCepG5zFT7GxjX47aLYewVVdrLyEWYiOIv38+EZR6NDi
+	 3EExJHzxcmKbw==
+Date: Fri, 9 Jan 2026 07:57:00 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Udit Tiwari <quic_utiwari@quicinc.com>,
+	Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
+	Md Sadre Alam <mdalam@qti.qualcomm.com>,
+	Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v9 03/11] dmaengine: qcom: bam_dma: implement support for
+ BAM locking
+Message-ID: <aWBndOfbtweRr0uS@vaman>
+References: <aUFX14nz8cQj8EIb@vaman>
+ <CAMRc=MetbSuaU9VpK7CTio4kt-1pkwEFecARv7ROWDH_yq63OQ@mail.gmail.com>
+ <aUF2gj_0svpygHmD@vaman>
+ <CAMRc=McO-Fbb=O3VjFk5C14CD6oVA4UmLroN4_ddCVxtfxr03A@mail.gmail.com>
+ <aUpyrIvu_kG7DtQm@vaman>
+ <CAMRc=Md6ucK-TAmtvWMmUGX1KuVE9Wj_z4i7_-Gc7YXP=Omtcw@mail.gmail.com>
+ <aVZh3hb32r1oVcwG@vaman>
+ <CAMRc=MePAVMZPju6rZsyQMir4CkQi+FEqbC++omQtVQC1rHBVg@mail.gmail.com>
+ <aVf5WUe9cAXZHxPJ@vaman>
+ <CAMRc=Mdaucen4=QACDAGMuwTR1L5224S0erfC0fA7yzVzMha_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251209015729.23253-1-ebiggers@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMRc=Mdaucen4=QACDAGMuwTR1L5224S0erfC0fA7yzVzMha_Q@mail.gmail.com>
 
-On Mon, Dec 08, 2025 at 05:57:26PM -0800, Eric Biggers wrote:
-> This series upgrades perf's build ID generation to a more modern hash
-> algorithm and switches to an incremental hashing API.
+On 02-01-26, 18:14, Bartosz Golaszewski wrote:
+> On Fri, Jan 2, 2026 at 5:59 PM Vinod Koul <vkoul@kernel.org> wrote:
+> >
+> > On 02-01-26, 10:26, Bartosz Golaszewski wrote:
+> > > On Thu, Jan 1, 2026 at 1:00 PM Vinod Koul <vkoul@kernel.org> wrote:
+> > > >
+> > > > > >
+> > > > > > > It will perform register I/O with DMA using the BAM locking mechanism
+> > > > > > > for synchronization. Currently linux doesn't use BAM locking and is
+> > > > > > > using CPU for register I/O so trying to access locked registers will
+> > > > > > > result in external abort. I'm trying to make the QCE driver use DMA
+> > > > > > > for register I/O AND use BAM locking. To that end: we need to pass
+> > > > > > > information about wanting the command descriptor to contain the
+> > > > > > > LOCK/UNLOCK flag (this is what we set here in the hardware descriptor)
+> > > > > > > from the QCE driver to the BAM driver. I initially used a global flag.
+> > > > > > > Dmitry said it's too Qualcomm-specific and to use metadata instead.
+> > > > > > > This is what I did in this version.
+> > > > > >
+> > > > > > Okay, how will client figure out should it set the lock or not? What are
+> > > > > > the conditions where the lock is set or not set by client..?
+> > > > > >
+> > > > >
+> > > > > I'm not sure what you refer to as "client". The user of the BAM engine
+> > > > > - the crypto driver? If so - we convert it to always lock/unlock
+> > > > > assuming the TA *may* use it and it's better to be safe. Other users
+> > > > > are not affected.
+> > > >
+> > > > Client are users of dmaengine. So how does the crypto driver figure out
+> > > > when to lock/unlock. Why not do this always...?
+> > > >
+> > >
+> > > It *does* do it always. We assume the TA may be doing it so the crypto
+> > > driver is converted to *always* perform register I/O with DMA *and* to
+> > > always lock the BAM for each transaction later in the series. This is
+> > > why Dmitry inquired whether all the HW with upstream support actually
+> > > supports the lock semantics.
+> >
+> > Okay then why do we need an API?
+> >
+> > Just lock it always and set the bits in the dma driver
+> >
 > 
-> It also fixes an issue where different (code, symtab, strsym) tuples
-> didn't necessarily result in different hashes.
-> 
-> Note that the size of the build ID field stays the same.
-> 
-> This applies to the perf-tools-next branch of
-> https://git.kernel.org/pub/scm/linux/kernel/git/perf/perf-tools-next.git
-> 
-> Changed in v2:
->     - Split into three patches
->     - Improved a couple comments
-> 
-> Eric Biggers (3):
->   perf util: Add BLAKE2s support
->   perf genelf: Switch from SHA-1 to BLAKE2s for build ID generation
->   perf util: Remove SHA-1 code
+> We need an API because we send a locking descriptor, then a regular
+> descriptor (or descriptors) for the actual transaction(s) and then an
+> unlocking descriptor. It's a thing the user of the DMA engine needs to
+> decide on, not the DMA engine itself.
 
-Any plan to apply this series to perf-tools-next?
+I think downstream sends lock descriptor always. What is the harm in
+doing that every time if we go down that path?
+Reg Dmitry question above, this is dma hw capability, how will client
+know if it has to lock on older rev of hardware or not...?
 
-- Eric
+> Also: only the crypto engine needs it for now, not all the other users
+> of the BAM engine.
+
+But they might eventually right?
+
+-- 
+~Vinod
