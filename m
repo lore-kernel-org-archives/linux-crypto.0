@@ -1,97 +1,77 @@
-Received: from relay.hostedemail.com (smtprelay0010.hostedemail.com [216.40.44.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F612EAD10;
-	Fri,  9 Jan 2026 13:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CD135C1BB
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 13:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767964025; cv=none; b=a2ztNGYwBKt0cU34PdFh5YMkA70C4T6/XVaJQjnL5x5PNgS0BSs3CyxTUcRN80hZSrFQXYazzJmgamfv7w8WcwgmB6yv1UYDSESBT1aT6qQvkpg43NOD9TOF8tR8xWhCgylCG/GDXXYTIOLT5wuIwOxOjc8jVryh0/TYR+kqrLA=
+	t=1767965654; cv=none; b=D2IAkPvQQhQPIrnt4bc10q9C6Tnqa7wySjHe5lBZFDuqDvOQMzQiwqP9QeivteXVkHi7iNld9N7FiaU3P1zPWiQ46ixgI9xBZGjoNYaZg9opD8DySUB6utzz92ks0mQdaF87bV6yztBdXZPKhdnOyjfNDjeuse3ZRk/HcDv/aNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767964025; c=relaxed/simple;
-	bh=I5Q9VQte+4cFW14Gz8D4egaODJhcInTga4GejSY4LNE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uUs5nxC8Ontljgziu66/phRF7ShB9N3os14dCcZthpN0A95gCX8a4Eq6+YaC7yVHAf6P4lpiCxwMY07Y28DjaSP+m7/s+LFng+LezdZn0/APNv+W/nsIaW02O1eRY992Kl2DtOlCNvd0neusKlLbg9wnqgV6k5N9n0FZAz+yfnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf13.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay05.hostedemail.com (Postfix) with ESMTP id 32BC75ACA9;
-	Fri,  9 Jan 2026 13:06:58 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf13.hostedemail.com (Postfix) with ESMTPA id A03A520010;
-	Fri,  9 Jan 2026 13:06:44 +0000 (UTC)
-Date: Fri, 9 Jan 2026 08:07:15 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Marco Elver <elver@google.com>, Bart Van Assche <bvanassche@acm.org>,
- Peter Zijlstra <peterz@infradead.org>, Boqun Feng <boqun.feng@gmail.com>,
- Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Luc Van Oostenryck
- <luc.vanoostenryck@gmail.com>, Chris Li <sparse@chrisli.org>, "Paul E.
- McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>,
- Arnd Bergmann <arnd@arndb.de>, Dmitry Vyukov <dvyukov@google.com>, Eric
- Dumazet <edumazet@google.com>, Frederic Weisbecker <frederic@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Herbert Xu
- <herbert@gondor.apana.org.au>, Ian Rogers <irogers@google.com>, Jann Horn
- <jannh@google.com>, Joel Fernandes <joelagnelf@nvidia.com>, Johannes Berg
- <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Josh Triplett
- <josh@joshtriplett.org>, Justin Stitt <justinstitt@google.com>, Kees Cook
- <kees@kernel.org>, Kentaro Takeda <takedakn@nttdata.co.jp>, Lukas Bulwahn
- <lukas.bulwahn@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Mathieu
- Desnoyers <mathieu.desnoyers@efficios.com>, Miguel Ojeda
- <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Neeraj Upadhyay
- <neeraj.upadhyay@kernel.org>, Nick Desaulniers
- <nick.desaulniers+lkml@gmail.com>, Tetsuo Handa
- <penguin-kernel@i-love.sakura.ne.jp>, Thomas Gleixner <tglx@linutronix.de>,
- Thomas Graf <tgraf@suug.ch>, Uladzislau Rezki <urezki@gmail.com>, Waiman
- Long <longman@redhat.com>, kasan-dev@googlegroups.com,
- linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-security-module@vger.kernel.org,
- linux-sparse@vger.kernel.org, linux-wireless@vger.kernel.org,
- llvm@lists.linux.dev, rcu@vger.kernel.org
-Subject: Re: [PATCH v5 10/36] locking/mutex: Support Clang's context
- analysis
-Message-ID: <20260109080715.0a390f6b@gandalf.local.home>
-In-Reply-To: <20260109060249.GA5259@lst.de>
-References: <20251219154418.3592607-1-elver@google.com>
-	<20251219154418.3592607-11-elver@google.com>
-	<57062131-e79e-42c2-aa0b-8f931cb8cac2@acm.org>
-	<aWA9P3_oI7JFTdkC@elver.google.com>
-	<20260109060249.GA5259@lst.de>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1767965654; c=relaxed/simple;
+	bh=qWzvjygcuLwzEIaEHIXEz9SaaWzpXF20ANBBtTSJsrI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CCSfBzwrxoS5kve4cLQkbfiby6/hX/ET/OcbRmbY6nGYEjkDOETQnG7l7Il5ZegDOFFWV5i3iCP4V5gezkBkxyoK0Rd55fJsBdObmqAC9Sy6OTbUVwx0A7A8Lxv6Wv4K9B7DEE1sW2X1iHswaDi56mRgafpwvIKT8+rPdZjfxso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXlvPg28; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXlvPg28"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00C32C19422
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 13:34:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767965654;
+	bh=qWzvjygcuLwzEIaEHIXEz9SaaWzpXF20ANBBtTSJsrI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=pXlvPg28ROYATVopjWOzBg5vR6kEbc/rx+T7qI0QvP2SRipywjvuMEbt9KtaaxSYT
+	 xe41Bh4rKblR4UC3fgonuJIUAP1Scoti7w7lySstIJj1IljhPDfFwqgyMSZ5hkLhkV
+	 hDwAKsaAklZBG6nfOBwnm/d727a3L+w3tVOlc3+2qmrFxxXMG9NSreOu1PRx0ID/T5
+	 Sk06jar9d7TVaM5zvynCh40hUwRb9JggexRF+5nrKi96yMZ7+CqICc69PeGzLkg8zg
+	 xqItjYKcEsy1nJZ42n/xGyGJudNUYjzO3ZEDujQGxtFPI33Kj01chsyagXJ1g1FxNG
+	 AfDuGE1XUDtzQ==
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-640c9c85255so4634272d50.3
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Jan 2026 05:34:13 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU8/3lGZv1axDqludyawoim8ZYBEB4WfXv4k5QLscEeA2dZKznWTfSR6VrTDJ45GTZ5m9Jd4ko8NPYluM4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhUeMix+nru9U3SbD5wUqDAgX4VBFx7aYpGkBGLho3qVvlkcPc
+	eKSRBfMUZQTt7LKV71zT1r3oAISuJkGLzOVMQnt4nV1RskH2Y41FVF/gPozyXsUODsC1zoQjoI0
+	E93vxDImhxgTZS0hBJeM3DaoMypHi60Y=
+X-Google-Smtp-Source: AGHT+IFesI9TgGv8pGaGDvBFA25rqPyYSWQ/7ybS7ei3jmEtj0pUiPwxVn1yVv3/z2opC7z47lsPIXjgx7XM38IPl5Y=
+X-Received: by 2002:a05:690e:118e:b0:640:d31d:6ed4 with SMTP id
+ 956f58d0204a3-64716c67b91mr8452143d50.51.1767965653394; Fri, 09 Jan 2026
+ 05:34:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: xo5wgurkrpym6obtb6d77z4eqezppqwq
-X-Rspamd-Server: rspamout02
-X-Rspamd-Queue-Id: A03A520010
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX1/Yuy/xlEJ4FchBK8FGPRyEzpxFlfJw7cM=
-X-HE-Tag: 1767964004-230449
-X-HE-Meta: U2FsdGVkX1/mK5KxM694kU63Rdn/iZMuRkOJbrkqpBY9gVZfABZTPJnGV+GXEC41f1CraOV8yVb8JwE6ex2vbV4aoxOT3VLKLF5Thmk+n9vBrpyyHnFtGdrkM3exSJJfO3l1oVR97XyrKK8Hkfj/5sdmmAH04zSgJDoYobVhPLcJaqT68Q0XdWN9PbI1sOsFrspcL2fHNGmrmo/p6rwpjlSypMilSM5I5ewwgNFo1hyODxJhs+YqTtFErumcaYRIY1tmmRLhIj0JwjIBTskcyNNIQY/Qv4I7CCtQ3inbL2pdKc5Mrj40SiW4O33CrPwJHtQvEPJd1GEXqrywF3gfPLCE0T+XQaZa
+References: <20251211-dev-dt-warnings-all-v1-0-21b18b9ada77@codeconstruct.com.au>
+ <20251211-dev-dt-warnings-all-v1-2-21b18b9ada77@codeconstruct.com.au>
+In-Reply-To: <20251211-dev-dt-warnings-all-v1-2-21b18b9ada77@codeconstruct.com.au>
+From: Linus Walleij <linusw@kernel.org>
+Date: Fri, 9 Jan 2026 14:34:02 +0100
+X-Gmail-Original-Message-ID: <CAD++jLk=9P3SaPgeuD46O_-D5xTKXiefRKenq2w8HVcv5rUdxw@mail.gmail.com>
+X-Gm-Features: AZwV_QjuVx1piuHcehHbUq1Xzc5Kt25GKCC_RKdVxx8gfqJ7sqje1Z1f8fkkuKU
+Message-ID: <CAD++jLk=9P3SaPgeuD46O_-D5xTKXiefRKenq2w8HVcv5rUdxw@mail.gmail.com>
+Subject: Re: [PATCH RFC 02/16] pinctrl: aspeed: g5: Constrain LPC binding
+ revision workaround to AST2500
+To: Andrew Jeffery <andrew@codeconstruct.com.au>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Joel Stanley <joel@jms.id.au>, linux-hwmon@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
+	openbmc@lists.ozlabs.org, linux-gpio@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-iio@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 9 Jan 2026 07:02:49 +0100
-Christoph Hellwig <hch@lst.de> wrote:
+On Thu, Dec 11, 2025 at 9:46=E2=80=AFAM Andrew Jeffery
+<andrew@codeconstruct.com.au> wrote:
 
-> On Fri, Jan 09, 2026 at 12:26:55AM +0100, Marco Elver wrote:
-> > Probably the most idiomatic option is to just factor out construction.
-> > Clearly separating complex object construction from use also helps
-> > readability regardless, esp. where concurrency is involved. We could
-> > document such advice somewhere.  
-> 
-> Initializing and locking a mutex (or spinlock, or other primitive) is a
-> not too unusual pattern, often used when inserting an object into a
-> hash table or other lookup data structure.  So supporting it without
-> creating pointless wrapper functions would be really useful.  One thing
-> that would be nice to have and probably help here is to have lock
-> initializers that create the lock in a held state.
+> Discovering a phandle to an AST2400 or AST2600 LPC node indicates an
+> error for the purpose of the AST2500 pinctrl driver.
+>
+> Signed-off-by: Andrew Jeffery <andrew@codeconstruct.com.au>
 
-Right. If tooling can't handle a simple pattern of initializing a lock than
-taking it, that's a hard show stopper of adding that tooling.
+Patch applied for Linux 7.0!
 
--- Steve
+Yours,
+Linus Walleij
