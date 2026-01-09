@@ -1,147 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF01D3321B3
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 09:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29FB93590CA
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 09:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767949694; cv=none; b=e2aKRVJKmAQxw+vbSFRIKIebFaLNqdRm6EL17J34uPyVmpqHBNzj6cO4q0ATX2jC+0WB6+rbBw5ynYfNFpD3Y/Kswwk9CeVgfpM0UCo/+k5ZaZohrh1W1NyvuqjrXPWmES5eFvaMg53oBy0+f4nPjqjR2G/OojqRZMqy08/Tats=
+	t=1767950789; cv=none; b=F7CJfkiWQ1grjHDrxdlRS8Xa7yBCoMdrF7iBwVgiJYUimC/KhoMfj6L6IGTVN/qOvzeDUawnyLBHAlCmiJV3v5Vcfc3VL9hseiaiz5rh62lA3IudoiQqsvwlUUVFOiRKFufo5ainWLe4lGBC7XQx9C39jI8zg9xqmFj0zOUGC0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767949694; c=relaxed/simple;
-	bh=goiI1ZxyIEI3mcfeHTSEAz7enxjoJAjvK6SpyVAMJNs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B6gUpQQQVuSIRSC3oLUX/SAp5svfI4c87cxlxmTp2GRnspq394DMd6mj/IPZdrKjX8WARLjM259+ukAaY9iJlvCqqFyd2ErifO1iNB5YqI4msPX9YXYWZmenpV4gCfT9EZV39Puqd29DyQvvisvs40J9awdyhrZkbx7/lYhnX8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WIGhG3sg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767950789; c=relaxed/simple;
+	bh=n/TG8MO6HyiL8J/XwIVaNqLz0iR+l4eo3PBvnTrhxes=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qW4MrMnKJsdriA6nu+mg1b0QIvgNZu5X6OEGQCRif/kJvxDk3zLwC3kRc3bcMtqgjzirGN3hTWK+EcesDaW6iLn82IM+lXUBhWQuzhu34l35lElmEv/96q2l3eWSNfwdgfoXrPwXAc15SvmBpRY6hhi7oUWT1A4YzaXa9yxWunQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=EpsAyHRm; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=IWQfTt9t; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WIGhG3sg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2FCBC2BC86
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Jan 2026 09:08:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767949694;
-	bh=goiI1ZxyIEI3mcfeHTSEAz7enxjoJAjvK6SpyVAMJNs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=WIGhG3sgki+KEoz1vXOR2kR3tB1EB73l3CF5edZGAclsEhVnW+MFWjTMXqfV7GEI6
-	 zQgT4YjabyJ7LWa0lp7M6x6hfaA8DQNCTQN1NNYT+o3fm+w2JaH0NLp6PEIx3bf1q1
-	 TzO5jLn7lUUx5vFHwxyMbeTKV0azO209foiogdr0ZA5CoY0r4o64woui0oxNWJLL20
-	 HYsni/IYgPj253gmaaKlTFuIDAiebwcY1Cx6bE0IzDPaAr+W4Ihox47gg0cM/Npeev
-	 rhL2V31+zMVTkjz233e1ZBCunhubLUJiaYIL2QcP5QJ56aXMlRzVsvhA666bTqMHu8
-	 vvLYrbMRF3uYw==
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-34cf1e31f85so2630448a91.1
-        for <linux-crypto@vger.kernel.org>; Fri, 09 Jan 2026 01:08:14 -0800 (PST)
-X-Gm-Message-State: AOJu0YzTClkkXQjYyuQJWerWgBQErbEHP/ZjdOAHsAqcDs5av1AkgErR
-	QznoVscmpxtADb0u1TyU+YbM9/jrrUhgxfX/RRA6a+eRjsqPkBrq+wMUj14ctDUOSG3vvMihLof
-	zo1nd5ZKFx38ewm5RNU+KhAbY/2yKRZ4=
-X-Google-Smtp-Source: AGHT+IFcD0rfNOJ4GvG+wPYTAWMVc/s2zy/BvRbkZK4bJO5tmt19sPbsMOldrWreI07DtS/l8EUtweFn+GaepdyG9dA=
-X-Received: by 2002:a17:90b:3a8d:b0:34a:adf1:677d with SMTP id
- 98e67ed59e1d1-34f68b64d7cmr8233808a91.9.1767949694052; Fri, 09 Jan 2026
- 01:08:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="EpsAyHRm";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="IWQfTt9t"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6096SO1b3141617
+	for <linux-crypto@vger.kernel.org>; Fri, 9 Jan 2026 09:26:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=GYupHi9hiffcOrLcYrkERu+8
+	TOtiFQWC8OIKZvLgLzU=; b=EpsAyHRml+EeiIqmsgWAs1OxeWytrrAwHkyIGuzN
+	U+Zof37ZEcsxtVOWMxe9ZKs8K7IJ3PrM2u9EB/7DvB+xLXzf0C899TV4+w6nSlc1
+	Iq5ApL4+rMhIfxaaKPA1mkhNtcRWIK2HoZiIBx+DJ1P5316AZ2UH7TumeNXjcSP5
+	LSDyknWvrkNmjR+QP+BGekArlurHYAYOnT8lJi5H3opn1BMhPU4Q6zHrFdLxLtZG
+	xCyVOIopHdgP740bHRyYtm5/yFHZwXup46cDy2OWshKhmc/KGBbBfoKZ0l+DBX1z
+	/4Lo/KkUOCYboSPcpXmFRM8kOMkHOvYxgvcbA3vUUC28KQ==
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bjj8j23rf-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Fri, 09 Jan 2026 09:26:25 +0000 (GMT)
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8c1cffa1f2dso758573385a.1
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Jan 2026 01:26:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1767950785; x=1768555585; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GYupHi9hiffcOrLcYrkERu+8TOtiFQWC8OIKZvLgLzU=;
+        b=IWQfTt9thRjXPzU1wuxnzTKhoBOpga1zlOFQ7BOSYhav6n9Y5OVu1OR3O6VI6WAekj
+         Hlkiu7dWgrpIHF6fygrw9Ch4Dl5pLtR75G9IH+0baowb7fY6wp05fQKANf5ubuiNk2MR
+         sy22V1TJ9X2BP7Q+64SGnFtepVAs0Cpv1q51Z2mgizKq52HRctNdiM51W/3GyjQZaPWI
+         Dk3xe0vFSvv785h27ZrzUJHtnDMd4J0sHUWxba4+pWdD4G2rv/rCUoMWFQtWQwK+vAZg
+         spExXdyjWWqT028IrHrx3BGk89DZVjJx4r2BP1oh/+LR5wSoLQGzgH94L3zflvuvt5PF
+         3s4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767950785; x=1768555585;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GYupHi9hiffcOrLcYrkERu+8TOtiFQWC8OIKZvLgLzU=;
+        b=DCge/iPbttFquCb4QCdmrMshCfLb7W/7Ne/rc4xtES27I0hfdhPd+EJvplSGrbD40H
+         mzI4sIqqgTlvlNRo5jdamZyoahg9QVpcVRC0aS4xWTt+CFHxA4wazP/GBQNbb1uiDC6I
+         ChKi29jhMGM4E2rcayvVvLUsnfQv3mTGw3aVkvHsEUTikq/XKRYG54fC0S0KemxOFtZY
+         IHl+koAEdc2AJ82WBWVytoM2HF3bDtOUD8CNHCpTppMRTtWqMHYbzHbgIiTFBK5PY08V
+         htwxF4Y5EpoiPlP2vQ7obQqEq0j0xa8bcS5GpL0k7igeijAQ8ZghwoN25VHn+VF9kCj3
+         KDMg==
+X-Forwarded-Encrypted: i=1; AJvYcCV5Ga9AI2c62i2URrumvWDbps1okX7Y8xbNZabypSf1NFaumoTAbakCeHWd+xtVqS4TKnlV5jJ4M3/ctiE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9VtBAlIc9xde39RQwmHMpqNw8X+Ls2W5XYDTxePuCB+I9HV/Y
+	K322EHcG86lHEInHMyw0+nDOu20hbRRaK5oFLmWOJa9zUJC2hJPlc7cAvgS9cCDIGAvG0hcLsK0
+	RfhB5Acsu0YBN8XfAPAbRIuleMFYaBYQWSMbbSVvfipOJkRyiCXM3TVTdxhM56kZldOA=
+X-Gm-Gg: AY/fxX7vL4txoX3DFAR9wuBO46T0AiPY4AKhOZRRkJnWz8Mpa7LZDTAZyDUujDbikGR
+	OLh7edqi1XogU+/T4jgxq21/eEyGcq8ZtLjw6FeXg6jUmR/ahwqHgev9bDvEbpuGtskgyUJ14g8
+	8OwJOZmXy5lPMgOel/v6k5J/io5wUNgDSeKEwXQZ6KLlKuiI1ofTxG2JKAOQI72t6hFBMw/86S0
+	1+wGRAkb5maW7MB/dXopYcOynlkxckG2J/TGVAIbw9yUwCEk/AKlWtANJsOa20d9Zi2Sh4gLG3D
+	gKhyK8Dx/MFZfEHGsC1B28hnDUjP/OOTlcSImH5NhiCDfXB8cYv0Nj3Qw50QLGlqe1Hc6HobnaE
+	ws9LSAtwke3U2eI96Sjs6
+X-Received: by 2002:a05:620a:28cd:b0:8b2:ea3f:2fa4 with SMTP id af79cd13be357-8c37f4c2b5bmr1694840585a.6.1767950785248;
+        Fri, 09 Jan 2026 01:26:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGqk8xaUlwvb+pLU9tqMNDnyTuej2+CgVW+rsndOdKz4BuiVC9qsdOjh+vh+cFbcIpNWeJ2+A==
+X-Received: by 2002:a05:620a:28cd:b0:8b2:ea3f:2fa4 with SMTP id af79cd13be357-8c37f4c2b5bmr1694837185a.6.1767950784625;
+        Fri, 09 Jan 2026 01:26:24 -0800 (PST)
+Received: from oss.qualcomm.com ([86.121.7.10])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8719e695sm56927835e9.17.2026.01.09.01.26.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jan 2026 01:26:23 -0800 (PST)
+Date: Fri, 9 Jan 2026 11:26:21 +0200
+From: Abel Vesa <abel.vesa@oss.qualcomm.com>
+To: Luca Weiss <luca.weiss@fairphone.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>, Vinod Koul <vkoul@kernel.org>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-phy@lists.infradead.org
+Subject: Re: [PATCH 4/6] phy: qcom-qmp-ufs: Add Milos support
+Message-ID: <5g7g2l4x4ocpw3hx3pkgdwrboicxnih37zxvvbfdrp5hw7jwai@3ybokrxepo5t>
+References: <20260107-milos-ufs-v1-0-6982ab20d0ac@fairphone.com>
+ <20260107-milos-ufs-v1-4-6982ab20d0ac@fairphone.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260105051311.1607207-1-ebiggers@kernel.org> <CAMj1kXGRTfyXPD3+Ravr7O5ZUMAUeabQw455sW5g7aRy3BU+2Q@mail.gmail.com>
- <20260108202618.GA2687@sol> <20260109012712.GA730896@google.com>
-In-Reply-To: <20260109012712.GA730896@google.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 9 Jan 2026 10:08:02 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGQae+SWEgvZTHvoTJueScbqfei1ie_HSC9WyByOwvJUw@mail.gmail.com>
-X-Gm-Features: AQt7F2ruRWMLxfzcb-WM7H3sakD6ZAGLYL1ZhftKy0m5nypWRiiegTKEJVDmsew
-Message-ID: <CAMj1kXGQae+SWEgvZTHvoTJueScbqfei1ie_HSC9WyByOwvJUw@mail.gmail.com>
-Subject: Re: [PATCH 00/36] AES library improvements
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	sparclinux@vger.kernel.org, x86@kernel.org, 
-	Holger Dengler <dengler@linux.ibm.com>, Harald Freudenberger <freude@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260107-milos-ufs-v1-4-6982ab20d0ac@fairphone.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA5MDA2NSBTYWx0ZWRfX9604MMJnouxc
+ zd/hzmps0zP8l7QsUj4Xdu1PSMayVLCDCdyz3CedusHjKubPThmA1dzzx1dTpHppEEGqu8aAusv
+ bBznSFU7w1dXbSyMdyf7aZeD7zMvFEqMe11E6RWblsH68uwEJjew6FJEa55opGWsRKEZtZu9QvW
+ RFiJeTnEfFQiEGr2svjIu3LxbMcxx19HgUqYuOMGHu5AaV8mW4nD7RAso97upfmVpzB84J+TETA
+ YWy8+hl9vTo8KVNVXDAMG2Xac/omWaZFZF+tkm/bX9OA8K0JpDKfKtlU/dKCKmgKrdbvkkfXs3A
+ 3vmZyNMgESkUiggj7C07+HuJrv4Akj32Tk8wUC0uD8H2CpJRa5h8P2gql5YlNNeiCSp2nD6GbL4
+ FTDZuXm+cvnXXXe4RdIbYZMx9uDJxenSdazdXNOchlOPqgldHmgNb9c98SrsHlzr/uxAaI52nkd
+ wFjhU8f9dSu60tZpbyA==
+X-Authority-Analysis: v=2.4 cv=JIs2csKb c=1 sm=1 tr=0 ts=6960c9c2 cx=c_pps
+ a=HLyN3IcIa5EE8TELMZ618Q==:117 a=hZ5Vz02otkLiOpJ15TJmsQ==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=6H0WHjuAAAAA:8 a=EUspDBNiAAAA:8
+ a=e_63XvbMukAsnnsCD6UA:9 a=CjuIK1q_8ugA:10 a=AYr37p2UDEkA:10
+ a=bTQJ7kPSJx9SKPbeHEYW:22 a=Soq9LBFxuPC4vsCAQt-j:22
+X-Proofpoint-GUID: 51n3G5IVmqz0TGUUkYOM4J3XuRRaSuKN
+X-Proofpoint-ORIG-GUID: 51n3G5IVmqz0TGUUkYOM4J3XuRRaSuKN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-09_02,2026-01-08_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 priorityscore=1501 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 adultscore=0 spamscore=0 clxscore=1015
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2512120000
+ definitions=main-2601090065
 
-On Fri, 9 Jan 2026 at 02:27, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Thu, Jan 08, 2026 at 12:26:18PM -0800, Eric Biggers wrote:
-> > On Thu, Jan 08, 2026 at 12:32:00PM +0100, Ard Biesheuvel wrote:
-> > > On Mon, 5 Jan 2026 at 06:14, Eric Biggers <ebiggers@kernel.org> wrote:
-> > > >
-> > > > This series applies to libcrypto-next.  It can also be retrieved from:
-> > > >
-> > > >     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git aes-lib-v1
-> > > >
-> > > > This series makes three main improvements to the kernel's AES library:
-> > > >
-> > > >   1. Make it use the kernel's existing architecture-optimized AES code,
-> > > >      including AES instructions, when available.  Previously, only the
-> > > >      traditional crypto API gave access to the optimized AES code.
-> > > >      (As a reminder, AES instructions typically make AES over 10 times
-> > > >      as fast as the generic code.  They also make it constant-time.)
-> > > >
-> > > >   2. Support preparing an AES key for only the forward direction of the
-> > > >      block cipher, using about half as much memory.  This is a helpful
-> > > >      optimization for many common AES modes of operation.  It also helps
-> > > >      keep structs small enough to be allocated on the stack, especially
-> > > >      considering potential future library APIs for AES modes.
-> > > >
-> > > >   3. Replace the library's generic AES implementation with a much faster
-> > > >      one that is almost as fast as "aes-generic", while still keeping
-> > > >      the table size reasonably small and maintaining some constant-time
-> > > >      hardening.  This allows removing "aes-generic", unifying the
-> > > >      current two generic AES implementations in the kernel tree.
-> > > >
-> > >
-> > > Architectures that support memory operands will be impacted by
-> > > dropping the pre-rotated lookup tables, especially if they have few
-> > > GPRs.
-> > >
-> > > I suspect that doesn't really matter in practice: if your pre-AESNI
-> > > IA-32 workload has a bottleneck on "aes-generic", you would have
-> > > probably moved it to a different machine by now. But the performance
-> > > delta will likely be noticeable so it is something that deserves a
-> > > mention.
-> >
-> > Sure.  I only claimed that the new implementation is "almost as fast" as
-> > aes-generic, not "as fast".
-> >
-> > By the way, these are the results I get for crypto_cipher_encrypt_one()
-> > and crypto_cipher_decrypt_one() (averaged together) in a loop on an i386
-> > kernel patched to not use AES-NI:
-> >
-> >     aes-fixed-time: 77 MB/s
-> >     aes-generic: 192 MB/s
-> >     aes-lib: 185 MB/s
-> >
-> > I'm not sure how relevant these are, considering that this was collected
-> > on a modern CPU, not one of the (very) old ones that would actually be
-> > running i386 non-AESNI code.  But if they are even vaguely
-> > representative, this suggests the new code does quite well: little
-> > slowdown over aes-generic, while adding some constant-time hardening
-> > (which arguably was an undeserved shortcut to not include before) and
-> > also using a lot less dcache.
-> >
-> > At the same time, there's clearly a large speedup vs. aes-fixed-time.
-> > So this will actually be a significant performance improvement on
-> > systems that were using aes-fixed-time.  Many people may have been doing
-> > that unintentionally, due to it being set to a higher priority than
-> > aes-generic in the crypto_cipher API.
-> >
-> > I'll also note that the state of the art for parallelizable AES modes on
-> > CPUs without AES instructions is bit-slicing with vector registers.  The
-> > kernel has such code for arm and arm64, but not for x86.  If x86 without
-> > AES-NI was actually important, we should be adding that.  But it seems
-> > clear that x86 CPUs have moved on, and hardly anyone cares anymore.  If
-> > for now we can just provide something that's almost as fast as before
-> > (and maybe even a lot faster in some cases!), that seems fine.
->
-> It's also worth emphasizing that there are likely to be systems that
-> support AES instructions but are not using them due to the corresponding
-> kconfig options (e.g. CONFIG_CRYPTO_AES_NI_INTEL) not being set to 'y'.
-> As we know, missing the crypto optimization kconfig options is a common
-> mistake.  This series fixes that for single-block AES.
->
-> So (in addition to the aes-fixed-time case) that's another case that
-> just gets faster, and where the difference between aes-generic and the
-> new generic code isn't actually relevant.
->
+On 26-01-07 09:05:54, Luca Weiss wrote:
+> Add the init sequence tables and config for the UFS QMP phy found in the
+> Milos SoC.
+> 
+> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
 
-Fair enough. Thanks for the elaboration.
+Reviewed-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
