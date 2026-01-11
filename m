@@ -1,185 +1,213 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F32500948;
-	Sat, 10 Jan 2026 21:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C9923EA9B
+	for <linux-crypto@vger.kernel.org>; Sun, 11 Jan 2026 13:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768080849; cv=none; b=FbcLCV+rqB18As/DGWKHKMoZx6+5s/DFd1ZQWjdA6VkGh9NJbwKR1uuI4Tz0T0Zq5ySeTp92DZYtabTM0p5AeZS6tPC6TmVUTDmMFqarPyi+PxcMZwAK4DG3MqF/D79a3rsEOtmtprZbl0MjpElckR+VaRFCWaY1OHUp3EVERjo=
+	t=1768137945; cv=none; b=rb9Hv8V9HlLEoBXHM3UQ0Ub4THoUOAEKflCzKVaE3THLbjT1t4PuWJvuDxxn7EdKkBMu2NSXAvz7AIt3321Ek0FcGo3vas2Xn7w9GDt+d6DvZ+63PC07dPhzRUDdRGmmfc/ZcKYvb1Lwrk2m2UXWzbEJlZ463IryZC8yRTAUxjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768080849; c=relaxed/simple;
-	bh=S2tmH5kwdYN7zYODDAQw5p3/8Qk0RhW6jRtTaQ1iw44=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LvyB+Id5ZJnczxcKP5a63G/ACXiYgnXGQgkqsDUJCK4A3Bv9woreawGlSqvn8Y1m6Pp6Iuo/6YXgYMQf++LwKYaACqEfhKs19UdypwcLcydtrVM0biC01QNhf8r9exPByrvM0l8NQzGduWkkgj1yTpDItzImxJ1ibnizcxAvnsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6lp8EEw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768137945; c=relaxed/simple;
+	bh=8UisnmU3szOPcO94JTzaz43rBan75wc6RjsMUcLfwWg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eKerpgVZrIiQDHljvP2WlzaL+cwE7ERVggUjUKBaPatbJcEFrYLmcHlZoaa1tJqN6j/MSL7xibN4QPh0Z3ADgSrBlrGGr35fDjIcGZyfbPcrlvw8LsFfKAiH0Pu5GEHkMAX36z/icfmaFPDr3N6y5gfceSAvXmBDbk8cs1JyvJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=y8l2u9O3; arc=none smtp.client-ip=212.77.101.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6lp8EEw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1781AC4CEF1;
-	Sat, 10 Jan 2026 21:34:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768080849;
-	bh=S2tmH5kwdYN7zYODDAQw5p3/8Qk0RhW6jRtTaQ1iw44=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=T6lp8EEwuGgBNv42eymwm+arM4meyg61AiKhI7yq7CghRwXJyTCCQqas9NRUl5cbv
-	 ocHpkjTmfIRu8C/NFZwcMusMH3RVBrPheMs/KAy8wboNbYJzljesvWnZjR2/i/qdM5
-	 i8BnfipdA+IzriTA3t/Ia2obQ+AoFaJHO75DQnflawlDxLknk/YtD/am/OY+h57kyX
-	 k29SkeBDgrifFCgbNy5CXz8yYYSrPkD4AwLiJF5AHZcPr+yuPKCktykBSWvf2SpOEP
-	 UkeTI4W65Z4ECsX2RUU61gdhWspEiPzxgAxZFpSnp0ADy88qnZzOVMrcB5P+saHkQz
-	 eUihywtsQNa6w==
-Message-ID: <a8dcc943-3a96-4654-97a3-0adf55f6d4e1@kernel.org>
-Date: Sat, 10 Jan 2026 15:34:05 -0600
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="y8l2u9O3"
+Received: (wp-smtpd smtp.wp.pl 19124 invoked from network); 11 Jan 2026 14:25:33 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1768137933; bh=mVcBbUWl9OtqlXJjNpuS18Ua67+5RsTr5xtOGD1mq1w=;
+          h=From:To:Cc:Subject;
+          b=y8l2u9O3c6IbEbRZDZt7T69WbmriY/m7TWCMYXDoO7C2vn4W80YtIDCMhW98fm4sV
+           aswjrISxCLEr/+ff6PG41JY9tsSL+B9iyBd+oFPw+Di5b0snzWlji59NV+4Tg86rCT
+           jtOhQVZcEjrICZvPs00teDfYepqVPrbLtsLFWUfczLDHXR6I3rmdDqVRUYffcE3SQs
+           CsKw/7uybvMxT8ZHy8Neiip4oHVxOTUncFncd2mLXcabsFqT+ls4SJB4q/LTC8TL+o
+           hAiX1koKYjTZejN7uyH3+JSN5gy8UfF//Z30+yoOER4ht2kY7ltYqSvxF5E7mtZpah
+           yQns+uqwsn2+Q==
+Received: from 83.5.241.112.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.5.241.112])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
+          for <ansuelsmth@gmail.com>; 11 Jan 2026 14:25:33 +0100
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: ansuelsmth@gmail.com,
+	maxim.anisimov.ua@gmail.com,
+	amadeus@jmu.edu.cn,
+	atenart@kernel.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	vschagen@icloud.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
+Subject: [PATCH] crypto: inside-secure/eip93 - unregister only available algorithm
+Date: Sun, 11 Jan 2026 14:20:32 +0100
+Message-ID: <20260111132531.2232417-1-olek2@wp.pl>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/5] crypto: ccp - Send PSP_CMD_TEE_RING_DESTROY when
- PSP_CMD_TEE_RING_INIT fails
-To: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
- "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- "Thomas, Rijo-john" <Rijo-john.Thomas@amd.com>
-Cc: "Allen, John" <John.Allen@amd.com>, "David S . Miller"
- <davem@davemloft.net>, Hans de Goede <hansg@kernel.org>,
- "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER"
- <linux-crypto@vger.kernel.org>,
- "open list:AMD PMF DRIVER" <platform-driver-x86@vger.kernel.org>,
- Lars Francke <lars.francke@gmail.com>, Yijun Shen <Yijun.Shen@dell.com>
-References: <20260106045423.55190-1-superm1@kernel.org>
- <20260106045423.55190-6-superm1@kernel.org>
- <f1cb81b7-5aab-48d0-99ce-5f971f5d2fa7@amd.com>
-Content-Language: en-US
-From: Mario Limonciello <superm1@kernel.org>
-In-Reply-To: <f1cb81b7-5aab-48d0-99ce-5f971f5d2fa7@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-WP-DKIM-Status: good (id: wp.pl)                                                      
+X-WP-MailID: 5e304fd16fd99187a363d4060307d357
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000007 [gRSF]                               
 
+EIP93 has an options register. This register indicates which crypto
+algorithms are implemented in silicon. Supported algorithms are
+registered on this basis. Unregister algorithms on the same basis.
+Currently, all algorithms are unregistered, even those not supported
+by HW. This results in panic on platforms that don't have all options
+implemented in silicon.
 
+Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+---
+v2:
+- keep the keysize assignment in eip93_register_algs
+---
+ .../crypto/inside-secure/eip93/eip93-main.c   | 92 +++++++++++--------
+ 1 file changed, 53 insertions(+), 39 deletions(-)
 
-On 1/7/26 3:04 AM, Shyam Sundar S K wrote:
-> 
-> 
-> On 1/6/2026 10:24, Mario Limonciello (AMD) wrote:
->> The hibernate resume sequence involves loading a resume kernel that is just
->> used for loading the hibernate image before shifting back to the existing
->> kernel.
->>
->> During that hibernate resume sequence the resume kernel may have loaded
->> the ccp driver.  If this happens the resume kernel will also have called
->> PSP_CMD_TEE_RING_INIT but it will never have called
->> PSP_CMD_TEE_RING_DESTROY.
->>
->> This is problematic because the existing kernel needs to re-initialize the
->> ring.  One could argue that the existing kernel should call destroy
->> as part of restore() but there is no guarantee that the resume kernel did
->> or didn't load the ccp driver.  There is also no callback opportunity for
->> the resume kernel to destroy before handing back control to the existing
->> kernel.
->>
->> Similar problems could potentially exist with the use of kdump and
->> crash handling. I actually reproduced this issue like this:
->>
->> 1) rmmod ccp
->> 2) hibernate the system
->> 3) resume the system
->> 4) modprobe ccp
->>
->> The resume kernel will have loaded ccp but never destroyed and then when
->> I try to modprobe it fails.
->>
->> Because of these possible cases add a flow that checks the error code from
->> the PSP_CMD_TEE_RING_INIT call and tries to call PSP_CMD_TEE_RING_DESTROY
->> if it failed.  If this succeeds then call PSP_CMD_TEE_RING_INIT again.
->>
->> Fixes: f892a21f51162 ("crypto: ccp - use generic power management")
->> Reported-by: Lars Francke <lars.francke@gmail.com>
->> Closes: https://lore.kernel.org/platform-driver-x86/CAD-Ua_gfJnQSo8ucS_7ZwzuhoBRJ14zXP7s8b-zX3ZcxcyWePw@mail.gmail.com/
->> Tested-by: Yijun Shen <Yijun.Shen@Dell.com>
->> Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
->> ---
->> v4:
->>   * Add tag (Yijun)
->>   * Move and rename PSP_TEE_STS_RING_BUSY (Ilpo)
->> v3:
->>   * Add a comment (Tom)
->>   * Add a define for busy condition (Shyam)
->>   * Rename label (Shyam)
->>   * Upgrade message to info (Shyam)
->>   * Use a helper that validates result for destroy command (Shyam)
->> ---
->>   drivers/crypto/ccp/tee-dev.c | 12 ++++++++++++
->>   include/linux/psp.h          |  1 +
->>   2 files changed, 13 insertions(+)
->>
->> diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
->> index ef1430f86ad62..ea9b94d5b10ba 100644
->> --- a/drivers/crypto/ccp/tee-dev.c
->> +++ b/drivers/crypto/ccp/tee-dev.c
->> @@ -113,6 +113,7 @@ static int tee_init_ring(struct psp_tee_device *tee)
->>   {
->>   	int ring_size = MAX_RING_BUFFER_ENTRIES * sizeof(struct tee_ring_cmd);
->>   	struct tee_init_ring_cmd *cmd;
->> +	bool retry = false;
->>   	unsigned int reg;
->>   	int ret;
->>   
->> @@ -135,6 +136,7 @@ static int tee_init_ring(struct psp_tee_device *tee)
->>   	/* Send command buffer details to Trusted OS by writing to
->>   	 * CPU-PSP message registers
->>   	 */
->> +retry_init:
->>   	ret = psp_mailbox_command(tee->psp, PSP_CMD_TEE_RING_INIT, cmd,
->>   				  TEE_DEFAULT_CMD_TIMEOUT, &reg);
->>   	if (ret) {
->> @@ -145,6 +147,16 @@ static int tee_init_ring(struct psp_tee_device *tee)
->>   	}
->>   
->>   	if (FIELD_GET(PSP_CMDRESP_STS, reg)) {
->> +		/*
->> +		 * During the hibernate resume sequence driver may have gotten loaded
->> +		 * but the ring not properly destroyed. If the ring doesn't work, try
->> +		 * to destroy and re-init once.
->> +		 */
->> +		if (!retry && FIELD_GET(PSP_CMDRESP_STS, reg) == PSP_TEE_STS_RING_BUSY) {
->> +			dev_info(tee->dev, "tee: ring init command failed with busy status, retrying\n");
->> +			if (tee_send_destroy_cmd(tee))
-> 
-> so it becomes infinite retry? I think we need to set the retry flag to
-> true to indicate that ring busy.
-
-Great catch, thanks.  I'll add the retry=true for this case.
-
-> 
->> +				goto retry_init;
->> +		}
->>   		dev_err(tee->dev, "tee: ring init command failed (%#010lx)\n",
->>   			FIELD_GET(PSP_CMDRESP_STS, reg));
->>   		tee_free_ring(tee);
->> diff --git a/include/linux/psp.h b/include/linux/psp.h
->> index 92e60aeef21e1..b337dcce1e991 100644
->> --- a/include/linux/psp.h
->> +++ b/include/linux/psp.h
->> @@ -18,6 +18,7 @@
->>    * and should include an appropriate local definition in their source file.
->>    */
->>   #define PSP_CMDRESP_STS		GENMASK(15, 0)
->> +#define  PSP_TEE_STS_RING_BUSY 0x0000000d  /* Ring already initialized */
-> 
-> additional spaces between the macro names.
-
-This was actually intended.  I wanted to make it obvious that 
-PSP_TEE_STS_RING_BUSY reflects a value used for PSP_CMDRESP_STS.
-
-> 
-> Thanks,
-> Shyam
-> 
->>   #define PSP_CMDRESP_CMD		GENMASK(23, 16)
->>   #define PSP_CMDRESP_RESERVED	GENMASK(29, 24)
->>   #define PSP_CMDRESP_RECOVERY	BIT(30)
-> 
-> 
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/drivers/crypto/inside-secure/eip93/eip93-main.c
+index 3cdc3308dcac..b7fd9795062d 100644
+--- a/drivers/crypto/inside-secure/eip93/eip93-main.c
++++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
+@@ -77,11 +77,44 @@ inline void eip93_irq_clear(struct eip93_device *eip93, u32 mask)
+ 	__raw_writel(mask, eip93->base + EIP93_REG_INT_CLR);
+ }
+ 
+-static void eip93_unregister_algs(unsigned int i)
++static int eip93_algo_is_supported(u32 alg_flags, u32 supported_algo_flags)
++{
++	if ((IS_DES(alg_flags) || IS_3DES(alg_flags)) &&
++	    !(supported_algo_flags & EIP93_PE_OPTION_TDES))
++		return 0;
++
++	if (IS_AES(alg_flags) &&
++	    !(supported_algo_flags & EIP93_PE_OPTION_AES))
++		return 0;
++
++	if (IS_HASH_MD5(alg_flags) &&
++	    !(supported_algo_flags & EIP93_PE_OPTION_MD5))
++		return 0;
++
++	if (IS_HASH_SHA1(alg_flags) &&
++	    !(supported_algo_flags & EIP93_PE_OPTION_SHA_1))
++		return 0;
++
++	if (IS_HASH_SHA224(alg_flags) &&
++	    !(supported_algo_flags & EIP93_PE_OPTION_SHA_224))
++		return 0;
++
++	if (IS_HASH_SHA256(alg_flags) &&
++	    !(supported_algo_flags & EIP93_PE_OPTION_SHA_256))
++		return 0;
++
++	return 1;
++}
++
++static void eip93_unregister_algs(u32 supported_algo_flags, unsigned int i)
+ {
+ 	unsigned int j;
+ 
+ 	for (j = 0; j < i; j++) {
++		if (!eip93_algo_is_supported(eip93_algs[j]->flags,
++					     supported_algo_flags))
++			continue;
++
+ 		switch (eip93_algs[j]->type) {
+ 		case EIP93_ALG_TYPE_SKCIPHER:
+ 			crypto_unregister_skcipher(&eip93_algs[j]->alg.skcipher);
+@@ -106,49 +139,27 @@ static int eip93_register_algs(struct eip93_device *eip93, u32 supported_algo_fl
+ 
+ 		eip93_algs[i]->eip93 = eip93;
+ 
+-		if ((IS_DES(alg_flags) || IS_3DES(alg_flags)) &&
+-		    !(supported_algo_flags & EIP93_PE_OPTION_TDES))
++		if (!eip93_algo_is_supported(alg_flags, supported_algo_flags))
+ 			continue;
+ 
+-		if (IS_AES(alg_flags)) {
+-			if (!(supported_algo_flags & EIP93_PE_OPTION_AES))
+-				continue;
++		if (IS_AES(alg_flags) && !IS_HMAC(alg_flags)) {
++			if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY128)
++				eip93_algs[i]->alg.skcipher.max_keysize =
++					AES_KEYSIZE_128;
+ 
+-			if (!IS_HMAC(alg_flags)) {
+-				if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY128)
+-					eip93_algs[i]->alg.skcipher.max_keysize =
+-						AES_KEYSIZE_128;
++			if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY192)
++				eip93_algs[i]->alg.skcipher.max_keysize =
++					AES_KEYSIZE_192;
+ 
+-				if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY192)
+-					eip93_algs[i]->alg.skcipher.max_keysize =
+-						AES_KEYSIZE_192;
++			if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY256)
++				eip93_algs[i]->alg.skcipher.max_keysize =
++					AES_KEYSIZE_256;
+ 
+-				if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY256)
+-					eip93_algs[i]->alg.skcipher.max_keysize =
+-						AES_KEYSIZE_256;
+-
+-				if (IS_RFC3686(alg_flags))
+-					eip93_algs[i]->alg.skcipher.max_keysize +=
+-						CTR_RFC3686_NONCE_SIZE;
+-			}
++			if (IS_RFC3686(alg_flags))
++				eip93_algs[i]->alg.skcipher.max_keysize +=
++					CTR_RFC3686_NONCE_SIZE;
+ 		}
+ 
+-		if (IS_HASH_MD5(alg_flags) &&
+-		    !(supported_algo_flags & EIP93_PE_OPTION_MD5))
+-			continue;
+-
+-		if (IS_HASH_SHA1(alg_flags) &&
+-		    !(supported_algo_flags & EIP93_PE_OPTION_SHA_1))
+-			continue;
+-
+-		if (IS_HASH_SHA224(alg_flags) &&
+-		    !(supported_algo_flags & EIP93_PE_OPTION_SHA_224))
+-			continue;
+-
+-		if (IS_HASH_SHA256(alg_flags) &&
+-		    !(supported_algo_flags & EIP93_PE_OPTION_SHA_256))
+-			continue;
+-
+ 		switch (eip93_algs[i]->type) {
+ 		case EIP93_ALG_TYPE_SKCIPHER:
+ 			ret = crypto_register_skcipher(&eip93_algs[i]->alg.skcipher);
+@@ -167,7 +178,7 @@ static int eip93_register_algs(struct eip93_device *eip93, u32 supported_algo_fl
+ 	return 0;
+ 
+ fail:
+-	eip93_unregister_algs(i);
++	eip93_unregister_algs(supported_algo_flags, i);
+ 
+ 	return ret;
+ }
+@@ -469,8 +480,11 @@ static int eip93_crypto_probe(struct platform_device *pdev)
+ static void eip93_crypto_remove(struct platform_device *pdev)
+ {
+ 	struct eip93_device *eip93 = platform_get_drvdata(pdev);
++	u32 algo_flags;
++
++	algo_flags = readl(eip93->base + EIP93_REG_PE_OPTION_1);
+ 
+-	eip93_unregister_algs(ARRAY_SIZE(eip93_algs));
++	eip93_unregister_algs(algo_flags, ARRAY_SIZE(eip93_algs));
+ 	eip93_cleanup(eip93);
+ }
+ 
+-- 
+2.47.3
 
