@@ -1,66 +1,67 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CAA33B6E9
-	for <linux-crypto@vger.kernel.org>; Sun, 11 Jan 2026 14:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B593491D6
+	for <linux-crypto@vger.kernel.org>; Sun, 11 Jan 2026 14:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768142565; cv=none; b=jwrM6WuZgDaWNN5BS/Cu8EyOv1v539WXTOppt2Q3rHv/H9nI9//Wmp7AEaUAy0SKkzusnRSov5SZz162TOWIvLEIUaxSJoFkI+CCFvycmXn5xoFAJ6jXFDl/HCNv5iA0i33OTqaEcR8zlgujIMU0mL8IA9Heg8AXKWW0VS6Iim0=
+	t=1768142636; cv=none; b=Vog38/Mj9HFABLmC5IGkTF6pcUGers/RzZJWNOV0R6M9F+QA5LkkTH7h93qLnKjqQFG/nuHogoAqcMyAtjfMAeLxT355mlOv/ErvK7GwDPK/kcpuv5xP4+7a08FvuquNND72HyPPpNI1chAWVtRbbwPx3HA4gFLVzis+HBAPmts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768142565; c=relaxed/simple;
-	bh=r3/sjCZcn12IuIXnTNYHXq/ljVnoUjX3EA+fjUfOI3Q=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=LEE/IDZFuX69D7yTrmcY7mRpbnvQ4CNpwctwshEGaptjTecjKJS3mOaBXmwZAiPLVEfehjhFwpQ+hMGhz12kqx48Xut1rC7AZmUKhoBunEMNWMVnnwF8I9GNm6NRjikX0mZimlx71uN/445p/9VFwjc/vbTs2UBX3sp/dJGLiYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=l107AcbN; arc=none smtp.client-ip=209.85.208.50
+	s=arc-20240116; t=1768142636; c=relaxed/simple;
+	bh=PnoQRnuiOPkoaR4OWKdkvM54htM4YQiVOhdkWK0qg5Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JbPa9/IGBaM0h3I50EqETvRmq2T1panpWJVdZzRu3FfuKKKah/48ET1rs2dh1U6YwbYuwVsb5fSm/WnA8rE2/AkpScEZXR3w9G3x5IV3LxSl77KUcbFYHw/U21RqMJN8HBpydG3iJ/yd+ZlNvrTj3H4E+xFw4CDRsp6uEnxaZTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=NoTM+k2S; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="l107AcbN"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-64b5ed53d0aso8278625a12.3
-        for <linux-crypto@vger.kernel.org>; Sun, 11 Jan 2026 06:42:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="NoTM+k2S"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b8052725de4so786115266b.0
+        for <linux-crypto@vger.kernel.org>; Sun, 11 Jan 2026 06:43:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1768142562; x=1768747362; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=G/KcOMY2Aiby4Ym2c9/9bLw/G2mVDeqsJ5KVEAaYuIM=;
-        b=l107AcbNznzRzuNtn2TbxkYQlhR6Da9D0PeoZ7sVNzp9wAV5yVHDFfgDXtNcse8JtP
-         1DmmAfeZqqOcYFTSenS6cILajX5b6RgXX6HIhmIY3UZg5aJbo1JdFeC80Cv5hvn3bc/j
-         KKvki4OvEDKaJ9Fj86eywK4bKJI3rT+mJc+W0fyaHWSjZlsmYrrYq/9nELRLzTNYMz8o
-         6P1n1ZpvhhJDtfSLkMqCU6tFwKyfICSvVpovW3EKjYdzLfS1yWeDeZCGMKox7umDzxa/
-         PmGX3iy4E8hkGBE0MJQGizSmXp2IAvi9VaWoFC5Y6NGSSlZKyu7zWYQjhjJS6J8/dfWu
-         Ev4g==
+        d=tuxon.dev; s=google; t=1768142633; x=1768747433; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=J8ivZWfcmepYc5T+3Up0ol6uJ6XFnUAYmd34ka9AIUo=;
+        b=NoTM+k2SO5HylCVHcHNqCec7b7gBIoX2QQd6dHlIYohJij5ffigE1XqVlvs93gRqWu
+         zSIkpxTis8OI66sDUEw9DNOr0vv38lEu0MABsxGfO4mb7PU0O/BAenxo8CfbBvrIUjvJ
+         LRD7tBDt5dQcbYHF3oqbQYYGIp7uzpqccEsipOONv2jXTM+d2xEwUlLYcgjMnPd3UHaG
+         v1LNXlJiyOp211uIT/EXTZAXo6ZwY2pa/ypM6jMTRJzxVWBG9VG0jzGXdKX5J6OsbGrT
+         +1rzoSd6z1syRrs42BwDqXaqn95JEU2D+Qx2+rM7+dRq6TJYCADcu6Rbo1rrtVkRqMN4
+         drtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768142562; x=1768747362;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G/KcOMY2Aiby4Ym2c9/9bLw/G2mVDeqsJ5KVEAaYuIM=;
-        b=OxNQpXim7agKQHmuNTi+LTIs0nhFF3KTsnVf1dKctt1bXI1HkqvCJ8K3ld+FeDNW8P
-         nd58ySniflHf8Uu7MA2YfUWgksiZs2xQAEyS6x2M+KVHwOKoZyPX2+SMb1kKn5y+3Pgq
-         nbr3x08Nphf6y8pS9eWJd+C27X6q/kWJXj25YCIXWLaurtcDk+OhwYy7woDLWFJ+jpzP
-         3HDW/pud1C4nwRvG3RImgv5JobUKclywk0+rqh/mWSKUdaY/MKAP4dunEtKFL2yZWuis
-         zCV/cTWm+QkSMzSqaNqJoIJf5fLZ1DHBwkxNKFNR8TRpfmnnfFkaIw+TZulNW4VgkLXt
-         C84w==
-X-Forwarded-Encrypted: i=1; AJvYcCX/KdSvbKAx96LldF1D2LQCeKjwyhF1e7c4hCnlFBC5nS/o/5VnI+4tYDkWZ8v5jkro1DqF3DamBaoKU2I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyN3FG0ydEBMpU2KYifaF6uvtlKUzBfeE7PnYN15MoQRxnN6mUK
-	72DH5xnTRwmKA3RA34i74sy8hDHmKSTDE5ElIyn/FBIF/9vsmDyvfsd60Tol53SVuKk=
-X-Gm-Gg: AY/fxX4xBn3EH8XkIRjgk3d04T9qxgoA58NU36ov/8DWy76aX1xucpKnPxeEMpEHYY0
-	GiT3US9nvzsKnzQ1ooiq7WQxdHzWplie4eMOAUShZvHR/Am2NmVjfD0vcqZ7Wd3auFI1ObEiGLM
-	Xt22L2w8nYhHlU8940gWK7SVyNLy/5nc7MlNoSFFetZIHju3SzcfMLXxxCV/dDQIDsT9Z4omNnD
-	vZec2Hjj0SIAOzvuPXjwAk4Y48FMP7tR/HvlAmXuKCdg9kVXTM0PiX0Bl/qqBIU+WxfVkSOzv1f
-	V2PursoC0EEbG1mIxCUPXPTX2KhobU+bWtAVSF/d0hjuxPXJuRsMolvSyABGQn8ovO6xy44JNpW
-	UC6TvmIzEAzutGUk4E927DtqX+baLzGytwWznDdgS4QtmcfbMyrBRDQvRPwXPkZa24w/Y7nlcev
-	Ok8E/Di/8Zxc+MtQLIa8/iG5U=
-X-Google-Smtp-Source: AGHT+IE39UCsqaKXvD3F+fxNGt3UWpgz3o9+Q+iDczrztF9S6FJS6cHaS0zXDwLhDt1npYxNq43EAw==
-X-Received: by 2002:a05:6402:26d1:b0:64b:5f4e:9e6d with SMTP id 4fb4d7f45d1cf-65097e50c56mr13973823a12.18.1768142561550;
-        Sun, 11 Jan 2026 06:42:41 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768142633; x=1768747433;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J8ivZWfcmepYc5T+3Up0ol6uJ6XFnUAYmd34ka9AIUo=;
+        b=LkGOAvyY+5ruZpsNVpQKUrEaKyRL8cFU/KkIcex2o7pnj1I8IHSXqt0sMhf5OQ6Vck
+         2nVPMN288tMCLIa0HRURWXwVdnrE4hWN+lx8wd3q2wuJZy7M7KeEH2oszAAgwwdVzeTd
+         tP62nreLQaIu2vrnMcRZh5ShNjBncItHdUT4M0o+Gx05ukQwt8CZBvpD9LIXFPcs9Exu
+         FL/jhtc/mUULUVZRH/65UJVGlWbWGJ5tnoljo6i1lQ/1ZmmVx/nc6TOwCZorgo0qxgbm
+         BxWk0gVGmNV42Jg4BEocBFezkHXoXbGJqpMCvKGfKywjAZRhBXa4ppQr+OtytzVwT7jr
+         9ZFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUsBeATemfv949rkdGVFtuFQETTykbMVyFQbGJ60tKyEBpBtqPNkALAPq3GgRKZUiFhBMJ5HheN3VIUIpw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9Pu2k6i5hvRDeZpclPF/FDtDx+F64mywv24MGA1oTuNUEj7Od
+	j0yH9PvR7L0Ry1TrjBbXBAaMVdjVZuW82hLyChO8YmZeYVGY7o/+Hej+edijBB0Ur4c=
+X-Gm-Gg: AY/fxX4YAaVyJfJ5cF9yNuRYClh1QVZmg2u66S7Tc6noIEqgEA6QQduClrTlLg5c+53
+	2WzWqN/2WQXkbPC5mTe/mpQ9w+QC3xlD04Bpd1EeajNFGnPvUPYsohccdHxGe0KE8jg4OvsnXs7
+	KbS5k2PEsOGtXz+1REyruXVBF8PlYChbRkUctCBh5r9HRnC1nHzgze/SrS0631NfF2dtNhwHIFJ
+	1DGxQNPEYXcXAS3RGbbn4f816+FQURYKLTTpE9/sLSKVspxcfIUheJJDNzrUsP8GnqoriLjpmId
+	td8ls5sFQ7wCNQzTyBX9L2aMh9ba+CKqigY+YB1BUQK9gLH0N7YPQE/AYUm4aqHF+OamFclgUfW
+	IvAULh/1BmzEppUrgxD5jUV6JbDHiSsZOz3CGqSk+QDu8sKHmPzfieTsrSonjMftNkZ4y7VoYmb
+	Xhu+vQXMsBna9/KD8c3avZh8g=
+X-Google-Smtp-Source: AGHT+IEIDu7YG5XG/nu65TCe1ZGy2PfVFAGljLAgOLVEydIa/k97PZQn/n1VHfMaw/abNX/NIg40nQ==
+X-Received: by 2002:a17:907:980e:b0:b72:5d9c:b47b with SMTP id a640c23a62f3a-b8444f6f7dcmr1568524366b.36.1768142632630;
+        Sun, 11 Jan 2026 06:43:52 -0800 (PST)
 Received: from [10.216.106.246] ([213.233.110.57])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507be642f5sm14853659a12.20.2026.01.11.06.42.37
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b86ebfd007fsm491365166b.31.2026.01.11.06.43.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 11 Jan 2026 06:42:41 -0800 (PST)
-Message-ID: <858ca139-61c5-45e3-a2c9-d0af414e3592@tuxon.dev>
-Date: Sun, 11 Jan 2026 16:42:36 +0200
+        Sun, 11 Jan 2026 06:43:52 -0800 (PST)
+Message-ID: <d97c48eb-ebbe-4742-a4f6-220d4515a65f@tuxon.dev>
+Date: Sun, 11 Jan 2026 16:43:47 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,8 +69,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-Subject: Re: [PATCH v4 15/15] arm64: dts: microchip: add EV23X71A board
+Subject: Re: [PATCH v4 02/15] dt-bindings: mfd: atmel,sama5d2-flexcom: add
+ microchip,lan9691-flexcom
 To: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org,
  krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com,
  alexandre.belloni@bootlin.com, herbert@gondor.apana.org.au,
@@ -85,149 +86,21 @@ To: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org,
  linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
  linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
  linux-serial@vger.kernel.org, linux-usb@vger.kernel.org
-Cc: luka.perkov@sartura.hr
+Cc: luka.perkov@sartura.hr, Conor Dooley <conor.dooley@microchip.com>
 References: <20251229184004.571837-1-robert.marko@sartura.hr>
- <20251229184004.571837-16-robert.marko@sartura.hr>
+ <20251229184004.571837-3-robert.marko@sartura.hr>
 Content-Language: en-US
-In-Reply-To: <20251229184004.571837-16-robert.marko@sartura.hr>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <20251229184004.571837-3-robert.marko@sartura.hr>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi, Robert,
+
 
 On 12/29/25 20:37, Robert Marko wrote:
-> Microchip EV23X71A is an LAN9696 based evaluation board.
+> Add binding documentation for Microchip LAN969x.
 > 
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> ---
-> Changes in v2:
-> * Split from SoC DTSI commit
-> * Apply DTS coding style
-> * Enclose array in i2c-mux
-> * Alphanumericaly sort nodes
-> * Change management port mode to RGMII-ID
-> 
->   arch/arm64/boot/dts/microchip/Makefile        |   1 +
->   .../boot/dts/microchip/lan9696-ev23x71a.dts   | 757 ++++++++++++++++++
->   2 files changed, 758 insertions(+)
->   create mode 100644 arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
-> 
-> diff --git a/arch/arm64/boot/dts/microchip/Makefile b/arch/arm64/boot/dts/microchip/Makefile
-> index c6e0313eea0f..09d16fc1ce9a 100644
-> --- a/arch/arm64/boot/dts/microchip/Makefile
-> +++ b/arch/arm64/boot/dts/microchip/Makefile
-> @@ -1,4 +1,5 @@
->   # SPDX-License-Identifier: GPL-2.0
-> +dtb-$(CONFIG_ARCH_LAN969X) += lan9696-ev23x71a.dtb
->   dtb-$(CONFIG_ARCH_SPARX5) += sparx5_pcb125.dtb
->   dtb-$(CONFIG_ARCH_SPARX5) += sparx5_pcb134.dtb sparx5_pcb134_emmc.dtb
->   dtb-$(CONFIG_ARCH_SPARX5) += sparx5_pcb135.dtb sparx5_pcb135_emmc.dtb
-> diff --git a/arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts b/arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
-> new file mode 100644
-> index 000000000000..435df455b078
-> --- /dev/null
-> +++ b/arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
+> Signed-off-by: Robert Marko<robert.marko@sartura.hr>
+> Acked-by: Conor Dooley<conor.dooley@microchip.com>
 
-[ ...]
-
-> +&gpio {
-> +	emmc_sd_pins: emmc-sd-pins {
-> +		/* eMMC_SD - CMD, CLK, D0, D1, D2, D3, D4, D5, D6, D7, RSTN */
-> +		pins = "GPIO_14", "GPIO_15", "GPIO_16", "GPIO_17",
-> +		       "GPIO_18", "GPIO_19", "GPIO_20", "GPIO_21",
-> +		       "GPIO_22", "GPIO_23", "GPIO_24";
-> +		function = "emmc_sd";
-> +	};
-> +
-> +	fan_pins: fan-pins {
-> +		pins = "GPIO_25", "GPIO_26";
-> +		function = "fan";
-> +	};
-> +
-> +	fc0_pins: fc0-pins {
-> +		pins = "GPIO_3", "GPIO_4";
-> +		function = "fc";
-> +	};
-> +
-> +	fc2_pins: fc2-pins {
-> +		pins = "GPIO_64", "GPIO_65", "GPIO_66";
-> +		function = "fc";
-> +	};
-> +
-> +	fc3_pins: fc3-pins {
-> +		pins = "GPIO_55", "GPIO_56";
-> +		function = "fc";
-> +	};
-> +
-> +	mdio_pins: mdio-pins {
-> +		pins = "GPIO_9", "GPIO_10";
-> +		function = "miim";
-> +	};
-> +
-> +	mdio_irq_pins: mdio-irq-pins {
-> +		pins = "GPIO_11";
-> +		function = "miim_irq";
-> +	};
-> +
-> +	sgpio_pins: sgpio-pins {
-> +		/* SCK, D0, D1, LD */
-> +		pins = "GPIO_5", "GPIO_6", "GPIO_7", "GPIO_8";
-> +		function = "sgpio_a";
-> +	};
-> +
-> +	usb_ulpi_pins: usb-ulpi-pins {
-> +		pins = "GPIO_30", "GPIO_31", "GPIO_32", "GPIO_33",
-> +		       "GPIO_34", "GPIO_35", "GPIO_36", "GPIO_37",
-> +		       "GPIO_38", "GPIO_39", "GPIO_40", "GPIO_41";
-> +		function = "usb_ulpi";
-> +	};
-> +
-> +	usb_rst_pins: usb-rst-pins {
-> +		pins = "GPIO_12";
-> +		function = "usb2phy_rst";
-> +	};
-> +
-> +	usb_over_pins: usb-over-pins {
-> +		pins = "GPIO_13";
-> +		function = "usb_over_detect";
-> +	};
-> +
-> +	usb_power_pins: usb-power-pins {
-> +		pins = "GPIO_1";
-> +		function = "usb_power";
-> +	};
-> +
-> +	ptp_out_pins: ptp-out-pins {
-> +		pins = "GPIO_58";
-> +		function = "ptpsync_4";
-> +	};
-
-Could you please move this one upper to have all the entries in the gpio 
-container alphanumerically sorted?
-
-> +
-> +	ptp_ext_pins: ptp-ext-pins {
-> +		pins = "GPIO_59";
-> +		function = "ptpsync_5";
-> +	};
-
-Same here.
-
-[ ...]
-
-> +		port29: port@29 {
-> +			reg = <29>;
-> +			phys = <&serdes 11>;
-> +			phy-handle = <&phy3>;
-> +			phy-mode = "rgmii-id";
-> +			microchip,bandwidth = <1000>;
-
-There are some questions around this node from Andrew in v1 of this series, 
-which I don't see an answer for in any of the following versions. Could you 
-please clarify?
-
-The rest looks good to me.
-
-Thank you,
-Claudiu
-
+Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
