@@ -1,141 +1,87 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3E435CB8D
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 13:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A822D4B68;
+	Mon, 12 Jan 2026 14:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768226007; cv=none; b=Mlq9Pq1wi+BZZwZsKOjY5cbNCT5lvESZwnXLBlYOwFdI6hDHMA1xvuAZGv2DRwcV+qwjbi6WLaKGE+NXQTsIjZdE8z44sBj1aJ1aG4qGjv1m8Q31eveT81/gclqjZm9NpsKPHztFd98KtXi6WxqoZ2Ngl1wWvkYEydaNa99FeAU=
+	t=1768229764; cv=none; b=Eas/WVgt0TrzTW/P3v31rV07JhX1A64VSs06sgZdxflUHKs+ZGy2MIKhp2jRzhrxRmao5jnViWfXTCLxZqOrNpkIFwiVZmomg5tbwjK5qeeEJvtw6JcQx7CEfi4GW6nNbketEZNmqPy6tI826cTyCKlEftLnl5k1BG/G+WB+OXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768226007; c=relaxed/simple;
-	bh=OvJq0jh8QNECDzCdo07ofUb3WVtkm5nfjpkgnAeKfPk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=FdoKOIBNMw4++/V2KX7gGhchs+EHARvSj0107TrOJUq79hOaMTRCnV+ppA5/Xn6Adzsmba8fJYVsxtvh8BRdvUpZzpRIGdt00/dBnButCxzwScwOuBncwLnrIVI7KXHEcCKE80cz0oGHHPhF4rHhuviSV4S7twJRoF0iMPPXvZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=dRoqTw0z; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+	s=arc-20240116; t=1768229764; c=relaxed/simple;
+	bh=tCoHB+9VbDLSgUJNKgtCaz1rSx1hAZupwzWxkTySq3w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L9RbyS0EL3qxf9fM0cGBQpWH/7g5q0xjlhc94OIQTNxsTOfvi9s76jJBWyEpdn4wVBOcRc+uV4vfv/bPuLPGlV8FOdy3eiZQS2XCzGl6r1A4M537x5h5BqcAfE4siq6BCYUxg+98jb9G4sGLPN5lBa3QL7Df4mj2oee0qlPzRx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=mfM7M73s; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="dRoqTw0z"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b87018f11e3so232457966b.0
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 05:53:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1768226002; x=1768830802; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=USTvaULg0xk0mT5ybZ9XYBzZEDvEHEKzPaHv4h0K7kk=;
-        b=dRoqTw0ztLkVkgFFGVnBOflPk1qssX4ytvO04TY2+LnL5i7zJm08UiKadDtIH6vcoE
-         sMKGzvl5KKHpo5TOyTna0JUCLhj5LqXfe0MeIlI/atwtq+ZnABF4C1TMj19hBZYiCu+X
-         sJsH39yfudNFg8MuaI+4m3WRBbcERciXnM5cqYQ+Mg+DLBMYWZudg8BMUoInCEjC/D7R
-         wEc8bnIQ6r8/+TUT+xiSF6W8YOaZSpvwOK1k0StcnoeUS7113AWYbYKB1fIFH5dGZdt2
-         laD8nBzNO0imvZajzQNoRmX6L54W7ysbOkuizybii8ul1cNi65+URUT8FI6c4CSFolt+
-         gZqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768226002; x=1768830802;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=USTvaULg0xk0mT5ybZ9XYBzZEDvEHEKzPaHv4h0K7kk=;
-        b=P0IBWWWd9NbjM7U2OGbBOZskTQH+8qZlcHVy8LZfrmXUUYFIRYM5sxRyvsYHlLOVf5
-         QmInJUvD73QAK+coNDdMLhpb2dK3p/sGrR4jnFwfy8Qo6d7+Hso0sosgk+UoBLEmSTFz
-         DvOorOsp+DwKxJuGMC+Q+I139pQ3UF35dfVA3xeZYj1t5qtiwAcFveqzCgiSQsRJd0Gc
-         6tNtpQLSzKUyUrHBogN0kF4CTl2qVGQRAz6+oAPXhoDuTR8m/aRSdzqgPr2KuA7VHtoT
-         VmwHSvVnmK+tAyaphzVO6ZIr75kPFOija/xaJWz+ykhhHfWO/trzv9lN2wdtFh6mxuq1
-         AzPw==
-X-Forwarded-Encrypted: i=1; AJvYcCU4t60xU/o1P7CqBC9nU4DfAnE9n0xrU73mLeLpQ5Hia+nGKvS0ysrCBqjxXNJEDb0K8hRZER89dOuSHn8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzcb+WXmPtI8Smn8fKHhTs7kt5UengOSbFuQs3IAlKy9P3hEHkH
-	OSUraKNQenggN1WE5FVX9aiZLeP8QKkkE2fY8nx8VMTMJoSJZMfOBmLfNAAcHWIHfQA=
-X-Gm-Gg: AY/fxX5tDalWaUE3myht/BPrwQnPlKT/BsK0wpICktdd6RDCValsjQwDwNiypFqaInW
-	YPgD5z0U00Vxe3KRzkuubwkz3vf3+F1DgX/9BcvGeC6MVp4HN1M35WId3L4FSdmW0u4/jUjlUxc
-	/AbOnlEeMx0An5r9mlMXGxQLCCngVbZI4P1nSf37KErTmH8tbSLxXxgCGNpcIaK0iXz1Y8J53jl
-	T2ZiDmmG5+Tkg4KBc1MYaeuRBiWj3LdycdQCdwqHRcV2pDCvaqUeJeUsc/5EpUgMOGZsd5Cmnbd
-	GR3q7o3BhItQ/eFKLiq/+6tWOxGrL3ijqCcKexy6A0oidJs/GQgaIEhRoGyb9q8HAWcwOUgjrhs
-	IqABoxh1+HC8w/bZKSDbjeCx6Ovz3j7/h4ZIYyw51KrxOnz5EbcNeHRtCfh0h+iagJF5w5Ft7cd
-	kmV/Wth5HHcEZLNFJfKLOStAkJYhk1jQ648eVgSesg1mJwZ+bZm2xpTA2/eVRIwFjg
-X-Google-Smtp-Source: AGHT+IERD9EpUubMa1qZHm1+gsFCHsZnNFyO5sx0pGx/fBWFcfFup5iRk+rNWU7XlYPQpnodXuWztw==
-X-Received: by 2002:a17:907:9558:b0:b86:f271:10bb with SMTP id a640c23a62f3a-b86f27111bamr560121466b.24.1768226001819;
-        Mon, 12 Jan 2026 05:53:21 -0800 (PST)
-Received: from [172.16.240.99] (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8731f071e4sm25700466b.66.2026.01.12.05.53.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 05:53:21 -0800 (PST)
-From: Luca Weiss <luca.weiss@fairphone.com>
-Date: Mon, 12 Jan 2026 14:53:19 +0100
-Subject: [PATCH v2 6/6] arm64: dts: qcom: milos-fairphone-fp6: Enable UFS
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="mfM7M73s"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1768229761;
+	bh=tCoHB+9VbDLSgUJNKgtCaz1rSx1hAZupwzWxkTySq3w=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mfM7M73s6rzWwjFv4SPWhwSA7Cq3+Wfcd+DcGC3yyHIZWvo1mKOmxGucpe9M/K1+8
+	 Qcnu6Q6uALbI6wIB1GP1gHNvmwB2ljpv6BCPlbI54ZvyRKTHns1608Eht4cVCnrTzB
+	 3osoub6Ljl8+HR6nCVNZGZrNwUOEA+LaMiXscdnxMkiirmefM7iy6jp6pFyFnUAqxZ
+	 eVXw5YErKOQ4GUI7uxlg4iidRNSiiG5Vssa6V/LxMG9wM58deyv0MHdOeFA7NcXseX
+	 1SgvgTzgUF+C7IvzcG1weTRzr3yapMGHFkgb+6DwL+KC3/yCB9KhC5ySeYuYRtlbEb
+	 SfJi6L0BoXfog==
+Received: from IcarusMOD.eternityproject.eu (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9791317E0333;
+	Mon, 12 Jan 2026 15:56:00 +0100 (CET)
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+To: krzk+dt@kernel.org
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	robh@kernel.org,
+	conor+dt@kernel.org,
+	andrew@lunn.ch,
+	gregory.clement@bootlin.com,
+	sebastian.hesselbarth@gmail.com,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	atenart@kernel.org,
+	linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	kernel@collabora.com
+Subject: [PATCH v2 0/4] Fixes for EIP97/EIP197 binding and devicetrees
+Date: Mon, 12 Jan 2026 15:55:54 +0100
+Message-ID: <20260112145558.54644-1-angelogioacchino.delregno@collabora.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260112-milos-ufs-v2-6-d3ce4f61f030@fairphone.com>
-References: <20260112-milos-ufs-v2-0-d3ce4f61f030@fairphone.com>
-In-Reply-To: <20260112-milos-ufs-v2-0-d3ce4f61f030@fairphone.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
- Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>, 
- Bart Van Assche <bvanassche@acm.org>, Vinod Koul <vkoul@kernel.org>, 
- Neil Armstrong <neil.armstrong@linaro.org>, 
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-scsi@vger.kernel.org, linux-phy@lists.infradead.org, 
- Luca Weiss <luca.weiss@fairphone.com>, 
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1768225995; l=1099;
- i=luca.weiss@fairphone.com; s=20250611; h=from:subject:message-id;
- bh=OvJq0jh8QNECDzCdo07ofUb3WVtkm5nfjpkgnAeKfPk=;
- b=h/ju29PagtFfLFrekGbhm7LODk9tgPEQl/Ctp4NfxS8Qk+oz/YilSiZT3fMKpfbZpJ1DfRfuu
- TVU2gzKQrxxA4UPFmjkDU2pdcL4AWg42PCx6hrSqUY/YFTTkQ4ybOPp
-X-Developer-Key: i=luca.weiss@fairphone.com; a=ed25519;
- pk=O1aw+AAust5lEmgrNJ1Bs7PTY0fEsJm+mdkjExA69q8=
+Content-Transfer-Encoding: 8bit
 
-Configure and enable the nodes for UFS, so that we can access the
-internal storage.
+Changes in v2:
+ - Reorder commits
+ - Change to restrict interrupts/interrupt-names minItems to MediaTek only
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
----
- arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+This series adds SoC compatibles to the EIP97/EIP197 binding, and also
+fixes all of the devicetrees to actually declare those in their nodes.
 
-diff --git a/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts b/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts
-index 3a7f2f2b3a59..7629ceddde2a 100644
---- a/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts
-+++ b/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts
-@@ -819,6 +819,24 @@ &uart5 {
- 	status = "okay";
- };
- 
-+&ufs_mem_hc {
-+	reset-gpios = <&tlmm 167 GPIO_ACTIVE_LOW>;
-+
-+	vcc-supply = <&vreg_l12b>;
-+	vcc-max-microamp = <800000>;
-+	vccq-supply = <&vreg_l5f>;
-+	vccq-max-microamp = <750000>;
-+
-+	status = "okay";
-+};
-+
-+&ufs_mem_phy {
-+	vdda-phy-supply = <&vreg_l2b>;
-+	vdda-pll-supply = <&vreg_l4b>;
-+
-+	status = "okay";
-+};
-+
- &usb_1 {
- 	dr_mode = "otg";
- 
+The only platforms using this binding are Marvell and MediaTek.
+
+AngeloGioacchino Del Regno (4):
+  dt-bindings: crypto: inside-secure,safexcel: Add SoC compatibles
+  dt-bindings: crypto: inside-secure,safexcel: Mandate only ring IRQs
+  arm64: dts: marvell: Add SoC specific compatibles to SafeXcel crypto
+  arm64: dts: mediatek: mt7986a: Change compatible for SafeXcel crypto
+
+ .../crypto/inside-secure,safexcel.yaml        | 22 +++++++++++++++++++
+ arch/arm64/boot/dts/marvell/armada-37xx.dtsi  |  3 ++-
+ arch/arm64/boot/dts/marvell/armada-cp11x.dtsi |  3 ++-
+ arch/arm64/boot/dts/mediatek/mt7986a.dtsi     |  2 +-
+ 4 files changed, 27 insertions(+), 3 deletions(-)
 
 -- 
 2.52.0
