@@ -1,63 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B04339878;
-	Mon, 12 Jan 2026 19:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9067632
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 19:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768246916; cv=none; b=dO4R9tui+B49zVGWyWeBV4MTluzdDJNYYgs5yi0LqGfF1EGITMUFYXfVsB88A52tozhDp4b4TyMSUZLOL2Lnch1LIg1ErE785r3Je/TdzQP4RMCArDasQGj1DVEgHZkFC/vxXFcMj/gRckppKWjMGYDROs8DHanW8cpsa/GCfQA=
+	t=1768247027; cv=none; b=TJG71znaWFU/1XwSUNUQfD346ngSbCfeIpmlikVX0fgpKSv7Be3KU9ccTATOUXFYmtkroWhYJTgWfHW+9S+pKdKfenKW+HACeuco9FgJgSaZZR07e4B3FyRSdwZSZHNr225ykFMp7O3sZknx+L4Z6itxj8Xb2twvT9An/x8T/IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768246916; c=relaxed/simple;
-	bh=jXXnRFAkcb4K1vgRE51siMG7Rs8YLTeospsnKLwFyJM=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=L3XUFFoVyMB04lOu9AWm4Z1CRf+FyQkMtzxNfjoYhmWaWo5xchxlntu/hSYB5K8W4il4eS5E2vgtwcgTYpjRFe8sn6Gx8CkAome9dUUSJ4/dAt72J12+wFFDpG/LUVPqugNd+tgnqY0EfV4bUaIkr2oR76xaSdHcvA3qcRYVj/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BdrjP8rr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768247027; c=relaxed/simple;
+	bh=MAxVjP6c4Om6u8vsm6jVY6NUCkgy7e4h2yG64mnXs5A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WqSqpyOF7CyMZ+GW8LJL9Ls8HlZHFwWitmAmEhsGLD/gVwhUkq6i8QZ9WHfjpqn7BHv86G3sRxg0VahR+GVvDtQj4cI9CmSzI2c5exyUPpDH73Rxkoenv+7xnEuP8nD+W9tI1yHbicnXwX5QAgbCRlqbatek0nsV/J4s1wzv/Aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eVyLx8NQ; arc=none smtp.client-ip=74.125.82.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BdrjP8rr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47AFEC16AAE;
-	Mon, 12 Jan 2026 19:41:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768246916;
-	bh=jXXnRFAkcb4K1vgRE51siMG7Rs8YLTeospsnKLwFyJM=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=BdrjP8rrronFFwrKjzneh79Ws3mUmPQCtfGdQx/mlZ5z1TL+f00usxKwD1Jv93Lgk
-	 T1xBC5qqOr1uwjQRTj7S0mXLM6IvhPJoxrBFO40gi0SHPh3JpjMgdXNBe0/oHEThZj
-	 8FXJhBm3aKjadc6Va8LRWO8uafTrKwZr9T9w7FNkEKz0v2AL75AW90Mszh02B8PvXr
-	 3rSxgSX0epzfcCwmlhTrPNhkUKHsEjzwPpla81OQi8hG/EXpLxbx92zde6Q9eESBmy
-	 MyJuCVloSqM20a0Hbt+AjYOKYv3QUvu1fC7ViRX4OwuIOB8py+/GHgmzDBoWnHhDQt
-	 bjQ5oAzWlmWpg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78ADA380CFC3;
-	Mon, 12 Jan 2026 19:38:31 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto library fixes for v6.19-rc5
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20260111193909.GA4348@quark>
-References: <20260111193909.GA4348@quark>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20260111193909.GA4348@quark>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
-X-PR-Tracked-Commit-Id: 74d74bb78aeccc9edc10db216d6be121cf7ec176
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 7143203341dccbca809ba0a8e72239ea4652ace6
-Message-Id: <176824671012.1091852.7378273717811695975.pr-tracker-bot@kernel.org>
-Date: Mon, 12 Jan 2026 19:38:30 +0000
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, Jie Zhan <zhanjie9@hisilicon.com>, Qingfang Deng <dqfext@gmail.com>, Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVyLx8NQ"
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-11f42e97229so10475970c88.0
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 11:43:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768247026; x=1768851826; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MAxVjP6c4Om6u8vsm6jVY6NUCkgy7e4h2yG64mnXs5A=;
+        b=eVyLx8NQsDXwFxULbC6lIB8aRSFZssJy4HqpWRrlKnX3I6McmdO1XXMQR0zlHqDBbz
+         6KsDmNBBsWAAzmWAdG+UGE+X9CriTVZafVKTzhrXf1pRlRMFMzYBR0j3d8pltOZvcjeG
+         ENNWb0dL+yTqrUBfkqve+Tpdx5oQPL99zANdQNfGlzFqixXIj6qEg51N/eOiUizQqj7X
+         J444QhQaCyym2EwyapBFq2yE3iwjpJdJDEV8eEuraHMNfQEymFNdbCIqqXct5wpHq6kJ
+         2qGDcX74iNoRdjaODIYkoenmmtfxdVjIe7sN07dRNL522Qrg2ENdXA44DMKuySOZvRoU
+         F+Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768247026; x=1768851826;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=MAxVjP6c4Om6u8vsm6jVY6NUCkgy7e4h2yG64mnXs5A=;
+        b=WDAmiSfPkhGNWsQIp3vkJkAGqP+mUfjkDVm3GfHAvevDU0hHoVC8OKaSbz9xgH7Bnk
+         rGpVPioqT2mC3NmvyB2nUtI8/+9nNCORV96xc6vEmxdVqHQ2goSgQugHEjrI2uIaCQyx
+         jyAUDx6O016L3oBnV9uy3o/TxB5cxb7/jj4sjbrL4StE0Vn9ZPYLAMumvFYUrSELZ17u
+         C0xv3TmMZbNGIHj1nkrcENZf+tEzhCg7Tb4uK8PIBHksvmAXmwk0lH8+cAMIfsqlRpoU
+         8Q8eNhqT+Z2UyhPc4cyatHfrhSq+hDWNToh9GJriY/qXjn315Q2D0KjrbFIKQnv90Qhi
+         iflg==
+X-Forwarded-Encrypted: i=1; AJvYcCWxzVSmFovH7Mmm+w5oTq5hIbwetkKznxPNJaLpA99sDDh7ct3y5N3YphIbHPoAHq7nRLX57hHm/M16CW0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdPncQrQiGEoSqvkrcHhaTY5whBYLDE4fMwWm/XoPpVkam7fEq
+	vnv0fFr7V42zXxlRpgTrDnoyrBXgRhiKqT8VSKPcwEeh/ZyfU75mGLmfP75G2o/i5urKTg3agjH
+	UrfTI+78JClXaPh15dAL+3zw/sUOAunE=
+X-Gm-Gg: AY/fxX74FfuTHZ4o4pEzfCwM2iokItOAfTjswjE7qaZU++soCwUO2W6DHxprn26J/IF
+	9kJv3ZLCs2gARuzjmSmNKv70NK+d9J9aFw5K/g9sUjZ2D28qU1xsLTLcqRRfKJnK0vCKb4YhAOP
+	NobakXhcw/F+KlvICTf5OQHLWqnKZvTm6ebWotuVWzyQ48g8uz9zZ7aLN7Zi3Knv0YjN0QsCgD3
+	Sy58PVVc+kXZeo2BWu96yUU7IFTY0TU2NXUi/Cqyw7UQd2Yye16j9d1W1KgwZ88IFt2sKMv
+X-Google-Smtp-Source: AGHT+IFh5tn+kU9IHfrTDs0YlDSC03bvGBEomnygmpEiizRJP6bN5S//rn0KLdIYBN2zkqKUpA3Hh5rzgVkX84e+Dw4=
+X-Received: by 2002:a05:7022:220d:b0:11b:ca88:c4f9 with SMTP id
+ a92af1059eb24-121f8ab9c96mr18145001c88.2.1768247025780; Mon, 12 Jan 2026
+ 11:43:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20260112192827.25989-1-ethan.w.s.graham@gmail.com>
+In-Reply-To: <20260112192827.25989-1-ethan.w.s.graham@gmail.com>
+From: Ethan Graham <ethan.w.s.graham@gmail.com>
+Date: Mon, 12 Jan 2026 20:43:34 +0100
+X-Gm-Features: AZwV_QjnGtbKh0drXweXXMzt0JXRbTQf5yAyudSCZCAyLdJxE_GC_2wiEvkNplw
+Message-ID: <CANgxf6xKrawktF4wPQOs08q5Ob9N_Ff7-=f_hRiZ9yKq4LN0oA@mail.gmail.com>
+Subject: Re: [PATCH v4 0/6] KFuzzTest: a new kernel fuzzing framework
+To: ethan.w.s.graham@gmail.com, glider@google.com
+Cc: akpm@linux-foundation.org, andreyknvl@gmail.com, andy@kernel.org, 
+	andy.shevchenko@gmail.com, brauner@kernel.org, brendan.higgins@linux.dev, 
+	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com, 
+	dvyukov@google.com, ebiggers@kernel.org, elver@google.com, 
+	gregkh@linuxfoundation.org, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
+	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
+	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, lukas@wunner.de, mcgrof@kernel.org, rmoar@google.com, 
+	shuah@kernel.org, sj@kernel.org, skhan@linuxfoundation.org, 
+	tarasmadan@google.com, wentaoz5@illinois.edu, raemoar63@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Sun, 11 Jan 2026 11:39:09 -0800:
+On Mon, Jan 12, 2026 at 8:28=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gmai=
+l.com> wrote:
+>
+> This patch series introduces KFuzzTest, a lightweight framework for
+> creating in-kernel fuzz targets for internal kernel functions.
+>
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/7143203341dccbca809ba0a8e72239ea4652ace6
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Adding Rae Moar to the thread (rmoar@google.com bounced).
