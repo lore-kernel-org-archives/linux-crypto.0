@@ -1,148 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C481C330B0E;
-	Mon, 12 Jan 2026 07:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC9133A9F7
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 07:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768203184; cv=none; b=E7aT6cMxjgyISOJ1aZgIbT3vozN2nvBeYs6Y6arS8vqhHUk9u9diYUoC1uwuNzTP/zGCGoAsO4Da4ru3IBF/R8Au72bK/FHE6SK7Vcafhcy3DXpM9JP5iCU85oBz19f5XgKw/S8TKaY2kvPL71BYEw7k7ehEg57rBB75TM/HcYs=
+	t=1768204598; cv=none; b=VEvZmB7q/ZNTK0sr185yiOmJg1QcOqRUpVs6K/1hErRyaeJ3DIEIlmWeNvAEfEXjZjNYwcA12/H53EZ3yDRbOpQqUxikzsqMdOvP/0SIv9W/9mI19VVb1cvUp+s06SkPgsSnZSOHJxB5PaaX9rYOUcMYS+5wjwZaEVAz4AsS6dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768203184; c=relaxed/simple;
-	bh=KdRXhfGl56K1YQnkAzeYiX2UFWqFdyLMMf/xAfsazgs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gOfbOiOW4S8JH0Q93ClCgw3ujtpUjptiG9G1BWJSKo4UtnzcB/IWFv3jwk9DDtfv/9gMY3ZgQ3ARtgtMqi6MAuuwBazKxjSSFn0gRK+mVMY2q8rgmwO0mHY+vqGV/uZqUwbjKZ5hnJgZKtZpTHhOKh6lHlklDpn3OdCB80X5WME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYTEdSE5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768204598; c=relaxed/simple;
+	bh=Gf3lltzd84X9dIvu2pA3a5Jkaw8Zcskzh0E99P0ou0M=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=RApxzfrPqOjRPmDOhIsTKNxsz/Eyy/VN5gEl5P0Cbf8nnHwxuyYKZ9hTldJzF+c8/2Wnul0LuD3Ih+WcQvr0fP5Xi9Nbfxw/d3wEU4IfKbnWPZ7pL9thHQAQCfnyv7lWRRCHRlHyIax1GAR+JcM9seE5yjjyR8MOOcasSbVgw14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=Vc4pdsMm; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYTEdSE5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 488DBC116D0;
-	Mon, 12 Jan 2026 07:33:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768203184;
-	bh=KdRXhfGl56K1YQnkAzeYiX2UFWqFdyLMMf/xAfsazgs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TYTEdSE5ONs10N1xaPrLoOvFhlajmZC79SjRE83TF7XfFJULFahdt0TuhRjcfaXO+
-	 HpZHPUNqMueI5PPPYmTBezPxDhEKBC+5QpOqWz1GndAFtPwUG61jMWHR568SNtPn3I
-	 TPuMcCVFlklcHwxykFQsAYaBil2g5ivBrZcQGD34OPCS/m8NrBFnXDm3SpSjKZAcWW
-	 dCZxagfOgWdeOoP0mUfbuiyBROVs2ixnjVYecK/7lSZWNBnI/nGrv1M7KDnczx0dF1
-	 20IpcW4Nf/lDZvoVkRh57gHFU3C+i7j4Ti6lpL/57yB1ml9uz6/lyf497/pkYvuTjW
-	 xCfBPr4Tg3N4w==
-Message-ID: <e5d1d9ce-0268-4b1b-9ce9-2b871926acbf@kernel.org>
-Date: Mon, 12 Jan 2026 08:32:58 +0100
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="Vc4pdsMm"
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-650854c473fso591118a12.1
+        for <linux-crypto@vger.kernel.org>; Sun, 11 Jan 2026 23:56:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fairphone.com; s=fair; t=1768204593; x=1768809393; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Gf3lltzd84X9dIvu2pA3a5Jkaw8Zcskzh0E99P0ou0M=;
+        b=Vc4pdsMmRyBsv3KmX3r5ZIySQolJAgqRaFfxfs5i+FqGpZqoIAWuL9cVnXzOk6RvYP
+         qyqldHPIqJPgztVszC4cxUnKrunSQY6yPRdDNjyXsvHgZXc6px2Kf9xoqhhFynkdahY3
+         s6AJuqC/TUmo/6wJBsZtvdxbsTt6PPaC4KBItv/ZB/bJa1Bg/K9hBCt++OAZZi3ANnEB
+         1zL/eTE9oelWCQYNNLW9oRUvft97VDRdF0HfQQrPCJDuqg0YlCH0wO1X0vY4N5jdpZxf
+         DGt8NYxDcmPeNNzyuflmO1d6dubmrRjQcIaWzQdzdp08ze7hDU6DarWRTkaqkuFo1WkE
+         A47w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768204593; x=1768809393;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Gf3lltzd84X9dIvu2pA3a5Jkaw8Zcskzh0E99P0ou0M=;
+        b=olVj2rjiDY0N4yXpUzgvI+j/EXgSeTpKGvJW94BC54SXa3DuujxZJ1b7d7W0WcBrvo
+         aOGr51ecEqT3MMXz+C1gSi5BKVxb4sB0BUv7fMzkUnFnL44DSKXlzwxKtdZIqRZ//qHF
+         qflbnmYX0jeySoWvu79UjbYji5Mt4xx7xWV++mTr1LCeA0dVdEWfN6TwCJjJGDsQDcTV
+         VzOeXRFMlkCnsmKkkzhw38a1eGW8MA33BGgGDOvRbfbsiwZBbMsKmNFJ27qFApkUVwv9
+         rU4x2n8n5zWB59qSniPin38nuQanHd8bO9e824ZpOj7drJi8YQ2lxoGjQJEt7k4PfncE
+         Tr4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWgntOu2kz8g2zCvv1MMrL5EWj1mP3Rt1P2vzwUMVSvjpbMvNzKAo2fZrf1P2lFsIllQstkJ5Sg/hHhCbs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjRNRSj6Njshjtq9Kjsk2Qoll9ugE9cZjR5IKHX56p9vRW4aJ8
+	Dd0i99UAKdGhcxNofOQQr4MbecnJi/S3YIl8uN3mx9tZsmtDQtRhBCKu+uP2ta0dcvM=
+X-Gm-Gg: AY/fxX4kmiCQl41gyzmpr8K1mMQfL56JKF7SgOTHWSZTLHZqLrm3EMUCuG3/abUdqEn
+	zHO2hRrWdecz6eyIiCJRDIC1wZf62K9ocJRQcPmlZHJG/cEIzwecDVqkDks4VppP88Nfha/afVR
+	B016VqMNxWx90XB/7ff4X1fjK2vwsRQMD50AkzEFUlXpHxHVI5eXeapYEC4qTDqY9vpnQitsOkP
+	ViCL02kksB2gQjS15ZQpNdULmurp9FJrlibNLZN//l6CLXCupSVBjNxE2/WmpygJD/7ut2VR8fI
+	HlaTxDXas+0VSZMqbX7V0HGWhd4BBqAjL14Dkk9MHm0TI4hysMrEPC4T810RvQCHkvUlR+UvI7Z
+	/DRmYvUj/4n6N15NhbouE/Jv4zZFoqkCzzpqdh7NKjdamBTLTBdPfhODZ7W3hnh2ezi0LrPlGC1
+	aFO38xB8Ddux+6mkcXasoAbWh0Qaq+py/Yfzw6JJH2Xc6SneAAKyvwrBWJ
+X-Google-Smtp-Source: AGHT+IF4Co8aoQPdp/p5ff/3fLI8tNtSvixQwidRJsMSeJbryeMgmiZxjL+AqiLpgmcJiIOYnaXZoQ==
+X-Received: by 2002:a05:6402:34d1:b0:636:2699:3812 with SMTP id 4fb4d7f45d1cf-650977df5e8mr17217698a12.0.1768204592725;
+        Sun, 11 Jan 2026 23:56:32 -0800 (PST)
+Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507b9d4c0asm17138294a12.9.2026.01.11.23.56.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 11 Jan 2026 23:56:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/3] dt-bindings: crypto: eip93: add clock gate and
- reset line
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: benjamin.larsson@genexis.eu, chester.a.unal@arinc9.com,
- davem@davemloft.net, angelogioacchino.delregno@collabora.com,
- ansuelsmth@gmail.com, conor+dt@kernel.org, herbert@gondor.apana.org.au,
- krzk+dt@kernel.org, matthias.bgg@gmail.com, robh@kernel.org,
- sergio.paracuellos@gmail.com, tsbogend@alpha.franken.de,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-mips@vger.kernel.org
-References: <20260102155341.3682013-1-olek2@wp.pl>
- <20260103-sweet-micro-manul-12eaee@quoll>
- <d7ab5be3-8502-407c-baf6-714ac3a89cb7@wp.pl>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <d7ab5be3-8502-407c-baf6-714ac3a89cb7@wp.pl>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Mon, 12 Jan 2026 08:56:31 +0100
+Message-Id: <DFMG7RK9BACS.1LM96XH56V2VL@fairphone.com>
+Cc: "Herbert Xu" <herbert@gondor.apana.org.au>, "David S. Miller"
+ <davem@davemloft.net>, "Rob Herring" <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Bjorn Andersson" <andersson@kernel.org>, "Alim Akhtar"
+ <alim.akhtar@samsung.com>, "Avri Altman" <avri.altman@wdc.com>, "Bart Van
+ Assche" <bvanassche@acm.org>, "Vinod Koul" <vkoul@kernel.org>, "Neil
+ Armstrong" <neil.armstrong@linaro.org>, "Konrad Dybcio"
+ <konradybcio@kernel.org>, <phone-devel@vger.kernel.org>,
+ <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-scsi@vger.kernel.org>, <linux-phy@lists.infradead.org>
+Subject: Re: [PATCH 5/6] arm64: dts: qcom: milos: Add UFS nodes
+From: "Luca Weiss" <luca.weiss@fairphone.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>, "Luca Weiss"
+ <luca.weiss@fairphone.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260107-milos-ufs-v1-0-6982ab20d0ac@fairphone.com>
+ <20260107-milos-ufs-v1-5-6982ab20d0ac@fairphone.com>
+ <yq1a4yj5ysp.fsf@ca-mkp.ca.oracle.com>
+In-Reply-To: <yq1a4yj5ysp.fsf@ca-mkp.ca.oracle.com>
 
-On 11/01/2026 14:36, Aleksander Jan Bajkowski wrote:
-> Hi Krzysztof,
-> 
-> On 1/3/26 15:11, Krzysztof Kozlowski wrote:
->> On Fri, Jan 02, 2026 at 04:47:33PM +0100, Aleksander Jan Bajkowski wrote:
->>> Add the clock gate and reset line, both of which are available
->>> on the Airoha AN7581.
->>>
->>> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
->>> ---
->>> v3:
->>> - introduce patch
->>> ---
->>>   .../crypto/inside-secure,safexcel-eip93.yaml       | 14 ++++++++++++++
->>>   1 file changed, 14 insertions(+)
->>>
->>> diff --git a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
->>> index 997bf9717f9e..c6c99c08dc68 100644
->>> --- a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
->>> +++ b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
->>> @@ -48,20 +48,34 @@ properties:
->>>     interrupts:
->>>       maxItems: 1
->>>   
->>> +  clocks:
->>> +    maxItems: 1
->>> +
->>> +  resets:
->>> +    maxItems: 1
->>> +
->>>   required:
->>>     - compatible
->>>     - reg
->>>     - interrupts
->>> +  - clocks
->>> +  - resets
->> That's ABI break without explanation in the commit msg.
->>
-> I think that the reset line and clock gate are available on all SoCs
-> with this IP Core. Should the reset line and clock gate only be
+Hi Martin,
 
-Not related. I did not say that hardware has or has not. I speak about
-ABI, so the interface.
+On Mon Jan 12, 2026 at 3:52 AM CET, Martin K. Petersen wrote:
+>
+> Hi Luca!
+>
+>> Add the nodes for the UFS PHY and UFS host controller, along with the
+>> ICE used for UFS.
+>
+> arch/arm64/boot/dts/qcom/milos.dtsi isn't present in v6.19-rc1 so I am
+> unable to apply this.
 
-> required for newly added SoCs, and remain optional for existing ones?
+This patch is based on linux-next where milos.dtsi exists, but any arm64
+qcom dts is for Bjorn to pick up, so please ignore this patch.
 
-Best regards,
-Krzysztof
+Regards
+Luca
