@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3777D322B88;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5B63242CC;
 	Mon, 12 Jan 2026 19:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768245800; cv=none; b=Mney7UdsEV9Oed51WXC7dacspkim0yleTXur1F721pJ+8sFS+hZJ7cc6yUWc4rwaIL4bVMZ7MGUTMDGmQ+4Fnz6/ZeE0PgmKNA9LAVp6ftthxSY+yv2AzPWHp+Dgk2b2d0xm88wrbrdwblRNveX4kFEwdoP/YK2qR02L1AMv9E0=
+	t=1768245800; cv=none; b=i7HOQ8vhsv8pv2umq/kTSp13jCwTzB9aD4MYVS0wl9Dv2MSA5ieD0vEA034ojx34DLNe7Lngz7d2Yq7q7MD6meFDkA1rFlHMVhINLL7n7NXbNroqPZ4jCJ/4bYvRGs78vopDdIHzMQJM6iTdjQRTGQUH9w05QM4/ueoGoxs/Gm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1768245800; c=relaxed/simple;
-	bh=2M8Gb/YRtberadtTzhIXpTjnvGh0/0hqHwkqCXSjCBo=;
+	bh=gKPegVOdOTFBLkcvg5JmDNGwdQNryqhr4ZKUObZBWW0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PGXz78fPSbw5mkWeD4j5aVDGXe9HKDLqqgsb/GGGms3zjKfiiI8PJzL9Tj+oaRcrCUzLfEg4MhujfW6XZmPpYB2jmAunbquyuGzme+3+xkpi/+r+akiT5fibOfUhrtk/Sspn7W2eyvMGtlq2lr14P4Jbomtzq9Be+78f8d3dp0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PeWo/wwn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=QlZfw+R1sub96e5uJ1QhP+Oh6HVjUt13jveWYKWtCgFJFXwmpoxpRR1dpqFpSEbQltlR4+aYlAWJArJuK4B/o5r8UIZzJmTL3krwuqXt0S+Xm5bt5kqlCDdcKq24W9aLbVBY13ltzmA6f8Dmg0K104IkZQiroJCKdfB7WBnTuX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GNPns4AU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PeWo/wwn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E1A5C19425;
-	Mon, 12 Jan 2026 19:23:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GNPns4AU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E026C16AAE;
+	Mon, 12 Jan 2026 19:23:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1768245800;
-	bh=2M8Gb/YRtberadtTzhIXpTjnvGh0/0hqHwkqCXSjCBo=;
+	bh=gKPegVOdOTFBLkcvg5JmDNGwdQNryqhr4ZKUObZBWW0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PeWo/wwnv7GJEhSx1Rr6KXtyzCKz82DrZzBSGOzoyh9p4L5PDGU+fcJJAszf9aOvC
-	 3nQ1ZzuD+/BhBCf3I+xz0Ga4TD6uXEJPz4pgcGUfHRNMN773cTSbwpo42TUOQTgpLQ
-	 p8/MShjCL6T2gM8EL3Q8azFme2TsUyDO4bZGXnEQgI3xm/Z69jIGxg4THjBVqgTQgn
-	 nFFvA/3thNtyEHoSxe2YGfG024AqgG+7kvBldYZurP6i60JW4o+nM7NA9zh9EcitJW
-	 eStkXyo61YXmHmBT7eoGdyDpRaxFgDXyv5lqvfT0EMmxoAqngYIrbCTHZOTCG9bumH
-	 nX/6iHZThwKEw==
+	b=GNPns4AUB6IFYkxnPq0QTR0KPVOq3rh9saC/xeXyfAgv9l7GY6JKe+/ai5CwNlIPR
+	 iGV6sf7GOMCBBOYUb6H3OemOH4f0g6N9AG2nXiw8MnO+tA3tugcAtvxQqKnV3wluci
+	 CNlzp0Ma1shaRGZYoPxW2/PCGl2HlkvDHX5GMsHR2vVw459z2L4rOsXmc2FKKbdEhI
+	 +ewZn43Ewtf0TB04PGOvVXvALgW7sfw7QjVuX3tpNLWP5O3XRs1n6498AkFf8vKHKm
+	 UGJ/3SARiNeXl8ArBO42WR5Nd43Lsq6qn6Kov12nIGPBMpG3+ccumgdWyzNVCVnU7I
+	 PAhpO3zmzFy3w==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Holger Dengler <dengler@linux.ibm.com>,
 	Harald Freudenberger <freude@linux.ibm.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 04/35] crypto: arm/aes - Switch to aes_enc_tab[] and aes_dec_tab[]
-Date: Mon, 12 Jan 2026 11:20:02 -0800
-Message-ID: <20260112192035.10427-5-ebiggers@kernel.org>
+Subject: [PATCH v2 05/35] crypto: arm64/aes - Switch to aes_enc_tab[] and aes_dec_tab[]
+Date: Mon, 12 Jan 2026 11:20:03 -0800
+Message-ID: <20260112192035.10427-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260112192035.10427-1-ebiggers@kernel.org>
 References: <20260112192035.10427-1-ebiggers@kernel.org>
@@ -64,28 +64,28 @@ eventually be removed.
 Acked-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/arm/crypto/aes-cipher-core.S | 4 ++--
+ arch/arm64/crypto/aes-cipher-core.S | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
-index 1da3f41359aa..87567d6822ba 100644
---- a/arch/arm/crypto/aes-cipher-core.S
-+++ b/arch/arm/crypto/aes-cipher-core.S
-@@ -190,12 +190,12 @@
- 	.align		3
- 	.ltorg
+diff --git a/arch/arm64/crypto/aes-cipher-core.S b/arch/arm64/crypto/aes-cipher-core.S
+index c9d6955f8404..651f701c56a8 100644
+--- a/arch/arm64/crypto/aes-cipher-core.S
++++ b/arch/arm64/crypto/aes-cipher-core.S
+@@ -121,12 +121,12 @@ CPU_BE(	rev		w7, w7		)
+ 	stp		w6, w7, [out, #8]
+ 	ret
  	.endm
  
- ENTRY(__aes_arm_encrypt)
--	do_crypt	fround, crypto_ft_tab,, 2
-+	do_crypt	fround, aes_enc_tab,, 2
- ENDPROC(__aes_arm_encrypt)
+ SYM_FUNC_START(__aes_arm64_encrypt)
+-	do_crypt	fround, crypto_ft_tab, crypto_ft_tab + 1, 2
++	do_crypt	fround, aes_enc_tab, aes_enc_tab + 1, 2
+ SYM_FUNC_END(__aes_arm64_encrypt)
  
  	.align		5
- ENTRY(__aes_arm_decrypt)
+ SYM_FUNC_START(__aes_arm64_decrypt)
 -	do_crypt	iround, crypto_it_tab, crypto_aes_inv_sbox, 0
 +	do_crypt	iround, aes_dec_tab, crypto_aes_inv_sbox, 0
- ENDPROC(__aes_arm_decrypt)
+ SYM_FUNC_END(__aes_arm64_decrypt)
 -- 
 2.52.0
 
