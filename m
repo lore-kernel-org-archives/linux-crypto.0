@@ -1,91 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8E1311C33;
-	Mon, 12 Jan 2026 19:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B04339878;
+	Mon, 12 Jan 2026 19:41:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768246769; cv=none; b=EexXb8PT+857TPNsTgZbQ/FefPj3rDbTewiRSTzG/oc26UFBJ2XifWxQmjfzBPEXoNGv9Ca3sk98wftTirJCYE6NwEOZP8u0JWyQ3J3EimMxUcM0TvKJqHUz2PfLigI364VdF3CFl9D9cCPTcAO9FuIlUUD9SWHHNrxAaYJEMek=
+	t=1768246916; cv=none; b=dO4R9tui+B49zVGWyWeBV4MTluzdDJNYYgs5yi0LqGfF1EGITMUFYXfVsB88A52tozhDp4b4TyMSUZLOL2Lnch1LIg1ErE785r3Je/TdzQP4RMCArDasQGj1DVEgHZkFC/vxXFcMj/gRckppKWjMGYDROs8DHanW8cpsa/GCfQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768246769; c=relaxed/simple;
-	bh=LURN05d3CU/QZ1spSz5FkUTEj3L7mOXS6iR5PRWHVqY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V6RJ/+qUGeXzX0WJqG0MYsVJ5hu0paVdjZAIynKzlIlt19P6GjWI5tVZQcpcen4wlrSzaVuGTnn0JeLUPepV6UMl/yU95HKkylCx4+WO1LeffafjMT1INguHLo9nIyPa99iaqPAmFhYd9Z+IAO7tO7X5ToEXwv4hICXvrBhRfyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mFWTTgxX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768246916; c=relaxed/simple;
+	bh=jXXnRFAkcb4K1vgRE51siMG7Rs8YLTeospsnKLwFyJM=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=L3XUFFoVyMB04lOu9AWm4Z1CRf+FyQkMtzxNfjoYhmWaWo5xchxlntu/hSYB5K8W4il4eS5E2vgtwcgTYpjRFe8sn6Gx8CkAome9dUUSJ4/dAt72J12+wFFDpG/LUVPqugNd+tgnqY0EfV4bUaIkr2oR76xaSdHcvA3qcRYVj/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BdrjP8rr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mFWTTgxX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95302C116D0;
-	Mon, 12 Jan 2026 19:39:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BdrjP8rr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47AFEC16AAE;
+	Mon, 12 Jan 2026 19:41:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768246768;
-	bh=LURN05d3CU/QZ1spSz5FkUTEj3L7mOXS6iR5PRWHVqY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mFWTTgxXkotZ0ofJBiqS9DXmNvTtyl0BeMYinX7moA67NgrridSjzZbnGlBxWPdyE
-	 uSDZEOxvYm1eZRbWVg1f2Np2vPLq7nYsOMo/dAqF+Ds8ESMKz7BriQRSH1in7oSjPN
-	 zKNFc523lkucWU0u+RvReEJBDhM+3DTBuopWzGhRnfeKmShnLGlAiT/WFHWvo96OiA
-	 b0lgRuDJnFT8AFhNxcDqeqnpUSpwJ32ZqR0AarD0GCVKFoSAQ59kZaiVaqrh20ZzmL
-	 wSlnSkhMdf0qyqw6aM1vixZIDGYaT9C6sjI/i4LCYjtibD148IxieB7Liy1e7AIM+j
-	 RqeO9eD9MTHEA==
-Date: Mon, 12 Jan 2026 11:39:02 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: syzbot <syzbot+703d8a2cd20971854b06@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in adiantum_crypt
-Message-ID: <20260112193902.GB1952@sol>
-References: <692f9906.a70a0220.d98e3.01ae.GAE@google.com>
+	s=k20201202; t=1768246916;
+	bh=jXXnRFAkcb4K1vgRE51siMG7Rs8YLTeospsnKLwFyJM=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=BdrjP8rrronFFwrKjzneh79Ws3mUmPQCtfGdQx/mlZ5z1TL+f00usxKwD1Jv93Lgk
+	 T1xBC5qqOr1uwjQRTj7S0mXLM6IvhPJoxrBFO40gi0SHPh3JpjMgdXNBe0/oHEThZj
+	 8FXJhBm3aKjadc6Va8LRWO8uafTrKwZr9T9w7FNkEKz0v2AL75AW90Mszh02B8PvXr
+	 3rSxgSX0epzfcCwmlhTrPNhkUKHsEjzwPpla81OQi8hG/EXpLxbx92zde6Q9eESBmy
+	 MyJuCVloSqM20a0Hbt+AjYOKYv3QUvu1fC7ViRX4OwuIOB8py+/GHgmzDBoWnHhDQt
+	 bjQ5oAzWlmWpg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78ADA380CFC3;
+	Mon, 12 Jan 2026 19:38:31 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto library fixes for v6.19-rc5
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20260111193909.GA4348@quark>
+References: <20260111193909.GA4348@quark>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20260111193909.GA4348@quark>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
+X-PR-Tracked-Commit-Id: 74d74bb78aeccc9edc10db216d6be121cf7ec176
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 7143203341dccbca809ba0a8e72239ea4652ace6
+Message-Id: <176824671012.1091852.7378273717811695975.pr-tracker-bot@kernel.org>
+Date: Mon, 12 Jan 2026 19:38:30 +0000
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, Jie Zhan <zhanjie9@hisilicon.com>, Qingfang Deng <dqfext@gmail.com>, Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <692f9906.a70a0220.d98e3.01ae.GAE@google.com>
 
-On Tue, Dec 02, 2025 at 05:57:26PM -0800, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    6cf62f0174de Merge tag 'char-misc-6.18-rc8' of git://git.k..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1727df42580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=61a9bf3cc5d17a01
-> dashboard link: https://syzkaller.appspot.com/bug?extid=703d8a2cd20971854b06
-> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13bfa112580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=169e422c580000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/fb216361ff9c/disk-6cf62f01.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/eb55e25eb970/vmlinux-6cf62f01.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/5110f00a1a4e/bzImage-6cf62f01.xz
-> mounted in repro: https://storage.googleapis.com/syzbot-assets/7a62729c5268/mount_0.gz
->   fsck result: OK (log: https://syzkaller.appspot.com/x/fsck.log?x=16dd8112580000)
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+703d8a2cd20971854b06@syzkaller.appspotmail.com
-> 
-> =====================================================
-> BUG: KMSAN: uninit-value in subshift lib/crypto/aes.c:150 [inline]
-> BUG: KMSAN: uninit-value in aes_encrypt+0x1239/0x1960 lib/crypto/aes.c:283
->  subshift lib/crypto/aes.c:150 [inline]
->  aes_encrypt+0x1239/0x1960 lib/crypto/aes.c:283
->  aesti_encrypt+0x7d/0xf0 crypto/aes_ti.c:31
->  cipher_crypt_one+0x120/0x2e0 crypto/cipher.c:75
->  crypto_cipher_encrypt_one+0x33/0x40 crypto/cipher.c:82
->  adiantum_crypt+0x939/0xe60 crypto/adiantum.c:383
->  adiantum_encrypt+0x33/0x40 crypto/adiantum.c:419
->  crypto_skcipher_encrypt+0x18a/0x1e0 crypto/skcipher.c:195
->  fscrypt_crypt_data_unit+0x38e/0x590 fs/crypto/crypto.c:139
->  fscrypt_encrypt_pagecache_blocks+0x430/0x900 fs/crypto/crypto.c:197
+The pull request you sent on Sun, 11 Jan 2026 11:39:09 -0800:
 
-ext4 sometimes encrypts uninitialized memory.  Duplicate of already-
-reported bug, see https://lore.kernel.org/r/20251210022202.GB4128@sol/
+> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
 
-#syz dup: KMSAN: uninit-value in fscrypt_crypt_data_unit
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/7143203341dccbca809ba0a8e72239ea4652ace6
 
-- Eric
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
