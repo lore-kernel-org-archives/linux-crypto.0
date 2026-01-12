@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A435322B60;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B147338A9D5;
 	Mon, 12 Jan 2026 19:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768245815; cv=none; b=dDBQTZquaHUy2LKjCHOjd3t1hbQGY+2p3TICAAy8bMOZL3paStf4/v4Nklb+vVAIlJTPJ4/FZLtq1V9mkMROwT6PQsK7M0u7HD+aMlyo+7dKPojpFAUXNOYj5TAnitSZSltFZopWt3QAKQC7JgOMruv6OSXbcm11QAyKfR7vzPA=
+	t=1768245815; cv=none; b=gtQMoUEYwTvkG+TOT+eHY0jrGm4bJfew2tCA0tpB0T4elq/z8/hNONF0IFf879o8BPTuH4p7o4aEShUu2fOU35ky1un9f3WnJy5m4TcWgDAkf+ZRIJYT1unwqye3o9zcUhrB52K2gJD6fwbWRYIB8DAtExCOWJ+7U4dCHlNgVOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1768245815; c=relaxed/simple;
-	bh=o3zwy8vdt1uNhlRXa37yap+uRed8L836MSpoje1i5gA=;
+	bh=JLs8bq0ROpmCEQjkpHCQ8d/SpuKsQOsr6NwPCgnihKU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jxm7aNaDLevXpUHjndTmlLSiSD06S+EXvBmwKJQeAMqLSm8c1LXmvQ8Scjp44MwawzICNOvrkyyTxt/bnJOY4HJi+MsOpVC73DMxPAE1mc2MAedblRPp3fjV+QqBjhLunwShUzKcm3lEKtITWQfizPVU5VwN+WMPQ2gAg9lubOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m+iQkfre; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=LPF4w7CTONlp+EWWrdI2TpDtbM8R9cbNhw0sbewkk4kPcuCauXospV6xldAS5xdXbNfEoVH5iElYv11HOZbPSy/b8kUMWoLpby6wCFrFDGUDy4OrTSCd5/beB8Ozo8aaY458XeF6EcyhgTE1mkUahlkO6ApPI3m7wjGkOViSlj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b0RBfUzQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m+iQkfre"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92D62C2BC9E;
-	Mon, 12 Jan 2026 19:23:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b0RBfUzQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27044C19424;
+	Mon, 12 Jan 2026 19:23:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1768245815;
-	bh=o3zwy8vdt1uNhlRXa37yap+uRed8L836MSpoje1i5gA=;
+	bh=JLs8bq0ROpmCEQjkpHCQ8d/SpuKsQOsr6NwPCgnihKU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=m+iQkfrebqurkYNcMsEDhd2QqbiCtp7wnSgHoAica72oEzTDfUKkSMUWZXpuRb9em
-	 1Do/8hqedeDta5gxo8MqlDW61v9x7Q7vZTzXp2TkY2U7zjXVxEQdDb5Tc0XzAX7VVU
-	 9TKEdQm8jHgXrAALBCww1rQnpHL301XBCKXcpnpH8fVqyvtxN0AZzZ4xBw/eYgSrKk
-	 cV3ifLIvrwSzEZQPhWE6hzNHFva8oR20xdbCbycacxePJ6OtQUL7re5uWOMRmer5Mp
-	 aKzUopZrsfMlXGNoISdPApHFyM2o8Bm7RRE27u6Iu2eUcffx29++btLMVG3D96Ohac
-	 Y99nAkUMvYzgA==
+	b=b0RBfUzQys2ZqJtm4Gnsyo+LFtO49H/4V1vBcG0UFdcL3d4er81g2SKeTPRBUfXlD
+	 m4M0CH0sjlKOMYmu5MKQUxxNNhgjBkXhlxsEJWsyOMNw/H5cz+0C/Ps+oieOmtIsnf
+	 42oOgGWrCU2dcQWgW9oaLQ2GOJT0MjnsdRT7AGxdEQdlwoJHzPSgRrGn+bi8VRh99V
+	 4KSB/CeMRewIeb8S1zLPd6/900w117IawjI2VbypbiXJ+dWaHngCbGCS57sol6Vy9F
+	 PmtGWO6L8nZLLtYShrJjmWS/Q0DYQ/3ba+J/FyOtwkWnRCotaa8rKeBIPbKmTpxzYr
+	 klHjBpXQvod3w==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Holger Dengler <dengler@linux.ibm.com>,
 	Harald Freudenberger <freude@linux.ibm.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 31/35] crypto: omap - Use new AES library API
-Date: Mon, 12 Jan 2026 11:20:29 -0800
-Message-ID: <20260112192035.10427-32-ebiggers@kernel.org>
+Subject: [PATCH v2 32/35] lib/crypto: aescfb: Use new AES library API
+Date: Mon, 12 Jan 2026 11:20:30 -0800
+Message-ID: <20260112192035.10427-33-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260112192035.10427-1-ebiggers@kernel.org>
 References: <20260112192035.10427-1-ebiggers@kernel.org>
@@ -69,70 +69,206 @@ calling the new encryption function rather than the old one.
 Acked-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- drivers/crypto/omap-aes-gcm.c | 6 +++---
- drivers/crypto/omap-aes.h     | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/char/tpm/tpm2-sessions.c | 10 +++++-----
+ include/crypto/aes.h             |  4 ++--
+ lib/crypto/aescfb.c              | 30 +++++++++++++++---------------
+ 3 files changed, 22 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/crypto/omap-aes-gcm.c b/drivers/crypto/omap-aes-gcm.c
-index 1f4586509ca4..c652f9d0062f 100644
---- a/drivers/crypto/omap-aes-gcm.c
-+++ b/drivers/crypto/omap-aes-gcm.c
-@@ -175,11 +175,11 @@ static int omap_aes_gcm_copy_buffers(struct omap_aes_dev *dd,
+diff --git a/drivers/char/tpm/tpm2-sessions.c b/drivers/char/tpm/tpm2-sessions.c
+index 4149379665c4..09df6353ef04 100644
+--- a/drivers/char/tpm/tpm2-sessions.c
++++ b/drivers/char/tpm/tpm2-sessions.c
+@@ -124,11 +124,11 @@ struct tpm2_auth {
+ 	 * session_key and passphrase.
+ 	 */
+ 	u8 session_key[SHA256_DIGEST_SIZE];
+ 	u8 passphrase[SHA256_DIGEST_SIZE];
+ 	int passphrase_len;
+-	struct crypto_aes_ctx aes_ctx;
++	struct aes_enckey aes_key;
+ 	/* saved session attributes: */
+ 	u8 attrs;
+ 	__be32 ordinal;
  
- static int do_encrypt_iv(struct aead_request *req, u32 *tag, u32 *iv)
+ 	/*
+@@ -675,12 +675,12 @@ int tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
+ 			  + auth->passphrase_len, "CFB", auth->our_nonce,
+ 			  auth->tpm_nonce, AES_KEY_BYTES + AES_BLOCK_SIZE,
+ 			  auth->scratch);
+ 
+ 		len = tpm_buf_read_u16(buf, &offset_p);
+-		aes_expandkey(&auth->aes_ctx, auth->scratch, AES_KEY_BYTES);
+-		aescfb_encrypt(&auth->aes_ctx, &buf->data[offset_p],
++		aes_prepareenckey(&auth->aes_key, auth->scratch, AES_KEY_BYTES);
++		aescfb_encrypt(&auth->aes_key, &buf->data[offset_p],
+ 			       &buf->data[offset_p], len,
+ 			       auth->scratch + AES_KEY_BYTES);
+ 		/* reset p to beginning of parameters for HMAC */
+ 		offset_p -= 2;
+ 	}
+@@ -856,12 +856,12 @@ int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
+ 			  + auth->passphrase_len, "CFB", auth->tpm_nonce,
+ 			  auth->our_nonce, AES_KEY_BYTES + AES_BLOCK_SIZE,
+ 			  auth->scratch);
+ 
+ 		len = tpm_buf_read_u16(buf, &offset_p);
+-		aes_expandkey(&auth->aes_ctx, auth->scratch, AES_KEY_BYTES);
+-		aescfb_decrypt(&auth->aes_ctx, &buf->data[offset_p],
++		aes_prepareenckey(&auth->aes_key, auth->scratch, AES_KEY_BYTES);
++		aescfb_decrypt(&auth->aes_key, &buf->data[offset_p],
+ 			       &buf->data[offset_p], len,
+ 			       auth->scratch + AES_KEY_BYTES);
+ 	}
+ 
+  out:
+diff --git a/include/crypto/aes.h b/include/crypto/aes.h
+index 4a56aed59973..4cb3c27d1bf5 100644
+--- a/include/crypto/aes.h
++++ b/include/crypto/aes.h
+@@ -341,11 +341,11 @@ void aes_decrypt_new(const struct aes_key *key, u8 out[at_least AES_BLOCK_SIZE],
+ extern const u8 crypto_aes_sbox[];
+ extern const u8 crypto_aes_inv_sbox[];
+ extern const u32 aes_enc_tab[256];
+ extern const u32 aes_dec_tab[256];
+ 
+-void aescfb_encrypt(const struct crypto_aes_ctx *ctx, u8 *dst, const u8 *src,
++void aescfb_encrypt(const struct aes_enckey *key, u8 *dst, const u8 *src,
+ 		    int len, const u8 iv[AES_BLOCK_SIZE]);
+-void aescfb_decrypt(const struct crypto_aes_ctx *ctx, u8 *dst, const u8 *src,
++void aescfb_decrypt(const struct aes_enckey *key, u8 *dst, const u8 *src,
+ 		    int len, const u8 iv[AES_BLOCK_SIZE]);
+ 
+ #endif
+diff --git a/lib/crypto/aescfb.c b/lib/crypto/aescfb.c
+index 0f294c8cbf3c..147e5211728f 100644
+--- a/lib/crypto/aescfb.c
++++ b/lib/crypto/aescfb.c
+@@ -9,11 +9,11 @@
+ #include <crypto/algapi.h>
+ #include <linux/export.h>
+ #include <linux/module.h>
+ #include <asm/irqflags.h>
+ 
+-static void aescfb_encrypt_block(const struct crypto_aes_ctx *ctx, void *dst,
++static void aescfb_encrypt_block(const struct aes_enckey *key, void *dst,
+ 				 const void *src)
  {
- 	struct omap_aes_gcm_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+ 	unsigned long flags;
  
--	aes_encrypt(&ctx->actx, (u8 *)tag, (u8 *)iv);
-+	aes_encrypt(&ctx->akey, (u8 *)tag, (const u8 *)iv);
- 	return 0;
+ 	/*
+@@ -23,31 +23,31 @@ static void aescfb_encrypt_block(const struct crypto_aes_ctx *ctx, void *dst,
+ 	 * extent by pulling the entire S-box into the caches before doing any
+ 	 * substitutions, but this strategy is more effective when running with
+ 	 * interrupts disabled.
+ 	 */
+ 	local_irq_save(flags);
+-	aes_encrypt(ctx, dst, src);
++	aes_encrypt(key, dst, src);
+ 	local_irq_restore(flags);
  }
  
- void omap_aes_gcm_dma_out_callback(void *data)
+ /**
+  * aescfb_encrypt - Perform AES-CFB encryption on a block of data
+  *
+- * @ctx:	The AES-CFB key schedule
++ * @key:	The AES-CFB key schedule
+  * @dst:	Pointer to the ciphertext output buffer
+  * @src:	Pointer the plaintext (may equal @dst for encryption in place)
+  * @len:	The size in bytes of the plaintext and ciphertext.
+  * @iv:		The initialization vector (IV) to use for this block of data
+  */
+-void aescfb_encrypt(const struct crypto_aes_ctx *ctx, u8 *dst, const u8 *src,
++void aescfb_encrypt(const struct aes_enckey *key, u8 *dst, const u8 *src,
+ 		    int len, const u8 iv[AES_BLOCK_SIZE])
  {
-@@ -312,11 +312,11 @@ int omap_aes_gcm_setkey(struct crypto_aead *tfm, const u8 *key,
- 			unsigned int keylen)
+ 	u8 ks[AES_BLOCK_SIZE];
+ 	const u8 *v = iv;
+ 
+ 	while (len > 0) {
+-		aescfb_encrypt_block(ctx, ks, v);
++		aescfb_encrypt_block(key, ks, v);
+ 		crypto_xor_cpy(dst, src, ks, min(len, AES_BLOCK_SIZE));
+ 		v = dst;
+ 
+ 		dst += AES_BLOCK_SIZE;
+ 		src += AES_BLOCK_SIZE;
+@@ -59,31 +59,31 @@ void aescfb_encrypt(const struct crypto_aes_ctx *ctx, u8 *dst, const u8 *src,
+ EXPORT_SYMBOL(aescfb_encrypt);
+ 
+ /**
+  * aescfb_decrypt - Perform AES-CFB decryption on a block of data
+  *
+- * @ctx:	The AES-CFB key schedule
++ * @key:	The AES-CFB key schedule
+  * @dst:	Pointer to the plaintext output buffer
+  * @src:	Pointer the ciphertext (may equal @dst for decryption in place)
+  * @len:	The size in bytes of the plaintext and ciphertext.
+  * @iv:		The initialization vector (IV) to use for this block of data
+  */
+-void aescfb_decrypt(const struct crypto_aes_ctx *ctx, u8 *dst, const u8 *src,
++void aescfb_decrypt(const struct aes_enckey *key, u8 *dst, const u8 *src,
+ 		    int len, const u8 iv[AES_BLOCK_SIZE])
  {
- 	struct omap_aes_gcm_ctx *ctx = crypto_aead_ctx(tfm);
- 	int ret;
+ 	u8 ks[2][AES_BLOCK_SIZE];
  
--	ret = aes_expandkey(&ctx->actx, key, keylen);
-+	ret = aes_prepareenckey(&ctx->akey, key, keylen);
- 	if (ret)
- 		return ret;
+-	aescfb_encrypt_block(ctx, ks[0], iv);
++	aescfb_encrypt_block(key, ks[0], iv);
  
- 	memcpy(ctx->octx.key, key, keylen);
- 	ctx->octx.keylen = keylen;
-@@ -332,11 +332,11 @@ int omap_aes_4106gcm_setkey(struct crypto_aead *tfm, const u8 *key,
+ 	for (int i = 0; len > 0; i ^= 1) {
+ 		if (len > AES_BLOCK_SIZE)
+ 			/*
+ 			 * Generate the keystream for the next block before
+ 			 * performing the XOR, as that may update in place and
+ 			 * overwrite the ciphertext.
+ 			 */
+-			aescfb_encrypt_block(ctx, ks[!i], src);
++			aescfb_encrypt_block(key, ks[!i], src);
  
- 	if (keylen < 4)
- 		return -EINVAL;
- 	keylen -= 4;
+ 		crypto_xor_cpy(dst, src, ks[i], min(len, AES_BLOCK_SIZE));
  
--	ret = aes_expandkey(&ctx->actx, key, keylen);
-+	ret = aes_prepareenckey(&ctx->akey, key, keylen);
- 	if (ret)
- 		return ret;
- 
- 	memcpy(ctx->octx.key, key, keylen);
- 	memcpy(ctx->octx.nonce, key + keylen, 4);
-diff --git a/drivers/crypto/omap-aes.h b/drivers/crypto/omap-aes.h
-index 99c36a777e97..6aa70bde387a 100644
---- a/drivers/crypto/omap-aes.h
-+++ b/drivers/crypto/omap-aes.h
-@@ -96,11 +96,11 @@ struct omap_aes_ctx {
- 	struct crypto_skcipher	*fallback;
+ 		dst += AES_BLOCK_SIZE;
+ 		src += AES_BLOCK_SIZE;
+@@ -212,34 +212,34 @@ static struct {
  };
  
- struct omap_aes_gcm_ctx {
- 	struct omap_aes_ctx	octx;
--	struct crypto_aes_ctx	actx;
-+	struct aes_enckey	akey;
- };
+ static int __init libaescfb_init(void)
+ {
+ 	for (int i = 0; i < ARRAY_SIZE(aescfb_tv); i++) {
+-		struct crypto_aes_ctx ctx;
++		struct aes_enckey key;
+ 		u8 buf[64];
  
- struct omap_aes_reqctx {
- 	struct omap_aes_dev *dd;
- 	unsigned long mode;
+-		if (aes_expandkey(&ctx, aescfb_tv[i].key, aescfb_tv[i].klen)) {
+-			pr_err("aes_expandkey() failed on vector %d\n", i);
++		if (aes_prepareenckey(&key, aescfb_tv[i].key, aescfb_tv[i].klen)) {
++			pr_err("aes_prepareenckey() failed on vector %d\n", i);
+ 			return -ENODEV;
+ 		}
+ 
+-		aescfb_encrypt(&ctx, buf, aescfb_tv[i].ptext, aescfb_tv[i].len,
++		aescfb_encrypt(&key, buf, aescfb_tv[i].ptext, aescfb_tv[i].len,
+ 			       aescfb_tv[i].iv);
+ 		if (memcmp(buf, aescfb_tv[i].ctext, aescfb_tv[i].len)) {
+ 			pr_err("aescfb_encrypt() #1 failed on vector %d\n", i);
+ 			return -ENODEV;
+ 		}
+ 
+ 		/* decrypt in place */
+-		aescfb_decrypt(&ctx, buf, buf, aescfb_tv[i].len, aescfb_tv[i].iv);
++		aescfb_decrypt(&key, buf, buf, aescfb_tv[i].len, aescfb_tv[i].iv);
+ 		if (memcmp(buf, aescfb_tv[i].ptext, aescfb_tv[i].len)) {
+ 			pr_err("aescfb_decrypt() failed on vector %d\n", i);
+ 			return -ENODEV;
+ 		}
+ 
+ 		/* encrypt in place */
+-		aescfb_encrypt(&ctx, buf, buf, aescfb_tv[i].len, aescfb_tv[i].iv);
++		aescfb_encrypt(&key, buf, buf, aescfb_tv[i].len, aescfb_tv[i].iv);
+ 		if (memcmp(buf, aescfb_tv[i].ctext, aescfb_tv[i].len)) {
+ 			pr_err("aescfb_encrypt() #2 failed on vector %d\n", i);
+ 
+ 			return -ENODEV;
+ 		}
 -- 
 2.52.0
 
