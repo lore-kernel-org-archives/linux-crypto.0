@@ -1,82 +1,88 @@
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51595356A11
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 12:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7F435770E;
+	Mon, 12 Jan 2026 13:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768221447; cv=none; b=h75LB/a1WgDicTZRknF5HJ2KgwmA3/7Lv8XubhwxJliODRI24grxXCBpKWZ+46SgpCRO8ktIF3O0Izs4vqmv3VOUpVLgfd6j39qJHcUkprwtrmNbj7GB7FdlKhymOYhTvbfNXCBMrwh+XDOcbI2HdhEcpOMyh1a2C8pLQ/Htu+Y=
+	t=1768222899; cv=none; b=XjMf3zzwUAoaEq8JhDDQ0alMmbjxwcyl4LInXYi5/OBScnvGIKx/OIGRMvWn3e4cduHd0jtsljq+TCbW/CQAaIsBEpmfQDBYf8LHuStz2HYb3px49Uwz81E5kDyFN8HRcrKIXKoyv6yWsTSMwE07qTo5ME9VTVe8vuyhrRvLM8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768221447; c=relaxed/simple;
-	bh=MH1SIl/siNd6RD3mAo7c+kEyc2/6N0kpv9gxCmC/t84=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rzPoEUsizrtGuw8HWmzDm8uwyArquqV7tTGiGdQq8Iq8QRJQNHoVOK8ewtANgOBTLUwBHEzftwRQWN/DNEOOSIaySlr4BZ0gN+qDiElFx8XdVguaqZlVSz+JqepPBS72gJ0LmK3FO5AM6PoG7XDN9nVLOH28lXs45B703CuQH4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-656b2edce07so13756163eaf.0
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 04:37:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768221445; x=1768826245;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JfVIGq0/5O1db/xFrE2hLWw8GpsFCfuWFbTXG+umsf8=;
-        b=vlI2kyCI1aVZ3eOjaHWHEZ5Gi2URE8phsQkMN46N3+AAcMn1u/5se26zctkEEho+GM
-         BaWQMARP56fO+32AjVYu/9Vfle6s6DPVSZZLwbd382hE0+BSrt5e7BwpPp3KpJgSuHIG
-         Lm8+cMC6IrRWtPlBG4sHvqcsSYMap/Znt2VZSKs829qCtffWmwHSIm7cZH2+qvOcVGWu
-         Se6keEeND60dBG1Ry4BOuVg3g/L2+Rp90NF/ZGC2p1vdPylA0n57B/TcNfbvbgCMUEe7
-         Zb6nF9i/XqaE8RnA29AAkIfXBbryPPoA2X8+oweUCUdsLNXCsX1YDcGyr743PIo0I5iz
-         nU7g==
-X-Gm-Message-State: AOJu0Yy+hWCbOlb+r+jmQS7IvqlFL7QHo7bpx5ny0BwkwkWYnAublDoX
-	wOTQd/zBOoz75uS2DVI9YTU/DzPk0Teaj4yU0/drMt7FAeEjlqchLcn7w0Ptjzxc7e7DwbWeCI/
-	0Dp1SGM4nb+R2Z8H8H0JD4lFT5cW4ZRk1GTwNDsChSswql3qDN67efQiih7Y=
-X-Google-Smtp-Source: AGHT+IF+2j6kdyIHsCbTXGkX4z1GUYN8FOvAUEQFWCnq0W4/OPSfmLqGsqZReUWvy9WdneJmZeXyG3TlIj7vKlxJiSyVnn2sU/GN
+	s=arc-20240116; t=1768222899; c=relaxed/simple;
+	bh=WLtpL3iiLHc+bo5wxz2Ay2u3w3qNsN2rTz0oFg1Enb0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UhC1x4UgYV5IkyeuWv4P19mf6jWl5aqr3qfDF9dqqBsmwr6XB/AHth30A4t+Q0i54u6mnbJDuGiPQa4yezjsWT4cODAS+2mRuyL0ObktO75fZZEA4YF97NHuCirMNY4n+5jhSgRN8LD3GI1fEX6zxE8z0Mrc44UIQLA5reAdZ6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rXpL3ocf; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rXpL3ocf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2987C19422;
+	Mon, 12 Jan 2026 13:01:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768222899;
+	bh=WLtpL3iiLHc+bo5wxz2Ay2u3w3qNsN2rTz0oFg1Enb0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rXpL3ocfh373K5bNXWgVfNocnwtPg11QneBpqIT66SgmmZ/6+awvuRRAs6hTWn3Iq
+	 bcl9sVDzTDUlH58n7OTWA7Ow5zH/zTAidmSunr1zSCV7wYLQ6IuEpHb1q50qGePdf/
+	 PAhA4LZm8r4xFIuS2KE+Ngg9rjsPTcO2qGiQXm+GwTe17ykNXaZGF5UZzQJLYgf+xD
+	 BPDMm+HMpYRLY0M9QmCK6sJM+ACJnMQ0KQyXmq2N5t91Gcbl0TWXezGTixppahR1vh
+	 vJ5SiF+P4EuQP4AruPe8Gy2Byg9B6EUPJJ2EtOAoKb4j4WrHjKfzutdV+iRJD1El6U
+	 X3sv697FjFtzg==
+Date: Mon, 12 Jan 2026 14:01:32 +0100
+From: Niklas Cassel <cassel@kernel.org>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: Vinod Koul <vkoul@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Koichiro Den <den@valinux.co.jp>, dmaengine@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org, mhi@lists.linux.dev,
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev,
+	Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [PATCH v3 0/9] dmaengine: Add new API to combine configuration
+ and descriptor preparation
+Message-ID: <aWTwrOOXX3AR8Ght@ryzen>
+References: <20260105-dma_prep_config-v3-0-a8480362fd42@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:c4ca:0:b0:65d:13ce:26d7 with SMTP id
- 006d021491bc7-65f54f37b26mr6051053eaf.29.1768221445365; Mon, 12 Jan 2026
- 04:37:25 -0800 (PST)
-Date: Mon, 12 Jan 2026 04:37:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6964eb05.050a0220.eaf7.00a3.GAE@google.com>
-Subject: [syzbot] Monthly crypto report (Jan 2026)
-From: syzbot <syzbot+listaddb66f9673a6eb4b9e8@syzkaller.appspotmail.com>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260105-dma_prep_config-v3-0-a8480362fd42@nxp.com>
 
-Hello crypto maintainers/developers,
+Frank,
 
-This is a 31-day syzbot report for the crypto subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/crypto
+Thanks a lot for your work on this series!
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 4 issues are still open and 112 have already been fixed.
+On Mon, Jan 05, 2026 at 05:46:50PM -0500, Frank Li wrote:
+>  Documentation/driver-api/dmaengine/client.rst |   9 ++
+>  drivers/crypto/atmel-aes.c                    |  10 +--
+>  drivers/dma/dmaengine.c                       |   3 +
+>  drivers/dma/dw-edma/dw-edma-core.c            |  41 ++++++---
+>  drivers/nvme/target/pci-epf.c                 |  21 ++---
+>  drivers/pci/endpoint/functions/pci-epf-mhi.c  |  52 ++++--------
+>  drivers/pci/endpoint/functions/pci-epf-test.c |   8 +-
+>  include/linux/dmaengine.h                     | 117 ++++++++++++++++++++++++--
+>  8 files changed, 177 insertions(+), 84 deletions(-)
 
-Some of the still happening issues:
+Is the plan to merge this series via the dmaengine tree?
 
-Ref Crashes Repro Title
-<1> 32      No    KMSAN: uninit-value in sw842_decompress (2)
-                  https://syzkaller.appspot.com/bug?extid=8f77ff6144a73f0cf71b
-<2> 27      Yes   KMSAN: uninit-value in adiantum_crypt
-                  https://syzkaller.appspot.com/bug?extid=703d8a2cd20971854b06
-<3> 1       No    possible deadlock in crypto_alg_mod_lookup
-                  https://syzkaller.appspot.com/bug?extid=ced80aa1e67e7ceac4ef
+If so, we might need an Ack from Mani on the pci-epf-mhi.c and
+pci-epf-test.c patch.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Likewise we might need an Ack from Keith/Christoph on the
+drivers/nvme/target/pci-epf.c patches.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Kind regards,
+Niklas
