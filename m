@@ -1,256 +1,134 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CED33587D7
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 13:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF6D32572F;
+	Mon, 12 Jan 2026 13:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768223335; cv=none; b=KOEGEfm1FuPttcbeH0KwaBwzHr1ejE3lDKUYmyEsrVtklHDxP8SfwPQObad9uLpQ1IRwJou4cd+MXzDJVrL5/kAyzhBQ26zLB0Si6DNWxOAd0oFgfDfEwneq7UJ+1d3G/U4EPS7ycqqB0CA/1NpTRdJubKesmwzZPzEQ4n1PNiw=
+	t=1768223461; cv=none; b=sjarT423UnYJUXUHPD1gHQ1tF1zwv5SE2I6MPK7zlDWI/QkzXbb40AfuqeVz7H/ESrEk46Xg2C8o4Kx9SWVh0qdkIrm0y425VMVUk/7Fdnf3VofW8AIvyd+foLqOV3FEyvyedBbeIr23hCbn/U57SZ7iTbizxR6rrPn8tsARpg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768223335; c=relaxed/simple;
-	bh=YTVkCN24/ARJNxBRMbLG2byyse7jCJp1KD9YVEJe7fg=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=YGp2m3C76IYYgmIoVZkaBhYrifa36KflvUtgrSsvWnwrAALIRAGCjZnTlA8VdrLgRETYmgA4e+nyoaF2I2WWKNGKwDwv3XEfP+8v2WCY/RY8RDaFB+yi5ksf7z9Io5CauEa7hbP4OVYa+cfs8srH8YEctsknZwSTPHvN568co3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ONUb602Q; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1768223461; c=relaxed/simple;
+	bh=mvIkmKn409pD6eflpxgiTStCeWg8rUWPkQ1Dv4/VyQY=;
+	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=EfRZKy45i+Df6BRKPqvVUBidI4wceVo3O5LY/mN1sty/6Gx4acNoqJs3c/S1JE2pnEqv56DjNNDoL7mGdwCU2K4uG+EFvrcclWJLs+SqbBWfLRmeb7BOZRpUxsLcCiO29rB1SZ7ki2+iAHTL0G8U0gpk50vlWeORayHepeYc/4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn; spf=pass smtp.mailfrom=stu.xidian.edu.cn; dkim=fail (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b=3lyh2PIV reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ONUb602Q"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-477a2ab455fso58439285e9.3
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 05:08:52 -0800 (PST)
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b="3lyh2PIV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1768223331; x=1768828131; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BF9HRCZwVM8HohHOVVmaFmMZoI1kBoRSnqS8ZzxwdRQ=;
-        b=ONUb602QVTxB0uTYiPCiU6+kXahVGELlLm3CowLbvvfwCD5mCGdVTasZm5O1ldbT2C
-         VGcxR4itUDFm6VeSBgxaf1gwxRXDJZZOPNgqJVdDeZlW7C2FuPA0mkYYYmhrSrrNLL2e
-         pRKlwPbOSJCgX76N3tQHSjy1+Dcv8453zZp7Y5YxFqeT3T23c3yGhynXocuH3wminpVk
-         PjcmmS2VDK7AFoZCPAUQ76XDNVz+vdz0LL4ME5MRWbHT0q1KZWuAIJkLclzBM/rRVcOX
-         qG8Z6e1sSzpsblBKsVFMJFZM6i7s8AWDfwo0qOLwX3uhplET2h6JPy8BiZxzCMLEmgeq
-         QGzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768223331; x=1768828131;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BF9HRCZwVM8HohHOVVmaFmMZoI1kBoRSnqS8ZzxwdRQ=;
-        b=O2dB//5FVAckB8mCVb8eX0Z/K6Ltrj2as3Nd1bMKuYe6tzJw9wS2gl76wUF/mKrW9Q
-         jpCLOtCjVpTrVHtu8YGztEfptIgZ+wT6OUJ1SmAWzM3f4MUWZXry3I1XbgcH7dZ2chnz
-         lVpe8rNnI++UPjLtZCRn8WneitZeV/7aweMfF5px32O+JAoHLNYwpCikZZVxLl9lIPRJ
-         oG8nrgwj7QaLJlbvaLX+e8S4ikeZfnLrb3SI8/h5Gy8VOx1gTq7c4IXGPex9/dsxdjrg
-         1K5EiaiYD9FQsyAKDuAr4TgKfx0S7rqd6rA17Ng9fh0q7w/a8LSeAdyW153vDBvPLLif
-         orTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWTIyo6LLFWiU6CTJJHldCG12yfXW5gG9z3EjIpMQncu20XPciGBlF8UKrcInTqOCwzcW29sWh7RrHY31Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1b7zPUa4IDSOvDyTKOUDzypZ4L5g8KnCZVFCcEePb4L1p+jM7
-	Ag7XdrkgpMfBRlqH3UyJbDfmMkEcz6aeTeLT14z8w7jwRwSEFwUKwwVJVftzEgPnpI4=
-X-Gm-Gg: AY/fxX6jjZyo23f4dlyPlTknW1vdmb7E3B2+JOgx3Tn1KBa2yjcIBLez+C0DH84NFGn
-	EME542Bjos35uhBrGnMYCmKwBHbF6W5hMinkRbK8ymPsyQ3uOLVIXEjQdvIxX62NJ3VsN05kcyo
-	qebAwCeNUKDEaHsBvkOX0tWSYldoP80BnTpmEry7zzyTDhdf5qmYRidxgGBdn/5+36K6+MBW6AN
-	G4a69LzMGPgEq1fM9qqNUPwwo4fwizvJB4OB4xCGpIvR8HpyP0N+eEVkE70DS98248ItFe+v/3D
-	kF8jz+UZ9qPiT+XN24NyF8uD8gvBRTlFBLONA2UOk1JskPBCbORrBtQEzjowWoXORCTGyRndtL7
-	cBDHBYmzCWyZ7WB2wMpbdscBBz25Skz40EqvFDQd2KeGUTTBfxL2B4imInt7y3Hmm6n1KkED41E
-	/lyn4LHpxZeIUr1Mjn9kTb1NlL+680I2D4hZotl1Q=
-X-Google-Smtp-Source: AGHT+IEtO2xzsh2F6bjVyeH53ljL8NiwROmn+6MmXlos+dptQWGriTYDZzCaDlYWz//1QpK6zSKEIg==
-X-Received: by 2002:a05:600c:3110:b0:479:3a86:dc1a with SMTP id 5b1f17b1804b1-47d84b41176mr203344865e9.36.1768223331152;
-        Mon, 12 Jan 2026 05:08:51 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:3d9:2080::fa42:7768? ([2a01:e0a:3d9:2080::fa42:7768])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5fe67csm38528840f8f.40.2026.01.12.05.08.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jan 2026 05:08:50 -0800 (PST)
-Message-ID: <99ec09fa-b4e3-4f68-9980-a3dfb81635e8@linaro.org>
-Date: Mon, 12 Jan 2026 14:08:49 +0100
+	d=stu.xidian.edu.cn; s=dkim; h=Received:Date:From:To:Cc:Subject:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID;
+	bh=o5D3XhRIrbXRTOMy/a9OKbFL3t4mDPb9ecBpqQVl0YU=; b=3lyh2PIVZkVL7
+	GA82Q9w9xPkHBjlVqHDyKi80ec46s9iEptIZ4TY+h+2ZVVr1TnY75jn2SXu/prIb
+	bKObHAuX/6At1W4o3GJQcZux67sgeZkBMYDeZ/U14iV725IaEF9PpigkE6dG1VYu
+	lKBYerhL9oqUBZEQ1RmoD8iwSthNhQ=
+Received: from wangzhi_xd$stu.xidian.edu.cn ( [113.200.174.49] ) by
+ ajax-webmail-hzbj-edu-front-4.icoremail.net (Coremail) ; Mon, 12 Jan 2026
+ 21:10:31 +0800 (GMT+08:00)
+Date: Mon, 12 Jan 2026 21:10:31 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?546L5b+X?= <wangzhi_xd@stu.xidian.edu.cn>
+To: "Giovanni Cabiddu" <giovanni.cabiddu@intel.com>,
+	"Herbert Xu" <herbert@gondor.apana.org.au>
+Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [BUG] KASAN: slab-use-after-free Read in adf_dev_up
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
+ 20250410(2f5ccd7f) Copyright (c) 2002-2026 www.mailtech.cn
+ mispb-8dfce572-2f24-404d-b59d-0dd2e304114c-icoremail.cn
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Neil Armstrong <neil.armstrong@linaro.org>
-Reply-To: Neil Armstrong <neil.armstrong@linaro.org>
-Subject: Re: [PATCH 5/6] arm64: dts: qcom: milos: Add UFS nodes
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Luca Weiss <luca.weiss@fairphone.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>,
- Bart Van Assche <bvanassche@acm.org>, Vinod Koul <vkoul@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-phy@lists.infradead.org
-References: <20260107-milos-ufs-v1-0-6982ab20d0ac@fairphone.com>
- <20260107-milos-ufs-v1-5-6982ab20d0ac@fairphone.com>
- <2486dc4b-71f3-4cd9-8139-b397407d7e4d@linaro.org>
- <543d9e55-c858-40f9-8785-c9f636850120@linaro.org>
- <DFMH8W40TCJ0.XCTHNRJFJE4T@fairphone.com>
- <ccbaff51-d7fa-4b22-8d4e-02bea5d8a529@oss.qualcomm.com>
-Content-Language: en-US, fr
-Autocrypt: addr=neil.armstrong@linaro.org; keydata=
- xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
- GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
- BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
- qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
- 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
- AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
- OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
- Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
- YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
- GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
- UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
- GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
- yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
- QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
- SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
- 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
- Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
- oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
- M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
- 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
- KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
- 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
- QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
-Organization: Linaro
-In-Reply-To: <ccbaff51-d7fa-4b22-8d4e-02bea5d8a529@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Message-ID: <782a4d0e.c456.19bb25459b4.Coremail.wangzhi_xd@stu.xidian.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:BrQMCkA2nuHI8mRpt3gJAQ--.17600W
+X-CM-SenderInfo: qstqimqsqqliuu6v33wo0lvxldqovvfxof0/1tbiAgULCGljss94m
+	gABsQ
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-On 1/12/26 11:29, Konrad Dybcio wrote:
-> On 1/12/26 9:45 AM, Luca Weiss wrote:
->> Hi Neil,
->>
->> On Mon Jan 12, 2026 at 9:26 AM CET, Neil Armstrong wrote:
->>> On 1/7/26 14:53, Neil Armstrong wrote:
->>>> Hi,
->>>>
->>>> On 1/7/26 09:05, Luca Weiss wrote:
->>>>> Add the nodes for the UFS PHY and UFS host controller, along with the
->>>>> ICE used for UFS.
->>>>>
->>>>> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
->>>>> ---
->>>>>    arch/arm64/boot/dts/qcom/milos.dtsi | 127 +++++++++++++++++++++++++++++++++++-
->>>>>    1 file changed, 124 insertions(+), 3 deletions(-)
->>>>>
->>>>> diff --git a/arch/arm64/boot/dts/qcom/milos.dtsi b/arch/arm64/boot/dts/qcom/milos.dtsi
->>>>> index e1a51d43943f..0f69deabb60c 100644
->>>>> --- a/arch/arm64/boot/dts/qcom/milos.dtsi
->>>>> +++ b/arch/arm64/boot/dts/qcom/milos.dtsi
->>>>> @@ -797,9 +797,9 @@ gcc: clock-controller@100000 {
->>>>>                     <&sleep_clk>,
->>>>>                     <0>, /* pcie_0_pipe_clk */
->>>>>                     <0>, /* pcie_1_pipe_clk */
->>>>> -                 <0>, /* ufs_phy_rx_symbol_0_clk */
->>>>> -                 <0>, /* ufs_phy_rx_symbol_1_clk */
->>>>> -                 <0>, /* ufs_phy_tx_symbol_0_clk */
->>>>> +                 <&ufs_mem_phy 0>,
->>>>> +                 <&ufs_mem_phy 1>,
->>>>> +                 <&ufs_mem_phy 2>,
->>>>>                     <0>; /* usb3_phy_wrapper_gcc_usb30_pipe_clk */
->>>>>                #clock-cells = <1>;
->>>>> @@ -1151,6 +1151,127 @@ aggre2_noc: interconnect@1700000 {
->>>>>                qcom,bcm-voters = <&apps_bcm_voter>;
->>>>>            };
->>>>> +        ufs_mem_phy: phy@1d80000 {
->>>>> +            compatible = "qcom,milos-qmp-ufs-phy";
->>>>> +            reg = <0x0 0x01d80000 0x0 0x2000>;
->>>>> +
->>>>> +            clocks = <&rpmhcc RPMH_CXO_CLK>,
->>>>> +                 <&gcc GCC_UFS_PHY_PHY_AUX_CLK>,
->>>>> +                 <&tcsr TCSR_UFS_CLKREF_EN>;
->>>>> +            clock-names = "ref",
->>>>> +                      "ref_aux",
->>>>> +                      "qref";
->>>>> +
->>>>> +            resets = <&ufs_mem_hc 0>;
->>>>> +            reset-names = "ufsphy";
->>>>> +
->>>>> +            power-domains = <&gcc UFS_MEM_PHY_GDSC>;
->>>>> +
->>>>> +            #clock-cells = <1>;
->>>>> +            #phy-cells = <0>;
->>>>> +
->>>>> +            status = "disabled";
->>>>> +        };
->>>>> +
->>>>> +        ufs_mem_hc: ufshc@1d84000 {
->>>>> +            compatible = "qcom,milos-ufshc", "qcom,ufshc", "jedec,ufs-2.0";
->>>>> +            reg = <0x0 0x01d84000 0x0 0x3000>;
->>>>> +
->>>>> +            interrupts = <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH 0>;
->>>>> +
->>>>> +            clocks = <&gcc GCC_UFS_PHY_AXI_CLK>,
->>>>> +                 <&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
->>>>> +                 <&gcc GCC_UFS_PHY_AHB_CLK>,
->>>>> +                 <&gcc GCC_UFS_PHY_UNIPRO_CORE_CLK>,
->>>>> +                 <&tcsr TCSR_UFS_PAD_CLKREF_EN>,
->>>>> +                 <&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
->>>>> +                 <&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
->>>>> +                 <&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
->>>>> +            clock-names = "core_clk",
->>>>> +                      "bus_aggr_clk",
->>>>> +                      "iface_clk",
->>>>> +                      "core_clk_unipro",
->>>>> +                      "ref_clk",
->>>>> +                      "tx_lane0_sync_clk",
->>>>> +                      "rx_lane0_sync_clk",
->>>>> +                      "rx_lane1_sync_clk";
->>>>> +
->>>>> +            resets = <&gcc GCC_UFS_PHY_BCR>;
->>>>> +            reset-names = "rst";
->>>>> +
->>>>> +            interconnects = <&aggre1_noc MASTER_UFS_MEM QCOM_ICC_TAG_ALWAYS
->>>>> +                     &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>,
->>>>> +                    <&gem_noc MASTER_APPSS_PROC QCOM_ICC_TAG_ACTIVE_ONLY
->>>>> +                     &cnoc_cfg SLAVE_UFS_MEM_CFG QCOM_ICC_TAG_ACTIVE_ONLY>;
->>>>> +            interconnect-names = "ufs-ddr",
->>>>> +                         "cpu-ufs";
->>>>> +
->>>>> +            power-domains = <&gcc UFS_PHY_GDSC>;
->>>>> +            required-opps = <&rpmhpd_opp_nom>;
->>>>> +
->>>>> +            operating-points-v2 = <&ufs_opp_table>;
->>>>> +
->>>>> +            iommus = <&apps_smmu 0x60 0>;
->>>>
->>>> dma-coherent ?
->>
->>
->> Given that downstream volcano.dtsi has dma-coherent in the ufshc@1d84000
->> node, looks like this is missing in my patch.
-> 
-> Seems that way
-> 
->>>>
->>>> and no MCQ support ?
->>
->> Not sure, I could only find one reference to MCQ on createpoint for
->> milos, but given there's no mcq_sqd/mcq_vs reg defined downstream, and I
->> couldn't find anything for the same register values in the .FLAT file, I
->> don't think Milos has MCQ? Feel free to prove me wrong though.
->>
->>>
->>> So, people just ignore my comment ?
->>>
->>> Milos is based on SM8550, so it should have dma-coherent, for the MCQ
->>> I hope they used the fixed added to the SM8650 UFS controller for MCQ.
->>
->> Not sure what this should mean regarding MCQ...
-> 
-> This platform doesn't support MCQ
-
-Ack, it must be same situation as Kailua then,
-
-Thanks
-Neil
-
-> 
-> Konrad
-
+RGVhciBNYWludGFpbmVycywKCldoZW4gdXNpbmcgb3VyIGN1c3RvbWl6ZWQgU3l6a2FsbGVyIHRv
+IGZ1enogdGhlIGxhdGVzdCBMaW51eCBrZXJuZWwsIHRoZSBmb2xsb3dpbmcgY3Jhc2ggd2FzIHRy
+aWdnZXJlZC4KSEVBRCBjb21taXQ6N2QwYTY2ZTRiYjkwODFkNzVjODJlYzQ5NTdjNTAwMzRjYjBl
+YTQ0OQpnaXQgdHJlZTogdXBzdHJlYW0KT3V0cHV0Omh0dHBzOi8vZ2l0aHViLmNvbS9tYW51YWww
+L2NyYXNoL2Jsb2IvbWFpbi9yZXBvcnRfYzZ4eHZmLnR4dApLZXJuZWwgY29uZmlnOiBodHRwczov
+L2dpdGh1Yi5jb20vbWFudWFsMC9jcmFzaC9ibG9iL21haW4vY29uZmlnLnR4dApDIHJlcHJvZHVj
+ZXI6IGh0dHBzOi8vZ2l0aHViLmNvbS9tYW51YWwwL2NyYXNoL2Jsb2IvbWFpbi9yZXByb19jNnh4
+dmYuYwpTeXogcmVwcm9kdWNlcjogaHR0cHM6Ly9naXRodWIuY29tL21hbnVhbDAvY3Jhc2gvYmxv
+Yi9tYWluL3JlcHJvX2M2eHh2Zi5zeXoKCktBU0FOIHJlcG9ydHMgYSBzbGFiIHVzZS1hZnRlci1m
+cmVlIGluIHRoZSBJbnRlbCBRQVQgZHJpdmVyIGR1cmluZyBhZGZfZGV2X3VwKCkuIFRoZSBkcml2
+ZXIgYWNjZXNzZXMgYSBuYW1lc19jYWNoZSBvYmplY3QgdGhhdCBoYXMgYWxyZWFkeSBiZWVuIGZy
+ZWVkIHdoaWxlIHBlcmZvcm1pbmcgbXV0ZXggb3BlcmF0aW9ucyAoX19tdXRleF9sb2NrX2NvbW1v
+biDihpIgbXV0ZXhfb3B0aW1pc3RpY19zcGluKS4gVGhlIGlzc3VlIGlzIHRyaWdnZXJlZCB3aGVu
+IG9wZW5pbmcgL2Rldi9xYXRfYWRmX2N0bCBhbmQgcGVyZm9ybWluZyBhbiBpb2N0bCB0byBzdGFy
+dCB0aGUgYWNjZWxlcmF0b3IgZGV2aWNlIHdpdGggbWluaW1hbCBjb25maWd1cmF0aW9uLiBJbiBz
+aG9ydCwgdGhlIFFBVCBkcml2ZXIgcmVhZHMgZnJlZWQgbWVtb3J5IGR1cmluZyBkZXZpY2UgaW5p
+dGlhbGl6YXRpb24sIGxlYWRpbmcgdG8gdXNlLWFmdGVyLWZyZWUuIAoKSWYgeW91IGZpeCB0aGlz
+IGlzc3VlLCBwbGVhc2UgYWRkIHRoZSBmb2xsb3dpbmcgdGFnIHRvIHRoZSBjb21taXQ6ClJlcG9y
+dGVkLWJ5OiBaaGkgV2FuZyA8d2FuZ3poaUBzdHUueGlkaWFuLmVkdS5jbj4sIEJpbiBZdTxieXVA
+eGlkaWFuLmVkdS5jbj4sIE1pbmdZdSBXYW5nPHcxNTMwMzc0NjA2MkAxNjMuY29tPgoKUUFUOiBm
+YWlsZWQgdG8gY29weSBmcm9tIHVzZXIgY2ZnX2RhdGEuCmM2eHh2ZiAwMDAwOjAwOjA1LjA6IFN0
+YXJ0aW5nIGFjY2VsZXJhdGlvbiBkZXZpY2UgcWF0X2RldjAuCj09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpCVUc6IEtBU0FO
+OiBzbGFiLXVzZS1hZnRlci1mcmVlIGluIG93bmVyX29uX2NwdSBob21lL3dteS9GdXp6ZXIvdGhp
+cmRfdG9vbC9saW51eC02LjE4L2luY2x1ZGUvbGludXgvc2NoZWQuaDoyMjgyIFtpbmxpbmVdCkJV
+RzogS0FTQU46IHNsYWItdXNlLWFmdGVyLWZyZWUgaW4gbXV0ZXhfY2FuX3NwaW5fb25fb3duZXIg
+aG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgtNi4xOC9rZXJuZWwvbG9ja2luZy9tdXRl
+eC5jOjM5NyBbaW5saW5lXQpCVUc6IEtBU0FOOiBzbGFiLXVzZS1hZnRlci1mcmVlIGluIG11dGV4
+X29wdGltaXN0aWNfc3BpbiBob21lL3dteS9GdXp6ZXIvdGhpcmRfdG9vbC9saW51eC02LjE4L2tl
+cm5lbC9sb2NraW5nL211dGV4LmM6NDQwIFtpbmxpbmVdCkJVRzogS0FTQU46IHNsYWItdXNlLWFm
+dGVyLWZyZWUgaW4gX19tdXRleF9sb2NrX2NvbW1vbiBob21lL3dteS9GdXp6ZXIvdGhpcmRfdG9v
+bC9saW51eC02LjE4L2tlcm5lbC9sb2NraW5nL211dGV4LmM6NjAyIFtpbmxpbmVdCkJVRzogS0FT
+QU46IHNsYWItdXNlLWFmdGVyLWZyZWUgaW4gX19tdXRleF9sb2NrKzB4ZDBhLzB4MTE2MCBob21l
+L3dteS9GdXp6ZXIvdGhpcmRfdG9vbC9saW51eC02LjE4L2tlcm5lbC9sb2NraW5nL211dGV4LmM6
+NzYwClJlYWQgb2Ygc2l6ZSA0IGF0IGFkZHIgZmZmZjg4ODExMjVjOWFiNCBieSB0YXNrIHN5ei4y
+LjYwNjcvMTczNjIKCkNQVTogMSBVSUQ6IDAgUElEOiAxNzM2MiBDb21tOiBzeXouMi42MDY3IFRh
+aW50ZWQ6IEcgICAgICBEICAgICAgICAgICAgIDYuMTguMCAjMyBQUkVFTVBUKHZvbHVudGFyeSkg
+ClRhaW50ZWQ6IFtEXT1ESUUKSGFyZHdhcmUgbmFtZTogUUVNVSBTdGFuZGFyZCBQQyAoaTQ0MEZY
+ICsgUElJWCwgMTk5NiksIEJJT1MgcmVsLTEuMTYuMy0wLWdhNmVkNmI3MDFmMGEtcHJlYnVpbHQu
+cWVtdS5vcmcgMDQvMDEvMjAxNApDYWxsIFRyYWNlOgogPFRBU0s+CiBfX2R1bXBfc3RhY2sgaG9t
+ZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgtNi4xOC9saWIvZHVtcF9zdGFjay5jOjk0IFtp
+bmxpbmVdCiBkdW1wX3N0YWNrX2x2bCsweGRiLzB4MTQwIGhvbWUvd215L0Z1enplci90aGlyZF90
+b29sL2xpbnV4LTYuMTgvbGliL2R1bXBfc3RhY2suYzoxMjAKIHByaW50X2FkZHJlc3NfZGVzY3Jp
+cHRpb24gaG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgtNi4xOC9tbS9rYXNhbi9yZXBv
+cnQuYzozNzggW2lubGluZV0KIHByaW50X3JlcG9ydCsweGNiLzB4NjEwIGhvbWUvd215L0Z1enpl
+ci90aGlyZF90b29sL2xpbnV4LTYuMTgvbW0va2FzYW4vcmVwb3J0LmM6NDgyCiBrYXNhbl9yZXBv
+cnQrMHhjYS8weDEwMCBob21lL3dteS9GdXp6ZXIvdGhpcmRfdG9vbC9saW51eC02LjE4L21tL2th
+c2FuL3JlcG9ydC5jOjU5NQogb3duZXJfb25fY3B1IGhvbWUvd215L0Z1enplci90aGlyZF90b29s
+L2xpbnV4LTYuMTgvaW5jbHVkZS9saW51eC9zY2hlZC5oOjIyODIgW2lubGluZV0KIG11dGV4X2Nh
+bl9zcGluX29uX293bmVyIGhvbWUvd215L0Z1enplci90aGlyZF90b29sL2xpbnV4LTYuMTgva2Vy
+bmVsL2xvY2tpbmcvbXV0ZXguYzozOTcgW2lubGluZV0KIG11dGV4X29wdGltaXN0aWNfc3BpbiBo
+b21lL3dteS9GdXp6ZXIvdGhpcmRfdG9vbC9saW51eC02LjE4L2tlcm5lbC9sb2NraW5nL211dGV4
+LmM6NDQwIFtpbmxpbmVdCiBfX211dGV4X2xvY2tfY29tbW9uIGhvbWUvd215L0Z1enplci90aGly
+ZF90b29sL2xpbnV4LTYuMTgva2VybmVsL2xvY2tpbmcvbXV0ZXguYzo2MDIgW2lubGluZV0KIF9f
+bXV0ZXhfbG9jaysweGQwYS8weDExNjAgaG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgt
+Ni4xOC9rZXJuZWwvbG9ja2luZy9tdXRleC5jOjc2MAogYWRmX2Rldl91cCsweDQ0LzB4MTRjMCBo
+b21lL3dteS9GdXp6ZXIvdGhpcmRfdG9vbC9saW51eC02LjE4L2RyaXZlcnMvY3J5cHRvL2ludGVs
+L3FhdC9xYXRfY29tbW9uL2FkZl9pbml0LmM6NDczIFtpbnRlbF9xYXRdCiBhZGZfY3RsX2lvY3Rs
+KzB4MWQ2LzB4MTA4MCBbaW50ZWxfcWF0XQogdmZzX2lvY3RsIGhvbWUvd215L0Z1enplci90aGly
+ZF90b29sL2xpbnV4LTYuMTgvZnMvaW9jdGwuYzo1MSBbaW5saW5lXQogX19kb19zeXNfaW9jdGwg
+aG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgtNi4xOC9mcy9pb2N0bC5jOjU5NyBbaW5s
+aW5lXQogX19zZV9zeXNfaW9jdGwgaG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgtNi4x
+OC9mcy9pb2N0bC5jOjU4MyBbaW5saW5lXQogX194NjRfc3lzX2lvY3RsKzB4MTk0LzB4MjEwIGhv
+bWUvd215L0Z1enplci90aGlyZF90b29sL2xpbnV4LTYuMTgvZnMvaW9jdGwuYzo1ODMKIGRvX3N5
+c2NhbGxfeDY0IGhvbWUvd215L0Z1enplci90aGlyZF90b29sL2xpbnV4LTYuMTgvYXJjaC94ODYv
+ZW50cnkvc3lzY2FsbF82NC5jOjYzIFtpbmxpbmVdCiBkb19zeXNjYWxsXzY0KzB4YzYvMHgzOTAg
+aG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgtNi4xOC9hcmNoL3g4Ni9lbnRyeS9zeXNj
+YWxsXzY0LmM6OTQKIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDc3LzB4N2YKUklQ
+OiAwMDMzOjB4N2ZhZTg3YzQwNTlkCkNvZGU6IDAyIGI4IGZmIGZmIGZmIGZmIGMzIDY2IDBmIDFm
+IDQ0IDAwIDAwIGYzIDBmIDFlIGZhIDQ4IDg5IGY4IDQ4IDg5IGY3IDQ4IDg5IGQ2IDQ4IDg5IGNh
+IDRkIDg5IGMyIDRkIDg5IGM4IDRjIDhiIDRjIDI0IDA4IDBmIDA1IDw0OD4gM2QgMDEgZjAgZmYg
+ZmYgNzMgMDEgYzMgNDggYzcgYzEgYTggZmYgZmYgZmYgZjcgZDggNjQgODkgMDEgNDgKUlNQOiAw
+MDJiOjAwMDA3ZmFlODY2ODZmOTggRUZMQUdTOiAwMDAwMDI0NiBPUklHX1JBWDogMDAwMDAwMDAw
+MDAwMDAxMApSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwN2ZhZTg3ZWI1ZmEwIFJDWDog
+MDAwMDdmYWU4N2M0MDU5ZApSRFg6IDAwMDAyMDAwMDAwMDAwMDAgUlNJOiAwMDAwMDAwMDQwMDk2
+MTAyIFJESTogMDAwMDAwMDAwMDAwMDAwMwpSQlA6IDAwMDA3ZmFlODdjZGUwNzggUjA4OiAwMDAw
+MDAwMDAwMDAwMDAwIFIwOTogMDAwMDAwMDAwMDAwMDAwMApSMTA6IDAwMDAwMDAwMDAwMDAwMDAg
+UjExOiAwMDAwMDAwMDAwMDAwMjQ2IFIxMjogMDAwMDAwMDAwMDAwMDAwMApSMTM6IDAwMDA3ZmFl
+ODdlYjYwMzggUjE0OiAwMDAwN2ZhZTg3ZWI1ZmEwIFIxNTogMDAwMDdmYWU4NjY2NzAwMAogPC9U
+QVNLPgoKVGhhbmtzLApaaGkgV2FuZw==
