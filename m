@@ -1,158 +1,124 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18CA52D2481;
-	Mon, 12 Jan 2026 10:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43DE53559CD
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 11:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768214001; cv=none; b=EGzy6pVrJCWYQq0LW5lNVtfjc5Ubk1ZidVLFrgzHcEDnQYzRaPNUo7Jh0nPPZjnnOVqRLCGsP2f9Zdjq1+9KoNwMPg6o8RSfKejK4/+IDfbrXT0DuWhFxnQfWj6ogbR9bZRScOunW/RIzgz870lHLMVkeQRUqYf0dNUIpECBoN4=
+	t=1768218829; cv=none; b=KbuJfD4au0vZ1Dos9208YLAW+WupSptG87IFqIs0QaTW3oHujQsbCa82fAluZhaMw2iRXxs+P2HYUBrGwnxFe7t4NgXdEf4q3jYOJJmpUOzaW48OF+WhEMi6WD2zGuuCQwyS9h1ZUxHbN7yPsmCamgkCeuL9DhUVmLlyUqwDEx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768214001; c=relaxed/simple;
-	bh=3WvoLxWPBX/nvNBdAet0EG4DRqalXwTIWl2WlwowKOE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xylum5bs/JG8rntzj3XYXCkX2gQvuA9nBM44LFnij4DKpUbzkM62aU9ZclbAv8wBdvA2D4WOjuw6g0LTyamFYeZA1dETpEwCVPVzW0KzI8oOZewe8o8tP2Fcq+dy0vynmhsIsrXeS5Hgr4XHGZmxYOnRvoRI2/Ymdh9uOSSktj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HPd93T2C; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1768218829; c=relaxed/simple;
+	bh=vmTytKEFKU0ifzxVpiXhAKs/Bpsn0CVSj3hYAL8y0FE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KoxHWhnjIjMxQrPGv8/5kQ3rnZ0sMZcwCUy3Oy6CWi0neJAiHdFDRs+VlWfLzjs5Wvt6vi3PGN8XrdSuphw7Pd2G+tmbfrC4Eo+GyhTcR9skY5F4zqhG9IWjs1MX2Z8U/073j/ix5qwSLSuRgGS0KsT6VzXSp6+qabYE7SvgVO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=dvhz3h48; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HPd93T2C"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768214000; x=1799750000;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=3WvoLxWPBX/nvNBdAet0EG4DRqalXwTIWl2WlwowKOE=;
-  b=HPd93T2Cje9vVucJkaUuwtO2R9nSXSGGb7Czteg2Mpt2VA0e+H6w4Wm0
-   2WOZevI4pMou1Eaizea/iLOnE9uLYmMDqpY0nVQOiEG9KIFhal6DZSroi
-   /jStJ1zmcRfF7wOg8ihT4xQVyUbIOomDnJU5CCKx30OJqKcbEqzvUoAFm
-   Hs3/mL/i+6p/RVarAQ4pGk1F/7DxtNvggrw/aSTRQhVoxIJwL0mwFiF0K
-   4PK8vU3vmnJaHcOmVtXi/I+BocHUU/moTYV6UvrPo+g9u4rmS7eMgu4vc
-   UsonMKsKJbWWd3rNJ9LP2we5U9X7pr1MvYzTydMSyo//A+0NiziBlSJmv
-   A==;
-X-CSE-ConnectionGUID: iGmtH3+TSDqYP+qWK3cczw==
-X-CSE-MsgGUID: JaSF/uxrRXS4q1E1oIpKTw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11668"; a="80939936"
-X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
-   d="scan'208";a="80939936"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 02:32:39 -0800
-X-CSE-ConnectionGUID: KeVRm3ThTIyu/02WLS2Cvw==
-X-CSE-MsgGUID: T5zF6Dw6TdejExXJJsJSFw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
-   d="scan'208";a="241588226"
-Received: from fpallare-mobl4.ger.corp.intel.com (HELO [10.245.245.90]) ([10.245.245.90])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 02:32:28 -0800
-Message-ID: <1502e5eb-0ac7-4581-85ce-2f0c390bd7db@linux.intel.com>
-Date: Mon, 12 Jan 2026 11:32:25 +0100
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="dvhz3h48"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4779ce2a624so52628735e9.2
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 03:53:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1768218825; x=1768823625; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vmTytKEFKU0ifzxVpiXhAKs/Bpsn0CVSj3hYAL8y0FE=;
+        b=dvhz3h48rSihr+heN2pL6rYoGdQRt2dmHZF1ED8M+d+xB/IWxP5HWUK2mAc1yls2bF
+         k1WwHwk4tqj2tQ7Wik3/ruZvc32KplY4Mi/rWz8FUNXoMKJeUl6xfIy4Gg6vZIHJvmKo
+         utM1H9gZDQGJtUDQBgkS3HEB6OmMbVHy9RWkJvah/lgiKJz7TmXaZp6R0bU2f9IwdtUf
+         +XJG1rdF+lfYl+GDO2RhrdigWg//eDWQLg856HntCoYxEm9Pa6F1zlZltCz+u2fN18Iy
+         /RiXuEg7rmj60wZg/7xLckQSSTrAU2xauQfd+n5XAc9b8S15Zd5AjYwSUaYYpKlKKV9L
+         YcLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768218825; x=1768823625;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vmTytKEFKU0ifzxVpiXhAKs/Bpsn0CVSj3hYAL8y0FE=;
+        b=Ku3nY4LHpTcvL8slDoEFX+gQ7A5+d1wcuW/3gy3BdxjcH+b4/fYRN4oJRM0T6PHqy+
+         HcBqpFXQc+SyUTKPxkVhC16tdsEhjf1jAs58HAqCV1iY2LltnF1N1pDxbMvf0uuqzFUl
+         U9FLlfNM8BWU+x27/fd+yfFgjXb/Bzs17K7NJesvpP2e5FW+KNvvhuca45op8EpYHXVp
+         KU2RaoxQGyMZZ9xtaCO2ifm4lC2BG8tdCkJd0GcvCZK3kFddumfNcsx2SXBJ0ENTk3Aj
+         I653Lkb0WIi9maiARVScNSloTGSF5I+Z6UTUadC5gdTdXfPNHZVB3WuQ92dPK6EuTbrC
+         C8gA==
+X-Gm-Message-State: AOJu0Yy3/MnwqebAqlJP5xbU0dF3tOAqGk/Mh67rtAP2f6WJ0Vpmv9zH
+	fz7OiGNWDC7MMuZd/iLDAhktCmwZalAUdUAY1zYj7vZxBsRI0z945c9k1TFf33Iw9Xk=
+X-Gm-Gg: AY/fxX5D8iUIGIxSCKzs3CKwSE0Ol/Wv3qPx5s4MYN751x4nxzAAUDbSl6QhaC70J4M
+	lm61DrLb9eQJazntaYnrWbfYUU0Q0lkzVqdXy10Sr6NgASuGmHWbSgOqz+q5FBoQ+Era9mCwZys
+	n29AG/GtkPLreNhRqq9glUfzIz1YnDWqO+zsgdk19KMNR5ThMRSJsrMVISZ9P+67D5BQWEA2yvp
+	NRKt6dZKODDEVxCpTzAWo3S6SQP+KZ96nfCN16yfgxEdMsMj3QHpVuKZ9L0HmpvO5g0Ez1RwxBY
+	6fxP558NX9KvZDArmwnMXdBf00f1Clg90b1Jwz9e2W12WHzVTwL4Mk3g77MxsTYKElxxC9ljNJ6
+	M2t+FzM7L+gSF+bttJ5SwWcq58lY4+uY8sXuh7nMPpwqgBZIR92GfsKtKK5Q7PaZ3EgftyjeWBC
+	Z8RxFSYU6iWYP5rNt5XYDr85SQm42vhgCzytLBG5/Mtfkm/mNYqQ7s+0iIH9oldHDbfyaxu+eu8
+	w==
+X-Google-Smtp-Source: AGHT+IHS+X3LSDt5qzxc7wN+ZiHbRa7V37jnrS+IUFcr2yrSlHBW3u8uORHbJtAGSuAyEXEXsweZBQ==
+X-Received: by 2002:a05:600c:4ed1:b0:47d:18b0:bb9a with SMTP id 5b1f17b1804b1-47d84b54031mr204347325e9.33.1768218825500;
+        Mon, 12 Jan 2026 03:53:45 -0800 (PST)
+Received: from localhost (p200300f65f20eb045084e32706235b2b.dip0.t-ipconnect.de. [2003:f6:5f20:eb04:5084:e327:623:5b2b])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-47d8660be14sm134733965e9.1.2026.01.12.03.53.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 03:53:44 -0800 (PST)
+Date: Mon, 12 Jan 2026 12:53:43 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Akhil R <akhilrajeev@nvidia.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Thierry Reding <thierry.reding@gmail.com>, Thierry Reding <treding@nvidia.com>, 
+	Jonathan Hunter <jonathanh@nvidia.com>, Mikko Perttunen <mperttunen@nvidia.com>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Sowjanya Komatineni <skomatineni@nvidia.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>, 
+	Mauro Carvalho Chehab <mchehab@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-crypto@vger.kernel.org, linux-tegra@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
+	linux-staging@lists.linux.dev
+Subject: Re: [PATCH 0/2] host1x: Convert to bus methods
+Message-ID: <qqdjk5wi5xlily3cfa74lrepglo42ibnpoyam76vwkymju3hkh@b5dc4yg64mhs>
+References: <cover.1765355236.git.u.kleine-koenig@baylibre.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 20/36] locking/ww_mutex: Support Clang's context
- analysis
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Marco Elver <elver@google.com>, Peter Zijlstra <peterz@infradead.org>,
- Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
- Will Deacon <will@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
- Chris Li <sparse@chrisli.org>, "Paul E. McKenney" <paulmck@kernel.org>,
- Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>,
- Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>,
- Eric Dumazet <edumazet@google.com>, Frederic Weisbecker
- <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Herbert Xu <herbert@gondor.apana.org.au>, Ian Rogers <irogers@google.com>,
- Jann Horn <jannh@google.com>, Joel Fernandes <joelagnelf@nvidia.com>,
- Johannes Berg <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>,
- Josh Triplett <josh@joshtriplett.org>, Justin Stitt
- <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
- Kentaro Takeda <takedakn@nttdata.co.jp>,
- Lukas Bulwahn <lukas.bulwahn@gmail.com>, Mark Rutland
- <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Steven Rostedt <rostedt@goodmis.org>,
- Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
- Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
- Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>,
- kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-security-module@vger.kernel.org, linux-sparse@vger.kernel.org,
- linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
-References: <20251219154418.3592607-1-elver@google.com>
- <20251219154418.3592607-21-elver@google.com>
- <05c77ca1-7618-43c5-b259-d89741808479@acm.org>
- <aWFt6hcLaCjQQu2c@elver.google.com>
- <8143ab09-fd9b-4615-8afb-7ee10e073c51@acm.org>
-Content-Language: en-US
-From: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-In-Reply-To: <8143ab09-fd9b-4615-8afb-7ee10e073c51@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="atue6rojhx5cbpx3"
+Content-Disposition: inline
+In-Reply-To: <cover.1765355236.git.u.kleine-koenig@baylibre.com>
 
-Hey,
 
-The acquire_done() call was always optional. It's meant to indicate that after this point,
-ww_acquire_lock may no longer be called and backoff can no longer occur.
+--atue6rojhx5cbpx3
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 0/2] host1x: Convert to bus methods
+MIME-Version: 1.0
 
-It's allowed to call ww_acquire_fini() without ww_acquire_done()
+Hello,
 
-Think of this case:
-ww_acquire_init()
+On Wed, Dec 10, 2025 at 09:31:36AM +0100, Uwe Kleine-K=F6nig wrote:
+> with the eventual goal to get rid of the callbacks .probe(), .remove()
+> and .shutdown() in struct device_driver, migrate host1x to use bus
+> callbacks instead.
 
-ww_acquire_lock_interruptible() -> -ERESTARTSYS
+This series got some positive feedback but nobody picked it up yet. Is
+this still on someone's radar? The last patches to drivers/gpu/host1x
+where picked up by Thierry.
 
-ww_acquire_fini()
+Best regards
+Uwe
 
-Here it wouldn't make sense to call ww_acquire_done().
+--atue6rojhx5cbpx3
+Content-Type: application/pgp-signature; name="signature.asc"
 
-It's mostly to facilitate this case:
+-----BEGIN PGP SIGNATURE-----
 
-ww_acquire_init()
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmlk4MUACgkQj4D7WH0S
+/k5w/QgAhE2EAWGMq3JkMD2P64EjS1rMwsjti9FFnLXqoSgWOD1/HpSebIxgHVUH
+9SjJD/+aDtRXdiEaEM0CWYWAcTk673HShaX+R5uJ+NUSegWvD1bO8RXbwYW2lW0l
+5XEoBJro1TsCECL4gBAlxENblu01RKLwAnTAcCHRjTFEgjM833wJgTFdHrtUAZxZ
+uiEOWaOT1mxK+8rPLf3lPzeu/3NAhDsUGyqIMDA1IQ4PUkSxBwR1A6CZPsL916r1
++Rr9xh8Jo7dY4QKqb7SseBTkAoqcbozDpROJPfpUmUbHCPld8WkAx7mt8I/DTJ+M
++lGuvDBluoPISCAslcMNqdQ44lcyOQ==
+=kDAI
+-----END PGP SIGNATURE-----
 
-ww_acquire_lock() a bunch.
-
-/* Got all locks, do the work as no more backoff occurs */
-ww_acquire_done()
-
-...
-
-unlock_all()
-ww_acquire_fini()
-
-If you call ww_acquire_lock after done, a warning should occur as this should no longer happen.
-
-Kind regards,
-~Maarten Lankhorst
-
-Den 2026-01-09 kl. 22:26, skrev Bart Van Assche:
-> (+Maarten)
-> 
-> On 1/9/26 2:06 PM, Marco Elver wrote:
->> If there's 1 out of N ww_mutex users that missed ww_acquire_done()
->> there's a good chance that 1 case is wrong.
-> 
-> $ git grep -w ww_acquire_done '**c'|wc -l
-> 11
-> $ git grep -w ww_acquire_fini '**c'|wc -l
-> 33
-> 
-> The above statistics show that there are more cases where
-> ww_acquire_done() is not called rather than cases where
-> ww_acquire_done() is called.
-> 
-> Maarten, since you introduced the ww_mutex code, do you perhaps prefer
-> that calling ww_acquire_done() is optional or rather that all users that
-> do not call ww_acquire_done() are modified such that they call
-> ww_acquire_done()? The full email conversation is available here:
-> https://lore.kernel.org/all/20251219154418.3592607-1-elver@google.com/
-> 
-> Thanks,
-> 
-> Bart.
-
+--atue6rojhx5cbpx3--
