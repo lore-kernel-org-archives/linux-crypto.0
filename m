@@ -1,165 +1,294 @@
-Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7363815C2
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 18:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3AA311C17;
+	Mon, 12 Jan 2026 19:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768241500; cv=none; b=brYyToxzorcPnL1JJB0zHF4x+sAWxPplE1qcdLR2VFauIUTAOR/UQvOysZKn727oa7UdX0rFR4tjZVEGeJaPEfk7Lbbqe5CkSZJPSiFEGHDBfBWmTQ0+val5EemXJuOXtMfA9HsuibZLyaBpcdk+lv63oYa+v3Pna+JGHwTwUGQ=
+	t=1768245798; cv=none; b=u6w7lic4GLxgBA3YhhFjNxIjTrelPR5MKkaFn8GwhKs4coGRstvFcFx4U5iT4EeTi9GaBnF0Cgr9r/BuTbXKcuxj5mytWm1tEyi4S/4bV+6dja9G6GqWGmIDAPjCkjFlaeH5geZsXhXMOnTTlAb5h1wYhaWc5Qqgncb/GZEEg2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768241500; c=relaxed/simple;
-	bh=fFcP0DbQA2hNBd36x1ltvD0yBLw29jFLbltMBnhdBG8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BSvewMYI+ep+5tEi8EOr2kpw1YxSoMYKovqoCIQzBGphR966YYG4AHkj/OhwSr/dhmskjtYDcW9UisFdjxOFm3vdl6DLvAUFPro2v4F+sstJNbEZDPoDK6jzO7TkPvgEfsnOi9X53AY9TCHFr4Ly0t2x2ZHR3ZWynEsn6R3OKAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=An53TtXx; arc=none smtp.client-ip=74.125.82.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
+	s=arc-20240116; t=1768245798; c=relaxed/simple;
+	bh=ZRvP8Eu2ZYkXNX7mjnd+j5ZWmCcl5EekdaxQe1idS1w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UGwDfTiP5ifj1eEPR74GaBsyetluzb0txaJg8pacZZL4pZ1YqCvr5Y8jZJshQtfa03ZNJ6Q/0J6yBp8nzDBAzpNDb/d6g/q8ahPXWzHkM2FD1XFpbe5QTuwpDiMKroLwqeu+SaS9kMJeiowH7J7aCxcZQZGo7/Q968DvMIJV3YQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=saTCPIlt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="An53TtXx"
-Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-11f42e971d6so1544218c88.0
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 10:11:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wbinvd.org; s=wbinvd; t=1768241498; x=1768846298; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fskuJNDN7ah1k6MwRaRiHDHSFs0dVGdpVVlIWs6g0AE=;
-        b=An53TtXxkgb5i6EB123LyeHoyjioZE0V9rlX5elzlb8Ry0Nw8cRuTppBLsQqAExmv0
-         xNbDKVyqhjA0Pc/DtXkNr2/BxKuzQxR3zeCQGcPUIwfjw+sbEZJdVwc7saeTgGrsTt2S
-         O/9wl+YM9uJ36BVZqRLUKUcqTLGEtTmzllLfZA8e6llBcSwBwU3xqFpg9AfViZ4cJWaC
-         3KkfmLseZsVI99K49YFFfkkmCK99HodYcq/ftMgdK0V+9ErIMF+UZdDqJrjliKMn7KSG
-         rpoCccrXTmrcgjsw5Qd5UQB/lcPUnT6NIS2ljhMAiTipQt8xDLG0RTmR4orQ4nrhOytV
-         33Vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768241498; x=1768846298;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fskuJNDN7ah1k6MwRaRiHDHSFs0dVGdpVVlIWs6g0AE=;
-        b=KFnEq6XrKk0JHCLiAFt4ekUmi52rxz/8Ngao3YZdG0ABdmUJlV8m7AqcNG0kT+BiFP
-         1dSLB4bfqrQjaX/RB562KCyPVIOV5yqjH8NUNAD1GNbPq+UyAmE0B/1L3HejleCpCH0c
-         /fX5xEKv1sy4wZxp681CsWbl7qnO7ITbSWcLAiVo8M+xlGEPryN2vvwizSR91YE+AYt5
-         2Dm2O0ryRk6VjtLl0OJ5kF5rYiqjfm/2E4B3awi5BqazSNAQVatEMN0YW0Lrb3uyq6AP
-         N5tWisEuQSQdo6q0hMswklb/2w3Kz/g+wx4hj3hd+s+GdE/D4Sl376qCtm2bncByqrKb
-         zWbw==
-X-Forwarded-Encrypted: i=1; AJvYcCUCn8qZscXwshriFLz2cJr3IIeDKgS/Z2yG+vFPcKlCK/WTOs3PMKvAT7TU9Qyi739Lleai+tXfMckZ5/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqG8e4dX1C8i+Bn9o/HYx3mnW9/IlW87WTyG59WuCISSFUikvS
-	o2SEZzbnr6eRkje6k7FP2Ym74l7RIsmObKXCFxDV5UC6Ge0eXcmYSUcjh8rtadiiMs0=
-X-Gm-Gg: AY/fxX5H++y5wkXqQWXm6i33ze508OEb7fW1JPgGsZYmgg/aMB9mYsbgbPEkjt1OeDg
-	Q/8D4Au0Bu3sk1qqGr0BZGsh2JEuaY0otIYmkvIeFim+fFY4tRUdfyi/D3+4VxsBlc2ZHsAUKqq
-	D5N3mvK2jC94iSUz/hK4gBGTsI/MFROW42O83592O5vgzze51J9BW8D0+/pacR61O5psKWXXWO+
-	x8+eaoTZhxq+UUQRljjvrp7Z/rFz9ZxSJVLyoZxKZy2XnVZQ0lFEp/UvyW6pJAV2dkbij1JMiyB
-	NYqCocL23j+Kf4gkZgfebhX4LAgU9jcjXaTpxi9mVjoCNF9hLaxx/+zmuEAv+As/fswg5bd7s0x
-	XQw0EvYSXTKGp2wPK1q/UKVMAfIaEXI4KpliOuHn4fYG8eLJc0L/IyWbUiXJysHkKOtVB0SGQD9
-	W7sYzBLLBmYgHeCQ==
-X-Google-Smtp-Source: AGHT+IGNt6oDzBfL0zHoJ+UM+BbLyjGJDfL3blbOY9WejiBqLu6Cxhb+pC6rJecCxLZ53cxOs52d3g==
-X-Received: by 2002:a05:7022:2207:b0:11a:436c:2d56 with SMTP id a92af1059eb24-121f8ab6931mr16746646c88.2.1768241497522;
-        Mon, 12 Jan 2026 10:11:37 -0800 (PST)
-Received: from mozart.vkv.me ([2001:5a8:468b:d015:69c1:c5a3:b5b9:6ece])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f243ed62sm25984960c88.5.2026.01.12.10.11.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 10:11:37 -0800 (PST)
-Date: Mon, 12 Jan 2026 10:11:34 -0800
-From: Calvin Owens <calvin@wbinvd.org>
-To: Qu Wenruo <quwenruo.btrfs@gmx.com>
-Cc: linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [QUESTION] Debugging some file data corruption
-Message-ID: <aWU5VnDW8cHnnauK@mozart.vkv.me>
-References: <20251111170142.635908-1-calvin@wbinvd.org>
- <cd54e3a7-d676-46fe-8922-bb97d4e775cc@gmx.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="saTCPIlt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A00AC116D0;
+	Mon, 12 Jan 2026 19:23:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768245797;
+	bh=ZRvP8Eu2ZYkXNX7mjnd+j5ZWmCcl5EekdaxQe1idS1w=;
+	h=From:To:Cc:Subject:Date:From;
+	b=saTCPIltyU6hz6OskiKaBu6wp//9dQn/pMKDiaQBrYAySSw/gaF4u8LT3tpoA/S3x
+	 HDgSfhKkzgLurULIdcYBigyg4lcTPA0P4V2A85QIA8Arxy9IjXOyd+XXCtFL4YXbbM
+	 9eN1XlEB6jH+SGVbkxNOOg8yh5x83M4rz1na5cHoXKGVUsbJQnzdPuslpZi/xasArB
+	 hpEnTlENXpj9JzigBVXjAZGkliYF3R689fK4oBhSkVokLMBKAeehfrxQ+bbAoqbWSt
+	 LZKoAa1hg/lJBEFBdij2oE6ESJlxcUveElZZcuVwMZLC/aFoWtf16D3TqQSO55znGl
+	 ZPaaDYuTbv88g==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-arm-kernel@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org,
+	x86@kernel.org,
+	Holger Dengler <dengler@linux.ibm.com>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v2 00/35] AES library improvements
+Date: Mon, 12 Jan 2026 11:19:58 -0800
+Message-ID: <20260112192035.10427-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <cd54e3a7-d676-46fe-8922-bb97d4e775cc@gmx.com>
 
-On Wednesday 11/12 at 07:32 +1030, Qu Wenruo wrote:
-> 在 2025/11/12 03:31, Calvin Owens 写道:
-> > Hello all,
-> > 
-> > I'm looking for help debugging some corruption I recently encountered.
-> > It happened on 6.17.0, and I'm trying to reproduce it on 6.18-rc. This
-> > is not really actionable yet, I'm just looking for advice.
-> > 
-> > After copying about 10TB of data to a btrfs+luks+mdraid1 across two 18TB
-> > drives,
-> 
-> With LUKS in the middle, it makes any corruption pattern very human
-> unreadable.
-> 
-> I guess it's not really feasible to try to reproduce the problem again since
-> it has 10TiB data involved?
-> 
-> But if you can spend a lot of time waiting for data copy, mind to try
-> the following combination(s)?
-> 
-> - btrfs on mdraid1
-> - btrfs RAID1 on raw two HDDs
+This series applies to libcrypto-next.  It can also be retrieved from:
 
-I re-ran the copies several times and never reproduced it. But I finally
-hit it again after I gave up, while making a backup on 6.18.0 with
-btrfs-raid1+luks:
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git aes-lib-v2
 
-    Opening filesystem to check...
-    Checking filesystem on /dev/mapper/sdc_crypt
-    UUID: f8223856-32cc-4dcf-8cee-9312e032c005
-    [1/8] checking log skipped (none written)
-    [1/7] checking root items                      (0:00:59 elapsed, 4875792 items checked)
-    [2/7] checking extents                         (0:28:03 elapsed, 4583919 items checked)
-    [3/7] checking free space tree                 (0:01:01 elapsed, 8253 items checked)
-    [4/7] checking fs roots                        (0:20:30 elapsed, 10978 items checked)
-    mirror 2 bytenr 870744010752 csum 0xdb1b27f0ca1a0139f7c65a0c0698a9a3f9e6ca6d624da7f70eecb3fc0f14ffc7 expected csum 0x2bce1cca32d98c3f83087f09980770a101b0560b1ddde7919fbbcd58a75f7d6b
-    mirror 1 bytenr 2004063948800 csum 0xe3f0a16cc8f03705a89f81178d4617c2847d660b7171abe29b65b5b394a9aace expected csum 0xc85b7f37fb620e1a68754692fd7ca43846ca316de6485fc8a4b447bfeab78d78
-    mirror 2 bytenr 3575828525056 csum 0xb9d9ee193d29b59b2015efed6151029c340a051c0338ec7ebca200363d304be8 expected csum 0xd645b7e5add1aa540a3440b78b7d31daa9545c925d32d2650d6bc61b7fdf4813
-    mirror 1 bytenr 3714124914688 csum 0xcb2ff575e84a8e965b94bc8faf9e76d8f645742ee9cd503609efd78ac22623e4 expected csum 0x966b1d021450ffb6c47759161533e185f06a14a50c30ff881097a43b7ad6d6cc
-    mirror 2 bytenr 4211891310592 csum 0xd1c11dabfa4bf3acea463479ab444bbc4c66dc9ba3257f09f4e1815bb46afac2 expected csum 0x17fff4d14269c69d84d267466c577ced3787fd9a9a445e36642067c47f129601
-    mirror 2 bytenr 4328552914944 csum 0x02f75c04f1d921ce34f5b6b9bf40c3b0056971fc89989dad227fc45723938472 expected csum 0xdd6416d001ac47f16e68a24d1438244152355a0774142d4885e5a031c6938d93
-    mirror 2 bytenr 4681011163136 csum 0x44c0b9d90fb258659e7377e93a96039afcadb501559a0cd831bf8c36f8fa1b2b expected csum 0x36c59223538807fc604537be5d686900031866626f3a1dc788755e92a74869cb
-    mirror 1 bytenr 4808263344128 csum 0xfd6278ce98b1f15c8aefea981e5ba7a521fa1a08d0f642185abf72e215288618 expected csum 0x1108b8b604c5b21f7d7d80d32a1fd9c0c0e753cad8fb97967dfa3525105bf808
-    mirror 1 bytenr 4993017057280 csum 0x033440e421102ec0c7b3057eae89dd80f300aecba70d3f1fcf5fe81c2cd6faba expected csum 0xb0e94e343b7291df9aae42a079bd0bba307a1c2ab81315361a49b0d8b6d53f49
-    mirror 2 bytenr 5037246173184 csum 0x00b807ff8d0a31a79bb947e774c077916b0bd162dbf24fe43e4fca179e364214 expected csum 0x984635996e4c3fed6c701519e9f654b1b0adb06f3921522f6b687bbccd730271
-    mirror 1 bytenr 5316786614272 csum 0x2805b36b130667ffaf187f1cc6bdab0802e5eb26332f3bae572202c9c34585dd expected csum 0xd7a2bab5bfddacddb610c6044504474c88962ed22d837a881faba8e4e60bee40
-    mirror 2 bytenr 7293991006208 csum 0x68f917b93233bb6c7e49775c0c0deed66c47fe0027f3d4287a3b2c736fb25a1b expected csum 0x3662cf0b4a35cd0a0b71a475f35a92a6fefdcf21b7ee59a97b261bb6fbda1c8a
-    [5/7] checking csums against data              (33:30:05 elapsed, 6082759 items checked)
-    ERROR: errors found in csum tree
-    [6/7] checking root refs                       (0:00:00 elapsed, 3 items checked)
-    [8/8] checking quota groups skipped (not enabled on this FS)
-    found 8848080683008 bytes used, error(s) found
-    total csum bytes: 68538889856
-    total tree bytes: 75102781440
-    total fs tree bytes: 180338688
-    total extent tree bytes: 340852736
-    btree space waste bytes: 5344101189
-    file data blocks allocated: 8776199127040
-     referenced 8772977901568
+This series makes three main improvements to the kernel's AES library:
 
-The corruptions looked similar to the first time, couldn't get any new
-clues out of them. Unfortunately it was on LUKS again because I'd given
-up on reproducing this, I'll try without LUKS going forward.
+  1. Make it use the kernel's existing architecture-optimized AES code,
+     including AES instructions, when available.  Previously, only the
+     traditional crypto API gave access to the optimized AES code.
+     (As a reminder, AES instructions typically make AES over 10 times
+     as fast as the generic code.  They also make it constant-time.)
 
-I realized the common factor betwen the original repro and this one was
-that I was additionally running an sftp copy of the same files over the
-network while the files were being copied between the two local volumes.
+  2. Support preparing an AES key for only the forward direction of the
+     block cipher, using about half as much memory.  This is a helpful
+     optimization for many common AES modes of operation.  It also helps
+     keep structs small enough to be allocated on the stack, especially
+     considering potential future library APIs for AES modes.
 
-    mkfs.btrfs -m raid1 -d raid1 --csum blake2 /dev/sda /dev/sdb
-    mount /dev/sda -o compress=zstd:1 /mnt
-    rsync -Pav /data/ /mnt
+  3. Replace the library's generic AES implementation with a much faster
+     one that is almost as fast as "aes-generic", while still keeping
+     the table size reasonably small and maintaining some constant-time
+     hardening.  This allows removing "aes-generic", unifying the
+     current two generic AES implementations in the kernel tree.
 
-...and then, concurrently from another machine:
+(1) and (2) end up being interrelated: the existing
+'struct crypto_aes_ctx' does not work for either one (in general).
+Thus, this series reworks the AES library to be based around new data
+types 'struct aes_key' and 'struct aes_enckey'.
 
-    sftp -ar nas:/data .
+As has been the case for other algorithms, to achieve (1) without
+duplicating the architecture-optimized code, it had to be moved into
+lib/crypto/ rather than copied.  To allow actually removing the
+arch-specific crypto_cipher "aes" algorithms, a consolidated "aes-lib"
+crypto_cipher algorithm which simply wraps the library is also added.
+That's most easily done with it replacing "aes-generic" too, so that is
+done too.  (That's another reason for doing (3) at the same time.)
 
-Can anybody else reproduce this corruption with that combo?
+As usual, care is taken to support all the existing arch-optimized code.
+This makes it possible for users of the traditional crypto API to switch
+to the library API, which is generally much easier to use, without being
+concerned about performance regressions.
 
-Otherwise, I'll keep working on narrowing this down: the tests take ages
-to run but require very little actual human time from me, so I'm happy
-to keep trying. Any other suggestions are welcome!
+That being said, this series only deals with the bare (single-block) AES
+library.  Future patchsets are expected to build on this work to provide
+architecture-optimized library APIs for specific AES modes of operation.
 
-Thanks,
-Calvin
+Changed in v2:
+- Fix missing MMU protection for aes_enc_tab and aes_dec_tab.
+  (Suggested by Qingfang Deng)
+- Reduced churn by temporarily making aes_encrypt() and aes_decrypt()
+  type-generic macros.  (Suggested by Andrew Cooper)
+- Added Ard's Acked-by
+- Rebased onto latest libcrypto-next
+- A few other very minor tweaks, such as updating the file comment in
+  aes-riscv64-glue.c
+
+Eric Biggers (35):
+  crypto: powerpc/aes - Rename struct aes_key
+  lib/crypto: aes: Introduce improved AES library
+  crypto: arm/aes-neonbs - Use AES library for single blocks
+  crypto: arm/aes - Switch to aes_enc_tab[] and aes_dec_tab[]
+  crypto: arm64/aes - Switch to aes_enc_tab[] and aes_dec_tab[]
+  crypto: arm64/aes - Select CRYPTO_LIB_SHA256 from correct places
+  crypto: aegis - Switch from crypto_ft_tab[] to aes_enc_tab[]
+  crypto: aes - Remove aes-fixed-time / CONFIG_CRYPTO_AES_TI
+  crypto: aes - Replace aes-generic with wrapper around lib
+  lib/crypto: arm/aes: Migrate optimized code into library
+  lib/crypto: arm64/aes: Migrate optimized code into library
+  lib/crypto: powerpc/aes: Migrate SPE optimized code into library
+  lib/crypto: powerpc/aes: Migrate POWER8 optimized code into library
+  lib/crypto: riscv/aes: Migrate optimized code into library
+  lib/crypto: s390/aes: Migrate optimized code into library
+  lib/crypto: sparc/aes: Migrate optimized code into library
+  lib/crypto: x86/aes: Add AES-NI optimization
+  crypto: x86/aes - Remove the superseded AES-NI crypto_cipher
+  Bluetooth: SMP: Use new AES library API
+  chelsio: Use new AES library API
+  net: phy: mscc: macsec: Use new AES library API
+  staging: rtl8723bs: core: Use new AES library API
+  crypto: arm/ghash - Use new AES library API
+  crypto: arm64/ghash - Use new AES library API
+  crypto: x86/aes-gcm - Use new AES library API
+  crypto: ccp - Use new AES library API
+  crypto: chelsio - Use new AES library API
+  crypto: crypto4xx - Use new AES library API
+  crypto: drbg - Use new AES library API
+  crypto: inside-secure - Use new AES library API
+  crypto: omap - Use new AES library API
+  lib/crypto: aescfb: Use new AES library API
+  lib/crypto: aesgcm: Use new AES library API
+  lib/crypto: aes: Remove old AES en/decryption functions
+  lib/crypto: aes: Drop 'volatile' from aes_sbox and aes_inv_sbox
+
+ arch/arm/configs/milbeaut_m10v_defconfig      |    1 -
+ arch/arm/configs/multi_v7_defconfig           |    2 +-
+ arch/arm/configs/omap2plus_defconfig          |    2 +-
+ arch/arm/configs/pxa_defconfig                |    2 +-
+ arch/arm/crypto/Kconfig                       |   19 -
+ arch/arm/crypto/Makefile                      |    2 -
+ arch/arm/crypto/aes-cipher-glue.c             |   69 -
+ arch/arm/crypto/aes-cipher.h                  |   13 -
+ arch/arm/crypto/aes-neonbs-glue.c             |   29 +-
+ arch/arm/crypto/ghash-ce-glue.c               |   14 +-
+ arch/arm64/crypto/Kconfig                     |   29 +-
+ arch/arm64/crypto/Makefile                    |    6 -
+ arch/arm64/crypto/aes-ce-ccm-glue.c           |    2 -
+ arch/arm64/crypto/aes-ce-glue.c               |  178 ---
+ arch/arm64/crypto/aes-ce-setkey.h             |    6 -
+ arch/arm64/crypto/aes-cipher-glue.c           |   63 -
+ arch/arm64/crypto/aes-glue.c                  |    2 -
+ arch/arm64/crypto/ghash-ce-glue.c             |   27 +-
+ arch/m68k/configs/amiga_defconfig             |    1 -
+ arch/m68k/configs/apollo_defconfig            |    1 -
+ arch/m68k/configs/atari_defconfig             |    1 -
+ arch/m68k/configs/bvme6000_defconfig          |    1 -
+ arch/m68k/configs/hp300_defconfig             |    1 -
+ arch/m68k/configs/mac_defconfig               |    1 -
+ arch/m68k/configs/multi_defconfig             |    1 -
+ arch/m68k/configs/mvme147_defconfig           |    1 -
+ arch/m68k/configs/mvme16x_defconfig           |    1 -
+ arch/m68k/configs/q40_defconfig               |    1 -
+ arch/m68k/configs/sun3_defconfig              |    1 -
+ arch/m68k/configs/sun3x_defconfig             |    1 -
+ arch/powerpc/crypto/Kconfig                   |    2 +-
+ arch/powerpc/crypto/Makefile                  |    9 +-
+ arch/powerpc/crypto/aes-gcm-p10-glue.c        |    4 +-
+ arch/powerpc/crypto/aes-spe-glue.c            |   88 +-
+ arch/powerpc/crypto/aes.c                     |  134 --
+ arch/powerpc/crypto/aes_cbc.c                 |    4 +-
+ arch/powerpc/crypto/aes_ctr.c                 |    2 +-
+ arch/powerpc/crypto/aes_xts.c                 |    6 +-
+ arch/powerpc/crypto/aesp8-ppc.h               |   22 -
+ arch/powerpc/crypto/vmx.c                     |   10 +-
+ arch/riscv/crypto/Kconfig                     |    2 -
+ arch/riscv/crypto/aes-macros.S                |   12 +-
+ arch/riscv/crypto/aes-riscv64-glue.c          |   81 +-
+ arch/riscv/crypto/aes-riscv64-zvkned.S        |   27 -
+ arch/s390/configs/debug_defconfig             |    2 +-
+ arch/s390/configs/defconfig                   |    2 +-
+ arch/s390/crypto/Kconfig                      |    2 -
+ arch/s390/crypto/aes_s390.c                   |  113 --
+ arch/sparc/crypto/Kconfig                     |    2 +-
+ arch/sparc/crypto/Makefile                    |    2 +-
+ arch/sparc/crypto/aes_glue.c                  |  140 +-
+ arch/x86/crypto/Kconfig                       |    2 -
+ arch/x86/crypto/aes-gcm-aesni-x86_64.S        |   33 +-
+ arch/x86/crypto/aes-gcm-vaes-avx2.S           |   21 +-
+ arch/x86/crypto/aes-gcm-vaes-avx512.S         |   25 +-
+ arch/x86/crypto/aesni-intel_asm.S             |   25 -
+ arch/x86/crypto/aesni-intel_glue.c            |  119 +-
+ crypto/Kconfig                                |   23 +-
+ crypto/Makefile                               |    4 +-
+ crypto/aegis.h                                |    2 +-
+ crypto/aes.c                                  |   66 +
+ crypto/aes_generic.c                          | 1320 -----------------
+ crypto/aes_ti.c                               |   83 --
+ crypto/crypto_user.c                          |    2 +-
+ crypto/df_sp80090a.c                          |   30 +-
+ crypto/drbg.c                                 |   12 +-
+ crypto/testmgr.c                              |   43 +-
+ drivers/char/tpm/tpm2-sessions.c              |   10 +-
+ drivers/crypto/amcc/crypto4xx_alg.c           |   10 +-
+ drivers/crypto/ccp/ccp-crypto-aes-cmac.c      |    4 +-
+ drivers/crypto/chelsio/chcr_algo.c            |   10 +-
+ .../crypto/inside-secure/safexcel_cipher.c    |   12 +-
+ drivers/crypto/inside-secure/safexcel_hash.c  |   14 +-
+ drivers/crypto/omap-aes-gcm.c                 |    6 +-
+ drivers/crypto/omap-aes.h                     |    2 +-
+ drivers/crypto/starfive/jh7110-aes.c          |   10 +-
+ drivers/crypto/xilinx/xilinx-trng.c           |    8 +-
+ .../inline_crypto/ch_ipsec/chcr_ipsec.c       |    4 +-
+ .../chelsio/inline_crypto/ch_ktls/chcr_ktls.c |    8 +-
+ .../chelsio/inline_crypto/chtls/chtls_hw.c    |    4 +-
+ drivers/net/phy/mscc/mscc_macsec.c            |    8 +-
+ drivers/staging/rtl8723bs/core/rtw_security.c |   20 +-
+ include/crypto/aes.h                          |  278 +++-
+ include/crypto/df_sp80090a.h                  |    2 +-
+ include/crypto/gcm.h                          |    2 +-
+ lib/crypto/Kconfig                            |   12 +
+ lib/crypto/Makefile                           |   43 +-
+ lib/crypto/aes.c                              |  473 ++++--
+ lib/crypto/aescfb.c                           |   30 +-
+ lib/crypto/aesgcm.c                           |   12 +-
+ .../crypto/arm}/aes-cipher-core.S             |    4 +-
+ lib/crypto/arm/aes.h                          |   56 +
+ .../crypto => lib/crypto/arm64}/aes-ce-core.S |    0
+ .../crypto/arm64}/aes-cipher-core.S           |    4 +-
+ lib/crypto/arm64/aes.h                        |  164 ++
+ lib/crypto/powerpc/.gitignore                 |    2 +
+ .../crypto/powerpc}/aes-spe-core.S            |    0
+ .../crypto/powerpc}/aes-spe-keys.S            |    0
+ .../crypto/powerpc}/aes-spe-modes.S           |    0
+ .../crypto/powerpc}/aes-spe-regs.h            |    0
+ .../crypto/powerpc}/aes-tab-4k.S              |    0
+ lib/crypto/powerpc/aes.h                      |  238 +++
+ .../crypto/powerpc}/aesp8-ppc.pl              |    1 +
+ lib/crypto/riscv/aes-riscv64-zvkned.S         |   84 ++
+ lib/crypto/riscv/aes.h                        |   63 +
+ lib/crypto/s390/aes.h                         |  106 ++
+ lib/crypto/sparc/aes.h                        |  149 ++
+ .../crypto => lib/crypto/sparc}/aes_asm.S     |    0
+ lib/crypto/x86/aes-aesni.S                    |  261 ++++
+ lib/crypto/x86/aes.h                          |   85 ++
+ net/bluetooth/smp.c                           |    8 +-
+ 111 files changed, 2202 insertions(+), 2959 deletions(-)
+ delete mode 100644 arch/arm/crypto/aes-cipher-glue.c
+ delete mode 100644 arch/arm/crypto/aes-cipher.h
+ delete mode 100644 arch/arm64/crypto/aes-ce-glue.c
+ delete mode 100644 arch/arm64/crypto/aes-ce-setkey.h
+ delete mode 100644 arch/arm64/crypto/aes-cipher-glue.c
+ delete mode 100644 arch/powerpc/crypto/aes.c
+ create mode 100644 crypto/aes.c
+ delete mode 100644 crypto/aes_generic.c
+ delete mode 100644 crypto/aes_ti.c
+ rename {arch/arm/crypto => lib/crypto/arm}/aes-cipher-core.S (97%)
+ create mode 100644 lib/crypto/arm/aes.h
+ rename {arch/arm64/crypto => lib/crypto/arm64}/aes-ce-core.S (100%)
+ rename {arch/arm64/crypto => lib/crypto/arm64}/aes-cipher-core.S (96%)
+ create mode 100644 lib/crypto/arm64/aes.h
+ create mode 100644 lib/crypto/powerpc/.gitignore
+ rename {arch/powerpc/crypto => lib/crypto/powerpc}/aes-spe-core.S (100%)
+ rename {arch/powerpc/crypto => lib/crypto/powerpc}/aes-spe-keys.S (100%)
+ rename {arch/powerpc/crypto => lib/crypto/powerpc}/aes-spe-modes.S (100%)
+ rename {arch/powerpc/crypto => lib/crypto/powerpc}/aes-spe-regs.h (100%)
+ rename {arch/powerpc/crypto => lib/crypto/powerpc}/aes-tab-4k.S (100%)
+ create mode 100644 lib/crypto/powerpc/aes.h
+ rename {arch/powerpc/crypto => lib/crypto/powerpc}/aesp8-ppc.pl (99%)
+ create mode 100644 lib/crypto/riscv/aes-riscv64-zvkned.S
+ create mode 100644 lib/crypto/riscv/aes.h
+ create mode 100644 lib/crypto/s390/aes.h
+ create mode 100644 lib/crypto/sparc/aes.h
+ rename {arch/sparc/crypto => lib/crypto/sparc}/aes_asm.S (100%)
+ create mode 100644 lib/crypto/x86/aes-aesni.S
+ create mode 100644 lib/crypto/x86/aes.h
+
+
+base-commit: 959a634ebcda02e0add101024a5793323d66cda5
+-- 
+2.52.0
+
