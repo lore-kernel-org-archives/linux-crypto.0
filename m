@@ -1,92 +1,91 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD163D6F;
-	Mon, 12 Jan 2026 04:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE9E303CA0;
+	Mon, 12 Jan 2026 05:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768192090; cv=none; b=XPFr9KA3Ipany+M9RK13SEdib89PHs74QSkNAah7YynrNyvqgXmccIL/sUcNrXFqpFXWgvsj4KQTvrIxfUBJl3+tLGVNRGJY80by4Zna75LGKKkWTZ3N2Y5F8tVRz5JL0xNiFjQLRf9usWHUop6TIj6522ag2/WL8eXqvPSymJg=
+	t=1768196208; cv=none; b=LSmYhp/JYU5Wp3PEc/mTXR3nFzgPregMb302seQH5X+Utrg8vEhQuMp08/bPkECBBEpIrB1Bw/iSe2nrswaMs91TbEBmAilDlfjgIr/GtezaTtIaYRb5J0I1mCPdYJxlwYy6LnIOS1+At7b2mCRliw1KChkn2Msqg488a6ptOj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768192090; c=relaxed/simple;
-	bh=NCHtEVA7PylBPydKawoYIqhcpI/yZviRDtr4ifekw5M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K4f7TWjhO1MhBN1rw0Yl4QDSiqO3H7JCzcxM0Ol5hv2/xfZznVIYKuDVRA48splquuVTqDk0f8yWZWzsbq08ghcbSjDJA07uwrZjrnSzWdLwdKZ7fBAeLrZcW6XGI8u5hziboc5+pcl4cFtvQVBEq5SQ/l/He6bryNgGZtOXNLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=SQTQ/Lg8; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1768196208; c=relaxed/simple;
+	bh=6MonPAQ8Qn8LGNrQyCCDnXQNntRRjzj0Iopo9N2EhaA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a9ZrBAbclHsoeZM6nrpPBOMv61yH7OgRIBxMPHk60725s6Hu+WqkfFwC4/mxBh9fhEEb6JrmHaAImli6RtUKgK7lG5hiW5HxIVwML1F+NpNfY2778GLsmTVpD8iXGeQI7kGCNzxLp3Lic1UaFd4vBSCk1bEpMj+nyBwFPN7hMNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fi6NslZD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="SQTQ/Lg8"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=4wekVBs552Ul+A82d1gcgJFDKSPLzWzQWAFP+ZsWD8A=; 
-	b=SQTQ/Lg8o+Osh3A08Qi3OxF4FK3KUoi+xDBOoWNUjRRfc/A7AKu2Wbq3Tv1sKLDK2D2cI3Acna3
-	Jor6n6PeVcfZK9vakXoMgfJ2LHoVyJKOBqr9e3RSWutkpu0AOIwgufiPPpewqBx1cj7xhioq8McvO
-	HQ9xWPjdG19F04sPZtn7YM0SLbbgVnzen+oxE0hSfTkZZQ72+5GPz/Oxfcrf+qij6W9MmWHAs9Pxf
-	cIfINzSmpLOjsTuu2eCA3y0lgW7z8K0AqC9hGkkm73rb9BNQKx9FLpwCTnvFiNvPMjfp5aDT6qdZu
-	xaGeJpqgsHXfhNZwHAVuQ18N8rR7bflmPPjg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vf9Wx-00FxMN-15;
-	Mon, 12 Jan 2026 12:27:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 12 Jan 2026 12:27:51 +0800
-Date: Mon, 12 Jan 2026 12:27:51 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Shiva Tripathi <s-tripathi1@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 1/3] crypto: ti - Add support for AES-CTR in DTHEv2
- driver
-Message-ID: <aWR4R8easn23zuHO@gondor.apana.org.au>
-References: <20251126112207.4033971-1-t-pratham@ti.com>
- <20251126112207.4033971-2-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fi6NslZD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61A07C116D0;
+	Mon, 12 Jan 2026 05:36:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768196207;
+	bh=6MonPAQ8Qn8LGNrQyCCDnXQNntRRjzj0Iopo9N2EhaA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Fi6NslZDcGFcA6szmD9BW62L6jBr7caBdv5/19qT6loSiPXhRNYecrgncg2LJvCjy
+	 qE1DYT83jne7OvSFsGqRbLANyK+nWFHuL1Y/DttEzUvuJDlyJwmWPxQfpgcQLOXOzG
+	 GhWoDObvuMBJ1o67QHQ3VKd2jMxbIg4yW2ndzbTpC6W/riXfBAgvvaaBSM8NOwNGRM
+	 8npEj6U1toScPByPedDmLpwpFM7x9OQsUUc09HBJLc6wkudOiMjqDl1fVVKg+jy2Gy
+	 xBuzx7kFcd8GE/fgbFusKPB11I2fd8HsKktq7HtT+YesnU0u+U4xyXBpSzEF5EzP7I
+	 /k+UQeoFVN19A==
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Rijo Thomas <Rijo-john.Thomas@amd.com>
+Cc: John Allen <john.allen@amd.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Hans de Goede <hansg@kernel.org>,
+	linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER),
+	platform-driver-x86@vger.kernel.org (open list:AMD PMF DRIVER),
+	Lars Francke <lars.francke@gmail.com>,
+	Yijun Shen <Yijun.Shen@dell.com>,
+	Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>
+Subject: [PATCH v5 0/5] Fixes for PMF and CCP drivers after S4
+Date: Sun, 11 Jan 2026 23:36:05 -0600
+Message-ID: <20260112053610.2566943-1-superm1@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251126112207.4033971-2-t-pratham@ti.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 26, 2025 at 04:46:15PM +0530, T Pratham wrote:
->
-> @@ -295,6 +356,32 @@ static int dthe_aes_run(struct crypto_engine *engine, void *areq)
->  	aes_irqenable_val |= DTHE_AES_IRQENABLE_EN_ALL;
->  	writel_relaxed(aes_irqenable_val, aes_base_reg + DTHE_P_AES_IRQENABLE);
->  
-> +	if (ctx->aes_mode == DTHE_AES_CTR) {
-> +		/*
-> +		 * CTR mode can operate on any input length, but the hardware
-> +		 * requires input length to be a multiple of the block size.
-> +		 * We need to handle the padding in the driver.
-> +		 */
-> +		if (req->cryptlen % AES_BLOCK_SIZE) {
-> +			/* Need to create a new SG list with padding */
-> +			pad_len = ALIGN(req->cryptlen, AES_BLOCK_SIZE) - req->cryptlen;
-> +			memset(pad_buf, 0, pad_len);
-> +
-> +			src = dthe_chain_pad_sg(req->src, src_nents, src_pad, pad_buf, pad_len);
-> +			src_nents++;
+Lars Francke reported that the PMF driver fails to work afer S4 with:
+  ccp 0000:c3:00.2: tee: command 0x5 timed out, disabling PSP
 
-This is too complicated and may break if the user supplies an SG list
-that's much longer than what is being encrypted.  For example, the
-user could have an SG list spanning many pages, and only the first
-of half of which are to be encrypted.  If you break it up here you
-will risk corrupting the bigger SG list.
+This is because there is a TA loaded to the TEE environment that
+is lost during S4.  The TEE rings need to be reinitialized and the
+TA needs to be reloaded.
 
-I think it's much simpler to just stop at the last block boundary,
-and then do the last partial block manually with lib/crypto aes.
+This series adds those flows to the PMF and CCP drivers.
 
-Cheers,
+v4->v5:
+ * Fix error return value in psp_restore()
+ * Fix retry loop in tee_init_ring()
+
+Mario Limonciello (AMD) (4):
+  crypto: ccp - Declare PSP dead if PSP_CMD_TEE_RING_INIT fails
+  crypto: ccp - Add an S4 restore flow
+  crypto: ccp - Factor out ring destroy handling to a helper
+  crypto: ccp - Send PSP_CMD_TEE_RING_DESTROY when PSP_CMD_TEE_RING_INIT
+    fails
+
+Shyam Sundar S K (1):
+  platform/x86/amd/pmf: Prevent TEE errors after hibernate
+
+ drivers/crypto/ccp/psp-dev.c          | 11 +++++
+ drivers/crypto/ccp/sp-dev.h           |  2 +
+ drivers/crypto/ccp/sp-pci.c           | 24 ++++++++++-
+ drivers/crypto/ccp/tee-dev.c          | 56 ++++++++++++++++++------
+ drivers/crypto/ccp/tee-dev.h          |  1 +
+ drivers/platform/x86/amd/pmf/core.c   | 62 ++++++++++++++++++++++++++-
+ drivers/platform/x86/amd/pmf/pmf.h    | 10 +++++
+ drivers/platform/x86/amd/pmf/tee-if.c | 12 ++----
+ include/linux/psp.h                   |  1 +
+ 9 files changed, 156 insertions(+), 23 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.43.0
+
