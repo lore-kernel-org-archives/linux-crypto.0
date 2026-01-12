@@ -1,148 +1,87 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BFFC324B17
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 19:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2ED3242C0;
+	Mon, 12 Jan 2026 19:35:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768246133; cv=none; b=ZxocQCp+Mjw7ATfNkqLtCjnAKDWPdYrQX4jRrNpvZugNy5QOKxa62SBodmeONLpnLpKOkOU2L1r5D3ox0DmH6Xwrf5knLNGsI3nCw1mA3gex0eRnthvydEnqz8yLGbNUFztocRevYJrvrXj1nKu9nMfPl0Tun3LKFwy96Pv0xq0=
+	t=1768246511; cv=none; b=gaOvj3zkc3PNuw/KdC1xswGAwYbB5mRjDCBkviBTRcLwOMBTSXkdqSSvLu+1rJO2+SIryHdpScZZsSbHwyrTJVjpHbbhaTnIFLG4FJENjFYk5gnBAXolP9B8robLN+1z45hZjdUMWolGbLDqjWPQx43uxC7JQ3+OZkJxqOcSDcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768246133; c=relaxed/simple;
-	bh=zojxNT+RZbLezTydyxAsIzYgwtxcsP67AtbFNc0SDsQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=in8FyZKyhKno90+y/RcbCDmIJdwuto8UPSfLYf1EhHYQCRpgfM4HI+pey7fyy2gFpHQkybQzOzGhTIAFtEbJtYnyhvv7K74EUbtHI7JU8WvpvOX4isCrflmB22/5YR0YUeMRDIttSBW6yaNrLrZGcfUid9Em80PWgw+cMYEvrqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NatTr60U; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768246511; c=relaxed/simple;
+	bh=ZUv9WOpoHSeCX9aDulOlpT8OUBsrCsexexznfgOSVEo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ODXdHNou1n43qRrl1IWW1of1bp/FTEsjOlYcjtv3Fnwb2qaqalFms/GRXSUcqOpnRxRbNyqVzE2OslfPg9+oIAdKp6X2hv0XWeii48LXLFgKjEHVlf0B80o2tRgRiRonAnKGNI0nirU2rEyU7gq5+EqUWLS4cn96wtBFX1hpW48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qkEcPXJW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NatTr60U"
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6505d141d02so10905471a12.3
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 11:28:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768246130; x=1768850930; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sQS0SzXkMyBsX0r/DMnRoitwZR/NjZ11xjjJpvDZxFQ=;
-        b=NatTr60UgeiWWQyqA+wUNCsI1SuWNvWELwEFUJx6Z7zqKFoXklxTadNGlkFzFh6gw/
-         Gbfc1DyA2sg48wtqzd1lGNbQ4DhYgAH+IZg60u3eZQbi+VF1ZneSQHUlSCfof8fL6Z2A
-         Pvav/EdbA3oWdmRiJuOOIJ7w06640VQ6NKzeB9Ja65jdLyPeusic5363I7XxSSTSXLK6
-         i8oSZ1ADG3PN+dcSOpgGBjwppxfi63Jd4h5DCTzOpWXKJsHjgMP4B8jQl7BocYk+dQur
-         NytbqWiGXWUINkIHrddsbGnX69FAtR1Ny7tKLebPE/uJXikTgTxCcXeWL8UWOJ+acWEW
-         S8IA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768246130; x=1768850930;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=sQS0SzXkMyBsX0r/DMnRoitwZR/NjZ11xjjJpvDZxFQ=;
-        b=WP2+SwNeIlC1RTIMk407N1s6tg7wjpsJuxStPVbVB9WKtRGkIjzS/T4KqMzqWFdkGq
-         +Pg92nb1qgpNpNRSi7MNdoBokuzkQNGL5JM3Hgw+ytnJGETOUrhct3izHXKAlCWyt3c5
-         5LO+CXc9CGRLRpTdqNfVa4f11MoUJpHIahW7n26FfHdCSRmvM23vl3vQ6Ukc0UHoW9Yo
-         cC8MDHGanhA1hRHdlkP6tDvYljTaEEtZBmuCq3uvjFNJEzWfxVUveJ0Hg4bqu8XTDoCE
-         GGl10nyKr1gxKtJELKTBBHvZ5NXwKcjfptDkrEyPaW8z2+KCLOeC0+hU9JXnlG/S3XWq
-         KT9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUphPFNdp8xLhVkVB7okZCELPcY6PuPQ9HcUg39TxGODS1BiyV82X/6JFps8bsawSGZ0QNmVpoMUtuoBQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvuTAJSqkPgidpjmUfBqnX2dj++BzLgJu2kSc/vvG4vVY7yx+A
-	QymBx7XOCR36XK6ybZgRHVNQPYmfgoLYdkorSHGg4v0zwIX9dPO1wZty
-X-Gm-Gg: AY/fxX6y9nMOZ1Ag2Dtn06qCGX+lYHNACNPTsUiWYGuPr1B6r7Wdh7g4B0m3xD6F6Dl
-	VC6k0HO0OAHAunZkxo4EYaRmBJrPvWB8Lgipu8aDaJ1/z1dhfF1osSpSKS6/MKYbY14OGQwlcbJ
-	VmoXanBWpsaokV1ITfc34uedPLJ8sZA0l9lxXI2JvHXVlqHhSgPS9YMErwbEUGjPohr1+eW9N/C
-	gCqa94nu5Ui/7Gm4sG26PbsII9VqbBhNyEimSDfCA+Y5SOHAm2DZ6fePrzrw7lqhSZrtitrjIyz
-	U4u+fY9/cCjn0B1vuC8tKx47bNUaHKf4U4GhtWEkokzMnarFpU5prfb6LQdrDWVnFYCKSzPmkCv
-	gULtulpqz5hL1EU5QIDIeY49pU2UK/U7+jXkAF67cHnffSbbshknUV9JD6/6vkcfmbnHnABaglt
-	cU/n2Db/wEDfAkMb5AzI3SugC4OiJsFyxTV5Ey7cJmspX2FzstEw==
-X-Google-Smtp-Source: AGHT+IFk8wLMtvnspL5X08nCOFuh4w793sCkSNYw871Bcc2rMNI5daxewGVPY4N9IKJlOxERKRgH1g==
-X-Received: by 2002:a05:6402:280f:b0:64b:3e03:63b with SMTP id 4fb4d7f45d1cf-65097e8c00fmr14927123a12.31.1768246129525;
-        Mon, 12 Jan 2026 11:28:49 -0800 (PST)
-Received: from ethan-tp (xdsl-31-164-106-179.adslplus.ch. [31.164.106.179])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507bf667fcsm18108959a12.29.2026.01.12.11.28.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 11:28:49 -0800 (PST)
-From: Ethan Graham <ethan.w.s.graham@gmail.com>
-To: ethan.w.s.graham@gmail.com,
-	glider@google.com
-Cc: akpm@linux-foundation.org,
-	andreyknvl@gmail.com,
-	andy@kernel.org,
-	andy.shevchenko@gmail.com,
-	brauner@kernel.org,
-	brendan.higgins@linux.dev,
-	davem@davemloft.net,
-	davidgow@google.com,
-	dhowells@redhat.com,
-	dvyukov@google.com,
-	ebiggers@kernel.org,
-	elver@google.com,
-	gregkh@linuxfoundation.org,
-	herbert@gondor.apana.org.au,
-	ignat@cloudflare.com,
-	jack@suse.cz,
-	jannh@google.com,
-	johannes@sipsolutions.net,
-	kasan-dev@googlegroups.com,
-	kees@kernel.org,
-	kunit-dev@googlegroups.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	lukas@wunner.de,
-	mcgrof@kernel.org,
-	rmoar@google.com,
-	shuah@kernel.org,
-	sj@kernel.org,
-	skhan@linuxfoundation.org,
-	tarasmadan@google.com,
-	wentaoz5@illinois.edu
-Subject: [PATCH v4 6/6] MAINTAINERS: add maintainer information for KFuzzTest
-Date: Mon, 12 Jan 2026 20:28:27 +0100
-Message-ID: <20260112192827.25989-7-ethan.w.s.graham@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260112192827.25989-1-ethan.w.s.graham@gmail.com>
-References: <20260112192827.25989-1-ethan.w.s.graham@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qkEcPXJW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCB19C116D0;
+	Mon, 12 Jan 2026 19:35:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768246511;
+	bh=ZUv9WOpoHSeCX9aDulOlpT8OUBsrCsexexznfgOSVEo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qkEcPXJWfvwYKw+qy3NDNf7Z/OyAoDvn3EtR2/iOKYwezSds2lZ/qOklle1QZf/RS
+	 0n0M/se6V2RScgyCVWHzoKqAuHBkLG+npgnZ/hkQNaUmdEMS8SMqc5iNRI3hM305pe
+	 5G4XuZI2hC2R2kGkAuwkn1s2N+qZuxDVtg0X7ixCwoqRSly1h/nTzUF/ZDmv7lOLzh
+	 3kpZQAFEhWTeMBp5aqTUXVSShJkCmIDCZqoj1MUyTL0F8E1sBOlG+e1Qkq99awf+XC
+	 L3aF8KO7N2Glp16xy++xBV238ItTYL3GJZmfRQvhL2B+JiGkP6QbxCBCuNGy5JTRtn
+	 bv/7KB6FxaUjA==
+Date: Mon, 12 Jan 2026 11:34:45 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: AlanSong-oc <AlanSong-oc@zhaoxin.com>
+Cc: herbert@gondor.apana.org.au, Jason@zx2c4.com, ardb@kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	CobeChen@zhaoxin.com, TonyWWang-oc@zhaoxin.com, YunShen@zhaoxin.com,
+	GeorgeXue@zhaoxin.com, LeoLiu-oc@zhaoxin.com, HansHu@zhaoxin.com,
+	x86@kernel.org
+Subject: Re: [PATCH v2 1/2] lib/crypto: x86/sha1: PHE Extensions optimized
+ SHA1 transform function
+Message-ID: <20260112193445.GA1952@sol>
+References: <cover.1766131281.git.AlanSong-oc@zhaoxin.com>
+ <aa8ed72a109480887bdb3f3b36af372eadf0e499.1766131281.git.AlanSong-oc@zhaoxin.com>
+ <20251219181805.GA1797@sol>
+ <7aa1603d-6520-414a-a2a1-3a5289724814@zhaoxin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7aa1603d-6520-414a-a2a1-3a5289724814@zhaoxin.com>
 
-Add myself as maintainer and Alexander Potapenko as reviewer for
-KFuzzTest.
+On Mon, Jan 12, 2026 at 05:12:01PM +0800, AlanSong-oc wrote:
+> > Is it supported in both 32-bit and 64-bit modes?  Your patch doesn't
+> > check for CONFIG_64BIT.  Should it?  New optimized assembly code
+> > generally should be 64-bit only.
+> 
+> The XSHA1 and XSHA256 are supported in both 32-bit and 64-bit modes.
+> Since newly optimized assembly code is typically 64-bit only, and XSHA1
+> and XSHA256 fully support 64-bit mode, an explicit CONFIG_64BIT check
+> should not required.
 
-Signed-off-by: Ethan Graham <ethan.w.s.graham@gmail.com>
-Acked-by: Alexander Potapenko <glider@google.com>
+Right, all the x86-optimized SHA-1 and SHA-256 code is already 64-bit
+specific, due to CONFIG_CRYPTO_LIB_SHA1_ARCH and
+CONFIG_CRYPTO_LIB_SHA256_ARCH being enabled only when CONFIG_x86_64=y.
+So there's no need to check for 64-bit again.
 
----
-PR v4:
-- Remove reference to the kfuzztest-bridge tool that has been removed
-PR v3:
-- Update MAINTAINERS to reflect the correct location of kfuzztest-bridge
-  under tools/testing as pointed out by SeongJae Park.
----
----
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+> > What is the difference between X86_FEATURE_PHE and X86_FEATURE_PHE_EN,
+> > and why are both needed?
+> 
+> The X86_FEATURE_PHE indicates the presence of the XSHA1 and XSHA256
+> instructions, whereas the X86_FEATURE_PHE_EN indicates that these
+> instructions are enabled for normal use.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6dcfbd11efef..0119816d038d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -13641,6 +13641,13 @@ F:	include/linux/kfifo.h
- F:	lib/kfifo.c
- F:	samples/kfifo/
- 
-+KFUZZTEST
-+M:  Ethan Graham <ethan.w.s.graham@gmail.com>
-+R:  Alexander Potapenko <glider@google.com>
-+F:  include/linux/kfuzztest.h
-+F:  lib/kfuzztest/
-+F:  Documentation/dev-tools/kfuzztest.rst
-+
- KGDB / KDB /debug_core
- M:	Jason Wessel <jason.wessel@windriver.com>
- M:	Daniel Thompson <danielt@kernel.org>
--- 
-2.51.0
+I still don't understand the difference.
 
+If you look at the other CPU feature flags, like X86_FEATURE_SHA_NI for
+example, there's just a single flag for the feature.  We don't have
+X86_FEATURE_SHA_NI and X86_FEATURE_SHA_NI_EN.  If the CPU supports the
+feature but the kernel decides it can't or shouldn't be used for
+whatever reason, the kernel just doesn't set the flag.  There's no
+separate flag that tracks the CPU support independently.
+
+Why can't the PHE flag work the same way?
+
+- Eric
