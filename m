@@ -1,290 +1,210 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EF5343D7B
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 08:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600683090D5;
+	Mon, 12 Jan 2026 08:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768207507; cv=none; b=L3H3XdkiLWEdcXPDB78RfDIf7hhTSs6DSaxoAjrItIhVNOowZ3XoCm3qgQ7JDrb/LUtkJBEBmyV8GhawhVmBlZAIwgVleuDz3G+YUYqFs3IPryFw2dvaiKDlircazZTLyqRv2p8KhAS6lylQudLnLCRBc2P8rvlu+PYV+7u8Z0k=
+	t=1768208194; cv=none; b=tU1Gdk4MwU8vvOtYXBtzOvQsoOljymolgLG9NDBOOAb6j58rAueZ5ICcOqrVp1Lsavr+UhNWcen5XLHqAmb9rDzj8N0NLC9W8X8XcIYFa8I5aQKTVK6M744c4T9H6d0KROGaEgA+RknvHB4qlEOjblS5jftiG4f0CCGgu6fDj6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768207507; c=relaxed/simple;
-	bh=zG33qFZy8JznR/XKQTux3df5oiRWiq1GjUuErjUR0fA=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=Ic55ku4uI5ivBoensxw9yUJuUU6hJNoN6ZQWbIEa8Liajz+PqG+0N152rFTUuy510j05mYdwpF6vJah7OmoaJI1UNLBnAdkpJNaPAKFpAYks++kszjmqwVg2t5Nkr/W5PEb/U4rjZHkAI2Vk1uIeVa5VngN+CI0hnME+H1PNobg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=IVDV/ohy; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+	s=arc-20240116; t=1768208194; c=relaxed/simple;
+	bh=ff7c8nDvG3/uV+VQ/OqrkrYfEBYLjseVoi5+CAXEcgg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=of+AV1QoNLAWeuLrxmRYGPi8KUV/LgCVTNe4qx3bk9Kik0q2tq5LHwP2F6EPVtMzOfU2wsruECLXsJJw+pBVn2vJ2lf9JcLmb8pZvH9lIZjfc2UAR8FnClUiJuSbWN5ZPUrsyhTN1BH1w69y5pis+cSKZkUva8mV0yxZI2p+IAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c2tQQu6H; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="IVDV/ohy"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b79f8f7ea43so1291853966b.2
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 00:45:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1768207502; x=1768812302; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zG33qFZy8JznR/XKQTux3df5oiRWiq1GjUuErjUR0fA=;
-        b=IVDV/ohytU0ay9yHJck6OOYUe8a5wpddekOQJo+U5YWT2V7t/wB/w1wM+T359sNeAS
-         /erSG0qpj9K6RgDKVMgo+wIkKDGzISr5/G5/A1XAIS0n5zVJNFSkEhdMlSm5jwr0G23T
-         Z/3ndWqyQF3fF6xiTHEUIF9zY3+b8hCEWF2Z7FUzH4GE7XXao6fOeF5bfbW8f4rb2oNr
-         9hfFfRB44rZHT7HPM9Kh+dbt6P2gRJh3Vta9wqwutcA+LKnkqhGClFiP0oK5Vo/st/WC
-         S0qaDsP4HZja8WEof5/2gfZz3eR6KLMF+kNBsJts+8HlHPEA0rg+4ZiXwHqFbfu0hZCC
-         S2UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768207502; x=1768812302;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zG33qFZy8JznR/XKQTux3df5oiRWiq1GjUuErjUR0fA=;
-        b=acKDjf++m9yiC41eQbOfueeFPaXwR9X1BbyatGXlYfOT849zApgkcB3rW457PGMwFn
-         /tEwn1OCmxfQbLw+jeuTP0J/Z9NIn34T+qP6c//wLXVDJU03hGRO0lRCWrYCPLOnA7Pu
-         0qnZnwTfofK9x6LwW6iku3798DwipDWQMDijeBwidcFQ3oC0MuZZXxqTWIaEaISqM2l0
-         N+RPmoC/A0wQjSwbMSqKNhrHeTScMA5Z2NYD5i+pz4Lvf3mt6QFFSX5pbSy5EW0p8XKx
-         vIG37DbNqj0jDXyDDuPwA1/YIMIFDSjF02vcaPr+UoQiNoqL0C4exo7LvvJt0PwM04YC
-         57LA==
-X-Forwarded-Encrypted: i=1; AJvYcCVivaLZaNt3IWHqEuO/NiFkF51yBq0cilTNJgaDUkRuIG2No3FdVbbae8N8W/UIqmCt9JE+POBowAiJT+k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMIpYcWOPiH2i9yMXmPIm/Uvc0q9thTGDnMCvlmf2QsiY+SgOk
-	2nqOAqiWW7+IebQt631QTiZ5wJFlK3S/S/pvaMxpb2WVIf5/sGHT9a3GobA2zr0XpoU=
-X-Gm-Gg: AY/fxX7gGxwMlcBjrLg5ug4umbM71sZsVVvbZa51QpLnppKSggQks3zgR4AoxsZpP0c
-	/1eolnyOX/wTH5HEO3j3BEthn1nzMZjyYeHp2tATM4dp4qZyWmMIG+Dp90RN2r7jDrV5qL9fZUw
-	vCvOSAvslHpbeezJZif4I++WmmiOWI04dktOSxKJd6e3P5bIcWCJDtf0tYOSmS+qPmLTKDWtyBU
-	3TiJa6ob3NUZqh71A1rMADEXkV+H+Sy5sQl0TWJKv+7DAOou3h7bkhAMwTnXBIg89stLOgA5wub
-	HdUk4S7JZwzTflkQ7b71vbaXlgjWF0Xj89Vyq8LMOGGUeNINXpG5etnZ9iLq1S84ewTH9sISunm
-	/Y4AVTv5LbdbgNIeltT4jqqY7GPJzHmrqsrbpzRYeU5XneX1rGUWvcdKi85eijXbM48HU2esQoh
-	31upnTJwTx57Bb64H6zgnlyTsIWvj0DGrE17gncy3Kc6j0zbZ6gU/jJgEX
-X-Google-Smtp-Source: AGHT+IGkp8lDjqeILjtMZ5LR+GI7r23/qVs+xlIeG79Zdksfi1ggdUWAo2X+W6SgmX5SlFgujBUWTQ==
-X-Received: by 2002:a17:907:1c25:b0:b7b:e754:b5ba with SMTP id a640c23a62f3a-b8445033422mr1833442366b.56.1768207502041;
-        Mon, 12 Jan 2026 00:45:02 -0800 (PST)
-Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a5187afsm1834263166b.58.2026.01.12.00.45.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jan 2026 00:45:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c2tQQu6H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94686C19422;
+	Mon, 12 Jan 2026 08:56:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768208194;
+	bh=ff7c8nDvG3/uV+VQ/OqrkrYfEBYLjseVoi5+CAXEcgg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c2tQQu6H02ndWrOEYyQUUF58xiq5hcnS2eyn7Kp69reEkky1cM8z0eZmEOoVZ6faJ
+	 2/eAy3ovgVrQSGcmmpjueqiu7dydoXplNqteoDCt7RSi/qGda+Q+E+/9eAdWm/PZPF
+	 3f0cKbeXI/K6+V0wOeNz97EtFGzgkLZpIuvIi4xy0UXRIm7ls66A2QbqRUAWeuUK+9
+	 fcoSVpOjbrsBLmT4R2HW9qQ+4y9kZXD9V10QzNPiy+EzkQ91GpdHF6q4K1OVdwD8JY
+	 xLdhrTAJNLhQEASfHHyPYBLdJvmym5IyvqOlynowJwBh8y3fMQWSi8k5qES/eM4EcB
+	 DK1J+VErkl8OQ==
+Date: Mon, 12 Jan 2026 09:56:30 +0100
+From: Antoine Tenart <atenart@kernel.org>
+To: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: ansuelsmth@gmail.com, maxim.anisimov.ua@gmail.com, amadeus@jmu.edu.cn, 
+	atenart@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	vschagen@icloud.com, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: inside-secure/eip93 - unregister only available
+ algorithm
+Message-ID: <aWS3A7wAv5KNVa1b@kwain>
+References: <20260111132531.2232417-1-olek2@wp.pl>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 12 Jan 2026 09:45:01 +0100
-Message-Id: <DFMH8W40TCJ0.XCTHNRJFJE4T@fairphone.com>
-Cc: <~postmarketos/upstreaming@lists.sr.ht>, <phone-devel@vger.kernel.org>,
- <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-scsi@vger.kernel.org>, <linux-phy@lists.infradead.org>
-Subject: Re: [PATCH 5/6] arm64: dts: qcom: milos: Add UFS nodes
-From: "Luca Weiss" <luca.weiss@fairphone.com>
-To: "Neil Armstrong" <neil.armstrong@linaro.org>, "Luca Weiss"
- <luca.weiss@fairphone.com>, "Herbert Xu" <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, "Rob Herring" <robh@kernel.org>,
- "Krzysztof Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley"
- <conor+dt@kernel.org>, "Bjorn Andersson" <andersson@kernel.org>, "Alim
- Akhtar" <alim.akhtar@samsung.com>, "Avri Altman" <avri.altman@wdc.com>,
- "Bart Van Assche" <bvanassche@acm.org>, "Vinod Koul" <vkoul@kernel.org>,
- "Konrad Dybcio" <konradybcio@kernel.org>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260107-milos-ufs-v1-0-6982ab20d0ac@fairphone.com>
- <20260107-milos-ufs-v1-5-6982ab20d0ac@fairphone.com>
- <2486dc4b-71f3-4cd9-8139-b397407d7e4d@linaro.org>
- <543d9e55-c858-40f9-8785-c9f636850120@linaro.org>
-In-Reply-To: <543d9e55-c858-40f9-8785-c9f636850120@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260111132531.2232417-1-olek2@wp.pl>
 
-Hi Neil,
+On Sun, Jan 11, 2026 at 02:20:32PM +0100, Aleksander Jan Bajkowski wrote:
+> EIP93 has an options register. This register indicates which crypto
+> algorithms are implemented in silicon. Supported algorithms are
+> registered on this basis. Unregister algorithms on the same basis.
+> Currently, all algorithms are unregistered, even those not supported
+> by HW. This results in panic on platforms that don't have all options
+> implemented in silicon.
+> 
+> Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
+> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
 
-On Mon Jan 12, 2026 at 9:26 AM CET, Neil Armstrong wrote:
-> On 1/7/26 14:53, Neil Armstrong wrote:
->> Hi,
->>=20
->> On 1/7/26 09:05, Luca Weiss wrote:
->>> Add the nodes for the UFS PHY and UFS host controller, along with the
->>> ICE used for UFS.
->>>
->>> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
->>> ---
->>> =C2=A0 arch/arm64/boot/dts/qcom/milos.dtsi | 127 ++++++++++++++++++++++=
-+++++++++++++-
->>> =C2=A0 1 file changed, 124 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/arch/arm64/boot/dts/qcom/milos.dtsi b/arch/arm64/boot/dts/=
-qcom/milos.dtsi
->>> index e1a51d43943f..0f69deabb60c 100644
->>> --- a/arch/arm64/boot/dts/qcom/milos.dtsi
->>> +++ b/arch/arm64/boot/dts/qcom/milos.dtsi
->>> @@ -797,9 +797,9 @@ gcc: clock-controller@100000 {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&sleep_clk>,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <0>, /* pcie_0_pipe_clk */
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <0>, /* pcie_1_pipe_clk */
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <0>, /* ufs_phy_rx_symbol_0_clk */
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <0>, /* ufs_phy_rx_symbol_1_clk */
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <0>, /* ufs_phy_tx_symbol_0_clk */
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&ufs_mem_phy 0>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&ufs_mem_phy 1>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&ufs_mem_phy 2>,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <0>; /* usb3_phy_wrapper_gcc_usb30_=
-pipe_clk */
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 #clock-cells =3D <1>;
->>> @@ -1151,6 +1151,127 @@ aggre2_noc: interconnect@1700000 {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 qcom,bcm-voters =3D <&apps_bcm_voter>;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ufs_mem_phy: phy@1d80000 {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 com=
-patible =3D "qcom,milos-qmp-ufs-phy";
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reg=
- =3D <0x0 0x01d80000 0x0 0x2000>;
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 clo=
-cks =3D <&rpmhcc RPMH_CXO_CLK>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&gcc GCC_UFS_PHY_PHY_AUX_CLK>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&tcsr TCSR_UFS_CLKREF_EN>;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 clo=
-ck-names =3D "ref",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "ref_aux",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "qref";
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 res=
-ets =3D <&ufs_mem_hc 0>;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 res=
-et-names =3D "ufsphy";
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pow=
-er-domains =3D <&gcc UFS_MEM_PHY_GDSC>;
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 #cl=
-ock-cells =3D <1>;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 #ph=
-y-cells =3D <0>;
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sta=
-tus =3D "disabled";
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ufs_mem_hc: ufshc@1d84000 {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 com=
-patible =3D "qcom,milos-ufshc", "qcom,ufshc", "jedec,ufs-2.0";
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reg=
- =3D <0x0 0x01d84000 0x0 0x3000>;
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int=
-errupts =3D <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH 0>;
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 clo=
-cks =3D <&gcc GCC_UFS_PHY_AXI_CLK>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&gcc GCC_UFS_PHY_AHB_CLK>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&gcc GCC_UFS_PHY_UNIPRO_CORE_CLK>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&tcsr TCSR_UFS_PAD_CLKREF_EN>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 clo=
-ck-names =3D "core_clk",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "bus_aggr_clk",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "iface_clk",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "core_clk_unipro"=
-,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "ref_clk",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "tx_lane0_sync_cl=
-k",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "rx_lane0_sync_cl=
-k",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "rx_lane1_sync_cl=
-k";
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 res=
-ets =3D <&gcc GCC_UFS_PHY_BCR>;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 res=
-et-names =3D "rst";
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int=
-erconnects =3D <&aggre1_noc MASTER_UFS_MEM QCOM_ICC_TAG_ALWAYS
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &mc_virt SLAVE_EBI1 QCO=
-M_ICC_TAG_ALWAYS>,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <&gem_noc MASTER_APPSS_PROC Q=
-COM_ICC_TAG_ACTIVE_ONLY
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &cnoc_cfg SLAVE_UFS_MEM=
-_CFG QCOM_ICC_TAG_ACTIVE_ONLY>;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int=
-erconnect-names =3D "ufs-ddr",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- "cpu-ufs";
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pow=
-er-domains =3D <&gcc UFS_PHY_GDSC>;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 req=
-uired-opps =3D <&rpmhpd_opp_nom>;
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ope=
-rating-points-v2 =3D <&ufs_opp_table>;
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iom=
-mus =3D <&apps_smmu 0x60 0>;
->>=20
->> dma-coherent ?
+Acked-by: Antoine Tenart <atenart@kernel.org>
 
+Thanks!
+Antoine
 
-Given that downstream volcano.dtsi has dma-coherent in the ufshc@1d84000
-node, looks like this is missing in my patch.
-
->>=20
->> and no MCQ support ?
-
-Not sure, I could only find one reference to MCQ on createpoint for
-milos, but given there's no mcq_sqd/mcq_vs reg defined downstream, and I
-couldn't find anything for the same register values in the .FLAT file, I
-don't think Milos has MCQ? Feel free to prove me wrong though.
-
->
-> So, people just ignore my comment ?
->
-> Milos is based on SM8550, so it should have dma-coherent, for the MCQ
-> I hope they used the fixed added to the SM8650 UFS controller for MCQ.
-
-Not sure what this should mean regarding MCQ...
-
-Regards
-Luca
-
->
-> Neil
->
->>=20
->> <snip>
->>=20
->> Thanks,
->> Neil
-
+> ---
+> v2:
+> - keep the keysize assignment in eip93_register_algs
+> ---
+>  .../crypto/inside-secure/eip93/eip93-main.c   | 92 +++++++++++--------
+>  1 file changed, 53 insertions(+), 39 deletions(-)
+> 
+> diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/drivers/crypto/inside-secure/eip93/eip93-main.c
+> index 3cdc3308dcac..b7fd9795062d 100644
+> --- a/drivers/crypto/inside-secure/eip93/eip93-main.c
+> +++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
+> @@ -77,11 +77,44 @@ inline void eip93_irq_clear(struct eip93_device *eip93, u32 mask)
+>  	__raw_writel(mask, eip93->base + EIP93_REG_INT_CLR);
+>  }
+>  
+> -static void eip93_unregister_algs(unsigned int i)
+> +static int eip93_algo_is_supported(u32 alg_flags, u32 supported_algo_flags)
+> +{
+> +	if ((IS_DES(alg_flags) || IS_3DES(alg_flags)) &&
+> +	    !(supported_algo_flags & EIP93_PE_OPTION_TDES))
+> +		return 0;
+> +
+> +	if (IS_AES(alg_flags) &&
+> +	    !(supported_algo_flags & EIP93_PE_OPTION_AES))
+> +		return 0;
+> +
+> +	if (IS_HASH_MD5(alg_flags) &&
+> +	    !(supported_algo_flags & EIP93_PE_OPTION_MD5))
+> +		return 0;
+> +
+> +	if (IS_HASH_SHA1(alg_flags) &&
+> +	    !(supported_algo_flags & EIP93_PE_OPTION_SHA_1))
+> +		return 0;
+> +
+> +	if (IS_HASH_SHA224(alg_flags) &&
+> +	    !(supported_algo_flags & EIP93_PE_OPTION_SHA_224))
+> +		return 0;
+> +
+> +	if (IS_HASH_SHA256(alg_flags) &&
+> +	    !(supported_algo_flags & EIP93_PE_OPTION_SHA_256))
+> +		return 0;
+> +
+> +	return 1;
+> +}
+> +
+> +static void eip93_unregister_algs(u32 supported_algo_flags, unsigned int i)
+>  {
+>  	unsigned int j;
+>  
+>  	for (j = 0; j < i; j++) {
+> +		if (!eip93_algo_is_supported(eip93_algs[j]->flags,
+> +					     supported_algo_flags))
+> +			continue;
+> +
+>  		switch (eip93_algs[j]->type) {
+>  		case EIP93_ALG_TYPE_SKCIPHER:
+>  			crypto_unregister_skcipher(&eip93_algs[j]->alg.skcipher);
+> @@ -106,49 +139,27 @@ static int eip93_register_algs(struct eip93_device *eip93, u32 supported_algo_fl
+>  
+>  		eip93_algs[i]->eip93 = eip93;
+>  
+> -		if ((IS_DES(alg_flags) || IS_3DES(alg_flags)) &&
+> -		    !(supported_algo_flags & EIP93_PE_OPTION_TDES))
+> +		if (!eip93_algo_is_supported(alg_flags, supported_algo_flags))
+>  			continue;
+>  
+> -		if (IS_AES(alg_flags)) {
+> -			if (!(supported_algo_flags & EIP93_PE_OPTION_AES))
+> -				continue;
+> +		if (IS_AES(alg_flags) && !IS_HMAC(alg_flags)) {
+> +			if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY128)
+> +				eip93_algs[i]->alg.skcipher.max_keysize =
+> +					AES_KEYSIZE_128;
+>  
+> -			if (!IS_HMAC(alg_flags)) {
+> -				if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY128)
+> -					eip93_algs[i]->alg.skcipher.max_keysize =
+> -						AES_KEYSIZE_128;
+> +			if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY192)
+> +				eip93_algs[i]->alg.skcipher.max_keysize =
+> +					AES_KEYSIZE_192;
+>  
+> -				if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY192)
+> -					eip93_algs[i]->alg.skcipher.max_keysize =
+> -						AES_KEYSIZE_192;
+> +			if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY256)
+> +				eip93_algs[i]->alg.skcipher.max_keysize =
+> +					AES_KEYSIZE_256;
+>  
+> -				if (supported_algo_flags & EIP93_PE_OPTION_AES_KEY256)
+> -					eip93_algs[i]->alg.skcipher.max_keysize =
+> -						AES_KEYSIZE_256;
+> -
+> -				if (IS_RFC3686(alg_flags))
+> -					eip93_algs[i]->alg.skcipher.max_keysize +=
+> -						CTR_RFC3686_NONCE_SIZE;
+> -			}
+> +			if (IS_RFC3686(alg_flags))
+> +				eip93_algs[i]->alg.skcipher.max_keysize +=
+> +					CTR_RFC3686_NONCE_SIZE;
+>  		}
+>  
+> -		if (IS_HASH_MD5(alg_flags) &&
+> -		    !(supported_algo_flags & EIP93_PE_OPTION_MD5))
+> -			continue;
+> -
+> -		if (IS_HASH_SHA1(alg_flags) &&
+> -		    !(supported_algo_flags & EIP93_PE_OPTION_SHA_1))
+> -			continue;
+> -
+> -		if (IS_HASH_SHA224(alg_flags) &&
+> -		    !(supported_algo_flags & EIP93_PE_OPTION_SHA_224))
+> -			continue;
+> -
+> -		if (IS_HASH_SHA256(alg_flags) &&
+> -		    !(supported_algo_flags & EIP93_PE_OPTION_SHA_256))
+> -			continue;
+> -
+>  		switch (eip93_algs[i]->type) {
+>  		case EIP93_ALG_TYPE_SKCIPHER:
+>  			ret = crypto_register_skcipher(&eip93_algs[i]->alg.skcipher);
+> @@ -167,7 +178,7 @@ static int eip93_register_algs(struct eip93_device *eip93, u32 supported_algo_fl
+>  	return 0;
+>  
+>  fail:
+> -	eip93_unregister_algs(i);
+> +	eip93_unregister_algs(supported_algo_flags, i);
+>  
+>  	return ret;
+>  }
+> @@ -469,8 +480,11 @@ static int eip93_crypto_probe(struct platform_device *pdev)
+>  static void eip93_crypto_remove(struct platform_device *pdev)
+>  {
+>  	struct eip93_device *eip93 = platform_get_drvdata(pdev);
+> +	u32 algo_flags;
+> +
+> +	algo_flags = readl(eip93->base + EIP93_REG_PE_OPTION_1);
+>  
+> -	eip93_unregister_algs(ARRAY_SIZE(eip93_algs));
+> +	eip93_unregister_algs(algo_flags, ARRAY_SIZE(eip93_algs));
+>  	eip93_cleanup(eip93);
+>  }
+>  
+> -- 
+> 2.47.3
+> 
