@@ -1,68 +1,68 @@
-Received: from mail-ej1-f66.google.com (mail-ej1-f66.google.com [209.85.218.66])
+Received: from mail-ej1-f65.google.com (mail-ej1-f65.google.com [209.85.218.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F36C35BDC4
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 13:53:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398E935C19B
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 13:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768226002; cv=none; b=GEXY4hp6BIKklzYMB+7L6NTZsZOXg9V2uzM3hpU1MRSKWPnQlaHndVVnk5LBl5xe3K2dDNSVsVMl9aUUxJHte4OTso0psob1tmfe5xk0OV5pTsl2JDMiYRWh4ycSHpQMSHlEz9cwsQ8ZuQcFOAJD+jQdAintnovtWqt8wYorJZs=
+	t=1768226003; cv=none; b=CcQVc5pNQWprmXTKFO/x7d3y/OlDDjKXzMIgJGSElRex/lQ+L+ynMVT3yEow8CgSUmKK8WIVmCIP1ZlKT4mQKmbPx5QoNlP+yGfk0NdMpExjBOdSgc0HmkpY6yDcsiMH91cbu8i1G2dzTx1nNWxY3vDc3WTpONclTgeV9Bz2gKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768226002; c=relaxed/simple;
-	bh=th6axCGBijF8Kah9JfcUeQ/2xCVBCKHltRaRG2KfK10=;
+	s=arc-20240116; t=1768226003; c=relaxed/simple;
+	bh=zh3of1YDtgoe8pLqLNknTMRnkRoApxNn8uXmHT9Ljkc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=utDpgKN9UmelW/vepn7VIqR36EhXgPQaoPf+CTDOaRkCn5SH///OXWkQTHQDkkVaZ0ejY+WEPMt2L1G10l7lI0E99Ds5nAT779V/C5GaCPCQ9BVRKuHlcJhba7ba2WYNUzzPlDLwTHaM/oR/j7wZRPd8RrF/5MJclCv6PrD+cps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=bvtd/Qce; arc=none smtp.client-ip=209.85.218.66
+	 In-Reply-To:To:Cc; b=SvD6sVd/iPVno8JxkvwJRXgy9cm9Fum94cjGJEFdoJnTksEt/Rqo7kaPe5RBD2nPzsVwtYmTl8uao4oEljwIWDYHwlBGrlknIQjHabcd6huUKhC645uUOGcQHLuNIiGRUHgKZFk9pCAjtRL6XVAspAjsPt1Lk3vMxfX0wVYAlGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=FZYi5v0Q; arc=none smtp.client-ip=209.85.218.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="bvtd/Qce"
-Received: by mail-ej1-f66.google.com with SMTP id a640c23a62f3a-b871cfb49e6so147478266b.1
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 05:53:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="FZYi5v0Q"
+Received: by mail-ej1-f65.google.com with SMTP id a640c23a62f3a-b872de50c91so65935966b.2
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 05:53:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=fairphone.com; s=fair; t=1768225999; x=1768830799; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=O8IKnx9yXSe0FPYJrKraQqEmWSwhdYk1T8goN1fuYRo=;
-        b=bvtd/QceeYnli6Bs1+KL8Hr3/0qYmVT3pvd044d4DzKHoUxdthJgoCmmE4qC2LeDxa
-         ydmAs8ErzXRKgL0egz5oK5HEWwr4SN8Jr1YC0Ul8AkGQH3eOHhFAAH6IP3q/LBEV/NFQ
-         THR/bNe0CxdLuph8+laxTEHSlzCrJe/MBcvrdD3q7sg6+7HzX+6dMDkLyBjL6NKHP6LW
-         QWGCwWAZiNDtb+zSsuC2/6IMuudEHxDvCdWtS+y9FUC1xSyG46+Ck09TO0iEc2mvsR6S
-         1OAC4k56yWIk/RwOCQjUKb9QcyOl/seyM9f3uYMLCVBw5wKVaYu89TpPRdJm4f8ct9e2
-         KS2g==
+        bh=Riko22R3LEFHoPXODAPQuN7cY7xnzdRvNV/1KcDSv4c=;
+        b=FZYi5v0QHK7CLjQ4KJRVOKYeki3+Oy4moavTOxJPhlzpNM0MguroNhdIO62jhl/W84
+         bKyk17RqL9gKoirR19TtrODdDGOL9z06TUo9sGILQgGri+bnzuXWNuogypkTPoudynu9
+         ImrWqhpnvA42IMRGdbfmXO8vRdJyxpT80x0RUzuqJEro3twawBJ6wkXJx7cIVbnS2eIg
+         zH4jJtuPfHTSL3dXNjysfnfG7MdztHemN4FHJYI2Kd24wArusdXJv5hW3B0YSuHyzM3L
+         05mkFAOdCowhTuyu9rstE/EUip59pq7iK1kVbH4o28mMU4PeDwVMCkxT5q1Ikv/JtIB5
+         2pNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1768225999; x=1768830799;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=O8IKnx9yXSe0FPYJrKraQqEmWSwhdYk1T8goN1fuYRo=;
-        b=vaW0D/im9YJsFH8NMVqhT1gemeecUJXs4jYo7sYum3/OMH4nMUYoFjDzvn+6kvUUu0
-         UEin/fEoC45oKhH3fM2v9bDY3p7hYjgDh82jtnS0GUryp/f4e+Y0CbgjrqL3X6m2u1QK
-         1Oa3WG0VG9l/KbJ7FAVVeYVJK69UPGwfw12LHm3ZW6oaZ6PdRP7f1j6zekZu4fMQg2Ar
-         ROwDUHXU7pGSgxHLNxybGjsS0Txh0BxhAMqdyH39xGEU4dj6CfCJVJQCL2+Ax1VasD93
-         raB6mURiDWpK+NWGLrToYJf/dS+abCbn9i6B9osysQ6D5nFjppuwDSyq2yiHNtLPekaT
-         b73g==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ1uxsfb5AT9iGyN2iLGHLKXfLhA9hGIbnc1X7gz4t5mRWYKBatjfsP79zVtmLFM51d8eNO0KO/nkGUjY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyD6XhGb49vF9FXUQXBdVP1EgPbRNPfRyYaNABw6rbHFEc3SP/v
-	OaskIY7N+oaU1CpHBdLOsKn91u03wpN6h8v16uVY45pmqyjllFRNIZUCtE4Iqr/cpgU=
-X-Gm-Gg: AY/fxX7pMFyQc91ZWSpJ1J6/I71q8aCsef1S19SuJH3nR4XpweQ7Chpb9aTv9w84pcX
-	lUgg5y1xuKQrcnG221tYUqSJFCr45JJi83s9MBHIZ7XNWg8SDtbV1vra6id8UzQapc8dIX2A6Bp
-	MOW1m1EZJR741p24PAnc3IR6oXJWGPLgyfsBk+BjZBrCyhfdA/VA2iHh1djFJjZkRSPxh44hHte
-	iUYoCiVViwJna1+wu5Av4Gcjqgv+o6Zzlt84CHi57MGHgGg501Wqj3U1xy78Uw64F+dbi1q5Q50
-	pZ4Rqf8rHElRwXp0KCs3mhXX+RooX7sYu8W/gffRU50Nu42knpPAV/c2L9hWWPryC6Nsa990Isx
-	nPLip9NuhOVygtP+E5Ftai67zR/rOdx+4LBqsGa1l6s9qGO0aDmJPgykzuYbBJNPGuN3c1GeMZL
-	/HCtVqlCotV150uszxTtDuMenKImIL74YgyQkndGB6cvFILtpLuRh10sRTTTgesFGC
-X-Google-Smtp-Source: AGHT+IG+AJ65kKB2Dp506sZrhGNvXlfvnMnaQWt8y8s6GD6rdulfK18GchB8ix/xHYp7NvkWK0olNQ==
-X-Received: by 2002:a17:907:7b87:b0:b87:1a26:366d with SMTP id a640c23a62f3a-b871a265a30mr330532366b.49.1768225998538;
-        Mon, 12 Jan 2026 05:53:18 -0800 (PST)
+        bh=Riko22R3LEFHoPXODAPQuN7cY7xnzdRvNV/1KcDSv4c=;
+        b=Zx50hskusp6bucmKbCCL149H5QoYFQvxHDIAtgr9+fXjFAHMZy41FAo2moSsSzu8U0
+         g/xfYBhwhoVxwhKP/S9dLT7iAZaT40Cs7UjNASL+50kiCxqrxxTKJX1P/uiPPTcoBYoz
+         dQYwe0fpvJYDBSD0sPUf2zCE6rDMve7AKuqUkalMdktWmxrfhb+uP5yIXRKU4RLznGeN
+         iwKgQozAdA+x3JiIYMvbJncwdk8E9K3k5XVXz4BY66kEiFp6rai8XamXOHt+LrXrU7Fd
+         K3cM4+kx8S5cwl42cDSvGjXqgRm/tncSBBQWOiJBk+Y/+O8jxCda/KMtmLdJiLt8Zvky
+         /Nsw==
+X-Forwarded-Encrypted: i=1; AJvYcCUlA5kzxA0095q1VM3Ejs7lIHjHqAjkAdt2MMBCDcMwQ5bflhU5gRt+39ja8txyhQSNa5a6giHSEnBcBC0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyV+ZSZn347wbYOdE5U5pEgb8dB+48Y3dU+SpqmOCCHuQBYFhOa
+	EQr4bYxU8YzrU+Slr4OimxfzKsuXKwAmXl5MFKks4gz8hcASnMdV/HdDXpIANEY8cvw=
+X-Gm-Gg: AY/fxX6IM4nIBZgJxZFkPs3yK7NojW9WpapvjhOvlcTU/+3pwvBIMcAMtea3IMMyqGw
+	xwxz2/v6tp+FYiQ3V3F3QM1lTZJ79jQpLKStF5NQpLzgevhNqcVH7WouCeI8aYtkKXDd9YY4z2F
+	7yEB51o7hGge7t6Aqa4ZZLB976xJ7WCEth7nEFpFkJ6XThDoaNqVGrTWGAYLudfUOnFYOImyhS3
+	N14pQ92f//Yn7RcjDShz63KZXUYpRdsnrGTDT2v9Jmq6mQFUSuKvZ3JFYcOfkuzFjXkI5xu8qJs
+	h2rTqDvfz8EVtIbjJjkyRWKntSnrez5zWBvrDe87gP2QBhNOD4VePIdMeovOFMUfc/dMS2/ov78
+	t/7qttDf9ZR4xP3Rm764hDDVpz/r4r+qBikfaCyibm96zluVxCh1GQeiRtgZxrMosb9Y0hqwR8l
+	QkhP8MU6EFTZ9QgI65OqVBug5GpCA5Jrt+CfqPoqng7M9H3/gkreKOenseh87Op9uw
+X-Google-Smtp-Source: AGHT+IHdJLxmu0+/UyOYC9vMKy7oBS2ps3RobFJH7GN6mmniuulIiVjJJaG/v4t7llHwrgOamXjL4A==
+X-Received: by 2002:a17:907:6d0b:b0:b87:fc5:40bf with SMTP id a640c23a62f3a-b870fc61e5dmr388903366b.5.1768225999475;
+        Mon, 12 Jan 2026 05:53:19 -0800 (PST)
 Received: from [172.16.240.99] (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8731f071e4sm25700466b.66.2026.01.12.05.53.17
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8731f071e4sm25700466b.66.2026.01.12.05.53.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 05:53:17 -0800 (PST)
+        Mon, 12 Jan 2026 05:53:18 -0800 (PST)
 From: Luca Weiss <luca.weiss@fairphone.com>
-Date: Mon, 12 Jan 2026 14:53:15 +0100
-Subject: [PATCH v2 2/6] scsi: ufs: qcom,sc7180-ufshc: dt-bindings: Document
- the Milos UFS Controller
+Date: Mon, 12 Jan 2026 14:53:16 +0100
+Subject: [PATCH v2 3/6] dt-bindings: phy: qcom,sc8280xp-qmp-ufs-phy:
+ document the Milos QMP UFS PHY
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260112-milos-ufs-v2-2-d3ce4f61f030@fairphone.com>
+Message-Id: <20260112-milos-ufs-v2-3-d3ce4f61f030@fairphone.com>
 References: <20260112-milos-ufs-v2-0-d3ce4f61f030@fairphone.com>
 In-Reply-To: <20260112-milos-ufs-v2-0-d3ce4f61f030@fairphone.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>, 
@@ -89,42 +89,42 @@ Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
  Luca Weiss <luca.weiss@fairphone.com>, 
  Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1768225995; l=1032;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1768225995; l=1204;
  i=luca.weiss@fairphone.com; s=20250611; h=from:subject:message-id;
- bh=th6axCGBijF8Kah9JfcUeQ/2xCVBCKHltRaRG2KfK10=;
- b=294PpU4+wAexgNBjfPS7wMuzv8k505newwtgg10/kKLbAsBgxO3JAl/3GxpexhG6+tpOtAn2F
- pbq6ihiX5kQBk/D38DpXyiw6nLvGBd0OB0JwZO0FQ7fGpZDgw8b8oAn
+ bh=zh3of1YDtgoe8pLqLNknTMRnkRoApxNn8uXmHT9Ljkc=;
+ b=ab3LaAh0nqDakMPE7Y+uZxb7TiZnokZj/MjVglhe9gkUgHWQNgJhpTwAQV0kbZgOi7A7Kifjn
+ B5zA13NSsnBCN3I5HDHb6fWcmf0WZDLqXXo1vlbop7PFojeA8ZII4xA
 X-Developer-Key: i=luca.weiss@fairphone.com; a=ed25519;
  pk=O1aw+AAust5lEmgrNJ1Bs7PTY0fEsJm+mdkjExA69q8=
 
-Document the UFS Controller on the Milos SoC.
+Document the QMP UFS PHY on the Milos SoC.
 
 Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
 ---
- Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml | 2 ++
+ Documentation/devicetree/bindings/phy/qcom,sc8280xp-qmp-ufs-phy.yaml | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml b/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml
-index d94ef4e6b85a..c85f126e52a0 100644
---- a/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml
-+++ b/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml
-@@ -15,6 +15,7 @@ select:
-     compatible:
-       contains:
-         enum:
-+          - qcom,milos-ufshc
-           - qcom,msm8998-ufshc
-           - qcom,qcs8300-ufshc
-           - qcom,sa8775p-ufshc
-@@ -33,6 +34,7 @@ properties:
-   compatible:
-     items:
+diff --git a/Documentation/devicetree/bindings/phy/qcom,sc8280xp-qmp-ufs-phy.yaml b/Documentation/devicetree/bindings/phy/qcom,sc8280xp-qmp-ufs-phy.yaml
+index fba7b2549dde..0b59b21b024c 100644
+--- a/Documentation/devicetree/bindings/phy/qcom,sc8280xp-qmp-ufs-phy.yaml
++++ b/Documentation/devicetree/bindings/phy/qcom,sc8280xp-qmp-ufs-phy.yaml
+@@ -29,6 +29,7 @@ properties:
+               - qcom,kaanapali-qmp-ufs-phy
+           - const: qcom,sm8750-qmp-ufs-phy
        - enum:
-+          - qcom,milos-ufshc
-           - qcom,msm8998-ufshc
-           - qcom,qcs8300-ufshc
-           - qcom,sa8775p-ufshc
++          - qcom,milos-qmp-ufs-phy
+           - qcom,msm8996-qmp-ufs-phy
+           - qcom,msm8998-qmp-ufs-phy
+           - qcom,sa8775p-qmp-ufs-phy
+@@ -98,6 +99,7 @@ allOf:
+         compatible:
+           contains:
+             enum:
++              - qcom,milos-qmp-ufs-phy
+               - qcom,msm8998-qmp-ufs-phy
+               - qcom,sa8775p-qmp-ufs-phy
+               - qcom,sc7180-qmp-ufs-phy
 
 -- 
 2.52.0
