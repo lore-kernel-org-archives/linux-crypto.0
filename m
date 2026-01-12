@@ -1,64 +1,64 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF9C2D0C8F
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 19:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08870320A09
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 19:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768246125; cv=none; b=Re32CPyw1eyhekQ+wO6//x0+KbvyqCHveSUFQVXdp6UC0dexlSzuAus4nSU45/pqaovA40GSKhRN5B4Z2rPzOh/p83taN4wJrW7lfo2xHCjlL/lFsein7YjKNlq91leAlDU9XVpm1LTuokciXSljGGiRO53mpY7uVl5FL5B76w0=
+	t=1768246126; cv=none; b=bzXj6Jw83F5nW+SYd7acU4PrRldI9i370DgEcKslgJXENUOO50nMgMeaB5zbY4UqQfNHjx9lpcjL6ojbLt+YkKo0xn5vm/IrqC3e/Fukn0oBuJi2ti44PxcA8YxoveuVQgteHRGkHtCoHNgD5FsLOrtiiEXa4Kk5pAOv6zLlLYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768246125; c=relaxed/simple;
-	bh=RfNOTU1rUXZFy81KWIMuzlRH+1v6cHn4VlKbisbvBZo=;
+	s=arc-20240116; t=1768246126; c=relaxed/simple;
+	bh=cF1SrwFUz0aBiEwsFE0dTWI91lmrP4xlRA143q9JWuM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QD180ImaPFCS1R95jpACYTYNPVNgNnM7haREoxfBSg4LLs8az3QwUREO1m7vZvfVkc5pYMGdXhAMi/dkhBnZAnO8Uyjmo1GsNe6nGwCW5v/XT4zzrM08jwufIXEzwwDTDMh0yi6DJz/CNAdvRbhubvaTfODXAqXYEL8JRaQt5qM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G0FD+77D; arc=none smtp.client-ip=209.85.208.46
+	 MIME-Version; b=lfrgicd7Sv4MfHFxcdrdJe5c4lyZrkhZ3EoqkW6uPWXEBwp/cJ4I/2uzWcAJru8TYI3wgqQ205Zcz0v+X7ca7x5amfPdJPMmixobRtyAjhChHxkUenyKci3gv9InTB8GaGIb6m4kvy54CMu+rH98lQ/FEMBhuwwJtIo2QMqB+Nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l3Jte956; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G0FD+77D"
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6505cac9879so11448128a12.1
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 11:28:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l3Jte956"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-65063a95558so10156270a12.0
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 11:28:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768246122; x=1768850922; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1768246123; x=1768850923; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=F6pmlmleIFnHYbLcLeHzqqQV2depV+HvaEyub6pwhNU=;
-        b=G0FD+77D2bNI93Aqfu3A9WVv9s0XQFwPwdbqoWyGxsrZlA92ckAmnrpJ6H1j9RmZNA
-         Z8Sl73GHmSUaNcv2fDUUGiY1+Zq4658rfZebBt8M2O8MCHhr1OptyqRbmoI7NtUsu1Bb
-         DP6QfCQRQAvz2su1IRRU0B/wdAbCR0ggKILjwhVBYDSPma3RX1saC6kL4eZIVQPlzUSQ
-         JrYQVUr+CWPTnIssy7UoA80Hy0aPeZOQnr6rd7GmpoREVaDMr3fTGAVSxYz57Wii1qc6
-         ZsSXys7YoBUMkKwkyOd0A+oNHdMhvikQyC2qbG2H1mXrTDio3/vXENnWXmzbCB7Wt/yl
-         9emw==
+        bh=Hw+SyBhpJj8Dk0rbLbmvCfZKQJWCvJPz8EnXuKWjIzw=;
+        b=l3Jte956WVCyRw/GXg2tGdpUIQzjoG5cMeo+qKSZWIZAuhqBO7ySzM1vhS94ULxwTH
+         iNIZWssXZ1DUBfRdUt0WLov+boooCDx6eyEH1buYUAnX0gr0inZCgCo2SaHGbuh5mzcK
+         HVbjQUUYxdzvodJ5VXqR4XBrs5TPfoHCYViCjQeKM/jsSMgrPbhJcvaWHkEmx9hHzbSg
+         Fh8dVx+LblUhypobh5kKXCIdLk3+BNcNeDePRXsVM4Dw+RC4ORhAM2GamgHQgdTWwaLo
+         VkWDC1BI4e9XolJJhZaBD855RkOm6qDsvKiNd7efciVvL9sVjtlo9gEXYmOteQG1lj6r
+         880w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768246122; x=1768850922;
+        d=1e100.net; s=20230601; t=1768246123; x=1768850923;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=F6pmlmleIFnHYbLcLeHzqqQV2depV+HvaEyub6pwhNU=;
-        b=U0k4LI06YOOAxH1ojTomBf7dJH/bbhfMRV8cfmLwosvbAt5Yc1kRDdNwoXGTPwcdWz
-         ZOjNETlbpGNbuTsjvGMSlLXEaDwYWw/ZPzPf74PGBNcorvewrsJ9+kuF8qjPs9fGGDiS
-         1f96aUMewdCuUf5Iy/QDCUy162ONvYPKh1uglbj7jbbvMWgVwjPIDH8fSXDzFyAO8Ec2
-         tUaO0b82g7SQOgOBLI3nrFyMYB+W/sg70ibqxDOXe7eRUGpl4YQq7+ZqpIp3+xVOBF4m
-         H+dfLbZ8RAkrTYPJNgh5l7PfCpugUL4sGcXT00wYTV+FcD1xckPMO9LQIP3qCR3eyeGK
-         aFGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWXK0JAoZiQA7y5rjR3YaGZNEZLvmcn37EJpKJbPlKT3WD+HSl8XYly5w2MzWlcGKLLrXMoh9AM3PseFZw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysCzb2MwHZm/P/hi1rKhte9ZABCMMZq0k5dSLLyxUGbFoh99rg
-	YhEkuqXfk60Fw6vw1plTtlCJUYeRa9ki6fp23apUEf60Q6ZkG/8UzOPe
-X-Gm-Gg: AY/fxX4br2jSud+bv1I4gdVbOXbhl2Px6xVcekh2QHjbNtxtTuahOkyacY1TYFLd1lr
-	1vj6dMBnktqNao/KCb1APysfOogXvacI5PeouwbxO2C1prb0Rtp38DThUOKg9KZCo5M4VQewyCQ
-	/5d14leLynz6BpvwjHJqziGSdw6+SUZsA1cLoxbrHhJb3OLo8R4bxXaAB6AudqI23FUIvrvnMqR
-	8//y2MWG68KyuE+CvRjW0PYg3wPxc6OrL3/0fu1Q4bFXsvz/cweyx5WNpN7+balPKi6HDWQKysv
-	ULEsc39zQcXHO5h8YOSTP+O3D161HYX4cYDUjfV3+sI6dlIMlqr1SyV8JWuc/vXuVzxpnsQEXny
-	pBueZQKfYDJxHFHeiMdzUKky3UA7W4aUdMkTDAkbjd4iJTW6wLFK9CSaGrGtaRMXaSbww/ho7ck
-	2VQoiMxceX2mEJwBqerQ0fzBoRasMoBss04ecu8pHR9yqvG/1w1w==
-X-Google-Smtp-Source: AGHT+IGy522OXBlgiFW3lPd749jJAYgvouP4QS9c8yndvmWTKnryLyWxg/YRj13+vMvBUdmHcTA0tA==
-X-Received: by 2002:a05:6402:42d3:b0:64b:6dfc:dd34 with SMTP id 4fb4d7f45d1cf-65097cde534mr16779217a12.0.1768246121349;
-        Mon, 12 Jan 2026 11:28:41 -0800 (PST)
+        bh=Hw+SyBhpJj8Dk0rbLbmvCfZKQJWCvJPz8EnXuKWjIzw=;
+        b=Bvw9QtxqtmLfvqmygfNUvinv1zw7N4eKE/0WaQcFznCkbNoR8pIlVl8UlPe8KgINcZ
+         HwzxfkJa8UYAOHQ8Q2twp7DP/p11gWWp+E0byLkoAcCa615oDKPMH6DxqQ64NvP5Rf/b
+         rRpSPGyNgXCOfymGaQ3et43fOpAuOBF86LmGeqzNL+i1MdlLjbuOpl2722tATvou6Ies
+         38tPv4fMJsAw/wzX+wbsT31z/iSTVX7GIMuAxC3rvp2fZfzxanPWhXQyaV354mtTgA3u
+         LyTGTJ4426x3YE31bj1+4VhxmgLwOZkOfn2T/qSxv5CGZgU8kIU5bGtzqx9gUZ4m4+3D
+         FAzw==
+X-Forwarded-Encrypted: i=1; AJvYcCUdHSuAjXCHnrxqiBkfwiij460MYqc5bk6DDgNVxfQtDxI9vCiybJ381yewO0E7uLHkxH+7e7nN1EF0EPg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzl4e+awOz8fxKlNi76XLZqquOp7A2ir2TRecx5FRQWgOGhry97
+	IZSTHP78U9S88ibDsB9vv+8RlEcOC/S8CzrXqxzLa90+nnZ+H5i0P9bI
+X-Gm-Gg: AY/fxX6fz6X4gjAgg7CPGJ0rHtXiFVjXgUOC7Vh4Qr013klnLehz1/y2JqaqKmGgBR4
+	L/QZXfnZqylimMFSqmOMINCVMVlrYrtfNaxjpFbTpQSc5vU73qrN1LBhCy09QkDnGMhaunyoqto
+	J2kmNu/hYc1a9ZdcYnxpgxFn+RFSiTH4l0vSGoboWGcz0sl4NPFFMZYpfiQYALWsz5MrIte2Uja
+	mhbLbT6/hKhDGN8av/slSCfFJMmFEzdF56nN4nvciUZt4Bcac7+oZ0uCTGBJyg0cLQawhBH3IlT
+	h3sT5+jcapKKVE6r0tKCpy8mYNQweEzmZ6QgnzzXUS2FWTmV4Jwv/4vHwPMaA0+86PsTjhjMUS5
+	8xvilbpTtDy3egeEIgW34O1JiSvC/x++ot7v2A6YShiTzPGk0RxAx/JUnZ250JuJC2ec7LvhpCe
+	+VDTX2uUImHP99CsB7cBV03xErMgUhNxC9J7F4smHv5+8dIdyEJQ==
+X-Google-Smtp-Source: AGHT+IFpEfk67Wu3s+my7vAAjgYzI8tk25YBO54kBfzlkDE0wM0gQSWTlCzqTfS+7VeyIp6Wy6teeA==
+X-Received: by 2002:a05:6402:1e8c:b0:64b:6007:d8dc with SMTP id 4fb4d7f45d1cf-65097dcd890mr17558013a12.7.1768246122989;
+        Mon, 12 Jan 2026 11:28:42 -0800 (PST)
 Received: from ethan-tp (xdsl-31-164-106-179.adslplus.ch. [31.164.106.179])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507bf667fcsm18108959a12.29.2026.01.12.11.28.39
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507bf667fcsm18108959a12.29.2026.01.12.11.28.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 11:28:40 -0800 (PST)
+        Mon, 12 Jan 2026 11:28:42 -0800 (PST)
 From: Ethan Graham <ethan.w.s.graham@gmail.com>
 To: ethan.w.s.graham@gmail.com,
 	glider@google.com
@@ -94,9 +94,9 @@ Cc: akpm@linux-foundation.org,
 	skhan@linuxfoundation.org,
 	tarasmadan@google.com,
 	wentaoz5@illinois.edu
-Subject: [PATCH v4 1/6] kfuzztest: add user-facing API and data structures
-Date: Mon, 12 Jan 2026 20:28:22 +0100
-Message-ID: <20260112192827.25989-2-ethan.w.s.graham@gmail.com>
+Subject: [PATCH v4 2/6] kfuzztest: implement core module and input processing
+Date: Mon, 12 Jan 2026 20:28:23 +0100
+Message-ID: <20260112192827.25989-3-ethan.w.s.graham@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260112192827.25989-1-ethan.w.s.graham@gmail.com>
 References: <20260112192827.25989-1-ethan.w.s.graham@gmail.com>
@@ -108,220 +108,294 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the foundational user-facing components for the KFuzzTest framework.
-This includes the main API header <linux/kfuzztest.h>, the Kconfig
-option to enable the feature, and the required linker script changes
-which introduce a new ELF section in vmlinux.
+Add the core runtime implementation for KFuzzTest. This includes the
+module initialization, and the logic for receiving and processing
+user-provided inputs through debugfs.
 
-Note that KFuzzTest is intended strictly for debug builds only, and
-should never be enabled in a production build. The fact that it exposes
-internal kernel functions and state directly to userspace may constitute
-a serious security vulnerability if used for any reason other than
-testing.
+On module load, the framework discovers all of the simple test targets
+(FUZZ_TEST_SIMPLE) by iterating over the .kfuzztest_simple_target
+section, creating a corresponding debugfs directory with a write-only
+'input_simple' file for each of them.
 
-The header defines:
-- The FUZZ_TEST_SIMPLE() macro for creating test targets.
-- The `struct kfuzztest_simple_target` structure used to register tests.
-- The linker section (.kfuzztest_simple_target) where test metadata is
-  stored for discovery by the framework.
+Writing to an 'input_simple' file triggers the following fuzzing
+sequence:
+1. The binary input is allocated and copied from userspace into a
+   kernel buffer.
+2. The buffer and its length are passed immediately to the user-defined
+   test logic.
+3. The kernel is tainted with TAINT_TEST to indicate that untrusted input
+   has been fed directly to the internal kernel functions.
 
-This patch only adds the public interface and build integration; no
-runtime logic is included.
+This lightweight implementation relies on the caller (e.g., a fuzzer or
+script) to provide raw binary data that the target function can process.
 
 Signed-off-by: Ethan Graham <ethan.w.s.graham@gmail.com>
 
 ---
 PR v4:
-- Remove the complex FUZZ_TEST macro and associated dependencies,
-  including domain constraints, annotations, and de-serialization,
-  dramatically simplifying the flow.
-- Drop unused ELF sections (.kfuzztest_constraint, etc...) from the
-  linker script, keeping only .kfuzztest_simple_target.
+- Remove parsing, relocation, and KASAN poisoning logic to support the
+  move to a simple-only design.
+- Remove the '_config' debugfs directory and associated state tracking
+  (minimum alignment, invocation counts) to reduce complexity.
+- Enforce zero offset in `kfuzztest_write_cb_common` to ensure inputs
+  are passed down as single, contiguous blocks.
 PR v3:
-- Reorder definitions in kfuzztest.h for better flow and readability.
-- Introduce __KFUZZTEST_CONSTRAINT macro in preparation for the
-  introduction of the FUZZ_TEST_SIMPLE macro in the following patch,
-  which uses it for manually emitting constraint metadata.
+- Handle FUZZ_TEST_SIMPLE targets by creating a write-only
+  'input_simple' under the fuzz target's directory.
+- Add implementation for `kfuzztest_write_input_cb`.
+PR v2:
+- Fix build issues identified by the kernel test robot <lkp@intel.com>.
+- Address some nits pointed out by Alexander Potapenko.
 PR v1:
-- Move KFuzzTest metadata definitions to generic vmlinux linkage so that
-  the framework isn't bound to x86_64.
-- Return -EFAULT when simple_write_to_buffer returns a value not equal
-  to the input length in the main FUZZ_TEST macro.
-- Enforce a maximum input size of 64KiB in the main FUZZ_TEST macro,
-  returning -EINVAL when it isn't respected.
-- Refactor KFUZZTEST_ANNOTATION_* macros.
-- Taint the kernel with TAINT_TEST inside the FUZZ_TEST macro when a
-  fuzz target is invoked for the first time.
+- Update kfuzztest/parse.c interfaces to take `unsigned char *` instead
+  of `void *`, reducing the number of pointer casts.
+- Expose minimum region alignment via a new debugfs file.
+- Expose number of successful invocations via a new debugfs file.
+- Refactor module init function, add _config directory with entries
+  containing KFuzzTest state information.
+- Account for kasan_poison_range() return value in input parsing logic.
+- Validate alignment of payload end.
+- Move static sizeof assertions into /lib/kfuzztest/main.c.
+- Remove the taint in kfuzztest/main.c. We instead taint the kernel as
+  soon as a fuzz test is invoked for the first time, which is done in
+  the primary FUZZ_TEST macro.
+RFC v2:
+- The module's init function now taints the kernel with TAINT_TEST.
 ---
 ---
- include/asm-generic/vmlinux.lds.h | 14 ++++-
- include/linux/kfuzztest.h         | 88 +++++++++++++++++++++++++++++++
- lib/Kconfig.debug                 |  1 +
- lib/kfuzztest/Kconfig             | 16 ++++++
- 4 files changed, 118 insertions(+), 1 deletion(-)
- create mode 100644 include/linux/kfuzztest.h
- create mode 100644 lib/kfuzztest/Kconfig
+ lib/Makefile           |   2 +
+ lib/kfuzztest/Makefile |   4 ++
+ lib/kfuzztest/input.c  |  47 ++++++++++++++
+ lib/kfuzztest/main.c   | 142 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 195 insertions(+)
+ create mode 100644 lib/kfuzztest/Makefile
+ create mode 100644 lib/kfuzztest/input.c
+ create mode 100644 lib/kfuzztest/main.c
 
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index ae2d2359b79e..5aa46dbbc9b2 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -373,7 +373,8 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
- 	TRACE_PRINTKS()							\
- 	BPF_RAW_TP()							\
- 	TRACEPOINT_STR()						\
--	KUNIT_TABLE()
-+	KUNIT_TABLE()							\
-+	KFUZZTEST_TABLE()
+diff --git a/lib/Makefile b/lib/Makefile
+index 392ff808c9b9..02789bf88499 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -325,6 +325,8 @@ obj-$(CONFIG_GENERIC_LIB_CMPDI2) += cmpdi2.o
+ obj-$(CONFIG_GENERIC_LIB_UCMPDI2) += ucmpdi2.o
+ obj-$(CONFIG_OBJAGG) += objagg.o
  
- /*
-  * Data section helpers
-@@ -966,6 +967,17 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
- 		BOUNDED_SECTION_POST_LABEL(.kunit_init_test_suites, \
- 				__kunit_init_suites, _start, _end)
++obj-$(CONFIG_KFUZZTEST) += kfuzztest/
++
+ # pldmfw library
+ obj-$(CONFIG_PLDMFW) += pldmfw/
  
-+#ifdef CONFIG_KFUZZTEST
-+#define KFUZZTEST_TABLE()						\
-+	. = ALIGN(PAGE_SIZE);						\
-+	__kfuzztest_simple_targets_start = .;				\
-+	KEEP(*(.kfuzztest_simple_target));				\
-+	__kfuzztest_simple_targets_end = .;				\
-+
-+#else /* CONFIG_KFUZZTEST */
-+#define KFUZZTEST_TABLE()
-+#endif /* CONFIG_KFUZZTEST */
-+
- #ifdef CONFIG_BLK_DEV_INITRD
- #define INIT_RAM_FS							\
- 	. = ALIGN(4);							\
-diff --git a/include/linux/kfuzztest.h b/include/linux/kfuzztest.h
+diff --git a/lib/kfuzztest/Makefile b/lib/kfuzztest/Makefile
 new file mode 100644
-index 000000000000..62fce9267761
+index 000000000000..3cf5da5597a4
 --- /dev/null
-+++ b/include/linux/kfuzztest.h
-@@ -0,0 +1,88 @@
-+// SPDX-License-Identifier: GPL-2.0
++++ b/lib/kfuzztest/Makefile
+@@ -0,0 +1,4 @@
++# SPDX-License-Identifier: GPL-2.0
++
++obj-$(CONFIG_KFUZZTEST) += kfuzztest.o
++kfuzztest-objs := main.o input.o
+diff --git a/lib/kfuzztest/input.c b/lib/kfuzztest/input.c
+new file mode 100644
+index 000000000000..aae966ea76b3
+--- /dev/null
++++ b/lib/kfuzztest/input.c
+@@ -0,0 +1,47 @@
++/* SPDX-License-Identifier: GPL-2.0 */
 +/*
-+ * The Kernel Fuzz Testing Framework (KFuzzTest) API for defining fuzz targets
-+ * for internal kernel functions.
++ * KFuzzTest input handling.
 + *
 + * Copyright 2025 Google LLC
 + */
-+#ifndef KFUZZTEST_H
-+#define KFUZZTEST_H
++#include <linux/kfuzztest.h>
 +
++int kfuzztest_write_cb_common(struct file *filp, const char __user *buf, size_t len, loff_t *off, void **test_buffer)
++{
++	void *buffer;
++	ssize_t ret;
++
++	/*
++	 * Enforce a zero-offset to ensure that all data is passed down in a
++	 * single contiguous blob and not fragmented across multiple write
++	 * system calls.
++	 */
++	if (*off)
++		return -EINVAL;
++
++	/*
++	 * Taint the kernel on the first fuzzing invocation. The debugfs
++	 * interface provides a high-risk entry point for userspace to
++	 * call kernel functions with untrusted input.
++	 */
++	if (!test_taint(TAINT_TEST))
++		add_taint(TAINT_TEST, LOCKDEP_STILL_OK);
++
++	if (len > KFUZZTEST_MAX_INPUT_SIZE) {
++		pr_warn("kfuzztest: user input of size %zu is too large", len);
++		return -EINVAL;
++	}
++
++	buffer = kzalloc(len, GFP_KERNEL);
++	if (!buffer)
++		return -ENOMEM;
++
++	ret = simple_write_to_buffer(buffer, len, off, buf, len);
++	if (ret != len) {
++		kfree(buffer);
++		return -EFAULT;
++	}
++
++	*test_buffer = buffer;
++	return 0;
++}
+diff --git a/lib/kfuzztest/main.c b/lib/kfuzztest/main.c
+new file mode 100644
+index 000000000000..40a9e56c81ad
+--- /dev/null
++++ b/lib/kfuzztest/main.c
+@@ -0,0 +1,142 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * KFuzzTest core module initialization and debugfs interface.
++ *
++ * Copyright 2025 Google LLC
++ */
++#include <linux/atomic.h>
++#include <linux/debugfs.h>
++#include <linux/err.h>
 +#include <linux/fs.h>
++#include <linux/kasan.h>
++#include <linux/kfuzztest.h>
++#include <linux/module.h>
 +#include <linux/printk.h>
-+#include <linux/types.h>
 +
-+#define KFUZZTEST_MAX_INPUT_SIZE (PAGE_SIZE * 16)
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Ethan Graham <ethan.w.s.graham@gmail.com>");
++MODULE_DESCRIPTION("Kernel Fuzz Testing Framework (KFuzzTest)");
 +
-+/* Common code for receiving inputs from userspace. */
-+int kfuzztest_write_cb_common(struct file *filp, const char __user *buf, size_t len, loff_t *off, void **test_buffer);
++extern const struct kfuzztest_simple_target __kfuzztest_simple_targets_start[];
++extern const struct kfuzztest_simple_target __kfuzztest_simple_targets_end[];
 +
-+struct kfuzztest_simple_target {
-+	const char *name;
-+	ssize_t (*write_input_cb)(struct file *filp, const char __user *buf, size_t len, loff_t *off);
++struct target_fops {
++	struct file_operations target_simple;
 +};
 +
 +/**
-+ * FUZZ_TEST_SIMPLE - defines a KFuzzTest target
++ * struct kfuzztest_state - global state for the KFuzzTest module
 + *
-+ * @test_name: the unique identifier for the fuzz test, which is used to name
-+ *             the debugfs entry.
-+ *
-+ * This macro defines a fuzz target entry point that accepts raw byte buffers
-+ * from userspace. It registers a struct kfuzztest_simple_target which the
-+ * framework exposes via debugfs.
-+ *
-+ * When userspace writes to the corresponding debugfs file, the framework
-+ * allocates a kernel buffer, copies the user data, and passes it to the
-+ * logic defined in the macro body.
-+ *
-+ * User-provided Logic:
-+ * The developer must provide the body of the fuzz test logic within the curly
-+ * braces following the macro invocation. Within this scope, the framework
-+ * implicitly defines the following variables:
-+ *
-+ * - `char *data`: A pointer to the raw input data.
-+ * - `size_t datalen`: The length of the input data.
-+ *
-+ * Example Usage:
-+ *
-+ * // 1. The kernel function that we want to fuzz.
-+ * int process_data(const char *data, size_t datalen);
-+ *
-+ * // 2. Define a fuzz target using the FUZZ_TEST_SIMPLE macro.
-+ * FUZZ_TEST_SIMPLE(test_process_data)
-+ * {
-+ *	// Call the function under test using the `data` and `datalen`
-+ *	// variables.
-+ *	process_data(data, datalen);
-+ * }
-+ *
++ * @kfuzztest_dir: The root debugfs directory, /sys/kernel/debug/kfuzztest/.
++ * @num_targets: number of registered targets.
++ * @target_fops: array of file operations for each registered target.
 + */
-+#define FUZZ_TEST_SIMPLE(test_name)											\
-+	static ssize_t kfuzztest_simple_write_cb_##test_name(struct file *filp, const char __user *buf, size_t len,	\
-+							     loff_t *off);						\
-+	static ssize_t kfuzztest_simple_logic_##test_name(char *data, size_t datalen);					\
-+	static const struct kfuzztest_simple_target __fuzz_test_simple__##test_name __section(				\
-+		".kfuzztest_simple_target") __used = {									\
-+		.name = #test_name,											\
-+		.write_input_cb = kfuzztest_simple_write_cb_##test_name,						\
-+	};														\
-+	static ssize_t kfuzztest_simple_write_cb_##test_name(struct file *filp, const char __user *buf, size_t len,	\
-+							     loff_t *off)						\
-+	{														\
-+		void *buffer;												\
-+		int ret;												\
-+															\
-+		ret = kfuzztest_write_cb_common(filp, buf, len, off, &buffer);						\
-+		if (ret < 0)												\
-+			goto out;											\
-+		ret = kfuzztest_simple_logic_##test_name(buffer, len);							\
-+		if (ret == 0)												\
-+			ret = len;											\
-+		kfree(buffer);												\
-+out:															\
-+		return ret;												\
-+	}														\
-+	static ssize_t kfuzztest_simple_logic_##test_name(char *data, size_t datalen)
++struct kfuzztest_state {
++	struct dentry *kfuzztest_dir;
++	struct target_fops *target_fops;
++	size_t num_targets;
++};
 +
-+#endif /* KFUZZTEST_H */
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index dc0e0c6ed075..49a1748b9f24 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1947,6 +1947,7 @@ endmenu
- menu "Kernel Testing and Coverage"
- 
- source "lib/kunit/Kconfig"
-+source "lib/kfuzztest/Kconfig"
- 
- config NOTIFIER_ERROR_INJECTION
- 	tristate "Notifier error injection"
-diff --git a/lib/kfuzztest/Kconfig b/lib/kfuzztest/Kconfig
-new file mode 100644
-index 000000000000..d8e9caaac108
---- /dev/null
-+++ b/lib/kfuzztest/Kconfig
-@@ -0,0 +1,16 @@
-+# SPDX-License-Identifier: GPL-2.0-only
++static struct kfuzztest_state state;
 +
-+config KFUZZTEST
-+	bool "KFuzzTest - enable support for internal fuzz targets"
-+	depends on DEBUG_FS && DEBUG_KERNEL
-+	help
-+	  Enables support for the kernel fuzz testing framework (KFuzzTest), an
-+	  interface for exposing internal kernel functions to a userspace fuzzing
-+	  engine. KFuzzTest targets are exposed via a debugfs interface that
-+	  accepts raw binary inputs from userspace, and is designed to make it
-+	  easier to fuzz deeply nested kernel code that is hard to reach from
-+	  the system call boundary. Using a simple macro-based API, developers
-+	  can add a new fuzz target with minimal boilerplate code.
++static void cleanup_kfuzztest_state(struct kfuzztest_state *st)
++{
++	debugfs_remove_recursive(st->kfuzztest_dir);
++	st->num_targets = 0;
++	kfree(st->target_fops);
++	st->target_fops = NULL;
++}
 +
-+	  WARNING: This exposes internal kernel functions directly to userspace
-+	  and must NEVER be enabled in production builds.
++static const umode_t KFUZZTEST_INPUT_PERMS = 0222;
++
++static int initialize_target_dir(struct kfuzztest_state *st, const struct kfuzztest_simple_target *targ,
++				 struct target_fops *fops)
++{
++	struct dentry *dir, *input_simple;
++	int err = 0;
++
++	dir = debugfs_create_dir(targ->name, st->kfuzztest_dir);
++	if (!dir)
++		err = -ENOMEM;
++	else if (IS_ERR(dir))
++		err = PTR_ERR(dir);
++	if (err) {
++		pr_info("kfuzztest: failed to create /kfuzztest/%s dir", targ->name);
++		goto out;
++	}
++
++	input_simple = debugfs_create_file("input_simple", KFUZZTEST_INPUT_PERMS, dir, NULL, &fops->target_simple);
++	if (!input_simple)
++		err = -ENOMEM;
++	else if (IS_ERR(input_simple))
++		err = PTR_ERR(input_simple);
++	if (err)
++		pr_info("kfuzztest: failed to create /kfuzztest/%s/input_simple", targ->name);
++out:
++	return err;
++}
++
++/**
++ * kfuzztest_init - initializes the debug filesystem for KFuzzTest
++ *
++ * Each registered target in the ".kfuzztest_simple_target" section gets its own
++ * subdirectory under "/sys/kernel/debug/kfuzztest/<test-name>" containing one
++ * write-only "input_simple" file used for receiving binary inputs from
++ * userspace.
++ *
++ * @return 0 on success or an error
++ */
++static int __init kfuzztest_init(void)
++{
++	const struct kfuzztest_simple_target *targ;
++	int err = 0;
++	int i = 0;
++
++	state.num_targets = __kfuzztest_simple_targets_end - __kfuzztest_simple_targets_start;
++	state.target_fops = kzalloc(sizeof(struct target_fops) * state.num_targets, GFP_KERNEL);
++	if (!state.target_fops)
++		return -ENOMEM;
++
++	/* Create the main "kfuzztest" directory in /sys/kernel/debug. */
++	state.kfuzztest_dir = debugfs_create_dir("kfuzztest", NULL);
++	if (!state.kfuzztest_dir) {
++		pr_warn("kfuzztest: could not create 'kfuzztest' debugfs directory");
++		return -ENOMEM;
++	}
++	if (IS_ERR(state.kfuzztest_dir)) {
++		pr_warn("kfuzztest: could not create 'kfuzztest' debugfs directory");
++		err = PTR_ERR(state.kfuzztest_dir);
++		state.kfuzztest_dir = NULL;
++		return err;
++	}
++
++	for (targ = __kfuzztest_simple_targets_start; targ < __kfuzztest_simple_targets_end; targ++, i++) {
++		state.target_fops[i].target_simple = (struct file_operations){
++			.owner = THIS_MODULE,
++			.write = targ->write_input_cb,
++		};
++		err = initialize_target_dir(&state, targ, &state.target_fops[i]);
++		/*
++		 * Bail out if a single target fails to initialize. This avoids
++		 * partial setup, and a failure here likely indicates an issue
++		 * with debugfs.
++		 */
++		if (err)
++			goto cleanup_failure;
++		pr_info("kfuzztest: registered target %s", targ->name);
++	}
++	return 0;
++
++cleanup_failure:
++	cleanup_kfuzztest_state(&state);
++	return err;
++}
++
++static void __exit kfuzztest_exit(void)
++{
++	pr_info("kfuzztest: exiting");
++	cleanup_kfuzztest_state(&state);
++}
++
++module_init(kfuzztest_init);
++module_exit(kfuzztest_exit);
 -- 
 2.51.0
 
