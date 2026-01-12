@@ -1,165 +1,148 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15CFA30E858;
-	Mon, 12 Jan 2026 05:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C481C330B0E;
+	Mon, 12 Jan 2026 07:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768196224; cv=none; b=hGTgfytte52cMSTLDW+JW1uvQ5K9ZUaOnqI+2AVaKLyGcmgvO7DsVzv6YrFxHOCIQpyiZ9I7dDjb+jYisrpF8zHYCBDqJMn2yoQ5fIkeilLnnxKbc/gL7IU7ZGvl+TN3h+SC1Ooh0wgnV/Avuwl/lOwMQPGnBmxnEHIFmCRgrgI=
+	t=1768203184; cv=none; b=E7aT6cMxjgyISOJ1aZgIbT3vozN2nvBeYs6Y6arS8vqhHUk9u9diYUoC1uwuNzTP/zGCGoAsO4Da4ru3IBF/R8Au72bK/FHE6SK7Vcafhcy3DXpM9JP5iCU85oBz19f5XgKw/S8TKaY2kvPL71BYEw7k7ehEg57rBB75TM/HcYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768196224; c=relaxed/simple;
-	bh=Hh5waHPwNk1sRu4s4FEAwm1VSrHS3qZRw6FAv1Jzalk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MwJOkn64s0ep7i296/35+hF+vzPd7vznOhrAfwhYFe9xIKC6gU7WG8dajxmcQlQc7IObHVpeMzswCPnHs7a0BqWd9rbX1/1P9jvR4C79+V0xc816ShyBHpyP+8eNoXxQh60y/ZTLEiem28lPRH2sPhbfdGfrxFmuRgkSuYkvUGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fzxfNbC+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768203184; c=relaxed/simple;
+	bh=KdRXhfGl56K1YQnkAzeYiX2UFWqFdyLMMf/xAfsazgs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gOfbOiOW4S8JH0Q93ClCgw3ujtpUjptiG9G1BWJSKo4UtnzcB/IWFv3jwk9DDtfv/9gMY3ZgQ3ARtgtMqi6MAuuwBazKxjSSFn0gRK+mVMY2q8rgmwO0mHY+vqGV/uZqUwbjKZ5hnJgZKtZpTHhOKh6lHlklDpn3OdCB80X5WME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYTEdSE5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fzxfNbC+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF95DC19424;
-	Mon, 12 Jan 2026 05:37:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYTEdSE5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 488DBC116D0;
+	Mon, 12 Jan 2026 07:33:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768196223;
-	bh=Hh5waHPwNk1sRu4s4FEAwm1VSrHS3qZRw6FAv1Jzalk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fzxfNbC+fqKU+ACL7cXCrDmDEz7F7JZ6zTa+ZQ1Es9zXdpP4i3GCxo5315odZj2Fh
-	 yEKzsXk+ZcH9QZKy1oYcQ4yvzA571Zhj4RJ9Zli4lAabceLzoIS3yKU5saLEnwSkXU
-	 bo32F3NK8M1zP93Gf00y6j71UROOVX7fakg707IY/ShD9XJZ9bUyihRvX5Kb/QW24g
-	 90hElGZDlo9sgXGqRC1O61aCwOAidK70iII1du8dyuBWet1z6VCtvTjWEdthGE4pmN
-	 7QfynPs3/TYmCSoRXosc5ewaPcRza32wqdE3DxCA6HlxwMn1E+SJJirLTHOim06nLj
-	 3FdXLNTYl11QQ==
-From: "Mario Limonciello (AMD)" <superm1@kernel.org>
-To: Tom Lendacky <thomas.lendacky@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Rijo Thomas <Rijo-john.Thomas@amd.com>
-Cc: John Allen <john.allen@amd.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Hans de Goede <hansg@kernel.org>,
-	linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER),
-	platform-driver-x86@vger.kernel.org (open list:AMD PMF DRIVER),
-	Lars Francke <lars.francke@gmail.com>,
-	Yijun Shen <Yijun.Shen@dell.com>,
-	Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
-	"Mario Limonciello (AMD)" <superm1@kernel.org>,
-	Yijun Shen <Yijun.Shen@Dell.com>
-Subject: [PATCH v5 5/5] crypto: ccp - Send PSP_CMD_TEE_RING_DESTROY when PSP_CMD_TEE_RING_INIT fails
-Date: Sun, 11 Jan 2026 23:36:10 -0600
-Message-ID: <20260112053610.2566943-6-superm1@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260112053610.2566943-1-superm1@kernel.org>
-References: <20260112053610.2566943-1-superm1@kernel.org>
+	s=k20201202; t=1768203184;
+	bh=KdRXhfGl56K1YQnkAzeYiX2UFWqFdyLMMf/xAfsazgs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=TYTEdSE5ONs10N1xaPrLoOvFhlajmZC79SjRE83TF7XfFJULFahdt0TuhRjcfaXO+
+	 HpZHPUNqMueI5PPPYmTBezPxDhEKBC+5QpOqWz1GndAFtPwUG61jMWHR568SNtPn3I
+	 TPuMcCVFlklcHwxykFQsAYaBil2g5ivBrZcQGD34OPCS/m8NrBFnXDm3SpSjKZAcWW
+	 dCZxagfOgWdeOoP0mUfbuiyBROVs2ixnjVYecK/7lSZWNBnI/nGrv1M7KDnczx0dF1
+	 20IpcW4Nf/lDZvoVkRh57gHFU3C+i7j4Ti6lpL/57yB1ml9uz6/lyf497/pkYvuTjW
+	 xCfBPr4Tg3N4w==
+Message-ID: <e5d1d9ce-0268-4b1b-9ce9-2b871926acbf@kernel.org>
+Date: Mon, 12 Jan 2026 08:32:58 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/3] dt-bindings: crypto: eip93: add clock gate and
+ reset line
+To: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: benjamin.larsson@genexis.eu, chester.a.unal@arinc9.com,
+ davem@davemloft.net, angelogioacchino.delregno@collabora.com,
+ ansuelsmth@gmail.com, conor+dt@kernel.org, herbert@gondor.apana.org.au,
+ krzk+dt@kernel.org, matthias.bgg@gmail.com, robh@kernel.org,
+ sergio.paracuellos@gmail.com, tsbogend@alpha.franken.de,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, linux-mips@vger.kernel.org
+References: <20260102155341.3682013-1-olek2@wp.pl>
+ <20260103-sweet-micro-manul-12eaee@quoll>
+ <d7ab5be3-8502-407c-baf6-714ac3a89cb7@wp.pl>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <d7ab5be3-8502-407c-baf6-714ac3a89cb7@wp.pl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The hibernate resume sequence involves loading a resume kernel that is just
-used for loading the hibernate image before shifting back to the existing
-kernel.
+On 11/01/2026 14:36, Aleksander Jan Bajkowski wrote:
+> Hi Krzysztof,
+> 
+> On 1/3/26 15:11, Krzysztof Kozlowski wrote:
+>> On Fri, Jan 02, 2026 at 04:47:33PM +0100, Aleksander Jan Bajkowski wrote:
+>>> Add the clock gate and reset line, both of which are available
+>>> on the Airoha AN7581.
+>>>
+>>> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+>>> ---
+>>> v3:
+>>> - introduce patch
+>>> ---
+>>>   .../crypto/inside-secure,safexcel-eip93.yaml       | 14 ++++++++++++++
+>>>   1 file changed, 14 insertions(+)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
+>>> index 997bf9717f9e..c6c99c08dc68 100644
+>>> --- a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
+>>> +++ b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
+>>> @@ -48,20 +48,34 @@ properties:
+>>>     interrupts:
+>>>       maxItems: 1
+>>>   
+>>> +  clocks:
+>>> +    maxItems: 1
+>>> +
+>>> +  resets:
+>>> +    maxItems: 1
+>>> +
+>>>   required:
+>>>     - compatible
+>>>     - reg
+>>>     - interrupts
+>>> +  - clocks
+>>> +  - resets
+>> That's ABI break without explanation in the commit msg.
+>>
+> I think that the reset line and clock gate are available on all SoCs
+> with this IP Core. Should the reset line and clock gate only be
 
-During that hibernate resume sequence the resume kernel may have loaded
-the ccp driver.  If this happens the resume kernel will also have called
-PSP_CMD_TEE_RING_INIT but it will never have called
-PSP_CMD_TEE_RING_DESTROY.
+Not related. I did not say that hardware has or has not. I speak about
+ABI, so the interface.
 
-This is problematic because the existing kernel needs to re-initialize the
-ring.  One could argue that the existing kernel should call destroy
-as part of restore() but there is no guarantee that the resume kernel did
-or didn't load the ccp driver.  There is also no callback opportunity for
-the resume kernel to destroy before handing back control to the existing
-kernel.
+> required for newly added SoCs, and remain optional for existing ones?
 
-Similar problems could potentially exist with the use of kdump and
-crash handling. I actually reproduced this issue like this:
-
-1) rmmod ccp
-2) hibernate the system
-3) resume the system
-4) modprobe ccp
-
-The resume kernel will have loaded ccp but never destroyed and then when
-I try to modprobe it fails.
-
-Because of these possible cases add a flow that checks the error code from
-the PSP_CMD_TEE_RING_INIT call and tries to call PSP_CMD_TEE_RING_DESTROY
-if it failed.  If this succeeds then call PSP_CMD_TEE_RING_INIT again.
-
-Fixes: f892a21f51162 ("crypto: ccp - use generic power management")
-Reported-by: Lars Francke <lars.francke@gmail.com>
-Closes: https://lore.kernel.org/platform-driver-x86/CAD-Ua_gfJnQSo8ucS_7ZwzuhoBRJ14zXP7s8b-zX3ZcxcyWePw@mail.gmail.com/
-Tested-by: Yijun Shen <Yijun.Shen@Dell.com>
-Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
----
-v5:
- * Add retry=true for the retry case (Shyam)
-v4:
- * Add tag (Yijun)
- * Move and rename PSP_TEE_STS_RING_BUSY (Ilpo)
-v3:
- * Add a comment (Tom)
- * Add a define for busy condition (Shyam)
- * Rename label (Shyam)
- * Upgrade message to info (Shyam)
- * Use a helper that validates result for destroy command (Shyam)
----
- drivers/crypto/ccp/tee-dev.c | 14 ++++++++++++++
- include/linux/psp.h          |  1 +
- 2 files changed, 15 insertions(+)
-
-diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
-index ef1430f86ad62..92ffa412622a2 100644
---- a/drivers/crypto/ccp/tee-dev.c
-+++ b/drivers/crypto/ccp/tee-dev.c
-@@ -113,6 +113,7 @@ static int tee_init_ring(struct psp_tee_device *tee)
- {
- 	int ring_size = MAX_RING_BUFFER_ENTRIES * sizeof(struct tee_ring_cmd);
- 	struct tee_init_ring_cmd *cmd;
-+	bool retry = false;
- 	unsigned int reg;
- 	int ret;
- 
-@@ -135,6 +136,7 @@ static int tee_init_ring(struct psp_tee_device *tee)
- 	/* Send command buffer details to Trusted OS by writing to
- 	 * CPU-PSP message registers
- 	 */
-+retry_init:
- 	ret = psp_mailbox_command(tee->psp, PSP_CMD_TEE_RING_INIT, cmd,
- 				  TEE_DEFAULT_CMD_TIMEOUT, &reg);
- 	if (ret) {
-@@ -145,6 +147,18 @@ static int tee_init_ring(struct psp_tee_device *tee)
- 	}
- 
- 	if (FIELD_GET(PSP_CMDRESP_STS, reg)) {
-+		/*
-+		 * During the hibernate resume sequence driver may have gotten loaded
-+		 * but the ring not properly destroyed. If the ring doesn't work, try
-+		 * to destroy and re-init once.
-+		 */
-+		if (!retry && FIELD_GET(PSP_CMDRESP_STS, reg) == PSP_TEE_STS_RING_BUSY) {
-+			dev_info(tee->dev, "tee: ring init command failed with busy status, retrying\n");
-+			if (tee_send_destroy_cmd(tee)) {
-+				retry = true;
-+				goto retry_init;
-+			}
-+		}
- 		dev_err(tee->dev, "tee: ring init command failed (%#010lx)\n",
- 			FIELD_GET(PSP_CMDRESP_STS, reg));
- 		tee_free_ring(tee);
-diff --git a/include/linux/psp.h b/include/linux/psp.h
-index 92e60aeef21e1..b337dcce1e991 100644
---- a/include/linux/psp.h
-+++ b/include/linux/psp.h
-@@ -18,6 +18,7 @@
-  * and should include an appropriate local definition in their source file.
-  */
- #define PSP_CMDRESP_STS		GENMASK(15, 0)
-+#define  PSP_TEE_STS_RING_BUSY 0x0000000d  /* Ring already initialized */
- #define PSP_CMDRESP_CMD		GENMASK(23, 16)
- #define PSP_CMDRESP_RESERVED	GENMASK(29, 24)
- #define PSP_CMDRESP_RECOVERY	BIT(30)
--- 
-2.43.0
-
+Best regards,
+Krzysztof
