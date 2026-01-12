@@ -1,37 +1,87 @@
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B6930FC10
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 09:37:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07732BEC34
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 10:29:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768210632; cv=none; b=B/5bJaZACERd0H/itPZEU+nXW9fAWChTuZxntq7hPUsQToIWjtRoK1lBNfIKUwac1uZj5Sh6WaRMsLXvY4osPUoE25uMjrGdoYyzsPZyhsBBT36cbfi9Dl56WFbYXtg30Gkm2pFANkDjuXUW7Wqtd9ROWJHPR/ICv9Y3+LHQzRA=
+	t=1768213801; cv=none; b=ChWgYQtTUDXEEhGgWsxMI12Nc5I5bDc2OZlHSciJqZRPqowxjV2TRwWHSAOg7B+8pNWiL1dNDnWRmFV6jjULpi9bE03JGULjD8QfOmYKKAMcmJfZO1vA0G1wc3rhMnSNo2rPbFb0czXe/i2Y42ThNcWA9b6tH8kdIgLwNyEA2B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768210632; c=relaxed/simple;
-	bh=s/0soxVLS7I9bDruxcwpW+pBGMdGAmBDH2ApMDWqxFk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=SH31u4zwL1sUnb1qBI1qzGDtH5KY6txC6d5TgffKnas0HlpavLwswRU5b7LJE3xHEa8RZrsKz8u4zIr1I4C9sf6bPwDH90sfNyuJdRbTGUztdGgzgV3itbsSVl30EsemnD6r7kspw80U9HZtDfU5VmCWI0JZxXheh8v/wnNzt4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1768209497-1eb14e7c010f250001-Xm9f1P
-Received: from ZXSHMBX2.zhaoxin.com (ZXSHMBX2.zhaoxin.com [10.28.252.164]) by mx2.zhaoxin.com with ESMTP id 48sW1qyJ7ZrIAkxQ (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Mon, 12 Jan 2026 17:18:17 +0800 (CST)
-X-Barracuda-Envelope-From: AlanSong-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-Received: from ZXSHMBX1.zhaoxin.com (10.28.252.163) by ZXSHMBX2.zhaoxin.com
- (10.28.252.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.59; Mon, 12 Jan
- 2026 17:18:17 +0800
-Received: from ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85]) by
- ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85%7]) with mapi id
- 15.01.2507.059; Mon, 12 Jan 2026 17:18:17 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-Received: from [10.32.65.156] (10.32.65.156) by ZXBJMBX02.zhaoxin.com
- (10.29.252.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.59; Mon, 12 Jan
- 2026 17:12:34 +0800
-Message-ID: <7aa1603d-6520-414a-a2a1-3a5289724814@zhaoxin.com>
-Date: Mon, 12 Jan 2026 17:12:01 +0800
+	s=arc-20240116; t=1768213801; c=relaxed/simple;
+	bh=zxYqm0zQueh0U0yDRbTPD4QtsJ7Bx27wmqHwL5z/+7A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Oz6wkwIJstBBFIdIQsUL6SyfiiJb/SAixsszWFfjh3oRNUNvtw72bCkGIw6hAcVpSnDZEjm9b4K1Y8fSP0Vu0TfgBGkuqhyofSYLHFRIcSLHcoEy0Vhne/abgNIjS7vDoOULBnNBxdRcp4OGii9wecDgQ1dwXe9KqWGEJ1Uk2sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=mKcniPiC; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Bu4u0C4a; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="mKcniPiC";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Bu4u0C4a"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60C7Bk3f2788278
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 10:29:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	bxMVnP7klhF7zuicFFjZTjp3gwEJfISaysxyhwsH6zU=; b=mKcniPiCqKedrd1a
+	ZUavt6rBtOP9PeRqG2qVS49oIRhL6AIthCiVoVjr8f2DbNgTRdVTW0+4NdwzwiTz
+	mFnrtTo4ozC736ydacctG+gIxMusfsYN3gmym7B6h/Mv4BJJNTfl7NMK72cPBA/D
+	lIWXR/U47x8G8F/Jy5k9RlNIJdrByd6jRvT15zXcKVSq1TYUcRNzMqjSkjNAFLho
+	1qQYnEuDtZw7atGKh9tu+dUdvwVqYvL1z9/JK8LvjzbMQ8FytlMWyR75dfZWknmj
+	2SULBr9nOtM/PrKw16HaGYI6Gw6oqExCw5lS46DsF9OWAeNPF/wQwaS74TFB5AGP
+	5ZKobQ==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bke3e4n41-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 10:29:58 +0000 (GMT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8b10c2ea0b5so213059885a.0
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 02:29:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1768213798; x=1768818598; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bxMVnP7klhF7zuicFFjZTjp3gwEJfISaysxyhwsH6zU=;
+        b=Bu4u0C4amzGQv55u6EpOQEEtFY7GRKj/YEvL1WGKy9IDYmL0ok+uRwq6SUwCwSIF6P
+         zUexIOpD7hmL4rI/W7mSYNXP+G/HsCW4HPiMSzEnYWSxlM6c42UFQ+xkTOV5D/7T49Ro
+         iH5RkVsFF3iF0B2HYOc8+TIxfBNRACHF00fWdPVK/zARO8ovPrrTEkHZK/ud4X3RBcls
+         z4mOQv4FOANPI4wzAY37fNF8KTNM85MbuAhZq455jf5brrViMRvC8VSNDjKGNNx88Mwp
+         HCIV2ZU13kUscx/01ArB0ukr1K6y652JTFNJva8x9715ydtQHyz9xjJV+sCFXZZfwlP8
+         7Smw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768213798; x=1768818598;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bxMVnP7klhF7zuicFFjZTjp3gwEJfISaysxyhwsH6zU=;
+        b=ngy9t5h5WE1i75yus6jeHvBVS6px1hAToiaijdG6xX5XlyHlZuMoi/8YDOrRSSJjcH
+         02MXNjbn2qMXWU9vFuAUwBIhjTbgoVsAz5ENIhp+P/NmWNaaWalzIh2/3udGvRVCRtlb
+         MC6XlLXGHfkG2BOu01usE86HbcNPkNdSelCrrVX7EusJMF9HjAdPJ+uUhA0k5SH2Tu/o
+         74Z5Rl9cPeGNaOS0cNyJO6olvoMM52WjgvBDVayR4WP8kz/pyJ7QAdR7XLnFb+m2nKpv
+         xw10oK5dryfYNWrh3+DLyR+xLz8i4gJjVgYVwg1iu0sCEJxJWyJQAVTsbRZ1ANuRg4po
+         /RKw==
+X-Forwarded-Encrypted: i=1; AJvYcCX9fMVce1WFlHKy7vTnPcqxqZ0y1gpp8DHKCiCnsdssbZycQOMFc4mDAfDjqbfz8AP4xFFODpmuxKASc+s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWBKXYXeeQCs+NNKLJNHogIhkQ8j4e6DwfNM+09DzVnCIoF683
+	UatzB+FQY//Tf8OEenPSB9DjMbc7thk7Zu9WpMNgFuwEwK3oYf6EAdj9PqGgaWQO/aJLrqlavah
+	MmK+E9tSy4HUqyrGk2L02+/pCL2oGuxwILOIjh2iIGPfoxfrkXCoklCj2P8veo0O4w2o=
+X-Gm-Gg: AY/fxX7Vg4LN9+CBIyWO4w28X/twwC3KiiaCPqT78EAff23dfS2QKeu4ExtymcxFZ5E
+	WKmfk+fTdoXxFXcNHlgCF0e2pxGrqxwp/hUzUqpwE786/vuV4dA2qwrHkuPSwb/+NMnVI8SkifV
+	aqcJ0Ci+aU8pl9/gSiySAUOCn5Oq3oW1Fq4az5KC4sw0LrpdIpCldlgCrukkX7HB2Hy3TuAwbhy
+	bQujHVP3SG/mQJ8+5ZSRFn/RFnEtaXWVe1WKe5qcCG8jFpbP1qwSzw+6NPSsH+MUN0d2MjWqfmF
+	3Z3hqvpIMOGxFdpJSMYEx64+mmfkTER7hSxVHIVT0HBErpi2SZLMpkCuXSZvyYhkCmpMFhkEcjh
+	jer+BE6jDjbWxTuvirjZFS8CjHUHgbz1IWR2CNtXLfWTQ1qEDFPNjdqDH8BHYB6hACBY=
+X-Received: by 2002:a05:620a:4150:b0:8be:7dd7:f041 with SMTP id af79cd13be357-8c3893dc319mr1707034585a.7.1768213798010;
+        Mon, 12 Jan 2026 02:29:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFYkinKvuUhGe4V4yaanPySErY45GVSf7HQse7lAC+h88C4FKeCk2VIkqMj67TZjna5NhPTaQ==
+X-Received: by 2002:a05:620a:4150:b0:8be:7dd7:f041 with SMTP id af79cd13be357-8c3893dc319mr1707031185a.7.1768213797514;
+        Mon, 12 Jan 2026 02:29:57 -0800 (PST)
+Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b86fee09163sm593221066b.26.2026.01.12.02.29.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jan 2026 02:29:56 -0800 (PST)
+Message-ID: <ccbaff51-d7fa-4b22-8d4e-02bea5d8a529@oss.qualcomm.com>
+Date: Mon, 12 Jan 2026 11:29:54 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -39,233 +89,180 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: AlanSong-oc <AlanSong-oc@zhaoxin.com>
-Subject: Re: [PATCH v2 1/2] lib/crypto: x86/sha1: PHE Extensions optimized
- SHA1 transform function
-To: Eric Biggers <ebiggers@kernel.org>
-X-ASG-Orig-Subj: Re: [PATCH v2 1/2] lib/crypto: x86/sha1: PHE Extensions optimized
- SHA1 transform function
-CC: <herbert@gondor.apana.org.au>, <Jason@zx2c4.com>, <ardb@kernel.org>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<CobeChen@zhaoxin.com>, <TonyWWang-oc@zhaoxin.com>, <YunShen@zhaoxin.com>,
-	<GeorgeXue@zhaoxin.com>, <LeoLiu-oc@zhaoxin.com>, <HansHu@zhaoxin.com>,
-	<x86@kernel.org>
-References: <cover.1766131281.git.AlanSong-oc@zhaoxin.com>
- <aa8ed72a109480887bdb3f3b36af372eadf0e499.1766131281.git.AlanSong-oc@zhaoxin.com>
- <20251219181805.GA1797@sol>
-In-Reply-To: <20251219181805.GA1797@sol>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
- ZXBJMBX02.zhaoxin.com (10.29.252.6)
-X-Moderation-Data: 1/12/2026 5:18:16 PM
-X-Barracuda-Connect: ZXSHMBX2.zhaoxin.com[10.28.252.164]
-X-Barracuda-Start-Time: 1768209497
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 8403
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.152921
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+Subject: Re: [PATCH 5/6] arm64: dts: qcom: milos: Add UFS nodes
+To: Luca Weiss <luca.weiss@fairphone.com>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>, Vinod Koul <vkoul@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>
+Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-phy@lists.infradead.org
+References: <20260107-milos-ufs-v1-0-6982ab20d0ac@fairphone.com>
+ <20260107-milos-ufs-v1-5-6982ab20d0ac@fairphone.com>
+ <2486dc4b-71f3-4cd9-8139-b397407d7e4d@linaro.org>
+ <543d9e55-c858-40f9-8785-c9f636850120@linaro.org>
+ <DFMH8W40TCJ0.XCTHNRJFJE4T@fairphone.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <DFMH8W40TCJ0.XCTHNRJFJE4T@fairphone.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: V9xtsP-lbt4mTGaNj3MUwHwOqbfwW4gv
+X-Proofpoint-ORIG-GUID: V9xtsP-lbt4mTGaNj3MUwHwOqbfwW4gv
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEyMDA4MiBTYWx0ZWRfX3n4tnndSWHDf
+ Oe6cD8W7xNhO94IxEpcCOkA1QgbXpoEXgGqBx1rTqtL7Y+ptE6cejtw5WI330I/snuSXtEFHMMH
+ hYjfCQpT+6SoVUzY2UpgtuEzz6yJ/YjtU2dJh/IPLmjNwMrbulg3ozwXSxXT727z8ovgPjpzbhg
+ De2h2V/7/pCNjqLJNx5RxlFhpclGymTTgEA/S9qgxv1m4H5o/ye0lPMOFC3SyRXUtfh3bUsZ58r
+ H4r7C/3DfLchdQ0w6kB9h+8IHqQpU0y4AjPw9ebU7DaF0cbmWS/CFLjorcutvEq3OUbii8yA8bq
+ t7eCP14xXrT8Z7l3iYD1tirfs7qEib7546MOsv8F7daLL6//n4eJJakSbnUOqx6g6u67ccNDxVL
+ 7mcflaWnzGaPpV08MCHRPQUbMJj9NhJ5ufwg1FR+C3JsCJS2JRta410O6jaLMVCtlT9f2pAozP5
+ McVX1qN2ZdynRTr9spA==
+X-Authority-Analysis: v=2.4 cv=Dckaa/tW c=1 sm=1 tr=0 ts=6964cd26 cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=6H0WHjuAAAAA:8 a=7X8Kw1P6343en4nalX4A:9
+ a=ZPF2tL_FRqzNxS05:21 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=PEH46H7Ffwr30OY-TuGO:22 a=Soq9LBFxuPC4vsCAQt-j:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-12_03,2026-01-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 suspectscore=0 bulkscore=0 impostorscore=0 spamscore=0
+ adultscore=0 lowpriorityscore=0 priorityscore=1501 phishscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2512120000
+ definitions=main-2601120082
 
-On 12/20/2025 2:18 AM, Eric Biggers wrote:
+On 1/12/26 9:45 AM, Luca Weiss wrote:
+> Hi Neil,
 > 
-> [+Cc x86@kernel.org]
+> On Mon Jan 12, 2026 at 9:26 AM CET, Neil Armstrong wrote:
+>> On 1/7/26 14:53, Neil Armstrong wrote:
+>>> Hi,
+>>>
+>>> On 1/7/26 09:05, Luca Weiss wrote:
+>>>> Add the nodes for the UFS PHY and UFS host controller, along with the
+>>>> ICE used for UFS.
+>>>>
+>>>> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+>>>> ---
+>>>>   arch/arm64/boot/dts/qcom/milos.dtsi | 127 +++++++++++++++++++++++++++++++++++-
+>>>>   1 file changed, 124 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/boot/dts/qcom/milos.dtsi b/arch/arm64/boot/dts/qcom/milos.dtsi
+>>>> index e1a51d43943f..0f69deabb60c 100644
+>>>> --- a/arch/arm64/boot/dts/qcom/milos.dtsi
+>>>> +++ b/arch/arm64/boot/dts/qcom/milos.dtsi
+>>>> @@ -797,9 +797,9 @@ gcc: clock-controller@100000 {
+>>>>                    <&sleep_clk>,
+>>>>                    <0>, /* pcie_0_pipe_clk */
+>>>>                    <0>, /* pcie_1_pipe_clk */
+>>>> -                 <0>, /* ufs_phy_rx_symbol_0_clk */
+>>>> -                 <0>, /* ufs_phy_rx_symbol_1_clk */
+>>>> -                 <0>, /* ufs_phy_tx_symbol_0_clk */
+>>>> +                 <&ufs_mem_phy 0>,
+>>>> +                 <&ufs_mem_phy 1>,
+>>>> +                 <&ufs_mem_phy 2>,
+>>>>                    <0>; /* usb3_phy_wrapper_gcc_usb30_pipe_clk */
+>>>>               #clock-cells = <1>;
+>>>> @@ -1151,6 +1151,127 @@ aggre2_noc: interconnect@1700000 {
+>>>>               qcom,bcm-voters = <&apps_bcm_voter>;
+>>>>           };
+>>>> +        ufs_mem_phy: phy@1d80000 {
+>>>> +            compatible = "qcom,milos-qmp-ufs-phy";
+>>>> +            reg = <0x0 0x01d80000 0x0 0x2000>;
+>>>> +
+>>>> +            clocks = <&rpmhcc RPMH_CXO_CLK>,
+>>>> +                 <&gcc GCC_UFS_PHY_PHY_AUX_CLK>,
+>>>> +                 <&tcsr TCSR_UFS_CLKREF_EN>;
+>>>> +            clock-names = "ref",
+>>>> +                      "ref_aux",
+>>>> +                      "qref";
+>>>> +
+>>>> +            resets = <&ufs_mem_hc 0>;
+>>>> +            reset-names = "ufsphy";
+>>>> +
+>>>> +            power-domains = <&gcc UFS_MEM_PHY_GDSC>;
+>>>> +
+>>>> +            #clock-cells = <1>;
+>>>> +            #phy-cells = <0>;
+>>>> +
+>>>> +            status = "disabled";
+>>>> +        };
+>>>> +
+>>>> +        ufs_mem_hc: ufshc@1d84000 {
+>>>> +            compatible = "qcom,milos-ufshc", "qcom,ufshc", "jedec,ufs-2.0";
+>>>> +            reg = <0x0 0x01d84000 0x0 0x3000>;
+>>>> +
+>>>> +            interrupts = <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH 0>;
+>>>> +
+>>>> +            clocks = <&gcc GCC_UFS_PHY_AXI_CLK>,
+>>>> +                 <&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
+>>>> +                 <&gcc GCC_UFS_PHY_AHB_CLK>,
+>>>> +                 <&gcc GCC_UFS_PHY_UNIPRO_CORE_CLK>,
+>>>> +                 <&tcsr TCSR_UFS_PAD_CLKREF_EN>,
+>>>> +                 <&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
+>>>> +                 <&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
+>>>> +                 <&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
+>>>> +            clock-names = "core_clk",
+>>>> +                      "bus_aggr_clk",
+>>>> +                      "iface_clk",
+>>>> +                      "core_clk_unipro",
+>>>> +                      "ref_clk",
+>>>> +                      "tx_lane0_sync_clk",
+>>>> +                      "rx_lane0_sync_clk",
+>>>> +                      "rx_lane1_sync_clk";
+>>>> +
+>>>> +            resets = <&gcc GCC_UFS_PHY_BCR>;
+>>>> +            reset-names = "rst";
+>>>> +
+>>>> +            interconnects = <&aggre1_noc MASTER_UFS_MEM QCOM_ICC_TAG_ALWAYS
+>>>> +                     &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>,
+>>>> +                    <&gem_noc MASTER_APPSS_PROC QCOM_ICC_TAG_ACTIVE_ONLY
+>>>> +                     &cnoc_cfg SLAVE_UFS_MEM_CFG QCOM_ICC_TAG_ACTIVE_ONLY>;
+>>>> +            interconnect-names = "ufs-ddr",
+>>>> +                         "cpu-ufs";
+>>>> +
+>>>> +            power-domains = <&gcc UFS_PHY_GDSC>;
+>>>> +            required-opps = <&rpmhpd_opp_nom>;
+>>>> +
+>>>> +            operating-points-v2 = <&ufs_opp_table>;
+>>>> +
+>>>> +            iommus = <&apps_smmu 0x60 0>;
+>>>
+>>> dma-coherent ?
 > 
-> On Fri, Dec 19, 2025 at 04:03:05PM +0800, AlanSong-oc wrote:
->> diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
->> index d2845b214..069069377 100644
->> --- a/lib/crypto/Makefile
->> +++ b/lib/crypto/Makefile
->> @@ -205,7 +205,8 @@ endif
->>  libsha1-$(CONFIG_SPARC) += sparc/sha1_asm.o
->>  libsha1-$(CONFIG_X86) += x86/sha1-ssse3-and-avx.o \
->>                        x86/sha1-avx2-asm.o \
->> -                      x86/sha1-ni-asm.o
->> +                      x86/sha1-ni-asm.o \
->> +                      x86/sha1-phe-asm.o
->>  endif # CONFIG_CRYPTO_LIB_SHA1_ARCH
+> 
+> Given that downstream volcano.dtsi has dma-coherent in the ufshc@1d84000
+> node, looks like this is missing in my patch.
+
+Seems that way
+
+>>>
+>>> and no MCQ support ?
+> 
+> Not sure, I could only find one reference to MCQ on createpoint for
+> milos, but given there's no mcq_sqd/mcq_vs reg defined downstream, and I
+> couldn't find anything for the same register values in the .FLAT file, I
+> don't think Milos has MCQ? Feel free to prove me wrong though.
+> 
 >>
->>  ################################################################################
->> diff --git a/lib/crypto/x86/sha1-phe-asm.S b/lib/crypto/x86/sha1-phe-asm.S
->> new file mode 100644
->> index 000000000..eff086104
->> --- /dev/null
->> +++ b/lib/crypto/x86/sha1-phe-asm.S
->> @@ -0,0 +1,71 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * PHE Extensions optimized implementation of a SHA-1 update function
->> + *
->> + * This file is provided under a dual BSD/GPLv2 license.  When using or
->> + * redistributing this file, you may do so under either license.
->> + *
->> + * GPL LICENSE SUMMARY
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of version 2 of the GNU General Public License as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful, but
->> + * WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->> + * General Public License for more details.
->> + *
->> + * BSD LICENSE
->> + *
->> + * Redistribution and use in source and binary forms, with or without
->> + * modification, are permitted provided that the following conditions
->> + * are met:
->> + *
->> + *   * Redistributions of source code must retain the above copyright
->> + *     notice, this list of conditions and the following disclaimer.
->> + *   * Redistributions in binary form must reproduce the above copyright
->> + *     notice, this list of conditions and the following disclaimer in
->> + *     the documentation and/or other materials provided with the
->> + *     distribution.
->> + *   * Neither the name of Intel Corporation nor the names of its
->> + *     contributors may be used to endorse or promote products derived
->> + *     from this software without specific prior written permission.
->> + *
->> + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
->> + * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
->> + * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
->> + * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
->> + * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
->> + * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
->> + * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
->> + * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
->> + * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
->> + * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
->> + * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
->> + *
->> + */
->> +
->> +#include <linux/linkage.h>
->> +
->> +/*
->> + * PHE Extensions optimized implementation of a SHA-1 block function
->> + *
->> + * This function takes a pointer to the current SHA-1 state, a pointer to the
->> + * input data, and the number of 64-byte blocks to process.  The number of
->> + * blocks to process is assumed to be nonzero.  Once all blocks have been
->> + * processed, the state is updated with the new state.  This function only
->> + * processes complete blocks.  State initialization, buffering of partial
->> + * blocks, and digest finalization are expected to be handled elsewhere.
->> + *
->> + * void sha1_transform_phe(u8 *state, const u8 *data, size_t nblocks)
->> + */
->> +.text
->> +SYM_FUNC_START(sha1_transform_phe)
->> +     mov             $-1, %rax
->> +     mov             %rdx, %rcx
->> +
->> +     .byte   0xf3,0x0f,0xa6,0xc8
->> +
->> +     RET
->> +SYM_FUNC_END(sha1_transform_phe)
+>> So, people just ignore my comment ?
+>>
+>> Milos is based on SM8550, so it should have dma-coherent, for the MCQ
+>> I hope they used the fixed added to the SM8650 UFS controller for MCQ.
 > 
-> Please make this an inline asm statement instead of using a .S file.
-> It's just one instruction.
+> Not sure what this should mean regarding MCQ...
 
-I will implement XSHA1 and XSHA256 instructions supported by the inline
-asm statement in the next version of the patch.
+This platform doesn't support MCQ
 
-> 
->> +#define PHE_ALIGNMENT 16
->> +asmlinkage void sha1_transform_phe(u8 *state, const u8 *data, size_t nblocks);
->> +static void sha1_blocks_phe(struct sha1_block_state *state,
->> +                          const u8 *data, size_t nblocks)
->> +{
->> +     /*
->> +      * XSHA1 requires %edi to point to a 32-byte, 16-byte-aligned
->> +      * buffer on Zhaoxin processors.
->> +      */
-> 
-> What is the largest 'nblocks' that the instruction supports?
-
-According to the instruction specification, the maximum input data size
-for the XSHA1 and XSHA256 instructions is limited by the maximum value
-of CX, ECX, or RCX, depending on the operation mode. Accordingly, the
-maximum value of 'nblocks'is subject to the same limitation.
-
-> What happens if the instruction is interrupted partway through?  Does
-> the CPU correctly resume it in all cases?
-
-The specification states that XSHA1 and XSHA256 instructions are
-interruptible. If an interrupt or exception occurs during execution,
-the instruction can be correctly resumed after the interrupt or
-exception has been handled.
-
-> Is it supported in both 32-bit and 64-bit modes?  Your patch doesn't
-> check for CONFIG_64BIT.  Should it?  New optimized assembly code
-> generally should be 64-bit only.
-
-The XSHA1 and XSHA256 are supported in both 32-bit and 64-bit modes.
-Since newly optimized assembly code is typically 64-bit only, and XSHA1
-and XSHA256 fully support 64-bit mode, an explicit CONFIG_64BIT check
-should not required.
-
-> Where is this instruction specified?  Please add a comment that links to
-> the specification.
-
-The instruction specification is available at the following
-link.(https://gitee.com/openzhaoxin/zhaoxin_specifications/blob/20260112/ZX_Padlock_Reference.pdf)
-
-> 
->> +     u8 buf[32 + PHE_ALIGNMENT - 1];
->> +     u8 *dst = PTR_ALIGN(&buf[0], PHE_ALIGNMENT);
->> +
->> +     memcpy(dst, (u8 *)(state), SHA1_DIGEST_SIZE);
->> +     sha1_transform_phe(dst, data, nblocks);
->> +     memcpy((u8 *)(state), dst, SHA1_DIGEST_SIZE);
->> +}
-> 
-> The casts to 'u8 *' are unnecessary.
-
-I will eliminate the unnecessary cast in the next version of the patch.
-
->> +
->>  static void sha1_blocks(struct sha1_block_state *state,
->>                       const u8 *data, size_t nblocks)
->>  {
->> @@ -59,6 +76,9 @@ static void sha1_mod_init_arch(void)
->>  {
->>       if (boot_cpu_has(X86_FEATURE_SHA_NI)) {
->>               static_call_update(sha1_blocks_x86, sha1_blocks_ni);
->> +     } else if (boot_cpu_has(X86_FEATURE_PHE) && boot_cpu_has(X86_FEATURE_PHE_EN)) {
->> +             if (cpu_data(0).x86 >= 0x07)
->> +                     static_call_update(sha1_blocks_x86, sha1_blocks_phe);
-> 
-> Check IS_ENABLED(CONFIG_CPU_SUP_ZHAOXIN) first, so that the code gets
-> compiled out when support for Zhaoxin CPUs isn't included in the kernel.
-> 
-> There are hardly any mentions of 'cpu_data(0).x86' in the kernel.  I
-> think you mean 'boot_cpu_data.x86', which is used much more frequently.
-
-I will add CONFIG_CPU_SUP_ZHAOXIN check in the relevant code paths and
-use 'boot_cpu_data.x86' to identify the CPU family instead of
-'cpu_data(0).x86.'
-
-> What is the difference between X86_FEATURE_PHE and X86_FEATURE_PHE_EN,
-> and why are both needed?
-> 
-> All these comments apply to the SHA-256 patch too.
-
-The X86_FEATURE_PHE indicates the presence of the XSHA1 and XSHA256
-instructions, whereas the X86_FEATURE_PHE_EN indicates that these
-instructions are enabled for normal use. Surely, all of the suggestions
-mentioned above will also apply to the SHA-256 patch.
-
-Please accept my apologies for the delayed response due to
-administrative procedures. Thank you for your review and valuable
-suggestions.
-
-Best Regards
-AlanSong-oc
+Konrad
