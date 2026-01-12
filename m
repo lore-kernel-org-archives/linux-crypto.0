@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6F732548B;
-	Mon, 12 Jan 2026 19:23:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9FB328B58;
+	Mon, 12 Jan 2026 19:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768245801; cv=none; b=HizgnvQUUcRcOck1VM02QmaTkKjS47BsW/d0UtNMutt5ZLBJvtVCA4zd4EO/KAj/6eE5q10P47qHo+OKOnlTMKLmrg+7ERvJbf2TuS7L7HfdM6JZJ7vJhxhCoUsXiBhl4pyw7N2G+8Nc+CTAC4Jahao7sfh2FcLWL8mgAKkzwpM=
+	t=1768245802; cv=none; b=SRyN90CnHLCLFwbEU6P76/MXs3h9w+r5lqGOf3z0JLGat0vBeLNYVBfrbUSdEnOXqYCjdMJRuS6ioMYOIgHLpMVwOwGkiKjrkMS0l56XR0NLoUZWO98IxW9CQp8KA4WV45WTazAPY5MSXRjrq4jlIO2rVJsPvJdiDdj+3lXxir0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768245801; c=relaxed/simple;
-	bh=jJvi3oRvsSqQATN4nKRbSiVsFU5R9KYuCOE+SKfl3jE=;
+	s=arc-20240116; t=1768245802; c=relaxed/simple;
+	bh=eqf3Or+nI3+CRqy3oJpCv5lnMY4rP3QtNL7pdFy6UrY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O7RSEsHAix35zHbjEVyG8EUdmqdHV+dzfWvH5y6dPo0BVzbEe2oThjgWuTjkdu8gCngBcfaLCcz/szUTlqTmorVqdaHcbEy5YSt+R7rgFbWfrw8Ztoo5kB+HcZVTPDU+v8aqhfiTa/4po/Oi2YvKPviBdvxpsbRw6Pwi/z/AZm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iMQOCeye; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=TcJani8eLh12iYBvuOeaVDfsXvf3MEr4V8vEoAOaDtQF2EdMkyCYpKNWbzhbCqyLDhQGN7zAGvhaTE0MF/3hVk8T8uy4gybEFjSePLDhYVF7GilxgyCHvlfKqF1fyMsUvKNIoiNibuHT/ZOIhcS/92krl91xxAySPc0nGiVE9PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oSEzCq+j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iMQOCeye"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32846C16AAE;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oSEzCq+j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B85EEC2BCB1;
 	Mon, 12 Jan 2026 19:23:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768245801;
-	bh=jJvi3oRvsSqQATN4nKRbSiVsFU5R9KYuCOE+SKfl3jE=;
+	s=k20201202; t=1768245802;
+	bh=eqf3Or+nI3+CRqy3oJpCv5lnMY4rP3QtNL7pdFy6UrY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iMQOCeyeqHFoWDrkaKFAaWbq6Fb/zXU54onwz2J8yL/esdgXjUEMqJXLLsFJRF04R
-	 VFto64arPPmT75ndJyPrLDNUFnejCIySLkR3CEwWS7fb8kcQ9ykcVaCABqer3PeKwF
-	 4J1/KYbKvThzi7RJ7LanIPEii0m2gP/GiJ4AWHCJ2bf7VgybaQwSL781G5hr7ZqqRe
-	 Nwd5GfZCh27dQLc+pIXSbtsz8WoApF+jj7aJS7fncV9YXV4pdY/Hozs3zVy7lhnL98
-	 p4L5Z9iYRnMc9t2l9XJjP7yuF5IU/Rx4wEAisPCEEKxTzwNFJSP2wVr4CBbCQqde8O
-	 yXWWj8rqnU/TQ==
+	b=oSEzCq+jiR/8DC6FoKeyoJUpLSs0Yo3HfXBOqh7IEsEBy8rFgYOzBPo5leCndVDx5
+	 E/J7T4QYTGi8wBoTu9aLADQhjO5Xz+FYOhbbtIF27ehNwgyNcNkz89ywCt9q+SrLj1
+	 XiIqWs+FGgJI9XiMjudkcB4xRRLkd6rDDZCgQ3YLDJ6yJ+/p9hL8Mm7g2C3W5jNcXE
+	 tGM01jJ9jQRUosrS0/AzLS/QXtAOs1a/89jHs2rvpxNVvDHvaBQXLjt7cM0PdYhxiR
+	 fDZTm2SNAlxKf9JngwcHUG/bNnGc2D4U/DYcddPlqRTVgW+Wzq0f3jV8ovaNyvUV9K
+	 LMbfoUhzvVraw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Holger Dengler <dengler@linux.ibm.com>,
 	Harald Freudenberger <freude@linux.ibm.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 07/35] crypto: aegis - Switch from crypto_ft_tab[] to aes_enc_tab[]
-Date: Mon, 12 Jan 2026 11:20:05 -0800
-Message-ID: <20260112192035.10427-8-ebiggers@kernel.org>
+Subject: [PATCH v2 08/35] crypto: aes - Remove aes-fixed-time / CONFIG_CRYPTO_AES_TI
+Date: Mon, 12 Jan 2026 11:20:06 -0800
+Message-ID: <20260112192035.10427-9-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260112192035.10427-1-ebiggers@kernel.org>
 References: <20260112192035.10427-1-ebiggers@kernel.org>
@@ -55,51 +55,432 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Instead of crypto_ft_tab[0] from aes_generic.c, use aes_enc_tab from
-lib/crypto/aes.c.  These contain the same data, so the result is the
-same.  This will allow aes_generic.c to eventually be removed.
+Remove aes-fixed-time, i.e. CONFIG_CRYPTO_AES_TI.  This was a wrapper
+around the 256-byte-table-based AES implementation in lib/crypto/aes.c,
+with extra code to enable and disable IRQs for constant-time hardening.
+
+While nice in theory, in practice this had the following issues:
+
+- For bulk en/decryption it was 2-4 times slower than aes-generic.  This
+  resulted in aes-generic still being needed, creating fragmentation.
+
+- Having both aes-generic and aes-fixed-time punted an AES
+  implementation decision to distros and users who are generally
+  unprepared to handle it.  In practice, whether aes-fixed-time gets
+  used tends to be incidental and not match an explicit distro or user
+  intent.  (While aes-fixed-time has a higher priority than aes-generic,
+  whether it actually gets enabled, loaded, and used depends on the
+  kconfig and whether a modprobe of "aes" happens to be done.  It also
+  has a lower priority than aes-arm and aes-arm64.)
+
+- My changes to the generic AES code (in other commits) significantly
+  close the gap with aes-fixed-time anyway.  The table size is reduced
+  from 8192 bytes to 1024 bytes, and prefetching is added.
+
+- While AES code *should* be constant-time, the real solutions for that
+  are AES instructions (which most CPUs have now) or bit-slicing.  arm
+  and arm64 already have bit-sliced AES code for many modes; generic
+  bit-sliced code could be written but would be very slow for single
+  blocks.  Overall, I suggest that trying to write constant-time
+  table-based AES code is a bit futile anyway, and in the rare cases
+  where a proper AES implementation is still unavailable it's reasonable
+  to compromise with an implementation that simply prefetches the table.
+
+Thus, this commit removes aes-fixed-time and CONFIG_CRYPTO_AES_TI.  The
+replacement is just the existing CONFIG_CRYPTO_AES, which for now maps
+to the existing aes-generic code, but I'll soon be changing to use the
+improved AES library code instead.
 
 Acked-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/Kconfig | 2 +-
- crypto/aegis.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arch/m68k/configs/amiga_defconfig    |  1 -
+ arch/m68k/configs/apollo_defconfig   |  1 -
+ arch/m68k/configs/atari_defconfig    |  1 -
+ arch/m68k/configs/bvme6000_defconfig |  1 -
+ arch/m68k/configs/hp300_defconfig    |  1 -
+ arch/m68k/configs/mac_defconfig      |  1 -
+ arch/m68k/configs/multi_defconfig    |  1 -
+ arch/m68k/configs/mvme147_defconfig  |  1 -
+ arch/m68k/configs/mvme16x_defconfig  |  1 -
+ arch/m68k/configs/q40_defconfig      |  1 -
+ arch/m68k/configs/sun3_defconfig     |  1 -
+ arch/m68k/configs/sun3x_defconfig    |  1 -
+ arch/s390/configs/debug_defconfig    |  2 +-
+ arch/s390/configs/defconfig          |  2 +-
+ crypto/Kconfig                       | 21 -------
+ crypto/Makefile                      |  1 -
+ crypto/aes_ti.c                      | 83 ----------------------------
+ 17 files changed, 2 insertions(+), 119 deletions(-)
+ delete mode 100644 crypto/aes_ti.c
 
+diff --git a/arch/m68k/configs/amiga_defconfig b/arch/m68k/configs/amiga_defconfig
+index bfc1ee7c8158..bffcc417f44c 100644
+--- a/arch/m68k/configs/amiga_defconfig
++++ b/arch/m68k/configs/amiga_defconfig
+@@ -553,11 +553,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/m68k/configs/apollo_defconfig b/arch/m68k/configs/apollo_defconfig
+index d9d1f3c4c70d..3f894c20b132 100644
+--- a/arch/m68k/configs/apollo_defconfig
++++ b/arch/m68k/configs/apollo_defconfig
+@@ -510,11 +510,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/m68k/configs/atari_defconfig b/arch/m68k/configs/atari_defconfig
+index 523205adccc8..5c5603ca16aa 100644
+--- a/arch/m68k/configs/atari_defconfig
++++ b/arch/m68k/configs/atari_defconfig
+@@ -530,11 +530,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/m68k/configs/bvme6000_defconfig b/arch/m68k/configs/bvme6000_defconfig
+index 7b0a4ef0b010..37c747ee395e 100644
+--- a/arch/m68k/configs/bvme6000_defconfig
++++ b/arch/m68k/configs/bvme6000_defconfig
+@@ -502,11 +502,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/m68k/configs/hp300_defconfig b/arch/m68k/configs/hp300_defconfig
+index 089c5c394c62..1a376c2b8c45 100644
+--- a/arch/m68k/configs/hp300_defconfig
++++ b/arch/m68k/configs/hp300_defconfig
+@@ -512,11 +512,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/m68k/configs/mac_defconfig b/arch/m68k/configs/mac_defconfig
+index 5f2484c36733..2b26450692a5 100644
+--- a/arch/m68k/configs/mac_defconfig
++++ b/arch/m68k/configs/mac_defconfig
+@@ -529,11 +529,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/m68k/configs/multi_defconfig b/arch/m68k/configs/multi_defconfig
+index 74f0a1f6d871..012e0e1f506f 100644
+--- a/arch/m68k/configs/multi_defconfig
++++ b/arch/m68k/configs/multi_defconfig
+@@ -616,11 +616,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/m68k/configs/mvme147_defconfig b/arch/m68k/configs/mvme147_defconfig
+index 4bee18c820e4..37634b35bfbd 100644
+--- a/arch/m68k/configs/mvme147_defconfig
++++ b/arch/m68k/configs/mvme147_defconfig
+@@ -502,11 +502,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/m68k/configs/mvme16x_defconfig b/arch/m68k/configs/mvme16x_defconfig
+index 322c17e55c9a..a0d2e0070afa 100644
+--- a/arch/m68k/configs/mvme16x_defconfig
++++ b/arch/m68k/configs/mvme16x_defconfig
+@@ -503,11 +503,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/m68k/configs/q40_defconfig b/arch/m68k/configs/q40_defconfig
+index 82f9baab8fea..62cc3964fc34 100644
+--- a/arch/m68k/configs/q40_defconfig
++++ b/arch/m68k/configs/q40_defconfig
+@@ -519,11 +519,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/m68k/configs/sun3_defconfig b/arch/m68k/configs/sun3_defconfig
+index f94ad226cb5b..13107aa4a1b4 100644
+--- a/arch/m68k/configs/sun3_defconfig
++++ b/arch/m68k/configs/sun3_defconfig
+@@ -500,11 +500,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/m68k/configs/sun3x_defconfig b/arch/m68k/configs/sun3x_defconfig
+index a5ecfc505ab2..eaab0ba08989 100644
+--- a/arch/m68k/configs/sun3x_defconfig
++++ b/arch/m68k/configs/sun3x_defconfig
+@@ -500,11 +500,10 @@ CONFIG_CRYPTO_RSA=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_AES_TI=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAMELLIA=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
+index 0713914b25b4..09f4bdb9e64f 100644
+--- a/arch/s390/configs/debug_defconfig
++++ b/arch/s390/configs/debug_defconfig
+@@ -768,11 +768,11 @@ CONFIG_CRYPTO_CRYPTD=m
+ CONFIG_CRYPTO_BENCHMARK=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+-CONFIG_CRYPTO_AES_TI=m
++CONFIG_CRYPTO_AES=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAST5=m
+ CONFIG_CRYPTO_CAST6=m
+diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
+index c064e0cacc98..823193b9f4c6 100644
+--- a/arch/s390/configs/defconfig
++++ b/arch/s390/configs/defconfig
+@@ -752,11 +752,11 @@ CONFIG_CRYPTO_CRYPTD=m
+ CONFIG_CRYPTO_BENCHMARK=m
+ CONFIG_CRYPTO_DH=m
+ CONFIG_CRYPTO_ECDH=m
+ CONFIG_CRYPTO_ECDSA=m
+ CONFIG_CRYPTO_ECRDSA=m
+-CONFIG_CRYPTO_AES_TI=m
++CONFIG_CRYPTO_AES=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAST5=m
+ CONFIG_CRYPTO_CAST6=m
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 12a87f7cf150..443fe8e016fd 100644
+index 443fe8e016fd..db6b0c2fb50e 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -764,11 +764,11 @@ endmenu
- menu "AEAD (authenticated encryption with associated data) ciphers"
+@@ -364,31 +364,10 @@ config CRYPTO_AES
+ 	  demonstrates excellent performance. Rijndael's operations are
+ 	  among the easiest to defend against power and timing attacks.
  
- config CRYPTO_AEGIS128
- 	tristate "AEGIS-128"
- 	select CRYPTO_AEAD
--	select CRYPTO_AES  # for AES S-box tables
-+	select CRYPTO_LIB_AES  # for AES S-box tables
+ 	  The AES specifies three key sizes: 128, 192 and 256 bits
+ 
+-config CRYPTO_AES_TI
+-	tristate "AES (Advanced Encryption Standard) (fixed time)"
+-	select CRYPTO_ALGAPI
+-	select CRYPTO_LIB_AES
+-	help
+-	  AES cipher algorithms (Rijndael)(FIPS-197, ISO/IEC 18033-3)
+-
+-	  This is a generic implementation of AES that attempts to eliminate
+-	  data dependent latencies as much as possible without affecting
+-	  performance too much. It is intended for use by the generic CCM
+-	  and GCM drivers, and other CTR or CMAC/XCBC based modes that rely
+-	  solely on encryption (although decryption is supported as well, but
+-	  with a more dramatic performance hit)
+-
+-	  Instead of using 16 lookup tables of 1 KB each, (8 for encryption and
+-	  8 for decryption), this implementation only uses just two S-boxes of
+-	  256 bytes each, and attempts to eliminate data dependent latencies by
+-	  prefetching the entire table into the cache at the start of each
+-	  block. Interrupts are also disabled to avoid races where cachelines
+-	  are evicted when the CPU is interrupted to do something else.
+-
+ config CRYPTO_ANUBIS
+ 	tristate "Anubis"
+ 	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
+ 	select CRYPTO_ALGAPI
  	help
- 	  AEGIS-128 AEAD algorithm
- 
- config CRYPTO_AEGIS128_SIMD
- 	bool "AEGIS-128 (arm NEON, arm64 NEON)"
-diff --git a/crypto/aegis.h b/crypto/aegis.h
-index 6ef9c174c973..ffcf8e85ea69 100644
---- a/crypto/aegis.h
-+++ b/crypto/aegis.h
-@@ -60,11 +60,11 @@ static __always_inline void crypto_aegis_block_and(union aegis_block *dst,
- static __always_inline void crypto_aegis_aesenc(union aegis_block *dst,
- 						const union aegis_block *src,
- 						const union aegis_block *key)
- {
- 	const u8  *s  = src->bytes;
--	const u32 *t = crypto_ft_tab[0];
-+	const u32 *t = aes_enc_tab;
- 	u32 d0, d1, d2, d3;
- 
- 	d0 = t[s[ 0]] ^ rol32(t[s[ 5]], 8) ^ rol32(t[s[10]], 16) ^ rol32(t[s[15]], 24);
- 	d1 = t[s[ 4]] ^ rol32(t[s[ 9]], 8) ^ rol32(t[s[14]], 16) ^ rol32(t[s[ 3]], 24);
- 	d2 = t[s[ 8]] ^ rol32(t[s[13]], 8) ^ rol32(t[s[ 2]], 16) ^ rol32(t[s[ 7]], 24);
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 23d3db7be425..be403dc20645 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -132,11 +132,10 @@ obj-$(CONFIG_CRYPTO_SERPENT) += serpent_generic.o
+ CFLAGS_serpent_generic.o := $(call cc-option,-fsched-pressure)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
+ obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
+ CFLAGS_aes_generic.o := $(call cc-option,-fno-code-hoisting) # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
+ obj-$(CONFIG_CRYPTO_SM4) += sm4.o
+ obj-$(CONFIG_CRYPTO_SM4_GENERIC) += sm4_generic.o
+-obj-$(CONFIG_CRYPTO_AES_TI) += aes_ti.o
+ obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
+ obj-$(CONFIG_CRYPTO_CAST_COMMON) += cast_common.o
+ obj-$(CONFIG_CRYPTO_CAST5) += cast5_generic.o
+ obj-$(CONFIG_CRYPTO_CAST6) += cast6_generic.o
+ obj-$(CONFIG_CRYPTO_ARC4) += arc4.o
+diff --git a/crypto/aes_ti.c b/crypto/aes_ti.c
+deleted file mode 100644
+index a3b342f92fab..000000000000
+--- a/crypto/aes_ti.c
++++ /dev/null
+@@ -1,83 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * Scalar fixed time AES core transform
+- *
+- * Copyright (C) 2017 Linaro Ltd <ard.biesheuvel@linaro.org>
+- */
+-
+-#include <crypto/aes.h>
+-#include <crypto/algapi.h>
+-#include <linux/module.h>
+-
+-static int aesti_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+-			 unsigned int key_len)
+-{
+-	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+-
+-	return aes_expandkey(ctx, in_key, key_len);
+-}
+-
+-static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+-{
+-	const struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+-	unsigned long flags;
+-
+-	/*
+-	 * Temporarily disable interrupts to avoid races where cachelines are
+-	 * evicted when the CPU is interrupted to do something else.
+-	 */
+-	local_irq_save(flags);
+-
+-	aes_encrypt(ctx, out, in);
+-
+-	local_irq_restore(flags);
+-}
+-
+-static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+-{
+-	const struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+-	unsigned long flags;
+-
+-	/*
+-	 * Temporarily disable interrupts to avoid races where cachelines are
+-	 * evicted when the CPU is interrupted to do something else.
+-	 */
+-	local_irq_save(flags);
+-
+-	aes_decrypt(ctx, out, in);
+-
+-	local_irq_restore(flags);
+-}
+-
+-static struct crypto_alg aes_alg = {
+-	.cra_name			= "aes",
+-	.cra_driver_name		= "aes-fixed-time",
+-	.cra_priority			= 100 + 1,
+-	.cra_flags			= CRYPTO_ALG_TYPE_CIPHER,
+-	.cra_blocksize			= AES_BLOCK_SIZE,
+-	.cra_ctxsize			= sizeof(struct crypto_aes_ctx),
+-	.cra_module			= THIS_MODULE,
+-
+-	.cra_cipher.cia_min_keysize	= AES_MIN_KEY_SIZE,
+-	.cra_cipher.cia_max_keysize	= AES_MAX_KEY_SIZE,
+-	.cra_cipher.cia_setkey		= aesti_set_key,
+-	.cra_cipher.cia_encrypt		= aesti_encrypt,
+-	.cra_cipher.cia_decrypt		= aesti_decrypt
+-};
+-
+-static int __init aes_init(void)
+-{
+-	return crypto_register_alg(&aes_alg);
+-}
+-
+-static void __exit aes_fini(void)
+-{
+-	crypto_unregister_alg(&aes_alg);
+-}
+-
+-module_init(aes_init);
+-module_exit(aes_fini);
+-
+-MODULE_DESCRIPTION("Generic fixed time AES");
+-MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+-MODULE_LICENSE("GPL v2");
 -- 
 2.52.0
 
