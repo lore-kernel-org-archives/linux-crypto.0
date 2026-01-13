@@ -1,106 +1,95 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A25F23D294;
-	Tue, 13 Jan 2026 02:18:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3014B23D294;
+	Tue, 13 Jan 2026 03:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768270716; cv=none; b=bEZQBirO7k69z7S0dnw+MX+Mv+Dy1ax4Uh7E4CV0EUh9aWncjonfsQGL2+FRt+8prkSK26Mf6AxJySBNiNHmFl7GEsT+seZrPONZg6agSMAGr35J8igcpBmSfXv+FSdXus37aiei/OH3+8kV7TRKAVOdy0yyEhDXAgyw3Hwaa/g=
+	t=1768273563; cv=none; b=WNvweiKJ/KZ1P7W56c2cvX74bD3AghcOOQA6B8r/k+/GF/TNT42KZyWBG5J4foTk/LaIefe8cX6nfHXpAUx02GXJPxkx2gko2SdCeTd8oVC+6bmwnAC7a9qnRHXmpZC87ZE91DT9CFBqIouUvFguYdrg2Zly9a3UEWVVGjGKjbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768270716; c=relaxed/simple;
-	bh=Yec0sfDxBI6Ht33ZuzbnIrm9kfnOv8pNuShawqEPPNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u0tMnVX4tqYlc0pzQEvJ2kRGyj4xDzhhI0fmcFHMuI6UmecItoomiYcIpq7Q8Wqr1LbhHSy++k8/mtmzy/ptN35Cm3JWwoAxPSg9FBkktmPFzkhI7mQYdbnLQxoCi3exLtX4HodKqmXTPD87wRptiimJV+aowvEwDM5kDt9+Yyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LgyZlt7/; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LgyZlt7/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768270715; x=1799806715;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Yec0sfDxBI6Ht33ZuzbnIrm9kfnOv8pNuShawqEPPNo=;
-  b=LgyZlt7/BI/1T7cWm2DoaiWjW9fgA4KjbSJootIc/8u092yadXdDQq2W
-   QoXKAlj/IB8Fhzj3uTBKCK8+VXhUQkmINjt9QxxKizkTso2Ai7pfCr1Mo
-   f1OoTCtj+szVlxmkgsgJAbTJc30mARu6ODxxLdJsCJkthm1oH9hHseAUc
-   gGm6eY1v1hqO+3YsCpy52v00Z5dj4LJSn17DoAoS4Z/5eInEZd2PQHJnL
-   ZdQ2PVNK8lsMa1oKRj22F9Yri1OvC9YMr2yAUh7sRbdE+HE1oaLrlyaIf
-   uXAR9bJm1Ik1SqQ2MrOLJ0QLFYveXR/4+HDafGY+R9/pBijgc6RD6Fwq6
-   Q==;
-X-CSE-ConnectionGUID: rAx8gbO9Qaau7GM0qXFuVw==
-X-CSE-MsgGUID: ha13WdRvT5iyQeeZ/ISFyA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="73184143"
-X-IronPort-AV: E=Sophos;i="6.21,222,1763452800"; 
-   d="scan'208";a="73184143"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 18:18:35 -0800
-X-CSE-ConnectionGUID: wNJWnrmuQbep4LDKovdUiQ==
-X-CSE-MsgGUID: sb3tkOFtS0Gig7MufspTXg==
-X-ExtLoop1: 1
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 12 Jan 2026 18:18:19 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vfTz6-00000000E68-3fEh;
-	Tue, 13 Jan 2026 02:18:16 +0000
-Date: Tue, 13 Jan 2026 10:17:53 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ethan Graham <ethan.w.s.graham@gmail.com>, glider@google.com
-Cc: oe-kbuild-all@lists.linux.dev, akpm@linux-foundation.org,
-	andreyknvl@gmail.com, andy@kernel.org, andy.shevchenko@gmail.com,
-	brauner@kernel.org, brendan.higgins@linux.dev, davem@davemloft.net,
-	davidgow@google.com, dhowells@redhat.com, dvyukov@google.com,
-	ebiggers@kernel.org, elver@google.com, gregkh@linuxfoundation.org,
-	herbert@gondor.apana.org.au, ignat@cloudflare.com, jack@suse.cz,
-	jannh@google.com, johannes@sipsolutions.net,
-	kasan-dev@googlegroups.com, kees@kernel.org,
-	kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lukas@wunner.de,
-	mcgrof@kernel.org, rmoar@google.com, shuah@kernel.org
-Subject: Re: [PATCH v4 4/6] kfuzztest: add KFuzzTest sample fuzz targets
-Message-ID: <202601130828.lXrl0Ijb-lkp@intel.com>
-References: <20260112192827.25989-5-ethan.w.s.graham@gmail.com>
+	s=arc-20240116; t=1768273563; c=relaxed/simple;
+	bh=GZVFLvhaseMrUG9aixy412i7VVA96RLEKsruXzwHOK0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WT65o2KPnwF1qDTu9cxza5KcVqxNKia79cPRtGgrnaMRvmWIjVvi454VlSUTCjiA90DYhOxRg/M1zltFIsIGi/BKp0qeExtQfgYTBUShqKHzf4enTaa+TPMoXqa0vdjNFhPrNxSOLVMyPyKXUz8oItqIWsjfkj7ArU4NXL+ageE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8DxAfGWtmVpOzAIAA--.26695S3;
+	Tue, 13 Jan 2026 11:05:58 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowJBxLMKVtmVp734cAA--.56671S2;
+	Tue, 13 Jan 2026 11:05:57 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Gonglei <arei.gonglei@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	wangyangxin <wangyangxin1@huawei.com>
+Cc: virtualization@lists.linux.dev,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v5 0/3] crypto: virtio: Some bugfix and enhancement
+Date: Tue, 13 Jan 2026 11:05:53 +0800
+Message-Id: <20260113030556.3522533-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260112192827.25989-5-ethan.w.s.graham@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJBxLMKVtmVp734cAA--.56671S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Hi Ethan,
+There is problem when multiple processes add encrypt/decrypt requests
+with virtio crypto device and spinlock is missing with command response
+handling. Also there is duplicated virtqueue_kick() without lock hold.
 
-kernel test robot noticed the following build warnings:
+Here these two issues are fixed, also there is code cleanup, such as use
+logical numa id rather than physical package id when checking matched
+virtio device with current CPU.
 
-[auto build test WARNING on akpm-mm/mm-nonmm-unstable]
-[also build test WARNING on herbert-cryptodev-2.6/master herbert-crypto-2.6/master linus/master v6.19-rc5 next-20260109]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+---
+v4 ... v5:
+  1. Only add bugfix patches and remove code cleanup patches.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ethan-Graham/kfuzztest-add-user-facing-API-and-data-structures/20260113-033045
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
-patch link:    https://lore.kernel.org/r/20260112192827.25989-5-ethan.w.s.graham%40gmail.com
-patch subject: [PATCH v4 4/6] kfuzztest: add KFuzzTest sample fuzz targets
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20260113/202601130828.lXrl0Ijb-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260113/202601130828.lXrl0Ijb-lkp@intel.com/reproduce)
+v3 ... v4:
+  1. Remove patch 10 which adds ECB AES algo, since application and qemu
+     backend emulation is not ready for ECB AES algo.
+  2. Add Cc stable tag with patch 2 which removes duplicated
+     virtqueue_kick() without lock hold.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601130828.lXrl0Ijb-lkp@intel.com/
+v2 ... v3:
+  1. Remove NULL checking with req_data where kfree() is called, since
+     NULL pointer is workable with kfree() API.
+  2. In patch 7 and patch 8, req_data and IV buffer which are preallocated
+     are sensitive data, memzero_explicit() is used even on error path
+     handling.
+  3. Remove duplicated virtqueue_kick() in new patch 2, since it is
+     already called in previous __virtio_crypto_skcipher_do_req().
 
-All warnings (new ones prefixed by >>):
+v1 ... v2:
+  1. Add Fixes tag with patch 1.
+  2. Add new patch 2 - patch 9 to add ecb aes algo support.
+---
+Bibo Mao (3):
+  crypto: virtio: Add spinlock protection with virtqueue notification
+  crypto: virtio: Remove duplicated virtqueue_kick in
+    virtio_crypto_skcipher_crypt_req
+  crypto: virtio: Replace package id with numa node id
 
->> Warning: samples/kfuzztest/underflow_on_buffer.c:24 function parameter 'buf' not described in 'underflow_on_buffer'
->> Warning: samples/kfuzztest/underflow_on_buffer.c:24 function parameter 'buflen' not described in 'underflow_on_buffer'
->> Warning: samples/kfuzztest/underflow_on_buffer.c:24 expecting prototype for test_underflow_on_buffer(). Prototype was for underflow_on_buffer() instead
+ drivers/crypto/virtio/virtio_crypto_common.h        | 2 +-
+ drivers/crypto/virtio/virtio_crypto_core.c          | 5 +++++
+ drivers/crypto/virtio/virtio_crypto_skcipher_algs.c | 2 --
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
+
+base-commit: 9c7ef209cd0f7c1a92ed61eed3e835d6e4abc66c
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.39.3
+
