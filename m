@@ -1,42 +1,96 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A406B2BEFFB;
-	Tue, 13 Jan 2026 03:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA5736921B
+	for <linux-crypto@vger.kernel.org>; Tue, 13 Jan 2026 06:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768273564; cv=none; b=c6hbWaIp/IdyFHUyVDukhU0BBCa+wvxGmu2zgHCy5l1zgk+0CeO1UbjZx9NRV6zu27gvOBrAQ2zlr9FhrlRflsHD3U42MlyxK8di7lbqpB1LQ/AdCibLzbqC6yFQahMYfvXQiQJbrTOffkWZ1I6cnMp/jP8drlfTRv0ZD6S83FU=
+	t=1768287153; cv=none; b=hTd1J0kKffH2j3USGS6NbjjKpJaimdDgWT7gNe8TJUwY1tFAoeb/hs/vSCdJnOYEwOWwATtF3BuoGrLZ3m+M4Yta3vyBSLndqYeCsvVmTr1Z7I9EybkU3e/IhG5xQOMY84DqJf86Yq1C1sw/HS2ckQkjXyak6RGviGO0yo+V31Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768273564; c=relaxed/simple;
-	bh=554NAZwFoUc3z7IJsJhZsee5G4Wiv+FZw6phGdg4r+g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fYwvdKQlu7MH5rfv4+7BG4/tfmUYeelVgBEB55Ct6saFkCD6+topYwQGYc8GSkLp/cxlI0SyDIE1B4/2+Rf+7Zf9Q9edGvf4fZhj9g1rmB6i5js3QUQSoigBqn3+YuJQYWnAkVa4V1GniteOpXXlaTciPxyA/uuBG/AitEWzdZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8AxScKYtmVpRTAIAA--.26215S3;
-	Tue, 13 Jan 2026 11:06:00 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by front1 (Coremail) with SMTP id qMiowJBxLMKVtmVp734cAA--.56671S3;
-	Tue, 13 Jan 2026 11:05:59 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Gonglei <arei.gonglei@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	wangyangxin <wangyangxin1@huawei.com>
-Cc: virtualization@lists.linux.dev,
+	s=arc-20240116; t=1768287153; c=relaxed/simple;
+	bh=u5ndTcqmJIXcINAN9E+jQTe2o3wnYS5Yqo8Mpkx9bN0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DqJuU/8xk+uFbaZFPG2KF6EttJQDktk6KxoyUVL/VS1DEf0+VauGTHu/exF0rvMkO/7Mp7onIk6sM1wTUnUtbHIexcJJNtMZ1ExeSWiIoobSbHKeRi+XH5Q7rUZhj9Th2pV2ibdudw8V1YCqD93vgY0VE9gZD7OnpoEjc8a1cbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Tn4n9VbW; arc=none smtp.client-ip=209.85.214.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Tn4n9VbW"
+Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-2a137692691so47552155ad.0
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 22:52:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768287152; x=1768891952;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u5ndTcqmJIXcINAN9E+jQTe2o3wnYS5Yqo8Mpkx9bN0=;
+        b=YyI/0xrlOpokYxOTEn5vysmzQVcXYY9NwO6/fFUUfkUfd+60Xb+t9c9AzaGACOrIkV
+         z6DCpLO+zthO9xul20ORKCByu3faD36tPDMIqq3TF6GhjHNrY3gi6l4lOePx1rkyvi5+
+         7gyMF40dVQBTpbUsBDlVq4P4x9oHudDgjABEKLM3Nd5e8ibFdJ8DQnnevEyvBxU1wcsE
+         D2kvg/yvDIog4MqMeJAFDhlDpNojw//igd4Y6fDvboLIhv2Vrf2bve+f+VJb04cKJ7bW
+         OBVUui73mJJXl8hLJ/GPwjlgboLcxUPmxKJus1mNuOah1t1lZmtaGXxGY3pgVksSVXum
+         92bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX69GjbDBJy3rlofhTV9FnfrP6t+Yh6mV8jycFU5/0pSOgWX7+Z9cU+gQE+/+RCsFo0zgCZ8x3dclxDn9s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywq03/Pt5Uev45cB/zaEqvKhuZbSHS8aDLHmnnvJFJ+qnNHtN9z
+	EW/BmPH3TnVM6xAx+yNACSfnJ1sb+fnPN500Z8FlrAl+qzXIYEHSH+cY3ZeoM51uWFEn37fgmZl
+	A3NANMwDCrEnEx0VoFBPOuRbeG6NsTt1mC/NGxC4VFXYhik2/feNIhm+QKoPfUjujDTBvrN5h18
+	LA5qUKX8HjQgT6Jf3oXu2U0baqLGMOeJgxdlJ7ml8YKeBKW1kvhdY5E9HEkSi67+VGxRwqt8CP1
+	T+e7EngtKCOU2416OQTLm2npd5kvpIYcrEITl4=
+X-Gm-Gg: AY/fxX7+uw5DXd63Ew3+7nza4260rfD1CPBgJjh/K4P5FUR66jRszdEl37gybDKgcVb
+	k/OJAv7EeZGaZ+PuuNBfurDVbCIbWv9Vh2foz7LH5xvUyP8RM9TwuSmoIliLca9/PMyQOGdTJZ4
+	/Dv0/qaHvUozTdBzl61tDgw63QPCYzqI0zvrYVeMWYTS2dJ1rB/GRhUREIqAkyg9rCiib0e7nUR
+	RjKW7gAjV4bbwS7SNpgTEVO5ndTi2UddAqO3/5RsyvoDStNLbjXIM6GoyAVq6xDQ7HFEdE3Lu/4
+	q7D9v3XG/U8lROQQoT+QyCxY055p4iO7ZGtCUmv7Evge8fcxPFajI4nHPx6HG27aHAE02ONtTyD
+	OTCHHR8A4q5Mp8+gcipHH3/UGmVZ0FHrt31O66fi2P5q2H4BkoxCfGMVcpxIWbrOXCW1ue7Pc/X
+	tjAMg+Wa0myMiUUmiYFTkvpLvudHNqtv2cu/hy1lgHbl/Lf9kXk3f+X7O7OaoFog==
+X-Google-Smtp-Source: AGHT+IGov52mlNsBiJNNCwslhxAom12QLz2nJIbfnql6UXIkOyajKqvcE8fohHs7BW5fHU2uHZqv9s6tC7tQ
+X-Received: by 2002:a17:903:478d:b0:2a0:b438:fc15 with SMTP id d9443c01a7336-2a3ee468407mr188321695ad.11.1768287151577;
+        Mon, 12 Jan 2026 22:52:31 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-2.dlp.protect.broadcom.com. [144.49.247.2])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a3e3cc4aa8sm24793525ad.46.2026.01.12.22.52.31
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 12 Jan 2026 22:52:31 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-8905883e793so187844626d6.2
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jan 2026 22:52:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1768287150; x=1768891950; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u5ndTcqmJIXcINAN9E+jQTe2o3wnYS5Yqo8Mpkx9bN0=;
+        b=Tn4n9VbWWULoYK7mI6klgoy7MatYunAA4RZtF3ZBTwjzhYRLTQrzcOED1+bXkTWZmh
+         iajro5fy2hYuRnNPCGw8cFF/GwHgFnwU860VajFQ6VH3XE0fDBrfjijp6rlmjOxkgqNG
+         CSmWBuJi2thmzCCtL83fqQKvL7wi9HIgDJB2Q=
+X-Forwarded-Encrypted: i=1; AJvYcCUviyDX1Ft5BrnnadqwEHCPN88/Nu6GV8Ma9QCfaGgqqIhcg1UUGA0u6xc732LdByc1uWYeEXnhU/VGqPg=@vger.kernel.org
+X-Received: by 2002:a05:6214:3d0f:b0:88a:4694:5921 with SMTP id 6a1803df08f44-8908427529cmr245145866d6.37.1768287149887;
+        Mon, 12 Jan 2026 22:52:29 -0800 (PST)
+X-Received: by 2002:a05:6214:3d0f:b0:88a:4694:5921 with SMTP id 6a1803df08f44-8908427529cmr245145716d6.37.1768287149540;
+        Mon, 12 Jan 2026 22:52:29 -0800 (PST)
+Received: from dhcp-10-192-110-161.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-890770cc6edsm150749946d6.4.2026.01.12.22.52.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 22:52:29 -0800 (PST)
+From: Vamsi Krishna Brahmajosyula <vamsi-krishna.brahmajosyula@broadcom.com>
+To: herbert@gondor.apana.org.au
+Cc: davem@davemloft.net,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH v5 1/3] crypto: virtio: Add spinlock protection with virtqueue notification
-Date: Tue, 13 Jan 2026 11:05:54 +0800
-Message-Id: <20260113030556.3522533-2-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20260113030556.3522533-1-maobibo@loongson.cn>
-References: <20260113030556.3522533-1-maobibo@loongson.cn>
+	lucien.xin@gmail.com,
+	steffen.klassert@secunet.com,
+	keerthana.kalyanasundaram@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	srinidhi.rao@broadcom.com,
+	sunil-kumar.yadav@broadcom.com,
+	ankit-aj.jain@broadcom.com
+Subject: Re: [v2 PATCH] crypto: seqiv - Do not use req->iv after crypto_aead_encrypt
+Date: Tue, 13 Jan 2026 00:13:23 -0600
+Message-ID: <20260113061323.159523-1-vamsi-krishna.brahmajosyula@broadcom.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <aUijI8zYq31rSY16@gondor.apana.org.au>
+References: <aUijI8zYq31rSY16@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,58 +98,11 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBxLMKVtmVp734cAA--.56671S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-When VM boots with one virtio-crypto PCI device and builtin backend,
-run openssl benchmark command with multiple processes, such as
-  openssl speed -evp aes-128-cbc -engine afalg  -seconds 10 -multi 32
+> I intend to push this to Linus for 6.19.
 
-openssl processes will hangup and there is error reported like this:
- virtio_crypto virtio0: dataq.0:id 3 is not a head!
+Is this issue being considered as a CVE?
 
-It seems that the data virtqueue need protection when it is handled
-for virtio done notification. If the spinlock protection is added
-in virtcrypto_done_task(), openssl benchmark with multiple processes
-works well.
-
-Fixes: fed93fb62e05 ("crypto: virtio - Handle dataq logic with tasklet")
-Cc: stable@vger.kernel.org
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/crypto/virtio/virtio_crypto_core.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
-index 3d241446099c..ccc6b5c1b24b 100644
---- a/drivers/crypto/virtio/virtio_crypto_core.c
-+++ b/drivers/crypto/virtio/virtio_crypto_core.c
-@@ -75,15 +75,20 @@ static void virtcrypto_done_task(unsigned long data)
- 	struct data_queue *data_vq = (struct data_queue *)data;
- 	struct virtqueue *vq = data_vq->vq;
- 	struct virtio_crypto_request *vc_req;
-+	unsigned long flags;
- 	unsigned int len;
- 
-+	spin_lock_irqsave(&data_vq->lock, flags);
- 	do {
- 		virtqueue_disable_cb(vq);
- 		while ((vc_req = virtqueue_get_buf(vq, &len)) != NULL) {
-+			spin_unlock_irqrestore(&data_vq->lock, flags);
- 			if (vc_req->alg_cb)
- 				vc_req->alg_cb(vc_req, len);
-+			spin_lock_irqsave(&data_vq->lock, flags);
- 		}
- 	} while (!virtqueue_enable_cb(vq));
-+	spin_unlock_irqrestore(&data_vq->lock, flags);
- }
- 
- static void virtcrypto_dataq_callback(struct virtqueue *vq)
--- 
-2.39.3
-
+Thanks,
+Vamsi
