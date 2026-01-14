@@ -1,120 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from cvsmtppost106.wmail.worksmobile.com (cvsmtppost106.wmail.worksmobile.com [125.209.209.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B7E39E6CB
-	for <linux-crypto@vger.kernel.org>; Wed, 14 Jan 2026 15:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3EF839C659
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Jan 2026 15:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=125.209.209.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768405067; cv=none; b=i4lvV4mcu3A87qgOLpEauDcmmfhi8ZA88KDZ/XNyjXc+/HLi6dwGiU1GF53ep2gJlVZzZBqp6XsXgxmf/JqXnI7K4Mxv7jWeA/q8C3XBAWjuwbZXUvYTxDCYv3/laWMD5cBh7184CiCeNDaFX6M8lnm4bKxd+UOkZfZltQKWlok=
+	t=1768406341; cv=none; b=BrAxaKnbJsIa4uiw0RHcdLEWNRuXfxP5GziTdmQVWwEBM1M2c/YOsdZAlzBPBYH4iEODdfZcQOQrNI54No1yHsvcbrPyHha/G3fFyYQkEVuvoZj8r2S0C+Ksnbtr/4fpg9L/kohndywC6y4oj6D7vN7jn6FeY7kSHm2892gBkFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768405067; c=relaxed/simple;
-	bh=Jdf2xSexkgbS7ZSYx+UBSEVANbQSyennQNDL47prCVY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ESfylLcjJNY9Y9VfcspyulY3u0Hwh4niDsDyn/3iTeh0YbajmS22ksOw6qd8HGKOPOzsFDR1dONj0dXVFYdb0k4WAHhjlD3hpp6vlsvfIiqKBMF23iXeEbMdBvkwWHKZy4alOPRrD64nyRR7p1Hi5SA63IWaCKFEx8kksH6fiKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lUf5Vz0/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768406341; c=relaxed/simple;
+	bh=cRB+YP21zLERgxw3gZcoe17vzwJmYED9VXTbMsBcgUM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K6NvPIDxZ/WKG8wENahBPlPu0fY6SZSjVv5VLDoEFK0fjYnXRWl47YJ/LkgB2polwmY/29bkhkWkuF62Jq3xZJjO4EzKy8yFWZ+zBLwt9sxQv69CK6aYEuols50z1P1XNfXlP+xSA0E+nfNVzepcz33wHs9gnoC2xdOSuxxLZq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=korea.ac.kr; spf=pass smtp.mailfrom=korea.ac.kr; dkim=pass (2048-bit key) header.d=worksmobile.com header.i=@worksmobile.com header.b=XOrTWlLH; dkim=pass (1024-bit key) header.d=korea.ac.kr header.i=@korea.ac.kr header.b=U9NGH/t9; arc=none smtp.client-ip=125.209.209.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=korea.ac.kr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=korea.ac.kr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lUf5Vz0/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC781C2BCAF
-	for <linux-crypto@vger.kernel.org>; Wed, 14 Jan 2026 15:37:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768405066;
-	bh=Jdf2xSexkgbS7ZSYx+UBSEVANbQSyennQNDL47prCVY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=lUf5Vz0/Ofg5fWusBzXuGU/j1Fc99aFLBoFEng8bt2KCxM9Y73KzVFzIYqbiXBV1B
-	 D5GjOX4bDbP5iJVjP1Y6d2va1H7rCfYDzQFVGWRC9HAx/lnToVUoua5fL8vsHKRzxg
-	 qE1tkZ95fl5dwWSifffcU0+UveCW9M+vBF7buL59IaMMmwo24A0S5QOrwAJEhkkpFG
-	 JMJzfNg2qg0Bikbv5vk4p0Y1o6Nx+AnRsjcfzllHJsF/U5ekwG1g39uxjOacCXvOru
-	 0R3sYFDqGFz8qzMN75yPo45MLzLYlCpBFYMkMrDr87e5OsvtFHJisd2pOqomZVVAay
-	 rCHhiA4aFdA7g==
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59b77f2e43aso1275485e87.1
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Jan 2026 07:37:46 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCURdFW9b7qswxISRQQN4copSnEzwJWV5ufzzfqckxP2LXDwT4Bi/WEXeYZOzekNsvU+H7P0Rjq0mIF0nn4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJ76Fgrj99LeTgZmY5A6iTXbG75iAnrVsTOMLwf47m5dyd/Dx8
-	CTzPxhkT9n3MkZiEH2V1yaEySJGVYHTmZ02BGon8rnKOax7Dm52N2aLZVALHm6TCy8zdPHoBHj8
-	hLvAhWe2LWLuI+s4wDXklRfhqwM2yUqjDs1Y6MU2Cew==
-X-Received: by 2002:a05:6512:138f:b0:59b:67cf:ac0c with SMTP id
- 2adb3069b0e04-59ba0ed7cdbmr1016163e87.17.1768405065358; Wed, 14 Jan 2026
- 07:37:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=worksmobile.com header.i=@worksmobile.com header.b="XOrTWlLH";
+	dkim=pass (1024-bit key) header.d=korea.ac.kr header.i=@korea.ac.kr header.b="U9NGH/t9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=worksmobile.com;
+	s=s20171120; t=1768405122;
+	bh=cRB+YP21zLERgxw3gZcoe17vzwJmYED9VXTbMsBcgUM=;
+	h=From:To:Subject:Date:Message-Id:From:Subject:Feedback-ID:
+	 X-Works-Security;
+	b=XOrTWlLHX8Kp0L+2UFdY1hob9FQrI2rjB10clNmjxb7VM+HK/+LzINPxgPeKcP6f1
+	 d9kwLB/v1kUm9GBgv814K/cF7USr4TIYYRH7P3AmNU5PhTLwqIQxPV4IQrM7UZ54id
+	 uA+LZNgvB6/NIfM6VxJ6JGHcgpDEw2VO/msjW1JsXftufGIy7sXD8qhn9hK7dtpjQ4
+	 ETkEvtei6XkjSktdPT1eCNmMI9NGPYx4vHlihu+MkWGTvc0aHY6IEEBViOTMgiiPJd
+	 gJ8xt0Xec+c+7V8HnYv7uyH4BpBFoLeVzN24d+FJ55yyX0QnnljP6dOxpD5nqCuNZw
+	 TYl52kgI/ifLQ==
+Received: from cvsendbo006.wmail ([10.112.11.111])
+  by cvsmtppost106.wmail.worksmobile.com with ESMTP id QX5-BtuSQiS8tMpQdB0n9g
+  for <linux-crypto@vger.kernel.org>;
+  Wed, 14 Jan 2026 15:38:42 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=korea.ac.kr;
+	s=naverworks; t=1768405122;
+	bh=cRB+YP21zLERgxw3gZcoe17vzwJmYED9VXTbMsBcgUM=;
+	h=From:To:Subject:Date:Message-Id:From:Subject:Feedback-ID:
+	 X-Works-Security;
+	b=U9NGH/t9L0jUmYpeBYXKdY1RVwhXTd7pEPl7dRNT6JwBuymlY2zwKJe1hK1kfqfg2
+	 0Q70LmNtAPr4vb1lu10NT8P8sNSPGaKzN1tVaQy6dTnN29wJC6k/ng6XKvjl64b636
+	 Skpo7nC8gjXjLopIr2xkxBEAi7yolItXKCxJxbBA=
+X-Session-ID: AMaK6SBuTvm98wit4hQMlg
+X-Works-Send-Opt: LlnwjAJYjHmXFoEXKBmmaAErKqpYjHmm
+X-Works-Smtp-Source: gZKXKq2rFqJZ+HmwKobZ+6E=
+Received: from s2lab05.. ([163.152.163.130])
+  by jvnsmtp402.gwmail.worksmobile.com with ESMTP id AMaK6SBuTvm98wit4hQMlg
+  for <multiple recipients>
+  (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+  Wed, 14 Jan 2026 15:38:41 -0000
+From: Jang Ingyu <ingyujang25@korea.ac.kr>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ingyu Jang <ingyujang25@korea.ac.kr>
+Subject: [Question] Redundant ternary operators in nhpoly1305/sha256 digest functions?
+Date: Thu, 15 Jan 2026 00:38:39 +0900
+Message-Id: <20260114153839.3649359-1-ingyujang25@korea.ac.kr>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aUFX14nz8cQj8EIb@vaman> <CAMRc=MetbSuaU9VpK7CTio4kt-1pkwEFecARv7ROWDH_yq63OQ@mail.gmail.com>
- <aUF2gj_0svpygHmD@vaman> <CAMRc=McO-Fbb=O3VjFk5C14CD6oVA4UmLroN4_ddCVxtfxr03A@mail.gmail.com>
- <aUpyrIvu_kG7DtQm@vaman> <CAMRc=Md6ucK-TAmtvWMmUGX1KuVE9Wj_z4i7_-Gc7YXP=Omtcw@mail.gmail.com>
- <aVZh3hb32r1oVcwG@vaman> <CAMRc=MePAVMZPju6rZsyQMir4CkQi+FEqbC++omQtVQC1rHBVg@mail.gmail.com>
- <aVf5WUe9cAXZHxPJ@vaman> <CAMRc=Mdaucen4=QACDAGMuwTR1L5224S0erfC0fA7yzVzMha_Q@mail.gmail.com>
- <aWBndOfbtweRr0uS@vaman> <CAMRc=McPz+W4GOCbNMx-tpSav3+wuUrLT2CF5FhoV5U29oiK6A@mail.gmail.com>
-In-Reply-To: <CAMRc=McPz+W4GOCbNMx-tpSav3+wuUrLT2CF5FhoV5U29oiK6A@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Wed, 14 Jan 2026 16:37:33 +0100
-X-Gmail-Original-Message-ID: <CAMRc=MejA90TRue6F2JjQXHYo0AmFxc-gKkwNX0EKzP5scB14Q@mail.gmail.com>
-X-Gm-Features: AZwV_Qg8bQsca4MwFyM00i6xD1tJYX8VuM1MGFpBUJPmAwH8VbH65HlWxQe3eOk
-Message-ID: <CAMRc=MejA90TRue6F2JjQXHYo0AmFxc-gKkwNX0EKzP5scB14Q@mail.gmail.com>
-Subject: Re: [PATCH v9 03/11] dmaengine: qcom: bam_dma: implement support for
- BAM locking
-To: Vinod Koul <vkoul@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Thara Gopinath <thara.gopinath@gmail.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Udit Tiwari <quic_utiwari@quicinc.com>, Daniel Perez-Zoghbi <dperezzo@quicinc.com>, 
-	Md Sadre Alam <mdalam@qti.qualcomm.com>, Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 9, 2026 at 3:15=E2=80=AFPM Bartosz Golaszewski <brgl@kernel.org=
-> wrote:
->
-> On Fri, Jan 9, 2026 at 3:27=E2=80=AFAM Vinod Koul <vkoul@kernel.org> wrot=
-e:
-> >
-> > >
-> > > We need an API because we send a locking descriptor, then a regular
-> > > descriptor (or descriptors) for the actual transaction(s) and then an
-> > > unlocking descriptor. It's a thing the user of the DMA engine needs t=
-o
-> > > decide on, not the DMA engine itself.
-> >
-> > I think downstream sends lock descriptor always. What is the harm in
-> > doing that every time if we go down that path?
->
-> No, in downstream it too depends on the user setting the right bits.
-> Currently the only user of the BAM locking downstream is the NAND
-> driver. I don't think the code where the crypto driver uses it is
-> public yet.
->
-> And yes, there is harm - it slightly impacts performance. For QCE it
-> doesn't really matter as any users wanting to offload skcipher or SHA
-> are better off using the Arm Crypto Extensions anyway as they are
-> faster by an order of magnitude (!). It's also the default upstream,
-> where the priorities are set such that the ARM CEs are preferred over
-> the QCE. QCE however, is able to coordinate with the TrustZone and
-> will be used to support the DRM use-cases.
->
-> I prefer to avoid impacting any other users of BAM DMA.
->
-> > Reg Dmitry question above, this is dma hw capability, how will client
-> > know if it has to lock on older rev of hardware or not...?
-> >
-> > > Also: only the crypto engine needs it for now, not all the other user=
-s
-> > > of the BAM engine.
-> >
->
-> Trying to set the lock/unlock bits will make
-> dmaengine_desc_attach_metadata() fail if HW does not support it.
->
-> > But they might eventually right?
-> >
->
-> Yes, and they will already have the interface to do it - in the form
-> of descriptor metadata.
->
+From: Ingyu Jang <ingyujang25@korea.ac.kr>
 
-Hi! Have I answered all your questions? Can we proceed with this?
+Hi,
 
-Bartosz
+I noticed that in arch/x86/crypto/, several digest functions use
+the ternary operator (?:) to chain function calls:
+
+In nhpoly1305-avx2-glue.c and nhpoly1305-sse2-glue.c:
+
+  return crypto_nhpoly1305_init(desc) ?:
+         nhpoly1305_xxx_update(desc, src, srclen) ?:
+         crypto_nhpoly1305_final(desc, out);
+
+In sha256_ssse3_glue.c (sha256_ssse3_digest, sha256_avx_digest,
+sha256_avx2_digest, sha256_ni_digest):
+
+  return sha256_base_init(desc) ?:
+         sha256_xxx_finup(desc, data, len, out);
+
+However, all the functions being checked always return 0:
+  - crypto_nhpoly1305_init() always returns 0
+  - nhpoly1305_xxx_update() always returns 0
+  - crypto_nhpoly1305_final() always returns 0
+  - sha256_base_init() always returns 0
+
+This makes the short-circuit evaluation of ?: unnecessary.
+
+Is this intentional defensive coding for potential future changes,
+or could this be cleaned up?
+
+Thanks,
+Ingyu Jang
