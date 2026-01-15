@@ -1,169 +1,97 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EFA32D7FA
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Jan 2026 21:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166A817A2EA;
+	Thu, 15 Jan 2026 21:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768513938; cv=none; b=ZchxtWxDd0Ubvm2RSKNMYD7E0yzATSEGibPJ28fRhUmFHifdCwJ8UMzILgKArZr9FMLJb5L1rIuGL1as5U09xLSNJGS1a9cA7VdMfs0DUF1L691+UH6mKdztq3DNifK3a2MW2/kub+P9IS2hA4L/ynRYwUbj4zzNqjZzCy8A9Xg=
+	t=1768514329; cv=none; b=iFwNGXjHU+TIiDwbbmN+pQAPs2x9SZT/mUqL29WkfHS38NGd3MWaWDXSlKbu9kBJKu/E11mrHkcoLAmtgUOtjlgp0GTlkfjluOgXPst2OnvLHZaZ0SVPd/dKWbEU3n+xwMsiN3aJw5q9hWYEwA/aHL9VN+7EgJZ1/4++eBk98dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768513938; c=relaxed/simple;
-	bh=26Ku/3MAM9rlhlUV9gJjcK/jLqBAxHcARq/ODpqghxo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uB9BGDoVIpy0sHz2rq/9STcEdWglsZZnEipdVFFOKxTVqBZuB4UfW6tqmO2AY6JeoMRhShCcIu/OIHDjEDWEec9zjPko3tWQhdDNqKUcmPSUBpLGAvXakJ7ILIR6IfmIlIhiXSOAbsuC1wxf2SCJhbFQ8CpP3GFnERIpAXiW+Zw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FVml89hH; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768514329; c=relaxed/simple;
+	bh=+I4EHyCRcog+i/equgmR9mk2bw+mqnXRdjAnJ5CaABE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tPnrIiqv/ra26/FWRGxJ3e1XZbTGEYDc+NOsm2lgDInmtHYkS1uBaoWQP9fVahdFi9kkrltMNVC5gDecFFh9hHsj3tPkgsoaaubbRYcLn3sRDoVXFsbsnknyD03MwDUnsSzbpg77/jir8nn6HQmNrbbjixqLND3EtiQFAX/Gijk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OK4aVYPL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FVml89hH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768513930;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T28k94VpOQSmmR3GIa8Y/1zMVZOhRHqV17VLDzYabDY=;
-	b=FVml89hHWQmhLd7uxnvRwcCSK6QnJ5Ka7OaspbNz1KcDjktbAtqybQ9GKP9eKDpj+R0QRY
-	jJeUiWrql9lo8jsvBBCX1WmthnJq7OitpGIhLB+NqbCbrKyh4jkgOJO5jdrV1MMIY9N0Rh
-	lWteIcrKg+sJuLENPcHrwX3OXcVKol0=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-204-hfKDrujmNxW5NtyNIV1yaw-1; Thu,
- 15 Jan 2026 16:52:05 -0500
-X-MC-Unique: hfKDrujmNxW5NtyNIV1yaw-1
-X-Mimecast-MFC-AGG-ID: hfKDrujmNxW5NtyNIV1yaw_1768513923
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4D0CF1956052;
-	Thu, 15 Jan 2026 21:52:03 +0000 (UTC)
-Received: from warthog.procyon.org.uk.com (unknown [10.42.28.4])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 82F00180049F;
-	Thu, 15 Jan 2026 21:51:59 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>
-Cc: David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OK4aVYPL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC431C116D0;
+	Thu, 15 Jan 2026 21:58:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768514328;
+	bh=+I4EHyCRcog+i/equgmR9mk2bw+mqnXRdjAnJ5CaABE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OK4aVYPLAB9SF1cW9N1mkpyAAAK0qapY/LXpWSENuJV+bLMxNXr3e3m1008WoUEqA
+	 aC55YDSQWMVGVFV3GXx4kwG+l2u7UIKdNsx1dyPP21mKat8vgGad/26hAGhzsfvDYh
+	 ChCPBHy+4Z1xgWXmK7AWyzy7HY/Flv3pOqFUiZYBQuqXb3lxd+0xU2wg/pE3KnDFSM
+	 5+NviKRydPmADUSyZAzVHLQSJsbMXUS0SwdxY89cACjZqiqiuJvqN56+ao7I8Ca/Jx
+	 ux4+3nmglwSy+WKm+GjoEhJNlix5nBPXU1GuOtdWR6mWcr2S/i5F90MJm6mBVVxAah
+	 6NiCWy2e7hhDA==
+Date: Thu, 15 Jan 2026 13:58:12 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Holger Dengler <dengler@linux.ibm.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>,
-	linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v12 10/10] x509, pkcs7: Limit crypto combinations that may be used for module signing
-Date: Thu, 15 Jan 2026 21:50:52 +0000
-Message-ID: <20260115215100.312611-11-dhowells@redhat.com>
-In-Reply-To: <20260115215100.312611-1-dhowells@redhat.com>
-References: <20260115215100.312611-1-dhowells@redhat.com>
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v1 1/1] lib/crypto: tests: Add KUnit tests for AES
+Message-ID: <20260115215812.GA10598@quark>
+References: <20260115183831.72010-1-dengler@linux.ibm.com>
+ <20260115183831.72010-2-dengler@linux.ibm.com>
+ <20260115204332.GA3138@quark>
+ <76089e1f-dfc9-44e8-8e16-b965cd43d848@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <76089e1f-dfc9-44e8-8e16-b965cd43d848@linux.ibm.com>
 
-Limit the set of crypto combinations that may be used for module signing as
-no indication of hash algorithm used for signing is added to the hash of
-the data, so in theory a data blob hashed with a different algorithm can be
-substituted provided it has the same hash output.
+On Thu, Jan 15, 2026 at 10:51:25PM +0100, Holger Dengler wrote:
+> On 15/01/2026 21:43, Eric Biggers wrote:
+> > On Thu, Jan 15, 2026 at 07:38:31PM +0100, Holger Dengler wrote:
+> >> Add a KUnit test suite for AES library functions, including KAT and
+> >> benchmarks.
+> >>
+> >> Signed-off-by: Holger Dengler <dengler@linux.ibm.com>
+> > 
+> > The cover letter had some more information.  Could you put it in the
+> > commit message directly?  Normally cover letters aren't used for a
+> > single patch: the explanation should just be in the patch itself.
+> 
+> Ok, I'll move the explanation to the commit message. I assume that the example
+> output of the test can be dropped?
 
-This also rejects the use of less secure algorithms.
+Yes, that's fine.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Lukas Wunner <lukas@wunner.de>
-cc: Ignat Korchagin <ignat@cloudflare.com>
-cc: Stephan Mueller <smueller@chronox.de>
-cc: Eric Biggers <ebiggers@kernel.org>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: keyrings@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
----
- crypto/asymmetric_keys/public_key.c | 51 +++++++++++++++++++++++++++--
- 1 file changed, 49 insertions(+), 2 deletions(-)
+> > 10000000 iterations is too many.  That's 160 MB of data in each
+> > direction per AES key length.  Some CPUs without AES instructions can do
+> > only ~20 MB AES per second.  In that case, this benchmark would take 16
+> > seconds to run per AES key length, for 48 seconds total.
+> > 
+> > hash-test-template.h and crc_kunit.c use 10000000 / (len + 128)
+> > iterations.  That would be 69444 in this case (considering len=16),
+> > which is less than 1% of the iterations you've used.  Choosing a number
+> > similar to that would seem more appropriate.
+> > 
+> > Ultimately these are just made-up numbers.  But I think we should aim
+> > for the benchmark test in each KUnit test suite to take less than a
+> > second or so.  The existing tests roughly achieve that, whereas it seems
+> > this one can go over it by quite a bit due to the 10000000 iterations.
+> 
+> As we have a fixed length, I would go stay with a fix value for the iterations
+> (instead of calculating it based on len).
+> 
+> The benchmark has a separate loop for encrypt and decrypt, so I will do the
+> half iterations on encrypt and the other half on decrypt. I will also reduce
+> the iterations for the warm-ups.
+> 
+> What about 100 iterations for each warm-up and 500.000 iterations for each
+> real measurement? Means processing 2x 8MiB with preemption disabled.
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index 13a5616becaa..78e1194de71c 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -24,6 +24,48 @@ MODULE_DESCRIPTION("In-software asymmetric public-key subtype");
- MODULE_AUTHOR("Red Hat, Inc.");
- MODULE_LICENSE("GPL");
- 
-+struct public_key_restriction {
-+	const char	*pkey_algo;	/* Signing algorithm (e.g. "rsa") */
-+	const char	*pkey_enc;	/* Signature encoding (e.g. "pkcs1") */
-+	const char	*hash_algo;	/* Content hash algorithm (e.g. "sha256") */
-+};
-+
-+static const struct public_key_restriction public_key_restrictions[] = {
-+	/* algo			encoding	hash */
-+	{ "rsa",		"pkcs1",	"sha256" },
-+	{ "rsa",		"pkcs1",	"sha384" },
-+	{ "rsa",		"pkcs1",	"sha512" },
-+	{ "rsa",		"emsa-pss",	"sha512" },
-+	{ "ecdsa",		"x962",		"sha512" },
-+	{ "ecrdsa",		"raw",		"sha512" },
-+	{ "mldsa44",		"raw",		"sha512" },
-+	{ "mldsa65",		"raw",		"sha512" },
-+	{ "mldsa87",		"raw",		"sha512" },
-+	/* ML-DSA may also do its own hashing over the entire message. */
-+	{ "mldsa44",		"raw",		"-" },
-+	{ "mldsa65",		"raw",		"-" },
-+	{ "mldsa87",		"raw",		"-" },
-+};
-+
-+/*
-+ * Determine if a particular key/hash combination is allowed.
-+ */
-+static int is_public_key_sig_allowed(const struct public_key_signature *sig)
-+{
-+	for (int i = 0; i < ARRAY_SIZE(public_key_restrictions); i++) {
-+		if (strcmp(public_key_restrictions[i].pkey_algo, sig->pkey_algo) != 0)
-+			continue;
-+		if (strcmp(public_key_restrictions[i].pkey_enc, sig->encoding) != 0)
-+			continue;
-+		if (strcmp(public_key_restrictions[i].hash_algo, sig->hash_algo) != 0)
-+			continue;
-+		return 0;
-+	}
-+	pr_warn_once("Public key signature combo (%s,%s,%s) rejected\n",
-+		     sig->pkey_algo, sig->encoding, sig->hash_algo);
-+	return -EKEYREJECTED;
-+}
-+
- /*
-  * Provide a part of a description of the key for /proc/keys.
-  */
-@@ -391,12 +433,17 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	bool issig;
- 	int ret;
- 
--	pr_devel("==>%s()\n", __func__);
--
- 	BUG_ON(!pkey);
- 	BUG_ON(!sig);
- 	BUG_ON(!sig->s);
- 
-+	ret = is_public_key_sig_allowed(sig);
-+	if (ret < 0)
-+		return ret;
-+
-+	pr_devel("==>%s(%s,%s,%s)\n",
-+		 __func__, sig->pkey_algo, sig->encoding, sig->hash_algo);
-+
- 	/*
- 	 * If the signature specifies a public key algorithm, it *must* match
- 	 * the key's actual public key algorithm.
+I'd suggest 50000 for each direction as well as the warm-up loop.
 
+- Eric
