@@ -1,43 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC91324B20;
-	Thu, 15 Jan 2026 20:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3543D27F72C;
+	Thu, 15 Jan 2026 20:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768509815; cv=none; b=g8dk1PeCKFefZDisUSnvqlzg9jBFuM/TN0/kegBtVy5fvTl/JG/g6qGUa0yKWqtDk9NR16OdKtYABSBXPa0dG3bUYNbchMDRukuna4BkkUhOc5GqBWJPVFbX+SOfA5ZC1rjTKI5V57eKwiWPrIKks1jU1aHEcDVry/AIAtOiNsU=
+	t=1768509940; cv=none; b=XQLK2VXc/dUoT7389H+VlASSVyymMXHdopYmfZ0XRbK5+fAjYmNoI7yaVSc3Qibux82ogcuRFjVs8pDDKx4/t8ORZxjqWzVemZ2Lu2JDQNs+QVbQ28mf0EkoK6YJ6imAmUC9wcvDqQ68kb10p2PKPUx56o0j3+Ovn8tjvr83E6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768509815; c=relaxed/simple;
-	bh=T0yUpiuw/OkVmyA4WNYjG9h+/8JmhVkUSiHo3GgotZo=;
+	s=arc-20240116; t=1768509940; c=relaxed/simple;
+	bh=TrVJ81gNlKGWflE9lzJbsnP9K0M2Q7j3JRWiu7197P4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c5RGXPfRssUxOzcTY3tCI6z8fURhs1yQubcFQ5dPiVLWtiv0nr1x4/BcY6KJVSneao0MMAtqq/xlu18HPKleouQXOwv3IlEGprWNoPTKVT7HQQ13IyaUOgjEgiRUb4WvyB1NpBohOp7TjIVXG09jGnWYoWjfbgTJUcA8whsJi4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OzzoKjS1; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=GWdoU1t6+obKKeL/nt7xObD62LhzAbzj8oOxXAP2TGTKANYrzwRatKZTOtha1pelLcSHlFHDL5fM/m63umGtkt2CNsoIFSoh43ZaZujsa5fK9Rl7tUbPYHx4TNuT7sJLci+Me58MsQWCow0GTTRHFaNr4e121a2CEHIeTtq8lGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u+snff/V; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OzzoKjS1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 310C0C16AAE;
-	Thu, 15 Jan 2026 20:43:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u+snff/V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 144BAC116D0;
+	Thu, 15 Jan 2026 20:45:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768509814;
-	bh=T0yUpiuw/OkVmyA4WNYjG9h+/8JmhVkUSiHo3GgotZo=;
+	s=k20201202; t=1768509939;
+	bh=TrVJ81gNlKGWflE9lzJbsnP9K0M2Q7j3JRWiu7197P4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OzzoKjS1ihnv+kzjilUrTiO5sU/pDTc9ns/k6uNfJ5eFU2CRaMEbKmDiJy/uSH9js
-	 iJnoU+wA6BVFxJ71veKXeJeCjNpJJtRUjMa4iwQMPzaskOYVsueCfoufL9J12sZxoh
-	 tbtc82vlpQ1A0N8zl+cYJ+l/Oonm7r7L6RAVErgirJgpTo+9f9j2NiLMZA4yhUEjKs
-	 chQu2i43ggKTNWI58JhbblkiEautSJMnbMmrYNBpfmRIbZ0gX4DFeUuGO4YGStWRsK
-	 eOr5Ko3agjS/DjtqyqoV0AR4+IGW+NTA05W19YD8S4yJC/din0OjcRiEHwHT8xQUII
-	 gX9S/fFZbGF/A==
-Date: Thu, 15 Jan 2026 12:43:32 -0800
+	b=u+snff/V7iHtCcygjYFJPTDIRB2va5QWcv2YTvthzYkkKO1dcLaPj0r1cWb+Qb0Ai
+	 ZVpOJ/eQka5sAfYC6lulUHJjHAJpvcWXM+J1c9dpGfWO8QtlVm/Cw2UmGDfsxb+hb2
+	 IyAaokiFcv3t0x5Ft7gH2uq7nPZ/1cVZRdTZbS2YPI+uHUJfIZ2X9X7c3kyukr5qNM
+	 R+2zdGs48Km5Khd4oVNLQDGIKWfd0F+kukNy4BH3hlSFRi//OC1itB5pkumE0828um
+	 nikeLbBlI0f+FnI5/oQ1XMHlgzziQOiqCsrTkLzNGbBUcWTeyZjD33D9GwKuEKNpfZ
+	 SyUTiXJoNf48g==
+Date: Thu, 15 Jan 2026 12:45:37 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Holger Dengler <dengler@linux.ibm.com>
-Cc: Ard Biesheuvel <ardb@kernel.org>,
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v1 1/1] lib/crypto: tests: Add KUnit tests for AES
-Message-ID: <20260115204332.GA3138@quark>
-References: <20260115183831.72010-1-dengler@linux.ibm.com>
- <20260115183831.72010-2-dengler@linux.ibm.com>
+	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org, x86@kernel.org,
+	Holger Dengler <dengler@linux.ibm.com>,
+	Harald Freudenberger <freude@linux.ibm.com>
+Subject: Re: [PATCH v2 00/35] AES library improvements
+Message-ID: <20260115204537.GB3138@quark>
+References: <20260112192035.10427-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,81 +48,17 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260115183831.72010-2-dengler@linux.ibm.com>
+In-Reply-To: <20260112192035.10427-1-ebiggers@kernel.org>
 
-On Thu, Jan 15, 2026 at 07:38:31PM +0100, Holger Dengler wrote:
-> Add a KUnit test suite for AES library functions, including KAT and
-> benchmarks.
+On Mon, Jan 12, 2026 at 11:19:58AM -0800, Eric Biggers wrote:
+> This series applies to libcrypto-next.  It can also be retrieved from:
 > 
-> Signed-off-by: Holger Dengler <dengler@linux.ibm.com>
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git aes-lib-v2
+> 
+> This series makes three main improvements to the kernel's AES library:
 
-The cover letter had some more information.  Could you put it in the
-commit message directly?  Normally cover letters aren't used for a
-single patch: the explanation should just be in the patch itself.
+FYI, applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
-> diff --git a/lib/crypto/tests/aes-testvecs.h b/lib/crypto/tests/aes-testvecs.h
-> new file mode 100644
-> index 000000000000..dfa528db7f02
-> --- /dev/null
-> +++ b/lib/crypto/tests/aes-testvecs.h
-> @@ -0,0 +1,78 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _AES_TESTVECS_H
-> +#define _AES_TESTVECS_H
-> +
-> +#include <crypto/aes.h>
-> +
-> +struct buf {
-> +	size_t blen;
-> +	u8 b[];
-> +};
-
-'struct buf' is never used.
-
-> +static const struct aes_testvector aes128_kat = {
-
-Where do these test vectors come from?  All test vectors should have a
-documented source.
-
-> +static void benchmark_aes(struct kunit *test, const struct aes_testvector *tv)
-> +{
-> +	const size_t num_iters = 10000000;
-
-10000000 iterations is too many.  That's 160 MB of data in each
-direction per AES key length.  Some CPUs without AES instructions can do
-only ~20 MB AES per second.  In that case, this benchmark would take 16
-seconds to run per AES key length, for 48 seconds total.
-
-hash-test-template.h and crc_kunit.c use 10000000 / (len + 128)
-iterations.  That would be 69444 in this case (considering len=16),
-which is less than 1% of the iterations you've used.  Choosing a number
-similar to that would seem more appropriate.
-
-Ultimately these are just made-up numbers.  But I think we should aim
-for the benchmark test in each KUnit test suite to take less than a
-second or so.  The existing tests roughly achieve that, whereas it seems
-this one can go over it by quite a bit due to the 10000000 iterations.
-
-> +	kunit_info(test, "enc (iter. %zu, duration %lluns)",
-> +		   num_iters, t_enc);
-> +	kunit_info(test, "enc (len=%zu): %llu MB/s",
-> +		   (size_t)AES_BLOCK_SIZE,
-> +		   div64_u64((u64)AES_BLOCK_SIZE * num_iters * NSEC_PER_SEC,
-> +			     (t_enc ?: 1) * SZ_1M));
-> +
-> +	kunit_info(test, "dec (iter. %zu, duration %lluns)",
-> +		   num_iters, t_dec);
-> +	kunit_info(test, "dec (len=%zu): %llu MB/s",
-> +		   (size_t)AES_BLOCK_SIZE,
-> +		   div64_u64((u64)AES_BLOCK_SIZE * num_iters * NSEC_PER_SEC,
-> +			     (t_dec ?: 1) * SZ_1M));
-
-Maybe delete the first line of each pair, and switch from power-of-2
-megabytes to power-of-10?  That would be consistent with how the other
-crypto and CRC benchmarks print their output.
-
-> +MODULE_DESCRIPTION("KUnit tests and benchmark aes library");
-
-"aes library" => "for the AES library"
+As always, additional reviews still appreciated!
 
 - Eric
