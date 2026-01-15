@@ -1,62 +1,64 @@
-Received: from mail-dl1-f68.google.com (mail-dl1-f68.google.com [74.125.82.68])
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D10378D7A
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Jan 2026 11:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C576A37A49C
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Jan 2026 11:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768477240; cv=none; b=ZdiKhFDboYkBT2Wn+Jz6dDgvkxC2dwXwkIJbz0AOl9vzSvZZcgYReLWbrOchQfJXofT5P3s90TLJDM/8UxQulzcI5hZvhickZNrfO/LR8y0TVrJLvUY3Z+ZD/fwNuhPD9Rx1faXO+V9bJSOtXZCpPbnMINHpBtkBHqmAUboZHAg=
+	t=1768477248; cv=none; b=LmaQEdNM2mz8/PXhUbmmJKdQ7TihZHcsPe094MZuLJbeCCZ9nGw/v5REsStI3pP5gcE5yHeSDpd3PVbpLGzWGah4SeY25KlTYn7YkIr/gMGLgU1wmZ21E0sJ36FHfb/Tyx9QDWuibaYFuzzWW3Qidx2VWAJdx/lxzeqXtwiFpwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768477240; c=relaxed/simple;
-	bh=PXS05RerQpUx4ctPGdnS/G+foMJ48Qj8aQtOAt7OSgE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g6AxXE+UZbEOAZFtfN+mW8gsGTY9NzqypWp7ql+8DTLNLrojd0PQvBCVQSzVkwY2qkhuoytZdpfJu93XDqCU1ij9g1Qwvh+/ukFthbCMK65dcnoCX3Ojbv4nazUCzTaubXIZxUmLdgCFlGq3rPs2Begp/CPju9oODay6ZI2I6xI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=Snj4H2ke; arc=none smtp.client-ip=74.125.82.68
+	s=arc-20240116; t=1768477248; c=relaxed/simple;
+	bh=WWvO7fvS51VGIasNJgUp3QyEPuObUZpxHbR7pn28FTk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mY6f81Fmbr159wriL6HuLExZV654EP+nExJ2+RVEtc1D5/o1Vdt2F9rO0Y8VDigwDZ0uUE5CgLpFjTqncGs19Fe5ZTLiyi6vCLxP7b42kBWiaRdOKX3jmj3sesQGb17AdUYHf3SChXSDKIBsGbuFOgjG7+2j9dAPm4V5VmyCQnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=UVcP/v20; arc=none smtp.client-ip=74.125.82.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="Snj4H2ke"
-Received: by mail-dl1-f68.google.com with SMTP id a92af1059eb24-1233702afd3so943705c88.0
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jan 2026 03:40:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="UVcP/v20"
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-121a0bcd364so1061217c88.0
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Jan 2026 03:40:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1768477238; x=1769082038; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cROdaZB2e3rP7WqjBdCtWuYMmHKRB0QhTDeH6xpIT5w=;
-        b=Snj4H2keuLGA7mBYNWNb7wLGKBThA06Y55uRRk5uCfCkPET0J6R0yz782x4EmHUDZU
-         x1phjNTKZcf6VkYqXdpdbDi/+/EQLAOJGxCX86tTBxCZrMwDoHCzeqzvWV3N6+PYPi6U
-         +cBfB2rdG5hiuqwBrwWBXXREREf4D7MgQTKd+fcBScJY+i+yhNR41iVUBtxtLu1Yr5Ra
-         HjdiID4koXPiVhsLA2rKtBxnOkK7YGzga0dcDPDV5T1lBaJvysqQVkVP8PicGWFOJLkT
-         XXaoeEv+/YFh4rmONO8a868tJ4eoQJVMmxgrsBMhru5hn0Mpbcj4SQWAeFdAvuHC/91g
-         Y6DQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768477238; x=1769082038;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=sartura.hr; s=sartura; t=1768477246; x=1769082046; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cROdaZB2e3rP7WqjBdCtWuYMmHKRB0QhTDeH6xpIT5w=;
-        b=SO67j29K8i4j68r7GO26VQBgdQicL75UQgqshEoSYSZfe9k92ym2nondLMeMftcOO+
-         UPyi5dfwFby06tT5enWHfeovPCjGLCTfym4RZiuFi/j7GTHrGuInuwo7sPRfZi5ksZ8K
-         AD4aUH3BmiwTxpU+9NjqW1grBd0eCEy0lnsjFujZdnBAqBHHYg8cB4NQwHciZRb2rnQ4
-         sHix0MaGTeMSggJZn+5rolNs24482LaMAcoqY9Hl398gk4KPW0AgWdXUo6415zaS7tFc
-         CPul2PnySxiCZPfuJs6Pp5uSptvdpIQ4LAzcFYYl+L2trx8bC7+5yt3qzEVrs49ropFw
-         Ve0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVBFASVq7kMxdSVLz1nEQKcdwAE0+By9WYBJcknOStmCR5KEcw3HVwbOwwj8roRKgqFcXKnVklbJ0a8uHQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKr7ZfGZ+QfG3ooGQhXzRrC1Lun+aXxQ4o951O4NBhAV9FXVP1
-	uJjsu7/cUqVJD6SwHDYUkl4Zb0eySes+1HRuejiteoOj42pu5HwFQz+KmpIBHwtAxZU=
-X-Gm-Gg: AY/fxX72H1nPHOWn+3yVCTMbSut5FyVxURKnWmwsCDLkV8aWoGEgbm9lYx4tCwU6Akg
-	OFIKjHM35eLKTaGTSJ9PsXomSgTOAdegUG1I7ao2iSvZz4oraOJUrP4G24PipS0CyHnYEEYnzsf
-	YVf18ekAKXo5tmMVBdW4bnXtpbrCGijdVfSSLWttkyBID5yLyF1N0QKq3cy4ujGfO/y6nSfD6DZ
-	4AF14vBLQSMn+7TPlLd4UKXdqKJdICBleBL/4urCBovrC8QE1qnO26JUo/pk94+Jk+Rlo8x/rPb
-	nOm5q5PgOGDjeaQlLQdRzd25Hkv8WW0DfW7u+W/Lm9+4PJfNnduZC5LoGYPdYFSHpqWePPoMGpG
-	D/Bgx/Gm5l2QYFITWf8Lc+GAh7zjuw9yX0dQoo05IwuGrIu2CF/2ggxzE6vgNy07jzeqZlxC6Pi
-	PaJ/so9n4ZiX1rmb9wyAdGofkoByN/SQQviPRJF8bKF1Vz8Eac6GVwI21DSHtxeDSyzJva4sDJo
-	AOcAlgP
-X-Received: by 2002:a05:701b:2305:b0:123:2c7f:28cf with SMTP id a92af1059eb24-12336a23a4amr5794003c88.8.1768477237584;
-        Thu, 15 Jan 2026 03:40:37 -0800 (PST)
+        bh=tEJGOG9KziC5WmpmFadtMIPKcgD9jyuKUB8JZhjDo5k=;
+        b=UVcP/v20an1Ri/KQX0pwKtk8IAvtwsby0xjBw61cKlNrVlC3TDhaqpNaluYDS/2jIM
+         BWRr1w+09ZCctBa2GQGQxakTSqfDNXYv3gb9kcXbnYzK/j3ghIrArgDxhs6vWGUp8+oz
+         8LISVjzM+5XaCtbqkAGVoGpwEvW6JpAY2v1pvUMP1+rMTXo3eg4HGJn1CxRU2zsaJeGx
+         hvT4IEdvfB/SCQiQLmtXEG5pFMpWDJRIQvvpl4zxcqkYCpHN4rAu2SCJ/cI6615bsSsL
+         suoU/9ddLvKABiycIMuTvbtzXnKVugaz1cHH7XQ61XUJVkJFz4lhWMBiVYPlKlSIoXT0
+         2QVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768477246; x=1769082046;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=tEJGOG9KziC5WmpmFadtMIPKcgD9jyuKUB8JZhjDo5k=;
+        b=vGAGkMUOZsau1Sg0g+5hZmZbST5b7iiC1C9yg4+L+8E4ZrdQ4O58Q4v4Zi+PQsdl83
+         1YABeTkUn8dzpFKqxF2s38uaqPo+lcmcHOTeCkTRypz8XUz+MoHPw+XSlNiDHBGdSEfK
+         pr06WLp8SEAQxEu6VGGahEzCoY+5D4PNAuw38DE2qgCvC2qDozOgeeGoyAeHdoM4G0cW
+         TjF8DmEbNsCnnL6a4KEUbNXzrVRsdyCUM2fHo4iBBCboxFEij9SuVp12Yy5Mq6yaUgpT
+         2MqyiUcM/emqPGM/4pODXtXVW+wAJ6WqJGkeD4+A2jcQZqAFXyofMno5yyKad57uT83D
+         Ddsw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzq1wmhG30QNQxcnIRflzc0rUvSZ3VCTvs46wtzKGpdcmvAVXwUmFvfaj380C7kY6OwWIDHOtmcICCmt0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyyo/TGZEKZvTs78XQrRIdzxx/gNnfj3LZBaR7p83+gAv32i6FU
+	Uo7d52bpIgCllM4Q4rMqWGlqi1IdT0HQj7S7fASVoXWK1ATYsFU9lF1wVgs8SOzktCo=
+X-Gm-Gg: AY/fxX7yDTsnOmPRUpclaMXPnqdg+Xw/saQlSpa6381C7StwCCyLpXhw4l7wF4lIX2N
+	Q8dOTieXCGle+srfrfAIY7QCep6zXUooKqr3RwISv2CIi6LiDDr1UZSNjQbbnTakq5LZ8Dr9EYx
+	dBA6o5v4JJbuXWhyl8uolx66MFsIQApjj/0XY3lVNnDuV7dmRCnvi3y4bcpIaztaikE1xGIxsUr
+	3DmEGZJnLhqG3h32auvCAsjt35eIi8jqhbynOWybdIBn0udkD1FqhsSvuS0uiPIbsp3la2lmAV6
+	908nUerY+CnC8iwJkMIggWTeCCBuwCpnOuypC4L29RBHWnyns0/ijTpepH1nVLEjx4s7yzqXDu4
+	FObgKyRp0IhZujRXffXa+P0DbIlCuruQllYgX5atiDA+uwmh5qD5gHquaAYgrJ/cqt1+1D/iGxV
+	kFqurPawvmWJ5KPbiL24ruf5lu9VDHnZ+Os0Y3d0RxvAfuvJMBzg54+5kgmT3jxEe+GOTM2RAxm
+	IQaijJe
+X-Received: by 2002:a05:7022:4392:b0:122:2f4:b251 with SMTP id a92af1059eb24-123376fccd9mr8604410c88.21.1768477245907;
+        Thu, 15 Jan 2026 03:40:45 -0800 (PST)
 Received: from fedora (dh207-14-52.xnet.hr. [88.207.14.52])
-        by smtp.googlemail.com with ESMTPSA id a92af1059eb24-123370a051esm4875347c88.15.2026.01.15.03.40.29
+        by smtp.googlemail.com with ESMTPSA id a92af1059eb24-123370a051esm4875347c88.15.2026.01.15.03.40.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 03:40:36 -0800 (PST)
+        Thu, 15 Jan 2026 03:40:45 -0800 (PST)
 From: Robert Marko <robert.marko@sartura.hr>
 To: robh@kernel.org,
 	krzk+dt@kernel.org,
@@ -94,11 +96,14 @@ To: robh@kernel.org,
 	linux-spi@vger.kernel.org,
 	linux-serial@vger.kernel.org
 Cc: luka.perkov@sartura.hr,
-	Robert Marko <robert.marko@sartura.hr>
-Subject: [PATCH v5 00/11] Add support for Microchip LAN969x
-Date: Thu, 15 Jan 2026 12:37:25 +0100
-Message-ID: <20260115114021.111324-1-robert.marko@sartura.hr>
+	Robert Marko <robert.marko@sartura.hr>,
+	Conor Dooley <conor.dooley@microchip.com>
+Subject: [PATCH v5 01/11] dt-bindings: mfd: atmel,sama5d2-flexcom: add microchip,lan9691-flexcom
+Date: Thu, 15 Jan 2026 12:37:26 +0100
+Message-ID: <20260115114021.111324-2-robert.marko@sartura.hr>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260115114021.111324-1-robert.marko@sartura.hr>
+References: <20260115114021.111324-1-robert.marko@sartura.hr>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -107,76 +112,33 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series adds support for the Microchip LAN969x switch SoC family.
-
-Series is a bit long since after discussions in previous versions, it was
-recommended[1][2] to add SoC specific compatibles for device nodes so it
-includes the required bindings updates.
-
-[1] https://lore.kernel.org/all/20251203-splendor-cubbyhole-eda2d6982b46@spud/
-[2] https://lore.kernel.org/all/173412c8-c2fb-4c38-8de7-5b1c2eebdbf9@microchip.com/
-[3] https://lore.kernel.org/all/20251203-duly-leotard-86b83bd840c6@spud/
-[4] https://lore.kernel.org/all/756ead5d-8c9b-480d-8ae5-71667575ab7c@kernel.org/
+Add binding documentation for Microchip LAN969x.
 
 Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+---
 Changes in v5:
-* Picked Acked-by and Reviewed-by tags
-* Change clock header license to match the DTSI one
-* Alphabetize EV23X71A pin nodes
-* Remove the requirment for all ethernet-port nodes to have phys property
-as when RGMII is used there is no SERDES being used
-* Drop phys from RGMII port on EV23X71A
-* Drop USB, DMA, MIIM, SPI and I2C bindings as those were already picked
-
-Changes in v4:
-* Pick Acked-by from Andi for I2C bindings
-* Move clock indexes from dt-bindings into a DTS header as suggested by
-Krzysztof[4]
+* Pick Reviewed-by from Claudiu
 
 Changes in v3:
 * Pick Acked-by from Conor
-* Drop HWMON binding as it was picked into hwmon already
-* Document EV23X71A into AT91 binding
-* Drop SparX-5 and AT91 bindings merge
-* Apply remark from Conor on DMA binding regarding merging cases
 
-Changes in v2:
-* Change LAN969x wildcards to LAN9691 in patches
-* Split SoC DTSI and evaluation board patches
-* Add the suggested binding changes required for SoC specific compatibles
-* Merge SparX-5 and AT91 bindings as suggested[3]
+ Documentation/devicetree/bindings/mfd/atmel,sama5d2-flexcom.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-Robert Marko (11):
-  dt-bindings: mfd: atmel,sama5d2-flexcom: add microchip,lan9691-flexcom
-  dt-bindings: serial: atmel,at91-usart: add microchip,lan9691-usart
-  dt-bindings: rng: atmel,at91-trng: add microchip,lan9691-trng
-  dt-bindings: crypto: atmel,at91sam9g46-aes: add microchip,lan9691-aes
-  dt-bindings: crypto: atmel,at91sam9g46-sha: add microchip,lan9691-sha
-  dt-bindings: pinctrl: pinctrl-microchip-sgpio: add LAN969x
-  arm64: dts: microchip: add LAN969x clock header file
-  arm64: dts: microchip: add LAN969x support
-  dt-bindings: arm: AT91: document EV23X71A board
-  dt-bindings: net: sparx5: do not require phys when RGMII is used
-  arm64: dts: microchip: add EV23X71A board
-
- .../devicetree/bindings/arm/atmel-at91.yaml   |   6 +
- .../crypto/atmel,at91sam9g46-aes.yaml         |   1 +
- .../crypto/atmel,at91sam9g46-sha.yaml         |   1 +
- .../bindings/mfd/atmel,sama5d2-flexcom.yaml   |   1 +
- .../bindings/net/microchip,sparx5-switch.yaml |  15 +-
- .../pinctrl/microchip,sparx5-sgpio.yaml       |  20 +-
- .../bindings/rng/atmel,at91-trng.yaml         |   1 +
- .../bindings/serial/atmel,at91-usart.yaml     |   1 +
- arch/arm64/boot/dts/microchip/Makefile        |   1 +
- arch/arm64/boot/dts/microchip/clk-lan9691.h   |  24 +
- arch/arm64/boot/dts/microchip/lan9691.dtsi    | 488 +++++++++++
- .../boot/dts/microchip/lan9696-ev23x71a.dts   | 756 ++++++++++++++++++
- 12 files changed, 1309 insertions(+), 6 deletions(-)
- create mode 100644 arch/arm64/boot/dts/microchip/clk-lan9691.h
- create mode 100644 arch/arm64/boot/dts/microchip/lan9691.dtsi
- create mode 100644 arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
-
+diff --git a/Documentation/devicetree/bindings/mfd/atmel,sama5d2-flexcom.yaml b/Documentation/devicetree/bindings/mfd/atmel,sama5d2-flexcom.yaml
+index c7d6cf96796c..5e5dec2f6564 100644
+--- a/Documentation/devicetree/bindings/mfd/atmel,sama5d2-flexcom.yaml
++++ b/Documentation/devicetree/bindings/mfd/atmel,sama5d2-flexcom.yaml
+@@ -20,6 +20,7 @@ properties:
+       - const: atmel,sama5d2-flexcom
+       - items:
+           - enum:
++              - microchip,lan9691-flexcom
+               - microchip,sam9x7-flexcom
+               - microchip,sama7d65-flexcom
+               - microchip,sama7g5-flexcom
 -- 
 2.52.0
 
