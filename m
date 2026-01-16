@@ -1,54 +1,209 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5807122D781;
-	Fri, 16 Jan 2026 15:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F1931063B
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Jan 2026 15:45:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768578220; cv=none; b=hC5u9C97iJogLT9onLchwIMA0ugtsGiXrvXiEQSDndL+411+E/ORxw8ibZaCBynE1fSQgX8gGLpMQ+VEpYIPIlCOO9/3CJmW6Qal2Xv+q7yrYh+ew6MmcmMwg//fE60ZBsJ2J0RGt3msE9ejJsiYieqPRGGMP4LEZl4S4X9indw=
+	t=1768578344; cv=none; b=A3zLFvZKRc69EFlycVFGLtx//3mExxgVPJIwih8r7l0AvvqmQ2RwMMjywObj2MxrQfcHX2ROozA24HeOEC2mY5IPf9Ve+CrZ8kmLTwxjdStyCuTLXT6Z/FHy9zRKxZRfeTSgcPau4crwSbnPDex1qTNDq0s5JGOy+XbMpF+1Co0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768578220; c=relaxed/simple;
-	bh=/Qu6YYe/IkLdLRCC2+zRX38VFiJNRVMn6Z/Q15FijsU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XMuqNszxJ/opsyigPrvY4UJ4WRti9M4UyC4a4kncMae/wOORwudXLHEpQyfLf9RaL8B1alYKxfUXor6ruCrgcmMA9D9kV7FXG44/LZ2idrW02vG+U19wyOqcN/q7dDVhsbrpj0z0AMvOdOomR8VfTz1VKtK3kyyAGGHfDIcTBbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=SnaIU6ul; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768578344; c=relaxed/simple;
+	bh=7WSELKFHp6tnLIgrq6oiFw1FV3UnkL+8iTtluDZR7sc=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Y6ERGWImFU8xFr5XQJQGM8j1hf2VGL1lCk41HiSd1gyaWltG/gG06cVJRe8U3QN9YCkH9J6mGMGhX81qOvuS9MHyy7QGWrZIY1Z+MRM1CWX2wRA1DQK5wCFk7UM2O8DlpIn7jwL65oy90sPVBdkg+zV+GURO6AjsVLNbBPJuy3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MMCx6cN7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="SnaIU6ul"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C5F6C116C6;
-	Fri, 16 Jan 2026 15:43:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1768578219;
-	bh=/Qu6YYe/IkLdLRCC2+zRX38VFiJNRVMn6Z/Q15FijsU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SnaIU6ul73Iy8njRMl2hUuJ78mv2+XiV4/LiZfPdNyAk+APlFVndcAz5fCWVgfvGc
-	 AVvIGm7Tj2ZygF1lLSKjoWTNhoWMwBW1z3enpdT9AAahCNqbV9mM1WDVG3OCdmNRLz
-	 ObKlJllK7td6Q/hgwlkfGE8aY1YusYef2ePu1eXs=
-Date: Fri, 16 Jan 2026 16:43:37 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: huangchenghai <huangchenghai2@huawei.com>
-Cc: zhangfei.gao@linaro.org, wangzhou1@hisilicon.com,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	fanghao11@huawei.com, shenyang39@huawei.com, liulongfang@huawei.com,
-	qianweili@huawei.com, linwenkai6@hisilicon.com
-Subject: Re: [PATCH v6 0/4] uacce: driver fixes for memory leaks and state
- management
-Message-ID: <2026011627-wreckage-comply-e78a@gregkh>
-References: <20251202061256.4158641-1-huangchenghai2@huawei.com>
- <828e0dcd-ae17-448b-ba33-97603031fc60@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MMCx6cN7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F2DDC4AF09;
+	Fri, 16 Jan 2026 15:45:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768578344;
+	bh=7WSELKFHp6tnLIgrq6oiFw1FV3UnkL+8iTtluDZR7sc=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=MMCx6cN7dNrnLH/xNu8CgWOSBfG8Uoa5Kqown40uDs0upYl7jDDuQ9stc6i6QXjpw
+	 nqlagAGV4b1TG13VtqshOCl+StVDSs5L0CXkKJaHCeNwC3UBgiGbS7Wpn6YieCUgsh
+	 d3rcIY7vyLWFRDCuED+lEY70TA05t16qvx4JYYdDN4aFmF1jof8n5LNVJXzuM+1UdG
+	 +ouPR5doBNdiUrlqQ3tdANOV5YtPcyIIQ5wzjOedXKJ3Qb9OizhRnoWdQDt9eVvAgK
+	 7t8StHHEEQYZ6QLO/bX1NZREz35/k41ymVVrN2r0q+3JN06fBrkNK4N2f2Mk7HrhFB
+	 yvUe9/J65LnwA==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 99274F4006A;
+	Fri, 16 Jan 2026 10:45:42 -0500 (EST)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Fri, 16 Jan 2026 10:45:42 -0500
+X-ME-Sender: <xms:Jl1qaWlQsV4qT_6BeccNOMPmFTfEcTuv2r3ABSKgznaTTn0TDNchZA>
+    <xme:Jl1qaYpmGKprwrgNCgZ2ZBjAkKdnbB8OX-bNfFGuUNTxDYnOscOXhpY1-sS0kJmpG
+    jIzf_GK06Au3x97MRhvs4kLFayjmSmh974dRxgOZn2wPgHnuhbp_5I>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduvdelfeefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
+    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
+    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
+    hilhdrtghomhdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopehnvghilhessghrohifnhdrnhgrmhgvpdhrtghpthhtoheprhhitghkrdhmrg
+    gtkhhlvghmsehgmhgrihhlrdgtohhmpdhrtghpthhtohepsggtohguughinhhgsehhrghm
+    mhgvrhhsphgrtggvrdgtohhmpdhrtghpthhtoheprghnnhgrsehkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopegvsghighhgvghrsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    jhhlrgihthhonheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhrohhnughmhieskh
+    gvrhhnvghlrdhorhhgpdhrtghpthhtoheptghhuhgtkhdrlhgvvhgvrhesohhrrggtlhgv
+    rdgtohhmpdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrkhgvrhhnvg
+    hlrdhorhhg
+X-ME-Proxy: <xmx:Jl1qaTvZ2fkMQR-EctfScCxUpZOlxzAFZ1BBrW7TBhBQhD1lf0hz-Q>
+    <xmx:Jl1qaQTrgUT5AGU3JahY2fApn2bKeArQgX-SlFCQazROCh8wZPrHPQ>
+    <xmx:Jl1qaSLid8wakogek2cXLkN1scoQ53ZK3_GIcvFKbU4BDigWXnnr_w>
+    <xmx:Jl1qabsRPOoU3yF-4XpHxHreG1mX5TJLd2dXP-2h2Jx5NSIOPU9Zkg>
+    <xmx:Jl1qaR8lcHz4-COH-XVFSj_f3CW8GRCtOkQGWDkZPiyLM2axDLa5aEzf>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 7850E780070; Fri, 16 Jan 2026 10:45:42 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <828e0dcd-ae17-448b-ba33-97603031fc60@huawei.com>
+X-ThreadId: AO3h44zqd9zZ
+Date: Fri, 16 Jan 2026 10:45:11 -0500
+From: "Chuck Lever" <cel@kernel.org>
+To: "Jeff Layton" <jlayton@kernel.org>,
+ "Benjamin Coddington" <bcodding@hammerspace.com>,
+ "Chuck Lever" <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
+ "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
+ "Eric Biggers" <ebiggers@kernel.org>, "Rick Macklem" <rick.macklem@gmail.com>
+Cc: linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+Message-Id: <703f29f8-a9e5-4947-9d93-a3cbde5cbdcc@app.fastmail.com>
+In-Reply-To: <3c5af19d8793c34022bde2cb7fcca1855d1ea080.camel@kernel.org>
+References: <cover.1768573690.git.bcodding@hammerspace.com>
+ <c49d28aade36c044f0533d03b564ff65e00d9e05.1768573690.git.bcodding@hammerspace.com>
+ <3db40beb64cb3663d9e8c83f498557bf8fbc0924.camel@kernel.org>
+ <3fc1c84e-3f0b-4342-9034-93e7fb441756@app.fastmail.com>
+ <3c5af19d8793c34022bde2cb7fcca1855d1ea080.camel@kernel.org>
+Subject: Re: [PATCH v1 2/4] nfsd: Add a key for signing filehandles
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 06, 2026 at 10:38:46AM +0800, huangchenghai wrote:
-> Kindly ping for this fix.
-> 
 
-Sorry for the delay, looks good, now queued up!
 
-greg k-h
+On Fri, Jan 16, 2026, at 10:25 AM, Jeff Layton wrote:
+> On Fri, 2026-01-16 at 10:09 -0500, Chuck Lever wrote:
+>> 
+>> On Fri, Jan 16, 2026, at 9:59 AM, Jeff Layton wrote:
+>> > On Fri, 2026-01-16 at 09:32 -0500, Benjamin Coddington wrote:
+>> > > Expand the nfsd_net to hold a siphash_key_t value "fh_key".
+>> > > 
+>> > > Expand the netlink server interface to allow the setting of the 128-bit
+>> > > fh_key value to be used as a signing key for filehandles.
+>> > > 
+>> > > Add a file to the nfsd filesystem to set and read the 128-bit key,
+>> > > formatted as a uuid.
+>> > > 
+>> > > Signed-off-by: Benjamin Coddington <bcodding@hammerspace.com>
+>> > > ---
+>> > >  Documentation/netlink/specs/nfsd.yaml | 12 ++++
+>> > >  fs/nfsd/netlink.c                     | 15 +++++
+>> > >  fs/nfsd/netlink.h                     |  1 +
+>> > >  fs/nfsd/netns.h                       |  2 +
+>> > >  fs/nfsd/nfsctl.c                      | 85 +++++++++++++++++++++++++++
+>> > >  fs/nfsd/trace.h                       | 19 ++++++
+>> > >  include/uapi/linux/nfsd_netlink.h     |  2 +
+>> > >  7 files changed, 136 insertions(+)
+>> > > 
+>> > > diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netlink/specs/nfsd.yaml
+>> > > index badb2fe57c98..a467888cfa62 100644
+>> > > --- a/Documentation/netlink/specs/nfsd.yaml
+>> > > +++ b/Documentation/netlink/specs/nfsd.yaml
+>> > > @@ -81,6 +81,9 @@ attribute-sets:
+>> > >        -
+>> > >          name: min-threads
+>> > >          type: u32
+>> > > +      -
+>> > > +        name: fh-key
+>> > > +        type: binary
+>> > >    -
+>> > >      name: version
+>> > >      attributes:
+>> > > @@ -227,3 +230,12 @@ operations:
+>> > >            attributes:
+>> > >              - mode
+>> > >              - npools
+>> > > +    -
+>> > > +      name: fh-key-set
+>> > > +      doc: set encryption key for filehandles
+>> > > +      attribute-set: server
+>> > > +      flags: [admin-perm]
+>> > > +      do:
+>> > > +        request:
+>> > > +          attributes:
+>> > > +            - fh-key
+>> > 
+>> > Rather than a new netlink operation, I think we might be better served
+>> > with just sending the fh-key down as an optional attribute in the
+>> > "threads" op. It's a per-netns attribute anyway, and the threads
+>> > setting is handled similarly.
+>> 
+>> Setting the FH key in the threads op seems awkward to me.
+>> Setting a key is optional, but you always set the thread
+>> count to start the server.
+>> 
+>> Key setting is done once; whereas setting the thread count
+>> can be done many times during operation. It seems like it
+>> would be easy to mistakenly change the key when setting the
+>> thread count.
+>> 
+>> From a "UI safety" perspective, a separate op makes sense
+>> to me.
+>> 
+>
+> I'm not convinced. We could easily vet that the key doesn't change when
+> changing the thread count, and either return an error or throw some
+> sort of warning and ignore the change.
+>
+> My main thinking here is that you'd want to set up the key at startup
+> time and never change it, so if the server is already running you
+> probably want to reject key changes -- otherwise you may have already
+> given out some unencrypted handles.
+>
+> If that's the case, then now you have to ensure you run the op to set
+> the key before issuing "threads".
+>
+> Why deal with an ordering constraint like that? Optionally passing down
+> the key with "threads" means we handle it all in one shot.
+
+We already configure listeners and threads in separate operations.
+The ordering is managed. It's reasonable for the kernel to block
+fh_key changes while the NFS server is in operation.
+
+I'd much rather set a precedent of several small ops rather than
+one or two Swiss army knives.
+
+
+>> What feels a little strange though is where to store the
+>> key? I was thinking in /etc/exports, but that would make
+>> the FH key per-export rather than per-server instance.
+>> 
+>> That gives a cryptographic benefit, as there would be
+>> more keying material. But maybe it doesn't make a lot of
+>> sense from a UX perspective.
+>> 
+>> On the other hand, some might like to manage the key by
+>> storing it in a trusted compute module -- systemd has
+>> a facility to extract keys from a TCM.
+>> 
+>
+> Yeah, there are a lot of possibilities here. I like the idea of
+> scraping this out of the TPM, but that's not going to be possible
+> everywhere. We'll also need some alternate method of storing the key in
+> a secure way on the fs so that nfsdctl can get to it for hosts that
+> don't have a TPM.
+
+My point is none of this has anything to do with thread count.
+Setting the fh_key needs to be a distinct UI element.
+
+-- 
+Chuck Lever
