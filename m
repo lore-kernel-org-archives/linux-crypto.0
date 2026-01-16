@@ -1,46 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BACB34C12B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7E134B43D;
 	Fri, 16 Jan 2026 06:05:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768543505; cv=none; b=ALdI5b0sP++Ej5NiPCmdZu6IDTtZC8f62e2dUNNgVaYQ9c2i9x5C1B/EiqISMhSu66JV8fKj2b1cwx/phzLB7EbGMbI+LkIkEX8WwLJqlgUbC+yCG4AUpbCdBauvF2EB5TH6X/mP/cK4pUKvxaPh/CsMXdoEn/El8w8qmp227xE=
+	t=1768543506; cv=none; b=AgHP22Io8wMeGkxS7SOm+/VuCpk1xQ/UzTgtqree+bycKSro+vDxLE+xzS7firIOx4XHnIh922/zbHhFbAuD/Aznyx33MJDxYAxl42hnX5qHqCnFAJCVsNTrAeGGmji9/43QF2Hgn0sBnBnz1/sYUZImtQ/gZ2bbFOovEbzGZBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768543505; c=relaxed/simple;
-	bh=FN+aCEE1iL9vdrvoKuxmZpihrD+8k45ikhQ9R6hm4Sw=;
+	s=arc-20240116; t=1768543506; c=relaxed/simple;
+	bh=IqQle2c3cLnajUOmPP3yALG8YwDQmxF7C6hk7yOpfoA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qrnnon14D/r9ZDYfeP+ksIwqFHIiVWG3PkRufALTZrKyAij+hSJgpCPA/FTo52XkeDlv28rwH6UyaZRbmwvy+atAhEZ46bdX8fxES3h6fY9M+KnfKiDT3Tr7IMC9Qu0fJ0O7/aYFdATRaI+7EZBzV/cZI0LfoV+kSLMjKa9nLIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=k5YMD7Yc; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=JSEShI3+gIO1rl6AP89S5s61bApFOb6Z9jruljgIwMvgQPNa0zP8az1fZhV+EiSYy/NbMGmAoy8ctIkFMmNE0hFJZi0UE2/2+/toM7IKQNfXgg+8y3sX0xekEtqrnEkEvVMGR0PICP1yxEzz7Bn0dtgV/IO9/SHIvPQC8q7gUnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=UdvLe9Iq; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="k5YMD7Yc"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="UdvLe9Iq"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=FpAwuq56UqWz07ahsm2U5uuWNsHxpefhN/wuvpIhlCY=; 
-	b=k5YMD7YcY21vXPmiZlH7WYkSzCjFleD0zlIRR9tnG7ILWjVpuE7ATrCdzc+JrrNrodEs+2Xd/7s
-	oKaSkhCS2EdUDb4HIyh+sNN2VWzN83XMQammDxn3Xqt+tcsW5gEAk/3RJ7WnHgQbe8PxNPRDMzJI7
-	iUf3ZZB5Qq5s0Qbr3DL5AU7oFgHNIohlYbN72PPS827kQaQW6w9YCYp8rElfJVXHaEgz9bCQOi0y9
-	N8u70p5KfbFPTnPNT2HVX2uqWdfpUX7bmaxT/MLeMxQns6M6YjNVazWieJyb9x3yuQTu9OL0LSIIl
-	cNKX1ruVTndJbTof8Y2ohqbeRlaKCmcGvMnw==;
+	from:content-type:reply-to; bh=0ZyB5zAD9FMNH022ny69PadGUOzgneEmsRQhRBlpFjU=; 
+	b=UdvLe9IqAdgcZqWxQEPDvxjApYxVgKox6gukwm7TYfI2CTTOSfQDksYn3NxxF7PA369TX7XPLpM
+	bqCS1/2c4cUyvz/QzbDUOC7j9lk/gEGZv7LdBjGJNXDiUfxuzyREwAWodTDt3fOWtm914ZD8ppWrs
+	Vpvrh9UdaUjTObr/mz6o+TG/YvJOIF9W4F4MOBygiO+8uC/RihIPuzx3oUfmofAvIg5f2vRZh/Kv9
+	Sr6qE0rbowsG2vBEst/I29aVhHoqxTe+757ta6RzepkoP8sCHItJKtmpYBtz0jqUmEnygh9QEwDuA
+	0XBwcV0lyiveeFXJfHl6/gLnRrAnP8gWgBHg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vgcx6-00HDMw-0t;
-	Fri, 16 Jan 2026 14:04:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Jan 2026 14:04:56 +0800
-Date: Fri, 16 Jan 2026 14:04:56 +0800
+	id 1vgcwz-00HDMs-0F;
+	Fri, 16 Jan 2026 14:04:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Jan 2026 14:04:49 +0800
+Date: Fri, 16 Jan 2026 14:04:49 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Thomas Fourier <fourier.thomas@gmail.com>
-Cc: Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
+Cc: George Cherian <gcherian@marvell.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Lukasz Bartosik <lbartosik@marvell.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: marvell: fix dma_free_coherent() size
-Message-ID: <aWnVCF78G3ZMlHER@gondor.apana.org.au>
-References: <20251218101259.47931-2-fourier.thomas@gmail.com>
+	David Daney <david.daney@cavium.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: cavium: fix dma_free_coherent() size
+Message-ID: <aWnVAavYGnsLHUCD@gondor.apana.org.au>
+References: <20251218095647.45214-2-fourier.thomas@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,17 +48,17 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251218101259.47931-2-fourier.thomas@gmail.com>
+In-Reply-To: <20251218095647.45214-2-fourier.thomas@gmail.com>
 
-On Thu, Dec 18, 2025 at 11:12:57AM +0100, Thomas Fourier wrote:
+On Thu, Dec 18, 2025 at 10:56:45AM +0100, Thomas Fourier wrote:
 > The size of the buffer in alloc_command_queues() is
-> curr->size + OTX_CPT_NEXT_CHUNK_PTR_SIZE, so used that length for
+> curr->size + CPT_NEXT_CHUNK_PTR_SIZE, so used that length for
 > dma_free_coherent().
 > 
-> Fixes: 10b4f09491bf ("crypto: marvell - add the Virtual Function driver for CPT")
+> Fixes: c694b233295b ("crypto: cavium - Add the Virtual Function driver for CPT")
 > Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
 > ---
->  drivers/crypto/marvell/octeontx/otx_cptvf_main.c | 3 ++-
+>  drivers/crypto/cavium/cpt/cptvf_main.c | 3 ++-
 >  1 file changed, 2 insertions(+), 1 deletion(-)
 
 Patch applied.  Thanks.
