@@ -1,169 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA763A1E60;
-	Fri, 16 Jan 2026 19:44:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4315C1FECCD;
+	Fri, 16 Jan 2026 19:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768592642; cv=none; b=Kv+uOzZSR5F3A03mycgAdVG+l7TASU5heHm0XQlhch2cNSnr7byFU9DNLtuoxWClkUwylxOkdplMVKpB3dOT5KUGk77X5Xickb143t/ZIUfX6vIpE9fd3t4eg2c0dOOUE14Kfmw/7juyvHO+WolPkc8YSNFyD3YrKnDwc3xY0m4=
+	t=1768592652; cv=none; b=jhWP0Zd7mE7LSYCe6ZNJOotEIu3AKtmHW86kOw+pzo0/A6sWS4nC4mLnmjgxIrV8HCEuziajUzodJhGOfLjF/MzTzZGtdgPaUT683sbu3DFu0C2YNtP+nA/+2kTzIfvfFudCMRT6haQ7Ru1dYHgMNC9QJL5lbGcENg8vaVjzAXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768592642; c=relaxed/simple;
-	bh=fowYOJgvzlLvh5gpFBgGukEbk2TOO3O7OzynWJwjMOM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jLqjrb+BFFPekZW2Emgu3IN6QMv0KB9KAveK2L8fgl2mV+BX/3QMlJYd+DXkpzJ1hxn/hHQuk3TmBvl9kFbD074SBAmifKE17Mfaje747orhIp/MEncA/CIb4g7JjucYqzVgiX+B/59+iKZHQExWp/z1bb+rHUn1/38usHHfQng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P7qWBHHL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768592652; c=relaxed/simple;
+	bh=Omo0RXYhCnccplhQW3URwXnzE3b3CBtbpp/2JUWXAqk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CmNv7zffumnqGnncBJa17M2DAirOsR3szK1l58uCveBnzllwALRYEhVtPXFyvxpiKJhLKA/CrvBDjWh8el2gNwqlO1pzSoD/jk4lvrs9ibDOBXhmTUphZC23A34UZ3G8t++1Exy7qlECaQH6et6c+LE6nd6566X/qlfaeWK9/O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WwjFVDgP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P7qWBHHL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E871C19422;
-	Fri, 16 Jan 2026 19:44:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WwjFVDgP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAC68C116C6;
+	Fri, 16 Jan 2026 19:44:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768592642;
-	bh=fowYOJgvzlLvh5gpFBgGukEbk2TOO3O7OzynWJwjMOM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=P7qWBHHLohHNVLhF4wKxbIwjBh4GFRad1Y4i0CrXocC7IIB56DGhI0skdKR/DPTC4
-	 iYgI7aLccgOlmYb79Y2NctD/2IncTgcXy1PlBGtEEDwMxDn0ZFi9T2oCkqnlku0Tqn
-	 7WPVheWI3Y1GeHVpLQPo+FDP9Zh+m4nt5OdWC9Sr4P4WyYkdJkrdOwF/7/fqOxnY0M
-	 e9RRXyDPYeZkflUY+DMJrLd45kTY0BtzPiCwjq0Er7qV0GZ8aAYLmNoCw/AGY8ryls
-	 ZwiT3mEyftUf5V0aoFDaPcyUan5TzxS/GhVQpLjA+727OFMMMZu/Id6k+SH3OajIMV
-	 LWNrgyfeDtoyg==
-Message-ID: <683798bf-b7f3-4418-99ce-b15b0788c960@kernel.org>
-Date: Fri, 16 Jan 2026 14:43:50 -0500
+	s=k20201202; t=1768592652;
+	bh=Omo0RXYhCnccplhQW3URwXnzE3b3CBtbpp/2JUWXAqk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WwjFVDgPVRIMNnaevrZ+su2DGugj9D1zoam9A7/hCg0XSMHl3zndPIwxDzv3mbx8e
+	 ueO6OeHYrE8DVu3Nm1NtA0RfbjG1sSto1J1huKrIm4PJ1X0ZUGBBnGeT7HEirRrBcN
+	 W5iNsz9sC/FviwiB/ZoI+7wULogKCy9kJXPmhGJPKoSOpxpDoIAB4e5XT9pPBT1tDY
+	 0ngWrqT0YpulwQyFKRaRciTvqKs8JjF5oWosg0tm0EgLTI9KqZtf8XMt15K645vhtS
+	 zbR/nArq2l0BBej7r18iTaGXpF1yp6xbSXoCc0uCl7eZ+zfJfXpVBKDBLJq1c3JrET
+	 vgNpEtm4jHlQA==
+Date: Fri, 16 Jan 2026 19:44:10 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Holger Dengler <dengler@linux.ibm.com>
+Cc: David Laight <david.laight.linux@gmail.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v1 1/1] lib/crypto: tests: Add KUnit tests for AES
+Message-ID: <20260116194410.GA1398962@google.com>
+References: <20260115183831.72010-1-dengler@linux.ibm.com>
+ <20260115183831.72010-2-dengler@linux.ibm.com>
+ <20260115204332.GA3138@quark>
+ <20260115220558.25390c0e@pumpkin>
+ <389595e9-e13a-42e3-b0ff-9ca0dd3effe3@linux.ibm.com>
+ <20260116183744.04781509@pumpkin>
+ <2d5c7775-de20-493d-88cc-011d2261c079@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/4] kNFSD Signed Filehandles
-To: Benjamin Coddington <bcodding@hammerspace.com>
-Cc: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- NeilBrown <neil@brown.name>, Trond Myklebust <trondmy@kernel.org>,
- Anna Schumaker <anna@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
- Rick Macklem <rick.macklem@gmail.com>, linux-nfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <cover.1768573690.git.bcodding@hammerspace.com>
- <f8e2d466-7280-4a21-ad71-21bf1e546300@app.fastmail.com>
- <C69B1F13-7248-4CAF-977C-5F0236B0923A@hammerspace.com>
-Content-Language: en-US
-From: Chuck Lever <cel@kernel.org>
-Organization: kernel.org
-In-Reply-To: <C69B1F13-7248-4CAF-977C-5F0236B0923A@hammerspace.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2d5c7775-de20-493d-88cc-011d2261c079@linux.ibm.com>
 
-On 1/16/26 12:17 PM, Benjamin Coddington wrote:
-> On 16 Jan 2026, at 11:56, Chuck Lever wrote:
+On Fri, Jan 16, 2026 at 08:20:51PM +0100, Holger Dengler wrote:
+> >> The benchmark loops for 100 iterations now without any warm-up. In each
+> >> iteration, I measure a single aes_encrypt()/aes_decrypt() call. The lowest
+> >> value of these measurements is takes as the value for the bandwidth
+> >> calculations. Although it is not necessary in my environment, I'm doing all
+> >> iterations with preemption disabled. I think, that this might help on other
+> >> platforms to reduce the jitter of the measurement values.
+> >>
+> >> The removal of the warm-up does not have any impact on the numbers.
+> > 
+> > I'm not sure what the 'warm-up' was for.
+> > The first test will be slow(er) due to I-cache misses.
+> > (That will be more noticeable for big software loops - like blake2.)
+> > Change to test parameters can affect branch prediction but that also only
+> > usually affects the first test with each set of parameters.
+> > (Unlikely to affect AES, but I could see that effect when testing
+> > mul_u64_u64_div_u64().)
+> > The only other reason for a 'warm-up' is to get the cpu frequency fast
+> > and fixed - and there ought to be a better way of doing that.
+
+The warm-up loops in the existing benchmarks are both for cache warming
+and to get the CPU frequency fast and fixed.  It's not anything
+sophisticated, but rather just something that's simple and seems to
+works well enough across CPUs without depending on any special APIs.  If
+your CPU doesn't do much frequency scaling, you may not notice a
+difference, but other CPUs may need it.
+
+> >> I also did some tests with IRQs disabled (instead of only preemption), but the
+> >> numbers stay the same. So I think, it is save enough to stay with disables
+> >> preemption.
+> > 
+> > I'd actually go for disabling interrupts.
+> > What you are seeing is the effect of interrupts not happening
+> > (which is likely for a short test, but not for a long one).
 > 
->> On Fri, Jan 16, 2026, at 9:32 AM, Benjamin Coddington wrote:
->>> The following series enables the linux NFS server to add a Message
->>> Authentication Code (MAC) to the filehandles it gives to clients.  This
->>> provides additional protection to the exported filesystem against filehandle
->>> guessing attacks.
->>>
->>> Filesystems generate their own filehandles through the export_operation
->>> "encode_fh" and a filehandle provides sufficient access to open a file
->>> without needing to perform a lookup.  An NFS client holding a valid
->>> filehandle can remotely open and read the contents of the file referred to
->>> by the filehandle.
->>
->> "open, read, or modify the contents of the file"
->>
->> Btw, referring to "open" here is a little confusing, since NFSv3 does
->> not have an on-the-wire OPEN operation. I'm not sure how to clarify.
->>
->>
->>> In order to acquire a filehandle, you must perform lookup operations on the
->>> parent directory(ies), and the permissions on those directories may
->>> prohibit you from walking into them to find the files within.  This would
->>> normally be considered sufficient protection on a local filesystem to
->>> prohibit users from accessing those files, however when the filesystem is
->>> exported via NFS those files can still be accessed by guessing the correct,
->>> valid filehandles.
->>
->> Instead: "an exported file can be accessed whenever the NFS server is
->> presented with the correct filehandle, which can be guessed or acquired
->> by means other than LOOKUP."
->>
->>
->>> Filehandles are easy to guess because they are well-formed.  The
->>> open_by_handle_at(2) man page contains an example C program
->>> (t_name_to_handle_at.c) that can display a filehandle given a path.  Here's
->>> an example filehandle from a fairly modern XFS:
->>>
->>> # ./t_name_to_handle_at /exports/foo
->>> 57
->>> 12 129    99 00 00 00 00 00 00 00 b4 10 0b 8c
->>>
->>>           ^---------  filehandle  ----------^
->>>           ^------- inode -------^ ^-- gen --^
->>>
->>> This filehandle consists of a 64-bit inode number and 32-bit generation
->>> number.  Because the handle is well-formed, its easy to fabricate
->>> filehandles that match other files within the same filesystem.  You can
->>> simply insert inode numbers and iterate on the generation number.
->>> Eventually you'll be able to access the file using open_by_handle_at(2).
->>> For a local system, open_by_handle_at(2) requires CAP_DAC_READ_SEARCH, which
->>> protects against guessing attacks by unprivileged users.
->>>
->>> In contrast to a local user using open_by_handle(2), the NFS server must
->>> permissively allow remote clients to open by filehandle without being able
->>> to check or trust the remote caller's access.
+> Ok, I'll send the next series with IRQ disabled. I don't see any difference on
+> my systems.
 
-Btw, "allow ... clients to open by filehandle" is another confusion.
+Some architectures don't allow vector registers to be used when IRQs are
+disabled.  On those architectures, disabling IRQs would always trigger
+the fallback to the generic code, which would make the benchmark not
+very useful.  That's why I've only been disabling preemption, not IRQs.
 
-NFSv4 OPEN does do access checking and authorization.
-
-Again, it's NFS READ and WRITE that are not blocked.
-
-NFSv3 READ and WRITE do an intrinsic open.
-
-NFSv4 READ and WRITE permit the use of a special stateid so that an OPEN
-isn't necessary to do the I/O (IIRC).
-
-
->>> Therefore additional
->>> protection against this attack is needed for NFS case.  We propose to sign
->>> filehandles by appending an 8-byte MAC which is the siphash of the
->>> filehandle from a key set from the nfs-utilities.  NFS server can then
->>> ensure that guessing a valid filehandle+MAC is practically impossible
->>> without knowledge of the MAC's key.  The NFS server performs optional
->>> signing by possessing a key set from userspace and having the "sign_fh"
->>> export option.
->>
->> OK, I guess this is where I got the idea this would be an export option.
->>
->> But I'm unconvinced that this provides any real security. There are
->> other ways of obtaining a filehandle besides guessing, and nothing
->> here suggests that guessing is the premier attack methodology.
-> 
-> Help me understand you - you're unconvinced that having the server sign
-> filehandles and verify filehandles prevents clients from fabricating valid
-> ones?
-
-The rationale provided here doesn't convince me that fabrication is the
-biggest threat and will give us the biggest bang for our buck if it is
-mitigated.
-
-In order to carry out this attack, the attacker has to have access to
-the filehandles on an NFS client to examine them. She has to have
-access to a valid client IP address to send NFS requests from. Maybe
-you can bridge the gap by explaining how a /non-root/ user on an NFS
-client might leverage FH fabrication to gain access to another user's
-files. I think only the root user has this ability.
-
-I've also tried to convince myself that cryptographic FH validation
-could mitigate misdirected WRITEs or READs. An attacker could replace
-the FH in a valid NFS request, for example, or a client might send
-garbage in an FH. I'm not sure those are real problems, though.
-
-I am keeping in mind that everything here is using AUTH_SYS anyway, so
-maybe I'm just an old man yelling at a cloud. Nothing here is blocking
-yet, but I want the feature to provide meaningful value (as I think you
-do).
-
-Thank you for bearing with me.
-
-
--- 
-Chuck Lever
+- Eric
