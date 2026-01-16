@@ -1,136 +1,107 @@
-Received: from mx1.zhaoxin.com (MX1.ZHAOXIN.COM [210.0.225.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E20F30AD13
-	for <linux-crypto@vger.kernel.org>; Fri, 16 Jan 2026 07:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.0.225.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7239E2D47F4
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Jan 2026 07:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768547930; cv=none; b=S7y/Jt22yV/1dU5G5gE0uzCUrmD+hdujpF7mkM50Qo+Vna9X7TquTMxT+9WdyDHQY3oV/pZ2RROaqwfijZXQ8q7oGoOI6BXY6KqVBUfjRVqBWIEoe3FXtB3Ir0tvpdVi+nuscU2nF/Axzaf0bRLMx9FongDxYSOXWdvOEIX9ymQ=
+	t=1768548145; cv=none; b=ojVtJsOuQIJYg+1RxGokd0M9QE8JdS6QK5sphvHciIjKFzR+vrivMw5X1jyn3uatwrrad+YX9UdeLPhpxJNCwnasamqbb44zY2E4thRXHxXs5g4uZxcanIs4AEr/wMVQVkaKBsMczDYO6sZjRgtpCeIKFRkwJ0Ksm14WZBrXy0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768547930; c=relaxed/simple;
-	bh=zpMjvvLJ7dls+Bl/nwUOdIQyIXVvMfpL6hgos2ZRr0k=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XlBYSqFbPzpQz5T9ygDvlkaGaUYFxDqd8GxL/IdlVh2XcREYtktolGbMtcf/ZIN5u63Lbw2/hGbqEv8Adrhtz+zqx0E9nqxIhMX5CYfHPSidm3pesSRuOQjRtpStA8wkjLp5f7NhTK+ob8nzF5fbqMqkVNZHyOEMlKU70wFBzLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=210.0.225.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1768547908-086e2306f621770001-Xm9f1P
-Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx1.zhaoxin.com with ESMTP id bFvG41esLxIymw6P (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Fri, 16 Jan 2026 15:18:28 +0800 (CST)
-X-Barracuda-Envelope-From: AlanSong-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
-Received: from ZXSHMBX1.zhaoxin.com (10.28.252.163) by ZXSHMBX3.zhaoxin.com
- (10.28.252.165) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.59; Fri, 16 Jan
- 2026 15:18:28 +0800
-Received: from ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85]) by
- ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85%7]) with mapi id
- 15.01.2507.059; Fri, 16 Jan 2026 15:18:28 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
-Received: from DESKTOP-A4I8D8T.zhaoxin.com (10.32.65.156) by
- ZXBJMBX02.zhaoxin.com (10.29.252.6) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.59; Fri, 16 Jan 2026 15:17:00 +0800
-From: AlanSong-oc <AlanSong-oc@zhaoxin.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<ebiggers@kernel.org>, <Jason@zx2c4.com>, <ardb@kernel.org>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<x86@kernel.org>
-CC: <CobeChen@zhaoxin.com>, <TonyWWang-oc@zhaoxin.com>, <YunShen@zhaoxin.com>,
-	<GeorgeXue@zhaoxin.com>, <LeoLiu-oc@zhaoxin.com>, <HansHu@zhaoxin.com>,
-	AlanSong-oc <AlanSong-oc@zhaoxin.com>
-Subject: [PATCH v3 3/3] lib/crypto: x86/sha256: PHE Extensions optimized SHA256 transform function
-Date: Fri, 16 Jan 2026 15:15:13 +0800
-X-ASG-Orig-Subj: [PATCH v3 3/3] lib/crypto: x86/sha256: PHE Extensions optimized SHA256 transform function
-Message-ID: <20260116071513.12134-4-AlanSong-oc@zhaoxin.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260116071513.12134-1-AlanSong-oc@zhaoxin.com>
-References: <20260116071513.12134-1-AlanSong-oc@zhaoxin.com>
+	s=arc-20240116; t=1768548145; c=relaxed/simple;
+	bh=ZoZCxIZIxuNG7iiq7ouEpN8AOaGaswIYZVOM5BEKY0g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jGQ5b8rp9pYLxxiEE1+dYjIlbIk3qB1Gp+qt/0gQxomob2RCNxENep8WgwxuJgOCXW0duhbAIhpW00HRL+dpfaHBix3GpshseLVj0KVx38XZnr/Wl03PC6PYlRmL0z3NLxoYwQsvMG4cXOETj7H9VkWrbhLS+REAYYW769zcCLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=DOz03dJJ; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="DOz03dJJ"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-43284ed32a0so920330f8f.3
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Jan 2026 23:22:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1768548141; x=1769152941; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W95GN1V+oZI3tCyhJrWoqvfYp2X9bfUg8CvoDb5FSAs=;
+        b=DOz03dJJJrHhANTzRWfRIwG4CLx0lVlmsIjqaVXIAMhwfUkQMzxluDIvnt6G5tZvZr
+         4c0dlJQT35H7vKeQ2kACS7kFyjHOCBRMDhEqHMGjvAHO3J/KXmEMGQKVzcuA8Tkh5u4v
+         iSdLnjY0HoFbhIx7+jU9y4jcsGD5y9+L4A9Rbbfwe9Oajkr9Uy/QAO6wftMa4FTKMWiv
+         Xr2onvXDgcKQNOVRRMi3T/uSAL+HyazSQJuk5cqWgDP+C85At8mPoVxlZUnJY2INJNn6
+         NZOLFZwP31nUoRTSEM/hLvbT2rEi9re57qBnGAEmHczkC9DApHPsTcrZS0p+KjQiDy4r
+         ffNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768548141; x=1769152941;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W95GN1V+oZI3tCyhJrWoqvfYp2X9bfUg8CvoDb5FSAs=;
+        b=g2b3pU1nG87zHwMukTCh370Lug6UKAf3L1B1mxg33v05BgYNyDI3HeaDG0o8Hi1tNn
+         2dVKGYu9CR3vfmKhisi/UPfXsruMhR4dCUhlawBp+XbhhHG/hR6Q7YWa4aHaZ9hRU73n
+         XI1Bpt/Qn0iDvwcA5YZAbUprhd8nThN6XXmfPrcM9GydI+4w7/uAIiCqoZPYr6n9i2l/
+         nB0EH4LbUPoM2DLdFo8PzmRsCqS4XgZKbAvOmJrOKf72KXwUXNxF4C7p0ckH4fZqR4bx
+         oGgm58BNWNNjRv2fiksJLjDH6yfjm1ftXtwEosd1yTYnZZN8Fa7qy6l/80zOtUZM2quW
+         wMIA==
+X-Forwarded-Encrypted: i=1; AJvYcCVjP628UU29yHZcfPjhRb4HsGq0GHg8ifLgdYZNyOp4HnVLT6aDZRQJ/nOA2b+GqAEyYyrjG+0oS982zCQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOBRF2tqwAiirexKWVAt/IzcfF003L03pwWkzwGCrDuRdrOzJM
+	O/FPLqbM6t9dBJ1QwuDqSrws8nR7QrMUg3DgT8gmZlnDTp0GZVCcyub3BwR3tA1aqkc=
+X-Gm-Gg: AY/fxX4RtYl6SIMt7LZBGgbDQYCGPJxLpyYGJJB7F5eYMQPETsijsEA9WHlDDqiodTK
+	0marhJo+AdtmkSbLMNnQe6aJGiJRV0AMIISg58xld54LrunYGLHiPAnhNkX8/RqLo+xIvNrIpbq
+	M5U15OZTuCBJ6oBebf7o3OVSduV/XXEFW28Af9rrdN4eW4avDLihD0JFLMfTJ/S/d3ssK5zpThD
+	h/84ncq3byCcIbRkfgrEE/5VLYWyG1AYXk9qkHIde4yhv6tErSHg/h3G5gPIUo7hQa/+3wgi6G5
+	nACg52XrPD2FkrHRXzSjdBbMXoL0iLSfD8ls+jZtLc6XtN1sgGWNBBjXvoNcyn/c9sXuTItqJgC
+	eASqAvEFNYQsa4IF+U3jParE86LFn92q1eiqexnHSMosyhLTUygEZ66gxfXhksJjTp+nB2LtYZb
+	FragMb9h0QC+rOJQb6Yw==
+X-Received: by 2002:a5d:5d81:0:b0:431:752:672b with SMTP id ffacd0b85a97d-4356998a823mr1864994f8f.14.1768548140696;
+        Thu, 15 Jan 2026 23:22:20 -0800 (PST)
+Received: from [10.31.13.216] ([82.77.28.160])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435699982aasm3496749f8f.42.2026.01.15.23.22.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jan 2026 23:22:20 -0800 (PST)
+Message-ID: <40b636b3-b1d3-4c67-bbfd-6f41a5b0b290@tuxon.dev>
+Date: Fri, 16 Jan 2026 09:22:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
- ZXBJMBX02.zhaoxin.com (10.29.252.6)
-X-Moderation-Data: 1/16/2026 3:18:27 PM
-X-Barracuda-Connect: ZXSHMBX3.zhaoxin.com[10.28.252.165]
-X-Barracuda-Start-Time: 1768547908
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://mx2.zhaoxin.com:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 2262
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.153109
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 07/11] arm64: dts: microchip: add LAN969x clock header
+ file
+To: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com,
+ alexandre.belloni@bootlin.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net, lee@kernel.org, andrew+netdev@lunn.ch,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
+ UNGLinuxDriver@microchip.com, linusw@kernel.org, olivia@selenic.com,
+ richard.genoud@bootlin.com, radu_nicolae.pirea@upb.ro,
+ gregkh@linuxfoundation.org, richardcochran@gmail.com,
+ horatiu.vultur@microchip.com, Ryan.Wanner@microchip.com,
+ tudor.ambarus@linaro.org, kavyasree.kotagiri@microchip.com,
+ lars.povlsen@microchip.com, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
+ linux-serial@vger.kernel.org
+Cc: luka.perkov@sartura.hr
+References: <20260115114021.111324-1-robert.marko@sartura.hr>
+ <20260115114021.111324-8-robert.marko@sartura.hr>
+Content-Language: en-US
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <20260115114021.111324-8-robert.marko@sartura.hr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Zhaoxin CPUs have implemented the SHA(Secure Hash Algorithm) as its CPU
-instructions by PHE(Padlock Hash Engine) Extensions, including XSHA1,
-XSHA256, XSHA384 and XSHA512 instructions.
 
-With the help of implementation of SHA in hardware instead of software,
-can develop applications with higher performance, more security and more
-flexibility.
 
-This patch includes the XSHA256 instruction optimized implementation of
-SHA-256 transform function.
+On 1/15/26 13:37, Robert Marko wrote:
+> LAN969x uses hardware clock indexes, so document theses in a header to make
+> them humanly readable.
+> 
+> Signed-off-by: Robert Marko<robert.marko@sartura.hr>
 
-Signed-off-by: AlanSong-oc <AlanSong-oc@zhaoxin.com>
----
- lib/crypto/x86/sha256.h | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
-
-diff --git a/lib/crypto/x86/sha256.h b/lib/crypto/x86/sha256.h
-index 38e33b22a..70b68bad0 100644
---- a/lib/crypto/x86/sha256.h
-+++ b/lib/crypto/x86/sha256.h
-@@ -31,6 +31,26 @@ DEFINE_X86_SHA256_FN(sha256_blocks_avx, sha256_transform=
-_avx);
- DEFINE_X86_SHA256_FN(sha256_blocks_avx2, sha256_transform_rorx);
- DEFINE_X86_SHA256_FN(sha256_blocks_ni, sha256_ni_transform);
-=20
-+#if IS_ENABLED(CONFIG_CPU_SUP_ZHAOXIN)
-+#define PHE_ALIGNMENT 16
-+static void sha256_blocks_phe(struct sha256_block_state *state,
-+			     const u8 *data, size_t nblocks)
-+{
-+	/*
-+	 * XSHA256 requires %edi to point to a 32-byte, 16-byte-aligned
-+	 * buffer on Zhaoxin processors.
-+	 */
-+	u8 buf[32 + PHE_ALIGNMENT - 1];
-+	u8 *dst =3D PTR_ALIGN(&buf[0], PHE_ALIGNMENT);
-+
-+	memcpy(dst, state, SHA256_DIGEST_SIZE);
-+	asm volatile(".byte 0xf3,0x0f,0xa6,0xd0"
-+			: "+S"(data), "+D"(dst)
-+			: "a"((long)-1), "c"(nblocks));
-+	memcpy(state, dst, SHA256_DIGEST_SIZE);
-+}
-+#endif /* CONFIG_CPU_SUP_ZHAOXIN */
-+
- static void sha256_blocks(struct sha256_block_state *state,
- 			  const u8 *data, size_t nblocks)
- {
-@@ -79,6 +99,11 @@ static void sha256_mod_init_arch(void)
- 	if (boot_cpu_has(X86_FEATURE_SHA_NI)) {
- 		static_call_update(sha256_blocks_x86, sha256_blocks_ni);
- 		static_branch_enable(&have_sha_ni);
-+#if IS_ENABLED(CONFIG_CPU_SUP_ZHAOXIN)
-+	} else if (boot_cpu_has(X86_FEATURE_PHE_EN)) {
-+		if (boot_cpu_data.x86 >=3D 0x07)
-+			static_call_update(sha256_blocks_x86, sha256_blocks_phe);
-+#endif
- 	} else if (cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
- 				     NULL) &&
- 		   boot_cpu_has(X86_FEATURE_AVX)) {
---=20
-2.34.1
+Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
 
