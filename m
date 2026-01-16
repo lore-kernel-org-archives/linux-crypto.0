@@ -1,100 +1,110 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4315C1FECCD;
-	Fri, 16 Jan 2026 19:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E709D3A1E63
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Jan 2026 19:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768592652; cv=none; b=jhWP0Zd7mE7LSYCe6ZNJOotEIu3AKtmHW86kOw+pzo0/A6sWS4nC4mLnmjgxIrV8HCEuziajUzodJhGOfLjF/MzTzZGtdgPaUT683sbu3DFu0C2YNtP+nA/+2kTzIfvfFudCMRT6haQ7Ru1dYHgMNC9QJL5lbGcENg8vaVjzAXg=
+	t=1768593394; cv=none; b=RD2aj3Xg/PmwQEnxWdQDFwcsyjuFNXBiHFXPLSDIsdE89NQqXpaXJHrqHONzg6ROb4utAaam/oAG6Bvz7cKNXU4FPGQNBGrXswVlCRH+ui7HKZNJoO4qeqvtbTm4YfIPa+zFoT8cAnx01h0Vq/4LvTiJIloNqAc8/KYF/Jf60cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768592652; c=relaxed/simple;
-	bh=Omo0RXYhCnccplhQW3URwXnzE3b3CBtbpp/2JUWXAqk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CmNv7zffumnqGnncBJa17M2DAirOsR3szK1l58uCveBnzllwALRYEhVtPXFyvxpiKJhLKA/CrvBDjWh8el2gNwqlO1pzSoD/jk4lvrs9ibDOBXhmTUphZC23A34UZ3G8t++1Exy7qlECaQH6et6c+LE6nd6566X/qlfaeWK9/O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WwjFVDgP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768593394; c=relaxed/simple;
+	bh=eYO3M2+xPQR000yZFl395HW9kp0UOalDe5aIv2leix8=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=pv/CLDuskELqdpgARN2DMtqTyKPixHfo0UWF9AkmSZpIxdETW8S7IQdS80gm79spmOeKNgvU/y3/RVbGUSnn9WImnkIPX9c3nRikE7jZdZUFqiN8YWFDiJCGx63ikZxa+DUKyGHOe320pSFB04TxCy0VIwCvlPgmQNu28NuHeqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rMc4Qfmq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WwjFVDgP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAC68C116C6;
-	Fri, 16 Jan 2026 19:44:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rMc4Qfmq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9645C19424;
+	Fri, 16 Jan 2026 19:56:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768592652;
-	bh=Omo0RXYhCnccplhQW3URwXnzE3b3CBtbpp/2JUWXAqk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WwjFVDgPVRIMNnaevrZ+su2DGugj9D1zoam9A7/hCg0XSMHl3zndPIwxDzv3mbx8e
-	 ueO6OeHYrE8DVu3Nm1NtA0RfbjG1sSto1J1huKrIm4PJ1X0ZUGBBnGeT7HEirRrBcN
-	 W5iNsz9sC/FviwiB/ZoI+7wULogKCy9kJXPmhGJPKoSOpxpDoIAB4e5XT9pPBT1tDY
-	 0ngWrqT0YpulwQyFKRaRciTvqKs8JjF5oWosg0tm0EgLTI9KqZtf8XMt15K645vhtS
-	 zbR/nArq2l0BBej7r18iTaGXpF1yp6xbSXoCc0uCl7eZ+zfJfXpVBKDBLJq1c3JrET
-	 vgNpEtm4jHlQA==
-Date: Fri, 16 Jan 2026 19:44:10 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Holger Dengler <dengler@linux.ibm.com>
-Cc: David Laight <david.laight.linux@gmail.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v1 1/1] lib/crypto: tests: Add KUnit tests for AES
-Message-ID: <20260116194410.GA1398962@google.com>
-References: <20260115183831.72010-1-dengler@linux.ibm.com>
- <20260115183831.72010-2-dengler@linux.ibm.com>
- <20260115204332.GA3138@quark>
- <20260115220558.25390c0e@pumpkin>
- <389595e9-e13a-42e3-b0ff-9ca0dd3effe3@linux.ibm.com>
- <20260116183744.04781509@pumpkin>
- <2d5c7775-de20-493d-88cc-011d2261c079@linux.ibm.com>
+	s=k20201202; t=1768593393;
+	bh=eYO3M2+xPQR000yZFl395HW9kp0UOalDe5aIv2leix8=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=rMc4QfmqOECN+7BNOobaFVYs7AxpXChyrU5/TswC+stPUz5mA0z/i+7XLTxaes1cP
+	 YthrKnsuUm4ZKmD2we8F7we35TijGN52ulMxxlb90yoaJuy0xfotQsOb4cNj9Vf+9a
+	 9FxIYcOymsSsR2Tq3SDF7wBKtY8o4rycKCAOl9XXvEywbSqQdUnM8J8OE49FI9Mqpr
+	 QFsvO6bPqHA2juSxHO/pu+urihN2ezJRDXg8hDavWj9NXjxvre496CBHqkKjp3ezXM
+	 AU0lp+fh9uBk+M6s9Qpqq5ZFVnnYmU9nRQGIW3e2NOaJyKgU0I56UXgoooM2dHhtPr
+	 2MzpV9ShrsbKQ==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id C5328F4007B;
+	Fri, 16 Jan 2026 14:56:31 -0500 (EST)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Fri, 16 Jan 2026 14:56:31 -0500
+X-ME-Sender: <xms:75dqaQQ9QMSbS2HUk-5DUCMP17fTUwahWOWof4rw57gaKpwdRviviQ>
+    <xme:75dqaYlmatl-DNy5Qerk1L0vgn92FYvx9t9P3MhPlg8FVq7wCbA4_uV0axcV-kETl
+    mhmb6ThPTPEHEP-uNtI-gt6QNSLWAzPsyXfzZQxIxDmZilU0GgvyaY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduvdelkeefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
+    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
+    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
+    hilhdrtghomhdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopehnvghilhessghrohifnhdrnhgrmhgvpdhrtghpthhtoheprhhitghkrdhmrg
+    gtkhhlvghmsehgmhgrihhlrdgtohhmpdhrtghpthhtohepsggtohguughinhhgsehhrghm
+    mhgvrhhsphgrtggvrdgtohhmpdhrtghpthhtoheprghnnhgrsehkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopegvsghighhgvghrsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    jhhlrgihthhonheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhrohhnughmhieskh
+    gvrhhnvghlrdhorhhgpdhrtghpthhtoheptghhuhgtkhdrlhgvvhgvrhesohhrrggtlhgv
+    rdgtohhmpdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrkhgvrhhnvg
+    hlrdhorhhg
+X-ME-Proxy: <xmx:75dqaS4d8RE2ipNZzNy4pBVTeF0KDEycDkBTV9v7Yqq6njkm3gHQZQ>
+    <xmx:75dqaXsresvI_Q6s6N9_o6Qdd9GeSlG1y10Wq9bB_oJCMRBto3gP5Q>
+    <xmx:75dqac0-yu0WA-M-85ovAcrqsjz4pvOxpceAq5kWAkv9P8qsiGf_4g>
+    <xmx:75dqaYooM9GFsm1jsfdlEvY6vW-3QHCpiF1BDHSMHHSz1FXCmAJ4mg>
+    <xmx:75dqaULV9lqBcEc3fqilH0r9ZWIiN0JTdBbEYCEDZ64mp3C-ayTkasOt>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id A46FC780070; Fri, 16 Jan 2026 14:56:31 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2d5c7775-de20-493d-88cc-011d2261c079@linux.ibm.com>
+X-ThreadId: AO3h44zqd9zZ
+Date: Fri, 16 Jan 2026 14:55:47 -0500
+From: "Chuck Lever" <cel@kernel.org>
+To: "Benjamin Coddington" <bcodding@hammerspace.com>
+Cc: "Chuck Lever" <chuck.lever@oracle.com>,
+ "Jeff Layton" <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
+ "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
+ "Eric Biggers" <ebiggers@kernel.org>,
+ "Rick Macklem" <rick.macklem@gmail.com>, linux-nfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org
+Message-Id: <7951f103-8e2a-49f9-a053-5c9df12aeedf@app.fastmail.com>
+In-Reply-To: <4A6213D5-BEFD-4090-9134-8D397C3F2ECE@hammerspace.com>
+References: <cover.1768573690.git.bcodding@hammerspace.com>
+ <c49d28aade36c044f0533d03b564ff65e00d9e05.1768573690.git.bcodding@hammerspace.com>
+ <bb62acdd-4185-41ed-8e91-001f96c78602@app.fastmail.com>
+ <4A6213D5-BEFD-4090-9134-8D397C3F2ECE@hammerspace.com>
+Subject: Re: [PATCH v1 2/4] nfsd: Add a key for signing filehandles
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 16, 2026 at 08:20:51PM +0100, Holger Dengler wrote:
-> >> The benchmark loops for 100 iterations now without any warm-up. In each
-> >> iteration, I measure a single aes_encrypt()/aes_decrypt() call. The lowest
-> >> value of these measurements is takes as the value for the bandwidth
-> >> calculations. Although it is not necessary in my environment, I'm doing all
-> >> iterations with preemption disabled. I think, that this might help on other
-> >> platforms to reduce the jitter of the measurement values.
-> >>
-> >> The removal of the warm-up does not have any impact on the numbers.
-> > 
-> > I'm not sure what the 'warm-up' was for.
-> > The first test will be slow(er) due to I-cache misses.
-> > (That will be more noticeable for big software loops - like blake2.)
-> > Change to test parameters can affect branch prediction but that also only
-> > usually affects the first test with each set of parameters.
-> > (Unlikely to affect AES, but I could see that effect when testing
-> > mul_u64_u64_div_u64().)
-> > The only other reason for a 'warm-up' is to get the cpu frequency fast
-> > and fixed - and there ought to be a better way of doing that.
 
-The warm-up loops in the existing benchmarks are both for cache warming
-and to get the CPU frequency fast and fixed.  It's not anything
-sophisticated, but rather just something that's simple and seems to
-works well enough across CPUs without depending on any special APIs.  If
-your CPU doesn't do much frequency scaling, you may not notice a
-difference, but other CPUs may need it.
 
-> >> I also did some tests with IRQs disabled (instead of only preemption), but the
-> >> numbers stay the same. So I think, it is save enough to stay with disables
-> >> preemption.
-> > 
-> > I'd actually go for disabling interrupts.
-> > What you are seeing is the effect of interrupts not happening
-> > (which is likely for a short test, but not for a long one).
-> 
-> Ok, I'll send the next series with IRQ disabled. I don't see any difference on
-> my systems.
+On Fri, Jan 16, 2026, at 11:42 AM, Benjamin Coddington wrote:
+> On 16 Jan 2026, at 11:11, Chuck Lever wrote:
+>> To save an extra pointer dereference on the hotter paths, maybe
+>> fh_key should be the actual key rather than a pointer. You can
+>> use kfree_sensitive() when freeing the whole struct nfsd_net, or
+>> just memset the fh_key field before freeing nfsd_net.
+>>
+>> Just a random thought.
+>
+> Could do!  ..but its easier to check if a pointer is NULL than to check two
+> u64's being unset.  That said, having half the key be zero is probably
+> insane odds.  I also figured to minimize the size of nfsd_net when this is
+> not used.  I think I like the pointer better, if that's acceptable.
 
-Some architectures don't allow vector registers to be used when IRQs are
-disabled.  On those architectures, disabling IRQs would always trigger
-the fallback to the generic code, which would make the benchmark not
-very useful.  That's why I've only been disabling preemption, not IRQs.
+Agreed, the pointer has the benefit of showing whether the fh_key
+has been set or not.
 
-- Eric
+-- 
+Chuck Lever
