@@ -1,74 +1,91 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434601548C;
-	Fri, 16 Jan 2026 02:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9276020C00C;
+	Fri, 16 Jan 2026 04:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768530625; cv=none; b=cZZgiirSY80JIX1VCG5SFi530GTccT6xNQMzbSHXBncxS26BcIvQWhaj7ZFHhsDajuX9ls63SgdH0zUgIV+BcfOZ/7bzvFj1vv4IN5vokJoxG2POP/DVQDodZhMuWvJdKHbKLe7R/pksJECskhyF+BYIzX08IBLjxkgDBkWsoUs=
+	t=1768536701; cv=none; b=g2sTDG46YykG81q40tziV0jy1dGxTQ/fMj7XDNk6IvE0LMZHEhqOE8zu0yi9/rbaOtDd4sTqXiYmVphNzGwUyUH06t4XLnaG6x62RL51UXRWN8/6dbVCmB7rpc0dlFhhgs9L18RZ5UCI2mNcK951HM/omZMrOSHWmu7rZKSjNAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768530625; c=relaxed/simple;
-	bh=ffv7g16iO9m8UHX0RTA4uXKz6o/2qcq4Jy0yQyafcKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GvEAMGCO25DMEddlBznZxd9Fre69AEakgnpHJwIjcBBkEhXR42B5tHx9PuYr6wF1tE1V9s0fno2FyxVmnWhNToZCp8DWXcg8FXDVPPDoAXo4tn9jwKTjmlt/Y50oNpybtw6+KlI+uPwUJMlQSoxI1f9vEd4TCyiIdtiId1JHIvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=bPkPPIdE; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1768536701; c=relaxed/simple;
+	bh=ZqnRJGrpiH1f2hzAoTldvi9iPJA9v+Ll4EkFKq/32ac=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HNhz1PtP+DK8LYAuYPPcnx10m2uieH2f0YIKmIVV+W3G/J9+H/0P1koNh07RMbgMYDG7YPNoiEJQiZPk3KqlOYf4zqD+iEF5gChZGY3ECdqNZF2pVG/glRTawmpkramWpD3PeZugvVDPDomPT4EDgYykzN9NZtAerLggSbXwiPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dgrn5XY+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="bPkPPIdE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=1co2DSI7IDkF2hLIPTUYj9KgEg5ywlQ2PtakaHKd1jY=; 
-	b=bPkPPIdE+602gYmio3hdhcd9POegg9H08kwz/ri38RjHxoCDsAZGiLmDNY0TAMVfs8CF3CswpYv
-	U2SNMIbDVEeKgWT+0JbJs5fLgwJfDT+1/3zkWWRrcZwb8GBdcNjnLzEoOHMM91e3NuxqisrcyVsim
-	VF7k+tmjFJfXCNdW+JGzFLnXxp3klX8r9N8LyzQiyCmLzZBmlNrqV7lOqQ0tCuhMYdO3OVP9RLcLt
-	oMGkPsoxU90gVaZ/VgSXU+eV25pXU2PDg7w90fZ+kuxF/lNit42xeNp8QjSQjKwpY0lQlvIRmYrfl
-	s+g2cbVa76IqbXGfeagJFzTn8WtsBeBt4lew==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vgZbF-00HBTO-1C;
-	Fri, 16 Jan 2026 10:30:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Jan 2026 10:30:09 +0800
-Date: Fri, 16 Jan 2026 10:30:09 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Manorit Chawdhry <m-chawdhry@ti.com>,
-	Shiva Tripathi <s-tripathi1@ti.com>,
-	Kamlesh Gurudasani <kamlesh@ti.com>
-Subject: Re: [BUG] crypto: tcrypt - data corruption in ahash tests with
- CRYPTO_AHASH_ALG_BLOCK_ONLY
-Message-ID: <aWmisYTEC07wOO2i@gondor.apana.org.au>
-References: <70710115-6bde-465b-91f2-a005bede1602@ti.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dgrn5XY+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CBB0C116C6;
+	Fri, 16 Jan 2026 04:11:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768536701;
+	bh=ZqnRJGrpiH1f2hzAoTldvi9iPJA9v+Ll4EkFKq/32ac=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dgrn5XY+GgiO4sogvXtY4C9vx+1VpdFDLlh3ZQsBzxIsvL+LW0MG91RUKNsBPn8qB
+	 OIj3hi/Q0+Lg4LsKupBQ8rtNDuXGSJ77UDCyFEKAVduTlIFa6cfucLDJzqmCrQYyFj
+	 ynRFxahHbecpvCaN7lACUq5PTc+pitm5msYv1bDFHu71dOeUQlaotpWNNDGTwm/GbG
+	 OXe6bvyiFSHIo6E89SBgFTxcJ2l2a1ilzqFbGe9v1cIrduBBieEL9fYnYoDLsCtqR1
+	 GmBvxbW1sMKfXeh3Zo+SkfHXv5KqnRnb2C3TGK5p/bBiZEh19r4iZErqL1Sa4nvX/j
+	 0BoSOKXiqphtQ==
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Rijo Thomas <Rijo-john.Thomas@amd.com>
+Cc: John Allen <john.allen@amd.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Hans de Goede <hansg@kernel.org>,
+	linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER),
+	platform-driver-x86@vger.kernel.org (open list:AMD PMF DRIVER),
+	Lars Francke <lars.francke@gmail.com>,
+	Yijun Shen <Yijun.Shen@dell.com>,
+	Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>
+Subject: [PATCH v6 0/5] Fixes for PMF and CCP drivers after S4
+Date: Thu, 15 Jan 2026 22:11:27 -0600
+Message-ID: <20260116041132.153674-1-superm1@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <70710115-6bde-465b-91f2-a005bede1602@ti.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 15, 2026 at 03:38:50PM +0530, T Pratham wrote:
->
-> However, in tcrypt, the wait struct is accessed as below:
-> 
-> crypto/tcrypt.c:
-> static inline int do_one_ahash_op(struct ahash_request *req, int ret)
-> {
-> 	struct crypto_wait *wait = req->base.data;
+Lars Francke reported that the PMF driver fails to work afer S4 with:
+  ccp 0000:c3:00.2: tee: command 0x5 timed out, disabling PSP
 
-This is just broken.  Even before the partial hash block handling
-there are code paths where req->base.data will be modified prior
-to final return.  That's why the completion function takes a void *
-instead of just passing the request back.
+This is because there is a TA loaded to the TEE environment that
+is lost during S4.  The TEE rings need to be reinitialized and the
+TA needs to be reloaded.
 
-So we should fix tcrypt to not do this crazy thing.
+This series adds those flows to the PMF and CCP drivers.
 
-Thanks,
+v5->v6:
+ * Fix Tom's feedback on patch 3/5
+
+Mario Limonciello (AMD) (4):
+  crypto: ccp - Declare PSP dead if PSP_CMD_TEE_RING_INIT fails
+  crypto: ccp - Add an S4 restore flow
+  crypto: ccp - Factor out ring destroy handling to a helper
+  crypto: ccp - Send PSP_CMD_TEE_RING_DESTROY when PSP_CMD_TEE_RING_INIT
+    fails
+
+Shyam Sundar S K (1):
+  platform/x86/amd/pmf: Prevent TEE errors after hibernate
+
+ drivers/crypto/ccp/psp-dev.c          | 11 +++++
+ drivers/crypto/ccp/sp-dev.c           | 12 ++++++
+ drivers/crypto/ccp/sp-dev.h           |  3 ++
+ drivers/crypto/ccp/sp-pci.c           | 16 ++++++-
+ drivers/crypto/ccp/tee-dev.c          | 56 ++++++++++++++++++------
+ drivers/crypto/ccp/tee-dev.h          |  1 +
+ drivers/platform/x86/amd/pmf/core.c   | 62 ++++++++++++++++++++++++++-
+ drivers/platform/x86/amd/pmf/pmf.h    | 10 +++++
+ drivers/platform/x86/amd/pmf/tee-if.c | 12 ++----
+ include/linux/psp.h                   |  1 +
+ 10 files changed, 161 insertions(+), 23 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.43.0
+
