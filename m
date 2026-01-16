@@ -1,67 +1,128 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254E8342528;
-	Fri, 16 Jan 2026 06:06:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897802DF13F
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Jan 2026 07:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768543604; cv=none; b=oOnYoWLR8yTZ2nP4sLSDcVu3tY/lY6rjRY8NzLmr7Dt/sHn2QuawnBJDBOvkzE1eL+H35RAeg9B0+SjxkTLlac30vCIDV75Wqy3jF3c2tqD5CktsGI6PlRhqae1e7N0mqHG6s4uOVvuNP1K+JUnxS7oxrDkaBcyhruMEUn/+dsU=
+	t=1768547913; cv=none; b=lic3wU6gQ9/DMvmEnUc4nQhRogHhkcJdjtvDXxxCJYhp62FCh9G33XvKgA6i9E8nyFviEjCBZVqoMjluJcWnx6Ac8RAMgdVGfRerM5gUF9Euwhz6lJLUznpRZI5eT969alBssegFLpiRkN17wy8GnSCwpv3XN/EwZ5RobYneNWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768543604; c=relaxed/simple;
-	bh=HVwW3rKac2tIMEQrFQdJ6BEtyn94C1pxOHzCM6jcGmg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kpu9hSUR0+0e5EeEXBW4FL52M+0cBGZg9ORil8QvL0kYgm0zoTEY54II1uESlkOpsq90eF8zKUfQ30dWCainsmZYRrKF0GOQ4q6wZacAcNgax3B+UCZdfNrQ4zSFWdPV7UaS8WBL2F3i6YawC+Kw7ISILH21Lsm5/7t2cEED2N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=M369rt78; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="M369rt78"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=+KGC7lTCcKc0vBvJ8uPtFlnVv2ATE6XSFty/u8lvDUk=; 
-	b=M369rt78Qv5F1tZtl+TzKN5wqpLuHcvZFQSJ2ayb983FmfT9ffVMfVrdUNNG3aIGR8BFuU2x/Ii
-	yRyxUbiYoHL7Y4YZUnODpoTVULf378NXh4OZT+CLVGdRQxxuPxyoxeaFtd3zRdk56Q9qZv6MYpgxx
-	M26Zy5fWV7CCgKH7QlT0Q7+Kh3OlCY1Y1rYvnJzJ/VBaTtaqRcRj4PlAlehUH+JlDBbSr6jXpG3m8
-	Y66cTTAhbUumpPGQCs52zYt0iI0sraaGJhE4GRRkQDZwFAk9mpdvm8/aiZ1zSB6CkI88c6zhz9s1S
-	RlMmn9t1FcakeNAWqgh8JEKz3KEEcPkWxTLQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vgcyk-00HDOb-2s;
-	Fri, 16 Jan 2026 14:06:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Jan 2026 14:06:38 +0800
-Date: Fri, 16 Jan 2026 14:06:38 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Chenghai Huang <huangchenghai2@huawei.com>
-Cc: davem@davemloft.net, yuzenghui@huawei.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, fanghao11@huawei.com,
-	liulongfang@huawei.com, qianweili@huawei.com
-Subject: Re: [PATCH] crypto: hisilicon/sgl - fix inconsistent map/unmap
- direction issue
-Message-ID: <aWnVbnHAUUk_AO81@gondor.apana.org.au>
-References: <20251219033619.1871450-1-huangchenghai2@huawei.com>
+	s=arc-20240116; t=1768547913; c=relaxed/simple;
+	bh=H0DoG9fDTAitBB6G9r2+4Ank/okYvVz2A2hDyXcN/PE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hBvqS0IHTjvKakosOo8qeBXzYL9plZWmR2fJmA+k3kDc1XdYMr2N8pLWQRf/aJ/KSf74KV50ytajFm6Ta6Mcy4v+BEcc4iId+N6S5apNYMUJxIwvlR3dKUTro6ZJHKw+/tYvln/Ok5zwVxfruH2UtlzQRxIw6Kuv+BZzIsZu0PA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1768547904-1eb14e7c0219540001-Xm9f1P
+Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx2.zhaoxin.com with ESMTP id SGMSHKJlvkcyL6Qx (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Fri, 16 Jan 2026 15:18:24 +0800 (CST)
+X-Barracuda-Envelope-From: AlanSong-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+Received: from ZXSHMBX1.zhaoxin.com (10.28.252.163) by ZXSHMBX3.zhaoxin.com
+ (10.28.252.165) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.59; Fri, 16 Jan
+ 2026 15:18:24 +0800
+Received: from ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85]) by
+ ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85%7]) with mapi id
+ 15.01.2507.059; Fri, 16 Jan 2026 15:18:24 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+Received: from DESKTOP-A4I8D8T.zhaoxin.com (10.32.65.156) by
+ ZXBJMBX02.zhaoxin.com (10.29.252.6) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.59; Fri, 16 Jan 2026 15:16:52 +0800
+From: AlanSong-oc <AlanSong-oc@zhaoxin.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<ebiggers@kernel.org>, <Jason@zx2c4.com>, <ardb@kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<x86@kernel.org>
+CC: <CobeChen@zhaoxin.com>, <TonyWWang-oc@zhaoxin.com>, <YunShen@zhaoxin.com>,
+	<GeorgeXue@zhaoxin.com>, <LeoLiu-oc@zhaoxin.com>, <HansHu@zhaoxin.com>,
+	AlanSong-oc <AlanSong-oc@zhaoxin.com>
+Subject: [PATCH v3 1/3] crypto: padlock-sha - Disable for Zhaoxin processor
+Date: Fri, 16 Jan 2026 15:15:11 +0800
+X-ASG-Orig-Subj: [PATCH v3 1/3] crypto: padlock-sha - Disable for Zhaoxin processor
+Message-ID: <20260116071513.12134-2-AlanSong-oc@zhaoxin.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260116071513.12134-1-AlanSong-oc@zhaoxin.com>
+References: <20260116071513.12134-1-AlanSong-oc@zhaoxin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251219033619.1871450-1-huangchenghai2@huawei.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
+ ZXBJMBX02.zhaoxin.com (10.29.252.6)
+X-Moderation-Data: 1/16/2026 3:18:22 PM
+X-Barracuda-Connect: ZXSHMBX3.zhaoxin.com[10.28.252.165]
+X-Barracuda-Start-Time: 1768547904
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 2164
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.153108
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-On Fri, Dec 19, 2025 at 11:36:19AM +0800, Chenghai Huang wrote:
-> Ensure that the direction for dma_map_sg and dma_unmap_sg is
-> consistent.
-> 
-> Fixes: 2566de3e06a3 ("crypto: hisilicon - Use fine grained DMA mapping direction")
-> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
-> ---
->  drivers/crypto/hisilicon/sgl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+For Zhaoxin processors, the XSHA1 instruction requires the total memory
+allocated at %rdi register must be 32 bytes, while the XSHA1 and
+XSHA256 instruction doesn't perform any operation when %ecx is zero.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Due to these requirements, the current padlock-sha driver does not work
+correctly with Zhaoxin processors. It cannot pass the self-tests and
+therefore does not activate the driver on Zhaoxin processors. This issue
+has been reported in Debian [1]. The self-tests fail with the
+following messages [2]:
+
+alg: shash: sha1-padlock-nano test failed (wrong result) on test vector 0, =
+cfg=3D"init+update+final aligned buffer"
+alg: self-tests for sha1 using sha1-padlock-nano failed (rc=3D-22)
+------------[ cut here ]------------
+
+alg: shash: sha256-padlock-nano test failed (wrong result) on test vector 0=
+, cfg=3D"init+update+final aligned buffer"
+alg: self-tests for sha256 using sha256-padlock-nano failed (rc=3D-22)
+------------[ cut here ]------------
+
+Disable the padlock-sha driver on Zhaoxin processors with CPU family
+0x07 and newer. Add PHE Extensions support for SHA-1 and SHA-256 to
+lib/crypto, following the suggestion in [3].
+
+[1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D1103397
+[2] https://linux-hardware.org/?probe=3D271fabb7a4&log=3Ddmesg
+[3] https://lore.kernel.org/linux-crypto/aUI4CGp6kK7mxgEr@gondor.apana.org.=
+au/
+
+Signed-off-by: AlanSong-oc <AlanSong-oc@zhaoxin.com>
+---
+ drivers/crypto/padlock-sha.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/crypto/padlock-sha.c b/drivers/crypto/padlock-sha.c
+index 329f60ad4..9214bbfc8 100644
+--- a/drivers/crypto/padlock-sha.c
++++ b/drivers/crypto/padlock-sha.c
+@@ -332,6 +332,13 @@ static int __init padlock_init(void)
+ 	if (!x86_match_cpu(padlock_sha_ids) || !boot_cpu_has(X86_FEATURE_PHE_EN))
+ 		return -ENODEV;
+=20
++	/*
++	 * Skip family 0x07 and newer used by Zhaoxin processors,
++	 * as the driver's self-tests fail on these CPUs.
++	 */
++	if (c->x86 >=3D 0x07)
++		return -ENODEV;
++
+ 	/* Register the newly added algorithm module if on *
+ 	* VIA Nano processor, or else just do as before */
+ 	if (c->x86_model < 0x0f) {
+--=20
+2.34.1
+
