@@ -1,130 +1,149 @@
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BC63559DC;
-	Mon, 19 Jan 2026 09:27:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4240D354ACC
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 09:40:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768814844; cv=none; b=W0KGtznTlMZoXi5ynPIvad+T8TX1h/0cg8R8rb+eU5TjSMmDaAX7qoWlSMrgaR0jIBDUzB64+rNGua3OnpZa+PMhHmq/ckE6V+enGF179plfzJCfprLrtWLH6TeLk3l8TtGzxf8SlLBvvntOT1v+kHJcD545zF/aH6ksab72Yww=
+	t=1768815648; cv=none; b=LA1ZEbz+HukjEsXd4cWGQ0K0aCiKeaAYG5o40D16B89G1Up9FXiic6LuzmspxnLHAciof4XlZu/VZy6P4N6O6NwKoNAl5UUepQ4C/v0sHx64TrPrg7eSdbYj/qOtOw18pPLOmZkQpARHkRyHBcFj5jt+cXftUsqFd8ZNNznyvFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768814844; c=relaxed/simple;
-	bh=FnDqYCqY4eMQu1KfJO2diG09+hGAQVkPBUCJXUeIZ0A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=A8pTliKXcsBGELtl96Dp9tYPAWppxTrrkUtzXBtWzJshG6ZdtyukpgRfiRWEYtr/jnwUk1k4lIR7yAq2+lH6Olls78v8mvTN5RYC8yRuatjQSEHb+U00CxtnAzjfhZGp/xXB0AUKzQhmoYlDRx3XpidkrwJDH8A9UthnDLAGwsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=qzI+jUV4; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1768815648; c=relaxed/simple;
+	bh=LFRNb1gEQo9FV1jLi6+eyd+fRn/YHv3OptpdwWFbVxE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Co2zlrnF00kEMQevar6omF+xgZraCt7Qx+2/ODDfzC9bix8lC/gl41EhNXN1BIfXSHMTe/6zV/6PrtQy5RVV6ktfU256FtkCIBmIIXDkFWEoE3RxG64J5izec0eMUTTefn4HOetOnkTguaEWouyL0QHwsioWIVpvssZXNAVLdz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=37uQbcQ1; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="qzI+jUV4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1768814842; x=1800350842;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=FnDqYCqY4eMQu1KfJO2diG09+hGAQVkPBUCJXUeIZ0A=;
-  b=qzI+jUV4F4r188AbBTHdpLNnjp1d8gSJoR3wif7ABt6XpEmfDpbNSJdP
-   CYUxz4vHcOZpqvThGgUwjtsX1Z0Xp+R2YuM88k+MbX75KhJsrWmQ8fyA7
-   a35ZK54PLMnDt1p4VsC0nwtpiDtbNNuN3H/qDKkDaCb3d8sp4yBjisL/1
-   eCK0hKTrwfstcHptvJGebQpIgTWe2f0fcWOsx96GRGsQW4M5CzrfJfTbz
-   6PlKYgldruDc6rncmL7lw5pX0KJ2Utd6UTeDTpD48f3BL2fWDjiwETQtl
-   ox2Wqw0zwb8CpSkmjZEiObe1Aj6W2OAdKrpDmHlQSUi+YGmKbnKzgvlxJ
-   w==;
-X-CSE-ConnectionGUID: i0zijf1nTfiJcIl2a1rGow==
-X-CSE-MsgGUID: 5Vc33klYRPeu5OUwKZF+zg==
-X-IronPort-AV: E=Sophos;i="6.21,237,1763449200"; 
-   d="scan'208";a="219379894"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Jan 2026 02:27:15 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Mon, 19 Jan 2026 02:26:44 -0700
-Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Mon, 19 Jan 2026 02:26:40 -0700
-Message-ID: <bc019bd8-34d3-420e-8519-09700437fb01@microchip.com>
-Date: Mon, 19 Jan 2026 10:26:39 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="37uQbcQ1"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4801c1056c7so18620675e9.2
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 01:40:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768815646; x=1769420446; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Tir03/0eTjGqYap+VXkH/YQyday94uYso0Z0/c7DdeU=;
+        b=37uQbcQ1CKqDDkAdb1lkP+I8pU0UDUltDhqfAVpP5SPDcQYJlViZ3k3dBVEq0WO12m
+         cIQccXy65LtV3IQv6H2M1jM4r7qEmkHAgILU6jRxF63kky97kNdQvKiE44GmhP27jDpp
+         mg5IPaWxJXg92hXihjlaEAo8Qw6TGqtc8JdJ7B9zk6nXT4dS9isbTmf2IzKi0P6Em1UJ
+         cwuT6tb5G0EslSIjR9kl6/E8R3TvBamDcsup8v/Xbqlm6ntQhsM0hI7cJiG2zwppXp1x
+         lPQaGz1ZK0Q1/17NzOKTPoJhh8MZSRzU+xrLLg2G8MGBcIboKCU67EwBDWVmM1cNsRUD
+         m9oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768815646; x=1769420446;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Tir03/0eTjGqYap+VXkH/YQyday94uYso0Z0/c7DdeU=;
+        b=iruXkmRE8Wqal8feDp09WkY3OBW0GHqw1OodKJfoInYgziFGlC2/GIaXOf/iiCnMfL
+         mtgcLA86EHCjsDFTOG3iVcmDkBW+UaNr1ZGturMQRW9EgNSa6gQ2LzlK1AWAehe0MhJW
+         TfYdajRIsUwzyIpRL13KBt6VgNdwfc4PI19fsflwhyPCBej0zydHRk0e+wvMY9yBTR0U
+         OVZWrrDjTBV5Hvwuba1EsNXtcQYZuSGLI0RNro/8E7XyZBnCn/DiYfUwg5LuD5bcx+qV
+         /HxmLhIO2oTPMoaLr0xRp2PdMIsbhA3Yykr257O2rAq8sDz1dN+vNijbSxy1b4ISIn1z
+         dgSw==
+X-Forwarded-Encrypted: i=1; AJvYcCUSidUgI6QAPzVLbIwyIiZ1obvXYLj2pvbXHWX5OU4h6lDfJVNe8tjX9slLRyq0yTn+j01c5Y5C24bjUow=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvJw2HVZcsoKNa76sY2WZtGzx5+K9NEkvFZFtRj95vcP5VCD3c
+	ucxGZw8caVFFf5CWmO4tMYX8vNGxEA7x1v8n157iafG3H4JuHxIIwceH5Ko+LZRTxVK1cLY2Q4D
+	YFg==
+X-Received: from wmbil25.prod.google.com ([2002:a05:600c:a599:b0:46e:1e57:dbd6])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:358e:b0:470:fe3c:a3b7
+ with SMTP id 5b1f17b1804b1-4801e2f3083mr136239335e9.5.1768815645684; Mon, 19
+ Jan 2026 01:40:45 -0800 (PST)
+Date: Mon, 19 Jan 2026 10:05:50 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 9/9] crypto: atmel: Use dmaengine_prep_config_single()
- API
-To: Frank Li <Frank.Li@nxp.com>, Vinod Koul <vkoul@kernel.org>, Manivannan
- Sadhasivam <mani@kernel.org>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?=
-	<kwilczynski@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, Bjorn
- Helgaas <bhelgaas@google.com>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg
-	<sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea
-	<claudiu.beznea@tuxon.dev>, Koichiro Den <den@valinux.co.jp>, Niklas Cassel
-	<cassel@kernel.org>
-CC: <dmaengine@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-pci@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-	<mhi@lists.linux.dev>, <linux-arm-msm@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<imx@lists.linux.dev>
-References: <20260105-dma_prep_config-v3-0-a8480362fd42@nxp.com>
- <20260105-dma_prep_config-v3-9-a8480362fd42@nxp.com>
-From: Nicolas Ferre <nicolas.ferre@microchip.com>
-Content-Language: en-US, fr
-Organization: microchip
-In-Reply-To: <20260105-dma_prep_config-v3-9-a8480362fd42@nxp.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260119094029.1344361-1-elver@google.com>
+Subject: [PATCH tip/locking/core 0/6] compiler-context-analysis: Scoped init guards
+From: Marco Elver <elver@google.com>
+To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>, 
+	Christoph Hellwig <hch@lst.de>, Steven Rostedt <rostedt@goodmis.org>, Bart Van Assche <bvanassche@acm.org>, 
+	kasan-dev@googlegroups.com, llvm@lists.linux.dev, 
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 05/01/2026 at 23:46, Frank Li wrote:
-> Using new API dmaengine_prep_config_single() to simple code.
-> 
-> No functional change.
-> 
-> Tested-by: Niklas Cassel <cassel@kernel.org>
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+Current context analysis treats lock_init() as implicitly "holding" the
+lock to allow initializing guarded members. This causes false-positive
+"double lock" reports if the lock is acquired immediately after
+initialization in the same scope; for example:
 
-Looks good to me:
-Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+	mutex_init(&d->mtx);
+	/* ... counter is guarded by mtx ... */
+	d->counter = 0;  /* ok, but mtx is now "held" */
+	...
+	mutex_lock(&d->mtx); /* warning: acquiring mutex already held */
 
-Thanks, best regards,
-   Nicolas
+This series proposes a solution to this by introducing scoped init
+guards which Peter suggested, using the guard(type_init)(&lock) or
+scoped_guard(type_init, ..) interface. This explicitly marks init scope
+where we can initialize guarded members. With that we can revert the
+"implicitly hold" after init annotations, which allows use after
+initialization scope as follows:
 
-> ---
->   drivers/crypto/atmel-aes.c | 10 +++-------
->   1 file changed, 3 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-> index 3a2684208dda9ee45d71b4bc2958be293a4fb6fe..e300672ffd7185b0f5bf356c2376681537047def 100644
-> --- a/drivers/crypto/atmel-aes.c
-> +++ b/drivers/crypto/atmel-aes.c
-> @@ -795,7 +795,6 @@ static int atmel_aes_dma_transfer_start(struct atmel_aes_dev *dd,
->          struct dma_slave_config config;
->          dma_async_tx_callback callback;
->          struct atmel_aes_dma *dma;
-> -       int err;
-> 
->          memset(&config, 0, sizeof(config));
->          config.src_addr_width = addr_width;
-> @@ -820,12 +819,9 @@ static int atmel_aes_dma_transfer_start(struct atmel_aes_dev *dd,
->                  return -EINVAL;
->          }
-> 
-> -       err = dmaengine_slave_config(dma->chan, &config);
-> -       if (err)
-> -               return err;
-> -
-> -       desc = dmaengine_prep_slave_sg(dma->chan, dma->sg, dma->sg_len, dir,
-> -                                      DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
-> +       desc = dmaengine_prep_config_sg(dma->chan, dma->sg, dma->sg_len, dir,
-> +                                       DMA_PREP_INTERRUPT | DMA_CTRL_ACK,
-> +                                       &config);
->          if (!desc)
->                  return -ENOMEM;
-> 
-> 
-> --
-> 2.34.1
-> 
+	scoped_guard(mutex_init, &d->mtx) {
+		d->counter = 0;
+	}
+	...
+	mutex_lock(&d->mtx); /* ok */
+
+Note: Scoped guarded initialization remains optional, and normal
+initialization can still be used if no guarded members are being
+initialized. Another alternative is to just disable context analysis to
+initialize guarded members with `context_unsafe(var = init)` or adding
+the `__context_unsafe(init)` function attribute (the latter not being
+recommended for non-trivial functions due to lack of any checking):
+
+	mutex_init(&d->mtx);
+	context_unsafe(d->counter = 0);  /* ok */
+	...
+	mutex_lock(&d->mtx);
+
+This series is an alternative to the approach in [1]:
+
+   * Scoped init guards (this series): Sound interface, requires use of
+     guard(type_init)(&lock) or scoped_guard(type_init, ..) for guarded
+     member initialization.
+
+   * Reentrant init [1]: Less intrusive, type_init() just works, and
+     also allows guarded member initialization with later lock use in
+     the same function. But unsound, and e.g. misses double-lock bugs
+     immediately after init, trading false positives for false negatives.
+
+[1] https://lore.kernel.org/all/20260115005231.1211866-1-elver@google.com/
+
+Marco Elver (6):
+  cleanup: Make __DEFINE_LOCK_GUARD handle commas in initializers
+  compiler-context-analysis: Introduce scoped init guards
+  kcov: Use scoped init guard
+  crypto: Use scoped init guard
+  tomoyo: Use scoped init guard
+  compiler-context-analysis: Remove __assume_ctx_lock from initializers
+
+ Documentation/dev-tools/context-analysis.rst | 30 ++++++++++++++++++--
+ crypto/crypto_engine.c                       |  2 +-
+ crypto/drbg.c                                |  2 +-
+ include/linux/cleanup.h                      |  8 +++---
+ include/linux/compiler-context-analysis.h    |  9 ++----
+ include/linux/local_lock.h                   |  8 ++++++
+ include/linux/local_lock_internal.h          |  4 +--
+ include/linux/mutex.h                        |  4 ++-
+ include/linux/rwlock.h                       |  3 +-
+ include/linux/rwlock_rt.h                    |  1 -
+ include/linux/rwsem.h                        |  6 ++--
+ include/linux/seqlock.h                      |  6 +++-
+ include/linux/spinlock.h                     | 17 ++++++++---
+ include/linux/spinlock_rt.h                  |  1 -
+ include/linux/ww_mutex.h                     |  1 -
+ kernel/kcov.c                                |  2 +-
+ lib/test_context-analysis.c                  | 22 ++++++--------
+ security/tomoyo/common.c                     |  2 +-
+ 18 files changed, 80 insertions(+), 48 deletions(-)
+
+-- 
+2.52.0.457.g6b5491de43-goog
 
