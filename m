@@ -1,54 +1,54 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC793570AE
-	for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 09:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F93C3587AE
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 09:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768815657; cv=none; b=gQkGFvU61LKfZeaHNG9qpZz8HXDeX7fOkG1GTWGKT2/QIqokiOjjOHO6+ims3S9wwaB5PANnDL2ewHR8HWrBKXfN7/Qq25eLfwxwHy9qCgOZEAb4qkESRojEBVWPrFQn9Bn/DrNadgYbttUzpWrmb1+04Y3aIQ2cegCMBZ02tvA=
+	t=1768815660; cv=none; b=Ybt062wT8Hz0Az8Y6g0KjSej4a3UrluL2h8oYmjh/pnZDvJ5NW++cjd2e+v5FjiOAh1+V9U3Jxws6vC/L8NLMdwm69/bJ0vToXetZgKslU/D9O+JE4sxlnCNtsCI9+hLgzW9P8F9yEcNAwrz2zLSikvTiDBU9L/5ngvMn2QIbH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768815657; c=relaxed/simple;
-	bh=imqmTq6qC6AvvOLRifzHIuTmTh3LUGINsRwO5tNrj/Y=;
+	s=arc-20240116; t=1768815660; c=relaxed/simple;
+	bh=y9/1uLJMC7+X7yi1h38x4esMDvrYwSDX9pt6Sh+Dy/I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=soij/RCdAECcj9cwmnb3cGEaYdoIAoZ2wNk+LoY6++zG4OgdEFpn8ouvSQYdGAf758r/+vhwngP3pS65nm5PMbastcRDEOwKWNLO7pko7h1ZCdlOJCwPohKaiCgoCYiW1/I3jdKdjiA38VtdhZvIrvcUCp9fdJQ0jm7w9/ZGlPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L0VmLEdg; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=bXzDEGiYLlt1ph02C0OLb9Pwo1frs55Ojige1E3ooe+TFcqW9GG8fVHfzaBSSkm8mMpVi0R2jQUWrEgVfvIXNiMCWcw5UO5VhuT72CyUkUG5G5mhAcWjVpa33/pRgNYSw4iPrp11/s+M1z9Dx7pYr1npeR3LN4yC6ISICK1vrqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lSImHJBn; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L0VmLEdg"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-4325b81081aso3412862f8f.3
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 01:40:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lSImHJBn"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-47edc79ff28so25949025e9.2
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 01:40:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768815654; x=1769420454; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768815657; x=1769420457; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ewHt49qLKu+2CyU8hq2cJxrH6CXFZn4CCknA2bnTf50=;
-        b=L0VmLEdgoX6kCOGL+kVmGoou8lkrcSDOzhY4t3FvkKZVtXnffe2NED9Ya/eFvT073L
-         9qeidD7dBAfbdSFEhPGSQYdWlA78OmsNTD45oqGOil2WnYmQSwLpc3SLv37vF5BuVMzj
-         /9mUS/gLpY84Divp/8aksNlIbLVBfInc4eKrBAOR/xsE8V5cAoPRgBPNGwMq+t1JUKO6
-         aQXcPLFEFuRoFsKOaHZ7O1n4BG0BMTyIpbZSJclAZHpFkwYzF6GvGEpS9uoV3pIj1Y4I
-         80Ts40bFE/H33kCqH5NXBZTm27PpFkoSTpVjB694pHSmUS6dPgJ9grJp6CqygVLJfTYc
-         QHqA==
+        bh=CA3Nu437Rj+eAevya/i4iek0cQKs4Ymlx+qux+GVc44=;
+        b=lSImHJBn+H6dS9/VrEouBwalyZflWzpJgQBwyX65HgE62415Bckxo4Bu/5W8G0TZzH
+         ZWm070IlDWr73MbNf+U9SOQ1927APAYEc5S6T5+xGmYROb5bFuBAMbssknpHrzBTJvfq
+         zxz6HmOUw4dO0X2Ziwe6p2S9qfFP01tYL79zXp6ca34KHL2vz7nXNNT0l5kp1Z8w2n0f
+         Mm9p9jvGl0j28oYIvUix+b2KaEwTPY7pTji2P51gSrS/ubz6j6lUGRET9TFa1ffQacBV
+         B1Ggusozm+sqPd2mhGIUicx7ioCLsPI6kIr+HXRgJeqLZQ830oXjTWWYBycc8mmlbNoU
+         mV1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768815654; x=1769420454;
+        d=1e100.net; s=20230601; t=1768815657; x=1769420457;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ewHt49qLKu+2CyU8hq2cJxrH6CXFZn4CCknA2bnTf50=;
-        b=tFX6PcjY3ix/8/y+mCnPLlgySMEO+8T4g6wtTYm5qgMMzDQn3fxi0s4By58BMaV1w4
-         yBJb2qRX4Ca0K1v9jFC8WYKpTeiaiHQllhPIZ/LCoDkdOiDQG6G/aTUwiBOUWoaJ1j3C
-         Q5oVljUdZ84VmuvPHy6xLYtq/oQV61yfC5LqIu7JCgPgObWON14Wvn4mOtUCwEmh5KfO
-         8RXzFkwQ07KUZB11F/TSuJArq0qvX3y3noIc1xTIteXeqocL8vv2iwBLDyfET+OrqcEc
-         DpTZ5hz1iBVaKBs3CIzhqtGlfRg+3neGuCTF5wSJihJSuZP/sMREftgXM97Pydl2gRQc
-         wyjA==
-X-Forwarded-Encrypted: i=1; AJvYcCVipaW/0FxfEgQ359oGHUVdHcr0a0NY0qZxxJcndQ+v+8bg5hcdh9j3WkU3C1FUPYNsyk5yZG+pbsJzxKA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSUQEBINymstsTfDwqxCGUn+83z4TEsadFrSXX1haNyzxUvyqJ
-	bA4kNFUmbE/ofWx6OqeV/0IF7n1TwDSGslMEcV+KQ3P0oU9yYWaXldgRwag2UH7V5bLN5faG+Mf
-	vXg==
-X-Received: from wrsz3.prod.google.com ([2002:a5d:4c83:0:b0:430:fcb8:38c0])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:64e9:0:b0:432:5bf9:cf22
- with SMTP id ffacd0b85a97d-435699709f8mr14538540f8f.3.1768815653726; Mon, 19
- Jan 2026 01:40:53 -0800 (PST)
-Date: Mon, 19 Jan 2026 10:05:53 +0100
+        bh=CA3Nu437Rj+eAevya/i4iek0cQKs4Ymlx+qux+GVc44=;
+        b=G/5BrCSfLMurpmmCSE2n1XVBmWv+1ExIjwNiUp00DqSZPSKmaiMYUcSn/YeQT0YzBr
+         MrfbfkMXoakHFAwBTgB99lSjRUdrTyWPPW/jRrE7HE0s3pHvqR4usS5g3ORea6OOC7a7
+         JCaH1IJe5W8xfJW/ntYMXkBQM8KPg4HsJQoJKqMivyxfwOOt/7bPZh3rnX4OHsqsl0at
+         G5sja/LmohlusGkR/00gUtjJwg2yxNRT12hXxEVPT+g3HOtCJWJ5gEWtEidyYXhqo5cg
+         xePGF4mfV2vNT6F5VDRyy78HZ4VnWrUG+1YsFz5H+jgVhhTU5GGs7AdhL6QBuYNiWdHc
+         XM9g==
+X-Forwarded-Encrypted: i=1; AJvYcCXcAy66EkZnqRqfiWyAR2ZSGPyE2z7YuUoFX69dK1BdRAM3S3q7Pp4fSB9sR+Z3HMA/sNeu+NTMpuf3zhQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsOyz/r4+3PfqJ+khasrMQHNsz3pCBP7Xu8mJndd9pjP4aMqlb
+	CIbbDBh5GtEbi7tLfRKkUIA+uDIMWb7OeEFtaS/efYuPxC58uC+fAospivI1sFLadvo6+3peEaD
+	7jw==
+X-Received: from wmbka9.prod.google.com ([2002:a05:600c:5849:b0:480:2880:4d51])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600d:6413:10b0:480:1e40:3d2
+ with SMTP id 5b1f17b1804b1-4801e400518mr100658775e9.29.1768815656749; Mon, 19
+ Jan 2026 01:40:56 -0800 (PST)
+Date: Mon, 19 Jan 2026 10:05:54 +0100
 In-Reply-To: <20260119094029.1344361-1-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260119094029.1344361-1-elver@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260119094029.1344361-4-elver@google.com>
-Subject: [PATCH tip/locking/core 3/6] kcov: Use scoped init guard
+Message-ID: <20260119094029.1344361-5-elver@google.com>
+Subject: [PATCH tip/locking/core 4/6] crypto: Use scoped init guard
 From: Marco Elver <elver@google.com>
 To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@kernel.org>
 Cc: Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, 
@@ -73,28 +73,42 @@ Content-Type: text/plain; charset="UTF-8"
 Convert lock initialization to scoped guarded initialization where
 lock-guarded members are initialized in the same scope.
 
-This ensures the context analysis treats the context as active during
-member initialization. This is required to avoid errors once implicit
-context assertion is removed.
+This ensures the context analysis treats the context as active during member
+initialization. This is required to avoid errors once implicit context
+assertion is removed.
 
 Signed-off-by: Marco Elver <elver@google.com>
 ---
- kernel/kcov.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/crypto_engine.c | 2 +-
+ crypto/drbg.c          | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/kernel/kcov.c b/kernel/kcov.c
-index 6cbc6e2d8aee..5397d0c14127 100644
---- a/kernel/kcov.c
-+++ b/kernel/kcov.c
-@@ -530,7 +530,7 @@ static int kcov_open(struct inode *inode, struct file *filep)
- 	kcov = kzalloc(sizeof(*kcov), GFP_KERNEL);
- 	if (!kcov)
+diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
+index 1653a4bf5b31..afb6848f7df4 100644
+--- a/crypto/crypto_engine.c
++++ b/crypto/crypto_engine.c
+@@ -453,7 +453,7 @@ struct crypto_engine *crypto_engine_alloc_init_and_set(struct device *dev,
+ 	snprintf(engine->name, sizeof(engine->name),
+ 		 "%s-engine", dev_name(dev));
+ 
+-	spin_lock_init(&engine->queue_lock);
++	guard(spinlock_init)(&engine->queue_lock);
+ 	crypto_init_queue(&engine->queue, qlen);
+ 
+ 	engine->kworker = kthread_run_worker(0, "%s", engine->name);
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 0a6f6c05a78f..21b339c76cca 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1780,7 +1780,7 @@ static inline int __init drbg_healthcheck_sanity(void)
+ 	if (!drbg)
  		return -ENOMEM;
--	spin_lock_init(&kcov->lock);
-+	guard(spinlock_init)(&kcov->lock);
- 	kcov->mode = KCOV_MODE_DISABLED;
- 	kcov->sequence = 1;
- 	refcount_set(&kcov->refcount, 1);
+ 
+-	mutex_init(&drbg->drbg_mutex);
++	guard(mutex_init)(&drbg->drbg_mutex);
+ 	drbg->core = &drbg_cores[coreref];
+ 	drbg->reseed_threshold = drbg_max_requests(drbg);
+ 
 -- 
 2.52.0.457.g6b5491de43-goog
 
