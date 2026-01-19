@@ -1,62 +1,66 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4240D354ACC
-	for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 09:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35283570B5
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 09:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768815648; cv=none; b=LA1ZEbz+HukjEsXd4cWGQ0K0aCiKeaAYG5o40D16B89G1Up9FXiic6LuzmspxnLHAciof4XlZu/VZy6P4N6O6NwKoNAl5UUepQ4C/v0sHx64TrPrg7eSdbYj/qOtOw18pPLOmZkQpARHkRyHBcFj5jt+cXftUsqFd8ZNNznyvFU=
+	t=1768815651; cv=none; b=dafIyr9/SQdBC+hcEX1EUWSkbqoIsvs/DsPJPfL65m89KCGHhNEfJhfFJcUbJ1ejkeB0/DyaG/IC9rxRFfW1jJQKK25p+z7Oj0C2ni7SgosDmInG9goSciEC5ildi8FvuBD1dM695bdK2mLv3YKEheHoomnlxqLJWoSWY37Q0pY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768815648; c=relaxed/simple;
-	bh=LFRNb1gEQo9FV1jLi6+eyd+fRn/YHv3OptpdwWFbVxE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Co2zlrnF00kEMQevar6omF+xgZraCt7Qx+2/ODDfzC9bix8lC/gl41EhNXN1BIfXSHMTe/6zV/6PrtQy5RVV6ktfU256FtkCIBmIIXDkFWEoE3RxG64J5izec0eMUTTefn4HOetOnkTguaEWouyL0QHwsioWIVpvssZXNAVLdz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=37uQbcQ1; arc=none smtp.client-ip=209.85.128.74
+	s=arc-20240116; t=1768815651; c=relaxed/simple;
+	bh=KgBNkhyWNQ2k0IPDloVTMBnOWkgGfX49s05GA2EIxpQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NHIFyu+ZHI8l2KjgZb+bKAJCDXUNtzy5b8irLRIDawJM9i2ZUSd/ZNAGamfDsNewXQH93Y+GMMljPjQ+5SUAEC5+QracIYzGZf2B8mvJrvop1HbPHTswmdFNE4Dv4fxx8fJIFkCpnHLBFSYfNr5cov39ps1FgFIvaB+nJnXp3zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bm81DMjF; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="37uQbcQ1"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4801c1056c7so18620675e9.2
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 01:40:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bm81DMjF"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-47d3c9b8c56so52466075e9.0
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 01:40:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768815646; x=1769420446; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Tir03/0eTjGqYap+VXkH/YQyday94uYso0Z0/c7DdeU=;
-        b=37uQbcQ1CKqDDkAdb1lkP+I8pU0UDUltDhqfAVpP5SPDcQYJlViZ3k3dBVEq0WO12m
-         cIQccXy65LtV3IQv6H2M1jM4r7qEmkHAgILU6jRxF63kky97kNdQvKiE44GmhP27jDpp
-         mg5IPaWxJXg92hXihjlaEAo8Qw6TGqtc8JdJ7B9zk6nXT4dS9isbTmf2IzKi0P6Em1UJ
-         cwuT6tb5G0EslSIjR9kl6/E8R3TvBamDcsup8v/Xbqlm6ntQhsM0hI7cJiG2zwppXp1x
-         lPQaGz1ZK0Q1/17NzOKTPoJhh8MZSRzU+xrLLg2G8MGBcIboKCU67EwBDWVmM1cNsRUD
-         m9oQ==
+        d=google.com; s=20230601; t=1768815648; x=1769420448; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FVzjIjtVdiVPjpEIkbADcVmmkIUg4nu9DkgIt9tpdDQ=;
+        b=bm81DMjFfdktpqHH9slPweWJXUfFPptm5Ji2niPZAjiAzpdizmvIaHTJ08W+JlSqUx
+         puWfEACgRHBpwKfJldW9LTqVn2fSr7Br7fQxDMgTVPmeJAPWz6kxogQo3gEK81ZyT0LA
+         vOJyFMQjL/TYcQqymCTP0/BlmOwIyTwC8X6jTKM7H2mFWJJEmpDjyF+WeuwueVegZIo9
+         h9ZjKE1uOhveVyDK5uLNqCN9GEjEzLeFwNJAV7lzLClOz2etstR8RG7K7b0wLCxxqALF
+         +wqmRO1sovhlMxbgAOLaSj6rir+Eqvdw3NQVOs6UpAhcuGXAv1g9M3929XmuDA0/msRS
+         ND8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768815646; x=1769420446;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Tir03/0eTjGqYap+VXkH/YQyday94uYso0Z0/c7DdeU=;
-        b=iruXkmRE8Wqal8feDp09WkY3OBW0GHqw1OodKJfoInYgziFGlC2/GIaXOf/iiCnMfL
-         mtgcLA86EHCjsDFTOG3iVcmDkBW+UaNr1ZGturMQRW9EgNSa6gQ2LzlK1AWAehe0MhJW
-         TfYdajRIsUwzyIpRL13KBt6VgNdwfc4PI19fsflwhyPCBej0zydHRk0e+wvMY9yBTR0U
-         OVZWrrDjTBV5Hvwuba1EsNXtcQYZuSGLI0RNro/8E7XyZBnCn/DiYfUwg5LuD5bcx+qV
-         /HxmLhIO2oTPMoaLr0xRp2PdMIsbhA3Yykr257O2rAq8sDz1dN+vNijbSxy1b4ISIn1z
-         dgSw==
-X-Forwarded-Encrypted: i=1; AJvYcCUSidUgI6QAPzVLbIwyIiZ1obvXYLj2pvbXHWX5OU4h6lDfJVNe8tjX9slLRyq0yTn+j01c5Y5C24bjUow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvJw2HVZcsoKNa76sY2WZtGzx5+K9NEkvFZFtRj95vcP5VCD3c
-	ucxGZw8caVFFf5CWmO4tMYX8vNGxEA7x1v8n157iafG3H4JuHxIIwceH5Ko+LZRTxVK1cLY2Q4D
-	YFg==
-X-Received: from wmbil25.prod.google.com ([2002:a05:600c:a599:b0:46e:1e57:dbd6])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:358e:b0:470:fe3c:a3b7
- with SMTP id 5b1f17b1804b1-4801e2f3083mr136239335e9.5.1768815645684; Mon, 19
- Jan 2026 01:40:45 -0800 (PST)
-Date: Mon, 19 Jan 2026 10:05:50 +0100
+        d=1e100.net; s=20230601; t=1768815648; x=1769420448;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FVzjIjtVdiVPjpEIkbADcVmmkIUg4nu9DkgIt9tpdDQ=;
+        b=Uco8qjPndSjo0xvXuhRYZtoi/4lXsA2sGWdLuvIkGmb+4aBHCKiY3ZcaF6eK5m29/E
+         NqAjqmYykglDx8XpgYAswS/pi8nWyoP0BtrLA5Hm3h9kWxcZcGM2sslZnGcvdfrVK9pa
+         A5lgEq7Rhg5gjHzkYU4vMlTGv1yOV+2mWTL5Q4yzKdVBol+Ig4EFgo/eVAzx1E7RPBzQ
+         oIZRUomMZ6o7J0WOsjYYauvj7yTPHbBBKKJmn+pdRC/qPEQqTcq6jrzIDwadgvUP5GQt
+         Gq2P7q0rKmMH9aBDjRjx6vtoXhvFwcxfE96jQ13lBlblzdsxlvFWboQ7lIWX34hkWeUv
+         +kfg==
+X-Forwarded-Encrypted: i=1; AJvYcCXStQxdtUxJ66LenIKxUV14E2NlCToH6D2Ovp5ZzlEssOCXNXZcz0CqXdJWvUE0euQehfyvBclwndAu3qI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDXtDCq5r9UU8pKBECdFC+6jKCZZ9kdyHc25WLNZ4nRBGm440K
+	KNOsCH8PwPLuM8PCbKUM7iOHrn/yVAtKDEJPaY9fLhTqVCVi317xQnkej4RKMj3T8aFCMX4G3kA
+	cGA==
+X-Received: from wmaz14.prod.google.com ([2002:a05:600c:6d8e:b0:477:a1f9:138c])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4e89:b0:475:dd89:acb
+ with SMTP id 5b1f17b1804b1-4801eb035ecmr125513305e9.22.1768815648401; Mon, 19
+ Jan 2026 01:40:48 -0800 (PST)
+Date: Mon, 19 Jan 2026 10:05:51 +0100
+In-Reply-To: <20260119094029.1344361-1-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260119094029.1344361-1-elver@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260119094029.1344361-1-elver@google.com>
-Subject: [PATCH tip/locking/core 0/6] compiler-context-analysis: Scoped init guards
+Message-ID: <20260119094029.1344361-2-elver@google.com>
+Subject: [PATCH tip/locking/core 1/6] cleanup: Make __DEFINE_LOCK_GUARD handle
+ commas in initializers
 From: Marco Elver <elver@google.com>
 To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@kernel.org>
 Cc: Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, 
@@ -64,86 +68,76 @@ Cc: Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
 	Christoph Hellwig <hch@lst.de>, Steven Rostedt <rostedt@goodmis.org>, Bart Van Assche <bvanassche@acm.org>, 
 	kasan-dev@googlegroups.com, llvm@lists.linux.dev, 
 	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel test robot <lkp@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Current context analysis treats lock_init() as implicitly "holding" the
-lock to allow initializing guarded members. This causes false-positive
-"double lock" reports if the lock is acquired immediately after
-initialization in the same scope; for example:
+Initialization macros can expand to structure initializers containing
+commas, which when used as a "lock" function resulted in errors such as:
 
-	mutex_init(&d->mtx);
-	/* ... counter is guarded by mtx ... */
-	d->counter = 0;  /* ok, but mtx is now "held" */
-	...
-	mutex_lock(&d->mtx); /* warning: acquiring mutex already held */
+>> include/linux/spinlock.h:582:56: error: too many arguments provided to function-like macro invocation
+     582 | DEFINE_LOCK_GUARD_1(raw_spinlock_init, raw_spinlock_t, raw_spin_lock_init(_T->lock), /* */)
+         |                                                        ^
+   include/linux/spinlock.h:113:17: note: expanded from macro 'raw_spin_lock_init'
+     113 |         do { *(lock) = __RAW_SPIN_LOCK_UNLOCKED(lock); } while (0)
+         |                        ^
+   include/linux/spinlock_types_raw.h:70:19: note: expanded from macro '__RAW_SPIN_LOCK_UNLOCKED'
+      70 |         (raw_spinlock_t) __RAW_SPIN_LOCK_INITIALIZER(lockname)
+         |                          ^
+   include/linux/spinlock_types_raw.h:67:34: note: expanded from macro '__RAW_SPIN_LOCK_INITIALIZER'
+      67 |         RAW_SPIN_DEP_MAP_INIT(lockname) }
+         |                                         ^
+   include/linux/cleanup.h:496:9: note: macro '__DEFINE_LOCK_GUARD_1' defined here
+     496 | #define __DEFINE_LOCK_GUARD_1(_name, _type, _lock)                      \
+         |         ^
+   include/linux/spinlock.h:582:1: note: parentheses are required around macro argument containing braced initializer list
+     582 | DEFINE_LOCK_GUARD_1(raw_spinlock_init, raw_spinlock_t, raw_spin_lock_init(_T->lock), /* */)
+         | ^
+         |                                                        (
+   include/linux/cleanup.h:558:60: note: expanded from macro 'DEFINE_LOCK_GUARD_1'
+     558 | __DEFINE_UNLOCK_GUARD(_name, _type, _unlock, __VA_ARGS__)               \
+         |                                                                         ^
 
-This series proposes a solution to this by introducing scoped init
-guards which Peter suggested, using the guard(type_init)(&lock) or
-scoped_guard(type_init, ..) interface. This explicitly marks init scope
-where we can initialize guarded members. With that we can revert the
-"implicitly hold" after init annotations, which allows use after
-initialization scope as follows:
+Make __DEFINE_LOCK_GUARD_0 and __DEFINE_LOCK_GUARD_1 variadic so that
+__VA_ARGS__ captures everything.
 
-	scoped_guard(mutex_init, &d->mtx) {
-		d->counter = 0;
-	}
-	...
-	mutex_lock(&d->mtx); /* ok */
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Marco Elver <elver@google.com>
+---
+ include/linux/cleanup.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Note: Scoped guarded initialization remains optional, and normal
-initialization can still be used if no guarded members are being
-initialized. Another alternative is to just disable context analysis to
-initialize guarded members with `context_unsafe(var = init)` or adding
-the `__context_unsafe(init)` function attribute (the latter not being
-recommended for non-trivial functions due to lack of any checking):
-
-	mutex_init(&d->mtx);
-	context_unsafe(d->counter = 0);  /* ok */
-	...
-	mutex_lock(&d->mtx);
-
-This series is an alternative to the approach in [1]:
-
-   * Scoped init guards (this series): Sound interface, requires use of
-     guard(type_init)(&lock) or scoped_guard(type_init, ..) for guarded
-     member initialization.
-
-   * Reentrant init [1]: Less intrusive, type_init() just works, and
-     also allows guarded member initialization with later lock use in
-     the same function. But unsound, and e.g. misses double-lock bugs
-     immediately after init, trading false positives for false negatives.
-
-[1] https://lore.kernel.org/all/20260115005231.1211866-1-elver@google.com/
-
-Marco Elver (6):
-  cleanup: Make __DEFINE_LOCK_GUARD handle commas in initializers
-  compiler-context-analysis: Introduce scoped init guards
-  kcov: Use scoped init guard
-  crypto: Use scoped init guard
-  tomoyo: Use scoped init guard
-  compiler-context-analysis: Remove __assume_ctx_lock from initializers
-
- Documentation/dev-tools/context-analysis.rst | 30 ++++++++++++++++++--
- crypto/crypto_engine.c                       |  2 +-
- crypto/drbg.c                                |  2 +-
- include/linux/cleanup.h                      |  8 +++---
- include/linux/compiler-context-analysis.h    |  9 ++----
- include/linux/local_lock.h                   |  8 ++++++
- include/linux/local_lock_internal.h          |  4 +--
- include/linux/mutex.h                        |  4 ++-
- include/linux/rwlock.h                       |  3 +-
- include/linux/rwlock_rt.h                    |  1 -
- include/linux/rwsem.h                        |  6 ++--
- include/linux/seqlock.h                      |  6 +++-
- include/linux/spinlock.h                     | 17 ++++++++---
- include/linux/spinlock_rt.h                  |  1 -
- include/linux/ww_mutex.h                     |  1 -
- kernel/kcov.c                                |  2 +-
- lib/test_context-analysis.c                  | 22 ++++++--------
- security/tomoyo/common.c                     |  2 +-
- 18 files changed, 80 insertions(+), 48 deletions(-)
-
+diff --git a/include/linux/cleanup.h b/include/linux/cleanup.h
+index ee6df68c2177..dbc4162921e9 100644
+--- a/include/linux/cleanup.h
++++ b/include/linux/cleanup.h
+@@ -493,22 +493,22 @@ static __always_inline void class_##_name##_destructor(class_##_name##_t *_T) \
+ 									\
+ __DEFINE_GUARD_LOCK_PTR(_name, &_T->lock)
+ 
+-#define __DEFINE_LOCK_GUARD_1(_name, _type, _lock)			\
++#define __DEFINE_LOCK_GUARD_1(_name, _type, ...)			\
+ static __always_inline class_##_name##_t class_##_name##_constructor(_type *l) \
+ 	__no_context_analysis						\
+ {									\
+ 	class_##_name##_t _t = { .lock = l }, *_T = &_t;		\
+-	_lock;								\
++	__VA_ARGS__;							\
+ 	return _t;							\
+ }
+ 
+-#define __DEFINE_LOCK_GUARD_0(_name, _lock)				\
++#define __DEFINE_LOCK_GUARD_0(_name, ...)				\
+ static __always_inline class_##_name##_t class_##_name##_constructor(void) \
+ 	__no_context_analysis						\
+ {									\
+ 	class_##_name##_t _t = { .lock = (void*)1 },			\
+ 			 *_T __maybe_unused = &_t;			\
+-	_lock;								\
++	__VA_ARGS__;							\
+ 	return _t;							\
+ }
+ 
 -- 
 2.52.0.457.g6b5491de43-goog
 
