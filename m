@@ -1,399 +1,246 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011017.outbound.protection.outlook.com [52.101.62.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6516E359F9F;
-	Mon, 19 Jan 2026 12:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768824745; cv=none; b=TmOGQ9hQYM1vzdf65i6GGrTfVggg9L8gQhXaqLCGvRyJ8NACq6vVN9UB0aJ/2+adN5cfwU/1TmhiDQCCZof+ShbaTPXfMBtJByxsDbjRGMOl9kGDb1OSJLzJWUMeyqOhlBOgdChZTUvX7P5MvDkhkYasrwkmMZCtDxN4XPZ72Mw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768824745; c=relaxed/simple;
-	bh=JxdKrqcZwbBmur5VMh1YFvuGxuY9Rnxf/u95XvDmwiU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AXvxQQpe5LqR0ogc22DWt3ugktNThoQ+2lW5OJ7X5SYaG9hiOwOGN9wL69cMjoCO5i8TecIcW/SwH77NPkDGut9ig6J7PEaj5vWLaq76iqk1hDIEg4Pu6VQmFzM7/rWy3Uf0sFjnWPDa6LKAjS6O6N9GR4/W1Zrp/RCXzoFSHk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HnypfJ5f; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC38A36E47F;
+	Mon, 19 Jan 2026 14:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768831843; cv=fail; b=SGWpg27P9O4NUNRGvP8unZEhWh0a4CfFkAGlyucGmBcySZMmW7kX5faqjVA/0HNsLeXLm2TFsuMhHQTSStKHAY676q2ITopXQqlH15QkkSGkdpeUrw4b2LyUjrMrYvKkNzir7zdYpe3Srpa43HqfCnLe8CzdPLXVktMpn3zcUIs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768831843; c=relaxed/simple;
+	bh=ic825M2sdSAFIuyYgTFXtznWtCHZ7EfbpAlTQikpiBU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JOWqwOUJSM5YlaR7sPoruyl1PIJvZyp/ANdaucVJDjjmp/G1mY3G6q4K9TiiyGk8RjV9cWC4nlwP85ipvqanQ2CFiZxtaNoT6L7sWKSJM1cR8QEcJAlpIXHzoSHBFQ6hcRyZhbqE3mpiEeYyaVX+OjeTO68CcK3csix7iydrSF0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TzjNm+zU; arc=fail smtp.client-ip=52.101.62.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HnypfJ5f"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 60ILFuJl006852;
-	Mon, 19 Jan 2026 12:12:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=nABxFGD8fCdzO96PB
-	9O0YHG32dHJPMYO73+OyniaqVA=; b=HnypfJ5feKVfhpIlKgD2zZ1dEU/gw/Igm
-	sfLJhuU1RB4mip78lCG3cjJvz5kxDTvu5RrXUImoGqIBCnl2R0jNIwJtHLxChZLo
-	gZ2wzitWGwiMynJdUGjfqK840dnIacctMReEwUmKXXfT5rPNwoKlHOQlQIFvHfqc
-	uevAbOcPeTiLLtZTAh5+fxl1oWBUlP6gUKm140LXSV3tSs5PCU/j8vYTuTyUkQ28
-	lWIqxWAFspxaIAb+0CxpCtJFWtO80byLEl5iXC9DxdvOAYqF8ma/WYeMWbcUvRBE
-	PVdd5qz0k3+oeGpxhRbHu6Iv+0C3a/J9ZN+TMt2YxB+0K7B+Y1Zyw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4br0uf7jtt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Jan 2026 12:12:16 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 60JC8w6D012029;
-	Mon, 19 Jan 2026 12:12:15 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4br0uf7jtm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Jan 2026 12:12:15 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 60J9qYOe016672;
-	Mon, 19 Jan 2026 12:12:14 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4brn4xppr2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Jan 2026 12:12:14 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 60JCCAD450856394
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 19 Jan 2026 12:12:10 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8E67920040;
-	Mon, 19 Jan 2026 12:12:10 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4EC712004B;
-	Mon, 19 Jan 2026 12:12:10 +0000 (GMT)
-Received: from ibm.com (unknown [9.111.163.233])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 19 Jan 2026 12:12:10 +0000 (GMT)
-From: Holger Dengler <dengler@linux.ibm.com>
-To: Eric Biggers <ebiggers@kernel.org>,
-        David Laight <david.laight.linux@gmail.com>
-Cc: Ard Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Holger Dengler <dengler@linux.ibm.com>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v2 1/1] lib/crypto: tests: Add KUnit tests for AES
-Date: Mon, 19 Jan 2026 13:12:10 +0100
-Message-ID: <20260119121210.2662-2-dengler@linux.ibm.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260119121210.2662-1-dengler@linux.ibm.com>
-References: <20260119121210.2662-1-dengler@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TzjNm+zU"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DWWkIz9esVUVFHMbI3UtVtNtb5/8Yct/fm8jBlgzoil4aVxVnbOy/1PrNL3P4aYOUBI5u7Hmq9m9CI5o/nXkqYRQeF83W6YenT9n3yfFTXTqmH+BrO7AzBk0Jxo13tev5qD98NfWL1TJj6fY/LZS5XdnYgEGjekU+faEESKLFVf9H32TCljTWly23UGrSlMF3vo0S+5RAvXMLMyj9rDbJOyzNQW8V6+UXxIpA2dwNWYO0ikZQNVipjEPsUy4EN32fHmwLAougm6cQXblqco06cz2GtFKqD2XgeMij2j+Oi1EFc6VCIegP7d0yt3pzcM6DvHC/yT6Xmnut6MrNsethw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=daBfrgcyo7/PK3IdsXMl4S1MynDAMkXNB22iCu8XUbk=;
+ b=OKOUpT60vHSdrkJ/FE7xXTuuTW4/4Xg67pCny53rgmH8LMKF2cjbbzCkv1c5GLB+wjecxyDMyI/EuL+srN8spGKM40X3Pgt2vam0kiUCut0Bt3Aa21SUzrgk42ER0a3Gz32iHJPael/fR4n7uge0pve8xuXprQ2FcpZ6x8XI9/2izEFg5A2l2MuJ1E4Asa28xc+NX0tGdNYWakkCEySvH2y6kvLBIhlz3/lBiwuE4u5qPQNgxzksEracj4X4JjryVMUyxt+wbAp09xFQlgZ2p2dr80NYsBhsXj8omR7pUh/rfAYbzGlMzgEAC3jYrdLMNZqRHv90Tq3TroIePu8t7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=daBfrgcyo7/PK3IdsXMl4S1MynDAMkXNB22iCu8XUbk=;
+ b=TzjNm+zU4pYmVahj1c3NhW9CLC0eG67ldZOLilJWBfGZaEF3NfQjW0qX7lSYncf+zlyzs+8ZvvBhdOD6nXwYd/92NkWDe+PeVtTN/nPj2u+zTB7LBna2F8s8hKbzZDmgpXac+ZtkvcZAtpZfvZeuCbbZc1ZI3M9i7nhReiAYb9M=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by CY8PR12MB7434.namprd12.prod.outlook.com (2603:10b6:930:52::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.5; Mon, 19 Jan
+ 2026 14:10:36 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%5]) with mapi id 15.20.9520.011; Mon, 19 Jan 2026
+ 14:10:36 +0000
+Message-ID: <b3e355f7-b242-4fda-ac13-f8cb90225fb5@amd.com>
+Date: Mon, 19 Jan 2026 08:10:34 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 2/5] crypto: ccp - Declare PSP dead if
+ PSP_CMD_TEE_RING_INIT fails
+To: "Mario Limonciello (AMD)" <superm1@kernel.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Rijo Thomas <Rijo-john.Thomas@amd.com>
+Cc: John Allen <john.allen@amd.com>, "David S . Miller"
+ <davem@davemloft.net>, Hans de Goede <hansg@kernel.org>,
+ "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER"
+ <linux-crypto@vger.kernel.org>,
+ "open list:AMD PMF DRIVER" <platform-driver-x86@vger.kernel.org>,
+ Lars Francke <lars.francke@gmail.com>, Yijun Shen <Yijun.Shen@dell.com>,
+ Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
+References: <20260116041132.153674-1-superm1@kernel.org>
+ <20260116041132.153674-3-superm1@kernel.org>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Content-Language: en-US
+Autocrypt: addr=thomas.lendacky@amd.com; keydata=
+ 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
+ WiyqywZI5g==
+In-Reply-To: <20260116041132.153674-3-superm1@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA1P222CA0161.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c3::9) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: H-9uR_dk-bAm4rTYuD0gUv1pPWVb9dMq
-X-Proofpoint-ORIG-GUID: fh9rn4TOvr7NWiNNQBio2Z1wR5w4gEKi
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE5MDA5NyBTYWx0ZWRfXwc3HkdqPMtwY
- cKIhFjcJnZfeVr3YAZghBk/vYMh+SNgl0ntR86j4rZItt1BUT+3bBasIRjY8+uOh+fo3qv2Db9O
- 7pM5JlJ7oY6sd9yDkR+zLr4wlfdXUrWyD/DVxjhar5QaTs6vtmxQhuYNzGo+dqO/x19L5geI/sQ
- AZ6rN43b2I34q8IbWdD1Ta6nxMmwcTxd1ORtM6pbgaxS2P942xGveeOCW5JEGJRdIYm8hoJDVUr
- NLySmZFhoFwMFgOuocEirqL9Qd8dFc7PWA0DwskgzXab2OXLJBDjVC8KCVLncnTLniJWRgiV7xX
- z1OckO4fFxDdhwc/ekECkvPPn4DtEpKJH8Yqp2w2Y+exNG8G2IiPrr4flHYTBoYSk+rUvCQSgiv
- zrBo9lwfzc2bWKCViLz8XuOlF9mLXcIfwBGnzQ/Q65UrueRT+jcdr0IQItWGE8t2Yal9PNsvUMn
- qloVY5+NObTiO2fXKQA==
-X-Authority-Analysis: v=2.4 cv=bopBxUai c=1 sm=1 tr=0 ts=696e1fa0 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=PYnjg3YJAAAA:8 a=VnNF1IyMAAAA:8
- a=Ta3jY6XSS_yevuDS-b0A:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-19_02,2026-01-19_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 adultscore=0 suspectscore=0 impostorscore=0
- phishscore=0 malwarescore=0 lowpriorityscore=0 priorityscore=1501
- clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2601150000
- definitions=main-2601190097
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|CY8PR12MB7434:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1e402a48-ff14-4377-6d28-08de57648488
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Q3dMZlJvMEx0dy9GT24rZXA2MjU3MjZzeUQrd2JCU2NjaGdnOU9FSWRKU25M?=
+ =?utf-8?B?N2J1YWpLUUpvMGtHcGpCbTdRSkNsWnFSMU9NUXZjSG5RK0RhYXNhTFpxK2Vz?=
+ =?utf-8?B?UjZRTnl3eW5hVHlNVSt0VjJoSUNmVnVDNk5NTmN3bnd0ZHpKMlEzcWRRREVp?=
+ =?utf-8?B?dFFVeEdBdVJEbjc1QlpLVWJLaUhkOU9VTnBpRytCMklGdU1Bd2FXaXRjRHlN?=
+ =?utf-8?B?TVRhTDhxUS83bW9yS01vMlpUSkdVZUo4akpsUW8xanRtbUVQMUd0ZXR6MlZ3?=
+ =?utf-8?B?dm1HMWJxR0tFVVI4T0VwL1RLdTZSSmVQOW40K25kZHZiNi9IaEJ1QlViRUVG?=
+ =?utf-8?B?eFZqdUpMRjhnMW9GSzNsNkw3Z2dUcTV6OFJvTnVQUEdLbHF3Q01KOFJpMXRr?=
+ =?utf-8?B?SzdJanNJM0krR2FmdDB2bkJLK0toUzIwRG5ZWVdqbWdhQXcrUGV1eEMyUHpN?=
+ =?utf-8?B?RGlTYnZ4amFzTU5DM3VOdmh4TUNXRGphaUt3T3Z0TVdJWGFyT1RuTXprMXN6?=
+ =?utf-8?B?M0o0bDdFT240bEk0bCtGSjVObkFqcE13L0dhTkNnV05paE1OYWVjdFplY3JP?=
+ =?utf-8?B?emVEOHNKVWhNbTdTd2hZODg4bko3bkMrWTRHYThBazZOWTl4U0Y4ci8zbjdl?=
+ =?utf-8?B?UGNKcWVTQzZaTDJQTXhKSVRLMURRVkVkRlRPUHhhUytFQkhCRUVhZnVnNnNl?=
+ =?utf-8?B?bG1kV29MeElnQjlLaERtRlQ5S0h3a3ZqZEZhekZtemRIZUREdHZMVzBhYlpR?=
+ =?utf-8?B?SFhZMkhHdk5DK0tRSHBaZnFaa0ZHRzRhRkQwTVZXelJiSjJZRUdDV3VSaDN6?=
+ =?utf-8?B?OVZrYUtHNFF6bmR3cGtOam1wSUxyUDRKZU43SXNLYnVOeERHN2VIMWpqakJJ?=
+ =?utf-8?B?cTdpQTk0Ykcranp0UFM2RDBEVndhRlBLTkhiN0tFcXFMbklTVi9reTN2Mm11?=
+ =?utf-8?B?TVpZUlR5WFA3SGdUZkJVemFzVDBaUkVEUWZOd0NtdWduYWhPMzJwM0JhS2Yx?=
+ =?utf-8?B?WE1WaFV4eWhnUGpOYWFkdWJ5RHVvenI5NzFiUjM5dThDWjM0MGFhVHBwZVdD?=
+ =?utf-8?B?SFcwTGdOKy9CMzNMMlh6K0ZDRnp1U2NMdVpWR3FkMjBha1RLbzkrZVJWbW9h?=
+ =?utf-8?B?QlVCNWJ5VCtrZXhEQ3d6OXd2Z3R5d0l4UUFDTHJNTXNnTm5IZXIrOURva3RO?=
+ =?utf-8?B?SldablFDS0ZxTHVFSHBweGFCcFZtMGZDQ3VVa3Z0U2FDTkkvU3VJYzZmUnRZ?=
+ =?utf-8?B?dHdmQmYya2VtTmdtN0VDa3BRc2tmMVNaTUxuQVNCU3Y3MjB0YkV3Z0FORzYz?=
+ =?utf-8?B?MHdiUENRYVJnTU5EMHRCYVM2Q0NiVG8vN2NNZ1RMWll0T3RoSUU3SnlBYktj?=
+ =?utf-8?B?MGx2dFc1TXZKMk9GYW1mZnJnbS9HQ1Jvc0dhQ2JiMjJhZnJ4UlU4bGlGWVZE?=
+ =?utf-8?B?Mnp4anhUeGJuam41YTlIaDMvVFRBTlc2bkpJdHoyRkZ5Y2lmdXJnT2NTMGZ2?=
+ =?utf-8?B?M3BTWG5XSXM3Vzk3SnNIaW9TZWV1a1l6VmxXakpGMnZ4OUU0YjB3VGZyZ1lQ?=
+ =?utf-8?B?ZWJPVTBBRGRXVVlmdE5PNkdKYTVpRVNBaXVjRlBYTGNJMVNsQVBYd3lXYThl?=
+ =?utf-8?B?RHNIbkFTZk5HN09pak5uTmZ1TTRJdjhzS2dZcExtMTQ0MXg4MzdSenlqWS9M?=
+ =?utf-8?B?MFJnYnh0QmFoU2FsbjluK3F4UEt6aFJTQk5TNXN4Zis3blgrWTUxUkxsS0Zq?=
+ =?utf-8?B?ZVNvK3creGZWb1dwRVNwV0pzd3kvSkJHR1NxbXV1WjJENzY1R0xMbzF1cko2?=
+ =?utf-8?B?dzVMQTU2dkplVmRqbFpGemRsSjU1c1lySGM5dFN6M24rWXdvMjZESmdWU1lB?=
+ =?utf-8?B?K3MrcE03T3piNWREL2tablFheFE4OUdPa0wvcG5VRTk3ei91NU5KNGl3OEwz?=
+ =?utf-8?B?YTlnRCtJQVlhdEJ6TjUvYnh3VGhSTFRMV2ZQZG83K2hvS1B1MURhdW9EeWZ1?=
+ =?utf-8?B?NnQ3cVV4UWkvM2VDNnh5a21JaWs2b2M5SmVlSitqcE43dWZnZWlOa094VnIx?=
+ =?utf-8?B?YXduUm9yVjNEQ0FnNnhpYWdhOUdPNnJNVEtjb1FoTEFnZW5kV2t6Y3J5aDNJ?=
+ =?utf-8?Q?aTSo=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?U0JWT01aTldSSTJBODN4K0FKckUway85MGZHNGRyTG82Z0tRblZCNDBrQ3dv?=
+ =?utf-8?B?YW95OGIzVmdSTForcElqY2VlMDJJVlRDeGhieWc2dFZ3UXJBZWdMbmFlZjNR?=
+ =?utf-8?B?MExBVEFTVWZqOWlrejQxczZLVm1hZXAzaFE0UU8rYy84ZTdlYnNQTjcxOVRH?=
+ =?utf-8?B?RTNST3g1OHlsWkpRNEZvMnFMMC84bzdxYmhCWkMxdFJKU21UTDNHZ2FJK3RU?=
+ =?utf-8?B?Y1Z6L3JicklQRExGcVdNZitEZ1piM3NnUDBXQ3NsZm5JUnlGOGZKdlpKck56?=
+ =?utf-8?B?R0J6QlpMekgvbWlhVnY1K0YvQzliYUJFSy82SGUrUE5ZMTgvYS8vVVFobUpL?=
+ =?utf-8?B?TDN0WUtoL3hqbFp3RGtGZHV1NjdmbWR3N0ZlYXdpZUlSanUrL3Q2YXh3RUd2?=
+ =?utf-8?B?RFlZK3FoZlJxYkN2ZWE4YzRsOHFlY0tpTHNjZ28yVlY0RVFIai9yUVhlcTFv?=
+ =?utf-8?B?K1pGekNZUlRIbmNQNEZwbCtzOXFhcUY5aVFZK3UvL01qZTIzRXBObVdPK0lO?=
+ =?utf-8?B?SURqTW9hNU8ydktaM1JXSkpuWmFsc2xVTWxVTEZRczVhM1JmY2ZpZU56WXZB?=
+ =?utf-8?B?cVdSKzBramx4NGZuaGVMVy8zVXYrcFVJWUpoTTk0R3l6eEtkMXpSUk1hcytQ?=
+ =?utf-8?B?MGxHQjltMGRJS0JiVy9XZU1tQUhDdWRsemZpNVJGNUU5OFN0ZTB0RzJ2c1Fj?=
+ =?utf-8?B?bG41RlNRbjhSYnlXSE5lOTl5QncyMVJSb2dhdHhncEdNQnN2M0g0NGRuWFgz?=
+ =?utf-8?B?dUJNR3RQclNpLzJZRzlyNzRLdk1UNlVYUjhuS25MYTd0b1NyRlNTL1M3LzZH?=
+ =?utf-8?B?MXNJaTNKK3dPZWlCZ0lKWGlYR09xUUZ4ZGI0WXduL0pyR0U3OG9qampWYnkx?=
+ =?utf-8?B?NlV0Mk5qRmp6VnI1MXVYSllkTHUrNFIyZ090citLU3h0VTZjajVLeXBGQzFt?=
+ =?utf-8?B?UzNLRDVYK3ptSExzSFk0V1BRSVBpcG11dXBOdG4rb2I3aHM2dmZZZXZhV09N?=
+ =?utf-8?B?YTBqekl2NUxYc1ViNlVPMmpPNW1DMGZhVEtxT1YyZk1hVTErTFRTa1JYQWR5?=
+ =?utf-8?B?VUN4SDNCd3AxU2ZBajRLekF1ajJPZElpd25vNk00eXNWTXZpN280ZWsyNWZS?=
+ =?utf-8?B?em9CUTdyNnFGai9KTzdMOFZDNm80ZkdNRjk3UXhXbmlZM2Q3bjNwaHN2cnN4?=
+ =?utf-8?B?aGRHa21jalpIbWxycGhJWXlHRzZwVzh3VTRzL1NSYzZuTm5tc3VTV2hiYXo3?=
+ =?utf-8?B?OVlHNjlZcUR2U01DdGYyTWszcWQyVnZrcFVpM3VaUWErQW1uMGJDTUZ4Zlll?=
+ =?utf-8?B?Z3JaMldEbGpFUWlyYkVvQ3BTY2grdElhR2RSTmw5Rm5QRTE1Mm00ZVdqYnBQ?=
+ =?utf-8?B?R21OWWp6cW84NTQwd1d0NEttSjVLdzBESWVQUnBmQjIyOWV4NDdONDVybWVO?=
+ =?utf-8?B?WWtWaEVsdGR2N04vUnFwc3FNTUZWVWQ4UTB4T1lMM0dFNG1uS0dqd3lsTUN0?=
+ =?utf-8?B?dXBYN0lzakJDa0IzUTVoRklhSllLT2xLdkxiOURrMGpHcnN0K241dGtjNGRQ?=
+ =?utf-8?B?MEpkYmgxWTR3T3VlYnlKTHhFWXkwbWxLZGpyMHNGQTYyclFDWm5jMUVsenNI?=
+ =?utf-8?B?R3lzNDJqWnNuV2tQVFA3S0N2TG1GWmhzOUl5K1Y3MWxTM0psazZXRUVlbSto?=
+ =?utf-8?B?dUVvREd3NmVtOTZpeEN4NnlSV1YyNlFiQUtLay9zYy9heFd0bHpUYmpMckNE?=
+ =?utf-8?B?ZElZMHk3NWtjd3V5OXRQMHhPRlYyZFh6VWhIam9tTXRxQjlGNHBCVTNpU0Yx?=
+ =?utf-8?B?eGg0dDBqZUNJcndSc0V3S2VJVVNlNU9ULzV6ekdvRVlZNjdmM3hheWtTRDhn?=
+ =?utf-8?B?ek96T3RIb0ZWMEx5TEdJWjI1Qk9hVVNOeU1LS0g0cGZma3RJU3BHTVo0RE9B?=
+ =?utf-8?B?dTJkVlRicWQ4T3ZSeVl2bUZ6Znc1VkdZUE5kUGV0L3g0L0Y4KytEVncraGxx?=
+ =?utf-8?B?Sy8vRHFmOWw1akt6N0ZLMlpTMmQ0ZlZsVlhlcytMK1hUWHFUWWdoYmt2TTBr?=
+ =?utf-8?B?MFBWcjBIdlhZdTMwMnk3U0t2YVh0M3RxbFJLNTR0akxzSW5JdzB1bmhpOWNn?=
+ =?utf-8?B?QTlvS1ZEMGtRakdhMVppT1pNeUhBT1k5aDJRTzBlK3FpUG93OUN6QkJCYlQ3?=
+ =?utf-8?B?RU5IcnJJUWdYdVZZcDlEVVIrQzZIeFQrVjEyYWtPcjNBOVMzT0RxKzU3Ump2?=
+ =?utf-8?B?bVhZRGdkdjZMR0t5YitPN2ZFS25sSlNkUitYN2oxeGQxRXBUNFh5R2lZVlpI?=
+ =?utf-8?Q?ocyFmCGD8HZI7QBLXS?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e402a48-ff14-4377-6d28-08de57648488
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 14:10:36.7020
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /AV2uJvCCSDLC/pejkzyzV9PMuODDFfJeezkbkFuMo1zsZynt0WlQmms4h3+D8In5t2QtG8WYN+hlBXO3k9Sdw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7434
 
-Add a KUnit test suite for AES library functions, including KAT and
-benchmarks. The functional tests do a very minimal verification of the
-AES operation for each key-size. The benchmarks, which are also part
-of the test-suite, can be used to get some rough performance
-measurements of the AES operations. The key preparation API
-performance is not covered by the benchmarks.
+On 1/15/26 22:11, Mario Limonciello (AMD) wrote:
+> tee_init_ring() only declares PSP dead if the command times out.
+> If there is any other failure it is still considered fatal though.
+> Set psp_dead for other failures as well.
+> 
+> Fixes: 949a0c8dd3c2 ("crypto: ccp - Move direct access to some PSP registers out of TEE")
+> Tested-by: Yijun Shen <Yijun.Shen@Dell.com>
+> Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
 
-Signed-off-by: Holger Dengler <dengler@linux.ibm.com>
----
- lib/crypto/tests/Kconfig        |  12 +++
- lib/crypto/tests/Makefile       |   1 +
- lib/crypto/tests/aes-testvecs.h |  77 ++++++++++++++++
- lib/crypto/tests/aes_kunit.c    | 150 ++++++++++++++++++++++++++++++++
- 4 files changed, 240 insertions(+)
- create mode 100644 lib/crypto/tests/aes-testvecs.h
- create mode 100644 lib/crypto/tests/aes_kunit.c
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index 4970463ea0aa..8ac06b6e2f12 100644
---- a/lib/crypto/tests/Kconfig
-+++ b/lib/crypto/tests/Kconfig
-@@ -1,5 +1,17 @@
- # SPDX-License-Identifier: GPL-2.0-or-later
- 
-+config CRYPTO_LIB_AES_KUNIT_TEST
-+	tristate "KUnit tests for AES" if !KUNIT_ALL_TESTS
-+	depends on KUNIT
-+	default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
-+	select CRYPTO_LIB_BENCHMARK_VISIBLE
-+	select CRYPTO_LIB_AES
-+	help
-+	  KUnit tests for the AES library functions, including known answer
-+	  tests and benchmarks for encrypt/decrypt with all key sizes. The
-+	  test suite does not contain any key generation test, nor any error
-+	  cases.
-+
- config CRYPTO_LIB_BLAKE2B_KUNIT_TEST
- 	tristate "KUnit tests for BLAKE2b" if !KUNIT_ALL_TESTS
- 	depends on KUNIT
-diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
-index f4262379f56c..e0a30bdc02ac 100644
---- a/lib/crypto/tests/Makefile
-+++ b/lib/crypto/tests/Makefile
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-or-later
- 
-+obj-$(CONFIG_CRYPTO_LIB_AES_KUNIT_TEST) += aes_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_BLAKE2B_KUNIT_TEST) += blake2b_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_BLAKE2S_KUNIT_TEST) += blake2s_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_CURVE25519_KUNIT_TEST) += curve25519_kunit.o
-diff --git a/lib/crypto/tests/aes-testvecs.h b/lib/crypto/tests/aes-testvecs.h
-new file mode 100644
-index 000000000000..fd52d8ad7760
---- /dev/null
-+++ b/lib/crypto/tests/aes-testvecs.h
-@@ -0,0 +1,77 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _AES_TESTVECS_H
-+#define _AES_TESTVECS_H
-+
-+#include <crypto/aes.h>
-+
-+struct aes_testvector {
-+	u8 plain[AES_BLOCK_SIZE];
-+	u8 cipher[AES_BLOCK_SIZE];
-+	struct {
-+		size_t len;
-+		u8 b[32];
-+	} key;
-+};
-+
-+/*
-+ * KAT test vectors from NIST.
-+ * https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/aes_ecb.pdf
-+ */
-+static const struct aes_testvector aes128_kat = {
-+	.plain = {
-+		0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96,
-+		0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a,
-+	},
-+	.cipher = {
-+		0x3a, 0xd7, 0x7b, 0xb4, 0x0d, 0x7a, 0x36, 0x60,
-+		0xa8, 0x9e, 0xca, 0xf3, 0x24, 0x66, 0xef, 0x97,
-+	},
-+	.key = {
-+		.len = 16,
-+		.b = {
-+			0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
-+			0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c,
-+		},
-+	},
-+};
-+
-+static const struct aes_testvector aes192_kat = {
-+	.plain = {
-+		0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96,
-+		0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a,
-+	},
-+	.cipher = {
-+		0xbd, 0x33, 0x4f, 0x1d, 0x6e, 0x45, 0xf2, 0x5f,
-+		0xf7, 0x12, 0xa2, 0x14, 0x57, 0x1f, 0xa5, 0xcc,
-+	},
-+	.key = {
-+		.len = 24,
-+		.b = {
-+			0x8e, 0x73, 0xb0, 0xf7, 0xda, 0x0e, 0x64, 0x52,
-+			0xc8, 0x10, 0xf3, 0x2b, 0x80, 0x90, 0x79, 0xe5,
-+			0x62, 0xf8, 0xea, 0xd2, 0x52, 0x2c, 0x6b, 0x7b,
-+		},
-+	},
-+};
-+
-+static const struct aes_testvector aes256_kat = {
-+	.plain = {
-+		0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96,
-+		0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a,
-+	},
-+	.cipher = {
-+		0xf3, 0xee, 0xd1, 0xbd, 0xb5, 0xd2, 0xa0, 0x3c,
-+		0x06, 0x4b, 0x5a, 0x7e, 0x3d, 0xb1, 0x81, 0xf8,
-+	},
-+	.key = {
-+		.len = 32,
-+		.b = {
-+			0x60, 0x3d, 0xeb, 0x10, 0x15, 0xca, 0x71, 0xbe,
-+			0x2b, 0x73, 0xae, 0xf0, 0x85, 0x7d, 0x77, 0x81,
-+			0x1f, 0x35, 0x2c, 0x07, 0x3b, 0x61, 0x08, 0xd7,
-+			0x2d, 0x98, 0x10, 0xa3, 0x09, 0x14, 0xdf, 0xf4,
-+		},
-+	},
-+};
-+
-+#endif /* _AES_TESTVECS_H */
-diff --git a/lib/crypto/tests/aes_kunit.c b/lib/crypto/tests/aes_kunit.c
-new file mode 100644
-index 000000000000..8110d3718085
---- /dev/null
-+++ b/lib/crypto/tests/aes_kunit.c
-@@ -0,0 +1,150 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <kunit/test.h>
-+#include <linux/preempt.h>
-+#include "aes-testvecs.h"
-+
-+static void test_aes(struct kunit *test, const struct aes_testvector *tv,
-+		     bool enc)
-+{
-+	struct aes_key aes_key;
-+	u8 out[AES_BLOCK_SIZE];
-+	const u8 *input, *expect;
-+	int rc;
-+
-+	rc = aes_preparekey(&aes_key, tv->key.b, tv->key.len);
-+	KUNIT_ASSERT_EQ(test, 0, rc);
-+
-+	if (enc) {
-+		input = tv->plain;
-+		expect = tv->cipher;
-+		aes_encrypt(&aes_key, out, input);
-+	} else {
-+		input = tv->cipher;
-+		expect = tv->plain;
-+		aes_decrypt(&aes_key, out, input);
-+	}
-+	KUNIT_ASSERT_MEMEQ(test, out, expect, sizeof(out));
-+}
-+
-+static __always_inline u64 time_aes_op(bool encrypt, struct aes_key *aes_key,
-+				       u8 *out, const u8 *in)
-+{
-+	void (*aes_op)(const struct aes_key *key, u8 *out, const u8 *in);
-+	u64 t;
-+
-+	aes_op = encrypt ? &aes_encrypt : &aes_decrypt;
-+
-+	preempt_disable();
-+	t = ktime_get_ns();
-+	aes_op(aes_key, out, in);
-+	t = ktime_get_ns() - t;
-+	preempt_enable();
-+
-+	return t;
-+}
-+
-+static void benchmark_aes(struct kunit *test, const struct aes_testvector *tv)
-+{
-+	const size_t num_iters = 100;
-+	struct aes_key aes_key;
-+	u8 out[AES_BLOCK_SIZE];
-+	u64 t, t_enc, t_dec;
-+	int rc;
-+
-+	if (!IS_ENABLED(CONFIG_CRYPTO_LIB_BENCHMARK))
-+		kunit_skip(test, "not enabled");
-+
-+	rc = aes_preparekey(&aes_key, tv->key.b, tv->key.len);
-+	KUNIT_ASSERT_EQ(test, 0, rc);
-+
-+	/* warm-up */
-+	for (size_t i = 0; i < num_iters; i++) {
-+		aes_encrypt(&aes_key, out, tv->plain);
-+		aes_decrypt(&aes_key, out, tv->cipher);
-+	}
-+
-+	t_enc = NSEC_PER_SEC;
-+	t_dec = NSEC_PER_SEC;
-+	for (size_t i = 0; i < num_iters; i++) {
-+		t = time_aes_op(true, &aes_key, out, tv->plain);
-+		t_enc = MIN_T(u64, t, t_enc);
-+
-+		t = time_aes_op(false, &aes_key, out, tv->cipher);
-+		t_dec = MIN_T(u64, t, t_dec);
-+	}
-+
-+	kunit_info(test, "enc (len=%zu): %llu MB/s", (size_t)AES_BLOCK_SIZE,
-+		   div64_u64(AES_BLOCK_SIZE * NSEC_PER_SEC / 1000000,
-+			     (t_enc ?: 1)));
-+	kunit_info(test, "dec (len=%zu): %llu MB/s", (size_t)AES_BLOCK_SIZE,
-+		   div64_u64(AES_BLOCK_SIZE * NSEC_PER_SEC / 1000000,
-+			     (t_dec ?: 1)));
-+}
-+
-+static void test_aes128_encrypt(struct kunit *test)
-+{
-+	test_aes(test, &aes128_kat, true);
-+}
-+
-+static void test_aes128_decrypt(struct kunit *test)
-+{
-+	test_aes(test, &aes128_kat, false);
-+}
-+
-+static void test_aes192_encrypt(struct kunit *test)
-+{
-+	test_aes(test, &aes192_kat, true);
-+}
-+
-+static void test_aes192_decrypt(struct kunit *test)
-+{
-+	test_aes(test, &aes192_kat, false);
-+}
-+
-+static void test_aes256_encrypt(struct kunit *test)
-+{
-+	test_aes(test, &aes256_kat, true);
-+}
-+
-+static void test_aes256_decrypt(struct kunit *test)
-+{
-+	test_aes(test, &aes256_kat, false);
-+}
-+
-+static void benchmark_aes128(struct kunit *test)
-+{
-+	benchmark_aes(test, &aes128_kat);
-+}
-+
-+static void benchmark_aes192(struct kunit *test)
-+{
-+	benchmark_aes(test, &aes192_kat);
-+}
-+
-+static void benchmark_aes256(struct kunit *test)
-+{
-+	benchmark_aes(test, &aes256_kat);
-+}
-+
-+static struct kunit_case aes_test_cases[] = {
-+	KUNIT_CASE(test_aes128_encrypt),
-+	KUNIT_CASE(test_aes128_decrypt),
-+	KUNIT_CASE(test_aes192_encrypt),
-+	KUNIT_CASE(test_aes192_decrypt),
-+	KUNIT_CASE(test_aes256_encrypt),
-+	KUNIT_CASE(test_aes256_decrypt),
-+	KUNIT_CASE(benchmark_aes128),
-+	KUNIT_CASE(benchmark_aes192),
-+	KUNIT_CASE(benchmark_aes256),
-+	{},
-+};
-+
-+static struct kunit_suite aes_test_suite = {
-+	.name = "aes",
-+	.test_cases = aes_test_cases,
-+};
-+
-+kunit_test_suite(aes_test_suite);
-+
-+MODULE_DESCRIPTION("KUnit tests and benchmark AES library");
-+MODULE_LICENSE("GPL");
--- 
-2.51.0
+> ---
+>  drivers/crypto/ccp/tee-dev.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
+> index 5e1d80724678d..af881daa5855b 100644
+> --- a/drivers/crypto/ccp/tee-dev.c
+> +++ b/drivers/crypto/ccp/tee-dev.c
+> @@ -125,6 +125,7 @@ static int tee_init_ring(struct psp_tee_device *tee)
+>  		dev_err(tee->dev, "tee: ring init command failed (%#010lx)\n",
+>  			FIELD_GET(PSP_CMDRESP_STS, reg));
+>  		tee_free_ring(tee);
+> +		psp_dead = true;
+>  		ret = -EIO;
+>  	}
+>  
 
