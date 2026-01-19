@@ -1,50 +1,51 @@
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010064.outbound.protection.outlook.com [52.101.85.64])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012000.outbound.protection.outlook.com [40.107.200.0])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2755832693E;
-	Mon, 19 Jan 2026 14:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CA13612CD;
+	Mon, 19 Jan 2026 14:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.0
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768831936; cv=fail; b=EGSInKbBsBspz882/Muzv+FBebEYH4NjTXEmb9q9TeKt47ivbL6C9VVyK7EHBXTUbxcBgUghszzNt4e3kjLeCozjvcZqVUTkhoyBeGQtlfh7ZyGkg95HOoE6+NvDnLkEXY9FtXBrtEZ3/MOZcRrAyKGkbIQREb8kxaDOmbn+U4w=
+	t=1768832175; cv=fail; b=dLj5IpbD4OipvAfcNYwfytj92l6HlUo/+iTmxxh+obNeBPMq6ovymFy14wYUYl2mUB7hUXTC/fzybmUdY+RQHgob2dqJYIzXA7hs4Fl5dzvbljbz3VflsBiiCxPincNH75ojsqzQhVvCHpFBZYIhYia5Ri73k0IhHBX7zVK9dL0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768831936; c=relaxed/simple;
-	bh=YpcbxT8nMc2hsLHwpjeZxeB28HkYCxkwU9LGH3sbDh0=;
+	s=arc-20240116; t=1768832175; c=relaxed/simple;
+	bh=1pqSvfQEe5C+inQuhnAauoXiDCKRgQFefrDjCMZOQA0=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=WFwY8ZTaZmq2UhEDqOKmXoYt+ulBiIWS8OX6oACOfQSlm1Bm9kTIdcMyPDfXHGqonQ1hcILyrMTjOvhbe15oeVluy5dpy5TSCX3U5xngeCaMvhSwV72eODLzwv67PvepVTFv6LGJXAJgY8e6bcOX9Ya8VMSTzgJZjA1uaIVkFeA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=siQkL6F6; arc=fail smtp.client-ip=52.101.85.64
+	 Content-Type:MIME-Version; b=LVcu9o3NVGQohafGwbnfEVH9KGquocmLXHVMgQQAmadx/7xG3385YiBpX7WDZ+mEn9qhh8F9ouu+6tvjaB872Rr8iBZeuKo8fvWCup04sTZ3pZD8XJi3lX8kEDjVa+q3QMhg9X6tUsYJnSWWCtiwX4d/ydqb8PU2Jc6uRbMtctw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mh/4BW+3; arc=fail smtp.client-ip=40.107.200.0
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="siQkL6F6"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mh/4BW+3"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gXcmEka/c1MMHXoXyOZq5B6EsJ6XaCQr68hjHJl3NtVrcSGKA0mjsb5s131IWtFu8rZ7bbYzv2KdV5cFq95OMXnPS0YFpQsBkVPtOG7er/mgEGtPHRWwqxbcIN1+ccmfyzChTVqSHZWFEV2L2LElq82zN8A5ETU4ehckAh/+5jc8i2QneCDi47eGBjqcuxcsyS4Ol2jahPyHjaceAk4IX6mF+HXtxZnrRLbrf/a+x/w5wduzSd30USR3JmzT/O652/656Yab9BJn++Af3x0YlpxO2+6F5k5pqNr1ubFkLNkGXteVclwiUdeT92gmtV6o7Q2GZnFOkpaUwseh9st0BA==
+ b=LZZpD3/LepEg9yHP07ZHQ4ZVnLVp6EkXnE44AbT96jXR+oAVhLxSFRlbhXhnDM9E+6AnshFxB0VoskFLVaCNZGnRp4cdy43N5mXOymdqbFoBPVNrWlXoFQD69M1MAETS54szbpFPpBqY+TvWr0RoTkRbT211S6RUV4LJOOh7iTNEEE9gzgCTWA8VX3tIdHgZqCfmXMKoV93wmzYZo6L8Hpyit9Mw/+SCvsrm5/TzlZkjB4P5OKiXnOZJIUZs+PvbwvWdCuyM5eYbDXqNpQrA/Jm24J3jE6+Sr5WAI6O5gXkDdwwjadUo0pD3smjgKaBlcRXMI0boH8aR7JuBPasY6w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tibq7375oMThU9yH9U5PBVXI7H9ByFepnEOR5b7Nfmg=;
- b=iOmimHTnb8c1EOaTbqC+38y6YxxiAArPHYf+EpTV6vL0HmF5J0392NB0MNjjP28v+PkwPGIr6P477yp/2VPrc+bJrnUOx4ivalk0I0BM7Jncms3D2MiDwWHV8MxdBT4ylYAg7jz2Lel3zSzXbxR1badmhy4KayyBdwgN+uxvKlQbfIN2UutDArqW9veo3RVF+Kwtu5myPSFwRYGZJk27qdgf92MKJrn4yutr+mWrZyqiwGJuTiB/SaBK/6XGNtNNCj1iMbFpVyYxV7NBbDzNU4DthvaZFPkTuFU8t7a7WcEqiUnTR3mWccL2yTzMZaMSZLTB/FfoBUTHu6DHkul1fg==
+ bh=k5+2Mw970nmXfUD3LtwZw9ss5c/0q0se74DfXzkNXOY=;
+ b=lL90deMEHtuT/dbFg8yVlGRJffe9VcjgzCjlfxkuHvYcabx50bMTJRkL21qJWtwI1VuRsmYDH/ysT83lcg1gGncW+LeAcmBn+92Tt7bFLK8oKYerlkjvPykB2t+fQ28k3RiVfsxDDbo9P1bCE9EH8wUQmg+3ewed+qsDV1M6gYp7xGhgBM1C7Suy9yqS7jaHwM96C05PmWgLH4ZaGKZLsXIwis3tn8txCGziQqGWSYBW9NXvueM8SGE3sB9B0KLl5kbOSGT3LcXF+L7dov6ZFD70pNo3SMgs0Ay/Hi+7PrqiDtsBGe9EykLLRVYha0dTG9HJWin3DQCG5SFvm/tEFg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tibq7375oMThU9yH9U5PBVXI7H9ByFepnEOR5b7Nfmg=;
- b=siQkL6F6Jud2ccesTAkjJgFcfaaG5Kv+rD+P9n7fn4dFg2fwmfzwpHq8vs9/eY8icMz5q7Bdx7irNoExD5MWaRbar9kcMDTq9c7SQLgI84Aq/YHndGfATf5Y1CNKPzAzRPkBzbHT0ojnrWuaUnCT7Yz+jOJE+uWGGgNoMJL+MKo=
+ bh=k5+2Mw970nmXfUD3LtwZw9ss5c/0q0se74DfXzkNXOY=;
+ b=mh/4BW+3kvFgocERcio2/jh1+kY4+SorTzussicvsEoNe6MfrW5OxalE1QJg7GK+roE514+PiPgP+tCKp0wmbtHrds3KyhKAlCm40jwo4vmzp6Toahq4MSVtYhV40Nkv4FQ4O8eAhGjIZSOfe+X91QBcz5J4uKmc7wX7EI3bKNk=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by DM4PR12MB7624.namprd12.prod.outlook.com (2603:10b6:8:107::11) with
+ by IA1PR12MB8334.namprd12.prod.outlook.com (2603:10b6:208:3ff::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Mon, 19 Jan
- 2026 14:12:10 +0000
+ 2026 14:16:10 +0000
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::20a9:919e:fd6b:5a6e%5]) with mapi id 15.20.9520.011; Mon, 19 Jan 2026
- 14:12:10 +0000
-Message-ID: <a0ab4c28-918f-4883-bad7-35b048202089@amd.com>
-Date: Mon, 19 Jan 2026 08:12:08 -0600
+ 14:16:09 +0000
+Message-ID: <9ebfcad8-dd35-4a6d-8e14-8eaa0f9550d8@amd.com>
+Date: Mon, 19 Jan 2026 08:16:08 -0600
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 3/5] crypto: ccp - Add an S4 restore flow
+Subject: Re: [PATCH v6 4/5] crypto: ccp - Factor out ring destroy handling to
+ a helper
 To: "Mario Limonciello (AMD)" <superm1@kernel.org>,
  Herbert Xu <herbert@gondor.apana.org.au>,
  Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
@@ -58,7 +59,7 @@ Cc: John Allen <john.allen@amd.com>, "David S . Miller"
  Lars Francke <lars.francke@gmail.com>, Yijun Shen <Yijun.Shen@dell.com>,
  Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
 References: <20260116041132.153674-1-superm1@kernel.org>
- <20260116041132.153674-4-superm1@kernel.org>
+ <20260116041132.153674-5-superm1@kernel.org>
 From: Tom Lendacky <thomas.lendacky@amd.com>
 Content-Language: en-US
 Autocrypt: addr=thomas.lendacky@amd.com; keydata=
@@ -105,11 +106,11 @@ Autocrypt: addr=thomas.lendacky@amd.com; keydata=
  qFAgP+x+ODm6/SYn0LE0VLbYuEGfyx5XcdNnSvww1NLUxSvuShcJMII0bSgP3+KJtFqrUx9z
  l+/NCGvn/wMy6NpYUpRSOmsqVv0N71LbtXnHRrJ42LzWiRW2I5IWsb1TfdMAyVToHPNaEb0i
  WiyqywZI5g==
-In-Reply-To: <20260116041132.153674-4-superm1@kernel.org>
+In-Reply-To: <20260116041132.153674-5-superm1@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1P222CA0168.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:3c3::14) To DM4PR12MB5070.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA9PR03CA0009.namprd03.prod.outlook.com
+ (2603:10b6:806:20::14) To DM4PR12MB5070.namprd12.prod.outlook.com
  (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -118,263 +119,174 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|DM4PR12MB7624:EE_
-X-MS-Office365-Filtering-Correlation-Id: ea7b714d-ff12-42db-5897-08de5764bc75
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|IA1PR12MB8334:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0d94c2a4-7d61-4ccd-62af-08de57654b27
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ejRJZDViengvdExTZ1hNTWRFc3hJSlAzL2lDdVUrQkhxM1RSRkZQV2pRS00v?=
- =?utf-8?B?ZUovSm41ZGtUUXprLzV3cVlEQlNWQWhVVU9xdzFkcDAzUzlYd0hZSng1WjMx?=
- =?utf-8?B?cWdIM0VkdWVLOFBRbS9SSTByejNYeTlocHhRbm43dTNFQ3E0YXJ0d1o4SG0v?=
- =?utf-8?B?bmF1T0NYMUFxUE14d3NPSld5TXo1cXMwMndnS2ZGWHR5b2ZMS1dyVVVpR2c5?=
- =?utf-8?B?VytIam1Gd2NFL2tRWFZhRzFHeHhUeFFYMmVBZndxbXdtZ2VCUitVRzdzeHV6?=
- =?utf-8?B?T3VBYU52RVdzcDM2Q3FBZlhXVlZFWG1yUUlwd1FoWi82ZjBXZ21aL3ViaEFN?=
- =?utf-8?B?SXZkZ3FQalg0MzdndmM4cUVtamxCRTY3MG9NZ25vTlc4ZVExaU11d3EvSlRE?=
- =?utf-8?B?YUJPZC9yREo4MzhBZ0JpL2crNUtDcVNZeTEwdGZIb2ZMdFZmY0VMbXZlOHNm?=
- =?utf-8?B?bFc4blNMS0FkRHhFVnNhbVN5cHc5MUlTemg4dUdjL0RmSzkyajU5dTZ3dG9u?=
- =?utf-8?B?VUgwZklRZHloRTRaNi8ycXBvME1xbFhFMDAzVWkvOFhxWXZvQkRBQXpZVW8y?=
- =?utf-8?B?Zlpuc29SYnl2cmZwMy9xOFY0K05QYk1PU1lDS0dGcjhhdWMxWENQRERFWWpQ?=
- =?utf-8?B?U0dZbjhuRzBOMzNuVVFvbk1qT2ptS0FXMFVMUXl0Ty9DZ3hzQ3VsOFltYWVS?=
- =?utf-8?B?eE84dzFFQXVpanY1WmZaWDJiNE1wT3FvL01oREkvNHc1L3FNNDR2N2RucXVH?=
- =?utf-8?B?QVpqczF2U0x6Vk5pUGVNOCtYOGlFcWl5L0pUdzdGbTVuekorV2h0VUtnMk9r?=
- =?utf-8?B?dU1xbUQrbngyaEF3ZUVMdW5CcDMzNnRQMWNsRGNFd1V0elFOQXNXNjEwcmhl?=
- =?utf-8?B?V09oQ1BBTXVuU0tpRS9tQkh1ZFdaMGlVTHdoanJNamF4YVVrUTBITG11TTl5?=
- =?utf-8?B?SU8zc3I4YUFOOGYyQzF2aXRpOXZ2dW5RQU5rTXhWWjc2RWJFb3BOL0lmNXht?=
- =?utf-8?B?Z1ZXU0ZtbW01UEVwdENlUnBBODIyUEkvSEFpWmNLblhXWjdYQ21RVkZDYzkv?=
- =?utf-8?B?NzM5NlV0bDBOa3AyRjlLSS82RmRyVmxMTlZzT2NRUzF4Vmw5YkJUQmRjUzdI?=
- =?utf-8?B?VFN0NmlnYmg3VGtRc0NEVk9ITXdXMmtDM3ZvajhoNHZjRUg3SHlEeG0zM012?=
- =?utf-8?B?MHBJT1RvR2oxM1VJa2lTOUd3dHJnY05xWHVZa0pzd1M3cWRYZ2R5azgxSVVW?=
- =?utf-8?B?MHFJMUxnV1dGMWhlM0dvNy9kRkZCM1NpUzdxN09OUE04VXdZaFgrWTZiS0ZJ?=
- =?utf-8?B?Yi9nbXg3VGVObXZVN1B6cHJxQjRjMG90Y0l0NmdQekVUMW9lNDFaSHdJWVA5?=
- =?utf-8?B?VzFXVzkzOHpOVVV3VUxWbGE0MzcyWk0rL2xHSUl2c0ZQWkpFT2F5RVNPbFlk?=
- =?utf-8?B?ZC9Cait0Skl0aU02QzRONWpBWGdHVkgvMDhGUU5ybjVyWFhXRkE2TEZURTN2?=
- =?utf-8?B?ZTVrQVd3dTlWL3B1ZGJEV1I0ZG52RUNRRGdHdk0yRTZMOTJta3Fjamx6RXRN?=
- =?utf-8?B?OGd3dGpyYmJCL243bVFXRS82cmN3Y0JjMVRBSGRiZCtTWm1Ra1grMkFGLzBp?=
- =?utf-8?B?Mm1tQm0rZm1pRmN0TCtmNWxqOC9lRmNkc29oRk5qUWR3d2t0elJaUU92cFNQ?=
- =?utf-8?B?T044SlQ0dEtyeWx2WE81dXFTZStRU3dXTi9FRzRrVUpxaGtjU0pmSmJKYUE0?=
- =?utf-8?B?MFY1RENaQ2QzMEZaUEUyakc0bjJRV3d0eHRXWmxKS0l2QmhxZGlpTkt5OHVD?=
- =?utf-8?B?TzQ5QUJ1TzhqWmRXSE5TUTBpa0tzTS9wdkM3WnhnV3V3MUZ4dzZETFJITkYz?=
- =?utf-8?B?SjFaLy95VlZyc1hJODhkYXpBMEFCNXBxaFh5L0xMcVdRMXl4eGlhWVdOcXF3?=
- =?utf-8?B?bFRMV09vaTRnZDg1WFgrQStmWjFQQkVYU0FaSXI5K2ptbENPSWNvclVsMVow?=
- =?utf-8?B?WjNiaktRTkJuYVJpRG1Fc2xXUlZ5TmtWWTU0ZmRzb1ZJN3NkSm05akwxR3Bn?=
- =?utf-8?B?SW9sVWR4N1krcmkrdXVUcit3ZEs2QU1yUkNaTDU1R2xtUHR5UWo4N1FnNS9H?=
- =?utf-8?Q?cIw48jybMr8lQi1eeigQ3tT7K?=
+	=?utf-8?B?ajgrSTRCNDZVYVFGZGQ2Rms2MjMwSWIxSUlzMUNuVTIvUmQ2anFoUTU1WUhG?=
+ =?utf-8?B?TEtiY2YydCtpdGgxamI2aEg0V0RKN0cyOWVJTE92ZFRHa2d0L0hMK29jcjdP?=
+ =?utf-8?B?WGpMYTVJL3lWQXpYaHZ1VEQ0aWN1V0xHLzY0Wnl0TjJDRmVpNm9ta3I4aDZm?=
+ =?utf-8?B?Y0lpd1UyZFBKVjJENWoxMnhhR1pacm9UWVpoODI0Z25CMFdTd1dZS0NRenJm?=
+ =?utf-8?B?UEdib0dRV2l4Vnl6ZDJPRnRvQXVuSjBtaklYbXR2c3Z4R1owMGQvK0xMemdu?=
+ =?utf-8?B?UlpnRlI4TmlxZW40ck1xL05IcjlsOGhxRWF0K1F0cEFnMGMyTnhtTGRUVHpj?=
+ =?utf-8?B?bUJhNzJjN3c3YW1ONnpEbnlzUW01RTZuUHlnTGp5SzJtQ052VG95WTNzT1FO?=
+ =?utf-8?B?bURaOEZxTTNJdVZMMklMblZPcmJtaXRvRnlldmlkMlMxNFcweHU0SWdFSklj?=
+ =?utf-8?B?NVdSV0QwUERJb21kV0R3eVppdEJMd2wrWXUrTk5Mb09RK01ZcFphaGVNd1Z2?=
+ =?utf-8?B?dk9FdWJXMUYwYkY0d1A3enhHK3l6RXdjWHB6am9TWDNCdlQ4eHpnTkZMK0VG?=
+ =?utf-8?B?ZzYvZmk5VXRjcFRRRHBkRksxK2tscW94VUNWU0xQdjhKSmczSHdmejNjUksw?=
+ =?utf-8?B?dzVFaGdlR05RRndkUFM4bkNwbnVadjF6RHVsdkpPZnRzL0ROZm5uWXptKytQ?=
+ =?utf-8?B?YkRwczB6UzlhU1ZSbDlVa1NDUHBUYnZ2MUlYOEg4UnJWVFJySGFFd1N5UWFD?=
+ =?utf-8?B?SmJ4OCtQb0FoUStZV0JqdTBTQW90OVR5NWE2aW8rZmN3eEZoQk1OaDUyN1Vp?=
+ =?utf-8?B?dmlxT2d2dnpWeE10VGxrcTRTVkkxcDJmTjVlZDMwUk41dzFWdXJwZC8wSksz?=
+ =?utf-8?B?dnpUM2ZLaVBKUDloOWpoSlp3a0xob1ROSzREcHZPSzBnWGx3a2ZpWmtyUjN6?=
+ =?utf-8?B?NklmUGc2L290RytxSnh5SjljbjBudm0rZGkzYXcrQVBhWCsxdFNLMUhoeGJM?=
+ =?utf-8?B?VWJyMlh6SmtTeHY2ZUJ5NkU5aE94QmR0amtZVmd6OVd5em1FZVFIdExOSm4x?=
+ =?utf-8?B?TEc1ZHJRbGsxdGU2RmxpNVREYnlxeXorQmZERW5ITkg1cFphUVZZYjhqZU0w?=
+ =?utf-8?B?YXVkcTVOSVVnYWd2dzRRb3l3dTB0TnFOTUF1TXJXOTUrN05yQTFDMEZlNE1S?=
+ =?utf-8?B?eHgraWZkaFRiN1lpQk8wa0dtNWMvcFI5MXJWMzd5Q1crN3BEemh1MjBQRDl6?=
+ =?utf-8?B?NjE5dTlDTmxkT0s3UnhGcmFuUWFrVjJwTmdWbDRUWExOZjM4RklZdTNySVBX?=
+ =?utf-8?B?SkNZbkpzRlRBS1BWamYxUzlJTWpvcFpnSHJoNmVKYW1jdWEyd3M3THNIUDEv?=
+ =?utf-8?B?ekx5RXEwMnpIMVYzYjlFTCtJNEFsaUEwL3ZQdGNVaTM2bWZzWGlZYzdRc3dM?=
+ =?utf-8?B?M3k2UDI4amVGdmhzMHVnRTRndzkwcDh2cEFyVzBTaUpQc29veUduZlgyeXor?=
+ =?utf-8?B?bnlXQ0Nha0NZQXMyMFpoalZxYzgxVkYxeFV4blBicVBUVzlteVFocHdXUG8y?=
+ =?utf-8?B?WVp0bG1oOG5sMGR0bWplNm91dk9GN0FYRVBNK3BTNmtWSWE3a2ozdmVVWXhr?=
+ =?utf-8?B?eC94UnpFRnNQU2dLS1pMVXMvN09sUmtlcWlhcnJaVURzaUZRNUpuc3BEUm9H?=
+ =?utf-8?B?Tlk4bGpjbmpNVmpkRTk3clY4V3NZbDZaR0p6R2ZQbHVWR0M5MWdxMTlocVhs?=
+ =?utf-8?B?b1RoRUdJUzFDM2RVU1U0YStoQVNsRkxKL1dTT0pwSG92ZTNxR1IrcjZxdG95?=
+ =?utf-8?B?dUFybFVHQ3IyR28vYm5KTlhPQ1hFeGFQMVNoOEkyeWZpV052cmMwaEI5RWZS?=
+ =?utf-8?B?dWZjZDN1dzJiWjZWVmhySFRBdUhJd3g5a0VwSEVZZ2dDV2gzKzlwNkxQUmZu?=
+ =?utf-8?B?bExnd0VCRWFVaE1XN0NLTXlHUVQwZEo0MWoxcEpzQ0o1dHpwbTNMdzM3dXpP?=
+ =?utf-8?B?WEZGTFR0bTJENTU0UENiZktUemczRElTUzhhUm9kcTF5VWhnVTBsY1AySG44?=
+ =?utf-8?B?MXN0VTNSV1pmbk5jZzZKTDNERUdlNStVZmhQSHpiY3o1Ukl1b1d2ZlJ0U3Bk?=
+ =?utf-8?Q?beIk=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?N21mQzNaejlTMi9Ea3NURkhoY0g1cy95bUNLcjkzMktoYzFaOVlxb3VtUUg3?=
- =?utf-8?B?WlhJRkY3WCtTckxmN0Q5NG1RejRobXFFNEtkcVZTV253cFdCLy92QWs3NGFQ?=
- =?utf-8?B?cWNXb1NwYUZpcmFaUGI2NjR0WVpPTDNPUXUvSjh1N2d0c2xLTGJIUjZILzhY?=
- =?utf-8?B?SWRmVng4eGhKM21JR3dOaHQ5VjdlenVjeUdZVnNQR3JPYVR2RGxXYStkRTJ6?=
- =?utf-8?B?b0orZWRrZHgrZmhnaTdIK2NnM0lRZUpVT3VxenVjYTUxT3czT3lGUmNFdlpw?=
- =?utf-8?B?Q0U5NnNPb1FQSTZKTnBpZ004YnphQjREOXpWYjNjZHpjcUhSZENsWTBnbHMw?=
- =?utf-8?B?WUZRMTFhemdoZHJZZmk1RHlSU3R2RlBKNEVHRDhyK0w0WFhNK2I3d2s4SlJL?=
- =?utf-8?B?d21xOXBrZlVUaTBwNlIvaUFzcE5yZVZDcGpjc0VncXZPR0w0WFJTbWNKc1dj?=
- =?utf-8?B?cm43dFVOS1BIb0FXa2lkcU1aMUlHeW9IRi9LYTdTKzNHUW1mMFdhcUtCTWpT?=
- =?utf-8?B?MWRiU1RicENnM3JWVVBKbnBxYmtCNHZkVjkrVE50aFdpanFjeFBxN3pSNDc3?=
- =?utf-8?B?c3hNa1VzUnRrUEpVSnJ6UE5iRHJvQXprdGFMT29TVlBCYVhqSlZTQXlVWktx?=
- =?utf-8?B?WjJWQWZSVnYrcXVoRFBubXRSY0o3SHEzREZ1clllN1podTVMaGQ3NU01RjlJ?=
- =?utf-8?B?amg2WVc5c3VVSUp5UUd2T0lrMkRyMS9HNFh6R1hBcXBXMUR4OEprdkY4ZjRE?=
- =?utf-8?B?eWdlak5SVEFma3cxdWtMMFdJclRzWWR5R0dTTWdFTk9qdGVXRzhja0E3MmJy?=
- =?utf-8?B?ZW0zQTRwQTdhNnNHcU5PUzJCRmdweWJxVnRXL2ZHSnMvM08zL3BYaWF5enlx?=
- =?utf-8?B?QkcveXdoWVR1V0JKYlNYU1l5VGxvS1diSXpOM3c0SUkxd0twRExWZngrSS9p?=
- =?utf-8?B?R1NwTThZbWUyOG9CMjJLVndlTUtSanVXMmRRZTF1Rzl1ZW5WeWxxRVgvcDB5?=
- =?utf-8?B?bjJmSjNLQnRwU3BxbGJyNVlnc2lUUUUycDVKTU92czVHb2s1aU1KUHFPbUJv?=
- =?utf-8?B?aG9BZjFDeE53YzVKWVZjZmNNVE5YZkFPMHFMaU96WTFRZjBFZHFuQlJQTTNj?=
- =?utf-8?B?NmdLZ0padjhzTHlseEVUMjJNaDZjWGZYOWg4QXVOMm94c2pLdEJscVpVUUJ6?=
- =?utf-8?B?MEhLbTlvaTRoWnFDR21tN0ZzSUNqVWxzZU40ZEc4dlAxWGdBczZpQ0lEQUV0?=
- =?utf-8?B?aThreS9FcUcrdzRHTG8rc3hpQ2hITjhQUGtWcW84aHhkTVdKN0hOak51MG82?=
- =?utf-8?B?L09JNkFRa28rRzJkUGRlM21rR2ZtNm1tbXhFeTRSenFsTlBmY25ua3J4cTIz?=
- =?utf-8?B?cm0wTUpXV2lteFJ4eHplanppYmJmOXVpdXl1QWpzTGx4ditNNmFKK0FHRFRo?=
- =?utf-8?B?VkhWRnhtRERoQWZpNFhIS0Jqb3JjY0ZvbWlWZFI0Mkl3Si8vNXpIZlVZZ3hn?=
- =?utf-8?B?ejUrMnZRdHVJOUdZYVQ3Wk5NNXhiRjQ1eEd5UDVsMjBWMlN1TmpGa2F2OW5t?=
- =?utf-8?B?c05VWFBPUW00Wm1ERzk2ckR6YzczOWhzTmdjQnNHUnpodHRCTFRKWlZ3VEFB?=
- =?utf-8?B?bHNrc1puM3FoNkl3UkZWZlUvTnFFQ3dTS09KUUc0SFYxdmpNdHQvOU5Temxn?=
- =?utf-8?B?ZXBla09ZRU9PZ1F5YTkwWmwyZVJGbmRuejhjRUFpeW83d3RNbnlVOVpPaTRo?=
- =?utf-8?B?KzBoZVR4NTZOUWhIN3o4UGZHd1BkbldSNkh3TE1aaGpoanBUMUNYY0ZvdW9v?=
- =?utf-8?B?VG9ScW4yY3d3bFdGODlBSTIxcFJZMHQxVEtnYjVMaUF2aGNvVWhmU2E3SDdt?=
- =?utf-8?B?RFEwL2ZwNDAxL1FQbjZIVW9XZGJLUjc5NnVpNXg3SDJ4SUhneXpNZll3L3JL?=
- =?utf-8?B?VE13eFhyUEtoUHBaSVlJbEp1dVdyL1ordk9IY1lUN0dHUTNpQUV6WmZFMk1l?=
- =?utf-8?B?WHF3ajEvRWxNcjZNWkFqSnovbmVITFdBWjFJUmprOUtyejJiTmgwVytrV0hO?=
- =?utf-8?B?c1k1UWo5NnA0eTlObndqVlIzb2U4VmMxK0tLQVRRVjBKTWFWSzVYNDVnNzhz?=
- =?utf-8?B?NUNrZytEV3E1aDRxUTVpZCtWU0JrbFYwajlEYWhHcmxKQlh5NUxJZ1p5SWJE?=
- =?utf-8?B?NVgyY2QyQ3VDYUFSdGlKZWpOUUhxeFY0NEMwVnl1S1QwZlJucVlyMUpRNDhi?=
- =?utf-8?B?VXZNMm1pU0cxbDRYSHhjcWZiL2VHTXVQbTJiWEptK3B1dCtoVjc3dTRTODY2?=
- =?utf-8?Q?/CVY1MgiHp4peFIOKl?=
+	=?utf-8?B?aXJFcVpJSFJmdnB2eTdqcHlRNzd4NXEwQTNQWStPZWhsb2N1SW1PMG9WVVVi?=
+ =?utf-8?B?ZlhFbjFVN3lwaTkrVWJPcGZNWEc5QU8vTE45UDF3bVlVS3krY2ZMU3BaWVY3?=
+ =?utf-8?B?SnNBVUVQNDFMeENaM0Y0c3RBcE1pekRVNnRGZk5NN2pWb29PdmZoTVBuV3Qv?=
+ =?utf-8?B?ejhJd0dTQitpU3JxK3hEek93bjlBelM1Mk5tRXZkclpPYVJMUXYwT0pjWFZQ?=
+ =?utf-8?B?ZU5OaEdSSjdVMHZXZzFhTkc2ZmVBdUtZQnVlZjcvS1I5dDBYcGFYNVc2NDJI?=
+ =?utf-8?B?ZHMwOGtna25xMzZTRFFQREFXY1dSbDczRktCK0lvdG9MeDlRZlF0dTBmdWhv?=
+ =?utf-8?B?OTMwRWZpL3RqQkRWVU54Uno2L2VwTm5sMU1NWnhZWGpSU0dKaUxCdThRRWdU?=
+ =?utf-8?B?aG03ZyswVWpDQnVXbnlLc3A0MW1iMFhySWE4YzV5YW5PL3dtQzg5anRKc0U5?=
+ =?utf-8?B?TUFsTmxJejNnWHFic0NFV2ZFRjJTajhGRklsczM2QnVOK05BZGt2RmQ1M1BG?=
+ =?utf-8?B?MGFad3ZMTWx6VllJNXlJb2Q4Um92NytIbzFRR25hcXVQQndqT2xnRkxDMXNW?=
+ =?utf-8?B?MTc0cW5GL0wwcThQOTd2VmRSTmhLTWF0VllKZmhzeWZwVlJYNnppZ3kwWk91?=
+ =?utf-8?B?YnhaLzdQdGRiZiswdTExdFJIU3lveVd6bWhGU01xZ08rRWRSVHJReDBFNTFM?=
+ =?utf-8?B?UEFsbTF5VGVVRE1PNWJGQ2kzVENwNDhab0VJZGJLZWNqSWpjZ3JYYmFFOUpK?=
+ =?utf-8?B?SHE1YVp2MnhqbHRNQm5EYTZkOXF1K3RMVGZ5V2xtUnB4TW5Ldk9vQ3VOK2lF?=
+ =?utf-8?B?eUhNOXp4dG55MldSaE41aENYaTFTS3BSS1VFOHFSVkgxKzVBeXB6aWhhU1hG?=
+ =?utf-8?B?Z1c0ZExuREZZYnA4SEkxQ0FCZW40SlIzSTdkYzlka2RlSURDeTNVaDd1MnF0?=
+ =?utf-8?B?ZFFPQkZiR09ZbXdzYUkrcUxxZXdCajhvZ0hYbFpYYVdNeVpCUndEc1Eyd1Mz?=
+ =?utf-8?B?ZjBHNmFleEZCZXkvUzVSbElxcTM1L2hiY3lLaXQyQlVLM2Y2Q214QXZNckMr?=
+ =?utf-8?B?N2xlMkZ5RFBFNVlINEhSWHNDQlRpYTlzOTVzTFVycjNrQWFOM2hIaFNKRnUr?=
+ =?utf-8?B?MitmZHVBNmlMUU9pOGZuVXJBSFh1MjdEb3RLbVVYbG1KOTRWQndNWjRoUEp0?=
+ =?utf-8?B?YVVVZDVJUlp0UnZaWGxJMUp4elcwNGlqTUhFbmtwQ1AxZ2Vkc3lmd2Eyck53?=
+ =?utf-8?B?MlBPUG1oQVhtRjB1YmkrMjNKTHpUMkNIbkxXNnUvRHJkWFUyMWJDRlI1S2l2?=
+ =?utf-8?B?am5BRGhZdUE2THFFYWZVaWpWbHBSYVpoTTBRTXdMdE5JNndMMGxZV2RrTnhW?=
+ =?utf-8?B?eVdUbWFOTW5IU3p2dkNBRG9yWGd1QWJUR0d4OHN0RmFSYW04ek9yeGduaU9H?=
+ =?utf-8?B?QndwUTFhc1ZqTE9mMDdhb0lTZndMNG5sNXA5a1plSHB5b2lvQ2QzVEJZZEZ2?=
+ =?utf-8?B?bFIzWTViRWIxTGhVWS9pSC9EeHBkK2JRZlBpRjJUbGp6VEVmSEtaTGVXVFdX?=
+ =?utf-8?B?Unc5aklZVnZydHdMa0JMdlJwOGpOM1RSMmN2Q1g4NDUyclJEWm1OT01Qb2Rm?=
+ =?utf-8?B?a2tETDlyK1JyeFpYTmY1VE80TnhheHRMK1R3S0RMUXN6V1dVbmxJNGhNdlAw?=
+ =?utf-8?B?WG5QbDRpQ0FYRmE1YUxQZEE0dE5lcGJ6OFFZLzltTzFiSVdmVVJrdGErak5z?=
+ =?utf-8?B?Qy9Cb1B2bHM2UURtYlhlTUZoMFFadzZTWGxMaElQUHB6WERQZm1DMTF5dnY1?=
+ =?utf-8?B?cHNBYXRiU0hnUDI5TkNvamZyNzRmaUgrZ1Y5ZEFlMEN2TDlwK2VqQ1ZkZXVB?=
+ =?utf-8?B?b2lIYXJBMVUvZmcyRjFnd0pSUm9HdjBvc1ErWmhzZllweWxXL281ZXJnZ3Yz?=
+ =?utf-8?B?dnhodnhSKzF6MCtvYUxBV2FGOGlhMjJqUWgvcjc5UWZqVXllMG55WXliWUQz?=
+ =?utf-8?B?MXdzeHFWVkRyTk5EZmhsMndaejFnekJWR2ZDRmJnamtjcEYrTHdJQmQrMVBS?=
+ =?utf-8?B?aXlsaEpNR1lFK1I2S24xN2UybUZZQTBuSlNZc2xKL205UDBZMHUxMHNtZXRs?=
+ =?utf-8?B?R1o4Y2ZyY2l3NHJZamhIUlY3VVFqRENSLzJBckZ4YW5sV0hmUUJSOUlHbitJ?=
+ =?utf-8?B?MFB5bnNleGJSa1RpYzZOZ1FqOEI1RTdrTHpOVXN0a0xHelE3dDIrLzhZaDV4?=
+ =?utf-8?B?VFlHdmNsMnU3WDQ1Y1VhaGlkOUJZQ1dnaUNqTXlid2hUUFRTSXIraGNLWXl5?=
+ =?utf-8?Q?IhV3ojdwQeUDYoD5BT?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea7b714d-ff12-42db-5897-08de5764bc75
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0d94c2a4-7d61-4ccd-62af-08de57654b27
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 14:12:10.6679
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 14:16:09.8783
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: K/mvXpJzUGa1c+GrHNvHQGJdjik9siSuItIbjgXyw9eqX/QOqsEQW/eslFDG0UFBVgbbA7KNRyd32CySbQ/eXA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7624
+X-MS-Exchange-CrossTenant-UserPrincipalName: gB4eCkTg2M4LyIMYLmImCgE8Sty1O8eCdhm3xBlCe8kJtIY6CvY9YXvDdpWBtCqGw2x8qvGRcHLDYnIYm7x5zg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8334
 
 On 1/15/26 22:11, Mario Limonciello (AMD) wrote:
-> The system will have lost power during S4.  The ring used for TEE
-> communications needs to be initialized before use.
+> The ring destroy command needs to be used in multiple places. Split
+> out the code to a helper.
 > 
-> Fixes: f892a21f51162 ("crypto: ccp - use generic power management")
-> Reported-by: Lars Francke <lars.francke@gmail.com>
-> Closes: https://lore.kernel.org/platform-driver-x86/CAD-Ua_gfJnQSo8ucS_7ZwzuhoBRJ14zXP7s8b-zX3ZcxcyWePw@mail.gmail.com/
 > Tested-by: Yijun Shen <Yijun.Shen@Dell.com>
 > Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
 
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
 > ---
-> v6:
->  * Add sp_restore() flow (Tom)
->  * Drop CONFIG_CRYPTO_DEV_SP_PSP conditional behavior
-> v5:
->  * Fix return for psp_restore() (LKP robot, Shyam)
-> v4:
->  * Add tag (Yijun)
->  * Remove blank line (Ilpo)
->  * Adjust whitespace in psp_restore() (Ilpo)
-> ---
->  drivers/crypto/ccp/psp-dev.c | 11 +++++++++++
->  drivers/crypto/ccp/sp-dev.c  | 12 ++++++++++++
->  drivers/crypto/ccp/sp-dev.h  |  3 +++
->  drivers/crypto/ccp/sp-pci.c  | 16 +++++++++++++++-
->  drivers/crypto/ccp/tee-dev.c |  5 +++++
->  drivers/crypto/ccp/tee-dev.h |  1 +
->  6 files changed, 47 insertions(+), 1 deletion(-)
+>  drivers/crypto/ccp/tee-dev.c | 36 ++++++++++++++++++++++++------------
+>  1 file changed, 24 insertions(+), 12 deletions(-)
 > 
-> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-> index 9e21da0e298ad..5c7f7e02a7d8a 100644
-> --- a/drivers/crypto/ccp/psp-dev.c
-> +++ b/drivers/crypto/ccp/psp-dev.c
-> @@ -351,6 +351,17 @@ struct psp_device *psp_get_master_device(void)
->  	return sp ? sp->psp_data : NULL;
->  }
->  
-> +int psp_restore(struct sp_device *sp)
-> +{
-> +	struct psp_device *psp = sp->psp_data;
-> +	int ret = 0;
-> +
-> +	if (psp->tee_data)
-> +		ret = tee_restore(psp);
-> +
-> +	return ret;
-> +}
-> +
->  void psp_pci_init(void)
->  {
->  	psp_master = psp_get_master_device();
-> diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
-> index 3467f6db4f505..f204aa5df96e2 100644
-> --- a/drivers/crypto/ccp/sp-dev.c
-> +++ b/drivers/crypto/ccp/sp-dev.c
-> @@ -230,6 +230,18 @@ int sp_resume(struct sp_device *sp)
->  	return 0;
->  }
->  
-> +int sp_restore(struct sp_device *sp)
-> +{
-> +	if (sp->psp_data) {
-> +		int ret = psp_restore(sp);
-> +
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	return sp_resume(sp);
-> +}
-> +
->  struct sp_device *sp_get_psp_master_device(void)
->  {
->  	struct sp_device *i, *ret = NULL;
-> diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
-> index 1335a83fe052e..a83751cfd0060 100644
-> --- a/drivers/crypto/ccp/sp-dev.h
-> +++ b/drivers/crypto/ccp/sp-dev.h
-> @@ -141,6 +141,7 @@ void sp_destroy(struct sp_device *sp);
->  
->  int sp_suspend(struct sp_device *sp);
->  int sp_resume(struct sp_device *sp);
-> +int sp_restore(struct sp_device *sp);
->  int sp_request_ccp_irq(struct sp_device *sp, irq_handler_t handler,
->  		       const char *name, void *data);
->  void sp_free_ccp_irq(struct sp_device *sp, void *data);
-> @@ -174,6 +175,7 @@ int psp_dev_init(struct sp_device *sp);
->  void psp_pci_init(void);
->  void psp_dev_destroy(struct sp_device *sp);
->  void psp_pci_exit(void);
-> +int psp_restore(struct sp_device *sp);
->  
->  #else /* !CONFIG_CRYPTO_DEV_SP_PSP */
->  
-> @@ -181,6 +183,7 @@ static inline int psp_dev_init(struct sp_device *sp) { return 0; }
->  static inline void psp_pci_init(void) { }
->  static inline void psp_dev_destroy(struct sp_device *sp) { }
->  static inline void psp_pci_exit(void) { }
-> +static inline int psp_restore(struct sp_device *sp) { return 0; }
->  
->  #endif /* CONFIG_CRYPTO_DEV_SP_PSP */
->  
-> diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-> index 8891ceee1d7d0..6ac805d99ccb3 100644
-> --- a/drivers/crypto/ccp/sp-pci.c
-> +++ b/drivers/crypto/ccp/sp-pci.c
-> @@ -353,6 +353,13 @@ static int __maybe_unused sp_pci_resume(struct device *dev)
->  	return sp_resume(sp);
->  }
->  
-> +static int __maybe_unused sp_pci_restore(struct device *dev)
-> +{
-> +	struct sp_device *sp = dev_get_drvdata(dev);
-> +
-> +	return sp_restore(sp);
-> +}
-> +
->  #ifdef CONFIG_CRYPTO_DEV_SP_PSP
->  static const struct sev_vdata sevv1 = {
->  	.cmdresp_reg		= 0x10580,	/* C2PMSG_32 */
-> @@ -563,7 +570,14 @@ static const struct pci_device_id sp_pci_table[] = {
->  };
->  MODULE_DEVICE_TABLE(pci, sp_pci_table);
->  
-> -static SIMPLE_DEV_PM_OPS(sp_pci_pm_ops, sp_pci_suspend, sp_pci_resume);
-> +static const struct dev_pm_ops sp_pci_pm_ops = {
-> +	.suspend = pm_sleep_ptr(sp_pci_suspend),
-> +	.resume = pm_sleep_ptr(sp_pci_resume),
-> +	.freeze = pm_sleep_ptr(sp_pci_suspend),
-> +	.thaw = pm_sleep_ptr(sp_pci_resume),
-> +	.poweroff = pm_sleep_ptr(sp_pci_suspend),
-> +	.restore_early = pm_sleep_ptr(sp_pci_restore),
-> +};
->  
->  static struct pci_driver sp_pci_driver = {
->  	.name = "ccp",
 > diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
-> index af881daa5855b..11c4b05e2f3a2 100644
+> index 11c4b05e2f3a2..ef1430f86ad62 100644
 > --- a/drivers/crypto/ccp/tee-dev.c
 > +++ b/drivers/crypto/ccp/tee-dev.c
-> @@ -366,3 +366,8 @@ int psp_check_tee_status(void)
->  	return 0;
+> @@ -86,6 +86,29 @@ static inline void tee_free_cmd_buffer(struct tee_init_ring_cmd *cmd)
+>  	kfree(cmd);
 >  }
->  EXPORT_SYMBOL(psp_check_tee_status);
-> +
-> +int tee_restore(struct psp_device *psp)
+>  
+> +static bool tee_send_destroy_cmd(struct psp_tee_device *tee)
 > +{
-> +	return tee_init_ring(psp->tee_data);
+> +	unsigned int reg;
+> +	int ret;
+> +
+> +	ret = psp_mailbox_command(tee->psp, PSP_CMD_TEE_RING_DESTROY, NULL,
+> +				  TEE_DEFAULT_CMD_TIMEOUT, &reg);
+> +	if (ret) {
+> +		dev_err(tee->dev, "tee: ring destroy command timed out, disabling TEE support\n");
+> +		psp_dead = true;
+> +		return false;
+> +	}
+> +
+> +	if (FIELD_GET(PSP_CMDRESP_STS, reg)) {
+> +		dev_err(tee->dev, "tee: ring destroy command failed (%#010lx)\n",
+> +			FIELD_GET(PSP_CMDRESP_STS, reg));
+> +		psp_dead = true;
+> +		return false;
+> +	}
+> +
+> +	return true;
 > +}
-> diff --git a/drivers/crypto/ccp/tee-dev.h b/drivers/crypto/ccp/tee-dev.h
-> index ea9a2b7c05f57..c23416cb7bb37 100644
-> --- a/drivers/crypto/ccp/tee-dev.h
-> +++ b/drivers/crypto/ccp/tee-dev.h
-> @@ -111,5 +111,6 @@ struct tee_ring_cmd {
+> +
+>  static int tee_init_ring(struct psp_tee_device *tee)
+>  {
+>  	int ring_size = MAX_RING_BUFFER_ENTRIES * sizeof(struct tee_ring_cmd);
+> @@ -137,24 +160,13 @@ static int tee_init_ring(struct psp_tee_device *tee)
 >  
->  int tee_dev_init(struct psp_device *psp);
->  void tee_dev_destroy(struct psp_device *psp);
-> +int tee_restore(struct psp_device *psp);
+>  static void tee_destroy_ring(struct psp_tee_device *tee)
+>  {
+> -	unsigned int reg;
+> -	int ret;
+> -
+>  	if (!tee->rb_mgr.ring_start)
+>  		return;
 >  
->  #endif /* __TEE_DEV_H__ */
+>  	if (psp_dead)
+>  		goto free_ring;
+>  
+> -	ret = psp_mailbox_command(tee->psp, PSP_CMD_TEE_RING_DESTROY, NULL,
+> -				  TEE_DEFAULT_CMD_TIMEOUT, &reg);
+> -	if (ret) {
+> -		dev_err(tee->dev, "tee: ring destroy command timed out, disabling TEE support\n");
+> -		psp_dead = true;
+> -	} else if (FIELD_GET(PSP_CMDRESP_STS, reg)) {
+> -		dev_err(tee->dev, "tee: ring destroy command failed (%#010lx)\n",
+> -			FIELD_GET(PSP_CMDRESP_STS, reg));
+> -	}
+> +	tee_send_destroy_cmd(tee);
+>  
+>  free_ring:
+>  	tee_free_ring(tee);
 
