@@ -1,71 +1,76 @@
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010010.outbound.protection.outlook.com [52.101.61.10])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D191EF0B0;
-	Sun, 18 Jan 2026 15:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698021E531;
+	Mon, 19 Jan 2026 02:05:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.178.238
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768750284; cv=fail; b=KK9HeLBMTU9BBorERFuscgOhtbUiO/QVlJop3iX9QTOWkH5MG+elFbdTuGn3bPIu0hTnp01gIjkR5UrkiDXIsVOFCYQNLxpEw5wIH8I3z/yCzs5d2Rqf2xX8BgF9SSeFpM6l+QxpP66HKlSAICySlYFTdFR8tW9cCLihEq0rFDA=
+	t=1768788325; cv=fail; b=OoOIcUkf1NNYrC6wbM9DZRA+VXSpqaWPX/MkdQ0QT3lNyqkixk38aho4QMpK5Kj+C80byKUpHmliJf1fVqKzEXHbzInKIlOw+CBjzdomEWsD5yJhBgJX4hDF0rUgx+vZhDpn7Yd/cooo6Gp2Fyz3ZEjan4SzlzQBdERo90vz4HA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768750284; c=relaxed/simple;
-	bh=R81Gf4q+pfQ5QWKW+4Qe2tKqatfIisKTrGR9kwyQArw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qxQw2FnzeCg6QufcKg3tlS8kV0Vy/OPE0ZvwbnkSuJ3qAC8VUF+Kf0Xb09jpxqAzuq9Qp6hIO4AN3h6/zi/EOjYvemow9UFiTAkrjIU01mKF0bflWDwldSNfFaBkZE9NtFD0PY9KVyh4suNImnqDbuzogJJs0S+J33l4buw/Y2c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0F0NfW0+; arc=fail smtp.client-ip=52.101.61.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1768788325; c=relaxed/simple;
+	bh=tMDvN4JUmO/0dwvmepNeHzu40OmtYIgu6KdByjxdy1Q=;
+	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ff07lW9SgB1fvlGNwzDecFBxNGGC2VGeKuhI5uLHy2lEJSi1mQsuOLlfz4fvzhHYMAGZ6xAuvDCTiGjO0kq9IUV0ZW/oK2hJBeOzR8gUk0KynWE+JFSgBwyJp/ad8fyiqElsN+moTtT5UXMCQPFUiyGNdLE/L+p+X2YVA4VX154=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=cixSvgU4; arc=fail smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0F0NfW0+"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="cixSvgU4"
+Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60J1UwKs2422660;
+	Mon, 19 Jan 2026 02:04:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	PPS06212021; bh=6FDP3W6SM9fi0VCDl+gXTW2ll4RTihhc0CoWpElUl4A=; b=
+	cixSvgU45lueuaVAomR0aw5LbPjQY9vC0VlyTJLuFa6pVbirR5PB+RQNpXb0/4ki
+	bx571nOGdCIWyZd5IijUI7mOhwU2HDEYKmgvmlEcmBrAufTcgMNuG9b2ZeUo2SbH
+	ZkamQ/YAaaISgMmmENse6Kx28CieYNYeFjGRc93hfSOnvrrxSj1voMO+tXaWvSbA
+	0ynKyCopJ9QqK+RNXapVXBcOCHSrbbMa8S1FSXzslxnuOE4na1Yq5GOSjx4yjkRX
+	YkBgSLlrOtCUJEnqyj5MjoTfYakDhwP0dWwqwfSKcoz5vm6I2BlW4piNPCwiR69E
+	q59inTzjIecY42XJ9uTy8w==
+Received: from bl2pr02cu003.outbound.protection.outlook.com (mail-eastusazon11011035.outbound.protection.outlook.com [52.101.52.35])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4br1d49b6f-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 19 Jan 2026 02:04:43 +0000 (GMT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u+CQ4VJW8/Z25CJrwJ63E5/SDZT03HrrDWNUwNDOIbFjAQ/16EVSgJjeR75Vnq+tb9vaNb2QTQBGk4HjN/Kcm7Ro+ayFZycdx3/JQAU8SY83QdhRA5e0+XN4QHXTh1N5VRThRv+i2sFiRXMyTD9XGx3zbr/lJM9bwWT03lpN8lJcbhNSBXhDtCce6TpdxhfRQtPOtn/wfZ99CXzeD3c6csohEA1f3YyWaUtIymwg0aTTcce+g/9uVr64XjkTnVB0mNGfSFKgVq+LYNMYFziG684Zo6Dq0yHXovmR1fGRIn1SEzXs0prPB0WDDLcxtvCcJ5kq7wtLwoqlatSF0hBBoA==
+ b=i92BBbAnZEFuklfKiB/NzYBEEdfGptjqqiMnWz88+COhh7SnUG8jSzAZGGP5EKMWUHMT8OaF1Yn+Vesmb/vhwcaj2YM8SHNJxj5HDw5wwW9LYqfJJ2HP58RgFQ1oCpcBXVUGzS3qo2OFiG6imLJM0wbhk/HD4wFQhCY3gG9TDn3qHCN29KtI0DsGBl2nDtZL9wOOSfgcvWd20TCohKxm98XGJUrKD0OaK0j7rzfzIDpBlg0GSpeZrA/yO20Ga7YtJFsyDuHhYYoeYU33nibLOGk9fFQA2gC2x0gaiAPoDgR6wpMQ7DTk5AqZTIw85udknZR5TA+37DVscuEu/EuRlw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a1UW4Xr/hA8PfATQua/Nq31pIMTnk1dd0aIbigasgos=;
- b=hBime4eLlWU5GYsBOsMCcetbkSdnRLiJlPeqrAb6WzBiwUpuRpLiHVhGVwMN5lM4V4/TnxmhXXi4kTezzvJC+6mqUvWcqMR64WYRFWBskVf5xG8+od4mPbUHldIKf53XrrM2Pent47Yj0snGLfCeWHb7lrsaSvkkMSCsNZIBUXojQOzB2M95t8rTHWIgk6oZbLDQ9HObEgAW3ndIfq07pmsXCQzZwamdTGqpiKfAlaInNr4Sya4rgjKIcKy1cS1HxWtkS9w9hfb6uaFDWp5Xb3G+gGIRh1DfsLpLxsIAMT/bv9AwgvHeLgbH19fvOL6PlmbI8kVM/O8TpaxegQaT1g==
+ bh=6FDP3W6SM9fi0VCDl+gXTW2ll4RTihhc0CoWpElUl4A=;
+ b=fearF/GpbKWEzdYpxqPGG6xCU/07XuofWzqCb7eTgAyX/0fOq3oMwKLL8Iz41d6gFM19aK9OCKVIXNIbjr4kfzLAbOafvOwsDWxBZXsOs6P9htAFm+EQ+uC0PVzfAqd3VOPb7eAFpv11x9QL4l5G2mwYbp/4uQuhyykk+hF6LlHQggRXrEGnjhovkZ8/b+P9o2B070Xdk8DVoUS+XrgHoXC0CpPWuEKX8z8m4+7sENL+jqtPtLPJmJ8jYtpmxOrEzOVDN11JcjdaIMXbKe+Gxss/HNjr0xCiZFhpOermfmqAKgt19lNvVLqFfFSh8KJc32fJ1rBRbOnWHappSZUvog==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a1UW4Xr/hA8PfATQua/Nq31pIMTnk1dd0aIbigasgos=;
- b=0F0NfW0+mjjKw8gndZA8P1Vftxrou0z2ylls/x9cm7G3I9Qp/zPXdg5XvbPBCta6SqouYsiY99+u7oPCS6UFKoNmoKberIBoVEgxZnKXDjwfF3+BNPRnlZkkSp8T8KwpVZf+a6uZ8eUvYZl6ibIT143g0QKPLndRz5pRud2vVrk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5176.namprd12.prod.outlook.com (2603:10b6:208:311::19)
- by DM4PR12MB5964.namprd12.prod.outlook.com (2603:10b6:8:6b::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9520.11; Sun, 18 Jan 2026 15:31:20 +0000
-Received: from BL1PR12MB5176.namprd12.prod.outlook.com
- ([fe80::91cb:8f10:c6d2:d683]) by BL1PR12MB5176.namprd12.prod.outlook.com
- ([fe80::91cb:8f10:c6d2:d683%5]) with mapi id 15.20.9520.009; Sun, 18 Jan 2026
- 15:31:20 +0000
-Message-ID: <550acaab-6007-4972-ad83-df6c0d51f6d7@amd.com>
-Date: Sun, 18 Jan 2026 21:01:12 +0530
+ smtp.mailfrom=windriver.com; dmarc=pass action=none
+ header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
+Received: from DS0PR11MB7736.namprd11.prod.outlook.com (2603:10b6:8:f1::17) by
+ MW4PR11MB6934.namprd11.prod.outlook.com (2603:10b6:303:229::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.11; Mon, 19 Jan
+ 2026 02:04:40 +0000
+Received: from DS0PR11MB7736.namprd11.prod.outlook.com
+ ([fe80::f7c7:f271:a7b:7a68]) by DS0PR11MB7736.namprd11.prod.outlook.com
+ ([fe80::f7c7:f271:a7b:7a68%4]) with mapi id 15.20.9520.011; Mon, 19 Jan 2026
+ 02:04:40 +0000
+Message-ID: <5ccb46f0-b4ac-4b00-a995-1062de841f4b@windriver.com>
+Date: Mon, 19 Jan 2026 10:02:59 +0800
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 3/5] crypto: ccp - Add an S4 restore flow
-To: "Mario Limonciello (AMD)" <superm1@kernel.org>,
- Tom Lendacky <thomas.lendacky@amd.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Rijo Thomas <Rijo-john.Thomas@amd.com>
-Cc: John Allen <john.allen@amd.com>, "David S . Miller"
- <davem@davemloft.net>, Hans de Goede <hansg@kernel.org>,
- "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER"
- <linux-crypto@vger.kernel.org>,
- "open list:AMD PMF DRIVER" <platform-driver-x86@vger.kernel.org>,
- Lars Francke <lars.francke@gmail.com>, Yijun Shen <Yijun.Shen@dell.com>,
- Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
-References: <20260116041132.153674-1-superm1@kernel.org>
- <20260116041132.153674-4-superm1@kernel.org>
-Content-Language: en-US
-From: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-In-Reply-To: <20260116041132.153674-4-superm1@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN4P287CA0066.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:267::7) To BL1PR12MB5176.namprd12.prod.outlook.com
- (2603:10b6:208:311::19)
+From: Jianpeng Chang <jianpeng.chang.cn@windriver.com>
+Subject: Re: [PATCH] crypto: caam: fix netdev memory leak in dpaa2_caam_probe
+To: Breno Leitao <leitao@debian.org>
+Cc: horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net, kuba@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260116014455.2575351-1-jianpeng.chang.cn@windriver.com>
+ <4h7joiwvamq3sgrkhyemtug4lucyicnx7beuik3i5foydwb256@iemjvkrs7h2d>
+ <4a5b1ada-0602-4f43-b09b-ba1a8da26f21@windriver.com>
+ <aijerp5ovv7m5mk2xrfn5rjgkufcynu7vikejqityxloeqnreo@jdnoev2yvfvy>
+In-Reply-To: <aijerp5ovv7m5mk2xrfn5rjgkufcynu7vikejqityxloeqnreo@jdnoev2yvfvy>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TY4P301CA0004.JPNP301.PROD.OUTLOOK.COM
+ (2603:1096:405:26f::13) To DS0PR11MB7736.namprd11.prod.outlook.com
+ (2603:10b6:8:f1::17)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -73,268 +78,226 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5176:EE_|DM4PR12MB5964:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5eb377bf-b77a-49e8-e2d6-08de56a6a15a
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7736:EE_|MW4PR11MB6934:EE_
+X-MS-Office365-Filtering-Correlation-Id: 355a6025-ddd5-4e20-bfd1-08de56ff1abb
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?K0M4Wmdmb2ZvYjZwUXpIZ3pCNE1PcktwTGJVRCs0ZDNLVExVaFBDeDZOK2FG?=
- =?utf-8?B?TktNUlRTTHBuUkowckpLOUZSQkxOUFJPTDJYSkFzWWxpRzJMY1hzWE5rU1R4?=
- =?utf-8?B?OFF3NThBbVJCRWhBL1RvdDltY202K1V4L3F1cjVkQlFqSGJmVjRLYjVXTWdq?=
- =?utf-8?B?OWxGZW8xZmFld0FDRjA5Vmx6dkI4UkxCc1J4RnF3SUE2SC9UUm9Od1Q1a3Nu?=
- =?utf-8?B?QTlpQTYxOFJKaGM4L1BGcTVVYjV4YXpmV2hyQmVpNkIyaVBsRzFMUmU0RVdK?=
- =?utf-8?B?MTRWT0FlcyswejF3TEp5aURjbm5RVy9ZQWQwZHdRTEFKeVEvS1hIWE5rN2E3?=
- =?utf-8?B?bUFjMnI0K2xGN0cvZmZJTCtwVUUyYXY1ODVVdFJZZUIvcWhSVEE0bzVyc25F?=
- =?utf-8?B?L3F0OHZQVDdQcEFXUWQzRXlkSVZ3NEpwS2ZJSmxHOVM3cFVybmwxa0F2VVFO?=
- =?utf-8?B?ZHYzVmlkeXVKZS9CVVpoUjBidk02TWVMVXFNd3N3MXp4dGo0V3FZSVhuV21R?=
- =?utf-8?B?SExtMzUxUGpSR3hTeERFbGsyeWlheGpUU1dkdE90S3RJdU9ScXFKQU5XQ1ZL?=
- =?utf-8?B?SjYvMmFyclhmRC9aRlFnb0RUZ2ZJRjdka2lsQnltVk95NE03ck1ZWDF5eDhH?=
- =?utf-8?B?aHlmOHdTMTBsazRvQTRiV1BoSy9ZczdVcW5XY25jSGk1UlY3VisvRkhmOVIr?=
- =?utf-8?B?aXBRalBpUVNNZ2dlSDNSbnh2UG9WUGkwY0IrSFBxbVRpSVQzNVAxT09WWGJq?=
- =?utf-8?B?VzQ5d3owcGV1NEpWMkJEOW43Ulh6Kzk0djJZQktFc0t0RVYrVENqOVhjWHBY?=
- =?utf-8?B?Y0lPWlZBZzJIZ0doOHhxVmhaVWhDZGtlNE1pNnF2WE4ybTBSZzJLM0l5czVh?=
- =?utf-8?B?c0NlOWR4Tk11VmMxcEo1RzBaT0J1NUN5RDRZVVpZRlN4YjlYU1VocG1wVTlM?=
- =?utf-8?B?b0NaZkdnRWlHZisxajFnTFEyemRrbCt2SytiY3pyaXFHd20zbFB1MkF4SU54?=
- =?utf-8?B?VnJOek1Hd3F5UFRseGRXLzEvSGNuMis2d1pyUGNRdEh6azR3U1Y3MWMwdVh4?=
- =?utf-8?B?ZndrdTMxYm1raVBkY0tCM09qSXZiMitnWFZLV20yNHVqb05LVzhNNkFsTlZF?=
- =?utf-8?B?Z0pkUGFhSXZSMm5NbzNmcDRveUN4cGd2UXZwem5wcm1weUVmemZwUStEY0FH?=
- =?utf-8?B?di9sbm1XNnlLMGtUN2tGeEdYVDZuRFdCY3pzcDJVbDBDUkhhbUVHY2E0aEEy?=
- =?utf-8?B?NWtxMU5SbnBkL0dObUhvYlF1R0QxMFdzZkZ4OW5sZUtUZkhIc1pYTkI4bnky?=
- =?utf-8?B?UFAvVWJIN1JsZzdxNFIrbkdLVW8vd2U4VitUd0wwSVdqNmVHbG8rZjhOQ0Ru?=
- =?utf-8?B?NGZWdWJRRkpjWGt0bXdiTFB1eFBpQk9MNDgzU3JyTFo1aGJaTTlpNkp6ai9U?=
- =?utf-8?B?UWhTWDBjaGZQNlJzVkNtUlphQjE5c0puZnBTMUpjWUxIekRPMlhPaGZWQlJR?=
- =?utf-8?B?TEJpWmN5RFZpckQyVWxTWXZYNGxCS0lGM2NyZml2Qk5GTEpheEZEOC9PRUFW?=
- =?utf-8?B?L29YU3ZNdDBxU2MveXJlVGlmSU9YZXNVUVNnRk9lbnNlRG82eTRoMVVlVXNu?=
- =?utf-8?B?aktGUGpJUnBJK0srY3lNd28wdFdTNlgvL2FaOFJoMmkrM1NWU3dWYURsQktz?=
- =?utf-8?B?eDlHc01FaCtpbkc2cFUyVVVjWG1YdkgwMmdQblRSc2pmcUZSZ3FLVWhXWW1B?=
- =?utf-8?B?ZE1ld0s2cERURXJHd0c4bTQrRmpmYlVhSVUxVFJ1NnBwU1NybGx5YmIyajB1?=
- =?utf-8?B?anZhTmtLb2dnakhBMGFNM2VHNy85TlRudzkwT2ZWNzNsN25CY1prVndadUgx?=
- =?utf-8?B?SDBZT3lNbisxblNNcFp1OTNyb0lkTFlnZzJQa29WVlNVTVJSRmFlMFBxY09H?=
- =?utf-8?B?VWtqc3BRL3ZSVTdFNCtqaHhtVzRka01YcjZneEdGT1NWVCtvS3ovSjVDR3ZL?=
- =?utf-8?B?Q0NPZ3ZGVk9vVUdKR1BjQUx5RE1ZcWxMemlCd2N1Z2RIQ1dVSWsvS3dDRDli?=
- =?utf-8?B?WTY1RTZ2ZnYwTGlzaVMvdldWSXNrTzF0RjUyMG9mVlhYeTdMS1RCUmd0Nysw?=
- =?utf-8?Q?8TdQ=3D?=
+	=?utf-8?B?emJuMTF3clpGVTRpSkphUHpXQXlicU4rMWtwZzlLNkRic1M1N3pkeTJ2czZD?=
+ =?utf-8?B?bW5GaDhYcVQ1ZkNURnJFekoxMWFDOSt4RnVLelByRE5IUWU5aGY3ZjdVZ1hJ?=
+ =?utf-8?B?dTI5SHIycWtaYSt6dmxCY0YzaGQ3SjdRaHVuZHVBdFpVVWROYUpyZFJYdHJN?=
+ =?utf-8?B?cUtqMDB5WjlYbEhzZ3YrT2FnVDVFeUFLYVFNNWZuc1RrQ0RRM1lOTU5KNllY?=
+ =?utf-8?B?S2s0R3k2Z0U4Y255anE2Kys2UDdpK3lzNk5BT3VwbHhQUXNKRGo5djNLSUMr?=
+ =?utf-8?B?YlZNZVhGNnlEc1ZWd2I3dHBHcjNIdVVndmQ3Q05PeTdQTGdZU0ROUW9kN3dY?=
+ =?utf-8?B?TE5OS2RiREYyaWlJZE5lTTE1TTBZWEpaZThPRnBsTFVMNjZiMGdMZks3UUVa?=
+ =?utf-8?B?K2JDYXFSOHFMMDQxZ2U1TEd0VS9zR1RHMDhzcGh1NXVRMWk3eStWOUhBZnlM?=
+ =?utf-8?B?MENqUE02VG1tMzdNUm1NTEZLL0ZjNGoxVGxuOGY5NkR1ditvSkhyKy9nOEdJ?=
+ =?utf-8?B?NjdmSEw0RkwvSFUwOGNYZDY4dHQ5VjVNcEJxTzJZTFlYSjZTcSs4V2VwSmpl?=
+ =?utf-8?B?Zy9DcmxTcnd1VjBSdHNoa1FHODQvWS93ajc4dnR6Wnh5d1NoRkNOVTdXTGZl?=
+ =?utf-8?B?anhSaHo1UVRjMzVxWk5vMDlOUzJmVVQ3TllSUEdVLzJaa3JNclpZaFE5dVZN?=
+ =?utf-8?B?d0VOcGNzVHd2SElMaFVnRWVNZ1UzeVpDNEtaazZ1dTMyMGNwTFNrN0pieFVO?=
+ =?utf-8?B?end6R054bzYyMFRSMnBMSS9UNlg3ZUpwQy9NMlg1aTJ0NTFCK2YyUHA0T2Rt?=
+ =?utf-8?B?UHRnUnRjVGxyYkt6ZEJsU1liRHFuVit3SHBUcmYyMlpLTlgwRXNRUHg4Lzkz?=
+ =?utf-8?B?Qy9oSE52NTIzZzEzeXJwTng2WXVsSHptSkgvS0FIcDd1a3FvZENIWVlLUmZn?=
+ =?utf-8?B?b3NYYlpLeTFBd2FrZzJVOS9ybW1WTDY1ZVV4V2NxUng1amRNOUpRNnhDRG5U?=
+ =?utf-8?B?Ym5RWjhTa0gzbWljSjN2Si9VeXM2MnFUNlpKM1VYYTF6aHFISzA5Q3FNOHJY?=
+ =?utf-8?B?U1NjcjJIUW5CT3d1RUFqdnZKYUhRYWk4d1V1U1pyMFdrbjdkZmVDcEtoRUpq?=
+ =?utf-8?B?MExIY0FuNWtrcmRMUGpDL3dmazZPdWc2VDR3UFR4ZlV3Z0RNUEtLRXVLS2VG?=
+ =?utf-8?B?S3hrcStycWZKbThnK0xjSDVYaWJPaXNlOVhlSWszMitpeXBJbk9lNDhkd1Mv?=
+ =?utf-8?B?Vm9SVnFxb2psMEViNW8rVGZ5a3RZaUR6YTBkM2lKRUc4S0R0MXl3SmtVQkZU?=
+ =?utf-8?B?citQTXIvYUhEd1NoNUZISXVOWGZvTmxPbzRTc0tPWGx2R20va2dheUsrZjhM?=
+ =?utf-8?B?R3p5SEZPSGgzQit0Y2lsQVhFNHlWNFNzL0QweVkwYkc3amU3d2g4QXZiSlZV?=
+ =?utf-8?B?OFFDak9zTnlwVmU3Q0VtQnVyN1lLOEliSUpySE9reUVJakNzcGJ2dTdVNFEw?=
+ =?utf-8?B?U2o1d3ByTXZaOU00RzZ4L1BJME9RNlNKRy8rOUlIS2d2UVdLc20zQ0U2VU0x?=
+ =?utf-8?B?SXBzc2RPQ283U3diQmhFYkVvWWltbGoyOFpkaEVJL2FYMStvelFYc1JLM3FO?=
+ =?utf-8?B?bVNuQnFKcStPOWd0UTlxbUJPYTNzU05MOWM2VTNjK1RGZjB4eE1CN3pqRmhP?=
+ =?utf-8?B?K2NRbVdrRHQxTDllRDY5MjVDZ0RzMHJNTHV6Z3NrTXRnUHdSN2JqVFhZYmNM?=
+ =?utf-8?B?MVdNUEZZcklsWkx3ZUliS09hWDhTbnVpUmpUZUhvOUQ0Tk9GUlFoZm9sUnli?=
+ =?utf-8?B?VE1zRnYrdkJSeGJ6TWdaQ2NXc3NTNFV0ZE13UVoxWGI2OFp6YkF0R3NTTUM5?=
+ =?utf-8?B?QTFpQmRXVHFlOEhCSnU5czJNcFhLZVMrZnM3a1JwY1JtalVpeUpzTXJKczNE?=
+ =?utf-8?B?L2I0SExEL3praW9LbVhaWEFwWkhibDNpTkgzekhVTHJPQVVSMEUyR3JsWFQx?=
+ =?utf-8?B?VmJuN3gyL3Zkanc5OFViN0RHTHBNZkxjSnArNTA2K2x4ZjM1c2d2Q2hyUmZV?=
+ =?utf-8?B?YzFPS1k5UUcvNnZmOWxmV0pSYlZ5azNxR2ttcktVZkpLNzQxQTV0UHF3TEVU?=
+ =?utf-8?Q?cq4w=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5176.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7736.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ejMrUEJ1cGFZd2U3Y0h4cEk5WmFVOTcwSlVZeDgxUHRFS2orSUptR0pPK2ZP?=
- =?utf-8?B?RDB3Mmd1VlhFVkFnTWcyYnBVRTJnYmFrcXp6SU16MlcxZjFMbzFIaXJYUmp1?=
- =?utf-8?B?TCtyaFUyZGVJdFh2dWtXdFdtTCttTkNDRUZWdE5MOGJzL0NEb1pKUE9LY24w?=
- =?utf-8?B?R25BdERvb253UlZuZGQyWEVhWGFkOWF2alU3V3ZzY0dIMWppSzRHbG9nZXdQ?=
- =?utf-8?B?aHdMYXhBTjV4RTR2dFpJYXI5WEFNUnR5UUpOVVJxdkRRNldrQjg4SzF0aGFI?=
- =?utf-8?B?Vm04VmE4cVV5T3R3YmVkSkdmVFNFcFlERFEwOW9tZzIxZWkrVklhSVBsTjRI?=
- =?utf-8?B?OER1aWZyeTB1eW9oc0lQMEpybUFTZUdoOGE2QnFpcnR5MC9CMldYMFoweitN?=
- =?utf-8?B?N2JlV05oL1doMzZsZWxVVGNaUmdsVlFmRDFJSm5BektJZTByd3FjM252SEpF?=
- =?utf-8?B?RlN2VkJyN3IxUnVKbkFCZHVFRG1lUzY5TTZNQWpPOTdFY0U5aXc1ZHljSm83?=
- =?utf-8?B?dGJLdHBjWFJhbWtQZ0tXVERPN3lXTXdvQTA0NWxkMHEzbENGVDJXTGllL3BJ?=
- =?utf-8?B?WXVpZXkwQ2krSW9BSGpwd3R0cXl5WWhUbStFQUErNHRhdHpMd0g0dG1zVkd5?=
- =?utf-8?B?RWN2QU93VGFGNXdDM0hiVFRqWFhRcVN6cm81UzQ1clk1RDJXalloTTZvUWN6?=
- =?utf-8?B?Y0grQUZmd1NGNEY5Y1pMRUkvVi9Nem9CSXpXTE1qYTJGZnd5ZzdmYkRSNlh4?=
- =?utf-8?B?ZEFzVE1ocWVqZmQ5TUJQZ043ZkVHUTZyYm5YZHhuM1QyVWMvdzVmb1JXQjYv?=
- =?utf-8?B?QS9MSzZUTWJLK2FFcUpqdlFWcUVVVk41NlQ5TzZrdHBhekhoMktraVBqRGEx?=
- =?utf-8?B?ZnVscDRhaHZoN3I0OVBpc0d2eVJEbUtnUURYd2plVVNSNUhEN3QwdllTT0Zk?=
- =?utf-8?B?VUlGblF4eDVtWDNKbTEweUhET2xWYnVIM2dTZGFSMEp5ajlxT1p3RGZQR0dL?=
- =?utf-8?B?VzB4dVBqcnRxZDM0c2hlN2tranVDRzZKSFJsWFlvWVlNb3d0aDlLVVNDVmZ5?=
- =?utf-8?B?dzNBdDVRajUwM0ZZWGNQQkhVSU5FeEJwck9Hb0txWngxZFVHRkVyTG1hMWVI?=
- =?utf-8?B?WUgrTFBtRW5nbjZ3SHVoNUEwUlVHbjNYTzlvRU9TbkdDY29OVkxmWlJJY0hM?=
- =?utf-8?B?NHlqa1hYVEh0VFNkSEV6d2ljSFJENVovaXJlQ3E0L2ZlT2lxOFFkWnNWeFVT?=
- =?utf-8?B?ellHMDdHWXEwWVdvb3U0ZTJFM1B5Ky93c2ZwTnhaU0lxc2ZuRDV2amYyd3Rh?=
- =?utf-8?B?cFhmNU13RmNBS1R5anE0WHJRWE1aWlJ3OElHSit4a2NYazF6dUNzTEhzdDF0?=
- =?utf-8?B?cVlLckpVMjRaL3lkN0xnTXBIMjhQRm9mSUFtandLR3NJYVVlWkY3blBRT2VG?=
- =?utf-8?B?OVdaVE1ia1BaQVRZRWY2dFEzaDQrbDBURnlWS0N5cUx3TjM0UjFYUUxGN2F0?=
- =?utf-8?B?d2NGbUUrMGx0M3Y1U2Q2ZW93U3YrcitpMDBESWozOVNXZ1FMM2JVemw0UDNS?=
- =?utf-8?B?dlpjdS9IMkNRZlowczgrbFdDS0h5dEVpUUlMNGx4YjRCeU1NaEN3cEhwb2M1?=
- =?utf-8?B?SFhvaGxUK3FFdGw0REFEWmgzSldpaUdWM1JLU09WcmhHcnlUU0ZCZDJNakpl?=
- =?utf-8?B?eFF6aEZTS0hVeFdLRnBnWDM5T25JaDEwM0orcUZVVGtmMTh0RTVYZFN4Lzgw?=
- =?utf-8?B?d21rNy93dVJib1c5d0F0Q1ZpNnh6bytrTzhHZVJyY3hFSnFEUWJrTm9pRC9x?=
- =?utf-8?B?UzlkNFFXU1pIcHc4VGRPWGMwR1RLWUxuWHc5QUVjMWhKT1VpV1F2S3E3cHhC?=
- =?utf-8?B?YjdyUmJqejcyRmRlTWhnSFg4ektOR0wybGRuRU54Yy9MbHBxOE9jbXBWQXlU?=
- =?utf-8?B?anQ0TFYyU1psakM0S09LT3Z3d2tyblVNSXZEVEJIZGxPNU9hejV1WWtwa2I5?=
- =?utf-8?B?emd4ZmtMMzdwN040UURNdm5VR2llZjJpVkUxOTUzaVljNVk5QXBSRFJvcmNn?=
- =?utf-8?B?TWhqWlJSUUZIVngyMTltWWdrb1FPNEJabXExQUg1NEwxemw5T0IvTTZOVlZH?=
- =?utf-8?B?MVRRTU15WWNYanNhekMyYmNXcWh4enk5Q0ZXWERxYWsydHIxZzRhWjhXQXNS?=
- =?utf-8?B?RzJXZVEzR3RDdit2alM2MktWcENXQ1VKZnJSVEFqKzYwWFlzdEd2OGU2M0l4?=
- =?utf-8?B?Nm1pU0JBVlZjZFR2a3p5VjJwV1FFSnlsakRlRlFtZW1VVnNPMnNVMXpLbHp5?=
- =?utf-8?B?VkNVVzEwRzJmOWRSY2NxeEdXeWliclBMSXlXUWYxREs4QUxYWnI1UT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5eb377bf-b77a-49e8-e2d6-08de56a6a15a
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5176.namprd12.prod.outlook.com
+	=?utf-8?B?Z3hCQ1ViVW1BK2dmQVZ3UmVDUEFZYWNINFRUd0U1SjIvMEFvMWdITkh6eDZt?=
+ =?utf-8?B?aUJpTFdjWnkzTVNLelZiZGw2a0dtMGVSNDgxNEJyNFh5VEgrWnN2SDlEYTVx?=
+ =?utf-8?B?bXFvYkJMZnBQTDhTV2JFK2lWc0hjUUp0T05zbEpSMUF1K3ZWaEdNZlBIcTF3?=
+ =?utf-8?B?RW9VbjZpL3l5em5SQkVTeldyTTlqdlBXZWIzUGh1R2NtZ2dFR1JuR25PWFZl?=
+ =?utf-8?B?WS9ZS0NpemFub01KRTFwT2JoeURya0ZFTVYydGdQSWxTUm1kQnZnUEllWnpH?=
+ =?utf-8?B?Q1BrLzh1SThwZElPT3J1ZjBoM1Y0OVdlY3NoeW4ySm5iOCtDTWdNanRwWGly?=
+ =?utf-8?B?YW4vUUFrRHJaZ2h1eXg4aDFBVjBrdGx4dFZubVc2Z3hBamh3K0E4UXd3aUtx?=
+ =?utf-8?B?UkY0b05aUnhRRGttUnNDUElKaDhQYmZGdHB2cTA1OThwaHE4Z09EcklCd2tS?=
+ =?utf-8?B?R1I4WXhGN1hNckdpTU9aTENUUk9XZWNVRmk0RGhTOTBQUDBNQ2U5Smp6c1ZD?=
+ =?utf-8?B?enhkb1BTMTJrSDhtTW0xajNmVW1rZnd0YnI4TnRhaWtNTzZvT2JvWXBrSStv?=
+ =?utf-8?B?UjlCb0xsaGVwSjQxTmsyR1I2Rkw0cUo5VG1MTHdBN2VXVS9wcVBPM09FaTRx?=
+ =?utf-8?B?cmJjaW5oWlhjNUQwR0cxVGptNjE5S1N5UE1KSGNoUDIxZXM4SVhBYWFyYkRP?=
+ =?utf-8?B?MU5YOW9tWHFqamJWZFFZdXkvLzcwbXFleXNyOURQdk5PeFo4bTVGam56QlJr?=
+ =?utf-8?B?a0VCWThSK1NVTWRJdXpoWDU4M3pFNkVpek9ibHRPZUlBQUdtY1R6YTZHZlo0?=
+ =?utf-8?B?TWtBeXVRM1E2QUJIVWZrbnJLaExKRXRiL2k1VWR4ek42VFF6MEdFcnArTGNy?=
+ =?utf-8?B?QldtTEowbExRVVMxUGdPdFNEOTd0bTN1OWN4R3hwL0xmT3dmaEQ5WERSNmpw?=
+ =?utf-8?B?d2dQN1g1cWdzVlFwYS9ldEdXNWMvNVNBMjFBaUpseEg3dXdLRkx3UDhZMkEw?=
+ =?utf-8?B?RG9sR0VxQWV4aHVBcGFKWDdCSWZrVGNDdmlrUURoU3c4cUxnMUJOYVpXMGdG?=
+ =?utf-8?B?cGwwU0J6S0hPYm8xMmdkSTBPKzlDNzVSU1E0ZlJjY0Y5T045Mzg0OUkwUkRE?=
+ =?utf-8?B?VEo0VmRjUHMwM0ZVcjMveXU5a1AvVmpHNEJDMGJLOENFM2lWdlhwRzZYV3BB?=
+ =?utf-8?B?OVBZTEo2TGVjeDlDNWpOcjBJNmYreXJVamdiWEswUmRGVkZOWjM0V3VjcDhs?=
+ =?utf-8?B?ekRla20zT0lUdWJRc3NYdWRuYmc4bGpKQXoxUlBULytCdDFPMjEzc0NSOVNl?=
+ =?utf-8?B?RENBeGE0Z2FyWG5xRFRDU2o2M0xuVnhQcXNwbVFmcjRkMG9OSnVhWjdmKzJC?=
+ =?utf-8?B?MFdiMnRFM1FPaUNMNWU0VkFLVmdoTWVqYW1lbnpTT2xzZU9hR1d3VjVIdExP?=
+ =?utf-8?B?dGk5ZXJWdWtkRENCNWNyQU5ucTlzY1l2Z25Tc28ybk80eVJDeHNOKzdVM2sx?=
+ =?utf-8?B?Y20zSFVDdUd3Rk52b25QZU12UkkxaGNRWnQzNDNCZCsvTHhZU2RPYXJ5b3JE?=
+ =?utf-8?B?RjhOamFqVFZabjgza3VLeWZKdU5MTDU1Mk9WRmlKUXlMYzc3TUNCYThFZm41?=
+ =?utf-8?B?ODIrQkdqVkxFeTd5OVhEOEhTaU9TYVA3TU43L1NDNGtuV3QybFBxVStNSWU0?=
+ =?utf-8?B?KzBweDI5cDRRSDExT08zaFh6UTZNTVp5YXhIN2NrTng3UzNGRmJtSXdUdU1z?=
+ =?utf-8?B?SjZuR0NHR2Fjc2ZobU1PS2pMazFSU3VZbWYzbUhjN1ZPaGpyYUwrQ1lKNUU4?=
+ =?utf-8?B?eVBMMy9SQlJLL2N6SGNLd2I3a2ZNN0Y2OGIxb0xOMGxNdTZraVc0Qjdtell5?=
+ =?utf-8?B?ekZsN3pyVEhGK0ZRUkl6dmQxdTM0UDZtT0xsM1BiNFVhczZ0RWo0QW9PVGlm?=
+ =?utf-8?B?aUM4eEdIKzliNjBMY1JKcDVEUzY1WkVBSnFJZ1oyeG0zUVArRlFYZ00rRHdl?=
+ =?utf-8?B?U1cxczE0NW1LdVcvYSs2eW1VellGMVRnYWFycHhJa1VEOU90Njk1b0hHaTlH?=
+ =?utf-8?B?dXJnalNaR09BdFJSSk1CekJQS1pjQ2lXbWt6bWhNS0tydkVyblVqTEduZ0Vj?=
+ =?utf-8?B?SU1VY012dGlTSXpKVVNwSVBGNDN5YzFtS1RkYkxBQVFVdXZUOERvM3U5azN0?=
+ =?utf-8?B?TnZES3BveG5BYU9BYU4xUkdXZjQ4c3NtOWg3N0U0R2xrdzhPS282ZlI4NC92?=
+ =?utf-8?B?WTdwNUthemFVVUphcjRnY0R4NzNobUpLODR0bEhGL3FwLytadFRzTTFLbEFV?=
+ =?utf-8?B?aUZOY2d6aXVFYS94a1ExUXhHR0EwSmUwTit3Wi80OFU4bXRoMXNqOXVpQzg2?=
+ =?utf-8?Q?VCth3W6M+8OUq0y4=3D?=
+X-OriginatorOrg: windriver.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 355a6025-ddd5-4e20-bfd1-08de56ff1abb
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7736.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2026 15:31:20.5904
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 02:04:40.1158
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yZHNJuTxC4/YAmF+OjbdE5fT6U6ivxtoxwXH4wA29VpcLxNGLbMl0YG0CfArjinfp60fHrIYsqfa6fpaTT4zlA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5964
+X-MS-Exchange-CrossTenant-UserPrincipalName: oqa2kzitkZIqoABrwt0vMKzZiW6EnaggDN+hH8W56BHL86XLQKi31gICJGWoaMlc+CkjQHyQ90H6TYXCivespDYDKYEoagtueSGfj5S+fMk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6934
+X-Proofpoint-ORIG-GUID: -9Ad2uEBhzvNzbeYkUbgXuTMUaRCjfiJ
+X-Authority-Analysis: v=2.4 cv=Rs3I7SmK c=1 sm=1 tr=0 ts=696d913b cx=c_pps
+ a=2EogD3SZGC0twO92opjmhQ==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=t7CeM3EgAAAA:8 a=jMwly8hnOpOiXLonyBsA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-GUID: -9Ad2uEBhzvNzbeYkUbgXuTMUaRCjfiJ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE5MDAxNiBTYWx0ZWRfX2xWJiRQ+HfgQ
+ 6HRyR51oAJIvjqBN02L4eHrEsFqfxNx5vN5PS7te9XVXkSC5jDlFKJDGaJyKUoWdCva0ERzBbaL
+ a0JgZvmsyaMGnNPoBXWsjhokO+aRWVJ6mJgzSwYgkhEiZEGkj2brWelPlMZsxB1fRY6vXftDdEd
+ ahq1hrVfAkp32mj4rc5QS2JuuUBhVVyjbrwPZ/AWMw94Bp/zMuQMlPyiANOwNRmUoVdJr+bpPye
+ OIyPWEQahKo31n2GvNNn1eucZIhq0oMtm4++lk9ujwH6hPZagTYHlrw7yL7V8oC/XaXWXOypWSu
+ wKCJ6xIdD7xP+X6ws1fS5PpKs2eVHy9HM/sJAjSzCPQtUVKGDSog86gKku0mo+KLyJZzY/ev/r2
+ jShDZp2CSgYxIvJm4HljjptBKHntwsoDLpvVzc3tg55qXnyo8Ulya+tvr0hB7MREWoV4pdqxMPY
+ mENdD6Mh3ERKdBT58pA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-17_03,2026-01-18_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 bulkscore=0 adultscore=0 clxscore=1015 suspectscore=0
+ malwarescore=0 priorityscore=1501 spamscore=0 impostorscore=0
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2601190016
 
 
 
-On 1/16/2026 09:41, Mario Limonciello (AMD) wrote:
-> The system will have lost power during S4.  The ring used for TEE
-> communications needs to be initialized before use.
+在 2026/1/16 下午7:43, Breno Leitao 写道:
+> CAUTION: This email comes from a non Wind River email account!
+> Do not click links or open attachments unless you recognize the sender and know the content is safe.
 > 
-> Fixes: f892a21f51162 ("crypto: ccp - use generic power management")
-> Reported-by: Lars Francke <lars.francke@gmail.com>
-> Closes: https://lore.kernel.org/platform-driver-x86/CAD-Ua_gfJnQSo8ucS_7ZwzuhoBRJ14zXP7s8b-zX3ZcxcyWePw@mail.gmail.com/
-> Tested-by: Yijun Shen <Yijun.Shen@Dell.com>
-> Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
+> Hello Jianpeng,
+> 
+> On Fri, Jan 16, 2026 at 06:14:37PM +0800, Chang, Jianpeng (CN) wrote:
+>> On 1/16/2026 5:46 PM, Breno Leitao wrote:
+>>> CAUTION: This email comes from a non Wind River email account!
+>>> Do not click links or open attachments unless you recognize the sender and know the content is safe.
+>>>
+>>> On Fri, Jan 16, 2026 at 09:44:55AM +0800, Jianpeng Chang wrote:
+>>>> When commit 0e1a4d427f58 ("crypto: caam: Unembed net_dev structure in
+>>>> dpaa2") converted embedded net_device to dynamically allocated pointers,
+>>>> it added cleanup in dpaa2_dpseci_disable() but missed adding cleanup in
+>>>> dpaa2_dpseci_free() for error paths.
+>>>>
+>>>> This causes memory leaks when dpaa2_dpseci_dpio_setup() fails during probe
+>>>> due to DPIO devices not being ready yet. The kernel's deferred probe
+>>>> mechanism handles the retry successfully, but the netdevs allocated during
+>>>> the failed probe attempt are never freed, resulting in kmemleak reports
+>>>> showing multiple leaked netdev-related allocations all traced back to
+>>>> dpaa2_caam_probe().
+>>>>
+>>>> Fix this by preserving the CPU mask of allocated netdevs during setup and
+>>>> using it for cleanup in dpaa2_dpseci_free(). This approach ensures that
+>>>> only the CPUs that actually had netdevs allocated will be cleaned up,
+>>>> avoiding potential issues with CPU hotplug scenarios.
+>>>>
+>>>> Fixes: 0e1a4d427f58 ("crypto: caam: Unembed net_dev structure in dpaa2")
+>>>> Signed-off-by: Jianpeng Chang <jianpeng.chang.cn@windriver.com>
+>>>> ---
+>>>>    drivers/crypto/caam/caamalg_qi2.c | 31 ++++++++++++++++---------------
+>>>>    drivers/crypto/caam/caamalg_qi2.h |  2 ++
+>>>>    2 files changed, 18 insertions(+), 15 deletions(-)
+>>>>
+>>>> diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+>>>> index 107ccb2ade42..a66c62174a0f 100644
+>>>> --- a/drivers/crypto/caam/caamalg_qi2.c
+>>>> +++ b/drivers/crypto/caam/caamalg_qi2.c
+>>>> @@ -4810,6 +4810,17 @@ static void dpaa2_dpseci_congestion_free(struct dpaa2_caam_priv *priv)
+>>>>         kfree(priv->cscn_mem);
+>>>>    }
+>>>>
+>>>> +static void free_dpaa2_pcpu_netdev(struct dpaa2_caam_priv *priv, const cpumask_t *cpus)
+>>> c> +{
+>>>> +     struct dpaa2_caam_priv_per_cpu *ppriv;
+>>>> +     int i;
+>>>> +
+>>>> +     for_each_cpu(i, cpus) {
+>>>> +             ppriv = per_cpu_ptr(priv->ppriv, i);
+>>>> +             free_netdev(ppriv->net_dev);
+>>>> +     }
+>>>> +}
+>>>
+>>> Why is the function being moved here? Please keep code movement separate
+>>> from functional changes, or at minimum explain why the move is necessary
+>>> in the commit message.
+>> Thank you for the feedback.
+>>
+>> I moved the function because I thought reusing existing code would be
+>> cleaner in dpaa2_dpseci_free. I will add the explain in commit message.
+>>
+>> For future reference, what's the preferred approach when needing to reuse a
+>> simple function (4-line loop) defined later in the file - forward
+>> declaration, move it with a separate change or just implement directly?
+> 
+> It is fine to implement directly, but, I am a bit confused with the
+> solution, let me back up a bit.
+> 
+> First, it seems the problem is real and thanks for fixing it.
+> 
+> Regarding the solution, I am wondering if it is not simpler to iterate
+> the priv->num_pairs and kfreeing them in dpaa2_dpseci_free(), similarly
+> to dpaa2_dpseci_disable().
+Hi Leitao,
 
-Reviewed-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+Thanks for you reply, I will implement directly instead of moving the 
+function in v2.
+
+I have considered using the approach of iterating through 
+priv->num_pairs, but the index of num_pairs cannot represent the CPU number.
+
+Consider a theoretical scenario where there are multiple CPUs and the 
+cpu 2 is disabled. When iterating through num_pairs, we would get 
+per_cpu_ptr(priv->ppriv, 2), but this would be meaningless.
+
+This is not a critical issue, and I don't have a strong preference 
+either way. I just think using a CPU mask to ensure precise cleanup 
+might be more appropriate.
+Furthermore, there are risks in using num_pairs. If we manually disable 
+a CPU and then disable/enable the driver, we would encounter an oops, 
+but that's a separate issue.
 
 Thanks,
-Shyam
+Jianpeng
 
-> ---
-> v6:
->  * Add sp_restore() flow (Tom)
->  * Drop CONFIG_CRYPTO_DEV_SP_PSP conditional behavior
-> v5:
->  * Fix return for psp_restore() (LKP robot, Shyam)
-> v4:
->  * Add tag (Yijun)
->  * Remove blank line (Ilpo)
->  * Adjust whitespace in psp_restore() (Ilpo)
-> ---
->  drivers/crypto/ccp/psp-dev.c | 11 +++++++++++
->  drivers/crypto/ccp/sp-dev.c  | 12 ++++++++++++
->  drivers/crypto/ccp/sp-dev.h  |  3 +++
->  drivers/crypto/ccp/sp-pci.c  | 16 +++++++++++++++-
->  drivers/crypto/ccp/tee-dev.c |  5 +++++
->  drivers/crypto/ccp/tee-dev.h |  1 +
->  6 files changed, 47 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-> index 9e21da0e298ad..5c7f7e02a7d8a 100644
-> --- a/drivers/crypto/ccp/psp-dev.c
-> +++ b/drivers/crypto/ccp/psp-dev.c
-> @@ -351,6 +351,17 @@ struct psp_device *psp_get_master_device(void)
->  	return sp ? sp->psp_data : NULL;
->  }
->  
-> +int psp_restore(struct sp_device *sp)
-> +{
-> +	struct psp_device *psp = sp->psp_data;
-> +	int ret = 0;
-> +
-> +	if (psp->tee_data)
-> +		ret = tee_restore(psp);
-> +
-> +	return ret;
-> +}
-> +
->  void psp_pci_init(void)
->  {
->  	psp_master = psp_get_master_device();
-> diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
-> index 3467f6db4f505..f204aa5df96e2 100644
-> --- a/drivers/crypto/ccp/sp-dev.c
-> +++ b/drivers/crypto/ccp/sp-dev.c
-> @@ -230,6 +230,18 @@ int sp_resume(struct sp_device *sp)
->  	return 0;
->  }
->  
-> +int sp_restore(struct sp_device *sp)
-> +{
-> +	if (sp->psp_data) {
-> +		int ret = psp_restore(sp);
-> +
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	return sp_resume(sp);
-> +}
-> +
->  struct sp_device *sp_get_psp_master_device(void)
->  {
->  	struct sp_device *i, *ret = NULL;
-> diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
-> index 1335a83fe052e..a83751cfd0060 100644
-> --- a/drivers/crypto/ccp/sp-dev.h
-> +++ b/drivers/crypto/ccp/sp-dev.h
-> @@ -141,6 +141,7 @@ void sp_destroy(struct sp_device *sp);
->  
->  int sp_suspend(struct sp_device *sp);
->  int sp_resume(struct sp_device *sp);
-> +int sp_restore(struct sp_device *sp);
->  int sp_request_ccp_irq(struct sp_device *sp, irq_handler_t handler,
->  		       const char *name, void *data);
->  void sp_free_ccp_irq(struct sp_device *sp, void *data);
-> @@ -174,6 +175,7 @@ int psp_dev_init(struct sp_device *sp);
->  void psp_pci_init(void);
->  void psp_dev_destroy(struct sp_device *sp);
->  void psp_pci_exit(void);
-> +int psp_restore(struct sp_device *sp);
->  
->  #else /* !CONFIG_CRYPTO_DEV_SP_PSP */
->  
-> @@ -181,6 +183,7 @@ static inline int psp_dev_init(struct sp_device *sp) { return 0; }
->  static inline void psp_pci_init(void) { }
->  static inline void psp_dev_destroy(struct sp_device *sp) { }
->  static inline void psp_pci_exit(void) { }
-> +static inline int psp_restore(struct sp_device *sp) { return 0; }
->  
->  #endif /* CONFIG_CRYPTO_DEV_SP_PSP */
->  
-> diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-> index 8891ceee1d7d0..6ac805d99ccb3 100644
-> --- a/drivers/crypto/ccp/sp-pci.c
-> +++ b/drivers/crypto/ccp/sp-pci.c
-> @@ -353,6 +353,13 @@ static int __maybe_unused sp_pci_resume(struct device *dev)
->  	return sp_resume(sp);
->  }
->  
-> +static int __maybe_unused sp_pci_restore(struct device *dev)
-> +{
-> +	struct sp_device *sp = dev_get_drvdata(dev);
-> +
-> +	return sp_restore(sp);
-> +}
-> +
->  #ifdef CONFIG_CRYPTO_DEV_SP_PSP
->  static const struct sev_vdata sevv1 = {
->  	.cmdresp_reg		= 0x10580,	/* C2PMSG_32 */
-> @@ -563,7 +570,14 @@ static const struct pci_device_id sp_pci_table[] = {
->  };
->  MODULE_DEVICE_TABLE(pci, sp_pci_table);
->  
-> -static SIMPLE_DEV_PM_OPS(sp_pci_pm_ops, sp_pci_suspend, sp_pci_resume);
-> +static const struct dev_pm_ops sp_pci_pm_ops = {
-> +	.suspend = pm_sleep_ptr(sp_pci_suspend),
-> +	.resume = pm_sleep_ptr(sp_pci_resume),
-> +	.freeze = pm_sleep_ptr(sp_pci_suspend),
-> +	.thaw = pm_sleep_ptr(sp_pci_resume),
-> +	.poweroff = pm_sleep_ptr(sp_pci_suspend),
-> +	.restore_early = pm_sleep_ptr(sp_pci_restore),
-> +};
->  
->  static struct pci_driver sp_pci_driver = {
->  	.name = "ccp",
-> diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
-> index af881daa5855b..11c4b05e2f3a2 100644
-> --- a/drivers/crypto/ccp/tee-dev.c
-> +++ b/drivers/crypto/ccp/tee-dev.c
-> @@ -366,3 +366,8 @@ int psp_check_tee_status(void)
->  	return 0;
->  }
->  EXPORT_SYMBOL(psp_check_tee_status);
-> +
-> +int tee_restore(struct psp_device *psp)
-> +{
-> +	return tee_init_ring(psp->tee_data);
-> +}
-> diff --git a/drivers/crypto/ccp/tee-dev.h b/drivers/crypto/ccp/tee-dev.h
-> index ea9a2b7c05f57..c23416cb7bb37 100644
-> --- a/drivers/crypto/ccp/tee-dev.h
-> +++ b/drivers/crypto/ccp/tee-dev.h
-> @@ -111,5 +111,6 @@ struct tee_ring_cmd {
->  
->  int tee_dev_init(struct psp_device *psp);
->  void tee_dev_destroy(struct psp_device *psp);
-> +int tee_restore(struct psp_device *psp);
->  
->  #endif /* __TEE_DEV_H__ */
 
