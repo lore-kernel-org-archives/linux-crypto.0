@@ -1,133 +1,207 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C89296BD5;
-	Mon, 19 Jan 2026 20:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9D02ECD2A;
+	Mon, 19 Jan 2026 21:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768854739; cv=none; b=WUYaVGUOZjGmsGUTaI5GzkosHgZN50N8Gi+jyjtytr8Sp7dI6gf9/bzm1mLVanr+OtYLHngwA1W8I79JmmBEvNP+ii2t/JZP2AK+YD+yNXXL99iexZzEd2n+E/viGSP4m3/MPZfsve/QSxx6ULmG3bczyLRGZZHzUZlzfVG0RAg=
+	t=1768856795; cv=none; b=IJtqWGAxylzIhGKrVBy7dEBCdKd3bThy9Tm5uAOROR30uJOoU6+cP6pnlSnEacfd9VBnHa2M35jTX1n/DD72cbINr8asWb1ouPNwrh85gwa+QzzGRHblRa1z4Qups/kHZJZPRP1gwKTXRXZ9eWZEYmISkCOGn3lahktt6vvGCBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768854739; c=relaxed/simple;
-	bh=9G3X5L4dQDNcCE4GzJviRia/VpS773SPyclyUMXM4MM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t64Kl9aZ8F+n8MIt9yhIgXmexcWcdI9FQxICZy6vg5uJYhBAIHT5Jl4XFWLO99p3vX9DVYgX0bI9IiYb4ovtKSLo6TE3IsdaII+ooNPuNPDAX6EaSK/CuUXkazoHAKcy0eUkd978okK9LwLKsdBIvHAyOrXrsfSMx/Sa6VaIYOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=InLN80mr; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1768856795; c=relaxed/simple;
+	bh=N/9LcEHsyFI/CSMH88ICdSbqRtErfRHvO+R71eZcEI8=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=hsTVhrrVMsFPoL6BvYo1mE5/4yvAQs4Fcq0MtliR6IMq+pMEh1rLN3gTzI1cOAwBjCaah9PY1DEZmpzAtYfbSUKgc5Q32+Sx+CnH0iCPBgFCRtEO3vLPZS5rNoHf7XzJxJfR+3b3iFs88ZhTODbuN7BbbfKOJtXStnpkUTO00SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=YgQQN8dq; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MAgr+J8Z; arc=none smtp.client-ip=202.12.124.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="InLN80mr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768854739; x=1800390739;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9G3X5L4dQDNcCE4GzJviRia/VpS773SPyclyUMXM4MM=;
-  b=InLN80mrzAlb+64u9m2tIgEQoTx6cwzB7f5EhcQRVHTediOazDpOsG7E
-   AZ+0ou41wKlw5K5uqqLL916wtbMPEiGyYTzKfC8bYFzdLgTkQOnHHWWFN
-   oDSyL6dseVYvjeghc0+O6ZltjIeWjSJfsV4DeZ/AS5MA23G6DIM3n7BYh
-   wa/gO2eF4vWkabauIkCV54gHEVQkh2D2p9s23fM5TTO9x1y+bD5QlkfB0
-   rqcCKdfTw0YCi1isgGqwujHolkVwQ2gIzNzXkQInd11h+EdJvpI1vwDu9
-   m4wK6tPoaR4wf7AKujbEElDvnfDfz9tN4K9QRNM1rhbM0OMREsX9c28LU
-   A==;
-X-CSE-ConnectionGUID: DSJrmqW6SoOx+wlme/A77A==
-X-CSE-MsgGUID: N3+WqZiaSAKK61eFwmfYzw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11676"; a="70039948"
-X-IronPort-AV: E=Sophos;i="6.21,238,1763452800"; 
-   d="scan'208";a="70039948"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2026 12:32:18 -0800
-X-CSE-ConnectionGUID: vu3zgAhNRXO37stiCH/kcw==
-X-CSE-MsgGUID: TpkMSGVFQ7qPH8nEsk/OpA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,238,1763452800"; 
-   d="scan'208";a="237215450"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 19 Jan 2026 12:32:15 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vhvv3-00000000OHd-00ic;
-	Mon, 19 Jan 2026 20:32:13 +0000
-Date: Tue, 20 Jan 2026 04:31:28 +0800
-From: kernel test robot <lkp@intel.com>
-To: Holger Dengler <dengler@linux.ibm.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	David Laight <david.laight.linux@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 1/1] lib/crypto: tests: Add KUnit tests for AES
-Message-ID: <202601200403.mo4FMAVa-lkp@intel.com>
-References: <20260119121210.2662-2-dengler@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="YgQQN8dq";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MAgr+J8Z"
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailfout.stl.internal (Postfix) with ESMTP id 7C2EE1D003E8;
+	Mon, 19 Jan 2026 16:06:32 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Mon, 19 Jan 2026 16:06:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
+	1768856792; x=1768943192; bh=DvWhVhjreP12gt2nm8MIZSJ/NQFSx5xqtka
+	eT2CXIlw=; b=YgQQN8dqXygxoM2Xgp37YmuX/0qaOpoyMDHdJlChLSP4MLcyAiM
+	rvTIsiVu+1lEqkYyvI5pcmel8iEUDULB1ec7dltIFpsZpUzS1KI6oxDw0pbitTW3
+	neci3ad/CxpmTxWEFZv6YHmVROO0HIETO+GgZBNPLgS5dzojh1/e0CPWOZFtRPQ2
+	vGupIoukIbScGTUgCyCOlgfGgyMiJm+KYMNAXo/L3CjkcYMrOnR5Ixzub1/dJ4Hc
+	DghPNjEcrIaGxZNLy9Eo3eZrfcgSgQpL3P4fOTbfM2OJPjLLVTrZZFrDfy9QrKWd
+	7XsAAEPqrXN0qHm9KBZszEqmG/SN/0d7/9Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1768856792; x=
+	1768943192; bh=DvWhVhjreP12gt2nm8MIZSJ/NQFSx5xqtkaeT2CXIlw=; b=M
+	Agr+J8ZJeRf17KPhkoT7treRGVgHQEYqtAZcUziStT4/F8RP30FPYZBwV4fFHzWV
+	Wqc/HrR+twYIXjoCJk1r6cnFeqriVotNoD3Nchx2rGEfAp1jb6JqrBlFMfH2Q1X3
+	At85jz02Td5i5HV+N/p2eKHCEkcbRENwTldbDe3Humjc7GX0VJTYVZE4uZ1PPg6K
+	NrYMtLhkrW5hzDBC4dEpEpsc9tmD3P0/SLiGqh8wL2etZcqCW1bLQerrWqsR5Okf
+	1omU8WUnqbLA/Irnw3cClAsDFH2Tx0rjpr2DTkZq5WbWrDRI7SLYPtr7WxAl+re0
+	1mzTk3iCgSv1Sr3r9UVow==
+X-ME-Sender: <xms:15xuaa8kyF79FSubz_ebAQLnWZZEoCZ2G6-Y_O7jgzteNdUFx6KxXg>
+    <xme:15xuaS2qf-oyZVeymZyPJBK4wqAaNge-EMdvSn2YpgtFCmzHjD7z-5EXYYnVJNdWw
+    iYQfhvPy4SF4d9-Xhb6CKJqZWQE4d_n0G-d71lvLhFugngCKw>
+X-ME-Received: <xmr:15xuafjwVDwNPx8Q11INka6Nvr2XX13RzZTJ2xjl4wuFCIUvcc2F2QJuR2o3oowtNzVjyycbrI3vsXpQE5HSlZp8zyWkXnUxg80MDMDgqmbW>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddufeekheelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
+    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epleejtdefgeeukeeiteduveehudevfeffvedutefgteduhfegvdfgtdeigeeuudejnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
+    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepuddvpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehlihhnuhigqdhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtoheplhhinhhugidqfhhsuggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehlvghnnhgrrhhtsehpohgvthhtvghrihhnghdrnhgvthdp
+    rhgtphhtthhopegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomhdprhgtphhtth
+    hopehtrhhonhgumhihsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjlhgrhihtohhn
+    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvsghighhgvghrsheskhgvrhhnvghlrd
+    horhhgpdhrtghpthhtohepsghrrghunhgvrheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:15xuaSbos4ep8YOd3B908_XZKskaLceq9BHg0z6SIf9XFUFzStjwYA>
+    <xmx:15xuabUdJN5cIPu1bytGvBJtm7N7A3HA5ijXZDfuEMjPkQO61bLqtA>
+    <xmx:15xuaaHjWsZXZShcFwfMpxqzQhADlgwl3BpVU9asrE3cFNpdEEeLLw>
+    <xmx:15xuaVaciyzGCnND4NDNJYG27dTpl-EFCnmqTEffLTKyVYMcL5jiTQ>
+    <xmx:2JxuaZHHivyS2HXmol5vIZDffl789r-CzhipcRLw2LRJx6N0fh5umcwm>
+Feedback-ID: iab3e480c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 19 Jan 2026 16:06:28 -0500 (EST)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260119121210.2662-2-dengler@linux.ibm.com>
+From: NeilBrown <neilb@ownmail.net>
+To: "Christian Brauner" <brauner@kernel.org>
+Cc: "Benjamin Coddington" <bcodding@hammerspace.com>,
+ "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
+ "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
+ "Eric Biggers" <ebiggers@kernel.org>, "Rick Macklem" <rick.macklem@gmail.com>,
+ linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, "Lennart Poettering" <lennart@poettering.net>
+Subject: Re: [PATCH v1 0/4] kNFSD Signed Filehandles
+In-reply-to: <20260119-reingehen-gelitten-a5e364f704fa@brauner>
+References: <cover.1768573690.git.bcodding@hammerspace.com>,
+ <20260119-reingehen-gelitten-a5e364f704fa@brauner>
+Date: Tue, 20 Jan 2026 08:06:26 +1100
+Message-id: <176885678653.16766.8436118850581649792@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-Hi Holger,
+On Mon, 19 Jan 2026, Christian Brauner wrote:
+> On Fri, Jan 16, 2026 at 09:32:10AM -0500, Benjamin Coddington wrote:
+> > The following series enables the linux NFS server to add a Message
+> > Authentication Code (MAC) to the filehandles it gives to clients.  This
+> > provides additional protection to the exported filesystem against filehan=
+dle
+> > guessing attacks.
+> >=20
+> > Filesystems generate their own filehandles through the export_operation
+> > "encode_fh" and a filehandle provides sufficient access to open a file
+> > without needing to perform a lookup.  An NFS client holding a valid
+> > filehandle can remotely open and read the contents of the file referred to
+> > by the filehandle.
+> >=20
+> > In order to acquire a filehandle, you must perform lookup operations on t=
+he
+> > parent directory(ies), and the permissions on those directories may
+> > prohibit you from walking into them to find the files within.  This would
+> > normally be considered sufficient protection on a local filesystem to
+> > prohibit users from accessing those files, however when the filesystem is
+> > exported via NFS those files can still be accessed by guessing the correc=
+t,
+> > valid filehandles.
+> >=20
+>=20
+> I really like this concept (I think Lennart has talked about support for
+> this before?).
+>=20
+> Fwiw, I would really like if nsfs and pidfs file handles were signed
+> specifically because they're not supposed to persist across reboot. But
+> we can't do that in a backward compatbile way because userspace accesses
+> the file handle directly to get e.g., the inode number out of it.
 
-kernel test robot noticed the following build warnings:
+You don't need signing to ensure a filehandle doesn't persist across
+reboot.  For that you just need a generation number.  Storing a random
+number generated at boot time in the filehandle would be a good solution.
 
-[auto build test WARNING on 47753e09a15d9fd7cdf114550510f4f2af9333ec]
+The only reason we need signing is because filesystems only provide
+32bits of generation number.  If a filesystem stored 64 bits, and used a
+crypto-safe random number for the generation number, then we wouldn't
+need signing or a key.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Holger-Dengler/lib-crypto-tests-Add-KUnit-tests-for-AES/20260119-201615
-base:   47753e09a15d9fd7cdf114550510f4f2af9333ec
-patch link:    https://lore.kernel.org/r/20260119121210.2662-2-dengler%40linux.ibm.com
-patch subject: [PATCH v2 1/1] lib/crypto: tests: Add KUnit tests for AES
-config: xtensa-randconfig-r133-20260120 (https://download.01.org/0day-ci/archive/20260120/202601200403.mo4FMAVa-lkp@intel.com/config)
-compiler: xtensa-linux-gcc (GCC) 10.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260120/202601200403.mo4FMAVa-lkp@intel.com/reproduce)
+We need a key, effectively, to turn a 32bit number that can be iterated
+into a 64bit number which cannot, in a non-reversible way.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601200403.mo4FMAVa-lkp@intel.com/
+Does userspace refuse the extract the inode number if the filehandle
+size changes?  It it can cope with size change, then adding a random
+number to the end of the filehandle should not be a problem.
 
-sparse warnings: (new ones prefixed by >>)
-   lib/crypto/tests/aes_kunit.c: note: in included file (through arch/xtensa/include/asm/atomic.h, include/linux/atomic.h, include/linux/jump_label.h, ...):
-   arch/xtensa/include/asm/processor.h:105:2: sparse: sparse: Unsupported xtensa ABI
-   arch/xtensa/include/asm/processor.h:135:2: sparse: sparse: Unsupported Xtensa ABI
-   lib/crypto/tests/aes_kunit.c:149:1: sparse: sparse: bad integer constant expression
-   lib/crypto/tests/aes_kunit.c:149:1: sparse: sparse: static assertion failed: "MODULE_INFO(description, ...) contains embedded NUL byte"
-   lib/crypto/tests/aes_kunit.c:150:1: sparse: sparse: bad integer constant expression
-   lib/crypto/tests/aes_kunit.c:150:1: sparse: sparse: static assertion failed: "MODULE_INFO(file, ...) contains embedded NUL byte"
-   lib/crypto/tests/aes_kunit.c:150:1: sparse: sparse: bad integer constant expression
-   lib/crypto/tests/aes_kunit.c:150:1: sparse: sparse: static assertion failed: "MODULE_INFO(license, ...) contains embedded NUL byte"
->> lib/crypto/tests/aes_kunit.c:35:26: sparse: sparse: incompatible types in conditional expression (incompatible argument 1 (different base types)):
-   lib/crypto/tests/aes_kunit.c:35:26: sparse:    void ( * )( ... )
-   lib/crypto/tests/aes_kunit.c:35:26: sparse:    void ( * )( ... )
->> lib/crypto/tests/aes_kunit.c:35:26: sparse: sparse: incompatible types in conditional expression (incompatible argument 1 (different base types)):
-   lib/crypto/tests/aes_kunit.c:35:26: sparse:    void ( * )( ... )
-   lib/crypto/tests/aes_kunit.c:35:26: sparse:    void ( * )( ... )
+>=20
+> But for new types of file handles for such pseudo-fses I think this
+> would be very lovely to have. It would probably mean generating a
+> per-boot key that is used to sign such file handles.
 
-vim +35 lib/crypto/tests/aes_kunit.c
+For new fses I recommend including a 64bit random number.  No signing.
 
-    28	
-    29	static __always_inline u64 time_aes_op(bool encrypt, struct aes_key *aes_key,
-    30					       u8 *out, const u8 *in)
-    31	{
-    32		void (*aes_op)(const struct aes_key *key, u8 *out, const u8 *in);
-    33		u64 t;
-    34	
-  > 35		aes_op = encrypt ? &aes_encrypt : &aes_decrypt;
-    36	
-    37		preempt_disable();
-    38		t = ktime_get_ns();
-    39		aes_op(aes_key, out, in);
-    40		t = ktime_get_ns() - t;
-    41		preempt_enable();
-    42	
-    43		return t;
-    44	}
-    45	
+>=20
+> For nfs I understand that you probably outsource the problem to
+> userspace how to generate and share the key.
+>=20
+> > Filehandles are easy to guess because they are well-formed.  The
+> > open_by_handle_at(2) man page contains an example C program
+> > (t_name_to_handle_at.c) that can display a filehandle given a path.  Here=
+'s
+> > an example filehandle from a fairly modern XFS:
+> >=20
+> > # ./t_name_to_handle_at /exports/foo=20
+> > 57
+> > 12 129    99 00 00 00 00 00 00 00 b4 10 0b 8c
+> >=20
+> >           ^---------  filehandle  ----------^
+> >           ^------- inode -------^ ^-- gen --^
+> >=20
+> > This filehandle consists of a 64-bit inode number and 32-bit generation
+> > number.  Because the handle is well-formed, its easy to fabricate
+> > filehandles that match other files within the same filesystem.  You can
+> > simply insert inode numbers and iterate on the generation number.
+> > Eventually you'll be able to access the file using open_by_handle_at(2).
+> > For a local system, open_by_handle_at(2) requires CAP_DAC_READ_SEARCH, wh=
+ich
+> > protects against guessing attacks by unprivileged users.
+>=20
+> Fyi, it's not so simple. For some filesystems like pidfs and nsfs they
+> have custom permission checks and are available to unprivileged users.
+> But they also don't do any path lookup ofc.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I didn't know that.....
+Oh, there is a "permission" operation now:
+
+ * permission:
+ *    Allow filesystems to specify a custom permission function.
+
+Not the most useful documentation I have ever read.
+Not documented in Documentation/filesystems/exporting.rst
+
+Not used in fs/exportfs/.
+Ahhh.. used in fs/fhandle.c to bypass may_decode_fh()
+
+Fair enough - seems sane for a special-purpose filesystem to give away
+different access.
+
+Thanks for the info.
+
+I wonder if nfsd should refuse to export filesystems which have a
+.permission function, as they clearly are something special.
+
+NeilBrown
