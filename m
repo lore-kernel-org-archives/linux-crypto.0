@@ -1,58 +1,60 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DDBD2F8BDF
-	for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 16:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3587F313523
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 17:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768841330; cv=none; b=kURzCN/ULOlYVqlyZ6Rg+24VNqYKK9DJitnOMzkd/TOuc+YMnQusqczB42tasclEx8U/BdBL3k5nB2BfYuoGAWUkCv4NqjrGSVQ5HFITOZrICUhU1t6/LvMckyV6tsopdgPfFYw5JB4upSXhCRTNssiQjzymsCqAbyNbIui4WDM=
+	t=1768842597; cv=none; b=CoLklIWd7BYFP/9nRIm6ShlJJ6WFOmcEhyEvrHS9TdhDXKoNP8O5u8/LRyFj9KhqylDEmA6DBwdI5iUKIMluWhH9Qxch2B9iswz43vt+skvzYtlJauvzJNecv0qm1K16TOm84m09McSwv4H6bSDIZG8XjbTD9QuauxJkQ0vNLp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768841330; c=relaxed/simple;
-	bh=yA139UzElXU4XAzk6UYNSUkcL4fh/Cwm5R0tfOpONnU=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=ju6q8Siwp2D1vq4cT9utPCvYT+dj5hjQWf99uMoBOqAr62srGC5U5f2AiuIbkpSzx7ljzHtsxMvx0KK2N/6jH29KjUN9bSOMrxt1iBLDIrD0l/DhODo//rEnCMpKFLG/zr4ainMzax71r5r+/TW3rTDLh/AQVhMlRgZnhIluOlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G7dswFwz; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1768842597; c=relaxed/simple;
+	bh=1Dt3dOj1iAwD08DBLIWOatkJXoMT64CjAygUmsZkOiM=;
+	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
+	 Date:Message-ID; b=jILu1E4jYKyWGoYm7S6513GQlVt7NFRXZCYEaMClHy5zf/wlNuutlLQpSxszDv0ke4zDSysZgHRmmlI8ZlUzn7ZRBnPvH/tGASfBBb+4St6a8FCJJ5p1KW06xH361maQWT4NxgdR8MTe9MC3ofHoMWjM5mlgtLE00D15B1PZlG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AMf3txZ8; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G7dswFwz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AMf3txZ8"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768841326;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=SohI1ctghGaOheNBI44PMHtTgyTaB5Yoh5gANVsG0Do=;
-	b=G7dswFwzupMwVlBQCqDWGA+K9vr9HqPwJYayQOiisYv6JWIKUjsCJGpKIKSmCHDki1XJwL
-	eDXs6uyYe1TC5lJXiplKJbCwLT/WfEdh9JooQFS9IfdieqzkPNBG6YptTmNLrjPSSNHwjx
-	B67SCDqqJo1/uAl5/DAKIewJ2s8kNu4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	s=mimecast20190719; t=1768842594;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3Qo769PN/XHND+sFY+3ZXojiE9mnl2Xoh8+/KAPbpX0=;
+	b=AMf3txZ8jV0wdu1DfvT7/l2WesswYRsHF897OnbK+OCkk3rM5ek1gJRy7T6/vBpMeHq5js
+	pURNEuo/rF2Gu4+RabOG18MRHhWQvDNmH0EWFGhZbBA3oxUWc+Hh7o2q1q5BKfrx9CsGm7
+	QSRtPCWcXxnroecngnWHe43lwar95tU=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-639-ijuUeEpmMoCmrJbToAKk_w-1; Mon,
- 19 Jan 2026 11:48:41 -0500
-X-MC-Unique: ijuUeEpmMoCmrJbToAKk_w-1
-X-Mimecast-MFC-AGG-ID: ijuUeEpmMoCmrJbToAKk_w_1768841319
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-456-rPrDERt0NnezPi1OaCg4wQ-1; Mon,
+ 19 Jan 2026 12:09:48 -0500
+X-MC-Unique: rPrDERt0NnezPi1OaCg4wQ-1
+X-Mimecast-MFC-AGG-ID: rPrDERt0NnezPi1OaCg4wQ_1768842587
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2C6DB18002FF;
-	Mon, 19 Jan 2026 16:48:35 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 301F01956059;
+	Mon, 19 Jan 2026 17:09:47 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.2])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D46F21801ACB;
-	Mon, 19 Jan 2026 16:48:32 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8B5C01800993;
+	Mon, 19 Jan 2026 17:09:44 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
 	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
 	Kingdom.
 	Registered in England and Wales under Company Registration No. 3798903
 From: David Howells <dhowells@redhat.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+In-Reply-To: <1010414.1768841311@warthog.procyon.org.uk>
+References: <1010414.1768841311@warthog.procyon.org.uk>
+Cc: dhowells@redhat.com, Eric Biggers <ebiggers@kernel.org>,
+    linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
     Ard Biesheuvel <ardb@kernel.org>,
-    "Jason A .
- Donenfeld" <Jason@zx2c4.com>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    David Howells <dhowells@redhat.com>
-Subject: NIST FIPS test vector failures
+    "Jason A . Donenfeld" <Jason@zx2c4.com>,
+    Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: NIST FIPS test vector failures
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -60,49 +62,25 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1010413.1768841311.1@warthog.procyon.org.uk>
+Content-ID: <1014089.1768842583.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 19 Jan 2026 16:48:31 +0000
-Message-ID: <1010414.1768841311@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Date: Mon, 19 Jan 2026 17:09:43 +0000
+Message-ID: <1014090.1768842583@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Hi Eric,
+David Howells <dhowells@redhat.com> wrote:
 
-I'm trying out autogenerating X.509 and PKCS#7 tests from the NIST FIPS te=
-st
-vectors here:
+> +	.msg_len =3D 64,
 
-https://github.com/usnistgov/ACVP-Server/tree/master/gen-val/json-files/ML=
--DSA-sigVer-FIPS204
+Sorry, that should be 17, but it still doesn't work.
 
-Unfortunately, all of them seem to fail, but I'm not sure why.  As far as =
-I
-can tell, test case (tcId) 174, for example, should pass, but does not.
-Attached is a patch that adds that test case to the kunit test for ML-DSA =
-for
-you to try, skipping the X509/PKCS7 stuff and going direct to verification=
-.
-Could you have a look see if I've done anything obviously incorrect?
+Revised patch attached.
 
-The data is in the prompt.json file:
-
-        {
-          "tcId": 174,
-          "pk": "B94C333BE...
-
-and the fact that it should apparently pass is in expectedResults.json:
-
-	{
-          "tcId": 174,
-          "testPassed": true
-        },
-
-Thanks,
 David
 ---
 diff --git a/lib/crypto/tests/mldsa-testvecs.h b/lib/crypto/tests/mldsa-te=
 stvecs.h
-index d2d6a042a829..263b973c54ef 100644
+index d2d6a042a829..3faec1118762 100644
 --- a/lib/crypto/tests/mldsa-testvecs.h
 +++ b/lib/crypto/tests/mldsa-testvecs.h
 @@ -1885,3 +1885,466 @@ static const struct mldsa_testvector mldsa87_testv=
@@ -277,7 +255,7 @@ ector =3D {
 +	"\x11\x69\xE4\x83\x63\x92\x0E\xA0\xA1\xAC\x94\xF8\xCB\x63\xFB\xD2"
 +	"\xA9\x5E\x57\x5A\xEB\x7E\xA5\x89\x1A\x27\x1D\xE5\x29\xC9\xDA\xDC"
 +	"\x6A\x54\xE6\x9F\x9F\x4A\x59\xC2\x6F\x5B\x46\xE8\x78\xDB\x64\x88",
-+	.msg_len =3D 64,
++	.msg_len =3D 17,
 +	.msg =3D
 +	"\x84\xA7\x1A\xFD\x75\x5F\x0A\xD0\xA4\x0F\x0C\xFB\x99\x89\xAB\xF0\x9C",
 +	.sig_len =3D MLDSA87_SIGNATURE_SIZE,
@@ -599,5 +577,4 @@ index 67f8f93e3dc6..87cf41178823 100644
  	{},
  };
  =
-
 
