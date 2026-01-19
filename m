@@ -1,275 +1,168 @@
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADB23587B1
-	for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 09:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359483596EB;
+	Mon, 19 Jan 2026 12:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768815666; cv=none; b=jP2Y/A6dJvGtVH/F4rx8iW4tjRUyd6L9GBnbeJ3f91qxUv+/4IQ7IRFH/iiDLcOMH8pRqK3IjhbOl51m5wgOjLU6slktabGIuTb3yZuYLExtaoNUwMSLX20jdwf95fbLqtxkugq+xReT6PL7fdmS0IE7YGipqbflObqIZT8Fr/o=
+	t=1768824742; cv=none; b=jD6H1nly2DSAOuHFUCURHp4Y8K3k//f14CtYMQkZ2s7Y4biZqdYLRecM8Hco0LSWnnCUY2a4ny8JQqUmphnxl8YGpIw3M0ZqE6TAM8qNvHAW7up75hNTxj8+r1RHDpOXG4UMUILYHC9ZWUpbM5+ZnzhYABG7FMAlVAakcN1XliE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768815666; c=relaxed/simple;
-	bh=Rz5y7C4R6h2lPczYksr0SVq/IrzgSt5kMTodp36I+ag=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Eb+BvBht71QhVOdFOie8E7ZW2KGSKvZdpatqLYb7lvxJNBPWYQr+4h5X4KBthgUq3K1+xWpB20LqUpcFdBg6QW9802ndt5Xuj/OkQtyH6Ki8n0KCv+ObzguXvdq6NrD/BOgH/erxmX6OStF2wOucA1mr74pFcLUNpR5JDwY5o54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QsrldsFN; arc=none smtp.client-ip=209.85.218.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
+	s=arc-20240116; t=1768824742; c=relaxed/simple;
+	bh=5u9c1V+dg8IJ067D8G/PQyCBLwEK5tVx2fI/lU9yh4g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YKE4VbQhwKMCezWMVWFtOMViR9XcCkt3euDaInugCYwv6TEGN7+bHhvb1xKQbgONRX5qsKuNjEbhCWSeL52cpStdn60Xd8Q7Tj/RWBDuiUKUKRkL4YKn0r4LGhB6PZzUMsPOrCe69sR3zU4AkRu2UCXJmdbCx1zaTSRBAg4YT7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MnfZAd6J; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QsrldsFN"
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b7ff8a27466so459104166b.3
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 01:41:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768815662; x=1769420462; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hOlRW9xg19eCgYwriGsA0YBy8PVXki3QHZit/P09OME=;
-        b=QsrldsFN3DHYzrDh1yE2q76dxLD3aFkiydurI0ZYXeZIS1vMwzMjMIH6+HILZ4rjzK
-         7656x/aaTHydyYZLfWkFhLa5SBr+rh1+u7Z/2blUXLW3sgUvHSj6TsEjg3zsCwHlbFkh
-         mc5zf/hzIS9n0M3mS4TxZqzsN5ifzpNIgCeAHgerAjcsm2O7v5nsjAWNYQpoRIsMLsRb
-         EriSXMa3/Dm3bkBm4tSW7cD3Wyu/bDGSPDtx57U/cVZ3XbTPyWcTPCaF3AX6oK85Cgjl
-         VWSg9cxhnQpZ4tIQttfTnDmMuxLi4yDeQC7asHb1V7oWm3Vmj7ol95ETQ5Uz7+LAoBt1
-         tSGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768815662; x=1769420462;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hOlRW9xg19eCgYwriGsA0YBy8PVXki3QHZit/P09OME=;
-        b=VWYXlwhEfiDArOFlCUM/OMGH3iiybZ5BUd88T+rEB2fjRIiufS3TDx0bBJ9wDaFIpv
-         MqBueREq+ajt8tvNP0hglwraFbqmY1Z44YhIskhVk6jOkCpl7HJpo+ApwS+vIShF8Lt3
-         tTZxUG9CsFEkMKb4a0J//SCps541HiNl/efo48ISFdGXoADEKN2OfOPr8cE65n9tMB+j
-         v/ATZLNhNG8mnsC1elnJi09u9Ms+Y/4oitbKsNjHkuCmXlD/Z0cusr33vcQbazxM8MWm
-         ikljBCXz2kGGhcV5sYRbfI7XeL9B9UogAsspOem91mvIGMXycezhBXB3pd+P1CXm1N7x
-         V7ug==
-X-Forwarded-Encrypted: i=1; AJvYcCV78XD2TDL/O3oV8uJVbZGOfApfRsPFb6JnMG3v0LWTyESYNv9/lW8cRMjhaT1PEHtfP6d9+dS6/+PnLQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXwtxNY5VXWy/TM8jB18WvFt3qN/RPrFqq7dwZ9423lwSazM6L
-	Jnltl1hED4D3gAIv7vpaaVfdg5/2Dji14IrsAO7Ll2CVOX2V0NubpZIpVO85H9ICstBbnexFF8j
-	JTA==
-X-Received: from ejek27.prod.google.com ([2002:a17:906:2a5b:b0:b7a:21aa:899e])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:3f21:b0:b87:25a7:3ea0
- with SMTP id a640c23a62f3a-b87968f6e82mr875438166b.25.1768815662390; Mon, 19
- Jan 2026 01:41:02 -0800 (PST)
-Date: Mon, 19 Jan 2026 10:05:56 +0100
-In-Reply-To: <20260119094029.1344361-1-elver@google.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MnfZAd6J"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 60ILlD69027362;
+	Mon, 19 Jan 2026 12:12:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=mU2qTNeVPMeZ9eEF2dj3vCu8GXcgQX96+7u8gPQI0
+	SU=; b=MnfZAd6Jq04CkOoOygqAemJzYLW5gQvGt245xaTYyakG0XfS6zAPjzi7u
+	4zQ5eXOhXoVesxglE35cR4cRHUX+Wlx7s1JdB2x3voZxubQo5g7CBnYaGYG7ncvU
+	HVpTDFpyxfj6r/97/jX9Me2/Mrh8x8eGRxykSwlib32RyNLJSAipyqLbA0995d98
+	Smpr4JplKtVFUTiSvk386iggdFrZJp5PXp5tcBpfjVYl4I6XzLgIHf+bWsadaId+
+	Hwhl2wGaH3ILYczEgrarcs5hNhidZBO6ag1YNJrtKgDVbSsLe/hLji/WXXqA6SH+
+	bFZ4zfwbgY4XqhAvluAMWSK2oaqcA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4br0uf7jtu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 Jan 2026 12:12:15 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 60JC6jfY007456;
+	Mon, 19 Jan 2026 12:12:15 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4br0uf7jtk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 Jan 2026 12:12:15 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 60JA1wfp024610;
+	Mon, 19 Jan 2026 12:12:14 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4brxarcx5j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 Jan 2026 12:12:14 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 60JCCAP547645132
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 19 Jan 2026 12:12:10 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 45E7220043;
+	Mon, 19 Jan 2026 12:12:10 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0CE5F20040;
+	Mon, 19 Jan 2026 12:12:10 +0000 (GMT)
+Received: from ibm.com (unknown [9.111.163.233])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 19 Jan 2026 12:12:09 +0000 (GMT)
+From: Holger Dengler <dengler@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>,
+        David Laight <david.laight.linux@gmail.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Holger Dengler <dengler@linux.ibm.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v2 0/1] lib/crypto: tests: KUnit test-suite for AES
+Date: Mon, 19 Jan 2026 13:12:09 +0100
+Message-ID: <20260119121210.2662-1-dengler@linux.ibm.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260119094029.1344361-1-elver@google.com>
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260119094029.1344361-7-elver@google.com>
-Subject: [PATCH tip/locking/core 6/6] compiler-context-analysis: Remove
- __assume_ctx_lock from initializers
-From: Marco Elver <elver@google.com>
-To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>, 
-	Christoph Hellwig <hch@lst.de>, Steven Rostedt <rostedt@goodmis.org>, Bart Van Assche <bvanassche@acm.org>, 
-	kasan-dev@googlegroups.com, llvm@lists.linux.dev, 
-	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: XkADxooyrlSRI-PE07fbsG9i_x3nMtwn
+X-Proofpoint-ORIG-GUID: QgSSW2wn3xCzW5AuZ-eJ5NED4TQfXp0j
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE5MDA5NyBTYWx0ZWRfXwOnQBHvFbdjG
+ zTeSnZHAM0Oh8bTH+ghCngp+al/kmCEmzWT/Oj1/iwwzlvveIcftRZIEnCJ4ZyX3yEp6Db3Qe20
+ xulA7KPUGJ+diSJF+lzG189NGUx+9IGsiSuAu11jo5VzZz3wWZkbyoMqApCfkI1Joba+0bu8Uit
+ voozQTpzR0pN9xr+qBKiiydFOZFswoxa7tEXSEjrRmjqINuET1OnB8PHNcTkfqikEulBB7uOreQ
+ KGgRQkotz2RFY3jyxO/JNQ/d564q05g1n4hYu9wyGRzugwkXYHpRg8eLaBUHO79HQRTYqAZyOqO
+ BYIvCuXBeO2GIKpJtbW+ZQhm+FE24iOeLoUonix1FL64xQxQ7jzSK9xLj5S0GL7pRZUqsakIipo
+ qncoFbVpuEpYY6XkEVbhWraRSQSUl9FrdEcmTpKNUmJVNGzBhju7DecKK8aqeuCqTzrK4bVMmuU
+ z45+5kHimAWZjl47jvQ==
+X-Authority-Analysis: v=2.4 cv=bopBxUai c=1 sm=1 tr=0 ts=696e1f9f cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
+ a=26R-6R9DoGBErhHyASgA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-19_02,2026-01-19_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0 adultscore=0 suspectscore=0 impostorscore=0
+ phishscore=0 malwarescore=0 lowpriorityscore=0 priorityscore=1501
+ clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2601150000
+ definitions=main-2601190097
 
-Remove __assume_ctx_lock() from lock initializers.
+The following patch adds a kunit tests for the aes library.
 
-Implicitly asserting an active context during initialization caused
-false-positive double-lock errors when acquiring a lock immediately after its
-initialization. Moving forward, guarded member initialization must either:
+Changes since v1 [1]:
+- move information from cover-letter to commit message
+- remove unused struct buf
+- add reference to the KAT source
+- restructure the benchmark
+  - reduce the number of iterations for warm-up and benchmark
+  - measure each aes operation and take the minimal measurement for the
+    bandwidth calculation
+  - normalize bandwidth to MB (power of 10) instead of MiB (power of 2)
 
-	1. Use guard(type_init)(&lock) or scoped_guard(type_init, ...).
-	2. Use context_unsafe() for simple initialization.
+Changes since RFC [2]:
+- reorder entries in Kconfig/Makefile alphabetically
+- fail (instead of skip) in case of failures in key preparation
+- replace local constant definitions
+- replace macros with helper functions
 
-Link: https://lore.kernel.org/all/57062131-e79e-42c2-aa0b-8f931cb8cac2@acm.org/
-Reported-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Marco Elver <elver@google.com>
----
- include/linux/local_lock_internal.h | 3 ---
- include/linux/mutex.h               | 1 -
- include/linux/rwlock.h              | 3 +--
- include/linux/rwlock_rt.h           | 1 -
- include/linux/rwsem.h               | 2 --
- include/linux/seqlock.h             | 1 -
- include/linux/spinlock.h            | 5 +----
- include/linux/spinlock_rt.h         | 1 -
- include/linux/ww_mutex.h            | 1 -
- lib/test_context-analysis.c         | 6 ------
- 10 files changed, 2 insertions(+), 22 deletions(-)
+[1] https://lore.kernel.org/linux-crypto/20260115183831.72010-1-dengler@linux.ibm.com
+[2] https://lore.kernel.org/linux-crypto/20260114153138.4896-1-dengler@linux.ibm.com
 
-diff --git a/include/linux/local_lock_internal.h b/include/linux/local_lock_internal.h
-index 4521c40895f8..ebfcdf517224 100644
---- a/include/linux/local_lock_internal.h
-+++ b/include/linux/local_lock_internal.h
-@@ -87,13 +87,11 @@ do {								\
- 			      0, LD_WAIT_CONFIG, LD_WAIT_INV,	\
- 			      LD_LOCK_PERCPU);			\
- 	local_lock_debug_init(lock);				\
--	__assume_ctx_lock(lock);				\
- } while (0)
- 
- #define __local_trylock_init(lock)				\
- do {								\
- 	__local_lock_init((local_lock_t *)lock);		\
--	__assume_ctx_lock(lock);				\
- } while (0)
- 
- #define __spinlock_nested_bh_init(lock)				\
-@@ -105,7 +103,6 @@ do {								\
- 			      0, LD_WAIT_CONFIG, LD_WAIT_INV,	\
- 			      LD_LOCK_NORMAL);			\
- 	local_lock_debug_init(lock);				\
--	__assume_ctx_lock(lock);				\
- } while (0)
- 
- #define __local_lock_acquire(lock)					\
-diff --git a/include/linux/mutex.h b/include/linux/mutex.h
-index 6b12009351d2..ecaa0440f6ec 100644
---- a/include/linux/mutex.h
-+++ b/include/linux/mutex.h
-@@ -62,7 +62,6 @@ do {									\
- 	static struct lock_class_key __key;				\
- 									\
- 	__mutex_init((mutex), #mutex, &__key);				\
--	__assume_ctx_lock(mutex);					\
- } while (0)
- 
- /**
-diff --git a/include/linux/rwlock.h b/include/linux/rwlock.h
-index 65a5b55e1bcd..3390d21c95dd 100644
---- a/include/linux/rwlock.h
-+++ b/include/linux/rwlock.h
-@@ -22,11 +22,10 @@ do {								\
- 	static struct lock_class_key __key;			\
- 								\
- 	__rwlock_init((lock), #lock, &__key);			\
--	__assume_ctx_lock(lock);				\
- } while (0)
- #else
- # define rwlock_init(lock)					\
--	do { *(lock) = __RW_LOCK_UNLOCKED(lock); __assume_ctx_lock(lock); } while (0)
-+	do { *(lock) = __RW_LOCK_UNLOCKED(lock); } while (0)
- #endif
- 
- #ifdef CONFIG_DEBUG_SPINLOCK
-diff --git a/include/linux/rwlock_rt.h b/include/linux/rwlock_rt.h
-index 37b387dcab21..5353abbfdc0b 100644
---- a/include/linux/rwlock_rt.h
-+++ b/include/linux/rwlock_rt.h
-@@ -22,7 +22,6 @@ do {							\
- 							\
- 	init_rwbase_rt(&(rwl)->rwbase);			\
- 	__rt_rwlock_init(rwl, #rwl, &__key);		\
--	__assume_ctx_lock(rwl);				\
- } while (0)
- 
- extern void rt_read_lock(rwlock_t *rwlock)	__acquires_shared(rwlock);
-diff --git a/include/linux/rwsem.h b/include/linux/rwsem.h
-index ea1bbdb57a47..9bf1d93d3d7b 100644
---- a/include/linux/rwsem.h
-+++ b/include/linux/rwsem.h
-@@ -121,7 +121,6 @@ do {								\
- 	static struct lock_class_key __key;			\
- 								\
- 	__init_rwsem((sem), #sem, &__key);			\
--	__assume_ctx_lock(sem);					\
- } while (0)
- 
- /*
-@@ -175,7 +174,6 @@ do {								\
- 	static struct lock_class_key __key;			\
- 								\
- 	__init_rwsem((sem), #sem, &__key);			\
--	__assume_ctx_lock(sem);					\
- } while (0)
- 
- static __always_inline int rwsem_is_locked(const struct rw_semaphore *sem)
-diff --git a/include/linux/seqlock.h b/include/linux/seqlock.h
-index 22216df47b0f..c0c6235dff59 100644
---- a/include/linux/seqlock.h
-+++ b/include/linux/seqlock.h
-@@ -817,7 +817,6 @@ static __always_inline void write_seqcount_latch_end(seqcount_latch_t *s)
- 	do {								\
- 		spin_lock_init(&(sl)->lock);				\
- 		seqcount_spinlock_init(&(sl)->seqcount, &(sl)->lock);	\
--		__assume_ctx_lock(sl);					\
- 	} while (0)
- 
- /**
-diff --git a/include/linux/spinlock.h b/include/linux/spinlock.h
-index 7b11991c742a..e1e2f144af9b 100644
---- a/include/linux/spinlock.h
-+++ b/include/linux/spinlock.h
-@@ -106,12 +106,11 @@ do {									\
- 	static struct lock_class_key __key;				\
- 									\
- 	__raw_spin_lock_init((lock), #lock, &__key, LD_WAIT_SPIN);	\
--	__assume_ctx_lock(lock);					\
- } while (0)
- 
- #else
- # define raw_spin_lock_init(lock)				\
--	do { *(lock) = __RAW_SPIN_LOCK_UNLOCKED(lock); __assume_ctx_lock(lock); } while (0)
-+	do { *(lock) = __RAW_SPIN_LOCK_UNLOCKED(lock); } while (0)
- #endif
- 
- #define raw_spin_is_locked(lock)	arch_spin_is_locked(&(lock)->raw_lock)
-@@ -324,7 +323,6 @@ do {								\
- 								\
- 	__raw_spin_lock_init(spinlock_check(lock),		\
- 			     #lock, &__key, LD_WAIT_CONFIG);	\
--	__assume_ctx_lock(lock);				\
- } while (0)
- 
- #else
-@@ -333,7 +331,6 @@ do {								\
- do {						\
- 	spinlock_check(_lock);			\
- 	*(_lock) = __SPIN_LOCK_UNLOCKED(_lock);	\
--	__assume_ctx_lock(_lock);		\
- } while (0)
- 
- #endif
-diff --git a/include/linux/spinlock_rt.h b/include/linux/spinlock_rt.h
-index 0a585768358f..373618a4243c 100644
---- a/include/linux/spinlock_rt.h
-+++ b/include/linux/spinlock_rt.h
-@@ -20,7 +20,6 @@ static inline void __rt_spin_lock_init(spinlock_t *lock, const char *name,
- do {								\
- 	rt_mutex_base_init(&(slock)->lock);			\
- 	__rt_spin_lock_init(slock, name, key, percpu);		\
--	__assume_ctx_lock(slock);				\
- } while (0)
- 
- #define _spin_lock_init(slock, percpu)				\
-diff --git a/include/linux/ww_mutex.h b/include/linux/ww_mutex.h
-index 58e959ee10e9..c47d4b9b88b3 100644
---- a/include/linux/ww_mutex.h
-+++ b/include/linux/ww_mutex.h
-@@ -107,7 +107,6 @@ context_lock_struct(ww_acquire_ctx) {
-  */
- static inline void ww_mutex_init(struct ww_mutex *lock,
- 				 struct ww_class *ww_class)
--	__assumes_ctx_lock(lock)
- {
- 	ww_mutex_base_init(&lock->base, ww_class->mutex_name, &ww_class->mutex_key);
- 	lock->ctx = NULL;
-diff --git a/lib/test_context-analysis.c b/lib/test_context-analysis.c
-index 0f05943d957f..140efa8a9763 100644
---- a/lib/test_context-analysis.c
-+++ b/lib/test_context-analysis.c
-@@ -542,12 +542,6 @@ struct test_ww_mutex_data {
- 	int counter __guarded_by(&mtx);
- };
- 
--static void __used test_ww_mutex_init(struct test_ww_mutex_data *d)
--{
--	ww_mutex_init(&d->mtx, &ww_class);
--	d->counter = 0;
--}
--
- static void __used test_ww_mutex_lock_noctx(struct test_ww_mutex_data *d)
- {
- 	if (!ww_mutex_lock(&d->mtx, NULL)) {
+Example output of the aes_kunit test-suite:
+
+[  316.380919] KTAP version 1
+[  316.380923] 1..1
+[  316.380964]     KTAP version 1
+[  316.380965]     # Subtest: aes
+[  316.380966]     # module: aes_kunit
+[  316.380968]     1..9
+[  316.381071]     ok 1 test_aes128_encrypt
+[  316.381129]     ok 2 test_aes128_decrypt
+[  316.381186]     ok 3 test_aes192_encrypt
+[  316.381248]     ok 4 test_aes192_decrypt
+[  316.381309]     ok 5 test_aes256_encrypt
+[  316.381367]     ok 6 test_aes256_decrypt
+[  316.381411]     # benchmark_aes128: enc (len=16): 500 MB/s
+[  316.381414]     # benchmark_aes128: dec (len=16): 500 MB/s
+[  316.381447]     ok 7 benchmark_aes128
+[  316.381491]     # benchmark_aes192: enc (len=16): 500 MB/s
+[  316.381494]     # benchmark_aes192: dec (len=16): 484 MB/s
+[  316.381529]     ok 8 benchmark_aes192
+[  316.381572]     # benchmark_aes256: enc (len=16): 484 MB/s
+[  316.381574]     # benchmark_aes256: dec (len=16): 484 MB/s
+[  316.381608]     ok 9 benchmark_aes256
+[  316.381610] # aes: pass:9 fail:0 skip:0 total:9
+[  316.381612] # Totals: pass:9 fail:0 skip:0 total:9
+[  316.381614] ok 1 aes
+
+Holger Dengler (1):
+  lib/crypto: tests: Add KUnit tests for AES
+
+ lib/crypto/tests/Kconfig        |  12 +++
+ lib/crypto/tests/Makefile       |   1 +
+ lib/crypto/tests/aes-testvecs.h |  77 ++++++++++++++++
+ lib/crypto/tests/aes_kunit.c    | 150 ++++++++++++++++++++++++++++++++
+ 4 files changed, 240 insertions(+)
+ create mode 100644 lib/crypto/tests/aes-testvecs.h
+ create mode 100644 lib/crypto/tests/aes_kunit.c
+
+
+base-commit: 47753e09a15d9fd7cdf114550510f4f2af9333ec
 -- 
-2.52.0.457.g6b5491de43-goog
+2.51.0
 
