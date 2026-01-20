@@ -1,96 +1,81 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBFB847278A;
-	Tue, 20 Jan 2026 19:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E54E478869;
+	Tue, 20 Jan 2026 20:52:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768936426; cv=none; b=tya7kFZTgL+HHWeUGhEw3kuTrmOAaaaPez6HLHRcQ6ITy9Unjgc5g38laNLeeBp+15kdOpLzn4kURH8J7y3aCndLeT613YzWqf1RAwobV/iPN4pmTLMqBFofNAkprAcYHa7TqKcsKUYQB2FrhCisX0/p+v5prYKFOuLQxXavgyE=
+	t=1768942373; cv=none; b=V5NEJaBgPtUPzHDSFiMmXdc3IVqa0bmzUrC85DM4PNUATu9SNh6qtzBFXTPhH1kMm+RsUrg+Sej01WO4w58Ff1rvhmNT4DY1hFvRFAOZ+k9HZgS4G4qcb5eZYsa/ZfyE7j7P/CCT/26ba++JtvJ9qJzadD0ABfkHTFm3+RhdZQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768936426; c=relaxed/simple;
-	bh=hR7VS+eGnEIFJeV2CJ6Lyfs5CIcoszKcZFkapk5y51A=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=XZmpEILd8enAzk/mL0FgXY8MnsDfEimZWA0eiHstU7wFLb4xK98Y+08zongAKzQnW/iYPNg/cuzfrrs448RHfr5qi4GIAqrXVOeePeuWuhC6I5m0gk5SLYGK+qD5FRNVE3fpxc2Bdij4pXI4F3vJRPmrV1J0OeBn6en3OxKz4WY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fIXHpLSj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768942373; c=relaxed/simple;
+	bh=cWBmd+6SVqCMDlWlRDRyy1mmdiX760SlRrPD4p0g28o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=stFqBtX2hkZ2p6pmErGlYEndvLYY6geUENH5QGg6CKSzVd/yrtOQYtKl6LBJ2AjV6uGiAmG43bMGeR88RaU9SZXVZOX04a2oBatkCZ22JIpCV+FyZHqWAnWl26Vs7j75p/WMnc9vPoZqlyCeiJVHcQEc0J86kUTVRl5Cdx+sNzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VHl86lUh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fIXHpLSj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E5DCC19425;
-	Tue, 20 Jan 2026 19:13:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VHl86lUh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC9B0C16AAE;
+	Tue, 20 Jan 2026 20:52:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768936426;
-	bh=hR7VS+eGnEIFJeV2CJ6Lyfs5CIcoszKcZFkapk5y51A=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=fIXHpLSjwwcIrK3t16Ux31rx7B3CC/uf12EHkBRtXsIKsaIIfMTIMmPAAxa+7ZnXb
-	 uxmxogIu+BEGZ9asCjo/Z622Clnq807VAt2nQMHzAgvaeU4qAbuSClhoOdHWzRkptb
-	 pN6YitKMvni2EsFreIafxjsyNmkDPhzbRn746kO9sf30/3OnwCUzJtWEn0azwm16kl
-	 UPmr5rk9BcDd39oiCwgNe/ntDIPy9Y+MKESY971qTJF/RpjYiZxWJ7kVwWnaok49J4
-	 fzMiHk04TnuYIzRrpO0C11GMD1g/9tw17UtOWxAI5R+VO4fMN9VUQlVD2d4MIaVh3i
-	 zPWyqTkyXHHJQ==
-Content-Type: multipart/mixed; boundary="===============7877633429921621322=="
+	s=k20201202; t=1768942371;
+	bh=cWBmd+6SVqCMDlWlRDRyy1mmdiX760SlRrPD4p0g28o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VHl86lUhY0auHqalxqSkh8KfGqaWm2aDNOCB5QCqfGX2RGydBdJi/QXetiwhA9ObL
+	 cUl/0gsQws6Ck8C/OhTzY078OVX6uLp5D5iXT2rLdNZacqIoDXrGy/mRXbTQcWe0jq
+	 +l7DCmWtmdRocejG6UUu46R5foCZGqBRhiql743qMYSdMaAG9tb5ZhNS88uzQqr5qf
+	 442pqt/7QoBU9bJ4OqUnw+ANiGXdw/ZIeiLeXjEc0QgSwBhdQVQTGqJuydvdckybD4
+	 8DgXiqY7eWwO+m7RQBXuyFo5SWxMBCcqkxO5ZZw+gLhNWf+VszWbJ0VZOe0fufHO7e
+	 nGIJ1F09daVVQ==
+Date: Tue, 20 Jan 2026 12:52:49 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@cloudflare.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v13 01/12] crypto: Add ML-DSA crypto_sig support
+Message-ID: <20260120205249.GA2657@quark>
+References: <20260120145103.1176337-1-dhowells@redhat.com>
+ <20260120145103.1176337-2-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <b1f74213800152dbd91fa2649b82c182058c295f6c1c15799a5b5871aa5ced48@mail.kernel.org>
-In-Reply-To: <20260120184701.23082-4-git@danielhodges.dev>
-References: <20260120184701.23082-4-git@danielhodges.dev>
-Subject: Re: [PATCH bpf-next v5 3/7] crypto: Add BPF signature algorithm type registration module
-From: bot+bpf-ci@kernel.org
-To: git@danielhodges.dev,bpf@vger.kernel.org
-Cc: ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,vadim.fedorenko@linux.dev,song@kernel.org,yatsenko@meta.com,martin.lau@linux.dev,eddyz87@gmail.com,haoluo@google.com,jolsa@kernel.org,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,yonghong.song@linux.dev,herbert@gondor.apana.org.au,davem@davemloft.net,linux-crypto@vger.kernel.org,linux-kernel@vger.kernel.org,linux-kselftest@vger.kernel.org,git@danielhodges.dev,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Tue, 20 Jan 2026 19:13:44 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260120145103.1176337-2-dhowells@redhat.com>
 
---===============7877633429921621322==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Jan 20, 2026 at 02:50:47PM +0000, David Howells wrote:
+> +config CRYPTO_MLDSA
+> +	tristate "ML-DSA (Module-Lattice-Based Digital Signature Algorithm)"
+> +	select CRYPTO_SIG
+> +	select CRYPTO_LIB_MLDSA
+> +	select CRYPTO_LIB_SHA3
+> +	help
+> +	  ML-DSA (Module-Lattice-Based Digital Signature Algorithm) (FIPS-204).
 
-> diff --git a/crypto/bpf_crypto_sig.c b/crypto/bpf_crypto_sig.c
-> new file mode 100644
-> index 000000000000..1d6521a066be
-> --- /dev/null
-> +++ b/crypto/bpf_crypto_sig.c
+The selection of CRYPTO_LIB_SHA3 is unnecessary.
 
-[ ... ]
-
-> +static const struct bpf_crypto_type bpf_crypto_sig_type = {
-> +	.alloc_tfm	= bpf_crypto_sig_alloc_tfm,
-> +	.free_tfm	= bpf_crypto_sig_free_tfm,
-> +	.has_algo	= bpf_crypto_sig_has_algo,
-> +	.get_flags	= bpf_crypto_sig_get_flags,
-> +	.setkey		= bpf_crypto_sig_setkey,
-> +	.verify		= bpf_crypto_sig_verify,
-> +	.owner		= THIS_MODULE,
-> +	.type_id	= BPF_CRYPTO_TYPE_SIG,
-> +	.name		= "sig",
+> +struct crypto_mldsa_ctx {
+> +	u8 pk[MAX(MAX(MLDSA44_PUBLIC_KEY_SIZE,
+> +		      MLDSA65_PUBLIC_KEY_SIZE),
+> +		  MLDSA87_PUBLIC_KEY_SIZE)];
+> +	unsigned int pk_len;
+> +	enum mldsa_alg strength;
+> +	u8 key_set;
 > +};
 
-The bpf_crypto_sig_type struct does not set .ivsize or .statesize callbacks.
-In bpf_crypto_ctx_create() in kernel/bpf/crypto.c, there is an unconditional
-call:
+'key_set' should have type 'bool'.   Or just use pk_len == 0 to mean the
+key hasn't been set yet.
 
-    ctx->siv_len = type->ivsize(ctx->tfm) + type->statesize(ctx->tfm);
-
-If a BPF program creates a crypto context with type="sig", this will call
-NULL function pointers and crash the kernel.
-
-I see this is fixed later in the series by commit 76d771a64b50 ("bpf: Add
-hash kfunc for cryptographic hashing") which adds NULL checks:
-
-    if (type->ivsize && type->statesize)
-        ctx->siv_len = type->ivsize(ctx->tfm) + type->statesize(ctx->tfm);
-
-Should this fix be folded into this commit to avoid the intermediate crash?
-
-[ ... ]
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21183820118
-
---===============7877633429921621322==--
+- Eric
