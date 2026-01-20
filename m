@@ -1,184 +1,105 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30E7379984;
-	Tue, 20 Jan 2026 10:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768906343; cv=none; b=N41gaAO+RTrR455Q72JL6L88r5vtiavVFDjdmsU4bozTgbL5dz8QB/yodRqPlKwnXjyFZ7FTuQol3lyLKs7qSdk6+CqzRONSCAvovlMUJNWP2ZS4ODRxs76pn8c7fzl9z6etn6oTXNTE62zS/t0h4sQ9zV9U0Zxm85I43QhRGcc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768906343; c=relaxed/simple;
-	bh=7tTn9KomlvNB6ws9NmjAQ2DQsDaQvHCfQzljpMZnb9Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I14L4la/M7HODoNjthmwEHngaubrzVNUw8mRYaIF/KCOE3Lbd4GZJCn4Tg//gswOq1kOKuOhmEvBoPDmDBjQ86goDAzgVGRvwDfjD6I8fimhSYyVLzwBo4VBHMtXe9LlDk0cLavEp8ohWAccElSZtC6w7T1Uvr3xI3I/qk51zMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=POGQsvVP; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B5B343D8A
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 10:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768906541; cv=pass; b=NCVovPPGx4KLu8Lt6uXzWP98FAD9Ew/HOYxrfe99T8xMfJBJ3nSH3cFa28GsFs2rx4P4LeQSBdr/lyMrdAPKXfL7hSWULemZqRxQoDe+6qtX+I7Q8kodq+WMpEJI9rgAmq2l4O1IkH89YJl4nJCOR6AOcgmf26KVH1q2B7gtOGQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768906541; c=relaxed/simple;
+	bh=fIzQM+I1dKrQeWlW8RXDEsaXmZzlz/hUkp2KF5rWyuk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pfWtRZyJ5VFV/G+7qiMC3nKdz/cY1bzFdnT+cydJ8BFXE2DiRVaTBjUTOSGBy5D1OfSkwX7vwzTnjvtlMstkmq0N3Ec7KXTRB2EcxO2emE/nsHvealTf5DFcvRHiNp3DcY2TeFFV8X/lIhixTN+0Als+mxYTOdr3AKyoMj23pIM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=UarTPr01; arc=pass smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="POGQsvVP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=qkRq9Kh+t9q2WeybfZmZ0D2kPKKoLj074IxXeupVa34=; b=POGQsvVPUouyYNoj21sDqBPYKZ
-	R0lCPeU5PRUnjN8MYEExDU20JEhGYMjxgs3bHFc43CwzxDrAUIp4J3NWjt4DYhHjj6peWPSyPdUAm
-	6HHdmNtG4AUOAnoVy30ZQtX9lB99C1cCkXmHBVfvkSd7Z8HVc63IWlEcdzbKwIZSu8CB/nWt+I+tG
-	U5nDyOddIWAX1IePkez6A4+ZLukEt9GQMNHdzWv80ifqFYIA2NbDkDWfregXWOoQ4mQxKSfDbvAZl
-	d3xwt4+zPTEpB3W4t9ePIX0x+7KVg8sFTAyT2++38imeqMTa+Gl3And/cNLGx+jj5EAyuz/H6NhRX
-	IMA2qUpA==;
-Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vi9LI-0000000DqiH-27xI;
-	Tue, 20 Jan 2026 10:52:12 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 022A5301C52; Tue, 20 Jan 2026 11:52:12 +0100 (CET)
-Date: Tue, 20 Jan 2026 11:52:11 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Marco Elver <elver@google.com>, Ingo Molnar <mingo@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Bart Van Assche <bvanassche@acm.org>, kasan-dev@googlegroups.com,
-	llvm@lists.linux.dev, linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH tip/locking/core 0/6] compiler-context-analysis: Scoped
- init guards
-Message-ID: <20260120105211.GW830755@noisy.programming.kicks-ass.net>
-References: <20260119094029.1344361-1-elver@google.com>
- <20260120072401.GA5905@lst.de>
+	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="UarTPr01"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-50150bc7731so79768621cf.1
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 02:55:39 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768906538; cv=none;
+        d=google.com; s=arc-20240605;
+        b=G0ghCdGg8o8gcCOl2rKENfUWp5831FK150S2VTr0sNV0/j5lUVGY5GqAfzI06GBG3X
+         zE8+EpZ5Ok1qrzyUqu6dErpYItJ10+tQLZvsJKyi/FWo3fTs/M8moPBIOLnTMcWDHRG6
+         MT9RQIyvjv10wwmB1z9wIIfafv6wk9/r+uOqei9uactvhcV8rz9pjh+8025Kay1Vlji/
+         1lHNeJizEydTa55YL+2RaKdunyCLZaPYnjoY8VoQj/AC9StUlenwK5eIVw3DQWw37+dj
+         Bmso4PhPkc4l4GjIFkXOQgIOte9guLTKqP4g+j6/U8pD+FEPB5RD6qrj6JrKr2L7+S1k
+         sE1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=+858jRkeuTzyR7QbFNMkP0w0F921+ZC4VlN4hpyPROU=;
+        fh=3uJA7K85JZhwJcvj8kVjqOMxXGqLofYdjSN2V83MMAY=;
+        b=gbX3zsGS5KFCwFmLR78/zWW+oWrXf4Qo0ZUhaGKG4L1fq7zjLx6s6Ro/XboDCiUXW/
+         Vz+sORiD42qevxZDg/DXbMa03KjOl55sMxtRahCUBT+fnr+IsXlU3iU6/qyCurs0CjOV
+         Jp7oBIt1ZXWvvB0aJWbux9ZWKdX38aEfAbmw20A1Z/gIMutE2TjIImj8cgS3k/xdyrxO
+         bhh+1AlTOUL/yC2JmNfz59boDEI6KBuIbIeAj0qbKhlb5QzvWQXVqd8zSnUM4kCYJfm8
+         WZHwGQ8BwWcF3tAr2qb6suX7zlxtgAKX5tXwidhNJ9qNMJqtRv44QEOKcfkBJ7pIpHVn
+         kX+g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=szeredi.hu; s=google; t=1768906538; x=1769511338; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+858jRkeuTzyR7QbFNMkP0w0F921+ZC4VlN4hpyPROU=;
+        b=UarTPr015F7dRJLJacZZzl2NOK/uiKmtbKv2oceQ84MND3/ducGjUdBlaRQ98tpe8l
+         iuWAxTZguNmQtI2E46ndHWUOmlqapQTRDAKQpzRsRC2qJqYZqEE63hOzLNwSX1lv5UJM
+         uDEWvpK4Ov/L93nsSMEPmC0p+NZNnZ2Jtl50s=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768906538; x=1769511338;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+858jRkeuTzyR7QbFNMkP0w0F921+ZC4VlN4hpyPROU=;
+        b=LuYnjROLLtOO6c8FMT+DCzG5eWwBkyG2fbM9JlSp9E7el2fVvnCprRHmGmE0mkLGt+
+         aYMtWiX9285v6jkaIO2TpI+wDMyNV4+KjhoYOmBDEIcPellhH4zA9y9NjKkQSXJwm1Go
+         9EP8vkPbVtUB9EbusbP2hYqY5PNmc8lBbRHx/P4aDdUuYjQ5mgsZYYHGoRGNYCYWw8fp
+         8rQJa4kZTyhIjkAViEN3dm/41tR4qReTogdehZZc+lIspacJluUU1D2VhdxBw7NEpLqK
+         Ff6YEoxGpGpxgApvKDkSqi2ISlPRdYI8nL3KDzJW/9QaAHzQvtWsFWuCC3GmYz8xDfcC
+         b0Aw==
+X-Forwarded-Encrypted: i=1; AJvYcCUyOvqhBm0tskPt2tIVuTL4Q9OQ8iG4faG1A6p3jCYH3vk+lOXL8I3KbMCoGgUoJQcnrY6e9gnY2w2LnVc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxx7MGbmyr3uI4ojXe9B4r1y9cc9YtEHorJSSyZv6Qci8vt+kDK
+	JoWW/JXKpHx8Eg+khCuOWE+WQ5fI4OVwGNiYHEic3/5b2LnAAsMOGaKw6jb6kGuotwPeWFIfyWG
+	OE8L/cI7VGWgt3rwIz7SmksXITiB/Invk8skuShlcTw==
+X-Gm-Gg: AY/fxX57qn4ToBnDi4ABz4o6nzFd5c8uhTi4UXy6S2q76JgfF9TpWPwOmCwgTw7quf8
+	xmkfQ5u+xXNBIPu7hCiTgPHKSHYC0zPvu8p3/SkH+xrNYaX3HoFDEvkvdHBU6BxBREpvWJYhlwl
+	NOQ6Ak78DAMMo9DouJTByEi5sYrFDly8TQgiVVjLjb4oQCi3NSH+lNtYfaDTuPwX8uIo4MI827u
+	dDNEm41ByBQ/wJX/1Ywn4AcEPZpR6DDsAndXDe4OiNDK8scRmuDNRIelGDKKJFxQ/ET28fiVIIR
+	FQKvIcLp
+X-Received: by 2002:a05:622a:f:b0:4f0:23b6:c285 with SMTP id
+ d75a77b69052e-502a1f231b4mr161536681cf.41.1768906538583; Tue, 20 Jan 2026
+ 02:55:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260120072401.GA5905@lst.de>
+References: <cover.1768573690.git.bcodding@hammerspace.com>
+In-Reply-To: <cover.1768573690.git.bcodding@hammerspace.com>
+From: Miklos Szeredi <miklos@szeredi.hu>
+Date: Tue, 20 Jan 2026 11:55:26 +0100
+X-Gm-Features: AZwV_QjAOHMTbnCyc1vnuEuGvNZiJz2bkDzfLZ1b6HoSesVSYIgHm3F1kdUgfiM
+Message-ID: <CAJfpegt=eV=2OxgfiVYG7drw_yN14b7edJhj+bsF_ku7cVGuig@mail.gmail.com>
+Subject: Re: [PATCH v1 0/4] kNFSD Signed Filehandles
+To: Benjamin Coddington <bcodding@hammerspace.com>
+Cc: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	NeilBrown <neil@brown.name>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+	Eric Biggers <ebiggers@kernel.org>, Rick Macklem <rick.macklem@gmail.com>, linux-nfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jan 20, 2026 at 08:24:01AM +0100, Christoph Hellwig wrote:
-> On Mon, Jan 19, 2026 at 10:05:50AM +0100, Marco Elver wrote:
-> > Note: Scoped guarded initialization remains optional, and normal
-> > initialization can still be used if no guarded members are being
-> > initialized. Another alternative is to just disable context analysis to
-> > initialize guarded members with `context_unsafe(var = init)` or adding
-> > the `__context_unsafe(init)` function attribute (the latter not being
-> > recommended for non-trivial functions due to lack of any checking):
-> 
-> I still think this is doing the wrong for the regular non-scoped
-> cased, and I think I finally understand what is so wrong about it.
-> 
-> The fact that mutex_init (let's use mutexes for the example, applied
-> to other primitives as well) should not automatically imply guarding
-> the members for the rest of the function.  Because as soon as the
-> structure that contains the lock is published that is not actually
-> true, and we did have quite a lot of bugs because of that in the
-> past.
-> 
-> So I think the first step is to avoid implying the safety of guarded
-> member access by initialing the lock.  We then need to think how to
-> express they are save, which would probably require explicit annotation
-> unless we can come up with a scheme that makes these accesses fine
-> before the mutex_init in a magic way.
+On Fri, 16 Jan 2026 at 15:36, Benjamin Coddington
+<bcodding@hammerspace.com> wrote:
 
-But that is exactly what these patches do!
+>  Documentation/netlink/specs/nfsd.yaml | 12 ++++
+>  fs/nfsd/export.c                      |  5 +-
 
-Note that the current state of things (tip/locking/core,next) is that
-mutex_init() is 'special'. And I agree with you that that is quite
-horrible.
+Would this make sense as a generic utility (i.e. in fs/exportfs/)?
 
-Now, these patches, specifically patch 6, removes this implied
-horribleness.
+The ultimate use case for me would be unprivileged open_by_handle_at(2).
 
-The alternative is an explicit annotation -- as you suggest.
-
-
-So given something like:
-
-struct my_obj {
-	struct mutex	mutex;
-	int		data __guarded_by(&mutex);
-	...
-};
-
-
-tip/locking/core,next:
-
-init_my_obj(struct my_obj *obj)
-{
-	mutex_init(&obj->mutex); // implies obj->mutex is taken until end of function
-	obj->data = FOO;	 // OK, because &obj->mutex 'held'
-	...
-}
-
-And per these patches that will no longer be true. So if you apply just
-patch 6, which removes this implied behaviour, you get a compile fail.
-Not good!
-
-So patches 1-5 introduces alternatives.
-
-So your preferred solution:
-
-hch_my_obj(struct my_obj *obj)
-{
-	mutex_init(&obj->mutex);
-	mutex_lock(&obj->mutex); // actually acquires lock
-	obj->data = FOO;
-	...
-}
-
-is perfectly fine and will work. But not everybody wants this. For the
-people that only need to init the data fields and don't care about the
-lock state we get:
-
-init_my_obj(struct my_obj *obj)
-{
-	guard(mutex_init)(&obj->mutex); // initializes mutex and considers lock
-					// held until end of function
-	obj->data = FOO;
-	...
-}
-
-For the people that want to first init the object but then actually lock
-it, we get:
-
-use_my_obj(struct my_obj *obj)
-{
-	scoped_guard (mutex_init, &obj->mutex) { // init mutex and 'hold' for scope
-		obj->data = FOO;
-		...
-	}
-
-	mutex_lock(&obj->lock);
-	...
-}
-
-And for the people that *reaaaaaly* hate guards, it is possible to write
-something like:
-
-ugly_my_obj(struct my_obj *obj)
-{
-	mutex_init(&obj->mutex);
-	__acquire_ctx_lock(&obj->mutex);
-	obj->data = FOO;
-	...
-	__release_ctx_lock(&obj->mutex);
-
-	mutex_lock(&obj->lock);
-	...
-}
-
-And, then there is the option that C++ has:
-
-init_my_obj(struct my_obj *obj)
-	__no_context_analysis // STFU!
-{
-	mutex_init(&obj->mutex);
-	obj->data = FOO;	 // WARN; but ignored
-	...
-}
-
-All I can make from your email is that you must be in favour of these
-patches.
+Thanks,
+Miklos
