@@ -1,79 +1,224 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A0F43CEC2;
-	Tue, 20 Jan 2026 18:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768933458; cv=none; b=SjCxfC5olskmHXucy4TcEXOGmFz7bK+1dsI1xRtJGCCK6Ufq14WIH6xar286YIUdXpB1QEgUcxJtg3MAaah9K3Qr94oyubXj49j2VAuOMRtD+ROHG06W7OEOonWeBVrYJAmDEnJp245okCE74eyhu3hFLgRnkid8cfDb5S8r+5U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768933458; c=relaxed/simple;
-	bh=laO+s2zBiXudQJg6l9/ECBEXlmXile3qngJMXioXyAw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ut5AHp7ssOavVixWTlUWRopMN2tGgbWSP/fA2DqQ0fc0om+Gaj/ALZ4djek16TcTYQi2XE4bU/NK8uG5xlT12NZOXTDPwnwT1LQhrL15SiQCzEFG9BnXGOCPZ/YuJyxRSmeXQjSsk0A4mxsCTE1dt4mRfdgZh4FFpBJW64hryN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=AqUY9lXl; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2A036A038
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 18:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768933878; cv=pass; b=VywZjaijVffJY2Rwz9sM+fGsZMPxSRIGqXVdTm1IDdHbdy1V2ffqYSHpZmB+JxiLU5m/Yler7LlWw6JlsBYx9uaTcaON4wK7HnrGNkk3rlDwz/CXmsoUoaYXdE9fpe0LlViCSmgcKpoTQ65YXmZFXo+FYE18AmN6ZL/dMQc7+RA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768933878; c=relaxed/simple;
+	bh=5aDLW+mihRDd+VHWYR5OgufqUvUAlNEFwdP2RjlGovs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TsDAA48eEAsBTUREVG3To1LvcF/Rn/5EGMBRFhVJtf4XBZho98e8xr3zbYjblL6fzq6LqP2qbF6s3OLOHzNB5AaNSGLWy0WSmGvQjn8hm8ENqUk0UD63c6UFQpR7SnGOJAhVwY/ySQby5UpWbhhMXsZ2wnndS3OQ2/iYU9DdtQM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=VgVvSZc0; arc=pass smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="AqUY9lXl"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4dwbM41s2Lz1XM0ns;
-	Tue, 20 Jan 2026 18:24:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1768933453; x=1771525454; bh=laO+s2zBiXudQJg6l9/ECBEX
-	lmXile3qngJMXioXyAw=; b=AqUY9lXlAQ4tazuUKBYtOVKX+Sxi+fpryjzp/hnc
-	Z1AscB9YpGz0GenM7OjEN3g14T9M/Kuce+x+5f3bG4kmckbcwZYJfJq9EyaysY72
-	qJw4hePIJKaAvOspdV2bQDFO4HeyNL8JD44+P+BQ14XFhP4xmlsr4FXDo/i4cnMe
-	mxRS9QxPfqEku4O18CCxatl0wvE3GFMMsFeS6BDvIQf/ih6+wet/Un5jjJk7Kwu9
-	4MDVTUzSLTlaMMbwyaZOfz8lROQZTYXIty0LXRmrI+JGyQesgVrQwNJcCJ0zvbYZ
-	jGcUcHjjHU95vSmMp/u05P9C9WLBkOPKCOICmMqwX+l2Zg==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id vZGs651jTWFO; Tue, 20 Jan 2026 18:24:13 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4dwbLx272pz1XM5jn;
-	Tue, 20 Jan 2026 18:24:08 +0000 (UTC)
-Message-ID: <16d01754-cab9-4067-a65f-60040ac6d47e@acm.org>
-Date: Tue, 20 Jan 2026 10:24:08 -0800
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="VgVvSZc0"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-59b77f2e43aso157899e87.1
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 10:31:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768933874; cv=none;
+        d=google.com; s=arc-20240605;
+        b=XTkY3OsTrwWgOaKj2jheU88oMprSBnQpWgvtGBuabSUYKclFvMPY8wTwZ3FaPvWJrm
+         ibdrkbXbNhnB7bbxxydEsLVWXW0JBvol6JbGNvG7VQIK32DuEWEHS0hoHRb+f1wj+P6E
+         kMmKliLct9mf7nR/Ezk1FQm6Wp1EmDOU5Q91xREEXutj19xnMuXbTCqUc+dKNX9z7GFR
+         Ei965SNvfnv9oZdnu4JJOwQ7Z5WGpMmLVJ+F62vB6ZeEYDDUfzFi12D/XfaQYub3q57w
+         tNIoeG/wAHErLhgrgotfsuXy8CuRbVlKk+rrA/lAr8Fu8/coXAWXGofRvo1b/ZzZLgR7
+         UH2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=8tcAcp7uWuIjCj2SaccYzTy4fHKVPeO3zwjJJlV2b3I=;
+        fh=kgfQWSCb617dTKJOm1+OPtZ+g1JnIhuHz2GyTVQuPQE=;
+        b=HnowOauY8D7U56o3AVDpVND9UxvrEdv080rI2FbSHpKC+xeLl5aFcq3cdAk4RW/C6C
+         eNoRGUuXJcU14rjGPTZNuJAC1JFAki+LRkAwbpotfhyaDsxmJg84T8U4o2MrG5Md6Yu1
+         NOM/xzwXMEmV+dn+/nBrE1XMoeMhM/I5fGcudFZ41BaxQ/6j2yXXgROaaJh9J6kQ3oyK
+         c6TmgRQCkTrcTNW3d1vs1JzeQjTREgrf0VQPmF6Qrd7qsq+FIEGPovJ8CCQzTM+zWKJ/
+         sI3nGItpfr5xE31Fg14gH4guJacB0SBpJnl5cOoBR6fue/l1EUc1jlwge/kEilzBDaaB
+         1qNA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1768933874; x=1769538674; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8tcAcp7uWuIjCj2SaccYzTy4fHKVPeO3zwjJJlV2b3I=;
+        b=VgVvSZc0FA9yVqTMeBkFcuMee8+jql/WBmKjN/WM+DgrzA9BtUy5gryv8ATjmG1ayW
+         etp6RHV78kaBPPUuL2HqjoOYVWIrg88To7tqa8gJmomxI9dMQ3qZBxWDhcGCfGe3AT5h
+         l4+qCU4j4rKBM786tSqUFfJ/mJatVcZV5+pY5AaL/YErmBmYhbsuhculkbPT1Gk10hUR
+         Gg496OKMN/SGBr4GMiygPfkLriSfy+2Fk85veLCOuc98m7cPNkT2wOTUba0Ku6o7hwLz
+         1ZNwQXW++IEoVWrO8Gxcv/6AT6tev77G5WuhgshjB6Gg5TJNqX8/tG/lQJxh5rAN1NFH
+         KGfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768933874; x=1769538674;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8tcAcp7uWuIjCj2SaccYzTy4fHKVPeO3zwjJJlV2b3I=;
+        b=YE/pZrtLUqVwjPOzEU89hNUpfTz/e/Fr24Hx7a5v6QOjA0LMnfn5AhH7IyoNjAPAQd
+         nIQj3D8TxO2ORRFaSz1PXJIwcVjSon7UlaIsrmdkkqh99RqrZA5+xh74CzsDmL0fjJo8
+         gqtgxrSMWY9+tpIxsNhG0eXktpgJP9Xi8jRZ5ou37VNnexcb3cZJhVgmy5rw6bl7beBz
+         bmmTMyFSdtu8gby2AIMEK9B9eJZYYRqz6xJFLjMFbnKm6Zt1+vl8p9EuSjQ6k9MXmC+Y
+         X1TMIH9v7/4YnYL+SWYBJYSlPDloNcVfjNdJWWKsYhw4oBg6Gx0oJB6OpjH1eyOTN7a3
+         WGRA==
+X-Forwarded-Encrypted: i=1; AJvYcCVkxGRxywswXmpjO0rR+bRs6P3o0jbxevQkHYOlLtR3u8vwinJM8RJhbNCEKl0PvlovzS5mppByI/T02wQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPc/RPzXkcEgSv9fKKamtqFbnm1MW04gaQ5zUXu1jrEXGeAUM2
+	PkE8hYjl1w0u6RioRIEGLR5mKr0PuZU6Nd6sbykWALh2oGm4OOSbaOePvSfsnyacgcEppfKPs/0
+	IJT6oYfp39Wc6yxy/nlBnYXHLO6wELDu9a3ILd9WsMg==
+X-Gm-Gg: AZuq6aL8ty7nfWAU8x04dve1A9qkWcW1jgnKerFrqOF2DOlQWTvEFkO0MlGpqOrq5CB
+	vpPvRidgKk9MdNL2yDMSwVu5AM3HtnRMZ0eMln2ltsSgYQiMnHS9m1FH4XounP6DaLgu/dQ9n5C
+	CXuihkivT0b0WRmYqEAX+bckWCsUY7aBWHI0jdOZiF4KWZ1Dm4UXAqqhEAozvUSCKEL9grQOGCJ
+	K0g3HtbZGOUsdNMz8B+8F8gu2/eq90JZ1xNzkTzLcYzqAYFoUaJh00DL5YBeY9qaxBw6auOuaQ0
+	hRRQ3aYN4KY=
+X-Received: by 2002:a05:6512:12c8:b0:59b:6f90:bb9b with SMTP id
+ 2adb3069b0e04-59ba7194a04mr7131150e87.19.1768933874345; Tue, 20 Jan 2026
+ 10:31:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH tip/locking/core 0/6] compiler-context-analysis: Scoped
- init guards
-To: Marco Elver <elver@google.com>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>,
- Christoph Hellwig <hch@lst.de>, Steven Rostedt <rostedt@goodmis.org>,
- kasan-dev@googlegroups.com, llvm@lists.linux.dev,
- linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260119094029.1344361-1-elver@google.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260119094029.1344361-1-elver@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260120145103.1176337-1-dhowells@redhat.com> <20260120145103.1176337-12-dhowells@redhat.com>
+In-Reply-To: <20260120145103.1176337-12-dhowells@redhat.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Tue, 20 Jan 2026 18:31:02 +0000
+X-Gm-Features: AZwV_QgHfD8HrBxrEOZbsSwT8PQCZski9dDNQ5llHPcq36JCOcYwlSptleCn6M0
+Message-ID: <CALrw=nGSr7F-NJri+UFgBVz5J+KFAS6OXa9EFvYo-qitX9R2bg@mail.gmail.com>
+Subject: Re: [PATCH v13 11/12] x509, pkcs7: Limit crypto combinations that may
+ be used for module signing
+To: David Howells <dhowells@redhat.com>
+Cc: Lukas Wunner <lukas@wunner.de>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Eric Biggers <ebiggers@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Stephan Mueller <smueller@chronox.de>, 
+	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/19/26 1:05 AM, Marco Elver wrote:
-> This series proposes a solution to this by introducing scoped init
-> guards which Peter suggested, using the guard(type_init)(&lock) or
-> scoped_guard(type_init, ..) interface.
-Although I haven't had the time yet to do an in-depth review, from a
-quick look all patches in this series look good to me.
+Hi David,
 
-Thanks,
+On Tue, Jan 20, 2026 at 2:52=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> Limit the set of crypto combinations that may be used for module signing =
+as
+> no indication of hash algorithm used for signing is added to the hash of
+> the data, so in theory a data blob hashed with a different algorithm can =
+be
+> substituted provided it has the same hash output.
+>
+> This also rejects the use of less secure algorithms.
+>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Lukas Wunner <lukas@wunner.de>
+> cc: Ignat Korchagin <ignat@cloudflare.com>
+> cc: Stephan Mueller <smueller@chronox.de>
+> cc: Eric Biggers <ebiggers@kernel.org>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: keyrings@vger.kernel.org
+> cc: linux-crypto@vger.kernel.org
+> ---
+>  crypto/asymmetric_keys/public_key.c | 55 +++++++++++++++++++++++++++--
+>  1 file changed, 53 insertions(+), 2 deletions(-)
+>
+> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys=
+/public_key.c
+> index 13a5616becaa..90b98e1a952d 100644
+> --- a/crypto/asymmetric_keys/public_key.c
+> +++ b/crypto/asymmetric_keys/public_key.c
+> @@ -24,6 +24,52 @@ MODULE_DESCRIPTION("In-software asymmetric public-key =
+subtype");
+>  MODULE_AUTHOR("Red Hat, Inc.");
+>  MODULE_LICENSE("GPL");
+>
+> +struct public_key_restriction {
+> +       const char      *pkey_algo;     /* Signing algorithm (e.g. "rsa")=
+ */
+> +       const char      *pkey_enc;      /* Signature encoding (e.g. "pkcs=
+1") */
+> +       const char      *hash_algo;     /* Content hash algorithm (e.g. "=
+sha256") */
+> +};
+> +
+> +static const struct public_key_restriction public_key_restrictions[] =3D=
+ {
+> +       /* algo                 encoding        hash */
+> +       { "rsa",                "pkcs1",        "sha256" },
+> +       { "rsa",                "pkcs1",        "sha384" },
+> +       { "rsa",                "pkcs1",        "sha512" },
+> +       { "rsa",                "emsa-pss",     "sha512" },
 
-Bart.
+Don't we want to allow sha256 for emsa-pss?
+
+> +       { "ecdsa",              "x962",         "sha256" },
+> +       { "ecdsa",              "x962",         "sha384" },
+> +       { "ecdsa",              "x962",         "sha512" },
+> +       { "ecrdsa",             "raw",          "sha256" },
+> +       { "ecrdsa",             "raw",          "sha384" },
+> +       { "ecrdsa",             "raw",          "sha512" },
+> +       { "mldsa44",            "raw",          "sha512" },
+> +       { "mldsa65",            "raw",          "sha512" },
+> +       { "mldsa87",            "raw",          "sha512" },
+> +       /* ML-DSA may also do its own hashing over the entire message. */
+> +       { "mldsa44",            "raw",          "-" },
+> +       { "mldsa65",            "raw",          "-" },
+> +       { "mldsa87",            "raw",          "-" },
+> +};
+> +
+> +/*
+> + * Determine if a particular key/hash combination is allowed.
+> + */
+> +static int is_public_key_sig_allowed(const struct public_key_signature *=
+sig)
+> +{
+> +       for (int i =3D 0; i < ARRAY_SIZE(public_key_restrictions); i++) {
+> +               if (strcmp(public_key_restrictions[i].pkey_algo, sig->pke=
+y_algo) !=3D 0)
+> +                       continue;
+> +               if (strcmp(public_key_restrictions[i].pkey_enc, sig->enco=
+ding) !=3D 0)
+> +                       continue;
+> +               if (strcmp(public_key_restrictions[i].hash_algo, sig->has=
+h_algo) !=3D 0)
+> +                       continue;
+> +               return 0;
+> +       }
+> +       pr_warn_once("Public key signature combo (%s,%s,%s) rejected\n",
+> +                    sig->pkey_algo, sig->encoding, sig->hash_algo);
+> +       return -EKEYREJECTED;
+> +}
+> +
+>  /*
+>   * Provide a part of a description of the key for /proc/keys.
+>   */
+> @@ -391,12 +437,17 @@ int public_key_verify_signature(const struct public=
+_key *pkey,
+>         bool issig;
+>         int ret;
+>
+> -       pr_devel("=3D=3D>%s()\n", __func__);
+> -
+>         BUG_ON(!pkey);
+>         BUG_ON(!sig);
+>         BUG_ON(!sig->s);
+>
+> +       ret =3D is_public_key_sig_allowed(sig);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       pr_devel("=3D=3D>%s(%s,%s,%s)\n",
+> +                __func__, sig->pkey_algo, sig->encoding, sig->hash_algo)=
+;
+> +
+>         /*
+>          * If the signature specifies a public key algorithm, it *must* m=
+atch
+>          * the key's actual public key algorithm.
+>
+
+Ignat
