@@ -1,772 +1,222 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF66C500965;
-	Tue, 20 Jan 2026 00:10:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686741D6DA9;
+	Tue, 20 Jan 2026 01:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768867841; cv=none; b=cnBOL7OCvqTrd7wne7v5/ssOlS4/1aN8LdBU9oLtdYu4fmQ9ZAjjcxTaxnQzx18RPd8fOmYuRfWUy4kAZG3hoUajjSZzPBjva8wjQ2ZKMoqgsZ4yFWtfhEkwyeNtQkbi9Y4zdJPxdtKVLXnlQw21zabqpiMqlBqGQvIh/dpKE+A=
+	t=1768874170; cv=none; b=DSGSuwu6VYEdZHZh35c8Ore7w9NoJ0vDH92kl+u//b5KtE7Q1kDynGyf91exBjH/Z1LrGGUp02IrfWZ9PQtHpwnC5/TlJreqs3515uxc70ldSUxVzXisDLwwe/UMVH9shuI9ymH7dVMLuML8SYGiPQjej6xf3zL5RkjAeTSvXPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768867841; c=relaxed/simple;
-	bh=UYhkcw7jT1kDejb0HUjsjFTLq54ojVOMKU7QLWxq7a8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tjHBk083lt6Lo+d5ofDC2I8qGorho7h5DMfZquRh3Z0+myO4rPSvP26bIL9DMVkygB7abujFVinVFSsX5tkt2xCbS9GVTFhB5cwuz48ZKNxbcRAlF6rDuR61lUWqH2DxuBCv0h5TSL5FbAqpz45Ayn5FV++aJejWPwXErNOOY68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t10SaOiH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768874170; c=relaxed/simple;
+	bh=nP4Ww8NLjbwRFxQb1fLKugkz1tMmsiUtd5EpnQeP5WU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CUiqRSL9Jki+VPbXvkw5AuCuobYLS7moyZ63n5/aO9ioJ6GOqlKJpH+e3CsYEnAY7t2hQ2i4KSIyBTJjllSUE+f5RwvR46X8R/eWNEGd19ZB5lhF9/ttw6JavokYVL2PAU9TySdqNYz8THGTxj43y0C0fmpaTli+XKMjSLvz1ZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=mnq64BMu; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t10SaOiH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A936C116C6;
-	Tue, 20 Jan 2026 00:10:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768867841;
-	bh=UYhkcw7jT1kDejb0HUjsjFTLq54ojVOMKU7QLWxq7a8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t10SaOiHvxDSb6/ZEchM2kpSMSAjd8YhA1P0+glMiPbt77/kn7WASwSHtzv+6AzHW
-	 hZBw8D/EqHctBuDmAlsbrKMnZOUqP56YVfvZbv6wswJZ3ea3w4q5BzzwlyzsAJGZAd
-	 1+HVVCSW0OG9fYYlP+1fplsC8gPaf1o2KaE2uMoCji72b7gh/CBK05j8jflna1ny4W
-	 jxaC4ORERDvpNYD6cMyu0n4qZc89YObI3xvhbWpA0mfq07p/UPbS3DCNqH1xLO+p5z
-	 +7iG2skk/OWddtHmEHb8cUZMnyB/V2VuL/YjSzXT9f9YdMZNDDx/R0ID1Q1pJ/OS+q
-	 VO3fkIpdSqe4Q==
-Date: Tue, 20 Jan 2026 02:10:36 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Ross Philipson <ross.philipson@oracle.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
-	linux-efi@vger.kernel.org, iommu@lists.linux.dev,
-	dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
-	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
-	ardb@kernel.org, mjg59@srcf.ucam.org,
-	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
-	jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu,
-	herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
-	ebiederm@xmission.com, dwmw2@infradead.org,
-	baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
-	andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v15 19/28] x86/tpm: Early TPM PCR extending driver
-Message-ID: <aW7H_LwhYux0ajtq@kernel.org>
-References: <20251215233316.1076248-1-ross.philipson@oracle.com>
- <20251215233316.1076248-20-ross.philipson@oracle.com>
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="mnq64BMu"
+Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60K0Y9Cw585121;
+	Tue, 20 Jan 2026 01:55:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:message-id:mime-version:subject:to; s=PPS06212021; bh=vIZfxpr+J
+	256TlD0uo/sr8jWoAJouBLaAJNcJomxm0Q=; b=mnq64BMuqzV1xgV9qMK5UQsOQ
+	ypS1INMPKb2F6cSAKN2EXRhzQZ60lpdXvnkhBnLiwkOI3IEaQ8iZKkjZv8sq16AR
+	C9ZWIycWEHRNSG/SbBGvksR7Q8BG4ZP4cWu8Lpv3niJCo8er0L/5drjN3IFMnepG
+	kaODcv7UebbS15hzOF8yVUi1u9nyBCUqTludnDzRvWJojsz3ncDh6lh09qL5rGys
+	wvp2b+DmmtoeLv8xiHqgKyoB8nVoG+KVs26om+2O6ykABrPn79sbchpH49y9AXL6
+	M9MSlMBgzQrlf/3ZD7VMS6O0q233MQkGAKz5klJ698EJTxNklwd1ZtwD5otzA==
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [128.224.246.37])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4br1d4aegs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 20 Jan 2026 01:55:29 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
+ ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Mon, 19 Jan 2026 17:55:27 -0800
+Received: from pek-lpggp9.wrs.com (10.11.232.110) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
+ 15.1.2507.61 via Frontend Transport; Mon, 19 Jan 2026 17:55:25 -0800
+From: Jianpeng Chang <jianpeng.chang.cn@windriver.com>
+To: <horia.geanta@nxp.com>, <pankaj.gupta@nxp.com>, <gaurav.jain@nxp.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <leitao@debian.org>, <kuba@kernel.org>
+CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Jianpeng
+ Chang" <jianpeng.chang.cn@windriver.com>
+Subject: [v2 PATCH 1/1] crypto: caam: fix netdev memory leak in dpaa2_caam_probe
+Date: Tue, 20 Jan 2026 09:55:24 +0800
+Message-ID: <20260120015524.1989458-1-jianpeng.chang.cn@windriver.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251215233316.1076248-20-ross.philipson@oracle.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: jFkvrQjOETy4SZRSiV_EjIy1k_6Qo75T
+X-Authority-Analysis: v=2.4 cv=Rs3I7SmK c=1 sm=1 tr=0 ts=696ee091 cx=c_pps
+ a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=t7CeM3EgAAAA:8
+ a=CefbV24u0As9B_iXbnYA:9 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-GUID: jFkvrQjOETy4SZRSiV_EjIy1k_6Qo75T
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIwMDAxNCBTYWx0ZWRfX84omGWDItIaC
+ e5k8Ct9F3TfqJ9iJeuXawKMh1HeYzPAr5PV50AoC09zoY5tru3KfcdGKjiPm+Xx/HNMr8vyGaj2
+ 7NAoz3qIMtsgck0jrMBwvdUQ9HcU0fv/VuF34sXjgXJlwEeYvUn6NnvfTxs5LTa9njO0tZSnory
+ //eUwvPWQb/+uWNTdifrG0hDQPLofeQgtBg9rBLOSMPU4WcJyS2M0IE7+pBvyKz/3E0jjwWkQiI
+ 8PiWLtEDita5LtrTDvfJRV+AimWbkgcIAzH7q3ANVkkFuyfOgwlG7CAdAYAcrTLTbYXToA4RDbp
+ oCQ38NSpuj5Dx9hI2oT3sSLQSo5w1+HgzVazbYgVs3qG0KKmsN8JBCPeE37VwvTV/ReDTx+nx/p
+ aqXiUKuJ453QXZ+3VSHkCATcCECvWn38gog7xn7cZQ13gJtJFrLXuZgbnobyiv8ebcLCZpzQW6+
+ +xk8LImXT5LNDo+IefQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-20_01,2026-01-19_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 bulkscore=0 adultscore=0 clxscore=1015 suspectscore=0
+ malwarescore=0 priorityscore=1501 spamscore=0 impostorscore=0
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2601200014
 
-On Mon, Dec 15, 2025 at 03:33:07PM -0800, Ross Philipson wrote:
-> Introduce an early driver that can interact minimally with the
-> TPM. This allows the Secure Launch startup code to extend measurement
-> values into the TPM's DRTM PCR banks early in the launch process.
-> 
-> This driver implementation is very minimal, only supporting basic
-> initialization and extend commands. An extend command can be sent to both
-> a TPM 2.0 or 1.2 chip but only the TIS/FIFO interface is currently
-> supported. The CRB interface is currently not supported. The TCG specs
-> for these interface can be found here:
-> 
-> https://trustedcomputinggroup.org/resource/pc-client-work-group-pc-client-specific-tpm-interface-specification-tis/
-> https://trustedcomputinggroup.org/resource/tpm-2-0-mobile-command-response-buffer-interface-specification/
-> 
-> The driver could be extended for further operations if needed. This
-> TPM dirver implementation relies as much as possible on existing mainline
-> kernel TPM code.
-> 
-> Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
-> Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
-> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+When commit 0e1a4d427f58 ("crypto: caam: Unembed net_dev structure in
+dpaa2") converted embedded net_device to dynamically allocated pointers,
+it added cleanup in dpaa2_dpseci_disable() but missed adding cleanup in
+dpaa2_dpseci_free() for error paths.
 
-Wouldn't it be possible to simply link code from tpm-interface.c and
-re-use PCR functions from tpm1-cmd.c and tpm2-cmd.c?
+This causes memory leaks when dpaa2_dpseci_dpio_setup() fails during probe
+due to DPIO devices not being ready yet. The kernel's deferred probe
+mechanism handles the retry successfully, but the netdevs allocated during
+the failed probe attempt are never freed, resulting in kmemleak reports
+showing multiple leaked netdev-related allocations all traced back to
+dpaa2_caam_probe().
 
-We can even split transmit code from rest of tpm-interface.c if that
-is necessary for some reason.
+Fix this by preserving the CPU mask of allocated netdevs during setup and
+using it for cleanup in dpaa2_dpseci_free(). This approach ensures that
+only the CPUs that actually had netdevs allocated will be cleaned up,
+avoiding potential issues with CPU hotplug scenarios.
 
-I.e. link the code and define ops re-using code below.
+Fixes: 0e1a4d427f58 ("crypto: caam: Unembed net_dev structure in dpaa2")
+Signed-off-by: Jianpeng Chang <jianpeng.chang.cn@windriver.com>
+---
+v2:
+  - fix the build error with CPUMASK_OFFSTACK disabled
+  - instead of the movement of free_dpaa2_pcpu_netdev, implement it
+    directly in dpaa2_dpseci_free
+v1: https://lore.kernel.org/all/20260116014455.2575351-1-jianpeng.chang.cn@windriver.com/
 
-If using tpm_transmit is impossible, less ideally you could also
-implement your own tpm_transmit_cmd and link tpm1-cmd.o and tpm2-cmd.o,
-which will work out as the symbol is there.
+ drivers/crypto/caam/caamalg_qi2.c | 27 +++++++++++++++------------
+ drivers/crypto/caam/caamalg_qi2.h |  2 ++
+ 2 files changed, 17 insertions(+), 12 deletions(-)
 
-> ---
->  arch/x86/boot/compressed/Makefile           |   1 +
->  arch/x86/boot/compressed/early_tpm_extend.c | 601 ++++++++++++++++++++
->  arch/x86/boot/compressed/tpm.h              |  42 ++
->  3 files changed, 644 insertions(+)
->  create mode 100644 arch/x86/boot/compressed/early_tpm_extend.c
->  create mode 100644 arch/x86/boot/compressed/tpm.h
-> 
-> diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-> index 0ea8a11ec271..b108e0edf367 100644
-> --- a/arch/x86/boot/compressed/Makefile
-> +++ b/arch/x86/boot/compressed/Makefile
-> @@ -114,6 +114,7 @@ endif
->  
->  slaunch-objs += $(obj)/sha1.o
->  slaunch-objs += $(obj)/sha256.o
-> +slaunch-objs += $(obj)/early_tpm_extend.o
->  
->  vmlinux-objs-$(CONFIG_SECURE_LAUNCH) += $(slaunch-objs)
->  
-> diff --git a/arch/x86/boot/compressed/early_tpm_extend.c b/arch/x86/boot/compressed/early_tpm_extend.c
-> new file mode 100644
-> index 000000000000..7cfdb7969878
-> --- /dev/null
-> +++ b/arch/x86/boot/compressed/early_tpm_extend.c
-> @@ -0,0 +1,601 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (c) 2010-2012 United States Government, as represented by
-> + * the Secretary of Defense.  All rights reserved.
-> + *
-> + * based off of the original tools/vtpm_manager code base which is:
-> + * Copyright (c) 2005, Intel Corp.
-> + * All rights reserved.
-> + *
-> + * Redistribution and use in source and binary forms, with or without
-> + * modification, are permitted provided that the following conditions
-> + * are met:
-> + *
-> + *   * Redistributions of source code must retain the above copyright
-> + *     notice, this list of conditions and the following disclaimer.
-> + *   * Redistributions in binary form must reproduce the above
-> + *     copyright notice, this list of conditions and the following
-> + *     disclaimer in the documentation and/or other materials provided
-> + *     with the distribution.
-> + *   * Neither the name of Intel Corporation nor the names of its
-> + *     contributors may be used to endorse or promote products derived
-> + *     from this software without specific prior written permission.
-> + *
-> + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-> + * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-> + * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-> + * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-> + * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-> + * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-> + * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-> + * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-> + * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-> + * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-> + * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-> + * OF THE POSSIBILITY OF SUCH DAMAGE.
-> + */
-> +
-> +#include <linux/types.h>
-> +#include <linux/init.h>
-> +#include <linux/string.h>
-> +#include <crypto/sha2.h>
-> +#include <asm/msr.h>
-> +#include <asm/io.h>
-> +
-> +#include <linux/tpm_common.h>
-> +#include <linux/tpm1.h>
-> +#include <linux/tpm2.h>
-> +#include <linux/tpm_ptp.h>
-> +#include <linux/tpm_buf.h>
-> +
-> +#include "../../../../drivers/char/tpm/tpm1_structs.h"
-> +#include "../../../../drivers/char/tpm/tpm2_structs.h"
-> +
-> +#include "tpm.h"
-> +
-> +static u8 tpm_buf_page[PAGE_SIZE];
-> +
-> +/*
-> + * Single threaded environment only running on BSP. Use a single shared
-> + * page for all TPM extend operations.
-> + */
-> +static inline struct tpm_buf *tpm_buf_alloc_page(void)
-> +{
-> +	memset(tpm_buf_page, 0, PAGE_SIZE);
-> +	return (struct tpm_buf *)tpm_buf_page;
-> +}
-> +
-> +static inline void tpm_buf_free_page(void)
-> +{
-> +	memset(tpm_buf_page, 0, PAGE_SIZE);
-> +}
-> +
-> +/* Pull in TPM buffer management support */
-> +#undef WARN
-> +#define WARN(c, f...)
-> +#undef WARN_ON
-> +#define WARN_ON(c) (0)
-> +
-> +#include "../../../../drivers/char/tpm/tpm-buf.c"
-> +
-> +static u32 tpm_get_alg_size(u16 alg_id)
-> +{
-> +	switch (alg_id) {
-> +	case TPM_ALG_SHA1:
-> +		return TPM_DIGEST_SIZE;
-> +	case TPM_ALG_SHA256:
-> +	case TPM_ALG_SM3_256:
-> +		return SHA256_DIGEST_SIZE;
-> +	case TPM_ALG_SHA384:
-> +		return SHA384_DIGEST_SIZE;
-> +	case TPM_ALG_SHA512:
-> +	default:
-> +		return SHA512_DIGEST_SIZE;
-> +	};
-> +}
-> +
-> +static inline u8 tpm_read8(struct tpm_chip *chip, u32 field)
-> +{
-> +	void *mmio_addr = (void *)(uintptr_t)(chip->baseaddr | field);
-> +	return readb(mmio_addr);
-> +}
-> +
-> +static inline void tpm_write8(struct tpm_chip *chip, u32 field, u8 val)
-> +{
-> +	void *mmio_addr = (void *)(uintptr_t)(chip->baseaddr | field);
-> +	writeb(val, mmio_addr);
-> +}
-> +
-> +static inline u32 tpm_read32(struct tpm_chip *chip, u32 field)
-> +{
-> +	void *mmio_addr = (void *)(uintptr_t)(chip->baseaddr | field);
-> +	return readl(mmio_addr);
-> +}
-> +
-> +static inline void tpm_write32(struct tpm_chip *chip, u32 field, u32 val)
-> +{
-> +	void *mmio_addr = (void *)(uintptr_t)(chip->baseaddr | field);
-> +	writel(val, mmio_addr);
-> +}
-> +
-> +static unsigned long ticks_per_ms = (5UL * 1000 * 1000 /* cpu_khz */ / 1000);
-> +
-> +static inline ktime_t tpm_now_ms(void)
-> +{
-> +	return rdtsc()/ticks_per_ms;
-> +}
-> +
-> +/*
-> + * We're far too early to calibrate time.  Assume a 5GHz processor (the upper
-> + * end of the Fam19h range), which causes us to be wrong in the safe direction
-> + * on slower systems.
-> + */
-> +static inline void tpm_mdelay(unsigned int msecs)
-> +{
-> +	unsigned long ticks = msecs * ticks_per_ms;
-> +	unsigned long s, e;
-> +
-> +	s = rdtsc();
-> +	do {
-> +		cpu_relax();
-> +		e = rdtsc();
-> +	} while ((e - s) < ticks);
-> +}
-> +
-> +static inline u8 __tis_status(struct tpm_chip *chip)
-> +{
-> +	return tpm_read8(chip, TPM_STS(chip->locality));
-> +}
-> +
-> +static inline void __tis_cancel(struct tpm_chip *chip)
-> +{
-> +	/* This causes the current command to be aborted */
-> +	tpm_write8(chip, TPM_STS(chip->locality), TPM_STS_COMMAND_READY);
-> +}
-> +
-> +static int __tis_get_burstcount(struct tpm_chip *chip)
-> +{
-> +	ktime_t stop;
-> +	int burstcnt;
-> +
-> +	stop = tpm_now_ms() + chip->timeout_d;
-> +	do {
-> +		burstcnt = tpm_read8(chip, (TPM_STS(chip->locality) + 1));
-> +		burstcnt += tpm_read8(chip, TPM_STS(chip->locality) + 2) << 8;
-> +
-> +		if (burstcnt)
-> +			return burstcnt;
-> +
-> +		tpm_mdelay(TPM_TIMEOUT);
-> +	} while (tpm_now_ms() < stop);
-> +
-> +	return -EBUSY;
-> +}
-> +
-> +static int __tis_wait_for_stat(struct tpm_chip *chip, u8 mask, ktime_t timeout)
-> +{
-> +	ktime_t stop;
-> +	u8 status;
-> +
-> +	if ((__tis_status(chip) & mask) == mask)
-> +		return 0;
-> +
-> +	stop = tpm_now_ms() + timeout;
-> +	do {
-> +		tpm_mdelay(TPM_TIMEOUT);
-> +
-> +		status = __tis_status(chip);
-> +		if ((status & mask) == mask)
-> +			return 0;
-> +	} while (tpm_now_ms() < stop);
-> +
-> +	return -ETIME;
-> +}
-> +
-> +static int __tis_recv_data(struct tpm_chip *chip, u8 *buf, int count)
-> +{
-> +	int size = 0;
-> +	int burstcnt;
-> +
-> +	while (size < count && __tis_wait_for_stat(chip, TPM_STS_DATA_AVAIL | TPM_STS_VALID, chip->timeout_c) == 0) {
-> +		burstcnt = __tis_get_burstcount(chip);
-> +
-> +		for ( ; burstcnt > 0 && size < count; --burstcnt)
-> +			buf[size++] = tpm_read8(chip, TPM_DATA_FIFO(chip->locality));
-> +	}
-> +
-> +	return size;
-> +}
-> +
-> +/**
-> + * tpm_tis_check_locality - Check if the given locality is the active one
-> + * @chip:	The TPM chip instance
-> + * @loc:	The locality to check
-> + *
-> + * Return: true - locality active, false - not active
-> + */
-> +bool tpm_tis_check_locality(struct tpm_chip *chip, int loc)
-> +{
-> +	if ((tpm_read8(chip, TPM_ACCESS(loc)) & (TPM_ACCESS_ACTIVE_LOCALITY | TPM_ACCESS_VALID)) == (TPM_ACCESS_ACTIVE_LOCALITY | TPM_ACCESS_VALID)) {
-> +		chip->locality = loc;
-> +		return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +/**
-> + * tpm_tis_release_locality - Release the active locality
-> + * @chip:	The TPM chip instance
-> + */
-> +void tpm_tis_release_locality(struct tpm_chip *chip)
-> +{
-> +	if ((tpm_read8(chip, TPM_ACCESS(chip->locality)) & (TPM_ACCESS_REQUEST_PENDING | TPM_ACCESS_VALID)) == (TPM_ACCESS_REQUEST_PENDING | TPM_ACCESS_VALID))
-> +		tpm_write8(chip, TPM_ACCESS(chip->locality), TPM_ACCESS_RELINQUISH_LOCALITY);
-> +
-> +	chip->locality = 0;
-> +}
-> +
-> +/**
-> + * tpm_tis_request_locality - Request to make the given locality the active one
-> + * @chip:	The TPM chip instance
-> + * @loc:	The locality to make active/set as current
-> + *
-> + * Return:
-> + *  >= 0 - Success, new active locality returned or locality already active
-> + *  < 0  - Error occurred
-> + */
-> +int tpm_tis_request_locality(struct tpm_chip *chip, int loc)
-> +{
-> +	ktime_t stop;
-> +
-> +	if (tpm_tis_check_locality(chip, loc))
-> +		return loc;
-> +
-> +	/* Set the new locality */
-> +	tpm_write8(chip, TPM_ACCESS(loc), TPM_ACCESS_REQUEST_USE);
-> +
-> +	stop = tpm_now_ms() + chip->timeout_b;
-> +	do {
-> +		if (tpm_tis_check_locality(chip, loc))
-> +			return loc;
-> +
-> +		tpm_mdelay(TPM_TIMEOUT);
-> +	} while (tpm_now_ms() < stop);
-> +
-> +	return -1;
-> +}
-> +
-> +/**
-> + * tpm_tis_disable_interrupts - Disable interrupts for the TPM, use polling mode only
-> + * @chip:	The TPM chip instance
-> + */
-> +void tpm_tis_disable_interrupts(struct tpm_chip *chip)
-> +{
-> +	u32 intmask;
-> +
-> +	intmask = tpm_read32(chip, TPM_INT_ENABLE(chip->locality));
-> +	/* Disable everything to make sure it is in a consistent state */
-> +	intmask &= ~(TPM_GLOBAL_INT_ENABLE | TPM_INTF_CMD_READY_INT | TPM_INTF_LOCALITY_CHANGE_INT | TPM_INTF_STS_VALID_INT | TPM_INTF_DATA_AVAIL_INT);
-> +	tpm_write32(chip, TPM_INT_ENABLE(chip->locality), intmask);
-> +}
-> +
-> +/**
-> + * tpm_tis_recv - Receive response data from TPM via TIS FIFO
-> + * @chip:	The TPM chip instance
-> + * @buf:	The response buffer
-> + * @count:	Length of the response buffer
-> + *
-> + * Return:
-> + *  = 0 - Success, no response data
-> + *  > 0 - Success, value is the response data length
-> + *  < 0 - Error occurred
-> + */
-> +static int tpm_tis_recv(struct tpm_chip *chip, u8 *buf, int count)
-> +{
-> +	int expected, status, size = 0, rc = -EIO;
-> +
-> +	if (count < TPM_HEADER_SIZE)
-> +		goto out;
-> +
-> +	/* Read first 10 bytes, including tag, paramsize, and result */
-> +	size = __tis_recv_data(chip, buf, TPM_HEADER_SIZE);
-> +	if (size < TPM_HEADER_SIZE)
-> +		goto out;
-> +
-> +	expected = be32_to_cpu(*((u32 *)(buf + 2)));
-> +	if (expected > count)
-> +		goto out;
-> +
-> +	size += __tis_recv_data(chip, &buf[TPM_HEADER_SIZE], expected - TPM_HEADER_SIZE);
-> +	if (size < expected) {
-> +		rc = -ETIME;
-> +		goto out;
-> +	}
-> +
-> +	__tis_wait_for_stat(chip, TPM_STS_VALID, chip->timeout_c);
-> +
-> +	status = __tis_status(chip);
-> +	if (status & TPM_STS_DATA_AVAIL) {
-> +		rc = -EIO;
-> +		goto out;
-> +	}
-> +
-> +	return size;
-> +out:
-> +	__tis_cancel(chip);
-> +	tpm_tis_release_locality(chip);
-> +	return rc;
-> +}
-> +
-> +/**
-> + * tpm_tis_send - Send command to TPM via TIS FIFO
-> + * @chip:	The TPM chip instance
-> + * @buf:	The command buffer
-> + * @len:	Length of the command buffer to send
-> + *
-> + * Return:
-> + *  = len - Success, all data sent
-> + *  < 0	  - Error occurred
-> + */
-> +static int tpm_tis_send(struct tpm_chip *chip, u8 *buf, int len)
-> +{
-> +	int status, burstcnt = 0;
-> +	int count = 0;
-> +	int rc = 0;
-> +
-> +	status = __tis_status(chip);
-> +	if ((status & TPM_STS_COMMAND_READY) == 0) {
-> +		__tis_cancel(chip);
-> +		if (__tis_wait_for_stat(chip, TPM_STS_COMMAND_READY, chip->timeout_b) < 0) {
-> +			rc = -ETIME;
-> +			goto out_err;
-> +		}
-> +	}
-> +
-> +	while (count < len - 1) {
-> +		burstcnt = __tis_get_burstcount(chip);
-> +		for ( ; burstcnt > 0 && count < len - 1; --burstcnt)
-> +			tpm_write8(chip, TPM_DATA_FIFO(chip->locality), buf[count++]);
-> +
-> +		__tis_wait_for_stat(chip, TPM_STS_VALID, chip->timeout_c);
-> +		status = __tis_status(chip);
-> +		if ((status & TPM_STS_DATA_EXPECT) == 0) {
-> +			rc = -EIO;
-> +			goto out_err;
-> +		}
-> +	}
-> +
-> +	/* Write last byte */
-> +	tpm_write8(chip, TPM_DATA_FIFO(chip->locality), buf[count]);
-> +	__tis_wait_for_stat(chip, TPM_STS_VALID, chip->timeout_c);
-> +	status = __tis_status(chip);
-> +	if ((status & TPM_STS_DATA_EXPECT) != 0) {
-> +		rc = -EIO;
-> +		goto out_err;
-> +	}
-> +
-> +	/* Go and do it */
-> +	tpm_write8(chip, TPM_STS(chip->locality), TPM_STS_GO);
-> +
-> +	return len;
-> +
-> +out_err:
-> +	__tis_cancel(chip);
-> +	tpm_tis_release_locality(chip);
-> +	return rc;
-> +}
-> +
-> +/**
-> + * tpm_tis_transmit - Transmit a TPM FIFO command
-> + * @chip:	The TPM chip instance
-> + * @buf:	The request and response buffer object
-> + * @bufsize:	Entire size available in buffer
-> + *
-> + * Return:
-> + *  = 0 - Success, no returned data
-> + *  > 0 - Success, value is the return data length
-> + *  < 0 - Error occurred
-> + */
-> +static int tpm_tis_transmit(struct tpm_chip *chip, u8 *buf, u32 bufsize)
-> +{
-> +	ktime_t stop;
-> +	u32 count;
-> +	u8 status;
-> +	int rc;
-> +
-> +	count = be32_to_cpu(*((u32 *) (buf + 2)));
-> +	if (count == 0)
-> +		return -ENODATA;
-> +
-> +	if (count > bufsize)
-> +		return -E2BIG;
-> +
-> +	rc = tpm_tis_send(chip, buf, count);
-> +	if (rc < 0)
-> +		goto out;
-> +
-> +	stop = tpm_now_ms() + TIS_DURATION;
-> +	do {
-> +		status = __tis_status(chip);
-> +		if ((status & (TPM_STS_DATA_AVAIL | TPM_STS_VALID)) == (TPM_STS_DATA_AVAIL | TPM_STS_VALID))
-> +			goto out_recv;
-> +
-> +		if (status == TPM_STS_COMMAND_READY) {
-> +			rc = -ECANCELED;
-> +			goto out;
-> +		}
-> +
-> +		tpm_mdelay(TPM_TIMEOUT);
-> +		rmb();
-> +	} while (tpm_now_ms() < stop);
-> +
-> +	/* Cancel the command */
-> +	__tis_cancel(chip);
-> +	rc = -ETIME;
-> +	goto out;
-> +
-> +out_recv:
-> +	rc = tpm_tis_recv(chip, buf, bufsize);
-> +	if (rc >= 0) {
-> +		if (rc > 0 && rc < TPM_HEADER_SIZE)
-> +			return -EFAULT;
-> +		return rc;
-> +	}
-> +	/* Else return was an error, nothing to receive */
-> +
-> +out:
-> +	return rc;
-> +}
-> +
-> +/**
-> + * tpm_find_interface_and_family - interface FIFO/CRB, family 2.0 or 1.2
-> + * @chip:	The TPM chip instance
-> + *
-> + * Return: TPM family ID enum
-> + */
-> +static enum tpm_family tpm_find_interface_and_family(struct tpm_chip *chip)
-> +{
-> +	struct tpm_intf_capability intf_cap;
-> +	struct tpm_interface_id intf_id;
-> +
-> +	/* Sort out whether it is 1.x */
-> +	intf_cap.val = tpm_read32(chip, TPM_INTF_CAPS(0));
-> +	if ((intf_cap.interface_version == TPM_TIS_INTF_12) ||
-> +	    (intf_cap.interface_version == TPM_TIS_INTF_13))
-> +		return TPM_FAMILY_12; /* Always TIS */
-> +
-> +	/* Assume that it is 2.0 but check if the interface is CRB */
-> +	intf_id.val = tpm_read32(chip, TPM_INTF_ID(0));
-> +	if (intf_id.interface_type == TPM_CRB_INTF_ACTIVE)
-> +		return TPM_FAMILY_INVALID;
-> +
-> +	/* Else TPM 2.0 with TIS interface */
-> +	return TPM_FAMILY_20;
-> +}
-> +
-> +/**
-> + * tpm1_pcr_extend - send a TPM1 extend command to the device
-> + * @chip:	a TPM chip to use
-> + * @pcr_idx:	the PCR index to extend for the current locality
-> + * @hash:	the SHA1 hash digest to extend
-> + *
-> + * Return:
-> + * * 0		- OK
-> + * * -errno	- A system error
-> + * * TPM_RC	- A TPM error
-> + */
-> +int tpm1_pcr_extend(struct tpm_chip *chip, u32 pcr_idx, const u8 *hash)
-> +{
-> +	int rc = 0;
-> +	struct tpm_buf *buf = tpm_buf_alloc_page();
-> +
-> +	if (!buf)
-> +		return -ENOMEM;
-> +
-> +	tpm_buf_init(buf, TPM_BUFSIZE);
-> +	tpm_buf_reset(buf, TPM_TAG_RQU_COMMAND, TPM_ORD_PCR_EXTEND);
-> +
-> +	tpm_buf_append_u32(buf, pcr_idx);
-> +	tpm_buf_append(buf, hash, TPM_DIGEST_SIZE);
-> +
-> +	rc = tpm_tis_transmit(chip, buf->data, PAGE_SIZE);
-> +
-> +	/* Ignoring output */
-> +	if (rc > 0)
-> +		rc = 0;
-> +
-> +	tpm_buf_free_page();
-> +
-> +	return rc;
-> +}
-> +
-> +/**
-> + * tpm2_pcr_extend() - send a TPM2 extend command to the device
-> + *
-> + * @chip:		TPM chip to use.
-> + * @pcr_idx:		index of the PCR.
-> + * @digests:		list of PCR banks and corresponding digest values to extend.
-> + * @digest_count:	count of digests to extend
-> + *
-> + * Return:
-> + * * 0		- OK
-> + * * -errno	- A system error
-> + * * TPM_RC	- A TPM error
-> + */
-> +int tpm2_pcr_extend(struct tpm_chip *chip, u32 pcr_idx,
-> +		    struct tpm_digest *digests, u32 digest_count)
-> +{
-> +	struct tpm_buf *buf = tpm_buf_alloc_page();
-> +	int rc = 0, i;
-> +
-> +	if (!buf)
-> +		return -ENOMEM;
-> +
-> +	tpm_buf_init(buf, TPM_BUFSIZE);
-> +	tpm_buf_reset(buf, TPM2_ST_SESSIONS, TPM2_CC_PCR_EXTEND);
-> +
-> +	tpm_buf_append_handle(buf, pcr_idx);
-> +
-> +	/* Setup a NULL auth session for the command */
-> +	tpm_buf_append_u32(buf, 9);
-> +	/* auth handle */
-> +	tpm_buf_append_u32(buf, TPM2_RS_PW);
-> +	/* nonce */
-> +	tpm_buf_append_u16(buf, 0);
-> +	/* attributes */
-> +	tpm_buf_append_u8(buf, 0);
-> +	/* passphrase */
-> +	tpm_buf_append_u16(buf, 0);
-> +
-> +	tpm_buf_append_u32(buf, digest_count);
-> +
-> +	for (i = 0; i < digest_count; i++) {
-> +		tpm_buf_append_u16(buf, digests[i].alg_id);
-> +		tpm_buf_append(buf, (const unsigned char *)&digests[i].digest,
-> +			       tpm_get_alg_size(digests[i].alg_id));
-> +	}
-> +
-> +	rc = tpm_tis_transmit(chip, buf->data, PAGE_SIZE);
-> +
-> +	/* Ignoring output */
-> +	if (rc > 0)
-> +		rc = 0;
-> +
-> +	tpm_buf_free_page();
-> +
-> +	return rc;
-> +}
-> +
-> +int early_tpm_init(struct tpm_chip *chip, u64 baseaddr)
-> +{
-> +	u32 didvid;
-> +
-> +	memset(chip, 0, sizeof(*chip));
-> +	chip->baseaddr = baseaddr;
-> +
-> +	chip->family = tpm_find_interface_and_family(chip);
-> +	if (chip->family == TPM_FAMILY_INVALID)
-> +		return TPM_ERR_INVALID_FAMILY;
-> +
-> +	/* Set default timeouts */
-> +	chip->timeout_a = TIS_SHORT_TIMEOUT;
-> +	chip->timeout_b = TIS_LONG_TIMEOUT;
-> +	chip->timeout_c = TIS_SHORT_TIMEOUT;
-> +	chip->timeout_d = TIS_SHORT_TIMEOUT;
-> +
-> +	/* Get the vendor and device ids */
-> +	didvid = tpm_read32(chip, TPM_DID_VID(0));
-> +	chip->did = didvid >> 16;
-> +	chip->vid = didvid & 0xFFFF;
-> +
-> +	return TPM_SUCCESS;
-> +}
-> +
-> +int early_tpm_fini(struct tpm_chip *chip)
-> +{
-> +	tpm_tis_release_locality(chip);
-> +	memset(chip, 0, sizeof(*chip));
-> +
-> +	return TPM_SUCCESS;
-> +}
-> diff --git a/arch/x86/boot/compressed/tpm.h b/arch/x86/boot/compressed/tpm.h
-> new file mode 100644
-> index 000000000000..6986593e0100
-> --- /dev/null
-> +++ b/arch/x86/boot/compressed/tpm.h
-> @@ -0,0 +1,42 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef BOOT_COMPRESSED_TPM_H
-> +#define BOOT_COMPRESSED_TPM_H
-> +
-> +enum early_tis_defaults {
-> +	TIS_MEM_X86_LPC_BASE	= 0xFED40000,
-> +	TIS_MEM_X86_LEN		= 0x5000,
-> +	TPM_TIMEOUT		= 5, /* ms */
-> +	TIS_DURATION		= 120000, /* 120 secs in ms */
-> +};
-> +
-> +enum tpm_family {
-> +	TPM_FAMILY_INVALID	= 0,
-> +	TPM_FAMILY_12		= 1,
-> +	TPM_FAMILY_20		= 2
-> +};
-> +
-> +struct tpm_chip {
-> +	enum tpm_family family;
-> +	u64 baseaddr;
-> +	int locality;
-> +	int did;
-> +	int vid;
-> +
-> +	/* in ms */
-> +	ktime_t timeout_a;
-> +	ktime_t timeout_b;
-> +	ktime_t timeout_c;
-> +	ktime_t timeout_d;
-> +};
-> +
-> +bool tpm_tis_check_locality(struct tpm_chip *chip, int loc);
-> +void tpm_tis_release_locality(struct tpm_chip *chip);
-> +int tpm_tis_request_locality(struct tpm_chip *chip, int loc);
-> +void tpm_tis_disable_interrupts(struct tpm_chip *chip);
-> +int tpm1_pcr_extend(struct tpm_chip *chip, u32 pcr_idx, const u8 *hash);
-> +int tpm2_pcr_extend(struct tpm_chip *chip, u32 pcr_idx,
-> +		    struct tpm_digest *digests, u32 digest_count);
-> +int early_tpm_init(struct tpm_chip *chip, u64 baseaddr);
-> +int early_tpm_fini(struct tpm_chip *chip);
-> +
-> +#endif /* BOOT_COMPRESSED_TPM_H */
-> -- 
-> 2.43.7
-> 
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 107ccb2ade42..c6117c23eb25 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -4814,7 +4814,8 @@ static void dpaa2_dpseci_free(struct dpaa2_caam_priv *priv)
+ {
+ 	struct device *dev = priv->dev;
+ 	struct fsl_mc_device *ls_dev = to_fsl_mc_device(dev);
+-	int err;
++	struct dpaa2_caam_priv_per_cpu *ppriv;
++	int i, err;
+ 
+ 	if (DPSECI_VER(priv->major_ver, priv->minor_ver) > DPSECI_VER(5, 3)) {
+ 		err = dpseci_reset(priv->mc_io, 0, ls_dev->mc_handle);
+@@ -4822,6 +4823,12 @@ static void dpaa2_dpseci_free(struct dpaa2_caam_priv *priv)
+ 			dev_err(dev, "dpseci_reset() failed\n");
+ 	}
+ 
++	for_each_cpu(i, priv->clean_mask) {
++		ppriv = per_cpu_ptr(priv->ppriv, i);
++		free_netdev(ppriv->net_dev);
++	}
++	free_cpumask_var(priv->clean_mask);
++
+ 	dpaa2_dpseci_congestion_free(priv);
+ 	dpseci_close(priv->mc_io, 0, ls_dev->mc_handle);
+ }
+@@ -5007,16 +5014,15 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
+ 	struct device *dev = &ls_dev->dev;
+ 	struct dpaa2_caam_priv *priv;
+ 	struct dpaa2_caam_priv_per_cpu *ppriv;
+-	cpumask_var_t clean_mask;
+ 	int err, cpu;
+ 	u8 i;
+ 
+ 	err = -ENOMEM;
+-	if (!zalloc_cpumask_var(&clean_mask, GFP_KERNEL))
+-		goto err_cpumask;
+-
+ 	priv = dev_get_drvdata(dev);
+ 
++	if (!zalloc_cpumask_var(&priv->clean_mask, GFP_KERNEL))
++		goto err_cpumask;
++
+ 	priv->dev = dev;
+ 	priv->dpsec_id = ls_dev->obj_desc.id;
+ 
+@@ -5118,7 +5124,7 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
+ 			err = -ENOMEM;
+ 			goto err_alloc_netdev;
+ 		}
+-		cpumask_set_cpu(cpu, clean_mask);
++		cpumask_set_cpu(cpu, priv->clean_mask);
+ 		ppriv->net_dev->dev = *dev;
+ 
+ 		netif_napi_add_tx_weight(ppriv->net_dev, &ppriv->napi,
+@@ -5126,18 +5132,16 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
+ 					 DPAA2_CAAM_NAPI_WEIGHT);
+ 	}
+ 
+-	err = 0;
+-	goto free_cpumask;
++	return 0;
+ 
+ err_alloc_netdev:
+-	free_dpaa2_pcpu_netdev(priv, clean_mask);
++	free_dpaa2_pcpu_netdev(priv, priv->clean_mask);
+ err_get_rx_queue:
+ 	dpaa2_dpseci_congestion_free(priv);
+ err_get_vers:
+ 	dpseci_close(priv->mc_io, 0, ls_dev->mc_handle);
+ err_open:
+-free_cpumask:
+-	free_cpumask_var(clean_mask);
++	free_cpumask_var(priv->clean_mask);
+ err_cpumask:
+ 	return err;
+ }
+@@ -5182,7 +5186,6 @@ static int __cold dpaa2_dpseci_disable(struct dpaa2_caam_priv *priv)
+ 		ppriv = per_cpu_ptr(priv->ppriv, i);
+ 		napi_disable(&ppriv->napi);
+ 		netif_napi_del(&ppriv->napi);
+-		free_netdev(ppriv->net_dev);
+ 	}
+ 
+ 	return 0;
+diff --git a/drivers/crypto/caam/caamalg_qi2.h b/drivers/crypto/caam/caamalg_qi2.h
+index 61d1219a202f..8e65b4b28c7b 100644
+--- a/drivers/crypto/caam/caamalg_qi2.h
++++ b/drivers/crypto/caam/caamalg_qi2.h
+@@ -42,6 +42,7 @@
+  * @mc_io: pointer to MC portal's I/O object
+  * @domain: IOMMU domain
+  * @ppriv: per CPU pointers to privata data
++ * @clean_mask: CPU mask of CPUs that have allocated netdevs
+  */
+ struct dpaa2_caam_priv {
+ 	int dpsec_id;
+@@ -65,6 +66,7 @@ struct dpaa2_caam_priv {
+ 
+ 	struct dpaa2_caam_priv_per_cpu __percpu *ppriv;
+ 	struct dentry *dfs_root;
++	cpumask_var_t clean_mask;
+ };
+ 
+ /**
+-- 
+2.52.0
 
-BR, Jarkko
