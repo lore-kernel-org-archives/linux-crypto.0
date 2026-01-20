@@ -1,194 +1,346 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A4D3D5242
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 14:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF2F426EB3
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 14:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768920574; cv=none; b=VI6XNPtT/ul44+Duo34cMc36mi10Wl4q9J0UY5rvS5qx7zeMmSJkXimfTl3H/+e87BTACATTk9/RXRFBQCyqT57bdawOA+Q+Gh9jiqZSNNKbK81SAeEfjTOUgLsNZUcnf8KmXbprUvFnTWYxadAOgtdlNPz/Q+/MTgxaTnM0cXU=
+	t=1768920681; cv=none; b=Ebrv67h4BDTfwVJ1ThVumXDbp82pD/k27aMdJ6me6HSowZ8DhdltseTnR5fLh9VZuQAIPis1+3ZvjU+1zfzn97adaAGcpvTyzCpDgSUpr/uy4CGN6ETqW9hvFhCqC3GvDBBfgOX8slna/nEiUyhwfnfSFsF1WsqhvhobY3ih0No=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768920574; c=relaxed/simple;
-	bh=cld2wmZoJ3rj/J+xhTxAwklwv2ytG7pFtjjFpgprF+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tjNZbTdxRXFI6ZgKq/TUgU/unsloRLfJTiOCDH48EpmdszviEPWGsc8FpRVU1zesR6piQuyt1tpG9QfEtTngtXw5/yvgqOtY0o0k5My3ul2ideMpqyLLN2xOpehbRzZsePCwcd+kO8NPEgVcRTKI6Y5Tfnl7W5E2/UjqB+Y/eLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=khOALW+b; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=GjUOnQK/; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1768920681; c=relaxed/simple;
+	bh=fmNswl1NBVXKoxKDQ+tEGMs9m81fa/e0+Cmz0lYHe8s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fXtVkre+qCz5RS6gIzJwQP7o3j+TBwClh/o0mEFnVSVdH63TKRfpowIWsIGGmoxIoe+OpMvnCM8mDhLFBKH/zhEluRlFwRtgvDW7LAMhmjv0/HscbJUA2OcK79YMZRy7l+IIYiGtKP+FgHwGGjsgTfWBnTCzDDs268y7WRcdLSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P6EbatVI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="khOALW+b";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="GjUOnQK/"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60KBg8ON3252513
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 14:49:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=LVjRE4VxYV0zLdBnpQoBaqo4
-	k87tJBm7GQsAW6vpzJo=; b=khOALW+bmfx8LK59WwyLADZYon7JsYdr2uxX9Mns
-	jt9gJUfTD4WM1Xm+/YST1wZkuRNDD82fzK7xaFJLio/6A4tjrnrobr6vckTTqtCn
-	MfwEAyWQDRRSBwsmQ+haNjLdXMWA1VJxF7twx6M7wdqgnfIYBk1IUPsa0a3hEFM/
-	PyJWoLy7TirDtPszqrXKF0PBTB2nWM89Js5V10/xXdH5jCHeXw++ORSNU7FfTwV6
-	T/eJDbqHiAXixM/vmIKrEdJZubJYx4Q89KxZyEZTSlS92BcGigeXZW66iENFRQus
-	tN1ElgnqcN48ETp0LgGAkC6uCiqnKJgPWE2dn2hXjErk1Q==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bt27ahunf-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 14:49:30 +0000 (GMT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8c52f07fbd0so162865485a.2
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 06:49:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1768920570; x=1769525370; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LVjRE4VxYV0zLdBnpQoBaqo4k87tJBm7GQsAW6vpzJo=;
-        b=GjUOnQK/T6mqXJfCMS4rqtB8/wEUPCHl0cgrqahEY9XH+OI+63y6+vsf4JEunncPVS
-         1GUyUGRoSxIFGrYTqoA9EYmGzd1hQ1/A8s2817Dvh4qp+sICfTKFtDBdeRsSIcdyti3v
-         rFmxZsZIlVT0WQthoLylCQSxuzzJvPxmIHY523wAqgNmdD9W/3jfgbdAL6RYRvrA20bq
-         Hu+yyJZpbT5E/Mnq3vBOkmsQ8kSlsnAqOHxBvI+eAbP+yTkoShf8zGu8WNU1gqBo8leC
-         7QXQ2ShqGqS0KFZ09uFrdSAJE9r3KSMXWI+paBKxsaHUcLfKyoW9ihwVuBVNxL7p7QD9
-         YLqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768920570; x=1769525370;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LVjRE4VxYV0zLdBnpQoBaqo4k87tJBm7GQsAW6vpzJo=;
-        b=w6cmHKjuaDn9Ufy3SAouxm3aMwnOwgU9/d2qBIOUSb6Jx0ckHS/uhJUADcF7mKs/PF
-         sretrJG+Z4mD80+Le3jD7oJcSGod/mHJ2X6+BuRwcgHFDfEHOw57gWN0N4mQ2Yeotxte
-         bCMtzlJYvCzHZ9EbYsQQnY0XP9p/QU5H5pNUgieyrJeuVA/PK9zuE/YUTiPjQBemH/i1
-         20a1D/oIv7fOWgbV58g9xzqfs91HG62htOUIE+im1pCLXRmpUT35C/lFhFrwLs9mUgQp
-         fXE5GutW6QC+xd4B4PT+UmzkKaOpcsY1XZtAbsvw38EVR0qIG1tTEfiF+e3AjSnuatHX
-         FiNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXN/WH48MVuvP9xNCvGRbMBZJAPcBBwxU0QCMkjGgWGCJyexGa31GFh59oYMAlsao9ewLX/n39sXBwsGkA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuK/GtCcqzlXf1+qwPyzwPT7FRk02caesR+DAZQE2ZVBE/euea
-	fN0HN98WKvMajBnGJn/k+0MHN3IKYgg5nDkQpC0d8nOc3Jbb7pqCXElYGkDiMYspA5AN+hca3Yb
-	V53ejyfWm5icCCuwgPn7mb2P7M6satcPDQ+Dd+hvPkUYmxthxbG/YR7UPdzq9xAopO20=
-X-Gm-Gg: AY/fxX4VItPwBXS6achQhZfvQpZI9GO0aNUJ/F3iBfKt6S6ThAR/ZXNW08FxmzjW0la
-	eIFMgZe/mAyujRLYRtjGp3gAH3PlFq8iPVm3wM9u+3RAOvbMxuMaliR9oShmL/xQsaQ/63Hi9gm
-	RBG5HyBurv6pFMKtl+F5fI++GdhUdyXN61YQU2xww7+o9/s8wS0/V0Xq1aztFcJQIF3clHbo60H
-	VQ56Ygm3JubQlED5E0ye1zTWSQjlsoaKmZuQNo7h7fXkWq+CckKjMFkDtKns6TfWf8frqKao3ZV
-	S/pWuEzkPuTNWIhfIepBIpgsXE1N8w9LwHhzkGy+OWwt+hK8X+DR20dSr1tF3WxJaFR27Ey29ka
-	1pIhoNWsGqtGNOx/gxhzEEUxx
-X-Received: by 2002:a05:620a:17a3:b0:8b2:f182:694e with SMTP id af79cd13be357-8c6a6945228mr1898004885a.54.1768920570007;
-        Tue, 20 Jan 2026 06:49:30 -0800 (PST)
-X-Received: by 2002:a05:620a:17a3:b0:8b2:f182:694e with SMTP id af79cd13be357-8c6a6945228mr1898000585a.54.1768920569328;
-        Tue, 20 Jan 2026 06:49:29 -0800 (PST)
-Received: from oss.qualcomm.com ([86.121.163.152])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-654534c8791sm13235856a12.24.2026.01.20.06.49.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 06:49:28 -0800 (PST)
-Date: Tue, 20 Jan 2026 16:49:26 +0200
-From: Abel Vesa <abel.vesa@oss.qualcomm.com>
-To: Luca Weiss <luca.weiss@fairphone.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>, Vinod Koul <vkoul@kernel.org>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-phy@lists.infradead.org,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Subject: Re: [PATCH v2 5/6] arm64: dts: qcom: milos: Add UFS nodes
-Message-ID: <zvagnaxqgrpm6bagw6zuov4oi6o4b7vmy673oh5st22tec2swl@abvblxgray2s>
-References: <20260112-milos-ufs-v2-0-d3ce4f61f030@fairphone.com>
- <20260112-milos-ufs-v2-5-d3ce4f61f030@fairphone.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6EbatVI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768920678;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=a+RtktdyIP1T7Sefe9pReT1Jhdb8TGsjxeEjHzpydH0=;
+	b=P6EbatVI7+m6OTHdVK6FRYCqDg0iZllgdwODPpU1uJxkVldWf4jwGvgrPjNjsrbFv1k8MH
+	64Va/45iGMhYLi4SuMgCEl9QziznshVAW9bN9XvVcfkSraPviD5hFG13io+eE91bq1nS4+
+	oM0MzBQxK12J7VtZ6xTWwRlO7I9epvk=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-18-jLFTHfMkN8C2qR56Wd3UUg-1; Tue,
+ 20 Jan 2026 09:51:14 -0500
+X-MC-Unique: jLFTHfMkN8C2qR56Wd3UUg-1
+X-Mimecast-MFC-AGG-ID: jLFTHfMkN8C2qR56Wd3UUg_1768920672
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9985A195423A;
+	Tue, 20 Jan 2026 14:51:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk.com (unknown [10.42.28.2])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5264519560AB;
+	Tue, 20 Jan 2026 14:51:06 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>,
+	linux-crypto@vger.kernel.org,
+	keyrings@vger.kernel.org,
+	linux-modules@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v13 00/12] x509, pkcs7, crypto: Add ML-DSA and RSASSA-PSS signing
+Date: Tue, 20 Jan 2026 14:50:46 +0000
+Message-ID: <20260120145103.1176337-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260112-milos-ufs-v2-5-d3ce4f61f030@fairphone.com>
-X-Proofpoint-ORIG-GUID: YsZERVNIaJpkQrMMkOTbDb0Qq0ZkKm4l
-X-Proofpoint-GUID: YsZERVNIaJpkQrMMkOTbDb0Qq0ZkKm4l
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIwMDEyMyBTYWx0ZWRfX1dH3N5oo+po5
- SL7LAuWd9j3gR7AxEqc0RmdHeJ4pv2Fq5j/9Im66iQgYEwKjRZTnWB6ECZlXUONBZPHksZlHbU4
- YYYo+shvDj7o3SFfaOXJFMcYq108OTwWR1sf6yA9KDmpYvrvn+Oj6ugClE1np2yOPVkY6Cqg0wf
- g/2W3Cnx6Vk5+rOFOqHRMEW1GQl8ViXzu0niTr3Emmg4OC4xqhSda8c8TbllsgXd8DVRWHIp8oH
- cjHFIbY6OePAf8oz6F8Kdg4m+MRE1aPxa5s2RSOFfDTxxVQ0Gcqs9e7htc/dlJ2tssoCHbXxgBl
- BWPBqDYPN3B82dwIgGbiBRZGVpRlaadkPKCQ5a66fRc5mLqKVndL/9qgs8UlLkovxzZgYaGjqm7
- e3rS5J6Lbdzn/Nkdcnzsprbd+2O5wsb7MUYPun7kzRwMXg7u0u1p3+RNXRvSfkxvV1FjLXHAQRR
- 32G1fM8yXqdGSCBYBTw==
-X-Authority-Analysis: v=2.4 cv=P6U3RyAu c=1 sm=1 tr=0 ts=696f95fa cx=c_pps
- a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=RUlelSpolvTNyr7Sls5SJA==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=6H0WHjuAAAAA:8
- a=0k69HSTtqGF5rPJBr-4A:9 a=CjuIK1q_8ugA:10 a=PEH46H7Ffwr30OY-TuGO:22
- a=Soq9LBFxuPC4vsCAQt-j:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
- definitions=2026-01-20_04,2026-01-20_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0 impostorscore=0
- phishscore=0 spamscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2601200123
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 26-01-12 14:53:18, Luca Weiss wrote:
-> Add the nodes for the UFS PHY and UFS host controller, along with the
-> ICE used for UFS.
-> 
-> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> ---
->  arch/arm64/boot/dts/qcom/milos.dtsi | 129 +++++++++++++++++++++++++++++++++++-
->  1 file changed, 126 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/milos.dtsi b/arch/arm64/boot/dts/qcom/milos.dtsi
-> index e1a51d43943f..7c8a84bfaee1 100644
-> --- a/arch/arm64/boot/dts/qcom/milos.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/milos.dtsi
-> @@ -1151,6 +1151,129 @@ aggre2_noc: interconnect@1700000 {
->  			qcom,bcm-voters = <&apps_bcm_voter>;
->  		};
->  
-> +		ufs_mem_phy: phy@1d80000 {
-> +			compatible = "qcom,milos-qmp-ufs-phy";
-> +			reg = <0x0 0x01d80000 0x0 0x2000>;
-> +
-> +			clocks = <&rpmhcc RPMH_CXO_CLK>,
-> +				 <&gcc GCC_UFS_PHY_PHY_AUX_CLK>,
-> +				 <&tcsr TCSR_UFS_CLKREF_EN>;
-> +			clock-names = "ref",
-> +				      "ref_aux",
-> +				      "qref";
-> +
-> +			resets = <&ufs_mem_hc 0>;
-> +			reset-names = "ufsphy";
-> +
-> +			power-domains = <&gcc UFS_MEM_PHY_GDSC>;
-> +
-> +			#clock-cells = <1>;
-> +			#phy-cells = <0>;
-> +
-> +			status = "disabled";
-> +		};
-> +
-> +		ufs_mem_hc: ufshc@1d84000 {
-> +			compatible = "qcom,milos-ufshc", "qcom,ufshc", "jedec,ufs-2.0";
-> +			reg = <0x0 0x01d84000 0x0 0x3000>;
-> +
-> +			interrupts = <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH 0>;
-> +
-> +			clocks = <&gcc GCC_UFS_PHY_AXI_CLK>,
-> +				 <&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
-> +				 <&gcc GCC_UFS_PHY_AHB_CLK>,
-> +				 <&gcc GCC_UFS_PHY_UNIPRO_CORE_CLK>,
-> +				 <&tcsr TCSR_UFS_PAD_CLKREF_EN>,
+Hi Lukas, Ignat,
 
-Maybe I'm looking at the wrong documentation, but it doesn't seem to exist
-such clock on Milos. It does exist on SM8650 though. So maybe the TCSR CC
-driver is not really that much compatible between these two platforms.
+[Note this is based on Eric Bigger's libcrypto-next branch].
 
-I take it that the UFS works. Maybe because the actual TCSR UFS clkref
-is left enabled at boot?
+These patches add ML-DSA module signing and RSASSA-PSS module signing.  The
+first half of the set adds ML-DSA signing:
+
+ (1) Add a crypto_sig interface for ML-DSA, verification only.
+
+ (2) Modify PKCS#7 support to allow kernel module signatures to carry
+     authenticatedAttributes as OpenSSL refuses to let them be opted out of
+     for ML-DSA (CMS_NOATTR).  This adds an extra digest calculation to the
+     process.
+
+     Modify PKCS#7 to pass the authenticatedAttributes directly to the
+     ML-DSA algorithm rather than passing over a digest as is done with RSA
+     as ML-DSA wants to do its own hashing and will add other stuff into
+     the hash.  We could use hashML-DSA or an external mu instead, but they
+     aren't standardised for CMS yet.
+
+ (3) Add support to the PKCS#7 and X.509 parsers for ML-DSA.
+
+ (4) Modify sign-file to handle OpenSSL not permitting CMS_NOATTR with
+     ML-DSA and add ML-DSA to the choice of algorithm with which to sign
+     modules.  Note that this might need some more 'select' lines in the
+     Kconfig to select the lib stuff as well.
+
+This is based on Eric's libcrypto-next branch which has the core
+implementation of ML-DSA.
+
+The second half of the set adds RSASSA-PSS signing:
+
+ (5) Add an info string parameter to the internal signature verification
+     routines where that does not already exist.  This is necessary to pass
+     extra parameters and is already supported in the KEYCTL_PKEY_VERIFY
+     keyctl.
+
+     Both X.509 and PKCS#7 provide for these parameters to be supplied, but
+     it is tricky to pass the parameters in a blob with the signature or
+     key data as there are checks on these sizes that are then violated;
+     further, the way the parameters are laid out in the ASN.1 doesn't lend
+     itself easily to simply extracting out a larger blob.
+
+ (6) Add RSASSA-PSS support to the RSA driver in crypto/.  This parses the
+     info string to get the verification parameters.
+
+ (7) Add support to the PKCS#7 and X.509 parsers for RSASSA-PSS.
+
+ (8) Modify sign-file to pass the extra parameters necessary to be able
+     generate RSASSA-PSS.  For the moment, only select MGF1 with the same
+     hash algorithm as for the data for the mask function.  Add RSASSA-PSS
+     to the choice of algorithm with which to sign modules.
+
+Note that I do still need to add some FIPS tests for ML-DSA in the form of
+X.509 certs, data and detached PKCS#7 signatures.  I'm not sure if I can
+use FIPS-standard tests for that.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-pqc
+
+David
+
+Changes
+=======
+ver #13)
+ - Allow a zero-length salt in RSAPSS-PSS.
+ - Don't reject ECDSA/ECRDSA with SHA256 and SHA384 otherwise the FIPS
+   selftest panics when used.
+ - Add a FIPS test for RSASSA-PSS (from NIST's SigVerPSS_186-3.rsp).
+ - Add a FIPS test for ML-DSA (from NIST's FIPS204 JSON set).
+
+ver #12)
+ - Rebased on Eric's libcrypto-next branch.
+ - Delete references to Dilithium (ML-DSA derived from this).
+ - Made sign-file supply CMS_NOATTR for ML-DSA if openssl >= v4.
+ - Made it possible to do ML-DSA over the data without signedAttrs.
+ - Made RSASSA-PSS info parser use strsep() and match_token().
+ - Cleaned the RSASSA-PSS param parsing.
+ - Added limitation on what hashes can be used with what algos.
+ - Moved __free()-marked variables to the point of setting.
+
+ver #11)
+ - Rebased on Eric's libcrypto-next branch.
+ - Added RSASSA-PSS support patches.
+
+ver #10)
+ - Replaced the Leancrypto ML-DSA implementation with Eric's.
+ - Fixed Eric's implementation to have MODULE_* info.
+ - Added a patch to drive Eric's ML-DSA implementation from crypto_sig.
+ - Removed SHAKE256 from the list of available module hash algorithms.
+ - Changed a some more ML_DSA to MLDSA in config symbols.
+
+ver #9)
+ - ML-DSA changes:
+   - Separate output into four modules (1 common, 3 strength-specific).
+     - Solves Kconfig issue with needing to select at least one strength.
+   - Separate the strength-specific crypto-lib APIs.
+     - This is now generated by preprocessor-templating.
+   - Remove the multiplexor code.
+   - Multiplex the crypto-lib APIs by C type.
+ - Fix the PKCS#7/X.509 code to have the correct algo names.
+
+ver #8)
+ - Moved the ML-DSA code to lib/crypto/mldsa/.
+ - Renamed some bits from ml-dsa to mldsa.
+ - Created a simplified API and placed that in include/crypto/mldsa.h.
+ - Made the testing code use the simplified API.
+ - Fixed a warning about implicitly casting between uint16_t and __le16.
+
+ver #7)
+ - Rebased on Eric's tree as that now contains all the necessary SHA-3
+   infrastructure and drop the SHA-3 patches from here.
+ - Added a minimal patch to provide shake256 support for crypto_sig.
+ - Got rid of the memory allocation wrappers.
+ - Removed the ML-DSA keypair generation code and the signing code, leaving
+   only the signature verification code.
+ - Removed the secret key handling code.
+ - Removed the secret keys from the kunit tests and the signing testing.
+ - Removed some unused bits from the ML-DSA code.
+ - Downgraded the kdoc comments to ordinary comments, but keep the markup
+   for easier comparison to Leancrypto.
+
+ver #6)
+ - Added a patch to make the jitterentropy RNG use lib/sha3.
+ - Added back the crypto/sha3_generic changes.
+ - Added ML-DSA implementation (still needs more cleanup).
+ - Added kunit test for ML-DSA.
+ - Modified PKCS#7 to accommodate ML-DSA.
+ - Modified PKCS#7 and X.509 to allow ML-DSA to be specified and used.
+ - Modified sign-file to not use CMS_NOATTR with ML-DSA.
+ - Allowed SHA3 and SHAKE* algorithms for module signing default.
+ - Allowed ML-DSA-{44,65,87} to be selected as the module signing default.
+
+ver #5)
+ - Fix gen-hash-testvecs.py to correctly handle algo names that contain a
+   dash.
+ - Fix gen-hash-testvecs.py to not generate HMAC for SHA3-* or SHAKE* as
+   these don't currently have HMAC variants implemented.
+ - Fix algo names to be correct.
+ - Fix kunit module description as it now tests all SHA3 variants.
+
+ver #4)
+ - Fix a couple of arm64 build problems.
+ - Doc fixes:
+   - Fix the description of the algorithm to be closer to the NIST spec's
+     terminology.
+   - Don't talk of finialising the context for XOFs.
+   - Don't say "Return: None".
+   - Declare the "Context" to be "Any context" and make no mention of the
+     fact that it might use the FPU.
+   - Change "initialise" to "initialize".
+   - Don't warn that the context is relatively large for stack use.
+ - Use size_t for size parameters/variables.
+ - Make the module_exit unconditional.
+ - Dropped the crypto/ dir-affecting patches for the moment.
+
+ver #3)
+ - Renamed conflicting arm64 functions.
+ - Made a separate wrapper API for each algorithm in the family.
+ - Removed sha3_init(), sha3_reinit() and sha3_final().
+ - Removed sha3_ctx::digest_size.
+ - Renamed sha3_ctx::partial to sha3_ctx::absorb_offset.
+ - Refer to the output of SHAKE* as "output" not "digest".
+ - Moved the Iota transform into the one-round function.
+ - Made sha3_update() warn if called after sha3_squeeze().
+ - Simplified the module-load test to not do update after squeeze.
+ - Added Return: and Context: kdoc statements and expanded the kdoc
+   headers.
+ - Added an API description document.
+ - Overhauled the kunit tests.
+   - Only have one kunit test.
+   - Only call the general hash tester on one algo.
+   - Add separate simple cursory checks for the other algos.
+   - Add resqueezing tests.
+   - Add some NIST example tests.
+ - Changed crypto/sha3_generic to use this
+ - Added SHAKE128/256 to crypto/sha3_generic and crypto/testmgr
+ - Folded struct sha3_state into struct sha3_ctx.
+
+ver #2)
+  - Simplify the endianness handling.
+  - Rename sha3_final() to sha3_squeeze() and don't clear the context at the
+    end as it's permitted to continue calling sha3_final() to extract
+    continuations of the digest (needed by ML-DSA).
+  - Don't reapply the end marker to the hash state in continuation
+    sha3_squeeze() unless sha3_update() gets called again (needed by
+    ML-DSA).
+  - Give sha3_squeeze() the amount of digest to produce as a parameter
+    rather than using ctx->digest_size and don't return the amount digested.
+  - Reimplement sha3_final() as a wrapper around sha3_squeeze() that
+    extracts ctx->digest_size amount of digest and then zeroes out the
+    context.  The latter is necessary to avoid upsetting
+    hash-test-template.h.
+  - Provide a sha3_reinit() function to clear the state, but to leave the
+    parameters that indicate the hash properties unaffected, allowing for
+    reuse.
+  - Provide a sha3_set_digestsize() function to change the size of the
+    digest to be extracted by sha3_final().  sha3_squeeze() takes a
+    parameter for this instead.
+  - Don't pass the digest size as a parameter to shake128/256_init() but
+    rather default to 128/256 bits as per the function name.
+  - Provide a sha3_clear() function to zero out the context.
+
+David Howells (12):
+  crypto: Add ML-DSA crypto_sig support
+  pkcs7: Allow the signing algo to calculate the digest itself
+  pkcs7: Allow direct signing of data with ML-DSA
+  pkcs7, x509: Add ML-DSA support
+  modsign: Enable ML-DSA module signing
+  crypto: Add supplementary info param to asymmetric key signature
+    verification
+  crypto: Add RSASSA-PSS support
+  pkcs7, x509: Add RSASSA-PSS support
+  modsign: Enable RSASSA-PSS module signing
+  pkcs7: Add FIPS selftest for RSASSA-PSS
+  x509, pkcs7: Limit crypto combinations that may be used for module
+    signing
+  pkcs7: Add ML-DSA FIPS selftest
+
+ Documentation/admin-guide/module-signing.rst |  17 +-
+ certs/Kconfig                                |  27 +
+ certs/Makefile                               |   4 +
+ crypto/Kconfig                               |  10 +
+ crypto/Makefile                              |   3 +
+ crypto/asymmetric_keys/Kconfig               |   6 +
+ crypto/asymmetric_keys/Makefile              |  13 +-
+ crypto/asymmetric_keys/asymmetric_type.c     |   1 +
+ crypto/asymmetric_keys/mgf1_params.asn1      |  12 +
+ crypto/asymmetric_keys/mscode_parser.c       |   2 +-
+ crypto/asymmetric_keys/pkcs7.asn1            |   2 +-
+ crypto/asymmetric_keys/pkcs7_parser.c        | 115 ++--
+ crypto/asymmetric_keys/pkcs7_verify.c        |  70 +-
+ crypto/asymmetric_keys/public_key.c          |  74 +-
+ crypto/asymmetric_keys/rsassa_params.asn1    |  25 +
+ crypto/asymmetric_keys/rsassa_parser.c       | 240 +++++++
+ crypto/asymmetric_keys/rsassa_parser.h       |  25 +
+ crypto/asymmetric_keys/selftest.c            |   1 +
+ crypto/asymmetric_keys/selftest.h            |   6 +
+ crypto/asymmetric_keys/selftest_mldsa.c      | 688 +++++++++++++++++++
+ crypto/asymmetric_keys/selftest_rsa.c        | 133 ++++
+ crypto/asymmetric_keys/signature.c           |   4 +-
+ crypto/asymmetric_keys/verify_pefile.c       |   3 +-
+ crypto/asymmetric_keys/verify_pefile.h       |   1 +
+ crypto/asymmetric_keys/x509.asn1             |   2 +-
+ crypto/asymmetric_keys/x509_cert_parser.c    | 124 ++--
+ crypto/asymmetric_keys/x509_parser.h         |  45 +-
+ crypto/asymmetric_keys/x509_public_key.c     |  37 +-
+ crypto/ecdsa-p1363.c                         |   5 +-
+ crypto/ecdsa-x962.c                          |   5 +-
+ crypto/ecdsa.c                               |   3 +-
+ crypto/ecrdsa.c                              |   3 +-
+ crypto/mldsa.c                               | 202 ++++++
+ crypto/rsa.c                                 |   8 +
+ crypto/rsassa-pkcs1.c                        |   3 +-
+ crypto/rsassa-pss.c                          | 383 +++++++++++
+ crypto/sig.c                                 |   3 +-
+ crypto/testmgr.c                             |   2 +-
+ crypto/testmgr.h                             |   1 +
+ include/crypto/hash.h                        |   3 +
+ include/crypto/internal/rsa.h                |   2 +
+ include/crypto/public_key.h                  |   3 +
+ include/crypto/sig.h                         |   9 +-
+ include/linux/oid_registry.h                 |   7 +
+ scripts/sign-file.c                          |  71 +-
+ 45 files changed, 2235 insertions(+), 168 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/mgf1_params.asn1
+ create mode 100644 crypto/asymmetric_keys/rsassa_params.asn1
+ create mode 100644 crypto/asymmetric_keys/rsassa_parser.c
+ create mode 100644 crypto/asymmetric_keys/rsassa_parser.h
+ create mode 100644 crypto/asymmetric_keys/selftest_mldsa.c
+ create mode 100644 crypto/mldsa.c
+ create mode 100644 crypto/rsassa-pss.c
+
