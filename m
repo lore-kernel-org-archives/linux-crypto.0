@@ -1,33 +1,33 @@
 Received: from devnull.danielhodges.dev (vps-2f6e086e.vps.ovh.us [135.148.138.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FE94657EB;
-	Tue, 20 Jan 2026 18:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B2E466B5C;
+	Tue, 20 Jan 2026 18:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.148.138.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768934853; cv=none; b=BsWgfzFLLhcXEufAf0ckiMcMPTkA8JiBT6u8dOgMdinW8/jGKSnvM20pKb1PudludjLhGhCI52TbxSJ/vb2FQNih/JDejWQGxU0nIiZZhYvJRYSLPRa+hyldVC2raWee25izLgNG0dcip1Fps5EgTLXHDeB+YM+lQpvIofDK8pM=
+	t=1768934864; cv=none; b=izzJu7bK7V3CZQ5tJimfPBlHMjpjCviwuOLXGuN6zDwuvBOgLUr0hO02IEx3yDpu+2OmjDShFcZkr117Jw+GtlGxf6oQZcW8esaMSQntNFVXvz5yEmnFn1hJO+sZZhN+93zUZznQsldE46EzN717YCZBL8p0xTvjic+ZxfXddqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768934853; c=relaxed/simple;
-	bh=hM2KyOMS+eZXsryzn7K/pMFBf7en3Cw/bkdHhsjjP9E=;
+	s=arc-20240116; t=1768934864; c=relaxed/simple;
+	bh=c9c112CfqOZIUtPBXyYub4SXP7/w2oeWMEWy4e/iG8M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b2aG7XZQnruRmOKCNS7J4pa/6u5xBvyWdnK/TRO7/v6JeaOj4DT5oX/lH5dCU9wgiNsn9Roy3DV11tbabl1w2xqLV3AWvRPgcgHLq+/NSX1VGofeHJR3zLBxhj6nC3IVkhcSNCHJqfo4ISNXZOXKT8bGoJx+wiXGflUsO3facDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=XLqCc38J; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=LheYgBBH; arc=none smtp.client-ip=135.148.138.8
+	 MIME-Version; b=RT1puisbv0tvYJ1I0m1GVZSV3I/jwbwuIKADpuSunAun9exEPFN0y8Rz2QlAyaHKvCpn8TD6BRDhlEOJsN2ApZzsafkMLwQ+WM2BhzmRegSENamtQz/dp+9zC+WLbytPJU+oL7icqMC/+aHJdhw6VSyL5zQZ/Ju0l7IMKaAdkqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=iWc/fKVr; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=UvdXDLmc; arc=none smtp.client-ip=135.148.138.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danielhodges.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="XLqCc38J";
-	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="LheYgBBH"
+	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="iWc/fKVr";
+	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="UvdXDLmc"
 DKIM-Signature: v=1; a=rsa-sha256; s=202510r; d=danielhodges.dev; c=relaxed/relaxed;
-	h=Message-ID:Date:Subject:To:From; t=1768934822; bh=WXZF1gl6PfUsJgVQx1bqUpP
-	wsVJMNv3kZJHgA/2BkXA=; b=XLqCc38J0OkuJDIME3o9rzOtE4arZrmbq38pTvLVkHvYxj8egC
-	GPSPxNf6gTktqsuMXc5xI0tsELckd89Xa3y1mw+ceGmNzCEHOsjXtbqIeFa0GmXLzXtemJSZAlm
-	behRIXWGWoasO+QmIYAjBiVzNDXgMAbtVcocw6Kjyfr4R58wWZqnuQWhegUyw+igaVFBseu5OVD
-	4jIMXeazYyuCKuVg+XH6M4mONhNBxhOMcmqDuo65EaPkSJVMsciQ6Q6gwtFjPvQRXx4qtS5m4lY
-	6ZXx+E3DPgE+KyGBgq8DFtcGX8XEvuDiAcyFUybPPhHIoWRYS8QmYPikmhPeGOeeGyQ==;
+	h=Message-ID:Date:Subject:To:From; t=1768934822; bh=x+cKrahUYB9zMrFLU4yGCt2
+	1rJRa9TAmp18ETboD+hQ=; b=iWc/fKVr4sx0aosPo1yP5CuqSAkum91Cqebi5R6NmuIsDgWrhb
+	NKW9RZGuxLh8SSj3bV9m6ZNFmMhfV7N0SwvOnoTwYkqIryFNMlij/T+2w7/5oqrh/4HpHaUG3LE
+	WFfsq+DxqnruH1AkJg7VMe04Pl8k64q43+Fh/dGIlOB1D71j4XaHfZURxN+jNQ6vPEesgZYZKnn
+	+N2VSAWxwpesR43/DjJPgMqDNcYLz7qO/vCWputzYiRCCPLyvwUGoIXEjQQwi7eKSGkMEclQI9x
+	yT0O1NxF8mhxpaS2ePo8isvdR13rCf4JVxsXicjNPZWX5TTiu2kPwYek1/Etvash/Wg==;
 DKIM-Signature: v=1; a=ed25519-sha256; s=202510e; d=danielhodges.dev; c=relaxed/relaxed;
-	h=Message-ID:Date:Subject:To:From; t=1768934822; bh=WXZF1gl6PfUsJgVQx1bqUpP
-	wsVJMNv3kZJHgA/2BkXA=; b=LheYgBBHnLa0Pd8LyzFiOQxK72DJqDmMfE1vFFxwhf5/jBJXoS
-	9bMaT5OEQgtGS/acPyiytlw3Bj7FtRzrHGAA==;
+	h=Message-ID:Date:Subject:To:From; t=1768934822; bh=x+cKrahUYB9zMrFLU4yGCt2
+	1rJRa9TAmp18ETboD+hQ=; b=UvdXDLmcxDUPQj9khnXaNeEpuU/qpWiCXN8Dp3Q74qFreFiwyY
+	r43aq1c9lJQvY9NrAZibnKzsATOuaU4peuAA==;
 From: Daniel Hodges <git@danielhodges.dev>
 To: bpf@vger.kernel.org
 Cc: Alexei Starovoitov <ast@kernel.org>,
@@ -50,9 +50,9 @@ Cc: Alexei Starovoitov <ast@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Daniel Hodges <git@danielhodges.dev>
-Subject: [PATCH bpf-next v5 3/7] crypto: Add BPF signature algorithm type registration module
-Date: Tue, 20 Jan 2026 13:46:57 -0500
-Message-ID: <20260120184701.23082-4-git@danielhodges.dev>
+Subject: [PATCH bpf-next v5 2/7] crypto: Add BPF hash algorithm type registration module
+Date: Tue, 20 Jan 2026 13:46:56 -0500
+Message-ID: <20260120184701.23082-3-git@danielhodges.dev>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260120184701.23082-1-git@danielhodges.dev>
 References: <20260120184701.23082-1-git@danielhodges.dev>
@@ -64,144 +64,183 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a new bpf_crypto_sig module that registers signature verification
-algorithms with the BPF crypto type system. This enables signature
-operations (like ECDSA) to use the unified bpf_crypto_ctx structure
-instead of requiring separate context types.
+Add bpf_crypto_shash module that registers a hash type with the BPF
+crypto infrastructure, enabling BPF programs to access kernel hash
+algorithms through a unified interface.
 
-Changes:
-- Add verify() callback to bpf_crypto_type for signature verification
-- Add bpf_crypto_sig module with:
-  - alloc_tfm/free_tfm for crypto_sig transform lifecycle
-  - has_algo to check algorithm availability
-  - setkey for public key configuration
-  - verify for signature verification
-  - get_flags for crypto API flags
+Update the bpf_crypto_type interface with hash-specific callbacks:
+   - alloc_tfm: Allocates crypto_shash context with proper descriptor size
+   - free_tfm: Releases hash transform and context memory
+   - has_algo: Checks algorithm availability via crypto_has_shash()
+   - hash: Performs single-shot hashing via crypto_shash_digest()
+   - digestsize: Returns the output size for the hash algorithm
+   - get_flags: Exposes transform flags to BPF programs
 
-This allows ECDSA and other signature verification operations to
-integrate with the existing BPF crypto infrastructure.
+Update bpf_shash_ctx to contain crypto_shash transform and shash_desc
+descriptor to accommodate algorithm-specific descriptor requirements.
 
 Signed-off-by: Daniel Hodges <git@danielhodges.dev>
 ---
  MAINTAINERS                |  1 +
  crypto/Makefile            |  3 ++
- crypto/bpf_crypto_sig.c    | 67 ++++++++++++++++++++++++++++++++++++++
- include/linux/bpf_crypto.h |  2 ++
- 4 files changed, 73 insertions(+)
- create mode 100644 crypto/bpf_crypto_sig.c
+ crypto/bpf_crypto_shash.c  | 96 ++++++++++++++++++++++++++++++++++++++
+ include/linux/bpf_crypto.h |  7 +++
+ 4 files changed, 107 insertions(+)
+ create mode 100644 crypto/bpf_crypto_shash.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 4e9b369acd1c..62d712a1f730 100644
+index 491d567f7dc8..4e9b369acd1c 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -4714,6 +4714,7 @@ M:	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+@@ -4713,6 +4713,7 @@ BPF [CRYPTO]
+ M:	Vadim Fedorenko <vadim.fedorenko@linux.dev>
  L:	bpf@vger.kernel.org
  S:	Maintained
- F:	crypto/bpf_crypto_shash.c
-+F:	crypto/bpf_crypto_sig.c
++F:	crypto/bpf_crypto_shash.c
  F:	crypto/bpf_crypto_skcipher.c
  F:	include/linux/bpf_crypto.h
  F:	kernel/bpf/crypto.c
 diff --git a/crypto/Makefile b/crypto/Makefile
-index 853dff375906..c9ab98b57bc0 100644
+index 16a35649dd91..853dff375906 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
-@@ -36,6 +36,9 @@ endif
+@@ -30,6 +30,9 @@ obj-$(CONFIG_CRYPTO_ECHAINIV) += echainiv.o
+ crypto_hash-y += ahash.o
+ crypto_hash-y += shash.o
+ obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
++ifeq ($(CONFIG_BPF_SYSCALL),y)
++obj-$(CONFIG_CRYPTO_HASH2) += bpf_crypto_shash.o
++endif
  
  obj-$(CONFIG_CRYPTO_AKCIPHER2) += akcipher.o
  obj-$(CONFIG_CRYPTO_SIG2) += sig.o
-+ifeq ($(CONFIG_BPF_SYSCALL),y)
-+obj-$(CONFIG_CRYPTO_SIG2) += bpf_crypto_sig.o
-+endif
- obj-$(CONFIG_CRYPTO_KPP2) += kpp.o
- obj-$(CONFIG_CRYPTO_HKDF) += hkdf.o
- 
-diff --git a/crypto/bpf_crypto_sig.c b/crypto/bpf_crypto_sig.c
+diff --git a/crypto/bpf_crypto_shash.c b/crypto/bpf_crypto_shash.c
 new file mode 100644
-index 000000000000..1d6521a066be
+index 000000000000..6e9b0d757ec9
 --- /dev/null
-+++ b/crypto/bpf_crypto_sig.c
-@@ -0,0 +1,67 @@
++++ b/crypto/bpf_crypto_shash.c
+@@ -0,0 +1,96 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
 +#include <linux/types.h>
 +#include <linux/module.h>
 +#include <linux/bpf_crypto.h>
-+#include <linux/crypto.h>
-+#include <crypto/sig.h>
++#include <crypto/hash.h>
 +
-+static void *bpf_crypto_sig_alloc_tfm(const char *algo)
-+{
-+	return crypto_alloc_sig(algo, 0, 0);
-+}
-+
-+static void bpf_crypto_sig_free_tfm(void *tfm)
-+{
-+	crypto_free_sig(tfm);
-+}
-+
-+static int bpf_crypto_sig_has_algo(const char *algo)
-+{
-+	return crypto_has_alg(algo, CRYPTO_ALG_TYPE_SIG, CRYPTO_ALG_TYPE_MASK);
-+}
-+
-+static u32 bpf_crypto_sig_get_flags(void *tfm)
-+{
-+	return crypto_tfm_get_flags(crypto_sig_tfm(tfm));
-+}
-+
-+static int bpf_crypto_sig_setkey(void *tfm, const u8 *key, unsigned int keylen)
-+{
-+	return crypto_sig_set_pubkey(tfm, key, keylen);
-+}
-+
-+static int bpf_crypto_sig_verify(void *tfm, const u8 *sig, unsigned int sig_len,
-+				 const u8 *msg, unsigned int msg_len)
-+{
-+	return crypto_sig_verify(tfm, sig, sig_len, msg, msg_len);
-+}
-+
-+static const struct bpf_crypto_type bpf_crypto_sig_type = {
-+	.alloc_tfm	= bpf_crypto_sig_alloc_tfm,
-+	.free_tfm	= bpf_crypto_sig_free_tfm,
-+	.has_algo	= bpf_crypto_sig_has_algo,
-+	.get_flags	= bpf_crypto_sig_get_flags,
-+	.setkey		= bpf_crypto_sig_setkey,
-+	.verify		= bpf_crypto_sig_verify,
-+	.owner		= THIS_MODULE,
-+	.type_id	= BPF_CRYPTO_TYPE_SIG,
-+	.name		= "sig",
++struct bpf_shash_ctx {
++	struct crypto_shash *tfm;
++	struct shash_desc desc;
 +};
 +
-+static int __init bpf_crypto_sig_init(void)
++static void *bpf_crypto_shash_alloc_tfm(const char *algo)
 +{
-+	return bpf_crypto_register_type(&bpf_crypto_sig_type);
++	struct bpf_shash_ctx *ctx;
++	struct crypto_shash *tfm;
++
++	tfm = crypto_alloc_shash(algo, 0, 0);
++	if (IS_ERR(tfm))
++		return tfm;
++
++	ctx = kzalloc(sizeof(*ctx) + crypto_shash_descsize(tfm), GFP_KERNEL);
++	if (!ctx) {
++		crypto_free_shash(tfm);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	ctx->tfm = tfm;
++	ctx->desc.tfm = tfm;
++
++	return ctx;
 +}
 +
-+static void __exit bpf_crypto_sig_exit(void)
++static void bpf_crypto_shash_free_tfm(void *tfm)
 +{
-+	int err = bpf_crypto_unregister_type(&bpf_crypto_sig_type);
++	struct bpf_shash_ctx *ctx = tfm;
++
++	crypto_free_shash(ctx->tfm);
++	kfree(ctx);
++}
++
++static int bpf_crypto_shash_has_algo(const char *algo)
++{
++	return crypto_has_shash(algo, 0, 0);
++}
++
++static int bpf_crypto_shash_hash(void *tfm, const u8 *data, u8 *out,
++				 unsigned int len)
++{
++	struct bpf_shash_ctx *ctx = tfm;
++
++	return crypto_shash_digest(&ctx->desc, data, len, out);
++}
++
++static unsigned int bpf_crypto_shash_digestsize(void *tfm)
++{
++	struct bpf_shash_ctx *ctx = tfm;
++
++	return crypto_shash_digestsize(ctx->tfm);
++}
++
++static u32 bpf_crypto_shash_get_flags(void *tfm)
++{
++	struct bpf_shash_ctx *ctx = tfm;
++
++	return crypto_shash_get_flags(ctx->tfm);
++}
++
++static const struct bpf_crypto_type bpf_crypto_shash_type = {
++	.alloc_tfm	= bpf_crypto_shash_alloc_tfm,
++	.free_tfm	= bpf_crypto_shash_free_tfm,
++	.has_algo	= bpf_crypto_shash_has_algo,
++	.hash		= bpf_crypto_shash_hash,
++	.digestsize	= bpf_crypto_shash_digestsize,
++	.get_flags	= bpf_crypto_shash_get_flags,
++	.owner		= THIS_MODULE,
++	.type_id	= BPF_CRYPTO_TYPE_HASH,
++	.name		= "hash",
++};
++
++static int __init bpf_crypto_shash_init(void)
++{
++	return bpf_crypto_register_type(&bpf_crypto_shash_type);
++}
++
++static void __exit bpf_crypto_shash_exit(void)
++{
++	int err = bpf_crypto_unregister_type(&bpf_crypto_shash_type);
 +
 +	WARN_ON_ONCE(err);
 +}
 +
-+module_init(bpf_crypto_sig_init);
-+module_exit(bpf_crypto_sig_exit);
++module_init(bpf_crypto_shash_init);
++module_exit(bpf_crypto_shash_exit);
 +MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Signature algorithm support for BPF");
++MODULE_DESCRIPTION("Hash algorithm support for BPF");
 diff --git a/include/linux/bpf_crypto.h b/include/linux/bpf_crypto.h
-index cf2c66f9782b..363ed72561f4 100644
+index c84371cc4e47..cf2c66f9782b 100644
 --- a/include/linux/bpf_crypto.h
 +++ b/include/linux/bpf_crypto.h
-@@ -18,6 +18,8 @@ struct bpf_crypto_type {
- 	int (*encrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
- 	int (*decrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
- 	int (*hash)(void *tfm, const u8 *data, u8 *out, unsigned int len);
-+	int (*verify)(void *tfm, const u8 *sig, unsigned int sig_len,
-+		      const u8 *msg, unsigned int msg_len);
- 	unsigned int (*ivsize)(void *tfm);
- 	unsigned int (*statesize)(void *tfm);
+@@ -3,6 +3,12 @@
+ #ifndef _BPF_CRYPTO_H
+ #define _BPF_CRYPTO_H
+ 
++enum bpf_crypto_type_id {
++	BPF_CRYPTO_TYPE_SKCIPHER = 1,
++	BPF_CRYPTO_TYPE_HASH,
++	BPF_CRYPTO_TYPE_SIG,
++};
++
+ struct bpf_crypto_type {
+ 	void *(*alloc_tfm)(const char *algo);
+ 	void (*free_tfm)(void *tfm);
+@@ -17,6 +23,7 @@ struct bpf_crypto_type {
  	unsigned int (*digestsize)(void *tfm);
+ 	u32 (*get_flags)(void *tfm);
+ 	struct module *owner;
++	enum bpf_crypto_type_id type_id;
+ 	char name[14];
+ };
+ 
 -- 
 2.52.0
 
