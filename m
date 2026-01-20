@@ -1,54 +1,75 @@
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686741D6DA9;
-	Tue, 20 Jan 2026 01:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245EF288C2B
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 02:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768874170; cv=none; b=DSGSuwu6VYEdZHZh35c8Ore7w9NoJ0vDH92kl+u//b5KtE7Q1kDynGyf91exBjH/Z1LrGGUp02IrfWZ9PQtHpwnC5/TlJreqs3515uxc70ldSUxVzXisDLwwe/UMVH9shuI9ymH7dVMLuML8SYGiPQjej6xf3zL5RkjAeTSvXPg=
+	t=1768877653; cv=none; b=YeQVn6ZaquAmbsVxZe15k87PyBt6KxVLdoXhd1RXYFXQY+YP22sNFUkbpP8dgTWK95AZ/yVphgvi8tk7WMFXVSd/2HktqDQrzeNEbDwbBGxeunG6j2r46STaw1hXjZrI13/IdrYgknqAGb4AsR8BncBycU9H0ypttRWQHLSUucw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768874170; c=relaxed/simple;
-	bh=nP4Ww8NLjbwRFxQb1fLKugkz1tMmsiUtd5EpnQeP5WU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CUiqRSL9Jki+VPbXvkw5AuCuobYLS7moyZ63n5/aO9ioJ6GOqlKJpH+e3CsYEnAY7t2hQ2i4KSIyBTJjllSUE+f5RwvR46X8R/eWNEGd19ZB5lhF9/ttw6JavokYVL2PAU9TySdqNYz8THGTxj43y0C0fmpaTli+XKMjSLvz1ZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=mnq64BMu; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+	s=arc-20240116; t=1768877653; c=relaxed/simple;
+	bh=3olXPzM1qgiWx/qcbWNWtmDJCGDFbWI2fdTK1AIODH0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SpFloelaVu5FK7Y1bKZJ2MkhSPb6qJZMj4CkDxUpgo0rM2gdISio+V/rUKqmmnq8Td31c1+Z7UFfXvhgfwHvK5zBsvT1T3nWy3sinyFL2CcK8sNBvTlXiwFVLZwQJZTfRiybARzjd5kD9KrtMs5DCCv4wnlpxTB1aQIKWM6DMkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jUv61sqA; arc=none smtp.client-ip=74.125.82.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="mnq64BMu"
-Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60K0Y9Cw585121;
-	Tue, 20 Jan 2026 01:55:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:message-id:mime-version:subject:to; s=PPS06212021; bh=vIZfxpr+J
-	256TlD0uo/sr8jWoAJouBLaAJNcJomxm0Q=; b=mnq64BMuqzV1xgV9qMK5UQsOQ
-	ypS1INMPKb2F6cSAKN2EXRhzQZ60lpdXvnkhBnLiwkOI3IEaQ8iZKkjZv8sq16AR
-	C9ZWIycWEHRNSG/SbBGvksR7Q8BG4ZP4cWu8Lpv3niJCo8er0L/5drjN3IFMnepG
-	kaODcv7UebbS15hzOF8yVUi1u9nyBCUqTludnDzRvWJojsz3ncDh6lh09qL5rGys
-	wvp2b+DmmtoeLv8xiHqgKyoB8nVoG+KVs26om+2O6ykABrPn79sbchpH49y9AXL6
-	M9MSlMBgzQrlf/3ZD7VMS6O0q233MQkGAKz5klJ698EJTxNklwd1ZtwD5otzA==
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [128.224.246.37])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4br1d4aegs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 20 Jan 2026 01:55:29 +0000 (GMT)
-Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
- ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.61; Mon, 19 Jan 2026 17:55:27 -0800
-Received: from pek-lpggp9.wrs.com (10.11.232.110) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
- 15.1.2507.61 via Frontend Transport; Mon, 19 Jan 2026 17:55:25 -0800
-From: Jianpeng Chang <jianpeng.chang.cn@windriver.com>
-To: <horia.geanta@nxp.com>, <pankaj.gupta@nxp.com>, <gaurav.jain@nxp.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <leitao@debian.org>, <kuba@kernel.org>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Jianpeng
- Chang" <jianpeng.chang.cn@windriver.com>
-Subject: [v2 PATCH 1/1] crypto: caam: fix netdev memory leak in dpaa2_caam_probe
-Date: Tue, 20 Jan 2026 09:55:24 +0800
-Message-ID: <20260120015524.1989458-1-jianpeng.chang.cn@windriver.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jUv61sqA"
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-121a0bcd376so5132659c88.0
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jan 2026 18:54:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768877651; x=1769482451; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DXcj7Mzk1xfN6EsBGo9fgY1I2HlcRhrQHtG/TGeOkDQ=;
+        b=jUv61sqAcriMardyv/u1ztpoXP5y7w5OG5L5VUw+XHKJ1I+J04X95l+p6uCVRsNPB+
+         fHn8rv0TQADKcTPjSb+GTDjy8NInAXMKjzMQlpEHZRpHUcoQkbE9MsJTwsDapvNIDytw
+         7F3WQK4wXGBGj1+UPAlh3NvJfCAMWkbHQoyWpUIjdSVE08+ehpB/Rct0mrIWUwcFVdyF
+         P2qe2A54+tpLr2JZ5+ePiwWs7xqHTdfhwCbkiY1/KazM8vfCU80i3DnpgwhRFjmNDKuL
+         UpFuvr3jw09TRCM8f/GYEeZ1LkLPWC2LceQn7JGoVyn5bUHrX6oNbbLEemqxxm7Wyp3Q
+         Q4Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768877651; x=1769482451;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DXcj7Mzk1xfN6EsBGo9fgY1I2HlcRhrQHtG/TGeOkDQ=;
+        b=WUN3CPNleGaCQe6peD4VjMh4ZiDrEcmQGbyT5BtmcO7vpgncXV5mVKUW+vNd0sYsuO
+         Yy3gYMiZ1FMvtiiC+kYnr0lT0UECbxlniLuYsQnf7fVoipoNHgkJwXlIiv4cVNXe9XkG
+         dHbF5C5aea1A+ldYgguLTT7v1JVia/p/KtHbsJTxtTN2XvnAhZwk9HtZ0Vi7mMD3UxpW
+         wTd9PzrPFVTmc97pktNKNdn6HOSkgocucSCurgmBcA5prfXOG099PnJ9IReELq4tzZ53
+         0UsiGtzw17wSBC3HHaJ0G6aPyXcPV/qmN26xK5FMYH9897V7SJlm87A+zoe2eE41a6G6
+         47dA==
+X-Forwarded-Encrypted: i=1; AJvYcCU9CQ7ssBaFI2vsatuQgwshP3hOvw0D8hxFn9wJecQ4BWlPxX2rXqgH76sjcYBi/QHSIWkL2sgMypA1E/U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOk4tfp672tyltiMAUMyK1QzRGysO3V+mVc/HKWIlOyZiXBmSI
+	ZOLspttuBvzYye2j03bRbkG8zWH7zg28ozg/AOIvlnbXxTpr4+/Fk25f
+X-Gm-Gg: AY/fxX6Ja+5o+5jkoeec+4tp0d/Z4e3P2Uj8nEYYoVfpudZqWtMfgUxIiKMPiR45cFY
+	lLv7ejN2P+2ogVOA3bXC0VtEDMKUUX6vXX/DS7Y0lzKbnZ2HeaBrN/PQLgqYmmalMf3WQqfCRT6
+	PfeGt2z734IbZr3/l+4HJH9x6XV/K17ypaZZgWW0ShdsrcYlK9ib7T91ohGRw3X+/TnwI8yn+1l
+	4TN86kbm0QyohbVDe94cp+m3y4WCqRaPxZLkm99wEH85yWFdgVhGv6atxSx0A3yc77ziZqftKpv
+	Ip2nLDx4nbEDFmO7pokp8EQPX5n92G093/GuOBhraZQLSo5fWPD5E9x7Nzhx6I133Q+FuW/N5jU
+	VDj7+lA+R3qMZ9pl5dvTn0tsVny8pjqBf2z+7KANZc2vdT7bVqvVZ8YlR0Su7BrH8E+5QKAxjpw
+	==
+X-Received: by 2002:a05:7022:f90:b0:124:11af:7b75 with SMTP id a92af1059eb24-1246aadcaebmr449624c88.34.1768877651167;
+        Mon, 19 Jan 2026 18:54:11 -0800 (PST)
+Received: from gmail.com ([2a09:bac1:19e0:20::4:33f])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1244af10e21sm18913273c88.16.2026.01.19.18.54.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jan 2026 18:54:10 -0800 (PST)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Richard van Schagen <vschagen@icloud.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Mieczyslaw Nalewaj <namiltd@yahoo.com>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>
+Subject: [PATCH] crypto: eip93: fix sleep inside atomic
+Date: Tue, 20 Jan 2026 10:54:00 +0800
+Message-ID: <20260120025400.54294-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -56,167 +77,206 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: jFkvrQjOETy4SZRSiV_EjIy1k_6Qo75T
-X-Authority-Analysis: v=2.4 cv=Rs3I7SmK c=1 sm=1 tr=0 ts=696ee091 cx=c_pps
- a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=t7CeM3EgAAAA:8
- a=CefbV24u0As9B_iXbnYA:9 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-GUID: jFkvrQjOETy4SZRSiV_EjIy1k_6Qo75T
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIwMDAxNCBTYWx0ZWRfX84omGWDItIaC
- e5k8Ct9F3TfqJ9iJeuXawKMh1HeYzPAr5PV50AoC09zoY5tru3KfcdGKjiPm+Xx/HNMr8vyGaj2
- 7NAoz3qIMtsgck0jrMBwvdUQ9HcU0fv/VuF34sXjgXJlwEeYvUn6NnvfTxs5LTa9njO0tZSnory
- //eUwvPWQb/+uWNTdifrG0hDQPLofeQgtBg9rBLOSMPU4WcJyS2M0IE7+pBvyKz/3E0jjwWkQiI
- 8PiWLtEDita5LtrTDvfJRV+AimWbkgcIAzH7q3ANVkkFuyfOgwlG7CAdAYAcrTLTbYXToA4RDbp
- oCQ38NSpuj5Dx9hI2oT3sSLQSo5w1+HgzVazbYgVs3qG0KKmsN8JBCPeE37VwvTV/ReDTx+nx/p
- aqXiUKuJ453QXZ+3VSHkCATcCECvWn38gog7xn7cZQ13gJtJFrLXuZgbnobyiv8ebcLCZpzQW6+
- +xk8LImXT5LNDo+IefQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-20_01,2026-01-19_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 bulkscore=0 adultscore=0 clxscore=1015 suspectscore=0
- malwarescore=0 priorityscore=1501 spamscore=0 impostorscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2601200014
 
-When commit 0e1a4d427f58 ("crypto: caam: Unembed net_dev structure in
-dpaa2") converted embedded net_device to dynamically allocated pointers,
-it added cleanup in dpaa2_dpseci_disable() but missed adding cleanup in
-dpaa2_dpseci_free() for error paths.
+A crypto request is allowed to sleep only if CRYPTO_TFM_REQ_MAY_SLEEP is
+set. Avoid GFP_KERNEL and usleep_range() if the flag is absent.
 
-This causes memory leaks when dpaa2_dpseci_dpio_setup() fails during probe
-due to DPIO devices not being ready yet. The kernel's deferred probe
-mechanism handles the retry successfully, but the netdevs allocated during
-the failed probe attempt are never freed, resulting in kmemleak reports
-showing multiple leaked netdev-related allocations all traced back to
-dpaa2_caam_probe().
-
-Fix this by preserving the CPU mask of allocated netdevs during setup and
-using it for cleanup in dpaa2_dpseci_free(). This approach ensures that
-only the CPUs that actually had netdevs allocated will be cleaned up,
-avoiding potential issues with CPU hotplug scenarios.
-
-Fixes: 0e1a4d427f58 ("crypto: caam: Unembed net_dev structure in dpaa2")
-Signed-off-by: Jianpeng Chang <jianpeng.chang.cn@windriver.com>
+Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
 ---
-v2:
-  - fix the build error with CPUMASK_OFFSTACK disabled
-  - instead of the movement of free_dpaa2_pcpu_netdev, implement it
-    directly in dpaa2_dpseci_free
-v1: https://lore.kernel.org/all/20260116014455.2575351-1-jianpeng.chang.cn@windriver.com/
+ .../crypto/inside-secure/eip93/eip93-aead.c   |  2 +-
+ .../crypto/inside-secure/eip93/eip93-cipher.c |  2 +-
+ .../crypto/inside-secure/eip93/eip93-cipher.h |  3 +-
+ .../crypto/inside-secure/eip93/eip93-common.c | 36 ++++++++++++-------
+ .../crypto/inside-secure/eip93/eip93-hash.c   |  9 +++--
+ 5 files changed, 35 insertions(+), 17 deletions(-)
 
- drivers/crypto/caam/caamalg_qi2.c | 27 +++++++++++++++------------
- drivers/crypto/caam/caamalg_qi2.h |  2 ++
- 2 files changed, 17 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 107ccb2ade42..c6117c23eb25 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -4814,7 +4814,8 @@ static void dpaa2_dpseci_free(struct dpaa2_caam_priv *priv)
- {
- 	struct device *dev = priv->dev;
- 	struct fsl_mc_device *ls_dev = to_fsl_mc_device(dev);
--	int err;
-+	struct dpaa2_caam_priv_per_cpu *ppriv;
-+	int i, err;
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-aead.c b/drivers/crypto/inside-secure/eip93/eip93-aead.c
+index 18dd8a9a5165..b5a47b583397 100644
+--- a/drivers/crypto/inside-secure/eip93/eip93-aead.c
++++ b/drivers/crypto/inside-secure/eip93/eip93-aead.c
+@@ -46,7 +46,7 @@ static int eip93_aead_send_req(struct crypto_async_request *async)
+ 	struct eip93_cipher_reqctx *rctx = aead_request_ctx(req);
+ 	int err;
  
- 	if (DPSECI_VER(priv->major_ver, priv->minor_ver) > DPSECI_VER(5, 3)) {
- 		err = dpseci_reset(priv->mc_io, 0, ls_dev->mc_handle);
-@@ -4822,6 +4823,12 @@ static void dpaa2_dpseci_free(struct dpaa2_caam_priv *priv)
- 			dev_err(dev, "dpseci_reset() failed\n");
- 	}
+-	err = check_valid_request(rctx);
++	err = check_valid_request(async, rctx);
+ 	if (err) {
+ 		aead_request_complete(req, err);
+ 		return err;
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-cipher.c b/drivers/crypto/inside-secure/eip93/eip93-cipher.c
+index 1f2d6846610f..23df414b0321 100644
+--- a/drivers/crypto/inside-secure/eip93/eip93-cipher.c
++++ b/drivers/crypto/inside-secure/eip93/eip93-cipher.c
+@@ -36,7 +36,7 @@ static int eip93_skcipher_send_req(struct crypto_async_request *async)
+ 	struct eip93_cipher_reqctx *rctx = skcipher_request_ctx(req);
+ 	int err;
  
-+	for_each_cpu(i, priv->clean_mask) {
-+		ppriv = per_cpu_ptr(priv->ppriv, i);
-+		free_netdev(ppriv->net_dev);
-+	}
-+	free_cpumask_var(priv->clean_mask);
-+
- 	dpaa2_dpseci_congestion_free(priv);
- 	dpseci_close(priv->mc_io, 0, ls_dev->mc_handle);
- }
-@@ -5007,16 +5014,15 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
- 	struct device *dev = &ls_dev->dev;
- 	struct dpaa2_caam_priv *priv;
- 	struct dpaa2_caam_priv_per_cpu *ppriv;
--	cpumask_var_t clean_mask;
- 	int err, cpu;
- 	u8 i;
+-	err = check_valid_request(rctx);
++	err = check_valid_request(async, rctx);
  
- 	err = -ENOMEM;
--	if (!zalloc_cpumask_var(&clean_mask, GFP_KERNEL))
--		goto err_cpumask;
--
- 	priv = dev_get_drvdata(dev);
- 
-+	if (!zalloc_cpumask_var(&priv->clean_mask, GFP_KERNEL))
-+		goto err_cpumask;
-+
- 	priv->dev = dev;
- 	priv->dpsec_id = ls_dev->obj_desc.id;
- 
-@@ -5118,7 +5124,7 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
- 			err = -ENOMEM;
- 			goto err_alloc_netdev;
- 		}
--		cpumask_set_cpu(cpu, clean_mask);
-+		cpumask_set_cpu(cpu, priv->clean_mask);
- 		ppriv->net_dev->dev = *dev;
- 
- 		netif_napi_add_tx_weight(ppriv->net_dev, &ppriv->napi,
-@@ -5126,18 +5132,16 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
- 					 DPAA2_CAAM_NAPI_WEIGHT);
- 	}
- 
--	err = 0;
--	goto free_cpumask;
-+	return 0;
- 
- err_alloc_netdev:
--	free_dpaa2_pcpu_netdev(priv, clean_mask);
-+	free_dpaa2_pcpu_netdev(priv, priv->clean_mask);
- err_get_rx_queue:
- 	dpaa2_dpseci_congestion_free(priv);
- err_get_vers:
- 	dpseci_close(priv->mc_io, 0, ls_dev->mc_handle);
- err_open:
--free_cpumask:
--	free_cpumask_var(clean_mask);
-+	free_cpumask_var(priv->clean_mask);
- err_cpumask:
- 	return err;
- }
-@@ -5182,7 +5186,6 @@ static int __cold dpaa2_dpseci_disable(struct dpaa2_caam_priv *priv)
- 		ppriv = per_cpu_ptr(priv->ppriv, i);
- 		napi_disable(&ppriv->napi);
- 		netif_napi_del(&ppriv->napi);
--		free_netdev(ppriv->net_dev);
- 	}
- 
- 	return 0;
-diff --git a/drivers/crypto/caam/caamalg_qi2.h b/drivers/crypto/caam/caamalg_qi2.h
-index 61d1219a202f..8e65b4b28c7b 100644
---- a/drivers/crypto/caam/caamalg_qi2.h
-+++ b/drivers/crypto/caam/caamalg_qi2.h
-@@ -42,6 +42,7 @@
-  * @mc_io: pointer to MC portal's I/O object
-  * @domain: IOMMU domain
-  * @ppriv: per CPU pointers to privata data
-+ * @clean_mask: CPU mask of CPUs that have allocated netdevs
-  */
- struct dpaa2_caam_priv {
- 	int dpsec_id;
-@@ -65,6 +66,7 @@ struct dpaa2_caam_priv {
- 
- 	struct dpaa2_caam_priv_per_cpu __percpu *ppriv;
- 	struct dentry *dfs_root;
-+	cpumask_var_t clean_mask;
+ 	if (err) {
+ 		skcipher_request_complete(req, err);
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-cipher.h b/drivers/crypto/inside-secure/eip93/eip93-cipher.h
+index 6e2545ebd879..2d72fa5f8b7e 100644
+--- a/drivers/crypto/inside-secure/eip93/eip93-cipher.h
++++ b/drivers/crypto/inside-secure/eip93/eip93-cipher.h
+@@ -44,7 +44,8 @@ struct eip93_cipher_reqctx {
+ 	dma_addr_t			sa_state_ctr_base;
  };
  
- /**
+-int check_valid_request(struct eip93_cipher_reqctx *rctx);
++int check_valid_request(struct crypto_async_request *async,
++			struct eip93_cipher_reqctx *rctx);
+ 
+ void eip93_unmap_dma(struct eip93_device *eip93, struct eip93_cipher_reqctx *rctx,
+ 		     struct scatterlist *reqsrc, struct scatterlist *reqdst);
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-common.c b/drivers/crypto/inside-secure/eip93/eip93-common.c
+index 66153aa2493f..5dd9c24bf463 100644
+--- a/drivers/crypto/inside-secure/eip93/eip93-common.c
++++ b/drivers/crypto/inside-secure/eip93/eip93-common.c
+@@ -148,15 +148,16 @@ static void eip93_free_sg_copy(const int len, struct scatterlist **sg)
+ }
+ 
+ static int eip93_make_sg_copy(struct scatterlist *src, struct scatterlist **dst,
+-			      const u32 len, const bool copy)
++			      const u32 len, const bool copy, bool maysleep)
+ {
++	gfp_t gfp = maysleep ? GFP_KERNEL : GFP_ATOMIC;
+ 	void *pages;
+ 
+-	*dst = kmalloc(sizeof(**dst), GFP_KERNEL);
++	*dst = kmalloc(sizeof(**dst), gfp);
+ 	if (!*dst)
+ 		return -ENOMEM;
+ 
+-	pages = (void *)__get_free_pages(GFP_KERNEL | GFP_DMA,
++	pages = (void *)__get_free_pages(gfp | GFP_DMA,
+ 					 get_order(len));
+ 	if (!pages) {
+ 		kfree(*dst);
+@@ -198,8 +199,10 @@ static bool eip93_is_sg_aligned(struct scatterlist *sg, u32 len,
+ 	return false;
+ }
+ 
+-int check_valid_request(struct eip93_cipher_reqctx *rctx)
++int check_valid_request(struct crypto_async_request *async,
++			struct eip93_cipher_reqctx *rctx)
+ {
++	bool maysleep = async->flags & CRYPTO_TFM_REQ_MAY_SLEEP;
+ 	struct scatterlist *src = rctx->sg_src;
+ 	struct scatterlist *dst = rctx->sg_dst;
+ 	u32 textsize = rctx->textsize;
+@@ -267,13 +270,15 @@ int check_valid_request(struct eip93_cipher_reqctx *rctx)
+ 
+ 	copy_len = max(totlen_src, totlen_dst);
+ 	if (!src_align) {
+-		err = eip93_make_sg_copy(src, &rctx->sg_src, copy_len, true);
++		err = eip93_make_sg_copy(src, &rctx->sg_src, copy_len, true,
++					 maysleep);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (!dst_align) {
+-		err = eip93_make_sg_copy(dst, &rctx->sg_dst, copy_len, false);
++		err = eip93_make_sg_copy(dst, &rctx->sg_dst, copy_len, false,
++					 maysleep);
+ 		if (err)
+ 			return err;
+ 	}
+@@ -379,7 +384,8 @@ void eip93_set_sa_record(struct sa_record *sa_record, const unsigned int keylen,
+  */
+ static int eip93_scatter_combine(struct eip93_device *eip93,
+ 				 struct eip93_cipher_reqctx *rctx,
+-				 u32 datalen, u32 split, int offsetin)
++				 u32 datalen, u32 split, int offsetin,
++				 bool maysleep)
+ {
+ 	struct eip93_descriptor *cdesc = rctx->cdesc;
+ 	struct scatterlist *sgsrc = rctx->sg_src;
+@@ -497,8 +503,11 @@ static int eip93_scatter_combine(struct eip93_device *eip93,
+ 		scoped_guard(spinlock_irqsave, &eip93->ring->write_lock)
+ 			err = eip93_put_descriptor(eip93, cdesc);
+ 		if (err) {
+-			usleep_range(EIP93_RING_BUSY_DELAY,
+-				     EIP93_RING_BUSY_DELAY * 2);
++			if (maysleep)
++				usleep_range(EIP93_RING_BUSY_DELAY,
++					     EIP93_RING_BUSY_DELAY * 2);
++			else
++				cpu_relax();
+ 			goto again;
+ 		}
+ 		/* Writing new descriptor count starts DMA action */
+@@ -512,6 +521,8 @@ int eip93_send_req(struct crypto_async_request *async,
+ 		   const u8 *reqiv, struct eip93_cipher_reqctx *rctx)
+ {
+ 	struct eip93_crypto_ctx *ctx = crypto_tfm_ctx(async->tfm);
++	bool maysleep = async->flags & CRYPTO_TFM_REQ_MAY_SLEEP;
++	gfp_t gfp = maysleep ? GFP_KERNEL : GFP_ATOMIC;
+ 	struct eip93_device *eip93 = ctx->eip93;
+ 	struct scatterlist *src = rctx->sg_src;
+ 	struct scatterlist *dst = rctx->sg_dst;
+@@ -533,7 +544,7 @@ int eip93_send_req(struct crypto_async_request *async,
+ 
+ 	memcpy(iv, reqiv, rctx->ivsize);
+ 
+-	rctx->sa_state = kzalloc(sizeof(*rctx->sa_state), GFP_KERNEL);
++	rctx->sa_state = kzalloc(sizeof(*rctx->sa_state), gfp);
+ 	if (!rctx->sa_state)
+ 		return -ENOMEM;
+ 
+@@ -562,7 +573,7 @@ int eip93_send_req(struct crypto_async_request *async,
+ 			crypto_inc((u8 *)iv, AES_BLOCK_SIZE);
+ 
+ 			rctx->sa_state_ctr = kzalloc(sizeof(*rctx->sa_state_ctr),
+-						     GFP_KERNEL);
++						     gfp);
+ 			if (!rctx->sa_state_ctr) {
+ 				err = -ENOMEM;
+ 				goto free_sa_state;
+@@ -616,7 +627,8 @@ int eip93_send_req(struct crypto_async_request *async,
+ 		goto free_sg_dma;
+ 	}
+ 
+-	return eip93_scatter_combine(eip93, rctx, datalen, split, offsetin);
++	return eip93_scatter_combine(eip93, rctx, datalen, split, offsetin,
++				     maysleep);
+ 
+ free_sg_dma:
+ 	dma_unmap_sg(eip93->dev, dst, rctx->dst_nents, DMA_BIDIRECTIONAL);
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-hash.c b/drivers/crypto/inside-secure/eip93/eip93-hash.c
+index ac13d90a2b7c..9b58de886c70 100644
+--- a/drivers/crypto/inside-secure/eip93/eip93-hash.c
++++ b/drivers/crypto/inside-secure/eip93/eip93-hash.c
+@@ -215,6 +215,7 @@ static int eip93_send_hash_req(struct crypto_async_request *async, u8 *data,
+ 	struct eip93_device *eip93 = ctx->eip93;
+ 	struct eip93_descriptor cdesc = { };
+ 	dma_addr_t src_addr;
++	bool maysleep;
+ 	int ret;
+ 
+ 	/* Map block data to DMA */
+@@ -267,12 +268,16 @@ static int eip93_send_hash_req(struct crypto_async_request *async, u8 *data,
+ 				 FIELD_PREP(EIP93_PE_USER_ID_DESC_FLAGS, EIP93_DESC_LAST);
+ 	}
+ 
++	maysleep = async->flags & CRYPTO_TFM_REQ_MAY_SLEEP;
+ again:
+ 	scoped_guard(spinlock_irqsave, &eip93->ring->write_lock)
+ 		ret = eip93_put_descriptor(eip93, &cdesc);
+ 	if (ret) {
+-		usleep_range(EIP93_RING_BUSY_DELAY,
+-			     EIP93_RING_BUSY_DELAY * 2);
++		if (maysleep)
++			usleep_range(EIP93_RING_BUSY_DELAY,
++				     EIP93_RING_BUSY_DELAY * 2);
++		else
++			cpu_relax();
+ 		goto again;
+ 	}
+ 
 -- 
-2.52.0
+2.43.0
 
