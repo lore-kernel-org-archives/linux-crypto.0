@@ -1,224 +1,225 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from devnull.danielhodges.dev (vps-2f6e086e.vps.ovh.us [135.148.138.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2A036A038
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 18:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768933878; cv=pass; b=VywZjaijVffJY2Rwz9sM+fGsZMPxSRIGqXVdTm1IDdHbdy1V2ffqYSHpZmB+JxiLU5m/Yler7LlWw6JlsBYx9uaTcaON4wK7HnrGNkk3rlDwz/CXmsoUoaYXdE9fpe0LlViCSmgcKpoTQ65YXmZFXo+FYE18AmN6ZL/dMQc7+RA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768933878; c=relaxed/simple;
-	bh=5aDLW+mihRDd+VHWYR5OgufqUvUAlNEFwdP2RjlGovs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TsDAA48eEAsBTUREVG3To1LvcF/Rn/5EGMBRFhVJtf4XBZho98e8xr3zbYjblL6fzq6LqP2qbF6s3OLOHzNB5AaNSGLWy0WSmGvQjn8hm8ENqUk0UD63c6UFQpR7SnGOJAhVwY/ySQby5UpWbhhMXsZ2wnndS3OQ2/iYU9DdtQM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=VgVvSZc0; arc=pass smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C08328B77;
+	Tue, 20 Jan 2026 18:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.148.138.8
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768934842; cv=none; b=RuC/U8WGjCy/J16QFNcyNpb5ZCk8fTC8blh7OHwPuuSTfya8Atu3Fhxi5cKySxTjJ9p+VpSyCJRN57dQTv3jM6qf5eD+eEc5yM9R5mF47oZL54X2WR9WOnmGJ4USCCjg5LtR+YqpNIuIxZh6e7E3BGDhVzT1l4GJDA+BoRITEVQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768934842; c=relaxed/simple;
+	bh=qCVuNNAjSm2ZryoOADn8nw2wzLohyxAWfpXZDz/Ghu0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sweCWGp+DXLw9/Ka7ds/CQRamAO1VLbXAEUZmFViSscUw9KqnCWdnSua5aS5zAYK5qsfHpYTauOI9nCaXJX2DsojZDLeMRiPZjk5jO12UZ8Azl016FeZ0TX51JyzWdSnbvtWkfi0BG2u0sKJsl6qXq2uZr1jbASe36m5Bb6e6UA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=R2rVd4f0; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=lnYnsnre; arc=none smtp.client-ip=135.148.138.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danielhodges.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="VgVvSZc0"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-59b77f2e43aso157899e87.1
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 10:31:16 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768933874; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XTkY3OsTrwWgOaKj2jheU88oMprSBnQpWgvtGBuabSUYKclFvMPY8wTwZ3FaPvWJrm
-         ibdrkbXbNhnB7bbxxydEsLVWXW0JBvol6JbGNvG7VQIK32DuEWEHS0hoHRb+f1wj+P6E
-         kMmKliLct9mf7nR/Ezk1FQm6Wp1EmDOU5Q91xREEXutj19xnMuXbTCqUc+dKNX9z7GFR
-         Ei965SNvfnv9oZdnu4JJOwQ7Z5WGpMmLVJ+F62vB6ZeEYDDUfzFi12D/XfaQYub3q57w
-         tNIoeG/wAHErLhgrgotfsuXy8CuRbVlKk+rrA/lAr8Fu8/coXAWXGofRvo1b/ZzZLgR7
-         UH2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=8tcAcp7uWuIjCj2SaccYzTy4fHKVPeO3zwjJJlV2b3I=;
-        fh=kgfQWSCb617dTKJOm1+OPtZ+g1JnIhuHz2GyTVQuPQE=;
-        b=HnowOauY8D7U56o3AVDpVND9UxvrEdv080rI2FbSHpKC+xeLl5aFcq3cdAk4RW/C6C
-         eNoRGUuXJcU14rjGPTZNuJAC1JFAki+LRkAwbpotfhyaDsxmJg84T8U4o2MrG5Md6Yu1
-         NOM/xzwXMEmV+dn+/nBrE1XMoeMhM/I5fGcudFZ41BaxQ/6j2yXXgROaaJh9J6kQ3oyK
-         c6TmgRQCkTrcTNW3d1vs1JzeQjTREgrf0VQPmF6Qrd7qsq+FIEGPovJ8CCQzTM+zWKJ/
-         sI3nGItpfr5xE31Fg14gH4guJacB0SBpJnl5cOoBR6fue/l1EUc1jlwge/kEilzBDaaB
-         1qNA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1768933874; x=1769538674; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8tcAcp7uWuIjCj2SaccYzTy4fHKVPeO3zwjJJlV2b3I=;
-        b=VgVvSZc0FA9yVqTMeBkFcuMee8+jql/WBmKjN/WM+DgrzA9BtUy5gryv8ATjmG1ayW
-         etp6RHV78kaBPPUuL2HqjoOYVWIrg88To7tqa8gJmomxI9dMQ3qZBxWDhcGCfGe3AT5h
-         l4+qCU4j4rKBM786tSqUFfJ/mJatVcZV5+pY5AaL/YErmBmYhbsuhculkbPT1Gk10hUR
-         Gg496OKMN/SGBr4GMiygPfkLriSfy+2Fk85veLCOuc98m7cPNkT2wOTUba0Ku6o7hwLz
-         1ZNwQXW++IEoVWrO8Gxcv/6AT6tev77G5WuhgshjB6Gg5TJNqX8/tG/lQJxh5rAN1NFH
-         KGfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768933874; x=1769538674;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8tcAcp7uWuIjCj2SaccYzTy4fHKVPeO3zwjJJlV2b3I=;
-        b=YE/pZrtLUqVwjPOzEU89hNUpfTz/e/Fr24Hx7a5v6QOjA0LMnfn5AhH7IyoNjAPAQd
-         nIQj3D8TxO2ORRFaSz1PXJIwcVjSon7UlaIsrmdkkqh99RqrZA5+xh74CzsDmL0fjJo8
-         gqtgxrSMWY9+tpIxsNhG0eXktpgJP9Xi8jRZ5ou37VNnexcb3cZJhVgmy5rw6bl7beBz
-         bmmTMyFSdtu8gby2AIMEK9B9eJZYYRqz6xJFLjMFbnKm6Zt1+vl8p9EuSjQ6k9MXmC+Y
-         X1TMIH9v7/4YnYL+SWYBJYSlPDloNcVfjNdJWWKsYhw4oBg6Gx0oJB6OpjH1eyOTN7a3
-         WGRA==
-X-Forwarded-Encrypted: i=1; AJvYcCVkxGRxywswXmpjO0rR+bRs6P3o0jbxevQkHYOlLtR3u8vwinJM8RJhbNCEKl0PvlovzS5mppByI/T02wQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPc/RPzXkcEgSv9fKKamtqFbnm1MW04gaQ5zUXu1jrEXGeAUM2
-	PkE8hYjl1w0u6RioRIEGLR5mKr0PuZU6Nd6sbykWALh2oGm4OOSbaOePvSfsnyacgcEppfKPs/0
-	IJT6oYfp39Wc6yxy/nlBnYXHLO6wELDu9a3ILd9WsMg==
-X-Gm-Gg: AZuq6aL8ty7nfWAU8x04dve1A9qkWcW1jgnKerFrqOF2DOlQWTvEFkO0MlGpqOrq5CB
-	vpPvRidgKk9MdNL2yDMSwVu5AM3HtnRMZ0eMln2ltsSgYQiMnHS9m1FH4XounP6DaLgu/dQ9n5C
-	CXuihkivT0b0WRmYqEAX+bckWCsUY7aBWHI0jdOZiF4KWZ1Dm4UXAqqhEAozvUSCKEL9grQOGCJ
-	K0g3HtbZGOUsdNMz8B+8F8gu2/eq90JZ1xNzkTzLcYzqAYFoUaJh00DL5YBeY9qaxBw6auOuaQ0
-	hRRQ3aYN4KY=
-X-Received: by 2002:a05:6512:12c8:b0:59b:6f90:bb9b with SMTP id
- 2adb3069b0e04-59ba7194a04mr7131150e87.19.1768933874345; Tue, 20 Jan 2026
- 10:31:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="R2rVd4f0";
+	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="lnYnsnre"
+DKIM-Signature: v=1; a=rsa-sha256; s=202510r; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Date:Subject:To:From; t=1768934822; bh=oSDTKco5Z+cIUPHV2/IWFXX
+	+zYklRUkeNigBk+7VzAY=; b=R2rVd4f0+h+siD3DjmILgTK7NnVBlb/aM/xsccQdPzZ+3Pl3Lt
+	CoX1micfT5W2cVndN5m55Ve1+UjP3qg430aEEtEzO+UIoFc1rB2tuWhXKSpbUlCJ3PBRc8yUEAN
+	1gbrmxkEzzsAOnGkefgyCTzL5RR5mP1cFRVOFVyBhfrGhXFunbJc9JLSkrMVb0GQlrFGUupR4lS
+	Q4/yBTR3OtEkJSi+daZUktIiAPyGSJj2o3PbQ/oFoZWG+wB+nPhTyDcFQx80gnqqqJNYTGh/13b
+	3QOZEvMQ6us4Gz/Lsw3dHvses2UgQH3hqv3qlECfHpFT6mjfdw0mVOe22R45lq2JcZg==;
+DKIM-Signature: v=1; a=ed25519-sha256; s=202510e; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Date:Subject:To:From; t=1768934822; bh=oSDTKco5Z+cIUPHV2/IWFXX
+	+zYklRUkeNigBk+7VzAY=; b=lnYnsnre7UItQ+bWyx/HJhq8dhq0uJusTVHxQqpb9wVuhxgB3A
+	pv5euYf/G4+LoC1u/0NBlnqVVf+yltMZbkCg==;
+From: Daniel Hodges <git@danielhodges.dev>
+To: bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Mykyta Yatsenko <yatsenko@meta.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Daniel Hodges <git@danielhodges.dev>
+Subject: [PATCH bpf-next v5 4/7] bpf: Add hash kfunc for cryptographic hashing
+Date: Tue, 20 Jan 2026 13:46:58 -0500
+Message-ID: <20260120184701.23082-5-git@danielhodges.dev>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260120184701.23082-1-git@danielhodges.dev>
+References: <20260120184701.23082-1-git@danielhodges.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260120145103.1176337-1-dhowells@redhat.com> <20260120145103.1176337-12-dhowells@redhat.com>
-In-Reply-To: <20260120145103.1176337-12-dhowells@redhat.com>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Tue, 20 Jan 2026 18:31:02 +0000
-X-Gm-Features: AZwV_QgHfD8HrBxrEOZbsSwT8PQCZski9dDNQ5llHPcq36JCOcYwlSptleCn6M0
-Message-ID: <CALrw=nGSr7F-NJri+UFgBVz5J+KFAS6OXa9EFvYo-qitX9R2bg@mail.gmail.com>
-Subject: Re: [PATCH v13 11/12] x509, pkcs7: Limit crypto combinations that may
- be used for module signing
-To: David Howells <dhowells@redhat.com>
-Cc: Lukas Wunner <lukas@wunner.de>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Eric Biggers <ebiggers@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
-	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Stephan Mueller <smueller@chronox.de>, 
-	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org, 
-	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi David,
+Extend bpf_crypto_type structure with hash operations:
+ - hash(): Performs hashing operation
+ - digestsize(): Returns hash output size
 
-On Tue, Jan 20, 2026 at 2:52=E2=80=AFPM David Howells <dhowells@redhat.com>=
- wrote:
->
-> Limit the set of crypto combinations that may be used for module signing =
-as
-> no indication of hash algorithm used for signing is added to the hash of
-> the data, so in theory a data blob hashed with a different algorithm can =
-be
-> substituted provided it has the same hash output.
->
-> This also rejects the use of less secure algorithms.
->
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Lukas Wunner <lukas@wunner.de>
-> cc: Ignat Korchagin <ignat@cloudflare.com>
-> cc: Stephan Mueller <smueller@chronox.de>
-> cc: Eric Biggers <ebiggers@kernel.org>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: keyrings@vger.kernel.org
-> cc: linux-crypto@vger.kernel.org
-> ---
->  crypto/asymmetric_keys/public_key.c | 55 +++++++++++++++++++++++++++--
->  1 file changed, 53 insertions(+), 2 deletions(-)
->
-> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys=
-/public_key.c
-> index 13a5616becaa..90b98e1a952d 100644
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-> @@ -24,6 +24,52 @@ MODULE_DESCRIPTION("In-software asymmetric public-key =
-subtype");
->  MODULE_AUTHOR("Red Hat, Inc.");
->  MODULE_LICENSE("GPL");
->
-> +struct public_key_restriction {
-> +       const char      *pkey_algo;     /* Signing algorithm (e.g. "rsa")=
- */
-> +       const char      *pkey_enc;      /* Signature encoding (e.g. "pkcs=
-1") */
-> +       const char      *hash_algo;     /* Content hash algorithm (e.g. "=
-sha256") */
-> +};
-> +
-> +static const struct public_key_restriction public_key_restrictions[] =3D=
- {
-> +       /* algo                 encoding        hash */
-> +       { "rsa",                "pkcs1",        "sha256" },
-> +       { "rsa",                "pkcs1",        "sha384" },
-> +       { "rsa",                "pkcs1",        "sha512" },
-> +       { "rsa",                "emsa-pss",     "sha512" },
+Update bpf_crypto_ctx_create() to support keyless operations:
+ - Hash algorithms don't require keys, unlike ciphers
+ - Only validates key presence if type->setkey is defined
+ - Conditionally sets IV/state length for cipher operations only
 
-Don't we want to allow sha256 for emsa-pss?
+Add bpf_crypto_hash() kfunc that works with any hash algorithm
+registered in the kernel's crypto API through the BPF crypto type
+system. This enables BPF programs to compute cryptographic hashes for
+use cases such as content verification, integrity checking, and data
+authentication.
 
-> +       { "ecdsa",              "x962",         "sha256" },
-> +       { "ecdsa",              "x962",         "sha384" },
-> +       { "ecdsa",              "x962",         "sha512" },
-> +       { "ecrdsa",             "raw",          "sha256" },
-> +       { "ecrdsa",             "raw",          "sha384" },
-> +       { "ecrdsa",             "raw",          "sha512" },
-> +       { "mldsa44",            "raw",          "sha512" },
-> +       { "mldsa65",            "raw",          "sha512" },
-> +       { "mldsa87",            "raw",          "sha512" },
-> +       /* ML-DSA may also do its own hashing over the entire message. */
-> +       { "mldsa44",            "raw",          "-" },
-> +       { "mldsa65",            "raw",          "-" },
-> +       { "mldsa87",            "raw",          "-" },
-> +};
-> +
-> +/*
-> + * Determine if a particular key/hash combination is allowed.
-> + */
-> +static int is_public_key_sig_allowed(const struct public_key_signature *=
-sig)
-> +{
-> +       for (int i =3D 0; i < ARRAY_SIZE(public_key_restrictions); i++) {
-> +               if (strcmp(public_key_restrictions[i].pkey_algo, sig->pke=
-y_algo) !=3D 0)
-> +                       continue;
-> +               if (strcmp(public_key_restrictions[i].pkey_enc, sig->enco=
-ding) !=3D 0)
-> +                       continue;
-> +               if (strcmp(public_key_restrictions[i].hash_algo, sig->has=
-h_algo) !=3D 0)
-> +                       continue;
-> +               return 0;
-> +       }
-> +       pr_warn_once("Public key signature combo (%s,%s,%s) rejected\n",
-> +                    sig->pkey_algo, sig->encoding, sig->hash_algo);
-> +       return -EKEYREJECTED;
-> +}
-> +
->  /*
->   * Provide a part of a description of the key for /proc/keys.
->   */
-> @@ -391,12 +437,17 @@ int public_key_verify_signature(const struct public=
-_key *pkey,
->         bool issig;
->         int ret;
->
-> -       pr_devel("=3D=3D>%s()\n", __func__);
-> -
->         BUG_ON(!pkey);
->         BUG_ON(!sig);
->         BUG_ON(!sig->s);
->
-> +       ret =3D is_public_key_sig_allowed(sig);
-> +       if (ret < 0)
-> +               return ret;
-> +
-> +       pr_devel("=3D=3D>%s(%s,%s,%s)\n",
-> +                __func__, sig->pkey_algo, sig->encoding, sig->hash_algo)=
-;
-> +
->         /*
->          * If the signature specifies a public key algorithm, it *must* m=
-atch
->          * the key's actual public key algorithm.
->
+Signed-off-by: Daniel Hodges <git@danielhodges.dev>
+---
+ kernel/bpf/crypto.c | 87 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 78 insertions(+), 9 deletions(-)
 
-Ignat
+diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
+index 7e75a1936256..c8f354b1a2cb 100644
+--- a/kernel/bpf/crypto.c
++++ b/kernel/bpf/crypto.c
+@@ -139,7 +139,7 @@ __bpf_kfunc_start_defs();
+  * It may return NULL if no memory is available.
+  * @params:	pointer to struct bpf_crypto_params which contains all the
+  *		details needed to initialise crypto context.
+- * @params__sz:	size of steuct bpf_crypto_params usef by bpf program
++ * @params__sz:	size of struct bpf_crypto_params used by bpf program
+  * @err:	integer to store error code when NULL is returned.
+  */
+ __bpf_kfunc struct bpf_crypto_ctx *
+@@ -171,7 +171,12 @@ bpf_crypto_ctx_create(const struct bpf_crypto_params *params, u32 params__sz,
+ 		goto err_module_put;
+ 	}
+ 
+-	if (!params->key_len || params->key_len > sizeof(params->key)) {
++	/* Hash operations don't require a key, but cipher operations do */
++	if (params->key_len > sizeof(params->key)) {
++		*err = -EINVAL;
++		goto err_module_put;
++	}
++	if (!params->key_len && type->setkey) {
+ 		*err = -EINVAL;
+ 		goto err_module_put;
+ 	}
+@@ -195,16 +200,23 @@ bpf_crypto_ctx_create(const struct bpf_crypto_params *params, u32 params__sz,
+ 			goto err_free_tfm;
+ 	}
+ 
+-	*err = type->setkey(ctx->tfm, params->key, params->key_len);
+-	if (*err)
+-		goto err_free_tfm;
++	if (params->key_len) {
++		if (!type->setkey) {
++			*err = -EINVAL;
++			goto err_free_tfm;
++		}
++		*err = type->setkey(ctx->tfm, params->key, params->key_len);
++		if (*err)
++			goto err_free_tfm;
+ 
+-	if (type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY) {
+-		*err = -EINVAL;
+-		goto err_free_tfm;
++		if (type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY) {
++			*err = -EINVAL;
++			goto err_free_tfm;
++		}
+ 	}
+ 
+-	ctx->siv_len = type->ivsize(ctx->tfm) + type->statesize(ctx->tfm);
++	if (type->ivsize && type->statesize)
++		ctx->siv_len = type->ivsize(ctx->tfm) + type->statesize(ctx->tfm);
+ 
+ 	refcount_set(&ctx->usage, 1);
+ 
+@@ -349,6 +361,58 @@ __bpf_kfunc int bpf_crypto_encrypt(struct bpf_crypto_ctx *ctx,
+ 	return bpf_crypto_crypt(ctx, src_kern, dst_kern, siv_kern, false);
+ }
+ 
++#if IS_ENABLED(CONFIG_CRYPTO_HASH2)
++/**
++ * bpf_crypto_hash() - Compute hash using configured context
++ * @ctx:	The crypto context being used. The ctx must be a trusted pointer.
++ * @data:	bpf_dynptr to the input data to hash. Must be a trusted pointer.
++ * @out:	bpf_dynptr to the output buffer. Must be a trusted pointer.
++ *
++ * Computes hash of the input data using the crypto context. The output buffer
++ * must be at least as large as the digest size of the hash algorithm.
++ */
++__bpf_kfunc int bpf_crypto_hash(struct bpf_crypto_ctx *ctx,
++				const struct bpf_dynptr *data,
++				const struct bpf_dynptr *out)
++{
++	const struct bpf_dynptr_kern *data_kern = (struct bpf_dynptr_kern *)data;
++	const struct bpf_dynptr_kern *out_kern = (struct bpf_dynptr_kern *)out;
++	unsigned int digestsize;
++	u64 data_len, out_len;
++	const u8 *data_ptr;
++	u8 *out_ptr;
++
++	if (ctx->type->type_id != BPF_CRYPTO_TYPE_HASH)
++		return -EINVAL;
++
++	if (!ctx->type->hash)
++		return -EOPNOTSUPP;
++
++	data_len = __bpf_dynptr_size(data_kern);
++	out_len = __bpf_dynptr_size(out_kern);
++
++	if (data_len == 0 || data_len > UINT_MAX)
++		return -EINVAL;
++
++	if (!ctx->type->digestsize)
++		return -EOPNOTSUPP;
++
++	digestsize = ctx->type->digestsize(ctx->tfm);
++	if (out_len < digestsize)
++		return -EINVAL;
++
++	data_ptr = __bpf_dynptr_data(data_kern, data_len);
++	if (!data_ptr)
++		return -EINVAL;
++
++	out_ptr = __bpf_dynptr_data_rw(out_kern, out_len);
++	if (!out_ptr)
++		return -EINVAL;
++
++	return ctx->type->hash(ctx->tfm, data_ptr, out_ptr, data_len);
++}
++#endif /* CONFIG_CRYPTO_HASH2 */
++
+ __bpf_kfunc_end_defs();
+ 
+ BTF_KFUNCS_START(crypt_init_kfunc_btf_ids)
+@@ -365,6 +429,9 @@ static const struct btf_kfunc_id_set crypt_init_kfunc_set = {
+ BTF_KFUNCS_START(crypt_kfunc_btf_ids)
+ BTF_ID_FLAGS(func, bpf_crypto_decrypt, KF_RCU)
+ BTF_ID_FLAGS(func, bpf_crypto_encrypt, KF_RCU)
++#if IS_ENABLED(CONFIG_CRYPTO_HASH2)
++BTF_ID_FLAGS(func, bpf_crypto_hash, KF_RCU)
++#endif
+ BTF_KFUNCS_END(crypt_kfunc_btf_ids)
+ 
+ static const struct btf_kfunc_id_set crypt_kfunc_set = {
+@@ -389,6 +456,8 @@ static int __init crypto_kfunc_init(void)
+ 	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &crypt_kfunc_set);
+ 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &crypt_kfunc_set);
+ 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &crypt_kfunc_set);
++	/* Register for SYSCALL programs to enable testing and debugging */
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SYSCALL, &crypt_kfunc_set);
+ 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SYSCALL,
+ 					       &crypt_init_kfunc_set);
+ 	return  ret ?: register_btf_id_dtor_kfuncs(bpf_crypto_dtors,
+-- 
+2.52.0
+
