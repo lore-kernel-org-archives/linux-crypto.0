@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3FE466B5A
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 14:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A35C46AED2
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 14:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768920732; cv=none; b=CnZ+Tn0HBiAoc6m3pEyy2cMl8DIZUDp+6x53bLmVBNSVpKK3f3K5a4N3GaBjmIrAyEXxXii7wNOXZsIAM+EHe/iO8xZtMKL/08XkB3uWZ8zBnT0UXKx+x9fLidCwIEmrIJ55YLzQg/l9e3NVn0LhnCD81VfYWG3LmX7HHtkvg/Y=
+	t=1768920737; cv=none; b=no91lqqllGhRi4JnMywLq3Hr4XBA62Qimxh2Fh8SMCTAJ27gxa6oslVysBm3D0O9zBdpJsUPqQT4USUF8F4h6NbBY0eykwHQyrIaEOW5M1fYj612b3gPqrpSpM1EixQvkJornRwOFf07KVXsfBsOJl+w5vdHjtEU+eoofwwR4AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768920732; c=relaxed/simple;
-	bh=Q+uHu4u/Mbi+H9rK60Sh6pfaEXhFj8X2WigDcbk50uM=;
+	s=arc-20240116; t=1768920737; c=relaxed/simple;
+	bh=fa+hShREMObsVCRFCK1oY+hHlTsq6I2YzMatIFRH6sM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eI980+WQU6YlRsCxhVujo4MhXRfov2lKkd6shSC+JxLn6feSr2qI4cN9r8gW29k3ULDp1MBjndWGhr6uAp4iLjZrQ1iPrtDyF2TfflRnJY55kXQFvZ16L0/vSmXyCCZR9J7fE8NJ3F7RxDAnHfmnejdzqjAZbLySByEqWRKZ2X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BwLdBl16; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=PMm0IsOiNoHE46uY6JSKQQIZRF9ODsBzYXeVvoT/cMkOZ1QEkrhx8tjvNWFmOXndMl1xpNbHHGBNwcNvKvHdJXbZ/NZfoERBlRaf3Sm9tJuk/s36xC9+Tn10Dc3lIRu5lHg1Ob1AH6bNMS2EziG9gPu3JxMcBiY3ZF69ZZjqqw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JlrQV2ny; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BwLdBl16"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JlrQV2ny"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768920729;
+	s=mimecast20190719; t=1768920734;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5ONdEFTmuicRpc0uh8shFoPeyhLNYTCObn7PLvjP6bE=;
-	b=BwLdBl16cpFAhpt0xmf+DX5mzL7uOdybzS3cz85BG2OyGXvikbNhq0+l+nHxIxCVDReMTy
-	lgQ5r/NV6CXHQ7x55yWwA0ZvEKRmB1FdRLu7o1H8JSIqhT9iUTAIDjk54JXN3xs/0z6auN
-	Tw7HQANeKyGc+ybxWgwdPId4/DJbI+g=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=IJXG7C/rLs0omri3bbxgUI5NvxadAAIhwS22q6nf80s=;
+	b=JlrQV2nylUpxdKBQ8S4+2v99yNocvBRRyeVoL2PaDt54iCYur6apWl8/Qksw9nGR7AVMwC
+	KUgNVT2ZyKniTN8G8iYiTyMMB7wotBpaCJ3LoJ0/5NtOPoMTRpIpk0R5Hpjq/iSqP0k+aF
+	KGswCdl8KXGjb9Xdl9hlr27LeMvN87g=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-346-bnZRZQjPMv-mUWpXnO0GdQ-1; Tue,
- 20 Jan 2026 09:52:04 -0500
-X-MC-Unique: bnZRZQjPMv-mUWpXnO0GdQ-1
-X-Mimecast-MFC-AGG-ID: bnZRZQjPMv-mUWpXnO0GdQ_1768920720
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-159-LHAAb3gbO4aq5Hg_2SEKEQ-1; Tue,
+ 20 Jan 2026 09:52:08 -0500
+X-MC-Unique: LHAAb3gbO4aq5Hg_2SEKEQ-1
+X-Mimecast-MFC-AGG-ID: LHAAb3gbO4aq5Hg_2SEKEQ_1768920726
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 88E5C19560B7;
-	Tue, 20 Jan 2026 14:52:00 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D621619560B1;
+	Tue, 20 Jan 2026 14:52:05 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.42.28.2])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BFEE818001D5;
-	Tue, 20 Jan 2026 14:51:56 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E8D3130001A8;
+	Tue, 20 Jan 2026 14:52:01 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Lukas Wunner <lukas@wunner.de>,
 	Ignat Korchagin <ignat@cloudflare.com>
@@ -60,9 +60,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	keyrings@vger.kernel.org,
 	linux-modules@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v13 09/12] modsign: Enable RSASSA-PSS module signing
-Date: Tue, 20 Jan 2026 14:50:55 +0000
-Message-ID: <20260120145103.1176337-10-dhowells@redhat.com>
+Subject: [PATCH v13 10/12] pkcs7: Add FIPS selftest for RSASSA-PSS
+Date: Tue, 20 Jan 2026 14:50:56 +0000
+Message-ID: <20260120145103.1176337-11-dhowells@redhat.com>
 In-Reply-To: <20260120145103.1176337-1-dhowells@redhat.com>
 References: <20260120145103.1176337-1-dhowells@redhat.com>
 Precedence: bulk
@@ -72,133 +72,171 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Add support for RSASSA-PSS signatures (RFC8017) for use with module signing
-and other public key cryptography done by the kernel.
+Add a FIPS selftest for RSASSA-PSS.
 
-Note that only signature verification is supported by the kernel.
-
-Note further that this alters some of the same code as the MLDSA support,
-so that needs to be applied first to avoid conflicts.
+This is the 267th test vector taken from NIST's SigVerPSS_186-3.rsp in
+186-3rsatestvectors.zip on line 2460, packaged into a rudimentary X.509
+cert and PKCS#7 message.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Ignat Korchagin <ignat@cloudflare.com>
 cc: Lukas Wunner <lukas@wunner.de>
+cc: Ignat Korchagin <ignat@cloudflare.com>
 cc: Herbert Xu <herbert@gondor.apana.org.au>
 cc: keyrings@vger.kernel.org
 cc: linux-crypto@vger.kernel.org
 ---
- Documentation/admin-guide/module-signing.rst |  5 ++-
- certs/Kconfig                                |  6 +++
- certs/Makefile                               |  1 +
- scripts/sign-file.c                          | 39 +++++++++++++++++++-
- 4 files changed, 47 insertions(+), 4 deletions(-)
+ crypto/asymmetric_keys/selftest_rsa.c | 133 ++++++++++++++++++++++++++
+ 1 file changed, 133 insertions(+)
 
-diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
-index 7f2f127dc76f..aa24715cd2d8 100644
---- a/Documentation/admin-guide/module-signing.rst
-+++ b/Documentation/admin-guide/module-signing.rst
-@@ -32,8 +32,9 @@ type.  The built-in facility currently only supports the RSA, NIST P-384 ECDSA
- and NIST FIPS-204 ML-DSA public key signing standards (though it is pluggable
- and permits others to be used).  For RSA and ECDSA, the possible hash
- algorithms that can be used are SHA-2 and SHA-3 of sizes 256, 384, and 512 (the
--algorithm is selected by data in the signature); ML-DSA does its own hashing,
--but is allowed to be used with a SHA512 hash for signed attributes.
-+algorithm is selected by data in the signature); RSASSA-PSS is allowed to use
-+SHA512 only; ML-DSA does its own hashing, but is allowed to be used with a
-+SHA512 hash for signed attributes.
+diff --git a/crypto/asymmetric_keys/selftest_rsa.c b/crypto/asymmetric_keys/selftest_rsa.c
+index 09c9815e456a..c06e32da0f7e 100644
+--- a/crypto/asymmetric_keys/selftest_rsa.c
++++ b/crypto/asymmetric_keys/selftest_rsa.c
+@@ -159,6 +159,131 @@ static const u8 certs_selftest_rsa_sig[] __initconst = {
+ 	"\x77\x55\x3c\x6f\x0c\x32\xd3\x8c\x44\x39\x71\x25\xfe\x96\xd2"
+ };
  
- 
- ==========================
-diff --git a/certs/Kconfig b/certs/Kconfig
-index 67a5786423b5..524d1747c541 100644
---- a/certs/Kconfig
-+++ b/certs/Kconfig
-@@ -27,6 +27,12 @@ config MODULE_SIG_KEY_TYPE_RSA
- 	help
- 	 Use an RSA key for module signing.
- 
-+config MODULE_SIG_KEY_TYPE_RSASSA_PSS
-+	bool "RSASSA-PSS"
-+	select CRYPTO_RSA
-+	help
-+	 Use an RSASSA-PSS key for module signing.
++/*
++ * RSASSA-PSS test vector from SigVerPSS_186-3.rsp published by NIST
++ * in 186-3rsatestvectors.zip.  This is the 267th test on line 2460.
++ */
++static const u8 certs_selftest_rsassa_keys[] __initconst = {
++	"\x30\x82\x04\x4c\x30\x82\x02\x84\xa0\x03\x02\x01\x02\x02\x04\x01"
++	"\x23\x41\x0b\x30\x3d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x0a"
++	"\x30\x30\xa0\x0d\x30\x0b\x06\x09\x60\x86\x48\x01\x65\x03\x04\x02"
++	"\x03\xa1\x1a\x30\x18\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x08"
++	"\x30\x0b\x06\x09\x60\x86\x48\x01\x65\x03\x04\x02\x03\xa2\x03\x02"
++	"\x01\x00\x30\x0f\x31\x0d\x30\x0b\x06\x03\x55\x04\x03\x0c\x04\x46"
++	"\x72\x65\x64\x30\x20\x17\x0d\x32\x36\x30\x31\x30\x31\x30\x30\x30"
++	"\x30\x30\x30\x5a\x18\x0f\x32\x31\x39\x39\x30\x31\x30\x31\x30\x30"
++	"\x30\x30\x30\x30\x5a\x30\x1c\x31\x1a\x30\x18\x06\x03\x55\x04\x03"
++	"\x0c\x11\x6e\x69\x73\x74\x5f\x72\x73\x61\x70\x73\x73\x5f\x32\x36"
++	"\x37\x5f\x50\x30\x82\x01\xa1\x30\x0b\x06\x09\x2a\x86\x48\x86\xf7"
++	"\x0d\x01\x01\x0a\x03\x82\x01\x90\x00\x30\x82\x01\x8b\x02\x82\x01"
++	"\x81\x00\xa3\xf2\x23\x5a\xd2\x05\x3b\x4c\x83\xfa\x38\xf8\x28\x4e"
++	"\xd8\x05\x42\x16\x21\xfe\x98\x84\x5f\xb0\x1b\x68\x9f\x5b\x82\xb3"
++	"\x25\x11\xb6\xd1\x61\x73\xe7\xb4\x0a\x66\xa3\xa9\x99\xc1\x89\xbe"
++	"\xb9\xe0\x68\x22\x15\x0a\xc8\xbe\x67\x71\x86\x37\x0c\x82\x3b\x52"
++	"\x77\xd9\x09\xde\x07\x56\x4e\x28\x1c\xca\x2f\x13\x87\x3d\x9d\x07"
++	"\xb7\xbd\x85\xa2\xb9\xac\x66\xf4\xce\x4f\x5e\x38\xb8\xe9\xee\xbe"
++	"\xc0\x4c\x8c\xaf\x31\x1e\x37\x5d\x69\xe8\x08\x51\xd5\x59\xb8\xe9"
++	"\x0e\x85\xba\x6b\x96\x47\x67\x90\xf7\x27\xc2\x5a\xa8\x16\x30\x62"
++	"\xec\x85\x43\xfc\xc7\x75\x9b\xe6\x2c\x77\x68\xec\xc3\x7f\x34\x0b"
++	"\xb0\x61\x02\x76\x2b\xf0\x44\x1c\xa1\xaa\x2c\x7a\x81\xbf\x37\xdc"
++	"\x8b\x27\x43\x9d\x3a\xbb\xa9\x38\x12\xc9\xbb\x44\xfe\x4d\x6a\x94"
++	"\xba\xae\x70\x93\x79\xf5\xce\x5d\x0c\x8f\x81\xd0\x00\x86\xb9\xca"
++	"\xa3\x02\x68\x19\x58\x8f\x49\x1b\x52\x58\x07\x89\x9c\xda\xb3\x3d"
++	"\x8e\x99\x21\x50\xd2\xb1\x05\xd3\xaa\xb6\x15\x21\x7c\x6a\x3d\x74"
++	"\x08\x31\xc7\xdc\x76\xfa\xab\xd9\xc9\xb9\x81\x7e\xad\x0b\x49\x45"
++	"\x66\xde\x14\x33\xff\xf5\xba\x46\x04\xc6\xb8\x44\x6f\x6f\xc3\x5e"
++	"\x74\x6a\xff\x84\xff\x8b\xd7\x50\x04\x10\xd1\x0e\x82\xbf\x4c\x90"
++	"\x36\x48\x9d\xe4\x7d\xee\x9a\x32\x7a\x5c\x45\x10\xd8\x56\x13\x21"
++	"\xb9\x1d\x55\x55\x9a\x4c\xba\x85\xe0\xc3\x61\x76\x70\x84\xb2\x52"
++	"\x17\xe8\xa6\x3c\x4e\x15\x1a\x1e\x88\x68\x9f\xee\xcf\xfd\x16\xfa"
++	"\x0a\x65\xae\x41\xd2\xba\xbc\xa9\x9c\xf1\xb9\x59\xc3\xc0\x76\xc0"
++	"\xf7\x59\x74\x14\x6f\x2c\xc4\x94\x12\x6f\xbe\xca\xd4\x21\x7b\x9a"
++	"\xaa\x00\xf1\x69\xfa\x51\x25\x27\xff\x5a\x0b\x50\xda\x46\xd6\xbe"
++	"\x87\x0e\xce\xf2\xaf\x7a\x1e\x6c\x45\x56\xf6\xf7\xa0\xa0\x0b\x9f"
++	"\x47\xcb\x02\x04\x00\xb3\xf5\x7f\xa3\x42\x30\x40\x30\x0c\x06\x03"
++	"\x55\x1d\x13\x01\x01\xff\x04\x02\x30\x00\x30\x0e\x06\x03\x55\x1d"
++	"\x0f\x01\x01\x00\x04\x04\x03\x02\x07\x80\x30\x20\x06\x03\x55\x1d"
++	"\x0e\x01\x01\x00\x04\x16\x04\x14\x2b\x73\x93\x2c\xf0\x6c\x34\x1a"
++	"\xa7\x2c\xce\xa4\xe0\xac\x35\xa9\x6c\xcc\x01\x0b\x30\x3d\x06\x09"
++	"\x2a\x86\x48\x86\xf7\x0d\x01\x01\x0a\x30\x30\xa0\x0d\x30\x0b\x06"
++	"\x09\x60\x86\x48\x01\x65\x03\x04\x02\x03\xa1\x1a\x30\x18\x06\x09"
++	"\x2a\x86\x48\x86\xf7\x0d\x01\x01\x08\x30\x0b\x06\x09\x60\x86\x48"
++	"\x01\x65\x03\x04\x02\x03\xa2\x03\x02\x01\x00\x03\x82\x01\x81\x00"
++	"\x78\x7c\xdd\x6e\x1d\x4f\xdf\x9a\x0d\x9f\x96\x5e\xb8\x57\x25\x23"
++	"\x2a\x9e\xfc\xc1\x2a\xbf\xa1\xef\x25\xa8\x1e\x09\x83\x11\x1d\x90"
++	"\x00\xd4\x94\xfc\x7d\x32\x01\xeb\x3b\xba\x32\x73\x02\x72\x7f\x70"
++	"\x86\x14\x7a\x75\x5b\x48\x27\x03\x0c\x72\x76\x53\x6f\x42\x55\x93"
++	"\xab\x2e\x91\x27\xa1\x49\xe7\x54\xde\x7a\xd7\x7f\x8c\x20\x43\x26"
++	"\x7d\xb4\x9f\x8a\x35\x03\x1d\x83\xf1\x3d\x14\x0d\x5d\xf4\xd4\x24"
++	"\xb4\x74\x54\x04\x1a\x23\xb9\x2f\xf6\x81\x8e\x74\x9d\x65\xd0\x1f"
++	"\xc5\x0b\xeb\xf6\x91\x52\xf3\xf5\xfc\xb4\x87\x3b\x10\x36\x21\x9e"
++	"\x22\xb1\xe7\x4f\x83\x68\xc8\xc5\x01\xce\x65\xf2\xc9\x29\xd9\x0a"
++	"\x8e\xc8\x99\x63\x0e\x80\x25\x47\xa7\xca\x6e\xf1\x8a\xb3\xcb\x3e"
++	"\xb4\xa6\x91\xee\x68\xae\xbe\xaf\x1b\x9c\x05\x5a\xd1\x22\x18\x03"
++	"\x9c\xf4\x80\xcd\x8d\x29\x43\x32\xc5\xe1\x6e\xbb\xe6\xaf\x11\xf8"
++	"\xf4\xbf\x49\xf9\xb4\xed\x2f\x51\x11\x26\xae\x78\x0a\x3b\x78\x4b"
++	"\xe8\xf4\x42\x6a\xbd\x17\xf8\x60\x00\x74\x48\x3f\x2a\xf3\xb7\x1a"
++	"\x89\x64\xc6\xe0\xfa\x00\x04\x9a\x1d\x94\x0d\x34\xcc\x08\x83\x9e"
++	"\x0c\x59\x25\x3d\x99\xe9\x0d\x17\x87\x1d\x48\x96\x74\x69\x56\x63"
++	"\x62\x61\x66\xd3\x6f\xf9\x1d\x8c\x22\x99\xa2\xf0\x51\xea\xe2\xd6"
++	"\x0e\x8e\xd0\xbc\x3f\xac\x1e\x49\x0b\x47\x0c\x12\xf3\xd6\x97\xf6"
++	"\xfb\xfd\x88\x0d\xe2\xe9\x0e\x9f\xcb\xd4\x85\xfa\x33\x93\x19\x83"
++	"\x72\xfb\x01\xe4\xce\xc5\xc1\x59\x17\xec\xdd\x42\xe5\x7c\x43\xec"
++	"\xf5\x5a\x8c\x0e\xcb\xdc\xef\x1b\xce\x4e\x36\xd9\x6d\x46\xb1\x12"
++	"\x57\x0b\x53\xf8\x2f\x3d\x20\x64\xb0\x8a\xc7\x86\x13\x67\x0a\x28"
++	"\xea\x69\xd7\x9c\x71\x7e\xb1\xc2\x94\x09\x0d\xbd\x56\x1f\xa6\xe5"
++	"\x04\xd0\x9d\x26\x57\x24\xe3\x7a\x2d\xc6\xf4\x45\xf6\xf5\x28\xc9"
++};
 +
- config MODULE_SIG_KEY_TYPE_ECDSA
- 	bool "ECDSA"
- 	select CRYPTO_ECDSA
-diff --git a/certs/Makefile b/certs/Makefile
-index 3ee1960f9f4a..3b5a3a303f4c 100644
---- a/certs/Makefile
-+++ b/certs/Makefile
-@@ -42,6 +42,7 @@ targets += x509_certificate_list
- # boolean option and we unfortunately can't make it depend on !RANDCONFIG.
- ifeq ($(CONFIG_MODULE_SIG_KEY),certs/signing_key.pem)
- 
-+keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_RSASSA_PSS) := -newkey rsassa-pss
- keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ECDSA) := -newkey ec -pkeyopt ec_paramgen_curve:secp384r1
- keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_44) := -newkey ml-dsa-44
- keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_65) := -newkey ml-dsa-65
-diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-index 547b97097230..800e2e2e36c3 100644
---- a/scripts/sign-file.c
-+++ b/scripts/sign-file.c
-@@ -233,6 +233,7 @@ int main(int argc, char **argv)
- 	EVP_PKEY *private_key;
- #ifndef USE_PKCS7
- 	CMS_ContentInfo *cms = NULL;
-+	CMS_SignerInfo *signer;
- 	unsigned int use_keyid = 0;
- #else
- 	PKCS7 *pkcs7 = NULL;
-@@ -338,12 +339,46 @@ int main(int argc, char **argv)
- 
- 		flags |= use_signed_attrs;
- 
-+		if (EVP_PKEY_is_a(private_key, "RSASSA-PSS")) {
-+			EVP_PKEY_CTX *pkctx;
-+			char mdname[1024] = {};
++static const u8 certs_selftest_rsassa_data[] __initconst = {
++	"\xbe\x2f\x3e\x1d\xc8\xa3\x71\x15\x70\x40\x1b\xd5\x35\x18\x54\x26"
++	"\x94\x4d\x09\x4e\x84\x81\xa1\x2a\x43\x8d\xe0\x7d\x54\x76\x0c\x88"
++	"\xc9\x9d\x4f\xdb\xbe\x35\x5d\x6a\x26\xfa\x56\xe3\xca\x20\xee\x3f"
++	"\x8e\x8a\xcb\x98\xf6\x3d\x2f\x3a\xea\x14\xd6\xfc\xb6\xb5\x22\xd1"
++	"\x55\xc3\x75\x9a\xef\x56\xde\x3e\xa0\xa8\xf9\xfd\x7b\x11\x10\x01"
++	"\xcf\x35\x86\x36\xa8\x7c\x76\x5c\x99\xc2\x97\x5b\xb9\x50\x63\xd6"
++	"\xec\x0b\x78\x02\x64\xec\x3e\xb9\x67\xb0\xca\xca\x52\xd1\x02\x94"
++	"\xde\xb4\x02\xd3\xa2\x24\xbf\xb9\xd9\xff\xea\x41\x66\x2f\x18\xc0"
++};
 +
-+			pkctx = EVP_PKEY_CTX_new(private_key, NULL);
++static const u8 certs_selftest_rsassa_sig[] __initconst = {
++	"\x30\x82\x02\x26\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x07\x02\xa0"
++	"\x82\x02\x17\x30\x82\x02\x13\x02\x01\x01\x31\x0d\x30\x0b\x06\x09"
++	"\x60\x86\x48\x01\x65\x03\x04\x02\x03\x30\x0b\x06\x09\x2a\x86\x48"
++	"\x86\xf7\x0d\x01\x07\x01\x31\x82\x01\xf0\x30\x82\x01\xec\x02\x01"
++	"\x01\x30\x17\x30\x0f\x31\x0d\x30\x0b\x06\x03\x55\x04\x03\x0c\x04"
++	"\x46\x72\x65\x64\x02\x04\x01\x23\x41\x0b\x30\x0b\x06\x09\x60\x86"
++	"\x48\x01\x65\x03\x04\x02\x03\x30\x3d\x06\x09\x2a\x86\x48\x86\xf7"
++	"\x0d\x01\x01\x0a\x30\x30\xa0\x0d\x30\x0b\x06\x09\x60\x86\x48\x01"
++	"\x65\x03\x04\x02\x03\xa1\x1a\x30\x18\x06\x09\x2a\x86\x48\x86\xf7"
++	"\x0d\x01\x01\x08\x30\x0b\x06\x09\x60\x86\x48\x01\x65\x03\x04\x02"
++	"\x03\xa2\x03\x02\x01\x00\x04\x82\x01\x80\x78\x7c\xdd\x6e\x1d\x4f"
++	"\xdf\x9a\x0d\x9f\x96\x5e\xb8\x57\x25\x23\x2a\x9e\xfc\xc1\x2a\xbf"
++	"\xa1\xef\x25\xa8\x1e\x09\x83\x11\x1d\x90\x00\xd4\x94\xfc\x7d\x32"
++	"\x01\xeb\x3b\xba\x32\x73\x02\x72\x7f\x70\x86\x14\x7a\x75\x5b\x48"
++	"\x27\x03\x0c\x72\x76\x53\x6f\x42\x55\x93\xab\x2e\x91\x27\xa1\x49"
++	"\xe7\x54\xde\x7a\xd7\x7f\x8c\x20\x43\x26\x7d\xb4\x9f\x8a\x35\x03"
++	"\x1d\x83\xf1\x3d\x14\x0d\x5d\xf4\xd4\x24\xb4\x74\x54\x04\x1a\x23"
++	"\xb9\x2f\xf6\x81\x8e\x74\x9d\x65\xd0\x1f\xc5\x0b\xeb\xf6\x91\x52"
++	"\xf3\xf5\xfc\xb4\x87\x3b\x10\x36\x21\x9e\x22\xb1\xe7\x4f\x83\x68"
++	"\xc8\xc5\x01\xce\x65\xf2\xc9\x29\xd9\x0a\x8e\xc8\x99\x63\x0e\x80"
++	"\x25\x47\xa7\xca\x6e\xf1\x8a\xb3\xcb\x3e\xb4\xa6\x91\xee\x68\xae"
++	"\xbe\xaf\x1b\x9c\x05\x5a\xd1\x22\x18\x03\x9c\xf4\x80\xcd\x8d\x29"
++	"\x43\x32\xc5\xe1\x6e\xbb\xe6\xaf\x11\xf8\xf4\xbf\x49\xf9\xb4\xed"
++	"\x2f\x51\x11\x26\xae\x78\x0a\x3b\x78\x4b\xe8\xf4\x42\x6a\xbd\x17"
++	"\xf8\x60\x00\x74\x48\x3f\x2a\xf3\xb7\x1a\x89\x64\xc6\xe0\xfa\x00"
++	"\x04\x9a\x1d\x94\x0d\x34\xcc\x08\x83\x9e\x0c\x59\x25\x3d\x99\xe9"
++	"\x0d\x17\x87\x1d\x48\x96\x74\x69\x56\x63\x62\x61\x66\xd3\x6f\xf9"
++	"\x1d\x8c\x22\x99\xa2\xf0\x51\xea\xe2\xd6\x0e\x8e\xd0\xbc\x3f\xac"
++	"\x1e\x49\x0b\x47\x0c\x12\xf3\xd6\x97\xf6\xfb\xfd\x88\x0d\xe2\xe9"
++	"\x0e\x9f\xcb\xd4\x85\xfa\x33\x93\x19\x83\x72\xfb\x01\xe4\xce\xc5"
++	"\xc1\x59\x17\xec\xdd\x42\xe5\x7c\x43\xec\xf5\x5a\x8c\x0e\xcb\xdc"
++	"\xef\x1b\xce\x4e\x36\xd9\x6d\x46\xb1\x12\x57\x0b\x53\xf8\x2f\x3d"
++	"\x20\x64\xb0\x8a\xc7\x86\x13\x67\x0a\x28\xea\x69\xd7\x9c\x71\x7e"
++	"\xb1\xc2\x94\x09\x0d\xbd\x56\x1f\xa6\xe5\x04\xd0\x9d\x26\x57\x24"
++	"\xe3\x7a\x2d\xc6\xf4\x45\xf6\xf5\x28\xc9"
++};
 +
-+			ERR(!EVP_PKEY_sign_init(pkctx), "EVP_PKEY_sign_init");
-+			ERR(!EVP_PKEY_CTX_set_rsa_padding(pkctx, RSA_PKCS1_PSS_PADDING),
-+			    "EVP_PKEY_CTX_set_rsa_padding");
-+			ERR(!EVP_PKEY_CTX_set_rsa_mgf1_md_name(pkctx, hash_algo, NULL),
-+			    "EVP_PKEY_CTX_set_rsa_mgf1_md_name");
+ void __init fips_signature_selftest_rsa(void)
+ {
+ 	fips_signature_selftest("RSA",
+@@ -168,4 +293,12 @@ void __init fips_signature_selftest_rsa(void)
+ 				sizeof(certs_selftest_rsa_data) - 1,
+ 				certs_selftest_rsa_sig,
+ 				sizeof(certs_selftest_rsa_sig) - 1);
 +
-+			ERR(!EVP_PKEY_CTX_get_rsa_mgf1_md_name(pkctx, mdname, sizeof(mdname)),
-+			    "EVP_PKEY_CTX_get_rsa_mgf1_md_name");
-+			printf("RSASSA-PSS %s\n", mdname);
-+			flags |= CMS_KEY_PARAM;
-+		}
-+
- 		/* Load the signature message from the digest buffer. */
- 		cms = CMS_sign(NULL, NULL, NULL, NULL, flags);
- 		ERR(!cms, "CMS_sign");
- 
--		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo, flags),
--		    "CMS_add1_signer");
-+		signer = CMS_add1_signer(cms, x509, private_key, digest_algo, flags);
-+		ERR(!signer, "CMS_add1_signer");
-+
-+		if (EVP_PKEY_is_a(private_key, "RSASSA-PSS")) {
-+			EVP_PKEY_CTX *pkctx;
-+			char mdname[1024] = {};
-+
-+			pkctx = CMS_SignerInfo_get0_pkey_ctx(signer);
-+			ERR(!EVP_PKEY_CTX_set_rsa_padding(pkctx, RSA_PKCS1_PSS_PADDING),
-+			    "EVP_PKEY_CTX_set_rsa_padding");
-+			ERR(!EVP_PKEY_CTX_set_rsa_mgf1_md_name(pkctx, hash_algo, NULL),
-+			    "EVP_PKEY_CTX_set_rsa_mgf1_md_name");
-+
-+			ERR(!EVP_PKEY_CTX_get_rsa_mgf1_md_name(pkctx, mdname, sizeof(mdname)),
-+			    "EVP_PKEY_CTX_get_rsa_mgf1_md_name");
-+			printf("RSASSA-PSS %s\n", mdname);
-+		}
-+
- 		ERR(CMS_final(cms, bm, NULL, flags) != 1,
- 		    "CMS_final");
- 
++	fips_signature_selftest("RSASSA",
++				certs_selftest_rsassa_keys,
++				sizeof(certs_selftest_rsassa_keys) - 1,
++				certs_selftest_rsassa_data,
++				sizeof(certs_selftest_rsassa_data) - 1,
++				certs_selftest_rsassa_sig,
++				sizeof(certs_selftest_rsassa_sig) - 1);
+ }
 
