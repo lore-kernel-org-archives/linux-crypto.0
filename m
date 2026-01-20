@@ -1,156 +1,111 @@
-Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BC13EDABE;
-	Tue, 20 Jan 2026 10:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD1E3ED13E;
+	Tue, 20 Jan 2026 10:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768904903; cv=none; b=plXoI3il3GKlexD+Su11lgAhng7yxRdN+glW88w7IthYUMljMQnrGDM0/8Z4pThX/3djzGCRKrbGQcGlhd0oiU72jRcm92+VNQqtBvKwOCWaUt8NAAwU+fbf5OkvqimVQKPC+rOx8oyrd48u6nCcmQv2yIvWWhxfWalX65/+v48=
+	t=1768905442; cv=none; b=Y+QPoSOGUeuPNBcrxP0+tIxlqMOsNm3Q0WI4BJaRZLMpbHhhC8n7r6FGqtDmqoRoILcbRTScPo1dQyelp/2K18kpePiRj6Lj8x58aelmzTABYsP7cc6uQ6T6do3rn2/ffrcn8oCeSsGUTS/I9jC2N7lj7D8yufVAhlNBGk6hwgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768904903; c=relaxed/simple;
-	bh=uAbk1/Uz2jcgXXPvriA1m0gX6yf6gApwV4w11D9e+k8=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=EATC+XwUCGbuTbc+FmQW6lHSTm116qGalKMVRcguUAL5vG50rzdvYn7qWgWKvz9MG0BbozjYIoHTg+ATVdzgX8TGS0+zg3TWrbBedSqR6S8r5vOZYAa+K7IG9nvU6qdeKZwpPt/HxNzd3V3pcw5lQ3SV1SRe1CH6wOQGsW3Joi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=hN9KLdlX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=x/vEY8yh; arc=none smtp.client-ip=202.12.124.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1768905442; c=relaxed/simple;
+	bh=pXSDHluWsRP0ONrt2c4w8+y04vClCGg63HGKISeqXk4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oqf9S2Ax5zy6usXQYp1D2re7Q61UtgmiC2sBES374pi6t89rNtNhA3ivLheiOmJ4SVDB/zZqPM/RSPg8ptifCF4dJc69OhAJ9oNbMe/hEVOfcW5708R7wUUZO7JJllV8CtpOTR9LsEQnSjmWsX0FFG1yXAc+rOsxl1C3sMRPO9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j1CnPJjX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="hN9KLdlX";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="x/vEY8yh"
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.stl.internal (Postfix) with ESMTP id 07AF61D004D5;
-	Tue, 20 Jan 2026 05:28:20 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Tue, 20 Jan 2026 05:28:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
-	1768904899; x=1768991299; bh=C3EXE34x1FqSyMvYORQfF6pSnoOYXTmwsAd
-	UpJjSX4k=; b=hN9KLdlXFBqO3z1rE4l3FNa6pysHyxvxAaeUL+gE4jcSNI4QzmW
-	niJzH9B7sz96mtrTwSthQw5hOoOFjDgFDsJfHHvdeI9d1xHYn38VnFb2D+9opnKD
-	7t8eXVMGpAmDWaBbChrGoRNqmDCryjZRQx9eLtsZD0rsTVBa6jklFZSDgF8Luh7R
-	f7CFECVYFWTNZnk7wFnUkJpWDer4k+ZG+baEybDgxlntdnXQTQR58JxkhK6wcTHL
-	fxj/R1hBmDLsjAjTMgHPgu0wB6vIIS5KUi1X4LyKMI95YEPRu2o8gYBR9D7UBU7D
-	NFLS2g+NpuHnBNfQrvtzR0hWhl5Wwns6RDQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1768904899; x=
-	1768991299; bh=C3EXE34x1FqSyMvYORQfF6pSnoOYXTmwsAdUpJjSX4k=; b=x
-	/vEY8yh/+K/bJFMKKoNH6RNKOKyUTMKznsKU/X+HeRAHv7M5vEBYU347hvC6abrg
-	fR6IAQld/ZHkp+2EOJLIHkg08VB+AZaLjkLpfgJORpONuir9dMMt+O87rbYyoNly
-	yCuJX9Rwtc61MTaokAtSNGv15bby5HQcyipaS4JpYLwwCfcAxcokiAH23FH7vx66
-	34z/2yliFuzoduPOuTd7cqxO+zbntlHFuYOQHcLyS5RRItwCg0FDPb5yohgytprc
-	IxysS6vuzMHPZFBqa/KMJPoCzyTfqEJVuDuvmSeqM0GII2RTr2AzGsjyAG0N0QaB
-	Oq++yxlVPdfJE/mGBObEw==
-X-ME-Sender: <xms:w1hvaYAO_XVpYN0MjCapn5gUhgYGqvMN3_NJ-mezp0R9Oc_ZA626Tw>
-    <xme:w1hvaSr-xCBhzJM3FtapcGvnTtekbybFml001IruHmzrNSd1DwXyXvyOt5IHYsA4V
-    yiOTJfb6nLwSPwI6jQZCVKnH0oP9NiC3IU4K15wk_b8FwOqiA>
-X-ME-Received: <xmr:w1hvabEBi3RolmKwCd0ZhzAFp2981QBg0OQPUONatUInSposudcnZSUy3insU1kcJ08zNjFAhF1g9A4rCMOqrK3zrgEC5ZFhMzTS-zvT26ky>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugedtudejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epuddtgfdufffhffeuueeludffvdejfeeufeeggfettddttdeigfetjeegveffgeegnecu
-    ffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurf
-    grrhgrmhepmhgrihhlfhhrohhmpehnvghilhgssehofihnmhgrihhlrdhnvghtpdhnsggp
-    rhgtphhtthhopeduvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhinhhugi
-    dqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhf
-    shguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugi
-    dqtghrhihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhgvnhhn
-    rghrthesphhovghtthgvrhhinhhgrdhnvghtpdhrtghpthhtoheptghhuhgtkhdrlhgvvh
-    gvrhesohhrrggtlhgvrdgtohhmpdhrtghpthhtohepthhrohhnughmhieskhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepjhhlrgihthhonheskhgvrhhnvghlrdhorhhgpdhrtghpth
-    htohepvggsihhgghgvrhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopegsrhgruhhn
-    vghrsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:w1hvaes8S-KeCEA2rdlHCpMvRH7uKjBisa5YWNLQhQGR951ArjqsPQ>
-    <xmx:w1hvaZYzWGJ8aZZwZQvFS4bRfdBqK_fAEp5uRvDiGnBwWNmsG1byeA>
-    <xmx:w1hvaW5anCXSFAKbH_KSP8gkF13OjV1B-7sxcKZy4sI3f9QFfAkO5g>
-    <xmx:w1hvaZ9fI9eJZT0Mh-WJXePIXZqtoGxh6OP89cAv9UPbImZke5RDCQ>
-    <xmx:w1hvaeMRlBbBquaIq6kujcykaIhsu85Z58Zq_Vbdwe3zix753h3pCrBX>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 20 Jan 2026 05:28:16 -0500 (EST)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j1CnPJjX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5C9C16AAE;
+	Tue, 20 Jan 2026 10:37:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768905441;
+	bh=pXSDHluWsRP0ONrt2c4w8+y04vClCGg63HGKISeqXk4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=j1CnPJjX4mcaIEUN6krptYAmbm5vqV9fYKxtAMaWcB3j2XeJe4k7q/k9lj6ITGgiy
+	 qZ35wiEOcQyS73TdBS9Ux7cz6vN9+zOqXptZE0YdydL+C+fS3kQ9fDxKcIwQ2ADdto
+	 BBz35lqNBlRhO4xMAQZoNwdbL7c9dXC2MbM+pm2JjPFUpBje/Ih7H/stTfXmPOlyzg
+	 thMrOTxD5wcvAUs0aPKotSo/R3T5cnos7esEgUiInb3MCWfF0A+WSpLBkrw8e4w8eM
+	 VCUnXBrcciz2dippNMBrFJlZEm8wKtqPO8XylhMkJcWc9PTj+q1N6BYqKuFIzpV3OB
+	 Apy0k4iYCPSBQ==
+Date: Tue, 20 Jan 2026 11:37:16 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: NeilBrown <neil@brown.name>
+Cc: Benjamin Coddington <bcodding@hammerspace.com>, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+	Eric Biggers <ebiggers@kernel.org>, Rick Macklem <rick.macklem@gmail.com>, linux-nfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	Lennart Poettering <lennart@poettering.net>
+Subject: Re: [PATCH v1 0/4] kNFSD Signed Filehandles
+Message-ID: <20260120-kundgeben-privat-e9077477f862@brauner>
+References: <cover.1768573690.git.bcodding@hammerspace.com>
+ <20260119-reingehen-gelitten-a5e364f704fa@brauner>
+ <176885678653.16766.8436118850581649792@noble.neil.brown.name>
+ <20260120-tratsch-luftfahrt-d447fdd12c10@brauner>
+ <176890236169.16766.7338555258291967939@noble.neil.brown.name>
+ <20260120-irrelevant-zeilen-b3c40a8e6c30@brauner>
+ <176890489330.16766.1807342797736472831@noble.neil.brown.name>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Christian Brauner" <brauner@kernel.org>
-Cc: "Benjamin Coddington" <bcodding@hammerspace.com>,
- "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
- "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
- "Eric Biggers" <ebiggers@kernel.org>, "Rick Macklem" <rick.macklem@gmail.com>,
- linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-crypto@vger.kernel.org, "Lennart Poettering" <lennart@poettering.net>
-Subject: Re: [PATCH v1 0/4] kNFSD Signed Filehandles
-In-reply-to: <20260120-irrelevant-zeilen-b3c40a8e6c30@brauner>
-References: <cover.1768573690.git.bcodding@hammerspace.com>,
- <20260119-reingehen-gelitten-a5e364f704fa@brauner>,
- <176885678653.16766.8436118850581649792@noble.neil.brown.name>,
- <20260120-tratsch-luftfahrt-d447fdd12c10@brauner>,
- <176890236169.16766.7338555258291967939@noble.neil.brown.name>,
- <20260120-irrelevant-zeilen-b3c40a8e6c30@brauner>
-Date: Tue, 20 Jan 2026 21:28:13 +1100
-Message-id: <176890489330.16766.1807342797736472831@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <176890489330.16766.1807342797736472831@noble.neil.brown.name>
 
-On Tue, 20 Jan 2026, Christian Brauner wrote:
-> On Tue, Jan 20, 2026 at 08:46:01PM +1100, NeilBrown wrote:
-> > On Tue, 20 Jan 2026, Christian Brauner wrote:
-> > > > You don't need signing to ensure a filehandle doesn't persist across
-> > > > reboot.  For that you just need a generation number.  Storing a random
-> > > > number generated at boot time in the filehandle would be a good solut=
-ion.
-> > >=20
-> > > For pidfs I went with the 64-bit inode number. But I dislike the
-> > > generation number thing. If I would have to freedom to completely redo
-> > > it I would probably assign a uuid to the pidfs sb and then use that in
-> > > the file handles alongside the inode number. That would be enough for
-> > > sure as the uuid would change on each boot.
-> >=20
-> > What you are calling a "uuid" in "the pidfs sb" is exactly what I am
-> > calling a "generation number" - for pidfs it would be a "generation
->=20
-> "generation number" just evokes the 32-bit identifier in struct inode
-> that's overall somewhat useless. And a UUID has much stronger
-> guarantees.
->=20
-> > number" for the whole filesystem, while for ext4 etc it is a generation
-> > number of the inode number.
-> >=20
-> > So we are substantially in agreement.
->=20
-> Great!
->=20
-> >=20
-> > Why do you not have freedom to add a uuid to the pidfs sb and to the
-> > filehandles now?
->=20
-> Userspace relies on the current format to get the inode number from the
-> file handle:
-> https://github.com/systemd/systemd/blob/main/src/basic/pidfd-util.c#L233-L2=
-81
+On Tue, Jan 20, 2026 at 09:28:13PM +1100, NeilBrown wrote:
+> On Tue, 20 Jan 2026, Christian Brauner wrote:
+> > On Tue, Jan 20, 2026 at 08:46:01PM +1100, NeilBrown wrote:
+> > > On Tue, 20 Jan 2026, Christian Brauner wrote:
+> > > > > You don't need signing to ensure a filehandle doesn't persist across
+> > > > > reboot.  For that you just need a generation number.  Storing a random
+> > > > > number generated at boot time in the filehandle would be a good solution.
+> > > > 
+> > > > For pidfs I went with the 64-bit inode number. But I dislike the
+> > > > generation number thing. If I would have to freedom to completely redo
+> > > > it I would probably assign a uuid to the pidfs sb and then use that in
+> > > > the file handles alongside the inode number. That would be enough for
+> > > > sure as the uuid would change on each boot.
+> > > 
+> > > What you are calling a "uuid" in "the pidfs sb" is exactly what I am
+> > > calling a "generation number" - for pidfs it would be a "generation
+> > 
+> > "generation number" just evokes the 32-bit identifier in struct inode
+> > that's overall somewhat useless. And a UUID has much stronger
+> > guarantees.
+> > 
+> > > number" for the whole filesystem, while for ext4 etc it is a generation
+> > > number of the inode number.
+> > > 
+> > > So we are substantially in agreement.
+> > 
+> > Great!
+> > 
+> > > 
+> > > Why do you not have freedom to add a uuid to the pidfs sb and to the
+> > > filehandles now?
+> > 
+> > Userspace relies on the current format to get the inode number from the
+> > file handle:
+> > https://github.com/systemd/systemd/blob/main/src/basic/pidfd-util.c#L233-L281
+> 
+> The
+>   assert(r != -EOVERFLOW);
+> means you cannot extend it
+> 
+> > 
+> > And they often also construct them in userspace. That needs to continue
+> > to work. I also don't think it's that critical.
+> > 
+> 
+> as does this.
 
-The
-  assert(r !=3D -EOVERFLOW);
-means you cannot extend it
+Well, we could add a new version and we could make this work. I just
+don't think we need to right now.
 
->=20
-> And they often also construct them in userspace. That needs to continue
-> to work. I also don't think it's that critical.
->=20
-
-as does this.
-
-OK, thanks.
-
-NeilBrown
+Btw, the manpage for name_to_handle_at() and friends mandates that file
+handles are to be treated as opaque and should not be messed with
+directly. That ship has sailed a long time ago. Userspace very much
+relies on file handle layout. That's at least true for cgroupfs and
+pidfs.
