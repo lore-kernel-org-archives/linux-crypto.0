@@ -1,264 +1,141 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBEF43901C
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 14:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E98B4418ED
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 14:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.173
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768917977; cv=pass; b=bZ5tB5H5U7XN7ikCqzmT6XmlBzmI9cgZeA2enTCw/pDweTBbL0Ko6LAleLLy8uIqCMEJYdp0i/UlK6LmELTYOe0GyU3HSs55ngVTlYuL0/KuIIltph6G8WnRkQKYYpwpPvRKUsjrEuVfuq5ISRTJ8lpfjL48oStLIJdY95Od+x8=
+	t=1768918415; cv=pass; b=IPuwcbNf8hIMFlDd6wii48R2vB/xhkh9o7RvX7x1QypVvYM/0eH2EG7BZg9YouKIo+YBejTPr+/flo6pBnBkp+7jPPCjtqFYWQz7AnUeutSAzSJxu/+6wIfWfWJbK4Vmv/q5mtj/C03mbIwprBwdDvyAxtoQ6jUxHqkt6UD0NKw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768917977; c=relaxed/simple;
-	bh=YK2c/N6z+9ArDdm+zc44ynJ17RZ2p78JcQ4HLMIlkFI=;
+	s=arc-20240116; t=1768918415; c=relaxed/simple;
+	bh=TbZbO+fx6iRdUpF4L5EkzdrM0Mo3gbhoq53Zn14NnpI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tnNkyVVHPdq/tkQzC73km4AzeR8hR96FXGlqCx7ZYAhztllx5A303bIqG1nTk1MT2+pqbSXvpxqr7H5LbMsvl3HS+z5zXQ4mWk4mnggE/p3y20sagK1YtdLH9QKdKwTKRRjelwIsQgsbvHEGF+/Ihp4fSp0YfFaB708oYIX7ttM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=PYoULEK4; arc=pass smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+	 To:Cc:Content-Type; b=SMDONeGOhiuUlGaOUBiPisMSOTwEvinf4D1GClK4biKhLdDOeI3xwUHx1xrKKAqKpfTK3w2AWI4qehQIh8dBYH+T3eAfWubYsjtJAYMER9aufnXwbDIvntJ4YsfhlGIyoOMzf0X+Xt/crtOR9cvjXNjdEDJV1gd13oVbtw7G+lw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ubYTugLH; arc=pass smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="PYoULEK4"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-382fea4a160so51708441fa.2
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 06:06:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768917974; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ubYTugLH"
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8c52f15c5b3so620376585a.3
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 06:13:33 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768918412; cv=none;
         d=google.com; s=arc-20240605;
-        b=ge2CYBsOk/+sT/KliMZfGjrNpv2g99Se0B2SGTEz2G0ps7WnlHbouVPTRYwGas/eeP
-         zgCpedG8OT7Ik6sbZ3hIhQg1MvM84PtfU+Bn/77P7OjLxE3BWz016aPx7QERqPUwtwIt
-         WYIk6HoiN67AhLTmqwo9BOPWIIGBRpAi6BabBjRVso86kR7aPyToMkRXXLrPYDbWBR1Q
-         xLzCKeickj26ELolg8HvlJvUuvAO78wK6thCuJiUvhoVZZan2lFE0JzrBsEihZv11va9
-         X4mefuNEpY0sfyj7NGRPa/VLkQIOOVRH+XIPt2+Jqf1lgFcv+IiBEpyFKPDG9jN4wavG
-         R+WA==
+        b=kx2aJh81o5622UWEP8O6PHf5IR/UO/IyQkw8YKcZMFmlFdPjGgE/RMxGAulEEk68+t
+         41VRrU/Pld/A7fgSDZH9ctlSX0S4bjD0CKFPL/Skoa8MOT9oacB621z/8ZfvEYY97Ocs
+         13kK6Bk8WIKSCNGaEvsLQgjyWfnt5lTFcQzOeRmtGBRimUeWsrgHnoeP3tgty19eFkDM
+         aED3h/+Nrv7RYCweTGD24uQDE1OujM3zkbg83A8bgKg2CVTYHXiR+iA6v6a5t2vxffZb
+         EnOzsSIrno34ZIFK58cnBpUfOn/VUzSXLwleJ3KSYHf8pxqse6Y08AkZgzbVUYV/nzuC
+         jyPg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=coebzWgpCcGie0B0iLVoXdMDPnL95oM6P6x36fKk/EY=;
-        fh=6PSOudsKU0o3MCoGShRrp5wAbkL/j+mTbhmm4h6E+FA=;
-        b=kUJk2f0h80QTfm7ZzjhyLPfa+gG/nUWOJo+gzTybj9ts+vvvf54WPU3VdL3TUgm5tS
-         lquKDVj/9MXiuPn98QNnh1PAWyLVymUuYNZIggduG0J4KUZ1taxa45fvhTpg60SBs8be
-         7WN0rnhKgSnI4ZshOPw6IDnHRn+GLy7cOf0r6iyrxmMQg1zwH7H33jcUBvdc/CPg9/2G
-         oipQqWC25bgfLT7uNVoqn1popprWBWXu5q+0J+pDTWxumtKS2BaPCPSMs8bjP+Uob/E7
-         3l8HO7SIoHlG3/HmquY3X0ptffPfXZ7MpW1CoBQgangG9iOYphgkOmZK4rcesfMFpmO7
-         EO1Q==;
+        bh=IdYE5jdvNdfk3sHI8GmEWBpt99cM9oMrMqemVzHltu4=;
+        fh=WtJLEzQ+nJrpW4eOQ4nCRRzKPNZZ/QvpZsR7rtrxy2I=;
+        b=jVzOUl8XVpz/Fa7ZgmVSyRTyhN2XTAJligi4cXB4orGMQNFvQ7qpDEPvo+0eNcs8SZ
+         MscSSUj0XeoEq7wnOt8SYYZd9MQMhvPsJMwZSKVpJ6Xzj71RnbCqnpiAWSS8Ucxp0ksY
+         IZFeS9ZaJBW6qCzhXwelwfsQPlCckk8yzLQcU5u2RqKosrhS7ZuiQ6u7PnlBxlpzKG+/
+         pBNMdo+GFP0aqB6lpPYLJVJ8Lws1bm/X/PFWtkkyNAMHkuJ+L7Eo+CJwYNjqFmOrN5hW
+         MkCGhSpCTunlTqbMKBnojXAfxCLWt7zEPyWzRWxwnFtBl/m96iqp45ORtbOT/mTO4Elh
+         wk3A==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1768917974; x=1769522774; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768918412; x=1769523212; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=coebzWgpCcGie0B0iLVoXdMDPnL95oM6P6x36fKk/EY=;
-        b=PYoULEK4cqitfrBlIQZhi3kBTcJ+4N1ROiEDanbo1dg1WfyOIkx6t5rW2nuJUV9UjM
-         dy7Iz80h/Q8OrjKMs0wAC29Ed/+tYt8l3KFLwSUhWbYdWR0/UPdJDh5vOHAD6PGVLt4Z
-         wFGwr7plHN1/0MWWvVGoF0P2Ycb+Pnj3JVRNtgfTZmsS+6j+xW+lF3nM+7GcDY18knjA
-         mbl6pYs3dt+9c6N0OPuAZ1ScUp2RKzD0RUDmz2GyoKmSnMA8jvzrM5aRMvjWWTHO5dox
-         2CHvvcz/jF/yOMCKU/9q35LF1xXj8m7iQUC4MiFwXTnoKXwk2Dx5StR/NS0HDUD4sll/
-         VslA==
+        bh=IdYE5jdvNdfk3sHI8GmEWBpt99cM9oMrMqemVzHltu4=;
+        b=ubYTugLHLKD5qHk7wxeCXwvzvGEzDc9STp3csWfmDxWVGAC0tPES7Y0kHcQNteRK4o
+         D+CMhVLKTo3H5jP23G4qVJuXucrgrhoRQDSfaZS6PyfZGUuSGOGiLnuyhV00XZbA5dhH
+         To6PlZxnxT/OUDJbVcPMl+YSy0qj4xWK7EZr2TcN9FES7G5eENDTkVXuYhaABtpi7Q0s
+         4F8mF3V76FgL3sC+LJERu4yW+eLp9O2KQ0BoSqOqYb4pD8KudsuH4Mp6E/zlCl9fYdhe
+         qN+IjvXCWw0xHr/PmMBZftS79eOOjaz7kznHRa0haSy/IGR4w8bFbYnkIIcWaTybBms2
+         WnEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768917974; x=1769522774;
+        d=1e100.net; s=20230601; t=1768918412; x=1769523212;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=coebzWgpCcGie0B0iLVoXdMDPnL95oM6P6x36fKk/EY=;
-        b=m2a2tUPvWgoOqMz4TTq/7jSfg0cmxL3HaS2TdbQ7b944ZnpvVGTBlU/MHa2rl/FOzg
-         cwxBWH0a6kHT4KIYxLsjjFkZe5xQPa4zQl/MjSBmswYc/+UfdZLZ2s7v8P/1vpgd8Py3
-         AHgkUi9sxL9D/XyXtfr53eYBKSF+SSnr8HyrzJSsEUF6isH1KH+FQ0z0lNEibITi69/T
-         95HNfteex2YOIWiQ/K0GW5awVxJSm+a6/H5TpnofkxHX76mfVBxE+1z/R6Wita/oJaI7
-         OJcW8npK6Lsv5eIU9VTLNmj0WItRW2rdeIjs4sVgaiJ5zhoMhOCtCqT9pln7DDNN579/
-         05aQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWYTPpJQWTupdqWuufp0AFI2i3AtxqpA6l8+DgwpkydBNO3sM2gG7+5lc/l2AG6aR0TJ5PiTRTmqePgdv4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmCYdYOq08eXbxS86CkNDaQR69HvndyfUSCv2hIx9VTxhEL4CF
-	Pr6PHre6dQR6sq403lAByRKiP8VXoMY4ZDphSSzI3aRizzoTvqvrXTHG8/SwQVPnYmDwvrwNiji
-	tyRb+mUxpxdBEhtPeUzMcs2aY5k4nMgUTLX+kZaSm7LvqEoWKrIPIOSM=
-X-Gm-Gg: AZuq6aIZHdCsW53BjWNtONbEd4iLQnQsYMcTT9jdk/gGnU4Yc65CgKibQdremDNyP4X
-	4t1aPaqRcPxVl8XA6um9pd2eY1MvlZBOzIpdexxl0Ejryz+M7Tw+NnoFOIwCKpbHbd6tXhB6UfB
-	jspVox40rxp5XopjE9meOjZF++J6d+wfzzPZsov1hgo6DSjZs7o6Ie75LcADvG04E6GTlMZR1bU
-	nxkKVq7GoUiUGF7KTjnLP8ThPtWz9DuOldLLexmjDAV8gA6czVaTHZDNJaaLSllmy9AWD0TxDit
-	TTCyskk7BWQ=
-X-Received: by 2002:a05:651c:31cd:b0:383:20cd:530d with SMTP id
- 38308e7fff4ca-38384147aa6mr58209661fa.7.1768917973945; Tue, 20 Jan 2026
- 06:06:13 -0800 (PST)
+        bh=IdYE5jdvNdfk3sHI8GmEWBpt99cM9oMrMqemVzHltu4=;
+        b=mI44W+nye6esWA0KK6KASZawdRP9jDWR8t+3dA0mt6h4nJcjky/Au25krX1SrvLixF
+         EC2zvfLrXl+FLTl/rmV6AX4d2jMTAwpOQD+7GVI7OdPCW4BsQpNMp2E6ERvzOGzF69PQ
+         ZigPRNWy1MZhhTstNQhCNtIZfTfaYFzqQcW7T/xgvCZEFi3Ee8WNKNXnOHN7H2qF18Cl
+         PwkLxDELSS1x4r7ApPK8YtbOr9oWG/z2lJzCeG5/nXQDgMiqupxHH1JZi209+KS7kng3
+         g1P1uvo04lxt0KbxrwLZYaRPkq1+mD4+1rF+mLDg0SNJBIjnhVkg9+Ve6VjjcwJdJs/v
+         HY1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUsBZ28NZA+iM7dixsbr6FAwpq28ZEox6kwQfJFywZmd4kpRC84WJgoOXwuE7bl1LpS2WSJ3VrB+IpwF7U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZUl7r4ipZ+xi44XkqIQFk6uBqflkVkl/vprG+O6lBLgp0n5S2
+	gk4O5G6b3EPybjW1ctlkLTHwPn9OXBucLx5VllNTlSn/gqbZ7aM+U1xzz3uQO4GJXfvD0uxB8R5
+	5uwRWd4DWvFsFM+wufFgNVYebTvnLsiB6MPJ5D8/n
+X-Gm-Gg: AZuq6aJQuRHk8qJ62qXoWcUAzD6xT183WIFsLkDWdPCtjE3iIXBAuycV9tDBP3krjHm
+	VVtzjzaHWOzcRvUJWBKrn15gkOwHJ1lHAXXFW7zrHMuKAO0J/H5OP3plM47UpyQp8XqnXGNA0WO
+	uCdinVNhY0QDEnpDuDJj0kiXbuzKqHrmkaFVSejWWr1r13h3GmeaoV/hAODsagp5myG8BtZfuHG
+	cKq6Xgi0blF/JLlfft2TQN1C3L2VLEPVz2F+cSs8qXdbqJAvu0IDqLyzjQH2on05iRL7oKchD5I
+	836uEyVwnXNCu/r2w7CSOkf/IBvryKYaGFA=
+X-Received: by 2002:a05:6214:202b:b0:894:68cf:49fc with SMTP id
+ 6a1803df08f44-89468cf5432mr19791426d6.23.1768918411939; Tue, 20 Jan 2026
+ 06:13:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260115215100.312611-1-dhowells@redhat.com> <20260115215100.312611-3-dhowells@redhat.com>
-In-Reply-To: <20260115215100.312611-3-dhowells@redhat.com>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Tue, 20 Jan 2026 14:06:02 +0000
-X-Gm-Features: AZwV_Qig-WseM1AqWnFAmAYc7N-AnkJS9PkeaesylQLn3vd-pGi7_2LyqZ5fUb8
-Message-ID: <CALrw=nH8zOXiyiCGkx1A533ijM=pyVebbhYCFpUyvP0bnjrXzA@mail.gmail.com>
-Subject: Re: [PATCH v12 02/10] pkcs7: Allow the signing algo to calculate the
- digest itself
-To: David Howells <dhowells@redhat.com>
-Cc: Lukas Wunner <lukas@wunner.de>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Eric Biggers <ebiggers@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
-	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Stephan Mueller <smueller@chronox.de>, 
-	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org, 
-	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260112192827.25989-1-ethan.w.s.graham@gmail.com> <20260112192827.25989-7-ethan.w.s.graham@gmail.com>
+In-Reply-To: <20260112192827.25989-7-ethan.w.s.graham@gmail.com>
+From: Alexander Potapenko <glider@google.com>
+Date: Tue, 20 Jan 2026 15:12:55 +0100
+X-Gm-Features: AZwV_QhSRG2StFyNZkwjvq48dDIr-HhWGfUMqppHNhj04WZytkphQv9nwByXueo
+Message-ID: <CAG_fn=VdRkSjvhO7wz7_PEznBOFgLjHCr2hSXwrKoO-hpMqTzg@mail.gmail.com>
+Subject: Re: [PATCH v4 6/6] MAINTAINERS: add maintainer information for KFuzzTest
+To: Ethan Graham <ethan.w.s.graham@gmail.com>
+Cc: akpm@linux-foundation.org, andreyknvl@gmail.com, andy@kernel.org, 
+	andy.shevchenko@gmail.com, brauner@kernel.org, brendan.higgins@linux.dev, 
+	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com, 
+	dvyukov@google.com, ebiggers@kernel.org, elver@google.com, 
+	gregkh@linuxfoundation.org, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
+	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
+	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, lukas@wunner.de, mcgrof@kernel.org, rmoar@google.com, 
+	shuah@kernel.org, sj@kernel.org, skhan@linuxfoundation.org, 
+	tarasmadan@google.com, wentaoz5@illinois.edu
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi David,
-
-On Thu, Jan 15, 2026 at 9:51=E2=80=AFPM David Howells <dhowells@redhat.com>=
- wrote:
+On Mon, Jan 12, 2026 at 8:28=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gmai=
+l.com> wrote:
 >
-> The ML-DSA public key algorithm really wants to calculate the message
-> digest itself, rather than having the digest precalculated and fed to it
-> separately as RSA does[*].  The kernel's PKCS#7 parser, however, is
-> designed around the latter approach.
+> Add myself as maintainer and Alexander Potapenko as reviewer for
+> KFuzzTest.
 >
->   [*] ML-DSA does allow for an "external mu", but CMS doesn't yet have th=
-at
->   standardised.
+> Signed-off-by: Ethan Graham <ethan.w.s.graham@gmail.com>
+> Acked-by: Alexander Potapenko <glider@google.com>
 >
-> Fix this by noting in the public_key_signature struct when the signing
-> algorithm is going to want this and then, rather than doing the digest of
-> the authenticatedAttributes ourselves and overwriting the sig->digest wit=
-h
-> that, replace sig->digest with a copy of the contents of the
-> authenticatedAttributes section and adjust the digest length to match.
->
-> This will then be fed to the public key algorithm as normal which can do
-> what it wants with the data.
->
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Lukas Wunner <lukas@wunner.de>
-> cc: Ignat Korchagin <ignat@cloudflare.com>
-> cc: Stephan Mueller <smueller@chronox.de>
-> cc: Eric Biggers <ebiggers@kernel.org>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: keyrings@vger.kernel.org
-> cc: linux-crypto@vger.kernel.org
 > ---
->  crypto/asymmetric_keys/pkcs7_parser.c |  4 +--
->  crypto/asymmetric_keys/pkcs7_verify.c | 48 ++++++++++++++++++---------
->  include/crypto/public_key.h           |  1 +
->  3 files changed, 36 insertions(+), 17 deletions(-)
+> PR v4:
+> - Remove reference to the kfuzztest-bridge tool that has been removed
+> PR v3:
+> - Update MAINTAINERS to reflect the correct location of kfuzztest-bridge
+>   under tools/testing as pointed out by SeongJae Park.
+> ---
+> ---
+>  MAINTAINERS | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >
-> diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_ke=
-ys/pkcs7_parser.c
-> index 423d13c47545..3cdbab3b9f50 100644
-> --- a/crypto/asymmetric_keys/pkcs7_parser.c
-> +++ b/crypto/asymmetric_keys/pkcs7_parser.c
-> @@ -599,8 +599,8 @@ int pkcs7_sig_note_set_of_authattrs(void *context, si=
-ze_t hdrlen,
->         }
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 6dcfbd11efef..0119816d038d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -13641,6 +13641,13 @@ F:     include/linux/kfifo.h
+>  F:     lib/kfifo.c
+>  F:     samples/kfifo/
 >
->         /* We need to switch the 'CONT 0' to a 'SET OF' when we digest */
-> -       sinfo->authattrs =3D value - (hdrlen - 1);
-> -       sinfo->authattrs_len =3D vlen + (hdrlen - 1);
-> +       sinfo->authattrs =3D value - hdrlen;
-> +       sinfo->authattrs_len =3D vlen + hdrlen;
->         return 0;
->  }
->
-> diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_ke=
-ys/pkcs7_verify.c
-> index 6d6475e3a9bf..0f9f515b784d 100644
-> --- a/crypto/asymmetric_keys/pkcs7_verify.c
-> +++ b/crypto/asymmetric_keys/pkcs7_verify.c
-> @@ -70,8 +70,6 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
->          * digest we just calculated.
->          */
->         if (sinfo->authattrs) {
-> -               u8 tag;
-> -
->                 if (!sinfo->msgdigest) {
->                         pr_warn("Sig %u: No messageDigest\n", sinfo->inde=
-x);
->                         ret =3D -EKEYREJECTED;
-> @@ -97,20 +95,40 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
->                  * as the contents of the digest instead.  Note that we n=
-eed to
->                  * convert the attributes from a CONT.0 into a SET before=
- we
->                  * hash it.
-> +                *
-> +                * However, for certain algorithms, such as ML-DSA, the d=
-igest
-> +                * is integrated into the signing algorithm.  In such a c=
-ase,
-> +                * we copy the authattrs, modifying the tag type, and set=
- that
-> +                * as the digest.
->                  */
-> -               memset(sig->digest, 0, sig->digest_size);
-> -
-> -               ret =3D crypto_shash_init(desc);
-> -               if (ret < 0)
-> -                       goto error;
-> -               tag =3D ASN1_CONS_BIT | ASN1_SET;
-> -               ret =3D crypto_shash_update(desc, &tag, 1);
-> -               if (ret < 0)
-> -                       goto error;
-> -               ret =3D crypto_shash_finup(desc, sinfo->authattrs,
-> -                                        sinfo->authattrs_len, sig->diges=
-t);
-> -               if (ret < 0)
-> -                       goto error;
-> +               if (sig->algo_does_hash) {
-> +                       kfree(sig->digest);
-> +
-> +                       ret =3D -ENOMEM;
-> +                       sig->digest =3D kmalloc(umax(sinfo->authattrs_len=
-, sig->digest_size),
-> +                                             GFP_KERNEL);
+> +KFUZZTEST
+> +M:  Ethan Graham <ethan.w.s.graham@gmail.com>
+> +R:  Alexander Potapenko <glider@google.com>
+> +F:  include/linux/kfuzztest.h
+> +F:  lib/kfuzztest/
+> +F:  Documentation/dev-tools/kfuzztest.rst
 
-I'm still bothered by this "reallocation". You mentioned we need to do
-some parsing for attributes, but it seems by the time this function is
-called we have all the data to do something like
-kmalloc(sig->algo_does_hash ? umax(sinfo->authattrs_len,
-sig->digest_size) : sig->digest_size, GFP_KERNEL) during the initial
-allocation. Or am I missing something?
-
-> +                       if (!sig->digest)
-> +                               goto error_no_desc;
-> +
-> +                       sig->digest_size =3D sinfo->authattrs_len;
-> +                       memcpy(sig->digest, sinfo->authattrs, sinfo->auth=
-attrs_len);
-> +                       ((u8 *)sig->digest)[0] =3D ASN1_CONS_BIT | ASN1_S=
-ET;
-> +                       ret =3D 0;
-> +               } else {
-> +                       u8 tag =3D ASN1_CONS_BIT | ASN1_SET;
-> +
-> +                       ret =3D crypto_shash_init(desc);
-> +                       if (ret < 0)
-> +                               goto error;
-> +                       ret =3D crypto_shash_update(desc, &tag, 1);
-> +                       if (ret < 0)
-> +                               goto error;
-> +                       ret =3D crypto_shash_finup(desc, sinfo->authattrs=
- + 1,
-> +                                                sinfo->authattrs_len - 1=
-,
-> +                                                sig->digest);
-> +                       if (ret < 0)
-> +                               goto error;
-> +               }
->                 pr_devel("AADigest =3D [%*ph]\n", 8, sig->digest);
->         }
->
-> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-> index 81098e00c08f..e4ec8003a3a4 100644
-> --- a/include/crypto/public_key.h
-> +++ b/include/crypto/public_key.h
-> @@ -46,6 +46,7 @@ struct public_key_signature {
->         u8 *digest;
->         u32 s_size;             /* Number of bytes in signature */
->         u32 digest_size;        /* Number of bytes in digest */
-> +       bool algo_does_hash;    /* Public key algo does its own hashing *=
-/
-
-nit: still do not like this name, but have no better alternatives so far
-
->         const char *pkey_algo;
->         const char *hash_algo;
->         const char *encoding;
->
-
-Ignat
+Please also add samples/kfuzztest here.
