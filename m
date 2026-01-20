@@ -1,111 +1,129 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE6743D4EB
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2026 15:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768922922; cv=none; b=Ipnv7ht+tePT1Vd/maopTTuDl5xOMGQKa+snGR/L2zfui+pGPBpF7Iknbm7oVYAB/jaj/uITUqYWJEDX4Zz59i3gwXwh9kF1KP6uaSxqwJ+HyZ2VCRMWvo18QUklUvqQraqAIjW+cPHtKTD7qlhIwpYjPfzbhw+gAZPVTIP5kJI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768922922; c=relaxed/simple;
-	bh=0sMmu5gg8UFyAWe/IH29MMMVB58NdXu2+b0v3ORUzhg=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=MRoJaXsbIubwPgoEyJxZp1bYEd587+Y5p/NO/O/0GqIDzWj2OcByh9QT+ImHKPlNzm7nILG2SCDQyyP3w9meWDMUbIkdnI4SVJFx6ZL8Ne/OWpiM/1a8h4TLnzGZA6jcJ7RMFeFeiMJjAO45f+ZqgPOaJKh/hvwHZ4toXD2Abuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zjr7DH8x; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A2C38E5FB;
+	Tue, 20 Jan 2026 15:43:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768923791; cv=pass; b=fPNz1ne+alKWfYpvKkRAB8fXltORxEmvkydro4CEN1QRHuLipQcQO4lrm3o2FDB6XeyZ10enj0eTrFuH1DE9se5lRYfF/8FTC+6Edt7TX3wZEVAMXawUaYz7CtvsnYkOD95Ie4v2cPJkrltRaBeX9kuvi/j/NkTdB23T9CrxiDI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768923791; c=relaxed/simple;
+	bh=hx2vvZMrEltWCKlhhOXO6GQxyjEInyfUEh3ubtofyDA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f7fmxh8EzT8qIec24p8+ooEVsXiwkhYUM4VM1Jws/sPDOWOPx7wGvL7CaAnmurquuf9nbzemVlUxZun1KMhEMmCc0+l0pcw3wXY/UDk/QSLUUOUE+DkOowLrdKaGTQFxnr8Vh+KZgmRDutldA2XcpkuDiTRQpRCplXC2sWfSyBo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=bCzb2rRK; dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b=jWAayJC6; arc=pass smtp.client-ip=85.215.255.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chronox.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zjr7DH8x"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768922919;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3/unPafAPOoP3LjRvac8Gzs8rjFGIe5eacRzIB3ctjc=;
-	b=Zjr7DH8xZPp0/taJr2uqn+F0wiZ6VGzTVE76H05ljGqEgFRljcjj6T3+bkguCjGrUSqnoo
-	zadG3e6k319st9AX22ZgXAyQCvsQwjNI10FXUx3OAFx0IZzdDV8H80ERQ2v0RqGxd3/MGI
-	sxFLnTkgfboGQ3TLuxYcdsqOEYp28yI=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-673-wc0lwKm0NwWG-NM39PZcOQ-1; Tue,
- 20 Jan 2026 10:28:35 -0500
-X-MC-Unique: wc0lwKm0NwWG-NM39PZcOQ-1
-X-Mimecast-MFC-AGG-ID: wc0lwKm0NwWG-NM39PZcOQ_1768922913
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 507351955F45;
-	Tue, 20 Jan 2026 15:28:33 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.2])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EF570180049F;
-	Tue, 20 Jan 2026 15:28:25 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CALrw=nENf3T=8MHPpt-wdneLupkzADpgDuHA6Gni_=C5-o_MjQ@mail.gmail.com>
-References: <CALrw=nENf3T=8MHPpt-wdneLupkzADpgDuHA6Gni_=C5-o_MjQ@mail.gmail.com> <20260115215100.312611-1-dhowells@redhat.com> <20260115215100.312611-9-dhowells@redhat.com>
-To: Ignat Korchagin <ignat@cloudflare.com>
-Cc: dhowells@redhat.com, Lukas Wunner <lukas@wunner.de>,
-    Jarkko Sakkinen <jarkko@kernel.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Eric Biggers <ebiggers@kernel.org>,
-    Luis Chamberlain <mcgrof@kernel.org>,
-    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
-    Sami Tolvanen <samitolvanen@google.com>,
-    "Jason A . Donenfeld" <Jason@zx2c4.com>,
-    Ard Biesheuvel <ardb@kernel.org>,
-    Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
-    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v12 08/10] pkcs7, x509: Add RSASSA-PSS support
+	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="bCzb2rRK";
+	dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b="jWAayJC6"
+ARC-Seal: i=1; a=rsa-sha256; t=1768923769; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=hUm5tZY+5WS09L4JjaRYD4Vif0QQsv+cfufGpvB68NIxVV01rAOtnXxinrSFOl5sor
+    tJM1v6oh4vVG5HLM8dVcB+9ehC2urNz3DPYn5LsyPlsjAjGoteIPvnzVeARlpc4Z27ql
+    g8rq06J6MveiugiSx0e4e7YxOQtKp0HGVEXLsGz74KXKBNF0crA1D7t7RDE/51TWFF0N
+    QYZ7sReQpNrsY5q+1K3yYZeNeou6MkE0YdTob4zg4Z0ViQ931nXq4x0+HsDde/BDbGWR
+    6JR86Jy2YutPEv/uI0+96HDlQ/TxZRd+G/SaP5poStIh7LCepiC8e4QJOzp4YOXbCVw3
+    P4Fg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1768923769;
+    s=strato-dkim-0002; d=strato.com;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=hx2vvZMrEltWCKlhhOXO6GQxyjEInyfUEh3ubtofyDA=;
+    b=rJS9JFtOdT0UJ6Y2BRqKN24ilb8MfjIxS1vHYLgbN3ZnmkTvSAH03IspzhexN5TQhb
+    GoyXxT4DNPg3PRJibhjctMqCYzE7Ep0dcS4B48NxTRtJgVsnDqSYTrA62ThpyjRBpG3V
+    y3tLEGMbZUzgMakU8SqY3yw/mCiQOF6DXPog1WfmTSPTwXMCbcTBYwldz9hm4h9Loa9n
+    r4TpQboRFV95nbGNa1yR5v2YFhaZ3mZDn6UgPkg8jlqNac/CrTVlF9ry2nh3/vACMQva
+    BM3ii+exTDKoneSeGo33ZiAMiacyHcGgRd0CKGNHQCG4tjI7jJHuqhvjIRJMKAr/Fi3A
+    g8CA==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1768923769;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=hx2vvZMrEltWCKlhhOXO6GQxyjEInyfUEh3ubtofyDA=;
+    b=bCzb2rRK27nxlVeqq5lnUU8+kZs2xaUNgXabeOqMIoG3vGg+mina6mxyh3e8nDbcpJ
+    X+WMRFc+1unvSl4MjhpQS3hTbjTqyJi/lABi9iKyXsyHf6r1RSYUYM55r0Gu89H4/3js
+    hlgp2LVtYLODm8X63+n9s/3zJ0PFFb/NdioMgdRii7ZIqoz1RjfqN+GSjVd01DxzdRnL
+    z1/kKq75kyd+4bSLf9GD5+L6N7hY1NDESdjSei6I4GfBYUbmR7DCSr3Novzck4iG0Uq/
+    NbNDXd/CY6NGe46darjv6z+xyD6KVOwGw26AG9zixbE2w8NL2X3hDbaE9Eg2Pi/Vt42S
+    1QKQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1768923769;
+    s=strato-dkim-0003; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=hx2vvZMrEltWCKlhhOXO6GQxyjEInyfUEh3ubtofyDA=;
+    b=jWAayJC6MSRtt/lIy5pVtTe9LNiHSo7tiFr8HMDwe7Er8j1AOztQfLD/qS+3ddKaFZ
+    0/MoChpnjqLUi59bolAA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXDYJPSfPhE="
+Received: from tauon.localnet
+    by smtp.strato.de (RZmta 54.1.0 DYNA|AUTH)
+    with ESMTPSA id ffd25f20KFgm26L
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Tue, 20 Jan 2026 16:42:48 +0100 (CET)
+From: Stephan Mueller <smueller@chronox.de>
+To: Eric Biggers <ebiggers@kernel.org>, David Howells <dhowells@redhat.com>
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+ "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Python script to generate X509/CMS from NIST testcases
+Date: Tue, 20 Jan 2026 16:42:47 +0100
+Message-ID: <10662580.0AQdONaE2F@tauon>
+In-Reply-To: <1176796.1768921455@warthog.procyon.org.uk>
+References:
+ <20260119185125.GA11957@sol> <1010414.1768841311@warthog.procyon.org.uk>
+ <1176796.1768921455@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1177987.1768922903.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 20 Jan 2026 15:28:23 +0000
-Message-ID: <1177988.1768922903@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset="utf-8"
 
-Ignat Korchagin <ignat@cloudflare.com> wrote:
+Am Dienstag, 20. Januar 2026, 16:04:15 Mitteleurop=C3=A4ische Normalzeit sc=
+hrieb=20
+David Howells:
 
-> > +       struct rsassa_parameters *rsassa __free(kfree) =3D
-> =
+Hi David,
 
-> Did you mean to use the newly added rsassa_params_free() here?
+> Hi Eric, Stephan,
+>=20
+> In case it turns out to be useful to you as a template, here's a script t=
+hat
+> I wrote to package NIST ML-DSA testcases from JSON files into rudimentary
+> X.509, message and CMS signature files and also to produce a C file that
+> contains those blobs packaged into u8 arrays with a table listing them al=
+l.
+>=20
+> It also tries to verify each testcase with "openssl smime" - except that
+> that doesn't work too will for ML-DSA (it did work for RSASSA-PSS, but
+> that's another script).
+>=20
 
-Err, yes, I should have done.
+Thank you very much for this reference.
 
-> > +DEFINE_FREE(rsassa_params_free,  struct rsassa_parameters*, rsassa_pa=
-rams_free(_T))
-> =
+Also, in case it is useful for you as well: I just completed the work on=20
+adopting the sbsigntools to PQC [1]. This would support the adoption of the=
+=20
+shim bootloader to use PQC algorithms that is started at [2]. The coding in=
+=20
+[2] is completed to the extend that it compiles as PE/COFF executable. Now =
+I=20
+am working through the testing and adopt it to use the updated sbsigntools.
 
-> So you use plain kfree() in one instance and this custom free definition=
- in
-> another.  We should probably pick one.
+[1] https://github.com/smuellerDD/leancrypto/tree/master/apps/src#secure-bo=
+ot-signing-tools-supporting-pqc
 
-Yeah, both should have used the custom one.
+[2] https://github.com/smuellerDD/shim/tree/leancrypto2
 
-> What is the idea behind this custom rsassa_params_free(), if it just cal=
-ls
-> into kfree()?
+Ciao
+Stephan
 
-In case in future something freeable is added to it, it seems like a good =
-idea
-to have a destructor[*].  Other mask functions are theoretically possible,=
- for
-example.
-
-[*] (Since we seem to be reinventing C++ ;-)
-
-David
 
