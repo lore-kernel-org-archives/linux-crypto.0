@@ -1,53 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E250127B4F7;
-	Wed, 21 Jan 2026 02:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB3F32252D;
+	Wed, 21 Jan 2026 02:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768961656; cv=none; b=ks7eg3jJy79+EyOMmM7vojnEuXpy64tPUW1zG98JNs4cR2/+YMU3ne1VIQtlUfrwerL3gUNnbl2GmuHLqDbNJ5uNB+UecO49V1RyspUuee8nPYUsNfVOsulEtQl0A1lazpCprj3Yr64oNa8fFsTffYqWFupJDdXOHmpJlUYMcZc=
+	t=1768962008; cv=none; b=kHs5gWCGbMYtHvKSK5Ia0Nc+70Z7AqunciInYgRzE1087PBFiAPrdZPFz3M1ddLnxRJclyzgHaBpA+3CNc3A7M7FWIN08rKXJ/Xvc0RMd3WvyrF/8RqfgM+5oP0WPOmQIwdNSI0KraeJ+Hl+xo58z9RkiL83QVUuONh8TctQG4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768961656; c=relaxed/simple;
-	bh=BG9pkfBir7XLyspne+cVryo9UhHMwaspQ+CurD6p3FU=;
+	s=arc-20240116; t=1768962008; c=relaxed/simple;
+	bh=0nU4w252q2DLRZ1F2BgYWeOeH4dQbxVKvzzaFa9j4I0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SB7SLF6dK34mzoLy2m7XUohqNrDWH5sf2skln+/U0WKxU6Fu0G5FyhzqvbGybN1RpVvSquIzzJ4YaT9jdNuJyQACiNaTNvPqIJQpY0YnCmAwpMlBU362q5M5KkGkfM7HAZq1Bpv96ht0QuSdE5p59ZvHTsKL+NlEmQZu+zQb//s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EvaCi02j; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=f2DGBMSlQxP3xdjSp1HB0WZ9orgcRDmkr9hxKbtxkUlveI5tiFkV8F9hW1ESYV/wdfykFWyD71R6vAZoeVVhEGryF3SHX8C9UmTrRYD8vJVIQLdiHTVI7Yxg1KUTXOMBE/NxMM+QPFOaNTfYlUt/mqOrN5D7oQ0diLnLzPATl1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LVYKMaQ2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EvaCi02j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1443C16AAE;
-	Wed, 21 Jan 2026 02:14:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LVYKMaQ2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DCFBC19425;
+	Wed, 21 Jan 2026 02:20:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768961655;
-	bh=BG9pkfBir7XLyspne+cVryo9UhHMwaspQ+CurD6p3FU=;
+	s=k20201202; t=1768962007;
+	bh=0nU4w252q2DLRZ1F2BgYWeOeH4dQbxVKvzzaFa9j4I0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EvaCi02jvSfBnscmszmkY55oB161aLkf/C22HgL3eo/DNjXp0/zofrFZqvJDd43V6
-	 pYHbAUY0dqogzyBrASpPMNyVhaO+CbCFC3KDypx/zF4XRF2MtC0S0tQLTux14rREby
-	 fvifk2bX+kwc7WuZ9mtQQipM4W+DYrJAuoh9vPu37qbFMZUoCYv6GUhn9wyGMEwj0E
-	 9ViYiH57Lb9eJl6Cpx5xm9vQReGpQhad37drvG7B8vum5Gn5NLgQSAqcWoykVI5xP/
-	 CofAwUQQ5OtYYl3borIK/4fTtxTHvvlXs3UHHNwiHGOSdx7v7hbl+uiEQwtY48kLBj
-	 JG067t3fMS4tA==
-Date: Wed, 21 Jan 2026 02:14:13 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@cloudflare.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v13 07/12] crypto: Add RSASSA-PSS support
-Message-ID: <20260121021413.GA998999@google.com>
-References: <20260120145103.1176337-1-dhowells@redhat.com>
- <20260120145103.1176337-8-dhowells@redhat.com>
- <20260120224108.GC6191@quark>
+	b=LVYKMaQ2cHRQNeAi9n25y0Dv91VfSuogevihUsmk2HR9BuNwnDZrw9Q455PhpWHjd
+	 J7lJB/eGzMzezrSzvAKD3s+heJlgmi8IW+NFcC7cj+KofCbN0IznoWFTqTrID1pBcO
+	 0ez7ADlglRFbcBRqRSKO8kLdV85TQ6xZcgxRHpKN5zLRCQx9t7DF8drFDVvqgLeBU3
+	 61FGgO+9OQvI/pgSxEfSZGuVXQvuWH/OMfZUH6vRuRqtIjopbkdMZ4hfjbRo5IF3VY
+	 arLgb8ZMcTQekrLJsWpNivH/dME9bgT+sARcCWS/zP+Frz9iQFRIYQRfYg9OZaavC2
+	 DqbGyVoBtBE4Q==
+Date: Tue, 20 Jan 2026 20:20:06 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: nicolas.ferre@microchip.com, UNGLinuxDriver@microchip.com,
+	gregkh@linuxfoundation.org, horatiu.vultur@microchip.com,
+	andrew+netdev@lunn.ch, luka.perkov@sartura.hr,
+	lars.povlsen@microchip.com, lee@kernel.org, kuba@kernel.org,
+	linusw@kernel.org, richardcochran@gmail.com,
+	Steen.Hegelund@microchip.com, richard.genoud@bootlin.com,
+	kavyasree.kotagiri@microchip.com, davem@davemloft.net,
+	krzk+dt@kernel.org, linux-spi@vger.kernel.org,
+	daniel.machon@microchip.com, linux-kernel@vger.kernel.org,
+	edumazet@google.com, linux-crypto@vger.kernel.org,
+	conor+dt@kernel.org, linux-gpio@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, pabeni@redhat.com,
+	tudor.ambarus@linaro.org, claudiu.beznea@tuxon.dev,
+	herbert@gondor.apana.org.au, alexandre.belloni@bootlin.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	olivia@selenic.com, radu_nicolae.pirea@upb.ro,
+	linux-serial@vger.kernel.org, Ryan.Wanner@microchip.com
+Subject: Re: [PATCH v5 10/11] dt-bindings: net: sparx5: do not require phys
+ when RGMII is used
+Message-ID: <176896200632.1779741.2061551364132854431.robh@kernel.org>
+References: <20260115114021.111324-1-robert.marko@sartura.hr>
+ <20260115114021.111324-11-robert.marko@sartura.hr>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -56,67 +59,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260120224108.GC6191@quark>
+In-Reply-To: <20260115114021.111324-11-robert.marko@sartura.hr>
 
-On Tue, Jan 20, 2026 at 02:41:11PM -0800, Eric Biggers wrote:
-> On Tue, Jan 20, 2026 at 02:50:53PM +0000, David Howells wrote:
-> > Add support for RSASSA-PSS [RFC8017 sec 8.1] signature verification support
-> > to the RSA driver in crypto/.
+
+On Thu, 15 Jan 2026 12:37:35 +0100, Robert Marko wrote:
+> LAN969x has 2 dedicated RGMII ports, so regular SERDES lanes are not used
+> for RGMII.
 > 
-> This additional feature significantly increases the scope of your
-> patchset, especially considering that the kernel previously didn't
-> implement RSASSA-PSS at all.  This patchset also doesn't include any
-> explanation for why this additional feature is needed.  It might make
-> sense to add this feature, but it needs to be properly explained, and it
-> would be preferable for it to be its own patchset.
+> So, lets not require phys to be defined when any of the rgmii phy-modes are
+> set.
 > 
-> > The verification function requires an info string formatted as a
-> > space-separated list of key=value pairs.  The following parameters need to
-> > be provided:
-> > 
-> >  (1) sighash=<algo>
-> > 
-> >      The hash algorithm to be used to digest the data.
-> > 
-> >  (2) pss_mask=<type>,...
-> > 
-> >      The mask generation function (MGF) and its parameters.
-> > 
-> >  (3) pss_salt=<len>
-> > 
-> >      The length of the salt used.
-> > 
-> > The only MGF currently supported is "mgf1".  This takes an additional
-> > parameter indicating the mask-generating hash (which need not be the same
-> > as the data hash).  E.g.:
-> > 
-> >      "sighash=sha256 pss_mask=mgf1,sha256 pss_salt=32"
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> ---
+>  .../bindings/net/microchip,sparx5-switch.yaml     | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
 > 
-> One of the issues with RSASSA-PSS is the excessive flexibility in the
-> parameters, which often end up being attacker controlled.  Therefore
-> many implementations of RSASSA-PSS restrict the allowed parameters to
-> something reasonable, e.g. restricting the allowed hash algorithms,
-> requiring the two hash algorithms to be the same, and requiring the salt
-> size to match the digest size.  We should do likewise if possible.
 
-Looking into this a bit more, I'm increasingly skeptical that RSASSA-PSS
-would be a worthwhile addition, especially when integrated into CMS and
-X.509.  It seems that while in theory it's an improvement over PKCS#1
-v1.5 padding, the specifications were messed up and it has way too many
-unnecessary and error-prone parameters.  Here are some references that
-describe some of the issues in RSASSA-PSS:
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
-    * https://boringssl-review.googlesource.com/c/boringssl/+/81656
-    * https://www.metzdowd.com/pipermail/cryptography/2019-November/035449.html
-
-It seems it might not be very widely used either.
-
-I think the fact that this patchset implements RSASSA-PSS verification
-incorrectly (by not verifying that the leading bit is zero) further
-validates these concerns.
-
-With RSA also being two generations behind the current generation of
-signature algorithms (RSA => elliptic curves => lattices), I'm wondering
-what the motivation for this feature is.
-
-- Eric
