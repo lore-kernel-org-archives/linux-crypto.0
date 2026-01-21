@@ -1,266 +1,179 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA3044D039
-	for <linux-crypto@vger.kernel.org>; Wed, 21 Jan 2026 22:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FEC45BD5F;
+	Wed, 21 Jan 2026 22:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769035012; cv=none; b=UX8qA+c0NMkE2TgqZHCjNmdi9o3kqcpKcCT6fMcy/wLc8mqQUwyS5U/IdAZ54X9+4kze9khrozAiGQWrDJimTUCbV5Fh8l1QyAv5lXl4hnYIPK2yIJh7Ol2N3siEPlMEsi3AkKWLzx/QYWqAKaziygYY4B9HFu7yNKzjW/soUJE=
+	t=1769036124; cv=none; b=RaF7IxOKBzTHXpINsFx6Cap0+7amuG3HWEl873ZN7NeLIbh4++DvsfpiSskjB+rJ6GNib9REAMki+wcohG73lOI5hwkUZ9efQW/Uhk68oxNy+YF0RBHEKO8Ozf+20ZjQGlPdIKnBPopb/lVevM0SnAeP5xo47/rF4nMTXV4mzd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769035012; c=relaxed/simple;
-	bh=+rg3lJLvDxerv8yUSS64iB1qk811zk40pN7OhykMw2o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FP0uAyblve0hUyzgSYsAOxWujsJosF9zftsdIJbwXgj2McBhvevJb2mRC9Nt3ICv1Scq7Q2C66PvV66knoDvUwv4wVeaW3/PhpfTYrBz2orchzkNaXVYcRaJEg2I/z6PTcBwpMTUV+wvBxzfG/ky6JAVLMejqCkqWW+QU1kkb/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R25+PQj6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1769036124; c=relaxed/simple;
+	bh=9WQMlF9y3LYTmPX+PtpTQ9hy6hrX/EbrW7sKShnCTrk=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=qnO4PCL+LUAcRB3wBmivx+JLsviEdj0xQh9uHLw8wXCfWZxLl0096VDdwVc4G7CT+33Ea6MnubquYU82U+V38+fJV/faidZhBim/aj7HPCHPOC2BsEmPrEmpNDYzXKQEKKWIiazs3/GqJ7Q949RzykbIGpvxWj9HzrJUk3nMxTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=EeaQEH92; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Q3/YSv5C; arc=none smtp.client-ip=202.12.124.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R25+PQj6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769035009;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WTtldxhQV+el+rHJHCaeIe7QXrB2b2WNyoFpo+6fd2I=;
-	b=R25+PQj6ka8CyeSsn6enIdrkl+nmbu29TXuzv5y4MUpVaNWqFLQvWCkV6J6zGpDwBb1AfI
-	fgGl5GTOgyEY7mHQnG9nC4mS0/mHXymupdnQzBrrNinULbN6pwIj9VuGiKppvUkLm0WoaS
-	g5efPclrjc5qwjN0hCZRRQWf+KxV0HM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-660-aVQYSRbSMeyZuOBWQ5uF-w-1; Wed,
- 21 Jan 2026 17:36:46 -0500
-X-MC-Unique: aVQYSRbSMeyZuOBWQ5uF-w-1
-X-Mimecast-MFC-AGG-ID: aVQYSRbSMeyZuOBWQ5uF-w_1769035003
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 20BBA1956052;
-	Wed, 21 Jan 2026 22:36:43 +0000 (UTC)
-Received: from warthog.procyon.org.uk.com (unknown [10.42.28.2])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 29B5119560A7;
-	Wed, 21 Jan 2026 22:36:38 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>
-Cc: David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>,
-	linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v14 5/5] modsign: Enable ML-DSA module signing
-Date: Wed, 21 Jan 2026 22:36:07 +0000
-Message-ID: <20260121223609.1650735-6-dhowells@redhat.com>
-In-Reply-To: <20260121223609.1650735-1-dhowells@redhat.com>
-References: <20260121223609.1650735-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="EeaQEH92";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Q3/YSv5C"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id CF7541D0006A;
+	Wed, 21 Jan 2026 17:55:20 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Wed, 21 Jan 2026 17:55:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
+	1769036120; x=1769122520; bh=nR24qK0BOSEatIvWbtacTkHQc26YOJgPKoB
+	IBDHjAgA=; b=EeaQEH92/W+83/D4vG11xnVozeMpzor9BwaxsGrZvW1f1GCTEyS
+	nOVkPJIBNuao2fKxMi+SstMYzzh3/bD7bZlb3m/UxW3tl6IbFJSKYWLwmcyb5soA
+	XQddR0Y37ZXqP3dcftdbVs/Lc7ad5pMYobX+6T+y6/SKUab4Kwh12hIjIwZRjIe4
+	uESmOopXoEGTGYzTXTILghjhObpMBnKV3BqNyOkUFoUpKCgqlGB9P87wYMLEht0T
+	9o9AesH137DdUYMoutWMQgIuE9aqsQcrNgQ9PQ+NtQFVw1ZmKy39rO2R1wEzvtwz
+	txmC6I01GgNs4aKkV+Bfrva9QHfy4ufd9sQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1769036120; x=
+	1769122520; bh=nR24qK0BOSEatIvWbtacTkHQc26YOJgPKoBIBDHjAgA=; b=Q
+	3/YSv5Cfxy822xi4NLHJQ6VaMlfYG8ptFndHmt2p5OhOSVCrW+qakEcQ0d46qE+w
+	vxS6JHBHjKqKcoqXApuyNOZXyre/uSPeTRi7e1xzNff/9oTK5b27xCKPM8ry4mMR
+	0yjuf8ph75gNJacMqkFb64x/vSBUFHolEu7azSihaYXBii0Hch6F/YL/Y5vQobzH
+	Ym0bjljkT4N5XEF/LvpsSKlhTnpAKaCWo/30SgaW6n0JOAoNLNmLsBpwDJl2ldWR
+	5oRNjXnJH6Su2mEDkPab5FY/IjDFmNjQnM3YzwjN3Qf4lbQYCDUU8eF/gAmJIYAj
+	LeoBehBPtB+fmXwPX8kNA==
+X-ME-Sender: <xms:WFlxafv1VK9yiCa9QZxYaxbPzhzrxrDXNwrgXwu2-bHEJuOJMy9yqg>
+    <xme:WFlxaWe1kkIhZHdPdNt2bwEE3TBV9eWaHLBd5CZtuWiVOlskIHShpeB38QDZLA6e7
+    zoPsyVtM05L5A17_iRspFAA4Bpu_h0bXGJ_IEopPPR0G-uMBg>
+X-ME-Received: <xmr:WFlxadkvJkizcEytJdlUDUudwLkV7C5FRB8W3Qe9DmrMELW1I3BA4M77h8WetZIfpKZ6ZW2OQyDd-MmoEjRI3B-lrmcCa_9gp4D7qm41OiAH>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugeegheefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
+    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epleejtdefgeeukeeiteduveehudevfeffvedutefgteduhfegvdfgtdeigeeuudejnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
+    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehlihhnuhigqdhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtoheplhhinhhugidqfhhsuggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlh
+    drohhrghdprhgtphhtthhopegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomhdp
+    rhgtphhtthhopehtrhhonhgumhihsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjlh
+    grhihtohhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvsghighhgvghrsheskhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtoheprghnnhgrsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopegstghougguihhngheshhgrmhhmvghrshhprggtvgdrtghomh
+X-ME-Proxy: <xmx:WFlxaRBmvROrZDFk3dBHdWxIbO8smBT4gF4UHgACugM0L-MsW0IUlw>
+    <xmx:WFlxafOWkRF3GXHb_alDOUFQF8OzIP6I9ZMoZOvh1XE3j0vOD7Rvlw>
+    <xmx:WFlxaYMdGI1gBk150Dhg3mS5Pz25yEKYXuflQnTufejaY4gE9i_vwg>
+    <xmx:WFlxaXmG2oO0UGe2YtTI9AffkrvFstfaLdehYmeyTBHUhSiLK5501A>
+    <xmx:WFlxaUIMGb1sLbfBDe_KjBFp_OxyH5eRPWQWkwyuc--AfZHhCgI9jDIV>
+Feedback-ID: iab3e480c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 21 Jan 2026 17:55:17 -0500 (EST)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+From: NeilBrown <neilb@ownmail.net>
+To: "Benjamin Coddington" <bcodding@hammerspace.com>
+Cc: "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
+ "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
+ "Benjamin Coddington" <bcodding@hammerspace.com>,
+ "Eric Biggers" <ebiggers@kernel.org>, "Rick Macklem" <rick.macklem@gmail.com>,
+ linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] kNFSD Signed Filehandles
+In-reply-to: <cover.1769026777.git.bcodding@hammerspace.com>
+References: <cover.1769026777.git.bcodding@hammerspace.com>
+Date: Thu, 22 Jan 2026 09:55:15 +1100
+Message-id: <176903611574.16766.10534751557103722262@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-Allow ML-DSA module signing to be enabled.
+On Thu, 22 Jan 2026, Benjamin Coddington wrote:
+> The following series enables the linux NFS server to add a Message
+> Authentication Code (MAC) to the filehandles it gives to clients.  This
+> provides additional protection to the exported filesystem against filehandle
+> guessing attacks.
+>=20
+> Filesystems generate their own filehandles through the export_operation
+> "encode_fh" and a filehandle provides sufficient access to open a file
+> without needing to perform a lookup.  A trusted NFS client holding a valid
+> filehandle can remotely access the corresponding file without reference to
+> access-path restrictions that might be imposed by the ancestor directories
+> or the server exports.
+>=20
+> In order to acquire a filehandle, you must perform lookup operations on the
+> parent directory(ies), and the permissions on those directories may prohibit
+> you from walking into them to find the files within.  This would normally be
+> considered sufficient protection on a local filesystem to prohibit users
+> from accessing those files, however when the filesystem is exported via NFS
+> an exported file can be accessed whenever the NFS server is presented with
+> the correct filehandle, which can be guessed or acquired by means other than
+> LOOKUP.
+>=20
+> Filehandles are easy to guess because they are well-formed.  The
+> open_by_handle_at(2) man page contains an example C program
+> (t_name_to_handle_at.c) that can display a filehandle given a path.  Here's
+> an example filehandle from a fairly modern XFS:
+>=20
+> # ./t_name_to_handle_at /exports/foo=20
+> 57
+> 12 129    99 00 00 00 00 00 00 00 b4 10 0b 8c
+>=20
+>           ^---------  filehandle  ----------^
+>           ^------- inode -------^ ^-- gen --^
+>=20
+> This filehandle consists of a 64-bit inode number and 32-bit generation
+> number.  Because the handle is well-formed, its easy to fabricate
+> filehandles that match other files within the same filesystem.  You can
+> simply insert inode numbers and iterate on the generation number.
+> Eventually you'll be able to access the file using open_by_handle_at(2).
+> For a local system, open_by_handle_at(2) requires CAP_DAC_READ_SEARCH, which
+> protects against guessing attacks by unprivileged users.
 
-Note that OpenSSL's CMS_*() function suite does not, as of OpenSSL-3.6,
-support the use of CMS_NOATTR with ML-DSA, so the prohibition against using
-signedAttrs with module signing has to be removed.  The selected digest
-then applies only to the algorithm used to calculate the digest stored in
-the messageDigest attribute.  The OpenSSL development branch has patches
-applied that fix this[1], but it appears that that will only be available
-in OpenSSL-4.
+"Simple testing confirms that the correct generation number can be found
+withing XXX minutes using open_by_handle_at() and it is estimated that
+adding network delay with genuine NFS calls would only increase this to
+YYY minutes (ZZZ hours)".
 
-[1] https://github.com/openssl/openssl/pull/28923
+>=20
+> In contrast to a local user using open_by_handle(2), the NFS server must
+> permissively allow remote clients to open by filehandle without being able
+> to check or trust the remote caller's access. Therefore additional
+> protection against this attack is needed for NFS case.  We propose to sign
+> filehandles by appending an 8-byte MAC which is the siphash of the
+> filehandle from a key set from the nfs-utilities.  NFS server can then
+> ensure that guessing a valid filehandle+MAC is practically impossible
+> without knowledge of the MAC's key.  The NFS server performs optional
+> signing by possessing a key set from userspace and having the "sign_fh"
+> export option.
+>=20
+> Because filehandles are long-lived, and there's no method for expiring them,
+> the server's key should be set once and not changed.  It also should be
+> persisted across restarts.  The methods to set the key allow only setting it
+> once, afterward it cannot be changed.  A separate patchset for nfs-utils
+> contains the userspace changes required to set the server's key.
+>=20
+> I had planned on adding additional work to enable the server to check wheth=
+er the
+> 8-byte MAC will overflow maximum filehandle length for the protocol at
+> export time.  There could be some filesystems with 40-byte fileid and
+> 24-byte fsid which would break NFSv3's 64-byte filehandle maximum with an
+> 8-byte MAC appended.  The server should refuse to export those filesystems
+> when "sign_fh" is requested.  However, the way the export caches work (the
+> server may not even be running when a user sets up the export) its
+> impossible to do this check at export time.  Instead, the server will refuse
+> to give out filehandles at mount time and emit a pr_warn().
+>=20
+> Thanks for any comments and critique.
 
-sign-file won't set CMS_NOATTR if openssl is earlier than v4, resulting in
-the use of signed attributes.
-
-The ML-DSA algorithm takes the raw data to be signed without regard to what
-digest algorithm is specified in the CMS message.  The CMS specified digest
-algorithm is ignored unless signedAttrs are used; in such a case, only
-SHA512 is permitted.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Eric Biggers <ebiggers@kernel.org>
-cc: Lukas Wunner <lukas@wunner.de>
-cc: Ignat Korchagin <ignat@cloudflare.com>
-cc: Stephan Mueller <smueller@chronox.de>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: keyrings@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
----
- Documentation/admin-guide/module-signing.rst | 16 +++++----
- certs/Kconfig                                | 30 +++++++++++++++++
- certs/Makefile                               |  3 ++
- crypto/asymmetric_keys/pkcs7_verify.c        |  4 ---
- scripts/sign-file.c                          | 34 +++++++++++++++-----
- 5 files changed, 68 insertions(+), 19 deletions(-)
-
-diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
-index a8667a777490..7f2f127dc76f 100644
---- a/Documentation/admin-guide/module-signing.rst
-+++ b/Documentation/admin-guide/module-signing.rst
-@@ -28,10 +28,12 @@ trusted userspace bits.
- 
- This facility uses X.509 ITU-T standard certificates to encode the public keys
- involved.  The signatures are not themselves encoded in any industrial standard
--type.  The built-in facility currently only supports the RSA & NIST P-384 ECDSA
--public key signing standard (though it is pluggable and permits others to be
--used).  The possible hash algorithms that can be used are SHA-2 and SHA-3 of
--sizes 256, 384, and 512 (the algorithm is selected by data in the signature).
-+type.  The built-in facility currently only supports the RSA, NIST P-384 ECDSA
-+and NIST FIPS-204 ML-DSA public key signing standards (though it is pluggable
-+and permits others to be used).  For RSA and ECDSA, the possible hash
-+algorithms that can be used are SHA-2 and SHA-3 of sizes 256, 384, and 512 (the
-+algorithm is selected by data in the signature); ML-DSA does its own hashing,
-+but is allowed to be used with a SHA512 hash for signed attributes.
- 
- 
- ==========================
-@@ -146,9 +148,9 @@ into vmlinux) using parameters in the::
- 
- file (which is also generated if it does not already exist).
- 
--One can select between RSA (``MODULE_SIG_KEY_TYPE_RSA``) and ECDSA
--(``MODULE_SIG_KEY_TYPE_ECDSA``) to generate either RSA 4k or NIST
--P-384 keypair.
-+One can select between RSA (``MODULE_SIG_KEY_TYPE_RSA``), ECDSA
-+(``MODULE_SIG_KEY_TYPE_ECDSA``) and ML-DSA (``MODULE_SIG_KEY_TYPE_MLDSA_*``) to
-+generate an RSA 4k, a NIST P-384 keypair or an ML-DSA 44, 65 or 87 keypair.
- 
- It is strongly recommended that you provide your own x509.genkey file.
- 
-diff --git a/certs/Kconfig b/certs/Kconfig
-index 78307dc25559..2b088ef58373 100644
---- a/certs/Kconfig
-+++ b/certs/Kconfig
-@@ -39,6 +39,36 @@ config MODULE_SIG_KEY_TYPE_ECDSA
- 	 Note: Remove all ECDSA signing keys, e.g. certs/signing_key.pem,
- 	 when falling back to building Linux 5.14 and older kernels.
- 
-+config MODULE_SIG_KEY_TYPE_MLDSA_44
-+	bool "ML-DSA-44"
-+	select CRYPTO_MLDSA
-+	help
-+	  Use an ML-DSA-44 key (NIST FIPS 204) for module signing.  ML-DSA
-+	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
-+	  the latter, the entire module body will be signed; with the former,
-+	  signedAttrs will be used as it lacks support for CMS_NOATTR with
-+	  ML-DSA.
-+
-+config MODULE_SIG_KEY_TYPE_MLDSA_65
-+	bool "ML-DSA-65"
-+	select CRYPTO_MLDSA
-+	help
-+	  Use an ML-DSA-65 key (NIST FIPS 204) for module signing.  ML-DSA
-+	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
-+	  the latter, the entire module body will be signed; with the former,
-+	  signedAttrs will be used as it lacks support for CMS_NOATTR with
-+	  ML-DSA.
-+
-+config MODULE_SIG_KEY_TYPE_MLDSA_87
-+	bool "ML-DSA-87"
-+	select CRYPTO_MLDSA
-+	help
-+	  Use an ML-DSA-87 key (NIST FIPS 204) for module signing.  ML-DSA
-+	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
-+	  the latter, the entire module body will be signed; with the former,
-+	  signedAttrs will be used as it lacks support for CMS_NOATTR with
-+	  ML-DSA.
-+
- endchoice
- 
- config SYSTEM_TRUSTED_KEYRING
-diff --git a/certs/Makefile b/certs/Makefile
-index f6fa4d8d75e0..3ee1960f9f4a 100644
---- a/certs/Makefile
-+++ b/certs/Makefile
-@@ -43,6 +43,9 @@ targets += x509_certificate_list
- ifeq ($(CONFIG_MODULE_SIG_KEY),certs/signing_key.pem)
- 
- keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ECDSA) := -newkey ec -pkeyopt ec_paramgen_curve:secp384r1
-+keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_44) := -newkey ml-dsa-44
-+keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_65) := -newkey ml-dsa-65
-+keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_87) := -newkey ml-dsa-87
- 
- quiet_cmd_gen_key = GENKEY  $@
-       cmd_gen_key = openssl req -new -nodes -utf8 -$(CONFIG_MODULE_SIG_HASH) -days 36500 \
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index a5b2ed4d53fd..75d1d694dc7b 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -431,10 +431,6 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
- 			pr_warn("Invalid module sig (not pkcs7-data)\n");
- 			return -EKEYREJECTED;
- 		}
--		if (pkcs7->have_authattrs) {
--			pr_warn("Invalid module sig (has authattrs)\n");
--			return -EKEYREJECTED;
--		}
- 		break;
- 	case VERIFYING_FIRMWARE_SIGNATURE:
- 		if (pkcs7->data_type != OID_data) {
-diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-index 7070245edfc1..547b97097230 100644
---- a/scripts/sign-file.c
-+++ b/scripts/sign-file.c
-@@ -315,18 +315,36 @@ int main(int argc, char **argv)
- 		ERR(!digest_algo, "EVP_get_digestbyname");
- 
- #ifndef USE_PKCS7
-+
-+		unsigned int flags =
-+			CMS_NOCERTS |
-+			CMS_PARTIAL |
-+			CMS_BINARY |
-+			CMS_DETACHED |
-+			CMS_STREAM  |
-+			CMS_NOSMIMECAP |
-+			CMS_NO_SIGNING_TIME |
-+			use_keyid;
-+
-+		if ((EVP_PKEY_is_a(private_key, "ML-DSA-44") ||
-+		     EVP_PKEY_is_a(private_key, "ML-DSA-65") ||
-+		     EVP_PKEY_is_a(private_key, "ML-DSA-87")) &&
-+		    OPENSSL_VERSION_MAJOR < 4) {
-+			 /* ML-DSA + CMS_NOATTR is not supported in openssl-3.5
-+			  * and before.
-+			  */
-+			use_signed_attrs = 0;
-+		}
-+
-+		flags |= use_signed_attrs;
-+
- 		/* Load the signature message from the digest buffer. */
--		cms = CMS_sign(NULL, NULL, NULL, NULL,
--			       CMS_NOCERTS | CMS_PARTIAL | CMS_BINARY |
--			       CMS_DETACHED | CMS_STREAM);
-+		cms = CMS_sign(NULL, NULL, NULL, NULL, flags);
- 		ERR(!cms, "CMS_sign");
- 
--		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo,
--				     CMS_NOCERTS | CMS_BINARY |
--				     CMS_NOSMIMECAP | use_keyid |
--				     use_signed_attrs),
-+		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo, flags),
- 		    "CMS_add1_signer");
--		ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) != 1,
-+		ERR(CMS_final(cms, bm, NULL, flags) != 1,
- 		    "CMS_final");
- 
- #else
-
+Thanks,
+NeilBrown
