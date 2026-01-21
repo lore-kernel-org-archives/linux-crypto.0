@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9914A44B67A
-	for <linux-crypto@vger.kernel.org>; Wed, 21 Jan 2026 22:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A43044BCBD
+	for <linux-crypto@vger.kernel.org>; Wed, 21 Jan 2026 22:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769034992; cv=none; b=Rkwb/C8VST+WYPEvWX73uOWHvJQR8VbpLCyzE2BZbg2VUclKlUiESf0412bTKkb6x42V2/JkAC6kjc9bLrtm9ZVtO6i0huSm9LzLgXhoK0aeYYnjGuD3QbLl/ULFyUt93lBZ1QBOACIGI7Gp2sPf362rnnq3IZQRqqCEMi3lfno=
+	t=1769034996; cv=none; b=CiLBYw3RZ6+fk15/4eoA9zvB7vHqb5V/63AED3GwpKOP8XUwc/yvpysCPa3TWAA+LurpP5AT40/msdmX1er9abn4xEp4Acg3ZE+L9YWE7Gjme1Q0Bwm9JJh0C7IYFbJOFZED5SiKamfUAR5iD85NUCay7hWX4NzvY82ueM5XOYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769034992; c=relaxed/simple;
-	bh=yxuz1XGwka25nwbP3TQtMQjnCd1A9XYnkw4fpQ+1zI4=;
+	s=arc-20240116; t=1769034996; c=relaxed/simple;
+	bh=pdLHwp+AM7G9cgOJyic5O/rASJPQnCOzMS4jYvo7/e4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KI1Ss1EBBQr/BuFhP6spHb1bjLlZItgPLvV0nd4bH5Scc7CRAPCM6DRl1Wwyo6dhXhazq5/oOdPZQ9+UpBeBZCTwCWh6ispUqBU9098tOpKCbBKXvSyZJqWdbJJ+UOts4M+vwGUymF6hDiGqp6Kni/DzCtgf0+3PIYJwq4+47VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jbu7pldI; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=udWLjHY7S9uFwd1+OUX5twR6nhk1pUDYma+nAF7/WLnlbPvNup3znYk30WFkzUK7jNneDBqgs8dhb9bS4x8K89wsy1TdSxNezMG+CsLH9tFKxzHA0BZJJbKaLmuO5OjtGx40zYQ7hWFto3NzW4BHd0Qy7H3UHQV5Yv/4FT5IgK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Iw8kdFUY; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jbu7pldI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iw8kdFUY"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769034989;
+	s=mimecast20190719; t=1769034993;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PrapPTZIg/B6PDqm9XjQ/SresbhuKzegBZp9ZIwUVT0=;
-	b=Jbu7pldIxU6l5rHecUBc6sPNYkzdOHuOu7oeXhTWEIfn7RDhutfuTxqrQn78bfJfCc8LpY
-	1FEXUdlLgF1vF752R13ceU2AA6v8A4b2070ANyV1RU3WU0x2bLYsCW0ikAz5LzsPWnMrLt
-	R/9GErfQcGoY5iwBw7Oo64j2PvMfmfs=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=aF5PUHy8KBpOlcEh/C5gwfugw+qLv3KlBU19uO3kK8o=;
+	b=Iw8kdFUYr4B+MQbqIn8NtKvlqY8KSZHih4yh8yhsVIOU2+we4TH3XQN5w+oM46VW4MFFpU
+	J9Gtc5vw8RXEkwhNGQWQfRI1v/RvZDCplof7HSu+aVSJrg4IUs4rehuPOHa4ddb4Tic0Zc
+	VwY+IxE94OXKIxBa22D7k/5szKII+SE=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-49-dYnw1CgzOrq1_sn54fzVwg-1; Wed,
- 21 Jan 2026 17:36:24 -0500
-X-MC-Unique: dYnw1CgzOrq1_sn54fzVwg-1
-X-Mimecast-MFC-AGG-ID: dYnw1CgzOrq1_sn54fzVwg_1769034982
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-141-f1Sgb9CBOSmQqs2vW8-n3A-1; Wed,
+ 21 Jan 2026 17:36:29 -0500
+X-MC-Unique: f1Sgb9CBOSmQqs2vW8-n3A-1
+X-Mimecast-MFC-AGG-ID: f1Sgb9CBOSmQqs2vW8-n3A_1769034987
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B1AA6180034D;
-	Wed, 21 Jan 2026 22:36:21 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C8C301956050;
+	Wed, 21 Jan 2026 22:36:26 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.42.28.2])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B939918004D8;
-	Wed, 21 Jan 2026 22:36:17 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1EB723000218;
+	Wed, 21 Jan 2026 22:36:22 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Lukas Wunner <lukas@wunner.de>,
 	Ignat Korchagin <ignat@cloudflare.com>
@@ -60,9 +60,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	keyrings@vger.kernel.org,
 	linux-modules@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v14 1/5] crypto: Add ML-DSA crypto_sig support
-Date: Wed, 21 Jan 2026 22:36:03 +0000
-Message-ID: <20260121223609.1650735-2-dhowells@redhat.com>
+Subject: [PATCH v14 2/5] x509: Separately calculate sha256 for blacklist
+Date: Wed, 21 Jan 2026 22:36:04 +0000
+Message-ID: <20260121223609.1650735-3-dhowells@redhat.com>
 In-Reply-To: <20260121223609.1650735-1-dhowells@redhat.com>
 References: <20260121223609.1650735-1-dhowells@redhat.com>
 Precedence: bulk
@@ -72,266 +72,91 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Add verify-only public key crypto support for ML-DSA so that the
-X.509/PKCS#7 signature verification code, as used by module signing,
-amongst other things, can make use of it through the common crypto_sig API.
+Calculate the SHA256 hash for blacklisting purposes independently of the
+signature hash (which may be something other than SHA256).
+
+This is necessary because when ML-DSA is used, no digest is calculated.
+
+Note that this represents a change of behaviour in that the hash used for
+the blacklist check would previously have been whatever digest was used
+for, say, RSA-based signatures.  It may be that this is inadvisable.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-cc: Eric Biggers <ebiggers@kernel.org>
 cc: Lukas Wunner <lukas@wunner.de>
 cc: Ignat Korchagin <ignat@cloudflare.com>
 cc: Stephan Mueller <smueller@chronox.de>
+cc: Eric Biggers <ebiggers@kernel.org>
 cc: Herbert Xu <herbert@gondor.apana.org.au>
 cc: keyrings@vger.kernel.org
 cc: linux-crypto@vger.kernel.org
 ---
- crypto/Kconfig  |   9 +++
- crypto/Makefile |   2 +
- crypto/mldsa.c  | 201 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 212 insertions(+)
- create mode 100644 crypto/mldsa.c
+ crypto/asymmetric_keys/x509_parser.h     |  2 ++
+ crypto/asymmetric_keys/x509_public_key.c | 23 +++++++++++++----------
+ 2 files changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 12a87f7cf150..a210575fa5e0 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -344,6 +344,15 @@ config CRYPTO_ECRDSA
- 	  One of the Russian cryptographic standard algorithms (called GOST
- 	  algorithms). Only signature verification is implemented.
+diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
+index 0688c222806b..b7aeebdddb36 100644
+--- a/crypto/asymmetric_keys/x509_parser.h
++++ b/crypto/asymmetric_keys/x509_parser.h
+@@ -9,12 +9,14 @@
+ #include <linux/time.h>
+ #include <crypto/public_key.h>
+ #include <keys/asymmetric-type.h>
++#include <crypto/sha2.h>
  
-+config CRYPTO_MLDSA
-+	tristate "ML-DSA (Module-Lattice-Based Digital Signature Algorithm)"
-+	select CRYPTO_SIG
-+	select CRYPTO_LIB_MLDSA
-+	help
-+	  ML-DSA (Module-Lattice-Based Digital Signature Algorithm) (FIPS-204).
-+
-+	  Only signature verification is implemented.
-+
- endmenu
+ struct x509_certificate {
+ 	struct x509_certificate *next;
+ 	struct x509_certificate *signer;	/* Certificate that signed this one */
+ 	struct public_key *pub;			/* Public key details */
+ 	struct public_key_signature *sig;	/* Signature parameters */
++	u8		sha256[SHA256_DIGEST_SIZE]; /* Hash for blacklist purposes */
+ 	char		*issuer;		/* Name of certificate issuer */
+ 	char		*subject;		/* Name of certificate subject */
+ 	struct asymmetric_key_id *id;		/* Issuer + Serial number */
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 12e3341e806b..6d002e3b20c5 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -31,6 +31,19 @@ int x509_get_sig_params(struct x509_certificate *cert)
  
- menu "Block ciphers"
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 23d3db7be425..267d5403045b 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -60,6 +60,8 @@ ecdsa_generic-y += ecdsa-p1363.o
- ecdsa_generic-y += ecdsasignature.asn1.o
- obj-$(CONFIG_CRYPTO_ECDSA) += ecdsa_generic.o
+ 	pr_devel("==>%s()\n", __func__);
  
-+obj-$(CONFIG_CRYPTO_MLDSA) += mldsa.o
-+
- crypto_acompress-y := acompress.o
- crypto_acompress-y += scompress.o
- obj-$(CONFIG_CRYPTO_ACOMP2) += crypto_acompress.o
-diff --git a/crypto/mldsa.c b/crypto/mldsa.c
-new file mode 100644
-index 000000000000..d8de082cc67a
---- /dev/null
-+++ b/crypto/mldsa.c
-@@ -0,0 +1,201 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * crypto_sig wrapper around ML-DSA library.
-+ */
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <crypto/internal/sig.h>
-+#include <crypto/mldsa.h>
-+
-+struct crypto_mldsa_ctx {
-+	u8 pk[MAX(MAX(MLDSA44_PUBLIC_KEY_SIZE,
-+		      MLDSA65_PUBLIC_KEY_SIZE),
-+		  MLDSA87_PUBLIC_KEY_SIZE)];
-+	unsigned int pk_len;
-+	enum mldsa_alg strength;
-+	bool key_set;
-+};
-+
-+static int crypto_mldsa_sign(struct crypto_sig *tfm,
-+			     const void *msg, unsigned int msg_len,
-+			     void *sig, unsigned int sig_len)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int crypto_mldsa_verify(struct crypto_sig *tfm,
-+			       const void *sig, unsigned int sig_len,
-+			       const void *msg, unsigned int msg_len)
-+{
-+	const struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	if (unlikely(!ctx->key_set))
-+		return -EINVAL;
-+
-+	return mldsa_verify(ctx->strength, sig, sig_len, msg, msg_len,
-+			    ctx->pk, ctx->pk_len);
-+}
-+
-+static unsigned int crypto_mldsa_key_size(struct crypto_sig *tfm)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	switch (ctx->strength) {
-+	case MLDSA44:
-+		return MLDSA44_PUBLIC_KEY_SIZE;
-+	case MLDSA65:
-+		return MLDSA65_PUBLIC_KEY_SIZE;
-+	case MLDSA87:
-+		return MLDSA87_PUBLIC_KEY_SIZE;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return 0;
++	/* Calculate a SHA256 hash of the TBS and check it against the
++	 * blacklist.
++	 */
++	sha256(cert->tbs, cert->tbs_size, cert->sha256);
++	ret = is_hash_blacklisted(cert->sha256, sizeof(cert->sha256),
++				  BLACKLIST_HASH_X509_TBS);
++	if (ret == -EKEYREJECTED) {
++		pr_err("Cert %*phN is blacklisted\n",
++		       (int)sizeof(cert->sha256), cert->sha256);
++		cert->blacklisted = true;
++		ret = 0;
 +	}
-+}
 +
-+static int crypto_mldsa_set_pub_key(struct crypto_sig *tfm,
-+				    const void *key, unsigned int keylen)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+	unsigned int expected_len = crypto_mldsa_key_size(tfm);
-+
-+	if (keylen != expected_len)
-+		return -EINVAL;
-+
-+	ctx->pk_len = keylen;
-+	memcpy(ctx->pk, key, keylen);
-+	ctx->key_set = true;
-+	return 0;
-+}
-+
-+static int crypto_mldsa_set_priv_key(struct crypto_sig *tfm,
-+				     const void *key, unsigned int keylen)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static unsigned int crypto_mldsa_max_size(struct crypto_sig *tfm)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	switch (ctx->strength) {
-+	case MLDSA44:
-+		return MLDSA44_SIGNATURE_SIZE;
-+	case MLDSA65:
-+		return MLDSA65_SIGNATURE_SIZE;
-+	case MLDSA87:
-+		return MLDSA87_SIGNATURE_SIZE;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return 0;
-+	}
-+}
-+
-+static int crypto_mldsa44_alg_init(struct crypto_sig *tfm)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	ctx->strength = MLDSA44;
-+	ctx->key_set = false;
-+	return 0;
-+}
-+
-+static int crypto_mldsa65_alg_init(struct crypto_sig *tfm)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	ctx->strength = MLDSA65;
-+	ctx->key_set = false;
-+	return 0;
-+}
-+
-+static int crypto_mldsa87_alg_init(struct crypto_sig *tfm)
-+{
-+	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	ctx->strength = MLDSA87;
-+	ctx->key_set = false;
-+	return 0;
-+}
-+
-+static void crypto_mldsa_alg_exit(struct crypto_sig *tfm)
-+{
-+}
-+
-+static struct sig_alg crypto_mldsa_algs[] = {
-+	{
-+		.sign			= crypto_mldsa_sign,
-+		.verify			= crypto_mldsa_verify,
-+		.set_pub_key		= crypto_mldsa_set_pub_key,
-+		.set_priv_key		= crypto_mldsa_set_priv_key,
-+		.key_size		= crypto_mldsa_key_size,
-+		.max_size		= crypto_mldsa_max_size,
-+		.init			= crypto_mldsa44_alg_init,
-+		.exit			= crypto_mldsa_alg_exit,
-+		.base.cra_name		= "mldsa44",
-+		.base.cra_driver_name	= "mldsa44-lib",
-+		.base.cra_ctxsize	= sizeof(struct crypto_mldsa_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.base.cra_priority	= 5000,
-+	}, {
-+		.sign			= crypto_mldsa_sign,
-+		.verify			= crypto_mldsa_verify,
-+		.set_pub_key		= crypto_mldsa_set_pub_key,
-+		.set_priv_key		= crypto_mldsa_set_priv_key,
-+		.key_size		= crypto_mldsa_key_size,
-+		.max_size		= crypto_mldsa_max_size,
-+		.init			= crypto_mldsa65_alg_init,
-+		.exit			= crypto_mldsa_alg_exit,
-+		.base.cra_name		= "mldsa65",
-+		.base.cra_driver_name	= "mldsa65-lib",
-+		.base.cra_ctxsize	= sizeof(struct crypto_mldsa_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.base.cra_priority	= 5000,
-+	}, {
-+		.sign			= crypto_mldsa_sign,
-+		.verify			= crypto_mldsa_verify,
-+		.set_pub_key		= crypto_mldsa_set_pub_key,
-+		.set_priv_key		= crypto_mldsa_set_priv_key,
-+		.key_size		= crypto_mldsa_key_size,
-+		.max_size		= crypto_mldsa_max_size,
-+		.init			= crypto_mldsa87_alg_init,
-+		.exit			= crypto_mldsa_alg_exit,
-+		.base.cra_name		= "mldsa87",
-+		.base.cra_driver_name	= "mldsa87-lib",
-+		.base.cra_ctxsize	= sizeof(struct crypto_mldsa_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.base.cra_priority	= 5000,
-+	},
-+};
-+
-+static int __init mldsa_init(void)
-+{
-+	int ret, i;
-+
-+	for (i = 0; i < ARRAY_SIZE(crypto_mldsa_algs); i++) {
-+		ret = crypto_register_sig(&crypto_mldsa_algs[i]);
-+		if (ret < 0)
-+			goto error;
-+	}
-+	return 0;
-+
-+error:
-+	pr_err("Failed to register (%d)\n", ret);
-+	for (i--; i >= 0; i--)
-+		crypto_unregister_sig(&crypto_mldsa_algs[i]);
-+	return ret;
-+}
-+module_init(mldsa_init);
-+
-+static void mldsa_exit(void)
-+{
-+	for (int i = 0; i < ARRAY_SIZE(crypto_mldsa_algs); i++)
-+		crypto_unregister_sig(&crypto_mldsa_algs[i]);
-+}
-+module_exit(mldsa_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Crypto API support for ML-DSA signature verification");
-+MODULE_ALIAS_CRYPTO("mldsa44");
-+MODULE_ALIAS_CRYPTO("mldsa65");
-+MODULE_ALIAS_CRYPTO("mldsa87");
+ 	sig->s = kmemdup(cert->raw_sig, cert->raw_sig_size, GFP_KERNEL);
+ 	if (!sig->s)
+ 		return -ENOMEM;
+@@ -65,19 +78,9 @@ int x509_get_sig_params(struct x509_certificate *cert)
+ 
+ 	ret = crypto_shash_digest(desc, cert->tbs, cert->tbs_size,
+ 				  sig->digest);
+-
+ 	if (ret < 0)
+ 		goto error_2;
+ 
+-	ret = is_hash_blacklisted(sig->digest, sig->digest_size,
+-				  BLACKLIST_HASH_X509_TBS);
+-	if (ret == -EKEYREJECTED) {
+-		pr_err("Cert %*phN is blacklisted\n",
+-		       sig->digest_size, sig->digest);
+-		cert->blacklisted = true;
+-		ret = 0;
+-	}
+-
+ error_2:
+ 	kfree(desc);
+ error:
 
