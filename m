@@ -1,43 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59B5372B3E;
-	Fri, 23 Jan 2026 05:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67761399001;
+	Fri, 23 Jan 2026 05:59:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769147920; cv=none; b=W8OYwIwc6XfKBm9wIADndA6cTPiqoXkLJJ84+GmkmonZq9N4QTW1vj91NAXmMinq3SomFIQsYrmWLqqzmEb0KsU6K6I5Dv/nZzl6gSejlnZFiVlhaw4bI1JzdBbg2kCu/xqYFLyunR9ynNfC0tLzCLpcRuUUmFg03PSf0OXjmNw=
+	t=1769147969; cv=none; b=SZb0m2CeMlByW9Pno92vo5MdZuQdMmKUeuDp/y9PfgGYwzJsyk5eFE1CyYSs5dADb7ukl7fuMB4JmwvxlrCH041GntX6Z3kf8MUem23GepwUTrZ7jkrX9rlEMA5zkYUkl+s2jgw5funBsvsGYtCyHFV7V85hRfCHoHuLmum5FC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769147920; c=relaxed/simple;
-	bh=Z9BLh7HqWTGB4sGjq5B96LOmxVi9lHzJMVbXKngzPnQ=;
+	s=arc-20240116; t=1769147969; c=relaxed/simple;
+	bh=xBPD4Kq5eV7X5Q7AIuiZrfzV80/9Fju+wnrGO/aoCWQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gIymfEVPy6FBT2bf0VacC9sBnIpRDT67iZsezsLpEZLSfUnSQ0LEatytdV9dV/+Csoyr0b1eWKsryWTmBqEim+JTazfcgD+vqcsW/dKx1QTgjaNaVk1BAkxNZ/86p6JBaAqK34HQu4ijUuspKMYH6WATFEv2qW1VqtSRlhtRlOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=FAMnQCtt; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=tsibpLHGPLWcZH9QFUjmHNIeGgBSjbH7NTzrVQ5kR1Y6k4N5PZ0gy/XzuHFiaWupf8ftg0FhwiI6wkCn+HPom5BR+bbVZLxntafRwtmG2Azpuv1k8nniA3hSBCXqlgc1pNRdpDqOW0tqXfstAQcbFYS9foyI8L7huUO3iXHncto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=o5Nr1584; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="FAMnQCtt"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="o5Nr1584"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=IRMc7Ew0xnVtRngB4SfCYgq/gZJ6LtzQ5tHEgyLytZ8=; 
-	b=FAMnQCttpJAEe70CinAkPbiwJy5K54vM0bL06FiJAW+kIiUDjX9fz0o+LAvJhfnbYiMEofk9g0y
-	KvxHSTkbpx6poltnX7Hdyl3h2e41fMX3+uulFMHiXPoHYxc3F/aBEnZkhwLabKhNFq2Jfz17V/Hmg
-	bRsFZFUG/hJH/b0QxJPALZUSr/KQZOjrRguhAO67VWuwpWHsUbR/X7xfpFAx/Wgp4P/8+eLDjJQiR
-	sMMO7jTZjDJqiTKQchTEtPos+vGW04DsxgZEgbldR0TLHGRCvOj8DY4EtwSr2pJR5mrtMGZKmVIBY
-	LuJ1MsXAHaSVHb0Bb76P94rjtavwk/hi01BQ==;
+	from:content-type:reply-to; bh=eoislff6NdgQr70mDGRhROvUf1Rezjfhuy+yFSDXiYA=; 
+	b=o5Nr1584Fv55I/Y5aWbBREYl7aAw9/UlkULnMXM8d4wmWhehZZy5eRnbt1ZeYOHEAhr9fe0Xe88
+	84y1arO4qv8+mTgBgqMvswjs7LbSV+uSLP/7tbwTeBOC6PtSJyoVqmkz/6FL5pdq2rHXXshB23OGE
+	VL/+NX7Uc97K9Un1x/XpPqVK5tR0nEyfLlo5YLEUENIoAwE4H2uWTGUCs8cXFUWpuppK8AHesQJ/x
+	dadVWWNnC4v9tConOV79GQRfNPhR+FF2+886vm/yKfnC9WrPKKm35HRWdWUbbAXxOLvO7s9mV/FNS
+	rpCiMNujm7hDzxnXUPEDSvPaasQUwBfbMCiQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vjABb-001VOY-37;
-	Fri, 23 Jan 2026 13:58:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 Jan 2026 13:58:23 +0800
-Date: Fri, 23 Jan 2026 13:58:23 +0800
+	id 1vjACH-001VOl-0r;
+	Fri, 23 Jan 2026 13:59:06 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 Jan 2026 13:59:05 +0800
+Date: Fri, 23 Jan 2026 13:59:05 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Alexander Bendezu <alexanderbendezu10@gmail.com>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+To: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: ansuelsmth@gmail.com, atenart@kernel.org, davem@davemloft.net,
+	vschagen@icloud.com, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: blowfish - fix typo in comment
-Message-ID: <aXMN_6vunR0HGOmr@gondor.apana.org.au>
-References: <20251228000101.12139-1-alexanderbendezu10@gmail.com>
+Subject: Re: [PATCH] crypto: inside-secure/eip93 - fix kernel panic in driver
+ detach
+Message-ID: <aXMOKTBrxUgB0rQq@gondor.apana.org.au>
+References: <20251230211721.1110174-1-olek2@wp.pl>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,14 +48,16 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251228000101.12139-1-alexanderbendezu10@gmail.com>
+In-Reply-To: <20251230211721.1110174-1-olek2@wp.pl>
 
-On Sun, Dec 28, 2025 at 12:01:01AM +0000, Alexander Bendezu wrote:
-> Fix spelling mistake in comment: endianess -> endianness
+On Tue, Dec 30, 2025 at 10:17:17PM +0100, Aleksander Jan Bajkowski wrote:
+> During driver detach, the same hash algorithm is unregistered multiple
+> times due to a wrong iterator.
 > 
-> Signed-off-by: Alexander Bendezu <alexanderbendezu10@gmail.com>
+> Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
+> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
 > ---
->  crypto/blowfish_common.c | 2 +-
+>  drivers/crypto/inside-secure/eip93/eip93-main.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
