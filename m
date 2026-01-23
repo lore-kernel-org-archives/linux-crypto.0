@@ -1,44 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB71237AA9E;
-	Fri, 23 Jan 2026 06:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20B6221F12;
+	Fri, 23 Jan 2026 06:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769148107; cv=none; b=d3/n7kjhfdpjEFDz/4pFDdaMH8UHZQr9z0X48wvCaQQI9nkBoHIOEErfLhi6y1hMI9cHBrl3zwSTp1YG9RN1GNF7lyhsHgts6leMwuYb+Kv1l6gpL5tABo44WiSTKjcsdeABy7t24mQQtLccxshbJJHTJgeyz7PCNeS/tj7qIjk=
+	t=1769148131; cv=none; b=CireSla+ShEz0ZgPSQpjXHe3U1WT6LLHzpG4o7HiW3g1n9wvRVt/gEh8+I8QfsEl6szKxt6NTTPfWCdm8dV6MMy7mPljkxzyEF/Tb8pq69b9y6EZpVxMnEAT8AVQEHS1MC2ND5Zs61j62QEVgGtDuN7o2Ivqoz3pLmBF2Deof2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769148107; c=relaxed/simple;
-	bh=xBB+IajcbYODYCssVaSCkuE8n6G+dpzj1y1zpm1BwUU=;
+	s=arc-20240116; t=1769148131; c=relaxed/simple;
+	bh=qvFFkUXMqN91q/9W0PkvJsENtOz/FGHAGrwUFjCGKEk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q2bwlXbIdIj0u6cxH/+hqXu6tZhLhBsQnZW0/VHEbMnkvosrFbA0IXu+oso7ETSFkHn+5U/5TB+OnTQiFQ1Pty4x1sLfA2xqNVtvBmNNc8bdDy3twyd3D2AIKXWrykwPQkHRGm+B1GNYjnyDckRDdZkfdlvn6WNoVO1r2Kryp74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=MN4VmyFo; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=NnslazvofWtkzUiIHX7Vg0k+vzBdqhqazzYulXfPIjowLQNTv+epW1kUZ8DRr9wQGaIM/fXZQt3azVYJXXpfW6omCyN6YgLsiy0FpsK8aUDUuinjSL81YxMfrPCawDmeJJLPgACfAQUc0ayG3WBkZmv8aEdzeNuu6akzXmdf1lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=DBkXUXSr; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="MN4VmyFo"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="DBkXUXSr"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=uxd8qXEJDj94YeJB4zv9coAoOQR2STnKUNJVVZFpwNQ=; 
-	b=MN4VmyFoyxWtsSvuQDifkmTnPVb1SI51h5g7cPFgOOLd5XMMYo+uaRhu67Tk0ujHEZil7fYWepU
-	PxL/LQ3yR48fd/AjDJzAPu17Y6iTAqe1jAB6LhIdWPzonnxT8InQw6SDq57skiVu//XebhbOQxr8g
-	BkJQ2Awn8Qyxhy/HQq+b0bbhv/9oi9O3XZOeVF/8wEon94+bIoz4SYjn91RW50qIullCWgk/51Uuq
-	GvTyskiAoEwg+yxmlGVadoTkmBwMAKVyJQQnszJph5Ovhxz4/z2/xWmkSwqncoWT/D6glZNbkiidv
-	a+tBBiCI0CBk1wOi37EiFPWqW/sOlCNXfwYA==;
+	from:content-type:reply-to; bh=SZcBaX9njbZsoyBZCnXkExSdR4O8mj9ArVaoUuVnRpU=; 
+	b=DBkXUXSryLiOXFbGQSf9uf3jdFlLJ3yaxyW5X32Jm30QQ9xKdvlFM1jjKcK1KhIN8IJ4nZu8nRZ
+	DLo6EiPYMkRft2rEN95PYwr4eM49YAGJ82mAqUCPChKi83Kt570+VFEU+4X4TMRgSIUf1wKw6KJ3+
+	fRFH6JJ5N3BhOE7RVo2XEbftsK8+aPwNc8zFiBg/TweWjJSDyyGSe0QHxC8/fRZB9bXUcUzMxscMX
+	23ESj5Dj8OHBhPdhKS6JfDx3MxFgmW9Eqd9p1FfmmqBZse21qeOeqynlwAJ74jEZnMXOjWhlBtpW0
+	BTZCnXr1IN8RHaXWlxgMStc6FoZqGTYW4F5Q==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vjAES-001VRO-0u;
-	Fri, 23 Jan 2026 14:01:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 Jan 2026 14:01:20 +0800
-Date: Fri, 23 Jan 2026 14:01:20 +0800
+	id 1vjAEZ-001VRS-0b;
+	Fri, 23 Jan 2026 14:01:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 Jan 2026 14:01:27 +0800
+Date: Fri, 23 Jan 2026 14:01:27 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: benjamin.larsson@genexis.eu, olivia@selenic.com, martin@kaiser.cx,
-	ansuelsmth@gmail.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] hwrng: airoha set rng quality to 900
-Message-ID: <aXMOsCsUMpCQRy6Y@gondor.apana.org.au>
-References: <20260105204204.2430571-1-olek2@wp.pl>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@cloudflare.com>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: ecc - Streamline alloc_point and remove
+ {alloc,free}_digits_space
+Message-ID: <aXMOt7xDgkm1b_BY@gondor.apana.org.au>
+References: <20260105222153.3249-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,49 +49,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260105204204.2430571-1-olek2@wp.pl>
+In-Reply-To: <20260105222153.3249-2-thorsten.blum@linux.dev>
 
-On Mon, Jan 05, 2026 at 09:41:49PM +0100, Aleksander Jan Bajkowski wrote:
-> Airoha uses RAW mode to collect noise from the TRNG. These appear to
-> be unprocessed oscillations from the tero loop. For this reason, they
-> do not have a perfect distribution and entropy. Simple noise compression
-> reduces its size by 9%, so setting the quality to 900 seems reasonable.
-> The same value is used by the downstream driver.
+On Mon, Jan 05, 2026 at 11:21:53PM +0100, Thorsten Blum wrote:
+> Check 'ndigits' before allocating 'struct ecc_point' to return early if
+> needed. Inline the code from and remove ecc_alloc_digits_space() and
+> ecc_free_digits_space(), respectively.
 > 
-> Compare the size before and after compression:
-> $ ls -l random_airoha*
-> -rw-r--r-- 1 aleksander aleksander 76546048 Jan  3 23:43 random_airoha
-> -rw-rw-r-- 1 aleksander aleksander 69783562 Jan  5 20:23 random_airoha.zip
-> 
-> FIPS test results:
-> $ cat random_airoha | rngtest -c 10000
-> rngtest 2.6
-> Copyright (c) 2004 by Henrique de Moraes Holschuh
-> This is free software; see the source for copying conditions.  There is NO
-> warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-> 
-> rngtest: starting FIPS tests...
-> rngtest: bits received from input: 200000032
-> rngtest: FIPS 140-2 successes: 0
-> rngtest: FIPS 140-2 failures: 10000
-> rngtest: FIPS 140-2(2001-10-10) Monobit: 9957
-> rngtest: FIPS 140-2(2001-10-10) Poker: 10000
-> rngtest: FIPS 140-2(2001-10-10) Runs: 10000
-> rngtest: FIPS 140-2(2001-10-10) Long run: 4249
-> rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-> rngtest: input channel speed: (min=953.674; avg=27698.935; max=19073.486)Mibits/s
-> rngtest: FIPS tests speed: (min=59.791; avg=298.028; max=328.853)Mibits/s
-> rngtest: Program run time: 647638 microseconds
-> 
-> In general, these data look like real noise, but with lower entropy
-> than expected.
-> 
-> Fixes: e53ca8efcc5e ("hwrng: airoha - add support for Airoha EN7581 TRNG")
-> Suggested-by: Benjamin Larsson <benjamin.larsson@genexis.eu>
-> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 > ---
->  drivers/char/hw_random/airoha-trng.c | 1 +
->  1 file changed, 1 insertion(+)
+> Changes in v2:
+> - Use kfree() instead of kfree_sensitive() as suggested by Stefan
+> - Link to v1: https://lore.kernel.org/lkml/20251218212713.1616-2-thorsten.blum@linux.dev/
+> ---
+>  crypto/ecc.c | 27 +++++++++------------------
+>  1 file changed, 9 insertions(+), 18 deletions(-)
 
 Patch applied.  Thanks.
 -- 
