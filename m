@@ -1,58 +1,59 @@
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010062.outbound.protection.outlook.com [52.101.46.62])
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012058.outbound.protection.outlook.com [52.101.53.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B5038734B;
-	Fri, 23 Jan 2026 05:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2901A372B22;
+	Fri, 23 Jan 2026 05:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.58
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769146289; cv=fail; b=BU9YSCTO2WtGFYT7hkf0S6zKXt3zIjtiGD301ttEa44H9mc050TIXDetQh3b7WSvunIkDPa5yqc3yugNHLeI/LgXtCU2S538WNccrQPsFE8Ph6GQti9LQMQ8PrBTH3VbZ84o+mUETNaaNbuuSzGl+vz+3jqcCy/1ahRlr7v6QX0=
+	t=1769146317; cv=fail; b=ioFmU+h3roR4Ci6MNZ/8pSl4zBL6YiAC4kZP/4gQuECL+PcifH1/iUBhwHHgDCngoFLmOo7HgsVFC3EyZkg7mk9E1zLAmgZobJQyO+R1TUGgXvErhMoZhDKX1SdnIqGV4MQE1TuecYtz58jYuZcT+4cqViXHpvSkxK1LMLqXgp4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769146289; c=relaxed/simple;
-	bh=FhWkVSsN4wlgl5cUmJgsGeXE8XIoVWpS6SGLnT1b6DQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oM+9N/JG1ogabpzK7B8j61M/sPCm09pOWHMwxbM/sP/K8tiyhbCA51U0rbQ1SRDvBGhwuqRLXMBRmC7hcYgVhUSTEfdOQ2nBzPqErwgDtAf96pjVNlflQ2TXH+Fo4n0sp8Q0pNtNJTcXTOyrHXxzUDdbsieY8zqaZLWnWbEpU3Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jibY7dz3; arc=fail smtp.client-ip=52.101.46.62
+	s=arc-20240116; t=1769146317; c=relaxed/simple;
+	bh=zjpFpbMAIbrT7D3xTNhSL5rRkqUmS0FreDagWAtaCE8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Uhg0z06j4dnPDh+jQDel4GetRCpoSW/4pNclu/8y+xq4Qiya7WbqGdp84AjmSxtyhbhAALGK0EBVOCxWTXOtxqoY3twTEwEn2BOWw7nej0Uvo8238P64k4Ai2bACsf57PlVLd1FaL7Qn78+nWB6Fpy4dKFEgdclnm6nAY8t/scY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=FOUvmjQZ; arc=fail smtp.client-ip=52.101.53.58
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jibY7dz3"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="FOUvmjQZ"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mimcS2nPQmiJJWlsp9o4QvTO1wRW6+GEz5syeOnrEFoVC2lyWos9qLTOCbs7zIwSTSHPgu6HEgCATesOKby6DD2bKLjVq4ohLuGNHT1bawoPcIEOvuRqefSstTco0Mun6Va1HDmU7hSvtkflSez57PIrle9H0gfzPs8oyacbN4jhQoZrAnxBzJ33Mcya+SLJGs98AiZAB6LUbC46pxrIe+8Xjc+ScDfwl7DmGEcmbEsH+neKkyK3W9Wm+b2S9DjZ2D/LwQd0Pqa0XHVPcsvYfjkYT+OlR2B9VaBMn70viCnLhibU1rPOkMi+Up31viNxQ4mvIJindPaXA8YqGME9vw==
+ b=QlQlFXuKjJYvxStKeCAVxWoAFCVu28KpFiXRMEPClgUrsWjYZHnUzsF4xKodnYDOkgHgs+IFsHaP/jITe+0gjAgixGADdnKf2IcgZMS0JlutpncWighfFZbzeGxo7n3uPXZIsQd7JCP5APw4iAJYdSMsAB+GqD9PwiES8n/mJocRTFwLetseE29g5jbbVPbXqF/fTqE/E/ShYCbDYd2zBgYAWXZAm7q3JbYObwEHzJnogyD6b3+a23MIGh5A4p648brQKNlBognNO4FODe3fnt1dY4OhMjcv3ElyNbeCBLSNPVHsCUGL2q4hQe45HMAcTZO1db3ffei683v9iVipIA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yO3dGOf11YDLWPmuMCyt8sL4a1m1wZ3volY0kbA5++I=;
- b=x3CQWb1eaS9caes0kgyJ+cI9CuMEcFFOvNfPofytVDRARZOv25BAqH2ny4GF7n6huCuKMVeY4laAeaXvpVoU3GYcGxQw0jE3XzQR8Rs08MuV1LVtAWT/ACRb2RstWBdfbJm+2hVGH9LDsnJoROYl8yqshwBZES0go2YHEqADNzLiAAboYWCet3mxObgOGQht3KuJ3JpurEjI4j0QPiaPd3icmSI/YMEYbL4SiwNYnb5UnceVUadUtmGEx5NmnJ5d3xRBp37JuJrv9cLL78lz5fxsOhKHc3H/s7bAti/GaLcePa+YoLxQWTHVz34htnAuC1tCsMyA3XVSwY2K8wcBgg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
+ bh=5wmS215LvOLBU/vSriUbn6xJuUdpFkgdRe9UzrPjJes=;
+ b=we75JcBOpBxJwme+EBgubIEE0wt2/VyDFqjPUAxk6hCOTuF6u66oF6L8Q/kABEiZHR95TQpPqzc6gvbvm1gJtZ0Mg6sT8c2vcm7XjPUcsfChhrzohKtAVUDAoW09lVGVmZ3Siwfmn/ozx86Ui676q8sQdgTkbq2/aCOWVXGvgp2VOaMACdPqfIUO6qqfIRd8Zsu7NSM48XHglQ4QyObtWHwaCf9gb6XU2szKKvxQa/YXf4wMVrzfV37piSQajxhwU4JxOsMh30UTe0F8oQuSBVS7kzxT2xHp99jPHy/GigWmXCjQf6EwmHHEmNDVdrGAxlWXqe+w36jsuxvFthiCsg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
+ is 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=temperror action=none header.from=amd.com; dkim=none (message not
+ signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yO3dGOf11YDLWPmuMCyt8sL4a1m1wZ3volY0kbA5++I=;
- b=jibY7dz3N4KMCUdcQUtMTkVXaQ8MKCh5YDhi54bqZTc9VHXtkPBxnFpkOmw422fhXMzP52pb9rw24gMGVbpZ3EhsEjA0pcic0SSpzWFa8EzEQ5PKVzme56EojcwEMGpdiqtaJ6lb6E33ZFJA10twobZ47j8FEpQgSiYRpPQ2l4M=
-Received: from SA0PR11CA0176.namprd11.prod.outlook.com (2603:10b6:806:1bb::31)
- by DM4PR12MB6232.namprd12.prod.outlook.com (2603:10b6:8:a5::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9542.10; Fri, 23 Jan 2026 05:31:18 +0000
-Received: from SA2PEPF00003F62.namprd04.prod.outlook.com
- (2603:10b6:806:1bb:cafe::1c) by SA0PR11CA0176.outlook.office365.com
- (2603:10b6:806:1bb::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9542.10 via Frontend Transport; Fri,
- 23 Jan 2026 05:31:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+ bh=5wmS215LvOLBU/vSriUbn6xJuUdpFkgdRe9UzrPjJes=;
+ b=FOUvmjQZ1Eoh+8mrytAy2X6kAL5i9SMMZLfmATqzxlV8sgKF3Pe9tmKyNPkOlsgzMOKpBi7cPcGYE1ysYKWYbHAxxbOx4IKZM0vjUcxiYmriLJ3rhafYPN6Ue09pSJz+ohNjK7psumUyjBs+MbsMCEutnXp5aoYPPFEbJ0zkhqc=
+Received: from MN2PR16CA0037.namprd16.prod.outlook.com (2603:10b6:208:234::6)
+ by SA3PR12MB9107.namprd12.prod.outlook.com (2603:10b6:806:381::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.11; Fri, 23 Jan
+ 2026 05:31:41 +0000
+Received: from BL6PEPF00020E63.namprd04.prod.outlook.com
+ (2603:10b6:208:234:cafe::35) by MN2PR16CA0037.outlook.office365.com
+ (2603:10b6:208:234::6) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9542.11 via Frontend Transport; Fri,
+ 23 Jan 2026 05:31:28 +0000
+X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
+ 165.204.84.17) smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=temperror action=none header.from=amd.com;
+Received-SPF: TempError (protection.outlook.com: error in processing during
+ lookup of amd.com: DNS Timeout)
 Received: from satlexmb07.amd.com (165.204.84.17) by
- SA2PEPF00003F62.mail.protection.outlook.com (10.167.248.37) with Microsoft
+ BL6PEPF00020E63.mail.protection.outlook.com (10.167.249.24) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9564.3 via Frontend Transport; Fri, 23 Jan 2026 05:31:17 +0000
+ 15.20.9564.3 via Frontend Transport; Fri, 23 Jan 2026 05:31:39 +0000
 Received: from aiemdee.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 22 Jan
- 2026 23:31:10 -0600
+ 2026 23:31:33 -0600
 From: Alexey Kardashevskiy <aik@amd.com>
 To: <linux-crypto@vger.kernel.org>
 CC: <linux-kernel@vger.kernel.org>, Ashish Kalra <ashish.kalra@amd.com>, "Tom
@@ -61,10 +62,12 @@ CC: <linux-kernel@vger.kernel.org>, Ashish Kalra <ashish.kalra@amd.com>, "Tom
 	<davem@davemloft.net>, Dan Williams <dan.j.williams@intel.com>, Alexey
  Kardashevskiy <aik@amd.com>, <x86@kernel.org>, <linux-coco@lists.linux.dev>,
 	"Pratik R . Sampat" <prsampat@amd.com>
-Subject: [PATCH kernel 0/2] crypto/ccp: Fixes for PCI IDE
-Date: Fri, 23 Jan 2026 16:30:55 +1100
-Message-ID: <20260123053057.1350569-1-aik@amd.com>
+Subject: [PATCH kernel 1/2] crypto/ccp: Use PCI bridge defaults for IDE
+Date: Fri, 23 Jan 2026 16:30:56 +1100
+Message-ID: <20260123053057.1350569-2-aik@amd.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260123053057.1350569-1-aik@amd.com>
+References: <20260123053057.1350569-1-aik@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -77,75 +80,105 @@ X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F62:EE_|DM4PR12MB6232:EE_
-X-MS-Office365-Filtering-Correlation-Id: e8748f01-596e-4265-942c-08de5a40a238
+X-MS-TrafficTypeDiagnostic: BL6PEPF00020E63:EE_|SA3PR12MB9107:EE_
+X-MS-Office365-Filtering-Correlation-Id: 90cde54d-d5ed-4d37-59e6-08de5a40af14
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014;
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?AifcDj1zMyq1AS756iTdCjHIa+Gd7+9DUlvKtjfEGP/YG+fsYZvxMdM5CBNP?=
- =?us-ascii?Q?cphMkbDVFED2FLZiemJnjFdgkRDthEEsJk9pnmCFwStClIdpE7oZ3xgTb0NZ?=
- =?us-ascii?Q?cA3BVhCiRx167zIGPZFBfehNMkLBx3ObLfWwdpnH0pXh0iAWn8C9l7Cl8rvw?=
- =?us-ascii?Q?Zlyk2GXhq9Q6uiHqL0U9tT9sbJmMc+xjzkGmcwAqHn1D/6fn+NvKM3GKjLyU?=
- =?us-ascii?Q?O60bdJqZ6uprWwZ/73JOQ7RXuMWOVf6kILGjKCHqu77sJHwP7tMszbgt5uIp?=
- =?us-ascii?Q?VlTGmk+ZOyLP0RZtj/M8/cgi0foNT+BTYTIjMeUfJ047nhqWa/bzrs5ZexAa?=
- =?us-ascii?Q?SQf9wIGkmEckUxBfUANypYvoHEUSns8mCmRHeV5AW/m1ekD2f9cwOdpJx6rs?=
- =?us-ascii?Q?orXXj0SXB4hP8fxh4XT9qzOj00MttCk39sRHMAklZPLCKTU0BtaGQkMn/5OD?=
- =?us-ascii?Q?4gSTlrZfJ8ETbBqW7Q9tfxKFx8cHbAVA50jD91urFal0Pl2tP/+6nP/vFyRI?=
- =?us-ascii?Q?xvIdJuhPCY0S1Ovd7tF6ng6Xy1BHuyV8pVshfijjLD3fZWRF6TAGFssSX3zw?=
- =?us-ascii?Q?hvjiO4SnUiuWQr/ZimC80pZmewaQeucFnjkcDztBVMvav26YKEQ81syZddEQ?=
- =?us-ascii?Q?+lMOBf5Mo4wCMB7vFwEBV3bRP4rHgJVtc/Mk29Nxiy8aqoCrlcQmPgDb+tVf?=
- =?us-ascii?Q?SVCsB/LYyIWpxlXLcpfOE2ZtOijeUgkqTMsht+vPceUG/91hdt/5OY96NWkq?=
- =?us-ascii?Q?xGfzI6x31qRIE2j4lCOsv4+C+2SJtjtszvPd0t1jL28QVjGyWehprgst3j7l?=
- =?us-ascii?Q?oIOZGuVVSgid33ILXR0e9QZzAW/Llu6mqf7yClothktbWO7zON/+2f7PBTOf?=
- =?us-ascii?Q?Oawxv5I7TwOcxWxruVJzHdx+D7kZB0Phr1Q8nvsKbtMKjH9A6Yj9ddf8ydjX?=
- =?us-ascii?Q?qYyWGIjuy5DAN5YtsgZRs7Dxmv9asUHL+j0Px0GPD9CApCL5LwowCJBj1c6W?=
- =?us-ascii?Q?muyBRgEqS3mp6Wt32VFrkTYroC1ASk8bWZQdkEPv6HE1uvKUgVNfOsh/jgV5?=
- =?us-ascii?Q?nE59bQblF+tZpKgPFulUAo3mQT9J9D3apjtKeDjKyDKcqF7L7NYcoTGudvcK?=
- =?us-ascii?Q?BasR/67L5M8FUCrKRqeCHDfNA0Cnfs9abNxl4S/KV4Wc47+Ebmf02Fa2z+0a?=
- =?us-ascii?Q?cJP+7S0vOvgs3fItiu0tSkVL2vQVYWBBR3qNU8+83yoSfSDwS5XFvhx7QlV8?=
- =?us-ascii?Q?1Pv9cQEDNVtKeT6XeNlkiOwIUoiySqNd4Q0Q2BXzUUZiiTERixhe6eqJ3I2O?=
- =?us-ascii?Q?P7CgwQ8nZ8m0De5ybEO8xtO2bxssQKg26mYiVvGdjEfsCz2KigUNxQHPcqXx?=
- =?us-ascii?Q?km0W/+mDPxfpZ1zBoANLxhdMeUDStRY16TSroRY4V5/cVFPdrQbg+NGqmF/b?=
- =?us-ascii?Q?+2B0kNK7K6eqc3sT7YWpV4FoqLQZIR4bPXDAnuJ1uvU+VUXk2p9kuwBOTRNT?=
- =?us-ascii?Q?O5lX9iCKLCtGgRfhk0hFjhMPHKzZ9OwItVJZmtT2Z+kbP3aZ5kaRKIGRANZ1?=
- =?us-ascii?Q?8XKn0VUXfflMZZm99qldJ8zE+5rpuGBJJA9Mhc8LXLpcvmaGqG+TXaQ+kXL7?=
- =?us-ascii?Q?8YirO0Z04lnxklN0Rp4WltVbnLukqcTrADbdGUlBgluiapkt9PVTVQsUcnf4?=
- =?us-ascii?Q?xg2QJw=3D=3D?=
+	=?us-ascii?Q?mH+a0/lBjXJNy27XzKDvrVgRFGqGjKHxi8SqZjred8IqfSjbeFyDeQj2gE1Q?=
+ =?us-ascii?Q?9HRfrPDwKVn0KoKIkuEbLR55Ttv4Qs/lOW9R4bg8BfT9LEJuJkTefOxLHm+b?=
+ =?us-ascii?Q?uakqiVrwbRHACE6YykqudTZFFfrB8jKJQNxidt85geuLQm+MgL+efpywHoj7?=
+ =?us-ascii?Q?74iekadzO3pF515thQBKR4yzlT+iiT66SpelRfJpvZJvPiDy/GZmj8v7HY3F?=
+ =?us-ascii?Q?l1SbluP/SVJNQeYTAz499rPwk5Zu6uOF7Re3wF44AmwsCxi9ctLe+Vt1i+BD?=
+ =?us-ascii?Q?PwuYryxfx7tMpsrY9o0P2BeSSscRVTPdxijkOmEsg90yRei0HeRv3F+5LCkA?=
+ =?us-ascii?Q?3h2erlM4a0L1nlix8Mbl2cUXGVWoAnVCNmNPMM7AMQuGnYozDKnnvcuRJcSR?=
+ =?us-ascii?Q?5Cpvqll22O1ffMLsoOFP1UU3R46U4vpLe8pJK1GeqoeFO7z3gxysJZKT1DHu?=
+ =?us-ascii?Q?DKvfp6C3pyMjxiZiS6UkrpmrMoY0fVcKCBhH6SMkj3VSLumH69qPyRSa3JkW?=
+ =?us-ascii?Q?/+9QE3D0pKRi5dYykIPRH5YS418T+7++zmxPyqaAwTOShPp3CI640Lsqz+H3?=
+ =?us-ascii?Q?icen1ORmlJxrUkn26yzacGkF7+C/D1GJOQxjmuJHUEvnemBenmlcODfWFCCV?=
+ =?us-ascii?Q?5Nd4omgj9VI1Y+hSnJWx6LflMRP0U5LjLNpMtivwEN8HtkivvsQ6UyRojKz+?=
+ =?us-ascii?Q?4oUbGorVDdoTUVEbbUMKbTR27ksOPHcTmJLBTP5VqOtJ+xcz+UBEPRqfDDPS?=
+ =?us-ascii?Q?bn8f84jz6UWOIZdnZtd9S3IpSyhfo5LIoBoLpGzFQ3mYm7K7FV6+OLs82n/a?=
+ =?us-ascii?Q?0zAg3rEWQ2B4weoERhalSQSXJKo1k04ul1tyftP9FrsMzOSjEM+SkVQujj2J?=
+ =?us-ascii?Q?Pc6eSA7ehPMwAF0xvcsrBucpQ9fu0zJL8tQOCthdHgWk7xNTwsvKcX9/kcKb?=
+ =?us-ascii?Q?vpuD6daQ85RcJ/wZjGfp1N4EsGYlwgTgEQn/lgw0TI8Ulf23IRA/+6PrxMDi?=
+ =?us-ascii?Q?ZnN+ZTGgh8G62b+WLwoC07e+Lg1vN2DwIHe4WZHrFA1gRC7MeBE+4qgQY/Y9?=
+ =?us-ascii?Q?vmqJX4cszQreNXyS9pt+2TWhPRZzeQfPKZVdHNHl8s++6Tu9IZMsIo/RQEop?=
+ =?us-ascii?Q?3NSlymMCnsImNB10mmFcqNxPIVPKPMc3/8E/imSjgIsRgsApU+gRrFxdGBuF?=
+ =?us-ascii?Q?fG0qu5ee836kJy7Q9z34e0IpZSc5fB+cGJWv+kYhyF7e+V2+8BXkYZp9Zu6U?=
+ =?us-ascii?Q?0Le4HVrj0ilCUCIeJn321nX7oHq73X/ZpBqoMy3kqidNNvMo8FYlIupzqmpo?=
+ =?us-ascii?Q?MaCQ90jcgfMlQiXm4KcbtG8Bc/3dD9r8imZZ2gao0xA3T9kv+LVLLafrQIi2?=
+ =?us-ascii?Q?T0K4An7EBoFTVF6wulxdTrYjBnNmEzfZaFTu+DUbE7HuUY3oS+bHCBP7Ioa6?=
+ =?us-ascii?Q?nslCNWpMl6FOuOgTChPqzWgvfhdrp2qK9jxWEymdBkLGP3VIJkRbYqtRbYTr?=
+ =?us-ascii?Q?2msJkqQyhiaopulJ9X+iblc5i9uT0VBFz5byMgiNNkXLJ5Ap2SHOrCX6G6Be?=
+ =?us-ascii?Q?iWnPEQjT8VDQZFajgvb9u7xB+endnKcZtP3Mg0wrDqsnfwJs5ZjZiNDVoHRQ?=
+ =?us-ascii?Q?ZOp6dMWxs3M/qiKm9+ONz2WUwc4p5BbmjLCKrrf55wcZc/F7Gha1jmSnW9La?=
+ =?us-ascii?Q?9jJ+1A=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2026 05:31:17.8847
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2026 05:31:39.4584
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e8748f01-596e-4265-942c-08de5a40a238
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90cde54d-d5ed-4d37-59e6-08de5a40af14
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F62.namprd04.prod.outlook.com
+	BL6PEPF00020E63.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6232
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9107
 
-A couple of fixes for bugs discovered recently as we got more of
-these devices and tested more configurations with multiple devices
-on same and different bridges.
+The current number of streams in AMD TSM is 1 which is too little,
+the core uses 255. Also, even if the module parameter is increased,
+calling pci_ide_set_nr_streams() second time triggers WARN_ON.
 
+Simplify the code by sticking to the PCI core defaults.
 
-This is based on sha1
-0499add8efd7 Paolo Bonzini Merge tag 'kvm-x86-fixes-6.19-rc1' of htts://github.com/kvm-x86/linux into HEAD
+Fixes: 4be423572da1 ("crypto/ccp: Implement SEV-TIO PCIe IDE (phase1)")
+Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+---
+ drivers/crypto/ccp/sev-dev-tsm.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-Please comment. Thanks.
-
-
-
-Alexey Kardashevskiy (2):
-  crypto/ccp: Use PCI bridge defaults for IDE
-  crypto/ccp: Allow multiple streams on the same root bridge
-
- drivers/crypto/ccp/sev-dev-tsm.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
-
+diff --git a/drivers/crypto/ccp/sev-dev-tsm.c b/drivers/crypto/ccp/sev-dev-tsm.c
+index ea29cd5d0ff9..7407b77c2ef2 100644
+--- a/drivers/crypto/ccp/sev-dev-tsm.c
++++ b/drivers/crypto/ccp/sev-dev-tsm.c
+@@ -19,12 +19,6 @@
+ 
+ MODULE_IMPORT_NS("PCI_IDE");
+ 
+-#define TIO_DEFAULT_NR_IDE_STREAMS	1
+-
+-static uint nr_ide_streams = TIO_DEFAULT_NR_IDE_STREAMS;
+-module_param_named(ide_nr, nr_ide_streams, uint, 0644);
+-MODULE_PARM_DESC(ide_nr, "Set the maximum number of IDE streams per PHB");
+-
+ #define dev_to_sp(dev)		((struct sp_device *)dev_get_drvdata(dev))
+ #define dev_to_psp(dev)		((struct psp_device *)(dev_to_sp(dev)->psp_data))
+ #define dev_to_sev(dev)		((struct sev_device *)(dev_to_psp(dev)->sev_data))
+@@ -193,7 +187,6 @@ static void streams_teardown(struct pci_ide **ide)
+ static int stream_alloc(struct pci_dev *pdev, struct pci_ide **ide,
+ 			unsigned int tc)
+ {
+-	struct pci_dev *rp = pcie_find_root_port(pdev);
+ 	struct pci_ide *ide1;
+ 
+ 	if (ide[tc]) {
+@@ -201,11 +194,6 @@ static int stream_alloc(struct pci_dev *pdev, struct pci_ide **ide,
+ 		return -EBUSY;
+ 	}
+ 
+-	/* FIXME: find a better way */
+-	if (nr_ide_streams != TIO_DEFAULT_NR_IDE_STREAMS)
+-		pci_notice(pdev, "Enable non-default %d streams", nr_ide_streams);
+-	pci_ide_set_nr_streams(to_pci_host_bridge(rp->bus->bridge), nr_ide_streams);
+-
+ 	ide1 = pci_ide_stream_alloc(pdev);
+ 	if (!ide1)
+ 		return -EFAULT;
 -- 
 2.52.0
 
