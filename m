@@ -1,48 +1,47 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D247832571D;
-	Fri, 23 Jan 2026 06:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2F2287265;
+	Fri, 23 Jan 2026 06:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769148034; cv=none; b=CRtunAgSNf7x4L4B3qDAslDWllKoMKbJPU+YEdz3PVZKGlV/BSIyE406rvPnW7rX0ugvvTP8Tpu4q1jujM00qKFF0tt3k4OQRFt3gSvSSt8ZY12MJkuOxmuNkDpoOi+xTZRtpZrG+aebAAglUqyM7IT1CI8zIv8/DPQsgSuNKRg=
+	t=1769148077; cv=none; b=UvUWj8g/KMcGOcQbNjr4ceXSujyPnyb0iLhDz/8QgY6Rs9+SAnqIER1XV0EuzYg1O6S947OnKgYRKVgw9u/TR+1Fsb0W82KXO4JK0R3IuhuEMAcVZ4GzLyAVnpNmZQfqJq8vXS/dv9AVTtM5Cv4xfGT7+igI7FIh4PZhlVteUEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769148034; c=relaxed/simple;
-	bh=2gwzXHED1cxqfsZd58g7WQbRsBkRPmwgy/EXY314xqI=;
+	s=arc-20240116; t=1769148077; c=relaxed/simple;
+	bh=1ZmTguyGuU2K1yWkswMX6ok7pcPQ9eXsOFv86KrFs5I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CuqRtIpPS78Juz4JDDaBr+OxowWbK2zVcQRgEBElGPc1w+igM7xPrIRNdCjvdAn6eTULd/2ofMoCP1ZuhiE+oKsd5lZUClnfs07k71DhO1W1yMsB8fvtfoGZc5fIC0bqYdHlxXsErVkYK4GmFs9GfFpNZiazpl6InPGN3BrtOrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=SM/p64lV; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=t1XEcc4qZtWeTGQSmt2YEv2rC9TzrVEfkeING3q7JKoY0Ap8OwFwbn79PVRqpNtW/pY+o85jQ6NFhaM9Z1Fi0bsKvP3NLeZojTLknQ0vnuxDiGIY+8NueG5WfAvEdXE1Wobdy1hjqcvxkUvzjlmhDecDpz35gjWJ4tSKd2VcdtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rXlJ4ezk; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="SM/p64lV"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rXlJ4ezk"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=RtzXpZGCFHahrFkdIvoMtF+cksQkU5NJKlrOBq+TlvI=; 
-	b=SM/p64lV1r/oqDXv6IiKK+J+XhrASzraHpgIi5pDQ8V+XHbYMdZ9ZU7rZJU6G6mMsv8ox+ZvTNE
-	9uf5yTwA5/dzRsaEA1ROptPyNCebVGYQE5uSfNJlPIj58cun+mh5McCf5ZX9HhJ3jGem2ZvaHPnpX
-	2TyYqrj3UKeOCnsy61B2kr+CMP8piBPzJNNLqvD6qRHgFdXYwxW8WmMitaqsIhmbrN+NsE2fdk8tm
-	xg4GJ0LM2I8+3Qpq2igVkleWawnkfrKw7mKawHOfaXrSJzPUQcpu2UF/6qUqeT1sSI3yeUCY8KDlG
-	VmWYHe0YxMSuaPlKK34OdCzL+mAl4Hsi2k3A==;
+	from:content-type:reply-to; bh=Ar2CgNwWujKJFPzeFmqgo8fMu/DGQr4he+lWJ1P78Uo=; 
+	b=rXlJ4ezkTuOwTKrvBSJiq2n25He0CoyXM56BUHeMdetJ0xyzeqYC/ONzFj6ylGbdz9Mdp3cv1Oq
+	HOQ+rmevzAjtdAKsf/m9H0oCnSjQ7erJ/L5nCi8UkoAOa7CcQLDiSFA6zv5kXL1DjiWh1YKdOBGAM
+	BbY03SHiz9ad1txjBkc/qqmA/MkN5edNNTTdhf+poJqaZh/h3gfCAZknXKmfZCqOL8Gf+TIoo3JFP
+	g1zXBNaT9ZWc/ybWshn2f/XqCTVGw6kbQ03ZfbQ9bI9UIOIQlKcLwlSEyTJlBnXHEqTOMeo6NO8B9
+	LKF0u1E9eebOv/UP4n14dQQ11jqO2tYog/ig==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vjADG-001VPV-21;
-	Fri, 23 Jan 2026 14:00:07 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 Jan 2026 14:00:06 +0800
-Date: Fri, 23 Jan 2026 14:00:06 +0800
+	id 1vjAEC-001VRE-2M;
+	Fri, 23 Jan 2026 14:01:05 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 Jan 2026 14:01:04 +0800
+Date: Fri, 23 Jan 2026 14:01:04 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: nx - Simplify with scoped for each OF child loop
-Message-ID: <aXMOZvjqHcAfWaEz@gondor.apana.org.au>
-References: <20260102125011.65046-2-krzysztof.kozlowski@oss.qualcomm.com>
+To: Tycho Andersen <tycho@kernel.org>
+Cc: Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Alexey Kardashevskiy <aik@amd.com>
+Subject: Re: [PATCH 1/2] crypto: ccp - Fix a case where SNP_SHUTDOWN is missed
+Message-ID: <aXMOoGQElcAVUX-b@gondor.apana.org.au>
+References: <20260105172218.39993-1-tycho@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,18 +50,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260102125011.65046-2-krzysztof.kozlowski@oss.qualcomm.com>
+In-Reply-To: <20260105172218.39993-1-tycho@kernel.org>
 
-On Fri, Jan 02, 2026 at 01:50:12PM +0100, Krzysztof Kozlowski wrote:
-> Use scoped for-each loop when iterating over device nodes to make code a
-> bit simpler.
+On Mon, Jan 05, 2026 at 10:22:17AM -0700, Tycho Andersen wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+> If page reclaim fails in sev_ioctl_do_snp_platform_status() and SNP was
+> moved from UNINIT to INIT for the function, SNP is not moved back to
+> UNINIT state. Additionally, SNP is not required to be initialized in order
+> to execute the SNP_PLATFORM_STATUS command, so don't attempt to move to
+> INIT state and let SNP_PLATFORM_STATUS report the status as is.
+> 
+> Fixes: ceac7fb89e8d ("crypto: ccp - Ensure implicit SEV/SNP init and shutdown in ioctls")
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Reviewed-by: Tycho Andersen (AMD) <tycho@kernel.org>
+> Reviewed-by: Alexey Kardashevskiy <aik@amd.com>
+> Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 > ---
->  drivers/crypto/nx/nx-common-powernv.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
+>  drivers/crypto/ccp/sev-dev.c | 46 ++++++++++++++++++------------------
+>  1 file changed, 23 insertions(+), 23 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
