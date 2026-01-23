@@ -1,127 +1,151 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B5E136672;
-	Fri, 23 Jan 2026 08:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56482D94B2;
+	Fri, 23 Jan 2026 08:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769157856; cv=none; b=NKxNtjnUci28G0gRAclt3B9w+18jTYyIKhceYQYMEO6bszqyLscwb+m3BEocmSvgq5dj0xtlrw9U+5+vxcWGTtWMrif5cemEmpxu8pPe/rzHIXRfA8gehVfX2+bPBK4FgN5ItYBijJR4zaLo5rJJzgp3q/j0Ihsf8TFcj51Zfc8=
+	t=1769158637; cv=none; b=CmI5M817DCXD8/yJ9JJuzBeLBwz3GUzLB6U1g3ybpPVYY1HUEg0bg2BETS5HJ2TbEvhIAss+TtCvIRUDUoEDqljxYtuoFwa4b71NN6jHBV7ZkFjPXDeKDgOJ0ybTvd0l7fpa+9eiL/NldLOV0YiHu38HpaE6RrsLKEY9UaRxM+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769157856; c=relaxed/simple;
-	bh=jKM7y9OA8Ts5lLeDHbj2fY3ejsQhVag7YZy+7flDjW8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mhVQhLFUWV81zKEIy5Z99wTIAVUIJ9tSLpMmjid9ULEGgMu5NCzOFzWa/QQORedEOJ4ADacGftX4HDToHO1ydWGoc9KsOmH11gxwTRjZOYW5FCH7nDqXrJTY8+nQIAa5UOKpT01WkZLdFcHTGZvbDrAkGw+So52d/LEISMWFSZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SaLiAaAs; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1769158637; c=relaxed/simple;
+	bh=bm/okLU6x23qJ0MER9hh6IPdhGCBpqA5JHEzijTUP/E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cXcSFpD8Y+BiW44FrXlVc2OkHI9Iya/IvdvKC1P1qFZj2t96e3rSPRwJL0ihlAWujMlnaI5TnGJBr0mtNAq82BQjq7yS2TiuCrwy0sW/8BPc8i/S1Ix05/xSnpVC0xqvYG+kJNCQxknk6FRwNz5rST6mlsd0VQNfR0r/G+e6icA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IkhHWMCT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SaLiAaAs"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=GqAez6IU6i4XAwM/6EtVwplPYXTstdRVXB7SnmbYRlw=; b=SaLiAaAsfel5pYPPeoItNDDHFo
-	rICGOG7M/lbjPr/KDTy2AOZBL+6V0VWN6U+AJaN97+WX/UPqvGLkv3woVQqK0avtARPBjj0eIFGSr
-	DXdpKwy7rKNi+HogbY2+GYJPpiLWPJ3nWPiMFe9+k8qWujcTZyYGca702uo9Kdax7Qj4VKpKCx0yo
-	tOvfKEowM6JDpqciRh5M5Ej9KvnMieAgRiwNrRB5mViCd4R3vO0t38bY49jNVNmp+XfW6LMlaQ7Xc
-	moZ5WrkYavZfdw9OPT9MkN2JO+wVWC+H+wM8w9Ff8+JKqpVjfbteFpWJjdj+am/JV2NY/yl5E0K3R
-	Fy1u1lig==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vjCly-00000001xAQ-0DnN;
-	Fri, 23 Jan 2026 08:44:06 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id A0187303018; Fri, 23 Jan 2026 09:44:04 +0100 (CET)
-Date: Fri, 23 Jan 2026 09:44:04 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Marco Elver <elver@google.com>, Ingo Molnar <mingo@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Bart Van Assche <bvanassche@acm.org>, kasan-dev@googlegroups.com,
-	llvm@lists.linux.dev, linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH tip/locking/core 0/6] compiler-context-analysis: Scoped
- init guards
-Message-ID: <20260123084404.GF171111@noisy.programming.kicks-ass.net>
-References: <20260119094029.1344361-1-elver@google.com>
- <20260120072401.GA5905@lst.de>
- <20260120105211.GW830755@noisy.programming.kicks-ass.net>
- <20260122063042.GA24452@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IkhHWMCT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB26BC4AF0B;
+	Fri, 23 Jan 2026 08:57:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769158637;
+	bh=bm/okLU6x23qJ0MER9hh6IPdhGCBpqA5JHEzijTUP/E=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IkhHWMCT2YMmpQtUpe+P4hICP1XzBYsuBwqeJKxhqSaAm9jzk89fVmSrwoZ/MU+vv
+	 BGY0qHa5QUfzR69VM9aHhS4Ar0W1MvH3UICNjzqJv9pWys4DfdZwbJiyG2r06zUUbo
+	 WUfyYTtEqkwynhHwDPYHypAuS0pMPE9rwqoUMTORGeSr90OwVjbRbOTEmWQ6iZbZ+Z
+	 nHKLbbNhJ7jZN4rSqdfBvjxjFbGwLQs7+Sm1VqlJ+tyF7dh7KTp7c8cAxik7lGgYbx
+	 njqmlTJNMkxvf/UUTfwt82FlpNM4oSZ8e9vgIA54xTntYjC2MQ4x2T+KonOBDgsH5Z
+	 lCOOh7Gv0oNYg==
+Message-ID: <14a71b33-4c10-41b0-a6cb-585a38e05f56@kernel.org>
+Date: Fri, 23 Jan 2026 09:57:12 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260122063042.GA24452@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/11] dt-bindings: crypto: qcom,ice: Require power-domain
+ and iface clk
+To: Harshal Dev <harshal.dev@oss.qualcomm.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>,
+ Abel Vesa <abel.vesa@oss.qualcomm.com>, cros-qcom-dts-watchers@chromium.org
+Cc: Brian Masney <bmasney@redhat.com>,
+ Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
+ Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
+ linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260123-qcom_ice_power_and_clk_vote-v1-0-e9059776f85c@qti.qualcomm.com>
+ <20260123-qcom_ice_power_and_clk_vote-v1-1-e9059776f85c@qti.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20260123-qcom_ice_power_and_clk_vote-v1-1-e9059776f85c@qti.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 22, 2026 at 07:30:42AM +0100, Christoph Hellwig wrote:
-
-> That's better.  What would be even better for everyone would be:
+On 23/01/2026 08:11, Harshal Dev wrote:
+> Update the inline-crypto engine DT binding to reflect that power-domain and
+> clock-names are now mandatory. Also update the maximum number of clocks
+> that can be specified to two. These new fields are mandatory because ICE
+> needs to vote on the power domain before it attempts to vote on the core
+> and iface clocks to avoid clock 'stuck' issues.
 > 
-> 	mutex_prepare(&obj->mutex); /* acquire, but with a nice name */
-> 	obj->data = FOO;
-> 	mutex_init_prepared(&obj->mutex); /* release, barrier, actual init */
+> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
+> ---
+>  .../bindings/crypto/qcom,inline-crypto-engine.yaml         | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
 > 
-> 	mutex_lock(&obj->mutex); /* IFF needed only */
-> 
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> index c3408dcf5d20..1c2416117d4c 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> @@ -28,12 +28,20 @@ properties:
+>      maxItems: 1
+>  
+>    clocks:
+> +    maxItems: 2
 
-This is cannot work. There is no such thing is a release-barrier.
-Furthermore, store-release, load-acquire needs an address dependency to
-work.
+This is ABI break and your commit msg suggests things were not perfect,
+but it is not explicit - was this working or not? How is it that ICE was
+never tested?
 
-When publishing an object, which is what we're talking about, we have
-two common patterns:
+> +
+> +  clock-names:
+> +    maxItems: 2
 
- 1) a locked data-structure
-
- 2) RCU
-
-
-The way 1) works is:
-
-	Publish				Use
-
-	lock(&structure_lock);
-	insert(&structure, obj);
-	unlock(&structure_lock);
-
-					lock(&structure_lock)
-					obj = find(&structure, key);
-					...
-					unlock(&structure_lock);
-
-And here the Publish-unlock is a release which pairs with the Use-lock's
-acquire and guarantees that Use sees both 'structure' in a coherent
-state and obj as it was at the time of insertion. IOW we have
-release-acquire through the &structure_lock pointer.
-
-The way 2) works is:
-
-	Publish				Use
-
-	lock(&structure_lock);
-	insert(&structure, obj)
-	   rcu_assign_pointer(ptr, obj);
-	unlock(&structure_lock);
-	  	
-					rcu_read_lock();
-					obj = find_rcu(&structure, key);
-					...
-					rcu_read_unlock();
+Why "yellowpony" is a correct name? Please look at existing code to see
+how this is done.
 
 
-And here rcu_assign_pointer() is a store-release that pairs with an
-rcu_dereference() inside find_rcu() on the same pointer.
+> +
+> +  power-domains:
+>      maxItems: 1
+>  
+>  required:
+>    - compatible
+>    - reg
+>    - clocks
+> +  - clock-names
+> +  - power-domains
 
-There is no alternative way to order things, there must be a
-release-acquire through a common address.
+Another ABI break...
 
-In both cases it is imperative the obj is fully (or full enough)
-initialized before publication, because the consumer is only guaranteed
-to see the state of the object it was in at publish time.
+Best regards,
+Krzysztof
