@@ -1,46 +1,48 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9797834BA3B;
-	Fri, 23 Jan 2026 05:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D247832571D;
+	Fri, 23 Jan 2026 06:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769148000; cv=none; b=OuVkoq5YqojO1o/2rDah0mvuKJDT8v0XKk9t1SguG5O+YJg173cOvQTVCboe/CX4kuhmB5+4Ug1a1RSiEnkMV2LRBwaN41MJxD2G0mjbj6Oik25w0da5BcCqXGCqPjCkAiQL1vRjN1pYzafU7SBN+0CLSeMiQtidOAiqoH1Ho5U=
+	t=1769148034; cv=none; b=CRtunAgSNf7x4L4B3qDAslDWllKoMKbJPU+YEdz3PVZKGlV/BSIyE406rvPnW7rX0ugvvTP8Tpu4q1jujM00qKFF0tt3k4OQRFt3gSvSSt8ZY12MJkuOxmuNkDpoOi+xTZRtpZrG+aebAAglUqyM7IT1CI8zIv8/DPQsgSuNKRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769148000; c=relaxed/simple;
-	bh=PQsya/tQi2WoCuD6sv6tkhG6f2z9Ju+fPgjCNT6yFKk=;
+	s=arc-20240116; t=1769148034; c=relaxed/simple;
+	bh=2gwzXHED1cxqfsZd58g7WQbRsBkRPmwgy/EXY314xqI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GoVNNeI3ltwt0p/GSdccr4GQMsQtFAoGHFFkA3sR8FxKA93yoH240RHNgVhIPG0CChRfireIGH+qBjPQvGecB9uz5p3qAAETEmqLT7ic+cMNZ50AinYQLN9wv8jdEBVhFBw8WpRERKoErdHrajAefby7NUQfEQg6oN0adBCwKQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=jvZ/Ou6c; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=CuqRtIpPS78Juz4JDDaBr+OxowWbK2zVcQRgEBElGPc1w+igM7xPrIRNdCjvdAn6eTULd/2ofMoCP1ZuhiE+oKsd5lZUClnfs07k71DhO1W1yMsB8fvtfoGZc5fIC0bqYdHlxXsErVkYK4GmFs9GfFpNZiazpl6InPGN3BrtOrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=SM/p64lV; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="jvZ/Ou6c"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="SM/p64lV"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=oLUWXUHo5Q/GmBrApC+e/MrzWDT+tmgwBy88fymy8h4=; 
-	b=jvZ/Ou6cZ8VQ2jLiwnAcGfCVe8LX2Vv50ho5wWfvf49+xLbAwhB1I8DtCrWH38mmKwPjOPp//ey
-	isfPgJlA1HF0+l4K4931Y9XRnQolxGBVtUVbne3/yTU+xVKWlFXo9Vx4OZHsdkveFjWA0RbRK6/U9
-	RG80592jE7FL1lPAIC698eJf9ZvXvMkCEHHYbuSUf1qodiNCl/k3TUdiNi80rR9ykpujDRhNgo8/0
-	nXF8ZIyN4sblCrhOApGDZbcz7MRzshdg5vf7/X1AWHMZypIB2ACWybr5ZJBJSbDsVXrhhqp7W55ut
-	9o4ItGEmizPC04MVdoyvGtlCwtgbT4BlzTXA==;
+	from:content-type:reply-to; bh=RtzXpZGCFHahrFkdIvoMtF+cksQkU5NJKlrOBq+TlvI=; 
+	b=SM/p64lV1r/oqDXv6IiKK+J+XhrASzraHpgIi5pDQ8V+XHbYMdZ9ZU7rZJU6G6mMsv8ox+ZvTNE
+	9uf5yTwA5/dzRsaEA1ROptPyNCebVGYQE5uSfNJlPIj58cun+mh5McCf5ZX9HhJ3jGem2ZvaHPnpX
+	2TyYqrj3UKeOCnsy61B2kr+CMP8piBPzJNNLqvD6qRHgFdXYwxW8WmMitaqsIhmbrN+NsE2fdk8tm
+	xg4GJ0LM2I8+3Qpq2igVkleWawnkfrKw7mKawHOfaXrSJzPUQcpu2UF/6qUqeT1sSI3yeUCY8KDlG
+	VmWYHe0YxMSuaPlKK34OdCzL+mAl4Hsi2k3A==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vjACn-001VPJ-00;
-	Fri, 23 Jan 2026 13:59:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 Jan 2026 13:59:36 +0800
-Date: Fri, 23 Jan 2026 13:59:36 +0800
+	id 1vjADG-001VPV-21;
+	Fri, 23 Jan 2026 14:00:07 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 Jan 2026 14:00:06 +0800
+Date: Fri, 23 Jan 2026 14:00:06 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, linux-crypto@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: testmgr - allow authenc(sha224,rfc3686) variant
- in fips mode
-Message-ID: <aXMOSCt5Yzfk8vTI@gondor.apana.org.au>
-References: <20260101152522.1147262-1-olek2@wp.pl>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: nx - Simplify with scoped for each OF child loop
+Message-ID: <aXMOZvjqHcAfWaEz@gondor.apana.org.au>
+References: <20260102125011.65046-2-krzysztof.kozlowski@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,19 +51,16 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260101152522.1147262-1-olek2@wp.pl>
+In-Reply-To: <20260102125011.65046-2-krzysztof.kozlowski@oss.qualcomm.com>
 
-On Thu, Jan 01, 2026 at 04:25:18PM +0100, Aleksander Jan Bajkowski wrote:
-> The remaining combinations of AES-CTR-RFC3686 and SHA* have already been
-> marked as allowed in 8888690ef5f7. This commit does the same for SHA224.
+On Fri, Jan 02, 2026 at 01:50:12PM +0100, Krzysztof Kozlowski wrote:
+> Use scoped for-each loop when iterating over device nodes to make code a
+> bit simpler.
 > 
-> rfc3686(ctr(aes)) is already marked fips compliant,
-> so these should be fine.
-> 
-> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 > ---
->  crypto/testmgr.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  drivers/crypto/nx/nx-common-powernv.c | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
 
 Patch applied.  Thanks.
 -- 
