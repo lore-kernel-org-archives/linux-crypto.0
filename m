@@ -1,126 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190AD2E5427
-	for <linux-crypto@vger.kernel.org>; Fri, 23 Jan 2026 03:35:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCF9387375;
+	Fri, 23 Jan 2026 03:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769139305; cv=none; b=cPqMXnYPBtlr4i4csZNpJyJpQUJNCmR2EO474j19JSFnjDbnU1SY2fm8AxlejvHIW2bQjCqRP5WZyE/8uq4Km0TGircxMT6uu4tCWnmZgOrDaXQw1I6wPEx+AEmYdpooQCFlT6JjG23a7civMU2/TXJAyFBrIdkf+K0tjkQpeCM=
+	t=1769139833; cv=none; b=eCIZHxedotKxVogB2JEAQGutz47jJhdJYuTt3EVYoaAo0bATjeiMlpDSA52Vx7Je2ApvPWcsQbijUFzivhloQnj0WNpcx/hZezp3OpCm2WVVx0Qm/YADpotQqtcQ6G4nAapjj0lcvxhMMrv+ccaFeJ5mIFY5zAbUSV2rCu5ySjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769139305; c=relaxed/simple;
-	bh=3yyx7QWX05nNRX/rjYbNqk6AglVOYO0tzJkWAwS+c34=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NzVA8/W+SUS3tTYPOtK0o68Bx4/S+7s7ScFFgb1/qUCRCtm1gs1+BSV9sEvZdSQ5MFa3f79jPw9kDCfoEzYr1ulPO5Cr6Qsw8uQ6Wc+G8OD1V5OM58k0YaBSgj6FvvOmTkgZ1S/V8Ee4CZy9vXrBoPkuxbIu3AZYzUw4VZE8Jv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pX73hJTl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769139833; c=relaxed/simple;
+	bh=IkOOBmm5XglU54qOihvmwhTQY65obUABchP6v6D/E74=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=OwpRSKGC3u3zMLGwGE7GE59ALUeR9nWbTcgXwoSjH53SSkzRICr8qPHgx9iLZyGOLN9gE5nrtDyPQrlP3f1KQO7OO60Ik5JdVXHFlk9xCVwfq9ciwcoA2wZWKk8tUfubQsWybZnrT/ctj1Lo22YC19pyRdxfpAZcMAz36PUtlEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ebLdm/mv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pX73hJTl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F809C4CEF1;
-	Fri, 23 Jan 2026 03:35:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ebLdm/mv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCE41C4CEF1;
+	Fri, 23 Jan 2026 03:43:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769139304;
-	bh=3yyx7QWX05nNRX/rjYbNqk6AglVOYO0tzJkWAwS+c34=;
-	h=From:To:Cc:Subject:Date:From;
-	b=pX73hJTlIOgz0ZsdnlJYWGVdS1/B05tuFRgwMZVVkcHp1nqvNWirKbXSX4CZeiuIi
-	 qgXRr/ZiIIMlOaFDeRep7yIpwLzVrqxXJK9d5PI2FpPmyvSytsNmGB2pRtwKel4Vqq
-	 fVyZgcGhSqfzXkxar+rDuURRP1lSd8A6T9wjjVQL9Lp57FRFv9hQdkApSQ//HmNsL4
-	 xMlx5ClIRMAO9GF41xTLwhURlO7aW+xlMBBlDYYRvPtgyIJwdcfxrX8JxSDfOT/bet
-	 fmvf87Ob3ZbVkO6iBPcOUq7Y7FB1JJo9s1DfGSRvkIorFORzFvBKmuwVxlDBP+p+Ui
-	 Za4kH93iqK5YQ==
-From: "Mario Limonciello (AMD)" <superm1@kernel.org>
-To: mario.limonciello@amd.com,
-	thomas.lendacky@amd.com,
-	john.allen@amd.com,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	davem@davemloft.net
-Cc: Mark Pearson <mpearson-lenovo@squebb.ca>,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: ccp - Add sysfs attribute for boot integrity
-Date: Thu, 22 Jan 2026 21:34:53 -0600
-Message-ID: <20260123033457.645189-1-superm1@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	s=k20201202; t=1769139832;
+	bh=IkOOBmm5XglU54qOihvmwhTQY65obUABchP6v6D/E74=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=ebLdm/mvxuzVnLYDorK5v5gXyEY6w3AzJyonH1WSFAZDWd7bp/srkzhPDtlR8N/wi
+	 YnD9xt+3GblRAsbAy+mtyLhdGJr2v1jn/ytGSqnkV/8aWgHWfnpsor1RDNAnJA3ERA
+	 a2byrtUxDAmUf/TNgnMyVnE1ULO67CTeqdXLP/Osh2kLJhgo/wGg4l5kL96MlBuBw+
+	 iROFTVLxl2gm0zG6+bU43FpkLT5PTz3dGPW0nahwHznTiwzajGIPj6YpsnqfedqDJg
+	 DAYuwCoin4OsgCVS+S59vb22lArhKKTMXfmxBVEJyj9BCKzGCAJCfyGuGCNQeUO5j+
+	 KPBWz3g9SC3Hw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4EC643808200;
+	Fri, 23 Jan 2026 03:43:50 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.19
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <aXLbDbSraxaYgfym@gondor.apana.org.au>
+References: <aXLbDbSraxaYgfym@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <aXLbDbSraxaYgfym@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.19-p4
+X-PR-Tracked-Commit-Id: 2397e9264676be7794f8f7f1e9763d90bd3c7335
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: c072629f05d7bca1148ab17690d7922a31423984
+Message-Id: <176913982891.2385556.13061800691176644125.pr-tracker-bot@kernel.org>
+Date: Fri, 23 Jan 2026 03:43:48 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Mario Limonciello <mario.limonciello@amd.com>
+The pull request you sent on Fri, 23 Jan 2026 10:21:01 +0800:
 
-The boot integrity attribute represents that the CPU or APU is used for the
-hardware root of trust in the boot process.  This bit only represents the
-CPU/APU and some vendors have other hardware root of trust implementations
-specific to their designs.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.19-p4
 
-Link: https://github.com/fwupd/fwupd/pull/9825
-Reviewed-by: Mark Pearson <mpearson-lenovo@squebb.ca>
-Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
----
- Documentation/ABI/testing/sysfs-driver-ccp | 15 +++++++++++++++
- drivers/crypto/ccp/hsti.c                  |  3 +++
- drivers/crypto/ccp/psp-dev.h               |  2 +-
- 3 files changed, 19 insertions(+), 1 deletion(-)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/c072629f05d7bca1148ab17690d7922a31423984
 
-diff --git a/Documentation/ABI/testing/sysfs-driver-ccp b/Documentation/ABI/testing/sysfs-driver-ccp
-index ee6b787eee7a0..6ec74b9a292a7 100644
---- a/Documentation/ABI/testing/sysfs-driver-ccp
-+++ b/Documentation/ABI/testing/sysfs-driver-ccp
-@@ -8,6 +8,21 @@ Description:
- 		0: Not fused
- 		1: Fused
- 
-+What:		/sys/bus/pci/devices/<BDF>/boot_integrity
-+Date:		April 2026
-+KernelVersion:	6.20
-+Contact:	mario.limonciello@amd.com
-+Description:
-+		The /sys/bus/pci/devices/<BDF>/boot_integrity reports
-+		whether the AMD CPU or APU is used for a hardware root of trust
-+		during the boot process.
-+		Possible values:
-+		0: Not hardware root of trust.
-+		1: Hardware root of trust
-+
-+		NOTE: Vendors may provide design specific alternative hardware
-+		root of trust implementations.
-+
- What:		/sys/bus/pci/devices/<BDF>/debug_lock_on
- Date:		June 2022
- KernelVersion:	5.19
-diff --git a/drivers/crypto/ccp/hsti.c b/drivers/crypto/ccp/hsti.c
-index c29c6a9c0f3f9..4b44729a019ea 100644
---- a/drivers/crypto/ccp/hsti.c
-+++ b/drivers/crypto/ccp/hsti.c
-@@ -30,6 +30,8 @@ static ssize_t name##_show(struct device *d, struct device_attribute *attr,	\
- 
- security_attribute_show(fused_part)
- static DEVICE_ATTR_RO(fused_part);
-+security_attribute_show(boot_integrity)
-+static DEVICE_ATTR_RO(boot_integrity);
- security_attribute_show(debug_lock_on)
- static DEVICE_ATTR_RO(debug_lock_on);
- security_attribute_show(tsme_status)
-@@ -47,6 +49,7 @@ static DEVICE_ATTR_RO(rom_armor_enforced);
- 
- static struct attribute *psp_security_attrs[] = {
- 	&dev_attr_fused_part.attr,
-+	&dev_attr_boot_integrity.attr,
- 	&dev_attr_debug_lock_on.attr,
- 	&dev_attr_tsme_status.attr,
- 	&dev_attr_anti_rollback_status.attr,
-diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
-index 268c83f298cb0..4e370e76b6ca5 100644
---- a/drivers/crypto/ccp/psp-dev.h
-+++ b/drivers/crypto/ccp/psp-dev.h
-@@ -36,7 +36,7 @@ union psp_cap_register {
- 			     rsvd1			:3,
- 			     security_reporting		:1,
- 			     fused_part			:1,
--			     rsvd2			:1,
-+			     boot_integrity		:1,
- 			     debug_lock_on		:1,
- 			     rsvd3			:2,
- 			     tsme_status		:1,
+Thank you!
+
 -- 
-2.43.0
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
