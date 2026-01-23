@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E8731A571;
-	Fri, 23 Jan 2026 08:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6C529E0E8;
+	Fri, 23 Jan 2026 10:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769158690; cv=none; b=pTRXMW3uJGKBYexzEN797PnuyWiSvj1sXj7cYcMOma0cZNtPa6muQoaJIxO7uj2kK1l0PKIrm4wwiBo2Op1y1EnlVOTJliXHlouABHfeSawIddS5duj7+fQHxu61vfWE6D9kG7+iItEAjeuETPxBGTb/q4X+LN/zE4mN89EDEQ8=
+	t=1769165853; cv=none; b=GvjwJj1hwIbErrPT+zOO7n/ey0T5IpXM/Kyw3HlkGpgLrMnmnPr1TWKuPcqrwZ3IqEtICu0a7pmXVN3FumhCpsOMFG1BXfKrmYbvyizLEx9CSZAZ+PTvpwDczMxtX3X+KDljc6QhxGcN9+4tYD9lq2EXnqhTOhNop6blzjLFPbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769158690; c=relaxed/simple;
-	bh=6qXgOvb4wrttKVTP2gCPsIDLsMnjhA8bIrijxmeW+tc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LhY+tMjUcwS4YJviZdLL876jdw2mpU0ipA+AUvpf8p9KYsOrWPJ4mQw2XXfHwrD1zmAlqPJogxhJCfCbH0XslL4W0gupUnhPAAhjLftAYbpDoSk65AT58TXRftSAK50B3P10iEhpkvUnX7tLxFLWLErFgUNjYN4Ur39wpzuquxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0iuuPer; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769165853; c=relaxed/simple;
+	bh=w7Q/QgiiEXX91b3zn3gtMElUl32UetaZpph06poTPUg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=JZmnVWin71B0/JPV4LqXXTA0PBbX84+tK0L6qU5OMsSG9wSSRGCiMnJ7aWAxWhpBTvBF/5zGfrIOZ2e1DlwL0In7Dtz9CxKjjGu+8iVfzP79ZSBpg7iwwRLXTfrT9r3RA3VfVf1bVwACWQU/Av+wCOa+R38mmkHdPRcxeo0Y7k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RqAVMdLU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0iuuPer"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73C0DC4CEF1;
-	Fri, 23 Jan 2026 08:58:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RqAVMdLU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48033C4CEF1;
+	Fri, 23 Jan 2026 10:57:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769158689;
-	bh=6qXgOvb4wrttKVTP2gCPsIDLsMnjhA8bIrijxmeW+tc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=n0iuuPerck6CkM9TIuwRuLzyezlPYdCzC+9YnslafrAO1Y27Gnbh4TWi53bryQGTj
-	 Ye5Jxt/rUyfkYfY/gNeKTeCBRRcAqWKf1pS7gD1tRQqgply6b2uf9tmCcCPDQX9vcR
-	 snZkTFAAiIbucGFJEkH2g4ycohvJUh3q0QQLZsDSrwC16By7zn5nWHRnqotvVMxv3/
-	 AZUEP4cjqqm/wQpKcCPsQ2q/JsuE2SCzo4FypjfUs5bVVSxEj/rfykREHizYv1nVY3
-	 +Z+H8xCASFmurypeJyTInxplhI1kY2YcmdqnpS7O2BsV8/tN2HxQHZmJrQWINFRED0
-	 NAwCb945M3fJA==
-Message-ID: <7da1727a-c1cd-466d-88fc-e140b2e7fe5d@kernel.org>
-Date: Fri, 23 Jan 2026 09:58:04 +0100
+	s=k20201202; t=1769165852;
+	bh=w7Q/QgiiEXX91b3zn3gtMElUl32UetaZpph06poTPUg=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=RqAVMdLUHfibnLZq8gNMlFHK4Z9PXRxDulsuPo+2+9Z1m5Fku/6lAoUdB7MOFUfH5
+	 4+9rzN95VrNumTehbcS7sOivKkBfI5yW3z5O1wYaKFHEKN0TE3kuttjZSILGbF7Gk7
+	 pY7xZsYcD+DUGYPwnXNp37GzDDURuK/SAu6rkz9PGd8iFFXO5l5YiXeMtyraP1tsec
+	 V24LqMYu+/MNy278jaWNIZhI9H+/KCNZdQl5JlhxYLOkuXmuJwAhiXnjyZxcHoMypC
+	 eaLlbt9SKP1yZGFa56SEEuxCElFnopJsCaaiOhOUJZLEo7Tg/10LcJKlg1/SyIWyXf
+	 sDmJmbMxAIOeQ==
+Message-ID: <54bf72b6-6397-4655-9c30-680b1374400b@kernel.org>
+Date: Fri, 23 Jan 2026 11:57:27 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -37,6 +37,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 11/11] soc: qcom: ice: Add explicit power-domain and clock
  voting calls for ICE
+From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Harshal Dev <harshal.dev@oss.qualcomm.com>,
  Herbert Xu <herbert@gondor.apana.org.au>,
  "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
@@ -51,7 +52,7 @@ Cc: Brian Masney <bmasney@redhat.com>,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20260123-qcom_ice_power_and_clk_vote-v1-0-e9059776f85c@qti.qualcomm.com>
  <20260123-qcom_ice_power_and_clk_vote-v1-11-e9059776f85c@qti.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+ <7da1727a-c1cd-466d-88fc-e140b2e7fe5d@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -96,89 +97,40 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20260123-qcom_ice_power_and_clk_vote-v1-11-e9059776f85c@qti.qualcomm.com>
+In-Reply-To: <7da1727a-c1cd-466d-88fc-e140b2e7fe5d@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 23/01/2026 08:11, Harshal Dev wrote:
-> Since Qualcomm inline-crypto engine (ICE) is now a dedicated driver
-> de-coupled from the QCOM UFS driver, it should explicitly vote for it's
-> needed resources during probe, specifically the UFS_PHY_GDSC power-domain
-> and the 'core' and 'iface' clocks.
-> Also updated the suspend and resume callbacks to handle votes on these
-> resources.
+On 23/01/2026 09:58, Krzysztof Kozlowski wrote:
+>>  
+>>  	return 0;
+>> @@ -584,6 +597,10 @@ static struct qcom_ice *qcom_ice_create(struct device *dev,
+>>  	if (IS_ERR(engine->core_clk))
+>>  		return ERR_CAST(engine->core_clk);
+>>  
+>> +	engine->iface_clk = devm_clk_get_enabled(dev, "iface_clk");
+>> +	if (IS_ERR(engine->iface_clk))
+>> +		return ERR_CAST(engine->iface_clk);
 > 
-> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
-> ---
->  drivers/soc/qcom/ice.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
+> And here actual breakage of ALL in-tree and out-of-tree DTS.
 > 
-> diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
-> index b203bc685cad..4b50d05ca02a 100644
-> --- a/drivers/soc/qcom/ice.c
-> +++ b/drivers/soc/qcom/ice.c
-> @@ -16,6 +16,8 @@
->  #include <linux/of.h>
->  #include <linux/of_platform.h>
->  #include <linux/platform_device.h>
-> +#include <linux/pm.h>
-> +#include <linux/pm_runtime.h>
->  
->  #include <linux/firmware/qcom/qcom_scm.h>
->  
-> @@ -108,6 +110,7 @@ struct qcom_ice {
->  	void __iomem *base;
->  
->  	struct clk *core_clk;
-> +	struct clk *iface_clk;
->  	bool use_hwkm;
->  	bool hwkm_init_complete;
->  	u8 hwkm_version;
-> @@ -310,12 +313,20 @@ int qcom_ice_resume(struct qcom_ice *ice)
->  	struct device *dev = ice->dev;
->  	int err;
->  
-> +	pm_runtime_get_sync(dev);
->  	err = clk_prepare_enable(ice->core_clk);
->  	if (err) {
->  		dev_err(dev, "failed to enable core clock (%d)\n",
->  			err);
->  		return err;
->  	}
-> +
-> +	err = clk_prepare_enable(ice->iface_clk);
-> +	if (err) {
-> +		dev_err(dev, "failed to enable iface clock (%d)\n",
-> +			err);
-> +		return err;
-> +	}
->  	qcom_ice_hwkm_init(ice);
->  	return qcom_ice_wait_bist_status(ice);
->  }
-> @@ -323,7 +334,9 @@ EXPORT_SYMBOL_GPL(qcom_ice_resume);
->  
->  int qcom_ice_suspend(struct qcom_ice *ice)
->  {
-> +	clk_disable_unprepare(ice->iface_clk);
->  	clk_disable_unprepare(ice->core_clk);
-> +	pm_runtime_put_sync(ice->dev);
->  	ice->hwkm_init_complete = false;
->  
->  	return 0;
-> @@ -584,6 +597,10 @@ static struct qcom_ice *qcom_ice_create(struct device *dev,
->  	if (IS_ERR(engine->core_clk))
->  		return ERR_CAST(engine->core_clk);
->  
-> +	engine->iface_clk = devm_clk_get_enabled(dev, "iface_clk");
-> +	if (IS_ERR(engine->iface_clk))
-> +		return ERR_CAST(engine->iface_clk);
+> NAK.
+> 
+> Please read internal guideline.
 
-And here actual breakage of ALL in-tree and out-of-tree DTS.
+Internal docs are pretty scattered and messy so I failed to find this
+there, which is surprising because this was frequent feedback. Therefore
+please update Kernel Upstreaming internal page with following:
 
-NAK.
+With few exceptions, it is not allowed to break the ABI, by making
+bindings or driver changes, where the existing or out of tree DTS would
+fail to boot. Updating in-tree DTS does not matter here, because DTS
+goes via different branch, thus driver branch would be always broken.
+This is explicitly documented in DT rules and explained also in
+maintainer-soc profile.
 
-Please read internal guideline.
-
+You need to either provide strong justification for ABI break or make
+the changes backwards compatible.
 
 Best regards,
 Krzysztof
