@@ -1,97 +1,273 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DBB272E7C
-	for <linux-crypto@vger.kernel.org>; Fri, 23 Jan 2026 17:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9902427FB18
+	for <linux-crypto@vger.kernel.org>; Fri, 23 Jan 2026 21:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769190209; cv=none; b=nWUv2TSbxQ+30102WHFi2bqzfoBKQZtG56JvVtmVxHAyZAtwxXd3cAa93+HCH+b6GsZCc5siGGdBmr1X30rR/pQApMQrEi3iOsAK0f02GSnLSeLueb173+C1ll7XFGwRWX5KBEYXvlQwoSRBqq5jOIYNp/r9yixlMXhboitxHPA=
+	t=1769204063; cv=none; b=THYJG8WYwbKIlSme7WPAd95mIWYMMfO5QgzdRHFkofJdxa3MNrR6p2RNxi/rVLi4iyr2zfXQe0yS8wTr9C4/KdfQs9cS9ykhvju5o3a5Sy02VQAqC+KgAPX5YqR5XYY98xJYC51Ya995rHP7XQ8fABdFmN7AQYP0cQPuDi0J8rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769190209; c=relaxed/simple;
-	bh=kT+Pn3gyhaoNqIWv1mtrMDHTRArFu/zsHuhePGBpLPs=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=MhlAxpNTdcegKfxCc4G1NCfDr5qZcho7vPvDy9nB6rmWDVlmpD3K+FUr2o8AgAaQhjyrqXTIpW/dOT5IHi64E9KeoFdfSeCsuK0K7DMY1vmPpOxPpofaxTQYpEqMHNceVLhrJePQ0KjyJXmHclC4JFSWz6JM6044gyv/mkch1BI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TGr7JoEU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1769204063; c=relaxed/simple;
+	bh=vw2/q88ZQdbNmtifK6znXic6JJELdzqo7BH4BvuRUvE=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Jrw4ILpQ+NKfuH+cknzP1Ji3VGPvcQXlilov8pSEUyw7yQT18gjbeDSNYASCV3UJYNKtEHl01/I8sP8e5RQ4LDGz8p4Mqomgau1vHaObuch3Zusk+iOEaOGNOlLAt9pngCNH/LdjpQGcGu9EszMk5Mq/hddKLjztIZ/APJLwVno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3Zaz0ep; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TGr7JoEU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769190207;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=HXWgAtc6UurHJ7v7o10vNJH+C+IF5KjA0KAPDFaMV1I=;
-	b=TGr7JoEUDn3a8IvIw/RA9lMMwp6cLXJQJSKncxUaUqZ/RVDOdJWhHMaajwPJ0RvfJF1wLr
-	bjLkXp8S6hTPO61MlF2otu3V8QwD4tWrkJOgFQeAHpc7TtrIbtqdseYoq2QtSjfKSkQHVm
-	YRQVGqXML8O93tOpb3feT0hW9Alop8c=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-66-wrds9M3_M2qiXpued7TKRg-1; Fri,
- 23 Jan 2026 12:43:23 -0500
-X-MC-Unique: wrds9M3_M2qiXpued7TKRg-1
-X-Mimecast-MFC-AGG-ID: wrds9M3_M2qiXpued7TKRg_1769190202
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9D1E41800378;
-	Fri, 23 Jan 2026 17:43:21 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.2])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 95809180099B;
-	Fri, 23 Jan 2026 17:43:18 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Mimi Zohar <zohar@linux.ibm.com>
-cc: dhowells@redhat.com, Simo Sorce <simo@redhat.com>,
-    Roberto Sassu <roberto.sassu@huawei.com>,
-    Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-    Eric Snowberg <eric.snowberg@oracle.com>,
-    Eric Biggers <ebiggers@kernel.org>, linux-integrity@vger.kernel.org,
-    linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-    linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: IMA and PQC
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3Zaz0ep"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3C95C4AF09;
+	Fri, 23 Jan 2026 21:34:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769204063;
+	bh=vw2/q88ZQdbNmtifK6znXic6JJELdzqo7BH4BvuRUvE=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=m3Zaz0ephijmdY+tk3sAaL9iBYU1d9GpPILkphzwiiARcEJ5LnTf4RHb1+tuDKAVf
+	 HB2Sn43M3M5j0qZTCA654n9rrjMZpFXb3bsdl87HVO+/Z0TGs6KD2dhpELsP9Kn76e
+	 TetKF42Ec+MGg+WM6tMXXLxr8zIWGdrvo25452nkLQmo2ajfwnibtsMLmQYBoLbHI/
+	 Hf7+/28lYDH4ps6AkhcgLKfHs5ETzulNYldkBSKJ5CouSNFspR7h8nQnlmWWcuBf+x
+	 fIFwDI0axlRftJlOAHhIeI6k1jZI8ENO3tnS4dB9gzJO3kxsc1f5JNdB6FckRLLcHf
+	 T+WgPl2Dw3UgA==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id DEDFDF4006A;
+	Fri, 23 Jan 2026 16:34:21 -0500 (EST)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Fri, 23 Jan 2026 16:34:21 -0500
+X-ME-Sender: <xms:XelzaZvPjK4vfn9B0yXiTNAzLXfNTkUR_Jgn7s6GIU_5FUazJFeFOQ>
+    <xme:XelzadR67HxgsZy_rDJt95z-R3g8oOi7doYq7f16ybgf6htRTxKu4q4gWFm3zDdJ5
+    -in9hYJuYehcdCfsrr6yNgJQ2Kc_cuFzMQZCTG-_twdMb54jwYhiaKT>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduhedtuddvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpeejvefhudehleetvdejhfejvefghfelgeejvedvgfduuefffeegtdejuefhiedukeen
+    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomheptghhuhgtkhhlvghvvghrodhmvghsmhhtphgruhht
+    hhhpvghrshhonhgrlhhithihqdduieefgeelleelheelqdefvdelkeeggedvfedqtggvlh
+    eppehkvghrnhgvlhdrohhrghesfhgrshhtmhgrihhlrdgtohhmpdhnsggprhgtphhtthho
+    peduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepnhgvihhlsegsrhhofihnrd
+    hnrghmvgdprhgtphhtthhopehrihgtkhdrmhgrtghklhgvmhesghhmrghilhdrtghomhdp
+    rhgtphhtthhopegstghougguihhngheshhgrmhhmvghrshhprggtvgdrtghomhdprhgtph
+    htthhopegrnhhnrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvggsihhgghgvrhhs
+    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjlhgrhihtohhnsehkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopehtrhhonhgumhihsehkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomhdprhgtphhtthhopehlihhnuh
+    igqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:Xelzaf04ueCMVVFqZuctZRBW5SNcxjTCww-smmiUkmaSz93OIMHdrQ>
+    <xmx:XelzaZ78fcQM2SXZ5yR-0jnSCmZURiAtRX_2ZJ-unv743uMxm2QD8w>
+    <xmx:XelzabS8k4iVXyhDLOF_5SOZLy_3hhITT1WHkxw9NDpRJOnCe2-Myw>
+    <xmx:XelzaeVNDyMxJJswRQUYQbL63NigESwmzQktIwIlqRYjsKGEx7yb9g>
+    <xmx:XelzaQF_JllNltrRcc6qGm2IO6ii9SlKXsYaHyQFSACposv4ES6BVFyu>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id B866F780070; Fri, 23 Jan 2026 16:34:21 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1783974.1769190197.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 23 Jan 2026 17:43:17 +0000
-Message-ID: <1783975.1769190197@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-ThreadId: AvBI4pOdhfek
+Date: Fri, 23 Jan 2026 16:33:36 -0500
+From: "Chuck Lever" <cel@kernel.org>
+To: "Benjamin Coddington" <bcodding@hammerspace.com>,
+ "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
+ NeilBrown <neil@brown.name>, "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>, "Eric Biggers" <ebiggers@kernel.org>,
+ "Rick Macklem" <rick.macklem@gmail.com>
+Cc: linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+Message-Id: <5fb38378-a8e0-46d5-956c-de1a3bdaaf23@app.fastmail.com>
+In-Reply-To: 
+ <0aaa9ca4fd3edc7e0d25433ad472cb873560bf7d.1769026777.git.bcodding@hammerspace.com>
+References: <cover.1769026777.git.bcodding@hammerspace.com>
+ <0aaa9ca4fd3edc7e0d25433ad472cb873560bf7d.1769026777.git.bcodding@hammerspace.com>
+Subject: Re: [PATCH v2 3/3] NFSD: Sign filehandles
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Hi Mimi,
 
-I've posted patches which I hope will accepted to implement ML-DSA module
-signing:
 
-	https://lore.kernel.org/linux-crypto/1753972.1769166821@warthog.procyon.o=
-rg.uk/T/#t
+On Wed, Jan 21, 2026, at 3:24 PM, Benjamin Coddington wrote:
+> NFS clients may bypass restrictive directory permissions by using
+> open_by_handle() (or other available OS system call) to guess the
+> filehandles for files below that directory.
+>
+> In order to harden knfsd servers against this attack, create a method to
+> sign and verify filehandles using siphash as a MAC (Message Authentication
+> Code).  Filehandles that have been signed cannot be tampered with, nor can
+> clients reasonably guess correct filehandles and hashes that may exist in
+> parts of the filesystem they cannot access due to directory permissions.
+>
+> Append the 8 byte siphash to encoded filehandles for exports that have set
+> the "sign_fh" export option.  The filehandle's fh_auth_type is set to
+> FH_AT_MAC(1) to indicate the filehandle is signed.  Filehandles received from
+> clients are verified by comparing the appended hash to the expected hash.
+> If the MAC does not match the server responds with NFS error _BADHANDLE.
+> If unsigned filehandles are received for an export with "sign_fh" they are
+> rejected with NFS error _BADHANDLE.
+>
+> Link: 
+> https://lore.kernel.org/linux-nfs/cover.1769026777.git.bcodding@hammerspace.com
+> Signed-off-by: Benjamin Coddington <bcodding@hammerspace.com>
+> ---
+>  fs/nfsd/nfsfh.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++--
+>  fs/nfsd/nfsfh.h |  3 ++
+>  2 files changed, 73 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/nfsd/nfsfh.c b/fs/nfsd/nfsfh.c
+> index ed85dd43da18..ea3473acbf71 100644
+> --- a/fs/nfsd/nfsfh.c
+> +++ b/fs/nfsd/nfsfh.c
+> @@ -11,6 +11,7 @@
+>  #include <linux/exportfs.h>
+> 
+>  #include <linux/sunrpc/svcauth_gss.h>
+> +#include <crypto/utils.h>
+>  #include "nfsd.h"
+>  #include "vfs.h"
+>  #include "auth.h"
+> @@ -137,6 +138,61 @@ static inline __be32 check_pseudo_root(struct 
+> dentry *dentry,
+>  	return nfs_ok;
+>  }
+> 
+> +/*
+> + * Append an 8-byte MAC to the filehandle hashed from the server's 
+> fh_key:
+> + */
+> +static int fh_append_mac(struct svc_fh *fhp, struct net *net)
+> +{
+> +	struct nfsd_net *nn = net_generic(net, nfsd_net_id);
+> +	struct knfsd_fh *fh = &fhp->fh_handle;
+> +	siphash_key_t *fh_key = nn->fh_key;
+> +	u64 hash;
+> +
+> +	if (!(fhp->fh_export->ex_flags & NFSEXP_SIGN_FH))
+> +		return 0;
+> +
+> +	if (!fh_key) {
+> +		pr_warn_ratelimited("NFSD: unable to sign filehandles, fh_key not 
+> set.\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (fh->fh_size + sizeof(hash) > fhp->fh_maxsize) {
+> +		pr_warn_ratelimited("NFSD: unable to sign filehandles, fh_size %d 
+> would be greater"
+> +			" than fh_maxsize %d.\n", (int)(fh->fh_size + sizeof(hash)), 
+> fhp->fh_maxsize);
+> +		return -EINVAL;
+> +	}
+> +
+> +	fh->fh_auth_type = FH_AT_MAC;
+> +	hash = siphash(&fh->fh_raw, fh->fh_size, fh_key);
+> +	memcpy(&fh->fh_raw[fh->fh_size], &hash, sizeof(hash));
+> +	fh->fh_size += sizeof(hash);
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Verify that the the filehandle's MAC was hashed from this filehandle
+> + * given the server's fh_key:
+> + */
+> +static int fh_verify_mac(struct svc_fh *fhp, struct net *net)
+> +{
+> +	struct nfsd_net *nn = net_generic(net, nfsd_net_id);
+> +	struct knfsd_fh *fh = &fhp->fh_handle;
+> +	siphash_key_t *fh_key = nn->fh_key;
+> +	u64 hash;
+> +
+> +	if (fhp->fh_handle.fh_auth_type != FH_AT_MAC)
+> +		return -EINVAL;
+> +
+> +	if (!fh_key) {
+> +		pr_warn_ratelimited("NFSD: unable to verify signed filehandles, 
+> fh_key not set.\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	hash = siphash(&fh->fh_raw, fh->fh_size - sizeof(hash),  fh_key);
+> +	return crypto_memneq(&fh->fh_raw[fh->fh_size - sizeof(hash)], &hash, 
+> sizeof(hash));
+> +}
+> +
+>  /*
+>   * Use the given filehandle to look up the corresponding export and
+>   * dentry.  On success, the results are used to set fh_export and
+> @@ -166,8 +222,11 @@ static __be32 nfsd_set_fh_dentry(struct svc_rqst 
+> *rqstp, struct net *net,
+> 
+>  	if (--data_left < 0)
+>  		return error;
+> -	if (fh->fh_auth_type != 0)
+> +
+> +	/* either FH_AT_NONE or FH_AT_MAC */
+> +	if (fh->fh_auth_type > 1)
+>  		return error;
+> +
+>  	len = key_len(fh->fh_fsid_type) / 4;
+>  	if (len == 0)
+>  		return error;
+> @@ -237,9 +296,14 @@ static __be32 nfsd_set_fh_dentry(struct svc_rqst 
+> *rqstp, struct net *net,
+> 
+>  	fileid_type = fh->fh_fileid_type;
+> 
+> -	if (fileid_type == FILEID_ROOT)
+> +	if (fileid_type == FILEID_ROOT) {
+>  		dentry = dget(exp->ex_path.dentry);
+> -	else {
+> +	} else {
+> +		if (exp->ex_flags & NFSEXP_SIGN_FH && fh_verify_mac(fhp, net)) {
+> +			trace_nfsd_set_fh_dentry_badhandle(rqstp, fhp, -EKEYREJECTED);
+> +			goto out;
+> +		}
+> +
+>  		dentry = exportfs_decode_fh_raw(exp->ex_path.mnt, fid,
+>  						data_left, fileid_type, 0,
+>  						nfsd_acceptable, exp);
+> @@ -495,6 +559,9 @@ static void _fh_update(struct svc_fh *fhp, struct 
+> svc_export *exp,
+>  		fhp->fh_handle.fh_fileid_type =
+>  			fileid_type > 0 ? fileid_type : FILEID_INVALID;
+>  		fhp->fh_handle.fh_size += maxsize * 4;
+> +
+> +		if (fh_append_mac(fhp, exp->cd->net))
+> +			fhp->fh_handle.fh_fileid_type = FILEID_INVALID;
+>  	} else {
+>  		fhp->fh_handle.fh_fileid_type = FILEID_ROOT;
+>  	}
+> diff --git a/fs/nfsd/nfsfh.h b/fs/nfsd/nfsfh.h
+> index 5ef7191f8ad8..7fff46ac2ba8 100644
+> --- a/fs/nfsd/nfsfh.h
+> +++ b/fs/nfsd/nfsfh.h
+> @@ -59,6 +59,9 @@ struct knfsd_fh {
+>  #define fh_fsid_type		fh_raw[2]
+>  #define fh_fileid_type		fh_raw[3]
+> 
+> +#define FH_AT_NONE		0
+> +#define FH_AT_MAC		1
 
-but for the moment, it will give an error to pkcs7_get_digest() if there's=
- no
-digest available (which there won't be with ML-DSA).  This means that ther=
-e
-isn't a hash for IMA to get at for TPM measurement.
+I'm pleased at how much this patch has shrunk since v1.
 
-Now, I probably have to make a SHA256 hash anyway for UEFI blacklisting
-purposes, so that could be used.  Alternatively, we can require the use of
-authenticatedAttributes/signedAttrs and give you the hash of that - but th=
-en
-you're a bit at the mercy of whatever hashes were used.
+This might not be an actionable review comment, but help me understand
+this particular point. Why do you need both a sign_fh export option
+and a new FH auth type? Shouldn't the server just look for and
+validate FH signatures whenever the sign_fh export option is
+present?
 
-Further, we need to think how we're going to do PQC support in IMA -
-particularly as the signatures are so much bigger and verification slower.
+It seems a little subtle, so perhaps a code comment somewhere could
+explain the need for both.
 
-Would ML-DSA-44 be acceptable?  Should we grab some internal state out of
-ML-DSA to use in lieu of a hash?
 
-David
+> +
+>  static inline u32 *fh_fsid(const struct knfsd_fh *fh)
+>  {
+>  	return (u32 *)&fh->fh_raw[4];
+> -- 
+> 2.50.1
 
+-- 
+Chuck Lever
