@@ -1,123 +1,187 @@
-Received: from mail.thorondor.fr (unknown [82.66.128.71])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA441B4F2C;
-	Sat, 24 Jan 2026 14:40:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.66.128.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBF13EBF0C;
+	Sat, 24 Jan 2026 16:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769265652; cv=none; b=dHK1G7cPMmK8LHaZvtScPozk6bvQgIsA0WbMu6LGb9sEjTOUQNkzOY0wgGT/dy268E3pN7PAAHq2V13LkWNtBICTK/Go46DxRPTnJ1CTfMrzVi4EM+KahRVlcREpkssaLZ3v2PMI5OZHxAo+xXkljNh6Nedlzdu29o6+XUgFpVg=
+	t=1769270874; cv=none; b=O+LYy9L+WWV3d7oISsvuAp6t75+kswI+HHaFsPHRjyhAJokIeJYnBTxolHrTkY1QNdAI2AGdOF/zpw9fnvxCW/bwsYx2iQQSl2TycLIFAjMd2wLN2xDajoKt4xpcl8Ux0mDNz+YpqzQjRkGaJCYE2vRd64JoZ1zIeesctNtskZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769265652; c=relaxed/simple;
-	bh=cS0mBluvzJW0KPbiT4PvyGUJVfzqblDmb8zlJD8r8dk=;
+	s=arc-20240116; t=1769270874; c=relaxed/simple;
+	bh=sM0x7LuafRplCO64dYy/ImhxFLrt50sQKSVagUQgaUE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZdOGTKbzsxqUzngmdYm7VmbKc8HA7Yz6NDGuECMTRIU1a4g1Zr6We6XHWwMBBZycUhXgpNJFrdD9gDohAVoIAKj9LArPEfgf9omPKrbrZEeacSKn0RxAO5z2R1qjsvpThBnz+uZdspn1bk8lP9mUzEIUAR4AmyW5pQ/FKKrXSEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr; spf=pass smtp.mailfrom=thorondor.fr; dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b=YbNfLH9z; arc=none smtp.client-ip=82.66.128.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorondor.fr
+	 In-Reply-To:Content-Type; b=lM0Xt6sJwuPwsbO/G73uJMUh9q0OC0GdppFFSa5ODhyzFvExNNf9Agr0doFIcwwffZAj5K6zmechgLvYY4srd0zF48GBhk5a3Gt6CcHtgiUi1xorM/VlgitmvTMHUrdJ+Cb0lGMEtWYTb00ITvCao+Ylp+JFDn8cdRQTdZyg/eU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BmrPinF3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b="YbNfLH9z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=thorondor.fr; s=mail;
-	t=1769265642; bh=cS0mBluvzJW0KPbiT4PvyGUJVfzqblDmb8zlJD8r8dk=;
-	h=Subject:To:Cc:References:From:In-Reply-To;
-	b=YbNfLH9zCXG2IZT6ag27gaMBYO7VLogsYOXFlz0VfQCfsYHALgM0rZVQLSzjuDagE
-	 1rHOBQ74wLuQuOjQxPGSNjdVPIK6zdkjnD+J+4ENQ1ZVOf2knddPj31nJB3as72W32
-	 YxTgKi26x7jvyi+RJEkvagbHgQLCD57CB/PuyfJcwEJ44MD6/7dAtX+vIS7Wu4EWo7
-	 7IxmeIUEHAYw8TpsK1gz5KangpQJuSG+vOiNqtzHTwBHL7BYP68Tps9xPrQHdz5MG8
-	 6dddWEI/FOtiVSg30gd6i2hI5OdRNFdPr9AwemWPo1ovqr8XAGnOT2+Rp/v3xQc9XM
-	 CGTXLCPMOqCqw==
-Message-ID: <879f354c-822f-4902-8cc3-6cf9557db969@thorondor.fr>
-Date: Sat, 24 Jan 2026 15:40:41 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmrPinF3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61B89C116D0;
+	Sat, 24 Jan 2026 16:07:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769270874;
+	bh=sM0x7LuafRplCO64dYy/ImhxFLrt50sQKSVagUQgaUE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BmrPinF3iideNzIAJUl9uspHGXghD9dMo5tR4xoP584DXZIKNm4MxHIZEtZAzaaCu
+	 0JoG/C9wgpp2vtOdCjaNE2RT1sszEzsBtbaMuUP0w1l0poWUntS/Pwam7xgEFtVcR5
+	 /nVelzcfiHFDpK/LbBNvMOB+lfAIr3BPdYTle3KbF2q0nFu2r8aknjm2Py+QfniAGA
+	 KQgYlS4Zb/DgYh3YxRau+bIW2PGLib9TD8Q7WMtXAcASx25Fj5Ss0YVV1OPXcHP/nO
+	 lNlLjLp/N1VwtYYgyJ4Z+ncX4s/bso5QNUcQMZ4i0Cy5r3zKr3HJCdhZzyE7P144so
+	 vmdd//diUP8Mw==
+Message-ID: <77e7a645-66bd-4ce2-b963-2a2488595b00@kernel.org>
+Date: Sat, 24 Jan 2026 11:07:47 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
-To: Tom Lendacky <thomas.lendacky@amd.com>, ashish.kalra@amd.com,
- corbet@lwn.net, herbert@gondor.apana.org.au, john.allen@amd.com,
- nikunj@amd.com, pbonzini@redhat.com, seanjc@google.com
-Cc: kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, x86@kernel.org
-References: <20251215141417.2821412-1-thomas.courrege@vates.tech>
- <254d7d53-b523-452d-8c6f-d611ab08a9ff@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/3] NFSD: Sign filehandles
+To: Benjamin Coddington <bcodding@hammerspace.com>,
+ NeilBrown <neil@brown.name>
+Cc: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+ Eric Biggers <ebiggers@kernel.org>, Rick Macklem <rick.macklem@gmail.com>,
+ linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+References: <> <e545c35e-31fc-4069-8d83-1f9585e82532@app.fastmail.com>
+ <176921979948.16766.5458950508894093690@noble.neil.brown.name>
+ <686CBEE5-D524-409D-8508-D3D48706CC02@hammerspace.com>
 Content-Language: en-US
-From: Thomas Courrege <thomas.courrege@thorondor.fr>
-In-Reply-To: <254d7d53-b523-452d-8c6f-d611ab08a9ff@amd.com>
+From: Chuck Lever <cel@kernel.org>
+Organization: kernel.org
+In-Reply-To: <686CBEE5-D524-409D-8508-D3D48706CC02@hammerspace.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Sorry, i didn't saw the response, i changed the email i use.
+On 1/24/26 8:58 AM, Benjamin Coddington wrote:
+> Hey Chuck and Neil - Sorry to be late responding here..
+> 
+> On 23 Jan 2026, at 20:56, NeilBrown wrote:
+> 
+>> On Sat, 24 Jan 2026, Chuck Lever wrote:
+>>>
+>>> On Fri, Jan 23, 2026, at 6:38 PM, NeilBrown wrote:
+>>>> On Sat, 24 Jan 2026, Chuck Lever wrote:
+>>>>> On 1/23/26 5:21 PM, NeilBrown wrote:
+>>>>>> On Sat, 24 Jan 2026, Chuck Lever wrote:
+>>>>>>>
+>>>>>>> On Wed, Jan 21, 2026, at 3:24 PM, Benjamin Coddington wrote:
+> ...
+>>>>>>>>
+>>>>>>>> +#define FH_AT_NONE		0
+>>>>>>>> +#define FH_AT_MAC		1
+>>>>>>>
+>>>>>>> I'm pleased at how much this patch has shrunk since v1.
+> 
+> Me too, thanks for all the help refining it.
+> 
+>>>>>>>
+>>>>>>> This might not be an actionable review comment, but help me understand
+>>>>>>> this particular point. Why do you need both a sign_fh export option
+>>>>>>> and a new FH auth type? Shouldn't the server just look for and
+>>>>>>> validate FH signatures whenever the sign_fh export option is
+>>>>>>> present?
+> 
+> Its vestigial from the encrypted_fh version which required it because the
+> fsid might be encrypted, so NFSD couldn't look up the export to see if it
+> was set to encrypt until decrypting the fsid, and needed the auth type to
+> know if it was encrypted.
+> 
+>>>>>> ...and also generate valid signatures on outgoing file handles.
+>>>>>>
+>>>>>> What does the server do to "look for" an FH signature so that it can
+>>>>>> "validate" it?  Answer: it inspects the fh_auth_type to see if it is
+>>>>>> FT_AT_MAC.
+>>>>>
+>>>>> No, NFSD checks the sign_fh export option. At first glance the two
+>>>>> seem redundant, and I might hesitate to inspect or not inspect
+>>>>> depending on information content received from a remote system. The
+>>>>> security policy is defined precisely by the "sign_fh" export option I
+>>>>> would think?
+> 
+> Yes, now its a bit redundant - but it could be used to still accept
+> filehandles that are signed after removing a "sign_fh" from an export.  In
+> other words, it might be useful to be "be liberal in what you accept from
+> others".  It would be essential if future patches wanted to "drain" and
+> "fill" clients with signed/plain filehandles using more permissive policies.
+> *waves hands wildly*
+> 
+>>>> So maybe you are thinking that, when sign_fh, is in effect - nfsd
+>>>> could always strip off the last 8 bytes, hash the remainder, and check
+>>>> the result matches the stripped bytes.
+>>>
+>>> I’m wondering why there is both — the purpose of having these two
+>>> seemingly redundant signals is worth documenting. There was some
+>>> discussion a few days ago about whether the root FH could be signed
+>>> or not. I thought for a moment or two that maybe when sign_fh is
+>>> enabled, there will be one or more file handles on that export that
+>>> won’t have a signature, and FT_AT_NONE would set those apart
+>>> from the signed FHs. Again, I’d like to see that documented if that is
+>>> the case.
+> 
+> Right now no, not that I know of - the root filehandle is the only one, and
+> its easy to detect.
+> 
+>> I would document it as:
+>>
+>>  sign_fh is needs to configure server policy
+>>  FT_AT_MAC, while technically redundant with sign_fh, is valuable
+>>   whehn interpreting NFS packet captures.
+> 
+> Yes, it would allow a network dissector to locate and parse the MAC.
+> 
+>>> In addition, I’ve always been told that what comes off the network
+>>> is completely untrusted. So, I want some assurance that using the
+>>> incoming FH’s auth type as part of the decision to check the signature
+>>> conforms with known best practices.
+>>>
+>>>> Another reason is that it helps people who are looking at network
+>>>> packets captures to try to work out what is going wrong.
+>>>> Seeing a flag to say "there is a signature" could help.
+>>>
+>>> Sure. But unconditionally trusting that flag is another question.
+>>
+>> By the time the code has reached this point it has already
+>> unconditionally trusted the RPC header, the NFS opcode, the '1' in
+>> fh_version, the fh_fsid_type and the fsid itself.
+>>
+>> Going further to trust fh_auth_type to the extent that we reject the
+>> request if it is 0, and check the MAC if it is 1 - is not significant.
 
-On 21-01-2026 00:45, Tom Lendacky wrote:
-> On 12/15/25 08:14, Thomas Courrege wrote:
->
->> +	size_t rsp_size = sizeof(*report_rsp);
->> +	int ret;
-> The declarations above should be in reverse fir tree order.
-    
-Like that ?
-    struct sev_data_snp_msg_report_rsp *report_rsp;
-    struct sev_data_snp_hv_report_req data;
-    struct kvm_sev_snp_hv_report_req params;
-    struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
-    size_t rsp_size = sizeof(*report_rsp);
-    void __user *u_report;
-    void __user *u_params;
-    int ret;
->> +	if (ret)
->> +		goto e_free_rsp;
->> +
->> +	if (!report_rsp->status)
->> +		rsp_size += report_rsp->report_size;
->> +
->> +	if (params.report_len < rsp_size) {
->> +		rsp_size = sizeof(*report_rsp);
->> +		ret = -ENOSPC;
->> +	}
-> This can be contained within the if above it, right?
->
-> if (!report_rsp->status) {
-> 	if (params.report_len < (rsp_size + report_rsp->report_size))
-> 		ret = -ENOSPC;
-> 	else
-> 		rsp_size += report_rsp->report_size;
-> }
-
-This leads to an error in case the user wants to query the report size.
+What I'm saying is that if it makes no difference to the security level,
+then let's not bother to check it at all.
 
 
-Using params.report_len = 32, the nested if is true and thus the user get
+> Not a great argument, I know, but I think its nice to keep the standard that
+> filehandles are independently self-describing.
+> 
+> We're building server systems that pass around filehandles generated by NFSD
+> and it can be a useful signal to those 3rd-party systems that there's a
+> signature.  Trond might know more about whether its essential - I'll ask him
+> to weigh in here.
 
-back the default rsp_size (= 32), not increased with report_size (= 1184).
-
->> +
->> +	if (copy_to_user(u_report, report_rsp, rsp_size))
->> +		ret = -EFAULT;
->> +
->> +	params.report_len = sizeof(*report_rsp) + report_rsp->report_size;
-> I'm not sure if we can rely on report_rsp->report_size being valid if
-> resport_rsp->status is not zero. So maybe just set this to rsp_size.
->
-> Thanks,
-> Tom
-maybe something like this ? to avoid copying on ENOSPC, where this issue come from
-
-    if (!report_rsp->status)
-        rsp_size += report_rsp->report_size;
-
-    if (params.report_len < rsp_size) {
-        ret = -ENOSPC;
-    } else {
-        if (copy_to_user(u_report, report_rsp, rsp_size))
-            ret = -EFAULT;
-    }
-
-    params.report_len = rsp_size;
+Thanks, yes, let's hear from Trond.
 
 
-To test this specific case : 
-    https://github.com/Th0rOnDoR/test-length-sev/blob/main/sev_test.c
+> All said - please let me know if the next version should keep it.
 
-Thanks, 
-Thomas
+There are really two question marks:
+
+1. If I were a security reviewer, I would say that NFSD shouldn't rely
+on network input like this to decide whether or not to validate the MAC.
+Either the server expects a MAC and uses it to validate, or it doesn't.
+For me as a maintainer, that is a risk we probably can deal with
+immediately -- would it be OK at least to change the FH verification
+code to not use the auth_type to decide when to validate the FH's MAC?
+
+2. Is setting FH_AT_MAC still useful for other reasons? I think we don't
+really know whether to keep the auth_type or how to document it until
+we've decided on how exactly NFSD will deal with changing the sign_fh
+setting while clients have the export mounted.
+
+So, let's leave the field in place and we'll come back to it. If you
+want, add a comment like /* XXX is FH_AT_MAC still needed? */
+
+
+-- 
+Chuck Lever
