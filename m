@@ -1,280 +1,97 @@
-Received: from mail.thorondor.fr (unknown [82.66.128.71])
+Received: from devnull.danielhodges.dev (vps-2f6e086e.vps.ovh.us [135.148.138.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FE1E55C;
-	Sun, 25 Jan 2026 11:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.66.128.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85173C17;
+	Sun, 25 Jan 2026 12:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.148.138.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769339222; cv=none; b=tWpt9ztRZ9cz9h9wt0qVJ6MuJwK0+Dg/M7GrUmNYUFB7K4glKHNd0HCdjsDxYgZlqM3PExKreuvKudvh/rhd5xA0T//lUuDcWJ7JNWc4fF7vk3kqfRV/YYWoHb+pFmZXCqHstq80jRZ/9p0ZEtuP3Ti7B0e/arDHE7DaJKyeBcw=
+	t=1769344545; cv=none; b=qUxMkZSP1TTeG0Ata4TjUduuBRe9r8MOtLYEDwGogoxJ6AW5x3Xa49ihRfF+7pLn08/1ucWUTNmdX4+gQsw/L7N6iwUxPwCGB4bxdVKlQ26Rugcpd7rPiQIyISFQpI73zvYIEFYNCUfIAqlkWd0mEiE54v28JU0/FtYWX8gOAeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769339222; c=relaxed/simple;
-	bh=hNYbYZde/EX3kkrznie2VHQIPWyYXPAvkCchlsCgE+k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UWGdPVTUPCuONV69+/swTl0CIcvncwG5JW+xsb8xZR9MWZOTnuBgnHrUN2VwPCu5AcgSoYY0pv+gtT/6nCOx3Ev9ubC8f3hJupJogA0SSgdOv7VojMe3EuZMX5gEm9qwJGIAhJHb228Jkfmk5MHLXaJb90SC9Y3otPmCGZ5TT5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr; spf=pass smtp.mailfrom=thorondor.fr; dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b=LsIhEn4G; arc=none smtp.client-ip=82.66.128.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorondor.fr
+	s=arc-20240116; t=1769344545; c=relaxed/simple;
+	bh=AdO9Ky1jH1UZBMml3ZkhvJLmWNgr0lSnD20567FTk7o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sObVpgmENqtylMzf+loGeIIg1sZ54OitFXBuIJQsFUZlX8msOk1Q3R8S2OSBDzcZyKFgFhX1yVNk0geFE7MsE8QVQ7IhmQV3sO41v1iTAxtTCvtmR8ub7d+otEQjpJ33Mry5JZWI4DOem24HheEyjg2R0XGihxxt0MAAMVsyK6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=eQrpjNu2; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=cCh/uV4m; arc=none smtp.client-ip=135.148.138.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danielhodges.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b="LsIhEn4G"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=thorondor.fr; s=mail;
-	t=1769339218; bh=hNYbYZde/EX3kkrznie2VHQIPWyYXPAvkCchlsCgE+k=;
-	h=From:To:Cc:Subject:In-Reply-To:References;
-	b=LsIhEn4GRZJS7Xhr+SSAnW9pfsMilj8CE+6QarTsd1oQAyftJguwmuA+wrj8Zvpo6
-	 10CEMHue5lN43Dx/AwcGBIyE5Xgrb66NUopTe/wBNsw1l2WgSY44WvW/HV/QP18wCM
-	 7UYdPBMRfDywIsum91cNhEXJGHOnK6/GEWlUyctCzcAMRYS5wSQo2DxaCnrHuiaBF0
-	 Yyt4LNM853LeLH3jQXjcUkylqh6rkqlVDD9ivRMKwMPa3N4zV2tyoF0StiShODGxDp
-	 uYdlnVWKfLHRqPx/aqy5maMfBa55GiMWLt2AQ1oxiB2vDQ4rwFCWH6r5FdkWmipaXB
-	 hZXAv7EEJfIfQ==
-From: Thomas Courrege <thomas.courrege@thorondor.fr>
-To: ashish.kalra@amd.com,
-	corbet@lwn.net,
-	herbert@gondor.apana.org.au,
-	john.allen@amd.com,
-	nikunj@amd.com,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	thomas.lendacky@amd.com
-Cc: kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	Thomas Courrege <thomas.courrege@thorondor.fr>
-Subject: [PATCH v5] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
-Date: Sun, 25 Jan 2026 12:06:29 +0100
-Message-ID: <20260125110629.43096-2-thomas.courrege@thorondor.fr>
-In-Reply-To: <20260125110629.43096-1-thomas.courrege@thorondor.fr>
-References: <20260125110629.43096-1-thomas.courrege@thorondor.fr>
+	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="eQrpjNu2";
+	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="cCh/uV4m"
+DKIM-Signature: v=1; a=rsa-sha256; s=202510r; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Subject:To:From:Date; t=1769344498; bh=XADZthbr48JgjrdwuL81M9F
+	r5NCF871XhmhImP4amhA=; b=eQrpjNu2ly68uVfsAz9ToAqV6P4L90q46vqsjPUdM05NWhXyeW
+	flv9Wx2Qp3vdRUoE+CPXdeB55j4LelylQmqu8MZOX2z4NXsed4i7zzOjWIxvND9QaEmDphDKAI2
+	WyboGyYBEDHr0qSmoskQLAPt+fcNxCFDHWWKVMmTz/6hsQEWIvESaNJLPRi2O6JdOmQazvo+4tl
+	MXp84vzK/73BdQgs7Cy9MAcMyBlUgMchVMHnlGCu0O9GGjbcuoWL36pcWUlrfCx18Knoioj90fq
+	gcNOkksuOj0gl9oIF1tpPWxvIrFy9kdNKPuwMCl31wEg36DzDiMlwjYY9+IC9F7vqwg==;
+DKIM-Signature: v=1; a=ed25519-sha256; s=202510e; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Subject:To:From:Date; t=1769344498; bh=XADZthbr48JgjrdwuL81M9F
+	r5NCF871XhmhImP4amhA=; b=cCh/uV4mlVLFkJ4I56fqZgOS0EOCR3VTFvONKK/BMv8ygIaZ+G
+	d4r5xPb3HApCh9uyGyJGKXuWCtmZoTGvslCw==;
+Date: Sun, 25 Jan 2026 07:34:57 -0500
+From: Daniel Hodges <daniel@danielhodges.dev>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Daniel Hodges <git@danielhodges.dev>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Song Liu <song@kernel.org>, Mykyta Yatsenko <yatsenko@meta.com>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Yonghong Song <yonghong.song@linux.dev>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH bpf-next v6 4/4] selftests/bpf: Add tests for signature
+ verification kfuncs
+Message-ID: <hk2e2og5v347kmuyyegilgejktgafjgvbxopfk4a2lippmggch@nzuoznk376s3>
+References: <20260124174349.16861-1-git@danielhodges.dev>
+ <20260124174349.16861-5-git@danielhodges.dev>
+ <CAADnVQJQsC0cQZPJpyofY4Othi5+j7xjAY+xbNRkX0p9wA7Khg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAADnVQJQsC0cQZPJpyofY4Othi5+j7xjAY+xbNRkX0p9wA7Khg@mail.gmail.com>
 
-Add support for retrieving the SEV-SNP attestation report via the
-SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
-ioctl for SNP guests.
+> > Signed-off-by: Daniel Hodges <git@danielhodges.dev>
+> > ---
+> >  MAINTAINERS                                   |   2 +
+> >  .../selftests/bpf/prog_tests/sig_verify.c     | 163 ++++++++++
+> >  .../selftests/bpf/progs/crypto_common.h       |   6 +
+> >  .../testing/selftests/bpf/progs/sig_verify.c  | 286 ++++++++++++++++++
+> >  4 files changed, 457 insertions(+)
+> >  create mode 100644 tools/testing/selftests/bpf/prog_tests/sig_verify.c
+> >  create mode 100644 tools/testing/selftests/bpf/progs/sig_verify.c
+> 
+> It's a v6 already, but your new selftests are still failing in CI.
+> 
+> Error: #385 sig_verify
+> Error: #385/1 sig_verify/verify_valid_signature
+> Error: #385/3 sig_verify/size_queries
+> Error: #385/6 sig_verify/zero_len_msg
+> Error: #385/7 sig_verify/zero_len_sig
+> 
+> Please make sure CI is green before submitting v7.
+> No one is reviewing the patches when they don't pass their own tests.
 
-Signed-off-by: Thomas Courrege <thomas.courrege@thorondor.fr>
----
- .../virt/kvm/x86/amd-memory-encryption.rst    | 28 +++++++++
- arch/x86/include/uapi/asm/kvm.h               |  9 +++
- arch/x86/kvm/svm/sev.c                        | 63 +++++++++++++++++++
- drivers/crypto/ccp/sev-dev.c                  |  1 +
- include/linux/psp-sev.h                       | 31 +++++++++
- 5 files changed, 132 insertions(+)
+Noted, sorry about that. I think my local vm has some different config:
 
-diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-index 1ddb6a86ce7f..78b59c91f21c 100644
---- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-+++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-@@ -572,6 +572,34 @@ Returns: 0 on success, -negative on error
- See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
- details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
- 
-+21. KVM_SEV_SNP_HV_REPORT_REQ
-+-----------------------------
-+
-+The KVM_SEV_SNP_HV_REPORT_REQ command requests the hypervisor-generated
-+SNP attestation report. This report is produced by the PSP using the
-+HV-SIGNED key selected by the caller.
-+
-+The ``key_sel`` field indicates which key the platform will use to sign the
-+report:
-+  * ``0``: If VLEK is installed, sign with VLEK. Otherwise, sign with VCEK.
-+  * ``1``: Sign with VCEK.
-+  * ``2``: Sign with VLEK.
-+  * Other values are reserved.
-+
-+Parameters (in): struct kvm_sev_snp_hv_report_req
-+
-+Returns:  0 on success, -negative on error
-+
-+::
-+        struct kvm_sev_snp_hv_report_req {
-+                __u64 report_uaddr;
-+                __u64 report_len;
-+                __u8 key_sel;
-+                __u8 pad0[7];
-+                __u64 pad1[4];
-+        };
-+
-+
- Device attribute API
- ====================
- 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 7ceff6583652..464146bed784 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -743,6 +743,7 @@ enum sev_cmd_id {
- 	KVM_SEV_SNP_LAUNCH_START = 100,
- 	KVM_SEV_SNP_LAUNCH_UPDATE,
- 	KVM_SEV_SNP_LAUNCH_FINISH,
-+	KVM_SEV_SNP_HV_REPORT_REQ,
- 
- 	KVM_SEV_NR_MAX,
- };
-@@ -871,6 +872,14 @@ struct kvm_sev_receive_update_data {
- 	__u32 pad2;
- };
- 
-+struct kvm_sev_snp_hv_report_req {
-+	__u64 report_uaddr;
-+	__u64 report_len;
-+	__u8 key_sel;
-+	__u8 pad0[7];
-+	__u64 pad1[4];
-+};
-+
- struct kvm_sev_snp_launch_start {
- 	__u64 policy;
- 	__u8 gosvw[16];
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f59c65abe3cf..63026d254ab1 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2261,6 +2261,66 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	return rc;
- }
- 
-+static int sev_snp_hv_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
-+{
-+	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
-+	struct sev_data_snp_msg_report_rsp *report_rsp;
-+	struct kvm_sev_snp_hv_report_req params;
-+	struct sev_data_snp_hv_report_req data;
-+	size_t rsp_size = sizeof(*report_rsp);
-+	void __user *u_report;
-+	void __user *u_params;
-+	int ret;
-+
-+	if (!sev_snp_guest(kvm))
-+		return -ENOTTY;
-+
-+	u_params = u64_to_user_ptr(argp->data);
-+	if (copy_from_user(&params, u_params, sizeof(params)))
-+		return -EFAULT;
-+
-+	if (params.report_len < rsp_size)
-+		return -ENOSPC;
-+
-+	u_report = u64_to_user_ptr(params.report_uaddr);
-+	if (!u_report)
-+		return -EINVAL;
-+
-+	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+	if (!report_rsp)
-+		return -ENOMEM;
-+
-+	data.len = sizeof(data);
-+	data.key_sel = params.key_sel;
-+	data.gctx_addr = __psp_pa(sev->snp_context);
-+	data.hv_report_paddr = __psp_pa(report_rsp);
-+	data.rsvd = 0;
-+
-+	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
-+			    &argp->error);
-+	if (ret)
-+		goto e_free_rsp;
-+
-+	if (!report_rsp->status) {
-+		if (params.report_len < (rsp_size + report_rsp->report_size))
-+			ret = -ENOSPC;
-+		else
-+			rsp_size += report_rsp->report_size;
-+
-+		params.report_len = sizeof(*report_rsp) + report_rsp->report_size;
-+	}
-+
-+	if (copy_to_user(u_report, report_rsp, rsp_size))
-+		ret = -EFAULT;
-+
-+	if (copy_to_user(u_params, &params, sizeof(params)))
-+		ret = -EFAULT;
-+
-+e_free_rsp:
-+	snp_free_firmware_page(report_rsp);
-+	return ret;
-+}
-+
- struct sev_gmem_populate_args {
- 	__u8 type;
- 	int sev_fd;
-@@ -2672,6 +2732,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
- 	case KVM_SEV_SNP_LAUNCH_FINISH:
- 		r = snp_launch_finish(kvm, &sev_cmd);
- 		break;
-+	case KVM_SEV_SNP_HV_REPORT_REQ:
-+		r = sev_snp_hv_report_request(kvm, &sev_cmd);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		goto out;
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 956ea609d0cc..5dd7c3f0d50d 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -259,6 +259,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
- 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
- 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
-+	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
- 	default:				return sev_tio_cmd_buffer_len(cmd);
- 	}
- 
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 69ffa4b4d1fa..c651a400d124 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -124,6 +124,7 @@ enum sev_cmd {
- 	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
- 	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
- 	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
-+	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
- 	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
- 	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
- 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
-@@ -594,6 +595,36 @@ struct sev_data_attestation_report {
- 	u32 len;				/* In/Out */
- } __packed;
- 
-+/**
-+ * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
-+ *
-+ * @len: length of the command buffer in bytes
-+ * @key_sel: Selects which key to use for generating the signature.
-+ * @gctx_addr: System physical address of guest context page
-+ * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
-+ */
-+struct sev_data_snp_hv_report_req {
-+	u32 len;		/* In */
-+	u32 key_sel	:2,	/* In */
-+	    rsvd	:30;
-+	u64 gctx_addr;		/* In */
-+	u64 hv_report_paddr;	/* In */
-+} __packed;
-+
-+/**
-+ * struct sev_data_snp_msg_export_rsp
-+ *
-+ * @status: Status : 0h: Success. 16h: Invalid parameters.
-+ * @report_size: Size in bytes of the attestation report
-+ * @report: attestation report
-+ */
-+struct sev_data_snp_msg_report_rsp {
-+	u32 status;			/* Out */
-+	u32 report_size;		/* Out */
-+	u8 rsvd[24];
-+	u8 report[];
-+} __packed;
-+
- /**
-  * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
-  *
+vng -- ./tools/testing/selftests/bpf/test_progs -t sig_verify
+WARNING! Selftests relying on bpf_testmod.ko will be skipped.
+Can't find bpf_testmod.ko kernel module: -2
+#385/1   sig_verify/verify_valid_signature:OK
+#385/2   sig_verify/verify_invalid_signature:OK
+#385/3   sig_verify/size_queries:OK
+#385/4   sig_verify/ecdsa_on_hash_ctx:OK
+#385/5   sig_verify/ecdsa_keysize_on_hash_ctx:OK
+#385/6   sig_verify/zero_len_msg:OK
+#385/7   sig_verify/zero_len_sig:OK
+#385     sig_verify:OK
+Summary: 1/7 PASSED, 0 SKIPPED, 0 FAILED
 
-base-commit: e89f0e9a0a007e8c3afb8ecd739c0b3255422b00
--- 
-2.52.0
-
+I'll figure it out properly, thanks for the direction!
