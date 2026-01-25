@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC87225775;
-	Sun, 25 Jan 2026 03:36:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6321D2264CF;
+	Sun, 25 Jan 2026 03:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769312162; cv=none; b=LUlw4nTqDAp9DIgBsCrUwhNarZpYljF2r85rquFhH1VBNaS8Vpq23iWXuhztGAqK17aWZ3B6/ukkevNAR8uNfxPH8FTa+nHJ/k11PvNm0ja/iJmJGFBCzmHKPo1Z9/htLVgFueOKT7T1Y9BWu6+bwTRgMS+8f2N5Y1wq1t/lXCY=
+	t=1769312167; cv=none; b=OpqVT2Z2cRdIeD5sFq5FRPQ8399m6PJn/WdD3aOXs2r/67sXxPySPNAWivLLsves1zmoIiJDXsA8Wa+ywwRD/f0XEDwzhBojl/+L3kCPEKs3NtQTgldx5AHDr/mwAfQVwxhbZxzNzf+KE6UgQtW9/WyrwlfQmcvhtUvz62xWSbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769312162; c=relaxed/simple;
-	bh=iZsxDdWF2NK1BJ57K8D8/hdtu1PFMhaa5X62fuQilRE=;
+	s=arc-20240116; t=1769312167; c=relaxed/simple;
+	bh=HC8fdqJFaBib45Q8EUreD6PT2wkYvwrws+aVSwrcud0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HWrLqPfGLTr2sb2dtWfk6bzOyg0tuVwkZDxuDSaKKUyQRxcWcpOC1smTJNlRHn7S1cj6XMCRhBeqtv7hFTjtUuiROpWms6tp+6AUH+vY9iaJLDuAdWHXjrp510c8JBTgHrT7GZKJIQuEd3FFmePBVDzB8NxhVfPZCQPYxSdN+0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FGoHm3Oo; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=G/nFWizIT2ATIjlxjttN6qEgI6Ft40wpjHOiqe061JFa1F8sfqa2sRyCUHgZ/0uNjrec4uE9Jo7leGvLp87ek1L+ooRB2yxWZcO7/y8vy90+GlEXXUQjymWtKTE7fCfn0+5rUoLgaBMo3lcAjgjIXk0s5KnM+dr2lwCfWSeE7Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=btnvQQY7; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FGoHm3Oo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="btnvQQY7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769312160; x=1800848160;
+  t=1769312161; x=1800848161;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=iZsxDdWF2NK1BJ57K8D8/hdtu1PFMhaa5X62fuQilRE=;
-  b=FGoHm3Ooi0NRq8n8iCVZjhL3QV/bBcp+KVFX/QHteNYgA/0T0BvPqGHn
-   x+X3SqMkg8rDTTF4g1YPtwVBmDGCOmk6EMeuJITc4p3mkXb+jqUT95ikO
-   +ycX+W239a425Zk+SPNNCkW/Amdjuun/nyFlpoj5sNhtxwxy1dlJmzmOr
-   mN3feRFs1Zxm1Pqt8MHg1+OPkCzsPNoD8HxP7frOT/ZGsdw6nOD/IlU6P
-   BRbjMOfMMffaqLBFVmLdQI8ndtB7qIistGhy+V74ok9J7HRYfRalsxlQ8
-   h1mWHyMg5z8ptOg3FA86ffqXoPDgIRk7n6dy/lpsln/YgtZWqSU6TUdP1
-   g==;
-X-CSE-ConnectionGUID: MAKzrqLCR6G/Pc9n0IRoGw==
-X-CSE-MsgGUID: Srf1hU5VTd+bG7iK6yaMFw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="81887510"
+  bh=HC8fdqJFaBib45Q8EUreD6PT2wkYvwrws+aVSwrcud0=;
+  b=btnvQQY7TcjpOjlMPikvLe7U3ZEHTh7rkkBQcGk4fQFhLtDc0DgUYJk4
+   0GgxpwqctyYARla/dB0GuF++JpcmbXozYkLqG2npbni6PRgl2J1ry5wVs
+   RBbBnJt9SGajCyhNzwq00TqdabthGJQOk+mfBZqXmAFSwG8to1Ck8THy1
+   LcnzdIdveMGUwpkW9s3jjBEqUSb6jIb6/xpLtg8anb+3ku5jioQDE7ZTZ
+   AzbGn0OGqBpLRiCt5o6JL+T54dHLYCS1Fli4PTEcuvrsTrdePt+lryiYT
+   Hqg9d3GqFN4X5kZPiM53GGMFyrdNbu+8l2KiLuFCxysSoMD40gkB5DiV9
+   w==;
+X-CSE-ConnectionGUID: ZSB52kABTaKJPNowKPU28A==
+X-CSE-MsgGUID: 1+O44jdkT6afXmq+oPnEcA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="81887525"
 X-IronPort-AV: E=Sophos;i="6.21,252,1763452800"; 
-   d="scan'208";a="81887510"
+   d="scan'208";a="81887525"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 19:35:59 -0800
-X-CSE-ConnectionGUID: mHNlEFcuSZ6CiJ6gsuZB5A==
-X-CSE-MsgGUID: TOHf7fr5QoqJz3LbsQFzlw==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 19:36:01 -0800
+X-CSE-ConnectionGUID: qnIXTLqWTZ23va22SQ/BYA==
+X-CSE-MsgGUID: zalW4RTiQNa1H401+BbH6w==
 X-ExtLoop1: 1
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
-  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2026 19:35:58 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2026 19:35:59 -0800
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 To: linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org,
@@ -68,9 +68,9 @@ To: linux-kernel@vger.kernel.org,
 	giovanni.cabiddu@intel.com
 Cc: wajdi.k.feghali@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v14 14/26] crypto: acomp - Add bit to indicate segmentation support
-Date: Sat, 24 Jan 2026 19:35:25 -0800
-Message-Id: <20260125033537.334628-15-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v14 15/26] crypto: acomp - Add trivial segmentation wrapper
+Date: Sat, 24 Jan 2026 19:35:26 -0800
+Message-Id: <20260125033537.334628-16-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20260125033537.334628-1-kanchana.p.sridhar@intel.com>
 References: <20260125033537.334628-1-kanchana.p.sridhar@intel.com>
@@ -82,65 +82,134 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch adds segmentation support for compression.
+This patch provides a wrapper for existing algorithms so that they can
+accept a single segment while returning the compressed length or error
+through the dst SG list length.
 
-Add a bit to the crypto_alg flags to indicate support for segmentation.
-Also add a helper for acomp to test whether a given tfm supports
-segmentation.
+This trivial segmentation wrapper only supports compression with a
+segment count of exactly one.
 
+The reason is that the first user zswap will only allocate the
+extra memory if the underlying algorithm supports segmentation,
+and otherwise only one segment will be given at a time.
+
+Having this wrapper means that the same calling convention can
+be used for all algorithms, regardless of segmentation support.
+
+Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- include/crypto/algapi.h             | 5 +++++
- include/crypto/internal/acompress.h | 5 +++++
- include/linux/crypto.h              | 3 +++
- 3 files changed, 13 insertions(+)
+ crypto/acompress.c         | 33 ++++++++++++++++++++++++++-------
+ include/crypto/acompress.h |  1 +
+ 2 files changed, 27 insertions(+), 7 deletions(-)
 
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 05deea9dac5e..7d406cfe5751 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -280,6 +280,11 @@ static inline bool crypto_tfm_req_virt(struct crypto_tfm *tfm)
- 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_REQ_VIRT;
+diff --git a/crypto/acompress.c b/crypto/acompress.c
+index be28cbfd22e3..cfb8ede02cf4 100644
+--- a/crypto/acompress.c
++++ b/crypto/acompress.c
+@@ -170,8 +170,13 @@ static void acomp_save_req(struct acomp_req *req, crypto_completion_t cplt)
+ 
+ 	state->compl = req->base.complete;
+ 	state->data = req->base.data;
++	state->unit_size = req->unit_size;
++	state->flags = req->base.flags & (CRYPTO_ACOMP_REQ_SRC_VIRT |
++					  CRYPTO_ACOMP_REQ_DST_VIRT);
++
+ 	req->base.complete = cplt;
+ 	req->base.data = state;
++	req->unit_size = 0;
  }
  
-+static inline bool crypto_tfm_req_seg(struct crypto_tfm *tfm)
-+{
-+	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_REQ_SEG;
-+}
-+
- static inline u32 crypto_request_flags(struct crypto_async_request *req)
+ static void acomp_restore_req(struct acomp_req *req)
+@@ -180,6 +185,7 @@ static void acomp_restore_req(struct acomp_req *req)
+ 
+ 	req->base.complete = state->compl;
+ 	req->base.data = state->data;
++	req->unit_size = state->unit_size;
+ }
+ 
+ static void acomp_reqchain_virt(struct acomp_req *req)
+@@ -198,9 +204,6 @@ static void acomp_virt_to_sg(struct acomp_req *req)
  {
- 	return req->flags & ~CRYPTO_TFM_REQ_ON_STACK;
-diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
-index 2d97440028ff..366dbdb987e8 100644
---- a/include/crypto/internal/acompress.h
-+++ b/include/crypto/internal/acompress.h
-@@ -188,6 +188,11 @@ static inline bool crypto_acomp_req_virt(struct crypto_acomp *tfm)
- 	return crypto_tfm_req_virt(&tfm->base);
+ 	struct acomp_req_chain *state = &req->chain;
+ 
+-	state->flags = req->base.flags & (CRYPTO_ACOMP_REQ_SRC_VIRT |
+-					  CRYPTO_ACOMP_REQ_DST_VIRT);
+-
+ 	if (acomp_request_src_isvirt(req)) {
+ 		unsigned int slen = req->slen;
+ 		const u8 *svirt = req->svirt;
+@@ -248,6 +251,10 @@ static int acomp_reqchain_finish(struct acomp_req *req, int err)
+ {
+ 	acomp_reqchain_virt(req);
+ 	acomp_restore_req(req);
++
++	if (req->unit_size)
++		req->dst->length = unlikely(err) ? err : req->dlen;
++
+ 	return err;
  }
  
-+static inline bool crypto_acomp_req_seg(struct crypto_acomp *tfm)
-+{
-+	return crypto_tfm_req_seg(&tfm->base);
-+}
+@@ -268,14 +275,17 @@ static void acomp_reqchain_done(void *data, int err)
+ 	compl(data, err);
+ }
+ 
+-static int acomp_do_req_chain(struct acomp_req *req, bool comp)
++static __always_inline int acomp_do_req_chain(struct acomp_req *req, bool comp)
+ {
+ 	int err;
+ 
++	if (unlikely(req->unit_size && req->slen > req->unit_size))
++		return -ENOSYS;
 +
- void crypto_acomp_free_streams(struct crypto_acomp_streams *s);
- int crypto_acomp_alloc_streams(struct crypto_acomp_streams *s);
+ 	acomp_save_req(req, acomp_reqchain_done);
  
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index a2137e19be7d..89b9c3f87f4d 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -139,6 +139,9 @@
- /* Set if the algorithm cannot have a fallback (e.g., phmac). */
- #define CRYPTO_ALG_NO_FALLBACK		0x00080000
+ 	err = acomp_do_one_req(req, comp);
+-	if (err == -EBUSY || err == -EINPROGRESS)
++	if (unlikely(err == -EBUSY || err == -EINPROGRESS))
+ 		return err;
  
-+/* Set if the algorithm supports segmentation. */
-+#define CRYPTO_ALG_REQ_SEG		0x00100000
+ 	return acomp_reqchain_finish(req, err);
+@@ -287,8 +297,17 @@ int crypto_acomp_compress(struct acomp_req *req)
+ 
+ 	if (acomp_req_on_stack(req) && acomp_is_async(tfm))
+ 		return -EAGAIN;
 +
- /* The high bits 0xff000000 are reserved for type-specific flags. */
++	if (req->unit_size && acomp_request_issg(req)) {
++		if (!crypto_acomp_req_seg(tfm))
++			return acomp_do_req_chain(req, true);
++
++		return tfm->compress(req);
++	}
++
+ 	if (crypto_acomp_req_virt(tfm) || acomp_request_issg(req))
+-		return crypto_acomp_reqtfm(req)->compress(req);
++		return tfm->compress(req);
++
+ 	return acomp_do_req_chain(req, true);
+ }
+ EXPORT_SYMBOL_GPL(crypto_acomp_compress);
+@@ -300,7 +319,7 @@ int crypto_acomp_decompress(struct acomp_req *req)
+ 	if (acomp_req_on_stack(req) && acomp_is_async(tfm))
+ 		return -EAGAIN;
+ 	if (crypto_acomp_req_virt(tfm) || acomp_request_issg(req))
+-		return crypto_acomp_reqtfm(req)->decompress(req);
++		return tfm->decompress(req);
+ 	return acomp_do_req_chain(req, false);
+ }
+ EXPORT_SYMBOL_GPL(crypto_acomp_decompress);
+diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+index 23a1a659843c..86e4932cd112 100644
+--- a/include/crypto/acompress.h
++++ b/include/crypto/acompress.h
+@@ -67,6 +67,7 @@ struct acomp_req_chain {
+ 		struct folio *dfolio;
+ 	};
+ 	u32 flags;
++	u32 unit_size;
+ };
  
- /*
+ /**
 -- 
 2.27.0
 
