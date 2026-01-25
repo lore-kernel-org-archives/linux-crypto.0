@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84044225417;
-	Sun, 25 Jan 2026 03:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC5C220698;
+	Sun, 25 Jan 2026 03:35:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769312153; cv=none; b=kOB50+gwYyTLDZwa/StcO0CKCaG2FJOB9spkyBs3JY9E4GwUEUXS/jQJNVqVg3YFymLpRLe11aAP7HjbrqTbCAV2ljilTZxys6QNyUi7DgnFrO7rGfuMn8Gu1v9qMFU5VQlg/fkDU9nK3FXLu1/RWAEoZBUi9PVpM8VRJXuupKo=
+	t=1769312155; cv=none; b=aSw91Dtb0oUj+zPrq5YIzBIslwH/mlpa3Rq4v1xbOCmbXUCnZ8fcOpqIygbKwhHO5Ov4Hqs9VyLRuJYu/S7XPIloyfKWshnokYYmU7/48aYZZM/Ca5+48TLqo+U31kuJ8GBY1ZNXVs/I+qsNh0sHGE5vZSp+6UgHcho3/wCEJKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769312153; c=relaxed/simple;
-	bh=chu3mCAeP0wjFOIz/yBzyDrIjGaCv78aq80eLeyDUEI=;
+	s=arc-20240116; t=1769312155; c=relaxed/simple;
+	bh=TXS6CTscafJd3lQMfTmunv6KR6knJ1F1wFy/sJU25Y8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TJzjqgAJs04mxdvqFEWOxTHWlY4NKtKdedz/LSj2OR50Ppp3UZqq284aF0ivKQSuDD3eGlvcDwY9IUDJX2g46q+qyYxitQEsUsWPj5s7gVEgxPwc6DGvuU03o54OndJ/sW7LJSMhgrGzBTx+qGqSZ7VlArQ47t+dQ8bYr2yqtNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jDK/KsBm; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=Z81w33RJGMPeI/Nx7ulWJCXTs/a5eHGlWTMgM/M6isHlTbkgwvGNjZABLOVDzEtjMBnEkzbIC77Jv8v1FeOSfIJbPiGLxmHvtuea/LHbEF/onsYyMsMr8Ux2IdHcHNVMcuNhiH5nwv0TJBKr0AN1UqSjU9vSRDx7zlADhlYiw5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X3YI5ACt; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jDK/KsBm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X3YI5ACt"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769312151; x=1800848151;
+  t=1769312153; x=1800848153;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=chu3mCAeP0wjFOIz/yBzyDrIjGaCv78aq80eLeyDUEI=;
-  b=jDK/KsBmk6N+mY+80S/1FLGDYvG6VD30+v4LUvMi39R5JrNxvMT1pAM5
-   Om6quO8KFHynZM1DSy/xKFEuGGXwUhOIspRufcZtuM2dpt4aqO1gJ2NaC
-   sMlY/YNKvTQwPh4SX5qoWyCjFqg9fPULko8nqQS9DGdbWNAEYq8pBCvhW
-   OV87GAJzQylIUPOKaLhurEwbNAVN6WbfUSc5eFb/e0IkZA0h+R/QhEgJ0
-   wWYOKc0HlcHbg5wxvkzkrh685a3fgg6zOIHk8giHsT/s9kjp/bjck32nO
-   ARbkxaDbIfaYERPg0kFnahYGnPLdH+Nrly0qasQqj+PGsJGZ5+mN2nuSq
-   Q==;
-X-CSE-ConnectionGUID: 5UX562zQRh6eUzBdaw00DA==
-X-CSE-MsgGUID: uEmfHS3pQna116VFQD7DBQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="81887418"
+  bh=TXS6CTscafJd3lQMfTmunv6KR6knJ1F1wFy/sJU25Y8=;
+  b=X3YI5ACtCQ0Ytapa3kHWDhbVWytgdDNXebiL8mFYZuVAyt9PwQxi7CFR
+   am+mtjjwXranYarUstfW1OrOahIF3xmYUNeLnZf4Sb/RWFxFdPEQlrQ69
+   4fiqViCgDa46+fyp2/yr6aufgOatG97NxidUkQ496ARBANWdWP9gARe6y
+   HVU3l1vipXI7p5UdHrYCwlhbagXrdNgXK5uVmU5pm6U00dzWn62fL7f4m
+   8rCbD8u0JVeEWtmvTdmo6Viqm62nGl0oqhGKn+EW6ZQDCmIzBghHDrZF2
+   hLfeHqFovhwyd29gKWuJzRWHSKxhNfQrUmvW3lm+CA7jYjy86OfANCd2E
+   A==;
+X-CSE-ConnectionGUID: GoMrlIC8RL2t8kfhY5gNyg==
+X-CSE-MsgGUID: h09o1BExSJaXiMDzxVM8NQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="81887434"
 X-IronPort-AV: E=Sophos;i="6.21,252,1763452800"; 
-   d="scan'208";a="81887418"
+   d="scan'208";a="81887434"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 19:35:51 -0800
-X-CSE-ConnectionGUID: T/10WBPPSwms9qTZoautxA==
-X-CSE-MsgGUID: pC5tBX5jQ1ml8oNpW3wuOw==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 19:35:52 -0800
+X-CSE-ConnectionGUID: k99u/6GAQNWgvmrs5Y/PeQ==
+X-CSE-MsgGUID: d5166B6RSsGzE7qv4gQMbw==
 X-ExtLoop1: 1
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
-  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2026 19:35:49 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2026 19:35:51 -0800
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 To: linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org,
@@ -68,9 +68,9 @@ To: linux-kernel@vger.kernel.org,
 	giovanni.cabiddu@intel.com
 Cc: wajdi.k.feghali@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v14 08/26] crypto: iaa - Refactor hardware descriptor setup into separate procedures.
-Date: Sat, 24 Jan 2026 19:35:19 -0800
-Message-Id: <20260125033537.334628-9-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v14 09/26] crypto: iaa - Simplified, efficient job submissions for non-irq mode.
+Date: Sat, 24 Jan 2026 19:35:20 -0800
+Message-Id: <20260125033537.334628-10-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20260125033537.334628-1-kanchana.p.sridhar@intel.com>
 References: <20260125033537.334628-1-kanchana.p.sridhar@intel.com>
@@ -82,198 +82,89 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch refactors the code that sets up the "struct iax_hw_desc" for
-compress/decompress ops, into distinct procedures to make the code more
-readable.
+This patch adds a new procedure, iaa_submit_desc_movdir64b(), that
+directly calls movdir64b. The core iaa_crypto routines that submit
+compress and decompress jobs now invoke iaa_submit_desc_movdir64b() in
+non-irq driver modes, instead of idxd_submit_desc().
 
-Also, get_iaa_device_compression_mode() is deleted and the compression
-mode directly accessed from the iaa_device in the calling procedures.
+idxd_submit_desc() is called only in irq mode.
+
+This improves latency for the most commonly used iaa_crypto usage
+(i.e., async non-irq) in zswap by eliminating redundant computes
+that would otherwise be incurred in idxd_submit_desc():
+
+For a single-threaded madvise-based workload with the Silesia.tar
+dataset, these are the before/after batch compression latencies for a
+compress batch of 8 pages:
+
+     ==================================
+                   p50 (ns)    p99 (ns)
+     ==================================
+     before           5,568       6,056
+     after            5,472       5,848
+     Change             -96        -208
+     ==================================
 
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 ---
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 99 ++++++++++++----------
- 1 file changed, 56 insertions(+), 43 deletions(-)
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 30 ++++++++++++++--------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index a727496d5791..f0e9eb52eec4 100644
+index f0e9eb52eec4..4b275cc09404 100644
 --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
 +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -484,12 +484,6 @@ int add_iaa_compression_mode(const char *name,
- }
- EXPORT_SYMBOL_GPL(add_iaa_compression_mode);
- 
--static struct iaa_device_compression_mode *
--get_iaa_device_compression_mode(struct iaa_device *iaa_device, int idx)
--{
--	return iaa_device->compression_modes[idx];
--}
--
- static void free_device_compression_mode(struct iaa_device *iaa_device,
- 					 struct iaa_device_compression_mode *device_mode)
- {
-@@ -1571,7 +1565,6 @@ static int iaa_compress_verify(struct crypto_tfm *tfm, struct acomp_req *req,
- 			       dma_addr_t src_addr, unsigned int slen,
- 			       dma_addr_t dst_addr, unsigned int dlen)
- {
--	struct iaa_device_compression_mode *active_compression_mode;
- 	struct iaa_compression_ctx *ctx = crypto_tfm_ctx(tfm);
- 	u32 *compression_crc = acomp_request_ctx(req);
- 	struct iaa_device *iaa_device;
-@@ -1590,8 +1583,6 @@ static int iaa_compress_verify(struct crypto_tfm *tfm, struct acomp_req *req,
- 	pdev = idxd->pdev;
- 	dev = &pdev->dev;
- 
--	active_compression_mode = get_iaa_device_compression_mode(iaa_device, ctx->mode);
--
- 	while ((idxd_desc == ERR_PTR(-EAGAIN)) && (alloc_desc_retries++ < ctx->alloc_decomp_desc_timeout)) {
- 		idxd_desc = idxd_alloc_desc(wq, IDXD_OP_NONBLOCK);
- 		cpu_relax();
-@@ -1667,8 +1658,7 @@ static void iaa_desc_complete(struct idxd_desc *idxd_desc,
- 	pdev = idxd->pdev;
- 	dev = &pdev->dev;
- 
--	active_compression_mode = get_iaa_device_compression_mode(iaa_device,
--								  compression_ctx->mode);
-+	active_compression_mode = iaa_device->compression_modes[compression_ctx->mode];
- 	dev_dbg(dev, "%s: compression mode %s,"
- 		" ctx->src_addr %llx, ctx->dst_addr %llx\n", __func__,
- 		active_compression_mode->name,
-@@ -1748,12 +1738,63 @@ static void iaa_desc_complete(struct idxd_desc *idxd_desc,
- 	percpu_ref_put(&iaa_wq->ref);
+@@ -1790,6 +1790,24 @@ iaa_setup_decompress_hw_desc(struct idxd_desc *idxd_desc,
+ 	return desc;
  }
  
-+static struct iax_hw_desc *
-+iaa_setup_compress_hw_desc(struct idxd_desc *idxd_desc,
-+			   dma_addr_t src_addr,
-+			   unsigned int slen,
-+			   dma_addr_t dst_addr,
-+			   unsigned int dlen,
-+			   enum iaa_mode mode,
-+			   struct iaa_device_compression_mode *active_compression_mode)
++/*
++ * Call this for non-irq, non-enqcmds job submissions.
++ */
++static __always_inline void iaa_submit_desc_movdir64b(struct idxd_wq *wq,
++						     struct idxd_desc *desc)
 +{
-+	struct iax_hw_desc *desc = idxd_desc->iax_hw;
++	void __iomem *portal = idxd_wq_portal_addr(wq);
 +
-+	desc->flags = IDXD_OP_FLAG_CRAV | IDXD_OP_FLAG_RCR | IDXD_OP_FLAG_CC;
-+	desc->opcode = IAX_OPCODE_COMPRESS;
-+	desc->compr_flags = IAA_COMP_FLAGS;
-+	desc->priv = 0;
++	/*
++	 * The wmb() flushes writes to coherent DMA data before
++	 * possibly triggering a DMA read. The wmb() is necessary
++	 * even on UP because the recipient is a device.
++	 */
++	wmb();
 +
-+	desc->src1_addr = (u64)src_addr;
-+	desc->src1_size = slen;
-+	desc->dst_addr = (u64)dst_addr;
-+	desc->max_dst_size = dlen;
-+	desc->flags |= IDXD_OP_FLAG_RD_SRC2_AECS;
-+	desc->src2_addr = active_compression_mode->aecs_comp_table_dma_addr;
-+	desc->src2_size = sizeof(struct aecs_comp_table_record);
-+	desc->completion_addr = idxd_desc->compl_dma;
-+
-+	return desc;
-+}
-+
-+static struct iax_hw_desc *
-+iaa_setup_decompress_hw_desc(struct idxd_desc *idxd_desc,
-+			     dma_addr_t src_addr,
-+			     unsigned int slen,
-+			     dma_addr_t dst_addr,
-+			     unsigned int dlen)
-+{
-+	struct iax_hw_desc *desc = idxd_desc->iax_hw;
-+
-+	desc->flags = IDXD_OP_FLAG_CRAV | IDXD_OP_FLAG_RCR | IDXD_OP_FLAG_CC;
-+	desc->opcode = IAX_OPCODE_DECOMPRESS;
-+	desc->max_dst_size = PAGE_SIZE;
-+	desc->decompr_flags = IAA_DECOMP_FLAGS;
-+	desc->priv = 0;
-+
-+	desc->src1_addr = (u64)src_addr;
-+	desc->dst_addr = (u64)dst_addr;
-+	desc->max_dst_size = dlen;
-+	desc->src1_size = slen;
-+	desc->completion_addr = idxd_desc->compl_dma;
-+
-+	return desc;
++	iosubmit_cmds512(portal, desc->hw, 1);
 +}
 +
  static int iaa_compress(struct crypto_tfm *tfm, struct acomp_req *req,
  			struct idxd_wq *wq,
  			dma_addr_t src_addr, unsigned int slen,
- 			dma_addr_t dst_addr, unsigned int *dlen)
- {
--	struct iaa_device_compression_mode *active_compression_mode;
- 	struct iaa_compression_ctx *ctx = crypto_tfm_ctx(tfm);
- 	u32 *compression_crc = acomp_request_ctx(req);
- 	struct iaa_device *iaa_device;
-@@ -1772,8 +1813,6 @@ static int iaa_compress(struct crypto_tfm *tfm, struct acomp_req *req,
- 	pdev = idxd->pdev;
- 	dev = &pdev->dev;
- 
--	active_compression_mode = get_iaa_device_compression_mode(iaa_device, ctx->mode);
--
- 	while ((idxd_desc == ERR_PTR(-EAGAIN)) && (alloc_desc_retries++ < ctx->alloc_comp_desc_timeout)) {
- 		idxd_desc = idxd_alloc_desc(wq, IDXD_OP_NONBLOCK);
- 		cpu_relax();
-@@ -1784,21 +1823,9 @@ static int iaa_compress(struct crypto_tfm *tfm, struct acomp_req *req,
- 			PTR_ERR(idxd_desc));
- 		return -ENODEV;
- 	}
--	desc = idxd_desc->iax_hw;
- 
--	desc->flags = IDXD_OP_FLAG_CRAV | IDXD_OP_FLAG_RCR |
--		IDXD_OP_FLAG_RD_SRC2_AECS | IDXD_OP_FLAG_CC;
--	desc->opcode = IAX_OPCODE_COMPRESS;
--	desc->compr_flags = IAA_COMP_FLAGS;
--	desc->priv = 0;
--
--	desc->src1_addr = (u64)src_addr;
--	desc->src1_size = slen;
--	desc->dst_addr = (u64)dst_addr;
--	desc->max_dst_size = *dlen;
--	desc->src2_addr = active_compression_mode->aecs_comp_table_dma_addr;
--	desc->src2_size = sizeof(struct aecs_comp_table_record);
--	desc->completion_addr = idxd_desc->compl_dma;
-+	desc = iaa_setup_compress_hw_desc(idxd_desc, src_addr, slen, dst_addr, *dlen,
-+					  ctx->mode, iaa_device->compression_modes[ctx->mode]);
+@@ -1828,11 +1846,7 @@ static int iaa_compress(struct crypto_tfm *tfm, struct acomp_req *req,
+ 					  ctx->mode, iaa_device->compression_modes[ctx->mode]);
  
  	if (likely(!ctx->use_irq)) {
- 		ret = idxd_submit_desc(wq, idxd_desc);
-@@ -1860,7 +1887,6 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 			  dma_addr_t src_addr, unsigned int slen,
- 			  dma_addr_t dst_addr, unsigned int *dlen)
- {
--	struct iaa_device_compression_mode *active_compression_mode;
- 	struct iaa_compression_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct iaa_device *iaa_device;
- 	struct idxd_desc *idxd_desc = ERR_PTR(-EAGAIN);
-@@ -1878,8 +1904,6 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 	pdev = idxd->pdev;
- 	dev = &pdev->dev;
+-		ret = idxd_submit_desc(wq, idxd_desc);
+-		if (ret) {
+-			dev_dbg(dev, "submit_desc failed ret=%d\n", ret);
+-			goto out;
+-		}
++		iaa_submit_desc_movdir64b(wq, idxd_desc);
  
--	active_compression_mode = get_iaa_device_compression_mode(iaa_device, ctx->mode);
--
- 	while ((idxd_desc == ERR_PTR(-EAGAIN)) && (alloc_desc_retries++ < ctx->alloc_decomp_desc_timeout)) {
- 		idxd_desc = idxd_alloc_desc(wq, IDXD_OP_NONBLOCK);
- 		cpu_relax();
-@@ -1892,19 +1916,8 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 		idxd_desc = NULL;
- 		goto fallback_software_decomp;
- 	}
--	desc = idxd_desc->iax_hw;
- 
--	desc->flags = IDXD_OP_FLAG_CRAV | IDXD_OP_FLAG_RCR | IDXD_OP_FLAG_CC;
--	desc->opcode = IAX_OPCODE_DECOMPRESS;
--	desc->max_dst_size = PAGE_SIZE;
--	desc->decompr_flags = IAA_DECOMP_FLAGS;
--	desc->priv = 0;
--
--	desc->src1_addr = (u64)src_addr;
--	desc->dst_addr = (u64)dst_addr;
--	desc->max_dst_size = *dlen;
--	desc->src1_size = slen;
--	desc->completion_addr = idxd_desc->compl_dma;
-+	desc = iaa_setup_decompress_hw_desc(idxd_desc, src_addr, slen, dst_addr, *dlen);
+ 		/* Update stats */
+ 		update_total_comp_calls();
+@@ -1920,11 +1934,7 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
+ 	desc = iaa_setup_decompress_hw_desc(idxd_desc, src_addr, slen, dst_addr, *dlen);
  
  	if (likely(!ctx->use_irq)) {
- 		ret = idxd_submit_desc(wq, idxd_desc);
+-		ret = idxd_submit_desc(wq, idxd_desc);
+-		if (ret) {
+-			dev_dbg(dev, "submit_desc failed ret=%d\n", ret);
+-			goto fallback_software_decomp;
+-		}
++		iaa_submit_desc_movdir64b(wq, idxd_desc);
+ 
+ 		/* Update stats */
+ 		update_total_decomp_calls();
 -- 
 2.27.0
 
