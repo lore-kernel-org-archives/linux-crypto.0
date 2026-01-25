@@ -1,254 +1,243 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521E61397;
-	Sun, 25 Jan 2026 14:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE7D3EBF1B;
+	Sun, 25 Jan 2026 21:53:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769352257; cv=none; b=rptMkayY5Uusfx8TQ258M18uyD9tYSbQUsJMfoVJciKfUuhtOc6Blc1xeHjYtNxlDT/fg2eN4ZMyVxxS18EL9qNaqztA1V9QBvxKnqAsf+R58D7KAqkiEPUQ/ymKEoW9s5ke9k4DzwIHRxUYbfKERhvPACmptTYYY6CIP836PgM=
+	t=1769378001; cv=none; b=AIlXzk0BpNTt4B2OUAO+FbHCenFNrixiy3zp97va7PBrVFMHAS2NMIf8XY9ZjFMey57mVe4Ji693XOzqF8RWAqc3TO5nJu8KarNbVEd6RVRKUsxtUZapMvcrvRwf1/f70oN54PWGJaQFVKgHeKX4Q3dgVzhahlfN3yb0ioB2Cwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769352257; c=relaxed/simple;
-	bh=aWMBV7bkuKCbXdqOTdGTEoNbK5MxTyT9ecr5TmC2HEI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fuXXKWrl2f0dB0jhIA/3hmpFL38o/xc2HE7kqlcBKXWKFR0IMgfk8UGXc4P5veSba8uwCteGz9AgJflWQpYAlSx+/avrTd3kWMvy/9fBzc1oOtNdmzPPmxMouhb0+eEJAy94KUxZp7XT+0EUeXrR7HVNoQeQkq+Fz7Lb/ir9J8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rSaUs/uX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769378001; c=relaxed/simple;
+	bh=Bjdi2yT63o0/wlrLV6DYuZNMUy6JuG9T2JELDHnobPk=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=kkseh1pCvJE0kkn77cxPppM7ltfU2wzr2+K0IAFxPuyLoGw5Ius+v46NyVLFajzX+DEbb0D1sC5/Q+GnKX7VkflvHbyNFdwrUGa/aXKdK9KPg2dT5kVf/C0eZGOAdZuEaMibvA9eLigHCVB0zdOt2Ss6vIERU1Yln+4K7aYiNvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uu5psUQc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rSaUs/uX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B703C4CEF1;
-	Sun, 25 Jan 2026 14:44:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uu5psUQc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CCFFC4CEF1;
+	Sun, 25 Jan 2026 21:53:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769352256;
-	bh=aWMBV7bkuKCbXdqOTdGTEoNbK5MxTyT9ecr5TmC2HEI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rSaUs/uXJpSoe0X2+pZdsmxCL0pMCfBsNP7ujs1m3L9TDRdFrgdBh4nIWTkcYyrtV
-	 LSxI+BtCYyJTaJ86w9ou/oseoa71YMe8RYWiItRLiqC81Mnj5SxJApmCqcdZyhpakw
-	 g0Q8iO6a/WhfzJzbCKjNn11tbO/oRoAJZE4dDdv2Z3HlV1zdI6DfLl1kP3uIYMEf1L
-	 fzkOiI380pYBBLLSjLWhEmjSfGc56TA6KSNTRbjEo2ijsuDf7uyZjqpyR/uD/wjXEL
-	 Vn5rFnF1FsmuFuStf5vtfVNuRxnC5chYLr6IKyfrKJRe2vh3rCLCEK4mh3n8ry1TbP
-	 vuo+E/CC59iog==
-Date: Sun, 25 Jan 2026 16:44:12 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@cloudflare.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v14 5/5] modsign: Enable ML-DSA module signing
-Message-ID: <aXYsPF4zhF0TNm7L@kernel.org>
-References: <20260121223609.1650735-1-dhowells@redhat.com>
- <20260121223609.1650735-6-dhowells@redhat.com>
+	s=k20201202; t=1769378001;
+	bh=Bjdi2yT63o0/wlrLV6DYuZNMUy6JuG9T2JELDHnobPk=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=uu5psUQcTWbGDH48Ka+dKSbzcqypki2wWhUrN4Stzq+6XD9zf0GtwlbTj4a8O/acT
+	 vBJjq//Tu7tXdxaGsfV+8/bs63Z70wec8a+pEPxOTdUUoQsLtH2JJjd01f91z4nly5
+	 EFF/bYZpRzYR43gN6dh8DiC1qLuoVzokrpFDVRV5FoDlGQSEadUpqYNl1utweQ1o0J
+	 mJL50Dki/7OuCcs90JeTXTyfm6CZOqe3eiHkeahC2x+pxp8k+NqQgCRxurKZa4Z4oH
+	 6zWD1PG7B1UMMS92JJizmV9CGCczYKWzj+KjXA8VgbmzqBkTcAFyjoM6n9pG3oVdAe
+	 9sNnWh9gWaciQ==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id EF8B5F40068;
+	Sun, 25 Jan 2026 16:53:19 -0500 (EST)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Sun, 25 Jan 2026 16:53:19 -0500
+X-ME-Sender: <xms:z5B2afLYRytISK9fvtfIDL_KW303uExqjj6XagGnyk2dO-Sw_18deQ>
+    <xme:z5B2ad-eJ7Hx_mWLBQpImxzhImDiFseYMWVraSle7-cosEI8uCvjiBTyIe8cnmgiv
+    SXiBDZaAIE_mpc4RgIKpCE-ju2s15NbIcj2pDkv2DD-dEPAkEIvQm4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduheehledvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
+    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
+    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
+    hilhdrtghomhdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopehnvghilhessghrohifnhdrnhgrmhgvpdhrtghpthhtoheprhhitghkrdhmrg
+    gtkhhlvghmsehgmhgrihhlrdgtohhmpdhrtghpthhtohepsggtohguughinhhgsehhrghm
+    mhgvrhhsphgrtggvrdgtohhmpdhrtghpthhtoheprghnnhgrsehkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopegvsghighhgvghrsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    jhhlrgihthhonheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhrohhnughmhieskh
+    gvrhhnvghlrdhorhhgpdhrtghpthhtoheptghhuhgtkhdrlhgvvhgvrhesohhrrggtlhgv
+    rdgtohhmpdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrkhgvrhhnvg
+    hlrdhorhhg
+X-ME-Proxy: <xmx:z5B2aYF7C1kfja5PQjwGeenrgNg8HwytIcsCA6nh10UtgeHBYjhPaA>
+    <xmx:z5B2aVu1FrzfopJ1MzFVX38kGbG08q_0Z2E77TMiGn61zzspFsYL1g>
+    <xmx:z5B2aQA3LclAwpXAU-jVWnig-4hv-W5D_JmpNl5ceg_Atadei7eyzA>
+    <xmx:z5B2aYABNULs1eYmDqIRuIjG3X7-e6AKSnt-WLpMb_FLQ2LfO-oHBg>
+    <xmx:z5B2aSp16VxjhCZr-jzpJn2D1jo3OwwUwqtalBiAkoI2af4PHdWfSuUp>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id C96CB780076; Sun, 25 Jan 2026 16:53:19 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260121223609.1650735-6-dhowells@redhat.com>
+X-ThreadId: AyedVEnZDM_s
+Date: Sun, 25 Jan 2026 16:51:03 -0500
+From: "Chuck Lever" <cel@kernel.org>
+To: NeilBrown <neil@brown.name>, "Chuck Lever" <chuck.lever@oracle.com>,
+ "Jeff Layton" <jlayton@kernel.org>, "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>,
+ "Benjamin Coddington" <bcodding@hammerspace.com>,
+ "Eric Biggers" <ebiggers@kernel.org>, "Rick Macklem" <rick.macklem@gmail.com>
+Cc: linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+Message-Id: <7d973130-d4a4-4f84-a7c0-a896e17339e1@app.fastmail.com>
+In-Reply-To: <176920977124.16766.1785815212991547773@noble.neil.brown.name>
+References: <176920977124.16766.1785815212991547773@noble.neil.brown.name>
+Subject: Re: [PATCH/RFC] nfsd: rate limit requests that result in -ESTALE from the
+ filesystem
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 21, 2026 at 10:36:07PM +0000, David Howells wrote:
-> Allow ML-DSA module signing to be enabled.
+
+On Fri, Jan 23, 2026, at 6:09 PM, NeilBrown wrote:
+
+> From: NeilBrown <neil@brown.name>
+> Subject: [PATCH] nfsd: rate limit requests that result in -ESTALE from the
+>  filesystem
+>
+> NFS file handles typically contain a 32 bit generation number which is
+> randomly generated by the filesystem when the inode (or inode number) is
+> allocated.  This makes it hard to guess correct file handles.  Hard but
+> not impossible on a low latency network with a high speed server.
+
+Is this claim accurate for commonly-exported filesystems? Looking
+at the kernel sources:
+
+  - btrfs sets i_generation = trans->transid (a sequential counter
+    starting from 1, incremented per transaction)
+  - ext2 uses sbi->s_next_generation++ (sequential counter seeded
+    randomly at mount)
+  - ocfs2 uses osb->s_next_generation++ (sequential counter)
+
+For btrfs in particular, the generation number contains zero bits of
+randomness. An attacker who can estimate the filesystem age or
+transaction count can predict valid generation numbers with high
+probability. Does the "1 year" security estimate hold for btrfs
+exports, or is that filesystem effectively unprotected by this
+mitigation?
+
+
+> Filehandles already contain 32 bits of randomness.
+
+This appears true for ext4, f2fs, XFS v3+, and tmpfs (which use
+get_random_u32()), but not for btrfs, ext2, or ocfs2 as noted above.
+
+Additionally, NFS re-exports (fs/nfs/export.c) use no generation number
+at all. The nfs_encode_fh() function embeds the backing server's
+filehandle verbatim rather than generating a local generation number.
+Protection depends entirely on what the backing NFS server uses. If
+someone re-exports a btrfs-backed NFS mount, the sequential transaction
+IDs on the backing server provide minimal protection.
+
+We can't legitimately extend your cryptanalysis to non-Linux servers
+that back re-exported NFS mounts.
+
+
+> The only known attack methodology is to guess the inode number of a file
+> of interest, then iterate over all possible generation numbers.
+
+Is generation number brute-forcing the optimal attack? Inode numbers
+are typically sequential and the valid range is much smaller than 2^32.
+Could an attacker first enumerate valid inode numbers (which also
+triggers ESTALE and the rate limit), then brute-force the generation
+for interesting inodes? The rate limit slows both phases equally, but
+inode enumeration requires far fewer guesses.
+
+
+> diff --git a/fs/nfsd/netns.h b/fs/nfsd/netns.h
+> index 9fa600602658..f7229d1f9d86 100644
+> --- a/fs/nfsd/netns.h
+> +++ b/fs/nfsd/netns.h
+> @@ -219,6 +219,8 @@ struct nfsd_net {
+>  	/* last time an admin-revoke happened for NFSv4.0 */
+>  	time64_t		nfs40_last_revoke;
 > 
-> Note that OpenSSL's CMS_*() function suite does not, as of OpenSSL-3.6,
-> support the use of CMS_NOATTR with ML-DSA, so the prohibition against using
-> signedAttrs with module signing has to be removed.  The selected digest
-> then applies only to the algorithm used to calculate the digest stored in
-> the messageDigest attribute.  The OpenSSL development branch has patches
-> applied that fix this[1], but it appears that that will only be available
-> in OpenSSL-4.
-> 
-> [1] https://github.com/openssl/openssl/pull/28923
-> 
-> sign-file won't set CMS_NOATTR if openssl is earlier than v4, resulting in
-> the use of signed attributes.
-> 
-> The ML-DSA algorithm takes the raw data to be signed without regard to what
-> digest algorithm is specified in the CMS message.  The CMS specified digest
-> algorithm is ignored unless signedAttrs are used; in such a case, only
-> SHA512 is permitted.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Eric Biggers <ebiggers@kernel.org>
-> cc: Lukas Wunner <lukas@wunner.de>
-> cc: Ignat Korchagin <ignat@cloudflare.com>
-> cc: Stephan Mueller <smueller@chronox.de>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: keyrings@vger.kernel.org
-> cc: linux-crypto@vger.kernel.org
-> ---
->  Documentation/admin-guide/module-signing.rst | 16 +++++----
->  certs/Kconfig                                | 30 +++++++++++++++++
->  certs/Makefile                               |  3 ++
->  crypto/asymmetric_keys/pkcs7_verify.c        |  4 ---
->  scripts/sign-file.c                          | 34 +++++++++++++++-----
->  5 files changed, 68 insertions(+), 19 deletions(-)
-> 
-> diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
-> index a8667a777490..7f2f127dc76f 100644
-> --- a/Documentation/admin-guide/module-signing.rst
-> +++ b/Documentation/admin-guide/module-signing.rst
-> @@ -28,10 +28,12 @@ trusted userspace bits.
->  
->  This facility uses X.509 ITU-T standard certificates to encode the public keys
->  involved.  The signatures are not themselves encoded in any industrial standard
-> -type.  The built-in facility currently only supports the RSA & NIST P-384 ECDSA
-> -public key signing standard (though it is pluggable and permits others to be
-> -used).  The possible hash algorithms that can be used are SHA-2 and SHA-3 of
-> -sizes 256, 384, and 512 (the algorithm is selected by data in the signature).
-> +type.  The built-in facility currently only supports the RSA, NIST P-384 ECDSA
-> +and NIST FIPS-204 ML-DSA public key signing standards (though it is pluggable
-> +and permits others to be used).  For RSA and ECDSA, the possible hash
-> +algorithms that can be used are SHA-2 and SHA-3 of sizes 256, 384, and 512 (the
-> +algorithm is selected by data in the signature); ML-DSA does its own hashing,
-> +but is allowed to be used with a SHA512 hash for signed attributes.
->  
->  
->  ==========================
-> @@ -146,9 +148,9 @@ into vmlinux) using parameters in the::
->  
->  file (which is also generated if it does not already exist).
->  
-> -One can select between RSA (``MODULE_SIG_KEY_TYPE_RSA``) and ECDSA
-> -(``MODULE_SIG_KEY_TYPE_ECDSA``) to generate either RSA 4k or NIST
-> -P-384 keypair.
-> +One can select between RSA (``MODULE_SIG_KEY_TYPE_RSA``), ECDSA
-> +(``MODULE_SIG_KEY_TYPE_ECDSA``) and ML-DSA (``MODULE_SIG_KEY_TYPE_MLDSA_*``) to
-> +generate an RSA 4k, a NIST P-384 keypair or an ML-DSA 44, 65 or 87 keypair.
->  
->  It is strongly recommended that you provide your own x509.genkey file.
->  
-> diff --git a/certs/Kconfig b/certs/Kconfig
-> index 78307dc25559..2b088ef58373 100644
-> --- a/certs/Kconfig
-> +++ b/certs/Kconfig
-> @@ -39,6 +39,36 @@ config MODULE_SIG_KEY_TYPE_ECDSA
->  	 Note: Remove all ECDSA signing keys, e.g. certs/signing_key.pem,
->  	 when falling back to building Linux 5.14 and older kernels.
->  
-> +config MODULE_SIG_KEY_TYPE_MLDSA_44
-> +	bool "ML-DSA-44"
-> +	select CRYPTO_MLDSA
-> +	help
-> +	  Use an ML-DSA-44 key (NIST FIPS 204) for module signing.  ML-DSA
-> +	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
-> +	  the latter, the entire module body will be signed; with the former,
-> +	  signedAttrs will be used as it lacks support for CMS_NOATTR with
-> +	  ML-DSA.
+> +	struct mutex		estale_rate_limit_mutex;
 > +
-> +config MODULE_SIG_KEY_TYPE_MLDSA_65
-> +	bool "ML-DSA-65"
-> +	select CRYPTO_MLDSA
-> +	help
-> +	  Use an ML-DSA-65 key (NIST FIPS 204) for module signing.  ML-DSA
-> +	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
-> +	  the latter, the entire module body will be signed; with the former,
-> +	  signedAttrs will be used as it lacks support for CMS_NOATTR with
-> +	  ML-DSA.
+>  #if IS_ENABLED(CONFIG_NFS_LOCALIO)
+>  	/* Local clients to be invalidated when net is shut down */
+>  	spinlock_t              local_clients_lock;
+> diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
+> index 7587c64bf26d..55d25d9b414f 100644
+> --- a/fs/nfsd/nfsctl.c
+> +++ b/fs/nfsd/nfsctl.c
+> @@ -2198,6 +2198,7 @@ static __net_init int nfsd_net_init(struct net 
+> *net)
+>  	nfsd4_init_leases_net(nn);
+>  	get_random_bytes(&nn->siphash_key, sizeof(nn->siphash_key));
+>  	seqlock_init(&nn->writeverf_lock);
+> +	mutex_init(&nn->estale_rate_limit_mutex);
+>  #if IS_ENABLED(CONFIG_NFS_LOCALIO)
+>  	spin_lock_init(&nn->local_clients_lock);
+>  	INIT_LIST_HEAD(&nn->local_clients);
+> diff --git a/fs/nfsd/nfsfh.c b/fs/nfsd/nfsfh.c
+> index ed85dd43da18..7032f65fe21a 100644
+> --- a/fs/nfsd/nfsfh.c
+> +++ b/fs/nfsd/nfsfh.c
+> @@ -244,6 +244,8 @@ static __be32 nfsd_set_fh_dentry(struct svc_rqst 
+> *rqstp, struct net *net,
+>  						data_left, fileid_type, 0,
+>  						nfsd_acceptable, exp);
+>  		if (IS_ERR_OR_NULL(dentry)) {
+> +			struct nfsd_net *nn = net_generic(net, nfsd_net_id);
 > +
-> +config MODULE_SIG_KEY_TYPE_MLDSA_87
-> +	bool "ML-DSA-87"
-> +	select CRYPTO_MLDSA
-> +	help
-> +	  Use an ML-DSA-87 key (NIST FIPS 204) for module signing.  ML-DSA
-> +	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
-> +	  the latter, the entire module body will be signed; with the former,
-> +	  signedAttrs will be used as it lacks support for CMS_NOATTR with
-> +	  ML-DSA.
-> +
->  endchoice
->  
->  config SYSTEM_TRUSTED_KEYRING
-> diff --git a/certs/Makefile b/certs/Makefile
-> index f6fa4d8d75e0..3ee1960f9f4a 100644
-> --- a/certs/Makefile
-> +++ b/certs/Makefile
-> @@ -43,6 +43,9 @@ targets += x509_certificate_list
->  ifeq ($(CONFIG_MODULE_SIG_KEY),certs/signing_key.pem)
->  
->  keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ECDSA) := -newkey ec -pkeyopt ec_paramgen_curve:secp384r1
-> +keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_44) := -newkey ml-dsa-44
-> +keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_65) := -newkey ml-dsa-65
-> +keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_87) := -newkey ml-dsa-87
->  
->  quiet_cmd_gen_key = GENKEY  $@
->        cmd_gen_key = openssl req -new -nodes -utf8 -$(CONFIG_MODULE_SIG_HASH) -days 36500 \
-> diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-> index a5b2ed4d53fd..75d1d694dc7b 100644
-> --- a/crypto/asymmetric_keys/pkcs7_verify.c
-> +++ b/crypto/asymmetric_keys/pkcs7_verify.c
-> @@ -431,10 +431,6 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
->  			pr_warn("Invalid module sig (not pkcs7-data)\n");
->  			return -EKEYREJECTED;
+>  			trace_nfsd_set_fh_dentry_badhandle(rqstp, fhp,
+>  					dentry ?  PTR_ERR(dentry) : -ESTALE);
+>  			switch (PTR_ERR(dentry)) {
+> @@ -252,6 +254,19 @@ static __be32 nfsd_set_fh_dentry(struct svc_rqst 
+> *rqstp, struct net *net,
+>  				break;
+>  			default:
+>  				dentry = ERR_PTR(-ESTALE);
+> +				/* We limit ESTALE returns to 1 every
+> +				 * 15 milliseconds (across all threads) to
+> +				 * prevent a client from guessing the
+> +				 * correct (32 bit) generation number
+> +				 * for an given inode in significantly
+> +				 * less than 1 year.  This ensures clients
+> +				 * can only access files for which they
+> +				 * are allowed to access a path from the
+> +				 * exported root.
+> +				 */
+> +				mutex_lock(&nn->estale_rate_limit_mutex);
+> +				msleep(15);
+> +				mutex_unlock(&nn->estale_rate_limit_mutex);
+
+The global mutex serializes all ESTALE errors across all nfsd threads
+in the network namespace. The impact on legitimate workloads must be
+carefully considered.
+
+For example, during file deletion or migration, multiple clients may
+encounter genuinely stale file handles simultaneously. With N
+concurrent ESTALE errors, the total delay becomes N * 15ms as each
+thread waits for the mutex. With 100 concurrent stale handle accesses,
+this adds 1.5 seconds of accumulated latency.
+
+Additionally, an attacker does not need to successfully guess file
+handles to cause harm. Simply sending requests with invalid file
+handles at a modest rate (e.g., 10/sec) can monopolize 15% of the
+mutex time, slowing all legitimate ESTALE processing on the server.
+
+Would per-client rate limiting (e.g., a token bucket per client IP)
+avoid penalizing legitimate operations while still throttling attacks?
+
+Or, as Jeff suggested, narrowing the blast radius to per-inode
+limiting?
+
+Lastly, we've spilled a large number of electrons trying to remove
+needless delays of nfsd threads (eg, waiting synchronously for NFS
+clients to respond to NFSv4 callbacks) because a malicious client
+can use this delay as a timing attack to determine the (maximum)
+number of available nfsd threads and simply keep them all busy,
+preventing the server from doing useful work.
+
+
+>  			}
 >  		}
-> -		if (pkcs7->have_authattrs) {
-> -			pr_warn("Invalid module sig (has authattrs)\n");
-> -			return -EKEYREJECTED;
-> -		}
->  		break;
->  	case VERIFYING_FIRMWARE_SIGNATURE:
->  		if (pkcs7->data_type != OID_data) {
-> diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-> index 7070245edfc1..547b97097230 100644
-> --- a/scripts/sign-file.c
-> +++ b/scripts/sign-file.c
-> @@ -315,18 +315,36 @@ int main(int argc, char **argv)
->  		ERR(!digest_algo, "EVP_get_digestbyname");
->  
->  #ifndef USE_PKCS7
-> +
-> +		unsigned int flags =
-> +			CMS_NOCERTS |
-> +			CMS_PARTIAL |
-> +			CMS_BINARY |
-> +			CMS_DETACHED |
-> +			CMS_STREAM  |
-> +			CMS_NOSMIMECAP |
-> +			CMS_NO_SIGNING_TIME |
-> +			use_keyid;
-> +
-> +		if ((EVP_PKEY_is_a(private_key, "ML-DSA-44") ||
-> +		     EVP_PKEY_is_a(private_key, "ML-DSA-65") ||
-> +		     EVP_PKEY_is_a(private_key, "ML-DSA-87")) &&
-> +		    OPENSSL_VERSION_MAJOR < 4) {
-> +			 /* ML-DSA + CMS_NOATTR is not supported in openssl-3.5
-> +			  * and before.
-> +			  */
-> +			use_signed_attrs = 0;
-> +		}
-> +
-> +		flags |= use_signed_attrs;
-> +
->  		/* Load the signature message from the digest buffer. */
-> -		cms = CMS_sign(NULL, NULL, NULL, NULL,
-> -			       CMS_NOCERTS | CMS_PARTIAL | CMS_BINARY |
-> -			       CMS_DETACHED | CMS_STREAM);
-> +		cms = CMS_sign(NULL, NULL, NULL, NULL, flags);
->  		ERR(!cms, "CMS_sign");
->  
-> -		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo,
-> -				     CMS_NOCERTS | CMS_BINARY |
-> -				     CMS_NOSMIMECAP | use_keyid |
-> -				     use_signed_attrs),
-> +		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo, flags),
->  		    "CMS_add1_signer");
-> -		ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) != 1,
-> +		ERR(CMS_final(cms, bm, NULL, flags) != 1,
->  		    "CMS_final");
->  
->  #else
-> 
+>  	}
 
-LGTM
+I think given the gaps in covering exports of first-tier file
+systems such as btrfs, the unknowns in protecting re-exported
+NFS mounts, and the increase in the surface of timing attacks,
+this approach needs significant refinement before I would feel
+comfortable with it.
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-
-BR, Jarkko
+-- 
+Chuck Lever
