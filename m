@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6321D2264CF;
-	Sun, 25 Jan 2026 03:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842A221FF2E;
+	Sun, 25 Jan 2026 03:36:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769312167; cv=none; b=OpqVT2Z2cRdIeD5sFq5FRPQ8399m6PJn/WdD3aOXs2r/67sXxPySPNAWivLLsves1zmoIiJDXsA8Wa+ywwRD/f0XEDwzhBojl/+L3kCPEKs3NtQTgldx5AHDr/mwAfQVwxhbZxzNzf+KE6UgQtW9/WyrwlfQmcvhtUvz62xWSbY=
+	t=1769312171; cv=none; b=Vc8hoU8a3vwTQqminyX9qzusIX5jtBXpjRl63HbLrFWIgTLHd1s9g+zvJfNdn90MKJpZTgGr7m2SHeMeNqg7YLvxFdGDma6+fY+snN8+W3X8Juw/NpSJMMhJ7CZfIITG3HvcgHFpCu3m6jOHRnWdTTD585ECzPuQO7BzMD0J9+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769312167; c=relaxed/simple;
-	bh=HC8fdqJFaBib45Q8EUreD6PT2wkYvwrws+aVSwrcud0=;
+	s=arc-20240116; t=1769312171; c=relaxed/simple;
+	bh=eQejQGKhQgKGnWoiX4nMcvTJdUUdiRQoPHylKVBWLaw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G/nFWizIT2ATIjlxjttN6qEgI6Ft40wpjHOiqe061JFa1F8sfqa2sRyCUHgZ/0uNjrec4uE9Jo7leGvLp87ek1L+ooRB2yxWZcO7/y8vy90+GlEXXUQjymWtKTE7fCfn0+5rUoLgaBMo3lcAjgjIXk0s5KnM+dr2lwCfWSeE7Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=btnvQQY7; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=rPkX+ofhIeGYM6BsDiMmBxl96f1qLv+mr5ddJF4tk/2ch/jD0M7aun/ue4n/z5w8pT75Nqfvo0obkiTKMGMk0qdsYr4MO3z2qC+R/AvYBm09HClbLBf84pGlsfWT0Y4R6IoFRaBnCr7odc7YbpYNgOXj6sPAdBxcOIYtWVnBYZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NF1lULkO; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="btnvQQY7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NF1lULkO"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769312161; x=1800848161;
+  t=1769312166; x=1800848166;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HC8fdqJFaBib45Q8EUreD6PT2wkYvwrws+aVSwrcud0=;
-  b=btnvQQY7TcjpOjlMPikvLe7U3ZEHTh7rkkBQcGk4fQFhLtDc0DgUYJk4
-   0GgxpwqctyYARla/dB0GuF++JpcmbXozYkLqG2npbni6PRgl2J1ry5wVs
-   RBbBnJt9SGajCyhNzwq00TqdabthGJQOk+mfBZqXmAFSwG8to1Ck8THy1
-   LcnzdIdveMGUwpkW9s3jjBEqUSb6jIb6/xpLtg8anb+3ku5jioQDE7ZTZ
-   AzbGn0OGqBpLRiCt5o6JL+T54dHLYCS1Fli4PTEcuvrsTrdePt+lryiYT
-   Hqg9d3GqFN4X5kZPiM53GGMFyrdNbu+8l2KiLuFCxysSoMD40gkB5DiV9
+  bh=eQejQGKhQgKGnWoiX4nMcvTJdUUdiRQoPHylKVBWLaw=;
+  b=NF1lULkOIXNoKOCoHu/DOHbI6AdIChh3mQNmCl/tmnkHrza1mW/Rt5il
+   fOeKBxEf8q1y/FPP3bxh2ni1rWDZVbmzqCWnNjzL3eLIA695nWczgeA1i
+   sKkHzjHI1ntqygX+ABvMXBsAS8+0hpVwdDDTxUUk7h8KhiBUFNlJ56P8N
+   5H0YJHBAJ1GJ6Ax/PFTOhZ5yUAUwVysUi54pkDWg1coInGAb3anXAMDvn
+   0Qia4zbT9LX4o5Qz2RMZzUj7zHM5aSzaBXJ1F4uGs8sHhWkVicoGFgPv4
+   XEBbCrczHfTK6pTPD2D5M4Djfc/oJcROU7gDlIyFsKYzbmYsnXeoknI9i
    w==;
-X-CSE-ConnectionGUID: ZSB52kABTaKJPNowKPU28A==
-X-CSE-MsgGUID: 1+O44jdkT6afXmq+oPnEcA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="81887525"
+X-CSE-ConnectionGUID: R+zgAsHKQ/Su7IMDLs+OCg==
+X-CSE-MsgGUID: imcdefKqT6imD/3V92LGvw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="81887557"
 X-IronPort-AV: E=Sophos;i="6.21,252,1763452800"; 
-   d="scan'208";a="81887525"
+   d="scan'208";a="81887557"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 19:36:01 -0800
-X-CSE-ConnectionGUID: qnIXTLqWTZ23va22SQ/BYA==
-X-CSE-MsgGUID: zalW4RTiQNa1H401+BbH6w==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 19:36:03 -0800
+X-CSE-ConnectionGUID: Z85Pl1NcTsK2IN+kQ6nDfg==
+X-CSE-MsgGUID: eHRhIEfTSDKJ2a+6EaNrNg==
 X-ExtLoop1: 1
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
-  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2026 19:35:59 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2026 19:36:02 -0800
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 To: linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org,
@@ -68,9 +68,9 @@ To: linux-kernel@vger.kernel.org,
 	giovanni.cabiddu@intel.com
 Cc: wajdi.k.feghali@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v14 15/26] crypto: acomp - Add trivial segmentation wrapper
-Date: Sat, 24 Jan 2026 19:35:26 -0800
-Message-Id: <20260125033537.334628-16-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v14 17/26] crypto: iaa - Submit the two largest source buffers first in batch decompress.
+Date: Sat, 24 Jan 2026 19:35:28 -0800
+Message-Id: <20260125033537.334628-18-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20260125033537.334628-1-kanchana.p.sridhar@intel.com>
 References: <20260125033537.334628-1-kanchana.p.sridhar@intel.com>
@@ -82,134 +82,107 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch provides a wrapper for existing algorithms so that they can
-accept a single segment while returning the compressed length or error
-through the dst SG list length.
+This patch finds the two largest source buffers in a given decompression
+batch, and submits them first to the IAA decompress engines.
 
-This trivial segmentation wrapper only supports compression with a
-segment count of exactly one.
-
-The reason is that the first user zswap will only allocate the
-extra memory if the underlying algorithm supports segmentation,
-and otherwise only one segment will be given at a time.
-
-Having this wrapper means that the same calling convention can
-be used for all algorithms, regardless of segmentation support.
+This improves decompress batching latency because the hardware has a
+head start on decompressing the highest latency source buffers in the
+batch. Workload performance is also significantly improved as a result
+of this optimization.
 
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/acompress.c         | 33 ++++++++++++++++++++++++++-------
- include/crypto/acompress.h |  1 +
- 2 files changed, 27 insertions(+), 7 deletions(-)
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 49 ++++++++++++++++++++--
+ 1 file changed, 45 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/acompress.c b/crypto/acompress.c
-index be28cbfd22e3..cfb8ede02cf4 100644
---- a/crypto/acompress.c
-+++ b/crypto/acompress.c
-@@ -170,8 +170,13 @@ static void acomp_save_req(struct acomp_req *req, crypto_completion_t cplt)
- 
- 	state->compl = req->base.complete;
- 	state->data = req->base.data;
-+	state->unit_size = req->unit_size;
-+	state->flags = req->base.flags & (CRYPTO_ACOMP_REQ_SRC_VIRT |
-+					  CRYPTO_ACOMP_REQ_DST_VIRT);
-+
- 	req->base.complete = cplt;
- 	req->base.data = state;
-+	req->unit_size = 0;
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+index a447555f4eb9..8d83a1ea15d7 100644
+--- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
++++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+@@ -2315,12 +2315,46 @@ static __always_inline int iaa_comp_submit_acompress_batch(
+ 	return ret;
  }
  
- static void acomp_restore_req(struct acomp_req *req)
-@@ -180,6 +185,7 @@ static void acomp_restore_req(struct acomp_req *req)
- 
- 	req->base.complete = state->compl;
- 	req->base.data = state->data;
-+	req->unit_size = state->unit_size;
- }
- 
- static void acomp_reqchain_virt(struct acomp_req *req)
-@@ -198,9 +204,6 @@ static void acomp_virt_to_sg(struct acomp_req *req)
- {
- 	struct acomp_req_chain *state = &req->chain;
- 
--	state->flags = req->base.flags & (CRYPTO_ACOMP_REQ_SRC_VIRT |
--					  CRYPTO_ACOMP_REQ_DST_VIRT);
--
- 	if (acomp_request_src_isvirt(req)) {
- 		unsigned int slen = req->slen;
- 		const u8 *svirt = req->svirt;
-@@ -248,6 +251,10 @@ static int acomp_reqchain_finish(struct acomp_req *req, int err)
- {
- 	acomp_reqchain_virt(req);
- 	acomp_restore_req(req);
++/*
++ * Find the two largest source buffers in @reqs for a decompress batch,
++ * based on @reqs[i]->slen. Save their indices as the first two elements in
++ * @submit_order, and the rest of the indices from the batch order.
++ */
++static void get_decompress_batch_submit_order(
++	struct iaa_req *reqs[],
++	int nr_pages,
++	int submit_order[])
++{
++	int i, j = 0, max_i = 0, next_max_i = 0;
 +
-+	if (req->unit_size)
-+		req->dst->length = unlikely(err) ? err : req->dlen;
-+
- 	return err;
- }
- 
-@@ -268,14 +275,17 @@ static void acomp_reqchain_done(void *data, int err)
- 	compl(data, err);
- }
- 
--static int acomp_do_req_chain(struct acomp_req *req, bool comp)
-+static __always_inline int acomp_do_req_chain(struct acomp_req *req, bool comp)
- {
- 	int err;
- 
-+	if (unlikely(req->unit_size && req->slen > req->unit_size))
-+		return -ENOSYS;
-+
- 	acomp_save_req(req, acomp_reqchain_done);
- 
- 	err = acomp_do_one_req(req, comp);
--	if (err == -EBUSY || err == -EINPROGRESS)
-+	if (unlikely(err == -EBUSY || err == -EINPROGRESS))
- 		return err;
- 
- 	return acomp_reqchain_finish(req, err);
-@@ -287,8 +297,17 @@ int crypto_acomp_compress(struct acomp_req *req)
- 
- 	if (acomp_req_on_stack(req) && acomp_is_async(tfm))
- 		return -EAGAIN;
-+
-+	if (req->unit_size && acomp_request_issg(req)) {
-+		if (!crypto_acomp_req_seg(tfm))
-+			return acomp_do_req_chain(req, true);
-+
-+		return tfm->compress(req);
++	for (i = 0; i < nr_pages; ++i) {
++		if (reqs[i]->slen >= reqs[max_i]->slen) {
++			next_max_i = max_i;
++			max_i = i;
++		} else if ((next_max_i == max_i) ||
++			   (reqs[i]->slen > reqs[next_max_i]->slen)) {
++			next_max_i = i;
++		}
 +	}
 +
- 	if (crypto_acomp_req_virt(tfm) || acomp_request_issg(req))
--		return crypto_acomp_reqtfm(req)->compress(req);
-+		return tfm->compress(req);
++	submit_order[j++] = max_i;
 +
- 	return acomp_do_req_chain(req, true);
- }
- EXPORT_SYMBOL_GPL(crypto_acomp_compress);
-@@ -300,7 +319,7 @@ int crypto_acomp_decompress(struct acomp_req *req)
- 	if (acomp_req_on_stack(req) && acomp_is_async(tfm))
- 		return -EAGAIN;
- 	if (crypto_acomp_req_virt(tfm) || acomp_request_issg(req))
--		return crypto_acomp_reqtfm(req)->decompress(req);
-+		return tfm->decompress(req);
- 	return acomp_do_req_chain(req, false);
- }
- EXPORT_SYMBOL_GPL(crypto_acomp_decompress);
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-index 23a1a659843c..86e4932cd112 100644
---- a/include/crypto/acompress.h
-+++ b/include/crypto/acompress.h
-@@ -67,6 +67,7 @@ struct acomp_req_chain {
- 		struct folio *dfolio;
- 	};
- 	u32 flags;
-+	u32 unit_size;
- };
++	if (next_max_i != max_i)
++		submit_order[j++] = next_max_i;
++
++	for (i = 0; i < nr_pages; ++i) {
++		if ((i != max_i) && (i != next_max_i))
++			submit_order[j++] = i;
++	}
++}
++
+ static __always_inline int iaa_comp_submit_adecompress_batch(
+ 	struct iaa_compression_ctx *ctx,
+ 	struct iaa_req *parent_req,
+ 	struct iaa_req **reqs,
+ 	int nr_reqs)
+ {
++	int submit_order[IAA_CRYPTO_MAX_BATCH_SIZE];
+ 	struct scatterlist *sg;
+ 	int i, err, ret = 0;
  
- /**
+@@ -2334,12 +2368,19 @@ static __always_inline int iaa_comp_submit_adecompress_batch(
+ 		reqs[i]->dlen = PAGE_SIZE;
+ 	}
+ 
++	/*
++	 * Construct the submit order by finding the indices of the two largest
++	 * compressed data buffers in the batch, so that they are submitted
++	 * first. This improves latency of the batch.
++	 */
++	get_decompress_batch_submit_order(reqs, nr_reqs, submit_order);
++
+ 	/*
+ 	 * Prepare and submit the batch of iaa_reqs to IAA. IAA will process
+ 	 * these decompress jobs in parallel.
+ 	 */
+ 	for (i = 0; i < nr_reqs; ++i) {
+-		err = iaa_comp_adecompress(ctx, reqs[i]);
++		err = iaa_comp_adecompress(ctx, reqs[submit_order[i]]);
+ 
+ 		/*
+ 		 * In case of idxd desc allocation/submission errors, the
+@@ -2347,12 +2388,12 @@ static __always_inline int iaa_comp_submit_adecompress_batch(
+ 		 * @err to 0 or an error value.
+ 		 */
+ 		if (likely(err == -EINPROGRESS)) {
+-			reqs[i]->dst->length = -EAGAIN;
++			reqs[submit_order[i]]->dst->length = -EAGAIN;
+ 		} else if (unlikely(err)) {
+-			reqs[i]->dst->length = err;
++			reqs[submit_order[i]]->dst->length = err;
+ 			ret = -EINVAL;
+ 		} else {
+-			reqs[i]->dst->length = reqs[i]->dlen;
++			reqs[submit_order[i]]->dst->length = reqs[submit_order[i]]->dlen;
+ 		}
+ 	}
+ 
 -- 
 2.27.0
 
