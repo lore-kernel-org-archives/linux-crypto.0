@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0882356BE;
-	Sun, 25 Jan 2026 03:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9467B225397;
+	Sun, 25 Jan 2026 03:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769312157; cv=none; b=KZyh6BFEMBcJtA/aNPvmhjEDMdZNXF9AxS9w8ua5uAweDwS6OtVxeiJB5xebnQXq5kXguKGoynUxCf20tpIbDxg6SmOlVEOh29KriYo/iX9VZzeUoHU2Lh20m2SKb/LQeK7xB2Q28Q0MObgiRY2LXfa0XguEcSQ5FNltvtf1lGY=
+	t=1769312160; cv=none; b=aT2BwSXovNmNpKnykKNySeUolUTbzjQwDooJpULrn72VPyOQ9QPW6OAIy0NJOYnvBu2ETIDMaOQYQ3t9THvZ7ZPjCrocSoOqXj7FgWnQ1c5Znhb2pw2dxi3h4YVcWBzFbbFNBu+1t0Huy+wEbNFat0JvYc8tuVY1PMA/0Tb8Opc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769312157; c=relaxed/simple;
-	bh=GQ14vRAHcbbj8om56GF25rYzFUWGSeE2wTidcEC1vZU=;
+	s=arc-20240116; t=1769312160; c=relaxed/simple;
+	bh=70sBRuY0D3jWosg337M/chzngh/qThvgD1lCMLip+1Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=N53FrwuoYIqekrrOwekq/w6jSJMgGpAvtMqeulBGusc1nFlPMQHB43dejzxlaUNwWTvcgdpDv80mGjyeIkK4tnQVVnAoTgBbH96W/4J+fJwdBtbS6kt3/4WeNz9Cy9RGHbfDb4H2ch+xsDw3n6XG1C2nOCBG0UT1To5sqUtZBhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DwlWLcKV; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=W3xOaWWPeOhQNVO+VCPCWBRPygZzQFe0j/opda/EiPIdMhIwuVqvEq3JsM5Y42yyacTtF4+x01++Yu024fQ2PRAopVDBbQqPnEL+NGf1L3W5oo3IiI1IrN7jOHxSBS5m9XsIupDdzPCWwks3uhUe4RGOmJZfNQs44KRm/Chw7/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kxOIXE0B; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DwlWLcKV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kxOIXE0B"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769312155; x=1800848155;
+  t=1769312158; x=1800848158;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GQ14vRAHcbbj8om56GF25rYzFUWGSeE2wTidcEC1vZU=;
-  b=DwlWLcKVgU+fsnwLA9YP5fj4m4th3vEdAii2TPoXyPfmYsN9wzTl/NFp
-   FNF+tVy2FA3wHhSSCtwGMJXR+4SnODhC6EbyR7Esle/I4SF7BmhqKXjKc
-   oXCH4yNCzLLDtXHXgYZxPBIS5tiCs1VYiA8Q7EJ6msa8UxgQbqpDBBR01
-   ARUqN3dBK3MwamFfs51b0fNNlnMPtj99v4/3wQJrozFxMq8pDhqCl7D2t
-   lIkU3mn/6Gp2VQQGXHS0/ZdRNzJ9YoxbldY/PB1JmJ0f8Ut0DdVYQ83Oq
-   LpRcAbJSOm3TVvtyQplEwc7wVW5RgR7m/fQar/BE47pmO5uJuQhwHPfMU
-   A==;
-X-CSE-ConnectionGUID: j5Pmuw05RaK/SVGCO20t7A==
-X-CSE-MsgGUID: U0cKv/i8RAOZKDfb+iAw5g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="81887464"
+  bh=70sBRuY0D3jWosg337M/chzngh/qThvgD1lCMLip+1Y=;
+  b=kxOIXE0BHjj97Dxbt2TM0Wn+o3JERZG7IjUr9fGNcf5Ry/57rXKQ6VGa
+   v/MmYzDXRJa1IX/ZtAHoem0GxHxlX5hCseQ2MOCAhbEL+Yy4m3XNBRQnn
+   3Pdpvp58zrpiQNyMLwMved2UNQR8h4R9cF5ktt2Qwpjwj38sW0fk3MWd9
+   4KwKBDMdvAf2e/hKTme5R/CXXr2Edd7DpEVCQq3Gny8/ecq8Qs+rQLLAt
+   Mra0l0jJm7YYbTwRtWlT4lb07o+KNhqyhm3vUyWu0Lg/K9jEjTA/ttkXr
+   t+MszXVBUZ+BXB7qijUjt9x0NDLCBPLfKN83eTxpa/widERe79vwuJlUv
+   w==;
+X-CSE-ConnectionGUID: 4KWdrViwR3eh5qmpz4Om4g==
+X-CSE-MsgGUID: n67kYFXKRwy/oY/7k91QJg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="81887494"
 X-IronPort-AV: E=Sophos;i="6.21,252,1763452800"; 
-   d="scan'208";a="81887464"
+   d="scan'208";a="81887494"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 19:35:55 -0800
-X-CSE-ConnectionGUID: lns0XCV+TNODYDu1Ja0FCA==
-X-CSE-MsgGUID: 91AaHQWjQ+GzdFYQIBIm0A==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 19:35:58 -0800
+X-CSE-ConnectionGUID: QrFMYZo2Qt2H6QcH3tF6aA==
+X-CSE-MsgGUID: QBjoQZT8TKWWSVQKfQakGw==
 X-ExtLoop1: 1
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
-  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2026 19:35:53 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2026 19:35:56 -0800
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 To: linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org,
@@ -68,9 +68,9 @@ To: linux-kernel@vger.kernel.org,
 	giovanni.cabiddu@intel.com
 Cc: wajdi.k.feghali@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v14 11/26] crypto: iaa - Expect a single scatterlist for a [de]compress request's src/dst.
-Date: Sat, 24 Jan 2026 19:35:22 -0800
-Message-Id: <20260125033537.334628-12-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v14 13/26] crypto: acomp - Define a unit_size in struct acomp_req to enable batching.
+Date: Sat, 24 Jan 2026 19:35:24 -0800
+Message-Id: <20260125033537.334628-14-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20260125033537.334628-1-kanchana.p.sridhar@intel.com>
 References: <20260125033537.334628-1-kanchana.p.sridhar@intel.com>
@@ -82,173 +82,128 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The calls to dma_map_sg() were passing sg_nents() for the @nents
-parameter, then error-ing out if more than one @nr_sgs were
-returned. Furthermore, there are no use-cases for iaa_crypto that allow
-multiple SG lists to be mapped for dma at once.
+mm: zswap: Set the unit size for zswap to PAGE_SIZE.
 
-Moreover, as per Herbert's direction in [1] for the batching API from
-higher mm layers to interface with crypto using SG lists, batching
-within iaa_crypto will rely on there being exactly one SG list per
-"unit" of [de]compression in a batch, where the component SG lists are
-obtained by breaking down the @req->src and @req->dst.
+We add a new @unit_size data member to struct acomp_req along with a
+helper function acomp_request_set_unit_size() for kernel modules to set
+the unit size to use while breaking down the request's src/dst
+scatterlists.
 
-Given all of the above, this patch simplifies the design by expecting
-only 1 @nents in req->src and req->dst, which aligns with current and
-batching use cases that will be developed in subsequent patches.
+An acomp_alg can implement batching by using the @req->unit_size to
+break down the SG lists passed in via @req->dst and/or @req->src, to
+submit individual @req->slen/@req->unit_size compress jobs or
+@req->dlen/@req->unit_size decompress jobs, for batch compression and
+batch decompression respectively.
 
-This alleviates the latency penalty of calling sg_nents() per
-[de]compress op submitted to the hardware.
+In case of batch compression, the folio's pages for the batch can be
+retrieved from the @req->src scatterlist by using a struct sg_page_iter
+after determining the number of pages as @req->slen/@req->unit_size.
 
-Some unlikely() annotations are added to conditionals in the core
-[de]compress routines to further improve latency per op.
+ 1) acomp_request_set_callback() sets the @req->unit_size to 0.
+ 2) In zswap_cpu_comp_prepare(), after the call to
+    acomp_request_set_callback(), we call:
 
-[1]: https://lore.kernel.org/all/aJ7Fk6RpNc815Ivd@gondor.apana.org.au/T/#m99aea2ce3d284e6c5a3253061d97b08c4752a798
+      acomp_request_set_unit_size(acomp_ctx->req, PAGE_SIZE);
 
+    to set the unit size for zswap to PAGE_SIZE.
+
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 54 +++++++++++-----------
- 1 file changed, 27 insertions(+), 27 deletions(-)
+ include/crypto/acompress.h | 48 ++++++++++++++++++++++++++++++++++++++
+ mm/zswap.c                 |  3 +++
+ 2 files changed, 51 insertions(+)
 
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 1b44c0524692..aafa8d4afcf4 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -1521,11 +1521,11 @@ static int iaa_remap_for_verify(struct device *dev, struct iaa_wq *iaa_wq,
- 	int ret = 0;
- 	int nr_sgs;
+diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+index 9eacb9fa375d..23a1a659843c 100644
+--- a/include/crypto/acompress.h
++++ b/include/crypto/acompress.h
+@@ -79,6 +79,7 @@ struct acomp_req_chain {
+  * @dvirt:	Destination virtual address
+  * @slen:	Size of the input buffer
+  * @dlen:	Size of the output buffer and number of bytes produced
++ * @unit_size:	Unit size for the request for use in batching
+  * @chain:	Private API code data, do not use
+  * @__ctx:	Start of private context data
+  */
+@@ -94,6 +95,7 @@ struct acomp_req {
+ 	};
+ 	unsigned int slen;
+ 	unsigned int dlen;
++	unsigned int unit_size;
  
--	dma_unmap_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
--	dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
-+	dma_unmap_sg(dev, req->dst, 1, DMA_FROM_DEVICE);
-+	dma_unmap_sg(dev, req->src, 1, DMA_TO_DEVICE);
+ 	struct acomp_req_chain chain;
  
--	nr_sgs = dma_map_sg(dev, req->src, sg_nents(req->src), DMA_FROM_DEVICE);
--	if (nr_sgs <= 0 || nr_sgs > 1) {
-+	nr_sgs = dma_map_sg(dev, req->src, 1, DMA_FROM_DEVICE);
-+	if (unlikely(nr_sgs <= 0 || nr_sgs > 1)) {
- 		dev_dbg(dev, "verify: couldn't map src sg for iaa device %d,"
- 			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
- 			iaa_wq->wq->id, ret);
-@@ -1537,13 +1537,13 @@ static int iaa_remap_for_verify(struct device *dev, struct iaa_wq *iaa_wq,
- 		" req->slen %d, sg_dma_len(sg) %d\n", *src_addr, nr_sgs,
- 		req->src, req->slen, sg_dma_len(req->src));
+@@ -328,9 +330,55 @@ static inline void acomp_request_set_callback(struct acomp_req *req,
+ {
+ 	flgs &= ~CRYPTO_ACOMP_REQ_PRIVATE;
+ 	flgs |= req->base.flags & CRYPTO_ACOMP_REQ_PRIVATE;
++	req->unit_size = 0;
+ 	crypto_request_set_callback(&req->base, flgs, cmpl, data);
+ }
  
--	nr_sgs = dma_map_sg(dev, req->dst, sg_nents(req->dst), DMA_TO_DEVICE);
--	if (nr_sgs <= 0 || nr_sgs > 1) {
-+	nr_sgs = dma_map_sg(dev, req->dst, 1, DMA_TO_DEVICE);
-+	if (unlikely(nr_sgs <= 0 || nr_sgs > 1)) {
- 		dev_dbg(dev, "verify: couldn't map dst sg for iaa device %d,"
- 			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
- 			iaa_wq->wq->id, ret);
- 		ret = -EIO;
--		dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_FROM_DEVICE);
-+		dma_unmap_sg(dev, req->src, 1, DMA_FROM_DEVICE);
- 		goto out;
- 	}
- 	*dst_addr = sg_dma_address(req->dst);
-@@ -1711,14 +1711,14 @@ static void iaa_desc_complete(struct idxd_desc *idxd_desc,
- 			err = -EIO;
- 		}
- 
--		dma_unmap_sg(dev, ctx->req->dst, sg_nents(ctx->req->dst), DMA_TO_DEVICE);
--		dma_unmap_sg(dev, ctx->req->src, sg_nents(ctx->req->src), DMA_FROM_DEVICE);
-+		dma_unmap_sg(dev, ctx->req->dst, 1, DMA_TO_DEVICE);
-+		dma_unmap_sg(dev, ctx->req->src, 1, DMA_FROM_DEVICE);
- 
- 		goto out;
- 	}
- err:
--	dma_unmap_sg(dev, ctx->req->dst, sg_nents(ctx->req->dst), DMA_FROM_DEVICE);
--	dma_unmap_sg(dev, ctx->req->src, sg_nents(ctx->req->src), DMA_TO_DEVICE);
-+	dma_unmap_sg(dev, ctx->req->dst, 1, DMA_FROM_DEVICE);
-+	dma_unmap_sg(dev, ctx->req->src, 1, DMA_TO_DEVICE);
- out:
- 	if (ret != 0)
- 		dev_dbg(dev, "asynchronous %s failed ret=%d\n",
-@@ -2022,8 +2022,8 @@ static int iaa_comp_acompress(struct acomp_req *req)
- 
- 	dev = &wq->idxd->pdev->dev;
- 
--	nr_sgs = dma_map_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
--	if (nr_sgs <= 0 || nr_sgs > 1) {
-+	nr_sgs = dma_map_sg(dev, req->src, 1, DMA_TO_DEVICE);
-+	if (unlikely(nr_sgs <= 0 || nr_sgs > 1)) {
- 		dev_dbg(dev, "couldn't map src sg for iaa device %d,"
- 			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
- 			iaa_wq->wq->id, ret);
-@@ -2032,8 +2032,8 @@ static int iaa_comp_acompress(struct acomp_req *req)
- 	}
- 	src_addr = sg_dma_address(req->src);
- 
--	nr_sgs = dma_map_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
--	if (nr_sgs <= 0 || nr_sgs > 1) {
-+	nr_sgs = dma_map_sg(dev, req->dst, 1, DMA_FROM_DEVICE);
-+	if (unlikely(nr_sgs <= 0 || nr_sgs > 1)) {
- 		dev_dbg(dev, "couldn't map dst sg for iaa device %d,"
- 			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
- 			iaa_wq->wq->id, ret);
-@@ -2059,18 +2059,18 @@ static int iaa_comp_acompress(struct acomp_req *req)
- 		if (ret)
- 			dev_dbg(dev, "asynchronous compress verification failed ret=%d\n", ret);
- 
--		dma_unmap_sg(dev, req->dst, sg_nents(req->dst), DMA_TO_DEVICE);
--		dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_FROM_DEVICE);
-+		dma_unmap_sg(dev, req->dst, 1, DMA_TO_DEVICE);
-+		dma_unmap_sg(dev, req->src, 1, DMA_FROM_DEVICE);
- 
- 		goto out;
- 	}
- 
--	if (ret)
-+	if (unlikely(ret))
- 		dev_dbg(dev, "asynchronous compress failed ret=%d\n", ret);
- 
--	dma_unmap_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
-+	dma_unmap_sg(dev, req->dst, 1, DMA_FROM_DEVICE);
- err_map_dst:
--	dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
-+	dma_unmap_sg(dev, req->src, 1, DMA_TO_DEVICE);
- out:
- 	percpu_ref_put(&iaa_wq->ref);
- 
-@@ -2103,8 +2103,8 @@ static int iaa_comp_adecompress(struct acomp_req *req)
- 
- 	dev = &wq->idxd->pdev->dev;
- 
--	nr_sgs = dma_map_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
--	if (nr_sgs <= 0 || nr_sgs > 1) {
-+	nr_sgs = dma_map_sg(dev, req->src, 1, DMA_TO_DEVICE);
-+	if (unlikely(nr_sgs <= 0 || nr_sgs > 1)) {
- 		dev_dbg(dev, "couldn't map src sg for iaa device %d,"
- 			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
- 			iaa_wq->wq->id, ret);
-@@ -2113,8 +2113,8 @@ static int iaa_comp_adecompress(struct acomp_req *req)
- 	}
- 	src_addr = sg_dma_address(req->src);
- 
--	nr_sgs = dma_map_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
--	if (nr_sgs <= 0 || nr_sgs > 1) {
-+	nr_sgs = dma_map_sg(dev, req->dst, 1, DMA_FROM_DEVICE);
-+	if (unlikely(nr_sgs <= 0 || nr_sgs > 1)) {
- 		dev_dbg(dev, "couldn't map dst sg for iaa device %d,"
- 			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
- 			iaa_wq->wq->id, ret);
-@@ -2128,12 +2128,12 @@ static int iaa_comp_adecompress(struct acomp_req *req)
- 	if (ret == -EINPROGRESS)
- 		return ret;
- 
--	if (ret != 0)
-+	if (unlikely(ret != 0))
- 		dev_dbg(dev, "asynchronous decompress failed ret=%d\n", ret);
- 
--	dma_unmap_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
-+	dma_unmap_sg(dev, req->dst, 1, DMA_FROM_DEVICE);
- err_map_dst:
--	dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
-+	dma_unmap_sg(dev, req->src, 1, DMA_TO_DEVICE);
- out:
- 	percpu_ref_put(&iaa_wq->ref);
++/**
++ * acomp_request_set_unit_size() -- Sets the unit size for the request.
++ *
++ * This is a helper function that enables batching for zswap, IPComp, etc.
++ * It allows multiple independent compression (or decompression) operations to
++ * be submitted in a single request's SG lists, where each SG list ("segment")
++ * is processed independently. The unit size helps derive segments from a
++ * single request. crypto_acomp does not expect the segments to be related in
++ * any way.
++ *
++ * Example usage model:
++ *
++ * A module such as zswap that's configured to use a batching compressor, can
++ * accomplish batch compression of "nr_pages" with crypto_acomp by creating an
++ * output SG table for the batch, initialized to contain "nr_pages" SG
++ * lists. Each scatterlist is mapped to the nth destination buffer for the
++ * batch. Depending on whether the @req is used for batch compress/decompress,
++ * zswap must set the @req's source/destination length to be
++ * "nr_pages * @req->unit_size" respectively.
++ *
++ * An acomp_alg can implement batch compression by using the @req->unit_size
++ * to break down the SG lists passed in via @req->dst to submit individual
++ * "@req->slen/@req->unit_size" compress jobs to be processed as a batch.
++ *
++ * Similarly, zswap can implement batch decompression by passing an
++ * SG table with "nr_pages" SG lists via @req->src to process
++ * "@req->dlen/@req->unit_size" decompress jobs as a batch.
++ *
++ * This API must be called after acomp_request_set_callback(),
++ * which sets @req->unit_size to 0. This makes it easy for users of
++ * crypto_acomp to rely on a default of not opting in to batching.
++ * Users such as zswap opt in to batching by defining @req->unit_size
++ * to a non-zero value for use by acomp_algs supporting batching.
++ *
++ * @du would be PAGE_SIZE for zswap, it could be the MTU for IPsec.
++ *
++ * @req:	asynchronous compress/decompress request
++ * @du:		data unit size of the input/output buffer scatterlist.
++ */
++static inline void acomp_request_set_unit_size(struct acomp_req *req,
++					       unsigned int du)
++{
++	req->unit_size = du;
++}
++
+ /**
+  * acomp_request_set_params() -- Sets request parameters
+  *
+diff --git a/mm/zswap.c b/mm/zswap.c
+index a3811b05ab57..038e240c03dd 100644
+--- a/mm/zswap.c
++++ b/mm/zswap.c
+@@ -781,6 +781,9 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+ 	acomp_ctx->buffer = buffer;
+ 	acomp_ctx->acomp = acomp;
+ 	acomp_ctx->req = req;
++
++	acomp_request_set_unit_size(acomp_ctx->req, PAGE_SIZE);
++
+ 	mutex_unlock(&acomp_ctx->mutex);
+ 	return 0;
  
 -- 
 2.27.0
