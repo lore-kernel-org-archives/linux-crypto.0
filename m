@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658B4233721;
-	Sun, 25 Jan 2026 03:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FBD523BF83;
+	Sun, 25 Jan 2026 03:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769312174; cv=none; b=H3EYxxN3b/7OEOxN623AW7XX1YaDbEjv7NfOPNkmzOL9fDqj8ZYukTOvCLMCqY17gkybdDewnBAs56YDbW0CN72eYLvsOQQUWCjB4kjt0YCLsTwVLfhV0KeTHJa2mMdrxORdJQiV953+qd5Dj9k31JAe3zedRHEZeM/gpTdx+CI=
+	t=1769312176; cv=none; b=YUr//vTJwpIEP0uiyV0Yjl8O8Lx4PQ5iESKMa1s8z/SkUXlWbe99apjzmvtFy2Li+J9Sh0F/rZjOkMen5ljbnOVSOydBS9UYWwqH4zzQWFnBlvqqwPCOJ3jMft1QoI31logBF2OhzvjM0AHFo3pQ1y3VMBhoVachgLELeIFREDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769312174; c=relaxed/simple;
-	bh=q1mVf0QKYvPJ+4NSUc+0SqCKPiVImrf5Dhf0M/kxVrY=;
+	s=arc-20240116; t=1769312176; c=relaxed/simple;
+	bh=SaK461OE9N571yM1DigWyBRhAbZ7RXxHms5EPvXQKq8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=A1F61mgKAiLuA5aHOXv7yrujn1KtVQp5++l5puW/28ezXnuWwgPWw9OHUfUnjL5OlsLpSwFoa5GWPQobJR7O5YCTaOD+6ZvqW4bpPQiv3U/UBO0qltZ8OryixprIjmQUUSlXPYFx+7tLz+O88BVGn273gwHyS0k1H1Ge+ZDucow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OF9tUF/f; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=O6jCNA2texRTQte+JqQB0wJrMFUi9cOvkseh9chcUGbQug0Q2edrz8y/FGNlQPwfoUvlAtUfwLPsT2ZJwrU4Z1VtyUJxbiNwBuunvEJ1YYmiPMIc7s610TQQYE7w4cZsch9xSIVppgMes0Tpr+miv0ENLHrPFGuVxx3wRh1utNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UTi3LsXK; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OF9tUF/f"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UTi3LsXK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769312171; x=1800848171;
+  t=1769312174; x=1800848174;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=q1mVf0QKYvPJ+4NSUc+0SqCKPiVImrf5Dhf0M/kxVrY=;
-  b=OF9tUF/fV2deo3aWMzPrN+49388Apg20IDlI4x+8UTtp64WJMHzP07eP
-   kYtO2qQTBqRMe2MPv7AX4KxpYoum2CzRIK9fbPq1GrvKNZ0BgRakIFF7t
-   dmQhoxz9b7lQ+Tp+Ol79o3pda85UVZYPn4yi+RY/I0lWq6S37n0z5QEba
-   JIn3gxb0yb0BN8IH6eAIQBneUUc0BautOXrACII+SBu6syJDgq6tTLyyr
-   7QlQwTKzPXTUDYsdJJdE04DWnWBi+qLFQAuZ3r1twBSH5OAOMouY9kP8K
-   rqcnsVufYkumiXMh+ZwGp3uvh8b0SAD4h5gAt3N+NdTeaf856gKMwuDwu
-   Q==;
-X-CSE-ConnectionGUID: qBc2TNEHRu2LFfwj54V1GQ==
-X-CSE-MsgGUID: 7rjT7Jq7RfODPeQKOFTOGQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="81887588"
+  bh=SaK461OE9N571yM1DigWyBRhAbZ7RXxHms5EPvXQKq8=;
+  b=UTi3LsXKww2A2lFXIcWsIoUlOWd8uhGcPLzie22AORAmKGJX8OanRmV+
+   +DP+ORT1e5LbLMO3zjFoeWvpCXGWqKuTAsDvoyuTppeuxVKIo+ylQfZ3s
+   SN0p9dLsF+Lw1F/hzwQTQQbzbQJO9JUU3zlNM9O5+ma7sp5/yWAGf5+bh
+   uu/5iX/b8q1RJJVvPcVoowbANY5qHWbRru9cJnbrUzuU7C80UjbK89ERQ
+   YbmemBkYYpR5D7fTDwessnuWH/+W7kWUNEmEYNNdahhMwtxs4n80juDh6
+   YUf1kwXOXS8sPaa7wIp0edawy4s9sg/JJgwT7F5tu8JGszpoQxkqTUjCm
+   g==;
+X-CSE-ConnectionGUID: qcDxsVGiRfiPFSp/n0ewag==
+X-CSE-MsgGUID: ZzF5jYByQvqGjKnkv5HtvQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="81887634"
 X-IronPort-AV: E=Sophos;i="6.21,252,1763452800"; 
-   d="scan'208";a="81887588"
+   d="scan'208";a="81887634"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 19:36:06 -0800
-X-CSE-ConnectionGUID: 5/eD9vAJTqqE4jtBlE15YQ==
-X-CSE-MsgGUID: COri05SvQWSM2HYSqWh0YQ==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 19:36:11 -0800
+X-CSE-ConnectionGUID: /MfoxdkxT5Ct5V0NNBDwbA==
+X-CSE-MsgGUID: 4LQ/McmVTw2S0JQejqfk8g==
 X-ExtLoop1: 1
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
-  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2026 19:36:05 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2026 19:36:09 -0800
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 To: linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org,
@@ -68,9 +68,9 @@ To: linux-kernel@vger.kernel.org,
 	giovanni.cabiddu@intel.com
 Cc: wajdi.k.feghali@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v14 19/26] crypto: iaa - Enable async mode and make it the default.
-Date: Sat, 24 Jan 2026 19:35:30 -0800
-Message-Id: <20260125033537.334628-20-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v14 22/26] crypto: acomp - Add crypto_acomp_batch_size() to get an algorithm's batch-size.
+Date: Sat, 24 Jan 2026 19:35:33 -0800
+Message-Id: <20260125033537.334628-23-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20260125033537.334628-1-kanchana.p.sridhar@intel.com>
 References: <20260125033537.334628-1-kanchana.p.sridhar@intel.com>
@@ -82,84 +82,130 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch enables the 'async' sync_mode in the driver. Further, it sets
-the default sync_mode to 'async', which makes it easier for IAA hardware
-acceleration in the iaa_crypto driver to be loaded by default in the most
-efficient/recommended 'async' mode for parallel
-compressions/decompressions, namely, asynchronous submission of
-descriptors, followed by polling for job completions. Earlier, the
-"sync" mode used to be the default.
+This commit adds a @batch_size data member to struct acomp_alg.
 
-The iaa_crypto driver documentation has been updated with these
-changes.
+An acomp_alg compression algorithm that supports batching of
+compressions and decompressions must provide a @batch_size greater than
+one, representing the maximum batch-size that the compressor supports,
+so that kernel users of crypto_acomp, such as zswap, can allocate
+resources for submitting multiple compress/decompress jobs that can be
+batched, and invoke batching of [de]compressions.
 
-This way, anyone who wants to use IAA as a zswap compressor, can do so
-right after building the kernel. Specifically, they *do not* have to go
-through these steps to use async mode:
+The new crypto_acomp_batch_size() API queries the crypto_acomp's
+acomp_alg for the batch-size. If the acomp_alg has registered a
+@batch_size greater than 1, this is returned. If not, a default of "1"
+is returned.
 
-  1) disable all the IAA device/wq bindings that happen at boot time
-  2) rmmod iaa_crypto
-  3) modprobe iaa_crypto
-  4) echo async > /sys/bus/dsa/drivers/crypto/sync_mode
-  5) re-run initialization of the IAA devices and wqs
+zswap can invoke crypto_acomp_batch_size() to query the maximum number
+of requests that can be batch [de]compressed. Based on this, zswap
+can use the minimum of any zswap-specific upper limits for batch-size
+and the compressor's max @batch_size, to allocate batching resources.
+
+The IAA acomp_algs Fixed ("deflate-iaa") and Dynamic
+("deflate-iaa-dynamic") register @batch_size as
+IAA_CRYPTO_MAX_BATCH_SIZE.
+
+This enables zswap to compress/decompress pages in parallel in the IAA
+hardware accelerator to improve swapout/swapin performance and memory
+savings.
 
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 ---
- Documentation/driver-api/crypto/iaa/iaa-crypto.rst | 11 ++---------
- drivers/crypto/intel/iaa/iaa_crypto_main.c         |  4 ++--
- 2 files changed, 4 insertions(+), 11 deletions(-)
+ crypto/acompress.c                         | 14 ++++++++++++++
+ drivers/crypto/intel/iaa/iaa_crypto_main.c |  2 ++
+ include/crypto/acompress.h                 | 12 ++++++++++++
+ include/crypto/internal/acompress.h        |  3 +++
+ 4 files changed, 31 insertions(+)
 
-diff --git a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
-index 0ff4ec603b43..d5e610ef4612 100644
---- a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
-+++ b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
-@@ -272,7 +272,7 @@ The available attributes are:
-       echo async_irq > /sys/bus/dsa/drivers/crypto/sync_mode
+diff --git a/crypto/acompress.c b/crypto/acompress.c
+index c48a1a20e21f..02c25c79c0d4 100644
+--- a/crypto/acompress.c
++++ b/crypto/acompress.c
+@@ -387,6 +387,20 @@ int crypto_acomp_decompress(struct acomp_req *req)
+ }
+ EXPORT_SYMBOL_GPL(crypto_acomp_decompress);
  
-     Async mode without interrupts (caller must poll) can be enabled by
--    writing 'async' to it (please see Caveat)::
-+    writing 'async' to it::
- 
-       echo async > /sys/bus/dsa/drivers/crypto/sync_mode
- 
-@@ -281,14 +281,7 @@ The available attributes are:
- 
-       echo sync > /sys/bus/dsa/drivers/crypto/sync_mode
- 
--    The default mode is 'sync'.
--
--    Caveat: since the only mechanism that iaa_crypto currently implements
--    for async polling without interrupts is via the 'sync' mode as
--    described earlier, writing 'async' to
--    '/sys/bus/dsa/drivers/crypto/sync_mode' will internally enable the
--    'sync' mode. This is to ensure correct iaa_crypto behavior until true
--    async polling without interrupts is enabled in iaa_crypto.
-+    The default mode is 'async'.
- 
-   - g_comp_wqs_per_iaa
- 
++unsigned int crypto_acomp_batch_size(struct crypto_acomp *tfm)
++{
++	if (acomp_is_async(tfm) &&
++		(crypto_comp_alg_common(tfm)->base.cra_flags & CRYPTO_ALG_TYPE_ACOMPRESS)) {
++		struct acomp_alg *alg = crypto_acomp_alg(tfm);
++
++		if (alg && alg->batch_size > 1)
++			return alg->batch_size;
++	}
++
++	return 1;
++}
++EXPORT_SYMBOL_GPL(crypto_acomp_batch_size);
++
+ void comp_prepare_alg(struct comp_alg_common *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
 diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 915bf9b17b39..f6e18f458fbf 100644
+index fe9f59ede577..e735aa01dce8 100644
 --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
 +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -153,7 +153,7 @@ static bool iaa_verify_compress = true;
+@@ -2729,6 +2729,7 @@ static struct acomp_alg iaa_acomp_fixed_deflate = {
+ 	.compress		= iaa_crypto_acomp_acompress_main,
+ 	.decompress		= iaa_crypto_acomp_adecompress_main,
+ 	.batch_completed	= iaa_crypto_acomp_batch_completed,
++	.batch_size		= IAA_CRYPTO_MAX_BATCH_SIZE,
+ 	.base			= {
+ 		.cra_name		= "deflate",
+ 		.cra_driver_name	= "deflate-iaa",
+@@ -2755,6 +2756,7 @@ static struct acomp_alg iaa_acomp_dynamic_deflate = {
+ 	.compress		= iaa_crypto_acomp_acompress_main,
+ 	.decompress		= iaa_crypto_acomp_adecompress_main,
+ 	.batch_completed	= iaa_crypto_acomp_batch_completed,
++	.batch_size		= IAA_CRYPTO_MAX_BATCH_SIZE,
+ 	.base			= {
+ 		.cra_name		= "deflate",
+ 		.cra_driver_name	= "deflate-iaa-dynamic",
+diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+index 752110a7719c..1448b20de492 100644
+--- a/include/crypto/acompress.h
++++ b/include/crypto/acompress.h
+@@ -598,6 +598,18 @@ int crypto_acomp_compress(struct acomp_req *req);
   */
+ int crypto_acomp_decompress(struct acomp_req *req);
  
- /* Use async mode */
--static bool async_mode;
-+static bool async_mode = true;
- /* Use interrupts */
- static bool use_irq;
++/**
++ * crypto_acomp_batch_size() -- Get the algorithm's batch size
++ *
++ * Function returns the algorithm's batch size for batching operations
++ *
++ * @tfm:	ACOMPRESS tfm handle allocated with crypto_alloc_acomp()
++ *
++ * Return:	@tfm's acomp_alg's @batch_size, if it has defined a
++ *		@batch_size greater than 1; else return 1.
++ */
++unsigned int crypto_acomp_batch_size(struct crypto_acomp *tfm);
++
+ static inline struct acomp_req *acomp_request_on_stack_init(
+ 	char *buf, struct crypto_acomp *tfm)
+ {
+diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
+index 7c4e14491d59..dc126a8cfea2 100644
+--- a/include/crypto/internal/acompress.h
++++ b/include/crypto/internal/acompress.h
+@@ -34,6 +34,8 @@
+  *                      of all batch sub-requests having completed.
+  *                      Returns an error code in @req->slen if any
+  *                      of the sub-requests completed with an error.
++ * @batch_size:	Maximum batch-size for batching compress/decompress
++ *		operations.
+  * @init:	Initialize the cryptographic transformation object.
+  *		This function is used to initialize the cryptographic
+  *		transformation object. This function is called only once at
+@@ -53,6 +55,7 @@ struct acomp_alg {
+ 	int (*compress)(struct acomp_req *req);
+ 	int (*decompress)(struct acomp_req *req);
+ 	bool (*batch_completed)(struct acomp_req *req, bool comp);
++	unsigned int batch_size;
+ 	int (*init)(struct crypto_acomp *tfm);
+ 	void (*exit)(struct crypto_acomp *tfm);
  
-@@ -207,7 +207,7 @@ static int set_iaa_sync_mode(const char *name)
- 		async_mode = false;
- 		use_irq = false;
- 	} else if (sysfs_streq(name, "async")) {
--		async_mode = false;
-+		async_mode = true;
- 		use_irq = false;
- 	} else if (sysfs_streq(name, "async_irq")) {
- 		async_mode = true;
 -- 
 2.27.0
 
