@@ -1,196 +1,142 @@
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com [209.85.221.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29511242D89
-	for <linux-crypto@vger.kernel.org>; Mon, 26 Jan 2026 18:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4C9252904;
+	Mon, 26 Jan 2026 18:55:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769452546; cv=none; b=SHo6eOyaL33i70tQ/xBjXtxusIdlG2ucEns/EIPzkBgRyRBzdbPCnp3yT73pSGD7R52zoAMVubAxs28JNO/gEuQ3fACLww5WOAzYT7Mhhkeu6hfoCttY5hE4FbtKnUhtv15UOZuqjYtY4qHRdGjlLKms0/Hf5Wtn4/XLesDweB0=
+	t=1769453720; cv=none; b=a5kMJcFafY8QjK8WAMhGzxtQCzBkX3bLRimVxo0ov1021PCQPiF1PjQZyp2Ab77gMa+ZnptbDPxtdiVq0tNCuysOEJjqd1ltrIVPtf0+hY/Y/EMtUR+GVFGywj/6E6POhbUt5gFM0lA5MnaKi4K3soVZ6BEMx5zoLctu7Sw9uBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769452546; c=relaxed/simple;
-	bh=3akyaakir9OAMjeT8WvM8HDWBZfX+8duXF5SLqJafO4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=idWgLVk1+xJF+tUPoTUw+56u2fyIHqksAZXT906f0RV4Ndzz3v8bBZY6xwuNH83d0pBndl5V3Lzz9z7pOgJB57UNV79O3krsmMxOEi38O8l+MZj/1YvvwRhTjhqnkRgddGIgdzBFvvCRBANnxePrNX1mVC51hfckdwHJUmB69S4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wvJJT80O; arc=none smtp.client-ip=209.85.221.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1769453720; c=relaxed/simple;
+	bh=jMVk9CS2JBRNsS5GC6/yI2ZxOvdhUQdY4kP4Vs3jjqU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U1LdWPmSE5EV/wwkSS6C/sNX1XhD/h0erzyArhHo19CvXQl7xZCsNgooFFxCFnkPxGxw/v1mFZ4qxiHCViTDS73pUrt1R4jjDEsbGmWEbCNe9mIM/wWj6ZBOHhFsLkUeIKOMBUffctIWlzGFVH0aOB7tMnsHcxBELg7cChxkvgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=4b+R0ix5; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wvJJT80O"
-Received: by mail-wr1-f67.google.com with SMTP id ffacd0b85a97d-4327790c4e9so3130196f8f.2
-        for <linux-crypto@vger.kernel.org>; Mon, 26 Jan 2026 10:35:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769452542; x=1770057342; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4wtupvaEvwne0Vq+SODEHB1y4+FGimHGUXOjd7XL3Zo=;
-        b=wvJJT80OLvni3EYE47w8AnsZMY8snhAhLXWOMn6pvJxMZBpzm0usVVgJ29KSDqdKV7
-         2vqDe7fyCrTaHkpNYup+/jabmU/g1j29n6fCqxDlWrCnJjCpT28McsS5DZBFECIDU/Y9
-         cSQl+o9tfvdygSKhtk+122URO1O5VKatL85F0Ki8fC/RFDY76MDCU9WezatXoDVkEKc3
-         wSq6fdWnSfERLbsV1XiaqCtgA1kCvy56c6ZM2mGvbVqxM1tkuC6jZM/COWWfvSmAAxYC
-         SrtjkKVhyeVLiTussvucj7klXvIOmwuXoBsa9J9+ac7v16OFAS+oyICYhb3NVGQOFc9j
-         WS8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769452542; x=1770057342;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4wtupvaEvwne0Vq+SODEHB1y4+FGimHGUXOjd7XL3Zo=;
-        b=sKb3r3vjkYNXJmp9k48yZDpOLWt+tKKSRhaXxjGMDtP0LMiWWVhsObIxT9pCRx50Qc
-         /UT/eeNx5W1kQ+91XA/RpTBuPYsKcvocnCu9abs+oTDUcu+veuPrZnnzCj6IxUu4q+il
-         gbTibuvoSZc5i3F0pbbovi1GQ0ho84lJpsLj4hdyhTRRrz9dEZ5rBnw4/ymmTvuLRRGL
-         yj9bML0EdrAOdYkFj33g5dKlPSmasyqmAQLoxkPVvfaO+94pGWN6N8f4rBc8b2US901X
-         c66+wP1OqIos8TGQyBlbXnsVV1LsEiPnlWSEYwKhVlqmyqVGX+4BVVId3JBvPySO0xMG
-         3gEw==
-X-Forwarded-Encrypted: i=1; AJvYcCXVgUUHFpdipBJUomyWluZ4I5LbfO51K8piYN+1R+fVsn4kSisuH83dOTAGGUKtdGI4J+0ly8TzeNdy1C4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf03PAOYjNpxYCHPM4SOIQVVUFppByMbr9eSevmWRu1jivZyYB
-	Fsyn0OPIsDINl57wVkCckDvDbe5vi66kzj1lUkcyQq7iYM52Bz7goNOqB9Uu0UIuSg==
-X-Gm-Gg: AZuq6aKWlVIm58c36qhUwtVctoO3m8+OqFmCHfPLYQIuD3dnOjlvx8O/dNyxBKbtiVm
-	ArOJE1w6vXiddQc2BHB1WrcRvkS0AQqAMd/q+0d65KLP8EDGLznISykdadFmXaByAdIz7BzZKN8
-	NdpuUkEWAtz1HpwiDYAFFrvYUFSYcX1p30A85UWnODrnqAKd0CDpZ8T1yCIWec18j+JXNu6BfQg
-	yg4M36AmkVNI3Eu7G6LhnifI60K1ouyzGbOGZQ3H2w5nCmwvbngLzTAQmlYU7fMHQIW5Cnj6XT/
-	8m6Zm9LpjNiMjbnsnsXtPebkioJlJ+Q9yjyusDnAwNj8Kz2P66kv9kWrSipbJ+kqE7NqJUMLWq/
-	8iyS63bAI3JLCmuEH6qj4EBAvhnHy3xxgOox9BL+55n7PjWrrd39e3D9ZydjYdBcvutuRcVP/mE
-	UIrTLg6/StxY1+Y8o9SNA1HGfdQ1t4OhTZBrm6VEYtGYO/ziv7aNZfpnIyfiY=
-X-Received: by 2002:a5d:5d06:0:b0:429:c14f:5f7d with SMTP id ffacd0b85a97d-435ca18f3cbmr9441304f8f.29.1769452542172;
-        Mon, 26 Jan 2026 10:35:42 -0800 (PST)
-Received: from elver.google.com ([2a00:79e0:2834:9:c598:7cce:ca6b:8ab7])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1b6e2besm32040119f8f.0.2026.01.26.10.35.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 10:35:41 -0800 (PST)
-Date: Mon, 26 Jan 2026 19:35:33 +0100
-From: Marco Elver <elver@google.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Peter Zijlstra <peterz@infradead.org>,
-	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-	Chris Li <sparse@chrisli.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Alexander Potapenko <glider@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Christoph Hellwig <hch@lst.de>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Kentaro Takeda <takedakn@nttdata.co.jp>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
-	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-	linux-sparse@vger.kernel.org, linux-wireless@vger.kernel.org,
-	llvm@lists.linux.dev, rcu@vger.kernel.org
-Subject: Re: [PATCH v5 15/36] srcu: Support Clang's context analysis
-Message-ID: <aXez9fSxdfu5-Boo@elver.google.com>
-References: <20251219154418.3592607-1-elver@google.com>
- <20251219154418.3592607-16-elver@google.com>
- <dd65bb7b-0dac-437a-a370-38efeb4737ba@acm.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="4b+R0ix5"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4f0Hm56kBhzlgyGr;
+	Mon, 26 Jan 2026 18:55:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1769453709; x=1772045710; bh=lrmRnMiS7e8oDqS8sJHadbKN
+	aRE4y8/9HerN9jURAnw=; b=4b+R0ix5+Os0UdymHVdPefR75pAjuePHzZSBDv1T
+	PhKFA4FAC8OQc9TuXgMxSrv6ALYLM26zsK043txlRzxnGUh1OQAsqSN0foShyawt
+	pgoA82i8a3e56Az+c5yQ/FRzJRlVVV9ONPOmo5QZvE0Q0R6BZlDabDdSvqRaIrWq
+	5qv/o/SAv+5/3fRLam45SzREjjV6pc62GFn6nBiQJg3JMywlrNKvmQ7VlMyrTxAH
+	T23+3S/pU978iX4yw8ahY2EFo/8Xq0lczgH+hEk7oD3ExiVmcFff0tai2SlH7PR7
+	9U/uiA5vPsPPUdDSnrYljSKcp1+NnDZMaTuY+V/YB+pCTQ==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id vhOvcRL97NLm; Mon, 26 Jan 2026 18:55:09 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4f0Hlj4MJNzlh1T6;
+	Mon, 26 Jan 2026 18:54:57 +0000 (UTC)
+Message-ID: <8c1bbab4-4615-4518-b773-a006d1402b8b@acm.org>
+Date: Mon, 26 Jan 2026 10:54:56 -0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dd65bb7b-0dac-437a-a370-38efeb4737ba@acm.org>
-User-Agent: Mutt/2.2.13 (2024-03-09)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 15/36] srcu: Support Clang's context analysis
+To: Marco Elver <elver@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+ Chris Li <sparse@chrisli.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>,
+ Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>,
+ Eric Dumazet <edumazet@google.com>, Frederic Weisbecker
+ <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Ian Rogers <irogers@google.com>,
+ Jann Horn <jannh@google.com>, Joel Fernandes <joelagnelf@nvidia.com>,
+ Johannes Berg <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>,
+ Josh Triplett <josh@joshtriplett.org>, Justin Stitt
+ <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+ Kentaro Takeda <takedakn@nttdata.co.jp>,
+ Lukas Bulwahn <lukas.bulwahn@gmail.com>, Mark Rutland
+ <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+ Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+ Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>,
+ kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-security-module@vger.kernel.org, linux-sparse@vger.kernel.org,
+ linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
+References: <20251219154418.3592607-1-elver@google.com>
+ <20251219154418.3592607-16-elver@google.com>
+ <dd65bb7b-0dac-437a-a370-38efeb4737ba@acm.org>
+ <aXez9fSxdfu5-Boo@elver.google.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <aXez9fSxdfu5-Boo@elver.google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 26, 2026 at 09:31AM -0800, Bart Van Assche wrote:
-> On 12/19/25 7:40 AM, Marco Elver wrote:
-> > +/*
-> > + * No-op helper to denote that ssp must be held. Because SRCU-protected pointers
-> > + * should still be marked with __rcu_guarded, and we do not want to mark them
-> > + * with __guarded_by(ssp) as it would complicate annotations for writers, we
-> > + * choose the following strategy: srcu_dereference_check() calls this helper
-> > + * that checks that the passed ssp is held, and then fake-acquires 'RCU'.
-> > + */
-> > +static inline void __srcu_read_lock_must_hold(const struct srcu_struct *ssp) __must_hold_shared(ssp) { }
-> >   /**
-> >    * srcu_dereference_check - fetch SRCU-protected pointer for later dereferencing
-> > @@ -223,9 +233,15 @@ static inline int srcu_read_lock_held(const struct srcu_struct *ssp)
-> >    * to 1.  The @c argument will normally be a logical expression containing
-> >    * lockdep_is_held() calls.
-> >    */
-> > -#define srcu_dereference_check(p, ssp, c) \
-> > -	__rcu_dereference_check((p), __UNIQUE_ID(rcu), \
-> > -				(c) || srcu_read_lock_held(ssp), __rcu)
-> > +#define srcu_dereference_check(p, ssp, c)					\
-> > +({										\
-> > +	__srcu_read_lock_must_hold(ssp);					\
-> > +	__acquire_shared_ctx_lock(RCU);					\
-> > +	__auto_type __v = __rcu_dereference_check((p), __UNIQUE_ID(rcu),	\
-> > +				(c) || srcu_read_lock_held(ssp), __rcu);	\
-> > +	__release_shared_ctx_lock(RCU);					\
-> > +	__v;									\
-> > +})
+On 1/26/26 10:35 AM, Marco Elver wrote:
+> That being said, I don't think it's wrong to write e.g.:
 > 
-> Hi Marco,
+> 	spin_lock(&updater_lock);
+> 	__acquire_shared(ssp);
+> 	...
+> 	// writes happen through rcu_assign_pointer()
+> 	// reads can happen through srcu_dereference_check()
+> 	...
+> 	__release_shared(ssp);
+> 	spin_unlock(&updater_lock);
 > 
-> The above change is something I'm not happy about. The original
-> implementation of the srcu_dereference_check() macro shows that it is
-> sufficient to either hold an SRCU reader lock or the updater lock ('c').
-> The addition of "__srcu_read_lock_must_hold()" will cause compilation to
-> fail if the caller doesn't hold an SRCU reader lock. I'm concerned that
-> this will either lead to adding __no_context_analysis to SRCU updater
-> code that uses srcu_dereference_check() or to adding misleading
-> __assume_ctx_lock(ssp) annotations in SRCU updater code.
+> , given holding the updater lock implies reader access.
+> 
+> And given the analysis is opt-in (CONTEXT_ANALYSIS := y), I think
+> it's a manageable problem.
 
-Right, and it doesn't help 'c' is an arbitrary condition. But it's
-fundamentally difficult to say "hold either this or that lock".
+I'd like to make context-analysis mandatory for the entire kernel tree.
 
-That being said, I don't think it's wrong to write e.g.:
+> If you have a different idea how we can solve this, please let us know.
+> 
+> One final note, usage of srcu_dereference_check() is rare enough:
+> 
+> 	arch/x86/kvm/hyperv.c:	irq_rt = srcu_dereference_check(kvm->irq_routing, &kvm->irq_srcu,
+> 	arch/x86/kvm/x86.c:	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
+> 	arch/x86/kvm/x86.c:	kfree(srcu_dereference_check(kvm->arch.pmu_event_filter, &kvm->srcu, 1));
+> 	drivers/gpio/gpiolib.c:	label = srcu_dereference_check(desc->label, &desc->gdev->desc_srcu,
+> 	drivers/hv/mshv_irq.c:	girq_tbl = srcu_dereference_check(partition->pt_girq_tbl,
+> 	drivers/hwtracing/stm/core.c:	link = srcu_dereference_check(src->link, &stm_source_srcu, 1);
+> 	drivers/infiniband/hw/hfi1/user_sdma.c:	pq = srcu_dereference_check(fd->pq, &fd->pq_srcu,
+> 	fs/quota/dquot.c:			struct dquot *dquot = srcu_dereference_check(
+> 	fs/quota/dquot.c:				struct dquot *dquot = srcu_dereference_check(
+> 	fs/quota/dquot.c:		put[cnt] = srcu_dereference_check(dquots[cnt], &dquot_srcu,
+> 	fs/quota/dquot.c:		transfer_from[cnt] = srcu_dereference_check(dquots[cnt],
+> 	include/linux/kvm_host.h:	return srcu_dereference_check(kvm->memslots[as_id], &kvm->srcu,
+> 	virt/kvm/irqchip.c:	irq_rt = srcu_dereference_check(kvm->irq_routing, &kvm->irq_srcu,
+> 
+> , that I think it's easy enough to annotate these places with the above
+> suggestions in case you're trying out global enablement.
 
-	spin_lock(&updater_lock);
-	__acquire_shared(ssp);
-	...
-	// writes happen through rcu_assign_pointer()
-	// reads can happen through srcu_dereference_check()
-	...
-	__release_shared(ssp);
-	spin_unlock(&updater_lock);
+Has it ever been considered to add support in the clang compiler for a
+variant of __must_hold() that expresses that one of two capabilities
+must be held by the caller? I think that would remove the need to
+annotate SRCU update-side code with __acquire_shared(ssp) and
+__release_shared(ssp).
 
-, given holding the updater lock implies reader access.
+Thanks,
 
-And given the analysis is opt-in (CONTEXT_ANALYSIS := y), I think
-it's a manageable problem.
-
-If you have a different idea how we can solve this, please let us know.
-
-One final note, usage of srcu_dereference_check() is rare enough:
-
-	arch/x86/kvm/hyperv.c:	irq_rt = srcu_dereference_check(kvm->irq_routing, &kvm->irq_srcu,
-	arch/x86/kvm/x86.c:	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
-	arch/x86/kvm/x86.c:	kfree(srcu_dereference_check(kvm->arch.pmu_event_filter, &kvm->srcu, 1));
-	drivers/gpio/gpiolib.c:	label = srcu_dereference_check(desc->label, &desc->gdev->desc_srcu,
-	drivers/hv/mshv_irq.c:	girq_tbl = srcu_dereference_check(partition->pt_girq_tbl,
-	drivers/hwtracing/stm/core.c:	link = srcu_dereference_check(src->link, &stm_source_srcu, 1);
-	drivers/infiniband/hw/hfi1/user_sdma.c:	pq = srcu_dereference_check(fd->pq, &fd->pq_srcu,
-	fs/quota/dquot.c:			struct dquot *dquot = srcu_dereference_check(
-	fs/quota/dquot.c:				struct dquot *dquot = srcu_dereference_check(
-	fs/quota/dquot.c:		put[cnt] = srcu_dereference_check(dquots[cnt], &dquot_srcu,
-	fs/quota/dquot.c:		transfer_from[cnt] = srcu_dereference_check(dquots[cnt],
-	include/linux/kvm_host.h:	return srcu_dereference_check(kvm->memslots[as_id], &kvm->srcu,
-	virt/kvm/irqchip.c:	irq_rt = srcu_dereference_check(kvm->irq_routing, &kvm->irq_srcu,
-
-, that I think it's easy enough to annotate these places with the above
-suggestions in case you're trying out global enablement.
+Bart.
