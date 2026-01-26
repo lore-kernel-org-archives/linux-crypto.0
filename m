@@ -1,134 +1,243 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D26C34677D;
-	Mon, 26 Jan 2026 17:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F943227BA4
+	for <linux-crypto@vger.kernel.org>; Mon, 26 Jan 2026 17:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769448693; cv=none; b=CFDUmdzVfhpFSKogh7dd3QeqP6Ouh9FrUhj1O4Chat3tZ0GVVdAhZiGeZiB9Gr7aCEfcR8Gpa0mVicT1DxysITOnKTITrmRZD64aJ2KHxtzI+GVe4g64qzCfrhZVBDHdpVQUf8mqRRJZp56HCBuRy2+ybyIfuDDuTqeF4k+JA9M=
+	t=1769449635; cv=none; b=KhoYKMXNgr8YuEIPkgpyD2J9dYL7/FRACOZCBgjTvV59jzz2Z35mMtactLVQ1Ihg6IKJGexvfAvVBY3A3woms9EfFlU+I7VwYpyjG1idKEI+Afbyt9fXwQZQqG9xy4iY/ydsuQAwge9SVNjD4Km8zC+G+tBsHDCUCcMe6zT6v0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769448693; c=relaxed/simple;
-	bh=M0wCL+k15bO3pDdyLHE8FGzohjX2ZEEC1+q4jfMMHgA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wu4weehapWZrj+4Eh7fDVdnuPX8WiPq8pwzJ27AYj4YG2tJbVa4oV11s9C3e8ve+dVMHCh/LqsLDCTHJIZXws3LDsuFVJDON7Z+6lzldsUurbWgJXqt2Jpwg1tza4/ecyuwWu0Q1Tfypgyx3cKexP9GRl4hYrsI1bGv6u9HMFtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Jfjqa2A5; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1769449635; c=relaxed/simple;
+	bh=apMBtf27Kh+LirTAtt3DXglnpiCWxwR6R+3KOTVn1ow=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n9k8jWbTruscNMY/056rkFVBbcrrXO2c3/HAk0gKU8WVKXAPxr3EpolBtXZUCzYq3UpjxZUekZQCAj1IjvL23jeMB6zO1NlkWLgp30w7yc7PGgJhsZpXel0qKDd7nw828q6fqBiEovk4H+2oW2zrEzqoaoYtJ65T+UzQhxlWU+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jmD2e4vQ; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Jfjqa2A5"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4f0FvS0HvMz1XM5kt;
-	Mon, 26 Jan 2026 17:31:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1769448682; x=1772040683; bh=cqyCB6D2UZUFPhod4jHX3yXa
-	2CT5+Aq6RptHuHLLwP4=; b=Jfjqa2A5xcoH8vxqxrPT6Fc3T+WNWvUSPtyI3dfc
-	K+K74UqCtqhORUbqAIJ2PabUFFnbxrVNvd96sUMMU/MEnaVjk9rgNQ8t5/0nRw19
-	sH24JJ46JZl/8BikOO9Kx+mt4Ur/Rh8Yzl6nngAhCrvlw0oYG3zzrCOIJGm0wInA
-	YwG5Fyd74wCsCC2gIdMl3vVF8TZuM0JPKyJCc8OrmAE33h8ZSEoKEb2DqwDLr2sf
-	hlPf/0+ka1e80z6j8NCnVVqxTk2wxfTwIisYs3BeL1zHtJcgzeItDapUP68dFmWE
-	DNXn0jJrQCoweUxibEiMVlGVbmaZJxeooqs7mbStQv3LCg==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id XReqotH7_hjc; Mon, 26 Jan 2026 17:31:22 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4f0Fv22xNsz1XLyhK;
-	Mon, 26 Jan 2026 17:31:10 +0000 (UTC)
-Message-ID: <dd65bb7b-0dac-437a-a370-38efeb4737ba@acm.org>
-Date: Mon, 26 Jan 2026 09:31:09 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jmD2e4vQ"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769449632;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MV7oBX2Ps45Ldknxm+5EalQaAccqqOFLOMB9j7YB/XU=;
+	b=jmD2e4vQejkA5I1i4sNN5tDqDDvmEhkLZFy0ZQCotRQRZ7OPjzKjVqDQ6KZyuYKlLDryeD
+	6v3lC9aWpsMoOuazyCU0wmuZndRKZBeuPK5lenD+NoJjhzTnLXzfINqAV/IlbuhfAveryw
+	DrfVKEH1qNJWwGhktnzoU4f+4jIXapI=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: atmel - Use unregister_{aeads,ahashes,skciphers}
+Date: Mon, 26 Jan 2026 18:47:03 +0100
+Message-ID: <20260126174704.237141-1-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 15/36] srcu: Support Clang's context analysis
-To: Marco Elver <elver@google.com>, Peter Zijlstra <peterz@infradead.org>,
- Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
- Will Deacon <will@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
- Chris Li <sparse@chrisli.org>, "Paul E. McKenney" <paulmck@kernel.org>,
- Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>,
- Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>,
- Eric Dumazet <edumazet@google.com>, Frederic Weisbecker
- <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Herbert Xu <herbert@gondor.apana.org.au>, Ian Rogers <irogers@google.com>,
- Jann Horn <jannh@google.com>, Joel Fernandes <joelagnelf@nvidia.com>,
- Johannes Berg <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>,
- Josh Triplett <josh@joshtriplett.org>, Justin Stitt
- <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
- Kentaro Takeda <takedakn@nttdata.co.jp>,
- Lukas Bulwahn <lukas.bulwahn@gmail.com>, Mark Rutland
- <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Steven Rostedt <rostedt@goodmis.org>,
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
- Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
- Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>,
- kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-security-module@vger.kernel.org, linux-sparse@vger.kernel.org,
- linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
-References: <20251219154418.3592607-1-elver@google.com>
- <20251219154418.3592607-16-elver@google.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20251219154418.3592607-16-elver@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 12/19/25 7:40 AM, Marco Elver wrote:
-> +/*
-> + * No-op helper to denote that ssp must be held. Because SRCU-protected pointers
-> + * should still be marked with __rcu_guarded, and we do not want to mark them
-> + * with __guarded_by(ssp) as it would complicate annotations for writers, we
-> + * choose the following strategy: srcu_dereference_check() calls this helper
-> + * that checks that the passed ssp is held, and then fake-acquires 'RCU'.
-> + */
-> +static inline void __srcu_read_lock_must_hold(const struct srcu_struct *ssp) __must_hold_shared(ssp) { }
->   
->   /**
->    * srcu_dereference_check - fetch SRCU-protected pointer for later dereferencing
-> @@ -223,9 +233,15 @@ static inline int srcu_read_lock_held(const struct srcu_struct *ssp)
->    * to 1.  The @c argument will normally be a logical expression containing
->    * lockdep_is_held() calls.
->    */
-> -#define srcu_dereference_check(p, ssp, c) \
-> -	__rcu_dereference_check((p), __UNIQUE_ID(rcu), \
-> -				(c) || srcu_read_lock_held(ssp), __rcu)
-> +#define srcu_dereference_check(p, ssp, c)					\
-> +({										\
-> +	__srcu_read_lock_must_hold(ssp);					\
-> +	__acquire_shared_ctx_lock(RCU);					\
-> +	__auto_type __v = __rcu_dereference_check((p), __UNIQUE_ID(rcu),	\
-> +				(c) || srcu_read_lock_held(ssp), __rcu);	\
-> +	__release_shared_ctx_lock(RCU);					\
-> +	__v;									\
-> +})
+Replace multiple for loops with calls to crypto_unregister_aeads(),
+crypto_unregister_ahashes(), and crypto_unregister_skciphers().
 
-Hi Marco,
+Remove the definition of atmel_tdes_unregister_algs() because it is
+equivalent to calling crypto_unregister_skciphers() directly, and the
+function parameter 'struct atmel_tdes_dev *' is unused anyway.
 
-The above change is something I'm not happy about. The original
-implementation of the srcu_dereference_check() macro shows that it is
-sufficient to either hold an SRCU reader lock or the updater lock ('c').
-The addition of "__srcu_read_lock_must_hold()" will cause compilation to
-fail if the caller doesn't hold an SRCU reader lock. I'm concerned that
-this will either lead to adding __no_context_analysis to SRCU updater
-code that uses srcu_dereference_check() or to adding misleading
-__assume_ctx_lock(ssp) annotations in SRCU updater code.
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/atmel-aes.c  | 17 ++++++-----------
+ drivers/crypto/atmel-sha.c  | 27 ++++++++++-----------------
+ drivers/crypto/atmel-tdes.c | 25 ++++++-------------------
+ 3 files changed, 22 insertions(+), 47 deletions(-)
 
-Thanks,
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 3a2684208dda..bc0c40f10944 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -2201,12 +2201,10 @@ static irqreturn_t atmel_aes_irq(int irq, void *dev_id)
+ 
+ static void atmel_aes_unregister_algs(struct atmel_aes_dev *dd)
+ {
+-	int i;
+-
+ #if IS_ENABLED(CONFIG_CRYPTO_DEV_ATMEL_AUTHENC)
+ 	if (dd->caps.has_authenc)
+-		for (i = 0; i < ARRAY_SIZE(aes_authenc_algs); i++)
+-			crypto_unregister_aead(&aes_authenc_algs[i]);
++		crypto_unregister_aeads(aes_authenc_algs,
++					ARRAY_SIZE(aes_authenc_algs));
+ #endif
+ 
+ 	if (dd->caps.has_xts)
+@@ -2215,8 +2213,7 @@ static void atmel_aes_unregister_algs(struct atmel_aes_dev *dd)
+ 	if (dd->caps.has_gcm)
+ 		crypto_unregister_aead(&aes_gcm_alg);
+ 
+-	for (i = 0; i < ARRAY_SIZE(aes_algs); i++)
+-		crypto_unregister_skcipher(&aes_algs[i]);
++	crypto_unregister_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
+ }
+ 
+ static void atmel_aes_crypto_alg_init(struct crypto_alg *alg)
+@@ -2229,7 +2226,7 @@ static void atmel_aes_crypto_alg_init(struct crypto_alg *alg)
+ 
+ static int atmel_aes_register_algs(struct atmel_aes_dev *dd)
+ {
+-	int err, i, j;
++	int err, i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(aes_algs); i++) {
+ 		atmel_aes_crypto_alg_init(&aes_algs[i].base);
+@@ -2272,8 +2269,7 @@ static int atmel_aes_register_algs(struct atmel_aes_dev *dd)
+ #if IS_ENABLED(CONFIG_CRYPTO_DEV_ATMEL_AUTHENC)
+ 	/* i = ARRAY_SIZE(aes_authenc_algs); */
+ err_aes_authenc_alg:
+-	for (j = 0; j < i; j++)
+-		crypto_unregister_aead(&aes_authenc_algs[j]);
++	crypto_unregister_aeads(aes_authenc_algs, i);
+ 	crypto_unregister_skcipher(&aes_xts_alg);
+ #endif
+ err_aes_xts_alg:
+@@ -2281,8 +2277,7 @@ static int atmel_aes_register_algs(struct atmel_aes_dev *dd)
+ err_aes_gcm_alg:
+ 	i = ARRAY_SIZE(aes_algs);
+ err_aes_algs:
+-	for (j = 0; j < i; j++)
+-		crypto_unregister_skcipher(&aes_algs[j]);
++	crypto_unregister_skciphers(aes_algs, i);
+ 
+ 	return err;
+ }
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index 3d7573c7bd1c..b02a71061708 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -2418,27 +2418,23 @@ EXPORT_SYMBOL_GPL(atmel_sha_authenc_abort);
+ 
+ static void atmel_sha_unregister_algs(struct atmel_sha_dev *dd)
+ {
+-	int i;
+-
+ 	if (dd->caps.has_hmac)
+-		for (i = 0; i < ARRAY_SIZE(sha_hmac_algs); i++)
+-			crypto_unregister_ahash(&sha_hmac_algs[i]);
++		crypto_unregister_ahashes(sha_hmac_algs,
++					  ARRAY_SIZE(sha_hmac_algs));
+ 
+-	for (i = 0; i < ARRAY_SIZE(sha_1_256_algs); i++)
+-		crypto_unregister_ahash(&sha_1_256_algs[i]);
++	crypto_unregister_ahashes(sha_1_256_algs, ARRAY_SIZE(sha_1_256_algs));
+ 
+ 	if (dd->caps.has_sha224)
+ 		crypto_unregister_ahash(&sha_224_alg);
+ 
+-	if (dd->caps.has_sha_384_512) {
+-		for (i = 0; i < ARRAY_SIZE(sha_384_512_algs); i++)
+-			crypto_unregister_ahash(&sha_384_512_algs[i]);
+-	}
++	if (dd->caps.has_sha_384_512)
++		crypto_unregister_ahashes(sha_384_512_algs,
++					  ARRAY_SIZE(sha_384_512_algs));
+ }
+ 
+ static int atmel_sha_register_algs(struct atmel_sha_dev *dd)
+ {
+-	int err, i, j;
++	int err, i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(sha_1_256_algs); i++) {
+ 		atmel_sha_alg_init(&sha_1_256_algs[i]);
+@@ -2480,18 +2476,15 @@ static int atmel_sha_register_algs(struct atmel_sha_dev *dd)
+ 
+ 	/*i = ARRAY_SIZE(sha_hmac_algs);*/
+ err_sha_hmac_algs:
+-	for (j = 0; j < i; j++)
+-		crypto_unregister_ahash(&sha_hmac_algs[j]);
++	crypto_unregister_ahashes(sha_hmac_algs, i);
+ 	i = ARRAY_SIZE(sha_384_512_algs);
+ err_sha_384_512_algs:
+-	for (j = 0; j < i; j++)
+-		crypto_unregister_ahash(&sha_384_512_algs[j]);
++	crypto_unregister_ahashes(sha_384_512_algs, i);
+ 	crypto_unregister_ahash(&sha_224_alg);
+ err_sha_224_algs:
+ 	i = ARRAY_SIZE(sha_1_256_algs);
+ err_sha_1_256_algs:
+-	for (j = 0; j < i; j++)
+-		crypto_unregister_ahash(&sha_1_256_algs[j]);
++	crypto_unregister_ahashes(sha_1_256_algs, i);
+ 
+ 	return err;
+ }
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index 3b2a92029b16..278c0df3c92f 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -897,38 +897,25 @@ static irqreturn_t atmel_tdes_irq(int irq, void *dev_id)
+ 	return IRQ_NONE;
+ }
+ 
+-static void atmel_tdes_unregister_algs(struct atmel_tdes_dev *dd)
+-{
+-	int i;
+-
+-	for (i = 0; i < ARRAY_SIZE(tdes_algs); i++)
+-		crypto_unregister_skcipher(&tdes_algs[i]);
+-}
+-
+ static int atmel_tdes_register_algs(struct atmel_tdes_dev *dd)
+ {
+-	int err, i, j;
++	int err, i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(tdes_algs); i++) {
+ 		atmel_tdes_skcipher_alg_init(&tdes_algs[i]);
+ 
+ 		err = crypto_register_skcipher(&tdes_algs[i]);
+-		if (err)
+-			goto err_tdes_algs;
++		if (err) {
++			crypto_unregister_skciphers(tdes_algs, i);
++			return err;
++		}
+ 	}
+ 
+ 	return 0;
+-
+-err_tdes_algs:
+-	for (j = 0; j < i; j++)
+-		crypto_unregister_skcipher(&tdes_algs[j]);
+-
+-	return err;
+ }
+ 
+ static void atmel_tdes_get_cap(struct atmel_tdes_dev *dd)
+ {
+-
+ 	dd->caps.has_dma = 0;
+ 
+ 	/* keep only major version number */
+@@ -1061,7 +1048,7 @@ static void atmel_tdes_remove(struct platform_device *pdev)
+ 	list_del(&tdes_dd->list);
+ 	spin_unlock(&atmel_tdes.lock);
+ 
+-	atmel_tdes_unregister_algs(tdes_dd);
++	crypto_unregister_skciphers(tdes_algs, ARRAY_SIZE(tdes_algs));
+ 
+ 	tasklet_kill(&tdes_dd->done_task);
+ 	tasklet_kill(&tdes_dd->queue_task);
+-- 
+Thorsten Blum <thorsten.blum@linux.dev>
+GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
 
-Bart.
