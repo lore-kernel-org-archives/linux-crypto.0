@@ -1,184 +1,977 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F88C2FE571;
-	Mon, 26 Jan 2026 04:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573C1219A8A;
+	Mon, 26 Jan 2026 09:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769402440; cv=none; b=mxrIpxTwm6VrXO5A0esfUPc+S3Yan0mPTGx5jALol+HUW55ogEgjl9aWUuYH4OTDAJkbMdvNVBcUA7bc0zdTQPXi/bIVPZbpbl8Og2d4igN87DgBIdgwycj/3e16vkqw+IdC5UBoYnwT9DdfH3wDWz1+KonGEMcmkiMauqmUot4=
+	t=1769419472; cv=none; b=i3LtYzy4bLDKjlkJQF8k9OhRz5mBMdQuOf1YNjRKMbmQhMzugwpH8Vf8rzyZINdcMvmXgpLPyiwbLRzSly4myBO2KEHLG54nby4Mzs9FXPvmDbf2L2YtlMJP0qHG1I9ppxu0df1x3HRi5/jbOwQcb3oCi7YeNfTRDGwxJNrFGVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769402440; c=relaxed/simple;
-	bh=jQ2Q1laXwAlsdt9jarJdpA8FVJIoiPYZ1UE80jCr0ek=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I/dRP5OmStUxK3XpC2VexLtot92CQCF1jPIYs5yqIESFlpm614/in0Wvzdk4psVIPovmy7KkcCkWBuy0wdmEMLiKpEp8ZdxkArUU9zWoYOlo8MM/Tk0HgN9kV6zhSe+EpP5EFjCXg2F5oNR2MBVegG0wvngSS2LinGgVo7YpTHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=hyPtIWUf; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="hyPtIWUf"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=ywqHLjVYk/p1KrDeKEFo/9K2tsO1DYVOCG79V4vgnUU=; 
-	b=hyPtIWUfV+SjFIXQ7xoR330cX13pWB3L7dgjx+f9aVBYJvjHH5Pty9sx9vu2LYyhi7ZR2iwkxV1
-	MKwFf0u0/bYDa4KB2gmqV3ZBG4VhxYhhZS9Jb8VJAHU4yKbBIab1U2pjYIXfpje9T49t2kD7h8McU
-	UN/eGofzpSIgkzo8HrqMO+Zf1UNszeY2IPXMgyGs/rC6v9GQmnB6Q8Aihn2o860tqfgbTsBhjG+4l
-	RJABzDoBB+6pNFI97aShOHq1kPuXmCvoBsGPy2n+4NkByNQhinC/Zv6cAdhloBdcF23sd48AXbt/s
-	rmaO2nT8RMhgYJnAUJeOAFtPBOd8BGj8gC7w==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vkEOh-002716-2T;
-	Mon, 26 Jan 2026 12:40:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 26 Jan 2026 12:40:19 +0800
-Date: Mon, 26 Jan 2026 12:40:19 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lianjie Wang <karin0.zst@gmail.com>
-Cc: Olivia Mackall <olivia@selenic.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	Jonathan McDowell <noodles@meta.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] hwrng: core - use RCU for current_rng to fix race
- condition
-Message-ID: <aXbwM1wiPKqmC94v@gondor.apana.org.au>
-References: <20260124195555.851117-1-karin0.zst@gmail.com>
+	s=arc-20240116; t=1769419472; c=relaxed/simple;
+	bh=3FNXYi3mbpJ8zf6LIgTbn9nr/k81g73D9Krs/RepZMM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dYx5XpoF3+cLNFAJzrAnQV5LAmzOKt9woAJ5byIc/XfLgXRHd4377E73Yc/dC4mWJ6odBHZ9NU8MC6kBHf3M5iVVbRL03FS/gsCLVQ6GqCeW5tlKt06mia4638j7T8ieVZeatPeNUJDO69/uM9cLFt11pbsQ+9OnUPMj5jwSYtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from ubt.. (unknown [210.73.43.101])
+	by APP-01 (Coremail) with SMTP id qwCowADnjmq9MndptA1LBg--.14759S2;
+	Mon, 26 Jan 2026 17:24:14 +0800 (CST)
+From: Chunyan Zhang <zhangchunyan@iscas.ac.cn>
+To: Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: linux-riscv@lists.infradead.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chunyan Zhang <zhang.lyra@gmail.com>
+Subject: [PATCH V2] crypto: aegis128: Add RISC-V vector SIMD implementation
+Date: Mon, 26 Jan 2026 17:24:11 +0800
+Message-Id: <20260126092411.243237-1-zhangchunyan@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260124195555.851117-1-karin0.zst@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowADnjmq9MndptA1LBg--.14759S2
+X-Coremail-Antispam: 1UD129KBjvAXoWfuw15Xr48AryrAr1fXrWfGrg_yoW8KrykZo
+	ZrGa1fWr4kuw12gFWak3y7GFn3uwsxKwsav3WFvF4UZFsxtF15K340vw45Wr1xAw12k3Wa
+	yFyfXw1fWw4jyw1Dn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UjIYCTnIWjp_UUUYT7k0a2IF6w4kM7kC6x804xWl14x267AKxVW8JVW5JwAFc2x0
+	x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj4
+	1l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0
+	I7IYx2IY6xkF7I0E14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwV
+	C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY
+	04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
+	vE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
+	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa
+	73UjIFyTuYvjxUgHanUUUUU
+X-CM-SenderInfo: x2kd0wxfkx051dq6x2xfdvhtffof0/1tbiBwsTB2l3H59ExwAAsF
 
-On Sun, Jan 25, 2026 at 04:55:55AM +0900, Lianjie Wang wrote:
-> Currently, hwrng_fill is not cleared until the hwrng_fillfn() thread
-> exits. Since hwrng_unregister() reads hwrng_fill outside the rng_mutex
-> lock, a concurrent hwrng_unregister() may call kthread_stop() again on
-> the same task.
-> 
-> Additionally, if the hwrng_unregister() call happens immediately after a
-> hwrng_register() before, the stopped thread may have never been running,
-> and thus hwrng_fill remains dirty even after the hwrng_unregister() call
-> returns. In this case, further calls to hwrng_register() may not start
-> new threads, and hwrng_unregister() will also call kthread_stop() on the
-> same task, causing use-after-free and sometimes lockups:
-> 
-> refcount_t: addition on 0; use-after-free.
-> WARNING: ... at lib/refcount.c:25 refcount_warn_saturate+0xec/0x1c0
-> Call Trace:
->  kthread_stop+0x181/0x360
->  hwrng_unregister+0x288/0x380
->  virtrng_remove+0xe3/0x200
-> 
-> This patch fixes the race by protecting the global hwrng_fill pointer
-> inside the rng_mutex lock, so that hwrng_fillfn() thread is stopped only
-> once, and calls to kthread_create() and kthread_stop() are serialized
-> with the lock held.
-> 
-> To avoid deadlock in hwrng_fillfn() while being stopped,
-> get_current_rng() and put_rng() no longer hold the rng_mutex lock now.
-> Instead, we convert current_rng to RCU.
-> 
-> With hwrng_fill protected by the rng_mutex lock, hwrng_fillfn() can no
-> longer clear hwrng_fill itself. Therefore, the kthread_stop() call is
-> moved from hwrng_unregister() to drop_current_rng(), where the lock is
-> already held. This ensures the task is joined via kthread_stop() on all
-> possible paths (whether kthread_should_stop() is set, or
-> get_current_rng() starts returning NULL).
-> 
-> Since get_current_rng() no longer returns ERR_PTR values, the IS_ERR()
-> checks are removed from its callers. The NULL check is also moved from
-> put_rng() to its caller rng_current_show(), since all the other callers
-> of put_rng() already check for NULL.
-> 
-> Fixes: be4000bc4644 ("hwrng: create filler thread")
-> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Lianjie Wang <karin0.zst@gmail.com>
-> ---
-> v2:
->  - Convert the lock for get_current_rng() to RCU to break the deadlock, as
->    suggested by Herbert Xu.
->  - Remove rng_mutex from put_rng() and move NULL check to rng_current_show().
->  - Move kthread_stop() to drop_current_rng() inside the lock to join the task
->    on all paths, avoiding modifying hwrng_fill inside hwrng_fillfn().
->  - Revert changes to rng_fillbuf.
-> 
-> v1: https://lore.kernel.org/linux-crypto/20251221122448.246531-1-karin0.zst@gmail.com/
-> 
->  drivers/char/hw_random/core.c | 145 +++++++++++++++++++---------------
->  1 file changed, 81 insertions(+), 64 deletions(-)
+Add a RISC-V vector-accelerated implementation of aegis128 by
+wiring it into the generic SIMD hooks.
 
-Thanks, this looks pretty good!
+This implementation supports vlen values of 512, 256, and 128.
 
->  static struct hwrng *get_current_rng(void)
->  {
->  	struct hwrng *rng;
-> 
-> -	if (mutex_lock_interruptible(&rng_mutex))
-> -		return ERR_PTR(-ERESTARTSYS);
-> +	rcu_read_lock();
-> +	rng = rcu_dereference(current_rng);
-> +	if (rng && !kref_get_unless_zero(&rng->ref))
-> +		rng = NULL;
+Signed-off-by: Chunyan Zhang <zhangchunyan@iscas.ac.cn>
+---
+V2:
+- Add config dependency of RISCV_ISA_V to fix the issue reported by kernel test robot;
+- Add return value in preload_round_data() and aegis128_round().
 
-rng->ref should never be zero here as the final kref_put is delayed
-by RCU.  So this should be a plain kref_get.
+V1: https://lore.kernel.org/all/20260121101923.64657-1-zhangchunyan@iscas.ac.cn/
+---
+ crypto/Kconfig              |   4 +-
+ crypto/Makefile             |   4 +
+ crypto/aegis-rvv.h          |  19 +
+ crypto/aegis128-rvv-inner.c | 762 ++++++++++++++++++++++++++++++++++++
+ crypto/aegis128-rvv.c       |  63 +++
+ 5 files changed, 850 insertions(+), 2 deletions(-)
+ create mode 100644 crypto/aegis-rvv.h
+ create mode 100644 crypto/aegis128-rvv-inner.c
+ create mode 100644 crypto/aegis128-rvv.c
 
->  static void put_rng(struct hwrng *rng)
->  {
-> -	/*
-> -	 * Hold rng_mutex here so we serialize in case they set_current_rng
-> -	 * on rng again immediately.
-> -	 */
-> -	mutex_lock(&rng_mutex);
-> -	if (rng)
-> -		kref_put(&rng->ref, cleanup_rng);
-> -	mutex_unlock(&rng_mutex);
-> +	kref_put(&rng->ref, cleanup_rng);
->  }
-
-I think the mutex needs to be kept here as otherwise there is
-a risk of a slow cleanup_rng racing against a subsequent hwrng_init
-on the same RNG.
-
-> @@ -371,11 +385,10 @@ static ssize_t rng_current_show(struct device *dev,
->  	struct hwrng *rng;
-> 
->  	rng = get_current_rng();
-> -	if (IS_ERR(rng))
-> -		return PTR_ERR(rng);
-> 
->  	ret = sysfs_emit(buf, "%s\n", rng ? rng->name : "none");
-> -	put_rng(rng);
-> +	if (rng)
-> +		put_rng(rng);
-
-I don't think this NULL check is necessary as put_rng can handle
-rng == NULL.
-
-> @@ -489,8 +502,17 @@ static int hwrng_fillfn(void *unused)
->  		struct hwrng *rng;
-> 
->  		rng = get_current_rng();
-> -		if (IS_ERR(rng) || !rng)
-> +		if (!rng) {
-> +			/* This is only possible within drop_current_rng(),
-> +			 * so just wait until we are stopped.
-> +			 */
-> +			while (!kthread_should_stop()) {
-> +				set_current_state(TASK_INTERRUPTIBLE);
-> +				schedule();
-> +			}
->  			break;
-> +		}
-> +
-
-Is the schedule necessary? Shouldn't the break just work as it
-did before?
-
-Cheers,
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 2e5b195b1b06..9766b3596049 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -777,8 +777,8 @@ config CRYPTO_AEGIS128
+ 	  AEGIS-128 AEAD algorithm
+ 
+ config CRYPTO_AEGIS128_SIMD
+-	bool "AEGIS-128 (arm NEON, arm64 NEON)"
+-	depends on CRYPTO_AEGIS128 && ((ARM || ARM64) && KERNEL_MODE_NEON)
++	bool "AEGIS-128 (arm NEON, arm64 NEON, RISC-V vector)"
++	depends on CRYPTO_AEGIS128 && (((ARM || ARM64) && KERNEL_MODE_NEON) || (RISCV && RISCV_ISA_V))
+ 	default y
+ 	help
+ 	  AEGIS-128 AEAD algorithm
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 16a35649dd91..3d94cae9eeba 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -121,6 +121,10 @@ endif
+ # Enable <arm_neon.h>
+ CFLAGS_aegis128-neon-inner.o += -isystem $(shell $(CC) -print-file-name=include)
+ 
++ifeq ($(ARCH),riscv)
++aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-rvv.o aegis128-rvv-inner.o
++endif
++
+ obj-$(CONFIG_CRYPTO_PCRYPT) += pcrypt.o
+ obj-$(CONFIG_CRYPTO_CRYPTD) += cryptd.o
+ obj-$(CONFIG_CRYPTO_DES) += des_generic.o
+diff --git a/crypto/aegis-rvv.h b/crypto/aegis-rvv.h
+new file mode 100644
+index 000000000000..02bd646e4467
+--- /dev/null
++++ b/crypto/aegis-rvv.h
+@@ -0,0 +1,19 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Copyright 2026 Institute of Software, CAS
++ */
++
++#ifndef _AEGIS_RVV_H
++#define _AEGIS_RVV_H
++
++extern const u8 crypto_aes_sbox[];
++
++void crypto_aegis128_init_rvv(void *state, const void *key, const void *iv);
++void crypto_aegis128_update_rvv(void *state, const void *msg);
++void crypto_aegis128_encrypt_chunk_rvv(void *state, void *dst, const void *src,
++				       unsigned int size);
++void crypto_aegis128_decrypt_chunk_rvv(void *state, void *dst, const void *src,
++				       unsigned int size);
++int crypto_aegis128_final_rvv(void *state, void *tag_xor, unsigned int assoclen,
++			      unsigned int cryptlen, unsigned int authsize);
++#endif
+diff --git a/crypto/aegis128-rvv-inner.c b/crypto/aegis128-rvv-inner.c
+new file mode 100644
+index 000000000000..2d7439769d77
+--- /dev/null
++++ b/crypto/aegis128-rvv-inner.c
+@@ -0,0 +1,762 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright 2026 Institute of Software, CAS
++ * Author: Chunyan Zhang <zhangchunyan@iscas.ac.cn>
++ *
++ * Based on aegis128-neon-inner.c:
++ *	Copyright (C) 2019 Linaro, Ltd. <ard.biesheuvel@linaro.org>
++ */
++
++#include <asm/vector.h>
++#include <linux/types.h>
++
++#include "aegis-rvv.h"
++#include "aegis.h"
++
++#define AEGIS128_STATE_BLOCKS 5
++#define RVV_VLEN	riscv_vector_vlen()
++
++typedef u8 aegis128_block_bytes[AEGIS_BLOCK_SIZE];
++struct aegis_state {
++	aegis128_block_bytes blocks[AEGIS128_STATE_BLOCKS];
++};
++
++/* Load 256 bytes at one time into the vector registers starting from r0 */
++#define preload_sbox_1(m, r0) do {				\
++	unsigned long vl;					\
++	asm volatile (".option	push\n"				\
++		      ".option	arch,+v\n"			\
++		      "vsetvli	%0, x0, e8, "m", ta, ma\n"	\
++		      "vle8.v	"r0", (%1)\n"			\
++		      ".option	pop\n"				\
++		      : "=&r" (vl)				\
++		      :						\
++		      "r" (crypto_aes_sbox)			\
++	:);							\
++} while (0)
++
++/* Load 256 bytes at two times into the vector registers starting from r0 and r1 */
++#define preload_sbox_2(m, r0, r1) do {				\
++	unsigned long vl;					\
++	asm volatile (".option	push\n"				\
++		      ".option	arch,+v\n"			\
++		      "vsetvli	%0, x0, e8, "m", ta, ma\n"	\
++		      "vle8.v	"r0", (%1)\n"			\
++		      "vle8.v	"r1", (%2)\n"			\
++		      ".option	pop\n"				\
++		      : "=&r" (vl)				\
++		      :						\
++		      "r" (crypto_aes_sbox),			\
++		      "r" (crypto_aes_sbox + 0x80)		\
++	:);							\
++} while (0)
++
++/* v16 - v31: crypto_aes_sbox[0-255] */
++#define preload_sbox_128() preload_sbox_2("m8", "v16", "v24")
++
++/* v16 - v23: crypto_aes_sbox[0-255] */
++#define preload_sbox_256() preload_sbox_1("m8", "v16")
++
++/* v16 - v19: crypto_aes_sbox[0-255] */
++#define preload_sbox_512() preload_sbox_1("m4", "v16")
++
++static __always_inline
++int preload_round_data(void)
++{
++	static const u8 rev32qu16[] = {
++		0x2, 0x3, 0x0, 0x1, 0x6, 0x7, 0x4, 0x5,
++		0xa, 0xb, 0x8, 0x9, 0xe, 0xf, 0xc, 0xd,
++	};
++
++	static const u8 shift_rows[] = {
++		0x0, 0x5, 0xa, 0xf, 0x4, 0x9, 0xe, 0x3,
++		0x8, 0xd, 0x2, 0x7, 0xc, 0x1, 0x6, 0xb,
++	};
++
++	static const u8 ror32by8[] = {
++		0x1, 0x2, 0x3, 0x0, 0x5, 0x6, 0x7, 0x4,
++		0x9, 0xa, 0xb, 0x8, 0xd, 0xe, 0xf, 0xc,
++	};
++
++	asm volatile (".option	push\n"
++		      ".option	arch,+v\n"
++		      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++		      "vle8.v	v13, (%[rev32qu16])\n"
++		      "vle8.v	v14, (%[shift_rows])\n"
++		      "vle8.v	v15, (%[ror32by8])\n"
++		      ".option	pop\n"
++		      : :
++		      [rev32qu16]"r"(rev32qu16),
++		      [shift_rows]"r"(shift_rows),
++		      [ror32by8]"r"(ror32by8)
++	:);
++
++	switch (RVV_VLEN) {
++	case 128:
++		preload_sbox_128();
++		break;
++	case 256:
++		preload_sbox_256();
++		break;
++	case 512:
++		preload_sbox_512();
++		break;
++	default:
++		pr_err("ERROR: %d is not a supported vector length!", RVV_VLEN);
++		return -ENODEV;
++	}
++
++	return 0;
++}
++
++#define AEGIS128_ROUND_PART1				\
++	".option	push\n"				\
++	".option	arch,+v\n"			\
++	"vsetivli	zero, 0x10, e8, m1, ta, ma\n"	\
++	/* s = vqtbl1q_u8(s, vld1q_u8(shift_rows)) */	\
++	"vle8.v		v0, (%[s])\n"			\
++	"vrgather.vv	v1, v0, v14\n" /* v14: shift_rows */
++
++#define AEGIS128_ROUND_PART3						\
++	/* s= (v << 1) ^ (uint8x16_t)(((int8x16_t)v >> 7) & 0x1b) */	\
++	"vsetivli	zero, 0x10, e8, m1, ta, ma\n"			\
++	"vsra.vi	v3, v2, 7\n" /* ((int8x16_t)v >> 7) */		\
++	"vand.vx	v3, v3, %[x1b]\n"				\
++	"vsll.vi	v4, v2, 1\n" /* (v << 1) */			\
++	"vxor.vv	v3, v4, v3\n"					\
++	/* s ^= (uint8x16_t)vrev32q_u16((uint16x8_t)v) */		\
++	"vrgather.vv	v4, v2, v13\n" /* v13: rev32qu16 */		\
++	"vxor.vv	v3, v3, v4\n"					\
++	/* s ^= vqtbl1q_u8(v ^ s, vld1q_u8(ror32by8)); */		\
++	"vxor.vv	v4, v3, v2\n" /* v ^ s */			\
++	"vrgather.vv	v5, v4, v15\n" /* v15: ror32by8 */		\
++	"vxor.vv	v3, v3, v5\n"					\
++	"vle8.v		v4, (%[d])\n"					\
++	"vxor.vv	v3, v3, v4\n" /* dst ^= v3 */			\
++	"vse8.v		v3, (%[d])\n"					\
++	".option	pop\n"
++
++/*
++ * v = vqtbx4q_u8(v, vld1q_u8_x4(crypto_aes_sbox + step), s - step);
++ * r: vector register which stores sbox array
++ */
++#define gather_sbox(r)				\
++	"vsub.vx	v1, v1, %[step]\n"	\
++	"vrgather.vv	v3, "r", v1\n"		\
++	"vor.vv		v2, v2, v3\n"
++
++static __always_inline
++void aegis128_round_128(u8 *dst, const u8 *src)
++{
++	unsigned long vl;
++
++	/* v16 - v31: crypto_aes_sbox[0-255] */
++	asm volatile (AEGIS128_ROUND_PART1
++		      /* v = vqtbl4q_u8(vld1q_u8_x4(crypto_aes_sbox), s); */
++		      "vsetvli		%0, x0, e8, m1, ta, ma\n"
++		      "vrgather.vv	v2, v16, v1\n"
++		      /* v = vqtbx4q_u8(v, vld1q_u8_x4(crypto_aes_sbox + 0x10), s - 0x10); */
++		      gather_sbox("v17")
++		      gather_sbox("v18")
++		      gather_sbox("v19")
++		      gather_sbox("v20")
++		      gather_sbox("v21")
++		      gather_sbox("v22")
++		      gather_sbox("v23")
++		      gather_sbox("v24")
++		      gather_sbox("v25")
++		      gather_sbox("v26")
++		      gather_sbox("v27")
++		      gather_sbox("v28")
++		      gather_sbox("v29")
++		      gather_sbox("v30")
++		      gather_sbox("v31")
++		      AEGIS128_ROUND_PART3
++		      : "=&r" (vl) :
++		      [s]"r"(src),
++		      [step]"r"(0x10),
++		      [x1b]"r"(0x1b),
++		      [d]"r"(dst)
++		      : "memory"
++	);
++}
++
++static __always_inline
++void aegis128_round_256(u8 *dst, const u8 *src)
++{
++	unsigned long vl;
++
++	/* v16 - v23: crypto_aes_sbox[0-255] */
++	asm volatile (AEGIS128_ROUND_PART1
++		      /* v = vqtbl4q_u8(vld1q_u8_x4(crypto_aes_sbox), s); */
++		      "vsetvli		%0, x0, e8, m1, ta, ma\n"
++		      "vrgather.vv	v2, v16, v1\n"
++		      /* v = vqtbx4q_u8(v, vld1q_u8_x4(crypto_aes_sbox + 0x20), s - 0x20); */
++		      gather_sbox("v17")
++		      gather_sbox("v18")
++		      gather_sbox("v19")
++		      gather_sbox("v20")
++		      gather_sbox("v21")
++		      gather_sbox("v22")
++		      gather_sbox("v23")
++		      AEGIS128_ROUND_PART3
++		      : "=&r" (vl) :
++		      [s]"r"(src),
++		      [step]"r"(0x20),
++		      [x1b]"r"(0x1b),
++		      [d]"r"(dst)
++		      : "memory"
++	);
++}
++
++static __always_inline
++void aegis128_round_512(u8 *dst, const u8 *src)
++{
++	unsigned long vl;
++
++	/* v16 - v19: crypto_aes_sbox[0-255] */
++	asm volatile (AEGIS128_ROUND_PART1
++		      /* v = vqtbl4q_u8(vld1q_u8_x4(crypto_aes_sbox), s); */
++		      "vsetvli		%0, x0, e8, m1, ta, ma\n"
++		      "vrgather.vv	v2, v16, v1\n"
++		      /*v = vqtbx4q_u8(v, vld1q_u8_x4(crypto_aes_sbox + 0x40), s - 0x40);*/
++		      gather_sbox("v17")
++		      /*v = vqtbx4q_u8(v, vld1q_u8_x4(crypto_aes_sbox + 0x80), s - 0x80);*/
++		      gather_sbox("v18")
++		      /*v = vqtbx4q_u8(v, vld1q_u8_x4(crypto_aes_sbox + 0xc0), s - 0xc0);*/
++		      gather_sbox("v19")
++		      AEGIS128_ROUND_PART3
++		      : "=&r" (vl) :
++		      [s]"r"(src),
++		      [step]"r"(0x40),
++		      [x1b]"r"(0x1b),
++		      [d]"r"(dst)
++		      : "memory"
++	);
++}
++
++static __always_inline
++int aegis128_round(u8 *dst, const u8 *src)
++{
++	switch (RVV_VLEN) {
++	case 128:
++		aegis128_round_128(dst, src);
++		break;
++	case 256:
++		aegis128_round_256(dst, src);
++		break;
++	case 512:
++		aegis128_round_512(dst, src);
++		break;
++	default:
++		pr_err("ERROR: %d is not a supported vector length!", RVV_VLEN);
++		return -ENODEV;
++	}
++
++	return 0;
++}
++
++static __always_inline
++void aegis128_update_rvv(struct aegis_state *state, const void *key)
++{
++	u8 k[AEGIS_BLOCK_SIZE];
++
++	/* save key to k[16] */
++	asm volatile (".option	push\n"
++		      ".option	arch,+v\n"
++		      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++		      "vle8.v	v1, (%[key])\n"
++		      "vse8.v	v1, (%[k])\n"
++		      ".option	pop\n"
++		      : :
++		      [key]"r"(key),
++		      [k]"r"(k)
++	:);
++
++	aegis128_round(k, state->blocks[4]);
++	aegis128_round(state->blocks[4], state->blocks[3]);
++	aegis128_round(state->blocks[3], state->blocks[2]);
++	aegis128_round(state->blocks[2], state->blocks[1]);
++	aegis128_round(state->blocks[1], state->blocks[0]);
++
++	/* state->blocks[0] ^= key */
++	asm volatile (".option	push\n"
++		      ".option	arch,+v\n"
++		      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++		      "vle8.v	v1, (%[k])\n"
++		      "vle8.v	v2, (%[block0])\n"
++		      "vxor.vv	v2, v2, v1\n"
++		      "vse8.v	v2, (%[block0])\n"
++		      ".option	pop\n"
++		      : :
++		      [k]"r"(k),
++		      [block0]"r"(state->blocks[0])
++	:);
++}
++
++void crypto_aegis128_init_rvv(void *state, const void *key, const void *iv)
++{
++	struct aegis_state *st = state;
++	u8 kiv[AEGIS_BLOCK_SIZE];
++
++	static const u8 const0[] = {
++		0x00, 0x01, 0x01, 0x02, 0x03, 0x05, 0x08, 0x0d,
++		0x15, 0x22, 0x37, 0x59, 0x90, 0xe9, 0x79, 0x62,
++	};
++	static const u8 const1[] = {
++		0xdb, 0x3d, 0x18, 0x55, 0x6d, 0xc2, 0x2f, 0xf1,
++		0x20, 0x11, 0x31, 0x42, 0x73, 0xb5, 0x28, 0xdd,
++	};
++
++	/*
++	 * kiv = key^iv
++	 * struct aegis128_state st = {{
++		kiv,
++		vld1q_u8(const1),
++		vld1q_u8(const0),
++		key ^ vld1q_u8(const0),
++		key ^ vld1q_u8(const1),
++	   }};
++	 */
++	asm volatile (".option	push\n"
++		      ".option	arch,+v\n"
++		      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++		      "vle8.v	v0, (%[const0])\n"
++		      "vle8.v	v1, (%[const1])\n"
++		      "vse8.v	v0, (%[block2])\n"
++		      "vse8.v	v1, (%[block1])\n"
++		      "vle8.v	v2, (%[iv])\n"
++		      "vle8.v	v3, (%[key])\n"
++		      "vxor.vv	v0, v0, v3\n"
++		      "vxor.vv	v1, v1, v3\n"
++		      "vxor.vv	v2, v2, v3\n"
++		      "vse8.v	v2, (%[block0])\n"
++		      "vse8.v	v2, (%[kiv])\n"
++		      "vse8.v	v0, (%[block3])\n"
++		      "vse8.v	v1, (%[block4])\n"
++		      ".option	pop\n"
++		      : :
++		      [const0]"r"(const0),
++		      [const1]"r"(const1),
++		      [block1]"r"(st->blocks[1]),
++		      [block2]"r"(st->blocks[2]),
++		      [iv]"r"(iv),
++		      [key]"r"(key),
++		      [block0]"r"(st->blocks[0]),
++		      [kiv]"r"(kiv),
++		      [block3]"r"(st->blocks[3]),
++		      [block4]"r"(st->blocks[4])
++	:);
++
++	if (preload_round_data())
++		return;
++
++	for (int i = 0; i < 5; i++) {
++		aegis128_update_rvv(st, key);
++		aegis128_update_rvv(st, kiv);
++	}
++}
++
++void crypto_aegis128_update_rvv(void *state, const void *msg)
++{
++	struct aegis_state *st = state;
++
++	if (preload_round_data())
++		return;
++
++	aegis128_update_rvv(st, msg);
++}
++
++static const u8 permute[] __aligned(64) = {
++	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
++	 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
++	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
++};
++
++void crypto_aegis128_encrypt_chunk_rvv(void *state, void *dst, const void *src,
++				       unsigned int size)
++{
++	struct aegis_state *st = state;
++	const int short_input = size < AEGIS_BLOCK_SIZE;
++	u8 s[AEGIS_BLOCK_SIZE];
++	u8 msg[AEGIS_BLOCK_SIZE];
++
++	if (preload_round_data())
++		return;
++
++	while (size >= AEGIS_BLOCK_SIZE) {
++		/* s = st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4]; */
++		asm volatile (".option	push\n"
++			      ".option	arch,+v\n"
++			      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++			      "vle8.v	v1, (%[block1])\n"
++			      "vle8.v	v2, (%[block2])\n"
++			      "vle8.v	v3, (%[block3])\n"
++			      "vle8.v	v4, (%[block4])\n"
++			      "vxor.vv	v1, v1, v4\n"
++			      "vand.vv	v2, v2, v3\n"
++			      "vxor.vv	v1, v1, v2\n"
++			      "vse8.v	v1, (%[s])\n"
++			      ".option	pop\n"
++			      : :
++			      [block1]"r"(st->blocks[1]),
++			      [block2]"r"(st->blocks[2]),
++			      [block3]"r"(st->blocks[3]),
++			      [block4]"r"(st->blocks[4]),
++			      [s]"r"(s)
++		:);
++
++		aegis128_update_rvv(st, src);
++		/* dst = s ^ src*/
++		asm volatile (".option	push\n"
++			      ".option	arch,+v\n"
++			      "vle8.v	v1, (%[s])\n"
++			      "vle8.v	v2, (%[src])\n"
++			      "vxor.vv	v1, v1, v2\n"
++			      "vse8.v	v1, (%[dst])\n"
++			      "vse8.v	v1, (%[msg])\n"
++			      ".option	pop\n"
++			      : :
++			      [s]"r"(s),
++			      [src]"r"(src),
++			      [dst]"r"(dst),
++			      [msg]"r"(msg)
++		:);
++
++		size -= AEGIS_BLOCK_SIZE;
++		src += AEGIS_BLOCK_SIZE;
++		dst += AEGIS_BLOCK_SIZE;
++	}
++
++	if (size > 0) {
++		u8 buf[AEGIS_BLOCK_SIZE];
++		const void *in = src;
++		void *out = dst;
++		u8 m[AEGIS_BLOCK_SIZE];
++
++		/* s = st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4]; */
++		asm volatile (".option	push\n"
++			      ".option	arch,+v\n"
++			      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++			      "vle8.v	v1, (%[block1])\n"
++			      "vle8.v	v2, (%[block2])\n"
++			      "vle8.v	v3, (%[block3])\n"
++			      "vle8.v	v4, (%[block4])\n"
++			      "vxor.vv	v1, v1, v4\n" /* st.v[1] ^ st.v[4] */
++			      "vand.vv	v2, v2, v3\n" /* st.v[2] & st.v[3] */
++			      "vxor.vv	v1, v1, v2\n"
++			      "vse8.v	v1, (%[s])\n"
++			      ".option	pop\n"
++			      : :
++			      [block1]"r"(st->blocks[1]),
++			      [block2]"r"(st->blocks[2]),
++			      [block3]"r"(st->blocks[3]),
++			      [block4]"r"(st->blocks[4]),
++			      [s]"r"(s)
++		:);
++
++		if (__builtin_expect(short_input, 0))
++			in = out = memcpy(buf + AEGIS_BLOCK_SIZE - size, src, size);
++
++		/*
++		 * m = vqtbl1q_u8(vld1q_u8(in + size - AEGIS_BLOCK_SIZE),
++		 *		  vld1q_u8(permute + 32 - size));
++		 */
++		asm volatile (".option		push\n"
++			      ".option		arch,+v\n"
++			      "vle8.v		v1, (%[in])\n"
++			      "vle8.v		v2, (%[p])\n"
++			      "vrgather.vv	v3, v1, v2\n"
++			      "vse8.v		v3, (%[m])\n"
++			      ".option		pop\n"
++			      : :
++			      [in]"r"(in + size - AEGIS_BLOCK_SIZE),
++			      [p]"r"(permute + 32 - size),
++			      [m]"r"(m)
++		:);
++
++		aegis128_update_rvv(st, m);
++
++		/*
++		 * vst1q_u8(out + size - AEGIS_BLOCK_SIZE,
++		 *			vqtbl1q_u8(m ^ s, vld1q_u8(permute + size)));
++		 */
++		asm volatile (".option		push\n"
++			      ".option		arch,+v\n"
++			      "vsetivli		zero, 0x10, e8, m1, ta, ma\n"
++			      "vle8.v		v1, (%[m])\n"
++			      "vle8.v		v2, (%[s])\n"
++			      "vxor.vv		v1, v1, v2\n"
++			      "vle8.v		v2, (%[p])\n"
++			      "vrgather.vv	v3, v1, v2\n"
++			      "vse8.v		v3, (%[out])\n"
++			      ".option		pop\n"
++			      : :
++			      [m]"r"(m),
++			      [s]"r"(s),
++			      [p]"r"(permute + size),
++			      [out]"r"(out + size - AEGIS_BLOCK_SIZE)
++		:);
++
++		if (__builtin_expect(short_input, 0)) {
++			memcpy(dst, out, size);
++		} else {
++			/* vst1q_u8(out - AEGIS_BLOCK_SIZE, m); */
++			asm volatile (".option	push\n"
++				      ".option	arch,+v\n"
++				      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++				      "vle8.v	v1, (%[msg])\n"
++				      "vse8.v	v1, (%[out])\n"
++				      ".option	pop\n"
++				      : :
++				      [msg]"r"(msg),
++				      [out]"r"(out - AEGIS_BLOCK_SIZE)
++			:);
++		}
++	}
++}
++
++void crypto_aegis128_decrypt_chunk_rvv(void *state, void *dst, const void *src,
++				       unsigned int size)
++{
++	struct aegis_state *st = state;
++	const int short_input = size < AEGIS_BLOCK_SIZE;
++	u8 s[AEGIS_BLOCK_SIZE];
++	u8 msg[AEGIS_BLOCK_SIZE];
++
++	if (preload_round_data())
++		return;
++
++	while (size >= AEGIS_BLOCK_SIZE) {
++		/* s = vld1q_u8(src) ^ st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4]; */
++		asm volatile (".option	push\n"
++			      ".option	arch,+v\n"
++			      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++			      "vle8.v	v1, (%[block1])\n"
++			      "vle8.v	v2, (%[block2])\n"
++			      "vle8.v	v3, (%[block3])\n"
++			      "vle8.v	v4, (%[block4])\n"
++			      "vle8.v	v5, (%[src])\n"
++			      "vxor.vv	v1, v1, v4\n"
++			      "vand.vv	v2, v2, v3\n"
++			      "vxor.vv	v1, v1, v2\n"
++			      "vxor.vv	v1, v1, v5\n"
++			      "vse8.v	v1, (%[msg])\n"
++			      ".option	pop\n"
++			      : :
++			      [block1]"r"(st->blocks[1]),
++			      [block2]"r"(st->blocks[2]),
++			      [block3]"r"(st->blocks[3]),
++			      [block4]"r"(st->blocks[4]),
++			      [src]"r"(src),
++			      [msg]"r"(msg)
++		:);
++
++		aegis128_update_rvv(st, msg);
++
++		asm volatile (".option	push\n"
++			      ".option	arch,+v\n"
++			      "vle8.v	v1, (%[msg])\n"
++			      "vse8.v	v1, (%[dst])\n"
++			      ".option	pop\n"
++			      : :
++			      [msg]"r"(msg),
++			      [dst]"r"(dst)
++		:);
++
++		size -= AEGIS_BLOCK_SIZE;
++		src += AEGIS_BLOCK_SIZE;
++		dst += AEGIS_BLOCK_SIZE;
++	}
++
++	if (size > 0) {
++		u8 buf[AEGIS_BLOCK_SIZE];
++		const void *in = src;
++		void *out = dst;
++		u8 m[AEGIS_BLOCK_SIZE];
++
++		/* s = st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4]; */
++		asm volatile (".option	push\n"
++			      ".option	arch,+v\n"
++			      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++			      "vle8.v	v1, (%[block1])\n"
++			      "vle8.v	v2, (%[block2])\n"
++			      "vle8.v	v3, (%[block3])\n"
++			      "vle8.v	v4, (%[block4])\n"
++			      "vxor.vv	v1, v1, v4\n"
++			      "vand.vv	v2, v2, v3\n"
++			      "vxor.vv	v1, v1, v2\n"
++			      "vse8.v	v1, (%[s])\n"
++			      ".option	pop\n"
++			      : :
++			      [block1]"r"(st->blocks[1]),
++			      [block2]"r"(st->blocks[2]),
++			      [block3]"r"(st->blocks[3]),
++			      [block4]"r"(st->blocks[4]),
++			      [s]"r"(s)
++		:);
++
++		if (__builtin_expect(short_input, 0))
++			in = out = memcpy(buf + AEGIS_BLOCK_SIZE - size, src, size);
++
++		/*
++		 * m = s ^ vqtbx1q_u8(s, vld1q_u8(in + size - AEGIS_BLOCK_SIZE),
++		 *		      vld1q_u8(permute + 32 - size));
++		 */
++		asm volatile (".option		push\n"
++			      ".option		arch,+v\n"
++			      "vle8.v		v1, (%[in])\n"
++			      "vle8.v		v2, (%[p])\n"
++			      "vrgather.vv	v3, v1, v2\n"
++			      "vle8.v		v4, (%[s])\n"
++			      "vmsltu.vx	v0, v2, %[x10]\n" /* set if less then 0x10 */
++			      "vmerge.vvm	v3, v4, v3, v0\n"
++			      "vxor.vv		v3, v4, v3\n"
++			      "vse8.v		v3, (%[m])\n"
++			      ".option		pop\n"
++			      : :
++			      [in]"r"(in + size - AEGIS_BLOCK_SIZE),
++			      [p]"r"(permute + 32 - size),
++			      [s]"r"(s),
++			      [x10]"r"(0x10),
++			      [m]"r"(m)
++		:);
++
++		aegis128_update_rvv(st, m);
++
++		/*
++		 * vst1q_u8(out + size - AEGIS_BLOCK_SIZE,
++		 *	    vqtbl1q_u8(m, vld1q_u8(permute + size)));
++		 */
++		asm volatile (".option		push\n"
++			      ".option		arch,+v\n"
++			      "vsetivli		zero, 0x10, e8, m1, ta, ma\n"
++			      "vle8.v		v1, (%[m])\n"
++			      "vle8.v		v2, (%[p])\n"
++			      "vrgather.vv	v3, v1, v2\n"
++			      "vse8.v		v3, (%[out])\n"
++			      ".option		pop\n"
++			      : :
++			      [m]"r"(m),
++			      [p]"r"(permute + size),
++			      [out]"r"(out + size - AEGIS_BLOCK_SIZE)
++		:);
++
++		if (__builtin_expect(short_input, 0)) {
++			memcpy(dst, out, size);
++		} else {
++			/* vst1q_u8(out - AEGIS_BLOCK_SIZE, m); */
++			asm volatile (".option	push\n"
++				      ".option	arch,+v\n"
++				      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++				      "vle8.v	v1, (%[msg])\n"
++				      "vse8.v	v1, (%[out])\n"
++				      ".option	pop\n"
++				      : :
++				      [msg]"r"(msg),
++				      [out]"r"(out - AEGIS_BLOCK_SIZE)
++			:);
++		}
++	}
++}
++
++int crypto_aegis128_final_rvv(void *state, void *tag_xor, unsigned int assoclen,
++			      unsigned int cryptlen, unsigned int authsize)
++{
++	struct aegis_state *st = state;
++	u64 v[2];
++	int i;
++	int ret;
++
++	ret = preload_round_data();
++	if (ret)
++		return ret;
++
++	/*
++	 *v = st.v[3] ^ (uint8x16_t)vcombine_u64(vmov_n_u64(8ULL * assoclen),
++	 *					 vmov_n_u64(8ULL * cryptlen));
++	 */
++	v[0] = 8ULL * assoclen;
++	v[1] = 8ULL * cryptlen;
++	asm volatile (".option	push\n"
++		      ".option	arch,+v\n"
++		      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++		      "vle8.v	v0, (%[v])\n"
++		      "vle8.v	v1, (%[block3])\n"
++		      "vxor.vv	v0, v0, v1\n"
++		      "vse8.v	v0, (%[v])\n"
++		      ".option	pop\n"
++		      : :
++		      [v]"r"(v),
++		      [block3]"r"(st->blocks[3])
++	:);
++
++	for (i = 0; i < 7; i++)
++		aegis128_update_rvv(st, v);
++
++	/* v = st.v[0] ^ st.v[1] ^ st.v[2] ^ st.v[3] ^ st.v[4]; */
++	asm volatile (".option	push\n"
++		      ".option	arch,+v\n"
++		      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++		      "vle8.v	v0, (%[block0])\n"
++		      "vle8.v	v1, (%[block1])\n"
++		      "vle8.v	v2, (%[block2])\n"
++		      "vle8.v	v3, (%[block3])\n"
++		      "vle8.v	v4, (%[block4])\n"
++		      "vxor.vv	v0, v0, v1\n"
++		      "vxor.vv	v2, v2, v3\n"
++		      "vxor.vv	v0, v0, v2\n"
++		      "vxor.vv	v0, v0, v4\n"
++		      "vse8.v	v0, (%[v])\n"
++		      ".option	pop\n"
++		      : :
++		      [block0]"r"(st->blocks[0]),
++		      [block1]"r"(st->blocks[1]),
++		      [block2]"r"(st->blocks[2]),
++		      [block3]"r"(st->blocks[3]),
++		      [block4]"r"(st->blocks[4]),
++		      [v]"r"(v)
++	:);
++
++	if (authsize > 0) {
++		/*
++		 * v = vqtbl1q_u8(~vceqq_u8(v, vld1q_u8(tag_xor)),
++		 *			    vld1q_u8(permute + authsize));
++		 */
++		asm volatile (".option		push\n"
++			      ".option		arch,+v\n"
++			      "vsetivli		zero, 0x10, e8, m1, ta, ma\n"
++			      "vle8.v		v0, (%[v])\n"
++			      "vle8.v		v1, (%[tag_xor])\n"
++			      "vmseq.vv		v0, v0, v1\n" /* vceqq_u8(v, vld1q_u8(tag_xor) */
++			      "vmv.v.i		v1, 0\n" /* set v1 = 0 */
++			      "vmerge.vxm	v1, v1, %[xff], v0\n"
++			      "vxor.vi		v1, v1, -1\n" /* vnot.v v0, v0 */
++			      "vle8.v		v0, (%[pa])\n"
++			      "vrgather.vv	v2, v1, v0\n"
++			      "vredmin.vs	v2, v2, v2\n" /* vminvq_s8((int8x16_t)v) */
++			      "vse8.v		v2, (%[v])\n"
++			      ".option		pop\n"
++			      : :
++			      [v]"r"(v),
++			      [tag_xor]"r"(tag_xor),
++			      [xff]"r"(0xff),
++			      [pa]"r"(permute + authsize)
++		:);
++
++		return *((s8 *)v);
++	}
++
++	asm volatile (".option	push\n"
++		      ".option	arch,+v\n"
++		      "vsetivli	zero, 0x10, e8, m1, ta, ma\n"
++		      "vle8.v	v0, (%[v])\n"
++		      "vse8.v	v0, (%[tag_xor])\n"
++		      ".option	pop\n"
++		      : :
++		      [v]"r"(v),
++		      [tag_xor]"r"(tag_xor)
++	:);
++
++	return 0;
++}
+diff --git a/crypto/aegis128-rvv.c b/crypto/aegis128-rvv.c
+new file mode 100644
+index 000000000000..5a6647722d82
+--- /dev/null
++++ b/crypto/aegis128-rvv.c
+@@ -0,0 +1,63 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright 2026 Institute of Software, CAS
++ * Author: Chunyan Zhang <zhangchunyan@iscas.ac.cn>
++ */
++
++#include <asm/vector.h>
++
++#include "aegis.h"
++#include "aegis-rvv.h"
++
++bool crypto_aegis128_have_simd(void)
++{
++	return IS_ENABLED(CONFIG_RISCV_ISA_V);
++}
++
++void crypto_aegis128_init_simd(struct aegis_state *state,
++			       const union aegis_block *key,
++			       const u8 *iv)
++{
++	kernel_vector_begin();
++	crypto_aegis128_init_rvv(state, key, iv);
++	kernel_vector_end();
++}
++
++void crypto_aegis128_update_simd(struct aegis_state *state, const void *msg)
++{
++	kernel_vector_begin();
++	crypto_aegis128_update_rvv(state, msg);
++	kernel_vector_end();
++}
++
++void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *dst,
++					const u8 *src, unsigned int size)
++{
++	kernel_vector_begin();
++	crypto_aegis128_encrypt_chunk_rvv(state, dst, src, size);
++	kernel_vector_end();
++}
++
++void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *dst,
++					const u8 *src, unsigned int size)
++{
++	kernel_vector_begin();
++	crypto_aegis128_decrypt_chunk_rvv(state, dst, src, size);
++	kernel_vector_end();
++}
++
++int crypto_aegis128_final_simd(struct aegis_state *state,
++			       union aegis_block *tag_xor,
++			       unsigned int assoclen,
++			       unsigned int cryptlen,
++			       unsigned int authsize)
++{
++	int ret;
++
++	kernel_vector_begin();
++	ret = crypto_aegis128_final_rvv(state, tag_xor, assoclen, cryptlen,
++					authsize);
++	kernel_vector_end();
++
++	return ret;
++}
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
