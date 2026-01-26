@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBD323BCF3
-	for <linux-crypto@vger.kernel.org>; Mon, 26 Jan 2026 14:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049C5274B4D
+	for <linux-crypto@vger.kernel.org>; Mon, 26 Jan 2026 14:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769437831; cv=none; b=N6zJil57dAUnQdEXu8S4VnWJve8u9veExCcIcaliusFlGnoUiRVZBdFEk8G9g9Ojh2xreHEP6ud+2+WqoOD64N21i2/T1qWrpIFnZKKUQ0ulo65bJRLtTjyajP77X6vUtteUQ7w5KNK3wNNjlVn8G/6lFA6LY9UToloqOqeEVy0=
+	t=1769437838; cv=none; b=WKyBCCV4GhuadiU2lzh98NHKI5ld1vi4MgXobB8c8YGBj2EBGUHCD6oXlB9/qabPVd1SRL+5GF0pmUsrRa7SDkRpTDRAizv/fWdis6F3QDm3Zz3/j1YqWXceXUlgvRykR8SKAeEk50S4Pn6oYCl4OUqFKhebT1gHPkv5iy2RFFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769437831; c=relaxed/simple;
-	bh=ZKqV4jdfUAWA5T+vgn8F9FloZgvwNgzM9afWi0tnKSM=;
+	s=arc-20240116; t=1769437838; c=relaxed/simple;
+	bh=YmYddHPvZEgOqKJmE8MugDptUWnHZHtuSGeVaqPbG3g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fplvCU3UoRwMRd9Ol8of0zOtNqMBSnJ/UTpez+bqeXEqa9E2nNjZ7HXodyLk9pvVvek7/SSJ/nIt7KN5fGImrQ6Jm3OJoy+E2f6WB1bqQhavwCimcPApxbwzO7FSsh3mL0lp5LO0mzgzZ79p65IAK6NK0Rq+7p4yqNmaGYCgHDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bRlN/M3I; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=V8MtaC1lufCRM8Wcgg0FCGxhAaAsNLHor9bDscrh2KYn8eUhpIUF2+HVbrwDYi/BXELB+PI9beA18Mv5rScHzght3mUerc6noytzXOHqQMVWmcYVXsUMf8nWGgNEVq1uya+4+deTba0DGeD01t9Vmb55kj0ijKY8Mg7dwjx8m4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MW2zIGQd; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bRlN/M3I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MW2zIGQd"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769437829;
+	s=mimecast20190719; t=1769437836;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UTvzySqwRBAB/UJpm0FXsBqjnOHhxCKseoxuTP/uJ7A=;
-	b=bRlN/M3IUSKZMu1uODg6cWaCX6NPcS7sV1Xzgr+dsfKdXHwgfNKe7LWo9KBbSqwWSaLnKp
-	dwCVcoi9xWIKL005CTZ+fwNK55b5/w4ZMKcNLcAwpdy6OjOIiD5MX9k3vvaWICLqUZn+pQ
-	yQs60EvXHzt9Crw2VaZBCEYi1W0HMng=
+	bh=RUvLtsQUIbuT8aNyKAbRO6AgrSzDL4SrRGZc9+zngls=;
+	b=MW2zIGQdTiDgVVYK9Y2IYoI08Knxs3b/Svai0MWSh/ePeDGj07M4NxYEiShcT1C3gPNl9K
+	CUH5CQapcAouqgLuup4VIt7pxuw60aurEJkEHKrNZyetreZV9v9Fq/Gv0PHuy7AURjBSQQ
+	To51JLB9pdLkQwOnVOBKLOsqYYrU7Us=
 Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-382-brTXolUjOO-x8Ob9AaXbaQ-1; Mon,
- 26 Jan 2026 09:30:25 -0500
-X-MC-Unique: brTXolUjOO-x8Ob9AaXbaQ-1
-X-Mimecast-MFC-AGG-ID: brTXolUjOO-x8Ob9AaXbaQ_1769437822
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-604-MXrR1Hh7NU2KjnMXnBYR3g-1; Mon,
+ 26 Jan 2026 09:30:31 -0500
+X-MC-Unique: MXrR1Hh7NU2KjnMXnBYR3g-1
+X-Mimecast-MFC-AGG-ID: MXrR1Hh7NU2KjnMXnBYR3g_1769437828
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 46BBF180034F;
-	Mon, 26 Jan 2026 14:30:22 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BE9EE18002E9;
+	Mon, 26 Jan 2026 14:30:28 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.44.33.164])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 81DF730001A8;
-	Mon, 26 Jan 2026 14:30:17 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0DD9F30001A7;
+	Mon, 26 Jan 2026 14:30:23 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Lukas Wunner <lukas@wunner.de>,
 	Ignat Korchagin <ignat@cloudflare.com>
@@ -60,9 +60,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	keyrings@vger.kernel.org,
 	linux-modules@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v15 6/7] modsign: Enable ML-DSA module signing
-Date: Mon, 26 Jan 2026 14:29:27 +0000
-Message-ID: <20260126142931.1940586-7-dhowells@redhat.com>
+Subject: [PATCH v15 7/7] pkcs7: Allow authenticatedAttributes for ML-DSA
+Date: Mon, 26 Jan 2026 14:29:28 +0000
+Message-ID: <20260126142931.1940586-8-dhowells@redhat.com>
 In-Reply-To: <20260126142931.1940586-1-dhowells@redhat.com>
 References: <20260126142931.1940586-1-dhowells@redhat.com>
 Precedence: bulk
@@ -74,178 +74,103 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Allow ML-DSA module signing to be enabled.
+Allow the rejection of authenticatedAttributes in PKCS#7 (signedAttrs in
+CMS) to be waived in the kernel config for ML-DSA when used for module
+signing.  This reflects the issue that openssl < 4.0 cannot do this and
+openssl-4 has not yet been released.
 
-Note that OpenSSL's CMS_*() function suite does not, as of OpenSSL-3.6,
-support the use of CMS_NOATTR with ML-DSA, so the prohibition against using
-signedAttrs with module signing has to be removed.  The selected digest
-then applies only to the algorithm used to calculate the digest stored in
-the messageDigest attribute.  The OpenSSL development branch has patches
-applied that fix this[1], but it appears that that will only be available
-in OpenSSL-4.
-
-[1] https://github.com/openssl/openssl/pull/28923
-
-sign-file won't set CMS_NOATTR if openssl is earlier than v4, resulting in
-the use of signed attributes.
-
-The ML-DSA algorithm takes the raw data to be signed without regard to what
-digest algorithm is specified in the CMS message.  The CMS specified digest
-algorithm is ignored unless signedAttrs are used; in such a case, only
-SHA512 is permitted.
+This does not permit RSA, ECDSA or ECRDSA to be so waived (behaviour
+unchanged).
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-cc: Eric Biggers <ebiggers@kernel.org>
 cc: Lukas Wunner <lukas@wunner.de>
 cc: Ignat Korchagin <ignat@cloudflare.com>
+cc: Jarkko Sakkinen <jarkko@kernel.org>
 cc: Stephan Mueller <smueller@chronox.de>
+cc: Eric Biggers <ebiggers@kernel.org>
 cc: Herbert Xu <herbert@gondor.apana.org.au>
 cc: keyrings@vger.kernel.org
 cc: linux-crypto@vger.kernel.org
 ---
- Documentation/admin-guide/module-signing.rst | 16 +++++----
- certs/Kconfig                                | 30 +++++++++++++++++
- certs/Makefile                               |  3 ++
- scripts/sign-file.c                          | 34 +++++++++++++++-----
- 4 files changed, 68 insertions(+), 15 deletions(-)
+ crypto/asymmetric_keys/Kconfig        | 11 +++++++++++
+ crypto/asymmetric_keys/pkcs7_parser.c |  8 ++++++++
+ crypto/asymmetric_keys/pkcs7_parser.h |  3 +++
+ crypto/asymmetric_keys/pkcs7_verify.c |  6 ++++++
+ 4 files changed, 28 insertions(+)
 
-diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
-index a8667a777490..7f2f127dc76f 100644
---- a/Documentation/admin-guide/module-signing.rst
-+++ b/Documentation/admin-guide/module-signing.rst
-@@ -28,10 +28,12 @@ trusted userspace bits.
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index e1345b8f39f1..1dae2232fe9a 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -53,6 +53,17 @@ config PKCS7_MESSAGE_PARSER
+ 	  This option provides support for parsing PKCS#7 format messages for
+ 	  signature data and provides the ability to verify the signature.
  
- This facility uses X.509 ITU-T standard certificates to encode the public keys
- involved.  The signatures are not themselves encoded in any industrial standard
--type.  The built-in facility currently only supports the RSA & NIST P-384 ECDSA
--public key signing standard (though it is pluggable and permits others to be
--used).  The possible hash algorithms that can be used are SHA-2 and SHA-3 of
--sizes 256, 384, and 512 (the algorithm is selected by data in the signature).
-+type.  The built-in facility currently only supports the RSA, NIST P-384 ECDSA
-+and NIST FIPS-204 ML-DSA public key signing standards (though it is pluggable
-+and permits others to be used).  For RSA and ECDSA, the possible hash
-+algorithms that can be used are SHA-2 and SHA-3 of sizes 256, 384, and 512 (the
-+algorithm is selected by data in the signature); ML-DSA does its own hashing,
-+but is allowed to be used with a SHA512 hash for signed attributes.
- 
- 
- ==========================
-@@ -146,9 +148,9 @@ into vmlinux) using parameters in the::
- 
- file (which is also generated if it does not already exist).
- 
--One can select between RSA (``MODULE_SIG_KEY_TYPE_RSA``) and ECDSA
--(``MODULE_SIG_KEY_TYPE_ECDSA``) to generate either RSA 4k or NIST
--P-384 keypair.
-+One can select between RSA (``MODULE_SIG_KEY_TYPE_RSA``), ECDSA
-+(``MODULE_SIG_KEY_TYPE_ECDSA``) and ML-DSA (``MODULE_SIG_KEY_TYPE_MLDSA_*``) to
-+generate an RSA 4k, a NIST P-384 keypair or an ML-DSA 44, 65 or 87 keypair.
- 
- It is strongly recommended that you provide your own x509.genkey file.
- 
-diff --git a/certs/Kconfig b/certs/Kconfig
-index 78307dc25559..2b088ef58373 100644
---- a/certs/Kconfig
-+++ b/certs/Kconfig
-@@ -39,6 +39,36 @@ config MODULE_SIG_KEY_TYPE_ECDSA
- 	 Note: Remove all ECDSA signing keys, e.g. certs/signing_key.pem,
- 	 when falling back to building Linux 5.14 and older kernels.
- 
-+config MODULE_SIG_KEY_TYPE_MLDSA_44
-+	bool "ML-DSA-44"
-+	select CRYPTO_MLDSA
++config PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
++	bool "Waive rejection of authenticatedAttributes for ML-DSA"
++	depends on PKCS7_MESSAGE_PARSER
++	depends on CRYPTO_MLDSA
 +	help
-+	  Use an ML-DSA-44 key (NIST FIPS 204) for module signing.  ML-DSA
-+	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
-+	  the latter, the entire module body will be signed; with the former,
-+	  signedAttrs will be used as it lacks support for CMS_NOATTR with
-+	  ML-DSA.
++	  Due to use of CMS_NOATTR with ML-DSA not being supported in
++	  OpenSSL < 4.0 (and thus any released version), enabling this
++	  allows authenticatedAttributes to be used with ML-DSA for
++	  module signing.  Use of authenticatedAttributes in this
++	  context is normally rejected.
 +
-+config MODULE_SIG_KEY_TYPE_MLDSA_65
-+	bool "ML-DSA-65"
-+	select CRYPTO_MLDSA
-+	help
-+	  Use an ML-DSA-65 key (NIST FIPS 204) for module signing.  ML-DSA
-+	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
-+	  the latter, the entire module body will be signed; with the former,
-+	  signedAttrs will be used as it lacks support for CMS_NOATTR with
-+	  ML-DSA.
-+
-+config MODULE_SIG_KEY_TYPE_MLDSA_87
-+	bool "ML-DSA-87"
-+	select CRYPTO_MLDSA
-+	help
-+	  Use an ML-DSA-87 key (NIST FIPS 204) for module signing.  ML-DSA
-+	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
-+	  the latter, the entire module body will be signed; with the former,
-+	  signedAttrs will be used as it lacks support for CMS_NOATTR with
-+	  ML-DSA.
-+
- endchoice
+ config PKCS7_TEST_KEY
+ 	tristate "PKCS#7 testing key type"
+ 	depends on SYSTEM_DATA_VERIFICATION
+diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
+index 594a8f1d9dfb..db1c90ca6fc1 100644
+--- a/crypto/asymmetric_keys/pkcs7_parser.c
++++ b/crypto/asymmetric_keys/pkcs7_parser.c
+@@ -92,9 +92,17 @@ static int pkcs7_check_authattrs(struct pkcs7_message *msg)
+ 	if (!sinfo)
+ 		goto inconsistent;
  
- config SYSTEM_TRUSTED_KEYRING
-diff --git a/certs/Makefile b/certs/Makefile
-index f6fa4d8d75e0..3ee1960f9f4a 100644
---- a/certs/Makefile
-+++ b/certs/Makefile
-@@ -43,6 +43,9 @@ targets += x509_certificate_list
- ifeq ($(CONFIG_MODULE_SIG_KEY),certs/signing_key.pem)
- 
- keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ECDSA) := -newkey ec -pkeyopt ec_paramgen_curve:secp384r1
-+keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_44) := -newkey ml-dsa-44
-+keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_65) := -newkey ml-dsa-65
-+keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_87) := -newkey ml-dsa-87
- 
- quiet_cmd_gen_key = GENKEY  $@
-       cmd_gen_key = openssl req -new -nodes -utf8 -$(CONFIG_MODULE_SIG_HASH) -days 36500 \
-diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-index 7070245edfc1..547b97097230 100644
---- a/scripts/sign-file.c
-+++ b/scripts/sign-file.c
-@@ -315,18 +315,36 @@ int main(int argc, char **argv)
- 		ERR(!digest_algo, "EVP_get_digestbyname");
- 
- #ifndef USE_PKCS7
++#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
++	msg->authattrs_rej_waivable = true;
++#endif
 +
-+		unsigned int flags =
-+			CMS_NOCERTS |
-+			CMS_PARTIAL |
-+			CMS_BINARY |
-+			CMS_DETACHED |
-+			CMS_STREAM  |
-+			CMS_NOSMIMECAP |
-+			CMS_NO_SIGNING_TIME |
-+			use_keyid;
-+
-+		if ((EVP_PKEY_is_a(private_key, "ML-DSA-44") ||
-+		     EVP_PKEY_is_a(private_key, "ML-DSA-65") ||
-+		     EVP_PKEY_is_a(private_key, "ML-DSA-87")) &&
-+		    OPENSSL_VERSION_MAJOR < 4) {
-+			 /* ML-DSA + CMS_NOATTR is not supported in openssl-3.5
-+			  * and before.
-+			  */
-+			use_signed_attrs = 0;
-+		}
-+
-+		flags |= use_signed_attrs;
-+
- 		/* Load the signature message from the digest buffer. */
--		cms = CMS_sign(NULL, NULL, NULL, NULL,
--			       CMS_NOCERTS | CMS_PARTIAL | CMS_BINARY |
--			       CMS_DETACHED | CMS_STREAM);
-+		cms = CMS_sign(NULL, NULL, NULL, NULL, flags);
- 		ERR(!cms, "CMS_sign");
+ 	if (sinfo->authattrs) {
+ 		want = true;
+ 		msg->have_authattrs = true;
++#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
++		if (strncmp(sinfo->sig->pkey_algo, "mldsa", 5) != 0)
++			msg->authattrs_rej_waivable = false;
++#endif
+ 	} else if (sinfo->sig->algo_takes_data) {
+ 		sinfo->sig->hash_algo = "none";
+ 	}
+diff --git a/crypto/asymmetric_keys/pkcs7_parser.h b/crypto/asymmetric_keys/pkcs7_parser.h
+index e17f7ce4fb43..6ef9f335bb17 100644
+--- a/crypto/asymmetric_keys/pkcs7_parser.h
++++ b/crypto/asymmetric_keys/pkcs7_parser.h
+@@ -55,6 +55,9 @@ struct pkcs7_message {
+ 	struct pkcs7_signed_info *signed_infos;
+ 	u8		version;	/* Version of cert (1 -> PKCS#7 or CMS; 3 -> CMS) */
+ 	bool		have_authattrs;	/* T if have authattrs */
++#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
++	bool		authattrs_rej_waivable; /* T if authatts rejection can be waived */
++#endif
  
--		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo,
--				     CMS_NOCERTS | CMS_BINARY |
--				     CMS_NOSMIMECAP | use_keyid |
--				     use_signed_attrs),
-+		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo, flags),
- 		    "CMS_add1_signer");
--		ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) != 1,
-+		ERR(CMS_final(cms, bm, NULL, flags) != 1,
- 		    "CMS_final");
- 
- #else
+ 	/* Content Data (or NULL) */
+ 	enum OID	data_type;	/* Type of Data */
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index 06abb9838f95..519eecfe6778 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -425,6 +425,12 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
+ 			return -EKEYREJECTED;
+ 		}
+ 		if (pkcs7->have_authattrs) {
++#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
++			if (pkcs7->authattrs_rej_waivable) {
++				pr_warn("Waived invalid module sig (has authattrs)\n");
++				break;
++			}
++#endif
+ 			pr_warn("Invalid module sig (has authattrs)\n");
+ 			return -EKEYREJECTED;
+ 		}
 
