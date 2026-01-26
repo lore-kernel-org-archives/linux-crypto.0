@@ -1,182 +1,196 @@
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11020085.outbound.protection.outlook.com [52.101.85.85])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com [209.85.221.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5581DE8BE;
-	Mon, 26 Jan 2026 18:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769451779; cv=fail; b=Wa2H2EmxwdK2l1Cfs/4Ew0OL72OcISOAJvtnGnLznTPaw42DE+gGkvezHlT7f45VyrFKpHgLNEkZo0EEkiTFGhX2R2PnnYGtZMsPzsWW/7AU+n+jiE8kC6VjKuIum8IDV33Wt+H4AAnKcyytlmTJ33STQ3Mt8aDpkCv49Pv/J+M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769451779; c=relaxed/simple;
-	bh=b1YuXGoY3GYMoe5hb7IsJ5KbjhVcV8/2e6oi6QWZm+s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=N0yOKXLX5sJRtNSQsXU3ueW7UUc8BsOzwTwanjNDK9BhbkMDlm+lbHnxTsDz2iYGPiIsgaX3beDmGoI/rBRqLh4e3Ux5SQwCk5OJjwQKaOr8EnG4wPFIIsHnq/uh8Ly/geCvhSyTanlhhaI28+zsEhwzTsfFS1KhpHVTVrc4nt8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com; spf=pass smtp.mailfrom=hammerspace.com; dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b=b2dB3R9i; arc=fail smtp.client-ip=52.101.85.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hammerspace.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29511242D89
+	for <linux-crypto@vger.kernel.org>; Mon, 26 Jan 2026 18:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.67
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769452546; cv=none; b=SHo6eOyaL33i70tQ/xBjXtxusIdlG2ucEns/EIPzkBgRyRBzdbPCnp3yT73pSGD7R52zoAMVubAxs28JNO/gEuQ3fACLww5WOAzYT7Mhhkeu6hfoCttY5hE4FbtKnUhtv15UOZuqjYtY4qHRdGjlLKms0/Hf5Wtn4/XLesDweB0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769452546; c=relaxed/simple;
+	bh=3akyaakir9OAMjeT8WvM8HDWBZfX+8duXF5SLqJafO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=idWgLVk1+xJF+tUPoTUw+56u2fyIHqksAZXT906f0RV4Ndzz3v8bBZY6xwuNH83d0pBndl5V3Lzz9z7pOgJB57UNV79O3krsmMxOEi38O8l+MZj/1YvvwRhTjhqnkRgddGIgdzBFvvCRBANnxePrNX1mVC51hfckdwHJUmB69S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wvJJT80O; arc=none smtp.client-ip=209.85.221.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b="b2dB3R9i"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fAVE3n/xy9QwwZ2t+xdK83M/DanX+m9ZR5D85azqEQBXJCSx6n5mQOFxCwF6Sok+D7oAy432cuLp9sfs0IYfpoTpU357akbPXDyVoWTA9U0G/0pvDHGkx0tfphNbwJ9jdKsQupQgyRfqWxgY8+RXsgSqOrIewLSD4nwYfBGXSZ3PjWPmf1iUHVOHIaMbon0Nbq5F4kn04R2UdhxxHvdJbafBsHSZjMghTs5I6E4x37+gvaESgwMv2x4XtWrLfKncukTgYC3QLSfP+ww/CpwBWkxlmJEyQJ/bP5Rs3+KbX0ug0fXZwAkonRwAbAMRT6QPXx1OOJ27D53yM93/UQWUFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HNcaxp5SWML22oSPFy+lTtOBVBs12B+yWB51xaFix9w=;
- b=ZVUrL8/t5FSpRA/AT1KDt3SiTYWZRU72p4P/f37Kubfew/z91+jLkD4wlqZiq57PtzZLQlIkcnNfNxy8lHIBmMzpYbDhZOXhYTcVpudLFYBRio3PXU0O/GQdav2zGy8gQwFKXMnK8eL5C77TENH34sYzdqjG9EKCYgR9zFOTrNmij737VnmDO+Aq/7NofhdOtmMAHOfj9cYpF8/bZei+9q/ZesKUvcvOSXMLKuC84E9WLHm68339e6mZxRYsOgj9WqNEDIZ1qmDyviPI3VprJRgzcr9Jc9BI2oz/nEEneq4qzsgU9pBOWGP9FgEgzsuApa/2tBLVar2wexKN3Rzzwg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hammerspace.com; dmarc=pass action=none
- header.from=hammerspace.com; dkim=pass header.d=hammerspace.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hammerspace.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HNcaxp5SWML22oSPFy+lTtOBVBs12B+yWB51xaFix9w=;
- b=b2dB3R9ifwvrhQuae8lnEx2CpLy9AQX9cO5LBCATXxvC2z1ardvdlqX5MGqdYnxZPsylaDfQDL9a2uUSCAYgxyPvHCZR03NYihxZsxy1NQ1dTGfTZdhiqxNbvRyOxo8D58ehoWNRpmCnbTJAiHzWIuy7svybkZfENkeBSt2tmoY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=hammerspace.com;
-Received: from DM8PR13MB5239.namprd13.prod.outlook.com (2603:10b6:5:314::5) by
- SA0PR13MB3934.namprd13.prod.outlook.com (2603:10b6:806:92::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9542.12; Mon, 26 Jan 2026 18:22:53 +0000
-Received: from DM8PR13MB5239.namprd13.prod.outlook.com
- ([fe80::fa6e:7b5:d1ec:92f3]) by DM8PR13MB5239.namprd13.prod.outlook.com
- ([fe80::fa6e:7b5:d1ec:92f3%4]) with mapi id 15.20.9542.010; Mon, 26 Jan 2026
- 18:22:53 +0000
-From: Benjamin Coddington <bcodding@hammerspace.com>
-To: Chuck Lever <cel@kernel.org>
-Cc: Trond Myklebust <trondmy@kernel.org>, NeilBrown <neil@brown.name>,
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Anna Schumaker <anna@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
- Rick Macklem <rick.macklem@gmail.com>, linux-nfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] NFSD: Sign filehandles
-Date: Mon, 26 Jan 2026 13:22:49 -0500
-X-Mailer: MailMate (2.0r6272)
-Message-ID: <D3263C1D-A15E-48EC-B05A-8DC6A0C2B37A@hammerspace.com>
-In-Reply-To: <33c02e5a-03e7-42ef-8ccd-790a9b29a763@kernel.org>
-References: <> <e545c35e-31fc-4069-8d83-1f9585e82532@app.fastmail.com>
- <176921979948.16766.5458950508894093690@noble.neil.brown.name>
- <686CBEE5-D524-409D-8508-D3D48706CC02@hammerspace.com>
- <77e7a645-66bd-4ce2-b963-2a2488595b00@kernel.org>
- <8be0a065a84bed02735141b4333e9c49a2ab0c90.camel@kernel.org>
- <33c02e5a-03e7-42ef-8ccd-790a9b29a763@kernel.org>
-Content-Type: text/plain
-X-ClientProxiedBy: PH8P223CA0022.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:510:2db::27) To DM8PR13MB5239.namprd13.prod.outlook.com
- (2603:10b6:5:314::5)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wvJJT80O"
+Received: by mail-wr1-f67.google.com with SMTP id ffacd0b85a97d-4327790c4e9so3130196f8f.2
+        for <linux-crypto@vger.kernel.org>; Mon, 26 Jan 2026 10:35:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769452542; x=1770057342; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4wtupvaEvwne0Vq+SODEHB1y4+FGimHGUXOjd7XL3Zo=;
+        b=wvJJT80OLvni3EYE47w8AnsZMY8snhAhLXWOMn6pvJxMZBpzm0usVVgJ29KSDqdKV7
+         2vqDe7fyCrTaHkpNYup+/jabmU/g1j29n6fCqxDlWrCnJjCpT28McsS5DZBFECIDU/Y9
+         cSQl+o9tfvdygSKhtk+122URO1O5VKatL85F0Ki8fC/RFDY76MDCU9WezatXoDVkEKc3
+         wSq6fdWnSfERLbsV1XiaqCtgA1kCvy56c6ZM2mGvbVqxM1tkuC6jZM/COWWfvSmAAxYC
+         SrtjkKVhyeVLiTussvucj7klXvIOmwuXoBsa9J9+ac7v16OFAS+oyICYhb3NVGQOFc9j
+         WS8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769452542; x=1770057342;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4wtupvaEvwne0Vq+SODEHB1y4+FGimHGUXOjd7XL3Zo=;
+        b=sKb3r3vjkYNXJmp9k48yZDpOLWt+tKKSRhaXxjGMDtP0LMiWWVhsObIxT9pCRx50Qc
+         /UT/eeNx5W1kQ+91XA/RpTBuPYsKcvocnCu9abs+oTDUcu+veuPrZnnzCj6IxUu4q+il
+         gbTibuvoSZc5i3F0pbbovi1GQ0ho84lJpsLj4hdyhTRRrz9dEZ5rBnw4/ymmTvuLRRGL
+         yj9bML0EdrAOdYkFj33g5dKlPSmasyqmAQLoxkPVvfaO+94pGWN6N8f4rBc8b2US901X
+         c66+wP1OqIos8TGQyBlbXnsVV1LsEiPnlWSEYwKhVlqmyqVGX+4BVVId3JBvPySO0xMG
+         3gEw==
+X-Forwarded-Encrypted: i=1; AJvYcCXVgUUHFpdipBJUomyWluZ4I5LbfO51K8piYN+1R+fVsn4kSisuH83dOTAGGUKtdGI4J+0ly8TzeNdy1C4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf03PAOYjNpxYCHPM4SOIQVVUFppByMbr9eSevmWRu1jivZyYB
+	Fsyn0OPIsDINl57wVkCckDvDbe5vi66kzj1lUkcyQq7iYM52Bz7goNOqB9Uu0UIuSg==
+X-Gm-Gg: AZuq6aKWlVIm58c36qhUwtVctoO3m8+OqFmCHfPLYQIuD3dnOjlvx8O/dNyxBKbtiVm
+	ArOJE1w6vXiddQc2BHB1WrcRvkS0AQqAMd/q+0d65KLP8EDGLznISykdadFmXaByAdIz7BzZKN8
+	NdpuUkEWAtz1HpwiDYAFFrvYUFSYcX1p30A85UWnODrnqAKd0CDpZ8T1yCIWec18j+JXNu6BfQg
+	yg4M36AmkVNI3Eu7G6LhnifI60K1ouyzGbOGZQ3H2w5nCmwvbngLzTAQmlYU7fMHQIW5Cnj6XT/
+	8m6Zm9LpjNiMjbnsnsXtPebkioJlJ+Q9yjyusDnAwNj8Kz2P66kv9kWrSipbJ+kqE7NqJUMLWq/
+	8iyS63bAI3JLCmuEH6qj4EBAvhnHy3xxgOox9BL+55n7PjWrrd39e3D9ZydjYdBcvutuRcVP/mE
+	UIrTLg6/StxY1+Y8o9SNA1HGfdQ1t4OhTZBrm6VEYtGYO/ziv7aNZfpnIyfiY=
+X-Received: by 2002:a5d:5d06:0:b0:429:c14f:5f7d with SMTP id ffacd0b85a97d-435ca18f3cbmr9441304f8f.29.1769452542172;
+        Mon, 26 Jan 2026 10:35:42 -0800 (PST)
+Received: from elver.google.com ([2a00:79e0:2834:9:c598:7cce:ca6b:8ab7])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1b6e2besm32040119f8f.0.2026.01.26.10.35.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jan 2026 10:35:41 -0800 (PST)
+Date: Mon, 26 Jan 2026 19:35:33 +0100
+From: Marco Elver <elver@google.com>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Peter Zijlstra <peterz@infradead.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	Chris Li <sparse@chrisli.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Christoph Hellwig <hch@lst.de>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+	linux-sparse@vger.kernel.org, linux-wireless@vger.kernel.org,
+	llvm@lists.linux.dev, rcu@vger.kernel.org
+Subject: Re: [PATCH v5 15/36] srcu: Support Clang's context analysis
+Message-ID: <aXez9fSxdfu5-Boo@elver.google.com>
+References: <20251219154418.3592607-1-elver@google.com>
+ <20251219154418.3592607-16-elver@google.com>
+ <dd65bb7b-0dac-437a-a370-38efeb4737ba@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR13MB5239:EE_|SA0PR13MB3934:EE_
-X-MS-Office365-Filtering-Correlation-Id: 16d0d6b7-e68c-426c-936e-08de5d07eb61
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?AFadxF2F8SmTkny+/cF40bPOr29Q9Pz+J+twLHIuy4a934HL0tkY9OnxP9vq?=
- =?us-ascii?Q?WxtBKO+9qKLvoWMiCb55l9AYlyrl0M/691VCqLTW6wrUpzZotMAuuBHS8AAQ?=
- =?us-ascii?Q?uvQhgWGvntOfczUKEUYB4DxBNsLivQ01GmvGKf3wavBSZPBMsopBZ2l8rsaR?=
- =?us-ascii?Q?fOvM+hHaRlmk8QOQvo+7GvVEiCk21EyRdTYcZQ5njUUmt6epCXpd5jljS9LW?=
- =?us-ascii?Q?1qOkfVrRjrpmTub8n8l9RgFVJfnko/exxsOKK9vC6XKa+GAHHPUjtexVMdH8?=
- =?us-ascii?Q?gS1xs1at1tP3y/ZFBh/Bg6z4R0GZxgL7L1jJ7bVYZ+ScD+wuBYccGF1rVSsU?=
- =?us-ascii?Q?N4WfqhS8ZXLD35x70sL+bh7FR5Y8C7zXQomfda6L3GrkeSHuKz2ArK7JlwvK?=
- =?us-ascii?Q?vSHf572kZ3JO4WXz8ufhLYyFTdxpGCjbxqKB/38shb+SkukEgt1DE4zSI9fi?=
- =?us-ascii?Q?M51KV4CTvUpi+iFgSIpV6WFvHEZsM2z6NHvXMkt24PoDT1t/nIqdmZv8o1jF?=
- =?us-ascii?Q?qruRXMKe2GYxPn56iv3LcSYb9TYPlX0F4tM+rqTslUROFghVaYjbInZDenuR?=
- =?us-ascii?Q?q86wCtfK3a6+7Dbf7zdQwrpiUkRfJnnAkbC64AVGKY9LVvcfAgnOciyqTgo2?=
- =?us-ascii?Q?OAN3948hIrQm0uW8Q2Z2tjmiMzllZs8tFcEnVPrZR/vphB+S07q28WfVj/A2?=
- =?us-ascii?Q?t+/2hBklVIr5NqqvAWvWt+cEHiqihwWxtJyU8D/9wdF38/QEKFC+zuEaOgrh?=
- =?us-ascii?Q?D0t5mWfCiu4d7mZ/lfNHMM1NRw36srmWLKx+tEBV1AS/8Ldwq3SJ+51ojbrv?=
- =?us-ascii?Q?M1xwbWnZFz8spfTylVIugUMGiro49WgLvpetBlrQ+1/2P7VN8IL3IK7HJMdq?=
- =?us-ascii?Q?3rJqjVlfXM6vWinFPkEMyW9jqUDP0VbxVejxFGq1qkM+q2Z3DNqZzsO7CZ2V?=
- =?us-ascii?Q?H88rsDpnRw577l8fPJnczNjU6hpxsseIkrXuvgzNIXr1v/yDNmTf0gjM3sMN?=
- =?us-ascii?Q?aAauRTHhSLbVxAM7dyGhrWXMGubTbfKJ4unpM9NjRqG4H5p1LMONrLLvcRoK?=
- =?us-ascii?Q?quiMOfWKcfToTx2WUgTWRniJyQp3+sz5PlQXhJIrFw9x9fCkzelxweHND/tR?=
- =?us-ascii?Q?X21eUSRJg0zSmoqhC44Pul8CnV9V9gHlfMAY0PPNWFqUXgXqaZALVHYYTAHc?=
- =?us-ascii?Q?lmPdbVgMURIo77EsT1jy1ftghsDwPr/RPoFiXEQzy7RK5ohYg1BefdyB6fdF?=
- =?us-ascii?Q?6acVI7TL+Fw6zWr7Se4QpBM1MOi2Jwwl6A4Zk5zGDzAnFs8jLmofORfi5xCK?=
- =?us-ascii?Q?LTt5vOOHGmJXWNJbg6iz0R21ls0bk3RA8R75W47RykcrSgl77CkGGzhbZqIr?=
- =?us-ascii?Q?PU1qz+o0clRLWXyg5yWB3ezEU4c0KhGiIuH3sGjrCaygYpwSkSkHOfiV44Js?=
- =?us-ascii?Q?VZNl92mw+qbK2Hzl5vTtBSlfOTsibKpg25G3tfCZ0R9bkioQMhANdhGS88Yt?=
- =?us-ascii?Q?3DPtHbTUxpE9xhcaiQ/Dkaur7pRaUkVkfg26hDc96P3PweTgcPhqw1ihHKFg?=
- =?us-ascii?Q?0q3ZnBwIS31bgwWY7b0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR13MB5239.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?TQU+HD+nuPn4gm7GUbhDOwPHbkHfLPn7zZS3xze4N2eMlqMViqmeMqLeDgRq?=
- =?us-ascii?Q?UPuv5rQLM/AUCdovCY2iEBxg1AqBUgHbVJ7FefAb7uH55kxHgHd9PRPVRy+D?=
- =?us-ascii?Q?hrTIYoxpPxmu/Q7SDAJBQndH9kuu07zKK6umSoNwoN2NsR8bR+6iv0PhKMiw?=
- =?us-ascii?Q?yTKnUYzUHgbtGvzBB01EDJrhuZbSw3DViU8rt4RYfypYWy36TV0cWX+EIAAk?=
- =?us-ascii?Q?vAH8BCCtp8MaC7WVjX61I/f7ePP7OqpVa1QtkYyWtmjiEG9l3XExHt85upER?=
- =?us-ascii?Q?AmyuFOu+UgjqMRtxgTBo/bm+DpwbEwo0NbB69rVz++YNc/GRzygR2TBBQxui?=
- =?us-ascii?Q?KWDPpVF622U8yX2S+0WU/FaHouJKysjb6nm5x8PpBFeAmB31mcs/H8QxLKJ2?=
- =?us-ascii?Q?FDULfTGdS2Kj2LVm8X9cdZzQOqe7lsmhh0M8f9mmvD8yoWlmmBxUdTBvBSUP?=
- =?us-ascii?Q?59KPNQAnInxg2jmd/jwoEwZYKA81YOfNSgEFzZpbgzCvAHauXildXfqihwxp?=
- =?us-ascii?Q?FhmjqCQYPBv915fGvHlObsRHFQL66/y34BXEqgrg9WY90Yyd2PbCULeAthMi?=
- =?us-ascii?Q?hc5uwInGRwm3Vwf+CmE41Mpp1RBnG8w08j0Evfk3RFO1QnF34xJEM3jFFyar?=
- =?us-ascii?Q?pkxrgvMV+2eaygp+V567ffSIdNhDIDUR2KO9xiVxuYJi4qgP924EIpk7zbWU?=
- =?us-ascii?Q?pwEBNmfK0nIVuh4re8fYA3ZBCA3ur0UxSnI4CRbOQqrXVwnrt93lVL6Bxiov?=
- =?us-ascii?Q?HbcXlVz94wMamwmdGgKwWiifZ4IG5ahBRqe26meMBQB8LcQSSyOI2HB7GoLU?=
- =?us-ascii?Q?xyJSntyx53K6/2J1ImHvG2iL5WW0Ge5j8Dt9Yu3C4HQQ3WLC7MAw6BkKSUcw?=
- =?us-ascii?Q?lFeUMPFFnq0JDAwSt8+YNLARv9jZeACnioJwC0VaRcGslyQ5VDCR3qTQEr/X?=
- =?us-ascii?Q?exxSJkqkl53EWxmZz2TZfHjE05ChH0Itww3liYpQ4NSlAQHSd3bRoXi1stDG?=
- =?us-ascii?Q?3f4sy2UNgIqqx4FrQH4NokowcmQP5JkmvbfHD48WiXLJWDS0HT2WJ2rs4lyc?=
- =?us-ascii?Q?lUb54i/qgnUzpBVsfSjBB6x0tFHsEqecYAcn9l6Mhj9vsKd5GZWo8/JcJMiZ?=
- =?us-ascii?Q?MlDwzpCqm9dmHI7HPbQSnQfV84lbqz9d4tFQJjwjRk3PAmi4NfHWHoB9Hcjc?=
- =?us-ascii?Q?m9X5XPhWQT1iN+o2hE7aJAxIM/53IbMsdlZrsC0w/BHYI8FS9csd8tvD2r1F?=
- =?us-ascii?Q?DPfdFrBsKxno6U3yrSHkQVPPWnp6kc7tdhwgBxmAMooDdm+zoY5L/p+Gbihq?=
- =?us-ascii?Q?RkiD5guzN7B1yEdICfKHex8kN37kGotPy1WYixqJzoRYQAkbF+2i0T+pRJbS?=
- =?us-ascii?Q?MmQthAoq1ZQVSspn33BNdS1u2DtlpmkJjp7r63x4n9MnH0v0GTpKCs/G2itY?=
- =?us-ascii?Q?uprCsmWtUAARCGCBe6p3ILk7IaWk6umAbAbBlAFqrmNnoDbCBbsrt51gp4JK?=
- =?us-ascii?Q?jt7UCVUFlToubhrY7t+HljpbPOvSEv6VOd5XmjTJFGudqfcadFuXC4+41/cE?=
- =?us-ascii?Q?thZwdNEIQbKprpp1Gc+l2ZrJt67qJGfPZiPLcddp/34SiHEULryfdo9/n7NA?=
- =?us-ascii?Q?u0LUTAKqb2/2VZYzbxy+/COhTlpg19UcSWRNKWdUFmKniK4uE8NgJDprxXTq?=
- =?us-ascii?Q?eKJdjZisemxjI+wGOk50sIsrVt+NHZKdDeks0Juse36Jn2qXNw+pyUG7roqw?=
- =?us-ascii?Q?r3yXRFXEK6RypChsau1e7sAkTzt5Kn4=3D?=
-X-OriginatorOrg: hammerspace.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 16d0d6b7-e68c-426c-936e-08de5d07eb61
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR13MB5239.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2026 18:22:52.9987
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0d4fed5c-3a70-46fe-9430-ece41741f59e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0Mvd3ZGetRolFwRbcX3T1U1nEhdHoKZibWdKvhX5HQfEvL6ZvKyOjiP6xUAGTpbZYvuRJ/7gDoAP585rYBWFkJ+gZq8A1/U+ChN9IP2kr6s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR13MB3934
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dd65bb7b-0dac-437a-a370-38efeb4737ba@acm.org>
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-On 24 Jan 2026, at 14:48, Chuck Lever wrote:
+On Mon, Jan 26, 2026 at 09:31AM -0800, Bart Van Assche wrote:
+> On 12/19/25 7:40 AM, Marco Elver wrote:
+> > +/*
+> > + * No-op helper to denote that ssp must be held. Because SRCU-protected pointers
+> > + * should still be marked with __rcu_guarded, and we do not want to mark them
+> > + * with __guarded_by(ssp) as it would complicate annotations for writers, we
+> > + * choose the following strategy: srcu_dereference_check() calls this helper
+> > + * that checks that the passed ssp is held, and then fake-acquires 'RCU'.
+> > + */
+> > +static inline void __srcu_read_lock_must_hold(const struct srcu_struct *ssp) __must_hold_shared(ssp) { }
+> >   /**
+> >    * srcu_dereference_check - fetch SRCU-protected pointer for later dereferencing
+> > @@ -223,9 +233,15 @@ static inline int srcu_read_lock_held(const struct srcu_struct *ssp)
+> >    * to 1.  The @c argument will normally be a logical expression containing
+> >    * lockdep_is_held() calls.
+> >    */
+> > -#define srcu_dereference_check(p, ssp, c) \
+> > -	__rcu_dereference_check((p), __UNIQUE_ID(rcu), \
+> > -				(c) || srcu_read_lock_held(ssp), __rcu)
+> > +#define srcu_dereference_check(p, ssp, c)					\
+> > +({										\
+> > +	__srcu_read_lock_must_hold(ssp);					\
+> > +	__acquire_shared_ctx_lock(RCU);					\
+> > +	__auto_type __v = __rcu_dereference_check((p), __UNIQUE_ID(rcu),	\
+> > +				(c) || srcu_read_lock_held(ssp), __rcu);	\
+> > +	__release_shared_ctx_lock(RCU);					\
+> > +	__v;									\
+> > +})
+> 
+> Hi Marco,
+> 
+> The above change is something I'm not happy about. The original
+> implementation of the srcu_dereference_check() macro shows that it is
+> sufficient to either hold an SRCU reader lock or the updater lock ('c').
+> The addition of "__srcu_read_lock_must_hold()" will cause compilation to
+> fail if the caller doesn't hold an SRCU reader lock. I'm concerned that
+> this will either lead to adding __no_context_analysis to SRCU updater
+> code that uses srcu_dereference_check() or to adding misleading
+> __assume_ctx_lock(ssp) annotations in SRCU updater code.
 
-> I can't recall if Wireshark is smart enough to introspect Linux NFSD
-> file handles (I thought it could). It would be sensible to have some
-> Wireshark update code in hand before making the final decision about
-> keeping the new auth_type.
+Right, and it doesn't help 'c' is an arbitrary condition. But it's
+fundamentally difficult to say "hold either this or that lock".
 
-I've gone digging and wireshark has a surprising amount of filehandle
-dissection code - it currently can "Decode As:"
+That being said, I don't think it's wrong to write e.g.:
 
-dissect_fhandle_data_SVR4
-dissect_fhandle_data_LINUX_KNFSD_LE
-dissect_fhandle_data_LINUX_NFSD_LE
-dissect_fhandle_data_NETAPP
-dissect_fhandle_data_NETAPP_V4
-dissect_fhandle_data_NETAPP_GX_v3
-dissect_fhandle_data_LINUX_KNFSD_NEW
-dissect_fhandle_data_GLUSTER
-dissect_fhandle_data_DCACHE
-dissect_fhandle_data_PRIMARY_DATA
-dissect_fhandle_data_CELERRA_VNX
-dissect_fhandle_data_unknown
+	spin_lock(&updater_lock);
+	__acquire_shared(ssp);
+	...
+	// writes happen through rcu_assign_pointer()
+	// reads can happen through srcu_dereference_check()
+	...
+	__release_shared(ssp);
+	spin_unlock(&updater_lock);
 
-.. almost all with finer grained filehandle components.  I certainly can add
-patches to parse FH_AT_MAC for the linux(s) decoders, but I admit I don't
-have any use case.
+, given holding the updater lock implies reader access.
 
-I'm completely neutral on keeping FH_AT_MAC at this point.
+And given the analysis is opt-in (CONTEXT_ANALYSIS := y), I think
+it's a manageable problem.
 
-Ben
+If you have a different idea how we can solve this, please let us know.
+
+One final note, usage of srcu_dereference_check() is rare enough:
+
+	arch/x86/kvm/hyperv.c:	irq_rt = srcu_dereference_check(kvm->irq_routing, &kvm->irq_srcu,
+	arch/x86/kvm/x86.c:	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
+	arch/x86/kvm/x86.c:	kfree(srcu_dereference_check(kvm->arch.pmu_event_filter, &kvm->srcu, 1));
+	drivers/gpio/gpiolib.c:	label = srcu_dereference_check(desc->label, &desc->gdev->desc_srcu,
+	drivers/hv/mshv_irq.c:	girq_tbl = srcu_dereference_check(partition->pt_girq_tbl,
+	drivers/hwtracing/stm/core.c:	link = srcu_dereference_check(src->link, &stm_source_srcu, 1);
+	drivers/infiniband/hw/hfi1/user_sdma.c:	pq = srcu_dereference_check(fd->pq, &fd->pq_srcu,
+	fs/quota/dquot.c:			struct dquot *dquot = srcu_dereference_check(
+	fs/quota/dquot.c:				struct dquot *dquot = srcu_dereference_check(
+	fs/quota/dquot.c:		put[cnt] = srcu_dereference_check(dquots[cnt], &dquot_srcu,
+	fs/quota/dquot.c:		transfer_from[cnt] = srcu_dereference_check(dquots[cnt],
+	include/linux/kvm_host.h:	return srcu_dereference_check(kvm->memslots[as_id], &kvm->srcu,
+	virt/kvm/irqchip.c:	irq_rt = srcu_dereference_check(kvm->irq_routing, &kvm->irq_srcu,
+
+, that I think it's easy enough to annotate these places with the above
+suggestions in case you're trying out global enablement.
