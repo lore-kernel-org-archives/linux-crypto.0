@@ -1,111 +1,86 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD822777EA;
-	Mon, 26 Jan 2026 21:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4543A2E5418
+	for <linux-crypto@vger.kernel.org>; Mon, 26 Jan 2026 21:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769463381; cv=none; b=nDHjsjv2RNvPWvCFX1VjdAU2PrezOZ3FCBaLqxKAJp4xd1r88BY+/g8z06Z+aP3pH5SZ62xzFyoXJYg5ZVk0P3Vkk5p8+p1mvVRlVLJLy66kn/wiXWBhcPxHn/bOFw3jgIerL5e9d8H4idOzNFOydKXNj6j8ZC6HuR1QH/eEuq4=
+	t=1769463432; cv=none; b=kDrJDdJh4GpsiE8sQGNAaSgPNVempalOr5gBnakHX0WYgvBZmGWE9PXkhpy2/sVFHm848Rxmz1XmXZJbaR1Sd7Kvxlj1cl+nxcTJMEalpAPDwm3P+eHRUxyd7mM7rf32clG1y2mE4UEnHUT91TIomeXKepZ210lnLR8bwO0HkcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769463381; c=relaxed/simple;
-	bh=0RodAB8oLx7+8GpYTVBTyvE4SVADV1YdcMRUy25UdUM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IpVQStJcjvkPiTl9I+u4znw56yrHjediztwr8JCSSKkV90g/Xjh4l2gT8Oe+BAEq4q+BPoLocrfGmvKLkQ09ZQWWAUe2mjEUbuVu6o98hGmY0xTvBhOZsTGwnqrJ6Q47qqOOZFnK/riaLibMnH6RQhHLldrrveXx8uCLWjuiQJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=J6iAAvmt; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1769463432; c=relaxed/simple;
+	bh=0hWe7eQ4HIAf6/j5HOv37+1vd+FYqSwe0P+LEC7HsfQ=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=X1rAcbQkkxmk6oVua6iPYqTZluxmm+JyOS4wrQHbehy0wdr05KMnTUuUopbYYdldq3vqUg0nOCEoJmJ9bF/oZiWbf6JpsmRbh3XidYL0KS0m2w6Fnlx4KFgZAVXfMS1XQqgBKny/9rzAEsVYrd3Alhvrk4Ixbe/dvNpgxYYskvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VyJcrakV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="J6iAAvmt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=IDX9AjD0dwjrQefXov9k2MtCld60dtQxGUUAV2j1WjI=; b=J6iAAvmtrgFJs9ze2z/3mvNozn
-	PZeYeQkBMpOoy6bARHpR02WAfbtaa7iTf6HiFwZskZHm4oN6foztXD1WXqeuhwHMSXWyJAFJbhTD5
-	qQ1+R5XWwGM3j+QSkNI1Q+zMTANXKoioCJJ8PtGwpUGGIcze5nZNWEXu1YR5X4maU7pfNt0Anyji+
-	GXAcVEho74qSXcSeKj2Ko+V9+LTubj1o43do861nH82B/ld1Fn3lt07jwKJr3drbI6UK0q+LPwinM
-	WYBkEgblZCF12DZiFoTwjzgiGipNv2h33OJAsRML39oXnwDKn1Bq0tULsElknva+RF0gidO6QOh3u
-	4kZob4og==;
-Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vkUFZ-00000005tyU-07kL;
-	Mon, 26 Jan 2026 21:35:57 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 41718300756; Mon, 26 Jan 2026 22:35:56 +0100 (CET)
-Date: Mon, 26 Jan 2026 22:35:56 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Marco Elver <elver@google.com>, Boqun Feng <boqun.feng@gmail.com>,
-	Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-	Chris Li <sparse@chrisli.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Alexander Potapenko <glider@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Christoph Hellwig <hch@lst.de>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Kentaro Takeda <takedakn@nttdata.co.jp>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
-	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-	linux-sparse@vger.kernel.org, linux-wireless@vger.kernel.org,
-	llvm@lists.linux.dev, rcu@vger.kernel.org
-Subject: Re: [PATCH v5 15/36] srcu: Support Clang's context analysis
-Message-ID: <20260126213556.GQ171111@noisy.programming.kicks-ass.net>
-References: <20251219154418.3592607-1-elver@google.com>
- <20251219154418.3592607-16-elver@google.com>
- <dd65bb7b-0dac-437a-a370-38efeb4737ba@acm.org>
- <aXez9fSxdfu5-Boo@elver.google.com>
- <8c1bbab4-4615-4518-b773-a006d1402b8b@acm.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VyJcrakV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769463430;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FuGQCOqf9yOzW+ft8te/e4xxRm2OgzH1ppkEP0d7iLg=;
+	b=VyJcrakVFtvYwYtGuk4m7+1fPDnKA6CR0a7Vvx1tA/6XdH+syURXUdt7DtEUYuq7zAo1Je
+	bnop4QYGQRhwn0A+kEPQkB7KPrB7jvHYj6Hj/2L2OR2wXGtxxZn/Uq8SjH2LtyTsM5evGD
+	Am7UsxCa6xbwA8drhkbqA49eZFHsxBM=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-512-bh118hx4PqOesZMsNWSXsw-1; Mon,
+ 26 Jan 2026 16:37:06 -0500
+X-MC-Unique: bh118hx4PqOesZMsNWSXsw-1
+X-Mimecast-MFC-AGG-ID: bh118hx4PqOesZMsNWSXsw_1769463425
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 30ADA19775A5;
+	Mon, 26 Jan 2026 21:37:05 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.33.164])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5C9851956095;
+	Mon, 26 Jan 2026 21:37:01 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <821cb2becf70b2dcb903e74685643f8b60a5cbb6.camel@linux.ibm.com>
+References: <821cb2becf70b2dcb903e74685643f8b60a5cbb6.camel@linux.ibm.com> <1783975.1769190197@warthog.procyon.org.uk>
+To: Mimi Zohar <zohar@linux.ibm.com>
+Cc: dhowells@redhat.com, Simo Sorce <simo@redhat.com>,
+    Roberto Sassu <roberto.sassu@huawei.com>,
+    Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+    Eric Snowberg <eric.snowberg@oracle.com>,
+    Eric Biggers <ebiggers@kernel.org>, linux-integrity@vger.kernel.org,
+    linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+    linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: IMA and PQC
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8c1bbab4-4615-4518-b773-a006d1402b8b@acm.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1988759.1769463419.1@warthog.procyon.org.uk>
+Date: Mon, 26 Jan 2026 21:36:59 +0000
+Message-ID: <1988760.1769463419@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Mon, Jan 26, 2026 at 10:54:56AM -0800, Bart Van Assche wrote:
+Mimi Zohar <zohar@linux.ibm.com> wrote:
 
-> Has it ever been considered to add support in the clang compiler for a
-> variant of __must_hold() that expresses that one of two capabilities
-> must be held by the caller? I think that would remove the need to
-> annotate SRCU update-side code with __acquire_shared(ssp) and
-> __release_shared(ssp).
+> > Further, we need to think how we're going to do PQC support in IMA -
+> > particularly as the signatures are so much bigger and verification slower.
+> 
+> Perhaps, but these same reasons would apply to kernel modules, firmware, and
+> the kernel image.  Why would IMA be special?!
 
-Right, I think I've asked for logical operators like that. Although I
-think it was in the __guarded_by() clause rather than the __must_hold().
-Both || and && would be nice to have ;-)
+Scale.  I wouldn't expect more than a couple of hundred or so kernel module
+and firmware signatures - and, for the most part, that would be done once
+during boot.  On the other hand, I'm assuming that a lot more IMA signatures
+might need checking and maybe more frequently.
 
-Specifically, I think I asked for something like:
+David
 
-        cpumask_t       cpus_allowed __guarded_by(pi_lock && rq->__lock)
-                                     __guarded_shared_by(pi_lock || rq->__lock);
-
-
-I think Marco's suggestion was to use 'fake' locks to mimic those
-semantics.
