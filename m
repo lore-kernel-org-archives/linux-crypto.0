@@ -1,200 +1,528 @@
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11020105.outbound.protection.outlook.com [52.101.61.105])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1CD36C58F;
-	Wed, 28 Jan 2026 21:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.105
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769635485; cv=fail; b=buo0m1Q2BVK5cpPKUgs9bmAsKdUUwU4ol+12ag1kJrEtAzvjUnIOTWlyqnNDy5er3w0mVJsrhvik7x4c8s6sS3utOGQ1axYt/SEKu/1sBMtnp78IhhKvjAhuQdYSqbaZom0Xuzh33Sbbm/kmVjMqZA679QjyyTHMNIUVHlZhvKQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769635485; c=relaxed/simple;
-	bh=vOmdYxIpys1IewPZZ2tPjatGdm4n2HBSSn/gjouwD94=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cemgrrliEjHLoaSot6IZjd+LszCpfBs9xSPbZgKF3sJHPaukT7UfpDs75lbZOypF4P3V+f9KNox9TIaJd9hmT6sUMxP9PBXVdxyiZeR3dKvoLdShakrFeT+isN2+2iA/KwYGY8lWA/rVa9hJOcuQ/z5FeWtYMyG9rf9YnDBiAM4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com; spf=pass smtp.mailfrom=hammerspace.com; dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b=QT7gFl1v; arc=fail smtp.client-ip=52.101.61.105
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hammerspace.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD19031C57B
+	for <linux-crypto@vger.kernel.org>; Wed, 28 Jan 2026 22:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769638265; cv=none; b=lCzH/GWRCjJVgUiu8HfqPxdszJCRd/9EazWkOGHKtY/fAFxKH6cE/uJZX/jIdsauqpABMk68jdt0XvtaHgEBpGHMUaD2VpHjdAz0HPKn91LmgL2P02S5gVULPG63KmP33KPoi4GdsQmJA2T4UE6gwKmJJxiy5fqX2fO4CI3UWSo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769638265; c=relaxed/simple;
+	bh=Hvu2zOltdFd5+paePnjm3qeAHpuA6oXjxdbTfLX3/G0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LV2M9yAYwymTea9hFC99HJ/7PB8wenuqstzfwG2IXjdVJcN/+vhKpgDgve80gji7NizpopsIBNN+vvPqJVH1xwAFB6fV/zzwTr06AkaGwfIEtd1qPypXbxC3DA81hO46W+Li0lt/YhwpaXTqy6vRLs6amNBDXT7/OS/+ZX5iZkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CUv9C5qL; arc=none smtp.client-ip=209.85.214.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b="QT7gFl1v"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X3YfNqc2NATC78ZOjEZMTYmeJ3XDMU28gxKkRbxMSLPaSC6vIfdzl+J+A03/sZNjT9tYSFAsx7e4eNvNk5AvzvPNRqRBh8dr8PIRUNIhzjif7P+c14eaAifIzIdShcU+Cf6ukAyMQru7vbMmoxlrX6mfVbKDBfy+CvVJDu07UwWt5jFx9xZO5DwljX92GXF3ligPcGPlPdUdXxjLp9XwpR179NkLUcB6JqCU9isSvjBRdPw3STw/GHY4xrj7lPXYDst3d59UEHO2Wh6OzYSyacgaZ6sw9ulThPn3JdefzNQ7/JwMMKvRP0aJcVn48F0+HmMmG3PZ/otRtU1qk3XSgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TUXXjra1HfAfCgRzRLmI2MjpRkE724AXTJ43T9C0TEg=;
- b=GEPGzAp4YRqM4Y8B/z4EyBAvtvvSHvLnaLCLYomhcdnOJYB8Tgt1x4fnRzdvNwktNJb4XuTiYcQAjVpeGt4I6x4f8yRElVavDi72B76ZhRO1GzK7s3ByujD1J+codTnRFqiyyK8PxyT3FpacXbTyaZvQDQbgJMHIxB3YnPjHdixhneSEvffydpaVVKOUfu5s3mEVQFtVpSFm/4CA24nsmNRG5RpPW7H5gHWD/aJgcpLnrUCTgNBICOpuk5Q0IRDsJF7xUhbxSToYT85XdAdaCEwupIOiKMooJRWYn9C+qNw3q1gSR0thd4hoc3iryB4tJi77/oZrZvhJR2n4Lshghw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hammerspace.com; dmarc=pass action=none
- header.from=hammerspace.com; dkim=pass header.d=hammerspace.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hammerspace.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TUXXjra1HfAfCgRzRLmI2MjpRkE724AXTJ43T9C0TEg=;
- b=QT7gFl1vS+UW1CfxsSFW9WTb4u54HAsJjmNWJmhoOEksxuxdr8WWfcYKiGP40heBur3hK1CRI2hMBeMxpLe2s/G2GEMVZFjUYb7NJ8gNeE3/pCP16eSfFKXtwxr8ZyUWbZ9S0UBn8PFKkYLmJFVxa/xeScYEiVo2MdjxWgqaPMM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=hammerspace.com;
-Received: from DM8PR13MB5239.namprd13.prod.outlook.com (2603:10b6:5:314::5) by
- PH0PR13MB4858.namprd13.prod.outlook.com (2603:10b6:510:98::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9564.7; Wed, 28 Jan 2026 21:24:39 +0000
-Received: from DM8PR13MB5239.namprd13.prod.outlook.com
- ([fe80::fa6e:7b5:d1ec:92f3]) by DM8PR13MB5239.namprd13.prod.outlook.com
- ([fe80::fa6e:7b5:d1ec:92f3%4]) with mapi id 15.20.9542.010; Wed, 28 Jan 2026
- 21:24:39 +0000
-From: Benjamin Coddington <bcodding@hammerspace.com>
-To: Chuck Lever <cel@kernel.org>
-Cc: Trond Myklebust <trondmy@kernel.org>, NeilBrown <neil@brown.name>,
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Anna Schumaker <anna@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
- Rick Macklem <rick.macklem@gmail.com>, linux-nfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] NFSD: Sign filehandles
-Date: Wed, 28 Jan 2026 16:24:35 -0500
-X-Mailer: MailMate (2.0r6272)
-Message-ID: <5C6C8838-9244-476A-87CF-123F4822F459@hammerspace.com>
-In-Reply-To: <041a37d8-c114-4ac0-875d-022e9d07aac8@kernel.org>
-References: <> <e545c35e-31fc-4069-8d83-1f9585e82532@app.fastmail.com>
- <176921979948.16766.5458950508894093690@noble.neil.brown.name>
- <686CBEE5-D524-409D-8508-D3D48706CC02@hammerspace.com>
- <77e7a645-66bd-4ce2-b963-2a2488595b00@kernel.org>
- <8be0a065a84bed02735141b4333e9c49a2ab0c90.camel@kernel.org>
- <33c02e5a-03e7-42ef-8ccd-790a9b29a763@kernel.org>
- <D3263C1D-A15E-48EC-B05A-8DC6A0C2B37A@hammerspace.com>
- <041a37d8-c114-4ac0-875d-022e9d07aac8@kernel.org>
-Content-Type: text/plain
-X-ClientProxiedBy: PH8P221CA0055.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:510:349::8) To DM8PR13MB5239.namprd13.prod.outlook.com
- (2603:10b6:5:314::5)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CUv9C5qL"
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2a7a94c6d4fso1347195ad.0
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Jan 2026 14:11:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769638263; x=1770243063; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DqY9UiMBv6wGikpAOmqkzeZyxh/eeRZipUUvQ4beoUQ=;
+        b=CUv9C5qLAVwA9R7dykpkqXqiDih6MVFMjihHTf7zJ5zN6wQl7nBthnhkDwKDwhC/VH
+         1h7Ej+eOXC8uE/P/Cjy335nAaeUMDzJw/5h5vp2vK2cJaLz9jKviqfiObO7NbHX7A5j6
+         kMcuV7OiaLWRpa0FRdlcQ6j0UsulsGOkl4FOno7Xr4a65NdYfT8Yv1CHq8/nrkzAjk34
+         taBNexRWbfELyWiz5tunDkD224YvfLIMo/q4Y06a8p2xyBrC+n7/i5niHWGBdTZupoMy
+         10MW/GPbhMQdrbHZDWmaxeW8rEsrUXPUiG4SkrHqNbDd8SCSQ+Kt5ATJ5x5N5eeNWhvP
+         zAow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769638263; x=1770243063;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DqY9UiMBv6wGikpAOmqkzeZyxh/eeRZipUUvQ4beoUQ=;
+        b=Psc4jymzL6ZowaJDUpEWixHayxSMdPhYnbphdWLG3RBtU5NiVa9zjyd5E92Sc01ZTo
+         AnMAsAFfPJDKD+9sSnn92L8r6SZInbCe90VOsmAmNcHhSkrOno1z6r2C1sNeDG6Lm4bf
+         JGaGYsRxoIQZ+vW4als4/fzgwsZ3h4C/B5IA1cATPWi5pfG8Y8qL+q9JxKxic4Jldof/
+         gE5fFCfv83/cvO9hALD/serfpl5+Mhvnv1ns022IP8LG7NccIgW1W8be2hkpCGRla4F5
+         ZrhlP0Po6gJcZADyYT5SB8vFZvFy+vqSRw+V2jr/z1lBXzWoXpm9QQVyGbN7esJUt/Ea
+         HOfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUdDgvi+SUtdN8agYrqRxlETbe1rUMq2+fY10Ia7vkQIeTJBdgVcj6znUNvz2taupkOc3vqrGC/f1WBnbs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgAWjmRtzGpUTDxf6XZFtXUyoAMl3LOKeCxY7x0y74SxCN/WR8
+	uD0DBucmraRYP5atoS39jw6PzCzMaarBtCrEkMp8KFwQEJsu+Rkys8O8
+X-Gm-Gg: AZuq6aLn8f+IGm8pUlD102DYSyOtKAlSEpup2ja3ZZWYKGuMgU/kxr1eU2cJDNDfYlP
+	pu94iRuy+3NSclsWQl5qaJA+jeLXySGz7JpY51Cw3z2GeXb4ue0q1Gy2dUjXNKid0r6KiH0V0b1
+	U8EmAUPGgfTaXPIjr9AieD8Dbc5ds90hzUORzugXG6ZXk+ixbnsALx23+2nzYA4kFMaTAAnzRoA
+	FNOokdjWyOViPIovNw15N+VutCl+c7j7DWb8LvJa+1lCLrEvu8dJuKqlMS8FGlpUp+P8/ROZK0B
+	lzc+jqEfGzaZYeY67MfO5uD0BS35Z3c7NfSx9YBqXkby36dFRmuOjv9PtsaLAOFPcxHmMdwdG/c
+	LflRLaRRith8jzoPtA/nuVPglWBBn2gePFbWqqsA/Mh/Kaa6jMmdEbnjfObpsKNhWw+fUwrUPGD
+	26nQgpdRmI8lbwMZ50qgMCd2XPQZN9KgwikZCsCAd+wLxtPcUs6CUByF77vHLdF2qXXyg6JySLa
+	Yfs7zlIAA==
+X-Received: by 2002:a17:903:1ac6:b0:2a0:c58c:fdd2 with SMTP id d9443c01a7336-2a870d9efdbmr70783975ad.26.1769638262900;
+        Wed, 28 Jan 2026 14:11:02 -0800 (PST)
+Received: from kator.shina-lab.internal ([133.11.33.33])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82379bfd797sm3490546b3a.43.2026.01.28.14.11.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 14:11:02 -0800 (PST)
+From: Lianjie Wang <karin0.zst@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Olivia Mackall <olivia@selenic.com>,
+	David Laight <david.laight.linux@gmail.com>,
+	Jonathan McDowell <noodles@meta.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lianjie Wang <karin0.zst@gmail.com>
+Subject: [PATCH v3] hwrng: core - use RCU and work_struct to fix race condition
+Date: Thu, 29 Jan 2026 07:10:52 +0900
+Message-ID: <20260128221052.2141154-1-karin0.zst@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR13MB5239:EE_|PH0PR13MB4858:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9f509039-2416-4000-c921-08de5eb3a4cd
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+K3inGQT9A/Gbfu3hKxB1n8P2h7nVOoI2WlZQ2qSkfoi7YnY2bRLOyphiGGx?=
- =?us-ascii?Q?gNmsD4TdL/g5Dil1Qwch/ntQ8ful2LmZd6ZXIwMIgQILuJ7We+almATUi1DV?=
- =?us-ascii?Q?yNuRCLcZH8wY0fhgRhcP/bFUisxaFYdaVE3dD9FfHfNpMiaLdE0JqJW8gjvy?=
- =?us-ascii?Q?chhmW71xBQFmKeObUlDuayZ7ZmgelUKl6rGXmzJnde00a9PyZcl4Q7vSn6JI?=
- =?us-ascii?Q?ZTuMphLWgmzHf5piEOsn+FoDoyS8leSNFmMZRVRVFr4vkz/RswqGnI2IWxmZ?=
- =?us-ascii?Q?JCq4dJ6NW8GF6qMktqYVbpl3OLnSbFvrdP34NUpcXtlXRtELjBF8fa9kymkO?=
- =?us-ascii?Q?BpLEFO3MQOChZmwjbpxIlWi+mb36JiSg8RwIGY7dVOFyI1pzSWEVVimWHVvc?=
- =?us-ascii?Q?IriJeiNd0FN0bO+l50XI95Ea0q3VgG4+Zl+V2eeHpGYZpHTwtBTRljVKASqk?=
- =?us-ascii?Q?mfHXhucP8oVCnDl26W3SCwLS5hfx3OdmachxJxb2z9Pz4N8zBwBabeI7sqFB?=
- =?us-ascii?Q?dnQTyjTwvuJr5GpKiNJt86R/N6As5YTqloOobF5Hl6p8Z9yDLyXSP78I+DbG?=
- =?us-ascii?Q?FbTBcoI0VommnyP0Ty3OpbzVNLMIEx7l+9C6G7T5c14VPWObR+9fe7zuP+hh?=
- =?us-ascii?Q?vX5wwOiabdjL7gTRkh3TXjMfQ1yarE9GOigK9iGyLQtY1LtGnPOY+ElpUbf+?=
- =?us-ascii?Q?9vyaPNa8BH8hOlCJZBI/aLClZRXErLZxyagD1Qyc1/c/XTU3t352FmpA+L4N?=
- =?us-ascii?Q?xtVCb/1qQb6Hb2Tfm9sme+5UmjeVYdW9QPtOgTzBtrAttMQjd6WijG7jzUli?=
- =?us-ascii?Q?V7JqBGPjNf/mkSFpY8h5pe+cAoIe/4PE2I+hrDtLWfLszvzpVCWPbdhOj0Zx?=
- =?us-ascii?Q?20AW3Ue2SmY2d5R/HsCrdtVplLFBjCX4xSSQF1HP+9RAJKlCrabU4UkcUjP1?=
- =?us-ascii?Q?22COeJuSMXgBfKAj7kkiLk9pvMHgq/qcloraVzn8WozrJB8tiQ8tNvKbB67d?=
- =?us-ascii?Q?VqGrrzkU/8E+rzhWf1HMSyoHhi1Z6pIa3T91P2Km87Cp6yntzCfPBKJBKB7F?=
- =?us-ascii?Q?fRAe+GXzPMXolUD6+0QiyqoLNC0/W7SdH9/hmZrrosD09VsQjXRiDAsyL5Bv?=
- =?us-ascii?Q?wtX92c/jW8amXnh3y3kMV7b3DePss7fIRa7KS5XDS3V9C2XiSG2dqnA1n4kK?=
- =?us-ascii?Q?ymnBBtCDQiygtqZpDq4RoXJhUJ3iwusTWvFSXn9lJXQHlDJRUeMr2TZcZiLr?=
- =?us-ascii?Q?ioB5F6WV6rlMeAULG3caPRrsAfItB8/DO6nRpvMrFqEjK6pXxeJN7aMq2PGc?=
- =?us-ascii?Q?M5XgbkB7vRgEPbwI25/lvFWkcn7dNbZ2bSp43jbwGs7wcamUG7VbWNon5p7g?=
- =?us-ascii?Q?Esi4ENI+dXtNm5FOmhqTOZ4Gpf6TUwVGsHyUkDoIqBP6JdL8t5vy0NbT2JoA?=
- =?us-ascii?Q?91Xjjw8+RBvx4g7ymPr0eKVxyy9qNgXA4RCAcXX4A6a33MWc3Iqsw36Iaadj?=
- =?us-ascii?Q?YVu7R1OyPdFpSjZ2hLIwzaZW9ln4kUH2128knC78YppheMTjfz4cXT3WsSFr?=
- =?us-ascii?Q?Oe94gcY2Enr798dRI4s=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR13MB5239.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Awx4Ax8x/jETQpdiAukVQ9q3zJKmAOoCNb5G+1ZlHCRhBL6qJzMj/HXxUivI?=
- =?us-ascii?Q?BF0gORH/O/x1oGG/0MAoUBBfW7iWuOfjELhn0vKFVP74b113hYJQxd10gkJN?=
- =?us-ascii?Q?XqMpdVJ7DBbZM38OAww9X8f3qNI7ltHlBpbgK/5Vx7RzCPfnFHqFn3zo6iKk?=
- =?us-ascii?Q?TCtje831LQ2AGDpFzBsSzr2NQtdS9y/Zsx4orEOXHZM57Tv/PJZYTMvXvFwG?=
- =?us-ascii?Q?rjLaU7GqMByZHHp9OealDKiER4OPYtk+qKUMg5BcXHKcx4dpgZp6btEa3Usn?=
- =?us-ascii?Q?xLNJ599HBk7eRxhm6+Xp4xCWV8C1BADAWsWRe6tLCQczODjhhPP9r3hMmBxc?=
- =?us-ascii?Q?vNWon3sGumW9/3emjKREKEpRERoNi8uwUwLC6CxEhlx/DrKfGVW3R1kLV8sW?=
- =?us-ascii?Q?JVo1+bp2VJGlEqjicJUpyxPK7f+Vp1tuJP/YB+46vSJcK+FHp08tnbK284zu?=
- =?us-ascii?Q?Ih1dDLiP5K6210ilmu8Cb1hFc6QjYgLGPT/AlRRXUnfebfVSpDpZ7Vb6Ay4L?=
- =?us-ascii?Q?HW3uJUttQVgCHXzpDVKpXNIWBDmzOZpXGM7raZELSSlIESV0WCWkwJG3OXoq?=
- =?us-ascii?Q?Nzf2HqlUC700q3LVwV8c52s5Ztf1/Cz8gXNaRwg3iAttQQFOL4bA+XdwsOd2?=
- =?us-ascii?Q?FJOM8H55AhpNjeCNieJE0ElaedP+D0Li3JxyYsGfEA3pp70q5ORq7ufzZQIV?=
- =?us-ascii?Q?sddl/nrSPIhPLq5WnPocdyRXkCNp+f0+zZejdVJGVXjNnEajJ1lYJn+lnnVV?=
- =?us-ascii?Q?dGAYADcy9K3pzsF3HM5kFnQyz1PnvN/mQCL7ArlijRURW2U4rw6sxXs0oMDY?=
- =?us-ascii?Q?C+eypaKWAMonZJjiqXB93xiybCKZen4wtDDJRC7oSEHlHmLjQ5IOcq1bOEWv?=
- =?us-ascii?Q?kr+jL/IjZH5EEZxu5E1Y7SM4ka/a2yTh3OXE7wkueFzA/VNEb9xP2emoXBCd?=
- =?us-ascii?Q?Eqf3U6kYli9suaIUp5/PQ631/J2jyssPQdDWneQlLcAsxwvq8i1yT9C0cH7B?=
- =?us-ascii?Q?etj+O+Dd8+XwDGgcJ2c5iGFwhzC2EEtpeCjyZzs53PRD6Du1zUr0AQmJVcXW?=
- =?us-ascii?Q?XFA2d4XTyjQDRhsnvv01GGEKds/zp4AZRBj5MakUwhjsoAmN+KZ6agVnqffs?=
- =?us-ascii?Q?HEczqqWHJcYF/tyDAWvhiebD7Suzr2MB/kIH0/9LxlOK4jmjAD+ZpjRy0ZNm?=
- =?us-ascii?Q?i66NBvBisnpkwzAaBmy4KivnDxzfHi0ysa3RpaoRoBPaLNcj7BF58fMuY2sg?=
- =?us-ascii?Q?bFG+SnsTS8r2FgyIM6lHqojb0CAU4JoKy1X25m7fOyfyursYFVny8J/QPG7L?=
- =?us-ascii?Q?P/sdmaeAKzV0hXbPbTuVFfMqxHWAVF4Rrkz53piaafaFPOqi0+GDZIoMYHtk?=
- =?us-ascii?Q?XToG5I2xcZVykAxaCX5suHAOVukcsFXhXVvm2CFUbqfsYt4thoKRusDikxIT?=
- =?us-ascii?Q?gMWwNXpSrwwNPm9DqxQZA9ACr8ucyaf+MmadrqD+EqzNz+uvop3+GwnWP7Dl?=
- =?us-ascii?Q?EEVPDwYYhNUR9MmQxGiv5SxrBLtdxVQtOQSoleOZVvgGgAJRPSRjUZfnpQu9?=
- =?us-ascii?Q?d4EDO7VAgEm5p+zPXcKhfjkI/tpIfkZ8FR71XEq2weIy8aCjQiBkVEV3k/KR?=
- =?us-ascii?Q?48NO2Vm9cSw95TZ4GF0p71PBpMMUmQHwkcrKdvrdnej4+OK09zoVSAqy6Sb2?=
- =?us-ascii?Q?meZTZ2HHD3giEVCVw3qJm/XwwaawWTtRSXbfLSe4Ez8jnxMGC323lGOV17k6?=
- =?us-ascii?Q?9DmOr1SkZ1BpdOhMRQkgmOy0CIWknYQ=3D?=
-X-OriginatorOrg: hammerspace.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f509039-2416-4000-c921-08de5eb3a4cd
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR13MB5239.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2026 21:24:39.2147
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0d4fed5c-3a70-46fe-9430-ece41741f59e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: in1nR9INICCYzhRgk25SXJeW0wwlfc1BVKRbmWTpQWRg2vIigxyjeWjPqG6lWuxHeRsPTjqwsXawSbAjhrAjD3349aSGhWmzYvEWfS7fkAA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB4858
+Content-Transfer-Encoding: 8bit
 
-On 28 Jan 2026, at 9:41, Chuck Lever wrote:
+Currently, hwrng_fill is not cleared until the hwrng_fillfn() thread
+exits. Since hwrng_unregister() reads hwrng_fill outside the rng_mutex
+lock, a concurrent hwrng_unregister() may call kthread_stop() again on
+the same task.
 
-> On 1/26/26 1:22 PM, Benjamin Coddington wrote:
->> On 24 Jan 2026, at 14:48, Chuck Lever wrote:
->>
->>> I can't recall if Wireshark is smart enough to introspect Linux NFSD
->>> file handles (I thought it could). It would be sensible to have some
->>> Wireshark update code in hand before making the final decision about
->>> keeping the new auth_type.
->>
->> I've gone digging and wireshark has a surprising amount of filehandle
->> dissection code - it currently can "Decode As:"
->>
->> dissect_fhandle_data_SVR4
->> dissect_fhandle_data_LINUX_KNFSD_LE
->> dissect_fhandle_data_LINUX_NFSD_LE
->> dissect_fhandle_data_NETAPP
->> dissect_fhandle_data_NETAPP_V4
->> dissect_fhandle_data_NETAPP_GX_v3
->> dissect_fhandle_data_LINUX_KNFSD_NEW
->> dissect_fhandle_data_GLUSTER
->> dissect_fhandle_data_DCACHE
->> dissect_fhandle_data_PRIMARY_DATA
->> dissect_fhandle_data_CELERRA_VNX
->> dissect_fhandle_data_unknown
->>
->> .. almost all with finer grained filehandle components.  I certainly can add
->> patches to parse FH_AT_MAC for the linux(s) decoders, but I admit I don't
->> have any use case.
->>
->> I'm completely neutral on keeping FH_AT_MAC at this point.
->
-> If we can't find a use case or need for something, the usual practice is
-> to remove it from your patches until we have one.
->
-> Is anyone working on Wireshark patches to handle signed Linux file
-> handles in some kind of sensible way?
+Additionally, if hwrng_unregister() is called immediately after
+hwrng_register(), the stopped thread may have never been executed. Thus,
+hwrng_fill remains dirty even after hwrng_unregister() returns. In this
+case, subsequent calls to hwrng_register() will fail to start new
+threads, and hwrng_unregister() will call kthread_stop() on the same
+freed task. In both cases, a use-after-free occurs:
 
-Well the other use-case might just be for those pynfs tests you were asking
-for.  Without FH_AT_MAC, its tricky for pynfs to know if its getting signed
-filehandles or not.
+refcount_t: addition on 0; use-after-free.
+WARNING: ... at lib/refcount.c:25 refcount_warn_saturate+0xec/0x1c0
+Call Trace:
+ kthread_stop+0x181/0x360
+ hwrng_unregister+0x288/0x380
+ virtrng_remove+0xe3/0x200
 
-The other thing about those pynfs tests is that they get awfully linux
-specific - requiring new tooling to setup and change the export option.
+This patch fixes the race by protecting the global hwrng_fill pointer
+inside the rng_mutex lock, so that hwrng_fillfn() thread is stopped only
+once, and calls to kthread_run() and kthread_stop() are serialized
+with the lock held.
 
-Ben
+To avoid deadlock in hwrng_fillfn() while being stopped with the lock
+held, we convert current_rng to RCU, so that get_current_rng() can read
+current_rng without holding the lock. To remove the lock from put_rng(),
+we also delay the actual cleanup into a work_struct.
+
+Since get_current_rng() no longer returns ERR_PTR values, the IS_ERR()
+checks are removed from its callers.
+
+With hwrng_fill protected by the rng_mutex lock, hwrng_fillfn() can no
+longer clear hwrng_fill itself. Therefore, if hwrng_fillfn() returns
+directly after current_rng is dropped, kthread_stop() would be called on
+a freed task_struct later. To fix this, hwrng_fillfn() calls schedule()
+now to keep the task alive until being stopped. The kthread_stop() call
+is also moved from hwrng_unregister() to drop_current_rng(), ensuring
+kthread_stop() is called on all possible paths where current_rng becomes
+NULL, so that the thread would not wait forever.
+
+Fixes: be4000bc4644 ("hwrng: create filler thread")
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Lianjie Wang <karin0.zst@gmail.com>
+---
+v3:
+ - Add work_struct to delay the cleanup and protect it with rng_mutex
+   again to avoid races with hwrng_init().
+ - Change the waiting loop in hwrng_fillfn() to match the pattern in
+   fs/ext4/mmp.c, and add comments for clarity.
+ - Change kref_get_unless_zero() back to a plain kref_get() in
+   get_current_rng().
+ - Move the NULL check back to put_rng().
+
+v2: https://lore.kernel.org/linux-crypto/20260124195555.851117-1-karin0.zst@gmail.com/
+ - Convert the lock for get_current_rng() to RCU to break the deadlock, as
+   suggested by Herbert Xu.
+ - Remove rng_mutex from put_rng() and move NULL check to rng_current_show().
+ - Move kthread_stop() to drop_current_rng() inside the lock to join the task
+   on all paths, avoiding modifying hwrng_fill inside hwrng_fillfn().
+ - Revert changes to rng_fillbuf.
+
+v1: https://lore.kernel.org/linux-crypto/20251221122448.246531-1-karin0.zst@gmail.com/
+
+ drivers/char/hw_random/core.c | 167 +++++++++++++++++++++-------------
+ include/linux/hw_random.h     |   2 +
+ 2 files changed, 106 insertions(+), 63 deletions(-)
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 96d7fe41b373..01660854d95e 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -20,6 +20,7 @@
+ #include <linux/miscdevice.h>
+ #include <linux/module.h>
+ #include <linux/random.h>
++#include <linux/rcupdate.h>
+ #include <linux/sched.h>
+ #include <linux/sched/signal.h>
+ #include <linux/slab.h>
+@@ -30,13 +31,13 @@
+ 
+ #define RNG_BUFFER_SIZE (SMP_CACHE_BYTES < 32 ? 32 : SMP_CACHE_BYTES)
+ 
+-static struct hwrng *current_rng;
++static struct hwrng __rcu *current_rng;
+ /* the current rng has been explicitly chosen by user via sysfs */
+ static int cur_rng_set_by_user;
+ static struct task_struct *hwrng_fill;
+ /* list of registered rngs */
+ static LIST_HEAD(rng_list);
+-/* Protects rng_list and current_rng */
++/* Protects rng_list, hwrng_fill and updating on current_rng */
+ static DEFINE_MUTEX(rng_mutex);
+ /* Protects rng read functions, data_avail, rng_buffer and rng_fillbuf */
+ static DEFINE_MUTEX(reading_mutex);
+@@ -64,18 +65,39 @@ static size_t rng_buffer_size(void)
+ 	return RNG_BUFFER_SIZE;
+ }
+ 
+-static inline void cleanup_rng(struct kref *kref)
++static void cleanup_rng_work(struct work_struct *work)
+ {
+-	struct hwrng *rng = container_of(kref, struct hwrng, ref);
++	struct hwrng *rng = container_of(work, struct hwrng, cleanup_work);
++
++	/*
++	 * Hold rng_mutex here so we serialize in case they set_current_rng
++	 * on rng again immediately.
++	 */
++	mutex_lock(&rng_mutex);
++
++	/* Skip if rng has been reinitialized. */
++	if (kref_read(&rng->ref)) {
++		mutex_unlock(&rng_mutex);
++		return;
++	}
+ 
+ 	if (rng->cleanup)
+ 		rng->cleanup(rng);
+ 
+ 	complete(&rng->cleanup_done);
++	mutex_unlock(&rng_mutex);
++}
++
++static inline void cleanup_rng(struct kref *kref)
++{
++	struct hwrng *rng = container_of(kref, struct hwrng, ref);
++
++	schedule_work(&rng->cleanup_work);
+ }
+ 
+ static int set_current_rng(struct hwrng *rng)
+ {
++	struct hwrng *old_rng;
+ 	int err;
+ 
+ 	BUG_ON(!mutex_is_locked(&rng_mutex));
+@@ -84,8 +106,14 @@ static int set_current_rng(struct hwrng *rng)
+ 	if (err)
+ 		return err;
+ 
+-	drop_current_rng();
+-	current_rng = rng;
++	old_rng = rcu_dereference_protected(current_rng,
++					    lockdep_is_held(&rng_mutex));
++	rcu_assign_pointer(current_rng, rng);
++
++	if (old_rng) {
++		synchronize_rcu();
++		kref_put(&old_rng->ref, cleanup_rng);
++	}
+ 
+ 	/* if necessary, start hwrng thread */
+ 	if (!hwrng_fill) {
+@@ -101,47 +129,56 @@ static int set_current_rng(struct hwrng *rng)
+ 
+ static void drop_current_rng(void)
+ {
+-	BUG_ON(!mutex_is_locked(&rng_mutex));
+-	if (!current_rng)
++	struct hwrng *rng;
++
++	rng = rcu_dereference_protected(current_rng,
++					lockdep_is_held(&rng_mutex));
++	if (!rng)
+ 		return;
+ 
++	RCU_INIT_POINTER(current_rng, NULL);
++	synchronize_rcu();
++
++	if (hwrng_fill) {
++		kthread_stop(hwrng_fill);
++		hwrng_fill = NULL;
++	}
++
+ 	/* decrease last reference for triggering the cleanup */
+-	kref_put(&current_rng->ref, cleanup_rng);
+-	current_rng = NULL;
++	kref_put(&rng->ref, cleanup_rng);
+ }
+ 
+-/* Returns ERR_PTR(), NULL or refcounted hwrng */
++/* Returns NULL or refcounted hwrng */
+ static struct hwrng *get_current_rng_nolock(void)
+ {
+-	if (current_rng)
+-		kref_get(&current_rng->ref);
++	struct hwrng *rng;
++
++	rng = rcu_dereference_protected(current_rng,
++					lockdep_is_held(&rng_mutex));
++	if (rng)
++		kref_get(&rng->ref);
+ 
+-	return current_rng;
++	return rng;
+ }
+ 
+ static struct hwrng *get_current_rng(void)
+ {
+ 	struct hwrng *rng;
+ 
+-	if (mutex_lock_interruptible(&rng_mutex))
+-		return ERR_PTR(-ERESTARTSYS);
++	rcu_read_lock();
++	rng = rcu_dereference(current_rng);
++	if (rng)
++		kref_get(&rng->ref);
+ 
+-	rng = get_current_rng_nolock();
++	rcu_read_unlock();
+ 
+-	mutex_unlock(&rng_mutex);
+ 	return rng;
+ }
+ 
+ static void put_rng(struct hwrng *rng)
+ {
+-	/*
+-	 * Hold rng_mutex here so we serialize in case they set_current_rng
+-	 * on rng again immediately.
+-	 */
+-	mutex_lock(&rng_mutex);
+ 	if (rng)
+ 		kref_put(&rng->ref, cleanup_rng);
+-	mutex_unlock(&rng_mutex);
+ }
+ 
+ static int hwrng_init(struct hwrng *rng)
+@@ -213,10 +250,6 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
+ 
+ 	while (size) {
+ 		rng = get_current_rng();
+-		if (IS_ERR(rng)) {
+-			err = PTR_ERR(rng);
+-			goto out;
+-		}
+ 		if (!rng) {
+ 			err = -ENODEV;
+ 			goto out;
+@@ -303,7 +336,7 @@ static struct miscdevice rng_miscdev = {
+ 
+ static int enable_best_rng(void)
+ {
+-	struct hwrng *rng, *new_rng = NULL;
++	struct hwrng *rng, *cur_rng, *new_rng = NULL;
+ 	int ret = -ENODEV;
+ 
+ 	BUG_ON(!mutex_is_locked(&rng_mutex));
+@@ -321,7 +354,9 @@ static int enable_best_rng(void)
+ 			new_rng = rng;
+ 	}
+ 
+-	ret = ((new_rng == current_rng) ? 0 : set_current_rng(new_rng));
++	cur_rng = rcu_dereference_protected(current_rng,
++					    lockdep_is_held(&rng_mutex));
++	ret = ((new_rng == cur_rng) ? 0 : set_current_rng(new_rng));
+ 	if (!ret)
+ 		cur_rng_set_by_user = 0;
+ 
+@@ -371,8 +406,6 @@ static ssize_t rng_current_show(struct device *dev,
+ 	struct hwrng *rng;
+ 
+ 	rng = get_current_rng();
+-	if (IS_ERR(rng))
+-		return PTR_ERR(rng);
+ 
+ 	ret = sysfs_emit(buf, "%s\n", rng ? rng->name : "none");
+ 	put_rng(rng);
+@@ -416,8 +449,6 @@ static ssize_t rng_quality_show(struct device *dev,
+ 	struct hwrng *rng;
+ 
+ 	rng = get_current_rng();
+-	if (IS_ERR(rng))
+-		return PTR_ERR(rng);
+ 
+ 	if (!rng) /* no need to put_rng */
+ 		return -ENODEV;
+@@ -432,6 +463,7 @@ static ssize_t rng_quality_store(struct device *dev,
+ 				 struct device_attribute *attr,
+ 				 const char *buf, size_t len)
+ {
++	struct hwrng *rng;
+ 	u16 quality;
+ 	int ret = -EINVAL;
+ 
+@@ -448,12 +480,13 @@ static ssize_t rng_quality_store(struct device *dev,
+ 		goto out;
+ 	}
+ 
+-	if (!current_rng) {
++	rng = rcu_dereference_protected(current_rng, lockdep_is_held(&rng_mutex));
++	if (!rng) {
+ 		ret = -ENODEV;
+ 		goto out;
+ 	}
+ 
+-	current_rng->quality = quality;
++	rng->quality = quality;
+ 	current_quality = quality; /* obsolete */
+ 
+ 	/* the best available RNG may have changed */
+@@ -489,8 +522,20 @@ static int hwrng_fillfn(void *unused)
+ 		struct hwrng *rng;
+ 
+ 		rng = get_current_rng();
+-		if (IS_ERR(rng) || !rng)
++		if (!rng) {
++			/*
++			 * Keep the task_struct alive until kthread_stop()
++			 * is called to avoid UAF in drop_current_rng().
++			 */
++			while (!kthread_should_stop()) {
++				set_current_state(TASK_INTERRUPTIBLE);
++				if (!kthread_should_stop())
++					schedule();
++			}
++			set_current_state(TASK_RUNNING);
+ 			break;
++		}
++
+ 		mutex_lock(&reading_mutex);
+ 		rc = rng_get_data(rng, rng_fillbuf,
+ 				  rng_buffer_size(), 1);
+@@ -518,14 +563,13 @@ static int hwrng_fillfn(void *unused)
+ 		add_hwgenerator_randomness((void *)rng_fillbuf, rc,
+ 					   entropy >> 10, true);
+ 	}
+-	hwrng_fill = NULL;
+ 	return 0;
+ }
+ 
+ int hwrng_register(struct hwrng *rng)
+ {
+ 	int err = -EINVAL;
+-	struct hwrng *tmp;
++	struct hwrng *cur_rng, *tmp;
+ 
+ 	if (!rng->name || (!rng->data_read && !rng->read))
+ 		goto out;
+@@ -540,6 +584,7 @@ int hwrng_register(struct hwrng *rng)
+ 	}
+ 	list_add_tail(&rng->list, &rng_list);
+ 
++	INIT_WORK(&rng->cleanup_work, cleanup_rng_work);
+ 	init_completion(&rng->cleanup_done);
+ 	complete(&rng->cleanup_done);
+ 	init_completion(&rng->dying);
+@@ -547,16 +592,19 @@ int hwrng_register(struct hwrng *rng)
+ 	/* Adjust quality field to always have a proper value */
+ 	rng->quality = min3(default_quality, 1024, rng->quality ?: 1024);
+ 
+-	if (!cur_rng_set_by_user &&
+-	    (!current_rng || rng->quality > current_rng->quality)) {
+-		/*
+-		 * Set new rng as current as the new rng source
+-		 * provides better entropy quality and was not
+-		 * chosen by userspace.
+-		 */
+-		err = set_current_rng(rng);
+-		if (err)
+-			goto out_unlock;
++	if (!cur_rng_set_by_user) {
++		cur_rng = rcu_dereference_protected(current_rng,
++						    lockdep_is_held(&rng_mutex));
++		if (!cur_rng || rng->quality > cur_rng->quality) {
++			/*
++			 * Set new rng as current as the new rng source
++			 * provides better entropy quality and was not
++			 * chosen by userspace.
++			 */
++			err = set_current_rng(rng);
++			if (err)
++				goto out_unlock;
++		}
+ 	}
+ 	mutex_unlock(&rng_mutex);
+ 	return 0;
+@@ -569,14 +617,17 @@ EXPORT_SYMBOL_GPL(hwrng_register);
+ 
+ void hwrng_unregister(struct hwrng *rng)
+ {
+-	struct hwrng *new_rng;
++	struct hwrng *cur_rng;
+ 	int err;
+ 
+ 	mutex_lock(&rng_mutex);
+ 
+ 	list_del(&rng->list);
+ 	complete_all(&rng->dying);
+-	if (current_rng == rng) {
++
++	cur_rng = rcu_dereference_protected(current_rng,
++					    lockdep_is_held(&rng_mutex));
++	if (cur_rng == rng) {
+ 		err = enable_best_rng();
+ 		if (err) {
+ 			drop_current_rng();
+@@ -584,17 +635,7 @@ void hwrng_unregister(struct hwrng *rng)
+ 		}
+ 	}
+ 
+-	new_rng = get_current_rng_nolock();
+-	if (list_empty(&rng_list)) {
+-		mutex_unlock(&rng_mutex);
+-		if (hwrng_fill)
+-			kthread_stop(hwrng_fill);
+-	} else
+-		mutex_unlock(&rng_mutex);
+-
+-	if (new_rng)
+-		put_rng(new_rng);
+-
++	mutex_unlock(&rng_mutex);
+ 	wait_for_completion(&rng->cleanup_done);
+ }
+ EXPORT_SYMBOL_GPL(hwrng_unregister);
+@@ -682,7 +723,7 @@ static int __init hwrng_modinit(void)
+ static void __exit hwrng_modexit(void)
+ {
+ 	mutex_lock(&rng_mutex);
+-	BUG_ON(current_rng);
++	WARN_ON(rcu_access_pointer(current_rng));
+ 	kfree(rng_buffer);
+ 	kfree(rng_fillbuf);
+ 	mutex_unlock(&rng_mutex);
+diff --git a/include/linux/hw_random.h b/include/linux/hw_random.h
+index b424555753b1..2ccfd081a94a 100644
+--- a/include/linux/hw_random.h
++++ b/include/linux/hw_random.h
+@@ -15,6 +15,7 @@
+ #include <linux/completion.h>
+ #include <linux/kref.h>
+ #include <linux/types.h>
++#include <linux/workqueue.h>
+ 
+ /**
+  * struct hwrng - Hardware Random Number Generator driver
+@@ -48,6 +49,7 @@ struct hwrng {
+ 	/* internal. */
+ 	struct list_head list;
+ 	struct kref ref;
++	struct work_struct cleanup_work;
+ 	struct completion cleanup_done;
+ 	struct completion dying;
+ };
+-- 
+2.52.0
