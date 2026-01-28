@@ -1,97 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.thorondor.fr (unknown [82.66.128.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC32F274670;
-	Wed, 28 Jan 2026 14:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63E025DB12;
+	Wed, 28 Jan 2026 19:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.66.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769611310; cv=none; b=NT5inurKiKdWEg29TCAaWlTc1h2fzVCETsd1AfGfMozR0fRRL6k+0Ncq2eibwqjeWA8z00Co/clLYiWq/XF955sra+keE8Fr6BSVkZPobIv0huV+76C1LsMAZoCfDjQioTccq+CCLEXRcwqOsrpzQ8JViEjtg4lyEZ5BIh1VV4c=
+	t=1769629826; cv=none; b=ZdbAn+kJ9cn77Qghrz0eNpNkMrZ3lmmcUGBhDqzLJP8T7iMQy2sE5POxlwSpLRaNybiuskvnpgeYsTwHzylmVC90fvPwRWU4+3v0+poMmouujtV41KxjGXH09dQZZ6tAPy+on6BVwkfHHpYnBVL0+uwQgRR9APN15yNW/qyVY9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769611310; c=relaxed/simple;
-	bh=eaglsE8/gh41Pv/4uZDqiEy1NKc+8kx3Y5GXq4lMU/s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZJQSXA/TgiWDtNtQO4Op2UGMOIg3+IpLusZFD+UUbBhUlcTnWoAyJ20PoYeJjDYjyaCA96uJCCbTTzM9CvBeGMhQK/3jhTdQHwvvz2kI1kE3zV60YdvbCSv3YucXteFWNF/s4G3nKHc3MhxtOV7Ci4S/s/pONGamIe2KBb+a110=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XArbwGGs; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769629826; c=relaxed/simple;
+	bh=m62tXWRWuYy8yrGSHppsuWL22LgI0zC5/hPwWv0H/Xk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lugnbu9pgOyGJumFNWjej9rDVqWCDmPsAbzl0rt6enABjUHOOo10veqrZFDDGmcmy5sy5OYQarHBx8/ygUbbPEbcoG+SzS6141ChZcNZm7LP4xFHIXBkFhRfzlDk73BqH+iJLZXDOB2NejDQJjwxWMlfqixlNPcCebeheTktjNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr; spf=pass smtp.mailfrom=thorondor.fr; dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b=DAWeqGzH; arc=none smtp.client-ip=82.66.128.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorondor.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XArbwGGs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC324C4CEF1;
-	Wed, 28 Jan 2026 14:41:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769611309;
-	bh=eaglsE8/gh41Pv/4uZDqiEy1NKc+8kx3Y5GXq4lMU/s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XArbwGGsJ6ShSlGxbPiN1HzTvjw9CLByogKuzIH0DDgj2SltlXZEnbNeCcZ6fsDSU
-	 aGlYNj9zDLfec/bHwHEm2/yWrg0c5oaTMVuLiEEfzQYMy/qSuiTZP+Z0QZsBhdGJq8
-	 hgcbjqGdD2+5pvd8JGTVW63ud582Lar0oP1kI2BbXxgYbIXE+p9sG87IKmIsa736rx
-	 cQpcTd7e9XMFJKpP8wfQ/zNfLkCXM8rtr1X3bqiH82xVCss5vN95E27LtGzIgBhulB
-	 rYWBSu4/gqRzTRSp85N29q/u6kYkG6oeFfiQAfmXnbpEZ0Ry53GtDumzHAf3gadvQC
-	 jxIbk8OXPtBQQ==
-Message-ID: <041a37d8-c114-4ac0-875d-022e9d07aac8@kernel.org>
-Date: Wed, 28 Jan 2026 09:41:37 -0500
+	dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b="DAWeqGzH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=thorondor.fr; s=mail;
+	t=1769629816; bh=m62tXWRWuYy8yrGSHppsuWL22LgI0zC5/hPwWv0H/Xk=;
+	h=From:To:Cc:Subject;
+	b=DAWeqGzHp31BCnnrgqHh0YhRaxtMFSQcN6IWD07GRiWaFdfqCLaxL0QdMAD/Lj+zE
+	 VWULY4VoYtYxSRBtCPfiUP5TMhtRV6KvLfZ1R1lt/5xTdaoIfc/QfKRZ1KEaiJ8Y3b
+	 kThdb6wII8IGg5r4fLHZHjpm0KSTHIndNNzK+BUQOvKqaWX3R1mZ25DuTh73Wec6Ye
+	 1mkwT87hYbi75eWX9CgRYpMs/FvMdJDidFUau7bgu0dA5S8lXgMf+rwa7TLIKPoIfo
+	 c5jUxmLDPExQV1DsGSk7WeP3dt3w9WqZJYRtNhmtNeTf/GsFDRvCANF2LloVNN4cJT
+	 nXh4HmA+j/dOQ==
+From: Thomas Courrege <thomas.courrege@thorondor.fr>
+To: ashish.kalra@amd.com,
+	corbet@lwn.net,
+	herbert@gondor.apana.org.au,
+	john.allen@amd.com,
+	nikunj@amd.com,
+	pbonzini@redhat.com,
+	seanjc@google.com,
+	thomas.lendacky@amd.com
+Cc: kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	x86@kernel.org,
+	Thomas Courrege <thomas.courrege@thorondor.fr>
+Subject: [PATCH v6 0/1] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
+Date: Wed, 28 Jan 2026 20:49:55 +0100
+Message-ID: <20260128194956.314678-1-thomas.courrege@thorondor.fr>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] NFSD: Sign filehandles
-To: Benjamin Coddington <bcodding@hammerspace.com>
-Cc: Trond Myklebust <trondmy@kernel.org>, NeilBrown <neil@brown.name>,
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Anna Schumaker <anna@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
- Rick Macklem <rick.macklem@gmail.com>, linux-nfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <> <e545c35e-31fc-4069-8d83-1f9585e82532@app.fastmail.com>
- <176921979948.16766.5458950508894093690@noble.neil.brown.name>
- <686CBEE5-D524-409D-8508-D3D48706CC02@hammerspace.com>
- <77e7a645-66bd-4ce2-b963-2a2488595b00@kernel.org>
- <8be0a065a84bed02735141b4333e9c49a2ab0c90.camel@kernel.org>
- <33c02e5a-03e7-42ef-8ccd-790a9b29a763@kernel.org>
- <D3263C1D-A15E-48EC-B05A-8DC6A0C2B37A@hammerspace.com>
-From: Chuck Lever <cel@kernel.org>
-Content-Language: en-US
-Organization: kernel.org
-In-Reply-To: <D3263C1D-A15E-48EC-B05A-8DC6A0C2B37A@hammerspace.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/26/26 1:22 PM, Benjamin Coddington wrote:
-> On 24 Jan 2026, at 14:48, Chuck Lever wrote:
-> 
->> I can't recall if Wireshark is smart enough to introspect Linux NFSD
->> file handles (I thought it could). It would be sensible to have some
->> Wireshark update code in hand before making the final decision about
->> keeping the new auth_type.
-> 
-> I've gone digging and wireshark has a surprising amount of filehandle
-> dissection code - it currently can "Decode As:"
-> 
-> dissect_fhandle_data_SVR4
-> dissect_fhandle_data_LINUX_KNFSD_LE
-> dissect_fhandle_data_LINUX_NFSD_LE
-> dissect_fhandle_data_NETAPP
-> dissect_fhandle_data_NETAPP_V4
-> dissect_fhandle_data_NETAPP_GX_v3
-> dissect_fhandle_data_LINUX_KNFSD_NEW
-> dissect_fhandle_data_GLUSTER
-> dissect_fhandle_data_DCACHE
-> dissect_fhandle_data_PRIMARY_DATA
-> dissect_fhandle_data_CELERRA_VNX
-> dissect_fhandle_data_unknown
-> 
-> .. almost all with finer grained filehandle components.  I certainly can add
-> patches to parse FH_AT_MAC for the linux(s) decoders, but I admit I don't
-> have any use case.
-> 
-> I'm completely neutral on keeping FH_AT_MAC at this point.
+Overview
+--------
+The SEV-SNP Firmware ABI allows the hypervisor to request an
+attestation report via the SEV_CMD_SNP_HV_REPORT_REQ firmware command.
 
-If we can't find a use case or need for something, the usual practice is
-to remove it from your patches until we have one.
+Testing
+-------
+For testing this via QEMU, please use the following tree:
+        https://github.com/Th0rOnDoR/qemu
 
-Is anyone working on Wireshark patches to handle signed Linux file
-handles in some kind of sensible way?
+Patch History
+-------------
+v5 -> v6:
+Fix typos issues in documentation
+
+v4 -> v5:
+Set variables in reverse christmas tree order
+Fix and clean the rsp_size logic
+
+v3 -> v4:
+Add newline in documentation to avoid a warning
+Add base commit
+
+v2 -> v3:
+Add padding to structure, code format
+Write back the full MSG_REPORT_RSP structure
+Remove the memzero_explicit for the report
+
+v1 -> v2:
+Renaming, code format
+Zeroes the report before returning
 
 
+Any feedback is appreciated.
+
+Thanks,
+Thomas
+
+
+Thomas Courrege (1):
+  KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
+
+ .../virt/kvm/x86/amd-memory-encryption.rst    | 28 +++++++++
+ arch/x86/include/uapi/asm/kvm.h               |  9 +++
+ arch/x86/kvm/svm/sev.c                        | 63 +++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.c                  |  1 +
+ include/linux/psp-sev.h                       | 31 +++++++++
+ 5 files changed, 132 insertions(+)
+
+
+base-commit: e89f0e9a0a007e8c3afb8ecd739c0b3255422b00
 -- 
-Chuck Lever
+2.52.0
+
