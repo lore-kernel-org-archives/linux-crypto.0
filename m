@@ -1,127 +1,312 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB185255E43;
-	Wed, 28 Jan 2026 01:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209FA2528FD;
+	Wed, 28 Jan 2026 03:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769564641; cv=none; b=qx2f2YZWIJOnB8PF4AN7nyfRcyZRBapM7cvyMFdZOSoQCzAlymI1+ywfyUS37+tk9sNKycSEEHbecrS/0SZjOq+Iei/fn8QV5fuOmOuUYlyc7VBnoYbOiTO7geybQW4Xl69kaDiTpmnL6C9p73UkYY7nhUHVr2xt+b14f3RY87M=
+	t=1769570874; cv=none; b=aQoM+cQ8FhYSJQDiUCWs9i061L8/38t5RuMUEkRm8Z85DE4y+IgSEdiyrDfszKF8cudsBGR1GO4n5afrv7gvxeD3lwdK4Wbh3zTiTs0BsJOV28sLe9PUradJL34lr6fzGOaNQ1wwyM3P5tWvXIjvPw7oGXNXf8UNGJsfcfYpFnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769564641; c=relaxed/simple;
-	bh=kObptGzYKGHiP+qqG53X3f0ccdJ68sqDyS4Y+ftKMDQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pHRS+2aVW2JBERc+xJm4YV9hGBUWMQjM03Ho5bfowqCGa2uvncrrFLyVxF5VoV69EZB4t95sCej02aq4EYxv5yGwB+Y6KPdGwMOjW4AIzoUWxYoEneVt14ghBTDFongCRoWeSEp31G/LgC6s11ISKz9ZpVjkZz2a0de+zpxxToo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=N4F9qwYU; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1769570874; c=relaxed/simple;
+	bh=V+XR6VP76w4DKm8upOwlgkXGNXhfrPYtWw9JnOBXAoI=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=tb0a4UnNXDWKiXXg3xxWy/V6XiPwPJObunfEJTqpFg9WDI8cwYNiWiezZpULNk7sIuofeALWXurMQa7mZwxXzCDCqrZdlZiyZ7RFa4ELBNegwrNG+x1iZ+vC5xzjz9h+q4z0a8WqD3P3KshVvI1rcEvqP3HT7uYkgkhMVCm1YM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=hTIh/Cbh; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GLeAki4f; arc=none smtp.client-ip=202.12.124.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="N4F9qwYU"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=4ozVjupN70NNxSObIAAi4OpBrU5B6mEXMnRy7ird/aA=; 
-	b=N4F9qwYUcfoi435b6DHvFM5huMjj+/M9LTOoFoMpoJd/DSSlSqH0TVhoi4sxBKF/5cM7UL43Fp8
-	o0zYtvmPPnpI1wUx/Gjlzj/d8EHs2GJx28ZAIfLdEPnFK9fqmWfhiV0QjO9Ky3xKmkq5GbvIMeWBh
-	pl1tudHv13qkqKlP0q8Nue7fdzu84pc8CRxFv085jhBPAUHNDjrjsE0QlDbGbjdnvsPfDnEVfyGMb
-	NayWXY5rBAWlkLm/J+iiU0KuRa3+c7PdEgnBoCD6ekoBLrIiTX2dpE0Ad61kZsHePML032l3QZ0p2
-	Ukm16PAs1TSr31SMvRNO4sbINVLt1a9PXAzw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vkuas-002cug-0F;
-	Wed, 28 Jan 2026 09:43:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 Jan 2026 09:43:42 +0800
-Date: Wed, 28 Jan 2026 09:43:42 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lianjie Wang <karin0.zst@gmail.com>
-Cc: Olivia Mackall <olivia@selenic.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	Jonathan McDowell <noodles@meta.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] hwrng: core - use RCU for current_rng to fix race
- condition
-Message-ID: <aXlpzqh9K6bqBh4T@gondor.apana.org.au>
-References: <aXbwM1wiPKqmC94v@gondor.apana.org.au>
- <aXirTffsg1GWk2Yw@kator>
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="hTIh/Cbh";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GLeAki4f"
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.stl.internal (Postfix) with ESMTP id 158611D00114;
+	Tue, 27 Jan 2026 22:27:51 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Tue, 27 Jan 2026 22:27:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
+	1769570870; x=1769657270; bh=qE6lXM8pKpo5gk3fRGouZrIVMYH4pyBU1RO
+	8HA3fqxY=; b=hTIh/CbhrKWNX51u3eM4w3zaJ4Jm2JWle/2TynxSGTBDSJcygkf
+	M4Fc1RS5duLdygaPdS6Me5De1Zx8SSvF+9bfK0Ux8FsLSmn+TbD9+mijO0tTjjL9
+	arUprazSHeXUZUHtg4PSuhaEqVpH7I0X5/fTZgOccvN75WhwzQEwtPXiqOLJQQ8G
+	IXE1A/gnEqBQE9uS+ruyQpYTR9QqihAkDPobn+LBteXi7eL2HxnJFx+2YU6XCCVd
+	+DC6GhJio1raKsdtAjGP7ch748nNtl4Ldo+4ne3b3cmXar1Sriyxz4pqjswaJ3UR
+	kTsnTmjI5/O+hw68UnXDfXZqwF0ieGyWtvg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1769570870; x=
+	1769657270; bh=qE6lXM8pKpo5gk3fRGouZrIVMYH4pyBU1RO8HA3fqxY=; b=G
+	LeAki4fsr1ppvnrCWDHi1tXKQ0lbPr3CuZVocliBIeZuyzmYP2BEAyNbf+OesjxK
+	TmcGkAzCeRY5gtuKCt4Tj23I9AgqwdoQF27j17L6aasF5MHGkexZ/IVF+X46sHWt
+	t5e2YF//GhIlwgodpCMwTfNV+lZtAaE/EHi7jx8DfE+5SHm5UaYgkYiLyyJsnjcV
+	/c9N4lnx8q/kCk2GrfuWWKnzz4exbST8A+4NlqePZqyM0VIuRoGvwQEO2g/WSW5k
+	2J6EYkWDp+e2WM9mV8uhcsJxKwEcCELDcwXfzQOvVRDbu2w0+oNVFG56AZvVraik
+	FYtzMsaEMMLLjLVsyJn1A==
+X-ME-Sender: <xms:NoJ5afOAedzHoIZxratogQjsIEntBXGy9sJUivmQ9tDsHvyxvo9kgg>
+    <xme:NoJ5aV0Mf5p05eueMEQcyuyB_SXs5H8IGROOjulpqtPAcK6nqz7gP9VlmJkrWAYzh
+    th54x0s1ctS5SiGfJwPdffBpfrIHC6QZaqdYe11rngJpoLHCJE>
+X-ME-Received: <xmr:NoJ5abTsusg0ymKuDc09UGnQE62iXW8YY0Xn2E6HPqJpGRQQWN3sgw5zupMMn0dQs3DhLNL0oa24QRil0rPVTWAD2jhguvpsWt-oZYsXmihM>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduiedvvdelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurheptgfgggfhvfevufgjfhffkfhrsehtjeertddttdejnecuhfhrohhmpefpvghilheu
+    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epudetfefhudevhedvfeeufedvffekveekgfdtfefggfekheejgefhteeihffggfelnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
+    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehlihhnuhigqdhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtoheplhhinhhugidqfhhsuggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlh
+    drohhrghdprhgtphhtthhopegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomhdp
+    rhgtphhtthhopehtrhhonhgumhihsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjlh
+    grhihtohhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvsghighhgvghrsheskhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtoheptggvlheskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htoheprghnnhgrsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:NoJ5aYnrYXOlCxJeAwxZz6RKAw2dHBdh24egVZFD0F_N-BdlhZw8YA>
+    <xmx:NoJ5acOY69JrQctcgNEai3ka4h55hxWUXHCMiUdR3_sTlxPaAk-oVA>
+    <xmx:NoJ5aUh6AZpo3H2wpK2ToOGJfUGOl1sRzXobQCJkjh0R6IdzsXA41A>
+    <xmx:NoJ5aShXaFfrBrG0CnD-GeTcuMcjB9cZxwT56VIqt4S-eMwLXOVFYQ>
+    <xmx:NoJ5acydHdeS9Icdp1a-N218Kpfihs4UB01ia4j_OvWaYP3y3AHdDKuG>
+Feedback-ID: iab3e480c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 27 Jan 2026 22:27:47 -0500 (EST)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXirTffsg1GWk2Yw@kator>
+From: NeilBrown <neilb@ownmail.net>
+To: "Chuck Lever" <cel@kernel.org>
+Cc: "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
+ "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
+ "Benjamin Coddington" <bcodding@hammerspace.com>,
+ "Eric Biggers" <ebiggers@kernel.org>, "Rick Macklem" <rick.macklem@gmail.com>,
+ linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+Subject: Re: [PATCH/RFC] nfsd: rate limit requests that result in -ESTALE from
+ the filesystem
+In-reply-to: <7d973130-d4a4-4f84-a7c0-a896e17339e1@app.fastmail.com>
+References: <176920977124.16766.1785815212991547773@noble.neil.brown.name>,
+ <7d973130-d4a4-4f84-a7c0-a896e17339e1@app.fastmail.com>
+Date: Wed, 28 Jan 2026 14:27:42 +1100
+Message-id: <176957086265.16766.1100004904619725538@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-On Tue, Jan 27, 2026 at 10:32:30PM +0900, Lianjie Wang wrote:
->
-> It is true that cleanup_rng() can race with hwrng_init(). However,
-> currently put_rng() is also called in hwrng_fillfn(), where we want to
-> avoid holding rng_mutex to prevent deadlock in hwrng_unregister().
+On Mon, 26 Jan 2026, Chuck Lever wrote:
+> On Fri, Jan 23, 2026, at 6:09 PM, NeilBrown wrote:
 > 
-> To solve this race, should we introduce a separate lock (e.g.,
-> init_mutex) to serialize only hwrng_init() and cleanup_rng()?
+> > From: NeilBrown <neil@brown.name>
+> > Subject: [PATCH] nfsd: rate limit requests that result in -ESTALE from the
+> >  filesystem
+> >
+> > NFS file handles typically contain a 32 bit generation number which is
+> > randomly generated by the filesystem when the inode (or inode number) is
+> > allocated.  This makes it hard to guess correct file handles.  Hard but
+> > not impossible on a low latency network with a high speed server.
 > 
-> Alternatively, I think we could stop the thread also in
-> set_current_rng() before switching current_rng, so that each lifetime of
-> hwrng_fillfn() thread strictly holds a single RNG instance, avoiding the
-> need to call get_current_rng() or put_rng() inside hwrng_fillfn().
+> Is this claim accurate for commonly-exported filesystems? Looking
+> at the kernel sources:
+> 
+>   - btrfs sets i_generation = trans->transid (a sequential counter
+>     starting from 1, incremented per transaction)
+>   - ext2 uses sbi->s_next_generation++ (sequential counter seeded
+>     randomly at mount)
+>   - ocfs2 uses osb->s_next_generation++ (sequential counter)
+> 
+> For btrfs in particular, the generation number contains zero bits of
+> randomness. An attacker who can estimate the filesystem age or
+> transaction count can predict valid generation numbers with high
+> probability. Does the "1 year" security estimate hold for btrfs
+> exports, or is that filesystem effectively unprotected by this
+> mitigation?
 
-Yes I missed the dead-lock.
+Thanks for exploring this.  I had only checked ext4 and xfs and thought
+I saw a pattern.
+btrfs is certainly a weakness here - though it could be "fixed" I expect.
 
-I suggest that we delay the work in cleanup_rng into a work_struct,
-IOW cleanup_work will simply schedule a work_struct to perform the
-actual cleanup.
+> 
+> 
+> > Filehandles already contain 32 bits of randomness.
+> 
+> This appears true for ext4, f2fs, XFS v3+, and tmpfs (which use
+> get_random_u32()), but not for btrfs, ext2, or ocfs2 as noted above.
+> 
+> Additionally, NFS re-exports (fs/nfs/export.c) use no generation number
+> at all. The nfs_encode_fh() function embeds the backing server's
+> filehandle verbatim rather than generating a local generation number.
+> Protection depends entirely on what the backing NFS server uses. If
+> someone re-exports a btrfs-backed NFS mount, the sequential transaction
+> IDs on the backing server provide minimal protection.
 
-Then the work_struct can take the mutex safely, immediately check
-the reference count on the rng, and if it is non-zero it should return
-because the rng has been re-used in the mean time.
+I think we would have to expect the backing server to provide any
+protection that it needs.  It is better placed than an intermediate
+server, not matter what sort of protection we choose.
 
-If it is zero then it can proceed with the clean-up while holding the
-mutex, thus preventing any re-use from occurring.
+> 
+> We can't legitimately extend your cryptanalysis to non-Linux servers
+> that back re-exported NFS mounts.
+> 
+> 
+> > The only known attack methodology is to guess the inode number of a file
+> > of interest, then iterate over all possible generation numbers.
+> 
+> Is generation number brute-forcing the optimal attack? Inode numbers
+> are typically sequential and the valid range is much smaller than 2^32.
+> Could an attacker first enumerate valid inode numbers (which also
+> triggers ESTALE and the rate limit), then brute-force the generation
+> for interesting inodes? The rate limit slows both phases equally, but
+> inode enumeration requires far fewer guesses.
 
-> I removed the NULL check in put_rng() and moved it to rng_current_show()
-> in v2, since all the other callers of put_rng() already check for NULL
-> before calling put_rng(). I can restore the NULL check in put_rng() in
-> v3 if preferred.
+How would they enumeration valid inode numbers?  and how would
+"interesting" inode numbers be determined?
 
-Let's keep this patch simpler by keeping things as they are.  If
-it turns out that moving the NULL check makes the code more readable,
-you can do that in a follow-up patch.
+The fact that an attacking client cannot know what inode numbers would
+be interesting would, I think, add a few bits to the guessing required.
+It could certainly guess something about what sort of numbers to try, as
+the assumption is that it *does* have access to some files.  So it
+wouldn't make the search *much* harder, but would increase it from a
+year to a decade.
 
-> > > @@ -489,8 +502,17 @@ static int hwrng_fillfn(void *unused)
-> > >  		struct hwrng *rng;
-> > > 
-> > >  		rng = get_current_rng();
-> > > -		if (IS_ERR(rng) || !rng)
-> > > +		if (!rng) {
-> > > +			/* This is only possible within drop_current_rng(),
-> > > +			 * so just wait until we are stopped.
-> > > +			 */
-> > > +			while (!kthread_should_stop()) {
-> > > +				set_current_state(TASK_INTERRUPTIBLE);
-> > > +				schedule();
-> > > +			}
-> > >  			break;
-> > > +		}
-> > > +
+> 
+> 
+> > diff --git a/fs/nfsd/netns.h b/fs/nfsd/netns.h
+> > index 9fa600602658..f7229d1f9d86 100644
+> > --- a/fs/nfsd/netns.h
+> > +++ b/fs/nfsd/netns.h
+> > @@ -219,6 +219,8 @@ struct nfsd_net {
+> >  	/* last time an admin-revoke happened for NFSv4.0 */
+> >  	time64_t		nfs40_last_revoke;
 > > 
-> > Is the schedule necessary? Shouldn't the break just work as it
-> > did before?
+> > +	struct mutex		estale_rate_limit_mutex;
+> > +
+> >  #if IS_ENABLED(CONFIG_NFS_LOCALIO)
+> >  	/* Local clients to be invalidated when net is shut down */
+> >  	spinlock_t              local_clients_lock;
+> > diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
+> > index 7587c64bf26d..55d25d9b414f 100644
+> > --- a/fs/nfsd/nfsctl.c
+> > +++ b/fs/nfsd/nfsctl.c
+> > @@ -2198,6 +2198,7 @@ static __net_init int nfsd_net_init(struct net 
+> > *net)
+> >  	nfsd4_init_leases_net(nn);
+> >  	get_random_bytes(&nn->siphash_key, sizeof(nn->siphash_key));
+> >  	seqlock_init(&nn->writeverf_lock);
+> > +	mutex_init(&nn->estale_rate_limit_mutex);
+> >  #if IS_ENABLED(CONFIG_NFS_LOCALIO)
+> >  	spin_lock_init(&nn->local_clients_lock);
+> >  	INIT_LIST_HEAD(&nn->local_clients);
+> > diff --git a/fs/nfsd/nfsfh.c b/fs/nfsd/nfsfh.c
+> > index ed85dd43da18..7032f65fe21a 100644
+> > --- a/fs/nfsd/nfsfh.c
+> > +++ b/fs/nfsd/nfsfh.c
+> > @@ -244,6 +244,8 @@ static __be32 nfsd_set_fh_dentry(struct svc_rqst 
+> > *rqstp, struct net *net,
+> >  						data_left, fileid_type, 0,
+> >  						nfsd_acceptable, exp);
+> >  		if (IS_ERR_OR_NULL(dentry)) {
+> > +			struct nfsd_net *nn = net_generic(net, nfsd_net_id);
+> > +
+> >  			trace_nfsd_set_fh_dentry_badhandle(rqstp, fhp,
+> >  					dentry ?  PTR_ERR(dentry) : -ESTALE);
+> >  			switch (PTR_ERR(dentry)) {
+> > @@ -252,6 +254,19 @@ static __be32 nfsd_set_fh_dentry(struct svc_rqst 
+> > *rqstp, struct net *net,
+> >  				break;
+> >  			default:
+> >  				dentry = ERR_PTR(-ESTALE);
+> > +				/* We limit ESTALE returns to 1 every
+> > +				 * 15 milliseconds (across all threads) to
+> > +				 * prevent a client from guessing the
+> > +				 * correct (32 bit) generation number
+> > +				 * for an given inode in significantly
+> > +				 * less than 1 year.  This ensures clients
+> > +				 * can only access files for which they
+> > +				 * are allowed to access a path from the
+> > +				 * exported root.
+> > +				 */
+> > +				mutex_lock(&nn->estale_rate_limit_mutex);
+> > +				msleep(15);
+> > +				mutex_unlock(&nn->estale_rate_limit_mutex);
 > 
-> With the break alone, the task_struct might get freed before
-> kthread_stop() is called, which can still cause use-after-free
-> sometimes:
+> The global mutex serializes all ESTALE errors across all nfsd threads
+> in the network namespace. The impact on legitimate workloads must be
+> carefully considered.
+> 
+> For example, during file deletion or migration, multiple clients may
+> encounter genuinely stale file handles simultaneously. With N
+> concurrent ESTALE errors, the total delay becomes N * 15ms as each
+> thread waits for the mutex. With 100 concurrent stale handle accesses,
+> this adds 1.5 seconds of accumulated latency.
 
-Please change the comment above to say that this loop is needed
-to keep the task_struct alive for kthread_stop as it isn't obvious.
+Deleting a file that clients might be using is always problematic.  This
+certainly does make it more problematic.  1.5 seconds isn't good, but
+for an unusual event it shouldn't be a big problem.
 
-I wonder why nobody has added a helper for this since this seems
-to be a common pattern in other kthread users? For example,
-fs/ext4/mmp.c also does this, and they also set the task state
-to TASK_RUNNING, perhaps we should do that too?
+> 
+> Additionally, an attacker does not need to successfully guess file
+> handles to cause harm. Simply sending requests with invalid file
+> handles at a modest rate (e.g., 10/sec) can monopolize 15% of the
+> mutex time, slowing all legitimate ESTALE processing on the server.
+
+Remember that that attacker already has access to the server and is
+permitted to send access some files.  Causing "some harm" is a risk you
+have to take when you give anyone any access to your server.
+The goal here isn't to prevent any harm, it is to prevent access to
+sensitive data.
+
+> 
+> Would per-client rate limiting (e.g., a token bucket per client IP)
+> avoid penalizing legitimate operations while still throttling attacks?
+
+Per svc_export or per client-IP would be OK.  An attacker with access to
+multiple IP addresses could find a gen number is less than 1 year, but
+with added added attack detection it would still be impractical I think.
+
+> 
+> Or, as Jeff suggested, narrowing the blast radius to per-inode
+> limiting?
+
+per-inode requires help from each fs - not impossible but awkward.
+And if 100 client are all accessing the one inode which is removed, you
+still get the 1.5 second delay for that inode.
+
+> 
+> Lastly, we've spilled a large number of electrons trying to remove
+> needless delays of nfsd threads (eg, waiting synchronously for NFS
+> clients to respond to NFSv4 callbacks) because a malicious client
+> can use this delay as a timing attack to determine the (maximum)
+> number of available nfsd threads and simply keep them all busy,
+> preventing the server from doing useful work.
+> 
+
+Again, this is client which is allowed to access at least one export.
+Such a client can problem figure out how many threads you have running
+already.
+
+> 
+> >  			}
+> >  		}
+> >  	}
+> 
+> I think given the gaps in covering exports of first-tier file
+> systems such as btrfs, the unknowns in protecting re-exported
+> NFS mounts, and the increase in the surface of timing attacks,
+> this approach needs significant refinement before I would feel
+> comfortable with it.
+
+Thanks a lot for the thoughtful review.
+
+In terms of defence-in-depth I think this is still a good approach.
+Maybe I'll resubmit with some fine tuning and better explanations.  I
+see how time works out.
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+NeilBrown
+
