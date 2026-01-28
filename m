@@ -1,312 +1,196 @@
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209FA2528FD;
-	Wed, 28 Jan 2026 03:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF1A2857CD
+	for <linux-crypto@vger.kernel.org>; Wed, 28 Jan 2026 08:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769570874; cv=none; b=aQoM+cQ8FhYSJQDiUCWs9i061L8/38t5RuMUEkRm8Z85DE4y+IgSEdiyrDfszKF8cudsBGR1GO4n5afrv7gvxeD3lwdK4Wbh3zTiTs0BsJOV28sLe9PUradJL34lr6fzGOaNQ1wwyM3P5tWvXIjvPw7oGXNXf8UNGJsfcfYpFnE=
+	t=1769590012; cv=none; b=UBJ2EWXEwSs3GwC3piZx8qbsHwJDDR5imhwpRcjZXw66aQoDOnSHXOk5SzrlVMo3LjHZVp/7oYWjgrktMEY3VrhinbUYE22u0qDnui0igOF8KGM28tO7Dnxa7Zx92bpS1/cdI0HjhyXp5evwG6yYZNj1Ix8B0EVouuu1xtZJdF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769570874; c=relaxed/simple;
-	bh=V+XR6VP76w4DKm8upOwlgkXGNXhfrPYtWw9JnOBXAoI=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=tb0a4UnNXDWKiXXg3xxWy/V6XiPwPJObunfEJTqpFg9WDI8cwYNiWiezZpULNk7sIuofeALWXurMQa7mZwxXzCDCqrZdlZiyZ7RFa4ELBNegwrNG+x1iZ+vC5xzjz9h+q4z0a8WqD3P3KshVvI1rcEvqP3HT7uYkgkhMVCm1YM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=hTIh/Cbh; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GLeAki4f; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1769590012; c=relaxed/simple;
+	bh=HRWGogkSiHy+QJi6EM67FXTpuIKksxP63f2OUF86h10=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ZyFhhM1f6MNz0ohxj3nAEK8EHfjNC8Wo/4DX8ThD4O+liHBM0trkvTnx1fTAmVZtP2zXE9WR1NCIVdOKvxIrqdM0bkJ21yT3TDboBb/tuXPtTYWYjzfCe9uXVtY8oYihgkwScGfZePH+d0VRLm+JcAfF6G0vvE1MRdSBkf/DJSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Ckm6s4os; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=JE52M7X9; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="hTIh/Cbh";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GLeAki4f"
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.stl.internal (Postfix) with ESMTP id 158611D00114;
-	Tue, 27 Jan 2026 22:27:51 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Tue, 27 Jan 2026 22:27:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
-	1769570870; x=1769657270; bh=qE6lXM8pKpo5gk3fRGouZrIVMYH4pyBU1RO
-	8HA3fqxY=; b=hTIh/CbhrKWNX51u3eM4w3zaJ4Jm2JWle/2TynxSGTBDSJcygkf
-	M4Fc1RS5duLdygaPdS6Me5De1Zx8SSvF+9bfK0Ux8FsLSmn+TbD9+mijO0tTjjL9
-	arUprazSHeXUZUHtg4PSuhaEqVpH7I0X5/fTZgOccvN75WhwzQEwtPXiqOLJQQ8G
-	IXE1A/gnEqBQE9uS+ruyQpYTR9QqihAkDPobn+LBteXi7eL2HxnJFx+2YU6XCCVd
-	+DC6GhJio1raKsdtAjGP7ch748nNtl4Ldo+4ne3b3cmXar1Sriyxz4pqjswaJ3UR
-	kTsnTmjI5/O+hw68UnXDfXZqwF0ieGyWtvg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1769570870; x=
-	1769657270; bh=qE6lXM8pKpo5gk3fRGouZrIVMYH4pyBU1RO8HA3fqxY=; b=G
-	LeAki4fsr1ppvnrCWDHi1tXKQ0lbPr3CuZVocliBIeZuyzmYP2BEAyNbf+OesjxK
-	TmcGkAzCeRY5gtuKCt4Tj23I9AgqwdoQF27j17L6aasF5MHGkexZ/IVF+X46sHWt
-	t5e2YF//GhIlwgodpCMwTfNV+lZtAaE/EHi7jx8DfE+5SHm5UaYgkYiLyyJsnjcV
-	/c9N4lnx8q/kCk2GrfuWWKnzz4exbST8A+4NlqePZqyM0VIuRoGvwQEO2g/WSW5k
-	2J6EYkWDp+e2WM9mV8uhcsJxKwEcCELDcwXfzQOvVRDbu2w0+oNVFG56AZvVraik
-	FYtzMsaEMMLLjLVsyJn1A==
-X-ME-Sender: <xms:NoJ5afOAedzHoIZxratogQjsIEntBXGy9sJUivmQ9tDsHvyxvo9kgg>
-    <xme:NoJ5aV0Mf5p05eueMEQcyuyB_SXs5H8IGROOjulpqtPAcK6nqz7gP9VlmJkrWAYzh
-    th54x0s1ctS5SiGfJwPdffBpfrIHC6QZaqdYe11rngJpoLHCJE>
-X-ME-Received: <xmr:NoJ5abTsusg0ymKuDc09UGnQE62iXW8YY0Xn2E6HPqJpGRQQWN3sgw5zupMMn0dQs3DhLNL0oa24QRil0rPVTWAD2jhguvpsWt-oZYsXmihM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduiedvvdelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurheptgfgggfhvfevufgjfhffkfhrsehtjeertddttdejnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epudetfefhudevhedvfeeufedvffekveekgfdtfefggfekheejgefhteeihffggfelnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
-    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehlihhnuhigqdhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtoheplhhinhhugidqfhhsuggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlh
-    drohhrghdprhgtphhtthhopegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomhdp
-    rhgtphhtthhopehtrhhonhgumhihsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjlh
-    grhihtohhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvsghighhgvghrsheskhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtoheptggvlheskhgvrhhnvghlrdhorhhgpdhrtghpth
-    htoheprghnnhgrsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:NoJ5aYnrYXOlCxJeAwxZz6RKAw2dHBdh24egVZFD0F_N-BdlhZw8YA>
-    <xmx:NoJ5acOY69JrQctcgNEai3ka4h55hxWUXHCMiUdR3_sTlxPaAk-oVA>
-    <xmx:NoJ5aUh6AZpo3H2wpK2ToOGJfUGOl1sRzXobQCJkjh0R6IdzsXA41A>
-    <xmx:NoJ5aShXaFfrBrG0CnD-GeTcuMcjB9cZxwT56VIqt4S-eMwLXOVFYQ>
-    <xmx:NoJ5acydHdeS9Icdp1a-N218Kpfihs4UB01ia4j_OvWaYP3y3AHdDKuG>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 27 Jan 2026 22:27:47 -0500 (EST)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Ckm6s4os";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="JE52M7X9"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60S3KUCi1334235
+	for <linux-crypto@vger.kernel.org>; Wed, 28 Jan 2026 08:46:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=hY9hL2IizyBWMbIQRXnyE1
+	ImG2q26W3C317pRVUUTqY=; b=Ckm6s4osztYLxzLe5cLt4K23dGX9x6moUMayNz
+	7hNXF0CsX/Rg20QFFDqeupM8AxneSzCzzmwRgpZDxOj85pJcJfgClDWmpJv1uMwB
+	0wRH+9fegnffKdChT2J1wsJfZiV9510e7dpbBngPzKD/xadsLk2DU6DJ6vKqH0YZ
+	XE14+i0u1VzPpVGdFy2pOyUp4ovwqugCCmC6WMJQ/V+pUQkmtpDia7CToX796i1X
+	V2KDwesomailY32uUJAoVNEwShk/Sxq5iwtDYZl/M0is4HS6wei8a9/gR11EcjRh
+	haNEHAdXc2vF/pSe9NnPipVZKRYk31TLEJaydB6zhnmfZ8iA==
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4by1dftq9d-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Wed, 28 Jan 2026 08:46:49 +0000 (GMT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-29f29ae883bso45937385ad.3
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Jan 2026 00:46:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1769590008; x=1770194808; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hY9hL2IizyBWMbIQRXnyE1ImG2q26W3C317pRVUUTqY=;
+        b=JE52M7X9aTet/q97+N2RhR1wX343qILNkYvdURmJtelaQkxDg78PtQajwOMLBrJx0D
+         fg0aVKCt6Tw5ONXq4XCBwepICK/CV9CN/EK0mkvHoot1/VttJIcgibpGTDvL0FCdby0W
+         0L0MiGoUSbi+DamsP8B0Drm7HXb4Soud/DUi9WIzKISI++AfknZLnCVTb0XTzaBXds/Z
+         OkDZYorDvvm9CMHqaR/viLxLYm/Q4Jz+37tT7I2QuCP3PBk5EF2rKxuljyaYPT5OqhlD
+         l5vPfsCy+1rFVeQtQRXSPTNXwPsVGI6alPKVaPNE7J+p0kU60TIvIdZ2PBatN8xdGMZY
+         Z4eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769590008; x=1770194808;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hY9hL2IizyBWMbIQRXnyE1ImG2q26W3C317pRVUUTqY=;
+        b=gk+9+ZViLz8CYX/L8n5CdRFqKf538Pczj6URok77E6f81fTqYUfIiuNua8KfQxuosC
+         sOfldbvudNiP7A0rS/46kB5V9Rsg0SMxG0b5Cn3dXvcWrr2ulO90I+9cg6/4Tf7V4s68
+         2Mu6fjBszPBgVRsfSIDGoF7Bmxh1kGrOD0AF9I2l0PZDY47GmFPLEok8FsZN0A3ElOqC
+         xy6S3Qb+QaVwTh8V2cLIwwCWu0omyq1z0K5jbDD+G7u1eSisBfgApooxRcx/PVedXy2t
+         AOWJr9T9fjW0GOv8TBQ5AoBkfM6rb6fvYxCDcoZpGvxZr++y5LuRltt8MkhY/gbQIusN
+         AnJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvr4d7t4zY4HT63FwJtup0FKEJtk38p0DDVHARZY96sNmoyfxtHq/gT8CtKyonvzRMXX5vaU9IIVfxW5w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaybQZj828kff9hyXOX/nbu64lOl7MVtln3PpQvEQnSo1U6v81
+	jngRwh4g3fl2xzDTlGIuKObPz+QOoUWZvV5c9gp9dxADhfg+K5tSz7cN9hh1FOk1wXtRzAkHpQy
+	OW6NSPYgAY7dKj2Wp0KEQuQVPl6N8s4i4D5yRG7DdkZqtfqvFFgcqYTJgrUizPKkG630=
+X-Gm-Gg: AZuq6aL+jwCSYSZXEFzOMZlKEZNNU40UuUiIffxFivwdeWguPcdcQchz+M2hMAabCsE
+	ON7lJ+B/JnHP3wSDS1dIUg1dqlL79LDmGLRSlJhGOBZVlAQe/0XakUFz5xdQUr0D7NvdENL93nl
+	m/enOB9WypfWHfyecqIdXS2f1zK9CBTylanUwuxcqq0/TQdluaPfJKch6ClAmLwvNdPgDlipCbr
+	syJIUbqtT0TIqsxQ7oZFJHiJ5BoejpzDo6X9H0uwZEWwogyq4AadNZ06JKTxaXnkXE5grAi4Y4b
+	BOJzFpg9sg63HVdm/L/FT57uwZZQ1vdvh27arcU91oAt5s2ZH8Duydfc5cHhDfjAnXq1xJH8qmx
+	cHYkky1Qu1v9XzLkT8SBleA4aVbWbXAVUozVUDM4ah+OAWhY=
+X-Received: by 2002:a17:902:ea01:b0:29a:5ce:b467 with SMTP id d9443c01a7336-2a870e0490bmr49886845ad.54.1769590007981;
+        Wed, 28 Jan 2026 00:46:47 -0800 (PST)
+X-Received: by 2002:a17:902:ea01:b0:29a:5ce:b467 with SMTP id d9443c01a7336-2a870e0490bmr49886505ad.54.1769590007455;
+        Wed, 28 Jan 2026 00:46:47 -0800 (PST)
+Received: from hu-arakshit-hyd.qualcomm.com ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a88b4c3b1esm16263075ad.63.2026.01.28.00.46.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 00:46:47 -0800 (PST)
+From: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
+Subject: [PATCH v4 0/4] Enable ICE clock scaling
+Date: Wed, 28 Jan 2026 14:16:39 +0530
+Message-Id: <20260128-enable-ufs-ice-clock-scaling-v4-0-260141e8fce6@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Chuck Lever" <cel@kernel.org>
-Cc: "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
- "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
- "Benjamin Coddington" <bcodding@hammerspace.com>,
- "Eric Biggers" <ebiggers@kernel.org>, "Rick Macklem" <rick.macklem@gmail.com>,
- linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-Subject: Re: [PATCH/RFC] nfsd: rate limit requests that result in -ESTALE from
- the filesystem
-In-reply-to: <7d973130-d4a4-4f84-a7c0-a896e17339e1@app.fastmail.com>
-References: <176920977124.16766.1785815212991547773@noble.neil.brown.name>,
- <7d973130-d4a4-4f84-a7c0-a896e17339e1@app.fastmail.com>
-Date: Wed, 28 Jan 2026 14:27:42 +1100
-Message-id: <176957086265.16766.1100004904619725538@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAO/MeWkC/4XNwU7DMAzG8VeZcl4m21lNsxPvgTgkrrtF6xpoW
+ AWa+u5kQ4gLsIulvw+/72KKTkmL2a0uZtI5lZTHGtv1ysghjHu1qattCKhBJLA6hjioPffFJlE
+ rQ5ajLRKGNO5tBHYSeqfce1OJl0n79H7jn55rH1J5y9PHbW3G6/cLBsD/4RltnRbfMDJE9vyYS
+ 9m8nsMg+XTa1GOu/kw/JtI9k6rJLPGBvG9hi3+Y7ttkQHJ3TFfNDrq2cRRi59tfzGVZPgG1riG
+ 7dwEAAA==
+X-Change-ID: 20251120-enable-ufs-ice-clock-scaling-b063caf3e6f9
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org,
+        Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
+X-Mailer: b4 0.14.2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI4MDA3MCBTYWx0ZWRfX4heu9LywekAe
+ F7ZrvchRhBMSuhf1mjjGyqb08dXdEoex644Yh4SUHuT0h+C/h4zANnP9y0aj9GGmNZqPbzz9GAi
+ DTzHyhuRLdrBrb17MfItz5SgzNLNEyo2Y6LfTLV8EgzKT1n0mM7afRbiigo13J+hiSldIarXRJe
+ 6kfEbkHZYtlSPwV0IwSHNA94Ed9RbrGsn1w/Q9YHz4yoMt4K3bnvJchFte9YviWTdUD9ke2RzNV
+ s+siG10YSeoC/9YL3O+WlujuTYWiULUUZNidV1fWFVCKBYKH9BSElQ4h/4S2YmF/NeAAVFIipeb
+ Fl+dqnI/jo1rz7yuxdXqjmTYE2xdfGcdhg3WXzGaATHpNKF0EacUPcbXC4QQtg3P8HWL73B7sL2
+ blWqhlBGGA2Hy22nbuklX8Uf3Ag6rrzoumZpauEWiiJOOZH/NvxEMIHEsLdpyC60AG52m8Rs0rM
+ snXC7YkdAVD6hsYqxuA==
+X-Proofpoint-GUID: nj0l74DixwEij8bC9marBLIXS8bXFBUO
+X-Proofpoint-ORIG-GUID: nj0l74DixwEij8bC9marBLIXS8bXFBUO
+X-Authority-Analysis: v=2.4 cv=YeuwJgRf c=1 sm=1 tr=0 ts=6979ccf9 cx=c_pps
+ a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
+ a=Lsz1E_LYmYg3FmW8_BQA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=GvdueXVYPmCkWapjIL-Q:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-01-28_01,2026-01-27_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0 bulkscore=0 adultscore=0 priorityscore=1501
+ suspectscore=0 phishscore=0 clxscore=1015 impostorscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2601280070
 
-On Mon, 26 Jan 2026, Chuck Lever wrote:
-> On Fri, Jan 23, 2026, at 6:09 PM, NeilBrown wrote:
-> 
-> > From: NeilBrown <neil@brown.name>
-> > Subject: [PATCH] nfsd: rate limit requests that result in -ESTALE from the
-> >  filesystem
-> >
-> > NFS file handles typically contain a 32 bit generation number which is
-> > randomly generated by the filesystem when the inode (or inode number) is
-> > allocated.  This makes it hard to guess correct file handles.  Hard but
-> > not impossible on a low latency network with a high speed server.
-> 
-> Is this claim accurate for commonly-exported filesystems? Looking
-> at the kernel sources:
-> 
->   - btrfs sets i_generation = trans->transid (a sequential counter
->     starting from 1, incremented per transaction)
->   - ext2 uses sbi->s_next_generation++ (sequential counter seeded
->     randomly at mount)
->   - ocfs2 uses osb->s_next_generation++ (sequential counter)
-> 
-> For btrfs in particular, the generation number contains zero bits of
-> randomness. An attacker who can estimate the filesystem age or
-> transaction count can predict valid generation numbers with high
-> probability. Does the "1 year" security estimate hold for btrfs
-> exports, or is that filesystem effectively unprotected by this
-> mitigation?
+Introduce support for dynamic clock scaling of the ICE (Inline Crypto Engine)
+using the OPP framework. During ICE device probe, the driver now attempts to
+parse an optional OPP table from the ICE-specific device tree node to
+determine minimum and maximum supported frequencies for DVFS-aware operations.
+API qcom_ice_scale_clk is exposed by ICE driver and is invoked by UFS host
+controller driver in response to clock scaling requests, ensuring coordination
+between ICE and host controller.
 
-Thanks for exploring this.  I had only checked ext4 and xfs and thought
-I saw a pattern.
-btrfs is certainly a weakness here - though it could be "fixed" I expect.
+For MMC controllers that do not support clock scaling, the ICE clock frequency
+is kept aligned with the MMC controller’s clock rate (TURBO) to ensure
+consistent operation.
 
-> 
-> 
-> > Filehandles already contain 32 bits of randomness.
-> 
-> This appears true for ext4, f2fs, XFS v3+, and tmpfs (which use
-> get_random_u32()), but not for btrfs, ext2, or ocfs2 as noted above.
-> 
-> Additionally, NFS re-exports (fs/nfs/export.c) use no generation number
-> at all. The nfs_encode_fh() function embeds the backing server's
-> filehandle verbatim rather than generating a local generation number.
-> Protection depends entirely on what the backing NFS server uses. If
-> someone re-exports a btrfs-backed NFS mount, the sequential transaction
-> IDs on the backing server provide minimal protection.
+Dynamic clock scaling based on OPP tables enables better power-performance
+trade-offs. By adjusting ICE clock frequencies according to workload and power
+constraints, the system can achieve higher throughput when needed and
+reduce power consumption during idle or low-load conditions.
 
-I think we would have to expect the backing server to provide any
-protection that it needs.  It is better placed than an intermediate
-server, not matter what sort of protection we choose.
+The OPP table remains optional, absence of the table will not cause
+probe failure. However, in the absence of an OPP table, ICE clocks will
+remain at their default rates, which may limit performance under
+high-load scenarios or prevent performance optimizations during idle periods.
 
-> 
-> We can't legitimately extend your cryptanalysis to non-Linux servers
-> that back re-exported NFS mounts.
-> 
-> 
-> > The only known attack methodology is to guess the inode number of a file
-> > of interest, then iterate over all possible generation numbers.
-> 
-> Is generation number brute-forcing the optimal attack? Inode numbers
-> are typically sequential and the valid range is much smaller than 2^32.
-> Could an attacker first enumerate valid inode numbers (which also
-> triggers ESTALE and the rate limit), then brute-force the generation
-> for interesting inodes? The rate limit slows both phases equally, but
-> inode enumeration requires far fewer guesses.
+Signed-off-by: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
+---
+Changes in v4:
+- Enable multiple frequency scaling based OPP-entries as suggested in v3 patchset.
+- Include bindings change: https://lore.kernel.org/all/20260123-add-operating-points-v2-property-for-qcom-ice-bindings-v1-1-2155f7aacc28@oss.qualcomm.com/.
+- Link to v3: https://lore.kernel.org/r/20260123-enable-ufs-ice-clock-scaling-v3-0-d0d8532abd98@oss.qualcomm.com
 
-How would they enumeration valid inode numbers?  and how would
-"interesting" inode numbers be determined?
+Changes in v3:
+- Avoid clock scaling in case of legacy bindings as suggested.
+- Use of_device_is_compatible to distinguish between legacy and non-legacy bindings.
+- Link to v2: https://lore.kernel.org/r/20251121-enable-ufs-ice-clock-scaling-v2-0-66cb72998041@oss.qualcomm.com
 
-The fact that an attacking client cannot know what inode numbers would
-be interesting would, I think, add a few bits to the guessing required.
-It could certainly guess something about what sort of numbers to try, as
-the assumption is that it *does* have access to some files.  So it
-wouldn't make the search *much* harder, but would increase it from a
-year to a decade.
+Changes in v2:
+- Use OPP-table instead of freq-table-hz for clock scaling.
+- Enable clock scaling for legacy targets as well, by fetching frequencies from storage opp-table.
+- Introduce has_opp variable in qcom_ice structure to keep track, if ICE instance has dedicated OPP-table registered.
+- Combined the changes for patch-series <20251001-set-ice-clock-to-turbo-v1-1-7b802cf61dda@oss.qualcomm.com> as suggested.
+- Link to v1: https://lore.kernel.org/r/20251001-enable-ufs-ice-clock-scaling-v1-0-ec956160b696@oss.qualcomm.com
 
-> 
-> 
-> > diff --git a/fs/nfsd/netns.h b/fs/nfsd/netns.h
-> > index 9fa600602658..f7229d1f9d86 100644
-> > --- a/fs/nfsd/netns.h
-> > +++ b/fs/nfsd/netns.h
-> > @@ -219,6 +219,8 @@ struct nfsd_net {
-> >  	/* last time an admin-revoke happened for NFSv4.0 */
-> >  	time64_t		nfs40_last_revoke;
-> > 
-> > +	struct mutex		estale_rate_limit_mutex;
-> > +
-> >  #if IS_ENABLED(CONFIG_NFS_LOCALIO)
-> >  	/* Local clients to be invalidated when net is shut down */
-> >  	spinlock_t              local_clients_lock;
-> > diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-> > index 7587c64bf26d..55d25d9b414f 100644
-> > --- a/fs/nfsd/nfsctl.c
-> > +++ b/fs/nfsd/nfsctl.c
-> > @@ -2198,6 +2198,7 @@ static __net_init int nfsd_net_init(struct net 
-> > *net)
-> >  	nfsd4_init_leases_net(nn);
-> >  	get_random_bytes(&nn->siphash_key, sizeof(nn->siphash_key));
-> >  	seqlock_init(&nn->writeverf_lock);
-> > +	mutex_init(&nn->estale_rate_limit_mutex);
-> >  #if IS_ENABLED(CONFIG_NFS_LOCALIO)
-> >  	spin_lock_init(&nn->local_clients_lock);
-> >  	INIT_LIST_HEAD(&nn->local_clients);
-> > diff --git a/fs/nfsd/nfsfh.c b/fs/nfsd/nfsfh.c
-> > index ed85dd43da18..7032f65fe21a 100644
-> > --- a/fs/nfsd/nfsfh.c
-> > +++ b/fs/nfsd/nfsfh.c
-> > @@ -244,6 +244,8 @@ static __be32 nfsd_set_fh_dentry(struct svc_rqst 
-> > *rqstp, struct net *net,
-> >  						data_left, fileid_type, 0,
-> >  						nfsd_acceptable, exp);
-> >  		if (IS_ERR_OR_NULL(dentry)) {
-> > +			struct nfsd_net *nn = net_generic(net, nfsd_net_id);
-> > +
-> >  			trace_nfsd_set_fh_dentry_badhandle(rqstp, fhp,
-> >  					dentry ?  PTR_ERR(dentry) : -ESTALE);
-> >  			switch (PTR_ERR(dentry)) {
-> > @@ -252,6 +254,19 @@ static __be32 nfsd_set_fh_dentry(struct svc_rqst 
-> > *rqstp, struct net *net,
-> >  				break;
-> >  			default:
-> >  				dentry = ERR_PTR(-ESTALE);
-> > +				/* We limit ESTALE returns to 1 every
-> > +				 * 15 milliseconds (across all threads) to
-> > +				 * prevent a client from guessing the
-> > +				 * correct (32 bit) generation number
-> > +				 * for an given inode in significantly
-> > +				 * less than 1 year.  This ensures clients
-> > +				 * can only access files for which they
-> > +				 * are allowed to access a path from the
-> > +				 * exported root.
-> > +				 */
-> > +				mutex_lock(&nn->estale_rate_limit_mutex);
-> > +				msleep(15);
-> > +				mutex_unlock(&nn->estale_rate_limit_mutex);
-> 
-> The global mutex serializes all ESTALE errors across all nfsd threads
-> in the network namespace. The impact on legitimate workloads must be
-> carefully considered.
-> 
-> For example, during file deletion or migration, multiple clients may
-> encounter genuinely stale file handles simultaneously. With N
-> concurrent ESTALE errors, the total delay becomes N * 15ms as each
-> thread waits for the mutex. With 100 concurrent stale handle accesses,
-> this adds 1.5 seconds of accumulated latency.
+---
+Abhinaba Rakshit (4):
+      dt-bindings: crypto: ice: add operating-points-v2 property for QCOM ICE
+      soc: qcom: ice: Add OPP-based clock scaling support for ICE
+      ufs: host: Add ICE clock scaling during UFS clock changes
+      soc: qcom: ice: Set ICE clk to TURBO on probe
 
-Deleting a file that clients might be using is always problematic.  This
-certainly does make it more problematic.  1.5 seconds isn't good, but
-for an unusual event it shouldn't be a big problem.
+ .../bindings/crypto/qcom,inline-crypto-engine.yaml |  29 ++++++
+ drivers/soc/qcom/ice.c                             | 112 +++++++++++++++++++++
+ drivers/ufs/host/ufs-qcom.c                        |  17 ++++
+ include/soc/qcom/ice.h                             |   5 +
+ 4 files changed, 163 insertions(+)
+---
+base-commit: fe4d0dea039f2befb93f27569593ec209843b0f5
+change-id: 20251120-enable-ufs-ice-clock-scaling-b063caf3e6f9
 
-> 
-> Additionally, an attacker does not need to successfully guess file
-> handles to cause harm. Simply sending requests with invalid file
-> handles at a modest rate (e.g., 10/sec) can monopolize 15% of the
-> mutex time, slowing all legitimate ESTALE processing on the server.
-
-Remember that that attacker already has access to the server and is
-permitted to send access some files.  Causing "some harm" is a risk you
-have to take when you give anyone any access to your server.
-The goal here isn't to prevent any harm, it is to prevent access to
-sensitive data.
-
-> 
-> Would per-client rate limiting (e.g., a token bucket per client IP)
-> avoid penalizing legitimate operations while still throttling attacks?
-
-Per svc_export or per client-IP would be OK.  An attacker with access to
-multiple IP addresses could find a gen number is less than 1 year, but
-with added added attack detection it would still be impractical I think.
-
-> 
-> Or, as Jeff suggested, narrowing the blast radius to per-inode
-> limiting?
-
-per-inode requires help from each fs - not impossible but awkward.
-And if 100 client are all accessing the one inode which is removed, you
-still get the 1.5 second delay for that inode.
-
-> 
-> Lastly, we've spilled a large number of electrons trying to remove
-> needless delays of nfsd threads (eg, waiting synchronously for NFS
-> clients to respond to NFSv4 callbacks) because a malicious client
-> can use this delay as a timing attack to determine the (maximum)
-> number of available nfsd threads and simply keep them all busy,
-> preventing the server from doing useful work.
-> 
-
-Again, this is client which is allowed to access at least one export.
-Such a client can problem figure out how many threads you have running
-already.
-
-> 
-> >  			}
-> >  		}
-> >  	}
-> 
-> I think given the gaps in covering exports of first-tier file
-> systems such as btrfs, the unknowns in protecting re-exported
-> NFS mounts, and the increase in the surface of timing attacks,
-> this approach needs significant refinement before I would feel
-> comfortable with it.
-
-Thanks a lot for the thoughtful review.
-
-In terms of defence-in-depth I think this is still a good approach.
-Maybe I'll resubmit with some fine tuning and better explanations.  I
-see how time works out.
-
-Thanks,
-NeilBrown
+Best regards,
+-- 
+Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
 
