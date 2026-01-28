@@ -1,278 +1,173 @@
-Received: from mail.thorondor.fr (unknown [82.66.128.71])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63622517AC;
-	Wed, 28 Jan 2026 19:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.66.128.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1227E37419B
+	for <linux-crypto@vger.kernel.org>; Wed, 28 Jan 2026 20:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769629826; cv=none; b=EhelzSoxyJCDc7bwYw+o5ZRVBM6iujYPbysvxK/SVUwo86d/lYMSqSax9I5p+flJFSHL9yiyjz3lHNIXhv1g7gKrExWho0ulgZ1wCiAA6of+V3sdQ2YRhJJzH29rOJjlT58OoliuvJov03JPAky6JW1RrERWVEvWlZEypAxbgOE=
+	t=1769632291; cv=none; b=dMkLNhlgljYAuDmMDwIaZcqiM29o1wYheX4b3XA6gGRJj2g2G7r7OJ475hIRPpTDRen+jbv+4xkZoOwqDsZ2ek0BhocxFEKphT9mlhqnCYlihhLl0rCEkTs5R5c3Pfil8c2ZrQuSmaZnvjUSSLkxclFpWtMDAllcISKCwVIrCHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769629826; c=relaxed/simple;
-	bh=hUxEQd9B/jtT2SP/nDIPRWt0LT8qLJgWnolLkxASwnI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Nkjr2JrbjCjjU/NVyRf4JLLrmKP9dP94oGHt1g8CM+yayZHr/MrUwWakHMHhpsaeAb1ZMVmOCZyWjC7pfzpw8j5slWRS4GoxijY6DlddZLmnNRxVnFzPSH3KyKLBm4PyTUrXUdV9vKgBh4GuPGVzmTaMM0R6GI8LCkvcWy3rcQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr; spf=pass smtp.mailfrom=thorondor.fr; dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b=s2g0wOcv; arc=none smtp.client-ip=82.66.128.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorondor.fr
+	s=arc-20240116; t=1769632291; c=relaxed/simple;
+	bh=2qvxf/62yttfNIZNAODh63qlXVSL99Ksrx5/ufwbejY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=spWucQeEZPdp7UK+KxSI6ZoQOBGAbRpIHGgcb9Gr0IgpplNp611/Jp+D3hgWRqtLoCArVjQsProuiI/E0Tngj2EQ2FJAwJCkr5uDVf2+7fpbQNJoxeEdaN1cpgCKuvxTsstz3T+alKPu9rcxbLvcL54eo2wUDb3Y5DaE7YevUUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XUXXe7xE; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fwcBGGuw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b="s2g0wOcv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=thorondor.fr; s=mail;
-	t=1769629816; bh=hUxEQd9B/jtT2SP/nDIPRWt0LT8qLJgWnolLkxASwnI=;
-	h=From:To:Cc:Subject:In-Reply-To:References;
-	b=s2g0wOcvGWRRmhRayxytT0j5r6TZCPHCeOCqNel/rQcq9UfgsUNrQONCVCrfHdHLx
-	 M/sleT5ltuhfq9zWXJpgh1cIyKNbQl2zY6aZORrqQH37QvjIe/Oo+vmAktumDhX78o
-	 Gfeg5qZIdYutiFcH/+kirfIOe9QMhRqmQHm6cb5BnWFEL02wIrSMFZ8o00PhgtfT6W
-	 HNwwYp2GlYenwCzlFtGkVmcLqlEBKg0S0d6eDp/A6kzfrEjj1deISwAECwcvsu9iyb
-	 iKan+SqgZR5rVorwIDwDrgVo9/71VGQM4S8kO+UhGbTPb6132tCMsSiMhC55NnSI//
-	 nh2KSNDlgexUA==
-From: Thomas Courrege <thomas.courrege@thorondor.fr>
-To: ashish.kalra@amd.com,
-	corbet@lwn.net,
-	herbert@gondor.apana.org.au,
-	john.allen@amd.com,
-	nikunj@amd.com,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	thomas.lendacky@amd.com
-Cc: kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	Thomas Courrege <thomas.courrege@thorondor.fr>
-Subject: [PATCH v6 1/1] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
-Date: Wed, 28 Jan 2026 20:49:56 +0100
-Message-ID: <20260128194956.314678-2-thomas.courrege@thorondor.fr>
-In-Reply-To: <20260128194956.314678-1-thomas.courrege@thorondor.fr>
-References: <20260128194956.314678-1-thomas.courrege@thorondor.fr>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XUXXe7xE";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwcBGGuw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769632288;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to; bh=6AqTWTOgRm78zpGWundx5DPK3QN0XJ8tGQTS1p8e64k=;
+	b=XUXXe7xETErab3wRuyukJ0+lVBhbKkaCcNv8QLKZwc4IIIOHcz3YCrmR6f3vNH/wlZJpjk
+	RnC4h+hm/NmAXYcWToR0nweZcgFZTxuS7xUNA6G2dCk/ERzre7e1N9gkt+KnsEx7+IwE5O
+	OR9QHTRzknUlppVd6rQJVsvP5dNvT5I=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-15-iWlGb3jUNo6mp8swAqWisw-1; Wed, 28 Jan 2026 15:31:26 -0500
+X-MC-Unique: iWlGb3jUNo6mp8swAqWisw-1
+X-Mimecast-MFC-AGG-ID: iWlGb3jUNo6mp8swAqWisw_1769632285
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-432a9ef3d86so116671f8f.2
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Jan 2026 12:31:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1769632285; x=1770237085; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6AqTWTOgRm78zpGWundx5DPK3QN0XJ8tGQTS1p8e64k=;
+        b=fwcBGGuw7IqQDPevelrNI5mPPr97koUxkOdPBeevIRXEdn2WQmQxRqzM4vbWV5CQ1K
+         GzG9MFQtT4t1UxM8me4DW4lGDGZMEMK2FdX8SYol2akxmRNKL/MKMwIty3VtcOZAXl9Y
+         wWS67ozLZW0GAsRqnPn39uwB0neig513SYS7rQ4feyTLBzJhhqABshCSXW7vNqJZmDFf
+         A4TdMWerNpSOIlJWmzAwR31lzurm2R3U59p0qiXMV54wKq1LH3nxg60LZ94v/n0WM/10
+         YOFMpQJ7sMCG/fIm2pvP57/YDw7JqNTudoYipg0ZAcyARnfbopdd6agIeA4ATotjkCEM
+         Kigg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769632285; x=1770237085;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6AqTWTOgRm78zpGWundx5DPK3QN0XJ8tGQTS1p8e64k=;
+        b=ZLwiHSoL7DF3w1ELnV3FwAZG7o+9Sxw5QpX41mMPcYpBgJW2GUT2rmV27gW/ShnJHq
+         O3UKvMphXHgSmR4UtZUds/QZ456AVH9tU59QbT3KVYXZtEWxK02XJuhbvKhfjM9Mrgdn
+         4cWtW9Tbf5+sp3n2QgiCsdixNYzb8/PDzbdcbkNp+MYmSlZk0r4htNZBJSG1/20MAdGx
+         MV1FlgfmqSPaMP5LaoxgOn9p4ccSJZtRHVNwFTmeUwDrwBc7VLtndpuPxnVxly82uHHq
+         au0rnMzQlYxofAuN6afzqtmPLF9sGjO18J7oDbvxWmFebTfgvU7CfmxH8pYkG6sX7UDg
+         HlpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWJV5lpTCX4Q3ScFoUEtRZ58D5/Ao7UN9mBpEAte4EsqBwRzwHf1dr6YWHz76Br9FTKXHDtyP6W3eCXHeE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywfy/4ZeAEQRZYSjGjlBpzybaeJ53oLNRBdnJrSj9v7eULZq8cf
+	mLMon3Ohr2oFHWrptbXg3gOlG0p2+NhuLbvZix6Q4w7DPAfvSnmIa5RTf1yB2ILPKRB+dbTAtkW
+	JGkOlQccGEjuT1UD6Ug1YVPflZ66vGg/zS+ej6fJ+M/W5m6j0WoU9E/zWZaOiI3L6hw==
+X-Gm-Gg: AZuq6aK5Rlp2VzmrYztkTv3wDsHckGQBh1hllvgW8iRUfZqJa6a8YIqYJnMuQVLx0RP
+	7g8zPuFIs7KcbJ05EIp956+yAPc4GQdAI0HfJX9FJFLKM4ycfpwzHePzkYyhTNV+O7DVDqgSsgy
+	IIViLuMDhqyx9eL1JmN9kdE0scWUteN3GOhjXhsOVkyesbJpukmWA5L3idHhf9t7GAgige7Hlg6
+	w55MOaF7s3X699KG2N3b4sHt8re7HJ9nefHG6ysKsCEtsufKDLTwBrxEjTW/ddQgWnEKW1+QM6e
+	mrIBcjkx49b0e1XkBqVWAXTf5Rmvx5YxqOLL+AYQsCxboYp+OvsOFXVdl2CP6ZbVBK6Z/FE48H3
+	uqrsSBfWhgvPM3FYt4pZLOVKwMLhcXxshHA==
+X-Received: by 2002:a05:600c:6995:b0:477:7af8:c8ad with SMTP id 5b1f17b1804b1-48069c92c03mr93433915e9.31.1769632285345;
+        Wed, 28 Jan 2026 12:31:25 -0800 (PST)
+X-Received: by 2002:a05:600c:6995:b0:477:7af8:c8ad with SMTP id 5b1f17b1804b1-48069c92c03mr93433305e9.31.1769632284808;
+        Wed, 28 Jan 2026 12:31:24 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-34-155.inter.net.il. [80.230.34.155])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066beeaf9sm161529595e9.6.2026.01.28.12.31.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 12:31:24 -0800 (PST)
+Date: Wed, 28 Jan 2026 15:31:21 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v3 15/15] vsock/virtio: reorder fields to reduce padding
+Message-ID: <ce44f61af415521e00ab7492aa16d3d19f00bd5e.1769632071.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f1221bbc120df6adaba9006710a517f1e84a10b2.1767601130.git.mst@redhat.com>
 
-Add support for retrieving the SEV-SNP attestation report via the
-SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
-ioctl for SNP guests.
+Reorder struct virtio_vsock fields to place the DMA buffer (event_list)
+last. This eliminates the padding from aligning the struct size on
+ARCH_DMA_MINALIGN.
 
-Signed-off-by: Thomas Courrege <thomas.courrege@thorondor.fr>
+Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- .../virt/kvm/x86/amd-memory-encryption.rst    | 28 +++++++++
- arch/x86/include/uapi/asm/kvm.h               |  9 +++
- arch/x86/kvm/svm/sev.c                        | 63 +++++++++++++++++++
- drivers/crypto/ccp/sev-dev.c                  |  1 +
- include/linux/psp-sev.h                       | 31 +++++++++
- 5 files changed, 132 insertions(+)
 
-diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-index 1ddb6a86ce7f..46fc07d9942a 100644
---- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-+++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-@@ -572,6 +572,34 @@ Returns: 0 on success, -negative on error
- See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
- details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
+changes from v2:
+	move event_lock and event_run too, to keep
+	event things logically together, as suggested by
+	Stefano Garzarella.
+
+Note: this is the only change in v3 and it's cosmetic, so I am
+not reposting the whole patchset.
+
+
+ net/vmw_vsock/virtio_transport.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 999a0839726a..b333a7591b26 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -55,15 +55,6 @@ struct virtio_vsock {
+ 	int rx_buf_nr;
+ 	int rx_buf_max_nr;
  
-+21. KVM_SEV_SNP_HV_REPORT_REQ
-+-----------------------------
-+
-+The KVM_SEV_SNP_HV_REPORT_REQ command requests a hypervisor-generated
-+SNP guest attestation report. This report is produced by the SEV firmware
-+using the key selected by the caller.
-+
-+The ``key_sel`` field indicates which key the platform will use to sign the
-+report:
-+  * ``0``: If VLEK is installed, sign with VLEK. Otherwise, sign with VCEK.
-+  * ``1``: Sign with VCEK.
-+  * ``2``: Sign with VLEK.
-+  * Other values are reserved.
-+
-+Parameters (in): struct kvm_sev_snp_hv_report_req
-+
-+Returns:  0 on success, -negative on error
-+
-+::
-+        struct kvm_sev_snp_hv_report_req {
-+                __u64 report_uaddr;
-+                __u64 report_len;
-+                __u8 key_sel;
-+                __u8 pad0[7];
-+                __u64 pad1[4];
-+        };
-+
-+
- Device attribute API
- ====================
+-	/* The following fields are protected by event_lock.
+-	 * vqs[VSOCK_VQ_EVENT] must be accessed with event_lock held.
+-	 */
+-	struct mutex event_lock;
+-	bool event_run;
+-	__dma_from_device_group_begin();
+-	struct virtio_vsock_event event_list[8];
+-	__dma_from_device_group_end();
+-
+ 	u32 guest_cid;
+ 	bool seqpacket_allow;
  
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 7ceff6583652..464146bed784 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -743,6 +743,7 @@ enum sev_cmd_id {
- 	KVM_SEV_SNP_LAUNCH_START = 100,
- 	KVM_SEV_SNP_LAUNCH_UPDATE,
- 	KVM_SEV_SNP_LAUNCH_FINISH,
-+	KVM_SEV_SNP_HV_REPORT_REQ,
- 
- 	KVM_SEV_NR_MAX,
- };
-@@ -871,6 +872,14 @@ struct kvm_sev_receive_update_data {
- 	__u32 pad2;
+@@ -77,6 +68,15 @@ struct virtio_vsock {
+ 	 */
+ 	struct scatterlist *out_sgs[MAX_SKB_FRAGS + 1];
+ 	struct scatterlist out_bufs[MAX_SKB_FRAGS + 1];
++
++	/* The following fields are protected by event_lock.
++	 * vqs[VSOCK_VQ_EVENT] must be accessed with event_lock held.
++	 */
++	struct mutex event_lock;
++	bool event_run;
++	__dma_from_device_group_begin();
++	struct virtio_vsock_event event_list[8];
++	__dma_from_device_group_end();
  };
  
-+struct kvm_sev_snp_hv_report_req {
-+	__u64 report_uaddr;
-+	__u64 report_len;
-+	__u8 key_sel;
-+	__u8 pad0[7];
-+	__u64 pad1[4];
-+};
-+
- struct kvm_sev_snp_launch_start {
- 	__u64 policy;
- 	__u8 gosvw[16];
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f59c65abe3cf..63026d254ab1 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2261,6 +2261,66 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	return rc;
- }
- 
-+static int sev_snp_hv_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
-+{
-+	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
-+	struct sev_data_snp_msg_report_rsp *report_rsp;
-+	struct kvm_sev_snp_hv_report_req params;
-+	struct sev_data_snp_hv_report_req data;
-+	size_t rsp_size = sizeof(*report_rsp);
-+	void __user *u_report;
-+	void __user *u_params;
-+	int ret;
-+
-+	if (!sev_snp_guest(kvm))
-+		return -ENOTTY;
-+
-+	u_params = u64_to_user_ptr(argp->data);
-+	if (copy_from_user(&params, u_params, sizeof(params)))
-+		return -EFAULT;
-+
-+	if (params.report_len < rsp_size)
-+		return -ENOSPC;
-+
-+	u_report = u64_to_user_ptr(params.report_uaddr);
-+	if (!u_report)
-+		return -EINVAL;
-+
-+	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+	if (!report_rsp)
-+		return -ENOMEM;
-+
-+	data.len = sizeof(data);
-+	data.key_sel = params.key_sel;
-+	data.gctx_addr = __psp_pa(sev->snp_context);
-+	data.hv_report_paddr = __psp_pa(report_rsp);
-+	data.rsvd = 0;
-+
-+	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
-+			    &argp->error);
-+	if (ret)
-+		goto e_free_rsp;
-+
-+	if (!report_rsp->status) {
-+		if (params.report_len < (rsp_size + report_rsp->report_size))
-+			ret = -ENOSPC;
-+		else
-+			rsp_size += report_rsp->report_size;
-+
-+		params.report_len = sizeof(*report_rsp) + report_rsp->report_size;
-+	}
-+
-+	if (copy_to_user(u_report, report_rsp, rsp_size))
-+		ret = -EFAULT;
-+
-+	if (copy_to_user(u_params, &params, sizeof(params)))
-+		ret = -EFAULT;
-+
-+e_free_rsp:
-+	snp_free_firmware_page(report_rsp);
-+	return ret;
-+}
-+
- struct sev_gmem_populate_args {
- 	__u8 type;
- 	int sev_fd;
-@@ -2672,6 +2732,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
- 	case KVM_SEV_SNP_LAUNCH_FINISH:
- 		r = snp_launch_finish(kvm, &sev_cmd);
- 		break;
-+	case KVM_SEV_SNP_HV_REPORT_REQ:
-+		r = sev_snp_hv_report_request(kvm, &sev_cmd);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		goto out;
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 956ea609d0cc..5dd7c3f0d50d 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -259,6 +259,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
- 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
- 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
-+	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
- 	default:				return sev_tio_cmd_buffer_len(cmd);
- 	}
- 
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 69ffa4b4d1fa..c651a400d124 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -124,6 +124,7 @@ enum sev_cmd {
- 	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
- 	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
- 	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
-+	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
- 	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
- 	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
- 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
-@@ -594,6 +595,36 @@ struct sev_data_attestation_report {
- 	u32 len;				/* In/Out */
- } __packed;
- 
-+/**
-+ * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
-+ *
-+ * @len: length of the command buffer in bytes
-+ * @key_sel: Selects which key to use for generating the signature.
-+ * @gctx_addr: System physical address of guest context page
-+ * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
-+ */
-+struct sev_data_snp_hv_report_req {
-+	u32 len;		/* In */
-+	u32 key_sel	:2,	/* In */
-+	    rsvd	:30;
-+	u64 gctx_addr;		/* In */
-+	u64 hv_report_paddr;	/* In */
-+} __packed;
-+
-+/**
-+ * struct sev_data_snp_msg_export_rsp
-+ *
-+ * @status: Status : 0h: Success. 16h: Invalid parameters.
-+ * @report_size: Size in bytes of the attestation report
-+ * @report: attestation report
-+ */
-+struct sev_data_snp_msg_report_rsp {
-+	u32 status;			/* Out */
-+	u32 report_size;		/* Out */
-+	u8 rsvd[24];
-+	u8 report[];
-+} __packed;
-+
- /**
-  * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
-  *
+ static u32 virtio_transport_get_local_cid(void)
 -- 
-2.52.0
+MST
 
