@@ -1,79 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E16A2836E;
-	Wed, 28 Jan 2026 00:10:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB185255E43;
+	Wed, 28 Jan 2026 01:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769559016; cv=none; b=giwKMdWBIZzmRrbCkR7znQqhD1ACWLu28xF5cbzwtgT2ycl/T3bC9vPewYMQG8fy7tzb5j7Zh/2uKnDRr8eAwum1XKb2swoN1Ki5UYeEFpON1aOT9sQkiSgS0TFngyRr7mlyvDPbgNwB0TEOnaAkGVXgJVT96SfBdOSzxOZ1hk4=
+	t=1769564641; cv=none; b=qx2f2YZWIJOnB8PF4AN7nyfRcyZRBapM7cvyMFdZOSoQCzAlymI1+ywfyUS37+tk9sNKycSEEHbecrS/0SZjOq+Iei/fn8QV5fuOmOuUYlyc7VBnoYbOiTO7geybQW4Xl69kaDiTpmnL6C9p73UkYY7nhUHVr2xt+b14f3RY87M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769559016; c=relaxed/simple;
-	bh=YFywH1NNICjJT9Qan9SX2ws511YbJA/z71q+8XPWPkQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NMAPHvZ2ym+LyqDSpgEZxb9CScowk60esYF+4LM5j+uiBDsui3q08TXpZVKX+Flf2CKypxWoOxv5iOxS1sJyebXO4Oe7octCtRe0Ipl+i7KY7wx+d4aOO/acpaFEkajESK6usx7uHp6w9pMl3En5BWWmc09DkMnr2IwHtUDORCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C+OhCtRj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769564641; c=relaxed/simple;
+	bh=kObptGzYKGHiP+qqG53X3f0ccdJ68sqDyS4Y+ftKMDQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pHRS+2aVW2JBERc+xJm4YV9hGBUWMQjM03Ho5bfowqCGa2uvncrrFLyVxF5VoV69EZB4t95sCej02aq4EYxv5yGwB+Y6KPdGwMOjW4AIzoUWxYoEneVt14ghBTDFongCRoWeSEp31G/LgC6s11ISKz9ZpVjkZz2a0de+zpxxToo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=N4F9qwYU; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C+OhCtRj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0778C19425;
-	Wed, 28 Jan 2026 00:10:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769559015;
-	bh=YFywH1NNICjJT9Qan9SX2ws511YbJA/z71q+8XPWPkQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=C+OhCtRjHcY7mZynFuZsKWtjMQT+gzMert3/KPLWyoq2RCibJHzk/cG4Qcc1GEHyl
-	 29YqBOuHZ4SdO8gGntXJDnnMbR7X3oj4FpeaYyEbgeBDuQJ6rCIaCS61bhEg3efQtb
-	 HqCpXVMISDIkXoL0rYGxQtJi0xgiBFwDzeFVjJuw4qM3hj/u5DvpK34RsHgUkJtEx4
-	 0cCtM7CiR95buoaAeHgb/yApJeaTWHzT+lI7AcjDagUs5vzeNZ6CbjNrGr/9IOBAHP
-	 XCOiDvpu19jgmYIcPjt/+87hBvaQjdwuxbE3I23NA/O5yoOeGadremK79ujJHKmvBG
-	 vGg2sN2EsK/wA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C8C5E380AA67;
-	Wed, 28 Jan 2026 00:10:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="N4F9qwYU"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=4ozVjupN70NNxSObIAAi4OpBrU5B6mEXMnRy7ird/aA=; 
+	b=N4F9qwYUcfoi435b6DHvFM5huMjj+/M9LTOoFoMpoJd/DSSlSqH0TVhoi4sxBKF/5cM7UL43Fp8
+	o0zYtvmPPnpI1wUx/Gjlzj/d8EHs2GJx28ZAIfLdEPnFK9fqmWfhiV0QjO9Ky3xKmkq5GbvIMeWBh
+	pl1tudHv13qkqKlP0q8Nue7fdzu84pc8CRxFv085jhBPAUHNDjrjsE0QlDbGbjdnvsPfDnEVfyGMb
+	NayWXY5rBAWlkLm/J+iiU0KuRa3+c7PdEgnBoCD6ekoBLrIiTX2dpE0Ad61kZsHePML032l3QZ0p2
+	Ukm16PAs1TSr31SMvRNO4sbINVLt1a9PXAzw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vkuas-002cug-0F;
+	Wed, 28 Jan 2026 09:43:43 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 Jan 2026 09:43:42 +0800
+Date: Wed, 28 Jan 2026 09:43:42 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Lianjie Wang <karin0.zst@gmail.com>
+Cc: Olivia Mackall <olivia@selenic.com>,
+	David Laight <david.laight.linux@gmail.com>,
+	Jonathan McDowell <noodles@meta.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] hwrng: core - use RCU for current_rng to fix race
+ condition
+Message-ID: <aXlpzqh9K6bqBh4T@gondor.apana.org.au>
+References: <aXbwM1wiPKqmC94v@gondor.apana.org.au>
+ <aXirTffsg1GWk2Yw@kator>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] Remove low-level SHA-1 functions
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176955900959.1450890.12872654962892844333.git-patchwork-notify@kernel.org>
-Date: Wed, 28 Jan 2026 00:10:09 +0000
-References: <20260123051656.396371-1-ebiggers@kernel.org>
-In-Reply-To: <20260123051656.396371-1-ebiggers@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org, ardb@kernel.org,
- Jason@zx2c4.com, dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aXirTffsg1GWk2Yw@kator>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 22 Jan 2026 21:16:54 -0800 you wrote:
-> This series updates net/ipv6/addrconf.c to use the regular SHA-1
-> functions, then removes sha1_init_raw() and sha1_transform().
+On Tue, Jan 27, 2026 at 10:32:30PM +0900, Lianjie Wang wrote:
+>
+> It is true that cleanup_rng() can race with hwrng_init(). However,
+> currently put_rng() is also called in hwrng_fillfn(), where we want to
+> avoid holding rng_mutex to prevent deadlock in hwrng_unregister().
 > 
-> Please consider these for net-next.
+> To solve this race, should we introduce a separate lock (e.g.,
+> init_mutex) to serialize only hwrng_init() and cleanup_rng()?
 > 
-> (These were originally patches 25-26 of the series
-> https://lore.kernel.org/linux-crypto/20250712232329.818226-1-ebiggers@kernel.org/ )
+> Alternatively, I think we could stop the thread also in
+> set_current_rng() before switching current_rng, so that each lifetime of
+> hwrng_fillfn() thread strictly holds a single RNG instance, avoiding the
+> need to call get_current_rng() or put_rng() inside hwrng_fillfn().
+
+Yes I missed the dead-lock.
+
+I suggest that we delay the work in cleanup_rng into a work_struct,
+IOW cleanup_work will simply schedule a work_struct to perform the
+actual cleanup.
+
+Then the work_struct can take the mutex safely, immediately check
+the reference count on the rng, and if it is non-zero it should return
+because the rng has been re-used in the mean time.
+
+If it is zero then it can proceed with the clean-up while holding the
+mutex, thus preventing any re-use from occurring.
+
+> I removed the NULL check in put_rng() and moved it to rng_current_show()
+> in v2, since all the other callers of put_rng() already check for NULL
+> before calling put_rng(). I can restore the NULL check in put_rng() in
+> v3 if preferred.
+
+Let's keep this patch simpler by keeping things as they are.  If
+it turns out that moving the NULL check makes the code more readable,
+you can do that in a follow-up patch.
+
+> > > @@ -489,8 +502,17 @@ static int hwrng_fillfn(void *unused)
+> > >  		struct hwrng *rng;
+> > > 
+> > >  		rng = get_current_rng();
+> > > -		if (IS_ERR(rng) || !rng)
+> > > +		if (!rng) {
+> > > +			/* This is only possible within drop_current_rng(),
+> > > +			 * so just wait until we are stopped.
+> > > +			 */
+> > > +			while (!kthread_should_stop()) {
+> > > +				set_current_state(TASK_INTERRUPTIBLE);
+> > > +				schedule();
+> > > +			}
+> > >  			break;
+> > > +		}
+> > > +
+> > 
+> > Is the schedule necessary? Shouldn't the break just work as it
+> > did before?
 > 
-> [...]
+> With the break alone, the task_struct might get freed before
+> kthread_stop() is called, which can still cause use-after-free
+> sometimes:
 
-Here is the summary with links:
-  - [net-next,1/2] ipv6: Switch to higher-level SHA-1 functions
-    https://git.kernel.org/netdev/net-next/c/5023479627e3
-  - [net-next,2/2] lib/crypto: sha1: Remove low-level functions from API
-    https://git.kernel.org/netdev/net-next/c/9ddfabcc1ed8
+Please change the comment above to say that this loop is needed
+to keep the task_struct alive for kthread_stop as it isn't obvious.
 
-You are awesome, thank you!
+I wonder why nobody has added a helper for this since this seems
+to be a common pattern in other kthread users? For example,
+fs/ext4/mmp.c also does this, and they also set the task state
+to TASK_RUNNING, perhaps we should do that too?
+
+Thanks,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
