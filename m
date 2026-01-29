@@ -1,50 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A722335554;
-	Wed, 28 Jan 2026 23:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BFE2877DC;
+	Thu, 29 Jan 2026 01:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769642148; cv=none; b=mOi0WG+glvpEmcBvI/cQpbNh/ZHNth/1kcajZ2u2zG2ho7qQQIg72EiHbNe7YgWz/KMNJIIp7jLJVUnE4fH92t3QTSe9pEkiF9ZCs4GugMZMeoJnDpNVyVb6uGJdH/M1aOta3p/TT5IByEbqJ99rYR/n5XD8QerVV+wlsvBXr8c=
+	t=1769649522; cv=none; b=QXAY7Q1kpzNh6l+Q5Kws7+qzTGzMjkQ+yspzSARxtc4jxmjrmyXeZZ6A2b3V59Cgj0WTSn09YvWWd+nAgIcjwclFWLz9wec41iIhOb1Zzv2dCO2E8HnwtH79yvqZhBctkNFSUo5k8Xe71NhpEpzva0l2870nOK5pw5h+2X/CPJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769642148; c=relaxed/simple;
-	bh=/g5GQCRx9VQ1qpx5c23mUIMjE6qDTKlKhm2i5tJzEEI=;
+	s=arc-20240116; t=1769649522; c=relaxed/simple;
+	bh=H2sV14e8HI+wblwa6bhREObIhAM/EZogM3B1BAXkhJ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B+fpcsTswn21XnBeuGsZUFpp8w+hUFyMJhOfneoFrHa/GP6EkOLgcXPCGOtNJ+gszasKJvpjP2Qxh02h/I/EkbnO0X845O3ZFalozsVb5uGcJDwqGC6IwHZYSEUiggaX0OBQfxOZ9aYJuLoXyLG95nq2V+yXq2Y542/sKLOmbkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U6goQrMS; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=sd0YFs5JrBJiKJCSPPECwcKmClDiVSGkON1/d8CMGoVc8/iNwW47j02IzdOQkXTy4UzgJDbGIxnEa4Ur4lf/gQFSHnp2PtAStvnetSoOBphOZT/ZY4UarduGvj0mKTSDfZWBStwaOiMdMuumGWcPEwhbcJsWAlaHM+FOi9L2cTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4VYaoSR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U6goQrMS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17FC4C4CEF1;
-	Wed, 28 Jan 2026 23:15:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4VYaoSR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89471C19421;
+	Thu, 29 Jan 2026 01:18:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769642147;
-	bh=/g5GQCRx9VQ1qpx5c23mUIMjE6qDTKlKhm2i5tJzEEI=;
+	s=k20201202; t=1769649521;
+	bh=H2sV14e8HI+wblwa6bhREObIhAM/EZogM3B1BAXkhJ4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U6goQrMSmWlTGBjF1g8gIXvwlczh4NG7n3FI0tec8IkWwjfTkqzDXSIsV20Q3lfhO
-	 7fypmBfJbkor5lM7uCar6mNAQMxuOpx/fNM1HLtjyffrReJN/amEDJQ8pn7SOuRJLe
-	 vE3SXwlZaBJaulwAlJ+2Mx2C+ooO5fheJ6XaJsW7UO6+frWJnQ3ICfO/hP3UTCXa+m
-	 18gwCBmRvd4Bz8wP+rv8kFrgb+PzleKUqjHAzIgZ4CkG3GlCMjebdV5gfml8IwCKhl
-	 xKKMT3QX0DjE/X457KCcw/+1aI+cdYYfzjoOV9rFZHo6Yk0OERKCUmPWntC/eeJYPj
-	 ySuqBNfrcCcAQ==
-Date: Thu, 29 Jan 2026 01:15:42 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@cloudflare.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	b=Q4VYaoSRn7twMXf5dckHiykohg1AoZGoBOMc8zL2cM/Y13dwDlBaIIBnky0wk/M3G
+	 2iFK7fAJO7AVkFlYcFgAWsbzPrO90ymEix2yHwvX35LtAMhJ4ET8Jknm53xQAV4xWI
+	 hj+7AxoURBFvzOPoX7gr7kPm1O7a0ZvlNOI3fhPizW+sF4ab1CoVM13IXOGr+K0BfZ
+	 eQ0ZpuxeXdGEf2HY56H45MVJr/wNPWxp6KLLIzYu4tRDS0R6aaaBUExBNj3koNxuvf
+	 2dMfDBluZNQRUDJZIrtfK7vzIf420106pLymvY/Fjvo8enJLBRjymBP723EgXtPHG/
+	 qRILwj0RDbdng==
+Date: Wed, 28 Jan 2026 17:18:38 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Holger Dengler <dengler@linux.ibm.com>
+Cc: David Laight <david.laight.linux@gmail.com>,
 	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v15 3/7] pkcs7, x509: Rename ->digest to ->m
-Message-ID: <aXqYnh92VWroe8AJ@kernel.org>
-References: <20260126142931.1940586-1-dhowells@redhat.com>
- <20260126142931.1940586-4-dhowells@redhat.com>
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 1/1] lib/crypto: tests: Add KUnit tests for AES
+Message-ID: <20260129011838.GG2024@quark>
+References: <20260119121210.2662-1-dengler@linux.ibm.com>
+ <20260119121210.2662-2-dengler@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,232 +47,77 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260126142931.1940586-4-dhowells@redhat.com>
+In-Reply-To: <20260119121210.2662-2-dengler@linux.ibm.com>
 
-On Mon, Jan 26, 2026 at 02:29:24PM +0000, David Howells wrote:
-> Rename ->digest and ->digest_len to ->m and ->m_size to represent the input
-> to the signature verification algorithm, reflecting that ->digest may no
-> longer actually *be* a digest.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Lukas Wunner <lukas@wunner.de>
-> cc: Ignat Korchagin <ignat@cloudflare.com>
-> cc: Jarkko Sakkinen <jarkko@kernel.org>
-> cc: Stephan Mueller <smueller@chronox.de>
-> cc: Eric Biggers <ebiggers@kernel.org>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: keyrings@vger.kernel.org
-> cc: linux-crypto@vger.kernel.org
-> ---
->  crypto/asymmetric_keys/asymmetric_type.c |  4 ++--
->  crypto/asymmetric_keys/pkcs7_verify.c    | 28 ++++++++++++------------
->  crypto/asymmetric_keys/public_key.c      |  3 +--
->  crypto/asymmetric_keys/signature.c       |  2 +-
->  crypto/asymmetric_keys/x509_public_key.c | 10 ++++-----
->  include/crypto/public_key.h              |  4 ++--
->  security/integrity/digsig_asymmetric.c   |  4 ++--
->  7 files changed, 26 insertions(+), 29 deletions(-)
-> 
-> diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
-> index 348966ea2175..2326743310b1 100644
-> --- a/crypto/asymmetric_keys/asymmetric_type.c
-> +++ b/crypto/asymmetric_keys/asymmetric_type.c
-> @@ -593,10 +593,10 @@ static int asymmetric_key_verify_signature(struct kernel_pkey_params *params,
->  {
->  	struct public_key_signature sig = {
->  		.s_size		= params->in2_len,
-> -		.digest_size	= params->in_len,
-> +		.m_size		= params->in_len,
->  		.encoding	= params->encoding,
->  		.hash_algo	= params->hash_algo,
-> -		.digest		= (void *)in,
-> +		.m		= (void *)in,
->  		.s		= (void *)in2,
->  	};
->  
-> diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-> index 6d6475e3a9bf..aa085ec6fb1c 100644
-> --- a/crypto/asymmetric_keys/pkcs7_verify.c
-> +++ b/crypto/asymmetric_keys/pkcs7_verify.c
-> @@ -31,7 +31,7 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
->  	kenter(",%u,%s", sinfo->index, sinfo->sig->hash_algo);
->  
->  	/* The digest was calculated already. */
-> -	if (sig->digest)
-> +	if (sig->m)
->  		return 0;
->  
->  	if (!sinfo->sig->hash_algo)
-> @@ -45,11 +45,11 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
->  		return (PTR_ERR(tfm) == -ENOENT) ? -ENOPKG : PTR_ERR(tfm);
->  
->  	desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
-> -	sig->digest_size = crypto_shash_digestsize(tfm);
-> +	sig->m_size = crypto_shash_digestsize(tfm);
->  
->  	ret = -ENOMEM;
-> -	sig->digest = kmalloc(sig->digest_size, GFP_KERNEL);
-> -	if (!sig->digest)
-> +	sig->m = kmalloc(sig->m_size, GFP_KERNEL);
-> +	if (!sig->m)
->  		goto error_no_desc;
->  
->  	desc = kzalloc(desc_size, GFP_KERNEL);
-> @@ -59,11 +59,10 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
->  	desc->tfm   = tfm;
->  
->  	/* Digest the message [RFC2315 9.3] */
-> -	ret = crypto_shash_digest(desc, pkcs7->data, pkcs7->data_len,
-> -				  sig->digest);
-> +	ret = crypto_shash_digest(desc, pkcs7->data, pkcs7->data_len, sig->m);
->  	if (ret < 0)
->  		goto error;
-> -	pr_devel("MsgDigest = [%*ph]\n", 8, sig->digest);
-> +	pr_devel("MsgDigest = [%*ph]\n", 8, sig->m);
->  
->  	/* However, if there are authenticated attributes, there must be a
->  	 * message digest attribute amongst them which corresponds to the
-> @@ -78,14 +77,14 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
->  			goto error;
->  		}
->  
-> -		if (sinfo->msgdigest_len != sig->digest_size) {
-> +		if (sinfo->msgdigest_len != sig->m_size) {
->  			pr_warn("Sig %u: Invalid digest size (%u)\n",
->  				sinfo->index, sinfo->msgdigest_len);
->  			ret = -EBADMSG;
->  			goto error;
->  		}
->  
-> -		if (memcmp(sig->digest, sinfo->msgdigest,
-> +		if (memcmp(sig->m, sinfo->msgdigest,
->  			   sinfo->msgdigest_len) != 0) {
->  			pr_warn("Sig %u: Message digest doesn't match\n",
->  				sinfo->index);
-> @@ -98,7 +97,8 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
->  		 * convert the attributes from a CONT.0 into a SET before we
->  		 * hash it.
->  		 */
-> -		memset(sig->digest, 0, sig->digest_size);
-> +		memset(sig->m, 0, sig->m_size);
+On Mon, Jan 19, 2026 at 01:12:10PM +0100, Holger Dengler wrote:
+> +static __always_inline u64 time_aes_op(bool encrypt, struct aes_key *aes_key,
+> +				       u8 *out, const u8 *in)
+> +{
+> +	void (*aes_op)(const struct aes_key *key, u8 *out, const u8 *in);
+> +	u64 t;
 > +
->  
->  		ret = crypto_shash_init(desc);
->  		if (ret < 0)
-> @@ -108,10 +108,10 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
->  		if (ret < 0)
->  			goto error;
->  		ret = crypto_shash_finup(desc, sinfo->authattrs,
-> -					 sinfo->authattrs_len, sig->digest);
-> +					 sinfo->authattrs_len, sig->m);
->  		if (ret < 0)
->  			goto error;
-> -		pr_devel("AADigest = [%*ph]\n", 8, sig->digest);
-> +		pr_devel("AADigest = [%*ph]\n", 8, sig->m);
->  	}
->  
->  error:
-> @@ -138,8 +138,8 @@ int pkcs7_get_digest(struct pkcs7_message *pkcs7, const u8 **buf, u32 *len,
->  	if (ret)
->  		return ret;
->  
-> -	*buf = sinfo->sig->digest;
-> -	*len = sinfo->sig->digest_size;
-> +	*buf = sinfo->sig->m;
-> +	*len = sinfo->sig->m_size;
->  
->  	i = match_string(hash_algo_name, HASH_ALGO__LAST,
->  			 sinfo->sig->hash_algo);
-> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-> index e5b177c8e842..a46356e0c08b 100644
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-> @@ -425,8 +425,7 @@ int public_key_verify_signature(const struct public_key *pkey,
->  	if (ret)
->  		goto error_free_key;
->  
-> -	ret = crypto_sig_verify(tfm, sig->s, sig->s_size,
-> -				sig->digest, sig->digest_size);
-> +	ret = crypto_sig_verify(tfm, sig->s, sig->s_size, sig->m, sig->m_size);
->  
->  error_free_key:
->  	kfree_sensitive(key);
-> diff --git a/crypto/asymmetric_keys/signature.c b/crypto/asymmetric_keys/signature.c
-> index 041d04b5c953..f4ec126121b3 100644
-> --- a/crypto/asymmetric_keys/signature.c
-> +++ b/crypto/asymmetric_keys/signature.c
-> @@ -28,7 +28,7 @@ void public_key_signature_free(struct public_key_signature *sig)
->  		for (i = 0; i < ARRAY_SIZE(sig->auth_ids); i++)
->  			kfree(sig->auth_ids[i]);
->  		kfree(sig->s);
-> -		kfree(sig->digest);
-> +		kfree(sig->m);
->  		kfree(sig);
->  	}
->  }
-> diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-> index 79cc7b7a0630..3854f7ae4ed0 100644
-> --- a/crypto/asymmetric_keys/x509_public_key.c
-> +++ b/crypto/asymmetric_keys/x509_public_key.c
-> @@ -63,11 +63,11 @@ int x509_get_sig_params(struct x509_certificate *cert)
->  	}
->  
->  	desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
-> -	sig->digest_size = crypto_shash_digestsize(tfm);
-> +	sig->m_size = crypto_shash_digestsize(tfm);
->  
->  	ret = -ENOMEM;
-> -	sig->digest = kmalloc(sig->digest_size, GFP_KERNEL);
-> -	if (!sig->digest)
-> +	sig->m = kmalloc(sig->m_size, GFP_KERNEL);
-> +	if (!sig->m)
->  		goto error;
->  
->  	desc = kzalloc(desc_size, GFP_KERNEL);
-> @@ -76,9 +76,7 @@ int x509_get_sig_params(struct x509_certificate *cert)
->  
->  	desc->tfm = tfm;
->  
-> -	ret = crypto_shash_digest(desc, cert->tbs, cert->tbs_size,
-> -				  sig->digest);
-> -
-> +	ret = crypto_shash_digest(desc, cert->tbs, cert->tbs_size, sig->m);
->  	if (ret < 0)
->  		goto error_2;
->  
-> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-> index 81098e00c08f..bd38ba4d217d 100644
-> --- a/include/crypto/public_key.h
-> +++ b/include/crypto/public_key.h
-> @@ -43,9 +43,9 @@ extern void public_key_free(struct public_key *key);
->  struct public_key_signature {
->  	struct asymmetric_key_id *auth_ids[3];
->  	u8 *s;			/* Signature */
-> -	u8 *digest;
-> +	u8 *m;			/* Message data to pass to verifier */
->  	u32 s_size;		/* Number of bytes in signature */
-> -	u32 digest_size;	/* Number of bytes in digest */
-> +	u32 m_size;		/* Number of bytes in ->m */
->  	const char *pkey_algo;
->  	const char *hash_algo;
->  	const char *encoding;
-> diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
-> index 457c0a396caf..87be85f477d1 100644
-> --- a/security/integrity/digsig_asymmetric.c
-> +++ b/security/integrity/digsig_asymmetric.c
-> @@ -121,8 +121,8 @@ int asymmetric_verify(struct key *keyring, const char *sig,
->  		goto out;
->  	}
->  
-> -	pks.digest = (u8 *)data;
-> -	pks.digest_size = datalen;
-> +	pks.m = (u8 *)data;
-> +	pks.m_size = datalen;
->  	pks.s = hdr->sig;
->  	pks.s_size = siglen;
->  	ret = verify_signature(key, &pks);
-> 
+> +	aes_op = encrypt ? &aes_encrypt : &aes_decrypt;
+> +
+> +	preempt_disable();
+> +	t = ktime_get_ns();
+> +	aes_op(aes_key, out, in);
+> +	t = ktime_get_ns() - t;
+> +	preempt_enable();
+> +
+> +	return t;
+> +}
+> +
+> +static void benchmark_aes(struct kunit *test, const struct aes_testvector *tv)
+> +{
+> +	const size_t num_iters = 100;
+> +	struct aes_key aes_key;
+> +	u8 out[AES_BLOCK_SIZE];
+> +	u64 t, t_enc, t_dec;
+> +	int rc;
+> +
+> +	if (!IS_ENABLED(CONFIG_CRYPTO_LIB_BENCHMARK))
+> +		kunit_skip(test, "not enabled");
+> +
+> +	rc = aes_preparekey(&aes_key, tv->key.b, tv->key.len);
+> +	KUNIT_ASSERT_EQ(test, 0, rc);
+> +
+> +	/* warm-up */
+> +	for (size_t i = 0; i < num_iters; i++) {
+> +		aes_encrypt(&aes_key, out, tv->plain);
+> +		aes_decrypt(&aes_key, out, tv->cipher);
+> +	}
+> +
+> +	t_enc = NSEC_PER_SEC;
+> +	t_dec = NSEC_PER_SEC;
+> +	for (size_t i = 0; i < num_iters; i++) {
+> +		t = time_aes_op(true, &aes_key, out, tv->plain);
+> +		t_enc = MIN_T(u64, t, t_enc);
+> +
+> +		t = time_aes_op(false, &aes_key, out, tv->cipher);
+> +		t_dec = MIN_T(u64, t, t_dec);
+> +	}
+> +
+> +	kunit_info(test, "enc (len=%zu): %llu MB/s", (size_t)AES_BLOCK_SIZE,
+> +		   div64_u64(AES_BLOCK_SIZE * NSEC_PER_SEC / 1000000,
+> +			     (t_enc ?: 1)));
+> +	kunit_info(test, "dec (len=%zu): %llu MB/s", (size_t)AES_BLOCK_SIZE,
+> +		   div64_u64(AES_BLOCK_SIZE * NSEC_PER_SEC / 1000000,
+> +			     (t_dec ?: 1)));
+> +}
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+"AES_BLOCK_SIZE * NSEC_PER_SEC" is missing a cast to u64, as reported by
+the kernel test robot.
 
-BR, Jarkko
+But also as discussed in v1, using ktime_get_ns() to time one AES block
+en/decryption at a time doesn't really work.  Even on x86 which has a
+high precision timer, it's spending longer getting the time than doing
+the actual AES en/decryption.
+
+You may have meant to use get_cycles() instead, which has less overhead.
+
+However, not all architectures have a cycle counter.
+
+So I recommend we go with the simple strategy that I suggested, and
+which v1 had.  Just the number of iterations in v1 was way too high.
+
+- Eric
