@@ -1,174 +1,105 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.thorondor.fr (unknown [82.66.128.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2F8377543
-	for <linux-crypto@vger.kernel.org>; Thu, 29 Jan 2026 08:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCC23876A6;
+	Thu, 29 Jan 2026 10:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.66.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769676139; cv=none; b=fGn9FN/cEEEKPIL36SdGT5P4w8JbUAcrY/4Ra2wwg/D1zD1tNas7ib7sP1m8SARdT+bLeLNQ2RuKjEMYPemUoTFw82bkhT/4oCTIBfKMv2RhoUImjnbRF/MJMtv2G8RRNOQ8Dn6fkmAi51inWZSDnR9w/8qhoCNHqx0gGk7lEXg=
+	t=1769682937; cv=none; b=YOM5QNQLf8rSjSvDDfObetjyj72H9n0T+eDaXlSgm8zWnzREjqEcWZB6ABLlUT7f1+iJ7qg2WrVhDMYcTSDuC/kRy/XPZBxJ57FIF4NT19t0avx5W5lcvK4liofJeDIqDvGFchl6sxYS3owM/UWvxV7JvnQId/pX2oAq5+5uFhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769676139; c=relaxed/simple;
-	bh=Bs6mTjUeA5qkWiBJBxqsJFMQQCY3VsRZlZa2vBfNivk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hVM+cz77pn41BxC6aneVuhIiU8aEcNCtMGRoYwhMddLURURvnV8ooJQXbr7R5q8Ww9mD2eZOYaGlnoLgkydiAErz89bv0ocWs5KhdkwFvjiJB9QpSAOirDbHleWdJcBNP8mvynA8y5AWvt18YGOCjNeq2TI7Nlxqj0KOL43thXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VWMB9joG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=mq5aWqvy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1769682937; c=relaxed/simple;
+	bh=pB05o+FNxJuOZKYxadKQglpf0zYg+JCb9JSnbOG3zHQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pSVHCJT5qhYY/Xi/HyfJ1+/pSTy6ZF30GviB1wf/38ePeDq2Mvx24YOXIl53a5t77FTjfSUnLoTVctXBMpPrCVm148dpez0eVUCHcmZeqCll2zb4awqR+L4mqEXQNA7tpygtHN6eNtBUURW3alVhydS6o+kCEMSOwlVV/F5YFKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr; spf=pass smtp.mailfrom=thorondor.fr; dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b=S6Na3Uds; arc=none smtp.client-ip=82.66.128.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorondor.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VWMB9joG";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="mq5aWqvy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769676137;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=THtu/B0OMAesHMQ0Tb4jSeVco+ToRrfio4hfGUipZDw=;
-	b=VWMB9joGXYC7p4SXDrqZ3kZ3eOqnv+1+GtytduFRo7jVG9Ybe1PWzU0Bt8QeKVgfkfWdz6
-	zmGDLVMkEvnLW0E9bRuhO3BQN7RGMB8HvHXXW10KrTRrtR3xoELejQ01NarfC09UEGnnFN
-	zyLUAx/s2WOiULXH4ByRf/0obMLKfDs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-42-eA-pwLfrOHigOt7tV-Rsxg-1; Thu, 29 Jan 2026 03:42:15 -0500
-X-MC-Unique: eA-pwLfrOHigOt7tV-Rsxg-1
-X-Mimecast-MFC-AGG-ID: eA-pwLfrOHigOt7tV-Rsxg_1769676134
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43284f60a8aso462121f8f.3
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Jan 2026 00:42:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769676134; x=1770280934; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=THtu/B0OMAesHMQ0Tb4jSeVco+ToRrfio4hfGUipZDw=;
-        b=mq5aWqvyQmv8XKxcpsL05xFNhP61yPx8mUM6PcbPlav9+2J+a2Asd7Xk5Xzvo/A/D8
-         YADLhS4VMYeN+3paz47G30CRdVTA6Ogaltn2PsoOPaJ+d55xEIJ/OqgOUBd6pxZBmcl1
-         yQ3/6bJ7YzwirFNvFH4c7GsCYJoB0QtVW3p8TUQLSoBk3NbBGlcxi7WINp0jDJG76yXv
-         ilLWC8irwCt8KlWWqe8LuhFPQYPHtZUZDIYYcIjDNB1r6KNgfP7VRlZUWuiyx8Cis1Vj
-         +L6SWkm3ku2hbUf67agmgdb+aUldVPeyCA5ksesY7AGlPwv2nqiduFy+F0BylQenQr1P
-         +doA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769676134; x=1770280934;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=THtu/B0OMAesHMQ0Tb4jSeVco+ToRrfio4hfGUipZDw=;
-        b=gq1+u1LDE+b1kgtIGa01zaareNTXRffy8KET0k5kw/BMYBHYqe4ug3xhlnol6I6Uea
-         mUBSVvHJiDnAuZbyjgbzwjd+tOxEVZQvm5TdpnyStd9/8PwxroKBUDOvH3xygq+A+Rhh
-         NbHCRjbTGz8myTi4qZC+dikLIX7+mGjWW5WNBH3dyRrWnX8lnqt4bLd5qYLUo2kD9TVC
-         H8BQ7+w7vQPeys4YBomeizSMY8LpxFXlvtEHIOLmWaRMSMQOWIAFFeS//HYfuCdqgy3U
-         /tSa6/UIDBgh3YZeje1NOFaZgp5ETYWN8IeV8YMG61pEydpjj80j9454KuQ7laM+DQl0
-         /WRA==
-X-Forwarded-Encrypted: i=1; AJvYcCWFzwxUzRIbNQb0rXxw9VHf2E7AnZ4RqodBO/IoJTK6IpwoOn2lmeNncwjZb2Fd43ZB1uTEhSuecB0HujM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzC+zpo5QsGM6I/PkUkLwbrosLqEW8enAvm2ol5OsJo3YTr/M+j
-	KaoSa34aHPzINIDnccsV13mtw8YfBnYLGpWIcnLrBImeG+vICWVh9biBEEZstHIs7ehggaLVjuQ
-	7Gm7oLElwD7rc1y7Qf2xNW92FyddCUvVMNBzwFI49gd1RPW5I/tRQWixZBYEVyjAV5w==
-X-Gm-Gg: AZuq6aLvQy7jPIuKDM4W3dY+jgmLoBEDtz3rhYuYBkK3t/UPOOS79VZD20srFS1Z9gq
-	jq8G33JeRcjDiSlYvLhk2P/p6CrolCw0zoIfkOZe9PHPcHu3kd7HDVuQvB4LcWV9RNu58xTGrYr
-	myaSJTFtu42jNn+6/b5w+1pPVuRzFDlpUxqbwNx46+tLuUwvGtxXo8GHaNq549q74WdDqH1bvjN
-	gY0mKrZROOQobkoYueegbGb63cOOsprabk6+NF98QQDHga35QLQCFFKwQ41daApp09H0PqO0XLD
-	DuFN1UuAJDOKmtH6G2fJokffpsLqXkKYkCiH9tU8lEOa4MHQYaqkUO0RPxSGripZ8LWujYbQrK5
-	Y4wFTLh3F6MaLYAvitTebfeNiAPxAEXhLwC6o8xWLFaUcqFbMsX0v
-X-Received: by 2002:a05:6000:178b:b0:435:9116:c713 with SMTP id ffacd0b85a97d-435dd02db27mr12237805f8f.5.1769676133932;
-        Thu, 29 Jan 2026 00:42:13 -0800 (PST)
-X-Received: by 2002:a05:6000:178b:b0:435:9116:c713 with SMTP id ffacd0b85a97d-435dd02db27mr12237753f8f.5.1769676133482;
-        Thu, 29 Jan 2026 00:42:13 -0800 (PST)
-Received: from sgarzare-redhat (ip110-139-192-82.pool-bba.aruba.it. [82.192.139.110])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10ee040sm12807318f8f.11.2026.01.29.00.42.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 00:42:12 -0800 (PST)
-Date: Thu, 29 Jan 2026 09:42:06 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Robin Murphy <robin.murphy@arm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Petr Tesarik <ptesarik@suse.com>, Leon Romanovsky <leon@kernel.org>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev, linux-scsi@vger.kernel.org, 
-	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 15/15] vsock/virtio: reorder fields to reduce padding
-Message-ID: <aXsclvInQFIuFe5i@sgarzare-redhat>
-References: <f1221bbc120df6adaba9006710a517f1e84a10b2.1767601130.git.mst@redhat.com>
- <ce44f61af415521e00ab7492aa16d3d19f00bd5e.1769632071.git.mst@redhat.com>
+	dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b="S6Na3Uds"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=thorondor.fr; s=mail;
+	t=1769682933; bh=pB05o+FNxJuOZKYxadKQglpf0zYg+JCb9JSnbOG3zHQ=;
+	h=Subject:To:Cc:References:From:In-Reply-To;
+	b=S6Na3UdsuJ3b3LxA/GSXMPE7tjhRRRZuZ29wo4kCpGvMLJkvAZdb0Zb2dUvf2pHgG
+	 dxa/3pPMs8hkGtGqSTNoRN3CdYxxXsurX5DUUyDjzxoOXy8ObEcxskMbcerXyCG5IS
+	 R6Ut3iUZDyGwIe2TUA+sREmozRDNt+jDBBmsVDFsA/JqSqCHQsq5ItF4hVlLJF+fnN
+	 7Q9sxc3zh9G6ZOUUuOqeNRXAHd3jRaZxH22Y3liWES1Kb0/WWVFwoZ1XVrBVOZiCKU
+	 tfCNaUClPNUjBnesSXLDQNj9njpqAQXdyxnw/tgialIWqgv4+t0izKcc8VRu7suWOd
+	 4Ua+74YYTrrkw==
+Message-ID: <4d286692-3e29-4e8d-b6d9-f04ceb748499@thorondor.fr>
+Date: Thu, 29 Jan 2026 11:35:24 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <ce44f61af415521e00ab7492aa16d3d19f00bd5e.1769632071.git.mst@redhat.com>
+Subject: Re: [PATCH v6 0/1] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
+To: ashish.kalra@amd.com, corbet@lwn.net, herbert@gondor.apana.org.au,
+ john.allen@amd.com, nikunj@amd.com, pbonzini@redhat.com, seanjc@google.com,
+ thomas.lendacky@amd.com
+Cc: kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, x86@kernel.org
+References: <20260128194956.314678-1-thomas.courrege@thorondor.fr>
+Content-Language: en-US
+From: Thomas Courrege <thomas.courrege@thorondor.fr>
+In-Reply-To: <20260128194956.314678-1-thomas.courrege@thorondor.fr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 28, 2026 at 03:31:21PM -0500, Michael S. Tsirkin wrote:
->Reorder struct virtio_vsock fields to place the DMA buffer (event_list)
->last. This eliminates the padding from aligning the struct size on
->ARCH_DMA_MINALIGN.
->
->Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
->Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->---
->
->changes from v2:
->	move event_lock and event_run too, to keep
->	event things logically together, as suggested by
->	Stefano Garzarella.
+On 28-01-2026 20:49, Thomas Courrege wrote:
+> Overview
+> --------
+> The SEV-SNP Firmware ABI allows the hypervisor to request an
+> attestation report via the SEV_CMD_SNP_HV_REPORT_REQ firmware command.
+This allow KVM to expose more of AMD’s SEV‑SNP features.
 
-Thanks for that!
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
+It also allow developers to easily request attestation.
+It could maybe be use by some cloud provider to easily provide an
+attestation report through their API, in case the Guest doesn't respond
+fast enough or even to compare the reports.
+> Testing
+> -------
+> For testing this via QEMU, please use the following tree:
+>         https://github.com/Th0rOnDoR/qemu
 >
->Note: this is the only change in v3 and it's cosmetic, so I am
->not reposting the whole patchset.
+> Patch History
+> -------------
+> v5 -> v6:
+> Fix typos issues in documentation
+>
+> v4 -> v5:
+> Set variables in reverse christmas tree order
+> Fix and clean the rsp_size logic
+>
+> v3 -> v4:
+> Add newline in documentation to avoid a warning
+> Add base commit
+>
+> v2 -> v3:
+> Add padding to structure, code format
+> Write back the full MSG_REPORT_RSP structure
+> Remove the memzero_explicit for the report
+>
+> v1 -> v2:
+> Renaming, code format
+> Zeroes the report before returning
 >
 >
-> net/vmw_vsock/virtio_transport.c | 18 +++++++++---------
-> 1 file changed, 9 insertions(+), 9 deletions(-)
+> Any feedback is appreciated.
 >
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 999a0839726a..b333a7591b26 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -55,15 +55,6 @@ struct virtio_vsock {
-> 	int rx_buf_nr;
-> 	int rx_buf_max_nr;
+> Thanks,
+> Thomas
 >
->-	/* The following fields are protected by event_lock.
->-	 * vqs[VSOCK_VQ_EVENT] must be accessed with event_lock held.
->-	 */
->-	struct mutex event_lock;
->-	bool event_run;
->-	__dma_from_device_group_begin();
->-	struct virtio_vsock_event event_list[8];
->-	__dma_from_device_group_end();
->-
-> 	u32 guest_cid;
-> 	bool seqpacket_allow;
 >
->@@ -77,6 +68,15 @@ struct virtio_vsock {
-> 	 */
-> 	struct scatterlist *out_sgs[MAX_SKB_FRAGS + 1];
-> 	struct scatterlist out_bufs[MAX_SKB_FRAGS + 1];
->+
->+	/* The following fields are protected by event_lock.
->+	 * vqs[VSOCK_VQ_EVENT] must be accessed with event_lock held.
->+	 */
->+	struct mutex event_lock;
->+	bool event_run;
->+	__dma_from_device_group_begin();
->+	struct virtio_vsock_event event_list[8];
->+	__dma_from_device_group_end();
-> };
+> Thomas Courrege (1):
+>   KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
 >
-> static u32 virtio_transport_get_local_cid(void)
->-- 
->MST
+>  .../virt/kvm/x86/amd-memory-encryption.rst    | 28 +++++++++
+>  arch/x86/include/uapi/asm/kvm.h               |  9 +++
+>  arch/x86/kvm/svm/sev.c                        | 63 +++++++++++++++++++
+>  drivers/crypto/ccp/sev-dev.c                  |  1 +
+>  include/linux/psp-sev.h                       | 31 +++++++++
+>  5 files changed, 132 insertions(+)
 >
-
+>
+> base-commit: e89f0e9a0a007e8c3afb8ecd739c0b3255422b00
