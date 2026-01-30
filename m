@@ -1,139 +1,141 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24ED92E7635;
-	Fri, 30 Jan 2026 10:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769770505; cv=none; b=W/icVZpe8n2vEjAaU33WcsCZRalCal/nVVcq7PKLdGSQZZgGrZmp+hIgNNSw6SFn/2VZaYkJaRkFK+svFnvmgAkQ8b2K9bEi0A+zhS3H+YtpkA/xu/8ozu3izWZUsQyD8MEybX6++ub37NfvpQDDkeb2mbRtpxuwcb6G4nN51hQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769770505; c=relaxed/simple;
-	bh=PfGhrwDBvnyJGSf07tST4uLH0Yc/ByVy5mKSsiaQcTw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=djl1Z1QDwq9CmIUGTktJncPNaukpE/Rh37gqjA+yEuc02z5Ef5QxbryxK93Y+YhX6KOvL6ylUqbPHhWPSHXuLqHfZOTcl+U5zaM/3hwt1pVBHR6A3DxQO6ngpAoN1R9wNUstcLoCoeeJu3aJZPPxiS/SpEmlrBzxTN7/5AC0qk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=e63ACIJc; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE69369997
+	for <linux-crypto@vger.kernel.org>; Fri, 30 Jan 2026 11:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769771670; cv=pass; b=a6zT/IqBy49U3xMdcdTaXhA9Au2oe1ca5GIBwNCWcImeJkI0wVRWIGB8HGtRK5GAEe365xsYRolR1mfHN7ZWtlo2dku6JBec4+SJojYRjChgFW/pd/ul37fjqDo//5dQFjHcbW3LOk+FwS5Tl5ZwJA8GLIUVO7+SQTevK/rSHew=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769771670; c=relaxed/simple;
+	bh=5NX6/8aQxy3kGKKmxgUb8QfLiJ2pU03lf0e4EyOMnpg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bXxbfBRlNOYjsPpD1+ukxvgfXf+22UCBAnm/Ofa5PWghQ9cdJDaRIVGcaH5J/UgZsBLi0quC7JoEaby0cJoV1ZIyXP2O7VUQwYUpOApfsOE0nioY7zY/27ZCpqYScpSudFDjMHUwgvAMoQbOfPKubUNmMHJsjuovpvOXqOTGfqg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=njpetUAn; arc=pass smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="e63ACIJc"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 60U4w8jm024677;
-	Fri, 30 Jan 2026 10:54:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=eNs2g1
-	LsTZG8YiPhOaS+wm6vbiDXF600sQYW5bWT6ww=; b=e63ACIJcVHCbxLRjkVzSpo
-	yaQAxbpyJ0FL85xIDS+x4pYhfKULntfG+YVNHEMGy0jwRGVWUOFhj5GT7m4pFpNO
-	CdJdkIRrFlWdGhngqPRECIMchCldS5kfaSP9nrh97xeexFzIrViKArozjkDaEhDX
-	44G6a77NKNjJKOYl/x5xEyCZA7z3IUyXOSNCnKNOFRzjC6udc4abai28cCTzd07c
-	IlHmqD0J9WpbVujxqyw0TnVsoQfJcYYryQTrfAWXxthHYI2fWIDZPDyDc/HQYuRP
-	2ucdKrbGkM2/mzMpGLrhgaOYhmgol3c4BzusqRY6d4z+8yTN5PaTuMMLPkg2oeEw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4bvnrtwdce-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 30 Jan 2026 10:54:58 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 60UAsvHa020435;
-	Fri, 30 Jan 2026 10:54:57 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4bvnrtwdcb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 30 Jan 2026 10:54:57 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 60U805uS018239;
-	Fri, 30 Jan 2026 10:54:57 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4bwb425mxw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 30 Jan 2026 10:54:56 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 60UAst4448890302
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 30 Jan 2026 10:54:55 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 35C4520040;
-	Fri, 30 Jan 2026 10:54:55 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F3BC72004D;
-	Fri, 30 Jan 2026 10:54:54 +0000 (GMT)
-Received: from [9.111.203.46] (unknown [9.111.203.46])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 30 Jan 2026 10:54:54 +0000 (GMT)
-Message-ID: <72667cb9-f30c-4a9d-97b1-355cc23d8b8e@linux.ibm.com>
-Date: Fri, 30 Jan 2026 11:54:52 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="njpetUAn"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-3530715386cso1354103a91.2
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Jan 2026 03:14:29 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769771669; cv=none;
+        d=google.com; s=arc-20240605;
+        b=R8sLPlP5bbQwTOjGBaFfEfA+qIue16XOFQx5FjmigoDJfFSzNICdgDc15kIUD/yrix
+         ps/KjlPKPZeYpOuygp/PipJ+LTGxEl2lPainCzq5n6H+Yteozl8y9woeNIvHfs/fFiNC
+         zs7dqC2m6uSTp2ZEh44+O66rZr/SJhGGcWmDWLr+vX41xRbW9u2NGe8CJpIN596gs6fB
+         IhMh/452OJZ7xpiSB4LTCIiNdEruswGlkut4KYMAe2G+c6KhU11GnknqWhyjBsxoGbkT
+         xpqUloG+iBx5Hs6H99XRPYPm4SpOSWXq9YfxiK4927K7zwTLhnt7BSn8dp+2RM7sdh1q
+         jpoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=5NX6/8aQxy3kGKKmxgUb8QfLiJ2pU03lf0e4EyOMnpg=;
+        fh=QHoiIXmolWsZzlQZ8upZ3XXyARSbrymxfyhZYbnriLo=;
+        b=bocKuxvYNLxvoJ/1/2EFZrrz///6nVzcPNBXK3xkIMfmGne2bpc+tnwWHB+KD50G+S
+         KSR5mdwjOQsdgb+c9ttID/BC8g67PlmQmzovWo0pH49gpcJKAqyytBlJWgrlMFau1STT
+         Qchig7GvydoMtaDytsi1ijZlbGxschQHq4ulic8SLszldSc/4zHAnSBRE57YbqEtyF91
+         PPCYj8d+lSfYTqCtafyBKkhokBJjF/Pcxb4vqhxeMn0bdStMHzFrqOUyE29A40auCTEM
+         bJmLiJZj1nEeQCRwz2wQdTLXhzcq3dAB1gNXd52CjOFQbddqAN8fZP1H+4QuW3vYUfGT
+         OgJQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769771669; x=1770376469; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5NX6/8aQxy3kGKKmxgUb8QfLiJ2pU03lf0e4EyOMnpg=;
+        b=njpetUAn0cqz1PK28IBBfX9oz7IzZeFycB1IpPo0Mi0Al15Y3b/BK9jESZ+D60I1bg
+         Vnxr82FX6nmkTegahag23Eku9cqFRdsmo4O7c9OA3yeC7EmQldUrb/w9aF33F9edEhnV
+         oPCpRC/nCZmSrvOLz0UFQRTF5hu2rtAJc5GRwFnc2L2amBOCLFIAu4iRH1OjvIOju+W5
+         cY0Av7MFBKKSp0ifpsRmKFYNZXFBFPKMnl/5rmxyePNkPPfi01eVMCUjyPbs8V4tykbY
+         9F33Qn472ixPxpY69lPPgNOLM7q5kwDXRqhFe113RyfxLSPJY15DKjo9lC0Lw2qlXiSY
+         xYEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769771669; x=1770376469;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5NX6/8aQxy3kGKKmxgUb8QfLiJ2pU03lf0e4EyOMnpg=;
+        b=onCTFtfNQVjcNJo4kMtXv047JOfN1MSYpib97f7gE1PjG+tYSnKFN+JKjFXhvAZqkM
+         LmtCVXDpKV+Uql00mTmJhjffYrcUNn+4mvvsWSD503D8EWMHEHgXA/XajcTMGheLzQ+n
+         vqR3SooPDR+482evqKip9+dvt1jn9yDiWUhTZ7DUbd1XYI7SuFmd/L2tv80Y890n4zk7
+         ofqU3WXngPPWaON305maGgtaYUn6CQ710PU5yH4jaKSz31jsBL+Im2yhk1ewrnSqhUsu
+         UQHQojSehLjHdeLK+UDzlI7YCY2luaDHGuSIJbfZueBxu925eu9LnGFOnbuHac0XSEK5
+         16Rw==
+X-Forwarded-Encrypted: i=1; AJvYcCXpXZO3SKlb/pl0Y+wU0RrkZwuHIc3MQ8dWaJiCy+5K3mbtDOMf31gAsW6/R2WHtMrj0QDJP/6OLHQ1ZTg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywwsr2QCoS2cwAmELtNtEOErO/dbQKrK6ez0fDAb0T6kY6KH1IR
+	/FwroZ+C/sSaJysc47naf7o1i1UwfmEWoyBnpVnG4q7L18Pj38t9uBVR06Tt0f7VEmu1QeO5+4n
+	axBtwLWQnrOF4DxAOZ7UnhElb/Ya1o5YKPz+CbtRD
+X-Gm-Gg: AZuq6aLFNEmcvHZnynfRDIRj90ABD6dZyuu/3+F1xp6u93SgeEHoouEY8PX/fLXbrYD
+	dYx7L0V2TKxbxzOW2Fezkv0Wmjrq1gp1UGVOlbdYNQZlSHs2h9ttirTYvKWVY5N8mEuHNGvOi1A
+	7cr3Ng5k94aDJWsMJr2HA6beMovjKFLkE2tJoj2OkcttaFvDTScS+jBY3LoXz2Jztey5b9XUx7p
+	nvYwe0s5Fk/O/cISGk1igqzwEQrFxgxBDCcxFKpuKzdPUMwf/w9jpWKfj3yzk7bXeVaw37YrKLf
+	POmBIMSr9RrcgZQJuWXHVuPNVA==
+X-Received: by 2002:a17:90b:3c43:b0:352:ccae:fe65 with SMTP id
+ 98e67ed59e1d1-3543b2dee06mr2832480a91.4.1769771668673; Fri, 30 Jan 2026
+ 03:14:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/1] lib/crypto: tests: Add KUnit tests for AES
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: David Laight <david.laight.linux@gmail.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <20260119121210.2662-1-dengler@linux.ibm.com>
- <20260119121210.2662-2-dengler@linux.ibm.com> <20260129011838.GG2024@quark>
-From: Holger Dengler <dengler@linux.ibm.com>
-Content-Language: de-DE
-In-Reply-To: <20260129011838.GG2024@quark>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8sU2n6PKuzjxV91B0RDJyCsSVoSXK271
-X-Authority-Analysis: v=2.4 cv=Uptu9uwB c=1 sm=1 tr=0 ts=697c8e02 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=Dpw4ZtHDUR9mF3UXEZMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: N13H_VHvfp7G3iTremcMJGw1rwzNj73v
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTMwMDA4NyBTYWx0ZWRfX+tuN/npe6Zvn
- +ADo5fB421kj4JkVQJixRbk1VRgRECVbj9hlem8kR1X85v9UYi1eualAtSgdXrD4kXJZX6Wb+Us
- 5pmoNuGYUTcgoiPkLwWOr3pNrLxMANGrAVLWlaCzgvuSGvxJOpiVEL0SjLqjEpIU26s2SRvmq52
- NUek2xMXZyeCPqpsSACvdx6YB/a6rFWnM7npC0NvE4nG+fJMAtE0YYKOo7TGNE5NR2ELMdD1WFS
- UE59PzeX8If3vGsQj8XapVTYoMfJCo2ul3MZ96yLmVKjau0rY2Z2zUtGqbkByNc8ciXl6m4YSoQ
- nG4kfCDFKSzOaP7TD8eEy7TzrxGMsTVESaYw38G9JaH0gYVa2yX2NfH/FGbiA0LFnNbaarBfFPa
- 9SQtPXvmfkzvrPIvOiAqo+OtnfrlcptDHsmLpF1vmeJrkXcgdVBSYKsGsfvCjCi1re8m+vJsOYZ
- knzNdNaCC70C7aoFhZA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-30_01,2026-01-29_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 priorityscore=1501 clxscore=1015 lowpriorityscore=0
- phishscore=0 adultscore=0 impostorscore=0 bulkscore=0 spamscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2601150000
- definitions=main-2601300087
+References: <20260112192827.25989-1-ethan.w.s.graham@gmail.com> <CAG_fn=W6wdFHYsEqkS37iWOkJUZqS0LUEg-N2HWo+3Rw-76v4A@mail.gmail.com>
+In-Reply-To: <CAG_fn=W6wdFHYsEqkS37iWOkJUZqS0LUEg-N2HWo+3Rw-76v4A@mail.gmail.com>
+From: Alexander Potapenko <glider@google.com>
+Date: Fri, 30 Jan 2026 12:13:49 +0100
+X-Gm-Features: AZwV_Qg0luMSY0y1N1xh2lvqYlNWV--Rlx3KALTJGGklX1gYVl6nq4JAZoKUMIQ
+Message-ID: <CAG_fn=URHwuOuF_RNyxDCJZmjAFKSf4kHau6uTsFFPrTB=3-Kw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/6] KFuzzTest: a new kernel fuzzing framework
+To: shuah@kernel.org, skhan@linuxfoundation.org
+Cc: akpm@linux-foundation.org, andreyknvl@gmail.com, andy@kernel.org, 
+	andy.shevchenko@gmail.com, brauner@kernel.org, brendan.higgins@linux.dev, 
+	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com, 
+	dvyukov@google.com, ebiggers@kernel.org, elver@google.com, 
+	gregkh@linuxfoundation.org, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
+	jack@suse.cz, Ethan Graham <ethan.w.s.graham@gmail.com>, jannh@google.com, 
+	johannes@sipsolutions.net, kasan-dev@googlegroups.com, kees@kernel.org, 
+	kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lukas@wunner.de, 
+	mcgrof@kernel.org, rmoar@google.com, sj@kernel.org, tarasmadan@google.com, 
+	wentaoz5@illinois.edu
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 29/01/2026 02:18, Eric Biggers wrote:
-> "AES_BLOCK_SIZE * NSEC_PER_SEC" is missing a cast to u64, as reported by
-> the kernel test robot.
-> 
-> But also as discussed in v1, using ktime_get_ns() to time one AES block
-> en/decryption at a time doesn't really work.  Even on x86 which has a
-> high precision timer, it's spending longer getting the time than doing
-> the actual AES en/decryption.
-> 
-> You may have meant to use get_cycles() instead, which has less overhead.
-> 
-> However, not all architectures have a cycle counter.
-> 
-> So I recommend we go with the simple strategy that I suggested, and
-> which v1 had.  Just the number of iterations in v1 was way too high.
+On Tue, Jan 20, 2026 at 3:26=E2=80=AFPM Alexander Potapenko <glider@google.=
+com> wrote:
+>
+> On Mon, Jan 12, 2026 at 8:28=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gm=
+ail.com> wrote:
+> >
+> > This patch series introduces KFuzzTest, a lightweight framework for
+> > creating in-kernel fuzz targets for internal kernel functions.
+> >
+> > The primary motivation for KFuzzTest is to simplify the fuzzing of
+> > low-level, relatively stateless functions (e.g., data parsers, format
+> > converters) that are difficult to exercise effectively from the syscall
+> > boundary. It is intended for in-situ fuzzing of kernel code without
+> > requiring that it be built as a separate userspace library or that its
+> > dependencies be stubbed out.
+> >
+> > Following feedback from the Linux Plumbers Conference and mailing list
+> > discussions, this version of the framework has been significantly
+> > simplified. It now focuses exclusively on handling raw binary inputs,
+> > removing the complexity of the custom serialization format and DWARF
+> > parsing found in previous iterations.
+>
+> Thanks, Ethan!
+> I left some comments, but overall I think we are almost there :)
+>
+> A remaining open question is how to handle concurrent attempts to
+> write data to debugfs.
+> Some kernel functions may not support reentrancy, so we'll need to
+> either document this limitation or implement proper per-test case
+> locking.
 
-Ok, I'll send a v3.
+Hi Shuah, I wanted to bring this series to your attention.
+There are some comments to be addressed in v5, but overall, do you
+think the code qualifies as "having no dependency on syzkaller"?
 
-> 
-> - Eric
-
--- 
-Mit freundlichen Grüßen / Kind regards
-Holger Dengler
---
-IBM Systems, Linux on IBM Z Development
-dengler@linux.ibm.com
-
+Thanks!
