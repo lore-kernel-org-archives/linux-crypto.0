@@ -1,85 +1,104 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520722E764D
-	for <linux-crypto@vger.kernel.org>; Fri, 30 Jan 2026 12:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BD52FBE1C;
+	Fri, 30 Jan 2026 12:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769775464; cv=none; b=CmOCmmrU/RrssUh/0KoBZz7v2bA5EAXDYOdRoGDLGe0zS8zBIE34HfBCtF1JKrWD2gj9E2iwQQ2GTMJwb+F5VJxeoHSVo72qP7x56UYNwtSHXXII/SUs8pYia9g8Z/oRAmZX99NdpNKEQSkgJOQIGQVkEqE2bc63kjsHIzrAgJo=
+	t=1769777363; cv=none; b=Ft/bxMa/vYIWAzNu1bCHwqRhCDQ2IuCEJA6u1633g63SS/7s7bpALI9UxSK+VzsiTuG5DrNjmfW1jNOhCerqhX4PeuN2IVlGZUnvFx9RkU7AwlIIvOjosRnxG6k26Jq3dIIq7kMNkucICerd9QDOsN+2qcKY0m+vULohqmOiIWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769775464; c=relaxed/simple;
-	bh=pQYiXMP6QX8T/5xnW276lNpDzkeZ8aQu2QGXGKO1IKc=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=Th0NdWJCB/mz3jmFjd644ZC1C5oBLmqEN+Jak4fZN9f7rbioG0JtxAOgDNO2n3grEHBMM5GfDSGd2Y2b5H2k2CQwKsJqL81fzW72tRg94kP4HNpuM5r20pSB8TTZNlyctRnIsmrD6oHMKC7GCVqDECfbnR17LhJyKZAbwDk+pXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jUDcOTRv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1769777363; c=relaxed/simple;
+	bh=cAX2yMpHCzbcKbcgdb9q0rgQh4WMr5xY/ZQPAOFUx5s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JfrHggI/woOnuRTQANUBir4wGU0TV5SDhD7WGind+5EBnUOU3fyrWI3LUbt6k2rpw7UmHGCO5jD9RluJ9KCOhdnvN/UbgaY9LWAgxosArISgr61wOWJWCM88i6Uxt2DVDkUu8zlQGB9/RGfvMTYJcDbGJZ9vrpvbp1uZlTi96eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LQnVS/MY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jUDcOTRv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769775462;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=99yUStWJqFWqwChJ5d1IzxZNNe+wRHK4BzUn4qr9ia4=;
-	b=jUDcOTRv4xHxv42XG6hBezq9YX6OJNylh/IgvvWEXqJM7eSZolm+2xmhtYL76iFyNy5ODC
-	Rhv4iz887X5MI5lwpKf+JTbtGSz7KywMBrbmNgK99T1dykWrLDH4z2fuLoAW8NaZPoliDb
-	w20XR5yKxxqvWSGDfMi90Fkz24LAIqc=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-39-BH22Tj7gOwGE_5fDIQPDvg-1; Fri,
- 30 Jan 2026 07:17:37 -0500
-X-MC-Unique: BH22Tj7gOwGE_5fDIQPDvg-1
-X-Mimecast-MFC-AGG-ID: BH22Tj7gOwGE_5fDIQPDvg_1769775455
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0628A1954B0B;
-	Fri, 30 Jan 2026 12:17:35 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.33.164])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1D09419560A7;
-	Fri, 30 Jan 2026 12:17:29 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Stephen Rothwell <sfr@canb.auug.org.au>,
-    Mark Brown <broonie@kernel.org>
-Cc: dhowells@redhat.com, Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>,
-    Jarkko Sakkinen <jarkko@kernel.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
-    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-    linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Pick up keys-next branch for linux-next?
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LQnVS/MY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D29A0C116D0;
+	Fri, 30 Jan 2026 12:49:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769777363;
+	bh=cAX2yMpHCzbcKbcgdb9q0rgQh4WMr5xY/ZQPAOFUx5s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LQnVS/MY94zvVXcqxpPESkFLKApvATe6Zaj4fGsLJ1eMtOS5AKEogzH6nkCdLBM2B
+	 XFElEGiEnRyGYf8Tb50LdpWk9oFEAE3tNKOZ88TfYwFM46f2g9djJ8fG/Cm6bVVIVC
+	 P6PLJJtYZOt/AKeO1b9CmtzES2KOSGGFZEEwHfOXXLjHttbUi69FjfdCh2GUBokq24
+	 Ntp/ypY65vPeClkGaUcC50guUqt3XnNlejlfj/f0Ifv50yHuxQMQXzjjZ7KfRFuhvK
+	 A19DbmH0qGH5KWC7fI160Za+MJBOEpI1o/NVUOYJRqGRqdSrfQdGDePOUiOa2FqjWi
+	 bIxbezZ7+vkhA==
+Date: Fri, 30 Jan 2026 12:49:18 +0000
+From: Mark Brown <broonie@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Pick up keys-next branch for linux-next?
+Message-ID: <daf8d8d0-60e4-4f0a-b535-25b99559aa79@sirena.org.uk>
+References: <2261418.1769775448@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2261417.1769775448.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Jan 2026 12:17:28 +0000
-Message-ID: <2261418.1769775448@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="+lGDKZdOwVpbLOWc"
+Content-Disposition: inline
+In-Reply-To: <2261418.1769775448@warthog.procyon.org.uk>
+X-Cookie: War is an equal opportunity destroyer.
 
-Hi Stephen, Mark,
 
-Can you pick up my keys-next branch for linux-next please?  It can be foun=
-d at:
+--+lGDKZdOwVpbLOWc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/
-	keys-next
+On Fri, Jan 30, 2026 at 12:17:28PM +0000, David Howells wrote:
 
-Note that it's based on part of Eric Bigger's libcrypto/libcrypto-next bra=
-nch
-which I believe you already have in order to get ML-DSA support.
+> Can you pick up my keys-next branch for linux-next please?  It can be found at:
 
-Thanks,
-David
+> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/
+> 	keys-next
 
+> Note that it's based on part of Eric Bigger's libcrypto/libcrypto-next branch
+> which I believe you already have in order to get ML-DSA support.
+
+I'll add this from today, called "keys-next", with you as the contact -
+anyone else?
+
+Thanks for adding your subsystem tree as a participant of linux-next.  As
+you may know, this is not a judgement of your code.  The purpose of
+linux-next is for integration testing and to lower the impact of
+conflicts between subsystems in the next merge window.
+
+You will need to ensure that the patches/commits in your tree/series have
+been:
+     * submitted under GPL v2 (or later) and include the Contributor's
+        Signed-off-by,
+     * posted to the relevant mailing list,
+     * reviewed by you (or another maintainer of your subsystem tree),
+     * successfully unit tested, and
+     * destined for the current or next Linux merge window.
+
+Basically, this should be just what you would send to Linus (or ask him
+to fetch).  It is allowed to be rebased if you deem it necessary.
+
+--+lGDKZdOwVpbLOWc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAml8qM0ACgkQJNaLcl1U
+h9AbNAf9GOugPnvrCKzHbhNTJQc+43n7GS+0TdUTBtMMAJr0SD9rcJ4wSAjf/1wl
+pTkZgkMyddvNH5GAdbL0qQdf4+9IH83yaH9hTV609LLgj9/KLUAdyzSJMW6EN45M
+vhHBbIBU176X57yfdk5flfWXfzjoYIcGc39vXPDsoGQtUIh/+rr/fsByGT7cyzjV
+3kdU3DldSbEWVlEF+U3xhAVxO4KWGJwGbRWiS/P4L4ic1qhDj3ry0FkIMKrWEu7K
+3clXUYFgLz60HSFO9DsXV812KrcT4hNTJGasY5P3y5JX3L+15sI/FrTCYB4Xc5GI
+qzEcEsWTvFWl/JbBhKAn8T7he+IWlA==
+=890+
+-----END PGP SIGNATURE-----
+
+--+lGDKZdOwVpbLOWc--
