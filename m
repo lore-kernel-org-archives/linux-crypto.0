@@ -1,104 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BD52FBE1C;
-	Fri, 30 Jan 2026 12:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769777363; cv=none; b=Ft/bxMa/vYIWAzNu1bCHwqRhCDQ2IuCEJA6u1633g63SS/7s7bpALI9UxSK+VzsiTuG5DrNjmfW1jNOhCerqhX4PeuN2IVlGZUnvFx9RkU7AwlIIvOjosRnxG6k26Jq3dIIq7kMNkucICerd9QDOsN+2qcKY0m+vULohqmOiIWQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769777363; c=relaxed/simple;
-	bh=cAX2yMpHCzbcKbcgdb9q0rgQh4WMr5xY/ZQPAOFUx5s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JfrHggI/woOnuRTQANUBir4wGU0TV5SDhD7WGind+5EBnUOU3fyrWI3LUbt6k2rpw7UmHGCO5jD9RluJ9KCOhdnvN/UbgaY9LWAgxosArISgr61wOWJWCM88i6Uxt2DVDkUu8zlQGB9/RGfvMTYJcDbGJZ9vrpvbp1uZlTi96eY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LQnVS/MY; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F80D37F113
+	for <linux-crypto@vger.kernel.org>; Fri, 30 Jan 2026 12:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769777963; cv=pass; b=NqiF5OQwNVWTKPKuJbdO85PbpufzZD8qIx8lrw6mAWEn7ccnO0B+bk3AXNkkLi9zUKRGAFwxLe0oD9G1PyKMFeJ0oMZCpF8PEpKSxg3Fz5fvc9phZmN8a0KCUhgeeKgKspLwr9KdSY0BzjU0t3e/QAVoe7wyNTuGQAwPjI/MS7s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769777963; c=relaxed/simple;
+	bh=xG0HoGtWgtaeO6rMJ6ftZ42hhmA+SOj2D6UatodVRxE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=EQl5JkIoxmGpbcfGbbNbpZVbkmOA9HvoEVDFmw4Y9tdgCaafRgQ7P10m24uqOd1TNWPAmyrkJ4dKfj0f91dc/8j8x+nBmiHL2eoUjjU8PaCZaRl5Lc8ULErNa8IaNEB4ukUCpsE5RHSrTDt/Nn28LIG5SEORlhTe7HvRu85wFhU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lYWwVwOl; arc=pass smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LQnVS/MY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D29A0C116D0;
-	Fri, 30 Jan 2026 12:49:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769777363;
-	bh=cAX2yMpHCzbcKbcgdb9q0rgQh4WMr5xY/ZQPAOFUx5s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LQnVS/MY94zvVXcqxpPESkFLKApvATe6Zaj4fGsLJ1eMtOS5AKEogzH6nkCdLBM2B
-	 XFElEGiEnRyGYf8Tb50LdpWk9oFEAE3tNKOZ88TfYwFM46f2g9djJ8fG/Cm6bVVIVC
-	 P6PLJJtYZOt/AKeO1b9CmtzES2KOSGGFZEEwHfOXXLjHttbUi69FjfdCh2GUBokq24
-	 Ntp/ypY65vPeClkGaUcC50guUqt3XnNlejlfj/f0Ifv50yHuxQMQXzjjZ7KfRFuhvK
-	 A19DbmH0qGH5KWC7fI160Za+MJBOEpI1o/NVUOYJRqGRqdSrfQdGDePOUiOa2FqjWi
-	 bIxbezZ7+vkhA==
-Date: Fri, 30 Jan 2026 12:49:18 +0000
-From: Mark Brown <broonie@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Pick up keys-next branch for linux-next?
-Message-ID: <daf8d8d0-60e4-4f0a-b535-25b99559aa79@sirena.org.uk>
-References: <2261418.1769775448@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYWwVwOl"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-65819e75691so3613256a12.3
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Jan 2026 04:59:21 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769777960; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fi+JgdDRLZdkich72j74JX06lyghcOvFHNA8xnY/r5YPbGMQzO6J5muNqBZMcHBEOg
+         KHelsifRXlg5bK5FOYAJDMzlK+W7jKrU2et0xJS7V/xBzWhuI5d6bDSQ56JT+IqjS5Lr
+         0KsTcugSYabT9dddOw22gb60vxt2AJzQ/sbdnOqLJIFlYqvBCedonrmeu0DTi1u4M2uY
+         lSp5kFv50NZdpC/faSTSMEgAMI5wDbvKKqHWMWVeoLuMKLbQ5oa1n+kc7tW6WfYYZvdC
+         WYfjv/S00Kc7oq8Pmiqh0rPuLoTOcBloJaINL/VpyEfoLSna7MZBQorqy3bf0T/nt1fz
+         JqpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :dkim-signature;
+        bh=/5hVLHdfoH2KEaRhGo53o2eC57XReA1/Lk8YzkL01/8=;
+        fh=lFoZMv6n4xFsjsZhIP9su14HJja5A+wqcdw18a2I3UI=;
+        b=YDPg8F50XPvaN1Pet4n/zJzJTahFGs6xC57SmuKo3STm/BxV/ZGW/3Cuqr7Yo6cZdW
+         LYkv6uVNA2K7kdAvF05EiknY+ShAGghBsmsSVV8o0cj8v2dFo6uUDcRJrIF5PGrQ4k3t
+         G/ru8ycxXOoi1hAAwyxvkSKcQdqa2rWZA5IXvRbX734i9qH93zz5mMosrvz0RtsBcLXz
+         0V0bmznmr9PKqmyVIp0+E96vovPpcEQCCvPxhVUtza69tiPbwognxSnK0T68fN9VOaIR
+         Bv7FhJ7G9Pnge8FRRoGGyGNUOG/L0GOrIcBHufrU3CD/Ac3oUGymp8nx/fSKtLURRECY
+         eisw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769777960; x=1770382760; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/5hVLHdfoH2KEaRhGo53o2eC57XReA1/Lk8YzkL01/8=;
+        b=lYWwVwOlgaPWDuDiRwKlFgDXMzdOrGvIXHLY8DKNG1lenuvrI5RvK4G8Qw/jlkBjCW
+         TuWUcRkZnTBpUv6AgjdMngTt+a+7mLecXSFWkg6w/ZBldxl5T6FxafK+tYJ64IiW1x9x
+         zQwTvmL42+yNz9VkV03ndd5W8ER1d8x644mZfRWDrKU3WzDxkVwWVA9/QHiyENZDIh7Z
+         DQszxYhE0zB6XXH+jqYCvT+8cKE063yS+0nep5Wn/bvYXBxuwPtGa69zQ7wYTZ1/fb8g
+         Phh6r2HZGMR4/JL/pk16RkMCJ3dFw91M+gHWP6Pe7fWLPa/Es7KGLGg+83Izlope8zSk
+         39Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769777960; x=1770382760;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/5hVLHdfoH2KEaRhGo53o2eC57XReA1/Lk8YzkL01/8=;
+        b=nGNKnKi0H57ObIgLELN56zJYo+DlmH9pjWwLV2qQ0zmLHu2LX7mGpbR/OAi3vt3xKU
+         gEh+RbmIviwebHSXbBS3s/M+ddWMAi74aJW40yE7S8MFpxg///hnaDNaAdk3veCzuOmb
+         5HVpKaOy1xUJwmJn+TsTG1OqlC+fn/opsvZ539myhgIyoMsBTShXUTf1J7XSMEFCtX1X
+         GHdEj1LWpF9R3mtxsPoiRu2McRgbuhXJiL0861fe0pImkyHBrBMClaebgPB4VcLsBb+0
+         KbiTYft8/SdzGY549HHJBbiu3IFanguVqY9RyDYXewdgxWExEbmigWS4+2zJcFeTuudV
+         KJlA==
+X-Forwarded-Encrypted: i=1; AJvYcCUK7HqfhUW0WCU08uEgUmskPa36eGoNkgHkrX98Ux0cHNV+w9bmecotWh/Cxcc4S5z9rgTqDIwAqdjGkCQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPuzLAvxNtGo4S70XHj8KNCEMW88FYUzC21EiCfDbIO0lvz4cp
+	sRUvnHouI/61Ny5A36yWwdkjm6yG4eMQyqPij4MJy9xLFiBlGyllhxP/Skwh62l7fpyYAK/iuxr
+	NzChdWqbVJnXJ5HPnJ7rKMWMIZ7nWgQo=
+X-Gm-Gg: AZuq6aLqSTXL8gAPoswmktffbQVEaN5vqfKujezzTlE6N297qAXK/aBdF9dECvKNwLC
+	mOY7oli99W2WSq5XtcCaTYatG4+9EXWENKBGdE6+yzZ74fY1KDc7DXckvDVKyb/aKy1ge+Mc/zB
+	sVZNyDLJ5Scq+DEzkS5eqcdgoG4fyG+BTMCiw6nGy+VeFlyOe8QWDc1wPAVqCd+/4GQw+7PFJZ1
+	oX8NHWtEesh7bi4omWIuYbvjC5Ga0LvbUJMpvFF9nEbZBcK4DV7LYTJo6Ogjt8tCuwc6Q==
+X-Received: by 2002:a17:907:9303:b0:b87:1b2b:32fc with SMTP id
+ a640c23a62f3a-b8dff221092mr159144566b.0.1769777959652; Fri, 30 Jan 2026
+ 04:59:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="+lGDKZdOwVpbLOWc"
-Content-Disposition: inline
-In-Reply-To: <2261418.1769775448@warthog.procyon.org.uk>
-X-Cookie: War is an equal opportunity destroyer.
+References: <cover.1769026777.git.bcodding@hammerspace.com> <0aaa9ca4fd3edc7e0d25433ad472cb873560bf7d.1769026777.git.bcodding@hammerspace.com>
+In-Reply-To: <0aaa9ca4fd3edc7e0d25433ad472cb873560bf7d.1769026777.git.bcodding@hammerspace.com>
+From: Lionel Cons <lionelcons1972@gmail.com>
+Date: Fri, 30 Jan 2026 13:58:42 +0100
+X-Gm-Features: AZwV_Qg9cHb_cy5s1iZbkKmSD6O6rh8Vs18I0Fb-ECMjeghOuBS5bTI7gCCvHXs
+Message-ID: <CAPJSo4XhEOGncxBRZcOL6KmyBRY+pERiCLUkWzN7Zw+8oUmXGg@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] NFSD: Sign filehandles
+To: linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+On Wed, 21 Jan 2026 at 22:03, Benjamin Coddington
+<bcodding@hammerspace.com> wrote:
+>
+> NFS clients may bypass restrictive directory permissions by using
+> open_by_handle() (or other available OS system call) to guess the
+> filehandles for files below that directory.
+>
+> In order to harden knfsd servers against this attack, create a method to
+> sign and verify filehandles using siphash as a MAC (Message Authentication
+> Code).  Filehandles that have been signed cannot be tampered with, nor can
+> clients reasonably guess correct filehandles and hashes that may exist in
+> parts of the filesystem they cannot access due to directory permissions.
+>
+> Append the 8 byte siphash to encoded filehandles for exports that have set
+> the "sign_fh" export option.  The filehandle's fh_auth_type is set to
+> FH_AT_MAC(1) to indicate the filehandle is signed.  Filehandles received from
+> clients are verified by comparing the appended hash to the expected hash.
+> If the MAC does not match the server responds with NFS error _BADHANDLE.
+> If unsigned filehandles are received for an export with "sign_fh" they are
+> rejected with NFS error _BADHANDLE.
 
---+lGDKZdOwVpbLOWc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Random questions:
+1. CPU load: Linux NFSv4 servers consume LOTS of CPU time, which has
+become a HUGE problem for hosting them on embedded hardware (so no
+realistic NFSv4 server performance on an i.mx6 or RISC/V machine). And
+this has become much worse in the last two years. Did anyone measure
+the impact of this patch series?
+2. Do NFS clients require any changes for this?
 
-On Fri, Jan 30, 2026 at 12:17:28PM +0000, David Howells wrote:
-
-> Can you pick up my keys-next branch for linux-next please?  It can be found at:
-
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/
-> 	keys-next
-
-> Note that it's based on part of Eric Bigger's libcrypto/libcrypto-next branch
-> which I believe you already have in order to get ML-DSA support.
-
-I'll add this from today, called "keys-next", with you as the contact -
-anyone else?
-
-Thanks for adding your subsystem tree as a participant of linux-next.  As
-you may know, this is not a judgement of your code.  The purpose of
-linux-next is for integration testing and to lower the impact of
-conflicts between subsystems in the next merge window.
-
-You will need to ensure that the patches/commits in your tree/series have
-been:
-     * submitted under GPL v2 (or later) and include the Contributor's
-        Signed-off-by,
-     * posted to the relevant mailing list,
-     * reviewed by you (or another maintainer of your subsystem tree),
-     * successfully unit tested, and
-     * destined for the current or next Linux merge window.
-
-Basically, this should be just what you would send to Linus (or ask him
-to fetch).  It is allowed to be rebased if you deem it necessary.
-
---+lGDKZdOwVpbLOWc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAml8qM0ACgkQJNaLcl1U
-h9AbNAf9GOugPnvrCKzHbhNTJQc+43n7GS+0TdUTBtMMAJr0SD9rcJ4wSAjf/1wl
-pTkZgkMyddvNH5GAdbL0qQdf4+9IH83yaH9hTV609LLgj9/KLUAdyzSJMW6EN45M
-vhHBbIBU176X57yfdk5flfWXfzjoYIcGc39vXPDsoGQtUIh/+rr/fsByGT7cyzjV
-3kdU3DldSbEWVlEF+U3xhAVxO4KWGJwGbRWiS/P4L4ic1qhDj3ry0FkIMKrWEu7K
-3clXUYFgLz60HSFO9DsXV812KrcT4hNTJGasY5P3y5JX3L+15sI/FrTCYB4Xc5GI
-qzEcEsWTvFWl/JbBhKAn8T7he+IWlA==
-=890+
------END PGP SIGNATURE-----
-
---+lGDKZdOwVpbLOWc--
+Lionel
