@@ -1,411 +1,388 @@
-Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.11])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazolkn19010003.outbound.protection.outlook.com [52.103.20.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E54156236
-	for <linux-crypto@vger.kernel.org>; Sat, 31 Jan 2026 11:01:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769857301; cv=none; b=Mo7dZy6/C1ugonZWc/KuTnZvy6dgUNGG04p7J6Jf20K0ryGM3d1iu7lRFaUcS2YbJi1TQLUHAdhGCMVELRFrrRtPHmIKB1q9Eo8REOqNBEw9mV5RkhJNC1ig8UmfPeZPmAirHzb2Xkht9JaLGEts0KPkhFdBWePtnWeleO/UZ3Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769857301; c=relaxed/simple;
-	bh=3LAZTxXTEAdUvbX2gxDX3wnYK0xUq0z032zGknK+2hQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PawlalzWGINavScrdxxR60n9ej1P4zl4thSQDAuFeNqOJtUiB1wMShaxcLlyhJL1Bpj6iHMsb4mAIPuD2Vt7eTNoG9NGfmc/YQ+ZxM5oUwryi5YHpInBPm8gaSSTS1sYvQtXPDdBJ9uS7PvGocQEfEGjwx0TEO1VSdqJ+758vDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=vo6xpdWg; arc=none smtp.client-ip=212.77.101.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E046219E8;
+	Sat, 31 Jan 2026 16:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.20.3
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769875218; cv=fail; b=a8UmOBXylFGoQQf1cSyjqr6mE+Clc/Hh+eNF0DnFl9Mt8Pyg8zLeYL8mF510Cyo866NlKc2LMrGRszgGEC49L5nMwaljYkxlZ4etr93o/1lkEFmPAF3EUO8mzUovC1wxdXT4TvDABEuM5TMdJgk29r/fMCCOOC1YoNJ2ouPukqI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769875218; c=relaxed/simple;
+	bh=ybnyXL0VSRYys0nw3LtUMe7e/+A2/MaRXkDslH1X9Ng=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YBWNmua4lV8WLCMB5Mk4jqTHIrhHasVKV5amLTWUpucWREHy02IgC/G6lcgIEYwqzDRdZ370V4sKHkq0V+BdcAbtzqcD1jFOh1NU9ogPREvWY9Hmly0mUFq9/BU2/HGN8YN125SrIxxchunsg1LtenL7/EEaHvOoh8C/R1xMbC0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=gUSQHWWA; arc=fail smtp.client-ip=52.103.20.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="vo6xpdWg"
-Received: (wp-smtpd smtp.wp.pl 39813 invoked from network); 31 Jan 2026 12:01:28 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1769857288; bh=Mo2WvZ8/LqTz0VHuSkh6/wuKvMNRIWbyHQAL+zQix9w=;
-          h=From:To:Cc:Subject;
-          b=vo6xpdWgl6WGgE3+C86H79fpXbHQpQQ+mZiR0EZT/WC3YfUtp6a2g4Ro5n3L1W9lj
-           koTJRomxLCFcKWI51Da3HnSDLEN8xB5q13hCYwBkjLxqqUqMdvnxTX4UNbi/7+BhCn
-           NvG7my8GjXtcArJ8Q+asPpvOKt2trNHDZ2dOOuf4VXifMmtjTkqE0ET4K8A9YLc4yC
-           xPP4aAjAy6kM6perRYQYEYqfBjEn96d3wYYXA/Fny/13e2jRjKkYetyjdqpHFtpavL
-           qr9JqnHfIm97E9Yxg3lasT5pRF1M6ZVNg2io/xMbN/0BLo1k6yGo40T3pOQCNDs02Y
-           3b5X5uFtAiHug==
-Received: from 83.24.122.77.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.24.122.77])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <herbert@gondor.apana.org.au>; 31 Jan 2026 12:01:28 +0100
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	linux-crypto@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH] crypto: tesmgr - Add test vectors for authenc(hmac(sha384),cbc(aes))
-Date: Sat, 31 Jan 2026 12:01:08 +0100
-Message-ID: <20260131110126.4230-1-olek2@wp.pl>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="gUSQHWWA"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=l/eLMKnZuq6gUqLXyQ3YW31T/0uXbyRbZrOehYGZFsYrqNY4Ksev92HWG6bm91EeMsPdPhTfR2lZbK1YXJcw9FA5ffBzdtlwfcwuh8GSeXieT5QdPwgJy8NocIFZiSNP6nxpeNwObIsQhk/r7Vvb5YpocpfWcVfFSWPxQUwv8umNjybHAO0iBG9loCKuRalfHZD38PAdXA9k59HOSEQ1eNUuHZo/ISk/FlBhm5Wbj567C0oBIeaqmH32SMyrpZmgh8H4m6rq66xUaIHjuwNA1zCiP7Y5WvmDKyZ4a4TBPf3VhhmjoXmnB3+jmOMpgFubW9mDkdrYJZ7reLagXkaF6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xPIjGbz/YfEvYQ4WSjm/YLx9Hn6jfLzJVgxwePzmeUw=;
+ b=yBzrusrcoMooPvN3fYTKdkLok4xhaQ+IOaiCAuDNPPTxCaduc141PUJIDn5AsYUi6q2K1sMNLSxOgLXs3Bb3c7PvqWTZKosvkYCY5vEC9Da/7fyb8nwqrAq27/8f+2mpcWrsjDnBI5vjFJOr35n0dPU3e/0oQ3brAvkW9B7Kah5rKHH20Ct3IAkkd4Cs6UvgSxN3JnV7tJXam2Jp7eYbw3j8bNnLZR5GmEa/PJQuKsEzqIgf9TjxPuqBPzrQ38Qcppl9ADNoJN/3/cVYXRln3k6v3YeNLoPDM3fv5+vA4ymitu9cNbbqxLZNEcKv4zVVRVQNrylBuB37QYRkdVi0iw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xPIjGbz/YfEvYQ4WSjm/YLx9Hn6jfLzJVgxwePzmeUw=;
+ b=gUSQHWWAmQUiMDDXLiGaqQWXyatLMq/tWjIfYZEI1Y7j4MronZA6Qlz8EL884qtjXuJQbx6/0QSbDyHjjyUGz/Mna9vMFGyNAQAY7jCYJFZyTp3hdnTm/WCv1gt6I8IoiVltBiWlgfHYnpcb8/v8ZDhAaOopoHR5URc/1H+4RZAug+cNs08oT2xqmwRxF+XrHw0KE3bxRTC1NrjpVNX0ceOrNB1LsK6fQ/f3RJx/Z+LPYBjQfjNgWxItgBi40NUvDQAV4mopc9XCKvCOxDutXriqmdvxVjt8b7r93fMR1+uChgObUs8oEsFcWpGnGqb142FfVVS3kghmCr7FGvIQaQ==
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
+ by SA1PR02MB9831.namprd02.prod.outlook.com (2603:10b6:806:376::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.8; Sat, 31 Jan
+ 2026 16:00:14 +0000
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::900:1ccf:2b1e:52b6]) by SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::900:1ccf:2b1e:52b6%6]) with mapi id 15.20.9564.014; Sat, 31 Jan 2026
+ 16:00:13 +0000
+From: Michael Kelley <mhklinux@outlook.com>
+To: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, Ignat
+ Korchagin <ignat@cloudflare.com>
+CC: Jarkko Sakkinen <jarkko@kernel.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>, Eric Biggers <ebiggers@kernel.org>, Luis
+ Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, Daniel
+ Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, "Jason
+ A . Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Stephan
+ Mueller <smueller@chronox.de>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "keyrings@vger.kernel.org"
+	<keyrings@vger.kernel.org>, "linux-modules@vger.kernel.org"
+	<linux-modules@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v15 6/7] modsign: Enable ML-DSA module signing
+Thread-Topic: [PATCH v15 6/7] modsign: Enable ML-DSA module signing
+Thread-Index: AQHcjtC3xUDRE8Ho5kej8+vCQMw4IrVsc8pg
+Date: Sat, 31 Jan 2026 16:00:13 +0000
+Message-ID:
+ <SN6PR02MB415708C0A6E2EB1B5C7BBFB0D49CA@SN6PR02MB4157.namprd02.prod.outlook.com>
+References: <20260126142931.1940586-1-dhowells@redhat.com>
+ <20260126142931.1940586-7-dhowells@redhat.com>
+In-Reply-To: <20260126142931.1940586-7-dhowells@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|SA1PR02MB9831:EE_
+x-ms-office365-filtering-correlation-id: 92177fcc-b657-423c-c022-08de60e1d1dd
+x-ms-exchange-slblob-mailprops:
+ YfhX3sd/0TXC3SDMOKasxb1Truxn0Xe/oumTv5Y4oWH+ckW6aHTm+j58isAPEIQ6qr+mYGZNc1XRWgDlDL3NCVCc5chbdVk4C+pVzii8vswYQzOpSSV8EYiBteMvaU5ocB0FMHetYzBh9gTMHnH1Ddc88x6xOlASDA4OArj9JhqmnAjVwP0iORpWaK6CzNIdV8vvcPkhahXh3y6qOyRcIf/KJQy9yD3JMBzqnERKyKBM5hwBScVsCErGLBbIQBSiWtCiciP+LraAQGWMejgVXJqQHrWWYrS2MLRjpYzZn4dILWfwgJ0dCOy48cuChdkVOSHQGJN4KqhVrtCDMMXWnL16F/VTDVcDJv4ouTbkIX33q+ulNEz9kxG4WNW1cKiPcWDwG9ElqXc7WE7a26eFhFlNP5WsxhHXITSXXZxuNuQ8IkWNzEhPzVSKE31nrxbwwBN6bEm5qGERsmy3jcGqWcI58trbfUB4E0VRvRtANGcEBDMq5eabIXYqBKIYjCzbZefS9SZTunhduubYc6p9GqsREFezOSuKmGTXaGJp12kTOt/eIrijo8+WN+URR6exGpDMhDnk7DtlBeWjWr8dbkVKQnnTLZxTTl9jalZhglgpsm8g+liX96z5q8u5TkBBLzmpYn5jFMkJ+DT6KDLvmW5N1zAJCBoLkZFm2GdoVCpjhQiVH2Oj7qHR4bCiZ4ISznX9mT8PQUKGUzflVMifLQOW+jafPtfVqIh2TeBgcQjPMlzNI3uOOy+Gg/iZFrXCLU/tvt0d/rcMuc0MmuDozbE+M2VpypJQwMhxl/4QU0g=
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|13091999003|39105399006|8062599012|8060799015|15080799012|31061999003|461199028|19110799012|41105399003|40105399003|3412199025|440099028|10035399007|102099032|19111999003;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?dmI88FgMvZN5UVOT08StMmpnBMf3d25VOH6Wh0INp4tHfXGHs3p+GBfi/FJW?=
+ =?us-ascii?Q?f62xh6Ds/IaW//oaPUN3zd9DLxkEsHMcrGpf7ydoWGmvPvZ/EwG4++zkgXKO?=
+ =?us-ascii?Q?MFrCs5IrsaWf8wF0B6wreYxEa7bh0qXW3numIb8dznUwHXZwezp6lZGRKw7V?=
+ =?us-ascii?Q?2P/aWlfVVPMlT138CoUcvQrnVAmvUXlW+gln1yTbSF4lDBRvmhETuLmhC3HX?=
+ =?us-ascii?Q?OEP2rKwMIuqSh9M68HMFZsTXvVtR4qohoioFqcvpnU2SR1f0WhJVPZPzKpHg?=
+ =?us-ascii?Q?NAenpV9nIOEl1XItciQ8BxZlldwubZn0eJq8r8AFv08323d9JBd2gETz7W/2?=
+ =?us-ascii?Q?ZT/4YYe1lR5ZOJhwHtjMBuhebgyKXlpsbBESnFwUnyStQhYOVUF2ViS30Hgd?=
+ =?us-ascii?Q?7buRtHaSRP5bgy9Wy5zQEqRP12e5MgIk2eioqlDSy/MsoQUMaP0Wd7Qo8ics?=
+ =?us-ascii?Q?21lY2AMu6IMMDe0+lQPJH/z5R+Cye6+rKsX6lKzBGlmKu9vqDAZI/1tiHXEg?=
+ =?us-ascii?Q?yNahCanOR+FGXtjghqLzR6DFIJaV+9iyg8w6qG3Rn99LgB0yfiY3Cqy6OtbI?=
+ =?us-ascii?Q?cfRYIbCUYNL34CP0AYN2nKA+SRnrPirUxW+KnpqMryVnYfK7T95QXncS4H5+?=
+ =?us-ascii?Q?WFRAqUrYBqhnCG3/gpt/mXoiYJYmS5fSB5TsFOC6z6JhaAe+RJ5sIR+vNCyQ?=
+ =?us-ascii?Q?WHCczS0qtDkLA6q6lOYCqX78oldOW+2JwdJDaAgCwmNaY+s0admKZACupy9K?=
+ =?us-ascii?Q?ryTkd0RqEKEVzlNPHO1SeAQslkOxqcP1MPyCbXuvBkRJjr+RpIvomAyi4dg7?=
+ =?us-ascii?Q?U3I49sxtB5/dCPhbXFDVYcAlJqqng7Vc05Q4f7EI8t06De3TNB1kfmWGqz2Z?=
+ =?us-ascii?Q?pQNDP+J+v5PJGYRrJaTd/QbqfWgh8jcejfupeSNCzbEPx238eeS5fG0KJIVf?=
+ =?us-ascii?Q?iJCmBGk2Ed7Tr+9g4Q2rifgEoDrIFXrkyr5hV7zEbt9OFADxg1MAzI7SBpKY?=
+ =?us-ascii?Q?iKyz+7b3sSFwTnyGFU+OqL2NLuknt1AFp4xpcA5RvBUV1B+fxuWGE8JeOe9Q?=
+ =?us-ascii?Q?nNpnJFHMO8ipXSpSzEj5mj3ltqsBs3DrEczlw0/zzhRQtwRGxWJwnaHH4T2+?=
+ =?us-ascii?Q?mRk1H71CCvrc7JULyvFaECBDIZFPsylWQErAvVuO9Pos3eKSs+hIx4KRqoVz?=
+ =?us-ascii?Q?LlKt7owRW6fN8IJycy/Yq0OuMOjx5ksIPBKfbu1dfdETlFbO62p4OPkbYvtS?=
+ =?us-ascii?Q?JNA/QgF/t5yrGIhGyIZ98yQZ6f+K+c2yZA7JUktvLWixJ3iwsAv4DJFKQMYs?=
+ =?us-ascii?Q?woY=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?6hG93AT6OtzEi058fiu1lhe86w7qtWEVblkTqC+/vK6I+nR8BgIeEFLo/L/C?=
+ =?us-ascii?Q?GISUFQo5XBs5De7ui6JBQX7Da0LKcBsPGDcGjVsDJZt6Q6FjNYKImgpDwWm7?=
+ =?us-ascii?Q?p6k0LfVRop/Hb2hY2JlerCrHkKFqRcwrvgKFfc+8SOPm/LL1UCnpnG6cebyt?=
+ =?us-ascii?Q?7dNJCwO9du7emHes9Vjf9AIfDBbdmwqgcmfTWHcwxI3DSQ7oT3UPsQ77FMuD?=
+ =?us-ascii?Q?osuhYYEJAE/gYM40IOW9B1qGU/podycMF/1ZwxmlVDzLFkrdYN154OS+gCco?=
+ =?us-ascii?Q?QyOygjrrU6aEnC7UaoKkf++cUH+LPZeSwnzqMUQaGVRvKikJ8iR7NoBlv6tX?=
+ =?us-ascii?Q?GjSY+8Z/9kDfw59UwSAdpAmbbddM0PovsRvtebZ/JMftkyc+Vg5Gl3T++mw/?=
+ =?us-ascii?Q?aqsns/CkgDvLMZ+G5p9ZoEgnpI+xw1sFFHTiK6vc8HnnJLfKdUTU1CbkBJg0?=
+ =?us-ascii?Q?RFV6b+CBJ/YUid3tWDAqbHp3FC07n7gRXrOGv+F2KrsoZ8lFbCstwOq3BfB6?=
+ =?us-ascii?Q?OreJwIcFWI126YrBMQ0PxjPfn2KMNmfvmtiX0/dJ5NVAtH43CiRrGRqShGkZ?=
+ =?us-ascii?Q?2AzzxPNg4578rPZHu5NE28JTcy7cQ3mwoApQzszvy+ukscadbVssJ1U2/4Tt?=
+ =?us-ascii?Q?ZbsdxNZIwt0GOjJQwoi6mn27iOrvdKr85qSA7NFUI3PmwcfV6aDwZgeMVGCV?=
+ =?us-ascii?Q?3s+UrDI0zgQI5a5Lla0Xds6SV+tF9WLYgzb2xDgKZiLgvOtFeHID7iHQ9Fg/?=
+ =?us-ascii?Q?l8iklTNxplWWoPKJEDzsEIHGYriMRB/lYmefit+53kkna4Ph99aNGDPHCf/h?=
+ =?us-ascii?Q?PG3S8fHHKamzelVs7BaoPvXB2oTGHd8e9fIanhtsgKWmaiOnZdJlYAP+p0cm?=
+ =?us-ascii?Q?p+jJmjS/KltiTgh3ts1WaFRTmy7rTNEbLsjp6/+Ice45etNaiT2BrG2T+v9W?=
+ =?us-ascii?Q?f+VbPb/m5EzVnI6Uu6lXkI6F2fJv4gwuLiBXfJmBuXr0WCMA8OLgDIQm7mIH?=
+ =?us-ascii?Q?PYKkKYTAZV/RywxPSMnPgHoXhAaulSFBXAXXdHyapPZtFhMWMhfmGBgRupwp?=
+ =?us-ascii?Q?uMhMUiPV+lManZ4OFF5fZpeIfQH9RAXY6Z3WajtUulWmW/rSsmsfCUb6CJxk?=
+ =?us-ascii?Q?aXHJbO/rQmqlGtqlYMfpBzy2p3e1V8txwRvtG12Txq+Fpt97NB6i5R+ex9Jn?=
+ =?us-ascii?Q?0B8J7qRvpWb7mU3vXuMk/RfomhLMu19XaCoytGadCoWwEWsNK4A1Q1QGHUha?=
+ =?us-ascii?Q?jsLIfAAqOyjVDljL1D6Tms9T/PIaMR+7Yi1etvj4XEJF4AcGPaHAaK8GNrRf?=
+ =?us-ascii?Q?X9mfgZ73kkoxPOkqS8OazED7P51N1pjZRO26ScIZJTk3IsaaqeoTgOP6O0Zy?=
+ =?us-ascii?Q?zAUvrZc=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: 96a5b9dc279b043bb5b849d13b37b5b1
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000008 [AYtX]                               
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92177fcc-b657-423c-c022-08de60e1d1dd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jan 2026 16:00:13.7413
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR02MB9831
 
-Test vectors were generated starting from existing CBC(AES) test vectors
-(RFC3602, NIST SP800-38A) and adding HMAC(SHA384) computed with Python
-script. Then, the results were double-checked on Mediatek MT7981 (safexcel)
-and NXP P2020 (talitos). Both platforms pass self-tests.
+From: David Howells <dhowells@redhat.com> Sent: Monday, January 26, 2026 6:=
+29 AM
+>=20
+> Allow ML-DSA module signing to be enabled.
+>=20
+> Note that OpenSSL's CMS_*() function suite does not, as of OpenSSL-3.6,
+> support the use of CMS_NOATTR with ML-DSA, so the prohibition against usi=
+ng
+> signedAttrs with module signing has to be removed.  The selected digest
+> then applies only to the algorithm used to calculate the digest stored in
+> the messageDigest attribute.  The OpenSSL development branch has patches
+> applied that fix this[1], but it appears that that will only be available
+> in OpenSSL-4.
+>=20
+> [1] https://github.com/openssl/openssl/pull/28923
+>=20
+> sign-file won't set CMS_NOATTR if openssl is earlier than v4, resulting i=
+n
+> the use of signed attributes.
+>=20
+> The ML-DSA algorithm takes the raw data to be signed without regard to wh=
+at
+> digest algorithm is specified in the CMS message.  The CMS specified dige=
+st
+> algorithm is ignored unless signedAttrs are used; in such a case, only
+> SHA512 is permitted.
+>=20
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+> cc: Eric Biggers <ebiggers@kernel.org>
+> cc: Lukas Wunner <lukas@wunner.de>
+> cc: Ignat Korchagin <ignat@cloudflare.com>
+> cc: Stephan Mueller <smueller@chronox.de>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: keyrings@vger.kernel.org
+> cc: linux-crypto@vger.kernel.org
 
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
----
- crypto/testmgr.c |   7 ++
- crypto/testmgr.h | 311 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 318 insertions(+)
+I'm building linux-next20260130, which has this patch, and get the followin=
+g errors:
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index a302be53896d..50cf685a3c6f 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4174,6 +4174,13 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.alg = "authenc(hmac(sha256),rfc3686(ctr(aes)))",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
-+	}, {
-+		.alg = "authenc(hmac(sha384),cbc(aes))",
-+		.generic_driver = "authenc(hmac-sha384-lib,cbc(aes-generic))",
-+		.test = alg_test_aead,
-+		.suite = {
-+			.aead = __VECS(hmac_sha384_aes_cbc_tv_temp)
-+		}
- 	}, {
- 		.alg = "authenc(hmac(sha384),cbc(des))",
- 		.generic_driver = "authenc(hmac-sha384-lib,cbc(des-generic))",
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 80bf5f1b67a6..8f38e96c0ee1 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -16574,6 +16574,317 @@ static const struct aead_testvec hmac_sha256_aes_cbc_tv_temp[] = {
- 	},
- };
- 
-+static const struct aead_testvec hmac_sha384_aes_cbc_tv_temp[] = {
-+	{ /* RFC 3602 Case 1 */
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
-+#endif
-+			  "\x00\x00\x00\x10"	/* enc key length */
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x06\xa9\x21\x40\x36\xb8\xa1\x5b"
-+			  "\x51\x2e\x03\xd5\x34\x12\x00\x06",
-+		.klen   = 8 + 48 + 16,
-+		.iv     = "\x3d\xaf\xba\x42\x9d\x9e\xb4\x30"
-+			  "\xb4\x22\xda\x80\x2c\x9f\xac\x41",
-+		.assoc	= "\x3d\xaf\xba\x42\x9d\x9e\xb4\x30"
-+			  "\xb4\x22\xda\x80\x2c\x9f\xac\x41",
-+		.alen   = 16,
-+		.ptext	= "Single block msg",
-+		.plen	= 16,
-+		.ctext	= "\xe3\x53\x77\x9c\x10\x79\xae\xb8"
-+			  "\x27\x08\x94\x2d\xbe\x77\x18\x1a"
-+			  "\x79\x1c\xf1\x22\x95\x80\xe0\x60"
-+			  "\x7f\xf9\x92\x60\x83\xbd\x60\x9c"
-+			  "\xf6\x62\x8b\xa9\x7d\x56\xe2\xaf"
-+			  "\x80\x43\xbc\x41\x4a\x63\x0b\xa0"
-+			  "\x16\x25\xe2\xfe\x0a\x96\xf6\xa5"
-+			  "\x6c\x0b\xc2\x53\xb4\x27\xd9\x42",
-+		.clen	= 16 + 48,
-+	}, { /* RFC 3602 Case 2 */
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
-+#endif
-+			  "\x00\x00\x00\x10"	/* enc key length */
-+			  "\x20\x21\x22\x23\x24\x25\x26\x27"
-+			  "\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
-+			  "\x30\x31\x32\x33\x34\x35\x36\x37"
-+			  "\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
-+			  "\x40\x41\x42\x43\x44\x45\x46\x47"
-+			  "\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
-+			  "\xc2\x86\x69\x6d\x88\x7c\x9a\xa0"
-+			  "\x61\x1b\xbb\x3e\x20\x25\xa4\x5a",
-+		.klen   = 8 + 48 + 16,
-+		.iv     = "\x56\x2e\x17\x99\x6d\x09\x3d\x28"
-+			  "\xdd\xb3\xba\x69\x5a\x2e\x6f\x58",
-+		.assoc	= "\x56\x2e\x17\x99\x6d\x09\x3d\x28"
-+			  "\xdd\xb3\xba\x69\x5a\x2e\x6f\x58",
-+		.alen   = 16,
-+		.ptext	= "\x00\x01\x02\x03\x04\x05\x06\x07"
-+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
-+			  "\x10\x11\x12\x13\x14\x15\x16\x17"
-+			  "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-+		.plen	= 32,
-+		.ctext	= "\xd2\x96\xcd\x94\xc2\xcc\xcf\x8a"
-+			  "\x3a\x86\x30\x28\xb5\xe1\xdc\x0a"
-+			  "\x75\x86\x60\x2d\x25\x3c\xff\xf9"
-+			  "\x1b\x82\x66\xbe\xa6\xd6\x1a\xb1"
-+			  "\x4e\x5b\xa8\x65\x51\xc6\x58\xaf"
-+			  "\x31\x57\x50\x3d\x01\xa1\xa4\x3f"
-+			  "\x42\xd1\xd7\x31\x76\x8d\xf8\xc8"
-+			  "\xe4\xd2\x7e\xc5\x23\xe7\xc6\x2e"
-+			  "\x2d\xfd\x9d\xc1\xac\x50\x1e\xcf"
-+			  "\xa0\x10\xeb\x1a\x9c\xb7\xe1\xca",
-+		.clen	= 32 + 48,
-+	}, { /* RFC 3602 Case 3 */
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"            /* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
-+#endif
-+			  "\x00\x00\x00\x10"	/* enc key length */
-+			  "\x11\x22\x33\x44\x55\x66\x77\x88"
-+			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
-+			  "\x22\x33\x44\x55\x66\x77\x88\x99"
-+			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
-+			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
-+			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
-+			  "\x6c\x3e\xa0\x47\x76\x30\xce\x21"
-+			  "\xa2\xce\x33\x4a\xa7\x46\xc2\xcd",
-+		.klen   = 8 + 48 + 16,
-+		.iv     = "\xc7\x82\xdc\x4c\x09\x8c\x66\xcb"
-+			  "\xd9\xcd\x27\xd8\x25\x68\x2c\x81",
-+		.assoc	= "\xc7\x82\xdc\x4c\x09\x8c\x66\xcb"
-+			  "\xd9\xcd\x27\xd8\x25\x68\x2c\x81",
-+		.alen   = 16,
-+		.ptext	= "This is a 48-byte message (exactly 3 AES blocks)",
-+		.plen	= 48,
-+		.ctext	= "\xd0\xa0\x2b\x38\x36\x45\x17\x53"
-+			  "\xd4\x93\x66\x5d\x33\xf0\xe8\x86"
-+			  "\x2d\xea\x54\xcd\xb2\x93\xab\xc7"
-+			  "\x50\x69\x39\x27\x67\x72\xf8\xd5"
-+			  "\x02\x1c\x19\x21\x6b\xad\x52\x5c"
-+			  "\x85\x79\x69\x5d\x83\xba\x26\x84"
-+			  "\xa1\x52\xe7\xda\xf7\x05\xb6\xca"
-+			  "\xad\x0f\x51\xed\x5a\xd3\x0f\xdf"
-+			  "\xde\xeb\x3f\x31\xed\x3a\x43\x93"
-+			  "\x3b\xb7\xca\xc8\x1b\xe7\x3b\x61"
-+			  "\x6a\x05\xfd\x2d\x6a\x5c\xb1\x0d"
-+			  "\x6e\x7a\xeb\x1c\x84\xec\xdb\xde",
-+		.clen	= 48 + 48,
-+	}, { /* RFC 3602 Case 4 */
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"            /* rta type */
-+#endif
-+			  "\x00\x00\x00\x10"	/* enc key length */
-+			  "\x11\x22\x33\x44\x55\x66\x77\x88"
-+			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
-+			  "\x22\x33\x44\x55\x66\x77\x88\x99"
-+			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
-+			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
-+			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
-+			  "\x56\xe4\x7a\x38\xc5\x59\x89\x74"
-+			  "\xbc\x46\x90\x3d\xba\x29\x03\x49",
-+		.klen   = 8 + 48 + 16,
-+		.iv     = "\x8c\xe8\x2e\xef\xbe\xa0\xda\x3c"
-+			  "\x44\x69\x9e\xd7\xdb\x51\xb7\xd9",
-+		.assoc	= "\x8c\xe8\x2e\xef\xbe\xa0\xda\x3c"
-+			  "\x44\x69\x9e\xd7\xdb\x51\xb7\xd9",
-+		.alen   = 16,
-+		.ptext	= "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
-+			  "\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
-+			  "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
-+			  "\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
-+			  "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
-+			  "\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
-+			  "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
-+			  "\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
-+		.plen	= 64,
-+		.ctext	= "\xc3\x0e\x32\xff\xed\xc0\x77\x4e"
-+			  "\x6a\xff\x6a\xf0\x86\x9f\x71\xaa"
-+			  "\x0f\x3a\xf0\x7a\x9a\x31\xa9\xc6"
-+			  "\x84\xdb\x20\x7e\xb0\xef\x8e\x4e"
-+			  "\x35\x90\x7a\xa6\x32\xc3\xff\xdf"
-+			  "\x86\x8b\xb7\xb2\x9d\x3d\x46\xad"
-+			  "\x83\xce\x9f\x9a\x10\x2e\xe9\x9d"
-+			  "\x49\xa5\x3e\x87\xf4\xc3\xda\x55"
-+			  "\x85\x7b\x91\xe0\x29\xeb\xd3\x59"
-+			  "\x7c\xe3\x67\x14\xbe\x71\x2a\xd2"
-+			  "\x8a\x1a\xd2\x35\x78\x6b\x69\xba"
-+			  "\x64\xa5\x04\x00\x19\xc3\x4c\xae"
-+			  "\x71\xff\x76\x9f\xbb\xc3\x29\x22"
-+			  "\xc2\xc6\x51\xf1\xe6\x29\x5e\xa5",
-+		.clen	= 64 + 48,
-+	}, { /* RFC 3602 Case 5 */
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"            /* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"            /* rta type */
-+#endif
-+			  "\x00\x00\x00\x10"	/* enc key length */
-+			  "\x11\x22\x33\x44\x55\x66\x77\x88"
-+			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
-+			  "\x22\x33\x44\x55\x66\x77\x88\x99"
-+			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
-+			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
-+			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
-+			  "\x90\xd3\x82\xb4\x10\xee\xba\x7a"
-+			  "\xd9\x38\xc4\x6c\xec\x1a\x82\xbf",
-+		.klen   = 8 + 48 + 16,
-+		.iv     = "\xe9\x6e\x8c\x08\xab\x46\x57\x63"
-+			  "\xfd\x09\x8d\x45\xdd\x3f\xf8\x93",
-+		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01"
-+			  "\xe9\x6e\x8c\x08\xab\x46\x57\x63"
-+			  "\xfd\x09\x8d\x45\xdd\x3f\xf8\x93",
-+		.alen   = 24,
-+		.ptext	= "\x08\x00\x0e\xbd\xa7\x0a\x00\x00"
-+			  "\x8e\x9c\x08\x3d\xb9\x5b\x07\x00"
-+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
-+			  "\x10\x11\x12\x13\x14\x15\x16\x17"
-+			  "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
-+			  "\x20\x21\x22\x23\x24\x25\x26\x27"
-+			  "\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
-+			  "\x30\x31\x32\x33\x34\x35\x36\x37"
-+			  "\x01\x02\x03\x04\x05\x06\x07\x08"
-+			  "\x09\x0a\x0b\x0c\x0d\x0e\x0e\x01",
-+		.plen	= 80,
-+		.ctext	= "\xf6\x63\xc2\x5d\x32\x5c\x18\xc6"
-+			  "\xa9\x45\x3e\x19\x4e\x12\x08\x49"
-+			  "\xa4\x87\x0b\x66\xcc\x6b\x99\x65"
-+			  "\x33\x00\x13\xb4\x89\x8d\xc8\x56"
-+			  "\xa4\x69\x9e\x52\x3a\x55\xdb\x08"
-+			  "\x0b\x59\xec\x3a\x8e\x4b\x7e\x52"
-+			  "\x77\x5b\x07\xd1\xdb\x34\xed\x9c"
-+			  "\x53\x8a\xb5\x0c\x55\x1b\x87\x4a"
-+			  "\xa2\x69\xad\xd0\x47\xad\x2d\x59"
-+			  "\x13\xac\x19\xb7\xcf\xba\xd4\xa6"
-+			  "\x57\x5f\xb4\xd7\x74\x6f\x18\x97"
-+			  "\xb7\xde\xfc\xf3\x4e\x0d\x29\x4d"
-+			  "\xa0\xff\x39\x9e\x2d\xbf\x27\xac"
-+			  "\x54\xb9\x8a\x3e\xab\x3b\xac\xd3"
-+			  "\x36\x43\x74\xfc\xc2\x64\x81\x8a"
-+			  "\x2c\x15\x72\xdf\x3f\x9d\x5b\xa4",
-+		.clen	= 80 + 48,
-+	}, { /* NIST SP800-38A F.2.3 CBC-AES192.Encrypt */
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"            /* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"            /* rta type */
-+#endif
-+			  "\x00\x00\x00\x18"	/* enc key length */
-+			  "\x11\x22\x33\x44\x55\x66\x77\x88"
-+			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
-+			  "\x22\x33\x44\x55\x66\x77\x88\x99"
-+			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
-+			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
-+			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
-+			  "\x8e\x73\xb0\xf7\xda\x0e\x64\x52"
-+			  "\xc8\x10\xf3\x2b\x80\x90\x79\xe5"
-+			  "\x62\xf8\xea\xd2\x52\x2c\x6b\x7b",
-+		.klen   = 8 + 48 + 24,
-+		.iv     = "\x00\x01\x02\x03\x04\x05\x06\x07"
-+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.assoc	= "\x00\x01\x02\x03\x04\x05\x06\x07"
-+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.alen   = 16,
-+		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
-+			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
-+			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
-+			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
-+			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
-+			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
-+			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
-+		.plen	= 64,
-+		.ctext	= "\x4f\x02\x1d\xb2\x43\xbc\x63\x3d"
-+			  "\x71\x78\x18\x3a\x9f\xa0\x71\xe8"
-+			  "\xb4\xd9\xad\xa9\xad\x7d\xed\xf4"
-+			  "\xe5\xe7\x38\x76\x3f\x69\x14\x5a"
-+			  "\x57\x1b\x24\x20\x12\xfb\x7a\xe0"
-+			  "\x7f\xa9\xba\xac\x3d\xf1\x02\xe0"
-+			  "\x08\xb0\xe2\x79\x88\x59\x88\x81"
-+			  "\xd9\x20\xa9\xe6\x4f\x56\x15\xcd"
-+			  "\x29\x9b\x42\x47\x0b\xbf\xf3\x54"
-+			  "\x54\x95\xb0\x89\xd5\xa0\xc3\x78"
-+			  "\x60\x6c\x18\x39\x6d\xc9\xfb\x2a"
-+			  "\x34\x1c\xed\x95\x10\x1e\x43\x0a"
-+			  "\x72\xce\x26\xbc\x74\xd9\x6f\xa2"
-+			  "\xf1\xd9\xd0\xb1\xdf\x3d\x93\x14",
-+		.clen	= 64 + 48,
-+	}, { /* NIST SP800-38A F.2.5 CBC-AES256.Encrypt */
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"            /* rta type */
-+#endif
-+			  "\x00\x00\x00\x20"	/* enc key length */
-+			  "\x11\x22\x33\x44\x55\x66\x77\x88"
-+			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
-+			  "\x22\x33\x44\x55\x66\x77\x88\x99"
-+			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
-+			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
-+			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
-+			  "\x60\x3d\xeb\x10\x15\xca\x71\xbe"
-+			  "\x2b\x73\xae\xf0\x85\x7d\x77\x81"
-+			  "\x1f\x35\x2c\x07\x3b\x61\x08\xd7"
-+			  "\x2d\x98\x10\xa3\x09\x14\xdf\xf4",
-+		.klen   = 8 + 48 + 32,
-+		.iv     = "\x00\x01\x02\x03\x04\x05\x06\x07"
-+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.assoc	= "\x00\x01\x02\x03\x04\x05\x06\x07"
-+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.alen   = 16,
-+		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
-+			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
-+			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
-+			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
-+			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
-+			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
-+			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
-+		.plen	= 64,
-+		.ctext	= "\xf5\x8c\x4c\x04\xd6\xe5\xf1\xba"
-+			  "\x77\x9e\xab\xfb\x5f\x7b\xfb\xd6"
-+			  "\x9c\xfc\x4e\x96\x7e\xdb\x80\x8d"
-+			  "\x67\x9f\x77\x7b\xc6\x70\x2c\x7d"
-+			  "\x39\xf2\x33\x69\xa9\xd9\xba\xcf"
-+			  "\xa5\x30\xe2\x63\x04\x23\x14\x61"
-+			  "\xb2\xeb\x05\xe2\xc3\x9b\xe9\xfc"
-+			  "\xda\x6c\x19\x07\x8c\x6a\x9d\x1b"
-+			  "\x9f\x50\xce\x64\xd9\xa3\xc9\x7a"
-+			  "\x15\x3a\x3d\x46\x9a\x90\xf3\x06"
-+			  "\x22\xad\xc5\x24\x77\x50\xb8\xfe"
-+			  "\xbe\x37\x16\x86\x34\x5f\xaf\x97"
-+			  "\x00\x9d\x86\xc8\x32\x4f\x72\x2f"
-+			  "\x48\x97\xad\xb6\xb9\x77\x33\xbc",
-+		.clen	= 64 + 48,
-+	},
-+};
-+
- static const struct aead_testvec hmac_sha512_aes_cbc_tv_temp[] = {
- 	{ /* RFC 3602 Case 1 */
- #ifdef __LITTLE_ENDIAN
--- 
-2.47.3
+  HOSTCC  scripts/sign-file
+scripts/sign-file.c: In function 'main':
+scripts/sign-file.c:282:25: error: 'CMS_NO_SIGNING_TIME' undeclared (first =
+use in this function)
+  282 |                         CMS_NO_SIGNING_TIME |
+      |                         ^~~~~~~~~~~~~~~~~~~
+scripts/sign-file.c:282:25: note: each undeclared identifier is reported on=
+ly once for each function it appears in
+scripts/sign-file.c:285:22: warning: implicit declaration of function 'EVP_=
+PKEY_is_a'; did you mean 'EVP_PKEY_sign'? [-Wimplicit-function-declaration]
+  285 |                 if ((EVP_PKEY_is_a(private_key, "ML-DSA-44") ||
+      |                      ^~~~~~~~~~~~~
+      |                      EVP_PKEY_sign
+scripts/sign-file.c:288:21: error: 'OPENSSL_VERSION_MAJOR' undeclared (firs=
+t use in this function); did you mean 'OPENSSL_VERSION_NUMBER'?
+  288 |                     OPENSSL_VERSION_MAJOR < 4) {
+      |                     ^~~~~~~~~~~~~~~~~~~~~
+      |                     OPENSSL_VERSION_NUMBER
+
+The problem is that I'm running on Ubuntu 20.04, with this openssl:
+
+# openssl version
+OpenSSL 1.1.1f  31 Mar 2020=20
+
+The symbols CMS_NO_SIGNING_TIME, EVP_PKEY_is_a() and OPENSSL_VERSION_MAJOR
+don't exist in the include/openssl/* files for that old version.
+
+Yes, I'm running on an old distro version which has been out-of-support for=
+ 9 months
+now. But I suspect this patch is not intending to raise the kernel build re=
+quirements
+to be openssl 3.0 or later -- at least there's no mention of that larger im=
+pact in the
+commit message.
+
+Thoughts? Can this patch be enhanced to handle openssl 1.1.1 appropriately?
+
+Michael
+
+> ---
+>  Documentation/admin-guide/module-signing.rst | 16 +++++----
+>  certs/Kconfig                                | 30 +++++++++++++++++
+>  certs/Makefile                               |  3 ++
+>  scripts/sign-file.c                          | 34 +++++++++++++++-----
+>  4 files changed, 68 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation=
+/admin-
+> guide/module-signing.rst
+> index a8667a777490..7f2f127dc76f 100644
+> --- a/Documentation/admin-guide/module-signing.rst
+> +++ b/Documentation/admin-guide/module-signing.rst
+> @@ -28,10 +28,12 @@ trusted userspace bits.
+>=20
+>  This facility uses X.509 ITU-T standard certificates to encode the publi=
+c keys
+>  involved.  The signatures are not themselves encoded in any industrial s=
+tandard
+> -type.  The built-in facility currently only supports the RSA & NIST P-38=
+4 ECDSA
+> -public key signing standard (though it is pluggable and permits others t=
+o be
+> -used).  The possible hash algorithms that can be used are SHA-2 and SHA-=
+3 of
+> -sizes 256, 384, and 512 (the algorithm is selected by data in the signat=
+ure).
+> +type.  The built-in facility currently only supports the RSA, NIST P-384=
+ ECDSA
+> +and NIST FIPS-204 ML-DSA public key signing standards (though it is plug=
+gable
+> +and permits others to be used).  For RSA and ECDSA, the possible hash
+> +algorithms that can be used are SHA-2 and SHA-3 of sizes 256, 384, and 5=
+12 (the
+> +algorithm is selected by data in the signature); ML-DSA does its own has=
+hing,
+> +but is allowed to be used with a SHA512 hash for signed attributes.
+>=20
+>=20
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+> @@ -146,9 +148,9 @@ into vmlinux) using parameters in the::
+>=20
+>  file (which is also generated if it does not already exist).
+>=20
+> -One can select between RSA (``MODULE_SIG_KEY_TYPE_RSA``) and ECDSA
+> -(``MODULE_SIG_KEY_TYPE_ECDSA``) to generate either RSA 4k or NIST
+> -P-384 keypair.
+> +One can select between RSA (``MODULE_SIG_KEY_TYPE_RSA``), ECDSA
+> +(``MODULE_SIG_KEY_TYPE_ECDSA``) and ML-DSA
+> (``MODULE_SIG_KEY_TYPE_MLDSA_*``) to
+> +generate an RSA 4k, a NIST P-384 keypair or an ML-DSA 44, 65 or 87 keypa=
+ir.
+>=20
+>  It is strongly recommended that you provide your own x509.genkey file.
+>=20
+> diff --git a/certs/Kconfig b/certs/Kconfig
+> index 78307dc25559..2b088ef58373 100644
+> --- a/certs/Kconfig
+> +++ b/certs/Kconfig
+> @@ -39,6 +39,36 @@ config MODULE_SIG_KEY_TYPE_ECDSA
+>  	 Note: Remove all ECDSA signing keys, e.g. certs/signing_key.pem,
+>  	 when falling back to building Linux 5.14 and older kernels.
+>=20
+> +config MODULE_SIG_KEY_TYPE_MLDSA_44
+> +	bool "ML-DSA-44"
+> +	select CRYPTO_MLDSA
+> +	help
+> +	  Use an ML-DSA-44 key (NIST FIPS 204) for module signing.  ML-DSA
+> +	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
+> +	  the latter, the entire module body will be signed; with the former,
+> +	  signedAttrs will be used as it lacks support for CMS_NOATTR with
+> +	  ML-DSA.
+> +
+> +config MODULE_SIG_KEY_TYPE_MLDSA_65
+> +	bool "ML-DSA-65"
+> +	select CRYPTO_MLDSA
+> +	help
+> +	  Use an ML-DSA-65 key (NIST FIPS 204) for module signing.  ML-DSA
+> +	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
+> +	  the latter, the entire module body will be signed; with the former,
+> +	  signedAttrs will be used as it lacks support for CMS_NOATTR with
+> +	  ML-DSA.
+> +
+> +config MODULE_SIG_KEY_TYPE_MLDSA_87
+> +	bool "ML-DSA-87"
+> +	select CRYPTO_MLDSA
+> +	help
+> +	  Use an ML-DSA-87 key (NIST FIPS 204) for module signing.  ML-DSA
+> +	  support requires OpenSSL-3.5 minimum; preferably OpenSSL-4+.  With
+> +	  the latter, the entire module body will be signed; with the former,
+> +	  signedAttrs will be used as it lacks support for CMS_NOATTR with
+> +	  ML-DSA.
+> +
+>  endchoice
+>=20
+>  config SYSTEM_TRUSTED_KEYRING
+> diff --git a/certs/Makefile b/certs/Makefile
+> index f6fa4d8d75e0..3ee1960f9f4a 100644
+> --- a/certs/Makefile
+> +++ b/certs/Makefile
+> @@ -43,6 +43,9 @@ targets +=3D x509_certificate_list
+>  ifeq ($(CONFIG_MODULE_SIG_KEY),certs/signing_key.pem)
+>=20
+>  keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ECDSA) :=3D -newkey ec -pkeyopt
+> ec_paramgen_curve:secp384r1
+> +keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_44) :=3D -newkey ml-dsa-44
+> +keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_65) :=3D -newkey ml-dsa-65
+> +keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_MLDSA_87) :=3D -newkey ml-dsa-87
+>=20
+>  quiet_cmd_gen_key =3D GENKEY  $@
+>        cmd_gen_key =3D openssl req -new -nodes -utf8 -$(CONFIG_MODULE_SIG=
+_HASH) -
+> days 36500 \
+> diff --git a/scripts/sign-file.c b/scripts/sign-file.c
+> index 7070245edfc1..547b97097230 100644
+> --- a/scripts/sign-file.c
+> +++ b/scripts/sign-file.c
+> @@ -315,18 +315,36 @@ int main(int argc, char **argv)
+>  		ERR(!digest_algo, "EVP_get_digestbyname");
+>=20
+>  #ifndef USE_PKCS7
+> +
+> +		unsigned int flags =3D
+> +			CMS_NOCERTS |
+> +			CMS_PARTIAL |
+> +			CMS_BINARY |
+> +			CMS_DETACHED |
+> +			CMS_STREAM  |
+> +			CMS_NOSMIMECAP |
+> +			CMS_NO_SIGNING_TIME |
+> +			use_keyid;
+> +
+> +		if ((EVP_PKEY_is_a(private_key, "ML-DSA-44") ||
+> +		     EVP_PKEY_is_a(private_key, "ML-DSA-65") ||
+> +		     EVP_PKEY_is_a(private_key, "ML-DSA-87")) &&
+> +		    OPENSSL_VERSION_MAJOR < 4) {
+> +			 /* ML-DSA + CMS_NOATTR is not supported in openssl-3.5
+> +			  * and before.
+> +			  */
+> +			use_signed_attrs =3D 0;
+> +		}
+> +
+> +		flags |=3D use_signed_attrs;
+> +
+>  		/* Load the signature message from the digest buffer. */
+> -		cms =3D CMS_sign(NULL, NULL, NULL, NULL,
+> -			       CMS_NOCERTS | CMS_PARTIAL | CMS_BINARY |
+> -			       CMS_DETACHED | CMS_STREAM);
+> +		cms =3D CMS_sign(NULL, NULL, NULL, NULL, flags);
+>  		ERR(!cms, "CMS_sign");
+>=20
+> -		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo,
+> -				     CMS_NOCERTS | CMS_BINARY |
+> -				     CMS_NOSMIMECAP | use_keyid |
+> -				     use_signed_attrs),
+> +		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo, flags),
+>  		    "CMS_add1_signer");
+> -		ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) !=3D 1,
+> +		ERR(CMS_final(cms, bm, NULL, flags) !=3D 1,
+>  		    "CMS_final");
+>=20
+>  #else
+>=20
 
