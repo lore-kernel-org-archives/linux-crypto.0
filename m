@@ -1,159 +1,107 @@
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.9])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB35824A049
-	for <linux-crypto@vger.kernel.org>; Sun,  1 Feb 2026 11:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C45A346784
+	for <linux-crypto@vger.kernel.org>; Sun,  1 Feb 2026 13:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769945322; cv=none; b=BH9EXOP4dlaoNy6kt9py9+w5Lic5nb0TCg06NA2lwDlIXv1S3rNNiVbcSt0Sg9F8TJ8BypJ3g1tFu+iZGSHDqrioDh94YORlNfZ/wJ85NJiO16c2+1qAum+7Wexkx6+zhalzSWSH7fhKBZYMGO2p5fUX6myAlDo+6ry2cIyyB9I=
+	t=1769951275; cv=none; b=IjXrTHpMPUuzDohQL5ShG2tB1MnFufeGfJ9wlGrRpPGX9zr6v1pBv4xYHsMYC+kEpZodew9p9g1ZI+FXqtws/3MK0FFb9Z0dUTfJq81FChP91HZiHixYtbRYi7LGqWyy2TVcyFUxrJVhXu6vSq+/1WHiloHSkHA0+CteAgcThPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769945322; c=relaxed/simple;
-	bh=0ghplTbu/J2f+YqaRk4Osg6DbmV/ect4TIdIrPUBNvo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hCgpHD3Ka55KJBmHQR0gb6VZXMhPdZaO0EZ67kbnISLEdK3rh4X4PrCgWto68PKnDBD1oh9lmobOO08DQKYz4NKyG6XHG2h+12r5OZq1ej/QgkLM6JDENrYDtzZK2LuRVdSqQ3y+cWJGXcdVa/DGcY3YW15FWFkT7pu8NGDMAAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=F4MdyiWF; arc=none smtp.client-ip=212.77.101.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+	s=arc-20240116; t=1769951275; c=relaxed/simple;
+	bh=Kwjp0+tVL9gMgYzKUXBYu1GRVe0BL1N/TmqXrs9Uwf4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rQ0ASKD/89quZyHimqPXvQeZ2JvQphjp5qOtSnjPnQFZyZdWybc9qHoQHkdGH9ntsh+3YPAvGrL9YoNvOHd+IKzMb33xdGdvUJVfheR/nZBk1UcQDrxyqd1Db7i5F2yOD/xNIKyP9IEGFMBWG5jCxMRVVMUwP9bP1SFMVSmrR48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=bVMWWEhE; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="F4MdyiWF"
-Received: (wp-smtpd smtp.wp.pl 3160 invoked from network); 1 Feb 2026 12:28:36 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1769945316; bh=/MfwfCTQ2QheiPcRl9dLEuVTRmc97tG+vjYeZQwO0Ao=;
-          h=From:To:Cc:Subject;
-          b=F4MdyiWFWHFPx38n4hqWuWj2OOcYypKlpGg2PPRaUobkWaibc5T65jtPvsvns2UQ0
-           /rU7afYTcgc7L78NH2quW7gYyljMlXljZD4cdgfMbg0wN/OSTYEB4J+WoCiP6pdgfr
-           pQIL2zvguiDWqVYxrdlusf+yehpmMamuJ81WSgYUNTUj4mkOapUUzJBvXWGNHC/ahD
-           L9oSNQQSNVBPo21PoZpMkhp5iJj/b9BB38ZsjqvdI2B83VZJSp2Pmvzww4rCKTKSo8
-           RodDVNCMGpiEQX3oz+ynu6iAK3CKSJLs8fAStnC1NThkZQ5sOooLDYovTD/zB/RUVq
-           Dr9oPNnUHsg6w==
-Received: from 83.5.238.100.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.5.238.100])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <herbert@gondor.apana.org.au>; 1 Feb 2026 12:28:36 +0100
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	linux-crypto@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH] crypto: testmgr - Add test vectors for authenc(hmac(md5),cbc(des3_ede))
-Date: Sun,  1 Feb 2026 12:27:08 +0100
-Message-ID: <20260201112834.3378-1-olek2@wp.pl>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="bVMWWEhE"
+Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6119u89A1872200
+	for <linux-crypto@vger.kernel.org>; Sun, 1 Feb 2026 05:07:53 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=AkESveN7TgNqfMbvTOPgaDQqBlCntqg8iMdsdi3eFAU=; b=bVMWWEhEBxjE
+	rUsPm27UoRCcx5AZ/bRG459qP5Pnw1Y7+JxmIfL1TXw00qAb0J9m2rxQQ1rAYjJX
+	4B8uSNXXLMn4zsXoA75cRxaQJDI5WXa4QoGY2tc+plUmiDFZ8FTtnUjmrXBJ0sDN
+	Wv4WvghZpEXzsJMVwVLKPJWXEovYte34aVtvqq0yvKBtAikOoZ85/XhJ7UnaNm9/
+	EIdeibhpzArPbbxeq/1sCEcKDg6AFXOa1ZvJTNNAkRusnLgvQfS/BOPl7vsh0tAi
+	KHtHEiA4MVuF2x+SZ+GiH47jBQAkINale3q7yuX11flD16MV56OM8Th1fSF8cFz0
+	pPsoKVXfRg==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4c1gbeyef5-5
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Sun, 01 Feb 2026 05:07:53 -0800 (PST)
+Received: from twshared41309.15.frc2.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Sun, 1 Feb 2026 13:07:49 +0000
+Received: by devbig010.atn3.facebook.com (Postfix, from userid 224791)
+	id 559387B1FB6; Sun,  1 Feb 2026 05:07:38 -0800 (PST)
+Date: Sun, 1 Feb 2026 05:07:38 -0800
+From: Daniel Hodges <hodgesd@meta.com>
+To: Ignat Korchagin <ignat@cloudflare.com>
+CC: Eric Biggers <ebiggers@kernel.org>, David Howells <dhowells@redhat.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>, <keyrings@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: pkcs7 - use constant-time digest comparison
+Message-ID: <aX9P2Y4AUuetwIPF@fb.com>
+References: <20260201035503.3945067-1-hodgesd@meta.com>
+ <20260201044135.GA71244@quark>
+ <CALrw=nG0Pj1W-bZ6qQax0WnxSayCtYx97ivRuQMsVZHbsQZong@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: 704c276ecd49b0c0ab7a0051055d0b4b
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000008 [wfs3]                               
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <CALrw=nG0Pj1W-bZ6qQax0WnxSayCtYx97ivRuQMsVZHbsQZong@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+X-Proofpoint-ORIG-GUID: FXmwWZVdDT6Sk4qFjvpKnn_Xblfa03Vi
+X-Authority-Analysis: v=2.4 cv=Ja+xbEKV c=1 sm=1 tr=0 ts=697f5029 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=-oXVGbNiZCuEa3XDEhEA:9 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAxMDExNCBTYWx0ZWRfXx9bXB6/QP6wF
+ GH8RWwuU8aN4swloQOmP+HDwtiFwbf0Z/DpuCqlyc3e7GwnbRQkP1NX0ByXYHtQ2076SPvGXVVx
+ y9Xcp9bAlLDf8Uow9tt50CYgzSDnbHOEds1dbS1Ush+rXF0YC85KMi9XVSCOEVj5IrCNmafr5sj
+ BRQlt3VV/r7nxNZ0WookNzmYi9m5h2zcDxc0u+e4m8BiuwaVBigZjejffXSfWP9rHc64p4Tynhj
+ KOiCnuHYTFa8b+0254dK373RLmr4tQQ9wizjNTapkyOJf1PqPjFB1U2ooUfoerO20xgJkRCqQCC
+ +JpNNdBLR7Oj3L2+ZvFULxxay32CjL0xuxUH6vC1YsvWi9dU+KKm5t2F2Rko5A0Dpt91Q1/XB4k
+ HDCb8fw5JhkxD+y6OmonXgmaSF0LDamP3azCc2VhlWedNET/S5Sq4KJqItSWn/T50LaJlXN8Fd2
+ NtHxz+afNMjeFSr69+Q==
+X-Proofpoint-GUID: FXmwWZVdDT6Sk4qFjvpKnn_Xblfa03Vi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-01_04,2026-01-30_04,2025-10-01_01
 
-Test vector was generated using a software implementation and then double
-checked using a hardware implementation on NXP P2020 (talitos). The
-encryption part is identical to authenc(hmac(sha1),cbc(des3_ede)),
-only HMAC is different.
+On Sun, Feb 01, 2026 at 11:55:26AM +0100, Ignat Korchagin wrote:
+> On Sun, Feb 1, 2026 at 5:41=E2=80=AFAM Eric Biggers <ebiggers@kernel.or=
+g> wrote:
+> >
+> > On Sat, Jan 31, 2026 at 07:55:03PM -0800, Daniel Hodges wrote:
+> > > This creates a timing side-channel that could allow an
+> > > attacker to forge valid signatures by measuring verification time
+> > > and recovering the expected digest value byte-by-byte.
+> >
+> > Good luck with that.  The memcmp just checks that the CMS object
+> > includes the hash of the data as a signed attribute.  It's a consiste=
+ncy
+> > check of two attacker-controlled values, which happens before the rea=
+l
+> > signature check.  You may be confusing it with a MAC comparison.
+>=20
+> On top of that the CMS object and the hash inside is "public", so even
+> if you have state-of-the-art quantum computer thing you can just take
+> the object and forge the signature "offline"
+>=20
+> > - Eric
 
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
----
- crypto/testmgr.c |  7 ++++++
- crypto/testmgr.h | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 66 insertions(+)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index f3e068382073..0fef46c35367 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4086,6 +4086,13 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.suite = {
- 			.aead = __VECS(hmac_md5_aes_cbc_tv_temp)
- 		}
-+	}, {
-+		.alg = "authenc(hmac(md5),cbc(des3_ede))",
-+		.generic_driver = "authenc(hmac-md5-lib,cbc(des3_ede-generic))",
-+		.test = alg_test_aead,
-+		.suite = {
-+			.aead = __VECS(hmac_md5_des3_ede_cbc_tv_temp)
-+		}
- 	}, {
- 		.alg = "authenc(hmac(md5),ecb(cipher_null))",
- 		.generic_driver = "authenc(hmac-md5-lib,ecb-cipher_null)",
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index dd690da11bae..c582255373d1 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -17481,6 +17481,65 @@ static const struct aead_testvec hmac_sha512_des_cbc_tv_temp[] = {
- 	},
- };
- 
-+static const struct aead_testvec hmac_md5_des3_ede_cbc_tv_temp[] = {
-+	{ /*Generated with cryptopp*/
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
-+#endif
-+			  "\x00\x00\x00\x18"	/* enc key length */
-+			  "\x11\x22\x33\x44\x55\x66\x77\x88"
-+			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
-+			  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
-+			  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
-+			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
-+		.klen	= 8 + 16 + 24,
-+		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
-+		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01"
-+			  "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
-+		.alen   = 16,
-+		.ptext	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
-+			  "\x53\x20\x63\x65\x65\x72\x73\x74"
-+			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
-+			  "\x20\x79\x65\x53\x72\x63\x74\x65"
-+			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
-+			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
-+			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
-+			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
-+			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
-+			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
-+			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
-+			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
-+			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
-+			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
-+			  "\x63\x65\x65\x72\x73\x74\x54\x20"
-+			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
-+		.plen	= 128,
-+		.ctext	= "\x0e\x2d\xb6\x97\x3c\x56\x33\xf4"
-+			  "\x67\x17\x21\xc7\x6e\x8a\xd5\x49"
-+			  "\x74\xb3\x49\x05\xc5\x1c\xd0\xed"
-+			  "\x12\x56\x5c\x53\x96\xb6\x00\x7d"
-+			  "\x90\x48\xfc\xf5\x8d\x29\x39\xcc"
-+			  "\x8a\xd5\x35\x18\x36\x23\x4e\xd7"
-+			  "\x76\xd1\xda\x0c\x94\x67\xbb\x04"
-+			  "\x8b\xf2\x03\x6c\xa8\xcf\xb6\xea"
-+			  "\x22\x64\x47\xaa\x8f\x75\x13\xbf"
-+			  "\x9f\xc2\xc3\xf0\xc9\x56\xc5\x7a"
-+			  "\x71\x63\x2e\x89\x7b\x1e\x12\xca"
-+			  "\xe2\x5f\xaf\xd8\xa4\xf8\xc9\x7a"
-+			  "\xd6\xf9\x21\x31\x62\x44\x45\xa6"
-+			  "\xd6\xbc\x5a\xd3\x2d\x54\x43\xcc"
-+			  "\x9d\xde\xa5\x70\xe9\x42\x45\x8a"
-+			  "\x6b\xfa\xb1\x91\x13\xb0\xd9\x19"
-+			  "\x99\x09\xfb\x05\x35\xc8\xcc\x38"
-+			  "\xc3\x1e\x5e\xe1\xe6\x96\x84\xc8",
-+			  .clen	= 128 + 16,
-+	},
-+};
-+
- static const struct aead_testvec hmac_sha1_des3_ede_cbc_tv_temp[] = {
- 	{ /*Generated with cryptopp*/
- #ifdef __LITTLE_ENDIAN
--- 
-2.47.3
-
+I just went through the code flow again and that makes sense, sorry
+about that!
