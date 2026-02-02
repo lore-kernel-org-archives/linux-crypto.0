@@ -1,70 +1,44 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D99C238C03
-	for <linux-crypto@vger.kernel.org>; Mon,  2 Feb 2026 17:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF0B2798E5
+	for <linux-crypto@vger.kernel.org>; Mon,  2 Feb 2026 17:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770051806; cv=none; b=hoR8l6rYRjPJKIraQNWcM6MJf1tDKxAubrZjUiR0Y2gaISCsBj/SUnA1dSVlMFqdJZvA04O/amoz38TW4RvuRh0UMfY5P0WPFfWB/W+8UKUI15PG+aTce+E4TplN+NSyZI705En5P+3DcsjGvsmcDTp+1pet6JBdcLCkRmIggKo=
+	t=1770053648; cv=none; b=bgAxAsAXo2dXd/z5OTdry8rpEWeSf+nmySNAOGjHsA6Ndm0A543Dqz1Ruh0TqavshwWZQn4KRKEzCT5BkCmdm57TeqdmJVnuEmqnWzwVF06dClhvg0NHNGB/pChDDL5llzxDQebCKM07MBwtoi89aQS0QHS6MgrMCn3KfBKePdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770051806; c=relaxed/simple;
-	bh=YmYddHPvZEgOqKJmE8MugDptUWnHZHtuSGeVaqPbG3g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ashntL5ivIZD66R3A9mq8Q1cm3cPJLoWuduJ1hk3moQ5CySEOq63jYBl1Yctg6K0DzYSepAuEmyB7uRZq63AzenKiaPNNha8296Nn2pGJQGHFf065oZaq6gG9DZtlgnWi3znS6PYxVM3wCxHDanX4V2OWi5eswrIVHkVg6v15jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZxeZ0rMG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1770053648; c=relaxed/simple;
+	bh=mjoBRn1KMFiT+6qQ1vMWJYzOJs4r/llNDgDPoJbub2s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AWgko4/SmiaT69gG+vCTmyaKBGo07/qLxV4T2QIJLzkpZ8d4tCxZlMZSrzy9hfpDxqVjzt5ZK7POt9y2ipPl+aAqR+Cl0YSdGLIABM8EGwBPDokuG8UGFjBVE8Jdw8RB65Srio0ORtKN9FV+YHkRp3FRC1NELM02/Y4lpZjbBuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bNmdjjWD; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZxeZ0rMG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770051802;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bNmdjjWD"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770053644;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RUvLtsQUIbuT8aNyKAbRO6AgrSzDL4SrRGZc9+zngls=;
-	b=ZxeZ0rMGzolNku3XM3eV6SOOq6cAaPgxqVK0L8oluf26nrvUH3aJ/r8oAN4wi/LGCA17UK
-	KL7WLJQUfK1aWptJDCuhvO7lSu1fz4DbfukcjD7CAVRu6ylklPlMtV6o46T6Sm3b6ucYnM
-	wtJAapVmg2F1MU4+BXeJjwjtQgB4BoI=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-179-29xKMmUAPLqP311Mu4AQHw-1; Mon,
- 02 Feb 2026 12:03:16 -0500
-X-MC-Unique: 29xKMmUAPLqP311Mu4AQHw-1
-X-Mimecast-MFC-AGG-ID: 29xKMmUAPLqP311Mu4AQHw_1770051792
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8CF5119560A1;
-	Mon,  2 Feb 2026 17:03:12 +0000 (UTC)
-Received: from warthog.procyon.org.uk.com (unknown [10.44.33.164])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C6C6B19560B2;
-	Mon,  2 Feb 2026 17:03:07 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>
-Cc: David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=qCJFF5AJAwgHihlo6Xmy7iPivmvop9cFNk1pmrP3CIM=;
+	b=bNmdjjWDHXthTahTyuS4rIJbzfzuyKVRg2Lr+bo04sg6Cqw/L86iB+17kQcIkUnP1mgJx6
+	MhYkWXvPre2L44fiD8odGGObK0CTl/vGUH21YexWh2TYVh/PTJuADZ8p9gOL60D1HD6Fpb
+	cYEMyV3Xv3QAoVNpCpULwbGTcNe1t50=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>,
-	linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org,
-	linux-modules@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v16 7/7] pkcs7: Allow authenticatedAttributes for ML-DSA
-Date: Mon,  2 Feb 2026 17:02:12 +0000
-Message-ID: <20260202170216.2467036-8-dhowells@redhat.com>
-In-Reply-To: <20260202170216.2467036-1-dhowells@redhat.com>
-References: <20260202170216.2467036-1-dhowells@redhat.com>
+Subject: [PATCH] crypto: octeontx - Replace scnprintf with strscpy in print_ucode_info
+Date: Mon,  2 Feb 2026 18:33:21 +0100
+Message-ID: <20260202173323.865842-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -72,105 +46,46 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Migadu-Flow: FLOW_OUT
 
-Allow the rejection of authenticatedAttributes in PKCS#7 (signedAttrs in
-CMS) to be waived in the kernel config for ML-DSA when used for module
-signing.  This reflects the issue that openssl < 4.0 cannot do this and
-openssl-4 has not yet been released.
+Replace scnprintf("%s", ...) with the faster and more direct strscpy().
+Remove the parentheses while we're at it.
 
-This does not permit RSA, ECDSA or ECRDSA to be so waived (behaviour
-unchanged).
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Lukas Wunner <lukas@wunner.de>
-cc: Ignat Korchagin <ignat@cloudflare.com>
-cc: Jarkko Sakkinen <jarkko@kernel.org>
-cc: Stephan Mueller <smueller@chronox.de>
-cc: Eric Biggers <ebiggers@kernel.org>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: keyrings@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- crypto/asymmetric_keys/Kconfig        | 11 +++++++++++
- crypto/asymmetric_keys/pkcs7_parser.c |  8 ++++++++
- crypto/asymmetric_keys/pkcs7_parser.h |  3 +++
- crypto/asymmetric_keys/pkcs7_verify.c |  6 ++++++
- 4 files changed, 28 insertions(+)
+ drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index e1345b8f39f1..1dae2232fe9a 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -53,6 +53,17 @@ config PKCS7_MESSAGE_PARSER
- 	  This option provides support for parsing PKCS#7 format messages for
- 	  signature data and provides the ability to verify the signature.
+diff --git a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
+index 9f5601c0280b..4ff28bd131d4 100644
+--- a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
++++ b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
+@@ -10,6 +10,7 @@
  
-+config PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
-+	bool "Waive rejection of authenticatedAttributes for ML-DSA"
-+	depends on PKCS7_MESSAGE_PARSER
-+	depends on CRYPTO_MLDSA
-+	help
-+	  Due to use of CMS_NOATTR with ML-DSA not being supported in
-+	  OpenSSL < 4.0 (and thus any released version), enabling this
-+	  allows authenticatedAttributes to be used with ML-DSA for
-+	  module signing.  Use of authenticatedAttributes in this
-+	  context is normally rejected.
-+
- config PKCS7_TEST_KEY
- 	tristate "PKCS#7 testing key type"
- 	depends on SYSTEM_DATA_VERIFICATION
-diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
-index 594a8f1d9dfb..db1c90ca6fc1 100644
---- a/crypto/asymmetric_keys/pkcs7_parser.c
-+++ b/crypto/asymmetric_keys/pkcs7_parser.c
-@@ -92,9 +92,17 @@ static int pkcs7_check_authattrs(struct pkcs7_message *msg)
- 	if (!sinfo)
- 		goto inconsistent;
+ #include <linux/ctype.h>
+ #include <linux/firmware.h>
++#include <linux/string.h>
+ #include <linux/string_choices.h>
+ #include "otx_cpt_common.h"
+ #include "otx_cptpf_ucode.h"
+@@ -509,13 +510,12 @@ EXPORT_SYMBOL_GPL(otx_cpt_uc_supports_eng_type);
+ static void print_ucode_info(struct otx_cpt_eng_grp_info *eng_grp,
+ 			     char *buf, int size)
+ {
+-	if (eng_grp->mirror.is_ena) {
++	if (eng_grp->mirror.is_ena)
+ 		scnprintf(buf, size, "%s (shared with engine_group%d)",
+ 			  eng_grp->g->grp[eng_grp->mirror.idx].ucode[0].ver_str,
+ 			  eng_grp->mirror.idx);
+-	} else {
+-		scnprintf(buf, size, "%s", eng_grp->ucode[0].ver_str);
+-	}
++	else
++		strscpy(buf, eng_grp->ucode[0].ver_str, size);
+ }
  
-+#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
-+	msg->authattrs_rej_waivable = true;
-+#endif
-+
- 	if (sinfo->authattrs) {
- 		want = true;
- 		msg->have_authattrs = true;
-+#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
-+		if (strncmp(sinfo->sig->pkey_algo, "mldsa", 5) != 0)
-+			msg->authattrs_rej_waivable = false;
-+#endif
- 	} else if (sinfo->sig->algo_takes_data) {
- 		sinfo->sig->hash_algo = "none";
- 	}
-diff --git a/crypto/asymmetric_keys/pkcs7_parser.h b/crypto/asymmetric_keys/pkcs7_parser.h
-index e17f7ce4fb43..6ef9f335bb17 100644
---- a/crypto/asymmetric_keys/pkcs7_parser.h
-+++ b/crypto/asymmetric_keys/pkcs7_parser.h
-@@ -55,6 +55,9 @@ struct pkcs7_message {
- 	struct pkcs7_signed_info *signed_infos;
- 	u8		version;	/* Version of cert (1 -> PKCS#7 or CMS; 3 -> CMS) */
- 	bool		have_authattrs;	/* T if have authattrs */
-+#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
-+	bool		authattrs_rej_waivable; /* T if authatts rejection can be waived */
-+#endif
- 
- 	/* Content Data (or NULL) */
- 	enum OID	data_type;	/* Type of Data */
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index 06abb9838f95..519eecfe6778 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -425,6 +425,12 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
- 			return -EKEYREJECTED;
- 		}
- 		if (pkcs7->have_authattrs) {
-+#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
-+			if (pkcs7->authattrs_rej_waivable) {
-+				pr_warn("Waived invalid module sig (has authattrs)\n");
-+				break;
-+			}
-+#endif
- 			pr_warn("Invalid module sig (has authattrs)\n");
- 			return -EKEYREJECTED;
- 		}
+ static void print_engs_info(struct otx_cpt_eng_grp_info *eng_grp,
+-- 
+Thorsten Blum <thorsten.blum@linux.dev>
+GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
 
