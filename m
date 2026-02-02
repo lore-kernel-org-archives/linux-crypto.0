@@ -1,325 +1,334 @@
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11021082.outbound.protection.outlook.com [52.101.62.82])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE831400C;
-	Mon,  2 Feb 2026 16:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770051088; cv=fail; b=r/DVKIW3B5mt/9ffxxZcT/2VtO+CFB0FOP3W5t3pn0Batt4/1UHZhuDv/EqWr7TPK+e5GV+61uUu3S5b8c8ae5rexgBQEYp+ed0aNNu9Oa+q93NdIldblVV+RH0DMY+LZkE7ufevbyMfcYWTJsV5vPPldCzMpIumuFqwN57GO78=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770051088; c=relaxed/simple;
-	bh=wiKqM4dtDMfv6nZxW0wfCbRnKoBOGl/cM+JFXt467DI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=seM1QnZJDW3O9tPIej5nQiV1iIYlii5IA/+RJyJbJih3uAWyNnFzPjtYCH058b90gR4d56nFvJ2Rdioaj19GnrRqs1ZlOpXNdU58q764cHm6gVCGBcNnCXn8QvV1xtifmLa/tviIiInFD6zOS32l/e4H/W6Z95+m1eHVkWXjISY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com; spf=pass smtp.mailfrom=hammerspace.com; dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b=J46ag3Lo; arc=fail smtp.client-ip=52.101.62.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hammerspace.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A11238C03
+	for <linux-crypto@vger.kernel.org>; Mon,  2 Feb 2026 17:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770051751; cv=none; b=ZD4vYn258tENnQBpMwu4Sz32PMolKUfYvHNhIhcquMSuJkmBUDJJID+hWCRycq69rdSRrneZ/Kx4X4FWgf52op/QC1YWsgR2ZQbX8ozeWDXt8jpeSSmWasZ9qgaMjzv+ECetQYkltQ/cHb4eayDKDnIxof6sO87FeBy4btJBTR8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770051751; c=relaxed/simple;
+	bh=HJNI+/ukjAPKsCplQcvlstT5Rinp/Iiw/ZSffFN/Z7c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NxiD6yNgtbNH/OvUqTlkerlpck1eCJFba8NMmSjyGgrIKO6Ki8TSA0B4xK6YItdVHmDaxQ/hqQnoRTxMNKmnVpvgV41YzaJLLLO26uP0pSmdl+lnmCe+bMcRwXWSbwaisiRS+4684Rdmz9uteGUOTfhwNyyPWiZNPB8CMzVfa2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IjaCHTFk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b="J46ag3Lo"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=A8kMNpN7oNkxTO9XDVP+4b5vtHceP1AMiPcF2svgNvznNN0LfDn5agURs1Ql4LMQxsiJlYjMg88OOZXZIO/mrZFXGPXrB5ZAXsJc0/CW8jqJGy/254dokt4HAV3cfB5fX3NNemNlSZKfMLUKYbIAFiKLE08ZN9D5csmLR+wxc2/+xttsTRtbn6D7hjUnzlkoaXR9z2DzvmCBWMoRWKWMqKoShaonmZ1kpTA/g5UGANmEclxJ6naNgJ6MkwRg5nZQXIKxYKqhpe+J2DFPi55/b+AFfsfPw94ZoGati9BsdmZ40k2oDe1GsyrAVkwbvvd8VEmcAGWVHqK3y9KZ+SbkUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nm7cZ0jG0W2wPWbCOlJkxMATHvuyH1yyA8frGtX+X2U=;
- b=YY2/mwrbQs34DRyVkKdweGA+/XF3fm8TVh0Luq/4HobTwZW+wuWhCDrlSGVRbhBFYDLQVDQqhIVoedBkz7/nPteSQg8Wxi5qts4/VD2X69dUfIODrCyq7McCwaMhA4S2Kf0qZeJ9yqmpy2b/7dWVQD6oHkM25mt+vopWgU1niL360QYbvow45kG/Cue7SW/LqsgJ8744wHiNn9EzQ6Xt18Ikrxf1pXzgKLD0SOLhAQzjhLrMFyL5uPr8+PocIRVKsgHzFfzijWcu7CIDRFMyJFS/F5oNIQLIauMSsgoYsQpHKTPjw2BJku2Rryj0nbnAWsvIr4e/YUaWn7W1fG1z+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hammerspace.com; dmarc=pass action=none
- header.from=hammerspace.com; dkim=pass header.d=hammerspace.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hammerspace.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nm7cZ0jG0W2wPWbCOlJkxMATHvuyH1yyA8frGtX+X2U=;
- b=J46ag3LoeGPyY1p8AH7qtFVdYUEq4NOFlrS8r3lf0UN4Fx4UWZmJsBKRIs/zEKxqf+DgQLvelEhsSjBTPdAkoLF9tRI+JrZgL54r86A2Gk66aNWxoH8QRu2JNx6Rdysv2qeecKOHbJnqthS//W0GXzfMq18OM9E72T23HbVbX1s=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=hammerspace.com;
-Received: from BN0PR13MB5246.namprd13.prod.outlook.com (2603:10b6:408:159::12)
- by DS7PR13MB4686.namprd13.prod.outlook.com (2603:10b6:5:3a3::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Mon, 2 Feb
- 2026 16:51:12 +0000
-Received: from BN0PR13MB5246.namprd13.prod.outlook.com
- ([fe80::39d0:ce59:f47d:5577]) by BN0PR13MB5246.namprd13.prod.outlook.com
- ([fe80::39d0:ce59:f47d:5577%6]) with mapi id 15.20.9564.014; Mon, 2 Feb 2026
- 16:51:11 +0000
-From: Benjamin Coddington <bcodding@hammerspace.com>
-To: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- NeilBrown <neil@brown.name>, Trond Myklebust <trondmy@kernel.org>,
- Anna Schumaker <anna@kernel.org>,
- Benjamin Coddington <bcodding@hammerspace.com>,
- Eric Biggers <ebiggers@kernel.org>, Rick Macklem <rick.macklem@gmail.com>
-Cc: <linux-nfs@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
- <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v3 1/3] NFSD: Add a key for signing filehandles
-Date: Mon, 02 Feb 2026 11:51:03 -0500
-X-Mailer: MailMate (2.0r6272)
-Message-ID: <45956CAA-4AA1-4216-8B83-C4D3F2FFD67D@hammerspace.com>
-In-Reply-To: <e3806f53c351c03725ecb12fb7ad100786df04f6.1770046529.git.bcodding@hammerspace.com>
-References: <cover.1770046529.git.bcodding@hammerspace.com>
- <e3806f53c351c03725ecb12fb7ad100786df04f6.1770046529.git.bcodding@hammerspace.com>
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: PH8P220CA0030.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:510:348::15) To BN0PR13MB5246.namprd13.prod.outlook.com
- (2603:10b6:408:159::12)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IjaCHTFk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770051749;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oET/gB+SB3Rm7CLBmvgEP1WX3LxcVAaP73+8Ws0b93g=;
+	b=IjaCHTFkvmLPVuFbBnSPB/jv8llsCDkqgRbuCe9noQb4FQOi9KZhZAGnlhxEM/uuzkRCAc
+	petZJ5QAxTnIS/mG6rjPtEJD/j/CQ1xKTruIPtxYz0PrsFpc2ghViTfq8xRVTyhgn6M0I/
+	B7nW1YXgf3CrAKU5SED0JsF8HgmqHUY=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-427-u8_5FDENN4GBi_nhX-O19Q-1; Mon,
+ 02 Feb 2026 12:02:27 -0500
+X-MC-Unique: u8_5FDENN4GBi_nhX-O19Q-1
+X-Mimecast-MFC-AGG-ID: u8_5FDENN4GBi_nhX-O19Q_1770051745
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 94A8D18005B4;
+	Mon,  2 Feb 2026 17:02:24 +0000 (UTC)
+Received: from warthog.procyon.org.uk.com (unknown [10.44.33.164])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4C1981800577;
+	Mon,  2 Feb 2026 17:02:19 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>,
+	linux-crypto@vger.kernel.org,
+	keyrings@vger.kernel.org,
+	linux-modules@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v16 0/7] x509, pkcs7, crypto: Add ML-DSA signing
+Date: Mon,  2 Feb 2026 17:02:05 +0000
+Message-ID: <20260202170216.2467036-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN0PR13MB5246:EE_|DS7PR13MB4686:EE_
-X-MS-Office365-Filtering-Correlation-Id: 249c5dc9-7734-45e2-0bd8-08de627b4554
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7142099003;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?IPe4JqXPARJA8hsqj834DjfTOjfMIS/du8i7sPpvDCpcqZKjm2JO5vr+EHzP?=
- =?us-ascii?Q?Me2Wk7ac5ot5/NWk0JsCtFC4WqQldmpooMdiIbpDvXOM/EpEM81W0NEtUrps?=
- =?us-ascii?Q?y6lrAotrL3vjyTEsuLJaqWoCvaRhXlJCsgiQPW0wjWNJS85Xo2JBReeYNXPV?=
- =?us-ascii?Q?8AXrvOy8aIs3SuM0RdASGvrVkfTEzRQ09kaAGnrvILDF6n3q9klVpsV0/DtC?=
- =?us-ascii?Q?8jRjpQyoWrGDamS7NbXneQ2HRMhwjys0Ee17O59hAQVov5B0aJFjBB//Ccfj?=
- =?us-ascii?Q?p+Mfrznr8oOcPzaAtRtxhPiaVAaju1Wq2CpBSIQTbgB/Ddx3/YYihjDYb2w7?=
- =?us-ascii?Q?+V5nHW+0CONirtPTdFyG64lRjSKRk2+LGj5j8r9Yk0pB9vbzzEcfnVDOMa4X?=
- =?us-ascii?Q?ZUIDX7lGVXKvbR4RnoSA9HHJzr/+/1zg1KTuxkTKmJ+Cj9duK6orr7kwU2Qu?=
- =?us-ascii?Q?eESOKWDxRhaNT4GxeDhtAEnNAY0SvciJw/CqNwMzo+hQEiPuyFXHDMjfs3SJ?=
- =?us-ascii?Q?E8kAye8J4yOcFKCJIyjPdXMoN3p46+phALTl+A6aVR/6ylPiDI1eVPO3m/s4?=
- =?us-ascii?Q?fqTqrAdmM9PMwf9i4MAJr7VX0bpFoF2owluzgM0/NC5tnbiy2x5W2WczlXZY?=
- =?us-ascii?Q?+cvu6g2EwmvkwQvpHIM30vOummlDfBEnhQrjQfWaFPQ74pacRBw/OGCcRL+s?=
- =?us-ascii?Q?UM4WPkQ0bFYeTmMIQn9hCDThRh/Ds27cbA1GbSwy7W4OHcd9rrMAkFJZfbMf?=
- =?us-ascii?Q?07+tIIpCNalFJVoCo+JOatBSnFAQ3uBcX4RXVfCPwR22wFkmygsUJe4xt2ey?=
- =?us-ascii?Q?xdQHFDhAKGF5mpkTRGYZvVlyc3gAmyUsC8hEzlrl1KVZkjCHo2kjxfBYMxos?=
- =?us-ascii?Q?MKhO6RnzyY9MFnviIBCqSIk0McAyITb4TJI0daT1uD+wJPMkbax0nuRtqq+4?=
- =?us-ascii?Q?58jLFSDRoBma0xeIsGk1+YybNCvkzOUpInhfHZZizYeunT31c2ECgaYkiJIa?=
- =?us-ascii?Q?BIdCtTCanIBSokcW1Ez5ksOyb5UU+AM7Bo0G6NX7EX8j41K3qYPXlyRGi7jJ?=
- =?us-ascii?Q?FfLWUqAoW2RyeUKYhJ5rFUE6Uc7MtTE5logf4KpMaq/tNRLoC6KOdoIb28HL?=
- =?us-ascii?Q?/51QRKasbYp6A4nRlmyFSkUIC6J/m33+ykBNQ+9RNGXNSWR0s+PCQwPvphuz?=
- =?us-ascii?Q?ymwAAVdfXogFTbrsUgmjLQqUD6Infl9SyJf1Wvx/IOjySKO9beqN6r0hf+J5?=
- =?us-ascii?Q?Dz2PQ8V8vhOv/m+96OaYQdqu6lnpqGJdHODms9jeKn3SCSR6CmCw4SHN5OXX?=
- =?us-ascii?Q?+DUo5ELw9M0q2aM6F1m2xOyh1qBQDb6cBrhF6walik8zrMwWKyOAb6ka8ssv?=
- =?us-ascii?Q?u/+7NFe0Qy0qJR1zG+BOiv8/uO53gYsbXJBJHCqfzNlMbg0qVaEciWSyUDxb?=
- =?us-ascii?Q?s2OzUR8pLbIJGoxrnJW8eraQjtg3eacIkN0XlSIZBuUlhYrOHtarWjdQW+s/?=
- =?us-ascii?Q?dTSnvewICQFPW4uDgRdthmtMpRPoyfwkiTrKpcUzVgFgXtsx6KzciLmFjwWq?=
- =?us-ascii?Q?ZoY9OZBu7P8ug279o4I=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR13MB5246.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7142099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?UXTY0kWZnCIStUuzTaL426utG/W/O1q9RmFClhrBwgWSHYIqixodUL730D/m?=
- =?us-ascii?Q?s+efVLX/v37goDAknpScIOtrWqcvxWrvzjcxU0b6UJeRb62uvC5GT4mZ0DUR?=
- =?us-ascii?Q?ZE50bHLONKHkz80f5VHRzd2lREY0szR76khtBZApQRI1AOASyP1J5cRa4jpM?=
- =?us-ascii?Q?/3pMi/3CPfVvV+f9M0SkWjunWRz3b8E2oZMKcouua7QTqMxJapdalCDZFgEd?=
- =?us-ascii?Q?mhCKhlx9jLdYet3Q4I4rHoMW4KfSezdvQx98MXVZoBAnlQdjS8UnaFATEIFs?=
- =?us-ascii?Q?yG2/2cb/Y4micAYlbiQswb5iRipD2YinatLWNHUFCniRDi4o7Di+12x1RJcg?=
- =?us-ascii?Q?nFFRBNYL4YvOloXltuKlrMgRukzml+mhp3MpMISJdH3kti7DXozAFyKgQj16?=
- =?us-ascii?Q?n47HhkZOmPXfhEPr4B4N8B9T4HnSN+2u7qy+qPKlNHLx07L3CkIRII7LWuz1?=
- =?us-ascii?Q?2OfAPjv4M7wLCaksvZHAenxqbKkQhKwtHmksL3wJ/OCAGYWRfyr5nGJ1jSuz?=
- =?us-ascii?Q?iw8w3LGXAtMT1aTqsK+rYiMupy+yItXsBq43KONOueuekUA2jAu15ZhmwHoT?=
- =?us-ascii?Q?7dM4jhp9bf7HfLelhFQTI641OTcQIHY8D3ixOVN4ojmywCU7qSs14ReVphvW?=
- =?us-ascii?Q?bMEV9X+SHfEiPQ/VcCHFHV7eAwJ61kC1ZsfcepXl96X+N9ZZlPUxYM4+kMsk?=
- =?us-ascii?Q?y+AgwWFrup4yINmrcRXQscJ+QbR5Pzkg7pE9isn/soitRrWOaidhGFnww6hX?=
- =?us-ascii?Q?c/tcPeSC1YinIMrxNpNxZtpqc20bwSWsE4DdyaZ2Pl/bqiErpWPdLIMpz1bM?=
- =?us-ascii?Q?qqzgmLxWaT2BQ9FlgvRnoQEia5qR4sLb17mYsR2ema5nhvnggWB9RHdTbbv/?=
- =?us-ascii?Q?J3fYZm93SN7wWadqB3E7s6zJkLZBYX/EuG/9jZoJrYKxoStszsDuMmtjQQM5?=
- =?us-ascii?Q?o5U2Lpj5ZcUn/V0ZSx3zwZiw7kyPdAaLKlTuAwnOwJveCEhqGCGV+kL58ICe?=
- =?us-ascii?Q?czkOwO1McjIIY1K3MrJmwQUyDtccguCY4P4DT55kRSdQ31tuyGWdAOb1oLnO?=
- =?us-ascii?Q?j9A3DiGiij23Pbkcky93zh8tfFp+cmolkOJRY0krH5rj9YR9I014vJH2/nbz?=
- =?us-ascii?Q?6kmAamMHNsZBkhpo/1J1NadsR1GtbOpPO9cQZru54U+feF8ER2ebvvq20Ago?=
- =?us-ascii?Q?mJi+nCj/gAmTatL5HfgpgXX759nNqG4jHyko1wDFvdDWx7T6AzuUu04DEyln?=
- =?us-ascii?Q?WaIwYQixj0/cZw0PwWmdcN2ZDUyUFGlKKrJvALKbcnPsBebcpfmUwkJrPjBM?=
- =?us-ascii?Q?vKX5aidI2bCJr9kjniebRDjrj7+vynkNV4JRuVemFyYrxjbeHyPfG+Bz0yfL?=
- =?us-ascii?Q?KYolQQ7jWUjkW8QxSCEE4MFCqz0LM66vvNfw1aHRO9XeUwf3Pvb+ctQqqsyN?=
- =?us-ascii?Q?Km/xXSEOkilqtFm58IQReBVs+uyU4JfI5OiBGpSQzInfEGoyqC/Cr/NjC+GK?=
- =?us-ascii?Q?J7EZLNJ3VmNdQWLvQX6XgcNvwUBUggq8XfOSH+7zOz52gC7jK6+Fp1TQUdRS?=
- =?us-ascii?Q?35nzrHch75UqGQKXvTa/vG6J3gohyXMn+a5bj790VnZKPazE6Xv6oIQFyVuf?=
- =?us-ascii?Q?vzcsrE7c3tPijEP4pUD8b2CrBgn4mcrVCiRPvW7kcGHJ4SEYFI0MBzFwYFrS?=
- =?us-ascii?Q?+KM8wStqpd5cPymlu00gMqsjMrYzb2KWcMORPgg/8jLLjRbaqYqcLfvxp7fY?=
- =?us-ascii?Q?3TyHfth2kYYDqWfZ0INW8ANFMd7M8Ro=3D?=
-X-OriginatorOrg: hammerspace.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 249c5dc9-7734-45e2-0bd8-08de627b4554
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR13MB5246.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2026 16:51:11.8289
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0d4fed5c-3a70-46fe-9430-ece41741f59e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sd4IXtASjRupsLjOa5R27F/0w/BZuR7bEziRTpg99V1RfvxTG20P8nrwe93Beplmt5riGqmwqsLe6Xd9z8sURb6FPW5LYvxbC5c5UsNzkMo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR13MB4686
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 2 Feb 2026, at 11:19, Benjamin Coddington wrote:
+Hi Lukas, Ignat,
 
-> A future patch will enable NFSD to sign filehandles by appending a Mess=
-age
-> Authentication Code(MAC).  To do this, NFSD requires a secret 128-bit k=
-ey
-> that can persist across reboots.  A persisted key allows the server to
-> accept filehandles after a restart.  Enable NFSD to be configured with =
-this
-> key the netlink interface.
->
-> Link: https://lore.kernel.org/linux-nfs/cover.1770046529.git.bcodding@h=
-ammerspace.com
-> Signed-off-by: Benjamin Coddington <bcodding@hammerspace.com>
-> ---
->  Documentation/netlink/specs/nfsd.yaml |  6 +++++
->  fs/nfsd/netlink.c                     |  5 ++--
->  fs/nfsd/netns.h                       |  2 ++
->  fs/nfsd/nfsctl.c                      | 37 ++++++++++++++++++++++++++-=
+[Note this is based on Eric Bigger's libcrypto-next branch].
 
->  fs/nfsd/trace.h                       | 25 ++++++++++++++++++
->  include/uapi/linux/nfsd_netlink.h     |  1 +
->  6 files changed, 73 insertions(+), 3 deletions(-)
->
-> diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netl=
-ink/specs/nfsd.yaml
-> index badb2fe57c98..d348648033d9 100644
-> --- a/Documentation/netlink/specs/nfsd.yaml
-> +++ b/Documentation/netlink/specs/nfsd.yaml
-> @@ -81,6 +81,11 @@ attribute-sets:
->        -
->          name: min-threads
->          type: u32
-> +      -
-> +        name: fh-key
-> +        type: binary
-> +        checks:
-> +            exact-len: 16
->    -
->      name: version
->      attributes:
-> @@ -163,6 +168,7 @@ operations:
->              - leasetime
->              - scope
->              - min-threads
-> +            - fh-key
->      -
->        name: threads-get
->        doc: get the number of running threads
-> diff --git a/fs/nfsd/netlink.c b/fs/nfsd/netlink.c
-> index 887525964451..4e08c1a6b394 100644
-> --- a/fs/nfsd/netlink.c
-> +++ b/fs/nfsd/netlink.c
-> @@ -24,12 +24,13 @@ const struct nla_policy nfsd_version_nl_policy[NFSD=
-_A_VERSION_ENABLED + 1] =3D {
->  };
->
->  /* NFSD_CMD_THREADS_SET - do */
-> -static const struct nla_policy nfsd_threads_set_nl_policy[NFSD_A_SERVE=
-R_MIN_THREADS + 1] =3D {
-> +static const struct nla_policy nfsd_threads_set_nl_policy[NFSD_A_SERVE=
-R_FH_KEY + 1] =3D {
->  	[NFSD_A_SERVER_THREADS] =3D { .type =3D NLA_U32, },
->  	[NFSD_A_SERVER_GRACETIME] =3D { .type =3D NLA_U32, },
->  	[NFSD_A_SERVER_LEASETIME] =3D { .type =3D NLA_U32, },
->  	[NFSD_A_SERVER_SCOPE] =3D { .type =3D NLA_NUL_STRING, },
->  	[NFSD_A_SERVER_MIN_THREADS] =3D { .type =3D NLA_U32, },
-> +	[NFSD_A_SERVER_FH_KEY] =3D NLA_POLICY_EXACT_LEN(16),
->  };
->
->  /* NFSD_CMD_VERSION_SET - do */
-> @@ -58,7 +59,7 @@ static const struct genl_split_ops nfsd_nl_ops[] =3D =
-{
->  		.cmd		=3D NFSD_CMD_THREADS_SET,
->  		.doit		=3D nfsd_nl_threads_set_doit,
->  		.policy		=3D nfsd_threads_set_nl_policy,
-> -		.maxattr	=3D NFSD_A_SERVER_MIN_THREADS,
-> +		.maxattr	=3D NFSD_A_SERVER_MAX,
->  		.flags		=3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
->  	},
->  	{
-> diff --git a/fs/nfsd/netns.h b/fs/nfsd/netns.h
-> index 9fa600602658..c8ed733240a0 100644
-> --- a/fs/nfsd/netns.h
-> +++ b/fs/nfsd/netns.h
-> @@ -16,6 +16,7 @@
->  #include <linux/percpu-refcount.h>
->  #include <linux/siphash.h>
->  #include <linux/sunrpc/stats.h>
-> +#include <linux/siphash.h>
->
->  /* Hash tables for nfs4_clientid state */
->  #define CLIENT_HASH_BITS                 4
-> @@ -224,6 +225,7 @@ struct nfsd_net {
->  	spinlock_t              local_clients_lock;
->  	struct list_head	local_clients;
->  #endif
-> +	siphash_key_t		*fh_key;
->  };
->
->  /* Simple check to find out if a given net was properly initialized */=
+These patches add ML-DSA module signing signing:
 
-> diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-> index 4d8e3c1a7be3..590584952bf6 100644
-> --- a/fs/nfsd/nfsctl.c
-> +++ b/fs/nfsd/nfsctl.c
-> @@ -1571,6 +1571,31 @@ int nfsd_nl_rpc_status_get_dumpit(struct sk_buff=
- *skb,
->  	return ret;
->  }
->
-> +/**
-> + * nfsd_nl_fh_key_set - helper to copy fh_key from userspace
-> + * @attr: nlattr NFSD_A_SERVER_FH_KEY
-> + * @nn: nfsd_net
-> + *
-> + * Callers should hold nfsd_mutex, returns 0 on success or negative er=
-rno.
-> + */
-> +static int nfsd_nl_fh_key_set(const struct nlattr *attr, struct nfsd_n=
-et *nn)
-> +{
-> +	siphash_key_t *fh_key;
-> +
-> +	if (nla_len(attr) !=3D sizeof(siphash_key_t))
-> +		return -EINVAL;
-> +
-> +	if (!nn->fh_key) {
-> +		fh_key =3D kmalloc(sizeof(siphash_key_t), GFP_KERNEL);
-> +		if (!fh_key)
-> +			return -ENOMEM;
-> +	}
-> +
-> +	memcpy(fh_key, nla_data(attr), sizeof(siphash_key_t));
-> +	nn->fh_key =3D fh_key;
-> +	return 0;
-> +}
-> +
+ (1) Add a crypto_sig interface for ML-DSA, verification only.
 
-Oof, I messed it up right here^^ this hunk needed to be folded in.. can s=
-end another version on this one:
+ (2) Generate a SHA256 hash of the X.509 TBSCertificate and check that in
+     the blacklist.  Direct-sign ML-DSA doesn't generate an easily
+     accessible hash.  Note that this changes behaviour as we no longer use
+     whatever hash is specified in the certificate for this.
 
-diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-index 590584952bf6..9b94e1ed98e0 100644
---- a/fs/nfsd/nfsctl.c
-+++ b/fs/nfsd/nfsctl.c
-@@ -1580,19 +1580,18 @@ int nfsd_nl_rpc_status_get_dumpit(struct sk_buff =
-*skb,
-  */
- static int nfsd_nl_fh_key_set(const struct nlattr *attr, struct nfsd_net=
- *nn)
- {
--       siphash_key_t *fh_key;
-+       siphash_key_t *fh_key =3D nn->fh_key;
+ (3) Rename the public_key_signature struct's "digest" and "digest_size"
+     members to "m" and "m_size" to reflect that it's not necessarily a
+     digest, but it is an input to the public key algorithm.
 
-        if (nla_len(attr) !=3D sizeof(siphash_key_t))
-                return -EINVAL;
+ (4) Modify PKCS#7 support to allow kernel module signatures to carry
+     authenticatedAttributes as OpenSSL refuses to let them be opted out of
+     for ML-DSA (CMS_NOATTR).  This adds an extra digest calculation to the
+     process.
 
--       if (!nn->fh_key) {
-+       if (!fh_key) {
-                fh_key =3D kmalloc(sizeof(siphash_key_t), GFP_KERNEL);
-                if (!fh_key)
-                        return -ENOMEM;
-+               nn->fh_key =3D fh_key;
-        }
--
-        memcpy(fh_key, nla_data(attr), sizeof(siphash_key_t));
--       nn->fh_key =3D fh_key;
-        return 0;
- }
+     Modify PKCS#7 to pass the authenticatedAttributes directly to the
+     ML-DSA algorithm rather than passing over a digest as is done with RSA
+     as ML-DSA wants to do its own hashing and will add other stuff into
+     the hash.  We could use hashML-DSA or an external mu instead, but they
+     aren't standardised for CMS yet.
 
+ (5) Add support to the PKCS#7 and X.509 parsers for ML-DSA.
 
-Ben
+ (6) Modify sign-file to handle OpenSSL not permitting CMS_NOATTR with
+     ML-DSA and add ML-DSA to the choice of algorithm with which to sign
+     modules.  Note that this might need some more 'select' lines in the
+     Kconfig to select the lib stuff as well.
+
+ (7) Add a config option to allow authenticatedAttributes to be used with
+     ML-DSA for module signing.  Ordinarily, authenticatedAttributes are
+     not permitted for this purpose, however direct signing with ML-DSA
+     will not be supported by OpenSSL until v4 is released.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-pqc
+
+David
+
+Changes
+=======
+ver #16)
+ - Make the selection of ML-DSA for module signing when configuring
+   contingent on openssl saying it supports ML-DSA (fix from Arnd
+   Bergmann).
+ - Make ML-DSA-related bits of sign-file contingent on openssl >= 3.0.0.
+
+ver #15)
+ - Undo a removed blank line to simplify the X.509 patch.
+ - Split the rename of ->digest to ->m into its own patch.
+ - In pkcs7_digest(), always copy the signedAttrs and modify rather than
+   passing the replacement tag byte in a separate shash update call to the
+   rest of the data.  That way the ->m buffer is very likely to be
+   optimally aligned for the crypto.
+ - Only allow authenticatedAttributes with ML-DSA for module signing and
+   only if permission is given in the kernel config.
+
+ver #14)
+ - public_key:
+   - Rename public_key::digest to public_key::m.
+ - X.509:
+   - Independently calculate the SHA256 hash for the blacklist check as
+     an ML-DSA-signed X.509 cert doesn't generate a digest we can use.
+   - Point public_key::m at the TBS data for ML-DSA.
+ - PKCS#7:
+   - Allocate a big enough digest buffer rather than reallocating in order
+     to store the authattrs/signedattrs instead.
+   - Merge the two patches that add direct signing support.
+ - ML-DSA:
+   - Use bool instead of u8.
+   - Remove references to SHAKE in Kconfig and mention OpenSSL requirements
+     there.
+   - Limit ML-DSA with an intermediate hash (e.g. signedAttrs) to using
+     SHA512 only.
+   - Don't select CRYPTO_LIB_SHA3 for CRYPTO_MLDSA.
+ - RSASSA-PSS:
+   - Allow use with SHA256 and SHA384.
+   - Fix calculation of emBits to be number of bits in the RSA modulus 'n'.
+   - Use strncmp() not memcmp() to avoid reading beyond end of string.
+   - Use correct destructor in rsassa_params_parse().
+   - Drop this algo for the moment.
+ - Drop the pefile_context::digest_free for now - it's only set to true and
+   is unrelated to public_key::digest_free.
+
+ver #13)
+ - Allow a zero-length salt in RSASSA-PSS.
+ - Don't reject ECDSA/ECRDSA with SHA256 and SHA384 otherwise the FIPS
+   selftest panics when used.
+ - Add a FIPS test for RSASSA-PSS (from NIST's SigVerPSS_186-3.rsp).
+ - Add a FIPS test for ML-DSA (from NIST's FIPS204 JSON set).
+
+ver #12)
+ - Rebased on Eric's libcrypto-next branch.
+ - Delete references to Dilithium (ML-DSA derived from this).
+ - Made sign-file supply CMS_NOATTR for ML-DSA if openssl >= v4.
+ - Made it possible to do ML-DSA over the data without signedAttrs.
+ - Made RSASSA-PSS info parser use strsep() and match_token().
+ - Cleaned the RSASSA-PSS param parsing.
+ - Added limitation on what hashes can be used with what algos.
+ - Moved __free()-marked variables to the point of setting.
+
+ver #11)
+ - Rebased on Eric's libcrypto-next branch.
+ - Added RSASSA-PSS support patches.
+
+ver #10)
+ - Replaced the Leancrypto ML-DSA implementation with Eric's.
+ - Fixed Eric's implementation to have MODULE_* info.
+ - Added a patch to drive Eric's ML-DSA implementation from crypto_sig.
+ - Removed SHAKE256 from the list of available module hash algorithms.
+ - Changed a some more ML_DSA to MLDSA in config symbols.
+
+ver #9)
+ - ML-DSA changes:
+   - Separate output into four modules (1 common, 3 strength-specific).
+     - Solves Kconfig issue with needing to select at least one strength.
+   - Separate the strength-specific crypto-lib APIs.
+     - This is now generated by preprocessor-templating.
+   - Remove the multiplexor code.
+   - Multiplex the crypto-lib APIs by C type.
+ - Fix the PKCS#7/X.509 code to have the correct algo names.
+
+ver #8)
+ - Moved the ML-DSA code to lib/crypto/mldsa/.
+ - Renamed some bits from ml-dsa to mldsa.
+ - Created a simplified API and placed that in include/crypto/mldsa.h.
+ - Made the testing code use the simplified API.
+ - Fixed a warning about implicitly casting between uint16_t and __le16.
+
+ver #7)
+ - Rebased on Eric's tree as that now contains all the necessary SHA-3
+   infrastructure and drop the SHA-3 patches from here.
+ - Added a minimal patch to provide shake256 support for crypto_sig.
+ - Got rid of the memory allocation wrappers.
+ - Removed the ML-DSA keypair generation code and the signing code, leaving
+   only the signature verification code.
+ - Removed the secret key handling code.
+ - Removed the secret keys from the kunit tests and the signing testing.
+ - Removed some unused bits from the ML-DSA code.
+ - Downgraded the kdoc comments to ordinary comments, but keep the markup
+   for easier comparison to Leancrypto.
+
+ver #6)
+ - Added a patch to make the jitterentropy RNG use lib/sha3.
+ - Added back the crypto/sha3_generic changes.
+ - Added ML-DSA implementation (still needs more cleanup).
+ - Added kunit test for ML-DSA.
+ - Modified PKCS#7 to accommodate ML-DSA.
+ - Modified PKCS#7 and X.509 to allow ML-DSA to be specified and used.
+ - Modified sign-file to not use CMS_NOATTR with ML-DSA.
+ - Allowed SHA3 and SHAKE* algorithms for module signing default.
+ - Allowed ML-DSA-{44,65,87} to be selected as the module signing default.
+
+ver #5)
+ - Fix gen-hash-testvecs.py to correctly handle algo names that contain a
+   dash.
+ - Fix gen-hash-testvecs.py to not generate HMAC for SHA3-* or SHAKE* as
+   these don't currently have HMAC variants implemented.
+ - Fix algo names to be correct.
+ - Fix kunit module description as it now tests all SHA3 variants.
+
+ver #4)
+ - Fix a couple of arm64 build problems.
+ - Doc fixes:
+   - Fix the description of the algorithm to be closer to the NIST spec's
+     terminology.
+   - Don't talk of finialising the context for XOFs.
+   - Don't say "Return: None".
+   - Declare the "Context" to be "Any context" and make no mention of the
+     fact that it might use the FPU.
+   - Change "initialise" to "initialize".
+   - Don't warn that the context is relatively large for stack use.
+ - Use size_t for size parameters/variables.
+ - Make the module_exit unconditional.
+ - Dropped the crypto/ dir-affecting patches for the moment.
+
+ver #3)
+ - Renamed conflicting arm64 functions.
+ - Made a separate wrapper API for each algorithm in the family.
+ - Removed sha3_init(), sha3_reinit() and sha3_final().
+ - Removed sha3_ctx::digest_size.
+ - Renamed sha3_ctx::partial to sha3_ctx::absorb_offset.
+ - Refer to the output of SHAKE* as "output" not "digest".
+ - Moved the Iota transform into the one-round function.
+ - Made sha3_update() warn if called after sha3_squeeze().
+ - Simplified the module-load test to not do update after squeeze.
+ - Added Return: and Context: kdoc statements and expanded the kdoc
+   headers.
+ - Added an API description document.
+ - Overhauled the kunit tests.
+   - Only have one kunit test.
+   - Only call the general hash tester on one algo.
+   - Add separate simple cursory checks for the other algos.
+   - Add resqueezing tests.
+   - Add some NIST example tests.
+ - Changed crypto/sha3_generic to use this
+ - Added SHAKE128/256 to crypto/sha3_generic and crypto/testmgr
+ - Folded struct sha3_state into struct sha3_ctx.
+
+ver #2)
+  - Simplify the endianness handling.
+  - Rename sha3_final() to sha3_squeeze() and don't clear the context at the
+    end as it's permitted to continue calling sha3_final() to extract
+    continuations of the digest (needed by ML-DSA).
+  - Don't reapply the end marker to the hash state in continuation
+    sha3_squeeze() unless sha3_update() gets called again (needed by
+    ML-DSA).
+  - Give sha3_squeeze() the amount of digest to produce as a parameter
+    rather than using ctx->digest_size and don't return the amount digested.
+  - Reimplement sha3_final() as a wrapper around sha3_squeeze() that
+    extracts ctx->digest_size amount of digest and then zeroes out the
+    context.  The latter is necessary to avoid upsetting
+    hash-test-template.h.
+  - Provide a sha3_reinit() function to clear the state, but to leave the
+    parameters that indicate the hash properties unaffected, allowing for
+    reuse.
+  - Provide a sha3_set_digestsize() function to change the size of the
+    digest to be extracted by sha3_final().  sha3_squeeze() takes a
+    parameter for this instead.
+  - Don't pass the digest size as a parameter to shake128/256_init() but
+    rather default to 128/256 bits as per the function name.
+  - Provide a sha3_clear() function to zero out the context.
+
+David Howells (7):
+  crypto: Add ML-DSA crypto_sig support
+  x509: Separately calculate sha256 for blacklist
+  pkcs7, x509: Rename ->digest to ->m
+  pkcs7: Allow the signing algo to do whatever digestion it wants itself
+  pkcs7, x509: Add ML-DSA support
+  modsign: Enable ML-DSA module signing
+  pkcs7: Allow authenticatedAttributes for ML-DSA
+
+ Documentation/admin-guide/module-signing.rst |  16 +-
+ certs/Kconfig                                |  40 ++++
+ certs/Makefile                               |   3 +
+ crypto/Kconfig                               |   9 +
+ crypto/Makefile                              |   2 +
+ crypto/asymmetric_keys/Kconfig               |  11 +
+ crypto/asymmetric_keys/asymmetric_type.c     |   4 +-
+ crypto/asymmetric_keys/pkcs7_parser.c        |  36 +++-
+ crypto/asymmetric_keys/pkcs7_parser.h        |   3 +
+ crypto/asymmetric_keys/pkcs7_verify.c        |  78 ++++---
+ crypto/asymmetric_keys/public_key.c          |  13 +-
+ crypto/asymmetric_keys/signature.c           |   3 +-
+ crypto/asymmetric_keys/x509_cert_parser.c    |  27 ++-
+ crypto/asymmetric_keys/x509_parser.h         |   2 +
+ crypto/asymmetric_keys/x509_public_key.c     |  42 ++--
+ crypto/mldsa.c                               | 201 +++++++++++++++++++
+ include/crypto/public_key.h                  |   6 +-
+ include/linux/oid_registry.h                 |   5 +
+ scripts/sign-file.c                          |  39 +++-
+ security/integrity/digsig_asymmetric.c       |   4 +-
+ 20 files changed, 473 insertions(+), 71 deletions(-)
+ create mode 100644 crypto/mldsa.c
+
