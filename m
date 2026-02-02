@@ -1,97 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D995434575F;
-	Mon,  2 Feb 2026 22:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D26B652;
+	Mon,  2 Feb 2026 22:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770070580; cv=none; b=baQU2+7mc1F49zvQYWq9JqIMOCsyZwAnhVMv6HRoPnw7JTzNowpebQktRlRt6nrpFJ4Xb6hSBiOJsE+iYICA4OUBOTJDsoyauNWZDt5IGTJQ8t2e9lAxUGFKVvMgogM+evzA9q+x9Rs4gUJbFz8nmyFtXf1Wtkp4VVy2dX0bT/I=
+	t=1770071554; cv=none; b=aJwbFihdVhqLoCGO/TLaYimihEyovLias9B4KmkN1Xvnm+Mo5lQW7jH2RXlO7KXg5kBiw+KmoUl8pSJ5UjOF03L6OA/OJRAeHpLzM0JjMjxe3mVldRCqAf9S8l+SlqtT+/edpKFzOM5JQGm6Q9/mDPMundXF1+G8zdZKqzkaKe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770070580; c=relaxed/simple;
-	bh=2GizkOyVy3QoEOxeYgr3chOKBw0aO7TklCvYGRzkn9Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cjHwEH9VmZbMyCHgpzN2SnYCGCfd9/l7G+8PRDRfC2EpGrj8UT40MaTW3AJt8HHgBCr+M45X+h90nMdi3584GvNNuax3AXgmAjSWt3u5QGK0WrWGLHpbJbJU8unSkTqE2iby6JtsdvgJIylPYlzShwgPYbT9AugWqev1F5Ck2RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZPpj8w+r; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1770071554; c=relaxed/simple;
+	bh=RkwvJ/eaG/ubSf4GeTmV9ctxLTvA9ARikKcdQA5n5PA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P8fOeegz4d3fGo7NpUJAWXN3PxdAt5GIBnFkWpJ4eLfoXTLhkWQn06iEsDdwkupLcrfkdz0L351kbor3dKvkc+J6hw2BsxO0SNj5pIumwtw7NH//wrzfixl/RKEdKTIs0eLhch3lRBW7cP4Do9xql9oNGV+WyM3wPRhk0vUDdWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Wwo3Yrxf; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZPpj8w+r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EC92C116C6;
-	Mon,  2 Feb 2026 22:16:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770070580;
-	bh=2GizkOyVy3QoEOxeYgr3chOKBw0aO7TklCvYGRzkn9Y=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ZPpj8w+rUpjFpcJeXrok7jieCdKdf60/OQOtjwEswwsQs8Qa4u8MUNkHvOJzuAMqp
-	 3M/c8Lk+10eBv8SUwlA/K5keyj6ePVDrTu1Hl+VaEivC1ahni9VpP1iwSJ8b5KUxO5
-	 tKkEA9pJOAfNE1tjW+FL5VwtZROAWVcw5Su2ifvS3uzyFnXdvp9oN7lbVuV2fG+Jrp
-	 axWQaXVSNwA8qM5KpR7BDyOyXI6JzexU+CeYa2hUS+U8haAWiyIJMFsXhj+dx5HYv0
-	 aFa07aLlvz3zvW3d5BGcC9yCdMZ/gjWZeC7i3JZQXuzAYBDgNEDOJbE6S8r+DEw9jQ
-	 TWaaL1ywvyU3A==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Howells <dhowells@redhat.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: mldsa: Clarify the documentation for mldsa_verify() slightly
-Date: Mon,  2 Feb 2026 14:15:52 -0800
-Message-ID: <20260202221552.174341-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Wwo3Yrxf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770071551; x=1801607551;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RkwvJ/eaG/ubSf4GeTmV9ctxLTvA9ARikKcdQA5n5PA=;
+  b=Wwo3Yrxf+7RnT7YVLqPmFJVkmyK5vM4YmLhWMgJgimZAbXV4bElJDHO5
+   unZ5JSV8/MUx4N3bT4Lw4TC9sXg3d7aFkKf/vLq1CBk1Hn4sSkS1hm3kO
+   E6s9/SCiuFfLlcQzsZ8LmU57j/VQUMlXN2o6o40R36VscHJOlcqKlY/a1
+   7F0fyQ+ClJE6ExZcNfOdcY8fnhs3NyHelQ73uiT93pghAUQZk6PO3uFUS
+   kQDo+d41opkJ6qGUNDhPUBsJifIgj+fiUBglvUGwxqVvyYO6njlqGEcsU
+   zx0QYg1pS1cVwErVhLS8V5dsx40JNr/OUcDqhE1vSXF3EqFT3ykq6iDVN
+   A==;
+X-CSE-ConnectionGUID: l0VF0J8gRPufzvYr2QI2kQ==
+X-CSE-MsgGUID: JILgaMbASCin1EUGr4lZlg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11690"; a="71276589"
+X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
+   d="scan'208";a="71276589"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2026 14:32:31 -0800
+X-CSE-ConnectionGUID: Hbxrtp+LSiCoLVQlQdZWyA==
+X-CSE-MsgGUID: Ek3RB598Quy6MtEbEFKVDQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
+   d="scan'208";a="208938576"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 02 Feb 2026 14:32:28 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vn2T3-00000000g1O-13HM;
+	Mon, 02 Feb 2026 22:32:25 +0000
+Date: Tue, 3 Feb 2026 06:31:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Benjamin Coddington <bcodding@hammerspace.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Rick Macklem <rick.macklem@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] NFSD: Add a key for signing filehandles
+Message-ID: <202602030619.d8NUY35L-lkp@intel.com>
+References: <e3806f53c351c03725ecb12fb7ad100786df04f6.1770046529.git.bcodding@hammerspace.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e3806f53c351c03725ecb12fb7ad100786df04f6.1770046529.git.bcodding@hammerspace.com>
 
-mldsa_verify() implements ML-DSA.Verify with ctx='', so document this
-more explicitly.  Remove the one-liner comment above mldsa_verify()
-which was somewhat misleading.
+Hi Benjamin,
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- include/crypto/mldsa.h | 4 +++-
- lib/crypto/mldsa.c     | 1 -
- 2 files changed, 3 insertions(+), 2 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/include/crypto/mldsa.h b/include/crypto/mldsa.h
-index cf30aef299706..3ef2676787c9e 100644
---- a/include/crypto/mldsa.h
-+++ b/include/crypto/mldsa.h
-@@ -37,11 +37,13 @@ enum mldsa_alg {
-  * @pk_len: Length of the public key in bytes.  Should match the
-  *	    MLDSA*_PUBLIC_KEY_SIZE constant associated with @alg,
-  *	    otherwise -EBADMSG will be returned.
-  *
-  * This verifies a signature using pure ML-DSA with the specified parameter set.
-- * The context string is assumed to be empty.
-+ * The context string is assumed to be empty.  This corresponds to FIPS 204
-+ * Algorithm 3 "ML-DSA.Verify" with the ctx parameter set to the empty string
-+ * and the lengths of the signature and key given explicitly by the caller.
-  *
-  * Context: Might sleep
-  *
-  * Return:
-  * * 0 if the signature is valid
-diff --git a/lib/crypto/mldsa.c b/lib/crypto/mldsa.c
-index ba0c0468956e2..c96fddc4e7dcf 100644
---- a/lib/crypto/mldsa.c
-+++ b/lib/crypto/mldsa.c
-@@ -523,11 +523,10 @@ static size_t encode_w1(u8 out[MAX_W1_ENCODED_LEN],
- 			out[pos++] = w1->x[j] | (w1->x[j + 1] << 4);
- 	}
- 	return pos;
- }
- 
--/* Reference: FIPS 204 Section 6.3 "ML-DSA Verifying (Internal)" */
- int mldsa_verify(enum mldsa_alg alg, const u8 *sig, size_t sig_len,
- 		 const u8 *msg, size_t msg_len, const u8 *pk, size_t pk_len)
- {
- 	const struct mldsa_parameter_set *params = &mldsa_parameter_sets[alg];
- 	const int k = params->k, l = params->l;
+[auto build test WARNING on dabff11003f9aaf293bd8f907a62f3366bd5e65f]
 
-base-commit: fbfeca74043777b48add294089cd4c4f68ed3377
+url:    https://github.com/intel-lab-lkp/linux/commits/Benjamin-Coddington/NFSD-Add-a-key-for-signing-filehandles/20260203-002703
+base:   dabff11003f9aaf293bd8f907a62f3366bd5e65f
+patch link:    https://lore.kernel.org/r/e3806f53c351c03725ecb12fb7ad100786df04f6.1770046529.git.bcodding%40hammerspace.com
+patch subject: [PATCH v3 1/3] NFSD: Add a key for signing filehandles
+config: x86_64-buildonly-randconfig-003-20260203 (https://download.01.org/0day-ci/archive/20260203/202602030619.d8NUY35L-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260203/202602030619.d8NUY35L-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602030619.d8NUY35L-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> fs/nfsd/nfsctl.c:1588:6: warning: variable 'fh_key' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+    1588 |         if (!nn->fh_key) {
+         |             ^~~~~~~~~~~
+   fs/nfsd/nfsctl.c:1594:9: note: uninitialized use occurs here
+    1594 |         memcpy(fh_key, nla_data(attr), sizeof(siphash_key_t));
+         |                ^~~~~~
+   fs/nfsd/nfsctl.c:1588:2: note: remove the 'if' if its condition is always true
+    1588 |         if (!nn->fh_key) {
+         |         ^~~~~~~~~~~~~~~~
+   fs/nfsd/nfsctl.c:1583:23: note: initialize the variable 'fh_key' to silence this warning
+    1583 |         siphash_key_t *fh_key;
+         |                              ^
+         |                               = NULL
+   1 warning generated.
+
+
+vim +1588 fs/nfsd/nfsctl.c
+
+  1573	
+  1574	/**
+  1575	 * nfsd_nl_fh_key_set - helper to copy fh_key from userspace
+  1576	 * @attr: nlattr NFSD_A_SERVER_FH_KEY
+  1577	 * @nn: nfsd_net
+  1578	 *
+  1579	 * Callers should hold nfsd_mutex, returns 0 on success or negative errno.
+  1580	 */
+  1581	static int nfsd_nl_fh_key_set(const struct nlattr *attr, struct nfsd_net *nn)
+  1582	{
+  1583		siphash_key_t *fh_key;
+  1584	
+  1585		if (nla_len(attr) != sizeof(siphash_key_t))
+  1586			return -EINVAL;
+  1587	
+> 1588		if (!nn->fh_key) {
+  1589			fh_key = kmalloc(sizeof(siphash_key_t), GFP_KERNEL);
+  1590			if (!fh_key)
+  1591				return -ENOMEM;
+  1592		}
+  1593	
+  1594		memcpy(fh_key, nla_data(attr), sizeof(siphash_key_t));
+  1595		nn->fh_key = fh_key;
+  1596		return 0;
+  1597	}
+  1598	
+
 -- 
-2.52.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
