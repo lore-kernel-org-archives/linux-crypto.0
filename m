@@ -1,155 +1,143 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934DD35BDBF
-	for <linux-crypto@vger.kernel.org>; Mon,  2 Feb 2026 11:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE4E359704
+	for <linux-crypto@vger.kernel.org>; Mon,  2 Feb 2026 12:25:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770032919; cv=none; b=iu6ZE6/Za4jRYAgADinfdsphwq9qxj9Plh5pdHwlCxcIGisXLZsEr6JMqNQEb3jjxzHhlnI1byXGEXfG0OOUV2xVh2EqbI8FmYI7vTZG99Q4VoAy33oXjrkQDjP7Cc0naNe+cfiCX53oOlF/FWTIPNJB1H2GWLnCnotGAv7AEbo=
+	t=1770035108; cv=none; b=PMvv3SZhT0FUSqwBEhdpE0RggpfTvnMhR6CENx5hKfE+ltgB07Yl2wUqDc2d8S1fxT0lRV0w4CzU4FgGnv57OU0lCwsxtP6KxFajzXZNdsB7hGFicN/CT7dpsknThxsmChZVQKFs4XbIdCuCnpjRA9ou7zXg9R0y3suiuU9EKVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770032919; c=relaxed/simple;
-	bh=y0M27HId7NanN+KU4bmQbyiW7t9DmGAMrikFMXLb2jE=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=FEcxzTaONcjjjt3kWSPIsnX8+WdK7jBDjsJXhIGEKDHk7sHqwoS+Va91OhOEjrcapRswKhtYjllbPikPn+u4gJLnm3OJiLuI99aEiHtTJevr8MCTP8jLVP6yJcau+kNsR3BGn7CKH3rHajZeIdeM7lDeYfhIS+q2AqPq/fXoD94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hgV8xzHx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1770035108; c=relaxed/simple;
+	bh=gUCF9+jSXyb3JIC6GV9eR70rJwXnnHWNLadFygf+hu0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=roWWCbwBkvbGSgjkyB3+7lPU+w8Vf5wd/xsu9dGSo3LG/V8HJBBEhTqino11hbx8D5xQlDGJ+WqQ+yy5cIuW3BwnwbKZAmKHTzIQRsQYbXBP76RDehVS3wBk9sCLLm82GvAN9eB5WB323x5NOrEZrRHT12ewT50NC+24E9lrZP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=g9lvvJQq; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=hFmOyD9O; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hgV8xzHx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770032917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=48ZJbU9M0XqFSl5lmSxIUBwR/U0Gi0NzVcwFc4/F/LI=;
-	b=hgV8xzHxMxht/+SsNCG1Qs/6SeGPDKbiGGn3YUASFp6FOPN2+VyOzh4hj5DkPEqjgS5rNu
-	Ts2oTO/MG71UK18u+Qx9riPpMWhGlyrfavItdjiGtmhVwqV7T7m6fAHj0NRjdFyhfE9aXA
-	E0JdI3lAp8m4lhtMfRL4CIHkRLE8DZ4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-104-w39nM4vVP1ChqFApyokLrQ-1; Mon,
- 02 Feb 2026 06:48:36 -0500
-X-MC-Unique: w39nM4vVP1ChqFApyokLrQ-1
-X-Mimecast-MFC-AGG-ID: w39nM4vVP1ChqFApyokLrQ_1770032914
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 08FED19560B7;
-	Mon,  2 Feb 2026 11:48:33 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.33.164])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 932151800109;
-	Mon,  2 Feb 2026 11:48:27 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <SN6PR02MB4157EE01F25375784EB7C507D49DA@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <SN6PR02MB4157EE01F25375784EB7C507D49DA@SN6PR02MB4157.namprd02.prod.outlook.com> <SN6PR02MB415708C0A6E2EB1B5C7BBFB0D49CA@SN6PR02MB4157.namprd02.prod.outlook.com> <20260126142931.1940586-1-dhowells@redhat.com> <20260126142931.1940586-7-dhowells@redhat.com> <2315764.1769964282@warthog.procyon.org.uk>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: dhowells@redhat.com, Sami Tolvanen <samitolvanen@google.com>,
-    Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>,
-    Jarkko Sakkinen <jarkko@kernel.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Eric Biggers <ebiggers@kernel.org>,
-    Luis Chamberlain <mcgrof@kernel.org>,
-    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
-    "Jason A . Donenfeld" <Jason@zx2c4.com>,
-    Ard Biesheuvel <ardb@kernel.org>,
-    Stephan Mueller <smueller@chronox.de>,
-    "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-    "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-    "linux-modules@vger.kernel.org" <linux-modules@vger.kernel.org>,
-    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v15 6/7] modsign: Enable ML-DSA module signing
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="g9lvvJQq";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="hFmOyD9O"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6128AKLN769243
+	for <linux-crypto@vger.kernel.org>; Mon, 2 Feb 2026 12:25:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	xI/twei90NFc37s8BZBKjsNGdHURMt/JPbtCf1osmek=; b=g9lvvJQqF+7AKUg6
+	4z7/PjIQ72WmlWUz0HZTyXGlA9ixxwvHSEIFOlM5VRN8rsruCRLUwuFpwJtmCoN2
+	D+v5DC1e4neZOJBLR+PgqyXAjZ2oZceXY1v1qKYHazMoTdvpB8vlWchpMG1Oq91S
+	r5YQDnuW4J2l7ansf8VXSX2nRabFidAj2hgO+qg5UYjD8TXD8F2AoTm4VPIKCpB+
+	/EKnlPVZ86bMP676PFPa+XOgLodZ0xEpaSgbxOTuIhBQI/sP5+HFKIjVvj4iWgoP
+	atqtAi2Ct6+ODW5jEyyoMhCCPo3BLZau1YhAQ0/FG2pMCxN3wI4lFt8mn4s+iXAC
+	mSyJwQ==
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c1aredaab-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Mon, 02 Feb 2026 12:25:05 +0000 (GMT)
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8c522c44febso95754285a.0
+        for <linux-crypto@vger.kernel.org>; Mon, 02 Feb 2026 04:25:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1770035105; x=1770639905; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xI/twei90NFc37s8BZBKjsNGdHURMt/JPbtCf1osmek=;
+        b=hFmOyD9OEYsiJakumR/4u9hjOf1uZWCAY77U2pMQ6jPnMwu4WxcatTl4CRLFggxSUD
+         nGuE91yTwKmuxkdx+30HoQ/wWG8ANxP27+Y8wS93tPV9rSFTsIOxkDta4PaseXackdjU
+         eQMmgp5dOy1PiqsOAyFR9IJUDVX00qrmD6tiZrILIt3n4OW2ZZFtdrYV1Hge2AYyL761
+         4IfRR6WsQDpiW3it5JZAt7yjMm4OhDMVYVnKAORhwotpbuGHnJhOjh3L5/4AeUuF5X7a
+         O6UGWxuFUTFiCZ1WoOPXsUMWe472NvWk9m+XHpTpzOKUaeqtaLG2wCrVClaldsvjedB0
+         F+ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770035105; x=1770639905;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xI/twei90NFc37s8BZBKjsNGdHURMt/JPbtCf1osmek=;
+        b=YC4P5bWcAzg8W1h3vycREuWKUIk078eV0v4c9DKCJDMKX9vPEweZOCAcFSAYgb36Eu
+         rTfBZjUdHR/x80EmqMwXbTp3IrVupTipEuL5cK/bmnZT7PPxyY/SVoBh6hSFP7KvMLiu
+         KMASBYbZqHSbiMmftuv9oryppTKOnrL3ZykxNqM5M7LxFKfpOJChQ0FRq+NqUqUCdoK8
+         l86i7qWpgFjrCTkB/6Pq7l/M1WPHfLIDljDmLmwX0l32tb6AeMIymY1/Eyrq9j2yJXl+
+         YkzMk9qa6KI7w4Tb+E3R1uP9LC7WHCa39WGQleftwLyo2yry23JuupnD+de4JtvOfXwc
+         YjFw==
+X-Gm-Message-State: AOJu0YzJFzQb6xy2bmeZPhjZvaRtY4JNvpmlV0gOTPlVsJDR3aGbNIGJ
+	DARrYmtz3I40EnCKBCTq/IkTgmRkgUVCIZeOJCu9onSz8hFKT65CzXXLCCTy5nr1PUmTBSCsnUm
+	iPmMQL1XJVAAjwygcsbTt3z7sBofiv8m3sfu0M10+5JmIJUWgrFxbXVaWbeOiKXuVCYcDShhjyK
+	U=
+X-Gm-Gg: AZuq6aIZGZCI7U+kOicyv6/9VyxcqS40chb8cygpflnvbgfxjx9Cn3s+3vKeMJnXRv5
+	s4n4ngZellExydJarew9pfUxEXRiaZgUiFyb+FSqaQ8LOI0yhHA8tqTvc68KVeSVign7IhZNK3t
+	dnhEJhM6biIpInOULTo9HilX0jkyryA2sR8TLimcY+WvDOAtm4O8uMS9Jfuhs3gRSUInPJKSb2S
+	ivzKnGGu8AGxVQ/fgaWLGiCRqChCfpDa6mz0RE/4UtN6VzdY7pr8+viCSyX+4PjjkBHYI/1nl7a
+	wiDZFeiGityJXBCbtphBN9GzXPKQ6B/D4rwjrpCIJ8vFw4Sej6cXQmroNmTTgNPQxdzGaUrDQ0G
+	LF0e7agBc5z7/7+ve+WqjVdjFHwjLMSN0Tt12iuXEfrgWsHTzWOFqlnPXQDYEhjtxuvk=
+X-Received: by 2002:a05:620a:31a4:b0:89f:5a1b:1ec9 with SMTP id af79cd13be357-8c9eb25aa3amr1079736585a.1.1770035105234;
+        Mon, 02 Feb 2026 04:25:05 -0800 (PST)
+X-Received: by 2002:a05:620a:31a4:b0:89f:5a1b:1ec9 with SMTP id af79cd13be357-8c9eb25aa3amr1079734385a.1.1770035104740;
+        Mon, 02 Feb 2026 04:25:04 -0800 (PST)
+Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-658b469e6b2sm7608999a12.26.2026.02.02.04.25.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Feb 2026 04:25:03 -0800 (PST)
+Message-ID: <b5d7ac9d-64f1-4666-a950-d79347854ad9@oss.qualcomm.com>
+Date: Mon, 2 Feb 2026 13:25:01 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2416272.1770032906.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Feb 2026 11:48:26 +0000
-Message-ID: <2416273.1770032906@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5] crypto: qce - Add runtime PM and interconnect
+ bandwidth scaling support
+To: Udit Tiwari <quic_utiwari@quicinc.com>, herbert@gondor.apana.org.au,
+        thara.gopinath@gmail.com, davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, quic_neersoni@quicinc.com
+References: <20251120062443.2016084-1-quic_utiwari@quicinc.com>
+ <a2c6cbdb-a114-423f-a315-6e5e9ab84e5a@oss.qualcomm.com>
+ <ec9e420a-932d-4265-8cac-dee003933898@quicinc.com>
+ <c1749b86-0016-4314-9497-04e952683060@quicinc.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <c1749b86-0016-4314-9497-04e952683060@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=NNfYOk6g c=1 sm=1 tr=0 ts=698097a2 cx=c_pps
+ a=HLyN3IcIa5EE8TELMZ618Q==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=5YqSPhDMRtzW0TTUFusA:9 a=QEXdDO2ut3YA:10
+ a=QYH75iMubAgA:10 a=bTQJ7kPSJx9SKPbeHEYW:22
+X-Proofpoint-GUID: GXkbRfqovgDHTYmBA0Qkb8Be9sRbNPCx
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAyMDA5NiBTYWx0ZWRfX9bSwQkf/0vtz
+ KIJ9eSEg7NTR/SrEa/YwDKxgplztyyfztu9z3t3+pAlkxrCAjNNWP/t+vvK1a44A+e02O/3eE2O
+ M9qrN+aHYWF6OryngtMLIREl2wAWjU3x/fWA+cKeC/+7OdzYW1BgIKLXd6cRdSciPSJH2x1YxbL
+ syjn383ikKvUjiq/VLjf+Rou5DzxgTNEt9J/RmASQcgVEjZDoy1q2XQ9wT+M2llwk3cUb5/x+HB
+ wAXbYgADO4bSS5PamXSQaJd07e5SEBOAGeA5lIIgob33GTsYZQDD1vU6XIzoNftBfl2FaqC9ioT
+ ugi9thJWRMyXLT+qwDpJ3Mgx2/VzLlRWk3lDbz5FOB222V2Uji4APtSUc7w5IVSez0ObHtibb98
+ fD+jsY6kCNR3mNqjdZxa2v98MJz+PGUdVgHwhZlxR1vu+LhYUjqi9mN/hJ0JitCfywO5kV8AlCA
+ E4RLXd2kUupSGAM9VCA==
+X-Proofpoint-ORIG-GUID: GXkbRfqovgDHTYmBA0Qkb8Be9sRbNPCx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-02_04,2026-01-30_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 lowpriorityscore=0 adultscore=0 priorityscore=1501
+ clxscore=1015 suspectscore=0 spamscore=0 phishscore=0 bulkscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602020096
 
-Michael Kelley <mhklinux@outlook.com> wrote:
+On 1/27/26 5:27 AM, Udit Tiwari wrote:
+> Hi Konrad,
+> 
+> Gentle ping on this.
+> 
+> Do you have any further thoughts on my previous reply regarding the PM runtime optimization? I am happy to spin a v6 if you view it as a blocker; otherwise, I would appreciate it if this could be considered for merging as-is.
 
-> Pardon my ignorance of the signing details, but I don't see an indicatio=
-n
-> of having selected PKCS#7 with SHA1 in my .config. What am I looking for=
-?
+Sorry for not getting back to you on this in time.
 
-Actually, if you have openssl >=3D 1.0.0 then it sign-file will be built t=
-o use
-CMS rather than PKCS#7, and will use the configured hash algo, so you can
-ignore this.
+I'd prefer if you used these helpers, as otherwise there's a lot
+of unnecessary goto-noise
 
-> The symbols CMS_NO_SIGNING_TIME,
-
-I can probably just not add that.
-
-> EVP_PKEY_is_a()
-
-I guess I can probably make this contingent on >=3D 3.0.0.
-
-> and OPENSSL_VERSION_MAJOR don't exist in the include/openssl/* files for
-> that old version.
-
-I should probably use OPENSSL_VERSION_NUMBER instead - though we already u=
-se
-it for selecting #includes (I guess #if doesn't complain).
-
-Do the attached changes work for you?
-
-David
----
-diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-index 547b97097230..78276b15ab23 100644
---- a/scripts/sign-file.c
-+++ b/scripts/sign-file.c
-@@ -27,7 +27,7 @@
- #include <openssl/evp.h>
- #include <openssl/pem.h>
- #include <openssl/err.h>
--#if OPENSSL_VERSION_MAJOR >=3D 3
-+#if OPENSSL_VERSION_NUMBER >=3D 0x30000000L
- # define USE_PKCS11_PROVIDER
- # include <openssl/provider.h>
- # include <openssl/store.h>
-@@ -323,18 +323,21 @@ int main(int argc, char **argv)
- 			CMS_DETACHED |
- 			CMS_STREAM  |
- 			CMS_NOSMIMECAP |
-+#ifdef CMS_NO_SIGNING_TIME
- 			CMS_NO_SIGNING_TIME |
-+#endif
- 			use_keyid;
- =
-
--		if ((EVP_PKEY_is_a(private_key, "ML-DSA-44") ||
--		     EVP_PKEY_is_a(private_key, "ML-DSA-65") ||
--		     EVP_PKEY_is_a(private_key, "ML-DSA-87")) &&
--		    OPENSSL_VERSION_MAJOR < 4) {
-+#if OPENSSL_VERSION_NUMBER >=3D 0x30000000L && OPENSSL_VERSION_NUMBER < 0=
-x40000000L
-+		if (EVP_PKEY_is_a(private_key, "ML-DSA-44") ||
-+		    EVP_PKEY_is_a(private_key, "ML-DSA-65") ||
-+		    EVP_PKEY_is_a(private_key, "ML-DSA-87")) {
- 			 /* ML-DSA + CMS_NOATTR is not supported in openssl-3.5
- 			  * and before.
- 			  */
- 			use_signed_attrs =3D 0;
- 		}
-+#endif
- =
-
- 		flags |=3D use_signed_attrs;
- =
-
+Konrad
