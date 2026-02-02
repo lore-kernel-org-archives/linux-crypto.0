@@ -1,91 +1,86 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF0B2798E5
-	for <linux-crypto@vger.kernel.org>; Mon,  2 Feb 2026 17:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0BE2E22AA;
+	Mon,  2 Feb 2026 18:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770053648; cv=none; b=bgAxAsAXo2dXd/z5OTdry8rpEWeSf+nmySNAOGjHsA6Ndm0A543Dqz1Ruh0TqavshwWZQn4KRKEzCT5BkCmdm57TeqdmJVnuEmqnWzwVF06dClhvg0NHNGB/pChDDL5llzxDQebCKM07MBwtoi89aQS0QHS6MgrMCn3KfBKePdY=
+	t=1770056375; cv=none; b=nojN8CThxRRehH8dRvUjjmmpWC+Zx37y8PciFkqIWZvXnIObiUHQZZSuFTNfShN5Ym8kCireTzscm0AvimCyo6SoFEtR4BY328p87b6+zK1x1ERYFmD2SWqijVEtYBAGgsOSwQmHvPOiO87trQbqN63SGLEDqlwQstz9pYo4CLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770053648; c=relaxed/simple;
-	bh=mjoBRn1KMFiT+6qQ1vMWJYzOJs4r/llNDgDPoJbub2s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AWgko4/SmiaT69gG+vCTmyaKBGo07/qLxV4T2QIJLzkpZ8d4tCxZlMZSrzy9hfpDxqVjzt5ZK7POt9y2ipPl+aAqR+Cl0YSdGLIABM8EGwBPDokuG8UGFjBVE8Jdw8RB65Srio0ORtKN9FV+YHkRp3FRC1NELM02/Y4lpZjbBuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bNmdjjWD; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1770056375; c=relaxed/simple;
+	bh=vVl96LCrbznZU72nHAStgcberNXB57p0T9mJjmMM7zo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pBnkHW0RMIHWjVbUkMs0HpZfrP7fZBV3W38GJsdjM2LfW+OD+FfTlgUNwpUVW1YRC10Mm0pFUwOtkknfVxA6v0Mt0UECxdUMURHWJJMaeg91wF0ORnX948oxc0eFndaTQGnp6IxpdVSJ5BHkZb+1d2CgjEtfezhS4hAgJ/JbYXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lWzn33rD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bNmdjjWD"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770053644;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qCJFF5AJAwgHihlo6Xmy7iPivmvop9cFNk1pmrP3CIM=;
-	b=bNmdjjWDHXthTahTyuS4rIJbzfzuyKVRg2Lr+bo04sg6Cqw/L86iB+17kQcIkUnP1mgJx6
-	MhYkWXvPre2L44fiD8odGGObK0CTl/vGUH21YexWh2TYVh/PTJuADZ8p9gOL60D1HD6Fpb
-	cYEMyV3Xv3QAoVNpCpULwbGTcNe1t50=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Thorsten Blum <thorsten.blum@linux.dev>,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: octeontx - Replace scnprintf with strscpy in print_ucode_info
-Date: Mon,  2 Feb 2026 18:33:21 +0100
-Message-ID: <20260202173323.865842-2-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lWzn33rD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70B38C116C6;
+	Mon,  2 Feb 2026 18:19:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770056375;
+	bh=vVl96LCrbznZU72nHAStgcberNXB57p0T9mJjmMM7zo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lWzn33rDKAeo1uglcKo5+ED21YZQlTtMyncGVp98W8LeQTfq+Ls1ok0krxqzidDnv
+	 yhYHzHx5alQF7XM6SRMw6296y0EJ32Yah37oJUznjdfW3AXNC/3z7jBchFLM0twiO+
+	 y8Hd5pZsl5HvludQonyKouxabDyLkyOFEvIXTi5BRv/KNlxEVGldPyYmNJCMmASSlR
+	 bjzTYG+vGZ/rtCFcABBqIeHHxSFY3pcQhkVf44AmuLjdrP3+Pfa0bYbE7e9O9PcCVe
+	 DUieRFald+XCkixtgm5m2pnGzM4Wo1uS3T8s7D9dvZ+GD8sdMtfXMw81zwUZEso4fk
+	 WrkaG3K3BjNMQ==
+Date: Mon, 2 Feb 2026 10:19:32 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Benjamin Coddington <bcodding@hammerspace.com>
+Cc: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+	NeilBrown <neil@brown.name>, Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Rick Macklem <rick.macklem@gmail.com>, linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] NFSD: Sign filehandles
+Message-ID: <20260202181932.GA2036@quark>
+References: <cover.1770046529.git.bcodding@hammerspace.com>
+ <11253ead28024160aaf8abf5c234de6605cc93b5.1770046529.git.bcodding@hammerspace.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <11253ead28024160aaf8abf5c234de6605cc93b5.1770046529.git.bcodding@hammerspace.com>
 
-Replace scnprintf("%s", ...) with the faster and more direct strscpy().
-Remove the parentheses while we're at it.
+On Mon, Feb 02, 2026 at 11:19:38AM -0500, Benjamin Coddington wrote:
+> +/*
+> + * Append an 8-byte MAC to the filehandle hashed from the server's fh_key:
+> + */
+> +static int fh_append_mac(struct svc_fh *fhp, struct net *net)
+> +{
+> +	struct nfsd_net *nn = net_generic(net, nfsd_net_id);
+> +	struct knfsd_fh *fh = &fhp->fh_handle;
+> +	siphash_key_t *fh_key = nn->fh_key;
+> +	u64 hash;
+> +
+> +	if (!(fhp->fh_export->ex_flags & NFSEXP_SIGN_FH))
+> +		return 0;
+> +
+> +	if (!fh_key) {
+> +		pr_warn_ratelimited("NFSD: unable to sign filehandles, fh_key not set.\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (fh->fh_size + sizeof(hash) > fhp->fh_maxsize) {
+> +		pr_warn_ratelimited("NFSD: unable to sign filehandles, fh_size %d would be greater"
+> +			" than fh_maxsize %d.\n", (int)(fh->fh_size + sizeof(hash)), fhp->fh_maxsize);
+> +		return -EINVAL;
+> +	}
+> +
+> +	hash = siphash(&fh->fh_raw, fh->fh_size, fh_key);
+> +	memcpy(&fh->fh_raw[fh->fh_size], &hash, sizeof(hash));
+> +	fh->fh_size += sizeof(hash);
+> +
+> +	return 0;
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Note that this is still creating endianness-specific MAC values,
+considering that siphash() returns a u64 which is being copied directly
+into a byte array.  Maybe not what was intended?
 
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-index 9f5601c0280b..4ff28bd131d4 100644
---- a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-@@ -10,6 +10,7 @@
- 
- #include <linux/ctype.h>
- #include <linux/firmware.h>
-+#include <linux/string.h>
- #include <linux/string_choices.h>
- #include "otx_cpt_common.h"
- #include "otx_cptpf_ucode.h"
-@@ -509,13 +510,12 @@ EXPORT_SYMBOL_GPL(otx_cpt_uc_supports_eng_type);
- static void print_ucode_info(struct otx_cpt_eng_grp_info *eng_grp,
- 			     char *buf, int size)
- {
--	if (eng_grp->mirror.is_ena) {
-+	if (eng_grp->mirror.is_ena)
- 		scnprintf(buf, size, "%s (shared with engine_group%d)",
- 			  eng_grp->g->grp[eng_grp->mirror.idx].ucode[0].ver_str,
- 			  eng_grp->mirror.idx);
--	} else {
--		scnprintf(buf, size, "%s", eng_grp->ucode[0].ver_str);
--	}
-+	else
-+		strscpy(buf, eng_grp->ucode[0].ver_str, size);
- }
- 
- static void print_engs_info(struct otx_cpt_eng_grp_info *eng_grp,
--- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
-
+- Eric
