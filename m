@@ -1,230 +1,280 @@
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azolkn19010017.outbound.protection.outlook.com [52.103.12.17])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11020136.outbound.protection.outlook.com [52.101.46.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3153E21D3F8;
-	Mon,  2 Feb 2026 15:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.12.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10C723C4E9;
+	Mon,  2 Feb 2026 16:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.136
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770047133; cv=fail; b=rmB9aJ9MlyhIp9+rNrD1XDV1Sv5Mh6Jpt/K1+jyNe53h+XXO2juSmVCOUgtsN5M0ob/7n2JcA3ew7es74cfc/uGhLGXqFzh77kdx46J2D7L2XwSd8lTR5pvDJzjqxy6+Z+aux3ezannj26bsm0QXpih06fAOQsN1k2GDeYm8uDA=
+	t=1770049189; cv=fail; b=aEcs/hXImaAuoPtkNdeK+W7ZBAxMf8pJ9S3exnmbKdIxgN4Uc1CrXM1RJ1RLtcNQH/ERwUbBuoviME7VaUm6Zj+gAidw55c5zKut/8SST5G70t2dCggsBh3nfmJeJ1KMLiqgIEB5tPI5s7jTPcsmm6LPwH/Y+EHlKx1Lf93pTiA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770047133; c=relaxed/simple;
-	bh=0JYV3GvpzWasjsUVSuMJTczibjNSzbp5NtZRTu3lUb0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bygis5CkDz6ZUM3je1XFbOMYqEXsqTvL+Bmoi6LOyB0Exzl7iZBfGyYpMAxGjAMN+62R6kmiqgr+NRfzWgXVNQbfnUO6KmCbmRbYBQ/xm9Q/Hfn1S+lCDXdWe3kKHUWMRkpNlyn1aKCn/AVd6vwgM5muBTw55q7AeKHoVT+0Q2E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=I20ViwaL; arc=fail smtp.client-ip=52.103.12.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	s=arc-20240116; t=1770049189; c=relaxed/simple;
+	bh=+nqAXW3VHTiJQDb8aK202spo2p+7SAky2s6nkha0ypI=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=I7BYQ4mREKyqkHcB+Ypgg0zsGT/thFLrw445WRiZ9YmF0t95cNrXwSikNdGnqFvyH03Gb/GC1iQtWSXu7ZqMp2tu82Gjf51SWfOS4D8e1Re3ODmjsaMNogxSbjEguGHOdGIca37sT7VR7fuipKNZrWBlXPYIQp0s7dMQ8V8q/CU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com; spf=pass smtp.mailfrom=hammerspace.com; dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b=fXLE/Yv9; arc=fail smtp.client-ip=52.101.46.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hammerspace.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="I20ViwaL"
+	dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b="fXLE/Yv9"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oGG0zFKzQNjqycdB0NTtfedn3yTmpQhL3p7N0LhioRbYCHMOEbLZoNMhnRTcSx51uVhiaxHZD9LRsS862oioUGZ1SBizIAUerkM8Eqd7RcQLWgGRWNMFvOnY2DrDvMMbZU9beQ7J2Iu92wfWTFj2xHX28+42g+hAcRyaEtA4B/eWO3LfdtQsXNU1YQ6x7R8j5OVe/qcPeNt1rfgWwOnpFqaxMT+SdHujjbTaGPpTWme5HVt6araqxOr57cmeDYQIs0/xQ51fV3fOk6E2A/ZyENfL2YdVQnvOrIoLACzEPPnpZFvNlMSeUAOUKrHOlmxzmrUIylUSgrWNMfBTCvms/w==
+ b=DKsayAtLTsmTAdqQJhR+uanVpcjdQem3tWASmhmF5FTtKpUi/anDvvGDbx30S0A9wKT10HMz1nK+JULdaqIeMJHJxcCC9dCWRNS5nyNq38+aqfpnsWXE8X/zW/9fAIfT5WSxrEAi78s+26qYoJTP5P+y3NOPUlHc3/dESu1got2WEOJY7gFB42puFYzcrVuaESjfP5Y2iAwAyPqDfqb2bOfhF6K1r6SKjQY91CrfsNfWSJiMnQNbuvK7hmfCAhww+7dTAzgR6VcYAqO5ANgl2MOAauzabgIIoyZJbWMNiC1D8cXnOjn4K+MQnJWkXNK1QW6zT5EvXLKiHkV37H7STg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KQr1ghCfc2rSxDYm3n+C5DAjdt9Y1bqCGxhRC/JkPk0=;
- b=nnKesHCd9ihmGpsBHx6a+gJWC+HwHKaBOylexrT/T1z+R5dx47LoDDOS8HGS+SxUtK8U6fpx602qAhixowOqzV61dRhB1tnHAF0cRJveBOrj/9+rcO7EeCSHeAAShD/etKS98ZfcbY4+/LwMppspAZHAViuAt30BeXJMr6vowV0YDfJx1XyYrtDS8vHyV7+nTX49wknFjavNDheCDnRWAuoG4ovlsLJgUSDeRFwUkFgs5ZfmNBvmZyk9MT9biXEwdDiqBdP3UoF6wdJrVC7PFv9UE08cjOwGM6v3QxYWVz0TlVjCsRW18DJwJ+L4/dc0YMJ4fIINzcGplDDPtnSTpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
+ bh=KqBkpgclRCjtchLzgayjoOitwWIdN4rTeFNCObaKXBI=;
+ b=oetYf+4hqzBFf3l5DWvcP8Q7jdFTIP3o06SQXfYJ22I4IAoyDfb3Vkkw7E/8Pewx0TaidlDh7J4gkr598SOSymHev5lpfLAHtkUpxri8lGwJjNx16oA7q7kWdx4jO11Bsc05wJWzYYlp5FsK/qNlcN96iZ+Fr9pMPmBe3/j0ViJ+PaqhckeAvjqAPn20ZOQUGd6Riqbk3m1UFEdEslTq5sGgzCsd9Q75lgl1ns0XC4yZ49jamu08oDhSSeWGtS7Jp6CoqZHvKwmdl4BILA842rvohmHqPvQaQLUIzhqIHu26RS3AUHHOKtV48UVN+DgYouM9DTANl7hRDexYnC75Gw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hammerspace.com; dmarc=pass action=none
+ header.from=hammerspace.com; dkim=pass header.d=hammerspace.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hammerspace.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KQr1ghCfc2rSxDYm3n+C5DAjdt9Y1bqCGxhRC/JkPk0=;
- b=I20ViwaLRl/Kk1FEEAblP42i93zQ+JDcnWU0fiN2wkF8MISG8O1WNumJv9puihUKU5JQxyh7YKMgW9o+Fmgqgx899zV7MZXhNg6AfkB8wOTEsGIrAjPBkZLrmoHcVn/laku5kTwLMdB7xd/AOds2XaNbYNtBjngLn2ZI5+FGRcoT4/5H2dolx3x+/3OaHjm0c+tmvLS+HP3FZ5GNWU9iXf5ZURFge+a8eyC0pYV/LyM6HTyh+BKpVriZ783/xdU+fhgC9j6atEXwMm2suFlec8I8oNTwbitWOupLardzUA1sFyUtzC9IbZMlpl4dXGAmxaGwYzjAixF4yLb2NiddjQ==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by CY8PR02MB9594.namprd02.prod.outlook.com (2603:10b6:930:79::17) with
+ bh=KqBkpgclRCjtchLzgayjoOitwWIdN4rTeFNCObaKXBI=;
+ b=fXLE/Yv9so/JAe3qHZbTcY2YVmYKeldAaQj3Tstw8yDyXDkKDSaUlPFfWce8/vTuY3tbXx9EdQHFKzNeSKXM0sE4R235d6tPFLWWcKcpIOJXpX6PECc+1/EKDUq1O9H12JichVYl0ZIC1GlxPiXyFhZwGzYli/nv2yue4s9LDGk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=hammerspace.com;
+Received: from BN0PR13MB5246.namprd13.prod.outlook.com (2603:10b6:408:159::12)
+ by BY5PR13MB4470.namprd13.prod.outlook.com (2603:10b6:a03:1d1::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Mon, 2 Feb
- 2026 15:45:28 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::900:1ccf:2b1e:52b6]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::900:1ccf:2b1e:52b6%6]) with mapi id 15.20.9564.016; Mon, 2 Feb 2026
- 15:45:28 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: David Howells <dhowells@redhat.com>
-CC: Sami Tolvanen <samitolvanen@google.com>, Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>, Eric Biggers <ebiggers@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>, Stephan Mueller <smueller@chronox.de>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-	"linux-modules@vger.kernel.org" <linux-modules@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v15 6/7] modsign: Enable ML-DSA module signing
-Thread-Topic: [PATCH v15 6/7] modsign: Enable ML-DSA module signing
-Thread-Index: AQHcjtC3xUDRE8Ho5kej8+vCQMw4IrVsc8pggAGitACAACfKkIABF8UAgABBlaA=
-Date: Mon, 2 Feb 2026 15:45:28 +0000
-Message-ID:
- <SN6PR02MB4157C511E3335A5020EE70AED49AA@SN6PR02MB4157.namprd02.prod.outlook.com>
-References:
- <SN6PR02MB4157EE01F25375784EB7C507D49DA@SN6PR02MB4157.namprd02.prod.outlook.com>
- <SN6PR02MB415708C0A6E2EB1B5C7BBFB0D49CA@SN6PR02MB4157.namprd02.prod.outlook.com>
- <20260126142931.1940586-1-dhowells@redhat.com>
- <20260126142931.1940586-7-dhowells@redhat.com>
- <2315764.1769964282@warthog.procyon.org.uk>
- <2416273.1770032906@warthog.procyon.org.uk>
-In-Reply-To: <2416273.1770032906@warthog.procyon.org.uk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|CY8PR02MB9594:EE_
-x-ms-office365-filtering-correlation-id: 502ae00c-57cf-4f31-2265-08de62721732
-x-ms-exchange-slblob-mailprops:
- laRBL560oLS7IWERjHonlu/qsKr3Bu1Zv/IyVf7GeOWxe2uknoJ/xPPU+HN6DWUksShCdG25hSwgVLYNaEjh72qD4g6+LTyIyll2E4dGBxVcUgxV57wSPkUPe3yDjTMuIliNC6+LVkfaKDOXr2FLntonYjUOxsCrzimVX5T+NA7wl1/pDZPnPifPOpny8XTXe8smakrvlmOyJfacsxOjS8taL/T5ohGfD8eSzSBjbW6p7H6vqkzqMwE3BhSCAOok3bZt4+HzpHkbIVsM9etYmIb24lEJWcryMI3cZ1SXmOyR9AHWY5wqZjQUMpDvUuEJCA0xzhX1S/anvQF6AdiuGu3pAYFhVFVkl7lDr/2Zb8L7/yzD2lT5bT/ulSTq1npmW+ukNmiyi8EYuVn66EARkvelhUU4QLv3NEFV42+BRsPUpbsZCnZO0DXzIaaHnqDdvzVjC2nHVl2w7DtmODuwKasyEolVrM72wdUlhCLHd7jby2nV/aiHdTd9d0jytdRKTLm2GOgh/ltGhDUdJIiQD0A1bZtKymWX4cN568rHQ+Bum85GLb482Z/7K+5q1WrdAiDX6DjsdjA8gl5A+FVN+hdoJRvwxhdKi61BYIX3kwbzWe4In0KFsLTmTtqVzCgALi8n0OGnQPZ/rVigf6ES6XhohXTxWgoZgnb+B3n1MQ+mpK6qJaVEvn9dHG/P732BJiJXNML08qjxDNJuPaa7wFxaYMGsmoDtHfkc2iG4qRDxiLQRPV204o3HBFHyNBvZVn9ZW1hCTMqHk4s7wqUP4wTZEz6K8Xvp
-x-microsoft-antispam:
- BCL:0;ARA:14566002|19110799012|51005399006|8062599012|8060799015|13091999003|461199028|15080799012|31061999003|3412199025|440099028|40105399003|102099032;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?0BAUwOmKJCkf6RYz7W4EKY5ni439r5yG+EDCDi6ybQLJzDipZX2kMCrI0Gsj?=
- =?us-ascii?Q?NjxjsLULMfScVJRPmREQgZrXhFU/WITjGrffgna/+XJCs1qYATroZ3DFT3Cc?=
- =?us-ascii?Q?+ENeVZXb6jKM1kqeAZIDmmIz2FF2vphh4z6AgPovOiHY71cEnKj8picK8Wky?=
- =?us-ascii?Q?2sEG1aO76toIjY6EiiD4q3hnA9wlAxtk+CqTVOkOuYrzA/jHDAa01orsvWBB?=
- =?us-ascii?Q?qDr/RA84FKCKR9YnocnT7STwkUANGpsiodpxKwnguZvpPGIitxW2crsWAVOp?=
- =?us-ascii?Q?qlTJnaPtH7WUbVYT2ctX7keuX+oux3Yqx2lOxZsb+kbIUoTlRti5kfuuqrm1?=
- =?us-ascii?Q?hTJEdBnV67Cgi0nJ4NnIffznbxrSfSVgAtIyCX0yWajMsjmM3pvLJtb69QBk?=
- =?us-ascii?Q?xthHAf8qAzoX2fABOc87ukFdPHwXOF+u7Qo6wSkTJSmWQfme+hV5DS/fZZWy?=
- =?us-ascii?Q?eUyEAt58T6ih8xZBO/TXCXiUSMiRKbXKnPHtv5NX614yL8DICgoNtN1m/4IN?=
- =?us-ascii?Q?+HZ0ciW8s6Efd/B+TKhfOmq1uodP9DI0YX6QLzhcSDco39UpmUf914wHka4n?=
- =?us-ascii?Q?KZc1UhKgQyrO240v51/xpoUR/4f2QkWLgErRivcC3mf7CMx2hoQkTfGBtP07?=
- =?us-ascii?Q?tOGwAXBPGBSp1tp9yXtDdtqcN6MQUcclw0tdYT9OOuWvG/mQ8QBsioFwzouE?=
- =?us-ascii?Q?X7epvyBHx+01OgGd1d38+69KJNEONfSFLC2Jo21GwVZez0F+C3nH9BiQ0VnH?=
- =?us-ascii?Q?PLS+aNyKNgkazx2v4GHrrnnY14rfe4TfMKGrKndPl2BVSmdksPmDWYb6Xe7w?=
- =?us-ascii?Q?v19fwH/dDvXG5ca/TjBaRFV02nIgX/WjW61b4DOzctMWbQ2SziL7CMMJPKIU?=
- =?us-ascii?Q?oONqVtot0jCo8+N+RZr11CM6IVNC+/9vaUQBTixRGWka6LS4C53o58e8KJQT?=
- =?us-ascii?Q?cNJIXfOps/tH2pOwWYNFtgsx5YXlqRzq+zh2dyduA1qaW91reyrntCTzuO7D?=
- =?us-ascii?Q?WEGKj3ed+Got8Xy4JMOJgQtXiG8bXEf+V5Ww2lkHGKYHr1CF3Ydua70CaphX?=
- =?us-ascii?Q?xCf68wBL0RByEc4xI+UGctdkMOy3yxjlMaS4GiMVnVn3tcWaEA+SH7RxOkTn?=
- =?us-ascii?Q?2jZXJIUrGI7O2X/jNs+dUyTf2ONdMgG9H9eX9YhxoixeBLpl0tjUhw2j1SDu?=
- =?us-ascii?Q?FXQW/odUYgqhJp+ESegCN8fxO50P3XsqxscC3A=3D=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?JkmQhIAqBUC6MprfSebigq3wWcfTBYKWlGsOSjks71lz6TKy+0xJJ5fRv5Tf?=
- =?us-ascii?Q?lws5Qr6K0HymiIHOtqmBJmqlU9sNfEb3vONuivjliGpZLdLOpFo3eHEFcy8k?=
- =?us-ascii?Q?GSSpVvcBojtoIQJjwh2aKHcHSZ2wx/xzIANlg9vMw2Wf6bbRULeFeiJZHGrb?=
- =?us-ascii?Q?ZtuBiwOLDkE4GXQZ2wBym5kbkmRpkM8dJcttWYrvFco7doIadKqgmFtRiCBP?=
- =?us-ascii?Q?S38+vQrcZAkatc8Me+lrKxu4tnvOoylUyP16zHnE3k/rdk2yUg5o82x9p8Rk?=
- =?us-ascii?Q?CvO6CHdUYD4/29ab0qNkZnp0wR16Y3oon93sdACAztIZDQOUXPD+lMzv5YIB?=
- =?us-ascii?Q?2eCcpfcMiDAKXAAs6VXJLEbm66V5gI4K2FiI8vpeoQ7xmTjLRq1yGOZXlyI6?=
- =?us-ascii?Q?DpfFw8vl68VoC1LAOL72w3nD6wuFbppnUsL/qbNRQrdBOo+82JK8y6V+M7jS?=
- =?us-ascii?Q?6hPHLdCHUrgUTOzXWHPckvQo1x3SSElfM/XPDB2fhtfpZKn47XO+f0A4diT3?=
- =?us-ascii?Q?/XFDf6fpaYyWoBK3CRGuseTLl3X/M7gQP6aFfgUOBht3pmfiVskyLP+5Mnrz?=
- =?us-ascii?Q?uft5GHC0ImHoZdfyPbQL/hyKCiyjvxl+ecfpTSXHAmVumRbnAyR51h7qLgnS?=
- =?us-ascii?Q?228pfzvi9hFHn7nLaiorIIIdPfryzuNC1bFspDIGbA1uPhzPWoXUKUSefnG0?=
- =?us-ascii?Q?brh4DB/59czfSE7+1wj+sojI9u8ko68YhU00ZDIfxLOqLEjWHkj4FtY0kCpm?=
- =?us-ascii?Q?co1E5BxjdSkm99Tdax0ANRXTWiscFIV3m5SYEITQjLMgEM5NEHcyj6bnQWHO?=
- =?us-ascii?Q?3SvtZBXYHHJNm/o5tYlmFsRZAQYhp8ABx+F5YnX4Nnll0B1QQfHOayKmX/8/?=
- =?us-ascii?Q?qLKANp1ivuGBly0rXu2A54jidvCJKnARKarRpIrIZvxWQEacteMGgnjWJ1Fu?=
- =?us-ascii?Q?VPIdBE/3K+ppKPlKmAvs/lW3jFijPJQtB1Gx2YUv/+8ZsZm4cOn/82mRltot?=
- =?us-ascii?Q?AS52egXwQKtieSrl4d2LbzNk4BiVfrdmIwWNImOulPu+Azh2L+uxiwoKt+1y?=
- =?us-ascii?Q?mbhw7I4PTQ955UIi0kLV0dIkcwfsVbvtLjAWV1VB3kFI3ZR1BPuPWAbrg8hM?=
- =?us-ascii?Q?xOVH5+iRXvI7rwEmIdAApWdprPxc+wIsQys8xNX+ozvRm4yolYlzBPy9AleF?=
- =?us-ascii?Q?ajXPdbc4fU9Cavzk1dTaFedNpvZDWgGHa8kWRb8HvkMY5lUEd8Lkz/6P6U3m?=
- =?us-ascii?Q?CHQhr7vw+CMkB2az9lB1Ia9+5+LWlTzzA6OGQ6RZWKL+mq0Rm/Qx2GpKcUW8?=
- =?us-ascii?Q?HfCDzZzrlRT1y45X9IHqvUcsHCvLWtF+4gfCn5n1cQtoIqZ+4P/2ls3S+z3C?=
- =?us-ascii?Q?m9SDrGE=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.11; Mon, 2 Feb
+ 2026 16:19:43 +0000
+Received: from BN0PR13MB5246.namprd13.prod.outlook.com
+ ([fe80::39d0:ce59:f47d:5577]) by BN0PR13MB5246.namprd13.prod.outlook.com
+ ([fe80::39d0:ce59:f47d:5577%6]) with mapi id 15.20.9564.014; Mon, 2 Feb 2026
+ 16:19:42 +0000
+From: Benjamin Coddington <bcodding@hammerspace.com>
+To: Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	NeilBrown <neil@brown.name>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Benjamin Coddington <bcodding@hammerspace.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Rick Macklem <rick.macklem@gmail.com>
+Cc: linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH v3 0/3] kNFSD Signed Filehandles
+Date: Mon,  2 Feb 2026 11:19:35 -0500
+Message-ID: <cover.1770046529.git.bcodding@hammerspace.com>
+X-Mailer: git-send-email 2.50.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: PH7P222CA0019.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:510:33a::22) To BN0PR13MB5246.namprd13.prod.outlook.com
+ (2603:10b6:408:159::12)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN0PR13MB5246:EE_|BY5PR13MB4470:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8d72afa7-1275-4858-9d86-08de6276df35
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|7142099003;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?+q3HFwBYu+ppkVITXfJ3NBUxqOWOByJ6rdMWvFtnA1s2DLJZtWnY+KLGrzxk?=
+ =?us-ascii?Q?8dWE0dcKXrSawOoFo/WqeB5V6O6bnW3y0xDvaJf0e05EYvqn+5N8uviBmD5P?=
+ =?us-ascii?Q?Eyzfa39rbH2V9kqc0upxuflO03LsNBLO4Merx6mBAMEW040nFnl++n0uoio3?=
+ =?us-ascii?Q?fNvHzQL6GyQn+cuo21Vj2z6Td3x8ppGQCAtwCMYxuflHzlJp7fuCA+jCfV3v?=
+ =?us-ascii?Q?1AngNyx+3aZTW2j9pdEIBdHlTHCUxD57Yj8/HXLT1g4gK0sop1ANX4ILOkCU?=
+ =?us-ascii?Q?qPM2w8kMn+M1r50uotMq2myhp67nixDwwVnILEtEevWMaxxYSIv3BAWKqi0u?=
+ =?us-ascii?Q?xsUjv7T3qs0IP+kNrWNFveInZQg0/AQp+Gvl7SR13yTgizePUj8OLLiJ2msg?=
+ =?us-ascii?Q?rHAUStifWJ6BHD+3fsjWV8HfOG5HpRzsscQozJyNLAUe4HdpNbs0CaO5BKYz?=
+ =?us-ascii?Q?qF34d1ExVW2f2/uWFEuK8BbYosClfeVfRUwtyCWpjicn15sBXV6m78/32Yhz?=
+ =?us-ascii?Q?1VI0t6tHtDmgkhOC/ixJTNFTmrTJqw91353+x+7zQkhkuqxJOgmtMU/StDA1?=
+ =?us-ascii?Q?FAGMAUXC7BzLZ2TJlsHwSJdc5SD0G+n+x3cu1SKOwi674AMFPgubMJWy23bt?=
+ =?us-ascii?Q?cU9TL0y4eYe12TcI8j+NVvmFVLG0I3MQH64eGw7P/3Vgl9QXf/PIah2HNcDF?=
+ =?us-ascii?Q?wGSY3b4dYFr4gcEWQKarwv8MNH5si/LWsVD0/PwtNiS23l1H8NuUUuu2yBI/?=
+ =?us-ascii?Q?2wEjjUpc2AwecM2YQU675+llLJfiRkc81G1zgLZ/zl3FKorqMr1a7OvgDkQl?=
+ =?us-ascii?Q?hmbjFW2kBtJcxTETMpLBrnCYBGAzBJb5VjGpwZcxsDURcFsFElshiKh2PWdm?=
+ =?us-ascii?Q?oXuiQ95OORuzrTzSjQraO56KOrSL1mI5+ezj3mmq7Nz5ifk4kS2E60l3rP/F?=
+ =?us-ascii?Q?GBMwO8uL0G8q4/eLIb5wO1ol3z/wBHMqivZbZ/4x7GOVCetQkL3kZSacIYCe?=
+ =?us-ascii?Q?pTJ0Q7NSi3N6DV3m1BD2du6qCzqyzDLm59pIOBdZJLZRoxvgd4MtF1LkMmHc?=
+ =?us-ascii?Q?VTnk1VeBLyYRKdmlk+DJhp2VNbumzBiCM8LRhzD6iFJyerO5b8Hr5WmVxob4?=
+ =?us-ascii?Q?JHQ+KE5lpQdCUY1C3em/t6dWLOw1E7lYWCh5aJNjYVMtMSObkH4NJZDlNOH5?=
+ =?us-ascii?Q?c+JWrZhR3kOJxdJyjyKCns04M7/tWVqiIzKQfyt0tCHcpOEbcTjiaZCiGo2x?=
+ =?us-ascii?Q?DDIKgwes9enOTcoBbeqcwQPyzT8mFEYYv28i61m8AVwYPeUVdNhXG5IjBOYC?=
+ =?us-ascii?Q?JAw+eMPOMZUClWCg36RoEFidEGmC5/bulK5YPTqbor8DboQ+aEoxfXxbqBUv?=
+ =?us-ascii?Q?IZi7xubmwGT51dfhn1N8SLGUAtRhlJCdQ3Vossu6wPy2CxMN8CTK1LH2Ysuq?=
+ =?us-ascii?Q?l6UJxoTz3cw+oCihT004Zq/Ko7sNVSkQZeUKBJQJzSzii5tLpkk/K7UhR4Zo?=
+ =?us-ascii?Q?idBXPVX0vmmZBZ6RB3Iw9wkaIYYgHckLECLO99QZRxfLrdgeIzLJmSPuH+h0?=
+ =?us-ascii?Q?zDyZ1laDmgkfmhNcJRUcaar4N86SFPkSzdoxu6tD?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR13MB5246.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(7142099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ONrXNRdkAxX5cYq61XHrr2xPHMbS7/J3jmM2+nx4TDBnVnNJZjgwdmlNCP9i?=
+ =?us-ascii?Q?mjfx3yvzIF0y8Ryro03/4yNxNXFMVUV7lS+4A34CBdjzsfVEFrPuc/nRRMuf?=
+ =?us-ascii?Q?YoRs9GqHjWQvdIObdVqSJyIWgeAPfdIrhLrG7UBnOWS2u2Py2EbLdZJkXCOp?=
+ =?us-ascii?Q?g9zqja3NXy9vZ5i4cqHoy4iRsp6uZQUpntBIFa7gkbhjDB2Uebjl9e9HBEEA?=
+ =?us-ascii?Q?AbU0Ni9C7K9AlHfJLobpnHTnSwb/rQQPKlnF6aQcg0GHnu9eNMIweMPRTXVd?=
+ =?us-ascii?Q?b8Avxyybpn68NIxNe22JoNpyPKAL3JrHp1ciDSw2hvukouLA3CDKaSKeClqk?=
+ =?us-ascii?Q?84wdbVbuU/WMOBQF6FXUqSkiyeq89ZIxxuMxife74kIIxbH/PJye4E2K35m8?=
+ =?us-ascii?Q?8vDxlFm0InxyESpIhSp8ENb7hXfH0/Dec+LmeL6ufGPlFd/nPPAi3GXjbcaC?=
+ =?us-ascii?Q?Gzrec1zwc1acwyC6fbsmXf7nkl6E7L6X4b/qIZT65twNQ9GtDgqkHG8uv+Qt?=
+ =?us-ascii?Q?BWx2VrIKCLlfewwg+b+w7KLanCf/E2kGxEGNGJhVUb8Dd5d86i33j3BjrWb0?=
+ =?us-ascii?Q?DgEIvToe2/CevNgMYJ02N+N1zHBRpvTyersiu7g3GKb3RUObiOAckkNmkmvT?=
+ =?us-ascii?Q?t+WMuWhSOiHJARbqXNHmIKoVWAoLhmP/xbG9GHV2GvyCWW+hY2MYvUyi0kNV?=
+ =?us-ascii?Q?zoS9oa3f5/R+kx1N+j0Wwh4R7wsbNDltgrmGvlZKLjcAJdV8wNzLa7Dzpdei?=
+ =?us-ascii?Q?tcFdqCqs3DRB6bKphxDrOI50IINN1c6RchUXQBf3eyP4EgkGdB5eVFNqx3Si?=
+ =?us-ascii?Q?BKwt1yClxPeIy1Y0xYGeOIcY+El8MyASuH48Xbar+L6hCvvrWAG66TrqMD9u?=
+ =?us-ascii?Q?jaTo8hfsrKAe9gjByVp8iZ631w4c0r2LtJIsg3ilfB/j5weHFySPAyvIrpfH?=
+ =?us-ascii?Q?dFQn5xTGyu/AcjVo+LY7Sx2jNJsNqlltDTyCtVBB4c9AZAOzzpNXxrDIrl/s?=
+ =?us-ascii?Q?J9qAfznezo26KjH8pBfTU06yNTvg3dRjpzF0VkXkuduN5sg58P9Y7lE5BF8T?=
+ =?us-ascii?Q?FjnpRAZoBiLNZV65j7bCkB1GcJo9J3feTK2JS7q18oBSVsAg0SGKbhiq0+wY?=
+ =?us-ascii?Q?Lt0VoPvCIp0zA/AVY/Dk8FeP6Mc7E03xaATizE+uyVJey24SrvpheEsfXnY6?=
+ =?us-ascii?Q?MBfiyVoWhs0e+pz76U4TJ7QG3Il/VV815gb8IK1ugFqscfKhp7R7uM8tUwbW?=
+ =?us-ascii?Q?pEcMkweWTcx5kFpUQbkvviG5D3Z0Akz8wWsTGFmmzzxJW9jXQwrZaAop/eHe?=
+ =?us-ascii?Q?8dCaJbySamQc5P5fxRVDmeKfSjx6G0rsmmqHem1KkZAcvNgJCHZBjp/BgfeU?=
+ =?us-ascii?Q?OVZHhedzOKrOjSNUaUIz7V9NLMs2ifkQHpo6+fkjVFSHiuJ+EjphgI3gGCwM?=
+ =?us-ascii?Q?MPfBt/XW7Hg146HxDT6VKrDx0OjUC2MBFTBqkvnwHDZpks5YfkZuG1dlJ+ko?=
+ =?us-ascii?Q?Ovgx8/+YWq/6ph5aJTGmiiSyLl65y6sKTkEoqD/oP9HIww5wbv/2D4UD95/a?=
+ =?us-ascii?Q?/YOFH73taNU0zV2VIfcZdJKe5BlqpdUZgtdDwmfhctD+erdn9WMLkxWOqAPw?=
+ =?us-ascii?Q?jO3t+SSXcSJWrfmXu4CISazpsYpfj8LYkCciUwxoBsNkto3bhgKnrfp/7Wkg?=
+ =?us-ascii?Q?5MayqUvHZQsZpxEMJi8fzNwb59oTtY/tpmwpaHmiT6uQCmLjgU8LeJYaJzh9?=
+ =?us-ascii?Q?A9k3G9Yvr4uYJa0NPuDgx16vOXtStC0=3D?=
+X-OriginatorOrg: hammerspace.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d72afa7-1275-4858-9d86-08de6276df35
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR13MB5246.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 502ae00c-57cf-4f31-2265-08de62721732
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Feb 2026 15:45:28.7702
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2026 16:19:42.9230
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR02MB9594
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0d4fed5c-3a70-46fe-9430-ece41741f59e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kyo+mS5NzXva/YGZVERZqzpcGNhASXLSrjLyj1qy6RatX3xrFTvQYA6QWCyGk47FGp2XLIeuf3kyWgFYpy7EpXzY66jsNBW+We1LdwPWNbg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR13MB4470
 
-From: David Howells <dhowells@redhat.com> Sent: Monday, February 2, 2026 3:=
-48 AM
->=20
-> Michael Kelley <mhklinux@outlook.com> wrote:
->=20
-> > Pardon my ignorance of the signing details, but I don't see an indicati=
-on
-> > of having selected PKCS#7 with SHA1 in my .config. What am I looking fo=
-r?
->=20
-> Actually, if you have openssl >=3D 1.0.0 then it sign-file will be built =
-to use
-> CMS rather than PKCS#7, and will use the configured hash algo, so you can
-> ignore this.
->=20
-> > The symbols CMS_NO_SIGNING_TIME,
->=20
-> I can probably just not add that.
->=20
-> > EVP_PKEY_is_a()
->=20
-> I guess I can probably make this contingent on >=3D 3.0.0.
->=20
-> > and OPENSSL_VERSION_MAJOR don't exist in the include/openssl/* files fo=
-r
-> > that old version.
->=20
-> I should probably use OPENSSL_VERSION_NUMBER instead - though we already =
-use
-> it for selecting #includes (I guess #if doesn't complain).
->=20
-> Do the attached changes work for you?
+The following series enables the linux NFS server to add a Message
+Authentication Code (MAC) to the filehandles it gives to clients.  This
+provides additional protection to the exported filesystem against filehandle
+guessing attacks.
 
-Yes, these changes work in my environment. A full kernel build succeeds wit=
-h
-no errors, and the resulting kernel runs as expected.
+Filesystems generate their own filehandles through the export_operation
+"encode_fh" and a filehandle provides sufficient access to open a file
+without needing to perform a lookup.  A trusted NFS client holding a valid
+filehandle can remotely access the corresponding file without reference to
+access-path restrictions that might be imposed by the ancestor directories
+or the server exports.
 
-Thanks!
+In order to acquire a filehandle, you must perform lookup operations on the
+parent directory(ies), and the permissions on those directories may prohibit
+you from walking into them to find the files within.  This would normally be
+considered sufficient protection on a local filesystem to prohibit users
+from accessing those files, however when the filesystem is exported via NFS
+an exported file can be accessed whenever the NFS server is presented with
+the correct filehandle, which can be guessed or acquired by means other than
+LOOKUP.
 
-Michael
+Filehandles are easy to guess because they are well-formed.  The
+open_by_handle_at(2) man page contains an example C program
+(t_name_to_handle_at.c) that can display a filehandle given a path.  Here's
+an example filehandle from a fairly modern XFS:
 
->=20
-> David
-> ---
-> diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-> index 547b97097230..78276b15ab23 100644
-> --- a/scripts/sign-file.c
-> +++ b/scripts/sign-file.c
-> @@ -27,7 +27,7 @@
->  #include <openssl/evp.h>
->  #include <openssl/pem.h>
->  #include <openssl/err.h>
-> -#if OPENSSL_VERSION_MAJOR >=3D 3
-> +#if OPENSSL_VERSION_NUMBER >=3D 0x30000000L
->  # define USE_PKCS11_PROVIDER
->  # include <openssl/provider.h>
->  # include <openssl/store.h>
-> @@ -323,18 +323,21 @@ int main(int argc, char **argv)
->  			CMS_DETACHED |
->  			CMS_STREAM  |
->  			CMS_NOSMIMECAP |
-> +#ifdef CMS_NO_SIGNING_TIME
->  			CMS_NO_SIGNING_TIME |
-> +#endif
->  			use_keyid;
->=20
-> -		if ((EVP_PKEY_is_a(private_key, "ML-DSA-44") ||
-> -		     EVP_PKEY_is_a(private_key, "ML-DSA-65") ||
-> -		     EVP_PKEY_is_a(private_key, "ML-DSA-87")) &&
-> -		    OPENSSL_VERSION_MAJOR < 4) {
-> +#if OPENSSL_VERSION_NUMBER >=3D 0x30000000L && OPENSSL_VERSION_NUMBER < =
-0x40000000L
-> +		if (EVP_PKEY_is_a(private_key, "ML-DSA-44") ||
-> +		    EVP_PKEY_is_a(private_key, "ML-DSA-65") ||
-> +		    EVP_PKEY_is_a(private_key, "ML-DSA-87")) {
->  			 /* ML-DSA + CMS_NOATTR is not supported in openssl-3.5
->  			  * and before.
->  			  */
->  			use_signed_attrs =3D 0;
->  		}
-> +#endif
->=20
->  		flags |=3D use_signed_attrs;
->=20
+# ./t_name_to_handle_at /exports/foo 
+57
+12 129    99 00 00 00 00 00 00 00 b4 10 0b 8c
+
+          ^---------  filehandle  ----------^
+          ^------- inode -------^ ^-- gen --^
+
+This filehandle consists of a 64-bit inode number and 32-bit generation
+number.  Because the handle is well-formed, its easy to fabricate
+filehandles that match other files within the same filesystem.  You can
+simply insert inode numbers and iterate on the generation number.
+Eventually you'll be able to access the file using open_by_handle_at(2).
+For a local system, open_by_handle_at(2) requires CAP_DAC_READ_SEARCH, which
+protects against guessing attacks by unprivileged users.
+
+Simple testing confirms that the correct generation number can be found
+within ~1200 minutes using open_by_handle_at() over NFS on a local system
+and it is estimated that adding network delay with genuine NFS calls may
+only increase this to around 24 hours.
+
+In contrast to a local user using open_by_handle(2), the NFS server must
+permissively allow remote clients to open by filehandle without being able
+to check or trust the remote caller's access. Therefore additional
+protection against this attack is needed for NFS case.  We propose to sign
+filehandles by appending an 8-byte MAC which is the siphash of the
+filehandle from a key set from the nfs-utilities.  NFS server can then
+ensure that guessing a valid filehandle+MAC is practically impossible
+without knowledge of the MAC's key.  The NFS server performs optional
+signing by possessing a key set from userspace and having the "sign_fh"
+export option.
+
+Because filehandles are long-lived, and there's no method for expiring them,
+the server's key should be set once and not changed.  It also should be
+persisted across restarts.  The methods to set the key allow only setting it
+once, afterward it cannot be changed.  A separate patchset for nfs-utils
+contains the userspace changes required to set the server's key.
+
+I had planned on adding additional work to enable the server to check whether the
+8-byte MAC will overflow maximum filehandle length for the protocol at
+export time.  There could be some filesystems with 40-byte fileid and
+24-byte fsid which would break NFSv3's 64-byte filehandle maximum with an
+8-byte MAC appended.  The server should refuse to export those filesystems
+when "sign_fh" is requested.  However, the way the export caches work (the
+server may not even be running when a user sets up the export) its
+impossible to do this check at export time.  Instead, the server will refuse
+to give out filehandles at mount time and emit a pr_warn().
+
+Thanks for any comments and critique.
+
+Changes from encrypt_fh posting:
+https://lore.kernel.org/linux-nfs/510E10A4-11BE-412D-93AF-C4CC969954E7@hammerspace.com
+	- sign filehandles instead of encrypt them (Eric Biggers)
+	- fix the NFSEXP_ macros, specifically NFSEXP_ALLFLAGS (NeilBrown)
+	- rebase onto cel/nfsd-next (Chuck Lever)
+	- condensed/clarified problem explantion (thanks Chuck Lever)
+	- add nfsctl file "fh_key" for rpc.nfsd to also set the key
+
+Changes from v1 posting:
+https://lore.kernel.org/linux-nfs/cover.1768573690.git.bcodding@hammerspace.com
+	- remove fh_fileid_offset() (Chuck Lever)
+	- fix pr_warns, fix memcmp (Chuck Lever)
+	- remove incorrect rootfh comment (NeilBrown)
+	- make fh_key setting an optional attr to threads verb (Jeff Layton)
+	- drop BIT() EXP_ flag conversion
+	- cover-letter tune-ups (NeilBrown, Chuck Lever)
+	- fix NFSEXP_ALLFLAGS on 2/3
+	- cast fh->fh_size + sizeof(hash) result to int (avoid x86_64 WARNING)
+	- move MAC signing into __fh_update() (Chuck Lever)
+
+Changes from v2 posting:
+https://lore.kernel.org/linux-nfs/cover.1769026777.git.bcodding@hammerspace.com/
+	- more cover-letter detail (NeilBrown)
+	- Documentation/filesystems/nfs/exporting.rst section (Jeff Layton)
+	- fix key copy (Eric Biggers)
+	- use NFSD_A_SERVER_MAX (NeilBrown)
+	- remove procfs fh_key interface (Chuck Lever)
+	- remove FH_AT_MAC (Chuck Lever)
+	- allow fh_key change when server is not running (Chuck/Jeff)
+	- accept fh_key as netlink attribute instead of command (Jeff Layton)
+
+Benjamin Coddington (3):
+  NFSD: Add a key for signing filehandles
+  NFSD/export: Add sign_fh export option
+  NFSD: Sign filehandles
+
+ Documentation/filesystems/nfs/exporting.rst | 85 +++++++++++++++++++++
+ Documentation/netlink/specs/nfsd.yaml       |  6 ++
+ fs/nfsd/export.c                            |  5 +-
+ fs/nfsd/netlink.c                           |  5 +-
+ fs/nfsd/netns.h                             |  2 +
+ fs/nfsd/nfsctl.c                            | 37 ++++++++-
+ fs/nfsd/nfsfh.c                             | 64 +++++++++++++++-
+ fs/nfsd/trace.h                             | 25 ++++++
+ include/uapi/linux/nfsd/export.h            |  4 +-
+ include/uapi/linux/nfsd_netlink.h           |  1 +
+ 10 files changed, 225 insertions(+), 9 deletions(-)
+
+
+base-commit: dabff11003f9aaf293bd8f907a62f3366bd5e65f (cel/nfsd-testing)
+-- 
+2.50.1
+
