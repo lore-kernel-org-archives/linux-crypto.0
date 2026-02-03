@@ -1,123 +1,110 @@
-Received: from zg8tmja5ljk3lje4ms43mwaa.icoremail.net (zg8tmja5ljk3lje4ms43mwaa.icoremail.net [209.97.181.73])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A307260F;
-	Tue,  3 Feb 2026 03:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.181.73
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396423921F9;
+	Tue,  3 Feb 2026 07:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770091175; cv=none; b=czsXKafk5crTeOgxXjB+3CT5OXejKMa8hP8hCE5/2V7dgrgUlpT2D7DRnqciAC/AhO4d6R/80VA+39u1eCYmCIRty6kqTolVdkQqSB4AkGKoXHb1QrhIwmwivF5HS85zC81Uh1YkWkyXZikodeQ+oTnLfq3Spjt2WbbN18D+S+I=
+	t=1770102711; cv=none; b=kI3flw9usneL+8vzKZNXBXfdMJa4YxNCEHL4sFKUNOo5d+oxO4pd9ZsggNf5eN/Ku9eg102X41siNE68igAQwwamWueCmZ2VSGmsgscyV8c8SFWsqk+d7x9Us2+6foNIQxPGDAlP3qnLwN3Qm4T4QOsTdsg2r9HHBhei2wIvaBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770091175; c=relaxed/simple;
-	bh=BIlpK5gMziqtOr2CXfQXjnul8vcogeUl0AbX7mTqLXU=;
-	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=nO5Jn81XCLI8rgWrPvljWcQCElEOOuhtIdkan54i4BkZtkXnRECehDK4l4AX3zmvJjilh6khm6/EOnf8HA/ORfk5b0cTsZa84TJKo51jtOW/ccThKF8D/v98y4osBHMnXFqhSFZdeEgV+9SrZTa7Pb+pq/4yOFB5BoI/vgw2NRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn; spf=pass smtp.mailfrom=stu.xidian.edu.cn; dkim=fail (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b=BXKx11zD reason="key not found in DNS"; arc=none smtp.client-ip=209.97.181.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
+	s=arc-20240116; t=1770102711; c=relaxed/simple;
+	bh=Tg20fcLNMaoCzT6bisqT/GU9JY66d1uJBrhI2VyXOUg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ISf+nER1CFv+i75wrds4+RxsH6tbdjVA7v6ziu/ui1JE6yCNYNBjecweCKW64oz+4CblT5+cMzuwRDvcHFvjAsH7kFCMHTzBPOrcGfUK9Daopmv85HUAzheyK6xeLuyX6tjubKppgJ1886QVHhWpNgwm1nbbSLGw8RSDbFvYEhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dZ+sz8Cz; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b="BXKx11zD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=stu.xidian.edu.cn; s=dkim; h=Received:Date:From:To:Cc:Subject:
-	Disposition-Notification-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-ID; bh=5Q9Cc5pEv2V2JxQkigMA1Y8
-	kRVDt484YYIPc6q8NTYg=; b=BXKx11zDcm9gLdVY42Ju+ZK/iNhtT8kyhK7Haj1
-	C6cbYIJNDT/uMQbWXUDlfMr9CgACGkA0/vGQOaNcD9lW7ZGwBOWJegS2saHSduGf
-	8UekAHp8CTH7D6/TkrvjSb1LFD/z2Si8qoRtTeQFVyehaq3lf/X4QYD4g2/Tfv84
-	Xk0Y=
-Received: from 25181214217$stu.xidian.edu.cn ( [115.53.181.194] ) by
- ajax-webmail-hzbj-edu-front-2.icoremail.net (Coremail) ; Tue, 3 Feb 2026
- 11:59:10 +0800 (GMT+08:00)
-Date: Tue, 3 Feb 2026 11:59:10 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?546L5piO54Wc?= <25181214217@stu.xidian.edu.cn>
-To: giovanni.cabiddu@intel.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [BUG] intel_qat: KASAN slab-use-after-free in __mutex_lock from
- adf_dev_up via IOCTL_START_ACCEL_DEV (syzkaller)
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
- 20250410(2f5ccd7f) Copyright (c) 2002-2026 www.mailtech.cn
- mispb-8dfce572-2f24-404d-b59d-0dd2e304114c-icoremail.cn
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dZ+sz8Cz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770102710; x=1801638710;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Tg20fcLNMaoCzT6bisqT/GU9JY66d1uJBrhI2VyXOUg=;
+  b=dZ+sz8CzpjR5abLdgUswDaYT7b99Pkeghl7dbQjgS27ZNoj19giJINac
+   wkjNIdgNlvu1Pibq2iMvKQKJVOCkbAVFgeqfxTfZnQMwbF2h7flmADLzG
+   wxs6ZfRse44ug1v3CRqxnxJ79jTNxMtLdvtvazjiW6zXUENsROtL+ziQe
+   TjelLysz8Er1xJpVwDSH3VusLcNc8u7BkTUa8cDvFGjiJsL1Kw3sSPLu2
+   NeNkfx6ivQQzX+TpiUwQmn5cs2mPg8GaQyF/ikgIUtHux1JiRunshj4Zz
+   3vxb66vSh8AGQMEnglnjIHkhkWIWJahfxmhrw+LMZ9xRVEOS/YPhp+882
+   w==;
+X-CSE-ConnectionGUID: SEZEDzM0SCuAnyuyTIWk2A==
+X-CSE-MsgGUID: YTO3cywHQYWZesUrgsGgRA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11690"; a="70991639"
+X-IronPort-AV: E=Sophos;i="6.21,270,1763452800"; 
+   d="scan'208";a="70991639"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2026 23:11:49 -0800
+X-CSE-ConnectionGUID: 3YTZ7BrnRSW1lPu5CbhUaw==
+X-CSE-MsgGUID: 6PERgo2rQkeGrLgSaXIB0w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,270,1763452800"; 
+   d="scan'208";a="213883170"
+Received: from igk-lkp-server01.igk.intel.com (HELO afc5bfd7f602) ([10.211.93.152])
+  by orviesa003.jf.intel.com with ESMTP; 02 Feb 2026 23:11:46 -0800
+Received: from kbuild by afc5bfd7f602 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vnAZc-000000003KX-061T;
+	Tue, 03 Feb 2026 07:11:44 +0000
+Date: Tue, 3 Feb 2026 08:11:17 +0100
+From: kernel test robot <lkp@intel.com>
+To: Benjamin Coddington <bcodding@hammerspace.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Rick Macklem <rick.macklem@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] NFSD: Sign filehandles
+Message-ID: <202602030854.mD7cfzBx-lkp@intel.com>
+References: <11253ead28024160aaf8abf5c234de6605cc93b5.1770046529.git.bcodding@hammerspace.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <1bc08963.a48.19c21a77cf7.Coremail.25181214217@stu.xidian.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:BLQMCkCmjb2OcoFpApkPAA--.1375W
-X-CM-SenderInfo: qsvrmiqsrujiux6v33wo0lvxldqovvfxof0/1tbiAgUNEWmA4JVnP
-	wABse
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW3Jw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <11253ead28024160aaf8abf5c234de6605cc93b5.1770046529.git.bcodding@hammerspace.com>
 
-RGVhciBRQVQgLyBDcnlwdG8gbWFpbnRhaW5lcnMsCgpXaGVuIHVzaW5nIG91ciBjdXN0b21pemVk
-IFN5emthbGxlciB0byBmdXp6IHRoZSB1cHN0cmVhbSBMaW51eCBrZXJuZWwsIHdlIHRyaWdnZXJl
-ZCB0aGUgZm9sbG93aW5nIGNyYXNoIGluIHRoZSBJbnRlbCBRQVQgZHJpdmVyLgoKSEVBRCBjb21t
-aXQ6N2QwYTY2ZTRiYjkwODFkNzVjODJlYzQ5NTdjNTAwMzRjYjBlYTQ0OQpHaXQgdHJlZTogdXBz
-dHJlYW0KS2VybmVsOiA2LjE4LjAgIzkgUFJFRU1QVCh2b2x1bnRhcnkpIChLQVNBTiBlbmFibGVk
-KQpIYXJkd2FyZTogaHR0cHM6Ly9naXRodWIuY29tL1dtaW5neXUvQ3Jhc2hlcy9ibG9iL21haW4v
-YzQ2MWQ0NjI2ZGQ1NTc2MzhkYjAwN2FlN2NkNGFiYTU3NzE4YzBkMi9jNnh4dmZfcGNpLmMgCk91
-dHB1dDogaHR0cHM6Ly9naXRodWIuY29tL1dtaW5neXUvQ3Jhc2hlcy9ibG9iL21haW4vYzQ2MWQ0
-NjI2ZGQ1NTc2MzhkYjAwN2FlN2NkNGFiYTU3NzE4YzBkMi9yZXByby50eHQKZG1lc2c6IGh0dHBz
-Oi8vZ2l0aHViLmNvbS9XbWluZ3l1L0NyYXNoZXMvYmxvYi9tYWluL2M0NjFkNDYyNmRkNTU3NjM4
-ZGIwMDdhZTdjZDRhYmE1NzcxOGMwZDIvZG1lc2cudHh0Cktlcm5lbCBjb25maWc6IGh0dHBzOi8v
-Z2l0aHViLmNvbS9XbWluZ3l1L0NyYXNoZXMvYmxvYi9tYWluLzYuMTguY29uZmlnCkMgcmVwcm9k
-dWNlcjogaHR0cHM6Ly9naXRodWIuY29tL1dtaW5neXUvQ3Jhc2hlcy9ibG9iL21haW4vYzQ2MWQ0
-NjI2ZGQ1NTc2MzhkYjAwN2FlN2NkNGFiYTU3NzE4YzBkMi9yZXByby5jClN5eiByZXByb2R1Y2Vy
-OiBodHRwczovL2dpdGh1Yi5jb20vV21pbmd5dS9DcmFzaGVzL2Jsb2IvbWFpbi9jNDYxZDQ2MjZk
-ZDU1NzYzOGRiMDA3YWU3Y2Q0YWJhNTc3MThjMGQyL3JlcHJvLnN5egoKPT0gU3VtbWFyeSA9PQpL
-QVNBTiByZXBvcnRzIGEgc2xhYi11c2UtYWZ0ZXItZnJlZSBpbiBfX211dGV4X2xvY2soKSB3aGls
-ZSBzdGFydGluZyBhIFFBVCBhY2NlbGVyYXRpb24gZGV2aWNlIHZpYSBJT0NUTF9TVEFSVF9BQ0NF
-TF9ERVYgb24gL2Rldi9xYXRfYWRmX2N0bC4gVGhlIGNhbGwgdHJhY2UgaW5kaWNhdGVzIHRoZSBh
-Y2Nlc3Mgb3JpZ2luYXRlcyBmcm9tIHRoZSBJbnRlbCBRQVQgZHJpdmVyIHBhdGg6CmFkZl9jdGxf
-aW9jdGwoKSAtPiBhZGZfZGV2X3VwKCkgW2ludGVsX3FhdF0gLT4gX19tdXRleF9sb2NrKCkKClRo
-ZSBrZXJuZWwgcHJpbnRzICJTdGFydGluZyBhY2NlbGVyYXRpb24gZGV2aWNlIHFhdF9kZXYwIiBp
-bW1lZGlhdGVseSBiZWZvcmUgdGhlIGNyYXNoLiBUaGUgS0FTQU4gcmVwb3J0IGluZGljYXRlcyB0
-aGUgZnJlZWQgb2JqZWN0IGJlbG9uZ3MgdG8gdGhlIHRhc2tfc3RydWN0IHNsYWIgY2FjaGUsIHN1
-Z2dlc3RpbmcgYSBzdGFsZSBwb2ludGVyIGlzIGJlaW5nIGRlcmVmZXJlbmNlZCBkdXJpbmcgbXV0
-ZXggbG9ja2luZy4KCj09IENyYXNoIGxvZyAoZG1lc2cgZXhjZXJwdCkgPT0KWyAyMzAuMDA1NDAw
-XSBjNnh4dmYgMDAwMDowMDowNC4wOiBTdGFydGluZyBhY2NlbGVyYXRpb24gZGV2aWNlIHFhdF9k
-ZXYwLgpbIDIzMC4wMTU4NjVdID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpbIDIzMC4wMTgyNTFdIEJVRzogS0FTQU46IHNs
-YWItdXNlLWFmdGVyLWZyZWUgaW4gX19tdXRleF9sb2NrKzB4ZDBhLzB4MTE2MApbIDIzMC4wMjA2
-NDJdIFJlYWQgb2Ygc2l6ZSA0IGF0IGFkZHIgZmZmZjg4ODAxMmVhMWFiNCBieSB0YXNrIHN5ei4x
-LjE4LzQyMzcKWyAyMzAuMDIzNjY5XSBDUFU6IDEgVUlEOiAwIFBJRDogNDIzNyBDb21tOiBzeXou
-MS4xOCBUYWludGVkOiBHIEQgNi4xOC4wICM5IFBSRUVNUFQodm9sdW50YXJ5KQpbIDIzMC4wMjM2
-ODBdIFRhaW50ZWQ6IFtEXT1ESUUKWyAyMzAuMDIzNjgyXSBIYXJkd2FyZSBuYW1lOiBRRU1VIFN0
-YW5kYXJkIFBDIChpNDQwRlggKyBQSUlYLCAxOTk2KSwgQklPUyByZWwtMS4xNi4zLTAtZ2E2ZWQ2
-YjcwMWYwYS1wcmVidWlsdC5xZW11Lm9yZyAwNC8wMS8yMDE0ClsgMjMwLjAyMzY4OF0gQ2FsbCBU
-cmFjZToKWyAyMzAuMDIzNjkxXQpbIDIzMC4wMjM2OTRdIGR1bXBfc3RhY2tfbHZsKzB4ZGIvMHgx
-NDAKWyAyMzAuMDIzNzQ1XSBwcmludF9yZXBvcnQrMHhjYi8weDYxMApbIDIzMC4wMjM3ODFdIGth
-c2FuX3JlcG9ydCsweGNhLzB4MTAwClsgMjMwLjAyMzgwMF0gX19tdXRleF9sb2NrKzB4ZDBhLzB4
-MTE2MApbIDIzMC4wMjQxMDddIGFkZl9kZXZfdXArMHg0NC8weDE0YzAgW2ludGVsX3FhdF0KWyAy
-MzAuMDI0MjI4XSBhZGZfY3RsX2lvY3RsKzB4MWQ2LzB4MTA4MCBbaW50ZWxfcWF0XQpbIDIzMC4w
-MjQ2MThdIF9feDY0X3N5c19pb2N0bCsweDE5NC8weDIxMApbIDIzMC4wMjQ2MjhdIGRvX3N5c2Nh
-bGxfNjQrMHhjNi8weDM5MApbIDIzMC4wMjQ2MzldIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdm
-cmFtZSsweDc3LzB4N2YKWyAyMzAuMDI0NjQ2XSBSSVA6IDAwMzM6MHg3ZjRhZTIyMDA1OWQKWyAy
-MzAuMDI0NjkwXQoKQWxsb2NhdGVkIGJ5IHRhc2sgODUwOgpbIDIzMC4xMDc5MTldIGNvcHlfcHJv
-Y2VzcysweDQ5Yy8weDcyYjAKWyAyMzAuMTEwNzEwXSB1c2VyX21vZGVfdGhyZWFkKzB4Y2QvMHgx
-MTAKWyAyMzAuMTEyMDQ5XSBjYWxsX3VzZXJtb2RlaGVscGVyX2V4ZWNfd29yaysweDcyLzB4MTkw
-ClsgMjMwLjExNTA4NV0gd29ya2VyX3RocmVhZCsweDY4My8weGU5MApbIDIzMC4xMTc3MThdIHJl
-dF9mcm9tX2ZvcmsrMHgzYTEvMHg0OTAKCkZyZWVkIGJ5IHRhc2sgNDE3NjoKWyAyMzAuMTI4NTc2
-XSBrbWVtX2NhY2hlX2ZyZWUrMHgyYWQvMHg2MjAKWyAyMzAuMTI5ODg2XSByY3VfY29yZSsweDg0
-Ni8weDE5NDAKWyAyMzAuMTMzNjIyXSBpcnFfZXhpdF9yY3UrMHhlLzB4MjAKWyAyMzAuMTM2Mzk0
-XSBhc21fc3lzdmVjX2FwaWNfdGltZXJfaW50ZXJydXB0KzB4MWEvMHgyMAoKVGhlIGJ1Z2d5IGFk
-ZHJlc3MgYmVsb25ncyB0bzoKWyAyMzAuMTc5ODE2XSBUaGUgYnVnZ3kgYWRkcmVzcyBiZWxvbmdz
-IHRvIHRoZSBvYmplY3QgYXQgZmZmZjg4ODAxMmVhMWE4MAp3aGljaCBiZWxvbmdzIHRvIHRoZSBj
-YWNoZSB0YXNrX3N0cnVjdCBvZiBzaXplIDY1MjgKWyAyMzAuMTg0MTI5XSBUaGUgYnVnZ3kgYWRk
-cmVzcyBpcyBsb2NhdGVkIDUyIGJ5dGVzIGluc2lkZSBvZgpmcmVlZCA2NTI4LWJ5dGUgcmVnaW9u
-IFtmZmZmODg4MDEyZWExYTgwLCBmZmZmODg4MDEyZWEzNDAwKQoKPT0gUmVwcm9kdWNlciAoc3l6
-IHNuaXBwZXQpID09CnIwID0gb3BlbmF0JHFhdF9hZGZfY3RsKDB4ZmZmZmZmZmZmZmZmZmY5Yywg
-JigweDdmMDAwMDAwMDAwMCksIDB4MiwgMHgwKQpyMSA9IHN5el9vcGVuX2RldiRkcmkoMHgwLCAw
-eDQsIDB4NDAwODAwKQppb2N0bCREUk1fSU9DVExfQUREX0NUWChyMSwgMHhjMDA4NjQyMCwgJigw
-eDdmMDAwMDAwMDE0MCkpCmlvY3RsJElPQ1RMX1NUQVJUX0FDQ0VMX0RFVihyMCwgMHg0MDA5NjEw
-MiwgJigweDdmMDAwMDAwMDNjMCkpCmlvY3RsJERSTV9JT0NUTF9TRVRfTUFTVEVSKHIxLCAweDY0
-MWUpCmlvY3RsJERSTV9JT0NUTF9NT0RFX0dFVFBMQU5FUkVTT1VSQ0VTKHIwLCAweGMwMTA2NGI1
-LCAweDApCmlvY3RsJERSTV9JT0NUTF9HRU1fT1BFTihyMSwgMHhjMDEwNjQwYiwgJigweDdmMDAw
-MDAwMDBjMCkpCgpUaGFuayB5b3UgZm9yIHlvdXIgdGltZS4gUGxlYXNlIGxldCB1cyBrbm93IGlm
-IHlvdSBuZWVkIHRoZSBjb21wbGV0ZSByZXBvcnQvY29uZmlnL3JlcHJvZHVjZXIgbGlua3MuCgpC
-ZXN0IHJlZ2FyZHMsCk1pbmd5dSBXYW5n
+Hi Benjamin,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on dabff11003f9aaf293bd8f907a62f3366bd5e65f]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Benjamin-Coddington/NFSD-Add-a-key-for-signing-filehandles/20260203-002703
+base:   dabff11003f9aaf293bd8f907a62f3366bd5e65f
+patch link:    https://lore.kernel.org/r/11253ead28024160aaf8abf5c234de6605cc93b5.1770046529.git.bcodding%40hammerspace.com
+patch subject: [PATCH v3 3/3] NFSD: Sign filehandles
+reproduce: (https://download.01.org/0day-ci/archive/20260203/202602030854.mD7cfzBx-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602030854.mD7cfzBx-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   ERROR: Cannot find file ./include/linux/jbd2.h
+   ERROR: Cannot find file ./include/linux/jbd2.h
+   WARNING: No kernel-doc for file ./include/linux/jbd2.h
+   ERROR: Cannot find file ./include/linux/netfs.h
+   WARNING: No kernel-doc for file ./include/linux/netfs.h
+>> Documentation/filesystems/nfs/exporting.rst:264: WARNING: Title underline too short.
+
+
+vim +264 Documentation/filesystems/nfs/exporting.rst
+
+   262	
+   263	Configuration
+ > 264	~~~~~~~~~~~~
+   265	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
