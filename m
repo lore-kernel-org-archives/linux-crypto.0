@@ -1,162 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BD918E025;
-	Tue,  3 Feb 2026 00:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from zg8tmja5ljk3lje4ms43mwaa.icoremail.net (zg8tmja5ljk3lje4ms43mwaa.icoremail.net [209.97.181.73])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A307260F;
+	Tue,  3 Feb 2026 03:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.181.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770078931; cv=none; b=WiUT5DN2PBsMpW2URwGg5u75v/AuGEXfTJRPQO/kigyRevPsS1r6xl/6YAFYqdUjwHu5L4c7E9SOkzDwEpyB6Uw4DjXkrZci9x3jPoE+lPaRWtz/NzZEwncta3ZU3qMfmpvTgpBKCNYnr6h/A+272eAuVIXeHqUqCnhg2yDubkg=
+	t=1770091175; cv=none; b=czsXKafk5crTeOgxXjB+3CT5OXejKMa8hP8hCE5/2V7dgrgUlpT2D7DRnqciAC/AhO4d6R/80VA+39u1eCYmCIRty6kqTolVdkQqSB4AkGKoXHb1QrhIwmwivF5HS85zC81Uh1YkWkyXZikodeQ+oTnLfq3Spjt2WbbN18D+S+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770078931; c=relaxed/simple;
-	bh=ovtezGkmnjYK1dJq7gxbfnsXpTZi+R1BHE8vyy9L2bs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s4LZ9ER4AIyH7afW9qch8sK7OyNKzn5SAV/6AnwTiJPV1qYCA9YUWlU15izNVR+q+U6AhbMcK9eRxhHKzGZYPZVW/GA5wUqPUrNpWn3xq4ST5YmHgi/4l2QYqqejZvUv2GP9Qrg6S2DKAlHb+0s/IP4ZtIMFOVT6oDHOgdKjJpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXVywSx5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1770091175; c=relaxed/simple;
+	bh=BIlpK5gMziqtOr2CXfQXjnul8vcogeUl0AbX7mTqLXU=;
+	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=nO5Jn81XCLI8rgWrPvljWcQCElEOOuhtIdkan54i4BkZtkXnRECehDK4l4AX3zmvJjilh6khm6/EOnf8HA/ORfk5b0cTsZa84TJKo51jtOW/ccThKF8D/v98y4osBHMnXFqhSFZdeEgV+9SrZTa7Pb+pq/4yOFB5BoI/vgw2NRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn; spf=pass smtp.mailfrom=stu.xidian.edu.cn; dkim=fail (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b=BXKx11zD reason="key not found in DNS"; arc=none smtp.client-ip=209.97.181.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXVywSx5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CDD4C116C6;
-	Tue,  3 Feb 2026 00:35:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770078931;
-	bh=ovtezGkmnjYK1dJq7gxbfnsXpTZi+R1BHE8vyy9L2bs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pXVywSx5/T+VdYINhKgFGG2rIPRbmAmvlrrctUivGuVVM9RlH+tSIuAEjB8rhpqxE
-	 cPKQ6aJmvxR+8iUH+cnWpmDRzw/jREp1ZiwNMt3Rg53PihT3/vHtb8c8z0cf2cUnYW
-	 V1hT8TCFoEy67+cthScL3fhaIFD2cPxPfh5PVt9DckzgIm7YSi0KgaW5nE1vsj9IKm
-	 hAhp2bqkIxTn3xnUqiDF/F4FXXHuySApeau6+ANsvsgjrL3cH73RHE+VnbE2JoZSIo
-	 u6crnRwVuGsEa9cAVeIpLlhiwpXn3XK67rhuVnoZhcrQ7txY/b2hmptNjSBWzGWfEN
-	 S/65u6pNESVFQ==
-Date: Tue, 3 Feb 2026 02:35:26 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@cloudflare.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b="BXKx11zD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=stu.xidian.edu.cn; s=dkim; h=Received:Date:From:To:Cc:Subject:
+	Disposition-Notification-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-ID; bh=5Q9Cc5pEv2V2JxQkigMA1Y8
+	kRVDt484YYIPc6q8NTYg=; b=BXKx11zDcm9gLdVY42Ju+ZK/iNhtT8kyhK7Haj1
+	C6cbYIJNDT/uMQbWXUDlfMr9CgACGkA0/vGQOaNcD9lW7ZGwBOWJegS2saHSduGf
+	8UekAHp8CTH7D6/TkrvjSb1LFD/z2Si8qoRtTeQFVyehaq3lf/X4QYD4g2/Tfv84
+	Xk0Y=
+Received: from 25181214217$stu.xidian.edu.cn ( [115.53.181.194] ) by
+ ajax-webmail-hzbj-edu-front-2.icoremail.net (Coremail) ; Tue, 3 Feb 2026
+ 11:59:10 +0800 (GMT+08:00)
+Date: Tue, 3 Feb 2026 11:59:10 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?546L5piO54Wc?= <25181214217@stu.xidian.edu.cn>
+To: giovanni.cabiddu@intel.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v16 7/7] pkcs7: Allow authenticatedAttributes for ML-DSA
-Message-ID: <aYFCzv9MKNnROg2Y@kernel.org>
-References: <20260202170216.2467036-1-dhowells@redhat.com>
- <20260202170216.2467036-8-dhowells@redhat.com>
+Subject: [BUG] intel_qat: KASAN slab-use-after-free in __mutex_lock from
+ adf_dev_up via IOCTL_START_ACCEL_DEV (syzkaller)
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
+ 20250410(2f5ccd7f) Copyright (c) 2002-2026 www.mailtech.cn
+ mispb-8dfce572-2f24-404d-b59d-0dd2e304114c-icoremail.cn
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260202170216.2467036-8-dhowells@redhat.com>
+Message-ID: <1bc08963.a48.19c21a77cf7.Coremail.25181214217@stu.xidian.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:BLQMCkCmjb2OcoFpApkPAA--.1375W
+X-CM-SenderInfo: qsvrmiqsrujiux6v33wo0lvxldqovvfxof0/1tbiAgUNEWmA4JVnP
+	wABse
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW3Jw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-On Mon, Feb 02, 2026 at 05:02:12PM +0000, David Howells wrote:
-> Allow the rejection of authenticatedAttributes in PKCS#7 (signedAttrs in
-> CMS) to be waived in the kernel config for ML-DSA when used for module
-> signing.  This reflects the issue that openssl < 4.0 cannot do this and
-> openssl-4 has not yet been released.
-> 
-> This does not permit RSA, ECDSA or ECRDSA to be so waived (behaviour
-> unchanged).
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Lukas Wunner <lukas@wunner.de>
-> cc: Ignat Korchagin <ignat@cloudflare.com>
-> cc: Jarkko Sakkinen <jarkko@kernel.org>
-> cc: Stephan Mueller <smueller@chronox.de>
-> cc: Eric Biggers <ebiggers@kernel.org>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: keyrings@vger.kernel.org
-> cc: linux-crypto@vger.kernel.org
-> ---
->  crypto/asymmetric_keys/Kconfig        | 11 +++++++++++
->  crypto/asymmetric_keys/pkcs7_parser.c |  8 ++++++++
->  crypto/asymmetric_keys/pkcs7_parser.h |  3 +++
->  crypto/asymmetric_keys/pkcs7_verify.c |  6 ++++++
->  4 files changed, 28 insertions(+)
-> 
-> diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-> index e1345b8f39f1..1dae2232fe9a 100644
-> --- a/crypto/asymmetric_keys/Kconfig
-> +++ b/crypto/asymmetric_keys/Kconfig
-> @@ -53,6 +53,17 @@ config PKCS7_MESSAGE_PARSER
->  	  This option provides support for parsing PKCS#7 format messages for
->  	  signature data and provides the ability to verify the signature.
->  
-> +config PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
-> +	bool "Waive rejection of authenticatedAttributes for ML-DSA"
-> +	depends on PKCS7_MESSAGE_PARSER
-> +	depends on CRYPTO_MLDSA
-> +	help
-> +	  Due to use of CMS_NOATTR with ML-DSA not being supported in
-> +	  OpenSSL < 4.0 (and thus any released version), enabling this
-> +	  allows authenticatedAttributes to be used with ML-DSA for
-> +	  module signing.  Use of authenticatedAttributes in this
-> +	  context is normally rejected.
-> +
->  config PKCS7_TEST_KEY
->  	tristate "PKCS#7 testing key type"
->  	depends on SYSTEM_DATA_VERIFICATION
-> diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
-> index 594a8f1d9dfb..db1c90ca6fc1 100644
-> --- a/crypto/asymmetric_keys/pkcs7_parser.c
-> +++ b/crypto/asymmetric_keys/pkcs7_parser.c
-> @@ -92,9 +92,17 @@ static int pkcs7_check_authattrs(struct pkcs7_message *msg)
->  	if (!sinfo)
->  		goto inconsistent;
->  
-> +#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
-> +	msg->authattrs_rej_waivable = true;
-> +#endif
-> +
->  	if (sinfo->authattrs) {
->  		want = true;
->  		msg->have_authattrs = true;
-> +#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
-> +		if (strncmp(sinfo->sig->pkey_algo, "mldsa", 5) != 0)
-> +			msg->authattrs_rej_waivable = false;
-> +#endif
->  	} else if (sinfo->sig->algo_takes_data) {
->  		sinfo->sig->hash_algo = "none";
->  	}
-> diff --git a/crypto/asymmetric_keys/pkcs7_parser.h b/crypto/asymmetric_keys/pkcs7_parser.h
-> index e17f7ce4fb43..6ef9f335bb17 100644
-> --- a/crypto/asymmetric_keys/pkcs7_parser.h
-> +++ b/crypto/asymmetric_keys/pkcs7_parser.h
-> @@ -55,6 +55,9 @@ struct pkcs7_message {
->  	struct pkcs7_signed_info *signed_infos;
->  	u8		version;	/* Version of cert (1 -> PKCS#7 or CMS; 3 -> CMS) */
->  	bool		have_authattrs;	/* T if have authattrs */
-> +#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
-> +	bool		authattrs_rej_waivable; /* T if authatts rejection can be waived */
-> +#endif
->  
->  	/* Content Data (or NULL) */
->  	enum OID	data_type;	/* Type of Data */
-> diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-> index 06abb9838f95..519eecfe6778 100644
-> --- a/crypto/asymmetric_keys/pkcs7_verify.c
-> +++ b/crypto/asymmetric_keys/pkcs7_verify.c
-> @@ -425,6 +425,12 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
->  			return -EKEYREJECTED;
->  		}
->  		if (pkcs7->have_authattrs) {
-> +#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
-> +			if (pkcs7->authattrs_rej_waivable) {
-> +				pr_warn("Waived invalid module sig (has authattrs)\n");
-> +				break;
-> +			}
-> +#endif
->  			pr_warn("Invalid module sig (has authattrs)\n");
->  			return -EKEYREJECTED;
->  		}
-> 
-
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-
-BR, Jarkko
+RGVhciBRQVQgLyBDcnlwdG8gbWFpbnRhaW5lcnMsCgpXaGVuIHVzaW5nIG91ciBjdXN0b21pemVk
+IFN5emthbGxlciB0byBmdXp6IHRoZSB1cHN0cmVhbSBMaW51eCBrZXJuZWwsIHdlIHRyaWdnZXJl
+ZCB0aGUgZm9sbG93aW5nIGNyYXNoIGluIHRoZSBJbnRlbCBRQVQgZHJpdmVyLgoKSEVBRCBjb21t
+aXQ6N2QwYTY2ZTRiYjkwODFkNzVjODJlYzQ5NTdjNTAwMzRjYjBlYTQ0OQpHaXQgdHJlZTogdXBz
+dHJlYW0KS2VybmVsOiA2LjE4LjAgIzkgUFJFRU1QVCh2b2x1bnRhcnkpIChLQVNBTiBlbmFibGVk
+KQpIYXJkd2FyZTogaHR0cHM6Ly9naXRodWIuY29tL1dtaW5neXUvQ3Jhc2hlcy9ibG9iL21haW4v
+YzQ2MWQ0NjI2ZGQ1NTc2MzhkYjAwN2FlN2NkNGFiYTU3NzE4YzBkMi9jNnh4dmZfcGNpLmMgCk91
+dHB1dDogaHR0cHM6Ly9naXRodWIuY29tL1dtaW5neXUvQ3Jhc2hlcy9ibG9iL21haW4vYzQ2MWQ0
+NjI2ZGQ1NTc2MzhkYjAwN2FlN2NkNGFiYTU3NzE4YzBkMi9yZXByby50eHQKZG1lc2c6IGh0dHBz
+Oi8vZ2l0aHViLmNvbS9XbWluZ3l1L0NyYXNoZXMvYmxvYi9tYWluL2M0NjFkNDYyNmRkNTU3NjM4
+ZGIwMDdhZTdjZDRhYmE1NzcxOGMwZDIvZG1lc2cudHh0Cktlcm5lbCBjb25maWc6IGh0dHBzOi8v
+Z2l0aHViLmNvbS9XbWluZ3l1L0NyYXNoZXMvYmxvYi9tYWluLzYuMTguY29uZmlnCkMgcmVwcm9k
+dWNlcjogaHR0cHM6Ly9naXRodWIuY29tL1dtaW5neXUvQ3Jhc2hlcy9ibG9iL21haW4vYzQ2MWQ0
+NjI2ZGQ1NTc2MzhkYjAwN2FlN2NkNGFiYTU3NzE4YzBkMi9yZXByby5jClN5eiByZXByb2R1Y2Vy
+OiBodHRwczovL2dpdGh1Yi5jb20vV21pbmd5dS9DcmFzaGVzL2Jsb2IvbWFpbi9jNDYxZDQ2MjZk
+ZDU1NzYzOGRiMDA3YWU3Y2Q0YWJhNTc3MThjMGQyL3JlcHJvLnN5egoKPT0gU3VtbWFyeSA9PQpL
+QVNBTiByZXBvcnRzIGEgc2xhYi11c2UtYWZ0ZXItZnJlZSBpbiBfX211dGV4X2xvY2soKSB3aGls
+ZSBzdGFydGluZyBhIFFBVCBhY2NlbGVyYXRpb24gZGV2aWNlIHZpYSBJT0NUTF9TVEFSVF9BQ0NF
+TF9ERVYgb24gL2Rldi9xYXRfYWRmX2N0bC4gVGhlIGNhbGwgdHJhY2UgaW5kaWNhdGVzIHRoZSBh
+Y2Nlc3Mgb3JpZ2luYXRlcyBmcm9tIHRoZSBJbnRlbCBRQVQgZHJpdmVyIHBhdGg6CmFkZl9jdGxf
+aW9jdGwoKSAtPiBhZGZfZGV2X3VwKCkgW2ludGVsX3FhdF0gLT4gX19tdXRleF9sb2NrKCkKClRo
+ZSBrZXJuZWwgcHJpbnRzICJTdGFydGluZyBhY2NlbGVyYXRpb24gZGV2aWNlIHFhdF9kZXYwIiBp
+bW1lZGlhdGVseSBiZWZvcmUgdGhlIGNyYXNoLiBUaGUgS0FTQU4gcmVwb3J0IGluZGljYXRlcyB0
+aGUgZnJlZWQgb2JqZWN0IGJlbG9uZ3MgdG8gdGhlIHRhc2tfc3RydWN0IHNsYWIgY2FjaGUsIHN1
+Z2dlc3RpbmcgYSBzdGFsZSBwb2ludGVyIGlzIGJlaW5nIGRlcmVmZXJlbmNlZCBkdXJpbmcgbXV0
+ZXggbG9ja2luZy4KCj09IENyYXNoIGxvZyAoZG1lc2cgZXhjZXJwdCkgPT0KWyAyMzAuMDA1NDAw
+XSBjNnh4dmYgMDAwMDowMDowNC4wOiBTdGFydGluZyBhY2NlbGVyYXRpb24gZGV2aWNlIHFhdF9k
+ZXYwLgpbIDIzMC4wMTU4NjVdID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpbIDIzMC4wMTgyNTFdIEJVRzogS0FTQU46IHNs
+YWItdXNlLWFmdGVyLWZyZWUgaW4gX19tdXRleF9sb2NrKzB4ZDBhLzB4MTE2MApbIDIzMC4wMjA2
+NDJdIFJlYWQgb2Ygc2l6ZSA0IGF0IGFkZHIgZmZmZjg4ODAxMmVhMWFiNCBieSB0YXNrIHN5ei4x
+LjE4LzQyMzcKWyAyMzAuMDIzNjY5XSBDUFU6IDEgVUlEOiAwIFBJRDogNDIzNyBDb21tOiBzeXou
+MS4xOCBUYWludGVkOiBHIEQgNi4xOC4wICM5IFBSRUVNUFQodm9sdW50YXJ5KQpbIDIzMC4wMjM2
+ODBdIFRhaW50ZWQ6IFtEXT1ESUUKWyAyMzAuMDIzNjgyXSBIYXJkd2FyZSBuYW1lOiBRRU1VIFN0
+YW5kYXJkIFBDIChpNDQwRlggKyBQSUlYLCAxOTk2KSwgQklPUyByZWwtMS4xNi4zLTAtZ2E2ZWQ2
+YjcwMWYwYS1wcmVidWlsdC5xZW11Lm9yZyAwNC8wMS8yMDE0ClsgMjMwLjAyMzY4OF0gQ2FsbCBU
+cmFjZToKWyAyMzAuMDIzNjkxXQpbIDIzMC4wMjM2OTRdIGR1bXBfc3RhY2tfbHZsKzB4ZGIvMHgx
+NDAKWyAyMzAuMDIzNzQ1XSBwcmludF9yZXBvcnQrMHhjYi8weDYxMApbIDIzMC4wMjM3ODFdIGth
+c2FuX3JlcG9ydCsweGNhLzB4MTAwClsgMjMwLjAyMzgwMF0gX19tdXRleF9sb2NrKzB4ZDBhLzB4
+MTE2MApbIDIzMC4wMjQxMDddIGFkZl9kZXZfdXArMHg0NC8weDE0YzAgW2ludGVsX3FhdF0KWyAy
+MzAuMDI0MjI4XSBhZGZfY3RsX2lvY3RsKzB4MWQ2LzB4MTA4MCBbaW50ZWxfcWF0XQpbIDIzMC4w
+MjQ2MThdIF9feDY0X3N5c19pb2N0bCsweDE5NC8weDIxMApbIDIzMC4wMjQ2MjhdIGRvX3N5c2Nh
+bGxfNjQrMHhjNi8weDM5MApbIDIzMC4wMjQ2MzldIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdm
+cmFtZSsweDc3LzB4N2YKWyAyMzAuMDI0NjQ2XSBSSVA6IDAwMzM6MHg3ZjRhZTIyMDA1OWQKWyAy
+MzAuMDI0NjkwXQoKQWxsb2NhdGVkIGJ5IHRhc2sgODUwOgpbIDIzMC4xMDc5MTldIGNvcHlfcHJv
+Y2VzcysweDQ5Yy8weDcyYjAKWyAyMzAuMTEwNzEwXSB1c2VyX21vZGVfdGhyZWFkKzB4Y2QvMHgx
+MTAKWyAyMzAuMTEyMDQ5XSBjYWxsX3VzZXJtb2RlaGVscGVyX2V4ZWNfd29yaysweDcyLzB4MTkw
+ClsgMjMwLjExNTA4NV0gd29ya2VyX3RocmVhZCsweDY4My8weGU5MApbIDIzMC4xMTc3MThdIHJl
+dF9mcm9tX2ZvcmsrMHgzYTEvMHg0OTAKCkZyZWVkIGJ5IHRhc2sgNDE3NjoKWyAyMzAuMTI4NTc2
+XSBrbWVtX2NhY2hlX2ZyZWUrMHgyYWQvMHg2MjAKWyAyMzAuMTI5ODg2XSByY3VfY29yZSsweDg0
+Ni8weDE5NDAKWyAyMzAuMTMzNjIyXSBpcnFfZXhpdF9yY3UrMHhlLzB4MjAKWyAyMzAuMTM2Mzk0
+XSBhc21fc3lzdmVjX2FwaWNfdGltZXJfaW50ZXJydXB0KzB4MWEvMHgyMAoKVGhlIGJ1Z2d5IGFk
+ZHJlc3MgYmVsb25ncyB0bzoKWyAyMzAuMTc5ODE2XSBUaGUgYnVnZ3kgYWRkcmVzcyBiZWxvbmdz
+IHRvIHRoZSBvYmplY3QgYXQgZmZmZjg4ODAxMmVhMWE4MAp3aGljaCBiZWxvbmdzIHRvIHRoZSBj
+YWNoZSB0YXNrX3N0cnVjdCBvZiBzaXplIDY1MjgKWyAyMzAuMTg0MTI5XSBUaGUgYnVnZ3kgYWRk
+cmVzcyBpcyBsb2NhdGVkIDUyIGJ5dGVzIGluc2lkZSBvZgpmcmVlZCA2NTI4LWJ5dGUgcmVnaW9u
+IFtmZmZmODg4MDEyZWExYTgwLCBmZmZmODg4MDEyZWEzNDAwKQoKPT0gUmVwcm9kdWNlciAoc3l6
+IHNuaXBwZXQpID09CnIwID0gb3BlbmF0JHFhdF9hZGZfY3RsKDB4ZmZmZmZmZmZmZmZmZmY5Yywg
+JigweDdmMDAwMDAwMDAwMCksIDB4MiwgMHgwKQpyMSA9IHN5el9vcGVuX2RldiRkcmkoMHgwLCAw
+eDQsIDB4NDAwODAwKQppb2N0bCREUk1fSU9DVExfQUREX0NUWChyMSwgMHhjMDA4NjQyMCwgJigw
+eDdmMDAwMDAwMDE0MCkpCmlvY3RsJElPQ1RMX1NUQVJUX0FDQ0VMX0RFVihyMCwgMHg0MDA5NjEw
+MiwgJigweDdmMDAwMDAwMDNjMCkpCmlvY3RsJERSTV9JT0NUTF9TRVRfTUFTVEVSKHIxLCAweDY0
+MWUpCmlvY3RsJERSTV9JT0NUTF9NT0RFX0dFVFBMQU5FUkVTT1VSQ0VTKHIwLCAweGMwMTA2NGI1
+LCAweDApCmlvY3RsJERSTV9JT0NUTF9HRU1fT1BFTihyMSwgMHhjMDEwNjQwYiwgJigweDdmMDAw
+MDAwMDBjMCkpCgpUaGFuayB5b3UgZm9yIHlvdXIgdGltZS4gUGxlYXNlIGxldCB1cyBrbm93IGlm
+IHlvdSBuZWVkIHRoZSBjb21wbGV0ZSByZXBvcnQvY29uZmlnL3JlcHJvZHVjZXIgbGlua3MuCgpC
+ZXN0IHJlZ2FyZHMsCk1pbmd5dSBXYW5n
