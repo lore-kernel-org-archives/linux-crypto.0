@@ -1,145 +1,79 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A704331B83B
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Feb 2026 18:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770144260; cv=pass; b=VEUv9Ykh+0YWcHVYHZKscia0XttuMoBO4++AwhsKu841lqG6785XHt1RT20viLnnJz3JZZMp+j/HCKk+Vzzz3f2g07gGOV8tZsCjVmdTr9F7qUNjB/XkegOpfAl5+ntjjZ0TvP/gaJCIPfUEBK76kUJN2ItUtBefgTUYnwK7Z6g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770144260; c=relaxed/simple;
-	bh=Im4rgwf3E6ZwNtN9dEhHYqmY2ELHiRifIkUXHstQmAM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RJI5o1y1+RqZsxKmS7H8TXEuDpDpoSL451RU7DdysaPh6Ft+UhLSeF3td6nQVr0VbUm7nZ4ISYQU/Bf/K43ZRhetoMGv+4eyEBTIXO2qdxev6AAKrsUtfqKPpfHbGiqrah6+9EYwNqh0IhhNVwkDgeII7aeh4si75xcU1m3JrQU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iQvnCaJC; arc=pass smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71161509AB
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Feb 2026 21:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770155781; cv=none; b=oBQf01BsBAMALuYH8hcJXgLLwxdcmp+p36xJdi7A2CnZn69RczNhYrW91uGb1t8h+iux+zHGrN5LXBK978fmjHkzBhZqbi22D+evlHUvBtvz85sq4bNRsY5dCqDhUDtFmNWQHpKOvF0ozMi039GALhHBXQEq9v/wD8NmWFO+7MA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770155781; c=relaxed/simple;
+	bh=hq0w2VSlTBBQpUIkuGwG99Wh9L8D7GZk4fsxtm5NiNU=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=WKAS9IFxlDjWQDgCFxQq5CluX832nqiXfaWmAj38eRGxBir5RnZuMzd8exu2L2QnGOhuEiedtZgd6XRqtF5cy9ElUlzzP3oW4hr4r4egt+KETyTXhucF3Bu5gCM/QoWhjxfRSWKwX94clxJlpDfJ6OCdpzqZ+OTEeeogktgh0hA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g5Y6vezk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQvnCaJC"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42fbbc3df8fso4668036f8f.2
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Feb 2026 10:44:18 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770144257; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fxWSQ8i5m1/pa2gwdOSB3ryAnvT8ztyU5on54yT/nMtREoovnH+1fXhwsKxuqL6Utk
-         qirlIfaqvvCz27zgoJl6EhsuJdShcDCnHVMHGHuxcSBKGnsd1CRUzgCM3vBaLGEJu4Ac
-         F+bl2LtVjo1GKTWLAaacAagapf8ezQ0y5v3Fq+CIPma0/zsgdI4ZUMXJdo1kospfza8G
-         KgURfZ/rIaDH+GWgxRpgonykQkvPmaLRKpi3xGnhcvDdjSIfiA9Ym3OOIOmVpl5zYktj
-         +brx11CDS/0LKE2AOYeRA1yOFf8jS6SKNm46cA+Lb4+OE9HuNs8arm30eLUPF3W+AYsW
-         jaiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Y/eSjMPi8545w/2b1wcpinwGLR1TY3uQV5L/lXYN5do=;
-        fh=IySAr2kmCxcgF6vdy5GJNhmGD6i1ESTiwI9lSxeXrtU=;
-        b=T6Y+FzE9xPTVqZrEahX3KPOz/93xGGpJk8ToNyZdGltkhBVpbbL1YEdppq5GDDKFu0
-         osiFc9PmB7ECoeHlb8VtdN+42dsvbLQaPyC0h0B7C7VkQtrt+x8B6pQa8cfbMF/PyiLB
-         lq6+o9nlBG4iRjJwdjbpw7lhb2XDrw6qez9suNJ2AbkU/TkwPWo8hBSJzu//6i18sLPh
-         MVEOEM+Ljgq2zaH27WrEdMmZ+jFM8dZStKpBtzGA8gpR+jgLtIwHHrpXHVqYybzgppN9
-         3jXHAXkpAj8lrZYFxhv3NOLlDwD6e7DqswC0Ajr1zymj49d+yxMoVXCfVbw9WJMiM4Dl
-         ch2A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770144257; x=1770749057; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y/eSjMPi8545w/2b1wcpinwGLR1TY3uQV5L/lXYN5do=;
-        b=iQvnCaJCty2JIWhQas86REZ9bYZlxyM45VOMQ6RnhCNLXlwVCSDYNvll931NLtifbR
-         hkAryy+iivUzgKsYedtYuHtmaxe8G5f3R8gc2qYAuxCgSlZsIqkfuSNg9vKqMKQ4flX6
-         A+0ZV3bocn46aKIp5knSSv1sW1k2DyLEPiUOuG2tOAOb4fjzFpC5PaLa0WBluIKQa14+
-         +GfqN2SFNcHT1hgLr0RQD8prLprdnem9PGEpADRaR6mKEXRz2ksjz2R9g3GDISWVR9x4
-         VVzqdY9fPgA6qrFBvFpVG6S5Txmqh640NKw+wswhOkQkr2IrNQqLll0UR0AKV7wBGE15
-         +oQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770144257; x=1770749057;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Y/eSjMPi8545w/2b1wcpinwGLR1TY3uQV5L/lXYN5do=;
-        b=wVFynSvYAmxu2qlFrGzhNezxhR3lTH4D8879g0obkbeCxXejZFqfxA5OCZoTh6iB5e
-         zozPxqwHv9vGyibBjZ0qqBdrIpf1PGPmBP20L3VQ7DUOMPDA3y0nrs5nlg+EtC1Vcw2c
-         easbBPseW8yLoDYkLtF9rDHV0mnKDxIY2yEB14S5nWM7SU7Z2Jc0jL06P6ClbT57jERq
-         D8cI/rYp8v0mX3uZl00KZGgTdq9Rl/qFKeOO3rXlWE09TOs2UEAC2CwC16cTMWOAWNJ5
-         IcwZ1adwejjfmKv14NxHPzrhW2ro2gx15SxxreUcOk+1kkr81bVRD+AXDUU8mBg4+1wc
-         lwqA==
-X-Forwarded-Encrypted: i=1; AJvYcCVMyqnGbGsDma/TnTg+jeZSYWL2cGdzCXDbFhALlQ9KLm+sTItTd4P4M3Lc6ld0DErdG3epa3pVGKcUcC8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8sZZTlXhtyW25cRCFqFMOnavaaw3j+Bl/kVmB5mqo5dQJZGpW
-	qnL4pRSmbUG2bmI2Z9CyQhiEe1Pyh5eBRGwKJc7s2+qO+iboKuY1GorPsOfeyEqGfOo752Qvkcq
-	/RuoaD5XRLARuU62gX0jp5zblkpztXOo=
-X-Gm-Gg: AZuq6aIIUWjHwBdXZd9XkV5OMrr0cqcmkMSonytIg4TQjVbKSKIMGHL8u3B2TvSuyuC
-	MZ2HFDMWaWR3cQSRKYGYSnSPCT8yXY4sPOw+Hl+ER/Evte0gwvGpxxUpov7lIYqzk2iGjAR8ZBh
-	usblfw9EBiSPj1NEQo8HT1ghXPNgERM2Zdw6jo/SjzGYp7Yt0PwlgN4a6wf8DrgzFi2Z3jqKJrZ
-	yuhxr++jgWiSOFYBreLI28VQpgeDGjM5g2sooDRAMRShpTVkziUW84zDH5MP4GnViO0slm56OiI
-	YJRe8X18zuHFktxYEI2k930qooaUMWQH8P0cstsC3sYDO9a6BZfEf0XISOcP6obOzE0UuA==
-X-Received: by 2002:a5d:584d:0:b0:435:8f18:9539 with SMTP id
- ffacd0b85a97d-43617e3970bmr476836f8f.9.1770144256833; Tue, 03 Feb 2026
- 10:44:16 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g5Y6vezk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770155778;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tz6ULZhTAdgJd8oMqD3yN5FCP56OfatQprs+uDB0s84=;
+	b=g5Y6vezks9rncGWoRrUnNiZ2RlPE0VdOXA+KjxF+4175Qwc/lrb6aivrewc4uwt8AE5dTb
+	fkO8/vFkCHy8bbR/DS9R7R9KugaW/1e79A7hS2baQuJd3XfrOPVGimDgAD9Bkgo6RxJ7Rw
+	/2Xl3s1+MOj0CmpRAU9fLISKQocZ8iE=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-684-MgKa4Wk-O0uCuWTaGP5YJA-1; Tue,
+ 03 Feb 2026 16:56:13 -0500
+X-MC-Unique: MgKa4Wk-O0uCuWTaGP5YJA-1
+X-Mimecast-MFC-AGG-ID: MgKa4Wk-O0uCuWTaGP5YJA_1770155772
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E76E418002CD;
+	Tue,  3 Feb 2026 21:56:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.33.164])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 039BA19560B4;
+	Tue,  3 Feb 2026 21:56:08 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20260202221552.174341-1-ebiggers@kernel.org>
+References: <20260202221552.174341-1-ebiggers@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
+    linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+    "Jason A .
+ Donenfeld" <Jason@zx2c4.com>,
+    Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] lib/crypto: mldsa: Clarify the documentation for mldsa_verify() slightly
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260202144749.22932-1-git@danielhodges.dev> <20260202144749.22932-4-git@danielhodges.dev>
-In-Reply-To: <20260202144749.22932-4-git@danielhodges.dev>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 3 Feb 2026 10:44:05 -0800
-X-Gm-Features: AZwV_Qjuc4yRZMN8e0jw82q4VJIVoJ4ryoLzyogKn1pKbtGVyVXGQl-iYAU8hyk
-Message-ID: <CAADnVQJKjv5fZ0suJkOKtybMNsrDr9d+Au8T08AvHCPzP3z8sw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v7 3/4] bpf: Add signature verification kfuncs
-To: Daniel Hodges <git@danielhodges.dev>
-Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Song Liu <song@kernel.org>, 
-	Mykyta Yatsenko <yatsenko@meta.com>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, 
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Yonghong Song <yonghong.song@linux.dev>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2582075.1770155767.1@warthog.procyon.org.uk>
+Date: Tue, 03 Feb 2026 21:56:07 +0000
+Message-ID: <2582076.1770155767@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Feb 2, 2026 at 6:48=E2=80=AFAM Daniel Hodges <git@danielhodges.dev>=
- wrote:
->
-> Add a bpf_crypto_sig module that registers signature verification
-> algorithms with the BPF crypto type system. This enables signature
-> operations (like ECDSA) to use the unified bpf_crypto_ctx structure.
->
-> The module provides:
->    - alloc_tfm/free_tfm for crypto_sig transform lifecycle
->    - has_algo to check algorithm availability
->    - setkey for public key configuration
->    - verify for signature verification
->    - get_flags for crypto API flags
->
-> Introduce bpf_sig_verify, bpf_sig_keysize, bpf_sig_digestsize,
-> and bpf_sig_maxsize kfuncs enabling BPF programs to verify digital
-> signatures using the kernel's crypto infrastructure.
->
-> Add enum bpf_crypto_type_id for runtime type checking to ensure
-> operations are performed on the correct crypto context type. The enum
-> values are assigned to all crypto type modules (skcipher, hash, sig).
->
-> The verify kfunc takes a crypto context (initialized with the sig
-> type and appropriate algorithm like "ecdsa-nist-p256"), a message
-> digest, and a signature. These kfuncs support any signature algorithm
-> registered with the crypto subsystem (e.g., ECDSA, RSA).
->
-> Signed-off-by: Daniel Hodges <git@danielhodges.dev>
-> ---
->  MAINTAINERS                |   1 +
->  crypto/Makefile            |   3 +
->  crypto/bpf_crypto_sig.c    |  89 ++++++++++++++++++++++++++++
->  include/linux/bpf_crypto.h |   4 ++
->  kernel/bpf/crypto.c        | 117 +++++++++++++++++++++++++++++++++++++
->  5 files changed, 214 insertions(+)
->  create mode 100644 crypto/bpf_crypto_sig.c
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-Other than the issue spotted by AI the patches look fine,
-but we need Ack from crypto maintainers.
+> mldsa_verify() implements ML-DSA.Verify with ctx='', so document this
+> more explicitly.  Remove the one-liner comment above mldsa_verify()
+> which was somewhat misleading.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-pw-bot: cr
+Reviewed-by: David Howells <dhowells@redhat.com>
+
