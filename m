@@ -1,93 +1,233 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33472FFF8D
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Feb 2026 08:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63760396D1A
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Feb 2026 09:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770107868; cv=none; b=QurAhdRWrTJ9++WDurcMbmsUaeeGoF8s+lNayKYDrmi4eGQAylnw7dwziTn2AWh0kXu9Qtoiwke6aJQY+NCWsEhqFmLj9blOScAuyFkSHRvYyPgeobhw4KxcP/GuBcYg7m/snIXyaEgwJYqhY09bkqxu3090Mh1kTunGW1iojgY=
+	t=1770110809; cv=none; b=Yr9hNtvSxhI5JYQ7yJ1lzxsVRiKD4FQ/NlOD8g4d6570xoKLTWY/EpnNgN8svZKbDnuVpFdIRQn2XSPtVHsOoClxMYbjuQSU1RDr3M01hz1vmLDgCX9Wk6IECV9W9FqMRH47hbzxTXWbeLO77wFTPJV14Q+4ZtqnGHQw9sdX5Vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770107868; c=relaxed/simple;
-	bh=fhHFRlG3WCN2W/+rRzgUganS8d2ZUMiekULHR4bbk1U=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=Sm9RzLh5FP5Iu9EPToTaMzquhn5XPPm8C72aLFGDZYimQzbgT7GXJszxjVC7DNbfcpFDOZeiHnsfCBQv94y4CGw0OZ9aINEH1nbAHQ7ibQivq33EOrm0HO6AejoAIjVv8yadkYaHr/zLBYLZNwbvJWpGCWKZixxtJeFIgvnTI9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iN6YdBIH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1770110809; c=relaxed/simple;
+	bh=6kl+6HQNqIsURe+OfkLQzjtn3wD48N1EvAaNq/iuQHY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MdjBPvDCKbeRaZHcoKu/ncmizUdI0l13gHsHp+JPjdB68G4GSoTxZaCPVYyS5bjJfn9K4oRyzHtR9w+er6PrKYH8cXJL2j8Xqi9vMSG65x2VAPjMYMuDHqIApuHicpZS2pZlbJFtmmXCNQTHOY307FFbxcKg1sZV3XhQUQbkqCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=jF9E9bfr; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=RxYbQK8S; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iN6YdBIH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770107866;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t011cPPxfFjL7A/dPlf694kTW9GQnC1PCROS07B/K/U=;
-	b=iN6YdBIH3JXWMHBzvAw70L141sOVHKmHTO24VIWI9X5KDEfvL62d2/fJ4JccbiZNVU1gbx
-	NmbGuSU1Qf+u+N9lYxJ25ovRANGZGp21Var2p2dyNzFo2KufYLMHp0ri5dvWxTxo9UHDKW
-	VjrD700k4UFr+TJncmjotn2ud8S1tpY=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-583-SBygyrJcOJKcJ7bPyQoI7Q-1; Tue,
- 03 Feb 2026 03:37:42 -0500
-X-MC-Unique: SBygyrJcOJKcJ7bPyQoI7Q-1
-X-Mimecast-MFC-AGG-ID: SBygyrJcOJKcJ7bPyQoI7Q_1770107860
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 304C6195608F;
-	Tue,  3 Feb 2026 08:37:39 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.33.164])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1F71D30001A7;
-	Tue,  3 Feb 2026 08:37:33 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <aYFBbGmMTszT3ZRb@kernel.org>
-References: <aYFBbGmMTszT3ZRb@kernel.org> <20260202170216.2467036-1-dhowells@redhat.com> <20260202170216.2467036-5-dhowells@redhat.com>
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: dhowells@redhat.com, Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Eric Biggers <ebiggers@kernel.org>,
-    Luis Chamberlain <mcgrof@kernel.org>,
-    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
-    Sami Tolvanen <samitolvanen@google.com>,
-    "Jason A . Donenfeld" <Jason@zx2c4.com>,
-    Ard Biesheuvel <ardb@kernel.org>,
-    Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
-    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v16 4/7] pkcs7: Allow the signing algo to do whatever digestion it wants itself
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="jF9E9bfr";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="RxYbQK8S"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61344ul42998767
+	for <linux-crypto@vger.kernel.org>; Tue, 3 Feb 2026 09:26:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	0zeOAZfMipWNF7Bk/i7KQ5CWYnI+TUUzwimahm0W0eU=; b=jF9E9bfreER0RJ0g
+	iJN4s/ekSgyNaQGhiaYgJ0vRui/30GQUFzq7GgUIR4+XtQX5ZamNXRM0Sm8ltBC7
+	K89W4nF484X/Bv1ZiWX56ivIbrOZhxn7LzcjY52A78n6ID3AJl1/McI+nSEpRhIq
+	KvIpZMjw+PiZGspK8I63M94r9nen+qNo2na9wCNWEXsSP5wqz1MyZECx86qr1RcM
+	DVrabdWII+zwK94qx1Qa68Z4SqpTQ3/zUbTI87o6gaAzj0ebM+XLY5uoorKNQlPh
+	XrnIbPobdNmWV37UUBsm950vXRtQQCBVvEhMP7rka/y9QikubpRhaRh4666jIj7+
+	vS92zg==
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c2v0mbf8t-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Tue, 03 Feb 2026 09:26:45 +0000 (GMT)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c5e56644646so508967a12.0
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Feb 2026 01:26:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1770110805; x=1770715605; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0zeOAZfMipWNF7Bk/i7KQ5CWYnI+TUUzwimahm0W0eU=;
+        b=RxYbQK8SectaafNTkPNiHhG4xZEs17Wb2SWOahSZohB/+giTk8CWl+0YgnRtJJc9sA
+         JH7wihwy62TgoLx4YA5xB2zrK9VaOiWG1nIuHd+q/9Lx/UjtAimAacS8KkXqzEFCJ0hO
+         SxJ/30EtxceZbN2Wd15wJDpynO6MMNHDBjvyP6f8+kqZWPCnZx9hOFD/90vAk8Lsj3eV
+         7UShFITjlh39C2RIJ+ULbngFm8819IUZQwlublWavGG5BeCz8L1frKBtbK+iYv5dFLtA
+         b03UjdWNsO0mCc96gpbca4wS8EayIuvzf7ulY+ezXBwGVi1+P2yj34V8KMvw5BFh/3h6
+         6+2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770110805; x=1770715605;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0zeOAZfMipWNF7Bk/i7KQ5CWYnI+TUUzwimahm0W0eU=;
+        b=GwocrOjJO1XH5u/UYdIAorFpoUE6ZcaBSyJcmNLKrzUdz4Dg72W6lCPqnU9F8iIEpk
+         /7/JNwfz92zKnqVe9LwwzlXIzNAPi12M3D8aK0Yt6tJmX5T/2wroMwoJ8wpF3KeyufN1
+         3nsvCom9uuxv07B0IQA6+FN39v0gzwogr97ytlYgrl1JlnsXMDtUpmwfcrzzpQlqs9C5
+         1y9SwY1pLfxlCjMU8gZsP7g7qj1UTw9YVOEY1SaXXTK2fsw1twrLWpOz/snFkVD5zHHG
+         pkWKWsD/3vVXuZYGPbEyva+7p1Vx3L+Q3gWzhJ7pbDoBmtw4Zj11xbTClRXOsaMRd3CW
+         QVoA==
+X-Forwarded-Encrypted: i=1; AJvYcCUclpn4mW8IfdtZ5EP396/2SoHfSivCyFqmDda4buBfvVnpLhlGOVSQEUG8/+NleVFmtDmHNIGehZ7sRtI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOxTxTTphA+WFghX+2wphEAvy1TXpB0j41ccQvAec62in/kzAZ
+	2IETOXbaxGiz8tu7HR6bn3C9V4o2i6w2YsYITH0tLE1AZbkJ7Ud73d7LZOsvXdWK3NFyp7TPC0Y
+	L+YkPqyJG/QQHxypdfMFIFfrIhXPNXTf2MAW4PI1TYNEAxKK58FXW6btHi13fcKLbCqkbyk+c+u
+	w=
+X-Gm-Gg: AZuq6aK9bh5l9dW3RCZwuI0h/4tTcvNiScPJyR7gjhDPIhb/3PSBX4OtDIShf2qem2m
+	C+2CXulPXdu48xjWQNZrVAeiGX//e4MdjyiJ4ybTO5glIlNIEi2hHuzgd4E4Y+cPHkmKLIeudtX
+	9BFcTq7wOJK9nvx92adxI4M0M3ZQ5F0EWMMJy895VITH+xNsaklT0YhAphbvhFkIjNdvinJvza3
+	Xag5VFfkLfUCE3m4X7lqY/cLxv7W4ijpQWFzQt5PYiS6jb2Tg4fEWpvyDZ2F6bvuo/H6XFd8Yua
+	1GvSI/whK5g8G/yPgGdTVtNBDveromvlVDO+stJrgSiCgT+GfURUYOZ9Kf+4evuWQFLkVoOVeHw
+	4eCAR9ikicaSaJl1t+Q8BH/FKH95saY0jwFiVMoI=
+X-Received: by 2002:a05:6a20:430f:b0:38e:9bdc:d48c with SMTP id adf61e73a8af0-39356196445mr2497417637.15.1770110804660;
+        Tue, 03 Feb 2026 01:26:44 -0800 (PST)
+X-Received: by 2002:a05:6a20:430f:b0:38e:9bdc:d48c with SMTP id adf61e73a8af0-39356196445mr2497390637.15.1770110804105;
+        Tue, 03 Feb 2026 01:26:44 -0800 (PST)
+Received: from [10.217.223.121] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c6427da8441sm15669014a12.9.2026.02.03.01.26.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Feb 2026 01:26:43 -0800 (PST)
+Message-ID: <1f99db18-d76c-4b87-9e30-423eee7037e1@oss.qualcomm.com>
+Date: Tue, 3 Feb 2026 14:56:36 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2546580.1770107852.1@warthog.procyon.org.uk>
-Date: Tue, 03 Feb 2026 08:37:32 +0000
-Message-ID: <2546581.1770107852@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/11] dt-bindings: crypto: qcom,ice: Require power-domain
+ and iface clk
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Abel Vesa <abel.vesa@oss.qualcomm.com>,
+        cros-qcom-dts-watchers@chromium.org
+Cc: Brian Masney <bmasney@redhat.com>,
+        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
+        Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260123-qcom_ice_power_and_clk_vote-v1-0-e9059776f85c@qti.qualcomm.com>
+ <20260123-qcom_ice_power_and_clk_vote-v1-1-e9059776f85c@qti.qualcomm.com>
+ <14a71b33-4c10-41b0-a6cb-585a38e05f56@kernel.org>
+ <06160c6c-a945-467a-be82-7b33c5285d0f@oss.qualcomm.com>
+ <7216c86d-2b87-496c-9548-ccdcb3c98b6b@oss.qualcomm.com>
+Content-Language: en-US
+From: Harshal Dev <harshal.dev@oss.qualcomm.com>
+In-Reply-To: <7216c86d-2b87-496c-9548-ccdcb3c98b6b@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=dceNHHXe c=1 sm=1 tr=0 ts=6981bf55 cx=c_pps
+ a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=jYfLf-RoV4Vd3_lPYZoA:9
+ a=QEXdDO2ut3YA:10 a=x9snwWr2DeNwDh03kgHS:22
+X-Proofpoint-GUID: ySTNwtlz7laW6l-vc3vNPJ9etvJOMBJk
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAzMDA3NCBTYWx0ZWRfX1iKnCwx8dH4D
+ BOHotZ5Hnh6QyiL0yaM302Xj+JKZH5oTxiJoh0uaHpYG94/MB2TGvrLxauOL75IVT1NL4ELBCMW
+ ybShXo4eO32gOYDiBg+uDqyzElE5YFI0alMeRhnZyCkmjB2M4hynFI/9IVsXpdbk3tEZdK//YLR
+ 5CWTm2EybA11K8GkMusNx5mJAzbWXlFLYnJV4g16I7ouZbXm1dKkKN6P35eaUcGuRHqMnIe40XS
+ FK9N4/S/GNPqZwSNGPy6UwPoPnO98FrgmCVvhB2kJlnXzaqEvs3ATiAUTENCM93DLr5Ltl9OvV9
+ Qk+AKQT1+hd+8wu0zg17g1MHQ0eVGnkr2Yay0ARNJc44vmbgTPTP87D9eaKkdLrvIvvQtslyist
+ eEKS92GAHJwHb9GcKcVS6oJpoeX/y1/L2BSaai0jjOY63yHyp4Stsao8sdKHshyiy5B+v7VOkfv
+ 9+7bQFnCSjdvQZRwx9A==
+X-Proofpoint-ORIG-GUID: ySTNwtlz7laW6l-vc3vNPJ9etvJOMBJk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-03_03,2026-02-02_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 spamscore=0 malwarescore=0 suspectscore=0
+ lowpriorityscore=0 impostorscore=0 adultscore=0 phishscore=0 bulkscore=0
+ clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602030074
 
-Jarkko Sakkinen <jarkko@kernel.org> wrote:
+Hi Krzysztof and Konrad,
 
-> > +	if (!sinfo->sig->m_free) {
-> > +		pr_notice_once("%s: No digest available\n", __func__);
-> > +		return -EINVAL; /* TODO: MLDSA doesn't necessarily calculate an
-> > +				 * intermediate digest. */
+On 1/26/2026 3:59 PM, Konrad Dybcio wrote:
+> On 1/23/26 12:04 PM, Harshal Dev wrote:
+>> Hi Krzysztof,
+>>
+>> On 1/23/2026 2:27 PM, Krzysztof Kozlowski wrote:
+>>> On 23/01/2026 08:11, Harshal Dev wrote:
+>>>> Update the inline-crypto engine DT binding to reflect that power-domain and
+>>>> clock-names are now mandatory. Also update the maximum number of clocks
+>>>> that can be specified to two. These new fields are mandatory because ICE
+>>>> needs to vote on the power domain before it attempts to vote on the core
+>>>> and iface clocks to avoid clock 'stuck' issues.
+>>>>
+>>>> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
+>>>> ---
+>>>>  .../bindings/crypto/qcom,inline-crypto-engine.yaml         | 14 +++++++++++++-
+>>>>  1 file changed, 13 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+>>>> index c3408dcf5d20..1c2416117d4c 100644
+>>>> --- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+>>>> +++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+>>>> @@ -28,12 +28,20 @@ properties:
+>>>>      maxItems: 1
+>>>>  
+>>>>    clocks:
+>>>> +    maxItems: 2
+>>>
+>>> This is ABI break and your commit msg suggests things were not perfect,
+>>> but it is not explicit - was this working or not? How is it that ICE was
+>>> never tested?
+>>>
+>>
+>> I took some time to educate myself on the point of DT bindings stability being a
+>> strict requirement now, so I understand how these changes are breaking ABI, I'll
+>> send a better version of this again.
+>>
+>> As for your question of how it was working till now, it seems that
+>> things were tested with the 'clk_ignore_unused' flag, or with CONFIG_SCSI_UFS_QCOM
+>> flag being override set to 'y'. When this is done, QCOM-ICE (on which QCOM-UFS
+>> depends) initiates probe _before_ the unused clocks and power-domains are
+>> disabled by the kernel. And so, the un-clocked register access or clock 'stuck'
+>> isn't observed (since the clocks and power domains are already enabled).
+>> Perhaps I should write this scenario explicitly in the commit message?
+>>
+>> To maintain backward compatibility, let me introduce minItems and maxItems for clocks.
+>> When the Linux distro uses CONFIG_SCSI_UFS_QCOM=y, we can do with just 1 clock as
+>> before.
 > 
-> Is this logic going to change in the foreseeable future?
+> You must not assume any particular kernel configuration
+> 
+> clk_ignore_unused is a hack which leads to situations like this, since
+> the bootloader doesn't clean up clocks it turned on, which leads to
+> situations like this where someone who previously wrote this binding
+> didn't care enough to **actually** test whether this device can operate
+> with only the set of clocks it requires
+> 
+> I believe in this case it absolutely makes sense to break things, but
+> you must put the backstory in writing, in the commit message
+> 
 
-This is only used by IMA to retrieve an intermediate digest, so something will
-need to be fixed to support use of ML-DSA in IMA, but I don't know what yet.
-It doesn't, however, preclude the use of the rest of the code for module or
-kexec signature verification, so I think it's reasonable enough just to emit a
-warning and return an error here for now.
+I took some more time to think this through, and I agree with you now Konrad.
 
-David
+These DT bindings appear to be invalid from day-1. ICE being an independent
+and common IP for both UFS and SDCC, it cannot operate correctly without its
+power-domain and clocks being enabled first. Hence, it should be mandatory for
+them to be specified in the DT-node and the same should be reflected in the DT
+binding.
+
+The only reason I can think of for omitting the 'power-domain' and 'iface' clock
+in the original DT-binding for ICE is because we failed to test the driver on
+a production kernel where the 'clk_ignore_unused' flag is not passed on the cmdline.
+Or if we did test that way, we were just lucky to not run into a timing scenario
+where the probe for the driver is attempted _after_ the clocks are turned off by the
+kernel.
+
+Sending a new patch, which makes these two resources optional (to preserve the DT
+binding) would either imply that we are make this bug fix optional as well or
+asking the reporter to resort to some workaround such as overriding
+CONFIG_SCSI_UFS_QCOM to 'y'.
+
+Let us know your thoughts on this Krzysztof.
+
+Thanks,
+Harshal
+
+> Konrad
 
