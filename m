@@ -1,727 +1,575 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF221D63F0
-	for <linux-crypto@vger.kernel.org>; Wed,  4 Feb 2026 16:57:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770224265; cv=none; b=np3kh900dz57FHSFsP8ylr6w9ozltradmj/Z4h0O9z1SyjhStyfJoLtR6AEuDkgAVKmroX3zn5p7kM5FV1FLTjQT0ycQw0THpMiuiV9iJruhLACDVXVsh8kyYmhC4pdNk9vBhDJrd/aK1bJMJPaijUQcASgNF3JpcHkovBxmFHY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770224265; c=relaxed/simple;
-	bh=G1IkjFMxJESmPPI9gAE0P6f0Lb1MvhzaPyzsBavYPeQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mA7isPfaa8KsTWQo3ZMXgWfNXRCCsA5GdP3q4jTPBkzb7PheElqdiCXuVtBGJkSA9ZbmR0/vHLy5e4qDfdR1sOmEQP2sbRCNuqbZ5Y7l0dtTz1PjMPxs4IdAV32/yHf8+dMcSgoVYiyin4ym5AstrTHmSXsaPEv4TMs9HOQ8rzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h0vWfW4E; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054D23491D6;
+	Wed,  4 Feb 2026 17:45:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770227144; cv=fail; b=pZMkfRdshFvVewN1tidswKziHMlmqmp7SPcQ7jLwdowb/32z7kEqhTeg0Raojdm/VdDoXoJ5AZLtDVBKjvsX6cO35pqQugvTHtrUAcdcpkPJbSvEOiHCAAYXt3P8aj4WYFxfdzSfhCfx/RN0iqZxsu/k8pnkx26oYK2rkl5L8es=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770227144; c=relaxed/simple;
+	bh=AtIQwPJdWP5XCHEk2BM65AMPHziyaFGUCDZhFJ/GhXg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KdQFSE3ASkV4dHD/u92g5AUTwA5StfpyHeY5cE9yld7CtuV4UoS5qZVGu2nFfsydxsH4MnA8VoMnDN8wulod0SsStG1rfCO1nbAK2i36Wv9inFie5vW7gEDaU6bitchZAURUkygi3h3QNcO5zF3d+a/NgoXJmv2MF/T+a4BqvWw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=fIirhGdx; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=jur0Kupw; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h0vWfW4E"
-Date: Wed, 4 Feb 2026 16:57:35 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770224262;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cx+x6G+SfQWLjevinHfo/G9XD5zagVRglZJCduB24h8=;
-	b=h0vWfW4E1lCJpCcaT7+TLnrrJxd0qrbWxFlfwlBvpvHuC0PvV97F7eI5SYSYS+WlFih5wu
-	MdxGindgUXR/s3R7Hrlk2S8X0VTjJQlkn6AmwVpANAMnK2Dhk8W+BloE0+B2pDuN9HSScs
-	W/71qHmeKl4T8LquUSyGDwnvqLu/RhQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org, 
-	nphamcs@gmail.com, chengming.zhou@linux.dev, usamaarif642@gmail.com, 
-	ryan.roberts@arm.com, 21cnbao@gmail.com, ying.huang@linux.alibaba.com, 
-	akpm@linux-foundation.org, senozhatsky@chromium.org, sj@kernel.org, kasong@tencent.com, 
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	clabbe@baylibre.com, ardb@kernel.org, ebiggers@google.com, surenb@google.com, 
-	kristen.c.accardi@intel.com, vinicius.gomes@intel.com, giovanni.cabiddu@intel.com, 
-	wajdi.k.feghali@intel.com
-Subject: Re: [PATCH v14 25/26] mm: zswap: Store large folios in batches.
-Message-ID: <7g4udorizeimntvz3lfjpl6ftaivrynjzowbb7wvnnelzyqmzg@5gbxsfvumpxi>
-References: <20260125033537.334628-1-kanchana.p.sridhar@intel.com>
- <20260125033537.334628-26-kanchana.p.sridhar@intel.com>
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fIirhGdx";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="jur0Kupw"
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 614DOE0M3258017;
+	Wed, 4 Feb 2026 17:44:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=mToUCRbwFhC5I9O8hcT3wFa66d0BnnJXnag524t6Lek=; b=
+	fIirhGdx4X0/DxEyyFhQzup+8Qzd7dE/pXfWxuwQ4KZ+gVQOdaMqfIrw5tZV7lLu
+	4JVx07bW64MmcCdpVUjKNESUnKDprQpMxeSl4hmdmqj1EvVVgswJjwNMwE/ag5F5
+	h1pLG8JU6iGIR3n13vFZvaUzVia/EsS3kV9dAucsqDcSaWhZaaHYMQrD8VMC2xnD
+	P4LfuKq7Z08Sh5XARJ43jl8sNazISWK2xoY8Hu4l9zjxq6Zh179hS3JyQL0w/jvl
+	OMPcspdK4D044/tgT5Zy4fHc4LBmX3EeL4Gp+Q31sqYEpd1gYZCmOiwsEcMl5z2a
+	KwVrbeYTBWB/BPVqpAIS8Q==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4c3jsqjakw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 04 Feb 2026 17:44:46 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 614GHa1V025788;
+	Wed, 4 Feb 2026 17:44:46 GMT
+Received: from cy3pr05cu001.outbound.protection.outlook.com (mail-westcentralusazon11013018.outbound.protection.outlook.com [40.93.201.18])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4c257ac60e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 04 Feb 2026 17:44:45 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=m+r+2qyvR2e650BpV7+1aQtvNGfyUQy8bP9c7WIKnLBdr76TYH2ChK5tKhVrWNkn9gl3Q+uEbISGgdaKbpRX81gKA1ZQfj13W/uckL/2hjxJqLuLynmFBziOwcHU+EsWOMDDDCcwOeshLKzk5bIrU15Tj2lbB+lVz6YpHtwFPZ3H5vvhOncv0oxDVtwHiK1bUBqwcWSPB4LviEzVGXCEHzpJHPcGRccGDostsGt7Kj9U+d6ZDfpnqSA1FQfhb69GPf8HNGzyhDyFfG9SVqggCbWyAyk0PZ8LhACFKClxl9kIH71UnUsW1xfnmDCbqiCLgMEX6smNPkvRFIMcTvLvrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mToUCRbwFhC5I9O8hcT3wFa66d0BnnJXnag524t6Lek=;
+ b=Oh9w9K5LorKkgH9PIZx3xC/Fr9UNOPuC4ahDcF9zlCmzMwi7F7BCsYshO4eEYOxyGcv784+VgpaF33AjGUkg59wvNR6ea2LkUG5lsGhwD/KnMDM1HkbEmjrpAZeg8PnOnzaDOt51E0xotWLWByXgMeTTqo1UE05ckm4OehMdS3qPxIloNDzRew39Qc2g693/1q9cptzbkMLBPaT6uBwV4zJWoH2kCVG8w9VVwFLS9K4wdgY9MN5NTvGtc/ZLANIzFm1oHRodHwmf9wjESWRuHwIywgr3mmSEsvZxoryakqbEnnmI6VrmeJjrgGpkIhHo02Cs63hKuN0jKGFxTvsjjA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mToUCRbwFhC5I9O8hcT3wFa66d0BnnJXnag524t6Lek=;
+ b=jur0KupwooYDry5M6l49hUTGrtAQQSVZ8rdOlOp1Poo6YWySllZs/0gZifx9CUhm+sbzpfIHsIKzhuL8OWYDUKZaS/ea9jP2rQpj2fQZ6/vxJeH6FbS7eTIwtbJVHVKT8hsUP8kdSQiVOjsUe69YstN+QL3AvvrSm58pxzkzP40=
+Received: from DS0PR10MB7224.namprd10.prod.outlook.com (2603:10b6:8:f5::14) by
+ PH3PPFCA9331432.namprd10.prod.outlook.com (2603:10b6:518:1::7c6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.13; Wed, 4 Feb
+ 2026 17:44:39 +0000
+Received: from DS0PR10MB7224.namprd10.prod.outlook.com
+ ([fe80::30d0:8be0:725b:3e0e]) by DS0PR10MB7224.namprd10.prod.outlook.com
+ ([fe80::30d0:8be0:725b:3e0e%5]) with mapi id 15.20.9587.013; Wed, 4 Feb 2026
+ 17:44:38 +0000
+Message-ID: <6e1e771c-ecd4-4ab6-ba9f-900f34c5d89d@oracle.com>
+Date: Wed, 4 Feb 2026 09:44:34 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 02/28] tpm: Move TPM1 specific definitions and
+ functions to new headers
+To: "Daniel P. Smith" <dpsmith@apertussolutions.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+        linux-efi@vger.kernel.org, iommu@lists.linux.dev, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        dave.hansen@linux.intel.com, ardb@kernel.org, mjg59@srcf.ucam.org,
+        James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, jgg@ziepe.ca,
+        luto@amacapital.net, nivedita@alum.mit.edu,
+        herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
+        ebiederm@xmission.com, dwmw2@infradead.org, baolu.lu@linux.intel.com,
+        kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
+        trenchboot-devel@googlegroups.com
+References: <20251215233316.1076248-1-ross.philipson@oracle.com>
+ <20251215233316.1076248-3-ross.philipson@oracle.com>
+ <aW7E2dVlmjZIUivW@kernel.org>
+ <7aad3461-f0a5-42ff-ba9b-b52edd7d36db@apertussolutions.com>
+Content-Language: en-US
+From: ross.philipson@oracle.com
+In-Reply-To: <7aad3461-f0a5-42ff-ba9b-b52edd7d36db@apertussolutions.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PH8P223CA0006.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:510:2db::12) To DS0PR10MB7224.namprd10.prod.outlook.com
+ (2603:10b6:8:f5::14)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260125033537.334628-26-kanchana.p.sridhar@intel.com>
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR10MB7224:EE_|PH3PPFCA9331432:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32c5671b-a13e-426f-0af4-08de641511a2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?b0ZDeWdYOTVGK0VyT2FWb1IxYkpZOXhZYU96MUlRUVI4Qm4zK1Qwa3lvNENS?=
+ =?utf-8?B?U2RwZ2dVQmVmcmh1TTZUSjd4Q3VqMThZNEJIWGN3L0F2Y21BL0VvMis1YTRm?=
+ =?utf-8?B?U1pGdmU3SHZGbVZOVFlNSGN2YXp2YUo0aHl3VkVlUll4bDJyd3ZQK1NYcXYz?=
+ =?utf-8?B?UkJudExKYk8yaDFvZFNlbENIeWxwNUFJMWdwQjRpV3N5TmZVK3drMlAxQVoy?=
+ =?utf-8?B?VDd4SUY1QWdUaVdKQWhVT1htaVdCT1pwZ2ZPOXhsZ3l3Yml3RExtaTl5dkZn?=
+ =?utf-8?B?UjRNWVA3LzZpUlFCVTJ5Nzk0V2tubi84aVoxdXZDRUJMaUJaY2lrYUc5dm83?=
+ =?utf-8?B?TjV3clUrUnVySjRkcW5TYWZ0Z3k3WFhTV3ZtVnJBNlByTFErcVBsR0d1ZDRV?=
+ =?utf-8?B?RmFjRlgyb095bUQrUUFvK2dMb1hlUXFNbGZ6dmVBWUIycjhMRVpBQm9WcjhT?=
+ =?utf-8?B?RHNPNEErbTJ3bnJZaVNhMEwxRStsWEpVSTNoa3BQOEJkdFU1K1lTcXVHMDQz?=
+ =?utf-8?B?b0s2NFZYSG5EQ2lDY1EzeDF2NWpTUHZrcnFTd2kxZm9pdEVCdzd5bzB4UmR1?=
+ =?utf-8?B?ZDBZaUlkejBZOUhjNzZIQWVlSFlOaEFlbGlnb1hnRkZYWjJOOTRsbHdvOW01?=
+ =?utf-8?B?aEQrenFHQjJYdHc0SHRrbUpkZ2YraWQ3Qi9hc3l6Ky9KeHdmdktaTDFkVzFz?=
+ =?utf-8?B?dTgvYWdVbkZ0OG9ONkkrQlF3VGxiTGpEeFRWSDNTM2YxR3Y2RHI1WWUyWTlR?=
+ =?utf-8?B?dS9MWGpMMDlXcDZHSE16M2hUbUZVQWo0S1R1QlgxK09VeUxzSnRwb2YzWHI2?=
+ =?utf-8?B?YUpraC9Makl2MFRMclQzRnJUcjVrck1xNUgrTGl6ejF6bFQwL1krbUdMa3VH?=
+ =?utf-8?B?a013ak1jOW9uT01kSXUxa3ZJRk5XSDIzTVNkZEcyeVY5QUUzRlA5UXNldmVX?=
+ =?utf-8?B?TlRGY1hPNGxjR3kreTNob2xTOWlmdXBOMlpQRm0xd28yN1JLQnJOYnRnYVRx?=
+ =?utf-8?B?K1p0azd3YTNKcnE3Rm91SmJFd1luNHBNRTdweUZNbkpub295bjJ3ZmtJak5U?=
+ =?utf-8?B?MzhWVlJCREVkSDhML1NQd3FhdWVrajIxczNHb3NtazhqZmpFS25xVk5ic3pW?=
+ =?utf-8?B?YUh3NEtJQnZVVzRvdExxdDRSUzVwMzFVWk5IdG1pN3NGSE9ycjg3L09oQTVJ?=
+ =?utf-8?B?eENRVXduOUl3UXByb2MzaXl3ZUJTcnFVc0thYzJrbkUzZDdTVVM5b2RONDlF?=
+ =?utf-8?B?TWYxODZyQlZJYmJIRjVvbDIvN3JyeXo2Zm5JSWR2TWUzNzFVdmVuMVd2K3h3?=
+ =?utf-8?B?WnN6WEw1eGVad3hldHNEbE1hcnBTTVF5cjkyNTh0S1VmcUVmdXNYcEN0d3N2?=
+ =?utf-8?B?YmlSM3B6bDNCNXVyNmNmTnc5U0hNenhJS2t3UXZ1S3Q2NTNYWU4ybDNKMDhO?=
+ =?utf-8?B?MzE3d2hwbXQrM3hNb3NhdFdtSjZMb3hTZ1VhbjcyWnQzY1U4ckpSZkZaZnlD?=
+ =?utf-8?B?Q0VkN0pyTXBSVDdhM1JjYXVJcy9TaVhpb1V3aVpHdWQ1MHpReXpsUlhsdWtw?=
+ =?utf-8?B?QllqaCs1eEtoMTE4NzhFeklQQk9PZDRXL0FNcVNVMkViakVxMnFybWphSlo2?=
+ =?utf-8?B?QXVzV2FKQzNjMUFLb3lzdjcxY1d6VHZWUlpZWFZkbzZ0bk5MdFJLZDB6c2Ex?=
+ =?utf-8?B?b1lQZ0RSb3pGNTZQSmNiVTB2emlsU21uN05RbE5xTDlleVRmZ2daWEFCelIw?=
+ =?utf-8?B?aEU1WWF2cExaVllVYjBFTFhBRjExSDBUNTUwMWhPZnFnMDNoZVh5dkwxYzc3?=
+ =?utf-8?B?MEZlNVRlbkhhQ1hQRThZY1FvMXpwdkZMRFpURWsxUjAybU1hU2ZYdnlnSlcy?=
+ =?utf-8?B?OUxTTkVQMFVzbFFpWFlkaDYzVHpBbnJsdXhXeWJJaFNTUWs0RXk4ZG8xL042?=
+ =?utf-8?B?UGIrLytVR2xDUGlRYkNjRllvQWplNlRRc1RQNEVna2t6Q1dPdXlpdDY0R3NJ?=
+ =?utf-8?B?THNyR1g1T05QcWNWZGpHcmFDdGVqM1k1Syt5dDczb0ZxaC90NTgyZnNRL2dB?=
+ =?utf-8?Q?u+b/9X?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR10MB7224.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?KzN0WVptVHVtNUswMzhidDlqTjNrb0YzWUw3VzU0TDVXRlFwVjRXNzZGRUF6?=
+ =?utf-8?B?UzFQWEtSeXRMYUpJN0ZFRVNVTjBhY0xyU0hobWhzS2tuak1FYm42ayt1TTZI?=
+ =?utf-8?B?d0pPa2VydXB1QlIxeWFVOTVGTXhHWjFhV09HTU4xc2cvN09taGw3RjZNMTNa?=
+ =?utf-8?B?RVBVcllPYnpoaDJiZEFObk5Xd21kSWQxdjBSS0RXRXBJa3dpTEcxQ1h0a1Mx?=
+ =?utf-8?B?WTZKeUtaVjE1M0ZuWjlKY1lZcjFZZ3prQXdzcDZEelZTZXh0R3UzcGl5MWJC?=
+ =?utf-8?B?dzlzSU1iZi9TVW5Xd254c2VaRTQyUnJ6TXc3L1NvUm5nM0RuWWE1Y29Xd1JB?=
+ =?utf-8?B?N0Z2TVBXM0lxNTR0RG4rbXo3VFM0KzMvZTNLdmUvemhDVVB3N1Iwc3RINEha?=
+ =?utf-8?B?eTA0aUE4WCtLVVBZbitPME40bFc3aklvRkRYcnhPY2plSU5qbmRrZllzN0lY?=
+ =?utf-8?B?NE9keUZFMlNXV1pUNk1SQUNYcEtBYkVDRFVHbmdMUjBYaUJiV3IrVHd0Q3ZP?=
+ =?utf-8?B?NG9nbkpQc0p1QSt3N2l2TytadFowR24rdVdzSTlHbE9sM1ZNYWxseHp3NzZ6?=
+ =?utf-8?B?eTYxYkxjd1ZLcTBOcEZSdkFIcVN3TGZSRGNLSUZLVzQ4OUhRS1E1VnFOTWlN?=
+ =?utf-8?B?cktVQ3U4UTRhNHZST29BS3Q5cWRMTHU5QnVKUnNmVnorb2dkUW1zNDRBc0ZM?=
+ =?utf-8?B?aFpjaGJIZG4wTFNSNWQ1VEpHQlA3b21CQXVublZEdHowQ2JxL1k2RnRmaEtJ?=
+ =?utf-8?B?MmNZVzdPTW00Qlc1UFhmM3RpUnJpTi9naVYyY2Q1aWt6YWFKK1Vab1lBb0gz?=
+ =?utf-8?B?aDJIRk5aUW9XOTdYZHc2ZGJpeElBQTFQQ09kbnB2d211a3dkeTdoWmxwZEZO?=
+ =?utf-8?B?cU4ydkxHYTVVVzhINm9kSU9oem1LckNqWjhJbXVrZTBhWkN0dTZoR1hsTDlI?=
+ =?utf-8?B?aDhhQ3lKK09wVFJleXZmSjY1ZmRYc2o0UXVmQ1hRSVNJalpxczEyT2U4MEYw?=
+ =?utf-8?B?dXp2bHVRakxjcWFkK09Qd2xOS014SksxK00wVU1GVm9KQUZXTjJLOCtMbS9y?=
+ =?utf-8?B?My9JL08rRjhPeEZUQWUzRnpTNVZYOVR6TVpkUTkwb0RXanpQVmw5SzlSZnp6?=
+ =?utf-8?B?N1k5N3BmTko4SkVMSVpVZ3JzWFdoT3ZrUjlLbjFSSFMyQVU4ZGhvczFqNGZ4?=
+ =?utf-8?B?d1hmL0lheWRzSU5FV3NXQlF5L1JJYTdiRGNGdzM2dUoyRmsvTit0bHJlYlgz?=
+ =?utf-8?B?S0oxblRmTlRzQUFtU1hzUGRyT0VETzdsN09pazlHdHhMTHMwYm1kMGhvWERB?=
+ =?utf-8?B?UkpiMEtzL2dacnI1KzYwZFBzUEdvRDVwbG0rUHc3WVRlb2dTa1RMSGdrdk5U?=
+ =?utf-8?B?bXNmWFA4Nm5wQ2w1cHZ1bDVDSy9Ia2JFQkpUYUhlNGYweW04akZIcWJFVU11?=
+ =?utf-8?B?NCtBU09ncTNORzRxaUFhZkVYOFkwMm0xaTJXQmQyZllZaDdOZVZ6WStjTElp?=
+ =?utf-8?B?bmdBN0RQZ21TU0JPbG9RTjQ2TXVHU1JzS1QvaytVb0VRVmlSM0R0TmVMOWVO?=
+ =?utf-8?B?SWNTcjE2aU04Z3JjTFdCVEIxRzJpdnZINDdNOTFBcUlTcFh2QnJYOXExL1hL?=
+ =?utf-8?B?WWVRU1g1aWJIODBkejhWcUE3aCtYZ3NIVVhQbzNpRkFtMXR5d1c1c1hmd1JP?=
+ =?utf-8?B?L0tnbWxHQUx4Q3pGUFgwRVJmYW9BcnNOb2FkNVMyK1U0VmxVMEhsVnVTTms4?=
+ =?utf-8?B?UkVJRkV2YmVXSm41U1pVcU9DZllNaTBQYmZHVUxRSnZuMzIwcXpZTGJWSlNU?=
+ =?utf-8?B?bXdwZE5jM0FRNjIrNWt0RDh2MXJERVpjNEdiMHVNRStkYTNDbER2RXI0alJ0?=
+ =?utf-8?B?VHh5MW52Y1V4U0UwbVg5dSs5VnVhUHgxZWZFYms0MUFFK0svblVkTW03OFhG?=
+ =?utf-8?B?Yk9ibmNpUWJSQWFRSXNLQWRtUHpwNWdqWWhrejhvL0VyMkNjcllPeHllaFdQ?=
+ =?utf-8?B?dmNhUStOelp1ZytvWlY4VitCY0xaUTN0Ri8rTVNKdC9BTnNJWTZTVkF6UjVk?=
+ =?utf-8?B?OENPOGQ4am1McW9FdTZka2p4UUkvTWlIbGpwTDdVWHgvQWNkOVhSZUlCck1h?=
+ =?utf-8?B?QjI2MDYwdXUrZWZuNHdOY0VlSEVMZkY2K0VCUmdxU0c4eERZT0hZY2kxanJs?=
+ =?utf-8?B?d3FGMmFXUXlRalpZcEZLTlEzMlBURnNMYUlUQUlXclpiL2JQRlIrbGtxM0lt?=
+ =?utf-8?B?a3ZXekt5NjEwSVB3c3Y5T3MrL1RXV0MyWkk2ZkJhZ3ptNENqWWxCaXVTV1hv?=
+ =?utf-8?B?cWcyOUVNd2FCSnBUVkliNjQ1NnlOUitnMTloNlNML3EwMWQ0M0ZDSWp5cENt?=
+ =?utf-8?Q?lDNtEMi4utHvwC1A=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	Za2jj2ydW+ERdmtT/Eh4OEgpKwwtdl8c9ex4qP7+jXRAHUHbwrlZgRYTv9GraA2xv4mP15GKJZPWrKreFgxFahV2oO3Tt2pY8PFmPvyN2LtoCt2IQXFDKeejjwWZ+EdrhRdYQeGC+rooTpa3Wyq7zMqMQ6oIgUD7KcZKUuzI33aZ2cHLO6KBORicIp4w20sEAaH1lMnnPWS51ZWVBmuf1x+VCmciAbj08/fUNhzG7q9T1QzFuDiWUfLXcog8o9yjss4f7a1quzGKCjIaCMjTnnWPUOp69pz5sAmIaHQMwRMVFNgYCZbhKVWMZ3Y0pag6nlzRRMAOsutxk/KHPLcYRr+j0CfVIXeMZj6KIMOr+K+AiXmgjXZjT8INUHKtMRbKhCUUIQhZpAeJCEszS5udHi8e2Bf+GhH0n/68KbjWg+6TofBacndZqtrpzYdQaYDfu4QK5wKK5Dz7CtVraAZcRhEVkXrVIGDo4vLaTBeVe2Ev6JU5F0KAKWA5mX0/WRAYfyFzG4GZX0ER8Ye9qKc2RHDRB/tTbbc64fceXn5fMucPWoQaHSFYRNBesdwhN8/HUc7LjJpnB7dAUQ3QPtAIDhoT+2unKfqtG1H31DAlbek=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32c5671b-a13e-426f-0af4-08de641511a2
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB7224.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2026 17:44:38.8528
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: J9TdV4OvN59iCKIU1yTGYJ59EbyzI1J8Za+jS052XLnv4Wt+w1UcPVk9vddaO1lc+F8Ba0Fo4fXRE+Z/Kkh1/N4ZbY3dH9/nh53ZHEYq/0s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPFCA9331432
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-04_06,2026-02-04_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0 adultscore=0
+ spamscore=0 bulkscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2601150000
+ definitions=main-2602040135
+X-Authority-Analysis: v=2.4 cv=Db0aa/tW c=1 sm=1 tr=0 ts=6983858e b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=HzLeVaNsDn8A:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=xt6ew7UTAAAA:8 a=UN5060LkAAAA:8 a=yPCof4ZbAAAA:8 a=VnNF1IyMAAAA:8
+ a=FP58Ms26AAAA:8 a=IFuHbMLi-Pw2QU87uAwA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=tn93DeGZTgJ6DdWMtdD4:22 a=E6eXv-vVeS7VqOnxGRGn:22 cc=ntf awl=host:13644
+X-Proofpoint-ORIG-GUID: Lv7Gcblx3MkUZSQQF7P_ZP0gDxy838eq
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA0MDEzNSBTYWx0ZWRfXwgXxTG6zdceI
+ BrtVHmBHpBUmdZU73XKXy3y+wcT/U6HwzCE0WUOugpc8Y12FoysjwEncNMvfZSRPqIu+sCVihrP
+ wIF0OMsrpY/pAiFLYnTb0dth/jGz01Y+zZqGcxcsGU4VQ8qrBzslHieP+XDriEwLaqYMs+ENvvN
+ kgD30Rcj43HH+jYWXzLme3DKumW8LAg7m36sya5nw0BITRJG9CY1kwsjgokN3k2c0bn7L5DZ2eD
+ ARME1kB9plmKMLMOszOlstyYDdap+DRieQtMHd556SM4TJL+xhsdmI3MtMFasw0dkMNURnMLkY6
+ cnHIVW7qeUFm6EVfDlmyY3VQkl0ZArwShT+czWFTsMu06M5NaMJIiHDneZlEeUKKiyG3ZpE5HE2
+ La8qcPpNlL7k40P7KRaANPaAAqe6V/6TfzRWJsBad/9RH2P9Rj8C4rlSaA4y9qhTQKH/TPaSG+E
+ FODZ+tmTTomfWzLBGzdsbEIo12wGPsEkhQuQwjNg=
+X-Proofpoint-GUID: Lv7Gcblx3MkUZSQQF7P_ZP0gDxy838eq
 
-On Sat, Jan 24, 2026 at 07:35:36PM -0800, Kanchana P Sridhar wrote:
-> Support batching when storing large folios in zswap. If the underlying
-> compressor supports batching (e.g. hardware parallel compression),
-> allocate multiple compression buffers, otherwise allocate one. The
-> number of buffers is bounded by a new constant, ZSWAP_MAX_BATCH_SIZE, to
-> limit the memory overhead. For existing software compressors, the only
-> extra overhead is the extra 'buffers' pointer, so 8 bytes per-CPU on
-> x86_64.
+On 2/1/26 8:23 AM, Daniel P. Smith wrote:
+> On 1/19/26 18:57, Jarkko Sakkinen wrote:
+>> On Mon, Dec 15, 2025 at 03:32:50PM -0800, Ross Philipson wrote:
+>>> This gathers all the TPM1 definitions and structures into two separate
+>>> header files (public tpm1.h and private tpm1_structs.h). The definitions
+>>> moved to these files correspond to the TCG specification for TPM 1 family:
+>>>
+>>> TPM 1.2 Main Specification
+>>>   -  https://urldefense.com/v3/__https://trustedcomputinggroup.org/resource/tpm-main-specification/__;!!ACWV5N9M2RV99hQ!OivTxO-R0nvBJYXIV-T0n0fq0wY64MTgdaecPzAauxrFkRxTcQ6CuBEcXmZZYY1KfZlqmfLTZBbPaEr7Y8k7hJk9_mQ$
+>>> Note that the structures were pulled into tpm1_structs.h to allow their
+>>> external reuse.
+>>>
+>>> Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
+>>> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+>>> ---
+>>>   drivers/char/tpm/tpm.h          | 98 +--------------------------------
+>>>   drivers/char/tpm/tpm1-cmd.c     |  5 --
+>>>   drivers/char/tpm/tpm1_structs.h | 97 ++++++++++++++++++++++++++++++++
+>>
+>> I think you are overcomplicating the patch set and doing more
+>> than you really need to do.
+>>
+>> I.e. structs could go also just as well to tpm_command.h. We
+>> will deal with if/when that file ever grows too large. It's
+>> absolutely not a priority for this patch set.
 > 
-> Only the first buffer is currently used, but subsequent changes will use
-> the remaining buffers for hardware compression batching.
+> Ack.
 > 
-> Regardless of compression batching, always process large folios in
-> batches. For hardware compressors, the batch size is the compressor
-> batch size, otherwise ZSWAP_MAX_BATCH_SIZE is used.
+>>>   include/linux/tpm1.h            | 34 +++++++++++-
+>>>   4 files changed, 132 insertions(+), 102 deletions(-)
+>>>   create mode 100644 drivers/char/tpm/tpm1_structs.h
+>>>
+>>> diff --git a/drivers/char/tpm/tpm.h b/drivers/char/tpm/tpm.h
+>>> index ca391b2a211c..1f9f8540eede 100644
+>>> --- a/drivers/char/tpm/tpm.h
+>>> +++ b/drivers/char/tpm/tpm.h
+>>> @@ -50,105 +50,9 @@ enum tpm_addr {
+>>>       TPM_ADDR = 0x4E,
+>>>   };
+>>> -#define TPM_WARN_RETRY          0x800
+>>> -#define TPM_WARN_DOING_SELFTEST 0x802
+>>> -#define TPM_ERR_DEACTIVATED     0x6
+>>> -#define TPM_ERR_DISABLED        0x7
+>>> -#define TPM_ERR_FAILEDSELFTEST  0x1C
+>>> -#define TPM_ERR_INVALID_POSTINIT 38
+>>> -
+>>> -#define TPM_TAG_RQU_COMMAND 193
+>>> -
+>>>   /* TPM2 specific constants. */
+>>>   #define TPM2_SPACE_BUFFER_SIZE        16384 /* 16 kB */
+>>> -struct    stclear_flags_t {
+>>> -    __be16    tag;
+>>> -    u8    deactivated;
+>>> -    u8    disableForceClear;
+>>> -    u8    physicalPresence;
+>>> -    u8    physicalPresenceLock;
+>>> -    u8    bGlobalLock;
+>>> -} __packed;
+>>> -
+>>> -struct tpm1_version {
+>>> -    u8 major;
+>>> -    u8 minor;
+>>> -    u8 rev_major;
+>>> -    u8 rev_minor;
+>>> -} __packed;
+>>> -
+>>> -struct tpm1_version2 {
+>>> -    __be16 tag;
+>>> -    struct tpm1_version version;
+>>> -} __packed;
+>>> -
+>>> -struct    timeout_t {
+>>> -    __be32    a;
+>>> -    __be32    b;
+>>> -    __be32    c;
+>>> -    __be32    d;
+>>> -} __packed;
+>>> -
+>>> -struct duration_t {
+>>> -    __be32    tpm_short;
+>>> -    __be32    tpm_medium;
+>>> -    __be32    tpm_long;
+>>> -} __packed;
+>>> -
+>>> -struct permanent_flags_t {
+>>> -    __be16    tag;
+>>> -    u8    disable;
+>>> -    u8    ownership;
+>>> -    u8    deactivated;
+>>> -    u8    readPubek;
+>>> -    u8    disableOwnerClear;
+>>> -    u8    allowMaintenance;
+>>> -    u8    physicalPresenceLifetimeLock;
+>>> -    u8    physicalPresenceHWEnable;
+>>> -    u8    physicalPresenceCMDEnable;
+>>> -    u8    CEKPUsed;
+>>> -    u8    TPMpost;
+>>> -    u8    TPMpostLock;
+>>> -    u8    FIPS;
+>>> -    u8    operator;
+>>> -    u8    enableRevokeEK;
+>>> -    u8    nvLocked;
+>>> -    u8    readSRKPub;
+>>> -    u8    tpmEstablished;
+>>> -    u8    maintenanceDone;
+>>> -    u8    disableFullDALogicInfo;
+>>> -} __packed;
+>>> -
+>>> -typedef union {
+>>> -    struct    permanent_flags_t perm_flags;
+>>> -    struct    stclear_flags_t    stclear_flags;
+>>> -    __u8    owned;
+>>> -    __be32    num_pcrs;
+>>> -    struct tpm1_version version1;
+>>> -    struct tpm1_version2 version2;
+>>> -    __be32    manufacturer_id;
+>>> -    struct timeout_t  timeout;
+>>> -    struct duration_t duration;
+>>> -} cap_t;
+>>> -
+>>> -enum tpm_capabilities {
+>>> -    TPM_CAP_FLAG = 4,
+>>> -    TPM_CAP_PROP = 5,
+>>> -    TPM_CAP_VERSION_1_1 = 0x06,
+>>> -    TPM_CAP_VERSION_1_2 = 0x1A,
+>>> -};
+>>> -
+>>> -enum tpm_sub_capabilities {
+>>> -    TPM_CAP_PROP_PCR = 0x101,
+>>> -    TPM_CAP_PROP_MANUFACTURER = 0x103,
+>>> -    TPM_CAP_FLAG_PERM = 0x108,
+>>> -    TPM_CAP_FLAG_VOL = 0x109,
+>>> -    TPM_CAP_PROP_OWNER = 0x111,
+>>> -    TPM_CAP_PROP_TIS_TIMEOUT = 0x115,
+>>> -    TPM_CAP_PROP_TIS_DURATION = 0x120,
+>>> -};
+>>> -
+>>>   enum tpm2_pt_props {
+>>>       TPM2_PT_NONE = 0x00000000,
+>>>       TPM2_PT_GROUP = 0x00000100,
+>>> @@ -229,6 +133,8 @@ enum tpm2_pt_props {
+>>>    * compiler warnings about stack frame size. */
+>>>   #define TPM_MAX_RNG_DATA    128
+>>> +#include "tpm1_structs.h"
+>>> +
+>>>   extern const struct class tpm_class;
+>>>   extern const struct class tpmrm_class;
+>>>   extern dev_t tpm_devt;
+>>> diff --git a/drivers/char/tpm/tpm1-cmd.c b/drivers/char/tpm/tpm1-cmd.c
+>>> index f29827b454d2..02f20a0aa37d 100644
+>>> --- a/drivers/char/tpm/tpm1-cmd.c
+>>> +++ b/drivers/char/tpm/tpm1-cmd.c
+>>> @@ -505,11 +505,6 @@ ssize_t tpm1_getcap(struct tpm_chip *chip, u32 subcap_id, cap_t *cap,
+>>>   }
+>>>   EXPORT_SYMBOL_GPL(tpm1_getcap);
+>>> -struct tpm1_get_random_out {
+>>> -    __be32 rng_data_len;
+>>> -    u8 rng_data[TPM_MAX_RNG_DATA];
+>>> -} __packed;
+>>> -
+>>>   /**
+>>>    * tpm1_get_random() - get random bytes from the TPM's RNG
+>>>    * @chip:    a &struct tpm_chip instance
+>>> diff --git a/drivers/char/tpm/tpm1_structs.h b/drivers/char/tpm/tpm1_structs.h
+>>> new file mode 100644
+>>> index 000000000000..ad21376af5ab
+>>> --- /dev/null
+>>> +++ b/drivers/char/tpm/tpm1_structs.h
+>>> @@ -0,0 +1,97 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>>> +/*
+>>> + * Copyright (C) 2004 IBM Corporation
+>>> + * Copyright (C) 2015 Intel Corporation
+>>> + *
+>>> + * Authors:
+>>> + * Leendert van Doorn <leendert@watson.ibm.com>
+>>> + * Dave Safford <safford@watson.ibm.com>
+>>> + * Reiner Sailer <sailer@watson.ibm.com>
+>>> + * Kylene Hall <kjhall@us.ibm.com>
+>>> + *
+>>> + * Maintained by: <tpmdd-devel@lists.sourceforge.net>
+>>> + *
+>>> + * Device driver for TCG/TCPA TPM (trusted platform module).
+>>> + * Specifications at https://urldefense.com/v3/__http://www.trustedcomputinggroup.org__;!!ACWV5N9M2RV99hQ!OivTxO-R0nvBJYXIV-T0n0fq0wY64MTgdaecPzAauxrFkRxTcQ6CuBEcXmZZYY1KfZlqmfLTZBbPaEr7Y8k7HW5iz_w$ + */
+>>> +
+>>> +#ifndef __TPM1_STRUCTS_H__
+>>> +#define __TPM1_STRUCTS_H__
+>>> +
+>>> +struct    stclear_flags_t {
+>>> +    __be16    tag;
+>>> +    u8    deactivated;
+>>> +    u8    disableForceClear;
+>>> +    u8    physicalPresence;
+>>> +    u8    physicalPresenceLock;
+>>> +    u8    bGlobalLock;
+>>> +} __packed;
+>>
+>>
+>> Don't retain alignment.
+>>
 > 
-> zswap_store_page() is replaced with zswap_store_pages(), which processes
-> a batch of pages and allows for batching optimizations. For now, only
-> optimize allocating entries by using batch allocations from the slab
-> cache.
+> Okay.
+
+I wanted to clarify what you are asking here. Do you mean to just not pack the structs? It seems some of these structs define the responses from the TPM chip and I would assume they are packed this way.
+
 > 
-> Since batch allocations do not support specifying a node id, store the
-> node id in the zswap entry instead of relying on the zswap_entry being
-> allocated on the same node. The size of the zswap_entry remains
-> unchanged as 'referenced' is lumped in with the 'length' (as it doesn't
-> need a full unsigned int anyway).
+>>> +
+>>> +struct tpm1_version {
+>>> +    u8 major;
+>>> +    u8 minor;
+>>> +    u8 rev_major;
+>>> +    u8 rev_minor;
+>>> +} __packed;
+>>> +
+>>> +struct tpm1_version2 {
+>>> +    __be16 tag;
+>>> +    struct tpm1_version version;
+>>> +} __packed;
+>>> +
+>>> +struct    timeout_t {
+>>> +    __be32    a;
+>>> +    __be32    b;
+>>> +    __be32    c;
+>>> +    __be32    d;
+>>> +} __packed;
+>>> +
+>>> +struct duration_t {
+>>> +    __be32    tpm_short;
+>>> +    __be32    tpm_medium;
+>>> +    __be32    tpm_long;
+>>> +} __packed;
+>>> +
+>>> +struct permanent_flags_t {
+>>> +    __be16    tag;
+>>> +    u8    disable;
+>>> +    u8    ownership;
+>>> +    u8    deactivated;
+>>> +    u8    readPubek;
+>>> +    u8    disableOwnerClear;
+>>> +    u8    allowMaintenance;
+>>> +    u8    physicalPresenceLifetimeLock;
+>>> +    u8    physicalPresenceHWEnable;
+>>> +    u8    physicalPresenceCMDEnable;
+>>> +    u8    CEKPUsed;
+>>> +    u8    TPMpost;
+>>> +    u8    TPMpostLock;
+>>> +    u8    FIPS;
+>>> +    u8    operator;
+>>> +    u8    enableRevokeEK;
+>>> +    u8    nvLocked;
+>>> +    u8    readSRKPub;
+>>> +    u8    tpmEstablished;
+>>> +    u8    maintenanceDone;
+>>> +    u8    disableFullDALogicInfo;
+>>> +} __packed;
+>>> +
+>>> +/* Gather all capabilities related information info one type */
+>>> +typedef union {
+>>> +    struct    permanent_flags_t perm_flags;
+>>> +    struct    stclear_flags_t    stclear_flags;
+>>> +    __u8    owned;
+>>> +    __be32    num_pcrs;
+>>> +    struct tpm1_version version1;
+>>> +    struct tpm1_version2 version2;
+>>> +    __be32    manufacturer_id;
+>>> +    struct timeout_t  timeout;
+>>> +    struct duration_t duration;
+>>> +} cap_t;
+>>
+>> Don't retain alignment here.
+
+Again to clarify, do you mean none of these structs should be packed (and thus the union won't be either)?
+
+Thanks
+Ross
+
+>>
 > 
-> Avoid repeatedly calling mem_cgroup_zswap_writeback_enabled() for every
-> page and only call it once for the folio, since the entire folio is
-> charged to a single memcg.
+> Okay.
 > 
-> Suggested-by: Nhat Pham <nphamcs@gmail.com>
-> Suggested-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-
-Generally LGTM with a few comments below, I suspect you'll need to
-update this patch anyway due to conflicts.
-
-> ---
->  mm/zswap.c | 351 +++++++++++++++++++++++++++++++++++++----------------
->  1 file changed, 248 insertions(+), 103 deletions(-)
+>>> +
+>>> +struct tpm1_get_random_out {
+>>> +    __be32 rng_data_len;
+>>> +    u8 rng_data[TPM_MAX_RNG_DATA];
+>>> +} __packed;
+>>> +
+>>> +#endif
+>>> diff --git a/include/linux/tpm1.h b/include/linux/tpm1.h
+>>> index 54c6c211eb9e..5fad94ac8d15 100644
+>>> --- a/include/linux/tpm1.h
+>>> +++ b/include/linux/tpm1.h
+>>> @@ -47,7 +47,39 @@ enum tpm_command_ordinals {
+>>>       TPM_ORD_UNSEAL            = 24,
+>>>   };
+>>> -/* Other constants */
+>>> +enum tpm_capabilities {
+>>> +    TPM_CAP_FLAG        = 4,
+>>> +    TPM_CAP_PROP        = 5,
+>>> +    TPM_CAP_VERSION_1_1    = 0x06,
+>>> +    TPM_CAP_VERSION_1_2    = 0x1A,
+>>> +};
+>>> +
+>>> +enum tpm_sub_capabilities {
+>>> +    TPM_CAP_PROP_PCR        = 0x101,
+>>> +    TPM_CAP_PROP_MANUFACTURER    = 0x103,
+>>> +    TPM_CAP_FLAG_PERM        = 0x108,
+>>> +    TPM_CAP_FLAG_VOL        = 0x109,
+>>> +    TPM_CAP_PROP_OWNER        = 0x111,
+>>> +    TPM_CAP_PROP_TIS_TIMEOUT    = 0x115,
+>>> +    TPM_CAP_PROP_TIS_DURATION    = 0x120,
+>>> +};
+>>> +
+>>> +/* Return Codes */
+>>> +enum tpm_return_codes {
+>>> +    TPM_BASE_MASK            = 0,
+>>> +    TPM_NON_FATAL_MASK        = 0x00000800,
+>>> +    TPM_SUCCESS            = TPM_BASE_MASK + 0,
+>>> +    TPM_ERR_DEACTIVATED        = TPM_BASE_MASK + 6,
+>>> +    TPM_ERR_DISABLED        = TPM_BASE_MASK + 7,
+>>> +    TPM_ERR_FAIL            = TPM_BASE_MASK + 9,
+>>> +    TPM_ERR_FAILEDSELFTEST        = TPM_BASE_MASK + 28,
+>>> +    TPM_ERR_INVALID_POSTINIT    = TPM_BASE_MASK + 38,
+>>> +    TPM_ERR_INVALID_FAMILY        = TPM_BASE_MASK + 55,
+>>> +    TPM_WARN_RETRY            = TPM_BASE_MASK + TPM_NON_FATAL_MASK + 0,
+>>> +    TPM_WARN_DOING_SELFTEST        = TPM_BASE_MASK + TPM_NON_FATAL_MASK + 2,
+>>> +};
+>>> +
+>>> +/* Misc. constants */
+>>
+>> These constants should be relocated in a separate patch.
+>>
 > 
-> diff --git a/mm/zswap.c b/mm/zswap.c
-> index 0d56390342b7..6a22add63220 100644
-> --- a/mm/zswap.c
-> +++ b/mm/zswap.c
-> @@ -82,6 +82,11 @@ static bool zswap_pool_reached_full;
->  
->  #define ZSWAP_PARAM_UNSET ""
->  
-> +/* Limit the batch size to limit per-CPU memory usage for dst buffers. */
-> +#define ZSWAP_MAX_BATCH_SIZE 8U
-> +#define ZSWAP_ENTRY_SPARE_4BYTES 32U
-> +#define ZSWAP_ENTRY_REF_BIT 1U
-> +
->  static int zswap_setup(void);
->  
->  /* Enable/disable zswap */
-> @@ -139,7 +144,7 @@ struct crypto_acomp_ctx {
->  	struct crypto_acomp *acomp;
->  	struct acomp_req *req;
->  	struct crypto_wait wait;
-> -	u8 *buffer;
-> +	u8 **buffers;
->  	struct mutex mutex;
->  };
->  
-> @@ -148,6 +153,9 @@ struct crypto_acomp_ctx {
->   * The only case where lru_lock is not acquired while holding tree.lock is
->   * when a zswap_entry is taken off the lru for writeback, in that case it
->   * needs to be verified that it's still valid in the tree.
-> + *
-> + * @compr_batch_size: The max batch size of the compression algorithm,
-> + *                    bounded by ZSWAP_MAX_BATCH_SIZE.
->   */
->  struct zswap_pool {
->  	struct zs_pool *zs_pool;
-> @@ -157,6 +165,7 @@ struct zswap_pool {
->  	struct work_struct release_work;
->  	struct hlist_node node;
->  	char tfm_name[CRYPTO_MAX_ALG_NAME];
-> +	u8 compr_batch_size;
->  };
->  
->  /* Global LRU lists shared by all zswap pools. */
-> @@ -181,6 +190,7 @@ static struct shrinker *zswap_shrinker;
->   *              writeback logic. The entry is only reclaimed by the writeback
->   *              logic if referenced is unset. See comments in the shrinker
->   *              section for context.
-> + * nid - NUMA node id of the page for which this is the zswap entry.
->   * pool - the zswap_pool the entry's data is in
->   * handle - zsmalloc allocation handle that stores the compressed page data
->   * objcg - the obj_cgroup that the compressed memory is charged to
-> @@ -188,8 +198,11 @@ static struct shrinker *zswap_shrinker;
->   */
->  struct zswap_entry {
->  	swp_entry_t swpentry;
-> -	unsigned int length;
-> -	bool referenced;
-> +	struct {
-> +		unsigned int length:(ZSWAP_ENTRY_SPARE_4BYTES - ZSWAP_ENTRY_REF_BIT);
-> +		bool referenced:ZSWAP_ENTRY_REF_BIT;
-> +	};
-
-As Nhat mentioned, please avoid the macros here. Also, if there's a new
-version (which I suspect there will be due to conflicts), please move
-adding the nid to the entry (instead of allocating it on the correct
-node) to a separate patch.
-
-> +	int nid;
->  	struct zswap_pool *pool;
->  	unsigned long handle;
->  	struct obj_cgroup *objcg;
-> @@ -241,8 +254,10 @@ static inline struct xarray *swap_zswap_tree(swp_entry_t swp)
->  **********************************/
->  static void __zswap_pool_empty(struct percpu_ref *ref);
->  
-> -static void acomp_ctx_dealloc(struct crypto_acomp_ctx *acomp_ctx)
-> +static void acomp_ctx_dealloc(struct crypto_acomp_ctx *acomp_ctx, u8 nr_buffers)
->  {
-> +	u8 i;
-> +
->  	if (IS_ERR_OR_NULL(acomp_ctx))
->  		return;
->  
-> @@ -252,7 +267,11 @@ static void acomp_ctx_dealloc(struct crypto_acomp_ctx *acomp_ctx)
->  	if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
->  		crypto_free_acomp(acomp_ctx->acomp);
->  
-> -	kfree(acomp_ctx->buffer);
-> +	if (acomp_ctx->buffers) {
-> +		for (i = 0; i < nr_buffers; ++i)
-> +			kfree(acomp_ctx->buffers[i]);
-> +		kfree(acomp_ctx->buffers);
-> +	}
->  }
->  
->  static struct zswap_pool *zswap_pool_create(char *compressor)
-> @@ -264,6 +283,7 @@ static struct zswap_pool *zswap_pool_create(char *compressor)
->  	if (!zswap_has_pool && !strcmp(compressor, ZSWAP_PARAM_UNSET))
->  		return NULL;
->  
-> +	/* Many things rely on the zero-initialization. */
->  	pool = kzalloc(sizeof(*pool), GFP_KERNEL);
->  	if (!pool)
->  		return NULL;
-> @@ -316,7 +336,9 @@ static struct zswap_pool *zswap_pool_create(char *compressor)
->  
->  cpuhp_add_fail:
->  	for_each_possible_cpu(cpu)
-> -		acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu));
-> +		acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu),
-> +				  pool->compr_batch_size);
-> +
->  error:
->  	if (pool->acomp_ctx)
->  		free_percpu(pool->acomp_ctx);
-> @@ -354,7 +376,8 @@ static void zswap_pool_destroy(struct zswap_pool *pool)
->  	cpuhp_state_remove_instance(CPUHP_MM_ZSWP_POOL_PREPARE, &pool->node);
->  
->  	for_each_possible_cpu(cpu)
-> -		acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu));
-> +		acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu),
-> +				  pool->compr_batch_size);
->  
->  	free_percpu(pool->acomp_ctx);
->  
-> @@ -645,14 +668,8 @@ static inline struct mem_cgroup *mem_cgroup_from_entry(struct zswap_entry *entry
->  }
->  #endif
->  
-> -static inline int entry_to_nid(struct zswap_entry *entry)
-> -{
-> -	return page_to_nid(virt_to_page(entry));
-> -}
-> -
->  static void zswap_lru_add(struct list_lru *list_lru, struct zswap_entry *entry)
->  {
-> -	int nid = entry_to_nid(entry);
->  	struct mem_cgroup *memcg;
->  
->  	/*
-> @@ -669,19 +686,18 @@ static void zswap_lru_add(struct list_lru *list_lru, struct zswap_entry *entry)
->  	rcu_read_lock();
->  	memcg = mem_cgroup_from_entry(entry);
->  	/* will always succeed */
-> -	list_lru_add(list_lru, &entry->lru, nid, memcg);
-> +	list_lru_add(list_lru, &entry->lru, entry->nid, memcg);
->  	rcu_read_unlock();
->  }
->  
->  static void zswap_lru_del(struct list_lru *list_lru, struct zswap_entry *entry)
->  {
-> -	int nid = entry_to_nid(entry);
->  	struct mem_cgroup *memcg;
->  
->  	rcu_read_lock();
->  	memcg = mem_cgroup_from_entry(entry);
->  	/* will always succeed */
-> -	list_lru_del(list_lru, &entry->lru, nid, memcg);
-> +	list_lru_del(list_lru, &entry->lru, entry->nid, memcg);
->  	rcu_read_unlock();
->  }
->  
-> @@ -741,6 +757,56 @@ static void zswap_entry_cache_free(struct zswap_entry *entry)
->  	kmem_cache_free(zswap_entry_cache, entry);
->  }
->  
-> +static __always_inline void zswap_entries_cache_free_batch(
-> +	struct zswap_entry **entries,
-> +	u8 nr_entries)
-> +{
-> +	/*
-> +	 * It is okay to use this to free entries allocated separately
-> +	 * by zswap_entry_cache_alloc().
-> +	 */
-> +	kmem_cache_free_bulk(zswap_entry_cache, nr_entries, (void **)entries);
-> +}
-> +
-> +static __always_inline bool zswap_entries_cache_alloc_batch(
-> +	struct zswap_entry **entries,
-> +	u8 nr_entries,
-> +	gfp_t gfp,
-> +	int nid)
-> +{
-> +	int nr_alloc = kmem_cache_alloc_bulk(zswap_entry_cache, gfp,
-> +					     nr_entries, (void **)entries);
-> +
-> +	/*
-> +	 * kmem_cache_alloc_bulk() should return @nr_entries on success
-> +	 * and 0 on failure.
-> +	 */
-> +	if (likely(nr_alloc == nr_entries))
-> +		return true;
-> +
-> +	if (WARN_ON_ONCE(unlikely(nr_alloc && (nr_alloc != nr_entries)))) {
-
-We don't need to check 'nr_alloc != nr_entries' here, as we just checked
-the opposite of it and returned above.
-
-> +		zswap_reject_kmemcache_fail++;
-
-I don't think we want to increment the counter if batch allocation
-fails, only if the fallback fails below. Not a big deal as this should
-never happen though.
-
-> +		zswap_entries_cache_free_batch(entries, nr_alloc);
-> +		nr_alloc = 0;
-> +	}
-> +
-> +	if (unlikely(!nr_alloc)) {
-
-We don't need to check this here as well, nr_alloc should always be 0,
-right? If anything, it's *very* likely() :)
-
-> +		unsigned int i;
-> +
-> +		for (i = 0; i < nr_entries; ++i) {
-> +			entries[i] = zswap_entry_cache_alloc(GFP_KERNEL, nid);
-> +
-> +			if (unlikely(!entries[i])) {
-> +				zswap_reject_kmemcache_fail++;
-> +				zswap_entries_cache_free_batch(entries, i);
-> +				return false;
-> +			}
-> +		}
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  /*
->   * Carries out the common pattern of freeing an entry's zsmalloc allocation,
->   * freeing the entry itself, and decrementing the number of stored pages.
-> @@ -767,7 +833,9 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
->  {
->  	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
->  	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
-> +	int nid = cpu_to_node(cpu);
->  	int ret = -ENOMEM;
-> +	u8 i;
->  
->  	/*
->  	 * To handle cases where the CPU goes through online-offline-online
-> @@ -778,11 +846,7 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
->  		return 0;
->  	}
->  
-> -	acomp_ctx->buffer = kmalloc_node(PAGE_SIZE, GFP_KERNEL, cpu_to_node(cpu));
-> -	if (!acomp_ctx->buffer)
-> -		return ret;
-> -
-> -	acomp_ctx->acomp = crypto_alloc_acomp_node(pool->tfm_name, 0, 0, cpu_to_node(cpu));
-> +	acomp_ctx->acomp = crypto_alloc_acomp_node(pool->tfm_name, 0, 0, nid);
->  	if (IS_ERR_OR_NULL(acomp_ctx->acomp)) {
->  		pr_err("could not alloc crypto acomp %s : %ld\n",
->  				pool->tfm_name, PTR_ERR(acomp_ctx->acomp));
-> @@ -790,20 +854,39 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
->  		goto fail;
->  	}
->  
-> +	/*
-> +	 * Allocate up to ZSWAP_MAX_BATCH_SIZE dst buffers if the
-> +	 * compressor supports batching.
-> +	 */
-> +	pool->compr_batch_size = min(ZSWAP_MAX_BATCH_SIZE,
-> +				     crypto_acomp_batch_size(acomp_ctx->acomp));
-> +
->  	acomp_ctx->req = acomp_request_alloc(acomp_ctx->acomp);
-> +
->  	if (IS_ERR_OR_NULL(acomp_ctx->req)) {
->  		pr_err("could not alloc crypto acomp_request %s\n",
->  		       pool->tfm_name);
->  		goto fail;
->  	}
->  
-> -	crypto_init_wait(&acomp_ctx->wait);
-> +	acomp_ctx->buffers = kcalloc_node(pool->compr_batch_size, sizeof(u8 *),
-> +					  GFP_KERNEL, nid);
-> +	if (!acomp_ctx->buffers)
-> +		goto fail;
-> +
-> +	for (i = 0; i < pool->compr_batch_size; ++i) {
-> +		acomp_ctx->buffers[i] = kmalloc_node(PAGE_SIZE, GFP_KERNEL, nid);
-> +		if (!acomp_ctx->buffers[i])
-> +			goto fail;
-> +	}
->  
->  	/*
->  	 * if the backend of acomp is async zip, crypto_req_done() will wakeup
->  	 * crypto_wait_req(); if the backend of acomp is scomp, the callback
->  	 * won't be called, crypto_wait_req() will return without blocking.
->  	 */
-> +	crypto_init_wait(&acomp_ctx->wait);
-> +
->  	acomp_request_set_callback(acomp_ctx->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
->  				   crypto_req_done, &acomp_ctx->wait);
->  
-> @@ -813,12 +896,12 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
->  	return 0;
->  
->  fail:
-> -	acomp_ctx_dealloc(acomp_ctx);
-> +	acomp_ctx_dealloc(acomp_ctx, pool->compr_batch_size);
->  	return ret;
->  }
->  
->  static bool zswap_compress(struct page *page, struct zswap_entry *entry,
-> -			   struct zswap_pool *pool)
-> +			   struct zswap_pool *pool, bool wb_enabled)
->  {
->  	struct crypto_acomp_ctx *acomp_ctx;
->  	struct scatterlist input, output;
-> @@ -832,7 +915,7 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
->  	acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
->  	mutex_lock(&acomp_ctx->mutex);
->  
-> -	dst = acomp_ctx->buffer;
-> +	dst = acomp_ctx->buffers[0];
->  	sg_init_table(&input, 1);
->  	sg_set_page(&input, page, PAGE_SIZE, 0);
->  
-> @@ -862,8 +945,7 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
->  	 * to the active LRU list in the case.
->  	 */
->  	if (comp_ret || !dlen || dlen >= PAGE_SIZE) {
-> -		if (!mem_cgroup_zswap_writeback_enabled(
-> -					folio_memcg(page_folio(page)))) {
-> +		if (!wb_enabled) {
->  			comp_ret = comp_ret ? comp_ret : -EINVAL;
->  			goto unlock;
->  		}
-> @@ -909,7 +991,7 @@ static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
->  	acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
->  	mutex_lock(&acomp_ctx->mutex);
->  	obj = zs_obj_read_begin(pool->zs_pool, entry->handle, entry->length,
-> -				acomp_ctx->buffer);
-> +				acomp_ctx->buffers[0]);
->  
->  	/* zswap entries of length PAGE_SIZE are not compressed. */
->  	if (entry->length == PAGE_SIZE) {
-> @@ -919,15 +1001,15 @@ static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
->  
->  	/*
->  	 * zs_obj_read_begin() might return a kmap address of highmem when
-> -	 * acomp_ctx->buffer is not used.  However, sg_init_one() does not
-> -	 * handle highmem addresses, so copy the object to acomp_ctx->buffer.
-> +	 * acomp_ctx->buffers[0] is not used.  However, sg_init_one() does not
-> +	 * handle highmem addresses, so copy the object to acomp_ctx->buffers[0].
->  	 */
->  	if (virt_addr_valid(obj)) {
->  		src = obj;
->  	} else {
-> -		WARN_ON_ONCE(obj == acomp_ctx->buffer);
-> -		memcpy(acomp_ctx->buffer, obj, entry->length);
-> -		src = acomp_ctx->buffer;
-> +		WARN_ON_ONCE(obj == acomp_ctx->buffers[0]);
-> +		memcpy(acomp_ctx->buffers[0], obj, entry->length);
-> +		src = acomp_ctx->buffers[0];
->  	}
-
-This code no longer exists (the conflict I referred to earlier).
-
->  	sg_init_one(&input, src, entry->length);
-> @@ -1381,95 +1463,136 @@ static void shrink_worker(struct work_struct *w)
->  * main API
->  **********************************/
->  
-> -static bool zswap_store_page(struct page *page,
-> -			     struct obj_cgroup *objcg,
-> -			     struct zswap_pool *pool)
-> +/*
-> + * Store multiple pages in @folio, starting from the page at index @start up to
-> + * the page at index @end-1.
-> + */
-> +static bool zswap_store_pages(struct folio *folio,
-> +			      long start,
-> +			      long end,
-> +			      struct zswap_pool *pool,
-> +			      struct crypto_acomp_ctx *acomp_ctx,
-
-I don't see where acomp_ctx is used here?
-
-> +			      int nid,
-> +			      bool wb_enabled,
-> +			      struct obj_cgroup *objcg)
->  {
-> -	swp_entry_t page_swpentry = page_swap_entry(page);
-> -	struct zswap_entry *entry, *old;
-> +	struct zswap_entry *entries[ZSWAP_MAX_BATCH_SIZE];
-> +	u8 i, store_fail_idx = 0, nr_pages = end - start;
->  
-> -	/* allocate entry */
-> -	entry = zswap_entry_cache_alloc(GFP_KERNEL, page_to_nid(page));
-> -	if (!entry) {
-> -		zswap_reject_kmemcache_fail++;
-> +	VM_WARN_ON_ONCE(nr_pages > ZSWAP_MAX_BATCH_SIZE);
-> +
-> +	if (unlikely(!zswap_entries_cache_alloc_batch(entries, nr_pages,
-> +						      GFP_KERNEL, nid)))
->  		return false;
-> -	}
->  
-> -	if (!zswap_compress(page, entry, pool))
-> -		goto compress_failed;
-> +	/*
-> +	 * We co-locate entry initialization as much as possible here to
-> +	 * minimize potential cache misses.
-> +	 */
-> +	for (i = 0; i < nr_pages; ++i) {
-> +		entries[i]->handle = (unsigned long)ERR_PTR(-EINVAL);
-> +		entries[i]->pool = pool;
-> +		entries[i]->swpentry = page_swap_entry(folio_page(folio, start + i));
-> +		entries[i]->objcg = objcg;
-> +		entries[i]->referenced = true;
-> +		entries[i]->nid = nid;
-> +		INIT_LIST_HEAD(&entries[i]->lru);
-> +	}
->  
-> -	old = xa_store(swap_zswap_tree(page_swpentry),
-> -		       swp_offset(page_swpentry),
-> -		       entry, GFP_KERNEL);
-> -	if (xa_is_err(old)) {
-> -		int err = xa_err(old);
-> +	for (i = 0; i < nr_pages; ++i) {
-> +		struct page *page = folio_page(folio, start + i);
->  
-> -		WARN_ONCE(err != -ENOMEM, "unexpected xarray error: %d\n", err);
-> -		zswap_reject_alloc_fail++;
-> -		goto store_failed;
-> +		if (!zswap_compress(page, entries[i], pool, wb_enabled))
-> +			goto store_pages_failed;
->  	}
->  
-> -	/*
-> -	 * We may have had an existing entry that became stale when
-> -	 * the folio was redirtied and now the new version is being
-> -	 * swapped out. Get rid of the old.
-> -	 */
-> -	if (old)
-> -		zswap_entry_free(old);
-> +	for (i = 0; i < nr_pages; ++i) {
-> +		struct zswap_entry *old, *entry = entries[i];
->  
-> -	/*
-> -	 * The entry is successfully compressed and stored in the tree, there is
-> -	 * no further possibility of failure. Grab refs to the pool and objcg,
-> -	 * charge zswap memory, and increment zswap_stored_pages.
-> -	 * The opposite actions will be performed by zswap_entry_free()
-> -	 * when the entry is removed from the tree.
-> -	 */
-> -	zswap_pool_get(pool);
-> -	if (objcg) {
-> -		obj_cgroup_get(objcg);
-> -		obj_cgroup_charge_zswap(objcg, entry->length);
-> -	}
-> -	atomic_long_inc(&zswap_stored_pages);
-> -	if (entry->length == PAGE_SIZE)
-> -		atomic_long_inc(&zswap_stored_incompressible_pages);
-> +		old = xa_store(swap_zswap_tree(entry->swpentry),
-> +			       swp_offset(entry->swpentry),
-> +			       entry, GFP_KERNEL);
-> +		if (unlikely(xa_is_err(old))) {
-> +			int err = xa_err(old);
->  
-> -	/*
-> -	 * We finish initializing the entry while it's already in xarray.
-> -	 * This is safe because:
-> -	 *
-> -	 * 1. Concurrent stores and invalidations are excluded by folio lock.
-> -	 *
-> -	 * 2. Writeback is excluded by the entry not being on the LRU yet.
-> -	 *    The publishing order matters to prevent writeback from seeing
-> -	 *    an incoherent entry.
-> -	 */
-> -	entry->pool = pool;
-> -	entry->swpentry = page_swpentry;
-> -	entry->objcg = objcg;
-> -	entry->referenced = true;
-> -	if (entry->length) {
-> -		INIT_LIST_HEAD(&entry->lru);
-> -		zswap_lru_add(&zswap_list_lru, entry);
-> +			WARN_ONCE(err != -ENOMEM, "unexpected xarray error: %d\n", err);
-> +			zswap_reject_alloc_fail++;
-> +			/*
-> +			 * Entries up to this point have been stored in the
-> +			 * xarray. zswap_store() will erase them from the xarray
-> +			 * and call zswap_entry_free(). Local cleanup in
-> +			 * 'store_pages_failed' only needs to happen for
-> +			 * entries from [@i to @nr_pages).
-> +			 */
-> +			store_fail_idx = i;
-> +			goto store_pages_failed;
-> +		}
-> +
-> +		/*
-> +		 * We may have had an existing entry that became stale when
-> +		 * the folio was redirtied and now the new version is being
-> +		 * swapped out. Get rid of the old.
-> +		 */
-> +		if (unlikely(old))
-> +			zswap_entry_free(old);
-> +
-> +		/*
-> +		 * The entry is successfully compressed and stored in the tree,
-> +		 * and further failures will be cleaned up in zswap_store().
-> +		 * Grab refs to the pool and objcg, charge zswap memory, and
-> +		 * increment zswap_stored_pages. The opposite actions will be
-> +		 * performed by zswap_entry_free() when the entry is removed
-> +		 * from the tree.
-> +		 */
-> +		zswap_pool_get(pool);
-> +		if (objcg) {
-> +			obj_cgroup_get(objcg);
-> +			obj_cgroup_charge_zswap(objcg, entry->length);
-> +		}
-> +		atomic_long_inc(&zswap_stored_pages);
-> +		if (entry->length == PAGE_SIZE)
-> +			atomic_long_inc(&zswap_stored_incompressible_pages);
-> +
-> +		/*
-> +		 * We finish by adding the entry to the LRU while it's already
-> +		 * in xarray. This is safe because:
-> +		 *
-> +		 * 1. Concurrent stores and invalidations are excluded by folio lock.
-> +		 *
-> +		 * 2. Writeback is excluded by the entry not being on the LRU yet.
-> +		 *    The publishing order matters to prevent writeback from seeing
-> +		 *    an incoherent entry.
-> +		 */
-> +		if (likely(entry->length))
-> +			zswap_lru_add(&zswap_list_lru, entry);
->  	}
->  
->  	return true;
->  
-> -store_failed:
-> -	zs_free(pool->zs_pool, entry->handle);
-> -compress_failed:
-> -	zswap_entry_cache_free(entry);
-> +store_pages_failed:
-> +	for (i = store_fail_idx; i < nr_pages; ++i) {
-> +		if (!IS_ERR_VALUE(entries[i]->handle))
-> +			zs_free(pool->zs_pool, entries[i]->handle);
-> +	}
-> +	zswap_entries_cache_free_batch(&entries[store_fail_idx],
-> +				       nr_pages - store_fail_idx);
-> +
->  	return false;
->  }
->  
->  bool zswap_store(struct folio *folio)
->  {
-> +	bool wb_enabled = mem_cgroup_zswap_writeback_enabled(folio_memcg(folio));
->  	long nr_pages = folio_nr_pages(folio);
-> +	struct crypto_acomp_ctx *acomp_ctx;
->  	swp_entry_t swp = folio->swap;
->  	struct obj_cgroup *objcg = NULL;
->  	struct mem_cgroup *memcg = NULL;
-> +	int nid = folio_nid(folio);
->  	struct zswap_pool *pool;
-> +	u8 store_batch_size;
->  	bool ret = false;
-> -	long index;
-> +	long start, end;
->  
->  	VM_WARN_ON_ONCE(!folio_test_locked(folio));
->  	VM_WARN_ON_ONCE(!folio_test_swapcache(folio));
-> @@ -1503,10 +1626,32 @@ bool zswap_store(struct folio *folio)
->  		mem_cgroup_put(memcg);
->  	}
->  
-> -	for (index = 0; index < nr_pages; ++index) {
-> -		struct page *page = folio_page(folio, index);
-> +	/*
-> +	 * For batching compressors, store the folio in batches of the
-> +	 * compressor's batch_size.
-> +	 *
-> +	 * For non-batching compressors, store the folio in batches
-> +	 * of ZSWAP_MAX_BATCH_SIZE, where each page in the batch is
-> +	 * compressed sequentially. This gives better performance than
-> +	 * invoking zswap_store_pages() per-page, due to cache locality
-> +	 * of working set structures.
-> +	 */
-> +	store_batch_size = (pool->compr_batch_size > 1) ?
-> +			    pool->compr_batch_size : ZSWAP_MAX_BATCH_SIZE;
-> +
-> +	acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
->  
-> -		if (!zswap_store_page(page, objcg, pool))
-> +	for (start = 0; start < nr_pages; start += store_batch_size) {
-> +		end = min(start + store_batch_size, nr_pages);
-> +
-> +		if (unlikely(!zswap_store_pages(folio,
-> +						start,
-> +						end,
-> +						pool,
-> +						acomp_ctx,
-> +						nid,
-
-I think acomp_ctx is not used in zswap_store_pages(). If it is, we don't
-need to pass it from here. Same for nid, no need to pass it from here.
-
-We should be able to shrink the arg list and make this more concise. I
-would drop unlikely() if it doesn't result in a meaningful improvement.
-Otherwise you can also make this line a bit shorter if you keep
-unlikely():
-
-	ret = zswap_store_pages(..);
-	if (unlikely(!ret))
-		goto put_pool;
-
-> +						wb_enabled,
-> +						objcg)))
->  			goto put_pool;
->  	}
->  
-> @@ -1536,9 +1681,9 @@ bool zswap_store(struct folio *folio)
->  		struct zswap_entry *entry;
->  		struct xarray *tree;
->  
-> -		for (index = 0; index < nr_pages; ++index) {
-> -			tree = swap_zswap_tree(swp_entry(type, offset + index));
-> -			entry = xa_erase(tree, offset + index);
-> +		for (start = 0; start < nr_pages; ++start) {
-> +			tree = swap_zswap_tree(swp_entry(type, offset + start));
-> +			entry = xa_erase(tree, offset + start);
->  			if (entry)
->  				zswap_entry_free(entry);
->  		}
-> -- 
-> 2.27.0
+> Okay.
 > 
+>>>   #define SRKHANDLE                       0x40000000
+>>>   #define TPM_NONCE_SIZE                  20
+>>>   #define TPM_ST_CLEAR            1
+>>> -- 
+>>> 2.43.7
+>>>
+>>
+>> BR, Jarkko
+> 
+
