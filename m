@@ -1,206 +1,212 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D792868B2;
-	Thu,  5 Feb 2026 11:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF332DECBA;
+	Thu,  5 Feb 2026 11:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770290239; cv=none; b=cKqYaI4/gh7+PYFIcDpKtHHHaWONDnD/xZWmv00gLdIoB2X8CMmMNVK5TyLQXNgfyr/5PzpK7OMw+/4D+irpxqs6Mhod40WKJJlIvHoJml0mcVgzq1WlEdb/Ve3snUu4KJCXKNLdg5wtAVLjNoEhCM4FM74BWdtcToIjCkXTQAs=
+	t=1770290697; cv=none; b=r6ztML/XnQCFUBPRuno+yO9viJKaw4bBtAd8fK+P/y/Gtb5xem6SBPnkest0Jx2YuPbbUbgaRR/kH6puYpAW7ER6sEMoGGTHJSIc4npQW6dPug77FZ0YVlxsAo41Fr9pNE7/BM7M0tbCZTKpntcbyVCkSYNdZgV9rfdPCu9jCcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770290239; c=relaxed/simple;
-	bh=I79pa1OT5eiWn8myWVqo3sKahUTRfM9JLtSq0m8sFUY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cUkw9T4MsHxAtCUK144C4AItH45gp4n82Kt4GfPGE+by/h0AOR+h4QV9IWKkE0B3yeJUM5znfSoFK9j4uu5A8Q6hCUdliIdcr+ocPyO0KtJyACDIzZFKfL3PwadgYVQXf5vKHvcCKyhm4pnJ7ZqCyB8e3ZbcAHoC8sZK/sXJHTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JB62V5um; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1770290697; c=relaxed/simple;
+	bh=RP9knd9zSX2JAIs659+W5o/dC9K4wTQXWG+rnTYiOmo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HCy+75s26DKS9as+6mzBRlBhMw7u7xBITZzvGTIt6gjv1n2N2d1sMRbGhNYcPxI8XSHpstpnkWQ3Jem12sDbshrsXJTsznVfFBY/ul2lc73JvshubY/nTfmoQq566L80OGufMCCg50x7UKVdTCyIyS/EHGHXx95F7gfNLg9uU2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R3RE1kRZ; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JB62V5um"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18355C16AAE;
-	Thu,  5 Feb 2026 11:17:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770290238;
-	bh=I79pa1OT5eiWn8myWVqo3sKahUTRfM9JLtSq0m8sFUY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JB62V5umlqDoRc59fDsLPismtZbahD2I1ssmVXEGo43N4yamtEAiWxOTxv3yD2j4u
-	 vc73Sk8eoYTiBa6t7Btu+T4/VAHSs72GTxME/u98jBVImF1KZBjHqBJtLhhbP5QMiV
-	 bC+yeQcwZUiOhQ+aSCczeckoa7A8nWuPpfBnwOoA8ASMNMoizc6RmwMZPkU13g6IWZ
-	 hqwQiAzKH+jStL4dFAkR/kuC1olBWDx+qfKXBc/cs0jKBpMAitckzq0H7t87TCCI16
-	 edwx3QeeA+LXs2cPQaii5Zy/vf8cz9a1nA9+BZC0WxvpmCjwm4GVf82e5swaOOkvEm
-	 X4ar7OqAbm+Eg==
-Message-ID: <dd34525c-0a25-47ae-9061-c4c7ab708306@kernel.org>
-Date: Thu, 5 Feb 2026 12:17:13 +0100
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R3RE1kRZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770290696; x=1801826696;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RP9knd9zSX2JAIs659+W5o/dC9K4wTQXWG+rnTYiOmo=;
+  b=R3RE1kRZ8rQODIPILR2FRT+S1GXzBrUIo0RBmTDnSKJBDXS4WaJaYHsN
+   SkgxVhHgJC5xB3LDsFqn8EC4RPOuzuv2d7ohjHLxSB+G7vSaeYDtmCBai
+   xwaMIxFULj/9FaM5CAzleKQYImQDL0uY2HhaSbEPXJCUz38PV+dEERIec
+   TSNwCLwH4RwAe8I9jegOwLhsc2jWjg8ddpFV9yrK9oQemkkbXASNn5F9z
+   iiUgjlTPFNAnK+om2r3niI8lAF9kgw/wWTtaVJWBUpqzpsMtqusEIvIMe
+   JL9IdaDzC3mZp6fuXWT2AkKic6P4LXrT/7Z7T4Tfk53qygqcjWpLEodne
+   g==;
+X-CSE-ConnectionGUID: S41xPsFLRMmQoijjTtUAfg==
+X-CSE-MsgGUID: Yh7Te6NVQ/y+BXtIR+rB8g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="82926597"
+X-IronPort-AV: E=Sophos;i="6.21,274,1763452800"; 
+   d="scan'208";a="82926597"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 03:24:56 -0800
+X-CSE-ConnectionGUID: seo9ZN/4SAWUD9WMECvqkw==
+X-CSE-MsgGUID: AZffPS4XS5G5/6egn3q4Mg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,274,1763452800"; 
+   d="scan'208";a="209841174"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by fmviesa007.fm.intel.com with ESMTP; 05 Feb 2026 03:24:52 -0800
+Received: by black.igk.intel.com (Postfix, from userid 1001)
+	id 432ED95; Thu, 05 Feb 2026 12:24:51 +0100 (CET)
+Date: Thu, 5 Feb 2026 12:24:51 +0100
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
+To: WangYuli <wangyuli@aosc.io>
+Cc: mario.limonciello@amd.com, thomas.lendacky@amd.com, john.allen@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	andriy.shevchenko@linux.intel.com, jsd@semihalf.com,
+	andi.shyti@kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-i2c@vger.kernel.org,
+	bp@alien8.de, ashish.kalra@amd.com, markhas@chromium.org,
+	jarkko.nikula@linux.intel.com, wsa@kernel.org,
+	WangYuli <wangyl5933@chinaunicom.cn>, stable@vger.kernel.org
+Subject: Re: [PATCH] i2c: designware: Enable PSP semaphore for AMDI0010 and
+ fix probe deferral
+Message-ID: <20260205112451.GX2275908@black.igk.intel.com>
+References: <20260205103047.19127-1-wangyuli@aosc.io>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/11] dt-bindings: crypto: qcom,ice: Require power-domain
- and iface clk
-To: Harshal Dev <harshal.dev@oss.qualcomm.com>,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Abel Vesa <abel.vesa@oss.qualcomm.com>, cros-qcom-dts-watchers@chromium.org
-Cc: Brian Masney <bmasney@redhat.com>,
- Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
- Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
- linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260123-qcom_ice_power_and_clk_vote-v1-0-e9059776f85c@qti.qualcomm.com>
- <20260123-qcom_ice_power_and_clk_vote-v1-1-e9059776f85c@qti.qualcomm.com>
- <14a71b33-4c10-41b0-a6cb-585a38e05f56@kernel.org>
- <06160c6c-a945-467a-be82-7b33c5285d0f@oss.qualcomm.com>
- <7216c86d-2b87-496c-9548-ccdcb3c98b6b@oss.qualcomm.com>
- <1f99db18-d76c-4b87-9e30-423eee7037e1@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <1f99db18-d76c-4b87-9e30-423eee7037e1@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260205103047.19127-1-wangyuli@aosc.io>
 
-On 03/02/2026 10:26, Harshal Dev wrote:
-> Hi Krzysztof and Konrad,
+On Thu, Feb 05, 2026 at 06:30:47PM +0800, WangYuli wrote:
+> From: WangYuli <wangyl5933@chinaunicom.cn>
 > 
-> On 1/26/2026 3:59 PM, Konrad Dybcio wrote:
->> On 1/23/26 12:04 PM, Harshal Dev wrote:
->>> Hi Krzysztof,
->>>
->>> On 1/23/2026 2:27 PM, Krzysztof Kozlowski wrote:
->>>> On 23/01/2026 08:11, Harshal Dev wrote:
->>>>> Update the inline-crypto engine DT binding to reflect that power-domain and
->>>>> clock-names are now mandatory. Also update the maximum number of clocks
->>>>> that can be specified to two. These new fields are mandatory because ICE
->>>>> needs to vote on the power domain before it attempts to vote on the core
->>>>> and iface clocks to avoid clock 'stuck' issues.
->>>>>
->>>>> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
->>>>> ---
->>>>>  .../bindings/crypto/qcom,inline-crypto-engine.yaml         | 14 +++++++++++++-
->>>>>  1 file changed, 13 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
->>>>> index c3408dcf5d20..1c2416117d4c 100644
->>>>> --- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
->>>>> +++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
->>>>> @@ -28,12 +28,20 @@ properties:
->>>>>      maxItems: 1
->>>>>  
->>>>>    clocks:
->>>>> +    maxItems: 2
->>>>
->>>> This is ABI break and your commit msg suggests things were not perfect,
->>>> but it is not explicit - was this working or not? How is it that ICE was
->>>> never tested?
->>>>
->>>
->>> I took some time to educate myself on the point of DT bindings stability being a
->>> strict requirement now, so I understand how these changes are breaking ABI, I'll
->>> send a better version of this again.
->>>
->>> As for your question of how it was working till now, it seems that
->>> things were tested with the 'clk_ignore_unused' flag, or with CONFIG_SCSI_UFS_QCOM
->>> flag being override set to 'y'. When this is done, QCOM-ICE (on which QCOM-UFS
->>> depends) initiates probe _before_ the unused clocks and power-domains are
->>> disabled by the kernel. And so, the un-clocked register access or clock 'stuck'
->>> isn't observed (since the clocks and power domains are already enabled).
->>> Perhaps I should write this scenario explicitly in the commit message?
->>>
->>> To maintain backward compatibility, let me introduce minItems and maxItems for clocks.
->>> When the Linux distro uses CONFIG_SCSI_UFS_QCOM=y, we can do with just 1 clock as
->>> before.
->>
->> You must not assume any particular kernel configuration
->>
->> clk_ignore_unused is a hack which leads to situations like this, since
->> the bootloader doesn't clean up clocks it turned on, which leads to
->> situations like this where someone who previously wrote this binding
->> didn't care enough to **actually** test whether this device can operate
->> with only the set of clocks it requires
->>
->> I believe in this case it absolutely makes sense to break things, but
->> you must put the backstory in writing, in the commit message
->>
+> AMD Strix Point platforms use the AMDI0010 ACPI HID for their I2C
+> controllers, but this entry was missing the ARBITRATION_SEMAPHORE flag
+> that enables PSP-based bus arbitration.
 > 
-> I took some more time to think this through, and I agree with you now Konrad.
+> Without proper arbitration, when both the x86 host and AMD PSP
+> (Platform Security Processor) attempt to access the shared I2C bus
+> simultaneously, the DesignWare controller loses arbitration and reports:
 > 
-> These DT bindings appear to be invalid from day-1. ICE being an independent
-> and common IP for both UFS and SDCC, it cannot operate correctly without its
-> power-domain and clocks being enabled first. Hence, it should be mandatory for
-> them to be specified in the DT-node and the same should be reflected in the DT
-> binding.
+>   i2c_designware AMDI0010:01: i2c_dw_handle_tx_abort: lost arbitration
 > 
-> The only reason I can think of for omitting the 'power-domain' and 'iface' clock
-> in the original DT-binding for ICE is because we failed to test the driver on
-> a production kernel where the 'clk_ignore_unused' flag is not passed on the cmdline.
-
-That's a reason to change ABI in the bindings, but not a reason to break
-in-kernel or out of tree DTS.
-
-> Or if we did test that way, we were just lucky to not run into a timing scenario
-> where the probe for the driver is attempted _after_ the clocks are turned off by the
-> kernel.
+> This causes communication failures with I2C devices such as touchpads
+> (e.g., BLTP7853 HID-over-I2C).
 > 
-> Sending a new patch, which makes these two resources optional (to preserve the DT
-> binding) would either imply that we are make this bug fix optional as well or
-> asking the reporter to resort to some workaround such as overriding
-> CONFIG_SCSI_UFS_QCOM to 'y'.
+> Add the ARBITRATION_SEMAPHORE flag to the AMDI0010 entry to enable PSP
+> mailbox-based I2C bus arbitration, consistent with how AMDI0019 was
+> handled for AMD Cezanne platforms.
+> 
+> However, simply enabling this flag exposes a latent bug introduced by
+> commit 440da737cf8d ("i2c: designware: Use PCI PSP driver for
+> communication"): the driver unconditionally returns -EPROBE_DEFER when
+> psp_check_platform_access_status() fails, causing an infinite probe
+> deferral loop on platforms that lack PSP platform access support.
+> 
+> The problem is that psp_check_platform_access_status() returned -ENODEV
+> for all failure cases, but there are two distinct scenarios:
+> 
+>   1. PSP is still initializing (psp pointer exists but platform_access_data
+>      is not yet ready, while vdata->platform_access indicates support) -
+>      this is a transient condition that warrants probe deferral.
+> 
+>   2. The platform genuinely lacks PSP platform access support (either no
+>      psp pointer, or vdata->platform_access is not set) - this is a
+>      permanent condition where probe deferral would loop indefinitely.
+> 
+> Fix this by updating psp_check_platform_access_status() to return:
+> 
+>   - -EPROBE_DEFER: when PSP exists with platform_access capability but
+>     platform_access_data is not yet initialized (transient)
+>   - -ENODEV: when the platform lacks PSP platform access support (permanent)
+> 
+> Then update the I2C driver to pass through the actual return code from
+> psp_check_platform_access_status() instead of forcing -EPROBE_DEFER,
+> allowing the driver to fail gracefully on unsupported platforms.
+> 
+> Tested on MECHREVO XINGYAO 14 with AMD Ryzen AI 9 H 365.
+> 
+> Fixes: 440da737cf8d ("i2c: designware: Use PCI PSP driver for communication")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: WangYuli <wangyl5933@chinaunicom.cn>
+> ---
+>  drivers/crypto/ccp/platform-access.c        |  7 ++++++-
+>  drivers/i2c/busses/i2c-designware-amdpsp.c  | 11 +++++++++--
+>  drivers/i2c/busses/i2c-designware-platdrv.c |  2 +-
+>  include/linux/psp-platform-access.h         |  5 +++--
+>  4 files changed, 19 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/platform-access.c b/drivers/crypto/ccp/platform-access.c
+> index 1b8ed3389733..3f20cf194cb6 100644
+> --- a/drivers/crypto/ccp/platform-access.c
+> +++ b/drivers/crypto/ccp/platform-access.c
+> @@ -46,7 +46,12 @@ int psp_check_platform_access_status(void)
+>  {
+>  	struct psp_device *psp = psp_get_master_device();
+>  
+> -	if (!psp || !psp->platform_access_data)
+> +	/* PSP driver not loaded yet, caller should defer */
+> +	if ((!psp) || (!psp->platform_access_data && psp->vdata->platform_access))
+> +		return -EPROBE_DEFER;
+> +
+> +	/* PSP loaded but platform_access not supported by hardware */
+> +	if (!psp->platform_access_data && !psp->vdata->platform_access)
+>  		return -ENODEV;
+>  
+>  	return 0;
+> diff --git a/drivers/i2c/busses/i2c-designware-amdpsp.c b/drivers/i2c/busses/i2c-designware-amdpsp.c
+> index 404571ad61a8..341232767177 100644
+> --- a/drivers/i2c/busses/i2c-designware-amdpsp.c
+> +++ b/drivers/i2c/busses/i2c-designware-amdpsp.c
+> @@ -269,6 +269,7 @@ static const struct i2c_lock_operations i2c_dw_psp_lock_ops = {
+>  int i2c_dw_amdpsp_probe_lock_support(struct dw_i2c_dev *dev)
+>  {
+>  	struct pci_dev *rdev;
+> +	int ret;
+>  
+>  	if (!IS_REACHABLE(CONFIG_CRYPTO_DEV_CCP_DD))
+>  		return -ENODEV;
+> @@ -291,8 +292,14 @@ int i2c_dw_amdpsp_probe_lock_support(struct dw_i2c_dev *dev)
+>  		_psp_send_i2c_req = psp_send_i2c_req_doorbell;
+>  	pci_dev_put(rdev);
+>  
+> -	if (psp_check_platform_access_status())
+> -		return -EPROBE_DEFER;
+> +	/*
+> +	 * Check if PSP platform access is available.
+> +	 * Returns 0 on success, -EPROBE_DEFER if PSP driver not loaded,
+> +	 * -ENODEV if platform_access is not supported by hardware.
+> +	 */
 
-Either I do not understand the point or you still insist on breaking a
-working DTS on kernels with clk_ignore_unused, just because what
-exactly? You claim it did not work, but in fact it did work. So you
-claim it worked by luck, right? And what this patchset achieves? It
-breaks this "work by luck" into "100% not working and broken". I do not
-see how is this an improvement.
+This is useless comment.
 
-My NAK for driver change stays. This is wrong approach - you cannot
-break working DTS.
-
-Best regards,
-Krzysztof
+> +	ret = psp_check_platform_access_status();
+> +	if (ret)
+> +		return ret;
+>  
+>  	psp_i2c_dev = dev->dev;
+>  
+> diff --git a/drivers/i2c/busses/i2c-designware-platdrv.c b/drivers/i2c/busses/i2c-designware-platdrv.c
+> index 7be99656a67d..63b1c06ee111 100644
+> --- a/drivers/i2c/busses/i2c-designware-platdrv.c
+> +++ b/drivers/i2c/busses/i2c-designware-platdrv.c
+> @@ -345,7 +345,7 @@ static const struct acpi_device_id dw_i2c_acpi_match[] = {
+>  	{ "80860F41", ACCESS_NO_IRQ_SUSPEND },
+>  	{ "808622C1", ACCESS_NO_IRQ_SUSPEND },
+>  	{ "AMD0010", ACCESS_INTR_MASK },
+> -	{ "AMDI0010", ACCESS_INTR_MASK },
+> +	{ "AMDI0010", ACCESS_INTR_MASK | ARBITRATION_SEMAPHORE },
+>  	{ "AMDI0019", ACCESS_INTR_MASK | ARBITRATION_SEMAPHORE },
+>  	{ "AMDI0510", 0 },
+>  	{ "APMC0D0F", 0 },
+> diff --git a/include/linux/psp-platform-access.h b/include/linux/psp-platform-access.h
+> index 540abf7de048..84dbdbeb61d6 100644
+> --- a/include/linux/psp-platform-access.h
+> +++ b/include/linux/psp-platform-access.h
+> @@ -64,8 +64,9 @@ int psp_ring_platform_doorbell(int msg, u32 *result);
+>   * if platform features has initialized.
+>   *
+>   * Returns:
+> - * 0          platform features is ready
+> - * -%ENODEV   platform features is not ready or present
+> + *  0:            platform features is ready
+> + *  -%ENODEV:     platform_access is not supported by hardware
+> + *  -%EPROBE_DEFER: PSP driver not ready or platform features not yet initialized
+>   */
+>  int psp_check_platform_access_status(void);
+>  
+> -- 
+> 2.51.0
