@@ -1,51 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718322D0C63;
-	Fri,  6 Feb 2026 09:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD5C1ADC7E;
+	Fri,  6 Feb 2026 10:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770370753; cv=none; b=WljW9yjtECX5QuS99FI67AY1aSXLcg6yUFqGnU7OWqNZuI9dr8ZeC4S1TQmVaM0tZzyBuJQ5aD4ESacBTUHza804WKQRCIYzVsbDBR0L62ywIz3C9NU4JiQ3w5ojoHk8B3z6b6S74e6gckX95u0CAYq118y6JgfiwmIUA/V1YJw=
+	t=1770372218; cv=none; b=JaYnhb2sBy75t2AR1vV+JxiIt3nbJ6LyzDTlwZNVCtlhTfeSMPqH4iapm4S75OlSA3SOI0OiI9QOMxLg6QjZLw9mCHSgfcqlw7FNGMaq304uyYfuLT41Zs1zfOkk91w8I0v5bTem6XZ1X+xxwLokxGoe9jUcbd2tuwknxysdTDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770370753; c=relaxed/simple;
-	bh=0KZ6Rc67mshf/8RIcAojjUEyfHIp6PTSvrY4xifGwKo=;
+	s=arc-20240116; t=1770372218; c=relaxed/simple;
+	bh=Rl071ZNdP/q5zBwHxsDurk485e7SBxe/KtCKGzss0sE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hLTGBu9Q8d9X/PB3WiSTfSJlKeVegRs58k33kx0JxIuFCNw7c3ENhgHhjXODV8yUyZ6B3tUDUX+pOC/1MSs7TDZ6QVjG01hA8wge3UtZBmcB4sVIwFb/mJVz3qacpZMF/BukNSgAQWLOz/i1FEEbKpP79t1Zt2q25kWCjRTMGjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=nog5pwgg; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=QFa2DrWCjz3P/RoqVKpquVZzWnBNKcChYwKzAHXkVfStsVvQ5F/f6QvS2U/Zjdz3hrblu/ZhFOVE0R1JA3fASinVwC2r+qJRXc+kXE9wt3r5RQKekCYvBoQoRTjB5/J5J9xwv4L9kEVbGLfHm8/BL1jZDTsXfZOImmX5Q/j2Hpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=V8PR9CTc; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="nog5pwgg"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="V8PR9CTc"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=gs9mZiOaseQgaZ/0S1QUwDW3mhpZfUYWbeh60dWS5ww=; 
-	b=nog5pwggdvKS52Em/got38xwqoN/m9dtAkynypMb+xS66Qv/mWxYy12kxCyczwuSHtX8aySsAk6
-	+n1we1MTO8ubClfUXpwgs8N9bMHXCAxP62sGBx9E/C+JodpCChk9zCTxjI0tpF49DA1u49HQJZmdx
-	yFxXS9o4Kt7+42z/8Cl81zH0V029BCcSsgDhpqEtM+U6x2Gns1fwzWxXPtFSpQof/oyHZPaF9kcn/
-	oacH6+CBO22u5IBchY7XYW7/xcRiYbZXKcEXr3DoJI99wXhRK6W0lFBypyQH2oDEVcxMKE2vS8Pdp
-	YJ8da5xBckwCdCnMKMgF5o6JL6ykMR/Ax5yQ==;
+	from:content-type:reply-to; bh=cH28OCzUCXtIb8rf4iZ/cLsOgAzYvktJTCaR2EzPIi4=; 
+	b=V8PR9CTcHMjJ8QWdpKrMNH33+V0npPyybclURKkiBN42b3rCcKFdDrllBgACxr+bbOzAGDyEYQW
+	vSAK37PyPPPAKzDYubWQVMFapVSJS/51YDYuHN6uPXudV6cxwaxjoe5zofc+MTVFxJbmEngIJBYrL
+	lc07Eeb8beEmD7ccT5WrYAMP0svQn5TKMU1Z6ZSy1NRb0KsC4vto56N1DkjObh8+WdpSzz0JhU72O
+	NB3IdJlHKDdpllHsX8Dzc9PgHEBBAgWN1EunofMkHIGWSXH+mCR85ktrG4FYhZHV+pC5hWVlmaVcD
+	sIpkahJa36o/b9B+BdFZNX0BDLP5DCYhE0jA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1voHbA-004xZ0-2V;
-	Fri, 06 Feb 2026 16:53:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Feb 2026 16:53:56 +0800
-Date: Fri, 6 Feb 2026 16:53:56 +0800
+	id 1voIg8-004yZR-0a;
+	Fri, 06 Feb 2026 18:03:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Feb 2026 18:03:08 +0800
+Date: Fri, 6 Feb 2026 18:03:08 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Shiva Tripathi <s-tripathi1@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 1/3] crypto: ti - Add support for AES-CTR in DTHEv2
- driver
-Message-ID: <aYWsJAmf05EdotTX@gondor.apana.org.au>
-References: <20260120144408.606911-1-t-pratham@ti.com>
- <20260120144408.606911-2-t-pratham@ti.com>
+To: Chunyan Zhang <zhangchunyan@iscas.ac.cn>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-riscv@lists.infradead.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Chunyan Zhang <zhang.lyra@gmail.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH V2] crypto: aegis128: Add RISC-V vector SIMD
+ implementation
+Message-ID: <aYW8XJk44phI3JSG@gondor.apana.org.au>
+References: <20260126092411.243237-1-zhangchunyan@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,40 +52,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260120144408.606911-2-t-pratham@ti.com>
+In-Reply-To: <20260126092411.243237-1-zhangchunyan@iscas.ac.cn>
 
-On Tue, Jan 20, 2026 at 08:14:06PM +0530, T Pratham wrote:
->
-> +	/*
-> +	 * CTR mode can operate on any input length, but the hardware
-> +	 * requires input length to be a multiple of the block size.
-> +	 * We need to handle the padding in the driver.
-> +	 */
-> +	if (ctx->aes_mode == DTHE_AES_CTR && req->cryptlen % AES_BLOCK_SIZE) {
-> +		struct scatterlist *sg;
-> +		int i = 0;
-> +		unsigned int curr_len = 0;
-> +
-> +		len -= req->cryptlen % AES_BLOCK_SIZE;
-> +		src_nents = sg_nents_for_len(req->src, len);
-> +		dst_nents = sg_nents_for_len(req->dst, len);
-> +
-> +		/*
-> +		 * Need to truncate the src and dst to len, else DMA complains.
-> +		 * Lengths restored at end
-> +		 */
-> +		for_each_sg(req->src, sg, src_nents - 1, i) {
-> +			curr_len += sg->length;
-> +		}
-> +		curr_len += sg->length;
-> +		src_bkup_len = sg->length;
-> +		sg->length -= curr_len % AES_BLOCK_SIZE;
+On Mon, Jan 26, 2026 at 05:24:11PM +0800, Chunyan Zhang wrote:
+> Add a RISC-V vector-accelerated implementation of aegis128 by
+> wiring it into the generic SIMD hooks.
+> 
+> This implementation supports vlen values of 512, 256, and 128.
+> 
+> Signed-off-by: Chunyan Zhang <zhangchunyan@iscas.ac.cn>
+> ---
+> V2:
+> - Add config dependency of RISCV_ISA_V to fix the issue reported by kernel test robot;
+> - Add return value in preload_round_data() and aegis128_round().
+> 
+> V1: https://lore.kernel.org/all/20260121101923.64657-1-zhangchunyan@iscas.ac.cn/
+> ---
+>  crypto/Kconfig              |   4 +-
+>  crypto/Makefile             |   4 +
+>  crypto/aegis-rvv.h          |  19 +
+>  crypto/aegis128-rvv-inner.c | 762 ++++++++++++++++++++++++++++++++++++
+>  crypto/aegis128-rvv.c       |  63 +++
+>  5 files changed, 850 insertions(+), 2 deletions(-)
+>  create mode 100644 crypto/aegis-rvv.h
+>  create mode 100644 crypto/aegis128-rvv-inner.c
+>  create mode 100644 crypto/aegis128-rvv.c
 
-Please don't modify the SG lists since they may be used elsewhere.
-There is no harm in mapping a bit more data than what you will
-end up using.
-
-Just truncate the length written to the hardware instead.
+In light of the recent move of aes from crypto to lib/crypto,
+perhaps the same should be done for aegis?
 
 Thanks,
 -- 
