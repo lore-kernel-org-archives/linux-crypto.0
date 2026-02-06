@@ -1,163 +1,159 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AEF2368260
-	for <linux-crypto@vger.kernel.org>; Fri,  6 Feb 2026 13:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B70822F01
+	for <linux-crypto@vger.kernel.org>; Fri,  6 Feb 2026 13:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770384218; cv=none; b=a8Y3tAh9yk1KoRwF/H+hQIcF5KALJ9dLazeT2x7TGsp9jU5hEA8gQFg23N26kgnKwb6gHSvjBIvRY+UYVhB4Yw3janTNvrx11mOOsBtj6s6COMZI0Pn6wTXD7iX/JkwrFXeLy8F3X3PZ7XFKZn0OGGiG+cp3qyu9PsJbrvYNGj8=
+	t=1770384822; cv=none; b=XAQnALAvwqoOGZbM4AcAUCX6dt3b8DyyDxFML39xK1xxdjdOd/rjVRPtze06K/Lx6a326rfJKB9NPU939pe8W5aYI6wy8vU8ClafQFW4vn7k3Lmjj7hzxLF6od3f2Q/xmGxthbdRKVL5ZvWm6vgurob4JSma5TnsB3lY63I4LL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770384218; c=relaxed/simple;
-	bh=fqZ8bqAlwUxBwe4Z1+H16jnykQV8yO9H8sw0Vqob/0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tjQd6fqZd8WkPIrQEBt+a+9Gt5QaqxcVXCme95+hpy6jyzD9cMALVv6l2D/h+tAwY/4iHd6P4WYq7MOEg2J6A8FGP6qldjPaHi1VG1FUay7FlHs1iFoK2tcMETYFmnYjhQUWfGEZBMF+gY/cRKYi6PosGUXHp0Rco2/qOUJ9cps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=oYLKpI92; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=YuVg3Ixy; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1770384822; c=relaxed/simple;
+	bh=HcehPSlopdgQojZ7EQaumhfR5EFZxPZlRXdbXMpqorU=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=Cp42dO9LJEQtOhnFOh9Gt1eiadMcvh+1+G6iVVyjb2EJSSsHanSgr+6+DZJFxOs052KnnWwz7566UsjYrT56dwTYHC4MMWQsTWrS3vx3tkPVOG42j7llRpwmrDZHDngxWQLDbHZ6xqsCJMQ61Ufr+IAp6+uXkNA888KaQrQOQzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MGsqa6rf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="oYLKpI92";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="YuVg3Ixy"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6168Prjr2058595
-	for <linux-crypto@vger.kernel.org>; Fri, 6 Feb 2026 13:23:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=Qcbx8hOqgZKgbdxSnQdVeh45
-	s4d6AAaaCPjmsAiQNIM=; b=oYLKpI92S6Q7d7Cf1DrAwDVbpDZdYaJQHEEYEz8i
-	q7+upvosTjWwB73AvGT/DpOKcSWDuqZsIRNc3KnITrFiQLJ9IuzuwLK1Qfe8SWt0
-	xPKxsdF9JGSpyQg0voI3pl0/RVSfz+qXq5gSgvObQ/RiECziXWgbdOst8cR9u5jj
-	VyrWYjteW0DrTXIcgYG0io0DMfwjIsWLAZaB2jGQQBJZjYo3mhq2bdmMDiGyAXfq
-	jONDLiC8TLq+60zWtaHleduCLB62m34ekmTP6UM3zy19XRfBebWJeZ4HjjFecNsT
-	YIduTS67LujAYsfXJfj4LtxXw00N9peEy8qZ1FjldKVPFQ==
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c4x8bktwe-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Fri, 06 Feb 2026 13:23:37 +0000 (GMT)
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-c52d37d346dso1320573a12.3
-        for <linux-crypto@vger.kernel.org>; Fri, 06 Feb 2026 05:23:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1770384217; x=1770989017; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qcbx8hOqgZKgbdxSnQdVeh45s4d6AAaaCPjmsAiQNIM=;
-        b=YuVg3IxyTS7DKgG4lVjz54J14oaNIMAFgY2VXC03zh1iYNiftCB5w/t5Uk9Dl/Edbk
-         Asd5g/cRj7xPa2XAHV+SuRIFToUzeUlSnyYqdn/gHJqGdVrhmDkKQZ9vT29ntf/iIoFw
-         S8+ySBkNtRM2ZWsMSr0kSXf14xxziFu0n1TO/G6UTryadQE1YHcaAXiHG6ZRFmxa0/Z3
-         YHtxFaHL3L0oSMnKo98az484CkD6VK3NNGVvSzc/EdgZBzoz7DreaywLWgktu1um0dce
-         CN9mA3MYk2VCSpsbMLs/B/rWkVEoe4A0XWrU26l66roVDSrh+BWCIr+vHMKqc+OXav17
-         g+Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770384217; x=1770989017;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qcbx8hOqgZKgbdxSnQdVeh45s4d6AAaaCPjmsAiQNIM=;
-        b=YyRV2G35QaMlxAL6Jhd4zH8DChHnB151CvR5UNoFxn+fD50GXSby9rsNbVAFrerDlU
-         9y3yz0VJCVEOlOFXhW2edWme0SKWtaFGLBYK9pf1dxPOGNdUfojvb5WDC16fxMvJR80n
-         m7RW1o3/kmAzaqtUd/wpI+RnAViRQ1pHzxRi5SN9oMh2nw2SgFbmv5gJe4hmxiE3VYlU
-         85LRXPik6t7o88ftAUI19mS7hpidBd7Bg2sNRoBpzXInSbopUmgeVHqgr7iReKMhocQI
-         YRFCGqeamsGU8/SrLJNPywRnIIBI+k2Go633mVSkLMQZ9u40MHiSThyJ0cbYLoeaq2kz
-         R4SQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXW6HshMQ+y9DVvKLB+hC7lNc7AaEBW1x0t95VkZ+UNUFbHf5dFg1dwMF9rbfZi16+2bEJQgoSSgVwcy68=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIydOoA5FpNKlBqmtsI3BuiRePgHSmf3kOzzNRCSZ7k/zCcJIw
-	6yF5yOZ4c4YvP0WQSNLDZcsaWMNbpvefMCAdy2LsYly1kGtb21iajVjNLkDgSNr07PIuIsdvhIt
-	qEjX8pfS532hkAu0suCAwIPwwactQHmawVy1APpcoqSeX8HN/ry/SrH/TWq5kX1FkI/g=
-X-Gm-Gg: AZuq6aJDfA55WYNvdWX7x10kUsnhQGk/bxKujajNeXF7chXjXpZRDwdIDvFYp/02nV+
-	DiEqNP/xgxRPX3X55aCCV0MBbhcC9WkqTlEbIo8XRHj6JjjrMxcCwEkarmFd1jyYjmVig48PakF
-	nKkI1VwqsaIHzxns8Ie7sTa+9BXsIpjA4pR3NXvdT1ZsQDlm711+CLU6FnayuAnYmbCcaZW+u7Y
-	CBLoF1PG4oZnllC2I5HV8b9+ltQoya07+PsLt169vhM7i5ItLWaMPIBTWwj37qMMAon5njxNf63
-	TDEL/vNVy/GlvdbL+asavveNG4PaADZLKZK7AhUFgE8Dh3po8rrmUlWAssH+tYiwMexEhrJ9pBx
-	QmDBFcPxBmC9jmEiPpmrNyrZVoXEi5VPcdXxAvfCkbmbppoo=
-X-Received: by 2002:a17:903:244a:b0:295:c2e7:7199 with SMTP id d9443c01a7336-2a9516fb30bmr25300675ad.29.1770384216751;
-        Fri, 06 Feb 2026 05:23:36 -0800 (PST)
-X-Received: by 2002:a17:903:244a:b0:295:c2e7:7199 with SMTP id d9443c01a7336-2a9516fb30bmr25300415ad.29.1770384216215;
-        Fri, 06 Feb 2026 05:23:36 -0800 (PST)
-Received: from hu-arakshit-hyd.qualcomm.com ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a9521f3b6asm24313205ad.77.2026.02.06.05.23.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Feb 2026 05:23:35 -0800 (PST)
-Date: Fri, 6 Feb 2026 18:53:28 +0530
-From: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v4 2/4] soc: qcom: ice: Add OPP-based clock scaling
- support for ICE
-Message-ID: <aYXrUM+Wuso+aHGc@hu-arakshit-hyd.qualcomm.com>
-References: <20260128-enable-ufs-ice-clock-scaling-v4-0-260141e8fce6@oss.qualcomm.com>
- <20260128-enable-ufs-ice-clock-scaling-v4-2-260141e8fce6@oss.qualcomm.com>
- <20260128-daft-seriema-of-promotion-c50eb5@quoll>
- <aYBE/VljJTUNx3LK@hu-arakshit-hyd.qualcomm.com>
- <b556cc32-2b8e-4451-b333-aec2eddee7b1@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MGsqa6rf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770384821;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZIZOCzqYxJiIRhnu2OUABj+ULNYXYuEc+snEBZA8w1U=;
+	b=MGsqa6rf5bbTQkqg04A9ca+Ym7KH6rFW3z8a05sgoTsas4yGWn+mYCWn/yMSSOzza9qceJ
+	5BF7h9YyfKnaUcOaqVd4yb0IYNtu6jVjz0j2GvqsXQz05LtI/rL1fhAdmFrydhzMPdf9+M
+	kgtC2RF3lnAHYJC93MfqBVEJNGmowpU=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-621-gTW-smkLMLGhd854M3Plfw-1; Fri,
+ 06 Feb 2026 08:33:36 -0500
+X-MC-Unique: gTW-smkLMLGhd854M3Plfw-1
+X-Mimecast-MFC-AGG-ID: gTW-smkLMLGhd854M3Plfw_1770384814
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 968F41800639;
+	Fri,  6 Feb 2026 13:33:33 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.33.164])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AE448180057F;
+	Fri,  6 Feb 2026 13:33:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+cc: dhowells@redhat.com, Lukas Wunner <lukas@wunner.de>,
+    Ignat Korchagin <ignat@cloudflare.com>,
+    Jarkko Sakkinen <jarkko@kernel.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Eric Biggers <ebiggers@kernel.org>,
+    Luis Chamberlain <mcgrof@kernel.org>,
+    Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>,
+    Sami Tolvanen <samitolvanen@google.com>,
+    "Jason A . Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
+    keyrings@vger.kernel.org, linux-modules@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: [GIT PULL] x509, pkcs7: Add support for ML-DSA signatures
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b556cc32-2b8e-4451-b333-aec2eddee7b1@kernel.org>
-X-Authority-Analysis: v=2.4 cv=GaoaXAXL c=1 sm=1 tr=0 ts=6985eb59 cx=c_pps
- a=oF/VQ+ItUULfLr/lQ2/icg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22
- a=utnUQDMwVCZhAfiAu78A:9 a=CjuIK1q_8ugA:10 a=3WC7DwWrALyhR5TkjVHa:22
-X-Proofpoint-ORIG-GUID: _eJdcy2Lef1oT6FAkRx5GtvYC2V0DcDn
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA2MDA5NSBTYWx0ZWRfXx0y7thjQkZL7
- MAq7Kqsv13nV/JFBq6kgaq/GIJW9hx8Jmix8BNPuZTB3RIPqO/rkmwFFMSN9tSHCb3hgtI3Bxqf
- +1HXm0E7t1eBB5aXxk/+3dN/YtvbLA6n3g7d0ByyL+XuL8QZOkNJSb1Ov5VC6+cSwYkLzV0QVXF
- UCBm/zXuorXb2yoL9R7csCg+aUuAvcYQTMWy81+49ORZWl52R90FHB2+eSMpoOFaKMo9miOo3TC
- TBU5Zft8fqExEPx6g/iUm5/4SMEP1haANzkFyUyVLuSb9y3BRj6u9Rtz4D47LjdG5F528gE5+7j
- jwAQEXGQWBRgzoyoIgmoY861Q/XXg4WpGYmagvU5DoL1roaN6RoEzecyz0Rsg49zONE3cKmHukB
- XODXOKLADge04odE0/QN79WhLluHwSdnTK8Zqj/ibDreBk7/3z86PTVgBoZwfIu4FrfQVhmwWnR
- 5+8QOomTnahb0WQMmlA==
-X-Proofpoint-GUID: _eJdcy2Lef1oT6FAkRx5GtvYC2V0DcDn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-06_04,2026-02-05_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 spamscore=0 clxscore=1015 impostorscore=0 phishscore=0
- priorityscore=1501 suspectscore=0 malwarescore=0 bulkscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2602060095
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2977831.1770384806.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Feb 2026 13:33:26 +0000
+Message-ID: <2977832.1770384806@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Thu, Feb 05, 2026 at 12:26:25PM +0100, Krzysztof Kozlowski wrote:
-> On 02/02/2026 07:32, Abhinaba Rakshit wrote:
-> > On Wed, Jan 28, 2026 at 12:04:26PM +0100, Krzysztof Kozlowski wrote:
-> >> On Wed, Jan 28, 2026 at 02:16:41PM +0530, Abhinaba Rakshit wrote:
-> >>>  	struct qcom_ice *engine;
-> >>> +	struct dev_pm_opp *opp;
-> >>> +	int err;
-> >>> +	unsigned long rate;
-> >>>  
-> >>>  	if (!qcom_scm_is_available())
-> >>>  		return ERR_PTR(-EPROBE_DEFER);
-> >>> @@ -584,6 +651,46 @@ static struct qcom_ice *qcom_ice_create(struct device *dev,
-> >>>  	if (IS_ERR(engine->core_clk))
-> >>>  		return ERR_CAST(engine->core_clk);
-> >>>  
-> >>> +	/* Register the OPP table only when ICE is described as a standalone
-> >>
-> >> This is not netdev...
-> > 
-> > Okay, if I understand it correct, its not conventional to use of_device_is_compatible
-> > outside netdev subsystem. Will update as mentioned below.
-> 
-> No, please read entire coding style, although the comment was about
-> comment style.
+Hi Linus,
 
-Sure, will ensure to use the correct comment styles.
+Could you pull this patchset in the upcoming merge window please?  It adds
+support for ML-DSA signatures in X.509 certificates and PKCS#7/CMS
+messages, thereby allowing this algorithm to be used for signing modules,
+kexec'able binaries, wifi regulatory data, etc..
 
-Abhinaba Rakshit
+This requires OpenSSL-3.5 at a minimum and preferably OpenSSL-4 (so that i=
+t
+can avoid the use of CMS signedAttrs - but that version is not cut yet).
+certs/Kconfig does a check to hide the signing options if OpenSSL does not
+list the algorithm as being available.
+
+Note that this is dependent on Eric Bigger's libcrypto (for the core ML-DS=
+A
+implementation) and would need to be pulled after that.
+
+Note also that this has a conflict with the modules tree which has a patch
+to unconditionally use the OpenSSL CMS_* API to generate signatures in
+scripts/sign-file.c and to remove fallback use of the PKCS7_* API.  I've
+added an illustrative merge at the top of my keys-pqc branch for reference
+purposes.
+
+The patches were last posted here:
+
+	https://lore.kernel.org/r/20260202170216.2467036-1-dhowells@redhat.com/
+
+Thanks,
+David
+---
+The following changes since commit 959a634ebcda02e0add101024a5793323d66cda=
+5:
+
+  lib/crypto: mldsa: Add FIPS cryptographic algorithm self-test (2026-01-1=
+2 11:07:50 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
+/keys-next-20260206
+
+for you to fetch changes up to 965e9a2cf23b066d8bdeb690dff9cd7089c5f667:
+
+  pkcs7: Change a pr_warn() to pr_warn_once() (2026-02-05 15:44:00 +0000)
+
+----------------------------------------------------------------
+keys: Support for ML-DSA module signing
+
+----------------------------------------------------------------
+David Howells (8):
+      crypto: Add ML-DSA crypto_sig support
+      x509: Separately calculate sha256 for blacklist
+      pkcs7, x509: Rename ->digest to ->m
+      pkcs7: Allow the signing algo to do whatever digestion it wants itse=
+lf
+      pkcs7, x509: Add ML-DSA support
+      modsign: Enable ML-DSA module signing
+      pkcs7: Allow authenticatedAttributes for ML-DSA
+      pkcs7: Change a pr_warn() to pr_warn_once()
+
+ Documentation/admin-guide/module-signing.rst |  16 ++-
+ certs/Kconfig                                |  40 ++++++
+ certs/Makefile                               |   3 +
+ crypto/Kconfig                               |   9 ++
+ crypto/Makefile                              |   2 +
+ crypto/asymmetric_keys/Kconfig               |  11 ++
+ crypto/asymmetric_keys/asymmetric_type.c     |   4 +-
+ crypto/asymmetric_keys/pkcs7_parser.c        |  36 ++++-
+ crypto/asymmetric_keys/pkcs7_parser.h        |   3 +
+ crypto/asymmetric_keys/pkcs7_verify.c        |  78 +++++++----
+ crypto/asymmetric_keys/public_key.c          |  13 +-
+ crypto/asymmetric_keys/signature.c           |   3 +-
+ crypto/asymmetric_keys/x509_cert_parser.c    |  27 +++-
+ crypto/asymmetric_keys/x509_parser.h         |   2 +
+ crypto/asymmetric_keys/x509_public_key.c     |  42 ++++--
+ crypto/mldsa.c                               | 201 ++++++++++++++++++++++=
++++++
+ include/crypto/public_key.h                  |   6 +-
+ include/linux/oid_registry.h                 |   5 +
+ scripts/sign-file.c                          |  39 ++++--
+ security/integrity/digsig_asymmetric.c       |   4 +-
+ 20 files changed, 473 insertions(+), 71 deletions(-)
+ create mode 100644 crypto/mldsa.c
+
