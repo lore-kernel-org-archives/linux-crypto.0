@@ -1,46 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8BA3314DE;
-	Fri,  6 Feb 2026 11:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C527A22301;
+	Fri,  6 Feb 2026 11:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770375719; cv=none; b=SQ06PPVSw8aZQmOL01zR1d/YfhDX8XTt9p9ZnNZ5Z6LSbJc0nuN10ZBbIDhiTA7Zn/PYrqH8GkDfazA++Z4GSEuO1Eo6X0U9DdFaVhExi0qds72fIzGSPhXWoFJMj4PBIp6VV1YfWhpQlnRw/iic5aOXgENTk98CEvi8l/DGnK4=
+	t=1770375730; cv=none; b=Z1TmuerSnhcJ7mJoXJn21cW1XSUvePkQdJFy/WYvmVhJcPWhvHuHeyZp6hEcCUNbwcjJvb0itTQmNsW7g/sIQVWnqKzLoe0mmx3Y+1cchdURpvaAxe2bbuK7xeH+hMRBtBg2mdmt1TqrnbWNvDdFgGyK/OWEiGC7P5oaMNRkyzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770375719; c=relaxed/simple;
-	bh=jCCiHRoO1xeTWF7TDnxb5PIykzgoT5rd0zB4i4mNXR4=;
+	s=arc-20240116; t=1770375730; c=relaxed/simple;
+	bh=ZFT/J5IZFi2raGMpv46P4jupO6mnVJgx8ZJlZWQQ3vw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cB0nBh09Zr5ujOLxl4wX81KMYmyxZdQa72D/AJwdJaGvgtIvkLsUC2N4fxiH5JFkdSx7EjHbz5EMyi/suqBpW66EPnTvI81WVD54HOu8rJ6SB1yvfEnMmFgHaOjhyzRs3y3SCr0pzJ5JAa/hOhxlPiwaOZctKEk/WOoKP7sHx8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=cWlRz0UC; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=PoOA4WnsLqoaYQhivbWpvArDgLXw8ReVDivSVlR9Kdi7ikMBfdHfYv9ITNxcSf+oU1bR1pr+8DDwsz5PIk3ceStrZU0nlPsbkFATNzjGpdQCO9nIoOMFVRlZFgxPHexpLbUmzgOZRf8nuU/c8+eFFqEKf1yjFYVF7+EsBfgqdfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=UPzFOGmA; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="cWlRz0UC"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="UPzFOGmA"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=7Qs+AwZ9zxauz8Rcv+n7jI5jaPGvqs7lG0yDaBw8ddk=; 
-	b=cWlRz0UCbnwM1bppUsryC4j36u0/bqmCRGqKnRnEqfvzf0i0Zju35fq+4qbuI+u/coF9vHOtkML
-	BFNtm5dtLWsUXGT6b6A/GmRsYABeRrf6jhJESDYSxqHHkfhoYBkG7+Q3BG1XPOALAy/eK0qYsIOco
-	yP7a3ePZ2RIysxBswlE4Ok6CTKG0GN3z1nP9CYd5hhFjteYM6h257wsGNa/apDdueV964MqYfuEme
-	SUpn986MWz/g6Ns/y8uFln/tppytdWHc5BmtShBLWggyZpHROKvl3LjPXPYlUXBA4JqTnDLbKP3YE
-	Fp5e2YpnckVNYtj6TNndNEAhAjsQl/TKORpw==;
+	from:content-type:reply-to; bh=7t6+yDO8eeNGPouZY7wy/I0B38I21LpHM224gOaecsU=; 
+	b=UPzFOGmAZ3w6NvIPol5swbV28+CX2SVPs0ZKmz4CQx9i9dSrznc0XqSgRU72m9YX8kQZGFD125O
+	pk9KprajVt6lPWOUqE0OH/qPC/ktx08JNrDdh664tZRFpz2g+k8SdR9jtU5oYsUIyVWldjV7r/hZ5
+	KeXZvshK8PnA5EwFtpt0FNsGJRMgCmVC8Loj1daUmKxjuFMO17rhmF/hndJbvkTwtq3JoqFQT3HsM
+	xWXsCikiVOl9K6tFnJs/EN70XxNewXxy7II9kSPkFC2ql/GRebEjhSUQ6w9cQvHtzZPZ2Feeg7unB
+	i/MTZrUzbKjhgxOVMpyvQ75POR5FfW5VK3Dg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1voJao-004zXC-2r;
-	Fri, 06 Feb 2026 19:01:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Feb 2026 19:01:42 +0800
-Date: Fri, 6 Feb 2026 19:01:42 +0800
+	id 1voJb9-004zYA-1U;
+	Fri, 06 Feb 2026 19:02:04 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Feb 2026 19:02:03 +0800
+Date: Fri, 6 Feb 2026 19:02:03 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, linux-crypto@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: testmgr - Add test vectors for
- authenc(hmac(md5),cbc(des3_ede))
-Message-ID: <aYXKFtmVJCCZpUVw@gondor.apana.org.au>
-References: <20260201112834.3378-1-olek2@wp.pl>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: img-hash - Use unregister_ahashes in
+ img_{un}register_algs
+Message-ID: <aYXKK5zNsZyXpVhN@gondor.apana.org.au>
+References: <20260201175632.662976-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,19 +47,20 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260201112834.3378-1-olek2@wp.pl>
+In-Reply-To: <20260201175632.662976-2-thorsten.blum@linux.dev>
 
-On Sun, Feb 01, 2026 at 12:27:08PM +0100, Aleksander Jan Bajkowski wrote:
-> Test vector was generated using a software implementation and then double
-> checked using a hardware implementation on NXP P2020 (talitos). The
-> encryption part is identical to authenc(hmac(sha1),cbc(des3_ede)),
-> only HMAC is different.
+On Sun, Feb 01, 2026 at 06:56:33PM +0100, Thorsten Blum wrote:
+> Replace the for loops with calls to crypto_unregister_ahashes(). In
+> img_register_algs(), return 'err' immediately and remove the goto
+> statement to simplify the error handling code.
 > 
-> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+> Convert img_unregister_algs() to a void function since its return value
+> is never used.
+> 
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 > ---
->  crypto/testmgr.c |  7 ++++++
->  crypto/testmgr.h | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 66 insertions(+)
+>  drivers/crypto/img-hash.c | 21 +++++++--------------
+>  1 file changed, 7 insertions(+), 14 deletions(-)
 
 Patch applied.  Thanks.
 -- 
