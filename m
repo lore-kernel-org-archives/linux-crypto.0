@@ -1,47 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49943612FE;
-	Fri,  6 Feb 2026 10:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60913612FE
+	for <linux-crypto@vger.kernel.org>; Fri,  6 Feb 2026 10:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770375531; cv=none; b=bvoUxb9EUcC97LJwLjI0iAkynbXfF7LUXgIYgaSSZA8z5GTIeFZA0JcMNWUhyxqZ3UfFB0L0fZngHkg2PHFR/zjadh4cK38HZBUwUXukVt2czJts+RxblP57YdNuL5Sb4MJL70ek+RtwFQZKsuA8gfVILb7JqQVGp6mQ9JYVdKQ=
+	t=1770375536; cv=none; b=LudtQlChrQqqFx3rVfsCk8OoiFm78pm7QYxEbmmpnd4FE79T18UKN4912dofe4aR3TMbU2Ia5aqMnRaT/YBoc8yPMssDmYTghGrfzSGBEvHlt/GkumZ+QvAoDJnS2pserDR+Lh+w5wNsTlqcKRkYvnDHpbda84KeYlPlTMgcZyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770375531; c=relaxed/simple;
-	bh=qCgd+NGrc+WY7VNlDf02HQqWh0CoSFHBfITKM35Kglo=;
+	s=arc-20240116; t=1770375536; c=relaxed/simple;
+	bh=SVxrvug3dHxkYz1wSVuAt1ZNkGIaefrBE1cEITAOAUE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qRpTyHoPGGunWjVYQ5746TykHnv2i9xNxIgBEhTsqWg4XqGs8C3LGetss6qx2OYMCRiTNmNVHqC7X7MNkVWwVNeeudqqKt8qLfHKQ7aYI4rkQjrtggN2ZCwJjmCnIdcLq+E6/VixAQ1PxIS8DmOcCB7U3V3dLKYmnHropJWtUzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=f+sdyDzh; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=rtD0dEi92FZCLHMSLMgzjEfhWb2VdGZ7b/kzxmvnutGOCka7s7686M+WCpk5w5x+JrjO7I5WvMCh2TCTRI+/+JlsGE9V22G1qWinJenijuk3pkpOHJhJ276T3k31bVLUgqWCWxZoax4W4XyiISZnAaYQ25R7Gwpu+vwK4gFTHho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=s6sH4vsW; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="f+sdyDzh"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="s6sH4vsW"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=s6PtmROzd+O5nnBGS1z+1XPE++3x1xM/uYQ3FTegpig=; 
-	b=f+sdyDzhPnXhAHbmjoz7F5jqlUJAHke1M4DzR5WLsbftfgrKV4QuLSEK26w+SyCV4KUMy5Fl0Es
-	yCXTBOwWUuW6/Jc3hT7QM6I4mnmwE3ysXH5Yq2G6im6h2vdr/WT40lm1Qq/azWlc5wAak+JiquIba
-	qeJxZFn0RSInlqt+26sORY+0I3Lh/oG46RrBxcRISjQ8DEndNtY7qWuuoY5Hz0O97KrB4rojwc3Mi
-	LIJtMVBw6kNPSwqYValqPeF/6u0eGgRaX+uQ+DbTZBzXwXzzo4vBQhR8cOSQ+rF5sTMuNwBHBmSot
-	TvHSuDJ6048W+3eadAbkYNhx3jF/UpIxy6KA==;
+	from:content-type:reply-to; bh=uf3Mn4yUKMvW/6DBZicxxhoSqJXvniVryUZ0kXqs+XI=; 
+	b=s6sH4vsW4qgkyo2SxElIASHPgrDhkK8fivT1GLXnfltpJm3HNla4qi8Sf6y4+0G+OQD4MoFaGtE
+	AEoyGaQ180Sxsog9mtf+uPMyU3G5YoweBP4HSyohz76HGwM4w77eCC7Lya2msir7wQvIOHKXQQGPD
+	zrOV4clt0ZIs5Ugb2WmyUYdvGfsVFV6ciFGJF1GKz8V3hjBkuPBQkbO8U/305AeF3n9RpdKDxPCI9
+	loxGkgcf4CA30e8GVF5/9MvEYkQbNP2Ff/uNXV1KOzaaVQNCtw/j1ZOtwAr7xWGR1lLlZEXSdCfQQ
+	0xFuV6Kie1rznFIDIwadiina9yJPt796jYVQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1voJXj-004zUe-28;
-	Fri, 06 Feb 2026 18:58:32 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Feb 2026 18:58:31 +0800
-Date: Fri, 6 Feb 2026 18:58:31 +0800
+	id 1voJY0-004zVG-1g;
+	Fri, 06 Feb 2026 18:58:49 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Feb 2026 18:58:48 +0800
+Date: Fri, 6 Feb 2026 18:58:48 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: atmel - Use unregister_{aeads,ahashes,skciphers}
-Message-ID: <aYXJV-XUwtAEXfz2@gondor.apana.org.au>
-References: <20260126174704.237141-1-thorsten.blum@linux.dev>
+To: Harsh Jain <h.jain@amd.com>
+Cc: michal.simek@amd.com, davem@davemloft.net, linux-crypto@vger.kernel.org,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [LINUX PATCH] crypto: xilinx: Fix inconsistant indentation
+Message-ID: <aYXJaKCXVkQo81u8@gondor.apana.org.au>
+References: <20260127070155.199790-1-h.jain@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,22 +46,17 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260126174704.237141-1-thorsten.blum@linux.dev>
+In-Reply-To: <20260127070155.199790-1-h.jain@amd.com>
 
-On Mon, Jan 26, 2026 at 06:47:03PM +0100, Thorsten Blum wrote:
-> Replace multiple for loops with calls to crypto_unregister_aeads(),
-> crypto_unregister_ahashes(), and crypto_unregister_skciphers().
+On Tue, Jan 27, 2026 at 12:31:55PM +0530, Harsh Jain wrote:
+> Fix smatch inconsistant code warning.
 > 
-> Remove the definition of atmel_tdes_unregister_algs() because it is
-> equivalent to calling crypto_unregister_skciphers() directly, and the
-> function parameter 'struct atmel_tdes_dev *' is unused anyway.
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202601251908.baMDVVgW-lkp@intel.com/
+> Signed-off-by: Harsh Jain <h.jain@amd.com>
 > ---
->  drivers/crypto/atmel-aes.c  | 17 ++++++-----------
->  drivers/crypto/atmel-sha.c  | 27 ++++++++++-----------------
->  drivers/crypto/atmel-tdes.c | 25 ++++++-------------------
->  3 files changed, 22 insertions(+), 47 deletions(-)
+>  drivers/crypto/xilinx/zynqmp-aes-gcm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
