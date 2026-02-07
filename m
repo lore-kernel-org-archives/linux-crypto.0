@@ -1,138 +1,167 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C072D33E34C;
-	Sat,  7 Feb 2026 10:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3539B3385A5
+	for <linux-crypto@vger.kernel.org>; Sat,  7 Feb 2026 10:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770461084; cv=none; b=CkleBHxLqmxWoGcWQP0Lc1N0Vdku/2Fqyw06JdNQHJuT5DVxxGChh50ZW7AN/qQkZpnX8X1hThNTROZMYY6ks/9bkffbp38ZpJZlt/7CpN05Lmoq2VRN0G20XHW2OJJaS/zPUkI5V3Kwi/2zQRnsq4cEmzKNVTK3HwcyvY08jfc=
+	t=1770461494; cv=none; b=dq7fgI0hkwCc4+ydSo5Vyx3/mG/cgJXLihlDLnMIpezMoIdghqHWCmTVj+UFz8tQsIgC3Hxl1la3/4BkakJ/oHXmY/3YcGfpWtj7ZWyMaHMFBFJh+dS0qr+C7iuwx/E5aQw2p1AyDg5pG0sWC13qRX4+KExLLmU3ywvfAq1lKJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770461084; c=relaxed/simple;
-	bh=Gk1b1szSKFtgjZ1DQKUhyp77v69EzsrYNnADb+xDK+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JGR9C02JezrfA+CauyQAAgJ8xKWVxPPdn0I0MJxm0tkVeKH28H85AKeY3AmHufF5XObbx740DEx8hpAhgxpdX5ku2uM8d2RdgmSGME/V0pzmO9ij8uBiVyj8n7khGcQl43dR3TYYckdApK7ik7OMvz7XrqA38E40mlAosly3A1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jOfDjLp0; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1770461494; c=relaxed/simple;
+	bh=A0+LTYwmCZ5W+zWmCdj1Npm0Zc4Pqtj1TsfF0hQZTTE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EL0XPqGp3wxeMMmKF/kboUS3RxM38cCp+6BRsbE47FlEhFJCtIjqOeniJxyX2uQdJ5myaRMCFy7VOz0DM9ekuoXRjSyO4cmuwOK4olkss0CFVGTS41GrAJygTEOdMdHF+wgvnW3TOXcat0CoLU4OEQQOffnOCIDANG13R70hABY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i67EnGop; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jOfDjLp0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770461083; x=1801997083;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Gk1b1szSKFtgjZ1DQKUhyp77v69EzsrYNnADb+xDK+c=;
-  b=jOfDjLp0v0QE+rc6LRr6Ml++4Mo7JaehAK1gc4moyRJhPBw5roIZJkah
-   p5LRbvINwcKH+V5+LJzGYQ4659aDVvJykIbCkStdOPm4d1Ds0g1Eemwof
-   0deH8Om+jg/qZw5p0oKVoql/9xXfNuMytRgPCdMtvv6abYgE8vGN5G4Y8
-   toLBGmUnaVY56y30HTe+SFL5Tqoy1X2v+O1FUl1dKrRZi+Gt2QJlUZ1XI
-   vjuu9NzCUGjxPHtHopgQO0mj4+Z+oR13o2wf6uM+lSiYQxfHNAOOD4/7N
-   nLWX32x8uSu7dBcxfx2HlkBYNm5/cd43fiFMYrDoCirpwBUIj6RqhVVrN
-   g==;
-X-CSE-ConnectionGUID: 452gl6fvQuCC80sddsxEww==
-X-CSE-MsgGUID: HiTu1PgWSqyjjkNZrgfjhg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11693"; a="97109629"
-X-IronPort-AV: E=Sophos;i="6.21,278,1763452800"; 
-   d="scan'208";a="97109629"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2026 02:44:43 -0800
-X-CSE-ConnectionGUID: XaIAzb1RTseln8MDTP5P8g==
-X-CSE-MsgGUID: su1AKVbVQBSEZSzAGvWb0g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,278,1763452800"; 
-   d="scan'208";a="210848523"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 07 Feb 2026 02:44:40 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vofnq-00000000laa-0Pv3;
-	Sat, 07 Feb 2026 10:44:38 +0000
-Date: Sat, 7 Feb 2026 18:43:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: Benjamin Coddington <bcodding@hammerspace.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Rick Macklem <rick.macklem@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 3/3] NFSD: Sign filehandles
-Message-ID: <202602071819.UF8h2gl7-lkp@intel.com>
-References: <d34d4f79a7d4c6b77ad260f925cb51c34fd53ce5.1770390036.git.bcodding@hammerspace.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i67EnGop"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-48039fdc8aeso18699985e9.3
+        for <linux-crypto@vger.kernel.org>; Sat, 07 Feb 2026 02:51:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770461492; x=1771066292; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fs1tDxIIOk0nugOD7PhyByb/8VSovdwAxjrX3UDxXC4=;
+        b=i67EnGopS7UZNEh5p6ydzxPUSa9LDHRzSB2r0gRkb9XUENehPDiczm1eLDGXF9sjl+
+         PuvDiKbt2iVDIbkOg0v4CTPkgJ84e3GHQYM9UINTW8Fu7PNhBalUy+IlzwF5PKiecRm7
+         SItpto1zCuuaJrMHYgcObAXXGMfsz4sS+rfqMHRJFno5h6NxSv2/jucHF17Q3q7xPDZ+
+         aJ/8bGfgmTMl9n9xqT6P/FbFsmUDLHM5w/4qcIWpW3/zT9/inA2aX866XyjQOr1sPpc7
+         SKUWCdKtnuEFDfzR27hClXaTptucjDGR5kcfyztODu7VdoM7I1d7ELcHr8Fyu90OfBOj
+         XTjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770461492; x=1771066292;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fs1tDxIIOk0nugOD7PhyByb/8VSovdwAxjrX3UDxXC4=;
+        b=iFG/XKWES6WEEfxnRi+jCKWukTMlu/93L9IRhEM9hQ5YdlyxOZ7cdfXSB4z9K+T6i0
+         8AItb1cQV0J2gIjyGTEN9yXJGmE0LMDHntHWoo7uddW0NKF9kgyseIsWNwCkRUUNlbKo
+         67sGEDLFlTD7BNoAb7P3ezySPkiiVZSBM/BECocr0D3GL1SPmq3pc1ia7LBqM1SuAqTK
+         VB25karq/I/2HlbF1PuF928glBtrCMvwFlOP37fAeIGRuEN7MzXYGDR9hLldDhun+Vpn
+         ISIT/T2IKAyD8DRjV0iw2f4GZiv9ei4zqFgTDyTzmuxxzrXZCyPSjZGrATJ0Hq1S4Vr2
+         1Q0A==
+X-Forwarded-Encrypted: i=1; AJvYcCUmH8uHvckFmVVQxwSgqZ9pajLibNx7VzlEyQWQyJxMVKnvA8Dk0KT1xRdmCT+0eems9Y7fbuQ/oGcGPrA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2LJ+A63tgnJWt455G2RYs4oLK5YTLwlk/AIxao0eYIcUlJs+/
+	pzxVtpnLIOFd2adCNPiFMt3RYZNlxdJprrrgguwjoWyoM7rlqIF2m9D8
+X-Gm-Gg: AZuq6aIG83EB6QppQt8z7FWaRNuojBSoC3k2euwgmcWTg7oSIIgXzzcrqtbczJazdo8
+	qaBv6NJOWcnfUL8IBuCXDDCrGC8+Sjoj9mnk3jZa1eI1ci1iJmpquaIVbeNmxDqNn95GqxvnyCq
+	taI8x1BYyO0mPGQk/IfJpzGh2uQvpxzWhrygyYH1p/7H1kjLb+tqZUQX8pJ5Bo54kn9knwnhcfM
+	Z2Pzg6cVr+ECbxmQZU4ZMRuVShqyvNU9AMacywx0uxhCJ2UWGuF8iI1u0m2j/X3hDlOHJdAa5G/
+	EuJZ4atQgCSSqTiincJE6eNKh7tEnUeHmhtHi8dXloO3YLFMKjlepq3bc+E0gzBVsZmT1FIXWHG
+	4rs9iglU24bA0bV1s5IMy9vsirR2vwN+sUF4ry2jzv+B9vD1r0BsGnGdqLA6liI/Qh6lFsuGFjl
+	4DoJt89X6wz5aivH0u7ISDGOlJYZiY/aKIAkRlAyAoYGuEstzgfwWY
+X-Received: by 2002:a05:600c:1388:b0:47b:e2a9:2bd7 with SMTP id 5b1f17b1804b1-48320216126mr65696695e9.19.1770461492491;
+        Sat, 07 Feb 2026 02:51:32 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48317d3e245sm195442315e9.8.2026.02.07.02.51.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Feb 2026 02:51:32 -0800 (PST)
+Date: Sat, 7 Feb 2026 10:51:30 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>, Vijay Sundar
+ Selvamani <vijay.sundar.selvamani@intel.com>, George Abraham P
+ <george.abraham.p@intel.com>, qat-linux@intel.com,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Marco Elver <elver@google.com>, Will Deacon <will@kernel.org>, Peter
+ Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH next] crypto: qat - replace avg_array() with a better
+ function
+Message-ID: <20260207105130.4af50ce1@pumpkin>
+In-Reply-To: <20260206210940.315817-1-david.laight.linux@gmail.com>
+References: <20260206210940.315817-1-david.laight.linux@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d34d4f79a7d4c6b77ad260f925cb51c34fd53ce5.1770390036.git.bcodding@hammerspace.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Benjamin,
+On Fri,  6 Feb 2026 21:09:40 +0000
+david.laight.linux@gmail.com wrote:
 
-kernel test robot noticed the following build warnings:
+Cc the people discussing unqual_scalar_typeof() for arm64 LTO READ_ONCE().
 
-[auto build test WARNING on e3934bbd57c73b3835a77562ca47b5fbc6f34287]
+> From: David Laight <david.laight.linux@gmail.com>
+> 
+> avg_array() is defined as a 'type independant' #define.
+> However the algorithm is only valid for unsigned types and the
+> implementation is only valid for u64.
+> All the callers pass temporary kmalloc() allocated arrays of u64.
+> 
+> Replace with a function that takes a pointer to a u64 array.
+> 
+> Change the implementation to sum the low and high 32bits of each
+> value separately and then compute the average.
+> This will be massively faster as it does two divisions rather than
+> one for each element.
+> 
+> Also removes some very pointless __unqual_scalar_typeof().
+> They could be 'auto _x = 0 ? x + 0 : 0;' even if the types weren't fixed.
+> 
+> Only compile tested.
+> 
+> Signed-off-by: David Laight <david.laight.linux@gmail.com>
+> ---
+>  .../intel/qat/qat_common/adf_tl_debugfs.c     | 38 ++++++++-----------
+>  1 file changed, 15 insertions(+), 23 deletions(-)
+> 
+> diff --git a/drivers/crypto/intel/qat/qat_common/adf_tl_debugfs.c b/drivers/crypto/intel/qat/qat_common/adf_tl_debugfs.c
+> index b81f70576683..a084437a2631 100644
+> --- a/drivers/crypto/intel/qat/qat_common/adf_tl_debugfs.c
+> +++ b/drivers/crypto/intel/qat/qat_common/adf_tl_debugfs.c
+> @@ -77,32 +77,24 @@ static int tl_collect_values_u64(struct adf_telemetry *telemetry,
+>   * @len: Number of elements.
+>   *
+>   * This algorithm computes average of an array without running into overflow.
+> + * (Provided len is less than 2 << 31.)
+>   *
+>   * Return: average of values.
+>   */
+> -#define avg_array(array, len) (				\
+> -{							\
+> -	typeof(&(array)[0]) _array = (array);		\
+> -	__unqual_scalar_typeof(_array[0]) _x = 0;	\
+> -	__unqual_scalar_typeof(_array[0]) _y = 0;	\
+> -	__unqual_scalar_typeof(_array[0]) _a, _b;	\
+> -	typeof(len) _len = (len);			\
+> -	size_t _i;					\
+> -							\
+> -	for (_i = 0; _i < _len; _i++) {			\
+> -		_a = _array[_i];			\
+> -		_b = do_div(_a, _len);			\
+> -		_x += _a;				\
+> -		if (_y >= _len - _b) {			\
+> -			_x++;				\
+> -			_y -= _len - _b;		\
+> -		} else {				\
+> -			_y += _b;			\
+> -		}					\
+> -	}						\
+> -	do_div(_y, _len);				\
+> -	(_x + _y);					\
+> -})
+> +static u64 avg_array(const u64 *array, size_t len)
+> +{
+> +	u64 sum_hi = 0, sum_lo = 0;
+> +	size_t i;
+> +
+> +	for (i = 0; i < len; i++) {
+> +		sum_hi += array[i] >> 32;
+> +		sum_lo += (u32)array[i];
+> +	}
+> +
+> +	sum_lo += (u64)do_div(sum_hi, len) << 32;
+> +
+> +	return (sum_hi << 32) + div_u64(sum_lo, len);
+> +}
+>  
+>  /* Calculation function for simple counter. */
+>  static int tl_calc_count(struct adf_telemetry *telemetry,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Benjamin-Coddington/NFSD-Add-a-key-for-signing-filehandles/20260206-231407
-base:   e3934bbd57c73b3835a77562ca47b5fbc6f34287
-patch link:    https://lore.kernel.org/r/d34d4f79a7d4c6b77ad260f925cb51c34fd53ce5.1770390036.git.bcodding%40hammerspace.com
-patch subject: [PATCH v4 3/3] NFSD: Sign filehandles
-config: x86_64-randconfig-121-20260207 (https://download.01.org/0day-ci/archive/20260207/202602071819.UF8h2gl7-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260207/202602071819.UF8h2gl7-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602071819.UF8h2gl7-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> fs/nfsd/nfsfh.c:168:14: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned long long [usertype] hash @@     got restricted __le64 [usertype] @@
-   fs/nfsd/nfsfh.c:168:14: sparse:     expected unsigned long long [usertype] hash
-   fs/nfsd/nfsfh.c:168:14: sparse:     got restricted __le64 [usertype]
-   fs/nfsd/nfsfh.c:191:14: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned long long [usertype] hash @@     got restricted __le64 [usertype] @@
-   fs/nfsd/nfsfh.c:191:14: sparse:     expected unsigned long long [usertype] hash
-   fs/nfsd/nfsfh.c:191:14: sparse:     got restricted __le64 [usertype]
-
-vim +168 fs/nfsd/nfsfh.c
-
-   143	
-   144	/*
-   145	 * Append an 8-byte MAC to the filehandle hashed from the server's fh_key:
-   146	 */
-   147	static int fh_append_mac(struct svc_fh *fhp, struct net *net)
-   148	{
-   149		struct nfsd_net *nn = net_generic(net, nfsd_net_id);
-   150		struct knfsd_fh *fh = &fhp->fh_handle;
-   151		siphash_key_t *fh_key = nn->fh_key;
-   152		u64 hash;
-   153	
-   154		if (!(fhp->fh_export->ex_flags & NFSEXP_SIGN_FH))
-   155			return 0;
-   156	
-   157		if (!fh_key) {
-   158			pr_warn_ratelimited("NFSD: unable to sign filehandles, fh_key not set.\n");
-   159			return -EINVAL;
-   160		}
-   161	
-   162		if (fh->fh_size + sizeof(hash) > fhp->fh_maxsize) {
-   163			pr_warn_ratelimited("NFSD: unable to sign filehandles, fh_size %d would be greater"
-   164				" than fh_maxsize %d.\n", (int)(fh->fh_size + sizeof(hash)), fhp->fh_maxsize);
-   165			return -EINVAL;
-   166		}
-   167	
- > 168		hash = cpu_to_le64(siphash(&fh->fh_raw, fh->fh_size, fh_key));
-   169		memcpy(&fh->fh_raw[fh->fh_size], &hash, sizeof(hash));
-   170		fh->fh_size += sizeof(hash);
-   171	
-   172		return 0;
-   173	}
-   174	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
