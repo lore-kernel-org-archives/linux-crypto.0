@@ -1,48 +1,93 @@
-Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.12])
+Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B977E2857CC
-	for <linux-crypto@vger.kernel.org>; Sat,  7 Feb 2026 14:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FCC2E6CDF;
+	Sat,  7 Feb 2026 18:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770475885; cv=none; b=gPeSbL7OMiA4jbeqqk62HADjBovTuF9itj6ZjNu/CRtQdaYXPp0i1AJtGZfad0dWBAOuoeDECAb7Lgr8KywkE2sWtqp22OmO9gGukkPZMQ+CKXeMcv9zFmcE5/BTwG2qlN5n+TtYbuUkrBlDWp3p/lRDIE4DNQJfReXBIfic9ss=
+	t=1770488416; cv=none; b=NMRB9q/VfboEp3L51Kdtg9xZEyGrS0VT+5YgizZuMIv+33E+yOXYFV6Qtvr8gOtcL/R179sHRvQjJjNnAFT4K0Bw33sAb7G8FmAzxQZypRvOtcZ4Rie5/QOyuMfD3/9WpiqD7Sdv3p174HpYqM+4jBrr9TOzMrP1EYLiPdEpMx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770475885; c=relaxed/simple;
-	bh=+TVIkrnnKYe05nVQGbOr0WuSKXxtceKYsEDlq8nBq7E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rQ5BaqP7+dZtua0KAd1SDZojo+BnSDCCOFflRQ9tT0xdi3DSyL91eGck3yTVuXeqeAaEOqESibzyEy/8c8bTHBO2OOeFujtrahS4GUEBVsxC8H0DnI6XBrl2XOwPNPAhVBPxT8o++kj6MJCDecBfgd4JiSJYgWPDLXOrC4Ctj/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=WyJj2duG; arc=none smtp.client-ip=212.77.101.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+	s=arc-20240116; t=1770488416; c=relaxed/simple;
+	bh=VQ/+d4GtvWgsueFwR/GePFVNJiRwnBr+ARdraOOAr5c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uqYR9/UisTD6jespdL+2HQVZOyLZJp0oFJsziT8vM+zCR7BM5atqLqNutaVOOuvtNbln8teHxWveEmSvpxddbfbuh2XXYSTwIUqMVl99MmIuwnNM2FDD2w6nncDqDFA3OYZmwVf9SxNa6ERDqL8jmbaIwxopU9cU+dTHa1t7k5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=likewhatevs.io; spf=pass smtp.mailfrom=likewhatevs.io; dkim=pass (2048-bit key) header.d=likewhatevs.io header.i=@likewhatevs.io header.b=hj+1ZigH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=scnshh+E; arc=none smtp.client-ip=202.12.124.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=likewhatevs.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=likewhatevs.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="WyJj2duG"
-Received: (wp-smtpd smtp.wp.pl 30724 invoked from network); 7 Feb 2026 15:51:16 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1770475876; bh=g8RweSPsSx90HGKGWAf4fbdUjyVCzKHo/JKtMVQFa5s=;
-          h=From:To:Cc:Subject;
-          b=WyJj2duGCo2fZY760i4V2WxafPRpd8OLmZArPEyF5d43kqbdwL/o6IN7x1Dc3HAmp
-           af6BlUUfCbKRAD6jIFfnanEHS8hJ2wyVddBfPCFt/0X2Y8JLR8mlKW+5deYII2F/ss
-           ru7RkbsayF0ZgNuGCI1ApS99Kb2EFnlkeQ7Z0c7E/jf2zOxwi/rRUzqNsoK71SnxDu
-           9f4RqCq1IZcR0YjCStWlPuSfwbClwzx2FGKDQU9RU21wpe5YTPFPSig8OihRwq7VmG
-           cZNMJxgq1NsLptht3IH1aUj8ISW1d7Ck7QPFV20k656kfeQfSyg3A37y9EwxqpcRFL
-           M0S7hDUAgQF9A==
-Received: from 83.5.238.100.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.5.238.100])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <herbert@gondor.apana.org.au>; 7 Feb 2026 15:51:16 +0100
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
+	dkim=pass (2048-bit key) header.d=likewhatevs.io header.i=@likewhatevs.io header.b="hj+1ZigH";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="scnshh+E"
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 326377A00D0;
+	Sat,  7 Feb 2026 13:20:14 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Sat, 07 Feb 2026 13:20:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=likewhatevs.io;
+	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
+	:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to; s=fm2; t=1770488413; x=1770574813; bh=IO9ywlmGfc
+	BO8cnAVToZ1n7BPbwOAGIfRGMDEBBgO1w=; b=hj+1ZigHU81o+NgMkXYIWGF7ac
+	JxJOZbGFRp6ULfRHAASao55TltRLZtYcW9GHH2MludYrrFV7tATV7/7e7ePf2o1z
+	4BsjKpRVnuHFzLsZgMyAMA659mn3gxv1e2LSZZWeFX5esJ5ej0jnkRI0TVB9sW79
+	8zl+RaAmxOZNI+57wjI4eoC/YE/Riu4rZi9iBy0grsndc3EcKasG9YtnEHwj6xzt
+	IYxuQMHJ1Y8tcE39whOiHgrLGyLJybG5C+6UM1/DJpamUcWLvP3W8eCNUTog1pUA
+	1YvMjbJjQFvSD4psvjnC7o7RDqdZBSUvlnh/zqApuLuFqCxSaPvqdHfxGrAg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1770488413; x=1770574813; bh=IO9ywlmGfcBO8cnAVToZ1n7BPbwOAGIfRGM
+	DEBBgO1w=; b=scnshh+Eyp8vbWpEJZwXyQ42wx9fOMRLdG/Inh/AhATRedpgXqt
+	TplI1PiNZEnH0DBwnu/rgFAY+IJKIG+WOTFHZ5V37/c8Qq3Jqe8v5OYHBjn8ZzoD
+	6UQaSzULcm8GqLl+4VXWvhq8p+/05P1OAB4tdj/i9FwcMU3nI7GGO5PL4BdMr/W6
+	/GO6Ktf4RaVCjPHjouE4zaLqCtcqYTaaX8hmANPgRDnmx5yRzkkje/T+nsZuqXFX
+	grW1MfMECRCpjm6BtA47cSNqFzWi9l5UfUkfT/cLcdxj8sZ2Q1VYc1cMhFsuzGhi
+	FFPSqaJbYJMfsEQA500weji+vwsZEX4+ggg==
+X-ME-Sender: <xms:W4KHaTMiwKZ77nWxK0cjRY_0OfM9c4E8cJA7gUHWhEFDysakuaIjMQ>
+    <xme:W4KHabdEetlCfRR1QHP__0XUWwZyh9iirILazW9OhONVoxULHV_n-IarcdHg_fTHh
+    uUzSPfEm0laaPJepuUIKqgNPVvY9vc2gN_kAy_DgGrt1xPQzYO8w5U>
+X-ME-Received: <xmr:W4KHaU6fRRvaVC2AA6nCDc_ZaEwn2V9cUezqrkTchOS7IYmmT24TrxbnHEKj5jZjAvxqK-3SItW5Kw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduledujeehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomheprfgrthcuufhomhgr
+    rhhuuceophgrthhsoheslhhikhgvfihhrghtvghvshdrihhoqeenucggtffrrghtthgvrh
+    hnpeefveeiveeijefgueettdejleelieefvddtkeekudduveetveeutdehffeiueehuden
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehprghtsh
+    hosehlihhkvgifhhgrthgvvhhsrdhiohdpnhgspghrtghpthhtohepuddvpdhmohguvgep
+    shhmthhpohhuthdprhgtphhtthhopegrrhgvihdrghhonhhglhgviheshhhurgifvghird
+    gtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrdgrphgrnhgrrdhorhhg
+    rdgruhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpth
+    htohepmhhsthesrhgvughhrghtrdgtohhmpdhrtghpthhtohepjhgrshhofigrnhhgsehr
+    vgguhhgrthdrtghomhdprhgtphhtthhopehtjheskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htohepgihurghniihhuhhosehlihhnuhigrdgrlhhisggrsggrrdgtohhmpdhrtghpthht
+    ohepvghpvghrvgiimhgrsehrvgguhhgrthdrtghomhdprhgtphhtthhopehvihhrthhurg
+    hlihiirghtihhonheslhhishhtshdrlhhinhhugidruggvvh
+X-ME-Proxy: <xmx:W4KHadI1JHH2Bey7c4l-btoCiMwH0fV3m__YW9Oun14EW6bW2M3nYQ>
+    <xmx:W4KHaeXd3Z79DGZAKbFUFXV-eLdT6XlVispDxwSXQWL8Yy9uR_oTzg>
+    <xmx:W4KHaZHAWT7FOxBsqgGnyVW0v5KF52nkq7Ugr865wijjbypWt8JbnQ>
+    <xmx:W4KHad6CAxE5JcDe3KW55Zfyb5lOYxQ60rNHATA-ooL38bPRvPJFhg>
+    <xmx:XYKHabyKJEV_eTRBlBauzhDr9DX0WO9d0KD1aj0eQJNc-8aT1RSeri2M>
+Feedback-ID: i7f194913:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 7 Feb 2026 13:20:11 -0500 (EST)
+From: Pat Somaru <patso@likewhatevs.io>
+To: Gonglei <arei.gonglei@huawei.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Tejun Heo <tj@kernel.org>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	virtualization@lists.linux.dev,
 	linux-crypto@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH] crypto: testmgr - Add test vectors for authenc(hmac(md5),cbc(des))
-Date: Sat,  7 Feb 2026 15:51:03 +0100
-Message-ID: <20260207145113.375192-1-olek2@wp.pl>
-X-Mailer: git-send-email 2.47.3
+	linux-kernel@vger.kernel.org,
+	Pat Somaru <patso@likewhatevs.io>
+Subject: [PATCH] crypto: virtio: Convert from tasklet to BH workqueue
+Date: Sat,  7 Feb 2026 13:20:01 -0500
+Message-ID: <20260207182001.2242836-1-patso@likewhatevs.io>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,107 +95,110 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: 48011265b9172d94413420b8c64bca8f
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000008 [ERv0]                               
 
-Test vector was generated using a software implementation and then double
-checked on Mediatek MT7981 (safexcel) and NXP P2020 (talitos). Both
-platforms pass self-tests.
+The only generic interface to execute asynchronously in the BH context
+is tasklet; however, it's marked deprecated and has some design flaws
+such as the execution code accessing the tasklet item after the
+execution is complete which can lead to subtle use-after-free in certain
+usage scenarios and less-developed flush and cancel mechanisms.
 
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+To replace tasklets, BH workqueue support was recently added. A BH
+workqueue behaves similarly to regular workqueues except that the queued
+work items are executed in the BH context.
+
+Convert virtio_crypto_core.c from tasklet to BH workqueue.
+
+Semantically, this is an equivalent conversion and there shouldn't be
+any user-visible behavior changes. The BH workqueue implementation uses
+the same softirq infrastructure, and performance-critical networking
+conversions have shown no measurable performance impact.
+
+Signed-off-by: Pat Somaru <patso@likewhatevs.io>
 ---
- crypto/testmgr.c |  7 ++++++
- crypto/testmgr.h | 57 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 64 insertions(+)
+ Hi, I'm working on converting tasklet usages to the BH WQ API.
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 3d60d9ae9416..a14829b67894 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4079,6 +4079,13 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.suite = {
- 			.aead = __VECS(aegis128_tv_template)
- 		}
-+	}, {
-+		.alg = "authenc(hmac(md5),cbc(des))",
-+		.generic_driver = "authenc(hmac-md5-lib,cbc(des-generic))",
-+		.test = alg_test_aead,
-+		.suite = {
-+			.aead = __VECS(hmac_md5_des_cbc_tv_temp)
-+		}
- 	}, {
- 		.alg = "authenc(hmac(md5),cbc(des3_ede))",
- 		.generic_driver = "authenc(hmac-md5-lib,cbc(des3_ede-generic))",
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 92b54038d24a..971a1129236c 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -17509,6 +17509,63 @@ static const struct aead_testvec hmac_sha512_aes_cbc_tv_temp[] = {
- 	},
+ The virtio-crypto driver uses a tasklet per data queue to process
+ completed crypto operations in BH context. This converts that tasklet
+ to use the BH workqueue infrastructure.
+
+ This patch was tested by:
+    - Building with allmodconfig: no new warnings (compared to v6.18)
+    - Building with allyesconfig: no new warnings (compared to v6.18)
+    - Booting defconfig kernel via vng and running `uname -a`:
+    Linux virtme-ng 6.18.0-virtme #1 SMP PREEMPT_DYNAMIC 0 x86_64 GNU/Linux
+
+ Maintainers can apply this directly to the crypto subsystem tree or ack
+ it for the workqueue tree to carry.
+
+ drivers/crypto/virtio/virtio_crypto_common.h |  3 ++-
+ drivers/crypto/virtio/virtio_crypto_core.c   | 11 +++++------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/crypto/virtio/virtio_crypto_common.h b/drivers/crypto/virtio/virtio_crypto_common.h
+index 19c934af3df6..c758a5a37729 100644
+--- a/drivers/crypto/virtio/virtio_crypto_common.h
++++ b/drivers/crypto/virtio/virtio_crypto_common.h
+@@ -11,6 +11,7 @@
+ #include <linux/crypto.h>
+ #include <linux/spinlock.h>
+ #include <linux/interrupt.h>
++#include <linux/workqueue.h>
+ #include <crypto/aead.h>
+ #include <crypto/aes.h>
+ #include <crypto/engine.h>
+@@ -29,7 +30,7 @@ struct data_queue {
+ 	char name[32];
+ 
+ 	struct crypto_engine *engine;
+-	struct tasklet_struct done_task;
++	struct work_struct done_work;
  };
  
-+static const struct aead_testvec hmac_md5_des_cbc_tv_temp[] = {
-+	{ /*Generated with cryptopp*/
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
-+#endif
-+			  "\x00\x00\x00\x08"	/* enc key length */
-+			  "\x11\x22\x33\x44\x55\x66\x77\x88"
-+			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
-+			  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24",
-+		.klen	= 8 + 16 + 8,
-+		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
-+		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01"
-+			  "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
-+		.alen   = 16,
-+		.ptext	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
-+			  "\x53\x20\x63\x65\x65\x72\x73\x74"
-+			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
-+			  "\x20\x79\x65\x53\x72\x63\x74\x65"
-+			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
-+			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
-+			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
-+			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
-+			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
-+			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
-+			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
-+			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
-+			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
-+			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
-+			  "\x63\x65\x65\x72\x73\x74\x54\x20"
-+			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
-+		.plen	= 128,
-+		.ctext	= "\x70\xd6\xde\x64\x87\x17\xf1\xe8"
-+			  "\x54\x31\x85\x37\xed\x6b\x01\x8d"
-+			  "\xe3\xcc\xe0\x1d\x5e\xf3\xfe\xf1"
-+			  "\x41\xaa\x33\x91\xa7\x7d\x99\x88"
-+			  "\x4d\x85\x6e\x2f\xa3\x69\xf5\x82"
-+			  "\x3a\x6f\x25\xcb\x7d\x58\x1f\x9b"
-+			  "\xaa\x9c\x11\xd5\x76\x67\xce\xde"
-+			  "\x56\xd7\x5a\x80\x69\xea\x3a\x02"
-+			  "\xf0\xc7\x7c\xe3\xcb\x40\xe5\x52"
-+			  "\xd1\x10\x92\x78\x0b\x8e\x5b\xf1"
-+			  "\xe3\x26\x1f\xe1\x15\x41\xc7\xba"
-+			  "\x99\xdb\x08\x51\x1c\xd3\x01\xf4"
-+			  "\x87\x47\x39\xb8\xd2\xdd\xbd\xfb"
-+			  "\x66\x13\xdf\x1c\x01\x44\xf0\x7a"
-+			  "\x1a\x6b\x13\xf5\xd5\x0b\xb8\xba"
-+			  "\x53\xba\xe1\x76\xe3\x82\x07\x86"
-+			  "\x95\x9e\x7d\x37\x1e\x60\xaf\x7c"
-+			  "\x53\x12\x61\x68\xef\xb4\x47\xa6",
-+			  .clen	= 128 + 16,
-+	},
-+};
-+
- static const struct aead_testvec hmac_sha1_des_cbc_tv_temp[] = {
- 	{ /*Generated with cryptopp*/
- #ifdef __LITTLE_ENDIAN
+ struct virtio_crypto {
+diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
+index 3d241446099c..345d1f1ed195 100644
+--- a/drivers/crypto/virtio/virtio_crypto_core.c
++++ b/drivers/crypto/virtio/virtio_crypto_core.c
+@@ -70,9 +70,9 @@ int virtio_crypto_ctrl_vq_request(struct virtio_crypto *vcrypto, struct scatterl
+ 	return 0;
+ }
+ 
+-static void virtcrypto_done_task(unsigned long data)
++static void virtcrypto_done_work(struct work_struct *work)
+ {
+-	struct data_queue *data_vq = (struct data_queue *)data;
++	struct data_queue *data_vq = from_work(data_vq, work, done_work);
+ 	struct virtqueue *vq = data_vq->vq;
+ 	struct virtio_crypto_request *vc_req;
+ 	unsigned int len;
+@@ -91,7 +91,7 @@ static void virtcrypto_dataq_callback(struct virtqueue *vq)
+ 	struct virtio_crypto *vcrypto = vq->vdev->priv;
+ 	struct data_queue *dq = &vcrypto->data_vq[vq->index];
+ 
+-	tasklet_schedule(&dq->done_task);
++	queue_work(system_bh_wq, &dq->done_work);
+ }
+ 
+ static int virtcrypto_find_vqs(struct virtio_crypto *vi)
+@@ -145,8 +145,7 @@ static int virtcrypto_find_vqs(struct virtio_crypto *vi)
+ 			ret = -ENOMEM;
+ 			goto err_engine;
+ 		}
+-		tasklet_init(&vi->data_vq[i].done_task, virtcrypto_done_task,
+-				(unsigned long)&vi->data_vq[i]);
++		INIT_WORK(&vi->data_vq[i].done_work, virtcrypto_done_work);
+ 	}
+ 
+ 	kfree(vqs_info);
+@@ -497,7 +496,7 @@ static void virtcrypto_remove(struct virtio_device *vdev)
+ 	if (virtcrypto_dev_started(vcrypto))
+ 		virtcrypto_dev_stop(vcrypto);
+ 	for (i = 0; i < vcrypto->max_data_queues; i++)
+-		tasklet_kill(&vcrypto->data_vq[i].done_task);
++		cancel_work_sync(&vcrypto->data_vq[i].done_work);
+ 	virtio_reset_device(vdev);
+ 	virtcrypto_free_unused_reqs(vcrypto);
+ 	virtcrypto_clear_crypto_engines(vcrypto);
 -- 
-2.47.3
+2.52.0
 
