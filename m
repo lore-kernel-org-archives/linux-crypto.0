@@ -1,108 +1,60 @@
-Received: from sg-1-106.ptr.blmpb.com (sg-1-106.ptr.blmpb.com [118.26.132.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-43166.protonmail.ch (mail-43166.protonmail.ch [185.70.43.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0971F2EC09B
-	for <linux-crypto@vger.kernel.org>; Tue, 10 Feb 2026 15:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B710536655F;
+	Tue, 10 Feb 2026 15:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770738001; cv=none; b=p62kl3f+m478yRbZyTE4v2uDuc5TB0t2I31yCUZn3QN6csCLjZW+LjalXo/OQ8178UqvrqOpns3M4k5ZxAxHqelaNWwB0OaqGAL6nrW/XSXKRAYCnRU/ysK+htfwnPdQc39vI9Bdg+6qs4hWuZ2dozjkAZiPA9U1HxBUhIwALdI=
+	t=1770738713; cv=none; b=OGaLo7i/ahZEXgKUZ8gZ7dex6CGFn412NRdfkIIFXFtbNSRrAMw5bBdJOaw8oVGrqcdIJ5FWQ5l4nS30d7E9PoLd9SspQSHSRfySDDAQ7Uk1tDzL3wvMqPLjO63IrxBSKBuNlFc4DdtEg67ND5dczKeuL7iDspVZ6bNlxeZ2mOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770738001; c=relaxed/simple;
-	bh=trve732AgltMeQxAnUf6kkiKtd/zzaxWrHhod0JjZ3Y=;
-	h=From:Subject:Message-Id:To:Mime-Version:Cc:Date:Content-Type; b=HlyWgpVUyYbxYMa674W0xMqVLqyRfPN1frOW9ajL9LgFUAXquEuhRvLQ5vzFK6yS+HLQXb6knubAnyN+r821DGkfVWOFx3Jd1snYd1uJ9ryfj5XGSWkChpssUEFm1ClUipEom/ArZFkyh6keeedzU6T1NsoTHBgzqDRkTXcnwRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Sz1uPfFb; arc=none smtp.client-ip=118.26.132.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+	s=arc-20240116; t=1770738713; c=relaxed/simple;
+	bh=34OFtMeiR5wUzClo47SIW6uNbMfy0kbQSz5F4kadDqU=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=QDy4Da9LfmO0VC/RSrKnyH51CEbEmbitFUxjYC25Op4pJYzfA4XFK6APj45y6kdshqJzFW1YaPaVBybZG/4CFBDgocGpxHNpOUl+uyDQyeBuziMJvLHqjyFC8axCzeVORmoyWl1lTaYcPVJOTqFFSoHmPwgDB/qn6vYNerHC4PM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=RFff/hrf; arc=none smtp.client-ip=185.70.43.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Sz1uPfFb"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=2212171451; d=bytedance.com; t=1770737980; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=UKhlb2nYYS80HSax6rX6UvTS5mIaY8mJEZbyrVr+z7w=;
- b=Sz1uPfFbka+6tBm3ZDCKg6tOlGmDtxv6jhfyoQiGvcjn/JoWsxMxw79YwqZr7/qAnZrL8H
- Pg8/toMnnwwiCbWr1AuBSTEaDoX108S7wD4SiZQ5HODBpc5s86c0SLz1VeAqpBm97Ily6y
- ZDocJGpMx1BY/UDAusFoWhHQJuPaMiVU0jgBuUxP5rld/SHU20n95fRjgVNAXvQM2hSZYH
- COrCmIkoA55/fmQ4aVtgo46gtBCaTqV4FnOA0bwBcIemk5lcO2vtOH24R8MhP+WYWMwfT8
- ZTrVuQfyTjeoCJtac5Z1+T+QFqXd2Gv3K6vkC3N2dfZiO+Udq7+DxFikSCV6Pw==
-From: "Chuyi Zhou" <zhouchuyi@bytedance.com>
-Subject: [PATCH] padata: Remove cpu online check from cpu add and removal
-Message-Id: <20260210153922.3435735-1-zhouchuyi@bytedance.com>
-X-Mailer: git-send-email 2.20.1
-X-Lms-Return-Path: <lba+2698b513a+0476b7+vger.kernel.org+zhouchuyi@bytedance.com>
-To: <herbert@gondor.apana.org.au>, <steffen.klassert@secunet.com>, 
-	<daniel.m.jordan@oracle.com>
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="RFff/hrf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1770738709; x=1770997909;
+	bh=f+OeOu6d18yS6QYGt1T/jc+J53ihviCW43RtoHdMyak=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=RFff/hrfUPe6qoHHW8PrjKXX9vir+Nl2Xi7IFKJcUGAT+g1jqYgc8B4k7R8WQ83e+
+	 c9RFL5bNQoB7gzCquqkA4QL/Tv67N5CQlbNTfoTjNrLknqapD3nCia2kf+1LhWs/VU
+	 6EqZJWHmHbfbPfF4K+QYlnuK6H0FZABFT+Cce6h6DA9e4PPD4KOlGORYoEfpda3cyU
+	 3OBfxINDJ9RersLRfVFcgqll7tjzTMHTTTdt0FgOyWRlf7/ij93ewDvzI0T1NBVJPj
+	 y0M58DtM1pJ3gWkcby6B9N1ATA7lWu+Nrkl2z66w5q66UYaR0BVMdPq0hfHLf/BQ6q
+	 5F0LQ4W+r3smQ==
+Date: Tue, 10 Feb 2026 15:51:45 +0000
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+From: Jari Ruusu <jariruusu@protonmail.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Announce loop-AES-v3.8h file/swap crypto package
+Message-ID: <MzA2mC2MkUUoXetmgkGqYH3atXVhBP5XjUZhGXOOPUzqI2KF_L92-TfLcElaIZZAymE7ODLN3xwCbn41BmXMsilZuxPpK4zafwlcgAL-nNs=@protonmail.com>
+Feedback-ID: 22639318:user:proton
+X-Pm-Message-ID: 83b5840e0c5b508fe9529f036a627ef1d8b2f1ef
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Original-From: Chuyi Zhou <zhouchuyi@bytedance.com>
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, "Chuyi Zhou" <zhouchuyi@bytedance.com>
-Date: Tue, 10 Feb 2026 23:39:22 +0800
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-During the CPU offline process, the dying CPU is cleared from the
-cpu_online_mask in takedown_cpu(). After this step, various CPUHP_*_DEAD
-callbacks are executed to perform cleanup jobs for the dead CPU, so this
-cpu online check in padata_cpu_dead() is unnecessary.
+loop-AES changes since previous release:
+- 64-bit ARM64 AES Crypto Extension (CE) instructions
+  use scoped_ksimd() on 6.19+ kernels.
+=20
+bzip2 compressed tarball is here:
+=20
+    https://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.8h.tar.bz2
+    md5sum b7e67577d3934a325fddfe06d92f6722
+=20
+    https://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.8h.tar.bz2.sign
 
-Similarly, when executing padata_cpu_online() during the
-CPUHP_AP_ONLINE_DYN phase, the CPU has already been set in the
-cpu_online_mask, the action even occurs earlier than the
-CPUHP_AP_ONLINE_IDLE stage.
+--
+Jari Ruusu=C2=A0 4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD=C2=A0 ACDF F073 3C=
+80 8132 F189
 
-Remove this unnecessary cpu online check in __padata_add_cpu() and
-__padata_remove_cpu().
-
-Signed-off-by: Chuyi Zhou <zhouchuyi@bytedance.com>
----
- kernel/padata.c | 22 ++++++++--------------
- 1 file changed, 8 insertions(+), 14 deletions(-)
-
-diff --git a/kernel/padata.c b/kernel/padata.c
-index aa66d91e20f9..53ce56053dd3 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -732,15 +732,11 @@ EXPORT_SYMBOL(padata_set_cpumask);
- 
- static int __padata_add_cpu(struct padata_instance *pinst, int cpu)
- {
--	int err = 0;
--
--	if (cpumask_test_cpu(cpu, cpu_online_mask)) {
--		err = padata_replace(pinst);
-+	int err = padata_replace(pinst);
- 
--		if (padata_validate_cpumask(pinst, pinst->cpumask.pcpu) &&
--		    padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
--			__padata_start(pinst);
--	}
-+	if (padata_validate_cpumask(pinst, pinst->cpumask.pcpu) &&
-+		padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
-+		__padata_start(pinst);
- 
- 	return err;
- }
-@@ -749,13 +745,11 @@ static int __padata_remove_cpu(struct padata_instance *pinst, int cpu)
- {
- 	int err = 0;
- 
--	if (!cpumask_test_cpu(cpu, cpu_online_mask)) {
--		if (!padata_validate_cpumask(pinst, pinst->cpumask.pcpu) ||
--		    !padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
--			__padata_stop(pinst);
-+	if (!padata_validate_cpumask(pinst, pinst->cpumask.pcpu) ||
-+		!padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
-+		__padata_stop(pinst);
- 
--		err = padata_replace(pinst);
--	}
-+	err = padata_replace(pinst);
- 
- 	return err;
- }
--- 
-2.20.1
