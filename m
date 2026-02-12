@@ -1,52 +1,52 @@
-Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
+Received: from pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.13.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99AF83EBF31;
-	Thu, 12 Feb 2026 03:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3834414;
+	Thu, 12 Feb 2026 03:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.13.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770865272; cv=none; b=uzb5HIOZiinpL+XS3z7yfgzrlji4x9eWq4pySviN98NvnXZKUgrRivbQK2eA6se6mQPRQZzY7LVpgqKnH43FXdpodJPOxkzTaZx9ENEIWqFFzlAQ0A97QAoOwZoA4Zh9yg6NF0Jw1L38UkSWkk6q7Q5738Funp5KwpI0TwIf8RA=
+	t=1770865286; cv=none; b=WPgllH2xQuH/H+EpZHCo6WR5mnCmVGNVrK7xuW1amIphOPw1JtLJDE0uDta3f3gXafz+NFcIJz4HmJblbynUA544uBmX0hDMZvzTh3zrn4TxUbbJ0huyRtQHAK+lveH9k7Us3YwAssuKDNaiLhn5Gd6kDuVLrUz/yeqkzalMpng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770865272; c=relaxed/simple;
-	bh=3r7ht40/dSaRUq4ENEZ95KqBrd4/VyP5gW2BtgBmqkg=;
+	s=arc-20240116; t=1770865286; c=relaxed/simple;
+	bh=HwUNx0MQt/VnOg2GHnzcRLYNcA3BcQbedLkoOArnpvo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JmnRey9Ici3KOWuQYMRcngH2lSfS0kUB5jRrE0BLvnfuTa419JlYiVdFJ0e8SpRzmhofavm1wBhan8DLRNZe5dLIpPf+FnDGTczp64m7m5jgv+D2NUv3S6pl9EgkNOFDZt8CAm3OMQee+ECJS9l+SjHLCR3kUwPyrvF463F1wds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=NXg0Gn7s; arc=none smtp.client-ip=35.155.198.111
+	 MIME-Version:Content-Type; b=XlqX6NL5YCl5Xmzu42UWjzgd+xSaCQojjQjBOOICiH+FhhnX44LB+7QtG0o8IB/zp77FWfDGKaaXK0sHo0LYvlKit+omkehx4pJrp6ZPHARO8C45+5pvsJ/Qw0MD1eHmfgHW0rnnWn57crPaoM9b9zoXP8uyGiWMWpF8lE+1Q/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=dO6kUhBn; arc=none smtp.client-ip=52.13.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="NXg0Gn7s"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="dO6kUhBn"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1770865271; x=1802401271;
+  t=1770865285; x=1802401285;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=H24b9NbQmIPZ7x8DsV1W6Gp6H2uPR71iqVVMu1piz/8=;
-  b=NXg0Gn7svx1AfgXje2EoEDACJ+erUUJBoq1t1gV4mDbNSjiPLK689I5N
-   ADq8QibeMRQXp8gPF1oFgDhQ5SUAEUXzRMoYX2gQlZh7CE6aLK+s+m4hh
-   vls9aU5njKE2hnnNudU0RUoGh+FaJuY1JRJ6PLwcOzv0MBZ06QLf+Q1S+
-   utiMvzIy5PppCQL0ehcMGeGKWiNLcQnhbDB6lv/LgCAoZQvu6GzEZVKw5
-   EYOg9upCKEp2wF8QLqd24EcK0a5ghbxISKBRAanR20ybBEsOUYARvo4uV
-   nHsg6ziQrrZX8CnwJ9dkNf/5lmG+FFOBFk7INc/VNYGo8nl98cgvBkRDp
+  bh=hcIM2QPZHzjzuquzQlPp2viA2Y2/npOOMsN3iH0l2+0=;
+  b=dO6kUhBnliEgvZszOSeRLiKj0+dc67ugcjnsL+kdIMwNngx3Xnv8aWZT
+   C32Izj+ZKdFrkrWkKE0sGxLxUyrsJwr+5iM37DOY+Y0Do5hIRKNOYMKST
+   6EAxSkzcjGfTzxdnusCrTs6eeZKWKXaR7nt/tSv+p9u5PCwg7KRLhtPoO
+   64JJWw2u4tnDMgYFFpLue/MuIg7B5AFIj4JKkymzzNeIT/aSkcdWh5x3Z
+   8bGDP97AnsQ2Kkqn6HGQKJvvRrvzdolDDWKXoKCMn3OhOasGh+PjK1v3n
+   VyUugz1bK7TuhffR3ACCTC5S2vBhqF3v5e7UIDAC+AQjy8yk+gp5M9GFW
    A==;
-X-CSE-ConnectionGUID: cbW6MUqmRZ2RXJ2jsirDSA==
-X-CSE-MsgGUID: rorEgPC6QU6gTtrgqgUcwQ==
+X-CSE-ConnectionGUID: oWQ5xUBZR+yjjKtxMzMC7A==
+X-CSE-MsgGUID: 7FKYcYEnR3aD+dH9Xu/5cg==
 X-IronPort-AV: E=Sophos;i="6.21,285,1763424000"; 
-   d="scan'208";a="12803560"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 03:01:11 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [205.251.233.236:19058]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.40.228:2525] with esmtp (Farcaster)
- id a253ba3b-c276-4167-a844-fba602f81218; Thu, 12 Feb 2026 03:01:11 +0000 (UTC)
-X-Farcaster-Flow-ID: a253ba3b-c276-4167-a844-fba602f81218
+   d="scan'208";a="12918024"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 03:01:25 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [205.251.233.105:21642]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.103:2525] with esmtp (Farcaster)
+ id d9355a1b-c65f-4f57-984b-ca1499704078; Thu, 12 Feb 2026 03:01:25 +0000 (UTC)
+X-Farcaster-Flow-ID: d9355a1b-c65f-4f57-984b-ca1499704078
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 12 Feb 2026 03:01:09 +0000
+ Thu, 12 Feb 2026 03:01:25 +0000
 Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 12 Feb 2026 03:01:09 +0000
+ Thu, 12 Feb 2026 03:01:24 +0000
 From: Jay Wang <wanjay@amazon.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
 	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>
@@ -59,9 +59,9 @@ CC: Jay Wang <jay.wang.upstream@gmail.com>, Vegard Nossum
 	<nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <x86@kernel.org>,
 	<linux-kbuild@vger.kernel.org>, <linux-modules@vger.kernel.org>
-Subject: [PATCH 053/106] crypto: convert exported crypto symbol into pluggable interface for CONFIG_CRYPTO_XTS crypto
-Date: Thu, 12 Feb 2026 02:46:29 +0000
-Message-ID: <20260212024725.11264-54-wanjay@amazon.com>
+Subject: [PATCH 054/106] crypto: convert exported crypto symbol into pluggable interface for CONFIG_CRYPTO_XCTR and CONFIG_CRYPTO_HCTR2 crypto
+Date: Thu, 12 Feb 2026 02:46:30 +0000
+Message-ID: <20260212024725.11264-55-wanjay@amazon.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260212024725.11264-1-wanjay@amazon.com>
 References: <20260212024725.11264-1-wanjay@amazon.com>
@@ -73,47 +73,65 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
+X-ClientProxiedBy: EX19D033UWC001.ant.amazon.com (10.13.139.218) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
 Apply Crypto API wrappers to the exported crypto symbol in
-CONFIG_CRYPTO_XTS-related crypto to convert them into pluggable
-interface.
+CONFIG_CRYPTO_XCTR- and CONFIG_CRYPTO_HCTR2-related crypto to convert
+them into pluggable interface.
 
 Signed-off-by: Jay Wang <wanjay@amazon.com>
 ---
- crypto/Makefile | 2 +-
- crypto/xts.c    | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ crypto/Makefile | 4 ++--
+ crypto/hctr2.c  | 4 ++--
+ crypto/xctr.c   | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/crypto/Makefile b/crypto/Makefile
-index 73c700538792..33e4e3a03c40 100644
+index 33e4e3a03c40..c3b0de034a47 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
-@@ -93,7 +93,7 @@ crypto-objs-$(CONFIG_CRYPTO_CBC) += cbc.o
- crypto-objs-$(CONFIG_CRYPTO_PCBC) += pcbc.o
- crypto-objs-$(CONFIG_CRYPTO_CTS) += cts.o
+@@ -95,8 +95,8 @@ crypto-objs-$(CONFIG_CRYPTO_CTS) += cts.o
  crypto-objs-$(CONFIG_CRYPTO_LRW) += lrw.o
--obj-$(CONFIG_CRYPTO_XTS) += xts.o
-+crypto-objs-$(CONFIG_CRYPTO_XTS) += xts.o
+ crypto-objs-$(CONFIG_CRYPTO_XTS) += xts.o
  crypto-objs-$(CONFIG_CRYPTO_CTR) += ctr.o
- obj-$(CONFIG_CRYPTO_XCTR) += xctr.o
- obj-$(CONFIG_CRYPTO_HCTR2) += hctr2.o
-diff --git a/crypto/xts.c b/crypto/xts.c
-index 3da8f5e053d6..97e499893292 100644
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -466,8 +466,8 @@ static void __exit xts_module_exit(void)
- 	crypto_unregister_template(&xts_tmpl);
+-obj-$(CONFIG_CRYPTO_XCTR) += xctr.o
+-obj-$(CONFIG_CRYPTO_HCTR2) += hctr2.o
++crypto-objs-$(CONFIG_CRYPTO_XCTR) += xctr.o
++crypto-objs-$(CONFIG_CRYPTO_HCTR2) += hctr2.o
+ obj-$(CONFIG_CRYPTO_ADIANTUM) += adiantum.o
+ crypto-objs-$(CONFIG_CRYPTO_GCM) += gcm.o
+ crypto-objs-$(CONFIG_CRYPTO_CCM) += ccm.o
+diff --git a/crypto/hctr2.c b/crypto/hctr2.c
+index f4cd6c29b4d3..78c0fc9faee5 100644
+--- a/crypto/hctr2.c
++++ b/crypto/hctr2.c
+@@ -472,8 +472,8 @@ static void __exit hctr2_module_exit(void)
+ 					   ARRAY_SIZE(hctr2_tmpls));
  }
  
--module_init(xts_module_init);
--module_exit(xts_module_exit);
-+crypto_module_init(xts_module_init);
-+crypto_module_exit(xts_module_exit);
+-module_init(hctr2_module_init);
+-module_exit(hctr2_module_exit);
++crypto_module_init(hctr2_module_init);
++crypto_module_exit(hctr2_module_exit);
+ 
+ MODULE_DESCRIPTION("HCTR2 length-preserving encryption mode");
+ MODULE_LICENSE("GPL v2");
+diff --git a/crypto/xctr.c b/crypto/xctr.c
+index 607ab82cb19b..e3dee674b941 100644
+--- a/crypto/xctr.c
++++ b/crypto/xctr.c
+@@ -182,8 +182,8 @@ static void __exit crypto_xctr_module_exit(void)
+ 	crypto_unregister_template(&crypto_xctr_tmpl);
+ }
+ 
+-module_init(crypto_xctr_module_init);
+-module_exit(crypto_xctr_module_exit);
++crypto_module_init(crypto_xctr_module_init);
++crypto_module_exit(crypto_xctr_module_exit);
  
  MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("XTS block cipher mode");
+ MODULE_DESCRIPTION("XCTR block cipher mode of operation");
 -- 
 2.47.3
 
