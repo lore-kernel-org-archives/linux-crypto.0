@@ -1,52 +1,52 @@
-Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
+Received: from pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.26.1.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DBE223DEF;
-	Thu, 12 Feb 2026 02:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.34.181.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8745B225762;
+	Thu, 12 Feb 2026 03:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.26.1.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770865193; cv=none; b=aJt0TN52lRcR2nWnU9ZZ+1rJltpCUNSO+eVA4Zb+PSL0vWDURIneEi9l/0/316dqxtSxx/x8zFsQICgljF6v1B20Q0JPqJLmpIuhTqV/gRMFKQR+zu+oBkz2FRR0VC7k1m8V0WpX26Zoj//VTmZAM5C2ZMLDh4VvxgVwyb+xfZU=
+	t=1770865210; cv=none; b=d3JNSg9Gf7x3arLPjclOVEgxXOcRFBJiB2yHy3Lqkn+2xGypjHg5UVOggs1IN15pk6YBtPv6eVLSim5HniGRgMjeNfpLguWzWLknWjd/gb7W5ZAm4Jwm5HNGj0LX/D6UrQCwxWo1/SR05qoZZ3em4m5O4jaGuutJ636zE2+KTy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770865193; c=relaxed/simple;
-	bh=5v7RmKWoJR19T3M7rzDYS5JABgbL8PzjJqj7dgJz3VU=;
+	s=arc-20240116; t=1770865210; c=relaxed/simple;
+	bh=B1uNSuMxYgG6OHy05kGCyn1RFvgsGOp2e4bI2Nq7Rzc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k30Bnqx0ZpJFJLBJgSINaoMseCFOuBUGagyh9BC0zvmJ1TrlSSeaRndJi0UwueWprNKwqcLZIv6FGSOooOjhks6mVWEnkFRZjHmmSdqR+zHCMFtBcu/OZSS+jz+DQS59VpBwnPmTOEZTPkS7krOHdKyvkFj3Hf8LlWx0s9svnqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=JpUbWLCv; arc=none smtp.client-ip=52.34.181.151
+	 MIME-Version:Content-Type; b=kLNS2o755skBiXFTP7YpfhhOLMlK2C4UFkn6/xFePOjQVcE9lOy0Eft70xjWhgSh73Wlf7G3cfGHSJBPNAXyYB/BuNjlhXQ2nVDd3LeTGx1VgU/orw3iyzcc6rxdjUOiQR5/tO3xrJsP2M6ytUnWqEcohkKu+jnfXUoBhR/1lNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=hWnnYTJL; arc=none smtp.client-ip=52.26.1.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="JpUbWLCv"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="hWnnYTJL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1770865192; x=1802401192;
+  t=1770865209; x=1802401209;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=M3iy5AzhfysAv3JsLqwI5fBQHgwNeM/C4lM3EsRiivc=;
-  b=JpUbWLCvkvzXH8LStA4l+X8EOWkkEJ3zV8t9NajDEu424QdwJYyjV9Hn
-   Vao+tUFh9+cHAq7vG/SzrHNl++PCex5jF903Rd4wj2wv1vCOnwufOFQXC
-   CdtrriV23tmdGl50ObUA8NKBBJgjD5uv3SQBNzwxfEdFX+3XvLHUmGKRe
-   qoU6yY0E7yoaWXq1LVWQ+a7VBQIwwcXmHWocDiIkYLSMfG9ZP3yaq9Lqv
-   D/PpWnwvRAxmLDGvgClD3EA88ocEbgYvyUHEPAKrl8Qp3NrXeH0z+2gbY
-   YWrG0bhdALmOL/6eaMpAzsM2Zo+TiJS557a1ZV/o2IElkqfBBSy9Gn0on
-   Q==;
-X-CSE-ConnectionGUID: iVC5RUBcTT+oksJJpoQMtg==
-X-CSE-MsgGUID: 93rCgShITWeSVmS3ud6SHg==
+  bh=2ZP1fOo5T1MmkTb/Gf0mWMuVdFlCxywnYIxRUCBfLYY=;
+  b=hWnnYTJLS6h8hZvpTarl2h5O8EpuRoyX51shTJhFECqGXTI8QWrwFYTd
+   hwS2k7bkdkZ4QYDpXtK2OLi+qh3RRXmAuhO3WH3QUE7CVG6SbSpfxU+I5
+   2SFkqGQ8Pb+A+DcaVweWu0GMTRCfKgVmmFXhJUpV1f8MPzToDYNwyB94U
+   jsEekvWyqC3iHu3Et2yuBrzJbU6F//UbNxgGekv9o1yw1H0rw2BFCV+/y
+   X7gzGlwZH463CATIVdaeJ0lLTDp3DLFhEYzHbaKREeHpaCZIi06//YBbX
+   IWS595R3xXjSZPpc9//tTXiBuXZ8c40TNeKnTDUDN6vZ716cDmQNWMCI3
+   g==;
+X-CSE-ConnectionGUID: DId0OMUWQie8O0c/2w42XQ==
+X-CSE-MsgGUID: 8q5ylipxSou9Eg/YhSymWQ==
 X-IronPort-AV: E=Sophos;i="6.21,285,1763424000"; 
-   d="scan'208";a="12919737"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 02:59:52 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [205.251.233.105:15930]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.209:2525] with esmtp (Farcaster)
- id 1897b6f3-a75f-4e53-b2ff-c0d6d7b5fbc0; Thu, 12 Feb 2026 02:59:52 +0000 (UTC)
-X-Farcaster-Flow-ID: 1897b6f3-a75f-4e53-b2ff-c0d6d7b5fbc0
+   d="scan'208";a="12918292"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 03:00:09 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:3428]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.85:2525] with esmtp (Farcaster)
+ id 2a9ffcba-9336-4f57-a794-7c299457ab0f; Thu, 12 Feb 2026 03:00:09 +0000 (UTC)
+X-Farcaster-Flow-ID: 2a9ffcba-9336-4f57-a794-7c299457ab0f
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 12 Feb 2026 02:59:51 +0000
+ Thu, 12 Feb 2026 03:00:07 +0000
 Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 12 Feb 2026 02:59:51 +0000
+ Thu, 12 Feb 2026 03:00:07 +0000
 From: Jay Wang <wanjay@amazon.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
 	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>
@@ -59,9 +59,9 @@ CC: Jay Wang <jay.wang.upstream@gmail.com>, Vegard Nossum
 	<nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <x86@kernel.org>,
 	<linux-kbuild@vger.kernel.org>, <linux-modules@vger.kernel.org>
-Subject: [PATCH 048/106] crypto: convert exported crypto symbol into pluggable interface for CONFIG_CRYPTO_WP512 crypto
-Date: Thu, 12 Feb 2026 02:46:24 +0000
-Message-ID: <20260212024725.11264-49-wanjay@amazon.com>
+Subject: [PATCH 049/106] crypto: convert exported crypto symbol into pluggable interface for CONFIG_CRYPTO_BLAKE2B crypto
+Date: Thu, 12 Feb 2026 02:46:25 +0000
+Message-ID: <20260212024725.11264-50-wanjay@amazon.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260212024725.11264-1-wanjay@amazon.com>
 References: <20260212024725.11264-1-wanjay@amazon.com>
@@ -73,47 +73,52 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB002.ant.amazon.com (10.13.138.79) To
+X-ClientProxiedBy: EX19D033UWC002.ant.amazon.com (10.13.139.196) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
 Apply Crypto API wrappers to the exported crypto symbol in
-CONFIG_CRYPTO_WP512-related crypto to convert them into pluggable
+CONFIG_CRYPTO_BLAKE2B-related crypto to convert them into pluggable
 interface.
 
 Signed-off-by: Jay Wang <wanjay@amazon.com>
 ---
- crypto/Makefile | 2 +-
- crypto/wp512.c  | 4 ++--
+ crypto/Makefile  | 2 +-
+ crypto/blake2b.c | 4 ++--
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/crypto/Makefile b/crypto/Makefile
-index c83ad9bb4324..0a0190292dd0 100644
+index 0a0190292dd0..dfcfcd0601dd 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
-@@ -85,7 +85,7 @@ crypto-objs-$(CONFIG_CRYPTO_SHA512) += sha512.o
- crypto-objs-$(CONFIG_CRYPTO_SHA3) += sha3.o
- crypto-objs-$(CONFIG_CRYPTO_SM3_GENERIC) += sm3_generic.o
+@@ -87,7 +87,7 @@ crypto-objs-$(CONFIG_CRYPTO_SM3_GENERIC) += sm3_generic.o
  crypto-objs-$(CONFIG_CRYPTO_STREEBOG) += streebog_generic.o
--obj-$(CONFIG_CRYPTO_WP512) += wp512.o
-+crypto-objs-$(CONFIG_CRYPTO_WP512) += wp512.o
+ crypto-objs-$(CONFIG_CRYPTO_WP512) += wp512.o
  CFLAGS_wp512.o := $(call cc-option,-fno-schedule-insns)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
- obj-$(CONFIG_CRYPTO_BLAKE2B) += blake2b.o
+-obj-$(CONFIG_CRYPTO_BLAKE2B) += blake2b.o
++crypto-objs-$(CONFIG_CRYPTO_BLAKE2B) += blake2b.o
  crypto-objs-$(CONFIG_CRYPTO_ECB) += ecb.o
-diff --git a/crypto/wp512.c b/crypto/wp512.c
-index 229b189a7988..2d76d4639d44 100644
---- a/crypto/wp512.c
-+++ b/crypto/wp512.c
-@@ -1138,8 +1138,8 @@ MODULE_ALIAS_CRYPTO("wp512");
- MODULE_ALIAS_CRYPTO("wp384");
- MODULE_ALIAS_CRYPTO("wp256");
+ crypto-objs-$(CONFIG_CRYPTO_CBC) += cbc.o
+ obj-$(CONFIG_CRYPTO_PCBC) += pcbc.o
+diff --git a/crypto/blake2b.c b/crypto/blake2b.c
+index 67a6dae43a54..74a2706aa7be 100644
+--- a/crypto/blake2b.c
++++ b/crypto/blake2b.c
+@@ -90,13 +90,13 @@ static int __init crypto_blake2b_mod_init(void)
+ {
+ 	return crypto_register_shashes(algs, ARRAY_SIZE(algs));
+ }
+-module_init(crypto_blake2b_mod_init);
++crypto_module_init(crypto_blake2b_mod_init);
  
--module_init(wp512_mod_init);
--module_exit(wp512_mod_fini);
-+crypto_module_init(wp512_mod_init);
-+crypto_module_exit(wp512_mod_fini);
+ static void __exit crypto_blake2b_mod_exit(void)
+ {
+ 	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
+ }
+-module_exit(crypto_blake2b_mod_exit);
++crypto_module_exit(crypto_blake2b_mod_exit);
  
  MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Whirlpool Message Digest Algorithm");
+ MODULE_DESCRIPTION("Crypto API support for BLAKE2b");
 -- 
 2.47.3
 
