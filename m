@@ -1,116 +1,182 @@
-Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11023102.outbound.protection.outlook.com [40.107.201.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE56B2417F2;
-	Thu, 12 Feb 2026 03:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770866665; cv=none; b=imkqG47wXnyljSyvaaar+8iomo0VF2Q6JfaF84xaWhIBK3RoMWd6t+vcUbgEmkgmjQaXVWTcLl7pV2gg22d+xF/PLbfIcpJoiVMJR0i9Lvrpkr082NlbnTQIC6BJkEsFTLkjP/Tsym7IYg18SijRpPKxiQOTQ0pot9lRVrbxOMQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770866665; c=relaxed/simple;
-	bh=Z/7DZ7duOTa/1dduC0XbPYEIlXNXmSkVEaxzSyjlA5g=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RiYHw7nPWH6weL8ywB1iFbiJgYWMELqK2wYLY7h6ZrvpHN4c2rjoKC4cDKae95UXxzUDSo5RpIy9HhJFPJfoPHsTLMEhpGSJcfBvy6FH7g2/xWpPA5bwZbK2fUs/s5XKX7u6Tp2PW3QNGGw0nptd/yUBqxYfqFtCn8tGEZHres4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=pzRHEGvx; arc=none smtp.client-ip=52.35.192.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F87319CD03;
+	Thu, 12 Feb 2026 05:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.102
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770873878; cv=fail; b=aT21PxnUPU49omIO+hAQilgsTjK2iQvuntVEnzVO0N4Shh3kErdObQKNw2G4gdWOhVjBwB2FTvIb2iiB6hMC9m3UflxYlQOXlmDspson8jHXRWliFDcmtQ8mNaLNUBMZgqH2lnVUJnOh3fMhTINNEYDY23io73mv9idp/q4R5GM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770873878; c=relaxed/simple;
+	bh=sMoMx7aF+GaGa8cxjbV3wTYBMSHf2jgtErJTHJ/PWA8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Pmpbzmq57qR22GAM+jsY96uccJN/ENTtbbR9QBUO4eyxqIRzw0arxb2oPDqfPxX5vUhl+KEwfNrLgpcix1O0xvgnP1zJGmwW+7PxZksExE/GCOc/HPO/e054VwFX/EMueeBtPigC2ONFdxIM55QK1samGmTaSEp4VM0ohgo+Sck=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com; spf=pass smtp.mailfrom=hammerspace.com; dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b=LksmHf7S; arc=fail smtp.client-ip=40.107.201.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hammerspace.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="pzRHEGvx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1770866664; x=1802402664;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=eyBtxVMRU3iJexQIcMrCxSy/8F36/qAiDl0Bt+KJ7FM=;
-  b=pzRHEGvxgZ9WRKndtpVwqCrQdQijFBfXZgblCysloRkxZQV1M4x8423o
-   Q1Dix1i7mmaSlebvYeAVgYj0kBJ7mJ71V+L9N5E+EDmR5Mw1nzcAzi1k/
-   D8J8+Pu1MB8jLb8zVJMxvA1vcmIVo5Lk1aQPwzu5Yao8tXmBo6FEM0jT/
-   lFHU0r/4nTb4gU142bmjCpx6cHmX/G0RjmOstPHHenwmYSQx59Xs+A27N
-   E9g8qbTnIuofCLNmDdA6r8hiyWSxXnlHLF/YBEa6AaZoET7OtsrKgEPiw
-   bxAJ4+7rcLTNhJ5pUvyCUV2PQkABVpAe/3FeUKAsu8d8qSmbCrKL5ek6u
-   Q==;
-X-CSE-ConnectionGUID: IViQqOIMRqKNstPltMtuEw==
-X-CSE-MsgGUID: nTkaTpJkQgahY2Wm+/oT2w==
-X-IronPort-AV: E=Sophos;i="6.21,285,1763424000"; 
-   d="scan'208";a="12699351"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 03:24:24 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.104:3338]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.103:2525] with esmtp (Farcaster)
- id c8b3e53f-c925-4ed7-a851-f37a81c4dfb0; Thu, 12 Feb 2026 03:24:24 +0000 (UTC)
-X-Farcaster-Flow-ID: c8b3e53f-c925-4ed7-a851-f37a81c4dfb0
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 12 Feb 2026 03:24:24 +0000
-Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 12 Feb 2026 03:24:23 +0000
-From: Jay Wang <wanjay@amazon.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
-	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>
-CC: Jay Wang <jay.wang.upstream@gmail.com>, Vegard Nossum
-	<vegard.nossum@oracle.com>, Nicolai Stange <nstange@suse.de>, Ilia Okomin
-	<ilya.okomin@oracle.com>, Catalin Marinas <catalin.marinas@arm.com>, "Will
- Deacon" <will@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar
-	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Luis Chamberlain
-	<mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, Nathan Chancellor
-	<nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <x86@kernel.org>,
-	<linux-kbuild@vger.kernel.org>, <linux-modules@vger.kernel.org>
-Subject: [PATCH 12/12] arm64: crypto: convert exported crypto symbol into pluggable interface for CONFIG_CRYPTO_AES_ARM64_BS crypto
-Date: Thu, 12 Feb 2026 03:21:12 +0000
-Message-ID: <20260212032117.9166-13-wanjay@amazon.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260212032117.9166-1-wanjay@amazon.com>
-References: <20260212032117.9166-1-wanjay@amazon.com>
+	dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b="LksmHf7S"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kLbphD8aNIkSz+j4xEtxPYrbFDG8MEqcoeIhFgI/2jcmtQYMZ/iGzamsAOEuSth27UDrjesOmtT8J2t+Fc8gst58oQ0JAtalCaCNVi+SA7UGYPHwxCB9Br3S0zghOA2fvOpKqEaFqvYHa4Xyet3R67dVDg14On+sUvguHnuqnhAlNYU3YArnmyxvUkune4uYL/GnfzqgkykX/Y6ppafB2Kvhl/JP4qTxsOVxvp9YoZJdNSM3S5f64eaRQ4osLDMesDL7lHHple89yH4+mhYk1sbXzyPfaoMFkP0Iz3v452dWCZPjmU8WjMt1/blwaaatipjJwea31rlTys/3HfwqzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CFoZlwgvVG3GB8iF4iwId8vlRfwYEHlqdFwiwRxyorc=;
+ b=p4lUGx6ppyq9+9kakghkmz1dPae03ehEcqrgUtt9AV/j2zh+/7dqiUJcpm75B7nJQOCZHgJEFDnfdkdR+jUcUbCPG3LzUPaZISiZcx2ud5K6aAvdhZFjmIpkYSxLb5zfWYevJ41Xe2BeSUaX46ZsqdKdyNR/KmSs3yvNy0uHI5vaniQTs3hA65sWOAwYTQWMVX1ZJ+nTqu7WyHLJeGOKDGvarXckrlr+6daz8BcYU0bZvtPQrblT+nHSGh6YZr/ztITvRFuEKy1eprlWGmWYsZUH6TLP3O4IKhi+cszDenK4sP3be6t9uc858x0PVbdqVftXjTVpry+FHhMG+5uqtA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hammerspace.com; dmarc=pass action=none
+ header.from=hammerspace.com; dkim=pass header.d=hammerspace.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hammerspace.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CFoZlwgvVG3GB8iF4iwId8vlRfwYEHlqdFwiwRxyorc=;
+ b=LksmHf7S/UWdCukCaPogKkg3/7KBrNZ0dwU3tHUhu/FjrTOQLq74kQM7DyjiG+tH/XAzx8Ldj2sUqb3lOAaZuC5ZqbY3hP5/fPjKA2QyFfnLr+1qfxXL34ufg9o64rTsckODV9YL9x246VBbaOIsORVFeEf4Lb6UiwpCKA17JIE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=hammerspace.com;
+Received: from DM8PR13MB5239.namprd13.prod.outlook.com (2603:10b6:5:314::5) by
+ BN0PR13MB4695.namprd13.prod.outlook.com (2603:10b6:408:125::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.11; Thu, 12 Feb
+ 2026 05:24:32 +0000
+Received: from DM8PR13MB5239.namprd13.prod.outlook.com
+ ([fe80::fa6e:7b5:d1ec:92f3]) by DM8PR13MB5239.namprd13.prod.outlook.com
+ ([fe80::fa6e:7b5:d1ec:92f3%4]) with mapi id 15.20.9611.008; Thu, 12 Feb 2026
+ 05:24:32 +0000
+From: Benjamin Coddington <bcodding@hammerspace.com>
+To: Chuck Lever <cel@kernel.org>
+Cc: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ NeilBrown <neil@brown.name>, Trond Myklebust <trondmy@kernel.org>,
+ Anna Schumaker <anna@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
+ Rick Macklem <rick.macklem@gmail.com>, linux-nfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v6 3/3] NFSD: Sign filehandles
+Date: Thu, 12 Feb 2026 00:24:29 -0500
+X-Mailer: MailMate (2.0r6272)
+Message-ID: <402ECD4C-8E84-4104-885E-7419A3F507B1@hammerspace.com>
+In-Reply-To: <f75f0d1b-9feb-4a0e-8c4e-4825f59f8053@app.fastmail.com>
+References: <cover.1770828956.git.bcodding@hammerspace.com>
+ <cb46e1aee9656be5f3692e239300148813b5c05d.1770828956.git.bcodding@hammerspace.com>
+ <f75f0d1b-9feb-4a0e-8c4e-4825f59f8053@app.fastmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: BL0PR01CA0021.prod.exchangelabs.com (2603:10b6:208:71::34)
+ To DM8PR13MB5239.namprd13.prod.outlook.com (2603:10b6:5:314::5)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWA003.ant.amazon.com (10.13.139.31) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM8PR13MB5239:EE_|BN0PR13MB4695:EE_
+X-MS-Office365-Filtering-Correlation-Id: e1f0d82a-e83b-4fae-c427-08de69f700b8
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?jPSMguXPDND0mlh6nvxbYcgFVjurLJx7WX20d/eQwPhdlclFXZ7PuoYFXSgC?=
+ =?us-ascii?Q?1AGmAB9jI3gWPwoppcTwscbPS4HvifXV+By4FXFXdUL0BJ+IL3PeL153DLqQ?=
+ =?us-ascii?Q?vGWSwsfeSktR61CvADJV/2SXv3ny6NF6rCHYjvmU9kq+GvyZIUX+zzHxD5DQ?=
+ =?us-ascii?Q?Kx1KegDK9gCL88mk9+qsnN5HCea88aIUQ26LVpgefuZWZb5vgkSI4A9nV7nH?=
+ =?us-ascii?Q?brNNxF07MotSKIqvazKstMghdAbSdoogm8Ufy3tTlcJb4aJY/ySgHl4aM0sy?=
+ =?us-ascii?Q?wXePresS9JPLYWJLz4y3tIM95QeMIbE+X0FRRmBml0ckXxxUpdci4U8/9qYl?=
+ =?us-ascii?Q?oRiwv0htDZUbQdscYM1Xpv/mLuTdgTXAjc5KOImg9EgxJIUPbhL7oFOJJWbq?=
+ =?us-ascii?Q?+c6xN8amRPPMasaiTf9U/nmwzYaAyDNSGbjZI4R+YuQDOZhDty518jCG6gaG?=
+ =?us-ascii?Q?GDRHcreG1LAgEO47DX6BekZgbkwnoyWo7Ioy2UevoOEaJDig/Hb1EyyTtaP0?=
+ =?us-ascii?Q?G7OZgucknf1sRFKyYyaMV2Q6NibyDCPvgHKnaZfV2PC6caBY3kYBW3vNyI0v?=
+ =?us-ascii?Q?ir04xwIGRm+2xyGu59gbgiOE8PzPUTfqbENhkBYY+yZXWHgXQvYWYGRwmBuV?=
+ =?us-ascii?Q?tA3SS4j+9+WjjytC9yGoCxexrO+SUA4ojdPxZLNZNH1c31efECNk+S1W0Irp?=
+ =?us-ascii?Q?z8tPXPSj6X0sEruZcevo3WWl2OPex8BvZmGbA2As+Q/b/uNZw+VnXZg0M5D+?=
+ =?us-ascii?Q?kQqtmcwVg34j1bL49TIZqrB3JQWUqz5RJF1B/sWfZQNZdecNOySZvpRzWsNu?=
+ =?us-ascii?Q?Wdy3/wdjKUj21fpLwiwQJ+iaNBeWgbrbz1pqni4mWzWK1NWhO30PWY59sI0o?=
+ =?us-ascii?Q?m9Vsyp69EpS/Qt89WOwWDDpJcyF5KT90tYE7cWSydCSfffbkWh83sk9efUyp?=
+ =?us-ascii?Q?2ugG8YFjZ7t5Jy+Q7uBywtGcs0a+FsYlBt4dsR9iDVPi5zmcLhA3bqAKpyeL?=
+ =?us-ascii?Q?rvdBt6x6bEBFKrVTBkXHUzTawsuGLHXEFGamRtXmHSDw05aqbsYzLPWzzVBW?=
+ =?us-ascii?Q?0UDYWhRCrjPgkA1yyIE9ZZWslbqLtldk6MPIHBqglK3oI5QSAnhxC/HNCvfc?=
+ =?us-ascii?Q?9NZo4rFH9u0Xfd5MsZGNX50+2nNLHtoyt6tohQRbjdegsx8LBQvAL/JUVmqy?=
+ =?us-ascii?Q?pAr/mWfp004e1BqhWF+DpimjLuHqM4wip69AHvYbUdiuvmhHDcm6fj9/Xdbb?=
+ =?us-ascii?Q?dHlp7z1UBCklWQkd/CgnP3OBNDK4qnzwDK+6g4vB6eED7ARoVdTtY4wgXLTY?=
+ =?us-ascii?Q?lC04FkVX/cuQIgKuVi+jb8OuCVO86F6jWKO1v4S5SzSS6q2vyt638O2Ynj9n?=
+ =?us-ascii?Q?t7/v4bufm4+MR4Hh9rsQPHh3QmnS2an3LGTJwzDrSITkpf6leoRyym4z4KMh?=
+ =?us-ascii?Q?ONoNaUPy0XrCYpUafT0DgyS880i7zulCbpFqSlinvVHBqYgVYtkvIUveFFKV?=
+ =?us-ascii?Q?pS3fIlFvJqwBkflwKGZJhHwN6eGitAUHijreMwUTBwXNXW9RTjm9ZbvJkOnX?=
+ =?us-ascii?Q?xIPpvSTMt3ljJFYr1EM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR13MB5239.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?AofhNra6Gs1MhMssRalqYptPvczwWLpciPQDBT9LsBFcFw8x/7MreQtmiKlP?=
+ =?us-ascii?Q?XO2H/HCghLI2LIL5hrpAVkXe3KhQ92d2Ygs61GLt31hUlhDzeZRASAKqJv6R?=
+ =?us-ascii?Q?dKMM8MWn1DBLkL6FRhGsxW3tsZvDhj3eJe0gBnT+3Fyezoebcs6FW5fYon3h?=
+ =?us-ascii?Q?7ju0dd+ZXP5OOy8zOB/eXwCm+wWU/oEiJIR7D1CGsIpNy7lE21eFBXQsAkU/?=
+ =?us-ascii?Q?6tR/9mtr3RUoDXCsWVw9kGdZVn9ywt86jluKk5UHqnbtLZOU08mnPsw/6j6r?=
+ =?us-ascii?Q?8Jwfw9K++N5ZFvHIc6voLcITjMFleHxgBphavRmAzK/Di3U+FwKbS18DppBa?=
+ =?us-ascii?Q?i3kcIaFZ/tESHv7hMXIOGmYuOxDF/GkmVb+2XAblLtXznsiI8FHR8yE4D1We?=
+ =?us-ascii?Q?t6RKJhi08cNF1BmN/94QL+ChX7Dntc4DwlHu36Ou439FmzJtyHfSDNK82Kxr?=
+ =?us-ascii?Q?qoUjQwU8RecasJrisWM7bqZrEe63VIS5XI0XJMVdLewSJiJHneSIBUIPP+kq?=
+ =?us-ascii?Q?NtSoIO3zP9tAqHbLQxTORFS17O12HkDu/lbjm8/Aipsaqcuf9ALMgbDcgYtw?=
+ =?us-ascii?Q?cbD1NOhnFxTkCxfsQaVRglDNChtfeU039LIjHdKNVRidLicFvbBv/hb+70wA?=
+ =?us-ascii?Q?Y+DQTpbfG5n4KbPGWwKR/OQMQ+R2HqPY+8twmjnpI8xMLeDXYsXCAXGk1rFI?=
+ =?us-ascii?Q?84LOk+ZfWgeAPPBqbKL8Dive/v8KffCUYw3EY01tpmqXFKcRHntnGWe5x7UE?=
+ =?us-ascii?Q?GmET/tGynQydO5r9JadVABBIiFh4EaJPidhgAB+O1/jRJwO5qwmx21STFRuP?=
+ =?us-ascii?Q?mcKjJvvK3W8RyXMi5rf3uui5o0gZeJ4nwqZJsHb3pukudUsIpxd1RMB6Yr1A?=
+ =?us-ascii?Q?08F6MgH5qOLKaFMf+ANFkiKTY9fVIdOnYwSzle9aOdWpTJf9Y9SrRPEtQEyS?=
+ =?us-ascii?Q?8C7sbl3Oy4qWmGe/HC7IxTFyzOfSBET7RuHY1xwT+W+AOof4TuMkBocx14UD?=
+ =?us-ascii?Q?Avh1dYB1kWMvE87fyyuMNCW40ZRcy4vvUL5wrH2d57YQfbA1PLVo9HM33AK5?=
+ =?us-ascii?Q?VKsT/WVwWN80M2RyRLvELs0DMAtjUzG9/l1pTO1jRX71fXNonpt6yevfuTC2?=
+ =?us-ascii?Q?pt2jYKYiQwO12iBu3zkoZOu0AgXky04ayMzdoVI9GPLFDRC28Mx5fRE6xOmh?=
+ =?us-ascii?Q?qB6skIusS/5LgYfC76/w/bqJ8l29OOzuXc/T3LbBgD2ujFO82xi0mjgxv+67?=
+ =?us-ascii?Q?2uIs8iTg4AltOrx4hwBiBNnoeKcG3aYqC/lfx10cDteUCAS5x5UvrSa1QVlS?=
+ =?us-ascii?Q?mai6tvSs+xOkm/lKNSZAIw94KnU/pa0SzHhvwVvDgqIspEnnJNPwsrVqHGIS?=
+ =?us-ascii?Q?K/cbF3VSyezkpEAMRImYHEteAPaPvGlMrIgZKrhU1ISMLS1CjRtFkbuBlyc0?=
+ =?us-ascii?Q?zL5cjD6WEwRgLK9qE50GukIzrl4AL7t57wfTz53NOyuNEk02AWckNUe90jsO?=
+ =?us-ascii?Q?9FPTucqKb3xem6nNxSXEyGbbV15DfYJnFFRyb4OcGSwi7H30ohjavodXsOw+?=
+ =?us-ascii?Q?WGEpnw5AcwwukGbxqrxCxBxXDfrx0i9Pg97eXdLgO89IiUs72mJoznT+r1Kw?=
+ =?us-ascii?Q?2U/ZQ5Fyh35So5HwRLIidn+3h1x6nrO43H1/i9S+pmXn0Fak/uU6mMPCuN1t?=
+ =?us-ascii?Q?FZL1T6++vZyIIzXqUuAQNGSFwFE+NyKKlW7XojN2nA1Fv4b0ccwn3KG+xgLY?=
+ =?us-ascii?Q?Rli7tJpVa8VxZvVO2iuDwI2T6XvNEb8=3D?=
+X-OriginatorOrg: hammerspace.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1f0d82a-e83b-4fae-c427-08de69f700b8
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR13MB5239.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2026 05:24:32.4909
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0d4fed5c-3a70-46fe-9430-ece41741f59e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: y6o21L7d06G115VWDr5l0tniFXJ480ju+xq7uZAqeVarAMW9A40bzMAZ/etrrdbjbBb3KyA7anPIEPwx8+vUH0TcTgTWl/iHAlOGNcK9QHc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR13MB4695
 
-Apply Crypto API wrappers to the exported crypto symbol in
-CONFIG_CRYPTO_AES_ARM64_BS-related crypto to convert them into pluggable
-interface.
+On 11 Feb 2026, at 17:05, Chuck Lever wrote:
 
-Signed-off-by: Jay Wang <wanjay@amazon.com>
----
- arch/arm64/crypto/Makefile          | 2 +-
- arch/arm64/crypto/aes-neonbs-glue.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+> On Wed, Feb 11, 2026, at 12:09 PM, Benjamin Coddington wrote:
+>> NFS clients may bypass restrictive directory permissions by using
+>> open_by_handle() (or other available OS system call) to guess the
+>> filehandles for files below that directory.
+>
+>> diff --git a/fs/nfsd/nfsfh.c b/fs/nfsd/nfsfh.c
+>> index 68b629fbaaeb..3bab2ad0b21f 100644
+>> --- a/fs/nfsd/nfsfh.c
+>> +++ b/fs/nfsd/nfsfh.c
+>
+>> @@ -236,13 +288,18 @@ static __be32 nfsd_set_fh_dentry(struct svc_rqst
+>> *rqstp, struct net *net,
+>>  	/*
+>>  	 * Look up the dentry using the NFS file handle.
+>>  	 */
+>> -	error = nfserr_badhandle;
+>> -
+>>  	fileid_type = fh->fh_fileid_type;
+>>
+>> -	if (fileid_type == FILEID_ROOT)
+>> +	if (fileid_type == FILEID_ROOT) {
+>
+> Still need a comment here explaining why ROOT is exempt from
+> file handle signing checks.
 
-diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-index 6053065c18cc..2c0215a09118 100644
---- a/arch/arm64/crypto/Makefile
-+++ b/arch/arm64/crypto/Makefile
-@@ -38,7 +38,7 @@ aes-ce-blk-y := aes-glue-ce.o aes-ce.o
- crypto-objs-$(CONFIG_CRYPTO_AES_ARM64_NEON_BLK) += aes-neon-blk.o
- aes-neon-blk-y := aes-glue-neon.o aes-neon.o
- 
--obj-$(CONFIG_CRYPTO_AES_ARM64_BS) += aes-neon-bs.o
-+crypto-objs-$(CONFIG_CRYPTO_AES_ARM64_BS) += aes-neon-bs.o
- aes-neon-bs-y := aes-neonbs-core.o aes-neonbs-glue.o
- 
- # FIPS 140 kernel module
-diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
-index cb87c8fc66b3..42da18008614 100644
---- a/arch/arm64/crypto/aes-neonbs-glue.c
-+++ b/arch/arm64/crypto/aes-neonbs-glue.c
-@@ -464,5 +464,5 @@ static int __init aes_init(void)
- 	return crypto_register_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
- }
- 
--module_init(aes_init);
--module_exit(aes_exit);
-+crypto_module_init(aes_init);
-+crypto_module_exit(aes_exit);
--- 
-2.47.3
+Right on all points.
 
+I'm really sorry Chuck, I sent the wrong patch here.  I am going to resend
+v6 with the correct 3/3 patch.
+
+Ben
