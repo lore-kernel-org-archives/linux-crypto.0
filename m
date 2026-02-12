@@ -1,199 +1,230 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCAC32938D
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Feb 2026 11:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770894947; cv=pass; b=MVIiYxLmuFTtLSIiTGISHjsmrCuWFodnjjMuBshBPyPI2qioG78U12EDeGLF063rELgnOpNgpUHI+gL+DSL4slMP5D6I8QuwpPVP23bpHCkH1416S4CHnbd3ysFhu1WKpv90qM3oCQFJdaSyrudIn5mK5RaF3q69Q4vLfrEtwyY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770894947; c=relaxed/simple;
-	bh=ElMnZ70+zoQeLBgc318HQhw7roMB7XWFjCkvnwtFtzM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cOKGa2GCDB6/KaPdodVvk5mZ3EYSz2hYNMSAMV9erl9D2JO/QvhIp7pC2eGuV04jLvpA+TXPoI1hJC41d/KcDbLnYmBFYN09hhRSI4AF2+FP7Osvh+hoaFqBIyDJT5MqifZ8uA/TLuWF4IO/FVqsXCMQFGXfNtlSGxPtESI4qTE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=fTctf9H5; arc=pass smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA502BDC16
+	for <linux-crypto@vger.kernel.org>; Thu, 12 Feb 2026 11:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770895808; cv=none; b=Sk4wKD9u7Pi8J3xd3Pu/F/ZWErAM3TN7PN0KUNeOzJ95hP2CPYq9lURqGv7bQun1QBOyiv9xk6XF+fdjzm3TpsSC267DzrAjvCO9I3zx6Ewrqb8XddrOxwT37fNJcPRiXfoaDSXa1pxgKd8fwFZvRdLcsaEQ/l+MQmwijskvWpo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770895808; c=relaxed/simple;
+	bh=s/xg6C6WN2NIXO1VE7H68jznG8Lz8f8idcAGIpFhkXQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hqc2o4OqX91kWDqTSsXP7wiO7UGSHThDkde4tS66mWLV8TQN6j91npmImMDaOtZEkwonrRmlaLrQ9s492qQreLzrbJWvWGFKQiR6VNrB7SmLwQ3Y06LCnM2izKtzdBIhkwM/TmetUnvrbXQ0zuZRVeoOUHgSZQLiW2v+KyleyDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=cp5oxCmm; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=cwK2gFx+; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="fTctf9H5"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59ddf02b00aso9131756e87.0
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Feb 2026 03:15:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770894944; cv=none;
-        d=google.com; s=arc-20240605;
-        b=j3HtSUsL1zEswlNFOHwoTwm/pkanULnf1hsZ0GB23Uv8mLYMGE9hzTzoz+ZEhM0R7t
-         ss6ikTsimw3CfJ9rwMSxKmvrF7N3viYbNw9nm2Z+dxAJf6ZdnPnd/QymhmFSYEir2oLL
-         WblAXZu86oNoXNPu2Y+4PjPxhO/IE49EjcH3YWPCYLdVXc5CLYYpz6l6K4XmlugWmqS3
-         yF+/0dz4CWZg4mlh/Hy1F+w6x7/gtivk5PgAof93y1WvkeXy+7jFQbWG6V5UBL6J9KK5
-         eTvC1E1G2mmyT9lweZ0fchv8a7ZGYyEnirqLuasmX/V8RW990l0jJhzxK7itfyd7zC6g
-         Yu5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=97eMc5qt5Ski44FO6QDuAEwHvuGExgtxR7fg9XZJj30=;
-        fh=Iq9jAbe2ujuY5VDL5gQ3nveyX9IZ50zOahYfHGmKumk=;
-        b=bJjfOCRC6+W2Bq/aA2VCzOpDUVSIVgHY1U4wWlEFLVIPQcaspHvaHN9CFs54WcVeOM
-         tfl8zWUEYdehiSImH0v50FFXqFa620sshJ5U6F31Znm8oOFmCmwjEUgEwiRJSLoWaCaI
-         ES29p95K3j8DzGduDCvQaVQNzTnSAkl6Y+cUwiKCwUfIhGWSdlknBy61ax8zwqT+NYf1
-         tHdVCroiPBVs8cDXWm85RaV1UiNcBbgVyvpmmp4z1Ps0dE3pp3mgXSEkJcT8hwEctfcs
-         SLOZOXGB1ot8oE+ElUACVUan8szAUJXKkcrPsbMJ2uMLTJZg2bkIZXClV4Iakltjrdgd
-         AFBA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="cp5oxCmm";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="cwK2gFx+"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61CAFvE8009023
+	for <linux-crypto@vger.kernel.org>; Thu, 12 Feb 2026 11:30:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	CcafTaVjifqFrLoCQd4r4m/zCs1n46XiePZ4WiT65Tg=; b=cp5oxCmmi5uiP91R
+	omlhAZvPlihcPIEMr6YJPdw0iPUivmDq5wu6B57wr4cIWi4vy0l4gSNtuvYAHHqk
+	xAX5ZrV0dm2qV17PeYiVzPwmQxlWvOTueaqPJpGt4ko5Yxnvt4xYX2sdjxaASZE0
+	msurNksYX+8eOhTtVLkYUipLDwKzvbu0SQDaYfew3EqxaliXJaImO0WDKYvArodf
+	GrXQULaq+GwSqKsSjCsGfDhaYaPtK7cfvcXaCTItZlrBAr/4IovFAeOTBsXTc3ck
+	elsHEh/eElFLiZSN2r5R8xoC5BEhDls71jpW/B1tBpVFq2H93vUPMRmEENcZzU7G
+	9BlgGQ==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c9cy486w7-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Thu, 12 Feb 2026 11:30:05 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8c70c91c8b0so295905685a.2
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Feb 2026 03:30:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1770894944; x=1771499744; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=97eMc5qt5Ski44FO6QDuAEwHvuGExgtxR7fg9XZJj30=;
-        b=fTctf9H5XoWiLX4TcrK+I1DnImmCC1Gf4HDAhIn9aCWZDO0UnUOw/wnWlgeJYU+bqx
-         T3BU1QPX7bYjgl8XK/lUX48jckrlIvuCKNbV7mI2yHr5gg41ae+Dl6uW8aY9i/cAhMf9
-         9vwMyUGy7rvz7cGBczwl1u9WTzMmqHazuYiR527LXWxIakVO5qZGqnItoqoVTYXzn8uK
-         1Kyl19IBsmc3hJgqbtr2am/A5xAY6LOGFnIF42Wx631trSCWg8OdCTgmmTTTvY5Vr3im
-         GYqyNcxx/zILzrGcXB7RXlJpFb8VIz+x4V6Y7HlcV+LSrBE8yOj9gSn52Qi/gqQNcE81
-         WEqQ==
+        d=oss.qualcomm.com; s=google; t=1770895805; x=1771500605; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CcafTaVjifqFrLoCQd4r4m/zCs1n46XiePZ4WiT65Tg=;
+        b=cwK2gFx+005GnA2gRJEBkCg4Y+rXXGjABsdpTTufPculx5Imzsr68LztdsvDf4ozTe
+         gEOC3qeDxwSwGNmA9jDQ1MiPIlJYMq5jN+7JW379ZjNHRGvE9fA/noezMXaRDV6j3O0q
+         oLy//xmVrTtwPQv4yixpFLMHMdt65vtms8V61CEaBngL/qFWAkfmo6xj+4tGuK3g89Bf
+         v6I1DczdAtjhrBN/LEwsurTP8YfoiSlYQPExud1gKJZ/vQvR34j2PYtkdCygT+/p3/5x
+         NmktCbIUtEaas+emSCVEB3dO9qYYDBFxq7EEphCWS+Gaj1R3MXxYh4dFKqamiu6dFPBk
+         ayJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770894944; x=1771499744;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=97eMc5qt5Ski44FO6QDuAEwHvuGExgtxR7fg9XZJj30=;
-        b=xEney2Rd4vXG9S2zCnJD6DWUTsLSs/JFigtUPO7gwzB6oNgmVq0xWhcLoLUV8bufdF
-         l4F5WZRirAVdbafRpgDC6a0Bnaln9sM9QAy74voS3iBP9LWPmDeWDd0mjuncyNu88lGu
-         /Gi3rIdAnri9FDGW7DJKqZTn0R7+/uWt6J18Iqu97+ICmvox6oLcgbS8+AC10ggl+dGK
-         3OM8jJuWDpUt9GlgcY0PJYI0Zl8U1b4NCCHZLUxeD81FQH0z/i+q+ouoWdJraTJmgApb
-         I2RIFQt/I5OCQpjZD1M1rETgUKphQa0AQD1WCj8OG1w20WmoWlmma1zTOT0+NrbjYP17
-         47WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV/PmUUZKoOB8xE7zGKvxxxQer8C5WwdNPF95C2iRGW4b7nmMiXCbyYJICfZVxLHeeN/SnOBCPDQ0EaRko=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywav2lwWH7DhvffEWUkV3C4ZQiTXOe0QJM6ZiYfRY+O7+BCt+Ao
-	1me4wpjxlg2wlHg+9Qgbeb7Mim5lv659xCVcO1YMc1pAOGrq4TQouWJ/baQ12wUEY+kl4EBBPFO
-	fIxftQpUnQYunvSQKh5l19jlWAhKtIB4eS6UKM/F9Bw==
-X-Gm-Gg: AZuq6aKMTPcWhKWKAqifKuMT4xz3p69/K5JGnJXqbVKWMQRTXJRwQDJZKw4YRpjBDs2
-	Wm9lHr92MD/38hOFeO5ABNZnTt34OsMuIy427gCQwN16raHqEme19pZ2w/CXlDYxvSk3tt/0NDS
-	HeqtmyKKt5SHwCi1EuCjlSOOMKiOQ2lKnF8Ecch6ygA/n7jWeAyLWiJqp6/WuUsshiQkG+n2egG
-	bGmotMjHUzcMfX7KPnaY1Reu7+MN5K6JqS2zJIBQtcL4BK1GXjhxpJbjYj/sp113MUoHErzVseb
-	ri1AUUhqf34Y9NNYQ99+Xf1/Vw==
-X-Received: by 2002:a05:6512:2c8d:b0:59e:6058:f160 with SMTP id
- 2adb3069b0e04-59e64043dc0mr579027e87.25.1770894943805; Thu, 12 Feb 2026
- 03:15:43 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770895805; x=1771500605;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CcafTaVjifqFrLoCQd4r4m/zCs1n46XiePZ4WiT65Tg=;
+        b=ALyzF81N0GAKos17uRAIU83h66JXZKXCJkPB+dUOYHzhZGAtOMl/DxkjfzUgzjkfLT
+         Vr4DNW05f+G6qFFJg6EZdcuX3GyUfVYThKgYrFOx9PNpCtNeInMOp+0O1nQ+lYX7g2xf
+         HI2JtDHfuwGifalD7j0d2GZ7EtyRWMmMHaOUSlLXE1Ieeox5GZ8yZpVnRf6oeCmvI2g2
+         ok66mdOrKYodvyD76rbztrrP9qX+8fYFm9+qLD/Q/VNJRndEa6hjuF79Za9kEB3/s+qs
+         DYx29ZafRNXJPsrzLgRc4X2cV+ENGrdEn+OPOsN5H+LVdgBJ/848cYeQgW5Brf1xJ5vg
+         ONYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUULQ2FLDlirLmuz2OtN7xZhPpRNPm4tczDk5MKgvdYvLg+e3anY0dKNFHU5jHSXI6j/dlJXVbT9Q9WfK4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAA92WwxZSkbUS6Egb7jqM/Iez1yk9Lh8GxwGvdLlEKiaIeWL5
+	e3fYhbxJdMyRy+LJf+PdEep4ZLCPxEBljs+1TNHZ/N4vPjpcVeyBtTaL2h2LsnBSKje00Hgha9O
+	UzUaJsNuOMWxLOH3YS3pOizWUgZGpJQrTGkw25bq9MoKzNBkW6twlmvZXOk9UbY5qqGE=
+X-Gm-Gg: AZuq6aIPw2HTpY1d1BcmRcVWAHjvGw4tI5yzqLgzDnDSATU3xGlPo908zt9jdv9lPpw
+	OIqORrtrtsXd1elCKJQ76mf6emLS2bHJqkKz1+uJIgC3CcNg0oOfKIqUipa0wXFCNFjFpJ6v4BJ
+	i66p1MTYmNZ5+xFyegewVdYoFwNjEwRULO1QsUbiHTkdDDRekBLS2AVKdufATOCPcQnFO6V6/5x
+	lyvcElNBAiZm96rwP2ttjga/5XI+szb2xTjJVVhZgTpqGOhy/EbF09aS8iAmXMJRqtElIgQrp8a
+	RSyFIRXOAzYUGh29yeRbxWDdV2fcvV/sdcJhHmtJJQDN4nYgt5e/avyNrxACPJLnq0c1aQV/ozX
+	4ofSauRjMOGEQrgXkzuy+3fEYhn1FSnp9dbdOsFtw4cMHaGrE9pGPEIgbMFffHHOOwgOkh/0ZhH
+	BRZxw=
+X-Received: by 2002:a05:620a:448b:b0:8c9:eae0:d1df with SMTP id af79cd13be357-8cb33115b5amr226371385a.6.1770895805147;
+        Thu, 12 Feb 2026 03:30:05 -0800 (PST)
+X-Received: by 2002:a05:620a:448b:b0:8c9:eae0:d1df with SMTP id af79cd13be357-8cb33115b5amr226368085a.6.1770895804702;
+        Thu, 12 Feb 2026 03:30:04 -0800 (PST)
+Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8f6ecadb27sm147972666b.63.2026.02.12.03.30.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Feb 2026 03:30:03 -0800 (PST)
+Message-ID: <bfbe04db-bf64-418b-a75a-88879bf0bf2d@oss.qualcomm.com>
+Date: Thu, 12 Feb 2026 12:30:00 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260212103915.2375576-1-martin.kepplinger-novakovic@ginzinger.com>
-In-Reply-To: <20260212103915.2375576-1-martin.kepplinger-novakovic@ginzinger.com>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Thu, 12 Feb 2026 11:15:32 +0000
-X-Gm-Features: AZwV_QitoqfQoVTEix3xPDR27nujXBVhj7L5gjmSDHlQSQtn7OoK4gHTZ6LY5aE
-Message-ID: <CALrw=nFiAfpFYWVZzpLZdrT=Vgn2X8mehgEm9J=yxT3K+X8CcQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: rsa: add debug message if leading zero byte is missing
-To: Martin Kepplinger-Novakovic <martin.kepplinger-novakovic@ginzinger.com>
-Cc: ebiggers@google.com, lukas@wunner.de, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 2/4] soc: qcom: ice: Add OPP-based clock scaling
+ support for ICE
+To: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org
+References: <20260211-enable-ufs-ice-clock-scaling-v5-0-221c520a1f2e@oss.qualcomm.com>
+ <20260211-enable-ufs-ice-clock-scaling-v5-2-221c520a1f2e@oss.qualcomm.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20260211-enable-ufs-ice-clock-scaling-v5-2-221c520a1f2e@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: AKxjyL0HnB4zMGuZBtcAQeSWG46YJxbR
+X-Proofpoint-GUID: AKxjyL0HnB4zMGuZBtcAQeSWG46YJxbR
+X-Authority-Analysis: v=2.4 cv=XvX3+FF9 c=1 sm=1 tr=0 ts=698db9bd cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22
+ a=EUspDBNiAAAA:8 a=cMzz2QcylWOBvAN0VsUA:9 a=QEXdDO2ut3YA:10
+ a=IoWCM6iH3mJn3m4BftBB:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEyMDA4NSBTYWx0ZWRfX8dqqfgztMTK4
+ 6+tVMmRUoFqijmki5IjKAdoDEZeKAAZAWID8yVfDPImmPPdO9Z9RnpLs93zj3ycMnLDL0gkNKYK
+ vJ6BvkH2nGGmtzmsJjTDm6hicRQBUclNSxyYHK7X7a7cH/IGeSeEsAZjEBl9otMgWhg9TeS1f7I
+ ehAC3BbNvMGDp1wcRrvX/2tb71TG5sJ5PXz5nlsuhNbYQA2ZG+JuPIE9EKb2xczgg5dDQCgTJ0O
+ xSr8bzS/SKGZty+fGq8G04mwov8kR82/GXUQv0qbF58+wJkBt4rVBL2gYN7ZlOExvXWnaTVuQFW
+ OI8sBDOH0Js+5SSU0CvUqmGavrsgZjlFiEMScmfvZzj0aI8L3EgSoFElXeY+s6b9wQovwDfsG3J
+ bJwBzTld6BJWaCQ7oJvbPXaMfMor9uJaEARMLDOCirpc2y9BmlqScO8Vz3Rl9gO3ud4B/kxyI7/
+ 2TPKKgB0kYiwUJY84Ag==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-12_03,2026-02-11_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 priorityscore=1501 malwarescore=0 adultscore=0 phishscore=0
+ bulkscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602120085
 
-Hi,
-
-On Thu, Feb 12, 2026 at 10:39=E2=80=AFAM Martin Kepplinger-Novakovic
-<martin.kepplinger-novakovic@ginzinger.com> wrote:
->
-> When debugging RSA certificate validation it can be valuable to see
-> why the RSA verify() callback returns -EINVAL.
-
-Not sure if this would be some kind of an information leak (depending
-on a subsystem using RSA). Also what makes this case so special?
-Should we then annotate every other validation check in the code?
-
-> Signed-off-by: Martin Kepplinger-Novakovic <martin.kepplinger-novakovic@g=
-inzinger.com>
+On 2/11/26 10:47 AM, Abhinaba Rakshit wrote:
+> Register optional operation-points-v2 table for ICE device
+> and aquire its minimum and maximum frequency during ICE
+> device probe.
+> 
+> Introduce clock scaling API qcom_ice_scale_clk which scale ICE
+> core clock based on the target frequency provided and if a valid
+> OPP-table is registered. Use flags (if provided) to decide on
+> the rounding of the clock freq against OPP-table. Incase no flags
+> are provided use default behaviour (CEIL incase of scale_up and FLOOR
+> incase of ~scale_up). Disable clock scaling if OPP-table is not
+> registered.
+> 
+> When an ICE-device specific OPP table is available, use the PM OPP
+> framework to manage frequency scaling and maintain proper power-domain
+> constraints.
+> 
+> Also, ensure to drop the votes in suspend to prevent power/thermal
+> retention. Subsequently restore the frequency in resume from
+> core_clk_freq which stores the last ICE core clock operating frequency.
+> 
+> Signed-off-by: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
 > ---
->
-> hi,
->
-> my real issue is: When using a certificate based on an RSA-key,
-> I sometimes see signature-verify errors and (via dm-verity)
-> rootfs signature-verify errors, all triggered by "no leading 0 byte".
->
-> key/cert generation:
-> openssl req -x509 -newkey rsa:4096 -keyout ca_key.pem -out ca.pem -nodes =
--days 365 -set_serial 01 -subj /CN=3Dginzinger.com
-> and simply used as trusted built-in key and rootfs hash sign appended
-> to rootfs (squashfs).
->
-> I'm on imx6ul. The thing is: Using the same certificate/key, works on
-> old v5.4-based kernels, up to v6.6!
->
-> Starting with commit 2f1f34c1bf7b309 ("crypto: ahash - optimize performan=
-ce
-> when wrapping shash") it starts to break. it is not a commit on it's own =
-I
-> can revert and move on.
->
-> What happended since v6.6 ? On v6.7 I see
-> [    2.978722] caam_jr 2142000.jr: 40000013: DECO: desc idx 0: Header Err=
-or. Invalid length or parity, or certain other problems.
->
-> and later the above -EINVAL from the RSA verify callback, where I add
-> the debug printing I see.
->
-> What's the deal with this "leading 0 byte"?
 
-See RFC 2313, p 8.1
+[...]
 
->
-> thank you!
->
->                                     martin
->
->
->
->  crypto/rsa-pkcs1pad.c | 5 +++--
->  crypto/rsassa-pkcs1.c | 5 +++--
->  2 files changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-> index 50bdb18e7b483..65a4821e9758b 100644
-> --- a/crypto/rsa-pkcs1pad.c
-> +++ b/crypto/rsa-pkcs1pad.c
-> @@ -191,9 +191,10 @@ static int pkcs1pad_decrypt_complete(struct akcipher=
-_request *req, int err)
->
->         out_buf =3D req_ctx->out_buf;
->         if (dst_len =3D=3D ctx->key_size) {
-> -               if (out_buf[0] !=3D 0x00)
-> -                       /* Decrypted value had no leading 0 byte */
-> +               if (out_buf[0] !=3D 0x00) {
-> +                       pr_debug("Decrypted value had no leading 0 byte\n=
-");
->                         goto done;
-> +               }
->
->                 dst_len--;
->                 out_buf++;
-> diff --git a/crypto/rsassa-pkcs1.c b/crypto/rsassa-pkcs1.c
-> index 94fa5e9600e79..22919728ea1c8 100644
-> --- a/crypto/rsassa-pkcs1.c
-> +++ b/crypto/rsassa-pkcs1.c
-> @@ -263,9 +263,10 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tf=
-m,
->                 return -EINVAL;
->
->         if (dst_len =3D=3D ctx->key_size) {
-> -               if (out_buf[0] !=3D 0x00)
-> -                       /* Encrypted value had no leading 0 byte */
-> +               if (out_buf[0] !=3D 0x00) {
-> +                       pr_debug("Encrypted value had no leading 0 byte\n=
-");
->                         return -EINVAL;
-> +               }
->
->                 dst_len--;
->                 out_buf++;
-> --
-> 2.47.3
->
+> +/**
+> + * qcom_ice_scale_clk() - Scale ICE clock for DVFS-aware operations
+> + * @ice: ICE driver data
+> + * @target_freq: requested frequency in Hz
+> + * @scale_up: If @flags is 0, choose ceil (true) or floor (false)
+> + * @flags: Rounding policy (ICE_CLOCK_ROUND_*); overrides @scale_up
+> + *
+> + * Clamps @target_freq to the OPP range (min/max), selects an OPP per rounding
+> + * policy, then applies it via dev_pm_opp_set_rate() (including voltage/PD
+> + * changes).
+> + *
+> + * Return: 0 on success; -EOPNOTSUPP if no OPP table; or error from
+> + *         dev_pm_opp_set_rate()/OPP lookup.
+> + */
+> +int qcom_ice_scale_clk(struct qcom_ice *ice, unsigned long target_freq,
+> +		       bool scale_up, unsigned int flags)
+> +{
+> +	int ret;
+> +	unsigned long ice_freq = target_freq;
+> +	struct dev_pm_opp *opp;
 
-Ignat
+Reverse-Christmas-tree ordering would be neat
+
+> +
+> +	if (!ice->has_opp)
+> +		return -EOPNOTSUPP;
+> +
+> +	/* Clamp the freq to max if target_freq is beyond supported frequencies */
+> +	if (ice->max_freq && target_freq >= ice->max_freq) {
+> +		ice_freq = ice->max_freq;
+> +		goto scale_clock;
+> +	}
+> +
+> +	/* Clamp the freq to min if target_freq is below supported frequencies */
+> +	if (ice->min_freq && target_freq <= ice->min_freq) {
+> +		ice_freq = ice->min_freq;
+> +		goto scale_clock;
+> +	}
+
+The OPP framework won't let you overclock the ICE if this is what these checks
+are about. Plus the clk framework will perform rounding for you too
+
+> +
+> +	switch (flags) {
+
+Are you going to use these flags? Currently they're dead code
+
+> +	case ICE_CLOCK_ROUND_CEIL:
+> +		opp = dev_pm_opp_find_freq_ceil_indexed(ice->dev, &ice_freq, 0);
+
+You never use the index (hardcoded to 0)
+
+> +		break;
+> +	case ICE_CLOCK_ROUND_FLOOR:
+> +		opp = dev_pm_opp_find_freq_floor_indexed(ice->dev, &ice_freq, 0);
+> +		break;
+> +	default:
+> +		if (scale_up)
+> +			opp = dev_pm_opp_find_freq_ceil_indexed(ice->dev, &ice_freq, 0);
+> +		else
+> +			opp = dev_pm_opp_find_freq_floor_indexed(ice->dev, &ice_freq, 0);
+
+Is this distinction necessary?
+
+Konrad
