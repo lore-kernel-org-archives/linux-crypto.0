@@ -1,123 +1,85 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF081CF8B
-	for <linux-crypto@vger.kernel.org>; Mon, 16 Feb 2026 07:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C026A267B89
+	for <linux-crypto@vger.kernel.org>; Mon, 16 Feb 2026 07:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771227968; cv=none; b=G2HZX/2u9fQnptoRG7TZjKwQYL2pH7XhVB5Quigup7oe9qVhkvWYwaOZmGiJRL4qn0h+XOkLDG1rbbPXz7JyhZi6uiVWu2QN9AB59+VhhZ4kkazgnBkLgtrNJQEUWq5elVCL+hhlFLvn+J48FG2O0dZx65u8sUxMrYLb9mEb2Nw=
+	t=1771228461; cv=none; b=LiMPNHYcvZWD+DLfDJbiF8UsKpuK3BG5HlKhlV0QWfpPfqbwYDGhP2y+svmBKMiU8P+Poa4cH63iAUh0axq3DkgmAWKWXOqzVhTcCrnZtaZa0hrB1MzqbSOp5fb85+weT4KKYj9WvhRSaF+dPk8vdv9OKaGHl9LjQUEdnNzWGVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771227968; c=relaxed/simple;
-	bh=h+OOEab+U7JqfLqZuXWtg2YBLqENHho+Xge8wtX7DTo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gr9Xaj31BSAD/Sz08P+Pk6Dq3QyCrfcEwxGFizOTFGeuV9nhwULaWxYTewTEERd9XCPIC4bCvwP9g//VH16KDSIcyDLiYoetcFRSXP1B1vUpLyHhGMDl5DvbAFgO6cNr7Ps/unYY/l0ZB5yK5Hs5sjx+mf0JW1ou5ri82GOESno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RZ52Jdyx; arc=none smtp.client-ip=95.215.58.174
+	s=arc-20240116; t=1771228461; c=relaxed/simple;
+	bh=hJHCqRRnankEoC/ErtC2hAAeRlqcyizmIk/mir5pSks=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=DxGzkeNPkClI/cgCxRwTtpyfy4qO62suxgZ4h3RjAqOXc5sQ3dwZ70aTHy5Cad5WTXGdy2o/jtiT5YiWcSqb2JUgbpwBAsJoYXjRsRwxEiUCx7OTxGF8VsL2qPceyoGmL15NySDvS0eNQbvSQctiKaYA3HtN7rtHZjY8zk0Gl3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=G3HZUODM; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RZ52Jdyx"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="G3HZUODM"
+Content-Type: text/plain;
+	charset=us-ascii
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771227964;
+	t=1771228447;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=RLvrlavvqhsMsZumdIpLoyT+Im13G14jyGnOLsn5bKE=;
-	b=RZ52Jdyxe6XiQTHXDsQO6GihvOPBgC0lqv3st4LY4st0n6eYcTDf7S+11dnYK8nSGx/hyh
-	bzgQBFfmjlJX9TUPTPKwh8k01uY2Nn7Jfr75wJ/nN4OLMcHT6o60Y8EDGTrUiiWnru4As1
-	YGJszJkW9kRtVdpj5oYMoDVnJzrcmrg=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Lothar Rubusch <l.rubusch@gmail.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	stable@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] crypto: atmel-sha204a - Fix OTP sysfs read and error handling
-Date: Mon, 16 Feb 2026 08:45:51 +0100
-Message-ID: <20260216074552.656814-1-thorsten.blum@linux.dev>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hJHCqRRnankEoC/ErtC2hAAeRlqcyizmIk/mir5pSks=;
+	b=G3HZUODMvtoogeed1XFbneGODNDFnbuOfeHNYf5KJrz7EnBtOA8efe5w4od6wv1bmVMR7Y
+	0ytucaPzok6gtuYcP2hzx2FjfDjUiCkEY07KwZy4cT1aW0JR692rlU4umqKwyIzPmSl7vD
+	0KaWsxAX59a/IN2USDzNatyBDh4p0go=
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.4\))
+Subject: Re: [PATCH] crypto: atmel-sha204a - Fix OTP sysfs read and error
+ handling
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Thorsten Blum <thorsten.blum@linux.dev>
+In-Reply-To: <CAFXKEHb+D__WYugjdbqUSSnubfsOeibfH-Q33eJGjG3kvfndwg@mail.gmail.com>
+Date: Mon, 16 Feb 2026 08:53:34 +0100
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ stable@vger.kernel.org,
+ linux-crypto@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A3F0A8DE-C8F4-4D45-B98D-60E896EFCEA2@linux.dev>
+References: <20260215124125.465162-2-thorsten.blum@linux.dev>
+ <CAFXKEHbCrp57ruvCF2TXXcnoJF93Z5bdUd7Nt5WtM9_abtc66w@mail.gmail.com>
+ <2E9C85C9-AD05-4BB3-A945-5ADECCB5C7E4@linux.dev>
+ <CAFXKEHb+D__WYugjdbqUSSnubfsOeibfH-Q33eJGjG3kvfndwg@mail.gmail.com>
+To: Lothar Rubusch <l.rubusch@gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-Fix otp_show() to read and print all 64 bytes of the OTP zone.
-Previously, the loop only printed half of the OTP (32 bytes), and
-partial output was returned on read errors.
+On 16. Feb 2026, at 07:14, Lothar Rubusch wrote:
+> [...]
+>=20
+> This would work. I'd squash this fixup together with the proposed
+> patch and resubmit a fixed version.
+>=20
+> 8<-------------------------------------------------------------->8
+> root@dut02:~/atsha204a-modif# insmod atmel-i2c.ko
+> root@dut02:~/atsha204a-modif# insmod atmel-sha204a.ko
+> root@dut02:~/atsha204a-modif# cat =
+/sys/bus/i2c/devices/1-0064/atsha204a/otp
+> =
+0001ED86032D0002154C033750FFFFFF20B0F703DB0CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF=
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+> 8<-------------------------------------------------------------->8
 
-Propagate the actual error from atmel_sha204a_otp_read() instead of
-producing partial output.
+Thanks for verifying and testing. v2 can be found here:
 
-Replace sprintf() with sysfs_emit_at(), which is preferred for
-formatting sysfs output because it provides safer bounds checking.
+=
+https://lore.kernel.org/lkml/20260216074552.656814-1-thorsten.blum@linux.d=
+ev/
 
-Cc: stable@vger.kernel.org
-Fixes: 13909a0c8897 ("crypto: atmel-sha204a - provide the otp content")
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
-Compile-tested only.
-
-Changes in v2:
-- Return the total number of bytes written by sysfs_emit_at() after
-  feedback from Lothar (thanks!)
-- Link to v1: https://lore.kernel.org/lkml/20260215124125.465162-2-thorsten.blum@linux.dev/
----
- drivers/crypto/atmel-sha204a.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
-index 0fcf4a39de27..8af767f903ea 100644
---- a/drivers/crypto/atmel-sha204a.c
-+++ b/drivers/crypto/atmel-sha204a.c
-@@ -15,6 +15,7 @@
- #include <linux/module.h>
- #include <linux/scatterlist.h>
- #include <linux/slab.h>
-+#include <linux/sysfs.h>
- #include <linux/workqueue.h>
- #include "atmel-i2c.h"
- 
-@@ -119,21 +120,22 @@ static ssize_t otp_show(struct device *dev,
- {
- 	u16 addr;
- 	u8 otp[OTP_ZONE_SIZE];
--	char *str = buf;
- 	struct i2c_client *client = to_i2c_client(dev);
--	int i;
-+	ssize_t len = 0;
-+	int i, ret;
- 
--	for (addr = 0; addr < OTP_ZONE_SIZE/4; addr++) {
--		if (atmel_sha204a_otp_read(client, addr, otp + addr * 4) < 0) {
-+	for (addr = 0; addr < OTP_ZONE_SIZE / 4; addr++) {
-+		ret = atmel_sha204a_otp_read(client, addr, otp + addr * 4);
-+		if (ret < 0) {
- 			dev_err(dev, "failed to read otp zone\n");
--			break;
-+			return ret;
- 		}
- 	}
- 
--	for (i = 0; i < addr*2; i++)
--		str += sprintf(str, "%02X", otp[i]);
--	str += sprintf(str, "\n");
--	return str - buf;
-+	for (i = 0; i < OTP_ZONE_SIZE; i++)
-+		len += sysfs_emit_at(buf, len, "%02X", otp[i]);
-+	len += sysfs_emit_at(buf, len, "\n");
-+	return len;
- }
- static DEVICE_ATTR_RO(otp);
- 
--- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
+Best,
+Thorsten
 
