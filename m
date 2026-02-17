@@ -1,80 +1,190 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74EC2EAB8E
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Feb 2026 08:35:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771317358; cv=none; b=OSF+UCu3tLSPknmi9QPTZbQXnVK6m0WVo3ugIcYUVd+l9KrQ/7ZCXWFmNWB7WA4lftX26mrFabvS7b9M6PKhxsctPGN32neHTCwZ0oXgbK7+5hRKM4iO6fY03D0IPUAr5gE13PDLyWatHLx5+bH0MAsNGZEWvqX23EODOVeejew=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771317358; c=relaxed/simple;
-	bh=GsPH1it93cBSSaSMcft/eEKKpedOcCglhw3uxqFZpEE=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=UDJUPpePj3H1LN4CLZm19y4D29avJ6rfxKzKuuRkDu/If8hj0Fz7khDlBjYlUowpSpVygF6s04/KvcB7sMbZfZQBzLJIgjc3sTnJtQSixktl8EmZbzUAAW2fhLuoBYz8HCE5nR/ZTFrsaDFO5Sa1r+uZJa0anUzVklSbnHBM1Xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SZoqX9iA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7541FC7C5
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Feb 2026 10:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771324532; cv=pass; b=LwIAmQTgc4tczOO4kRBuBzS6AxN3OJSoQwKMNL7X5gJGQz8usMvQmpdRoUjjfX/lBQ4dkCY6pXJ/NSf/e4jdhuIw1hGFLOAFiozP0ck1sATbrjlFQGKuusG8unNFlNxI9KVJmFT553DvYBSXZauyqICtQsi2uZ7417zmDRDhTZA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771324532; c=relaxed/simple;
+	bh=hQ/FqnZ9bKw+6nwRHG3ZTJKdNXpanN5b0OW3+szbKJ4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DcDdA04dyBaF1KNr83w6YU2etPp7JDkilt6jJ8R3HFXnMCfntKmFbNjz0meBcbzxQg8FqhCV8PFlQ+qVuMxF2gTNfS4xKsRHoKGjq2jRW44MPkfzoFaAf269JeFf2qRQx56glC7MTNmsSeVDlwDeAJi596Rlbgpf5JXFAH4TzPA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EgBlfZ44; arc=pass smtp.client-ip=74.125.224.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SZoqX9iA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771317356;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9grVDW8AZxJbfIkeJFe8IQduDAoxBnE9/JhYwG+hwok=;
-	b=SZoqX9iAxPytCP3GAwFdKzZrRA9ddpSHP2BTpmMOKEB4rbURx7NWJfDCbFUlE2H1E3/J2v
-	mQNnPeYfF0vtNviIrqAYnY31YWbvY5D+Mg2FhYt4klhseC/wzqhNkREy+33NH+ymo+b2I7
-	dgVqt89mO+8bFcG74HQIvt2SjSfHJl4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-444-9c_sTZ-MMDaMFhu7z8Pw1A-1; Tue,
- 17 Feb 2026 03:35:52 -0500
-X-MC-Unique: 9c_sTZ-MMDaMFhu7z8Pw1A-1
-X-Mimecast-MFC-AGG-ID: 9c_sTZ-MMDaMFhu7z8Pw1A_1771317350
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A14F31956060;
-	Tue, 17 Feb 2026 08:35:49 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.45.225.173])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 931861800666;
-	Tue, 17 Feb 2026 08:35:45 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <1015832.1771316809@warthog.procyon.org.uk>
-References: <1015832.1771316809@warthog.procyon.org.uk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: dhowells@redhat.com, Arnd Bergmann <arnd@kernel.org>,
-    Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    "David S. Miller" <davem@davemloft.net>,
-    Jarkko Sakkinen <jarkko@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-    keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] x509: select CONFIG_CRYPTO_LIB_SHA256
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EgBlfZ44"
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-649ba337157so153566d50.2
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Feb 2026 02:35:30 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771324530; cv=none;
+        d=google.com; s=arc-20240605;
+        b=EWd9U9J014vPUxw6okYaWzkaxBkxb/0AeqbkgAnoDGEYNggrurfqFStUdJ6FsUV3F2
+         1u2b2yhr1MIs2gaH7uXglKxe8XVG/mh2LgmsWE2v6zgN0i1f8LmkOqLLVPgFxv3vj6Qc
+         4504zRM2glvbdoOA5BX41HS+X07X0VUXUFsNil7pEphpJuGkmNLs7VU0BaaWVQqMfCTk
+         V9vEM9xhLKJoxvkFZ4ZfyBc2KDFZQWYoNbHQviPBz+bvW40A9tC9mJqGKV9PqHp30jbU
+         cLT44ggpPeepP9Yb1yhfuxNlNVvTKPMyo94ToNrBuiv1GWfNP0+cJn2HFqu7I6ezmYSv
+         heZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Uo6JCEeQIxQJPR/F/WxTJBoUZKo4YM7XMzFICKJsqXE=;
+        fh=Ma1q1VeW5F2h30bJnZJ9Q6vnND2/p0EbYKpPB34biYk=;
+        b=KAH/uIzx7JLQfovTGiO5cLwaxjfrAyd2QVcjz5x9nM8jd+RM99EzxUamQzDSQC2k5G
+         RS4tsuM271ED3GE6TNGt/bmjteUM1NfAdP2yHjVaN7fz8aO72q0VdRlZAkz8RX+AEx0J
+         ejTGADXYJDJrpQIyx7qUwdAnWU4nbJtXfFE0QbsRJkdtrj2ujAMqDzM8BArRHaAQZ2sb
+         CQ+CZ6NSnvyFZ28dWYXOmOzFTQWFPwr7uccV31nWfK/8Vy3l+of8EW/T6l57egHhqm/Q
+         b2wbmlpR2pCdEIuccd8U8dbH5JDSr6fBTrYcfwBL6I3GQI+Mx8xWlkdjOlWNqf6FPcnm
+         ZOsQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771324530; x=1771929330; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Uo6JCEeQIxQJPR/F/WxTJBoUZKo4YM7XMzFICKJsqXE=;
+        b=EgBlfZ44TKAVsRNIWRXtLTs4YKdfVcek7m4w4lc6E2M22Q0r5g4qWAG5nZIs4mSa56
+         5ugKCZBzu5v+/FHoWrxvMkCvhkxFu0ZgpPXQETMlNPSBpnmhYJPi4XdS60mDljF8veJD
+         J6OMMTOtiVT9K2sIwgGcrR4gTEFntxQ+aO7+zVfhGJ1JDWnEwV4Ce7Uz15pG6Ut2Pujq
+         /RRajVbYgUz29qYaN0LRJN+xczInUlb+qiSJEfwOpNwssUu6zOCLV6APta73BueT/PzF
+         H46yVyTFElIbLXklgR0RMcNXe6/pKqggHgg4wfjQHWgHPa3wZw5/rLr48xeKzxnNvpKi
+         SLTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771324530; x=1771929330;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Uo6JCEeQIxQJPR/F/WxTJBoUZKo4YM7XMzFICKJsqXE=;
+        b=ks6tMEvcXa7HtSV17imhhDp+oq7raV9kGrgqB3h09J0JEHbj8aeJ1LB887MUaOrm8o
+         H7wZDZD1BZUmlgl9TktRVw+cNwofsdKfJvl1Ifd4yxFSTcYxv6vUQmmMg7A7mO+nSHoF
+         8T7ciRcdAtfyPhK76yXe6pmRsE77iywDmAN++YhIKT48/SZbzaP/Qfnn2hRXeybBGa8P
+         Dj5f+kA/NEfrr/4fhVcZjlRuyfDDJtPR20hTuiY9LyFzdXJUx/YsasoRuzQNOWa4iXCI
+         B/Ip5NCDf54lDcXsiPvxcoWs82jfkp2jQNAJ2MsDrZMx86JEMkrqLxRjvkZTjHohDNpM
+         ToMw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDqpXLoCG8RSmKQu2SvZEC8wIl/oatY//MCvpJuuEeajHa8F7YxqWW/2xlo7xWt90dgnv5Bf+yaRy4cd4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQuGN78Y52RNh7lmwaZEj4NU8ut2FkT3LYO4prMTfQhxMuq+Qw
+	zX3NiMZjHk2N712Q+drhcuOMB1M4Bvsfa+njTOQOosKtdn8tHuvcrObWN6ieoSEVrWQ+u+OoyX7
+	COAVj8IYJj0TOHNf5c8yz9J7RzTPQyvQ=
+X-Gm-Gg: AZuq6aJwG+tfbpu0yH8C6W9u5XaeOHx8h3fOBFF9L6ibyXifluL1XDeS5w2qUgndKKZ
+	6TVvJtkVusZ+VfHa/53Kpmr9sYXmThOSO/TlcINoB3FkarmBNQr27IfUAJxJYvQTDpfMzlWZIvg
+	gk3+JskjczWOXoGgutoekKL5bczRheqQGeyt0FF+vxbt++jjTc9MwAWlrWUy2yrL7jFwAmK894r
+	DGa8h/k908K/8oEdA49bY/QcGy9bMIoCSsupwuFK++x0iCBZp5rW6YftbxNpQt30+myoDh0M387
+	smpNZ+hd1Sphhqk=
+X-Received: by 2002:a05:690e:1c1c:b0:649:f09d:a6cc with SMTP id
+ 956f58d0204a3-64c14b29c19mr10556977d50.1.1771324530052; Tue, 17 Feb 2026
+ 02:35:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1017226.1771317344.1@warthog.procyon.org.uk>
-Date: Tue, 17 Feb 2026 08:35:44 +0000
-Message-ID: <1017227.1771317344@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+References: <20260216074552.656814-1-thorsten.blum@linux.dev>
+In-Reply-To: <20260216074552.656814-1-thorsten.blum@linux.dev>
+From: Lothar Rubusch <l.rubusch@gmail.com>
+Date: Tue, 17 Feb 2026 11:34:54 +0100
+X-Gm-Features: AZwV_QiWJubl1SYRemd2GYIh64zSBa8SJWZKFL5Plf5tVXdnNSQH30MoF3bKYeE
+Message-ID: <CAFXKEHbveJdNM9gEiJ5P4kExvFii=V7KtP4TnQLVve5_3FheMw@mail.gmail.com>
+Subject: Hi Thorsten,
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	stable@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Apologies, I forgot the:
+On Mon, Feb 16, 2026 at 8:46=E2=80=AFAM Thorsten Blum <thorsten.blum@linux.=
+dev> wrote:
+>
+> Fix otp_show() to read and print all 64 bytes of the OTP zone.
+> Previously, the loop only printed half of the OTP (32 bytes), and
+> partial output was returned on read errors.
+>
+> Propagate the actual error from atmel_sha204a_otp_read() instead of
+> producing partial output.
+>
+> Replace sprintf() with sysfs_emit_at(), which is preferred for
+> formatting sysfs output because it provides safer bounds checking.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 13909a0c8897 ("crypto: atmel-sha204a - provide the otp content")
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+> Compile-tested only.
+>
+> Changes in v2:
+> - Return the total number of bytes written by sysfs_emit_at() after
+>   feedback from Lothar (thanks!)
+> - Link to v1: https://lore.kernel.org/lkml/20260215124125.465162-2-thorst=
+en.blum@linux.dev/
+> ---
+>  drivers/crypto/atmel-sha204a.c | 20 +++++++++++---------
+>  1 file changed, 11 insertions(+), 9 deletions(-)
+>
+> diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204=
+a.c
+> index 0fcf4a39de27..8af767f903ea 100644
+> --- a/drivers/crypto/atmel-sha204a.c
+> +++ b/drivers/crypto/atmel-sha204a.c
+> @@ -15,6 +15,7 @@
+>  #include <linux/module.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/slab.h>
+> +#include <linux/sysfs.h>
+>  #include <linux/workqueue.h>
+>  #include "atmel-i2c.h"
+>
+> @@ -119,21 +120,22 @@ static ssize_t otp_show(struct device *dev,
+>  {
+>         u16 addr;
+>         u8 otp[OTP_ZONE_SIZE];
+> -       char *str =3D buf;
+>         struct i2c_client *client =3D to_i2c_client(dev);
+> -       int i;
+> +       ssize_t len =3D 0;
+> +       int i, ret;
+>
+> -       for (addr =3D 0; addr < OTP_ZONE_SIZE/4; addr++) {
+> -               if (atmel_sha204a_otp_read(client, addr, otp + addr * 4) =
+< 0) {
+> +       for (addr =3D 0; addr < OTP_ZONE_SIZE / 4; addr++) {
+> +               ret =3D atmel_sha204a_otp_read(client, addr, otp + addr *=
+ 4);
+> +               if (ret < 0) {
+>                         dev_err(dev, "failed to read otp zone\n");
+> -                       break;
+> +                       return ret;
+>                 }
+>         }
+>
+> -       for (i =3D 0; i < addr*2; i++)
+> -               str +=3D sprintf(str, "%02X", otp[i]);
+> -       str +=3D sprintf(str, "\n");
+> -       return str - buf;
+> +       for (i =3D 0; i < OTP_ZONE_SIZE; i++)
+> +               len +=3D sysfs_emit_at(buf, len, "%02X", otp[i]);
+> +       len +=3D sysfs_emit_at(buf, len, "\n");
+> +       return len;
+>  }
+>  static DEVICE_ATTR_RO(otp);
+>
+> --
+> Thorsten Blum <thorsten.blum@linux.dev>
+> GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
+>
 
-From: Arnd Bergmann <arnd@kernel.org>
+I took the patch as of link below. I verified on the before described setup=
+.
+https://lore.kernel.org/lkml/20260216074552.656814-1-thorsten.blum@linux.de=
+v/
 
-at the beginning.  Do you want me to resend the patch?
+worked, LGTM
 
-David
+Reviewed-by: Lothar Rubusch <l.rubusch@gmail.com>
 
+Best,
+L
