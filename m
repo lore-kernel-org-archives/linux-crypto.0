@@ -1,185 +1,185 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010019.outbound.protection.outlook.com [52.101.46.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179CD3112C9
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Feb 2026 11:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD5E2C3255;
+	Tue, 17 Feb 2026 20:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.19
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771326102; cv=pass; b=Taca/4fikYBBsoeepHITZy+evnVk7YDBDZBw0iKH1tSuIGK9tpy19dJpo28v2Vb5OjWoiIvO4ZEMca64Vey2obxqiPOLeRafHLM+/NONJZH1a3qwt0Z/X5pnSo0N7MsOYHiN4EOfzNCrgGD4sbVMY8y3Z0e4r5dBUk9yu5rADkQ=
+	t=1771358980; cv=fail; b=n1sj/skxgm58HxL0OcoZOzOXOXxjtRPbp7L0yiTO33Rwdnpwu1V0pYXkINiiOgzEyQ+MrvwJP6+nZ7eaQzEEvBhHuOSjuFgUNVaS4i7P44u7NhGklqQCZ9GOoTQ5JskyAR6ElZ1D2vU/QdZk19oqqEbbqQgCz4wupyPwhwtHIwA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771326102; c=relaxed/simple;
-	bh=NejZiV/V3YzcLdOEsrDKIlM3Cm8jcTsCrNvnU8CR6xU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l3xDWSPrH/eQL8NZ4Bx/qPnYqbgbUls4SmjGVOlSJSiyGatKecDxDyoRy3ynf6B1K01NbM53fHBtw5GtDpz+0ZCaoRUHhYeeVpIY4/tHufYCJJ2Jj+wMN2X6rLjaZ4X4p2gwGNdi0OdDSiA6d7ZBIOsfS/OVQtsvDq5y+6luhDs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WB/iGyuJ; arc=pass smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1771358980; c=relaxed/simple;
+	bh=42iAD4yNR0BHytSVc0BwrwEATm9HNltn86vyDwCRC+0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sSVTcB/tvi7QMFi1OX2LmCOeLsvfXWiJfvQYquUH5prLqhBdmtp038A/Wm242SjggRcrD+s6ABhi2aqI5eD5lL/nKNLCvvsmvwZXbJOg6ecP3nuMLNMd4zQ2OcZ4zo/OHHJ8oUfaSWsNJ07DfajRMb8JqbmhSgoCS6vg4K7ypRE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=BGW+vX3J; arc=fail smtp.client-ip=52.101.46.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WB/iGyuJ"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7968b6f6dfdso4582287b3.0
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Feb 2026 03:01:38 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771326098; cv=none;
-        d=google.com; s=arc-20240605;
-        b=X9xG4oNveRJcB877CV8lcgsg7QiLOxrPt4d7NMJhQfBGF5g6vZU/C6UDAkGAMsAavL
-         uJDtvbL1RVOaLqILfNp7y4DM1AfZqqIQ4f/WTpdjphfJsdPxSNVZeIDv10ml56W4bmjv
-         TvGdAN8+NtWIqwAwogMG1XrVw0qE0Ms9X3Q9St8oRaCcva5Tv9Pj+Q2SDPMGPVetCx5g
-         wZQQ3pxYvJGfsOoAKtPlJCPDZ+vpCpTsXx8KclCtMsYbmekNt5M7ncNOuIgZvUfoshV+
-         ykFiDt17XeUjzq94n8pHosU6n9BFsjA+bN32oMGMc49ENbI1x5f0VQBZnGb6RuNV/Jkv
-         avfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=lNlPguOObx+yXshPeTIquRndnBus7h4jAK1vKKf010E=;
-        fh=bfvOhyLvIOWJElk8Fp3xffruF7v7EgWwFC3fNg6j9cY=;
-        b=BQJWrAKIUdyyfmeSJJ0KVP4pcHperw7ci5mV9zl7kqlTvOWNb9loBTFvv7qfWUAjQK
-         EB7spHtgQz+fYG7iYKk7XyR5NVPOhS9NlAnMsLVww2LnE7EM3G2bdDCVpo+Jboe6HnA8
-         UyWk8r/CzA7QkPJZkw5E5WhASC4VYUC45/DXe2xjfjIchEz8IKNVl/wZ2kA0BGgtqQ3/
-         zdtL4cpnsM3NcCodgPTHuVcddrFexFjxlZ5RUQRFTRHZea/zXcS3Cxbn8ImV6/7htQgF
-         Yj7O46Q7waairn0izYNJINRgs60qgMOwcZ6Pa512GEIDoc1J5JipDKATndYLBb1fPA1m
-         f+cA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771326098; x=1771930898; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lNlPguOObx+yXshPeTIquRndnBus7h4jAK1vKKf010E=;
-        b=WB/iGyuJW6p7cB2vylJaCC0PyE5AAIqvDkktIm+UAJKZeojOKob6paNG7uhr1StEo+
-         JYylY50A7PiKGCH9GMFZBY4vad75ufeE9wNKBUnqOpQZAe+fp8KbUQuuS4A5QpTxT8Kz
-         s5IUSTWBXTyPV9KWmsca5fZTaD62J9iT/V5Zq7ilgxoz+orGyQzN8hIZXt1xMp95lhBQ
-         skdOWvqCFCWxP64dKx4iERmUh5gOq0xpBVhnrAfyvdrfjpJKtn5/tt8otXuxQ2Myh1Ph
-         9TQyGTKY2lmxHeRgmequFggg8qFHgYPBEKBAivYVycDTYWzQ06ceTxSqNFFuRcAz19DR
-         SQsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771326098; x=1771930898;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lNlPguOObx+yXshPeTIquRndnBus7h4jAK1vKKf010E=;
-        b=P2/iCLjsqNWebuhKCuvYTB1fzu9XFnyt4cIYtuNSxncYgvKsGyvYnf+UI9x1qHEaoa
-         A0nqMLz0TVfk9wtDrKGXP18VYgcqvSHUTT3Ac79tywT+Hqztai9eZrLkr6lBrRCLbQm8
-         c6ENAVuFlN5PKo6rTzhW7jhUCtIQvBG8d5IIogNoveLva+T7onBfjTFJu71EFZEtWKM4
-         0SjOWdhYUMaIcBtQVwO0ACYEeP3qtvLQLgIukfnUuhcJwqoNF9Kaiod1qVlKskOrP7Wr
-         s3cN5sxn5jbf6uqtxvyf93rvMztTGCLJpJEom0Ulsc8z27gV5s95KdG92B9WwTanXB6z
-         /ziw==
-X-Forwarded-Encrypted: i=1; AJvYcCUCMP8DrP4cAOP9yTw98iXDaGKagqW95t8YwC+AsJxWxc/enXwY4enXMB5wcigy8QCOjDVuIVQMs2xeVUg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkMUijqL8u2vQY6+7oRLHnqYqowG3fOQO2gj1XNsgfC77GaYdC
-	Ke9Whl4U1rBpeuIpIEm683PIS1bc5QvNNns7OtsmS3ctwM/5NSlnESbl0K45q0V9elrgjrzSzez
-	epsGLiTtbuVWamh9un2hbpNa2+A+QFTw=
-X-Gm-Gg: AZuq6aIjS4u0bfj5D+HOmnPK1W/UYjvWxGIJgn91FZX5zyo1dkmYZydK/Mw9HrttjBR
-	/5weSfTdrc4KblKLPtdRszMQhF/tTWu0c52F2F9HUYgVsNVnd9npkt8S5yc/XlwSsm9f9dFSGsz
-	Eh3QxanN4g6VOInlZxgR6fW5IB5VxG/NpVDBFu7d1D+WG81KUkkO8uNc+6fSQox8xxI0IDKnNnF
-	ItMX9chHaCrbFTve3Q5KlCUtvIiw+2LN6oPVzO6jQH9pV7DDkeyjbM5z+DBKSskvPJiuMsiEid0
-	W+35Yxa6nHcB2/w=
-X-Received: by 2002:a05:690e:4004:b0:649:bf2a:71d with SMTP id
- 956f58d0204a3-64c14d8c91dmr10695377d50.4.1771326096397; Tue, 17 Feb 2026
- 03:01:36 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BGW+vX3J"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DkxSIvhJvgNNByS/HRfVreVfqchFj40A7AkDv2Bdv5Iv/zoD8eG2gEgGN9YZnF8Gf+DlmMZs4XpOaf0u8CMB9XrlhB2ZzkmpoP6HuYjfsTWoJ1jTyS99withS0fNPDEUhnx7W/H8q5DhKFry8eYzNOJVM76ZO476hSc5r09baCkau8uoTwHDgv4uyTBN4uJUDJxVuc2GCIkyH+ZCBC7qAvhwV3fk3Ox2CIbka7dD9m8/DOigQj3cYUicTcZF3gvC6clWXILRHKPhzkox0gvOdWtBfxVXiXl8HaNXw/wj9uK6G5DgzEYh8fBr2KRNRe2pUD48FuP+DOinO9hUCmhcGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=z2XoWPMZjBR56Mc1kgY1SJsdsppsFl/AmWTP5xZdRzY=;
+ b=mjBhz19eU6U6LVlP71nbJ9xrXMRyAGi5ln1TiNs06oNt6fjEXChoFb1GVlpHWtmByHEexPDbuomz7WqelqYS5rw0tabLo45g2wf18+8MxMT2sLswDxXLzBVp3bof5PRbQgEctwlJo0XoRnQSE9JR+3TFcK2noJeHVD/rCYUxbxkDPWHREM69qHgmSrgn0xBwDOIoQs9S7oO1dLaCN2EIYvNHN/wZ/lA2ETb16HXIOKVzeq1c3/MaDG9kKCFjq+B5U+Yo4l7Z9bQ8LWmRnPNMgjtfvyTT5Rc4hTdYHgWC3Rc+QfQZj2ObupDOb7ubSZLb0J/E9ykTJpts+DaE3z6Tzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z2XoWPMZjBR56Mc1kgY1SJsdsppsFl/AmWTP5xZdRzY=;
+ b=BGW+vX3JvyFRo/nZKpqZqdZ7xwhKafE+7MOMVH0dXZFcJvsjfjku1P7NHS7JEWv2pnIaTQaN8adAcosoCuNRYkVRa2POvki2pPwe+shiXolFtJyW1e3ZteoiUYrHbSbckHJla17+6wD1fwtUrH3nHpKGN9kcyHkL/bihmhZ1wG8=
+Received: from MN2PR11CA0025.namprd11.prod.outlook.com (2603:10b6:208:23b::30)
+ by PH7PR12MB7916.namprd12.prod.outlook.com (2603:10b6:510:26a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.13; Tue, 17 Feb
+ 2026 20:09:33 +0000
+Received: from BL6PEPF0001AB58.namprd02.prod.outlook.com
+ (2603:10b6:208:23b:cafe::90) by MN2PR11CA0025.outlook.office365.com
+ (2603:10b6:208:23b::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.13 via Frontend Transport; Tue,
+ 17 Feb 2026 20:09:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BL6PEPF0001AB58.mail.protection.outlook.com (10.167.241.10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9611.8 via Frontend Transport; Tue, 17 Feb 2026 20:09:33 +0000
+Received: from nigeria-2635-os.aus-spse (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 17 Feb
+ 2026 14:09:31 -0600
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <tglx@kernel.org>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+	<seanjc@google.com>, <peterz@infradead.org>, <thomas.lendacky@amd.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <ardb@kernel.org>
+CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
+	<KPrateek.Nayak@amd.com>, <Tycho.Andersen@amd.com>,
+	<Nathan.Fontenot@amd.com>, <jackyli@google.com>, <pgonda@google.com>,
+	<rientjes@google.com>, <jacobhxu@google.com>, <xin@zytor.com>,
+	<pawan.kumar.gupta@linux.intel.com>, <babu.moger@amd.com>,
+	<dyoung@redhat.com>, <nikunj@amd.com>, <john.allen@amd.com>,
+	<darwi@linutronix.de>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>
+Subject: [PATCH 1/6] x86/cpufeatures: Add X86_FEATURE_AMD_RMPOPT feature flag
+Date: Tue, 17 Feb 2026 20:09:07 +0000
+Message-ID: <6e004cd8c4deb4660bc5887309fc64aece0a5b25.1771321114.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1771321114.git.ashish.kalra@amd.com>
+References: <cover.1771321114.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260215205152.518472-3-thorsten.blum@linux.dev>
-In-Reply-To: <20260215205152.518472-3-thorsten.blum@linux.dev>
-From: Lothar Rubusch <l.rubusch@gmail.com>
-Date: Tue, 17 Feb 2026 12:01:00 +0100
-X-Gm-Features: AZwV_QhRbxpAvpo2UBR8-Y_jstIAD1Nkb3C6Xx--Z_yv-x7ERa_X4u_C0YYTw2Q
-Message-ID: <CAFXKEHbzStf-8egh4QVdxz6MmAn_fBh1A4G-sb4gg+pxU9Qdkg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: atmel-sha204a - Fix error codes in OTP reads
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	stable@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB58:EE_|PH7PR12MB7916:EE_
+X-MS-Office365-Filtering-Correlation-Id: c8303793-5cda-4e3b-25fe-08de6e607750
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|7416014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?mxfLN0y69GFq8z1MB/57h/uMt533RqiaQ9C9nlQDOIehiBUWzGWl1E3gKWVG?=
+ =?us-ascii?Q?BcpYK786WEiQEiRfUeKcfDUqVMCGj+H2jXg5SNSus3LV3TmOuQrluR6EPWwB?=
+ =?us-ascii?Q?bcCXFuczkMWl0sWOmrzUbJ1GVv0GVrNFeN7l7jNml0NNitTN058/ljA/uI0R?=
+ =?us-ascii?Q?0IomHV8jpwUSOJO97FWki3jYtA4zmYH5ZoIVdIXadaUKmxHmtRgaAZ9XL+Rc?=
+ =?us-ascii?Q?6htzk8TdwAEaylfs6cSqeQ8PG8/t4KZ22xEdPSu4w+HkTb4kXMeHh8y/v1Bw?=
+ =?us-ascii?Q?IkcnRn97DzEJQqGQCPXS/ccCsWAgyDQUFCZKkL2TX/99h4FOk3aBEDKG2zfI?=
+ =?us-ascii?Q?1vy/B6G384aaFr2p340R8Pc9V7B8NrUYu2tdpSmhSbYgljhKmfj9PD/SUaDb?=
+ =?us-ascii?Q?N2E5onmpJcIxpxIpoAijmua9tOtYe2xZ7qbAH0up9/gSAc2y9qVInnT+x/Te?=
+ =?us-ascii?Q?tMBYSUENkjwU/kFIJhoYAG2PmHB9X+FzwAwya3GbRDP/7hAkyC8E8DW3b18d?=
+ =?us-ascii?Q?uCH6F0h4pmurALZ3RviM26cVdDhQyHHwP6GNA7dcnu8lMe3jWPIv9Pv19qGZ?=
+ =?us-ascii?Q?O0O8oPDCnwpW+vQQs2YdK84Q9XCbM1Rfhp5M6M9Lc0VvyAorblOoBiDdHcJ1?=
+ =?us-ascii?Q?xX6waafaO0PAxJmEZrD5MCVj6A+s47OR6eFW3noiymLgq9iWVvBeFfG4lOfm?=
+ =?us-ascii?Q?g2Fd+mWB1zXvwHHDY9cHsvEMSN4JsGkhVyOsi8OyrkE9CpzfymRLUPzOF9ou?=
+ =?us-ascii?Q?wspQpmmsAFLbkoDjESoc2fmvGTQ6M1V5Gie0yo+cQqBv7sFS7HvP3nRsRPyh?=
+ =?us-ascii?Q?MpNuxnhvvOX7noopsdz6Ggs5wSRYj6GdvFiIX7BBhpiaQXpg/3nPpwUxm7h5?=
+ =?us-ascii?Q?+ZTKwrt4RnldDWWPd/X83plbwyVLONED8zzeExhZh+7OaFrrHxHCG1At5iIl?=
+ =?us-ascii?Q?vSyyHZ88KQXMwOUzSYA//AzA0uEIIkyYOtJW7giyxgsq9t8cu9P79SS79319?=
+ =?us-ascii?Q?e8VameqaEOQO+SmIxMsjW8wNLYDCfgqOeYoxsHFecEJAwNNk3pJIzxGsf7sE?=
+ =?us-ascii?Q?dr+AuK5CGeUniVOlgIzV+HyeJ2uYPHjq4jddhhs4vnVkkTS3UfEvq+7kSIQ6?=
+ =?us-ascii?Q?nXCAhlZEY0YqyASCsrnR2SQ/dgoT5AQdWHa4CT5fx4kdsa8J9cAnODLs1aet?=
+ =?us-ascii?Q?aKXM0tvWj9ARFMQ+QoNSraXTA7fGBYzNJNKnK647r2eK7YsL6Yj6n1F2QT2q?=
+ =?us-ascii?Q?qEj+AMPikxcOHTNd9Uk2NM3QhD1bKGDjyoirkIkEhiefAEkMp9TJ9DqCQH21?=
+ =?us-ascii?Q?H0iGHuOnObiKroinSKTjYyMizrscz6kEbRpe9oucpOI8vmBBjscaH5Ws2ZX6?=
+ =?us-ascii?Q?3Ugpb68pg4r8PwxWFL4BwBxFfrp+XKX9wBYsLpqK6ftC9zbEJUoqKKDCpzgr?=
+ =?us-ascii?Q?qNLgCiU+ZBoeSr6WySkJZorbQBQwY1i0fhq6ZdjwQ34o2LGH5Vp8K+kvvRo/?=
+ =?us-ascii?Q?TZAK07UKyBL6fvR5j/YfIcbGJVOvFQoz1oLeJqLFuZtkCCbUyC+UV1Yijp9M?=
+ =?us-ascii?Q?pnt/6w/iqeH2+2ujdZ8l1WRmqjf1v+RXdPB7c62GcHX4sXCXoe4KU4kQmj4H?=
+ =?us-ascii?Q?Ru41koHVCx4d/swtkWNJixI6KJfLR+mYpGgpXzSrRGRFF3nqqR02czVSBp1+?=
+ =?us-ascii?Q?sR8b7w=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(7416014)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	1lfRBswbFYA6YOLE163xQHue+sgXtCct3QFVKzPOsZbinwtPsStuZRgFpkSLqpwTAKdXSrnlN//EZLLsYaF4/GY6l5vciRn3MMDckmJqrtFsY5Ld28mT6s7LuQHeNq0CjCIpxxtpD7gt88XZgpkhw/Bf9OU58AL1YLnqIrJFvoI4owzHhwKOVz8RgkFxKVslUkheuquDYAAyWOJFcBqTSwXccQa9TBnYgPdP18E5lw0hBdKeacU6ExDM3NUuumbItqK4kH9Q5zkds2z5Ebipl1AKie+intbzTLaXAX2wBFbDSOEAsx6+bh7EugDnjVXfefwobzmPRcLKeUOwqxzoLPptB40E0Ke3FjEtAaB1F91+HsppWxZd1TVoTJQp8/3Mn9LR+JtzfSjWV+eWWGqZWv+ry/pI5RVAg1CAoErrVIhoUDM96/yQ3/WADJSY7tCq
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2026 20:09:33.0402
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c8303793-5cda-4e3b-25fe-08de6e607750
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB58.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7916
 
-Hi, the change works (doesn't break behavior at least) verified on
-hardware, LGTM.
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-I remember that time we had a small discussion on what is the right
-approach with the return
-handling, and at least me was unsure about it. If this puts it
-straight I'll take it for me as take
-away. Thank you Thorsten, and sorry for the fuzz.
+Add a flag indicating whether RMPOPT instruction is supported.
 
-Reviewed-by: Lothar Rubusch <l.rubusch@gmail.com>
+RMPOPT is a new instruction designed to minimize the performance
+overhead of RMP checks on the hypervisor and on non-SNP guests by
+allowing RMP checks to be skipped when 1G regions of memory are known
+not to contain any SEV-SNP guest memory.
 
-Best,
-L
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+---
+ arch/x86/include/asm/cpufeatures.h | 2 +-
+ arch/x86/kernel/cpu/scattered.c    | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-On Sun, Feb 15, 2026 at 9:52=E2=80=AFPM Thorsten Blum <thorsten.blum@linux.=
-dev> wrote:
->
-> Return -EINVAL from atmel_i2c_init_read_otp_cmd() on invalid addresses
-> instead of -1. Since the OTP zone is accessed in 4-byte blocks, valid
-> addresses range from 0 to OTP_ZONE_SIZE / 4 - 1. Fix the bounds check
-> accordingly.
->
-> In atmel_sha204a_otp_read(), propagate the actual error code from
-> atmel_i2c_init_read_otp_cmd() instead of -1. Also, return -EIO instead
-> of -EINVAL when the device is not ready.
->
-> Cc: stable@vger.kernel.org
-> Fixes: e05ce444e9e5 ("crypto: atmel-sha204a - add reading from otp zone")
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
-> Compile-tested only.
-> ---
->  drivers/crypto/atmel-i2c.c     | 4 ++--
->  drivers/crypto/atmel-sha204a.c | 7 ++++---
->  2 files changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
-> index 9688d116d07e..ba9d3f593601 100644
-> --- a/drivers/crypto/atmel-i2c.c
-> +++ b/drivers/crypto/atmel-i2c.c
-> @@ -72,8 +72,8 @@ EXPORT_SYMBOL(atmel_i2c_init_read_config_cmd);
->
->  int atmel_i2c_init_read_otp_cmd(struct atmel_i2c_cmd *cmd, u16 addr)
->  {
-> -       if (addr < 0 || addr > OTP_ZONE_SIZE)
-> -               return -1;
-> +       if (addr >=3D OTP_ZONE_SIZE / 4)
-> +               return -EINVAL;
->
->         cmd->word_addr =3D COMMAND;
->         cmd->opcode =3D OPCODE_READ;
-> diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204=
-a.c
-> index 0fcf4a39de27..6b4e2764523e 100644
-> --- a/drivers/crypto/atmel-sha204a.c
-> +++ b/drivers/crypto/atmel-sha204a.c
-> @@ -94,9 +94,10 @@ static int atmel_sha204a_rng_read(struct hwrng *rng, v=
-oid *data, size_t max,
->  static int atmel_sha204a_otp_read(struct i2c_client *client, u16 addr, u=
-8 *otp)
->  {
->         struct atmel_i2c_cmd cmd;
-> -       int ret =3D -1;
-> +       int ret;
->
-> -       if (atmel_i2c_init_read_otp_cmd(&cmd, addr) < 0) {
-> +       ret =3D atmel_i2c_init_read_otp_cmd(&cmd, addr);
-> +       if (ret < 0) {
->                 dev_err(&client->dev, "failed, invalid otp address %04X\n=
-",
->                         addr);
->                 return ret;
-> @@ -106,7 +107,7 @@ static int atmel_sha204a_otp_read(struct i2c_client *=
-client, u16 addr, u8 *otp)
->
->         if (cmd.data[0] =3D=3D 0xff) {
->                 dev_err(&client->dev, "failed, device not ready\n");
-> -               return -EINVAL;
-> +               return -EIO;
->         }
->
->         memcpy(otp, cmd.data+1, 4);
-> --
-> Thorsten Blum <thorsten.blum@linux.dev>
-> GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
->
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index dbe104df339b..bce1b2e2a35c 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -76,7 +76,7 @@
+ #define X86_FEATURE_K8			( 3*32+ 4) /* Opteron, Athlon64 */
+ #define X86_FEATURE_ZEN5		( 3*32+ 5) /* CPU based on Zen5 microarchitecture */
+ #define X86_FEATURE_ZEN6		( 3*32+ 6) /* CPU based on Zen6 microarchitecture */
+-/* Free                                 ( 3*32+ 7) */
++#define X86_FEATURE_RMPOPT		( 3*32+ 7) /* Support for AMD RMPOPT instruction */
+ #define X86_FEATURE_CONSTANT_TSC	( 3*32+ 8) /* "constant_tsc" TSC ticks at a constant rate */
+ #define X86_FEATURE_UP			( 3*32+ 9) /* "up" SMP kernel running on UP */
+ #define X86_FEATURE_ART			( 3*32+10) /* "art" Always running timer (ART) */
+diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
+index 42c7eac0c387..7ac3818c4502 100644
+--- a/arch/x86/kernel/cpu/scattered.c
++++ b/arch/x86/kernel/cpu/scattered.c
+@@ -65,6 +65,7 @@ static const struct cpuid_bit cpuid_bits[] = {
+ 	{ X86_FEATURE_PERFMON_V2,		CPUID_EAX,  0, 0x80000022, 0 },
+ 	{ X86_FEATURE_AMD_LBR_V2,		CPUID_EAX,  1, 0x80000022, 0 },
+ 	{ X86_FEATURE_AMD_LBR_PMC_FREEZE,	CPUID_EAX,  2, 0x80000022, 0 },
++	{ X86_FEATURE_RMPOPT,			CPUID_EDX,  0, 0x80000025, 0 },
+ 	{ X86_FEATURE_AMD_HTR_CORES,		CPUID_EAX, 30, 0x80000026, 0 },
+ 	{ 0, 0, 0, 0, 0 }
+ };
+-- 
+2.43.0
+
