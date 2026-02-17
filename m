@@ -1,176 +1,185 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2186E326957
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Feb 2026 10:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771324947; cv=none; b=LRVRMvF4KeIeNNKej2PX9k3U8ZVFpVnbDAbdc8owqnO/GEtTbObJOeR6ts/koJOBFKMey8dpRiAw0FCkWnLCdIMnP7Irom7gQqVyiN/93SK7eubQKAybxljWpXpOcvCJdl8MoRKKyLoMh0iJ7H9Lv0cBKYc2S4YHyKkWMBmoucM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771324947; c=relaxed/simple;
-	bh=zwkZhKPwzD2PsE1qcDcLirFWz7+Ud7DF8KDPjOGbD5Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FyBMp9s7JGQbt9ahHniqNBxi9auwyqnmi9ixkbhrY06CD8Xx8aWLLRDAaNO7soN2225SPHyQEp/Hq0GNyWnJ44RZTbCrNSf5nyqSpZ3UPoW1UaE4MzLkJY40m5Flb+9BP4a4v3W7stQ5L7dYHp0QG4iL8YiA9x/V7oKf47qiKxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SKt6GQ1n; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Qz3mJse6; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179CD3112C9
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Feb 2026 11:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771326102; cv=pass; b=Taca/4fikYBBsoeepHITZy+evnVk7YDBDZBw0iKH1tSuIGK9tpy19dJpo28v2Vb5OjWoiIvO4ZEMca64Vey2obxqiPOLeRafHLM+/NONJZH1a3qwt0Z/X5pnSo0N7MsOYHiN4EOfzNCrgGD4sbVMY8y3Z0e4r5dBUk9yu5rADkQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771326102; c=relaxed/simple;
+	bh=NejZiV/V3YzcLdOEsrDKIlM3Cm8jcTsCrNvnU8CR6xU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l3xDWSPrH/eQL8NZ4Bx/qPnYqbgbUls4SmjGVOlSJSiyGatKecDxDyoRy3ynf6B1K01NbM53fHBtw5GtDpz+0ZCaoRUHhYeeVpIY4/tHufYCJJ2Jj+wMN2X6rLjaZ4X4p2gwGNdi0OdDSiA6d7ZBIOsfS/OVQtsvDq5y+6luhDs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WB/iGyuJ; arc=pass smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SKt6GQ1n";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Qz3mJse6"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61H89QO1048812
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Feb 2026 10:42:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	lERWgpfQ021ixuj5VydJR9LwXl6bNyrORxIkuF1K2e8=; b=SKt6GQ1ndkPWdntu
-	fLOUWgc0edVxjIUWHa3CXbm/A1NSIdL++g/98VhYcO7GAKtxPVTuKCJzlwXKxE9b
-	SAUMTPjw4+eyh29vXrqfAS8IS+MsiKfoSPGQ0JJKoraYbyML/aCJJ9sID/uB2Czv
-	KJdlEzvteTnlVFIj9fJ+YAGJtCqetROozgTpTf2xPXZCcSOnf0F+AKYfdAcnPboO
-	ChT48Tc85S8v2/grel88r5+fJMwxqg5F7szz7/2uUta3C4JcrJq8zNUS/KkO3Lp3
-	MBQ7/3ehwhfB8WGRxORYxEMVbXm58gcs3SGJggNfT0/CXmcHvvsoWb//3Ns7Re72
-	9svWxg==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cc6d8218f-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Feb 2026 10:42:25 +0000 (GMT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8cb45a6b860so222805085a.0
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Feb 2026 02:42:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WB/iGyuJ"
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7968b6f6dfdso4582287b3.0
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Feb 2026 03:01:38 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771326098; cv=none;
+        d=google.com; s=arc-20240605;
+        b=X9xG4oNveRJcB877CV8lcgsg7QiLOxrPt4d7NMJhQfBGF5g6vZU/C6UDAkGAMsAavL
+         uJDtvbL1RVOaLqILfNp7y4DM1AfZqqIQ4f/WTpdjphfJsdPxSNVZeIDv10ml56W4bmjv
+         TvGdAN8+NtWIqwAwogMG1XrVw0qE0Ms9X3Q9St8oRaCcva5Tv9Pj+Q2SDPMGPVetCx5g
+         wZQQ3pxYvJGfsOoAKtPlJCPDZ+vpCpTsXx8KclCtMsYbmekNt5M7ncNOuIgZvUfoshV+
+         ykFiDt17XeUjzq94n8pHosU6n9BFsjA+bN32oMGMc49ENbI1x5f0VQBZnGb6RuNV/Jkv
+         avfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=lNlPguOObx+yXshPeTIquRndnBus7h4jAK1vKKf010E=;
+        fh=bfvOhyLvIOWJElk8Fp3xffruF7v7EgWwFC3fNg6j9cY=;
+        b=BQJWrAKIUdyyfmeSJJ0KVP4pcHperw7ci5mV9zl7kqlTvOWNb9loBTFvv7qfWUAjQK
+         EB7spHtgQz+fYG7iYKk7XyR5NVPOhS9NlAnMsLVww2LnE7EM3G2bdDCVpo+Jboe6HnA8
+         UyWk8r/CzA7QkPJZkw5E5WhASC4VYUC45/DXe2xjfjIchEz8IKNVl/wZ2kA0BGgtqQ3/
+         zdtL4cpnsM3NcCodgPTHuVcddrFexFjxlZ5RUQRFTRHZea/zXcS3Cxbn8ImV6/7htQgF
+         Yj7O46Q7waairn0izYNJINRgs60qgMOwcZ6Pa512GEIDoc1J5JipDKATndYLBb1fPA1m
+         f+cA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1771324944; x=1771929744; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lERWgpfQ021ixuj5VydJR9LwXl6bNyrORxIkuF1K2e8=;
-        b=Qz3mJse6+k+zYrgF7+ZUunw9+Ak32DY8VTDuF//0Hq81DHCutbPSpzqi1XTmKBVlgy
-         2iV8R+zXF/chUUGSoVWYS2dDl3speZc5zAqk3JJRzfyuqJ06nz0ezYhykN5KopXy81Lb
-         sWwFLefTjnsH4jfthrfTkA3MRAnnE///C313P2xp2W3V2FZ9mSbquMhirbq+CO6XH/79
-         H1ZRjx5bajRqqp5C527EXSCPBy9+pp3ATyxjPxjXeQUIdRGZ8/VJJjSvL8f1KEn9Immf
-         yR8PIeKGBlpQUZgoncxm5gu/pLPbh4ei/RGpxofchmXHg8d0Ru+Eo3p40M72QSRxE43r
-         YF+w==
+        d=gmail.com; s=20230601; t=1771326098; x=1771930898; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lNlPguOObx+yXshPeTIquRndnBus7h4jAK1vKKf010E=;
+        b=WB/iGyuJW6p7cB2vylJaCC0PyE5AAIqvDkktIm+UAJKZeojOKob6paNG7uhr1StEo+
+         JYylY50A7PiKGCH9GMFZBY4vad75ufeE9wNKBUnqOpQZAe+fp8KbUQuuS4A5QpTxT8Kz
+         s5IUSTWBXTyPV9KWmsca5fZTaD62J9iT/V5Zq7ilgxoz+orGyQzN8hIZXt1xMp95lhBQ
+         skdOWvqCFCWxP64dKx4iERmUh5gOq0xpBVhnrAfyvdrfjpJKtn5/tt8otXuxQ2Myh1Ph
+         9TQyGTKY2lmxHeRgmequFggg8qFHgYPBEKBAivYVycDTYWzQ06ceTxSqNFFuRcAz19DR
+         SQsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771324944; x=1771929744;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lERWgpfQ021ixuj5VydJR9LwXl6bNyrORxIkuF1K2e8=;
-        b=gUvhlvqIDV4Y6NCKMbWBryt3GXX1+EniN578hyfAhKRJVPhmet6eq4pDG/t2QPpiIu
-         rLeKpC6c33u9BlUlE2yV0f1GvbwyTL8irn36sAcKyaeHg90690tdtNjJF1WTcf+UI/+Q
-         uxH6PiGCb6gQND/CFQ4Ohn6MSB/8I/Ajb7LaN0NHh4VhpA9jagykYN8EQ8oQGA1dhTSW
-         BDo0Uqd+y4NjdSrvvbtLm2/aON06PpLZ9eA4C/xz17j4JSJhxVZVIKKxiu49F9k4mHno
-         1CBzb0oHWxprN/ccbXNG/MsV4Y094b4plw7BrAQiHbr/JQxKW5AD1APMHJFm5MfeFs8x
-         1xNQ==
-X-Gm-Message-State: AOJu0Yws+rABsiwxjRD//hzgGqsh3TTld0wZ4YjPWdempHM83hZSFsEF
-	n+9UgkaBwhj4HYhL8hVUIsTNrJGZ6qTsz+gi/KYt60IddUkyFYmD0uXWoln6+Isov4QqLnQ5qgp
-	uzMgvttXVUapn0sYyBwazhtLBkoQ+RKK0DyOlcUd6crELbDV1skPWj2oJFFwa6nX688s=
-X-Gm-Gg: AZuq6aK8R94wj9ZpZoV1aw2jqv57cMgIEE7833vV88AHwuviPuQL25VmzyX22cwMKd7
-	vcpq6mwakkSN9N1zBC0sFdTnEE6R8VYwhyvlztC8+lEPnmiMn/Xynq6ciheBn3rHyXm1UZ/IuUf
-	jZdFnXAECddDH0kHLkTbobRWG5/gPIHV4893y3UvWejV+/p/Pv5h5VJG+3T3INi4VGtI0aAOokZ
-	sBMfKKbUyVf/wlVk3wPCPfk8cDpAzRE9tgsTauhOoyi1lkH7/fLskzRLX0lKj6k1lPnAmRPd9Zf
-	UefXIbJDul/TW2K29vSPBYnJMQPoSVjZk040QD1AWJZS+5DbC5Ve52IoLE59YxdGNT76twMcmDn
-	1swkOp7hq2qs1YcPQNLdCkTzqy2zJM4/4F6WvrBxU3oRT507IZsyKWQIK2DGZPD50o5EXmt874G
-	bEC9w=
-X-Received: by 2002:a05:620a:40c9:b0:8b2:fe27:d2ff with SMTP id af79cd13be357-8cb408cab72mr1172602185a.8.1771324944422;
-        Tue, 17 Feb 2026 02:42:24 -0800 (PST)
-X-Received: by 2002:a05:620a:40c9:b0:8b2:fe27:d2ff with SMTP id af79cd13be357-8cb408cab72mr1172601485a.8.1771324943969;
-        Tue, 17 Feb 2026 02:42:23 -0800 (PST)
-Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8fc763810asm330777466b.43.2026.02.17.02.42.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Feb 2026 02:42:23 -0800 (PST)
-Message-ID: <e5fe09e4-758e-43ed-a134-55bcf3a198b7@oss.qualcomm.com>
-Date: Tue, 17 Feb 2026 11:42:22 +0100
+        d=1e100.net; s=20230601; t=1771326098; x=1771930898;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lNlPguOObx+yXshPeTIquRndnBus7h4jAK1vKKf010E=;
+        b=P2/iCLjsqNWebuhKCuvYTB1fzu9XFnyt4cIYtuNSxncYgvKsGyvYnf+UI9x1qHEaoa
+         A0nqMLz0TVfk9wtDrKGXP18VYgcqvSHUTT3Ac79tywT+Hqztai9eZrLkr6lBrRCLbQm8
+         c6ENAVuFlN5PKo6rTzhW7jhUCtIQvBG8d5IIogNoveLva+T7onBfjTFJu71EFZEtWKM4
+         0SjOWdhYUMaIcBtQVwO0ACYEeP3qtvLQLgIukfnUuhcJwqoNF9Kaiod1qVlKskOrP7Wr
+         s3cN5sxn5jbf6uqtxvyf93rvMztTGCLJpJEom0Ulsc8z27gV5s95KdG92B9WwTanXB6z
+         /ziw==
+X-Forwarded-Encrypted: i=1; AJvYcCUCMP8DrP4cAOP9yTw98iXDaGKagqW95t8YwC+AsJxWxc/enXwY4enXMB5wcigy8QCOjDVuIVQMs2xeVUg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkMUijqL8u2vQY6+7oRLHnqYqowG3fOQO2gj1XNsgfC77GaYdC
+	Ke9Whl4U1rBpeuIpIEm683PIS1bc5QvNNns7OtsmS3ctwM/5NSlnESbl0K45q0V9elrgjrzSzez
+	epsGLiTtbuVWamh9un2hbpNa2+A+QFTw=
+X-Gm-Gg: AZuq6aIjS4u0bfj5D+HOmnPK1W/UYjvWxGIJgn91FZX5zyo1dkmYZydK/Mw9HrttjBR
+	/5weSfTdrc4KblKLPtdRszMQhF/tTWu0c52F2F9HUYgVsNVnd9npkt8S5yc/XlwSsm9f9dFSGsz
+	Eh3QxanN4g6VOInlZxgR6fW5IB5VxG/NpVDBFu7d1D+WG81KUkkO8uNc+6fSQox8xxI0IDKnNnF
+	ItMX9chHaCrbFTve3Q5KlCUtvIiw+2LN6oPVzO6jQH9pV7DDkeyjbM5z+DBKSskvPJiuMsiEid0
+	W+35Yxa6nHcB2/w=
+X-Received: by 2002:a05:690e:4004:b0:649:bf2a:71d with SMTP id
+ 956f58d0204a3-64c14d8c91dmr10695377d50.4.1771326096397; Tue, 17 Feb 2026
+ 03:01:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6] crypto: qce - Add runtime PM and interconnect
- bandwidth scaling support
-To: quic_utiwari@quicinc.com, herbert@gondor.apana.org.au,
-        thara.gopinath@gmail.com, davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, quic_neersoni@quicinc.com,
-        quic_kuldsing@quicinc.com
-References: <20260210061437.2293654-1-quic_utiwari@quicinc.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260210061437.2293654-1-quic_utiwari@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=bqVBxUai c=1 sm=1 tr=0 ts=69944611 cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22
- a=COk6AnOGAAAA:8 a=1gNIoQPsFeqS8mZPopYA:9 a=QEXdDO2ut3YA:10
- a=bTQJ7kPSJx9SKPbeHEYW:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjE3MDA4OSBTYWx0ZWRfXw4Xsh1bPN1RE
- 5RpXk+7aPwRDFkVTJSa9KcypjNGrA0iBQW9Nr7GOhO9ZU/Gt763TgeiZAX6Hnxk9m8ire09S72K
- vR0OshTR1B0HIJ6nMTr2ix10fhj17FI1V3BzdvQi2WOzs60YI5tflP2mPcFQvKECe0+U122Pkc3
- 6S6PHFeabE949ZMMtMqBxgbaPnZ1xSycSgd0U9TqPTRIxweL8rQN/oAaKNclDj0WCJSswZfLHZ/
- cfLDRzkKbImdjUe8EuiZfTgo1gJqUZTjajc+gf6RSr3qeVN4AKh5vV6/u0QNWtRzW/tTNr3hiKY
- cwxHTT0BUPj4Adyj/ELRhX2NiCT/wxfxUCAPf2YnCn3AbJB/RgKIgtjilpw3MGFUD3vv7BRzvsX
- M2gmR/UHFeNOLCzKeCiRzN2m5FiKk+pimJ60vEqfv4Gl1ENls4yawUTBz5yAfkDaNtsHP/LG/mw
- vrhV4ikaJy4YVmxu2XQ==
-X-Proofpoint-GUID: ckXZU9ZYhfwcnsiE-RCaGgAI9RmT-iI9
-X-Proofpoint-ORIG-GUID: ckXZU9ZYhfwcnsiE-RCaGgAI9RmT-iI9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-17_01,2026-02-16_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0
- priorityscore=1501 spamscore=0 adultscore=0 phishscore=0 clxscore=1015
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2602170089
+References: <20260215205152.518472-3-thorsten.blum@linux.dev>
+In-Reply-To: <20260215205152.518472-3-thorsten.blum@linux.dev>
+From: Lothar Rubusch <l.rubusch@gmail.com>
+Date: Tue, 17 Feb 2026 12:01:00 +0100
+X-Gm-Features: AZwV_QhRbxpAvpo2UBR8-Y_jstIAD1Nkb3C6Xx--Z_yv-x7ERa_X4u_C0YYTw2Q
+Message-ID: <CAFXKEHbzStf-8egh4QVdxz6MmAn_fBh1A4G-sb4gg+pxU9Qdkg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: atmel-sha204a - Fix error codes in OTP reads
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	stable@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/10/26 7:14 AM, quic_utiwari@quicinc.com wrote:
-> From: Udit Tiwari <quic_utiwari@quicinc.com>
-> 
-> The Qualcomm Crypto Engine (QCE) driver currently lacks support for
-> runtime power management (PM) and interconnect bandwidth control.
-> As a result, the hardware remains fully powered and clocks stay
-> enabled even when the device is idle. Additionally, static
-> interconnect bandwidth votes are held indefinitely, preventing the
-> system from reclaiming unused bandwidth.
-> 
-> Address this by enabling runtime PM and dynamic interconnect
-> bandwidth scaling to allow the system to suspend the device when idle
-> and scale interconnect usage based on actual demand. Improve overall
-> system efficiency by reducing power usage and optimizing interconnect
-> resource allocation.
-> 
+Hi, the change works (doesn't break behavior at least) verified on
+hardware, LGTM.
 
-[...]
+I remember that time we had a small discussion on what is the right
+approach with the return
+handling, and at least me was unsure about it. If this puts it
+straight I'll take it for me as take
+away. Thank you Thorsten, and sorry for the fuzz.
 
-> +	ret = pm_runtime_resume_and_get(dev);
->  	if (ret)
->  		return ret;
+Reviewed-by: Lothar Rubusch <l.rubusch@gmail.com>
 
-I expected this to use the new helper too, removing the need for gotos
-altogether (unless this path needs some other handling which doesn't
-immediately jump out to me)
+Best,
+L
 
-[...]
-
-> +static int __maybe_unused qce_runtime_resume(struct device *dev)
-> +{
-> +	struct qce_device *qce = dev_get_drvdata(dev);
-> +	int ret = 0;
-> +
-> +	ret = icc_enable(qce->mem_path);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH, QCE_DEFAULT_MEM_BANDWIDTH);
-> +	if (ret)
-> +		goto err_icc;
-
-Just one of these is good - icc_enable() simply calls icc_set_bw() with
-the last known rate. Since we're not setting the rate any earlier,
-just keeping the set_bw() alone seems like the way to go
-
-Konrad
+On Sun, Feb 15, 2026 at 9:52=E2=80=AFPM Thorsten Blum <thorsten.blum@linux.=
+dev> wrote:
+>
+> Return -EINVAL from atmel_i2c_init_read_otp_cmd() on invalid addresses
+> instead of -1. Since the OTP zone is accessed in 4-byte blocks, valid
+> addresses range from 0 to OTP_ZONE_SIZE / 4 - 1. Fix the bounds check
+> accordingly.
+>
+> In atmel_sha204a_otp_read(), propagate the actual error code from
+> atmel_i2c_init_read_otp_cmd() instead of -1. Also, return -EIO instead
+> of -EINVAL when the device is not ready.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: e05ce444e9e5 ("crypto: atmel-sha204a - add reading from otp zone")
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+> Compile-tested only.
+> ---
+>  drivers/crypto/atmel-i2c.c     | 4 ++--
+>  drivers/crypto/atmel-sha204a.c | 7 ++++---
+>  2 files changed, 6 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+> index 9688d116d07e..ba9d3f593601 100644
+> --- a/drivers/crypto/atmel-i2c.c
+> +++ b/drivers/crypto/atmel-i2c.c
+> @@ -72,8 +72,8 @@ EXPORT_SYMBOL(atmel_i2c_init_read_config_cmd);
+>
+>  int atmel_i2c_init_read_otp_cmd(struct atmel_i2c_cmd *cmd, u16 addr)
+>  {
+> -       if (addr < 0 || addr > OTP_ZONE_SIZE)
+> -               return -1;
+> +       if (addr >=3D OTP_ZONE_SIZE / 4)
+> +               return -EINVAL;
+>
+>         cmd->word_addr =3D COMMAND;
+>         cmd->opcode =3D OPCODE_READ;
+> diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204=
+a.c
+> index 0fcf4a39de27..6b4e2764523e 100644
+> --- a/drivers/crypto/atmel-sha204a.c
+> +++ b/drivers/crypto/atmel-sha204a.c
+> @@ -94,9 +94,10 @@ static int atmel_sha204a_rng_read(struct hwrng *rng, v=
+oid *data, size_t max,
+>  static int atmel_sha204a_otp_read(struct i2c_client *client, u16 addr, u=
+8 *otp)
+>  {
+>         struct atmel_i2c_cmd cmd;
+> -       int ret =3D -1;
+> +       int ret;
+>
+> -       if (atmel_i2c_init_read_otp_cmd(&cmd, addr) < 0) {
+> +       ret =3D atmel_i2c_init_read_otp_cmd(&cmd, addr);
+> +       if (ret < 0) {
+>                 dev_err(&client->dev, "failed, invalid otp address %04X\n=
+",
+>                         addr);
+>                 return ret;
+> @@ -106,7 +107,7 @@ static int atmel_sha204a_otp_read(struct i2c_client *=
+client, u16 addr, u8 *otp)
+>
+>         if (cmd.data[0] =3D=3D 0xff) {
+>                 dev_err(&client->dev, "failed, device not ready\n");
+> -               return -EINVAL;
+> +               return -EIO;
+>         }
+>
+>         memcpy(otp, cmd.data+1, 4);
+> --
+> Thorsten Blum <thorsten.blum@linux.dev>
+> GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
+>
