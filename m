@@ -1,221 +1,252 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012061.outbound.protection.outlook.com [52.101.48.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F84B34A76A
-	for <linux-crypto@vger.kernel.org>; Wed, 18 Feb 2026 21:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771448652; cv=none; b=Q8Ils9uB3/thHxdsHJYazDtlKABmUJhAYodp37ZxokD8RrVzSepFtrii5GqTSZRdCu6I/wATUcrR16tF9K+sgec31W9N1zLd9FA/epsVaaP8Ia2O9a6MWjiVvvR/DeLGov/lAaR6pJudao3bpxsWlBEVI+sde+AWtRAuTWSsGb4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771448652; c=relaxed/simple;
-	bh=qBtd2CO59a+HKvdpME8+RXTr+DLTGtsE5jPI2nVtVKA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ogDlueRc8UrJsdMn2KFYG8GzPsMJv5r5nCsnRhaqf0GMAlAwweGLqUSd1/qz4IXYS306I8hzJXb8o1nSbLYYBFXSns1H++GYoyDwILtz27HVLsedVjaH0TV7hon+/tlXAGbyKN/tQRZfygrX1b+cw716+077wBeeqzGkEPLyO8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XUdB4z/2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=N5/oQMW7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD06A321445;
+	Wed, 18 Feb 2026 21:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771448986; cv=fail; b=umk33Sa33mxHUoj5SjxZP5lVUoc/eEBYgT4nCC8y3Az+zBQQdjR5RWXlWG3MbXMdpRVGTSYh1sJ7xwcILM1mMEfc6YG11Tc9UfQRI4fuo7D00GR5+GTQ4w0wKE2mzjVgKXz0OBOfZFUFAAzDzSqjrfsPtY4uJNRZdnBtel5YDKI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771448986; c=relaxed/simple;
+	bh=JDCr7YHkc8PHoGq7iAf628weepniPkAU+eGif6nzPfs=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oKqjd3rOsNwt24XdqAa69b5DlqK+3F8D6ve0CxvVdErU4I+m2YDQUnoZv5mavAH0dzeYk2AltHHyfg3AFAtOWeJmLcHyoSPY6L0Z/2wWBwRE5zZNlgpdi8VM8y2hoo2vxl1JoazXiyIiOKjPe/g6n4O7EmemKVsaP159gWGDlTA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jgVWrTnS; arc=fail smtp.client-ip=52.101.48.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XUdB4z/2";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="N5/oQMW7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771448648;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pPcRNxiA9VF/PkhlksjBanylvA2gRYuNpURfmKx7ewA=;
-	b=XUdB4z/2ooGyyR1GFO/q6nUzsd6shssqEe5S3WTR+HSCOm61Tx+8x+4IZS7rhb5cFDHCcu
-	2gV8+dDb+NWs11HPktnfXUporxv7KdST3HfRB0YR7aOlMraWCBdDipjxI50Ej0dm+wRC3C
-	5Mtr0xNThT+0noB6uLqho2E84dOMc6Y=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-120-l-_7LBXFOTyY2LjO0hb4dg-1; Wed, 18 Feb 2026 16:04:06 -0500
-X-MC-Unique: l-_7LBXFOTyY2LjO0hb4dg-1
-X-Mimecast-MFC-AGG-ID: l-_7LBXFOTyY2LjO0hb4dg_1771448646
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8cb4a241582so160619185a.0
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Feb 2026 13:04:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771448646; x=1772053446; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:organization
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pPcRNxiA9VF/PkhlksjBanylvA2gRYuNpURfmKx7ewA=;
-        b=N5/oQMW77slCy5JJJssOVI61DoD9V2Vh5jAI0A0dy1ggfKFWmj7c7IzVs3r7hpZfoa
-         TR07yOgyUIaNQAdEiOACUUr8lHyahS46iLIKE4X5/ShcXOa+H1xf5hqpUqE7uECij6Sq
-         G9/Mkc4mtRVVSqPw64TQWf+nOLIWol9QOoxj+FoBVjE0lVP+TllAd+QlhjEuI2s+0Brd
-         TR+yjGXWReX5vcEC60gwpahYdmldMBtgeT6GNlqeoKRgckcIB26ciiVPe3U7pCbKl3tv
-         YDJw8TQ8VyMXtArM/M1Gj0sdeMnt3EkffcnAl6XyEH836KSsdVoFPnQrVHlsRVbwwqKd
-         0G0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771448646; x=1772053446;
-        h=mime-version:user-agent:content-transfer-encoding:organization
-         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pPcRNxiA9VF/PkhlksjBanylvA2gRYuNpURfmKx7ewA=;
-        b=tU9NlYCBsxN+Wn7LusGuAvZJ47/oLQYIvPpIIyea/KpK6jY8X4hF0gie8LROC/5XSb
-         LkcCMPHcp0kwpkGchahPVE4qgHXNqNxxEc8DgTkB9J1JH2/LcuEoXjyE9kwBpycpxdr3
-         4YvzGTh24gMCtZ0JxU6OMI9Qh7XJjz/YfiA9ABXsoi7r7vEpng3+rKaD1NrILBPvYxte
-         Jnu7ONxuOxsuOewxYGKxaBIb1L87umVbBAuU0Wj/fLTm0RaTPvKrYACDvO/ENFkt3GEY
-         5Dav5c94F43zWZB4CFCuGBmveIt4xYoTesV2yTpthTMtIY7cP+jJ8WZ0TjZQIEFvjbtY
-         xznw==
-X-Forwarded-Encrypted: i=1; AJvYcCUy0RM3TFFyu7GpzAYF0xJkUgdtAGijDDKfMiMdVzJY6WlyiCzKMsjE/t3gPQBgPSwiF6b4ElUgyAEj5Qs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHV//Za5GOJZLiRvXoyQK+z/qsg61z/13yq388QsH8ppSwwNwk
-	p18oyVh06Zz+PhEuv7Tv/5s95nyLpLfYxSparTMVbsGbtmmkItuscMukND1SIaDaZj/vnYkfYVE
-	c6uUV6RuDk6EyahlqnbJhDneZBVsTUaSWjEvq+TP5kI/esR1qN3QlQdCSKXOIUfA3vQ==
-X-Gm-Gg: AZuq6aJByVgB+jumNr5dRa+P+nyuYXydvd0GxUu9wJHp7yGMkEzcZSBG7XV8UCWGiUC
-	NpTm9FwgDQZ5XXhLoA+ltD/NfUHXYSIwnBUI1nGS5grj3IkD73UWGupZAJNpnmVukh8fDk8shFC
-	2UxiWk2ddey3CEcu63ad4MteNCwLhd/f8Tb2P3510m4xTmqwVQbS2t54WZDjing1/2x0En159++
-	9xO8CaQXW4XJ728G8k9oHt5y+vgvkDZpCzSwqGnO7bEkMTukKQ/3rx1TcYsbyquiFEARQZeCYXg
-	O+8xctCtR9pIG2NkxR5k+mqohKAN664xzBk79CdO9lnmiyrUwHgyOZNs5aC6rcMfuJcC+BP/NGK
-	wMDgyOahBVBRU0/Wc
-X-Received: by 2002:a05:620a:4689:b0:8cb:4dc4:61be with SMTP id af79cd13be357-8cb4dc46babmr1909602385a.49.1771448646072;
-        Wed, 18 Feb 2026 13:04:06 -0800 (PST)
-X-Received: by 2002:a05:620a:4689:b0:8cb:4dc4:61be with SMTP id af79cd13be357-8cb4dc46babmr1909597185a.49.1771448645565;
-        Wed, 18 Feb 2026 13:04:05 -0800 (PST)
-Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::7a7])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cb2b1c7ef7sm2079117785a.28.2026.02.18.13.04.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Feb 2026 13:04:04 -0800 (PST)
-Message-ID: <32e62cef7b89d9691bdd4120388ce752fd041230.camel@redhat.com>
-Subject: Re: [PATCH v15 00/28] x86: Secure Launch support for Intel TXT
-From: Simo Sorce <simo@redhat.com>
-To: Andy Lutomirski <luto@amacapital.net>, "H. Peter Anvin" <hpa@zytor.com>
-Cc: Ard Biesheuvel <ardb@kernel.org>, "Daniel P. Smith"	
- <dpsmith@apertussolutions.com>, Ross Philipson <ross.philipson@oracle.com>,
- 	linux-kernel@vger.kernel.org, x86@kernel.org,
- linux-integrity@vger.kernel.org, 	linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, 	kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, iommu@lists.linux.dev, 
-	dave.hansen@linux.intel.com, Thomas Gleixner <tglx@linutronix.de>, Ingo
- Molnar	 <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- mjg59@srcf.ucam.org, 	James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, Jarkko Sakkinen	 <jarkko@kernel.org>, jgg@ziepe.ca,
- nivedita@alum.mit.edu, Herbert Xu	 <herbert@gondor.apana.org.au>,
- davem@davemloft.net, corbet@lwn.net, 	ebiederm@xmission.com,
- dwmw2@infradead.org, baolu.lu@linux.intel.com, 	kanth.ghatraju@oracle.com,
- andrew.cooper3@citrix.com, 	trenchboot-devel@googlegroups.com
-Date: Wed, 18 Feb 2026 16:04:03 -0500
-In-Reply-To: <CALCETrWzG1Mjb-RcwLQ5-tGFZ15WKHjZbqtLvyif+UPuVKJ_5g@mail.gmail.com>
-References: <20251215233316.1076248-1-ross.philipson@oracle.com>
-	 <b5f2b5a5-b984-4ed3-a023-c06d634f9146@app.fastmail.com>
-	 <1ffd3cb5-2c76-4371-a067-3e4849907d80@apertussolutions.com>
-	 <49d169bf-0ad2-49be-b7d7-fceb9e7f831a@app.fastmail.com>
-	 <CALCETrUE8c-dxRWhtHKz_PojwZuWMXJSzOsFQf2vt5LS3ATwpA@mail.gmail.com>
-	 <1BBD7449-8420-43FD-930B-A4E1BA38FFC6@zytor.com>
-	 <CALCETrWzG1Mjb-RcwLQ5-tGFZ15WKHjZbqtLvyif+UPuVKJ_5g@mail.gmail.com>
-Organization: Red Hat
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jgVWrTnS"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZvyADWW3RvkAlvy8Z5O7SIeXwNsLEfyQLIZF7vqYKqV8UlLaKO2VEBsQO6AuEgWDoHX0dvRh8bW+SalotY5XQALpg+BPMEYdLYnxS35Qh9zAZ2P2nMUz2X60tRJ4FxIAkvxjk5WWQTgbnmR5dOEnQp7aCVLeR3dUXC5xlGNrV343xTci1U/jhNyURNEPvxzBiH1m09vtVeUzK7aXiYwhsS6FcZaynMupbOWXFlE0RGwKRSffrM5SEsPM45CU8LpLqbmdZkqgkLqTw0K9A73eGXCJBHfR8+6cA6qzDiScTXUHoShAceyDJ+mBsVzipI9pnEA24XTeKsMkQ3/Zu/ek1A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lHMKjgceYpi104XChXdORPUsTi7pcQPlPCnBS3RszII=;
+ b=GP50GrJOue85Hu3uyqIVTartt94btxvz3HIV8Nz6KYUEvNpUp2U9wlJ4q2bY7caVlmv6Gw8JCmZLYEG5Jclf7/qeWGWqoBReqCIPXC6wBf5fpEa1ps4abv3aVHeDmQ809szDRZ+K2y03A4IDw2GKBCXTgNUV/p3MgtVBUFL+ONrJPYKxTggeeGsHgo2fWS16/P2QI/hv2v/fFxHOZ/nxxQBXE0z8E+zMXlR/IxDRSp7JFmHie2E5TUlCydD4oGwi1wkb85fQGR969doidNYFswm6SJSaeSiGcbQLIumHB+6V4A3HopaRJp23sTOlTFR/HlSv8zTPCwn+lrPW3telNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lHMKjgceYpi104XChXdORPUsTi7pcQPlPCnBS3RszII=;
+ b=jgVWrTnSte77Mc7uCombs0Ultb9rH7UevxOLSYL/3VEbYXouEGub2mHDKI2OQVB0PnZxxjEpltPBYP1BRB5rkm78dIh73/9PsMYMJCHmul7gQc+SaijGbVEIXCjrQ0OG52AU0yKCHopDAUr6ZOpEc4iWhjuLwGfaH5ElPZJZJZ8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB9066.namprd12.prod.outlook.com (2603:10b6:510:1f6::5)
+ by DM6PR12MB4217.namprd12.prod.outlook.com (2603:10b6:5:219::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.14; Wed, 18 Feb
+ 2026 21:09:40 +0000
+Received: from PH7PR12MB9066.namprd12.prod.outlook.com
+ ([fe80::f71e:4264:146c:b356]) by PH7PR12MB9066.namprd12.prod.outlook.com
+ ([fe80::f71e:4264:146c:b356%6]) with mapi id 15.20.9632.010; Wed, 18 Feb 2026
+ 21:09:39 +0000
+Message-ID: <69b4d9c7-5fc1-4562-865e-1388b1f40e66@amd.com>
+Date: Wed, 18 Feb 2026 15:09:35 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] Add RMPOPT support.
+To: Dave Hansen <dave.hansen@intel.com>, tglx@kernel.org, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
+ herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org
+Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+ KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
+ jackyli@google.com, pgonda@google.com, rientjes@google.com,
+ jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+ babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com,
+ darwi@linutronix.de, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
+References: <cover.1771321114.git.ashish.kalra@amd.com>
+ <9c77e206-442d-4891-bb29-295bc8bffe20@intel.com>
+ <65986f9e-59e8-4f1c-aaa7-1edf45af24d8@amd.com>
+ <31b42ba3-dd0c-42e7-ad1e-800c5cd2bcf8@intel.com>
+ <cc930514-b0c0-4b9f-8287-aaee2878e668@amd.com>
+ <2398df04-082d-4d98-beca-f85de385941a@intel.com>
+Content-Language: en-US
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <2398df04-082d-4d98-beca-f85de385941a@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SA0PR11CA0077.namprd11.prod.outlook.com
+ (2603:10b6:806:d2::22) To PH7PR12MB9066.namprd12.prod.outlook.com
+ (2603:10b6:510:1f6::5)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB9066:EE_|DM6PR12MB4217:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1937ea0e-2cf5-4d92-19d0-08de6f32073c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|366016|376014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?MVhMTmh1ZVkvUHdya2QzajhzakRNdXpwR0hrNHk4cHFMaCtUSnVoOHlYUVVY?=
+ =?utf-8?B?NnJPWHZZenBTV0lyZlJmcFYybDJSWVpaUUFBdVpLVkFLTUZObE01dlFML2Ew?=
+ =?utf-8?B?UUZaMDcySDkvQ3orS1V2amc4anBpTEtGOFdUSEp6ZkYzL2JVelhEK002VC9u?=
+ =?utf-8?B?K0NmSmhva0JoNjFEbHMzWUJUdElnd2cwa3BMZXUrcU1CcXJzWWtZSE14NHI4?=
+ =?utf-8?B?a2dmQ01Ka3BnMjcrRnhNWDY4M3lGNjg4WmJYUUhBVkw4aHE4S0dJSXRLVzJm?=
+ =?utf-8?B?TkEzcXY1R3RiSm1PdDl6cm1ldWRpb2JHQyszZXFBeFZIclRlZXZmSi80bjlF?=
+ =?utf-8?B?R1ZxN2U2M0NiL20reE1EaktINy9rS2lXYkIxcCtLRXgxbERoWlB6UE5YaUc3?=
+ =?utf-8?B?TVU1TmdCY3dvdFQxQjJFUHFWYVNnbkd1OG0zazZudDc4WXk5bUVJNnRFWmcw?=
+ =?utf-8?B?cU5RSkIwL1RpZ0VMMDJUSXZyYS9rWDFSeHNyQy9mZ3lPczA2a0NTUE1FNVV5?=
+ =?utf-8?B?OEQ1LzRDS0dmZk5ZalpYNmsxczFsY3Z0c3l5Nk9PbkpxT1gzR04wZHNjaGFo?=
+ =?utf-8?B?UzcwbHpkUWc3aUdBWWNCWUdMSjBnRXFMbWM3THpoUXpkMnY3OGhUeWtuNkg5?=
+ =?utf-8?B?Uzl5c2t2Y0RmSi9sYkhWRVhnejh1UEFNZENVdEMvU0F3NlhPSGNCcnRnU1I1?=
+ =?utf-8?B?MFdTS2pVaTh0QXpDWEp1eWMwNlNvVFljYkFFNGpKVUNvSkVKWGZ1dkVFRVpS?=
+ =?utf-8?B?Rm1UYXVDRDdOU013K0NMTG15TFlQU3F4NUNwNGJpOVhLa2xiQ3dZbWJxajd1?=
+ =?utf-8?B?UC8reUVjOGFnTy9jSkJJQWdSOS9Jb0R2SU5EMldQUXRaemR4bkVycllHLzVY?=
+ =?utf-8?B?czhLbnpDS2Z1UEdEZHdoZUYyVnBzYXZtaG5yZzNtRWhlRGVuVGJaL1hJYmxv?=
+ =?utf-8?B?ZDRrUmRIZ1N4VWJDSGpUb0FzYy8xRU5FYVVnbmYxazBmOWVnTk8vK1M0bVdz?=
+ =?utf-8?B?a1NtVVprcnJyL3ZsWEFrY0IxVW41RXk2Zk9lcEd4V0J6ZzN1eXg2SHd2bU0v?=
+ =?utf-8?B?ZnU0MnpvNjNoaHd5UDFrbStmSmd2THhYQndhemtqZHFCcDZNekZOQnpXUnVa?=
+ =?utf-8?B?WDRGUDh1c3FXQ3orWUp5eWY1YWZyUXlTei9GdmgvL29jZnpvQStqeTlwZXRr?=
+ =?utf-8?B?WXpzWXhDSk9ZK0NVckgvN1BLVTUyY3dvUlh3bmR1bVhKb1ZKTWpsTUQ2SXJY?=
+ =?utf-8?B?anc5bFA5NHl0RXJOdisrWGVxL3NzSkdnY09qQVQ5VTBoZ0xBTE92VlYzb2sx?=
+ =?utf-8?B?UmRNUjV6WXduNFZzenVWK3N3WHBuWkt2eGhIQlpqVjVYeGlEakVVY2prbko4?=
+ =?utf-8?B?U2JNWGxNZDlQV00zRG53bmxoZ1pjZHlyc0kwRXd1b01NRGRTYzZCdDRSdzA0?=
+ =?utf-8?B?KzVaZENPUTBkeEN1RVdTUjNFSVpkZDdPWUpmc2hQSnZoRXRqNjdsMTd1MkZG?=
+ =?utf-8?B?M3ZqajArdEtzRHRCSHoxZEltbUY0NGJvRHY2MHRkLzEyazJkVjR6TlZuZi9l?=
+ =?utf-8?B?d2ZGTTBIVGdYTkJQOXVIR01aZEpRTkNHVGNDOCtRVi9HMzFLMXFIa1hYbm5D?=
+ =?utf-8?B?YndOZXNLNTZIMlM2WVhxbklYaVZ6bzAra1J2ZjM5MjFKMVY2Z3RRVHFpQ0ho?=
+ =?utf-8?B?RzcybmwwN2MrQ2YzTGU5YVB0dzkxNzRkOXlDdVd4akh1Z2c3Z29YQkFSNito?=
+ =?utf-8?B?WlpOT3MwOXpCc1FjbEYwcmdVVytYSUt0Wi84L3I5cGI2enBoUkxkWEhvZWs5?=
+ =?utf-8?B?OEt2ZTArb0c4d3lpZkVCR0ExKzdOcm1jckQ3aWdzc1lpV25XeUJ3RHBBZGlF?=
+ =?utf-8?B?RnF0anVOTm5WVUJJcldBRmh0Ykt4VDBRTVU0c2lES3l0dE1GRUcrYXd0NlBL?=
+ =?utf-8?B?VzhjQmR2cHlJRlZrNEhXVDJDVWNlZmJaZFd6QXh2YU5RVll2dTBuRjlNeGxx?=
+ =?utf-8?B?WVNQbE5neGF4RklScDhRVFhlVTNyYWZGYUdlSGNFMmpSVHdqeExEQmhHNkg2?=
+ =?utf-8?B?Y0xjT0lqcDlCSEpkaWhhUmgvckhtT2U3dTZQb3pjVzlRN255dktadk1mQkZa?=
+ =?utf-8?B?UUNqbU5RdC8wZ0ZiblRieGtTUDF4Wks5TXVqcXV5WGVCZStneVExeHVWNE5E?=
+ =?utf-8?B?Ymc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB9066.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?czNEVHAzR2JNWloydDFzSzZNNEVONEliQVBpSUx1VCsvRU05N1JUNi9ERDI5?=
+ =?utf-8?B?Vk1YTnB2SWp0Q0NZNTNrcGlsWDdoL1FBVklkQVh4Z0VHanNVWEdoSmxxQzMy?=
+ =?utf-8?B?WmU2UjkzY2wxVFJSQnQxVUU4TFFOdDVUNjlWcTB5NTh4MytZTEVYa1V4dG9n?=
+ =?utf-8?B?cHNzVnVtQjIvOG83aXJrYU9iOUNFcXhEQTdJcnQ5Z0pXdk5uTGgzbU9xUmZl?=
+ =?utf-8?B?dlBQejF3bFZnL0N1bE9BcDV6RWNVam5kVU5WVExqTTdqbUlMMmEvd0FVRVVx?=
+ =?utf-8?B?TU9sMlFqSkFEZXVBa2p4SFJjZ0RCWG55dDArakFEaHFjQkxQMGdQWFlhREVn?=
+ =?utf-8?B?elBoaU5HNW12eElqUUI2c0NPeTVLdlNxNmQxdU9jSXp0K2pVMHZuNlZ5RTFX?=
+ =?utf-8?B?MFRZS2E0eHdUNDg4RDdYOUZwZVU3QjNGazRLbExobG5jM25qUXpSSDkyeTRJ?=
+ =?utf-8?B?Z2huaGtTUjFkOEV6UndmUzMwUVJsTlUrdjhnUXE4Rk94eEt3T0d5Wml1bGk0?=
+ =?utf-8?B?SmRXL1NDZm5qVVdKcmhYdXp6eWNrb1Z2dXhhcy9BQW5aSjhpSC92K2dFTEE0?=
+ =?utf-8?B?alhLK1ZNVHl2Qk1qcnlUWlRjTXU5QzdteDREYWtZRjBnNW1GMU9IN00wc1l4?=
+ =?utf-8?B?OXBZd0hrWGtNRkJ2L3dFQlowNE1xQ084U1U5cTgwQ1VMN2hnSUZsMHpNblJM?=
+ =?utf-8?B?Mmsxd0RPUml6K2VTZzBVWGlidTJ4a0tDZ0FWSlhISEpFOENuVDFTTWs2eVNw?=
+ =?utf-8?B?Ylo3ZGtSclgwVDNEL1B1dzg0VGpaMjFLeWJkVWdhNnJsZmNRQmtoK3JXL3J1?=
+ =?utf-8?B?Z3gxUGs1cVN0MTg0N1lDOGVNa1BKUVBRS09tclVhWDZ0OVBlNFNGRmYvK2hh?=
+ =?utf-8?B?Nk5xQ3I2dzlkWnBLNU5RTDlIdVdWQXhwancyOHFQYWRjODY5TWFUZndGcWtI?=
+ =?utf-8?B?QUtybGJVR0JPTGJyR1JNd1RtUUxqNEN2M0VqaXNISHk5bHIrUXhGcStiUU9P?=
+ =?utf-8?B?cmZZanNkRnBET0p4RTVoNmJBbTFPOHBCY3ZxeG9xanZuOTNITDlab3pXUXRN?=
+ =?utf-8?B?Q2dZellERllsa1NKQU9RYmxSczNLVnJxRjZXWEJoTjJmQ0c0dnVOTnI1OFRX?=
+ =?utf-8?B?bWIweTk5bjgzN0hoMU15UFp3ZzJHQmd6UTQ2bWJiV1pVMEtYbHdxaXVxOGJB?=
+ =?utf-8?B?S2txZEtnVktkOTk4VUsxMUxESmlSY0toVEpqcVR3M1Q5R1ZNRERKeHhpcmRS?=
+ =?utf-8?B?RWcyK2lVQ0MxRnZSaE1VZ3ZqeVdvLzc0bklhQnNBYisxRkNjejNpZENmNU9H?=
+ =?utf-8?B?enU3ZXNTK0Yxemo2YSt3ZE9iWXV3eWUvU1ZFZWp0cW9McDdPbjErUll3dDNx?=
+ =?utf-8?B?Y0pMVjdUYjFkNkVqQ0w4WC9IbmswOTYrSUE3UjlTdFE2blNkc1pVYk8zWmM2?=
+ =?utf-8?B?dmNxR2ovT1F5SzZBV1FaTnljbXFzTWhPOENLL3MxMGhKZTlNNUhnNGpPcXN6?=
+ =?utf-8?B?d1Zka0o2SDFhcy9BamZwNUtNY2dEcDQySnpOVzlhS3BHNWYrYUpxY1FvL3ZP?=
+ =?utf-8?B?T3UybU1sdStNS1JoSU1sZDNyMWZCdWRlUDRHdE1nWVlraVBOR2oyMk11RVJM?=
+ =?utf-8?B?bFJOZ2psbUFMdzc5U2hpdmlqQVNQT0R6MlFTL0lpbnJOdHgzTXZwRDBibWM1?=
+ =?utf-8?B?ZXR0Rzd2dTh2TkZ3Vm03ajBGS2cwaTdPWkZ3YWxyRVZ0ODMwSXIwdUtidjRk?=
+ =?utf-8?B?UWRtOEJiZFlrM2xObUFWdVkvUVZnN0hMdXhIcUsrZlJ3aDFvc01Id3J6ZXRh?=
+ =?utf-8?B?cm5kbS8zQ0N5US9mdUZxVXNKa084SHpZVkJBZyttNGdFOC80Y2tNL25BV0Nz?=
+ =?utf-8?B?R0F2QVBaZzh2MCt5Y0t1ODV1TlpyVTRWakxuVVVOOWhLdis1ZUVyaUFaYkYy?=
+ =?utf-8?B?VGhtbjhiWkpHRFhDeWVJQzFxQnZLSHlzZmlTWEo5QzlEOEM2Rkh5QjdIL3dH?=
+ =?utf-8?B?Ym9pL0dJM3JSUmViV1hxQmRDczdqc3gxcm5VRFZJTDE2SXhkSElMemg2dFcx?=
+ =?utf-8?B?VlB2bGZ4eHBNODkrYUpFOGFCUHBIMEF1NDVVUllUR2lYRDlYZ0o1MW9SelR2?=
+ =?utf-8?B?QVdOdzdobVVnaUZvRlhHT1ZOS0R0bWhxSDErUitXNkNUWTBxV3pncVJON2ty?=
+ =?utf-8?B?NUNiZDI5dGpPWGVvOU5rQ2h5YUNyTDJlV3FoT3EzQlZLRVlVN01ZNXRNS2Yv?=
+ =?utf-8?B?M2tCWlljK3VOSDhmYWFzcWFpeEdyQ2N1aVpHN3ViMWI3Sk53eXpLR3JJS01W?=
+ =?utf-8?B?M0tEdDBLV1hKTHJQK3RidFlnWGtyNkdOQkdtMjRFMzlHV05RVHordz09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1937ea0e-2cf5-4d92-19d0-08de6f32073c
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB9066.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2026 21:09:39.5550
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: csgKZ/q8XX6D58WGFeiX5Wc7G8OQXz2mV9+sN7r6MItIslauKSr1AXpIGC7OCnp8DLA0J51iMbgurmN2wIO7NA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4217
 
-On Wed, 2026-02-18 at 12:34 -0800, Andy Lutomirski wrote:
-> On Wed, Feb 18, 2026 at 12:29=E2=80=AFPM H. Peter Anvin <hpa@zytor.com> w=
-rote:
-> >=20
-> > On February 18, 2026 12:03:27 PM PST, Andy Lutomirski <luto@amacapital.=
-net> wrote:
-> > > On Thu, Feb 12, 2026 at 12:40=E2=80=AFPM Ard Biesheuvel <ardb@kernel.=
-org> wrote:
-> > > >=20
-> > > > On Thu, 12 Feb 2026, at 20:49, Daniel P. Smith wrote:
-> > > > > On 2/9/26 09:04, Ard Biesheuvel wrote:
-> > > > ...
-> > > > > > Surprisingly, even when doing a secure launch, the EFI runtime =
-services still work happily, which means (AIUI) that code that was excluded=
- from the D-RTM TCB is still being executed at ring 0? Doesn't this defeat =
-D-RTM entirely in the case some exploit is hidden in the EFI runtime code? =
-Should we measure the contents of EfiRuntimeServicesCode regions too?
-> > > > >=20
-> > > > > Yes, in fact in the early days I specifically stated that we shou=
-ld
-> > > > > provide for the ability to measure the RS blocks. Particularly if=
- you
-> > > > > are not in an environment where you can isolate the calls to RS f=
-rom the
-> > > > > TCB. While the RS can pose runtime corruption risks, the larger c=
-oncern
-> > > > > is integrating the D-RTM validation of the Intel System Resources
-> > > > > Defense (ISRD), aka SMI isolation/SMM Supervisor, provided by the=
- Intel
-> > > > > System Security Report (ISSR). Within the ISSR is a list of memor=
-y
-> > > > > regions which the SMM Policy Shim (SPS) restricts a SMI handler's=
- access
-> > > > > when running. This allows a kernel to restrict what access a SMI =
-handler
-> > > > > are able to reach, thus allowing them to be removed from the TCB =
-when
-> > > > > the appropriate guards are put in place.
-> > > > >=20
-> > > > > If you are interested in understanding these further, Satoshi Tan=
-da has
-> > > > > probably the best technical explanation without Intel market spea=
-k.
-> > > > >=20
-> > > > > ISRD: https://tandasat.github.io/blog/2024/02/29/ISRD.html
-> > > > > ISSR: https://tandasat.github.io/blog/2024/03/18/ISSR.html
-> > > > >=20
-> > > >=20
-> > > > Thanks, I'll take a look at those.
-> > > >=20
-> > > > But would it be better to disable the runtime services by default w=
-hen doing a secure launch? PREEMPT_RT already does the same.
-> > >=20
-> > > So I have a possible way to disable EFI runtime service without losin=
-g
-> > > the ability to write EFI vars.  We come up with a simple file format
-> > > to store deferred EFI var updates and we come up with a place to put
-> > > it so that we find it early-ish in boot the next time around.  (This
-> > > could be done via integration with systemd-boot or shim some other
-> > > boot loader or it could actually be part of the kernel.)  And then,
-> > > instead of writing variables directly, we write them to the deferred
-> > > list and then update them on reboot (before TXT launch, etc).  [0]
-> > > This would be a distincly nontrivial project and would not work for
-> > > all configurations.
-> > >=20
-> > > As a maybe less painful option, we could disable EFI runtime services
-> > > but have a root-writable thing in sysfs that (a) turns them back on
-> > > but (b) first extends a PCR to say that they're turned back on.
-> > >=20
-> > > (Or someone could try running runtime services at CPL3...)
-> > >=20
-> > > [0] I have thought for years that Intel and AMD should do this on
-> > > their end, too.  Keep the sensitive part of SMI flash entirely locked
-> > > after boot and, instead of using magic SMM stuff to validate that
-> > > write attempts have the appropriate permissions and signatures, queue
-> > > them up as deferred upates and validate the signatures on the next
-> > > boot before locking flash.
-> > >=20
-> >=20
-> > *If* a physical EFI partition exists there is a lot to be said for this=
- approach.
-> >=20
-> > The only issue with this that I can see is for things like network or C=
-D/DVD booting where there isn't necessarily any EFI boot partition, it migh=
-t not be writable, or it might not be persistent (e.g. http booting typical=
-ly uses a ramdisk, like the old Linux initrd.)
->=20
-> Hmm, I guess my approach is a 100% complete nonstarter for installing
-> Linux from a CD, and it's really not awesome for installing Linux from
-> a USB stick.
+Hello Dave,
 
-Doing any of this on a removable device feels generally like a trap.
-You get your USB disk in, try to boot, and it saves vars, but reboot
-fails for whatever reason, you plug it in another machine ... and it
-tries to "continue" from there? The amount of validation needed and
-testing for failure modes across reboots sounds really painful.
+On 2/18/2026 11:15 AM, Dave Hansen wrote:
+> On 2/18/26 09:03, Kalra, Ashish wrote:
+>>> They are known not to contain any SEV-SNP guest memory at the
+>>> moment snp_rmptable_init() finishes, no?
+>> Yes, but RMP checks are still performed and they affect performance.
+>>
+>> Testing a bit in the per‑CPU RMPOPT table to avoid RMP checks
+>> significantly improves performance.
+> 
+> Sorry, Ashish, I don't think I'm explaining myself very well. Let me try
+> again, please.
+> 
+> First, my goal here is to ensure that the system has a whole has good
+> performance, with minimal kernel code, and in the most common
+> configurations.
+> 
+> I would wager that the most common SEV-SNP configuration in the whole
+> world is a system that has booted, enabled SEV-SNP, and has never run an
+> SEV-SNP guest. If it's not *the* most common, it's certainly going to be
+> common enough to care about deeply.
+> 
+> Do you agree?
 
+Yes.
 
---=20
-Simo Sorce
-Distinguished Engineer
-RHEL Crypto Team
-Red Hat, Inc
+> 
+> If you agree, I hope we can also agree that a "SNP enabled but never ran
+> a guest" state is deserving of good performance with minimal kernel code.
+> 
+> My assumption (which is maybe a bad one) is that there is a natural
+> point when SEV-SNP is enabled on the system when the system as a whole
+> can easily assert that no SEV-SNP guest has ever run. I'm assuming that
+> there is *a* point where, for instance, the RMP table gets atomically
+> flipped from being unprotected to being protected. At that point, its
+> state *must* be known. It must also be naturally obvious that no guest
+> has had a chance to run at this point.
+> 
+> If that point can be leveraged, and the RMPOPT optimization can be
+> applied at SEV-SNP enabled time, then an important SEV-SNP configuration
+> would be optimized by default and with zero or little kernel code needed
+> to drive it.
+> 
+> To me, that seems like a valuable goal.
+> 
+> Do you agree?
+
+Now, RMP gets protected at the *same* point where SNP is enabled and then
+RMP checking is started. And this is the same point at which RMPOPT
+optimizations are enabled with this patch. 
+
+I believe you are talking about the hardware doing it as part of SNP enablement, 
+but that isn't how it is implemented and the reasons for that are it would take
+a long time (in CPU terms) for a single WRMSR, and we don't support that.
+
+And if RMP has been allocated means that you are going to be running SNP guests,
+otherwise you wouldn't have allocated the RMP and enabled SNP in BIOS. 
+
+The RMPOPT feature address the RMP checks associated with non-SNP guests and the 
+hypervisor itself, theoretically, a cloud provider has good memory placement for
+guests and can benefit even when launching/running SNP guests.
+
+We can simplify this initial series to just using this RMPOPT feature and enabling
+RMP optimizations for 0 to 2TB across the system and then do the optimizations
+for/or supporting larger systems as a follow on series.
+
+That will address your concerns of performing the RMPOPT optimizations at
+SEV-SNP enabled time, and having the important SEV-SNP configuration
+optimized by default and with little kernel code needed to drive it.
+
+Thanks,
+Ashish
 
