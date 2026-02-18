@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3406E33EAEB;
-	Wed, 18 Feb 2026 14:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EF42FBE05;
+	Wed, 18 Feb 2026 15:03:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771426780; cv=none; b=bi5++iB2rZc+p3zuu2MDmGQijSOr+gLZDblzZduaSNdvNWQeUC8F3/kSsQdXiCgnWhhQPvnQ6DNFV/i3bHC/x+Elj6wbZJE5LBqydr/OQXFdCk3cQ9wI/N67+AF/Tk8/1AiZEylXfwwoXwEq9RLCwk/TcE0AQCQ1YHqIhMIn8cY=
+	t=1771427039; cv=none; b=X1aQCkOhZf7JNehqupAXNusplLwlfnU6QMKkB50hSp7XFhnB7fnbTpyXVqx20qSwHAlWBA1+acnKPvzhLNhJXBYLVKYpaNw9e0qe9QMNtSuaOkLvIRQX7sb3DKN7PwmHAhyxfBzI+jwLdyRuFDDZISq4/rQ2aZPK6TFpEeyesGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771426780; c=relaxed/simple;
-	bh=E7otzTFJDz8mqPkypwrcDupS4AS2hrjbMDBTUblHKYY=;
+	s=arc-20240116; t=1771427039; c=relaxed/simple;
+	bh=K1c524pLimFdculvJiQ+Fn1yVIfWiKktNS938mv4qDM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y9OZGGtDyYv3+z+d2avyXxOiF/MGtLMCTRSYConFfsEZtEbe+Jgmqbfuv6aubovAv5s5/AfO7XLU6KzwiwNwI5767VB9HnmUaR0dKmW4fIixzXREcOCwhmIFrJIDReRJuU8gSTrLwRZ9RMopdgRuMqBK+9DBVvKnpByPGTF/++Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OwMmJvoY; arc=none smtp.client-ip=192.198.163.17
+	 In-Reply-To:Content-Type; b=q3zIQrUzteUylIjnLi266WyCWrhVGFSkbOSHjrauvG7lGYFS9u13xPBiTkJFm+Lm5FE/mTCw04H2J1OUdDlR8t240WVPg2HSvdBadLC6nxxQmCUcjhDPlAQa9ToceDPrugo6WDpfUxcMnAWZhnzvjl4mfc3S+9mIDzNFMfaWPkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TwhJ7RM+; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OwMmJvoY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TwhJ7RM+"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771426779; x=1802962779;
+  t=1771427038; x=1802963038;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=E7otzTFJDz8mqPkypwrcDupS4AS2hrjbMDBTUblHKYY=;
-  b=OwMmJvoY3i6HeTB72QW3YPpyr+OLpeHJuyW/PpDAcleAC0D3Ur3SjrL7
-   5GqmSRxd+m5kzio59OzkoV6sDKIrhaD+ihz26xCTU2PsabvLCMZvFvxrE
-   5Fy9kZDJAI4o0u2va7Oz550IFuviozS3KsBBr6qHVebS1I1td3YUzN2aW
-   Xd7q6Wxur2b5/4cBazBTlnJc2yDEF9AwYY78hgLOymjDU1vDEBpcm6OcB
-   pHCbAAtSJqFhUPxbmgsnVaGg11PCXfjlW9T7lJ116HgYXfFeTjhcaK7G1
-   GPlIojDPIl1Ol+/oZH4S7knzvJhwvl6Nk3Kj4TI6jOpYruVKyGBafiXPw
-   A==;
-X-CSE-ConnectionGUID: o19jJsNWRQKTSTwV+0dc+g==
-X-CSE-MsgGUID: hxuFz9ngQiGaHvxSUZQcpg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11705"; a="72415794"
+  bh=K1c524pLimFdculvJiQ+Fn1yVIfWiKktNS938mv4qDM=;
+  b=TwhJ7RM+Gy7ujl7xV8QA5pf+IPkPvwI924nkhrhZpjmCc2q+Pv0IM4T0
+   49JFZOa2gqp+A8VQ9HK04w3uVPd7JnTXUpKuZxcdDyZKwj69EXTgIPsdN
+   v/UI5D979sw17NuIuaZ0Hnj3kEhZS6fJAzh4rfCkHTThpDIOjTJEHNsmv
+   DvX9xpMnY2HBAh4RhIDJDPEt9ZcMW2YvT9E9dveKgiuagIHyvweU0wRgQ
+   nALU6GE7dZlXi+O7bD4BwLGKx1/kCPBPIKFOg/12h9bBJdf7vHpcoUhxA
+   ZXWPOzsY73wqCwaeQ6z7Qpj+r33ZZfvYkTNTM+PbBGHW8ABfrjkkJgNKn
+   Q==;
+X-CSE-ConnectionGUID: d4NVG7h9RmqPyGS4+hITMw==
+X-CSE-MsgGUID: 7QDH5IEGSUefySF3IBRZLg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11705"; a="72570146"
 X-IronPort-AV: E=Sophos;i="6.21,298,1763452800"; 
-   d="scan'208";a="72415794"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 06:59:39 -0800
-X-CSE-ConnectionGUID: 14Hwz+PuSA6YNrMDw9Qzmg==
-X-CSE-MsgGUID: 0w75jjLuRhuudalHmr5PeA==
+   d="scan'208";a="72570146"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 07:03:58 -0800
+X-CSE-ConnectionGUID: XZ2CyFN4S4CjAiyQIYyMgw==
+X-CSE-MsgGUID: rxXf9NurTe2/p7O9SA7sQw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,298,1763452800"; 
-   d="scan'208";a="218737003"
+   d="scan'208";a="213296938"
 Received: from rchatre-mobl4.amr.corp.intel.com (HELO [10.125.109.189]) ([10.125.109.189])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 06:59:38 -0800
-Message-ID: <59c0b0f0-26b0-4311-82a9-a5f8392ec4c6@intel.com>
-Date: Wed, 18 Feb 2026 06:59:37 -0800
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 07:03:56 -0800
+Message-ID: <31b42ba3-dd0c-42e7-ad1e-800c5cd2bcf8@intel.com>
+Date: Wed, 18 Feb 2026 07:03:56 -0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,23 +52,22 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/6] x86/sev: add support for enabling RMPOPT
-To: K Prateek Nayak <kprateek.nayak@amd.com>,
- Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
- herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org
+Subject: Re: [PATCH 0/6] Add RMPOPT support.
+To: "Kalra, Ashish" <ashish.kalra@amd.com>, tglx@kernel.org,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
+ thomas.lendacky@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+ ardb@kernel.org
 Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
- Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com, jackyli@google.com,
- pgonda@google.com, rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
- pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
- nikunj@amd.com, john.allen@amd.com, darwi@linutronix.de,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- kvm@vger.kernel.org, linux-coco@lists.linux.dev
+ KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
+ jackyli@google.com, pgonda@google.com, rientjes@google.com,
+ jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+ babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com,
+ darwi@linutronix.de, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
 References: <cover.1771321114.git.ashish.kalra@amd.com>
- <7df872903e16ccee9fce73b34280ede8dfc37063.1771321114.git.ashish.kalra@amd.com>
- <10baddd3-add6-4771-a1ce-f759d3ec69d2@intel.com>
- <b860e5f4-4111-4de7-acc7-aec4a3f23908@amd.com>
+ <9c77e206-442d-4891-bb29-295bc8bffe20@intel.com>
+ <65986f9e-59e8-4f1c-aaa7-1edf45af24d8@amd.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -114,48 +113,28 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <b860e5f4-4111-4de7-acc7-aec4a3f23908@amd.com>
+In-Reply-To: <65986f9e-59e8-4f1c-aaa7-1edf45af24d8@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2/17/26 19:08, K Prateek Nayak wrote:
-> Hello Dave,
-> 
-> On 2/18/2026 3:36 AM, Dave Hansen wrote:
->>> +/*
->>> + * Build a cpumask of online primary threads, accounting for primary threads
->>> + * that have been offlined while their secondary threads are still online.
->>> + */
->>> +static void get_cpumask_of_primary_threads(cpumask_var_t cpulist)
->>> +{
->>> +	cpumask_t cpus;
->>> +	int cpu;
->>> +
->>> +	cpumask_copy(&cpus, cpu_online_mask);
->>> +	for_each_cpu(cpu, &cpus) {
->>> +		cpumask_set_cpu(cpu, cpulist);
->>> +		cpumask_andnot(&cpus, &cpus, cpu_smt_mask(cpu));
->>> +	}
->>> +}
+On 2/17/26 20:12, Kalra, Ashish wrote:
+>> That's not awful.
 >>
->> Don't we have a primary thread mask already? I thought we did.
+>> To be honest, though, I think this is misdesigned. Shouldn't the CPU
+>> *boot* in a state where it is optimized? Why should software have to
+>> tell it that coming out of reset, there is no SEV-SNP memory?
+> When the CPU boots, the RMP checks are not done and therefore the CPU
+> is booting in a state where it is optimized.
 > 
-> If you are referring to cpu_primary_thread_mask(), the CPUs are set on it
-> based on the LSB of APICID, specifically:
+> The RMP checks are not enabled till SEV-SNP is enabled and SNP is enabled
+> during kernel boot (as part of iommu_snp_enable() -> snp_rmptable_init()).
 > 
->     !(apicid & (__max_threads_per_core - 1))
+> Once SNP is enabled as part of kernel boot, hypervisor and non-SNP guests are
+> subject to RMP checks on writes to provide integrity of SEV-SNP guest memory.
 > 
-> It can so happen, the primary thread ((apicid & 1) == 0) of the core is
-> offline while the secondary thread ((apicid & 1) == 1) is online but the
-> traversal of (cpu_primary_thread_mask() & cpu_online_mask()) will simply
-> skip these cores.
-> 
-> Is there an equivalent mask that sets the first online CPU of each core?
+> Therefore, we need to enable these RMP optimizations after SNP has been 
+> enabled to indicate which 1GB regions of memory are known to not contain any
+> SEV-SNP guest memory.
 
-No I don't think we have that sitting around.
-
-But, stepping back, why is this even necessary? Is it just saving a few
-IPIs in the super rare case that someone has offlined the primary thread
-but not a secondary one?
-
-Why bother?
+They are known not to contain any SEV-SNP guest memory at the moment
+snp_rmptable_init() finishes, no?
