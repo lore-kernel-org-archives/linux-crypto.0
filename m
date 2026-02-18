@@ -1,54 +1,63 @@
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012012.outbound.protection.outlook.com [40.107.200.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E3831D38B;
-	Wed, 18 Feb 2026 22:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771453076; cv=fail; b=NfaGvE9auxf/+iksYqXTJO3SVOI1nQgdBZoHwoekw1vtzIoavMTUp4rcLJVGo0+380BkBUmITb3s76ppSv5eaOj0kdcmpsKQwh6GLuI1pRLs1nzmVoGN0ckpKZYGp6Rin+XLVydOxEmJ4EBHS6wR5W/y9EqEULCQBg88Bhj/Kn0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771453076; c=relaxed/simple;
-	bh=vijPwjES8UBBh2f2CoiElfbTruHE77TAy5aKL1oKOZQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Vf7uKdra0i58qoz11kyB/tauyeA0yteJE7+Q83b1WXH7G8eclsNhYxxprYr4U0s4Q0tEXW79f42v35g78Xoi8wC+Qrjnjm+pKI7uxzCNBCcUT0qmGKBs8hU/mHAiCeowo4iK2efOZYiGesJ/7cd1/32IbRdFEfkiqd36nWCOGHQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ddEME7a8; arc=fail smtp.client-ip=40.107.200.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB6F338939;
+	Wed, 18 Feb 2026 22:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771455367; cv=none; b=qa3C3+sCx7KsnY1xyGfXlJFU2KFawDb/FmUqL01984qd+aut54qeDsFAF6+aFxzW1G6Jv3uIKpE7EPFNxjENF4Ac+b3axk+OMetKBCSupoDodbV8/xRuYFqG1DT4IINrktc+E1QDj+TkEAT9EJu8qbK8cGA/YXZ9cOY4DPisT3g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771455367; c=relaxed/simple;
+	bh=UzfjcaaPR5s5Szb5LBtuVDWYAZXATlyBw0MrHEBSTyI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DssAizKd6FH7O0+Nput7Fx4eOR+e0EbeTITO4ZK9KvURErC9ORfWueBVXGVChUNhfX/jEiZOuU4vTMzxVnibCP4IZVgs4AQD63sppwY1mRS5WYJRzOxWYtLqdmzRs6hoy/syrRBcAbq/425wk7LrYj+PiLhvmgS2dRpjuBBUZIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WoSM+5W0; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ddEME7a8"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Z86gnu/ZnUEThV6Ci1N0wr9iXHQyJVeebNz6gYDqdR/bqKPVJnTmw/UmheupGFbOBNtxiOP2qJyu9oyOFJixkLQefKzwurYVBb6cDpG6jOY9CtM1tExgoe2mKY9njECsO6ivTkLsSeS2v3zbQ0eUADrlNFmTxm0S7Gteyj3KlLFNWWhw0rsKLDnlVW7FplMD7jIbjUqiD+0WNFuLYm46+lv32CNnZglQ8BSdAmB3nos4mG34dyfYKuelrfFeWykFkcVNpwnuRfVh2YVUW1dhsOle6dS/ecz84JMQwfRg+PGa1bglYmJ1ROx1rtpF6nc909xBY/kIBW44u+00w1EdUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oOSQ8imS82iUlhuwLg9gFyt3EXN2YPQnKAW20FgngrE=;
- b=JAbRxocCIBNURqwaYWoF/wh+TgNErO/KTpQY2sgFGsn/LUYkrbf3/F6m3FdfZB0CmGRghiiyIcg5VF21wRZf2bfPd5Nld1yW/r1lcjuNIz4G6fLPu/5fogA8K8oeeFVUa/3bHb6vfVIqBJNjrafKfc/vh+1iRJ1Rzkv/7ks7TyZYyBK6qIeRru7G38nAU+FyFFTvEx19rylAILeM7PE1y94uSIYzbs8Vjs3xuemA8ihVRLI3M91ZLB/R8hceZoChuGPnjMut7WgGM6Lz4AW0yiPzQFRZd6chzJAho/LZng0mD59I2e/HxfTIuCLgYIqV0Y7lix/EYhHBnkSmsI5mzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oOSQ8imS82iUlhuwLg9gFyt3EXN2YPQnKAW20FgngrE=;
- b=ddEME7a8bQhDaX2nA/kT53MS6lwtJmirhNHt/xb1FNNJserW5VjC3bruyasFlLROw1jDX+NlFyZLRiG8RY2mhNWp9hGIIaxxDnW0Y0lewSmjQIkMpU6uuPtGlsmsYoFAcVKNq6xzSbPfmAPDYIE3d9AAtsAWam8ScCsk7ktnbok=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com (2603:10b6:510:1f6::5)
- by CYYPR12MB8654.namprd12.prod.outlook.com (2603:10b6:930:c9::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.16; Wed, 18 Feb
- 2026 22:17:50 +0000
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::f71e:4264:146c:b356]) by PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::f71e:4264:146c:b356%6]) with mapi id 15.20.9632.010; Wed, 18 Feb 2026
- 22:17:50 +0000
-Message-ID: <bab6afd4-b197-4a7b-b9d1-f518d192524f@amd.com>
-Date: Wed, 18 Feb 2026 16:17:45 -0600
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WoSM+5W0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771455366; x=1802991366;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=UzfjcaaPR5s5Szb5LBtuVDWYAZXATlyBw0MrHEBSTyI=;
+  b=WoSM+5W07VBfSGxFpVraJ0TfMj5bzg5DCcyL1XvKJI8zmKLAsgXEW4UW
+   6cano/jG/JEuYKIhvxGxBNoqoaeSS7YKxydaLQcVaLcv1KOTzNNUh4UiO
+   L/vCYlltL+ZwfQ/UN+azllQipNbCz6waW8lA6jt+iRIRMFVPgAA3BvkuV
+   UFmWY2qAZTIVsoLAo9TfBlc4xo4DHOgQ0aZFYaMqdg3Oigz+0H5gA+d46
+   pjmCqy92PfPUqmfgnaiv/JmtzZ3LvasRcnRERRXYGRAqXJ7pQQHeWA3hu
+   Jz49BFxyoUHAVdlz7O/x9QgvzbWFaRx/hq/7k4at2rAsNUU61E1ue/POM
+   Q==;
+X-CSE-ConnectionGUID: YKn4bjaRS2uvyY/AHXFMHQ==
+X-CSE-MsgGUID: Fy36qt++TQK3kS4sGD/Y3g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11705"; a="83645565"
+X-IronPort-AV: E=Sophos;i="6.21,299,1763452800"; 
+   d="scan'208";a="83645565"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 14:56:05 -0800
+X-CSE-ConnectionGUID: musoQcFeR3icuGJ7BgwEyA==
+X-CSE-MsgGUID: PPVsSIy7R2Gw0LJkKXuVZQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,299,1763452800"; 
+   d="scan'208";a="212370350"
+Received: from ray2.jf.intel.com (HELO [10.24.81.147]) ([10.24.81.147])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 14:56:03 -0800
+Message-ID: <b41a2b0f-3ca7-4f2a-8b71-5e8e189b41fa@intel.com>
+Date: Wed, 18 Feb 2026 14:56:03 -0800
+Precedence: bulk
+X-Mailing-List: linux-crypto@vger.kernel.org
+List-Id: <linux-crypto.vger.kernel.org>
+List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 2/6] x86/sev: add support for enabling RMPOPT
-To: Dave Hansen <dave.hansen@intel.com>, tglx@kernel.org, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
- herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org
+To: "Kalra, Ashish" <ashish.kalra@amd.com>, tglx@kernel.org,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
+ thomas.lendacky@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+ ardb@kernel.org
 Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
  KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
  jackyli@google.com, pgonda@google.com, rientjes@google.com,
@@ -59,390 +68,89 @@ Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
 References: <cover.1771321114.git.ashish.kalra@amd.com>
  <7df872903e16ccee9fce73b34280ede8dfc37063.1771321114.git.ashish.kalra@amd.com>
  <10baddd3-add6-4771-a1ce-f759d3ec69d2@intel.com>
+ <bab6afd4-b197-4a7b-b9d1-f518d192524f@amd.com>
+From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <10baddd3-add6-4771-a1ce-f759d3ec69d2@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <bab6afd4-b197-4a7b-b9d1-f518d192524f@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7P220CA0028.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:806:123::33) To PH7PR12MB9066.namprd12.prod.outlook.com
- (2603:10b6:510:1f6::5)
-Precedence: bulk
-X-Mailing-List: linux-crypto@vger.kernel.org
-List-Id: <linux-crypto.vger.kernel.org>
-List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB9066:EE_|CYYPR12MB8654:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9267995e-e998-46f5-e3c4-08de6f3b8cbb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|376014|366016|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?emtiUjRCYlZwOVBuN0JZYVc0djJtMHBQMStWWjFsKzhUSFBsdHNNSThVQ1ZN?=
- =?utf-8?B?TUtNTS9jUEpocWdLRFV4TTh3YnhMR1Z2MFo3S0l3bFpkNHl0MWVTOGhObG8y?=
- =?utf-8?B?SzZHcXpJNFFLWmlISVBSMDJJelBwQlNSanRFRUNRT25teGJSREdFdFQ3UTFW?=
- =?utf-8?B?eHBzWjNEVFZFZVpGNmhhOTZrdi8za0dqZks3MERwZkQ0TXNiRGR5UEdnRTNs?=
- =?utf-8?B?QzdLQkhxMHozY09FNUpyT2UyR3ZIUU5CWGEwbXVCY1VxY2tzbWVmS2JvaUVM?=
- =?utf-8?B?ZWlETzJPVjIyOHNPcjl2d05xN1A4aG1TU25teUNYZjQzSEdMT2hXSitKS0lY?=
- =?utf-8?B?WEc3cnlDZ3gwMnVGRzh2b3hTZFpYNldXWUh3TTZwbkdBMnUvMlJ0TWxLbk4y?=
- =?utf-8?B?QUxVaGhPb3g1aDRwaGFHbTMwNkNBWWVpejdna1FoL1YvdDhjY0V5TGtVdnI4?=
- =?utf-8?B?U2NkaWFoeHUyYUMrZEtUZDNvMkNSTCs4dmVJUjRmMUdMdkluV3lzQXdmT1Bj?=
- =?utf-8?B?TVgzYXFCT0hsSTZkNm9jMnRVVjg1RllEWHQ2eHVwck8rUXV2WmJQSzh1SWg5?=
- =?utf-8?B?MkNxaHUyZTRtUUQ2bEVmbThPQzFNOWRFZDEra2xETVlkY0NTTFRHTjgvVUdq?=
- =?utf-8?B?VjB6eHdKS05IQmZENkVjRFNFRjROemkrWExEOEJYbjBIWWFBSGNvZXJpN1NU?=
- =?utf-8?B?TWJEdEo1Ni93MmN5SVRFWUJscWs4NWtMM1hFRDY4L0hwcUh4T1hTaVR3ZXZL?=
- =?utf-8?B?VXBJQk1YemxsMmZHSVZ3ZC83NEV1VDVNODh0dzBoRVo2aThvSVUxYnA2RHpt?=
- =?utf-8?B?TzdRaVg4Z25pT0VBUFVYcTltWVpnYjIvdCtBRTMrWkJ6aFY2bVdVVzc0cFJV?=
- =?utf-8?B?ckg5QXkxdk5aVmwweXliY3dZUEhRSk92WFFiQ2RvRjBwNEVGMk5sZ2dkdmd0?=
- =?utf-8?B?dVp4SUtSZ3hITHNvdURkNXhuWWZKNUZJc25RUmNRbkc3UUIvSllXeEVtYmpT?=
- =?utf-8?B?YzgyeGZOelI3L2tXY3o0alZORGVnMHl1VUtvdGNsZE0rZ1NUTFRlbDdsdTBW?=
- =?utf-8?B?Skt2SkVJVVdHK2VPemtOQ3QvRTJNNFFWeGRxWks3cnIraG10VWNXTlBralNV?=
- =?utf-8?B?RlVZYzRlTzlSNktwOFNTVFBrZmZMSy9DM0dCWE5hL3VkRzdmam5sTnIxSmxE?=
- =?utf-8?B?YzEzSjhFY1JNclJaaGxwMzZRY2VOaTVKUlFHSWRRWHdQQzB3dllKYkMrTjhl?=
- =?utf-8?B?VG40WUVGRGt6eEpRVTRDaml3S0dHL2ovQ3BtakI0TDNsc0VDZVJaVFlRSjA2?=
- =?utf-8?B?OG1PNngxS21aYXlMcmNwVXNlUXZYNGhGc2lxM0dWUHl2WnhweVVhQWNuaHo2?=
- =?utf-8?B?cUJ0RWVjNWVJZFVSSzdPN21BWFQrV0JUazhyblUvK1lXWFZhL2h4WE8vd09s?=
- =?utf-8?B?Z3FuSzdqbFlRTnN2ZHR1aWowbUtMZkJ4TDhiZzZROTl5ZTdDd3ZZR3FKck1m?=
- =?utf-8?B?eEZvQWRoOHFqekhtN2s2czRnbVhuWitqTVB3VmQxU2JPWCt3bHVjRDErYmxP?=
- =?utf-8?B?UGVndXRxb0FLQTVJVVBVaVgzbGU5Mi9jZnRtY1cyNHVTZVdkcE9DQU5hMlhL?=
- =?utf-8?B?M00wbU0zUDJqUGZuK1kxOURXUEdDVmVVRkQ3LzVVbUp0blAzenhCMHFFczBY?=
- =?utf-8?B?SThROHl1ZlNFZFVhTWp4c3VTbUZoK2YxM3hzd0tYeEptMHRuMmp3VXFyMGd6?=
- =?utf-8?B?SnpoRFllZE82ak5qekFJcUQ4dlk2ckk4WWRYVzhxd05uUnA0aW1kQTlldUpB?=
- =?utf-8?B?dFJNL25FQmJjUi9qVm5ISmJrYTEwV3dtT0pGUjZzOUxiVHhKaXUwb3VYV21L?=
- =?utf-8?B?bTFWQ2p6L1htN3RmR1BMU04rYnhKU0RHOWo1M0pOZm11b3dhYk9RWlk1Z090?=
- =?utf-8?B?dHg4RVc5T29vSTlQTkE1eHZNcDJlZlBPWEZLOVhNVkdZd3h2SlNQZ0E5ekpu?=
- =?utf-8?B?ZmVob3ppWWdENVFzNjd3aFRmRTJXT2IzMlhtZDBLR2tNdi9LM2x0UEFSVWFE?=
- =?utf-8?B?YVBsYWdJR3VFWEFBM09PZGdURlJ6NGY0U3E0ekpDZ2xpSzRPV3Z1U2d0RGhK?=
- =?utf-8?B?Rk10MHNRNnFuVDNvTXgzWWU2bnFMR2NYSVlPcnVMMkd0SnRkRXBQaDZUNVVR?=
- =?utf-8?B?UHc9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB9066.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NEFsZGRMcGZHMTdLMEhsMUFyMXI3UUtodTFmQ013WGZmSm9Fb2diUkZOc0Mv?=
- =?utf-8?B?QjNpN0pJamQyaFJBQTVRelhpSmtlazRDS2Nsd0ptVXVUNUVVRnVOY25hbzZj?=
- =?utf-8?B?SkJORVdIYkR5WXV5NmJTTENYQjQ3MmtpQlBCc29DcU8ySDZrV2VLTkY0N1RK?=
- =?utf-8?B?QTMvb1lNNlJvaDNyc01INEFQYUUzRGo0Wm5uNnA3TmFtQlJkRzJqWWZ5cGhz?=
- =?utf-8?B?anVwaVZBNDQ3UmhGRjBpNFNpRExDM0hxVWNqVUdST2JXSVVGL2E5YnUyWm56?=
- =?utf-8?B?VVl5WDdyZDZyUGhPL09HMythYis4WGVBWHdlVE9TY1htT2srazJBaTFsUGJY?=
- =?utf-8?B?Tlo3V0h2MU0yZTJqZkx4VWMybjdYWVpqbS9aZ3ZUZHV0ZTVUc1hESFBuQXFO?=
- =?utf-8?B?Y2NJdjNZNGJUMnAxM0NQOVZUSDNaSVEvQk5rbUxIYUV3QlFzTGFoeHFkTlFi?=
- =?utf-8?B?cW03Y2xrNmtpeVZidEV6N0orT2lIUDk3Z0xsTFNNaElxU1ZNTjhWUm5obHli?=
- =?utf-8?B?R0tpNkZmYlpwSzdqdDVMR1RPOVRzejAzd0Q5eUJjNzIyUE94TWJTdlVERUIr?=
- =?utf-8?B?bUliQ1dxYjZjVUNnUGZ0VjMySGFDMFJIVktJVzc5UHRIbGJqQ2c3NFNRRmIy?=
- =?utf-8?B?QXhSOC9PNTRSNHA4SzdqQmVrRnN2S29iZ1dicVVUMDZlU3k1ejA0WWdOc0oy?=
- =?utf-8?B?NEUrQ204dnFOTzhobzZyQVdYcUloVHRZMloyVU9uYURxUmY1Z3lUeG0yM0Rq?=
- =?utf-8?B?NW04SWhMRDdkWUlxOGg1Z092N2JwQ0tNK0NIdDBhdVQzY0xmMzFUSzF6eGJP?=
- =?utf-8?B?WnZvRGtEaXRaakttYkZhVTlCbEs1WTNPV1hLSXlhTUVDaG5NMnBXZUREdDNE?=
- =?utf-8?B?RmRmRVdoU3NHUWZDY2YyQUNaRU5WWHhmT2lTMjJqZitpNGhveU9QZmhac0Yw?=
- =?utf-8?B?ZjkxblBpa1dGNGtJdWQraE5DYXhNVkVLYUxiOFdIazJRSEo5d3d4d0tjbDVS?=
- =?utf-8?B?WXFUZklwV3NmSWg2dWJiYktVaFlEVlovYlpMaGQwTk1JcnVURHBTL3pUMTdR?=
- =?utf-8?B?SkhKT3Q5c0NtUm5uQTRlM0Z5d1Q2R2oxNFZWeU5HZGJVdi9MNkRuVnp3Q2xi?=
- =?utf-8?B?ZTJ1eVhqbkY2bm93OXJieERIRDdjNlV4YWlIaTF1QmtDazFtQUtlY0JEMDBU?=
- =?utf-8?B?R2FjTmxQRnNseXZGRGY0MGZtYlZzWk5qVlZSU0xpa3VLQ1hmZWJqNkVqUUdP?=
- =?utf-8?B?SzRRdjVlRFg5NGduT05rY1VnYlRCRWVpN2dJQ0Vra2lHV3NzYVdyNGI1TU5M?=
- =?utf-8?B?N3U5dWpkMnA3MDgzMlhtQk5QVTU2bmhvYnd5RGtxQ1hKdWd0UW1vaG5ZRDNl?=
- =?utf-8?B?eFo1ZXRydURyWGJWK3A4Tk0zekh3cmg4SFVONjZXclVFK1AxK3o4YzlZdEFt?=
- =?utf-8?B?QkdtQ3lOUFh3RFhTZnZTMXlXcmg2dVIvUC9wQTFjbE1lUFd6WmlsYm9STnM2?=
- =?utf-8?B?SFFyYmxrUHpEVTNCYk9wRVd3N0lpOGkwSmxsVnRnQ2dUMjZpSEd3Zjg1enB5?=
- =?utf-8?B?S3RyZTBiWWdHNjYzeGRCOXYvTDVJandQTXJ2Nm13ejR2S090aHlKd05ud3Bk?=
- =?utf-8?B?QS9IbTBKNXZOWUJ5aXN3ams0eXgvakJGVXhiRTAvNjNMYjIxcUM1RGRFR24y?=
- =?utf-8?B?YjY5cm9iRCtKblUwWEgvMThLamYxUmxnc01SSW5hUm4yYzRrUmNuaGF4Tm9m?=
- =?utf-8?B?TFJ0YmU1MHpQclM0d3h2bG9UaW4rTlRGeFNIVXNqNXhJWFN2RWwzbjhaOTNp?=
- =?utf-8?B?Z0RlSCtJZzlrUWxBU01mWnQ1OFB4emRIWVVDVVN5N2IyYWxpMi8wS1NYSFp0?=
- =?utf-8?B?TVN5TEFEMW1DaVpNSVpqUjhUWFYvcHVsbFNsRTNyRVZDWnF6Z3IrLzczcTYy?=
- =?utf-8?B?UTQraGxYNTczYXB4R001d1NVbWpKblRneHlBa3RMSUlWY01nWnVVb2I2ZFl0?=
- =?utf-8?B?anVVeUFGZXAwdHA1L28xM3V1aUZONit4R3piMkRKczF0MlRYRWdCWElGamcr?=
- =?utf-8?B?TjJtaUZjMUpuMVh3MFZaMHVZN2txTjJtTVZ6akk3VFVKSXZtSzE0K2MrMit3?=
- =?utf-8?B?Q2piaUMrWUZNZmo0eEhROHN2c3A5RS8rQmdsbStqZ29ZZEQwT3c3OVVCMVdz?=
- =?utf-8?B?WXY0dGs0em5jQmYwVmxDaGhSL3VWWjFTNzE3MWtCYVZuUElZa1RveGZ4NzNn?=
- =?utf-8?B?OVVTelJxejRRRjdpOWlhWmp2R2hNN0d4ZEhIQWFxZy8vM0RtOHAydEgrWXlL?=
- =?utf-8?B?RXJmWVhHT0VBREhiQnZnaXVWWUFjd1J3WE9tRk1EK1JXUDVaeG41dz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9267995e-e998-46f5-e3c4-08de6f3b8cbb
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB9066.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2026 22:17:50.4607
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dWkwSblWkt2vgHfkQOXWMEh10Nd5QQeQ+QCEMYJsPXJ7XGwd+pzVr+rmGktnnF18e5f2Bivb4Pa6JhUNAM0ekw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8654
 
-Hello Dave,
+On 2/18/26 14:17, Kalra, Ashish wrote:
+> Yes, by default Venice platform has the NPS2 configuration enabled by default,
+> so we have 'X' nodes per socket and we have to consider this NPSx configuration
+> and optimize for those groups. 
 
-On 2/17/2026 4:06 PM, Dave Hansen wrote:
->> +#define RMPOPT_TABLE_MAX_LIMIT_IN_TB	2
->> +#define NUM_TB(pfn_min, pfn_max)	\
->> +	(((pfn_max) - (pfn_min)) / (1 << (40 - PAGE_SHIFT)))
-> 
-> IMNHO, you should just keep these in bytes. No reason to keep them in TB.
-> 
->> +struct rmpopt_socket_config {
->> +	unsigned long start_pfn, end_pfn;
->> +	cpumask_var_t cpulist;
->> +	int *node_id;
->> +	int current_node_idx;
->> +};
-> 
-> This looks like optimization complexity before the groundwork is in
-> place. Also, don't we *have* CPU lists for NUMA nodes? This seems rather
-> redundant.
-> 
+Why, though?
 
-Yes, we do have CPU lists for NUMA nodes, but we need a socket specific 
-cpumask, let me explain more about that below. 
+You keep saying: "We have NPS so we must configure sockets". But not *why*.
 
->> +/*
->> + * Build a cpumask of online primary threads, accounting for primary threads
->> + * that have been offlined while their secondary threads are still online.
->> + */
->> +static void get_cpumask_of_primary_threads(cpumask_var_t cpulist)
->> +{
->> +	cpumask_t cpus;
->> +	int cpu;
->> +
->> +	cpumask_copy(&cpus, cpu_online_mask);
->> +	for_each_cpu(cpu, &cpus) {
->> +		cpumask_set_cpu(cpu, cpulist);
->> +		cpumask_andnot(&cpus, &cpus, cpu_smt_mask(cpu));
->> +	}
->> +}
-> 
-> Don't we have a primary thread mask already? I thought we did.
-> 
+I suspect this is another premature optimization. Nodes are a bit too
+small so if you configure via nodes, the later nodes will have RMPOPT
+tables that cover empty address space off the end of system memory.
 
-Already discussed this. 
+Honestly, I think this is all just done wrong. It doesn't need to even
+consider sockets. Sockets might even be the wrong thing to look at.
 
->> +static void __configure_rmpopt(void *val)
->> +{
->> +	u64 rmpopt_base = ((u64)val & PUD_MASK) | MSR_AMD64_RMPOPT_ENABLE;
->> +
->> +	wrmsrq(MSR_AMD64_RMPOPT_BASE, rmpopt_base);
->> +}
-> 
-> I'd honestly just make the callers align the address..
-> 
->> +static void configure_rmpopt_non_numa(cpumask_var_t primary_threads_cpulist)
->> +{
->> +	on_each_cpu_mask(primary_threads_cpulist, __configure_rmpopt, (void *)0, true);
->> +}
->> +
->> +static void free_rmpopt_socket_config(struct rmpopt_socket_config *socket)
->> +{
->> +	int i;
->> +
->> +	if (!socket)
->> +		return;
->> +
->> +	for (i = 0; i < topology_max_packages(); i++) {
->> +		free_cpumask_var(socket[i].cpulist);
->> +		kfree(socket[i].node_id);
->> +	}
->> +
->> +	kfree(socket);
->> +}
->> +DEFINE_FREE(free_rmpopt_socket_config, struct rmpopt_socket_config *, free_rmpopt_socket_config(_T))
-> 
-> Looking at all this, I really think you need a more organized series.
-> 
-> Make something that's _functional_ and works for all <2TB configs. Then,
-> go add all this NUMA complexity in a follow-on patch or patches. There's
-> too much going on here.
+Basically, RMPOPT gives you a 2TB window of potentially "fast" memory.
+The rest of memory is "slow". If you're lucky, the memory that's fast
+because of RMPOPT is also in a low-distance NUMA node.
 
-Sure. 
+Sockets are a good thing to use, for sure. But they're not even optimal!
+Just imagine what's going to happen if you have more than 2TB in a
+socket. You just turn off the per-socket optimization. If that happens,
+the last node in the socket will end up with an RMPOPT table that has
+itself at the beginning, but probably a nonzero amount of off-socket memory.
 
-> 
->> +static void configure_rmpopt_large_physmem(cpumask_var_t primary_threads_cpulist)
->> +{
->> +	struct rmpopt_socket_config *socket __free(free_rmpopt_socket_config) = NULL;
->> +	int max_packages = topology_max_packages();
->> +	struct rmpopt_socket_config *sc;
->> +	int cpu, i;
->> +
->> +	socket = kcalloc(max_packages, sizeof(struct rmpopt_socket_config), GFP_KERNEL);
->> +	if (!socket)
->> +		return;
->> +
->> +	for (i = 0; i < max_packages; i++) {
->> +		sc = &socket[i];
->> +		if (!zalloc_cpumask_var(&sc->cpulist, GFP_KERNEL))
->> +			return;
->> +		sc->node_id = kcalloc(nr_node_ids, sizeof(int), GFP_KERNEL);
->> +		if (!sc->node_id)
->> +			return;
->> +		sc->current_node_idx = -1;
->> +	}
->> +
->> +	/*
->> +	 * Handle case of virtualized NUMA software domains, such as AMD Nodes Per Socket(NPS)
->> +	 * configurations. The kernel does not have an abstraction for physical sockets,
->> +	 * therefore, enumerate the physical sockets and Nodes Per Socket(NPS) information by
->> +	 * walking the online CPU list.
->> +	 */
-> 
-> By this point, I've forgotten why sockets are important here.
-> 
-> Why are they important?
-Because, Nodes per Socket (NPS) configuration is enabled by default, therefore, we have to
-look at Sockets instead of simply NUMA nodes, and collect/aggregate all the Node data per Socket
-and then accordingly setup the RMPOPT tables, so that the 2TB limit of RMPOPT tables is covered
-appropriately and we try to map the maximum possible memory in RMPOPT tables per-Socket rather
-than per-Node.
+I'd probably just do something like this:
 
-And as there is no per-Socket information available in kernel, we walk through the online
-CPU list and collect all this per-Socket information (including socket's start, end addresses,
-NUMA nodes in the socket, cpumask of the socket, etc.)
+Given a NUMA node, go through each 1GB of memory in the system and see
+what the average NUMA distance of that 2TB window of memory is. Find the
+2TB window with the lowest average distance. That'll give you a more or
+less optimal RMPOPT window. It'll work with NPS or regular NUMA or
+whatever bonkers future fancy thing shows up.
 
->  
->> +	for_each_cpu(cpu, primary_threads_cpulist) {
->> +		int socket_id, nid;
->> +
->> +		socket_id = topology_logical_package_id(cpu);
->> +		nid = cpu_to_node(cpu);
->> +		sc = &socket[socket_id];
->> +
->> +		/*
->> +		 * For each socket, determine the corresponding nodes and the socket's start
->> +		 * and end PFNs.
->> +		 * Record the node and the start and end PFNs of the first node found on the
->> +		 * socket, then record each subsequent node and update the end PFN for that
->> +		 * socket as additional nodes are found.
->> +		 */
->> +		if (sc->current_node_idx == -1) {
->> +			sc->current_node_idx = 0;
->> +			sc->node_id[sc->current_node_idx] = nid;
->> +			sc->start_pfn = node_start_pfn(nid);
->> +			sc->end_pfn = node_end_pfn(nid);
->> +		} else if (sc->node_id[sc->current_node_idx] != nid) {
->> +			sc->current_node_idx++;
->> +			sc->node_id[sc->current_node_idx] = nid;
->> +			sc->end_pfn = node_end_pfn(nid);
->> +		}
->> +
->> +		cpumask_set_cpu(cpu, sc->cpulist);
->> +	}
->> +
->> +	/*
->> +	 * If the "physical" socket has up to 2TB of memory, the per-CPU RMPOPT tables are
->> +	 * configured to the starting physical address of the socket, otherwise the tables
->> +	 * are configured per-node.
->> +	 */
->> +	for (i = 0; i < max_packages; i++) {
->> +		int num_tb_socket;
->> +		phys_addr_t pa;
->> +		int j;
->> +
->> +		sc = &socket[i];
->> +		num_tb_socket = NUM_TB(sc->start_pfn, sc->end_pfn) + 1;
->> +
->> +		pr_debug("socket start_pfn 0x%lx, end_pfn 0x%lx, socket cpu mask %*pbl\n",
->> +			 sc->start_pfn, sc->end_pfn, cpumask_pr_args(sc->cpulist));
->> +
->> +		if (num_tb_socket <= RMPOPT_TABLE_MAX_LIMIT_IN_TB) {
->> +			pa = PFN_PHYS(sc->start_pfn);
->> +			on_each_cpu_mask(sc->cpulist, __configure_rmpopt, (void *)pa, true);
->> +			continue;
->> +		}
->> +
->> +		for (j = 0; j <= sc->current_node_idx; j++) {
->> +			int nid = sc->node_id[j];
->> +			struct cpumask node_mask;
->> +
->> +			cpumask_and(&node_mask, cpumask_of_node(nid), sc->cpulist);
->> +			pa = PFN_PHYS(node_start_pfn(nid));
->> +
->> +			pr_debug("RMPOPT_BASE MSR on nodeid %d cpu mask %*pbl set to 0x%llx\n",
->> +				 nid, cpumask_pr_args(&node_mask), pa);
->> +			on_each_cpu_mask(&node_mask, __configure_rmpopt, (void *)pa, true);
->> +		}
->> +	}
->> +}
-> 
-> Ahh, so you're not optimizing by NUMA itself: you're assuming that there
-> are groups of NUMA nodes in a socket and then optimizing for those groups.
->
-Yes, by default Venice platform has the NPS2 configuration enabled by default,
-so we have 'X' nodes per socket and we have to consider this NPSx configuration
-and optimize for those groups. 
-
-> It would have been nice to say that. It would make great material for
-> the changelog for your broken out patches.
-
-Ok. 
-
-> 
-> I have the feeling that the structure here could be one of these in a patch:
-> 
->  1. Support systems with <2TB of memory
->  2. Support a RMPOPT range per NUMA node
->  3. Group NUMA nodes at socket boundaries and have them share a common
->     RMPOPT config.
-> 
-> Right?
-
-Yes, sure.
-
-> 
->> +static __init void configure_and_enable_rmpopt(void)
->> +{
->> +	cpumask_var_t primary_threads_cpulist;
->> +	int num_tb;
->> +
->> +	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT)) {
->> +		pr_debug("RMPOPT not supported on this platform\n");
->> +		return;
->> +	}
->> +
->> +	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP)) {
->> +		pr_debug("RMPOPT optimizations not enabled as SNP support is not enabled\n");
->> +		return;
->> +	}
->> +
->> +	if (!(rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED)) {
->> +		pr_info("RMPOPT optimizations not enabled, segmented RMP required\n");
->> +		return;
->> +	}
->> +
->> +	if (!zalloc_cpumask_var(&primary_threads_cpulist, GFP_KERNEL))
->> +		return;
->> +
->> +	num_tb = NUM_TB(min_low_pfn, max_pfn) + 1;
->> +	pr_debug("NUM_TB pages in system %d\n", num_tb);
-> 
-> This looks wrong. Earlier, you program 0 as the base RMPOPT address into
-> the MSR. But this uses 'min_low_pfn'. Why not 0?
-
-You are right, we should have used min_low_pfn earlier to program the 
-base RMPOPT address into the MSR. 
-
-> 
->> +	/* Only one thread per core needs to set RMPOPT_BASE MSR as it is per-core */
->> +	get_cpumask_of_primary_threads(primary_threads_cpulist);
->> +
->> +	/*
->> +	 * Per-CPU RMPOPT tables support at most 2 TB of addressable memory for RMP optimizations.
->> +	 *
->> +	 * Fastpath RMPOPT configuration and setup:
->> +	 * For systems with <= 2 TB of RAM, configure each per-core RMPOPT base to 0,
->> +	 * ensuring all system RAM is RMP-optimized on all CPUs.
->> +	 */
->> +	if (num_tb <= RMPOPT_TABLE_MAX_LIMIT_IN_TB)
->> +		configure_rmpopt_non_numa(primary_threads_cpulist);
-> 
-> this part:
-> 
->> +	else
->> +		configure_rmpopt_large_physmem(primary_threads_cpulist);
-> 
-> ^^ needs to be broken out into a separate optimization patch.
-> 
-
-Ok.
-
-Thanks,
-Ashish
+But that's all optimization territory. Please squirrel that away to go
+look at in 6 months once you get the rest of this merged.
