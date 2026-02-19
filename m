@@ -1,65 +1,67 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE35334694;
-	Thu, 19 Feb 2026 07:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3AD28469B
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Feb 2026 09:24:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771487718; cv=none; b=bzvXmTaqPjmN0PrcEL9GLDLna4Fqo2Vb4qhWiCMSn6ik0Vm9hQiOo3MU8lSW1FWEaFy97hzVDVAKw/fHIobq4XKcVTxrabEG+xDAflRPvZzskrWKFAn/I4qY9eblneLYeTnx2kF70+HtUy0X9v7XM+S6lw4VqF1ZI52fz3Zt1Ao=
+	t=1771493054; cv=none; b=Mo/y5qUra7CUhsIBXLxs/EhUT153OrB71bsUNoi6vhrIcWiOYb9JH+dvrjXwI/rejl93jM+0a4YVINfyOrejkbtBhJdpqXmrtFdh7t2vcMvm5DEOg/l/nhfw9XbJl4jS75Uqn3uZG/Luo3SictxecwuVT+vHSylSMP2TTK5pJ28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771487718; c=relaxed/simple;
-	bh=pzbK4/brNz010auB9728EGVQiHeaL9TguEYVSzMvosk=;
+	s=arc-20240116; t=1771493054; c=relaxed/simple;
+	bh=7x4iJcrAJx0s0mdhi4aA1VWX8cBG3QA4CqCnflf0TaM=;
 	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=I0iFY3YJnGO+uL65+tmwrYIWX/Zc5FnMMCsF26t6lCb+x1ODyqQE1Y/A41jtyTuy8dWWKQCw4zL/uXozb5OVHalmCUZp/i4Zx+v+xRY7MvD8JjCvGlMhOczp+AjJlcKuOydz+4CQTZ5MKJX7PxUNLb44VzWC1BaIOQk/OMrzLGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N4iaJjTw; arc=none smtp.client-ip=10.30.226.201
+	 Subject:Content-Type; b=QXJfBvTKjr8T5WAT5qHAYQDrlibWTbxlkjr1DefYMZSH7O1IpfMcuZTgDcrV7bgDxM/UTSX/FdAE1StLpCaa0ZcZ+aPZBC5bM7OBQFZFs3sRHrcAmvOgJpTPLkaQ2bdZpC9dFSYQh5q0bYql/mq+QAxzVDck2YK1h3EcEiFdgiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j0S7PTc1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N4iaJjTw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F5ABC4CEF7;
-	Thu, 19 Feb 2026 07:55:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j0S7PTc1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5F46C4AF09;
+	Thu, 19 Feb 2026 09:24:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771487718;
-	bh=pzbK4/brNz010auB9728EGVQiHeaL9TguEYVSzMvosk=;
+	s=k20201202; t=1771493054;
+	bh=7x4iJcrAJx0s0mdhi4aA1VWX8cBG3QA4CqCnflf0TaM=;
 	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=N4iaJjTwhPsUSIw/0tVqi0Wuaonzo3KM0NGXPNmfYCWl/cGhFtueCK/+728B4GUrL
-	 TMh2PycyFWg34db12zB4FGynt9FkyWu9PRfK3CddxE1kwHAGS64sjh4LxW7dUDDmXe
-	 GKSJ69RqbDsPxrIm9smqPMOYgaaKz/sHVczqc4w73FExob5B2Dlg4kWeA6dSUJagmr
-	 3S+/GlR/lmfBderEx8n8/mSdHoUajuBoNIvGcbcNcBPbF+iMmTGZxswmhxn4o1tTNx
-	 L1htvApQDN33C7pWQi2wXMCJwBJKPrIqpqxWyPVHa2H3sp/f6XnSLivaUO+nCMt0Zr
-	 jzyW4tlAgp1RA==
+	b=j0S7PTc1AYTKclJM4VrrVU73y39Gm+g1r0n/WB7xvc3rog9V/88uQNpd+8q1TlVcn
+	 ra6uE9LnD/79O8wcOlmXwu9frhVyscQZnWG7kWrQyn5qTxRmOwzunDbtYSczvigdQD
+	 ZTOcAwGOMbTeUY5sIy2E0enw9aRm1Ng6Umu2gKZYUQpRgZOvFBBhAltlarDgN7p+Am
+	 E0al+pDRVghpOIouVejND5QjFktE9G1S02hbhwv+/9rtqDBy/gcqZBd1NiTsHyaFpV
+	 +6gY/TUDkPL2SMODbqJt2GntC0KvwUsViOAurmArgOX/BI9R0uw3X/Lmlj/xuJOY7E
+	 2JDwQhG8WBF3w==
 Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 45BADF40069;
-	Thu, 19 Feb 2026 02:55:16 -0500 (EST)
+	by mailfauth.phl.internal (Postfix) with ESMTP id 67629F40069;
+	Thu, 19 Feb 2026 04:24:12 -0500 (EST)
 Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-01.internal (MEProxy); Thu, 19 Feb 2026 02:55:16 -0500
-X-ME-Sender: <xms:5MGWaZRKE8Ruz9fmbEYmk4H5lzQ5-zRr0MuEO5P_F1JZbXi2RRQQVw>
-    <xme:5MGWadmMNsXduT7E6Uq7nJrZlvJGIKzKb0uP1G7Mm8OQTWCPS2UHYIdt-d33U6EMd
-    FfV1NELxawXYk4V9niOQusN5kHnJlgqxxCCnnFv-RN44MsM_JWpxg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvvdegleejucetufdoteggodetrf
+  by phl-compute-01.internal (MEProxy); Thu, 19 Feb 2026 04:24:12 -0500
+X-ME-Sender: <xms:vNaWabUcj4Aqx9nItrl4czIWPhn8_OResdeqA8wQhJn4x4rLxaDZIg>
+    <xme:vNaWaeaqJJmsesaxFxUUxAR6N5U-1Wdl2OF-dWkCWD10w_KDLVGV_mXTUlpaGtL_Z
+    pp9Z8OOU3O17BfqmwyW7PKa2ydBlWTKAdgMpAbYFtP-MWeUgLQw6w>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvvdehudehucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedftehrugcu
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcu
     uehivghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrg
-    htthgvrhhnpeeuteeiudeigeekjedvheduieehteetgfdtuefghfejgffhfedtleehvdeh
-    fffhvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grrhguodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeel
-    qdeffedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrh
-    gurdgtohhmpdhnsggprhgtphhtthhopeefvddpmhhouggvpehsmhhtphhouhhtpdhrtghp
-    thhtohepsghpsegrlhhivghnkedruggvpdhrtghpthhtohepnhhivhgvughithgrsegrlh
-    humhdrmhhithdrvgguuhdprhgtphhtthhopehluhhtohesrghmrggtrghpihhtrghlrdhn
-    vghtpdhrtghpthhtohepughpshhmihhthhesrghpvghrthhushhsohhluhhtihhonhhsrd
-    gtohhmpdhrtghpthhtoheprghnughrvgifrdgtohhophgvrhefsegtihhtrhhigidrtgho
-    mhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoh
-    epphgvthgvrhhhuhgvfigvsehgmhigrdguvgdprhgtphhtthhopehhvghrsggvrhhtsehg
-    ohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepthhrvghntghhsghooh
-    htqdguvghvvghlsehgohhoghhlvghgrhhouhhpshdrtghomh
-X-ME-Proxy: <xmx:5MGWaQrTlO_H0Mob2v0oWSZhVnKE8GIcS6zblXO65tnvCJ3av6UZNQ>
-    <xmx:5MGWaUDOsEcd6Q_bO1fv6si6ilfGp8v83nBXZtXvrrhjJ2KETt4_DQ>
-    <xmx:5MGWaRNGd9fZiWxwtbMd7y2HQ3BNt-5qTsLDnKh-FIGdB3_3jHJ78w>
-    <xmx:5MGWablqDJwvTtmFQIOQi068xLRNpmuck6JGsQ0R88Dp_ysIgeXKGA>
-    <xmx:5MGWabfyU6Y_VYhL-tFs7ATSMD5qvQp-YyUSitnmKMnFHbLkkIJE9i1g>
+    htthgvrhhnpeejudffheffueetveelgfeiueetgfegffelueetfeevkeeiueetieejkeef
+    ueeiudenucffohhmrghinheprggvshdqmhhouggvshdrshgsnecuvehluhhsthgvrhfuih
+    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrugdomhgvshhmthhprghuthhh
+    phgvrhhsohhnrghlihhthidqudeijedthedttdejledqfeefvdduieegudehqdgrrhgusg
+    eppehkvghrnhgvlhdrohhrghesfihorhhkohhfrghrugdrtghomhdpnhgspghrtghpthht
+    ohepledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohephhgvrhgsvghrthesghhonh
+    guohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopegvsghighhgvghrsheskhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhnvghlsehlih
+    hsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqtghifhhs
+    sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqtghrhihpth
+    hosehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhn
+    vghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqfihirh
+    gvlhgvshhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhtrggslhgv
+    sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhgrshhonhesiiigvdgtge
+    drtghomh
+X-ME-Proxy: <xmx:vNaWaS64zKkRvQhaNM4wCXInrk7mBmRvcZy3O0-GJa4-wT3LisAR5A>
+    <xmx:vNaWaXyS8N5sSvspaCM7is8CG3TqLDxl3wmtkBthmQen6O9hfbZ2yQ>
+    <xmx:vNaWaefhJHLJmMJBEgL7DuqFOar2e3PCt75BVdSotqPSZEe5b9PsAg>
+    <xmx:vNaWaUAkzwzwun1XhrdCGxSumha3ZtmudVayj7zyOqUPz8l0hnV-fg>
+    <xmx:vNaWaa4oFUIZH8U2AHQhIKYPHtakE0NUwPusoA5Ny-wiou4_xJBzfBPs>
 Feedback-ID: ice86485a:Fastmail
 Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 0E84D700065; Thu, 19 Feb 2026 02:55:16 -0500 (EST)
+	id 44524700065; Thu, 19 Feb 2026 04:24:12 -0500 (EST)
 X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -67,145 +69,74 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AAnEvm6syrbF
-Date: Thu, 19 Feb 2026 08:54:55 +0100
+X-ThreadId: AlW4kGf5pqho
+Date: Thu, 19 Feb 2026 10:23:39 +0100
 From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Andy Lutomirski" <luto@amacapital.net>, "Simo Sorce" <simo@redhat.com>
-Cc: "H . Peter Anvin" <hpa@zytor.com>,
- "Daniel P. Smith" <dpsmith@apertussolutions.com>,
- "Ross Philipson" <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, iommu@lists.linux.dev,
- dave.hansen@linux.intel.com, "Thomas Gleixner" <tglx@linutronix.de>,
- "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
- mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, "Jarkko Sakkinen" <jarkko@kernel.org>, jgg@ziepe.ca,
- nivedita@alum.mit.edu, "Herbert Xu" <herbert@gondor.apana.org.au>,
- davem@davemloft.net, corbet@lwn.net, ebiederm@xmission.com,
- dwmw2@infradead.org, baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
- andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
-Message-Id: <558d0f28-01fb-4447-891c-2ffbf869c077@app.fastmail.com>
-In-Reply-To: 
- <CALCETrUMR0RvOFXGzL7=F4c-3veL+1Sm2xf-BprHTK4=UKw8yA@mail.gmail.com>
-References: <20251215233316.1076248-1-ross.philipson@oracle.com>
- <b5f2b5a5-b984-4ed3-a023-c06d634f9146@app.fastmail.com>
- <1ffd3cb5-2c76-4371-a067-3e4849907d80@apertussolutions.com>
- <49d169bf-0ad2-49be-b7d7-fceb9e7f831a@app.fastmail.com>
- <CALCETrUE8c-dxRWhtHKz_PojwZuWMXJSzOsFQf2vt5LS3ATwpA@mail.gmail.com>
- <1BBD7449-8420-43FD-930B-A4E1BA38FFC6@zytor.com>
- <CALCETrWzG1Mjb-RcwLQ5-tGFZ15WKHjZbqtLvyif+UPuVKJ_5g@mail.gmail.com>
- <32e62cef7b89d9691bdd4120388ce752fd041230.camel@redhat.com>
- <CALCETrUMR0RvOFXGzL7=F4c-3veL+1Sm2xf-BprHTK4=UKw8yA@mail.gmail.com>
-Subject: Re: [PATCH v15 00/28] x86: Secure Launch support for Intel TXT
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>,
+ linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org,
+ linux-wireless@vger.kernel.org, stable@vger.kernel.org
+Message-Id: <21d30582-9cb2-4e7a-9aa8-36e16aa45ff9@app.fastmail.com>
+In-Reply-To: <20260218213501.136844-4-ebiggers@kernel.org>
+References: <20260218213501.136844-1-ebiggers@kernel.org>
+ <20260218213501.136844-4-ebiggers@kernel.org>
+Subject: Re: [PATCH 03/15] crypto: arm64/aes - Fix 32-bit aes_mac_update() arg treated
+ as 64-bit
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Wed, 18 Feb 2026, at 22:54, Andy Lutomirski wrote:
-> On Wed, Feb 18, 2026 at 1:04=E2=80=AFPM Simo Sorce <simo@redhat.com> w=
-rote:
->>
->> On Wed, 2026-02-18 at 12:34 -0800, Andy Lutomirski wrote:
->> > On Wed, Feb 18, 2026 at 12:29=E2=80=AFPM H. Peter Anvin <hpa@zytor.=
-com> wrote:
->> > >
->> > > On February 18, 2026 12:03:27 PM PST, Andy Lutomirski <luto@amaca=
-pital.net> wrote:
->> > > > On Thu, Feb 12, 2026 at 12:40=E2=80=AFPM Ard Biesheuvel <ardb@k=
-ernel.org> wrote:
->> > > > >
->> > > > > On Thu, 12 Feb 2026, at 20:49, Daniel P. Smith wrote:
->> > > > > > On 2/9/26 09:04, Ard Biesheuvel wrote:
->> > > > > ...
->> > > > > But would it be better to disable the runtime services by def=
-ault when doing a secure launch? PREEMPT_RT already does the same.
->> > > >
->> > > > So I have a possible way to disable EFI runtime service without=
- losing
->> > > > the ability to write EFI vars.  We come up with a simple file f=
-ormat
->> > > > to store deferred EFI var updates and we come up with a place t=
-o put
->> > > > it so that we find it early-ish in boot the next time around.  =
-(This
->> > > > could be done via integration with systemd-boot or shim some ot=
-her
->> > > > boot loader or it could actually be part of the kernel.)  And t=
-hen,
->> > > > instead of writing variables directly, we write them to the def=
-erred
->> > > > list and then update them on reboot (before TXT launch, etc).  =
-[0]
->> > > > This would be a distincly nontrivial project and would not work=
- for
->> > > > all configurations.
->> > > >
->> > > > As a maybe less painful option, we could disable EFI runtime se=
-rvices
->> > > > but have a root-writable thing in sysfs that (a) turns them bac=
-k on
->> > > > but (b) first extends a PCR to say that they're turned back on.
->> > > >
->> > > > (Or someone could try running runtime services at CPL3...)
->> > > >
->> > > > [0] I have thought for years that Intel and AMD should do this =
-on
->> > > > their end, too.  Keep the sensitive part of SMI flash entirely =
-locked
->> > > > after boot and, instead of using magic SMM stuff to validate th=
-at
->> > > > write attempts have the appropriate permissions and signatures,=
- queue
->> > > > them up as deferred upates and validate the signatures on the n=
-ext
->> > > > boot before locking flash.
->> > > >
->> > >
->> > > *If* a physical EFI partition exists there is a lot to be said fo=
-r this approach.
->> > >
->> > > The only issue with this that I can see is for things like networ=
-k or CD/DVD booting where there isn't necessarily any EFI boot partition=
-, it might not be writable, or it might not be persistent (e.g. http boo=
-ting typically uses a ramdisk, like the old Linux initrd.)
->> >
->> > Hmm, I guess my approach is a 100% complete nonstarter for installi=
-ng
->> > Linux from a CD, and it's really not awesome for installing Linux f=
-rom
->> > a USB stick.
->>
->> Doing any of this on a removable device feels generally like a trap.
->> You get your USB disk in, try to boot, and it saves vars, but reboot
->> fails for whatever reason, you plug it in another machine ... and it
->> tries to "continue" from there? The amount of validation needed and
->> testing for failure modes across reboots sounds really painful.
->
-> I kind of stand by my other previous suggestion, though:
->
-> As a maybe less painful option, we could disable EFI runtime services
-> but have a root-writable thing in sysfs that (a) turns them back on
-> but (b) first extends a PCR to say that they're turned back on.
+
+
+On Wed, 18 Feb 2026, at 22:34, Eric Biggers wrote:
+> Since the 'enc_after' argument to neon_aes_mac_update() and
+> ce_aes_mac_update() has type 'int', it needs to be accessed using the
+> corresponding 32-bit register, not the 64-bit register.  The upper half
+> of the corresponding 64-bit register may contain garbage.
 >
 
-After setting the EFI boot path to GRUB (or systemd-boot or whatever) at=
- installation time, what other meaningful interactions do we expect with=
- the EFI runtime services?
+How could that happen? Setting the 32-bit alias of a GPR clears the upper half.
 
-And given that the secure launch is orchestrated by the bootloader , wit=
-h which the kernel has a backchannel via its configuration file, it shou=
-ld be rather straight-forward to implement the staging of variable updat=
-es there if we really need it.=20
+> Fixes: 4860620da7e5 ("crypto: arm64/aes - add NEON/Crypto Extensions 
+> CBCMAC/CMAC/XCBC driver")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-Doing any of this at the EFI/spec level might lead to a situation where =
-the OS now has to guess which of the provided APIs to manipulate variabl=
-es is the least broken.
+Agree with the change but I don't think this needs a cc:stable (or a fixes tag)
 
-Of course, for readinf variables, dumping the RT variables into a memory=
- buffer at boot time and exposing it via a EFI config table would be rat=
-her straight-forward, but it is also something I feel should be the job =
-of the boot component that takes part in the decision to shield the runt=
-ime services from the OS.
-
-
-
+> ---
+>  arch/arm64/crypto/aes-modes.S | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
+> index 0e834a2c062c..e793478f37c1 100644
+> --- a/arch/arm64/crypto/aes-modes.S
+> +++ b/arch/arm64/crypto/aes-modes.S
+> @@ -836,11 +836,11 @@ AES_FUNC_START(aes_mac_update)
+>  	encrypt_block	v0, w2, x1, x7, w8
+>  	eor		v0.16b, v0.16b, v3.16b
+>  	encrypt_block	v0, w2, x1, x7, w8
+>  	eor		v0.16b, v0.16b, v4.16b
+>  	cmp		w3, wzr
+> -	csinv		x5, x6, xzr, eq
+> +	csinv		w5, w6, wzr, eq
+>  	cbz		w5, .Lmacout
+>  	encrypt_block	v0, w2, x1, x7, w8
+>  	st1		{v0.16b}, [x4]			/* return dg */
+>  	cond_yield	.Lmacout, x7, x8
+>  	b		.Lmacloop4x
+> @@ -850,11 +850,11 @@ AES_FUNC_START(aes_mac_update)
+>  	cbz		w3, .Lmacout
+>  	ld1		{v1.16b}, [x0], #16		/* get next pt block */
+>  	eor		v0.16b, v0.16b, v1.16b		/* ..and xor with dg */
+> 
+>  	subs		w3, w3, #1
+> -	csinv		x5, x6, xzr, eq
+> +	csinv		w5, w6, wzr, eq
+>  	cbz		w5, .Lmacout
+> 
+>  .Lmacenc:
+>  	encrypt_block	v0, w2, x1, x7, w8
+>  	b		.Lmacloop
+> -- 
+> 2.53.0
