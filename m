@@ -1,171 +1,133 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB2E41754;
-	Fri, 20 Feb 2026 14:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303E425F7B9;
+	Fri, 20 Feb 2026 15:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771598694; cv=none; b=IKrWafwXNfrtS6Ltq90VnIZDJyUko0H69QS8fW7tZ0dGZVEUrDTmzweCSdOMlhrTedNDc9YA9G2QNi0fiRSr0t7tQZwOkLxu74aB5gAoOHWB7FinhDGfow+0N/QZ5qiMK1BNVt1eYN/uNrr8SrE/U1K/JOSR+aEk9Lw+O5l70I0=
+	t=1771601785; cv=none; b=dvupQpn2Ug1bg67/pSi/lO9C3HktS5giCp/C4baan7woix0lPWJdm2JxKPWknJgHHR8Jn7BgXo3fVs43EcMxXkf0yBJS/BsdLhkQ9rs+bjN/xvayhLrlIQdJ+fjQE/gR55RXrY9HMewAUQ92/VNqf3IPw1dg3qW1RpdV0CnS1/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771598694; c=relaxed/simple;
-	bh=RG2Hbf0o3KuqHZA5+48UswLVGJeXGifkvsztTu4/mN4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l+rHcgC284T6Zum4BFon8Si14T6EP6uN3zA0omH6GNXmDc+J0yEE4RQKEU7xik0rFszvO+tN0cVIFgsRx0QX7XHqO8lklVWqMcOc2UjBrDFjtGzNFmfFTPLs8twTx/DPQPVAUjSdMGdLvMTB5WJbzwaNNyFulfAM86SyWaeyCjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C12rBUTn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771601785; c=relaxed/simple;
+	bh=Ip+Ok3z4b8Mn4e2k/xxO7ygofUYVx5NJdGPJvg3Uvvo=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=pZRh+19iPeKcn1RZRAMyDTv1jGPx82l0Bqx/Qps1cdNZgjxhxd1fN0YVjCSFq8ZIS1GSKKqzFDTfsJw6ka9F3TeIsCo1XnuIcDW8fkO4yzC1bG3cY+8opTeC18khHTuHMXgeCGKRaGXxyzYU1O0CwbPwFdIudg0KRKcKb/nmrCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d8j24fM/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C12rBUTn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCB7EC116C6;
-	Fri, 20 Feb 2026 14:44:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8j24fM/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07B75C116C6;
+	Fri, 20 Feb 2026 15:36:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771598694;
-	bh=RG2Hbf0o3KuqHZA5+48UswLVGJeXGifkvsztTu4/mN4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C12rBUTnA1iJHVlm9ABE6opSgoFtD/ToalKiOumJIOKBNooJtp5TVG/aJmvhSYzoN
-	 JdxJ7uk4iCij2Aui1zxPm8KDGulo+EhprMBZduPecMxE0eTB+C/K2rVrG6MjNvVBwA
-	 V0tAmRNwiC3Son3ZQwnVkKQgTtax/HAdgY9zjkbrgyU1c0zY1FMYUqv36qm+mLv+5w
-	 HIj9eCxwC2UJ46qn+BMXGx8FTh9f7R/YHTrpBiyacN6nH/CCzjA0TA6eRsJ76X/0Wv
-	 Lo24d5B3SiovMtgewWVYU2pfVG8IjcwsMGCjEopMcAqm6LJ/WpZUEGvEutRLP4bLW3
-	 16gH6/69vLArw==
-Date: Fri, 20 Feb 2026 20:14:44 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Harshal Dev <harshal.dev@oss.qualcomm.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Abel Vesa <abel.vesa@oss.qualcomm.com>, cros-qcom-dts-watchers@chromium.org, 
-	Brian Masney <bmasney@redhat.com>, Neeraj Soni <neeraj.soni@oss.qualcomm.com>, 
-	Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 11/11] soc: qcom: ice: Add explicit power-domain and
- clock voting calls for ICE
-Message-ID: <vimd3tbnu4mr2uqporj7d4fv23aq2cb6e5een43yz5spe4u2xx@ufyzb2lzlc6j>
-References: <20260123-qcom_ice_power_and_clk_vote-v1-0-e9059776f85c@qti.qualcomm.com>
- <20260123-qcom_ice_power_and_clk_vote-v1-11-e9059776f85c@qti.qualcomm.com>
+	s=k20201202; t=1771601784;
+	bh=Ip+Ok3z4b8Mn4e2k/xxO7ygofUYVx5NJdGPJvg3Uvvo=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=d8j24fM/iIueOFUXQImLRiw/Nvq9i5abxog58HkgSvv3tfg3f8bPIw4TIaTL2cNsF
+	 gj5E9/mdWAZ8jDtMoQbP0PsHlnKjlIaYKj+W4RmlL35pZsFnxdbTRoGlT/HDBOL1oD
+	 hS9oP7F1wMw4vHb8tBOq8YsCezfJ2JQwZUjGQnK92/Q6OTmB+qs8Dhl4KVI+wJ9Ynn
+	 bL7miOtFFyZc+7gtzmfTPsDwSVtXhaWtx6TIZIex4mvbDtrG809w7MJGHQP/NDckLn
+	 BLhR46uTaItrkYXBa7Po6XxMGAHum954lWlXf6VMAlRckrSh48zxvKM9vVUQTwYL26
+	 EkdgubbdOGCcQ==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id DD74FF4006D;
+	Fri, 20 Feb 2026 10:36:22 -0500 (EST)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-01.internal (MEProxy); Fri, 20 Feb 2026 10:36:22 -0500
+X-ME-Sender: <xms:dn-YaXpKzgBI7lLLXvVnqkp9s_8LSG6eYRHb_v7Dh4I_nA74WDDqdw>
+    <xme:dn-Yacclxv5BJtKZ-Qq1XI4iHx3RyLHcNXmhZ9xG5qOn3jV4EcwK33tH6kozNhz9o
+    AbjnGXi1_VPLoTivYQYVCdUF9t9jfiBkqZ4d5ah8cdAmjyXu-PjMSg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvvdekkedvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcu
+    uehivghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrg
+    htthgvrhhnpedvueehiedtvedtleekuddutefgffdtleetfeetveejveejieehfefhjeei
+    jeefudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhguodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeel
+    qdeffedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrh
+    gurdgtohhmpdhnsggprhgtphhtthhopeefvddpmhhouggvpehsmhhtphhouhhtpdhrtghp
+    thhtohepsghpsegrlhhivghnkedruggvpdhrtghpthhtohepnhhivhgvughithgrsegrlh
+    humhdrmhhithdrvgguuhdprhgtphhtthhopehluhhtohesrghmrggtrghpihhtrghlrdhn
+    vghtpdhrtghpthhtohepughpshhmihhthhesrghpvghrthhushhsohhluhhtihhonhhsrd
+    gtohhmpdhrtghpthhtoheprghnughrvgifrdgtohhophgvrhefsegtihhtrhhigidrtgho
+    mhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoh
+    epphgvthgvrhhhuhgvfigvsehgmhigrdguvgdprhgtphhtthhopehhvghrsggvrhhtsehg
+    ohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepthhrvghntghhsghooh
+    htqdguvghvvghlsehgohhoghhlvghgrhhouhhpshdrtghomh
+X-ME-Proxy: <xmx:dn-YaZBdaidTbvEBGfz-iUZ-mgy8GA-vuxokns0lACS79eaqin2sjQ>
+    <xmx:dn-YaU4tmc_oQXzOQdSawhF3iuF8TCBCCqScSkC_zNOtmM0y7z9SfA>
+    <xmx:dn-YaQlTtj_nEiNEidchtEBlqmzl0pkyLthbR5p7BnKlCdBg4gvexw>
+    <xmx:dn-YaXfzUes1HVb7VveqSbLUM6qO4SVJqCj2HwTjJqow0G19GkCsMw>
+    <xmx:dn-YaZ3f8bIvTNMtbs-XCNvgBOCGXlsfh9Hb0ZD3p2MiApd3SUqnKoDq>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id A57F1700065; Fri, 20 Feb 2026 10:36:22 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260123-qcom_ice_power_and_clk_vote-v1-11-e9059776f85c@qti.qualcomm.com>
+X-ThreadId: A1ToacgRLhLF
+Date: Fri, 20 Feb 2026 16:35:44 +0100
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Daniel P. Smith" <dpsmith@apertussolutions.com>,
+ "Thomas Gleixner" <tglx@linutronix.de>,
+ "Eric W. Biederman" <ebiederm@xmission.com>,
+ "Eric Biggers" <ebiggers@kernel.org>
+Cc: "Ross Philipson" <ross.philipson@oracle.com>,
+ linux-kernel@vger.kernel.org, x86@kernel.org,
+ linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+ linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
+ "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+ "H . Peter Anvin" <hpa@zytor.com>, dave.hansen@linux.intel.com,
+ "Matthew Garrett" <mjg59@srcf.ucam.org>,
+ "James Bottomley" <James.Bottomley@hansenpartnership.com>, peterhuewe@gmx.de,
+ "Jarkko Sakkinen" <jarkko@kernel.org>, jgg@ziepe.ca,
+ "Andy Lutomirski" <luto@amacapital.net>, nivedita@alum.mit.edu,
+ "Herbert Xu" <herbert@gondor.apana.org.au>, davem@davemloft.net,
+ corbet@lwn.net, dwmw2@infradead.org, baolu.lu@linux.intel.com,
+ kanth.ghatraju@oracle.com, "Andrew Cooper" <andrew.cooper3@citrix.com>,
+ trenchboot-devel@googlegroups.com
+Message-Id: <c9a0cd9f-17cb-49e5-a411-b78ef9c7e35e@app.fastmail.com>
+In-Reply-To: <281c3bb3-13f6-47a2-9a9a-134e397bf686@apertussolutions.com>
+References: <20240531010331.134441-1-ross.philipson@oracle.com>
+ <20240531010331.134441-7-ross.philipson@oracle.com>
+ <20240531021656.GA1502@sol.localdomain>
+ <874jaegk8i.fsf@email.froward.int.ebiederm.org>
+ <5b1ce8d3-516d-4dfd-a976-38e5cee1ef4e@apertussolutions.com>
+ <87ttflli09.ffs@tglx>
+ <281c3bb3-13f6-47a2-9a9a-134e397bf686@apertussolutions.com>
+Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch early
+ measurements
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 23, 2026 at 12:41:35PM +0530, Harshal Dev wrote:
-> Since Qualcomm inline-crypto engine (ICE) is now a dedicated driver
-> de-coupled from the QCOM UFS driver, it should explicitly vote for it's
-> needed resources during probe, specifically the UFS_PHY_GDSC power-domain
-> and the 'core' and 'iface' clocks.
+Coming back to this old thread after having spent some time playing with the code:
 
-You don't need to vote for a single power domain since genpd will do that for
-you before the driver probes.
+On Thu, 22 Aug 2024, at 20:29, Daniel P. Smith wrote:
 
-> Also updated the suspend and resume callbacks to handle votes on these
-> resources.
-> 
-> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
+<selective snip>
 
-Where is the Fixes tag?
+> Another fact to consider is that the current Intel's TXT MLE 
+> specification dictates SHA1 as a valid configuration. Secure Launch's 
+> use of SHA1 is therefore to comply with Intel's specification for TXT. 
 
-> ---
->  drivers/soc/qcom/ice.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
-> 
-> diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
-> index b203bc685cad..4b50d05ca02a 100644
-> --- a/drivers/soc/qcom/ice.c
-> +++ b/drivers/soc/qcom/ice.c
-> @@ -16,6 +16,8 @@
->  #include <linux/of.h>
->  #include <linux/of_platform.h>
->  #include <linux/platform_device.h>
-> +#include <linux/pm.h>
-> +#include <linux/pm_runtime.h>
->  
->  #include <linux/firmware/qcom/qcom_scm.h>
->  
-> @@ -108,6 +110,7 @@ struct qcom_ice {
->  	void __iomem *base;
->  
->  	struct clk *core_clk;
-> +	struct clk *iface_clk;
->  	bool use_hwkm;
->  	bool hwkm_init_complete;
->  	u8 hwkm_version;
-> @@ -310,12 +313,20 @@ int qcom_ice_resume(struct qcom_ice *ice)
->  	struct device *dev = ice->dev;
->  	int err;
->  
-> +	pm_runtime_get_sync(dev);
+As I understand the Intel TXT spec and the code:
 
-This is not needed as the power domain would be enabled at this point.
+- TPM 1.2 is no longer supported by the TXT spec (since 2023)
+- TPM 1.2 is not supported by your GRUB implementation
+- in TPM 2.0 mode, SHA1 is only supported by the TXT spec if it is the /only/ algo supported by the TPM
+- the proposed kernel implementation ignores any SHA-384 and SM3-256 PCR banks if they are active, and caps them using a { 1, 0, ... } fake digest.
 
->  	err = clk_prepare_enable(ice->core_clk);
->  	if (err) {
->  		dev_err(dev, "failed to enable core clock (%d)\n",
->  			err);
->  		return err;
->  	}
-> +
-> +	err = clk_prepare_enable(ice->iface_clk);
-> +	if (err) {
-> +		dev_err(dev, "failed to enable iface clock (%d)\n",
-> +			err);
-> +		return err;
-> +	}
+So apologies for being slow, but I still struggle to understand why it is so important to have a SHA-1 implementation to cap those PCRs. Is it just to support systems with a TPM 2.0 that only has SHA-1 banks enabled?
 
-Use clk_bulk API to enable all clocks in one go.
+Assuming that this code will get merged this year, it will be in a LTS branch by 2027, by which time distros like Debian will pick it up. 
 
->  	qcom_ice_hwkm_init(ice);
->  	return qcom_ice_wait_bist_status(ice);
->  }
-> @@ -323,7 +334,9 @@ EXPORT_SYMBOL_GPL(qcom_ice_resume);
->  
->  int qcom_ice_suspend(struct qcom_ice *ice)
->  {
-> +	clk_disable_unprepare(ice->iface_clk);
+I fully understand that this code has lived out-of-tree for more than a decade, and you likely prefer to get everything upstream that your current users may be relying on. But for Linux, this is a new feature, and merging code now that is basically obsolete on day 1 is not something we should entertain imo.
 
-Same here.
-
->  	clk_disable_unprepare(ice->core_clk);
-> +	pm_runtime_put_sync(ice->dev);
-
-Not needed.
-
->  	ice->hwkm_init_complete = false;
->  
->  	return 0;
-> @@ -584,6 +597,10 @@ static struct qcom_ice *qcom_ice_create(struct device *dev,
->  	if (IS_ERR(engine->core_clk))
->  		return ERR_CAST(engine->core_clk);
->  
-> +	engine->iface_clk = devm_clk_get_enabled(dev, "iface_clk");
-> +	if (IS_ERR(engine->iface_clk))
-> +		return ERR_CAST(engine->iface_clk);
-> +
-
-Same here. Use devm_clk_bulk_get_all_enabled().
-
->  	if (!qcom_ice_check_supported(engine))
->  		return ERR_PTR(-EOPNOTSUPP);
->  
-> @@ -725,6 +742,9 @@ static int qcom_ice_probe(struct platform_device *pdev)
->  		return PTR_ERR(base);
->  	}
->  
-> +	devm_pm_runtime_enable(&pdev->dev);
-> +	pm_runtime_get_sync(&pdev->dev);
-
-If you want to mark & enable the runtime PM status, you should just do:
-
-	devm_pm_runtime_set_active_enabled();	
-
-But this is not really needed in this patch. You can add it in a separate patch
-for the sake of correctness.
-
-- Mani
+(and apologies for re-opening yet another can of worms - I assure you I am trying to be constructive here)
 
 -- 
-மணிவண்ணன் சதாசிவம்
+Ard.
+
