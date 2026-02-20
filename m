@@ -1,194 +1,296 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A911D555
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Feb 2026 07:37:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9CD30F549;
+	Fri, 20 Feb 2026 08:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771573079; cv=none; b=GzURsiOVe4qNnYg6MYU+Y+hhUBJ+u3CHFnKLN2/vA2GYkTzqPB7OmfDecP1rF8rUSU/Y08fce4MWkmpBmd9uUjEVUYsq7QlbnIU644iTS4LFUGIwAPKX5VjZqfknkeI2MvASK2ksJ92Pp4pUQImvfO6bYkbCaeeSj6soiu/PKfg=
+	t=1771576245; cv=none; b=QKklWGJYIz7MDsysjtGvxPRcO2ZipjSrYlCmc36zNtI487V+w9V+gSKTVD5ImgQYIevbbixTXnxR0c3GBcMlwbEeHZZkZamrVMzB/uT96pY/1X5sK4vKY5Lj5Xu6jX2rNclumaNqpREo3leLrMOYCdHKaA0Q0JBD41nfVZ/3JNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771573079; c=relaxed/simple;
-	bh=HGuSp2VF6EtcyW5OJmPkCM7XvToSlNH2F3wLtZoNy8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VVlxWNZ59I+XmOiB7zq6px0+71pDdOHVJRHc8rKDGQHHAwbxmtIi1nJ2gkpjp9OcmLuuQA2VxyfqtYyYMyZxrSUyovsv3AMlXALcK+fs5GQUFCTBFYInWPBzum6in7ofEejyAEWgCRgHIlZzV/0GR5EaphfZPObLkA/6N2SweBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=QnJk6wnU; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=PrBMskYK; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1771576245; c=relaxed/simple;
+	bh=OOkNKzJWZ2PKiWVeYu871t9knsMGA4JMCfqoaCA5Qc0=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Wf2JvZosiPJ7llNITqDCgxir+oU0qA0THzrfo4HvP0tNxxW9Wbo4MYxf5Owi5izvuLrgzjpIHLX9huBZGrfB7YcKdHdw+4snIcptYC/ckWZAdr3fWJoaucAE9uy0d/1eh5toBnp9GKXPiEFLbF1PT9sPAma4hOEHFC+ElEIb8YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aPwL1llw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="QnJk6wnU";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="PrBMskYK"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61K5Rxe71646412
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Feb 2026 07:37:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=EYpf01VqzYMOqIKXop1UeY2N
-	HKS7LocvqzJI2+Aqals=; b=QnJk6wnUt4vtseRe36MZ95F4GU5juTeFBeoNAVbv
-	vKHuEMFZje53bXsBrspZIyuuM+/KIuU5GrZP6LR/B4tF4zqn6G7C8Se9N3qUA6Lb
-	3yk3hMWlYPzpng5L7QIYTKmb7Fsf8zXLT9p9EHXoWq5HlYx0sGnMVSj6NKrOMx3T
-	WZC9bvxyZaOIKdLcUDZnRAE7vcWBaEEZX18RonMTtipNUgpDidlat4xM4AnbX8/H
-	H0jSIsd6ZxzPG2cDtOpbIJRdspw76fGIcclluyr18xAejjS3IjwozEhY/TkZDrmf
-	AnMWPXkpSacIqS30cd0vSi87kxL3D2cnhyvEo7hMfmDprQ==
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ce1k834ky-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Feb 2026 07:37:57 +0000 (GMT)
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3586e7cf42aso7948198a91.0
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Feb 2026 23:37:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1771573076; x=1772177876; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EYpf01VqzYMOqIKXop1UeY2NHKS7LocvqzJI2+Aqals=;
-        b=PrBMskYKrPwdEn2U8dXnURst53/BcEUoWF50nTLEgLZcRFj9t0e1v65mNq7mmA15wK
-         w2KNRdkj0qDXdzFcUC60Xu0OtwnBkdL6+RhS5Azf2hg5CuvjYWDgFeZzF5g73ZdgYHvA
-         zit3WbkBbLSoTBCagYAmdhJyhF5WspQ0tYcYuqMudOtJGTuI2ICp/sCeO05m2HINWcqt
-         L9Fjy0elh52CiKViqUYU9thA5GvHJ3+KT8zqYbktZ0OC06rXYNpU2s7B4rdMZvIbkChT
-         cE3cJGp9aMbYB2w2fF82vgaeHycpmjbRebGiA4629LujEPoKtejDXilSJ6AwUNO0dGyE
-         QVVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771573076; x=1772177876;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EYpf01VqzYMOqIKXop1UeY2NHKS7LocvqzJI2+Aqals=;
-        b=S2+Bz/i24TeMlJKbqJjcMECzP3DbQgnmKfrS42IvF9oHscMzjIt2yfFk4Yfa4T237J
-         4WWANpahrWv3Kf6KMkkuvAHufl8BUiXDqI+AEShCRFsVCDHoEcd2VhRakV5aQSVtVZav
-         uJDSXhGA7R8+RXnlQeDCVPvon/BQ0exv6m2oktwLBj/+XeI4eQQQ/XQTLWzgeWYawewo
-         y5bouIAwLm2IDYRD2OWtYM43ilUxGUxqVyksv2Vj7jp3yJ7Zo0MPQr5BkoEeBIXqymWK
-         HGRctNA0Tf9zz15sge6NO8I51SplmlSe0GyiflZ3g7HQkx5SWigBWBGtxN8Wtgd/fu2C
-         3dPw==
-X-Forwarded-Encrypted: i=1; AJvYcCXzLrFKl16i+R4NtUiuhAyBTjXEo5W7KlA3D5bDkM8JrPwvnuiV4TycmFOxwK78svN4OdhXhFu8ALbEKio=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYrevxyCfZzvNdZUZGg1gxR8nngK+usNtN9PCft9NQ1GwpMiPD
-	lD5skNa0eeUmkSBZC9h80H0q1mg2APLGjn1js6HGsjTkNaxPaKpczqSi+lZPuTaKL5/JVVXxvUQ
-	TBKJd8yWsWv6ar7ugekBJeL3V9Kbvxsyue0e8tKrm577wXh+FUcy6J2Mk1BDaEFmKv4I=
-X-Gm-Gg: AZuq6aLdBCwKCQgjc+RyU20zzqT1T76XpZDUDNTOeDT/3NeN1QaX5Q1qicLcQcNFZXM
-	Ctx2Cev5s6M/GHKS7JmCu8wABAC6s4F8zfxSc1/cryMzenJ0e+IjwGIUiLqpxuUqXDBSUeVxQij
-	zTrFqn69egnbtHIY218xrg/hfyaWHGCIUc/CGoUXKKiyjsW7Z7YNayDywP/mjt638SkiZ9pOzvV
-	pAs5y0yFRKwk6FV7dj96l0zOhHo2e5JVN5V4dHIJ36drLxkWGEjO9YVg032IOszW0NGpDU/4+jU
-	d1CmFVGyxNp+sPRo71FPdZp1/ne8tus6FDXR9E2ztZjxsaUBjzj+eEZj3rRh3X4JFawIxuWtUbG
-	XKc19jNnChBq6p/+w20myJToofj/AsQpeB+hy6jKGR732rkb1s8g432+jZS0=
-X-Received: by 2002:a17:90b:2f45:b0:340:ca7d:936a with SMTP id 98e67ed59e1d1-35844f99201mr20142480a91.18.1771573076327;
-        Thu, 19 Feb 2026 23:37:56 -0800 (PST)
-X-Received: by 2002:a17:90b:2f45:b0:340:ca7d:936a with SMTP id 98e67ed59e1d1-35844f99201mr20142446a91.18.1771573075810;
-        Thu, 19 Feb 2026 23:37:55 -0800 (PST)
-Received: from hu-arakshit-hyd.qualcomm.com ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3589d81eb8fsm2285630a91.8.2026.02.19.23.37.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 23:37:55 -0800 (PST)
-Date: Fri, 20 Feb 2026 13:07:48 +0530
-From: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v6 2/4] soc: qcom: ice: Add OPP-based clock scaling
- support for ICE
-Message-ID: <aZgPTLttO+fO8cfC@hu-arakshit-hyd.qualcomm.com>
-References: <20260219-enable-ufs-ice-clock-scaling-v6-0-0c5245117d45@oss.qualcomm.com>
- <20260219-enable-ufs-ice-clock-scaling-v6-2-0c5245117d45@oss.qualcomm.com>
- <15495f8a-37b0-4768-9ee1-05fd6c70034e@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aPwL1llw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6916BC116D0;
+	Fri, 20 Feb 2026 08:30:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771576244;
+	bh=OOkNKzJWZ2PKiWVeYu871t9knsMGA4JMCfqoaCA5Qc0=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=aPwL1llwYZ0PhJbYJjiccMMsFKNTpSN3h6HKEogc0SQMz0qNQ95k7ksQcMyHLRjzK
+	 V60/YPqUhDW73lmKblFgu8a0slvOz89MYLjGDR+YttCGKKNianvSxnuMy9ax4BfD14
+	 lZU0a4EmplrZP3FXNHbo6CJoWZS4W9XjwvCLq4/ylA8nJQ0Lulhq0hN7rX3Gx52dEn
+	 36cwfpbnut6G1KNsmrkILyKkomEwq3EsuUQ6xL4TCJYqfZhZ8qmk0A48pXktKFzez/
+	 RDCSP8cYbJqnbb50y21F212txXq/CGSZ2GdpPOCoOov13wP8rjvPAnbGqej0BOJA5Y
+	 3J8X2mNNwPAMg==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id EF254F40069;
+	Fri, 20 Feb 2026 03:30:41 -0500 (EST)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-01.internal (MEProxy); Fri, 20 Feb 2026 03:30:42 -0500
+X-ME-Sender: <xms:sRuYaZtdO-kEDZ6jyrUg29QVVJFQrny0pZ3ezNCYPVygXUo8kPT68Q>
+    <xme:sRuYadTw0jR6o4mFsXaOb3AWdfxTdgAv1HFsKo5j_w9sORkvJLEhzV-q3spNFynOh
+    2Ubtqz0ZMXu-WayYa5VUA01TJLh6XvD099OkNR3ywFqD-joIDr8dsw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvvdejleehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedftehrugcu
+    uehivghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrg
+    htthgvrhhnpeeuteeiudeigeekjedvheduieehteetgfdtuefghfejgffhfedtleehvdeh
+    fffhvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhguodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeel
+    qdeffedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrh
+    gurdgtohhmpdhnsggprhgtphhtthhopeefvddpmhhouggvpehsmhhtphhouhhtpdhrtghp
+    thhtohepsghpsegrlhhivghnkedruggvpdhrtghpthhtohepnhhivhgvughithgrsegrlh
+    humhdrmhhithdrvgguuhdprhgtphhtthhopehluhhtohesrghmrggtrghpihhtrghlrdhn
+    vghtpdhrtghpthhtohepughpshhmihhthhesrghpvghrthhushhsohhluhhtihhonhhsrd
+    gtohhmpdhrtghpthhtoheprghnughrvgifrdgtohhophgvrhefsegtihhtrhhigidrtgho
+    mhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoh
+    epphgvthgvrhhhuhgvfigvsehgmhigrdguvgdprhgtphhtthhopehhvghrsggvrhhtsehg
+    ohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepthhrvghntghhsghooh
+    htqdguvghvvghlsehgohhoghhlvghgrhhouhhpshdrtghomh
+X-ME-Proxy: <xmx:sRuYaSE41zy-0gKhEDntCwr9EkMSTDAbWBC6gFogmaZORdtSCZazBg>
+    <xmx:sRuYaQuD_PamJME6yIMQvHwc-vTB6378FCneQDrqKdQkZr2d7YsGNg>
+    <xmx:sRuYaYKiRTSt0NGzQEf8b1tar7A2Ez8t7wct0zTn-wFVaEhdpoQwBw>
+    <xmx:sRuYafx_Sf8aIzNhbGWpWKYWTwuFMiqozbcCiCP20ySSLcMVutcyMg>
+    <xmx:sRuYaT4yNHzt4j55xgiWueu0sefZ18usY5pqg8AA7-I87bnf8eokGbBA>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id BE6FD700069; Fri, 20 Feb 2026 03:30:41 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <15495f8a-37b0-4768-9ee1-05fd6c70034e@oss.qualcomm.com>
-X-Proofpoint-GUID: Cx7Qywby650JTIHYEC86Gn4FM48mYdL5
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjIwMDA2NSBTYWx0ZWRfXyhNE2546HUTL
- iKE//IV2eFAxux3GKkiLKpfBF2AI655Mh/rlAUvex4zhYBJTBCuJuU3uY9TvgwXiF/vJi2lr6w/
- t/yorVUz2lRlYJY3QriCQh4wTmLIgeBcpJ60EuHgnwBJ5GQLFyVNCQn3OCqKx3Iq69qAItS6Wz8
- 9iutWio1lS8AH8sh5zadMiJM65HqbrQN+MdM8PvAkF/u2xPSuUWAEDQBDkmOsFOe5LwWfmeT+9R
- /AuxrxbS/1bQsGkbfBlPJygp2rwJ7uj4Df4aHNOe2yc9dj1U4mOloYjjf+WBX9vSy/pscLuK3N+
- zEnyYuhKcp9Z5EjFM8zLMtHVpq2c8lgXbnvE+Y3Uto+Af5aENaRi3AGYrTJrlJrqnZQdcyz0FCI
- PQi2e6t44Yi3HmJonQuTCjVlqtB7abXyPt6ugXtlFrX9Oj+Xf70VRNejY0o0sThWe4HFlKSiPAv
- HKi05i4wz1wzaKjyWcQ==
-X-Authority-Analysis: v=2.4 cv=cdrfb3DM c=1 sm=1 tr=0 ts=69980f55 cx=c_pps
- a=UNFcQwm+pnOIJct1K4W+Mw==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22
- a=EUspDBNiAAAA:8 a=3jkGTw76aC5nUHUS4j8A:9 a=CjuIK1q_8ugA:10
- a=uKXjsCUrEbL0IQVhDsJ9:22
-X-Proofpoint-ORIG-GUID: Cx7Qywby650JTIHYEC86Gn4FM48mYdL5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-19_06,2026-02-20_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 adultscore=0 priorityscore=1501 phishscore=0
- impostorscore=0 lowpriorityscore=0 suspectscore=0 malwarescore=0
- clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2602200065
+X-ThreadId: AAnEvm6syrbF
+Date: Fri, 20 Feb 2026 09:30:21 +0100
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Andy Lutomirski" <luto@amacapital.net>
+Cc: "Simo Sorce" <simo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+ "Daniel P. Smith" <dpsmith@apertussolutions.com>,
+ "Ross Philipson" <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+ linux-efi@vger.kernel.org, iommu@lists.linux.dev,
+ dave.hansen@linux.intel.com, "Thomas Gleixner" <tglx@linutronix.de>,
+ "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+ mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
+ peterhuewe@gmx.de, "Jarkko Sakkinen" <jarkko@kernel.org>, jgg@ziepe.ca,
+ nivedita@alum.mit.edu, "Herbert Xu" <herbert@gondor.apana.org.au>,
+ davem@davemloft.net, corbet@lwn.net, ebiederm@xmission.com,
+ dwmw2@infradead.org, baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
+ andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
+Message-Id: <9034c6a1-ebce-40b6-9ac8-0b8cc5a50dd4@app.fastmail.com>
+In-Reply-To: 
+ <CALCETrWynypSD7vEjJNLcym3JhBw4k0ovDiR_3YuOHh92TnM=A@mail.gmail.com>
+References: <20251215233316.1076248-1-ross.philipson@oracle.com>
+ <b5f2b5a5-b984-4ed3-a023-c06d634f9146@app.fastmail.com>
+ <1ffd3cb5-2c76-4371-a067-3e4849907d80@apertussolutions.com>
+ <49d169bf-0ad2-49be-b7d7-fceb9e7f831a@app.fastmail.com>
+ <CALCETrUE8c-dxRWhtHKz_PojwZuWMXJSzOsFQf2vt5LS3ATwpA@mail.gmail.com>
+ <1BBD7449-8420-43FD-930B-A4E1BA38FFC6@zytor.com>
+ <CALCETrWzG1Mjb-RcwLQ5-tGFZ15WKHjZbqtLvyif+UPuVKJ_5g@mail.gmail.com>
+ <32e62cef7b89d9691bdd4120388ce752fd041230.camel@redhat.com>
+ <CALCETrUMR0RvOFXGzL7=F4c-3veL+1Sm2xf-BprHTK4=UKw8yA@mail.gmail.com>
+ <558d0f28-01fb-4447-891c-2ffbf869c077@app.fastmail.com>
+ <CALCETrWynypSD7vEjJNLcym3JhBw4k0ovDiR_3YuOHh92TnM=A@mail.gmail.com>
+Subject: Re: [PATCH v15 00/28] x86: Secure Launch support for Intel TXT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 19, 2026 at 03:16:33PM +0100, Konrad Dybcio wrote:
-> On 2/19/26 10:39 AM, Abhinaba Rakshit wrote:
-> > Register optional operation-points-v2 table for ICE device
-> > during device probe.
-> > 
-> > Introduce clock scaling API qcom_ice_scale_clk which scale ICE
-> > core clock based on the target frequency provided and if a valid
-> > OPP-table is registered. Use flags (if provided) to decide on
-> > the rounding of the clock freq against OPP-table. Disable clock
-> > scaling if OPP-table is not registered.
-> > 
-> > When an ICE-device specific OPP table is available, use the PM OPP
-> > framework to manage frequency scaling and maintain proper power-domain
-> > constraints.
-> > 
-> > Also, ensure to drop the votes in suspend to prevent power/thermal
-> > retention. Subsequently restore the frequency in resume from
-> > core_clk_freq which stores the last ICE core clock operating frequency.
-> > 
-> > Signed-off-by: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
-> > ---
-> 
-> [...]
-> 
-> > +int qcom_ice_scale_clk(struct qcom_ice *ice, unsigned long target_freq,
-> > +		       unsigned int flags)
-> 
-> If you're not going to add more flags, 'bool round_ceil' would do just fine,
-> without introducing new custom defines
 
-I guess, the defines I am currently using are mutually exclusive and not intend
-to extend it. Hence, can replace using 'bool round_ceil'.
-Ack, will send a new patchset with the update.
- 
-> [...]
-> 
-> > +	/*
-> > +	 * Register the OPP table only when ICE is described as a standalone
-> > +	 * device node. Older platforms place ICE inside the storage controller
-> > +	 * node, so they don't need an OPP table here, as they are handled in
-> > +	 * storage controller.
-> > +	 */
-> > +	if (!is_legacy_binding) {
-> > +		/* OPP table is optional */
-> > +		err = devm_pm_opp_of_add_table(dev);
-> > +		if (err && err != -ENODEV) {
-> > +			dev_err(dev, "Invalid OPP table in Device tree\n");
-> > +			return ERR_PTR(err);
-> > +		}
-> > +		engine->has_opp = (err == 0);
-> > +
-> > +		if (!engine->has_opp)
-> > +			dev_info(dev, "ICE OPP table is not registered\n");
-> 
-> dev_warn(dev, "ICE OPP table is not registered, please update your DT")
 
-Ack, will send a new patchset with the update.
+On Thu, 19 Feb 2026, at 18:34, Andy Lutomirski wrote:
+> On Wed, Feb 18, 2026 at 11:55=E2=80=AFPM Ard Biesheuvel <ardb@kernel.o=
+rg> wrote:
+>>
+>> On Wed, 18 Feb 2026, at 22:54, Andy Lutomirski wrote:
+>> > On Wed, Feb 18, 2026 at 1:04=E2=80=AFPM Simo Sorce <simo@redhat.com=
+> wrote:
+>> >>
+>> >> On Wed, 2026-02-18 at 12:34 -0800, Andy Lutomirski wrote:
+>> >> > On Wed, Feb 18, 2026 at 12:29=E2=80=AFPM H. Peter Anvin <hpa@zyt=
+or.com> wrote:
+>> >> > >
+>> >> > > On February 18, 2026 12:03:27 PM PST, Andy Lutomirski <luto@am=
+acapital.net> wrote:
+>> >> > > > On Thu, Feb 12, 2026 at 12:40=E2=80=AFPM Ard Biesheuvel <ard=
+b@kernel.org> wrote:
+>> >> > > > >
+>> >> > > > > On Thu, 12 Feb 2026, at 20:49, Daniel P. Smith wrote:
+>> >> > > > > > On 2/9/26 09:04, Ard Biesheuvel wrote:
+>> >> > > > > ...
+>> >> > > > > But would it be better to disable the runtime services by =
+default when doing a secure launch? PREEMPT_RT already does the same.
+>> >> > > >
+>> >> > > > So I have a possible way to disable EFI runtime service with=
+out losing
+>> >> > > > the ability to write EFI vars.  We come up with a simple fil=
+e format
+>> >> > > > to store deferred EFI var updates and we come up with a plac=
+e to put
+>> >> > > > it so that we find it early-ish in boot the next time around=
+.  (This
+>> >> > > > could be done via integration with systemd-boot or shim some=
+ other
+>> >> > > > boot loader or it could actually be part of the kernel.)  An=
+d then,
+>> >> > > > instead of writing variables directly, we write them to the =
+deferred
+>> >> > > > list and then update them on reboot (before TXT launch, etc)=
+.  [0]
+>> >> > > > This would be a distincly nontrivial project and would not w=
+ork for
+>> >> > > > all configurations.
+>> >> > > >
+>> >> > > > As a maybe less painful option, we could disable EFI runtime=
+ services
+>> >> > > > but have a root-writable thing in sysfs that (a) turns them =
+back on
+>> >> > > > but (b) first extends a PCR to say that they're turned back =
+on.
+>> >> > > >
+>> >> > > > (Or someone could try running runtime services at CPL3...)
+>> >> > > >
+>> >> > > > [0] I have thought for years that Intel and AMD should do th=
+is on
+>> >> > > > their end, too.  Keep the sensitive part of SMI flash entire=
+ly locked
+>> >> > > > after boot and, instead of using magic SMM stuff to validate=
+ that
+>> >> > > > write attempts have the appropriate permissions and signatur=
+es, queue
+>> >> > > > them up as deferred upates and validate the signatures on th=
+e next
+>> >> > > > boot before locking flash.
+>> >> > > >
+>> >> > >
+>> >> > > *If* a physical EFI partition exists there is a lot to be said=
+ for this approach.
+>> >> > >
+>> >> > > The only issue with this that I can see is for things like net=
+work or CD/DVD booting where there isn't necessarily any EFI boot partit=
+ion, it might not be writable, or it might not be persistent (e.g. http =
+booting typically uses a ramdisk, like the old Linux initrd.)
+>> >> >
+>> >> > Hmm, I guess my approach is a 100% complete nonstarter for insta=
+lling
+>> >> > Linux from a CD, and it's really not awesome for installing Linu=
+x from
+>> >> > a USB stick.
+>> >>
+>> >> Doing any of this on a removable device feels generally like a tra=
+p.
+>> >> You get your USB disk in, try to boot, and it saves vars, but rebo=
+ot
+>> >> fails for whatever reason, you plug it in another machine ... and =
+it
+>> >> tries to "continue" from there? The amount of validation needed and
+>> >> testing for failure modes across reboots sounds really painful.
+>> >
+>> > I kind of stand by my other previous suggestion, though:
+>> >
+>> > As a maybe less painful option, we could disable EFI runtime servic=
+es
+>> > but have a root-writable thing in sysfs that (a) turns them back on
+>> > but (b) first extends a PCR to say that they're turned back on.
+>> >
+>>
+>> After setting the EFI boot path to GRUB (or systemd-boot or whatever)=
+ at installation time, what other meaningful interactions do we expect w=
+ith the EFI runtime services?
+>>
+>> And given that the secure launch is orchestrated by the bootloader , =
+with which the kernel has a backchannel via its configuration file, it s=
+hould be rather straight-forward to implement the staging of variable up=
+dates there if we really need it.
+>>
+>> Doing any of this at the EFI/spec level might lead to a situation whe=
+re the OS now has to guess which of the provided APIs to manipulate vari=
+ables is the least broken.
+>>
+>> Of course, for readinf variables, dumping the RT variables into a mem=
+ory buffer at boot time and exposing it via a EFI config table would be =
+rather straight-forward, but it is also something I feel should be the j=
+ob of the boot component that takes part in the decision to shield the r=
+untime services from the OS.
+>
+> So there's sort of a usability issue here.  On the one hand, this can
+> all be orchestrated to work.  We build a kernel, and the kernel
+> supports secure launch.  Someone makes an installer image, and that
+> image is configured to skip secure launch, then install to disk, then
+> program EFI vars, then reboot.  And the installed image is configured
+> to do the secure launch, and EFI variable writes are turned off.
+>
+> On the other hand, this all sucks.  I'm getting sick of having the
+> kernel tell me that I am not permitted to do things.  I'm sick of
+> writing software that deals with unnecessary restrictions.  If I were
+> writing an OS with a USB stick-based installer, I might want to be
+> able to boot the thing and decide later whether I'm installing an OS
+> to disk.  (In fact, many USB installers work this way.)  But, in the
+> model where EFI variable writes are hard-disabled on a secure launch,
+> the decision to do the secure launch happens before the decision to
+> install an OS, and we all lose.
+>
+> So I'm proposing that EFI variable writes be treated a bit like kexec
+> [0] -- root (which is already part of the TCB for any practical
+> purpose) is going to decide, like a grown up, to execute some code
+> that it doesn't fully trust -- in this case, the EFI variable writes.
+> And root will coordinate, correctly, with whomever it's busy using the
+> TPM to coordinate with, and tell it that it's going to do something
+> that will change its trustworthiness.  So it works like this:
+>
+> 1. Secure launch the environment on the stick.  (At this stage,
+> neither the boot loader nor the kernel has the faintest clue whether
+> anyone needs that secure launch, but this doesn't matter.)
+>
+> 2. The owner of the machine clicks "install".
+>
+> 3. The installer makes some partitions and writes some files.
+>
+> (Up until now, the security posture of the running environment has not=
+ changed.)
+>
+> 4. The installer decides that it's now time to do untrustworthy
+> things, namely writing EFI vars.  So it unmounts anything it mounted
+> using TPM-sealed keys (or not -- this is between the distro and
+> whoever trusts the distro), and it does:
+>
+> # echo 1 >/sys/.../extend_pcr_and_unlock_efi
+>
+> which *first* extends a PCR because we are about to change our
+> security posture and *second* sets whatever flag permits use of EFI
+> runtime services.
+>
+> 5. The installer writes to EFI variables.  And the installer can no
+> longer generate attestations to its previous security posture, which
+> is the correct behavior.  And maybe the user can no longer unlock
+> their home directory or whatever until they reboot.  Which is not
+> really a big deal.
+>
+> (This is *dynamic* root of trust.  In theory the system could do a
+> DRTM re-launch and recover its security posture, but I don't think
+> this is implemented.)
+>
+>
+> One thing I like about this is that it involves very little code.
+>
 
-Abhinaba Rakshit
+It does seem rather straight-forward, and it doesn't have to be specific=
+ to TXT either. I.e., we should probably always measure the runtime enab=
+led/disabled state into the PCRs.
+
+But given the actual problem at hand (untrustworthy glue code running in=
+ ring 3 that does little more than poke SMM, which itself fundamentally =
+remains part of the TCB), it would be nice if we could just sandbox that=
+ code using virtualization.
+
+This came up in a separate discussion regarding ACPI PRM (the new dumpin=
+g ground for evil vendor code now that SMM has gone out of fashion), alt=
+hough there it should be feasible to run it unprivileged, as the spec re=
+quires that capability for the PRM payloads.
