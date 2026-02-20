@@ -1,133 +1,141 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303E425F7B9;
-	Fri, 20 Feb 2026 15:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309372BF00A;
+	Fri, 20 Feb 2026 15:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771601785; cv=none; b=dvupQpn2Ug1bg67/pSi/lO9C3HktS5giCp/C4baan7woix0lPWJdm2JxKPWknJgHHR8Jn7BgXo3fVs43EcMxXkf0yBJS/BsdLhkQ9rs+bjN/xvayhLrlIQdJ+fjQE/gR55RXrY9HMewAUQ92/VNqf3IPw1dg3qW1RpdV0CnS1/w=
+	t=1771603185; cv=none; b=OnvQGyoLmGW3uEy5nrqH0+vXS9ZDtczUSEyauh0fVC4/wYD7EzehFGgoszNxUlBqjRomKRwygPaID/0LeP4YB/EPNi132rT1cIxY7q70YAxoiK5dRkNgXc3zBFGbhK7kG9kQKzjG8q+0Soyz1pHqfLbD79A6wCnrLCJuwbulTpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771601785; c=relaxed/simple;
-	bh=Ip+Ok3z4b8Mn4e2k/xxO7ygofUYVx5NJdGPJvg3Uvvo=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=pZRh+19iPeKcn1RZRAMyDTv1jGPx82l0Bqx/Qps1cdNZgjxhxd1fN0YVjCSFq8ZIS1GSKKqzFDTfsJw6ka9F3TeIsCo1XnuIcDW8fkO4yzC1bG3cY+8opTeC18khHTuHMXgeCGKRaGXxyzYU1O0CwbPwFdIudg0KRKcKb/nmrCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d8j24fM/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771603185; c=relaxed/simple;
+	bh=6cuMGKybA6nMgwR4d/d5hq1DbXYI+gxftIfAvX08tOw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tDy/VQRFLgD+QEiQxB4fErtWg3M4CwM/whS82rtRePPvMVqYfqvhoYYdU7/M6dOo0uCJ7QPh11joVrjx/0WItbUgdF9j9Cnma9HQPK+OpJDg0Nth3kHs2nisDUroG1mIpVRa6CLltLQ1mhGna6glZD+OeVksH2A2F0eInI9gGUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LUmRafCX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8j24fM/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07B75C116C6;
-	Fri, 20 Feb 2026 15:36:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LUmRafCX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93FF3C116D0;
+	Fri, 20 Feb 2026 15:59:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771601784;
-	bh=Ip+Ok3z4b8Mn4e2k/xxO7ygofUYVx5NJdGPJvg3Uvvo=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=d8j24fM/iIueOFUXQImLRiw/Nvq9i5abxog58HkgSvv3tfg3f8bPIw4TIaTL2cNsF
-	 gj5E9/mdWAZ8jDtMoQbP0PsHlnKjlIaYKj+W4RmlL35pZsFnxdbTRoGlT/HDBOL1oD
-	 hS9oP7F1wMw4vHb8tBOq8YsCezfJ2JQwZUjGQnK92/Q6OTmB+qs8Dhl4KVI+wJ9Ynn
-	 bL7miOtFFyZc+7gtzmfTPsDwSVtXhaWtx6TIZIex4mvbDtrG809w7MJGHQP/NDckLn
-	 BLhR46uTaItrkYXBa7Po6XxMGAHum954lWlXf6VMAlRckrSh48zxvKM9vVUQTwYL26
-	 EkdgubbdOGCcQ==
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id DD74FF4006D;
-	Fri, 20 Feb 2026 10:36:22 -0500 (EST)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-01.internal (MEProxy); Fri, 20 Feb 2026 10:36:22 -0500
-X-ME-Sender: <xms:dn-YaXpKzgBI7lLLXvVnqkp9s_8LSG6eYRHb_v7Dh4I_nA74WDDqdw>
-    <xme:dn-Yacclxv5BJtKZ-Qq1XI4iHx3RyLHcNXmhZ9xG5qOn3jV4EcwK33tH6kozNhz9o
-    AbjnGXi1_VPLoTivYQYVCdUF9t9jfiBkqZ4d5ah8cdAmjyXu-PjMSg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvvdekkedvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcu
-    uehivghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvueehiedtvedtleekuddutefgffdtleetfeetveejveejieehfefhjeei
-    jeefudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grrhguodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeel
-    qdeffedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrh
-    gurdgtohhmpdhnsggprhgtphhtthhopeefvddpmhhouggvpehsmhhtphhouhhtpdhrtghp
-    thhtohepsghpsegrlhhivghnkedruggvpdhrtghpthhtohepnhhivhgvughithgrsegrlh
-    humhdrmhhithdrvgguuhdprhgtphhtthhopehluhhtohesrghmrggtrghpihhtrghlrdhn
-    vghtpdhrtghpthhtohepughpshhmihhthhesrghpvghrthhushhsohhluhhtihhonhhsrd
-    gtohhmpdhrtghpthhtoheprghnughrvgifrdgtohhophgvrhefsegtihhtrhhigidrtgho
-    mhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoh
-    epphgvthgvrhhhuhgvfigvsehgmhigrdguvgdprhgtphhtthhopehhvghrsggvrhhtsehg
-    ohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepthhrvghntghhsghooh
-    htqdguvghvvghlsehgohhoghhlvghgrhhouhhpshdrtghomh
-X-ME-Proxy: <xmx:dn-YaZBdaidTbvEBGfz-iUZ-mgy8GA-vuxokns0lACS79eaqin2sjQ>
-    <xmx:dn-YaU4tmc_oQXzOQdSawhF3iuF8TCBCCqScSkC_zNOtmM0y7z9SfA>
-    <xmx:dn-YaQlTtj_nEiNEidchtEBlqmzl0pkyLthbR5p7BnKlCdBg4gvexw>
-    <xmx:dn-YaXfzUes1HVb7VveqSbLUM6qO4SVJqCj2HwTjJqow0G19GkCsMw>
-    <xmx:dn-YaZ3f8bIvTNMtbs-XCNvgBOCGXlsfh9Hb0ZD3p2MiApd3SUqnKoDq>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id A57F1700065; Fri, 20 Feb 2026 10:36:22 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=k20201202; t=1771603184;
+	bh=6cuMGKybA6nMgwR4d/d5hq1DbXYI+gxftIfAvX08tOw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LUmRafCXygPu5aecy5p9uW1s2CjAYMSYPbCRXdB/gzDSjKUuT7+J6+6+p52S0B52r
+	 XOCfwrLhMEvF4Vf1FVujfdmPV44adeCJ88zN3ky6781QsCKmU+T8oP3X+ZlHHIWVkB
+	 HiRkdZX9XJpHd0y8gkl0mlet2LBvEOWSpHoeI5wAS2HObmPYTnxUZ3glek7za4hT3O
+	 1lexvbpdoIV2j3s3Er9jMbRopeug3pCrCttUwPqBWHDveLFqL8AbDd1oEqOPqLk/76
+	 rcVN5DfYVnZektLc/tEPl2+Y/BNLZsiZGWZsyBGn/E/J01GH3aMjIN48kYm6X5/5yE
+	 rECbmfZNUiH7w==
+Date: Fri, 20 Feb 2026 09:59:41 -0600
+From: Bjorn Andersson <andersson@kernel.org>
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: Harshal Dev <harshal.dev@oss.qualcomm.com>, 
+	Krzysztof Kozlowski <krzk@kernel.org>, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Abel Vesa <abel.vesa@oss.qualcomm.com>, cros-qcom-dts-watchers@chromium.org, 
+	Brian Masney <bmasney@redhat.com>, Neeraj Soni <neeraj.soni@oss.qualcomm.com>, 
+	Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/11] dt-bindings: crypto: qcom,ice: Require
+ power-domain and iface clk
+Message-ID: <vpgeduh5fwgvbx42dujbm7x3vacbmwjgjkcmhpgcsaa2ig4cm3@kk34eaqoh6ww>
+References: <20260123-qcom_ice_power_and_clk_vote-v1-1-e9059776f85c@qti.qualcomm.com>
+ <14a71b33-4c10-41b0-a6cb-585a38e05f56@kernel.org>
+ <06160c6c-a945-467a-be82-7b33c5285d0f@oss.qualcomm.com>
+ <7216c86d-2b87-496c-9548-ccdcb3c98b6b@oss.qualcomm.com>
+ <1f99db18-d76c-4b87-9e30-423eee7037e1@oss.qualcomm.com>
+ <dd34525c-0a25-47ae-9061-c4c7ab708306@kernel.org>
+ <2830a189-a5ce-45a0-92fe-7a01c3b012a7@oss.qualcomm.com>
+ <6efcdf51-bdb1-4dfc-aa5e-8b7dc8c68cd3@kernel.org>
+ <b217a08a-2755-4ef8-bf39-af1c3e628cf8@oss.qualcomm.com>
+ <3cxejy2jplgqufj5fivi27ii3rrcrhzdyvmxd4ekp2ik3aqa6l@tiwyslt3ng5p>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A1ToacgRLhLF
-Date: Fri, 20 Feb 2026 16:35:44 +0100
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Daniel P. Smith" <dpsmith@apertussolutions.com>,
- "Thomas Gleixner" <tglx@linutronix.de>,
- "Eric W. Biederman" <ebiederm@xmission.com>,
- "Eric Biggers" <ebiggers@kernel.org>
-Cc: "Ross Philipson" <ross.philipson@oracle.com>,
- linux-kernel@vger.kernel.org, x86@kernel.org,
- linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
- "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
- "H . Peter Anvin" <hpa@zytor.com>, dave.hansen@linux.intel.com,
- "Matthew Garrett" <mjg59@srcf.ucam.org>,
- "James Bottomley" <James.Bottomley@hansenpartnership.com>, peterhuewe@gmx.de,
- "Jarkko Sakkinen" <jarkko@kernel.org>, jgg@ziepe.ca,
- "Andy Lutomirski" <luto@amacapital.net>, nivedita@alum.mit.edu,
- "Herbert Xu" <herbert@gondor.apana.org.au>, davem@davemloft.net,
- corbet@lwn.net, dwmw2@infradead.org, baolu.lu@linux.intel.com,
- kanth.ghatraju@oracle.com, "Andrew Cooper" <andrew.cooper3@citrix.com>,
- trenchboot-devel@googlegroups.com
-Message-Id: <c9a0cd9f-17cb-49e5-a411-b78ef9c7e35e@app.fastmail.com>
-In-Reply-To: <281c3bb3-13f6-47a2-9a9a-134e397bf686@apertussolutions.com>
-References: <20240531010331.134441-1-ross.philipson@oracle.com>
- <20240531010331.134441-7-ross.philipson@oracle.com>
- <20240531021656.GA1502@sol.localdomain>
- <874jaegk8i.fsf@email.froward.int.ebiederm.org>
- <5b1ce8d3-516d-4dfd-a976-38e5cee1ef4e@apertussolutions.com>
- <87ttflli09.ffs@tglx>
- <281c3bb3-13f6-47a2-9a9a-134e397bf686@apertussolutions.com>
-Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch early
- measurements
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3cxejy2jplgqufj5fivi27ii3rrcrhzdyvmxd4ekp2ik3aqa6l@tiwyslt3ng5p>
 
-Coming back to this old thread after having spent some time playing with the code:
+On Fri, Feb 20, 2026 at 08:01:59PM +0530, Manivannan Sadhasivam wrote:
+> On Mon, Feb 09, 2026 at 11:13:06AM +0530, Harshal Dev wrote:
+> > On 2/6/2026 4:20 PM, Krzysztof Kozlowski wrote:
+> > > On 06/02/2026 11:07, Harshal Dev wrote:
+> > >> On 2/5/2026 4:47 PM, Krzysztof Kozlowski wrote:
+> > >>> On 03/02/2026 10:26, Harshal Dev wrote:
+> > >>>> On 1/26/2026 3:59 PM, Konrad Dybcio wrote:
+> > >>>>> On 1/23/26 12:04 PM, Harshal Dev wrote:
+> > >>>>>> On 1/23/2026 2:27 PM, Krzysztof Kozlowski wrote:
+> > >>>>>>> On 23/01/2026 08:11, Harshal Dev wrote:
+[..]
+> > >>> My NAK for driver change stays. This is wrong approach - you cannot
+> > >>> break working DTS.
+> > >>>
+> > >>
+> > >> I agree that this patch in it's current form will break both the in-kernel and
+> > >> out of tree DTS written in accordance with the old binding. If this isn't acceptable
+> > > 
+> > > What? You just said few lines above:
+> > > "it will still continue to work if:"
+> > >
+> > 
+> > I hope I am clear now, 'it' referred to the in-tree ICE driver and not to this particular
+> > DT schema commit. :)
+> >  
+> > > So either this will continue to work or not. I don't understand this
+> > > thread and honestly do not have patience for it. I gave you already
+> > > reasoning what is wrong and why it is. Now it is just wasting my time.
+> > > 
+> > 
+> > Apologies again for the confusion. I totally agree, as replied previously too, that the
+> > updated DT binding breaks backward compatibility. Like I said, I will post another patch
+> > to preserve the correctness of existing in-tree and out-of-tree DTS.
+> > 
+> 
+> The ICE hardware cannot work without 'iface' clock and the power domain, which
+> are shared with the UFS PHY. One can argue that ICE is actually a part of the
+> peripherals like UFS/eMMC, but I don't have access to internal layout, so cannot
+> comment on that. I ran into this issue today when I tried to rmmod ice driver
+> together with ufs_qcom driver and got SError when reloading the module because
+> ice driver was trying to access unclocked/unpowered register.
+> 
+> But you should mark the resources as 'required' in the binding and justify the
+> ABI break. No need to preserve backwards compatibility here as the binding was
+> wrong from day one.
+> 
 
-On Thu, 22 Aug 2024, at 20:29, Daniel P. Smith wrote:
+Marking it "required" in the binding, implies that it's fine for the
+driver to fail in its absence. If I understand correctly that will
+prevent UFS and eMMC from probing, unless you have a DTB from "the
+future".
 
-<selective snip>
+Even if I merge the dt-binding change through the qcom-tree (together
+with the driver change) I will not guarantee that torvalds/master will
+remain bisectable - because dts changes and driver changes goes in
+different branches.
 
-> Another fact to consider is that the current Intel's TXT MLE 
-> specification dictates SHA1 as a valid configuration. Secure Launch's 
-> use of SHA1 is therefore to comply with Intel's specification for TXT. 
 
-As I understand the Intel TXT spec and the code:
+As such, the pragmatic approach is to introduce the clock as optional
+and then once we're "certain" that the dts changes has propagated we
+can consider breaking the backwards compatibility.
 
-- TPM 1.2 is no longer supported by the TXT spec (since 2023)
-- TPM 1.2 is not supported by your GRUB implementation
-- in TPM 2.0 mode, SHA1 is only supported by the TXT spec if it is the /only/ algo supported by the TPM
-- the proposed kernel implementation ignores any SHA-384 and SM3-256 PCR banks if they are active, and caps them using a { 1, 0, ... } fake digest.
+Regards,
+Bjorn
 
-So apologies for being slow, but I still struggle to understand why it is so important to have a SHA-1 implementation to cap those PCRs. Is it just to support systems with a TPM 2.0 that only has SHA-1 banks enabled?
-
-Assuming that this code will get merged this year, it will be in a LTS branch by 2027, by which time distros like Debian will pick it up. 
-
-I fully understand that this code has lived out-of-tree for more than a decade, and you likely prefer to get everything upstream that your current users may be relying on. But for Linux, this is a new feature, and merging code now that is basically obsolete on day 1 is not something we should entertain imo.
-
-(and apologies for re-opening yet another can of worms - I assure you I am trying to be constructive here)
-
--- 
-Ard.
-
+> > The only point I am trying to highlight for everyone's awareness is that as per this bug
+> > report https://lore.kernel.org/all/ZZYTYsaNUuWQg3tR@x1/ the kernel fails to boot with the
+> > existing DTS when the above two conditions aren't satisfied.
+> > 
+> 
+> And you sent the fix after almost 2 years. Atleast I'm happy that you got around
+> to fix it.
+> 
+> - Mani
+> 
+> -- 
+> மணிவண்ணன் சதாசிவம்
