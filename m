@@ -1,68 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D19535C182;
-	Sun, 22 Feb 2026 20:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31EBE1F8AC5;
+	Sun, 22 Feb 2026 21:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771792552; cv=none; b=gJU4MzEm25oc5iH0JWdYHga5w/WqGzmpolihgHbYmo9HETN9DpKAjOCtS+5++gGsLw6jLHouuOc8RmWg+cucoCIFHVnW6OdIdAKR7h3B9u8LyHluHcVXUp0GEGxDEYkj1a0lBIzF/5aWfrp1DqfqYkSwg/ClL8uUJ5zrzsVVzh8=
+	t=1771795178; cv=none; b=dbSdujUhA2MmXsj/iUWVyNmsn+/WMSGtzsVHJ+FwjE2ZI04OqUX/zkTLZv28pjVuh/UECFbdub8cL7ySXaoTrX7UIJkmAuS7iT/LCVTazGRllZwmtPe8eujDDT/M46YCSV/crcmbUc7Tcr9l+dtNZtrKt7+caAVBZlYMcbPi9VU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771792552; c=relaxed/simple;
-	bh=nB3wfhscOxQHp0LEV1GBvtP30jxZODZvLWMqMVvIqSc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=M7K4UvbfNUBfm9ASTpsz5330o1Dho1vC85YXT3G2cmdJ3Tv4dheImpZV4Xcr3Ed1BzuXPlT0Fr+FuIeqUU933r6CKVgrWXQY0+ZZFS6rL08SvL/JfwHYlwtZKXY4ehWaPOK92KbUnDu9NQHInYUoh04ggeZm3C492OwaoqiuY0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h5VJEA6w; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771795178; c=relaxed/simple;
+	bh=YQ8MiMbU2gaw1BUCBjolouOvZgqpI0bY7QYQ2Uv7Ulg=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=B1j6YrGrvXOu3b62/Z20/Y4sqYnMCbDh3FDdK+UnbaOSUgHjUKmCjziAqFH4bVo4wsBm+VmDcJCXBWyGtlzBhF+vBpupgruTx+PYez2xG85ULq9OAaExLjAgc82dfABQH9+9r7nrrrAtrm67CPoDLbSC+RSHh+FxKcMRYbaQPa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SgGA8UVa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5VJEA6w"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A7D1C116D0;
-	Sun, 22 Feb 2026 20:35:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SgGA8UVa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7DA4C116D0;
+	Sun, 22 Feb 2026 21:19:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771792552;
-	bh=nB3wfhscOxQHp0LEV1GBvtP30jxZODZvLWMqMVvIqSc=;
-	h=Date:From:To:Cc:Subject:From;
-	b=h5VJEA6w+T7vpIgRUfEycWyh6a0iGlFk2yJkPJQqTmVchoUkeyLsRJc+/Ia9LyXYr
-	 zDkrk20h7S7Z3wW8hqwwGxqKFzFxp8FG0mUI4ta/e91XCa0r8gNSnWfT6tkPbnubdE
-	 fBD45a5Fwjub3UfFnU/wI9+pp2+vq+1Zi7snQAl0z1ZG18U16aBlU9nx4/PM8mravY
-	 64TofNgrwSdEjCP2lCOhcZPTluC3+Rx+SbqCSXSQCHEfFWhfU9/19VhNDaTM2tO3Xg
-	 rqWBT94HCaBXD+s5Z8IgVaqh/xiQj/r/KzUEOMnfYeTYEwhg3GQtc0WbvLllcoOWOs
-	 ym+z7sYC+yx8A==
-Date: Sun, 22 Feb 2026 12:35:43 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [GIT PULL] Crypto library fix for v7.0-rc1
-Message-ID: <20260222203543.GC37806@quark>
+	s=k20201202; t=1771795177;
+	bh=YQ8MiMbU2gaw1BUCBjolouOvZgqpI0bY7QYQ2Uv7Ulg=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=SgGA8UVa+DLbtw0uMMvdZM0mvbx/1tm3J7uJ5vhW8vKezdHW4feJ8Uc7oz00Rw7Wp
+	 uDc/8Llr7uR7QMSYf5wMXi03wxPNIA2ry9TD5na5325D8Cb+Fbg4ktpUjUGsnOQlel
+	 w8JemU5TxB389F1qpNtoU0uONDOyQ/o2wQ3izl62aGyDnYjDsvEBnRaruAynXIRdmt
+	 cwKBFnRdyD6e3xmj5Z0/4FJVZYoaJ8YnZ4iWsUH/rQVtMfHa5AoJ430Y8MTFlX9OL8
+	 pqU+HschbZuRn8QLEuYXrWLKC6XLOWkUriJop6Ef3vB5JdoFJe8yQ/eEKz+HW/dpF4
+	 I224K1FdFjpfA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA09A3808200;
+	Sun, 22 Feb 2026 21:19:45 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto library fix for v7.0-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20260222203543.GC37806@quark>
+References: <20260222203543.GC37806@quark>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20260222203543.GC37806@quark>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
+X-PR-Tracked-Commit-Id: beeebffc807531f69445356180238500f56951cc
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 75e1f66a9ed09f29c6883ea379c174e8cf31f7cc
+Message-Id: <177179518422.1502390.6995161937246919166.pr-tracker-bot@kernel.org>
+Date: Sun, 22 Feb 2026 21:19:44 +0000
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-The following changes since commit 23b0f90ba871f096474e1c27c3d14f455189d2d9:
+The pull request you sent on Sun, 22 Feb 2026 12:35:43 -0800:
 
-  Merge tag 'sysctl-7.00-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/sysctl/sysctl (2026-02-18 10:45:36 -0800)
+> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/75e1f66a9ed09f29c6883ea379c174e8cf31f7cc
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
+Thank you!
 
-for you to fetch changes up to beeebffc807531f69445356180238500f56951cc:
-
-  lib/crypto: powerpc/aes: Fix rndkey_from_vsx() on big endian CPUs (2026-02-18 13:38:14 -0800)
-
-----------------------------------------------------------------
-
-Fix a big endian specific issue in the PPC64-optimized AES code.
-
-----------------------------------------------------------------
-Eric Biggers (1):
-      lib/crypto: powerpc/aes: Fix rndkey_from_vsx() on big endian CPUs
-
- lib/crypto/powerpc/aes.h | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
