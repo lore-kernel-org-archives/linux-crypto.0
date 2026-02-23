@@ -1,62 +1,36 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mail-m2489.xmail.ntesmail.com (mail-m2489.xmail.ntesmail.com [45.195.24.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4553328ED;
-	Mon, 23 Feb 2026 17:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A52F4F1;
+	Mon, 23 Feb 2026 21:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.195.24.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771868336; cv=none; b=S0TDDsvzZx6kNRvbVQgbRkKM8whhRbD1pOF1b8Qh5ncKju18ZJ1Hbz9RP1NOs8xq/4FSDTMxBza9tuPy2PsrFsjUP0OGDCBVC8QmRHJamUDbiq4ImrTmyQTQgGChdBN6PvUreolfdM3m83/vBxR7LVSjmBMoheYxCv95brtT2aM=
+	t=1771881338; cv=none; b=XIzvgnF5YHIvLQ5rvQ2Fp6GSRNSTOuJl0gWB9tA80rI7ELoF7VP5JGCNCpwHs3mZXu/mZ5VeXVDovRe0X7fpK6fwEAQD6p1xoZigHWiFviMeXVkTtpj5AhsZB6eGNv8oV032o//jIPER2lrAMgzIyThwyzLr7uEXs9TmPcIJdag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771868336; c=relaxed/simple;
-	bh=OFs+F2i4fpeRmsTH7tUJ5hO0npgCDxBo25FPhTX/hFs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FE0pNcsIdieHenKdz4s0nolqaxsrB3RIVp71Iabx+AgxS75Z5+p/sIj9saDfKA97vI9w7LRFRfYShrGoDlpMBS2btFk5miAzjNNuM0oxvFeZjOXtPCxARM2sACeTlCqWH0jJIlKbNeP5II3760TLhyAk6qLk8VEY7qaBCBoSV4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NvMPcrsr; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1771881338; c=relaxed/simple;
+	bh=Zq2IirUyfEPFzMu6m9iwUulfmXx1dT5LTcM+Mxmn32U=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=dsFWsyABv064nHcTNUQ6KXGD+JLy6v2oGHDMVluIPYUfcq/t0OvUwiuRNhF1P+d0ysqUlxao3g9emPtNMdyj65954rNAVQQb1THqCzAnbj1w0z/wOqLoBeGofYeorsnkWCp1Qcx3ikE9PRCQS9tFncv66UvJ+5Ed1ikQdGcNv9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=hesEBWpu; arc=none smtp.client-ip=45.195.24.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rock-chips.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NvMPcrsr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771868335; x=1803404335;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=OFs+F2i4fpeRmsTH7tUJ5hO0npgCDxBo25FPhTX/hFs=;
-  b=NvMPcrsrscxq4yCJYNHBwma5dXpYiaLlpl5YaiHU4AbKmW1dss4zVpgH
-   eKc6wHV4HSpKqyOZ8UlLVlghXkur2gCHm4j/0tVPiKMiMs8WIyTYBU/2a
-   6yowW4cOU55qzj4P1UFjG06x85lKFyOgcBuajicG0+hQ7xUZWW5IVie0T
-   CzejcQppfEPzmSpHn0vPl0BWBUbMvv0s0ke5e+Qjssqu807Hmk7eyaE7j
-   rAcT4p6XKH7FNn0xujYAvGZ00DAcOtrZCn+DLE46UjHdqz7MQNGpBv4ef
-   eZ4zNkJ8cO1QoE+PCo+ORxkR4NcdogZJ2/EBVMiLNS/FtyyTrgvpBtjZv
-   g==;
-X-CSE-ConnectionGUID: jsfaBeNbRdOcjkAScBt/AA==
-X-CSE-MsgGUID: qC3ahawxSriUb3w5OK63yQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11710"; a="73050398"
-X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
-   d="scan'208";a="73050398"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 09:38:54 -0800
-X-CSE-ConnectionGUID: i7eZdD4uRr+gNr/ct2htpA==
-X-CSE-MsgGUID: B0cv0ytAS2ClRPRHaDlf4w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
-   d="scan'208";a="214708424"
-Received: from abityuts-desk.ger.corp.intel.com (HELO localhost) ([10.245.245.222])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 09:38:36 -0800
-Date: Mon, 23 Feb 2026 19:38:33 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Shawn Lin <shawn.lin@rock-chips.com>
-Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
+	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="hesEBWpu"
+Received: from localhost.localdomain (unknown [58.22.7.114])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 34b37f77f;
+	Mon, 23 Feb 2026 23:31:55 +0800 (GMT+08:00)
+From: Shawn Lin <shawn.lin@rock-chips.com>
+To: Bjorn Helgaas <bhelgaas@google.com>,
 	"Vaibhaav Ram T . L" <vaibhaavram.tl@microchip.com>,
 	Kumaravel Thiagarajan <kumaravel.thiagarajan@microchip.com>,
-	Even Xu <even.xu@intel.com>, Xinpeng Sun <xinpeng.sun@intel.com>,
+	Even Xu <even.xu@intel.com>,
+	Xinpeng Sun <xinpeng.sun@intel.com>,
 	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
 	Jiri Kosina <jikos@kernel.org>,
 	Alexandre Belloni <alexandre.belloni@bootlin.com>,
 	Zhou Wang <wangzhou1@hisilicon.com>,
 	Longfang Liu <liulongfang@huawei.com>,
-	Vinod Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Lee Jones <lee@kernel.org>,
 	Jijie Shao <shaojijie@huawei.com>,
 	Jian Shen <shenjian15@huawei.com>,
 	Sunil Goutham <sgoutham@marvell.com>,
@@ -67,7 +41,8 @@ Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
 	Oded Gabbay <ogabbay@kernel.org>,
 	Maciej Falkowski <maciej.falkowski@linux.intel.com>,
 	Karol Wachowski <karol.wachowski@linux.intel.com>,
-	Min Ma <mamin506@gmail.com>, Lizhi Hou <lizhi.hou@amd.com>,
+	Min Ma <mamin506@gmail.com>,
+	Lizhi Hou <lizhi.hou@amd.com>,
 	Andreas Noever <andreas.noever@gmail.com>,
 	Mika Westerberg <westeri@kernel.org>,
 	Tomasz Jeznach <tjeznach@rivosinc.com>,
@@ -80,14 +55,16 @@ Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
 	Bharat Bhushan <bbhushan2@marvell.com>,
 	Antoine Tenart <atenart@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Raag Jadav <raag.jadav@intel.com>, Hans de Goede <hansg@kernel.org>,
+	Raag Jadav <raag.jadav@intel.com>,
+	Hans de Goede <hansg@kernel.org>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Jiri Slaby <jirislaby@kernel.org>,
 	Andy Shevchenko <andy@kernel.org>,
 	Manivannan Sadhasivam <mani@kernel.org>,
 	Mika Westerberg <mika.westerberg@linux.intel.com>,
 	Andi Shyti <andi.shyti@kernel.org>,
-	Robert Richter <rric@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Robert Richter <rric@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
 	Nirmal Patel <nirmal.patel@linux.intel.com>,
 	Kurt Schwemmer <kurt.schwemmer@microsemi.com>,
 	Logan Gunthorpe <logang@deltatee.com>,
@@ -95,120 +72,149 @@ Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
 	Bartosz Golaszewski <brgl@kernel.org>,
 	Sakari Ailus <sakari.ailus@linux.intel.com>,
 	Bingbu Cao <bingbu.cao@intel.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
 	Benjamin Tissoires <bentiss@kernel.org>,
-	linux-input@vger.kernel.org, linux-i3c@lists.infradead.org,
-	dmaengine@vger.kernel.org, Philipp Stanner <phasta@kernel.org>,
-	netdev@vger.kernel.org, nic_swsd@realtek.com,
-	linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-usb@vger.kernel.org, iommu@lists.linux.dev,
-	linux-riscv@lists.infradead.org, David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>, linux-cxl@vger.kernel.org,
-	linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-	linux-serial@vger.kernel.org, mhi@lists.linux.dev,
-	Jan Dabros <jsd@semihalf.com>, linux-i2c@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	linux-i3c@lists.infradead.org,
+	dmaengine@vger.kernel.org,
+	Philipp Stanner <phasta@kernel.org>,
+	netdev@vger.kernel.org,
+	nic_swsd@realtek.com,
+	linux-arm-msm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-usb@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-riscv@lists.infradead.org,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	linux-cxl@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	mhi@lists.linux.dev,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Jan Dabros <jsd@semihalf.com>,
+	linux-i2c@vger.kernel.org,
 	Daniel Mack <daniel@zonque.org>,
 	Haojian Zhuang <haojian.zhuang@gmail.com>,
 	linux-spi@vger.kernel.org,
 	Jonathan Derrick <jonathan.derrick@linux.dev>,
-	linux-pci@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
 	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org
-Subject: Re: [PATCH 0/37] PCI/MSI: Enforce explicit IRQ vector management by
- removing devres auto-free
-Message-ID: <aZyQmc7nOt87jitX@smile.fi.intel.com>
+	linux-media@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	Shawn Lin <shawn.lin@rock-chips.com>
+Subject: [PATCH 01/37] PCI/MSI: Add Devres managed IRQ vectors allocation
+Date: Mon, 23 Feb 2026 23:29:40 +0800
+Message-Id: <1771860581-82092-2-git-send-email-shawn.lin@rock-chips.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
 References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
- <CAHp75VeWD5A0r7-Uayyte1ZXXxdhLixd+z_y0xNeki0N+Ro=jQ@mail.gmail.com>
- <cb878741-7b61-b72c-5a72-6ed6d5091b1f@rock-chips.com>
+X-HM-Tid: 0a9c8b20e63209cckunm6946b3c7986369
+X-HM-MType: 1
+X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZGh5JGFYdQhpNQ0tOHx8aQhpWFRQJFh
+	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZS1VLVUtVS1kG
+DKIM-Signature: a=rsa-sha256;
+	b=hesEBWpuUfkngcgz1f2Ig1nlGmmzRwW4WQwqVSHNJo/8mDrQHyi2jBXfpRejbQ5213Bi/x3y5ZKsO4yPdU29saCaBfjZuhiQPZrXuFi/nfbjzR0kpb+gL5Eft5gNlVXtMsgoBjIOykghNIgFG4xZvqITu8wqjNed5lf17v/+SjU=; s=default; c=relaxed/relaxed; d=rock-chips.com; v=1;
+	bh=j3H95hgVRLs6dldnhhXVuqSGrPI2yynu10KTCXrGKLk=;
+	h=date:mime-version:subject:message-id:from;
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cb878741-7b61-b72c-5a72-6ed6d5091b1f@rock-chips.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Tue, Feb 24, 2026 at 12:09:37AM +0800, Shawn Lin wrote:
-> 在 2026/02/23 星期一 23:50, Andy Shevchenko 写道:
-> > On Mon, Feb 23, 2026 at 5:32 PM Shawn Lin <shawn.lin@rock-chips.com> wrote:
-> > > 
-> > > This patch series addresses a long-standing design issue in the PCI/MSI
-> > > subsystem where the implicit, automatic management of IRQ vectors by
-> > > the devres framework conflicts with explicit driver cleanup, creating
-> > > ambiguity and potential resource management bugs.
-> > > 
-> > > ==== The Problem: Implicit vs. Explicit Management ====
-> > > Historically, `pcim_enable_device()` not only manages standard PCI resources
-> > > (BARs) via devres but also implicitly triggers automatic IRQ vector management
-> > > by setting a flag that registers `pcim_msi_release()` as a cleanup action.
-> > > 
-> > > This creates an ambiguous ownership model. Many drivers follow a pattern of:
-> > > 1. Calling `pci_alloc_irq_vectors()` to allocate interrupts.
-> > > 2. Also calling `pci_free_irq_vectors()` in their error paths or remove routines.
-> > > 
-> > > When such a driver also uses `pcim_enable_device()`, the devres framework may
-> > > attempt to free the IRQ vectors a second time upon device release, leading to
-> > > a double-free. Analysis of the tree shows this hazardous pattern exists widely,
-> > > while 35 other drivers correctly rely solely on the implicit cleanup.
-> > 
-> > Is this confirmed? What I read from the cover letter, this series was
-> > only compile-tested, so how can you prove the problem exists in the
-> > first place?
-> 
-> Yes, it's confirmed. My debug of a double free issue of a out-of-tree
-> PCIe wifi driver which uses
-> pcim_enable_device + pci_alloc_irq_vectors + pci_free_irq_vectors expose
-> it. And we did have a TODO to cleanup this hybrid usage, targeted in
-> this cycle[1] suggested by Philipp:
+pcim_alloc_irq_vectors() and pcim_alloc_irq_vectors_affinity() are created for
+pci device drivers which rely on the devres machinery to help cleanup the IRQ
+vectors.
 
-Okay, fair enough. I think this bit was missing in the cover letter.
+Signed-off-by: Shawn Lin <shawn.lin@rock-chips.com>
+---
 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git/log/?h=msi
+ drivers/pci/msi/api.c | 26 ++++++++++++++++++++++++++
+ include/linux/pci.h   | 22 ++++++++++++++++++++++
+ 2 files changed, 48 insertions(+)
 
-> > > ==== The Solution: Making Management Explicit ====
-> > > This series enforces a clear, predictable model:
-> > > 1.  New Managed API (Patch 1/37): Introduces pcim_alloc_irq_vectors() and
-> > >      pcim_alloc_irq_vectors_affinity(). Drivers that desire devres-managed IRQ
-> > >      vectors should use these functions, which set the is_msi_managed flag and
-> > >      ensure automatic cleanup.
-> > > 2.  Patches 2 through 36 convert each driver that uses pcim_enable_device() alongside
-> > >      pci_alloc_irq_vectors() and relies on devres for IRQ vector cleanup to instead
-> > >      make an explicit call to pcim_alloc_irq_vectors().
-> > > 3.  Core Change (Patch 37/37): With the former cleanup, now modifies pcim_setup_msi_release()
-> > >      to check only the is_msi_managed flag. This decouples automatic IRQ cleanup from
-> > >      pcim_enable_device(). IRQ vectors allocated via pci_alloc_irq_vectors*()
-> > >      are now solely the driver's responsibility to free with pci_free_irq_vectors().
-> > > 
-> > > With these changes, we clear ownership model: Explicit resource management eliminates
-> > > ambiguity and follows the "principle of least surprise." New drivers choose one model and
-> > > be consistent.
-> > > - Use `pci_alloc_irq_vectors()` + `pci_free_irq_vectors()` for explicit control.
-> > > - Use `pcim_alloc_irq_vectors()` for devres-managed, automatic cleanup.
-> > 
-> > Have you checked previous attempts? Why is your series better than those?
-> 
-> There seems not previous attempts.
-
-Maybe we are looking to the different projects...
-
-https://lore.kernel.org/all/?q=pcim_alloc_irq_vectors
-
-> > > ==== Testing And Review ====
-> > > 1. This series is only compiled test with allmodconfig.
-> > > 2. Given the substantial size of this patch series, I have structured the mailing
-> > >     to facilitate efficient review. The cover letter, the first patch and the last one will be sent
-> > >     to all relevant mailing lists and key maintainers to ensure broad visibility and
-> > >     initial feedback on the overall approach. The remaining subsystem-specific patches
-> > >     will be sent only to the respective subsystem maintainers and their associated
-> > >     mailing lists, reducing noise.
-
+diff --git a/drivers/pci/msi/api.c b/drivers/pci/msi/api.c
+index c18559b..2362fca 100644
+--- a/drivers/pci/msi/api.c
++++ b/drivers/pci/msi/api.c
+@@ -297,6 +297,32 @@ int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
+ EXPORT_SYMBOL(pci_alloc_irq_vectors_affinity);
+ 
+ /**
++ * pcim_alloc_irq_vectors() - devres managed pci_alloc_irq_vectors()
++ * Interrupt vectors are automatically freed by the devres machinery
++ */
++int pcim_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
++			   unsigned int max_vecs, unsigned int flags)
++{
++	return pcim_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs,
++					       flags, NULL);
++}
++EXPORT_SYMBOL(pcim_alloc_irq_vectors);
++
++/**
++ * pcim_alloc_irq_vectors_affinity() - devres managed pci_alloc_irq_vectors_affinity()
++ * Interrupt vectors are automatically freed by the devres machinery
++ */
++int pcim_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
++				   unsigned int max_vecs, unsigned int flags,
++				   struct irq_affinity *affd)
++{
++	dev->is_msi_managed = true;
++	return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs,
++					      flags, affd);
++}
++EXPORT_SYMBOL(pcim_alloc_irq_vectors_affinity);
++
++/**
+  * pci_irq_vector() - Get Linux IRQ number of a device interrupt vector
+  * @dev: the PCI device to operate on
+  * @nr:  device-relative interrupt vector index (0-based); has different
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index d5ec0f8..ae58f70 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -1764,6 +1764,12 @@ int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
+ 				   unsigned int max_vecs, unsigned int flags,
+ 				   struct irq_affinity *affd);
+ 
++int pcim_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
++			  unsigned int max_vecs, unsigned int flags);
++int pcim_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
++				   unsigned int max_vecs, unsigned int flags,
++				   struct irq_affinity *affd);
++
+ bool pci_msix_can_alloc_dyn(struct pci_dev *dev);
+ struct msi_map pci_msix_alloc_irq_at(struct pci_dev *dev, unsigned int index,
+ 				     const struct irq_affinity_desc *affdesc);
+@@ -1806,6 +1812,22 @@ pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
+ 					      flags, NULL);
+ }
+ 
++static inline int
++pcim_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
++			       unsigned int max_vecs, unsigned int flags,
++			       struct irq_affinity *aff_desc)
++{
++	return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs,
++					      flags, aff_desc);
++}
++static inline int
++pcim_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
++		      unsigned int max_vecs, unsigned int flags)
++{
++	return pcim_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs,
++					      flags, NULL);
++}
++
+ static inline bool pci_msix_can_alloc_dyn(struct pci_dev *dev)
+ { return false; }
+ static inline struct msi_map pci_msix_alloc_irq_at(struct pci_dev *dev, unsigned int index,
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.7.4
 
