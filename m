@@ -1,67 +1,67 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0711C5D57
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Feb 2026 13:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B61D221FB1
+	for <linux-crypto@vger.kernel.org>; Mon, 23 Feb 2026 13:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771853359; cv=none; b=K+mc4bkQunBVQ2/vtO8WvEUIhfyrfPXwnCkWCPoGd61FRp4+Jr/XYDFeL96a/dJIQuIxmTBfrCihZBfBWtU2EDKn97SCQD5AdQa3Bch9ejwjUHVkmYvCmvcGxB/ya3ndHUyog7hOWuV53DtWadH5kxSF4HFGIik5sr/j/c3+G1k=
+	t=1771854849; cv=none; b=ntnIY2PrdhIMZqAn/j5OyqZbc1X7Ju1R9ArZO81hnQAmPvRMkYHxrJTHx32a2tKoTLJrIS8+LGxZmcoSY8ySJpF6AjvCJX6g8QSSUbwAkMyU9CUjO1z7I7t/Pqhl5jVs/NdDpOsT0GJuRLOy2BEOO1YAiseLWHJ072idAQqXSG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771853359; c=relaxed/simple;
-	bh=oaA6DNQXxsM04m3tfom1XS9SO0Lri+0Iwf+sI+9PrY4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZY16r0zfOv6PRWuaRJml6kqfFo2COQxa4TA7Pitsr9Wi8UycznxkZCrEv0oAa3fiGtn1aF+h8FaCXCKevNQEQJ1RaJHUtAkb86n781fRnMHOWTtPqJtKzWTfxWlDih3h7fqTmb67WmQf5fUui/vGcFOCtzHpWWyBF9nO4MxiEPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LWefYr1x; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1771854849; c=relaxed/simple;
+	bh=nMNKM2hbPd4zqSQopRJMeuwy8HqeQaJMUGkJjXpyxJc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O4usPTKsgK9gBMeW64uBNUHOKK9rpKATvhQX1VidiHUvnW9SSGAXOLxGIg3qzkctRiJ1sLbMTz8pE3pKMPKTmzvy/gBVpSuv22dfkFZeLK4UNCSJ6q36/RGlh9g1eZ5WbYhDSBd4HeFwu3Bc0v8knw4+3UccIMc2v9CeMCOpWF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G7RouRdH; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LWefYr1x"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2a79998d35aso26793555ad.0
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Feb 2026 05:29:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G7RouRdH"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-824af5e5c81so4117291b3a.0
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Feb 2026 05:54:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771853358; x=1772458158; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771854848; x=1772459648; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=H9C9BNhNVdd+lQuTXkIJYUwqSO8EqzgaJtKCGGRuNxI=;
-        b=LWefYr1xmyVUnxWl3MVTbJ/pZEyH13z9NwIO946702guaGutDG4Pn3Dmmno4o1shLt
-         3Nn+7akdhY5fGsUogxr68LbmglAzx6kxSwl0L2Gux7wlN6SQ3quUVvWks0baNaW8REIu
-         ry0t/rFVEm9Db7cAjkmUPrRuHLmsZqIYzibHWCHDvF5Y6RV8cTD3jRaUTmMUznGMTpFQ
-         tzluHqF99NGMpC5fkZLIEItDpaCxuhE1FkVOnm7y/q7+aC/XTX9EfGChe0LM6J+iFnNC
-         Ssuoea/6dihJ1/uNPhidtaALMaq99A8ijFQ4dLDGXAvRqgUH/pfPvDQFeAz1E45+NRNy
-         Reuw==
+        bh=EOtit9nPhhTYStdVZEsCqrHrK6HVIjzNEiHiK3t7y2U=;
+        b=G7RouRdH7jSejRv0rHGdO6Hz8PZAOjPebZ3kUJWmQRDpQ5YjJJTVTPf0N9fuQx1pmi
+         S7YfR86bd2bILvxFRD/YJESlqZZ3ujkCra/lCQkCZWw+X9bTQJVEXYo0s9EpPe8IgP4y
+         +q0GSzgqsoJLLPuLGJF8qsNQyRUWeCLMsn1Z7oLIuKmjw8482teOeui2zr8CL7464+uL
+         ApfDu779ZPPIEt4qFdDyzfEb42Wwo2ooL9iZ/j4bwk8WAkkzw7YoctO82G8DFDd0CCkM
+         BbzI722n7ATeM5wFOJny9A0uNPmR9SVaDGhziswdCRpB85BfSWb2a5Vmg1ardgP5+tdj
+         qjdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771853358; x=1772458158;
+        d=1e100.net; s=20230601; t=1771854848; x=1772459648;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H9C9BNhNVdd+lQuTXkIJYUwqSO8EqzgaJtKCGGRuNxI=;
-        b=T/ofce8l/+g//eCVHL7b6eH4Y8qbQyn9bwUT6BL6NM0U0G7UPwB9SdMC15GKB+K6UT
-         vF0WJWtMlxgynocxDNm5FVZgtMjhavZMFjGM6cNBex4NpDwdN0C7V/H415zvbMzyNAbi
-         VJvgXbajMiKSqIZqAGrVeC91tJLrru50T5LO5FdsWS/nt0YPSa551pwO7H/xzeSZUfN0
-         /x7esbPcF5HLA96F4v0T0TqGEkef9Zt3UwDsGt2kPAOHIc3LU2XMSoJVknzdjVJ4TkQk
-         b39cvF5vfaj7RWvZY4vgN91kI6xccS2vugKllzerTQuQJb+iK2p7es8ZGFmIlf2M80LW
-         GJrQ==
-X-Gm-Message-State: AOJu0YwV60uW+RuPuPwvHOMsE4/jv4+Il/TPt4oD81BfEQXtkQ1mlu1p
-	Kumsmf9Ky4fAUzjdgRTeyjY5G4QK+GF8mUsoP1ICjg+frkp4nRWhqPWO
-X-Gm-Gg: ATEYQzzrrJc81S8e5DFuEYP1wkIKfRMc59CYoBPskkrkXXeeEBpWy5OH6PzkMeeiFeQ
-	tn9iAPqXOs61ijlpYGjwCT4U6Nyqyl7U5of7zmTcWIpxuTOFLC7mNW5IS6w3598TGVhywJU+ix2
-	6aTyXG9WlP/J7z+alpikahoYfce0I+Oo6+/f2WSh8PMoXNjLv7i+uTr7Vy2YQ/Rdxtne4y4AJXA
-	P8Pekn3rdeiLgi/5FxPxKUy6U5Ac7TgFE3yQJlYMjHSWkSclT1K+jEhn0P0vpswgZg+YzMOyrAK
-	xRzOQIpmy+42rz8bukOr/Pih4ai2GjTeXomADDOZhB5NKpXqL786AIirE8uc5rACZTRLSpqHchQ
-	d4ESY8WOrMgu3yw3I4O5KIg4obevwQWYIT1BHavjineWURKUqAjf7KVbjrbDefVoTp6gyN963VT
-	S1afipc0KybnvotsEpTq0P8JmyKsE=
-X-Received: by 2002:a17:903:2283:b0:2a9:3397:2647 with SMTP id d9443c01a7336-2ad7455fdfamr76547735ad.50.1771853357749;
-        Mon, 23 Feb 2026 05:29:17 -0800 (PST)
+        bh=EOtit9nPhhTYStdVZEsCqrHrK6HVIjzNEiHiK3t7y2U=;
+        b=J3Ryi+wAe/gAM/sVUkQajlQTsMEWqEzkYiU5pf9ahF0wgCnxtPyR1IjaEZtA3kg763
+         ZXzKUPOdDYfq5ykbEv/6hBqWh2g+17Y771BrQbR+9ozwOP1Uu73zEXBI3Y9tOp0GYC3a
+         YiS4TgS43eqcVwcSG3erWie/XVNWjvyxrmViuQksBr9VJHQemzz2MgOl3RggJ/1UVsIs
+         XhU4byINmqRJz/8KijmnjrZGjSomKO2bu77SveI94m/XdVOfIwRieqAzOwJ3UOV7XMNg
+         Xo01Txu3alMjFWUOP44JIiV8td7g/ajHY5uyb9EaqW5mR/jDzpmmbq1gNK/v3ehyBz3+
+         ngcA==
+X-Gm-Message-State: AOJu0YyZXuSSIO6gH8H2119PteuIkRiMd4I+22gWqYcDjl3Z1cdJYIAW
+	OZV8ZpZjKxF5ZKPNt4taQHN7+aQ7Wd1FERYhkpt6CAF12T4UF2vMliPbUzTzQ+pw89bmdQ==
+X-Gm-Gg: AZuq6aInXMJSm4JSfI4k8GU+CTOwJ+bmricKHOPCOyidfhtODaRaW2zPiPWAoFd8cqj
+	VRHLr5Ngo+pEwbq7RH/wttV0FJ051YRJ9+KPQPOYDHqqeszbD+arVhCeYE2i4xTwpfc02IWbsfJ
+	NL6KQgnkdFyV0HMyn8eQ4Vjofttbqzl9C030FjNGpq+z57Eh1Y8mZ9P6XtjD+pHwrT4P7qrZ5Bq
+	IpEm+bsWOKiavUWPdXNiBMPIHcjwpvh1X3QwfEuDlpSUrPp+PO4Dk8cIL1vlLxsNGHyCESdCwIo
+	bvx3c/MoNYG9dGjoUiv2EVt07tSlM5RYG5W2PMTg0a+zIB2GQy7+74VjwKNeNFE3UPNpSzqNH1q
+	tE19z+Z1QW7OFIGxOwGxjoaH/QyVr5hDfPXNl/gExxjCXphcQWJMrAvtdrCm2U+UDBF+iLcN3w1
+	fXrrzi4aFfeNltr5FR7HW4r8HiYoI=
+X-Received: by 2002:a05:6a00:3407:b0:823:998:95b0 with SMTP id d2e1a72fcca58-826da9ee868mr8366804b3a.35.1771854847801;
+        Mon, 23 Feb 2026 05:54:07 -0800 (PST)
 Received: from archlinux ([2408:8340:a622:6ad0:e841:fcfd:4323:9565])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ad75029f11sm74542235ad.69.2026.02.23.05.29.15
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-826dd8bf9besm9470190b3a.55.2026.02.23.05.54.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 05:29:17 -0800 (PST)
+        Mon, 23 Feb 2026 05:54:07 -0800 (PST)
 From: Sun Chaobo <suncoding913@gmail.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	Sun Chaobo <suncoding913@gmail.com>
-Subject: [PATCH] crypto: fix spelling errors in comments
-Date: Mon, 23 Feb 2026 21:28:53 +0800
-Message-ID: <20260223132853.37393-1-suncoding913@gmail.com>
+Subject: [PATCH v2] crypto: fix spelling errors in comments
+Date: Mon, 23 Feb 2026 21:53:39 +0800
+Message-ID: <20260223135339.38631-1-suncoding913@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -73,7 +73,7 @@ Content-Transfer-Encoding: 8bit
 
 Fix several spelling mistakes in comments across the following files:
 
-- crypto/tea.c: Correct "algorogrthm" to "algorithm"
+- crypto/tea.c: Correct "alogrithms" to "algorithms"
 - crypto/lrw.c: Correct "mutliple" to "multiple"
 - crypto/drbg.c: Correct "additonal" to "additional"
 
@@ -128,3 +128,12 @@ index cb05140e3..7c66efcb5 100644
 -- 
 2.53.0
 
+Changes since v1:
+- Fixed multiple typos in the commit message description.
+  1. Corrected the spelling of the target word "algorithms" (added missing 's').
+  2. Fixed a typo in the quoted original error string (the original code had 
+     "alogrithms", but I accidentally mistyped it again in the v1 log).
+  Both are now accurately represented.
+- The actual code diff remains unchanged from v1; the source code fixes 
+  were already correct in v1.
+- No functional changes.
