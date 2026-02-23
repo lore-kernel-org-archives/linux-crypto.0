@@ -1,110 +1,214 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D23330648
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Feb 2026 17:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4553328ED;
+	Mon, 23 Feb 2026 17:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771866917; cv=none; b=df9F2ox8CYiNt0OSxSKe2MVLj6rX86DIbN37If1yybfjjZ30ZM9IMU+A1R/sB7cfGsV5zgVKPkM0gRH4HZYA6Hs6kOP0/AsbymERV++ljxvcWDKTJnPcEuxnkbp8SQV4tXEW6Y1Gbv7uaJtAlPOB+uOUjke/RDjQa+mI5853hoo=
+	t=1771868336; cv=none; b=S0TDDsvzZx6kNRvbVQgbRkKM8whhRbD1pOF1b8Qh5ncKju18ZJ1Hbz9RP1NOs8xq/4FSDTMxBza9tuPy2PsrFsjUP0OGDCBVC8QmRHJamUDbiq4ImrTmyQTQgGChdBN6PvUreolfdM3m83/vBxR7LVSjmBMoheYxCv95brtT2aM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771866917; c=relaxed/simple;
-	bh=HKwLbvFmJGYEGnpPr7MOM6oLTlNTOu8bfAhYYTRO13E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jSpHCfQbwzrobqar9zaOP0qRN70cEx7ZH7nbsUVZO388KRNOdnZ+5sD6FLkmF3S8jhJb41w4FCJqgfNc+MSIgA8S0fTLZj6OHAcuYAkj+Lk3g4Wk5gz5Q00SRsW6oSHX27AtgfxndAJz7Jt9EO2035zB8vOKCe9DVj5JEQy0APY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WgAGk0Bk; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1771868336; c=relaxed/simple;
+	bh=OFs+F2i4fpeRmsTH7tUJ5hO0npgCDxBo25FPhTX/hFs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FE0pNcsIdieHenKdz4s0nolqaxsrB3RIVp71Iabx+AgxS75Z5+p/sIj9saDfKA97vI9w7LRFRfYShrGoDlpMBS2btFk5miAzjNNuM0oxvFeZjOXtPCxARM2sACeTlCqWH0jJIlKbNeP5II3760TLhyAk6qLk8VEY7qaBCBoSV4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NvMPcrsr; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WgAGk0Bk"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2aad60525deso336739055ad.1
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Feb 2026 09:15:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771866915; x=1772471715; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qB/D8oykiAjYH+aojy11MUffmbGAGIdMwqBS+z3LBGk=;
-        b=WgAGk0Bk55uiejxu96L2NKrxY/yQztTYJ8SjfeOjAsYB7UT2PY82EebeMu4INfNuQ8
-         24F1frhdW0Vr57JI/tAe/cCk0U/dEit9Va6WGmeKLxVZAR3pdx3cBZK3r0NM4VJGwqJJ
-         Szq3x6FoggeTgB5m33sAm3rxMwMY+ODR9AMGY+KcITBlHxqT5m0w0O2VGEdEmn179oRm
-         HADjm7dAr5CwfxOTRwl9izLomLx+v68xPhWio0rzKwRLP1UGNWLMxmJRsnfJESaj7yor
-         6DXxIHFxKS+jZ8c3r45dt/NP0itUtxwefT4XNaLp+WqGmprewC88ZCM4mSbtIAzNJCnf
-         DyOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771866915; x=1772471715;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qB/D8oykiAjYH+aojy11MUffmbGAGIdMwqBS+z3LBGk=;
-        b=SgVqqrqrKEQaSBSAn8XnF67gTJGlLI5Jii6WP+bXdQpEtW+9mBUxxdltOUSvMpkPKn
-         D10zMxBYsjF+2SKqTY3h2Sn9H3k3Za4yatVLP1W/lYVqeBar3gCpqGQsS1KRYN40ed0F
-         kbqzIDH2CBF0AT+I4iNz7qbnvHz0l42PIKi+n40yaE3U7zMp/c2l9NazhI/NxjcyrGCu
-         +njkikAhaFOjH+VE6Lq+Eaf548Ur1lwYJczYH6+OQmnevpAh78IhbXnOu1ZLkUIFQJLw
-         9v2GGW4Qn1cHE2BwbNO2xAqT87Oetl19YO1w7GeSEgA4O4v3Wc7oxLfy0DAiUAlYTpYq
-         9E6g==
-X-Forwarded-Encrypted: i=1; AJvYcCVGceisZQPLbQbliNsaVKJBrfcE880Mb0792MxQa9a9Od8xnd3vz8A88mqf5A3VgV4bDctCsLSA985B0g8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwC5hTxLeFWYL0Lqr1yiRCHuG1F2G92TgwIfjlsQ8GdwhPmPzUN
-	fgZRNc8cJHl1k44+kICXyCwC/ac3tMUgBSvRpw4osleldMOb9T5mZhc658lTTU9WEEzGB/Kr/pZ
-	E5Gk34w==
-X-Received: from plpw17.prod.google.com ([2002:a17:902:9a91:b0:2a0:c485:7eed])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:b90:b0:2a9:411a:c5c6
- with SMTP id d9443c01a7336-2ad74511698mr75532445ad.39.1771866915160; Mon, 23
- Feb 2026 09:15:15 -0800 (PST)
-Date: Mon, 23 Feb 2026 09:15:13 -0800
-In-Reply-To: <aZyE4zvPtujZ4-6X@tycho.pizza>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NvMPcrsr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771868335; x=1803404335;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=OFs+F2i4fpeRmsTH7tUJ5hO0npgCDxBo25FPhTX/hFs=;
+  b=NvMPcrsrscxq4yCJYNHBwma5dXpYiaLlpl5YaiHU4AbKmW1dss4zVpgH
+   eKc6wHV4HSpKqyOZ8UlLVlghXkur2gCHm4j/0tVPiKMiMs8WIyTYBU/2a
+   6yowW4cOU55qzj4P1UFjG06x85lKFyOgcBuajicG0+hQ7xUZWW5IVie0T
+   CzejcQppfEPzmSpHn0vPl0BWBUbMvv0s0ke5e+Qjssqu807Hmk7eyaE7j
+   rAcT4p6XKH7FNn0xujYAvGZ00DAcOtrZCn+DLE46UjHdqz7MQNGpBv4ef
+   eZ4zNkJ8cO1QoE+PCo+ORxkR4NcdogZJ2/EBVMiLNS/FtyyTrgvpBtjZv
+   g==;
+X-CSE-ConnectionGUID: jsfaBeNbRdOcjkAScBt/AA==
+X-CSE-MsgGUID: qC3ahawxSriUb3w5OK63yQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11710"; a="73050398"
+X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
+   d="scan'208";a="73050398"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 09:38:54 -0800
+X-CSE-ConnectionGUID: i7eZdD4uRr+gNr/ct2htpA==
+X-CSE-MsgGUID: B0cv0ytAS2ClRPRHaDlf4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
+   d="scan'208";a="214708424"
+Received: from abityuts-desk.ger.corp.intel.com (HELO localhost) ([10.245.245.222])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 09:38:36 -0800
+Date: Mon, 23 Feb 2026 19:38:33 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Shawn Lin <shawn.lin@rock-chips.com>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"Vaibhaav Ram T . L" <vaibhaavram.tl@microchip.com>,
+	Kumaravel Thiagarajan <kumaravel.thiagarajan@microchip.com>,
+	Even Xu <even.xu@intel.com>, Xinpeng Sun <xinpeng.sun@intel.com>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Zhou Wang <wangzhou1@hisilicon.com>,
+	Longfang Liu <liulongfang@huawei.com>,
+	Vinod Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Jian Shen <shenjian15@huawei.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
+	Oded Gabbay <ogabbay@kernel.org>,
+	Maciej Falkowski <maciej.falkowski@linux.intel.com>,
+	Karol Wachowski <karol.wachowski@linux.intel.com>,
+	Min Ma <mamin506@gmail.com>, Lizhi Hou <lizhi.hou@amd.com>,
+	Andreas Noever <andreas.noever@gmail.com>,
+	Mika Westerberg <westeri@kernel.org>,
+	Tomasz Jeznach <tjeznach@rivosinc.com>,
+	Will Deacon <will@kernel.org>,
+	Xinliang Liu <xinliang.liu@linaro.org>,
+	Tian Tao <tiantao6@hisilicon.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Jonathan Cameron <jonathan.cameron@huawei.com>,
+	Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Raag Jadav <raag.jadav@intel.com>, Hans de Goede <hansg@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Andy Shevchenko <andy@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Robert Richter <rric@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Nirmal Patel <nirmal.patel@linux.intel.com>,
+	Kurt Schwemmer <kurt.schwemmer@microsemi.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Linus Walleij <linusw@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Bingbu Cao <bingbu.cao@intel.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	linux-input@vger.kernel.org, linux-i3c@lists.infradead.org,
+	dmaengine@vger.kernel.org, Philipp Stanner <phasta@kernel.org>,
+	netdev@vger.kernel.org, nic_swsd@realtek.com,
+	linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-usb@vger.kernel.org, iommu@lists.linux.dev,
+	linux-riscv@lists.infradead.org, David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>, linux-cxl@vger.kernel.org,
+	linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+	linux-serial@vger.kernel.org, mhi@lists.linux.dev,
+	Jan Dabros <jsd@semihalf.com>, linux-i2c@vger.kernel.org,
+	Daniel Mack <daniel@zonque.org>,
+	Haojian Zhuang <haojian.zhuang@gmail.com>,
+	linux-spi@vger.kernel.org,
+	Jonathan Derrick <jonathan.derrick@linux.dev>,
+	linux-pci@vger.kernel.org, linux-gpio@vger.kernel.org,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org
+Subject: Re: [PATCH 0/37] PCI/MSI: Enforce explicit IRQ vector management by
+ removing devres auto-free
+Message-ID: <aZyQmc7nOt87jitX@smile.fi.intel.com>
+References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
+ <CAHp75VeWD5A0r7-Uayyte1ZXXxdhLixd+z_y0xNeki0N+Ro=jQ@mail.gmail.com>
+ <cb878741-7b61-b72c-5a72-6ed6d5091b1f@rock-chips.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260223162900.772669-1-tycho@kernel.org> <20260223162900.772669-3-tycho@kernel.org>
- <aZyCEBo07EHw2Prk@google.com> <aZyE4zvPtujZ4-6X@tycho.pizza>
-Message-ID: <aZyLIWtffvEnmtYh@google.com>
-Subject: Re: [PATCH 2/4] selftests/kvm: check that SEV-ES VMs are allowed in
- SEV-SNP mode
-From: Sean Christopherson <seanjc@google.com>
-To: Tycho Andersen <tycho@kernel.org>
-Cc: Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cb878741-7b61-b72c-5a72-6ed6d5091b1f@rock-chips.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Mon, Feb 23, 2026, Tycho Andersen wrote:
-> > > +	/*
-> > > +	 * In some cases when SEV-SNP is enabled, firmware disallows starting
-> > > +	 * an SEV-ES VM. When SEV-SNP is enabled try to launch an SEV-ES, and
-> > > +	 * check the underlying firmware error for this case.
-> > > +	 */
-> > > +	vm = vm_sev_create_with_one_vcpu(KVM_X86_SEV_ES_VM, guest_sev_es_code,
-> > > +					 &vcpu);
+On Tue, Feb 24, 2026 at 12:09:37AM +0800, Shawn Lin wrote:
+> 在 2026/02/23 星期一 23:50, Andy Shevchenko 写道:
+> > On Mon, Feb 23, 2026 at 5:32 PM Shawn Lin <shawn.lin@rock-chips.com> wrote:
+> > > 
+> > > This patch series addresses a long-standing design issue in the PCI/MSI
+> > > subsystem where the implicit, automatic management of IRQ vectors by
+> > > the devres framework conflicts with explicit driver cleanup, creating
+> > > ambiguity and potential resource management bugs.
+> > > 
+> > > ==== The Problem: Implicit vs. Explicit Management ====
+> > > Historically, `pcim_enable_device()` not only manages standard PCI resources
+> > > (BARs) via devres but also implicitly triggers automatic IRQ vector management
+> > > by setting a flag that registers `pcim_msi_release()` as a cleanup action.
+> > > 
+> > > This creates an ambiguous ownership model. Many drivers follow a pattern of:
+> > > 1. Calling `pci_alloc_irq_vectors()` to allocate interrupts.
+> > > 2. Also calling `pci_free_irq_vectors()` in their error paths or remove routines.
+> > > 
+> > > When such a driver also uses `pcim_enable_device()`, the devres framework may
+> > > attempt to free the IRQ vectors a second time upon device release, leading to
+> > > a double-free. Analysis of the tree shows this hazardous pattern exists widely,
+> > > while 35 other drivers correctly rely solely on the implicit cleanup.
 > > 
-> > If there's a legimate reason why an SEV-ES VM can't be created, then that needs
-> > to be explicitly enumerated in some way by the kernel.  E.g. is this due to lack
-> > of ASIDs due to CipherTextHiding or something?
+> > Is this confirmed? What I read from the cover letter, this series was
+> > only compile-tested, so how can you prove the problem exists in the
+> > first place?
 > 
-> Newer firmware that fixes CVE-2025-48514 won't allow SEV-ES VMs to be
-> started with SNP enabled, there is a footnote (2) about it here:
-> 
-> https://www.amd.com/en/resources/product-security/bulletin/amd-sb-3023.html
-> 
-> Probably should have included this in the patch, sorry.
-> 
-> > Throwing a noodle to see if it sticks is not an option.
-> 
-> Sure, we could do some firmware version test to see if it's fixed
-> instead? Or do this same test in the kernel and export that as an
-> ioctl?
+> Yes, it's confirmed. My debug of a double free issue of a out-of-tree
+> PCIe wifi driver which uses
+> pcim_enable_device + pci_alloc_irq_vectors + pci_free_irq_vectors expose
+> it. And we did have a TODO to cleanup this hybrid usage, targeted in
+> this cycle[1] suggested by Philipp:
 
-Uh, no idea what would be ideal, but there absolutely needs to be some way to
-communicate lack of effective SEV-ES support to userspace, and in a way that
-doesn't break userspace.
+Okay, fair enough. I think this bit was missing in the cover letter.
 
-Hrm, I think we also neglected to communicate when SEV and SEV-ES are effectively
-unusable, e.g. due to CipherTextHiding, so maybe we can kill two birds with one
-stone?  IIRC, we didn't bother enumerating the limitation with CipherTextHiding
-because making SEV-ES unusable would require a deliberate act from the admin.
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git/log/?h=msi
 
-"Update firmware" is also an deliberate act, but the side effect of SEV-ES being
-disabled, not so much.
+> > > ==== The Solution: Making Management Explicit ====
+> > > This series enforces a clear, predictable model:
+> > > 1.  New Managed API (Patch 1/37): Introduces pcim_alloc_irq_vectors() and
+> > >      pcim_alloc_irq_vectors_affinity(). Drivers that desire devres-managed IRQ
+> > >      vectors should use these functions, which set the is_msi_managed flag and
+> > >      ensure automatic cleanup.
+> > > 2.  Patches 2 through 36 convert each driver that uses pcim_enable_device() alongside
+> > >      pci_alloc_irq_vectors() and relies on devres for IRQ vector cleanup to instead
+> > >      make an explicit call to pcim_alloc_irq_vectors().
+> > > 3.  Core Change (Patch 37/37): With the former cleanup, now modifies pcim_setup_msi_release()
+> > >      to check only the is_msi_managed flag. This decouples automatic IRQ cleanup from
+> > >      pcim_enable_device(). IRQ vectors allocated via pci_alloc_irq_vectors*()
+> > >      are now solely the driver's responsibility to free with pci_free_irq_vectors().
+> > > 
+> > > With these changes, we clear ownership model: Explicit resource management eliminates
+> > > ambiguity and follows the "principle of least surprise." New drivers choose one model and
+> > > be consistent.
+> > > - Use `pci_alloc_irq_vectors()` + `pci_free_irq_vectors()` for explicit control.
+> > > - Use `pcim_alloc_irq_vectors()` for devres-managed, automatic cleanup.
+> > 
+> > Have you checked previous attempts? Why is your series better than those?
+> 
+> There seems not previous attempts.
+
+Maybe we are looking to the different projects...
+
+https://lore.kernel.org/all/?q=pcim_alloc_irq_vectors
+
+> > > ==== Testing And Review ====
+> > > 1. This series is only compiled test with allmodconfig.
+> > > 2. Given the substantial size of this patch series, I have structured the mailing
+> > >     to facilitate efficient review. The cover letter, the first patch and the last one will be sent
+> > >     to all relevant mailing lists and key maintainers to ensure broad visibility and
+> > >     initial feedback on the overall approach. The remaining subsystem-specific patches
+> > >     will be sent only to the respective subsystem maintainers and their associated
+> > >     mailing lists, reducing noise.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
