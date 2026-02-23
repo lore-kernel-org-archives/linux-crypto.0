@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C2833120E;
-	Mon, 23 Feb 2026 22:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DE637104D;
+	Mon, 23 Feb 2026 22:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771884750; cv=none; b=O7n8vWo1pC0u7aT/FNplNR7egzwOgwjVcv8qHhQlfR9J55hU3K/qOHkmoeUVSJZCQ4qbWgK8b1w95u2Qrayuf0W9DtwCT2ANIbYy2xKCe8ugnuVO8b3lCzD+c8zb3xpotiI3ai1DEwlcM8+YjHQzQfTVY9ZOH9LW+z30nZSSQNI=
+	t=1771884888; cv=none; b=kqGASqSfS4m9KqLf60FPiVFQnJ/Nxn4mAwjvSWC6Luihg//1kWMeo31pyvO3GREZBcH4pNb+mGfCcutp6hqVzFyh1mxKLe5Kbe2nF65DhiS63ZORp4SQSEbcFSfZob//Q4Dt7g8uiEFvebFfW7sDIjgXlQghEmQTQMTMjkWHAjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771884750; c=relaxed/simple;
-	bh=OWub5nswDSi5TmwvNoO5gqG24elF/8q8aeObIUkJA4o=;
+	s=arc-20240116; t=1771884888; c=relaxed/simple;
+	bh=4kH174067DzI+LXZAng55RHiqKZbdN+aHW/t4m7nco4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ax2nuHAn1vzWQB03HdpRDqPDlXcFL7MdReDDAs2VQ0gd3Mwi3HeE+61/MU+1mVBUFqppB+Ob4b0R/pj5FFf4rl/aS8wk9ohygaSF/voUXbHyCbdMgFg1OSOUS9C8Ki5kYlwv2IWMwj2O916cl5mSyMTaSo9QbId7iHoxFfppK7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YfEgEKgI; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ebrFjN/eS54NYuuBmAJCiupBCgel12pPGFYefXesWMHy5UMiQCG+3vEIytQq2LTj+cK8YSIHOojefLJYoYCbUsvQhdffdvqAXqRnPpyQ6tAWNwcVOBWI86zaMp0YmZ+EXbITIBENwZZq2ccDJjr8CVHXL47b4581Xy66qMQPibI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZC11twMr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YfEgEKgI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9A63C116C6;
-	Mon, 23 Feb 2026 22:12:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZC11twMr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 251D5C116C6;
+	Mon, 23 Feb 2026 22:14:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771884750;
-	bh=OWub5nswDSi5TmwvNoO5gqG24elF/8q8aeObIUkJA4o=;
+	s=k20201202; t=1771884888;
+	bh=4kH174067DzI+LXZAng55RHiqKZbdN+aHW/t4m7nco4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YfEgEKgIgvC3Jji1an1FpWaex/z5nDC54A+AUXpkkhfqcHKobfA5Pmrie+/VvSNnU
-	 sgbxEuw4L6rczNTS7CL/JR1n6wfEQtvduOfpiKAdg+l5tYmb3c/apftlYdTfi3EJch
-	 rS5CScEr7zigIj+gK8qetYHABlopcLeeQU3oRCDMx12BAdanu/rCWG982BJSP5K6De
-	 W+nLpS5spMDLfY/mrGoEuBi3LnFLhIz9jXjbr69Rs5+admL1I3ohmLuT/QHr101u3q
-	 bByQvLlvgPuFOeOHuqoDfT+klN1QcxpjuASNXXjigx6nYhib7QJjMPXmHbENFhN0f9
-	 wNBL1dnLWDYtg==
-Date: Mon, 23 Feb 2026 15:12:27 -0700
+	b=ZC11twMrmgGTJXn8dEA/A2mDLi28NFLZbvffIeU4a+aHmvvJrlJ/6MAFilWfXwMoJ
+	 BSemHdih76UPmdkWqnldt6n3Fwi1hwuMhL2sjp+t0+quDj3jEO3tDCW4YLwT284Foi
+	 S6z4FL83KYE7iMUf/E4VETzJoTwEYnnWMCCn1oHhDcBY0jTeijJhWSkeZP27+EhzN7
+	 K9y8QzzUKZ7y2Yy7JG+cNXOJvyfKLAJBpbENYdmP7tGcobH1oj8SZTilY1nTraqXzV
+	 97jfPATwFt7BAhQVY6nKPTJgbx2CemPoFMEn1Wb4HUbmbH589x14g+2VPz4jpZeSXR
+	 hU+AR/nmueeDw==
+Date: Mon, 23 Feb 2026 15:14:45 -0700
 From: Tycho Andersen <tycho@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Ashish Kalra <ashish.kalra@amd.com>,
@@ -37,14 +37,11 @@ Cc: Ashish Kalra <ashish.kalra@amd.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 2/4] selftests/kvm: check that SEV-ES VMs are allowed in
- SEV-SNP mode
-Message-ID: <aZzQy7c8VqCaZ_fE@tycho.pizza>
+Subject: Re: [PATCH 3/4] crypto/ccp: support setting RAPL_DIS in SNP_INIT_EX
+Message-ID: <aZzRVXp_E3cMcgtX@tycho.pizza>
 References: <20260223162900.772669-1-tycho@kernel.org>
- <20260223162900.772669-3-tycho@kernel.org>
- <aZyCEBo07EHw2Prk@google.com>
- <aZyE4zvPtujZ4-6X@tycho.pizza>
- <aZyLIWtffvEnmtYh@google.com>
+ <20260223162900.772669-4-tycho@kernel.org>
+ <aZyC89v9JAVEPeLt@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,57 +50,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aZyLIWtffvEnmtYh@google.com>
+In-Reply-To: <aZyC89v9JAVEPeLt@google.com>
 
-On Mon, Feb 23, 2026 at 09:15:13AM -0800, Sean Christopherson wrote:
+On Mon, Feb 23, 2026 at 08:40:19AM -0800, Sean Christopherson wrote:
 > On Mon, Feb 23, 2026, Tycho Andersen wrote:
-> > > > +	/*
-> > > > +	 * In some cases when SEV-SNP is enabled, firmware disallows starting
-> > > > +	 * an SEV-ES VM. When SEV-SNP is enabled try to launch an SEV-ES, and
-> > > > +	 * check the underlying firmware error for this case.
-> > > > +	 */
-> > > > +	vm = vm_sev_create_with_one_vcpu(KVM_X86_SEV_ES_VM, guest_sev_es_code,
-> > > > +					 &vcpu);
-> > > 
-> > > If there's a legimate reason why an SEV-ES VM can't be created, then that needs
-> > > to be explicitly enumerated in some way by the kernel.  E.g. is this due to lack
-> > > of ASIDs due to CipherTextHiding or something?
+> > From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 > > 
-> > Newer firmware that fixes CVE-2025-48514 won't allow SEV-ES VMs to be
-> > started with SNP enabled, there is a footnote (2) about it here:
-> > 
-> > https://www.amd.com/en/resources/product-security/bulletin/amd-sb-3023.html
-> > 
-> > Probably should have included this in the patch, sorry.
-> > 
-> > > Throwing a noodle to see if it sticks is not an option.
-> > 
-> > Sure, we could do some firmware version test to see if it's fixed
-> > instead? Or do this same test in the kernel and export that as an
-> > ioctl?
+> > The kernel allows setting the RAPL_DIS policy bit, but had no way to set
 > 
-> Uh, no idea what would be ideal, but there absolutely needs to be some way to
-> communicate lack of effective SEV-ES support to userspace, and in a way that
-> doesn't break userspace.
+> Please actually say what RAPL_DIS is and does, and explain why this is the
+> correct approach.  I genuinely have no idea what the impact of this patch is,
+> (beyond disabling something, obviously).
 
-Just to clarify, by "doesn't break userspace" here you mean that we
-shouldn't revoke the SEV_ES bit from the list of supported VM types
-once we've exposed it? Or you mean preserving the current behavior of
-CPU supports it => bit is set?
+Sure, the easiest thing is probably to quote the firmware PDF:
 
-> Hrm, I think we also neglected to communicate when SEV and SEV-ES are effectively
-> unusable, e.g. due to CipherTextHiding, so maybe we can kill two birds with one
-> stone?  IIRC, we didn't bother enumerating the limitation with CipherTextHiding
-> because making SEV-ES unusable would require a deliberate act from the admin.
+    Some processors support the Running Average Power Limit (RAPL)
+    feature which provides information about power utilization of
+    software. RAPL can be disabled using the RAPL_DIS flag in
+    SNP_INIT_EX to disable RAPL while SNP firmware is in the INIT
+    state. Guests may require that RAPL is disabled by using the
+    POLICY.RAPL_DIS guest policy flag.
 
-We know these parameters at module load time so we could unset the
-supported bit, but...
+I'll add this to the message in the next version.
 
-> "Update firmware" is also an deliberate act, but the side effect of SEV-ES being
-> disabled, not so much.
-
-since this could be a runtime thing via DOWNLOAD_FIRMWARE_EX at some
-point, I guess we need a new RUNTIME_STATUS ioctl or similar. Then the
-question is: does it live in /dev/sev, or /dev/kvm?
+I will also split out the RAPL_DIS stuff from the test fix for the
+firmware update.
 
 Tycho
