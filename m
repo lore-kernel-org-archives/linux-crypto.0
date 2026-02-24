@@ -1,90 +1,120 @@
-Received: from mail-m10214.netease.com (mail-m10214.netease.com [154.81.10.214])
+Received: from mail-m1973185.qiye.163.com (mail-m1973185.qiye.163.com [220.197.31.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E07223DE7;
-	Tue, 24 Feb 2026 00:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=154.81.10.214
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B491A9FBC;
+	Tue, 24 Feb 2026 02:24:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.85
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771894520; cv=none; b=lSCQecTmajtUKC8ePqvfQUCacBHgECY9MVSi252sU8wzifC9SEgMqziDEE2gbyZ6ceX3Imouhj2I3HiMwozhXyPsjDvy2q4R8ilv97pFh+aIciZzHdW02bYnStKf4IbYBSevy38JWAtFdurDiJshIQpjhzGYzH6ID+aB2MW3G14=
+	t=1771899876; cv=none; b=i0G+WlUN05LrDEyhg86ed61NX2390HjVK1Nw168H8D9oYAqWqCJ8Kc1DhlksYxQ40vDIaBXAby4GqiieOEoMPo4ZjEMvTqAV0bJMspa2LWsQTnSVY9u2GaNzxABoT6jr2fJa6JcaJDZyv80frqEgimnv6IvHjPibpobnLvDRijA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771894520; c=relaxed/simple;
-	bh=8WzlflZ34qKm3b5d02I3sYaBSLAexfVSpezxBgpifBI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=c0me3mUuzlErpDXy0OjNiQ1ARrRpDPcM8ljMnHq7TW5ldvrMk4TGSRu4qVidElfH9do17Nzo2F7qYgdDEMD3aTYAqZptIFwl0FhX7SvtNXnMvNE2EReo9BYnaKcpQ8v/poxBVT/2YOkjgp0hmz0WlPS1JcI/7qvjYgrMQE0iPmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=SvPqBqoI; arc=none smtp.client-ip=154.81.10.214
+	s=arc-20240116; t=1771899876; c=relaxed/simple;
+	bh=VFI84jsJoxKxbbl2Av3iihOwmdaUZt/3qxvYrHVfk1A=;
+	h=Cc:Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=VBPYwiL4yLQsyXsqVnEg6E1nWzE0tL7EPnj76s3zTnS0GpxARrzBahESAw79vNYluJ3W/EIcPb2Vq5xCiGAYTj/MTxF0UvZ24dC0kpmcS9PiFPhx0V/AuLtxcCh3Qr9XopNzLG+wuDoLJW1449mAJVoqgpN0+f5Y4/ljj9srBeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=I2JxoTtV; arc=none smtp.client-ip=220.197.31.85
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rock-chips.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="SvPqBqoI"
-Received: from localhost.localdomain (unknown [58.22.7.114])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 34b40457d;
-	Mon, 23 Feb 2026 23:51:57 +0800 (GMT+08:00)
-From: Shawn Lin <shawn.lin@rock-chips.com>
-To: Antoine Tenart <atenart@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Stanner <phasta@kernel.org>,
-	linux-pci@vger.kernel.org,
-	Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH 17/37] crypto: safexcel: Replace pci_alloc_irq_vectors() with pcim_alloc_irq_vectors()
-Date: Mon, 23 Feb 2026 23:51:50 +0800
-Message-Id: <1771861910-88163-1-git-send-email-shawn.lin@rock-chips.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
+	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="I2JxoTtV"
+Received: from [172.16.12.14] (unknown [58.22.7.114])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 34bd86f1b;
+	Tue, 24 Feb 2026 10:08:59 +0800 (GMT+08:00)
+Cc: shawn.lin@rock-chips.com, Bjorn Helgaas <bhelgaas@google.com>,
+ "Vaibhaav Ram T . L" <vaibhaavram.tl@microchip.com>,
+ Kumaravel Thiagarajan <kumaravel.thiagarajan@microchip.com>,
+ Even Xu <even.xu@intel.com>, Xinpeng Sun <xinpeng.sun@intel.com>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Jiri Kosina <jikos@kernel.org>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Zhou Wang <wangzhou1@hisilicon.com>, Longfang Liu <liulongfang@huawei.com>,
+ Vinod Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>,
+ Jijie Shao <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>,
+ Sunil Goutham <sgoutham@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Oded Gabbay <ogabbay@kernel.org>,
+ Maciej Falkowski <maciej.falkowski@linux.intel.com>,
+ Karol Wachowski <karol.wachowski@linux.intel.com>,
+ Min Ma <mamin506@gmail.com>, Lizhi Hou <lizhi.hou@amd.com>,
+ Andreas Noever <andreas.noever@gmail.com>,
+ Mika Westerberg <westeri@kernel.org>, Tomasz Jeznach
+ <tjeznach@rivosinc.com>, Will Deacon <will@kernel.org>,
+ Xinliang Liu <xinliang.liu@linaro.org>, Tian Tao <tiantao6@hisilicon.com>,
+ Davidlohr Bueso <dave@stgolabs.net>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Srujana Challa <schalla@marvell.com>, Bharat Bhushan
+ <bbhushan2@marvell.com>, Antoine Tenart <atenart@kernel.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Raag Jadav <raag.jadav@intel.com>,
+ Hans de Goede <hansg@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jiri Slaby <jirislaby@kernel.org>, Andy Shevchenko <andy@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>,
+ Mika Westerberg <mika.westerberg@linux.intel.com>,
+ Andi Shyti <andi.shyti@kernel.org>, Robert Richter <rric@kernel.org>,
+ Mark Brown <broonie@kernel.org>, Nirmal Patel
+ <nirmal.patel@linux.intel.com>, Kurt Schwemmer
+ <kurt.schwemmer@microsemi.com>, Logan Gunthorpe <logang@deltatee.com>,
+ Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
+ Sakari Ailus <sakari.ailus@linux.intel.com>,
+ Bingbu Cao <bingbu.cao@intel.com>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Arnd Bergmann <arnd@arndb.de>, Benjamin Tissoires <bentiss@kernel.org>,
+ linux-input@vger.kernel.org, linux-i3c@lists.infradead.org,
+ dmaengine@vger.kernel.org, Philipp Stanner <phasta@kernel.org>,
+ netdev@vger.kernel.org, nic_swsd@realtek.com, linux-arm-msm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org,
+ iommu@lists.linux.dev, linux-riscv@lists.infradead.org,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ linux-cxl@vger.kernel.org, linux-crypto@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
+ mhi@lists.linux.dev, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Jan Dabros <jsd@semihalf.com>, linux-i2c@vger.kernel.org,
+ Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>,
+ linux-spi@vger.kernel.org, Jonathan Derrick <jonathan.derrick@linux.dev>,
+ linux-pci@vger.kernel.org, linux-gpio@vger.kernel.org,
+ Mauro Carvalho Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org,
+ linux-mmc@vger.kernel.org
+Subject: Re: [PATCH 01/37] PCI/MSI: Add Devres managed IRQ vectors allocation
+To: Jakub Kicinski <kuba@kernel.org>
 References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
-X-HM-Tid: 0a9c8b333de609cckunma0e2a033987a79
-X-HM-MType: 1
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZGhhLHVZPQxpPQx8fSE1OTkJWFRQJFh
-	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZT0tIVUpLSU9PT0
-	hVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=SvPqBqoIKCJ5Fh92JioddDZ6IPavGqxBmDIFVU+H4SVb8h3jIygbncHCUNN+jHNY2HuDiOVrgLqCiHbJHtd2tZqc0gwWpbfOghrHWEvHje838d753QD/mEj/+M3CZm/0xWNo7Ufzs348lD8nQbTUgtykafQR8PQRoqqFh9Q3iv0=; s=default; c=relaxed/relaxed; d=rock-chips.com; v=1;
-	bh=Jv8sx4V8Kx94pQbsGOseu8/K3SdNRp4HhMI/8Hu2kN8=;
-	h=date:mime-version:subject:message-id:from;
+ <1771860581-82092-2-git-send-email-shawn.lin@rock-chips.com>
+ <20260223160402.3ad8f079@kernel.org>
+From: Shawn Lin <shawn.lin@rock-chips.com>
+Message-ID: <ec226aa1-5cc8-855f-8f90-1d7f89efe766@rock-chips.com>
+Date: Tue, 24 Feb 2026 10:08:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20260223160402.3ad8f079@kernel.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9c8d68279109cckunm6766673b9bec2a
+X-HM-MType: 1
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZQ09CQ1YYTU4fGk8fHk9CSE1WFRQJFh
+	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZT0tIVUpLSEtKTE
+	tVSktLVUtZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=I2JxoTtVS0Yy5g50bgv4Wil//q2f9q9dCHuXovK/5LdNvBScPX9QRZNqNln/2pGvmbHOVQSNiAizH26Ay9wuN1CW4yf959RsxwxZnY1zkzGm1f2heNBE5Aht1ygGExZDhYnxUaCH2lYQFIRzQh1Ji7cYGdQWjF/HKhpMW2zjyIY=; s=default; c=relaxed/relaxed; d=rock-chips.com; v=1;
+	bh=VXxBr7dg17LQLBnY9v36F+7EuLqaMgXXNtGWjPOgYcA=;
+	h=date:mime-version:subject:message-id:from;
 
-pcim_enable_device() no longer automatically manages IRQ vectors via devres.
-Drivers must now manually call pci_free_irq_vectors() for cleanup. Alternatively,
-pcim_alloc_irq_vectors() should be used.
+在 2026/02/24 星期二 8:04, Jakub Kicinski 写道:
+> On Mon, 23 Feb 2026 23:29:40 +0800 Shawn Lin wrote:
+>> pcim_alloc_irq_vectors() and pcim_alloc_irq_vectors_affinity() are created for
+>> pci device drivers which rely on the devres machinery to help cleanup the IRQ
+>> vectors.
+> 
+> If you can please add this API with just a few users, and then convert
+> remaining users via the subsystem trees in the next cycle.
+> There's no need to risk wasting maintainer time on conflicts with
+> conversions like this.
 
-To: Antoine Tenart <atenart@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-To: davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org
-Cc: Bjorn Helgaas <bhelgaas@google.com>
-Cc: Philipp Stanner <phasta@kernel.org>
-Cc: linux-pci@vger.kernel.org
-Signed-off-by: Shawn Lin <shawn.lin@rock-chips.com>
----
+Thanks for the suggestion, Jakub. I have little experience with 
+cross-subsystem cleanups like this, so your suggestion is very helpful.
 
- drivers/crypto/inside-secure/safexcel.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index c3b2b22..4e4991e 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -1596,10 +1596,10 @@ static int safexcel_probe_generic(void *pdev,
- 		 */
- 		struct pci_dev *pci_pdev = pdev;
- 
--		ret = pci_alloc_irq_vectors(pci_pdev,
--					    priv->config.rings + 1,
--					    priv->config.rings + 1,
--					    PCI_IRQ_MSI | PCI_IRQ_MSIX);
-+		ret = pcim_alloc_irq_vectors(pci_pdev,
-+					     priv->config.rings + 1,
-+					     priv->config.rings + 1,
-+					     PCI_IRQ_MSI | PCI_IRQ_MSIX);
- 		if (ret < 0) {
- 			dev_err(dev, "Failed to allocate PCI MSI interrupts\n");
- 			return ret;
--- 
-2.7.4
-
+> 
