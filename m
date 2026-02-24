@@ -1,165 +1,222 @@
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from sphereful.davidgow.net (sphereful.davidgow.net [203.29.242.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504021DFDB8;
-	Tue, 24 Feb 2026 08:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4644C190462;
+	Tue, 24 Feb 2026 09:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.242.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771922004; cv=none; b=nbQ2/uCUgp9QZBVSrJptxHleqA8dFTbM7/FYKEvb6PPxZUnN0D1BhwRzOY2U4ZFuQH9T3i0sDDDWPEjXT+IqGBuEeCZ8xrATCcmSLBM79mLOoJ//pyfI8vdfDJr6U0g3XjJSj5sXeOoYyc6oYTA1Qas0nlgz40bj7DfP2pVfdxw=
+	t=1771923696; cv=none; b=OkbzoE60Qp/hjh8PGoiWuz6Sl/vCfA/87jCE8QiWvMaEZHKGJ6w9uRu6XmSQ/Tk4Fy+7ojYluZbCJVBzTqqgWnDYixgcbQBzO/MS869FTtR/xONip58LTTyVCkshXoqDOu21MdPZbcfLjMBpkGnCGuI3GyeIna9IebkhPwan+fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771922004; c=relaxed/simple;
-	bh=jbJfsDf/AFVBkWOy7rSA4AaZdHLzv8lJvtIZjuKCFtE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EVf9aGxuXIcgilZMvncrDKL8sy8rQMUpPk83/EANmYRE+zOBqUqjNk38gUY1tx6dnuiF5c0LRCjZprClLlgD9Wl36Tnhy+ZBQagmEtPjrrYfC2NjaivYsrUhc9FT61FJ1OpQ6eD2Ezl4gWHK3InAKL9ZbHKFdyRfTiYE0KlqhzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=ed6RPlZl; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+	s=arc-20240116; t=1771923696; c=relaxed/simple;
+	bh=pty0p3EkgQsMv5GqCnhpOyx0EMZJ0zKmu+67M/tExE8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CDlJJYTaDItA184u9wd5m0pAwhgy+JFCQ4EFFpm7Ky05l9qmYz8c1eXlntvRn35CD/HZPPHCAf1uvrjbu+Dbxyj6VXNgbQgrJkGhFdigXftgk27mwnSxhomzLdnBP1eCT9tWF2k5KPkihFqHrMQpK++QmL85u/hiJoCzB2PJk1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=davidgow.net; spf=pass smtp.mailfrom=davidgow.net; dkim=pass (4096-bit key) header.d=davidgow.net header.i=@davidgow.net header.b=lRgv4bTZ; dkim=pass (4096-bit key) header.d=davidgow.net header.i=@davidgow.net header.b=fNwipv6W; arc=none smtp.client-ip=203.29.242.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=davidgow.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=davidgow.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="ed6RPlZl"
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4fKrZw3WpFz9vHN;
-	Tue, 24 Feb 2026 09:33:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1771921992; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BYg4q6UpxC9QuXXiNNDVGkJ25zHrTtqhRQuiGoCwbvc=;
-	b=ed6RPlZlOUibWHwOocSfYTbtNmFVbXwAr31lgxNkh51bR+5xZFRh30ChM/VGa7gukLud7Z
-	gjTbJ0LWe52KAN52GeHh8bJ/s/WoNKVXWlvSRa1yRizbR3EpzoiYW3Wbfme/2w9YFsXFEw
-	1Sfja1+XOBY3ofP3UjIRgt036+qwuwuFFrM+HEUlokbyx8ydCENU7J4uyTEkj1BUrJue4J
-	99L7hKKIyf8MBC9C72PvXh5nuwMG3ygnRsPehMi1rXkCt72nSQ/Sw/iY4BR8htDmahaWW7
-	ev+dgehPQrgSupmjoTGs4VKws0G0Lm/uzKdxtzYsBciIbPjnvhapWs+EIlsL6g==
-Message-ID: <3014988f8a26dbac18a32ec22e0da3f5a383fd97.camel@mailbox.org>
-Subject: Re: [PATCH 01/37] PCI/MSI: Add Devres managed IRQ vectors allocation
-From: Philipp Stanner <phasta@mailbox.org>
-Reply-To: phasta@kernel.org
-To: Shawn Lin <shawn.lin@rock-chips.com>, phasta@kernel.org
-Cc: Bjorn Helgaas <bhelgaas@google.com>, "Vaibhaav Ram T . L"
- <vaibhaavram.tl@microchip.com>, Kumaravel Thiagarajan
- <kumaravel.thiagarajan@microchip.com>, Even Xu <even.xu@intel.com>, Xinpeng
- Sun <xinpeng.sun@intel.com>, Srinivas Pandruvada
- <srinivas.pandruvada@linux.intel.com>, Jiri Kosina <jikos@kernel.org>, 
- Alexandre Belloni <alexandre.belloni@bootlin.com>, Zhou Wang
- <wangzhou1@hisilicon.com>, Longfang Liu <liulongfang@huawei.com>, Vinod
- Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>, Jijie Shao
- <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>, Sunil Goutham
- <sgoutham@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, "David S . Miller" <davem@davemloft.net>,
- Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Oded Gabbay <ogabbay@kernel.org>,
- Maciej Falkowski <maciej.falkowski@linux.intel.com>,  Karol Wachowski
- <karol.wachowski@linux.intel.com>, Min Ma <mamin506@gmail.com>, Lizhi Hou
- <lizhi.hou@amd.com>,  Andreas Noever <andreas.noever@gmail.com>, Mika
- Westerberg <westeri@kernel.org>, Tomasz Jeznach <tjeznach@rivosinc.com>,
- Will Deacon <will@kernel.org>, Xinliang Liu <xinliang.liu@linaro.org>, Tian
- Tao <tiantao6@hisilicon.com>, Davidlohr Bueso <dave@stgolabs.net>, Jonathan
- Cameron <jonathan.cameron@huawei.com>, Srujana Challa
- <schalla@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>, Antoine
- Tenart <atenart@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Raag
- Jadav <raag.jadav@intel.com>, Hans de Goede <hansg@kernel.org>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby
- <jirislaby@kernel.org>, Andy Shevchenko <andy@kernel.org>, Manivannan
- Sadhasivam <mani@kernel.org>, Mika Westerberg
- <mika.westerberg@linux.intel.com>, Andi Shyti <andi.shyti@kernel.org>, 
- Robert Richter <rric@kernel.org>, Mark Brown <broonie@kernel.org>, Nirmal
- Patel <nirmal.patel@linux.intel.com>, Kurt Schwemmer
- <kurt.schwemmer@microsemi.com>,  Logan Gunthorpe <logang@deltatee.com>,
- Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
- Sakari Ailus <sakari.ailus@linux.intel.com>, Bingbu Cao
- <bingbu.cao@intel.com>, Ulf Hansson <ulf.hansson@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, Benjamin Tissoires <bentiss@kernel.org>,
- linux-input@vger.kernel.org,  linux-i3c@lists.infradead.org,
- dmaengine@vger.kernel.org, netdev@vger.kernel.org,  nic_swsd@realtek.com,
- linux-arm-msm@vger.kernel.org,  dri-devel@lists.freedesktop.org,
- linux-usb@vger.kernel.org,  iommu@lists.linux.dev,
- linux-riscv@lists.infradead.org, David Airlie <airlied@gmail.com>, Simona
- Vetter <simona@ffwll.ch>, linux-cxl@vger.kernel.org, 
- linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
- linux-serial@vger.kernel.org, mhi@lists.linux.dev, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Jan Dabros <jsd@semihalf.com>, 
- linux-i2c@vger.kernel.org, Daniel Mack <daniel@zonque.org>, Haojian Zhuang
- <haojian.zhuang@gmail.com>, linux-spi@vger.kernel.org, Jonathan Derrick
- <jonathan.derrick@linux.dev>, linux-pci@vger.kernel.org, 
- linux-gpio@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, 
- linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, Jakub Kicinski
- <kuba@kernel.org>
-Date: Tue, 24 Feb 2026 09:32:39 +0100
-In-Reply-To: <d601ec05-ef38-5e8e-c643-c05010717ebe@rock-chips.com>
-References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
-	 <1771860581-82092-2-git-send-email-shawn.lin@rock-chips.com>
-	 <20260223160402.3ad8f079@kernel.org>
-	 <ec226aa1-5cc8-855f-8f90-1d7f89efe766@rock-chips.com>
-	 <07fc896007d86b731cbfb3cf6bbdf4e5315d7a77.camel@mailbox.org>
-	 <d601ec05-ef38-5e8e-c643-c05010717ebe@rock-chips.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (4096-bit key) header.d=davidgow.net header.i=@davidgow.net header.b="lRgv4bTZ";
+	dkim=pass (4096-bit key) header.d=davidgow.net header.i=@davidgow.net header.b="fNwipv6W"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=davidgow.net;
+	s=201606; t=1771923692;
+	bh=pty0p3EkgQsMv5GqCnhpOyx0EMZJ0zKmu+67M/tExE8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=lRgv4bTZvMupZejdLNOAfeW0fBmESQk+nEFcPSNeLSrRdXJhrQXjA8Xs+lSQ2VkDO
+	 3MfmZeOSHAiHHg873mXQxwuB341Wbi+vjyCyWNi4//fE0ProOs1OGqfZxxKvqDPlTn
+	 IYZLWjNBW21Xik23q8sKK8757dwyO746aCN/2MTDs23GD2SB9EzWURpjLdz8kQBkFw
+	 47chRRLeW7g8HpRJVJYr7mnHWBAHfn25JznTiRPwpXjrUvmkzjtlyX/XTja8nKTXxJ
+	 UeXXEKd2bCL9W59TZJ1OtAUjU48PcciruooIGABirXMURFFI1NONFzOHIPYoBZudT7
+	 pYIVsFU+8a5scBsIxbNbSOHM5Q1R8L8BSY48plYUZIHBuMUZRV2qngODj23YiTns1V
+	 PWHLsLfpjAolh7puAFpgwKVZ73Viu5LHYU+aDEeO3kIX95Ca1iSKOwRfm2DlorC5v8
+	 0GbzveJhMS7Kmqw4yEoZK46/gia173kivtwPQhyQEafO3EnuQcJ2vK5cf7IO7w7m9+
+	 dHxI64KttFO+oq8IDufh2r+qcd6I5vRTCM2N8vRAJ9hPvmuBfWOBLrk8obx2seO1hz
+	 6W+IQtBlJj26600g3UzUgmwGOeu6CWjtLQXz2/3vWiLMIsK+JDbQJkQiw/VNHdkbW0
+	 44YjVbXjg42Z5xikNo5sdPuo=
+Received: by sphereful.davidgow.net (Postfix, from userid 119)
+	id E5AD41E78B6; Tue, 24 Feb 2026 17:01:32 +0800 (AWST)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=davidgow.net;
+	s=201606; t=1771923691;
+	bh=pty0p3EkgQsMv5GqCnhpOyx0EMZJ0zKmu+67M/tExE8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fNwipv6WKQoKAH3qAW1VgWlotPhOh0t6cMqzyD6DoT501nVeQXwe6ZgiE63OwBoUK
+	 xcyncTsZ51ymNreqaqMczKtuCSC9+AhWdsp0ql+nwu54HvG9ekv5pzpmI0SGTkqtvZ
+	 YcJJJUq420QzdXewAGcnBRUng+3+I4ytWTWZLHeJQnA8Xj3XC3GVU1hKPr/sDgbJbe
+	 ls07JJ9kfex+fBI4YK8wUI4gn7A+ACpEWhlRdyYuUSxNeTVvADd1iRM7BOgRxQ1QXC
+	 zQ0vv9/tpnMwEJ3x8RS+zm5L4FaYEA/wqQZ8WQvMx7yk9s2Gwf0M9/UpF5QwXNE68t
+	 TY0Pq9PnWobllMdGbUZCxVh88INHi+YBFUsJubwP6+MKVznfLUXPYMQHOEcBMhRZuQ
+	 MUlWbT/PC/F2R0o1hq9enC31RzqqoJRuEpFCxaacQb8zFHqCPPCQuyJVaruCalQmS6
+	 zVTmspdVK7gmVee9/uEiCn6Odd93EDHiIDy/TA2twKzZdatQ02HXUyszaYKIKT4XzA
+	 ZN1A/XcOjeYunz8im7COIJOdF9UtunKQc5xIEjUgJQscQvrwwAm4qGGibEdHoS4inM
+	 +PUr0BWha5zOnRCdtgJYulUjX58Wr1PLJ1MqFSbPQ2ldfi/gQdnuk0tvW7tdAw1rT6
+	 7TBIwPRifKCJkZgvOvXUz/uI=
+Received: from [IPV6:2001:8003:8824:9e00::744] (unknown [IPv6:2001:8003:8824:9e00::744])
+	by sphereful.davidgow.net (Postfix) with ESMTPSA id ABF171E778A;
+	Tue, 24 Feb 2026 17:01:30 +0800 (AWST)
+Message-ID: <75ea0056-605d-4f1c-ac49-76fb094744d1@davidgow.net>
+Date: Tue, 24 Feb 2026 17:01:27 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-META: 9xmyhhcgdmozckmn6yfrqrcxte8ryx4p
-X-MBO-RS-ID: 6c93f1b6d9c4844e3a5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] kunit: irq: Ensure timer doesn't fire too frequently
+To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+ "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, kunit-dev@googlegroups.com,
+ Brendan Higgins <brendan.higgins@linux.dev>, Rae Moar <raemoar63@gmail.com>,
+ stable@vger.kernel.org
+References: <20260224033751.97615-1-ebiggers@kernel.org>
+Content-Language: en-US
+From: David Gow <david@davidgow.net>
+In-Reply-To: <20260224033751.97615-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, 2026-02-24 at 16:21 +0800, Shawn Lin wrote:
-> =E5=9C=A8 2026/02/24 =E6=98=9F=E6=9C=9F=E4=BA=8C 15:47, Philipp Stanner =
-=E5=86=99=E9=81=93:
-> > On Tue, 2026-02-24 at 10:08 +0800, Shawn Lin wrote:
-> > > =E5=9C=A8 2026/02/24 =E6=98=9F=E6=9C=9F=E4=BA=8C 8:04, Jakub Kicinski=
- =E5=86=99=E9=81=93:
-> > > > On Mon, 23 Feb 2026 23:29:40 +0800 Shawn Lin wrote:
-> > > > > pcim_alloc_irq_vectors() and pcim_alloc_irq_vectors_affinity() ar=
-e created for
-> > > > > pci device drivers which rely on the devres machinery to help cle=
-anup the IRQ
-> > > > > vectors.
-> > > >=20
-> > > > If you can please add this API with just a few users, and then conv=
-ert
-> > > > remaining users via the subsystem trees in the next cycle.
-> > > > There's no need to risk wasting maintainer time on conflicts with
-> > > > conversions like this.
-> > >=20
-> > > Thanks for the suggestion, Jakub. I have little experience with
-> > > cross-subsystem cleanups like this, so your suggestion is very helpfu=
-l.
-> >=20
-> >=20
-> > When I removed the hybrid nature of pci_request_region() et al., I
-> > concluded that there were so few users that doing them all in one run
-> > was sufficient.
-> >=20
-> > For larger reworks, like removing pcim_iomap_table(), a slower step-by-
-> > step strategy is necessary for the reasons that Jakub details.
-> >=20
-> > It is then smart to omit an easy to port subsystem / driver for the
-> > ultimate patch series where one then removes the hybrid behavior from
-> > PCI itself, after porting the last driver.
-> >=20
-> > In general,=C2=A0 as Jakub details, those step-by-step cleanups are a b=
-it
-> > safer, since you can proof valid behavior early on and in case of an
-> > explosion they are very easy to revert.
-> >=20
->=20
-> Thank you, Philipp. I wish I had attended your talk at FOSDEM 2025 on
-> removing pcim_iomap_table earlier. This first version was perhaps a bit=
-=20
-> too aggressive.
+Le 24/02/2026 à 11:37, 'Eric Biggers' via KUnit Development a écrit :
+> Fix a bug where kunit_run_irq_test() could hang if the system is too
+> slow.  This was noticed with the crypto library tests in certain VMs.
+> 
+> Specifically, if kunit_irq_test_timer_func() and the associated hrtimer
+> code took over 5us to run, then the CPU would spend all its time
+> executing that code in hardirq context.  As a result, the task executing
+> kunit_run_irq_test() never had a chance to run, exit the loop, and
+> cancel the timer.
+> 
+> To fix it, make kunit_irq_test_timer_func() increase the timer interval
+> when the other contexts aren't having a chance to run.
+> 
+> Fixes: 950a81224e8b ("lib/crypto: tests: Add hash-test-template.h and gen-hash-testvecs.py")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
 
-No worries at all, it's very cool that you pick this work up!
+Looks good to me, thanks!
 
->  For v2, I think the plan should start with addressing
-> the switchtec and vmd drivers, since both of those, along with the new=
-=20
-> API additions, can be handled entirely within the PCI subsystem scope.
+Reviewed-by: David Gow <david@davidgow.net>
 
-Sounds reasonable to me.
+Cheers,
+-- David
 
-Regards
-Philipp
+> 
+> This patch applies to v7.0-rc1 and is targeting libcrypto-fixes
+> 
+>   include/kunit/run-in-irq-context.h | 44 +++++++++++++++++++-----------
+>   1 file changed, 28 insertions(+), 16 deletions(-)
+> 
+> diff --git a/include/kunit/run-in-irq-context.h b/include/kunit/run-in-irq-context.h
+> index c89b1b1b12dd5..bfe60d6cf28d8 100644
+> --- a/include/kunit/run-in-irq-context.h
+> +++ b/include/kunit/run-in-irq-context.h
+> @@ -10,36 +10,47 @@
+>   #include <kunit/test.h>
+>   #include <linux/timekeeping.h>
+>   #include <linux/hrtimer.h>
+>   #include <linux/workqueue.h>
+>   
+> -#define KUNIT_IRQ_TEST_HRTIMER_INTERVAL us_to_ktime(5)
+> -
+>   struct kunit_irq_test_state {
+>   	bool (*func)(void *test_specific_state);
+>   	void *test_specific_state;
+>   	bool task_func_reported_failure;
+>   	bool hardirq_func_reported_failure;
+>   	bool softirq_func_reported_failure;
+> +	atomic_t task_func_calls;
+>   	atomic_t hardirq_func_calls;
+>   	atomic_t softirq_func_calls;
+> +	ktime_t interval;
+>   	struct hrtimer timer;
+>   	struct work_struct bh_work;
+>   };
+>   
+>   static enum hrtimer_restart kunit_irq_test_timer_func(struct hrtimer *timer)
+>   {
+>   	struct kunit_irq_test_state *state =
+>   		container_of(timer, typeof(*state), timer);
+> +	int task_calls, hardirq_calls, softirq_calls;
+>   
+>   	WARN_ON_ONCE(!in_hardirq());
+> -	atomic_inc(&state->hardirq_func_calls);
+> +	task_calls = atomic_read(&state->task_func_calls);
+> +	hardirq_calls = atomic_inc_return(&state->hardirq_func_calls);
+> +	softirq_calls = atomic_read(&state->softirq_func_calls);
+> +
+> +	/*
+> +	 * If the timer is firing too often for the softirq or task to ever have
+> +	 * a chance to run, increase the timer interval.  This is needed on very
+> +	 * slow systems.
+> +	 */
+> +	if (hardirq_calls >= 20 && (softirq_calls == 0 || task_calls == 0))
+> +		state->interval = ktime_add_ns(state->interval, 250);
+>   
+>   	if (!state->func(state->test_specific_state))
+>   		state->hardirq_func_reported_failure = true;
+>   
+> -	hrtimer_forward_now(&state->timer, KUNIT_IRQ_TEST_HRTIMER_INTERVAL);
+> +	hrtimer_forward_now(&state->timer, state->interval);
+>   	queue_work(system_bh_wq, &state->bh_work);
+>   	return HRTIMER_RESTART;
+>   }
+>   
+>   static void kunit_irq_test_bh_work_func(struct work_struct *work)
+> @@ -84,14 +95,18 @@ static inline void kunit_run_irq_test(struct kunit *test, bool (*func)(void *),
+>   				      void *test_specific_state)
+>   {
+>   	struct kunit_irq_test_state state = {
+>   		.func = func,
+>   		.test_specific_state = test_specific_state,
+> +		/*
+> +		 * Start with a 5us timer interval.  If the system can't keep
+> +		 * up, kunit_irq_test_timer_func() will increase it.
+> +		 */
+> +		.interval = us_to_ktime(5),
+>   	};
+>   	unsigned long end_jiffies;
+> -	int hardirq_calls, softirq_calls;
+> -	bool allctx = false;
+> +	int task_calls, hardirq_calls, softirq_calls;
+>   
+>   	/*
+>   	 * Set up a hrtimer (the way we access hardirq context) and a work
+>   	 * struct for the BH workqueue (the way we access softirq context).
+>   	 */
+> @@ -102,25 +117,22 @@ static inline void kunit_run_irq_test(struct kunit *test, bool (*func)(void *),
+>   	/*
+>   	 * Run for up to max_iterations (including at least one task, softirq,
+>   	 * and hardirq), or 1 second, whichever comes first.
+>   	 */
+>   	end_jiffies = jiffies + HZ;
+> -	hrtimer_start(&state.timer, KUNIT_IRQ_TEST_HRTIMER_INTERVAL,
+> -		      HRTIMER_MODE_REL_HARD);
+> -	for (int task_calls = 0, calls = 0;
+> -	     ((calls < max_iterations) || !allctx) &&
+> -	     !time_after(jiffies, end_jiffies);
+> -	     task_calls++) {
+> +	hrtimer_start(&state.timer, state.interval, HRTIMER_MODE_REL_HARD);
+> +	do {
+>   		if (!func(test_specific_state))
+>   			state.task_func_reported_failure = true;
+>   
+> +		task_calls = atomic_inc_return(&state.task_func_calls);
+>   		hardirq_calls = atomic_read(&state.hardirq_func_calls);
+>   		softirq_calls = atomic_read(&state.softirq_func_calls);
+> -		calls = task_calls + hardirq_calls + softirq_calls;
+> -		allctx = (task_calls > 0) && (hardirq_calls > 0) &&
+> -			 (softirq_calls > 0);
+> -	}
+> +	} while ((task_calls + hardirq_calls + softirq_calls < max_iterations ||
+> +		  (task_calls == 0 || hardirq_calls == 0 ||
+> +		   softirq_calls == 0)) &&
+> +		 !time_after(jiffies, end_jiffies));
+>   
+>   	/* Cancel the timer and work. */
+>   	hrtimer_cancel(&state.timer);
+>   	flush_work(&state.bh_work);
+>   
+> 
+> base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+
