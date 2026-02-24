@@ -1,481 +1,226 @@
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11020114.outbound.protection.outlook.com [52.101.56.114])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA81025F988;
-	Tue, 24 Feb 2026 19:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.114
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771962091; cv=fail; b=uKbOLwtjTQ3DduXKBijk/4coA8PdgxCIdL4TsU4FbF0s5Z8Pp4Uk3VLHPIMitJZCL6YBIMgTaXrdnhayG0XxUNYvnGGTuHNyRD5eL9QrNFXSnsOPxJbeGTxpzC6gJYFN+08oNDSNm553HMS+DQsismMJqQfe3ckNsYBGYEWOnOk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771962091; c=relaxed/simple;
-	bh=/CnwovVZDJj1rHa6en0ePMDjJsvRs24jXfn3EuEKMLY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=j3j4Tpnx1gNMnJpowlDG3Nli4HXkq+9WOKX02dNNcxYMMPahASlEl+rb27TAZu8GBhYNoKwSa9wtWuHjoRxI0UDzSFsgxT30JaXtaOCk5jL8dEMpz2Yk8O5zNgnQBKtNTJrenJfHaGzQUsjhTFsqKTQWHg1xq+kBUHt865bFBQU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com; spf=pass smtp.mailfrom=hammerspace.com; dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b=MvfQsI1p; arc=fail smtp.client-ip=52.101.56.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hammerspace.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4664E2EA151
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Feb 2026 22:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771970509; cv=none; b=teSdsjU44TT3SIt6sHBtFXsBLQHuwCI4EWK0Iug0GVFT87L+EaHipYcUlnRiOZWUpyO4CMvpebCs02f/tJ6R7Uqo6MxCl75soN+FWO2jESTSm18Wmw7WN5CywlKqM8eR+zXKKTcrcm5CT1ffORJEgrMKnBjyCYybIcVT5Z6YusM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771970509; c=relaxed/simple;
+	bh=gNo+Luqh0EqEViTKORbAtKlxTP1njg8YqxJJycW7MHY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PvmGKUNg0T8z+BRZqseVC0VF525bbii5Nfke5cK29zJeyVrjlVnsxuRon0P+PL8GW7D4NohIkwEKz39oZGWDi0sMdxuxe/Y5NEDJox+CvPZH2aoek3+l6eNSebavcu11aQozCiEsrQFvi9K9VAv59v9ReCunX0oocBOjjF+JHUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K3wuEiZZ; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b="MvfQsI1p"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MBRipQSC17nhM4L7uUfjK/ruXillAqPBzukjc6Xw6fJa+J5vNnjWeGCin+X/KkH196tZIe906IRdj0Vei92L4FooqNCfQRrVNG/FhE5h8VB3Ls4YMUo/GA/YTomAS+kFTMIgRPsX+p5duqLxvfl/gk/hGbSMxWT+JMsK4zv8hb0Y2MCWysDQ5B9S50lHyT4cKbMnNBacuclUKk7wIoHnpPGNReLqt6n1/ntzdK6dYtMFiey/ZqIapzXuqb8mfc6L8isZbRZLx6wai/q2FwYV6onArN6G+3qIRJaTBWOnMxzcmig4UG1PHoOfV5iQ+JGtfUDeYsNR/HJvSYIXh5ZRbw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=COsXiNI4wktaGtpqMWTizMngqgsegvU/t+yLOTM8Qr4=;
- b=d4eVLEA4IqbZkBBngam1DcyUGGnii/hTsQMYlCiMgIzDIcykQT10GrQN8FsO+/qRwhwSjOHuoaOG5sEFgHHTLiOwtoPucH7cQt7Ge2AcmZowaM3didO2E12EEtC8rdyoJLRgGzjqjRKGQdMh6rHjABZ583T78LWdwcfGoR3JZ47Z8x/GGpLdqxNSS1okjBnGcCAxik1/1IZ1Fxf0TnYG+4XfutOlaMl0MDmM9+pLWdEZd7iG3t1u0kVG0TThpt7/UgKuJ4ZWyaCcBk6v7AGw9tKJH0e+ieshCZiep0de6AxDrgv7u/UFs3QIuq4uLYrCjurFu6uPD3x94FLF31ZTkQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hammerspace.com; dmarc=pass action=none
- header.from=hammerspace.com; dkim=pass header.d=hammerspace.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hammerspace.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=COsXiNI4wktaGtpqMWTizMngqgsegvU/t+yLOTM8Qr4=;
- b=MvfQsI1pMi+HJag6nXzxNTn0KoB+BjyaXGJSPf/IWVJFz3qejRgmroC/4E/N0rgyI64GGS1kcYEjn5c/1kmMmkgyTMummARyxlcLUq02TLGByKZ7drbOtEJBuK7+He9cypFFY512mviHeVBjAEOgkTmblfClCdC7hkR05aw/pWw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=hammerspace.com;
-Received: from DM8PR13MB5239.namprd13.prod.outlook.com (2603:10b6:5:314::5) by
- SJ0PR13MB5333.namprd13.prod.outlook.com (2603:10b6:a03:3d1::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Tue, 24 Feb
- 2026 19:41:23 +0000
-Received: from DM8PR13MB5239.namprd13.prod.outlook.com
- ([fe80::fa6e:7b5:d1ec:92f3]) by DM8PR13MB5239.namprd13.prod.outlook.com
- ([fe80::fa6e:7b5:d1ec:92f3%4]) with mapi id 15.20.9632.017; Tue, 24 Feb 2026
- 19:41:22 +0000
-From: Benjamin Coddington <bcodding@hammerspace.com>
-To: Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	NeilBrown <neil@brown.name>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Benjamin Coddington <bcodding@hammerspace.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Rick Macklem <rick.macklem@gmail.com>
-Cc: linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH v7 3/3] NFSD: Sign filehandles
-Date: Tue, 24 Feb 2026 14:41:16 -0500
-Message-ID: <6ca1559957e3ebe3a96ac9553df621305a4b33ea.1771961922.git.bcodding@hammerspace.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <cover.1771961922.git.bcodding@hammerspace.com>
-References: <cover.1771961922.git.bcodding@hammerspace.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BL1PR13CA0193.namprd13.prod.outlook.com
- (2603:10b6:208:2be::18) To DM8PR13MB5239.namprd13.prod.outlook.com
- (2603:10b6:5:314::5)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K3wuEiZZ"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-4362197d174so3849834f8f.3
+        for <linux-crypto@vger.kernel.org>; Tue, 24 Feb 2026 14:01:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771970507; x=1772575307; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mfa86fLMSPUVmW4YbSbkR35RBg4PgJbe2U1gOw3VAbE=;
+        b=K3wuEiZZVRsC8chXP2KkpIvkbyUpYDC663TV/a8fS8+QDOyACwYIdS4WR+h1JBP8pf
+         jmLJsztYYMUJlICUBHZiJSgE0cYwZp02sJmXjuWThcHww9iavjXM8YR6gV+AhL2NbKb8
+         bg6pSMD/5vNN0BgffIFkWrxX4VqbTgE3XDQlEKb1JbcuiAkmc/fSng/RITG2Q9CRkrS7
+         wSa+3v6Db8ec055NW2m3bPDnmY3kLw1UWedDBYc3kUsrmTDSSr8j7ZHgetmGfppZeuN3
+         +xe3yC/Tuq2Jvs/KH05vFSfpAS1fbYncn0OdwWudCIkcx2XevckZrsGrZWKK5Vm78zHE
+         A7Jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771970507; x=1772575307;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Mfa86fLMSPUVmW4YbSbkR35RBg4PgJbe2U1gOw3VAbE=;
+        b=fAotaetvzCBnwN3YLihNGxm6Qfh/K8xsV3B4mLSbJhCGCWTJZzNwodZFHwAh7Kxrtc
+         k5hVXJCAG6gFCKSZdgPT6UWyMEGO5vVG11MyKXTnGm08PiXkho4VaWC1hO9vEodgavq3
+         u1EeO5bs200zyw6rVgag438rC/25jK6zITvyTIZMjGr+FGG6OIouONGCkWmOCJmaQeV6
+         21eqSR74Ek32PkrrK9xwIVEAaB6kxfqfxHVV6WX5UEWdGag/82hZx0Kqd5QMdHdYGnVZ
+         WDcWPGnzHGjZc+pPVv/TWeHZbwMnZgEfgb+1i/8/zGKS+Vwyk53t3h9E9yXVsNNe4aFs
+         wPKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWqCr2pEvm5K0fU9G0qJ3H/B2JslvbWms5KgACZcBqbzCUQ0P82Z+AF7kSs6M7qqkK8uMpQiu9g1q4yY9c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy50XqfMbZuNb10o4owlHerxm4OWyLGAu0ubN/EUEZA9ZvVv89a
+	6wm7iRkX5l4mHTIACz3Lr0dvq/EGFdNxGc8UrmFjUkZuP19ihqvD9gCu
+X-Gm-Gg: ATEYQzyZz6LeB/8TorEbAB00n2nnKHpE4ZfzrkAXbnez5afwGl88Hh7WrsC+d1CaEOD
+	ln+oGCnqhO7+UF7x6SrnUGm7tkjP5zTvxsHp4AcNUwHsVezrrJT5LIGAeoyJABpEcqaRZ2dfdqF
+	bd6eMb+3uLToQz6RmvzL1RmrFOo20g4lP4x+O/pXc+YqpD7o9qdvZZEXu2Ft4JTwt507DClkmbd
+	RM/nifGYSckCe+HhPE7TAj9nI63lpPDUTBsLHghp18tcNoER57HfmDcHEkUA9pVIKUvJiB+hp7u
+	8HBKgv7sZ8+l88VplkOeQ/9josEdZWlcKHMOcCvYUigPlAbb6p3HkTVPhHJt8W0glHl27lQdAm4
+	wJqGvddryVxXsMqaaT6Zu25OlqyuCd9aCVQRVeV/iZo44pkLudGPN+4VvQiNQTSoDgZpBWo7qUb
+	fqNWhCP6W21k6jxjUdIW1/4RXjGfjI9Y8z32wQGFKPyEoaP566m2ZRuLxo+AiYPXiQLEr8w1lR9
+	nY=
+X-Received: by 2002:a05:6000:22c1:b0:435:a2f8:1534 with SMTP id ffacd0b85a97d-4396f181357mr23507281f8f.49.1771970506403;
+        Tue, 24 Feb 2026 14:01:46 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970d4c95dsm32330432f8f.33.2026.02.24.14.01.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Feb 2026 14:01:45 -0800 (PST)
+Date: Tue, 24 Feb 2026 22:01:44 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+ <davem@davemloft.net>, Suman Kumar Chakraborty
+ <suman.kumar.chakraborty@intel.com>, Vijay Sundar Selvamani
+ <vijay.sundar.selvamani@intel.com>, George Abraham P
+ <george.abraham.p@intel.com>, <qat-linux@intel.com>,
+ <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH next] crypto: qat - replace avg_array() with a better
+ function
+Message-ID: <20260224220144.231b17a5@pumpkin>
+In-Reply-To: <aZ3p2dQFDNOgyQVz@gcabiddu-mobl.ger.corp.intel.com>
+References: <20260206210940.315817-1-david.laight.linux@gmail.com>
+	<aZ3p2dQFDNOgyQVz@gcabiddu-mobl.ger.corp.intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR13MB5239:EE_|SJ0PR13MB5333:EE_
-X-MS-Office365-Filtering-Correlation-Id: e1a7e276-7543-41e9-5309-08de73dcb079
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|7142099003;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?hP8pxPmtOUJY8ArfD/987i8pp/aFtyC+qEaagA2nNP48QB4o6F6B7CS0Teas?=
- =?us-ascii?Q?iiufE79mWj15R5vi6/FERt/A1R6WlG/THvfW2DqFCL6G9fu/AjBRKfWbla0B?=
- =?us-ascii?Q?x24EV8dWnxPLXZlCjf6nVv+7L4R/Y4FE7W8U8FIFyJGKxcI5a9p3eGSRTFUa?=
- =?us-ascii?Q?5WPbbw0CewVeXkP+kB+dKOdoLn9dM5XiPg3+PUIDKkx5bTgBLXiAUdIk9kj8?=
- =?us-ascii?Q?u4E6Xg2pm0EuqXmhUuohNEAvgM4hruQhYPecWr59T30/TJirmudHaS5claBu?=
- =?us-ascii?Q?d57TgUvxtanrnalb6T2ejAfyqauVj+n8wf2mZUw2lUDBg7qCGp2J/ZHFxAfe?=
- =?us-ascii?Q?h+NANRN8pG0NCyQv13klFM+A6cG6enFA4r4an+ArPIsiVyuT4QCXTPUjV+Vg?=
- =?us-ascii?Q?blNgilUaNSfiLy2iGSdQe4Kc44oBdsA58gy7Cc08HpuMXLfDQnXJPKOFPZAm?=
- =?us-ascii?Q?W9IUqHw8EQgykafowvUZECeC5SoPeYTpQJU4eVG9op1H+hfLbsqzkVXSVsjt?=
- =?us-ascii?Q?/5Vf7yQutLvBETut9tUI+EFoBwqWMeBOCoiyepKO9Q4Bm/VKQLyvXlYuEbqh?=
- =?us-ascii?Q?jYMSexqpeBVTuCvfbkifft6swQjXWrhtj3oYTjOI9W//Hkk3KcSauRNzZ5VF?=
- =?us-ascii?Q?yBPz4CVrOs7bz8yMM7KIR4tG7Vw7Bf6iQhTH6BSTCim7cwBYvqXqxaPJpcEQ?=
- =?us-ascii?Q?pe8C+6Awy6KeGqlrH01eTZJETNP6L987lllCd83t5gBCVc2BS6hVLzQ5Q13p?=
- =?us-ascii?Q?fCcixIXoiddII//27cFPMxgdI80kIgDujMXZsfAhZIwWJK7RuGsvMvNUaN/g?=
- =?us-ascii?Q?xFQQ++4Ygvcplg3cX/EIJ0YAW9ivwtvtY/zSjZyXKvv9+IgPZA78fX2xfZ7I?=
- =?us-ascii?Q?ZjKewsGSsu2DstR0WhLOimf0l1y8v6fcsWW9aJliFMNNhVgJDA/ISYUwwp++?=
- =?us-ascii?Q?DIBBlq+oFLH1KuiLS0w1OJtdjpDQjtXBAFearJ7kFNluE6MapSCwfmjJl6bh?=
- =?us-ascii?Q?euqadesq5alLZJ47dprZ5H1l2bIPFIrglImYC1oB26qFFWIlgoN5cnOGqmwZ?=
- =?us-ascii?Q?2O3e4lG75aFargjxKpqgWN0RHb0TXoziUsi00YFHZXKGJqkriaivkRH3gPPq?=
- =?us-ascii?Q?Zjlf1QmKnFipYBESc2DB0H5jGCj9pQVRlgdIANNykcbvcUWEji8FBvpZ/hMW?=
- =?us-ascii?Q?GVZS4SU8D5F+gZ6wodn6vYKHkmm+LqnNuJeQKWUBbf5ZHSpWYU0+NUErIdOV?=
- =?us-ascii?Q?nwI8eWyVTp4VObWT3E8MUq3Xu8KyHt4sI4+ltkMbKcHja4vj0o8vEL5ABUek?=
- =?us-ascii?Q?qB4fQ+ZHbAOwKX5Izl9bjXM48pKiSUYpP6JaliEaVG12qYdODc3DI4zEFNen?=
- =?us-ascii?Q?LAPOX8/zlKqWJsA411usyhgLh/SmGYL3dJbDbTGH4vo+opqeXJAzGpPUo4an?=
- =?us-ascii?Q?8AvWEmvKnoILJm8Aotb2Fd9+uM+wu9Zt8fIxshUXREdsq6cqUwyExQZ9Nxr4?=
- =?us-ascii?Q?ZAd1wNK5KWDHa4B4zXPeusC585yql9QIuenJ?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR13MB5239.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(7142099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Lj1YfqZ+Uu1l8CAjeQURRmxGQ0SFilc+5h9S08VvhjSc/+xYiLo7btfNvRii?=
- =?us-ascii?Q?PA9U9rGp2D8jS4BMow0vDTEmkXvzDpy7iSssxk3Gef6fvp9gfqV6IS3Jw6qs?=
- =?us-ascii?Q?dMCnhd2/3VlQqzxiTyFxeflDShpBnvRhoXKKHKRdw9XivUpROO9gnQXElZBA?=
- =?us-ascii?Q?xRJD7klgsLxR30198T2pQeX5FuaqKfkb3MauUtkGuj/vtM0y+0q10qgjX+BE?=
- =?us-ascii?Q?qOpz5wDFzQOsHRKp+OUW9+nGhxoZcAj+XEuoT+PuOmz5sM+WGr5vb860rE+f?=
- =?us-ascii?Q?SyX6nEFkJK9nc0MJrvUttNTg361TAHkL2j3B2OyrFFfclgLIKx6FfLK0A/Re?=
- =?us-ascii?Q?ikFAv1dFtReqGU+MpzDLvhx0d0oVLgmTxC614xU6S/pRjedk1sU9i8e0DQZd?=
- =?us-ascii?Q?gayzreBTCwUUJXUEp9NEOniNnrbDpnsTDf+KeR9k+baR93Q5q14Hh9LN7qMm?=
- =?us-ascii?Q?wrqsgK4Ae/5robb2X5xjJ0sfC8tsmSvtdnqs/YwQLChjxkqdhImiACVr/Bes?=
- =?us-ascii?Q?C7rr5y35HS2nGoPZ8AY5VOEjt9yxdMoybKHlgoIGKUTQqBCGTyq18fl+1prg?=
- =?us-ascii?Q?/V910KhM4VXi/uMrR2EA7pQMX7GpbXzE31/ridEfv8wioERFY2Bvs6fGp/Us?=
- =?us-ascii?Q?YmMumCX5Cei378GEuyOKXL7GaPSgU1xphon/dpoomcyt+QA5uqWQi3JsMHPg?=
- =?us-ascii?Q?wfgQ+s5g62XjBpM9Iik2kbX/cMwlxrXJoeaoyoCI4nKnFugHP+vw1Wqux1v6?=
- =?us-ascii?Q?JkE4DN2nUU/vqdvC9WCGOkPsYPomEznXpiq20n09NfxLTJ7RbE6Bepn1bO9M?=
- =?us-ascii?Q?505x5DvZ1+LP6PjFpmreoG4tu6QHnpIKN1TH9z6NvwGLHjArHIA1bvDuhnA5?=
- =?us-ascii?Q?r3OJdoaLPDcOqZKHu97p7ajjd7bi/38wxfwK/1h8kk0d91uWO9qj//kC8S25?=
- =?us-ascii?Q?p4IL05qVKBNjGB0s7gzQ7lW7GaKJrwt+I+GqI0MKMNPS+sFFkKSAF3Pu8s3/?=
- =?us-ascii?Q?7H/TADtzK6WLDc0nN3JulyZo77d+SBM0LNg5N0Ab/JjV403aVvJGDgZ6ALMg?=
- =?us-ascii?Q?MtH9X1x6U2fQOot23ICGRYsuRZmv2l/4jlMU8NUskFnZU5lqz2F+HGSnw40z?=
- =?us-ascii?Q?Vx5Fy0B34vezvuNLvjfj742GesxB9UAnw7WgEeDZJXviX7qrFj5hwMwJvX7T?=
- =?us-ascii?Q?6E4jEWXYbpocG7xHeR0KClaK0tHL2ha0j4WBCdYvoD19+wiREhz/Rf/K3usH?=
- =?us-ascii?Q?1ipuwRR0TGHkrTSzK9ZNnwVFHWRkgi+fU2gckZfpcHfEkRxsGbLt35VoYGAL?=
- =?us-ascii?Q?OJno9njmX8qXA4ILa6b3ffsMdydNPeXimLpcvZpvV4bn59PnwtJajI950lTi?=
- =?us-ascii?Q?FoGFWlB93/s0zBJXxQqDncmi8/rdf9CVhae02xoe/72Yn0KMeeywOxjUh1d3?=
- =?us-ascii?Q?7ppFBE7weKfSi8jIvyV4LxjOg/rIBOCq+4lhWu1I1dVDjo/azNeBk31tCVcV?=
- =?us-ascii?Q?79OPnbiMoG35o/k3YPKdChnGFHLPRIIk/IyGKBbxy0ixqgGQbtkzYxfIjx7H?=
- =?us-ascii?Q?OG2n+T5Wyl3ZTNhqKsa69ntkEX0x4EYWwMBjghnm1nwJUgkF4Z0+z00PSwaL?=
- =?us-ascii?Q?pjZjHK81h9wgly7VLKFpBmzVJgSwvruy72pnhPvZoHfsQV61mKbfek5CPQc1?=
- =?us-ascii?Q?i1T/fPixirBqbiOl4JsZBgj/XpZhfQdMiYanZvsWmDGYuFGc2pmh017XHiRA?=
- =?us-ascii?Q?nXoWbgpWQICsV219v2KH7xXIrhNAYEo=3D?=
-X-OriginatorOrg: hammerspace.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1a7e276-7543-41e9-5309-08de73dcb079
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR13MB5239.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2026 19:41:22.5361
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0d4fed5c-3a70-46fe-9430-ece41741f59e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: r5Uehw2tJEMiV1vhct4da8fYD/qcGhsD5/35YzfqDoerYiYjIVljmNVN57xfMbi8BdgsFwKLJz1hEDqErhwb3IrFJZnRTRsJ3yqrY7rjubo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR13MB5333
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-NFS clients may bypass restrictive directory permissions by using
-open_by_handle() (or other available OS system call) to guess the
-filehandles for files below that directory.
+On Tue, 24 Feb 2026 18:11:37 +0000
+Giovanni Cabiddu <giovanni.cabiddu@intel.com> wrote:
 
-In order to harden knfsd servers against this attack, create a method to
-sign and verify filehandles using SipHash-2-4 as a MAC (Message
-Authentication Code).  According to
-https://cr.yp.to/siphash/siphash-20120918.pdf, SipHash can be used as a
-MAC, and our use of SipHash-2-4 provides a low 1 in 2^64 chance of forgery.
+> On Fri, Feb 06, 2026 at 09:09:40PM +0000, david.laight.linux@gmail.com wrote:
+> > From: David Laight <david.laight.linux@gmail.com>
+> > 
+> > avg_array() is defined as a 'type independant' #define.
+> > However the algorithm is only valid for unsigned types and the
+> > implementation is only valid for u64.
+> > All the callers pass temporary kmalloc() allocated arrays of u64.
+> > 
+> > Replace with a function that takes a pointer to a u64 array.
+> > 
+> > Change the implementation to sum the low and high 32bits of each
+> > value separately and then compute the average.  
+> Thanks David, this is a great optimization.
+> 
+> I also reviewed the algorithm and confirmed it is functionally equivalent
+> to the previous version. I tested it on a platform with QAT and it
+> behaves as expected.
+> 
+> Some minor comments below.
+> 
+> > This will be massively faster as it does two divisions rather than
+> > one for each element.  
+> NIT: probably not `massively faster` as the maximum value for len in the
+> current implementation is 4.
 
-Filehandles that have been signed cannot be tampered with, nor can
-clients reasonably guess correct filehandles and hashes that may exist in
-parts of the filesystem they cannot access due to directory permissions.
+It is still a lot faster - but probably not significant to system performance.
 
-Append the 8 byte SipHash to encoded filehandles for exports that have set
-the "sign_fh" export option.  Filehandles received from clients are
-verified by comparing the appended hash to the expected hash.  If the MAC
-does not match the server responds with NFS error _STALE.  If unsigned
-filehandles are received for an export with "sign_fh" they are rejected
-with NFS error _STALE.
+Actually if the max for len is 65536 you can do better (esp. for 32bit).
+Instead of splitting 32/32 split 48/16, then sum_lo needs only be u32.
 
-Signed-off-by: Benjamin Coddington <bcodding@hammerspace.com>
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
----
- Documentation/filesystems/nfs/exporting.rst |  85 +++++++++++++
- fs/nfsd/Kconfig                             |   2 +-
- fs/nfsd/nfsfh.c                             | 127 +++++++++++++++++++-
- fs/nfsd/trace.h                             |   1 +
- 4 files changed, 210 insertions(+), 5 deletions(-)
+giving:
 
-diff --git a/Documentation/filesystems/nfs/exporting.rst b/Documentation/filesystems/nfs/exporting.rst
-index a01d9b9b5bc3..4aa59b0bf253 100644
---- a/Documentation/filesystems/nfs/exporting.rst
-+++ b/Documentation/filesystems/nfs/exporting.rst
-@@ -206,3 +206,88 @@ following flags are defined:
-     all of an inode's dirty data on last close. Exports that behave this
-     way should set EXPORT_OP_FLUSH_ON_CLOSE so that NFSD knows to skip
-     waiting for writeback when closing such files.
-+
-+Signed Filehandles
-+------------------
-+
-+To protect against filehandle guessing attacks, the Linux NFS server can be
-+configured to sign filehandles with a Message Authentication Code (MAC).
-+
-+Standard NFS filehandles are often predictable. If an attacker can guess
-+a valid filehandle for a file they do not have permission to access via
-+directory traversal, they may be able to bypass path-based permissions
-+(though they still remain subject to inode-level permissions).
-+
-+Signed filehandles prevent this by appending a MAC to the filehandle
-+before it is sent to the client. Upon receiving a filehandle back from a
-+client, the server re-calculates the MAC using its internal key and
-+verifies it against the one provided. If the signatures do not match,
-+the server treats the filehandle as invalid (returning NFS[34]ERR_STALE).
-+
-+Note that signing filehandles provides integrity and authenticity but
-+not confidentiality. The contents of the filehandle remain visible to
-+the client; they simply cannot be forged or modified.
-+
-+Configuration
-+~~~~~~~~~~~~~
-+
-+To enable signed filehandles, the administrator must provide a signing
-+key to the kernel and enable the "sign_fh" export option.
-+
-+1. Providing a Key
-+   The signing key is managed via the nfsd netlink interface. This key
-+   is per-network-namespace and must be set before any exports using
-+   "sign_fh" become active.
-+
-+2. Export Options
-+   The feature is controlled on a per-export basis in /etc/exports:
-+
-+   sign_fh
-+     Enables signing for all filehandles generated under this export.
-+
-+   no_sign_fh
-+     (Default) Disables signing.
-+
-+Key Management and Rotation
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+The security of this mechanism relies entirely on the secrecy of the
-+signing key.
-+
-+Initial Setup:
-+  The key should be generated using a high-quality random source and
-+  loaded early in the boot process or during the nfs-server startup
-+  sequence.
-+
-+Changing Keys:
-+  If a key is changed while clients have active mounts, existing
-+  filehandles held by those clients will become invalid, resulting in
-+  "Stale file handle" errors on the client side.
-+
-+Safe Rotation:
-+  Currently, there is no mechanism for "graceful" key rotation
-+  (maintaining multiple valid keys). Changing the key is an atomic
-+  operation that immediately invalidates all previous signatures.
-+
-+Transitioning Exports
-+~~~~~~~~~~~~~~~~~~~~~
-+
-+When adding or removing the "sign_fh" flag from an active export, the
-+following behaviors should be expected:
-+
-++-------------------+---------------------------------------------------+
-+| Change            | Result for Existing Clients                       |
-++===================+===================================================+
-+| Adding sign_fh    | Clients holding unsigned filehandles will find    |
-+|                   | them rejected, as the server now expects a        |
-+|                   | signature.                                        |
-++-------------------+---------------------------------------------------+
-+| Removing sign_fh  | Clients holding signed filehandles will find them |
-+|                   | rejected, as the server now expects the           |
-+|                   | filehandle to end at its traditional boundary     |
-+|                   | without a MAC.                                    |
-++-------------------+---------------------------------------------------+
-+
-+Because filehandles are often cached persistently by clients, adding or
-+removing this option should generally be done during a scheduled maintenance
-+window involving a NFS client unmount/remount.
-diff --git a/fs/nfsd/Kconfig b/fs/nfsd/Kconfig
-index fc0e87eaa257..ffb76761d6a8 100644
---- a/fs/nfsd/Kconfig
-+++ b/fs/nfsd/Kconfig
-@@ -7,6 +7,7 @@ config NFSD
- 	select CRC32
- 	select CRYPTO_LIB_MD5 if NFSD_LEGACY_CLIENT_TRACKING
- 	select CRYPTO_LIB_SHA256 if NFSD_V4
-+	select CRYPTO # required by RPCSEC_GSS_KRB5 and signed filehandles
- 	select LOCKD
- 	select SUNRPC
- 	select EXPORTFS
-@@ -78,7 +79,6 @@ config NFSD_V4
- 	depends on NFSD && PROC_FS
- 	select FS_POSIX_ACL
- 	select RPCSEC_GSS_KRB5
--	select CRYPTO # required by RPCSEC_GSS_KRB5
- 	select GRACE_PERIOD
- 	select NFS_V4_2_SSC_HELPER if NFS_V4_2
- 	help
-diff --git a/fs/nfsd/nfsfh.c b/fs/nfsd/nfsfh.c
-index 68b629fbaaeb..383d04596627 100644
---- a/fs/nfsd/nfsfh.c
-+++ b/fs/nfsd/nfsfh.c
-@@ -11,6 +11,7 @@
- #include <linux/exportfs.h>
+{
+	u64 sum_hi = 0;
+	u32 sum_lo = 0;
+	size_t i;
+
+	for (i = 0; i < len; i++) {
+		sum_hi += array[i] >> 16;
+		sum_lo += array[i] & 0xffff;
+	}
+
+	sum_lo += do_div(sum_hi, len) << 16;
+
+	return (sum_hi << 16) + sum_lo / len;
+}
+
+OTOH aren't those values performance counts of some kind?
+Adding four of them together isn't going to wrap.
+
+> 
+> > Also removes some very pointless __unqual_scalar_typeof().
+> > They could be 'auto _x = 0 ? x + 0 : 0;' even if the types weren't fixed.
+> > 
+> > Only compile tested.
+> > 
+> > Signed-off-by: David Laight <david.laight.linux@gmail.com>
+> > ---
+> >  .../intel/qat/qat_common/adf_tl_debugfs.c     | 38 ++++++++-----------
+> >  1 file changed, 15 insertions(+), 23 deletions(-)
+> > 
+> > diff --git a/drivers/crypto/intel/qat/qat_common/adf_tl_debugfs.c b/drivers/crypto/intel/qat/qat_common/adf_tl_debugfs.c
+> > index b81f70576683..a084437a2631 100644
+> > --- a/drivers/crypto/intel/qat/qat_common/adf_tl_debugfs.c
+> > +++ b/drivers/crypto/intel/qat/qat_common/adf_tl_debugfs.c
+> > @@ -77,32 +77,24 @@ static int tl_collect_values_u64(struct adf_telemetry *telemetry,
+> >   * @len: Number of elements.
+> >   *
+> >   * This algorithm computes average of an array without running into overflow.
+> > + * (Provided len is less than 2 << 31.)  
+> Should this be 2^31 or 1 << 31?
+> Alternatively: `Provided len fits in u32`?
+
+Not sure why I wrote 2 << 31 :-)
+
+The condition is that sum_lo must not overflow.
+The worst case is all the low bits being 1.
+If len is 2^32 then sum_lo is then (2^32 - 1) * 2^32.
+The remainder from the sum_hi divide is shifted and added in,
+giving (2^32 - 1) * (2^32 + 1) which is what my maths teacher called a
+'cow and goat' - (cow + goat) * (cow - goat) = cow squared - goat squared,
+so then maximum for sum_lo is 2^64 - 1 which fits.
+Which means it should have been 'len <= 2^32'.
+
+	David
  
- #include <linux/sunrpc/svcauth_gss.h>
-+#include <crypto/utils.h>
- #include "nfsd.h"
- #include "vfs.h"
- #include "auth.h"
-@@ -140,6 +141,110 @@ static inline __be32 check_pseudo_root(struct dentry *dentry,
- 	return nfs_ok;
- }
- 
-+/* Size of a file handle MAC, in 4-octet words */
-+#define FH_MAC_WORDS (sizeof(__le64) / 4)
-+
-+static bool fh_append_mac(struct svc_fh *fhp, struct net *net)
-+{
-+	struct nfsd_net *nn = net_generic(net, nfsd_net_id);
-+	struct knfsd_fh *fh = &fhp->fh_handle;
-+	siphash_key_t *fh_key = nn->fh_key;
-+	__le64 hash;
-+
-+	if (!fh_key)
-+		goto out_no_key;
-+	if (fh->fh_size + sizeof(hash) > fhp->fh_maxsize)
-+		goto out_no_space;
-+
-+	hash = cpu_to_le64(siphash(&fh->fh_raw, fh->fh_size, fh_key));
-+	memcpy(&fh->fh_raw[fh->fh_size], &hash, sizeof(hash));
-+	fh->fh_size += sizeof(hash);
-+	return true;
-+
-+out_no_key:
-+	pr_warn_ratelimited("NFSD: unable to sign filehandles, fh_key not set.\n");
-+	return false;
-+
-+out_no_space:
-+	pr_warn_ratelimited("NFSD: unable to sign filehandles, fh_size %zu would be greater than fh_maxsize %d.\n",
-+			    fh->fh_size + sizeof(hash), fhp->fh_maxsize);
-+	return false;
-+}
-+
-+/*
-+ * Verify that the filehandle's MAC was hashed from this filehandle
-+ * given the server's fh_key:
-+ */
-+static bool fh_verify_mac(struct svc_fh *fhp, struct net *net)
-+{
-+	struct nfsd_net *nn = net_generic(net, nfsd_net_id);
-+	struct knfsd_fh *fh = &fhp->fh_handle;
-+	siphash_key_t *fh_key = nn->fh_key;
-+	__le64 hash;
-+
-+	if (!fh_key) {
-+		pr_warn_ratelimited("NFSD: unable to verify signed filehandles, fh_key not set.\n");
-+		return false;
-+	}
-+
-+	hash = cpu_to_le64(siphash(&fh->fh_raw, fh->fh_size - sizeof(hash),  fh_key));
-+	return crypto_memneq(&fh->fh_raw[fh->fh_size - sizeof(hash)],
-+					&hash, sizeof(hash)) == 0;
-+}
-+
-+/*
-+ * Append an 8-byte MAC to the filehandle hashed from the server's fh_key:
-+ */
-+#define FH_MAC_WORDS sizeof(__le64)/4
-+static bool fh_append_mac(struct svc_fh *fhp, struct net *net)
-+{
-+	struct nfsd_net *nn = net_generic(net, nfsd_net_id);
-+	struct knfsd_fh *fh = &fhp->fh_handle;
-+	siphash_key_t *fh_key = nn->fh_key;
-+	__le64 hash;
-+
-+	if (!(fhp->fh_export->ex_flags & NFSEXP_SIGN_FH))
-+		return true;
-+
-+	if (!fh_key) {
-+		pr_warn_ratelimited("NFSD: unable to sign filehandles, fh_key not set.\n");
-+		return false;
-+	}
-+
-+	if (fh->fh_size + sizeof(hash) > fhp->fh_maxsize) {
-+		pr_warn_ratelimited("NFSD: unable to sign filehandles, fh_size %d would be greater"
-+			" than fh_maxsize %d.\n", (int)(fh->fh_size + sizeof(hash)), fhp->fh_maxsize);
-+		return false;
-+	}
-+
-+	hash = cpu_to_le64(siphash(&fh->fh_raw, fh->fh_size, fh_key));
-+	memcpy(&fh->fh_raw[fh->fh_size], &hash, sizeof(hash));
-+	fh->fh_size += sizeof(hash);
-+
-+	return true;
-+}
-+
-+/*
-+ * Verify that the filehandle's MAC was hashed from this filehandle
-+ * given the server's fh_key:
-+ */
-+static bool fh_verify_mac(struct svc_fh *fhp, struct net *net)
-+{
-+	struct nfsd_net *nn = net_generic(net, nfsd_net_id);
-+	struct knfsd_fh *fh = &fhp->fh_handle;
-+	siphash_key_t *fh_key = nn->fh_key;
-+	__le64 hash;
-+
-+	if (!fh_key) {
-+		pr_warn_ratelimited("NFSD: unable to verify signed filehandles, fh_key not set.\n");
-+		return false;
-+	}
-+
-+	hash = cpu_to_le64(siphash(&fh->fh_raw, fh->fh_size - sizeof(hash),  fh_key));
-+	return crypto_memneq(&fh->fh_raw[fh->fh_size - sizeof(hash)],
-+					&hash, sizeof(hash)) == 0;
-+}
-+
- /*
-  * Use the given filehandle to look up the corresponding export and
-  * dentry.  On success, the results are used to set fh_export and
-@@ -236,13 +341,21 @@ static __be32 nfsd_set_fh_dentry(struct svc_rqst *rqstp, struct net *net,
- 	/*
- 	 * Look up the dentry using the NFS file handle.
- 	 */
--	error = nfserr_badhandle;
--
- 	fileid_type = fh->fh_fileid_type;
-+	error = nfserr_stale;
- 
--	if (fileid_type == FILEID_ROOT)
-+	if (fileid_type == FILEID_ROOT) {
-+		/* We don't sign or verify the root, no per-file identity */
- 		dentry = dget(exp->ex_path.dentry);
--	else {
-+	} else {
-+		if (exp->ex_flags & NFSEXP_SIGN_FH) {
-+			if (!fh_verify_mac(fhp, net)) {
-+				trace_nfsd_set_fh_dentry_badmac(rqstp, fhp, -ESTALE);
-+				goto out;
-+			}
-+			data_left -= FH_MAC_WORDS;
-+		}
-+
- 		dentry = exportfs_decode_fh_raw(exp->ex_path.mnt, fid,
- 						data_left, fileid_type, 0,
- 						nfsd_acceptable, exp);
-@@ -258,6 +371,8 @@ static __be32 nfsd_set_fh_dentry(struct svc_rqst *rqstp, struct net *net,
- 			}
- 		}
- 	}
-+
-+	error = nfserr_badhandle;
- 	if (dentry == NULL)
- 		goto out;
- 	if (IS_ERR(dentry)) {
-@@ -498,6 +613,10 @@ static void _fh_update(struct svc_fh *fhp, struct svc_export *exp,
- 		fhp->fh_handle.fh_fileid_type =
- 			fileid_type > 0 ? fileid_type : FILEID_INVALID;
- 		fhp->fh_handle.fh_size += maxsize * 4;
-+
-+		if (exp->ex_flags & NFSEXP_SIGN_FH)
-+			if (!fh_append_mac(fhp, exp->cd->net))
-+				fhp->fh_handle.fh_fileid_type = FILEID_INVALID;
- 	} else {
- 		fhp->fh_handle.fh_fileid_type = FILEID_ROOT;
- 	}
-diff --git a/fs/nfsd/trace.h b/fs/nfsd/trace.h
-index 185a998996a0..5ad38f50836d 100644
---- a/fs/nfsd/trace.h
-+++ b/fs/nfsd/trace.h
-@@ -373,6 +373,7 @@ DEFINE_EVENT_CONDITION(nfsd_fh_err_class, nfsd_##name,	\
- 
- DEFINE_NFSD_FH_ERR_EVENT(set_fh_dentry_badexport);
- DEFINE_NFSD_FH_ERR_EVENT(set_fh_dentry_badhandle);
-+DEFINE_NFSD_FH_ERR_EVENT(set_fh_dentry_badmac);
- 
- TRACE_EVENT(nfsd_exp_find_key,
- 	TP_PROTO(const struct svc_expkey *key,
--- 
-2.53.0
+
+> 
+> >   *
+> >   * Return: average of values.
+> >   */
+> > -#define avg_array(array, len) (				\
+> > -{							\
+> > -	typeof(&(array)[0]) _array = (array);		\
+> > -	__unqual_scalar_typeof(_array[0]) _x = 0;	\
+> > -	__unqual_scalar_typeof(_array[0]) _y = 0;	\
+> > -	__unqual_scalar_typeof(_array[0]) _a, _b;	\
+> > -	typeof(len) _len = (len);			\
+> > -	size_t _i;					\
+> > -							\
+> > -	for (_i = 0; _i < _len; _i++) {			\
+> > -		_a = _array[_i];			\
+> > -		_b = do_div(_a, _len);			\
+> > -		_x += _a;				\
+> > -		if (_y >= _len - _b) {			\
+> > -			_x++;				\
+> > -			_y -= _len - _b;		\
+> > -		} else {				\
+> > -			_y += _b;			\
+> > -		}					\
+> > -	}						\
+> > -	do_div(_y, _len);				\
+> > -	(_x + _y);					\
+> > -})
+> > +static u64 avg_array(const u64 *array, size_t len)  
+> Shall size_t len be u32 len?
+> 
+> > +{
+> > +	u64 sum_hi = 0, sum_lo = 0;
+> > +	size_t i;
+> > +
+> > +	for (i = 0; i < len; i++) {
+> > +		sum_hi += array[i] >> 32;
+> > +		sum_lo += (u32)array[i];
+> > +	}
+> > +
+> > +	sum_lo += (u64)do_div(sum_hi, len) << 32;
+> > +
+> > +	return (sum_hi << 32) + div_u64(sum_lo, len);
+> > +}
+> >  
+> >  /* Calculation function for simple counter. */
+> >  static int tl_calc_count(struct adf_telemetry *telemetry,  
+> 
+> Thanks,
+> 
 
