@@ -1,125 +1,175 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8973231ED81;
-	Wed, 25 Feb 2026 09:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FD338F238;
+	Wed, 25 Feb 2026 09:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772010017; cv=none; b=IuzpM/75OXc0/xjzXoiOnKcjygpzKhXj5l0GeYhNZ9veF7v936360fuAT2LG3I/kzjlwITE+1GGMvnKo0PTdtYuXa9J7PjqNAmGWYxGghd0NiFlyUGR3WhF3ygcnS14A8qNLN8zDvxULFeyoOuCKdQ+SA/hKsidr1Xw1P04DB2c=
+	t=1772013136; cv=none; b=IIglay5jaMRXP1LKywGCClqeAf7V2eIekbrIWnYh5JQyF4qJeYpjxfImLAmbKRzu4A+8Uh2mPizjP30ve3hVO3KJvGNtvmtj6b8MBCXtS3MXHc8aTIOY7irH6zPcAY7I+4CzyqZM8HVYOikFjuZw0Xxu1LLq5Z3MRaaGL8ZvpXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772010017; c=relaxed/simple;
-	bh=dVWfSmIUUjCFmllCvxIPPcCyTqDUd3G6LkkkZjx77F8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q0b8R1MORfh8YGa6dPR2wF77i00IH4QfYkKrdxhaIGIj2mMounAip0i/Nje2gwITdzVFCuXuvH/IW41Ffhgz3ITuwdxpr9kCGUYN03grG+yzX5orEcV5Q6dgUA1AWhZ2GscHk81pTbfgeFJl7LIzB20ckFaazPhwDWmeP7QOYPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oviQlUN1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772013136; c=relaxed/simple;
+	bh=64AR6GQw5wetkmyW2DX8vIhUpyQSLEYiMb7oLsS8C8k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b8Vgx0uaG9nnZCiM9kRf52zBAf2wGNyagUzMUQSowBHPZro9sJErDnKxduABOdtH2irVe8i3bBE4kHPlv5YIJ6Dyp0QDG2uLhOPwEV+VSULQn+pYt3Qz5uVDGtF86Zm4oulFDN4l4FKjDRtfWgGb2284TBI4hg3GdTjJvEamcP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cfWecix+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oviQlUN1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAEFAC19423;
-	Wed, 25 Feb 2026 09:00:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cfWecix+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03215C19422;
+	Wed, 25 Feb 2026 09:52:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772010017;
-	bh=dVWfSmIUUjCFmllCvxIPPcCyTqDUd3G6LkkkZjx77F8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=oviQlUN1s7efrUmOLqLUrhcagT7cAxAM/PGvBBciTItJev3mYYfh9c/LLN+HJEZD0
-	 Nq+zLuA2s/HG7WJUmuRfC+njerBHxNJmsC4AYARCBOgzXa13ufXDX00DtPFrTpZ9YT
-	 RD+XavJsrnyeMiOvgQG+jEHEyOvzA9wRN5FI98BF/iVZ9KpRR0mvKDCi0kqJzeID1v
-	 2fGi7N96NZGY/Lt75bg8f6llKEYjv7p12khjMQh43qaEt4KJ6ZZW5ygIyk8gGJ+5lO
-	 +HmCXbSybJLdLmJ/1SIWv52aRv0arEWDbECCXMVMpwEhB31GcJgoWmhIKgEFoVPVx/
-	 PenaBwRbec4+g==
-Message-ID: <f984c9a0-9ce2-49f9-927b-e69c26f69176@kernel.org>
-Date: Wed, 25 Feb 2026 10:00:12 +0100
+	s=k20201202; t=1772013135;
+	bh=64AR6GQw5wetkmyW2DX8vIhUpyQSLEYiMb7oLsS8C8k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cfWecix+zaTLA6BKRqcRNH9ciC29tn+9RbWqXvuSUijFdaUnA8pAtWUj5RjjvmvNK
+	 SCTGgCFHYkh6p03KgRFu9tiV89wFUrgnd/liBhO5G2vsQqXxXNS135GfVBhzM8dDiF
+	 yXZiJYM8Jy7T66v6zhNamyB6kPhz0YB1xEdRmn/hdiaCJ7DYhZ3uwTixzza6xJ8xNZ
+	 KqAl28FgiDnc7wTViNwrdUwp8YgCcHw10y+C+aEi3K0zILaUQ/rb665wmfRH3VLtci
+	 h1Ita/68wEbwIzptjBLB63SkNfgoKz6wSLlZAP8i/dUxlZWiqlHYfVb9TpsdPT2tvs
+	 x5FcwTl2PPGiw==
+Date: Wed, 25 Feb 2026 15:22:11 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: Bartosz Golaszewski <brgl@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Udit Tiwari <quic_utiwari@quicinc.com>,
+	Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
+	Md Sadre Alam <mdalam@qti.qualcomm.com>,
+	Dmitry Baryshkov <lumag@kernel.org>, dmaengine@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v9 03/11] dmaengine: qcom: bam_dma: implement support for
+ BAM locking
+Message-ID: <aZ7GS5W1VNNB2fLi@vaman>
+References: <CAMRc=Md6ucK-TAmtvWMmUGX1KuVE9Wj_z4i7_-Gc7YXP=Omtcw@mail.gmail.com>
+ <aVZh3hb32r1oVcwG@vaman>
+ <CAMRc=MePAVMZPju6rZsyQMir4CkQi+FEqbC++omQtVQC1rHBVg@mail.gmail.com>
+ <aVf5WUe9cAXZHxPJ@vaman>
+ <CAMRc=Mdaucen4=QACDAGMuwTR1L5224S0erfC0fA7yzVzMha_Q@mail.gmail.com>
+ <aWBndOfbtweRr0uS@vaman>
+ <CAMRc=McPz+W4GOCbNMx-tpSav3+wuUrLT2CF5FhoV5U29oiK6A@mail.gmail.com>
+ <ana2ugshqjicqscwpdgo6knv53n4zzuwqp376qil27spco5vwh@ck7wmplz52qs>
+ <CAMRc=MevcsQ+sWsERQzod-a9A+F8feoLnbBXSkZrUk4zBPYCSQ@mail.gmail.com>
+ <xuiiqsrj63rtg4onuu2vmohwu2b2sd3so5uzakdzuucmwqaufn@7xwecs4apayt>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 3/4] ufs: host: Add ICE clock scaling during UFS clock
- changes
-To: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Neeraj Soni <neeraj.soni@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-scsi@vger.kernel.org
-References: <20260219-enable-ufs-ice-clock-scaling-v6-0-0c5245117d45@oss.qualcomm.com>
- <20260219-enable-ufs-ice-clock-scaling-v6-3-0c5245117d45@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260219-enable-ufs-ice-clock-scaling-v6-3-0c5245117d45@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <xuiiqsrj63rtg4onuu2vmohwu2b2sd3so5uzakdzuucmwqaufn@7xwecs4apayt>
 
-On 19/02/2026 10:39, Abhinaba Rakshit wrote:
-> Implement ICE (Inline Crypto Engine) clock scaling in sync with
-> UFS controller clock scaling. This ensures that the ICE operates at
-> an appropriate frequency when the UFS clocks are scaled up or down,
-> improving performance and maintaining stability for crypto operations.
+On 19-02-26, 20:10, Manivannan Sadhasivam wrote:
+> On Thu, Feb 19, 2026 at 07:30:04AM -0600, Bartosz Golaszewski wrote:
+> > On Thu, 19 Feb 2026 13:12:09 +0100, Manivannan Sadhasivam
+> > <mani@kernel.org> said:
+> > > On Fri, Jan 09, 2026 at 03:15:38PM +0100, Bartosz Golaszewski wrote:
+> > >> On Fri, Jan 9, 2026 at 3:27 AM Vinod Koul <vkoul@kernel.org> wrote:
+> > >> >
+> > >> > >
+> > >> > > We need an API because we send a locking descriptor, then a regular
+> > >> > > descriptor (or descriptors) for the actual transaction(s) and then an
+> > >> > > unlocking descriptor. It's a thing the user of the DMA engine needs to
+> > >> > > decide on, not the DMA engine itself.
+> > >> >
+> > >> > I think downstream sends lock descriptor always. What is the harm in
+> > >> > doing that every time if we go down that path?
+> > >>
+> > >> No, in downstream it too depends on the user setting the right bits.
+> > >> Currently the only user of the BAM locking downstream is the NAND
+> > >> driver. I don't think the code where the crypto driver uses it is
+> > >> public yet.
+> > >>
+> > >> And yes, there is harm - it slightly impacts performance. For QCE it
+> > >> doesn't really matter as any users wanting to offload skcipher or SHA
+> > >> are better off using the Arm Crypto Extensions anyway as they are
+> > >> faster by an order of magnitude (!). It's also the default upstream,
+> > >> where the priorities are set such that the ARM CEs are preferred over
+> > >> the QCE. QCE however, is able to coordinate with the TrustZone and
+> > >> will be used to support the DRM use-cases.
+> > >>
+> > >> I prefer to avoid impacting any other users of BAM DMA.
+> > >>
+> > >
+> > > Sorry for jumping late. But I disagree with the argument that the client drivers
+> > > have to set the LOCK/UNLOCK bit. These bits are specific to BAM DMA IP for
+> > > serializing the command descriptors from multiple entities. So DMA clients like
+> > > Crypto/NAND have no business in setting this flag. It is the job of the BAM
+> > > dmaengine driver to set/unset it at the start and end of the descriptor chain.
+> > >
+> > 
+> > But what if a given client does not need locking? We don't want to enable it
+> > for everyone - as I explained before.
+> > 
 > 
-> Incase of OPP scaling is not supported by ICE, ensure to not prevent
-> devfreq for UFS, as ICE OPP-table is optional.
+> That's not going to hurt. AFAIK, enabling locking wouldn't cause any notable
+> performance overhead.
+
+I was always skeptical on this one. I had never seen why locking should
+be pushed to clients. As Bjorn said it leads to more mess than worth it.
+Thanks Mnai
+
 > 
-> Acked-by: Manivannan Sadhasivam <mani@kernel.org>
-> Signed-off-by: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
-> ---
->  drivers/ufs/host/ufs-qcom.c | 21 ++++++++++++++++++++-
+> > >> > Reg Dmitry question above, this is dma hw capability, how will client
+> > >> > know if it has to lock on older rev of hardware or not...?
+> > >> >
+> > >> > > Also: only the crypto engine needs it for now, not all the other users
+> > >> > > of the BAM engine.
+> > >> >
+> > >>
+> > >> Trying to set the lock/unlock bits will make
+> > >> dmaengine_desc_attach_metadata() fail if HW does not support it.
+> > >>
+> > >
+> > > The BAM dmaengine driver *must* know based on the IP version whether it supports
+> > > the LOCK/UNLOCK bits or not, not the client drivers. How can the client drivers
+> > > know about the BAM DMA IP capability?
 
+Lock bits are on the BAM DMA IP or client? Can we not add this
+capability to BAM driver and lock for IPs that support
 
-SCSI/UFS is not respecting subsystem boundaries, thus you must not
-combine multiple subsystem when targeting UFS.
+> > >
+> > 
+> > FYI: the current version of this is v10[1].
+> > 
+> > In it (and in this one too but let's discuss the current one) the BAM driver
+> > *does* know *based on IP version* whether is supports locking or not. The client
+> > requests a lock but this will fail if the BAM does not support it. The
+> > client does
+> > not check the BAM IP revision. So yes: it's the BAM driver that's in charge.
+> > 
+> 
+> This design looks flawed. The client *doesn't* know whether it needs locking or
+> not. If the BAM supports locking, it should enable it for all descriptors.
 
-Please split your patches.
+Ack
 
-Best regards,
-Krzysztof
+> 
+> > > For all these reasons, BAM driver should handle the locking mechanism internaly.
+> > > This will allow the client drivers to work without any modifications.
+> > >
+> > 
+> > Ok, I'm open to alternatives but please help me figure out the "hows": How do
+> > you tell the BAM driver that the client needs (or does not) locking?
+> 
+> As said above, BAM doesn't need to know. Locking is the hardware capability of
+> the BAM, not clients.
+> 
+> > How do
+> > you handle the case where we need to lock the BAM, send an arbitrary number
+> > of descriptors from the client and then unlock it? How can the BAM know *when*
+> > to lock/unlock?
+> > 
+> 
+> BAM driver has to perform lock during issue_pending() and unlock while reporting
+> the completion using vchan_cookie_complete().
+
+Sounds good to me, thanks Mani
+
+-- 
+~Vinod
