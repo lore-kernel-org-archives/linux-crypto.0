@@ -1,112 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com [34.218.115.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAD127A45C;
-	Wed, 25 Feb 2026 17:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874DC3921D1;
+	Wed, 25 Feb 2026 17:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.218.115.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772040592; cv=none; b=jo1SnG/nmFJGKX/8OOFuXQsNG6r2ZigX+CPlSjB2eJc8BIO4NRGfuWVYJH4NPzHj4/h+hyaesBcFURu1R8noIU2f+dcBDZZNFU6GxVXA/FeT89pLOWP1ZURdIDixnzhVsOtlaYVGFPDF7JC3Q5CbMZyQDPtl0G2xKxqngbAkYqM=
+	t=1772040964; cv=none; b=QpwVwK6sOLjgDIjvnQIP9XZxJe2+ZcF/yhzDvkmEIMPIU6LqfTNOF2wscgWzbamIA7qgeOTAR3FkzMgVfMjPJkjDPp5aENFSe4F94KV4IOuX9fZ2DbmzoZfoPEoUFOPJRN8q/p8JVarWrQwaek5fdoclvjxyZe/b9GNX5DW3I0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772040592; c=relaxed/simple;
-	bh=0NznGpQd9koR+NDgSzpNiwtG/d8wl3ltVnSIMUxgvZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kYEPPc/b2KPVxvlTvZrzTK4aBa/sOTeCl1zy5gA7pHd1SZQNSh3bA1c45Z+Nt4nzHzgdx9otrGQ61PfmRgBIx1tMTNJV45pi+h6/D9mX4n59nt/5n239qHF0gD9wyQ3qerqRLj6AADbLIoJHLv+lb0HFiecf0h4af6zk0Pp6Fe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wtg4b+wD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772040964; c=relaxed/simple;
+	bh=YRY5VNh5WJAQAaMILsab9VN7315yMrX1I852eDbxTtU=;
+	h=Subject:From:To:CC:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E9/TdFH7dqXiUKqSrFi+9rSa8Iyq1u8smQ6XHciIiesQRwuO8MrjfYWjJyG/BaR4sXvwfh1OSAscqOGz3jOIyX7fqOIkzM9F2HqULTXfesT0IAwqLFrH/7cChazvBdoL+nLA9V/EzYGl/q3VIi8uLcvxa4KW3Ra12RS/0opVjEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=hayY423g; arc=none smtp.client-ip=34.218.115.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wtg4b+wD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0A7EC116D0;
-	Wed, 25 Feb 2026 17:29:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772040592;
-	bh=0NznGpQd9koR+NDgSzpNiwtG/d8wl3ltVnSIMUxgvZI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Wtg4b+wDK4NGNGRmiAdPyJA/KjY9qWR/MOfihY1W6FP3CfdL3KaVHc80z2ccuYCjr
-	 BFlE3OhYPFV3+rFqBGW5jnSZUkiHGWOPPOYbH7RBivQFbDvwe7t8S1Zd0Q+CoOFQUE
-	 oIJXZTDifenMlGnyaURNp7wue6ka05mCmRPLe2nsgfjyPPj688AlipKTTrGzLKLbEY
-	 gyCYwq1z8xL3B062m/y+O2Q7t/CFqNVuQ4aSCci9y8mfAavTbNH/43Jt/MUvSHLTlF
-	 z5jK51B1mKBxva8gtaAvcWhzMLHlWMn8hQnUi08WKiePqDfq2pyDAX0kbzGrY7iYdH
-	 8IIa1hQR72WzQ==
-Date: Wed, 25 Feb 2026 10:29:49 -0700
-From: Tycho Andersen <tycho@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Ashish Kalra <ashish.kalra@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 2/4] selftests/kvm: check that SEV-ES VMs are allowed in
- SEV-SNP mode
-Message-ID: <aZ8xje-iM0_9ACie@tycho.pizza>
-References: <20260223162900.772669-1-tycho@kernel.org>
- <20260223162900.772669-3-tycho@kernel.org>
- <aZyCEBo07EHw2Prk@google.com>
- <aZyE4zvPtujZ4-6X@tycho.pizza>
- <aZyLIWtffvEnmtYh@google.com>
- <aZzQy7c8VqCaZ_fE@tycho.pizza>
- <aZ3ntHUPXNTNoyx2@google.com>
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="hayY423g"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1772040963; x=1803576963;
+  h=from:to:cc:date:message-id:in-reply-to:references:
+   mime-version:content-transfer-encoding:subject;
+  bh=YRY5VNh5WJAQAaMILsab9VN7315yMrX1I852eDbxTtU=;
+  b=hayY423gYfNpQdEb1njjsKucjYdX2eYQFzzawghxCT5tyolnzskmY8oN
+   ByZBzQ3Rwzzm/d5KIcioFPr4BAfbMEH2e5DhcAMn9OD3i2MkiRMl2Gn+F
+   ZbzxFKdxy5YhFFDVUU0+NBa7EqAUGDL3ZgnQdZyXNZKIsywI0VaIyFt9i
+   pCx/5a7sYyp/wpnVxENonNLA7x+L3KJnJ0zSaBNO/Wi19vmA9VHzSdEkO
+   WPCXlz2zOvVoYynbBLva4Omef6GZcemU6Lz0gjirxA5KLqHIkKw/yJ8Cc
+   Gd7E0GPeXQh6lrKxsn+So7Oo/eA+LI/OiCDNdk+t83WopYxZeL+UhSdWm
+   w==;
+X-CSE-ConnectionGUID: 8uhsIv4TQIe9EcUHkouJpQ==
+X-CSE-MsgGUID: ba3PhwdMSXS3IlmTrBGnTQ==
+X-IronPort-AV: E=Sophos;i="6.21,310,1763424000"; 
+   d="scan'208";a="13593227"
+Subject: RE: [PATCH 17/17] Add standalone crypto kernel module technical documentation
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 17:36:03 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [205.251.233.105:1793]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.86:2525] with esmtp (Farcaster)
+ id 93693ec8-671a-42a3-87bc-f5a3c251f9ed; Wed, 25 Feb 2026 17:36:02 +0000 (UTC)
+X-Farcaster-Flow-ID: 93693ec8-671a-42a3-87bc-f5a3c251f9ed
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Wed, 25 Feb 2026 17:36:00 +0000
+Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Wed, 25 Feb 2026 17:35:59 +0000
+From: Jay Wang <wanjay@amazon.com>
+To: <ebiggers@kernel.org>
+CC: <bp@alien8.de>, <catalin.marinas@arm.com>, <davem@davemloft.net>,
+	<herbert@gondor.apana.org.au>, <ilya.okomin@oracle.com>,
+	<jay.wang.upstream@gmail.com>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-crypto@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
+	<linux-modules@vger.kernel.org>, <mcgrof@kernel.org>, <mingo@redhat.com>,
+	<nathan@kernel.org>, <nsc@kernel.org>, <nstange@suse.de>,
+	<petr.pavlu@suse.com>, <tglx@kernel.org>, <vegard.nossum@oracle.com>,
+	<wanjay@amazon.com>, <will@kernel.org>, <x86@kernel.org>
+Date: Wed, 25 Feb 2026 17:35:45 +0000
+Message-ID: <20260225173551.8704-1-wanjay@amazon.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260225015517.GA162634@quark>
+References: <20260225015517.GA162634@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aZ3ntHUPXNTNoyx2@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Tue, Feb 24, 2026 at 10:02:28AM -0800, Sean Christopherson wrote:
-> Hmm, I like the idea of clearing supported_vm_types.  The wrinkle is that "legacy"
-> deployments that use KVM_SEV_INIT instead of KVM_SEV_INIT2 will use
-> KVM_X86_DEFAULT_VM, and probably won't check for SEV and SEV_ES VM types.
+Thanks to everyone who has taken the time to review and comment.
 
-Does that matter? If in the case of CiphertextHiding we would revoke
-KVM_X86_SEV_VM, users already couldn't start a VM anyway in the
-configuration.
+Based on the discussion so far, it seems the core question is whether this feature is appropriate for upstream at all, or whether it should remain entirely downstream.
 
-The firmware update is more tricky, but I don't think you can blame
-the kernel there...
+We’ve discussed this with a few folks, and to help clarify the discussion, let me outline what is actually required to use this approach and what the community would gain from upstreaming it:
 
-> Alternatively, or in addition to, we could clear X86_FEATURE_SEV_ES.  But clearing
-> SEV_ES while leaving X86_FEATURE_SEV_SNP makes me nervous.  KVM doesn't *currently*
-> check for any of those in kvm_cpu_caps, but that could change in the future.  And
-> it's somewhat misleading, e.g. because sev_snp_guest() expects sev_es_guest() to
-> be true.
-> 
-> Given that it doesn't make sense for KVM to actively prevent the admin from upgrading
-> the firmware, I think it's ok if KVM can't "gracefully" handle *every* case.  E.g.
-> even if KVM clears X86_FEATURE_SEV_ES, userspace could have cached that information
-> at system boot. 
-> 
-> > > Hrm, I think we also neglected to communicate when SEV and SEV-ES are effectively
-> > > unusable, e.g. due to CipherTextHiding, so maybe we can kill two birds with one
-> > > stone?  IIRC, we didn't bother enumerating the limitation with CipherTextHiding
-> > > because making SEV-ES unusable would require a deliberate act from the admin.
-> > 
-> > We know these parameters at module load time so we could unset the
-> > supported bit, but...
-> > 
-> > > "Update firmware" is also an deliberate act, but the side effect of SEV-ES being
-> > > disabled, not so much.
-> > 
-> > since this could be a runtime thing via DOWNLOAD_FIRMWARE_EX at some
-> > point, I guess we need a new RUNTIME_STATUS ioctl or similar. Then the
-> > question is: does it live in /dev/sev, or /dev/kvm?
-> 
-> Ugh.  Yeah, updating supported_vm_types definitely seems like the least-awful
-> option.
+1. Maintaining a crypto snapshot (for example, a source code snapshot used for streamlined FIPS re-validation processes such as NSRL).
+2. Maintaining the loadable crypto build infrastructure itself (i.e., this patch set).
 
-Since firmware update only happens on init right now, I think we can
-add a:
+For (1), since this requires maintaining a specific snapshot, we acknowledge that this is inherently a downstream responsibility. We are not expecting upstream to provide or guarantee a stable in-kernel API (to clarify, a stable ABI is not strictly required here, since the crypto module can be rebuilt against newer kernels and still benefit from FIPS through the shorter NSRL re-validation process of roughly 3 months, compared to the full 12–18 month certification cycle). The upstream crypto subsystem should continue evolving independently.
 
-    int sev_firmware_supported_vm_types();
+For (2), since this feature mainly serves as infrastructure and is of interest to multiple distributions, upstreaming it could help reduce the effort each distribution would otherwise spend maintaining similar infrastructure patches independently.
 
-that will do the feature detection from the ccp, and merge that with
-the results based on asid assignments during module init.
+We’d love to hear more thoughts on this. If the general consensus is that the downsides outweigh the benefits of merging this into mainline, we are happy to maintain it in a separate repository tracking the latest mainline and stable releases in order to keep the work publicly available.
 
-We'll eventually need some callback into KVM to say say "hey the
-firmware got updated here's a new list of vm types".
+Thanks again for taking the time to read and discuss this.
 
-Tycho
+Jay
