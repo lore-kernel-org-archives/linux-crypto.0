@@ -1,33 +1,60 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB843B8BBB;
-	Wed, 25 Feb 2026 14:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5E43AE703;
+	Wed, 25 Feb 2026 14:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772028744; cv=none; b=UsaOcmZ/8hlzN4mOO5SQLDPh4+P6lyjxb0Z7meGCYFk/KRPxUjryo8AfdPtYhPgkdzjayoK+Igup2TNDtQHrRtgOxe8DFNtgElm0w2GZb/CtqZEqplydhGXMBV3wSResUrw0tOSBlPhiY2/tsc/2p538ZxD2k3Fns1PoAJagbi0=
+	t=1772029573; cv=none; b=kS8WZddesmNT2yI2VuyVxp+Y+qWy/5Oyqvd7BfDk6rW/y4Ok1gakVfIQ+zFb/nIqx7khEAPVQWY2DVuTIK0/59q8aaOXHT8YhLrVSaymQ47MPfT3mWuF+p181OrJ5aeDtHM5Qaf3KqeB4NoUfbH83brXWu4AYuGcrraTwgTsNSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772028744; c=relaxed/simple;
-	bh=pdU85n01r+h484HehqiWqeN2j90rHSuo7tRp4OVFlBw=;
+	s=arc-20240116; t=1772029573; c=relaxed/simple;
+	bh=POFnvDRMDntoaKYYUzHLozgduV3d4+IdNOY4m5PKl4U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FaPcxC/GbI/CGNiRq/AtAIYmBQ0MPI1GiEaHsXR2pIKFQIhDu46Bf0SrgQMWICnMsuGks0NZXJTnKycQDVFcHRiRLyYgWHoEI3SpiWu+LAi9SGXDYaPogOoGfolGoP+QNgW7mrIVYl7OwL16Eu+Q23RqWe92qU/ly2paIHMqRRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rsxljzo9; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=mpuBSqRNjCqpvw75mx+27DC39Ho/31gJmtWZZAVdwpY2kZIq0vOOjXHSokGxIxm5UJYBEjrsWOpXNtRvZct+CK1fOflRNcXNDbmef4P/JcRmgS749V7IuaswcUIe8ZEBWw+mvD7qaFwbtVwnb5be01dv5Gs7kR43d3ln6oDyJrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jsNiwTj1; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rsxljzo9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 790C9C116D0;
-	Wed, 25 Feb 2026 14:12:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772028743;
-	bh=pdU85n01r+h484HehqiWqeN2j90rHSuo7tRp4OVFlBw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rsxljzo9GoQsgLIQtCdfEXHb1LyV7a1dnVv4jjxAoHGoQ0PVHZLvpK46LcpTA2Xnr
-	 wdse6YjuJnbiFy3IyGjRUesDSb7TrnFRvH4pDdjmK8T05JorbLzuPJFiPHJ4vSRN5D
-	 5ROkVTKNrXs/NNrwITYCPZhqSfUXF3Jw0neaKOveOGM8BK78Md/bfW9yRunFrqz0Zd
-	 rlZfY7VXgsCj2yyS9lntLf/UY0SnRLfYpVxGOrJQbm5EA8Jbn3AreHVZLjk0EveK18
-	 Zgcjc0zX4JmN07TT+kIq590mbgNrsVp6klbBKXR5t2BQCSyYvuPb0TX5lJT7kKo1Y+
-	 RSeIXbZ3bdA3w==
-Message-ID: <784d5711-3f3a-48af-ab1b-9a8834249445@kernel.org>
-Date: Wed, 25 Feb 2026 15:12:18 +0100
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jsNiwTj1"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61PCEjjX2347293;
+	Wed, 25 Feb 2026 14:25:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=SHMqjR
+	5JS4nc3Prvtwcb2C6pncruxyqQAeH0T5Ewzhc=; b=jsNiwTj1A5DYsXEXoJqQA+
+	0TkBYk8v4ot1xoL3Bwy4ILnhsF88j1eSNeasaj7/PbWXz+Rnl6C1t9ZSwEdBywWg
+	JgOfwI3RJ/oWs/RKCGbZG5tr5Bf/tt6aJQKBcE9NeK+xfn3mLq0Hc+3HvgxHzNmV
+	Q39bihEexZoJBf1/yTVB5GSmjtQZcBkKNVInTo13tLucZ8oOruJw88LmIm1E8UJN
+	+cvUJUgOzhguOCNKvqXjvZH4Jatk79gbeiCNrg+cbWIEY1YZzyMHkgK1rx7qHkf/
+	qBQAq005yfS4e3yda9rUZvRmEpUNOI1KoduOTuHOULaoSH7fLhdWQBKV1/3IFq7w
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ch858p0s0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Feb 2026 14:25:46 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61PDp8Si027794;
+	Wed, 25 Feb 2026 14:25:45 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cfsr1wcej-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Feb 2026 14:25:45 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61PEPiLj30999090
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 25 Feb 2026 14:25:44 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9AA9958059;
+	Wed, 25 Feb 2026 14:25:44 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B9F0558063;
+	Wed, 25 Feb 2026 14:25:43 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 25 Feb 2026 14:25:43 +0000 (GMT)
+Message-ID: <ee36981d-d658-4296-9acb-874c72606b3e@linux.ibm.com>
+Date: Wed, 25 Feb 2026 09:25:43 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,101 +62,84 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 3/4] ufs: host: Add ICE clock scaling during UFS clock
- changes
-To: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Neeraj Soni <neeraj.soni@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org,
- linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20260219-enable-ufs-ice-clock-scaling-v6-0-0c5245117d45@oss.qualcomm.com>
- <20260219-enable-ufs-ice-clock-scaling-v6-3-0c5245117d45@oss.qualcomm.com>
- <f984c9a0-9ce2-49f9-927b-e69c26f69176@kernel.org>
- <aZ7x7gG0OZEQSKVy@hu-arakshit-hyd.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: IMA and PQC
+To: Coiby Xu <coxu@redhat.com>,
+        =?UTF-8?Q?Johannes_Wiesb=C3=B6ck?= <johannes.wiesboeck@aisec.fraunhofer.de>
+Cc: dhowells@redhat.com, dmitry.kasatkin@gmail.com, ebiggers@kernel.org,
+        eric.snowberg@oracle.com, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
+        roberto.sassu@huawei.com, simo@redhat.com, zohar@linux.ibm.com,
+        michael.weiss@aisec.fraunhofer.de
+References: <aXrKaTem9nnWNuGV@Rk>
+ <20260130203126.662082-1-johannes.wiesboeck@aisec.fraunhofer.de>
+ <aYHznG6vbptVOjHQ@Rk>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <aZ7x7gG0OZEQSKVy@hu-arakshit-hyd.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <aYHznG6vbptVOjHQ@Rk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI1MDEzNSBTYWx0ZWRfX3qP5/QR4NiU0
+ GOqGnNq7OdR6+Ew1H+Du8EZdvcu3XXvpqnjEgNAZOC5+zqjVH1bB6TOMKI753jx9CE4m7sbsGMJ
+ JCiR9f2di7zqlSf1n1bNe0JyN6R0y7SQM4fu6Jz/q3fBMhxh5MqMVIPeMXLF5tNc+INOrewy31B
+ IcvAZ8sK+vkSS8VYWhMBuLb4VpEQhWQ+TEiu/9GKn5JjBincwgzgDCk3a1ir09xfmGqTL/Q6OIo
+ 3YFKUEckgUnAFInxMCm/8Xt/+23R0ZmVXrut7aldZnp4u3tlNRJR0kyz54WSNCQhnE2XTJ3uDUt
+ ei0IzhDuYrxEjdLXe2gpIsv64EGlWXZNuAtdfvJlPF9ks2bY1zhu/eTqDSq6eAhxhVK+iS6KCDW
+ PSR+3/7xvNNs5cNDRCCtBX0XxBllt0uXCLoCQSHmHEbj34VVi8qCuxWcZfDsyx6vGnSHty2wsTo
+ FwLd8a+eDi/0WjgiUjA==
+X-Proofpoint-GUID: NgaRPDtkcA5qlnwKN1z91muvBPFRyMN8
+X-Authority-Analysis: v=2.4 cv=S4HUAYsP c=1 sm=1 tr=0 ts=699f066a cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=20KFwNOVAAAA:8
+ a=8AN272uGgGVaRbb4kAAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: a5T0_K3QU7mjD237BGpEkprt9BYz8mkj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-25_01,2026-02-25_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 clxscore=1011 impostorscore=0 malwarescore=0 bulkscore=0
+ phishscore=0 adultscore=0 lowpriorityscore=0 spamscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602250135
 
-On 25/02/2026 13:58, Abhinaba Rakshit wrote:
-> On Wed, Feb 25, 2026 at 10:00:12AM +0100, Krzysztof Kozlowski wrote:
->> On 19/02/2026 10:39, Abhinaba Rakshit wrote:
->>> Implement ICE (Inline Crypto Engine) clock scaling in sync with
->>> UFS controller clock scaling. This ensures that the ICE operates at
->>> an appropriate frequency when the UFS clocks are scaled up or down,
->>> improving performance and maintaining stability for crypto operations.
->>>
->>> Incase of OPP scaling is not supported by ICE, ensure to not prevent
->>> devfreq for UFS, as ICE OPP-table is optional.
->>>
->>> Acked-by: Manivannan Sadhasivam <mani@kernel.org>
->>> Signed-off-by: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
->>> ---
->>>  drivers/ufs/host/ufs-qcom.c | 21 ++++++++++++++++++++-
->>
->>
->> SCSI/UFS is not respecting subsystem boundaries, thus you must not
->> combine multiple subsystem when targeting UFS.
->>
->> Please split your patches.
+
+
+On 2/3/26 8:32 AM, Coiby Xu wrote:
+> On Fri, Jan 30, 2026 at 09:31:26PM +0100, Johannes Wiesböck wrote:
+>> Hi all,
 > 
-> Sorry, if I fail to understand the context here.
-> This patch-series is already split into 4 patches based on the subsystem.
+> Hi Johannes,
+> 
+>>
+>> we conducted an evaluation regarding PQC use in IMA last year (see [1] 
+>> for all
+>> details) where we also considered the interplay of different PQC 
+>> signatures and
+>> file systems (ext4, btrfs, XFS, f2fs).
+> 
+> Thanks for sharing this comprehensive study! There are many nuances in
+> this research paper!
+> 
+>>
+>> Coiby Xu <coxu@redhat.com> wrote:
+>>
+>>> According to my experiments done so far, for verification speed,
+>>> ML-DSA-65 is consistently faster than ECDSA P-384 which is used by
+>>> current CentOS/RHEL to sign files in a package.
+>>
+>> Regarding performance, similar to Coiby, we found that all variants of 
+>> ML-DSA
+>> consistently outperformed ECDSA P-256.
+> 
+> Glad to know ML-DSA is also faster than ECDSA P-256!
 
-s/patches/patchset/
-Please split the patchset to not combine independent patches targeting
-different subsystem into one patchset.
+To avoid duplicate work: Is either one of you planning on writing 
+patches for IMA to use ML-DSA and convert the current ML-DSA to also 
+support HashML? I had done the work on this before and could dig out the 
+patches again...
 
-Best regards,
-Krzysztof
+    Stefan
+
