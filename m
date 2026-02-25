@@ -1,38 +1,38 @@
 Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552C1310620
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Feb 2026 21:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228BC301717
+	for <linux-crypto@vger.kernel.org>; Wed, 25 Feb 2026 21:21:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772054449; cv=none; b=FJkOrU45lI8CH9frgUJ4wtxZbBXgkwqDiH8pzKMEaQAixUjNk5g3Rf3SArfjLtoAyN/Ss9gNcHqYvoHRuDNc1sEypxW4L8yoCIdqjnikrzfAfcNqsblTnIwEV90GA9+TtD101yEoKO4fJD/AFNjKplXs5QInX7ySqfL0Z3fJIGc=
+	t=1772054470; cv=none; b=ZVCNKNGc8Lz1P+DlWDnIpMwbwq/Gy0VdRD3ctjWsp6sgOtNGiD88kfyxZEukNpjDQg5JuDG6EzDQ2HCYuZL087uJp7ZHgN7ddWn0N+4wZqm5pLWa+lWQTq3XpKD92nLtfke2Ev8ssSENsQn5Nx/JKQ4gI1B//h/5dV/7i/B6a0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772054449; c=relaxed/simple;
-	bh=XXzq6DeQXGa9+ohMsE0/gCIoQUDeXXt9J0/hhrubkCw=;
+	s=arc-20240116; t=1772054470; c=relaxed/simple;
+	bh=q8wdPMPb2RN2csnEeuqVOnvMtvqW/FaKnFEDkkE5AyA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S/k1HiLxgon6F/PP5GRIS39DWhWuaoCLdsI+SO/Z1GCfqjlZB4JpFz7+WWOWyVXYmyTsGItkYalfg4nCKWuNVebReo62/oLJRURf0Y0gQvPljQBhHzixA72eyC4sm5QXDOJCAdWR1bODhcoDSVkj3iwTuVVXjXJ3f93yOGtKAyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=FXPyhc1v; arc=none smtp.client-ip=198.37.111.173
+	 MIME-Version; b=MKlVZaribpsaIKngBMtqidXO+8gnFiQZzFgr56hf8Uf2ZTkGSBUf1c2UdwxYAtOufRUcIplMHOBiYfKwNJVZKSoLtqsTX9emoMkZhXojX/JpMJrcALNnUZKkSwHIKFREm0l1kvuIoEXl9KhF80xH5VPeo1qZbu+5WW10v3JoAAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=j+rI3UH9; arc=none smtp.client-ip=198.37.111.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="FXPyhc1v"
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="j+rI3UH9"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1772054446;
-	bh=XXzq6DeQXGa9+ohMsE0/gCIoQUDeXXt9J0/hhrubkCw=;
+	d=hansenpartnership.com; s=20151216; t=1772054468;
+	bh=q8wdPMPb2RN2csnEeuqVOnvMtvqW/FaKnFEDkkE5AyA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:From;
-	b=FXPyhc1vC3WaqSB+q0VJk90PigmPQpErSRVzaG+v7T9NFSqONUhynfIUyIqDHqcTC
-	 e7UFSarkeHz3XJjc3xlAyKrfGvG+YSq8VJfFvK1nA13RDDU2NV5xpwHkO05WEX2TVL
-	 QMSNc4l9hssGo/LrBquvM9qckDN6CdOCJPGJBJ+k=
+	b=j+rI3UH9mc8GLcUUMPyIJBu/oN07XknA/hG7RrJmTVY+TQamZbqwjFtV87n2oQOMT
+	 DFDua309WwgMhOyRkZmuHa3crisbxJLETU08ZG1rXS+3HuLg3unuCFPZYG8kFL1ELb
+	 8pz1UYb8C5yXCtKbAO8JgxP3jU9GocWxmRQMEC+0=
 Received: from lingrow.int.hansenpartnership.com (unknown [153.66.160.227])
-	by lamorak.hansenpartnership.com (Postfix) with ESMTP id 246331C02E8;
-	Wed, 25 Feb 2026 16:20:46 -0500 (EST)
+	by lamorak.hansenpartnership.com (Postfix) with ESMTP id 19F161C02E8;
+	Wed, 25 Feb 2026 16:21:08 -0500 (EST)
 From: James Bottomley <James.Bottomley@HansenPartnership.com>
 To: linux-crypto@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
 	Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-Subject: [PATCH v3 2/5] crypto: pkcs7: add flag for validated trust on a signed info block
-Date: Wed, 25 Feb 2026 16:19:04 -0500
-Message-ID: <20260225211907.7368-3-James.Bottomley@HansenPartnership.com>
+Subject: [PATCH v3 3/5] crypto: pkcs7: allow pkcs7_digest() to be called from pkcs7_trust
+Date: Wed, 25 Feb 2026 16:19:05 -0500
+Message-ID: <20260225211907.7368-4-James.Bottomley@HansenPartnership.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260225211907.7368-1-James.Bottomley@HansenPartnership.com>
 References: <20260225211907.7368-1-James.Bottomley@HansenPartnership.com>
@@ -44,41 +44,92 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow consumers of struct pkcs7_message to tell if any of the sinfo
-fields has passed a trust validation.  Note that this does not happen
-in parsing, pkcs7_validate_trust() must be explicitly called or called
-via validate_pkcs7_trust().
+Trying to run pkcs7_validate_trust() on something that parsed
+correctly but is not verified doesn't work because the signature
+digest hasn't been calculated.  Fix this by adding a digest calclation
+in to pkcs7_validate_one().  This is almost a nop if the digest exists.
+
+Additionally, the trust validation doesn't know the data payload, so
+adjust the digest calculator to skip checking the data digest if
+pkcs7->data is NULL.  A check is added in pkcs7_verify() for
+pkcs7->data being null (returning -EBADMSG) to guard against someone
+forgetting to supply data and getting an invalid success return.
 
 Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership.com>
 ---
- crypto/asymmetric_keys/pkcs7_parser.h | 1 +
- crypto/asymmetric_keys/pkcs7_trust.c  | 1 +
- 2 files changed, 2 insertions(+)
+ crypto/asymmetric_keys/pkcs7_parser.h |  3 +++
+ crypto/asymmetric_keys/pkcs7_trust.c  |  8 ++++++++
+ crypto/asymmetric_keys/pkcs7_verify.c | 13 +++++++++----
+ 3 files changed, 20 insertions(+), 4 deletions(-)
 
 diff --git a/crypto/asymmetric_keys/pkcs7_parser.h b/crypto/asymmetric_keys/pkcs7_parser.h
-index 6ef9f335bb17..203062a33def 100644
+index 203062a33def..cbe823aeac06 100644
 --- a/crypto/asymmetric_keys/pkcs7_parser.h
 +++ b/crypto/asymmetric_keys/pkcs7_parser.h
-@@ -20,6 +20,7 @@ struct pkcs7_signed_info {
- 	unsigned	index;
- 	bool		unsupported_crypto;	/* T if not usable due to missing crypto */
- 	bool		blacklisted;
-+	bool		verified; /* T if this signer has validated trust */
- 
- 	/* Message digest - the digest of the Content Data (or NULL) */
- 	const void	*msgdigest;
+@@ -66,3 +66,6 @@ struct pkcs7_message {
+ 	size_t		data_hdrlen;	/* Length of Data ASN.1 header */
+ 	const void	*data;		/* Content Data (or 0) */
+ };
++
++int pkcs7_digest(struct pkcs7_message *pkcs7,
++		 struct pkcs7_signed_info *sinfo);
 diff --git a/crypto/asymmetric_keys/pkcs7_trust.c b/crypto/asymmetric_keys/pkcs7_trust.c
-index 9a87c34ed173..78ebfb6373b6 100644
+index 78ebfb6373b6..7cb0a6bc7b32 100644
 --- a/crypto/asymmetric_keys/pkcs7_trust.c
 +++ b/crypto/asymmetric_keys/pkcs7_trust.c
-@@ -127,6 +127,7 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
- 		for (p = sinfo->signer; p != x509; p = p->signer)
- 			p->verified = true;
+@@ -30,6 +30,14 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
+ 
+ 	kenter(",%u,", sinfo->index);
+ 
++	/*
++	 * if we're being called immediately after parse, the
++	 * signature won't have a calculated digest yet, so calculate
++	 * one.  This function returns immediately if a digest has
++	 * already been calculated
++	 */
++	pkcs7_digest(pkcs7, sinfo);
++
+ 	if (sinfo->unsupported_crypto) {
+ 		kleave(" = -ENOPKG [cached]");
+ 		return -ENOPKG;
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index 474e2c1ae21b..3080f0ec52e0 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -19,8 +19,8 @@
+ /*
+  * Digest the relevant parts of the PKCS#7 data
+  */
+-static int pkcs7_digest(struct pkcs7_message *pkcs7,
+-			struct pkcs7_signed_info *sinfo)
++int pkcs7_digest(struct pkcs7_message *pkcs7,
++		 struct pkcs7_signed_info *sinfo)
+ {
+ 	struct public_key_signature *sig = sinfo->sig;
+ 	struct crypto_shash *tfm;
+@@ -93,8 +93,8 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
+ 			goto error;
+ 		}
+ 
+-		if (memcmp(sig->m, sinfo->msgdigest,
+-			   sinfo->msgdigest_len) != 0) {
++		if (pkcs7->data && memcmp(sig->m, sinfo->msgdigest,
++					  sinfo->msgdigest_len) != 0) {
+ 			pr_warn("Sig %u: Message digest doesn't match\n",
+ 				sinfo->index);
+ 			ret = -EKEYREJECTED;
+@@ -463,6 +463,11 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
+ 		return -EINVAL;
  	}
-+	sinfo->verified = true;
- 	kleave(" = 0");
- 	return 0;
- }
+ 
++	if (!pkcs7->data) {
++		pr_warn("Data not supplied to verify operation\n");
++		return -EBADMSG;
++	}
++
+ 	for (sinfo = pkcs7->signed_infos; sinfo; sinfo = sinfo->next) {
+ 		ret = pkcs7_verify_one(pkcs7, sinfo);
+ 		if (sinfo->blacklisted) {
 -- 
 2.51.0
 
