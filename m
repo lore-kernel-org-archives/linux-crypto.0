@@ -1,145 +1,84 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5E43AE703;
-	Wed, 25 Feb 2026 14:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18093D3D02;
+	Wed, 25 Feb 2026 15:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772029573; cv=none; b=kS8WZddesmNT2yI2VuyVxp+Y+qWy/5Oyqvd7BfDk6rW/y4Ok1gakVfIQ+zFb/nIqx7khEAPVQWY2DVuTIK0/59q8aaOXHT8YhLrVSaymQ47MPfT3mWuF+p181OrJ5aeDtHM5Qaf3KqeB4NoUfbH83brXWu4AYuGcrraTwgTsNSw=
+	t=1772032832; cv=none; b=KR0Vnbp8d+TM0oy8yS6ZwGvXEpF1/ToybXmsuykIi8Hg/KRyGhvIAKM+uzO7KnhArl5MxAYgdRhQBt/n60gTNIwcOoHHpOr8T5m4NukWS5SdFcZUjgsRBiwm8Op4WYHaN0315RvT6/AwuXKqka9Wf27EzdGGOYnZpfbHhdeUXcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772029573; c=relaxed/simple;
-	bh=POFnvDRMDntoaKYYUzHLozgduV3d4+IdNOY4m5PKl4U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mpuBSqRNjCqpvw75mx+27DC39Ho/31gJmtWZZAVdwpY2kZIq0vOOjXHSokGxIxm5UJYBEjrsWOpXNtRvZct+CK1fOflRNcXNDbmef4P/JcRmgS749V7IuaswcUIe8ZEBWw+mvD7qaFwbtVwnb5be01dv5Gs7kR43d3ln6oDyJrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jsNiwTj1; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1772032832; c=relaxed/simple;
+	bh=BRx7ePiRM6IM6xYTQJGooau4EcGTKpq37riztwBysz4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YqN3GcX+UIdSlNWa7qVJK9YYHGFe9TjY83pc7Kbz3MCRJufP5DAyid+4o2vQC61kYlLwmKdija9AcKAITCxzXurNpbDKtzRAxJQ6iO6EMCfhEISWeZ6kxa2ODbok9//DwlrmdnokjMdaxmaSITJ1D0tfXAR3wcmDKJY0q7i7RPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+9gjrFD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jsNiwTj1"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61PCEjjX2347293;
-	Wed, 25 Feb 2026 14:25:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=SHMqjR
-	5JS4nc3Prvtwcb2C6pncruxyqQAeH0T5Ewzhc=; b=jsNiwTj1A5DYsXEXoJqQA+
-	0TkBYk8v4ot1xoL3Bwy4ILnhsF88j1eSNeasaj7/PbWXz+Rnl6C1t9ZSwEdBywWg
-	JgOfwI3RJ/oWs/RKCGbZG5tr5Bf/tt6aJQKBcE9NeK+xfn3mLq0Hc+3HvgxHzNmV
-	Q39bihEexZoJBf1/yTVB5GSmjtQZcBkKNVInTo13tLucZ8oOruJw88LmIm1E8UJN
-	+cvUJUgOzhguOCNKvqXjvZH4Jatk79gbeiCNrg+cbWIEY1YZzyMHkgK1rx7qHkf/
-	qBQAq005yfS4e3yda9rUZvRmEpUNOI1KoduOTuHOULaoSH7fLhdWQBKV1/3IFq7w
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ch858p0s0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Feb 2026 14:25:46 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61PDp8Si027794;
-	Wed, 25 Feb 2026 14:25:45 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cfsr1wcej-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Feb 2026 14:25:45 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61PEPiLj30999090
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Feb 2026 14:25:44 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9AA9958059;
-	Wed, 25 Feb 2026 14:25:44 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B9F0558063;
-	Wed, 25 Feb 2026 14:25:43 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 25 Feb 2026 14:25:43 +0000 (GMT)
-Message-ID: <ee36981d-d658-4296-9acb-874c72606b3e@linux.ibm.com>
-Date: Wed, 25 Feb 2026 09:25:43 -0500
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+9gjrFD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56F9DC116D0;
+	Wed, 25 Feb 2026 15:20:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772032832;
+	bh=BRx7ePiRM6IM6xYTQJGooau4EcGTKpq37riztwBysz4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=a+9gjrFDskVEx0qP2hOBK8OrRP/Mp6Q/uQKSfL9tCeOnDQmuogsoF/eDIyhwH0h53
+	 s3fR0H7FBLPj2cIEU290B4IlfAP0yyEY4dtRTqB/IOicY7Dy5MASTyTc7z1rRlwMpz
+	 b9f+xBfwn9upr4bwxzYKUA39XiNX+TxXCbmgSzTT3yNI9AdCcepQgzBEmN8z3ygGjn
+	 uiSptbI6GSY0yvfKlHHX+WVlVr4wFoqh+atzLHd1kSuq+bJhKnXH+lMZhLBFmMM3ya
+	 Zd6OF0pu6ARkK7mKuabOmfGBxe979G159yI5DfFJ9eFv0pCa3H8fVvDqt1ozvRkw5/
+	 93Wug+zO2VSDQ==
+From: Chuck Lever <cel@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>,
+	NeilBrown <neil@brown.name>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Rick Macklem <rick.macklem@gmail.com>,
+	Benjamin Coddington <bcodding@hammerspace.com>
+Cc: Chuck Lever <chuck.lever@oracle.com>,
+	linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [RESEND PATCH v7 0/3] kNFSD Signed Filehandles
+Date: Wed, 25 Feb 2026 10:20:27 -0500
+Message-ID: <177203282074.180717.12140239799657635407.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <cover.1772022373.git.bcodding@hammerspace.com>
+References: <cover.1772022373.git.bcodding@hammerspace.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: IMA and PQC
-To: Coiby Xu <coxu@redhat.com>,
-        =?UTF-8?Q?Johannes_Wiesb=C3=B6ck?= <johannes.wiesboeck@aisec.fraunhofer.de>
-Cc: dhowells@redhat.com, dmitry.kasatkin@gmail.com, ebiggers@kernel.org,
-        eric.snowberg@oracle.com, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
-        roberto.sassu@huawei.com, simo@redhat.com, zohar@linux.ibm.com,
-        michael.weiss@aisec.fraunhofer.de
-References: <aXrKaTem9nnWNuGV@Rk>
- <20260130203126.662082-1-johannes.wiesboeck@aisec.fraunhofer.de>
- <aYHznG6vbptVOjHQ@Rk>
-Content-Language: en-US
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <aYHznG6vbptVOjHQ@Rk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI1MDEzNSBTYWx0ZWRfX3qP5/QR4NiU0
- GOqGnNq7OdR6+Ew1H+Du8EZdvcu3XXvpqnjEgNAZOC5+zqjVH1bB6TOMKI753jx9CE4m7sbsGMJ
- JCiR9f2di7zqlSf1n1bNe0JyN6R0y7SQM4fu6Jz/q3fBMhxh5MqMVIPeMXLF5tNc+INOrewy31B
- IcvAZ8sK+vkSS8VYWhMBuLb4VpEQhWQ+TEiu/9GKn5JjBincwgzgDCk3a1ir09xfmGqTL/Q6OIo
- 3YFKUEckgUnAFInxMCm/8Xt/+23R0ZmVXrut7aldZnp4u3tlNRJR0kyz54WSNCQhnE2XTJ3uDUt
- ei0IzhDuYrxEjdLXe2gpIsv64EGlWXZNuAtdfvJlPF9ks2bY1zhu/eTqDSq6eAhxhVK+iS6KCDW
- PSR+3/7xvNNs5cNDRCCtBX0XxBllt0uXCLoCQSHmHEbj34VVi8qCuxWcZfDsyx6vGnSHty2wsTo
- FwLd8a+eDi/0WjgiUjA==
-X-Proofpoint-GUID: NgaRPDtkcA5qlnwKN1z91muvBPFRyMN8
-X-Authority-Analysis: v=2.4 cv=S4HUAYsP c=1 sm=1 tr=0 ts=699f066a cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=20KFwNOVAAAA:8
- a=8AN272uGgGVaRbb4kAAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: a5T0_K3QU7mjD237BGpEkprt9BYz8mkj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-25_01,2026-02-25_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 clxscore=1011 impostorscore=0 malwarescore=0 bulkscore=0
- phishscore=0 adultscore=0 lowpriorityscore=0 spamscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602250135
 
+From: Chuck Lever <chuck.lever@oracle.com>
 
+On Wed, 25 Feb 2026 07:51:35 -0500, Benjamin Coddington wrote:
+> The following series enables the linux NFS server to add a Message
+> Authentication Code (MAC) to the filehandles it gives to clients.  This
+> provides additional protection to the exported filesystem against filehandle
+> guessing attacks.
+> 
+> Filesystems generate their own filehandles through the export_operation
+> "encode_fh" and a filehandle provides sufficient access to open a file
+> without needing to perform a lookup.  A trusted NFS client holding a valid
+> filehandle can remotely access the corresponding file without reference to
+> access-path restrictions that might be imposed by the ancestor directories
+> or the server exports.
+> 
+> [...]
 
-On 2/3/26 8:32 AM, Coiby Xu wrote:
-> On Fri, Jan 30, 2026 at 09:31:26PM +0100, Johannes Wiesböck wrote:
->> Hi all,
-> 
-> Hi Johannes,
-> 
->>
->> we conducted an evaluation regarding PQC use in IMA last year (see [1] 
->> for all
->> details) where we also considered the interplay of different PQC 
->> signatures and
->> file systems (ext4, btrfs, XFS, f2fs).
-> 
-> Thanks for sharing this comprehensive study! There are many nuances in
-> this research paper!
-> 
->>
->> Coiby Xu <coxu@redhat.com> wrote:
->>
->>> According to my experiments done so far, for verification speed,
->>> ML-DSA-65 is consistently faster than ECDSA P-384 which is used by
->>> current CentOS/RHEL to sign files in a package.
->>
->> Regarding performance, similar to Coiby, we found that all variants of 
->> ML-DSA
->> consistently outperformed ECDSA P-256.
-> 
-> Glad to know ML-DSA is also faster than ECDSA P-256!
+Applied to nfsd-testing, thanks!
 
-To avoid duplicate work: Is either one of you planning on writing 
-patches for IMA to use ML-DSA and convert the current ML-DSA to also 
-support HashML? I had done the work on this before and could dig out the 
-patches again...
+[1/3] NFSD: Add a key for signing filehandles
+      commit: 168286a8a886b760d3beb2ef41f0f69200393ea7
+[2/3] NFSD/export: Add sign_fh export option
+      commit: a90745b646b3f207e34c559b6a9d0e7e6c551f36
+[3/3] NFSD: Sign filehandles
+      commit: 5a51cb5090c646656958a008b8813ac7a849edaf
 
-    Stefan
+--
+Chuck Lever
 
