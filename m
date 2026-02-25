@@ -1,160 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B987303A04;
-	Wed, 25 Feb 2026 21:06:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FC1239099
+	for <linux-crypto@vger.kernel.org>; Wed, 25 Feb 2026 21:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772053602; cv=none; b=LhN9sd//AlFNAQeQ42iztgDvPrOFh6fJW9Q+kPUkdk0bUkvZp8ps9xMMDF5BpsJhr0u+T5dfpeMb20rwIbZWe7NotOPIXb627AgICFyeOtG46ra0sWCFeUc1B8i1KTytN0fUCB38Y9Cnd+aJH8VqmJ/B8NijIxH9a7JFZBPIhWE=
+	t=1772054359; cv=none; b=SiASsyIankJm/wSzSdAlD1mmtOxLRcHKm8N9FsQoridnoZS8thShcsVJK0dfch1ccRj4miB2Qz7QGihwUw3JnvQfySaVUMJC1OxVjMvJ6USJCUIoRGEgghqQiB3RHzVR5K3UBzaVGYfkt4bhbTDAW8dYid2H4OceJRu30PhWvjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772053602; c=relaxed/simple;
-	bh=dgVUcg5h0F/5rdQgXU6jWV/I3Z8iC65i5+Eqs9p8nXs=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=hiHXV3jT5nsqR6cr3Z8xmbVpx0BQjHzT6HTX2/k+tRQ/cW8CLkaMxMOlohxBXgkLTkN9U1h1w63SB9eumIxBqeQ7UJw2cQwIMr1mszue/3hO6SUczCWmv9mCIWQAgND2Cgo3iaDKdOjhhfqxHiyEIm/R2RYkQ01x9fOx3J5DRvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ugwRTs0D; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772054359; c=relaxed/simple;
+	bh=1HA4ywL7XBrJAafSssnyb4SgIYcFrRjOv1N7k4X7vd8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s96tjsdT+Asmyhe14d7mrDuGfNI0Wb+a57i0m3Ck/47DTBbRLqOWjyby4yatdnphb3llbS1uvUL5tBvFUphZ/36ERHIDpyEBSVj0/QCY0xMbpa1c4L9HfG6LkSxzLYFm8Sb8zLslTLxVahM/lat+UQzaq7Kv44UbOfO26/oW01A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=Q7K63SlU; arc=none smtp.client-ip=198.37.111.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ugwRTs0D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B95CCC116D0;
-	Wed, 25 Feb 2026 21:06:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772053601;
-	bh=dgVUcg5h0F/5rdQgXU6jWV/I3Z8iC65i5+Eqs9p8nXs=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=ugwRTs0D8xDEBxAPXPTRj1sk9quW659aQDtIFlQTPc502a/rMoTtrzdufXQik7jLQ
-	 ACCH6cK79I0WHaNyd/eph9KWYr0Qppt/I3IkIg+8qZPYjeecBectcs5GhE9xXmVDt2
-	 /ylHNnae0nT44Q6j5D8LwTEafT4FKNU/FkoEuYrGB//7eVyKnNQj8ztnT3xqxvNL2F
-	 MxGnJINMstRiB8XI6kYYscgg6IcymYCZ4rLcDktQvEinoIufU17JOrSJdauIVDT46U
-	 dn+FEcQhE3okGiJcztJnJu7AXjLfeWJWNYUJ6vzJ2LnzsqAoofgiQDO8sdcClA+iY6
-	 3qvGoP/lktGhw==
-Content-Type: multipart/mixed; boundary="===============2090170065257609829=="
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="Q7K63SlU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1772054356;
+	bh=1HA4ywL7XBrJAafSssnyb4SgIYcFrRjOv1N7k4X7vd8=;
+	h=From:To:Subject:Date:Message-ID:From;
+	b=Q7K63SlUTKYUzpHRIJ5MxvR/k+74HPnIsJ0paIkV7D9d0q2VmpwwVZd1odQSkMWHW
+	 yxFtcs32anGmYGqW5mITOgrRMUg9FXA73M8hT3IL+RPGZkhgERMUaVh9v8MjBuWh71
+	 X6p62ZtSX2xVx06IiU12BMvIdztF8TIcjszhuoB4=
+Received: from lingrow.int.hansenpartnership.com (unknown [153.66.160.227])
+	by lamorak.hansenpartnership.com (Postfix) with ESMTP id 161861C02CA;
+	Wed, 25 Feb 2026 16:19:16 -0500 (EST)
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: linux-crypto@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+Subject: [PATCH v3 0/5] pkcs7: better handling of signed attributes
+Date: Wed, 25 Feb 2026 16:19:02 -0500
+Message-ID: <20260225211907.7368-1-James.Bottomley@HansenPartnership.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <bf515a9784c17b9b0dcfeff987e9cc7c328fc6d330cdb97b1cfe77448eafcc27@mail.kernel.org>
-In-Reply-To: <20260225202935.31986-2-git@danielhodges.dev>
-References: <20260225202935.31986-2-git@danielhodges.dev>
-Subject: Re: [PATCH bpf-next v8 1/4] bpf: Add hash kfunc for cryptographic hashing
-From: bot+bpf-ci@kernel.org
-To: git@danielhodges.dev,bpf@vger.kernel.org,linux-crypto@vger.kernel.org,linux-kernel@vger.kernel.org,linux-kselftest@vger.kernel.org
-Cc: ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,vadim.fedorenko@linux.dev,song@kernel.org,yatsenko@meta.com,martin.lau@linux.dev,eddyz87@gmail.com,haoluo@google.com,jolsa@kernel.org,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,yonghong.song@linux.dev,herbert@gondor.apana.org.au,davem@davemloft.net,git@danielhodges.dev,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Wed, 25 Feb 2026 21:06:39 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 
---===============2090170065257609829==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+v3 updates for the now-upstream ml-dsa.  The ml-dsa patches actually
+changed the definition of authattrs in struct pkcs7_signed_info, which
+means I now don't have to justify stepping one back in patch 4
+(thanks!).  Just in case I checked that nothing else was affected by
+this change.
 
-> diff --git a/crypto/bpf_crypto_shash.c b/crypto/bpf_crypto_shash.c
-> --- /dev/null
-> +++ b/crypto/bpf_crypto_shash.c
-> @@ -0,0 +1,96 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
-> +#include <linux/types.h>
-> +#include <linux/module.h>
-> +#include <linux/bpf_crypto.h>
-> +#include <crypto/hash.h>
-> +
-> +struct bpf_shash_ctx {
-> +	struct crypto_shash *tfm;
-> +	struct shash_desc desc;
-> +};
+Original cover letter:
 
-[ ... ]
+Although the biggest use of signed attributes is PKCS#7 and X509
+specific data, they can be added to a signature to support arbitrary
+and verifiable objects.  This makes them particularly useful when you
+want to take an existing signature scheme and extend it with
+additional (but always verified) data in such a way that it still
+looks valid to both the old and new schemes.
 
-> +static void *bpf_crypto_shash_alloc_tfm(const char *algo)
-> +{
+To use a scheme like this to extend signatures requires that the
+authenticated attribute only be pulled out of a signer info that can
+be verified by one of the trusted keys, so the implementation loops
+over all signer infos, discarding those that haven't been verified and
+returns the first OID match it finds in the verified ones.  Note that
+if you reparse a pkcs7 it starts out with no trusted signer infos, and
+you must anchor trust by calling validate_pkcs7_trust() with the
+trusted keyring.
 
-[ ... ]
+The first three patches in this series are new to v2.  They add the
+new validate_pkcs7_trust() call, thread a verified flag through struct
+pkcs7_signer_info so we can tell which signers have been validated
+against the trusted keyring. And finally thread pkcs7_digest through
+the pkcs7_validate functions so they can operate on a plain parsed
+pkcs7 structure that hasn't gone through pkcs7_verify.  Note we could
+simply drop the last patch and insist that the pkcs7 be re-verified;
+it just looked a bit inefficient, especially as the default way of
+doing this (verify_pkcs7_signature() frees the pkcs7 structure before
+returning.
 
-> +	ctx->tfm = tfm;
-> +	ctx->desc.tfm = tfm;
-> +
-> +	return ctx;
-> +}
+The final two patches search for the authenticated attribute by OID,
+stopping at the first one it finds belonging to a verified signer
+info.  The final patch demonstrates how to use it.  I've added a check
+to show that if you don't in any way validate the pkcs7 then no signed
+attributes get returned.
 
-[ ... ]
+Regards,
 
-> +static int bpf_crypto_shash_hash(void *tfm, const u8 *data, u8 *out,
-> +				 unsigned int len)
-> +{
-> +	struct bpf_shash_ctx *ctx = tfm;
-> +
-> +	return crypto_shash_digest(&ctx->desc, data, len, out);
-> +}
-
-bpf_crypto_shash_alloc_tfm() creates one bpf_shash_ctx per
-bpf_crypto_ctx, with a single embedded shash_desc. Multiple BPF
-programs can acquire references to the same bpf_crypto_ctx
-concurrently via bpf_crypto_ctx_acquire() (which just does
-refcount_inc_not_zero), and the hash kfunc is marked KF_RCU which
-provides no mutual exclusion.
-
-When two CPUs call bpf_crypto_hash() with the same context, both
-end up in crypto_shash_digest() using the same desc:
-
-  CPU0                           CPU1
-  bpf_crypto_hash(ctx)           bpf_crypto_hash(ctx)
-    bpf_crypto_shash_hash()        bpf_crypto_shash_hash()
-      crypto_shash_digest(desc)      crypto_shash_digest(desc)
-        alg->digest(desc, ...)         alg->digest(desc, ...)
-        // writes desc->__ctx          // writes desc->__ctx
-        memset(desc->__ctx, 0)         memset(desc->__ctx, 0)
-
-crypto_shash_op_and_zero() in crypto/shash.c writes to
-shash_desc_ctx(desc) via the algorithm callback and then zeroes it
-with memset. Both CPUs race on this buffer, producing silently
-corrupted hash output.
-
-The existing encrypt/decrypt path does not have this problem because
-crypto_lskcipher_encrypt() treats the tfm as read-only (the key
-schedule is pre-computed) and the mutable IV state is passed
-per-call through the siv dynptr.
-
-Would it make sense to allocate a shash_desc per-call on the stack,
-or use a per-cpu descriptor, to avoid this race?
-
-> diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
-> --- a/kernel/bpf/crypto.c
-> +++ b/kernel/bpf/crypto.c
-
-[ ... ]
-
-> +#if IS_ENABLED(CONFIG_CRYPTO_HASH2)
-> +/**
-> + * bpf_crypto_hash() - Compute hash using configured context
-> + * @ctx:	The crypto context being used. The ctx must be a trusted pointer.
-> + * @data:	bpf_dynptr to the input data to hash. Must be a trusted pointer.
-> + * @out:	bpf_dynptr to the output buffer. Must be a trusted pointer.
-> + *
-> + * Computes hash of the input data using the crypto context. The output buffer
-> + * must be at least as large as the digest size of the hash algorithm.
-> + */
-> +__bpf_kfunc int bpf_crypto_hash(struct bpf_crypto_ctx *ctx,
-> +				const struct bpf_dynptr *data,
-> +				const struct bpf_dynptr *out)
-> +{
-
-[ ... ]
-
-> +	return ctx->type->hash(ctx->tfm, data_ptr, out_ptr, data_len);
-> +}
-> +#endif /* CONFIG_CRYPTO_HASH2 */
-
+James
 
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/22414975518
+James Bottomley (5):
+  certs: break out pkcs7 check into its own function
+  crypto: pkcs7: add flag for validated trust on a signed info block
+  crypto: pkcs7: allow pkcs7_digest() to be called from pkcs7_trust
+  crypto: pkcs7: add ability to extract signed attributes by OID
+  crypto: pkcs7: add tests for pkcs7_get_authattr
 
-AI-authorship-score: low
-AI-authorship-explanation: Eight revision iterations with active reviewer engagement on lore.kernel.org and incremental changes addressing feedback are consistent with human-driven development.
-issues-found: 1
-issue-severity-score: medium
-issue-severity-explanation: Data race on shared shash_desc in bpf_crypto_hash() produces silently corrupted cryptographic hash output when two CPUs use the same context concurrently, which could affect integrity checking and authentication use cases.
+ certs/system_keyring.c                  | 76 +++++++++++++----------
+ crypto/asymmetric_keys/Makefile         |  4 +-
+ crypto/asymmetric_keys/pkcs7_aa.asn1    | 18 ++++++
+ crypto/asymmetric_keys/pkcs7_key_type.c | 42 ++++++++++++-
+ crypto/asymmetric_keys/pkcs7_parser.c   | 81 +++++++++++++++++++++++++
+ crypto/asymmetric_keys/pkcs7_parser.h   |  4 ++
+ crypto/asymmetric_keys/pkcs7_trust.c    |  9 +++
+ crypto/asymmetric_keys/pkcs7_verify.c   | 13 ++--
+ include/crypto/pkcs7.h                  |  4 ++
+ include/linux/verification.h            |  2 +
+ 10 files changed, 216 insertions(+), 37 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/pkcs7_aa.asn1
 
---===============2090170065257609829==--
+-- 
+2.51.0
+
