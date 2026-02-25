@@ -1,84 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18093D3D02;
-	Wed, 25 Feb 2026 15:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAD127A45C;
+	Wed, 25 Feb 2026 17:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772032832; cv=none; b=KR0Vnbp8d+TM0oy8yS6ZwGvXEpF1/ToybXmsuykIi8Hg/KRyGhvIAKM+uzO7KnhArl5MxAYgdRhQBt/n60gTNIwcOoHHpOr8T5m4NukWS5SdFcZUjgsRBiwm8Op4WYHaN0315RvT6/AwuXKqka9Wf27EzdGGOYnZpfbHhdeUXcM=
+	t=1772040592; cv=none; b=jo1SnG/nmFJGKX/8OOFuXQsNG6r2ZigX+CPlSjB2eJc8BIO4NRGfuWVYJH4NPzHj4/h+hyaesBcFURu1R8noIU2f+dcBDZZNFU6GxVXA/FeT89pLOWP1ZURdIDixnzhVsOtlaYVGFPDF7JC3Q5CbMZyQDPtl0G2xKxqngbAkYqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772032832; c=relaxed/simple;
-	bh=BRx7ePiRM6IM6xYTQJGooau4EcGTKpq37riztwBysz4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YqN3GcX+UIdSlNWa7qVJK9YYHGFe9TjY83pc7Kbz3MCRJufP5DAyid+4o2vQC61kYlLwmKdija9AcKAITCxzXurNpbDKtzRAxJQ6iO6EMCfhEISWeZ6kxa2ODbok9//DwlrmdnokjMdaxmaSITJ1D0tfXAR3wcmDKJY0q7i7RPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+9gjrFD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772040592; c=relaxed/simple;
+	bh=0NznGpQd9koR+NDgSzpNiwtG/d8wl3ltVnSIMUxgvZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kYEPPc/b2KPVxvlTvZrzTK4aBa/sOTeCl1zy5gA7pHd1SZQNSh3bA1c45Z+Nt4nzHzgdx9otrGQ61PfmRgBIx1tMTNJV45pi+h6/D9mX4n59nt/5n239qHF0gD9wyQ3qerqRLj6AADbLIoJHLv+lb0HFiecf0h4af6zk0Pp6Fe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wtg4b+wD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+9gjrFD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56F9DC116D0;
-	Wed, 25 Feb 2026 15:20:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wtg4b+wD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0A7EC116D0;
+	Wed, 25 Feb 2026 17:29:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772032832;
-	bh=BRx7ePiRM6IM6xYTQJGooau4EcGTKpq37riztwBysz4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=a+9gjrFDskVEx0qP2hOBK8OrRP/Mp6Q/uQKSfL9tCeOnDQmuogsoF/eDIyhwH0h53
-	 s3fR0H7FBLPj2cIEU290B4IlfAP0yyEY4dtRTqB/IOicY7Dy5MASTyTc7z1rRlwMpz
-	 b9f+xBfwn9upr4bwxzYKUA39XiNX+TxXCbmgSzTT3yNI9AdCcepQgzBEmN8z3ygGjn
-	 uiSptbI6GSY0yvfKlHHX+WVlVr4wFoqh+atzLHd1kSuq+bJhKnXH+lMZhLBFmMM3ya
-	 Zd6OF0pu6ARkK7mKuabOmfGBxe979G159yI5DfFJ9eFv0pCa3H8fVvDqt1ozvRkw5/
-	 93Wug+zO2VSDQ==
-From: Chuck Lever <cel@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>,
-	NeilBrown <neil@brown.name>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Rick Macklem <rick.macklem@gmail.com>,
-	Benjamin Coddington <bcodding@hammerspace.com>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [RESEND PATCH v7 0/3] kNFSD Signed Filehandles
-Date: Wed, 25 Feb 2026 10:20:27 -0500
-Message-ID: <177203282074.180717.12140239799657635407.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <cover.1772022373.git.bcodding@hammerspace.com>
-References: <cover.1772022373.git.bcodding@hammerspace.com>
+	s=k20201202; t=1772040592;
+	bh=0NznGpQd9koR+NDgSzpNiwtG/d8wl3ltVnSIMUxgvZI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Wtg4b+wDK4NGNGRmiAdPyJA/KjY9qWR/MOfihY1W6FP3CfdL3KaVHc80z2ccuYCjr
+	 BFlE3OhYPFV3+rFqBGW5jnSZUkiHGWOPPOYbH7RBivQFbDvwe7t8S1Zd0Q+CoOFQUE
+	 oIJXZTDifenMlGnyaURNp7wue6ka05mCmRPLe2nsgfjyPPj688AlipKTTrGzLKLbEY
+	 gyCYwq1z8xL3B062m/y+O2Q7t/CFqNVuQ4aSCci9y8mfAavTbNH/43Jt/MUvSHLTlF
+	 z5jK51B1mKBxva8gtaAvcWhzMLHlWMn8hQnUi08WKiePqDfq2pyDAX0kbzGrY7iYdH
+	 8IIa1hQR72WzQ==
+Date: Wed, 25 Feb 2026 10:29:49 -0700
+From: Tycho Andersen <tycho@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 2/4] selftests/kvm: check that SEV-ES VMs are allowed in
+ SEV-SNP mode
+Message-ID: <aZ8xje-iM0_9ACie@tycho.pizza>
+References: <20260223162900.772669-1-tycho@kernel.org>
+ <20260223162900.772669-3-tycho@kernel.org>
+ <aZyCEBo07EHw2Prk@google.com>
+ <aZyE4zvPtujZ4-6X@tycho.pizza>
+ <aZyLIWtffvEnmtYh@google.com>
+ <aZzQy7c8VqCaZ_fE@tycho.pizza>
+ <aZ3ntHUPXNTNoyx2@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aZ3ntHUPXNTNoyx2@google.com>
 
-From: Chuck Lever <chuck.lever@oracle.com>
+On Tue, Feb 24, 2026 at 10:02:28AM -0800, Sean Christopherson wrote:
+> Hmm, I like the idea of clearing supported_vm_types.  The wrinkle is that "legacy"
+> deployments that use KVM_SEV_INIT instead of KVM_SEV_INIT2 will use
+> KVM_X86_DEFAULT_VM, and probably won't check for SEV and SEV_ES VM types.
 
-On Wed, 25 Feb 2026 07:51:35 -0500, Benjamin Coddington wrote:
-> The following series enables the linux NFS server to add a Message
-> Authentication Code (MAC) to the filehandles it gives to clients.  This
-> provides additional protection to the exported filesystem against filehandle
-> guessing attacks.
+Does that matter? If in the case of CiphertextHiding we would revoke
+KVM_X86_SEV_VM, users already couldn't start a VM anyway in the
+configuration.
+
+The firmware update is more tricky, but I don't think you can blame
+the kernel there...
+
+> Alternatively, or in addition to, we could clear X86_FEATURE_SEV_ES.  But clearing
+> SEV_ES while leaving X86_FEATURE_SEV_SNP makes me nervous.  KVM doesn't *currently*
+> check for any of those in kvm_cpu_caps, but that could change in the future.  And
+> it's somewhat misleading, e.g. because sev_snp_guest() expects sev_es_guest() to
+> be true.
 > 
-> Filesystems generate their own filehandles through the export_operation
-> "encode_fh" and a filehandle provides sufficient access to open a file
-> without needing to perform a lookup.  A trusted NFS client holding a valid
-> filehandle can remotely access the corresponding file without reference to
-> access-path restrictions that might be imposed by the ancestor directories
-> or the server exports.
+> Given that it doesn't make sense for KVM to actively prevent the admin from upgrading
+> the firmware, I think it's ok if KVM can't "gracefully" handle *every* case.  E.g.
+> even if KVM clears X86_FEATURE_SEV_ES, userspace could have cached that information
+> at system boot. 
 > 
-> [...]
+> > > Hrm, I think we also neglected to communicate when SEV and SEV-ES are effectively
+> > > unusable, e.g. due to CipherTextHiding, so maybe we can kill two birds with one
+> > > stone?  IIRC, we didn't bother enumerating the limitation with CipherTextHiding
+> > > because making SEV-ES unusable would require a deliberate act from the admin.
+> > 
+> > We know these parameters at module load time so we could unset the
+> > supported bit, but...
+> > 
+> > > "Update firmware" is also an deliberate act, but the side effect of SEV-ES being
+> > > disabled, not so much.
+> > 
+> > since this could be a runtime thing via DOWNLOAD_FIRMWARE_EX at some
+> > point, I guess we need a new RUNTIME_STATUS ioctl or similar. Then the
+> > question is: does it live in /dev/sev, or /dev/kvm?
+> 
+> Ugh.  Yeah, updating supported_vm_types definitely seems like the least-awful
+> option.
 
-Applied to nfsd-testing, thanks!
+Since firmware update only happens on init right now, I think we can
+add a:
 
-[1/3] NFSD: Add a key for signing filehandles
-      commit: 168286a8a886b760d3beb2ef41f0f69200393ea7
-[2/3] NFSD/export: Add sign_fh export option
-      commit: a90745b646b3f207e34c559b6a9d0e7e6c551f36
-[3/3] NFSD: Sign filehandles
-      commit: 5a51cb5090c646656958a008b8813ac7a849edaf
+    int sev_firmware_supported_vm_types();
 
---
-Chuck Lever
+that will do the feature detection from the ccp, and merge that with
+the results based on asid assignments during module init.
 
+We'll eventually need some callback into KVM to say say "hey the
+firmware got updated here's a new list of vm types".
+
+Tycho
