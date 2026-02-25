@@ -1,136 +1,92 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CB43DA7C5
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Feb 2026 17:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DF82E3397;
+	Wed, 25 Feb 2026 18:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772041459; cv=none; b=uhtL/1sVQuUKnm5MyEdLkibMhmXhzZgpJ4eROjVAJFb+JM/TJwYrMiOEJ+q1R0VGS2bNskq/91LIrIBnUG5eFiNzVI4Yuf5X2c/9z8l8Wr11b2kpM7mcIL++SQ7qGqmi+rcZGtDBpSfVJCzVUNHdU58m+eBkmCOdyjO1+IaLWSs=
+	t=1772042761; cv=none; b=o65WNUlhG6Tb7FxKGY0U9ulLdyGiWDThVu2TfjbboZLtvf/A5sRdTnOUfjI12Zd27dAv5qzmU/ldUqcHHut45MpU8TYcw21VXvIchRkpauImE3XCneWXd47fqw6wflXDtkD86Ho8zeHpENKW4uNzQPrHYM13BCncefeBTlmcous=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772041459; c=relaxed/simple;
-	bh=e8g6K6jqH7yi+J7S+Llf7wJHW3GxzjdSA1XAzbdLd+Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VLaGdAXC3IEJZLC+fbdIcZ7iv1gqU+LYbqVT0EeZtHL//RuTGFGTzfDdBu9g0e434q04Oj6fA6B8ZPlJEkTEamo1qjKgw0QW8r7ImI29qRfvutUzecJd9xnEoW6YDLPuhBcEvNrFWcPrOakNySWT/oEDD2NCNmxME7zTCgTfb9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uXUZgkId; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1772042761; c=relaxed/simple;
+	bh=YB6d0VUqMffIUrv91jAOHnTGBUBEMBtpj9+Ww1jhiJc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y3DKXVG6mTayoHCJd59lfU7mTuAQrmYMQR3DhAJjFDtWBd2CkuGXIU/5WK1jvULg9YVevSYV8IDD49vZ2xjn5xfNnS1S7cQfurRhUSdOW1tgfUS31zYxmzUKqa8JdxClP75BR+jGg+eqQpSfJpFXSbuw7Ie80Bts22zJd75UOA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lV5K2XPX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uXUZgkId"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-358e95e81aeso8913554a91.0
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Feb 2026 09:44:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772041457; x=1772646257; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Aw6GQL6ZdLBj1XQdIzcZiKvieiwtt1s7FniDgSgRoX4=;
-        b=uXUZgkIdnxhqudhwwNwNJyjHnndkQWn+hblQTZ8KYQsYWhSizwej7/C3gXnYRxjVJV
-         u1L2BxmH8n92RkO/XHI3Jhq3tpVQXzzao6GQXaSGXagXMgMNJpW2LETBFN0H/slc93Ra
-         6X0C1r0y+x2XSxASKGWwTjNvTjdO4uE9jbYf3j2MowoaZXoS14+Ds5i7z6H/cZiVm7/e
-         8axmlzAG3+4lfWD11BtVEuFf9THYkwDJFvy1DWFwiW4lNK+vZTuisG5d+709dmE0V0Ia
-         jgnMZl2aNLv6/F3XmEmrNOQ8d4Dd5f//7MkHpNVbl1xJRvU06rwZgp1uVKPCZuBBGU+n
-         T7RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772041457; x=1772646257;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Aw6GQL6ZdLBj1XQdIzcZiKvieiwtt1s7FniDgSgRoX4=;
-        b=fdk7EzPTs2a6WXno7Xs7w7VSG616f1lF4icxp970mmZmrU8HwI/R+fABCzXq0xDjkS
-         iwEZyG4uKcApw0WDFkyUeO0eDZ65QWAU2pwdHuxdYU5gnZiZ/tB5Lt24t4t7GRWehYG9
-         68eQZQwgI4WYL+RW6bEv2WsG3MBgaWCm+ntpbHjREpw1C4GAhgw8QGvAQngFtHkywY9q
-         6tGM0+r469mxqzsHsHx3DUxFVnBcYpELeU8C8w3V7AfD1WobJHvzR6WUgOb6umWsp925
-         N+6fcdA4ZMuInbxuXa8aXLe1orqf8RIWWfor/9C8+M+K6G0xFnpnjDE9Na4uIG5k6VTi
-         G0Tg==
-X-Forwarded-Encrypted: i=1; AJvYcCW9xzd4wTY8dP+d3Bd8q5jf8tQsUOaaF3ztIeTzOC6nUF2OJRTg02oWUvltXtTXGkwTgu/2k9ha2oTF3Cs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNW9IoC5NLwb3FYPEfk4eOH37zhBCSUuZuKbIHp4HbupmI7ISl
-	771tTXQYkJpUnApu9T7v6eDcMkNDzqH3Ngapp+GeTOrM9o1Lm03FaAGD2bj0YgyDMWbizRPCweJ
-	sdnMxsw==
-X-Received: from pjqo2.prod.google.com ([2002:a17:90a:ac02:b0:359:dfa:87b2])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3ccd:b0:34c:99d6:175d
- with SMTP id 98e67ed59e1d1-358ae7e9facmr14240529a91.2.1772041457104; Wed, 25
- Feb 2026 09:44:17 -0800 (PST)
-Date: Wed, 25 Feb 2026 09:44:15 -0800
-In-Reply-To: <aZ8xje-iM0_9ACie@tycho.pizza>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lV5K2XPX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95425C116D0;
+	Wed, 25 Feb 2026 18:05:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772042761;
+	bh=YB6d0VUqMffIUrv91jAOHnTGBUBEMBtpj9+Ww1jhiJc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lV5K2XPXMHCr52eBxVhUjKUYmk825lbHp6fxibfqCvS5SE2fZ1V7NJZGialt9+fwi
+	 /Voqv5LNKkoXdV26NRujTM2PEXWcYS8aTig8epWkjnPdHXrT+KtJkeh/a48XSUcYk7
+	 D3TBY8UPKvLH/taMKTEGWEJlPVOJQiaLl45nzIe4d4vD2i/1mx+CEQ3K1fQGfUQBH+
+	 MCYRbxHpXBdSiI7/u6ZVthdCUumzFVDgck3MhVz6cVL2SwWr4cmUHrPA3Xj828MG3R
+	 DLJoqY0B4movPtbIGTqEyRMO8YFe8HJ3VCzKJ2CVxqvNUVZXi1DS7DtIaYNzLr9jVv
+	 Xo03vDAoozRTQ==
+Date: Wed, 25 Feb 2026 11:05:57 -0700
+From: Tycho Andersen <tycho@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 3/4] crypto/ccp: support setting RAPL_DIS in SNP_INIT_EX
+Message-ID: <aZ86BZWi-GLiHvmt@tycho.pizza>
+References: <20260223162900.772669-1-tycho@kernel.org>
+ <20260223162900.772669-4-tycho@kernel.org>
+ <aZyC89v9JAVEPeLt@google.com>
+ <aZzRVXp_E3cMcgtX@tycho.pizza>
+ <aZ3k01UObX03Sv-n@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260223162900.772669-1-tycho@kernel.org> <20260223162900.772669-3-tycho@kernel.org>
- <aZyCEBo07EHw2Prk@google.com> <aZyE4zvPtujZ4-6X@tycho.pizza>
- <aZyLIWtffvEnmtYh@google.com> <aZzQy7c8VqCaZ_fE@tycho.pizza>
- <aZ3ntHUPXNTNoyx2@google.com> <aZ8xje-iM0_9ACie@tycho.pizza>
-Message-ID: <aZ8077EfpxRGmT-O@google.com>
-Subject: Re: [PATCH 2/4] selftests/kvm: check that SEV-ES VMs are allowed in
- SEV-SNP mode
-From: Sean Christopherson <seanjc@google.com>
-To: Tycho Andersen <tycho@kernel.org>
-Cc: Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aZ3k01UObX03Sv-n@google.com>
 
-On Wed, Feb 25, 2026, Tycho Andersen wrote:
-> On Tue, Feb 24, 2026 at 10:02:28AM -0800, Sean Christopherson wrote:
-> > Hmm, I like the idea of clearing supported_vm_types.  The wrinkle is that "legacy"
-> > deployments that use KVM_SEV_INIT instead of KVM_SEV_INIT2 will use
-> > KVM_X86_DEFAULT_VM, and probably won't check for SEV and SEV_ES VM types.
-> 
-> Does that matter?
-
-Yes, but I don't think it matters so much that it's worth dealing with.  For me,
-being slightly nicer to userspace doesn't justify the risk of confusing KVM.
-
-> If in the case of CiphertextHiding we would revoke KVM_X86_SEV_VM, users
-> already couldn't start a VM anyway in the configuration.
-> 
-> The firmware update is more tricky, but I don't think you can blame
-> the kernel there...
-
-Yeah, that's about where I'm at. 
-
-> > Alternatively, or in addition to, we could clear X86_FEATURE_SEV_ES.  But clearing
-> > SEV_ES while leaving X86_FEATURE_SEV_SNP makes me nervous.  KVM doesn't *currently*
-> > check for any of those in kvm_cpu_caps, but that could change in the future.  And
-> > it's somewhat misleading, e.g. because sev_snp_guest() expects sev_es_guest() to
-> > be true.
-> > 
-> > Given that it doesn't make sense for KVM to actively prevent the admin from upgrading
-> > the firmware, I think it's ok if KVM can't "gracefully" handle *every* case.  E.g.
-> > even if KVM clears X86_FEATURE_SEV_ES, userspace could have cached that information
-> > at system boot. 
-> > 
-> > > > Hrm, I think we also neglected to communicate when SEV and SEV-ES are effectively
-> > > > unusable, e.g. due to CipherTextHiding, so maybe we can kill two birds with one
-> > > > stone?  IIRC, we didn't bother enumerating the limitation with CipherTextHiding
-> > > > because making SEV-ES unusable would require a deliberate act from the admin.
+On Tue, Feb 24, 2026 at 09:50:11AM -0800, Sean Christopherson wrote:
+> On Mon, Feb 23, 2026, Tycho Andersen wrote:
+> > On Mon, Feb 23, 2026 at 08:40:19AM -0800, Sean Christopherson wrote:
+> > > On Mon, Feb 23, 2026, Tycho Andersen wrote:
+> > > > From: "Tycho Andersen (AMD)" <tycho@kernel.org>
+> > > > 
+> > > > The kernel allows setting the RAPL_DIS policy bit, but had no way to set
 > > > 
-> > > We know these parameters at module load time so we could unset the
-> > > supported bit, but...
-> > > 
-> > > > "Update firmware" is also an deliberate act, but the side effect of SEV-ES being
-> > > > disabled, not so much.
-> > > 
-> > > since this could be a runtime thing via DOWNLOAD_FIRMWARE_EX at some
-> > > point, I guess we need a new RUNTIME_STATUS ioctl or similar. Then the
-> > > question is: does it live in /dev/sev, or /dev/kvm?
+> > > Please actually say what RAPL_DIS is and does, and explain why this is the
+> > > correct approach.  I genuinely have no idea what the impact of this patch is,
+> > > (beyond disabling something, obviously).
 > > 
-> > Ugh.  Yeah, updating supported_vm_types definitely seems like the least-awful
-> > option.
+> > Sure, the easiest thing is probably to quote the firmware PDF:
+> > 
+> >     Some processors support the Running Average Power Limit (RAPL)
+> >     feature which provides information about power utilization of
+> >     software. RAPL can be disabled using the RAPL_DIS flag in
+> >     SNP_INIT_EX to disable RAPL while SNP firmware is in the INIT
+> >     state. Guests may require that RAPL is disabled by using the
+> >     POLICY.RAPL_DIS guest policy flag.
 > 
-> Since firmware update only happens on init right now, I think we can
-> add a:
+> Ah, I assume this about disabling RAPL to mitigate a potential side channel?  If
+> so, please call that out in the changelog.
 > 
->     int sev_firmware_supported_vm_types();
-> 
-> that will do the feature detection from the ccp, and merge that with
-> the results based on asid assignments during module init.
+> And does this disable RAPL for _everything_?  Or does it just disable RAPL for
+> SNP VMs?  If it's the former, then burying this in drivers/crypto/ccp/sev-dev.c
+> feels wrong.
 
-Ya, I don't have a better idea.  Bleeding VM types into the CCP driver might be
-a bit wonky, though I guess it is uAPI so it's certainly not a KVM-internal detail.
+Presumably you're right on both counts, but I've asked our firmware
+team to clarify exactly what happens.
 
-> We'll eventually need some callback into KVM to say say "hey the
-> firmware got updated here's a new list of vm types".
+I guess that means it should be kvm-amd.rapl_disable?
+
+Thanks,
+
+Tycho
