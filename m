@@ -1,35 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CDA41C316;
-	Thu, 26 Feb 2026 15:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE0A4218AE;
+	Thu, 26 Feb 2026 15:12:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772118734; cv=none; b=NctOUrQWv0ROtPynqFwvLtEBlmnXyxB5y5ARlk8ugX/ZSDnk9ineCQSKOPtxWEqW0ydQfeXgW87Jo9YRVOH7sL+BfH23pyYtVKfIGpUy4AQeZlCTFr6VAEUsyhPowezDlrHlGgykH9oSRULD9LM9aKV2DGAEtF+bW9K9ODGpjMU=
+	t=1772118736; cv=none; b=ITiGH/aw8BEBTWIAlOHh1prDipmXaJd6hmLZlHfmX4m2EvVyoqdik13usX/SLBf5QD6FC86obqvRyIqy0WtMDcis1b1Z4WGfJ/TWlfNLmJVL4yIVLqfiAiciai7+paYNEfqBaiCl8esXB4QUFpC9HKbkTQoBxm5J+ht66NNanlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772118734; c=relaxed/simple;
-	bh=u9mukUbtNW9HKp6dIQdhf9GxHzqPPxtyu3rwPxAQDqc=;
+	s=arc-20240116; t=1772118736; c=relaxed/simple;
+	bh=bFIC6Rt1zofGAV+4oWJMxgoyBXil8dFhaIdHOVSkwJs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lRlkojyUKbTci0KVdJwMiGYTz6eGyzL13nV0HFD9o4VYeyE1jZZnyNm1vzuV0eiy2uwIYBZb2AUfJOXfTilDDLNKJn98hYmU11BNgt367CRKGhuGjsps0/aSwNa4Re4Q2bEz9U7YM4opTvqOFzmHfZOS4LIJjAsSCIrbohoXnns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0fQ+ziN2; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=Fes7YYscaZ+FrYc3uX30eOREDJW+XV04t5mRSpu5NKR0qQ6bQwUGOlm40GVH6QNILgkfL3/rIb8kVsaKI/klEOA8iDyXGrfWWtNCV4KLSgG7ITVp2zYAwECoQFkPxqrzhHZOrXMFmqRRSL8+NHj/kEZP6XSO7s3pi54tzqXiqXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LHLrvrFC; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0fQ+ziN2"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LHLrvrFC"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=6wXlWATGkI9LtZmZKd6pDj/YsUZIAwbclFsmEmtMkgM=; b=0fQ+ziN29Gl2ARYY0VrJA/aEZQ
-	7cG8oZI7alqaImdfkV2UmgKZ/COv6TD5KN1+RK+HU501lQUrsz7jVVQ2gabFIlNkDSsVU4B2igeal
-	sSg6xBWvxeWNSjoiJNtsHKA/NEN9vKpt2zUvHZT4o510BZxcycI8EnwwXteY/JcLdEmVYNlvtClbT
-	grfd3I00JP7CGRu+OjQDFjtzDfgz2m3n1ZsO6tyw+vJyYyGXxJqb3ueojrT3iE+t8PcqSquW0SB7E
-	W33lXSx7ZZDlzJnNi8ogtXu0J3J1e0IXwhgdQMYt1f7rkwP1k2sZxFbju5lKdAk5Y3GosHgSe9mNI
-	FJoj/GJw==;
+	bh=H2vQZ0n6ApADqlHQBkKJl8JvR6Rc+huPC8RGmru6TyA=; b=LHLrvrFCzVjVz5RkC5jDTlCe2x
+	d//6CIOE9389jvj/w6NOmURB01PgGNhWOBgmeKiKtSFbMP5rrCAZAr9YEUE2lwPOsXPNgPeeI/M2M
+	E0oMEum9H693k56riJecn38wor/KaCckCM3+2h6W82zd1N4KfxStnUM3hMWy66N4Z5SpUeqd9F8Nk
+	+a0yxJWzroAv1+3Lo22e73oWhiH3KkNxRkc5phnXBVNzQ92iQZZEOESrgV5lU+oUGU1DDjYNZDVi5
+	oGEWno4kHtXiSUN4kVBKc0GxIabdPfhyVfzixmAEwRFHTnPKhTNESQI1UkYRdVnJaK/OfZBve2KV8
+	aO3kYOwg==;
 Received: from [4.28.11.157] (helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vvd1i-00000006Qgq-3lP2;
-	Thu, 26 Feb 2026 15:11:42 +0000
+	id 1vvd1m-00000006Qm8-2Nf0;
+	Thu, 26 Feb 2026 15:11:46 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: Richard Henderson <richard.henderson@linaro.org>,
@@ -85,9 +85,9 @@ Cc: Richard Henderson <richard.henderson@linaro.org>,
 	linux-btrfs@vger.kernel.org,
 	linux-arch@vger.kernel.org,
 	linux-raid@vger.kernel.org
-Subject: [PATCH 21/25] xor: add a better public API
-Date: Thu, 26 Feb 2026 07:10:33 -0800
-Message-ID: <20260226151106.144735-22-hch@lst.de>
+Subject: [PATCH 23/25] btrfs: use xor_gen
+Date: Thu, 26 Feb 2026 07:10:35 -0800
+Message-ID: <20260226151106.144735-24-hch@lst.de>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260226151106.144735-1-hch@lst.de>
 References: <20260226151106.144735-1-hch@lst.de>
@@ -100,70 +100,74 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-xor_blocks is very annoying to use, because it is limited to 4 + 1
-sources / destinations, has an odd argument order and is completely
-undocumented.
-
-Lift the code that loops around it from btrfs and async_tx/async_xor into
-common code under the name xor_gen and properly document it.
+Use the new xor_gen helper instead of open coding the loop around
+xor_blocks.  This helper is very similar to the existing run_xor helper
+in btrfs, except that the destination buffer is passed explicitly.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/raid/xor.h |  3 +++
- lib/raid/xor/xor-core.c  | 28 ++++++++++++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ fs/btrfs/raid56.c | 27 ++++-----------------------
+ 1 file changed, 4 insertions(+), 23 deletions(-)
 
-diff --git a/include/linux/raid/xor.h b/include/linux/raid/xor.h
-index 02bda8d99534..4735a4e960f9 100644
---- a/include/linux/raid/xor.h
-+++ b/include/linux/raid/xor.h
-@@ -7,4 +7,7 @@
- extern void xor_blocks(unsigned int count, unsigned int bytes,
- 	void *dest, void **srcs);
- 
-+void xor_gen(void *dest, void **srcss, unsigned int src_cnt,
-+		unsigned int bytes);
-+
- #endif /* _XOR_H */
-diff --git a/lib/raid/xor/xor-core.c b/lib/raid/xor/xor-core.c
-index 8dda4055ad09..b7c29ca931ec 100644
---- a/lib/raid/xor/xor-core.c
-+++ b/lib/raid/xor/xor-core.c
-@@ -46,6 +46,34 @@ xor_blocks(unsigned int src_count, unsigned int bytes, void *dest, void **srcs)
+diff --git a/fs/btrfs/raid56.c b/fs/btrfs/raid56.c
+index b4511f560e92..dab07442f634 100644
+--- a/fs/btrfs/raid56.c
++++ b/fs/btrfs/raid56.c
+@@ -617,26 +617,6 @@ static void cache_rbio(struct btrfs_raid_bio *rbio)
+ 	spin_unlock(&table->cache_lock);
  }
- EXPORT_SYMBOL(xor_blocks);
  
-+/**
-+ * xor_gen - generate RAID-style XOR information
-+ * @dest:	destination vector
-+ * @srcs:	source vectors
-+ * @src_cnt:	number of source vectors
-+ * @bytes:	length in bytes of each vector
-+ *
-+ * Performs bit-wise XOR operation into @dest for each of the @src_cnt vectors
-+ * in @srcs for a length of @bytes bytes.
-+ *
-+ * Note: for typical RAID uses, @dest either needs to be zeroed, or filled with
-+ * the first disk, which then needs to be removed from @srcs.
-+ */
-+void xor_gen(void *dest, void **srcs, unsigned int src_cnt, unsigned int bytes)
-+{
-+	unsigned int src_off = 0;
-+
-+	while (src_cnt > 0) {
-+		unsigned int this_cnt = min(src_cnt, MAX_XOR_BLOCKS);
-+
-+		xor_blocks(this_cnt, bytes, dest, srcs + src_off);
-+
-+		src_cnt -= this_cnt;
-+		src_off += this_cnt;
-+	}
-+}
-+EXPORT_SYMBOL(xor_gen);
-+
- /* Set of all registered templates.  */
- static struct xor_block_template *__initdata template_list;
- static int __initdata xor_forced = false;
+-/*
+- * helper function to run the xor_blocks api.  It is only
+- * able to do MAX_XOR_BLOCKS at a time, so we need to
+- * loop through.
+- */
+-static void run_xor(void **pages, int src_cnt, ssize_t len)
+-{
+-	int src_off = 0;
+-	int xor_src_cnt = 0;
+-	void *dest = pages[src_cnt];
+-
+-	while(src_cnt > 0) {
+-		xor_src_cnt = min(src_cnt, MAX_XOR_BLOCKS);
+-		xor_blocks(xor_src_cnt, len, dest, pages + src_off);
+-
+-		src_cnt -= xor_src_cnt;
+-		src_off += xor_src_cnt;
+-	}
+-}
+-
+ /*
+  * Returns true if the bio list inside this rbio covers an entire stripe (no
+  * rmw required).
+@@ -1434,7 +1414,8 @@ static void generate_pq_vertical_step(struct btrfs_raid_bio *rbio, unsigned int
+ 	} else {
+ 		/* raid5 */
+ 		memcpy(pointers[rbio->nr_data], pointers[0], step);
+-		run_xor(pointers + 1, rbio->nr_data - 1, step);
++		xor_gen(pointers[rbio->nr_data], pointers + 1, rbio->nr_data - 1,
++				step);
+ 	}
+ 	for (stripe = stripe - 1; stripe >= 0; stripe--)
+ 		kunmap_local(pointers[stripe]);
+@@ -2034,7 +2015,7 @@ static void recover_vertical_step(struct btrfs_raid_bio *rbio,
+ 		pointers[rbio->nr_data - 1] = p;
+ 
+ 		/* Xor in the rest */
+-		run_xor(pointers, rbio->nr_data - 1, step);
++		xor_gen(p, pointers, rbio->nr_data - 1, step);
+ 	}
+ 
+ cleanup:
+@@ -2664,7 +2645,7 @@ static bool verify_one_parity_step(struct btrfs_raid_bio *rbio,
+ 	} else {
+ 		/* RAID5. */
+ 		memcpy(pointers[nr_data], pointers[0], step);
+-		run_xor(pointers + 1, nr_data - 1, step);
++		xor_gen(pointers[nr_data], pointers + 1, nr_data - 1, step);
+ 	}
+ 
+ 	/* Check scrubbing parity and repair it. */
 -- 
 2.47.3
 
