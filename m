@@ -1,35 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2403E9F78;
-	Thu, 26 Feb 2026 15:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E20E41C2EF;
+	Thu, 26 Feb 2026 15:12:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772118729; cv=none; b=tb4s2iGVIwxIc5vnH7d+JkyX503hJW0vMZ0UERxaEg48RmY46l36tNUkwjm4r/oo8t4ZV/oibZrDJNawR6zdxgUDFwLAoHjBTk2oS68LhV8TFJGCJbhHomX1GF2q2CvYQX6qKjv96M+crwGV+u2GcdlZIvFFwzSDg2NO3QyBcbE=
+	t=1772118730; cv=none; b=aor1k9SJ1kjLnBzxRPQ74qRclQ7Fg4fqWIioVIoG0ETU7AH9Llnui2TAzDCFv3rZwJ5qiHfqjb1jwIJ+WvRM9NeD6C+m5yFb92mf6QThmBLskEysfFXcsE/UWRS3eZswyAQMIhYRTx/hB7EUQXVCWgBVV1tyy6NKhjT2z8sd7vI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772118729; c=relaxed/simple;
-	bh=Pt+BmKi8gr1PQZ9AgX+uG0EqPWwz3RbvbWIlEk4u8zI=;
+	s=arc-20240116; t=1772118730; c=relaxed/simple;
+	bh=2NKiHY4+RTOzsyvk7dubB1vbqIXW9ibW87L0oYS8JSc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mBkLmN/IVr/eXG2sJtZ8yM+mKzXKauJPKv2RX/85GX+Bkb6U5775N7nCZ0VqxFCeMRO4LGl21BxH5v/84JOB0ykXGoEMthUOm0oQOlziJiEV9PAvoxuRQc+A0QBM/d1s6iJo/Jn+ncP6lj5WrCs5JOcmxeKoRjgB17/OoUaULhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=axYPDdh0; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=G0wN0rv6M0+saDOKgMbbew17IlwlWcfZcc0kt9lX1IfT+KbDGroXGMZzjt7BOrdGgTvc+FuZx6CE1YPgnVYH6RtCkVTLwlB3jtLBcq9ZEo6W83Xm2qVb05bmjmpLcZByV30YlV3zHCs1xZtrOYElU25hlxzzI9UiyTr8IzO32FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vI141pgN; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="axYPDdh0"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vI141pgN"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=vfRQfd6HX2UIy1GEtF4WxXFvmD5740u62PQfhFgAIN8=; b=axYPDdh0UlU4k8LzDUOIudYBVh
-	TbPnRJxIe18M9ITWaQgUGlBsyQe+hOWF1f8RffuwREO/jvkiQLUwWbX0P/ANN4KDXpTj74CD4Q6xc
-	sSraeZvLv+Ob1QTNupALOxkqnq7xMx1mTThH2h8nYx6SFVuHlwiFKLLxH8tmlZr0gQje/gjE0oZ3C
-	Ixcestfgvy25/rBkDc8efMzHfK2pZ3ulUhj0iaXJpezBXfEfKx3Foway9BGmW0DTP5x9nDwej/VrN
-	yn+mIbL0BVHTLHYw0+tjRaaZ+5uhEwcvowJKnmnF71UCw7egmbj4X8tmrEr9f71WClpr61keKcNZo
-	xgMjnArg==;
+	bh=9A9Yz8/Cuuvhtyv7lk9AujInuJ9yx6/sygljaE8NTzM=; b=vI141pgNfFpEqWZpBYCgwHWjeg
+	N7kZDl9hta7v4qPUhdrGX/BZ7a4ncIqvhYtFKfBETR1Xcwo5DvbLGtIRtEQLbpahXiMa+da7PRgqx
+	yx1b9JzOvZckot5AYVcghvmJzRWIZsB8no5NdEczx4Q9sx//cAUhaQmZqG1m1bZKp+mL0uEwHIez+
+	AW1zpovXhPwhZvaYaf5tmKVaZMTVIlMYPN3KJ2wTMN3X5SkyfeCM3+e0pxPw95K4KofjMyND1LVK4
+	9ZRIvun5OoQ5pKEdRmjN0vlYyFUpK4MinnYw4CuIxeg/sfiWDpk9muIJbg9CfMFW1GE8PcmQN5x+G
+	apUYP0BQ==;
 Received: from [4.28.11.157] (helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vvd1c-00000006QXP-2ZyS;
-	Thu, 26 Feb 2026 15:11:36 +0000
+	id 1vvd1k-00000006QjI-3Ujl;
+	Thu, 26 Feb 2026 15:11:44 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: Richard Henderson <richard.henderson@linaro.org>,
@@ -85,9 +85,9 @@ Cc: Richard Henderson <richard.henderson@linaro.org>,
 	linux-btrfs@vger.kernel.org,
 	linux-arch@vger.kernel.org,
 	linux-raid@vger.kernel.org
-Subject: [PATCH 19/25] xor: avoid indirect calls for arm64-optimized ops
-Date: Thu, 26 Feb 2026 07:10:31 -0800
-Message-ID: <20260226151106.144735-20-hch@lst.de>
+Subject: [PATCH 22/25] async_xor: use xor_gen
+Date: Thu, 26 Feb 2026 07:10:34 -0800
+Message-ID: <20260226151106.144735-23-hch@lst.de>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260226151106.144735-1-hch@lst.de>
 References: <20260226151106.144735-1-hch@lst.de>
@@ -100,325 +100,52 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Remove the inner xor_block_templates, and instead have two separate
-actual template that call into the neon-enabled compilation unit.
+Replace use of the loop around xor_blocks with the easier to use xor_gen
+API.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- arch/arm64/include/asm/xor.h       | 13 ++--
- lib/raid/xor/arm64/xor-neon-glue.c | 95 +++++++++++++++---------------
- lib/raid/xor/arm64/xor-neon.c      | 73 +++++++++--------------
- lib/raid/xor/arm64/xor-neon.h      | 30 ++++++++++
- 4 files changed, 114 insertions(+), 97 deletions(-)
- create mode 100644 lib/raid/xor/arm64/xor-neon.h
+ crypto/async_tx/async_xor.c | 16 ++--------------
+ 1 file changed, 2 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/include/asm/xor.h b/arch/arm64/include/asm/xor.h
-index 81718f010761..4782c760bcac 100644
---- a/arch/arm64/include/asm/xor.h
-+++ b/arch/arm64/include/asm/xor.h
-@@ -7,15 +7,18 @@
- #include <asm-generic/xor.h>
- #include <asm/simd.h>
- 
--extern struct xor_block_template xor_block_arm64;
--void __init xor_neon_init(void);
-+extern struct xor_block_template xor_block_neon;
-+extern struct xor_block_template xor_block_eor3;
- 
- #define arch_xor_init arch_xor_init
- static __always_inline void __init arch_xor_init(void)
+diff --git a/crypto/async_tx/async_xor.c b/crypto/async_tx/async_xor.c
+index 2c499654a36c..460960d45388 100644
+--- a/crypto/async_tx/async_xor.c
++++ b/crypto/async_tx/async_xor.c
+@@ -103,7 +103,6 @@ do_sync_xor_offs(struct page *dest, unsigned int offset,
  {
--	xor_neon_init();
- 	xor_register(&xor_block_8regs);
- 	xor_register(&xor_block_32regs);
--	if (cpu_has_neon())
--		xor_register(&xor_block_arm64);
-+	if (cpu_has_neon()) {
-+		if (cpu_have_named_feature(SHA3))
-+			xor_register(&xor_block_eor3);
-+		else
-+			xor_register(&xor_block_neon);
-+	}
- }
-diff --git a/lib/raid/xor/arm64/xor-neon-glue.c b/lib/raid/xor/arm64/xor-neon-glue.c
-index 067a2095659a..08c3e3573388 100644
---- a/lib/raid/xor/arm64/xor-neon-glue.c
-+++ b/lib/raid/xor/arm64/xor-neon-glue.c
-@@ -7,51 +7,54 @@
- #include <linux/raid/xor_impl.h>
- #include <asm/simd.h>
- #include <asm/xor.h>
-+#include "xor-neon.h"
+ 	int i;
+ 	int xor_src_cnt = 0;
+-	int src_off = 0;
+ 	void *dest_buf;
+ 	void **srcs;
  
--extern struct xor_block_template const xor_block_inner_neon;
--
--static void
--xor_neon_2(unsigned long bytes, unsigned long * __restrict p1,
--	   const unsigned long * __restrict p2)
--{
--	scoped_ksimd()
--		xor_block_inner_neon.do_2(bytes, p1, p2);
--}
--
--static void
--xor_neon_3(unsigned long bytes, unsigned long * __restrict p1,
--	   const unsigned long * __restrict p2,
--	   const unsigned long * __restrict p3)
--{
--	scoped_ksimd()
--		xor_block_inner_neon.do_3(bytes, p1, p2, p3);
--}
--
--static void
--xor_neon_4(unsigned long bytes, unsigned long * __restrict p1,
--	   const unsigned long * __restrict p2,
--	   const unsigned long * __restrict p3,
--	   const unsigned long * __restrict p4)
--{
--	scoped_ksimd()
--		xor_block_inner_neon.do_4(bytes, p1, p2, p3, p4);
--}
--
--static void
--xor_neon_5(unsigned long bytes, unsigned long * __restrict p1,
--	   const unsigned long * __restrict p2,
--	   const unsigned long * __restrict p3,
--	   const unsigned long * __restrict p4,
--	   const unsigned long * __restrict p5)
--{
--	scoped_ksimd()
--		xor_block_inner_neon.do_5(bytes, p1, p2, p3, p4, p5);
--}
--
--struct xor_block_template xor_block_arm64 = {
--	.name   = "arm64_neon",
--	.do_2   = xor_neon_2,
--	.do_3   = xor_neon_3,
--	.do_4   = xor_neon_4,
--	.do_5	= xor_neon_5
-+#define XOR_TEMPLATE(_name)						\
-+static void								\
-+xor_##_name##_2(unsigned long bytes, unsigned long * __restrict p1,	\
-+	   const unsigned long * __restrict p2)				\
-+{									\
-+	scoped_ksimd()							\
-+		__xor_##_name##_2(bytes, p1, p2);			\
-+}									\
-+									\
-+static void								\
-+xor_##_name##_3(unsigned long bytes, unsigned long * __restrict p1,	\
-+	   const unsigned long * __restrict p2,				\
-+	   const unsigned long * __restrict p3)				\
-+{									\
-+	scoped_ksimd()							\
-+		__xor_##_name##_3(bytes, p1, p2, p3);			\
-+}									\
-+									\
-+static void								\
-+xor_##_name##_4(unsigned long bytes, unsigned long * __restrict p1,	\
-+	   const unsigned long * __restrict p2,				\
-+	   const unsigned long * __restrict p3,				\
-+	   const unsigned long * __restrict p4)				\
-+{									\
-+	scoped_ksimd()							\
-+		__xor_##_name##_4(bytes, p1, p2, p3, p4);		\
-+}									\
-+									\
-+static void								\
-+xor_##_name##_5(unsigned long bytes, unsigned long * __restrict p1,	\
-+	   const unsigned long * __restrict p2,				\
-+	   const unsigned long * __restrict p3,				\
-+	   const unsigned long * __restrict p4,				\
-+	   const unsigned long * __restrict p5)				\
-+{									\
-+	scoped_ksimd()							\
-+		__xor_##_name##_5(bytes, p1, p2, p3, p4, p5);		\
-+}									\
-+									\
-+struct xor_block_template xor_block_##_name = {				\
-+	.name   = __stringify(_name),					\
-+	.do_2   = xor_##_name##_2,					\
-+	.do_3   = xor_##_name##_3,					\
-+	.do_4   = xor_##_name##_4,					\
-+	.do_5	= xor_##_name##_5					\
- };
+@@ -117,23 +116,12 @@ do_sync_xor_offs(struct page *dest, unsigned int offset,
+ 		if (src_list[i])
+ 			srcs[xor_src_cnt++] = page_address(src_list[i]) +
+ 				(src_offs ? src_offs[i] : offset);
+-	src_cnt = xor_src_cnt;
 +
-+XOR_TEMPLATE(neon);
-+XOR_TEMPLATE(eor3);
-diff --git a/lib/raid/xor/arm64/xor-neon.c b/lib/raid/xor/arm64/xor-neon.c
-index 8d2d185090db..61194c292917 100644
---- a/lib/raid/xor/arm64/xor-neon.c
-+++ b/lib/raid/xor/arm64/xor-neon.c
-@@ -8,9 +8,10 @@
- #include <linux/cache.h>
- #include <asm/neon-intrinsics.h>
- #include <asm/xor.h>
-+#include "xor-neon.h"
- 
--static void xor_arm64_neon_2(unsigned long bytes, unsigned long * __restrict p1,
--	const unsigned long * __restrict p2)
-+void __xor_neon_2(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2)
- {
- 	uint64_t *dp1 = (uint64_t *)p1;
- 	uint64_t *dp2 = (uint64_t *)p2;
-@@ -36,9 +37,9 @@ static void xor_arm64_neon_2(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
--static void xor_arm64_neon_3(unsigned long bytes, unsigned long * __restrict p1,
--	const unsigned long * __restrict p2,
--	const unsigned long * __restrict p3)
-+void __xor_neon_3(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3)
- {
- 	uint64_t *dp1 = (uint64_t *)p1;
- 	uint64_t *dp2 = (uint64_t *)p2;
-@@ -72,10 +73,10 @@ static void xor_arm64_neon_3(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
--static void xor_arm64_neon_4(unsigned long bytes, unsigned long * __restrict p1,
--	const unsigned long * __restrict p2,
--	const unsigned long * __restrict p3,
--	const unsigned long * __restrict p4)
-+void __xor_neon_4(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3,
-+		const unsigned long * __restrict p4)
- {
- 	uint64_t *dp1 = (uint64_t *)p1;
- 	uint64_t *dp2 = (uint64_t *)p2;
-@@ -117,11 +118,11 @@ static void xor_arm64_neon_4(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
--static void xor_arm64_neon_5(unsigned long bytes, unsigned long * __restrict p1,
--	const unsigned long * __restrict p2,
--	const unsigned long * __restrict p3,
--	const unsigned long * __restrict p4,
--	const unsigned long * __restrict p5)
-+void __xor_neon_5(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3,
-+		const unsigned long * __restrict p4,
-+		const unsigned long * __restrict p5)
- {
- 	uint64_t *dp1 = (uint64_t *)p1;
- 	uint64_t *dp2 = (uint64_t *)p2;
-@@ -171,14 +172,6 @@ static void xor_arm64_neon_5(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
--struct xor_block_template xor_block_inner_neon __ro_after_init = {
--	.name	= "__inner_neon__",
--	.do_2	= xor_arm64_neon_2,
--	.do_3	= xor_arm64_neon_3,
--	.do_4	= xor_arm64_neon_4,
--	.do_5	= xor_arm64_neon_5,
--};
+ 	/* set destination address */
+ 	dest_buf = page_address(dest) + offset;
 -
- static inline uint64x2_t eor3(uint64x2_t p, uint64x2_t q, uint64x2_t r)
- {
- 	uint64x2_t res;
-@@ -189,10 +182,9 @@ static inline uint64x2_t eor3(uint64x2_t p, uint64x2_t q, uint64x2_t r)
- 	return res;
- }
- 
--static void xor_arm64_eor3_3(unsigned long bytes,
--	unsigned long * __restrict p1,
--	const unsigned long * __restrict p2,
--	const unsigned long * __restrict p3)
-+void __xor_eor3_3(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3)
- {
- 	uint64_t *dp1 = (uint64_t *)p1;
- 	uint64_t *dp2 = (uint64_t *)p2;
-@@ -224,11 +216,10 @@ static void xor_arm64_eor3_3(unsigned long bytes,
- 	} while (--lines > 0);
- }
- 
--static void xor_arm64_eor3_4(unsigned long bytes,
--	unsigned long * __restrict p1,
--	const unsigned long * __restrict p2,
--	const unsigned long * __restrict p3,
--	const unsigned long * __restrict p4)
-+void __xor_eor3_4(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3,
-+		const unsigned long * __restrict p4)
- {
- 	uint64_t *dp1 = (uint64_t *)p1;
- 	uint64_t *dp2 = (uint64_t *)p2;
-@@ -268,12 +259,11 @@ static void xor_arm64_eor3_4(unsigned long bytes,
- 	} while (--lines > 0);
- }
- 
--static void xor_arm64_eor3_5(unsigned long bytes,
--	unsigned long * __restrict p1,
--	const unsigned long * __restrict p2,
--	const unsigned long * __restrict p3,
--	const unsigned long * __restrict p4,
--	const unsigned long * __restrict p5)
-+void __xor_eor3_5(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3,
-+		const unsigned long * __restrict p4,
-+		const unsigned long * __restrict p5)
- {
- 	uint64_t *dp1 = (uint64_t *)p1;
- 	uint64_t *dp2 = (uint64_t *)p2;
-@@ -314,12 +304,3 @@ static void xor_arm64_eor3_5(unsigned long bytes,
- 		dp5 += 8;
- 	} while (--lines > 0);
- }
+ 	if (submit->flags & ASYNC_TX_XOR_ZERO_DST)
+ 		memset(dest_buf, 0, len);
 -
--void __init xor_neon_init(void)
--{
--	if (cpu_have_named_feature(SHA3)) {
--		xor_block_inner_neon.do_3 = xor_arm64_eor3_3;
--		xor_block_inner_neon.do_4 = xor_arm64_eor3_4;
--		xor_block_inner_neon.do_5 = xor_arm64_eor3_5;
+-	while (src_cnt > 0) {
+-		/* process up to 'MAX_XOR_BLOCKS' sources */
+-		xor_src_cnt = min(src_cnt, MAX_XOR_BLOCKS);
+-		xor_blocks(xor_src_cnt, len, dest_buf, &srcs[src_off]);
+-
+-		/* drop completed sources */
+-		src_cnt -= xor_src_cnt;
+-		src_off += xor_src_cnt;
 -	}
--}
-diff --git a/lib/raid/xor/arm64/xor-neon.h b/lib/raid/xor/arm64/xor-neon.h
-new file mode 100644
-index 000000000000..cec0ac846fea
---- /dev/null
-+++ b/lib/raid/xor/arm64/xor-neon.h
-@@ -0,0 +1,30 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+void __xor_neon_2(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2);
-+void __xor_neon_3(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3);
-+void __xor_neon_4(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3,
-+		const unsigned long * __restrict p4);
-+void __xor_neon_5(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3,
-+		const unsigned long * __restrict p4,
-+		const unsigned long * __restrict p5);
-+
-+#define __xor_eor3_2	__xor_neon_2
-+void __xor_eor3_3(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3);
-+void __xor_eor3_4(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3,
-+		const unsigned long * __restrict p4);
-+void __xor_eor3_5(unsigned long bytes, unsigned long * __restrict p1,
-+		const unsigned long * __restrict p2,
-+		const unsigned long * __restrict p3,
-+		const unsigned long * __restrict p4,
-+		const unsigned long * __restrict p5);
+-
++	xor_gen(dest_buf, srcs, xor_src_cnt, len);
+ 	async_tx_sync_epilog(submit);
+ }
+ 
 -- 
 2.47.3
 
