@@ -1,115 +1,109 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [144.76.133.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFCC92135AD;
-	Thu, 26 Feb 2026 13:28:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.133.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AD82DC34E
+	for <linux-crypto@vger.kernel.org>; Thu, 26 Feb 2026 14:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772112485; cv=none; b=Fmb1N+n3CKYjUjM4m8jJhHggb37kReD9PLOE/VIRkdzp2iT46K/we7leIP1Jj/rTl9YPWd/Uoqguy472IZHD2KUkDgwx8Iw0uRWQSO+2mxNaMQuMHUL6Wz6FyRQcZ55p8vWpTwhIEcDr23cKBTEoI7QAuxAPDuHNrkYdvvpXy6E=
+	t=1772114773; cv=none; b=SOo32QsvFIIso7nCipSzvEozPJ9YYGcH2tpDqXYGXCS/RHFYctn2s33rCH53/YHMLzlZvOAm9JIn5pJYc92b8SF3gloIouwPZIC7DSzjM2MkbTXszWq21az1ZCoOIDaWaatINL+t7iTgjt2rh298opcMaXxSpkfRhh61QpDCkME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772112485; c=relaxed/simple;
-	bh=n0fZlMeLdFTr4OLNB1E08HU8lcvCOjZAjIYfWYUtXFk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R+06NZOEyap8aHmPGCxKofNBQlrBkNZz8Dzw35N32itbPZDxr/ReTSGCo1X8fy/xAL5Kz9zPStAOe01x1JdUGUH7TuOEoOfctOB1g7OPqOIRbqdAcfIozuZn3hUhSdnLokxcvmBz3ut81zC7utnMFFj59ZY3BJEPxCDFPP9rKu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=144.76.133.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
-	 client-signature ECDSA (secp384r1) client-digest SHA384)
-	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id 10DDE20208FF;
-	Thu, 26 Feb 2026 14:27:55 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id E051D1E6ED; Thu, 26 Feb 2026 14:27:54 +0100 (CET)
-Date: Thu, 26 Feb 2026 14:27:54 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Kepplinger-Novakovic Martin <Martin.Kepplinger-Novakovic@ginzinger.com>
-Cc: "ebiggers@google.com" <ebiggers@google.com>,
-	"horia.geanta@nxp.com" <horia.geanta@nxp.com>,
-	"pankaj.gupta@nxp.com" <pankaj.gupta@nxp.com>,
-	"gaurav.jain@nxp.com" <gaurav.jain@nxp.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"ignat@cloudflare.com" <ignat@cloudflare.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [BUG] crypto: caam - RSA encrypt doesn't always complete new
- data in out_buf
-Message-ID: <aaBKWqY57OSxhx7q@wunner.de>
-References: <6029acc0f0ddfe25e2537c2866d54fd7f54bc182.camel@ginzinger.com>
- <aZ296wd7fLE6X3-U@wunner.de>
- <e1d7ad1106dbb259f7c61bdd1910ac9f08012725.camel@ginzinger.com>
- <aZ3Uqaec79TUrP2I@wunner.de>
- <e36dd6fa756015ec1f2a16002fabfa941c33d367.camel@ginzinger.com>
- <aZ6vF1CHpcp5d5qk@wunner.de>
- <5f9c1e7ec61065a2665a2ec70338e05e551435d4.camel@ginzinger.com>
- <aZ_zfnKVnTaG_4bk@wunner.de>
- <1a65ac92579fadb4bfc76b32a3a4f1c6df022801.camel@ginzinger.com>
+	s=arc-20240116; t=1772114773; c=relaxed/simple;
+	bh=uT9JiKcQKJ0pv2CawhWujaRPoPxzzMdg14SR3yeyED0=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=exdmWvieYiGMVCUwFX3JRnWdwIdp5PI2VT3rDGQ9C9J7eJ+ccr6rUFI7JU8JFCe8fJGUYkKV1P4Y9jWqxava/S+lsG7KSQIwY2ds0qBjjQ1ABwn8j9Y/Yohmybyq40vZAxn0jz2yy/zykH+lINq5HB6eSx967BspGrxPMaIkc4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gNce1AU5; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gNce1AU5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9B43C19422
+	for <linux-crypto@vger.kernel.org>; Thu, 26 Feb 2026 14:06:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772114773;
+	bh=uT9JiKcQKJ0pv2CawhWujaRPoPxzzMdg14SR3yeyED0=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=gNce1AU5hDdBnUgw/y7D770KbN4gDfCr9h/QlZDhl3Zl2VdQsgsZOvYs5OUuQ7hs0
+	 qiIF0hYG5QliKM735I2/H1xWl4rn21oiYK4hEdnIqufSgoYILbXKSZAN5kYWTMaP3s
+	 r7rMWo7CLoCQ9CZFHPzTf8L6Uwb3cPlGrPJaJuls1pnpsKkE42oL8/Xc1xXF/vrBu0
+	 5jfetvki5JaohKdnkoeBbNiFvD5a2vxf587hf+2CyDYOeMJsDi5EV1sga188H+t/oF
+	 dq7Le/vhLqc1qS7/uhxmRgmhwRPFDfYv0J7lqzAopaLFiX8duKzsaeHKN1LLmgqsfz
+	 VIkqPkfDz4UMQ==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id EA8B0F40069;
+	Thu, 26 Feb 2026 09:06:11 -0500 (EST)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-01.internal (MEProxy); Thu, 26 Feb 2026 09:06:11 -0500
+X-ME-Sender: <xms:U1OgaVZ5N7C1bqo91QtGLAPuXrmbZd387hlYKFc9b_REatcqmbegrA>
+    <xme:U1OgaXPBeClDqi6LTQxqD1c6fnwJmC1DODBcoX8cC-QQWJjbIkbYWFN1vOFvyZJIC
+    e41Rm2aTVj9vApVfsKUoTd3kvdJQfUdR6NQCMV8y8NXPG_FrrL7KeI>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeeivdegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcu
+    uehivghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrg
+    htthgvrhhnpeekvdffkefhgfegveekfedtieffhfelgeetiedvieffhfekfeeikeetueeg
+    teetteenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghrugdomhgvshhmthhprghuthhhphgv
+    rhhsohhnrghlihhthidqudeijedthedttdejledqfeefvdduieegudehqdgrrhgusgeppe
+    hkvghrnhgvlhdrohhrghesfihorhhkohhfrghrugdrtghomhdpnhgspghrtghpthhtohep
+    jedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepshhmuhgvlhhlvghrsegthhhroh
+    hnohigrdguvgdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdr
+    ohhrghdrrghupdhrtghpthhtohepvggsihhgghgvrhhssehkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopeguhhhofigvlhhlshesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhi
+    nhhugidqtghrhihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
+    hinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    jhgrshhonhesiiigvdgtgedrtghomh
+X-ME-Proxy: <xmx:U1OgaVvXnAE0wGIbvKKT6JBSt9Iy7yUclpsbg64P31S9EHlYuDyBgw>
+    <xmx:U1OgaYeREID6UtbrBOU7TfPxZfx6ikyuayCzNYu9XvNUu62Oxg6nkw>
+    <xmx:U1OgafbOf8wWkG_sVgOiTnYao-Y53LU-ZqwgEKLAph8MJ-TlUqIcVQ>
+    <xmx:U1OgaaYg3OUAC-mGrevd1xEWx_KDgcl6tzF-DlXyLBHVxssW1KDzIg>
+    <xmx:U1OgaUJb2jM0S_bHQNXhBBa0kUcPjbEn2SHjyn62qoTafvP-wXka7cgX>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id C8586700065; Thu, 26 Feb 2026 09:06:11 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1a65ac92579fadb4bfc76b32a3a4f1c6df022801.camel@ginzinger.com>
+X-ThreadId: AkESWeXa1bhB
+Date: Thu, 26 Feb 2026 15:05:50 +0100
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>,
+ "David Howells" <dhowells@redhat.com>,
+ "Stephan Mueller" <smueller@chronox.de>
+Message-Id: <d74eb790-83b7-42ef-bcbd-3a3c03ff1a51@app.fastmail.com>
+In-Reply-To: <20260226010005.43528-1-ebiggers@kernel.org>
+References: <20260226010005.43528-1-ebiggers@kernel.org>
+Subject: Re: [PATCH v7] crypto: jitterentropy - Use SHA-3 library
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 26, 2026 at 11:41:56AM +0000, Kepplinger-Novakovic Martin wrote:
-> [    2.272135] PKEY: ==>public_key_verify_signature()
-> [    2.272165] CAAM rsa init start
-> [    2.272180] CAAM rsa init done
-> [    2.272191] caam_rsa_pub_key: free old key in ctx
-> [    2.272201] caam_rsa_pub_key: write rsa_key->e
-> [    2.272210] caam_rsa_pub_key: write rsa_key->n
-> [    2.272220] start rsassa_pkcs1_verify
-> [    2.272228] slen: 256
-> [    2.272238] child_req address: 1d64b62a full size: 64 + 48 + 256 = 368
-> [    2.272274] out_buf1:00000000: 00000000 00000000 00000000 00000000  ................
-> [    2.272298] out_buf1:00000010: 00000000 00000000 00000000 00000000  ................
-> [    2.272322] SRC BUF in out_buf1 CRC: 969ee858
-> [    2.272335] start caam_rsa_enc
-> [    2.272352] key:00000000: cf60a600 cf4d1240 00000000 00000000  ..`.@.M.........
-> [    2.272377] key:00000010: 00000000 00000000 00000000 00000000  ................
-> [    2.272413] edesc:00000000: 00000001 00000001 00000000 00000000  ................
-> [    2.272438] edesc:00000010: 00000000 00000000 00000000 cf533d6c  ............l=S.
-> [    2.272466] req:00000000: 00000000 00000000 c02e2f68 d083dcb4  ........h/......
-> [    2.272491] req:00000010: cf60a540 00000200 d083dc94 d083dca4  @.`.............
-> [    2.272509] CAAM: calling caam_jr_enqueue
-> [    2.272524] key:00000000: cf60a600 cf4d1240 00000000 00000000  ..`.@.M.........
-> [    2.272546] key:00000010: 00000000 00000000 00000000 00000000  ................
-> [    2.277444] CAAM: completion callback
-> [    2.424765] OUT BUF in out_buf2 CRC: fd0eef11
-> [    2.424799] out_buf2:00000000: 00000000 00000000 00000000 00000000  ................
-> [    2.424827] out_buf2:00000010: ffffffff ffffffff ffffffff ffffffff  ................
-> [    2.424853] out_buf2:00000020: ffffffff ffffffff ffffffff ffffffff  ................
-> [    2.424878] out_buf2:00000030: ffffffff ffffffff ffffffff ffffffff  ................
-> [    2.424902] out_buf2:00000040: ffffffff ffffffff ffffffff ffffffff  ................
-> [    2.424926] out_buf2:00000050: ffffffff ffffffff ffffffff ffffffff  ................
-> [    2.424949] out_buf2:00000060: ffffffff ffffffff ffffffff ffffffff  ................
-> [    2.424973] out_buf2:00000070: ffffffff ffffffff ffffffff ffffffff  ................
-> [    2.424996] out_buf2:00000080: ffffffff ffffffff ffffffff ffffffff  ................
-> [    2.425020] out_buf2:00000090: ffffffff ffffffff ffffffff ffffffff  ................
-> [    2.425043] out_buf2:000000a0: ffffffff ffffffff ffffffff ffffffff  ................
-> [    2.425068] out_buf2:000000b0: ffffffff ffffffff ffffffff ffffffff  ................
-> [    2.425095] out_buf2:000000c0: ffffffff ffffffff ffffffff 30313000  .............010
-> [    2.425123] out_buf2:000000d0: 6009060d 65014886 01020403 20040005  ...`.H.e....... 
-> [    2.425148] out_buf2:000000e0: 6155a84e 7aa089cb 7540e613 f28b9a30  N.Ua...z..@u0...
-> [    2.425172] out_buf2:000000f0: 1e98ec34 cecb0e0f 9ee8951a ad8baec3  4...............
 
-There's an endianness issue here:  30313000 is the zero byte prescribed
-by EMSA-PKCS1-v1_5 ("in_buf[ps_end] = 0x00;" in rsassa_pkcs1_sign()),
-followed by the first three bytes of hash_prefix_sha256[] in reverse order.
 
-Then 6009060d are the next four bytes of hash_prefix_sha256[], again
-in reverse order.  And so on until 20040005, which are the last four
-bytes of the prefix in reverse order.
+On Thu, 26 Feb 2026, at 02:00, Eric Biggers wrote:
+> From: David Howells <dhowells@redhat.com>
+>
+> Make the jitterentropy RNG use the SHA-3 library API instead of
+> crypto_shash.  This ends up being quite a bit simpler, as various
+> dynamic allocations and error checks become unnecessary.
+>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Co-developed-by: Eric Biggers <ebiggers@kernel.org>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>
+> This is a cleaned-up and rebased version of
+> https://lore.kernel.org/linux-crypto/20251017144311.817771-7-dhowells@redhat.com/
+> If there are no objections, I'll take this via libcrypto-next.
+>
+>  crypto/Kconfig               |   2 +-
+>  crypto/jitterentropy-kcapi.c | 114 +++++++++--------------------------
+>  crypto/jitterentropy.c       |  25 ++++----
+>  crypto/jitterentropy.h       |  19 +++---
+>  4 files changed, 52 insertions(+), 108 deletions(-)
+>
 
-How are you generating that hexdump?  What's the CPU's endianness?
-Is the caam RSA accelerator using a different endianness?
-
-Thanks,
-
-Lukas
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
