@@ -1,161 +1,177 @@
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012011.outbound.protection.outlook.com [40.107.209.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A693112D2
-	for <linux-crypto@vger.kernel.org>; Thu, 26 Feb 2026 13:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772111402; cv=none; b=Xg8zlVSqjs2e9XmQPDK1SR19j8wgv3s6VAGojwICt7Bvz6NnkU5xhdrADRoPOn81k3Cx6FeHvT8D4qtVN8PFHdKXDOm3uHUBNCfBqiSoKt7yIiIL1XssyKtZ3omiMfFFjah5Hudvv79Nv9+0Y0pemkG0S456wOLCAxLNz0J/xdw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772111402; c=relaxed/simple;
-	bh=a1p1msLbl85XGiJLc5pnzixV/EAE95C8WZQeXpg7yPU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F5tdFhVw+IERv4/LOOwc7nVASIiS2nO1xuOY/1eZPudke0b4Tnpqi7x6RaUfmLjj/1ur6x8cyi2DKYn991J77awl/+0vVQJIB4MO9o5of0mG6gHUrd21TBeVdYu1E5nCA//uKNlalTTGExrFSBqGsDoLx8YcUsDPhBfesZ5Ojxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-56a9402b52fso658909e0c.0
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Feb 2026 05:10:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772111400; x=1772716200;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iFo4C5bqe5c13AwLxjM1MlDIBZrqfqokVA35lsfZfy0=;
-        b=lkbX93DB32+v3r1V+s6dW/gt8+9BkzfZNx5d/r5PumCRb2krWJBEHp5P5QKdJ77C4b
-         Cnq6El9eC35l8PUgaVijKvQlqXoVgz+B7/bUpNzBeeduHLH+KxGBX/VkTiVZkIILb3nB
-         /bmKzKuq9jG8eKQQkfYor5r+WTguR9QjRnYc08QHTcvSSXUuGxnWQoZgW8FBlb4RNw1T
-         qzTbjGzy2Xc+9AEjT5VzB6ooRGAdXcKma/SCeXevUinn1QUr88RyVFevcURQruD2n74J
-         DdQDh5WHduEhMamSTzNuNEOYjIpu7Ik05JdJnUBGTrLpnKL0vr7cwdg3bGZi8/dDWQc+
-         m1yw==
-X-Gm-Message-State: AOJu0Yw++g3szQJft4AWYfKwQA6sYKg3KhmrT6O3+DR+/h/vwqGZUXAh
-	d5Ixj47NSI4vGNHcRDwxX2ds+qCam6ISKzVFcetxitJgRQtv3EvF9rFifRZs3CMm
-X-Gm-Gg: ATEYQzwXT3kPpPwl4xEDODcM+8oJFOntAAMisl75aX6NhgXwmFziCsiFnoRvXz9DwRr
-	FkJn39YKT2rwY3tKUDOTgpE7IaNokrLd+hCttZReqH1LTjgB9EXaKuxqND5iE6Ap00xdiSx333D
-	teMUU8bknmawnlniiHoNPg2kSPJGXwq2R1zOfKZcg45H+XAmJRnOyt2XpNbTq2YWe7kMKakD7/k
-	DMGdi+l2d862qHfaoCiql3RS2H/CiSCjFUq+thQiFhwiJDFFFE79r1XHI+yhN6n27veL5qf1LP2
-	HtuGRKbD0QtBwc6Gg8pYz12RlO6qhLaDe5yLD6n7F8fUx1Cp1+yhLmliE+1vyDLN1AeV87EMRfl
-	u/IDtAjFAD4YdxJNN64/lUf7fGQpbDtpjpd8AkS1CEiWB7NFArHrJbPWMO3hldCp8t27At8LvW1
-	y+SL2M+FDEs2lP/lr+qSQXEZDbGtRF62pZgd8RUp1o4y6rlRgFF603DC8Tj7CPhuvtVL4W1Q8=
-X-Received: by 2002:a05:6122:6e0e:b0:566:3b13:8208 with SMTP id 71dfb90a1353d-56a93084677mr1102283e0c.5.1772111400275;
-        Thu, 26 Feb 2026 05:10:00 -0800 (PST)
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com. [209.85.222.54])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56a92177fbasm2379686e0c.16.2026.02.26.05.09.58
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Feb 2026 05:09:58 -0800 (PST)
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-94acf9ce1b7so661338241.2
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Feb 2026 05:09:58 -0800 (PST)
-X-Received: by 2002:a05:6102:5112:b0:5dd:c3ec:b66 with SMTP id
- ada2fe7eead31-5ff20c30021mr989167137.30.1772111398038; Thu, 26 Feb 2026
- 05:09:58 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EBD2D9EDB;
+	Thu, 26 Feb 2026 13:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772111484; cv=fail; b=mEE5uOq2/yF4WOTJeIep8g7PZv53PCcIJJJ8BWs3SI7w3ZKiEMj7gJ8Jcvhvo2cTSWP5zhXTfyPPAYBMV6ssV1lIK6up6fYGcWB/aiJoAxFAdIJAPLiRD9tl8ZjEour/mxNsScDDfbS+cLL+A8PTU462ZSz5Nc90qKRSJlNa1Ps=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772111484; c=relaxed/simple;
+	bh=8PCFVsvjB0Ql46a0X1eX/kNp2WDZzJFAEW8x2+4j+eI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EurpphMqhbiACwHrahaGOiZItWfDiJlk6jztxBGwYjc7zRzf55fWuZsO0wpPAzCUjfyOHmtrYOFUVBhiT5s78q3Y8EZdzULwm3IDnODaBQuNuuo7SVzTH9tURwQ5ZUpOC+7QjmKeWpMmMKoHSZnxKUgTzGqbNHLBKbkqa+mIYnQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=giyNYOHo; arc=fail smtp.client-ip=40.107.209.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="giyNYOHo"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GgfuGiDE9QMrE9mTUiIDnN4dEVZ5CgGjtv7jPit/Nvv8LYLH2T6rIgUP4CfkXwMFt0Tj3vToS3BZVednHHeSGf9hCGEXeXsHWwvD4PF5TaOINFWgZXKKUEkso47WOg8v9S3aEFh7OOb4/LCABHuY1X6L1cP6/9sAXB+eS2aoCdUuMwtNdo37dU0iDe+XvPgzAiYvHlacbURwjxhdiuceNJc16K9p5VE2Il+RCcuiPsri9Sp68YwtuRSyUA35OhA2OB9DmifVOiydEItwr2yTNr5YCfVbeGPbpodjpLc7JvL2XWM6+ARvTwlM2E7Va7Rx4RbaZoAnIsXYp2fChOsM9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=f10NGWA1OjS2WILYTgGdfSEU5oLOC36KR4diogdPk28=;
+ b=rdhWk6qbn0cbLKphZ0fHXvrwg2MawlocBQqET7QvMJYSh/wWmxjm1YM1fqPFIYK8ZhqurP41WK80LSGgcmhPjN7l4Z+ff+oiOB8hLhimiD8koYWHJye1dqn52JFVY/nG/q+iDztPrQksZR7IdR6srXufV9WneRmNbkb3GKOLg9uDWWoCROTExZVTEgQLoTLCds4CWrpHwQzluNEvlALuNBzZyO3xsp1WaOP4x+EXCSwKOYV+mHT9h3ZqcnLC99/D96uW6H/0mwxuU1R3lyNv1t8TFm0eoocV69D3rlyyF42nzxrXmi/uqGF9tHa7/2hB+ATVeOoXbfXI7AETmi7/Sw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.195) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f10NGWA1OjS2WILYTgGdfSEU5oLOC36KR4diogdPk28=;
+ b=giyNYOHodG9l4M7rKwSvl7FRAfJHiUZYfp5efPJWkD+ubeDnTcuyu9KUgrYdbxESuObUqdVKvczUmpgPXWbgoGJQ4bAofXLCGiQ1yi+plEowjSjHmXpEEL/nb0cHEechiW6j5bg+1fMhGNLFGIoqVvZN3Xz4UArjNTlfbcbYf64=
+Received: from BY5PR20CA0004.namprd20.prod.outlook.com (2603:10b6:a03:1f4::17)
+ by CY5PR10MB6071.namprd10.prod.outlook.com (2603:10b6:930:39::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.23; Thu, 26 Feb
+ 2026 13:11:19 +0000
+Received: from SJ5PEPF000001CC.namprd05.prod.outlook.com
+ (2603:10b6:a03:1f4:cafe::4c) by BY5PR20CA0004.outlook.office365.com
+ (2603:10b6:a03:1f4::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.25 via Frontend Transport; Thu,
+ 26 Feb 2026 13:11:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
+Received: from lewvzet201.ext.ti.com (198.47.23.195) by
+ SJ5PEPF000001CC.mail.protection.outlook.com (10.167.242.41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.12 via Frontend Transport; Thu, 26 Feb 2026 13:11:18 +0000
+Received: from DLEE213.ent.ti.com (157.170.170.116) by lewvzet201.ext.ti.com
+ (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 26 Feb
+ 2026 07:11:16 -0600
+Received: from DLEE213.ent.ti.com (157.170.170.116) by DLEE213.ent.ti.com
+ (157.170.170.116) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 26 Feb
+ 2026 07:11:15 -0600
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE213.ent.ti.com
+ (157.170.170.116) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Thu, 26 Feb 2026 07:11:15 -0600
+Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [10.24.69.191])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 61QDBEmm1917403;
+	Thu, 26 Feb 2026 07:11:15 -0600
+From: T Pratham <t-pratham@ti.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
+	<davem@davemloft.net>
+CC: T Pratham <t-pratham@ti.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Manorit Chawdhry <m-chawdhry@ti.com>,
+	"Kamlesh Gurudasani" <kamlesh@ti.com>, Shiva Tripathi <s-tripathi1@ti.com>,
+	"Kavitha Malarvizhi" <k-malarvizhi@ti.com>, Vishal Mahaveer <vishalm@ti.com>,
+	"Praneeth Bajjuri" <praneeth@ti.com>
+Subject: [PATCH v3 0/3] Add support for hashing algorithms in TI DTHE V2
+Date: Thu, 26 Feb 2026 18:41:00 +0530
+Message-ID: <20260226131103.3560884-1-t-pratham@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251214181712.29132-1-ebiggers@kernel.org> <20251214181712.29132-3-ebiggers@kernel.org>
-In-Reply-To: <20251214181712.29132-3-ebiggers@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 26 Feb 2026 14:09:47 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdULzMdxuTVfg8_4jdgzbzjfx-PHkcgbGSthcUx_sHRNMg@mail.gmail.com>
-X-Gm-Features: AaiRm51PaPKg5xcCQeCnUb9vy0Lr9tZrrIwLkmaSIGSq-OyO54vQniCM8N9qQps
-Message-ID: <CAMuHMdULzMdxuTVfg8_4jdgzbzjfx-PHkcgbGSthcUx_sHRNMg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] lib/crypto: tests: Add KUnit tests for ML-DSA verification
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, 
-	Sami Tolvanen <samitolvanen@google.com>, "Jason A . Donenfeld" <Jason@zx2c4.com>, 
-	Ard Biesheuvel <ardb@kernel.org>, Stephan Mueller <smueller@chronox.de>, Lukas Wunner <lukas@wunner.de>, 
-	Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org, 
-	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
-	KUnit Development <kunit-dev@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CC:EE_|CY5PR10MB6071:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9e36220a-cc9b-4f60-7fff-08de75388772
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|34020700016|36860700013|82310400026|376014|1800799024|7142099003;
+X-Microsoft-Antispam-Message-Info:
+	WZkMjWzfdDKLdkv6UrRKHzzc+wuwasLWMeJ23Xc0G+pUFoKYlLorCIyXMAaeSShgnK7A7j6KzIQQwPx+MY6O7WmP2CUS3p0qxC5l6L4VHfx8ICfSO7M+CF7GsFP2KAcqz5mKf5tB8KV7MpZm+v2AJXVOp86tqclvodkpZPFqGYR/2mc3+Lk5u0gbulne8PBR0hZUOs+GRu1d5xYFD8dIadLuhDQtk3MMJu4VEZOIEFjSTCIXJcPmH0vEbtl1Y6v1nk1dXMs0r7q4P3UIppG+Y172l0rM63ZxWOeitr1b3KhKjzW529Z8LE2+3LkTpZ6yI00bbqRqMUO5JCAOGqo5WUfT6VAnZfbh27x5ERoRyp/GeFUucZrX0CJntMPre4ke8uwtCuMarHgTiQzYCBZwtAGJ4qflJIyeqWz75acSKB4TU5xV5CihOgjzpIIfZ6srkrqRPtr7LiXpq8KAM5AQD01T4TYh/G8ljm7WiNcFvVgsTvnf7vbLYshbFzmIEEJ49gZA37oSDpYO/1h5IYmVnpncXH53HDeWg3ErLExk3LBxqki8QPaDPbWE5sNgyTsF+DFAZ4KcnIcY+b//n67h/xY2PorTq7mIw4DhOU8DqfLBKR+T3Sh/ZdNw21m/VBc/MaHHJkIbHFsf3QJ8u/md0XoeSXy8ZLis9SKP5DlAXgD5+b3ZwlG+ZEDif8rLW9BpSKxuuWCnh9KGextkEwjeXHuObLaJ0PmssYhcQ6jj15lMKCLNEuJC0TNLOBPTcRl4NPpetGRStyLCFtv0ocs6mV0vo5YC9u9SA8vz+0YMwoE=
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(34020700016)(36860700013)(82310400026)(376014)(1800799024)(7142099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	jnLaQ1br2mxh5Qged5dOJ8T1138jERC3CMVr1TucYGSJlp+CgM9Wn2JeINnHJZ5rB31kw8zdLFH9+cBqBYIxqwsx+yTqgpBCl99Rq5yM/T3X1AIhv+mgtSxyriEBSSnzEz7QOmUZttL2JLszGDSy3EwNGkmXSfkUfSKV6qVvcQNdxAKqxauB8OkMnL49xTl3FkMXz1tBgKaz8PlcNA/e8ypNs85f43vtKWJxZpJEvDDZjTTbWiJ5N1bujEIKdW/3ezG3tQXJJnZP3+m8NsgSJCUc1mZyo/nxRriIs7Adwk0yF7QWkAF5A/l6+ZippUEBrSzILinwr1WrWTH3j+ShQ/BYrIFLVAsvMlYzhlB1faxhqXRQC7FBoySxqSyKRij7kZBmzi+kAvRpXpltkqPmqhKo9+1/NtHktQo+Vk6LaJcYZjed1IwNJ5vKcbW6b6/P
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 13:11:18.2871
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e36220a-cc9b-4f60-7fff-08de75388772
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001CC.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR10MB6071
 
-Hi Eric,
+DTHEv2 is a new cryptography engine introduced in TI AM62L SoC. The
+features of DTHEv2 were detailed in [1]. Additional hardware details
+available in SoC TRM [2]. DTHEv2 includes, among its various
+sub-components, a hashing engine which is compliant with various IETF
+and NIST standards, including FIPS 180-3 and FIPS PUB 198.
 
-CC kunit
+This patch series adds support for the hashing algorithms
+SHA224/256/384/512 and MD5 as well as their HMAC counnterparts for the
+hashing engine of Texas Instruments DTHE V2 crypto driver.
 
-On Sun, 14 Dec 2025 at 19:18, Eric Biggers <ebiggers@kernel.org> wrote:
-> Add a KUnit test suite for ML-DSA verification, including the following
-> for each ML-DSA parameter set (ML-DSA-44, ML-DSA-65, and ML-DSA-87):
->
-> - Positive test (valid signature), using vector imported from leancrypto
-> - Various negative tests:
->     - Wrong length for signature, message, or public key
->     - Out-of-range coefficients in z vector
->     - Invalid encoded hint vector
->     - Any bit flipped in signature, message, or public key
-> - Unit test for the internal function use_hint()
-> - A benchmark
->
-> ML-DSA inputs and outputs are very large.  To keep the size of the tests
-> down, use just one valid test vector per parameter set, and generate the
-> negative tests at runtime by mutating the valid test vector.
->
-> I also considered importing the test vectors from Wycheproof.  I've
-> tested that mldsa_verify() indeed passes all of Wycheproof's ML-DSA test
-> vectors that use an empty context string.  However, importing these
-> permanently would add over 6 MB of source.  That's too much to be a
-> reasonable addition to the Linux kernel tree for one algorithm.  It also
-> wouldn't actually provide much better test coverage than this commit.
-> Another potential issue is that Wycheproof uses the Apache license.
->
-> Similarly, this also differs from the earlier proposal to import a long
-> list of test vectors from leancrypto.  I retained only one valid
-> signature for each algorithm, and I also added (runtime-generated)
-> negative tests which were missing.  I think this is a better tradeoff.
->
-> Reviewed-by: David Howells <dhowells@redhat.com>
-> Tested-by: David Howells <dhowells@redhat.com>
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+This patch series depends on the following previous series [3]:
+[PATCH v10 0/3] Add support for more AES modes in TI DTHEv2
 
-Thanks for your patch, which is now commit ed894faccb8de55c
-("lib/crypto: tests: Add KUnit tests for ML-DSA verification")
-in v7.0-rc1.
+The driver is tested using full kernel crypto selftests
+(CRYPTO_SELFTESTS_FULL) which all pass successfully [4].
 
-> --- a/lib/crypto/tests/Kconfig
-> +++ b/lib/crypto/tests/Kconfig
-> @@ -36,10 +36,19 @@ config CRYPTO_LIB_MD5_KUNIT_TEST
->         select CRYPTO_LIB_MD5
->         help
->           KUnit tests for the MD5 cryptographic hash function and its
->           corresponding HMAC.
->
-> +config CRYPTO_LIB_MLDSA_KUNIT_TEST
-> +       tristate "KUnit tests for ML-DSA" if !KUNIT_ALL_TESTS
-> +       depends on KUNIT
-> +       default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
-> +       select CRYPTO_LIB_BENCHMARK_VISIBLE
-> +       select CRYPTO_LIB_MLDSA
+Signed-off-by: T Pratham <t-pratham@ti.com>
+---
+[1]: [PATCH v7 0/2] Add support for Texas Instruments DTHEv2 Crypto Engine
+Link: https://lore.kernel.org/all/20250820092710.3510788-1-t-pratham@ti.com/
 
-These two selects mean that enabling KUNIT_ALL_TESTS also enables
-extra functionality, which may not be desirable in a production system.
-Fortunately CRYPTO_LIB_MLDSA is tristate, so in the modular case
-the extra functionality is a module, too, and not part of the running system
-by default.  Unfortunately CRYPTO_LIB_MLDSA is invisible, so this cannot
-just be changed from "select" to "depends on". But as CRYPTO_MLDSA
-also selects it, perhaps the test can be made dependent on CRYPTO_MLDSA?
+[2]: Section 14.6.3 (DMA Control Registers -> DMASS_DTHE)
+Link: https://www.ti.com/lit/ug/sprujb4/sprujb4.pdf
 
-> +       help
-> +         KUnit tests for the ML-DSA digital signature algorithm.
-> +
->  config CRYPTO_LIB_POLY1305_KUNIT_TEST
->         tristate "KUnit tests for Poly1305" if !KUNIT_ALL_TESTS
->         depends on KUNIT
->         default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
->         select CRYPTO_LIB_BENCHMARK_VISIBLE
+[3]: [PATCH v10 0/3] Add support for more AES modes in TI DTHEv2
+Link: https://lore.kernel.org/all/20260226125441.3559664-1-t-pratham@ti.com/
 
-Gr{oetje,eeting}s,
+[4]: DTHEv2 kernel self-tests logs
+Link: https://gist.github.com/Pratham-T/fd15b8e0ee815bcb420a60d451a0cf18
 
-                        Geert
+Changelog:
+v3:
+ - Check for error in registration individualy for hash and aes driver
+   algos.
+ - Fixed comment style in dthev2-common.c
+v2:
+ - Completely revamped the driver to use the new CRYPTO_AHASH_BLOCK_ONLY
+   framework for handling partial blocks and crypto_engine for queueing.
+ - Added HMAC as well.
+
+Link to previous versions:
+v2: https://lore.kernel.org/all/20260121132408.743777-1-t-pratham@ti.com/
+v1: https://lore.kernel.org/all/20250218104943.2304730-1-t-pratham@ti.com/
+---
+
+T Pratham (3):
+  crypto: ti - Add support for SHA224/256/384/512 in DTHEv2 driver
+  crypto: ti - Add support for MD5 in DTHEv2 Hashing Engine driver
+  crypto: ti - Add support for HMAC in DTHEv2 Hashing Engine driver
+
+ drivers/crypto/ti/Kconfig         |   4 +
+ drivers/crypto/ti/Makefile        |   2 +-
+ drivers/crypto/ti/dthev2-aes.c    |   6 +-
+ drivers/crypto/ti/dthev2-common.c |  43 +-
+ drivers/crypto/ti/dthev2-common.h |  58 +-
+ drivers/crypto/ti/dthev2-hash.c   | 922 ++++++++++++++++++++++++++++++
+ 6 files changed, 1017 insertions(+), 18 deletions(-)
+ create mode 100644 drivers/crypto/ti/dthev2-hash.c
 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.34.1
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
