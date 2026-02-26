@@ -1,18 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527563D5225;
-	Thu, 26 Feb 2026 14:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEBAF3D9045;
+	Thu, 26 Feb 2026 14:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772117174; cv=none; b=cDhr48nQReRQb0zmZYS4gS6NNrk/i8DuWhc4XouvwwnTsPmEWjiJEpFUEyFSvaciMFHfzyJkYAJME/GuI3jIRifEFey6F1QMsy0HCGMVhTPz3dVjHHm+/ogPwyD57Qng4bg7G4jEZqG3LeD46GZena1UIfAlC8s1QF7tIRtfD+s=
+	t=1772117175; cv=none; b=FdsFCLW26PhEhhXoXaqY2ndrj6X3zK7rgV0sOfFDepki5yVSc2b4gvLQxKJetG57pEouSEBb2txbidnszrUUlrcQjMoKUjKGoyhRU8dix+QiS8T22Pc+NFTf3pVBYxNp0dkS4D9DM/Fn7PpTkGtlPiMqePv2Uh8ltB8fY7GoGk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772117174; c=relaxed/simple;
-	bh=dOx7L9FMXSNyyO9RDoQZeW4I5roMbAYAp6pktIjCurw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AeepFRFEuN/uQrTjXmw7l5z+OLsxDtni6WsuH0jJyyvtvALhPonWp/Rp7Mv00hna50Q6xNiMpeJAryEkgOzJmsdpH/lJvQw6IalgQ3KBx0OBD+0Su2ZdY8mRT+iUeIZo5zEL2KwAxPxLvjrIUeIs4bWvc6BIFBORmtrtnBLzmfI=
+	s=arc-20240116; t=1772117175; c=relaxed/simple;
+	bh=kR1hjMinjNvTwkQ2I8iZSR/aiZt5ZceOZNw87uJHnC4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=d5x+EBqnbRuYTJhilce6NSopLwC0YbysItB4otpxAiFcDmUeKnyFkaIeLYaAC1HTUIENWV1foIQc1TIea0o/Tlu9YM6JZLHDxd5eLoD6XRN4tIdrjGv4zShnNJz6ZJPKH9CHQYEe+QDA+pVaTPV26DhEVmpWprymjMGKeGdQ11o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1573C116C6;
-	Thu, 26 Feb 2026 14:46:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 556A3C19422;
+	Thu, 26 Feb 2026 14:46:14 +0000 (UTC)
 From: Geert Uytterhoeven <geert+renesas@glider.be>
 To: Eric Biggers <ebiggers@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
@@ -20,10 +21,12 @@ To: Eric Biggers <ebiggers@kernel.org>,
 Cc: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH 0/5] crypto: Drop stale usages in various help texts
-Date: Thu, 26 Feb 2026 15:46:04 +0100
-Message-ID: <cover.1772116160.git.geert+renesas@glider.be>
+Subject: [PATCH 1/5] crypto: Clean up CRYPTO_BLAKE2B usage
+Date: Thu, 26 Feb 2026 15:46:05 +0100
+Message-ID: <98b983d2f2bddf0e5e8e1c970446c3c64527ef89.1772116160.git.geert+renesas@glider.be>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1772116160.git.geert+renesas@glider.be>
+References: <cover.1772116160.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -32,37 +35,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-	Hi all,
+Btrfs stopped using this BLAKE2b implementations in commit
+fe11ac191ce0ad91 ("btrfs: switch to library APIs for checksums").
 
-This patch series drops stale references to subsystems that are using
-various crypto algoritms.  It was triggered by "make oldconfig" in
-v7.0-rc1 showing new prompts about BLAKE2b, SHA-256, xxHash, and CRC32c
-algorithms.  When querying these symbols, the corresponding help texts
-incorrectly claim they are used by btrfs.
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+ crypto/Kconfig | 2 --
+ 1 file changed, 2 deletions(-)
 
-Notw that even if correct, there is no need for such references, as all
-users should select the needed symbols anyway.
-
-Geert Uytterhoeven (5):
-  crypto: Drop stale CRYPTO_BLAKE2B usage
-  crypto: Drop stale CRYPTO_SHA256 usage
-  crypto: Drop stale CRYPTO_XXHASH usage
-  crypto: Drop stale CRYPTO_CRC32C usage
-  crypto: Drop stale CRYPTO_CRC32 usage
-
- crypto/Kconfig | 9 ---------
- 1 file changed, 9 deletions(-)
-
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index e2b4106ac961eb52..8bc95e69faa5557a 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -876,8 +876,6 @@ config CRYPTO_BLAKE2B
+ 	  - blake2b-384
+ 	  - blake2b-512
+ 
+-	  Used by the btrfs filesystem.
+-
+ 	  See https://blake2.net for further information.
+ 
+ config CRYPTO_CMAC
 -- 
 2.43.0
 
-Gr{oetje,eeting}s,
-
-						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
