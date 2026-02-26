@@ -1,175 +1,240 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD706286D70
-	for <linux-crypto@vger.kernel.org>; Thu, 26 Feb 2026 01:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40602371067;
+	Thu, 26 Feb 2026 01:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772068476; cv=none; b=U3FMEQUTGLut2dSTir+f4rPMouSipNFOZRxOLKWfbizI9fLdieUSjc5+6PoM6/HD1p9rNJhdsX5dgVUL1/YkVx2rczwYPhrMXkEyObGAvEZFKMrgSVLadCXmtXTag1MV/keGGdoBmChULjiy53SpdIy7f+lpLwnqEjok9zhz9Rs=
+	t=1772070115; cv=none; b=Yq+mtQDQCRg2ZGsDA8dXoipbVWwx2cecNrk4ypwSkDgbwo11lSNAlId1SFs9Px/IZ7MehY7PsU9npPqT+N0stGOVDGefEDPFqo9iLQgiBrJPntCrFpn8WqiAQhS3V4Q4pwXc/RLWNCP8MCfnZHtCls1fe3ADjupXaaLo3WPeCqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772068476; c=relaxed/simple;
-	bh=EcPFw3fwdHKBUa9LIKaZnc+0flJAKUAS/QgR7EiNEGs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NUVjJN963h9AeKg1Rd3fOMeCFxY+wy4jcSE20kPEQUPtFOwiPzLPdFfV7uTllJu6DOX08ZuN1FHPPKtcSHSeykPOXaku2RSaJYW+gWCM+j0bSXILcCe0esbfrpwmsbf1NjnR/uJi5hyz9YSkU/1eK4LiHNyg6rEFTUkjzvXvgmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zong3RjQ; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1772070115; c=relaxed/simple;
+	bh=CfAYEd9U4HSw1/bmYpiEHbdxZ+wvqDZ8aVBkXZx6dkU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=onfyZzTXcY6LFw07601VM4Keek1wEK2aUbYnfynIJodPmyA455dqtLrrRdfjSKGRZ3L2ymTEBvuK6eK0foSdw6JJ18nACbljnQgiFJ6U4ZPTO2TRtXH5Fbblc6BuITjxcaM7+nRLxSVgFfO+wpSxtkaCS7Ezm5KNTgJtesGzy7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H53BGrd2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zong3RjQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772068475; x=1803604475;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=EcPFw3fwdHKBUa9LIKaZnc+0flJAKUAS/QgR7EiNEGs=;
-  b=Zong3RjQy0gu2Btw4zmDUmKMStLgGCFXmAq6DGSZn1tAaMz06M1DBVe/
-   qi24aj3IpJE6vC4LO+L9vvA+3jdS+wSjGYmdkWZ1OTD3W6u3RTIKPEN/0
-   NLUbzizWl8vRqGr2D+rNECR+/YpQRA2V2i3ovBzIXMDkE8wuWRul/opVH
-   EEJ3t1bCOBgVn9enjtaDerfhNUX09QtWnaCHlAABOal58uO1sWp1M6VI5
-   M3EkdR8ldxsB/a7A6r7jv+y206K8uMFievwl3XJ9tXygH1+PPhDCxqpsE
-   TgfL9upHt8YT8JaWnFD8wiwM0o9Ag2spxxy6fzNNoqGlv+mrrPU5I6ut7
-   Q==;
-X-CSE-ConnectionGUID: 3l9JHzyAT3+gN1UEUCKTCw==
-X-CSE-MsgGUID: NZ7qUciBTLK856RCeM/e/w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11712"; a="75726520"
-X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
-   d="scan'208";a="75726520"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 17:14:34 -0800
-X-CSE-ConnectionGUID: ZDR4v/W6Rt2COLyzL1ABgg==
-X-CSE-MsgGUID: NFxp3jjOTeSap7c3rCMNog==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
-   d="scan'208";a="219780931"
-Received: from lkp-server02.sh.intel.com (HELO a3936d6a266d) ([10.239.97.151])
-  by fmviesa004.fm.intel.com with ESMTP; 25 Feb 2026 17:14:32 -0800
-Received: from kbuild by a3936d6a266d with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vvPwY-000000007lJ-2etx;
-	Thu, 26 Feb 2026 01:13:55 +0000
-Date: Thu, 26 Feb 2026 09:12:32 +0800
-From: kernel test robot <lkp@intel.com>
-To: James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-crypto@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-Subject: Re: [PATCH v3 5/5] crypto: pkcs7: add tests for pkcs7_get_authattr
-Message-ID: <202602260949.uDrsr8hd-lkp@intel.com>
-References: <20260225211907.7368-6-James.Bottomley@HansenPartnership.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H53BGrd2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BE0AC116D0;
+	Thu, 26 Feb 2026 01:41:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772070114;
+	bh=CfAYEd9U4HSw1/bmYpiEHbdxZ+wvqDZ8aVBkXZx6dkU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=H53BGrd2Jugain5WpBIrTcN5iYco/wtxdQ1czG6LZmIRgWcSRT+cMyVtPC2C0wLAi
+	 ukX2fn+giEXD/GWD+eFKH2XMMtDJA9JXtQoQ0VQyLr7t2XF/khLqloaUOLYxwwbSI2
+	 +bkRNGZKOEj2Nv9rPGQX0N8Qhb04x65bbgPOIFG+twUTqicJu7IaceGFFKfwJSpvNO
+	 bOPHwHmB77NHBCzrW9wWzq9cNPogZgfL0xLMx31cpQeGrPqwnvGq4WYhBUFLkQ9gLw
+	 Hg0tNGX3DXf3j4kRCpe7w4xFvZeV+GB11W6biY0D79iO0pkcPhjladpvXQuLn7ywo+
+	 w4tBht8QGUEzA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: dm-devel@lists.linux.dev,
+	Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>
+Cc: linux-crypto@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] dm-ima: use SHA-256 library
+Date: Wed, 25 Feb 2026 17:39:15 -0800
+Message-ID: <20260226013915.54873-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260225211907.7368-6-James.Bottomley@HansenPartnership.com>
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Make dm_ima_measure_on_table_load() use the SHA-256 library API instead
+of crypto_shash to calculate the SHA-256 hash value that it needs.  This
+is simpler and more efficient.  It also ensures that SHA-256 is actually
+available and doesn't fail due to the unreliable loading by name.
 
-kernel test robot noticed the following build warnings:
+While doing this, also use kasprintf() to simplify building the string
+version of the digest.
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v7.0-rc1 next-20260225]
-[cannot apply to herbert-cryptodev-2.6/master herbert-crypto-2.6/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ drivers/md/Kconfig  |  1 +
+ drivers/md/dm-ima.c | 54 +++++++++------------------------------------
+ drivers/md/dm-ima.h |  1 -
+ 3 files changed, 11 insertions(+), 45 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/James-Bottomley/certs-break-out-pkcs7-check-into-its-own-function/20260226-052454
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20260225211907.7368-6-James.Bottomley%40HansenPartnership.com
-patch subject: [PATCH v3 5/5] crypto: pkcs7: add tests for pkcs7_get_authattr
-config: i386-buildonly-randconfig-002-20260226 (https://download.01.org/0day-ci/archive/20260226/202602260949.uDrsr8hd-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260226/202602260949.uDrsr8hd-lkp@intel.com/reproduce)
+diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
+index c58a9a8ea54e..53351048d3ec 100644
+--- a/drivers/md/Kconfig
++++ b/drivers/md/Kconfig
+@@ -224,10 +224,11 @@ config BLK_DEV_DM_BUILTIN
+ config BLK_DEV_DM
+ 	tristate "Device mapper support"
+ 	select BLOCK_HOLDER_DEPRECATED if SYSFS
+ 	select BLK_DEV_DM_BUILTIN
+ 	select BLK_MQ_STACKING
++	select CRYPTO_LIB_SHA256 if IMA
+ 	depends on DAX || DAX=n
+ 	help
+ 	  Device-mapper is a low level volume manager.  It works by allowing
+ 	  people to specify mappings for ranges of logical sectors.  Various
+ 	  mapping types are available, in addition people may write their own
+diff --git a/drivers/md/dm-ima.c b/drivers/md/dm-ima.c
+index efb3cd4f9cd4..9495ca035056 100644
+--- a/drivers/md/dm-ima.c
++++ b/drivers/md/dm-ima.c
+@@ -10,13 +10,11 @@
+ #include "dm-core.h"
+ #include "dm-ima.h"
+ 
+ #include <linux/ima.h>
+ #include <linux/sched/mm.h>
+-#include <crypto/hash.h>
+-#include <linux/crypto.h>
+-#include <crypto/hash_info.h>
++#include <crypto/sha2.h>
+ 
+ #define DM_MSG_PREFIX "ima"
+ 
+ /*
+  * Internal function to prefix separator characters in input buffer with escape
+@@ -176,23 +174,17 @@ void dm_ima_reset_data(struct mapped_device *md)
+ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_flags)
+ {
+ 	size_t device_data_buf_len, target_metadata_buf_len, target_data_buf_len, l = 0;
+ 	char *target_metadata_buf = NULL, *target_data_buf = NULL, *digest_buf = NULL;
+ 	char *ima_buf = NULL, *device_data_buf = NULL;
+-	int digest_size, last_target_measured = -1, r;
++	int last_target_measured = -1;
+ 	status_type_t type = STATUSTYPE_IMA;
+ 	size_t cur_total_buf_len = 0;
+ 	unsigned int num_targets, i;
+-	SHASH_DESC_ON_STACK(shash, NULL);
+-	struct crypto_shash *tfm = NULL;
+-	u8 *digest = NULL;
++	struct sha256_ctx hash_ctx;
++	u8 digest[SHA256_DIGEST_SIZE];
+ 	bool noio = false;
+-	/*
+-	 * In below hash_alg_prefix_len assignment +1 is for the additional char (':'),
+-	 * when prefixing the hash value with the hash algorithm name. e.g. sha256:<hash_value>.
+-	 */
+-	const size_t hash_alg_prefix_len = strlen(DM_IMA_TABLE_HASH_ALG) + 1;
+ 	char table_load_event_name[] = "dm_table_load";
+ 
+ 	ima_buf = dm_ima_alloc(DM_IMA_MEASUREMENT_BUF_LEN, noio);
+ 	if (!ima_buf)
+ 		return;
+@@ -208,23 +200,11 @@ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_fl
+ 	num_targets = table->num_targets;
+ 
+ 	if (dm_ima_alloc_and_copy_device_data(table->md, &device_data_buf, num_targets, noio))
+ 		goto error;
+ 
+-	tfm = crypto_alloc_shash(DM_IMA_TABLE_HASH_ALG, 0, 0);
+-	if (IS_ERR(tfm))
+-		goto error;
+-
+-	shash->tfm = tfm;
+-	digest_size = crypto_shash_digestsize(tfm);
+-	digest = dm_ima_alloc(digest_size, noio);
+-	if (!digest)
+-		goto error;
+-
+-	r = crypto_shash_init(shash);
+-	if (r)
+-		goto error;
++	sha256_init(&hash_ctx);
+ 
+ 	memcpy(ima_buf + l, DM_IMA_VERSION_STR, table->md->ima.dm_version_str_len);
+ 	l += table->md->ima.dm_version_str_len;
+ 
+ 	device_data_buf_len = strlen(device_data_buf);
+@@ -268,13 +248,11 @@ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_fl
+ 		 * we have in the current buffer, and continue measuring the remaining
+ 		 * targets by prefixing the device metadata again.
+ 		 */
+ 		if (unlikely(cur_total_buf_len >= DM_IMA_MEASUREMENT_BUF_LEN)) {
+ 			dm_ima_measure_data(table_load_event_name, ima_buf, l, noio);
+-			r = crypto_shash_update(shash, (const u8 *)ima_buf, l);
+-			if (r < 0)
+-				goto error;
++			sha256_update(&hash_ctx, (const u8 *)ima_buf, l);
+ 
+ 			memset(ima_buf, 0, DM_IMA_MEASUREMENT_BUF_LEN);
+ 			l = 0;
+ 
+ 			/*
+@@ -309,34 +287,25 @@ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_fl
+ 	}
+ 
+ 	if (!last_target_measured) {
+ 		dm_ima_measure_data(table_load_event_name, ima_buf, l, noio);
+ 
+-		r = crypto_shash_update(shash, (const u8 *)ima_buf, l);
+-		if (r < 0)
+-			goto error;
++		sha256_update(&hash_ctx, (const u8 *)ima_buf, l);
+ 	}
+ 
+ 	/*
+ 	 * Finalize the table hash, and store it in table->md->ima.inactive_table.hash,
+ 	 * so that the table data can be verified against the future device state change
+ 	 * events, e.g. resume, rename, remove, table-clear etc.
+ 	 */
+-	r = crypto_shash_final(shash, digest);
+-	if (r < 0)
+-		goto error;
+-
+-	digest_buf = dm_ima_alloc((digest_size*2) + hash_alg_prefix_len + 1, noio);
++	sha256_final(&hash_ctx, digest);
+ 
++	digest_buf = kasprintf(GFP_KERNEL, "sha256:%*phN", SHA256_DIGEST_SIZE,
++			       digest);
+ 	if (!digest_buf)
+ 		goto error;
+ 
+-	snprintf(digest_buf, hash_alg_prefix_len + 1, "%s:", DM_IMA_TABLE_HASH_ALG);
+-
+-	for (i = 0; i < digest_size; i++)
+-		snprintf((digest_buf + hash_alg_prefix_len + (i*2)), 3, "%02x", digest[i]);
+-
+ 	if (table->md->ima.active_table.hash != table->md->ima.inactive_table.hash)
+ 		kfree(table->md->ima.inactive_table.hash);
+ 
+ 	table->md->ima.inactive_table.hash = digest_buf;
+ 	table->md->ima.inactive_table.hash_len = strlen(digest_buf);
+@@ -352,13 +321,10 @@ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_fl
+ 	goto exit;
+ error:
+ 	kfree(digest_buf);
+ 	kfree(device_data_buf);
+ exit:
+-	kfree(digest);
+-	if (tfm)
+-		crypto_free_shash(tfm);
+ 	kfree(ima_buf);
+ 	kfree(target_metadata_buf);
+ 	kfree(target_data_buf);
+ }
+ 
+diff --git a/drivers/md/dm-ima.h b/drivers/md/dm-ima.h
+index 568870a1a145..a403deca6093 100644
+--- a/drivers/md/dm-ima.h
++++ b/drivers/md/dm-ima.h
+@@ -13,11 +13,10 @@
+ #define DM_IMA_MEASUREMENT_BUF_LEN	4096
+ #define DM_IMA_DEVICE_BUF_LEN		1024
+ #define DM_IMA_TARGET_METADATA_BUF_LEN	128
+ #define DM_IMA_TARGET_DATA_BUF_LEN	2048
+ #define DM_IMA_DEVICE_CAPACITY_BUF_LEN	128
+-#define DM_IMA_TABLE_HASH_ALG		"sha256"
+ 
+ #define __dm_ima_stringify(s) #s
+ #define __dm_ima_str(s) __dm_ima_stringify(s)
+ 
+ #define DM_IMA_VERSION_STR "dm_version="	\
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602260949.uDrsr8hd-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> crypto/asymmetric_keys/pkcs7_key_type.c:99:52: warning: format specifies type 'long' but the argument has type 'size_t' (aka 'unsigned int') [-Wformat]
-      99 |         pr_info("Correctly Got message hash, size=%ld\n", len);
-         |                                                   ~~~     ^~~
-         |                                                   %zu
-   include/linux/printk.h:584:34: note: expanded from macro 'pr_info'
-     584 |         printk(KERN_INFO pr_fmt(fmt), ##__VA_ARGS__)
-         |                                 ~~~     ^~~~~~~~~~~
-   include/linux/printk.h:511:60: note: expanded from macro 'printk'
-     511 | #define printk(fmt, ...) printk_index_wrap(_printk, fmt, ##__VA_ARGS__)
-         |                                                     ~~~    ^~~~~~~~~~~
-   include/linux/printk.h:483:19: note: expanded from macro 'printk_index_wrap'
-     483 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
-         |                         ~~~~    ^~~~~~~~~~~
-   1 warning generated.
-
-
-vim +99 crypto/asymmetric_keys/pkcs7_key_type.c
-
-    48	
-    49	/*
-    50	 * Preparse a PKCS#7 wrapped and validated data blob.
-    51	 */
-    52	static int pkcs7_preparse(struct key_preparsed_payload *prep)
-    53	{
-    54		enum key_being_used_for usage = pkcs7_usage;
-    55		int ret;
-    56		struct pkcs7_message *pkcs7;
-    57		const void *data;
-    58		size_t len;
-    59	
-    60		if (usage >= NR__KEY_BEING_USED_FOR) {
-    61			pr_err("Invalid usage type %d\n", usage);
-    62			return -EINVAL;
-    63		}
-    64	
-    65		ret = verify_pkcs7_signature(NULL, 0,
-    66					      prep->data, prep->datalen,
-    67					      VERIFY_USE_SECONDARY_KEYRING, usage,
-    68					      pkcs7_view_content, prep);
-    69		if (ret)
-    70			return ret;
-    71	
-    72		pkcs7 = pkcs7_parse_message(prep->data, prep->datalen);
-    73		if (IS_ERR(pkcs7)) {
-    74			pr_err("pkcs7 parse error\n");
-    75			return PTR_ERR(pkcs7);
-    76		}
-    77	
-    78		/*
-    79		 * the parsed message has no trusted signer, so nothing should
-    80		 * be returned here
-    81		 */
-    82		ret = pkcs7_get_authattr(pkcs7, OID_messageDigest, &data, &len);
-    83		if (ret == 0) {
-    84			pr_err("OID returned when no trust in signer\n");
-    85			goto out;
-    86		}
-    87		/* add trust and check again */
-    88		ret = validate_pkcs7_trust(pkcs7, VERIFY_USE_SECONDARY_KEYRING);
-    89		if (ret) {
-    90			pr_err("validate_pkcs7_trust failed!!\n");
-    91			goto out;
-    92		}
-    93		/* now we should find the OID */
-    94		ret = pkcs7_get_authattr(pkcs7, OID_messageDigest, &data, &len);
-    95		if (ret) {
-    96			pr_err("Failed to get message digest\n");
-    97			goto out;
-    98		}
-  > 99		pr_info("Correctly Got message hash, size=%ld\n", len);
-   100	
-   101	 out:
-   102		pkcs7_free_message(pkcs7);
-   103		return 0;
-   104	}
-   105	
-
+base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.53.0
+
