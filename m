@@ -1,54 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56531436379;
-	Thu, 26 Feb 2026 19:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2252B4657DF;
+	Thu, 26 Feb 2026 19:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772135098; cv=none; b=t//2425Qu6qHtgUw+6jZs2kPjDUJKISYiunzqcDFEBnwRSS0vSIx46inrTabgWsfPI4rjgTHIr/5uHPT7gMXt+fLQbHZY5AZ3o/EELrPazA8d6byxKI10tIlDenuiBPgvgZLXCBJzJykAKSXVwiBnJQZgocx2LxqQMpnd8mdLU0=
+	t=1772135732; cv=none; b=P8Jx9P38ATiErGP9p2pq40JkbClPJ8WGSafIBYWI8/NiQBz049wslTb4AkikvYRiCoANTUqK5+rPSEjMs/ab39I1YQwrRhnVJyMnV3S75zMKZFoxtVk94y/NmdiaxWTUB4aOcIUI7jL/U8mL59mZRjNa/Gb/HfuqIVK4d078z9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772135098; c=relaxed/simple;
-	bh=UG450D5WGyfY+2w/1tUOfXSUM7WzFWBCfyTF4YNVzAs=;
+	s=arc-20240116; t=1772135732; c=relaxed/simple;
+	bh=XeE4MfnoD1Gac/djppLiAsbbhx0QboJzv/ayBzFJW+w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sqI3g7uvHaV0JSfQSMctSiai89jbj9GNsCbNxb6IX1Vkjp9BSukuxJtKX50m79g1EZU+P8WWQLvR266ZOhsTbAXp3xp7taERFK5IRRK2l5QzARvAXsg6dDhgaLOXhOuFMya+aYyeAzPYS0xceFTQYs0tVSGOHJAsClQREtMlReE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gvx7lbcq; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=MzcM+qlo3GKEmzP/E+7OLNSgHP8t5kWOyA4BHGMVOvJz49uEeNk8otD38Z5UgNbvK1CT3FahtDfMcNnfYIN7xutX/a99hR4Rdr0hJFTbYLIENBW48Kb4xYJwup7SnSnHfExnrr7BQNbjGfAqcsPOj7sAa3e+JJbZSv9lFyWdWqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czHPwhZo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gvx7lbcq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF2B3C116C6;
-	Thu, 26 Feb 2026 19:44:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czHPwhZo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E445C116C6;
+	Thu, 26 Feb 2026 19:55:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772135098;
-	bh=UG450D5WGyfY+2w/1tUOfXSUM7WzFWBCfyTF4YNVzAs=;
+	s=k20201202; t=1772135731;
+	bh=XeE4MfnoD1Gac/djppLiAsbbhx0QboJzv/ayBzFJW+w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gvx7lbcqikj8cTH0HVZQfyrj9ZdK4BZRa2DoB5hE/i2W5/aQz4LZ2kWOzqoYSGmNg
-	 IEbnLf2bdj+ifUoxvq0OIInKqq3iyWi0JKfPqygbjlZKYwsz3++pu2Rd2NWRcMFggt
-	 sHW30HimMCPptoRCGS2/RpIPCRpOzQAPS2N2F7EoMYTTL8Tph3/Mebnz0bp9BhCr2X
-	 WCJc4QY9S3AchAKu/NIs+m4kzT51Up3jdNiaXohV3ypbXWU3RHMxzIN3NQupMl9pX8
-	 9yE/2ibC1Bhj2N9WodnoSlIbBy/QOLmEvhbFF1ngVwN+tfAbAm9PnLUJLUPoS4JaA+
-	 E3nkHem7j/rvA==
-Date: Thu, 26 Feb 2026 11:44:06 -0800
+	b=czHPwhZoGRSm+Kgyl6XYimYwM4fIJga8rS3dmfAK369r5UcmBVOnW7VK/rKBZ6cQ/
+	 00y5NVnM3gvp2NuboyXF2Yyg9nfIDusr/ABNdGMyrvlg1aypSalw/f1u/Ive9N2TGi
+	 CMjlEfRlLrIlpTgcXxR8uAA+055iiLubCVnzY6e1r0XsNAjeciCuqZS91gyu+1q5mJ
+	 CB57DbNZ7om8zQp7LejanT/27arC2kYlLg29a8hXdA+McuExMmtAP0eKfbvW63w86e
+	 puhayKBx5l17mvRnCJ4URIkdn4lSH7hXLLUQMMfl1BTf1L2gXLgrZaXEEVISpbcp8C
+	 fP0OIVk+krpFw==
+Date: Thu, 26 Feb 2026 11:54:40 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Cc: Simo Sorce <simo@redhat.com>, Coiby Xu <coxu@redhat.com>,
-	Johannes =?iso-8859-1?Q?Wiesb=F6ck?= <johannes.wiesboeck@aisec.fraunhofer.de>,
-	dhowells@redhat.com, dmitry.kasatkin@gmail.com,
-	eric.snowberg@oracle.com, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
-	roberto.sassu@huawei.com, zohar@linux.ibm.com,
-	michael.weiss@aisec.fraunhofer.de
-Subject: Re: IMA and PQC
-Message-ID: <20260226194406.GG2251@sol>
-References: <aYHznG6vbptVOjHQ@Rk>
- <ee36981d-d658-4296-9acb-874c72606b3e@linux.ibm.com>
- <20260226001049.GA3135@quark>
- <cba10ac6-3557-4fc1-9b86-55361d14156d@linux.ibm.com>
- <dc09be79-5efe-4756-a295-5b0428985525@linux.ibm.com>
- <da190dbbc692b9da8464bbbfffdde7bab26b3f1c.camel@redhat.com>
- <20260226165819.GA2251@sol>
- <969c74f3-81ed-442c-87dd-381274a642a7@linux.ibm.com>
- <20260226183248.GE2251@sol>
- <13ebe763-dcaf-4379-b9a7-82d06fd0fdb3@linux.ibm.com>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/5] crypto: Drop stale usages in various help texts
+Message-ID: <20260226195440.GH2251@sol>
+References: <cover.1772116160.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,89 +43,33 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <13ebe763-dcaf-4379-b9a7-82d06fd0fdb3@linux.ibm.com>
+In-Reply-To: <cover.1772116160.git.geert+renesas@glider.be>
 
-On Thu, Feb 26, 2026 at 02:21:41PM -0500, Stefan Berger wrote:
+On Thu, Feb 26, 2026 at 03:46:04PM +0100, Geert Uytterhoeven wrote:
+> 	Hi all,
 > 
+> This patch series drops stale references to subsystems that are using
+> various crypto algoritms.  It was triggered by "make oldconfig" in
+> v7.0-rc1 showing new prompts about BLAKE2b, SHA-256, xxHash, and CRC32c
+> algorithms.  When querying these symbols, the corresponding help texts
+> incorrectly claim they are used by btrfs.
 > 
-> On 2/26/26 1:32 PM, Eric Biggers wrote:
-> > On Thu, Feb 26, 2026 at 12:22:32PM -0500, Stefan Berger wrote:
-> > > > I see that IMA indeed never upgraded full file hashes to use
-> > > > 'struct ima_file_id'.  Building a new feature that relies on this seems
-> > > > like a bad idea though, given that it's a security bug that makes the> IMA
-> > > protocol cryptographically ambiguous.  I.e., it means that in IMA,
-> > > > when the contents of some file are signed, that signature is sometimes
-> > > > also valid for some other file contents which the signer didn't intend.
-> > > 
-> > > You mean IMA should not sign the digest in the ima_file_id structure but
-> > > hash the ima_file_id structure in which this file digest is written into
-> > > (that we currently sign) and sign/verify this digest? And we would do this
-> > > to avoid two different files (with presumably different content) from having
-> > > the same hashes leading to the same signature? Which hashes (besides the
-> > > non-recommended ones) are so weak now that you must not merely sign a file's
-> > > hash?
-> > > 
-> > > The problem with this is that older kernels (without patching) won't be able
-> > > to handle newer signatures.
-> > 
-> > IMA needs to sign the entire ima_file_id structure, which is indeed what
-> > IMA already does when it uses that structure.  (Well, actually it signs
-> > a hash of the struct, but that's best thought of an implementation
-> > detail of legacy signature algorithms that can only sign hashes.  For a
-> > modern algorithm the whole struct should be passed instead.)  Just IMA
-> > uses that structure only for fsverity hashes, which is a bug that makes
-> > the IMA protocol ambiguous.  It needs to use ima_file_id consistently,
-> > otherwise a signed message sometimes corresponds to multiple unique file
-> > contents even without a break in the cryptographic hash function.
+> Notw that even if correct, there is no need for such references, as all
+> users should select the needed symbols anyway.
 > 
-> Before we jump into making changes on this old stuff I think it's good to
-> understand the underlying problem and the likelyhood of signatures
-> validating different data, such as a file and fsverity data. How likely is
-> this?
+> Geert Uytterhoeven (5):
+>   crypto: Drop stale CRYPTO_BLAKE2B usage
+>   crypto: Drop stale CRYPTO_SHA256 usage
+>   crypto: Drop stale CRYPTO_XXHASH usage
+>   crypto: Drop stale CRYPTO_CRC32C usage
+>   crypto: Drop stale CRYPTO_CRC32 usage
 > 
-> Assuming a strong hash I suppose that is not a concern with RSA because here
-> the digest is padded and then directly encrypted with the private key. Upon
-> verification (pub key decrypt) we would unpad and memcmp the digests.
-> 
-> Again, assuming a strong hash: With ECDSA NIST P256 for example we have a 32
-> byte signature. With a SHA512 being used for hashing for example we would be
-> doing a projection of a 64byte hash space to a 32byte signature space with.
-> Just by this projection of a much larger space into a smaller space
-> signatures that validate multiple input data could be a problem. One 'easy'
-> case where signatures for different input data is the same (not exactly the
-> same due to nonce involved the signature is verifyable), albeit unlikely, is
-> that there could be different input data for the SHA512 that lead to the
-> same 32bytes prefix, which is then used after truncating the sha512 to the
-> first 32 bytes for the ECDSA signature, and this then leads to a signature
-> that is verifyable for different input data. So that's the 'simple' case at
-> least for this thought experiment for a non-expert.
-> 
-> Now what should still be difficult to do is given a file and a hash-to-use
-> that you can create fsverity content that leads to a hash that in turn leads
-> to a NIST-P256 signature that can be used for signature verification(s) of
-> the file and the totally different fsverity data. Is this a problem that is
-> as difficult to solve just as finding different input data for a hash that
-> leads to the same digest?
+>  crypto/Kconfig | 9 ---------
+>  1 file changed, 9 deletions(-)
 
-There's no differentiation between a 'struct ima_file_id' that
-*represents* the contents of some file, and a file whose contents are
-*equal to* that 'struct ima_file_id' and that uses a full-file hash.  In
-both cases the same key and message are used for signing and verifying.
+Thanks for cleaning this up!
 
-This means that every time a file is signed using the ima_file_id
-scheme, it also implicitly signs some other file contents, which an
-attacker can freely replace the file with.  Similarly, every time a file
-that happens to be a valid ima_file_id is signed using the older scheme,
-it also implicitly signs the contents that the ima_file_id correspond
-to, which the attacker can freely replace the file with.  In either
-case, no collision in the cryptographic hash function is required.
-
-It's simply a broken protocol.  To fix this, IMA must only support
-signatures that use the ima_file_id scheme.
-
-Of course, that will require making them support full-file hashes and
-not just fsverity hashes.  If I recall correctly, this was actually part
-of the original design of the ima_file_id-based signatures.  It's
-unclear why the implementation is still incomplete.
+If there are no objections I'd like take these through libcrypto-fixes,
+given that they are related to the library conversions.
 
 - Eric
