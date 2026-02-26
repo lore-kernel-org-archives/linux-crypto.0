@@ -1,89 +1,214 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377CE44CAED;
-	Thu, 26 Feb 2026 20:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB013939C6;
+	Thu, 26 Feb 2026 21:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772139564; cv=none; b=FsylgrEv5C1Ehhf8PmfjWFdruICluaQ+ZUzXhobbKrnXku7miZxhmRCsNONx/4VlNUSbSh2vTJ4kVO0mrjlmJHydH8liMye/qKZXPzE9S/u+xI2MVlMv5Ez2gIugtZVCFMmzEafg8Lba8TXsJjtrNzdP2Zt0FWsduA1poiOMpfk=
+	t=1772139936; cv=none; b=Nhx4516qDQds6ANkHtykVD0BqNRVMJIxKvNkZUGrG/ZV7KJ3L1dJ6kfbbxhiPV1REl2cyLY9phB2JaFGo9+iov2WMnCu3kjW7h+XpS+IS9cWY2FTX30vNZOKJzyRnZV1HxSTpiRCzSIVpQpmGgQY79MgXc00MbqIOVrn45f6aHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772139564; c=relaxed/simple;
-	bh=qWBjnKxweipSLzAbTf4M/P9qFFraSj8HuEvZL4idUcU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ck1Qk9MCHzemEzVROkZCzaxtdtgVb6+5yc5E5avl1m5Atz+qvMqnWJuCiLYQMQ4qM0Lb8cRgZ8cgGFi19+WtTZk7VZqHFq1+UgJTTXRtpjjfqAMBvT3Yu0Pt99cUEOt4wVMuWsAe1tUANnlXxMlqzFsPtjbw0FlfgfRY/FWEMvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D+lZWLBM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772139936; c=relaxed/simple;
+	bh=CGJOtdEq3F146PP+b+MPdofOSSJn1EG7PDzHAp8/b3Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IsEqU8jVVCGfweW1NxPv/lbde/9kAJrQSv5U0v4KlOUU/TqRVIG1UwAK7I/iLfh8naoT281sZ7IY1TxYmpKqe9cFRB+1Q0hG5a1s0U71c1dswcj8E0sD/+BIfEISUvnJbuJ7Wx680GGx6/R9sQxp9BHK4Vh4ztTeT3lOVdfuiII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kMWwDEBX; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D+lZWLBM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56D38C19425;
-	Thu, 26 Feb 2026 20:59:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772139563;
-	bh=qWBjnKxweipSLzAbTf4M/P9qFFraSj8HuEvZL4idUcU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D+lZWLBM7gwe7s3XKtau6bIucSKnJVNqG9MJAmoOrDoelvSi2qQDK04i97S3vT8RM
-	 j3Px6vTrnh0aizTfll9s/sbZ7gfjqLyND/GZ9SUbDkdVR4CFvUYU1oxuNGzQpV+ZPZ
-	 ClC0nm+ZYaHHwHPFSssfN09y1cxah8Notl4S6lWpDVRsVWzoWIFptiitA2g8YIGS3Z
-	 Ic45V6/uw0fsdsclo7PlQGyg4iDtdav+6LCV2rrcaPOHKCoHfX1Dxo/XUqU0r/yQBu
-	 N+cFNBSHh16nmm4r86pwNYSxaA16wcQa5wiLclskp2TLyxQomgIq96RuBysWbvJvLK
-	 0xEQfxYTA6sGw==
-Date: Thu, 26 Feb 2026 13:59:20 -0700
-From: Tycho Andersen <tycho@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Ashish Kalra <ashish.kalra@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 2/4] selftests/kvm: check that SEV-ES VMs are allowed in
- SEV-SNP mode
-Message-ID: <aaC0KGXmfhOMOrJ9@tycho.pizza>
-References: <20260223162900.772669-1-tycho@kernel.org>
- <20260223162900.772669-3-tycho@kernel.org>
- <aZyCEBo07EHw2Prk@google.com>
- <aZyE4zvPtujZ4-6X@tycho.pizza>
- <aZyLIWtffvEnmtYh@google.com>
- <aZzQy7c8VqCaZ_fE@tycho.pizza>
- <aZ3ntHUPXNTNoyx2@google.com>
- <aZ8xje-iM0_9ACie@tycho.pizza>
- <aZ8077EfpxRGmT-O@google.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kMWwDEBX"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61QHtqJC3003598;
+	Thu, 26 Feb 2026 21:05:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=//3GCo
+	5ghP7YnX/8DlB/b0HC567HIVL4lqpc0QRGdAA=; b=kMWwDEBXtVjB1FCTNB9RNg
+	+Dwfah2GZAy0VXXdviJQWi6JByYjpQhPnbKPgZs2QnZrTnx1UZrlBIDOM7qVRr/4
+	+Dus2pqqBQGiY/gk9CN58RcoNKFWxxr6V04qCYqwfPPDh6iD+RUfXdg1H6TE43+K
+	N4H8jViSHaTc4IPsnwtkXWgxWPc718r9BW0+8i8qI2BxUv76fcLSGfZuSBwde/1o
+	fxyYfB6m0RM2la/OIiyuYCPH8JRdR2bH70XEXs/EagtuD9i+SQ64S/lQ5LLT3l1S
+	C7B2iFSoFOT26KQPomP6JVCHoDwzdYaH2xtw0p2hTsYAi4ZNuA/oBzAaV14+tw3Q
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cf4bs861v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 26 Feb 2026 21:05:20 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61QIV3aJ015983;
+	Thu, 26 Feb 2026 21:05:19 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cfq1sx8sy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 26 Feb 2026 21:05:19 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61QL5JPY27329254
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 26 Feb 2026 21:05:19 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 462B358056;
+	Thu, 26 Feb 2026 21:05:19 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 641C65803F;
+	Thu, 26 Feb 2026 21:05:18 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 26 Feb 2026 21:05:18 +0000 (GMT)
+Message-ID: <1faaa368-451c-49fa-8ba2-82610dfef3e8@linux.ibm.com>
+Date: Thu, 26 Feb 2026 16:05:17 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aZ8077EfpxRGmT-O@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: IMA and PQC
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Simo Sorce <simo@redhat.com>, Coiby Xu <coxu@redhat.com>,
+        =?UTF-8?Q?Johannes_Wiesb=C3=B6ck?= <johannes.wiesboeck@aisec.fraunhofer.de>,
+        dhowells@redhat.com, dmitry.kasatkin@gmail.com,
+        eric.snowberg@oracle.com, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
+        roberto.sassu@huawei.com, zohar@linux.ibm.com,
+        michael.weiss@aisec.fraunhofer.de
+References: <aYHznG6vbptVOjHQ@Rk>
+ <ee36981d-d658-4296-9acb-874c72606b3e@linux.ibm.com>
+ <20260226001049.GA3135@quark>
+ <cba10ac6-3557-4fc1-9b86-55361d14156d@linux.ibm.com>
+ <dc09be79-5efe-4756-a295-5b0428985525@linux.ibm.com>
+ <da190dbbc692b9da8464bbbfffdde7bab26b3f1c.camel@redhat.com>
+ <20260226165819.GA2251@sol>
+ <969c74f3-81ed-442c-87dd-381274a642a7@linux.ibm.com>
+ <20260226183248.GE2251@sol>
+ <13ebe763-dcaf-4379-b9a7-82d06fd0fdb3@linux.ibm.com>
+ <20260226194406.GG2251@sol>
+Content-Language: en-US
+From: Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <20260226194406.GG2251@sol>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: vX2zSuxstHXhjgCw-A1HAYqr-CGGzolU
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI2MDE4OCBTYWx0ZWRfX/a2JQU9aa5ee
+ 2rKqdPf62pG74+XDCUnKIphMQ/4jhR5R4mE02G+Wm/dTV0ngzD2zU1a17D7kkbhZjWQyU4Je7Gj
+ pilRlxcKp0OgA1ix4MKPI+5c6gKCq1VMifrNl9RW7gT4xE9VW86VT40OGHpIaXRsgZtSj1304/M
+ m2myg4j8wgA+664aRPCdSjCdYgYrQVrgfD2bXfOkRVQFmUHibUu0bnzHXKdN/Mh7bCfV1S09VZw
+ HlUgab1lgA2nZzKVgZ84vEHb4MRX4ZUVx0DmxeUuiOiQRehYmJTTjyZle+9sARyDJgHCiNL0JpQ
+ himd4x0yeXVUoaXySaxyIUQb+a/IpGcQV3uL+2D3nTK6+gRR9TnIvU7zCzal8cWYoZQnGK5IUDi
+ uy33sHXS2KmBg9yRrkqs0oiVaOPAY9eH8psumb12xcH5FWUd6dxI7KawEk9EjNkDLiS63N6NGwg
+ 2jZR7eOHQSPv05dbG8A==
+X-Authority-Analysis: v=2.4 cv=eNceTXp1 c=1 sm=1 tr=0 ts=69a0b590 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=TKsHhThkkL6ydXzSVRkA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: WxIQyzXbclRQMkqPy7P1Z_1PNO7y14kp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-26_03,2026-02-26_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 priorityscore=1501 phishscore=0 suspectscore=0 adultscore=0
+ bulkscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602260188
 
-On Wed, Feb 25, 2026 at 09:44:15AM -0800, Sean Christopherson wrote:
-> Ya, I don't have a better idea.  Bleeding VM types into the CCP driver might be
-> a bit wonky, though I guess it is uAPI so it's certainly not a KVM-internal detail.
 
-Turns out this approach breaks the selftests, which is at least one
-userspace:
 
-# ./sev_init2_tests
-Random seed: 0x6b8b4567
-==== Test Assertion Failure ====
-  x86/sev_init2_tests.c:141: have_sev_es == !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM))
-  pid=12498 tid=12498 errno=0 - Success
-     1	0x0000000000402747: main at sev_init2_tests.c:141 (discriminator 2)
-     2	0x00007f9adae2a1c9: ?? ??:0
-     3	0x00007f9adae2a28a: ?? ??:0
-     4	0x0000000000402934: _start at ??:?
-  sev-es: KVM_CAP_VM_TYPES (15) does not match cpuid (checking 8)
+On 2/26/26 2:44 PM, Eric Biggers wrote:
+> On Thu, Feb 26, 2026 at 02:21:41PM -0500, Stefan Berger wrote:
+>>
+>>
+>> On 2/26/26 1:32 PM, Eric Biggers wrote:
+>>> On Thu, Feb 26, 2026 at 12:22:32PM -0500, Stefan Berger wrote:
+>>>>> I see that IMA indeed never upgraded full file hashes to use
+>>>>> 'struct ima_file_id'.  Building a new feature that relies on this seems
+>>>>> like a bad idea though, given that it's a security bug that makes the> IMA
+>>>> protocol cryptographically ambiguous.  I.e., it means that in IMA,
+>>>>> when the contents of some file are signed, that signature is sometimes
+>>>>> also valid for some other file contents which the signer didn't intend.
+>>>>
+>>>> You mean IMA should not sign the digest in the ima_file_id structure but
+>>>> hash the ima_file_id structure in which this file digest is written into
+>>>> (that we currently sign) and sign/verify this digest? And we would do this
+>>>> to avoid two different files (with presumably different content) from having
+>>>> the same hashes leading to the same signature? Which hashes (besides the
+>>>> non-recommended ones) are so weak now that you must not merely sign a file's
+>>>> hash?
+>>>>
+>>>> The problem with this is that older kernels (without patching) won't be able
+>>>> to handle newer signatures.
+>>>
+>>> IMA needs to sign the entire ima_file_id structure, which is indeed what
+>>> IMA already does when it uses that structure.  (Well, actually it signs
+>>> a hash of the struct, but that's best thought of an implementation
+>>> detail of legacy signature algorithms that can only sign hashes.  For a
+>>> modern algorithm the whole struct should be passed instead.)  Just IMA
+>>> uses that structure only for fsverity hashes, which is a bug that makes
+>>> the IMA protocol ambiguous.  It needs to use ima_file_id consistently,
+>>> otherwise a signed message sometimes corresponds to multiple unique file
+>>> contents even without a break in the cryptographic hash function.
+>>
+>> Before we jump into making changes on this old stuff I think it's good to
+>> understand the underlying problem and the likelyhood of signatures
+>> validating different data, such as a file and fsverity data. How likely is
+>> this?
+>>
+>> Assuming a strong hash I suppose that is not a concern with RSA because here
+>> the digest is padded and then directly encrypted with the private key. Upon
+>> verification (pub key decrypt) we would unpad and memcmp the digests.
+>>
+>> Again, assuming a strong hash: With ECDSA NIST P256 for example we have a 32
+>> byte signature. With a SHA512 being used for hashing for example we would be
+>> doing a projection of a 64byte hash space to a 32byte signature space with.
+>> Just by this projection of a much larger space into a smaller space
+>> signatures that validate multiple input data could be a problem. One 'easy'
+>> case where signatures for different input data is the same (not exactly the
+>> same due to nonce involved the signature is verifyable), albeit unlikely, is
+>> that there could be different input data for the SHA512 that lead to the
+>> same 32bytes prefix, which is then used after truncating the sha512 to the
+>> first 32 bytes for the ECDSA signature, and this then leads to a signature
+>> that is verifyable for different input data. So that's the 'simple' case at
+>> least for this thought experiment for a non-expert.
+>>
+>> Now what should still be difficult to do is given a file and a hash-to-use
+>> that you can create fsverity content that leads to a hash that in turn leads
+>> to a NIST-P256 signature that can be used for signature verification(s) of
+>> the file and the totally different fsverity data. Is this a problem that is
+>> as difficult to solve just as finding different input data for a hash that
+>> leads to the same digest?
+> 
+> There's no differentiation between a 'struct ima_file_id' that
+> *represents* the contents of some file, and a file whose contents are
+> *equal to* that 'struct ima_file_id' and that uses a full-file hash.  In
+> both cases the same key and message are used for signing and verifying.
 
-As near as I can tell qemu doesn't do the same anywhere. SNP guests
-run fine, and SEV-ES says something reasonable:
+I hadn't been thinking of this... It's a side-effect of starting to sign 
+ima_file_id for v3 that a file *content* could now hold the ima_file_id 
+structure (as signed with v3) and the signature would validate when used 
+with the v2 signature verification scheme. So, the content of the file 
+would presumably be odd/useless (2 bytes + hash) but it would verify 
+with the signature created for v3. We will have to offer the possibility 
+to move to v3 signatures for all signing schemes and offer the 
+possibility to deactivate older versions (<v3).
 
-qemu-system-x86_64: sev_launch_start: LAUNCH_START ret=1 fw_error=21 'Feature not supported'
-qemu-system-x86_64: sev_common_kvm_init: failed to create encryption context
-qemu-system-x86_64: failed to initialize kvm: Operation not permitted
+> 
+> This means that every time a file is signed using the ima_file_id
+> scheme, it also implicitly signs some other file contents, which an
+> attacker can freely replace the file with.  Similarly, every time a file
+> that happens to be a valid ima_file_id is signed using the older scheme,
+> it also implicitly signs the contents that the ima_file_id correspond
+> to, which the attacker can freely replace the file with.  In either
+> case, no collision in the cryptographic hash function is required.
+> 
+> It's simply a broken protocol.  To fix this, IMA must only support
+> signatures that use the ima_file_id scheme.
+> 
+> Of course, that will require making them support full-file hashes and
+> not just fsverity hashes.  If I recall correctly, this was actually part
+> of the original design of the ima_file_id-based signatures.  It's
+> unclear why the implementation is still incomplete.
+> 
+> - Eric
 
-Thoughts?
-
-Tycho
