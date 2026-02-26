@@ -1,1579 +1,238 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724663ECBF3;
-	Thu, 26 Feb 2026 15:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E043E95A3
+	for <linux-crypto@vger.kernel.org>; Thu, 26 Feb 2026 15:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772118745; cv=none; b=ccM4jSfvM2eSbNKhC/F8t2L9OTr+aYeX9ZgZ4RpegVNEqv5PLzqoEbqdxviNqBYboaffjd8dYPLBG44JqGEuXJr2PKKxv4vwvF34SFd9tuyXPDaY18mPpovVIEX1o7+hrWrEI3IPHEIpgH2yJhanyMTFRjzaHQQZmD820RsCJsg=
+	t=1772119676; cv=none; b=pvBebwvEQsRMZCssph/CnXqbjR4aeob9GDbu37vPSdl/Q785ZFgBHpzZmsSP763vRcBfRV8T6EFf0AIvHksQTwxdeI+X5J508a8GAMYm4GDwhGH8+C6gfv9WHIfxv3H1VFKlzciV8TrRJNloDwEboe/S/p9fPPUkXucWorj0Ijw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772118745; c=relaxed/simple;
-	bh=iYQxWngO34/BV18kRU6oCtENoi+VTiNYjBRQHtnQayo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ss9xx6sDOoYMZ0eCSF3YED3lyFNuOFtk1JF1olhTfvrgxgEUJC6EYflXj5c2DwxlfCIyKvZ1cf9NRkyxCo/Q3VdQAmj+e0z5hvTWnRvoIQMsBrQqjeHbQg+BdDJx+5q6k1dn9OYI+g3PJpk9LuiYllF60nnl8EppaG3LsgXqmds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=b/6dBKkm; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1772119676; c=relaxed/simple;
+	bh=WdeCGCTL6JPLNjQboPf6jlsCpxs5JFZtnDaqVpFIDdc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=lI8Ah5DqWNhlb8gTdM+Pn+aGWUhc2zJQd7rn02Be9PnMDSFKVaG+es8IbHkEH3vRy7VGNrLYXqQbIC+C2KER5OqPJMExYN57D6e5MkGxhZYMyIKSE+/iCQbidgEzf52FNLJ69nBTTNIOgidUrNdbevde+TB/uEtaJANqzoknFNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S5ltdFD6; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WX2LLoxW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="b/6dBKkm"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=K4l9ZkzSckMxURtWF70ZO+gc5JoMPZeK4EVbJax8Sws=; b=b/6dBKkmydVkehF8XwlrV2zif8
-	SeB+r29TQrXc2nff7Wbevdc6AqCS8omcX0XQwFNqV+Aqzq34wmvu1p5eENQJjqEUBZEXyEENopCeY
-	nx0Pjuql6bch9np3IgJuYw3bQzmVPOfvH0EYAo4yJKPBzaJHNGeTwoUOorasCl8PyOyULylGYatKz
-	ks3G3JNvHmo4WwmiFg9AwMmqzCPt+dxj595CPStB04pFNGuDIjSyxgDN7VufPE8iOW1p3Iym2NPUr
-	PpEDra22Kqlj3n7cAUo6FhEPgB5ZNSnSLg72a8IiOKG6GXKE+uRlwBjaVqW6TSUWG02B0eWIJVBmW
-	EJY2e2pQ==;
-Received: from [4.28.11.157] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vvd1o-00000006Qov-2ars;
-	Thu, 26 Feb 2026 15:11:48 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
-	Matt Turner <mattst88@gmail.com>,
-	Magnus Lindholm <linmag7@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai@fnnas.com>,
-	Li Nan <linan122@huawei.com>,
-	linux-alpha@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	loongarch@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org,
-	linux-um@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 24/25] xor: pass the entire operation to the low-level ops
-Date: Thu, 26 Feb 2026 07:10:36 -0800
-Message-ID: <20260226151106.144735-25-hch@lst.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260226151106.144735-1-hch@lst.de>
-References: <20260226151106.144735-1-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S5ltdFD6";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WX2LLoxW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772119674;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RAyu0qMgQFztjvGBxM+KVZ6vBWyzEz+Ckm03PfSHbXI=;
+	b=S5ltdFD6tpgV6e3qmfxhGsJV+xEQBfui2Zs973WoZm928uTJwFLAkBU4GSmaIak/BTMGgd
+	xvXZQpp806b8LgM49AxJBLT49Gk057eW6G72ChqjkuiLPv8CiR642Z+ghbIGT0iTu/7oOi
+	sgbQn1lEBy5iAt82q1ZC9/dTcpDeJ/Q=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-77-8P2vbXkJOSG_VBWXgTu50Q-1; Thu, 26 Feb 2026 10:27:47 -0500
+X-MC-Unique: 8P2vbXkJOSG_VBWXgTu50Q-1
+X-Mimecast-MFC-AGG-ID: 8P2vbXkJOSG_VBWXgTu50Q_1772119666
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8cb390a0c4eso897827585a.1
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Feb 2026 07:27:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772119666; x=1772724466; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RAyu0qMgQFztjvGBxM+KVZ6vBWyzEz+Ckm03PfSHbXI=;
+        b=WX2LLoxWt6hvLP3jV0Og6ZzYw9aYiPL+n5Mnja/lU2r30Q3d5LDZauYt2p/i4wYnyB
+         b8fZEBzsCEiUVzeJ1c6F/FneoNVZCNuaDdJy+Si3xE54E6et0IFAFB8HKK0TxBPtdCwj
+         5WdaVp/fb0HPdi1y7G3Q1zgZa3G6uXpgsXz2b71yORhhksnSYT+FMkYD4Wyu/fgtNF2y
+         o1R/1ZyrSFactKQ3SQ5LrK9kgv09l9MV7EiQo3EqDIU8kqK1s9kWCR3o/Yv0OrMQi+ul
+         gseZJl3BJaPOG0Y9e0hfnyq3vINyMqusFA2IDHC9FlZe6r4J7QWHtqLc42yx0oUxjLp/
+         2dYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772119666; x=1772724466;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RAyu0qMgQFztjvGBxM+KVZ6vBWyzEz+Ckm03PfSHbXI=;
+        b=teZTMY7BTrqyqpT8W/zMWaw6798lxzBW9z4xm2+6eEIr8tQ2qiRIF6XipuUbNnQpxA
+         A3BOgRhk4te0whmkzyZNtXvX7ajZG99F1RFN6cwMvr3XGVroP9DJ1Uf55YrEDp6S5i5o
+         PqAJakC/1oLFZrBSAkSCzwPjqgDve9SDtyPda2RJ9/vX/K65VPQshdMCoaW4TrJLvgvH
+         wze+Ma03x1B7wwzL0Cq+2t9dKxDqieGbppWam/qjwUkZcATCAw02uMTk7NQnMSB6TjVo
+         DpQc5pJa/cPapW2NheZO0ZqwT4FLMgEHzocX5W926O5AwvONvw14EevtSDVV1taMcT90
+         1wxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU80WHdgb7ZCAN7z9qL8cyknXvYv8N8WUd3DVOii4/BrtRBWoPFaWIK1sQU+Jo3/sHfXTfLWLi+cuvFH1E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxETQH90QXMLjgWsh0ldfzTMToNmv0Zlgi9rouUUIqtTRToOoub
+	8RgkjEFPClJ32C00KlpIRWRPsJ1AWhegGcDH4PEuApPXPXF2ClsC5GKgevkITcYOeeRa3YYBvI/
+	/fMDtkDNbT86zgX4fOAIVVvQJcHERxHhIsJSDLj1GfI+332XjFfQK4sV70fzLSA/t1w==
+X-Gm-Gg: ATEYQzwzQfwzkamHqTAxA7R0oVZQ9qQF5ersho7xWhjHRQM1FzIfTC/Bp3AbX3P+0a+
+	fWxf7fw71tk9cNH1lylfoZjtMJGWxAhfHNSw6/Hh/HA6BWTtsByDfurqNe+8Vp9quyQoKXEGHVS
+	vEACfHvco2XQjQzBrEhyMcbBIl0sTBHxVDHcfw0ymV+I9ybJtZswJd50QXySPwQhvk5goinqoLs
+	puK6R8ttoy3YaQx9W2nQ/RP6Eg1EQu+7YPf1xUdIfGrqCP8PuaKRrJoUG6Re+Ge9kp/ssXx3F/M
+	25w8lmay1Kz81iSsOXfSKEj6coLxdOMBq03uZEEAT0A5Jp7IZMiTs3hqev0F5inW3ebC/9TdcvH
+	AbrDCPyu0+nb8g3gN
+X-Received: by 2002:a05:620a:d8a:b0:8a3:1b83:1036 with SMTP id af79cd13be357-8cbbcf7e84amr649027885a.29.1772119666329;
+        Thu, 26 Feb 2026 07:27:46 -0800 (PST)
+X-Received: by 2002:a05:620a:d8a:b0:8a3:1b83:1036 with SMTP id af79cd13be357-8cbbcf7e84amr649021385a.29.1772119665670;
+        Thu, 26 Feb 2026 07:27:45 -0800 (PST)
+Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::7a7])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cbbf6730afsm262894585a.13.2026.02.26.07.27.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Feb 2026 07:27:44 -0800 (PST)
+Message-ID: <da190dbbc692b9da8464bbbfffdde7bab26b3f1c.camel@redhat.com>
+Subject: Re: IMA and PQC
+From: Simo Sorce <simo@redhat.com>
+To: Stefan Berger <stefanb@linux.ibm.com>, Eric Biggers <ebiggers@kernel.org>
+Cc: Coiby Xu <coxu@redhat.com>, Johannes =?ISO-8859-1?Q?Wiesb=F6ck?=	
+ <johannes.wiesboeck@aisec.fraunhofer.de>, dhowells@redhat.com, 
+	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
+ keyrings@vger.kernel.org, 	linux-crypto@vger.kernel.org,
+ linux-integrity@vger.kernel.org, 	linux-kernel@vger.kernel.org,
+ linux-modules@vger.kernel.org, 	roberto.sassu@huawei.com,
+ zohar@linux.ibm.com, michael.weiss@aisec.fraunhofer.de
+Date: Thu, 26 Feb 2026 10:27:43 -0500
+In-Reply-To: <dc09be79-5efe-4756-a295-5b0428985525@linux.ibm.com>
+References: <aXrKaTem9nnWNuGV@Rk>
+	 <20260130203126.662082-1-johannes.wiesboeck@aisec.fraunhofer.de>
+	 <aYHznG6vbptVOjHQ@Rk> <ee36981d-d658-4296-9acb-874c72606b3e@linux.ibm.com>
+	 <20260226001049.GA3135@quark>
+	 <cba10ac6-3557-4fc1-9b86-55361d14156d@linux.ibm.com>
+	 <dc09be79-5efe-4756-a295-5b0428985525@linux.ibm.com>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Currently the high-level xor code chunks up all operations into small
-units for only up to 1 + 4 vectors, and passes it to four different
-methods.  This means the FPU/vector context is entered and left a lot
-for wide stripes, and a lot of indirect expensive indirect calls are
-performed.  Switch to passing the entire gen_xor request to the
-low-level ops, and provide a macro to dispatch it to the existing
-helper.
+On Thu, 2026-02-26 at 09:16 -0500, Stefan Berger wrote:
+>=20
+> On 2/26/26 7:42 AM, Stefan Berger wrote:
+> >=20
+> >=20
+> > On 2/25/26 7:10 PM, Eric Biggers wrote:
+> > > On Wed, Feb 25, 2026 at 09:25:43AM -0500, Stefan Berger wrote:
+> > > > To avoid duplicate work: Is either one of you planning on writing=
+=20
+> > > > patches
+> > > > for IMA to use ML-DSA and convert the current ML-DSA to also suppor=
+t=20
+> > > > HashML?
+> > > > I had done the work on this before and could dig out the patches=
+=20
+> > > > again...
+> > >=20
+> > > IMA already had to add its own digest prefixing support, since it was
+> > > needed to disambiguate between full-file digests and fsverity digests=
+.
+> > > See 'struct ima_file_id'.=C2=A0 Thus the message signed is at most 66=
+ bytes.
+> >=20
+> > The hash there is still only a hash over a file and that hash is signed=
+,=20
+> > isn't it?
+> >=20
+> > >=20
+> > > With that being the case, HashML-DSA isn't necessary.=C2=A0 It's not =
+even
+> > > possible to use here, since there are no OIDs assigned for the fsveri=
+ty
+> > > digests, so it cannot replace the ima_file_id.
+> >=20
+> > For non-fsverify IMA signatures it is 'possible' to use HashML-DSA and=
+=20
+> > it's 'working' (recycled old patches yesterday):
+> >=20
+> > Linux: https://github.com/stefanberger/linux/commits/=20
+> > dhmlsa%2Bima.202602025/
+> >=20
+> > ima-evm-utils: https://github.com/linux-integrity/ima-evm-utils/pull/19=
+/=20
+> > commits
+> >=20
+> > >=20
+> > > I'll also note that HashML-DSA is controversial (e.g. see
+> > > https://keymaterial.net/2024/11/05/hashml-dsa-considered-harmful/),
+> >=20
+> > The problem with this is that NIST would have to react to these=20
+> > controversies as we race to support PQC. If something is wrong with the=
+=20
+> > standard then it would be best for NIST to withdraw/modify HashML-DSA=
+=20
+> > asap. Otherwise it's the best to follow the standard IMO because if you=
+=20
+> > don't you get criticism otherwise.
+>=20
+> What I am not clear about from FIPS-204 is whether availability of=20
+> HashML-DSA is a "must-use" or  a "may-use". What speaks against it for=
+=20
+> our use case is performance. The lookup of a hash's ID (last digit of=20
+> OID) and the creation of the 11 byte encoding to prepend before every=20
+> digest for every signature takes cycles.
 
-This reduce the number of indirect calls and FPU/vector context switches
-by a factor approaching nr_stripes / 4, and also reduces source and
-binary code size.
+It is a recommendation, but there are plenty of protocols (TLS,
+OpenPGP, etc...) where the decision has been made to use "pure" ML-DSA
+only, even if what you are signing is not the full data, but something
+containing a hash.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/raid/xor.h               |  5 --
- lib/raid/xor/alpha/xor.c               | 19 ++++----
- lib/raid/xor/arm/xor-neon-glue.c       | 49 ++------------------
- lib/raid/xor/arm/xor-neon.c            |  9 +---
- lib/raid/xor/arm/xor.c                 | 10 ++--
- lib/raid/xor/arm/xor_arch.h            |  3 ++
- lib/raid/xor/arm64/xor-neon-glue.c     | 44 ++----------------
- lib/raid/xor/arm64/xor-neon.c          | 20 +++++---
- lib/raid/xor/arm64/xor-neon.h          | 32 ++-----------
- lib/raid/xor/loongarch/xor_simd_glue.c | 62 +++++--------------------
- lib/raid/xor/powerpc/xor_vmx.c         | 40 ++++++++--------
- lib/raid/xor/powerpc/xor_vmx.h         | 16 +------
- lib/raid/xor/powerpc/xor_vmx_glue.c    | 49 ++------------------
- lib/raid/xor/riscv/xor-glue.c          | 43 +++--------------
- lib/raid/xor/s390/xor.c                |  9 ++--
- lib/raid/xor/sparc/xor-niagara-glue.c  | 10 ++--
- lib/raid/xor/sparc/xor-sparc32.c       |  9 ++--
- lib/raid/xor/sparc/xor-vis-glue.c      |  9 ++--
- lib/raid/xor/x86/xor-avx.c             | 29 ++++--------
- lib/raid/xor/x86/xor-mmx.c             | 64 ++++++++++----------------
- lib/raid/xor/x86/xor-sse.c             | 63 +++++++++----------------
- lib/raid/xor/xor-32regs-prefetch.c     | 10 ++--
- lib/raid/xor/xor-32regs.c              |  9 ++--
- lib/raid/xor/xor-8regs-prefetch.c      | 11 +++--
- lib/raid/xor/xor-8regs.c               |  9 ++--
- lib/raid/xor/xor-core.c                | 47 ++-----------------
- lib/raid/xor/xor_impl.h                | 48 +++++++++++++------
- 27 files changed, 224 insertions(+), 504 deletions(-)
+Ideally you do not sign *just* a hash, but some structured data, like a
+context label that identifies the hash and some other related metadata
+for example. In order to make forgeries much harder should the hashing
+algorithm used to hash the data weaken over time. But it is not
+strictly necessary (NIST mentioned in some forum, sorry I do not have
+the message handy for quoting, that a structured packet is perfectly
+fine for use with pure ML-DSA, because it does enough to address the
+same issues that a separate internal context does with HashML-DSA).
 
-diff --git a/include/linux/raid/xor.h b/include/linux/raid/xor.h
-index 4735a4e960f9..11620d5f5b93 100644
---- a/include/linux/raid/xor.h
-+++ b/include/linux/raid/xor.h
-@@ -2,11 +2,6 @@
- #ifndef _XOR_H
- #define _XOR_H
- 
--#define MAX_XOR_BLOCKS 4
--
--extern void xor_blocks(unsigned int count, unsigned int bytes,
--	void *dest, void **srcs);
--
- void xor_gen(void *dest, void **srcss, unsigned int src_cnt,
- 		unsigned int bytes);
- 
-diff --git a/lib/raid/xor/alpha/xor.c b/lib/raid/xor/alpha/xor.c
-index 90694cc47395..a8f72f2dd3a5 100644
---- a/lib/raid/xor/alpha/xor.c
-+++ b/lib/raid/xor/alpha/xor.c
-@@ -832,18 +832,17 @@ xor_alpha_prefetch_5:						\n\
- 	.end xor_alpha_prefetch_5				\n\
- ");
- 
-+DO_XOR_BLOCKS(alpha, xor_alpha_2, xor_alpha_3, xor_alpha_4, xor_alpha_5);
-+
- struct xor_block_template xor_block_alpha = {
--	.name	= "alpha",
--	.do_2	= xor_alpha_2,
--	.do_3	= xor_alpha_3,
--	.do_4	= xor_alpha_4,
--	.do_5	= xor_alpha_5,
-+	.name		= "alpha",
-+	.xor_gen	= xor_gen_alpha,
- };
- 
-+DO_XOR_BLOCKS(alpha_prefetch, xor_alpha_prefetch_2, xor_alpha_prefetch_3,
-+		xor_alpha_prefetch_4, xor_alpha_prefetch_5);
-+
- struct xor_block_template xor_block_alpha_prefetch = {
--	.name	= "alpha prefetch",
--	.do_2	= xor_alpha_prefetch_2,
--	.do_3	= xor_alpha_prefetch_3,
--	.do_4	= xor_alpha_prefetch_4,
--	.do_5	= xor_alpha_prefetch_5,
-+	.name		= "alpha prefetch",
-+	.xor_gen	= xor_gen_alpha_prefetch,
- };
-diff --git a/lib/raid/xor/arm/xor-neon-glue.c b/lib/raid/xor/arm/xor-neon-glue.c
-index 7afd6294464b..cea39e019904 100644
---- a/lib/raid/xor/arm/xor-neon-glue.c
-+++ b/lib/raid/xor/arm/xor-neon-glue.c
-@@ -5,54 +5,15 @@
- #include "xor_impl.h"
- #include "xor_arch.h"
- 
--extern struct xor_block_template const xor_block_neon_inner;
--
--static void
--xor_neon_2(unsigned long bytes, unsigned long * __restrict p1,
--	   const unsigned long * __restrict p2)
--{
--	kernel_neon_begin();
--	xor_block_neon_inner.do_2(bytes, p1, p2);
--	kernel_neon_end();
--}
--
--static void
--xor_neon_3(unsigned long bytes, unsigned long * __restrict p1,
--	   const unsigned long * __restrict p2,
--	   const unsigned long * __restrict p3)
--{
--	kernel_neon_begin();
--	xor_block_neon_inner.do_3(bytes, p1, p2, p3);
--	kernel_neon_end();
--}
--
--static void
--xor_neon_4(unsigned long bytes, unsigned long * __restrict p1,
--	   const unsigned long * __restrict p2,
--	   const unsigned long * __restrict p3,
--	   const unsigned long * __restrict p4)
--{
--	kernel_neon_begin();
--	xor_block_neon_inner.do_4(bytes, p1, p2, p3, p4);
--	kernel_neon_end();
--}
--
--static void
--xor_neon_5(unsigned long bytes, unsigned long * __restrict p1,
--	   const unsigned long * __restrict p2,
--	   const unsigned long * __restrict p3,
--	   const unsigned long * __restrict p4,
--	   const unsigned long * __restrict p5)
-+static void xor_gen_neon(void *dest, void **srcs, unsigned int src_cnt,
-+		unsigned int bytes)
- {
- 	kernel_neon_begin();
--	xor_block_neon_inner.do_5(bytes, p1, p2, p3, p4, p5);
-+	xor_gen_neon_inner(dest, srcs, src_cnt, bytes);
- 	kernel_neon_end();
- }
- 
- struct xor_block_template xor_block_neon = {
--	.name	= "neon",
--	.do_2	= xor_neon_2,
--	.do_3	= xor_neon_3,
--	.do_4	= xor_neon_4,
--	.do_5	= xor_neon_5
-+	.name		= "neon",
-+	.xor_gen	= xor_gen_neon,
- };
-diff --git a/lib/raid/xor/arm/xor-neon.c b/lib/raid/xor/arm/xor-neon.c
-index 806a42c5952c..23147e3a7904 100644
---- a/lib/raid/xor/arm/xor-neon.c
-+++ b/lib/raid/xor/arm/xor-neon.c
-@@ -4,6 +4,7 @@
-  */
- 
- #include "xor_impl.h"
-+#include "xor_arch.h"
- 
- #ifndef __ARM_NEON__
- #error You should compile this file with '-march=armv7-a -mfloat-abi=softfp -mfpu=neon'
-@@ -22,10 +23,4 @@
- #define NO_TEMPLATE
- #include "../xor-8regs.c"
- 
--struct xor_block_template const xor_block_neon_inner = {
--	.name	= "__inner_neon__",
--	.do_2	= xor_8regs_2,
--	.do_3	= xor_8regs_3,
--	.do_4	= xor_8regs_4,
--	.do_5	= xor_8regs_5,
--};
-+__DO_XOR_BLOCKS(neon_inner, xor_8regs_2, xor_8regs_3, xor_8regs_4, xor_8regs_5);
-diff --git a/lib/raid/xor/arm/xor.c b/lib/raid/xor/arm/xor.c
-index 5bd5f048bbe9..45139b6c55ea 100644
---- a/lib/raid/xor/arm/xor.c
-+++ b/lib/raid/xor/arm/xor.c
-@@ -127,10 +127,10 @@ xor_arm4regs_5(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines);
- }
- 
-+DO_XOR_BLOCKS(arm4regs, xor_arm4regs_2, xor_arm4regs_3, xor_arm4regs_4,
-+		xor_arm4regs_5);
-+
- struct xor_block_template xor_block_arm4regs = {
--	.name	= "arm4regs",
--	.do_2	= xor_arm4regs_2,
--	.do_3	= xor_arm4regs_3,
--	.do_4	= xor_arm4regs_4,
--	.do_5	= xor_arm4regs_5,
-+	.name		= "arm4regs",
-+	.xor_gen	= xor_gen_arm4regs,
- };
-diff --git a/lib/raid/xor/arm/xor_arch.h b/lib/raid/xor/arm/xor_arch.h
-index 5a7eedb48fbb..775ff835df65 100644
---- a/lib/raid/xor/arm/xor_arch.h
-+++ b/lib/raid/xor/arm/xor_arch.h
-@@ -7,6 +7,9 @@
- extern struct xor_block_template xor_block_arm4regs;
- extern struct xor_block_template xor_block_neon;
- 
-+void xor_gen_neon_inner(void *dest, void **srcs, unsigned int src_cnt,
-+		unsigned int bytes);
-+
- static __always_inline void __init arch_xor_init(void)
- {
- 	xor_register(&xor_block_arm4regs);
-diff --git a/lib/raid/xor/arm64/xor-neon-glue.c b/lib/raid/xor/arm64/xor-neon-glue.c
-index 3db0a318cf5b..f0284f86feb4 100644
---- a/lib/raid/xor/arm64/xor-neon-glue.c
-+++ b/lib/raid/xor/arm64/xor-neon-glue.c
-@@ -10,50 +10,16 @@
- #include "xor-neon.h"
- 
- #define XOR_TEMPLATE(_name)						\
--static void								\
--xor_##_name##_2(unsigned long bytes, unsigned long * __restrict p1,	\
--	   const unsigned long * __restrict p2)				\
-+static void xor_gen_##_name(void *dest, void **srcs, unsigned int src_cnt, \
-+		unsigned int bytes)					\
- {									\
- 	scoped_ksimd()							\
--		__xor_##_name##_2(bytes, p1, p2);			\
--}									\
--									\
--static void								\
--xor_##_name##_3(unsigned long bytes, unsigned long * __restrict p1,	\
--	   const unsigned long * __restrict p2,				\
--	   const unsigned long * __restrict p3)				\
--{									\
--	scoped_ksimd()							\
--		__xor_##_name##_3(bytes, p1, p2, p3);			\
--}									\
--									\
--static void								\
--xor_##_name##_4(unsigned long bytes, unsigned long * __restrict p1,	\
--	   const unsigned long * __restrict p2,				\
--	   const unsigned long * __restrict p3,				\
--	   const unsigned long * __restrict p4)				\
--{									\
--	scoped_ksimd()							\
--		__xor_##_name##_4(bytes, p1, p2, p3, p4);		\
--}									\
--									\
--static void								\
--xor_##_name##_5(unsigned long bytes, unsigned long * __restrict p1,	\
--	   const unsigned long * __restrict p2,				\
--	   const unsigned long * __restrict p3,				\
--	   const unsigned long * __restrict p4,				\
--	   const unsigned long * __restrict p5)				\
--{									\
--	scoped_ksimd()							\
--		__xor_##_name##_5(bytes, p1, p2, p3, p4, p5);		\
-+		xor_gen_##_name##_inner(dest, srcs, src_cnt, bytes);	\
- }									\
- 									\
- struct xor_block_template xor_block_##_name = {				\
--	.name   = __stringify(_name),					\
--	.do_2   = xor_##_name##_2,					\
--	.do_3   = xor_##_name##_3,					\
--	.do_4   = xor_##_name##_4,					\
--	.do_5	= xor_##_name##_5					\
-+	.name   	= __stringify(_name),				\
-+	.xor_gen	= xor_gen_##_name,				\
- };
- 
- XOR_TEMPLATE(neon);
-diff --git a/lib/raid/xor/arm64/xor-neon.c b/lib/raid/xor/arm64/xor-neon.c
-index 61f00c4fee49..97ef3cb92496 100644
---- a/lib/raid/xor/arm64/xor-neon.c
-+++ b/lib/raid/xor/arm64/xor-neon.c
-@@ -10,7 +10,7 @@
- #include "xor_arch.h"
- #include "xor-neon.h"
- 
--void __xor_neon_2(unsigned long bytes, unsigned long * __restrict p1,
-+static void __xor_neon_2(unsigned long bytes, unsigned long * __restrict p1,
- 		const unsigned long * __restrict p2)
- {
- 	uint64_t *dp1 = (uint64_t *)p1;
-@@ -37,7 +37,7 @@ void __xor_neon_2(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
--void __xor_neon_3(unsigned long bytes, unsigned long * __restrict p1,
-+static void __xor_neon_3(unsigned long bytes, unsigned long * __restrict p1,
- 		const unsigned long * __restrict p2,
- 		const unsigned long * __restrict p3)
- {
-@@ -73,7 +73,7 @@ void __xor_neon_3(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
--void __xor_neon_4(unsigned long bytes, unsigned long * __restrict p1,
-+static void __xor_neon_4(unsigned long bytes, unsigned long * __restrict p1,
- 		const unsigned long * __restrict p2,
- 		const unsigned long * __restrict p3,
- 		const unsigned long * __restrict p4)
-@@ -118,7 +118,7 @@ void __xor_neon_4(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
--void __xor_neon_5(unsigned long bytes, unsigned long * __restrict p1,
-+static void __xor_neon_5(unsigned long bytes, unsigned long * __restrict p1,
- 		const unsigned long * __restrict p2,
- 		const unsigned long * __restrict p3,
- 		const unsigned long * __restrict p4,
-@@ -172,6 +172,9 @@ void __xor_neon_5(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
-+__DO_XOR_BLOCKS(neon_inner, __xor_neon_2, __xor_neon_3, __xor_neon_4,
-+		__xor_neon_5);
-+
- static inline uint64x2_t eor3(uint64x2_t p, uint64x2_t q, uint64x2_t r)
- {
- 	uint64x2_t res;
-@@ -182,7 +185,7 @@ static inline uint64x2_t eor3(uint64x2_t p, uint64x2_t q, uint64x2_t r)
- 	return res;
- }
- 
--void __xor_eor3_3(unsigned long bytes, unsigned long * __restrict p1,
-+static void __xor_eor3_3(unsigned long bytes, unsigned long * __restrict p1,
- 		const unsigned long * __restrict p2,
- 		const unsigned long * __restrict p3)
- {
-@@ -216,7 +219,7 @@ void __xor_eor3_3(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
--void __xor_eor3_4(unsigned long bytes, unsigned long * __restrict p1,
-+static void __xor_eor3_4(unsigned long bytes, unsigned long * __restrict p1,
- 		const unsigned long * __restrict p2,
- 		const unsigned long * __restrict p3,
- 		const unsigned long * __restrict p4)
-@@ -259,7 +262,7 @@ void __xor_eor3_4(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
--void __xor_eor3_5(unsigned long bytes, unsigned long * __restrict p1,
-+static void __xor_eor3_5(unsigned long bytes, unsigned long * __restrict p1,
- 		const unsigned long * __restrict p2,
- 		const unsigned long * __restrict p3,
- 		const unsigned long * __restrict p4,
-@@ -304,3 +307,6 @@ void __xor_eor3_5(unsigned long bytes, unsigned long * __restrict p1,
- 		dp5 += 8;
- 	} while (--lines > 0);
- }
-+
-+__DO_XOR_BLOCKS(eor3_inner, __xor_neon_2, __xor_eor3_3, __xor_eor3_4,
-+		__xor_eor3_5);
-diff --git a/lib/raid/xor/arm64/xor-neon.h b/lib/raid/xor/arm64/xor-neon.h
-index cec0ac846fea..514699ba8f5f 100644
---- a/lib/raid/xor/arm64/xor-neon.h
-+++ b/lib/raid/xor/arm64/xor-neon.h
-@@ -1,30 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
- 
--void __xor_neon_2(unsigned long bytes, unsigned long * __restrict p1,
--		const unsigned long * __restrict p2);
--void __xor_neon_3(unsigned long bytes, unsigned long * __restrict p1,
--		const unsigned long * __restrict p2,
--		const unsigned long * __restrict p3);
--void __xor_neon_4(unsigned long bytes, unsigned long * __restrict p1,
--		const unsigned long * __restrict p2,
--		const unsigned long * __restrict p3,
--		const unsigned long * __restrict p4);
--void __xor_neon_5(unsigned long bytes, unsigned long * __restrict p1,
--		const unsigned long * __restrict p2,
--		const unsigned long * __restrict p3,
--		const unsigned long * __restrict p4,
--		const unsigned long * __restrict p5);
--
--#define __xor_eor3_2	__xor_neon_2
--void __xor_eor3_3(unsigned long bytes, unsigned long * __restrict p1,
--		const unsigned long * __restrict p2,
--		const unsigned long * __restrict p3);
--void __xor_eor3_4(unsigned long bytes, unsigned long * __restrict p1,
--		const unsigned long * __restrict p2,
--		const unsigned long * __restrict p3,
--		const unsigned long * __restrict p4);
--void __xor_eor3_5(unsigned long bytes, unsigned long * __restrict p1,
--		const unsigned long * __restrict p2,
--		const unsigned long * __restrict p3,
--		const unsigned long * __restrict p4,
--		const unsigned long * __restrict p5);
-+void xor_gen_neon_inner(void *dest, void **srcs, unsigned int src_cnt,
-+		unsigned int bytes);
-+void xor_gen_eor3_inner(void *dest, void **srcs, unsigned int src_cnt,
-+		unsigned int bytes);
-diff --git a/lib/raid/xor/loongarch/xor_simd_glue.c b/lib/raid/xor/loongarch/xor_simd_glue.c
-index b387aa0213b4..7f324d924f87 100644
---- a/lib/raid/xor/loongarch/xor_simd_glue.c
-+++ b/lib/raid/xor/loongarch/xor_simd_glue.c
-@@ -11,63 +11,23 @@
- #include "xor_arch.h"
- #include "xor_simd.h"
- 
--#define MAKE_XOR_GLUE_2(flavor)							\
--static void xor_##flavor##_2(unsigned long bytes, unsigned long * __restrict p1,\
--		      const unsigned long * __restrict p2)			\
-+#define MAKE_XOR_GLUES(flavor)							\
-+DO_XOR_BLOCKS(flavor##_inner, __xor_##flavor##_2, __xor_##flavor##_3,		\
-+		__xor_##flavor##_4, __xor_##flavor##_5);			\
-+										\
-+static void xor_gen_##flavor(void *dest, void **srcs, unsigned int src_cnt,	\
-+		unsigned int bytes)						\
- {										\
- 	kernel_fpu_begin();							\
--	__xor_##flavor##_2(bytes, p1, p2);					\
-+	xor_gen_##flavor##_inner(dest, srcs, src_cnt, bytes);			\
- 	kernel_fpu_end();							\
- }										\
--
--#define MAKE_XOR_GLUE_3(flavor)							\
--static void xor_##flavor##_3(unsigned long bytes, unsigned long * __restrict p1,\
--		      const unsigned long * __restrict p2,			\
--		      const unsigned long * __restrict p3)			\
--{										\
--	kernel_fpu_begin();							\
--	__xor_##flavor##_3(bytes, p1, p2, p3);					\
--	kernel_fpu_end();							\
--}										\
--
--#define MAKE_XOR_GLUE_4(flavor)							\
--static void xor_##flavor##_4(unsigned long bytes, unsigned long * __restrict p1,\
--		      const unsigned long * __restrict p2,			\
--		      const unsigned long * __restrict p3,			\
--		      const unsigned long * __restrict p4)			\
--{										\
--	kernel_fpu_begin();							\
--	__xor_##flavor##_4(bytes, p1, p2, p3, p4);				\
--	kernel_fpu_end();							\
--}										\
--
--#define MAKE_XOR_GLUE_5(flavor)							\
--static void xor_##flavor##_5(unsigned long bytes, unsigned long * __restrict p1,\
--		      const unsigned long * __restrict p2,			\
--		      const unsigned long * __restrict p3,			\
--		      const unsigned long * __restrict p4,			\
--		      const unsigned long * __restrict p5)			\
--{										\
--	kernel_fpu_begin();							\
--	__xor_##flavor##_5(bytes, p1, p2, p3, p4, p5);				\
--	kernel_fpu_end();							\
--}										\
--
--#define MAKE_XOR_GLUES(flavor)				\
--	MAKE_XOR_GLUE_2(flavor);			\
--	MAKE_XOR_GLUE_3(flavor);			\
--	MAKE_XOR_GLUE_4(flavor);			\
--	MAKE_XOR_GLUE_5(flavor);			\
--							\
--struct xor_block_template xor_block_##flavor = {	\
--	.name = __stringify(flavor),			\
--	.do_2 = xor_##flavor##_2,			\
--	.do_3 = xor_##flavor##_3,			\
--	.do_4 = xor_##flavor##_4,			\
--	.do_5 = xor_##flavor##_5,			\
-+										\
-+struct xor_block_template xor_block_##flavor = {				\
-+	.name		= __stringify(flavor),					\
-+	.xor_gen	= xor_gen_##flavor					\
- }
- 
--
- #ifdef CONFIG_CPU_HAS_LSX
- MAKE_XOR_GLUES(lsx);
- #endif /* CONFIG_CPU_HAS_LSX */
-diff --git a/lib/raid/xor/powerpc/xor_vmx.c b/lib/raid/xor/powerpc/xor_vmx.c
-index aab49d056d18..09bed98c1bc7 100644
---- a/lib/raid/xor/powerpc/xor_vmx.c
-+++ b/lib/raid/xor/powerpc/xor_vmx.c
-@@ -10,6 +10,7 @@
-  * Sparse (as at v0.5.0) gets very, very confused by this file.
-  * Make it a bit simpler for it.
-  */
-+#include "xor_impl.h"
- #if !defined(__CHECKER__)
- #include <altivec.h>
- #else
-@@ -49,9 +50,9 @@ typedef vector signed char unative_t;
- 		V1##_3 = vec_xor(V1##_3, V2##_3);	\
- 	} while (0)
- 
--void __xor_altivec_2(unsigned long bytes,
--		     unsigned long * __restrict v1_in,
--		     const unsigned long * __restrict v2_in)
-+static void __xor_altivec_2(unsigned long bytes,
-+		unsigned long * __restrict v1_in,
-+		const unsigned long * __restrict v2_in)
- {
- 	DEFINE(v1);
- 	DEFINE(v2);
-@@ -68,10 +69,10 @@ void __xor_altivec_2(unsigned long bytes,
- 	} while (--lines > 0);
- }
- 
--void __xor_altivec_3(unsigned long bytes,
--		     unsigned long * __restrict v1_in,
--		     const unsigned long * __restrict v2_in,
--		     const unsigned long * __restrict v3_in)
-+static void __xor_altivec_3(unsigned long bytes,
-+		unsigned long * __restrict v1_in,
-+		const unsigned long * __restrict v2_in,
-+		const unsigned long * __restrict v3_in)
- {
- 	DEFINE(v1);
- 	DEFINE(v2);
-@@ -92,11 +93,11 @@ void __xor_altivec_3(unsigned long bytes,
- 	} while (--lines > 0);
- }
- 
--void __xor_altivec_4(unsigned long bytes,
--		     unsigned long * __restrict v1_in,
--		     const unsigned long * __restrict v2_in,
--		     const unsigned long * __restrict v3_in,
--		     const unsigned long * __restrict v4_in)
-+static void __xor_altivec_4(unsigned long bytes,
-+		unsigned long * __restrict v1_in,
-+		const unsigned long * __restrict v2_in,
-+		const unsigned long * __restrict v3_in,
-+		const unsigned long * __restrict v4_in)
- {
- 	DEFINE(v1);
- 	DEFINE(v2);
-@@ -121,12 +122,12 @@ void __xor_altivec_4(unsigned long bytes,
- 	} while (--lines > 0);
- }
- 
--void __xor_altivec_5(unsigned long bytes,
--		     unsigned long * __restrict v1_in,
--		     const unsigned long * __restrict v2_in,
--		     const unsigned long * __restrict v3_in,
--		     const unsigned long * __restrict v4_in,
--		     const unsigned long * __restrict v5_in)
-+static void __xor_altivec_5(unsigned long bytes,
-+		unsigned long * __restrict v1_in,
-+		const unsigned long * __restrict v2_in,
-+		const unsigned long * __restrict v3_in,
-+		const unsigned long * __restrict v4_in,
-+		const unsigned long * __restrict v5_in)
- {
- 	DEFINE(v1);
- 	DEFINE(v2);
-@@ -154,3 +155,6 @@ void __xor_altivec_5(unsigned long bytes,
- 		v5 += 4;
- 	} while (--lines > 0);
- }
-+
-+__DO_XOR_BLOCKS(altivec_inner, __xor_altivec_2, __xor_altivec_3,
-+		__xor_altivec_4, __xor_altivec_5);
-diff --git a/lib/raid/xor/powerpc/xor_vmx.h b/lib/raid/xor/powerpc/xor_vmx.h
-index 573c41d90dac..1d26c1133a86 100644
---- a/lib/raid/xor/powerpc/xor_vmx.h
-+++ b/lib/raid/xor/powerpc/xor_vmx.h
-@@ -6,17 +6,5 @@
-  * outside of the enable/disable altivec block.
-  */
- 
--void __xor_altivec_2(unsigned long bytes, unsigned long * __restrict p1,
--		     const unsigned long * __restrict p2);
--void __xor_altivec_3(unsigned long bytes, unsigned long * __restrict p1,
--		     const unsigned long * __restrict p2,
--		     const unsigned long * __restrict p3);
--void __xor_altivec_4(unsigned long bytes, unsigned long * __restrict p1,
--		     const unsigned long * __restrict p2,
--		     const unsigned long * __restrict p3,
--		     const unsigned long * __restrict p4);
--void __xor_altivec_5(unsigned long bytes, unsigned long * __restrict p1,
--		     const unsigned long * __restrict p2,
--		     const unsigned long * __restrict p3,
--		     const unsigned long * __restrict p4,
--		     const unsigned long * __restrict p5);
-+void xor_gen_altivec_inner(void *dest, void **srcs, unsigned int src_cnt,
-+		unsigned int bytes);
-diff --git a/lib/raid/xor/powerpc/xor_vmx_glue.c b/lib/raid/xor/powerpc/xor_vmx_glue.c
-index 56e99ddfb64f..dbfbb5cadc36 100644
---- a/lib/raid/xor/powerpc/xor_vmx_glue.c
-+++ b/lib/raid/xor/powerpc/xor_vmx_glue.c
-@@ -12,56 +12,17 @@
- #include "xor_arch.h"
- #include "xor_vmx.h"
- 
--static void xor_altivec_2(unsigned long bytes, unsigned long * __restrict p1,
--		const unsigned long * __restrict p2)
-+static void xor_gen_altivec(void *dest, void **srcs, unsigned int src_cnt,
-+		unsigned int bytes)
- {
- 	preempt_disable();
- 	enable_kernel_altivec();
--	__xor_altivec_2(bytes, p1, p2);
--	disable_kernel_altivec();
--	preempt_enable();
--}
--
--static void xor_altivec_3(unsigned long bytes, unsigned long * __restrict p1,
--		const unsigned long * __restrict p2,
--		const unsigned long * __restrict p3)
--{
--	preempt_disable();
--	enable_kernel_altivec();
--	__xor_altivec_3(bytes, p1, p2, p3);
--	disable_kernel_altivec();
--	preempt_enable();
--}
--
--static void xor_altivec_4(unsigned long bytes, unsigned long * __restrict p1,
--		const unsigned long * __restrict p2,
--		const unsigned long * __restrict p3,
--		const unsigned long * __restrict p4)
--{
--	preempt_disable();
--	enable_kernel_altivec();
--	__xor_altivec_4(bytes, p1, p2, p3, p4);
--	disable_kernel_altivec();
--	preempt_enable();
--}
--
--static void xor_altivec_5(unsigned long bytes, unsigned long * __restrict p1,
--		const unsigned long * __restrict p2,
--		const unsigned long * __restrict p3,
--		const unsigned long * __restrict p4,
--		const unsigned long * __restrict p5)
--{
--	preempt_disable();
--	enable_kernel_altivec();
--	__xor_altivec_5(bytes, p1, p2, p3, p4, p5);
-+	xor_gen_altivec_inner(dest, srcs, src_cnt, bytes);
- 	disable_kernel_altivec();
- 	preempt_enable();
- }
- 
- struct xor_block_template xor_block_altivec = {
--	.name = "altivec",
--	.do_2 = xor_altivec_2,
--	.do_3 = xor_altivec_3,
--	.do_4 = xor_altivec_4,
--	.do_5 = xor_altivec_5,
-+	.name		= "altivec",
-+	.xor_gen	= xor_gen_altivec,
- };
-diff --git a/lib/raid/xor/riscv/xor-glue.c b/lib/raid/xor/riscv/xor-glue.c
-index 060e5f22ebcc..2e4c1b05d998 100644
---- a/lib/raid/xor/riscv/xor-glue.c
-+++ b/lib/raid/xor/riscv/xor-glue.c
-@@ -9,48 +9,17 @@
- #include "xor_impl.h"
- #include "xor_arch.h"
- 
--static void xor_vector_2(unsigned long bytes, unsigned long *__restrict p1,
--			 const unsigned long *__restrict p2)
--{
--	kernel_vector_begin();
--	xor_regs_2_(bytes, p1, p2);
--	kernel_vector_end();
--}
--
--static void xor_vector_3(unsigned long bytes, unsigned long *__restrict p1,
--			 const unsigned long *__restrict p2,
--			 const unsigned long *__restrict p3)
--{
--	kernel_vector_begin();
--	xor_regs_3_(bytes, p1, p2, p3);
--	kernel_vector_end();
--}
--
--static void xor_vector_4(unsigned long bytes, unsigned long *__restrict p1,
--			 const unsigned long *__restrict p2,
--			 const unsigned long *__restrict p3,
--			 const unsigned long *__restrict p4)
--{
--	kernel_vector_begin();
--	xor_regs_4_(bytes, p1, p2, p3, p4);
--	kernel_vector_end();
--}
-+DO_XOR_BLOCKS(vector_inner, xor_regs_2_, xor_regs_3_, xor_regs_4_, xor_regs_5_);
- 
--static void xor_vector_5(unsigned long bytes, unsigned long *__restrict p1,
--			 const unsigned long *__restrict p2,
--			 const unsigned long *__restrict p3,
--			 const unsigned long *__restrict p4,
--			 const unsigned long *__restrict p5)
-+static void xor_gen_vector(void *dest, void **srcs, unsigned int src_cnt,
-+		unsigned int bytes)
- {
- 	kernel_vector_begin();
--	xor_regs_5_(bytes, p1, p2, p3, p4, p5);
-+	xor_gen_vector_inner(dest, srcs, src_cnt, bytes);
- 	kernel_vector_end();
- }
- 
- struct xor_block_template xor_block_rvv = {
--	.name = "rvv",
--	.do_2 = xor_vector_2,
--	.do_3 = xor_vector_3,
--	.do_4 = xor_vector_4,
--	.do_5 = xor_vector_5
-+	.name		= "rvv",
-+	.xor_gen	= xor_gen_vector,
- };
-diff --git a/lib/raid/xor/s390/xor.c b/lib/raid/xor/s390/xor.c
-index 48b8cdc684a3..d8a62a70db6c 100644
---- a/lib/raid/xor/s390/xor.c
-+++ b/lib/raid/xor/s390/xor.c
-@@ -126,10 +126,9 @@ static void xor_xc_5(unsigned long bytes, unsigned long * __restrict p1,
- 		: : "0", "cc", "memory");
- }
- 
-+DO_XOR_BLOCKS(xc, xor_xc_2, xor_xc_3, xor_xc_4, xor_xc_5);
-+
- struct xor_block_template xor_block_xc = {
--	.name = "xc",
--	.do_2 = xor_xc_2,
--	.do_3 = xor_xc_3,
--	.do_4 = xor_xc_4,
--	.do_5 = xor_xc_5,
-+	.name		= "xc",
-+	.xor_gen	= xor_gen_xc,
- };
-diff --git a/lib/raid/xor/sparc/xor-niagara-glue.c b/lib/raid/xor/sparc/xor-niagara-glue.c
-index 92d4712c65e1..a4adb088e7d3 100644
---- a/lib/raid/xor/sparc/xor-niagara-glue.c
-+++ b/lib/raid/xor/sparc/xor-niagara-glue.c
-@@ -24,10 +24,10 @@ void xor_niagara_5(unsigned long bytes, unsigned long * __restrict p1,
- 		   const unsigned long * __restrict p4,
- 		   const unsigned long * __restrict p5);
- 
-+DO_XOR_BLOCKS(niagara, xor_niagara_2, xor_niagara_3, xor_niagara_4,
-+		xor_niagara_5);
-+
- struct xor_block_template xor_block_niagara = {
--        .name	= "Niagara",
--        .do_2	= xor_niagara_2,
--        .do_3	= xor_niagara_3,
--        .do_4	= xor_niagara_4,
--        .do_5	= xor_niagara_5,
-+        .name		= "Niagara",
-+	.xor_gen	= xor_gen_niagara,
- };
-diff --git a/lib/raid/xor/sparc/xor-sparc32.c b/lib/raid/xor/sparc/xor-sparc32.c
-index 307c4a84f535..fb37631e90e6 100644
---- a/lib/raid/xor/sparc/xor-sparc32.c
-+++ b/lib/raid/xor/sparc/xor-sparc32.c
-@@ -244,10 +244,9 @@ sparc_5(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
-+DO_XOR_BLOCKS(sparc32, sparc_2, sparc_3, sparc_4, sparc_5);
-+
- struct xor_block_template xor_block_SPARC = {
--	.name	= "SPARC",
--	.do_2	= sparc_2,
--	.do_3	= sparc_3,
--	.do_4	= sparc_4,
--	.do_5	= sparc_5,
-+	.name		= "SPARC",
-+	.xor_gen	= xor_gen_sparc32,
- };
-diff --git a/lib/raid/xor/sparc/xor-vis-glue.c b/lib/raid/xor/sparc/xor-vis-glue.c
-index 1c0977e85f53..ef39d6c8b9bb 100644
---- a/lib/raid/xor/sparc/xor-vis-glue.c
-+++ b/lib/raid/xor/sparc/xor-vis-glue.c
-@@ -26,10 +26,9 @@ void xor_vis_5(unsigned long bytes, unsigned long * __restrict p1,
- 
- /* XXX Ugh, write cheetah versions... -DaveM */
- 
-+DO_XOR_BLOCKS(vis, xor_vis_2, xor_vis_3, xor_vis_4, xor_vis_5);
-+
- struct xor_block_template xor_block_VIS = {
--        .name	= "VIS",
--        .do_2	= xor_vis_2,
--        .do_3	= xor_vis_3,
--        .do_4	= xor_vis_4,
--        .do_5	= xor_vis_5,
-+        .name		= "VIS",
-+	.xor_gen	= xor_gen_vis,
- };
-diff --git a/lib/raid/xor/x86/xor-avx.c b/lib/raid/xor/x86/xor-avx.c
-index d411efa1ff43..f7777d7aa269 100644
---- a/lib/raid/xor/x86/xor-avx.c
-+++ b/lib/raid/xor/x86/xor-avx.c
-@@ -29,8 +29,6 @@ static void xor_avx_2(unsigned long bytes, unsigned long * __restrict p0,
- {
- 	unsigned long lines = bytes >> 9;
- 
--	kernel_fpu_begin();
--
- 	while (lines--) {
- #undef BLOCK
- #define BLOCK(i, reg) \
-@@ -47,8 +45,6 @@ do { \
- 		p0 = (unsigned long *)((uintptr_t)p0 + 512);
- 		p1 = (unsigned long *)((uintptr_t)p1 + 512);
- 	}
--
--	kernel_fpu_end();
- }
- 
- static void xor_avx_3(unsigned long bytes, unsigned long * __restrict p0,
-@@ -57,8 +53,6 @@ static void xor_avx_3(unsigned long bytes, unsigned long * __restrict p0,
- {
- 	unsigned long lines = bytes >> 9;
- 
--	kernel_fpu_begin();
--
- 	while (lines--) {
- #undef BLOCK
- #define BLOCK(i, reg) \
-@@ -78,8 +72,6 @@ do { \
- 		p1 = (unsigned long *)((uintptr_t)p1 + 512);
- 		p2 = (unsigned long *)((uintptr_t)p2 + 512);
- 	}
--
--	kernel_fpu_end();
- }
- 
- static void xor_avx_4(unsigned long bytes, unsigned long * __restrict p0,
-@@ -89,8 +81,6 @@ static void xor_avx_4(unsigned long bytes, unsigned long * __restrict p0,
- {
- 	unsigned long lines = bytes >> 9;
- 
--	kernel_fpu_begin();
--
- 	while (lines--) {
- #undef BLOCK
- #define BLOCK(i, reg) \
-@@ -113,8 +103,6 @@ do { \
- 		p2 = (unsigned long *)((uintptr_t)p2 + 512);
- 		p3 = (unsigned long *)((uintptr_t)p3 + 512);
- 	}
--
--	kernel_fpu_end();
- }
- 
- static void xor_avx_5(unsigned long bytes, unsigned long * __restrict p0,
-@@ -125,8 +113,6 @@ static void xor_avx_5(unsigned long bytes, unsigned long * __restrict p0,
- {
- 	unsigned long lines = bytes >> 9;
- 
--	kernel_fpu_begin();
--
- 	while (lines--) {
- #undef BLOCK
- #define BLOCK(i, reg) \
-@@ -152,14 +138,19 @@ do { \
- 		p3 = (unsigned long *)((uintptr_t)p3 + 512);
- 		p4 = (unsigned long *)((uintptr_t)p4 + 512);
- 	}
-+}
-+
-+DO_XOR_BLOCKS(avx_inner, xor_avx_2, xor_avx_3, xor_avx_4, xor_avx_5);
- 
-+static void xor_gen_avx(void *dest, void **srcs, unsigned int src_cnt,
-+			unsigned int bytes)
-+{
-+	kernel_fpu_begin();
-+	xor_gen_avx_inner(dest, srcs, src_cnt, bytes);
- 	kernel_fpu_end();
- }
- 
- struct xor_block_template xor_block_avx = {
--	.name = "avx",
--	.do_2 = xor_avx_2,
--	.do_3 = xor_avx_3,
--	.do_4 = xor_avx_4,
--	.do_5 = xor_avx_5,
-+	.name		= "avx",
-+	.xor_gen	= xor_gen_avx,
- };
-diff --git a/lib/raid/xor/x86/xor-mmx.c b/lib/raid/xor/x86/xor-mmx.c
-index e48c58f92874..63a8b0444fce 100644
---- a/lib/raid/xor/x86/xor-mmx.c
-+++ b/lib/raid/xor/x86/xor-mmx.c
-@@ -21,8 +21,6 @@ xor_pII_mmx_2(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 7;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- #undef BLOCK
- #define BLOCK(i)				\
-@@ -55,8 +53,6 @@ xor_pII_mmx_2(unsigned long bytes, unsigned long * __restrict p1,
- 	  "+r" (p1), "+r" (p2)
- 	:
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -66,8 +62,6 @@ xor_pII_mmx_3(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 7;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- #undef BLOCK
- #define BLOCK(i)				\
-@@ -105,8 +99,6 @@ xor_pII_mmx_3(unsigned long bytes, unsigned long * __restrict p1,
- 	  "+r" (p1), "+r" (p2), "+r" (p3)
- 	:
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -117,8 +109,6 @@ xor_pII_mmx_4(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 7;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- #undef BLOCK
- #define BLOCK(i)				\
-@@ -161,8 +151,6 @@ xor_pII_mmx_4(unsigned long bytes, unsigned long * __restrict p1,
- 	  "+r" (p1), "+r" (p2), "+r" (p3), "+r" (p4)
- 	:
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- 
-@@ -175,8 +163,6 @@ xor_pII_mmx_5(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 7;
- 
--	kernel_fpu_begin();
--
- 	/* Make sure GCC forgets anything it knows about p4 or p5,
- 	   such that it won't pass to the asm volatile below a
- 	   register that is shared with any other variable.  That's
-@@ -237,8 +223,6 @@ xor_pII_mmx_5(unsigned long bytes, unsigned long * __restrict p1,
- 	   Clobber them just to be sure nobody does something stupid
- 	   like assuming they have some legal value.  */
- 	asm("" : "=r" (p4), "=r" (p5));
--
--	kernel_fpu_end();
- }
- 
- #undef LD
-@@ -255,8 +239,6 @@ xor_p5_mmx_2(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 6;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- 	" .align 32	             ;\n"
- 	" 1:                         ;\n"
-@@ -293,8 +275,6 @@ xor_p5_mmx_2(unsigned long bytes, unsigned long * __restrict p1,
- 	  "+r" (p1), "+r" (p2)
- 	:
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -304,8 +284,6 @@ xor_p5_mmx_3(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 6;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- 	" .align 32,0x90             ;\n"
- 	" 1:                         ;\n"
-@@ -351,8 +329,6 @@ xor_p5_mmx_3(unsigned long bytes, unsigned long * __restrict p1,
- 	  "+r" (p1), "+r" (p2), "+r" (p3)
- 	:
- 	: "memory" );
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -363,8 +339,6 @@ xor_p5_mmx_4(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 6;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- 	" .align 32,0x90             ;\n"
- 	" 1:                         ;\n"
-@@ -419,8 +393,6 @@ xor_p5_mmx_4(unsigned long bytes, unsigned long * __restrict p1,
- 	  "+r" (p1), "+r" (p2), "+r" (p3), "+r" (p4)
- 	:
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -432,8 +404,6 @@ xor_p5_mmx_5(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 6;
- 
--	kernel_fpu_begin();
--
- 	/* Make sure GCC forgets anything it knows about p4 or p5,
- 	   such that it won't pass to the asm volatile below a
- 	   register that is shared with any other variable.  That's
-@@ -510,22 +480,36 @@ xor_p5_mmx_5(unsigned long bytes, unsigned long * __restrict p1,
- 	   Clobber them just to be sure nobody does something stupid
- 	   like assuming they have some legal value.  */
- 	asm("" : "=r" (p4), "=r" (p5));
-+}
-+
-+DO_XOR_BLOCKS(pII_mmx_inner, xor_pII_mmx_2, xor_pII_mmx_3, xor_pII_mmx_4,
-+		xor_pII_mmx_5);
- 
-+static void xor_gen_pII_mmx(void *dest, void **srcs, unsigned int src_cnt,
-+		unsigned int bytes)
-+{
-+	kernel_fpu_begin();
-+	xor_gen_pII_mmx_inner(dest, srcs, src_cnt, bytes);
- 	kernel_fpu_end();
- }
- 
- struct xor_block_template xor_block_pII_mmx = {
--	.name = "pII_mmx",
--	.do_2 = xor_pII_mmx_2,
--	.do_3 = xor_pII_mmx_3,
--	.do_4 = xor_pII_mmx_4,
--	.do_5 = xor_pII_mmx_5,
-+	.name		= "pII_mmx",
-+	.xor_gen	= xor_gen_pII_mmx,
- };
- 
-+DO_XOR_BLOCKS(p5_mmx_inner, xor_p5_mmx_2, xor_p5_mmx_3, xor_p5_mmx_4,
-+		xor_p5_mmx_5);
-+
-+static void xor_gen_p5_mmx(void *dest, void **srcs, unsigned int src_cnt,
-+		unsigned int bytes)
-+{
-+	kernel_fpu_begin();
-+	xor_gen_p5_mmx_inner(dest, srcs, src_cnt, bytes);
-+	kernel_fpu_end();
-+}
-+
- struct xor_block_template xor_block_p5_mmx = {
--	.name = "p5_mmx",
--	.do_2 = xor_p5_mmx_2,
--	.do_3 = xor_p5_mmx_3,
--	.do_4 = xor_p5_mmx_4,
--	.do_5 = xor_p5_mmx_5,
-+	.name		= "p5_mmx",
-+	.xor_gen	= xor_gen_p5_mmx,
- };
-diff --git a/lib/raid/xor/x86/xor-sse.c b/lib/raid/xor/x86/xor-sse.c
-index 5993ed688c15..c6626ecae6ba 100644
---- a/lib/raid/xor/x86/xor-sse.c
-+++ b/lib/raid/xor/x86/xor-sse.c
-@@ -51,8 +51,6 @@ xor_sse_2(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 8;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- #undef BLOCK
- #define BLOCK(i)					\
-@@ -93,8 +91,6 @@ xor_sse_2(unsigned long bytes, unsigned long * __restrict p1,
- 	  [p1] "+r" (p1), [p2] "+r" (p2)
- 	: [inc] XOR_CONSTANT_CONSTRAINT (256UL)
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -103,8 +99,6 @@ xor_sse_2_pf64(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 8;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- #undef BLOCK
- #define BLOCK(i)			\
-@@ -128,8 +122,6 @@ xor_sse_2_pf64(unsigned long bytes, unsigned long * __restrict p1,
- 	  [p1] "+r" (p1), [p2] "+r" (p2)
- 	: [inc] XOR_CONSTANT_CONSTRAINT (256UL)
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -139,8 +131,6 @@ xor_sse_3(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 8;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- #undef BLOCK
- #define BLOCK(i) \
-@@ -188,8 +178,6 @@ xor_sse_3(unsigned long bytes, unsigned long * __restrict p1,
- 	  [p1] "+r" (p1), [p2] "+r" (p2), [p3] "+r" (p3)
- 	: [inc] XOR_CONSTANT_CONSTRAINT (256UL)
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -199,8 +187,6 @@ xor_sse_3_pf64(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 8;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- #undef BLOCK
- #define BLOCK(i)			\
-@@ -226,8 +212,6 @@ xor_sse_3_pf64(unsigned long bytes, unsigned long * __restrict p1,
- 	  [p1] "+r" (p1), [p2] "+r" (p2), [p3] "+r" (p3)
- 	: [inc] XOR_CONSTANT_CONSTRAINT (256UL)
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -238,8 +222,6 @@ xor_sse_4(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 8;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- #undef BLOCK
- #define BLOCK(i) \
-@@ -294,8 +276,6 @@ xor_sse_4(unsigned long bytes, unsigned long * __restrict p1,
- 	  [p2] "+r" (p2), [p3] "+r" (p3), [p4] "+r" (p4)
- 	: [inc] XOR_CONSTANT_CONSTRAINT (256UL)
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -306,8 +286,6 @@ xor_sse_4_pf64(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 8;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- #undef BLOCK
- #define BLOCK(i)			\
-@@ -335,8 +313,6 @@ xor_sse_4_pf64(unsigned long bytes, unsigned long * __restrict p1,
- 	  [p2] "+r" (p2), [p3] "+r" (p3), [p4] "+r" (p4)
- 	: [inc] XOR_CONSTANT_CONSTRAINT (256UL)
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -348,8 +324,6 @@ xor_sse_5(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 8;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- #undef BLOCK
- #define BLOCK(i) \
-@@ -411,8 +385,6 @@ xor_sse_5(unsigned long bytes, unsigned long * __restrict p1,
- 	  [p3] "+r" (p3), [p4] "+r" (p4), [p5] "+r" (p5)
- 	: [inc] XOR_CONSTANT_CONSTRAINT (256UL)
- 	: "memory");
--
--	kernel_fpu_end();
- }
- 
- static void
-@@ -424,8 +396,6 @@ xor_sse_5_pf64(unsigned long bytes, unsigned long * __restrict p1,
- {
- 	unsigned long lines = bytes >> 8;
- 
--	kernel_fpu_begin();
--
- 	asm volatile(
- #undef BLOCK
- #define BLOCK(i)			\
-@@ -455,22 +425,35 @@ xor_sse_5_pf64(unsigned long bytes, unsigned long * __restrict p1,
- 	  [p3] "+r" (p3), [p4] "+r" (p4), [p5] "+r" (p5)
- 	: [inc] XOR_CONSTANT_CONSTRAINT (256UL)
- 	: "memory");
-+}
-+
-+DO_XOR_BLOCKS(sse_inner, xor_sse_2, xor_sse_3, xor_sse_4, xor_sse_5);
- 
-+static void xor_gen_sse(void *dest, void **srcs, unsigned int src_cnt,
-+			unsigned int bytes)
-+{
-+	kernel_fpu_begin();
-+	xor_gen_sse_inner(dest, srcs, src_cnt, bytes);
- 	kernel_fpu_end();
- }
- 
- struct xor_block_template xor_block_sse = {
--	.name = "sse",
--	.do_2 = xor_sse_2,
--	.do_3 = xor_sse_3,
--	.do_4 = xor_sse_4,
--	.do_5 = xor_sse_5,
-+	.name		= "sse",
-+	.xor_gen	= xor_gen_sse,
- };
- 
-+DO_XOR_BLOCKS(sse_pf64_inner, xor_sse_2_pf64, xor_sse_3_pf64, xor_sse_4_pf64,
-+		xor_sse_5_pf64);
-+
-+static void xor_gen_sse_pf64(void *dest, void **srcs, unsigned int src_cnt,
-+			unsigned int bytes)
-+{
-+	kernel_fpu_begin();
-+	xor_gen_sse_pf64_inner(dest, srcs, src_cnt, bytes);
-+	kernel_fpu_end();
-+}
-+
- struct xor_block_template xor_block_sse_pf64 = {
--	.name = "prefetch64-sse",
--	.do_2 = xor_sse_2_pf64,
--	.do_3 = xor_sse_3_pf64,
--	.do_4 = xor_sse_4_pf64,
--	.do_5 = xor_sse_5_pf64,
-+	.name		= "prefetch64-sse",
-+	.xor_gen	= xor_gen_sse_pf64,
- };
-diff --git a/lib/raid/xor/xor-32regs-prefetch.c b/lib/raid/xor/xor-32regs-prefetch.c
-index 2856a8e50cb8..ade2a7d8cbe2 100644
---- a/lib/raid/xor/xor-32regs-prefetch.c
-+++ b/lib/raid/xor/xor-32regs-prefetch.c
-@@ -258,10 +258,10 @@ xor_32regs_p_5(unsigned long bytes, unsigned long * __restrict p1,
- 		goto once_more;
- }
- 
-+DO_XOR_BLOCKS(32regs_p, xor_32regs_p_2, xor_32regs_p_3, xor_32regs_p_4,
-+		xor_32regs_p_5);
-+
- struct xor_block_template xor_block_32regs_p = {
--	.name = "32regs_prefetch",
--	.do_2 = xor_32regs_p_2,
--	.do_3 = xor_32regs_p_3,
--	.do_4 = xor_32regs_p_4,
--	.do_5 = xor_32regs_p_5,
-+	.name		= "32regs_prefetch",
-+	.xor_gen	= xor_gen_32regs_p,
- };
-diff --git a/lib/raid/xor/xor-32regs.c b/lib/raid/xor/xor-32regs.c
-index cc44d64032fa..acb4a10d1e95 100644
---- a/lib/raid/xor/xor-32regs.c
-+++ b/lib/raid/xor/xor-32regs.c
-@@ -209,10 +209,9 @@ xor_32regs_5(unsigned long bytes, unsigned long * __restrict p1,
- 	} while (--lines > 0);
- }
- 
-+DO_XOR_BLOCKS(32regs, xor_32regs_2, xor_32regs_3, xor_32regs_4, xor_32regs_5);
-+
- struct xor_block_template xor_block_32regs = {
--	.name = "32regs",
--	.do_2 = xor_32regs_2,
--	.do_3 = xor_32regs_3,
--	.do_4 = xor_32regs_4,
--	.do_5 = xor_32regs_5,
-+	.name		= "32regs",
-+	.xor_gen	= xor_gen_32regs,
- };
-diff --git a/lib/raid/xor/xor-8regs-prefetch.c b/lib/raid/xor/xor-8regs-prefetch.c
-index 1d53aec50d27..451527a951b1 100644
---- a/lib/raid/xor/xor-8regs-prefetch.c
-+++ b/lib/raid/xor/xor-8regs-prefetch.c
-@@ -136,10 +136,11 @@ xor_8regs_p_5(unsigned long bytes, unsigned long * __restrict p1,
- 		goto once_more;
- }
- 
-+
-+DO_XOR_BLOCKS(8regs_p, xor_8regs_p_2, xor_8regs_p_3, xor_8regs_p_4,
-+		xor_8regs_p_5);
-+
- struct xor_block_template xor_block_8regs_p = {
--	.name = "8regs_prefetch",
--	.do_2 = xor_8regs_p_2,
--	.do_3 = xor_8regs_p_3,
--	.do_4 = xor_8regs_p_4,
--	.do_5 = xor_8regs_p_5,
-+	.name		= "8regs_prefetch",
-+	.xor_gen	= xor_gen_8regs_p,
- };
-diff --git a/lib/raid/xor/xor-8regs.c b/lib/raid/xor/xor-8regs.c
-index 72a44e898c55..1edaed8acffe 100644
---- a/lib/raid/xor/xor-8regs.c
-+++ b/lib/raid/xor/xor-8regs.c
-@@ -94,11 +94,10 @@ xor_8regs_5(unsigned long bytes, unsigned long * __restrict p1,
- }
- 
- #ifndef NO_TEMPLATE
-+DO_XOR_BLOCKS(8regs, xor_8regs_2, xor_8regs_3, xor_8regs_4, xor_8regs_5);
-+
- struct xor_block_template xor_block_8regs = {
--	.name = "8regs",
--	.do_2 = xor_8regs_2,
--	.do_3 = xor_8regs_3,
--	.do_4 = xor_8regs_4,
--	.do_5 = xor_8regs_5,
-+	.name		= "8regs",
-+	.xor_gen	= xor_gen_8regs,
- };
- #endif /* NO_TEMPLATE */
-diff --git a/lib/raid/xor/xor-core.c b/lib/raid/xor/xor-core.c
-index b7c29ca931ec..f18dcc57004b 100644
---- a/lib/raid/xor/xor-core.c
-+++ b/lib/raid/xor/xor-core.c
-@@ -13,39 +13,9 @@
- #include <linux/preempt.h>
- #include "xor_impl.h"
- 
--/* The xor routines to use.  */
-+/* The xor routine to use.  */
- static struct xor_block_template *active_template;
- 
--void
--xor_blocks(unsigned int src_count, unsigned int bytes, void *dest, void **srcs)
--{
--	unsigned long *p1, *p2, *p3, *p4;
--
--	WARN_ON_ONCE(in_interrupt());
--
--	p1 = (unsigned long *) srcs[0];
--	if (src_count == 1) {
--		active_template->do_2(bytes, dest, p1);
--		return;
--	}
--
--	p2 = (unsigned long *) srcs[1];
--	if (src_count == 2) {
--		active_template->do_3(bytes, dest, p1, p2);
--		return;
--	}
--
--	p3 = (unsigned long *) srcs[2];
--	if (src_count == 3) {
--		active_template->do_4(bytes, dest, p1, p2, p3);
--		return;
--	}
--
--	p4 = (unsigned long *) srcs[3];
--	active_template->do_5(bytes, dest, p1, p2, p3, p4);
--}
--EXPORT_SYMBOL(xor_blocks);
--
- /**
-  * xor_gen - generate RAID-style XOR information
-  * @dest:	destination vector
-@@ -61,16 +31,8 @@ EXPORT_SYMBOL(xor_blocks);
-  */
- void xor_gen(void *dest, void **srcs, unsigned int src_cnt, unsigned int bytes)
- {
--	unsigned int src_off = 0;
--
--	while (src_cnt > 0) {
--		unsigned int this_cnt = min(src_cnt, MAX_XOR_BLOCKS);
--
--		xor_blocks(this_cnt, bytes, dest, srcs + src_off);
--
--		src_cnt -= this_cnt;
--		src_off += this_cnt;
--	}
-+	WARN_ON_ONCE(in_interrupt());
-+	active_template->xor_gen(dest, srcs, src_cnt, bytes);
- }
- EXPORT_SYMBOL(xor_gen);
- 
-@@ -114,6 +76,7 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- 	int speed;
- 	unsigned long reps;
- 	ktime_t min, start, t0;
-+	void *srcs[1] = { b2 };
- 
- 	preempt_disable();
- 
-@@ -124,7 +87,7 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- 		cpu_relax();
- 	do {
- 		mb(); /* prevent loop optimization */
--		tmpl->do_2(BENCH_SIZE, b1, b2);
-+		tmpl->xor_gen(b1, srcs, 1, BENCH_SIZE);
- 		mb();
- 	} while (reps++ < REPS || (t0 = ktime_get()) == start);
- 	min = ktime_sub(t0, start);
-diff --git a/lib/raid/xor/xor_impl.h b/lib/raid/xor/xor_impl.h
-index 44b6c99e2093..968dd07df627 100644
---- a/lib/raid/xor/xor_impl.h
-+++ b/lib/raid/xor/xor_impl.h
-@@ -3,27 +3,47 @@
- #define _XOR_IMPL_H
- 
- #include <linux/init.h>
-+#include <linux/minmax.h>
- 
- struct xor_block_template {
- 	struct xor_block_template *next;
- 	const char *name;
- 	int speed;
--	void (*do_2)(unsigned long, unsigned long * __restrict,
--		     const unsigned long * __restrict);
--	void (*do_3)(unsigned long, unsigned long * __restrict,
--		     const unsigned long * __restrict,
--		     const unsigned long * __restrict);
--	void (*do_4)(unsigned long, unsigned long * __restrict,
--		     const unsigned long * __restrict,
--		     const unsigned long * __restrict,
--		     const unsigned long * __restrict);
--	void (*do_5)(unsigned long, unsigned long * __restrict,
--		     const unsigned long * __restrict,
--		     const unsigned long * __restrict,
--		     const unsigned long * __restrict,
--		     const unsigned long * __restrict);
-+	void (*xor_gen)(void *dest, void **srcs, unsigned int src_cnt,
-+			unsigned int bytes);
- };
- 
-+#define __DO_XOR_BLOCKS(_name, _handle1, _handle2, _handle3, _handle4)	\
-+void								\
-+xor_gen_##_name(void *dest, void **srcs, unsigned int src_cnt,		\
-+		unsigned int bytes)					\
-+{									\
-+	unsigned int src_off = 0;					\
-+									\
-+	while (src_cnt > 0) {						\
-+		unsigned int this_cnt = min(src_cnt, 4);		\
-+		unsigned long *p1 = (unsigned long *)srcs[src_off];	\
-+		unsigned long *p2 = (unsigned long *)srcs[src_off + 1];	\
-+		unsigned long *p3 = (unsigned long *)srcs[src_off + 2];	\
-+		unsigned long *p4 = (unsigned long *)srcs[src_off + 3];	\
-+									\
-+		if (this_cnt == 1)					\
-+			_handle1(bytes, dest, p1);			\
-+		else if (this_cnt == 2)					\
-+			_handle2(bytes, dest, p1, p2);			\
-+		else if (this_cnt == 3)					\
-+			_handle3(bytes, dest, p1, p2, p3);		\
-+		else							\
-+			_handle4(bytes, dest, p1, p2, p3, p4);		\
-+									\
-+		src_cnt -= this_cnt;					\
-+		src_off += this_cnt;					\
-+	}								\
-+}
-+
-+#define DO_XOR_BLOCKS(_name, _handle1, _handle2, _handle3, _handle4)	\
-+	static __DO_XOR_BLOCKS(_name, _handle1, _handle2, _handle3, _handle4)
-+
- /* generic implementations */
- extern struct xor_block_template xor_block_8regs;
- extern struct xor_block_template xor_block_32regs;
--- 
-2.47.3
+If pure-ML-DSA works better for IMA, just use pure ML-DSA.
+
+> Maybe it should explicitly state in FIPS-204 something along the lines=
+=20
+> of "with a given hash either ML-DSA or HashML-DSA can be used (for as=20
+> long as you use it in the same way from then on)." At least this way=20
+> nobody can point out that HashML-DSA should have been used when you didn'=
+t.
+
+NIST will not change the standard documents any time soon, but for FIPS
+certification there are Implementation Guidelines.
+
+In any case a FIPS module cannot distinguish between data that happens
+to be 32 bytes long and a hash of larger data, so the point is kind of
+moot. From the FIPS perspective HashML-DSA is just an available
+algorithm that protocol implementations can use, or not.
+
+There are additional guidelines on what this may be useful for, but so
+far NIST has not objected to the use of pure ML-DSA even where
+theoretically HashML-DSA could be used.
+
+> >=20
+> > > since it was added to the ML-DSA specification at a late stage withou=
+t
+> > > sufficient review, and what it does can be achieved in better ways.
+> >=20
+> > In case of doubt I would use the standard, though. It's probably not a=
+=20
+> > good idea for everyone to implement their own (bad) solution.
+> >=20
+> > > Which is exactly what we are seeing here, since again, IMA needs to d=
+o
+> > > the digest calculation and prefixing itself anyway.
+> >=20
+> > Use the standard...
+> >=20
+> >  =C2=A0=C2=A0 Stefan
+> >=20
+> > >=20
+> > > - Eric
+> >=20
+> >=20
+>=20
+
+--=20
+Simo Sorce
+Distinguished Engineer
+RHEL Crypto Team
+Red Hat, Inc
 
