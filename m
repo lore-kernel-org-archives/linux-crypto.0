@@ -1,56 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9330E3246EB;
-	Thu, 26 Feb 2026 18:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F6236AB71;
+	Thu, 26 Feb 2026 18:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772129190; cv=none; b=G1yCn5Tqr6saYK2TpdNt6IFgEUB6xHc83JVYR5ZvgiHFHf/0LcIFITR8f1Q5msyelGWqssEuIxWSC3kQ2KktdyE8++6ZVJcM3Yglw786hD665RDgV8a2pkUNhP66+xWfw6qGcGxyJZ+eCK3nSTOyzfauUh27gCL7lWcD0lAVInI=
+	t=1772129526; cv=none; b=LDbq3SEabfxs9A7632pKnxwxV/IyOKaS+NQGTQO6r0p+B8BzVCn2fwXkz7mgh2TkjdJbW9RAAQPxmBdqRT68Dp5vWQ/DgCRgqaglh5FAGhROLQzcsKeRFWlG9JKMSbtI2x8XyOTZm8SUa4nAqMZrLtqN6Hy6WXEda49sYzefM44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772129190; c=relaxed/simple;
-	bh=/VC1zI8gyRjIqgWzQZ2wTqewHEcl/+S3+ikq7qvbGPo=;
+	s=arc-20240116; t=1772129526; c=relaxed/simple;
+	bh=8Cj4mVY38C6nhdFzrjSAka6RCIWO/rW2rKB3wTy3Mrk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cct0I/8ZYf9tig5ZDRa7U9AsGsxJHOkO228lxM4s/SucFPoZNXeOxebx2JP96xKzeC+D8kfiwhW1CEvN6/jpVj7oaqa4MboRWSo4gFBdgLpk1GFuhEwdR+LtqKtK6b9CLC1IxpCkhaNJGk9c/68I2oeuH/QOJnTRJ/3v54+Mp1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V0al8PCb; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=UXWvlQm4m3xsSftYP3TG8Q2Yk+i2XiCibztsfGFaHpZ19Zqq+/2ijFEXOu80ELye+J53YbW867f9kAVXPquOQkNVTIrzIG8D2Std+aYqfU8+Lw158GfTMVGQvr95HJlL6mQQst52yD+oDWIP+fZDhnpIcvsEV2mJYeLo2DmwQvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uorws0FB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V0al8PCb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA86AC116C6;
-	Thu, 26 Feb 2026 18:06:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uorws0FB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89C8BC116C6;
+	Thu, 26 Feb 2026 18:12:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772129190;
-	bh=/VC1zI8gyRjIqgWzQZ2wTqewHEcl/+S3+ikq7qvbGPo=;
+	s=k20201202; t=1772129525;
+	bh=8Cj4mVY38C6nhdFzrjSAka6RCIWO/rW2rKB3wTy3Mrk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V0al8PCbDfksz3c923c59Vass7yvTlhiEYg97IgF2KYsKXPwfxU5UNWMaUFeQAT+v
-	 44X3HQzzXrj5g/ejCYL0MWU78TauqjzkWBeSFzhSiXb+kS7USaQFlqQfuK0WHyTuMw
-	 Wrx19GwVDQwXDDDkWiKkepPXSIvWVq6NQPuGIqGoXM0Qjc7x5VdCDPXICImYweDNcl
-	 rkhdWZPyVoCGKjhEPPJT5M2F1qLriZsXCCmO9xgZhLh3v5x0AmdrphO1l56ESK/yio
-	 m9KnyVplDWLW//fag0HYjADJPoo7G4H5naqXyIMhL6wEAHMikl8vBOcMz0acUZF6PW
-	 xQJEKn/HQL9MA==
-Date: Thu, 26 Feb 2026 10:05:38 -0800
+	b=uorws0FBPDWAIpjNgZRvwPN30CfVU62ec1xMNL1dXXIixREopcQ7IA/snjB8enMNX
+	 4M4DirIRgsvtXnogsIHu5KoLlilHDfujrSPV9lYQ49i+aFpDu4iAiOBA5V/dleIRNq
+	 /lmx4vsKqbPgFMrjODdA20VP8LqrR+T2yyNXfhnd/Po3TNEFVkD8Ir+5nxFZ+9yBrE
+	 0xk82X6+fhdbtZyFWRbLwIFXGA0S2SLkz8L1rzDYKSyjedMbbXnKwLd9xBRQ1tl0VS
+	 80dTiyvlzr3/O/UZIB+K6Eldt1WeEFvlMr2dxBhsEFIQrUOTDJ+t9zlZext145mnF6
+	 r+u2fReFBZuhg==
+Date: Thu, 26 Feb 2026 10:11:14 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>
-Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
-	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-arm-kernel@lists.infradead.org, x86@kernel.org,
 	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
 	KUnit Development <kunit-dev@googlegroups.com>
-Subject: Re: [PATCH v4 2/2] lib/crypto: tests: Add KUnit tests for ML-DSA
- verification
-Message-ID: <20260226180538.GC2251@sol>
-References: <20251214181712.29132-1-ebiggers@kernel.org>
- <20251214181712.29132-3-ebiggers@kernel.org>
- <CAMuHMdULzMdxuTVfg8_4jdgzbzjfx-PHkcgbGSthcUx_sHRNMg@mail.gmail.com>
+Subject: Re: [PATCH 02/12] lib/crypto: tests: Add KUnit tests for NH
+Message-ID: <20260226181114.GD2251@sol>
+References: <20251211011846.8179-1-ebiggers@kernel.org>
+ <20251211011846.8179-3-ebiggers@kernel.org>
+ <CAMuHMdVFRQZXCKJBOBDJtpENvpVO39AxGMUFWVQdM6xKTpnYYw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -59,98 +49,48 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMuHMdULzMdxuTVfg8_4jdgzbzjfx-PHkcgbGSthcUx_sHRNMg@mail.gmail.com>
+In-Reply-To: <CAMuHMdVFRQZXCKJBOBDJtpENvpVO39AxGMUFWVQdM6xKTpnYYw@mail.gmail.com>
 
-On Thu, Feb 26, 2026 at 02:09:47PM +0100, Geert Uytterhoeven wrote:
-> On Sun, 14 Dec 2025 at 19:18, Eric Biggers <ebiggers@kernel.org> wrote:
-> > Add a KUnit test suite for ML-DSA verification, including the following
-> > for each ML-DSA parameter set (ML-DSA-44, ML-DSA-65, and ML-DSA-87):
+On Thu, Feb 26, 2026 at 02:12:38PM +0100, Geert Uytterhoeven wrote:
+> Hi Eric,
+> 
+> On Thu, 11 Dec 2025 at 02:25, Eric Biggers <ebiggers@kernel.org> wrote:
+> > Add some simple KUnit tests for the nh() function.
 > >
-> > - Positive test (valid signature), using vector imported from leancrypto
-> > - Various negative tests:
-> >     - Wrong length for signature, message, or public key
-> >     - Out-of-range coefficients in z vector
-> >     - Invalid encoded hint vector
-> >     - Any bit flipped in signature, message, or public key
-> > - Unit test for the internal function use_hint()
-> > - A benchmark
+> > These replace the test coverage which will be lost by removing the
+> > nhpoly1305 crypto_shash.
 > >
-> > ML-DSA inputs and outputs are very large.  To keep the size of the tests
-> > down, use just one valid test vector per parameter set, and generate the
-> > negative tests at runtime by mutating the valid test vector.
+> > Note that the NH code also continues to be tested indirectly as well,
+> > via the tests for the "adiantum(xchacha12,aes)" crypto_skcipher.
 > >
-> > I also considered importing the test vectors from Wycheproof.  I've
-> > tested that mldsa_verify() indeed passes all of Wycheproof's ML-DSA test
-> > vectors that use an empty context string.  However, importing these
-> > permanently would add over 6 MB of source.  That's too much to be a
-> > reasonable addition to the Linux kernel tree for one algorithm.  It also
-> > wouldn't actually provide much better test coverage than this commit.
-> > Another potential issue is that Wycheproof uses the Apache license.
-> >
-> > Similarly, this also differs from the earlier proposal to import a long
-> > list of test vectors from leancrypto.  I retained only one valid
-> > signature for each algorithm, and I also added (runtime-generated)
-> > negative tests which were missing.  I think this is a better tradeoff.
-> >
-> > Reviewed-by: David Howells <dhowells@redhat.com>
-> > Tested-by: David Howells <dhowells@redhat.com>
 > > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > 
-> Thanks for your patch, which is now commit ed894faccb8de55c
-> ("lib/crypto: tests: Add KUnit tests for ML-DSA verification")
-> in v7.0-rc1.
+> Thanks for your patch, which is now commit 7246fe6cd64475d8
+> ("lib/crypto: tests: Add KUnit tests for NH") in v7.0-rc1.
 > 
 > > --- a/lib/crypto/tests/Kconfig
 > > +++ b/lib/crypto/tests/Kconfig
-> > @@ -36,10 +36,19 @@ config CRYPTO_LIB_MD5_KUNIT_TEST
-> >         select CRYPTO_LIB_MD5
+> > @@ -45,10 +45,18 @@ config CRYPTO_LIB_MLDSA_KUNIT_TEST
+> >         select CRYPTO_LIB_BENCHMARK_VISIBLE
+> >         select CRYPTO_LIB_MLDSA
 > >         help
-> >           KUnit tests for the MD5 cryptographic hash function and its
-> >           corresponding HMAC.
+> >           KUnit tests for the ML-DSA digital signature algorithm.
 > >
-> > +config CRYPTO_LIB_MLDSA_KUNIT_TEST
-> > +       tristate "KUnit tests for ML-DSA" if !KUNIT_ALL_TESTS
+> > +config CRYPTO_LIB_NH_KUNIT_TEST
+> > +       tristate "KUnit tests for NH" if !KUNIT_ALL_TESTS
 > > +       depends on KUNIT
 > > +       default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
-> > +       select CRYPTO_LIB_BENCHMARK_VISIBLE
-> > +       select CRYPTO_LIB_MLDSA
+> > +       select CRYPTO_LIB_NH
 > 
-> These two selects mean that enabling KUNIT_ALL_TESTS also enables
+> This select means that enabling KUNIT_ALL_TESTS also enables
 > extra functionality, which may not be desirable in a production system.
-> Fortunately CRYPTO_LIB_MLDSA is tristate, so in the modular case
-> the extra functionality is a module, too, and not part of the running system
-> by default.  Unfortunately CRYPTO_LIB_MLDSA is invisible, so this cannot
-> just be changed from "select" to "depends on". But as CRYPTO_MLDSA
-> also selects it, perhaps the test can be made dependent on CRYPTO_MLDSA?
+> Fortunately CRYPTO_LIB_NH is tristate, so in the modular case the
+> extra functionality is a module, too, and not part of the running
+> system by default.  Unfortunately CRYPTO_LIB_NH is invisible, so this
+> cannot just be changed from "select" to "depends on".
 
-"depends on CRYPTO_MLDSA" doesn't make sense, since the test is for the
-code in CRYPTO_LIB_MLDSA, not CRYPTO_MLDSA.  CRYPTO_MLDSA just happens
-to be one of the users of CRYPTO_LIB_MLDSA.  In this case the names
-happen to be similar, but consider e.g. CRYPTO_LIB_AESGCM which is
-selected by AMD_MEM_ENCRYPT.  If we added a test for CRYPTO_LIB_AESGCM,
-it clearly shouldn't use "depends on AMD_MEM_ENCRYPT".
-
-So, "depends on CRYPTO_LIB_MLDSA" would be the correct way to switch it
-from a selection to a dependency.
-
-It's just a bit annoying to do this for hidden symbols, given that it
-makes it so that anyone who wants to unconditionally enable the test,
-like what I do to test all the crypto library code, has to find and
-enable some other random kconfig symbol that enables the code.
-
-Also, the series that originally added CRYPTO_LIB_MLDSA and its test
-(https://lore.kernel.org/linux-crypto/20251214181712.29132-1-ebiggers@kernel.org/)
-didn't add any user of CRYPTO_LIB_MLDSA besides the test, as the real
-user came a bit later.  So if I had used "depends on CRYPTO_LIB_MLDSA",
-my series wouldn't have received any build bot coverage, and I'd have
-needed to temporarily carry local patches to build and test the code.
-
-But if this is really the convention for KUnit, as it seems to be, I
-will follow it and work around it for my own testing.  So I'll plan to
-change the crypto library and CRC tests to use "depends on".
-
-But any thoughts from the KUnit maintainers would also be appreciated.
-Is it indeed intended that the tests for library modules depend on those
-modules rather than selecting them, despite their symbols being hidden?
+I'll probably be changing this, pending the result of the discussion on
+the similar thread about CRYPTO_LIB_MLDSA_KUNIT_TEST:
+https://lore.kernel.org/linux-crypto/20260226180538.GC2251@sol/
 
 - Eric
