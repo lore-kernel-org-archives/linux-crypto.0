@@ -1,40 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2252B4657DF;
-	Thu, 26 Feb 2026 19:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C8B320CCC
+	for <linux-crypto@vger.kernel.org>; Thu, 26 Feb 2026 20:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772135732; cv=none; b=P8Jx9P38ATiErGP9p2pq40JkbClPJ8WGSafIBYWI8/NiQBz049wslTb4AkikvYRiCoANTUqK5+rPSEjMs/ab39I1YQwrRhnVJyMnV3S75zMKZFoxtVk94y/NmdiaxWTUB4aOcIUI7jL/U8mL59mZRjNa/Gb/HfuqIVK4d078z9E=
+	t=1772137944; cv=none; b=W+bM6D+HESnVsZz4AcBv+YMhAiZt8+GqzGhig1kGgm7inc/WjVKk4cbx2Qbvj9X7lMZhCWN16ed2/bZp9xYTtNCZCazx/Dy3ZxOxL3f8Ifsed5muVOa2D4/43yp4V8374vu+Lf6QT/+lQdUrDARR4AYfOpRfk//pa1gBdHqBC74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772135732; c=relaxed/simple;
-	bh=XeE4MfnoD1Gac/djppLiAsbbhx0QboJzv/ayBzFJW+w=;
+	s=arc-20240116; t=1772137944; c=relaxed/simple;
+	bh=C+iTffCLjsqI4qo0b9qTkR5RJDv1+JxWY9RpgdkZiX0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MzcM+qlo3GKEmzP/E+7OLNSgHP8t5kWOyA4BHGMVOvJz49uEeNk8otD38Z5UgNbvK1CT3FahtDfMcNnfYIN7xutX/a99hR4Rdr0hJFTbYLIENBW48Kb4xYJwup7SnSnHfExnrr7BQNbjGfAqcsPOj7sAa3e+JJbZSv9lFyWdWqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czHPwhZo; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZfbcUb7anABOGsBzr+NUA245NuwfdwBvZUVxfIu1fXkn6M0ZG5cKMtc6yNu1MFrtPMIVbf1d2I/lLckeAx2tvaVbctIyBRqnfLIQOEk9h34EapxS4A0I3KxCzAfsI9Q0XFA/8/U2FBbrpOjlMrUR72BP0PBWp2/LNPxqM8LqtbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YXlAip6f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czHPwhZo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E445C116C6;
-	Thu, 26 Feb 2026 19:55:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YXlAip6f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30193C116C6;
+	Thu, 26 Feb 2026 20:32:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772135731;
-	bh=XeE4MfnoD1Gac/djppLiAsbbhx0QboJzv/ayBzFJW+w=;
+	s=k20201202; t=1772137944;
+	bh=C+iTffCLjsqI4qo0b9qTkR5RJDv1+JxWY9RpgdkZiX0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=czHPwhZoGRSm+Kgyl6XYimYwM4fIJga8rS3dmfAK369r5UcmBVOnW7VK/rKBZ6cQ/
-	 00y5NVnM3gvp2NuboyXF2Yyg9nfIDusr/ABNdGMyrvlg1aypSalw/f1u/Ive9N2TGi
-	 CMjlEfRlLrIlpTgcXxR8uAA+055iiLubCVnzY6e1r0XsNAjeciCuqZS91gyu+1q5mJ
-	 CB57DbNZ7om8zQp7LejanT/27arC2kYlLg29a8hXdA+McuExMmtAP0eKfbvW63w86e
-	 puhayKBx5l17mvRnCJ4URIkdn4lSH7hXLLUQMMfl1BTf1L2gXLgrZaXEEVISpbcp8C
-	 fP0OIVk+krpFw==
-Date: Thu, 26 Feb 2026 11:54:40 -0800
+	b=YXlAip6fEExCl1C0fzFtHFOrz+mm7xB/NUz1LDK9qscetMDQ9ds8LtPUb/gAdagWr
+	 kPjGhG+6LKh6vIHmkLoNuVf1ZDO00l+09V2uMSAohIzX1MbBkmimZLAmKKEY9UJDPG
+	 x3HPiXhyrNnH2eZAqQ7PZTcx+ZvhpuLTsfUV4d9Hd+07U4XSDU6Io11Y4AVh4Ag2jI
+	 4qJtWJztMIwDi8ebRnDPGxM96bGa1Btm35VAzE5Ykbuu+Qpa901zxD8fW7llh7BtWr
+	 yCSLc0lV/5WZ04zwAFP84AAchAiFfTsTQMQiKH+43xbCUVyHy+DcCPgXXHNSrw7vFb
+	 uY2nFvWg8rUIQ==
+Date: Thu, 26 Feb 2026 12:31:33 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/5] crypto: Drop stale usages in various help texts
-Message-ID: <20260226195440.GH2251@sol>
-References: <cover.1772116160.git.geert+renesas@glider.be>
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+Subject: Re: [PATCH v3 3/5] crypto: pkcs7: allow pkcs7_digest() to be called
+ from pkcs7_trust
+Message-ID: <20260226203133.GB2273@sol>
+References: <20260225211907.7368-1-James.Bottomley@HansenPartnership.com>
+ <20260225211907.7368-4-James.Bottomley@HansenPartnership.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,33 +44,20 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1772116160.git.geert+renesas@glider.be>
+In-Reply-To: <20260225211907.7368-4-James.Bottomley@HansenPartnership.com>
 
-On Thu, Feb 26, 2026 at 03:46:04PM +0100, Geert Uytterhoeven wrote:
-> 	Hi all,
-> 
-> This patch series drops stale references to subsystems that are using
-> various crypto algoritms.  It was triggered by "make oldconfig" in
-> v7.0-rc1 showing new prompts about BLAKE2b, SHA-256, xxHash, and CRC32c
-> algorithms.  When querying these symbols, the corresponding help texts
-> incorrectly claim they are used by btrfs.
-> 
-> Notw that even if correct, there is no need for such references, as all
-> users should select the needed symbols anyway.
-> 
-> Geert Uytterhoeven (5):
->   crypto: Drop stale CRYPTO_BLAKE2B usage
->   crypto: Drop stale CRYPTO_SHA256 usage
->   crypto: Drop stale CRYPTO_XXHASH usage
->   crypto: Drop stale CRYPTO_CRC32C usage
->   crypto: Drop stale CRYPTO_CRC32 usage
-> 
->  crypto/Kconfig | 9 ---------
->  1 file changed, 9 deletions(-)
+On Wed, Feb 25, 2026 at 04:19:05PM -0500, James Bottomley wrote:
+> +	/*
+> +	 * if we're being called immediately after parse, the
+> +	 * signature won't have a calculated digest yet, so calculate
+> +	 * one.  This function returns immediately if a digest has
+> +	 * already been calculated
+> +	 */
+> +	pkcs7_digest(pkcs7, sinfo);
 
-Thanks for cleaning this up!
-
-If there are no objections I'd like take these through libcrypto-fixes,
-given that they are related to the library conversions.
+pkcs7_digest() can fail, returning an error code and leaving sig->m ==
+NULL && sig->m_size == 0.  Here, the error is just being ignored.
+Doesn't that then cause the signature verification to proceed against an
+empty message, rather than anything related to the data provided?
 
 - Eric
