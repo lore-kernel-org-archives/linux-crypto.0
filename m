@@ -1,214 +1,208 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB013939C6;
-	Thu, 26 Feb 2026 21:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772139936; cv=none; b=Nhx4516qDQds6ANkHtykVD0BqNRVMJIxKvNkZUGrG/ZV7KJ3L1dJ6kfbbxhiPV1REl2cyLY9phB2JaFGo9+iov2WMnCu3kjW7h+XpS+IS9cWY2FTX30vNZOKJzyRnZV1HxSTpiRCzSIVpQpmGgQY79MgXc00MbqIOVrn45f6aHs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772139936; c=relaxed/simple;
-	bh=CGJOtdEq3F146PP+b+MPdofOSSJn1EG7PDzHAp8/b3Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IsEqU8jVVCGfweW1NxPv/lbde/9kAJrQSv5U0v4KlOUU/TqRVIG1UwAK7I/iLfh8naoT281sZ7IY1TxYmpKqe9cFRB+1Q0hG5a1s0U71c1dswcj8E0sD/+BIfEISUvnJbuJ7Wx680GGx6/R9sQxp9BHK4Vh4ztTeT3lOVdfuiII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kMWwDEBX; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E63C428463
+	for <linux-crypto@vger.kernel.org>; Thu, 26 Feb 2026 21:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772140967; cv=pass; b=sQayv5S+klhW9xRJgsSZzoPwpdFSMiGHae9iZe3Xc/1nTh9rUID0h/fTszJIVaM53NL9f3IDw3+iDPS/yczTAoIVxYaAl0tODV84wP95xeCbrA4c3dTzozPrG9J13Bq6bnCq3kk5Fh1fxDwF2D8JugokBIjdb/9LncwVMSLVYSE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772140967; c=relaxed/simple;
+	bh=ivaSk08hsOQ+TfXEHtIOfQ/rw2QIDNUh0XWawt6aHAA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SdQZDg+sr/sbtaFmekRqQXqiy0VNzpZT8a7BOutL6m03KJvPwAN4bhKFlbKymlGUQKkAwecVpyMIzw0Xwfhp4/RIQsl4psRduGcUfMsnEkb+WtfqSvF4FWcAnK/OvVL1RWqUIJyxb+4b1Mfrs8B2X1buq+ICfzKL/i0h7lko+Aw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KcTg4KAQ; arc=pass smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kMWwDEBX"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61QHtqJC3003598;
-	Thu, 26 Feb 2026 21:05:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=//3GCo
-	5ghP7YnX/8DlB/b0HC567HIVL4lqpc0QRGdAA=; b=kMWwDEBXtVjB1FCTNB9RNg
-	+Dwfah2GZAy0VXXdviJQWi6JByYjpQhPnbKPgZs2QnZrTnx1UZrlBIDOM7qVRr/4
-	+Dus2pqqBQGiY/gk9CN58RcoNKFWxxr6V04qCYqwfPPDh6iD+RUfXdg1H6TE43+K
-	N4H8jViSHaTc4IPsnwtkXWgxWPc718r9BW0+8i8qI2BxUv76fcLSGfZuSBwde/1o
-	fxyYfB6m0RM2la/OIiyuYCPH8JRdR2bH70XEXs/EagtuD9i+SQ64S/lQ5LLT3l1S
-	C7B2iFSoFOT26KQPomP6JVCHoDwzdYaH2xtw0p2hTsYAi4ZNuA/oBzAaV14+tw3Q
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cf4bs861v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Feb 2026 21:05:20 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61QIV3aJ015983;
-	Thu, 26 Feb 2026 21:05:19 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cfq1sx8sy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Feb 2026 21:05:19 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61QL5JPY27329254
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 26 Feb 2026 21:05:19 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 462B358056;
-	Thu, 26 Feb 2026 21:05:19 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 641C65803F;
-	Thu, 26 Feb 2026 21:05:18 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 26 Feb 2026 21:05:18 +0000 (GMT)
-Message-ID: <1faaa368-451c-49fa-8ba2-82610dfef3e8@linux.ibm.com>
-Date: Thu, 26 Feb 2026 16:05:17 -0500
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KcTg4KAQ"
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7986b4e59d1so1449947b3.2
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Feb 2026 13:22:45 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772140964; cv=none;
+        d=google.com; s=arc-20240605;
+        b=PULSVMk0MpNOsa/I9EdjKTcYxH/A4sam32m+Rw1E0YvkcjZv0pFZcdw6nX75Xcf6TI
+         KR3i/hd/ZUqBtG+UmS4XVF3yyeI+6+Gs/Dao0KkpltzxWjOgJdNWQBBEy3fLavwhsND/
+         pB4xdeKvkp0DYTRrFHvorlP8EXEwdNax/iANlNXtL89q0i+h9WputTGysH/fm2gThny8
+         CtAitOpP+Ay96kR9EG558RYH2jHjSCiqOykIrJUzHAahihZ1sScWWq/qJM7c+eofOBOx
+         SgXPzWVXVx2/veGVsHDkmA3vV08KnZZdMhUkcAPjhOs7u4qdZEtlhhh2yMOQcGoSEopl
+         GL5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=JB4+0Jjmsb7WCQkN35VAE3lNJIaVQsTkaWwYNjZ0X0I=;
+        fh=HmM/K7MnQASmVX2/mbKSwjZhEFhJOLeWEiHLEnA9osI=;
+        b=WHSxxZNG/etKlI5KgsS+ls4GaDA1weBXrfxq+XNAO4WF9DlXMcqla1iY58Nka3d7M6
+         QZZ00qRM3GuS8Nr1hu8YEtpvFspVBas95Va6/nryqEQ9F+uBdufAjh3XPM9/Q1D1eSrn
+         is4lhGOWlla4Yuen0fwyIGhOq7JS52bCeC1Z0rBsotnJWRr67uZ4qFG6Dmkw/NG7Xwyp
+         5gC1/WuQVpaeJP4Iv8+zWJbqRn6poDuxtqEEMRm5iA/r/fff9EwaO9debosia8XqYh80
+         JGWYf+dlCHXwbPxiozpoyxjeqqdkP/66WiqiCyET8aWMLeuXWkSjxmu+ima+hz1vHFr6
+         wLww==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772140964; x=1772745764; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JB4+0Jjmsb7WCQkN35VAE3lNJIaVQsTkaWwYNjZ0X0I=;
+        b=KcTg4KAQuH2dAQInBo4qSx7S9AmZ0QJO7TrzIofQaql1R/aciIGi6yWC75nTksszdN
+         dt0UinD/NhIQLPDfI/OdTEbfT5uWjy8FIk0Y5c3dh4K2zgvSntImkGUi3DYZMfT4dDAZ
+         VaoJp1TW2NZzP0PjE11/S3BGjqm3Vuv76msbV4JRQLaXNOoco0rgt6AMI2Iv7FL0zZD8
+         bipIWSG3D6YkFqtp3XjaPYtoq2qFxePTXCvU8y6pq5xtZpyUoXz9lQE7595fPTSZwksF
+         MVNNUVA56ZRycP+LLv47wziusX/ZYcUwfanzNQn6d3F9aBJ9OyrtnJk7fzL3OCoRfNyb
+         jxUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772140964; x=1772745764;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=JB4+0Jjmsb7WCQkN35VAE3lNJIaVQsTkaWwYNjZ0X0I=;
+        b=iSM8wIQHJBPifMz8V2JyYEMHSha0bv0Dxq8tHeKNwey1WvP8IAg1JpJgMTb/FbjmJP
+         whr7bk7LcVpbeDxHqqU5LFD1otVaL3CYhjxt0GmKqKGEFe05CH+W3DR9nwUYXs3e9pbH
+         +9VATEjjezDurRsTeW0RW5HEZI5k22Aib5jWzD7yusitvF+t3dC30YnF5PLVTqXgmObn
+         lTpjXvqQG/QwaB/CqpkthFQqr12ExTZQYh4oimCZ71ayVRzFFK861/e0W+uQU18+N2By
+         Cu+vlJ3DyEMXIEu54sxZTYrOtLxOLFbg/6Y+Dm21wrnjvR/ka4frzKmvg2Z65sacZFEQ
+         7jWg==
+X-Forwarded-Encrypted: i=1; AJvYcCXyVji05Jhk9FhPfXObdnC223oUJywIPKhl7MUFG7f9U5QEdU0f7f6jn3ey6lX46QBLBy/D86ZGNBRhmJI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2SiVfvk+kqOnAkrssb1NQyYNGAc1sQIvDkpw0OwY3ngxE2BwA
+	2RgfyD3Rs5uEKcfL3trtTvf3o1n70sYEDvKCtD+MJuVwfCgEtmW53ACqMCmuH+Dj1jj/aS0p2h0
+	EyML+RoUIdBEu+FuKbtixs3R20j2vdgw=
+X-Gm-Gg: ATEYQzw3FFJxZ2WSp5DStCnoioZUv70l4IREsgU4gtx23mr6HeiBwlCIPTzPR3FQ9SO
+	WiiVg9vrFRLEC5Qjm2wwjEy2dUEjS7OoRjy7vu4tdQkYr0fo5XGz+LebvQ0yJGbKtuv5jnuOZU1
+	RyEKXLu01rOkjpWIN+w6y+WS3AATTKgvxAjeQg6OtkDzAVLGt/6Qp3SFXDZ0qnFSldJm2bH44Og
+	jp4AR73VmhHUQaopRr1FZAZADZIKh1CXqJu9h4DU+QqWPDJl2/RcpU1+RtaKW+nfO5e6o4howv9
+	bPSe
+X-Received: by 2002:a05:690e:1596:10b0:64c:a2fc:807b with SMTP id
+ 956f58d0204a3-64cc23341c0mr449268d50.6.1772140964164; Thu, 26 Feb 2026
+ 13:22:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: IMA and PQC
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Simo Sorce <simo@redhat.com>, Coiby Xu <coxu@redhat.com>,
-        =?UTF-8?Q?Johannes_Wiesb=C3=B6ck?= <johannes.wiesboeck@aisec.fraunhofer.de>,
-        dhowells@redhat.com, dmitry.kasatkin@gmail.com,
-        eric.snowberg@oracle.com, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
-        roberto.sassu@huawei.com, zohar@linux.ibm.com,
-        michael.weiss@aisec.fraunhofer.de
-References: <aYHznG6vbptVOjHQ@Rk>
- <ee36981d-d658-4296-9acb-874c72606b3e@linux.ibm.com>
- <20260226001049.GA3135@quark>
- <cba10ac6-3557-4fc1-9b86-55361d14156d@linux.ibm.com>
- <dc09be79-5efe-4756-a295-5b0428985525@linux.ibm.com>
- <da190dbbc692b9da8464bbbfffdde7bab26b3f1c.camel@redhat.com>
- <20260226165819.GA2251@sol>
- <969c74f3-81ed-442c-87dd-381274a642a7@linux.ibm.com>
- <20260226183248.GE2251@sol>
- <13ebe763-dcaf-4379-b9a7-82d06fd0fdb3@linux.ibm.com>
- <20260226194406.GG2251@sol>
-Content-Language: en-US
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <20260226194406.GG2251@sol>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-ORIG-GUID: vX2zSuxstHXhjgCw-A1HAYqr-CGGzolU
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI2MDE4OCBTYWx0ZWRfX/a2JQU9aa5ee
- 2rKqdPf62pG74+XDCUnKIphMQ/4jhR5R4mE02G+Wm/dTV0ngzD2zU1a17D7kkbhZjWQyU4Je7Gj
- pilRlxcKp0OgA1ix4MKPI+5c6gKCq1VMifrNl9RW7gT4xE9VW86VT40OGHpIaXRsgZtSj1304/M
- m2myg4j8wgA+664aRPCdSjCdYgYrQVrgfD2bXfOkRVQFmUHibUu0bnzHXKdN/Mh7bCfV1S09VZw
- HlUgab1lgA2nZzKVgZ84vEHb4MRX4ZUVx0DmxeUuiOiQRehYmJTTjyZle+9sARyDJgHCiNL0JpQ
- himd4x0yeXVUoaXySaxyIUQb+a/IpGcQV3uL+2D3nTK6+gRR9TnIvU7zCzal8cWYoZQnGK5IUDi
- uy33sHXS2KmBg9yRrkqs0oiVaOPAY9eH8psumb12xcH5FWUd6dxI7KawEk9EjNkDLiS63N6NGwg
- 2jZR7eOHQSPv05dbG8A==
-X-Authority-Analysis: v=2.4 cv=eNceTXp1 c=1 sm=1 tr=0 ts=69a0b590 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=TKsHhThkkL6ydXzSVRkA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: WxIQyzXbclRQMkqPy7P1Z_1PNO7y14kp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-26_03,2026-02-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 phishscore=0 suspectscore=0 adultscore=0
- bulkscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602260188
+References: <20260224225547.683713-2-thorsten.blum@linux.dev>
+In-Reply-To: <20260224225547.683713-2-thorsten.blum@linux.dev>
+From: Lothar Rubusch <l.rubusch@gmail.com>
+Date: Thu, 26 Feb 2026 22:22:07 +0100
+X-Gm-Features: AaiRm52It-aXFcuLq__go6bqOZfdSs9Bh4efwCHuAs4dMiL1mpRRlFj6QRKv3qw
+Message-ID: <CAFXKEHYTZHT1sX0rNhbZoG40eEkn2B1Utrx+9Jn4a580sGj7Ew@mail.gmail.com>
+Subject: Re: [PATCH] crypto: atmel-sha204a - Fix OTP address check and
+ uninitialized data access
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	stable@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Thorsten, thx for squashing. I hope this goes ok with the maintainers.
 
+On Tue, Feb 24, 2026 at 11:57=E2=80=AFPM Thorsten Blum <thorsten.blum@linux=
+.dev> wrote:
+>
+> Return -EINVAL from atmel_i2c_init_read_otp_cmd() on invalid addresses
+> instead of -1. Since the OTP zone is accessed in 4-byte blocks, valid
+> addresses range from 0 to OTP_ZONE_SIZE / 4 - 1. Fix the bounds check
+> accordingly.
+>
+> In atmel_sha204a_otp_read(), propagate the actual error code from
+> atmel_i2c_init_read_otp_cmd() instead of -1, and return early if
+> atmel_i2c_send_receive() fails to avoid checking potentially
+> uninitialized data in 'cmd.data'.
+>
+> Also, return -EIO instead of -EINVAL when the device is not ready.
+>
+> Fixes: e05ce444e9e5 ("crypto: atmel-sha204a - add reading from otp zone")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Lothar Rubusch <l.rubusch@gmail.com>
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+> Compile-tested only.
+>
+> This patch combines [1] and [2], as suggested by Lothar in [2].
+>
+> Lothar's Reviewed-by: for [1] has been preserved.
+>
+> In [2], Lothar questioned whether returning -EIO is appropriate; the
+> exact error code can be adjusted if needed. The errno is currently not
+> propagated to userspace, but [3] changes this.
+>
+This was just more curiosity, nothing to mention.
 
-On 2/26/26 2:44 PM, Eric Biggers wrote:
-> On Thu, Feb 26, 2026 at 02:21:41PM -0500, Stefan Berger wrote:
->>
->>
->> On 2/26/26 1:32 PM, Eric Biggers wrote:
->>> On Thu, Feb 26, 2026 at 12:22:32PM -0500, Stefan Berger wrote:
->>>>> I see that IMA indeed never upgraded full file hashes to use
->>>>> 'struct ima_file_id'.  Building a new feature that relies on this seems
->>>>> like a bad idea though, given that it's a security bug that makes the> IMA
->>>> protocol cryptographically ambiguous.  I.e., it means that in IMA,
->>>>> when the contents of some file are signed, that signature is sometimes
->>>>> also valid for some other file contents which the signer didn't intend.
->>>>
->>>> You mean IMA should not sign the digest in the ima_file_id structure but
->>>> hash the ima_file_id structure in which this file digest is written into
->>>> (that we currently sign) and sign/verify this digest? And we would do this
->>>> to avoid two different files (with presumably different content) from having
->>>> the same hashes leading to the same signature? Which hashes (besides the
->>>> non-recommended ones) are so weak now that you must not merely sign a file's
->>>> hash?
->>>>
->>>> The problem with this is that older kernels (without patching) won't be able
->>>> to handle newer signatures.
->>>
->>> IMA needs to sign the entire ima_file_id structure, which is indeed what
->>> IMA already does when it uses that structure.  (Well, actually it signs
->>> a hash of the struct, but that's best thought of an implementation
->>> detail of legacy signature algorithms that can only sign hashes.  For a
->>> modern algorithm the whole struct should be passed instead.)  Just IMA
->>> uses that structure only for fsverity hashes, which is a bug that makes
->>> the IMA protocol ambiguous.  It needs to use ima_file_id consistently,
->>> otherwise a signed message sometimes corresponds to multiple unique file
->>> contents even without a break in the cryptographic hash function.
->>
->> Before we jump into making changes on this old stuff I think it's good to
->> understand the underlying problem and the likelyhood of signatures
->> validating different data, such as a file and fsverity data. How likely is
->> this?
->>
->> Assuming a strong hash I suppose that is not a concern with RSA because here
->> the digest is padded and then directly encrypted with the private key. Upon
->> verification (pub key decrypt) we would unpad and memcmp the digests.
->>
->> Again, assuming a strong hash: With ECDSA NIST P256 for example we have a 32
->> byte signature. With a SHA512 being used for hashing for example we would be
->> doing a projection of a 64byte hash space to a 32byte signature space with.
->> Just by this projection of a much larger space into a smaller space
->> signatures that validate multiple input data could be a problem. One 'easy'
->> case where signatures for different input data is the same (not exactly the
->> same due to nonce involved the signature is verifyable), albeit unlikely, is
->> that there could be different input data for the SHA512 that lead to the
->> same 32bytes prefix, which is then used after truncating the sha512 to the
->> first 32 bytes for the ECDSA signature, and this then leads to a signature
->> that is verifyable for different input data. So that's the 'simple' case at
->> least for this thought experiment for a non-expert.
->>
->> Now what should still be difficult to do is given a file and a hash-to-use
->> that you can create fsverity content that leads to a hash that in turn leads
->> to a NIST-P256 signature that can be used for signature verification(s) of
->> the file and the totally different fsverity data. Is this a problem that is
->> as difficult to solve just as finding different input data for a hash that
->> leads to the same digest?
-> 
-> There's no differentiation between a 'struct ima_file_id' that
-> *represents* the contents of some file, and a file whose contents are
-> *equal to* that 'struct ima_file_id' and that uses a full-file hash.  In
-> both cases the same key and message are used for signing and verifying.
+> [1] https://lore.kernel.org/lkml/20260215205152.518472-3-thorsten.blum@li=
+nux.dev/
+> [2] https://lore.kernel.org/lkml/20260220133135.1122081-2-thorsten.blum@l=
+inux.dev/
+> [3] https://lore.kernel.org/lkml/20260216074552.656814-1-thorsten.blum@li=
+nux.dev/
+> ---
+>  drivers/crypto/atmel-i2c.c     |  4 ++--
+>  drivers/crypto/atmel-sha204a.c | 11 ++++++++---
+>  2 files changed, 10 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+> index da3cd986b1eb..59d11fa5caeb 100644
+> --- a/drivers/crypto/atmel-i2c.c
+> +++ b/drivers/crypto/atmel-i2c.c
+> @@ -72,8 +72,8 @@ EXPORT_SYMBOL(atmel_i2c_init_read_config_cmd);
+>
+>  int atmel_i2c_init_read_otp_cmd(struct atmel_i2c_cmd *cmd, u16 addr)
+>  {
+> -       if (addr < 0 || addr > OTP_ZONE_SIZE)
+> -               return -1;
+> +       if (addr >=3D OTP_ZONE_SIZE / 4)
+> +               return -EINVAL;
+>
+>         cmd->word_addr =3D COMMAND;
+>         cmd->opcode =3D OPCODE_READ;
+> diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204=
+a.c
+> index 8adc7fe71c04..b0480d3bec70 100644
+> --- a/drivers/crypto/atmel-sha204a.c
+> +++ b/drivers/crypto/atmel-sha204a.c
+> @@ -94,19 +94,24 @@ static int atmel_sha204a_rng_read(struct hwrng *rng, =
+void *data, size_t max,
+>  static int atmel_sha204a_otp_read(struct i2c_client *client, u16 addr, u=
+8 *otp)
+>  {
+>         struct atmel_i2c_cmd cmd;
+> -       int ret =3D -1;
+> +       int ret;
+>
+> -       if (atmel_i2c_init_read_otp_cmd(&cmd, addr) < 0) {
+> +       ret =3D atmel_i2c_init_read_otp_cmd(&cmd, addr);
+> +       if (ret < 0) {
+>                 dev_err(&client->dev, "failed, invalid otp address %04X\n=
+",
+>                         addr);
+>                 return ret;
+>         }
+>
+>         ret =3D atmel_i2c_send_receive(client, &cmd);
+> +       if (ret < 0) {
+> +               dev_err(&client->dev, "failed to read otp at %04X\n", add=
+r);
+> +               return ret;
+> +       }
+>
+>         if (cmd.data[0] =3D=3D 0xff) {
+>                 dev_err(&client->dev, "failed, device not ready\n");
+> -               return -EINVAL;
+> +               return -EIO;
+>         }
+>
+>         memcpy(otp, cmd.data+1, 4);
+> --
+> Thorsten Blum <thorsten.blum@linux.dev>
+> GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
+>
 
-I hadn't been thinking of this... It's a side-effect of starting to sign 
-ima_file_id for v3 that a file *content* could now hold the ima_file_id 
-structure (as signed with v3) and the signature would validate when used 
-with the v2 signature verification scheme. So, the content of the file 
-would presumably be odd/useless (2 bytes + hash) but it would verify 
-with the signature created for v3. We will have to offer the possibility 
-to move to v3 signatures for all signing schemes and offer the 
-possibility to deactivate older versions (<v3).
+I compiled this patch, loaded and unloaded it, sysfs entry also still
+working. LGTM.
+Reviewed-by: Lothar Rubusch <l.rubusch@gmail.com>
 
-> 
-> This means that every time a file is signed using the ima_file_id
-> scheme, it also implicitly signs some other file contents, which an
-> attacker can freely replace the file with.  Similarly, every time a file
-> that happens to be a valid ima_file_id is signed using the older scheme,
-> it also implicitly signs the contents that the ima_file_id correspond
-> to, which the attacker can freely replace the file with.  In either
-> case, no collision in the cryptographic hash function is required.
-> 
-> It's simply a broken protocol.  To fix this, IMA must only support
-> signatures that use the ima_file_id scheme.
-> 
-> Of course, that will require making them support full-file hashes and
-> not just fsverity hashes.  If I recall correctly, this was actually part
-> of the original design of the ima_file_id-based signatures.  It's
-> unclear why the implementation is still incomplete.
-> 
-> - Eric
-
+Best,
+L
