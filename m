@@ -1,57 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0542A2FB0A3;
-	Wed, 25 Feb 2026 22:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E8B4A21;
+	Thu, 26 Feb 2026 00:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772059797; cv=none; b=inQ2vR2s9wFsAc2NbU8MEgq7R+gXRA7FqoIavpKyeb51pSHN1vEvPgffMmShEwhq/tPNcqOqOHeUX0vfZ1w8ABMknFIuhTGUaDykq/DezCAsHGofMHt4Uue3tyVCLbc2TExHWDFuMMvkjxpOtUtNDYwoVQ31YHNooDncYvqPkpo=
+	t=1772064657; cv=none; b=pGHUkmz28HxTC9nxTZxPnKkBF2ZnqyfhKMqa+AC8/x0hy58ms6qjzg/Abh4JMWS360/VJ9CwqFtIzqshYZbvaAFm/t9knm7gxEGTAa53okMHg3t2ZCSIUJfrmT8qsrFZB0p5axzvW2xBJtiUNudl+LE2NcK1UrhZbPPSIhZ67iU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772059797; c=relaxed/simple;
-	bh=mgxqDo5rlL2fSjIeQ+XKlvcKVTdg4JhBlzt9laj0qHg=;
+	s=arc-20240116; t=1772064657; c=relaxed/simple;
+	bh=Hp8XdMbt8T9/DD+xxTRZWrJVGxrduonc71/LyubvrO8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q8Z0l65NT8KEPzD4yiuYtvF2DHwjx9lgMxiVpDwKxQqelkCejjwOSiQPAOgKVQLRIt8XbajxF9W0OEMtYPTxoUZQe5XBSkrp6OBftkeWvSVrDIQo0u3gHkFNphm/x5KX43DMi/zChOiMiTQf1cvSlVT58FawgdXNrx2Xs1fhk5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bLQgSWqw; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=E0zfE2LmxBV5imrvXdVA6p/ka9uLXL3nPGwLMBucKqyPNMFW0tAekriYXUFUnxNxVVXkDx6s4aR0JgOjlV2neSQdF/HjLvDeWysAn+P6itfZ5SQVd32atVhfAjS5O06pYQYjLp3VlLXTkMq6Nu37RQptqYLOvtmG2RR9VTqfqZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dCynDOyU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bLQgSWqw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3F67C116D0;
-	Wed, 25 Feb 2026 22:49:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dCynDOyU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3C3CC116D0;
+	Thu, 26 Feb 2026 00:10:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772059796;
-	bh=mgxqDo5rlL2fSjIeQ+XKlvcKVTdg4JhBlzt9laj0qHg=;
+	s=k20201202; t=1772064657;
+	bh=Hp8XdMbt8T9/DD+xxTRZWrJVGxrduonc71/LyubvrO8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bLQgSWqwB5/tv0+42PqFvJIC6uAPHKjAVuUraKTMifpKvdyvIvgx2av6xiXb+jH5w
-	 vfxvNUjNhJQFj7zDnuSMySWY8oxqftC2658+awD+Z+ssthXdxbiRx2An5UKGIFeWSW
-	 m+38CS/WIcesBthKltLTgLd6s6YyLAEHVGDq4KfM7hukPxRtfCPnQNWC84zww7ujzV
-	 GkMRN2aBhoBsLVtQ+AL+0EQxWMyo9+QZJEmm9A++JG1qYr+RfGPm9tKIQRmFWkajWl
-	 82fndr47I2wtRIv+6rSlpJIR0iMlE8DmQUIsXlOHENAShAHcrP2x+JZZmYK471ujpS
-	 y9e3wzlMle7Ig==
-Date: Wed, 25 Feb 2026 23:49:49 +0100
-From: Niklas Cassel <cassel@kernel.org>
-To: Frank Li <Frank.li@nxp.com>
-Cc: Vinod Koul <vkoul@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Koichiro Den <den@valinux.co.jp>, dmaengine@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org, mhi@lists.linux.dev,
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev,
-	Damien Le Moal <dlemoal@kernel.org>
-Subject: Re: [PATCH v3 0/9] dmaengine: Add new API to combine configuration
- and descriptor preparation
-Message-ID: <aZ98jbxb2Wh-yRe1@ryzen>
-References: <20260105-dma_prep_config-v3-0-a8480362fd42@nxp.com>
- <aXD/EYqhhRJEN8oy@lizhi-Precision-Tower-5810>
- <aX0EXjM4LlO3Hygd@lizhi-Precision-Tower-5810>
+	b=dCynDOyUSyIUc8xszf6VlE+bVWzCsTD2J7PC4kD9e3AKvgz7NPklqOKnY/XfWO5kK
+	 dV7oS8lkcSmWuHqyrW9e89NvTRFuLDG5IOnYJU3rXZBh7ysVFvTFfD85fdxSgN3Ixq
+	 fL1DuMTF07JQnF/uVR7ym/mWiOPxhyi25jx05O9ubXIZyH7BmpKWG+eLDNm/1gFgEf
+	 zT6hPr8/6ZRDJsXA6532ifUsXmQMXVbygqC1pHGHGlphKUpgJGX+BuelkZ2twyOWzo
+	 TgMvdslJ9YH9++4JjN3tkrN4cIzcBrsbZJPkYT6Z841FOr3Tm6pfvQi2b8kVAbNiao
+	 /b4NKlbQB7QuQ==
+Date: Wed, 25 Feb 2026 16:10:49 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Stefan Berger <stefanb@linux.ibm.com>
+Cc: Coiby Xu <coxu@redhat.com>,
+	Johannes =?iso-8859-1?Q?Wiesb=F6ck?= <johannes.wiesboeck@aisec.fraunhofer.de>,
+	dhowells@redhat.com, dmitry.kasatkin@gmail.com,
+	eric.snowberg@oracle.com, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
+	roberto.sassu@huawei.com, simo@redhat.com, zohar@linux.ibm.com,
+	michael.weiss@aisec.fraunhofer.de
+Subject: Re: IMA and PQC
+Message-ID: <20260226001049.GA3135@quark>
+References: <aXrKaTem9nnWNuGV@Rk>
+ <20260130203126.662082-1-johannes.wiesboeck@aisec.fraunhofer.de>
+ <aYHznG6vbptVOjHQ@Rk>
+ <ee36981d-d658-4296-9acb-874c72606b3e@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -60,23 +51,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aX0EXjM4LlO3Hygd@lizhi-Precision-Tower-5810>
+In-Reply-To: <ee36981d-d658-4296-9acb-874c72606b3e@linux.ibm.com>
 
-On Fri, Jan 30, 2026 at 02:19:58PM -0500, Frank Li wrote:
-> 
-> Vinod Koul:
-> 
-> 	Do you have chance to pick up (at least first 2 patches) for 6.20?
-> So I can start do more cleanup work.
+On Wed, Feb 25, 2026 at 09:25:43AM -0500, Stefan Berger wrote:
+> To avoid duplicate work: Is either one of you planning on writing patches
+> for IMA to use ML-DSA and convert the current ML-DSA to also support HashML?
+> I had done the work on this before and could dig out the patches again...
 
-Why only the first two patches?
+IMA already had to add its own digest prefixing support, since it was
+needed to disambiguate between full-file digests and fsverity digests.
+See 'struct ima_file_id'.  Thus the message signed is at most 66 bytes.
 
-Mani has already given his ack and said that he thinks it should go via
-the dmaengine tree:
-https://lore.kernel.org/dmaengine/6f4elcu5iql65jeqfeqhmllquv253xh4gb37ivef2kyvsj5lps@w35ciehuwxym/
+With that being the case, HashML-DSA isn't necessary.  It's not even
+possible to use here, since there are no OIDs assigned for the fsverity
+digests, so it cannot replace the ima_file_id.
 
-The series still applies to dmaengine/next btw :)
+I'll also note that HashML-DSA is controversial (e.g. see
+https://keymaterial.net/2024/11/05/hashml-dsa-considered-harmful/),
+since it was added to the ML-DSA specification at a late stage without
+sufficient review, and what it does can be achieved in better ways.
+Which is exactly what we are seeing here, since again, IMA needs to do
+the digest calculation and prefixing itself anyway.
 
-
-Kind regards,
-Niklas
+- Eric
