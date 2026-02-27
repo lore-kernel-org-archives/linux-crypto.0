@@ -1,126 +1,155 @@
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7550919E97B
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Feb 2026 08:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECA93B52E4;
+	Fri, 27 Feb 2026 09:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772181184; cv=none; b=mwu/PpbVvCinepOT4NeB/c4WG+VL/3U2WrLCLQ0qvaza79Y3ijwIikAdxcIhMCjOXiAcqw6X1WFblE1Tb/f7q0a6JiKF9ROD/Vqp02cpYl0ke4jV1ECOwjiD/gLGjcWaHGbfoKbdz35lfwFs5Gjk7ak0H/AOMjuvT4j/PMhm0C0=
+	t=1772183518; cv=none; b=Dya5oVm8fHtF3M/8CZqs5cZ5fnsuQQj1L8siJ+3/cmGhl6wFKq4b9NMoxOWIECszDSLlpQMgY8+PhXEIWDCGv6xEAq7hRJ7L2tZlbr4RqklOSfvaQpBgQ4fMld7uomO8eLw70cUVnfIkow+lwhcRXrhiObR5UY7MYcFWBBNYdJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772181184; c=relaxed/simple;
-	bh=3RupPG3bVf8o1iXp3/mZ55D1C9CIdFksOYT0HhrFzOM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VyrXt3xWYr6gtgAaiaK1+YmvMusyhKgFz0TxypRcIih6tkQXAO62P4+SRQv8T/EIvKYfor9uWKbZs1aYKTOP3N6hfYADdvxniOr6NjUFrreVLlflGQUz6TvcKKo81xiAh2zgPGNibL/krta1tt/4aVw7EcbDoNsFBJFxWmCncdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-94acf9ce1b7so1355526241.2
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Feb 2026 00:33:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772181182; x=1772785982;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2dEzLMMeMCHGMsmtD9q5xZQbfso5OBJS8UWwuF8jf68=;
-        b=rTmp/sViFx7D0WnXjImyzFiSCHeDww9aiSgD+DnbMdZxIesQgBDxeDNQPb1a4z5uDw
-         A2iMYz42rxlW+iCSo7+vmxjZWdsVeOrvU4OegqlyR//xEF5Gme60cunn/OBlofMOMyQ4
-         kkUlnNibhlqlrgDKZGi0fcPVkjdip9THmFYeuJGwV68jqnI/dICWVwOGLNbuufdiUlcx
-         CS4i/rR1iTaOpGBAVnIUC7TRPA8rr8c6/eP74eTp+IPfW6lZOGypkIx8HbAFJ+/EGPYS
-         URU1V9UOBJv9KvAaVuR3ohRktbrEYevse6LBBS59Oj9jXd2OmCXDQU/t74WZI+3XXtnr
-         kSIQ==
-X-Gm-Message-State: AOJu0YzF42QYn8mnnOglrJWx9cXc/vqFaTMyRg5MitbPAOnTl3/JJijW
-	HLbF8NR0rIZKzHx5lVpcsU5SssHr6c4qNVPHV34I2wL4ScBmdRd+IYSN/UPb3oEOdBk=
-X-Gm-Gg: ATEYQzx3Jc8vtLa3jKzUsDIA0H0OKwbBZwZaydFA0zdhtK1UdewHkxBUryxd9so44+2
-	uQuzyR5iydFcXXfW1gxI256dxR2SsRKR5QaYZxdIK7kk7ZcsVNb9EQ8AQs30KVhIlIV1jld9d9/
-	7msx7Ed7IiC2KEVQUU6IJTIBdBi75WmD7Bx03A0jtg09Dsvv3ZXJ06lnbVjaQ5ol/5hS4oWPFYI
-	avbavfEGBDSsRT+LAzaCTVbaQmNhIGl0TB+hjh6AzYZRIcSCLgDGzmsb323LwNGLcn/9+deK9ni
-	0I4KHmJZa7aAEct6TiAuEvJtdGBxqDVdzdcyi4qL+dFyw7H5ZToqoGUekegm1at/yoRbz4Mc09R
-	2fD9zyFIY5Z68+Y9r3J4iu3PJ1k+5Kq/Bl69XikOTQWB/TJ3r8WWKt6HwRyJE/+aZSDnRMrVbg0
-	CzBqSNCKGoIjPEq+bTE8N3eUhacCwZym2gKq8c3OG54lm7G1qwdquISCDSfa/jw/eYIxBwwvZJE
-	h8=
-X-Received: by 2002:a05:6102:a46:b0:5db:cf38:f506 with SMTP id ada2fe7eead31-5ff324e889cmr1364025137.23.1772181182393;
-        Fri, 27 Feb 2026 00:33:02 -0800 (PST)
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com. [209.85.221.170])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94df63d6f03sm3946198241.3.2026.02.27.00.33.01
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Feb 2026 00:33:02 -0800 (PST)
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-56a9402b52fso1546992e0c.0
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Feb 2026 00:33:01 -0800 (PST)
-X-Received: by 2002:a05:6102:c47:b0:5f5:487c:83d2 with SMTP id
- ada2fe7eead31-5ff325d53c9mr1297367137.38.1772181181577; Fri, 27 Feb 2026
- 00:33:01 -0800 (PST)
+	s=arc-20240116; t=1772183518; c=relaxed/simple;
+	bh=zHYdbKnsq8dhCXkAKHSWS7m786Mc+pWJxumIZ3n3mhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bWELCeYAG86rEl/6MVf2eD4ZDp32kTYt12LLvPm9n/u8LYc7yPNJhpWfCusRM5gwioq1vprVSbutRNx2ipTlGUu9hhbJ+THAEynjLKsniAKIwOeAcDw5spO7gMUtZzO84Oz4kJnf7FrYypvLqDpXrOppnAbFN+pOIOTBXVTilaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WsV8TR6r; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WsV8TR6r"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61R42kun3100088;
+	Fri, 27 Feb 2026 09:10:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=9fJNQ8hFc6Hs06NykvFdnbwjP22Qa4
+	Czsab7f5+iT/s=; b=WsV8TR6rk52sfgi0yEDU4EhQlIECmYdEVoCyjTqw7gZ3F3
+	eeHg+aJhMwLYBfRrvCTB+X1E8112JloZG505tr4YoHOHpsA+0VMCmikGSenHxCgI
+	8HXR4cEHiWmwwkzLwBscjDqpDZO3ne2k4EEE07xYvkotrBxJdXJpgPVvwn27muSf
+	xqBav/gaocnH+/b+cmw7rtzjfv7peKnbFuS/n+xyS+NBW6dWAjUvlxf2Z1nhGNyZ
+	JW8mx8qyfv8JeTYDboY2RdD3NfJMbMKBk4Cfsm9yXyMH2NxCMnd5vEs8SgkmIVEz
+	9iyvjXnemPAPNRZVT+C81oevbnLXFbPBfFIhRcFg==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cf34cjvka-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 27 Feb 2026 09:10:08 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61R7xVgm027794;
+	Fri, 27 Feb 2026 09:10:07 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cfsr291xx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 27 Feb 2026 09:10:07 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61R9A3w526345784
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 27 Feb 2026 09:10:03 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3E7ED20043;
+	Fri, 27 Feb 2026 09:10:03 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 88C6E20040;
+	Fri, 27 Feb 2026 09:10:00 +0000 (GMT)
+Received: from osiris (unknown [9.87.152.66])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 27 Feb 2026 09:10:00 +0000 (GMT)
+Date: Fri, 27 Feb 2026 10:09:59 +0100
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Matt Turner <mattst88@gmail.com>, Magnus Lindholm <linmag7@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+        Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andreas Larsson <andreas@gaisler.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
+        Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
+        Li Nan <linan122@huawei.com>, linux-alpha@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
+Subject: Re: [PATCH 17/25] s390: move the XOR code to lib/raid/
+Message-ID: <20260227090959.10882Af7-hca@linux.ibm.com>
+References: <20260226151106.144735-1-hch@lst.de>
+ <20260226151106.144735-18-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260226191749.39397-1-ebiggers@kernel.org>
-In-Reply-To: <20260226191749.39397-1-ebiggers@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 27 Feb 2026 09:32:50 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXH94DvcDKN1zTzTBOrcn_zAfZZZJCyGbxjfs8DBya5_Q@mail.gmail.com>
-X-Gm-Features: AaiRm52H2NMgOqKerYwyHCRsXF_5j9O_JAbJk1Fw4Sl8AnR8WmXboXf1vEA3uZA
-Message-ID: <CAMuHMdXH94DvcDKN1zTzTBOrcn_zAfZZZJCyGbxjfs8DBya5_Q@mail.gmail.com>
-Subject: Re: [PATCH] lib/crypto: tests: Depend on library options rather than
- selecting them
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Ard Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, kunit-dev@googlegroups.com, 
-	linux-kselftest@vger.kernel.org, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <raemoar63@gmail.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260226151106.144735-18-hch@lst.de>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI3MDA3OCBTYWx0ZWRfX82U5aVPSCKMj
+ b+0tJb22GfHqv9v4ECkZvrQTVdwe0NpyD3M0iH/J0+Xwr+YNeZjI36wIQPTa9rvjnE1UWrx9YkQ
+ JHFDvWeaZB3m0vLeSHPjQ41gZNyK3P7jz3/RMGU+PQUjTrl/esmjGZf3JQqOP9wpvYUJI8IGwZd
+ /XesnT0Fp6f7P6zmIK4NRyzDQXfXKB/frdS7KrKVpjV7P2YYv2qXUSwm17bcz6D+3OU43mCcNJw
+ VglTApNotpU5nP84m/1BO0OHu/I+7q5gBb6aF778m34dUw2mKpCO0GIw5iCL/18UvCIDVst+Cg2
+ or+7hBFh9lVuTlBEIYrN26hWcqnQmJk+cg6nVuLOR39apbYgayyTTwj8euDUuBGnNDky60OnBzo
+ zdR2VUTZDeHZGzwsBRd/sH8aRuZ3XZmPmK5c8OM2MVccRTGc8Hd/VLBtD8pqPq/pRTFgfAMLrBX
+ 75ZY0FEa+686cu8Lnvw==
+X-Proofpoint-ORIG-GUID: F8S8ZNtQow6uofq1eM08rQyj9jFeslmn
+X-Authority-Analysis: v=2.4 cv=F9lat6hN c=1 sm=1 tr=0 ts=69a15f71 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
+ a=HpkjO1BTjMN3Ce6vPK4A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: j1a5E8YeCxBUvXVfRM302zEA8A8N1Tzy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-27_01,2026-02-26_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 phishscore=0 bulkscore=0 adultscore=0 spamscore=0
+ clxscore=1011 suspectscore=0 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602270078
 
-Hi Eric,
+On Thu, Feb 26, 2026 at 07:10:29AM -0800, Christoph Hellwig wrote:
+> Move the optimized XOR into lib/raid and include it it in xor.ko
+> instead of unconditionally building it into the main kernel image.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  arch/s390/lib/Makefile                     | 2 +-
+>  lib/raid/xor/Makefile                      | 1 +
+>  {arch/s390/lib => lib/raid/xor/s390}/xor.c | 2 --
+>  3 files changed, 2 insertions(+), 3 deletions(-)
+>  rename {arch/s390/lib => lib/raid/xor/s390}/xor.c (98%)
 
-Thanks for your patch!
+FWIW:
+Acked-by: Heiko Carstens <hca@linux.ibm.com>
 
-On Thu, 26 Feb 2026 at 20:20, Eric Biggers <ebiggers@kernel.org> wrote:
-> The convention for KUnit tests is to have the test kconfig options
-> visible only when the code they depend on is already enabled.  This way
-> only the tests that are relevant to the particular kernel build can be
-> enabled, either manually or via KUNIT_ALL_TESTS.
->
-> Update lib/crypto/tests/Kconfig to follow that convention, i.e. depend
-> on the corresponding library options rather than selecting them.  This
-> fixes an issue where enabling KUNIT_ALL_TESTS enabled non-test code.
->
-> This does mean that it becomes more difficult to enable *all* the crypto
-> library tests (which is what I do as a maintainer of the code), since
-> doing so will now require enabling other options that select the
-> libraries.  Regardless, we should follow the standard KUnit convention.
->
-> Note: currently most of the crypto library options are selected by
-> visible options in crypto/Kconfig, which can be used to enable them
-> without too much trouble.  If in the future we end up with more cases
-> like CRYPTO_LIB_CURVE25519 which is selected only by WIREGUARD (thus
-> making CRYPTO_LIB_CURVE25519_KUNIT_TEST effectively depend on WIREGUARD
-> after this commit), we could consider adding a new kconfig option that
-> enables all the library code specifically for testing.
-
-You can make those library symbols visible if KUNIT_ALL_TESTS, like
-I suggested (after I sent my earlier reports to you) in [1], and like
-Vladimir already did in [2].
-
-> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Closes: https://lore.kernel.org/r/CAMuHMdVFRQZXCKJBOBDJtpENvpVO39AxGMUFWVQdM6xKTpnYYw@mail.gmail.com
-
-[1] "Re: [PATCH v3 net-next 05/10] phy: add phy_get_rx_polarity()
-    and phy_get_tx_polarity()"
-    https://lore.kernel.org/CAMuHMdUBaoYKNj52gn8DQeZFZ42Cvm6xT6fvo0-_twNv1k3Jhg@mail.gmail.com/
-[2] "[PATCH phy-fixes] phy: make PHY_COMMON_PROPS Kconfig symbol
-    conditionally user-selectable"
-    https://lore.kernel.org/20260226153315.3530378-1-vladimir.oltean@nxp.com/
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+However, I just had a look at the s390 implementation and just saw that the
+inline assembly constraints for xor_xc_2() are incorrect. "bytes", "p1",
+and "p2" are input operands, while all three of them are modified within
+the inline assembly. Given that the function consists only of this inline
+assembly I doubt that this causes any harm, however I still want to fix
+this now; but your patch should apply fine with or without this fixed.
