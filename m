@@ -1,97 +1,122 @@
-Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A878A3385A2
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Feb 2026 03:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B323290CA;
+	Fri, 27 Feb 2026 07:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772164214; cv=none; b=lGak8lHtdEzvxPWF2h+PgRPau0Qh8X4d/KVVthCtnWUWTX+owHejNeue5vi5fERquhKaY9iFnZ0+t7x5hfn15M4NquhMPhnACMcwGpXOz4rRsEq6x4xuG25ftjMdWbNzfGDCMR7h/uE3CTjrAENMVzc89sceUrn1YDk10giP8Dk=
+	t=1772178034; cv=none; b=EG9OjANfqOQ/X5RsplimQjEXNRRHmUvdlUiO1b8QNmMyCdtxTMgf2QhfAbFQ5Zx218q3QyHAdtj/oCUZP8GDAEn/kbbW0921N1XfmmXF26+IJiPRiIXDUQT9UMtmzeTtMsjdfqwyYac9lWK5e4sC8CMjxjF5ZGcO2yf1grWVuQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772164214; c=relaxed/simple;
-	bh=WMgIsWd3p5FUqx4aslokKnq0jIOvZJZGb4CCmdOlWUg=;
+	s=arc-20240116; t=1772178034; c=relaxed/simple;
+	bh=6TeB+wxnECTY0tW0ZKEAuaK+iy41tgHYSXrYQbS68lU=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Q/Np58DJUyulJoi2nndiyDjdEFcbzoo764sy92wZFLbBMN1qc0pnhOhcF/PJP8QNlyC3NvclKkSHtaPIiJHDH2fbj0FE3qCvvkPAJKt3NCfbY0KQqPUTqgEz9h9eTfd52vHKlw1MM2MDTLojnDB7IhpCJThyzoqhSoYMPxvjZdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=vjl5Lmq0; arc=none smtp.client-ip=198.37.111.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	 Content-Type:MIME-Version; b=p2bBCehUPWRt0WmV+q9r40cU80XRtl3eWzk3mjO9qe8fi0g2KkIZdHQbN2GvF7yQqHMjAFX45nOcr79FVamfOk6ey2kmYszRkzOH2cF/CHEDWgx+CImXPuh5IHWaAWTNdQkV6sBhMrsz3Z/29UwIeuXyp7NDKVDbNZ8dsOiZ+h4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=olls9gHq; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="vjl5Lmq0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1772164211;
-	bh=WMgIsWd3p5FUqx4aslokKnq0jIOvZJZGb4CCmdOlWUg=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=vjl5Lmq0gBQ93+F8crXveK9vWN1xst4r/ga8x1i4Lw0J40lb/Qa2uwOOl5FIbbwMN
-	 MgiwdAGLFsT/J0kbfLGd5NJSHU/G5j474QjTr0rp2KWAILNY1qynJx0zmSpCgyB6Qq
-	 CSkie7HYVo5FiJegvgSVSXD3Kb3QN75SoZzAOZ0A=
-Received: from [IPv6:2601:5c4:4300:d341::a774] (unknown [IPv6:2601:5c4:4300:d341::a774])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 7F1B01C0315;
-	Thu, 26 Feb 2026 22:50:11 -0500 (EST)
-Message-ID: <bf8b8c374d4398a677b87246bb426c4cd157e1d0.camel@HansenPartnership.com>
-Subject: Re: [PATCH v3 3/5] crypto: pkcs7: allow pkcs7_digest() to be called
- from pkcs7_trust
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>, 
-	Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-Date: Thu, 26 Feb 2026 22:50:10 -0500
-In-Reply-To: <20260226203133.GB2273@sol>
-References: <20260225211907.7368-1-James.Bottomley@HansenPartnership.com>
-	 <20260225211907.7368-4-James.Bottomley@HansenPartnership.com>
-	 <20260226203133.GB2273@sol>
-Autocrypt: addr=James.Bottomley@HansenPartnership.com;
- prefer-encrypt=mutual;
- keydata=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
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="olls9gHq"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=V6J0SL9RsbUQWhN8iu+ey8pLnEs4VtLYMczUYtzIoAc=;
+	t=1772178033; x=1773387633; b=olls9gHq4SfXvD7rB7T8SpHOijo2QBHoX6MRNp3DUbo+0Im
+	y+q06hN04UokGh0RMfdWm1bYFHKotymTHTa1+GjC7ZCe9l8+McnJ5AS76iQnFZdD3wIA5nOR/cg+k
+	8mTWhwYPXLtuFofRu8uph/xh82gjsE6JsS8m7BbSPM0AW+jUdVwDOKgniqinilyZzKsJrQNNw0Y1V
+	CqVnb2bf8xsLxTVcXNAnoiny1SFp+03CShFkZt4M+0+1i8G97TFjPLnTj58ZaSPJtdh/Lx9ZNj8ds
+	mUhPCVLTDnmgVy1evl8fzWNhiXKjnq4cBZTCGmJtBl7XRJudvEpAWYezHg0MCAXw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vvsRx-00000003Eus-2oGQ;
+	Fri, 27 Feb 2026 08:39:49 +0100
+Message-ID: <4f69d30f952bc374e69f44786f662886c30058e9.camel@sipsolutions.net>
+Subject: Re: [PATCH 03/25] um/xor: don't override XOR_SELECT_TEMPLATE
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Richard Weinberger <richard@nod.at>, hch <hch@lst.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Richard Henderson	
+ <richard.henderson@linaro.org>, Matt Turner <mattst88@gmail.com>, Magnus
+ Lindholm <linmag7@gmail.com>, Russell King <linux@armlinux.org.uk>, Catalin
+ Marinas	 <catalin.marinas@arm.com>, will <will@kernel.org>, Huacai Chen	
+ <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, Madhavan
+ Srinivasan	 <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ Nicholas Piggin	 <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)"
+ <chleroy@kernel.org>,  Paul Walmsley	 <pjw@kernel.org>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou	 <aou@eecs.berkeley.edu>, Alexandre Ghiti
+ <alex@ghiti.fr>, Heiko Carstens	 <hca@linux.ibm.com>, Vasily Gorbik
+ <gor@linux.ibm.com>, Alexander Gordeev	 <agordeev@linux.ibm.com>, Christian
+ Borntraeger <borntraeger@linux.ibm.com>,  Sven Schnelle
+ <svens@linux.ibm.com>, davem <davem@davemloft.net>, Andreas Larsson
+ <andreas@gaisler.com>,  anton ivanov <anton.ivanov@cambridgegreys.com>,
+ Thomas Gleixner <tglx@kernel.org>, mingo <mingo@redhat.com>,  bp
+ <bp@alien8.de>, dave hansen <dave.hansen@linux.intel.com>, x86
+ <x86@kernel.org>, hpa	 <hpa@zytor.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, dan j williams	 <dan.j.williams@intel.com>,
+ Chris Mason <clm@fb.com>, David Sterba	 <dsterba@suse.com>, Arnd Bergmann
+ <arnd@arndb.de>, Song Liu <song@kernel.org>,  Yu Kuai <yukuai@fnnas.com>,
+ Li Nan <linan122@huawei.com>, linux-alpha <linux-alpha@vger.kernel.org>, 
+ linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel
+ <linux-arm-kernel@lists.infradead.org>,  loongarch
+ <loongarch@lists.linux.dev>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+ linux-riscv	 <linux-riscv@lists.infradead.org>, linux-s390
+ <linux-s390@vger.kernel.org>,  sparclinux <sparclinux@vger.kernel.org>,
+ linux-um <linux-um@lists.infradead.org>, Linux Crypto Mailing List
+ <linux-crypto@vger.kernel.org>, linux-btrfs <linux-btrfs@vger.kernel.org>,
+ linux-arch	 <linux-arch@vger.kernel.org>, linux-raid
+ <linux-raid@vger.kernel.org>, Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 27 Feb 2026 08:39:47 +0100
+In-Reply-To: <445921547.2198.1772142326749.JavaMail.zimbra@nod.at>
+References: <20260226151106.144735-1-hch@lst.de>
+	 <20260226151106.144735-4-hch@lst.de>
+	 <445921547.2198.1772142326749.JavaMail.zimbra@nod.at>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-malware-bazaar: not-scanned
 
-On Thu, 2026-02-26 at 12:31 -0800, Eric Biggers wrote:
-> On Wed, Feb 25, 2026 at 04:19:05PM -0500, James Bottomley wrote:
-> > +	/*
-> > +	 * if we're being called immediately after parse, the
-> > +	 * signature won't have a calculated digest yet, so
-> > calculate
-> > +	 * one.=C2=A0 This function returns immediately if a digest has
-> > +	 * already been calculated
-> > +	 */
-> > +	pkcs7_digest(pkcs7, sinfo);
+On Thu, 2026-02-26 at 22:45 +0100, Richard Weinberger wrote:
+> ----- Urspr=C3=BCngliche Mail -----
+> > Von: "hch" <hch@lst.de>
+> > XOR_SELECT_TEMPLATE is only ever called with a NULL argument, so all th=
+e
+> > ifdef'ery doesn't do anything.  With our without this, the time travel
+> > mode should work fine on CPUs that support AVX2, as the AVX2
+> > implementation is forced in this case, and won't work otherwise.
 >=20
-> pkcs7_digest() can fail, returning an error code and leaving sig->m
-> =3D=3D NULL && sig->m_size =3D=3D 0.=C2=A0 Here, the error is just being =
-ignored.
+> IIRC Johannes added XOR_SELECT_TEMPLATE() here to skip
+> the template selection logic because it didn't work with time travel mode=
+.
+>=20
+> Johannes, can you please test whether this change does not break
+> time travel mode?
 
-That's right.  Basically I wasn't sure what to return on error
-(although -ENOKEY looks about right since it will cause retries on a
-different sig chain).
+It does work, even if it reports nonsense (as you'd expect):
 
-> Doesn't that then cause the signature verification to proceed against
-> an empty message, rather than anything related to the data provided?
+xor: measuring software checksum speed
+   prefetch64-sse  : 12816000 MB/sec
+   sse             : 12816000 MB/sec
+xor: using function: prefetch64-sse (12816000 MB/sec)
 
-Not if sig->m is NULL, no, because the verifier will try to reget the
-digest in that case (and error out if it fails).
+I think it works now because the loop is using ktime and is bounded by
+REPS, since commit c055e3eae0f1 ("crypto: xor - use ktime for template
+benchmarking").
 
-However, were you possibly thinking of the case where you first call
-pkcs7_validate_trust() to verify the signature (and extract attributes)
-and then call verify_pkcs7_message_sig() on the same pkcs7?  Because in
-the latter case the hash of the supplied data wouldn't get checked
-because the second call to pkcs7_digest() would find sig->m populated
-and assume the data hash had been verified against the attributes.
+The RAID speed select still hangs, but we've gotten that removed via
+Kconfig, so that's already handled. Perhaps raid6_choose_gen() should
+use a similar algorithm? But for UML it doesn't really matter since
+CONFIG_RAID6_PQ_BENCHMARK exists.
 
-Regards,
 
-James
+As far as AVX2 is concerned, yeah, I guess that was a bug, but evidently
+nobody (who configured time-travel) ever cared - what _did_ matter
+though in practice is that the boot not get stuck entirely... Two
+completely separate issues.
 
+johannes
