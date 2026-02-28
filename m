@@ -1,34 +1,34 @@
 Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35869279903
-	for <linux-crypto@vger.kernel.org>; Sat, 28 Feb 2026 13:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931281F09AD
+	for <linux-crypto@vger.kernel.org>; Sat, 28 Feb 2026 20:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772284859; cv=none; b=CyazYvxZwc67gfyqxXQiGWouvuEyeHD/gZOEuwcpSj7nxYn9eXbNbYcBJemkcfu/vg+R6IoVpIaoBQ6VGtSluPIRIR9sIAh+oOYDKuPRsB5lppV9Ds3orua+pzAZGv28fSyxMNg5qqNywwF1isenI1gi+XU7hfS1XQeobP5Qh4I=
+	t=1772309991; cv=none; b=jl/i0jNLeluMsWlqpkzkHnim2HGfAzREQn0SlZ3pSS5FEzRyC4xD+nWxOzbWwgD0/fW4rQzB0AwHNMZy8jpiLPzyHZc0g9VRofTLbcl0lQ8MP1GysmleJyOrRWiJ9SI3isOHG1rF2LPjLdf0UvgyUflXhgjiilFZuotTA4Q6w4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772284859; c=relaxed/simple;
-	bh=qB0hfOHpmHvW58mb26eZygj+9HkUSF5b1tVcZuK9fhM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BsELgLwa9047VeHQdJsi3Tdcfcfh0ccqlpCN5dO354183NhT431VAB/2ezl2ExU/SbhTNL/lcwRZyZuRX89vwDXLMfpYC97C3e2xQjOK+KBpCKb8Bqg/ZhGK/CN+RrVmiAd4k5Dke2Yb3BpQPkths30qI7aKzFgYU/Apt6iOBvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=eIV69jiL; arc=none smtp.client-ip=212.77.101.9
+	s=arc-20240116; t=1772309991; c=relaxed/simple;
+	bh=AqpjXQdX++IcJiTPl35LjoglOxnPSLKSV+cP5SM7JN0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JFBNhSaw6JoKz9JOHvmg3CgstmPcyAjl7u0JZgRyBVJQz3/8Fwuhqjd5bLcIYyLBEEdQeQOn9kDXX8y/pDNCsh9dqZjV4TfgQlQL8L8pdvq/Csg1NkUnXAdEQczZMIs13OXEgCBVE3FGTPPYtBsYOQd8DWnHtrdYNUk5vyrx36A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=qEczXMml; arc=none smtp.client-ip=212.77.101.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="eIV69jiL"
-Received: (wp-smtpd smtp.wp.pl 10702 invoked from network); 28 Feb 2026 14:20:46 +0100
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="qEczXMml"
+Received: (wp-smtpd smtp.wp.pl 26720 invoked from network); 28 Feb 2026 21:19:44 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1772284846; bh=h38ekxCTXJcI1POKthETkhy7LqjYbJGyIPXr206sfD4=;
+          t=1772309984; bh=Ux/w4OGxXUzkkaMa4A2Nkt8M1PomaG4erghSigxEn9c=;
           h=From:To:Cc:Subject;
-          b=eIV69jiL9Dqv4yasnGABr72+y7GXxgddznu0rn7s/0XksNaBVnFYWBie0mqiGNAf1
-           88d8cbDUC5vZvYFo2FDYwoI8qUIMMnif4BWHIGg+bUMy1gO4URYguYbniLGY3fIzDI
-           xChc1Lw8UV5jPISya36sjHNRohKo5i9MTGDHh+eLO9mNeaqlhj4KKrMy4GXYNQicJU
-           EaDKZd8NmUrCOEHofMycT6kQZN08Um1vldwQXYLbYlt0WjU0IKfHmnDwszHrYhrXKd
-           gAGTa9o/tpxOP4sMlhstlnZj0CuhdTzbTCOa4ztQ76gA0+WmiN2r3PtNGutTOG6xUq
-           dVqb5EXHifamA==
+          b=qEczXMmldO0GFCD7vI24X8TxV9NRX4uPQoiwbnRfzVCGHBLfvyp74v4XqqKiOjxjM
+           0Adnjk6Sws+ulpZezgYoKQXqQ1pmP45HZdbXFUWqPfZ+7TVYYeloVI77wKyOxz3Ptm
+           oDD5AOHd2YwnvhkPz+svFzrnOFd9LuGeIr9/Q9YQhUg4mdhWmme50G6OHNGzJhPiC2
+           /D14GtriGBkyWbKOyFkVpbO+w5+a7mwy+k4RifQeC1qq+ze08SgBZqgQoNe3NlITqR
+           sTGRBTHh0SLP7p2VQ+DmuaNtH18zc9orh2Ibpl/Nop3ZOuqT4/pR1SdMDY2Asa9gRe
+           yJb12ijjihbLA==
 Received: from 83.24.116.171.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.24.116.171])
           (envelope-sender <olek2@wp.pl>)
           by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <herbert@gondor.apana.org.au>; 28 Feb 2026 14:20:46 +0100
+          for <herbert@gondor.apana.org.au>; 28 Feb 2026 21:19:44 +0100
 From: Aleksander Jan Bajkowski <olek2@wp.pl>
 To: herbert@gondor.apana.org.au,
 	davem@davemloft.net,
@@ -39,9 +39,9 @@ To: herbert@gondor.apana.org.au,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
 Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH v2] crypto: testmgr - Add test vectors for authenc(hmac(md5),cbc(aes))
-Date: Sat, 28 Feb 2026 14:19:51 +0100
-Message-ID: <20260228132044.1616253-1-olek2@wp.pl>
+Subject: [PATCH v3] crypto: testmgr - Add test vectors for authenc(hmac(md5),cbc(aes))
+Date: Sat, 28 Feb 2026 21:17:21 +0100
+Message-ID: <20260228201942.2827643-1-olek2@wp.pl>
 X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -51,17 +51,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: 369f1aee090656608dcb8530df83d908
+X-WP-MailID: abce59b58bcfec0f9c3fb2b7911ddaab
 X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000009 [AGPx]                               
+X-WP-SPAM: NO 0000009 [8APh]                               
 
 Test vectors were generated starting from existing CBC(AES) test vectors
-(RFC3602, NIST SP800-38A) and adding HMAC(SHA384) computed with Python
+(RFC3602, NIST SP800-38A) and adding HMAC(MD5) computed with Python
 script. Then, the results were double-checked on Mediatek MT7981 (safexcel)
 and NXP P2020 (talitos). Both platforms pass self-tests.
 
 Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
 ---
+v3:
+- correct sha384 -> md5 in description
 v2:
 - rebase and resolve conflicts
 ---
