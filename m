@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BBF3267B90;
-	Sat, 28 Feb 2026 05:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A43A22157B;
+	Sat, 28 Feb 2026 06:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772257640; cv=none; b=EqLqeUXZnZa8Ynk0kcazSnR3+oyD0L3qOiChSuK+2J6MuqpreTeXnwqcFAc+9tmB97L9C9G/Mpe1Xt2JBLpotcExKREmeYiJnCw0U65hdhnDkF3kjslEJ7FFeVjxEjZqdA/pFAn7Fdfa/zfOQ/7uHr/9pnaGtZIoFJRlAHUaZkg=
+	t=1772260973; cv=none; b=DD0BsBK/X7ndaBvHidKZBvhs28v6clIjCGFw4qKlw6oAZEkrqCfR2NO3isNrj11c0pvbLJuHWzZnFtEr1SjrjXgob0e35EHTh/ZGJXje4pDjdYYyJ9lvN8JTV5hrwCc/R7V6PGn4/x2wE8j4JUbUjcB0RAMt04jJG1ETYcSQHdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772257640; c=relaxed/simple;
-	bh=3fhtDiEfYQIsR8xe5v1xLPzjOApnwt1LgQea0fiE/sk=;
+	s=arc-20240116; t=1772260973; c=relaxed/simple;
+	bh=RjXh+3ODcjpkGCclxlZLerhUTxAgrS3+Qw6tdSUsizg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P3g7YYmSQm9GFVcyALJhpVvc8OvgQCFOp5TFm/wRdqsCmiNRDiYHJhIQDHzghxw1M4SjwYoHlEEWTUZb8ZRYHzjNsvLYDm6hNjLalKnqnBu6mpCJBs1B8oyblF/91fbhSika/eVuBYhHyUHWxPTjJfJY7rWdmH4ffayA/f9yCOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZxnCfx5J; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=QuOxS9guKFDIlOM8yfkdMCyosDarWSmBWAw43uxnCVGJsA59jOGTpbafM/SSfBhyVhUs5/x67/KrKCaj0RVILGRsZUflscWcwliWdUg8Ymvj+N3YNFlqO2HwicRik5iCO2bGT0M1gBspmBXLGRt/Q/4cVL6ML9GaCPoCbGrNTus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YClOM9Wk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZxnCfx5J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6374C116D0;
-	Sat, 28 Feb 2026 05:47:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YClOM9Wk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32FCCC116D0;
+	Sat, 28 Feb 2026 06:42:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772257640;
-	bh=3fhtDiEfYQIsR8xe5v1xLPzjOApnwt1LgQea0fiE/sk=;
+	s=k20201202; t=1772260973;
+	bh=RjXh+3ODcjpkGCclxlZLerhUTxAgrS3+Qw6tdSUsizg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZxnCfx5JDI332Qrr3aqcMLFE+Z8TXsT+uailOd+3AxcXf1coTOZ7vF5OtRVlFz27S
-	 I+XE3qJMsOy/NaWilUmpaeuY7J3oz+cG4Um71U6OgQ7NcFA0HIvDDJfrudH5EPWD3S
-	 jPn9xscU5HDErluyyxksFTvSuNR6X2vG6RGaNlRTZxMmerYr0sgLOhE7L00/8t5/MJ
-	 uNCGKSSPUVI6ufs4uUbVSf5rsbRTL4oD2BooogSyg1zZ0YWLvakCTY7IPYd2SyPwrp
-	 50+eB5Q59+IeVeLCa8yNWJbEZz5QSmLw3fDIRjKAzMjZdSuoZa7lO1W7LFFthLj2/W
-	 ELDld1Q34kANQ==
-Date: Fri, 27 Feb 2026 21:47:16 -0800
+	b=YClOM9Wk3/7+pE7QyV7s9mlYuDllppl2YGLrTn0xkJ5pU3h4NtzzqxpXAgzhRI9N2
+	 JuGJGprSvbiCiYCR4+DPFVLVUesA+9zY/ql1wKLu6GOJbDRJOE72dBApORguyRvSk0
+	 Ip+z80iLf2XB3ZIQqPYK3ZEA4iixYi0/FOhgYq24wKd6cZqPgSNMaeZpzPpmIg/H3w
+	 0n7sJMgccYUbEkKSe7BVVGr7K1ToaaAdi9JBbH+YWUnyRyLa4C5j5ZLWu0XZjJO8MA
+	 f7GJPwidtEPGlIQhpocckRINXMDZxErl0fKAfQbViWFT5IVTuMqtgP4lHaU8x4cpN/
+	 +BKrl6+TlJfNA==
+Date: Fri, 27 Feb 2026 22:42:49 -0800
 From: Eric Biggers <ebiggers@kernel.org>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -68,10 +68,10 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
 	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
 	linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
-Subject: Re: [PATCH 16/25] sparc: move the XOR code to lib/raid/
-Message-ID: <20260228054716.GF65277@quark>
+Subject: Re: [PATCH 20/25] xor: make xor.ko self-contained in lib/raid/
+Message-ID: <20260228064249.GG65277@quark>
 References: <20260226151106.144735-1-hch@lst.de>
- <20260226151106.144735-17-hch@lst.de>
+ <20260226151106.144735-21-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -80,39 +80,33 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260226151106.144735-17-hch@lst.de>
+In-Reply-To: <20260226151106.144735-21-hch@lst.de>
 
-On Thu, Feb 26, 2026 at 07:10:28AM -0800, Christoph Hellwig wrote:
-> diff --git a/arch/sparc/lib/xor.S b/lib/raid/xor/sparc/xor-niagara.S
-> similarity index 53%
-> rename from arch/sparc/lib/xor.S
-> rename to lib/raid/xor/sparc/xor-niagara.S
-> index 35461e3b2a9b..f8749a212eb3 100644
-> --- a/arch/sparc/lib/xor.S
-> +++ b/lib/raid/xor/sparc/xor-niagara.S
-> @@ -1,11 +1,8 @@
+On Thu, Feb 26, 2026 at 07:10:32AM -0800, Christoph Hellwig wrote:
+> diff --git a/arch/um/include/asm/xor.h b/lib/raid/xor/um/xor_arch.h
+> similarity index 61%
+> rename from arch/um/include/asm/xor.h
+> rename to lib/raid/xor/um/xor_arch.h
+> index c9ddedc19301..c75cd9caf792 100644
+> --- a/arch/um/include/asm/xor.h
+> +++ b/lib/raid/xor/um/xor_arch.h
+> @@ -1,7 +1,4 @@
 >  /* SPDX-License-Identifier: GPL-2.0 */
->  /*
-> - * arch/sparc64/lib/xor.S
-> - *
->   * High speed xor_block operation for RAID4/5 utilizing the
-> - * UltraSparc Visual Instruction Set and Niagara store-init/twin-load.
-> + * Niagara store-init/twin-load.
->   *
-> - * Copyright (C) 1997, 1999 Jakub Jelinek (jj@ultra.linux.cz)
->   * Copyright (C) 2006 David S. Miller <davem@davemloft.net>
->   */
->  
-> @@ -16,343 +13,6 @@
->  #include <asm/dcu.h>
->  #include <asm/spitfire.h>
->  
+> -#ifndef _ASM_UM_XOR_H
+> -#define _ASM_UM_XOR_H
+> -
+>  #ifdef CONFIG_64BIT
+>  #undef CONFIG_X86_32
+>  #else
+>  #define CONFIG_X86_32 1
+>  #endif
 
-<linux/export.h> can be removed from the two assembly files, since all
-the invocations of EXPORT_SYMBOL() in them were removed.
-
-Also, xor-niagara.S ended up without a .text directive at the beginning.
-Probably it was unnecessary anyway.  However, this seems unintentional,
-given that xor-vis.S still has it.
+Due to this change, the above code that sets CONFIG_X86_32 to the
+opposite of CONFIG_64BIT is no longer included in xor-sse.c, which uses
+CONFIG_X86_32.  So if the above code actually did anything, this change
+would have broken it for xor-sse.c.  However, based on
+arch/x86/um/Kconfig, CONFIG_X86_32 is always the opposite of
+CONFIG_64BIT, so the above code actually has no effect.  Does that sound
+right?
 
 - Eric
