@@ -1,79 +1,44 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98DDC257431;
-	Fri, 27 Feb 2026 23:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5DB2C178D;
+	Sat, 28 Feb 2026 03:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772236532; cv=none; b=kOWBoK93+Y947mOnMCSBjas7ifdLVOX7ccAvFyk1vDqJ1Tn8DJ1peowk6Xw0mqsWfg33k6XsP1/Uq5KBg+DVOIPMmW4ynFvf8AbV05nW4jhDye78FifO1logcVGpBpSYYHB1iIbYbit1e1KiHQRAkvoxdDTAH6WamVwiuJDsUaQ=
+	t=1772250047; cv=none; b=AhW1dbR1UUGe5idB+vuURO1C2H/biB0UsnskckmwVRsXKwpMHE75Djmn9AuQVNp6JAmeYUrHbwMoanQdSyPveQa9Q8M62dsmD2X+s3fLXG381auXSEQPhWOfsMNXMNrd8+vPY8DBTzEsCsWMvLKt6/K1yaEyKVfOdqJM5vjFgUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772236532; c=relaxed/simple;
-	bh=9epsKT1Tqv7365SBQ+LgdgBkS+QLvJq0YDfqzGCQppg=;
+	s=arc-20240116; t=1772250047; c=relaxed/simple;
+	bh=ORR41oNRqpSaz/9EeKWjE2HUD+iWGppUOWIiwAgBG/M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DfDzI4rmuuG670rfVBaQpSv5MwnCFSyuWIXWv+G5wo7Hz8s1wlrVCEX9j7Z9Itta4SrX7zxz+eWTQg1c/iQlAXCVUdKfYTvtsez5OBA3dHui+MvaK6bvQz4vb08+3ZXmg1F8e9Fpl9FgpJJJJjpIJJZK7YpNn9qjbZiVyHStBXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XVTF8TDa; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=badJU3PwaUeH5mYs/Hz0OzMgiteENGEdK0HedAGpK7d6g5r1/5KaNz2hSOQTSnj/kew3rZvSo1cvz5j4kJC7XcgQpPcFev2v4RC3QRg67dPkPXyX3q9e4hn+ZbmAJibYLr4kycPaKfW0hiGO7eUe1O6BXMQxWNRoYKC64Vaf0RE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=SgDVLnIY; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XVTF8TDa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97119C116C6;
-	Fri, 27 Feb 2026 23:55:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772236532;
-	bh=9epsKT1Tqv7365SBQ+LgdgBkS+QLvJq0YDfqzGCQppg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XVTF8TDa48poxgWx9OMrHOWcWeX+DIvF8W0Cz9PzVZzIIYVyeCBp8CVqVCQqnKv6k
-	 5zzYRJst/PHEWqq92j85maQBi7plq+GNVhfHcc+9Pog+YMNqi1zTL7+4Ehtq9UJ7o9
-	 QJHa0cD62wS9Zi36AMnb9/VkZXXyv/qc0FNC/OF8hsDCWgrlGfX7gqqn/VNAfN6Fee
-	 CkNTC4E/BHSyzLgTwiN6IqzHfjJo9okaT9JcgxYGTsEHUQc31er3WUHfK/2Gx865yY
-	 ogRz41c7RbSVwCM0hpH/O2zyx2nKKDpUW5eh/FdyMQPRe2Q68ih/qS1f7bbUEX5IYc
-	 3kMoxNtkaet5g==
-Date: Fri, 27 Feb 2026 15:55:29 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Matt Turner <mattst88@gmail.com>,
-	Magnus Lindholm <linmag7@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
-	Li Nan <linan122@huawei.com>, linux-alpha@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
-Subject: Re: [PATCH 18/25] x86: move the XOR code to lib/raid/
-Message-ID: <20260227235529.GA31321@quark>
-References: <20260226151106.144735-1-hch@lst.de>
- <20260226151106.144735-19-hch@lst.de>
- <20260227143016.GH1282955@noisy.programming.kicks-ass.net>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="SgDVLnIY"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=OA1Gm4aH6afdX6co966EXqk3g4zzx7bu9CBDahUFiqw=; 
+	b=SgDVLnIYxB587fBdmNpj+LNenN8vA/4qr3ftG1WLV8KQ1QkIFbHP4uAHFS4dJ77MUUaUD+0wai2
+	v9DcddO/7E/BTjyjXaOS3hqzfngjGb6K4/oXDeBjbXY8GQH/NsWXI6ZwgbXJf9k+f3Uj8gSrlTL8H
+	7R6sI9seuTJdprE9wJ/6HHxHCr+hq5yM/wHBHCl4Ez0c1/MnzhxOrxtYtDKBAqH3kEyWBIuTHF+uw
+	g/ITuOv1WeI20SNqrFujGYSSjcaJAdrD+lqD4UXwo5wCmh2mS1w1+53YeKR52pB9Vphcv1CbPTs4Y
+	kJ74A1UYYxwLpFSxkFCI3APtqwD0EN/pQNzA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vwBBy-00ABZG-2g;
+	Sat, 28 Feb 2026 11:40:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 28 Feb 2026 12:40:34 +0900
+Date: Sat, 28 Feb 2026 12:40:34 +0900
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ethan Tidmore <ethantidmore06@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Keerthy <j-keerthy@ti.com>,
+	Tero Kristo <t-kristo@ti.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: sa2ul: add missing IS_ERR checks
+Message-ID: <aaJjsnV8rGLpxha_@gondor.apana.org.au>
+References: <20260216231609.38021-1-ethantidmore06@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -82,40 +47,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260227143016.GH1282955@noisy.programming.kicks-ass.net>
+In-Reply-To: <20260216231609.38021-1-ethantidmore06@gmail.com>
 
-On Fri, Feb 27, 2026 at 03:30:16PM +0100, Peter Zijlstra wrote:
-> On Thu, Feb 26, 2026 at 07:10:30AM -0800, Christoph Hellwig wrote:
-> > Move the optimized XOR code out of line into lib/raid.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > ---
-> >  arch/x86/include/asm/xor.h                    | 518 ++----------------
-> >  arch/x86/include/asm/xor_64.h                 |  32 --
-> >  lib/raid/xor/Makefile                         |   8 +
-> >  .../xor_avx.h => lib/raid/xor/x86/xor-avx.c   |  14 +-
-> >  .../xor_32.h => lib/raid/xor/x86/xor-mmx.c    |  60 +-
-> >  lib/raid/xor/x86/xor-sse.c                    | 476 ++++++++++++++++
+On Mon, Feb 16, 2026 at 05:16:09PM -0600, Ethan Tidmore wrote:
+> The function dmaengine_desc_get_metadata_ptr() can return an error
+> pointer and is not checked for it. Add error pointer checks.
 > 
-> I gotta ask, why lib/raid/xor/$arch/ instead of something like
-> arch/$arch/lib/xor ?
+> Fixes: 7694b6ca649fe ("crypto: sa2ul - Add crypto driver")
+> Signed-off-by: Ethan Tidmore <ethantidmore06@gmail.com>
+> ---
+>  drivers/crypto/sa2ul.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
+> index fdc0b2486069..58d41c269d62 100644
+> --- a/drivers/crypto/sa2ul.c
+> +++ b/drivers/crypto/sa2ul.c
+> @@ -1051,6 +1051,9 @@ static void sa_aes_dma_in_callback(void *data)
+>  	if (req->iv) {
+>  		mdptr = (__be32 *)dmaengine_desc_get_metadata_ptr(rxd->tx_in, &pl,
+>  							       &ml);
+> +		if (IS_ERR(mdptr))
+> +			return;
 
-Similar to lib/crypto/ and lib/crc/, it allows the translation units
-(either .c or .S files) containing architecture-optimized XOR code to be
-included directly in the xor.ko module, where they should be.
+Thanks for adding the error checks.  However, if we get an error
+here shouldn't we still free the resources and pass the error up
+to the caller?
 
-Previously, these were always built into the core kernel even if
-XOR_BLOCKS was 'n' or 'm', or they were built into a separate module
-xor-neon.ko which xor.ko depended on.  So either the code was included
-unnecessarily, or there was an extra module.
-
-Technically we could instead have the lib makefile compile stuff in
-arch/, but that would be unusual.  It's much cleaner to have the
-directory structure match the build system.
-
-If we made this code always built-in, like memcpy(), then we could put
-it anywhere.  But (like many of the crypto and CRC algorithms) many
-kernels don't need this code, and even if they do it may be needed only
-by 'm' code.  So it makes sense to support tristate.
-
-- Eric
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
