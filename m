@@ -1,49 +1,47 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E314221A459;
-	Sat, 28 Feb 2026 08:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379B7184524;
+	Sat, 28 Feb 2026 08:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772268536; cv=none; b=IM8Rbp42QzPKlSNyTlOEq3pSJMbfUSRPzLIW2KCq78/qtAs+2CSXWnSWOsB+f8JamlCHDty0AuG7nvJ8v9A7iN5tizI3zVGwmKjwW8ptrU9bT9nVyiseR82ulS8ITK87UFDrJm/Cwx7XHONtr0g7pqO3OZq4xI6Sk9AaUy1hw2I=
+	t=1772268996; cv=none; b=C0DbmOscIxAUBwGDZncrXDvpxQmKGK1eKUkg2yv+K60o7ICr0KvKfm9nsrX4DTt8e4E2LYilNYRHFvHYUfdUaa9XFWgUOcWQoa3jHon4Y717wnOVkxK4HexuENr/H46uh7+ackKpNyxfvdDQZE2Lrlz9XqZSVl/fx7tkXnh8jOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772268536; c=relaxed/simple;
-	bh=rGTAnL5yPjGit+bZ0dAy1+AH7uGzggMbjSEln0qkmSM=;
+	s=arc-20240116; t=1772268996; c=relaxed/simple;
+	bh=MN35DYoY6v1CbJ5Fx0X2KmXlpgXJ3y1FDNRAmd0oVik=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K59WdSdmmqmk3adFpi/hLwTnRAQ1KXaGtWe1G8Ir2dwEoMQ7jBs7Ge3sfLElR3V1TxI7UfSPjW7grAwD2IVO3LnLFB1VJWDINasuGv/fi4cDOyP6a3ZcT2ApL2qD5evuYS5pNTw3/wBDYTnM7of1f2vBIL8eOe5+rp0TQgFtIrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=GXom2qhr; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=U2dz3zUdNX1hWvwe7UL2jbcoFe5MmXnUu6AYKlr92obIfvrQISqblrzT8clkIRTcErzPMl+9/F1/DcQ7vtEFYi1gEDp+ErmcO3igqF3o9MdxGHk8kNdbn1zZVMxniHitw420IHi5SxbmGRKvGS4i6AaBI+K2wr4bjk5FMjzYNCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=MMLt57gt; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="GXom2qhr"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="MMLt57gt"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=utVUTvkDaRFs1KjtJ8lUX61qZxYSAsEUcGdk9IgvdKo=; 
-	b=GXom2qhrf/Z/VBUOeUacG3CWnl3rCA7UtczjEoauWhPL+kktPg+HTcrFdB+mwOndHQ9rgi6KiF8
-	maLMhjNeYhNCZ8A18edW8wsnZ9M9/EJNxEXiEc88y8svyDiAywgVzBwLnSX5PMClZKOrvF6RzCdVS
-	8Fb1yGxqRRGtolrvslpDchyYw5vhdY64aJC+GuRWt573O5UDcpZ7Vwxf3OMoaLpnCWr1sL0E+eKYv
-	PMrCFEi73FvIMVpwMsBVMbtOt8/0gqIappUjlRjIvlyPG2N35Duy+6JHWHoI5x6h8JuPaK6J8HnV2
-	nOZKQ6FhiEnNB6jn/p7DK1dVezr2HEbrk+og==;
+	from:content-type:reply-to; bh=PENJ3u1oRqkCAFoEC2zMwPQ2xkR5GPODis8NlOlrmeE=; 
+	b=MMLt57gt9Whtpw8hvHkKwcRH88DbW+Z823Ec6k/axa1Cmnygyi/jISh9VOQGFi07vFGD4CtTKiS
+	BYtc4MVCFg7yqhZHh/GRAR8FVOamYTA/JEAk4AU5f0VJTfOV1JPvoL4sWaem1SkoomaYQRP8kdUr8
+	N3OW/VjsL2NDyAiHBTWjMMAP2GSFQbc1oVLABkj0Zx+nMN49KBDHLp5htWbHDUFReaQPbmvztqhfo
+	JlBlSqwZaUmnHc7rJb+m/aAjtrZv8ZOCIEWWiC5YmBA9Zr0eltxYp7ORyzxtZ+Mc5prxFncFOyhf/
+	YBmQGstX6NPafS/JNygXNy5AZ9J+uuUQPfUA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vwG07-00ADsK-2Y;
-	Sat, 28 Feb 2026 16:48:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 28 Feb 2026 17:48:39 +0900
-Date: Sat, 28 Feb 2026 17:48:39 +0900
+	id 1vwG7e-00ADwE-2z;
+	Sat, 28 Feb 2026 16:56:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 28 Feb 2026 17:56:26 +0900
+Date: Sat, 28 Feb 2026 17:56:26 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Lothar Rubusch <l.rubusch@gmail.com>, stable@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: atmel-sha204a - Fix OTP sysfs read and error
- handling
-Message-ID: <aaKr5_c7nFZnBDCI@gondor.apana.org.au>
-References: <20260216074552.656814-1-thorsten.blum@linux.dev>
+To: Jeff Barnes <jeffbarnes@linux.microsoft.com>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jeff Barnes <jeffbarnes@microsoft.com>
+Subject: Re: [PATCH] crypto: aead: add service indicator flag for RFC4106
+ AES-GCM
+Message-ID: <aaKtujHwV0zDFWxi@gondor.apana.org.au>
+References: <20260129-fips-gcm-clean-v1-v1-1-43e17dc20a1a@microsoft.com>
+ <aXw9Wj19ZX6dpNHW@gondor.apana.org.au>
+ <ce1d34d9-23f9-4d1e-b790-6af75d1555ed@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,34 +50,36 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260216074552.656814-1-thorsten.blum@linux.dev>
+In-Reply-To: <ce1d34d9-23f9-4d1e-b790-6af75d1555ed@linux.microsoft.com>
 
-On Mon, Feb 16, 2026 at 08:45:51AM +0100, Thorsten Blum wrote:
-> Fix otp_show() to read and print all 64 bytes of the OTP zone.
-> Previously, the loop only printed half of the OTP (32 bytes), and
-> partial output was returned on read errors.
+On Tue, Feb 17, 2026 at 03:59:41PM -0500, Jeff Barnes wrote:
+>
+> I don't know how to accomplish that.
 > 
-> Propagate the actual error from atmel_sha204a_otp_read() instead of
-> producing partial output.
+> SP800-38D provides two frameworks for constructing a gcm IV. (https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
 > 
-> Replace sprintf() with sysfs_emit_at(), which is preferred for
-> formatting sysfs output because it provides safer bounds checking.
+> The first construction, described in Sec. 8.2.1, relies on deterministic
+> elements to achieve the uniqueness requirement in Sec. 8; the second
+> construction, described in Sec. 8.2.2, relies on a sufficiently long output
+> string from an approved RBG with a sufficient security strength. My patch
+> checks for an implementation of 8.2.1 via rfc4106(gcm(aes)). I don't know
+> how a patch could check for 8.2.1 or 8.2.2 from an externally generated iv.
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: 13909a0c8897 ("crypto: atmel-sha204a - provide the otp content")
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
-> Compile-tested only.
-> 
-> Changes in v2:
-> - Return the total number of bytes written by sysfs_emit_at() after
->   feedback from Lothar (thanks!)
-> - Link to v1: https://lore.kernel.org/lkml/20260215124125.465162-2-thorsten.blum@linux.dev/
-> ---
->  drivers/crypto/atmel-sha204a.c | 20 +++++++++++---------
->  1 file changed, 11 insertions(+), 9 deletions(-)
+> Suggestions welcome.
 
-Patch applied.  Thanks.
+Rather than setting the FIPS_COMPLIANCE flag, why not simply ban the
+non-compliant cases from being used in FIPS mode?
+
+Sure that would mean banning gcm(aes) in FIPS mode, and only
+allowing seqiv(gcm(aes)) but that's OK because we have the
+FIPS_INTERNAL flag to deal with this by only allowing gcm(aes)
+to be used to construct something like seqiv(gcm(aes)).
+
+Of course this would need to be tested since FIPS_INTERNAL was
+introduced for something else but I see no reason why it can't
+be used for gcm too.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
