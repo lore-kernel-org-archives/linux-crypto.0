@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C5420E702;
-	Sun,  1 Mar 2026 01:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C70621CC58;
+	Sun,  1 Mar 2026 01:15:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772327698; cv=none; b=ehv06OP7FQgxxO9+WRdBfssmIFitRedFoJcwI9cIY4/MVpyJ2kkOtONmYMUNin9jSIECD+ZUvco8YmdWs4HSYsnuhD4h1HiB8Iypw8AnDnReGmnoEkmlv3/0UrG2Ao7BAX7n92R9jtBvtNRqfEB1m6ac1yNkT4m7cNQn9e/ZbXY=
+	t=1772327700; cv=none; b=t+p5zyar1AvlQHYO7a/UHa4zcuhwmnTmDYlbrsMd+NUk8o2GYG/y70u+e0ZB3k0NPRLwn9AiaZapR1hlmWR5d6pl5DeU1Q8K9QYEKwLxs1yRfEPtcJEyWozxCqOo/XSVTphbGUYWHDyo8C6B5g/eK6UtoOjiLZm0BCaavUG9CDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772327698; c=relaxed/simple;
-	bh=QZzfFSJ/0uKy60raiQ6Rm2wR+BC43qXdSn5/7cW9hY8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=prTACbmL6xu7XA83iyTLJS20D3Nv5wtdkjxf749lJbC2Vnw7stvdD7X47ssiY02st2ZIgpPKkV+tpkXn9kkYkix+3F1iOo1MIAgkESfZKDNTGc6y6Wi0OvYjAqqkMHlLaPeCg3WKI06/R5vXyUUddXv5WgAiFReTcGS2AvGCpPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CmozZFlT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772327700; c=relaxed/simple;
+	bh=CXTtYOJAx/qq6YG6jNMyPqDPLX2euDcjsCXurEWMEI8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ODvk0ZAWFi3x14AMyKneVQ/2K3iuCgOXzc7keOvt1nnA6NqD945g2U1BmHX1o6DBFnpQZAblxfW4PKKic5qI1WwkFSzkXxdntt7Wg1VQuBSJBsqFqv3TNH1awT25SUDJ/PQqk+72iQ8J3tRsJPO0pxmi/grkdJ4JOBCmPJFdxGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=athV3J3v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CmozZFlT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12AE5C19425;
-	Sun,  1 Mar 2026 01:14:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="athV3J3v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77092C19421;
+	Sun,  1 Mar 2026 01:14:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772327697;
-	bh=QZzfFSJ/0uKy60raiQ6Rm2wR+BC43qXdSn5/7cW9hY8=;
+	s=k20201202; t=1772327700;
+	bh=CXTtYOJAx/qq6YG6jNMyPqDPLX2euDcjsCXurEWMEI8=;
 	h=From:To:Cc:Subject:Date:From;
-	b=CmozZFlT7uWmnLQaDyCYZt36NAoilc5JGOoLKIXHxOjK2nptnDAmyZ5+sPwa585nb
-	 80yaTOROawksp3+2xB4S4wWtb5L2NOWd//exDeZD/yA1n6KJQcC55i8BKU2zzBfCX+
-	 nRnttdbuJWrxVn/Zlvd+N08T0HNsenYspw11/hqIr3dEEnACvkbPxmLoGuz0kUsEWM
-	 quYOxNzlcp1M1cx3Vs5xtE3zCHPUgFtsNwb75PMKsmEVBplknFaRG7wWs4vn+8/UM9
-	 7ukwgzeVLdtqKBcUYdnX8zJpebgEIXsj5HWx6TttjZdKgrbhf+snQd+Jjd1VNy0l39
-	 n7L4fDZaBWbgA==
+	b=athV3J3vRHeAsFqa9wwW/KqOFdre9x2fU4CxIUjdOpCbr9h+b4hZYz0awJ7FuWZG+
+	 ZIXAhs0V+MjuXDFESOB5lgsLCKEDahAMHgm5SWrERrhCCa8c4N+QHBqFriJV8Vl/pb
+	 iKzu0FTyps5MGn4fZJH/jjXvZfYs+VbDcsjoop6Vb0Idg1wcPlo/7P/fk3JXBPY+hw
+	 +2SAO/kXIWXzu+qyw/lZ/7VmumiGPP0l4gugJK7aMWOniyVvqcm0b4P/ZU5d/10p/u
+	 itiEafzK06unUEbTwApJE0sew8dpAV9aFhhOlB5tINIHKDXsjb4vcK+6rr9zpqVp9P
+	 mkqgaS+z0bB4w==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	maobibo@loongson.cn
@@ -32,9 +32,9 @@ Cc: Jason Wang <jasowang@redhat.com>,
 	"Michael S. Tsirkin" <mst@redhat.com>,
 	virtualization@lists.linux.dev,
 	linux-crypto@vger.kernel.org
-Subject: FAILED: Patch "crypto: virtio: Add spinlock protection with virtqueue notification" failed to apply to 6.19-stable tree
-Date: Sat, 28 Feb 2026 20:14:55 -0500
-Message-ID: <20260301011455.1667661-1-sashal@kernel.org>
+Subject: FAILED: Patch "crypto: virtio: Remove duplicated virtqueue_kick in virtio_crypto_skcipher_crypt_req" failed to apply to 6.19-stable tree
+Date: Sat, 28 Feb 2026 20:14:58 -0500
+Message-ID: <20260301011458.1667727-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -56,60 +56,41 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From af9a17d29ce9060664f56264bcc64b976fddd2b5 Mon Sep 17 00:00:00 2001
+From a389d431053935366b88a8fbf271f1a564b9a44e Mon Sep 17 00:00:00 2001
 From: Bibo Mao <maobibo@loongson.cn>
-Date: Tue, 13 Jan 2026 11:05:54 +0800
-Subject: [PATCH] crypto: virtio: Add spinlock protection with virtqueue
- notification
+Date: Tue, 13 Jan 2026 11:05:55 +0800
+Subject: [PATCH] crypto: virtio: Remove duplicated virtqueue_kick in
+ virtio_crypto_skcipher_crypt_req
 
-When VM boots with one virtio-crypto PCI device and builtin backend,
-run openssl benchmark command with multiple processes, such as
-  openssl speed -evp aes-128-cbc -engine afalg  -seconds 10 -multi 32
+With function virtio_crypto_skcipher_crypt_req(), there is already
+virtqueue_kick() call with spinlock held in function
+__virtio_crypto_skcipher_do_req(). Remove duplicated virtqueue_kick()
+function call here.
 
-openssl processes will hangup and there is error reported like this:
- virtio_crypto virtio0: dataq.0:id 3 is not a head!
-
-It seems that the data virtqueue need protection when it is handled
-for virtio done notification. If the spinlock protection is added
-in virtcrypto_done_task(), openssl benchmark with multiple processes
-works well.
-
-Fixes: fed93fb62e05 ("crypto: virtio - Handle dataq logic with tasklet")
+Fixes: d79b5d0bbf2e ("crypto: virtio - support crypto engine framework")
 Cc: stable@vger.kernel.org
 Signed-off-by: Bibo Mao <maobibo@loongson.cn>
 Acked-by: Jason Wang <jasowang@redhat.com>
 Acked-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <20260113030556.3522533-2-maobibo@loongson.cn>
+Message-Id: <20260113030556.3522533-3-maobibo@loongson.cn>
 ---
- drivers/crypto/virtio/virtio_crypto_core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/crypto/virtio/virtio_crypto_skcipher_algs.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
-index 3d241446099cc..ccc6b5c1b24b3 100644
---- a/drivers/crypto/virtio/virtio_crypto_core.c
-+++ b/drivers/crypto/virtio/virtio_crypto_core.c
-@@ -75,15 +75,20 @@ static void virtcrypto_done_task(unsigned long data)
- 	struct data_queue *data_vq = (struct data_queue *)data;
- 	struct virtqueue *vq = data_vq->vq;
- 	struct virtio_crypto_request *vc_req;
-+	unsigned long flags;
- 	unsigned int len;
+diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+index 1b3fb21a2a7de..11053d1786d4d 100644
+--- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+@@ -541,8 +541,6 @@ int virtio_crypto_skcipher_crypt_req(
+ 	if (ret < 0)
+ 		return ret;
  
-+	spin_lock_irqsave(&data_vq->lock, flags);
- 	do {
- 		virtqueue_disable_cb(vq);
- 		while ((vc_req = virtqueue_get_buf(vq, &len)) != NULL) {
-+			spin_unlock_irqrestore(&data_vq->lock, flags);
- 			if (vc_req->alg_cb)
- 				vc_req->alg_cb(vc_req, len);
-+			spin_lock_irqsave(&data_vq->lock, flags);
- 		}
- 	} while (!virtqueue_enable_cb(vq));
-+	spin_unlock_irqrestore(&data_vq->lock, flags);
+-	virtqueue_kick(data_vq->vq);
+-
+ 	return 0;
  }
  
- static void virtcrypto_dataq_callback(struct virtqueue *vq)
 -- 
 2.51.0
 
