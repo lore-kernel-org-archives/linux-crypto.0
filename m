@@ -1,99 +1,65 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E582F3C37;
-	Sun,  1 Mar 2026 02:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C6C3093D3;
+	Sun,  1 Mar 2026 03:14:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772330563; cv=none; b=S2qArL87z0oKTgw8ujLZ0ruGDNHCcj10fwiJYDFnHjDEk96ftrVe/BA0wI7RPsNTnJkL7Di7vqoWSOZ4py+EUH9yqmNka7PCCgyygnjYheedSQIrGMuq4guAkV9iQeTaAqnGRy1quFXfECsOQ8Udbp9TclkvJpD8CUMER+z3ILo=
+	t=1772334893; cv=none; b=DUqiBgyWyXglejntTPOhed4a4VpBRnZ2xL0ZHYw/fWscwcgCpGmuaWZLMvobrW2PQ3a2TLS1Ttjuy0FBwMRH7qbqnSJ7Ak0X2tGHUIVg1KVeIURUNlfZOgbtF2NdoU8kHikQ8aMUnuLf2BdfbkHlDTyrpIhqbN83etL9h+lfIUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772330563; c=relaxed/simple;
-	bh=LDxGwsraqImVTWWZcy0nwDq6ZA8+w5j/0XYs9b1qwGI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tHZtUzeF0omm6hCjOY8+75g38xf1R7Jtp/Ff+nxTuw3yIiT4uzUfJPuutJLMFOSK5vQoMtY/nj6LbzdQhn+JSiY5yjGnD9jzt/yohGFz0ZqxU6TmUjFfXpn+Ikp1ik6MnDMrt+lNhUJ9MhIP0D9xkVS1c6+yoDwDm+UQcwJ/ohM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dD/fye6M; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772334893; c=relaxed/simple;
+	bh=cztyXyeNUtJ2suFuxPdzJBanyjZeXjZQOti7SdfAox8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sfgUAwSZwI2h0Vfx2NsR0P6BT6Ym7J6MBK0IH+QzJqEGW0bOBCh1U2tyeTRmlSRhClpK+jZzDw/dQERbezS5cOju7GPSqSQ+gEjEzksVAKZ01O6Q8460NzvjU6amilvSLAKRjek7jwpeTd7LsuvHJSkf8RP+sfhiWSpExtE0a2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e5LPLrPF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dD/fye6M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24BE0C19421;
-	Sun,  1 Mar 2026 02:02:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e5LPLrPF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65EB0C19425;
+	Sun,  1 Mar 2026 03:14:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772330562;
-	bh=LDxGwsraqImVTWWZcy0nwDq6ZA8+w5j/0XYs9b1qwGI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=dD/fye6MUkgwLDcP5rzekp3+3MdJuqat1AL3fmepNoCBRUAKu7bV9FWSrztAFRmC+
-	 azCg/wMQDPDizXAulAChRIK4fi9iqtz+Gg7iq9Qq+YSIk6FGrR7PbIEf0fxKUvnjXu
-	 zfe2Yf8RTJ3vLdyGMVg1POGBxw2AMNd/fx2LMc0QiEXQ97wFmf047QgnB/Qk0UmTgN
-	 2DXP+DH+kteTxVvRxc2jTJUNsvfSaKcYsqxpwf776nOJsCfdNmkWgIlOTzEYyWi2oZ
-	 b9RJDa/cHH86zd0+Cazh9Tz4bcTRSLJpGyhLrbGbm1e5MloPYnbb3goQ2940WsM8y9
-	 GSAwndj9Ccmwg==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org,
-	maobibo@loongson.cn
-Cc: Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	virtualization@lists.linux.dev,
-	linux-crypto@vger.kernel.org
-Subject: FAILED: Patch "crypto: virtio: Remove duplicated virtqueue_kick in virtio_crypto_skcipher_crypt_req" failed to apply to 5.10-stable tree
-Date: Sat, 28 Feb 2026 21:02:40 -0500
-Message-ID: <20260301020241.1730575-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=k20201202; t=1772334892;
+	bh=cztyXyeNUtJ2suFuxPdzJBanyjZeXjZQOti7SdfAox8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e5LPLrPFO0XYtOvyoaJ8UZ6IuA2cX9A8f/+qAYQgz2OJ4a255Z6ZMsC7n79xxGEoW
+	 Z+PBv2SuvNhdWzW8RDa0bXQbMiD3JGcgxX/rRQy2aeMu7H9l3YzwMlQO5Lwmi6jpeK
+	 xjCMsXILdBMZIR1XJe7CKk8yFal+m9UhEVo25KXxaHZy3IPYM+dIBEtbL+pVbvTrgT
+	 zwlQ5uRjzxabJps7y02wZ9e8eXZOos2cDJq/CPk3PBTLXZzhBI5S5dPhpclz8CEviZ
+	 Kiv0L6m+Z68eUaSmJ15w+503WoMy8yiEAURS7QOQ/eB1sGsy50RBM286NAbX/+MsTI
+	 TBaSm/36UugHg==
+Date: Sat, 28 Feb 2026 19:13:59 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	kunit-dev@googlegroups.com, linux-kselftest@vger.kernel.org,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <raemoar63@gmail.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] lib/crypto: tests: Depend on library options rather than
+ selecting them
+Message-ID: <20260301031359.GA2271@sol>
+References: <20260226191749.39397-1-ebiggers@kernel.org>
+ <CAMuHMdXH94DvcDKN1zTzTBOrcn_zAfZZZJCyGbxjfs8DBya5_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Patchwork-Hint: ignore
-X-stable: review
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdXH94DvcDKN1zTzTBOrcn_zAfZZZJCyGbxjfs8DBya5_Q@mail.gmail.com>
 
-The patch below does not apply to the 5.10-stable tree.
-If someone wants it applied there, or to any other stable or longterm
-tree, then please email the backport, including the original git commit
-id to <stable@vger.kernel.org>.
+On Fri, Feb 27, 2026 at 09:32:50AM +0100, Geert Uytterhoeven wrote:
+> You can make those library symbols visible if KUNIT_ALL_TESTS, like
+> I suggested (after I sent my earlier reports to you) in [1], and like
+> Vladimir already did in [2].
 
-Thanks,
-Sasha
+Sure, but that would help only when KUNIT_ALL_TESTS is enabled.
 
------------------- original commit in Linus's tree ------------------
+I think for now I'll just add a .kunitconfig file that enables
+everything needed to enable all the crypto libraries with KUnit tests.
 
-From a389d431053935366b88a8fbf271f1a564b9a44e Mon Sep 17 00:00:00 2001
-From: Bibo Mao <maobibo@loongson.cn>
-Date: Tue, 13 Jan 2026 11:05:55 +0800
-Subject: [PATCH] crypto: virtio: Remove duplicated virtqueue_kick in
- virtio_crypto_skcipher_crypt_req
-
-With function virtio_crypto_skcipher_crypt_req(), there is already
-virtqueue_kick() call with spinlock held in function
-__virtio_crypto_skcipher_do_req(). Remove duplicated virtqueue_kick()
-function call here.
-
-Fixes: d79b5d0bbf2e ("crypto: virtio - support crypto engine framework")
-Cc: stable@vger.kernel.org
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <20260113030556.3522533-3-maobibo@loongson.cn>
----
- drivers/crypto/virtio/virtio_crypto_skcipher_algs.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
-index 1b3fb21a2a7de..11053d1786d4d 100644
---- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
-@@ -541,8 +541,6 @@ int virtio_crypto_skcipher_crypt_req(
- 	if (ret < 0)
- 		return ret;
- 
--	virtqueue_kick(data_vq->vq);
--
- 	return 0;
- }
- 
--- 
-2.51.0
-
-
-
-
+- Eric
