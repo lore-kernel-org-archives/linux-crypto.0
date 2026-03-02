@@ -1,54 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A36326952;
-	Mon,  2 Mar 2026 21:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F8B33F5B7;
+	Mon,  2 Mar 2026 21:24:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772486439; cv=none; b=ry3cZ77XsJ2sUYn/fvOeIP1t4hHzokDD20yvqcOClQyf4baGvT/3svSi6CLFpOf+An2z3HzfAHReg+//sdbN02iNOb1dS1TE20XF4RfRDXqTD+RBHiw2kJ/c840KKEQbeZAXvux33kcoZsYTd0F8J86uz90J6k8hhwQGxabYC6o=
+	t=1772486678; cv=none; b=L/JsgWZFKHk1oQhxVdVLpceE65J5TzfVnMxeInii05eYGHM5lOrKHuGEhuelGQo/zMHkciL/TS4p4UhWpYnljESTPrb5SmYmud9FjfZebdOchD4XG06l/AHJZnSuTRxuD063kAJrTlwWC1z9g34DGZ7Ut443LD6b1ONnQb9J4lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772486439; c=relaxed/simple;
-	bh=YGALtDZlEiD2F1T9KtPan3LNnqM1FDj8xY10c0Wlkm4=;
+	s=arc-20240116; t=1772486678; c=relaxed/simple;
+	bh=2Cfkijj60alvXH5PPm4F14EP0ye+11LCUdDUZbJ1uKQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W+Ggcpq5m1ZvENg12bsIsj1lDx8nZktQebaEoL8YfoPd5apnOhHzIuS768g8BdbMW5/uJUlDQfSEKbjwVpoThZ9ibTLGWKl+wCgRj0uWRREngSoEhCk5m1sqxSbHeT9InJUc/vVzjHeyGgdQtQxXh+dfSRiOl5ahICRWxOvasEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lrAKQVys; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=HeZIiH3ogaMJRr1I+qhYe3R81InOYRUVCMcLnvBnFiIujdCOSTQfZmq3F/IWvGI+GYqJNiaseRmuH3gEtqphfSkgvsz3unUhtt9TYxrRS3jYi37Q6Mz/GV/kSac9Lg60V7Lqp7CB2x8GXn1Ix6GxPtUpaCgg8Su1Oni+ywSJAaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uH2ct0S9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lrAKQVys"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2C27C19423;
-	Mon,  2 Mar 2026 21:20:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uH2ct0S9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4412C19423;
+	Mon,  2 Mar 2026 21:24:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772486438;
-	bh=YGALtDZlEiD2F1T9KtPan3LNnqM1FDj8xY10c0Wlkm4=;
+	s=k20201202; t=1772486678;
+	bh=2Cfkijj60alvXH5PPm4F14EP0ye+11LCUdDUZbJ1uKQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lrAKQVysVibqoBBDvK32W+UtmBfwhDTgkU4caaXs0YlSmgTwV7PM6me8HUIrNoBg6
-	 gkxqhFRh1txnPiK9ju34RrgrSsf+yr+C8SigVSbz4ECjpi3JyVRXEAnNnt3K4oVjl4
-	 bINVRc+e0XOd2zHjxwSC8r4Wl3Dv31RvQ9lD+BXvBj3kGQsh//U3OIGd20z9H/LUEs
-	 jRn9mY62lxWR2P1PljbzzE12cJ+2BfIS9zrAPO59aQqJMMMgY2iNkeA+/Rqz+raxIx
-	 3TvIj4HWeoBtjiTUaSOfnluG84DL6RoQnpNgG5W9iW6wMr1xhXnAsGgidrDZXV4Z/Y
-	 g8JK1KEQ6kw5g==
-Date: Mon, 2 Mar 2026 14:20:35 -0700
-From: Tycho Andersen <tycho@kernel.org>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	John Allen <john.allen@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
-	Kim Phillips <kim.phillips@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 09/11] x86/snp: create snp_x86_shutdown()
-Message-ID: <aaX_I1QKxeAj7iY4@tycho.pizza>
-References: <20260302191334.937981-1-tycho@kernel.org>
- <20260302191334.937981-10-tycho@kernel.org>
- <b3beeb84-51e3-46df-8b9b-8808f478c408@amd.com>
+	b=uH2ct0S9vThZrVYPTo1AjSucjyZYdGuzlYMo05oHkUUY5kG3ZAIutgb6FypGcHUAz
+	 MkXU8HIrMPUt1d3gNCI9ii9UNBrKW/Ny1OItVX6gDP6IEeR68jtBmq9jBZzHnjfohe
+	 ybXawuYnEHk79HsO9CWtuVis0sVbpU8eU8bmo33mC1p43VAwHpk4faGXWFdQ514QrH
+	 /qbWA8GPtbOsAQBeD0TFF+YAEFMidWMEPqTLszAH80QsR3QQnyD8MbHZZ1zmj4gaC0
+	 lJTbg/7rANC5j1w1t35t9Z3/ZUw7ZOYPOFmL+txxIkQT9TDQYQvVkE38WQ5O4bNIUP
+	 lOJKQUkcREDAA==
+Date: Mon, 2 Mar 2026 13:24:36 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] net/tcp-ao: Fix MAC comparison to be constant-time
+Message-ID: <20260302212436.GB2143@quark>
+References: <20260302203600.13561-1-ebiggers@kernel.org>
+ <CAJwJo6Yt9v8pscqFB7mfuHGhwNSOE2no4Y5fu8o67atn=EtnUA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,32 +49,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b3beeb84-51e3-46df-8b9b-8808f478c408@amd.com>
+In-Reply-To: <CAJwJo6Yt9v8pscqFB7mfuHGhwNSOE2no4Y5fu8o67atn=EtnUA@mail.gmail.com>
 
-Hi Tom,
-
-On Mon, Mar 02, 2026 at 02:35:38PM -0600, Tom Lendacky wrote:
-> > +void snp_x86_shutdown(void)
-> > +{
+On Mon, Mar 02, 2026 at 08:59:50PM +0000, Dmitry Safonov wrote:
+> On Mon, 2 Mar 2026 at 20:36, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > To prevent timing attacks, MACs need to be compared in constant
+> > time.  Use the appropriate helper function for this.
+> >
+> > Fixes: 0a3a809089eb ("net/tcp: Verify inbound TCP-AO signed segments")
+> > Cc: stable@vger.kernel.org
+> > Cc: Dmitry Safonov <0x7f454c46@gmail.com>
+> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > 
-> Would it make sense to check for SNP being enabled before calling the
-> functions below? I realize each of the functions in question will do
-> that, but it could save a bunch of IPI's with the on_each_cpu() if SNP
-> is still enabled. Not a big deal either way, so:
+> Thanks, Eric, LGTM.
+> 
+> Reviewed-by: Dmitry Safonov <0x7f454c46@gmail.com>
+> 
+> Could you also send a similar patch for TCP-MD5?
+> tcp_inbound_md5_hash(), tcp_v{4,6}_send_reset() would need the same change.
 
-It is guarded at the call site by:
+Already done, it was the first one I sent:
+https://lore.kernel.org/netdev/20260302203409.13388-1-ebiggers@kernel.org/
 
-        if (data.x86_snp_shutdown &&
-            !WARN_ON_ONCE(syscfg & MSR_AMD64_SYSCFG_SNP_EN)) {
-                if (!panic)
-                        snp_x86_shutdown();
-
-but we could push that into here to protect any future callers.
-
-If we require a v2 I will make the fix.
-
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-
-Thanks for this and the others!
-
-Tycho
+- Eric
