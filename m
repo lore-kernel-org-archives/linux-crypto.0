@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BECF31B131;
-	Mon,  2 Mar 2026 19:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABF7366DB7;
+	Mon,  2 Mar 2026 19:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772478872; cv=none; b=XXlMk6e7ESo9pAqjnjDzuazLj5CbsuRJccn7ThtS47oPXjSZCs6BRVyznydnTkVqtDFiua+Guk3gmM5GIy0K9LwaQk517LIukzBy3u44q7ISyW3ohUK+xk93MNIA8V98ChgeO71cS1RpnpOau9paxaootc+jsHg7P0JVm+OQIjA=
+	t=1772478874; cv=none; b=Trt7e/PdIeNMCIJbIqrSIpSf9LDs0L8UvdCb/S9astKrpe3DCs8cu2icrUrXomv1JaRh+tQK0l/nj1JbLgPTDECGZsZ7Pm3CIlKCP5pqPCqQByAgbmTAs5oQC7aT6CROPTclQ10zd9JmfcIMHiJOO8zZgLbGQ3E7D+o2U6jf8Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772478872; c=relaxed/simple;
-	bh=mr8fnQHScadkR4uCG8Cf45gkFhDtXzkKMTtJf6PxiUs=;
+	s=arc-20240116; t=1772478874; c=relaxed/simple;
+	bh=fFDjbzQSB9XtQHzqU10kxCoVxNcp9uM4c+YvBs9ZhlM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=elUaVWIwqgLdt/7MW31L84nztI6hzWdm5UzTi6++68Po3xAPI1G2Vw4mL8RzzgK7iOfYgXrWciD5+/43R17jEZk4/HlilMEva7XxvW5furW54x9z1WtoAAgUrkkGeMiYSK8ACh/VFMpMtH46sVg1ghXOUhcxTzI5GAoopf3r75E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ek69pEVr; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=aJhro4J31JRqkDAAtSZN4UrcsbLppX3oezH9/7jP5nufQX86aD1OedTkwJieWzSPmjoj44CVgnWwr77fG3BR25+B+2PJNSNAzAXKFkIi4PNCGSVusDANceldLe1bGSNXn8OIENY5qDHYV7zTat/wY4qeTwBdD29IKI5Y47CBenE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hWP/dQip; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ek69pEVr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C63D9C2BC9E;
-	Mon,  2 Mar 2026 19:14:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWP/dQip"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40357C19425;
+	Mon,  2 Mar 2026 19:14:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772478872;
-	bh=mr8fnQHScadkR4uCG8Cf45gkFhDtXzkKMTtJf6PxiUs=;
+	s=k20201202; t=1772478874;
+	bh=fFDjbzQSB9XtQHzqU10kxCoVxNcp9uM4c+YvBs9ZhlM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ek69pEVrM5DLnyG1fkSNDUUmECUKMulNQ4QjxEUBdO8/I7c7cWbxw+o4ASmFeh6YQ
-	 13VJVP3169mx4aLEYT+cPiDvbTijzhkO/1P8L6464dfjm3npMs9/6isr8Kp9VqQO0N
-	 b7FHbrqAP5MM5RAMmD4/Fq1Bd074h5a6zjC4HToAMHMHwqxL8QhL2xX/wPwLxT5rL6
-	 Y64HRQNc4Tg25Dqmf4xGGwUytQ/Xf08j2nlUEc9l+D7UW9ZwvFaOzhv3nLdObjNP+8
-	 2tBU+OspJFwobxxMOcgUs9bn5Lfc+NZtSJja0DZzKDl76rQYkWVqcCq35pzirUjszw
-	 8ZkP7jsIzCmjg==
+	b=hWP/dQipIRxAY+GJ2m/uU6alZOvnIgH/bEFHR1CNTMHyJxhl6xUnMJYzc5BaROTcB
+	 IUaFe4WBAUEnh1kCa7n4DKWDWc5zg6xZCMbr2Iitg16JjFPK5+gsK8ekx/27WBqkdE
+	 u9pC8GyB18eO27iRjo/+n7CSTXRknvnBdvAKSPGbILB+p94z3rwmvWyvrBfX+k+F2c
+	 jVy41AQyTHEFDjeI50OT527JW5+PQfnWdjBPwh+vmfgLKs/sl/BvB4uHxo2lo0EPrw
+	 28WyQ2LReUrYRFRfDgvaM0Nfw0dwoko1qLzgXlrO5nNQZZ/AJiQj3NR8uPfd9Ypgde
+	 QH9nRRl6ozmyw==
 From: Tycho Andersen <tycho@kernel.org>
 To: Thomas Gleixner <tglx@kernel.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -48,9 +48,9 @@ To: Thomas Gleixner <tglx@kernel.org>,
 	Sean Christopherson <seanjc@google.com>
 Cc: linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH 01/11] x86/snp: drop support for SNP hotplug
-Date: Mon,  2 Mar 2026 12:13:24 -0700
-Message-ID: <20260302191334.937981-2-tycho@kernel.org>
+Subject: [PATCH 02/11] x86/snp: Keep the RMP table bookkeeping area mapped
+Date: Mon,  2 Mar 2026 12:13:25 -0700
+Message-ID: <20260302191334.937981-3-tycho@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260302191334.937981-1-tycho@kernel.org>
 References: <20260302191334.937981-1-tycho@kernel.org>
@@ -62,91 +62,93 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Tycho Andersen (AMD)" <tycho@kernel.org>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-During an SNP_INIT(_EX), the SEV firmware checks that all CPUs have SNPEn
-set, and fails if they do not. As such, it does not make sense to have
-offline CPUs: the firmware will fail initialization because of the offlined
-ones that the kernel did not initialize.
+In prep for delayed SNP initialization and disablement on shutdown, the
+RMP will need to be cleared each time SNP is disabled. Maintain the
+the mapping to the RMP bookkeeping area to avoid mapping and unmapping it
+each time and any possible errors that may arise from that.
 
-Futher, there is a bug: SNP_INIT(_EX) require MFDM to be set in addition to
-SNPEn which the previous hotplug code did not do. Since
-k8_check_syscfg_dram_mod_en() enforces this be cleared, hotplug wouldn't
-work.
-
-Drop the hotplug code. Collapse the __{mfd,snp}__enable() wrappers into
-their non-__ versions, since the cpu number argument is no longer needed.
-
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 ---
- arch/x86/virt/svm/sev.c | 24 ++++--------------------
- 1 file changed, 4 insertions(+), 20 deletions(-)
+ arch/x86/virt/svm/sev.c | 40 +++++++++++++++++-----------------------
+ 1 file changed, 17 insertions(+), 23 deletions(-)
 
 diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index a4f3a364fb65..1446011c6337 100644
+index 1446011c6337..232a385f11cb 100644
 --- a/arch/x86/virt/svm/sev.c
 +++ b/arch/x86/virt/svm/sev.c
-@@ -130,33 +130,26 @@ static unsigned long snp_nr_leaked_pages;
- #undef pr_fmt
- #define pr_fmt(fmt)	"SEV-SNP: " fmt
+@@ -117,6 +117,8 @@ static u64 rmp_segment_mask;
  
--static int __mfd_enable(unsigned int cpu)
-+static __init void mfd_enable(void *arg)
- {
- 	u64 val;
+ static u64 rmp_cfg;
  
- 	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
--		return 0;
-+		return;
++static void *rmp_bookkeeping __ro_after_init;
++
+ /* Mask to apply to a PFN to get the first PFN of a 2MB page */
+ #define PFN_PMD_MASK	GENMASK_ULL(63, PMD_SHIFT - PAGE_SHIFT)
  
- 	rdmsrq(MSR_AMD64_SYSCFG, val);
- 
- 	val |= MSR_AMD64_SYSCFG_MFDM;
- 
- 	wrmsrq(MSR_AMD64_SYSCFG, val);
--
--	return 0;
+@@ -246,23 +248,6 @@ void __init snp_fixup_e820_tables(void)
+ 	}
  }
  
--static __init void mfd_enable(void *arg)
+-static bool __init clear_rmptable_bookkeeping(void)
 -{
--	__mfd_enable(smp_processor_id());
+-	void *bk;
+-
+-	bk = memremap(probed_rmp_base, RMPTABLE_CPU_BOOKKEEPING_SZ, MEMREMAP_WB);
+-	if (!bk) {
+-		pr_err("Failed to map RMP bookkeeping area\n");
+-		return false;
+-	}
+-
+-	memset(bk, 0, RMPTABLE_CPU_BOOKKEEPING_SZ);
+-
+-	memunmap(bk);
+-
+-	return true;
 -}
 -
--static int __snp_enable(unsigned int cpu)
-+static __init void snp_enable(void *arg)
+ static bool __init alloc_rmp_segment_desc(u64 segment_pa, u64 segment_size, u64 pa)
  {
- 	u64 val;
- 
- 	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
--		return 0;
-+		return;
- 
- 	rdmsrq(MSR_AMD64_SYSCFG, val);
- 
-@@ -164,13 +157,6 @@ static int __snp_enable(unsigned int cpu)
- 	val |= MSR_AMD64_SYSCFG_SNP_VMPL_EN;
- 
- 	wrmsrq(MSR_AMD64_SYSCFG, val);
--
--	return 0;
--}
--
--static __init void snp_enable(void *arg)
--{
--	__snp_enable(smp_processor_id());
+ 	u64 rst_index, rmp_segment_size_max;
+@@ -480,10 +465,22 @@ static bool __init setup_segmented_rmptable(void)
+ static bool __init setup_rmptable(void)
+ {
+ 	if (rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED) {
+-		return setup_segmented_rmptable();
++		if (!setup_segmented_rmptable())
++			return false;
+ 	} else {
+-		return setup_contiguous_rmptable();
++		if (!setup_contiguous_rmptable())
++			return false;
+ 	}
++
++	rmp_bookkeeping = memremap(probed_rmp_base, RMPTABLE_CPU_BOOKKEEPING_SZ, MEMREMAP_WB);
++	if (!rmp_bookkeeping) {
++		pr_err("Failed to map RMP bookkeeping area\n");
++		free_rmp_segment_table();
++
++		return false;
++	}
++
++	return true;
  }
  
- static void __init __snp_fixup_e820_tables(u64 pa)
-@@ -553,8 +539,6 @@ int __init snp_rmptable_init(void)
- 	on_each_cpu(snp_enable, NULL, 1);
+ /*
+@@ -514,10 +511,7 @@ int __init snp_rmptable_init(void)
+ 		goto skip_enable;
  
- skip_enable:
--	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/rmptable_init:online", __snp_enable, NULL);
--
- 	/*
- 	 * Setting crash_kexec_post_notifiers to 'true' to ensure that SNP panic
- 	 * notifier is invoked to do SNP IOMMU shutdown before kdump.
+ 	/* Zero out the RMP bookkeeping area */
+-	if (!clear_rmptable_bookkeeping()) {
+-		free_rmp_segment_table();
+-		return -ENOSYS;
+-	}
++	memset(rmp_bookkeeping, 0, RMPTABLE_CPU_BOOKKEEPING_SZ);
+ 
+ 	/* Zero out the RMP entries */
+ 	for (i = 0; i < rst_max_index; i++) {
 -- 
 2.53.0
 
