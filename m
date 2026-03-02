@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378E83E0C4B;
-	Mon,  2 Mar 2026 19:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FEF3E7146;
+	Mon,  2 Mar 2026 19:14:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772478887; cv=none; b=Uh9aUoCdrJftvhm5QTIO4wKtzhzG9wPYPVbBgrOTpzZ5bh/faP1p8l0wCvJcfvv/1YkGmxpBkXi/ErDmT5SmcaC9Td0c8hViF6iZ+bzpmMfEz7B4nl/JwKkxHwwZ1ciiQXp5gLl2ZHoy4ghxfsGKkSs1P0DbCiNuq/zyxQt+6Z8=
+	t=1772478889; cv=none; b=q/FNOmBL06itnF/ao2r/A15NADnlqDBAK9cllT9v2kJ2K7UAabFsD7Asoj7iHk4WrzTTg8scM9gpaQWyE1+1ej/ESeivdcyyHd/Ts49QCYUKBSmhHEC1K6kGdKZfAfNCXDkQhEfQcEBnmkdGTWRgdChNV9tQSPpfvnBTFJgz0uQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772478887; c=relaxed/simple;
-	bh=UFroV8mauc76cWxH7swPjhVFjeW5UFWPeFCqSXmtJJI=;
+	s=arc-20240116; t=1772478889; c=relaxed/simple;
+	bh=qAQttDEXuNN5uevUynuFwNEoZIIiao4qqyUzO8+IfTw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BeywJs7YwDfrb/VTarupAGu0qORTLCd/0OA/kI/sc7QpY8YSkP5CWeJMq30ZExo5KxjTu4Xz1wgiJekBP3SA7yhm63OltoQixtmbUEYqmcM7oTyDsRaWHh1mtBJHQXryRLJ9152pmaQfDEDO1C12JBEDJ2AA+BznuD49ZLHEU7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CbzdbfOg; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=VkxkHgjwADDfhsa/Akv/F8PLiDml9L4pJ392pymqMY4wrbMAMGHDnRtNXYgzAU4Cl7Ssc1OF2u9/4nrtjnL1jyARNSqTtLZQfVhHKIxZBGxnDBxq8izKeLlnfjRkSBB+nelb5WsZJvyWSGQcbLtWrl+74llFYWFbmFEIIYaal/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BT74g3Av; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CbzdbfOg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70072C2BC9E;
-	Mon,  2 Mar 2026 19:14:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BT74g3Av"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DED95C19423;
+	Mon,  2 Mar 2026 19:14:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772478886;
-	bh=UFroV8mauc76cWxH7swPjhVFjeW5UFWPeFCqSXmtJJI=;
+	s=k20201202; t=1772478889;
+	bh=qAQttDEXuNN5uevUynuFwNEoZIIiao4qqyUzO8+IfTw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CbzdbfOgQmocbWi0A2sz3VRTX3m6zmsdHQUvZP1oxbl32S5QZpF/KmhA4vnLKbazT
-	 FixfPD/+dU3QE6dEWwEtnL9LYfweJqap2agTBLxlRcHN3itltHwzTDieQvot/EyC/5
-	 U2CxanvRO4I+gDbq/+LPNCKZ75v5iDo8IY6I1SSCeRrX/oTgxNq7AInV4rgpHWOsEj
-	 79tAspZsC9JGhOYPrrYjyxUzaJvZG4EZNWOlknW39zLqRf5jyMH3F5FwKm7iO6PP1f
-	 cRmDsnJ8/bJW5Ga/wvrigdRXjYpuOcnT3axmNtSFYexM+QD9klNSOOntPm+SkXJrmC
-	 ArE8fNDBP3UHw==
+	b=BT74g3AvvTBZdWue2nx3S10fGYbGqF7ZTO+PVZ3YMYF6yosRS8zrbCIyBQlIhojK4
+	 uDsDRp2uoAVmQC0BD/4/sZm2wvmsUKHIQ2LlLEG2sWdbOxL1CmvzirW64pDWVhakUt
+	 r05VXWDKaDNFh+GySBBlMcNKwSUQehv8CwrRDMwv9g1cIF8LGw33or3KJmfOHXplar
+	 RD6SrMGKdmMf5+d5HC6IP9gpJy8nfuZ9gZvzSUV5ae3H6IjtFpfvnvl5QHbQccweh9
+	 gyGu7fajujQOWlEP7Dj39C1Xm/xzohibTh3GZDIB2ByFTrxE4xSQV0YlcNjERDMi5j
+	 bkq1keD3IlxsA==
 From: Tycho Andersen <tycho@kernel.org>
 To: Thomas Gleixner <tglx@kernel.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -48,9 +48,9 @@ To: Thomas Gleixner <tglx@kernel.org>,
 	Sean Christopherson <seanjc@google.com>
 Cc: linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH 07/11] x86/snp, crypto: move HSAVE_PA setup to arch/
-Date: Mon,  2 Mar 2026 12:13:30 -0700
-Message-ID: <20260302191334.937981-8-tycho@kernel.org>
+Subject: [PATCH 08/11] x86/snp: allow disabling MFDM
+Date: Mon,  2 Mar 2026 12:13:31 -0700
+Message-ID: <20260302191334.937981-9-tycho@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260302191334.937981-1-tycho@kernel.org>
 References: <20260302191334.937981-1-tycho@kernel.org>
@@ -64,68 +64,51 @@ Content-Transfer-Encoding: 8bit
 
 From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-Now that there is snp_prepare_for_snp_init() that indicates when the CCP
-driver wants to prepare the architecture for SNP_INIT(_EX), move this
-architecture-specific bit of code to a more sensible place.
+The SNP x86 shutdown path needs to disable MFDM, since as the comment for
+k8_check_syscfg_dram_mod_en(), the "BIOS" is supposed clear it, or the
+kernel in the case of module unload and shutdown followed by kexec.
+
+Change this helper to allow for disabling it.
 
 Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 ---
- arch/x86/virt/svm/sev.c      | 8 ++++++++
- drivers/crypto/ccp/sev-dev.c | 8 --------
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ arch/x86/virt/svm/sev.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index aa784542b32d..53bc0c7f2c50 100644
+index 53bc0c7f2c50..cf984b8f4493 100644
 --- a/arch/x86/virt/svm/sev.c
 +++ b/arch/x86/virt/svm/sev.c
-@@ -509,6 +509,11 @@ static bool __init setup_rmptable(void)
- 	return true;
- }
+@@ -132,7 +132,7 @@ static unsigned long snp_nr_leaked_pages;
+ #undef pr_fmt
+ #define pr_fmt(fmt)	"SEV-SNP: " fmt
  
-+static void snp_set_hsave_pa(void *arg)
-+{
-+	wrmsrq(MSR_VM_HSAVE_PA, 0);
-+}
-+
- void snp_prepare_for_snp_init(void)
+-static void mfd_enable(void *arg)
++static void mfd_reconfigure(void *arg)
  {
  	u64 val;
-@@ -530,6 +535,9 @@ void snp_prepare_for_snp_init(void)
- 	on_each_cpu(mfd_enable, NULL, 1);
+ 
+@@ -141,7 +141,10 @@ static void mfd_enable(void *arg)
+ 
+ 	rdmsrq(MSR_AMD64_SYSCFG, val);
+ 
+-	val |= MSR_AMD64_SYSCFG_MFDM;
++	if (arg)
++		val |= MSR_AMD64_SYSCFG_MFDM;
++	else
++		val &= ~MSR_AMD64_SYSCFG_MFDM;
+ 
+ 	wrmsrq(MSR_AMD64_SYSCFG, val);
+ }
+@@ -532,7 +535,7 @@ void snp_prepare_for_snp_init(void)
+ 	 * MtrrFixDramModEn is not shared between threads on a core,
+ 	 * therefore it must be set on all CPUs prior to enabling SNP.
+ 	 */
+-	on_each_cpu(mfd_enable, NULL, 1);
++	on_each_cpu(mfd_reconfigure, (void *)1, 1);
  
  	on_each_cpu(snp_enable, NULL, 1);
-+
-+	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
-+	on_each_cpu(snp_set_hsave_pa, NULL, 1);
- }
- EXPORT_SYMBOL_FOR_MODULES(snp_prepare_for_snp_init, "ccp");
  
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 5b1a24b11e3e..ef45977b09b6 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1076,11 +1076,6 @@ static inline int __sev_do_init_locked(int *psp_ret)
- 		return __sev_init_locked(psp_ret);
- }
- 
--static void snp_set_hsave_pa(void *arg)
--{
--	wrmsrq(MSR_VM_HSAVE_PA, 0);
--}
--
- /* Hypervisor Fixed pages API interface */
- static void snp_hv_fixed_pages_state_update(struct sev_device *sev,
- 					    enum snp_hv_fixed_pages_state page_state)
-@@ -1377,9 +1372,6 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
- 
- 	snp_prepare_for_snp_init();
- 
--	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
--	on_each_cpu(snp_set_hsave_pa, NULL, 1);
--
- 	/*
- 	 * Starting in SNP firmware v1.52, the SNP_INIT_EX command takes a list
- 	 * of system physical address ranges to convert into HV-fixed page
 -- 
 2.53.0
 
