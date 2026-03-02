@@ -1,86 +1,73 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011014.outbound.protection.outlook.com [40.93.194.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D97B3ACA73
-	for <linux-crypto@vger.kernel.org>; Mon,  2 Mar 2026 12:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772455654; cv=none; b=AKfP8/Ms8TkRhqjxOt0Op/8VoMTiz7mx437TlwfDI+Ylankpp2SMHMGbNgPtQMUw+fz/THC9Fvhj34mNLjMMRGpTkHg6ksHV6g3xVd51PjUtvSlwxNrQ1oY7zLuhHUcdpGsVlj58c8tn2hBYjszS1Pm5Pm53VlT5Ja5GcEyR7gs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772455654; c=relaxed/simple;
-	bh=pJ4iAt7874rcqFlGJ+jurrn+MAbXtuSXcTqMFZeR8fU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q9HOrQs6bPcg8TFV4SP/J5obZ9+H95xJsg5vz6ihrxcA9yYEeOhhKMIC4b6EABsCqEWxvcaKT59ziwAeGUZwPrVVaTbXLpSTuNswR/jq85Rmwmxf+LyAVb4PQUzJIu7TlsJs81QdCWyqhWeux1q3iWyibcBYZ3GvNPp0uN6ERK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=LrHaU/vm; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=DXMKlx7K; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784BE3B8BD3;
+	Mon,  2 Mar 2026 14:08:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772460532; cv=fail; b=N7xmwPDp7kMJDCd1THB8AkV+svCLpPNm7++tblqxKVFGBJ1Pzxq2J7GiXD45/8iD+80ccZDigeIu6zdbFvl8w/QWtSaXcr4YmPGKfTz1x0INMxEsfGf0lBTyvPtMJZvAyiTrMVUqQV1byh9bQrfMAYaCBDrQsRRWdbORpw7XKBs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772460532; c=relaxed/simple;
+	bh=l9sxWZTUJBIZ6nMJoiGGkdv4ZIVL4F6DO38Y5JEgC/w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=AJSuEYfGmjTqPEl1Bz7X46taPCZtTxeV9/2LEgi+2UJnXsrf3nbmMqnPcDqnCIr1g5QVUg7uUhMy+FBvwdNgLZWDE0qgQyuMCvlX9nrjqY392hDI+Zx2yStBnb5g7d7Ke6TOo3RxBSlEkNvStPrAgULwjFhKtztuJ6cBsQmQ3ko=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=WdGIAINP; arc=fail smtp.client-ip=40.93.194.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="LrHaU/vm";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="DXMKlx7K"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62281pju2624089
-	for <linux-crypto@vger.kernel.org>; Mon, 2 Mar 2026 12:47:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	nVABGUu4mY4JMI9362kjhkOtFnXqgezOf4nKx95HeS4=; b=LrHaU/vm+HW3238O
-	wLNgX8f/3KQfa8miTon4/uGg3sQs9GLbmLax9c979MeszYLiO054HK0m89iBCQ9P
-	zsq1aQJfMCkqG8jz21inUozmBKbK+ABfPrr7JLMXcoD0YL/rJrAg/vvCspv/WHyq
-	MHNRX8Um7uaKCDianlo8LSTzWFCgnnQ5j6X0/x6vkqciprj20N6HURscfA1f+JHa
-	ahL65sqmYEsw84JS81vsuY9zvr9dAztp1WNkKZetcmQcRfbMb4fIjnSLpr1xMWcb
-	5vXj43JY11v3wjBhCyeVapO8gaLbvQWvvs9XMhibqhqpivo7W4YMKkHOKPYh493c
-	mfnhMQ==
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com [209.85.219.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cmgbaucv0-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Mon, 02 Mar 2026 12:47:32 +0000 (GMT)
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-89a01982dc5so2453066d6.3
-        for <linux-crypto@vger.kernel.org>; Mon, 02 Mar 2026 04:47:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1772455652; x=1773060452; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nVABGUu4mY4JMI9362kjhkOtFnXqgezOf4nKx95HeS4=;
-        b=DXMKlx7Kgiep8BzyHjztkMvevpPBipSLt/lX4OCB6CwQtBXbHXoEqvXYywufHQiDFe
-         F/mu1ewK3rJOEKpJchgAExnrF7pCxrM+xnLJIoMuW420cCAFFojotH9k5spxQgh7y5IS
-         Bp1iWaOmaCuvAZaqC7aX+H3TVdVRxdwWWDGJZkjqcdAI1AIwEmCzt+kQmAGX+KPenPbT
-         t+71IVKVFrL1WznPBL0XWTtDgYgjHV6yUZpHqkFS/4nLlYML42RN7zRyY0GB+y6Kh+xd
-         IxtkWNH+RhBb8SH4aExgSJNTgAtFnFcPyo9lNC1aB4Hl67a6bIfyI4JboO+I3y8VtUEu
-         IS2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772455652; x=1773060452;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nVABGUu4mY4JMI9362kjhkOtFnXqgezOf4nKx95HeS4=;
-        b=K5PLF/T18+9rIwDd9++esxp+7jpKom0fP8xaTimDDI3N2FIL0KlYua0YPTx9mIxxRz
-         KULUWCWuyCcKOY1uKKC9018Wf9HnGsoFEyyoDittdvsqQtbZiK8PJ5/m6CMHUx5TZD4h
-         wMzZqUdh018qo6vMA8X829Lvxaq+dQGTC/Z8DcCU5DYvbIhl+yWhx66BG2zJRiTuWYkP
-         z3GkgqXkXfHWcSvCBWo+3nqQJ/LbnY0YRI5dQibQ+NWFrrFAy1LK/IDt21MslnRT7zE8
-         DgVPtdDPEF3UKu4ehiWE93sHVvuO7CQ5nxU3a6Y+LjGG8FGkShLDce/JmC7gsAWPw7mb
-         6pvA==
-X-Gm-Message-State: AOJu0YzzCL6C9IiTePOIfUYvW+61BmajlesJZAuL+AlmZ3H5oR9Buakl
-	589vqKI5k6kcHZYg+DqkdLpoHl363lCdfOpUFyqPdBFIUpxdILcX1LT+AXMacPkM/4gDu1rs0FR
-	yxmlqa45+lKUvjKxhHSm/bGwMp573NTofMGUvN6iSVSkErlCMLu2wFch3O5jVfAcP+Fs=
-X-Gm-Gg: ATEYQzxfz5pYuMYGAgc7pvqzc23bbGaxeM66/Oh1UlyO91MLCDd6DnbBCyPUbztoBbz
-	DAssR+63ywzTkVwqpNruvPw070P+ZgCNgqdav+kd+hh5ad2vvNI1FkrrSv02fl2YQcGnGXTmXbQ
-	+lJlwKqA8zNXWp6MSVJrYT5oUlF2IH09gLb12JINpcrnxlNDLnFJR0VKFPIRca3pd2CG1N0CnGa
-	onq2rs0FCBjYPL9KqpsTWEhr2Sg6rL/5kEqdyNfilDdRYPgZzt3GI207m5ajz5LD7ZBcA5K9mmJ
-	VotOGzTtyeqt4RXaIbxoAijZI/EZevCjnWBnrZPDY0AjNWQsGHM4k7nSNM6WMbNCerwwWQ7naPr
-	ELfOOd668LZXCo+xhj1GLI+Ho7+w2AJKQgxSIObpHwl1Srynb2S3LcA9ISwa9+c9IinowjbSdoJ
-	26Qiw=
-X-Received: by 2002:a05:6214:5e07:b0:89a:a9:569f with SMTP id 6a1803df08f44-89a00a95abfmr14245006d6.2.1772455651875;
-        Mon, 02 Mar 2026 04:47:31 -0800 (PST)
-X-Received: by 2002:a05:6214:5e07:b0:89a:a9:569f with SMTP id 6a1803df08f44-89a00a95abfmr14244796d6.2.1772455651326;
-        Mon, 02 Mar 2026 04:47:31 -0800 (PST)
-Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b93973d3ec4sm266490366b.66.2026.03.02.04.47.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Mar 2026 04:47:30 -0800 (PST)
-Message-ID: <68c63578-ff12-4f4a-86a0-212c2a6adfd6@oss.qualcomm.com>
-Date: Mon, 2 Mar 2026 13:47:28 +0100
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="WdGIAINP"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ai2TcUrkCGdljLagFoEwsomD0J/QXU+7Mu2NcCnpxzLE5ULIwizb9hhblUR2dyXgcrs3ZLSR4qrptlZNUdOIUZjEium8BQjWQu8maBHUtxpP4APvjLR/+cIFVST5W1f6+tOdtOKd2rTkQNs/gcX9R5YvsvFjFJ+7DK4UEU0L5WuYyQn/EAVRoDLAC7fKpUHtjQ4DUHRvtGlaGPH7TIAoBLCQUs+mROu1q2zoSuNzC6vgo1D1uhQ33a0YyO9LAbJ5wW89JwJFJaTvWBP6/q6W3GesRg4wCx8f2FzvJJ8tZ1FFylBkLplYVQxR32OEL0TWmWRT7Y6eddJSWV9fOQLB9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cEUrizsyCYHvW/pSmO+Hg1zau21t3KlfTMD+/mkzrLU=;
+ b=x5teC9loLMxwN/Bl7Fg4FNNs5eo7px1UFxrXYYj8s0NvQEGMhHak+rGBMaAU7I+rQDoud5pYqO7aRSRSMxM1KX9hmvv5pDIKy38Yjp3KmIAr5/FRb4YQJpBQpAHgR0AtXZrXDdTe8JjiuN80YPZ90aqOZUFzyVj/VNQCMZ8EDeUh7wa12xfOXjhRRKgH9BC4qNiRhP7lH11i7gLX1KS5Ff3q2lu/fC2efVSXJ0tP2GnXnLm5TXgj7+Vvxf5Ra78HjsKPeNHkC9tbiM6jks1bgl0+Y+BM6SZKAyjeASjziUaexWwl2i86juvjzw8Rcms+wkF22KoL+VTh998OFNxQMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.21.194) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cEUrizsyCYHvW/pSmO+Hg1zau21t3KlfTMD+/mkzrLU=;
+ b=WdGIAINP8msBia9f2Qb4ujV4LlUSLHM93d2tH88+bpYDk06Q9lpUIWuNQbGqOXxxtpQL3BmIgSCqSI3YCfdV72lond1WKAqSBkJenvxi0dsxRulaxLbHqEQVm2cBwcyQhaUbeqfHZ6PL1JqmSrYXj8QoD+8J9SnYszXwMoIuhlM=
+Received: from MN0PR04CA0002.namprd04.prod.outlook.com (2603:10b6:208:52d::13)
+ by DS4PPF376CF97B3.namprd10.prod.outlook.com (2603:10b6:f:fc00::d13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.20; Mon, 2 Mar
+ 2026 14:08:46 +0000
+Received: from BL02EPF0001A107.namprd05.prod.outlook.com
+ (2603:10b6:208:52d:cafe::7d) by MN0PR04CA0002.outlook.office365.com
+ (2603:10b6:208:52d::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.21 via Frontend Transport; Mon,
+ 2 Mar 2026 14:08:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
+Received: from flwvzet200.ext.ti.com (198.47.21.194) by
+ BL02EPF0001A107.mail.protection.outlook.com (10.167.241.136) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9654.16 via Frontend Transport; Mon, 2 Mar 2026 14:08:45 +0000
+Received: from DFLE213.ent.ti.com (10.64.6.71) by flwvzet200.ext.ti.com
+ (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 2 Mar
+ 2026 08:08:44 -0600
+Received: from DFLE202.ent.ti.com (10.64.6.60) by DFLE213.ent.ti.com
+ (10.64.6.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 2 Mar
+ 2026 08:08:44 -0600
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE202.ent.ti.com
+ (10.64.6.60) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Mon, 2 Mar 2026 08:08:44 -0600
+Received: from [10.249.132.17] ([10.249.132.17])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 622E8eHX403914;
+	Mon, 2 Mar 2026 08:08:41 -0600
+Message-ID: <845474f9-a809-4b6f-b10f-2d79284b0a60@ti.com>
+Date: Mon, 2 Mar 2026 19:38:39 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -88,85 +75,76 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: qce - Remove return variable and unused
- assignments
-To: Thorsten Blum <thorsten.blum@linux.dev>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20260302113453.938998-2-thorsten.blum@linux.dev>
+Subject: Re: [PATCH v8 1/3] crypto: ti - Add support for AES-CTR in DTHEv2
+ driver
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "David S. Miller" <davem@davemloft.net>, Manorit Chawdhry
+	<m-chawdhry@ti.com>, Kamlesh Gurudasani <kamlesh@ti.com>, Shiva Tripathi
+	<s-tripathi1@ti.com>, Kavitha Malarvizhi <k-malarvizhi@ti.com>, "Vishal
+ Mahaveer" <vishalm@ti.com>, Praneeth Bajjuri <praneeth@ti.com>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20260120144408.606911-1-t-pratham@ti.com>
+ <20260120144408.606911-2-t-pratham@ti.com>
+ <aYWsJAmf05EdotTX@gondor.apana.org.au>
+ <b3b9f41a-adc3-408f-9fc9-69618c4aa2ba@ti.com>
+ <aaKqD5FP6w8dp48p@gondor.apana.org.au>
 Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260302113453.938998-2-thorsten.blum@linux.dev>
-Content-Type: text/plain; charset=UTF-8
+From: T Pratham <t-pratham@ti.com>
+In-Reply-To: <aaKqD5FP6w8dp48p@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAyMDEwNyBTYWx0ZWRfX41/h+AvkYnGw
- Z3RtJXGYN/I0QfNUtiBp6n6nl0srIh9Gni0ax2SN7fHllRAKGEV/0Dgoo38Ke5o5wDN6Nap8S1b
- NaeV5Intt9aEdolL04qQhnjrR2o1sSBrt0hsiOBNWsdhUiLfub7RlXfT3mxHC/KWa4V8uCn6eJu
- B516qR5tvVJ62XAhoDqSiUL+87mrsHL4LC5fckH81rDjfXkdEU9UALWAAfQmQWzOqSbnkIyzzDo
- 9tgLQ5aYtjhQdZuiLa3w4137y27+qo7LloQsnrsoa+6UrjtL7z9Cvm0KmMWF3sRxSr3ij7VDHU0
- DjYoWs4f5KwtCDTySJBR9r7a11PsWSGRas3OTex3oXtIIWI8BCEguoosclPQOqn2lLX5uQ/fJbN
- lbtD9ce84/SmlBZQAhoH7r3wc1jfKIMYqQ454Slvlqmy7zD6o2pZYsFETwKdmuocurakPnL/UAJ
- q7w2HhSdYLxX+0NPPWA==
-X-Authority-Analysis: v=2.4 cv=QfVrf8bv c=1 sm=1 tr=0 ts=69a586e4 cx=c_pps
- a=wEM5vcRIz55oU/E2lInRtA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
- a=CZKHD8RhjnvZNWBU2NoA:9 a=QEXdDO2ut3YA:10 a=OIgjcC2v60KrkQgK7BGD:22
-X-Proofpoint-ORIG-GUID: 63DBGydDBQQE9skXPbS1gQDEn_xQAree
-X-Proofpoint-GUID: 63DBGydDBQQE9skXPbS1gQDEn_xQAree
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-02_03,2026-02-27_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 priorityscore=1501 spamscore=0 bulkscore=0 clxscore=1015
- adultscore=0 lowpriorityscore=0 phishscore=0 impostorscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603020107
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A107:EE_|DS4PPF376CF97B3:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c2fcba5-8066-4a80-e7d3-08de7865379a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|34020700016|376014;
+X-Microsoft-Antispam-Message-Info:
+	in/KGvJy5JC1bACdvY5+GZU6UI3wcE0zXolBpm8fG2V2SjZtHEOOTG1+JbCpCg6ya7RWk2IisGLwj7TaX0b74l3t3dMGBTBbDAelBsCLHKXhStw7BKbwxuctMby4C585zYjBaScsfrsOJgzBfyCFu1bjOS54F5PzFfk8dCeO1R2MK9eZSjkbTh4835jYLNyVtpIHDMZZWSoie7ruypt1B2AUU+ccF22aAiM1UBeXLxyZa129bw6AkOyNVKzX6gpDOcDphEh6KH7jBqPOCvaO81iRcUNhTgkRqki3l3+MvWelBlCbu0fp3xbm7E3uQFiPYwiUctlu3k3YRorj3o5ywi6pBIoHz6vtSRPJyHspy+zyWHM37VRTXEC5yKAdPnAZ+SV9LUfJWk4i6987pbxSJFhYObaZzugXH3MyLhsS6Bkm8DXZt3YpQm/1K1Cfzbkl7np1IntJEmVsY7rPuKmwf+vlukK03hN/iHfhsoBePuASetLW6oJiexz/P/xYd//XHIVGpTupTVFQMUMezZ61m4vk0+OIKLHjwf8MlPRADmO7XehTWMbBRwdYAJDOBV4ej8nGf+alJfQcFOepPM0p2tCdiAgECjgLB0ctkHQGyTOrWScssGl26NA6dirprFAzUr5iKSLa9+Mcg3n1K7gAQ/zscRSOn5aLyBtQuHZ2lBvfxHIl7YcfH+mV1dzh4fdRFqnpSk3cIRoSuKM7CtR+jhXuWrGv6SLVAQQgzJolmM1Zh4shzC2CJuxrD6zrPfOIcTM16Hwo8gLzVN6THB06JYUCVcq+i5MLSkb3OhhTG4L07JtLxmOHP43c0iLYHFwDSosmQewCzUHRmgU0Jhiopw==
+X-Forefront-Antispam-Report:
+	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(34020700016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	SBE4+7Wk9GXVj6AQFJyarJd19MXqcXXg/hizyn4dy/0pTwT2Bi2uWcBqp3KHF/4FOLaYG2a3YgVd53/HmchRsf21F7ummpFZ6MwXbCaTiiguKxybBjWK6WSVjCR06TdBPyvjyv1OF6su59Rznsxr+OKVnsSsbodL34hP8dp0RRXLE1XN3m9OY01dD06C8tHIm6BDR7tN05eI4fwHZpUeofLHIEhBMPhHrJTxCNC8pEPlbQSkacrJneZItJcmU94r9UuW4bvi+mboUVpVqtokAVxQ33rPdC75nWVlT2laZ9x5lEUTGOKrs861MpiT7tltYroEWUpqaxSqLpCdMCM6NIe7ayKzZgUsZtv3HqHpwhY9gLMZS1K0Rg4kj51AAF3Y7qsSBxxTJ9qCplpE2Fquu2O7wMs35l6F8LTGstonwce+3/IBbKTkudiYohiqiJwD
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2026 14:08:45.1877
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c2fcba5-8066-4a80-e7d3-08de7865379a
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A107.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPF376CF97B3
 
-On 3/2/26 12:34 PM, Thorsten Blum wrote:
-> In qce_aead_done(), the return variable 'ret' is no longer used - remove
-> it. And qce_aead_prepare_dst_buf() jumps directly to 'dst_tbl_free:' on
-> error and returns 'sg' - drop the useless 'ret' assignments.
+On 28-02-2026 14:10, Herbert Xu wrote:
+> On Fri, Feb 06, 2026 at 05:07:13PM +0530, T Pratham wrote:
+>>
+>> The DMA (at least UDMA in K3 SoCs) sends/receives all the mapped length.
+>> If I have the dst sg mapped with length (len + x) but write len in
+>> crypto hardware, the DMA gets stuck waiting for hardware to send the
+>> extra x len. Similar issue in reverse as well.
+>>
+>> Also, FWIW, I'm restoring the len in SG list correctly at the end.
 > 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  drivers/crypto/qce/aead.c | 12 +++---------
->  1 file changed, 3 insertions(+), 9 deletions(-)
+> If that's the case wouldn't it also break if the caller supplied
+> an SG list that's longer than req->cryptlen? There is no requirement
+> that the SG list must be exactly as long as req->cryptlen and it
+> can contain extra data at the end.
 > 
-> diff --git a/drivers/crypto/qce/aead.c b/drivers/crypto/qce/aead.c
-> index 97b56e92ea33..67a87a7d6abd 100644
-> --- a/drivers/crypto/qce/aead.c
-> +++ b/drivers/crypto/qce/aead.c
-> @@ -35,7 +35,6 @@ static void qce_aead_done(void *data)
->  	u32 status;
->  	unsigned int totallen;
->  	unsigned char tag[SHA256_DIGEST_SIZE] = {0};
-> -	int ret = 0;
->  
->  	diff_dst = (req->src != req->dst) ? true : false;
->  	dir_src = diff_dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL;
-> @@ -79,8 +78,7 @@ static void qce_aead_done(void *data)
->  	} else if (!IS_CCM(rctx->flags)) {
->  		totallen = req->cryptlen + req->assoclen - ctx->authsize;
->  		scatterwalk_map_and_copy(tag, req->src, totallen, ctx->authsize, 0);
-> -		ret = memcmp(result_buf->auth_iv, tag, ctx->authsize);
-> -		if (ret) {
-> +		if (memcmp(result_buf->auth_iv, tag, ctx->authsize)) {
->  			pr_err("Bad message error\n");
->  			error = -EBADMSG;
->  		}
-> @@ -144,16 +142,12 @@ qce_aead_prepare_dst_buf(struct aead_request *req)
->  
->  		sg = qce_sgtable_add(&rctx->dst_tbl, &rctx->adata_sg,
->  				     rctx->assoclen);
-> -		if (IS_ERR(sg)) {
-> -			ret = PTR_ERR(sg);
-> +		if (IS_ERR(sg))
->  			goto dst_tbl_free;
+> Perhaps you should use sg_split like sa2ul.
+> 
+> Thanks,
 
-This could be made much better with a DEFINE_FREE()
+Understood. Will update accordingly.
+Also, sent an updated series twice with other changes.
+Here, for reference, is the latest one:
+https://lore.kernel.org/all/20260226125441.3559664-1-t-pratham@ti.com/
 
-Konrad
+-- 
+Regards
+T Pratham <t-pratham@ti.com>
