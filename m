@@ -1,78 +1,69 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B093B3BEF;
-	Mon,  2 Mar 2026 12:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A442F36C9DD;
+	Mon,  2 Mar 2026 12:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772454379; cv=none; b=adVHoNy2eJUDQey+ojBDOJPS2yKGGmOOu7CYRl7MbQJPgPekHtwB+GD3Ty9YMOOTnvfcW4CfUGEuKLGK38eK1I/ECWp1ClxDjwBAX4dRtrU5q517NQ1uupBHGL7dOEiNMWxFDk5ItezjycYz52wAVD2sipbysVCSK3NwiHGmGNI=
+	t=1772454469; cv=none; b=UnIUsiKYs+XTgPOlBBKiK/J/rD1bPQEPvct3LGiukDZSDeAygeOkXEKeTxhnPQsjl8X780/+Um4UWyvb/DBR3OKmxDCpQW8i0eFiqWMo1lHt2IHqeYf5HVU28+3JtN/iWcvNJR/N/46weGMO6r/wA3JyMSA+zdyT/UHOoxuG2rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772454379; c=relaxed/simple;
-	bh=RVfsxgTlhH0JmZwUCJXcBzOXQy7zP4FBhDhUvUOB5Q0=;
+	s=arc-20240116; t=1772454469; c=relaxed/simple;
+	bh=1ckF6QdQkyCk2xZqDdMsVw1xiETxNXFsBBEulVknFrg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K1Mb23q07GCOY8/8oC+qbxHhmUyZ/mRxzH9S3bK7CKWlvZGFMaihPKOUbLN0rJ/+b0d31oHQcOGGvMI3+lC2aTwWuMc+ph6E3oqxC7zB9o/YQao6HI9wDCD6wSiY97OE98W6C6pfbj3cTJfxndu0J+bLWap+/HgUwndFqXTRcj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=eoDZElef; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=eGurImul8iaAvyRXJVYcHKKcizGRxagywWD1+t3akHeCCxGL/DQzADqYKwqJ2o7bW5s9awEgdiA7X9aXq40IoL2Q4CJpSSjRtMR/BG3uC3Z9GjyLVrLjf+wYy6yYCgPlsKDawAM6c2B/W55XE0wa8gK5z6wyDlJ0ZVATVllMW74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=aNDXOFMt; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="eoDZElef"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="aNDXOFMt"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=JCf2dHrA2iWaWPU4fEd7CeTt13nQg+INWuJr+P4W4uI=; 
-	b=eoDZElefMPXMBIePXRIfKIQ9jcsmjhxJ9LWnQTStlFADXeN6Wx8bdgo+ZM8qZAM+rdVlHH022ZU
-	zd3bSY/OzrIJTkJLjTDj6BTY53/dTN2F+lgOriCL11JphXcw8icOQIes1NYRCZeytVDuEzyLwwYyN
-	CUHcDKXCdVINHSU8cu3mQ3kN/bT63bW7/IJ0XzJK2GEwWMYyc0Z4mmrcjvpIJ7eLkWhFmEqo5NIJJ
-	687AvelxyBjMaXUEOy/x4sDWwJgENYV0EM4gp1eTkY88brI5rBGfqtvpu6IrnUXmT0FUHYsFvnPCV
-	Unx3MU/wtXcX876zbvQxZS7opeKIigVVqQPw==;
+	from:content-type:reply-to; bh=XNdAL0oi2itesvkRrR2aHWdmQUgtRHss82mYI7NB3+s=; 
+	b=aNDXOFMtVxX7EEtMULIBEj8WRGHAKEHyIkTfvitD2ZbTRfpIhtF9kNOk5BRxWlWpWsRMHLx1UM+
+	1ae/qxlbkh/x2j2Df+7hfq4dZ4Q2jYI8IGll7QQL3kWhNWFIoM2R+b3yqB93dDcqHH1bzfzVmr0k7
+	eX2zP+rhYwOpXWx/zIccfJbc0H9NRrADQ1O11h3FEHA6xII/nsEfObUOEfYWKC1Yi/griTfNr22RB
+	iooksmQyMgeED+X0X3XBrmLZu7yflkyQIk5TIBbotb8HbOqwEr0tj8DdzjlqBl1f8govH66Xnr5e+
+	UuvmnR7R9wzHIMn2TlHA0MFqmVKxuOCuuNNw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vx2Ld-00AlE0-10;
-	Mon, 02 Mar 2026 20:26:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 02 Mar 2026 21:26:05 +0900
-Date: Mon, 2 Mar 2026 21:26:05 +0900
+	id 1vx2NA-00AlHc-36;
+	Mon, 02 Mar 2026 20:27:42 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 02 Mar 2026 21:27:40 +0900
+Date: Mon, 2 Mar 2026 21:27:40 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Joachim Vandersmissen <git@jvdsn.com>
-Cc: Jeff Barnes <jeffbarnes@linux.microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jeff Barnes <jeffbarnes@microsoft.com>
-Subject: Re: [PATCH] crypto: aead: add service indicator flag for RFC4106
- AES-GCM
-Message-ID: <aaWB3RkW4AeJ-c9z@gondor.apana.org.au>
-References: <20260129-fips-gcm-clean-v1-v1-1-43e17dc20a1a@microsoft.com>
- <aXw9Wj19ZX6dpNHW@gondor.apana.org.au>
- <ce1d34d9-23f9-4d1e-b790-6af75d1555ed@linux.microsoft.com>
- <aaKtujHwV0zDFWxi@gondor.apana.org.au>
- <a73a2556-3fa3-45fc-bf06-a62e8367e953@jvdsn.com>
+To: Ethan Tidmore <ethantidmore06@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Keerthy <j-keerthy@ti.com>,
+	Tero Kristo <t-kristo@ti.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: sa2ul: add missing IS_ERR checks
+Message-ID: <aaWCPBaiv1QZpZ6n@gondor.apana.org.au>
+References: <20260216231609.38021-1-ethantidmore06@gmail.com>
+ <aaJjsnV8rGLpxha_@gondor.apana.org.au>
+ <DGRTCXXMP7OJ.ZETCDPV2WZN4@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a73a2556-3fa3-45fc-bf06-a62e8367e953@jvdsn.com>
+In-Reply-To: <DGRTCXXMP7OJ.ZETCDPV2WZN4@gmail.com>
 
-On Sun, Mar 01, 2026 at 02:41:28PM -0600, Joachim Vandersmissen wrote:
+On Sun, Mar 01, 2026 at 04:53:50PM -0600, Ethan Tidmore wrote:
 >
-> However, Cryptographic Module Validation Program has also recently made it
-> clear that xxhash64 cannot be FIPS approved the way it is currently
-> implemented in the kernel. Even though the designers of xxhash publicly
-> state that it is a non-cryptographic hash, the kernel offers it as part of
-> the shash interface, the same interface as the approved algorithms. The
-> interface / API also has "crypto" in the name, which according to CMVP
-> implies security. CMVP feels that there could be confusion with the approved
-> hash algorithms, so there needs to be some indication that xxhash64 is not
-> FIPS approved. I think blocking xxhash64 in FIPS mode would break btrfs,
-> where it is used for checksumming.
+> Since this is a callback I'm not sure how to propagate the error. Nor am
+> I aware of the specific teardown required for this driver. I'll just
+> drop this patch for now, hopefully I was able to draw your attention to
+> this possible issue
 
-xxhash64 should be converted to lib/crypto and removed from the
-Crypto API.
+You can pass the error up by giving it as the second argument to the
+callback function.
 
-Thanks,
+In any case, thanks for reporting this bug.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
