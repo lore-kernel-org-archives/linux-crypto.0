@@ -1,98 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F794350A22;
-	Mon,  2 Mar 2026 23:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE04F349B16;
+	Mon,  2 Mar 2026 23:53:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772495381; cv=none; b=uf82yIm0HukIoKtrbg/GpBtUMiDRlvMwATkOij9GPtEQMArxtg2aT+qQmId5nk6fUteqqHL6upMJuxDscMxCbAelaAM+EWbXIX6hGo0Scqbwg6MmGPajSfxLwC9+J8JeFExpNZNZ2chsUmvTrW7eQmFF3G+PZC7Jex5aeZbORMY=
+	t=1772495601; cv=none; b=fXYw1cWuCBgLAYsKpE7HEM+NdernHE49B+ZRxYog3kxZ7iuI3NzfVj5sDJ7TBVR1aDoaFzub3pRIYJieSVbUsGHJY1c4FweGdtA3tA+idP774rI6s9A4xdDYDdvwRpa4JGFNIAc6F6A8SJpmyJW7UsOFS2GHPMSYte7DuzjA20g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772495381; c=relaxed/simple;
-	bh=lVckU9fV0K96txaKWynH+hEQtPyhAQIPx0S58PLEBsw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rL9V4qd9361hgGzrD2YlEM74SNU+OvPvhig4uSDU/49mar8oVcBqdBVp8V1T3BYjwxqECeo2P2mDSRzZbJfy7DCAi/fp+MWA5F80NYNmGlTz4zPMjvshigsmbUIPpdZo4nMXFNV7hlCvTmgNmA/hFfP2awsX7AxDjhImCoU3BGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ezsHrkR7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772495601; c=relaxed/simple;
+	bh=44cMeGZr/l5eYry48qvh4fYrPN4/ezc2BGolvQEwZcg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DpEdqqT9PO86DXvOXgo7x8KS91sZ3KNsTyijljzKmFcFbkgMSme9Qv4y6bsN+c55oQLxv36887XJQ0G8lMZwDDi9KqUFCu0fsjCCggCEHllghxi2xyQUNuJ7+4qba+Kr9ZcpfAq+0alxo4C8iMLMp6dT4/4q8hsdzigIWcaCK3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NOD83Aq9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ezsHrkR7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06BACC19423;
-	Mon,  2 Mar 2026 23:49:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NOD83Aq9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECB98C19423;
+	Mon,  2 Mar 2026 23:53:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772495380;
-	bh=lVckU9fV0K96txaKWynH+hEQtPyhAQIPx0S58PLEBsw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ezsHrkR7SJ5/AB/1JwP0CQxXesQpVctWyV03GlXdVn3VILq3dwQM0k77yJpo/p48V
-	 OGxc3IOnzoNWLvMwS4EPMMe04uWPVmt0CwMe/eZVRvyfgr8fqhOUGhD7niJ2vli5TX
-	 reSO0kn0Y4H07Wzh2RuUXxtBRGkV8fj4ctcLbsDpoO8n6im06iM26bpAHruhudwDcw
-	 MopyUEJ05Bk2F/cyCfBEfmn2K5IbRWa1MIxPVHP/g7xlOq+LqFtSZYRxN8+r5tGnYl
-	 AyMMqf7CFwTMo9HI7k4ZfaIP0eEgSWfYxNUrT1H4UvIz0+jUStMyVmKc9MJeZNf32q
-	 CLbgP6ZLnsN2g==
+	s=k20201202; t=1772495601;
+	bh=44cMeGZr/l5eYry48qvh4fYrPN4/ezc2BGolvQEwZcg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NOD83Aq93vDhuSJZC6nInxhLwfcgbL1UQJR7sGFh7xp8XQFbyiN4RNNlhWX3PffNO
+	 s1W8+SJksbF8P/9tteHUOkLR8syoaongW5t7IFwOu4bWAlS8G8YL4eIFKKS5G9somd
+	 3eYp9zNhudI3RUjvasFNKuy7Nm4ygXLH6KKBs0+7VHhqEE2guVQrXZO9cH+IiRjPyY
+	 CyeOLmjGZm9IE6Bj3qFNeSgFfAVCK7ADrP9Nr6I6ypMyjERKzoEtXttAYOepNwbzFF
+	 Y48Kfv7x1MNIt+6BJNsivtW0YRDvrSEP/LLRNYcOABEyYh+oxqE0wA9acepL7BjAnq
+	 gFgt3cfiAqgcw==
+Date: Mon, 2 Mar 2026 15:53:13 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH] crypto: testmgr - Fix stale references to aes-generic
-Date: Mon,  2 Mar 2026 15:48:56 -0800
-Message-ID: <20260302234856.30569-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.53.0
+To: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: testmgr - Add test vectors for
+ authenc(hmac(md5),cbc(des))
+Message-ID: <20260302235313.GD20209@quark>
+References: <20260207145113.375192-1-olek2@wp.pl>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260207145113.375192-1-olek2@wp.pl>
 
-Due to commit a2484474272e ("crypto: aes - Replace aes-generic with
-wrapper around lib"), the "aes-generic" driver name has been replaced
-with "aes-lib".  Update a couple testmgr entries that were added
-concurrently with this change.
+On Sat, Feb 07, 2026 at 03:51:03PM +0100, Aleksander Jan Bajkowski wrote:
+> Test vector was generated using a software implementation and then double
+> checked on Mediatek MT7981 (safexcel) and NXP P2020 (talitos). Both
+> platforms pass self-tests.
 
-Fixes: a22d48cbe558 ("crypto: testmgr - Add test vectors for authenc(hmac(sha224),cbc(aes))")
-Fixes: 030218dedee2 ("crypto: testmgr - Add test vectors for authenc(hmac(sha384),cbc(aes))")
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
+It would be better to just remove the support for these obsolete
+algorithms from the drivers that support them.
 
-This patch is targeting libcrypto-fixes for v7.0
-
- crypto/testmgr.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 49b607f65f636..4985411dedaec 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4130,11 +4130,11 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.alg = "authenc(hmac(sha1),rfc3686(ctr(aes)))",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
- 	}, {
- 		.alg = "authenc(hmac(sha224),cbc(aes))",
--		.generic_driver = "authenc(hmac-sha224-lib,cbc(aes-generic))",
-+		.generic_driver = "authenc(hmac-sha224-lib,cbc(aes-lib))",
- 		.test = alg_test_aead,
- 		.suite = {
- 			.aead = __VECS(hmac_sha224_aes_cbc_tv_temp)
- 		}
- 	}, {
-@@ -4192,11 +4192,11 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.alg = "authenc(hmac(sha256),rfc3686(ctr(aes)))",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
- 	}, {
- 		.alg = "authenc(hmac(sha384),cbc(aes))",
--		.generic_driver = "authenc(hmac-sha384-lib,cbc(aes-generic))",
-+		.generic_driver = "authenc(hmac-sha384-lib,cbc(aes-lib))",
- 		.test = alg_test_aead,
- 		.suite = {
- 			.aead = __VECS(hmac_sha384_aes_cbc_tv_temp)
- 		}
- 	}, {
-
-base-commit: f33ac74f9cc1cdadd3921246832b2084a5dec53a
--- 
-2.53.0
-
+- Eric
