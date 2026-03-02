@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94AAC394465;
-	Mon,  2 Mar 2026 08:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31622395D97;
+	Mon,  2 Mar 2026 08:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772438486; cv=none; b=f7eJs7h1z6MpUfwxym0le7hbpob8TEQ3LV35E5iK2kJEzBQmEqVy2I38wvgeZY6ezRmcghOgctEh6DfTN+/ikchwGlRrRk3Pg7RZkFco5th0BYiMDg9YcU37QuNHbPubie0X90pOxmpHCwRsXexEeCYTIgyi9MSyzV+I64jLt4s=
+	t=1772438487; cv=none; b=ACUhYACS7fyoD0kA7fHhAULAMv2b4KoAvnO7HDuhbsYISCCN+S/T2lvMLu566iDYNWzhV+EzpV31fhl9tZiNSla0pyuEhebnaEjN8aDPEOSdaGakFY3WMuYC72DE2/Bhv0TsSRBpcpRrnBDs+M5QE/IIV0t8TrNNZTWMcD32WNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772438486; c=relaxed/simple;
-	bh=o0SzMwmhs68jxLgExtyOWQABbfkTZFlkpk/nVETOC1s=;
+	s=arc-20240116; t=1772438487; c=relaxed/simple;
+	bh=CY5S+8Xe7LGX85M7lE2YZMKcd7EzAIMtR79Jhigxnp0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fqmlAHcUnoVIk2n0nBwhZ/YQAhde9qisXgGSejYPfrsY+629nrgJbBvg/YIl3wBmDc/8SmA8/cH+ktz1GdDjthY6nTXr389jj2Jh2h6ZWc/9AP7PSuO0sJ+/CZ5OYgiZVIp6FWZmXv94EnW+z0sqVCIswFSv0h0DFA16+jbyebI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VJs4g56J; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=tMrnhkrsKZaYzRd5ZMtDeLBhP1PIAcXL4QDZ3HvwYd5Q0nvsPZGJuyc6ef3Iaujxnsb7v+NewuHsLDYMveKHAb6vWSu7xoLecsrS+LFm9l9nP3FkRDn6mUNFulcZ1kVnN4QieNRAWEXa7ucOaj1cCfxT0OZO5tpT2cEaFtfZEQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ORYfLTF7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VJs4g56J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09B08C2BCAF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ORYfLTF7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AE82C2BC87;
 	Mon,  2 Mar 2026 08:01:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1772438486;
-	bh=o0SzMwmhs68jxLgExtyOWQABbfkTZFlkpk/nVETOC1s=;
+	bh=CY5S+8Xe7LGX85M7lE2YZMKcd7EzAIMtR79Jhigxnp0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VJs4g56JqYSP4oPFx4omBiRs5/Ajd5OQCvW8QBQNR+1AwfsZCTNdUuWlZCqYM/UaK
-	 qGZbE76KFXo3uojwPmPIUFFAuEDN5RRpbcYCB4mxDxWXVnZKstCImKAeNHt13CLzQC
-	 5ik5y2OyyQ1+4hhF7FfSdwoq3Ubfw7B1mZZGyqA/9B4Q4Sk7pQitfndYlXWMeTB4fD
-	 PgYb+yrGXmlXA/arKUAkh4PdQIPNQ7oFXHrTsxk/uhG8If0MjlQ2zHuaBzL6TxTKOD
-	 nQsn/jJHUCywq6T8P9Wzvqbb/d375S+5OBBBvNwkFtoqrPBZEWP3wKgkiF7BQJaWBH
-	 dk7BCMWV4niGQ==
+	b=ORYfLTF719UTIp1G3cyD39g/CaEAT66LC7vKpnjJiFKVJmdTVc5ebgSVgFFYTTYED
+	 LYyywuH955n5rnJAqjhbdz92VHuyFFxGuZ9Ny2HA5UBifnQ+i84cFEu8LZFbLh1WlK
+	 6ppUXi2xTpCfRKhJADa/5LDNi5GsR7xGjyWO/LsPyvVyhycBWaWqtfXRt6dv2/OUG6
+	 CG3e1HA+JDY2g2iCaQd26eghO8M7tiaI01DLJwISYqBmXwMyz3tTvQZl9m6cerOi/m
+	 r5BwA1fznJkWFrHLJJ761CgUsD6PR5BmTgMIVNXXPVEUSDoEwc5hLutozP6KxahDMc
+	 OLKKwO7PHgCkA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-nvme@lists.infradead.org,
 	Chaitanya Kulkarni <kch@nvidia.com>,
@@ -38,9 +38,9 @@ Cc: linux-crypto@vger.kernel.org,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 15/21] nvme-auth: host: remove allocation of crypto_shash
-Date: Sun,  1 Mar 2026 23:59:53 -0800
-Message-ID: <20260302075959.338638-16-ebiggers@kernel.org>
+Subject: [PATCH 16/21] nvme-auth: target: remove obsolete crypto_has_shash() checks
+Date: Sun,  1 Mar 2026 23:59:54 -0800
+Message-ID: <20260302075959.338638-17-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260302075959.338638-1-ebiggers@kernel.org>
 References: <20260302075959.338638-1-ebiggers@kernel.org>
@@ -52,101 +52,105 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that the crypto_shash that is being allocated in
-nvme_auth_process_dhchap_challenge() and stored in the
-struct nvme_dhchap_queue_context is no longer used, remove it.
+Since nvme-auth is now doing its HMAC computations using the crypto
+library, it's guaranteed that all the algorithms actually work.
+Therefore, remove the crypto_has_shash() checks which are now obsolete.
+
+However, the caller in nvmet_auth_negotiate() seems to have also been
+relying on crypto_has_shash(nvme_auth_hmac_name(host_hmac_id)) to
+validate the host_hmac_id.  Therefore, make it validate the ID more
+directly by checking whether nvme_auth_hmac_hash_len() returns 0 or not.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- drivers/nvme/host/auth.c | 29 ++---------------------------
- 1 file changed, 2 insertions(+), 27 deletions(-)
+ drivers/nvme/target/auth.c             | 9 ---------
+ drivers/nvme/target/configfs.c         | 3 ---
+ drivers/nvme/target/fabrics-cmd-auth.c | 4 +---
+ 3 files changed, 1 insertion(+), 15 deletions(-)
 
-diff --git a/drivers/nvme/host/auth.c b/drivers/nvme/host/auth.c
-index 2f27f550a7442..c8cd633cb0eae 100644
---- a/drivers/nvme/host/auth.c
-+++ b/drivers/nvme/host/auth.c
-@@ -5,11 +5,10 @@
- 
- #include <linux/crc32.h>
- #include <linux/base64.h>
- #include <linux/prandom.h>
- #include <linux/unaligned.h>
--#include <crypto/hash.h>
- #include <crypto/dh.h>
- #include "nvme.h"
- #include "fabrics.h"
- #include <linux/nvme-auth.h>
- #include <linux/nvme-keyring.h>
-@@ -20,11 +19,10 @@ static mempool_t *nvme_chap_buf_pool;
- 
- struct nvme_dhchap_queue_context {
- 	struct list_head entry;
- 	struct work_struct auth_work;
- 	struct nvme_ctrl *ctrl;
--	struct crypto_shash *shash_tfm;
- 	struct crypto_kpp *dh_tfm;
- 	struct nvme_dhchap_key *transformed_key;
- 	void *buf;
- 	int qid;
- 	int error;
-@@ -181,42 +179,21 @@ static int nvme_auth_process_dhchap_challenge(struct nvme_ctrl *ctrl,
- 			 chap->qid, data->hashid);
- 		chap->status = NVME_AUTH_DHCHAP_FAILURE_HASH_UNUSABLE;
- 		return -EPROTO;
+diff --git a/drivers/nvme/target/auth.c b/drivers/nvme/target/auth.c
+index f483e1fd48acc..08c1783d70fc4 100644
+--- a/drivers/nvme/target/auth.c
++++ b/drivers/nvme/target/auth.c
+@@ -43,19 +43,10 @@ int nvmet_auth_set_key(struct nvmet_host *host, const char *secret,
+ 	if (key_hash > 3) {
+ 		pr_warn("Invalid DH-HMAC-CHAP hash id %d\n",
+ 			 key_hash);
+ 		return -EINVAL;
  	}
- 
--	if (chap->hash_id == data->hashid && chap->shash_tfm &&
--	    !strcmp(crypto_shash_alg_name(chap->shash_tfm), hmac_name) &&
--	    crypto_shash_digestsize(chap->shash_tfm) == data->hl) {
-+	if (chap->hash_id == data->hashid && chap->hash_len == data->hl) {
- 		dev_dbg(ctrl->device,
- 			"qid %d: reuse existing hash %s\n",
- 			chap->qid, hmac_name);
- 		goto select_kpp;
- 	}
- 
--	/* Reset if hash cannot be reused */
--	if (chap->shash_tfm) {
--		crypto_free_shash(chap->shash_tfm);
--		chap->hash_id = 0;
--		chap->hash_len = 0;
--	}
--	chap->shash_tfm = crypto_alloc_shash(hmac_name, 0,
--					     CRYPTO_ALG_ALLOCATES_MEMORY);
--	if (IS_ERR(chap->shash_tfm)) {
--		dev_warn(ctrl->device,
--			 "qid %d: failed to allocate hash %s, error %ld\n",
--			 chap->qid, hmac_name, PTR_ERR(chap->shash_tfm));
--		chap->shash_tfm = NULL;
--		chap->status = NVME_AUTH_DHCHAP_FAILURE_FAILED;
--		return -ENOMEM;
--	}
+-	if (key_hash > 0) {
+-		/* Validate selected hash algorithm */
+-		const char *hmac = nvme_auth_hmac_name(key_hash);
 -
--	if (crypto_shash_digestsize(chap->shash_tfm) != data->hl) {
-+	if (nvme_auth_hmac_hash_len(data->hashid) != data->hl) {
- 		dev_warn(ctrl->device,
- 			 "qid %d: invalid hash length %d\n",
- 			 chap->qid, data->hl);
--		crypto_free_shash(chap->shash_tfm);
--		chap->shash_tfm = NULL;
- 		chap->status = NVME_AUTH_DHCHAP_FAILURE_HASH_UNUSABLE;
- 		return -EPROTO;
- 	}
+-		if (!crypto_has_shash(hmac, 0, 0)) {
+-			pr_err("DH-HMAC-CHAP hash %s unsupported\n", hmac);
+-			return -ENOTSUPP;
+-		}
+-	}
+ 	dhchap_secret = kstrdup(secret, GFP_KERNEL);
+ 	if (!dhchap_secret)
+ 		return -ENOMEM;
+ 	down_write(&nvmet_config_sem);
+ 	if (set_ctrl) {
+diff --git a/drivers/nvme/target/configfs.c b/drivers/nvme/target/configfs.c
+index 3088e044dbcbb..463348c7f097b 100644
+--- a/drivers/nvme/target/configfs.c
++++ b/drivers/nvme/target/configfs.c
+@@ -15,11 +15,10 @@
+ #include <linux/pci-p2pdma.h>
+ #ifdef CONFIG_NVME_TARGET_AUTH
+ #include <linux/nvme-auth.h>
+ #endif
+ #include <linux/nvme-keyring.h>
+-#include <crypto/hash.h>
+ #include <crypto/kpp.h>
+ #include <linux/nospec.h>
  
- 	chap->hash_id = data->hashid;
-@@ -656,12 +633,10 @@ static void nvme_auth_reset_dhchap(struct nvme_dhchap_queue_context *chap)
+ #include "nvmet.h"
  
- static void nvme_auth_free_dhchap(struct nvme_dhchap_queue_context *chap)
- {
- 	nvme_auth_reset_dhchap(chap);
- 	chap->authenticated = false;
--	if (chap->shash_tfm)
--		crypto_free_shash(chap->shash_tfm);
- 	if (chap->dh_tfm)
- 		crypto_free_kpp(chap->dh_tfm);
+@@ -2179,12 +2178,10 @@ static ssize_t nvmet_host_dhchap_hash_store(struct config_item *item,
+ 	u8 hmac_id;
+ 
+ 	hmac_id = nvme_auth_hmac_id(page);
+ 	if (hmac_id == NVME_AUTH_HASH_INVALID)
+ 		return -EINVAL;
+-	if (!crypto_has_shash(nvme_auth_hmac_name(hmac_id), 0, 0))
+-		return -ENOTSUPP;
+ 	host->dhchap_hash_id = hmac_id;
+ 	return count;
  }
  
- void nvme_auth_revoke_tls_key(struct nvme_ctrl *ctrl)
+ CONFIGFS_ATTR(nvmet_host_, dhchap_hash);
+diff --git a/drivers/nvme/target/fabrics-cmd-auth.c b/drivers/nvme/target/fabrics-cmd-auth.c
+index 5946681cb0e32..b703e3bebae4e 100644
+--- a/drivers/nvme/target/fabrics-cmd-auth.c
++++ b/drivers/nvme/target/fabrics-cmd-auth.c
+@@ -6,11 +6,10 @@
+  */
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ #include <linux/blkdev.h>
+ #include <linux/random.h>
+ #include <linux/nvme-auth.h>
+-#include <crypto/hash.h>
+ #include <crypto/kpp.h>
+ #include "nvmet.h"
+ 
+ static void nvmet_auth_expired_work(struct work_struct *work)
+ {
+@@ -73,12 +72,11 @@ static u8 nvmet_auth_negotiate(struct nvmet_req *req, void *d)
+ 		return NVME_AUTH_DHCHAP_FAILURE_INCORRECT_PAYLOAD;
+ 
+ 	for (i = 0; i < data->auth_protocol[0].dhchap.halen; i++) {
+ 		u8 host_hmac_id = data->auth_protocol[0].dhchap.idlist[i];
+ 
+-		if (!fallback_hash_id &&
+-		    crypto_has_shash(nvme_auth_hmac_name(host_hmac_id), 0, 0))
++		if (!fallback_hash_id && nvme_auth_hmac_hash_len(host_hmac_id))
+ 			fallback_hash_id = host_hmac_id;
+ 		if (ctrl->shash_id != host_hmac_id)
+ 			continue;
+ 		hash_id = ctrl->shash_id;
+ 		break;
 -- 
 2.53.0
 
