@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FEF3E7146;
-	Mon,  2 Mar 2026 19:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99913EBF0B;
+	Mon,  2 Mar 2026 19:14:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772478889; cv=none; b=q/FNOmBL06itnF/ao2r/A15NADnlqDBAK9cllT9v2kJ2K7UAabFsD7Asoj7iHk4WrzTTg8scM9gpaQWyE1+1ej/ESeivdcyyHd/Ts49QCYUKBSmhHEC1K6kGdKZfAfNCXDkQhEfQcEBnmkdGTWRgdChNV9tQSPpfvnBTFJgz0uQ=
+	t=1772478891; cv=none; b=eAQyIIOPQWcO+L2hMtmtt1IvFTHUqO9EXJ2Ndf2WyjHvRfBueY3rpnehN04FrnVP72LT5PKudBHMmmR15vYxKHFzMg5t1znNDVziYT++vzyKkTqVcdobNgVkmrp770NgXpDwBVTazmpoXgbfz+NOYOSparxH/6qmNTQL8p7fdvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772478889; c=relaxed/simple;
-	bh=qAQttDEXuNN5uevUynuFwNEoZIIiao4qqyUzO8+IfTw=;
+	s=arc-20240116; t=1772478891; c=relaxed/simple;
+	bh=S7O9Pwkij2Awxqvl2IdvidJkvTEayDKdMv2IpZS7iJM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VkxkHgjwADDfhsa/Akv/F8PLiDml9L4pJ392pymqMY4wrbMAMGHDnRtNXYgzAU4Cl7Ssc1OF2u9/4nrtjnL1jyARNSqTtLZQfVhHKIxZBGxnDBxq8izKeLlnfjRkSBB+nelb5WsZJvyWSGQcbLtWrl+74llFYWFbmFEIIYaal/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BT74g3Av; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=g6mvYha9ZVBJbqWiSfKP555LcsWYyyVPZgnJ07h7QIZX16Z7VPIKIOgTDFPGXsn0cC5Fj7WEHK+TI2521TJPf+EJ7VCsR637WmSVNg3EB8HSMAdOqhXoJwFENC5e+Uqcin0bwjRDpIpbLpWCuYQ4CcLs5pW2vWcv6c9hz1ITtpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P8wneOhP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BT74g3Av"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DED95C19423;
-	Mon,  2 Mar 2026 19:14:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P8wneOhP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A0C6C19423;
+	Mon,  2 Mar 2026 19:14:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772478889;
-	bh=qAQttDEXuNN5uevUynuFwNEoZIIiao4qqyUzO8+IfTw=;
+	s=k20201202; t=1772478891;
+	bh=S7O9Pwkij2Awxqvl2IdvidJkvTEayDKdMv2IpZS7iJM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BT74g3AvvTBZdWue2nx3S10fGYbGqF7ZTO+PVZ3YMYF6yosRS8zrbCIyBQlIhojK4
-	 uDsDRp2uoAVmQC0BD/4/sZm2wvmsUKHIQ2LlLEG2sWdbOxL1CmvzirW64pDWVhakUt
-	 r05VXWDKaDNFh+GySBBlMcNKwSUQehv8CwrRDMwv9g1cIF8LGw33or3KJmfOHXplar
-	 RD6SrMGKdmMf5+d5HC6IP9gpJy8nfuZ9gZvzSUV5ae3H6IjtFpfvnvl5QHbQccweh9
-	 gyGu7fajujQOWlEP7Dj39C1Xm/xzohibTh3GZDIB2ByFTrxE4xSQV0YlcNjERDMi5j
-	 bkq1keD3IlxsA==
+	b=P8wneOhP+zXAuZCvpw9yuabiGrOyLiz9dBMW4cZ+pPFFC3g1eO5um/M7eDfN8k0nX
+	 v+9kx8TjQxnexlfcSeoY1wjHgywzuHGXYhg2QXS/AD0Fgwck9mqahHVvSGoJB46smR
+	 tMPcFv/LbG0Pmo9qB7atsSoN4ZbC33yjk50fdxflRzUb8K3Ys0hrUqP52lWdt+mXWz
+	 eovC/3H7BgYN4Q4HaF3xpkmUm06jOHIdfLgBHf0UyrxinmI0rrZiUTdhyJ67pMhjV/
+	 ph8l7g/quWv1dWl8RXx+6WFZ8T3/axHh6bF8BL3781idPvcxqNEW7zItS6SWodetB7
+	 fbtwMIxVt19Tw==
 From: Tycho Andersen <tycho@kernel.org>
 To: Thomas Gleixner <tglx@kernel.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -48,9 +48,9 @@ To: Thomas Gleixner <tglx@kernel.org>,
 	Sean Christopherson <seanjc@google.com>
 Cc: linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH 08/11] x86/snp: allow disabling MFDM
-Date: Mon,  2 Mar 2026 12:13:31 -0700
-Message-ID: <20260302191334.937981-9-tycho@kernel.org>
+Subject: [PATCH 09/11] x86/snp: create snp_x86_shutdown()
+Date: Mon,  2 Mar 2026 12:13:32 -0700
+Message-ID: <20260302191334.937981-10-tycho@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260302191334.937981-1-tycho@kernel.org>
 References: <20260302191334.937981-1-tycho@kernel.org>
@@ -64,51 +64,58 @@ Content-Transfer-Encoding: 8bit
 
 From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-The SNP x86 shutdown path needs to disable MFDM, since as the comment for
-k8_check_syscfg_dram_mod_en(), the "BIOS" is supposed clear it, or the
-kernel in the case of module unload and shutdown followed by kexec.
+After SNP_SHUTDOWN, two architecture-level things should be done:
 
-Change this helper to allow for disabling it.
+1. clear the RMP table
+2. disable MFDM to prevent the FW_WARN in k8_check_syscfg_dram_mod_en() in
+   the event of a kexec
+
+Create and export to the CCP driver a function that does them.
 
 Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 ---
- arch/x86/virt/svm/sev.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/sev.h | 2 ++
+ arch/x86/virt/svm/sev.c    | 7 +++++++
+ 2 files changed, 9 insertions(+)
 
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index 0bcd89d4fe90..36d2b1ea19c0 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -662,6 +662,7 @@ static inline void snp_leak_pages(u64 pfn, unsigned int pages)
+ 	__snp_leak_pages(pfn, pages, true);
+ }
+ void snp_prepare_for_snp_init(void);
++void snp_x86_shutdown(void);
+ #else
+ static inline bool snp_probe_rmptable_info(void) { return false; }
+ static inline int snp_rmptable_init(void) { return -ENOSYS; }
+@@ -679,6 +680,7 @@ static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
+ static inline void kdump_sev_callback(void) { }
+ static inline void snp_fixup_e820_tables(void) {}
+ static inline void snp_prepare_for_snp_init(void) {}
++static inline void snp_x86_shutdown(void) {}
+ #endif
+ 
+ #endif
 diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 53bc0c7f2c50..cf984b8f4493 100644
+index cf984b8f4493..0524fc77b44d 100644
 --- a/arch/x86/virt/svm/sev.c
 +++ b/arch/x86/virt/svm/sev.c
-@@ -132,7 +132,7 @@ static unsigned long snp_nr_leaked_pages;
- #undef pr_fmt
- #define pr_fmt(fmt)	"SEV-SNP: " fmt
- 
--static void mfd_enable(void *arg)
-+static void mfd_reconfigure(void *arg)
- {
- 	u64 val;
- 
-@@ -141,7 +141,10 @@ static void mfd_enable(void *arg)
- 
- 	rdmsrq(MSR_AMD64_SYSCFG, val);
- 
--	val |= MSR_AMD64_SYSCFG_MFDM;
-+	if (arg)
-+		val |= MSR_AMD64_SYSCFG_MFDM;
-+	else
-+		val &= ~MSR_AMD64_SYSCFG_MFDM;
- 
- 	wrmsrq(MSR_AMD64_SYSCFG, val);
+@@ -544,6 +544,13 @@ void snp_prepare_for_snp_init(void)
  }
-@@ -532,7 +535,7 @@ void snp_prepare_for_snp_init(void)
- 	 * MtrrFixDramModEn is not shared between threads on a core,
- 	 * therefore it must be set on all CPUs prior to enabling SNP.
- 	 */
--	on_each_cpu(mfd_enable, NULL, 1);
-+	on_each_cpu(mfd_reconfigure, (void *)1, 1);
+ EXPORT_SYMBOL_FOR_MODULES(snp_prepare_for_snp_init, "ccp");
  
- 	on_each_cpu(snp_enable, NULL, 1);
- 
++void snp_x86_shutdown(void)
++{
++	snp_clear_rmp();
++	on_each_cpu(mfd_reconfigure, 0, 1);
++}
++EXPORT_SYMBOL_FOR_MODULES(snp_x86_shutdown, "ccp");
++
+ /*
+  * Do the necessary preparations which are verified by the firmware as
+  * described in the SNP_INIT_EX firmware command description in the SNP
 -- 
 2.53.0
 
