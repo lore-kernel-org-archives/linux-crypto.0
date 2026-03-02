@@ -1,43 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E2333CE9A;
-	Mon,  2 Mar 2026 23:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59974282F01;
+	Mon,  2 Mar 2026 23:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772494730; cv=none; b=EHCtdsNxLVoh6tk+Mck5IynkPtvnhUxNqr9mXyFboNjfBd4x0iP+HSrIKlRjzx1E4YvtjX+ja7PudTImfUg8XGEKOWyHPhW6DcIDqRazqM/o0BTbamSUvCDfx2S8qhPy1Z0qj0kMdEqe1Ch4BNi0ZvGVh0SRSuvQXQO6yhqNyK4=
+	t=1772494914; cv=none; b=Ltxb+NJIabT8MiCbz+7V8mkVTfh1KhIveDeMOaC7yoXVJ9IXAIUmt8/UtS9TZwYQErhwOFub6d9NbB9j3wRYTcF4VrCaTb22R8FIc4YwvPmXBuJsVcCgwVGo1h8tXWcywFTkkDcFW0VTcjIrO5nXKR2rjVEsM52kxgNTRsPeCXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772494730; c=relaxed/simple;
-	bh=Ro8E+hc7C8VoOj49hQUQ7Xh0hyc7qH+SkExmWOVCP20=;
+	s=arc-20240116; t=1772494914; c=relaxed/simple;
+	bh=1LxuzaBs1KjEcjfNJq1K+KBvh1Y3reR7Da1++7iZ0do=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TKYocz/DeRcuaK+IeRScXNHv/rCl/C4AvEGTn/k00SC81ZaXGS2vAN4uq/XFj/HB+tHhXwYXcNGHuxtrbcly0AskNQrf9h6nyI6j+BRzBlP7pCiZVPwR/TWtVHb7hBDm7iVziogidqx+9nRHBs9Cn8q5wzgvSVvcfM9OzmyIzYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fIWjkNy+; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=nhiJ39ooJFTa+JXH67RJy5o7VLxgL7a1y1Mw+EHc+YFjOwh9oB6L1uJ0n1pQkudmHPfaKSSiUkSfQsc+o90ffer4a0xydk1wpp1gg9L/6UepG2Ap+4JzsiJHK8SgyiUx4K1Mh63gNrBtwfzKNPhliYiM/PTn9fhk3p36oDFUo8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PC0hpR+S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fIWjkNy+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBAFEC19423;
-	Mon,  2 Mar 2026 23:38:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PC0hpR+S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A02BC19423;
+	Mon,  2 Mar 2026 23:41:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772494729;
-	bh=Ro8E+hc7C8VoOj49hQUQ7Xh0hyc7qH+SkExmWOVCP20=;
+	s=k20201202; t=1772494913;
+	bh=1LxuzaBs1KjEcjfNJq1K+KBvh1Y3reR7Da1++7iZ0do=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fIWjkNy+yqugdWaP5zPilFg/TMa8BB92SSUp7guY3iPUOVf7NwVACzC9ozzXVGgWB
-	 YHSy9MuC+qCPQvBlhANzEhOTN9n50bD1CFRYfBNVdn9rouYi5KbOAjKKa3BSKkBKJC
-	 1OCF/VR2B+sVACGzHUOvH/Mn7/6HPCX9wDvAvRsL2WSVLqz9mtzMZdsPfi7UaXw5a/
-	 grq3C15+uU/jIhWy3jUUabAUID0OSvZX9YfY6cD5Ets96Oe14eOHxqv/Ava8uZ6/Zm
-	 KKCoGYbxZ+1zwaD2zU2lyyTkCj/Ryrk/4CAqRXv9L+O8VkLkB5z9EHdMdbPevQ3Puv
-	 IUSDZXdYUoaIA==
-Date: Mon, 2 Mar 2026 15:38:46 -0800
+	b=PC0hpR+Sg7ncrBtFqmRdtF0WNYo5MufvJ3kkUxuAMy897roCo1zW7EoMGPNzgSfVd
+	 kItTk3iZQI3N59JnPRwQlgt5nrK2RJwCp6pGFLtI5PuK869ZU2hbf6UxfDGKRwQV8W
+	 0b5zTQEJutAuBEblgNQxHpU/RqPSQn5mLCTt1ThBz1f/2AV3wl+wD/KqD1xWbGv5A2
+	 jjfMz6vBxORfC45PyGlQe/rjFRDuGGXg7cZRZCp2vjFNcep2egIS05sTEmNyzgK8/Y
+	 hv67uPCyBF5/Yv9aniqt4+9sCFsou/O+GE2GZqn5mWipcEj8z2zAQINY+rRfljX+u/
+	 fq4Im+JLMRsBA==
+Date: Mon, 2 Mar 2026 15:41:49 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	kunit-dev@googlegroups.com,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <raemoar63@gmail.com>
-Subject: Re: [PATCH] lib/crypto: tests: Add a .kunitconfig file
-Message-ID: <20260302233846.GA20209@quark>
-References: <20260301040140.490310-1-ebiggers@kernel.org>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/5] crypto: Drop stale usages in various help texts
+Message-ID: <20260302234149.GB20209@quark>
+References: <cover.1772116160.git.geert+renesas@glider.be>
+ <20260226195440.GH2251@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,29 +44,41 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260301040140.490310-1-ebiggers@kernel.org>
+In-Reply-To: <20260226195440.GH2251@sol>
 
-On Sat, Feb 28, 2026 at 08:01:40PM -0800, Eric Biggers wrote:
-> Add a .kunitconfig file to the lib/crypto/ directory so that the crypto
-> library tests can be run more easily using kunit.py.  Example with UML:
+On Thu, Feb 26, 2026 at 11:54:40AM -0800, Eric Biggers wrote:
+> On Thu, Feb 26, 2026 at 03:46:04PM +0100, Geert Uytterhoeven wrote:
+> > 	Hi all,
+> > 
+> > This patch series drops stale references to subsystems that are using
+> > various crypto algoritms.  It was triggered by "make oldconfig" in
+> > v7.0-rc1 showing new prompts about BLAKE2b, SHA-256, xxHash, and CRC32c
+> > algorithms.  When querying these symbols, the corresponding help texts
+> > incorrectly claim they are used by btrfs.
+> > 
+> > Notw that even if correct, there is no need for such references, as all
+> > users should select the needed symbols anyway.
+> > 
+> > Geert Uytterhoeven (5):
+> >   crypto: Drop stale CRYPTO_BLAKE2B usage
+> >   crypto: Drop stale CRYPTO_SHA256 usage
+> >   crypto: Drop stale CRYPTO_XXHASH usage
+> >   crypto: Drop stale CRYPTO_CRC32C usage
+> >   crypto: Drop stale CRYPTO_CRC32 usage
+> > 
+> >  crypto/Kconfig | 9 ---------
+> >  1 file changed, 9 deletions(-)
 > 
->     tools/testing/kunit/kunit.py run --kunitconfig=lib/crypto
+> Thanks for cleaning this up!
 > 
-> Example with QEMU:
-> 
->     tools/testing/kunit/kunit.py run --kunitconfig=lib/crypto --arch=arm64 --make_options LLVM=1
-> 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
-> 
-> This is targeting libcrypto-fixes
-> 
->  lib/crypto/.kunitconfig | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
->  create mode 100644 lib/crypto/.kunitconfig
-> 
+> If there are no objections I'd like take these through libcrypto-fixes,
+> given that they are related to the library conversions.
 
-Applied to
-https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
+
+I adjusted the commit titles to make it clear that the changes are to
+the help text, not e.g. to selections of the symbols.
+
+    crypto: Clean up help text for CRYPTO_CRC32
 
 - Eric
