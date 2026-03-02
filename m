@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E2032E137;
-	Mon,  2 Mar 2026 08:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45928389E0C;
+	Mon,  2 Mar 2026 08:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772438480; cv=none; b=q5dao75qA6KVO+u90wWoLO2iw9JpIjmWrsvmIj1UijTrF0wF2YyWH+0LkQL/9Bq45OhOxE/ytWawsX5rOXd9vqZTxnmX80p8DD5VA9TjfQWLoMOpKKoasvYhpU7Lh20bpap2zQ7rcVdAM/D02QAmmZ2b6gmri31vCCpyxRUu1OY=
+	t=1772438480; cv=none; b=IGKKwbOgmjgjnIPIAimv4Cx0jrOJi5/BNLkMi06DrLTNfO/tnyE0FIQgmp+4UZ3d2YG4rKGC5WGVdhuNb2jp255xdb+6ZzCOp9gXfIrAyHw0ywqNOGyNvhw0ltdcaTZ+SvON7uaXCzLPQNhkmsgPOjtV5mz+XWz7SdxDEaBWM5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772438480; c=relaxed/simple;
-	bh=harymnB7hCX/JjGHppJgWSHiwMixCAs5CzazQ0NoDZU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rw09D0yCCXPxymozrsIMvPdfGD8WW0P1WVyE9XvLx9N/64w1GDOikgMr/5PF00JjAP5HukdNfkl9i0ryLvGJulD6R/im1bo4G3e6wFvsPRRcrv2qb9y4mAh/eRW3byOzZ9CbpzmuSxooemezBaodbRAJKLSCFwhFtd8Y4S69DfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRgASHfd; arc=none smtp.client-ip=10.30.226.201
+	bh=xQ5RtD94C3LBzXx6yIdHXsl3lt/lINUQ+CN4ouJkUEA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=N2qnOdEcUSjWP+tjyWUIheuu91vLwvMg9do7AGkzbfYHa0SHlDCXkzYaZH0nZlUG8pcacTPf421vF4PVH+v4ywA3sYWb8SpwCeTkVMHh15vo+f1LULDN7yW2wTU8C4n9UZIpperFy2w6ca4L726Ckzf4AvrK0Xk9h7hN+OcJUW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOI8/EPz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRgASHfd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33EF9C2BCAF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOI8/EPz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD821C4AF09;
 	Mon,  2 Mar 2026 08:01:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772438479;
-	bh=harymnB7hCX/JjGHppJgWSHiwMixCAs5CzazQ0NoDZU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=SRgASHfdbLnhF9xMKATAZFw1YLttrhvaHwDhCnn+CTUqgRHBxPiwKi97jZ6v6hnvF
-	 hLgIEjo1xHoNtP12rQgHF9NzlxUkKt92IAeOtcuKfet3BBLT65Am2Q3ourzptXzTkm
-	 lMfAkPd/RxjX3BIhsuFOTS/05gvmPcY1MYUpGYKfVUBeV3NYEcN5f3QdssHFE9mLBY
-	 zFGD9e2OEBWLzHAzvyrIZFwAH2MhFRgnzMDKbFL5F41PhQwxCqMc5oDBbvH98r6Jf3
-	 shdw0AFx9q+OYb6KtvDJ5e8wP7DNyAwbAH9qGnpIyFHtkvNK74oic+5gixllz3tDcg
-	 xYOmG4gfa/pLg==
+	s=k20201202; t=1772438480;
+	bh=xQ5RtD94C3LBzXx6yIdHXsl3lt/lINUQ+CN4ouJkUEA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=IOI8/EPzmL6q6C262MSNJOTpavVZ7BbeYmZTnf0E5xzXcOevrwwCwO2/xB2j5nDPn
+	 Ebg6zddVEZ/DcQB0k4soRK4v7FuBRPPyL74+cf+iQy9hTw1lWTSZu6/U7FKOycgLN3
+	 hhiOcOa0gYmgRDC+IryfI4ULSa918wNK8uiivOp7E4AW6LPFLQoW+wqKSUQ4QzJ996
+	 XfMykgBIFQwTeeE0Py60XXxaLpxThXpS2YniuTM31Ix8D8+6cK8qIdFWDhkqfYenIE
+	 bMxvKg1sHGTuUPUl0mMeh5U2E+IBBH5K9dxZOrfO2Gatq8zFM8ts1GeQiUdU7+2On7
+	 Et1qcp4m/AK3Q==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-nvme@lists.infradead.org,
 	Chaitanya Kulkarni <kch@nvidia.com>,
@@ -37,10 +38,12 @@ Cc: linux-crypto@vger.kernel.org,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 00/21] nvme-auth: use crypto library for HMAC and hashing
-Date: Sun,  1 Mar 2026 23:59:38 -0800
-Message-ID: <20260302075959.338638-1-ebiggers@kernel.org>
+Subject: [PATCH 01/21] nvme-auth: add NVME_AUTH_MAX_DIGEST_SIZE constant
+Date: Sun,  1 Mar 2026 23:59:39 -0800
+Message-ID: <20260302075959.338638-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260302075959.338638-1-ebiggers@kernel.org>
+References: <20260302075959.338638-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,76 +52,100 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series converts the implementation of NVMe in-band authentication
-to use the crypto library instead of crypto_shash for HMAC and hashing.
+Define a NVME_AUTH_MAX_DIGEST_SIZE constant and use it in the
+appropriate places.
 
-The result is simpler, faster, and more reliable.  Notably, it
-eliminates a lot of dynamic memory allocations, indirect calls, lookups
-in crypto_alg_list, and other API overhead.  It also uses the library's
-support for initializing HMAC contexts directly from a raw key, which is
-an optimization not accessible via crypto_shash.  Finally, a lot of the
-error handling code goes away, since the library functions just always
-succeed and return void.
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ drivers/nvme/common/auth.c | 6 ++----
+ drivers/nvme/host/auth.c   | 6 +++---
+ include/linux/nvme.h       | 5 +++++
+ 3 files changed, 10 insertions(+), 7 deletions(-)
 
-The last patch removes crypto/hkdf.c, as it's no longer needed.
-
-This series applies to v7.0-rc1 and is targeting the nvme tree.
-
-I've tested the TLS key derivation using the KUnit test suite added in
-this series.  I don't know how to test the other parts, but it all
-should behave the same as before.
-
-Eric Biggers (21):
-  nvme-auth: add NVME_AUTH_MAX_DIGEST_SIZE constant
-  nvme-auth: common: constify static data
-  nvme-auth: use proper argument types
-  nvme-auth: common: add KUnit tests for TLS key derivation
-  nvme-auth: rename nvme_auth_generate_key() to nvme_auth_parse_key()
-  nvme-auth: common: explicitly verify psk_len == hash_len
-  nvme-auth: common: add HMAC helper functions
-  nvme-auth: common: use crypto library in nvme_auth_transform_key()
-  nvme-auth: common: use crypto library in
-    nvme_auth_augmented_challenge()
-  nvme-auth: common: use crypto library in nvme_auth_generate_psk()
-  nvme-auth: common: use crypto library in nvme_auth_generate_digest()
-  nvme-auth: common: use crypto library in nvme_auth_derive_tls_psk()
-  nvme-auth: host: use crypto library in
-    nvme_auth_dhchap_setup_host_response()
-  nvme-auth: host: use crypto library in
-    nvme_auth_dhchap_setup_ctrl_response()
-  nvme-auth: host: remove allocation of crypto_shash
-  nvme-auth: target: remove obsolete crypto_has_shash() checks
-  nvme-auth: target: use crypto library in nvmet_auth_host_hash()
-  nvme-auth: target: use crypto library in nvmet_auth_ctrl_hash()
-  nvme-auth: common: remove nvme_auth_digest_name()
-  nvme-auth: common: remove selections of no-longer used crypto modules
-  crypto: remove HKDF library
-
- crypto/Kconfig                         |   6 -
- crypto/Makefile                        |   1 -
- crypto/hkdf.c                          | 573 ------------------------
- drivers/nvme/common/.kunitconfig       |   6 +
- drivers/nvme/common/Kconfig            |  14 +-
- drivers/nvme/common/Makefile           |   2 +
- drivers/nvme/common/auth.c             | 587 ++++++++++---------------
- drivers/nvme/common/tests/auth_kunit.c | 175 ++++++++
- drivers/nvme/host/auth.c               | 160 +++----
- drivers/nvme/host/sysfs.c              |   4 +-
- drivers/nvme/target/auth.c             | 198 +++------
- drivers/nvme/target/configfs.c         |   3 -
- drivers/nvme/target/fabrics-cmd-auth.c |   4 +-
- drivers/nvme/target/nvmet.h            |   2 +-
- include/crypto/hkdf.h                  |  20 -
- include/linux/nvme-auth.h              |  41 +-
- include/linux/nvme.h                   |   5 +
- 17 files changed, 571 insertions(+), 1230 deletions(-)
- delete mode 100644 crypto/hkdf.c
- create mode 100644 drivers/nvme/common/.kunitconfig
- create mode 100644 drivers/nvme/common/tests/auth_kunit.c
- delete mode 100644 include/crypto/hkdf.h
-
-
-base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+diff --git a/drivers/nvme/common/auth.c b/drivers/nvme/common/auth.c
+index e07e7d4bf8b68..78d751481fe31 100644
+--- a/drivers/nvme/common/auth.c
++++ b/drivers/nvme/common/auth.c
+@@ -13,12 +13,10 @@
+ #include <crypto/dh.h>
+ #include <crypto/hkdf.h>
+ #include <linux/nvme.h>
+ #include <linux/nvme-auth.h>
+ 
+-#define HKDF_MAX_HASHLEN 64
+-
+ static u32 nvme_dhchap_seqnum;
+ static DEFINE_MUTEX(nvme_dhchap_mutex);
+ 
+ u32 nvme_auth_get_seqnum(void)
+ {
+@@ -767,11 +765,11 @@ int nvme_auth_derive_tls_psk(int hmac_id, u8 *psk, size_t psk_len,
+ 		u8 *psk_digest, u8 **ret_psk)
+ {
+ 	struct crypto_shash *hmac_tfm;
+ 	const char *hmac_name;
+ 	const char *label = "nvme-tls-psk";
+-	static const char default_salt[HKDF_MAX_HASHLEN];
++	static const char default_salt[NVME_AUTH_MAX_DIGEST_SIZE];
+ 	size_t prk_len;
+ 	const char *ctx;
+ 	unsigned char *prk, *tls_key;
+ 	int ret;
+ 
+@@ -796,11 +794,11 @@ int nvme_auth_derive_tls_psk(int hmac_id, u8 *psk, size_t psk_len,
+ 	if (!prk) {
+ 		ret = -ENOMEM;
+ 		goto out_free_shash;
+ 	}
+ 
+-	if (WARN_ON(prk_len > HKDF_MAX_HASHLEN)) {
++	if (WARN_ON(prk_len > NVME_AUTH_MAX_DIGEST_SIZE)) {
+ 		ret = -EINVAL;
+ 		goto out_free_prk;
+ 	}
+ 	ret = hkdf_extract(hmac_tfm, psk, psk_len,
+ 			   default_salt, prk_len, prk);
+diff --git a/drivers/nvme/host/auth.c b/drivers/nvme/host/auth.c
+index 405e7c03b1cfe..301c858b7c577 100644
+--- a/drivers/nvme/host/auth.c
++++ b/drivers/nvme/host/auth.c
+@@ -36,13 +36,13 @@ struct nvme_dhchap_queue_context {
+ 	u8 status;
+ 	u8 dhgroup_id;
+ 	u8 hash_id;
+ 	u8 sc_c;
+ 	size_t hash_len;
+-	u8 c1[64];
+-	u8 c2[64];
+-	u8 response[64];
++	u8 c1[NVME_AUTH_MAX_DIGEST_SIZE];
++	u8 c2[NVME_AUTH_MAX_DIGEST_SIZE];
++	u8 response[NVME_AUTH_MAX_DIGEST_SIZE];
+ 	u8 *ctrl_key;
+ 	u8 *host_key;
+ 	u8 *sess_key;
+ 	int ctrl_key_len;
+ 	int host_key_len;
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index 655d194f8e722..edfebbce67453 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -1835,10 +1835,15 @@ enum {
+ 	NVME_AUTH_HASH_SHA384	= 0x02,
+ 	NVME_AUTH_HASH_SHA512	= 0x03,
+ 	NVME_AUTH_HASH_INVALID	= 0xff,
+ };
+ 
++/* Maximum digest size for any NVME_AUTH_HASH_* value */
++enum {
++	NVME_AUTH_MAX_DIGEST_SIZE = 64,
++};
++
+ /* Defined Diffie-Hellman group identifiers for DH-HMAC-CHAP authentication */
+ enum {
+ 	NVME_AUTH_DHGROUP_NULL		= 0x00,
+ 	NVME_AUTH_DHGROUP_2048		= 0x01,
+ 	NVME_AUTH_DHGROUP_3072		= 0x02,
 -- 
 2.53.0
 
