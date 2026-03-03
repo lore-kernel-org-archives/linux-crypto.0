@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF6F389116;
-	Tue,  3 Mar 2026 19:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15A5384231;
+	Tue,  3 Mar 2026 19:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772565353; cv=none; b=kUT9lIZzIBifnIllOQZAhawOjSKrCs943va2vcjVrLRsbTufio3z7gb8zttnclXTS//HGFcwsDKbtu0tauXr0dHrHsvTO+VJXXJskqrERixMscdTaZDObPM6FdOjGPucmZ8iZwtJ7ddnrpMQTIODVvDRUpFIYHQa+Xx6Yowpu9A=
+	t=1772565356; cv=none; b=jBe+fqBlgdu7vOE7DcbmF52MEdBndmIANcJngcZPDQzNUT4jTVeeHSN3X/W7w2ZbEBoNy3yeU+WSpS5humkuIaUnFvo7GLn9sbSBiETea952wLtvPBjgUmOAjF3ypMNcmwqBrQ5I5DDG+ELiwV7sBNvJXpXSzoLnlZSd16wTVRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772565353; c=relaxed/simple;
-	bh=kveI5NdoYoIPiQcLw4KGZAcgSTGkk3UJZOxqHb0xznI=;
+	s=arc-20240116; t=1772565356; c=relaxed/simple;
+	bh=tgcMP1DjiSuWdQdTXNizhC+/un3ZdmwWd5CjtmNWK04=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WsadcVwS2efrtEsJz489yljzAe/g2BiKu08zd3OwlX54bUU2OiZraqLaUN7qH9YT4AQ4FDp46QTCGlDvvLpcqEd2jL1t3BLo0ApnAWfjONcCYUcD+ufNO5T/3EyNG+uj6ykwNBFQ1QsRHnyn2wVe7WLZdxOB001LCBhaLR8fF1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g0sXClsp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=DjB0Rb/Jt5DZtAJUwuDT5IuZvTdNUrTnUA9blxoTV+FvLmc3HvAKjlWSBij2Eh2zOJaE/0EB5rBLPG/CY2jGe6S7JH3ulKShIWz6MgsVqe29g4Wl7Hq+bZeDKHLmJNFZGbOI7Uk3SJpMDfyG/Sp7oiIwHQ0J5NrFXmRaRTCUtFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zs4O+trg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g0sXClsp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D902C2BC87;
-	Tue,  3 Mar 2026 19:15:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zs4O+trg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3EF6C2BCB0;
+	Tue,  3 Mar 2026 19:15:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772565353;
-	bh=kveI5NdoYoIPiQcLw4KGZAcgSTGkk3UJZOxqHb0xznI=;
+	s=k20201202; t=1772565355;
+	bh=tgcMP1DjiSuWdQdTXNizhC+/un3ZdmwWd5CjtmNWK04=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=g0sXClspFtHY3XbFdqQrUUCHWxpbkkh2dvqIz+IwyRrZsfIyVB5Meb3fZhlvLekdd
-	 zWqLceVOwjhYcCYdWSWGWxYqF4Li+dDCfXdg6/KOElpVI3NhKO6fXbAqQ5wy3YgyM0
-	 Y/3oXio5DHunahkRExUl+u0r6MXNDABpw29r1EiV2jedB+Ie2TtRnhnuNTsuAP99ie
-	 cKaJkn5OeS8DZ5xEENTw/BfWqx79cxP8J+MOjVyf1pIfyORKRpZrwhRJKyFwmSXSN6
-	 I493ITnNim3fGebXVSp055CztwuyxaA3fcaIU6TrEJLHhbbHFnPgrlRubSw78nHFLO
-	 1wcMmZsaIwGBw==
+	b=Zs4O+trggAO5+VjU3bcSHqykfHaMlyCqdUz0t73lLf9fwJPz1P4BCRJSm69JxTKoZ
+	 T4HmVXGvhklGqZGsH/mzdXFwZNNONIyy9wP86jEPs5W/XQfnPR7O7i3QwsP+2uyjlV
+	 1dtrxai1mgldJh+oCfw8PaO8EcIAGfqhyHRqoD1EXUZ19P8K+HM5VJVaim8zrWCSvq
+	 uR4y6B961iZf4HGl3Zygib4nL17QQyl1pde4XLO4e0O7sb2dl+tRlEIoO/tsIxLBon
+	 TqH7J51oND/UuWR6ohmGBd0Puh4Dhx7epJ+ry/XT4LJBarTnEov7oUk+0bT7eW2p16
+	 FKd1pH6H3gokQ==
 From: Tycho Andersen <tycho@kernel.org>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
@@ -48,9 +48,9 @@ Cc: Kim Phillips <kim.phillips@amd.com>,
 	linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH 4/5] kvm/sev: mask off firmware unsupported vm types
-Date: Tue,  3 Mar 2026 12:15:08 -0700
-Message-ID: <20260303191509.1565629-5-tycho@kernel.org>
+Subject: [PATCH 5/5] selftests/kvm: teach sev_*_test about revoking VM types
+Date: Tue,  3 Mar 2026 12:15:09 -0700
+Message-ID: <20260303191509.1565629-6-tycho@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260303191509.1565629-1-tycho@kernel.org>
 References: <20260303191509.1565629-1-tycho@kernel.org>
@@ -64,29 +64,75 @@ Content-Transfer-Encoding: 8bit
 
 From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-In some configurations not all VM types are supported by the firmware.
-Reflect this information in the supported_vm_types that KVM exports.
+Instead of using CPUID, use the VM type bit to determine support, since
+those now reflect the correct status of support by the kernel and firmware
+configurations.
 
-Link: https://lore.kernel.org/all/aZyLIWtffvEnmtYh@google.com/
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 ---
- arch/x86/kvm/svm/sev.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tools/testing/selftests/kvm/x86/sev_init2_tests.c  | 14 ++++++--------
+ .../testing/selftests/kvm/x86/sev_migrate_tests.c  |  2 +-
+ tools/testing/selftests/kvm/x86/sev_smoke_test.c   |  4 ++--
+ 3 files changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f941d48626d3..eeae39af63a9 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2976,6 +2976,8 @@ void __init sev_set_cpu_caps(void)
- 		supported_vm_types |= BIT(KVM_X86_SNP_VM);
- 	}
+diff --git a/tools/testing/selftests/kvm/x86/sev_init2_tests.c b/tools/testing/selftests/kvm/x86/sev_init2_tests.c
+index b238615196ad..97bd036b4f1c 100644
+--- a/tools/testing/selftests/kvm/x86/sev_init2_tests.c
++++ b/tools/testing/selftests/kvm/x86/sev_init2_tests.c
+@@ -136,16 +136,14 @@ int main(int argc, char *argv[])
+ 		    kvm_check_cap(KVM_CAP_VM_TYPES), 1 << KVM_X86_SEV_VM);
  
-+	supported_vm_types &= sev_firmware_supported_vm_types();
-+
- 	kvm_caps.supported_vm_types |= supported_vm_types;
- }
+ 	TEST_REQUIRE(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_VM));
+-	have_sev_es = kvm_cpu_has(X86_FEATURE_SEV_ES);
++	have_sev_es = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM);
  
+-	TEST_ASSERT(have_sev_es == !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM)),
+-		    "sev-es: KVM_CAP_VM_TYPES (%x) does not match cpuid (checking %x)",
+-		    kvm_check_cap(KVM_CAP_VM_TYPES), 1 << KVM_X86_SEV_ES_VM);
++	TEST_ASSERT(!have_sev_es || kvm_cpu_has(X86_FEATURE_SEV_ES),
++		    "sev-es: SEV_ES_VM supported without SEV_ES in CPUID");
+ 
+-	have_snp = kvm_cpu_has(X86_FEATURE_SEV_SNP);
+-	TEST_ASSERT(have_snp == !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM)),
+-		    "sev-snp: KVM_CAP_VM_TYPES (%x) indicates SNP support (bit %d), but CPUID does not",
+-		    kvm_check_cap(KVM_CAP_VM_TYPES), KVM_X86_SNP_VM);
++	have_snp = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM);
++	TEST_ASSERT(!have_snp || kvm_cpu_has(X86_FEATURE_SEV_SNP),
++		    "sev-snp: SNP_VM supported without SEV_SNP in CPUID");
+ 
+ 	test_vm_types();
+ 
+diff --git a/tools/testing/selftests/kvm/x86/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
+index 0a6dfba3905b..3f2c3b00e3bc 100644
+--- a/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
++++ b/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
+@@ -376,7 +376,7 @@ int main(int argc, char *argv[])
+ 
+ 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SEV));
+ 
+-	have_sev_es = kvm_cpu_has(X86_FEATURE_SEV_ES);
++	have_sev_es = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM);
+ 
+ 	if (kvm_has_cap(KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM)) {
+ 		test_sev_migrate_from(/* es= */ false);
+diff --git a/tools/testing/selftests/kvm/x86/sev_smoke_test.c b/tools/testing/selftests/kvm/x86/sev_smoke_test.c
+index 86ad1c7d068f..16ec940de5ac 100644
+--- a/tools/testing/selftests/kvm/x86/sev_smoke_test.c
++++ b/tools/testing/selftests/kvm/x86/sev_smoke_test.c
+@@ -219,10 +219,10 @@ int main(int argc, char *argv[])
+ 
+ 	test_sev_smoke(guest_sev_code, KVM_X86_SEV_VM, 0);
+ 
+-	if (kvm_cpu_has(X86_FEATURE_SEV_ES))
++	if (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM))
+ 		test_sev_smoke(guest_sev_es_code, KVM_X86_SEV_ES_VM, SEV_POLICY_ES);
+ 
+-	if (kvm_cpu_has(X86_FEATURE_SEV_SNP))
++	if (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM))
+ 		test_sev_smoke(guest_snp_code, KVM_X86_SNP_VM, snp_default_policy());
+ 
+ 	return 0;
 -- 
 2.53.0
 
