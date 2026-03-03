@@ -1,51 +1,68 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F313D565E;
-	Tue,  3 Mar 2026 15:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C0E4949F4;
+	Tue,  3 Mar 2026 16:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772550871; cv=none; b=q5ESOXvz7msp2npPPd741AEjS4X5ooE+CE3iYzM59OVrg7cUjTM5c/J8OFxIdj8cGQl2ToZp2NH0X4LASRt5WTpWU3E+aZpHnZ0nQ2OgnH217kIHbBeVS9zdgWfUFksJMKewEpeOeQlJF1nx0tpro9Wxq5L4MEKibT5HgbDXxcU=
+	t=1772553665; cv=none; b=r2CjDofs+3X1lpffHG9DUXX2QKVM4JCzMiIaffTWk0IjY68AwMbU3g0ZcMNgQWszf47gCrZvbdfp6HRKFuO4zkkfIdm6O0rwmKWSbbRfBckOAwv+EgulFvka+2heC9y0EJeyJoKxD5crFhU6HJqdmBIuL5QJ2zJXrWBPHpjEVsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772550871; c=relaxed/simple;
-	bh=i27tGhGCkluWLCokkpF6ZJMC+DubtBoDpz2Z+DismL0=;
+	s=arc-20240116; t=1772553665; c=relaxed/simple;
+	bh=mTiv9QtnxAmDU7iBPLuvPKwF8m82DFxtJ9m30zudKqY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EmyqLK2Vn5urGXFEqRAE7XBFrq2R++IbloSHfp1L2pGEe/lgzAINPWG7KmNmk3y/pshMIIOPJi/TmH+eB04ylFdu6XmqtvMhVIo0JtpuqcOFk5ZO3+IhBrv4HtzWezHayFTfMxn+KldhFxnDyZfTt3M4ib7RCZazJbefpl0pZ/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=4UAFphq6; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="4UAFphq6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=rKGEneEcw53Sf3AVLYcV0KpVJlSUZ1EgLx/uOiwEn5I=; b=4UAFphq6QfiSsWiCg0GBfRm+RH
-	F7/Ne4TUtkMLeCUdPmGNw7gCvK7ruHDuz7R1vjFAY/jMAyG7fIqmrzCO/gopNAIt9vCIy+wLxXn2F
-	zNmZBlAhBhuBbCbSW5SYlbAk0MI/4f1NEvcWu+ovXknzZhZVM3RwZPDlUJvE2Oz10JcX7wQfl0wTM
-	nVvSjzrPcJlRaVDNhaISRTkv85SxSN1kq2/8QrMtESRxsCQGaetXroM7BvBAaRbrElwIfkOUuNWRd
-	RrZZ6yJkGWz57Q6r57iFtr6VlcLfP4QjMFvSkqafjewjkIY0F2Pej5UZG1QUihKgu7jA4wgtGInqu
-	WHyNkBRw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vxRS8-0000000FPD2-3CY5;
-	Tue, 03 Mar 2026 15:14:28 +0000
-Date: Tue, 3 Mar 2026 07:14:28 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Jeff Barnes <jeffbarnes@linux.microsoft.com>
-Cc: Joachim Vandersmissen <git@jvdsn.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=p+BDHkJLd/ofyqJwviZvcVTkEz2TlstWbNlSTCcV+J3EhdvVWY3r5MDpwU6MrydizEZ+rhBrE98jUhZYdaXYkdtLSwG8V+3HeT/fLg/qvlplLHZiVCjZUz51Cnlg+IJt0vRYQgydAsWsAf3i4+4lW+Q9IXY14nWam1ck7rqnUu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 89BBD68BFE; Tue,  3 Mar 2026 17:00:51 +0100 (CET)
+Date: Tue, 3 Mar 2026 17:00:50 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Matt Turner <mattst88@gmail.com>,
+	Magnus Lindholm <linmag7@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jeff Barnes <jeffbarnes@microsoft.com>
-Subject: Re: [PATCH] crypto: aead: add service indicator flag for RFC4106
- AES-GCM
-Message-ID: <aab61CI7zajzqu5u@infradead.org>
-References: <20260129-fips-gcm-clean-v1-v1-1-43e17dc20a1a@microsoft.com>
- <aXw9Wj19ZX6dpNHW@gondor.apana.org.au>
- <ce1d34d9-23f9-4d1e-b790-6af75d1555ed@linux.microsoft.com>
- <aaKtujHwV0zDFWxi@gondor.apana.org.au>
- <a73a2556-3fa3-45fc-bf06-a62e8367e953@jvdsn.com>
- <145cfedf-7510-44b7-b1b7-6569144e7b21@linux.microsoft.com>
+	Andreas Larsson <andreas@gaisler.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
+	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
+	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
+	Li Nan <linan122@huawei.com>, linux-alpha@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
+Subject: Re: [PATCH 01/25] xor: assert that xor_blocks is not called from
+ interrupt context
+Message-ID: <20260303160050.GB7021@lst.de>
+References: <20260226151106.144735-1-hch@lst.de> <20260226151106.144735-2-hch@lst.de> <20260227142455.GG1282955@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,14 +71,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <145cfedf-7510-44b7-b1b7-6569144e7b21@linux.microsoft.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20260227142455.GG1282955@noisy.programming.kicks-ass.net>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Mar 02, 2026 at 04:51:38PM -0500, Jeff Barnes wrote:
-> for out-of-tree modules, you're on your own". But that's where the need for
-> the service indicator arises. I'm sure that maintaining the out-of-tree
-> patch with a service indicator is a royal pain downstream.
+On Fri, Feb 27, 2026 at 03:24:55PM +0100, Peter Zijlstra wrote:
+> >  	unsigned long *p1, *p2, *p3, *p4;
+> >  
+> > +	WARN_ON_ONCE(in_interrupt());
+> 
+> Your changelog makes it sound like you want:
+> 
+> 	WARN_ON_ONCE(!in_task());
+> 
+> But perhaps something like so:
+> 
+> 	lockdep_assert_preempt_enabled();
+> 
+> Would do? That ensures we are in preemptible context, which is much the
+> same. That also ensures the cost of this assertion is only paid on debug
+> kernels.
 
-And that's a good thing.  Maintaining out of tree stuff should be a
-royal pain and not impact the upstream kernel in any way.
+No idea honestly.  The kernel FPU/vector helpers generally don't work
+from irq context, and I want to assert that.  Happy to do whatever
+version works best for that.
 
