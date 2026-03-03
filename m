@@ -1,65 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F128C1990A7;
-	Tue,  3 Mar 2026 05:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E882DF144;
+	Tue,  3 Mar 2026 06:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772514335; cv=none; b=GLQhzQyfvDD4I7zKGl4hBEGhBBSzIOPgyw8rXI5oQTS7Dj+XTVvF+xfChta6D4yV9CvfFA360e/nDBphDLJyxo4inBkZO+KCHiTZrCpDbLVQ9zGPEynzfJvPUkwi5w+QICGk8lD9avIYK97oAlkhiqLKIgtpjIJekp+7nXSC/2k=
+	t=1772517937; cv=none; b=fSh1/T7e4c4OoDtivDS3GahGAzD20gu5srDDkIWThRmGPsweR9LZB5nIt0ij3v1mVf0nkkr2/rfEiBIQBwjH5D/WM72t5la8qa830UEZ97A8bteZlIzzgH2ec0ULh+HO8yxyLJn2DvFy1iUDxhxVgDRlrILypfLzyOq1eiqW40w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772514335; c=relaxed/simple;
-	bh=pVNsw8FbQdsCS9MidUuH13rClfK4hay55esSvGYmbc4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gv2fPYJ3e7/opRH9x7gpWY4Ncjhqh9PUEZIqgU7FI+GVIVwUmSXgYI0dkScv3C7uWMSRcqTfStYOQayQ1b7UpSpkEkvswOApebjOGjmpaujIZG/MO0INbdIFGKQXIs6tRTApLIt2yeQVaibODp+253Wti8vIYKC55ngjMmH6Sfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cIPi4zKk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772517937; c=relaxed/simple;
+	bh=enmyVlM9QgRzuKEYUPIKv1hMr+WrNhZ5gYCBMQMAZ8E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uxMuENqIDSnSWKRR0OiwR/uAT9UVVDOySeITi/3AwPiRJKFbuTUDCCwGDF+N18vMyOm+MvdEbfEcKqIENeIuo6rE3MB2M4DM5kQqcZz0ZjYzu6m/OtsBXAnNXrnrm8HDisHqYFVzy0yJBvX2762AqFMtcmFU8UiZy7ExL37+VMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=pukjEq0F; arc=none smtp.client-ip=129.153.194.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cIPi4zKk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 472A3C116C6;
-	Tue,  3 Mar 2026 05:05:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772514334;
-	bh=pVNsw8FbQdsCS9MidUuH13rClfK4hay55esSvGYmbc4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cIPi4zKkoJBDg1OdyRZOdiyXq7bRp5ch+rtA9HWR+50RVJ5n18yqsHmxF1YAVwUNH
-	 tvrHGg2ckLHHqhNWWNkIwIuIpjiEmHmp4if0geuAu59i+PF4Ajw3elu418oUub18+f
-	 eEvHJ9xaKmm2SdDudYX5fWXrBGqgJzk/73BqSP5vz2drAbz7zo7i4CZWnIbPudKOnY
-	 Cr6GaRkWMQ+zNzz/1joHauzswpojvFCxZZ7g5FwzxaX5+zkp+ZZn07k3ajwDhI502Z
-	 IyeRjwJlQdBRTlHGkC8T471eZf1Q6Quy96co1yFykKW3DTZWLrRWMPv+3m2i7Ytxb3
-	 lk0G3FB86xrJg==
-Date: Mon, 2 Mar 2026 21:04:39 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org, linux-crypto@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] smb: client: Compare MACs in constant time
-Message-ID: <20260303050439.GB5238@sol>
-References: <20260218042702.67907-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="pukjEq0F"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
+	t=1772517930; bh=enmyVlM9QgRzuKEYUPIKv1hMr+WrNhZ5gYCBMQMAZ8E=;
+	h=From:To:Cc:Subject:Date;
+	b=pukjEq0F6SSJxbGXZm4eRcDDr/58o6BsyXvGMdFuIYlRHB03PKiyOyT99FdaLfnVm
+	 CQwEBGx+A5njCdAYb+wqe+iiwWSzyJcw0k3/CMzNJXB1BtR1wItUSmMO7pTB35oOO9
+	 JVzYGwEesbjmsT/K+8SzeLfMN81/pf/5dMwgwyCW/17JbYNXfwTr2hQaGQRwVrL+rC
+	 mY8HQlOL2uM9RCYbklJrfp5hmqM932HwgdeXmtOOQ/kPdZ/vbMIhdyGdwYALME0wOY
+	 wxDo/CUdzYRUV5yq+6fb8sk7Dqn5aX6jspqDs/trmV8xXfY3S+sfx5CRZdUmC50PdF
+	 HRMonRhp1VC7w==
+From: Joachim Vandersmissen <git@jvdsn.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Joachim Vandersmissen <git@jvdsn.com>
+Subject: [PATCH] crypto: testmgr - block Crypto API xxhash64 in FIPS mode
+Date: Tue,  3 Mar 2026 00:05:09 -0600
+Message-ID: <20260303060509.246038-1-git@jvdsn.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260218042702.67907-1-ebiggers@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 17, 2026 at 08:27:02PM -0800, Eric Biggers wrote:
-> To prevent timing attacks, MAC comparisons need to be constant-time.
-> Replace the memcmp() with the correct function, crypto_memneq().
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->  fs/smb/client/smb1encrypt.c   | 3 ++-
->  fs/smb/client/smb2transport.c | 4 +++-
->  2 files changed, 5 insertions(+), 2 deletions(-)
+xxhash64 is not a cryptographic hash algorithm, but is offered in the
+same API (shash) as actual cryptographic hash algorithms such as
+SHA-256. The Cryptographic Module Validation Program (CMVP), managing
+FIPS certification, believes that this could cause confusion. xxhash64
+must therefore be blocked in FIPS mode.
 
-Any feedback on this?  Just to clarify, this is intended to be taken
-through the smb tree.
+The only usage of xxhash64 in the kernel is btrfs. Commit fe11ac191ce0
+("btrfs: switch to library APIs for checksums") recently modified the
+btrfs code to use the lib/crypto API, avoiding the Kernel Cryptographic
+API. Consequently, the removal of xxhash64 from the Crypto API in FIPS
+mode should now have no impact on btrfs usage.
 
-- Eric
+Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
+---
+ crypto/testmgr.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 49b607f65f63..d7475d6000dd 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -5609,7 +5609,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ #endif
+ 		.alg = "xxhash64",
+ 		.test = alg_test_hash,
+-		.fips_allowed = 1,
+ 		.suite = {
+ 			.hash = __VECS(xxhash64_tv_template)
+ 		}
+-- 
+2.53.0
+
