@@ -1,81 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78863890E9;
-	Tue,  3 Mar 2026 19:56:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F60730C371;
+	Tue,  3 Mar 2026 19:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772567776; cv=none; b=UZf84atDxYdzOlZ62ATudKTjWCJLwCGWnz46FpQwU0DV01ji9DLG7HzuSOf145kxA3aqtgpEVpE+MRcLEh3ZTtdmfKGQRQrMP4/G0mcbOUmxsvybm13gCRShPrZ0jAy+D6QL0J9iMJt/d34RX8tO7WrJedTIVRXUNy9Rvbi2hfA=
+	t=1772567944; cv=none; b=LZfEBGDoMNPTRBrV5ldVD3OIwYxb/LiXnHVf+tuLjto4mJo4D1VXqz9C79aD69U7DufSWgNMOVZe7LcFIZwZ8uP7T8YbUeY9QRElKG++5gx0DP7IWN4R14RCFqrnusftLUJKPvFgBxozc3kPDojZP5j74RZIxeoLh3ZZwZiDqKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772567776; c=relaxed/simple;
-	bh=9sr6A1ZQ/OAOM0MyaKuNScWB7UA08hne7lVI9ssYSPg=;
+	s=arc-20240116; t=1772567944; c=relaxed/simple;
+	bh=9fPUIdzfqT+sR7Yy8pvxcpYK+B8255T9ohMfYTkVnBg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oYoTYjaKU31rDK5RzhF2BbBUGjdBu104ZgDQWBpvi8jBNu2GchXWxU+YCU5vZbWNT8U4yymINOqPxIW6Q8MDM0GrGES+RGEhZ5WqhGnnQqQ9vD39/r5oDJbwHt3xKjnvWIhl7T/UxEwERsyF15UBwl+WplbBdYITXA5fV6wdMxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mHMra/+s; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=lIy58NDwnrsd1KQ+JES9CxPLimke8vBGHEXKuOptPNM1ZCJL12Ge1hkPG9xhQyFg7fqklfYZJttzfuUN2jm8l7yh5Whu4rRRR/PuxmUW9cvBt7ZQHnXe7c8OLsZp3CCtowCqxpnSdkm0upYh3HZMDNWrNMpMDzhaunEYZWdZ3d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=my9qGj67; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mHMra/+s"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1644C116C6;
-	Tue,  3 Mar 2026 19:56:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="my9qGj67"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 028E2C116C6;
+	Tue,  3 Mar 2026 19:59:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772567774;
-	bh=9sr6A1ZQ/OAOM0MyaKuNScWB7UA08hne7lVI9ssYSPg=;
+	s=k20201202; t=1772567944;
+	bh=9fPUIdzfqT+sR7Yy8pvxcpYK+B8255T9ohMfYTkVnBg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mHMra/+se8TmXPAvXWkLhgpf0kETRB4dEaJCtUtlUTftYpe0ReqfitRfwD4MGq4+T
-	 WuzDe+k5qMfwF8Pvg7plbRdHjZuWKh+IB7lEOogeIHeGkKvwd2/EpZagMr99KeT7V+
-	 XN7WYkTp/J6gkuhSVqd3D55QMpvT59XaPLLtFxjhlFBUF5SPdV1HoakLZQKIIo/fdH
-	 BGibgd4432V2o3DyL8VfocxjZKarY5SdEW/Gzxyc6CkyylsV/unCa5mrJJyTo1wkxn
-	 QMVCX29BeW41faad8f8MgUVR1waChaWC40npYyOs3agb3dJecKXchWeHWLYBSYXFrd
-	 nwEHrCxoK1HSw==
-Date: Tue, 3 Mar 2026 11:55:17 -0800
+	b=my9qGj67jv4gpyQ99UxyaYzfNAmonfJJl8oXWn43rlisUEwPsIFPshjw5r9P5dBWl
+	 NIdFAccFRPIRwkCIwSJcsYKbOSo+xxqhLi2stIeK6x7z0UgTQSeQaCgVrJcqK4/Di0
+	 zLAwwLJ4NfgWC0dfSZQV2kmWDvoQ4VbInwv9LYc1SBO9KrGmWdv1jZ25t9AbYOOAzM
+	 0+C2IPzh7Ht75h8fB3NlsFArB7adEAUUcasH42PcXe8B8DVyv/kH+0+xH6Yn5n2PNo
+	 x/Mrd7g5ugAAGAeu47gXBY5YMQj6hETQfDOJWLV1Ms1z9uXHn+Hc9LOqcYTpKrsFjD
+	 9cY9wIGgk+Ybg==
+Date: Tue, 3 Mar 2026 11:58:06 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Peter Zijlstra <peterz@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Matt Turner <mattst88@gmail.com>,
-	Magnus Lindholm <linmag7@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
-	Li Nan <linan122@huawei.com>, linux-alpha@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
-Subject: Re: [PATCH 01/25] xor: assert that xor_blocks is not called from
- interrupt context
-Message-ID: <20260303195517.GC2846@sol>
-References: <20260226151106.144735-1-hch@lst.de>
- <20260226151106.144735-2-hch@lst.de>
- <20260227142455.GG1282955@noisy.programming.kicks-ass.net>
- <20260303160050.GB7021@lst.de>
+	Aleksander Jan Bajkowski <olek2@wp.pl>
+Subject: Re: [PATCH] crypto: testmgr - Fix stale references to aes-generic
+Message-ID: <20260303195806.GD2846@sol>
+References: <20260302234856.30569-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -84,55 +44,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260303160050.GB7021@lst.de>
+In-Reply-To: <20260302234856.30569-1-ebiggers@kernel.org>
 
-On Tue, Mar 03, 2026 at 05:00:50PM +0100, Christoph Hellwig wrote:
-> On Fri, Feb 27, 2026 at 03:24:55PM +0100, Peter Zijlstra wrote:
-> > >  	unsigned long *p1, *p2, *p3, *p4;
-> > >  
-> > > +	WARN_ON_ONCE(in_interrupt());
-> > 
-> > Your changelog makes it sound like you want:
-> > 
-> > 	WARN_ON_ONCE(!in_task());
-> > 
-> > But perhaps something like so:
-> > 
-> > 	lockdep_assert_preempt_enabled();
-> > 
-> > Would do? That ensures we are in preemptible context, which is much the
-> > same. That also ensures the cost of this assertion is only paid on debug
-> > kernels.
+On Mon, Mar 02, 2026 at 03:48:56PM -0800, Eric Biggers wrote:
+> Due to commit a2484474272e ("crypto: aes - Replace aes-generic with
+> wrapper around lib"), the "aes-generic" driver name has been replaced
+> with "aes-lib".  Update a couple testmgr entries that were added
+> concurrently with this change.
 > 
-> No idea honestly.  The kernel FPU/vector helpers generally don't work
-> from irq context, and I want to assert that.  Happy to do whatever
-> version works best for that.
+> Fixes: a22d48cbe558 ("crypto: testmgr - Add test vectors for authenc(hmac(sha224),cbc(aes))")
+> Fixes: 030218dedee2 ("crypto: testmgr - Add test vectors for authenc(hmac(sha384),cbc(aes))")
+> Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+> 
+> This patch is targeting libcrypto-fixes for v7.0
+> 
 
-may_use_simd() is the "generic" way to check "can the FPU/vector/SIMD
-registers be used".  However, what it does varies by architecture, and
-it's kind of a questionable abstraction in the first place.  It's used
-mostly by architecture-specific code.
-
-If you union together the context restrictions from all the
-architectures, I think you get: "For may_use_simd() to be guaranteed not
-to return false due to the context, the caller needs to be running in
-task context without hardirqs or softirqs disabled."
-
-However, some architectures also incorporate a CPU feature check in
-may_use_simd() as well, which makes it return false if some
-CPU-dependent SIMD feature is not supported.
-
-Because of that CPU feature check, I don't think
-"WARN_ON_ONCE(!may_use_simd())" would actually be correct here.
-
-How about "WARN_ON_ONCE(!preemptible())"?  I think that covers the union
-of the context restrictions correctly.  (Compared to in_task(), it
-handles the cases where hardirqs or softirqs are disabled.)
-
-Yes, it could be lockdep_assert_preemption_enabled(), but I'm not sure
-"ensures the cost of this assertion is only paid on debug kernels" is
-worth the cost of hiding this on production kernels.  The consequences
-of using FPU/vector/SIMD registers when they can't be are very bad: some
-random task's registers get corrupted.
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
 
 - Eric
