@@ -1,56 +1,56 @@
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30E237EFED
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Mar 2026 18:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C5937C904;
+	Tue,  3 Mar 2026 19:15:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772564100; cv=none; b=QSUVxNv2wyZIsj3LNNQWSgJPUQ24ILZQPQwk9vFNfWa8W8E500YNokXPWtbBw8nAuPVXXA+tkvvn5TDf9wGA9WQEIS9RHwhxQ5J3FyZYB8IYdFhvTrjy8szMEM5lG5Aayjdwr1q7DkoA6edoRRKE7+8A3zyu5VgxiHe15+wZnNM=
+	t=1772565343; cv=none; b=FugV/W3frrqXfUOUH9S2M/V7zdZwTW/cT0DCcmjTn0SaAACjFZBu7U+GL1CC0YWiCV7gT4TtNr5F+kilRIndh4+0qH9655WoeKbVtBgGyJqZKzqAB74dLhy7jwUdL+hW+ftkBLeznKUnUUdInV5TC8PqoJTTyvspZGHVjFz7M6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772564100; c=relaxed/simple;
-	bh=+B9N9a0VNwBhIQZAxT1kIzubVJvqrzU0XbMlVw4a2PQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J4dORr0DT5DTTw12ZXJAVCuSo0Y7PXzEMSx8bcSfrK2ZBSC5DFSL6KuVEupUDj4mFwZt3BH+YzFtP27uU+/J12ckEOeREkGUn/jGBvpRAQAw7dLt1Tl92HxtExQUJdQmTnx8Ts7lkp/rE2YElbew3T03heXR6vtIomByTS/JKDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=daMJGcVP; arc=none smtp.client-ip=212.77.101.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+	s=arc-20240116; t=1772565343; c=relaxed/simple;
+	bh=ntcvvjP8obpOAQSTZOCZsIkocrKc0EYZVEgtp1Q0FcE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZBfPzDoI5DCzEb4NIU0rpr81WNWMcGk7gWJQVgLdW7C29nYEHr1NadTzCKAuEev5vpOR2r8P1rBu3NmRxF9srIwJfChW5bH94n0yPCzea5fbJJNUsuGWWtynqZHw4uEhtYMHLsYpcAJNl0B4ofYunaWb4XBVDlXJwRbPiaGwsBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AYTonWmF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="daMJGcVP"
-Received: (wp-smtpd smtp.wp.pl 46139 invoked from network); 3 Mar 2026 19:54:55 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1772564095; bh=zwh2kADgvZw65MCFoX1HtfudMZcZ5wfa9E3f2CLwDlw=;
-          h=From:To:Cc:Subject;
-          b=daMJGcVPw90CcQ/NtdndGOIiXDQQSp29B3g2jgQuGq4+gLKGJS6z+JKAuEicI/Yuf
-           zZl1EYiCUeVuvLSfk8FCwapvNdslHaxpqCCMeYAngPIMLm0UuBYIIvzevKl4yQsarf
-           ltHUismVs9QYyC6mBzs+Yb6w2MKHFjs5k6lLZqpYOcYhmQCgjW6rghMDeSYtZ0h9GH
-           zy4nWiJLdAysZoFhBicSpoXFyEBGOZuscsU2P6w+EMfY/WPUNXuKiFzhmvFCVPKjfM
-           DQNtSn//dBqzyWt/meBBjGmaw7mIHxRZ/KKYJN2XWVi4UnWfVH6qqC0+pRLBxm1dvB
-           Bpqpyzl46Q8NQ==
-Received: from 83.24.116.171.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.24.116.171])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <herbert@gondor.apana.org.au>; 3 Mar 2026 19:54:55 +0100
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	atenart@kernel.org,
-	linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AYTonWmF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77026C116C6;
+	Tue,  3 Mar 2026 19:15:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772565343;
+	bh=ntcvvjP8obpOAQSTZOCZsIkocrKc0EYZVEgtp1Q0FcE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=AYTonWmFSYej9IbogOfW1QgZyRhpducblPK/xO6xn84DHW6zv3m+OggJ1kanHBWQB
+	 MaAtooRPcdRZcInZcKX66JAd9W68liuGRX0wc8RvcXdqpNA+eXxRPZ1JFSd9DExh8y
+	 sHBBsHdXpNL2MSffD+3FgRP+qyjqyvksO9+WkKirjQBA4HLZp8SbpvLfRzfcJ/kTf0
+	 cW52vwVTZMn+NEpvbxNu5phErXG6Bwt9OM1DhI+Xsz/KM73OBwOC+SJodDwXhhVbwc
+	 JXyvPDHlOCzDZCDbxB7+Phh3CbTLmhXWghwJ/CX3rGenFgczvBJs9Sf7hf74HOvrCv
+	 D+1YShFKda7uA==
+From: Tycho Andersen <tycho@kernel.org>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Shuah Khan <shuah@kernel.org>
+Cc: Kim Phillips <kim.phillips@amd.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH v3 2/2] arm64: dts: mediatek: add crypto offload support on MT7981
-Date: Tue,  3 Mar 2026 19:53:50 +0100
-Message-ID: <20260303185451.70794-2-olek2@wp.pl>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260303185451.70794-1-olek2@wp.pl>
-References: <20260303185451.70794-1-olek2@wp.pl>
+	linux-crypto@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH 0/5] Revoke supported SEV VM types
+Date: Tue,  3 Mar 2026 12:15:04 -0700
+Message-ID: <20260303191509.1565629-1-tycho@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -58,46 +58,34 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: b80b92edaf8e041f5f39b6bc99eed231
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000009 [gLPh]                               
 
-The MT7981 as well as the MT7986 have a built-in EIP-97 crypto accelerator.
-This commit adds the missing entry in the dts.
+From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
----
- arch/arm64/boot/dts/mediatek/mt7981b.dtsi | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Recent SEV firmware [1] does not support SEV-ES VMs when SNP is enabled.
+Sean suggested [2] adding an API so that userspace can check for this
+condition, so do that. Also introduce and use SNP_VERIFY_MITIGATION to
+determine whether it is present or not.
 
-diff --git a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-index 4084f4dfa3e5..94c7bf0050fc 100644
---- a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-+++ b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-@@ -150,6 +150,21 @@ sgmiisys1: syscon@10070000 {
- 			#clock-cells = <1>;
- 		};
- 
-+		crypto@10320000 {
-+			compatible = "mediatek,mt7981-crypto",
-+				"inside-secure,safexcel-eip97ies";
-+			reg = <0 0x10320000 0 0x40000>;
-+			interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
-+			interrupt-names = "ring0", "ring1", "ring2", "ring3";
-+			clocks = <&topckgen CLK_TOP_EIP97B>;
-+			clock-names = "core";
-+			assigned-clocks = <&topckgen CLK_TOP_EIP97B_SEL>;
-+			assigned-clock-parents = <&topckgen CLK_TOP_CB_NET1_D5>;
-+		};
-+
- 		uart0: serial@11002000 {
- 			compatible = "mediatek,mt7981-uart", "mediatek,mt6577-uart";
- 			reg = <0 0x11002000 0 0x100>;
+[1]: https://www.amd.com/en/resources/product-security/bulletin/amd-sb-3023.html
+[2]: https://lore.kernel.org/all/aZyLIWtffvEnmtYh@google.com/
+
+Tycho Andersen (AMD) (5):
+  kvm/sev: don't expose unusable VM types
+  crypto/ccp: introduce SNP_VERIFY_MITIGATION
+  crypto/ccp: export firmware supported vm types
+  kvm/sev: mask off firmware unsupported vm types
+  selftests/kvm: teach sev_*_test about revoking VM types
+
+ arch/x86/kvm/svm/sev.c                        | 16 +++-
+ drivers/crypto/ccp/sev-dev.c                  | 84 +++++++++++++++++++
+ include/linux/psp-sev.h                       | 56 +++++++++++++
+ .../selftests/kvm/x86/sev_init2_tests.c       | 14 ++--
+ .../selftests/kvm/x86/sev_migrate_tests.c     |  2 +-
+ .../selftests/kvm/x86/sev_smoke_test.c        |  4 +-
+ 6 files changed, 162 insertions(+), 14 deletions(-)
+
+
+base-commit: 11439c4635edd669ae435eec308f4ab8a0804808
 -- 
-2.47.3
+2.53.0
 
