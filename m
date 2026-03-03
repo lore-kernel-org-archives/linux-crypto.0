@@ -1,138 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15A5384231;
-	Tue,  3 Mar 2026 19:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4323890E7;
+	Tue,  3 Mar 2026 19:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772565356; cv=none; b=jBe+fqBlgdu7vOE7DcbmF52MEdBndmIANcJngcZPDQzNUT4jTVeeHSN3X/W7w2ZbEBoNy3yeU+WSpS5humkuIaUnFvo7GLn9sbSBiETea952wLtvPBjgUmOAjF3ypMNcmwqBrQ5I5DDG+ELiwV7sBNvJXpXSzoLnlZSd16wTVRc=
+	t=1772566318; cv=none; b=CoIhOBhTsWSor18rxTNgWMvwJP7+hwcxGLLvUo02K+jO0G3xlLiBmjkJjv2e1/kGXBvcOcXF3PadwJ4T0dpNWLZBNKG5+719r9FekZmzkQ7+ht8psQgNfYhGAIMKwDAYZSYg8cxBXjz6IUfmq4YrsmMAJrkSOdu75g6CedbHPVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772565356; c=relaxed/simple;
-	bh=tgcMP1DjiSuWdQdTXNizhC+/un3ZdmwWd5CjtmNWK04=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DjB0Rb/Jt5DZtAJUwuDT5IuZvTdNUrTnUA9blxoTV+FvLmc3HvAKjlWSBij2Eh2zOJaE/0EB5rBLPG/CY2jGe6S7JH3ulKShIWz6MgsVqe29g4Wl7Hq+bZeDKHLmJNFZGbOI7Uk3SJpMDfyG/Sp7oiIwHQ0J5NrFXmRaRTCUtFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zs4O+trg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772566318; c=relaxed/simple;
+	bh=i9EZozHW8XRAVLe8EAr2xfM/6NutGAKezx67stLre7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P+oLoGgaRcRNmJQWA+2+7gEICEqbyN+klesFLf4ZYxVMsbCGSlE0pr+2NrsKDyESfz00eUaR5fAmykn92R0CElSnksCVWUzCj0qPZdveJnlMqcllnhJnq9aoaztQyQKCxNsZfiM3boXt7gfPbcBmQESWLKZ0y0cnjuHSTRZekN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LBMtiYqd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zs4O+trg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3EF6C2BCB0;
-	Tue,  3 Mar 2026 19:15:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LBMtiYqd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAD2DC2BCB2;
+	Tue,  3 Mar 2026 19:31:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772565355;
-	bh=tgcMP1DjiSuWdQdTXNizhC+/un3ZdmwWd5CjtmNWK04=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Zs4O+trggAO5+VjU3bcSHqykfHaMlyCqdUz0t73lLf9fwJPz1P4BCRJSm69JxTKoZ
-	 T4HmVXGvhklGqZGsH/mzdXFwZNNONIyy9wP86jEPs5W/XQfnPR7O7i3QwsP+2uyjlV
-	 1dtrxai1mgldJh+oCfw8PaO8EcIAGfqhyHRqoD1EXUZ19P8K+HM5VJVaim8zrWCSvq
-	 uR4y6B961iZf4HGl3Zygib4nL17QQyl1pde4XLO4e0O7sb2dl+tRlEIoO/tsIxLBon
-	 TqH7J51oND/UuWR6ohmGBd0Puh4Dhx7epJ+ry/XT4LJBarTnEov7oUk+0bT7eW2p16
-	 FKd1pH6H3gokQ==
-From: Tycho Andersen <tycho@kernel.org>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>,
+	s=k20201202; t=1772566318;
+	bh=i9EZozHW8XRAVLe8EAr2xfM/6NutGAKezx67stLre7Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LBMtiYqdzTeup8FJVWXxT6ukyG6zRobBUe/9Mx8IhAhFrfRxHAAIym3RpikfeMD8m
+	 v+A2VcjZ21cSREjyMLdsu4gGu0wL0kRMhC4IlX1qyyeULlbBGl5uw6UGuBBquOolxm
+	 Row+8ruBmAX+JL+HmOC80eEVQkVtrtMP8DP02cDIuI7a5crnsN/KD8SglZtR0sV8T2
+	 FSzBQStrg4lKjjyetLh5Js0XceJBji3eyotTabSoV8O5Bg2+oeRAjkkb6HQGmyyYd8
+	 IiX+5wsaOMUgS37UEGItnTYawAACGA3cYTgx4ebBRCK2MxWOXqEBOSJPb1mhDQEhyr
+	 p8K4qxyCPAlBg==
+Date: Tue, 3 Mar 2026 11:31:02 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Joachim Vandersmissen <git@jvdsn.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Kim Phillips <kim.phillips@amd.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	linux-crypto@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH 5/5] selftests/kvm: teach sev_*_test about revoking VM types
-Date: Tue,  3 Mar 2026 12:15:09 -0700
-Message-ID: <20260303191509.1565629-6-tycho@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260303191509.1565629-1-tycho@kernel.org>
-References: <20260303191509.1565629-1-tycho@kernel.org>
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev
+Subject: Re: [PATCH] crypto: testmgr - block Crypto API xxhash64 in FIPS mode
+Message-ID: <20260303193102.GA2846@sol>
+References: <20260303060509.246038-1-git@jvdsn.com>
+ <aab5ptuamQ7d_tTi@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aab5ptuamQ7d_tTi@infradead.org>
 
-From: "Tycho Andersen (AMD)" <tycho@kernel.org>
+[+Cc dm-devel@lists.linux.dev]
 
-Instead of using CPUID, use the VM type bit to determine support, since
-those now reflect the correct status of support by the kernel and firmware
-configurations.
+On Tue, Mar 03, 2026 at 07:09:26AM -0800, Christoph Hellwig wrote:
+> On Tue, Mar 03, 2026 at 12:05:09AM -0600, Joachim Vandersmissen wrote:
+> > xxhash64 is not a cryptographic hash algorithm, but is offered in the
+> > same API (shash) as actual cryptographic hash algorithms such as
+> > SHA-256. The Cryptographic Module Validation Program (CMVP), managing
+> > FIPS certification, believes that this could cause confusion. xxhash64
+> > must therefore be blocked in FIPS mode.
+> > 
+> > The only usage of xxhash64 in the kernel is btrfs. Commit fe11ac191ce0
+> > ("btrfs: switch to library APIs for checksums") recently modified the
+> > btrfs code to use the lib/crypto API, avoiding the Kernel Cryptographic
+> > API. Consequently, the removal of xxhash64 from the Crypto API in FIPS
+> > mode should now have no impact on btrfs usage.
+> 
+> It sounds like xxhash should be removed the crypto API entirely.
+> There's no user of it, it's not crypto, and doing xxhash through
+> the userspace crypto API socket is so stupid that I doubt anyone
+> attempted it.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
----
- tools/testing/selftests/kvm/x86/sev_init2_tests.c  | 14 ++++++--------
- .../testing/selftests/kvm/x86/sev_migrate_tests.c  |  2 +-
- tools/testing/selftests/kvm/x86/sev_smoke_test.c   |  4 ++--
- 3 files changed, 9 insertions(+), 11 deletions(-)
+dm-integrity, which uses crypto_shash and accepts arbitrary hash
+algorithm strings from userspace, might be relying on "xxhash64" being
+supported in crypto_shash.  The integritysetup man page specifically
+mentions xxhash64:
 
-diff --git a/tools/testing/selftests/kvm/x86/sev_init2_tests.c b/tools/testing/selftests/kvm/x86/sev_init2_tests.c
-index b238615196ad..97bd036b4f1c 100644
---- a/tools/testing/selftests/kvm/x86/sev_init2_tests.c
-+++ b/tools/testing/selftests/kvm/x86/sev_init2_tests.c
-@@ -136,16 +136,14 @@ int main(int argc, char *argv[])
- 		    kvm_check_cap(KVM_CAP_VM_TYPES), 1 << KVM_X86_SEV_VM);
- 
- 	TEST_REQUIRE(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_VM));
--	have_sev_es = kvm_cpu_has(X86_FEATURE_SEV_ES);
-+	have_sev_es = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM);
- 
--	TEST_ASSERT(have_sev_es == !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM)),
--		    "sev-es: KVM_CAP_VM_TYPES (%x) does not match cpuid (checking %x)",
--		    kvm_check_cap(KVM_CAP_VM_TYPES), 1 << KVM_X86_SEV_ES_VM);
-+	TEST_ASSERT(!have_sev_es || kvm_cpu_has(X86_FEATURE_SEV_ES),
-+		    "sev-es: SEV_ES_VM supported without SEV_ES in CPUID");
- 
--	have_snp = kvm_cpu_has(X86_FEATURE_SEV_SNP);
--	TEST_ASSERT(have_snp == !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM)),
--		    "sev-snp: KVM_CAP_VM_TYPES (%x) indicates SNP support (bit %d), but CPUID does not",
--		    kvm_check_cap(KVM_CAP_VM_TYPES), KVM_X86_SNP_VM);
-+	have_snp = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM);
-+	TEST_ASSERT(!have_snp || kvm_cpu_has(X86_FEATURE_SEV_SNP),
-+		    "sev-snp: SNP_VM supported without SEV_SNP in CPUID");
- 
- 	test_vm_types();
- 
-diff --git a/tools/testing/selftests/kvm/x86/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
-index 0a6dfba3905b..3f2c3b00e3bc 100644
---- a/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
-+++ b/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
-@@ -376,7 +376,7 @@ int main(int argc, char *argv[])
- 
- 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SEV));
- 
--	have_sev_es = kvm_cpu_has(X86_FEATURE_SEV_ES);
-+	have_sev_es = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM);
- 
- 	if (kvm_has_cap(KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM)) {
- 		test_sev_migrate_from(/* es= */ false);
-diff --git a/tools/testing/selftests/kvm/x86/sev_smoke_test.c b/tools/testing/selftests/kvm/x86/sev_smoke_test.c
-index 86ad1c7d068f..16ec940de5ac 100644
---- a/tools/testing/selftests/kvm/x86/sev_smoke_test.c
-+++ b/tools/testing/selftests/kvm/x86/sev_smoke_test.c
-@@ -219,10 +219,10 @@ int main(int argc, char *argv[])
- 
- 	test_sev_smoke(guest_sev_code, KVM_X86_SEV_VM, 0);
- 
--	if (kvm_cpu_has(X86_FEATURE_SEV_ES))
-+	if (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM))
- 		test_sev_smoke(guest_sev_es_code, KVM_X86_SEV_ES_VM, SEV_POLICY_ES);
- 
--	if (kvm_cpu_has(X86_FEATURE_SEV_SNP))
-+	if (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM))
- 		test_sev_smoke(guest_snp_code, KVM_X86_SNP_VM, snp_default_policy());
- 
- 	return 0;
--- 
-2.53.0
+     --integrity, -I algorithm
+         Use  internal  integrity  calculation (standalone mode). The integrity
+         algorithm can be CRC (crc32c/crc32), a non-cryptographic hash function
+         (xxhash64) or a hash function (sha1, sha256).
 
+         For HMAC (hmac-sha256), you must specify  an  integrity  key  and  its
+         size.
+
+Maybe the device-mapper maintainers have some insight into whether
+anyone is actually using xxhash64 with dm-integrity.
+
+If yes, then dm-integrity could still switch to using the library API
+for it.  dm-integrity would just need to gain some helper functions that
+call either the xxhash64 library or crypto_shash depending on the
+configured algorithm.  If the full set of algorithms being used can be
+determined, then dm-integrity could even switch to the library APIs
+entirely, like many other kernel subsystems such as btrfs have.
+
+- Eric
