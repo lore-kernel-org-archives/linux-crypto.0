@@ -1,137 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85DD35F163
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Mar 2026 12:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E745939E6D4;
+	Tue,  3 Mar 2026 14:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772542627; cv=none; b=FGoiHNjTyLpq9/bKpratDR3C5teZ76eT0PjKur0uqb571TxCfBKMsW57CSHdEbJmi3klQhwXsnCJWct995zS5ce9ZUiCP6OqKvOgv0i8WOpFGlN27iXrB6My0zQse4rY2rnKSq7NKyeGkumgoXCHmBmDRopqeEq/E29cSSr2YmE=
+	t=1772547095; cv=none; b=u64ykbWSkLvg+ZYi/VCGM8cCkGtWiBjhnr6ZPAEYsraYGvIJVZHtWZBnQO1PSwA6WmB1jkoOR5ODMWVFkEL85ETrkamuB7+RA+OT6nfQfcvUz8oZSAftzagkftMZgCZqK8y23ROGF71oueQjTRCYBxC1cE7U/Rm+OmYb7iNusf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772542627; c=relaxed/simple;
-	bh=2y5Udud1w9el92nDGw3MAoHFspsRDspk+6XQIuYd3+8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nuvp/CTyGXTM2jTanAhLDQraPmzdARuooaB8C7aLOK1iptewlmcHR/IG/k49ddBr/bUvLG57WFLYCdmkqw6PeCq747uhd4Lk5/iL8cCYIx5kIv74wF1t15qrglO8SIri7oEYcKn7oEdmT4zPkZeHuvca9fuJS5ug52X8rAXHoLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rh/xtQ2P; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772547095; c=relaxed/simple;
+	bh=gqpj5LlBtH7M/NHlGkNd2PMy/VhJqn7LsUBN9beRTb4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Ht4LFiBMh409XzcpLJY/aW3RH/mVEXPiO90wamf0fi62KYQNH9FoMKJnoeTDAEt97/Sffn4MrYh/RYy/8tMTd9jNUa1fHsJbLQav4+UdoDfsnOw2KU5I8egFZE3PlNAhGJ88MLMvdxOj1RmxvAxOghNReDBdmCNLXca4ETETvjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=iUOMBAPQ; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rh/xtQ2P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A8E9C2BCB0
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Mar 2026 12:57:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772542627;
-	bh=2y5Udud1w9el92nDGw3MAoHFspsRDspk+6XQIuYd3+8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Rh/xtQ2PfEdy9h+mFHmJQtMu9in4NIZz77vdXqFOxi2qJBdz4H/HKFOKLN4w+Bv3X
-	 8mKx18Yob5aY1B3ewea3IYfRB+7cnC8rF99DsHn/8jkHZ9CUGY0in/KLfY79ubuMHZ
-	 u6VKtGeCOKdSaPv0+BciddobJ1+cRxIng4YPDr2lBP7DLTQGITYLh45qQx1926uUYx
-	 A4uCp/BQFfNepLtvcSv1TeIhfEG18Tqe3iV+z719ruEjW4ggTEkiiMG6txqxzAc4h4
-	 lQ4joinhMpnlbuYyrZVY1P5SVn/n3xSkqSRZGoLiIX/D1bgXHx65GuF3qQF/FrdnNS
-	 Uv68zIfofJ1BQ==
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-38704f70ea3so98552601fa.2
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Mar 2026 04:57:07 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWr9OXFutDK208M+ExreD+e5kWky5Mny+mYv6AdWfYqeggFj1IEt6oqufhNp7dpHFkOrtqE3w7E+V238Uk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+84R3RcTR9v9gCmetjnuEsGXu5H/448UGSYbcjp07H6gBkqxu
-	XjOZzxI27+ME6YzLmntu6MNgE+PBq+8VPla1B6P47/6T3JLgThkuUnewtmnt+kfPfwF1Mwlx119
-	lwY44fuMc8IGQGE2J2Nn/SyaNeV01q+JL1okWyYQf4A==
-X-Received: by 2002:a2e:be9b:0:b0:389:fcc6:4923 with SMTP id
- 38308e7fff4ca-389ff36c676mr123347411fa.36.1772542625858; Tue, 03 Mar 2026
- 04:57:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="iUOMBAPQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1772547092;
+	bh=gqpj5LlBtH7M/NHlGkNd2PMy/VhJqn7LsUBN9beRTb4=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=iUOMBAPQf6QqMV9DwdlzOU9GODujSmrfgGXt3SXGgKc6ACzhdl4NDmaZ2XvuGWlfY
+	 bD4M/LphRvhi9kXNjP4XEGjBoMcBItv9gqxKL97RQpzz512UfkhcQEHMPalaiGifKQ
+	 IPgFCQpz2SPr5P5HV1emJvF6upCqj0XLAEU3Fh9dCSr0U24SywxCQU7I2WurUU1eA5
+	 Itw5UyILKvlny34u/Cy4/PcOYJU+CpJbm/43e6qvzm+LVzbprt5yrS0PXhtK49OG0H
+	 jKo+53AN9zN542I5m2yYObS49Q48NNrIPvoB8DnN/FCncbEpjHzQabVY50+3Cr6dEW
+	 8t1ugUpQk07QA==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id B4D1617E03E5;
+	Tue,  3 Mar 2026 15:11:31 +0100 (CET)
+Message-ID: <5b384601-cb49-4f69-8df7-f751c947c336@collabora.com>
+Date: Tue, 3 Mar 2026 15:11:31 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260302-qcom-qce-cmd-descr-v11-0-4bf1f5db4802@oss.qualcomm.com> <scr5qvxa7f7k22pms4c6k5gwiky7lhssrw6qryfngexlek44g2@rayinnnwqgbt>
-In-Reply-To: <scr5qvxa7f7k22pms4c6k5gwiky7lhssrw6qryfngexlek44g2@rayinnnwqgbt>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Tue, 3 Mar 2026 13:56:53 +0100
-X-Gmail-Original-Message-ID: <CAMRc=McCXg+YjSL2_tBW2G-oBwQn3UyLGu1HxZtrognoag_CHQ@mail.gmail.com>
-X-Gm-Features: AaiRm52NOJdgTLTN2sMabKBu44N91ubF3l3v3ULSOW8VIGjX28hNaR8okhr4RNg
-Message-ID: <CAMRc=McCXg+YjSL2_tBW2G-oBwQn3UyLGu1HxZtrognoag_CHQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v11 00/12] crypto/dmaengine: qce: introduce BAM
- locking and use DMA for register I/O
-To: Manivannan Sadhasivam <mani@kernel.org>, Vinod Koul <vkoul@kernel.org>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
-	Dmitry Baryshkov <lumag@kernel.org>, Peter Ujfalusi <peter.ujfalusi@gmail.com>, 
-	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>, dmaengine@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, Bjorn Andersson <andersson@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] arm64: dts: mediatek: add crypto offload support
+ on MT7981
+To: Aleksander Jan Bajkowski <olek2@wp.pl>, herbert@gondor.apana.org.au,
+ davem@davemloft.net, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, matthias.bgg@gmail.com, atenart@kernel.org,
+ linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20260302230100.70240-1-olek2@wp.pl>
+ <20260302230100.70240-2-olek2@wp.pl>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <20260302230100.70240-2-olek2@wp.pl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 3, 2026 at 1:44=E2=80=AFPM Manivannan Sadhasivam <mani@kernel.o=
-rg> wrote:
->
-> On Mon, Mar 02, 2026 at 04:57:13PM +0100, Bartosz Golaszewski wrote:
-> > NOTE: Please note that even though this is version 11, I changed the
-> > prefix to RFC as this is an entirely new approach resulting from
-> > discussions under v9. I AM AWARE of the existing memory leaks in the
-> > last patch of this series - I'm sending it because I want to first
-> > discuss the approach and get a green light from Vinod as well as Mani
-> > and Bjorn. Especially when it comes to communicating the address for th=
-e
-> > dummy rights from the client to the BAM driver.
-> > /NOTE
-> >
-> > Currently the QCE crypto driver accesses the crypto engine registers
-> > directly via CPU. Trust Zone may perform crypto operations simultaneous=
-ly
-> > resulting in a race condition. To remedy that, let's introduce support
-> > for BAM locking/unlocking to the driver. The BAM driver will now wrap
-> > any existing issued descriptor chains with additional descriptors
-> > performing the locking when the client starts the transaction
-> > (dmaengine_issue_pending()). The client wanting to profit from locking
-> > needs to switch to performing register I/O over DMA and communicate the
-> > address to which to perform the dummy writes via a call to
-> > dmaengine_slave_config().
-> >
->
-> Thanks for moving the LOCK/UNLOCK bits out of client to the BAM driver. I=
-t looks
-> neat now. I understand the limitation that for LOCK/UNLOCK, BAM needs to =
-perform
-> a dummy write to an address in the client register space. So in this case=
-, you
-> can also use the previous metadata approach to pass the scratchpad regist=
-er to
-> the BAM driver from clients. The BAM driver can use this register to perf=
-orm
-> LOCK/UNLOCK.
->
+Il 03/03/26 00:00, Aleksander Jan Bajkowski ha scritto:
+> The MT7981 as well as the MT7986 have a built-in EIP-97 crypto accelerator.
+> This commit adds the missing entry in the dts.
+> 
+> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
 
-I thought about reusing descriptor metadata but this is attached to
-every descriptor created with dmaengine_prep_slave_sg() (as opposed to
-doing it once with dmaengine_slave_config()). We would also still need
-a custom struct in the existing BAM DMA header.
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
-I'm fine with that. Vinod: could you please say if that's sound for
-you and if so - I'll rework it and also fix the memory leaks by
-reworking the cleanup path.
 
-> It may sound like I'm suggesting a part of your previous design, but it f=
-its the
-> design more cleanly IMO. The BAM performs LOCK/UNLOCK on its own, but it =
-gets
-> the scratchpad register address from the clients through the metadata onc=
-e.
->
-
-If that gets it upstream, then it's fine with me.
-
-> It is very unfortunate that the IP doesn't accept '0' address for LOCK/UN=
-LOCK or
-> some of them cannot append LOCK/UNLOCK to the actual CMD descriptors pass=
-ed from
-> the clients. These would've made the code/design even more cleaner.
->
-
-For sure but I double-checked this. :(
-
-Bart
