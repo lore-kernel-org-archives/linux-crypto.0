@@ -1,75 +1,71 @@
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010046.outbound.protection.outlook.com [52.101.85.46])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011023.outbound.protection.outlook.com [52.101.62.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC3E375F9E
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Mar 2026 07:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC4F386456
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Mar 2026 07:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.23
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772522443; cv=fail; b=SxNtdY/ucTTg+3QnoM5Qgb86HDbMvSqlYcRHvkc+9PPcqyfkRnOX+9UOHHRi7LnSEGUY694NqL8I056mQ0G7JLIJAaR5jNPvLc7Ry9S9wth0YqwzvbQm3y5bQLuE98o3RrschthyomjIEFlMxDEk0zUqenq9+eoSoCInEdlyq/k=
+	t=1772522451; cv=fail; b=biVtCiUBEA6eJ4WAGLLhZ/NbenBktWzlm3n7qJlKeVeAUwAZO1Tq/thw3hcgPP8lA1Hc0GJCv08DG/yziuudWbm7FBHVZl4Oo6m9ygr4O4gSmAt5QGSo6TqHO6S1hx8PgzdhP1Ik2uivGYMKoE6Qbsfj6RORliXVCQ5ShrTvBjc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772522443; c=relaxed/simple;
-	bh=vMAHSdjqCPiM6q3fjsHx4pWYJ+Mhhts0ZgjczAR5PTk=;
+	s=arc-20240116; t=1772522451; c=relaxed/simple;
+	bh=//uPcmwBkNFMMOBBZ/B22ty8urB8aL50QA2Ew/s9Yvs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZSsfEwtMkwD59ZZTCGarUr9Q27AnsnIvGp87Q+GGNYC/6UxUo7Ok+ZNat9sBdy4pcUhfeP06gFiatyF2vQ32aLlo3sSVorp4+af8ellHpA1byWzol5rZ/Y7HaX86NkV70gpLOZ4IrU4xLVflt97iQThee7k3mLAIWGlxElh8MVg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=4Gme96Uy; arc=fail smtp.client-ip=52.101.85.46
+	 MIME-Version:Content-Type; b=DhNHV+e1yY0iIskI5aEMN+2fOMAG7zRstGzvElaUF83WJjnL6nV8DijFN55i+z4H2USy1BZsPlOAhmGv8ctiLzaasNuaweGRIRdslf+jhX/E7Fzuk/0tF8iKwtEBSgs5qE8hCTT5Hj+uR9MOX2kto6q24m1RaVzuV4IVkUVgWNA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jhp3MtnH; arc=fail smtp.client-ip=52.101.62.23
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="4Gme96Uy"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jhp3MtnH"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ituJ2iUy4Hi1ehmbyUqYCpEhYyldG5TYQP9GFZbaMj4dDpbs39IikoNFbixEPxa5HS7S7WyS3fKZMcG9EcWFGE2CusGizZ9XW9/TyThG2TC4QoMVhBf6aAPd5OWeeKqGzi7rzTcyTAETtnEd2unzGvoox6bGDuWiy2/GYEpThxsl7CtKc+bfIZak8kKP9INzmTUdAwArWaQO4O+TPcQfgFg8C8BZiIHq7/m+H7LwyPERy7KR0JL+m0+CEFeFt/sG0r2FxxJFnmyiwGLN9fNhPpWFgWZuK4fxbJabVIhH/w7gPMsPP1WCXO/48+RubJsbbEFpuel5gphlZ9sPbTk8LA==
+ b=cqmlz3IsFczHmNIPclKVJJsSbCMXvupjoT4xFwoRgHuJqLuZ5DKyVXV1mswN689finAenoINASdOKuYDFxdHqsiCGWDMvc2AG5w522tLPfHbq8+ghznqorNnol3PT0Au54fqP/gK+bRte6Kk6h9b0x329gkXR1XW8yFt+f2Wni+ASS1dLKjLziq0BDTGCNalsSwio4tNOSmiogKynkYCUBxgPTnA0W6xrQMP3+HsTmozMb7KIpReaIfqxPF9gGAvMFIWmYYRFmhUCWG1IvOpW63L+BEy0FijHNXPvkX+X2Q8lj+c57V1DeClSnzw/66NqwsAJdpueL7ArOMTbEHFYw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=A6PbFoxTMZ2NeSDdY4OpFvajrNTXS0bmuhx4Z6lzjtQ=;
- b=RSxXOGWXbzPtSRT2aZGpqckGuyfj52mIe9S+q16cVNvaa9YD8ipDyNYpoDGKyyNqRIdDr0xKGWOWbaa5n4bnP/8f/MVDnjLYtMm4WXPfUjps3jvXz2mVYvvh7oGSncVXq8pWwgmlpmErEylKNn8hjbjOnf2Hf/1dj+GWHgCZnPZSb8uzkQyUJSl0uuOKGp2etpSWL2ZsjsdGVMp+8bYsF8xY01U8PbwHEk7VlQ55j2CL5ZuY6l4at2wr375+yGCK4wTq7h0MK8w7DNHR79OHUztEbRvxruI3ViiMhf5GmD3m2kfMxMyV1a+qVyj8h52kCHGVuDeeuz5l5QWR0i4MzQ==
+ bh=U5ZqO3Fo4lkTF/Aso1KKFfUKhYJrSWaQTt3+tm+Yxm4=;
+ b=dlynfkkzhk1AqLV6q5e9qj+j3Myhh+VGN++0rxqJqUf8lh/Se+jtIcsP1GWDHS/o1GH1F6KfO22sjA9HQyJTsonlQs0PL+2u6GsfMbpWgxwCJ/K5S711WFSX5ZtGG4j6IknbYVQ3nKD2NuA3yPigFf2He+702CkbhHIJAliG1ptVIN4qAkMU6PtJOcmyjG0c45h4rd9OHbLXB2wqULEN5M0/1GFDc7TVCKVBGu6tDYCMNSF7NYsi6XifgvQzANm8bRSBd+xzM/3WOF60oBTrfGvutW+YA8PFTdOwjWoTuZHo1O21VidS1Xi6jdsJOpwGO9wxMcxIWy0XPbfafo68ag==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A6PbFoxTMZ2NeSDdY4OpFvajrNTXS0bmuhx4Z6lzjtQ=;
- b=4Gme96UyZYE77yIKSsPWd3W/T7pYEE4Nhva/iLc9aY6hg3mucrzkPUnzUvQuYUJlawAXc+KNqpGrTzIVTa7EUyVlhLPFajmDSnI45o33nJCCvp7mbal1lDFcFSTdRqrD25p7FayfQe8v5uACh4ytunMwju1rYpIvdSW567pvUUM=
-Received: from BL1PR13CA0412.namprd13.prod.outlook.com (2603:10b6:208:2c2::27)
- by DS0PR12MB6462.namprd12.prod.outlook.com (2603:10b6:8:c6::19) with
+ bh=U5ZqO3Fo4lkTF/Aso1KKFfUKhYJrSWaQTt3+tm+Yxm4=;
+ b=jhp3MtnHBh4UcwrZJA2rk4qgPkrG37esot62JUdXiEZli+5sjlFIW7GjyR1UkDJhTPKSa8Gl7g4IiDf/4Nw7JkbYW9+VFHNBuY+YVmeu/KPmUOBVP6VrU4gUcAysPon2FIfv9DAHxbooTFaB4IzkNjLAyky/Wo/65VEVBBeE7VA=
+Received: from BYAPR08CA0033.namprd08.prod.outlook.com (2603:10b6:a03:100::46)
+ by SJ5PPF1C7838BF6.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::98d) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.21; Tue, 3 Mar
- 2026 07:20:38 +0000
-Received: from BN3PEPF0000B36E.namprd21.prod.outlook.com
- (2603:10b6:208:2c2:cafe::53) by BL1PR13CA0412.outlook.office365.com
- (2603:10b6:208:2c2::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.22 via Frontend Transport; Tue,
- 3 Mar 2026 07:20:32 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.16; Tue, 3 Mar
+ 2026 07:20:46 +0000
+Received: from MWH0EPF000C6185.namprd02.prod.outlook.com
+ (2603:10b6:a03:100:cafe::21) by BYAPR08CA0033.outlook.office365.com
+ (2603:10b6:a03:100::46) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.20 via Frontend Transport; Tue,
+ 3 Mar 2026 07:20:44 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BN3PEPF0000B36E.mail.protection.outlook.com (10.167.243.165) with Microsoft
+ client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
+Received: from satlexmb08.amd.com (165.204.84.17) by
+ MWH0EPF000C6185.mail.protection.outlook.com (10.167.249.117) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9700.0 via Frontend Transport; Tue, 3 Mar 2026 07:20:37 +0000
-Received: from satlexmb10.amd.com (10.181.42.219) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9654.16 via Frontend Transport; Tue, 3 Mar 2026 07:20:45 +0000
+Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 3 Mar
- 2026 01:20:37 -0600
-Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb10.amd.com
- (10.181.42.219) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 3 Mar
- 2026 01:20:37 -0600
+ 2026 01:20:44 -0600
 Received: from xhdharshj40.xilinx.com (10.180.168.240) by satlexmb08.amd.com
  (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Tue, 3 Mar 2026 01:20:35 -0600
+ Transport; Tue, 3 Mar 2026 01:20:42 -0600
 From: Harsh Jain <h.jain@amd.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<linux-crypto@vger.kernel.org>, <mounika.botcha@amd.com>,
 	<sarat.chand.savitala@amd.com>, <michal.simek@amd.com>
 CC: Harsh Jain <h.jain@amd.com>
-Subject: [PATCH 1/6] crypto: xilinx: zynamp-sha: Update the driver to make it as self discoverable
-Date: Tue, 3 Mar 2026 12:49:48 +0530
-Message-ID: <20260303071953.149252-2-h.jain@amd.com>
+Subject: [PATCH 4/6] firmware: xilinx: Add firmware API's to support sha3-384 in Versal device
+Date: Tue, 3 Mar 2026 12:49:51 +0530
+Message-ID: <20260303071953.149252-5-h.jain@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260303071953.149252-1-h.jain@amd.com>
 References: <20260303071953.149252-1-h.jain@amd.com>
@@ -83,185 +79,107 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B36E:EE_|DS0PR12MB6462:EE_
-X-MS-Office365-Filtering-Correlation-Id: 24fa984e-4f52-4f8c-27ba-08de78f55e59
+X-MS-TrafficTypeDiagnostic: MWH0EPF000C6185:EE_|SJ5PPF1C7838BF6:EE_
+X-MS-Office365-Filtering-Correlation-Id: 29a7336b-235e-45b2-cc8f-08de78f5633d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014;
+	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013|7142099003;
 X-Microsoft-Antispam-Message-Info:
-	3E/2RlUte4MAFPsOAU+/p2GihGU8p0K3tcrRGEnKa6MiXlf26L6gnDcxwM8RsFAwQcmys44/coMVTdiMzB7ril58TyUMygZhtsQ7AnK6X3ZgEEamy69/Wbehmm2S1YaRUAbfDjN1cBd7ELuOXTD6hRH5NLExVGvSafts+MszcoQlKx+uomTRAmhdO3Ooj4SBorBft1iRhuopt7+PiIvRoYhCBvClK7i9PSDjKCsnHibqBkaA2XbcFUXAYQ+gAZfU+XfGuFjCxJIKN4lnvbpOgYrbd2Nv3eNRt3TUDgWDikTHnBH9nHq/lAflVC+lkUBMm/BwQAcHkWLfnOw5woxbcF0eefcbesQ6xF09Hw9ZXZfbP4EGuu4hvXkdIDsS2kaja/O95jWYPgdNf1wtEAoDpMDduiyLKtLfimVx/4NOrC4W6pQsBOvpJVK3TmW8VXijT5p6Zz05K4R4ypDioOYWWo4j/sdR785F+L2L8BPZ7LdXym2m3Rm/bx+O3++Ap+icV2t8LkxP7RFLnqygzOa01z3SX5Zzw3zv4l6DDO6TmQABWgIiaeRJpbArDnPuiFtcH8Id6uZP0cOq8mfz9mOT7d4bthduERN9b8fXIAvA7WJ9QX+9lMQ4DX+108v8+Fr8I8AEXt1JYnn7I7AZtH5izIiS8bCeHvLHAmTd6v7vq2KR5ALnOfsy3dAhNNP49hU/empfVNQSx/7jP7JQgwY6LqYlwiH7IswNKPC5HKaXrg0J6aDlSrzp6Su5sBVq/gAre24yvuK6u/lZNND1LkX9BqL8Cti9oXReWo4J1Zp+h588Hu5f0uRIyn5VqgFx5WTRjGjLgCJA4tL/qhvUv0tBow==
+	7Fqa1gIwZ+E1ROcir8uIAiDlGnW4dIWPyrJ3CBmFKrdxolBS3fCdu+iG4QyU5b0RcFGohN7HYoA4nBJL+gr3fg3ILp8wtSYEAaHmk/SX70smTKa85kVdtqstqSvonJNvZiMEmVKI6KXCYkG839IerNvsm1y/5eDBz+ooQ21vd8jvhhA0xWiOioWKn+O3EAIyD5ljTUw2JCgZlBz8hKj59QTGM8IlKS1Uw8tYhnKqx8yiod3t6G+iCl4azzsMIE5EGTTNM26aUV/R3KFrh551Yfc6+irfQ7YcHGOhPgDTP0MVcpE8pEEL12nPjLOVFae6W22Y9zofKoy3L/834DN9EBiUxSTlUgbNvKNzM2hCHMlHWDlQAIkgr6SwSK9U2gt3v4SCIDFcmONo5e9Ksyyplsl3Gfni26eII3xDY+ClLlwrjykeKDxGXZ+VhACsfam7E2vgVO25a3Dfsn/+AVRhq5COXDrNrg6FFwEeixcq3wZb+NKws8gQ1GEFgbgaoXue2ijoTx6RnxE9PZa2Rg0AQawxjpC5L6cwp02u0oQcGpgdIbOQn6PpaIHFot6k0Sb4OFp9Cfey1U+0C9+aPDHXXGEh5q4Dy43xWfMurW6K8odJCtjunzBfTV+xQW74F9dNP75d6pjo1hN1jKr7KTkmiF0S37qpG1unnn/DAKZr7lIIazXv9CI20orY2jAIyB0gNJ4nfdh20py7Gjv2ONmoDXtvQLFmdm7STAaLhJ6sZ0LFAaN0wq2vD4xu+VHN2pxn41SY5lPMb1PG41gN6toI94idMI64DyVOufOh3Qve8NwhSBW8BzfuzGVB5VK1ywyYEE3rcedhjNpWJj3k0OZbtg==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013)(7142099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	440m1k2Exo+1hqCO1z/fgBKr5Y3ZqDXeu9fX43oapPfZJjqkQl+SX18hYBfApF0+VUcMuDBSHEJSIdZUG7yGr9doSYeoOhMDsyuIxr8KRghvlPGE2k1qYmVjRcHjje8pH4MHpvgH7giJoifY6JRLgqQ0dqrSkARFhi8Yxox8+VfuDBm28oezsT8bjxGf8mAxNx8b/3GmtMx23ENMtZOrJX9AuW2tNUg5C97n4YLgUL7hVMg69DWeYGF9YeTPI8YIGYEUd51Bby4rXwKWy16nHBFDbbe5gyQBewNaeAIMgOcyusVc3GCwSFbBIBmxVoNOFRxOU6faNAMLNUzQmC+WGERNFNth2hiXHTsMgjgKEH9vxojBFCN1WjFerptdQaJQ3EF1jOchqOPqbXKfbdKaip2yJUubzx9zTaz2nxFdFnoxRoZDKVNVwPLcqvYzbo9G
+	m+lvzUGxP0QVfiptpDoq8D/ioWCfRoPXSvjBErq4S39nG8wRciP+1+JDYO22N7Oig9b+xRU+mOoKfT3+BkPJIwKLg73t1XOq2DQYPo1y0ZTioxPtvEKgjx2J83siGoimdxRWuNLQTEo3iZ8sxgHdexpZG11ERS+HfAkfy1cFvVlBtZSUiJgoXzvLT1Hh5N2X+TcwyVi3J5VGE6ft5ReRVr00b8ggSYL5vyka72f+CM6iJ+W+VvJkxOPlAvyeIoJjgghr3FnsuuZg1NYf1VS7BO84iYY2i1N1YhwihPUoPpJzGdZImQ9lspjO+ZqaV81InA/u+f1Z6dUVYR9smakKtPYj8zC427IVo/pdE8HxY67SEX47RsNn0zpU4dC/nPPQK0tqv1G/zBn9L+rjTQKUxDWuRHNTD6b3QcnnoZ/4kkQVewO1hjZA5KbwV104V1ec
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 07:20:37.7980
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 07:20:45.9161
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 24fa984e-4f52-4f8c-27ba-08de78f55e59
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29a7336b-235e-45b2-cc8f-08de78f5633d
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B36E.namprd21.prod.outlook.com
+	MWH0EPF000C6185.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6462
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF1C7838BF6
 
 From: Mounika Botcha <mounika.botcha@amd.com>
 
-Update driver to self discover the device.
+Add sha3-384 crypto API's for AMD/Xilinx Versal device.
 
 Signed-off-by: Mounika Botcha <mounika.botcha@amd.com>
 Signed-off-by: Harsh Jain <h.jain@amd.com>
 ---
- drivers/crypto/xilinx/zynqmp-sha.c | 85 +++++++++++++++++++++---------
- 1 file changed, 61 insertions(+), 24 deletions(-)
+ drivers/firmware/xilinx/zynqmp-crypto.c     | 24 +++++++++++++++++++++
+ include/linux/firmware/xlnx-zynqmp-crypto.h |  8 +++++++
+ 2 files changed, 32 insertions(+)
 
-diff --git a/drivers/crypto/xilinx/zynqmp-sha.c b/drivers/crypto/xilinx/zynqmp-sha.c
-index 5813017b6b79..1d6b7f971111 100644
---- a/drivers/crypto/xilinx/zynqmp-sha.c
-+++ b/drivers/crypto/xilinx/zynqmp-sha.c
-@@ -162,7 +162,7 @@ static int zynqmp_sha_digest(struct shash_desc *desc, const u8 *data, unsigned i
- 		return __zynqmp_sha_digest(desc, data, len, out);
+diff --git a/drivers/firmware/xilinx/zynqmp-crypto.c b/drivers/firmware/xilinx/zynqmp-crypto.c
+index f06f1e2f67b8..caa3ee8c6e2a 100644
+--- a/drivers/firmware/xilinx/zynqmp-crypto.c
++++ b/drivers/firmware/xilinx/zynqmp-crypto.c
+@@ -236,3 +236,27 @@ int versal_pm_aes_init(void)
+ 	return zynqmp_pm_invoke_fn(XSECURE_API_AES_INIT, NULL, 0);
  }
- 
--static struct zynqmp_sha_drv_ctx sha3_drv_ctx = {
-+static struct zynqmp_sha_drv_ctx zynqmp_sha3_drv_ctx = {
- 	.sha3_384 = {
- 		.init = zynqmp_sha_init,
- 		.update = zynqmp_sha_update,
-@@ -185,17 +185,26 @@ static struct zynqmp_sha_drv_ctx sha3_drv_ctx = {
- 	}
- };
- 
-+static struct xlnx_feature sha_feature_map[] = {
-+	{
-+		.family = PM_ZYNQMP_FAMILY_CODE,
-+		.feature_id = PM_SECURE_SHA,
-+		.data = &zynqmp_sha3_drv_ctx,
-+	},
-+};
+ EXPORT_SYMBOL_GPL(versal_pm_aes_init);
 +
- static int zynqmp_sha_probe(struct platform_device *pdev)
- {
-+	struct zynqmp_sha_drv_ctx *sha3_drv_ctx;
- 	struct device *dev = &pdev->dev;
- 	int err;
--	u32 v;
- 
- 	/* Verify the hardware is present */
--	err = zynqmp_pm_get_api_version(&v);
--	if (err)
--		return err;
--
-+	sha3_drv_ctx = xlnx_get_crypto_dev_data(sha_feature_map);
-+	if (IS_ERR(sha3_drv_ctx)) {
-+		dev_err(dev, "SHA is not supported on the platform\n");
-+		return PTR_ERR(sha3_drv_ctx);
-+	}
- 
- 	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(ZYNQMP_DMA_BIT_MASK));
- 	if (err < 0) {
-@@ -203,19 +212,13 @@ static int zynqmp_sha_probe(struct platform_device *pdev)
- 		return err;
- 	}
- 
--	err = crypto_register_shash(&sha3_drv_ctx.sha3_384);
--	if (err < 0) {
--		dev_err(dev, "Failed to register shash alg.\n");
--		return err;
--	}
--
--	sha3_drv_ctx.dev = dev;
--	platform_set_drvdata(pdev, &sha3_drv_ctx);
-+	sha3_drv_ctx->dev = dev;
-+	platform_set_drvdata(pdev, sha3_drv_ctx);
- 
- 	ubuf = dma_alloc_coherent(dev, ZYNQMP_DMA_ALLOC_FIXED_SIZE, &update_dma_addr, GFP_KERNEL);
- 	if (!ubuf) {
- 		err = -ENOMEM;
--		goto err_shash;
-+		return err;
- 	}
- 
- 	fbuf = dma_alloc_coherent(dev, SHA3_384_DIGEST_SIZE, &final_dma_addr, GFP_KERNEL);
-@@ -224,24 +227,30 @@ static int zynqmp_sha_probe(struct platform_device *pdev)
- 		goto err_mem;
- 	}
- 
-+	err = crypto_register_shash(&sha3_drv_ctx->sha3_384);
-+	if (err < 0) {
-+		dev_err(dev, "Failed to register shash alg.\n");
-+		goto err_mem1;
-+	}
- 	return 0;
- 
--err_mem:
--	dma_free_coherent(sha3_drv_ctx.dev, ZYNQMP_DMA_ALLOC_FIXED_SIZE, ubuf, update_dma_addr);
-+err_mem1:
-+	dma_free_coherent(dev, SHA3_384_DIGEST_SIZE, fbuf, final_dma_addr);
- 
--err_shash:
--	crypto_unregister_shash(&sha3_drv_ctx.sha3_384);
-+err_mem:
-+	dma_free_coherent(dev, ZYNQMP_DMA_ALLOC_FIXED_SIZE, ubuf, update_dma_addr);
- 
- 	return err;
- }
- 
- static void zynqmp_sha_remove(struct platform_device *pdev)
- {
--	sha3_drv_ctx.dev = platform_get_drvdata(pdev);
-+	struct zynqmp_sha_drv_ctx *sha3_drv_ctx;
- 
--	dma_free_coherent(sha3_drv_ctx.dev, ZYNQMP_DMA_ALLOC_FIXED_SIZE, ubuf, update_dma_addr);
--	dma_free_coherent(sha3_drv_ctx.dev, SHA3_384_DIGEST_SIZE, fbuf, final_dma_addr);
--	crypto_unregister_shash(&sha3_drv_ctx.sha3_384);
-+	sha3_drv_ctx = platform_get_drvdata(pdev);
-+	dma_free_coherent(sha3_drv_ctx->dev, ZYNQMP_DMA_ALLOC_FIXED_SIZE, ubuf, update_dma_addr);
-+	dma_free_coherent(sha3_drv_ctx->dev, SHA3_384_DIGEST_SIZE, fbuf, final_dma_addr);
-+	crypto_unregister_shash(&sha3_drv_ctx->sha3_384);
- }
- 
- static struct platform_driver zynqmp_sha_driver = {
-@@ -252,7 +261,35 @@ static struct platform_driver zynqmp_sha_driver = {
- 	},
- };
- 
--module_platform_driver(zynqmp_sha_driver);
-+static struct platform_device *platform_dev;
-+
-+static int __init sha_driver_init(void)
++/**
++ * versal_pm_sha_hash - Access the SHA engine to calculate the hash
++ * @src:	Address of the data
++ * @dst:	Address of the output buffer
++ * @size:	Size of the data.
++ * @out_status:	Returned output value
++ *
++ * Return:	Returns status, either success or error code.
++ */
++int versal_pm_sha_hash(const u64 src, const u64 dst, const u32 size, u32 *out_status)
 +{
++	u32 ret_payload[PAYLOAD_ARG_CNT];
 +	int ret;
 +
-+	ret = platform_driver_register(&zynqmp_sha_driver);
-+	if (ret)
-+		return ret;
-+
-+	platform_dev = platform_device_register_simple(zynqmp_sha_driver.driver.name,
-+						       0, NULL, 0);
-+	if (IS_ERR(platform_dev)) {
-+		ret = PTR_ERR(platform_dev);
-+		platform_driver_unregister(&zynqmp_sha_driver);
-+	}
-+
++	if (!out_status)
++		return -EINVAL;
++	ret = zynqmp_pm_invoke_fn(XSECURE_API_SHA3_UPDATE, ret_payload, 5,
++				  lower_32_bits(src), upper_32_bits(src),
++				  size, lower_32_bits(dst), upper_32_bits(dst));
++	*out_status = ret_payload[0];
 +	return ret;
 +}
++EXPORT_SYMBOL_GPL(versal_pm_sha_hash);
+diff --git a/include/linux/firmware/xlnx-zynqmp-crypto.h b/include/linux/firmware/xlnx-zynqmp-crypto.h
+index 56595ab37c43..c93b77a2c084 100644
+--- a/include/linux/firmware/xlnx-zynqmp-crypto.h
++++ b/include/linux/firmware/xlnx-zynqmp-crypto.h
+@@ -33,6 +33,8 @@ struct xlnx_feature {
+ #define XSECURE_API_AES_KEY_ZERO	0x510
+ #define XSECURE_API_AES_WRITE_KEY	0x511
+ 
++#define XSECURE_API_SHA3_UPDATE		0x504
 +
-+static void __exit sha_driver_exit(void)
+ #if IS_REACHABLE(CONFIG_ZYNQMP_FIRMWARE)
+ int zynqmp_pm_aes_engine(const u64 address, u32 *out);
+ int zynqmp_pm_sha_hash(const u64 address, const u32 size, const u32 flags);
+@@ -47,6 +49,7 @@ int versal_pm_aes_dec_update(const u64 in_params, const u64 in_addr);
+ int versal_pm_aes_dec_final(const u64 gcm_addr);
+ int versal_pm_aes_enc_final(const u64 gcm_addr);
+ int versal_pm_aes_init(void);
++int versal_pm_sha_hash(const u64 src, const u64 dst, const u32 size, u32 *out_status);
+ 
+ #else
+ static inline int zynqmp_pm_aes_engine(const u64 address, u32 *out)
+@@ -114,6 +117,11 @@ static inline int versal_pm_aes_init(void)
+ 	return -ENODEV;
+ }
+ 
++static inline int versal_pm_sha_hash(const u64 src, const u64 dst, const u32 size, u32 *out_status)
 +{
-+	platform_device_unregister(platform_dev);
-+	platform_driver_unregister(&zynqmp_sha_driver);
++	return -ENODEV;
 +}
 +
-+module_init(sha_driver_init);
-+module_exit(sha_driver_exit);
-+
- MODULE_DESCRIPTION("ZynqMP SHA3 hardware acceleration support.");
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Harsha <harsha.harsha@xilinx.com>");
+ #endif
+ 
+ #endif /* __FIRMWARE_XLNX_ZYNQMP_CRYPTO_H__ */
 -- 
 2.34.1
 
