@@ -1,77 +1,77 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4A63890EF
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Mar 2026 20:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C31B35DA71
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Mar 2026 22:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772568017; cv=none; b=JPyJY43zHVf6K9/KYIz6y62BlMpaPAFfg5izakanPFR9ITEh8n7A0kLTmaWclAvTJEobHYYsQhdV7F7YBeY93JdsNIVlvKhMOmltNPf9M04Nid20K9KMNkyeLC7arwx2zBjrylqKeBVxXX6odEerGXs4eyD8GsqUnWL8CHxTvH4=
+	t=1772577315; cv=none; b=Tva88RPS/5utc16iellJcn7S+t8UiUF0pZj9deDvie8I8S4TJAvE8LDfPnNSsTlbuHaabE5mTxZ8PQVPqpMvxmGKqWiIOOqscUBNUtY2vDWwJlZ61BsRzqCd09lLkVK1MMNMbUj9AzvtXJv15kN1q9VY+wVy7f8FEZEbjdQCaP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772568017; c=relaxed/simple;
-	bh=hWwivSsmttOdBiwD/tUkaDCdWccb5O3I93SN3eCnZrc=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OJWCtT0u8CD0saRcFhTIwB5yLKQPM6k0MESifjdb6B+wSJMGiaoPCv7IvWy7oww5bQwrQgcjyOP1vAVJwVC+xppkrMpbq8IS1XVmL5Dz/iufP6GD8Z6DPXdU2KWXwIfiqESgls0Fm73aF+0LTEgqjtNw7D/nYiA3zFU88cc4sHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z+AH/Fwr; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1772577315; c=relaxed/simple;
+	bh=Rfm52zSu2HGUSdIiLKfU3zTtTYX02jGA3AsNVafekYg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l0CBJZ7ydG2LyRC5DqDaJE2KurtQf/Wdd26x11OMb/eDezGEZAYPWFJ7J3R12IpHxtU88h+ygkPwJ4khDwwefbjoOiLe6GKRKVQQnDb4d/YLGd4wpqJym2c4Hk+4kqUNbVT3Th5oeC/GvjIcbSvoWXf35dV0jQWmK4eyH5ph0eE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gL3fr+rx; arc=none smtp.client-ip=74.125.82.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z+AH/Fwr"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-48379a42f76so50168445e9.0
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Mar 2026 12:00:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gL3fr+rx"
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2bdecd00ebdso583159eec.0
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Mar 2026 14:35:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772568014; x=1773172814; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LrVCaQvW0iEI3otUrXDkdYdjfZQ36uxHWa4/LArwCVM=;
-        b=Z+AH/Fwro2zRlEE6SGawGziy8ZtT6fglsKGxWTK4HvmK+ObP8sojlQO8zza7NEG2U1
-         JxKn+o+zqJ5WN6+pZ+TLVyiacL/4JSte1r7m5wiRGz969oFBJopXHSrnE0nzlDlhkGoK
-         YpD35J/Hs/u/j49u3oKxIgGIsT8uSrJENTeWLFvRjaUNvBiHDg88thNiIrPfo1anEAQG
-         SLZG31VCK82pnpCKdYnebdIf5ZptEaVVAy9Zkua2VVKVCftBiqaLIZN9o4YU0MdL3ef5
-         4pcjEqe3pVTBl1U0g5Yq8zl7pFZmYMqdpL+4FRUNp0pCPfJ9VSPFdonAco96iyt1y4bB
-         /YOQ==
+        d=gmail.com; s=20230601; t=1772577312; x=1773182112; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jMrDJNCgdkeQkoqQI6cQjxkbEQKVW+efRqHQbomqEkE=;
+        b=gL3fr+rxuT5aZReb5zZhVNWk72btq09dNBQJMguQXF58SY/W+RvIU6WLiyptihv4TD
+         gGC/TIf4SgRYNWqid2mrreHNNHFAd5q34ebK8PyPNcgb5A0rwO0UR7PQexsfU13UraZy
+         cFLivSem53/C681gu7BPEGhrLDRzJzVtWgdGUZHlEuSi0Runy3Jy2239ygMeu8Xos7iC
+         tG6b0bTEYaBDSjGxSUXpKzWRQUOMuXVif/8aSzlU+hHIT7HpCO2rkEyTTdJK6S6sTjLN
+         KaRhaVoOYucr0eJG0lZYR58bZ8il2l1NKpO7M4oHIsDCnCfMYnlThcZtYehafI34AXEL
+         SUCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772568014; x=1773172814;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LrVCaQvW0iEI3otUrXDkdYdjfZQ36uxHWa4/LArwCVM=;
-        b=GlUIrNVo0jR1jDcNIVcVynAUjDBO5ahseGnMLn7autI8KM50BO3i603Kmpsji7D/Qz
-         luQoryEQGbdRz45GyT0GC3kXHPCGpOB1tLg+lzl0ElCwMBogsnVZv+tztScxjUuwG1Yy
-         uf3weWIhZijmVV9ycHWAoido6YEV0M6CI+fuOTu0w+NCOvQVBk42BZFA75atcZb4lAMp
-         WqPNC6zK8eeD14W/bB3oEQNNApZW4JMT8HSvWYn9rA5yyPKN0Ln/7WAD01GQzQ6s/Upr
-         g0/JYBFLLBI9/JvaITqcr8j/HTp9Zzm2Kmcs6SCv+4xUZ9V6aY8DcYGsnAsXqW29KNIU
-         epWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJfgSBUOUSslYGTB6DFgSDkiS/qKZPDHFXTpO/BAAI/wvvDgNjwAHsKaED3V2SaK7txvhIy1SdDtoBpnI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysXg4Wx+KTD06FxavOfwX8NkalFBPoqAsSGdND7hNsSqstgc3W
-	O3VHFZd6OZ+gNBwuwIvQSK8I0kYVgB4fXpCwJ1PNIIeBBTJdgoeqKrAm
-X-Gm-Gg: ATEYQzx4Dck25b7cc/yb9rXaZkG0/+4QCg3Tr5npaxQAi9aQ3PPynUcc4wJ9FxRMztA
-	ShuFn+zLUKiWG1l2SwyCcci/I3SdCuyRpcjHSMiZ5owO8u/EjpTXYfUkI9w3C7ODB03EzRH89Zy
-	duUxRXeoIrF0taBjbtacN6uxxhqtRh0RzeOTTs2gvE3yTgCp5oZc1v+9mtQLbz+GUBI7zREsz3n
-	ZZQW9iJ9rRpc0e/qZF9kcnlEUXknOS+1UyPTHWQ3K0N3SoUZC293IKHeWFZss4cGI9fjxX+nIw3
-	a+6RUDOmQPgAjG71XPfcXRM2fX613ueynAY8jIjFR5KmCVX5ewPrMdD7GnhTvQCIGRbpfcEgEPC
-	3a+o1qyNDdARIciF1xEY1qEP52CmcxUaBznPzJ+LQNlA3qyay3xvWG8rnHegHcGrQvWa1BM/kDd
-	Dbw2EtpqGAMn4w2AJSNe6/G3Z+uNC7VSFDVf+F9mQAe7OcAhzqH9xnAQ==
-X-Received: by 2002:a05:600c:3b22:b0:477:a978:3a7b with SMTP id 5b1f17b1804b1-483c9bff7b0mr280384695e9.22.1772568013945;
-        Tue, 03 Mar 2026 12:00:13 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-88-122.ip49.fastwebnet.it. [93.34.88.122])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485133a91b1sm21667245e9.12.2026.03.03.12.00.12
+        d=1e100.net; s=20230601; t=1772577312; x=1773182112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jMrDJNCgdkeQkoqQI6cQjxkbEQKVW+efRqHQbomqEkE=;
+        b=ZyJV5vtLE0db8lLgAXxm85ZZw9i8el9GCsUb6hXOsS10j3YHE2CayqTlVj43984cb5
+         fbw5XjDxatlErkl07qqNfHICa/sG8++sLCuN6V94Yt9Je9s9MVPgZqnM25LkKfh8SB7E
+         tIxJBElU+XqXKP/fk0H8itBdPoRAU9d8XZ3L2b2ooyUaOcQ8fcmSTQ+nbhyggRJimeA9
+         slhdbAn2wvNezY701Z/6+6DsFnVDPb7vi5wxwzNuidMBPkdF133W+dWKorUXvy6DgN+m
+         BE1PMAbg49YwtEuoBYuOB7DgYf7HOwD8YWngZlCGdAeRuDoBMTBZ04/rWRyCBo7fPhUm
+         0YwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUEh6THaAgvs9W8+p5LyBnaJzg5o9oP7MKizVOeClOWf9jISzjZCWKUeWIO307nMB0POBHM9i5JZp8lhxM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3+iySruY7U9KwDXzLPxfb4Ru6o6k51lOUWmcvqAfhXm8iM1KO
+	2HVjaDWthDrL6tuk8o6+vd1YWkimssFLwboQ0y76lmxURkWu+5SGEjJH
+X-Gm-Gg: ATEYQzwUZp1sZILvAsrvB+TH2ZWzrSUJqGWuSSZjRHWkYAwbjILywc5h8y2nBPZlRYY
+	THZ90Dw7xB9rVeqa8JqRH3oeOO+LlCf7uT/82WzwRZToSVsoUrM4cBxGM92WIbkKVUH6kFkn1Mv
+	FnVmD2Ji5qQ0Z1Jl4a/55ADqBn628j4sxAieoujn7O0lBk1Vuiqk4A/U2kChuMlktBiCLjUfmjd
+	NQlFIH8Vh11fQNkqCXE0zDhEt0Gn3YsG3pk++lS06HDq6tnwIFRh9Z2qMbBDoHWjJvbb9iS2vir
+	5PvqLDuMuFLGI2udM5+NeKLfrYoGTwPcVKD5h6A48saae3YqNssrTgaYP2wWZyOVj9SW4sGrgqY
+	qbmKuq6+RuaDQBbDoS121Qm3coka/VbWXmBRZapI6qR3XA68yHjJJ71yvol2MsEPEWmy9yIpzms
+	z0kGM3yuldoSpG6xAF5l5rzYPm9DnjEbR07roG
+X-Received: by 2002:a05:7301:5792:b0:2be:26d9:da9b with SMTP id 5a478bee46e88-2be26d9dfc4mr1145572eec.35.1772577312277;
+        Tue, 03 Mar 2026 14:35:12 -0800 (PST)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2be249ed6a4sm1879476eec.11.2026.03.03.14.35.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 12:00:13 -0800 (PST)
-Message-ID: <69a73dcd.7b0a0220.1ac46b.9bfc@mx.google.com>
-X-Google-Original-Message-ID: <aac9yrt6MhSXBSbO@Ansuel-XPS.>
-Date: Tue, 3 Mar 2026 21:00:10 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	lorenzo@kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] arm64: dts: airoha: en7581: add crypto offload
- support
-References: <20260303193923.85242-1-olek2@wp.pl>
- <20260303193923.85242-2-olek2@wp.pl>
+        Tue, 03 Mar 2026 14:35:11 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Tue, 3 Mar 2026 14:35:10 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: Tycho Andersen <tycho@kernel.org>
+Cc: Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Alexey Kardashevskiy <aik@amd.com>
+Subject: Re: [PATCH 1/2] crypto: ccp - Fix a case where SNP_SHUTDOWN is missed
+Message-ID: <0182578a-424d-454f-8a38-57b885eb966b@roeck-us.net>
+References: <20260105172218.39993-1-tycho@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -80,50 +80,52 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260303193923.85242-2-olek2@wp.pl>
+In-Reply-To: <20260105172218.39993-1-tycho@kernel.org>
 
-On Tue, Mar 03, 2026 at 08:39:18PM +0100, Aleksander Jan Bajkowski wrote:
-> Add support for the built-in cryptographic accelerator. This accelerator
-> supports 3DES, AES (128/192/256 bit), ARC4, MD5, SHA1, SHA224, and SHA256.
-> It also supports full IPSEC, SRTP and TLS offload.
+Hi,
+
+On Mon, Jan 05, 2026 at 10:22:17AM -0700, Tycho Andersen wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
 > 
-> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+> If page reclaim fails in sev_ioctl_do_snp_platform_status() and SNP was
+> moved from UNINIT to INIT for the function, SNP is not moved back to
+> UNINIT state. Additionally, SNP is not required to be initialized in order
+> to execute the SNP_PLATFORM_STATUS command, so don't attempt to move to
+> INIT state and let SNP_PLATFORM_STATUS report the status as is.
+> 
+> Fixes: ceac7fb89e8d ("crypto: ccp - Ensure implicit SEV/SNP init and shutdown in ioctls")
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Reviewed-by: Tycho Andersen (AMD) <tycho@kernel.org>
+> Reviewed-by: Alexey Kardashevskiy <aik@amd.com>
+> Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 > ---
->  arch/arm64/boot/dts/airoha/en7581.dtsi | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>  drivers/crypto/ccp/sev-dev.c | 46 ++++++++++++++++++------------------
+>  1 file changed, 23 insertions(+), 23 deletions(-)
 > 
-> diff --git a/arch/arm64/boot/dts/airoha/en7581.dtsi b/arch/arm64/boot/dts/airoha/en7581.dtsi
-> index ff6908a76e8e..4931b704235a 100644
-> --- a/arch/arm64/boot/dts/airoha/en7581.dtsi
-> +++ b/arch/arm64/boot/dts/airoha/en7581.dtsi
-> @@ -300,6 +300,18 @@ rng@1faa1000 {
->  			interrupts = <GIC_SPI 35 IRQ_TYPE_LEVEL_HIGH>;
->  		};
->  
-> +		crypto@1e004000 {
-> +			compatible = "airoha,en7581-eip93",
-> +				"inside-secure,safexcel-eip93ies";
-> +			reg = <0x0 0x1fb70000 0x0 0x1000>;
-> +
-> +			clocks = <&scuclk EN7523_CLK_CRYPTO>;
-> +
-> +			interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
-> +
-> +			resets = <&scuclk EN7581_CRYPTO_RST>;
+> -	if (snp_reclaim_pages(__pa(data), 1, true))
+> -		return -EFAULT;
+> +	if (sev->snp_initialized) {
+> +		/*
+> +		 * The status page will be in Reclaim state on success, or left
+> +		 * in Firmware state on failure. Use snp_reclaim_pages() to
+> +		 * transition either case back to Hypervisor-owned state.
+> +		 */
+> +		if (snp_reclaim_pages(__pa(data), 1, true)) {
+> +			snp_leak_pages(__page_to_pfn(status_page), 1);
 
-I guess you can drop the extra new line between clocks interrupts and resets.
+This change got flagged by an experimental AI agent:
 
-Does the driver supports these property tho? For example the clock is just
-enabled or tweaked to a specific frequency? Same question for resets.
+  If `snp_reclaim_pages()` fails, it already internally calls
+  `snp_leak_pages()`. Does calling `snp_leak_pages()` a second time
+  on the exact same page corrupt the `snp_leaked_pages_list` because
+  `list_add_tail(&page->buddy_list, &snp_leaked_pages_list)` is
+  executed again?
 
-> +		};
-> +
->  		system-controller@1fbf0200 {
->  			compatible = "airoha,en7581-gpio-sysctl", "syscon",
->  				     "simple-mfd";
-> -- 
-> 2.47.3
-> 
+I don't claim to understand the code, but it does look like snp_leak_pages()
+is indeed called twice on the same page, which does suggest that it is added
+twice to the leaked pages list if it is not a compound page.
 
--- 
-	Ansuel
+Does this make sense, or is the AI missing something ?
+
+Thanks,
+Guenter
