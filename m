@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 293131A6810;
-	Tue,  3 Mar 2026 04:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F128C1990A7;
+	Tue,  3 Mar 2026 05:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772513993; cv=none; b=tT7eyirlbz7XSYlrkY/ay3jznIh5lfkxGCnSBt5UXDYQeW3kPiLnV/1poOwvn2hwFfsG0D+mox4QogijuOxlgnaRNyjBU5BmxGBB6M3rAKBnhpvefwKahaf+ESYoORmHMl097PnYvcFnr8UbxZBH8QgtKYPDR6EOZa1HWPyQVGw=
+	t=1772514335; cv=none; b=GLQhzQyfvDD4I7zKGl4hBEGhBBSzIOPgyw8rXI5oQTS7Dj+XTVvF+xfChta6D4yV9CvfFA360e/nDBphDLJyxo4inBkZO+KCHiTZrCpDbLVQ9zGPEynzfJvPUkwi5w+QICGk8lD9avIYK97oAlkhiqLKIgtpjIJekp+7nXSC/2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772513993; c=relaxed/simple;
-	bh=GXE9B9NI78FWPwaPJo9a3b8uj3AJ5bHP6qkvPhjVU74=;
+	s=arc-20240116; t=1772514335; c=relaxed/simple;
+	bh=pVNsw8FbQdsCS9MidUuH13rClfK4hay55esSvGYmbc4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YZYPa0YY59i+4JfczMEW6O6VP3R/wb+PcEFsGTlam4JvCtxdk9S/n9rB823AqhVgtnvhhWDU9Al2jwwkT+n3xz5Ja3baXS1V78yZzpVXCd+qtB2eR/2wsZ7BZs10uNaT13Bf0Og4a/91NUuj1WchCbu6F2KVo84FUw7X3y8ZhLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o4sSS/dD; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=gv2fPYJ3e7/opRH9x7gpWY4Ncjhqh9PUEZIqgU7FI+GVIVwUmSXgYI0dkScv3C7uWMSRcqTfStYOQayQ1b7UpSpkEkvswOApebjOGjmpaujIZG/MO0INbdIFGKQXIs6tRTApLIt2yeQVaibODp+253Wti8vIYKC55ngjMmH6Sfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cIPi4zKk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o4sSS/dD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82569C116C6;
-	Tue,  3 Mar 2026 04:59:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cIPi4zKk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 472A3C116C6;
+	Tue,  3 Mar 2026 05:05:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772513992;
-	bh=GXE9B9NI78FWPwaPJo9a3b8uj3AJ5bHP6qkvPhjVU74=;
+	s=k20201202; t=1772514334;
+	bh=pVNsw8FbQdsCS9MidUuH13rClfK4hay55esSvGYmbc4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o4sSS/dDIzT0KZGGSpg0D0ao8wm/EQ1gdu+/UCedeCy8A53/zYclcT9G9Zl/eVOuX
-	 Q1J6xD2r1LnqR1U41XBgAxm/1VsNWvd1cq5DDYKMHNDJdzRvCKirtYASZSBFUaFK32
-	 qzPAZ2/GAAsyc/GZYgGCcOlsnpYsc88TORS+I8XTIho4npASA3SdsU8LXmVsJguePo
-	 Idkv+7/7B4mPRMp92AENEBNLfDjZttmTF6SRzmI3fXwlLZJEmb7e8+Rulwq+hgpHh3
-	 0yNIdD1MO+W6uYFe3eBYDmKlnjnrD/eWjrwJ/RmL17pT4vNPytZxMW3eVrNznxFlFj
-	 aHgB8RcnsQsAA==
-Date: Mon, 2 Mar 2026 20:58:57 -0800
+	b=cIPi4zKkoJBDg1OdyRZOdiyXq7bRp5ch+rtA9HWR+50RVJ5n18yqsHmxF1YAVwUNH
+	 tvrHGg2ckLHHqhNWWNkIwIuIpjiEmHmp4if0geuAu59i+PF4Ajw3elu418oUub18+f
+	 eEvHJ9xaKmm2SdDudYX5fWXrBGqgJzk/73BqSP5vz2drAbz7zo7i4CZWnIbPudKOnY
+	 Cr6GaRkWMQ+zNzz/1joHauzswpojvFCxZZ7g5FwzxaX5+zkp+ZZn07k3ajwDhI502Z
+	 IyeRjwJlQdBRTlHGkC8T471eZf1Q6Quy96co1yFykKW3DTZWLrRWMPv+3m2i7Ytxb3
+	 lk0G3FB86xrJg==
+Date: Mon, 2 Mar 2026 21:04:39 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Howells <dhowells@redhat.com>,
-	Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v7] crypto: jitterentropy - Use SHA-3 library
-Message-ID: <20260303045857.GA5238@sol>
-References: <20260226010005.43528-1-ebiggers@kernel.org>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org, linux-crypto@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] smb: client: Compare MACs in constant time
+Message-ID: <20260303050439.GB5238@sol>
+References: <20260218042702.67907-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,24 +45,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260226010005.43528-1-ebiggers@kernel.org>
+In-Reply-To: <20260218042702.67907-1-ebiggers@kernel.org>
 
-On Wed, Feb 25, 2026 at 05:00:05PM -0800, Eric Biggers wrote:
-> From: David Howells <dhowells@redhat.com>
+On Tue, Feb 17, 2026 at 08:27:02PM -0800, Eric Biggers wrote:
+> To prevent timing attacks, MAC comparisons need to be constant-time.
+> Replace the memcmp() with the correct function, crypto_memneq().
 > 
-> Make the jitterentropy RNG use the SHA-3 library API instead of
-> crypto_shash.  This ends up being quite a bit simpler, as various
-> dynamic allocations and error checks become unnecessary.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Co-developed-by: Eric Biggers <ebiggers@kernel.org>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Cc: stable@vger.kernel.org
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
-> 
-> This is a cleaned-up and rebased version of
-> https://lore.kernel.org/linux-crypto/20251017144311.817771-7-dhowells@redhat.com/
-> If there are no objections, I'll take this via libcrypto-next.
+>  fs/smb/client/smb1encrypt.c   | 3 ++-
+>  fs/smb/client/smb2transport.c | 4 +++-
+>  2 files changed, 5 insertions(+), 2 deletions(-)
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
+Any feedback on this?  Just to clarify, this is intended to be taken
+through the smb tree.
 
 - Eric
