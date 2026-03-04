@@ -1,54 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43435310779;
-	Wed,  4 Mar 2026 14:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E259625B30D;
+	Wed,  4 Mar 2026 14:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772635190; cv=none; b=UCkSQye1H4iVQRQeKjRymxgS7C9lkHH6p51gmYK4qXs1yB6wwc1DjQcwhZv3iMGYitQ+EH52rwuBj8RUrJ6eNrFwc2Cz46aqWc3pHTzNwLPq5h94Pcq15FStglV8+vchqa3QJ33TFsXODn7VUOMfUff0IOe5Ac1u5ouc44Na6mY=
+	t=1772635911; cv=none; b=BRsaSvMfHOJ+MneRCvIAmEczl63TIm5XbrzR+HD7vb+Y5p3raq5tLTf5nM0mWN8hQblqJg42ekm0jGEtPSSGGMzNsor5du6dNwnCUkjK17EY/6gWzzU0zFIaGegBafKocMoyT7OEb840aqSNWQfcHdH7PU9bbrj8Vl12XmoB3Fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772635190; c=relaxed/simple;
-	bh=c9P1MJrJ5iSgDeKJm2NK7T0A2RucQmD2Vtmr+HlkX3Q=;
+	s=arc-20240116; t=1772635911; c=relaxed/simple;
+	bh=2E+COVdk95EvvOhcxzJIojbkXopuFHW8IBxu52ORtHY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s/2rQraPlSf3o64aVONeAP1xuN+9kR9XokXI8xbyeKO4+qf0xw2TnV++w1TY6EaaK6gpTbECCBqMEaoI7FvCRSsPT56Dg2CxZobB1mB2dYNvXbyISu3peD/9qjG0pjGGHRl3YL2dbUdFww4VEMg8CaVh8Bz13KF1l76PwCXD1fQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SZKU8NqA; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SZKU8NqA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F371C2BC9E;
-	Wed,  4 Mar 2026 14:39:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772635189;
-	bh=c9P1MJrJ5iSgDeKJm2NK7T0A2RucQmD2Vtmr+HlkX3Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SZKU8NqA2W9FxhntXn0JhnExzE2aPOPFnhX203q5ThWEX3Jvx4XduNtRzD/QksrPa
-	 oMZ+/mMEeXN6hqUmheqwvSrgdEdh3PzriZ68n353S4FvbSMqzipYmBlnVPRBhI6pNE
-	 kdxLjT3tLl1SfLcsJ1jh+46HLzdU66Ey4yP6I1i+brkPoar3PWRX0V0sJ7oWim0F/8
-	 JAk8HbtQ1mXHUTRZQgBrCEAsi08vAgbdqHzlnKhDXpC75w+/rsEsGvNWYKlCmZ/Xt9
-	 1mCD1AjNcjak/1lTyXyJt5KjtzPezIyuihcVM89GKR4sZGSXmTJ0S7rVbWMP3mB+nm
-	 lmm+UaOtjWHmw==
-Date: Wed, 4 Mar 2026 20:09:46 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=SvRvGHA/atn+PlQp6LBs78yCPrbszjKDuHqI9hvAAOW4pD7PImdxo5rkIQ8psi85u8PTNJzWdKcTN9/lOcA62e4X/oob/1m8c77+UzFk/XBtIdtGSCXHrECctX5EVGgg2yAoLF+egZudCVAbT8kPJ2HWuQYwAmaOZjIPptt2N4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 23B5068AFE; Wed,  4 Mar 2026 15:51:35 +0100 (CET)
+Date: Wed, 4 Mar 2026 15:51:34 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Peter Zijlstra <peterz@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Matt Turner <mattst88@gmail.com>,
+	Magnus Lindholm <linmag7@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Udit Tiwari <quic_utiwari@quicinc.com>,
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
-	Md Sadre Alam <mdalam@qti.qualcomm.com>,
-	Dmitry Baryshkov <lumag@kernel.org>,
-	Peter Ujfalusi <peter.ujfalusi@gmail.com>,
-	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>,
-	dmaengine@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	brgl@kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH RFC v11 07/12] crypto: qce - Communicate the base
- physical address to the dmaengine
-Message-ID: <aahEMjjBRINXL5zC@vaman>
-References: <20260302-qcom-qce-cmd-descr-v11-0-4bf1f5db4802@oss.qualcomm.com>
- <20260302-qcom-qce-cmd-descr-v11-7-4bf1f5db4802@oss.qualcomm.com>
+	Andreas Larsson <andreas@gaisler.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
+	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
+	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
+	Li Nan <linan122@huawei.com>, linux-alpha@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
+Subject: Re: [PATCH 01/25] xor: assert that xor_blocks is not called from
+ interrupt context
+Message-ID: <20260304145134.GA21983@lst.de>
+References: <20260226151106.144735-1-hch@lst.de> <20260226151106.144735-2-hch@lst.de> <20260227142455.GG1282955@noisy.programming.kicks-ass.net> <20260303160050.GB7021@lst.de> <20260303195517.GC2846@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,66 +71,20 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260302-qcom-qce-cmd-descr-v11-7-4bf1f5db4802@oss.qualcomm.com>
+In-Reply-To: <20260303195517.GC2846@sol>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 02-03-26, 16:57, Bartosz Golaszewski wrote:
-> In order to let the BAM DMA engine know which address is used for
-> register I/O, call dmaengine_slave_config() after requesting the RX
-> channel and use the config structure to pass that information to the
-> dmaengine core. This is done ahead of extending the BAM driver with
-> support for pipe locking, which requires performing dummy writes when
-> passing the lock/unlock flags alongside the command descriptors.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
->  drivers/crypto/qce/core.c | 3 ++-
->  drivers/crypto/qce/dma.c  | 8 ++++++++
->  2 files changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-> index 2667fcd67fee826a44080da8f88a3e2abbb9b2cf..f6363d2a1231dcee0176824135389c42bec02153 100644
-> --- a/drivers/crypto/qce/core.c
-> +++ b/drivers/crypto/qce/core.c
-> @@ -211,6 +211,8 @@ static int qce_crypto_probe(struct platform_device *pdev)
->  	if (IS_ERR(qce->base))
->  		return PTR_ERR(qce->base);
->  
-> +	qce->base_phys = res->start;
-> +
->  	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
->  	if (ret < 0)
->  		return ret;
-> @@ -260,7 +262,6 @@ static int qce_crypto_probe(struct platform_device *pdev)
->  	qce->dma_size = resource_size(res);
->  	qce->base_dma = dma_map_resource(dev, res->start, qce->dma_size,
->  					 DMA_BIDIRECTIONAL, 0);
-> -	qce->base_phys = res->start;
->  	ret = dma_mapping_error(dev, qce->base_dma);
->  	if (ret)
->  		return ret;
-> diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
-> index ba7a52fd4c6349d59c075c346f75741defeb6034..86f22c9a11f8a9e055c243dd8beaf1ded6f88bb9 100644
-> --- a/drivers/crypto/qce/dma.c
-> +++ b/drivers/crypto/qce/dma.c
-> @@ -109,7 +109,9 @@ void qce_write_dma(struct qce_device *qce, unsigned int offset, u32 val)
->  int devm_qce_dma_request(struct qce_device *qce)
->  {
->  	struct qce_dma_data *dma = &qce->dma;
-> +	struct dma_slave_config cfg = { };
->  	struct device *dev = qce->dev;
-> +	int ret;
->  
->  	dma->txchan = devm_dma_request_chan(dev, "tx");
->  	if (IS_ERR(dma->txchan))
-> @@ -121,6 +123,12 @@ int devm_qce_dma_request(struct qce_device *qce)
->  		return dev_err_probe(dev, PTR_ERR(dma->rxchan),
->  				     "Failed to get RX DMA channel\n");
->  
-> +	cfg.dst_addr = qce->base_phys;
-> +	cfg.direction = DMA_MEM_TO_DEV;
+On Tue, Mar 03, 2026 at 11:55:17AM -0800, Eric Biggers wrote:
+> may_use_simd() is the "generic" way to check "can the FPU/vector/SIMD
+> registers be used".  However, what it does varies by architecture, and
+> it's kind of a questionable abstraction in the first place.  It's used
+> mostly by architecture-specific code.
 
-So is this the address of crypto engine address where dma data is
-supposed to be pushed to..?
+Yeah, I don't think that is quite right here.
 
--- 
-~Vinod
+> How about "WARN_ON_ONCE(!preemptible())"?  I think that covers the union
+> of the context restrictions correctly.  (Compared to in_task(), it
+> handles the cases where hardirqs or softirqs are disabled.)
+
+Good enough I guess.  Peter?
+
