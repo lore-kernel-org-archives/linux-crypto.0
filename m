@@ -1,121 +1,63 @@
-Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7125337269D
-	for <linux-crypto@vger.kernel.org>; Wed,  4 Mar 2026 21:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63D3383C67;
+	Wed,  4 Mar 2026 22:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772660807; cv=none; b=sTWDpxmKP86BIsZFhoTyEmrZJLVUKRbFcTN6zCjNo1qwm0r6EK2TB+8gKudoALEXnXv5elZ24H93EjDtiJheJWuGi7rYU7LUhgCnFJsWiksc2+IuIFTpONwluuWOv0pBmn0Zb7QNdfVm7DKAhEsPC8dA6hTvycU6VmWE9VMJAAo=
+	t=1772661835; cv=none; b=lXmlPmGKA/Erzm1OKQcXIrCvQZDKH9x3STVmLGI3uGzi8H1qbG1HdgNLw1zKIuPCTm4JciPDglb8i2R9TtCdZYrGLalucbS9cCm57asdAmwUUmpNSb8t8FPT5aMr1YKeurOY2dJPFZNwPGVlvVWW6SZMwv0MNGSqLdwfmZsjUbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772660807; c=relaxed/simple;
-	bh=223XzBN0EuYg8B6+phfCR8wOW4TgNR5NTLYQtHwsqNI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hx5u5OjadCBeKJ6bjqJzVBARf2+EsQfZa9brIrFb5LVwMwq7/OIaSsPJ1JfwNKK3QBPW/XnLx6NwjdMrfop+VcO/CvsOt3+WB6KsU1sYr0PSSUOPYPoKZjoEZe/5DPMxCCCEC4F2R5GKr6S9SKKRwdmik7TYy3d97iy+rWgwTdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=kXijcwDr; arc=none smtp.client-ip=212.77.101.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+	s=arc-20240116; t=1772661835; c=relaxed/simple;
+	bh=X4//Yj2/Ujl1m4VEwBvnjqeL8UvhG9m6vISP+WwMes8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kOoZ08+0qrg1hKaNUuaJYaRRkTiCYD0Un4iCIsNMPlwbrUcYveDsSgxkQ4FAIPRip6be+SVt/RfxzzedRRkpOrcCZMKdLBTFF8OYTrxWfwkI8OIe/HkEMgE/8OWPYZ9iUah7J1XJyQNGcj7LjAB3FsEqt3bu6EIn/CiUsRFCEj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+GL1VxL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="kXijcwDr"
-Received: (wp-smtpd smtp.wp.pl 398 invoked from network); 4 Mar 2026 22:46:42 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1772660802; bh=NzpEAndabLXdFU83lYguNUY29Q1wC4ZmNMkxm9NkFgM=;
-          h=Subject:To:Cc:From;
-          b=kXijcwDr5eR+9K1AwEREg5sp8eO2Ui5fNQ/FNdpdD4KuEECE7vZahMbWoLbr221VF
-           YDdZcQW2bq/cH4l4B9dnHaSQIOlXrJX6lmG86qAKolf84vsSUInILkDJiH35VvpCLC
-           7Lt/fLQ7rjqjdVkIjGGYT/vj5iJODYPGx7rN82nglesI7ilXYsoPz16kYO/jdLJN8l
-           l5Resb1XzI48I8Whs3PHD7z3LKLXAZZA8GLYpCrCpUEqwcehFiHjcL0Y3OnQhEFoGd
-           qfFgyF47S1t4dK+qTNRhKK9z4bWOyKJRcVO8WrhYn5c0uSUqbCVDVsne9U1yV0dQRy
-           pEqTVWAKGk8MA==
-Received: from 83.24.116.171.ipv4.supernova.orange.pl (HELO [192.168.3.246]) (olek2@wp.pl@[83.24.116.171])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <conor@kernel.org>; 4 Mar 2026 22:46:42 +0100
-Message-ID: <f9b266d7-f545-4088-b6c5-a0cc8676d60c@wp.pl>
-Date: Wed, 4 Mar 2026 22:46:41 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+GL1VxL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2B18C4CEF7;
+	Wed,  4 Mar 2026 22:03:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772661835;
+	bh=X4//Yj2/Ujl1m4VEwBvnjqeL8UvhG9m6vISP+WwMes8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=L+GL1VxL0JOpaK3ciGujI74BWHA3IA2+LahDawxYRDVMu8sUvy0SAVqhYOsEPVQut
+	 ErWsq5RUYzZ6Wt90jpqwiWd6tUctzkeniJZaEO8ovdKmBaR4ar3qfjupOPOe23fRN3
+	 t4yfusgekeV/IYio4BHvkO6YbUKN+gLroZL2ovL2Y4PhkKx13tr+291DiinjwcuiOS
+	 HZ8ugNNz7jkWJTgmiYpfp34P7rI7yGBZ41X3RjaVEPsXF1XcWaMP3p8QJ3XSRmCBP7
+	 b0K9JAfvN0CRk7YTRXULrsHHcX+eA07c0dG+ksJ4mPqFoEoPsTiUIo2e4gInqDNH48
+	 dHIvUKUT7Z8sA==
+Date: Wed, 4 Mar 2026 15:03:53 -0700
+From: Tycho Andersen <tycho@kernel.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Ashish Kalra <ashish.kalra@amd.com>, John Allen <john.allen@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH] crypto: ccp - Fix leaking the same page twice
+Message-ID: <aaisSe6VBchOUqVF@tycho.pizza>
+References: <20260304203934.3217058-1-linux@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: eip93: add clock gate and reset
- line
-To: Conor Dooley <conor@kernel.org>
-Cc: ansuelsmth@gmail.com, herbert@gondor.apana.org.au, davem@davemloft.net,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- lorenzo@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260303193923.85242-1-olek2@wp.pl>
- <20260304-hardship-abreast-7a2d58cbe446@spud>
-Content-Language: en-US
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-In-Reply-To: <20260304-hardship-abreast-7a2d58cbe446@spud>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-WP-MailID: 99f604febecd4a2e8ba3ea7d20496df9
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000009 [oTqX]                               
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260304203934.3217058-1-linux@roeck-us.net>
 
-Hi Conor,
+On Wed, Mar 04, 2026 at 12:39:34PM -0800, Guenter Roeck wrote:
+> Commit 551120148b67 ("crypto: ccp - Fix a case where SNP_SHUTDOWN is
+> missed") fixed a case where SNP is left in INIT state if page reclaim
+> fails. It removes the transition to the INIT state for this command and
+> adjusts the page state management.
+> 
+> While doing this, it added a call to snp_leak_pages() after a call to
+> snp_reclaim_pages() failed. Since snp_reclaim_pages() already calls
+> snp_leak_pages() internally on the pages it fails to reclaim, calling
+> it again leaks the exact same page twice.
+> 
+> Fix by removing the extra call to snp_leak_pages().
 
-On 3/4/26 20:08, Conor Dooley wrote:
-> On Tue, Mar 03, 2026 at 08:39:17PM +0100, Aleksander Jan Bajkowski wrote:
->> Add the clock gate and reset line, both of which are available
->> on the Airoha AN7581. Both properties are optional.
-> Why are they optional?
-
-No reason. In theory, a hardware designer could connect the reset
-to a fixed input signal. In practice, all SoCs on the market have
-a built-in reset and clock controller. I can mark them as required
-in the next revision.
-
->> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
->> ---
->>   .../crypto/inside-secure,safexcel-eip93.yaml         | 12 ++++++++++++
->>   1 file changed, 12 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
->> index 997bf9717f9e..058454b679b4 100644
->> --- a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
->> +++ b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
->> @@ -48,6 +48,12 @@ properties:
->>     interrupts:
->>       maxItems: 1
->>   
->> +  clocks:
->> +    maxItems: 1
->> +
->> +  resets:
->> +    maxItems: 1
->> +
->>   required:
->>     - compatible
->>     - reg
->> @@ -57,11 +63,17 @@ additionalProperties: false
->>   
->>   examples:
->>     - |
->> +    #include <dt-bindings/clock/en7523-clk.h>
->>       #include <dt-bindings/interrupt-controller/arm-gic.h>
->> +    #include <dt-bindings/reset/airoha,en7581-reset.h>
->>   
->>       crypto@1e004000 {
->>         compatible = "airoha,en7581-eip93", "inside-secure,safexcel-eip93ies";
->>         reg = <0x1fb70000 0x1000>;
->>   
->> +      clocks = <&scuclk EN7523_CLK_CRYPTO>;
->> +
->>         interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
->> +
->> +      resets = <&scuclk EN7581_CRYPTO_RST>;
->>       };
->> -- 
->> 2.47.3
->>
-Best regards,
-Aleksander
-
-
+Reviewed-by: Tycho Andersen (AMD) <tycho@kernel.org>
