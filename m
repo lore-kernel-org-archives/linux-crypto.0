@@ -1,101 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC2B3382F0
-	for <linux-crypto@vger.kernel.org>; Wed,  4 Mar 2026 15:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3700C26E6FA;
+	Wed,  4 Mar 2026 15:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772636766; cv=none; b=do8rFxZk2r/BykvEjxMnz0bn5bm6d2x12CCV3s3mNQ7m6EFWyjMZY2TIKhKVjrq9+uzBS6kX3hJElxWJVDArMLXX7Zit39MujWsVMe2xoXfQ3fxbFzG/PPtMTeKOnF779qk9PM+dAOmciqwFWNkFp7gebws4fs50CyxI8x0+HRc=
+	t=1772636833; cv=none; b=Zizcy9+HZcX+QCSHBGB17arXsIc4jpUwiLVuklir2zbhiuSCS52x0R44BVql0S+WQ8q0dWn6opLpLVf8s9/Pygv83TAJ6VCtTfYCKaBX04NDg2ZbvklICRpU2w2XPrKOw6LyMk7WQt4oeavksoonr8rYAERY57Mn1XPmtuc7Teg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772636766; c=relaxed/simple;
-	bh=gxAcEfjco4wGcd5mrryQitiaU7LNC8vhE9G14RTHDDo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BYl8Q8B8M7gH40WYNc+ooDNgRV8uL90zaXywjhsf9LkNqcPk/BDxgpqrRukG7Q5cYlXU4SkptDZ7LsfF0TqtKtdTXCruiSJQ1qde7VDndvgFbCrf6ZSX9NeEujB621HXLkqRpdTYdZ6WTwZI1K8EbVzi2XGLGbF1RCvxWMloYaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GXd9GKw6; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GXd9GKw6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AF05C2BCB5
-	for <linux-crypto@vger.kernel.org>; Wed,  4 Mar 2026 15:06:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772636766;
-	bh=gxAcEfjco4wGcd5mrryQitiaU7LNC8vhE9G14RTHDDo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=GXd9GKw66/RCES5/LDmh94gtKijy68iTiVF7ojlM67lcaT22ypzTDzXcxsFJblQ6l
-	 W6ejBD0MtWbJIHL5/oXbb7GeyJdKsNkyOPuHJwq2LJWBUs9Z+ZZgAxTMGZXyWG/y41
-	 nmPiyrTkAoeQqffmxjP9IU0KCXecY75c2KMtDeZa5F/iGV1/irZ6HW6hSq8TcPwNfu
-	 onqJ7QVaCLjNZsk8hiP4+IP/yJjKDCos9GqzS1n6rIz9/zcxFW1aYFm+ZLJ4za9yVE
-	 cl17M7asN0sOHqdfifMeQ+Ym00xoTvAUxYPaWQmwQcDru+jF34WmDDtgbZskwy1WZV
-	 FdgyxnC6U9+9Q==
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-389fac627c9so107894101fa.0
-        for <linux-crypto@vger.kernel.org>; Wed, 04 Mar 2026 07:06:06 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVSxQivfVU1jCXF/GLd2tbZ4xZAEuvKaWfWqpDL3wwJjVWY/nLK8S+C1TkNUn82/0rNISNWJv0x0eY8jB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPwgoHt6hqEDg//QrZeh/W/b0UxbPuSKg9TvoFpYH3uKJvQEyu
-	Qi8c/0ouPAEFIM0WFXIoAMPbL3RfRidw+GnUuzdF7HSVBLvmDJFcVFc2uCUB1pExV3vGFwjP9mY
-	YqPUvgaDZ0MS57XvShVBe9eEVQ7ED45elpnTbv6Umew==
-X-Received: by 2002:a2e:8245:0:b0:386:1e28:4d72 with SMTP id
- 38308e7fff4ca-38a2c7cf3f0mr16410411fa.30.1772636764859; Wed, 04 Mar 2026
- 07:06:04 -0800 (PST)
+	s=arc-20240116; t=1772636833; c=relaxed/simple;
+	bh=9SXhtW4k3MBZjjq2Mkcj04AbBIFzwpuFY2VgDt3g+5E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jg3O8GpBgjdKoZD94vGXT/o6rsrw7ITakRdWYxmQFLCLkb3s87/3JG+Bh1L+5fEh+ZXgitV8N81XEexJaHNvQtgQPL2LeciylfjKpuBm4wkefMxEC7wQIfIBASWpRr2UzrrLa0P1MypqRJzMaIDXbw0YSjoe8/Mu5jMLpkg9IZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 61CD968AFE; Wed,  4 Mar 2026 16:06:59 +0100 (CET)
+Date: Wed, 4 Mar 2026 16:06:59 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Heiko Carstens <hca@linux.ibm.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Matt Turner <mattst88@gmail.com>,
+	Magnus Lindholm <linmag7@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
+	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
+	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
+	Li Nan <linan122@huawei.com>, linux-alpha@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
+Subject: Re: [PATCH 01/25] xor: assert that xor_blocks is not called from
+ interrupt context
+Message-ID: <20260304150659.GA23393@lst.de>
+References: <20260226151106.144735-1-hch@lst.de> <20260226151106.144735-2-hch@lst.de> <20260227142455.GG1282955@noisy.programming.kicks-ass.net> <20260303160050.GB7021@lst.de> <20260303195517.GC2846@sol> <20260304150142.10892A0b-hca@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260302-qcom-qce-cmd-descr-v11-0-4bf1f5db4802@oss.qualcomm.com>
- <20260302-qcom-qce-cmd-descr-v11-7-4bf1f5db4802@oss.qualcomm.com> <aahEMjjBRINXL5zC@vaman>
-In-Reply-To: <aahEMjjBRINXL5zC@vaman>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Wed, 4 Mar 2026 16:05:51 +0100
-X-Gmail-Original-Message-ID: <CAMRc=Md2G7k7DGMZv2Du75ososQtsAutw2WwwAQ3WL8pC_-LmQ@mail.gmail.com>
-X-Gm-Features: AaiRm53H7_XeJS7KZNaUgV2GDd2SiLuqpmAUu8ZTp5xsf7mIRHhbSIEFXAiwXiE
-Message-ID: <CAMRc=Md2G7k7DGMZv2Du75ososQtsAutw2WwwAQ3WL8pC_-LmQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v11 07/12] crypto: qce - Communicate the base physical
- address to the dmaengine
-To: Vinod Koul <vkoul@kernel.org>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
-	Dmitry Baryshkov <lumag@kernel.org>, Peter Ujfalusi <peter.ujfalusi@gmail.com>, 
-	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>, dmaengine@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260304150142.10892A0b-hca@linux.ibm.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Mar 4, 2026 at 3:39=E2=80=AFPM Vinod Koul <vkoul@kernel.org> wrote:
->
-> On 02-03-26, 16:57, Bartosz Golaszewski wrote:
-> > In order to let the BAM DMA engine know which address is used for
-> > register I/O, call dmaengine_slave_config() after requesting the RX
-> > channel and use the config structure to pass that information to the
-> > dmaengine core. This is done ahead of extending the BAM driver with
-> > support for pipe locking, which requires performing dummy writes when
-> > passing the lock/unlock flags alongside the command descriptors.
-> >
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.co=
-m>
-> > ---
-> >
-> >       dma->txchan =3D devm_dma_request_chan(dev, "tx");
-> >       if (IS_ERR(dma->txchan))
-> > @@ -121,6 +123,12 @@ int devm_qce_dma_request(struct qce_device *qce)
-> >               return dev_err_probe(dev, PTR_ERR(dma->rxchan),
-> >                                    "Failed to get RX DMA channel\n");
-> >
-> > +     cfg.dst_addr =3D qce->base_phys;
-> > +     cfg.direction =3D DMA_MEM_TO_DEV;
->
-> So is this the address of crypto engine address where dma data is
-> supposed to be pushed to..?
->
+On Wed, Mar 04, 2026 at 04:01:42PM +0100, Heiko Carstens wrote:
+> > Because of that CPU feature check, I don't think
+> > "WARN_ON_ONCE(!may_use_simd())" would actually be correct here.
+> > 
+> > How about "WARN_ON_ONCE(!preemptible())"?  I think that covers the union
+> > of the context restrictions correctly.  (Compared to in_task(), it
+> > handles the cases where hardirqs or softirqs are disabled.)
+> 
+> I guess, this is not true, since there is at least one architecture which
+> allows to run simd code in interrupt context (but which missed to implement
+> may_use_simd()).
 
-No. In case I wasn't clear enough in the cover letter: this is the
-address of the *crypto engine* register which we use as a scratchpad
-for the dummy write when issuing the lock/unlock command. Mani
-suggested under the cover letter to use the descriptor metadata for
-that.
-
-Bart
+I'd rather have a strict upper limit that is generally applicable.
+Currently there is no non-task user of this code, and while maybe doing
+XOR recovery for tiny blocks from irq context would be nice, let's defer
+that until we need it.  There is much bigger fish to fry in terms of
+raid performance at the moment.
