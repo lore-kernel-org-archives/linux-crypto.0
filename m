@@ -1,140 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C143A4F25;
-	Wed,  4 Mar 2026 11:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C112E3451AE;
+	Wed,  4 Mar 2026 11:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772622631; cv=none; b=aZtHzLQpweEt+kh840pINpvzSE+nKnyhcJoOhxo+6R1N7Yw31nPRCynTzOGkPzNmmZJZRYKnQIgwHQsOfoZhbxhnjQv+KKhyj4y/jh6dN9In27WClQl1bg1Awldy4VcrF1MHVjT7ozDtmmCBbM9Y/+sJ3o7kDLmOcFQ97kz4LrY=
+	t=1772624087; cv=none; b=mx9xFt2wT1IKYyJpzt0zaztJJrQalBuwioy4hbSoFAIsx7dbwpaI88OVYQMXE2C/kkfIzvNmc1jr9f9SPtXICJIpFwwyPVmZeGkf0oIDciflBYgBWAe9JQ2sNEKHGxkZXR7tNIJ0VziqanuLR0nSXQ/MzMb1NcEXvc+BmaCLLNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772622631; c=relaxed/simple;
-	bh=NqNfQqjBGfmbAJo/aZtHMPo7003kq0HNHUa3oLLM9rE=;
+	s=arc-20240116; t=1772624087; c=relaxed/simple;
+	bh=8ynUVUDyth5bSt/By20k6bJWU9I97gy1nrt2iENQfHY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mOwlADegZNWRm0dv1I4xMg8DdkrRZbC46fUuw/aLiMnSDMLdPP8/cLmuhRe9Vw96PeB0QSAmg+sms6aFjjxTSOFAZjwpi9F7k594FFvGPhAoOOuNfBGe+Fx1beGv1+HxaEnI950JuPzQtAN/CqdL+7qCjmLB4Lo2GwEd3jnJrWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KtxESzLT; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=GbQyEfjCN5gKpjRRnKySdPnOIVI9Af8fo6huOQSuhDQH4+537r6k8rxn23osxpjbTVXqzKvw+vHhiek7eiu6O/VMXXIRHDtbIToq9SPbAvtgOUXuYMqbfKUnd5xqUdBbAv1Frd6clYVb7moGVHa/IxICBVMh/sTROGK5qPfCAP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P8pZhTA6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtxESzLT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64839C19423;
-	Wed,  4 Mar 2026 11:10:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P8pZhTA6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04F1FC19423;
+	Wed,  4 Mar 2026 11:34:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772622630;
-	bh=NqNfQqjBGfmbAJo/aZtHMPo7003kq0HNHUa3oLLM9rE=;
+	s=k20201202; t=1772624087;
+	bh=8ynUVUDyth5bSt/By20k6bJWU9I97gy1nrt2iENQfHY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KtxESzLTRevMkC0RMT3EArDVMk2FhTkCghz7l84S/Sl/uRFMKbvYjBO6WKTPLXZG2
-	 hDd+jtXTkQDCPlsNqrRNNBIS69FSEG3kyCqhhWldcKaA7lgmXmclpmibkTkxFDGx05
-	 L1mWc9QOtddQl0a6TEhhiss3l8edtqg3iz0dJiofY0wVH+4yeCbYY1MzoD2oPWrjdR
-	 EnDw2NjEjLAGM8p4Zym2vHqMmJuBYJNQQtn7Ix1yH9YiSler1bu8kJQI/BP/hsAWKP
-	 HCA4EbtIlLqW3pzKVaXGzu0CeEXA+pozdgRHL7CTE7jTeamnzsicmpnlaw5LC2gU+C
-	 eQD2mqeeLI41g==
-Date: Wed, 4 Mar 2026 11:10:13 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Yury Norov <ynorov@nvidia.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Theodore Ts'o <tytso@mit.edu>, Albert Ou <aou@eecs.berkeley.edu>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Anna Schumaker <anna@kernel.org>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Aswin Karuvally <aswin@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>, Carlos Maiolino <cem@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chao Yu <chao@kernel.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	David Airlie <airlied@gmail.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Dongsheng Yang <dongsheng.yang@linux.dev>,
-	Eric Dumazet <edumazet@google.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ingo Molnar <mingo@redhat.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Jaroslav Kysela <perex@perex.cz>, Jens Axboe <axboe@kernel.dk>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Linus Walleij <linusw@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <pjw@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Simona Vetter <simona@ffwll.ch>, Takashi Iwai <tiwai@suse.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-	Yury Norov <yury.norov@gmail.com>, Zheng Gu <cengku@gmail.com>,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-block@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	dm-devel@lists.linux.dev, netdev@vger.kernel.org,
-	linux-spi@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
-	v9fs@lists.linux.dev, virtualization@lists.linux.dev,
-	linux-sound@vger.kernel.org
-Subject: Re: [PATCH 5/8] spi: use rest_of_page() macro where appropriate
-Message-ID: <e731e101-bf06-44d7-ac91-0756c5b8bbc8@sirena.org.uk>
-References: <20260304012717.201797-1-ynorov@nvidia.com>
- <20260304012717.201797-6-ynorov@nvidia.com>
+	b=P8pZhTA6EhprRj40CnGqbIRNhfj1qcvYxaVvXz9neh16grGyd57KyQXsPDmzkzyzd
+	 pyo4tgOInkzbL1RPptLdgqPHLZ9pFvN2R/rO4nQy0pivE3AGYgBC5A7UST7SRpGAmO
+	 auQa8sQp/G8i0Wd6U9qmRYUJyI697qHud/eii+OZ4YG+RthlAqAP3V2I+FCJttXueO
+	 c346ig/LwSV5U81xG8gs34KXaYaPW4/HeaWYtlYqYi4hajinmEBduJjQCosAgX5jmx
+	 dgTgYGycoZ7lEzPR84ocX84KLvrUVxYrCMa2+eE1u8vTE0CTkHpgLuf4/Il2MZw/Dv
+	 rdtWvNpCZLndQ==
+Date: Wed, 4 Mar 2026 12:34:45 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Olivia Mackall <olivia@selenic.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Sean Wang <sean.wang@mediatek.com>, linux-crypto@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 1/2] dt-bindings: rng: mtk-rng: add SMC-based TRNG
+ variants
+Message-ID: <20260304-defiant-echidna-of-examination-b1e798@quoll>
+References: <04622e0bc917aed4145a9a3b50b61f343fc89312.1772585683.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="MuL6cN1k4g/DbVd2"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260304012717.201797-6-ynorov@nvidia.com>
-X-Cookie: Take it easy, we're in a hurry.
+In-Reply-To: <04622e0bc917aed4145a9a3b50b61f343fc89312.1772585683.git.daniel@makrotopia.org>
 
+On Wed, Mar 04, 2026 at 12:55:27AM +0000, Daniel Golle wrote:
+> diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.yaml b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+> index 7e8dc62e5d3a6..6074758552ac3 100644
+> --- a/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+> +++ b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+> @@ -11,12 +11,15 @@ maintainers:
+>  
+>  properties:
+>    $nodename:
+> -    pattern: "^rng@[0-9a-f]+$"
+> +    pattern: "^rng(@[0-9a-f]+)?$"
+>  
+>    compatible:
+>      oneOf:
+>        - enum:
+>            - mediatek,mt7623-rng
+> +          - mediatek,mt7981-rng
+> +          - mediatek,mt7987-rng
+> +          - mediatek,mt7988-rng
 
---MuL6cN1k4g/DbVd2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Not compatible with each other?
 
-On Tue, Mar 03, 2026 at 08:27:13PM -0500, Yury Norov wrote:
-> Switch SPI code to using the macro. No functional changes intended.
->=20
+>        - items:
+>            - enum:
+>                - mediatek,mt7622-rng
+> @@ -38,9 +41,22 @@ properties:
+>  
+>  required:
+>    - compatible
+> -  - reg
+> -  - clocks
+> -  - clock-names
+> +
+> +allOf:
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          not:
 
-Acked-by: Mark Brown <broonie@kernel.org>
+Use rather positive list, so drop "not:" and use cntains for only one
+compatible - mediatek,mt7623-rng.
 
---MuL6cN1k4g/DbVd2
-Content-Type: application/pgp-signature; name="signature.asc"
+> +            contains:
+> +              enum:
+> +                - mediatek,mt7981-rng
+> +                - mediatek,mt7987-rng
+> +                - mediatek,mt7988-rng
+> +    then:
+> +      required:
+> +        - reg
+> +        - clocks
+> +        - clock-names
+>  
+>  additionalProperties: false
+>  
+> @@ -53,3 +69,7 @@ examples:
+>              clocks = <&infracfg CLK_INFRA_TRNG>;
+>              clock-names = "rng";
+>      };
+> +  - |
+> +    rng {
+> +            compatible = "mediatek,mt7981-rng";
 
------BEGIN PGP SIGNATURE-----
+Use four spaces for indentation.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmoExQACgkQJNaLcl1U
-h9CfwQf+I/XcN+BTYZLFcHPKTZ6Gt21+q3GLOzdkgChqzxOybf6b2qD+OHDN55Te
-HvnosWIFzWzrD0ZP4eNe1TE0j1djIs+y2hdX6fElOOuJijsn21UWvVZXuuGdENdA
-tPZDWrSzxJ8sU12FFYyBJDxsnWysekc1llPy00e37sfeetOZOLaYg/1jnttOl6oU
-a3i0DGlMSVCN0pIYah+1R5Vbe35l4DlrcyOoswdwqqqEAzPLr0ysycWbbVmelm0M
-U/y3gvpx6ZZBlMMio/3WWZfu3pM/Kwc8nzHkdzsstdqSIsRHEWru1MF5W4E+IcwO
-Id51vK66wgwDVauWcfBpUUDez8/oEA==
-=1DSJ
------END PGP SIGNATURE-----
-
---MuL6cN1k4g/DbVd2--
+> +    };
+> -- 
+> 2.53.0
