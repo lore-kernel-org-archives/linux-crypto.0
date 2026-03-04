@@ -1,54 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4881425B30D;
-	Wed,  4 Mar 2026 14:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980563B8933;
+	Wed,  4 Mar 2026 14:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772636029; cv=none; b=oZscLGCV8Cle2GQBgN+iEoIfz6oy3aBAsJuLb2OTexOA7ImGSMkMkTan7ilOyhcrAv+dFCKp/UoLdrwGkE8TYwR2Unp4HXQ9b9cKu3wxh9SCd8AtoPm8WUQsy36vZi+i9rnU5geezLVJSAu4n0uTU0Mn5GGZ6ir6RdSN4L5wuQs=
+	t=1772636370; cv=none; b=UGs2lGsjKqgMNk78pEu+y+HDawNuPcQaS348xe7efo8XuQGxopMZxdDgLVdts8YjTx80fijXtqPWva827JEKZw4/+rgabb/WItkFqqwMDLiPDBqYqQ7TQ82quxfJ5OifdT6CQJklGpyfA2lrxnHrW83E2XfQI0IppHFyzj/0Yn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772636029; c=relaxed/simple;
-	bh=BQ44oQAbUgWr8U493meAVTfSHv7WjBkib8olnp0zRU8=;
+	s=arc-20240116; t=1772636370; c=relaxed/simple;
+	bh=wdcCO0L/xsiqKhDAxmFbZX2PklbiXgIeuyOJqP0cjh4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fwO0KKnpLN4Mo/AyZ9xEb5p64TP+bZW9ikbmEh22bWArykB14eOoRdLKeBeswcHZL+1Dm2ZZBOfYHYRNvJoKyWScvQMKFiegpkNbY/OZygKoVqTXEbP/1EgSU5kiM0kdc8EWCMilVLFbffh6FdOlRhvuXU4r+ryhadFWyHX2PYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f6MmgnWD; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=QkmYH8XmOcq1e0yG4rSBNRWT8kNh8yRzKEvCd+MjckgbR2fK5vJJsalKOqdRqwqi7NkGyWqZyJJGVhz95/5qPMup8AynLAC4pFKZIF2b8wCxNTOhqm7aOVpyJ0hJepkJ6zeaRi9hPwX9Pu5EizRpA2USRKc1gu2qDZ6MhgjcHoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YcWrCoB9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f6MmgnWD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4591BC4CEF7;
-	Wed,  4 Mar 2026 14:53:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YcWrCoB9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E660C4CEF7;
+	Wed,  4 Mar 2026 14:59:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772636028;
-	bh=BQ44oQAbUgWr8U493meAVTfSHv7WjBkib8olnp0zRU8=;
+	s=k20201202; t=1772636370;
+	bh=wdcCO0L/xsiqKhDAxmFbZX2PklbiXgIeuyOJqP0cjh4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f6MmgnWD9JwZT5Tvq6TfWT4O2Q0Ys4L4GsXTR99rvN4VdJSfEj4ZluNmAQMjsZdxp
-	 V+DtoAa1YNw7+qyrec0lX+nJFl7SrGE4eD/3irtT21i9lHBv65L+TYP9+yAb5XnS2c
-	 ii/X5EXVyth4FxwEx9IZk5taVpjq8CK4yhqtt7WdaaM7MW8xFIZnzobXi7X3qX+/Z0
-	 VyurzjP7sF2JONPbrejSJI8uOkRAalAjh9N3ZKSMLGGDiPyWcFTMVECa3/jJjnyI0V
-	 gp3jyR/fUwsIuD+Hpo/UMOBhQXYANsZpjjQDEKWr1J392kst//oRBLVVnd9k4VL5FB
-	 oY+zrqBmrPvhg==
-Date: Wed, 4 Mar 2026 20:23:45 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
+	b=YcWrCoB9XSvPLBZpVhXmcyBQS/QHLdxxQ7AZ/SOixE7BAcX9w8grlteqNipP/sXsw
+	 quN848ax+v+GmwGB79qCW2v02sVZVkarqSIhY8+hndytNw8gqVba27OzRfoFk5zqQA
+	 0XFzK7NwKo69EjVa9A/HD57uTxCFArMnAZrmRnIFFM2symIEn/UNJ3BmN++KuRO2lk
+	 EA0ggFoXRUXsTa81OGa2Ac2CITb2HmWp34K1hxZB3T0Tw30vA23VfelGruGShCU5d9
+	 LjMAnpzm+qzGGt0fOgNC4sIZzP+1aa5nSgrQjN5r1YXZDdxd2U1H2kLJI0PfK62MUc
+	 H1Vxb8cte+GOg==
+Date: Wed, 4 Mar 2026 07:59:27 -0700
+From: Tycho Andersen <tycho@kernel.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Udit Tiwari <quic_utiwari@quicinc.com>,
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
-	Md Sadre Alam <mdalam@qti.qualcomm.com>,
-	Dmitry Baryshkov <lumag@kernel.org>,
-	Peter Ujfalusi <peter.ujfalusi@gmail.com>,
-	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>,
-	dmaengine@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	brgl@kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH RFC v11 12/12] dmaengine: qcom: bam_dma: add support for
- BAM locking
-Message-ID: <aahHeR9j7q4_ynYK@vaman>
-References: <20260302-qcom-qce-cmd-descr-v11-0-4bf1f5db4802@oss.qualcomm.com>
- <20260302-qcom-qce-cmd-descr-v11-12-4bf1f5db4802@oss.qualcomm.com>
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Alexey Kardashevskiy <aik@amd.com>
+Subject: Re: [PATCH 1/2] crypto: ccp - Fix a case where SNP_SHUTDOWN is missed
+Message-ID: <aahIz8bTPNpnaSZM@tycho.pizza>
+References: <20260105172218.39993-1-tycho@kernel.org>
+ <0182578a-424d-454f-8a38-57b885eb966b@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,186 +48,81 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260302-qcom-qce-cmd-descr-v11-12-4bf1f5db4802@oss.qualcomm.com>
+In-Reply-To: <0182578a-424d-454f-8a38-57b885eb966b@roeck-us.net>
 
-On 02-03-26, 16:57, Bartosz Golaszewski wrote:
-> Add support for BAM pipe locking. To that end: when starting the DMA on
-> an RX channel - wrap the already issued descriptors with additional
-> command descriptors performing dummy writes to the base register
-> supplied by the client via dmaengine_slave_config() (if any) alongside
-> the lock/unlock HW flags.
+Hi Guenter,
+
+On Tue, Mar 03, 2026 at 02:35:10PM -0800, Guenter Roeck wrote:
+> Hi,
 > 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
->  drivers/dma/qcom/bam_dma.c | 100 ++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 99 insertions(+), 1 deletion(-)
+> On Mon, Jan 05, 2026 at 10:22:17AM -0700, Tycho Andersen wrote:
+> > From: Tom Lendacky <thomas.lendacky@amd.com>
+> > 
+> > If page reclaim fails in sev_ioctl_do_snp_platform_status() and SNP was
+> > moved from UNINIT to INIT for the function, SNP is not moved back to
+> > UNINIT state. Additionally, SNP is not required to be initialized in order
+> > to execute the SNP_PLATFORM_STATUS command, so don't attempt to move to
+> > INIT state and let SNP_PLATFORM_STATUS report the status as is.
+> > 
+> > Fixes: ceac7fb89e8d ("crypto: ccp - Ensure implicit SEV/SNP init and shutdown in ioctls")
+> > Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> > Reviewed-by: Tycho Andersen (AMD) <tycho@kernel.org>
+> > Reviewed-by: Alexey Kardashevskiy <aik@amd.com>
+> > Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
+> > ---
+> >  drivers/crypto/ccp/sev-dev.c | 46 ++++++++++++++++++------------------
+> >  1 file changed, 23 insertions(+), 23 deletions(-)
+> > 
+> > -	if (snp_reclaim_pages(__pa(data), 1, true))
+> > -		return -EFAULT;
+> > +	if (sev->snp_initialized) {
+> > +		/*
+> > +		 * The status page will be in Reclaim state on success, or left
+> > +		 * in Firmware state on failure. Use snp_reclaim_pages() to
+> > +		 * transition either case back to Hypervisor-owned state.
+> > +		 */
+> > +		if (snp_reclaim_pages(__pa(data), 1, true)) {
+> > +			snp_leak_pages(__page_to_pfn(status_page), 1);
 > 
-> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
-> index 83491e7c2f17d8c9d12a1a055baea7e3a0a75a53..b149cbe9613f0bdc8e26cae4f0cc6922997480d5 100644
-> --- a/drivers/dma/qcom/bam_dma.c
-> +++ b/drivers/dma/qcom/bam_dma.c
-> @@ -28,11 +28,13 @@
->  #include <linux/clk.h>
->  #include <linux/device.h>
->  #include <linux/dma-mapping.h>
-> +#include <linux/dma/qcom_bam_dma.h>
->  #include <linux/dmaengine.h>
->  #include <linux/init.h>
->  #include <linux/interrupt.h>
->  #include <linux/io.h>
->  #include <linux/kernel.h>
-> +#include <linux/lockdep.h>
->  #include <linux/module.h>
->  #include <linux/of_address.h>
->  #include <linux/of_dma.h>
-> @@ -60,6 +62,8 @@ struct bam_desc_hw {
->  #define DESC_FLAG_EOB BIT(13)
->  #define DESC_FLAG_NWD BIT(12)
->  #define DESC_FLAG_CMD BIT(11)
-> +#define DESC_FLAG_LOCK BIT(10)
-> +#define DESC_FLAG_UNLOCK BIT(9)
->  
->  struct bam_async_desc {
->  	struct virt_dma_desc vd;
-> @@ -391,6 +395,12 @@ struct bam_chan {
->  	struct list_head desc_list;
->  
->  	struct list_head node;
-> +
-> +	/* BAM locking infrastructure */
-> +	struct scatterlist lock_sg;
-> +	struct scatterlist unlock_sg;
-> +	struct bam_cmd_element lock_ce;
-> +	struct bam_cmd_element unlock_ce;
->  };
->  
->  static inline struct bam_chan *to_bam_chan(struct dma_chan *common)
-> @@ -1012,14 +1022,92 @@ static void bam_apply_new_config(struct bam_chan *bchan,
->  	bchan->reconfigure = 0;
->  }
->  
-> +static struct bam_async_desc *
-> +bam_make_lock_desc(struct bam_chan *bchan, struct scatterlist *sg,
-> +		   struct bam_cmd_element *ce, unsigned int flag)
-> +{
-> +	struct dma_chan *chan = &bchan->vc.chan;
-> +	struct bam_async_desc *async_desc;
-> +	struct bam_desc_hw *desc;
-> +	struct virt_dma_desc *vd;
-> +	struct virt_dma_chan *vc;
-> +	unsigned int mapped;
-> +	dma_cookie_t cookie;
-> +	int ret;
-> +
-> +	async_desc = kzalloc_flex(*async_desc, desc, 1, GFP_NOWAIT);
-> +	if (!async_desc) {
-> +		dev_err(bchan->bdev->dev, "failed to allocate the BAM lock descriptor\n");
-> +		return NULL;
-> +	}
-> +
-> +	async_desc->num_desc = 1;
-> +	async_desc->curr_desc = async_desc->desc;
-> +	async_desc->dir = DMA_MEM_TO_DEV;
-> +
-> +	desc = async_desc->desc;
-> +
-> +	bam_prep_ce_le32(ce, bchan->slave.dst_addr, BAM_WRITE_COMMAND, 0);
-> +	sg_set_buf(sg, ce, sizeof(*ce));
-> +
-> +	mapped = dma_map_sg_attrs(chan->slave, sg, 1, DMA_TO_DEVICE, DMA_PREP_CMD);
-> +	if (!mapped) {
-> +		kfree(async_desc);
-> +		return NULL;
-> +	}
-> +
-> +	desc->flags |= cpu_to_le16(DESC_FLAG_CMD | flag);
-> +	desc->addr = sg_dma_address(sg);
-> +	desc->size = sizeof(struct bam_cmd_element);
-> +
-> +	vc = &bchan->vc;
-> +	vd = &async_desc->vd;
-> +
-> +	dma_async_tx_descriptor_init(&vd->tx, &vc->chan);
-> +	vd->tx.flags = DMA_PREP_CMD;
-> +	vd->tx.desc_free = vchan_tx_desc_free;
-> +	vd->tx_result.result = DMA_TRANS_NOERROR;
-> +	vd->tx_result.residue = 0;
-> +
-> +	cookie = dma_cookie_assign(&vd->tx);
-> +	ret = dma_submit_error(cookie);
-
-I am not sure I understand this.
-
-At start you add a descriptor in the queue, ideally which should be
-queued after the existing descriptors are completed!
-
-Also I thought you want to append Pipe cmd to descriptors, why not do
-this while preparing the descriptors and add the pipe cmd and start and
-end of the sequence when you prepare... This was you dont need to create
-a cookie like this
-
-
-> +	if (ret)
-> +		return NULL;
-> +
-> +	return async_desc;
-> +}
-> +
-> +static int bam_setup_pipe_lock(struct bam_chan *bchan)
-> +{
-> +	struct bam_async_desc *lock_desc, *unlock_desc;
-> +
-> +	lock_desc = bam_make_lock_desc(bchan, &bchan->lock_sg,
-> +				       &bchan->lock_ce, DESC_FLAG_LOCK);
-> +	if (!lock_desc)
-> +		return -ENOMEM;
-> +
-> +	unlock_desc = bam_make_lock_desc(bchan, &bchan->unlock_sg,
-> +					 &bchan->unlock_ce, DESC_FLAG_UNLOCK);
-> +	if (!unlock_desc) {
-> +		kfree(lock_desc);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	list_add(&lock_desc->vd.node, &bchan->vc.desc_issued);
-> +	list_add_tail(&unlock_desc->vd.node, &bchan->vc.desc_issued);
-> +
-> +	return 0;
-> +}
-> +
->  /**
->   * bam_start_dma - start next transaction
->   * @bchan: bam dma channel
->   */
->  static void bam_start_dma(struct bam_chan *bchan)
->  {
-> -	struct virt_dma_desc *vd = vchan_next_desc(&bchan->vc);
-> +	struct virt_dma_desc *vd;
->  	struct bam_device *bdev = bchan->bdev;
-> +	const struct bam_device_data *bdata = bdev->dev_data;
->  	struct bam_async_desc *async_desc = NULL;
->  	struct bam_desc_hw *desc;
->  	struct bam_desc_hw *fifo = PTR_ALIGN(bchan->fifo_virt,
-> @@ -1030,6 +1118,16 @@ static void bam_start_dma(struct bam_chan *bchan)
->  
->  	lockdep_assert_held(&bchan->vc.lock);
->  
-> +	if (bdata->pipe_lock_supported && bchan->slave.dst_addr &&
-> +	    bchan->slave.direction == DMA_MEM_TO_DEV) {
-> +		ret = bam_setup_pipe_lock(bchan);
-> +		if (ret) {
-> +			dev_err(bdev->dev, "Failed to set up the BAM lock\n");
-> +			return;
-> +		}
-> +	}
-> +
-> +	vd = vchan_next_desc(&bchan->vc);
->  	if (!vd)
->  		return;
->  
+> This change got flagged by an experimental AI agent:
 > 
-> -- 
-> 2.47.3
+>   If `snp_reclaim_pages()` fails, it already internally calls
+>   `snp_leak_pages()`. Does calling `snp_leak_pages()` a second time
+>   on the exact same page corrupt the `snp_leaked_pages_list` because
+>   `list_add_tail(&page->buddy_list, &snp_leaked_pages_list)` is
+>   executed again?
+> 
+> I don't claim to understand the code, but it does look like snp_leak_pages()
+> is indeed called twice on the same page, which does suggest that it is added
+> twice to the leaked pages list if it is not a compound page.
+> 
+> Does this make sense, or is the AI missing something ?
 
--- 
-~Vinod
+Thanks for flagging this, I agree. I think we can drop that call:
+
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 096f993974d1..bd31ebfc85d5 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -2410,10 +2410,8 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+ 		 * in Firmware state on failure. Use snp_reclaim_pages() to
+ 		 * transition either case back to Hypervisor-owned state.
+ 		 */
+-		if (snp_reclaim_pages(__pa(data), 1, true)) {
+-			snp_leak_pages(__page_to_pfn(status_page), 1);
++		if (snp_reclaim_pages(__pa(data), 1, true))
+ 			return -EFAULT;
+-		}
+ 	}
+ 
+ 	if (ret)
+
+Double checking other uses of snp_reclaim_pages(), I don't think
+anyone else makes this mistake.
+
+Do you want to send a patch? Otherwise, how do I credit via
+Reported-by:, to just you?
+
+Thanks,
+
+Tycho
