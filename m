@@ -1,78 +1,103 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9623277C88;
-	Wed,  4 Mar 2026 01:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC8C231A21;
+	Wed,  4 Mar 2026 02:28:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772587811; cv=none; b=H7FKpq2oiw3KjQTC8a7ewo4lV/N5/lFyeDBgdca18QYlVsnVwVrHYUc6uXRhin/C6b5cBITYnuL8oE7y9J/TXgh23s0L1qy7+VBQ2JXCATV04F2URAPYt8KNSb9gk1WuGShlvetuTmFxEGnwWYb435uDxizO/CKeeQZz6b34DAk=
+	t=1772591329; cv=none; b=Nvt/dnmGxtSrA0EG/Rlhok2LXwYKmucBF7RMPWLMJvrMz06g5qI8d9hfF+66GnoFNvJep+48+FM9sd3GbmEo3exFMp2Ye/aHw8e3hQLGoronvWyyr/0QPLnPPbPNJu61qoS1iPL3+2S6a6GirS3RHb8ZRx6+SNCvFa3Py25ZAcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772587811; c=relaxed/simple;
-	bh=rKREH/ZWWHdXybPmLcgvicI3opDq0i74m3QvZscbWzw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eo0FJR2FT/yJLXhevfztq9T6s3fTTs/cyV55EIeoCRED5n/dItcsYnWfoqUL09aQgbhZuv6h3JlgR8bqYT6gmGzgnT2L853GZNfpypaNWql5yIn5aeKWs9RLWDNEg4LutGZhjniNU63RJsMsBN5a85RKTO8mHyhjulxlLKqszFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nalHdQ48; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772591329; c=relaxed/simple;
+	bh=w0enNDJ6vj/GjKs1g6Qapybf69Y+ysKOpkctiG5RrpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MQRAn0h3laXENu/bzGpGkiLJS7Dod+JVQu/ZL2zCdR9iPu6YW0WHP+KDWox8fPx5rzDLrFt/eqA0BNtuvkosiP9S8Y2U7LqQt4ClJ7y055E7lTi0f3v6F4NExcrcuw/0/bbWsfQnEz2yZ5lPsHiBuof/HmLqorwz9fLC0+IekyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=spjB+qe8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nalHdQ48"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43C51C116C6;
-	Wed,  4 Mar 2026 01:30:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="spjB+qe8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB983C116C6;
+	Wed,  4 Mar 2026 02:28:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772587811;
-	bh=rKREH/ZWWHdXybPmLcgvicI3opDq0i74m3QvZscbWzw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nalHdQ48MvqFOzKKb+3nUzVl3W/NGZOYyzoa3iguvpZ3bqWQ6d2zObDTLlOFhlJJr
-	 JbDp7tHH/vTn9P09XTT9XUUNZvk/4yQOU0CWzidJqlVdnQ9XoFJrMyM9avvWQvT6gv
-	 +HUXnjvT148aQ2/xFsYqFrlnzKkw7AJtV5D8f5F9Nkvmk+kGg9C/gteuvloYW1P3qK
-	 gSnxg9UJ6o70u0S16ExW3EjWf6wNCAW4BghJwrf68G1IhAoV9m6eZAgdQoMj4r+Mzo
-	 KbnFnOYksaVhjKauTDt+/7ZyW8edK0G+NbKtQLLs0gTkeSI8QO5bSbafqSXzlzBzlj
-	 0ZVUyTPJ6R3yg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE8D3808200;
-	Wed,  4 Mar 2026 01:30:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1772591329;
+	bh=w0enNDJ6vj/GjKs1g6Qapybf69Y+ysKOpkctiG5RrpQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=spjB+qe83UoElqhhSNfGwtYNBZK6rgflA8nN48IzNFPIWPeUr3QRcXVdCtF1NJKnf
+	 z5EksqVKhftC9MLC9j/7nGeIaaTR87yGm5Rwd8MxIRtsUMKdsilMMJ3Cd9iakxj8Bd
+	 EH9ATACpJVqsf4PLZG7kLZaviIgPJnXRNiYRro7z9N/ZFYixQx9IlT7mTSxw717b7C
+	 FtZrlDgcd81FIPR+0JhvBn0boDgv6oQAtRyqPocimgjFVPbqTR/7W2RrWO0jyc8Sw9
+	 QZEusDhvc5/gFZA6KC6+NigNLVm6yl1rbhBl2iBivGRlsjsn6q5oZHNnRRI6Qq4pAT
+	 NJF9zxNmgNh2w==
+Date: Tue, 3 Mar 2026 18:28:45 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yury Norov <ynorov@nvidia.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"
+ <davem@davemloft.net>, "Michael S. Tsirkin" <mst@redhat.com>, "Theodore
+ Ts'o" <tytso@mit.edu>, Albert Ou <aou@eecs.berkeley.edu>, Alexander Duyck
+ <alexanderduyck@fb.com>, Alexander Gordeev <agordeev@linux.ibm.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Alexandra Winter
+ <wintera@linux.ibm.com>, Andreas Dilger <adilger.kernel@dilger.ca>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, Anna Schumaker <anna@kernel.org>, Anton
+ Yakovlev <anton.yakovlev@opensynergy.com>, Arnaldo Carvalho de Melo
+ <acme@kernel.org>, Aswin Karuvally <aswin@linux.ibm.com>, Borislav Petkov
+ <bp@alien8.de>, Carlos Maiolino <cem@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Chao Yu <chao@kernel.org>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Christian Brauner <brauner@kernel.org>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Dave Hansen
+ <dave.hansen@linux.intel.com>, David Airlie <airlied@gmail.com>, Dominique
+ Martinet <asmadeus@codewreck.org>, Dongsheng Yang
+ <dongsheng.yang@linux.dev>, Eric Dumazet <edumazet@google.com>, Eric Van
+ Hensbergen <ericvh@kernel.org>, Heiko Carstens <hca@linux.ibm.com>, Herbert
+ Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, Jaegeuk
+ Kim <jaegeuk@kernel.org>, Jani Nikula <jani.nikula@linux.intel.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Jaroslav Kysela <perex@perex.cz>,
+ Jens Axboe <axboe@kernel.dk>, Joonas Lahtinen
+ <joonas.lahtinen@linux.intel.com>, Latchesar Ionkov <lucho@ionkov.net>,
+ Linus Walleij <linusw@kernel.org>, Madhavan Srinivasan
+ <maddy@linux.ibm.com>, Mark Brown <broonie@kernel.org>, Michael Ellerman
+ <mpe@ellerman.id.au>, Miklos Szeredi <miklos@szeredi.hu>, Namhyung Kim
+ <namhyung@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Paolo Abeni
+ <pabeni@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley
+ <pjw@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rodrigo Vivi
+ <rodrigo.vivi@intel.com>, Sean Christopherson <seanjc@google.com>, Simona
+ Vetter <simona@ffwll.ch>, Takashi Iwai <tiwai@suse.com>, Thomas Gleixner
+ <tglx@kernel.org>, Trond Myklebust <trondmy@kernel.org>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, Vasily Gorbik <gor@linux.ibm.com>, Will Deacon
+ <will@kernel.org>, Yury Norov <yury.norov@gmail.com>, Zheng Gu
+ <cengku@gmail.com>, linux-kernel@vger.kernel.org, x86@kernel.org,
+ linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+ linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-block@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ dm-devel@lists.linux.dev, netdev@vger.kernel.org,
+ linux-spi@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-mm@kvack.org,
+ linux-perf-users@vger.kernel.org, v9fs@lists.linux.dev,
+ virtualization@lists.linux.dev, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 0/8] mm: globalize rest_of_page() macro
+Message-ID: <20260303182845.250bb2de@kernel.org>
+In-Reply-To: <20260304012717.201797-1-ynorov@nvidia.com>
+References: <20260304012717.201797-1-ynorov@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/tcp-ao: Fix MAC comparison to be constant-time
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177258781230.1546050.13760298129957795669.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Mar 2026 01:30:12 +0000
-References: <20260302203600.13561-1-ebiggers@kernel.org>
-In-Reply-To: <20260302203600.13561-1-ebiggers@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- ncardwell@google.com, kuniyu@google.com, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, 0x7f454c46@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  2 Mar 2026 12:36:00 -0800 you wrote:
-> To prevent timing attacks, MACs need to be compared in constant
-> time.  Use the appropriate helper function for this.
+On Tue,  3 Mar 2026 20:27:08 -0500 Yury Norov wrote:
+> The net/9p networking driver has a handy macro to calculate the
+> amount of bytes from a given pointer to the end of page. Move it
+> to core/mm, and apply tree-wide. No functional changes intended.
 > 
-> Fixes: 0a3a809089eb ("net/tcp: Verify inbound TCP-AO signed segments")
-> Cc: stable@vger.kernel.org
-> Cc: Dmitry Safonov <0x7f454c46@gmail.com>
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> This series was originally introduced as a single patch #07/12 in:
 > 
-> [...]
+> https://lore.kernel.org/all/20260219181407.290201-1-ynorov@nvidia.com/
+> 
+> Split it for better granularity and submit separately.
 
-Here is the summary with links:
-  - [net] net/tcp-ao: Fix MAC comparison to be constant-time
-    https://git.kernel.org/netdev/net/c/67edfec516d3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I don't get what the motivation is here. Another helper developers
+and readers of the code will need to know about just to replace 
+obvious and easy to comprehend math.
