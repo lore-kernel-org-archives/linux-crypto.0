@@ -1,89 +1,185 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012056.outbound.protection.outlook.com [40.107.200.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B78C34FF48;
-	Wed,  4 Mar 2026 15:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772638975; cv=none; b=tHwvrdTlxV8UzX/nX+8JRhJ4xKmmDDWWRKs82A+k+aGGDKzxhUCVcYI6fADcDDdxbXySlVpTMz9Fg1+xGHEmMSz5+vnHaB3tXFnUEFXeLQqMLAG38NjBvgtoKu6qlLWMOfekEwETStVwtAglx3QPlMrtCcNc80ElFU5cCZoUyA4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772638975; c=relaxed/simple;
-	bh=G35ADxfoqXbd7RRW+WhhRkiRg+yJnXX6ywEBdaUxinA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WZOn3y89IrFmqTSTAejvJ1Ku8B5ZQXYCCutjzbuG7q6brtEvuUBQFlA9P7+i4cm6PIPVT0O+a8XUeWq5SXE9OW3iWJjzllT1WjAZgichrTwME9vL2518vR5qq7CcHZ0W371qU5w9QCbPaTzbDt4gnyEVswPy19WtskWKfocw8BY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 7375068AFE; Wed,  4 Mar 2026 16:42:41 +0100 (CET)
-Date: Wed, 4 Mar 2026 16:42:41 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>, Eric Biggers <ebiggers@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Matt Turner <mattst88@gmail.com>,
-	Magnus Lindholm <linmag7@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
-	Li Nan <linan122@huawei.com>, linux-alpha@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
-Subject: Re: [PATCH 01/25] xor: assert that xor_blocks is not called from
- interrupt context
-Message-ID: <20260304154241.GA26451@lst.de>
-References: <20260226151106.144735-1-hch@lst.de> <20260226151106.144735-2-hch@lst.de> <20260227142455.GG1282955@noisy.programming.kicks-ass.net> <20260303160050.GB7021@lst.de> <20260303195517.GC2846@sol> <20260304145134.GA21983@lst.de> <20260304151548.GN1395266@noisy.programming.kicks-ass.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6CC34D4D2;
+	Wed,  4 Mar 2026 15:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772639778; cv=fail; b=omv0/KL1Pki7ouFjd+PLUOU3YUFZdzWHRT54Wx53v9/ZsT+YNl9zzbZfjsX0FhxDdyw5C9lopFBhWNR+dYZYD8CSypEFr0/X1rGcGReAcpvYSSSp0zCCbTLM/VP+eY5Ma0rg135Ik1n6pTALh6n/I4gE3h8dqdJjufncpkZjlXU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772639778; c=relaxed/simple;
+	bh=DeC2hUVqAo4pRe+byXb0TGh6XIHQPfkiuaThzSoeT28=;
+	h=Message-ID:Date:To:Cc:References:Subject:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=LylzOKGFbf+gM0vq6G/bU8JscdIw9H+L16wjyQUqdzSTV64OIL2EyOP4Fyj0fKPURxNSUsErXcZtzWWwQjNUcj7xGjEpAsFT6+6i0pGJdtJFk3DZozDbjbnCahJkl0nKrh+Oj0EUVvCSK037NZL2yYn2EdcopaQiog+SEYF7HE0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=citrix.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=IB8ThaQy; arc=fail smtp.client-ip=40.107.200.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=citrix.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="IB8ThaQy"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=a5cGwQTZgKL6ePbUq5b9C2Y+eiDP18aZ/ZLogjQ8OZa7dnOgF8mhCW3zyjCpJM8O4PfnfqRmtqzJ3f/HyiVqBX+E3LWLEObDjpvy96ABVLE6nD6ZIarNbn2OYoGn/QoohjvaVmBKiTsfqYzv8b1dguMtujVZ0oy3Cud15aLOiMMM4g1rCbw6zMDcGLqBvQpWQN765Vk6lSaomFHHQAPJmSYKZsRf0CCwA76YsJOWpC2wzLEE1YyRGnAvGEDkfcEQnyyZXjqkpLn/G17HOp5IR+ICJT7O2T7GzHR0hbdtNFGzaCfyToPLKs7KcgmXy5H2zp2CQIcK83/Gt28YrzZBOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DeC2hUVqAo4pRe+byXb0TGh6XIHQPfkiuaThzSoeT28=;
+ b=KCTS/CccGf2+xBaDaU7tf1C0xxLyaY0UXMTooleLP/snubkXrj1rLHDoANg4Jhg0l+Wt0qG8EHKdCQx75YtHzzITD7arb7kCJbE2fiEZrTRrCd6k6FcG3r3ahcmEECQijXqRHdpRSC1uII2vQYS6X1cLoRhaPyLN6g/Olx0gKIZMwltwjt6K9XKrjgf3AJdehV7ZQErbNDuxMEDqgNUD/qQz9iIVqmjoG0E5H2fNQ3Oa7fA0yz9qGklpqsqxZAB520dyR7t3zv5X2hj5kH4QQoGFTxEbt0jmDhz+C5QymO3hDhCC8i16rS7obiikM6jqkhnhZcL2y5obzZ6ECBCjTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
+ dkim=pass header.d=citrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=citrix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DeC2hUVqAo4pRe+byXb0TGh6XIHQPfkiuaThzSoeT28=;
+ b=IB8ThaQysrkYsYXRTEa65NkfneBVKL4ZQP2INhlsR2EDW4ZTpY9og1QEPQTJQxPRB1EJx9QYP4sKAJRRAJM+LgUrV6m37lxHKJGaz9hypGsWozACboDhzhwIZjwsdR3ODYraR/ZG4vv2WfasLXY/agqNN4qnBELJItTV45q3Wy4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=citrix.com;
+Received: from CH8PR03MB8275.namprd03.prod.outlook.com (2603:10b6:610:2b9::7)
+ by PH0PR03MB6621.namprd03.prod.outlook.com (2603:10b6:510:b7::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.17; Wed, 4 Mar
+ 2026 15:56:14 +0000
+Received: from CH8PR03MB8275.namprd03.prod.outlook.com
+ ([fe80::a70d:dc32:bba8:ce37]) by CH8PR03MB8275.namprd03.prod.outlook.com
+ ([fe80::a70d:dc32:bba8:ce37%6]) with mapi id 15.20.9678.016; Wed, 4 Mar 2026
+ 15:56:14 +0000
+Message-ID: <4ec520a1-68c7-4833-9e8f-edc610e5fdfa@citrix.com>
+Date: Wed, 4 Mar 2026 15:56:07 +0000
+User-Agent: Mozilla Thunderbird
+To: dave.hansen@intel.com
+Cc: Andrew Cooper <andrew.cooper3@citrix.com>, Ashish.Kalra@amd.com,
+ KPrateek.Nayak@amd.com, Michael.Roth@amd.com, Nathan.Fontenot@amd.com,
+ Tycho.Andersen@amd.com, aik@amd.com, ardb@kernel.org, babu.moger@amd.com,
+ bp@alien8.de, darwi@linutronix.de, dave.hansen@linux.intel.com,
+ davem@davemloft.net, dyoung@redhat.com, herbert@gondor.apana.org.au,
+ hpa@zytor.com, jackyli@google.com, jacobhxu@google.com, john.allen@amd.com,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ mingo@redhat.com, nikunj@amd.com, pawan.kumar.gupta@linux.intel.com,
+ pbonzini@redhat.com, peterz@infradead.org, pgonda@google.com,
+ rientjes@google.com, seanjc@google.com, tglx@kernel.org,
+ thomas.lendacky@amd.com, x86@kernel.org, xin@zytor.com
+References: <a1701ab4-d80f-496c-bdb3-5d94d2d2f673@intel.com>
+Subject: Re: [PATCH v2 3/7] x86/sev: add support for RMPOPT instruction
+Content-Language: en-GB
+From: Andrew Cooper <andrew.cooper3@citrix.com>
+In-Reply-To: <a1701ab4-d80f-496c-bdb3-5d94d2d2f673@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO4P265CA0286.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:38f::13) To CH8PR03MB8275.namprd03.prod.outlook.com
+ (2603:10b6:610:2b9::7)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260304151548.GN1395266@noisy.programming.kicks-ass.net>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH8PR03MB8275:EE_|PH0PR03MB6621:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4d3a0953-be97-4d5f-22e3-08de7a069042
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	8mHKXrpazgg8wZC44icjrdRqSrh65Lsl4uYDz4ab3C9ob8jy5SVwjcGppDdA1CwQwiRBZAjOA9RNggKDu1K5Yo/vWoYxpIZSoY8h21CQMc4QFTi672XFvfIivyO1BAuRaOxcK9ZVlYXZZIHYFHIC5fH4rjubv/CJOxXBTypw4fV+I23u/LXFrCIDA4RdBh7WVBR9daG0b1XfnFOxAoBFuMl/VnxOPFiWsM3QX1wy4gm4R3hhz6kJSmw//qPwqKQx8QqSlS0yStrJiOz28VBOLXJDAffbFdWbjN+5VjeqRqzycAxQAAQbDcK2BbuMQRgLEacRAe0mlXVAcr9/WJeobpb9+ABBbBpVMesHeY91w+p8TUq9nRkta4nVJuKRsyI+44kQ/F9PZ5teo8DFp6kIjqdoFiMBwSEWA7XUnlhg1/yNRxjjAiy1JFKvXQom+v1ge/qWk828bxKcVIE9+FKSSzrnw8s2gA9WXPaDEm3MjOiFy/LObZQritHVDQM40B0USr+KIw4m9f1SFeCwV+5E0OGaLmJs49aHQ3PMCIqCLmiTkH7OBMSideLr2YZJ4ln4BBE4zgVYr5vfJu+/kNL3op3X+ozt/Ih1yNW7NxUTVB0wUiBvWsbxhestXHtPSH/ydkoYWiksoiGUi62gHxP3yWbgwpAIabUXbA4I3NXsMURGynnxPexhDMZxNtuhmbFBLShfDp7XVjEZGEZ8dIMkHh+VcXEBkwjeJEZO0Vv2+kw=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH8PR03MB8275.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aDNuOUN4Zlg5aUJiRmxuV1lHTy9tdHRpU1lldjJvSmQ3dkZRVmwwR2tmYWly?=
+ =?utf-8?B?cEVpVkJFWG5qV2VMbDlyeXNkb3Y3dHErRDZEbG5aeGc4ZDh2c2dCOTZhejFW?=
+ =?utf-8?B?Rzk5Y09kU3dOSENia1Myd2kxUzBWd0xtUEpXcmVLNHBlQzBqdjV3bzZvVysv?=
+ =?utf-8?B?RWhqMGpRMDMyVEMwK0I0RzRaREVGQU1PYnZRbXI1ak5GbU1zbE0wM0NNK2hp?=
+ =?utf-8?B?QUZYcno2RVlmQ3NQWjllZ2gxQWdmYk9HWHJBeWswMER1MEkrSGlRTGFzTmJk?=
+ =?utf-8?B?ZTgzRzllNEp1MEE3L0V0OTFtWHNQZlRkaTRVT2FTSmRrZjVGV0xDMzVldDZI?=
+ =?utf-8?B?UGpPUUZza2dhUWYxUlhmaW1oYnhLbzhST3hCZW1KSndxSkJKVlBERlR1bW1M?=
+ =?utf-8?B?N2NjRVUyOVpoNHM3OEtiUG5sS0ExQmMrS2Z6SEZleVdnNTJKdzgxR042L1U1?=
+ =?utf-8?B?SVo4SGtnQSswZ1pyZERacmdOdC9LOVo0ZWhDcWdRbGVuQzI3R2g4RzVvbkp4?=
+ =?utf-8?B?Y0xSK2N5QS83S0QxeURiNlg0KzB3UXA5cmNEMVlrL0hJT2M5eE1BYmg4UjB0?=
+ =?utf-8?B?cU9YOU9yU0RxRmNvaHBBY0xEYk1iemtsMmtNMXVtRkY2VEZ6elRNN0k0M3gx?=
+ =?utf-8?B?Y0FxNXgyaWE4RjB6UEE2MGVmSkpYc0xEL0J3S1hEU3VwSFY1U2lqMHM1Vkpl?=
+ =?utf-8?B?aGNRZGRoQjNRWWlWQlNtWWJUTEdrV3pDaXpLVklsRzlvcHVPTFhmbjVvdEY5?=
+ =?utf-8?B?QWYxUWxNejlVTGVOaUs1cXUvZWtFOFVmMlVTRWxsSUZSMGhmZnVQNmJpM2ZF?=
+ =?utf-8?B?SS9KWHhNVWpCeFJzUzErZGZRREFxWGFXYWtYUStOcHkwb1Avc2d1M01uVDh4?=
+ =?utf-8?B?OGh1RkUzUHhvNWNmaUEvZmZQMDVrM2hsbEhNVkxNTCthUW5kK2sxZzg5U1NQ?=
+ =?utf-8?B?aDU2M3BFSmVoTUp0V0VReUJDZHFWNXNzOUlEVjJrNm9ITE1BejhnMVRwbVdT?=
+ =?utf-8?B?bHFRTnVxUm8vZXBjNnpqVGxkZmlPT004Rk1QcXJUK2hYK0c2eFpUUGJLaFFj?=
+ =?utf-8?B?dEZmWVpPZ2E0V2pDSVptQkNaMVg1cEpWQ0trN3BJd2xOa2p5YmltMUluaVZT?=
+ =?utf-8?B?cnBjcU1JM0Jsc3VPUXpxaHdpdVRtYXlsT0lWZkdwSXRpVEhhTml5QmVwbEJW?=
+ =?utf-8?B?bEVQOGh4UCthSVFTY29GWEpNZzlqekNCSGhvQlBRaFgxaURlbTMxS09ZT3k1?=
+ =?utf-8?B?RnpPdDNwQm1hTUdGSThaZXdST3ljMmlZeGVjd3Bqc3BrTmlvOC9MQjVWSTFr?=
+ =?utf-8?B?UkptSG1mRDA3UnRSa0hFclZrR2U1N0tLNnpvM3EyWWJITUpEOFN1Y3dLY1pn?=
+ =?utf-8?B?NUtacUwvNFY2R3dvdDR2WHVmQlJRQVc5ZmM2RmVJNzRScWFZMXRURnNMZ29Y?=
+ =?utf-8?B?SDRtdjRiMTBnbFNwWFlvVmwxSG44ampYclNYbWN6TUJwMU1weU5OQmNiazFG?=
+ =?utf-8?B?UXo0cFB2M3F4Tm11czJsTWpFVHpUOThJTjczbzY2bFVWenFrMXNuS05RVDda?=
+ =?utf-8?B?UUJBVlN0Q0dTY0I1Tmcycm8yZTV2YTZuMTZJaVJUUUdLYTBuaFFMK1hZM1Jh?=
+ =?utf-8?B?TExtbmdqWXA1bS9mZllpeWc4Zm5IK2cwVXdQRXpodnE3Qkp1YzFtNXZEbVQ1?=
+ =?utf-8?B?NnJBci9NeGp1K3M1U0ptRUlDbmhlK0hFcHQxVGJxZ3hsbU1hNFNKNWQyZ293?=
+ =?utf-8?B?Z3diUW8wUHQ4OVJJS09DRG11RVV5VklBRk1pZjYxajVOZEZiUmphajZtSVNJ?=
+ =?utf-8?B?R3dMVHpmTDkrb1FkWGs4QTZTdXhhKzVQN2MwUHhWTC9XWVZVRXFSSkxiQURG?=
+ =?utf-8?B?QzZ4TWYzTDRSN01ZREhPM0thK0NqNTdOdUI0Zis0T3RLd1E1eU51NStVeWFZ?=
+ =?utf-8?B?SUxGYVhIUUwzcFl3d3dtTTlrcnhoNHJwR2tnYnd5Y01ZRGd3R1ZwaTM3K0Fz?=
+ =?utf-8?B?OURPNG1Jb1BLcWt5V0xndTVjK21iRktOR3hvOUt5cE9zLzNQNXBmRVR6MGpn?=
+ =?utf-8?B?alQ1WUZEbXZXa05iZkprT2UzWVpLMTZ3aU50cHpZUmQ0S2F1M2ttV2ltZ1VH?=
+ =?utf-8?B?SzMwYzBneGpJOTU2dHhIOU03K0wxMERxQ3Z6aDFFaUNaVytiRUNEZm8xa1hQ?=
+ =?utf-8?B?SWVuVHpYTWdHdTdPdUxHdmNyemt2Nmp0VC9pbExBUDlxZGZjMUV5a2ttL1ho?=
+ =?utf-8?B?QVdUK3lxY2RTbWpMZUdyOEFsdUJoUWpTQ29YUTk2RWVwaUlPN2xqd25SQ1dQ?=
+ =?utf-8?B?T25rL1crWEdjYTZ4eGF4ZUtQZHl6SENaZXRTa2FxU1hrS1FDMnlTdz09?=
+X-OriginatorOrg: citrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d3a0953-be97-4d5f-22e3-08de7a069042
+X-MS-Exchange-CrossTenant-AuthSource: CH8PR03MB8275.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2026 15:56:14.2665
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Oa47Z9j3QXM8+e5p5QyMgNXGG3TbXipjfuUGXZ9ubPLdYXLnQ9je4IT7Szts4WOpgrncSPkgjmzdiq3hy0XcFdvE8I38gj9hPAh79jcqZZM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR03MB6621
 
-On Wed, Mar 04, 2026 at 04:15:48PM +0100, Peter Zijlstra wrote:
-> On Wed, Mar 04, 2026 at 03:51:34PM +0100, Christoph Hellwig wrote:
-> 
-> > > How about "WARN_ON_ONCE(!preemptible())"?  I think that covers the union
-> > > of the context restrictions correctly.  (Compared to in_task(), it
-> > > handles the cases where hardirqs or softirqs are disabled.)
-> > 
-> > Good enough I guess.  Peter?
-> 
-> Sure. The only caveat with that is that for PREEMPT_COUNT=n this might
-> not work, it unconditionally returns 0.
+>> +/* + * 'val' is a system physical address aligned to 1GB OR'ed with
+>> + * a function selection. Currently supported functions are 0 + *
+>> (verify and report status) and 1 (report status). + */ +static void
+>> rmpopt(void *val) +{ + asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc" +
+>> : : "a" ((u64)val & PUD_MASK), "c" ((u64)val & 0x1) + : "memory",
+>> "cc"); +}
+> Doesn't this belong in:
+>
+> arch/x86/include/asm/special_insns.h
+>
+> Also, it's not reporting *any* status here, right? So why even talk
+> about it if the kernel isn't doing any status checks? It just makes it
+> more confusing.
 
-That's a pretty good argument for the lockdep version...
+The "c" (val & 0x1) constraint encodes whether this is a query or a
+mutation, but both forms produce an answer via the carry flag.
+
+Because it's void, it's a useless helper, and the overloading via one
+parameter makes specifically poor code generation.
+
+It should be:
+
+static inline bool __rmpopt(unsigned long addr, unsigned int fn)
+{
+    bool res;
+
+    asm volatile (".byte 0xf2, 0x0f, 0x01, 0xfc"
+                 : "=ccc" (res)
+                 : "a" (addr), "c" (fn));
+
+    return res;
+}
+
+with:
+
+    static inline bool rmpopt_query(unsigned long addr)
+    static inline bool rmpopt_set(unsigned long addr)
+
+built on top.
+
+Logic asking hardware to optimise a 1G region because of no guest memory
+should at least WARN() if hardware comes back and says "well hang on now..."
+
+The memory barrier isn't necessary and hinders the optimiser.
+
+~Andrew
