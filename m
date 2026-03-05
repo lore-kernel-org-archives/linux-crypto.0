@@ -1,146 +1,285 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013007.outbound.protection.outlook.com [40.93.196.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4968E384244;
-	Wed,  4 Mar 2026 22:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772663347; cv=none; b=cEtvn7jnCGOHDZU7Paz8wmP5f/f2zaAHjpv7hTyvhAOd9XkxI9oZaiT6P6Bk+3t9Mb0L1hfeM3wI7jMVL/oM1GxdUxfVqHPxbcCTxhD8MQ0Si1SCkR55HEDs0yZ02RI2gBv0Afu8ZVxb5f4PzcoDgRDyZa6NYCXj+ghmwCvPKpU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772663347; c=relaxed/simple;
-	bh=ORYQQGNYlwnQgy888AgkqY1bU5sv3cRTXo0nb+aOkbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sj69HTKAlBonuf6FpM28xFL6DT2ADmfxD08S35ZfPcs6wE9+WaN1HJW3mvCQ99Cx9k36d0w7WSv4QLG3AtVH+PdnoIHs6uUvUVz4/XezrQUuBQ4od73oMvNpAjvUCfh7sGm9QRUEjGsqYtDsZ9u2/zljWN+U6ZWKLcomnYk2+HU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OU3WRITI; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F2013AA2D;
+	Thu,  5 Mar 2026 01:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772674837; cv=fail; b=oZMDQPhoSXNy3Q6ZiVrys2KIckEq1v8792S+1xXtrFFbPoxNn5x9WNgVOyJBChu5u6EBMT1zI/IJq5LnWMztUJM5jaXC86rVwJeJynvcthiJXg0UcPDLWhwQ+EQF82r0TFYpH1LJvfh0DMzHCif1fZSNTyZnCG/wbTZwgVyNYz4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772674837; c=relaxed/simple;
+	bh=w2KCMNM3b+cIEmmPyXLxCMB98lk1pbGED7onrFYBMjo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=j/V1dsMFmfgvQMfJIdnqnMfuIAsvnZMnLx9O3oTDm+VwUD0E8gJ1uSfhpPfrzrujFFA7nODu0cLbXtLdeqWEilbR+AQnpiCIE07ZxfTtGWIqMefmDgZ3QROC4crv6x7v2kDk1xK1uzHcN/t6uw1IIbJLxuZ8s+8x3tBlHffosCg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ROG0DZ65; arc=fail smtp.client-ip=40.93.196.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OU3WRITI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55AD0C4CEF7;
-	Wed,  4 Mar 2026 22:29:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772663347;
-	bh=ORYQQGNYlwnQgy888AgkqY1bU5sv3cRTXo0nb+aOkbU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OU3WRITIa8Au08wJ1jU2p9dBP01IwGSkDOCxNBL7XgBg6trhBqfW4Ma4uATYqAA9L
-	 3ejgoDmg66mLFvZab4yEK1JF5QHuEDe6vcg7cH290T7LdhLrtp0LXXstY9WgkQK1b3
-	 bIOThJ+xB6KrTCwwKCZuYoZ7vSuqGoCCm+7RvlXw1X+/XnXsNYE1FLGAKIxNGStdXa
-	 P5MrB9tsMPJuk6qnOJNV0luFGZa0zafeMF19a7WtioPcW1+SQzTzVbEU2Hk2qlxW9u
-	 OJSOemr7f22VbMRG6Vk5xBjr2DVGzuDTBtkkdh1xpelWs1ohTyOWIlzo/7wYYGlnPR
-	 GG4+tsXGtc+aQ==
-Date: Wed, 4 Mar 2026 22:29:02 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: ansuelsmth@gmail.com, herbert@gondor.apana.org.au, davem@davemloft.net,
-	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	lorenzo@kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: eip93: add clock gate and reset
- line
-Message-ID: <20260304-thinner-ungraded-67d7472b6c0b@spud>
-References: <20260303193923.85242-1-olek2@wp.pl>
- <20260304-hardship-abreast-7a2d58cbe446@spud>
- <f9b266d7-f545-4088-b6c5-a0cc8676d60c@wp.pl>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ROG0DZ65"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=F2ZFkAmda6INwt0KWDuhu/+FuOlpsGJKvAiqRS5ddXirLrnIYZmbmfEprgaqdYeZwPXXXRNF5AcTKjHWikA0UmB7VP7/JZDSW75UrhfEs0L/RREf2xdvNiNRpnH9kGKkMSmF4lJ50Up2LjTmC993eE4Je8MGqWlZ2KMcUIJwQBQpKnVxpBM//KKLtleny2cdzi/XrKWjH5igziF6NG/Bbf8AqSfiuRHHQyGO4YT7S70/Ulsqrv+ChqiYeEhazE4oy6agQjv5oJkrrQEj5AB2Zt/i6w1LHIcx1awuF7a41sqrLll539Zwnxi88ttgGqA1yt0zcFiR7QFYbxp4mCy06g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=05Wu8OHCOCjDRFOgPMSRsh2a5dG9MSzmcR/xIXkcVEU=;
+ b=Vw/XxW0xF0v/0hKi8tEDKIx5E8bX5ItYBHbwLNx/YN2hHMMwQ1Lk0uxGwLa+28DupuKQueuD9sQa9+NIDbOkcZkwliLfj7XZTQoyNTKdFMDE9eMWLHlCE+Tw8Ig4wTHlFobSHZHTt02Gw+pL+dvHSV0Yj/gJMmPBiRMPL+l/MPZSh3xPhOxssE5asORPILlbUjttbTi9hs8JSYepLGHQkWmeHD9temyZ1z3NT6gZUlITyN1lmhIZuvWn1Ro9jG+kb3i8KIW5DEEf1e2IzJD2EzqKFNyj5XGxmsGasbyJYTd7UdOzlYywF+/kfHL1728rkpLs2YU30B7xc3zMhAJ5jw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=05Wu8OHCOCjDRFOgPMSRsh2a5dG9MSzmcR/xIXkcVEU=;
+ b=ROG0DZ65iV//oOaOaI7Fi1QOKujUgyC8vztO0IXfKgb7WgHYhkQvzpMGQuOQKpofbxu2u/kjufTCFLWhoJTNScFxgi3fp4Pa24bEdzM9UFCovan9368ew2BoAlgCyRo8zFtP/xynEmcsOYA+8xlE99WmaPl84appTvHFze1dtrs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by DS0PR12MB7969.namprd12.prod.outlook.com (2603:10b6:8:146::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.18; Thu, 5 Mar
+ 2026 01:40:29 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad%5]) with mapi id 15.20.9678.016; Thu, 5 Mar 2026
+ 01:40:29 +0000
+Message-ID: <0fbb94ad-bfcf-4fbe-bf40-d79051d67ad8@amd.com>
+Date: Wed, 4 Mar 2026 19:40:25 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/7] x86/sev: add support for RMPOPT instruction
+To: Dave Hansen <dave.hansen@intel.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: tglx@kernel.org, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ peterz@infradead.org, thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net, ardb@kernel.org, pbonzini@redhat.com, aik@amd.com,
+ Michael.Roth@amd.com, KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
+ Nathan.Fontenot@amd.com, jackyli@google.com, pgonda@google.com,
+ rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
+ pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
+ nikunj@amd.com, john.allen@amd.com, darwi@linutronix.de,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev
+References: <cover.1772486459.git.ashish.kalra@amd.com>
+ <8dc0198f1261f5ae4b16388fc1ffad5ddb3895f9.1772486459.git.ashish.kalra@amd.com>
+ <aahH4XARlftClMrQ@google.com>
+ <7ab8d3af-b4f5-481c-ab2e-059ddd7e718e@intel.com>
+Content-Language: en-US
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <7ab8d3af-b4f5-481c-ab2e-059ddd7e718e@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DS7PR03CA0039.namprd03.prod.outlook.com
+ (2603:10b6:5:3b5::14) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="RUXrRWyOYYwphHi5"
-Content-Disposition: inline
-In-Reply-To: <f9b266d7-f545-4088-b6c5-a0cc8676d60c@wp.pl>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|DS0PR12MB7969:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54fe225f-bdd9-40cb-d444-08de7a582eaa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	MtkeI+NkGSxNp/raHTdovwauQjm6/Xg69A/OjPts2jXEjav2m61NpagqwNj9Kqcoi9ge91YvUxjRleTX/h+p+BI9UIV0Fab6Z8ATBjeEsqwx+Pl2JWBn2s7NAt3HiNd99y22DlLI0tR+fWNdokhTW0415bl7PHdq2dAjoh8AUAyfg7qZp6bWB8uQyWhlvxnalBQbVN3pte/4zIuGTWL7v8FPi+vwTqBsviYPJGW0PImH0pkjd1QHVhWajNwKtOG3wdbUwYn+US/vhSGYqujXZXRrW+cg9u0mgWPziJge72+7etD0ItgG5V8VIq3FflL374tygMVVdQDD6Om0iZlBpSo6ljEaXXF3EZmFFM0eAjrGYDlVfZcjChavSBSnW4yIh6umj6qIGGTjI0dH0GVCXI3UELCKDxyzuO6aXr5AzAEDcx51kfolYBJzkcLhbqpAUJxVcKaK99qOrVhfC7X933Suhjw+hgbzxKZRvxc9AXxZBdYErCq9H0UgJ51Eais7ckWLxt/c2ORKG1qKwh7M5EuCHy0u51fN0sHDg1Q+/tiqPU4uq9DopRmsxcV3pNvl2GMuDgrp8tjiyNbYaBIr35cAOirOsS7ssg4+7ETrC+Jkdu1IHnqWy22TqjdGFaSRehhs8lpahU3bZSgV/ay7r9kfD5KrJrnJejuZwjYMl3CfzOYTKZ0R2I0gV9E+iE0vIE1EVMSVrTl/R7Mj111u3WB3X8LpkSBUj13QRrM423o=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VmZIdzlnUTlFT2VVclRhd0U4aVF5QnpseVBld2R1R2ZmdEN1b04vTzJWTW1a?=
+ =?utf-8?B?cTVRMm5zR0dXbTNZZlQreFFIcHd3aHZKUXdsYWlKZmVwblB6eDhabFZnNUpE?=
+ =?utf-8?B?VzdGZUtKQUVkbHNHR1oyb3dJWEtaYk82ck0xekdLWTZFTnd0Yk9zdElqL09M?=
+ =?utf-8?B?NC92eG9YV0pYdkdLTlM3b1haWU1BN24rOUIxRmp6c0VqK3lPd0dWYkVQa3d5?=
+ =?utf-8?B?cXpVWjVMbC9MUUtoVzBSTVhtSytLKzJXWFAvT3ZzVjk1c2o5WUl3VDJyWkJw?=
+ =?utf-8?B?QllBNVRuWEN1b3NWR01YSmpVR294WjgwcDBLUWFac0pZZ0lKZVl1aEd2QlRL?=
+ =?utf-8?B?MXpMSWRib2puRGR1R0E0S0ZHSC85djJwZmNadVIybWl3T2VyMHJJaEQzNysr?=
+ =?utf-8?B?SGpsNktvSzUrclVJY0pnNFA0TDVncXRVcXdOZTZ5NE9iSm95S0tTUXFLazhU?=
+ =?utf-8?B?cWVoMiswUEh0OHBhMTh2aGFCdVpwcElweERXU2ZkNzZSTCtyVmxSRVBkUWpq?=
+ =?utf-8?B?ZlNzdXVydnVaWFdkMlJvRVY2bkxXMWFmeXpjSWFVcnNMN2lNUGg2bUtqbjZO?=
+ =?utf-8?B?NkdZZmNRb3U4Y1JqZCt3SDBEQk9sUC9Oc0swV29YMlQyZVp0cGsvbmJZd0Jz?=
+ =?utf-8?B?dUdGemNXU29hSytNN25oR2k0Wk4vOWo3cUt6a3V2NmZhblo0TzFnb2trR0dQ?=
+ =?utf-8?B?c0NKQUpkcFFucUxubjlpeUxDNmlRL3RJM1M5UWF2c3hFdEY2TytWNmJUQW9F?=
+ =?utf-8?B?ckd4dlpVVjR5ZXMxQ1BaMDNOL2VaMEtXY3FlM1pLUEJQQ0pmM3NPQVlObnYz?=
+ =?utf-8?B?RkR5NTBqYmFBcmNtZkprWUxUMXY0V2J0RGF4aEtyakNjLzdkQ2ZBNWxIeUdx?=
+ =?utf-8?B?d0x4V01qaDRXRTRMMnpVTGl5eXUyVEcvWWo2dTBLOUxCVTZ5MXY1alNZSjJl?=
+ =?utf-8?B?N2VOMGI4alV2OW9uaGF4YUZhYmhmUmlIK0pZSWNFK0hTeWhqK21xcEhhRUZW?=
+ =?utf-8?B?MzlGbHptMyswV3FPcUh5S1dsL3h4ZzM2c1BYVDEzSjdmZ1FHa1ZiYUR5ZmhD?=
+ =?utf-8?B?WElpQjRZVG45M0ViMXNBZzYwQVl3SDg5MHErQlAyWVVhSWVneks4akdyeXpx?=
+ =?utf-8?B?TWtCVHRSTTVvb3dmSkNtRWszYVZ2a3k1SzQ4SitkMTR5TGk2Z3pxbTBmbVhx?=
+ =?utf-8?B?V1ZveWZsVmxITUhMczRBT3ZYRmt0aHhHL2I4cW5pMXp4QU4wRzhnVDhXT211?=
+ =?utf-8?B?Y2pVVHRFT0lXN3JoeWhROUcrNnljajhiYTVyRUdvVXl2L2UvMXVtRGl0VlhM?=
+ =?utf-8?B?MWlZQVB4YnpVYWhIRVJSL0ZHdi8yRlVSNXFXdWpPdkpBR20xSUtEcFZIWDVr?=
+ =?utf-8?B?eTNxRVFqTWl2bW0wS2U1UnlWVWJFUkljOGpHQisrS1Y2WHhqQ01pbmpOQTE1?=
+ =?utf-8?B?bGNreVN2bUQ0VzRubTRRY0REN1ltOXMzNjBBZXJtVm1PanZiTit5c0FoKzRN?=
+ =?utf-8?B?L1RMQ1ZsbWo1Zlhtanpwc1VnbXdnTWFJc0xUclhJZnd1TzhCZlpmQm9UY010?=
+ =?utf-8?B?cEY4ZjNrVGduSGRxSTFLR3ZWY0dHU3gzN1I0UVJIeWFPa0VwZzFGblhBUEN3?=
+ =?utf-8?B?bitaSkZpQVFNMStTdmt0UnlWcnBXeS9BOFJMM0xxc1lKTDdqZVJKOGdLOW1K?=
+ =?utf-8?B?VzIxOWJtZjQyWXVqcndENENWdzhDdXRhRTkvYkpkSU9xOXJFSXREQ2F0OVJl?=
+ =?utf-8?B?S3VSQStsQ1dydnZmck5udnRrSndiYXB3aDdZRTgrYnNQV0diQmd4WFgxSGpD?=
+ =?utf-8?B?TTE3M0h1RjhDWHVDdWFteHhhajIzQThVdU5mYk54VjM5cm00ZndjYjhnS003?=
+ =?utf-8?B?SDFPSVN0ZFRBMDlnUEVaTUhMenQ3Ykt0TmUydERnNDVReHBYeTMvVHlZcStU?=
+ =?utf-8?B?Y0lmeFZiRjJGMXhZTUxZdWVKTmlSa2pMSTk0cnpXUlRLV05WZmdyRXlIWHFx?=
+ =?utf-8?B?Ylo3NC92eWdVUU5kM1FYdDdrc3BvWHo0Vy80bkx6MDJnQ3pyVi8zNUZwY0F2?=
+ =?utf-8?B?aUtQWmZybS90Uk9qZXpPV0I2akhoZzdGYkpOZ1Vqc2lqeTl0THYwbFpsaS8y?=
+ =?utf-8?B?d3NaTDhObkIxa2c0R1FGSC9XZnJPMHFvVUdhN3hSWHBUejR0Wk9tdUFqMVhE?=
+ =?utf-8?B?di9CZlN5cndtN3A5RG1jVDBVd1h3WXYvTTgrMjZYTDNWRnNSOTkyYjRidkZG?=
+ =?utf-8?B?a09jb0IyY2FXMHVpbThtUndLNTd2aXd0djFNK1dMVDArWEYwcVp1YTNqNXhG?=
+ =?utf-8?Q?rheK+Q1/AmN4o0SV/w?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54fe225f-bdd9-40cb-d444-08de7a582eaa
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2026 01:40:29.4302
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VyrKYHZbbFiisfFtUHv40AFrTHRA3r50eJRGlgaqyvmx8aTn7EUBtQsa3YFrzot71Y5Ys5cf+pwzan47P3km1w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7969
+
+Hello Dave and Sean,
+
+On 3/4/2026 9:25 AM, Dave Hansen wrote:
+> On 3/4/26 07:01, Sean Christopherson wrote:
+>> I don't see any performance data in either posted version.  Bluntly, this series
+>> isn't going anywhere without data to guide us.  E.g. comments like this from v1
+>>
+>>  : And there is a cost associated with re-enabling the optimizations for all
+>>  : system RAM (even though it runs as a background kernel thread executing RMPOPT
+>>  : on different 1GB regions in parallel and with inline cond_resched()'s),
+>>  : we don't want to run this periodically.
+>>
+>> suggest there is meaningful cost associated with the scan.
+> 
+> Well the RMP is 0.4% of the size of system memory, and I assume that you
+> need to scan the whole table. There are surely shortcuts for 2M pages,
+> but with 4k, that's ~8.5GB of RMP table for 2TB of memory. That's an
+> awful lot of memory traffic for each CPU.
+
+The RMPOPT instruction is optimized for 2M pages, so it checks that
+all 512 2MB entries in that 1GB region are not assigned, i.e., for each
+2MB RMP in the 1GB region containing the specified address it checks if
+they are not assigned.
+  
+> 
+> It'll be annoying to keep a refcount per 1GB of paddr space.
+> 
+> One other way to do it would be to loosely mirror the RMPOPT bitmap and
+> keep our own bitmap of 1GB regions that _need_ RMPOPT run on them. Any
+> private=>shared conversion sets a bit in the bitmap and schedules some
+> work out in the future.
+> 
+> It could also be less granular than that. Instead of any private=>shared
+> conversion, the RMPOPT scan could be triggered on VM destruction which
+> is much more likely to result in RMPOPT doing anything useful.
+
+Yes, it will need to be more granular than scheduling RMPOPT work for any
+private->shared conversion. 
+
+And that's what we are doing in v2 patch series, RMPOPT scan getting 
+triggered on VM destruction.
+
+> 
+> BTW, I assume that the RMPOPT disable machinery is driven from the
+> INVLPGB-like TLB invalidations that are a part of the SNP
+> shared=>private conversions. It's a darn shame that RMPOPT wasn't
+> broadcast in the same way. It would save the poor OS a lot of work. The
+> RMPOPT table is per-cpu of course, but I'm not sure what keeps *a* CPU
+> from broadcasting its success finding an SNP-free physical region to
+> other CPUs.
+
+The hardware does this broadcast for the RMPUPDATE instruction, 
+a broadcast will be sent in the RMPUPDATE instruction to clear matching entries
+in other RMPOPT tables.  This broadcast will be sent to all CPUs.
+
+For the RMPOPT instruction itself, there is no such broadcast, but RMPOPT 
+instruction needs to be executed on only one thread per core, the 
+per-CPU RMPOPT table of the other sibling thread will be programmed while
+executing the same instruction.
+
+That's the reason, why we had this optimization to executing RMPOPT instruction
+on only the primary thread as part of the v1 patch series and i believe we should
+include this optimization as part of future series.
+
+> 
+> tl;dr: I agree with you. The cost of these scans is going to be
+> annoying, and it's going to need OS help to optimize it.
+
+Here is some performance data:
+
+Raw CPU cycles for a single RMPOPT instruction, func=0 :
+
+RMPOPT during snp_rmptable_init() while booting: 
+
+....
+[   12.098580] SEV-SNP: RMPOPT max. CPU cycles 501460
+[   12.103839] SEV-SNP: RMPOPT min. CPU cycles 60
+[   12.108799] SEV-SNP: RMPOPT average cycles 139790
 
 
---RUXrRWyOYYwphHi5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+RMPOPT during SNP_INIT_EX, at CCP module load at boot: 
 
-On Wed, Mar 04, 2026 at 10:46:41PM +0100, Aleksander Jan Bajkowski wrote:
-> Hi Conor,
->=20
-> On 3/4/26 20:08, Conor Dooley wrote:
-> > On Tue, Mar 03, 2026 at 08:39:17PM +0100, Aleksander Jan Bajkowski wrot=
-e:
-> > > Add the clock gate and reset line, both of which are available
-> > > on the Airoha AN7581. Both properties are optional.
-> > Why are they optional?
->=20
-> No reason. In theory, a hardware designer could connect the reset
-> to a fixed input signal. In practice, all SoCs on the market have
-> a built-in reset and clock controller. I can mark them as required
-> in the next revision.
+[   40.206619] SEV-SNP: RMPOPT max. CPU cycles 248083620
+[   40.206629] SEV-SNP: RMPOPT min. CPU cycles 60
+[   40.206629] SEV-SNP: RMPOPT average cycles 249820
 
-Right, the reset could be optional on some systems, but sounds like it
-is always there on the an7581. The clock is probably mandatory always.
-I think you should make it required in the binding, but not in the
-driver since that needs to work with existing devicetrees.
-Technically this is an ABI break (new required property), so at least
-mention in the commit message that you're aware of this.
+RMPOPT after SNP guest shutdown:
+...
+[  298.746893] SEV-SNP: RMPOPT max. CPU cycles 248083620
+[  298.746898] SEV-SNP: RMPOPT min. CPU cycles 60
+[  298.746900] SEV-SNP: RMPOPT average cycles 127859
 
 
->=20
-> > > Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
-> > > ---
-> > >   .../crypto/inside-secure,safexcel-eip93.yaml         | 12 +++++++++=
-+++
-> > >   1 file changed, 12 insertions(+)
-> > >=20
-> > > diff --git a/Documentation/devicetree/bindings/crypto/inside-secure,s=
-afexcel-eip93.yaml b/Documentation/devicetree/bindings/crypto/inside-secure=
-,safexcel-eip93.yaml
-> > > index 997bf9717f9e..058454b679b4 100644
-> > > --- a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel=
--eip93.yaml
-> > > +++ b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel=
--eip93.yaml
-> > > @@ -48,6 +48,12 @@ properties:
-> > >     interrupts:
-> > >       maxItems: 1
-> > > +  clocks:
-> > > +    maxItems: 1
-> > > +
-> > > +  resets:
-> > > +    maxItems: 1
-> > > +
-> > >   required:
-> > >     - compatible
-> > >     - reg
-> > > @@ -57,11 +63,17 @@ additionalProperties: false
-> > >   examples:
-> > >     - |
-> > > +    #include <dt-bindings/clock/en7523-clk.h>
-> > >       #include <dt-bindings/interrupt-controller/arm-gic.h>
-> > > +    #include <dt-bindings/reset/airoha,en7581-reset.h>
-> > >       crypto@1e004000 {
-> > >         compatible =3D "airoha,en7581-eip93", "inside-secure,safexcel=
--eip93ies";
-> > >         reg =3D <0x1fb70000 0x1000>;
-> > > +      clocks =3D <&scuclk EN7523_CLK_CRYPTO>;
-> > > +
-> > >         interrupts =3D <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
-> > > +
-> > > +      resets =3D <&scuclk EN7581_CRYPTO_RST>;
-> > >       };
-> > > --=20
-> > > 2.47.3
-> > >=20
-> Best regards,
-> Aleksander
->=20
->=20
+I believe the min. CPU cycles is the case where RMPOPT fails early. 
 
---RUXrRWyOYYwphHi5
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+Raw CPU cycles for one complete iteration of executing RMPOPT (func=0) on all CPUs for the whole RAM: 
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaaiyLQAKCRB4tDGHoIJi
-0ibOAQCXhDFN8QSYrxF47Qb/oFi3wBnPBFiMdgbEvxrc67IdFAEAyO/3v3UV4NE5
-KvSZXTUIkTs0eodNUYw8zdjOzJ0vQAE=
-=6PiR
------END PGP SIGNATURE-----
+This is for this complete loop with cond_resched() removed.
 
---RUXrRWyOYYwphHi5--
+      while (!kthread_should_stop()) {
+                phys_addr_t pa;
+
+                pr_info("RMP optimizations enabled on physical address range @1GB alignment [0x%016llx - 0x%016llx]\n",
+                        pa_start, pa_end);
+
+                start = rdtsc_ordered();
+                /*
+                 * RMPOPT optimizations skip RMP checks at 1GB granularity if this range of
+                 * memory does not contain any SNP guest memory.
+                 */
+                for (pa = pa_start; pa < pa_end; pa += PUD_SIZE) {
+                        /* Bit zero passes the function to the RMPOPT instruction. */
+                        on_each_cpu_mask(cpu_online_mask, rmpopt,
+                                         (void *)(pa | RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS),
+                                         true);
+
+                        
+                }
+                end = rdtsc_ordered();
+
+                pr_info("RMPOPT cycles taken for physical address range 0x%016llx - 0x%016llx on all cpus %llu cycles\n",
+                                pa_start, pa_end, end - start);
+
+                set_current_state(TASK_INTERRUPTIBLE);
+                schedule();
+        }
+
+
+RMPOPT during snp_rmptable_init() while booting: 
+
+...
+[   12.114047] SEV-SNP: RMPOPT cycles taken for physical address range 0x0000000000000000 - 0x0000010380000000 on all cpus 1499496600 cycles
+
+RMPOPT during SNP_INIT_EX:
+...
+[   40.206630] SEV-SNP: RMPOPT cycles taken for physical address range 0x0000000000000000 - 0x0000010380000000 on all cpus 686519180 cycles
+
+RMPOPT after SNP guest shutdown:
+...
+[  298.746900] SEV-SNP: RMPOPT cycles taken for physical address range 0x0000000000000000 - 0x0000010380000000 on all cpus 369059160 cycles
+
+Thanks,
+Ashish
