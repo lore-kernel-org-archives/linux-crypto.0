@@ -1,168 +1,160 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFC43783A2;
-	Thu,  5 Mar 2026 12:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7750C18EB0
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Mar 2026 13:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772715480; cv=none; b=lna8EKOlS+HAbo6fUUHAN2Dm380BTcsNxaghq8JRda10UWF6kqNuWXLQuRh4vA5PlEAaZuH7IoaV52HtP2t708LPYn5dReiFykP0iqQud2N6EMc5H0TYn7Ed9ppWu/7hCqsfndWdXXTdfFJ0HMcmb5khk68Cy7qSz6i7IQYPy1A=
+	t=1772716268; cv=none; b=czfiKSTi4tpdVrvFfeQIrF4zGIkkZSVSuQi910d+vZr9a+2wX8ptk8zYbQblikXRiUAgnr1+M5GC1ziryyvvmvIg17FlxaR3uKUg09uQavU/67MtacUbRoFQjaK7/49CKvcJhAJY0g5AbVUGVS4dVwwvQwd+AcA7ke6x655hNPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772715480; c=relaxed/simple;
-	bh=WQ2Njdb/9oWIlEsZz3Ln1HrmbcOjmXQvor8UjtaGW+M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HeyLtQ5KD37qpCbKYz18AUZonLI6uIl4gXLU5kuSeuOJrthRK4wCKPuE5efbc8kw5DgDNlbpvDKcTnO98JdHw/KIJO6RVha8x6ekI490miKxBjcentfD7kkdFGStx2g41E9LvOQhg87stLrpSpZmcCHKlcosqytYJ76MCOCCnPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=NDo2SBk7; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1772716268; c=relaxed/simple;
+	bh=ISJ9IeJb4bdYq8e9zGFzYpxXmxiQlQWQQQm3BHAO9ac=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r2q1HTncHpbCg21HCg4c8Wit/6wzLSC1eRAjIuozEYON9kkxySQyw/IZL2RwOT4pysvuR22UvaVRoG6Nj9TnD+4JVaVwsUWTYfldRWY2pkhvd5R1N5+GW85rjR8kKC6oKW/U2nav4CnrmhTWWj6ba18cU0eWO/3+j3j+rFPZq18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G9tX/hM7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="NDo2SBk7"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8404840E019B;
-	Thu,  5 Mar 2026 12:57:56 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id Fa_n2Uo796sR; Thu,  5 Mar 2026 12:57:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1772715473; bh=VnZZM+inE6N+Di4JQJ/Nelhp+G+JJVKjw05A5KPh4vs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NDo2SBk7xBQBqVnIrbeJa6vVZq7x5ftZHar4+uyBUsDXoMi6Whb4L/gRlcU1bWkGJ
-	 Sud8gmPoYOvFmrjXKg2o+gE3CvQNMWskwu2KPtQONWoHjbk6PNpoLE551iNFK3vvEi
-	 qR1nEhZMDal6hb8o0aMOD0cTG6LPk2LlFQbOCGRBZK8kMEqJizrq+7vwyXO8rtVSc9
-	 zqJvy1GW8M+c5A5/5Mvb8bDleeTCD8/3w5cDVq8tr5eL+2+/RfNUmB4HGLEDi4THtB
-	 KIBTYWqgP8gnoL6DBuLvi8j8Xm73l7XRm5FtDHF9JhyGYdNLr6W3uvIROSykTvbu4u
-	 e4KQjXWGX5vT9G2+tzM3cU6jzv3J8rcI2YFnP21uUHQ3lSsaDO3Qsod/IyCXky/us8
-	 nGm22WNeeMvgUWmpdvCIX2A3mk5/rLH5PfNFYaV3+PdFQ/7DcVJVFxnfApRZ14D1gK
-	 Ev2oCSn2AkyzmNjzDKd5yPAh4cehbvnUg6gY/94Sh/Et/vOZZxDengbTX41HrcDLBa
-	 5iAb5Z700WRu4SPAQI71cBVvOWsOliPo91X/Mcupdf5JBiiLP4HmQVzzDmzPAHjvnN
-	 ciq2NnxnkeyZOuHx0AREBlZM8TR87g04WPQk+ib8TMTzZ4ljxoc1HZ33/+YFuee2su
-	 qPrqCQ2ivOJvTKCUfhZoBLac=
-Received: from zn.tnic (pd9530d5e.dip0.t-ipconnect.de [217.83.13.94])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id E440A40E0198;
-	Thu,  5 Mar 2026 12:57:31 +0000 (UTC)
-Date: Thu, 5 Mar 2026 13:57:25 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Tycho Andersen <tycho@kernel.org>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>,
-	Kishon Vijay Abraham I <kvijayab@amd.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
-	Kim Phillips <kim.phillips@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 01/11] x86/snp: drop support for SNP hotplug
-Message-ID: <20260305125725.GGaal9tdytn8gOpiEO@fat_crate.local>
-References: <20260302191334.937981-1-tycho@kernel.org>
- <20260302191334.937981-2-tycho@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G9tX/hM7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38F93C2BCB2
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Mar 2026 13:11:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772716268;
+	bh=ISJ9IeJb4bdYq8e9zGFzYpxXmxiQlQWQQQm3BHAO9ac=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=G9tX/hM7Mw5zGuhmFHkyyRDc++MrZfNxmP/ZNpmTsla4iANpe9h6kxmyvipqjVzAz
+	 Je4rF+N2HacpqEUtA56nQtcW1Htkr75+BA+vYEBrXZ0N0EhwNnymUo/bk0Yb2nmnJI
+	 6At5t1N+ZbugQP602yqM+0ekCuw5r/LjlLyjizp7gjfUKgG9DbIFhqJ5snjfsbc7qL
+	 tRdXzb1bCUDZ+74i3CHKIzvC2Qvcl0Pbqfwm7DRHg9NWxMR797L8CIY5ZgcM1SXhW3
+	 gdQRt7gvL13nfQWGsJz8VdZ6LjcxwV1aDfNTS9fN+gdaJEhCSsx11FW798ngQVwGtG
+	 1h6WZhARdxABQ==
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-38a2e62b893so20924101fa.1
+        for <linux-crypto@vger.kernel.org>; Thu, 05 Mar 2026 05:11:08 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVZ35rDQJupV3WU28j2K4fspJWfQgWgGnyMu+KCQDDcgBFTpERPveNQecRJgx8CFr9FQ06IcLypv3MauEU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyS6867fsT+yQQhfqdMimviMQQO+NjzinoY3oGuC87yp4Sn0+O6
+	XrHSs3vieDJq1CgLF+esFZQ/lPk95esYixDUvH+QYXzmuW5xQoyvPUtdH1WEQEgvsqd1TfuCNl8
+	ATfKBROA2Wc4cFeDFF1+g7LSIAsfpR/uTCGdtRTQmEg==
+X-Received: by 2002:a2e:22c4:0:b0:383:7f85:8eef with SMTP id
+ 38308e7fff4ca-38a2c7c74e6mr37197791fa.29.1772716266754; Thu, 05 Mar 2026
+ 05:11:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260302191334.937981-2-tycho@kernel.org>
+References: <20260302-qcom-qce-cmd-descr-v11-0-4bf1f5db4802@oss.qualcomm.com>
+ <scr5qvxa7f7k22pms4c6k5gwiky7lhssrw6qryfngexlek44g2@rayinnnwqgbt> <aalwMwN3qMlzrql5@linaro.org>
+In-Reply-To: <aalwMwN3qMlzrql5@linaro.org>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Thu, 5 Mar 2026 14:10:55 +0100
+X-Gmail-Original-Message-ID: <CAMRc=MfjknN1AYF_NPLzR0YbdWuoET25D9o0zsvx56VN+u59HQ@mail.gmail.com>
+X-Gm-Features: AaiRm53riIL1Ev5aiOi4LeHVM1opButAi-QDELWr9rH7US3VnOIMoqa9uDUU7UY
+Message-ID: <CAMRc=MfjknN1AYF_NPLzR0YbdWuoET25D9o0zsvx56VN+u59HQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v11 00/12] crypto/dmaengine: qce: introduce BAM
+ locking and use DMA for register I/O
+To: Stephan Gerhold <stephan.gerhold@linaro.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
+	Daniel Perez-Zoghbi <dperezzo@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
+	Dmitry Baryshkov <lumag@kernel.org>, Peter Ujfalusi <peter.ujfalusi@gmail.com>, 
+	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>, dmaengine@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, Bjorn Andersson <andersson@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 02, 2026 at 12:13:24PM -0700, Tycho Andersen wrote:
-> From: "Tycho Andersen (AMD)" <tycho@kernel.org>
-> 
-> During an SNP_INIT(_EX), the SEV firmware checks that all CPUs have SNPEn
+On Thu, Mar 5, 2026 at 1:00=E2=80=AFPM Stephan Gerhold
+<stephan.gerhold@linaro.org> wrote:
+>
+> On Tue, Mar 03, 2026 at 06:13:56PM +0530, Manivannan Sadhasivam wrote:
+> > On Mon, Mar 02, 2026 at 04:57:13PM +0100, Bartosz Golaszewski wrote:
+> > > NOTE: Please note that even though this is version 11, I changed the
+> > > prefix to RFC as this is an entirely new approach resulting from
+> > > discussions under v9. I AM AWARE of the existing memory leaks in the
+> > > last patch of this series - I'm sending it because I want to first
+> > > discuss the approach and get a green light from Vinod as well as Mani
+> > > and Bjorn. Especially when it comes to communicating the address for =
+the
+> > > dummy rights from the client to the BAM driver.
+> > > /NOTE
+> > >
+> > > Currently the QCE crypto driver accesses the crypto engine registers
+> > > directly via CPU. Trust Zone may perform crypto operations simultaneo=
+usly
+> > > resulting in a race condition. To remedy that, let's introduce suppor=
+t
+> > > for BAM locking/unlocking to the driver. The BAM driver will now wrap
+> > > any existing issued descriptor chains with additional descriptors
+> > > performing the locking when the client starts the transaction
+> > > (dmaengine_issue_pending()). The client wanting to profit from lockin=
+g
+> > > needs to switch to performing register I/O over DMA and communicate t=
+he
+> > > address to which to perform the dummy writes via a call to
+> > > dmaengine_slave_config().
+> > >
+> >
+> > Thanks for moving the LOCK/UNLOCK bits out of client to the BAM driver.=
+ It looks
+> > neat now. I understand the limitation that for LOCK/UNLOCK, BAM needs t=
+o perform
+> > a dummy write to an address in the client register space. So in this ca=
+se, you
+> > can also use the previous metadata approach to pass the scratchpad regi=
+ster to
+> > the BAM driver from clients. The BAM driver can use this register to pe=
+rform
+> > LOCK/UNLOCK.
+> >
+> > It may sound like I'm suggesting a part of your previous design, but it=
+ fits the
+> > design more cleanly IMO. The BAM performs LOCK/UNLOCK on its own, but i=
+t gets
+> > the scratchpad register address from the clients through the metadata o=
+nce.
+> >
+> > It is very unfortunate that the IP doesn't accept '0' address for LOCK/=
+UNLOCK or
+> > some of them cannot append LOCK/UNLOCK to the actual CMD descriptors pa=
+ssed from
+> > the clients. These would've made the code/design even more cleaner.
+> >
+>
+> I was staring at the downstream drivers for QCE (qce50.c?) [1] for a bit
+> and my impression is that they manage to get along without dummy writes.
+> It's a big mess, but it looks like they always have some commands
+> (depending on the crypto operation) that they are sending anyway and
+> they just assign the LOCK/UNLOCK flag to the command descriptor of that.
+>
+> It is similar for the second relevant user of the LOCK/UNLOCK flags, the
+> QPIC NAND driver (msm_qpic_nand.c in downstream [2], qcom_nandc.c in
+> mainline), it is assigned as part of the register programming sequence
+> instead of using a dummy write. In addition, the UNLOCK flag is
+> sometimes assigned to a READ command descriptor rather than a WRITE.
+>
+> @Bartosz: Can we get by without doing any dummy writes?
+> If not, would a dummy read perhaps be less intrusive than a dummy write?
+>
 
-Please write those in a human-readable form - not as code in text. Commit
-messages are still predominantly read by humans.
+The HPG says that the LOCK/UNLOCK flag *must* be set on a command
+descriptor, not a data descriptor. For a simple encryption we will
+typically have a data descriptor and a command descriptor with
+register writes. So we need a command descriptor in front of the data
+and - while we could technically set the UNLOCK bit on the subsequent
+command descriptor - it's unclear from the HPG whether it will unlock
+before or after processing the command descriptor with the UNLOCK bit
+set. Hence the additional command descriptor at the end.
 
-:)
+The HPG also only mentions a write command and says nothing about a
+read. In any case: that's the least of the problems as switching to
+read doesn't solve the issue of passing the address of the scratchpad
+register.
 
-> set, and fails if they do not. As such, it does not make sense to have
-> offline CPUs: the firmware will fail initialization because of the offlined
-> ones that the kernel did not initialize.
-> 
-> Futher, there is a bug: SNP_INIT(_EX) require MFDM to be set in addition to
-> SNPEn which the previous hotplug code did not do. Since
-> k8_check_syscfg_dram_mod_en() enforces this be cleared, hotplug wouldn't
-> work.
-> 
-> Drop the hotplug code. Collapse the __{mfd,snp}__enable() wrappers into
-> their non-__ versions, since the cpu number argument is no longer needed.
+So while some of this *may* just work, I would prefer to stick to what
+documentation says *will* work. :)
 
-Please, do not talk about *what* the patch is doing in the commit message
-- that should be obvious from the diff itself. Rather, concentrate on the
-*why* it needs to be done and why your patch exists.
-
-> Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
-> ---
->  arch/x86/virt/svm/sev.c | 24 ++++--------------------
->  1 file changed, 4 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> index a4f3a364fb65..1446011c6337 100644
-> --- a/arch/x86/virt/svm/sev.c
-> +++ b/arch/x86/virt/svm/sev.c
-> @@ -130,33 +130,26 @@ static unsigned long snp_nr_leaked_pages;
->  #undef pr_fmt
->  #define pr_fmt(fmt)	"SEV-SNP: " fmt
->  
-> -static int __mfd_enable(unsigned int cpu)
-> +static __init void mfd_enable(void *arg)
->  {
->  	u64 val;
->  
->  	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
-> -		return 0;
-> +		return;
->  
->  	rdmsrq(MSR_AMD64_SYSCFG, val);
->  
->  	val |= MSR_AMD64_SYSCFG_MFDM;
->  
->  	wrmsrq(MSR_AMD64_SYSCFG, val);
-> -
-> -	return 0;
->  }
-
-While at it:
-
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 1446011c6337..f404c609582c 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -132,16 +132,10 @@ static unsigned long snp_nr_leaked_pages;
- 
- static __init void mfd_enable(void *arg)
- {
--	u64 val;
--
- 	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return;
- 
--	rdmsrq(MSR_AMD64_SYSCFG, val);
--
--	val |= MSR_AMD64_SYSCFG_MFDM;
--
--	wrmsrq(MSR_AMD64_SYSCFG, val);
-+	msr_set_bit(MSR_AMD64_SYSCFG, MSR_AMD64_SYSCFG_MFDM_BIT);
- }
- 
- static __init void snp_enable(void *arg)
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Bartosz
