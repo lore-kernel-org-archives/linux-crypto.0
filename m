@@ -1,285 +1,230 @@
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013007.outbound.protection.outlook.com [40.93.196.7])
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F2013AA2D;
-	Thu,  5 Mar 2026 01:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772674837; cv=fail; b=oZMDQPhoSXNy3Q6ZiVrys2KIckEq1v8792S+1xXtrFFbPoxNn5x9WNgVOyJBChu5u6EBMT1zI/IJq5LnWMztUJM5jaXC86rVwJeJynvcthiJXg0UcPDLWhwQ+EQF82r0TFYpH1LJvfh0DMzHCif1fZSNTyZnCG/wbTZwgVyNYz4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772674837; c=relaxed/simple;
-	bh=w2KCMNM3b+cIEmmPyXLxCMB98lk1pbGED7onrFYBMjo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=j/V1dsMFmfgvQMfJIdnqnMfuIAsvnZMnLx9O3oTDm+VwUD0E8gJ1uSfhpPfrzrujFFA7nODu0cLbXtLdeqWEilbR+AQnpiCIE07ZxfTtGWIqMefmDgZ3QROC4crv6x7v2kDk1xK1uzHcN/t6uw1IIbJLxuZ8s+8x3tBlHffosCg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ROG0DZ65; arc=fail smtp.client-ip=40.93.196.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ROG0DZ65"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=F2ZFkAmda6INwt0KWDuhu/+FuOlpsGJKvAiqRS5ddXirLrnIYZmbmfEprgaqdYeZwPXXXRNF5AcTKjHWikA0UmB7VP7/JZDSW75UrhfEs0L/RREf2xdvNiNRpnH9kGKkMSmF4lJ50Up2LjTmC993eE4Je8MGqWlZ2KMcUIJwQBQpKnVxpBM//KKLtleny2cdzi/XrKWjH5igziF6NG/Bbf8AqSfiuRHHQyGO4YT7S70/Ulsqrv+ChqiYeEhazE4oy6agQjv5oJkrrQEj5AB2Zt/i6w1LHIcx1awuF7a41sqrLll539Zwnxi88ttgGqA1yt0zcFiR7QFYbxp4mCy06g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=05Wu8OHCOCjDRFOgPMSRsh2a5dG9MSzmcR/xIXkcVEU=;
- b=Vw/XxW0xF0v/0hKi8tEDKIx5E8bX5ItYBHbwLNx/YN2hHMMwQ1Lk0uxGwLa+28DupuKQueuD9sQa9+NIDbOkcZkwliLfj7XZTQoyNTKdFMDE9eMWLHlCE+Tw8Ig4wTHlFobSHZHTt02Gw+pL+dvHSV0Yj/gJMmPBiRMPL+l/MPZSh3xPhOxssE5asORPILlbUjttbTi9hs8JSYepLGHQkWmeHD9temyZ1z3NT6gZUlITyN1lmhIZuvWn1Ro9jG+kb3i8KIW5DEEf1e2IzJD2EzqKFNyj5XGxmsGasbyJYTd7UdOzlYywF+/kfHL1728rkpLs2YU30B7xc3zMhAJ5jw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=05Wu8OHCOCjDRFOgPMSRsh2a5dG9MSzmcR/xIXkcVEU=;
- b=ROG0DZ65iV//oOaOaI7Fi1QOKujUgyC8vztO0IXfKgb7WgHYhkQvzpMGQuOQKpofbxu2u/kjufTCFLWhoJTNScFxgi3fp4Pa24bEdzM9UFCovan9368ew2BoAlgCyRo8zFtP/xynEmcsOYA+8xlE99WmaPl84appTvHFze1dtrs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by DS0PR12MB7969.namprd12.prod.outlook.com (2603:10b6:8:146::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.18; Thu, 5 Mar
- 2026 01:40:29 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad%5]) with mapi id 15.20.9678.016; Thu, 5 Mar 2026
- 01:40:29 +0000
-Message-ID: <0fbb94ad-bfcf-4fbe-bf40-d79051d67ad8@amd.com>
-Date: Wed, 4 Mar 2026 19:40:25 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/7] x86/sev: add support for RMPOPT instruction
-To: Dave Hansen <dave.hansen@intel.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: tglx@kernel.org, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- peterz@infradead.org, thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
- davem@davemloft.net, ardb@kernel.org, pbonzini@redhat.com, aik@amd.com,
- Michael.Roth@amd.com, KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
- Nathan.Fontenot@amd.com, jackyli@google.com, pgonda@google.com,
- rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
- pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
- nikunj@amd.com, john.allen@amd.com, darwi@linutronix.de,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- kvm@vger.kernel.org, linux-coco@lists.linux.dev
-References: <cover.1772486459.git.ashish.kalra@amd.com>
- <8dc0198f1261f5ae4b16388fc1ffad5ddb3895f9.1772486459.git.ashish.kalra@amd.com>
- <aahH4XARlftClMrQ@google.com>
- <7ab8d3af-b4f5-481c-ab2e-059ddd7e718e@intel.com>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <7ab8d3af-b4f5-481c-ab2e-059ddd7e718e@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DS7PR03CA0039.namprd03.prod.outlook.com
- (2603:10b6:5:3b5::14) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821712882C5
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Mar 2026 06:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772691619; cv=none; b=sUFOpgAyqk/is9e9o7iJZMWfE9izubCOrR0jb89+DUvhSK+xcdJPMhcgFmeZLgUJUYM2eW/dYAtIrqbMr29UFuAB4MWo5c0FI4gUxjqQfUThBGKveMKAJ9cjAPXsCaJl7Ve0T6blAnENZzAkfIXjRRAy+5PtH4ma1a+qSTeXfj4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772691619; c=relaxed/simple;
+	bh=JYoVtqT+TlZivIYwGhB+s6D+2mX7bsKlbpZgEZw3dRA=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=WrUsNk43q8EOntoaDAjArG0K9hbykMWAdwQLo9X7dh8Pu7j0CX3OWSNV+75CpLHXN1bIQKsMlVFZyqHz8gK2a8tnd1PFYCFKpI7s5ZEnu02rXQ+wJkA/mLo97Ij7i+QgRUUPJZMSsUqscjypPLJwTQJbBXFdRvncQetmb1Mz2hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1772690949-1eb14e7586273a0001-Xm9f1P
+Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx2.zhaoxin.com with ESMTP id a56iC6VahJp61GyC (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Thu, 05 Mar 2026 14:09:09 +0800 (CST)
+X-Barracuda-Envelope-From: AlanSong-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Received: from ZXSHMBX1.zhaoxin.com (10.28.252.163) by ZXSHMBX1.zhaoxin.com
+ (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.59; Thu, 5 Mar
+ 2026 14:09:08 +0800
+Received: from ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85]) by
+ ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85%7]) with mapi id
+ 15.01.2507.059; Thu, 5 Mar 2026 14:09:08 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Received: from [10.32.65.156] (10.32.65.156) by ZXBJMBX02.zhaoxin.com
+ (10.29.252.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.59; Thu, 5 Mar
+ 2026 09:37:01 +0800
+Message-ID: <220d9651-3edc-4dc1-9086-e3482d2d5da3@zhaoxin.com>
+Date: Thu, 5 Mar 2026 09:37:01 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|DS0PR12MB7969:EE_
-X-MS-Office365-Filtering-Correlation-Id: 54fe225f-bdd9-40cb-d444-08de7a582eaa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	MtkeI+NkGSxNp/raHTdovwauQjm6/Xg69A/OjPts2jXEjav2m61NpagqwNj9Kqcoi9ge91YvUxjRleTX/h+p+BI9UIV0Fab6Z8ATBjeEsqwx+Pl2JWBn2s7NAt3HiNd99y22DlLI0tR+fWNdokhTW0415bl7PHdq2dAjoh8AUAyfg7qZp6bWB8uQyWhlvxnalBQbVN3pte/4zIuGTWL7v8FPi+vwTqBsviYPJGW0PImH0pkjd1QHVhWajNwKtOG3wdbUwYn+US/vhSGYqujXZXRrW+cg9u0mgWPziJge72+7etD0ItgG5V8VIq3FflL374tygMVVdQDD6Om0iZlBpSo6ljEaXXF3EZmFFM0eAjrGYDlVfZcjChavSBSnW4yIh6umj6qIGGTjI0dH0GVCXI3UELCKDxyzuO6aXr5AzAEDcx51kfolYBJzkcLhbqpAUJxVcKaK99qOrVhfC7X933Suhjw+hgbzxKZRvxc9AXxZBdYErCq9H0UgJ51Eais7ckWLxt/c2ORKG1qKwh7M5EuCHy0u51fN0sHDg1Q+/tiqPU4uq9DopRmsxcV3pNvl2GMuDgrp8tjiyNbYaBIr35cAOirOsS7ssg4+7ETrC+Jkdu1IHnqWy22TqjdGFaSRehhs8lpahU3bZSgV/ay7r9kfD5KrJrnJejuZwjYMl3CfzOYTKZ0R2I0gV9E+iE0vIE1EVMSVrTl/R7Mj111u3WB3X8LpkSBUj13QRrM423o=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VmZIdzlnUTlFT2VVclRhd0U4aVF5QnpseVBld2R1R2ZmdEN1b04vTzJWTW1a?=
- =?utf-8?B?cTVRMm5zR0dXbTNZZlQreFFIcHd3aHZKUXdsYWlKZmVwblB6eDhabFZnNUpE?=
- =?utf-8?B?VzdGZUtKQUVkbHNHR1oyb3dJWEtaYk82ck0xekdLWTZFTnd0Yk9zdElqL09M?=
- =?utf-8?B?NC92eG9YV0pYdkdLTlM3b1haWU1BN24rOUIxRmp6c0VqK3lPd0dWYkVQa3d5?=
- =?utf-8?B?cXpVWjVMbC9MUUtoVzBSTVhtSytLKzJXWFAvT3ZzVjk1c2o5WUl3VDJyWkJw?=
- =?utf-8?B?QllBNVRuWEN1b3NWR01YSmpVR294WjgwcDBLUWFac0pZZ0lKZVl1aEd2QlRL?=
- =?utf-8?B?MXpMSWRib2puRGR1R0E0S0ZHSC85djJwZmNadVIybWl3T2VyMHJJaEQzNysr?=
- =?utf-8?B?SGpsNktvSzUrclVJY0pnNFA0TDVncXRVcXdOZTZ5NE9iSm95S0tTUXFLazhU?=
- =?utf-8?B?cWVoMiswUEh0OHBhMTh2aGFCdVpwcElweERXU2ZkNzZSTCtyVmxSRVBkUWpq?=
- =?utf-8?B?ZlNzdXVydnVaWFdkMlJvRVY2bkxXMWFmeXpjSWFVcnNMN2lNUGg2bUtqbjZO?=
- =?utf-8?B?NkdZZmNRb3U4Y1JqZCt3SDBEQk9sUC9Oc0swV29YMlQyZVp0cGsvbmJZd0Jz?=
- =?utf-8?B?dUdGemNXU29hSytNN25oR2k0Wk4vOWo3cUt6a3V2NmZhblo0TzFnb2trR0dQ?=
- =?utf-8?B?c0NKQUpkcFFucUxubjlpeUxDNmlRL3RJM1M5UWF2c3hFdEY2TytWNmJUQW9F?=
- =?utf-8?B?ckd4dlpVVjR5ZXMxQ1BaMDNOL2VaMEtXY3FlM1pLUEJQQ0pmM3NPQVlObnYz?=
- =?utf-8?B?RkR5NTBqYmFBcmNtZkprWUxUMXY0V2J0RGF4aEtyakNjLzdkQ2ZBNWxIeUdx?=
- =?utf-8?B?d0x4V01qaDRXRTRMMnpVTGl5eXUyVEcvWWo2dTBLOUxCVTZ5MXY1alNZSjJl?=
- =?utf-8?B?N2VOMGI4alV2OW9uaGF4YUZhYmhmUmlIK0pZSWNFK0hTeWhqK21xcEhhRUZW?=
- =?utf-8?B?MzlGbHptMyswV3FPcUh5S1dsL3h4ZzM2c1BYVDEzSjdmZ1FHa1ZiYUR5ZmhD?=
- =?utf-8?B?WElpQjRZVG45M0ViMXNBZzYwQVl3SDg5MHErQlAyWVVhSWVneks4akdyeXpx?=
- =?utf-8?B?TWtCVHRSTTVvb3dmSkNtRWszYVZ2a3k1SzQ4SitkMTR5TGk2Z3pxbTBmbVhx?=
- =?utf-8?B?V1ZveWZsVmxITUhMczRBT3ZYRmt0aHhHL2I4cW5pMXp4QU4wRzhnVDhXT211?=
- =?utf-8?B?Y2pVVHRFT0lXN3JoeWhROUcrNnljajhiYTVyRUdvVXl2L2UvMXVtRGl0VlhM?=
- =?utf-8?B?MWlZQVB4YnpVYWhIRVJSL0ZHdi8yRlVSNXFXdWpPdkpBR20xSUtEcFZIWDVr?=
- =?utf-8?B?eTNxRVFqTWl2bW0wS2U1UnlWVWJFUkljOGpHQisrS1Y2WHhqQ01pbmpOQTE1?=
- =?utf-8?B?bGNreVN2bUQ0VzRubTRRY0REN1ltOXMzNjBBZXJtVm1PanZiTit5c0FoKzRN?=
- =?utf-8?B?L1RMQ1ZsbWo1Zlhtanpwc1VnbXdnTWFJc0xUclhJZnd1TzhCZlpmQm9UY010?=
- =?utf-8?B?cEY4ZjNrVGduSGRxSTFLR3ZWY0dHU3gzN1I0UVJIeWFPa0VwZzFGblhBUEN3?=
- =?utf-8?B?bitaSkZpQVFNMStTdmt0UnlWcnBXeS9BOFJMM0xxc1lKTDdqZVJKOGdLOW1K?=
- =?utf-8?B?VzIxOWJtZjQyWXVqcndENENWdzhDdXRhRTkvYkpkSU9xOXJFSXREQ2F0OVJl?=
- =?utf-8?B?S3VSQStsQ1dydnZmck5udnRrSndiYXB3aDdZRTgrYnNQV0diQmd4WFgxSGpD?=
- =?utf-8?B?TTE3M0h1RjhDWHVDdWFteHhhajIzQThVdU5mYk54VjM5cm00ZndjYjhnS003?=
- =?utf-8?B?SDFPSVN0ZFRBMDlnUEVaTUhMenQ3Ykt0TmUydERnNDVReHBYeTMvVHlZcStU?=
- =?utf-8?B?Y0lmeFZiRjJGMXhZTUxZdWVKTmlSa2pMSTk0cnpXUlRLV05WZmdyRXlIWHFx?=
- =?utf-8?B?Ylo3NC92eWdVUU5kM1FYdDdrc3BvWHo0Vy80bkx6MDJnQ3pyVi8zNUZwY0F2?=
- =?utf-8?B?aUtQWmZybS90Uk9qZXpPV0I2akhoZzdGYkpOZ1Vqc2lqeTl0THYwbFpsaS8y?=
- =?utf-8?B?d3NaTDhObkIxa2c0R1FGSC9XZnJPMHFvVUdhN3hSWHBUejR0Wk9tdUFqMVhE?=
- =?utf-8?B?di9CZlN5cndtN3A5RG1jVDBVd1h3WXYvTTgrMjZYTDNWRnNSOTkyYjRidkZG?=
- =?utf-8?B?a09jb0IyY2FXMHVpbThtUndLNTd2aXd0djFNK1dMVDArWEYwcVp1YTNqNXhG?=
- =?utf-8?Q?rheK+Q1/AmN4o0SV/w?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 54fe225f-bdd9-40cb-d444-08de7a582eaa
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2026 01:40:29.4302
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VyrKYHZbbFiisfFtUHv40AFrTHRA3r50eJRGlgaqyvmx8aTn7EUBtQsa3YFrzot71Y5Ys5cf+pwzan47P3km1w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7969
+User-Agent: Mozilla Thunderbird
+From: AlanSong-oc <AlanSong-oc@zhaoxin.com>
+Subject: Re: [PATCH v3 2/3] lib/crypto: x86/sha1: PHE Extensions optimized
+ SHA1 transform function
+To: Eric Biggers <ebiggers@kernel.org>
+X-ASG-Orig-Subj: Re: [PATCH v3 2/3] lib/crypto: x86/sha1: PHE Extensions optimized
+ SHA1 transform function
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <Jason@zx2c4.com>,
+	<ardb@kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <x86@kernel.org>, <CobeChen@zhaoxin.com>,
+	<TonyWWang-oc@zhaoxin.com>, <YunShen@zhaoxin.com>, <GeorgeXue@zhaoxin.com>,
+	<LeoLiu-oc@zhaoxin.com>, <HansHu@zhaoxin.com>
+References: <20260116071513.12134-1-AlanSong-oc@zhaoxin.com>
+ <20260116071513.12134-3-AlanSong-oc@zhaoxin.com>
+ <20260118003120.GF74518@quark>
+In-Reply-To: <20260118003120.GF74518@quark>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
+ ZXBJMBX02.zhaoxin.com (10.29.252.6)
+X-Moderation-Data: 3/5/2026 2:09:07 PM
+X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
+X-Barracuda-Start-Time: 1772690949
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 6466
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -0.94
+X-Barracuda-Spam-Status: No, SCORE=-0.94 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=DATE_IN_PAST_03_06, DATE_IN_PAST_03_06_2
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.155397
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
+	0.01 DATE_IN_PAST_03_06     Date: is 3 to 6 hours before Received: date
+	1.08 DATE_IN_PAST_03_06_2   DATE_IN_PAST_03_06_2
 
-Hello Dave and Sean,
-
-On 3/4/2026 9:25 AM, Dave Hansen wrote:
-> On 3/4/26 07:01, Sean Christopherson wrote:
->> I don't see any performance data in either posted version.  Bluntly, this series
->> isn't going anywhere without data to guide us.  E.g. comments like this from v1
+On 1/18/2026 8:31 AM, Eric Biggers wrote:
+> 
+> On Fri, Jan 16, 2026 at 03:15:12PM +0800, AlanSong-oc wrote:
+>> Zhaoxin CPUs have implemented the SHA(Secure Hash Algorithm) as its CPU
+>> instructions by PHE(Padlock Hash Engine) Extensions, including XSHA1,
+>> XSHA256, XSHA384 and XSHA512 instructions.
 >>
->>  : And there is a cost associated with re-enabling the optimizations for all
->>  : system RAM (even though it runs as a background kernel thread executing RMPOPT
->>  : on different 1GB regions in parallel and with inline cond_resched()'s),
->>  : we don't want to run this periodically.
+>> With the help of implementation of SHA in hardware instead of software,
+>> can develop applications with higher performance, more security and more
+>> flexibility.
 >>
->> suggest there is meaningful cost associated with the scan.
+>> This patch includes the XSHA1 instruction optimized implementation of
+>> SHA-1 transform function.
+>>
+>> Signed-off-by: AlanSong-oc <AlanSong-oc@zhaoxin.com>
 > 
-> Well the RMP is 0.4% of the size of system memory, and I assume that you
-> need to scan the whole table. There are surely shortcuts for 2M pages,
-> but with 4k, that's ~8.5GB of RMP table for 2TB of memory. That's an
-> awful lot of memory traffic for each CPU.
+> Please include the information I've asked for (benchmark results, test
+> results, and link to the specification) directly in the commit message.
 
-The RMPOPT instruction is optimized for 2M pages, so it checks that
-all 512 2MB entries in that 1GB region are not assigned, i.e., for each
-2MB RMP in the 1GB region containing the specified address it checks if
-they are not assigned.
-  
-> 
-> It'll be annoying to keep a refcount per 1GB of paddr space.
-> 
-> One other way to do it would be to loosely mirror the RMPOPT bitmap and
-> keep our own bitmap of 1GB regions that _need_ RMPOPT run on them. Any
-> private=>shared conversion sets a bit in the bitmap and schedules some
-> work out in the future.
-> 
-> It could also be less granular than that. Instead of any private=>shared
-> conversion, the RMPOPT scan could be triggered on VM destruction which
-> is much more likely to result in RMPOPT doing anything useful.
+Sorry for missing the link to the specification in the commit message.
+I will include the benchmark results, test results, and the link to the
+specification directly in the commit message in the next version of the
+patch, rather than in the cover letter.
 
-Yes, it will need to be more granular than scheduling RMPOPT work for any
-private->shared conversion. 
+>> +#if IS_ENABLED(CONFIG_CPU_SUP_ZHAOXIN)
+>> +#define PHE_ALIGNMENT 16
+>> +static void sha1_blocks_phe(struct sha1_block_state *state,
+>> +                          const u8 *data, size_t nblocks)
+> 
+> The IS_ENABLED(CONFIG_CPU_SUP_ZHAOXIN) should go in the CPU feature
+> check, so that the code will be parsed regardless of the setting.  That
+> reduces the chance that future changes will cause compilation errors.
 
-And that's what we are doing in v2 patch series, RMPOPT scan getting 
-triggered on VM destruction.
+I will address this problem using the approach you described below in
+the next version of the patch.
 
 > 
-> BTW, I assume that the RMPOPT disable machinery is driven from the
-> INVLPGB-like TLB invalidations that are a part of the SNP
-> shared=>private conversions. It's a darn shame that RMPOPT wasn't
-> broadcast in the same way. It would save the poor OS a lot of work. The
-> RMPOPT table is per-cpu of course, but I'm not sure what keeps *a* CPU
-> from broadcasting its success finding an SNP-free physical region to
-> other CPUs.
+>> +     /*
+>> +      * XSHA1 requires %edi to point to a 32-byte, 16-byte-aligned
+>> +      * buffer on Zhaoxin processors.
+>> +      */
+> 
+> This seems implausible.  In 64-bit mode a pointer can't fit in %edi.  I
+> thought you mentioned that this instruction is 64-bit compatible?  You
+> may have meant %rdi.
+> 
+> Interestingly, the spec you provided specifically says the registers
+> operated on are %eax, %ecx, %esi, and %edi.
+> 
+> So assuming the code works, perhaps both the spec and your code comment
+> are incorrect?
+> 
+> These errors don't really confidence in this instruction.
 
-The hardware does this broadcast for the RMPUPDATE instruction, 
-a broadcast will be sent in the RMPUPDATE instruction to clear matching entries
-in other RMPOPT tables.  This broadcast will be sent to all CPUs.
-
-For the RMPOPT instruction itself, there is no such broadcast, but RMPOPT 
-instruction needs to be executed on only one thread per core, the 
-per-CPU RMPOPT table of the other sibling thread will be programmed while
-executing the same instruction.
-
-That's the reason, why we had this optimization to executing RMPOPT instruction
-on only the primary thread as part of the v1 patch series and i believe we should
-include this optimization as part of future series.
+Sorry for the misleading comment. I will correct it in the next version
+of the patch. The specification provided earlier uses the 32-bit
+register as an example, which doesn't mean the instruction only supports
+32-bit mode. The updated specification explicitly clarifies this point
+and is available at the following link.
+(https://gitee.com/openzhaoxin/zhaoxin_specifications/blob/20260227/ZX_Padlock_Reference.pdf)
 
 > 
-> tl;dr: I agree with you. The cost of these scans is going to be
-> annoying, and it's going to need OS help to optimize it.
+>> +     memcpy(dst, state, SHA1_DIGEST_SIZE);
+>> +     asm volatile(".byte 0xf3,0x0f,0xa6,0xc8"
+>> +                  : "+S"(data), "+D"(dst)
+>> +                  : "a"((long)-1), "c"(nblocks));
+>> +     memcpy(state, dst, SHA1_DIGEST_SIZE);
+> 
+> Is the reason for using '.byte' that the GNU and clang assemblers don't
+> implement the mnemonic this Zhaoxin-specific instruction?  The spec
+> implies that the intended mnemonic is "rep sha1".
+> 
+> If that's correct, could you add a comment like /* rep sha1 */ so that
+> it's clear what the intended instruction is?
 
-Here is some performance data:
+The '.byte' directive is used to ensure the correct binary code is
+generated, regardless of compiler support, particularly for compilers
+that lack the corresponding mnemonic. I will add an appropriate comment
+in the next version of the patch to clarify the intended instruction.
 
-Raw CPU cycles for a single RMPOPT instruction, func=0 :
+> Also, the spec describes all four registers as both input and output
+> registers.  Yet your inline asm marks %rax and %rcx as inputs only.
 
-RMPOPT during snp_rmptable_init() while booting: 
+Thank you for pointing this question out.
 
-....
-[   12.098580] SEV-SNP: RMPOPT max. CPU cycles 501460
-[   12.103839] SEV-SNP: RMPOPT min. CPU cycles 60
-[   12.108799] SEV-SNP: RMPOPT average cycles 139790
+On the one hand, when the '+' constraint modifier is applied to an
+operand, it is treated as both an input and an output operand.
+Therefore, %rsi and %rdi are considered input operands as well.
+
+On the other hand, after the instruction executes, the values in %rax,
+%rsi, and %rcx are modified. These registers should therefore use the
+'+' constraint modifier to inform the compiler that their values are
+updated by the assembly code. We cannot rely on clobbers to indicate
+that the values of input operands are modified following the suggestion
+by gcc manual. However, since %rax is initialized with a constant value,
+it does not need the '+' constraint modifier. It should can simply be
+specified as an input operand.
+
+In addition, although %rdi itself is not modified by the instruction but
+the memory it references may be updated, a "memory" clobber should be
+added to notify the compiler about possible memory side effects.
+
+The corrected inline assembly should be written as follows:
+
+    asm volatile(".byte 0xf3,0x0f,0xa6,0xc8" /* REP XSHA1 */
+                : "+S"(data), "+c"(nblocks)
+                : "a"((long)-1), "D"(dst)
+                : "memory");
+
+I will adopt it in the next version of the patch.
+
+>> @@ -59,6 +79,11 @@ static void sha1_mod_init_arch(void)
+>>  {
+>>       if (boot_cpu_has(X86_FEATURE_SHA_NI)) {
+>>               static_call_update(sha1_blocks_x86, sha1_blocks_ni);
+>> +#if IS_ENABLED(CONFIG_CPU_SUP_ZHAOXIN)
+>> +     } else if (boot_cpu_has(X86_FEATURE_PHE_EN)) {
+>> +             if (boot_cpu_data.x86 >= 0x07)
+>> +                     static_call_update(sha1_blocks_x86, sha1_blocks_phe);
+>> +#endif
+> 
+> I think it should be:
+> 
+>         } else if (IS_ENABLED(CONFIG_CPU_SUP_ZHAOXIN) &&
+>                    boot_cpu_has(X86_FEATURE_PHE_EN) &&
+>                    boot_cpu_data.x86 >= 0x07) {
+>                         static_call_update(sha1_blocks_x86, sha1_blocks_phe);
+> 
+> ... so (a) the code will be parsed even when !CONFIG_CPU_SUP_ZHAOXIN,
+> and (b) functions won't be unnecessarily disabled when
+> boot_cpu_has(X86_FEATURE_PHE_EN) && boot_cpu_data.x86 < 0x07).
+
+Thanks for the suggestion, that makes more sense.
+
+Using #if and #endif for conditional compilation is a poor choice, as it
+prevents the code from being properly parsed. It is more efficient to
+include CPU family checks directly in the condition.
+
+> 
+> As before, all these comments apply to the SHA-256 patch too.
+
+Surely, I will also apply all of the suggestions mentioned above to the
+SHA-256 patch.
+
+Please accept my apologies for the delayed response due to
+administrative procedures and the recent holidays. Thank you for your
+review and valuable suggestions.
+
+Best Regards
+AlanSong-oc
 
 
-RMPOPT during SNP_INIT_EX, at CCP module load at boot: 
-
-[   40.206619] SEV-SNP: RMPOPT max. CPU cycles 248083620
-[   40.206629] SEV-SNP: RMPOPT min. CPU cycles 60
-[   40.206629] SEV-SNP: RMPOPT average cycles 249820
-
-RMPOPT after SNP guest shutdown:
-...
-[  298.746893] SEV-SNP: RMPOPT max. CPU cycles 248083620
-[  298.746898] SEV-SNP: RMPOPT min. CPU cycles 60
-[  298.746900] SEV-SNP: RMPOPT average cycles 127859
-
-
-I believe the min. CPU cycles is the case where RMPOPT fails early. 
-
-
-Raw CPU cycles for one complete iteration of executing RMPOPT (func=0) on all CPUs for the whole RAM: 
-
-This is for this complete loop with cond_resched() removed.
-
-      while (!kthread_should_stop()) {
-                phys_addr_t pa;
-
-                pr_info("RMP optimizations enabled on physical address range @1GB alignment [0x%016llx - 0x%016llx]\n",
-                        pa_start, pa_end);
-
-                start = rdtsc_ordered();
-                /*
-                 * RMPOPT optimizations skip RMP checks at 1GB granularity if this range of
-                 * memory does not contain any SNP guest memory.
-                 */
-                for (pa = pa_start; pa < pa_end; pa += PUD_SIZE) {
-                        /* Bit zero passes the function to the RMPOPT instruction. */
-                        on_each_cpu_mask(cpu_online_mask, rmpopt,
-                                         (void *)(pa | RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS),
-                                         true);
-
-                        
-                }
-                end = rdtsc_ordered();
-
-                pr_info("RMPOPT cycles taken for physical address range 0x%016llx - 0x%016llx on all cpus %llu cycles\n",
-                                pa_start, pa_end, end - start);
-
-                set_current_state(TASK_INTERRUPTIBLE);
-                schedule();
-        }
-
-
-RMPOPT during snp_rmptable_init() while booting: 
-
-...
-[   12.114047] SEV-SNP: RMPOPT cycles taken for physical address range 0x0000000000000000 - 0x0000010380000000 on all cpus 1499496600 cycles
-
-RMPOPT during SNP_INIT_EX:
-...
-[   40.206630] SEV-SNP: RMPOPT cycles taken for physical address range 0x0000000000000000 - 0x0000010380000000 on all cpus 686519180 cycles
-
-RMPOPT after SNP guest shutdown:
-...
-[  298.746900] SEV-SNP: RMPOPT cycles taken for physical address range 0x0000000000000000 - 0x0000010380000000 on all cpus 369059160 cycles
-
-Thanks,
-Ashish
