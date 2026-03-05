@@ -1,225 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2968E3A63E3
-	for <linux-crypto@vger.kernel.org>; Thu,  5 Mar 2026 13:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01663A962C
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Mar 2026 14:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772718857; cv=none; b=mmKl+ziCKXE7pzK4DBX4tJpl4ljl/DfgADlzC/cDLRC0qw0l+FoAmU3tQaBkOJgoAzJoqqnwp/Kr6TWPPahdmSe01ox7pUpC95rXbj1NCeKZmVXDp8eu0vXdB4F3xz9HlgOrjOkpUcGLFg4lI0gMkp8uU6fm1mAI7rd9vm5Lmvg=
+	t=1772722017; cv=none; b=KP61nBJZZuAO5cHuk20KThjGJcUFTZS1BrUC+QoYP55o0aYcjOOqewQMpUVtAtDPWrBVL7tbl6TNCqKMVjSzG7SJ8gNxVle2d97WW8vrSEzUVkGFExf7MR+lPWYxVM0I0x4z4VG5QYP0b7x962RZyEyJuzWsqWMpbk+SngdP5Eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772718857; c=relaxed/simple;
-	bh=XNEc9+ahz7dlU1ZGYsJX4Kf6Gy+aD7tZ2f4Pr2djs3Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MLut3ZkJR9oTUltr3nZByXQA95eQkY6iYqrWcEkW9Wq+KTjlV3hVwlBob0gZkMQ56IOPTjnfgZ2q1E7m28HIBhUyMdU2SWOxk0/ooXFHQzi+vRpMvn+dOBCrk3WX9gaAOfTF0MYX1Uh5P048TXBKAfCqtQtwBEy6HLlltV4lwbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dp7ewJ63; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772722017; c=relaxed/simple;
+	bh=m+luluOu9DcLJuQ4bEtx0bAFbL2Ra4sYJSROobO45wA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=eSrTdSTVts8uIIGhEgDKVI1jTYCXa005Yv26A0Sxm0SM+TJp+IMY9e96kpxEuIVp2fcjzwnEsnjfpWSULTzcNWo3Vea4P4gNbRUhZsyvyMzvjjEIgWkdo/k77CkLoEsLy0EBqVX6vk+glwfr4e8bTCPm86qVG8s56NJfqXomUuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=He/ZHulw; arc=none smtp.client-ip=198.37.111.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dp7ewJ63"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07F7FC2BC9E
-	for <linux-crypto@vger.kernel.org>; Thu,  5 Mar 2026 13:54:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772718857;
-	bh=XNEc9+ahz7dlU1ZGYsJX4Kf6Gy+aD7tZ2f4Pr2djs3Y=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=dp7ewJ63ttgOP1PtrZioY/atwGNJkiQNcfAFQBa1XKT8CHKo4D7xKECuRoGm0Q9eV
-	 kTSL9ztSPuHmFQm9jsDMeTLAOkvDnHtyM5ZMoqRH3pvCjKBiewB+Pyxpvyb76NuxYK
-	 H4/FNLdk71c3AAB79AU5euhR00LeLHofcGFoM1dirTFpkHLwygyLirEHS+/Km0LdUX
-	 4naSpi9nx2Ljpy0w9yggWn0XRB1uEhS90bLQ2zlAktQKPqInqpyrxcvwnlfhz2DN9n
-	 6sOgQyUhajNBEPPq3kkW2XPGpWRFbEq93JHDq/hs9oQS7F5u1xzqsXyJJ6hwRGG7TD
-	 WHwXwM6tYFntw==
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-389fad34e2eso125144881fa.3
-        for <linux-crypto@vger.kernel.org>; Thu, 05 Mar 2026 05:54:15 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUwP0HfdEROtS7+ZY/bco8uBHmIJNJU7eI+ioUBnxgHxnWq64VMTS5JqDG4STx/LDaLaLr+96haxqtmSiM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnL1LYriS5WQ6IKjq7EtqYq+fnpbNAhlXeYzDtlHjsHPLDjWtA
-	QFU1AUpiTpRZj8EvuXkWAnZWHbVPfmIqDYNxYIInBn4bWPI50T5uyH4qPRuOpCGYW+domvFZ6mY
-	yVfA6VzR6Y8l6GSrjT+ysv8a8+h0uHkh184cmg8imjA==
-X-Received: by 2002:a05:651c:3244:b0:38a:23cf:873 with SMTP id
- 38308e7fff4ca-38a2c7a62c1mr39072801fa.29.1772718854668; Thu, 05 Mar 2026
- 05:54:14 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="He/ZHulw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1772722014;
+	bh=m+luluOu9DcLJuQ4bEtx0bAFbL2Ra4sYJSROobO45wA=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=He/ZHulwEXUAL4346h6EIwxAezOrO0n/7WRUTuQw3cNd2XEFR3U9Sir/h96v134qP
+	 CCWoMdii4Fq7q/T2vwWGvbaoRFQ/KXxoofAysxax7nUewllGacjdsofmHy/PvPR96K
+	 9V/H/4ZWSDwkKJgPvbWn6qU8S4IwJe9YO3lPZRfA=
+Received: from [192.168.109.22] (unknown [75.104.92.190])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 918B81C0311;
+	Thu, 05 Mar 2026 09:46:48 -0500 (EST)
+Message-ID: <ba545f3db317ba3410b8fb9f5bab9e72be1854b6.camel@HansenPartnership.com>
+Subject: Re: [PATCH v3 0/5] pkcs7: better handling of signed attributes
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>, 
+	Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+Date: Thu, 05 Mar 2026 09:46:42 -0500
+In-Reply-To: <20260305075511.GA155793@sol>
+References: <20260225211907.7368-1-James.Bottomley@HansenPartnership.com>
+	 <20260226021331.GA55502@quark>
+	 <3900433c727c1e7ab6e131003de7ca53bb0d23d1.camel@HansenPartnership.com>
+	 <20260305075511.GA155793@sol>
+Autocrypt: addr=James.Bottomley@HansenPartnership.com;
+ prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260302-qcom-qce-cmd-descr-v11-0-4bf1f5db4802@oss.qualcomm.com>
- <scr5qvxa7f7k22pms4c6k5gwiky7lhssrw6qryfngexlek44g2@rayinnnwqgbt>
- <aalwMwN3qMlzrql5@linaro.org> <CAMRc=MfjknN1AYF_NPLzR0YbdWuoET25D9o0zsvx56VN+u59HQ@mail.gmail.com>
- <aamIf8JethKzLW93@linaro.org>
-In-Reply-To: <aamIf8JethKzLW93@linaro.org>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Thu, 5 Mar 2026 14:54:02 +0100
-X-Gmail-Original-Message-ID: <CAMRc=Mf=NjCqf0eqmM800Q3MEUC48V_DZ3ts6+4=qMCtrbvzzQ@mail.gmail.com>
-X-Gm-Features: AaiRm51IYcUCfeLohT9D6zKyfOjMI-00Tvkk-qYeZ800US0I_YGYl-ZxLXXpeCw
-Message-ID: <CAMRc=Mf=NjCqf0eqmM800Q3MEUC48V_DZ3ts6+4=qMCtrbvzzQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v11 00/12] crypto/dmaengine: qce: introduce BAM
- locking and use DMA for register I/O
-To: Stephan Gerhold <stephan.gerhold@linaro.org>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
-	Dmitry Baryshkov <lumag@kernel.org>, Peter Ujfalusi <peter.ujfalusi@gmail.com>, 
-	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>, dmaengine@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, Bjorn Andersson <andersson@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 5, 2026 at 2:43=E2=80=AFPM Stephan Gerhold
-<stephan.gerhold@linaro.org> wrote:
->
-> On Thu, Mar 05, 2026 at 02:10:55PM +0100, Bartosz Golaszewski wrote:
-> > On Thu, Mar 5, 2026 at 1:00=E2=80=AFPM Stephan Gerhold
-> > <stephan.gerhold@linaro.org> wrote:
-> > >
-> > > On Tue, Mar 03, 2026 at 06:13:56PM +0530, Manivannan Sadhasivam wrote=
-:
-> > > > On Mon, Mar 02, 2026 at 04:57:13PM +0100, Bartosz Golaszewski wrote=
-:
-> > > > > NOTE: Please note that even though this is version 11, I changed =
-the
-> > > > > prefix to RFC as this is an entirely new approach resulting from
-> > > > > discussions under v9. I AM AWARE of the existing memory leaks in =
-the
-> > > > > last patch of this series - I'm sending it because I want to firs=
-t
-> > > > > discuss the approach and get a green light from Vinod as well as =
-Mani
-> > > > > and Bjorn. Especially when it comes to communicating the address =
-for the
-> > > > > dummy rights from the client to the BAM driver.
-> > > > > /NOTE
-> > > > >
-> > > > > Currently the QCE crypto driver accesses the crypto engine regist=
-ers
-> > > > > directly via CPU. Trust Zone may perform crypto operations simult=
-aneously
-> > > > > resulting in a race condition. To remedy that, let's introduce su=
-pport
-> > > > > for BAM locking/unlocking to the driver. The BAM driver will now =
-wrap
-> > > > > any existing issued descriptor chains with additional descriptors
-> > > > > performing the locking when the client starts the transaction
-> > > > > (dmaengine_issue_pending()). The client wanting to profit from lo=
-cking
-> > > > > needs to switch to performing register I/O over DMA and communica=
-te the
-> > > > > address to which to perform the dummy writes via a call to
-> > > > > dmaengine_slave_config().
-> > > > >
-> > > >
-> > > > Thanks for moving the LOCK/UNLOCK bits out of client to the BAM dri=
-ver. It looks
-> > > > neat now. I understand the limitation that for LOCK/UNLOCK, BAM nee=
-ds to perform
-> > > > a dummy write to an address in the client register space. So in thi=
-s case, you
-> > > > can also use the previous metadata approach to pass the scratchpad =
-register to
-> > > > the BAM driver from clients. The BAM driver can use this register t=
-o perform
-> > > > LOCK/UNLOCK.
-> > > >
-> > > > It may sound like I'm suggesting a part of your previous design, bu=
-t it fits the
-> > > > design more cleanly IMO. The BAM performs LOCK/UNLOCK on its own, b=
-ut it gets
-> > > > the scratchpad register address from the clients through the metada=
-ta once.
-> > > >
-> > > > It is very unfortunate that the IP doesn't accept '0' address for L=
-OCK/UNLOCK or
-> > > > some of them cannot append LOCK/UNLOCK to the actual CMD descriptor=
-s passed from
-> > > > the clients. These would've made the code/design even more cleaner.
-> > > >
-> > >
-> > > I was staring at the downstream drivers for QCE (qce50.c?) [1] for a =
-bit
-> > > and my impression is that they manage to get along without dummy writ=
-es.
-> > > It's a big mess, but it looks like they always have some commands
-> > > (depending on the crypto operation) that they are sending anyway and
-> > > they just assign the LOCK/UNLOCK flag to the command descriptor of th=
-at.
-> > >
-> > > It is similar for the second relevant user of the LOCK/UNLOCK flags, =
-the
-> > > QPIC NAND driver (msm_qpic_nand.c in downstream [2], qcom_nandc.c in
-> > > mainline), it is assigned as part of the register programming sequenc=
-e
-> > > instead of using a dummy write. In addition, the UNLOCK flag is
-> > > sometimes assigned to a READ command descriptor rather than a WRITE.
-> > >
-> > > @Bartosz: Can we get by without doing any dummy writes?
-> > > If not, would a dummy read perhaps be less intrusive than a dummy wri=
-te?
-> > >
-> >
-> > The HPG says that the LOCK/UNLOCK flag *must* be set on a command
-> > descriptor, not a data descriptor. For a simple encryption we will
-> > typically have a data descriptor and a command descriptor with
-> > register writes. So we need a command descriptor in front of the data
-> > and - while we could technically set the UNLOCK bit on the subsequent
-> > command descriptor - it's unclear from the HPG whether it will unlock
-> > before or after processing the command descriptor with the UNLOCK bit
-> > set. Hence the additional command descriptor at the end.
-> >
->
-> I won't pretend that I actually understand what the downstream QCE
-> driver is doing, but e.g. qce_ablk_cipher_req() in the qce50.c I linked
-> looks like they just put the command descriptor with all the register
-> writes first and then the data second (followed by another command
-> descriptor for cleanup/unlocking). Is it actually required to put the
-> data first?
->
+On Wed, 2026-03-04 at 23:55 -0800, Eric Biggers wrote:
+> On Thu, Feb 26, 2026 at 07:43:54AM -0500, James Bottomley wrote:
+> > > If this is for some out-of-tree module, we don't do that.
+> > >=20
+> > > I'll also note that we should generally be aiming to simplify the
+> > > PKCS#7 signature verification code, not making it even more
+> > > complex.
+> >=20
+> > I'm fine with the general goal, but since the current code verifies
+> > the signature, pulls out the message hash and other attributes,
+> > compares the message against the MessageDigest one and then frees
+> > the whole structure it's a bit hard to see how the current goal can
+> > be achieved without extracting at least the first part of that ...
+> > but if you have   suggestion, I'm happy to implement.
+>=20
+> Sure, just incorporate your auxiliary data into the actual message
+> being signed and verified.=C2=A0 Something like:
+> =C2=A0=C2=A0=C2=A0=20
+> =C2=A0=C2=A0=C2=A0 program_len || program || hash*
 
-Well, now you're getting into the philosophical issue of imposing
-requirements on the client which seemed to be the main point of
-contention in earlier versions. If you start requiring the client to
-put the DMA operations in a certain order (and it's not based on any
-HW requirement but rather on how the DMA driver is implemented) then
-how is it better than having the client just drive the locking
-altogether like pre v11? We won't get away without at least some
-requirements - like the client doing register I/O over DMA or
-providing the scratchpad address - but I think just wrapping the
-existing queue with additional descriptors in a way transparent to
-consumers is better in this case. And as I said: the HPG doesn't
-explicitly say that it unlocks the pipe *after* the descriptor with
-the unlock bit is processed. Doesn't even hint at what real the
-ordering is.
+We can't do that because the second hash is for the LSM.  If there's no
+LSM then we need the signature to pass the current eBPF signature check
+because the second hash will be verified by the loader, which means the
+program hash and nothing else must be in the messageDigest attr.
 
-> > The HPG also only mentions a write command and says nothing about a
-> > read. In any case: that's the least of the problems as switching to
-> > read doesn't solve the issue of passing the address of the scratchpad
-> > register.
->
-> True.
->
-> >
-> > So while some of this *may* just work, I would prefer to stick to what
-> > documentation says *will* work. :)
-> >
->
-> Well, the question is if there is always a dummy register that can be
-> safely written (without causing any side effects). This will be always
-> just based on experiments, since the concept of a dummy write doesn't
-> seem to exist downstream (and I assume the documentation doesn't suggest
-> a specific register to use either).
->
+Regards,
 
-You'd think so but the HPG actually does use the word "dummy" to
-describe the write operation with lock/unlock bits set. Though it does
-not recommend any particular register to do it.
-
-> NAND_VERSION (0xf08) might work for qcom_nandc.c (which might be the
-> only other relevant user of the BAM locking functionality...).
->
-
-Yeah, I do the same for QCE, write to the version register.
-
-Bart
+James
+dddddddddddddddddddddddddddddddddddddddddddddddddddddddd
