@@ -1,52 +1,50 @@
 Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C3035E946
-	for <linux-crypto@vger.kernel.org>; Thu,  5 Mar 2026 22:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A5F344020
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Mar 2026 22:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772748394; cv=none; b=NKALa2/eIIJHm8Pa4spZayKohf8Oae6sAD5HjGR0h5swfo1FGV9MuJwkwn/0o5iHVMtnrjQ368l6oU/yIPEqvuo0giZW4fHzzNUrQeCYe5tLIfNAJEPGoG2zh5G2vEzW1jyLALCuw6n2D+o3Hn9vYfX8lhaUWfv4KHywBydJ0Mg=
+	t=1772748728; cv=none; b=iYRzLv8CyiTJwb3dEQ+MwD/8fuVMRujQ1ntdnmVT0u0syRa5eJ/Hma1flrCs8ZQYp9nd7S9PBga9Ak3o3SCQoHxXQ6pvJIZcpMhoUswc4orIxEWAszwrBdvwBXPRZzTw0XD7dTsoW536YrD8fQa2xOIDiptRw6D/G6YpxD/bBCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772748394; c=relaxed/simple;
-	bh=eHugqbIjgLQla4/OLlxHu+L7fKAHiH2BHenO/NNYqdA=;
+	s=arc-20240116; t=1772748728; c=relaxed/simple;
+	bh=a3D8lUKExNlE1ycDySQ3rwo+Tpc/BIuq9fcuNQAtidI=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TJyJFsEayR4DJY2lmolACuzOrOYtyqkczI0QoO0Vq4ZXg9aPqPjUSCqZVKMvEh8qKvB4Ndmt3BR3Q10R3M339M7whFdAY5asNuv0eMu54QW0RrUsnNEhNuJoRvFrI9zzwO103HIMFbIX2T4UwkuANO7LzKb+ai0dRFp1f72zVmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=A5dg12i4; arc=none smtp.client-ip=198.37.111.173
+	 Content-Type:MIME-Version; b=NxsUk3LsjU5/nUaiCOcJ3zbW6uSYs5CQttk/DueYd3UKHw7YzzVUU07S7PfpH377BItR2FWDgwgy08RWl7IUzyMUkeearuFuhzv319geT71atdBYkpXT4NFi5JXIny9SHwU/imgc5r3JIetfhwovNjyRF2uYhl83fvODPXlHNck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=hTCmAwIC; arc=none smtp.client-ip=198.37.111.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="A5dg12i4"
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="hTCmAwIC"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1772748391;
-	bh=eHugqbIjgLQla4/OLlxHu+L7fKAHiH2BHenO/NNYqdA=;
+	d=hansenpartnership.com; s=20151216; t=1772748726;
+	bh=a3D8lUKExNlE1ycDySQ3rwo+Tpc/BIuq9fcuNQAtidI=;
 	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=A5dg12i4cUrYI8AQO+xz8RHuTeE3keCoDXxCz+TjRXV4+XuR3DAZZOJDlLMAArKm5
-	 drvx+1t2eSrWnCmYB02V3gKmYrPDDQaJsJfBk9OUfDqL79/GI/ENfMdD/g+TRzrfnN
-	 kFo0Ho/W1RqwQ6wVkUtD711m3dNAyMOGreFnMl3M=
+	b=hTCmAwIC+Bw99b4zyaPql7Mqf3gNcelsIJtf+XejmyesS+xFBgW1lrBPfPCCvzheh
+	 5D+reCYDnF2H5eHWJ1KNO3lRchkSdj81zQQI8C2lBmp/fX2n06zWyXsO/Yj8T+v7Z6
+	 MKk9dbw3iMHn0yRcUKP2VvsbMla9+VtPu3kSsgY8=
 Received: from [172.19.0.240] (unknown [75.104.94.254])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 9735C1C024C;
-	Thu, 05 Mar 2026 17:06:23 -0500 (EST)
-Message-ID: <8b645c324e2046e493f2f18ac28c6fd22ea8c598.camel@HansenPartnership.com>
-Subject: Re: [PATCH v3 3/5] crypto: pkcs7: allow pkcs7_digest() to be called
- from pkcs7_trust
+	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id E81E51C005E;
+	Thu, 05 Mar 2026 17:11:57 -0500 (EST)
+Message-ID: <02c4b329ecee56979631e832906ff77948aa3176.camel@HansenPartnership.com>
+Subject: Re: [PATCH v3 0/5] pkcs7: better handling of signed attributes
 From: James Bottomley <James.Bottomley@HansenPartnership.com>
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>, 
 	Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-Date: Thu, 05 Mar 2026 17:06:13 -0500
-In-Reply-To: <20260305213651.GA64054@quark>
+Date: Thu, 05 Mar 2026 17:11:47 -0500
+In-Reply-To: <20260305214014.GB64054@quark>
 References: <20260225211907.7368-1-James.Bottomley@HansenPartnership.com>
-	 <20260225211907.7368-4-James.Bottomley@HansenPartnership.com>
-	 <20260226203133.GB2273@sol>
-	 <bf8b8c374d4398a677b87246bb426c4cd157e1d0.camel@HansenPartnership.com>
-	 <20260305075831.GB155793@sol>
-	 <51cf814b5dd2a126c4b2379c7b7d02ff9d2e17f2.camel@HansenPartnership.com>
-	 <20260305185016.GC2796@quark>
-	 <8fc67a378cc379065fc187e00e728956a86c9894.camel@HansenPartnership.com>
-	 <20260305213651.GA64054@quark>
+	 <20260226021331.GA55502@quark>
+	 <3900433c727c1e7ab6e131003de7ca53bb0d23d1.camel@HansenPartnership.com>
+	 <20260305075511.GA155793@sol>
+	 <ba545f3db317ba3410b8fb9f5bab9e72be1854b6.camel@HansenPartnership.com>
+	 <20260305185156.GD2796@quark>
+	 <124016e6aa10434b73391cdccd95c69242f8e4de.camel@HansenPartnership.com>
+	 <20260305214014.GB64054@quark>
 Autocrypt: addr=James.Bottomley@HansenPartnership.com;
  prefer-encrypt=mutual;
  keydata=mQENBE58FlABCADPM714lRLxGmba4JFjkocqpj1/6/Cx+IXezcS22azZetzCXDpm2MfNElecY3qkFjfnoffQiw5rrOO0/oRSATOh8+2fmJ6el7naRbDuh+i8lVESfdlkoqX57H5R8h/UTIp6gn1mpNlxjQv6QSZbl551zQ1nmkSVRbA5TbEp4br5GZeJ58esmYDCBwxuFTsSsdzbOBNthLcudWpJZHURfMc0ew24By1nldL9F37AktNcCipKpC2U0NtGlJjYPNSVXrCd1izxKmO7te7BLP+7B4DNj1VRnaf8X9+VIApCi/l4Kdx+ZR3aLTqSuNsIMmXUJ3T8JRl+ag7kby/KBp+0OpotABEBAAG0N0phbWVzIEJvdHRvbWxleSA8SmFtZXMuQm90dG9tbGV5QEhhbnNlblBhcnRuZXJzaGlwLmNvbT6JAVgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAhkBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAml2ZBIFCS3GUMIACgkQgUrkfCFIVNZKjQf/deRzlXZClKxTC/Ee2yEPqqS7mm/INUA49KdQQ5oIhSxkUBy09J4qjMIo5F8ZFkFTqikBqeL35LKu7O7rn8WETfX8Bxvos3HUsl3jHo34DES4MUFIpoQPgtiLRGwLbK0cVCAArR2u2qj4ABmTRrs1I1kvdjEw6gatOuXtEe/j5O2fvfzTq9GBr0Q3n2IAsFXi4hLlx6VPE8tyWUZ8BWJKtih3JAeUiXFvASL3McV0rV9RnU0VbjEQEhSE7PMYhWpnDC9AyBb0lXJllQRvC3NSkUB8KVQgNNxRPss0WE/nBoZ4dFA42jTyzTz8lNylxZoAWV7WJb3QxVg4oCodRVrxxrQhSmFtZXMgQm90dG9tbGV5IDxqZWpiQGtlcm5lbC5vcmc+iQFVBBMBCAA/AhsDBgsJCAcDAgYVCAIJCgsEFgIDA
@@ -65,120 +63,70 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Thu, 2026-03-05 at 13:36 -0800, Eric Biggers wrote:
-> On Thu, Mar 05, 2026 at 03:11:29PM -0500, James Bottomley wrote:
-> > On Thu, 2026-03-05 at 10:50 -0800, Eric Biggers wrote:
-> > > On Thu, Mar 05, 2026 at 09:53:56AM -0500, James Bottomley wrote:
-> > > > On Wed, 2026-03-04 at 23:58 -0800, Eric Biggers wrote:
-> > > > > On Thu, Feb 26, 2026 at 10:50:10PM -0500, James Bottomley
+On Thu, 2026-03-05 at 13:40 -0800, Eric Biggers wrote:
+> On Thu, Mar 05, 2026 at 03:18:09PM -0500, James Bottomley wrote:
+> > On Thu, 2026-03-05 at 10:51 -0800, Eric Biggers wrote:
+> > > On Thu, Mar 05, 2026 at 09:46:42AM -0500, James Bottomley wrote:
+> > > > On Wed, 2026-03-04 at 23:55 -0800, Eric Biggers wrote:
+> > > > > On Thu, Feb 26, 2026 at 07:43:54AM -0500, James Bottomley
 > > > > > wrote:
-> > > > > > On Thu, 2026-02-26 at 12:31 -0800, Eric Biggers wrote:
-> > > > > > > On Wed, Feb 25, 2026 at 04:19:05PM -0500, James Bottomley
-> > > > > > > wrote:
-> > > > > > > > +	/*
-> > > > > > > > +	 * if we're being called immediately after
-> > > > > > > > parse,
-> > > > > > > > the
-> > > > > > > > +	 * signature won't have a calculated digest
-> > > > > > > > yet,
-> > > > > > > > so
-> > > > > > > > calculate
-> > > > > > > > +	 * one.=C2=A0 This function returns immediately if
-> > > > > > > > a
-> > > > > > > > digest
-> > > > > > > > has
-> > > > > > > > +	 * already been calculated
-> > > > > > > > +	 */
-> > > > > > > > +	pkcs7_digest(pkcs7, sinfo);
+> > > > > > > If this is for some out-of-tree module, we don't do that.
 > > > > > > >=20
-> > > > > > > pkcs7_digest() can fail, returning an error code and
-> > > > > > > leaving
-> > > > > > > sig-
-> > > > > > > > m
-> > > > > > > =3D=3D NULL && sig->m_size =3D=3D 0.=C2=A0 Here, the error is=
- just
-> > > > > > > being
-> > > > > > > ignored.
+> > > > > > > I'll also note that we should generally be aiming to
+> > > > > > > simplify the PKCS#7 signature verification code, not
+> > > > > > > making it even more complex.
 > > > > > >=20
-> > > > > > That's right.=C2=A0 Basically I wasn't sure what to return on
-> > > > > > error
-> > > > > > (although -ENOKEY looks about right since it will cause
-> > > > > > retries
-> > > > > > on
-> > > > > > a
-> > > > > > different sig chain).
-> > > > > >=20
-> > > > > > > Doesn't that then cause the signature verification to
-> > > > > > > proceed
-> > > > > > > against an empty message, rather than anything related to
-> > > > > > > the
-> > > > > > > data provided?
-> > > > > >=20
-> > > > > > Not if sig->m is NULL, no, because the verifier will try to
-> > > > > > reget the digest in that case (and error out if it fails).
+> > > > > > I'm fine with the general goal, but since the current code
+> > > > > > verifies the signature, pulls out the message hash and
+> > > > > > other attributes, compares the message against the
+> > > > > > MessageDigest one and then frees the whole structure it's a
+> > > > > > bit hard to see how the current goal can be achieved
+> > > > > > without extracting at least the first part of that
+> > > > > > ... but if you have=C2=A0=C2=A0 suggestion, I'm happy to implem=
+ent.
 > > > > >=20
-> > > > > Can you point to where that happens?=C2=A0 It still looks like it
-> > > > > just
-> > > > > proceeds with an empty message.
+> > > > > Sure, just incorporate your auxiliary data into the actual
+> > > > > message being signed and verified.=C2=A0 Something like:
+> > > > > =C2=A0=C2=A0=C2=A0=20
+> > > > > =C2=A0=C2=A0=C2=A0 program_len || program || hash*
 > > > >=20
-> > > > It's the obvious one:
-> > > >=20
-> > > > verify_pkcs7_message_sig->pkcs7_verify->pkcs7_verify_one-
-> > > > > pkcs7_digest
-> > > >=20
-> > > > The latter will allocate and calculate the digest if sig->m is
-> > > > null.
-> > > >=20
-> > > > Regards,
-> > > >=20
-> > > > James
+> > > > We can't do that because the second hash is for the LSM.=C2=A0 If
+> > > > there's no LSM then we need the signature to pass the current
+> > > > eBPF signature check because the second hash will be verified
+> > > > by the loader, which means the program hash and nothing else
+> > > > must be in the messageDigest attr.
 > > > >=20
 > > >=20
-> > > But looking at hornet_check_program() from
-> > > https://lore.kernel.org/linux-security-module/20251211021257.1208712-=
-9-bboscaccy@linux.microsoft.com/
-> > > ,
-> > > it calls:
-> > >=20
-> > > =C2=A0=C2=A0=C2=A0 pkcs7_parse_message()
-> > > =C2=A0=C2=A0=C2=A0 validate_pkcs7_trust()
-> > > =C2=A0=C2=A0=C2=A0 pkcs7_get_authattr()
-> > >=20
-> > > The actual signature check happens in validate_pkcs7_trust(),
-> > > which
-> > > appears to have the issue where it can proceed with an empty
-> > > message,
-> > > as I mentioned.
+> > > Why does the loader need to verify the signature if the kernel
+> > > has to do it anyway, and why does the loader need to skip
+> > > verifying the maps?
 > >=20
-> > The whole design of validate_pkccs7_trust() is to validate the
-> > signature only so we can trust the attributes.=C2=A0 It doesn't actuall=
-y
-> > verify the digest against the data, that's the job of the
-> > verify_pkcs7_sig.. class of functions.=C2=A0 The original thought behin=
-d
-> > this was that we might not have the original data by the time we
-> > came
-> > to extract the OID.=C2=A0 However, it turns out we do, so the split of
-> > the
-> > trust functions is not really necessary..
+> > Well, I didn't say kernel, I said LSM.=C2=A0 The problem is that the
+> > last hook in the LSM chain for eBPF loading occurs before the
+> > loader has actually run.=C2=A0 This means that either the LSM needs to
+> > be assured verification will complete (by running it itself), which
+> > is what the patch set I pointed to does; or that we need an
+> > additional verification hook in eBPF somewhere in the verifier
+> > after the loader has run, which the eBPF people are looking at but
+> > haven't actually found anything
+> > yet.
+> >=20
+> > The OID helps the LSM do the additional verification without
+> > changing any of the eBPF loading flow.
 >=20
-> But surely you *do* want to verify the data as well, as that is the
-> contents of the BPF program?=C2=A0 I think the API you want is something
-> like verify_pkcs7_signature() extended to return your signed
-> attribute as extra information on success.
+> LSMs are part of the kernel.
 
-No, the data has already been verified in eBPF before the hook was
-called.  Because of the way the hooks work, that's a guarantee we can
-rely on.
+They are, but they're policy driven.  The policy could be anything
+including don't bother calling the LSM.
 
-> Of course, again it would be a lot simpler if you could find a way to
-> format all the information you want to sign into one message, instead
-> of relying on the PKCS#7 message-within-a-message thing that is hard
-> to understand and implement correctly.
+> Not sure I follow.=C2=A0 How can the kernel verify something before it's
+> been loaded into the kernel?
 
-Well, as I said, we have enough information to reverify if required,
-but the original verification also has to happen in the way eBPF
-designed it.
+There's a disconnect somewhere but I'm not sure where. The eBPF code is
+loaded into the kernel and eBPF will have verified the signature over
+the loader component of the light skeleton before the hook is called,
+but the loader won't verify the actual program until it runs, which
+will happen after the hook is called.
 
 Regards,
 
