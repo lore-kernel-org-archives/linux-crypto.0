@@ -1,35 +1,35 @@
-Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.12])
+Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6952C3EBF28
-	for <linux-crypto@vger.kernel.org>; Thu,  5 Mar 2026 20:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B7326E706
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Mar 2026 20:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772741455; cv=none; b=AKgts1cO1syDtk61jF5Oycf9hPs+EadAF5QP4uBk14KhLwas8MaB+VCY8FP1xBkJyRXeqReSlvfeUKTzatTH51a8vuc3NBbfGhhFp9aGYilRFPdX90E5tHOEKgZDxi8uElcgfsfT5eLkTN7zjM2IYQaa5ru57inSAxsLFz7OwvE=
+	t=1772741455; cv=none; b=bJZLDWBsUtw/ZZbmFgQIIaDfujp6XYKC1V6qsB7VvDttTi7+AqMTjfSDyGhKJiszlCfOKX+dUmjbQCZ8jXzXGV5gfBNGze/Uu8YnerlsjTjZK7ypQrrb+oSYsib4FrVma88RzrIMVE23dGAq5SgXlCIp3cJ5CTEqjho8fF+hwOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772741455; c=relaxed/simple;
-	bh=IhsniHHZXgfn7s8lwZal3msgGDqa6GUoNa18H5mb6qY=;
+	bh=12Gc7cMU4TOkZ5XOLT/wIVwS2VO6LKzi9vGxf2ldSS4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U5agVsRGiBD3RJuaWTe3VVKmrXq6fex/8MKDo1q0ZnTdXAaRs/O/7LO0OB84yFs8cbUvOcgOgIH4yz80jLn+2ctMgmxYHVJf+DMC0JkCrByxAsl++yXf8+wF6x1yHfnKtq7zV4apqGFcRZrbjSfVGMXLDClc2kx4iTN7vulpFSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=PGPTe2zu; arc=none smtp.client-ip=212.77.101.12
+	 MIME-Version; b=DWsqx3BzDdULNMCNyWJUtYkfHE6xa7UIRWM5OLS9BNgvDlOFaz0Sojh/6ODbqpxblocdR64tFKhqKYmRWDus/cIOnLsxNE5Qq95kiPtl9yPANw9ITlq32d6xlzKFcBG30t2r6H5+8Yobr4BbWF510WA/I8qz4sYMYwmqz+LOqjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=EXR/ruWj; arc=none smtp.client-ip=212.77.101.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="PGPTe2zu"
-Received: (wp-smtpd smtp.wp.pl 9878 invoked from network); 5 Mar 2026 21:10:51 +0100
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="EXR/ruWj"
+Received: (wp-smtpd smtp.wp.pl 3109 invoked from network); 5 Mar 2026 21:10:43 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1772741451; bh=qYUWFldmTns86xLo8ByG89oOU0GT5V5Em0fSa3QlG2Y=;
+          t=1772741443; bh=NLuTen/JPZA30+bxDJ2kSJ6qBgBGe7utETqr3yMX3T0=;
           h=From:To:Cc:Subject;
-          b=PGPTe2zujLrYTUN8DfHEl5m/cg4nqO1mLqVYsYkuPorxiWkcadmS8XlKSlDWa3LfH
-           ld/l4DFTLswHwBx/UucOxWvZqE1jN8kT+vdzobHWZIkxeoyGmM//psmIeAVyjRecVP
-           Cd9qQJjGCEdm32rfkZn4fQ9G4epoLjXuz8VjY5Cbio7HYTZx/Sa9h5t6uRcq9Oq2Tp
-           CuXuJkcapBZizdS4j/8OJ6TuD00qj5U3Hmz54akD/qNEtQOaudNvtA+V+n8l4NGPGT
-           9EbTiMS7HFuHWw+7LzWzYhMocIj6PyrclakTJB2s++1134EMlnKGbZ5CW3bF6m69n1
-           nbNxhAaQLx3+g==
+          b=EXR/ruWjdZjPbjB75xY0dPHlVFLgV8+eKYwfK1BhSznRwysaKHYSv0nagmbKrXFIo
+           lz3qv9ZDIw/2/pa/Eonf94yrVnl8GAm8yjgOkjz8bawZ16WTv/7XTPZxcXeXR2DC7F
+           VPwN4F9A2xB5402zT+RQcGonY/0msO8naoq2YgkAcgEa5JXMRDwHaR5WG5bScg2xML
+           BsX1nU1VouQCLOpwsOimCbQ2tPpcfvvy5g8uk8Y0kdjgxtAjtM5rFlKawLr2buS0Gc
+           2M3DZEsTfrY1m0Bf0TQOvvytrufUH9zsPzNA7bATCrtljer3zIt34g5OW398pzDoAa
+           TbTy4uYMQUuog==
 Received: from 83.24.116.171.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.24.116.171])
           (envelope-sender <olek2@wp.pl>)
           by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <herbert@gondor.apana.org.au>; 5 Mar 2026 21:10:51 +0100
+          for <herbert@gondor.apana.org.au>; 5 Mar 2026 21:10:43 +0100
 From: Aleksander Jan Bajkowski <olek2@wp.pl>
 To: herbert@gondor.apana.org.au,
 	davem@davemloft.net,
@@ -40,9 +40,9 @@ To: herbert@gondor.apana.org.au,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
 Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH v2 5/5] crypto: testmgr - Add test vectors for authenc(hmac(sha512),rfc3686(ctr(aes)))
-Date: Thu,  5 Mar 2026 21:08:24 +0100
-Message-ID: <20260305201036.63280-5-olek2@wp.pl>
+Subject: [PATCH v2 3/5] crypto: testmgr - Add test vectors for authenc(hmac(sha256),rfc3686(ctr(aes)))
+Date: Thu,  5 Mar 2026 21:08:22 +0100
+Message-ID: <20260305201036.63280-3-olek2@wp.pl>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260305201036.63280-1-olek2@wp.pl>
 References: <20260305201036.63280-1-olek2@wp.pl>
@@ -54,12 +54,12 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: d42209b5766de24675409d4dc85b4a99
+X-WP-MailID: 27fe927da1b05b6423febb4ef0c6ea9d
 X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000009 [IEPU]                               
+X-WP-SPAM: NO 0000009 [sLOU]                               
 
 Test vectors were generated starting from existing RFC3686(CTR(AES)) test
-vectors and adding HMAC(SHA512) computed with software implementation.
+vectors and adding HMAC(SHA256) computed with software implementation.
 Then, the results were double-checked on Mediatek MT7986 (safexcel).
 Platform pass self-tests.
 
@@ -69,36 +69,36 @@ v2:
 - rename aes-generic -> aes-lib
 ---
  crypto/testmgr.c |   6 +-
- crypto/testmgr.h | 291 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 296 insertions(+), 1 deletion(-)
+ crypto/testmgr.h | 235 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 240 insertions(+), 1 deletion(-)
 
 diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 04be77aa15f1..8c34d6f8f139 100644
+index b0d2d7538e98..befc46145841 100644
 --- a/crypto/testmgr.c
 +++ b/crypto/testmgr.c
-@@ -4272,8 +4272,12 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.fips_allowed = 1,
+@@ -4198,8 +4198,12 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		}
  	}, {
- 		.alg = "authenc(hmac(sha512),rfc3686(ctr(aes)))",
+ 		.alg = "authenc(hmac(sha256),rfc3686(ctr(aes)))",
 -		.test = alg_test_null,
-+		.generic_driver = "authenc(hmac-sha512-lib,rfc3686(ctr(aes-lib)))",
++		.generic_driver = "authenc(hmac-sha256-lib,rfc3686(ctr(aes-lib)))",
 +		.test = alg_test_aead,
  		.fips_allowed = 1,
 +		.suite = {
-+			.aead = __VECS(hmac_sha512_aes_ctr_rfc3686_tv_temp)
++			.aead = __VECS(hmac_sha256_aes_ctr_rfc3686_tv_temp)
 +		}
  	}, {
- 		.alg = "blake2b-160",
- 		.generic_driver = "blake2b-160-lib",
+ 		.alg = "authenc(hmac(sha384),cbc(aes))",
+ 		.generic_driver = "authenc(hmac-sha384-lib,cbc(aes-lib))",
 diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 6c5f47886d87..68e6be44c6e6 100644
+index fec03f8c32e7..acc41c16b945 100644
 --- a/crypto/testmgr.h
 +++ b/crypto/testmgr.h
-@@ -17091,6 +17091,297 @@ static const struct aead_testvec hmac_sha512_aes_cbc_tv_temp[] = {
+@@ -15943,6 +15943,241 @@ static const struct aead_testvec hmac_sha256_aes_cbc_tv_temp[] = {
  	},
  };
  
-+static const struct aead_testvec hmac_sha512_aes_ctr_rfc3686_tv_temp[] = {
++static const struct aead_testvec hmac_sha256_aes_ctr_rfc3686_tv_temp[] = {
 +	{ /* RFC 3686 Case 1 */
 +#ifdef __LITTLE_ENDIAN
 +		.key    = "\x08\x00"		/* rta length */
@@ -112,14 +112,10 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\xae\x68\x52\xf8\x12\x10\x67\xcc"
 +			  "\x4b\xf7\xa5\x76\x55\x77\xf3\x9e"
 +			  "\x00\x00\x00\x30",
-+		.klen	= 8 + 64 + 20,
++		.klen	= 8 + 32 + 20,
 +		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00",
 +		.assoc	= "\x00\x00\x00\x00\x00\x00\x00\x00",
 +		.alen	= 8,
@@ -127,15 +123,11 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +		.plen	= 16,
 +		.ctext	= "\xe4\x09\x5d\x4f\xb7\xa7\xb3\x79"
 +			  "\x2d\x61\x75\xa3\x26\x13\x11\xb8"
-+			  "\xa4\x45\x3a\x44\x9c\xe5\x1c\xd9"
-+			  "\x10\x43\x51\x2e\x76\x5e\xf8\x9d"
-+			  "\x03\x12\x1a\x31\x00\x33\x10\xb4"
-+			  "\x94\x4b\x70\x84\x6c\xda\xb1\x46"
-+			  "\x24\xb6\x3b\x2a\xec\xd5\x67\xb8"
-+			  "\x65\xa2\xbd\xac\x18\xe2\xf8\x55"
-+			  "\xc6\x91\xb0\x92\x84\x2d\x74\x44"
-+			  "\xa7\xee\xc3\x44\xa0\x07\x0e\x62",
-+		.clen	= 16 + 64,
++			  "\x9b\xa2\x34\x62\xe5\xb3\xe8\x2d"
++			  "\x6d\xdb\x93\x64\xa5\x08\x2e\x77"
++			  "\x72\x1f\x21\x94\xc7\xbe\x14\xa6"
++			  "\xcd\xea\x96\xa1\x29\x8f\x30\xc3",
++		.clen	= 16 + 32,
 +	}, { /* RFC 3686 Case 2 */
 +#ifdef __LITTLE_ENDIAN
 +		.key    = "\x08\x00"		/* rta length */
@@ -149,14 +141,10 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +			  "\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
 +			  "\x30\x31\x32\x33\x34\x35\x36\x37"
 +			  "\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
-+			  "\x40\x41\x42\x43\x44\x45\x46\x47"
-+			  "\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
-+			  "\x50\x51\x52\x53\x54\x55\x56\x57"
-+			  "\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
 +			  "\x7e\x24\x06\x78\x17\xfa\xe0\xd7"
 +			  "\x43\xd6\xce\x1f\x32\x53\x91\x63"
 +			  "\x00\x6c\xb6\xdb",
-+		.klen	= 8 + 64 + 20,
++		.klen	= 8 + 32 + 20,
 +		.iv	= "\xc0\x54\x3b\x59\xda\x48\xd9\x0b",
 +		.assoc	= "\xc0\x54\x3b\x59\xda\x48\xd9\x0b",
 +		.alen	= 8,
@@ -169,15 +157,11 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +			  "\x79\x0d\x41\xee\x8e\xda\xd3\x88"
 +			  "\xeb\x2e\x1e\xfc\x46\xda\x57\xc8"
 +			  "\xfc\xe6\x30\xdf\x91\x41\xbe\x28"
-+			  "\xec\x67\x0d\xb3\xbd\x98\x13\x01"
-+			  "\x2b\x04\x9b\xe6\x06\x67\x3c\x76"
-+			  "\xcd\x41\xb7\xcc\x70\x6c\x7f\xc8"
-+			  "\x67\xbd\x22\x39\xb2\xaa\xe8\x88"
-+			  "\xe0\x4f\x81\x52\xdf\xc9\xc3\xd6"
-+			  "\x44\xf4\x66\x33\x87\x64\x61\x02"
-+			  "\x02\xa2\x64\x15\x2b\xe9\x0b\x3d"
-+			  "\x4c\xea\xa1\xa5\xa7\xc9\xd3\x1b",
-+		.clen	= 32 + 64,
++			  "\x22\xf7\x95\xa8\xbb\xcd\x19\xf4"
++			  "\x58\x16\x54\x28\x2b\xf4\x52\xe7"
++			  "\x5c\x6c\xe1\x44\x0b\xd5\x10\x6e"
++			  "\xe1\xf7\x04\xc4\x2c\xab\x93\xdd",
++		.clen	= 32 + 32,
 +	}, { /* RFC 3686 Case 3 */
 +#ifdef __LITTLE_ENDIAN
 +		.key    = "\x08\x00"		/* rta length */
@@ -191,14 +175,10 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
 +			  "\x22\x33\x44\x55\x66\x77\x88\x99"
 +			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
-+			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
-+			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
-+			  "\x44\x55\x66\x77\x88\x99\xaa\xbb"
-+			  "\xcc\xdd\xee\xff\x11\x22\x33\x44"
 +			  "\x76\x91\xbe\x03\x5e\x50\x20\xa8"
 +			  "\xac\x6e\x61\x85\x29\xf9\xa0\xdc"
 +			  "\x00\xe0\x01\x7b",
-+		.klen	= 8 + 64 + 20,
++		.klen	= 8 + 32 + 20,
 +		.iv	= "\x27\x77\x7f\x3f\x4a\x17\x86\xf0",
 +		.assoc	= "\x27\x77\x7f\x3f\x4a\x17\x86\xf0",
 +		.alen	= 8,
@@ -213,15 +193,11 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +			  "\x45\x40\xa4\x2b\xde\x6d\x78\x36"
 +			  "\xd5\x9a\x5c\xea\xae\xf3\x10\x53"
 +			  "\x25\xb2\x07\x2f"
-+			  "\x6f\x90\xb6\xa3\x35\x43\x59\xff"
-+			  "\x1e\x32\xd6\xfe\xfa\x33\xf9\xf0"
-+			  "\x31\x2f\x03\x2d\x88\x1d\xab\xbf"
-+			  "\x0e\x19\x16\xd9\xf3\x98\x3e\xdd"
-+			  "\x0c\xec\xfe\xe8\x89\x13\x91\x15"
-+			  "\xf6\x61\x65\x5c\x1b\x7d\xde\xc0"
-+			  "\xe4\xba\x6d\x27\xe2\x89\x23\x24"
-+			  "\x15\x82\x37\x3d\x48\xd3\xc9\x32",
-+		.clen	= 36 + 64,
++			  "\x1d\x05\x5f\x77\x3b\x4f\x5c\x21"
++			  "\x29\xea\xf1\xa8\x71\x49\x7b\x0b"
++			  "\x66\x0d\xff\x18\x81\x63\xfc\xc3"
++			  "\x91\xb6\x38\xc8\xcd\x2d\x39\x83",
++		.clen	= 36 + 32,
 +	}, { /* RFC 3686 Case 4 */
 +#ifdef __LITTLE_ENDIAN
 +		.key    = "\x08\x00"		/* rta length */
@@ -235,15 +211,11 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x16\xaf\x5b\x14\x5f\xc9\xf5\x79"
 +			  "\xc1\x75\xf9\x3e\x3b\xfb\x0e\xed"
 +			  "\x86\x3d\x06\xcc\xfd\xb7\x85\x15"
 +			  "\x00\x00\x00\x48",
-+		.klen	= 8 + 64 + 28,
++		.klen	= 8 + 32 + 28,
 +		.iv	= "\x36\x73\x3c\x14\x7d\x6d\x93\xcb",
 +		.assoc	= "\x36\x73\x3c\x14\x7d\x6d\x93\xcb",
 +		.alen	= 8,
@@ -251,15 +223,11 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +		.plen	= 16,
 +		.ctext	= "\x4b\x55\x38\x4f\xe2\x59\xc9\xc8"
 +			  "\x4e\x79\x35\xa0\x03\xcb\xe9\x28"
-+			  "\x25\xea\xdc\xad\x52\xb8\x0f\x70"
-+			  "\xe7\x39\x83\x80\x10\x3f\x18\xc4"
-+			  "\xf8\x59\x14\x25\x5f\xba\x20\x87"
-+			  "\x0b\x04\x5e\xf7\xde\x41\x39\xff"
-+			  "\xa2\xee\x84\x3f\x9d\x38\xfd\x17"
-+			  "\xc0\x66\x5e\x74\x39\xe3\xd3\xd7"
-+			  "\x3d\xbc\xe3\x99\x2f\xe7\xef\x37"
-+			  "\x61\x03\xf3\x9e\x01\xaf\xba\x9d",
-+		.clen	= 16 + 64,
++			  "\x8d\x03\x77\xb2\x1c\xc9\xe0\xac"
++			  "\xde\x69\xbe\x8a\xef\x5b\x13\x74"
++			  "\x1d\x39\xbc\xdc\x95\xa4\xbf\xc3"
++			  "\xd5\xc6\xd1\xda\xda\x3b\xca\x78",
++		.clen	= 16 + 32,
 +	}, { /* RFC 3686 Case 5 */
 +#ifdef __LITTLE_ENDIAN
 +		.key    = "\x08\x00"		/* rta length */
@@ -273,15 +241,11 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +			  "\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
 +			  "\x30\x31\x32\x33\x34\x35\x36\x37"
 +			  "\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
-+			  "\x40\x41\x42\x43\x44\x45\x46\x47"
-+			  "\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
-+			  "\x50\x51\x52\x53\x54\x55\x56\x57"
-+			  "\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
 +			  "\x7c\x5c\xb2\x40\x1b\x3d\xc3\x3c"
 +			  "\x19\xe7\x34\x08\x19\xe0\xf6\x9c"
 +			  "\x67\x8c\x3d\xb8\xe6\xf6\xa9\x1a"
 +			  "\x00\x96\xb0\x3b",
-+		.klen	= 8 + 64 + 28,
++		.klen	= 8 + 32 + 28,
 +		.iv	= "\x02\x0c\x6e\xad\xc2\xcb\x50\x0d",
 +		.assoc	= "\x02\x0c\x6e\xad\xc2\xcb\x50\x0d",
 +		.alen	= 8,
@@ -294,15 +258,11 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +			  "\x7e\xdf\xaa\xfa\x71\x31\xcd\x9f"
 +			  "\x84\x90\x70\x1c\x5a\xd4\xa7\x9c"
 +			  "\xfc\x1f\xe0\xff\x42\xf4\xfb\x00"
-+			  "\x51\xa3\xe6\x1d\x23\x7d\xd1\x18"
-+			  "\x55\x9c\x1c\x92\x2b\xc2\xcd\xfe"
-+			  "\x8a\xa8\xa5\x96\x65\x2e\x9d\xdb"
-+			  "\x06\xd2\x1c\x57\x2b\x76\xb5\x9c"
-+			  "\xd4\x3e\x8b\x61\x54\x2d\x08\xe5"
-+			  "\xb2\xf8\x88\x20\x0c\xad\xe8\x85"
-+			  "\x61\x8e\x5c\xa4\x96\x2c\xe2\x7d"
-+			  "\x4f\xb6\x1d\xb2\x8c\xd7\xe3\x38",
-+		.clen	= 32 + 64,
++			  "\x34\x06\x2b\x3d\xf1\xa8\x3d\xf1"
++			  "\xa6\x5e\x5c\x1a\xdb\x0c\xb5\x1e"
++			  "\x8f\xdb\xf4\xca\x7d\x09\x5e\x81"
++			  "\xdb\x32\x07\x4a\x1d\x1c\x6d\x83",
++		.clen	= 32 + 32,
 +	}, { /* RFC 3686 Case 7 */
 +#ifdef __LITTLE_ENDIAN
 +		.key    = "\x08\x00"		/* rta length */
@@ -316,16 +276,12 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x77\x6b\xef\xf2\x85\x1d\xb0\x6f"
 +			  "\x4c\x8a\x05\x42\xc8\x69\x6f\x6c"
 +			  "\x6a\x81\xaf\x1e\xec\x96\xb4\xd3"
 +			  "\x7f\xc1\xd6\x89\xe6\xc1\xc1\x04"
 +			  "\x00\x00\x00\x60",
-+		.klen	= 8 + 64 + 36,
++		.klen	= 8 + 32 + 36,
 +		.iv	= "\xdb\x56\x72\xc9\x7a\xa8\xf0\xb2",
 +		.assoc	= "\xdb\x56\x72\xc9\x7a\xa8\xf0\xb2",
 +		.alen	= 8,
@@ -333,15 +289,11 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +		.plen	= 16,
 +		.ctext	= "\x14\x5a\xd0\x1d\xbf\x82\x4e\xc7"
 +			  "\x56\x08\x63\xdc\x71\xe3\xe0\xc0"
-+			  "\x6b\x68\x0b\x99\x9a\x4d\xc8\xb9"
-+			  "\x35\xea\xcd\x56\x3f\x40\xa2\xb6"
-+			  "\x68\xda\x59\xd8\xa0\x89\xcd\x52"
-+			  "\xb1\x6e\xed\xc1\x42\x10\xa5\x0f"
-+			  "\x88\x0b\x80\xce\xc4\x67\xf0\x45"
-+			  "\x5d\xb2\x9e\xde\x1c\x79\x52\x0d"
-+			  "\xff\x75\x36\xd5\x0f\x52\x8e\xe5"
-+			  "\x31\x85\xcf\x1d\x31\xf8\x62\x67",
-+		.clen	= 16 + 64,
++			  "\xc3\xb4\x5f\xb0\xbf\xf5\x1b\xff"
++			  "\x7c\xf1\x79\x00\x63\x50\xdd\x77"
++			  "\xc0\x4a\xba\xcd\xdc\x47\x05\x2a"
++			  "\x5d\x85\x2d\x83\x44\xca\x79\x2c",
++		.clen	= 16 + 32,
 +	}, { /* RFC 3686 Case 8 */
 +#ifdef __LITTLE_ENDIAN
 +		.key    = "\x08\x00"		/* rta length */
@@ -355,16 +307,12 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +			  "\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
 +			  "\x30\x31\x32\x33\x34\x35\x36\x37"
 +			  "\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
-+			  "\x40\x41\x42\x43\x44\x45\x46\x47"
-+			  "\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
-+			  "\x50\x51\x52\x53\x54\x55\x56\x57"
-+			  "\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
 +			  "\xf6\xd6\x6d\x6b\xd5\x2d\x59\xbb"
 +			  "\x07\x96\x36\x58\x79\xef\xf8\x86"
 +			  "\xc6\x6d\xd5\x1a\x5b\x6a\x99\x74"
 +			  "\x4b\x50\x59\x0c\x87\xa2\x38\x84"
 +			  "\x00\xfa\xac\x24",
-+		.klen	= 8 + 64 + 36,
++		.klen	= 8 + 32 + 36,
 +		.iv	= "\xc1\x58\x5e\xf1\x5a\x43\xd8\x75",
 +		.assoc	= "\xc1\x58\x5e\xf1\x5a\x43\xd8\x75",
 +		.alen	= 8,
@@ -377,20 +325,16 @@ index 6c5f47886d87..68e6be44c6e6 100644
 +			  "\x49\xee\x00\x0b\x80\x4e\xb2\xa9"
 +			  "\xb8\x30\x6b\x50\x8f\x83\x9d\x6a"
 +			  "\x55\x30\x83\x1d\x93\x44\xaf\x1c"
-+			  "\x9a\xac\x38\xbd\xf3\xcf\xd5\xd0"
-+			  "\x09\x07\xa6\xe1\x7f\xd6\x79\x98"
-+			  "\x4e\x90\x0e\xc0\x3d\xa0\xf2\x12"
-+			  "\x52\x79\x9c\x17\xff\xb9\xb8\xe3"
-+			  "\x2f\x31\xcb\xbd\x63\x70\x72\x7b"
-+			  "\x4e\x1e\xd1\xde\xb5\x6b\x7d\x54"
-+			  "\x68\x56\xdd\xe5\x53\xee\x29\xd2"
-+			  "\x85\xa1\x73\x61\x00\xa9\x26\x8f",
-+		.clen	= 32 + 64,
++			  "\xc8\x59\x5d\xe1\xba\xac\x13\x82"
++			  "\xfd\x21\x7c\x8c\x23\x31\x04\x02"
++			  "\x9e\x69\x5b\x57\xa8\x13\xe7\x21"
++			  "\x60\x0c\x24\xc2\x80\x4a\x93\x6e",
++		.clen	= 32 + 32,
 +	},
 +};
 +
- static const struct aead_testvec hmac_sha1_des_cbc_tv_temp[] = {
- 	{ /*Generated with cryptopp*/
+ static const struct aead_testvec hmac_sha384_aes_cbc_tv_temp[] = {
+ 	{ /* RFC 3602 Case 1 */
  #ifdef __LITTLE_ENDIAN
 -- 
 2.47.3
