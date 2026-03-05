@@ -1,102 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D1D3803D4;
-	Thu,  5 Mar 2026 18:42:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24A71C68F
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Mar 2026 18:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772736177; cv=none; b=QPW1Aa3Wkn2fARvYzNNCQb3dCvX7vQzVmpZKtmy7LhQZLTZWG2C0E7x2RYOC8jxX7iXpxk4lfOS520jUBSH2yuLnZyyWWYJFIB1pWFtchNON4eCfO7RH2I1MFeMhF2zSwLgab95eli6eBFGsHD5xaGA1aCp9v4/sFdvxxWtCbpc=
+	t=1772736618; cv=none; b=Bt/pi44e+GvsL5ubIvvirpUf7cL7Y3HFjzStPmXA+5lkCDV2IMSiIQEAumTeDZJkcqkcCK63edWZJxGXdmfIH9f6i1dhXbuA4+q9l4utQ/hgTt5ljQw5yr5ige5zGkIh2yLmDuIczJoYTQQweMGr1jc/4oQKJitzpgv+SPwZXg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772736177; c=relaxed/simple;
-	bh=HXFwye6TjZ2zWMOtockgbKzyxUfFjkR2RM+j2C5LwGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=vFNyhQQcmX4vcf1I+dwd/LykXwkYgvp7e3AWXyChUof5838O3EypI9LrBtjEgKH4JnCYhMSPSsXNkohEen+vvHTOtRkLLmGdJplGpvfVaucL49T5Rnk9yundlbU+4pGMN3z0/r3++Bib7SLRhaDkAT5h4TOpfHdHU6jpWMxIHQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1suozit; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772736618; c=relaxed/simple;
+	bh=LurJlOGLaLv3ERNZ1jW49QewAnV1ayjkhtKmH6tq+vg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MzOZpynvODcubjZahZVf41hXJ+ungr412wQxIZZ79mCMqUImrg3L8VjVyPDI5zHAIVQHyuQu+kGsmxom2IkmNGfWTYmB7j1FJbKaXgkQGsMDdahbusHKUAbx7fCyb1ARWACUWvMbjAo83465YSQfrXSn2Nmvj8k5XZoiI7SnIkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nQhC4PIA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1suozit"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56E7AC116C6;
-	Thu,  5 Mar 2026 18:42:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nQhC4PIA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75BA2C116C6;
+	Thu,  5 Mar 2026 18:50:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772736176;
-	bh=HXFwye6TjZ2zWMOtockgbKzyxUfFjkR2RM+j2C5LwGA=;
-	h=Date:From:To:Cc:Subject:From;
-	b=M1suozit7dnA6VnYkehSSjDHA4MZNTvi6XSrD8UZ2x3WX2hLMAjMca48vcvdyvQ3a
-	 Xb3m/x+hGIyucGzAuQKOLnAXx8i2fmWywVk1IN1PASq99ZGN+p1L3H5SniaNjaoEGw
-	 hCgnTHPlJkY+bwspr/AVnnsubDxZSjnW06CynSjfKFHMACoejDLmGqzd+mtKxOANmP
-	 RXc1byRV8l/pVXR9Qh1oL5M6dcu/PGzjK0eMyi3CIROHCWOiIxkE0+3LZjmW0EXdsy
-	 M/2NKRgwjMp+Rwf90evt4m9n+nyFN7QOvw9JIxk00nARp4ijrLrdrozKmBEWUthrT9
-	 +ffkSOvvGFGjA==
-Date: Thu, 5 Mar 2026 10:42:54 -0800
+	s=k20201202; t=1772736617;
+	bh=LurJlOGLaLv3ERNZ1jW49QewAnV1ayjkhtKmH6tq+vg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nQhC4PIAjneIg4Cwi7jKaYs5lXDEg8dEwURZQrQJGFBaalZ+8jkhraClJLasp7jqD
+	 3lAdjOiIRrkbKZknpDgMMFeX+sjBzkX9/9NMQO5jGl6Z5XpJIjmwux1pxu7nyN2+zW
+	 VGXnHx9U5Sp/UrrqvxCaNQms11PlXGSvT3BXQU9DIsKTEzRexL6be0vrr2jLAmPXnN
+	 v4x3HATBLnMqt9Y7f6iog5EFOTdCG9wIOT9lb88buV+gQfkjdnUii8TJmiNKY95VlD
+	 u+XBlqSS8LPAx3IQtQcPukKCt9PhuiiZJIg4aVJWI2oo+k8CFrYvRe3pvdhR85UyNa
+	 c08KegCdVj4lQ==
+Date: Thu, 5 Mar 2026 10:50:16 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kunit-dev@googlegroups.com, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	David Gow <david@davidgow.net>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [GIT PULL] Crypto library fixes for v7.0-rc3
-Message-ID: <20260305184254.GA2796@quark>
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+Subject: Re: [PATCH v3 3/5] crypto: pkcs7: allow pkcs7_digest() to be called
+ from pkcs7_trust
+Message-ID: <20260305185016.GC2796@quark>
+References: <20260225211907.7368-1-James.Bottomley@HansenPartnership.com>
+ <20260225211907.7368-4-James.Bottomley@HansenPartnership.com>
+ <20260226203133.GB2273@sol>
+ <bf8b8c374d4398a677b87246bb426c4cd157e1d0.camel@HansenPartnership.com>
+ <20260305075831.GB155793@sol>
+ <51cf814b5dd2a126c4b2379c7b7d02ff9d2e17f2.camel@HansenPartnership.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <51cf814b5dd2a126c4b2379c7b7d02ff9d2e17f2.camel@HansenPartnership.com>
 
-The following changes since commit 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f:
+On Thu, Mar 05, 2026 at 09:53:56AM -0500, James Bottomley wrote:
+> On Wed, 2026-03-04 at 23:58 -0800, Eric Biggers wrote:
+> > On Thu, Feb 26, 2026 at 10:50:10PM -0500, James Bottomley wrote:
+> > > On Thu, 2026-02-26 at 12:31 -0800, Eric Biggers wrote:
+> > > > On Wed, Feb 25, 2026 at 04:19:05PM -0500, James Bottomley wrote:
+> > > > > +	/*
+> > > > > +	 * if we're being called immediately after parse, the
+> > > > > +	 * signature won't have a calculated digest yet, so
+> > > > > calculate
+> > > > > +	 * one.  This function returns immediately if a digest
+> > > > > has
+> > > > > +	 * already been calculated
+> > > > > +	 */
+> > > > > +	pkcs7_digest(pkcs7, sinfo);
+> > > > 
+> > > > pkcs7_digest() can fail, returning an error code and leaving sig-
+> > > > >m
+> > > > == NULL && sig->m_size == 0.  Here, the error is just being
+> > > > ignored.
+> > > 
+> > > That's right.  Basically I wasn't sure what to return on error
+> > > (although -ENOKEY looks about right since it will cause retries on
+> > > a
+> > > different sig chain).
+> > > 
+> > > > Doesn't that then cause the signature verification to proceed
+> > > > against
+> > > > an empty message, rather than anything related to the data
+> > > > provided?
+> > > 
+> > > Not if sig->m is NULL, no, because the verifier will try to reget
+> > > the digest in that case (and error out if it fails).
+> > 
+> > Can you point to where that happens?  It still looks like it just
+> > proceeds with an empty message.
+> 
+> It's the obvious one:
+> 
+> verify_pkcs7_message_sig->pkcs7_verify->pkcs7_verify_one->pkcs7_digest
+> 
+> The latter will allocate and calculate the digest if sig->m is null.
+> 
+> Regards,
+> 
+> James
+> 
 
-  Linux 7.0-rc1 (2026-02-22 13:18:59 -0800)
+But looking at hornet_check_program() from
+https://lore.kernel.org/linux-security-module/20251211021257.1208712-9-bboscaccy@linux.microsoft.com/,
+it calls:
 
-are available in the Git repository at:
+    pkcs7_parse_message()
+    validate_pkcs7_trust()
+    pkcs7_get_authattr()
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
+The actual signature check happens in validate_pkcs7_trust(), which
+appears to have the issue where it can proceed with an empty message, as
+I mentioned.
 
-for you to fetch changes up to 3875ceb592d3cb23dc932165cc1eeb74cf4dc319:
-
-  crypto: testmgr - Fix stale references to aes-generic (2026-03-03 11:57:15 -0800)
-
-----------------------------------------------------------------
-
-- Several test fixes:
-
-   - Fix flakiness in the interrupt context tests in certain VMs.
-
-   - Make the lib/crypto/ KUnit tests depend on the corresponding
-     library options rather than selecting them. This follows the
-     standard KUnit convention, and it fixes an issue where enabling
-     CONFIG_KUNIT_ALL_TESTS pulled in all the crypto library code.
-
-   - Add a kunitconfig file for lib/crypto/.
-
-   - Fix a couple stale references to "aes-generic" that made it in
-     concurrently with the rename to "aes-lib".
-
-- Update the help text for several CRYPTO kconfig options to remove
-  outdated information about users that now use the library instead.
-
-----------------------------------------------------------------
-Eric Biggers (4):
-      kunit: irq: Ensure timer doesn't fire too frequently
-      lib/crypto: tests: Depend on library options rather than selecting them
-      lib/crypto: tests: Add a .kunitconfig file
-      crypto: testmgr - Fix stale references to aes-generic
-
-Geert Uytterhoeven (5):
-      crypto: Clean up help text for CRYPTO_BLAKE2B
-      crypto: Clean up help text for CRYPTO_SHA256
-      crypto: Clean up help text for CRYPTO_XXHASH
-      crypto: Clean up help text for CRYPTO_CRC32C
-      crypto: Clean up help text for CRYPTO_CRC32
-
- crypto/Kconfig                     |  9 --------
- crypto/testmgr.c                   |  4 ++--
- include/kunit/run-in-irq-context.h | 44 ++++++++++++++++++++++++--------------
- lib/crypto/.kunitconfig            | 34 +++++++++++++++++++++++++++++
- lib/crypto/tests/Kconfig           | 35 +++++++++++-------------------
- 5 files changed, 76 insertions(+), 50 deletions(-)
- create mode 100644 lib/crypto/.kunitconfig
+- Eric
