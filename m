@@ -1,115 +1,175 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F8038229B
-	for <linux-crypto@vger.kernel.org>; Fri,  6 Mar 2026 11:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81EF02FB97B;
+	Fri,  6 Mar 2026 13:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772795570; cv=none; b=pJekzN8bIR+1mFim1ex60lNSwYKxoaheM5B0pzulXL2Zim2ScspbSvzlAy5Y0c+KWiedxv/L5gUdH3O/hHIoeiuIfg1qek6qoljYnpXcRnaBAPne5tN8lrdvGTHgttk73N/SnQGRrDxJSgUgR+xbZToI0wlDE/l9Nn9Q8yNKwkg=
+	t=1772804162; cv=none; b=kb6rmjEg8Gu9qF/Ix34lw0eRwfxA56PcmyqkMP83iwgUg/+gg5WXef1DyRI83GXYn7xSFaxuwLAlfXzeGGFHJcGsz3AXfc5lJdPPPwrOz9h6UsPm9eCyCM98lPMzmqfrQl4Dj2/YEazHX8nsCLwldC3VlLrJqQItJSM0J7sQ58k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772795570; c=relaxed/simple;
-	bh=QYd7xFcjrF8awsSI06SrYCEauI5a1imh5mlX5CvHAd8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rs3BXarmVQ1QGgz2SfSazI1ZWPpjsT6c11YRI55pDzFKORVgxYquvg7H4/c6ums3FufehR+EKP6Y+pdMcHz5PC0EpZrSS+XpLOaZF0fjUPl7MT7DwcMma4Scu6vnKnjb/3ev6gTzp0R3+QaUX7ogNRfE5CjWTBS8uU+une8Kfvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GLaoXKhh; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1772804162; c=relaxed/simple;
+	bh=TWDXtJWdxpOQeGtw/5t2k2HNsAK+Wlpw4wGXYUyDegg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g8011agfF8TcphEy2CO0HHnmDxwIo7GEjtNctvduTOmahy4jXhyZbOaR+MqTQrUMIUoTEYb58VSbkbXa2kLb8cux3zJ69blUSJDtkohE5wKE6NtqFsFavZu85EfRcC9L5MKep4otk8S/d3f1wVAixPO5552iza+w3oAC0XLwNhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIo3o4OB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GLaoXKhh"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772795557;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=t1fqidfFXzXSPjlsXOGznuUcZaf+Cb/XywjElhxqFYM=;
-	b=GLaoXKhhSt1r5wLQadTCBMIOMa09dAfDXl/L/Yf7j11PsFXHQnPRp4dmEgeFaNiAaAKQNQ
-	H1BpCRZ5640y4904gLrPRjkNITJewbCYmNT8mKVRE/447l8mAXCcbfYLAgArZW5mzDJfPY
-	tiWyghzz3TqSXQrKVDnao5+JRPDrAbE=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Yuan Kang <Yuan.Kang@freescale.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	stable@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: caam - remove HMAC key hex dumps from hash_digest_key
-Date: Fri,  6 Mar 2026 12:12:03 +0100
-Message-ID: <20260306111204.302544-1-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIo3o4OB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B93CC4CEF7;
+	Fri,  6 Mar 2026 13:36:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772804162;
+	bh=TWDXtJWdxpOQeGtw/5t2k2HNsAK+Wlpw4wGXYUyDegg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vIo3o4OB1dD7sZybxM+1696l84aWLmVXwtes2jvlyjJ+X7+JOkRrAgqCDv0QwwV+7
+	 lDVWzxGTbJ4gi4oeu0AYDpk7tV6cINoneTtFmDgJHKfdgzbXS2kAe3tryIDdOUaqU8
+	 tNWXeSi2sMlOVF5H53ilZKaTxUSC1Nne+7/07FhH/DNQ5+hTubFJOoBQO2Hs/3LzSU
+	 wkQT8ogQRECgsYe4JS15mrl33raXhxKiYPu9Ka0uQDqsNfjZJjMW1J10iyGzKqeT2u
+	 a8qtBo7cbLbExDNms/t9FNsx3owwv00ZX2eylKSzikdkMTxh8DDNNY5kmcKhmJvbQB
+	 ctgeNcL0RHeTQ==
+Date: Fri, 6 Mar 2026 13:35:58 +0000
+From: Lee Jones <lee@kernel.org>
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] mfd: loongson-se: Add multi-node support
+Message-ID: <20260306133558.GL183676@google.com>
+References: <20260226102225.19516-1-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20260226102225.19516-1-zhaoqunqin@loongson.cn>
 
-Stop dumping sensitive HMAC key bytes (original and reduced keys) in
-hash_digest_key() to avoid leaking secrets when debug logging is
-enabled.
+On Thu, 26 Feb 2026, Qunqin Zhao wrote:
 
-Fixes: 045e36780f11 ("crypto: caam - ahash hmac support")
-Fixes: 3f16f6c9d632 ("crypto: caam/qi2 - add support for ahash algorithms")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/crypto/caam/caamalg_qi2.c | 5 -----
- drivers/crypto/caam/caamhash.c    | 6 ------
- 2 files changed, 11 deletions(-)
+> On the Loongson platform, each node is equipped with a security engine
+> device. However, due to a hardware flaw, only the device on node 0 can
+> trigger interrupts. Therefore, interrupts from other nodes are forwarded
+> by node 0. We need to check in the interrupt handler of node 0 whether
+> this interrupt is intended for other nodes.
+> 
+> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> ---
+>  drivers/mfd/loongson-se.c       | 38 +++++++++++++++++++++++++++------
+>  include/linux/mfd/loongson-se.h |  3 +++
+>  2 files changed, 35 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+> index 3902ba377..40e18c212 100644
+> --- a/drivers/mfd/loongson-se.c
+> +++ b/drivers/mfd/loongson-se.c
+> @@ -37,6 +37,9 @@ struct loongson_se_controller_cmd {
+>  	u32 info[7];
+>  };
+>  
+> +static DECLARE_COMPLETION(node0);
+> +static struct loongson_se *se_node[SE_MAX_NODES];
 
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 167372936ca7..b4a6e4637b79 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -3269,8 +3269,6 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
- 	dpaa2_fl_set_addr(out_fle, key_dma);
- 	dpaa2_fl_set_len(out_fle, digestsize);
- 
--	print_hex_dump_debug("key_in@" __stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, key, *keylen, 1);
- 	print_hex_dump_debug("shdesc@" __stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
- 			     1);
-@@ -3289,9 +3287,6 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
- 		/* in progress */
- 		wait_for_completion(&result.completion);
- 		ret = result.err;
--		print_hex_dump_debug("digested key@" __stringify(__LINE__)": ",
--				     DUMP_PREFIX_ADDRESS, 16, 4, key,
--				     digestsize, 1);
- 	}
- 
- 	dma_unmap_single(ctx->dev, flc_dma, sizeof(flc->flc) + desc_bytes(desc),
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 628c43a7efc4..70c252f167c5 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -393,8 +393,6 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
- 	append_seq_store(desc, digestsize, LDST_CLASS_2_CCB |
- 			 LDST_SRCDST_BYTE_CONTEXT);
- 
--	print_hex_dump_debug("key_in@"__stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, key, *keylen, 1);
- 	print_hex_dump_debug("jobdesc@"__stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
- 			     1);
-@@ -407,10 +405,6 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
- 		/* in progress */
- 		wait_for_completion(&result.completion);
- 		ret = result.err;
--
--		print_hex_dump_debug("digested key@"__stringify(__LINE__)": ",
--				     DUMP_PREFIX_ADDRESS, 16, 4, key,
--				     digestsize, 1);
- 	}
- 	dma_unmap_single(jrdev, key_dma, *keylen, DMA_BIDIRECTIONAL);
- 
+Really not keen on global variables.
+
+Why are they _needed_?
+
+>  static int loongson_se_poll(struct loongson_se *se, u32 int_bit)
+>  {
+>  	u32 status;
+> @@ -133,8 +136,8 @@ EXPORT_SYMBOL_GPL(loongson_se_init_engine);
+>  static irqreturn_t se_irq_handler(int irq, void *dev_id)
+>  {
+>  	struct loongson_se *se = dev_id;
+> -	u32 int_status;
+> -	int id;
+> +	u32 int_status, node_irq = 0;
+> +	int id, node;
+>  
+>  	spin_lock(&se->dev_lock);
+>  
+> @@ -147,6 +150,11 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+>  		writel(SE_INT_CONTROLLER, se->base + SE_S2LINT_CL);
+>  	}
+>  
+> +	if (int_status & SE_INT_OTHER_NODE) {
+> +		int_status &= ~SE_INT_OTHER_NODE;
+> +		node_irq = 1;
+> +	}
+> +
+>  	/* For engines */
+>  	while (int_status) {
+>  		id = __ffs(int_status);
+> @@ -157,6 +165,14 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+>  
+>  	spin_unlock(&se->dev_lock);
+>  
+> +	if (node_irq) {
+> +		writel(SE_INT_OTHER_NODE, se->base + SE_S2LINT_CL);
+> +		for (node = 1; node < SE_MAX_NODES; node++) {
+> +			if (se_node[node])
+> +				se_irq_handler(irq, se_node[node]);
+> +		}
+> +	}
+> +
+>  	return IRQ_HANDLED;
+>  }
+>  
+> @@ -189,6 +205,7 @@ static int loongson_se_probe(struct platform_device *pdev)
+>  	struct loongson_se *se;
+>  	int nr_irq, irq, err, i;
+>  	dma_addr_t paddr;
+> +	int node = dev_to_node(dev);
+>  
+>  	se = devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
+>  	if (!se)
+> @@ -213,9 +230,16 @@ static int loongson_se_probe(struct platform_device *pdev)
+>  
+>  	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
+>  
+> -	nr_irq = platform_irq_count(pdev);
+> -	if (nr_irq <= 0)
+> -		return -ENODEV;
+> +	if (node == 0 || node == NUMA_NO_NODE) {
+> +		nr_irq = platform_irq_count(pdev);
+> +		if (nr_irq <= 0)
+> +			return -ENODEV;
+> +	} else {
+> +		/* Only the device on node 0 can trigger interrupts */
+> +		nr_irq = 0;
+> +		wait_for_completion_interruptible(&node0);
+> +		se_node[node] = se;
+> +	}
+>  
+>  	for (i = 0; i < nr_irq; i++) {
+>  		irq = platform_get_irq(pdev, i);
+> @@ -228,7 +252,9 @@ static int loongson_se_probe(struct platform_device *pdev)
+>  	if (err)
+>  		return err;
+>  
+> -	return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
+> +	complete_all(&node0);
+> +
+> +	return devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO, engines,
+>  				    ARRAY_SIZE(engines), NULL, 0, NULL);
+>  }
+>  
+> diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson-se.h
+> index 07afa0c25..a80e06eb0 100644
+> --- a/include/linux/mfd/loongson-se.h
+> +++ b/include/linux/mfd/loongson-se.h
+> @@ -20,6 +20,9 @@
+>  
+>  #define SE_INT_ALL			0xffffffff
+>  #define SE_INT_CONTROLLER		BIT(0)
+> +#define SE_INT_OTHER_NODE		BIT(31)
+> +
+> +#define SE_MAX_NODES			8
+>  
+>  #define SE_ENGINE_MAX			16
+>  #define SE_ENGINE_RNG			1
+> -- 
+> 2.47.2
+> 
+
 -- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
-
+Lee Jones [李琼斯]
