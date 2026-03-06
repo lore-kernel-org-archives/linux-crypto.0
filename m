@@ -1,257 +1,252 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3FCB2BEC27
-	for <linux-crypto@vger.kernel.org>; Fri,  6 Mar 2026 16:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772815070; cv=none; b=nEaSgqvwaCYyqqrNxVXrGypmSWCffTmj/uF+hhayrnU4JjxZPinREl5sc6iW8MxpYEnPVo2ekRO6GA3XuBxJTtzWhLFvlEEe+zhGahnZe+YUIXyzk649ClCIlWEABb0YUnfbAt2SN4oBKmlvBlThnqkcztX2r8lF/oMc9YNKw/s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772815070; c=relaxed/simple;
-	bh=JHj2OY6d8eKbQeRapfnCJ+S/9OtFltd8Xt0exu2oABo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qpxVI3lPm/1FDVj58aWN2Xz71SKe7R56UxX+/TiajYH6Y8mPwm5l3k1zK4yuAcRcAUg0lUR+yKz+mKjhYGrzhk0KKo64b/CAsBR4Zn3LteuKQmUvV3+VGBuIyEDtaYBPq+IKagCPL3eI6+En8kWEhgITwbQo9Yz60U+16BQ7Deo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=P1FKTYVy; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=HkYs3Fkh; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E2833BBC6
+	for <linux-crypto@vger.kernel.org>; Fri,  6 Mar 2026 16:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772816030; cv=pass; b=RxdvHtUqk8o0efU36n46flI82fAAUX5S1rT+ZGhrHjboKcjZcvi1xPCxKcs2s1RJ4sDiYfgXhgbDD8A0QSTQBTA23dCNUsP/T8FAqyt8CvjFljLnUohKo8vOy6r0Oc3K6K+YNJCkSbGOn0i5Bh5kQiRe4T9n/Rz14NhJqToZNXw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772816030; c=relaxed/simple;
+	bh=sOB0uRpn90bNn0KEyo8o/J3jsfZjShZ7dooZWroirh0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YqnYX/E4HxdqtYDBaV4b5dxfX0tO7h4fkzfkv6Z74zdzNlnXH5nEFU5RlIqsa2igtJwNDDTNqZZFFjyXbXiLEvTzLe/JTnnw1JB2m/KoeCk22+VMGBf2AUCfAs9r2hn77Lxq2jsNJZcYQAnHu6mIer/A52sOXbbUz2DrJ1ptXDw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k6fVHpN8; arc=pass smtp.client-ip=74.125.82.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="P1FKTYVy";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="HkYs3Fkh"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 626FqvjV1742884
-	for <linux-crypto@vger.kernel.org>; Fri, 6 Mar 2026 16:37:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=GAQ9pLciHvE
-	89gx35mXrNVxSf1XEwFKPuDx6QiEHunQ=; b=P1FKTYVyaDTRWBui++G0QZpvcf3
-	kRJUM5T8j7aH3DAqhO9UFO8Ln03Jxu8mO4M/T/jwUhy4YoHS9jxS6n7vPzw8e362
-	71SnrJLpEQtBWBWm1ij/sp+hZyv8gsmmgRPiMnh+gMd02+53V5JwxKvGq49FdeH2
-	ocyG2/0uwDG6u73p0UwkMpvPZRvcq26z8gr+1aVCF1nqMINH5RKc0Pwq6SkUO9Vs
-	Y7BYlpOe/uXWlUmHPn8byD6p3BTzuIKWgY4xZK18rSotEzHQl6zKzFxRxG7KOi+9
-	uWUT7XGpYMcblNJThe34GwGIXOjy/NLVtTvvo0V3NEL0LvnrIcLwM5lT4bg==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cqx14gyc0-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Fri, 06 Mar 2026 16:37:47 +0000 (GMT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8cb390a0c4eso5820660085a.1
-        for <linux-crypto@vger.kernel.org>; Fri, 06 Mar 2026 08:37:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k6fVHpN8"
+Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-1275750cf9cso7866987c88.0
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Mar 2026 08:53:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772816028; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a1J1FuUNrX2ey8w/j3hql/CJnyMImBVBUAR6HhkDCA4tcNwdWroT08k6A5sVloEtJr
+         jAzYvBIXoE/Rk2KxDQrHj+oj995fz8kRqLBR4QqCCyJLUKid7xQJ/pTk6pw/M9oE1Ypd
+         lzmxH9dwVZr7w4CEdKpAxpD4FDyZmAY+sx3uohsfYrpsbl6L/rgJ8tdT9Wtb9NPimySH
+         uFWwIx+aeQyK+w9yo1nsWg9pCiRSMZ0ZkVCV8MN5Mdq96n9npSRDKUGSxo6jEJffV+KP
+         mfmsOFPwYnLN6Owg4oBXxwAQNtHEQZYF+3eQonxv+sdFh6hmkMLNtJvcFfhypKnKOoQS
+         ZOGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=d55lq5uPJ8gGFWTrhAL2DxmhHj1adF25qQQ5iMiqqsE=;
+        fh=WTGPYswrAEctXtULa++iLtTlTrlrueHABEseyqsjf68=;
+        b=IdU/SrjAUFwFWdWX2eIksQJPuvwH1L8OHIgeeGXF0ifuRhXdA4TcR10cbHAT02a6Xs
+         +IesMDvJeLfh5qk03Xbw3NEXtJBsXR4Ln6aGIYsuKI1Raq5vev95nqtdvIDo0v/137F1
+         phTdk32rGZY3+Ift4p8TQk+PEk9NDAZ/hFBUJUOumu8o0VsCp/2oC2UoCL6sVQs/c0US
+         PUofKRlPJ3UPbNx8s+cMnd3MyVWAv9wag9mot6DKmmbJrOnLng9QehwAMPYNe7wfE/dQ
+         iKqWPRpEv5FNmNmtONLdJj+U0ebkiJVe03jGd1oNwbhxp0rcidyljBILX9HwIU4oGWj+
+         ZeCg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1772815066; x=1773419866; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1772816028; x=1773420828; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GAQ9pLciHvE89gx35mXrNVxSf1XEwFKPuDx6QiEHunQ=;
-        b=HkYs3FkhujN1/f0I+btKCFlWveB2ySHXuasO6tTMNfRQTCzG76b0DaKG6V7CTPeiOX
-         /4vjeQrE5WIs3c9d6jNiPm5b0FVupCn0mLuEOiAf4puwwe9sr8Lz7jKeDOgEoeKK9LbS
-         9UqVCc35D/cYR6uH5vl9JkZpoGJBXdJsgN06CnpRw/uZGGs4Sa7Vqhis1cPq5hvpLjx0
-         qNhNhoi9r2G8/uo2UN4Ad5NbkhFF2yRT5F/R+7vhbCAlleLsIqPu8abuRRO/QKdXGvek
-         AII0hZmVFTGFXynfj5gZ4OzW61AnuB+hP5HVJk+RQJ4HmyzL13jG//IwmHD3tsjAskLm
-         JfHw==
+        bh=d55lq5uPJ8gGFWTrhAL2DxmhHj1adF25qQQ5iMiqqsE=;
+        b=k6fVHpN8iNYGg0+yDVjPTk7jPKVHEFumtiEwNxJJT+Hkp7yU/xg6OLFQLDfH9e8QFW
+         kmTngRfaUNQ66eZTSLUdFJwTKBPR43tmrGrKsfp0djYdQ4KozRLOYm3wfKNp1PP/qw6l
+         rcomLlAmuECumhFvou30+IvZ7RBmIbTgwOJcKW9g/6+LKnrZ8Th0my0hmLRwAItK/RbO
+         0IXbiHVfNGQXOCdY89Bxguz5g3nGrwfzptuIUV9V4BQ9TsUdkuJqWz4oMPb/rDNlHoEx
+         QYK9SbZGAIFg9g/ARn07/EHSH1L7PVWxso84bdzYEDyXCw9C4uyQjLl/2RqrQNcybzEB
+         aFNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772815066; x=1773419866;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1772816028; x=1773420828;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=GAQ9pLciHvE89gx35mXrNVxSf1XEwFKPuDx6QiEHunQ=;
-        b=AEr88gyCI4ZskcJHOYeF0imi6ufJIOgk2ORDh3cH5VTbP4yqPUTSNGqpS0VlhyNH1Z
-         6lkuDEDPnBIoZ/j7qMkMg6DjY/YnVq0sUtXgauWwglZuWPP1G0RO1NUaChQ+nVbneXna
-         dWRjrJEnQ+RYnVlmmMNJFdO/U8Kn13akuSnhG93kZrjPOrKNWAD+D90H8B7dkDQ8azQF
-         lNr/aumCtz+8ItCjhwj/Bq1EGqNJtZmEtmlA/v+OL7NlprxVuFqefZWHQYJteQoMUdCf
-         XHPsnOhpZfi8TP2SZTgDVN1L6WcTjY2sIijYH+6chECGfSZaluaLSTSosqw99UntOi8T
-         q+bw==
-X-Forwarded-Encrypted: i=1; AJvYcCU44N2w0OVS2ws2TdH6BXMBKor3HwrlO1WPzoT5unRj8NUJuITlHfDxfXuohpbuOUdQKROAbd1pvW61yss=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFh8RLiMCh0GMLJhFzI61VbZFWmNjN53gAVr5QiLEd1/RE6bow
-	t3pBFnp1Yul23a8T413aImRjdyZTKm+KqIM3EPS0k+hp0+gaDoCgRD1Qic0wCH0uQHYeqjb/jJr
-	n4U2ny0ZplswLB2lafs5YRwU9SwkUqE0e2IUHbKj4Oi1qtK5EX26z/bzywAD2r+wkKWlYjOs3E/
-	fG0w==
-X-Gm-Gg: ATEYQzyMaKkEqsrcvPW54fbmzV3yfddFLuGYus+65hIbWU9N06n8qQGjmMJClymbKtY
-	9MCp87UVjjdvH7ovOif/VJipqa2QpKoSs+AgfjBR9vVsIY4MJcgvY8aefn83ouE7qM7IlVEyIW8
-	CX8RpgOiMRr4YC1hXOVflA0slNYCD1nYMppQXihm8FSqyKQciAUesrOs6x6MQ+3f9LRUIzvUMJr
-	n38gvRe30GJJpPjdipt3qNM2gkgvtR7K/j2at7w27rG6yGtb1UMiRCKGbm5xBNxjNzHuySZMSIg
-	XeeV9qCrgdaIUpRpukZG+GjhUqEmsxxE5Ep0H1vaQ7FJrX1Wjjje+s1QY7YV1ro4dwNvXk2+bm8
-	AJfHcJqPtYkDXKV4y2scFq3wVb6hInxIyZ8465wduI1a5HM21HWUTfI9maBYVOw==
-X-Received: by 2002:a05:620a:489b:b0:8c7:155a:6d03 with SMTP id af79cd13be357-8cd6d4e70b4mr377711885a.58.1772815066073;
-        Fri, 06 Mar 2026 08:37:46 -0800 (PST)
-X-Received: by 2002:a05:620a:489b:b0:8c7:155a:6d03 with SMTP id af79cd13be357-8cd6d4e70b4mr377707685a.58.1772815065512;
-        Fri, 06 Mar 2026 08:37:45 -0800 (PST)
-Received: from hu-yabdulra-ams.qualcomm.com ([212.136.9.4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4851fb3666asm112694935e9.14.2026.03.06.08.37.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 08:37:44 -0800 (PST)
-From: Youssef Samir <youssef.abdulrahman@oss.qualcomm.com>
-To: ebiggers@kernel.org
-Cc: amadeuszx.slawinski@linux.intel.com, arnd@arndb.de, dakr@kernel.org,
-        gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mcgrof@kernel.org, rafael@kernel.org,
-        russ.weight@linux.dev, jeff.hugo@oss.qualcomm.com,
-        troy.hanson@oss.qualcomm.com
-Subject: Re: [PATCH] firmware_loader: use SHA-256 library API instead of crypto_shash API
-Date: Fri,  6 Mar 2026 17:37:43 +0100
-Message-ID: <20260306163744.1495881-1-youssef.abdulrahman@oss.qualcomm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250428190909.852705-1-ebiggers@kernel.org>
-References: <20250428190909.852705-1-ebiggers@kernel.org>
+        bh=d55lq5uPJ8gGFWTrhAL2DxmhHj1adF25qQQ5iMiqqsE=;
+        b=YtHuzVJUfjYWFbNbDBo/IHQ8wFNemF+jGgzQalVFvW9l5198L+FzbdiOg/xsCViAgV
+         WwND/nEk00RY56B5WujVdh97duqKM2DffeVlRoGN4KiDEaezqjVwOxNjtpFf5OsPyjSv
+         RxdLra7RU2vDUD8EDguoxYVM0cFFhz8OBvTRzFmhbKyDRSVLC04KmdAv//mbRT9nDnpg
+         AwOSBCbQIafMTfUpjzcawl4NXMqoYd0yKw5w3BVQeUQSx7vqGz6TTDav+Bp9RjhZ4wKF
+         dltFI7CIkjN2EVWbr84E18nQH54p/hkMvR1cVOWPtcFtNyvR7k2IQpJ+Am52ZByUkabd
+         mobA==
+X-Forwarded-Encrypted: i=1; AJvYcCUioIehKc3o3SO2/wf1NduVxsiuca5LiE3IojlSenxNIMOWvbKf+LJMr6mndlvoxk0OMIizPZ7ZVnaXa7w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0T5ygPF1fq0SLPB+wmd8yqOIWXelzXnZDJX2moYvPujDGWHse
+	vcsENi5CpIAPIRbT/FzUEVlzOsYKHlT6JalBscIw1w0WasYlSwmv8lIRXw2OwrXrDo8yRvudUay
+	Pjse20bMH+3SUOsCtbSHD+BwESD3cMuI=
+X-Gm-Gg: ATEYQzzmDrQWXlD6vjV9UztVwvPkz1tS4U7sqvrO4vjh/Nwto5sE+hhDVMiQoay9lih
+	4L5eNCsT9nKNxmCXki72DjCrdhrw3y8/+wxvrZWN8I3IXSQNIf6I1hiyvskXgnB0t7k5nnKFeRa
+	on5uS0XWVTslrpTaQ1y+qHGDXT0BaNR7dQOEzW7ORimC4Hp9t0UuXlJiLNDp1O3WiFjOX1IEhe3
+	9qqzNxHihs942jtrWLru1/vYHfo0A9L3yIvQ49vgLB5B/W7n8b2EJIU0hpTlgb8++5OZABK2mlR
+	dkKppI2UK6WyCzhalTqraxNCAfw=
+X-Received: by 2002:a05:7022:2381:b0:123:330b:3b5 with SMTP id
+ a92af1059eb24-128c2e8cce8mr927019c88.30.1772816027931; Fri, 06 Mar 2026
+ 08:53:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260112192827.25989-4-ethan.w.s.graham@gmail.com>
+ <20260306094459.973-1-jiakaiPeanut@gmail.com> <CANgxf6yMNZ3=xm9xVhPZDuxMc__7pQk=mti-CyD1QjUOgTJLEA@mail.gmail.com>
+ <CAFb8wJvmnPv96o9Kr9VAh=cL9zMr8-5eCEmmkjtgX02_Ypa4nw@mail.gmail.com>
+In-Reply-To: <CAFb8wJvmnPv96o9Kr9VAh=cL9zMr8-5eCEmmkjtgX02_Ypa4nw@mail.gmail.com>
+From: Ethan Graham <ethan.w.s.graham@gmail.com>
+Date: Fri, 6 Mar 2026 17:53:36 +0100
+X-Gm-Features: AaiRm520AP3BKAgH-rViiwWeXF81JB5TY519npbH34QQ3iWXw2jRnyHpyWWp2eg
+Message-ID: <CANgxf6wjPOoYemsK9EKrFM-eSpOgSUQvZ6kX5JyDTfC5J62Ufg@mail.gmail.com>
+Subject: Re: Question about "stateless or low-state functions" in KFuzzTest doc
+To: Jiakai Xu <jiakaipeanut@gmail.com>
+Cc: akpm@linux-foundation.org, andreyknvl@gmail.com, andy.shevchenko@gmail.com, 
+	andy@kernel.org, brauner@kernel.org, brendan.higgins@linux.dev, 
+	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com, 
+	dvyukov@google.com, ebiggers@kernel.org, elver@google.com, glider@google.com, 
+	gregkh@linuxfoundation.org, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
+	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
+	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, lukas@wunner.de, mcgrof@kernel.org, rmoar@google.com, 
+	shuah@kernel.org, sj@kernel.org, skhan@linuxfoundation.org, 
+	tarasmadan@google.com, wentaoz5@illinois.edu
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA2MDE1NyBTYWx0ZWRfX+JiqsRmAX42M
- v8KHb0c6gAzQnm3oRBzFovwPgEJC8EAFpnTa5g6mou4LvuvTaVaswcomkl8V5zY6C6lSb08l+MR
- 2yFST6oGrYzekpqItRDS/CaEuuNa0+8aYbiEeVgJTN4nH1pjReIR4r0vPT8WLNj/Ki9kFoK6sS5
- NCf8+0hYAZgYxUQgp68CeILzxcLCzKPVYXTQMyeligKaAOmKs0UXgcdAjTNXxhWveSUyvUOa2Gm
- g+CGZWkDXuHRsiXnSoqxyARoQv//siEyCjWPkg5TfdoAPMHBfG1iPxkjRzYyrHwbgz80Q44orHP
- TYj5j0T9CeqfeER3acXcKDtyxZAPPGj6JPQGvkgfyMPArlWsHpFjah6zFiC2UvlVBx1401+Ys9Z
- xa4PAcdViEU3Yz4/ef/iexmnQzQbiE2RoNj96RyrDE/g0AKhGTb6e7Ct2tSPHJHr+9rWPq+/qQo
- v/9ng5yJVA4S5ChWkTQ==
-X-Proofpoint-GUID: iDTgaOPT8JZAdndZZVIVmM7_DAwoW3wu
-X-Proofpoint-ORIG-GUID: iDTgaOPT8JZAdndZZVIVmM7_DAwoW3wu
-X-Authority-Analysis: v=2.4 cv=e/MLiKp/ c=1 sm=1 tr=0 ts=69ab02db cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=dNlqnMcrdpbb+gQrTujlOQ==:17
- a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22 a=VwQbUJbxAAAA:8
- a=FNyBlpCuAAAA:8 a=1XWaLZrsAAAA:8 a=RQVng53ib3JEPYZLgFUA:9
- a=bTQJ7kPSJx9SKPbeHEYW:22 a=RlW-AWeGUCXs_Nkyno-6:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-06_05,2026-03-06_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 bulkscore=0 adultscore=0 clxscore=1011 spamscore=0
- phishscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603060157
 
-On 4/28/2025 8:09 PM, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
->=20
-> This user of SHA-256 does not support any other algorithm, so the
-> crypto_shash abstraction provides no value.  Just use the SHA-256
-> library API instead, which is much simpler and easier to use.
->=20
-> Also take advantage of printk's built-in hex conversion using %*phN.
->=20
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->=20
-> This patch is targeting the firmware_loader tree for 6.16.
-Hi Eric,
+On Fri, Mar 6, 2026 at 12:04=E2=80=AFPM Jiakai Xu <jiakaipeanut@gmail.com> =
+wrote:
+>
+> Hi Ethan,
 
-An issue has been found on kernel versions older than v6.16, where a firmwa=
-re
-file larger than 2GB and is not divisible by SHA256_BLOCK_SIZE (64b) will a=
-lways lead to a page fault. The first size that fits this criteria is 21474=
-83649b. It is also worth noting that any subsequent loads regardless of the=
- size or divisibility by 64, will lead to another page fault.
-I've mainly tested this with drivers/accel/qaic on 6.8.0-62-generic, but te=
-chnically this should affect any code that uses the firmware loader on a ke=
-rnel version older than v6.16 with CONFIG_FW_LOADER_DEBUG enabled, includin=
-g the stable kernels.
+Hi Jiakai,
 
-This can be reproduced by creating a dummy binary file of a size that fits =
-the criteria listed above, then compress it using zstd to allow _request_fi=
-rmware() to open it.
+> Thanks for the detailed explanation.
+>
+> Would it be fair to say that KFuzzTest is not well suited for testing
+> kernel functions that are heavily influenced by or have a significant
+> impact on kernel state?
 
-This patch appears to have fixed the issue so I suggest backporting it, but
-I also noticed that it relies on changes that were introduced in this serie=
-s:
-https://lore.kernel.org/lkml/cover.1745734678.git.herbert@gondor.apana.org.=
-au/
+With the current fuzzer support (see the PR in the syzkaller repo [1])
+this is a fair assessment, but with a caveat.
 
-Below is the BUG splat:
+It really depends on how you are fuzzing. KFuzzTest itself is just the
+conduit. Whether or not your fuzzer can meaningfully reproduce
+bugs/crashes related to complex state is somewhat out of KFuzzTest's
+hands. However as of v4 the framework only supports blob-based
+fuzzing, I would advise against targeting heavily stateful functions right
+now. You are welcome to experiment to see if there is a way to meaningfully
+fuzz more stateful functions, but with just binary buffers as inputs, I don=
+'t
+reckon that there will be too many candidates.
 
-[1667258.914177] BUG: unable to handle page fault for address: ffffb731b3fb=
-cd40
-[1667258.914188] #PF: supervisor read access in kernel mode
-[1667258.914193] #PF: error_code(0x0000) - not-present page
-[1667258.914198] PGD 100000067 P4D 100000067 PUD 1002d4067 PMD 529eec067 PT=
-E 0
-[1667258.914208] Oops: 0000 [#3] PREEMPT SMP PTI
-[1667258.914214] CPU: 11 PID: 1252644 Comm: kworker/11:1 Tainted: P      D =
-W  OE      6.8.0-62-generic #65-Ubuntu
-[1667258.914223] Hardware name: Wiwynn Twin Lakes MP/Twin Lakes Passive MP,=
- BIOS YMGPE07 12/23/2019
-[1667258.914229] Workqueue: events sahara_processing [qaic]
-[1667258.914257] RIP: 0010:memcpy_orig+0x105/0x130
-[1667258.914267] Code: 0f 1f 44 00 00 83 fa 04 72 1b 8b 0e 44 8b 44 16 fc 8=
-9 0f 44 89 44 17 fc c3 cc cc cc cc 0f 1f 84 00 00 00 00 00 83 ea 01 72 19 <=
-0f> b6 0e 74 12 4c 0f b6 46 01 4c 0f b6 0c 16 44 88 47 01 44 88 0c
-[1667258.914278] RSP: 0018:ffffb731a3c57c78 EFLAGS: 00010202
-[1667258.914284] RAX: ffffa0ac564f41b0 RBX: ffffa0ac564f41b0 RCX: 00000000d=
-7af7212
-[1667258.914290] RDX: 0000000000000001 RSI: ffffb731b3fbcd40 RDI: ffffa0ac5=
-64f41b0
-[1667258.914295] RBP: ffffb731a3c57ca8 R08: 000000005ab6c582 R09: 000000007=
-2a12f7b
-[1667258.914301] R10: 0000000064f65b73 R11: 000000001cb47ae9 R12: ffffffff9=
-3d71d40
-[1667258.914306] R13: ffffb731b3fbcd40 R14: 0000000000000002 R15: ffffb7322=
-024b000
-[1667258.914311] FS:  0000000000000000(0000) GS:ffffa0bb7f580000(0000) knlG=
-S:0000000000000000
-[1667258.914318] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[1667258.914323] CR2: ffffb731b3fbcd40 CR3: 0000000b09e3c005 CR4: 000000000=
-07706f0
-[1667258.914329] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
-0000000
-[1667258.914334] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000=
-0000400
-[1667258.914339] PKRU: 55555554
-[1667258.914342] Call Trace:
-[1667258.914346]  <TASK>
-[1667258.914350]  ? show_regs+0x6d/0x80
-[1667258.914358]  ? __die+0x24/0x80
-[1667258.914364]  ? page_fault_oops+0x99/0x1b0
-[1667258.914372]  ? kernelmode_fixup_or_oops.isra.0+0x69/0x90
-[1667258.914380]  ? __bad_area_nosemaphore+0x19e/0x2c0
-[1667258.914388]  ? bad_area_nosemaphore+0x16/0x30
-[1667258.914394]  ? do_kern_addr_fault+0x7b/0xa0
-[1667258.914400]  ? exc_page_fault+0x1a4/0x1b0
-[1667258.914407]  ? asm_exc_page_fault+0x27/0x30
-[1667258.914417]  ? memcpy_orig+0x105/0x130
-[1667258.914425]  ? lib_sha256_base_do_update.isra.0+0x5d/0x1d0 [sha256_sss=
-e3]
-[1667258.914433]  ? __pfx_sha256_transform_rorx+0x10/0x10 [sha256_ssse3]
-[1667258.914440]  sha256_finup+0xf5/0x150 [sha256_ssse3]
-[1667258.914447]  sha256_avx2_digest+0x55/0x70 [sha256_ssse3]
-[1667258.914453]  crypto_shash_digest+0x2a/0x60
-[1667258.914460]  fw_log_firmware_info+0x113/0x1b0
-[1667258.914469]  _request_firmware+0x19d/0x4b0
-[1667258.914476]  firmware_request_nowarn+0x36/0x60
-[1667258.914482]  sahara_processing+0x399/0x710 [qaic]
-[1667258.914501]  process_one_work+0x181/0x3a0
-[1667258.914508]  worker_thread+0x306/0x440
-[1667258.914514]  ? _raw_spin_lock_irqsave+0xe/0x20
-[1667258.914521]  ? __pfx_worker_thread+0x10/0x10
-[1667258.914526]  kthread+0xef/0x120
-[1667258.914533]  ? __pfx_kthread+0x10/0x10
-[1667258.914540]  ret_from_fork+0x44/0x70
-[1667258.914546]  ? __pfx_kthread+0x10/0x10
-[1667258.914552]  ret_from_fork_asm+0x1b/0x30
-[1667258.914561]  </TASK>
-[1667258.914564] Modules linked in: tls nfsv3 rpcsec_gss_krb5 nfsv4 nfs net=
-fs snd_seq_dummy snd_hrtimer snd_seq_midi snd_seq_midi_event snd_rawmidi sn=
-d_seq snd_seq_device snd_timer snd soundcore qrtr_mhi(OE) qrtr(OE) xt_connt=
-rack xt_MASQUERADE bridge stp llc xt_set ip_set nft_chain_nat nf_nat nf_con=
-ntrack nf_defrag_ipv6 nf_defrag_ipv4 xt_addrtype nft_compat nf_tables xfrm_=
-user xfrm_algo openafs(POE-) overlay cfg80211 binfmt_misc nls_iso8859_1 int=
-el_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency=
-_common isst_if_common skx_edac skx_edac_common nfit x86_pkg_temp_thermal i=
-ntel_powerclamp coretemp kvm_intel ipmi_ssif kvm cmdlinepart spi_nor irqbyp=
-ass mtd qaic(OE) mei_me rapl intel_cstate i2c_i801 mhi(OE) spi_intel_pci me=
-i switchtec(OE) ioatdma spi_intel i2c_smbus intel_pch_thermal dca ipmi_si a=
-cpi_power_meter acpi_ipmi ipmi_devintf ipmi_msghandler acpi_pad mac_hid sch=
-_fq_codel dm_multipath nfsd msr parport_pc auth_rpcgss nfs_acl lockd ppdev =
-grace lp parport sunrpc efi_pstore nfnetlink dmi_sysfs
-[1667258.914665]  ip_tables x_tables autofs4 btrfs blake2b_generic xor raid=
-6_pq libcrc32c dm_mirror dm_region_hash dm_log crct10dif_pclmul crc32_pclmu=
-l polyval_clmulni polyval_generic nvme ghash_clmulni_intel sha256_ssse3 bnx=
-t_en sha1_ssse3 nvme_core xhci_pci nvme_auth xhci_pci_renesas wmi aesni_int=
-el crypto_simd cryptd
-[1667258.914741] CR2: ffffb731b3fbcd40
-[1667258.914746] ---[ end trace 0000000000000000 ]---
+> I agree with your point that "the goal of the framework is to fuzz real
+> functions with realistic inputs." One thing I've been thinking about,
+> though, is how we determine what counts as "realistic" input for a given
+> function. If the generated inputs that a function would never actually
+> receive in practice, we'd likely end up chasing false-positive crashes
+> that don't represent real bugs.
 
-Thanks
-- Youssef
+I would argue that just because an input isn't "realistic" in the current
+kernel context (i.e., the current upstream code only calls into the library
+after performing sanity checks and/or validation) doesn't mean that a
+crash isn't problematic.
 
+Code can and does get reused and refactored over time. If an internal
+parser can cause a panic or OOB access when handed certain inputs,
+it is inherently fragile. Even if that code path is shielded today, it coul=
+d
+be exposed by a new caller tomorrow. Our baseline assumption here is
+that if a function accepts a blob as input, it should be resilient to all t=
+ypes
+of blobs.
+
+However your concerns about false positives is justified, and something
+that we have thought about. In previous iterations of this work, we relied
+on a constraints system for encoding input semantics and performing
+validation inside the fuzz harness. While we stepped back from that due
+to its inherent complexity, instead favoring a more simple blob-only design=
+,
+adding constraints to better define "realistic" inputs is a good idea that =
+may
+need to be revisited in the future.
+
+Hope this helps clarify the design philosphy!
+
+[1] related syzkaller PR for KFuzzTest:
+https://github.com/google/syzkaller/pull/6280
+
+> Thanks,
+> Jiakai
+>
+>
+> On Fri, Mar 6, 2026 at 6:29=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gma=
+il.com> wrote:
+> >
+> > On Fri, Mar 6, 2026 at 10:45=E2=80=AFAM Jiakai Xu <jiakaipeanut@gmail.c=
+om> wrote:
+> > >
+> > > Hi Ethan and all,
+> >
+> > Hi Jiakai
+> >
+> > > I've been reading the KFuzzTest documentation patch (v4 3/6) with gre=
+at
+> > > interest. I have some questions about the scope and applicability of =
+this
+> > > framework that I'd like to discuss with the community.
+> > >
+> > > The documentation states:
+> > > > It is intended for testing stateless or low-state functions that ar=
+e
+> > > > difficult to reach from the system call interface, such as routines
+> > > > involved in file format parsing or complex data transformations.
+> > >
+> > > I'm trying to better understand what qualifies as a "stateless or
+> > > low-state function" in the kernel context. How do we define or identi=
+fy
+> > > whether a kernel function is stateless or low-state?
+> > >
+> > > Also, I'm curious - what proportion of kernel functions would we
+> > > estimate falls into this category?
+> >
+> > I would define it based on "practical heuristics". A function is probab=
+ly a
+> > good candidate for KFuzzTest if it fits these loose criteria:
+> >
+> > - Minimal setup: KFuzzTest currently supports blob-based fuzzing, so th=
+e
+> >   function should consume raw data (or a thin wrapper struct) and not
+> >   require a complex web of pre-initialized objects or deep call-chain
+> >   prerequisites.
+> > - Manageable teardown: if the function allocates memory or creates
+> >   objects, the fuzzing harness must be able to cleanly free or revert
+> >   that state before the next iteration. An example of this can be found
+> >   in the pkcs7 example in patch 5/6 [1].
+> > - Non-destructive global impact: it's okay if the function touches glob=
+al
+> >   state in minor ways (e.g., writing to the OID registry logs as is don=
+e
+> >   by the crypto/ functions that are fuzzed by the harnesses in patch 5/=
+6),
+> >   but what matters is that the kernel isn't left in a broken state befo=
+re the
+> >   next fuzzing iteration, meaning no leaked global locks, no corrupted
+> >   shared data structures, and no deadlocks.
+> >
+> > These loose criteria are just suggestions, as you can technically fuzz
+> > anything that you want to - KFuzzTest won't stop you. The danger is
+> > that the kernel isn't designed to have raw userspace inputs shoved
+> > into deep stateful functions out of nowhere. If a harness or function
+> > relies on complex ad-hoc state management or strict preconditions,
+> > fuzzing it out of context will likely just result in false positives, p=
+anics,
+> > and ultimately bogus harnesses.
+> >
+> > The goal of the framework is to fuzz real functions with realistic inpu=
+ts
+> > without accidentally breaking other parts of the kernel that the functi=
+on
+> > wasn't meant to touch. Therefore ideal targets (like the PKCS7 example)
+> > are ones with minimal setup (just passing a blob), have manageable
+> > teardown (like freeing a returned object on success) and don't
+> > destructively impact global state (even if they do minor things like
+> > printing to logs).
+> >
+> > That said, I'm curious to see what you come up with! I'm sure there are
+> > other use cases that I haven't thought of.
+> >
+> > [1] PKCS7 message parser fuzzing harness:
+> > https://lore.kernel.org/all/20260112192827.25989-6-ethan.w.s.graham@gma=
+il.com/
