@@ -1,90 +1,72 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9C11D47B4;
-	Fri,  6 Mar 2026 03:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D30366801;
+	Fri,  6 Mar 2026 03:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772766130; cv=none; b=jpBIKaWj184F/y8Sw+/TJQ+/nhit5Ow79EQZIwZh5FIWLN6H/r9Gfmqko+sm/oW4pzfrRTeLSBemqmNKnPf0UHiT8gslUjgaqyDqBhWMiyMn7Xu/H4KoUJ4J9vZeRBF3aQDBsn/SiqymkRa+Zx4eyjDMS2E/MylQMSdTw+/CA1A=
+	t=1772768296; cv=none; b=pwEXF5dZxPknKyl191MUydUWY4j2q/2vqu0kPhvSNqPa0xaF282I2y5Z6Az0jrLeIwM9Ei8x0K2B5fXTjKaDv6lWB5q/rhIvTtOeIzUsNQhnBal2fWTXyu1UNXagWzVD/qvAGwsCY45CXAfU10Scsv5Gk9niAYtJuVgVE3gqsGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772766130; c=relaxed/simple;
-	bh=cYsFBDxeH7XQgwnisJ0NeCTIUFF5JQeRIXRxNhQORrI=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=vDWzv/bscnL/wF20eGF3hkZAQwZFjI95dOd41uwaL0zRQW80avmRTG7Tm8WdSQv4CsGPXlvKkhPiy252oQ5t3vPJ9KzRXyurbUuRdY56nI6o4XbroSyF7uoEx6aAeCkhLnWcUlJTNP81mxoSVJUyKwEAasRyg7JUcuwfU6uXEW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=oAE1Db4M; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1772768296; c=relaxed/simple;
+	bh=j5OSSfhjq4fzEZ8ikkY59xts3gjsKQZ/pEYxs6sL9l0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y9oHz+O4/0MDTzTXFMP3OzabNf9BFeaTP60/+yhu28V7PmoJK1ZIhoIMjmaUiVDN2jGjrRHvLrhs9OF3Pj8QzGNkhz9rcmrFCQxOcZUhFShzuwLJ0cMm8hmdIeUyAHbbioWk8lC4aKQSitvaHbAZaIGwkP8Qc6W1SCun0CngX4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NsniiPds; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="oAE1Db4M"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
-	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
-	references:reply-to; bh=pARoOQjLnFAa6vgxr9eXH/gxQeXLKv6NBwNdsqsoofs=; b=oAE1D
-	b4MAIk74s8yMMOEYADDUml9sOIiJb3R6ZObTuJSnr/6FML9ZVnrmoaSQtoN9BY7Jn1wfv69czFcDr
-	93mrqZHfTgLwXVICe8/FAjeQYSNZ7vdHzDlGZmogtUZI8zwAhcO9172/s+RP4WW6K5WO08KKnuwLI
-	VQfVNHT0dbkT37+Gb+Ab4Wx7IM3ikaS4lt3zn98sgs0GBp1gz7xwxNVrU9VqwwDcR0q4N12R8ZvuJ
-	Pem12CPKbF1XXEY6X3QtLe6cUionaumW6qApFNlcT+Yt1tB+sbvlEarnpiJA1yJBQABB6qRbYyGYO
-	0TjJX4iwqtXGRVlOxqXP7ntO5qeiA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vyLRn-00BzF4-0h;
-	Fri, 06 Mar 2026 11:01:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Mar 2026 12:01:51 +0900
-Date: Fri, 6 Mar 2026 12:01:51 +0900
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 7.0
-Message-ID: <aapDn5mYeL861_6n@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NsniiPds"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58A95C116C6;
+	Fri,  6 Mar 2026 03:38:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772768295;
+	bh=j5OSSfhjq4fzEZ8ikkY59xts3gjsKQZ/pEYxs6sL9l0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NsniiPdstav/u8s8l/0evYSRb2ZuXrMwP7HD9fu1nojsy3Lo8gFDwdlwYVH44qxP/
+	 EIAliHRHMeiTpYDIFbC4+u0uznJKWalclF5/Psa2bTMyIn1pZHQENmYMKOsCKVxzj7
+	 6FyFBSzWjedRFvsRIplgkxfFFEN+ZvgEh2D6EH5ytPP5tIJFy4kSODx2Oqa7H+myod
+	 J2sQPDqu3Vqyv8mM2eZqLjdPTwOtObRLGSs5w6+uX/R/QcuNlrdw9xjERD3DfFZva6
+	 dEFHnEfujlkMARer/PMr3xrkycomkaQO8TM+m24V/HIHVzqghG6PB5jbwCUfqDwgT0
+	 P8zd9FsnlrNtQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	kunit-dev@googlegroups.com,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 0/3] lib/crc: Fix crc_kunit dependency and add kunitconfig
+Date: Thu,  5 Mar 2026 19:35:54 -0800
+Message-ID: <20260306033557.250499-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Hi Linus:
+This series fixes crc_kunit to follow the standard KUnit convention of
+depending on the code it tests rather than selecting it, adds a kconfig
+option that enables all the CRC variants for KUnit testing, and adds a
+kunitconfig file for lib/crc/.
 
-The following changes since commit 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f:
+This follows similar changes to lib/crypto/ (except lib/crypto/ doesn't
+have an equivalent to CRC_ENABLE_ALL_FOR_KUNIT yet, but we could
+consider adding one).
 
-  Linux 7.0-rc1 (2026-02-22 13:18:59 -0800)
+This series applies to v7.0-rc2 and is targeting crc-next.
 
-are available in the Git repository at:
+Eric Biggers (3):
+  lib/crc: tests: Make crc_kunit test only the enabled CRC variants
+  lib/crc: tests: Add CRC_ENABLE_ALL_FOR_KUNIT
+  lib/crc: tests: Add a .kunitconfig file
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v7.0-p2
+ lib/crc/.kunitconfig      |  3 +++
+ lib/crc/Kconfig           | 17 +++++++++++++----
+ lib/crc/tests/crc_kunit.c | 28 ++++++++++++++++++++++------
+ 3 files changed, 38 insertions(+), 10 deletions(-)
+ create mode 100644 lib/crc/.kunitconfig
 
-for you to fetch changes up to d240b079a37e90af03fd7dfec94930eb6c83936e:
 
-  crypto: atmel-sha204a - Fix OOM ->tfm_count leak (2026-02-28 12:53:25 +0900)
-
-----------------------------------------------------------------
-This push contains the following changes:
-
-- Fix use-after-free in ccp.
-- Fix bug when SEV is disabled in ccp.
-- Fix tfm_count leak in atmel-sha204a.
-----------------------------------------------------------------
-
-Alper Ak (1):
-      crypto: ccp - Fix use-after-free on error path
-
-Ashish Kalra (1):
-      crypto: ccp - allow callers to use HV-Fixed page API when SEV is disabled
-
-Thorsten Blum (1):
-      crypto: atmel-sha204a - Fix OOM ->tfm_count leak
-
- drivers/crypto/atmel-sha204a.c   |  5 +++--
- drivers/crypto/ccp/sev-dev-tsm.c |  2 +-
- drivers/crypto/ccp/sev-dev.c     | 10 ++++------
- 3 files changed, 8 insertions(+), 9 deletions(-)
-
-Thanks,
+base-commit: 11439c4635edd669ae435eec308f4ab8a0804808
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.53.0
+
