@@ -1,196 +1,118 @@
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF3335CBC4
-	for <linux-crypto@vger.kernel.org>; Fri,  6 Mar 2026 11:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772795056; cv=pass; b=Td6E9hsPcZFqAKvgugArACkifwxT477Gze9o1w0ywdKG4pnDTHByDIOgX45SASWNPh67TgcH3D1OTBxIsLyMMbdp/rqkYElUednhP6OaW1xaGT4jz6iukk3Ngz2DCyGCySe6jmqhHkn1Piz/3LpTL7icEEGPmulDE0scDHVMABw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772795056; c=relaxed/simple;
-	bh=TMUl2twD3WVb9bUpNILamvTXmAfNlYzQY+btVe3lQyY=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5711735028B
+	for <linux-crypto@vger.kernel.org>; Fri,  6 Mar 2026 11:08:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772795288; cv=none; b=RmcpJRsXwSGQIyCPGe1mNmlQ1nOXQ4gwvwl50IvaXb+U//qxIlFfU6Dh9QIPAt0t5L/dzfsWUWjWo2MG5ZvvRxKzDw+LrQSbm825EVdhZ8M85AdzUfBetM2fcuJBFU9Ea0zpS56USOtQTCJSgwW2uZiGDNd0ZCK1yGXGYt/eljM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772795288; c=relaxed/simple;
+	bh=zvGkoOu6sc3DwKuM9+tCXqq+dXf2cC7y58uKtjKrGkA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SWlOfXWBWIe3Ain9vPUdGBVFwj96fOdYu/jg7KSFWrFgLjRdH7J6PW59VHIAoT+xzn56tE8js9vpvGuEEZ/zNx7oxOWuupmwJh4GAjeWZrPD7j0/NYo8qUy9N2Tm4hEEQlvU9QIFwg0SjXdi+52msS6gACvirbIlafutfpKdddM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZwnN+wWA; arc=pass smtp.client-ip=209.85.167.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=CsSf7WH/OjjjrzG+kmPYsyaCkkyA0Z9P+P4BXs4rIxp+CNPmBAe6ynNix96wK24TvlOvrcDxB5SbmcTYed2vKdRVXv4HnGg+0tdjxxt/S8rQrlHWKSFW97mBMTfEjNueQYWoSoiVjDVeMdvouSVIHpyAiSu2bmmDRYGi/3RhqII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enhnqn0c; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZwnN+wWA"
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-463a94f8475so6613359b6e.0
-        for <linux-crypto@vger.kernel.org>; Fri, 06 Mar 2026 03:04:14 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772795054; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DVvFwPU3h2xJe7HNvzQwHiTgXx7w7KO3ODR7OkuZS7Y3ZTY+39bT6agjR3+acv3lTq
-         zU1P86C1tTEn1mH2/y15tBJ6CYDOknm2E9g0qE5gIW51Kda9GSom0rIxzeBxxhk8HJM9
-         n/3G70f/o20U2fhpxW3+/Ckl2jmFrxhZWfouFI+mKD/y/8ETYhByjMqeZjNqHHfHiwfK
-         Ok/25A5z3hx/tA9SomrW16ekA5hFgd/2+7ZfwF0J567FasisTeWSjO4n/NiwSFGVbR1h
-         t9qPhul6GTGBuPtyCrMKNSsyCMQu3Adx/46aHlOc+B6NtuqfQA6KnICeoGbFr9upS2Ip
-         oNhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=4FBAY7Ptj233wihUnQns1LO/raURJqSuY43ghIQW2sU=;
-        fh=7RgpRm0rw9xCBwoh4yPe0O8/X6cXtqdNiyw+Pr9WHYo=;
-        b=QNjexARp9nATNT4+k6s9n0F5yGsGu6cdvAru0Pbmw6UE/M+VENHLRMl3nIqf3zfWwM
-         xwuIX2xRjjPJrD8bG7gZbQ+j/C6NU8MTt1DtGr+HhzDcMiAiYnvMLQ9dy+JwWeIsxCO+
-         Qqbqvmxu7gDhVyheKEde6UAT0TQp9s18OIOeMpDOAlTbM95VCkoYjMOovQ136RY+1vuy
-         CVoG1Y2hi7THfl6oeLwfQiTXOMc42Ooy6XPn3d0KZIsdZ3cJvSpUBijnIx2wso+8Pv4m
-         x3h1emp8JOpe42eOSuylFy6J4yfOd1hFaQOvm2DlW/BWpIf68WB3IuK4paqQhAq5kd6J
-         ROuw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772795054; x=1773399854; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4FBAY7Ptj233wihUnQns1LO/raURJqSuY43ghIQW2sU=;
-        b=ZwnN+wWAAWFrV84YHShPZsf5L+LInsVkqlHGrOR5UVBNSSf1WKGw9P+6cdgmPGQ/T5
-         fG/bmuGIotEW/hujneKmWAorWzgfMdihkpanFtNwA2Fw/YJNzveRvJabIwvLQJ6nik1C
-         d45C2xMcfiE+o2uxMMrG2B3UuZt6bSjaQ0pOost1LOz8bC1ymlU/0L4xoz9l9ihDyOJD
-         oquRdVKcTv1SPKplrfU/SOfHCZot4tNUL5FF3DzF2kJOw0gXwN94QcdrNbT8X95CF4m0
-         RQvmCDGMgayHT6nT/80z8WYJH8Og4PFspXHzC/oGUnfUXNah4pLdAu5g+EVM6dc6wR47
-         zqGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772795054; x=1773399854;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4FBAY7Ptj233wihUnQns1LO/raURJqSuY43ghIQW2sU=;
-        b=aus4kNoSz384pX+j5oz0Q0O3ODRJf7p99H3VNZ1S5Lhq7qIY/RYEweYF6s0rY1QtjQ
-         DfUv88zUToahyHx3XkhnR02SsCv5F9NNg4p/R5iy4DLK7Y88paBY4XkXQm/1jTIQtyeg
-         rrIMZF06FUv2806KJXUPEimojcIOPg9PW6J8OC/7g5Cgjp31009YtMSwMw8pS5PFQkJ8
-         NFkt8LK1Q05EVN2sS0uv2stgKxHLLY/PKWyZAMmntZHKyBMZ5j4NrrlQISruOAi5+/xK
-         i+mHgjMH9dK+luCFfIoYEQjPWLxTEtl9Fu8w5jCqYSwf3sCOyIhsKttii0tmewdLhtvi
-         NrLA==
-X-Forwarded-Encrypted: i=1; AJvYcCX3TmODZ6lpldzneIdwJxnLW33gO2hKnilhPgeEm+CdRzOdMnY8u6LSIZcX/jTYijY2Y87ZsMMi5JoyD5U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaUebwwi7vGwDfeCjp1oLCeW8vZCWnWc5+US8R57mnJe0arTvh
-	IgX9+OVshBFOuEOYRjmcVaSKSGinIL/C0TZlZD+wR8MRcOcbV2U4U2GwqXIGvYRxXBLAXCSBg23
-	owZjwezukzJlahKbjq680KNz31NtWE0w=
-X-Gm-Gg: ATEYQzw28NhJN/KEw7lsYnSdvW1RyLjSISyq2gJL7BAM6KhMq3mcHuUbS3x9CdmckaZ
-	pxNEay0GZtBihXgcJt6gKQj8RBUpxcmDSbbw10LrfLIn1s9rC+KGNJs7VW1Zj2/yK7tENq4Eb4u
-	nwFdFl9qWMmW55ZaivGs3VREnkRQq6l23PHmcVHVybnRVXKEoY4Ee34S7u0GhRQKSHrGuw9m0H9
-	sR+7bXD2bQ6kxuPCKjT3+Y/KX0dq76dmvximaXQ9BsF7AdcRAOVRPnPNk6VLuJrbXgLduUniPXf
-	LiIpr9C2hi97UgI8z5hRdtfY226PWBBAONZVA0s=
-X-Received: by 2002:a05:6808:1522:b0:450:b87b:1ec4 with SMTP id
- 5614622812f47-466dd0f715bmr888114b6e.15.1772795053874; Fri, 06 Mar 2026
- 03:04:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enhnqn0c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22531C2BCB3
+	for <linux-crypto@vger.kernel.org>; Fri,  6 Mar 2026 11:08:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772795288;
+	bh=zvGkoOu6sc3DwKuM9+tCXqq+dXf2cC7y58uKtjKrGkA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=enhnqn0cQZOEfPg4lbr5H0FcIOxP/gaxG/zy4LHsHbA4Y//gAslwnbfUUjaIeSPwd
+	 /XqGAc1zKK9l/RwY+YKBm0jm2/l5eZ8bBH84Vl9gXweq54jTLN7PSUoS5wkA+sj52M
+	 OgrSO3Yc8VMOPu3u81jUj+NfsgMOtFEoNikq6bspa78MHsrfxKrY2l7pWKZc8O6DsX
+	 /kH3ojHcyPUAyuaR6CUWEXqo+2wa9wyMT8+h8PiUpnnAtMeoRI5n355eulvZupV3aQ
+	 OICqI7Ot9BXmBXN1FpeBIotaIPwdFoAwwGcAHoQHXlmbuZJgb7wZoYFsWqk3W4OCfo
+	 QmkMfSQbe73LA==
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5a0faa0d15cso2806439e87.0
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Mar 2026 03:08:08 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVxMhKLDrZFbTcCIBrQtMh2hLkgJHTwYNxG3m+2ZJpADKwoCKGKazQQOJkRS59/xhGw1n1xC7i86uvHnSw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUEVTe7dNcITtD+k+sgom5IfKlNciNK2UvS0n3TWA39bQrJ/Lj
+	aqtaXhIWBq21/EFAlOKV/P/5wOMSkVDsZj7SIve2X054JPf6zK/oT/ozEnm2JXnFfE8t/uVtSll
+	W56fgNs8GEqcNMjF0DPrWPTZ6wwWbI9NwtS9xfxxWxQ==
+X-Received: by 2002:a05:6512:3719:b0:5a1:3b28:42fd with SMTP id
+ 2adb3069b0e04-5a13cd58785mr456080e87.47.1772795286638; Fri, 06 Mar 2026
+ 03:08:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260112192827.25989-4-ethan.w.s.graham@gmail.com>
- <20260306094459.973-1-jiakaiPeanut@gmail.com> <CANgxf6yMNZ3=xm9xVhPZDuxMc__7pQk=mti-CyD1QjUOgTJLEA@mail.gmail.com>
-In-Reply-To: <CANgxf6yMNZ3=xm9xVhPZDuxMc__7pQk=mti-CyD1QjUOgTJLEA@mail.gmail.com>
-From: Jiakai Xu <jiakaipeanut@gmail.com>
-Date: Fri, 6 Mar 2026 19:04:02 +0800
-X-Gm-Features: AaiRm50fj2zUudpYSke1Ww9X_50G4gGf4UxVg0WDage5_ANMvrcVMJxjNhrQX6Q
-Message-ID: <CAFb8wJvmnPv96o9Kr9VAh=cL9zMr8-5eCEmmkjtgX02_Ypa4nw@mail.gmail.com>
-Subject: Re: Question about "stateless or low-state functions" in KFuzzTest doc
-To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: akpm@linux-foundation.org, andreyknvl@gmail.com, andy.shevchenko@gmail.com, 
-	andy@kernel.org, brauner@kernel.org, brendan.higgins@linux.dev, 
-	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com, 
-	dvyukov@google.com, ebiggers@kernel.org, elver@google.com, glider@google.com, 
-	gregkh@linuxfoundation.org, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
-	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
-	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, lukas@wunner.de, mcgrof@kernel.org, rmoar@google.com, 
-	shuah@kernel.org, sj@kernel.org, skhan@linuxfoundation.org, 
-	tarasmadan@google.com, wentaoz5@illinois.edu
+References: <20260302-qcom-qce-cmd-descr-v11-0-4bf1f5db4802@oss.qualcomm.com>
+ <scr5qvxa7f7k22pms4c6k5gwiky7lhssrw6qryfngexlek44g2@rayinnnwqgbt>
+ <aalwMwN3qMlzrql5@linaro.org> <CAMRc=MfjknN1AYF_NPLzR0YbdWuoET25D9o0zsvx56VN+u59HQ@mail.gmail.com>
+ <aamIf8JethKzLW93@linaro.org> <CAMRc=Mf=NjCqf0eqmM800Q3MEUC48V_DZ3ts6+4=qMCtrbvzzQ@mail.gmail.com>
+ <aamsL4uh58Fv5een@linaro.org>
+In-Reply-To: <aamsL4uh58Fv5een@linaro.org>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Fri, 6 Mar 2026 12:07:54 +0100
+X-Gmail-Original-Message-ID: <CAMRc=MfMJzVrRBo0kbgDbznRexFn2bc6GBkNh75k3L4Kw25VJg@mail.gmail.com>
+X-Gm-Features: AaiRm50SYPFbrtvBCgqbAD5XV2pariKnEghQc2LIPzo-Ehg13xkHUxUA3b9Bzso
+Message-ID: <CAMRc=MfMJzVrRBo0kbgDbznRexFn2bc6GBkNh75k3L4Kw25VJg@mail.gmail.com>
+Subject: Re: [PATCH RFC v11 00/12] crypto/dmaengine: qce: introduce BAM
+ locking and use DMA for register I/O
+To: Stephan Gerhold <stephan.gerhold@linaro.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
+	Md Sadre Alam <mdalam@qti.qualcomm.com>, Dmitry Baryshkov <lumag@kernel.org>, 
+	Peter Ujfalusi <peter.ujfalusi@gmail.com>, Michal Simek <michal.simek@amd.com>, 
+	Frank Li <Frank.Li@kernel.org>, dmaengine@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, Bjorn Andersson <andersson@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Ethan,
-
-Thanks for the detailed explanation.
-
-Would it be fair to say that KFuzzTest is not well suited for testing
-kernel functions that are heavily influenced by or have a significant
-impact on kernel state?
-
-I agree with your point that "the goal of the framework is to fuzz real
-functions with realistic inputs." One thing I've been thinking about,
-though, is how we determine what counts as "realistic" input for a given
-function. If the generated inputs that a function would never actually
-receive in practice, we'd likely end up chasing false-positive crashes
-that don't represent real bugs.
-
-Thanks,
-Jiakai
-
-
-On Fri, Mar 6, 2026 at 6:29=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gmail=
-.com> wrote:
+On Thu, Mar 5, 2026 at 5:16=E2=80=AFPM Stephan Gerhold
+<stephan.gerhold@linaro.org> wrote:
 >
-> On Fri, Mar 6, 2026 at 10:45=E2=80=AFAM Jiakai Xu <jiakaipeanut@gmail.com=
-> wrote:
 > >
-> > Hi Ethan and all,
->
-> Hi Jiakai
->
-> > I've been reading the KFuzzTest documentation patch (v4 3/6) with great
-> > interest. I have some questions about the scope and applicability of th=
-is
-> > framework that I'd like to discuss with the community.
+> > You'd think so but the HPG actually does use the word "dummy" to
+> > describe the write operation with lock/unlock bits set. Though it does
+> > not recommend any particular register to do it.
 > >
-> > The documentation states:
-> > > It is intended for testing stateless or low-state functions that are
-> > > difficult to reach from the system call interface, such as routines
-> > > involved in file format parsing or complex data transformations.
-> >
-> > I'm trying to better understand what qualifies as a "stateless or
-> > low-state function" in the kernel context. How do we define or identify
-> > whether a kernel function is stateless or low-state?
-> >
-> > Also, I'm curious - what proportion of kernel functions would we
-> > estimate falls into this category?
 >
-> I would define it based on "practical heuristics". A function is probably=
- a
-> good candidate for KFuzzTest if it fits these loose criteria:
+> I guess the documentation I'm looking at (8.7.3.4 BAM operation in the
+> public APQ8016E TRM) might be an excerpt from some older version of the
+> BAM HPG. Is also has a note about "dummy" command descriptors:
 >
-> - Minimal setup: KFuzzTest currently supports blob-based fuzzing, so the
->   function should consume raw data (or a thin wrapper struct) and not
->   require a complex web of pre-initialized objects or deep call-chain
->   prerequisites.
-> - Manageable teardown: if the function allocates memory or creates
->   objects, the fuzzing harness must be able to cleanly free or revert
->   that state before the next iteration. An example of this can be found
->   in the pkcs7 example in patch 5/6 [1].
-> - Non-destructive global impact: it's okay if the function touches global
->   state in minor ways (e.g., writing to the OID registry logs as is done
->   by the crypto/ functions that are fuzzed by the harnesses in patch 5/6)=
-,
->   but what matters is that the kernel isn't left in a broken state before=
- the
->   next fuzzing iteration, meaning no leaked global locks, no corrupted
->   shared data structures, and no deadlocks.
+>   "NOTE: Pipe locking and unlocking should appear only in
+>    command-descriptor. In case a lock is required on a data descriptor
+>    this can be implemented by a dummy command descriptor with
+>    lock/unlock bit asserted preceding/following the data descriptor."
 >
-> These loose criteria are just suggestions, as you can technically fuzz
-> anything that you want to - KFuzzTest won't stop you. The danger is
-> that the kernel isn't designed to have raw userspace inputs shoved
-> into deep stateful functions out of nowhere. If a harness or function
-> relies on complex ad-hoc state management or strict preconditions,
-> fuzzing it out of context will likely just result in false positives, pan=
-ics,
-> and ultimately bogus harnesses.
+> This one doesn't make any difference between READ and WRITE command
+> descriptors (and both are documented in the chapter).
 >
-> The goal of the framework is to fuzz real functions with realistic inputs
-> without accidentally breaking other parts of the kernel that the function
-> wasn't meant to touch. Therefore ideal targets (like the PKCS7 example)
-> are ones with minimal setup (just passing a blob), have manageable
-> teardown (like freeing a returned object on success) and don't
-> destructively impact global state (even if they do minor things like
-> printing to logs).
+> Personally, I would prefer using a read over a write if possible. Unless
+> you can confirm that the register used for the dummy write is actually
+> read-only *and* write-ignore, writing to the register is essentially
+> undefined behavior. It will probably do the right thing on most
+> platforms, but there could also be one out there where writing to the
+> register triggers an error or potentially even silently ends up writing
+> into another register. Register logic can be fun in practice, commit
+> e9a48ea4d90b ("irqchip/qcom-pdc: Workaround hardware register bug on
+> X1E80100") [1] is a good example of that. :')
 >
-> That said, I'm curious to see what you come up with! I'm sure there are
-> other use cases that I haven't thought of.
->
-> [1] PKCS7 message parser fuzzing harness:
-> https://lore.kernel.org/all/20260112192827.25989-6-ethan.w.s.graham@gmail=
-.com/
+> [1]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/c=
+ommit/?id=3De9a48ea4d90be251e0d057d41665745caccb0351
+
+I agree in general but I also learned from the QCE team at Qualcomm
+that apparently there were some issues with register reads over DMA,
+which makes writes preferable. While the VERSION register is
+officially read-only, I've been told writing to it is safe. So it's a
+choice between doing a READ that may not work on some platforms and
+doing a WRITE that may theoretically not work on some platforms.
+
+I'll send v12 which will be a proper series with using register
+metadata and correctly freeing resources and we can rediscuss. Doing
+one or the other is actually a minor details of the whole thing after
+all.
+
+Bart
