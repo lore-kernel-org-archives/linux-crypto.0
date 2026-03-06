@@ -1,174 +1,133 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7AA20C461
-	for <linux-crypto@vger.kernel.org>; Fri,  6 Mar 2026 06:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A02D34A3B4
+	for <linux-crypto@vger.kernel.org>; Fri,  6 Mar 2026 09:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772779389; cv=none; b=nssoFkYxdzMNvMXfbnbLth6/lvlXgf9YEoBtCbhjuCqD3SOMaO0ndw7MH6H7ZUTEM4e0eTohDP+MFr/DJGsmYunYsMOpsV4qi/K0QiQSH/Qke1ebjB1FWOLV5BavCbIxUi+Ft+W1Z8qFaekZ8ETjTmGCV+UXDkJU+P5Y9awb5IM=
+	t=1772790323; cv=none; b=QFardU+wyQTxIyMEEfgXYO4buxuBVjVtRnZmfLAyHQjgjFXU6wLVfXu3AkFXngGuxnfgl5AYRkwxBkjTQGHnODSCKYnv02TUFJvs7OLV7Qgwzo3EcUbGUQphzWaeBQZHjBH45HC3bVjP5G1ypo+HvBXp6z98T/wzE+C+R9aqxWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772779389; c=relaxed/simple;
-	bh=WTSm68jH8PQSZso+MBpBdL/R1lZqKRsqj7qp1sf6HQA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pxpiZHt8ju3L+Gf3CHwrwmxIJUIcTFy8uveVeHpBvtKiQtNXWp8vi+qnHWBIsuc9WFCDPjaAq7xe6yWJ9UcLTkRB9iAFSUynNe5qlrIrqsIQ9PY3ZkCtpwdKz5hv+/mBe4GqskKG90ITEnjPqJDDF/dTY8Px+IZyRFgtgMY6rAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=egsJ39M4; arc=none smtp.client-ip=209.85.216.44
+	s=arc-20240116; t=1772790323; c=relaxed/simple;
+	bh=wS1qxKCchhjtDwRNXR6jv/SqzMa5hcVlBO3c/OsKvrQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=kSRFBXsvXplFsQSpNEqn7D5olUqb8eTv6ya/iqz5jKPG4dS54NWCcGzifwHovDWJO4RF8cqGmoc6Ulg4uTi4IosmqiZL+lbb1yJ8Afc0WemPyvkr/WviKWVj8gRfIlkP13g3wTuvEVrc6OHy2fZSw/ocNADbkPMBJlv5WifSAHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRpLJ8GR; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="egsJ39M4"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-3598df39444so3237804a91.2
-        for <linux-crypto@vger.kernel.org>; Thu, 05 Mar 2026 22:43:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRpLJ8GR"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82976220e97so1585902b3a.3
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Mar 2026 01:45:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772779388; x=1773384188; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=11+RTC5t0MsdYzyhRjOIFhJd9Jd2+UWG3tuKjDCny7k=;
-        b=egsJ39M4uerykHgLQsaysYmlzVq8jTAWdu/lcXX4naaPKi8CK8gClnXw9+yQtMN2zg
-         TvmzYt6/yAu6MMhl1oRqEjvOxe50yE62Fn4LZg4V3rekzaLeQ5Fe+oF/9sA5StsTKg/4
-         1nzKb0plMieUVqyI/XKvexdbHw3WVNcWTbs1gg1PJfHKnzjf1+4lAofG7btS/fdc5Mkv
-         wWOFpVzSRCjScuIoqyg5DQexhcBmO+asgt3NMDiEYDuJCCkaK57n2eC5WYvBoQUTHD1x
-         5zJJyO0Dhs87piNzGLD8+aMwgtovQAO0EF+3P56ytqoFzkBfzvzPpbxa7x7VQVcSF7fv
-         m/tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772779388; x=1773384188;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1772790322; x=1773395122; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=11+RTC5t0MsdYzyhRjOIFhJd9Jd2+UWG3tuKjDCny7k=;
-        b=YAY7ozqLMtC2OnVDzsE8tJavzmfkHhc9nCCrqzrI/AotcMd8OKvNG1AXAmNBnqPbZN
-         EvS/YjX0lmOQs94sbl4hzKchN00CHeuiF3l2GQAYG5b+9DtFX0WQrUyNRH9xdyd7FKhD
-         cZY7NI+nPKFKpUU88SqtBbQEGtuZhXq4V0bPck2Ip6iqVFLjpFMHZJuAmMGHiUEvGHOt
-         TkOLInOJVMVstIvwp0QHuvvczYU498v678BxBjAEdUZF1XpXlGrW83kyqz007/nrOvWS
-         KKz0S/BpLGtFwXhoE8z3Di0R0ezSR3j2srZH6v2FVI5cu2XvuCgJWw11d9ezrlyjGcSA
-         oGMg==
-X-Forwarded-Encrypted: i=1; AJvYcCXkiPAw+f0QrwOpWc9OqU6xh6JlSXykVfR9ChUjAmXLzqf4zv+36HSNGl8rKtz2fFM2kf5g9OFbKlFLYtw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEqv3VsK49AxRFQH/tYLeh0+wBPWr9DA5qYYHYkzm+wPK2A0nr
-	P3hCoBby1qowtRN69HhFP8+o+qCSsltO4bFJa/FMLFA4bx6rQZKbys9P
-X-Gm-Gg: ATEYQzyJOSnR7z+IdG/uSD5v3oTPCdpeXQiRfye8oFYrnmrK0MYjJDUzrQ8OFE19oD2
-	xbNbb1QPlsbGUQTieaEuwkRDz5q1nPwnWvcg1I8iAdetRs9YcqAUt980rpGPFdksxFTnHUtC+W7
-	d5fF6CK+DNGRPNyAY+6Jq/iGl1GOoyNlCHp87r9bVH9ArNSN3o1hPrqE3yXzOso1tJqKWD5rq7I
-	QHAB/dCxUShIvsMAF7vf0z84c2XXJENv3gJM8tNUWE2QA2pEbh7bCquV33964RnWXGsk7CiMlaI
-	LumC14Tp1yXgJX6eDba9iOLXFFmu/dmblPjoKC07Eg18qnnrJ/L2ANmhTPOU2b/uCZ9+LdyQXrR
-	wNYLg+S/EpOtZFJO1v6oELBHf0jdmnOjyRaivOOAtP038evRcS7sIph8GIUcT/r83Is5JUFXLz1
-	zT+U9MOo7sUe21o20qVncO3s/AiWGHOw==
-X-Received: by 2002:a17:902:da8a:b0:2ae:450c:951e with SMTP id d9443c01a7336-2ae82388a53mr13181935ad.17.1772779387493;
-        Thu, 05 Mar 2026 22:43:07 -0800 (PST)
-Received: from arm-server.. ([2001:288:7001:2724:1a31:bfff:fe58:b622])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae840b2e9dsm11892375ad.85.2026.03.05.22.43.05
+        bh=wS1qxKCchhjtDwRNXR6jv/SqzMa5hcVlBO3c/OsKvrQ=;
+        b=eRpLJ8GR3N/DESL1Zv2QogEs2UkUOSCFQySNIutUPimJ6BuCFg+d8LcFAc1zaWJl68
+         w84DxURWOHMBvLfoK/0I3VjtGxaVA/yBwTv+RQryVwD+jvgD7b8EJX79LXNFxpr1jJrU
+         H8NXJNuekFZiK0TTYwb+KSf0/eWK9/didy3Ndrf/DM2GN4QqqNtUpF5SM1nTmeX2q8r4
+         b8OyN53uQL2ArEO/HCIYkQHQSx7mUGj8pvhdrOToFns/Z+DaDTIPwmj5UzzOuOjlhPJZ
+         g5hWC9BGMBRQWrhPrEIirzpL1dHMGiN4wBdrPCkVP9xiOtLcicrv8VeojXOk9014f6TF
+         Q2EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772790322; x=1773395122;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=wS1qxKCchhjtDwRNXR6jv/SqzMa5hcVlBO3c/OsKvrQ=;
+        b=Sjfnixm7zjWTCgvG18fNApIv19iUId9mgaos6SBEQY1k4sdUvScsC6OqGB7iUQU3kV
+         +2Gx+cpUBtrbsko20U8FGwUVsYA0GMkxbrOfbaWjU8GHbzu3HkUD/wsLXTdnZ0B86yoV
+         RxIc/nm0ctM4eGZdDYPf/Pvc97BfckzHtt+NXrpDgPwLa7695kqgKNQu28cJnAdwEkvm
+         +iQcTCKtBRGalNrNFQf2UIuk+8Npm0QlqjjSltPlcsk+rZtf2UNaWPX46u9yF8/MuA0E
+         nrMzhvUPChjCYsCO7RMbsVNg/S/aXdb/rUAlk7wX3XAz2lvLkINxybqEj/2cjY1oKkNc
+         QDkg==
+X-Forwarded-Encrypted: i=1; AJvYcCV6WZid4BFJpV78E4bF3sCpuouUS5JmAiWlAhNb1v0uf3+qpvHveYRx9S3X5WDvObjm63kSpfWjOiY3CXg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2KG9jdYHzkaQ0L3RdrVz3J+A++YKzULzELEj7A/AUdQB4uBit
+	cKucmtTS8RZx5KG0OfcTFHcITd0DY1XwI6QSrEr5McheqpHaksMgw1cy
+X-Gm-Gg: ATEYQzyW5aFe0cFrz9uzLmuX0llKGW8ck3CdlB99UaPRokdGlfiAA2zosPv0CtK7xQT
+	2e4tJl76agTKF9zswv0ld/gNB5TfAkT24s3HnP/ZOfJp/rkaQ+Wsqhw5NXPb9eiwaHnhnRUt+yn
+	nFuaTfR0BGCup328QvxLJHe9Ipj3zjiF5NZDE2eRe3Zs6N1v7gy31myCU0tyHiZYOzWF9pr0D00
+	lL048WOf+4Dve0eqQJXFHLU6ZdEPItczlkaPx5BDPxnpRKxZu5Xg6eqpuVYt2vyUXpD2xH8CTFW
+	cfZEKR5NMmBLBNTczhsCiqcKUspTtC1ShZdirfwYT+ko5hBfb0Xwt15knuYVe+yaPFWMgs8WjiR
+	qrXxbOyHGpNyRAM7VYyeTonCNISo/9XD6dotKs/jbMdNzAQcCgv3gPfj4zFoJFoP1RyLc0XeOon
+	A41YPsZmZBZWLhYYuzQdgbxCaFJHF0Smzy6ihi19zq6PNH
+X-Received: by 2002:a05:6a21:a43:b0:393:c4d:be50 with SMTP id adf61e73a8af0-39858fda4a6mr1885603637.16.1772790321826;
+        Fri, 06 Mar 2026 01:45:21 -0800 (PST)
+Received: from localhost.localdomain ([210.73.43.101])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c739e0cb598sm1080738a12.13.2026.03.06.01.45.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 22:43:07 -0800 (PST)
-From: Cheng-Yang Chou <yphbchou0911@gmail.com>
-To: herbert@gondor.apana.org.au,
+        Fri, 06 Mar 2026 01:45:21 -0800 (PST)
+From: Jiakai Xu <jiakaipeanut@gmail.com>
+X-Google-Original-From: Jiakai Xu <jiakaiPeanut@gmail.com>
+To: ethan.w.s.graham@gmail.com
+Cc: akpm@linux-foundation.org,
+	andreyknvl@gmail.com,
+	andy.shevchenko@gmail.com,
+	andy@kernel.org,
+	brauner@kernel.org,
+	brendan.higgins@linux.dev,
 	davem@davemloft.net,
-	catalin.marinas@arm.com,
-	will@kernel.org,
+	davidgow@google.com,
+	dhowells@redhat.com,
+	dvyukov@google.com,
 	ebiggers@kernel.org,
+	elver@google.com,
+	glider@google.com,
+	gregkh@linuxfoundation.org,
+	herbert@gondor.apana.org.au,
+	ignat@cloudflare.com,
+	jack@suse.cz,
+	jannh@google.com,
+	johannes@sipsolutions.net,
+	kasan-dev@googlegroups.com,
+	kees@kernel.org,
+	kunit-dev@googlegroups.com,
 	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: jserv@ccns.ncku.edu.tw,
-	yphbchou0911@gmail.com
-Subject: [PATCH v2] crypto: arm64/aes-neonbs - Move key expansion off the stack
-Date: Fri,  6 Mar 2026 14:42:54 +0800
-Message-ID: <20260306064254.2079274-1-yphbchou0911@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	lukas@wunner.de,
+	mcgrof@kernel.org,
+	rmoar@google.com,
+	shuah@kernel.org,
+	sj@kernel.org,
+	skhan@linuxfoundation.org,
+	tarasmadan@google.com,
+	wentaoz5@illinois.edu
+Subject: Question about "stateless or low-state functions" in KFuzzTest doc
+Date: Fri,  6 Mar 2026 17:44:58 +0800
+Message-Id: <20260306094459.973-1-jiakaiPeanut@gmail.com>
+X-Mailer: git-send-email 2.35.1.windows.2
+In-Reply-To: <20260112192827.25989-4-ethan.w.s.graham@gmail.com>
+References: <20260112192827.25989-4-ethan.w.s.graham@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-aesbs_setkey() and aesbs_cbc_ctr_setkey() allocate struct crypto_aes_ctx
-on the stack. On arm64, the kernel-mode NEON context is also stored on
-the stack, causing the combined frame size to exceed 1024 bytes and
-triggering -Wframe-larger-than= warnings.
-
-Allocate struct crypto_aes_ctx on the heap instead and use
-kfree_sensitive() to ensure the key material is zeroed on free.
-Use a goto-based cleanup path to ensure kfree_sensitive() is always
-called.
-
-Signed-off-by: Cheng-Yang Chou <yphbchou0911@gmail.com>
----
-Changes in v1:
-- Replace memzero_explicit() + kfree() with kfree_sensitive()
-  (Eric Biggers)
-- Link to v1: https://lore.kernel.org/all/20260305183229.150599-1-yphbchou0911@gmail.com/
-
- arch/arm64/crypto/aes-neonbs-glue.c | 37 ++++++++++++++++++-----------
- 1 file changed, 23 insertions(+), 14 deletions(-)
-
-diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
-index cb87c8fc66b3..00530b291010 100644
---- a/arch/arm64/crypto/aes-neonbs-glue.c
-+++ b/arch/arm64/crypto/aes-neonbs-glue.c
-@@ -76,19 +76,24 @@ static int aesbs_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
- 			unsigned int key_len)
- {
- 	struct aesbs_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct crypto_aes_ctx rk;
-+	struct crypto_aes_ctx *rk;
- 	int err;
- 
--	err = aes_expandkey(&rk, in_key, key_len);
-+	rk = kmalloc(sizeof(*rk), GFP_KERNEL);
-+	if (!rk)
-+		return -ENOMEM;
-+
-+	err = aes_expandkey(rk, in_key, key_len);
- 	if (err)
--		return err;
-+		goto out;
- 
- 	ctx->rounds = 6 + key_len / 4;
- 
- 	scoped_ksimd()
--		aesbs_convert_key(ctx->rk, rk.key_enc, ctx->rounds);
--
--	return 0;
-+		aesbs_convert_key(ctx->rk, rk->key_enc, ctx->rounds);
-+out:
-+	kfree_sensitive(rk);
-+	return err;
- }
- 
- static int __ecb_crypt(struct skcipher_request *req,
-@@ -133,22 +138,26 @@ static int aesbs_cbc_ctr_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
- 			    unsigned int key_len)
- {
- 	struct aesbs_cbc_ctr_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct crypto_aes_ctx rk;
-+	struct crypto_aes_ctx *rk;
- 	int err;
- 
--	err = aes_expandkey(&rk, in_key, key_len);
-+	rk = kmalloc(sizeof(*rk), GFP_KERNEL);
-+	if (!rk)
-+		return -ENOMEM;
-+
-+	err = aes_expandkey(rk, in_key, key_len);
- 	if (err)
--		return err;
-+		goto out;
- 
- 	ctx->key.rounds = 6 + key_len / 4;
- 
--	memcpy(ctx->enc, rk.key_enc, sizeof(ctx->enc));
-+	memcpy(ctx->enc, rk->key_enc, sizeof(ctx->enc));
- 
- 	scoped_ksimd()
--		aesbs_convert_key(ctx->key.rk, rk.key_enc, ctx->key.rounds);
--	memzero_explicit(&rk, sizeof(rk));
--
--	return 0;
-+		aesbs_convert_key(ctx->key.rk, rk->key_enc, ctx->key.rounds);
-+out:
-+	kfree_sensitive(rk);
-+	return err;
- }
- 
- static int cbc_encrypt(struct skcipher_request *req)
--- 
-2.48.1
-
+Hi Ethan and all,=0D
+=0D
+I've been reading the KFuzzTest documentation patch (v4 3/6) with great =0D
+interest. I have some questions about the scope and applicability of this =
+=0D
+framework that I'd like to discuss with the community.=0D
+=0D
+The documentation states:=0D
+> It is intended for testing stateless or low-state functions that are =0D
+> difficult to reach from the system call interface, such as routines =0D
+> involved in file format parsing or complex data transformations.=0D
+=0D
+I'm trying to better understand what qualifies as a "stateless or =0D
+low-state function" in the kernel context. How do we define or identify =0D
+whether a kernel function is stateless or low-state?=0D
+=0D
+Also, I'm curious - what proportion of kernel functions would we =0D
+estimate falls into this category?=0D
+=0D
+Any insights would be greatly appreciated!=0D
+=0D
+Thanks,=0D
+Jiakai=
