@@ -1,38 +1,70 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81EF02FB97B;
-	Fri,  6 Mar 2026 13:36:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2DC35E93E;
+	Fri,  6 Mar 2026 15:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772804162; cv=none; b=kb6rmjEg8Gu9qF/Ix34lw0eRwfxA56PcmyqkMP83iwgUg/+gg5WXef1DyRI83GXYn7xSFaxuwLAlfXzeGGFHJcGsz3AXfc5lJdPPPwrOz9h6UsPm9eCyCM98lPMzmqfrQl4Dj2/YEazHX8nsCLwldC3VlLrJqQItJSM0J7sQ58k=
+	t=1772810382; cv=none; b=U0TI5iQhDJ9mw1PIOmyvHXrXDqIWNz3ZrsLNll+uOTfizFoUXMrwjZ2OHzBingH2kFmyTJJkmQHs95RjPBiJRWa/h+Njgj3HO2KOWwANXJmJQMFWxfXD6zqS1kmdPP9LaExlK4FoGOnWCAwaqtLf3n9455EaI9sqX2XJmE38efQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772804162; c=relaxed/simple;
-	bh=TWDXtJWdxpOQeGtw/5t2k2HNsAK+Wlpw4wGXYUyDegg=;
+	s=arc-20240116; t=1772810382; c=relaxed/simple;
+	bh=v3LKzXkodj+l36OKp4RxCqnK9t1FiiIFsZZAQCR36zY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g8011agfF8TcphEy2CO0HHnmDxwIo7GEjtNctvduTOmahy4jXhyZbOaR+MqTQrUMIUoTEYb58VSbkbXa2kLb8cux3zJ69blUSJDtkohE5wKE6NtqFsFavZu85EfRcC9L5MKep4otk8S/d3f1wVAixPO5552iza+w3oAC0XLwNhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIo3o4OB; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZxEbtfazt8g7PaX4NceA+nwP+rx8ipwgroWvZNapj7BIz7COPgWy9i26ZZPamatm57MDrdsckvus+5yIPKhLDQDXFh6rGZjh8rqMpVsp5Qhre0/t4D1xNprLrZ3vB35AOzRah5r+a1DI1D7npmqDyCiidm3milse7r61ZkEBX6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=OMx32v+z; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIo3o4OB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B93CC4CEF7;
-	Fri,  6 Mar 2026 13:36:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772804162;
-	bh=TWDXtJWdxpOQeGtw/5t2k2HNsAK+Wlpw4wGXYUyDegg=;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="OMx32v+z"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3D96E40E00DA;
+	Fri,  6 Mar 2026 15:19:38 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id b9Ab6cX9k1Fv; Fri,  6 Mar 2026 15:19:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1772810369; bh=W5O495qAOhtPn0LOsows19z8Qw78XamX4AmZRX7hjBs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vIo3o4OB1dD7sZybxM+1696l84aWLmVXwtes2jvlyjJ+X7+JOkRrAgqCDv0QwwV+7
-	 lDVWzxGTbJ4gi4oeu0AYDpk7tV6cINoneTtFmDgJHKfdgzbXS2kAe3tryIDdOUaqU8
-	 tNWXeSi2sMlOVF5H53ilZKaTxUSC1Nne+7/07FhH/DNQ5+hTubFJOoBQO2Hs/3LzSU
-	 wkQT8ogQRECgsYe4JS15mrl33raXhxKiYPu9Ka0uQDqsNfjZJjMW1J10iyGzKqeT2u
-	 a8qtBo7cbLbExDNms/t9FNsx3owwv00ZX2eylKSzikdkMTxh8DDNNY5kmcKhmJvbQB
-	 ctgeNcL0RHeTQ==
-Date: Fri, 6 Mar 2026 13:35:58 +0000
-From: Lee Jones <lee@kernel.org>
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] mfd: loongson-se: Add multi-node support
-Message-ID: <20260306133558.GL183676@google.com>
-References: <20260226102225.19516-1-zhaoqunqin@loongson.cn>
+	b=OMx32v+zrjQfoYchuF3hG1CNfGktt9l7c0T4vOVOC8fPuSZ/LmsoX62THQBws8Mqt
+	 XR63izvAzOiGJy4IE0xwD7kS+PG4f6feoNsi18mGIiof4LXfzjpyUWVIObzfF8A1zs
+	 RkPlYf8rUfcPor1KYFZ8ylz/UvxKE5+183u6feaA3ZbqzWh3nf7j2vAD5EpIIphh8S
+	 X5ciZWmZZLFd8r2RsQCtifjvsRHa7rIt6WHb4TyfBcJJFa3gSCM8zKoQ/sVdB92iLa
+	 w0iJcj5n7Zcdg0LKMwmxGt336rF9mwwkdDu6/UUBh/BktNEJa5B0qQIalaYzKAnmR+
+	 5PZ7Llz66EOywXQOiUu2XoYq64/tovlq3xoIKg6vBMjwO+D32p6IU2Ll+4BsuR0aSc
+	 nq38JZ2fMWruACgSABQUCQB7Jycc1unRTulk66EymGMMADNMheJCTgQt0PFuND2Y+d
+	 95NxkQsdyPWeYFI51pvkElDJpUbZ5TtCsaJ+EYnnakZbcR42wTsFdXa4yw3jGASN7D
+	 UxiwJ/tfyTZSkcdGbbsrE8cd9XTa5KRkXZx9guFdyuKtrvj9TuVlyJ2C0LIYlt1Ovl
+	 POfz326u/KgkKuw39pR2ETnYa65xyMEB0n7oIix2tko3P8nn6GNkMUNZKssKdSduyR
+	 V7SznCDyP3y0PBliniu/+lYw=
+Received: from zn.tnic (pd9530d5e.dip0.t-ipconnect.de [217.83.13.94])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 450F240E00DE;
+	Fri,  6 Mar 2026 15:18:56 +0000 (UTC)
+Date: Fri, 6 Mar 2026 16:18:49 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	peterz@infradead.org, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
+	Nathan.Fontenot@amd.com, jackyli@google.com, pgonda@google.com,
+	rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
+	pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
+	dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com,
+	darwi@linutronix.de, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev
+Subject: Re: [PATCH v2 2/7] x86/sev: add support for enabling RMPOPT
+Message-ID: <20260306151849.GJaarwWSaWnnRh9ffB@fat_crate.local>
+References: <cover.1772486459.git.ashish.kalra@amd.com>
+ <85aec55af41957678d214e9629eb6249b064fa87.1772486459.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,135 +73,71 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260226102225.19516-1-zhaoqunqin@loongson.cn>
+In-Reply-To: <85aec55af41957678d214e9629eb6249b064fa87.1772486459.git.ashish.kalra@amd.com>
 
-On Thu, 26 Feb 2026, Qunqin Zhao wrote:
-
-> On the Loongson platform, each node is equipped with a security engine
-> device. However, due to a hardware flaw, only the device on node 0 can
-> trigger interrupts. Therefore, interrupts from other nodes are forwarded
-> by node 0. We need to check in the interrupt handler of node 0 whether
-> this interrupt is intended for other nodes.
+On Mon, Mar 02, 2026 at 09:35:55PM +0000, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
 > 
-> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-> ---
->  drivers/mfd/loongson-se.c       | 38 +++++++++++++++++++++++++++------
->  include/linux/mfd/loongson-se.h |  3 +++
->  2 files changed, 35 insertions(+), 6 deletions(-)
+> The new RMPOPT instruction sets bits in a per-CPU RMPOPT table, which
+> indicates whether specific 1GB physical memory regions contain SEV-SNP
+
+"... which indicate... "
+
+> guest memory.
 > 
-> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-> index 3902ba377..40e18c212 100644
-> --- a/drivers/mfd/loongson-se.c
-> +++ b/drivers/mfd/loongson-se.c
-> @@ -37,6 +37,9 @@ struct loongson_se_controller_cmd {
->  	u32 info[7];
->  };
->  
-> +static DECLARE_COMPLETION(node0);
-> +static struct loongson_se *se_node[SE_MAX_NODES];
+> Per-CPU RMPOPT tables support at most 2 TB of addressable memory for
+> RMP optimizations.
+> 
+> Initialize the per-CPU RMPOPT table base to the starting physical
+> address. This enables RMP optimization for up to 2 TB of system RAM on
+> all CPUs.
 
-Really not keen on global variables.
+...
 
-Why are they _needed_?
+> +static void __configure_rmpopt(void *val)
+> +{
+> +	u64 rmpopt_base = ((u64)val & PUD_MASK) | MSR_AMD64_RMPOPT_ENABLE;
+> +
+> +	wrmsrq(MSR_AMD64_RMPOPT_BASE, rmpopt_base);
+> +}
+> +
+> +static __init void configure_and_enable_rmpopt(void)
 
->  static int loongson_se_poll(struct loongson_se *se, u32 int_bit)
->  {
->  	u32 status;
-> @@ -133,8 +136,8 @@ EXPORT_SYMBOL_GPL(loongson_se_init_engine);
->  static irqreturn_t se_irq_handler(int irq, void *dev_id)
->  {
->  	struct loongson_se *se = dev_id;
-> -	u32 int_status;
-> -	int id;
-> +	u32 int_status, node_irq = 0;
-> +	int id, node;
->  
->  	spin_lock(&se->dev_lock);
->  
-> @@ -147,6 +150,11 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
->  		writel(SE_INT_CONTROLLER, se->base + SE_S2LINT_CL);
->  	}
->  
-> +	if (int_status & SE_INT_OTHER_NODE) {
-> +		int_status &= ~SE_INT_OTHER_NODE;
-> +		node_irq = 1;
+If the sub-helper is called __configure_rmpopt() then this should be called
+"configure_rmpopt", without the prepended underscores.
+
+> +	phys_addr_t pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), PUD_SIZE);
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT)) {
+> +		pr_debug("RMPOPT not supported on this platform\n");
+> +		return;
 > +	}
 > +
->  	/* For engines */
->  	while (int_status) {
->  		id = __ffs(int_status);
-> @@ -157,6 +165,14 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
->  
->  	spin_unlock(&se->dev_lock);
->  
-> +	if (node_irq) {
-> +		writel(SE_INT_OTHER_NODE, se->base + SE_S2LINT_CL);
-> +		for (node = 1; node < SE_MAX_NODES; node++) {
-> +			if (se_node[node])
-> +				se_irq_handler(irq, se_node[node]);
-> +		}
+> +	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP)) {
+> +		pr_debug("RMPOPT optimizations not enabled as SNP support is not enabled\n");
+> +		return;
 > +	}
+
+Zap this one - snp_rmptable_init() already checked it.
+
+Also, zap those pr_debugs - you have that information elsewhere already.
+
 > +
->  	return IRQ_HANDLED;
->  }
->  
-> @@ -189,6 +205,7 @@ static int loongson_se_probe(struct platform_device *pdev)
->  	struct loongson_se *se;
->  	int nr_irq, irq, err, i;
->  	dma_addr_t paddr;
-> +	int node = dev_to_node(dev);
->  
->  	se = devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
->  	if (!se)
-> @@ -213,9 +230,16 @@ static int loongson_se_probe(struct platform_device *pdev)
->  
->  	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
->  
-> -	nr_irq = platform_irq_count(pdev);
-> -	if (nr_irq <= 0)
-> -		return -ENODEV;
-> +	if (node == 0 || node == NUMA_NO_NODE) {
-> +		nr_irq = platform_irq_count(pdev);
-> +		if (nr_irq <= 0)
-> +			return -ENODEV;
-> +	} else {
-> +		/* Only the device on node 0 can trigger interrupts */
-> +		nr_irq = 0;
-> +		wait_for_completion_interruptible(&node0);
-> +		se_node[node] = se;
+> +	if (!(rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED)) {
+
+You can't test this one - you need to test the result of
+setup_segmented_rmptable() and whether it did set up the segmented RMP
+properly. Only then you can continue here.
+
+> +		pr_info("RMPOPT optimizations not enabled, segmented RMP required\n");
+
+This looks like pr_notice() to me.
+
+> +		return;
 > +	}
->  
->  	for (i = 0; i < nr_irq; i++) {
->  		irq = platform_get_irq(pdev, i);
-> @@ -228,7 +252,9 @@ static int loongson_se_probe(struct platform_device *pdev)
->  	if (err)
->  		return err;
->  
-> -	return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
-> +	complete_all(&node0);
-> +
-> +	return devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO, engines,
->  				    ARRAY_SIZE(engines), NULL, 0, NULL);
->  }
->  
-> diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson-se.h
-> index 07afa0c25..a80e06eb0 100644
-> --- a/include/linux/mfd/loongson-se.h
-> +++ b/include/linux/mfd/loongson-se.h
-> @@ -20,6 +20,9 @@
->  
->  #define SE_INT_ALL			0xffffffff
->  #define SE_INT_CONTROLLER		BIT(0)
-> +#define SE_INT_OTHER_NODE		BIT(31)
-> +
-> +#define SE_MAX_NODES			8
->  
->  #define SE_ENGINE_MAX			16
->  #define SE_ENGINE_RNG			1
-> -- 
-> 2.47.2
-> 
 
 -- 
-Lee Jones [李琼斯]
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
