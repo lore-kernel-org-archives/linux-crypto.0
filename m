@@ -1,115 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0776190473;
-	Fri,  6 Mar 2026 00:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9C11D47B4;
+	Fri,  6 Mar 2026 03:02:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772756426; cv=none; b=mZWgCTGxJuWPhRMucXUxeMmW+5sxNOl1J0BEdvh1SJ0JeK/x3DGlwBdOD5+Z+rW0ZkI7fRK3DcQV5AokndbvsmH2ZFaqZDQyCl/uJrtYLcCCDsjetHu0n5wdFybLiUMC5Ls+K/3gh7I1WaR4JYX4KGr2XHnBVbqYFFM8VGbTeUE=
+	t=1772766130; cv=none; b=jpBIKaWj184F/y8Sw+/TJQ+/nhit5Ow79EQZIwZh5FIWLN6H/r9Gfmqko+sm/oW4pzfrRTeLSBemqmNKnPf0UHiT8gslUjgaqyDqBhWMiyMn7Xu/H4KoUJ4J9vZeRBF3aQDBsn/SiqymkRa+Zx4eyjDMS2E/MylQMSdTw+/CA1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772756426; c=relaxed/simple;
-	bh=2m9nF0p0OdbUjR6hTYp5NFma5L+MqoxNyXQslnug9Fc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tpnUtuYcrBY3ozecCSUe+jUOpyU1ut7oxipumdshFFV3KdcVyYQigcgw39so2+F2TgFFhse+ZqIJYtIfASKEHYx+cf/XSTh3wn8XuPIGohrXmE8tbFNSrSiKj/oeNxbOEz0/QzExmf243QLc3n5H/KGzz9h2BbZI6KeaSCJ8c0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=THSO5Q3g; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772766130; c=relaxed/simple;
+	bh=cYsFBDxeH7XQgwnisJ0NeCTIUFF5JQeRIXRxNhQORrI=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=vDWzv/bscnL/wF20eGF3hkZAQwZFjI95dOd41uwaL0zRQW80avmRTG7Tm8WdSQv4CsGPXlvKkhPiy252oQ5t3vPJ9KzRXyurbUuRdY56nI6o4XbroSyF7uoEx6aAeCkhLnWcUlJTNP81mxoSVJUyKwEAasRyg7JUcuwfU6uXEW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=oAE1Db4M; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="THSO5Q3g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E5F4C116C6;
-	Fri,  6 Mar 2026 00:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772756425;
-	bh=2m9nF0p0OdbUjR6hTYp5NFma5L+MqoxNyXQslnug9Fc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=THSO5Q3gO+MhZrcgPJB4/Y/csZjJ01vCahW2vteLlFrdA0phpOd3BrxDtVERFaHZJ
-	 ibQyZCSEcFfjAkCt1LGZOFMAtqbJu0GaZkISKolot8EMMlF4TxtIUW2WtJ4s5wieya
-	 jfQZCRjUUw9FbZvtw6Npzy17LTwkqwXjTBGsEvd2qya/6EXSmjfLVcrxie/4MW4QdL
-	 L0gUBDogghcSwuZciit5qb0NceFMj05CnKf1gNY0Cn4+MMjzZ6c5w6w4yTDIgN2nMv
-	 Q/MujS+pJZ6kGWfZ4LpMKU931HNo5uUc2IXbeZFJCMiEnnWkxZbGCf8J2iwflzkgiB
-	 l7D8eujcvtLYQ==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: tests: Fix aes_cbc_macs dependency and add to kunitconfig
-Date: Thu,  5 Mar 2026 16:19:17 -0800
-Message-ID: <20260306001917.24105-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="oAE1Db4M"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
+	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
+	references:reply-to; bh=pARoOQjLnFAa6vgxr9eXH/gxQeXLKv6NBwNdsqsoofs=; b=oAE1D
+	b4MAIk74s8yMMOEYADDUml9sOIiJb3R6ZObTuJSnr/6FML9ZVnrmoaSQtoN9BY7Jn1wfv69czFcDr
+	93mrqZHfTgLwXVICe8/FAjeQYSNZ7vdHzDlGZmogtUZI8zwAhcO9172/s+RP4WW6K5WO08KKnuwLI
+	VQfVNHT0dbkT37+Gb+Ab4Wx7IM3ikaS4lt3zn98sgs0GBp1gz7xwxNVrU9VqwwDcR0q4N12R8ZvuJ
+	Pem12CPKbF1XXEY6X3QtLe6cUionaumW6qApFNlcT+Yt1tB+sbvlEarnpiJA1yJBQABB6qRbYyGYO
+	0TjJX4iwqtXGRVlOxqXP7ntO5qeiA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vyLRn-00BzF4-0h;
+	Fri, 06 Mar 2026 11:01:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Mar 2026 12:01:51 +0900
+Date: Fri, 6 Mar 2026 12:01:51 +0900
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 7.0
+Message-ID: <aapDn5mYeL861_6n@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Update the dependency of CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST to match the
-new convention established by commit 4478e8eeb871 ("lib/crypto: tests:
-Depend on library options rather than selecting them"), and add this
-test to the kunitconfig file added by commit 20d6f07004d6 ("lib/crypto:
-tests: Add a .kunitconfig file").
+Hi Linus:
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
+The following changes since commit 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f:
 
-This is targeting libcrypto-next.  This patch is needed because the
-aes_cbc_macs test is queued for 7.1 and wasn't handled by the commits
-mentioned above which were merged into 7.0.
- 
- lib/crypto/.kunitconfig  | 3 +++
- lib/crypto/tests/Kconfig | 3 +--
- 2 files changed, 4 insertions(+), 2 deletions(-)
+  Linux 7.0-rc1 (2026-02-22 13:18:59 -0800)
 
-diff --git a/lib/crypto/.kunitconfig b/lib/crypto/.kunitconfig
-index 6b2ce28ae509..8cfd213bded9 100644
---- a/lib/crypto/.kunitconfig
-+++ b/lib/crypto/.kunitconfig
-@@ -3,12 +3,14 @@ CONFIG_KUNIT=y
- # These kconfig options select all the CONFIG_CRYPTO_LIB_* symbols that have a
- # corresponding KUnit test.  Those symbols cannot be directly enabled here,
- # since they are hidden symbols.
- CONFIG_CRYPTO=y
- CONFIG_CRYPTO_ADIANTUM=y
-+CONFIG_CRYPTO_AES=y
- CONFIG_CRYPTO_BLAKE2B=y
- CONFIG_CRYPTO_CHACHA20POLY1305=y
-+CONFIG_CRYPTO_CMAC=y
- CONFIG_CRYPTO_HCTR2=y
- CONFIG_CRYPTO_MD5=y
- CONFIG_CRYPTO_MLDSA=y
- CONFIG_CRYPTO_SHA1=y
- CONFIG_CRYPTO_SHA256=y
-@@ -18,10 +20,11 @@ CONFIG_INET=y
- CONFIG_IPV6=y
- CONFIG_NET=y
- CONFIG_NETDEVICES=y
- CONFIG_WIREGUARD=y
- 
-+CONFIG_CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_BLAKE2B_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_BLAKE2S_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_CURVE25519_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_MD5_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_MLDSA_KUNIT_TEST=y
-diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index f6b842cad97e..0d71de3da15d 100644
---- a/lib/crypto/tests/Kconfig
-+++ b/lib/crypto/tests/Kconfig
-@@ -1,13 +1,12 @@
- # SPDX-License-Identifier: GPL-2.0-or-later
- 
- config CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST
- 	tristate "KUnit tests for AES-CMAC, AES-XCBC-MAC, and AES-CBC-MAC" if !KUNIT_ALL_TESTS
--	depends on KUNIT
-+	depends on KUNIT && CRYPTO_LIB_AES_CBC_MACS
- 	default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
- 	select CRYPTO_LIB_BENCHMARK_VISIBLE
--	select CRYPTO_LIB_AES_CBC_MACS
- 	help
- 	  KUnit tests for the AES-CMAC, AES-XCBC-MAC, and AES-CBC-MAC message
- 	  authentication codes.
- 
- config CRYPTO_LIB_BLAKE2B_KUNIT_TEST
+are available in the Git repository at:
 
-base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v7.0-p2
+
+for you to fetch changes up to d240b079a37e90af03fd7dfec94930eb6c83936e:
+
+  crypto: atmel-sha204a - Fix OOM ->tfm_count leak (2026-02-28 12:53:25 +0900)
+
+----------------------------------------------------------------
+This push contains the following changes:
+
+- Fix use-after-free in ccp.
+- Fix bug when SEV is disabled in ccp.
+- Fix tfm_count leak in atmel-sha204a.
+----------------------------------------------------------------
+
+Alper Ak (1):
+      crypto: ccp - Fix use-after-free on error path
+
+Ashish Kalra (1):
+      crypto: ccp - allow callers to use HV-Fixed page API when SEV is disabled
+
+Thorsten Blum (1):
+      crypto: atmel-sha204a - Fix OOM ->tfm_count leak
+
+ drivers/crypto/atmel-sha204a.c   |  5 +++--
+ drivers/crypto/ccp/sev-dev-tsm.c |  2 +-
+ drivers/crypto/ccp/sev-dev.c     | 10 ++++------
+ 3 files changed, 8 insertions(+), 9 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
