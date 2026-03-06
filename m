@@ -1,133 +1,170 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A02D34A3B4
-	for <linux-crypto@vger.kernel.org>; Fri,  6 Mar 2026 09:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772790323; cv=none; b=QFardU+wyQTxIyMEEfgXYO4buxuBVjVtRnZmfLAyHQjgjFXU6wLVfXu3AkFXngGuxnfgl5AYRkwxBkjTQGHnODSCKYnv02TUFJvs7OLV7Qgwzo3EcUbGUQphzWaeBQZHjBH45HC3bVjP5G1ypo+HvBXp6z98T/wzE+C+R9aqxWA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772790323; c=relaxed/simple;
-	bh=wS1qxKCchhjtDwRNXR6jv/SqzMa5hcVlBO3c/OsKvrQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kSRFBXsvXplFsQSpNEqn7D5olUqb8eTv6ya/iqz5jKPG4dS54NWCcGzifwHovDWJO4RF8cqGmoc6Ulg4uTi4IosmqiZL+lbb1yJ8Afc0WemPyvkr/WviKWVj8gRfIlkP13g3wTuvEVrc6OHy2fZSw/ocNADbkPMBJlv5WifSAHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRpLJ8GR; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4B937C91A
+	for <linux-crypto@vger.kernel.org>; Fri,  6 Mar 2026 10:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772792986; cv=pass; b=EdrkPvj9OHp1QsQbKn2I6T9gbD10fP6Vw8SArI6JPtt7/SfgabpVxoZGmWvotCD9pYSqPZ+P+Mzb937Ij4vVAfaPbsYOTsxkSO3r4SyRcx3wADl3mfput7PC+XnbTbwM7o9sj+5/Be0yEyOML16QDRFUUUxJaUrHt9Rr/IH/bRc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772792986; c=relaxed/simple;
+	bh=gECJK7cPixDrAk2Npfu12wCevFuyOXPtoop7lI+zuNs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ff2IStd0PKFgCdxTa8ZGkTEjek2fjglJOIBLqHt2e45A2PvEqDh6lJxLClgY0BWUEVQzqceATNQHqm7t6Cirk3R04orZ99Yhh1ZIn1/zGWiXe2ML3Sp5WYoq7XAsTbiUEoNjBAaBmi41j8mRV8m7hzEsD0nhPeEK7//UhJAXTF4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPciZQiM; arc=pass smtp.client-ip=74.125.82.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRpLJ8GR"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82976220e97so1585902b3a.3
-        for <linux-crypto@vger.kernel.org>; Fri, 06 Mar 2026 01:45:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPciZQiM"
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-12732165d1eso9983954c88.1
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Mar 2026 02:29:44 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772792984; cv=none;
+        d=google.com; s=arc-20240605;
+        b=eUO1duUBZoHJOGdsuzFLf7Q+dsO7BD+bTuBlPvQ4OauXVtZDMD54DJJWfgQiDhNylK
+         +49FyqmbRiFm31Eo3kCvrmX4LIoTONoFURJGZ2+JNTxccLRlpiVcOd9CHQBRJgX1/Eek
+         gphTK7rangZEENaf7ynO5W/DSMnQP1VW/m5FPpwQ4n7eyTMhIFC5CUAvI3MlOiLDXWK1
+         NarbnZvbGCcBIJriFlb93Ubnl+NriOJnRUTUwIki/djNaMM1oav7/LFVJ4E80u89xCxs
+         08HATaMvKIIwUra6mhwpYHNc19khaz0Yk/42R+40QDGJtGUC+UQvPNQdZwHW7zkSBNZF
+         7zoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=z+Brq/6epKBsg4Pkewf6wjnSj/Rj8BpANFOXV5LwXOU=;
+        fh=JL0DJC6opBkpA7T240pl/YnfSeS1GzOkI1HQ7GKN9Qw=;
+        b=dtKyD59qDukLh7fQYjJdnooVFHnu8/5AU9BD4IhgxafKLHeh57lpjjOZTsDZxDOEnB
+         PTjVO7sHvNDWCsqJBmvkRmE4wnh2r0y3lQPG1AVOSmjvETN6AC3UAiFIdl4sTWtEhH+D
+         rsBteB2GvvUWYSLyFhzp1Z7O+YgjYgNwTL39KWB3zRgq9UstAAjfTGFCfx7i9lW4MO/p
+         83Z5ObaJ8lMveUVuvE2UAomUE+StP7g5EaiiTLzptj2ONUQBeFAsbaXavx4TLdhyzxpy
+         bTj8N5a86fRvjc1uMTFOJIDe7JudAO6xnfxH8eiR3ETOCAEiIKnio9XmQzXcc7FSVYVV
+         AXXA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772790322; x=1773395122; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1772792984; x=1773397784; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wS1qxKCchhjtDwRNXR6jv/SqzMa5hcVlBO3c/OsKvrQ=;
-        b=eRpLJ8GR3N/DESL1Zv2QogEs2UkUOSCFQySNIutUPimJ6BuCFg+d8LcFAc1zaWJl68
-         w84DxURWOHMBvLfoK/0I3VjtGxaVA/yBwTv+RQryVwD+jvgD7b8EJX79LXNFxpr1jJrU
-         H8NXJNuekFZiK0TTYwb+KSf0/eWK9/didy3Ndrf/DM2GN4QqqNtUpF5SM1nTmeX2q8r4
-         b8OyN53uQL2ArEO/HCIYkQHQSx7mUGj8pvhdrOToFns/Z+DaDTIPwmj5UzzOuOjlhPJZ
-         g5hWC9BGMBRQWrhPrEIirzpL1dHMGiN4wBdrPCkVP9xiOtLcicrv8VeojXOk9014f6TF
-         Q2EA==
+        bh=z+Brq/6epKBsg4Pkewf6wjnSj/Rj8BpANFOXV5LwXOU=;
+        b=DPciZQiMKD5tpYD5JOPfy5XWO8h5E7J2NXB0TFwoULSdkTCh6HvyGVr63+boZzIHZs
+         vFd+Ga8e98Xu9TZncfRmHXkZs7AJODc4sBPJbb/X+0fc/1v9T4do2B3Yu5C6VOPyHnq9
+         vwiwI5b6sPuQiOtaUxnH7RSwDlGvQV9he5NbfXQwnv5bRDEfq93zvF4qKYxoMSTz/j6S
+         MTXhVfqZgAyP8oa1OMv3m579DkmauSp54LU3vdllxtGB0j6m5cJ28wXBjZxzUCXvUbh8
+         099EtVgyIpgeNYg2iRoIvKlNtULifmppEV6kG1gCFKKLUYQWj/l/4B9k9wWgUXFaAVVw
+         9U8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772790322; x=1773395122;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1772792984; x=1773397784;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=wS1qxKCchhjtDwRNXR6jv/SqzMa5hcVlBO3c/OsKvrQ=;
-        b=Sjfnixm7zjWTCgvG18fNApIv19iUId9mgaos6SBEQY1k4sdUvScsC6OqGB7iUQU3kV
-         +2Gx+cpUBtrbsko20U8FGwUVsYA0GMkxbrOfbaWjU8GHbzu3HkUD/wsLXTdnZ0B86yoV
-         RxIc/nm0ctM4eGZdDYPf/Pvc97BfckzHtt+NXrpDgPwLa7695kqgKNQu28cJnAdwEkvm
-         +iQcTCKtBRGalNrNFQf2UIuk+8Npm0QlqjjSltPlcsk+rZtf2UNaWPX46u9yF8/MuA0E
-         nrMzhvUPChjCYsCO7RMbsVNg/S/aXdb/rUAlk7wX3XAz2lvLkINxybqEj/2cjY1oKkNc
-         QDkg==
-X-Forwarded-Encrypted: i=1; AJvYcCV6WZid4BFJpV78E4bF3sCpuouUS5JmAiWlAhNb1v0uf3+qpvHveYRx9S3X5WDvObjm63kSpfWjOiY3CXg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2KG9jdYHzkaQ0L3RdrVz3J+A++YKzULzELEj7A/AUdQB4uBit
-	cKucmtTS8RZx5KG0OfcTFHcITd0DY1XwI6QSrEr5McheqpHaksMgw1cy
-X-Gm-Gg: ATEYQzyW5aFe0cFrz9uzLmuX0llKGW8ck3CdlB99UaPRokdGlfiAA2zosPv0CtK7xQT
-	2e4tJl76agTKF9zswv0ld/gNB5TfAkT24s3HnP/ZOfJp/rkaQ+Wsqhw5NXPb9eiwaHnhnRUt+yn
-	nFuaTfR0BGCup328QvxLJHe9Ipj3zjiF5NZDE2eRe3Zs6N1v7gy31myCU0tyHiZYOzWF9pr0D00
-	lL048WOf+4Dve0eqQJXFHLU6ZdEPItczlkaPx5BDPxnpRKxZu5Xg6eqpuVYt2vyUXpD2xH8CTFW
-	cfZEKR5NMmBLBNTczhsCiqcKUspTtC1ShZdirfwYT+ko5hBfb0Xwt15knuYVe+yaPFWMgs8WjiR
-	qrXxbOyHGpNyRAM7VYyeTonCNISo/9XD6dotKs/jbMdNzAQcCgv3gPfj4zFoJFoP1RyLc0XeOon
-	A41YPsZmZBZWLhYYuzQdgbxCaFJHF0Smzy6ihi19zq6PNH
-X-Received: by 2002:a05:6a21:a43:b0:393:c4d:be50 with SMTP id adf61e73a8af0-39858fda4a6mr1885603637.16.1772790321826;
-        Fri, 06 Mar 2026 01:45:21 -0800 (PST)
-Received: from localhost.localdomain ([210.73.43.101])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c739e0cb598sm1080738a12.13.2026.03.06.01.45.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 01:45:21 -0800 (PST)
-From: Jiakai Xu <jiakaipeanut@gmail.com>
-X-Google-Original-From: Jiakai Xu <jiakaiPeanut@gmail.com>
-To: ethan.w.s.graham@gmail.com
-Cc: akpm@linux-foundation.org,
-	andreyknvl@gmail.com,
-	andy.shevchenko@gmail.com,
-	andy@kernel.org,
-	brauner@kernel.org,
-	brendan.higgins@linux.dev,
-	davem@davemloft.net,
-	davidgow@google.com,
-	dhowells@redhat.com,
-	dvyukov@google.com,
-	ebiggers@kernel.org,
-	elver@google.com,
-	glider@google.com,
-	gregkh@linuxfoundation.org,
-	herbert@gondor.apana.org.au,
-	ignat@cloudflare.com,
-	jack@suse.cz,
-	jannh@google.com,
-	johannes@sipsolutions.net,
-	kasan-dev@googlegroups.com,
-	kees@kernel.org,
-	kunit-dev@googlegroups.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	lukas@wunner.de,
-	mcgrof@kernel.org,
-	rmoar@google.com,
-	shuah@kernel.org,
-	sj@kernel.org,
-	skhan@linuxfoundation.org,
-	tarasmadan@google.com,
-	wentaoz5@illinois.edu
-Subject: Question about "stateless or low-state functions" in KFuzzTest doc
-Date: Fri,  6 Mar 2026 17:44:58 +0800
-Message-Id: <20260306094459.973-1-jiakaiPeanut@gmail.com>
-X-Mailer: git-send-email 2.35.1.windows.2
-In-Reply-To: <20260112192827.25989-4-ethan.w.s.graham@gmail.com>
-References: <20260112192827.25989-4-ethan.w.s.graham@gmail.com>
+        bh=z+Brq/6epKBsg4Pkewf6wjnSj/Rj8BpANFOXV5LwXOU=;
+        b=p1PuAOPcPwWOYgUnVzHBXJZNAVAIMB7AiFhWzxzngDM6lh0/UB1OAgrnPIJdApbfoc
+         vB3ijjgS2sz1tplNrFuuH1u2g5RcSWeKXk5OMFU7TkBOr/GDujemgOvYu4J2xu+cs0Ku
+         shkX2VQ5QlpeCmJ1wIzXJ//hNmTQIGA3KRSry5CJ00wbDHyd2/QByDcMaZME39NNpC4F
+         pEv9+YxC8PCTVpZ+EMOOg26sIWhcWWg8BRg8h+F4ilg63/WCGusOv+2/nKbgqd1ixR/w
+         0VNwLeHYr8ueqlpAKnGtVAe0nqeMGfeMnhTjWRKq03lnwftNrBAAIaUjgtmjwgMSR4lc
+         7vAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX82JB5y23EfF4mmRlaAWSGM2pftbDC/+KqH7hk2NtKBbJ5E+ezbPsbPxBFC7UwCQrJeWsnvoAZxG6dwdQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrwvKlBdljbjO0LYBiiwjdXM9sHc2iEfwgWxoswxPkHaDknd6m
+	yjtfkGQEIcju7fSk77CEX3Bftb8uUC1m4Byi9zqmyML2RSPwtbEc9fchwO6B9zHribHTGEg0zGl
+	tD952kqyVAhIZ/gHXdOyoGpF3ssunimI=
+X-Gm-Gg: ATEYQzwuumwymQNXuV/OYsrtaT7+ZLPtiiYC6PXCw8XnAxXp/9zCJiSLXVaNtAcCi4/
+	F5TsFP1nPPQddHyVpBYHrUf5yqBL6YAWQYAdUoMdkiRBV0fApBbAU+BKE3cjqWma6eXwvWWNeat
+	2/H9gSFrI/yuwkx0embR9H18FZu08NZ/UX/Ed6B5oKGsQ6KvpJBWvni7Ny7EJSznVf3OcVm0Db7
+	EB8w3/L9BVwYW5NW2TaQG2xiY2BcihEfPNhIZk0n59Kr3rV9VWgFE8P8/2DEEHckU8zK8BL5n4E
+	Fjkeu9rSQHuvnv5mFEFfnICdlgq+Dt6vayBupg==
+X-Received: by 2002:a05:7022:671f:b0:127:9cad:1a65 with SMTP id
+ a92af1059eb24-128c2e1136amr744524c88.14.1772792983223; Fri, 06 Mar 2026
+ 02:29:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260112192827.25989-4-ethan.w.s.graham@gmail.com> <20260306094459.973-1-jiakaiPeanut@gmail.com>
+In-Reply-To: <20260306094459.973-1-jiakaiPeanut@gmail.com>
+From: Ethan Graham <ethan.w.s.graham@gmail.com>
+Date: Fri, 6 Mar 2026 11:29:32 +0100
+X-Gm-Features: AaiRm53Jfg5bSHF6icJs_KFXZYY4iK_phz9SHYzN-JwsHFLACvMKwbEaczno5iQ
+Message-ID: <CANgxf6yMNZ3=xm9xVhPZDuxMc__7pQk=mti-CyD1QjUOgTJLEA@mail.gmail.com>
+Subject: Re: Question about "stateless or low-state functions" in KFuzzTest doc
+To: Jiakai Xu <jiakaipeanut@gmail.com>
+Cc: akpm@linux-foundation.org, andreyknvl@gmail.com, andy.shevchenko@gmail.com, 
+	andy@kernel.org, brauner@kernel.org, brendan.higgins@linux.dev, 
+	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com, 
+	dvyukov@google.com, ebiggers@kernel.org, elver@google.com, glider@google.com, 
+	gregkh@linuxfoundation.org, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
+	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
+	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, lukas@wunner.de, mcgrof@kernel.org, rmoar@google.com, 
+	shuah@kernel.org, sj@kernel.org, skhan@linuxfoundation.org, 
+	tarasmadan@google.com, wentaoz5@illinois.edu
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Ethan and all,=0D
-=0D
-I've been reading the KFuzzTest documentation patch (v4 3/6) with great =0D
-interest. I have some questions about the scope and applicability of this =
-=0D
-framework that I'd like to discuss with the community.=0D
-=0D
-The documentation states:=0D
-> It is intended for testing stateless or low-state functions that are =0D
-> difficult to reach from the system call interface, such as routines =0D
-> involved in file format parsing or complex data transformations.=0D
-=0D
-I'm trying to better understand what qualifies as a "stateless or =0D
-low-state function" in the kernel context. How do we define or identify =0D
-whether a kernel function is stateless or low-state?=0D
-=0D
-Also, I'm curious - what proportion of kernel functions would we =0D
-estimate falls into this category?=0D
-=0D
-Any insights would be greatly appreciated!=0D
-=0D
-Thanks,=0D
-Jiakai=
+On Fri, Mar 6, 2026 at 10:45=E2=80=AFAM Jiakai Xu <jiakaipeanut@gmail.com> =
+wrote:
+>
+> Hi Ethan and all,
+
+Hi Jiakai
+
+> I've been reading the KFuzzTest documentation patch (v4 3/6) with great
+> interest. I have some questions about the scope and applicability of this
+> framework that I'd like to discuss with the community.
+>
+> The documentation states:
+> > It is intended for testing stateless or low-state functions that are
+> > difficult to reach from the system call interface, such as routines
+> > involved in file format parsing or complex data transformations.
+>
+> I'm trying to better understand what qualifies as a "stateless or
+> low-state function" in the kernel context. How do we define or identify
+> whether a kernel function is stateless or low-state?
+>
+> Also, I'm curious - what proportion of kernel functions would we
+> estimate falls into this category?
+
+I would define it based on "practical heuristics". A function is probably a
+good candidate for KFuzzTest if it fits these loose criteria:
+
+- Minimal setup: KFuzzTest currently supports blob-based fuzzing, so the
+  function should consume raw data (or a thin wrapper struct) and not
+  require a complex web of pre-initialized objects or deep call-chain
+  prerequisites.
+- Manageable teardown: if the function allocates memory or creates
+  objects, the fuzzing harness must be able to cleanly free or revert
+  that state before the next iteration. An example of this can be found
+  in the pkcs7 example in patch 5/6 [1].
+- Non-destructive global impact: it's okay if the function touches global
+  state in minor ways (e.g., writing to the OID registry logs as is done
+  by the crypto/ functions that are fuzzed by the harnesses in patch 5/6),
+  but what matters is that the kernel isn't left in a broken state before t=
+he
+  next fuzzing iteration, meaning no leaked global locks, no corrupted
+  shared data structures, and no deadlocks.
+
+These loose criteria are just suggestions, as you can technically fuzz
+anything that you want to - KFuzzTest won't stop you. The danger is
+that the kernel isn't designed to have raw userspace inputs shoved
+into deep stateful functions out of nowhere. If a harness or function
+relies on complex ad-hoc state management or strict preconditions,
+fuzzing it out of context will likely just result in false positives, panic=
+s,
+and ultimately bogus harnesses.
+
+The goal of the framework is to fuzz real functions with realistic inputs
+without accidentally breaking other parts of the kernel that the function
+wasn't meant to touch. Therefore ideal targets (like the PKCS7 example)
+are ones with minimal setup (just passing a blob), have manageable
+teardown (like freeing a returned object on success) and don't
+destructively impact global state (even if they do minor things like
+printing to logs).
+
+That said, I'm curious to see what you come up with! I'm sure there are
+other use cases that I haven't thought of.
+
+[1] PKCS7 message parser fuzzing harness:
+https://lore.kernel.org/all/20260112192827.25989-6-ethan.w.s.graham@gmail.c=
+om/
