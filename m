@@ -1,97 +1,154 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3072D274641
-	for <linux-crypto@vger.kernel.org>; Sat,  7 Mar 2026 15:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DABF1E51E0;
+	Sat,  7 Mar 2026 20:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772897523; cv=none; b=ZVV8FAfQEfutBSwjMHaeuL+ycQ2q635ocTKqLZ1pVnG6ACUvJmcjMtGTfV7ps2V+1DZaaIuPB9rWgYbdr8poMjMKMGIqu6ROaMl9kDMZYHsAPlABt/oudJmKX+YulV+bknC9f2TSgm18M6CKuwA+gmivsave8f9knez2/+GyZcM=
+	t=1772915607; cv=none; b=rJRhQb0jawRNevpubNK8QS99ZJgcRKIenDvUn7G08MApzArAyLTEErMT1wZyzzxCwJcrYAb33B8Ybd+Qh4W93MLyslLoZ8OSrn7w5TSLZAgcQYimgO2PkVJqlLRkl04ajEMVdXnu5K5q7Kxao5P0MbMmPM6vGBCLNiiv7rBpJRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772897523; c=relaxed/simple;
-	bh=12uNODLktx6BEfkMaGGtrq9ZKRAKF85Ng0piF3rogU0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mrajeeiFsD3iCI9XNDUaKsYa2VHemFbsb2CoBQV0V3zZ6b39WUjDXXUeEMJLk6/eWAwd9GmWYaOZdJg81uDiEXO+TRxM+nRaYgzKlIFMPA0OMltkVkCy/U91SSMWkBywLjYymnEGcdznvFU0M93TbcZWNZaZ3O42nmkzNfbgaD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uVARBis+; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1772915607; c=relaxed/simple;
+	bh=31nT2idXq0b+j8ZBcxl0zy3PJn21/46lvsAvq0uSrZY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PACV+6aWlp/E4Ij7M5Z5nvAWZ2FsilMWnb/KNbxKuq06aQZO80XCDSLd2OQrxo2ol/XGbPjHCUxJBf7TzYYFVYu6ViJTBzBRTTAHchk4oj8jDNsU2EvygIFxxNsR0Il+r96VoRb3RAPl1uZudiE1fFVmPuT1ZRcoxPre5qKe6kM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lajtb8PL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uVARBis+"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772897510;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=WCkjlMOHTdO7UOxucKf2A+R16ZfIHUwM/0MaXiSsIN4=;
-	b=uVARBis+gT927/YxV8BaJDN81E2SICI9F76QBhCWq94eRk8hxiuEuD1McgUcyCOczUm5TE
-	IHSNJyLVMkvSf++yawmVaBO5XYZyv+DarnbjyVhWWOWzc4J4CGF0kj8mYyybQ81UMsn9OL
-	C6ILaD6SCar5i72ubQHBkIJ/x1ELH20=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lajtb8PL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24B8EC19422;
+	Sat,  7 Mar 2026 20:33:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772915607;
+	bh=31nT2idXq0b+j8ZBcxl0zy3PJn21/46lvsAvq0uSrZY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Lajtb8PLKfTECoMV48do6LFXGQr0OLrEVgYDwGomgZjaA/+vYMBq5DJk3TKH0yf09
+	 8umviV+NpV9V8KosVu1u29DMjDUppkt7HEMYplUgw2w1aLHiTUZcKrU6i4XhiPQ2Oo
+	 Ly4i1BSLRHKur85eP2SdyITkSaRvBi7N8GctW5ystyxuWH37lpNvt6833CF768WChW
+	 n1LaFhHwBDrVHqAbzyhZYpYMbmd7QJhPuoJD1fx5oQRXUFxbmMgmNx/QAIJ9c9lCfC
+	 9S3ku7+aOCkycsqyVHMIOmAMBklTpvbB1nm+IH2tBqCgVsQxWsQexuOJ6fp3AAwotS
+	 vRBzbTcMeHFBg==
+Date: Sun, 8 Mar 2026 02:03:22 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	=?UTF-8?q?Eric=20B=C3=A9nard?= <eric@eukrea.com>,
-	Nicolas Royer <nicolas@eukrea.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	stable@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: atmel-tdes - fix DMA sync direction
-Date: Sat,  7 Mar 2026 16:31:10 +0100
-Message-ID: <20260307153109.321147-2-thorsten.blum@linux.dev>
+	Udit Tiwari <quic_utiwari@quicinc.com>,
+	Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
+	Md Sadre Alam <mdalam@qti.qualcomm.com>,
+	Dmitry Baryshkov <lumag@kernel.org>,
+	Peter Ujfalusi <peter.ujfalusi@gmail.com>,
+	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>,
+	dmaengine@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH RFC v11 12/12] dmaengine: qcom: bam_dma: add support for
+ BAM locking
+Message-ID: <aayLkmDRLMuTzXZv@vaman>
+References: <20260302-qcom-qce-cmd-descr-v11-0-4bf1f5db4802@oss.qualcomm.com>
+ <20260302-qcom-qce-cmd-descr-v11-12-4bf1f5db4802@oss.qualcomm.com>
+ <aahHeR9j7q4_ynYK@vaman>
+ <CAMRc=Mc48+NyMPkFRa8GPv-odCe=r9WXJWUZYkTsaY53Ev_stQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1847; i=thorsten.blum@linux.dev; h=from:subject; bh=12uNODLktx6BEfkMaGGtrq9ZKRAKF85Ng0piF3rogU0=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJlrXPZ+vaQmmt7/c0Na2mPHlOvzvgWs+rpIIjLpd3FW3 ysLlSKzjlIWBjEuBlkxRZYHs37M8C2tqdxkErETZg4rE8gQBi5OAZhISyIjQ7O8+/O89zbth+e1 Hpp0cKvQ8+LaGUsjfuo83rbUa+75Z9cY/spOYlrM439627n1igGyTz98On/91hqRKcHFUje77pz mC2cAAA==
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <CAMRc=Mc48+NyMPkFRa8GPv-odCe=r9WXJWUZYkTsaY53Ev_stQ@mail.gmail.com>
 
-Before DMA output is consumed by the CPU, ->dma_addr_out must be synced
-with dma_sync_single_for_cpu() instead of dma_sync_single_for_device().
-Using the wrong direction can return stale cache data on non-coherent
-platforms.
+On 04-03-26, 16:27, Bartosz Golaszewski wrote:
+> On Wed, Mar 4, 2026 at 3:53 PM Vinod Koul <vkoul@kernel.org> wrote:
+> >
+> > On 02-03-26, 16:57, Bartosz Golaszewski wrote:
+> > > Add support for BAM pipe locking. To that end: when starting the DMA on
+> > > an RX channel - wrap the already issued descriptors with additional
+> > > command descriptors performing dummy writes to the base register
+> > > supplied by the client via dmaengine_slave_config() (if any) alongside
+> > > the lock/unlock HW flags.
+> > >
+> > > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> 
+> [snip]
+> 
+> > > +static struct bam_async_desc *
+> > > +bam_make_lock_desc(struct bam_chan *bchan, struct scatterlist *sg,
+> > > +                struct bam_cmd_element *ce, unsigned int flag)
+> > > +{
+> > > +     struct dma_chan *chan = &bchan->vc.chan;
+> > > +     struct bam_async_desc *async_desc;
+> > > +     struct bam_desc_hw *desc;
+> > > +     struct virt_dma_desc *vd;
+> > > +     struct virt_dma_chan *vc;
+> > > +     unsigned int mapped;
+> > > +     dma_cookie_t cookie;
+> > > +     int ret;
+> > > +
+> > > +     async_desc = kzalloc_flex(*async_desc, desc, 1, GFP_NOWAIT);
+> > > +     if (!async_desc) {
+> > > +             dev_err(bchan->bdev->dev, "failed to allocate the BAM lock descriptor\n");
+> > > +             return NULL;
+> > > +     }
+> > > +
+> > > +     async_desc->num_desc = 1;
+> > > +     async_desc->curr_desc = async_desc->desc;
+> > > +     async_desc->dir = DMA_MEM_TO_DEV;
+> > > +
+> > > +     desc = async_desc->desc;
+> > > +
+> > > +     bam_prep_ce_le32(ce, bchan->slave.dst_addr, BAM_WRITE_COMMAND, 0);
+> > > +     sg_set_buf(sg, ce, sizeof(*ce));
+> > > +
+> > > +     mapped = dma_map_sg_attrs(chan->slave, sg, 1, DMA_TO_DEVICE, DMA_PREP_CMD);
+> > > +     if (!mapped) {
+> > > +             kfree(async_desc);
+> > > +             return NULL;
+> > > +     }
+> > > +
+> > > +     desc->flags |= cpu_to_le16(DESC_FLAG_CMD | flag);
+> > > +     desc->addr = sg_dma_address(sg);
+> > > +     desc->size = sizeof(struct bam_cmd_element);
+> > > +
+> > > +     vc = &bchan->vc;
+> > > +     vd = &async_desc->vd;
+> > > +
+> > > +     dma_async_tx_descriptor_init(&vd->tx, &vc->chan);
+> > > +     vd->tx.flags = DMA_PREP_CMD;
+> > > +     vd->tx.desc_free = vchan_tx_desc_free;
+> > > +     vd->tx_result.result = DMA_TRANS_NOERROR;
+> > > +     vd->tx_result.residue = 0;
+> > > +
+> > > +     cookie = dma_cookie_assign(&vd->tx);
+> > > +     ret = dma_submit_error(cookie);
+> >
+> > I am not sure I understand this.
+> >
+> > At start you add a descriptor in the queue, ideally which should be
+> > queued after the existing descriptors are completed!
+> >
+> > Also I thought you want to append Pipe cmd to descriptors, why not do
+> > this while preparing the descriptors and add the pipe cmd and start and
+> > end of the sequence when you prepare... This was you dont need to create
+> > a cookie like this
+> >
+> 
+> Client (in this case - crypto engine) can call
+> dmaengine_prep_slave_sg() multiple times adding several logical
+> descriptors which themselves can have several hardware descriptors. We
+> want to lock the channel before issuing the first queued descriptor
+> (for crypto: typically data descriptor) and unlock it once the final
+> descriptor is processed (typically command descriptor). To that end:
+> we insert the dummy command descriptor with the lock flag at the head
+> of the queue and the one with the unlock flag at the tail - "wrapping"
+> the existing queue with lock/unlock operations.
 
-Fixes: 13802005d8f2 ("crypto: atmel - add Atmel DES/TDES driver")
-Fixes: 1f858040c2f7 ("crypto: atmel-tdes - add support for latest release of the IP (0x700)")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/crypto/atmel-tdes.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Why not do this per prep call submitted to the engine. It would be
+simpler to just add lock and unlock to the start and end of transaction.
 
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 278c0df3c92f..643e507f9c02 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -294,8 +294,8 @@ static int atmel_tdes_crypt_pdc_stop(struct atmel_tdes_dev *dd)
- 		dma_unmap_sg(dd->dev, dd->out_sg, 1, DMA_FROM_DEVICE);
- 		dma_unmap_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
- 	} else {
--		dma_sync_single_for_device(dd->dev, dd->dma_addr_out,
--					   dd->dma_size, DMA_FROM_DEVICE);
-+		dma_sync_single_for_cpu(dd->dev, dd->dma_addr_out,
-+					dd->dma_size, DMA_FROM_DEVICE);
- 
- 		/* copy data */
- 		count = atmel_tdes_sg_copy(&dd->out_sg, &dd->out_offset,
-@@ -619,8 +619,8 @@ static int atmel_tdes_crypt_dma_stop(struct atmel_tdes_dev *dd)
- 			dma_unmap_sg(dd->dev, dd->out_sg, 1, DMA_FROM_DEVICE);
- 			dma_unmap_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
- 		} else {
--			dma_sync_single_for_device(dd->dev, dd->dma_addr_out,
--				dd->dma_size, DMA_FROM_DEVICE);
-+			dma_sync_single_for_cpu(dd->dev, dd->dma_addr_out,
-+						dd->dma_size, DMA_FROM_DEVICE);
- 
- 			/* copy data */
- 			count = atmel_tdes_sg_copy(&dd->out_sg, &dd->out_offset,
 -- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
-
+~Vinod
