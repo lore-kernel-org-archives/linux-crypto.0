@@ -1,58 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053AE1A682D;
-	Sat,  7 Mar 2026 05:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C851A682D
+	for <linux-crypto@vger.kernel.org>; Sat,  7 Mar 2026 05:33:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772861599; cv=none; b=kfL8d0Dd745PolLgJO2GCJibdPWmchu1DpqntDQ9tm5Lu765MDF4cBZAq+uPrdxCqUCQ3juyxIV53jsZ+iqdQ1NvUMtH2EZ/E8TN03kCn+pbP4aBurDtsf3S3YEp5yhF1C72sdH0KIZhq4ZYwb/Eo5AXit2thQ2j/ixjhcCQUk0=
+	t=1772861606; cv=none; b=CGEo8uoOdrrxzuh4tIA58xXiKuZAxm1zVnssalEe+RZ/KgHjOYFOW6e7UeqsVJbQ2l3RNQ5bMVR7klw0kqD2KbfEd87GVTophEVk3h4UV3uhX9iU2emvWCmeMBfvTa70wsu/omBcKRZmQJ1WhVzJalUpDLsQi+JRTkyuwSyrxOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772861599; c=relaxed/simple;
-	bh=IiZs38fXIBUHcX3k8H1N47+fArJO194TrcoiNrJ3jjM=;
+	s=arc-20240116; t=1772861606; c=relaxed/simple;
+	bh=t6C8ABY4NozGaZF2V8uUav9/4xVsnTL6vJhBkCeBiLE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gUy+rA6CWvbBRQrWp3YvwOex05BvfB2GzPerlTsGJK33bsbO7MP+dq8LUf9g59SDq09SmmgbCZOfoPq0FUDM8RTu7dTspbgWvE9AJjPx2wy8t+/t5WQRyKIwsIMH8YH1uUikq573n0zSNWdFYa03aenJnd6ROXcuMQsjXVhYYbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=eexA7cWZ; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=NvuvW3KNjkfUxDbsEq9L2eSfNnEHxAdkIMG3wRH0Jkkoz4OuGHWm2uiWW0crh1M56zHvIdKQ3cSTNnjgU++SvEhnWIXhlMkdbRos62zstupIO0VuqoY1uyyAuLecaa8Nlz3KkjD8m8IRi3ymv+asC5yQYxWLDBtyUm8RhGZJt98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=OeH3gp8P; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="eexA7cWZ"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="OeH3gp8P"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=PYP9yHpWOZRbrEWMSr+QtQEN75JRCFb5x8h/H9Pxbnc=; 
-	b=eexA7cWZqtVTAZvPV3+MT/R/ma17rGXWuWHk5kpzNnJhhEOqKX5rkkviguAxtDoGQuW0QYIppd7
-	EJkmepLTSr/9hiPVCyc09RA3Y5b1dIPAW5m4QgNsCe5lA8fO06lS8dEKzt5PQ+Vm0F2CIXI70nr7k
-	ZLhNxy3dDZBYIrz4X+DOLnwLVZLZv1Rccqm8VLeMJlK0+VrgSEIxGzfSgb5mbXX1AFt9JeqJyiwUT
-	LQP0rIh8rDbdpIQCcFOQ4ROS/8Khm9XIUCIB2xaz3Q53uGvtC9YxzhUvSX2uN+Lm7lXqzMDkPJTP6
-	YGmmtFF97r0sUgJ5Omhk3SKijgw6Uu7tsufA==;
+	from:content-type:reply-to; bh=0VwEmzWozW/oJrnPpXt6mOMZ6lupaAHLdWU04c6FfLQ=; 
+	b=OeH3gp8PSQYKgx6vMFB3wWP2PuYJLlOMMTknFWohOJYAsMLJWSsk3DShR3wexx36tNogiEGU29y
+	et5wPO32NfU9R89A3srfSfzoMACeDJ08OD1Y6CnCPWenyu0RtdBnl2OcBWRhxXTkyouhQaT9QTspK
+	cvxWYUekm4MBqTPdxw1axTGAq7YYiwrDgx60/t4i1O0+hCEkYb3RXITPzDGDJV+dq5aSbdZKhQ3Sm
+	pWjr20BzL1y9g/NsDqYHRAuI7w13pRgF8Jai7w7IuXcmOBuzJYODLkwoU9Q6JYJh0JOK2nBp+ZSMV
+	NApF4h5cfuCkY9EqRfO6hTCWUDa4dG3r282w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vykHV-00CJZO-2O;
-	Sat, 07 Mar 2026 13:32:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 07 Mar 2026 14:32:53 +0900
-Date: Sat, 7 Mar 2026 14:32:53 +0900
+	id 1vykHx-00CJaM-0g;
+	Sat, 07 Mar 2026 13:33:22 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 07 Mar 2026 14:33:21 +0900
+Date: Sat, 7 Mar 2026 14:33:21 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Kepplinger-Novakovic Martin <Martin.Kepplinger-Novakovic@ginzinger.com>,
-	"ebiggers@google.com" <ebiggers@google.com>,
-	"horia.geanta@nxp.com" <horia.geanta@nxp.com>,
-	"pankaj.gupta@nxp.com" <pankaj.gupta@nxp.com>,
-	"gaurav.jain@nxp.com" <gaurav.jain@nxp.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"ignat@cloudflare.com" <ignat@cloudflare.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [BUG] crypto: caam - RSA encrypt doesn't always complete new
- data in out_buf
-Message-ID: <aau4hTzIYEVKyAT3@gondor.apana.org.au>
-References: <6029acc0f0ddfe25e2537c2866d54fd7f54bc182.camel@ginzinger.com>
- <aZ296wd7fLE6X3-U@wunner.de>
- <e1d7ad1106dbb259f7c61bdd1910ac9f08012725.camel@ginzinger.com>
- <aZ3Uqaec79TUrP2I@wunner.de>
- <e36dd6fa756015ec1f2a16002fabfa941c33d367.camel@ginzinger.com>
- <aZ6vF1CHpcp5d5qk@wunner.de>
- <5f9c1e7ec61065a2665a2ec70338e05e551435d4.camel@ginzinger.com>
- <aZ_zfnKVnTaG_4bk@wunner.de>
+To: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
+Cc: linux-crypto@vger.kernel.org, tgraf@suug.ch, ast@kernel.org,
+	andrii@kernel.org, kernel-team@meta.com,
+	Mykyta Yatsenko <yatsenko@meta.com>
+Subject: Re: [PATCH] rhashtable: consolidate hash computation in
+ rht_key_get_hash()
+Message-ID: <aau4oQWfvg_V33rj@gondor.apana.org.au>
+References: <20260224192954.819444-1-mykyta.yatsenko5@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,20 +48,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aZ_zfnKVnTaG_4bk@wunner.de>
+In-Reply-To: <20260224192954.819444-1-mykyta.yatsenko5@gmail.com>
 
-On Thu, Feb 26, 2026 at 08:17:18AM +0100, Lukas Wunner wrote:
->
-> That's fine for the RSA software implementation in crypto/rsa.c but
-> I could very well imagine it causes problems with an RSA accelerator,
-> particularly because rsa_edesc_alloc() in drivers/crypto/caam/caampkc.c
-> now maps the same buffer with DMA_TO_DEVICE and then DMA_FROM_DEVICE.
+On Tue, Feb 24, 2026 at 07:29:54PM +0000, Mykyta Yatsenko wrote:
+> From: Mykyta Yatsenko <yatsenko@meta.com>
+> 
+> The else-if and else branches in rht_key_get_hash() both compute a hash
+> using either params.hashfn or jhash, differing only in the source of
+> key_len (params.key_len vs ht->p.key_len). Merge the two branches into
+> one by using the ternary `params.key_len ?: ht->p.key_len` to select
+> the key length, removing the duplicated logic.
+> 
+> This also improves the performance of the else branch which previously
+> always used jhash and never fell through to jhash2. This branch is going
+> to be used by BPF resizable hashmap, which wraps rhashtable:
+> https://lore.kernel.org/bpf/20260205-rhash-v1-0-30dd6d63c462@meta.com/
+> 
+> Signed-off-by: Mykyta Yatsenko <yatsenko@meta.com>
+> ---
+>  include/linux/rhashtable.h | 13 +++----------
+>  1 file changed, 3 insertions(+), 10 deletions(-)
 
-That's definitely not good.  It needs to handle in-place encryption
-by using DMA_BIDIRECTIONAL.  If the hardware is not capable of that
-then an extra copy must be performed by the driver.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
