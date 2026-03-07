@@ -1,48 +1,54 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B9036894D;
-	Sat,  7 Mar 2026 05:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5253130148C;
+	Sat,  7 Mar 2026 05:29:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772861308; cv=none; b=QLsqvmSaiwAVmYyEKeqMto/WmMRXW1FNpqwjEVJ7p3sU85z0OCCC9TXcVI3d5gKIoQwVd5YIeS1s1IqGo3twRySX4XIgYIJkGWg631Zj9mzVWa+syTHG29e0TOLVGTr8QKzzCcggDqntyw3YTaPZyJXgJ94NLimKkqOi9JQLcUs=
+	t=1772861364; cv=none; b=EEvwg93dcKNVdlVRI2RCY2OZKR4Asd8AJSITusea13sIsYldzu5OFlwxAp8FJiMIBw67x1TLhuJ69sXpvJPkOOxa5P6TPFgkH8rwmVovBS4jusJA2yM4fJ/IHpl8z8ojRcZInRFcRFgEEH+Gxr/KICbQUfSq+vnNmcFoZGY6R9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772861308; c=relaxed/simple;
-	bh=OQNbLzyU3Qmf6r/JkKGRWkfEDA/7PAQQuo2Gn3W6BJo=;
+	s=arc-20240116; t=1772861364; c=relaxed/simple;
+	bh=DSkO3veVPwbV5RUPjq1EzwxbpITyYosbGGAoHpgTzQk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lyxBlD+KAhFtd8NdlgQ/biiN/JjTM0vVpHMFoQ59p0JUFJEPELSyT02F+UPVu7rpCJFl4JSd4tg3SgddOEUf5rv08JNaJoy05WXIrvB0N44C3EvAD/MadxzgWsF1dUXz9fdLRyUyrISey+9cOCRiAojob2EwBXE5fQ6xK/NI5fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=fXVndNcp; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=nTa6thPZ6600pjDjsYVqaMgtqjRk+OJ4Zkbd6lvy/E6q2Ln00uflqYInOaX16HRokATB/816kA3u+cNOCJ7cT24D31OglCmbL1M/8cNq8rlHoVn1L3hdyW4DDD4t7riGEZuFZPwuAuNOTML9tN5VYvgkxVc/xKYZsSuqfgmfnqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=eqiSEHkz; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="fXVndNcp"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="eqiSEHkz"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=yo+IddqOCrOr1IYUEm6NZ6DdLQMY9Wy4rdVxCyJhmkQ=; 
-	b=fXVndNcpxKTn5xK1z1lOIwRIPB1RKDW4SyGoPNXMlQG5N7+T3j+MydEQ+H9JSLlgACtmJWLQ43i
-	ljSl7Rg2WsU+UjBfLTBAtLemvDUEZEAkcbFg25W3YdEDakzpDwPI5X5MrbzkZdKw2L9M5AH1TwwNj
-	ODi6UFnkmEXmmOM4250AZ6A4/EoMdIStSc0H105KFl7wtQ9Dmdbm9eMNRxMIlXdixhETX4GdpAqgl
-	ilZoyQqmdlReymwUoj/VW2/+OnHngiSjxW7OEMBCNKEulNmZqXbKHxq1ET+VGTOqr3wuol3s1sLZO
-	YAdPGZKnC02FAGb12znO39g2mQNF04Austug==;
+	from:content-type:reply-to; bh=2JnLgd+KZwcv/H6Y5gFaAahwS9+prfosZbBrOjXVFjM=; 
+	b=eqiSEHkzZrtmjwCE4EkqwUffgOhRn+9M/T05VQ3mO62aXB+Y1JIL2E149bK79c6lSji8q/jGEyN
+	vaCho+2dlsqTG90t4K4HmB+XkNeFwL60oCFcWwqbOpvzeqrIYmRBnKzzo2+P5J3tcRZ6wWh4xN+gR
+	Vd7/oEyvShi+r/xwB/5RTcKsWgO71uMkTb013ud9cyf16qqqrhOkqDYYLhyJ4r8H5lERzpfpyFH7k
+	Tjtj7rSQCO3IKi/Gl9yMV+hT+nEGSXUMAM7msq8NttxTa/jqvvSVmNDOw2ahpKt/q1IgQ86nnQOeE
+	KM9lbwdp2XKs2grgZ+pH/tW6VM6phFbNN4iQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vykD5-00CJVz-10;
-	Sat, 07 Mar 2026 13:28:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 07 Mar 2026 14:28:19 +0900
-Date: Sat, 7 Mar 2026 14:28:19 +0900
+	id 1vykDp-00CJWX-0I;
+	Sat, 07 Mar 2026 13:29:06 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 07 Mar 2026 14:29:05 +0900
+Date: Sat, 7 Mar 2026 14:29:05 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Abel Vesa <abel.vesa@oss.qualcomm.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: crypto: qcom,inline-crypto-engine: Document
- the Eliza ICE
-Message-ID: <aau3c8RwVMSkb1lZ@gondor.apana.org.au>
-References: <20260223-eliza-bindings-crypto-ice-v1-1-fc76c1a5adce@oss.qualcomm.com>
+To: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+Cc: linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Paul J . Murphy" <paul.j.murphy@intel.com>,
+	"Paul J . Murphy" <paul.j.murphy@linux.intel.com>,
+	Prabhjot Khurana <prabhjot.khurana@intel.com>,
+	Mark Gross <mgross@linux.intel.com>,
+	Declan Murphy <declan.murphy@intel.com>,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	Daniele Alessandrelli <daniele.alessandrelli@gmail.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>
+Subject: Re: [PATCH] MAINTAINERS: Remove Daniele Alessandrelli as Keem Bay
+ maintainer
+Message-ID: <aau3oQgauYBNWhWW@gondor.apana.org.au>
+References: <20260223150622.268245-1-daniele.alessandrelli@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,15 +57,24 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260223-eliza-bindings-crypto-ice-v1-1-fc76c1a5adce@oss.qualcomm.com>
+In-Reply-To: <20260223150622.268245-1-daniele.alessandrelli@intel.com>
 
-On Mon, Feb 23, 2026 at 10:44:02AM +0200, Abel Vesa wrote:
-> Document the Inline Crypto Engine (ICE) on the Eliza platform.
+On Mon, Feb 23, 2026 at 03:06:22PM +0000, Daniele Alessandrelli wrote:
+> I'm leaving Intel soon. Remove myself as maintainer of Keem Bay
+> architecture and related crypto drivers.
 > 
-> Signed-off-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
+> The INTEL KEEM BAY OCS AES/SM4 CRYPTO DRIVER has no replacement
+> maintainer available, so mark it as Orphan.
+> 
+> Signed-off-by: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
 > ---
->  Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml | 1 +
->  1 file changed, 1 insertion(+)
+> 
+> This patch involves two subsystems (ARM and Crypto). Not sure
+> who should pick it up; should I split it into two separate patches
+> instead?
+> 
+>  MAINTAINERS | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
 
 Patch applied.  Thanks.
 -- 
