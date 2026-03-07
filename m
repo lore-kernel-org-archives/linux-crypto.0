@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E113431E9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C96EF346770;
 	Sat,  7 Mar 2026 22:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772923577; cv=none; b=gkv2QZBexcdVWohCNQKyBOAeR0oXjGxsJgUeik70tuyAD1XivTimMUjIqPAW9Mwo0bL8XfP5woDKaC8spEEfqlXDI8pFDBqyGyqtBkklOsMzThqZojRkWVLdmaYTuAzW8PQOsHG50jE9nfY1bhz5EJjYE61gdIxHQFmbfKtK1is=
+	t=1772923577; cv=none; b=kHnRjJnl8qvHtYxNEi4Tb+quhjNqgcAN3zZMuoOsKIEQs/nbiNLNDxjOZJU0tZpGbzM+jPSpmdkxGvmVjrBzRwhFKQhSKR1cZQeAT3b9ibrcXX/Vo7wR7Z/0cB27iMfH8Rps/Ihe248m7GNRMNtkjuklsdXfQIGmoAglhwxTJ6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772923577; c=relaxed/simple;
-	bh=ETOBZymeHG+RfWz4RBdVFEwQAwJS577BxMSzcKm1fqs=;
+	bh=NaDEjwP1efsfHD7GRkA/+b8LQpDP7b8fj8TiHJoftd8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M8TOshxVmjQcBRbudZEZhpg6boyAaorm0VIkckMeeftn1DQCbSuRDmjPYtCHp8qoSbB6rmqa2tfXJRu9FQo1rBzJR4zvZ6NHwndTEZGJ8F6izoVwE/IGe1jxVFQpZ0dogfzY3O7zRzF+qDtuDB5ssfjbViiLLTdtRjIOPAJizY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2FcKZp5; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=XMSXsQv7B98Se5d9Comm7QYiLqtNjDtk7QiTSx6wkAEmHQIB8wgTqfj5gXd7PTVFHPRrAx3GLzka++WrcqVe4e7Plisy2j7lzC3snTZ07a3RqBDbw8WuP95lp9wZf1LfxeGazbH/O9r5S3gXBYwkaM23WJ/G32zetjmwOAVsvOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mUDay2dm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2FcKZp5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A900EC2BCB1;
-	Sat,  7 Mar 2026 22:46:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mUDay2dm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42ABAC19423;
+	Sat,  7 Mar 2026 22:46:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1772923577;
-	bh=ETOBZymeHG+RfWz4RBdVFEwQAwJS577BxMSzcKm1fqs=;
+	bh=NaDEjwP1efsfHD7GRkA/+b8LQpDP7b8fj8TiHJoftd8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=r2FcKZp5Gq5+gML2nV5uie7rnpHlrCdqYX2KdodAEdveX77T8nspebQ8IDxtVNM4l
-	 2E5Y7LMGjvBLK4Mr8EvkvxdiXiEe4vUymx7Q0d/wqYG5CNWaHNOSQRmF22O17K5jl6
-	 up197/NQWHVX7r8AeCGMrlAX34HiZ0v0NJa8WubN9M5uBDLr4XTB3gIBT6XACDtAj3
-	 lsLfKUYFzGypqLKGITzPtmPS3yi9ezGpe9n7MTVoQgmllXfme+cOouQTvO36DYXKEk
-	 Vg3z2xwCNTl99C6xNvrHqpH0lFYUliEO674MpAx4AIbzVw3G6GllvF2oHbzVYAF+8/
-	 Ft0M8zHDBq0lw==
+	b=mUDay2dmzhc40wywat/XlLuCHs5kjflNQggo4QFHRXd8CK6EDj5fJst6SkEv6kJy/
+	 RGj4O24n1d/S44F5/0FFQcIvyc/eRHiVikyt1q/uCfQnzRsRwj+pvMm2bEY6civ3ri
+	 6xyCsKOY8s0TI9yFjXorlW9byaceFuBMsRlvNyF1p0N3/MnO+BjB2P7oJS36k8/foy
+	 OCmQ/ErPucxvJIWHYFvaLbEBA9Uh8gPNdmSPY+EjVPusQbmPe17G8EDkYS9MDhXeWk
+	 NQAiDCvQwG7arXajjAeooWvTVQkMosBJLF3CtI4qHSdvkvwQsM17UTujCL9TKNenCm
+	 7Pk23nR/ey0EA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: netdev@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -43,9 +43,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Dmitry Safonov <0x7f454c46@gmail.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [RFC PATCH 5/8] net/tcp: Remove tcp_sigpool
-Date: Sat,  7 Mar 2026 14:43:38 -0800
-Message-ID: <20260307224341.5644-6-ebiggers@kernel.org>
+Subject: [RFC PATCH 6/8] crypto: hash - Remove support for cloning hash tfms
+Date: Sat,  7 Mar 2026 14:43:39 -0800
+Message-ID: <20260307224341.5644-7-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260307224341.5644-1-ebiggers@kernel.org>
 References: <20260307224341.5644-1-ebiggers@kernel.org>
@@ -57,474 +57,398 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-tcp_sigpool is no longer used.  It existed only as a workaround for
-issues in the design of the crypto_ahash API, which have been avoided by
-switching to the much easier-to-use library APIs instead.  Remove it.
+Hash transformation cloning no longer has a user, and there's a good
+chance no new one will appear because the library API solves the problem
+in a much simpler and more efficient way.  Remove support for it.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- include/net/tcp.h      |  34 ----
- net/ipv4/Kconfig       |   3 -
- net/ipv4/Makefile      |   1 -
- net/ipv4/tcp_sigpool.c | 366 -----------------------------------------
- 4 files changed, 404 deletions(-)
- delete mode 100644 net/ipv4/tcp_sigpool.c
+ crypto/ahash.c        | 70 -------------------------------------------
+ crypto/cmac.c         | 16 ----------
+ crypto/cryptd.c       | 16 ----------
+ crypto/hmac.c         | 31 -------------------
+ crypto/shash.c        | 37 -----------------------
+ include/crypto/hash.h |  8 -----
+ 6 files changed, 178 deletions(-)
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 18fb675d05bc4..73e7c1c1050b8 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1968,44 +1968,10 @@ struct tcp6_pseudohdr {
- 	struct in6_addr daddr;
- 	__be32		len;
- 	__be32		protocol;	/* including padding */
- };
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 7a730324c50e2..85dcd120de3ee 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -860,80 +860,10 @@ bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg)
  
--/*
-- * struct tcp_sigpool - per-CPU pool of ahash_requests
-- * @scratch: per-CPU temporary area, that can be used between
-- *	     tcp_sigpool_start() and tcp_sigpool_end() to perform
-- *	     crypto request
-- * @req: pre-allocated ahash request
-- */
--struct tcp_sigpool {
--	void *scratch;
--	struct ahash_request *req;
--};
--
--int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size);
--void tcp_sigpool_get(unsigned int id);
--void tcp_sigpool_release(unsigned int id);
--int tcp_sigpool_hash_skb_data(struct tcp_sigpool *hp,
--			      const struct sk_buff *skb,
--			      unsigned int header_len);
--
--/**
-- * tcp_sigpool_start - disable bh and start using tcp_sigpool_ahash
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- * @c: returned tcp_sigpool for usage (uninitialized on failure)
-- *
-- * Returns: 0 on success, error otherwise.
-- */
--int tcp_sigpool_start(unsigned int id, struct tcp_sigpool *c);
--/**
-- * tcp_sigpool_end - enable bh and stop using tcp_sigpool
-- * @c: tcp_sigpool context that was returned by tcp_sigpool_start()
-- */
--void tcp_sigpool_end(struct tcp_sigpool *c);
--size_t tcp_sigpool_algo(unsigned int id, char *buf, size_t buf_len);
--/* - functions */
- void tcp_v4_md5_hash_skb(char *md5_hash, const struct tcp_md5sig_key *key,
- 			 const struct sock *sk, const struct sk_buff *skb);
- int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
- 		   int family, u8 prefixlen, int l3index, u8 flags,
- 		   const u8 *newkey, u8 newkeylen);
-diff --git a/net/ipv4/Kconfig b/net/ipv4/Kconfig
-index 0fa293527cee9..7b945a5186c9b 100644
---- a/net/ipv4/Kconfig
-+++ b/net/ipv4/Kconfig
-@@ -740,13 +740,10 @@ config DEFAULT_TCP_CONG
- 	default "dctcp" if DEFAULT_DCTCP
- 	default "cdg" if DEFAULT_CDG
- 	default "bbr" if DEFAULT_BBR
- 	default "cubic"
+ 	return __crypto_ahash_alg(alg)->setkey != ahash_nosetkey;
+ }
+ EXPORT_SYMBOL_GPL(crypto_hash_alg_has_setkey);
  
--config TCP_SIGPOOL
--	tristate
--
- config TCP_AO
- 	bool "TCP: Authentication Option (RFC5925)"
- 	select CRYPTO_LIB_AES_CBC_MACS
- 	select CRYPTO_LIB_SHA1
- 	select CRYPTO_LIB_SHA256
-diff --git a/net/ipv4/Makefile b/net/ipv4/Makefile
-index 18108a6f04999..f98d4734e4eeb 100644
---- a/net/ipv4/Makefile
-+++ b/net/ipv4/Makefile
-@@ -58,11 +58,10 @@ obj-$(CONFIG_TCP_CONG_NV) += tcp_nv.o
- obj-$(CONFIG_TCP_CONG_VENO) += tcp_veno.o
- obj-$(CONFIG_TCP_CONG_SCALABLE) += tcp_scalable.o
- obj-$(CONFIG_TCP_CONG_LP) += tcp_lp.o
- obj-$(CONFIG_TCP_CONG_YEAH) += tcp_yeah.o
- obj-$(CONFIG_TCP_CONG_ILLINOIS) += tcp_illinois.o
--obj-$(CONFIG_TCP_SIGPOOL) += tcp_sigpool.o
- obj-$(CONFIG_NET_SOCK_MSG) += tcp_bpf.o
- obj-$(CONFIG_BPF_SYSCALL) += udp_bpf.o
- obj-$(CONFIG_NETLABEL) += cipso_ipv4.o
- 
- obj-$(CONFIG_XFRM) += xfrm4_policy.o xfrm4_state.o xfrm4_input.o \
-diff --git a/net/ipv4/tcp_sigpool.c b/net/ipv4/tcp_sigpool.c
-deleted file mode 100644
-index 10b2e5970c402..0000000000000
---- a/net/ipv4/tcp_sigpool.c
-+++ /dev/null
-@@ -1,366 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--
--#include <crypto/hash.h>
--#include <linux/cpu.h>
--#include <linux/kref.h>
--#include <linux/module.h>
--#include <linux/mutex.h>
--#include <linux/percpu.h>
--#include <linux/workqueue.h>
--#include <net/tcp.h>
--
--static size_t __scratch_size;
--struct sigpool_scratch {
--	local_lock_t bh_lock;
--	void __rcu *pad;
--};
--
--static DEFINE_PER_CPU(struct sigpool_scratch, sigpool_scratch) = {
--	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
--};
--
--struct sigpool_entry {
--	struct crypto_ahash	*hash;
--	const char		*alg;
--	struct kref		kref;
--	uint16_t		needs_key:1,
--				reserved:15;
--};
--
--#define CPOOL_SIZE (PAGE_SIZE / sizeof(struct sigpool_entry))
--static struct sigpool_entry cpool[CPOOL_SIZE];
--static unsigned int cpool_populated;
--static DEFINE_MUTEX(cpool_mutex);
--
--/* Slow-path */
--struct scratches_to_free {
--	struct rcu_head rcu;
--	unsigned int cnt;
--	void *scratches[];
--};
--
--static void free_old_scratches(struct rcu_head *head)
+-struct crypto_ahash *crypto_clone_ahash(struct crypto_ahash *hash)
 -{
--	struct scratches_to_free *stf;
+-	struct hash_alg_common *halg = crypto_hash_alg_common(hash);
+-	struct crypto_tfm *tfm = crypto_ahash_tfm(hash);
+-	struct crypto_ahash *fb = NULL;
+-	struct crypto_ahash *nhash;
+-	struct ahash_alg *alg;
+-	int err;
 -
--	stf = container_of(head, struct scratches_to_free, rcu);
--	while (stf->cnt--)
--		kfree(stf->scratches[stf->cnt]);
--	kfree(stf);
--}
+-	if (!crypto_hash_alg_has_setkey(halg)) {
+-		tfm = crypto_tfm_get(tfm);
+-		if (IS_ERR(tfm))
+-			return ERR_CAST(tfm);
 -
--/**
-- * sigpool_reserve_scratch - re-allocates scratch buffer, slow-path
-- * @size: request size for the scratch/temp buffer
-- */
--static int sigpool_reserve_scratch(size_t size)
--{
--	struct scratches_to_free *stf;
--	size_t stf_sz = struct_size(stf, scratches, num_possible_cpus());
--	int cpu, err = 0;
--
--	lockdep_assert_held(&cpool_mutex);
--	if (__scratch_size >= size)
--		return 0;
--
--	stf = kmalloc(stf_sz, GFP_KERNEL);
--	if (!stf)
--		return -ENOMEM;
--	stf->cnt = 0;
--
--	size = max(size, __scratch_size);
--	cpus_read_lock();
--	for_each_possible_cpu(cpu) {
--		void *scratch, *old_scratch;
--
--		scratch = kmalloc_node(size, GFP_KERNEL, cpu_to_node(cpu));
--		if (!scratch) {
--			err = -ENOMEM;
--			break;
--		}
--
--		old_scratch = rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
--					scratch, lockdep_is_held(&cpool_mutex));
--		if (!cpu_online(cpu) || !old_scratch) {
--			kfree(old_scratch);
--			continue;
--		}
--		stf->scratches[stf->cnt++] = old_scratch;
+-		return hash;
 -	}
--	cpus_read_unlock();
--	if (!err)
--		__scratch_size = size;
 -
--	call_rcu(&stf->rcu, free_old_scratches);
--	return err;
+-	nhash = crypto_clone_tfm(&crypto_ahash_type, tfm);
+-
+-	if (IS_ERR(nhash))
+-		return nhash;
+-
+-	nhash->reqsize = hash->reqsize;
+-	nhash->statesize = hash->statesize;
+-
+-	if (likely(hash->using_shash)) {
+-		struct crypto_shash **nctx = crypto_ahash_ctx(nhash);
+-		struct crypto_shash *shash;
+-
+-		shash = crypto_clone_shash(ahash_to_shash(hash));
+-		if (IS_ERR(shash)) {
+-			err = PTR_ERR(shash);
+-			goto out_free_nhash;
+-		}
+-		crypto_ahash_tfm(nhash)->exit = crypto_exit_ahash_using_shash;
+-		nhash->using_shash = true;
+-		*nctx = shash;
+-		return nhash;
+-	}
+-
+-	if (crypto_ahash_need_fallback(hash)) {
+-		fb = crypto_clone_ahash(crypto_ahash_fb(hash));
+-		err = PTR_ERR(fb);
+-		if (IS_ERR(fb))
+-			goto out_free_nhash;
+-
+-		crypto_ahash_tfm(nhash)->fb = crypto_ahash_tfm(fb);
+-	}
+-
+-	err = -ENOSYS;
+-	alg = crypto_ahash_alg(hash);
+-	if (!alg->clone_tfm)
+-		goto out_free_fb;
+-
+-	err = alg->clone_tfm(nhash, hash);
+-	if (err)
+-		goto out_free_fb;
+-
+-	crypto_ahash_tfm(nhash)->exit = crypto_ahash_exit_tfm;
+-
+-	return nhash;
+-
+-out_free_fb:
+-	crypto_free_ahash(fb);
+-out_free_nhash:
+-	crypto_free_ahash(nhash);
+-	return ERR_PTR(err);
 -}
+-EXPORT_SYMBOL_GPL(crypto_clone_ahash);
 -
--static void sigpool_scratch_free(void)
+ static int ahash_default_export_core(struct ahash_request *req, void *out)
+ {
+ 	return -ENOSYS;
+ }
+ 
+diff --git a/crypto/cmac.c b/crypto/cmac.c
+index 1b03964abe007..83e58937f0136 100644
+--- a/crypto/cmac.c
++++ b/crypto/cmac.c
+@@ -149,25 +149,10 @@ static int cmac_init_tfm(struct crypto_shash *tfm)
+ 	ctx->child = cipher;
+ 
+ 	return 0;
+ }
+ 
+-static int cmac_clone_tfm(struct crypto_shash *tfm, struct crypto_shash *otfm)
 -{
--	int cpu;
+-	struct cmac_tfm_ctx *octx = crypto_shash_ctx(otfm);
+-	struct cmac_tfm_ctx *ctx = crypto_shash_ctx(tfm);
+-	struct crypto_cipher *cipher;
 -
--	for_each_possible_cpu(cpu)
--		kfree(rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
--					  NULL, lockdep_is_held(&cpool_mutex)));
--	__scratch_size = 0;
--}
+-	cipher = crypto_clone_cipher(octx->child);
+-	if (IS_ERR(cipher))
+-		return PTR_ERR(cipher);
 -
--static int __cpool_try_clone(struct crypto_ahash *hash)
--{
--	struct crypto_ahash *tmp;
+-	ctx->child = cipher;
 -
--	tmp = crypto_clone_ahash(hash);
--	if (IS_ERR(tmp))
--		return PTR_ERR(tmp);
--
--	crypto_free_ahash(tmp);
 -	return 0;
 -}
 -
--static int __cpool_alloc_ahash(struct sigpool_entry *e, const char *alg)
+ static void cmac_exit_tfm(struct crypto_shash *tfm)
+ {
+ 	struct cmac_tfm_ctx *ctx = crypto_shash_ctx(tfm);
+ 	crypto_free_cipher(ctx->child);
+ }
+@@ -220,11 +205,10 @@ static int cmac_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.init = crypto_cmac_digest_init;
+ 	inst->alg.update = crypto_cmac_digest_update;
+ 	inst->alg.finup = crypto_cmac_digest_finup;
+ 	inst->alg.setkey = crypto_cmac_digest_setkey;
+ 	inst->alg.init_tfm = cmac_init_tfm;
+-	inst->alg.clone_tfm = cmac_clone_tfm;
+ 	inst->alg.exit_tfm = cmac_exit_tfm;
+ 
+ 	inst->free = shash_free_singlespawn_instance;
+ 
+ 	err = shash_register_instance(tmpl, inst);
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index cd38f46761767..e2958020f1ae4 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -450,25 +450,10 @@ static int cryptd_hash_init_tfm(struct crypto_ahash *tfm)
+ 				 sizeof(struct cryptd_hash_request_ctx) +
+ 				 crypto_shash_descsize(hash));
+ 	return 0;
+ }
+ 
+-static int cryptd_hash_clone_tfm(struct crypto_ahash *ntfm,
+-				 struct crypto_ahash *tfm)
 -{
--	struct crypto_ahash *cpu0_hash;
--	int ret;
+-	struct cryptd_hash_ctx *nctx = crypto_ahash_ctx(ntfm);
+-	struct cryptd_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+-	struct crypto_shash *hash;
 -
--	e->alg = kstrdup(alg, GFP_KERNEL);
--	if (!e->alg)
--		return -ENOMEM;
+-	hash = crypto_clone_shash(ctx->child);
+-	if (IS_ERR(hash))
+-		return PTR_ERR(hash);
 -
--	cpu0_hash = crypto_alloc_ahash(alg, 0, CRYPTO_ALG_ASYNC);
--	if (IS_ERR(cpu0_hash)) {
--		ret = PTR_ERR(cpu0_hash);
--		goto out_free_alg;
--	}
--
--	e->needs_key = crypto_ahash_get_flags(cpu0_hash) & CRYPTO_TFM_NEED_KEY;
--
--	ret = __cpool_try_clone(cpu0_hash);
--	if (ret)
--		goto out_free_cpu0_hash;
--	e->hash = cpu0_hash;
--	kref_init(&e->kref);
+-	nctx->child = hash;
 -	return 0;
--
--out_free_cpu0_hash:
--	crypto_free_ahash(cpu0_hash);
--out_free_alg:
--	kfree(e->alg);
--	e->alg = NULL;
--	return ret;
 -}
 -
--/**
-- * tcp_sigpool_alloc_ahash - allocates pool for ahash requests
-- * @alg: name of async hash algorithm
-- * @scratch_size: reserve a tcp_sigpool::scratch buffer of this size
-- */
--int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size)
+ static void cryptd_hash_exit_tfm(struct crypto_ahash *tfm)
+ {
+ 	struct cryptd_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+ 
+ 	crypto_free_shash(ctx->child);
+@@ -697,11 +682,10 @@ static int cryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
+ 	inst->alg.halg.digestsize = alg->digestsize;
+ 	inst->alg.halg.statesize = alg->statesize;
+ 	inst->alg.halg.base.cra_ctxsize = sizeof(struct cryptd_hash_ctx);
+ 
+ 	inst->alg.init_tfm = cryptd_hash_init_tfm;
+-	inst->alg.clone_tfm = cryptd_hash_clone_tfm;
+ 	inst->alg.exit_tfm = cryptd_hash_exit_tfm;
+ 
+ 	inst->alg.init   = cryptd_hash_init_enqueue;
+ 	inst->alg.update = cryptd_hash_update_enqueue;
+ 	inst->alg.final  = cryptd_hash_final_enqueue;
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+index 148af460ae974..807e08b252c55 100644
+--- a/crypto/hmac.c
++++ b/crypto/hmac.c
+@@ -156,24 +156,10 @@ static int hmac_init_tfm(struct crypto_shash *parent)
+ 
+ 	tctx->hash = hash;
+ 	return 0;
+ }
+ 
+-static int hmac_clone_tfm(struct crypto_shash *dst, struct crypto_shash *src)
 -{
--	int i, ret;
+-	struct hmac_ctx *sctx = crypto_shash_ctx(src);
+-	struct hmac_ctx *dctx = crypto_shash_ctx(dst);
+-	struct crypto_shash *hash;
 -
--	/* slow-path */
--	mutex_lock(&cpool_mutex);
--	ret = sigpool_reserve_scratch(scratch_size);
--	if (ret)
--		goto out;
--	for (i = 0; i < cpool_populated; i++) {
--		if (!cpool[i].alg)
--			continue;
--		if (strcmp(cpool[i].alg, alg))
--			continue;
+-	hash = crypto_clone_shash(sctx->hash);
+-	if (IS_ERR(hash))
+-		return PTR_ERR(hash);
 -
--		/* pairs with tcp_sigpool_release() */
--		if (!kref_get_unless_zero(&cpool[i].kref))
--			kref_init(&cpool[i].kref);
--		ret = i;
--		goto out;
--	}
--
--	for (i = 0; i < cpool_populated; i++) {
--		if (!cpool[i].alg)
--			break;
--	}
--	if (i >= CPOOL_SIZE) {
--		ret = -ENOSPC;
--		goto out;
--	}
--
--	ret = __cpool_alloc_ahash(&cpool[i], alg);
--	if (!ret) {
--		ret = i;
--		if (i == cpool_populated)
--			cpool_populated++;
--	}
--out:
--	mutex_unlock(&cpool_mutex);
--	return ret;
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_alloc_ahash);
--
--static void __cpool_free_entry(struct sigpool_entry *e)
--{
--	crypto_free_ahash(e->hash);
--	kfree(e->alg);
--	memset(e, 0, sizeof(*e));
+-	dctx->hash = hash;
+-	return 0;
 -}
 -
--static void cpool_cleanup_work_cb(struct work_struct *work)
+ static void hmac_exit_tfm(struct crypto_shash *parent)
+ {
+ 	struct hmac_ctx *tctx = crypto_shash_ctx(parent);
+ 
+ 	crypto_free_shash(tctx->hash);
+@@ -233,11 +219,10 @@ static int __hmac_create_shash(struct crypto_template *tmpl,
+ 	inst->alg.import = hmac_import;
+ 	inst->alg.export_core = hmac_export_core;
+ 	inst->alg.import_core = hmac_import_core;
+ 	inst->alg.setkey = hmac_setkey;
+ 	inst->alg.init_tfm = hmac_init_tfm;
+-	inst->alg.clone_tfm = hmac_clone_tfm;
+ 	inst->alg.exit_tfm = hmac_exit_tfm;
+ 
+ 	inst->free = shash_free_singlespawn_instance;
+ 
+ 	err = shash_register_instance(tmpl, inst);
+@@ -421,25 +406,10 @@ static int hmac_init_ahash_tfm(struct crypto_ahash *parent)
+ 
+ 	tctx->hash = hash;
+ 	return 0;
+ }
+ 
+-static int hmac_clone_ahash_tfm(struct crypto_ahash *dst,
+-				struct crypto_ahash *src)
 -{
--	bool free_scratch = true;
--	unsigned int i;
--
--	mutex_lock(&cpool_mutex);
--	for (i = 0; i < cpool_populated; i++) {
--		if (kref_read(&cpool[i].kref) > 0) {
--			free_scratch = false;
--			continue;
--		}
--		if (!cpool[i].alg)
--			continue;
--		__cpool_free_entry(&cpool[i]);
--	}
--	if (free_scratch)
--		sigpool_scratch_free();
--	mutex_unlock(&cpool_mutex);
--}
--
--static DECLARE_WORK(cpool_cleanup_work, cpool_cleanup_work_cb);
--static void cpool_schedule_cleanup(struct kref *kref)
--{
--	schedule_work(&cpool_cleanup_work);
--}
--
--/**
-- * tcp_sigpool_release - decreases number of users for a pool. If it was
-- * the last user of the pool, releases any memory that was consumed.
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- */
--void tcp_sigpool_release(unsigned int id)
--{
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
--		return;
--
--	/* slow-path */
--	kref_put(&cpool[id].kref, cpool_schedule_cleanup);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_release);
--
--/**
-- * tcp_sigpool_get - increases number of users (refcounter) for a pool
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- */
--void tcp_sigpool_get(unsigned int id)
--{
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
--		return;
--	kref_get(&cpool[id].kref);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_get);
--
--int tcp_sigpool_start(unsigned int id, struct tcp_sigpool *c) __cond_acquires(0, RCU_BH)
--{
+-	struct ahash_hmac_ctx *sctx = crypto_ahash_ctx(src);
+-	struct ahash_hmac_ctx *dctx = crypto_ahash_ctx(dst);
 -	struct crypto_ahash *hash;
 -
--	rcu_read_lock_bh();
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg)) {
--		rcu_read_unlock_bh();
--		return -EINVAL;
--	}
--
--	hash = crypto_clone_ahash(cpool[id].hash);
--	if (IS_ERR(hash)) {
--		rcu_read_unlock_bh();
+-	hash = crypto_clone_ahash(sctx->hash);
+-	if (IS_ERR(hash))
 -		return PTR_ERR(hash);
--	}
 -
--	c->req = ahash_request_alloc(hash, GFP_ATOMIC);
--	if (!c->req) {
--		crypto_free_ahash(hash);
--		rcu_read_unlock_bh();
--		return -ENOMEM;
--	}
--	ahash_request_set_callback(c->req, 0, NULL, NULL);
--
--	/* Pairs with tcp_sigpool_reserve_scratch(), scratch area is
--	 * valid (allocated) until tcp_sigpool_end().
--	 */
--	local_lock_nested_bh(&sigpool_scratch.bh_lock);
--	c->scratch = rcu_dereference_bh(*this_cpu_ptr(&sigpool_scratch.pad));
+-	dctx->hash = hash;
 -	return 0;
 -}
--EXPORT_SYMBOL_GPL(tcp_sigpool_start);
 -
--void tcp_sigpool_end(struct tcp_sigpool *c) __releases(RCU_BH)
+ static void hmac_exit_ahash_tfm(struct crypto_ahash *parent)
+ {
+ 	struct ahash_hmac_ctx *tctx = crypto_ahash_ctx(parent);
+ 
+ 	crypto_free_ahash(tctx->hash);
+@@ -501,11 +471,10 @@ static int hmac_create_ahash(struct crypto_template *tmpl, struct rtattr **tb,
+ 	inst->alg.import = hmac_import_ahash;
+ 	inst->alg.export_core = hmac_export_core_ahash;
+ 	inst->alg.import_core = hmac_import_core_ahash;
+ 	inst->alg.setkey = hmac_setkey_ahash;
+ 	inst->alg.init_tfm = hmac_init_ahash_tfm;
+-	inst->alg.clone_tfm = hmac_clone_ahash_tfm;
+ 	inst->alg.exit_tfm = hmac_exit_ahash_tfm;
+ 
+ 	inst->free = ahash_free_singlespawn_instance;
+ 
+ 	err = ahash_register_instance(tmpl, inst);
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 2f07d0bd1f61b..351cba3c11070 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -393,47 +393,10 @@ int crypto_has_shash(const char *alg_name, u32 type, u32 mask)
+ {
+ 	return crypto_type_has_alg(alg_name, &crypto_shash_type, type, mask);
+ }
+ EXPORT_SYMBOL_GPL(crypto_has_shash);
+ 
+-struct crypto_shash *crypto_clone_shash(struct crypto_shash *hash)
 -{
--	struct crypto_ahash *hash = crypto_ahash_reqtfm(c->req);
+-	struct crypto_tfm *tfm = crypto_shash_tfm(hash);
+-	struct shash_alg *alg = crypto_shash_alg(hash);
+-	struct crypto_shash *nhash;
+-	int err;
 -
--	local_unlock_nested_bh(&sigpool_scratch.bh_lock);
--	rcu_read_unlock_bh();
--	ahash_request_free(c->req);
--	crypto_free_ahash(hash);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_end);
+-	if (!crypto_shash_alg_has_setkey(alg)) {
+-		tfm = crypto_tfm_get(tfm);
+-		if (IS_ERR(tfm))
+-			return ERR_CAST(tfm);
 -
--/**
-- * tcp_sigpool_algo - return algorithm of tcp_sigpool
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- * @buf: buffer to return name of algorithm
-- * @buf_len: size of @buf
-- */
--size_t tcp_sigpool_algo(unsigned int id, char *buf, size_t buf_len)
--{
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
--		return -EINVAL;
--
--	return strscpy(buf, cpool[id].alg, buf_len);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_algo);
--
--/**
-- * tcp_sigpool_hash_skb_data - hash data in skb with initialized tcp_sigpool
-- * @hp: tcp_sigpool pointer
-- * @skb: buffer to add sign for
-- * @header_len: TCP header length for this segment
-- */
--int tcp_sigpool_hash_skb_data(struct tcp_sigpool *hp,
--			      const struct sk_buff *skb,
--			      unsigned int header_len)
--{
--	const unsigned int head_data_len = skb_headlen(skb) > header_len ?
--					   skb_headlen(skb) - header_len : 0;
--	const struct skb_shared_info *shi = skb_shinfo(skb);
--	const struct tcphdr *tp = tcp_hdr(skb);
--	struct ahash_request *req = hp->req;
--	struct sk_buff *frag_iter;
--	struct scatterlist sg;
--	unsigned int i;
--
--	sg_init_table(&sg, 1);
--
--	sg_set_buf(&sg, ((u8 *)tp) + header_len, head_data_len);
--	ahash_request_set_crypt(req, &sg, NULL, head_data_len);
--	if (crypto_ahash_update(req))
--		return 1;
--
--	for (i = 0; i < shi->nr_frags; ++i) {
--		const skb_frag_t *f = &shi->frags[i];
--		unsigned int offset = skb_frag_off(f);
--		struct page *page;
--
--		page = skb_frag_page(f) + (offset >> PAGE_SHIFT);
--		sg_set_page(&sg, page, skb_frag_size(f), offset_in_page(offset));
--		ahash_request_set_crypt(req, &sg, NULL, skb_frag_size(f));
--		if (crypto_ahash_update(req))
--			return 1;
+-		return hash;
 -	}
 -
--	skb_walk_frags(skb, frag_iter)
--		if (tcp_sigpool_hash_skb_data(hp, frag_iter, 0))
--			return 1;
+-	if (!alg->clone_tfm && (alg->init_tfm || alg->base.cra_init))
+-		return ERR_PTR(-ENOSYS);
 -
--	return 0;
+-	nhash = crypto_clone_tfm(&crypto_shash_type, tfm);
+-	if (IS_ERR(nhash))
+-		return nhash;
+-
+-	if (alg->clone_tfm) {
+-		err = alg->clone_tfm(nhash, hash);
+-		if (err) {
+-			crypto_free_shash(nhash);
+-			return ERR_PTR(err);
+-		}
+-	}
+-
+-	if (alg->exit_tfm)
+-		crypto_shash_tfm(nhash)->exit = crypto_shash_exit_tfm;
+-
+-	return nhash;
 -}
--EXPORT_SYMBOL(tcp_sigpool_hash_skb_data);
+-EXPORT_SYMBOL_GPL(crypto_clone_shash);
 -
--MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Per-CPU pool of crypto requests");
+ int hash_prepare_alg(struct hash_alg_common *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
+ 
+ 	if (alg->digestsize > HASH_MAX_DIGESTSIZE)
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 586700332c731..e474f8461ea19 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -146,11 +146,10 @@ struct ahash_request {
+  *	      requirement of the transformation and put any software
+  *	      fallbacks in place.
+  * @exit_tfm: Deinitialize the cryptographic transformation object.
+  *	      This is a counterpart to @init_tfm, used to remove
+  *	      various changes set in @init_tfm.
+- * @clone_tfm: Copy transform into new object, may allocate memory.
+  * @halg: see struct hash_alg_common
+  */
+ struct ahash_alg {
+ 	int (*init)(struct ahash_request *req);
+ 	int (*update)(struct ahash_request *req);
+@@ -163,11 +162,10 @@ struct ahash_alg {
+ 	int (*import_core)(struct ahash_request *req, const void *in);
+ 	int (*setkey)(struct crypto_ahash *tfm, const u8 *key,
+ 		      unsigned int keylen);
+ 	int (*init_tfm)(struct crypto_ahash *tfm);
+ 	void (*exit_tfm)(struct crypto_ahash *tfm);
+-	int (*clone_tfm)(struct crypto_ahash *dst, struct crypto_ahash *src);
+ 
+ 	struct hash_alg_common halg;
+ };
+ 
+ struct shash_desc {
+@@ -237,11 +235,10 @@ struct shash_desc {
+  *	      requirement of the transformation and put any software
+  *	      fallbacks in place.
+  * @exit_tfm: Deinitialize the cryptographic transformation object.
+  *	      This is a counterpart to @init_tfm, used to remove
+  *	      various changes set in @init_tfm.
+- * @clone_tfm: Copy transform into new object, may allocate memory.
+  * @descsize: Size of the operational state for the message digest. This state
+  * 	      size is the memory size that needs to be allocated for
+  *	      shash_desc.__ctx
+  * @halg: see struct hash_alg_common
+  * @HASH_ALG_COMMON: see struct hash_alg_common
+@@ -261,11 +258,10 @@ struct shash_alg {
+ 	int (*import_core)(struct shash_desc *desc, const void *in);
+ 	int (*setkey)(struct crypto_shash *tfm, const u8 *key,
+ 		      unsigned int keylen);
+ 	int (*init_tfm)(struct crypto_shash *tfm);
+ 	void (*exit_tfm)(struct crypto_shash *tfm);
+-	int (*clone_tfm)(struct crypto_shash *dst, struct crypto_shash *src);
+ 
+ 	unsigned int descsize;
+ 
+ 	union {
+ 		struct HASH_ALG_COMMON;
+@@ -320,12 +316,10 @@ static inline struct crypto_ahash *__crypto_ahash_cast(struct crypto_tfm *tfm)
+  *	   of an error, PTR_ERR() returns the error code.
+  */
+ struct crypto_ahash *crypto_alloc_ahash(const char *alg_name, u32 type,
+ 					u32 mask);
+ 
+-struct crypto_ahash *crypto_clone_ahash(struct crypto_ahash *tfm);
+-
+ static inline struct crypto_tfm *crypto_ahash_tfm(struct crypto_ahash *tfm)
+ {
+ 	return &tfm->base;
+ }
+ 
+@@ -757,12 +751,10 @@ static inline void ahash_request_set_virt(struct ahash_request *req,
+  *	   of an error, PTR_ERR() returns the error code.
+  */
+ struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
+ 					u32 mask);
+ 
+-struct crypto_shash *crypto_clone_shash(struct crypto_shash *tfm);
+-
+ int crypto_has_shash(const char *alg_name, u32 type, u32 mask);
+ 
+ static inline struct crypto_tfm *crypto_shash_tfm(struct crypto_shash *tfm)
+ {
+ 	return &tfm->base;
 -- 
 2.53.0
 
