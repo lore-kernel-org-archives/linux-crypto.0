@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CBE3385AC;
-	Sat,  7 Mar 2026 22:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E113431E9;
+	Sat,  7 Mar 2026 22:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772923576; cv=none; b=hSnXkkCSJuqzMWLKrkwy3lP0ax7xOcmNPJIM8uwCJnVZpMX6RhPU6ojcq+luCbN4W+fWpRsFYXL6febh4w39T+d+1l9YORIZxcNCM/kRgCf7I+PV2loExItgvYYXkyBdEBCssWk0PZkh2FWNPqWDTMPrQ4fonvETEnEaP7TsvJQ=
+	t=1772923577; cv=none; b=gkv2QZBexcdVWohCNQKyBOAeR0oXjGxsJgUeik70tuyAD1XivTimMUjIqPAW9Mwo0bL8XfP5woDKaC8spEEfqlXDI8pFDBqyGyqtBkklOsMzThqZojRkWVLdmaYTuAzW8PQOsHG50jE9nfY1bhz5EJjYE61gdIxHQFmbfKtK1is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772923576; c=relaxed/simple;
-	bh=t0xxkmc+LBcvhVMdCIXmj9CBTstJxk/Y/EgILiuujh0=;
+	s=arc-20240116; t=1772923577; c=relaxed/simple;
+	bh=ETOBZymeHG+RfWz4RBdVFEwQAwJS577BxMSzcKm1fqs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E9uX93gqbPdoLYhJAhUsniUd9sN65qCrB4XlSJC5XC5Dk+YRO5thdCnBIqkf4SYxLq5h+/sxfxEWIPG+wfV95VElb4VaC80s4qd6D57mB5UCjYsoVtO8vzm3/uUZGpHYYBa3ZLHsxpSmBk7m1DRw3pcVVQK3was+GP+2NEDlr1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wwd3asBC; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=M8TOshxVmjQcBRbudZEZhpg6boyAaorm0VIkckMeeftn1DQCbSuRDmjPYtCHp8qoSbB6rmqa2tfXJRu9FQo1rBzJR4zvZ6NHwndTEZGJ8F6izoVwE/IGe1jxVFQpZ0dogfzY3O7zRzF+qDtuDB5ssfjbViiLLTdtRjIOPAJizY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2FcKZp5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wwd3asBC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AE8CC19422;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2FcKZp5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A900EC2BCB1;
 	Sat,  7 Mar 2026 22:46:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772923576;
-	bh=t0xxkmc+LBcvhVMdCIXmj9CBTstJxk/Y/EgILiuujh0=;
+	s=k20201202; t=1772923577;
+	bh=ETOBZymeHG+RfWz4RBdVFEwQAwJS577BxMSzcKm1fqs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Wwd3asBCuCi8ove4fLbCCyXK2DSwEZ5Uuvi4QJ1fiet4GOnVPrrqt8ZuDce3W4+C8
-	 ync+RPBVvIF1sJUnwCzlr+2Q4fNBFzkz6M4A7ioJFa78wFgaroD4SCxDhi/jkSr1Et
-	 Ke7S5EMGu6rueB91RYtsY1eHTgDAzFLl12sBg2d7mVwSTR/nSYe956GWlOrH9VpTDS
-	 nBMpG0WkhGxPKKl+laA0HBZ10wQryx2lUVAiSdFPASPSiBPTewN8q3lUZ8l0yDuxGL
-	 p7HhaXkakhn3FhcfFAJ/jkMt6VFY9NFzuBqJGX3LX7FZNzgc0lgf8tVKqCoq+QZES1
-	 pELer0uPAFGJQ==
+	b=r2FcKZp5Gq5+gML2nV5uie7rnpHlrCdqYX2KdodAEdveX77T8nspebQ8IDxtVNM4l
+	 2E5Y7LMGjvBLK4Mr8EvkvxdiXiEe4vUymx7Q0d/wqYG5CNWaHNOSQRmF22O17K5jl6
+	 up197/NQWHVX7r8AeCGMrlAX34HiZ0v0NJa8WubN9M5uBDLr4XTB3gIBT6XACDtAj3
+	 lsLfKUYFzGypqLKGITzPtmPS3yi9ezGpe9n7MTVoQgmllXfme+cOouQTvO36DYXKEk
+	 Vg3z2xwCNTl99C6xNvrHqpH0lFYUliEO674MpAx4AIbzVw3G6GllvF2oHbzVYAF+8/
+	 Ft0M8zHDBq0lw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: netdev@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -43,9 +43,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Dmitry Safonov <0x7f454c46@gmail.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [RFC PATCH 4/8] net/tcp-ao: Return void from functions that can no longer fail
-Date: Sat,  7 Mar 2026 14:43:37 -0800
-Message-ID: <20260307224341.5644-5-ebiggers@kernel.org>
+Subject: [RFC PATCH 5/8] net/tcp: Remove tcp_sigpool
+Date: Sat,  7 Mar 2026 14:43:38 -0800
+Message-ID: <20260307224341.5644-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260307224341.5644-1-ebiggers@kernel.org>
 References: <20260307224341.5644-1-ebiggers@kernel.org>
@@ -57,562 +57,474 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since tcp-ao now uses the crypto library API instead of crypto_ahash,
-and MACs and keys now have a statically-known maximum size, many tcp-ao
-functions can no longer fail.  Propagate this change up into the return
-types of various functions.
+tcp_sigpool is no longer used.  It existed only as a workaround for
+issues in the design of the crypto_ahash API, which have been avoided by
+switching to the much easier-to-use library APIs instead.  Remove it.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- include/net/tcp.h     |   8 +--
- include/net/tcp_ao.h  |  44 +++++++--------
- net/ipv4/tcp_ao.c     | 128 ++++++++++++++++++++++--------------------
- net/ipv4/tcp_output.c |  10 +---
- net/ipv6/tcp_ao.c     |  65 ++++++++++-----------
- 5 files changed, 123 insertions(+), 132 deletions(-)
+ include/net/tcp.h      |  34 ----
+ net/ipv4/Kconfig       |   3 -
+ net/ipv4/Makefile      |   1 -
+ net/ipv4/tcp_sigpool.c | 366 -----------------------------------------
+ 4 files changed, 404 deletions(-)
+ delete mode 100644 net/ipv4/tcp_sigpool.c
 
 diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 978eea2d5df04..18fb675d05bc4 100644
+index 18fb675d05bc4..73e7c1c1050b8 100644
 --- a/include/net/tcp.h
 +++ b/include/net/tcp.h
-@@ -2426,13 +2426,13 @@ struct tcp_sock_af_ops {
- #ifdef CONFIG_TCP_AO
- 	int (*ao_parse)(struct sock *sk, int optname, sockptr_t optval, int optlen);
- 	struct tcp_ao_key *(*ao_lookup)(const struct sock *sk,
- 					struct sock *addr_sk,
- 					int sndid, int rcvid);
--	int (*ao_calc_key_sk)(struct tcp_ao_key *mkt, u8 *key,
--			      const struct sock *sk,
--			      __be32 sisn, __be32 disn, bool send);
-+	void (*ao_calc_key_sk)(struct tcp_ao_key *mkt, u8 *key,
-+			       const struct sock *sk,
-+			       __be32 sisn, __be32 disn, bool send);
- 	int (*calc_ao_hash)(char *location, struct tcp_ao_key *ao,
- 			    const struct sock *sk, const struct sk_buff *skb,
- 			    const u8 *tkey, int hash_offset, u32 sne);
- #endif
+@@ -1968,44 +1968,10 @@ struct tcp6_pseudohdr {
+ 	struct in6_addr daddr;
+ 	__be32		len;
+ 	__be32		protocol;	/* including padding */
  };
-@@ -2449,11 +2449,11 @@ struct tcp_request_sock_ops {
- #endif
- #ifdef CONFIG_TCP_AO
- 	struct tcp_ao_key *(*ao_lookup)(const struct sock *sk,
- 					struct request_sock *req,
- 					int sndid, int rcvid);
--	int (*ao_calc_key)(struct tcp_ao_key *mkt, u8 *key, struct request_sock *sk);
-+	void (*ao_calc_key)(struct tcp_ao_key *mkt, u8 *key, struct request_sock *sk);
- 	int (*ao_synack_hash)(char *ao_hash, struct tcp_ao_key *mkt,
- 			      struct request_sock *req, const struct sk_buff *skb,
- 			      int hash_offset, u32 sne);
- #endif
- #ifdef CONFIG_SYN_COOKIES
-diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
-index f845bc631bc1e..2f20c57ea46b2 100644
---- a/include/net/tcp_ao.h
-+++ b/include/net/tcp_ao.h
-@@ -180,13 +180,13 @@ struct tcp6_ao_context {
  
- /* Established states are fast-path and there always is current_key/rnext_key */
- #define TCP_AO_ESTABLISHED (TCPF_ESTABLISHED | TCPF_FIN_WAIT1 | TCPF_FIN_WAIT2 | \
- 			    TCPF_CLOSE_WAIT | TCPF_LAST_ACK | TCPF_CLOSING)
- 
--int tcp_ao_transmit_skb(struct sock *sk, struct sk_buff *skb,
--			struct tcp_ao_key *key, struct tcphdr *th,
--			__u8 *hash_location);
-+void tcp_ao_transmit_skb(struct sock *sk, struct sk_buff *skb,
-+			 struct tcp_ao_key *key, struct tcphdr *th,
-+			 __u8 *hash_location);
- void tcp_ao_mac_update(struct tcp_ao_mac_ctx *mac_ctx, const void *data,
- 		       size_t data_len);
- int tcp_ao_hash_skb(unsigned short int family,
- 		    char *ao_hash, struct tcp_ao_key *key,
- 		    const struct sock *sk, const struct sk_buff *skb,
-@@ -231,32 +231,33 @@ int tcp_v4_parse_ao(struct sock *sk, int cmd, sockptr_t optval, int optlen);
- struct tcp_ao_key *tcp_v4_ao_lookup(const struct sock *sk, struct sock *addr_sk,
- 				    int sndid, int rcvid);
- int tcp_v4_ao_synack_hash(char *ao_hash, struct tcp_ao_key *mkt,
- 			  struct request_sock *req, const struct sk_buff *skb,
- 			  int hash_offset, u32 sne);
--int tcp_v4_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
--			  const struct sock *sk,
--			  __be32 sisn, __be32 disn, bool send);
--int tcp_v4_ao_calc_key_rsk(struct tcp_ao_key *mkt, u8 *key,
--			   struct request_sock *req);
-+void tcp_v4_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
-+			   const struct sock *sk,
-+			   __be32 sisn, __be32 disn, bool send);
-+void tcp_v4_ao_calc_key_rsk(struct tcp_ao_key *mkt, u8 *key,
-+			    struct request_sock *req);
- struct tcp_ao_key *tcp_v4_ao_lookup_rsk(const struct sock *sk,
- 					struct request_sock *req,
- 					int sndid, int rcvid);
- int tcp_v4_ao_hash_skb(char *ao_hash, struct tcp_ao_key *key,
- 		       const struct sock *sk, const struct sk_buff *skb,
- 		       const u8 *tkey, int hash_offset, u32 sne);
- /* ipv6 specific functions */
--int tcp_v6_ao_hash_pseudoheader(struct tcp_ao_mac_ctx *mac_ctx,
--				const struct in6_addr *daddr,
--				const struct in6_addr *saddr, int nbytes);
--int tcp_v6_ao_calc_key_skb(struct tcp_ao_key *mkt, u8 *key,
--			   const struct sk_buff *skb, __be32 sisn, __be32 disn);
--int tcp_v6_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
--			  const struct sock *sk, __be32 sisn,
--			  __be32 disn, bool send);
--int tcp_v6_ao_calc_key_rsk(struct tcp_ao_key *mkt, u8 *key,
--			   struct request_sock *req);
-+void tcp_v6_ao_hash_pseudoheader(struct tcp_ao_mac_ctx *mac_ctx,
-+				 const struct in6_addr *daddr,
-+				 const struct in6_addr *saddr, int nbytes);
-+void tcp_v6_ao_calc_key_skb(struct tcp_ao_key *mkt, u8 *key,
-+			    const struct sk_buff *skb, __be32 sisn,
-+			    __be32 disn);
-+void tcp_v6_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
-+			   const struct sock *sk, __be32 sisn,
-+			   __be32 disn, bool send);
-+void tcp_v6_ao_calc_key_rsk(struct tcp_ao_key *mkt, u8 *key,
-+			    struct request_sock *req);
- struct tcp_ao_key *tcp_v6_ao_lookup(const struct sock *sk,
- 				    struct sock *addr_sk, int sndid, int rcvid);
- struct tcp_ao_key *tcp_v6_ao_lookup_rsk(const struct sock *sk,
- 					struct request_sock *req,
- 					int sndid, int rcvid);
-@@ -272,15 +273,14 @@ void tcp_ao_finish_connect(struct sock *sk, struct sk_buff *skb);
- void tcp_ao_connect_init(struct sock *sk);
- void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
- 		      struct request_sock *req, unsigned short int family);
- #else /* CONFIG_TCP_AO */
- 
--static inline int tcp_ao_transmit_skb(struct sock *sk, struct sk_buff *skb,
--				      struct tcp_ao_key *key, struct tcphdr *th,
--				      __u8 *hash_location)
-+static inline void tcp_ao_transmit_skb(struct sock *sk, struct sk_buff *skb,
-+				       struct tcp_ao_key *key,
-+				       struct tcphdr *th, __u8 *hash_location)
- {
--	return 0;
- }
- 
- static inline void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
- 				    struct request_sock *req, unsigned short int family)
- {
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 69f1d6d26562e..36a64c1cd8c99 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -433,14 +433,14 @@ void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *tp)
- 		tcptw->ao_info = NULL;
- 	}
- }
- 
- /* 4 tuple and ISNs are expected in NBO */
--static int tcp_v4_ao_calc_key(struct tcp_ao_key *mkt, u8 *key,
--			      __be32 saddr, __be32 daddr,
--			      __be16 sport, __be16 dport,
--			      __be32 sisn,  __be32 disn)
-+static void tcp_v4_ao_calc_key(struct tcp_ao_key *mkt, u8 *key,
-+			       __be32 saddr, __be32 daddr,
-+			       __be16 sport, __be16 dport,
-+			       __be32 sisn, __be32 disn)
- {
- 	/* See RFC5926 3.1.1 */
- 	struct kdf_input_block {
- 		u8                      counter;
- 		u8                      label[6];
-@@ -459,91 +459,92 @@ static int tcp_v4_ao_calc_key(struct tcp_ao_key *mkt, u8 *key,
- 		},
- 		.outlen = htons(tcp_ao_digest_size(mkt) * 8), /* in bits */
- 	};
- 
- 	tcp_ao_calc_traffic_key(mkt, key, &input, sizeof(input));
--	return 0;
- }
- 
--int tcp_v4_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
--			  const struct sock *sk,
--			  __be32 sisn, __be32 disn, bool send)
-+void tcp_v4_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
-+			   const struct sock *sk,
-+			   __be32 sisn, __be32 disn, bool send)
- {
- 	if (send)
--		return tcp_v4_ao_calc_key(mkt, key, sk->sk_rcv_saddr,
--					  sk->sk_daddr, htons(sk->sk_num),
--					  sk->sk_dport, sisn, disn);
-+		tcp_v4_ao_calc_key(mkt, key, sk->sk_rcv_saddr, sk->sk_daddr,
-+				   htons(sk->sk_num), sk->sk_dport, sisn, disn);
- 	else
--		return tcp_v4_ao_calc_key(mkt, key, sk->sk_daddr,
--					  sk->sk_rcv_saddr, sk->sk_dport,
--					  htons(sk->sk_num), disn, sisn);
-+		tcp_v4_ao_calc_key(mkt, key, sk->sk_daddr, sk->sk_rcv_saddr,
-+				   sk->sk_dport, htons(sk->sk_num), disn, sisn);
- }
- 
- static int tcp_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
- 			      const struct sock *sk,
- 			      __be32 sisn, __be32 disn, bool send)
- {
--	if (mkt->family == AF_INET)
--		return tcp_v4_ao_calc_key_sk(mkt, key, sk, sisn, disn, send);
-+	if (mkt->family == AF_INET) {
-+		tcp_v4_ao_calc_key_sk(mkt, key, sk, sisn, disn, send);
-+		return 0;
-+	}
- #if IS_ENABLED(CONFIG_IPV6)
--	else if (mkt->family == AF_INET6)
--		return tcp_v6_ao_calc_key_sk(mkt, key, sk, sisn, disn, send);
-+	if (mkt->family == AF_INET6) {
-+		tcp_v6_ao_calc_key_sk(mkt, key, sk, sisn, disn, send);
-+		return 0;
-+	}
- #endif
--	else
--		return -EOPNOTSUPP;
-+	return -EOPNOTSUPP;
- }
- 
--int tcp_v4_ao_calc_key_rsk(struct tcp_ao_key *mkt, u8 *key,
--			   struct request_sock *req)
-+void tcp_v4_ao_calc_key_rsk(struct tcp_ao_key *mkt, u8 *key,
-+			    struct request_sock *req)
- {
- 	struct inet_request_sock *ireq = inet_rsk(req);
- 
--	return tcp_v4_ao_calc_key(mkt, key,
--				  ireq->ir_loc_addr, ireq->ir_rmt_addr,
--				  htons(ireq->ir_num), ireq->ir_rmt_port,
--				  htonl(tcp_rsk(req)->snt_isn),
--				  htonl(tcp_rsk(req)->rcv_isn));
-+	tcp_v4_ao_calc_key(mkt, key, ireq->ir_loc_addr, ireq->ir_rmt_addr,
-+			   htons(ireq->ir_num), ireq->ir_rmt_port,
-+			   htonl(tcp_rsk(req)->snt_isn),
-+			   htonl(tcp_rsk(req)->rcv_isn));
- }
- 
--static int tcp_v4_ao_calc_key_skb(struct tcp_ao_key *mkt, u8 *key,
--				  const struct sk_buff *skb,
--				  __be32 sisn, __be32 disn)
-+static void tcp_v4_ao_calc_key_skb(struct tcp_ao_key *mkt, u8 *key,
-+				   const struct sk_buff *skb,
-+				   __be32 sisn, __be32 disn)
- {
- 	const struct iphdr *iph = ip_hdr(skb);
- 	const struct tcphdr *th = tcp_hdr(skb);
- 
--	return tcp_v4_ao_calc_key(mkt, key, iph->saddr, iph->daddr,
--				  th->source, th->dest, sisn, disn);
-+	tcp_v4_ao_calc_key(mkt, key, iph->saddr, iph->daddr, th->source,
-+			   th->dest, sisn, disn);
- }
- 
- static int tcp_ao_calc_key_skb(struct tcp_ao_key *mkt, u8 *key,
- 			       const struct sk_buff *skb,
- 			       __be32 sisn, __be32 disn, int family)
- {
--	if (family == AF_INET)
--		return tcp_v4_ao_calc_key_skb(mkt, key, skb, sisn, disn);
-+	if (family == AF_INET) {
-+		tcp_v4_ao_calc_key_skb(mkt, key, skb, sisn, disn);
-+		return 0;
-+	}
- #if IS_ENABLED(CONFIG_IPV6)
--	else if (family == AF_INET6)
--		return tcp_v6_ao_calc_key_skb(mkt, key, skb, sisn, disn);
-+	if (family == AF_INET6) {
-+		tcp_v6_ao_calc_key_skb(mkt, key, skb, sisn, disn);
-+		return 0;
-+	}
- #endif
- 	return -EAFNOSUPPORT;
- }
- 
--static int tcp_v4_ao_hash_pseudoheader(struct tcp_ao_mac_ctx *mac_ctx,
--				       __be32 daddr, __be32 saddr,
--				       int nbytes)
-+static void tcp_v4_ao_hash_pseudoheader(struct tcp_ao_mac_ctx *mac_ctx,
-+					__be32 daddr, __be32 saddr, int nbytes)
- {
- 	struct tcp4_pseudohdr phdr = {
- 		.saddr = saddr,
- 		.daddr = daddr,
- 		.pad = 0,
- 		.protocol = IPPROTO_TCP,
- 		.len = cpu_to_be16(nbytes),
- 	};
- 
- 	tcp_ao_mac_update(mac_ctx, &phdr, sizeof(phdr));
--	return 0;
- }
- 
- static int tcp_ao_hash_pseudoheader(unsigned short int family,
- 				    const struct sock *sk,
- 				    const struct sk_buff *skb,
-@@ -551,35 +552,42 @@ static int tcp_ao_hash_pseudoheader(unsigned short int family,
- {
- 	const struct tcphdr *th = tcp_hdr(skb);
- 
- 	/* TODO: Can we rely on checksum being zero to mean outbound pkt? */
- 	if (!th->check) {
--		if (family == AF_INET)
--			return tcp_v4_ao_hash_pseudoheader(mac_ctx, sk->sk_daddr,
--					sk->sk_rcv_saddr, skb->len);
-+		if (family == AF_INET) {
-+			tcp_v4_ao_hash_pseudoheader(mac_ctx, sk->sk_daddr,
-+						    sk->sk_rcv_saddr, skb->len);
-+			return 0;
-+		}
- #if IS_ENABLED(CONFIG_IPV6)
--		else if (family == AF_INET6)
--			return tcp_v6_ao_hash_pseudoheader(mac_ctx, &sk->sk_v6_daddr,
--					&sk->sk_v6_rcv_saddr, skb->len);
-+		if (family == AF_INET6) {
-+			tcp_v6_ao_hash_pseudoheader(mac_ctx, &sk->sk_v6_daddr,
-+						    &sk->sk_v6_rcv_saddr,
-+						    skb->len);
-+			return 0;
-+		}
- #endif
--		else
--			return -EAFNOSUPPORT;
-+		return -EAFNOSUPPORT;
- 	}
- 
- 	if (family == AF_INET) {
- 		const struct iphdr *iph = ip_hdr(skb);
- 
--		return tcp_v4_ao_hash_pseudoheader(mac_ctx, iph->daddr,
--				iph->saddr, skb->len);
-+		tcp_v4_ao_hash_pseudoheader(mac_ctx, iph->daddr, iph->saddr,
-+					    skb->len);
-+		return 0;
-+	}
- #if IS_ENABLED(CONFIG_IPV6)
--	} else if (family == AF_INET6) {
-+	if (family == AF_INET6) {
- 		const struct ipv6hdr *iph = ipv6_hdr(skb);
- 
--		return tcp_v6_ao_hash_pseudoheader(mac_ctx, &iph->daddr,
--				&iph->saddr, skb->len);
--#endif
-+		tcp_v6_ao_hash_pseudoheader(mac_ctx, &iph->daddr, &iph->saddr,
-+					    skb->len);
-+		return 0;
- 	}
-+#endif
- 	return -EAFNOSUPPORT;
- }
- 
- u32 tcp_ao_compute_sne(u32 next_sne, u32 next_seq, u32 seq)
- {
-@@ -738,15 +746,12 @@ int tcp_v4_ao_hash_skb(char *ao_hash, struct tcp_ao_key *key,
- int tcp_v4_ao_synack_hash(char *ao_hash, struct tcp_ao_key *ao_key,
- 			  struct request_sock *req, const struct sk_buff *skb,
- 			  int hash_offset, u32 sne)
- {
- 	u8 tkey_buf[TCP_AO_MAX_TRAFFIC_KEY_LEN];
--	int err;
- 
--	err = tcp_v4_ao_calc_key_rsk(ao_key, tkey_buf, req);
--	if (err)
--		return err;
-+	tcp_v4_ao_calc_key_rsk(ao_key, tkey_buf, req);
- 
- 	return tcp_ao_hash_skb(AF_INET, ao_hash, ao_key, req_to_sk(req), skb,
- 			       tkey_buf, hash_offset, sne);
- }
- 
-@@ -855,13 +860,13 @@ int tcp_ao_prepare_reset(const struct sock *sk, struct sk_buff *skb,
- 					  snd_basis, seq);
- 	}
- 	return 0;
- }
- 
--int tcp_ao_transmit_skb(struct sock *sk, struct sk_buff *skb,
--			struct tcp_ao_key *key, struct tcphdr *th,
--			__u8 *hash_location)
-+void tcp_ao_transmit_skb(struct sock *sk, struct sk_buff *skb,
-+			 struct tcp_ao_key *key, struct tcphdr *th,
-+			 __u8 *hash_location)
- {
- 	struct tcp_skb_cb *tcb = TCP_SKB_CB(skb);
- 	u8 tkey_buf[TCP_AO_MAX_TRAFFIC_KEY_LEN];
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	struct tcp_ao_info *ao;
-@@ -885,11 +890,10 @@ int tcp_ao_transmit_skb(struct sock *sk, struct sk_buff *skb,
- 	}
- 	sne = tcp_ao_compute_sne(READ_ONCE(ao->snd_sne), READ_ONCE(tp->snd_una),
- 				 ntohl(th->seq));
- 	tp->af_specific->calc_ao_hash(hash_location, key, sk, skb, traffic_key,
- 				      hash_location - (u8 *)th, sne);
--	return 0;
- }
- 
- static struct tcp_ao_key *tcp_ao_inbound_lookup(unsigned short int family,
- 		const struct sock *sk, const struct sk_buff *skb,
- 		int sndid, int rcvid, int l3index)
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 326b58ff1118d..8145f9aad77b3 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -1644,18 +1644,12 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
- 		sk_gso_disable(sk);
- 		tp->af_specific->calc_md5_hash(opts.hash_location,
- 					       key.md5_key, sk, skb);
- #endif
- 	} else if (tcp_key_is_ao(&key)) {
--		int err;
+-/*
+- * struct tcp_sigpool - per-CPU pool of ahash_requests
+- * @scratch: per-CPU temporary area, that can be used between
+- *	     tcp_sigpool_start() and tcp_sigpool_end() to perform
+- *	     crypto request
+- * @req: pre-allocated ahash request
+- */
+-struct tcp_sigpool {
+-	void *scratch;
+-	struct ahash_request *req;
+-};
 -
--		err = tcp_ao_transmit_skb(sk, skb, key.ao_key, th,
--					  opts.hash_location);
--		if (err) {
--			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_NOT_SPECIFIED);
--			return -ENOMEM;
+-int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size);
+-void tcp_sigpool_get(unsigned int id);
+-void tcp_sigpool_release(unsigned int id);
+-int tcp_sigpool_hash_skb_data(struct tcp_sigpool *hp,
+-			      const struct sk_buff *skb,
+-			      unsigned int header_len);
+-
+-/**
+- * tcp_sigpool_start - disable bh and start using tcp_sigpool_ahash
+- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
+- * @c: returned tcp_sigpool for usage (uninitialized on failure)
+- *
+- * Returns: 0 on success, error otherwise.
+- */
+-int tcp_sigpool_start(unsigned int id, struct tcp_sigpool *c);
+-/**
+- * tcp_sigpool_end - enable bh and stop using tcp_sigpool
+- * @c: tcp_sigpool context that was returned by tcp_sigpool_start()
+- */
+-void tcp_sigpool_end(struct tcp_sigpool *c);
+-size_t tcp_sigpool_algo(unsigned int id, char *buf, size_t buf_len);
+-/* - functions */
+ void tcp_v4_md5_hash_skb(char *md5_hash, const struct tcp_md5sig_key *key,
+ 			 const struct sock *sk, const struct sk_buff *skb);
+ int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
+ 		   int family, u8 prefixlen, int l3index, u8 flags,
+ 		   const u8 *newkey, u8 newkeylen);
+diff --git a/net/ipv4/Kconfig b/net/ipv4/Kconfig
+index 0fa293527cee9..7b945a5186c9b 100644
+--- a/net/ipv4/Kconfig
++++ b/net/ipv4/Kconfig
+@@ -740,13 +740,10 @@ config DEFAULT_TCP_CONG
+ 	default "dctcp" if DEFAULT_DCTCP
+ 	default "cdg" if DEFAULT_CDG
+ 	default "bbr" if DEFAULT_BBR
+ 	default "cubic"
+ 
+-config TCP_SIGPOOL
+-	tristate
+-
+ config TCP_AO
+ 	bool "TCP: Authentication Option (RFC5925)"
+ 	select CRYPTO_LIB_AES_CBC_MACS
+ 	select CRYPTO_LIB_SHA1
+ 	select CRYPTO_LIB_SHA256
+diff --git a/net/ipv4/Makefile b/net/ipv4/Makefile
+index 18108a6f04999..f98d4734e4eeb 100644
+--- a/net/ipv4/Makefile
++++ b/net/ipv4/Makefile
+@@ -58,11 +58,10 @@ obj-$(CONFIG_TCP_CONG_NV) += tcp_nv.o
+ obj-$(CONFIG_TCP_CONG_VENO) += tcp_veno.o
+ obj-$(CONFIG_TCP_CONG_SCALABLE) += tcp_scalable.o
+ obj-$(CONFIG_TCP_CONG_LP) += tcp_lp.o
+ obj-$(CONFIG_TCP_CONG_YEAH) += tcp_yeah.o
+ obj-$(CONFIG_TCP_CONG_ILLINOIS) += tcp_illinois.o
+-obj-$(CONFIG_TCP_SIGPOOL) += tcp_sigpool.o
+ obj-$(CONFIG_NET_SOCK_MSG) += tcp_bpf.o
+ obj-$(CONFIG_BPF_SYSCALL) += udp_bpf.o
+ obj-$(CONFIG_NETLABEL) += cipso_ipv4.o
+ 
+ obj-$(CONFIG_XFRM) += xfrm4_policy.o xfrm4_state.o xfrm4_input.o \
+diff --git a/net/ipv4/tcp_sigpool.c b/net/ipv4/tcp_sigpool.c
+deleted file mode 100644
+index 10b2e5970c402..0000000000000
+--- a/net/ipv4/tcp_sigpool.c
++++ /dev/null
+@@ -1,366 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-
+-#include <crypto/hash.h>
+-#include <linux/cpu.h>
+-#include <linux/kref.h>
+-#include <linux/module.h>
+-#include <linux/mutex.h>
+-#include <linux/percpu.h>
+-#include <linux/workqueue.h>
+-#include <net/tcp.h>
+-
+-static size_t __scratch_size;
+-struct sigpool_scratch {
+-	local_lock_t bh_lock;
+-	void __rcu *pad;
+-};
+-
+-static DEFINE_PER_CPU(struct sigpool_scratch, sigpool_scratch) = {
+-	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
+-};
+-
+-struct sigpool_entry {
+-	struct crypto_ahash	*hash;
+-	const char		*alg;
+-	struct kref		kref;
+-	uint16_t		needs_key:1,
+-				reserved:15;
+-};
+-
+-#define CPOOL_SIZE (PAGE_SIZE / sizeof(struct sigpool_entry))
+-static struct sigpool_entry cpool[CPOOL_SIZE];
+-static unsigned int cpool_populated;
+-static DEFINE_MUTEX(cpool_mutex);
+-
+-/* Slow-path */
+-struct scratches_to_free {
+-	struct rcu_head rcu;
+-	unsigned int cnt;
+-	void *scratches[];
+-};
+-
+-static void free_old_scratches(struct rcu_head *head)
+-{
+-	struct scratches_to_free *stf;
+-
+-	stf = container_of(head, struct scratches_to_free, rcu);
+-	while (stf->cnt--)
+-		kfree(stf->scratches[stf->cnt]);
+-	kfree(stf);
+-}
+-
+-/**
+- * sigpool_reserve_scratch - re-allocates scratch buffer, slow-path
+- * @size: request size for the scratch/temp buffer
+- */
+-static int sigpool_reserve_scratch(size_t size)
+-{
+-	struct scratches_to_free *stf;
+-	size_t stf_sz = struct_size(stf, scratches, num_possible_cpus());
+-	int cpu, err = 0;
+-
+-	lockdep_assert_held(&cpool_mutex);
+-	if (__scratch_size >= size)
+-		return 0;
+-
+-	stf = kmalloc(stf_sz, GFP_KERNEL);
+-	if (!stf)
+-		return -ENOMEM;
+-	stf->cnt = 0;
+-
+-	size = max(size, __scratch_size);
+-	cpus_read_lock();
+-	for_each_possible_cpu(cpu) {
+-		void *scratch, *old_scratch;
+-
+-		scratch = kmalloc_node(size, GFP_KERNEL, cpu_to_node(cpu));
+-		if (!scratch) {
+-			err = -ENOMEM;
+-			break;
 -		}
-+		tcp_ao_transmit_skb(sk, skb, key.ao_key, th,
-+				    opts.hash_location);
- 	}
- 
- 	/* BPF prog is the last one writing header option */
- 	bpf_skops_write_hdr_opt(sk, skb, NULL, NULL, 0, &opts);
- 
-diff --git a/net/ipv6/tcp_ao.c b/net/ipv6/tcp_ao.c
-index bf30b970181d7..01a8472805d1d 100644
---- a/net/ipv6/tcp_ao.c
-+++ b/net/ipv6/tcp_ao.c
-@@ -10,15 +10,15 @@
- #include <linux/tcp.h>
- 
- #include <net/tcp.h>
- #include <net/ipv6.h>
- 
--static int tcp_v6_ao_calc_key(struct tcp_ao_key *mkt, u8 *key,
--			      const struct in6_addr *saddr,
--			      const struct in6_addr *daddr,
--			      __be16 sport, __be16 dport,
--			      __be32 sisn, __be32 disn)
-+static void tcp_v6_ao_calc_key(struct tcp_ao_key *mkt, u8 *key,
-+			       const struct in6_addr *saddr,
-+			       const struct in6_addr *daddr,
-+			       __be16 sport, __be16 dport,
-+			       __be32 sisn, __be32 disn)
- {
- 	struct kdf_input_block {
- 		u8			counter;
- 		u8			label[6];
- 		struct tcp6_ao_context	ctx;
-@@ -36,49 +36,46 @@ static int tcp_v6_ao_calc_key(struct tcp_ao_key *mkt, u8 *key,
- 		},
- 		.outlen = htons(tcp_ao_digest_size(mkt) * 8), /* in bits */
- 	};
- 
- 	tcp_ao_calc_traffic_key(mkt, key, &input, sizeof(input));
+-
+-		old_scratch = rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
+-					scratch, lockdep_is_held(&cpool_mutex));
+-		if (!cpu_online(cpu) || !old_scratch) {
+-			kfree(old_scratch);
+-			continue;
+-		}
+-		stf->scratches[stf->cnt++] = old_scratch;
+-	}
+-	cpus_read_unlock();
+-	if (!err)
+-		__scratch_size = size;
+-
+-	call_rcu(&stf->rcu, free_old_scratches);
+-	return err;
+-}
+-
+-static void sigpool_scratch_free(void)
+-{
+-	int cpu;
+-
+-	for_each_possible_cpu(cpu)
+-		kfree(rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
+-					  NULL, lockdep_is_held(&cpool_mutex)));
+-	__scratch_size = 0;
+-}
+-
+-static int __cpool_try_clone(struct crypto_ahash *hash)
+-{
+-	struct crypto_ahash *tmp;
+-
+-	tmp = crypto_clone_ahash(hash);
+-	if (IS_ERR(tmp))
+-		return PTR_ERR(tmp);
+-
+-	crypto_free_ahash(tmp);
 -	return 0;
- }
- 
--int tcp_v6_ao_calc_key_skb(struct tcp_ao_key *mkt, u8 *key,
--			   const struct sk_buff *skb,
--			   __be32 sisn, __be32 disn)
-+void tcp_v6_ao_calc_key_skb(struct tcp_ao_key *mkt, u8 *key,
-+			    const struct sk_buff *skb, __be32 sisn, __be32 disn)
- {
- 	const struct ipv6hdr *iph = ipv6_hdr(skb);
- 	const struct tcphdr *th = tcp_hdr(skb);
- 
--	return tcp_v6_ao_calc_key(mkt, key, &iph->saddr,
--				  &iph->daddr, th->source,
--				  th->dest, sisn, disn);
-+	tcp_v6_ao_calc_key(mkt, key, &iph->saddr, &iph->daddr, th->source,
-+			   th->dest, sisn, disn);
- }
- 
--int tcp_v6_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
--			  const struct sock *sk, __be32 sisn,
--			  __be32 disn, bool send)
-+void tcp_v6_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
-+			   const struct sock *sk, __be32 sisn,
-+			   __be32 disn, bool send)
- {
- 	if (send)
--		return tcp_v6_ao_calc_key(mkt, key, &sk->sk_v6_rcv_saddr,
--					  &sk->sk_v6_daddr, htons(sk->sk_num),
--					  sk->sk_dport, sisn, disn);
-+		tcp_v6_ao_calc_key(mkt, key, &sk->sk_v6_rcv_saddr,
-+				   &sk->sk_v6_daddr, htons(sk->sk_num),
-+				   sk->sk_dport, sisn, disn);
- 	else
--		return tcp_v6_ao_calc_key(mkt, key, &sk->sk_v6_daddr,
--					  &sk->sk_v6_rcv_saddr, sk->sk_dport,
--					  htons(sk->sk_num), disn, sisn);
-+		tcp_v6_ao_calc_key(mkt, key, &sk->sk_v6_daddr,
-+				   &sk->sk_v6_rcv_saddr, sk->sk_dport,
-+				   htons(sk->sk_num), disn, sisn);
- }
- 
--int tcp_v6_ao_calc_key_rsk(struct tcp_ao_key *mkt, u8 *key,
--			   struct request_sock *req)
-+void tcp_v6_ao_calc_key_rsk(struct tcp_ao_key *mkt, u8 *key,
-+			    struct request_sock *req)
- {
- 	struct inet_request_sock *ireq = inet_rsk(req);
- 
--	return tcp_v6_ao_calc_key(mkt, key,
--			&ireq->ir_v6_loc_addr, &ireq->ir_v6_rmt_addr,
--			htons(ireq->ir_num), ireq->ir_rmt_port,
--			htonl(tcp_rsk(req)->snt_isn),
--			htonl(tcp_rsk(req)->rcv_isn));
-+	tcp_v6_ao_calc_key(mkt, key,
-+			   &ireq->ir_v6_loc_addr, &ireq->ir_v6_rmt_addr,
-+			   htons(ireq->ir_num), ireq->ir_rmt_port,
-+			   htonl(tcp_rsk(req)->snt_isn),
-+			   htonl(tcp_rsk(req)->rcv_isn));
- }
- 
- struct tcp_ao_key *tcp_v6_ao_lookup(const struct sock *sk,
- 				    struct sock *addr_sk,
- 				    int sndid, int rcvid)
-@@ -102,24 +99,23 @@ struct tcp_ao_key *tcp_v6_ao_lookup_rsk(const struct sock *sk,
- 	l3index = l3mdev_master_ifindex_by_index(sock_net(sk), ireq->ir_iif);
- 	return tcp_ao_do_lookup(sk, l3index, (union tcp_ao_addr *)addr,
- 				AF_INET6, sndid, rcvid);
- }
- 
--int tcp_v6_ao_hash_pseudoheader(struct tcp_ao_mac_ctx *mac_ctx,
--				const struct in6_addr *daddr,
--				const struct in6_addr *saddr, int nbytes)
-+void tcp_v6_ao_hash_pseudoheader(struct tcp_ao_mac_ctx *mac_ctx,
-+				 const struct in6_addr *daddr,
-+				 const struct in6_addr *saddr, int nbytes)
- {
- 	/* 1. TCP pseudo-header (RFC2460) */
- 	struct tcp6_pseudohdr phdr = {
- 		.saddr = *saddr,
- 		.daddr = *daddr,
- 		.len = cpu_to_be32(nbytes),
- 		.protocol = cpu_to_be32(IPPROTO_TCP),
- 	};
- 
- 	tcp_ao_mac_update(mac_ctx, &phdr, sizeof(phdr));
+-}
+-
+-static int __cpool_alloc_ahash(struct sigpool_entry *e, const char *alg)
+-{
+-	struct crypto_ahash *cpu0_hash;
+-	int ret;
+-
+-	e->alg = kstrdup(alg, GFP_KERNEL);
+-	if (!e->alg)
+-		return -ENOMEM;
+-
+-	cpu0_hash = crypto_alloc_ahash(alg, 0, CRYPTO_ALG_ASYNC);
+-	if (IS_ERR(cpu0_hash)) {
+-		ret = PTR_ERR(cpu0_hash);
+-		goto out_free_alg;
+-	}
+-
+-	e->needs_key = crypto_ahash_get_flags(cpu0_hash) & CRYPTO_TFM_NEED_KEY;
+-
+-	ret = __cpool_try_clone(cpu0_hash);
+-	if (ret)
+-		goto out_free_cpu0_hash;
+-	e->hash = cpu0_hash;
+-	kref_init(&e->kref);
 -	return 0;
- }
- 
- int tcp_v6_ao_hash_skb(char *ao_hash, struct tcp_ao_key *key,
- 		       const struct sock *sk, const struct sk_buff *skb,
- 		       const u8 *tkey, int hash_offset, u32 sne)
-@@ -137,14 +133,11 @@ int tcp_v6_parse_ao(struct sock *sk, int cmd,
- int tcp_v6_ao_synack_hash(char *ao_hash, struct tcp_ao_key *ao_key,
- 			  struct request_sock *req, const struct sk_buff *skb,
- 			  int hash_offset, u32 sne)
- {
- 	u8 tkey_buf[TCP_AO_MAX_TRAFFIC_KEY_LEN];
--	int err;
- 
--	err = tcp_v6_ao_calc_key_rsk(ao_key, tkey_buf, req);
--	if (err)
--		return err;
-+	tcp_v6_ao_calc_key_rsk(ao_key, tkey_buf, req);
- 
- 	return tcp_ao_hash_skb(AF_INET6, ao_hash, ao_key, req_to_sk(req), skb,
- 			       tkey_buf, hash_offset, sne);
- }
+-
+-out_free_cpu0_hash:
+-	crypto_free_ahash(cpu0_hash);
+-out_free_alg:
+-	kfree(e->alg);
+-	e->alg = NULL;
+-	return ret;
+-}
+-
+-/**
+- * tcp_sigpool_alloc_ahash - allocates pool for ahash requests
+- * @alg: name of async hash algorithm
+- * @scratch_size: reserve a tcp_sigpool::scratch buffer of this size
+- */
+-int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size)
+-{
+-	int i, ret;
+-
+-	/* slow-path */
+-	mutex_lock(&cpool_mutex);
+-	ret = sigpool_reserve_scratch(scratch_size);
+-	if (ret)
+-		goto out;
+-	for (i = 0; i < cpool_populated; i++) {
+-		if (!cpool[i].alg)
+-			continue;
+-		if (strcmp(cpool[i].alg, alg))
+-			continue;
+-
+-		/* pairs with tcp_sigpool_release() */
+-		if (!kref_get_unless_zero(&cpool[i].kref))
+-			kref_init(&cpool[i].kref);
+-		ret = i;
+-		goto out;
+-	}
+-
+-	for (i = 0; i < cpool_populated; i++) {
+-		if (!cpool[i].alg)
+-			break;
+-	}
+-	if (i >= CPOOL_SIZE) {
+-		ret = -ENOSPC;
+-		goto out;
+-	}
+-
+-	ret = __cpool_alloc_ahash(&cpool[i], alg);
+-	if (!ret) {
+-		ret = i;
+-		if (i == cpool_populated)
+-			cpool_populated++;
+-	}
+-out:
+-	mutex_unlock(&cpool_mutex);
+-	return ret;
+-}
+-EXPORT_SYMBOL_GPL(tcp_sigpool_alloc_ahash);
+-
+-static void __cpool_free_entry(struct sigpool_entry *e)
+-{
+-	crypto_free_ahash(e->hash);
+-	kfree(e->alg);
+-	memset(e, 0, sizeof(*e));
+-}
+-
+-static void cpool_cleanup_work_cb(struct work_struct *work)
+-{
+-	bool free_scratch = true;
+-	unsigned int i;
+-
+-	mutex_lock(&cpool_mutex);
+-	for (i = 0; i < cpool_populated; i++) {
+-		if (kref_read(&cpool[i].kref) > 0) {
+-			free_scratch = false;
+-			continue;
+-		}
+-		if (!cpool[i].alg)
+-			continue;
+-		__cpool_free_entry(&cpool[i]);
+-	}
+-	if (free_scratch)
+-		sigpool_scratch_free();
+-	mutex_unlock(&cpool_mutex);
+-}
+-
+-static DECLARE_WORK(cpool_cleanup_work, cpool_cleanup_work_cb);
+-static void cpool_schedule_cleanup(struct kref *kref)
+-{
+-	schedule_work(&cpool_cleanup_work);
+-}
+-
+-/**
+- * tcp_sigpool_release - decreases number of users for a pool. If it was
+- * the last user of the pool, releases any memory that was consumed.
+- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
+- */
+-void tcp_sigpool_release(unsigned int id)
+-{
+-	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
+-		return;
+-
+-	/* slow-path */
+-	kref_put(&cpool[id].kref, cpool_schedule_cleanup);
+-}
+-EXPORT_SYMBOL_GPL(tcp_sigpool_release);
+-
+-/**
+- * tcp_sigpool_get - increases number of users (refcounter) for a pool
+- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
+- */
+-void tcp_sigpool_get(unsigned int id)
+-{
+-	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
+-		return;
+-	kref_get(&cpool[id].kref);
+-}
+-EXPORT_SYMBOL_GPL(tcp_sigpool_get);
+-
+-int tcp_sigpool_start(unsigned int id, struct tcp_sigpool *c) __cond_acquires(0, RCU_BH)
+-{
+-	struct crypto_ahash *hash;
+-
+-	rcu_read_lock_bh();
+-	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg)) {
+-		rcu_read_unlock_bh();
+-		return -EINVAL;
+-	}
+-
+-	hash = crypto_clone_ahash(cpool[id].hash);
+-	if (IS_ERR(hash)) {
+-		rcu_read_unlock_bh();
+-		return PTR_ERR(hash);
+-	}
+-
+-	c->req = ahash_request_alloc(hash, GFP_ATOMIC);
+-	if (!c->req) {
+-		crypto_free_ahash(hash);
+-		rcu_read_unlock_bh();
+-		return -ENOMEM;
+-	}
+-	ahash_request_set_callback(c->req, 0, NULL, NULL);
+-
+-	/* Pairs with tcp_sigpool_reserve_scratch(), scratch area is
+-	 * valid (allocated) until tcp_sigpool_end().
+-	 */
+-	local_lock_nested_bh(&sigpool_scratch.bh_lock);
+-	c->scratch = rcu_dereference_bh(*this_cpu_ptr(&sigpool_scratch.pad));
+-	return 0;
+-}
+-EXPORT_SYMBOL_GPL(tcp_sigpool_start);
+-
+-void tcp_sigpool_end(struct tcp_sigpool *c) __releases(RCU_BH)
+-{
+-	struct crypto_ahash *hash = crypto_ahash_reqtfm(c->req);
+-
+-	local_unlock_nested_bh(&sigpool_scratch.bh_lock);
+-	rcu_read_unlock_bh();
+-	ahash_request_free(c->req);
+-	crypto_free_ahash(hash);
+-}
+-EXPORT_SYMBOL_GPL(tcp_sigpool_end);
+-
+-/**
+- * tcp_sigpool_algo - return algorithm of tcp_sigpool
+- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
+- * @buf: buffer to return name of algorithm
+- * @buf_len: size of @buf
+- */
+-size_t tcp_sigpool_algo(unsigned int id, char *buf, size_t buf_len)
+-{
+-	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
+-		return -EINVAL;
+-
+-	return strscpy(buf, cpool[id].alg, buf_len);
+-}
+-EXPORT_SYMBOL_GPL(tcp_sigpool_algo);
+-
+-/**
+- * tcp_sigpool_hash_skb_data - hash data in skb with initialized tcp_sigpool
+- * @hp: tcp_sigpool pointer
+- * @skb: buffer to add sign for
+- * @header_len: TCP header length for this segment
+- */
+-int tcp_sigpool_hash_skb_data(struct tcp_sigpool *hp,
+-			      const struct sk_buff *skb,
+-			      unsigned int header_len)
+-{
+-	const unsigned int head_data_len = skb_headlen(skb) > header_len ?
+-					   skb_headlen(skb) - header_len : 0;
+-	const struct skb_shared_info *shi = skb_shinfo(skb);
+-	const struct tcphdr *tp = tcp_hdr(skb);
+-	struct ahash_request *req = hp->req;
+-	struct sk_buff *frag_iter;
+-	struct scatterlist sg;
+-	unsigned int i;
+-
+-	sg_init_table(&sg, 1);
+-
+-	sg_set_buf(&sg, ((u8 *)tp) + header_len, head_data_len);
+-	ahash_request_set_crypt(req, &sg, NULL, head_data_len);
+-	if (crypto_ahash_update(req))
+-		return 1;
+-
+-	for (i = 0; i < shi->nr_frags; ++i) {
+-		const skb_frag_t *f = &shi->frags[i];
+-		unsigned int offset = skb_frag_off(f);
+-		struct page *page;
+-
+-		page = skb_frag_page(f) + (offset >> PAGE_SHIFT);
+-		sg_set_page(&sg, page, skb_frag_size(f), offset_in_page(offset));
+-		ahash_request_set_crypt(req, &sg, NULL, skb_frag_size(f));
+-		if (crypto_ahash_update(req))
+-			return 1;
+-	}
+-
+-	skb_walk_frags(skb, frag_iter)
+-		if (tcp_sigpool_hash_skb_data(hp, frag_iter, 0))
+-			return 1;
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL(tcp_sigpool_hash_skb_data);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("Per-CPU pool of crypto requests");
 -- 
 2.53.0
 
