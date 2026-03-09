@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9136D347FC4;
-	Mon,  9 Mar 2026 18:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2C734B408;
+	Mon,  9 Mar 2026 18:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773079289; cv=none; b=glSZ/TkH6cbA+sDt+aZMKMCd0DVjmLBiEPSJIWDBxWzkYuQq5o2bpNaVWjnp1c8ocD2GxUJ/B2qSxMouyi0aCuK2UyxUT0YrS/YnnrR+vp5e4B5IR49y2pz1xWofMLbx/2ShKG8cNefBbwqBiUtFrxDKkHwz8xaF1GlKVyBQ/8M=
+	t=1773079292; cv=none; b=g+urN8aBOXCcc1/4jHMTOCH6fk/vVtQsm5K7V7r+gNCcnbIJMk003guCxG43rohgSyR5k8ESSTq5LSBIA2YYMe2HN5xu8wfvw+lsNtUzV2n4twyc7GSQC93Hqt7OF9MMfCtTOrXTDglzUgs0ctjbIJPrlktLSFM4zMcZVEVMm3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773079289; c=relaxed/simple;
-	bh=8+eedZkuRiiEx+AHpOUJiKJ97lwbA6RpN02/poBXrwY=;
+	s=arc-20240116; t=1773079292; c=relaxed/simple;
+	bh=SeTaaMFQof9ylHh0W6XyzL5ZnPxEAQuaJ3T/0ofB0aE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p/mVSmfZZ97SgyKAC4cLRkLwI8j9rCRE/8VG6eemS8SMBMV3TZcbCJNy/BYM8PUxmOFrYm+hR4t0I9yhC2RvQ3jRCvVqoxZVy3z1xUyRQPoWzXt14MRYN4AwVnCF2Jz7Jsjg2hEAuEJktDAAgL271fYmXVB1hASrXR0MbFhHhNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LWJzZqYk; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=DnI5WzzKoUKceoutIPJj8xPL98w0Rw7RVCg3wiedizHGu6puh6q4YJQBpoUXq6eelaXz3T0Sy2jcMeBW3iAXwwg/r94UPVhQguSYYTNiJUZ+p65JRsPQ+dqI4Vqn3yhctmBdDN11cHi2e5ZfFsnVjDEi+ATtic/aSt+oI9sWyAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=smVrMKUV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LWJzZqYk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FB17C2BCB0;
-	Mon,  9 Mar 2026 18:01:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="smVrMKUV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBB12C2BCB0;
+	Mon,  9 Mar 2026 18:01:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773079289;
-	bh=8+eedZkuRiiEx+AHpOUJiKJ97lwbA6RpN02/poBXrwY=;
+	s=k20201202; t=1773079292;
+	bh=SeTaaMFQof9ylHh0W6XyzL5ZnPxEAQuaJ3T/0ofB0aE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LWJzZqYkmkwM+e8qE0UHdB6Fjxft03Sq5NdnveJzD5yOqA+gwBeP6Bd5w6hRfqqKQ
-	 sL9qI6ah+N5DDwCQSguWLieyjXk1kAUr5ZoW79egF5JPZF4nmvE3DoIY6QpWqc5Rax
-	 MU0yxMgF1m2rUrMKlnsk7e8lgE8kKe+N07gf1toDtBVcVgOUjdOvzWWzhLJrDrRq/Q
-	 2n4VlVoqKY45ywvCHlVHgcvQlgfkc5kjXO8TPeXIewoY4LzjH5UcZZb7Oh5vuEsOWZ
-	 /yMSX+NHRkn2KI3Jm27n16DkITwLOVuaLFpurrL4u6UEDiup1hifRiFS/oGHkF5DtT
-	 LAcPUiWng7ewA==
+	b=smVrMKUVN0lv2Q6yFzcheFrz1I5M+nE6Z4fzD414kurXUXrFvyH6mtiCF2HAuqD46
+	 4pO2hzR58CaIfHOGygpTI6jTdiPOgmZOTRuJgshhgoyD1+1QwYJ2oXZRBLoGL0AFe4
+	 D64VwcQ8DrbcphUB4ZrUGqdlZhJJ+fJ7mRLJkgthlxZRbMCTvxpA+9DBz62StS3EoQ
+	 OA076eC5a5wqNzR235RpaQOzbpjQpq7khC4Gy1RdZ4ujiMVdAtdbOE7u/iF/kwPj1z
+	 ovRF8v7FizUio/29hWRmNPwiBujqixN2sapqhSxnbejgxJyLpbcnk+PoYdA4//oEBo
+	 B8y/solY6Hfag==
 From: Tycho Andersen <tycho@kernel.org>
 To: Thomas Gleixner <tglx@kernel.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -48,9 +48,9 @@ To: Thomas Gleixner <tglx@kernel.org>,
 	Sean Christopherson <seanjc@google.com>
 Cc: linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH v2 07/10] x86/snp, crypto: move HSAVE_PA setup to arch/
-Date: Mon,  9 Mar 2026 12:00:49 -0600
-Message-ID: <20260309180053.2389118-8-tycho@kernel.org>
+Subject: [PATCH v2 08/10] x86/snp: create snp_x86_shutdown()
+Date: Mon,  9 Mar 2026 12:00:50 -0600
+Message-ID: <20260309180053.2389118-9-tycho@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260309180053.2389118-1-tycho@kernel.org>
 References: <20260306153846.GKaar1Bg_1EKm17tXJ@fat_crate.local>
@@ -65,69 +65,98 @@ Content-Transfer-Encoding: 8bit
 
 From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-Now that there is snp_prepare_for_snp_init() that indicates when the CCP
-driver wants to prepare the architecture for SNP_INIT(_EX), move this
-architecture-specific bit of code to a more sensible place.
+After SNP_SHUTDOWN, two architecture-level things should be done:
+
+1. clear the RMP table
+2. disable MFDM to prevent the FW_WARN in k8_check_syscfg_dram_mod_en() in
+   the event of a kexec
+
+Create and export to the CCP driver a function that does them.
+
+Also change the MFDM helper to allow for disabling the bit, since the SNP
+x86 shutdown path needs to disable MFDM. The comment for
+k8_check_syscfg_dram_mod_en() notes, the "BIOS" is supposed clear it, or
+the kernel in the case of module unload and shutdown followed by kexec.
 
 Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/virt/svm/sev.c      | 8 ++++++++
- drivers/crypto/ccp/sev-dev.c | 8 --------
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/sev.h |  2 ++
+ arch/x86/virt/svm/sev.c    | 23 ++++++++++++++++++++---
+ 2 files changed, 22 insertions(+), 3 deletions(-)
 
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index 0bcd89d4fe90..36d2b1ea19c0 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -662,6 +662,7 @@ static inline void snp_leak_pages(u64 pfn, unsigned int pages)
+ 	__snp_leak_pages(pfn, pages, true);
+ }
+ void snp_prepare_for_snp_init(void);
++void snp_x86_shutdown(void);
+ #else
+ static inline bool snp_probe_rmptable_info(void) { return false; }
+ static inline int snp_rmptable_init(void) { return -ENOSYS; }
+@@ -679,6 +680,7 @@ static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
+ static inline void kdump_sev_callback(void) { }
+ static inline void snp_fixup_e820_tables(void) {}
+ static inline void snp_prepare_for_snp_init(void) {}
++static inline void snp_x86_shutdown(void) {}
+ #endif
+ 
+ #endif
 diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 28d240484453..cc10d059140d 100644
+index cc10d059140d..321f3c004fbc 100644
 --- a/arch/x86/virt/svm/sev.c
 +++ b/arch/x86/virt/svm/sev.c
-@@ -503,6 +503,11 @@ static bool __init setup_rmptable(void)
- 	return true;
+@@ -132,12 +132,15 @@ static unsigned long snp_nr_leaked_pages;
+ #undef pr_fmt
+ #define pr_fmt(fmt)	"SEV-SNP: " fmt
+ 
+-static void mfd_enable(void *arg)
++static void mfd_reconfigure(void *arg)
+ {
+ 	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
+ 		return;
+ 
+-	msr_set_bit(MSR_AMD64_SYSCFG, MSR_AMD64_SYSCFG_MFDM_BIT);
++	if (arg)
++		msr_set_bit(MSR_AMD64_SYSCFG, MSR_AMD64_SYSCFG_MFDM_BIT);
++	else
++		msr_clear_bit(MSR_AMD64_SYSCFG, MSR_AMD64_SYSCFG_MFDM_BIT);
  }
  
-+static void snp_set_hsave_pa(void *arg)
-+{
-+	wrmsrq(MSR_VM_HSAVE_PA, 0);
-+}
-+
- void snp_prepare_for_snp_init(void)
- {
- 	u64 val;
-@@ -524,6 +529,9 @@ void snp_prepare_for_snp_init(void)
- 	on_each_cpu(mfd_enable, NULL, 1);
+ static void snp_enable(void *arg)
+@@ -526,7 +529,7 @@ void snp_prepare_for_snp_init(void)
+ 	 * MtrrFixDramModEn is not shared between threads on a core,
+ 	 * therefore it must be set on all CPUs prior to enabling SNP.
+ 	 */
+-	on_each_cpu(mfd_enable, NULL, 1);
++	on_each_cpu(mfd_reconfigure, (void *)1, 1);
  
  	on_each_cpu(snp_enable, NULL, 1);
-+
-+	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
-+	on_each_cpu(snp_set_hsave_pa, NULL, 1);
+ 
+@@ -535,6 +538,20 @@ void snp_prepare_for_snp_init(void)
  }
  EXPORT_SYMBOL_FOR_MODULES(snp_prepare_for_snp_init, "ccp");
  
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 07c4736a1f0a..b10104f243b9 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1076,11 +1076,6 @@ static inline int __sev_do_init_locked(int *psp_ret)
- 		return __sev_init_locked(psp_ret);
- }
- 
--static void snp_set_hsave_pa(void *arg)
--{
--	wrmsrq(MSR_VM_HSAVE_PA, 0);
--}
--
- /* Hypervisor Fixed pages API interface */
- static void snp_hv_fixed_pages_state_update(struct sev_device *sev,
- 					    enum snp_hv_fixed_pages_state page_state)
-@@ -1375,9 +1370,6 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
- 
- 	snp_prepare_for_snp_init();
- 
--	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
--	on_each_cpu(snp_set_hsave_pa, NULL, 1);
--
- 	/*
- 	 * Starting in SNP firmware v1.52, the SNP_INIT_EX command takes a list
- 	 * of system physical address ranges to convert into HV-fixed page
++void snp_x86_shutdown(void)
++{
++	u64 syscfg;
++
++	rdmsrq(MSR_AMD64_SYSCFG, syscfg);
++
++	if (syscfg & MSR_AMD64_SYSCFG_SNP_EN)
++		return;
++
++	snp_clear_rmp();
++	on_each_cpu(mfd_reconfigure, 0, 1);
++}
++EXPORT_SYMBOL_FOR_MODULES(snp_x86_shutdown, "ccp");
++
+ /*
+  * Do the necessary preparations which are verified by the firmware as
+  * described in the SNP_INIT_EX firmware command description in the SNP
 -- 
 2.53.0
 
