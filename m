@@ -1,181 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0214D3B895D
-	for <linux-crypto@vger.kernel.org>; Mon,  9 Mar 2026 17:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D002F068C
+	for <linux-crypto@vger.kernel.org>; Mon,  9 Mar 2026 17:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773075963; cv=none; b=oGmiOVeJuBWFNOUiamcx89CARpz4QKbEhfseJ2P+XvP6gq22XTXJ2UHk7T98edwy/ZlFyyJ2ATrAsrRrrvjM54KAIGyqGJRKok3yeFRppv84NSvQXU+WgEJJAMPHb1TROe/6HvhjZ6qFghA/oroCxL4GpHkkg07QmgIS9gOX6o4=
+	t=1773077708; cv=none; b=BpilL8YuGu6v6LlbvflKco095d3SlSDHB0xctonWwbjPtlRxXrL75gMMusbaPn8ogr+f0gdf06yTjsNqxyOlbeUHTehC43PRCdyUaFZH6eCbGsT7ywObZRNtU+FRvkpM89956J0vMV8WIkGCY4GFk22VYKPOLpz8E1a+UvDJ2pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773075963; c=relaxed/simple;
-	bh=Nl4HOblw010V5+pE2S/P/QX3P3lziK39Je/lLiEZbvE=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DhGAYoyGtP/vqnlKokObYsbk69uQcvOMnJ1caNkrEDILsWVCHbJYlkK1iGbq44kKhojw7BuLezMcNt2PBjKJLcduOfBx2vslz+EZtPmrW9AIRP7gI9jH4WkWdsHHaoSvRpQnOmMRA3aSFn1uzgBVf1tmYGJCsSDC1VZkmWNf1pA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=geuaaSQv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773077708; c=relaxed/simple;
+	bh=xxWlkG7hfT8JbQBeR3KYqtMRWw+T8l04P54TH1pcZ5I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qUGXrBOsCcqRV+HBZiZ2QuboF+gMmWFdB1ibx0VLckuUZ99s6lg10GS0Fk9gSfDVkUI8G3Wj3vaNWASG+s9T31bqR3/KJBUFmhb2zpONA0Kcr+f9JCqe7gj6c9o7L45u83RKUy6mD9YU9IEAsm/wENiY4lj9L13U2f+2FcEEM/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=W2AtOi0e; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="geuaaSQv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8499C2BCB0
-	for <linux-crypto@vger.kernel.org>; Mon,  9 Mar 2026 17:06:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773075962;
-	bh=Nl4HOblw010V5+pE2S/P/QX3P3lziK39Je/lLiEZbvE=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
-	b=geuaaSQvhOJNX357Z9w1wt3tQulaQ2XrNbaryqjHB41cQrIEKqI/vZq5TaPrTTZU+
-	 M9vyJ9dq4ijyvChbTm7rBXIN+xqp7/7Zg+LweUoaGQQCyIzdQIbX7vO9RmCBO6SNh0
-	 HCkM2f6NvmQE+cjtgjISXrFdntTFS+KmP8R7IFEr9MshUvtq11+rZDb9ytOF4jZPhy
-	 KjfxZqgFqENm7BRNZg+fcqG3/PRG0xYL6KOoxcXbrxqFB9eNIaHOcjgrNo6H5NQrFp
-	 r+IQpXqjhjyxflvNd5G53edsKI7lnL8xnAnY+13IpRtz43P5qHajtmAGju844wD7nb
-	 WMU6swPIGVMOA==
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-38a2f196cbaso47987961fa.1
-        for <linux-crypto@vger.kernel.org>; Mon, 09 Mar 2026 10:06:02 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU0PCb2MqPWoCZLgjJK++uyZSojQnhWR+ni1EJtlYB+9Zx8nuTjme7YqJpSzzDa+bRrUpYy+AildPTMXuI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCGn0CghQRCwGhDR3Nd3unnpy6b4cyPSUW2/BOoba4PfGpUO77
-	fKhvOO4kXWoCCjeiUYE7K4+vftjSOYbjl8R1eFW8JELR9oDJ4Oc3Po4KGQq/wruX/+c2/8mxeWA
-	BspEsJk0OPIrRzqC3lbDG1HbO6pHI6KZguS755EfNDw==
-X-Received: by 2002:a05:651c:2212:b0:38a:42ec:9f84 with SMTP id
- 38308e7fff4ca-38a42ec9ffcmr33518861fa.4.1773075960460; Mon, 09 Mar 2026
- 10:06:00 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 9 Mar 2026 10:05:59 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 9 Mar 2026 10:05:59 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <aayLkmDRLMuTzXZv@vaman>
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="W2AtOi0e"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso109388985e9.3
+        for <linux-crypto@vger.kernel.org>; Mon, 09 Mar 2026 10:35:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1773077702; x=1773682502; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=J6bRQRZp+NSuLQEA4zsCW8v0b5lP2R+6l0eeYBSAqEg=;
+        b=W2AtOi0eRv2k3xgJ2jWcsM7zYu+sIOySQz/Co9akgWEdethO3WA7dLFMCLzO2jRTw5
+         Bo+qCvZc54HX5B1Zh+Zp5iNr2DeMz4ULsn6mcLyMzyLVibiZcrH1HMs6Uv+KnowCd766
+         9wfn3JHkcrtMobnSZpdaqfYV98FcdCgkScFljKICm2taZnhjZQI8iXVqBq6x2Fx0NPRb
+         BlB03qolL/qFrkZOyrG9WEK/9O869IbaGR9viO1nRC6fMHmzovN3yOdYMtaTyBmeENDO
+         iBuiISjvcGE6B2Dhio8FuenyKLOmHfZon7kgU2lVqBHJxC681xIMttUieAGndwv/Q9kt
+         +ZBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773077702; x=1773682502;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J6bRQRZp+NSuLQEA4zsCW8v0b5lP2R+6l0eeYBSAqEg=;
+        b=LKkosCara/jAaouK+hQXR9MQMu7gOgQaGhBY5Bc/7PZyQecrq5agHfztQcDCptkWSE
+         4AKIgv+ONAtoYUjFfmgEQl/ToiRcX/dKm1hxdawxGn91ck2ABc/xl3VLn9sMQJgh3l1u
+         U9WbZCD8h2KYkaH6xAEa2bcDBwQ6s6Wu6Urov8nV4mDy/j6/mQEZtL7l3zO/b6SchWlv
+         ghyb8cFv5j5EaH0szBWHk1PqaRElFs04LozgFI9AdM1w+nFPsDFz/VFpjwYwiEAXfrcF
+         DQNZeRxQoo+2egoQi16RmrssJ3ikaEzCo3ioHX8uJhwST5owzy/sbHSM+mtfxEf0fx/0
+         bfjw==
+X-Forwarded-Encrypted: i=1; AJvYcCWrJzwf1nS9erJdqojsG9gCbMQ3R//y2FyVxYHuxU1tXYj044QwIoTXZsAEqLw8fKYxK5L12R6XC9F7qmU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5YrriGeheGPVJokdShpo9GCBoOQmGUyum/k80K+8UQkcs8t1d
+	9f+IAdDSqhq6OB0zCrBExvVZ29etbLmUPUg3krr+gPNDnLaMMfkUgx+4nNBSBF2nnDA=
+X-Gm-Gg: ATEYQzwWdA650xi8LVGYN1cv+oUafgqfmLLEvrnVrASI03Uo0ZItjs5gRh+EHTj8imZ
+	g+3XvlIugT7Q7i33AgrXIx5igyCTLcCmJYdmuB8mzJw6+vXErfKHre6dFBsIKFE0hMqRKwKOTkA
+	bhcj4AQTcianEnIPSmuPPWwxEcQFsZRs8HbPcy3J6Mifx2unVietMlMY4bCMyV7/0KdZepC8cKm
+	YzT8zAA6MGszwsGnrhb9pI7G9iwRks4RasLuUXqUDlrE/dgjDFTG/0ee3ZNwzmvirf9V4uRoTPK
+	99sn8Iyv9XwxJRgrwY4efZcslqB6eWYBCXdoR3dxd4CjEVWHlh5eOwjWomZAgg/mjX0W7g1tjAP
+	GK7w9mKwBYk8CsPbmu9mMp+M5iD0df4bo+aAcM2fZTCIFgbmRimWg4UHNhK0HdwCu0QKQnKd8yT
+	hb0wRXF1zYZw==
+X-Received: by 2002:a05:600c:3b92:b0:485:3dfc:57a with SMTP id 5b1f17b1804b1-4853dfc07d7mr49051935e9.32.1773077702411;
+        Mon, 09 Mar 2026 10:35:02 -0700 (PDT)
+Received: from PF7QT03RWQ ([2a09:bac5:372b:26d2::3de:1f])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dad8da01sm29590088f8f.1.2026.03.09.10.35.01
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 09 Mar 2026 10:35:01 -0700 (PDT)
+From: Ignat Korchagin <ignat@cloudflare.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Ignat Korchagin <ignat@linux.win>,
+	Ignat Korchagin <ignat@cloudflare.com>
+Subject: [PATCH] MAINTAINERS: update email address for Ignat Korchagin
+Date: Mon,  9 Mar 2026 17:34:45 +0000
+Message-ID: <20260309173445.71393-1-ignat@cloudflare.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260302-qcom-qce-cmd-descr-v11-0-4bf1f5db4802@oss.qualcomm.com>
- <20260302-qcom-qce-cmd-descr-v11-12-4bf1f5db4802@oss.qualcomm.com>
- <aahHeR9j7q4_ynYK@vaman> <CAMRc=Mc48+NyMPkFRa8GPv-odCe=r9WXJWUZYkTsaY53Ev_stQ@mail.gmail.com>
- <aayLkmDRLMuTzXZv@vaman>
-Date: Mon, 9 Mar 2026 10:05:59 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MeJNQq8AF9SrJYY=CNOF62UXpaX7Tzuk5VSfaXoWSCGRg@mail.gmail.com>
-X-Gm-Features: AaiRm52AwUikzvApltwtSp3ZuI8KyckqNAj_xcMnQHdUmblkYlZhjv-tlMSJcGs
-Message-ID: <CAMRc=MeJNQq8AF9SrJYY=CNOF62UXpaX7Tzuk5VSfaXoWSCGRg@mail.gmail.com>
-Subject: Re: [PATCH RFC v11 12/12] dmaengine: qcom: bam_dma: add support for
- BAM locking
-To: Vinod Koul <vkoul@kernel.org>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
-	Dmitry Baryshkov <lumag@kernel.org>, Peter Ujfalusi <peter.ujfalusi@gmail.com>, 
-	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>, dmaengine@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Bartosz Golaszewski <brgl@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, 7 Mar 2026 21:33:22 +0100, Vinod Koul <vkoul@kernel.org> said:
-> On 04-03-26, 16:27, Bartosz Golaszewski wrote:
->> On Wed, Mar 4, 2026 at 3:53=E2=80=AFPM Vinod Koul <vkoul@kernel.org> wro=
-te:
->> >
->> > On 02-03-26, 16:57, Bartosz Golaszewski wrote:
->> > > Add support for BAM pipe locking. To that end: when starting the DMA=
- on
->> > > an RX channel - wrap the already issued descriptors with additional
->> > > command descriptors performing dummy writes to the base register
->> > > supplied by the client via dmaengine_slave_config() (if any) alongsi=
-de
->> > > the lock/unlock HW flags.
->> > >
->> > > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm=
-.com>
->>
->> [snip]
->>
->> > > +static struct bam_async_desc *
->> > > +bam_make_lock_desc(struct bam_chan *bchan, struct scatterlist *sg,
->> > > +                struct bam_cmd_element *ce, unsigned int flag)
->> > > +{
->> > > +     struct dma_chan *chan =3D &bchan->vc.chan;
->> > > +     struct bam_async_desc *async_desc;
->> > > +     struct bam_desc_hw *desc;
->> > > +     struct virt_dma_desc *vd;
->> > > +     struct virt_dma_chan *vc;
->> > > +     unsigned int mapped;
->> > > +     dma_cookie_t cookie;
->> > > +     int ret;
->> > > +
->> > > +     async_desc =3D kzalloc_flex(*async_desc, desc, 1, GFP_NOWAIT);
->> > > +     if (!async_desc) {
->> > > +             dev_err(bchan->bdev->dev, "failed to allocate the BAM =
-lock descriptor\n");
->> > > +             return NULL;
->> > > +     }
->> > > +
->> > > +     async_desc->num_desc =3D 1;
->> > > +     async_desc->curr_desc =3D async_desc->desc;
->> > > +     async_desc->dir =3D DMA_MEM_TO_DEV;
->> > > +
->> > > +     desc =3D async_desc->desc;
->> > > +
->> > > +     bam_prep_ce_le32(ce, bchan->slave.dst_addr, BAM_WRITE_COMMAND,=
- 0);
->> > > +     sg_set_buf(sg, ce, sizeof(*ce));
->> > > +
->> > > +     mapped =3D dma_map_sg_attrs(chan->slave, sg, 1, DMA_TO_DEVICE,=
- DMA_PREP_CMD);
->> > > +     if (!mapped) {
->> > > +             kfree(async_desc);
->> > > +             return NULL;
->> > > +     }
->> > > +
->> > > +     desc->flags |=3D cpu_to_le16(DESC_FLAG_CMD | flag);
->> > > +     desc->addr =3D sg_dma_address(sg);
->> > > +     desc->size =3D sizeof(struct bam_cmd_element);
->> > > +
->> > > +     vc =3D &bchan->vc;
->> > > +     vd =3D &async_desc->vd;
->> > > +
->> > > +     dma_async_tx_descriptor_init(&vd->tx, &vc->chan);
->> > > +     vd->tx.flags =3D DMA_PREP_CMD;
->> > > +     vd->tx.desc_free =3D vchan_tx_desc_free;
->> > > +     vd->tx_result.result =3D DMA_TRANS_NOERROR;
->> > > +     vd->tx_result.residue =3D 0;
->> > > +
->> > > +     cookie =3D dma_cookie_assign(&vd->tx);
->> > > +     ret =3D dma_submit_error(cookie);
->> >
->> > I am not sure I understand this.
->> >
->> > At start you add a descriptor in the queue, ideally which should be
->> > queued after the existing descriptors are completed!
->> >
->> > Also I thought you want to append Pipe cmd to descriptors, why not do
->> > this while preparing the descriptors and add the pipe cmd and start an=
-d
->> > end of the sequence when you prepare... This was you dont need to crea=
-te
->> > a cookie like this
->> >
->>
->> Client (in this case - crypto engine) can call
->> dmaengine_prep_slave_sg() multiple times adding several logical
->> descriptors which themselves can have several hardware descriptors. We
->> want to lock the channel before issuing the first queued descriptor
->> (for crypto: typically data descriptor) and unlock it once the final
->> descriptor is processed (typically command descriptor). To that end:
->> we insert the dummy command descriptor with the lock flag at the head
->> of the queue and the one with the unlock flag at the tail - "wrapping"
->> the existing queue with lock/unlock operations.
->
-> Why not do this per prep call submitted to the engine. It would be
-> simpler to just add lock and unlock to the start and end of transaction.
->
+Since I'm moving from Cloudflare update my email address in the
+MAINTAINERS file and add an entry to .mailmap so nothing gets lost.
 
-Becuase then we'd have:
+Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+---
+ .mailmap    | 1 +
+ MAINTAINERS | 8 ++++----
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-  [LOCK] [DATA] [UNLOCK] [LOCK] [CMD] [UNLOCK]
+diff --git a/.mailmap b/.mailmap
+index 5ac7074c455f..013bce631ffc 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -327,6 +327,7 @@ Henrik Rydberg <rydberg@bitmath.org>
+ Herbert Xu <herbert@gondor.apana.org.au>
+ Huacai Chen <chenhuacai@kernel.org> <chenhc@lemote.com>
+ Huacai Chen <chenhuacai@kernel.org> <chenhuacai@loongson.cn>
++Ignat Korchagin <ignat@linux.win> <ignat@cloudflare.com>
+ Ike Panhc <ikepanhc@gmail.com> <ike.pan@canonical.com>
+ J. Bruce Fields <bfields@fieldses.org> <bfields@redhat.com>
+ J. Bruce Fields <bfields@fieldses.org> <bfields@citi.umich.edu>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 77fdfcb55f06..4f4b894bb328 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4022,7 +4022,7 @@ F:	drivers/hwmon/asus_wmi_sensors.c
+ ASYMMETRIC KEYS
+ M:	David Howells <dhowells@redhat.com>
+ M:	Lukas Wunner <lukas@wunner.de>
+-M:	Ignat Korchagin <ignat@cloudflare.com>
++M:	Ignat Korchagin <ignat@linux.win>
+ L:	keyrings@vger.kernel.org
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+@@ -4035,7 +4035,7 @@ F:	include/linux/verification.h
+ 
+ ASYMMETRIC KEYS - ECDSA
+ M:	Lukas Wunner <lukas@wunner.de>
+-M:	Ignat Korchagin <ignat@cloudflare.com>
++M:	Ignat Korchagin <ignat@linux.win>
+ R:	Stefan Berger <stefanb@linux.ibm.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+@@ -4045,14 +4045,14 @@ F:	include/crypto/ecc*
+ 
+ ASYMMETRIC KEYS - GOST
+ M:	Lukas Wunner <lukas@wunner.de>
+-M:	Ignat Korchagin <ignat@cloudflare.com>
++M:	Ignat Korchagin <ignat@linux.win>
+ L:	linux-crypto@vger.kernel.org
+ S:	Odd fixes
+ F:	crypto/ecrdsa*
+ 
+ ASYMMETRIC KEYS - RSA
+ M:	Lukas Wunner <lukas@wunner.de>
+-M:	Ignat Korchagin <ignat@cloudflare.com>
++M:	Ignat Korchagin <ignat@linux.win>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	crypto/rsa*
+-- 
+2.53.0
 
-while what we want is:
-
-  [LOCK] [DATA] [CMD] [UNLOCK]
-
-Bartosz
