@@ -1,86 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2640D284663;
-	Mon,  9 Mar 2026 20:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A8F41C2F3
+	for <linux-crypto@vger.kernel.org>; Mon,  9 Mar 2026 21:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773089292; cv=none; b=lqgZyqpaSryqH4KBWVPechxbjWwBQzamSn68ybvbwGF+DWa6ddWx8R1jxl8+bcpEwaRY/+ygUlA9I169MZNYd18/T6JpiEdMqKV/wHktrzNaGx0ErjWH60tGybmCEslpx9aiP9L84jhfnoP1hWoIfo6DC21mlaNmLkLChWy03bU=
+	t=1773090748; cv=none; b=lApeFVIMO5cjAi4D9Zk0m0YHW2KpInHbd5c1Cx74WKrXg96xxgRp3tWuG0yQE2kROYwgBbzzrEdRA6TDA45hL4kX1qgA1khUcZ0PsCE/wpL8+ZcCi5t7lxbYQtk0BofGmwgzTKvSBWoP870aaOikf8Avm+Y7lBSSDy9ZteJ/sGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773089292; c=relaxed/simple;
-	bh=Wz+3F7vwckC5eQhXk6NG/xcIuOMnL5SG2fVjLNGfWYI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tMW2UFV2OSjbJ6c2Uh+uys4BdQaTVBH19OWvWxQJBYoWL82ZTAgHgyBF3DfeeppscKJraAcVi7/j8FOOSWl05P8mXYC8f+UVYcjeK2cuKwTdLntVGc1PJNJcpGtpaFf7IvxRY8s5qrv1bnAWLXqG/e9shnjWEtlogtmuBSltIoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hz6HJi1I; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773090748; c=relaxed/simple;
+	bh=XPpul2ao42q/7bFDJdqitqHKcml0oQtqR27LghI2aa8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RcEu4JGN5+sN1S3c6aV5nGvY6quYosvKWm3S2zI9Vj2rzpC/sI1kd89DJEiegLqG/l0hujGNh6y7ajOiZ6rodBqWI/0gKulTl3J+n6r404gzqHgv3mfj313S2t1dsRPSwxR9lz3ANZFwGaiFSL96KnLwPFe6pvR06v/mPCX64C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cRB9lqBc; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hz6HJi1I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3538BC4CEF7;
-	Mon,  9 Mar 2026 20:48:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773089291;
-	bh=Wz+3F7vwckC5eQhXk6NG/xcIuOMnL5SG2fVjLNGfWYI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hz6HJi1Iha92kWoNbh368nUftSmTGsT2Kxlq/8McxQFC0PSr1+vnN5Y6+7slwVGim
-	 XFUDoaG+s1i2qWfgg+EGV/llVjgan2E/xGb+Ly9fBUMdYZA0ZNChGEgHqz4VuBs2Jk
-	 sIJQutfiId5/0JMcIIJwl6xGPAKphOi2T7CFYe4ax5SQKnFZRB9364bD5Ck9/7V0Sb
-	 m6aQbjYXU192Bua+u5GFKaVHc8bkzMKH13S5htChImc35yRDP22l5qaB4c7sOPTqec
-	 mCs+fMtbmdqhAJQeDa1ZcN4uB18Ynq6ELpYLlxSX/Ilc9wrZ9PQWC96YuYY5xRBkpl
-	 Gl7Nc6alcnvEA==
-Date: Mon, 9 Mar 2026 13:48:08 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Cheng-Yang Chou <yphbchou0911@gmail.com>, herbert@gondor.apana.org.au
-Cc: davem@davemloft.net, catalin.marinas@arm.com, will@kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, jserv@ccns.ncku.edu.tw
-Subject: Re: [PATCH v2] crypto: arm64/aes-neonbs - Move key expansion off the
- stack
-Message-ID: <20260309204808.GC2048@quark>
-References: <20260306064254.2079274-1-yphbchou0911@gmail.com>
- <20260306213502.GB9593@quark>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cRB9lqBc"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773090743;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=cpTYeJh42cZvPRFS5bBe1Vg0lrjXL5sYMb3s1PdTh+o=;
+	b=cRB9lqBcVUYh0qSQGWv6pDNjd5DIsGv9093zkCr3Zl/xRlo5fDDsZtRCAwyeJcxh7+ArUl
+	TROeagEaoqOlbOktayaKscMaN1njvD6qXaGAocKpS5rfMxJxWARwjMQnbgwla2hGvDqrAz
+	HVSjr9e5rpLCFEEs9hWvhLJAC3qxFEc=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Jesper Nilsson <jesper.nilsson@axis.com>,
+	Lars Persson <lars.persson@axis.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-arm-kernel@axis.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: artpec6 - use memcpy_and_pad to simplify prepare_hash
+Date: Mon,  9 Mar 2026 22:11:21 +0100
+Message-ID: <20260309211119.81778-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260306213502.GB9593@quark>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1501; i=thorsten.blum@linux.dev; h=from:subject; bh=XPpul2ao42q/7bFDJdqitqHKcml0oQtqR27LghI2aa8=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJnrzctdV9ZJeJlL1m/Wn7s+RfSWdeGsv3E2OUv3iB2Zo ZrY/z2to5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACZyqIrhf+bB3XvyX+2YqNmc cUUmcYF+SY9G9Kv0DY4OU754z44+fonhn6V/l3Nz2yYbBs+6DD+2uAuNz52z7sTGmzVwrL+6uvc 4AwA=
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Mar 06, 2026 at 01:35:02PM -0800, Eric Biggers wrote:
-> On Fri, Mar 06, 2026 at 02:42:54PM +0800, Cheng-Yang Chou wrote:
-> > aesbs_setkey() and aesbs_cbc_ctr_setkey() allocate struct crypto_aes_ctx
-> > on the stack. On arm64, the kernel-mode NEON context is also stored on
-> > the stack, causing the combined frame size to exceed 1024 bytes and
-> > triggering -Wframe-larger-than= warnings.
-> > 
-> > Allocate struct crypto_aes_ctx on the heap instead and use
-> > kfree_sensitive() to ensure the key material is zeroed on free.
-> > Use a goto-based cleanup path to ensure kfree_sensitive() is always
-> > called.
-> > 
-> > Signed-off-by: Cheng-Yang Chou <yphbchou0911@gmail.com>
-> > ---
-> > Changes in v1:
-> > - Replace memzero_explicit() + kfree() with kfree_sensitive()
-> >   (Eric Biggers)
-> > - Link to v1: https://lore.kernel.org/all/20260305183229.150599-1-yphbchou0911@gmail.com/
-> > 
-> >  arch/arm64/crypto/aes-neonbs-glue.c | 37 ++++++++++++++++++-----------
-> >  1 file changed, 23 insertions(+), 14 deletions(-)
-> 
-> Looks okay for now, though as I mentioned I'd like to eventually
-> refactor this code to not need so much temporary space.
-> 
-> I'll plan to take this through the libcrypto-fixes tree.  Herbert, let
-> me know if you prefer to take it instead.
-> 
-> I'll plan to add:
-> 
->     Fixes: 4fa617cc6851 ("arm64/fpsimd: Allocate kernel mode FP/SIMD buffers on the stack")
-> 
-> ... since that is the change that put the stack usage over the "limit".
+Use memcpy_and_pad() instead of memcpy() followed by memset() to
+simplify artpec6_crypto_prepare_hash().
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
+Also fix a duplicate word in a comment and remove a now-redundant one.
 
-- Eric
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/axis/artpec6_crypto.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
+index b04d6379244a..a4793b76300c 100644
+--- a/drivers/crypto/axis/artpec6_crypto.c
++++ b/drivers/crypto/axis/artpec6_crypto.c
+@@ -1323,7 +1323,7 @@ static int artpec6_crypto_prepare_hash(struct ahash_request *areq)
+ 
+ 	artpec6_crypto_init_dma_operation(common);
+ 
+-	/* Upload HMAC key, must be first the first packet */
++	/* Upload HMAC key, it must be the first packet */
+ 	if (req_ctx->hash_flags & HASH_FLAG_HMAC) {
+ 		if (variant == ARTPEC6_CRYPTO) {
+ 			req_ctx->key_md = FIELD_PREP(A6_CRY_MD_OPER,
+@@ -1333,11 +1333,8 @@ static int artpec6_crypto_prepare_hash(struct ahash_request *areq)
+ 						     a7_regk_crypto_dlkey);
+ 		}
+ 
+-		/* Copy and pad up the key */
+-		memcpy(req_ctx->key_buffer, ctx->hmac_key,
+-		       ctx->hmac_key_length);
+-		memset(req_ctx->key_buffer + ctx->hmac_key_length, 0,
+-		       blocksize - ctx->hmac_key_length);
++		memcpy_and_pad(req_ctx->key_buffer, blocksize, ctx->hmac_key,
++			       ctx->hmac_key_length, 0);
+ 
+ 		error = artpec6_crypto_setup_out_descr(common,
+ 					(void *)&req_ctx->key_md,
