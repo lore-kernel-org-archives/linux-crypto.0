@@ -1,433 +1,163 @@
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E71136656C
-	for <linux-crypto@vger.kernel.org>; Mon,  9 Mar 2026 08:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773044497; cv=none; b=fEKaMHb9UbaaWyL38CdDbpyk8ogWTWIKERSRa16BWUBU9K0TzbafIadHwpyY9/cNLqumopCYg3upGVymNnhiwj2KdNPRrPjQaeeuVHmXy7J6gTJz57XEX5IYfSNHDtkOYkMk85UKx5HzFjtlwSskFjtSidjELAYBPRcA7fubbe8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773044497; c=relaxed/simple;
-	bh=ae8oC6M24RmGbgaPYEriiD8mhYaapi3fMrA0MRSkwkU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DiNjFnGQQ2sDy3fiTRokSGUS+JvVQwEVW2gKfmzNR/WXDAk+IPmNBvpg3VO8Yi7Guk4bpvmH6me/HE0mFs7bMWW6KZNUOKNTIEKMsgxSYJJy6waupNvVSKx2641iXNqy9ZToWMTaTBsKGcTXgGrorzMDnMjZy8SCRTO/lLLQi+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HlQPjY6X; arc=none smtp.client-ip=209.85.210.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62629374177
+	for <linux-crypto@vger.kernel.org>; Mon,  9 Mar 2026 09:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773046917; cv=pass; b=fyWqVPhgPQS1SFsbY2Z+MUBM79bhmWpQKy/xm1702CwCeNcHZiRkv/Ly2G2lWFurm3/ot3QUvdTaZy6BsyhHi+DwHmJwaIohCje/P/00UhypQ7PbTmsQynORP1kypIitwY9GLgrdnYul/xUI1OTaLw4U8hdevniYPxZEN3KMmYg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773046917; c=relaxed/simple;
+	bh=PNkPX25Cp7e7Iwb2dKtnjzov9RP8heUl93T4iWLshSg=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oVBA7zPEIb/n2vScLNqnDtskJ5NNii99f3PdT+RGi16+hkLnwkuUHWKjdgkXNrE5Oqtro0qm6rAs0S+2XNM1V1cGt9by8wCXTfiuTjjsPdNz4dM8ApeTSbkYHNQd0Qcz4zDvTaHaL7/kp22IkO9O4DRMd+vbfvzdQq5XmIv6kOE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HZ+OBMvu; arc=pass smtp.client-ip=209.85.217.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HlQPjY6X"
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7d7412cfb9eso840522a34.1
-        for <linux-crypto@vger.kernel.org>; Mon, 09 Mar 2026 01:21:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HZ+OBMvu"
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-5ff05af29b4so3855644137.1
+        for <linux-crypto@vger.kernel.org>; Mon, 09 Mar 2026 02:01:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773046914; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Pj4sa3hQ0swvSAgcDwI+IuoMSiCI8FF2aU4F0CYVmHoKeJwLP5pBOZcylalrUP24wf
+         heeI6+F+026mii6h0VkotkImGs384IxpZ1gjybL2DOcBQUS2k7tK6gK6BlhpbaVeA0Qa
+         b4YQFGYjJD1jzS4ndjOLo3GO56/ILboe3y2WUcV5XvNJ+IZCcjX4zazWeDpkjPTwMieY
+         wh6jtrFyaRKXGkU7L6MRn8S3ptxAEyw7q6FMRTAD0TFyIHHCWGFK0LGaGbU9jVrd/GDE
+         GKZMDGCTxeUGytIfBRObKfgUCH7T+61KmZSMHUUGBIZxsEkeVqA3QuGPeotS5Ghcgkof
+         SUow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=RFQA1zNrgYGwPSpxXXkSccQrNeC8DGePNpNQ4Qq3K74=;
+        fh=pu3ny/TA0xd8NShjHj9wFtqCa2Sa2y5k0yyRrSy80g8=;
+        b=ZUJ2MjoS6lVb50CA01OFHiZpPuZZnpiGnAbdqQZ8hOeSK8fl+A16WZFW1Xlkt2vUIA
+         iU5sTlidW27HJ5Eo7lx+U3bDR+NG1Eww6tvuRCumhbI0Pbwk5MQn7G3RmDDnojjCvk9P
+         3U2VTfG7LRi8GNxUiQemwWEcbUxRn75fHUizj6eJfg/ML9D8WoIiI040S9YadrvQJs9a
+         /6rwl+z5akue5zW4LT92HNMChpSMNbwWJfdLWnjvkMKE+f35vnIIAMkbfk0iUvkyIOEV
+         Ja8TfoiELndUttzW9y9tEM8Ydc+mZTYFnRZP/MGhb1CR9ANq6tcfv42TYMXF30DQRiK5
+         +rVw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773044495; x=1773649295; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LYplohEROQ/aWKluUhy32Hw7e1z7Llc/p+3/sITdRrk=;
-        b=HlQPjY6Xfhd0NjJbKzHiTYJcpRMvCEEt+LLsHF4Cwu19IuN+8rVoCUM6yakW9JHOrS
-         xzg2o0JMTX9M63EME6ZdyyA7ghzTMl0HQN4SxQrAtJrl7hMwQOwDu+0dOhooNpaqF4Al
-         BrVHBFCXYtMGU+Yuv6BRm07X7CoZtUeqTRIeAxCXppufM6eKIeWKD3D0lgKwGE1+L3t2
-         V015sOwFM/hC46p6UculaN+MpmnNOZrxrwhRIPw8a3NaLXVbi44tdT+iqCOZ1HYb9iXi
-         Y4xi3huoHE295uapYo6qgvKXjXxXABXYJPq6DJct3Ljx+M0493/5b8EZu//H12RTJXgz
-         Lr6A==
+        d=google.com; s=20230601; t=1773046914; x=1773651714; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RFQA1zNrgYGwPSpxXXkSccQrNeC8DGePNpNQ4Qq3K74=;
+        b=HZ+OBMvu14mLMWV7Hizzd6RlJU+TG+l5CUyuTPiK3a8leO1gHkq9AhhkKPdYyvVTgl
+         O7BRrxwbVPMIMuA0zGsbKSSw3GeoElrAvB3jEhKS9fyofkrGPKBcYRGf7CTrjvAPHrB6
+         awiWYKqFZ/l8b39F0Qjoxd4KBA7QDMCZPVRgni3XLyZa30ARiMoLr6u9pA14p7Ki/8I6
+         D+moV25McBJrtzIfddwO0l1/HtDYCxK4oTbmbDrWkJ8kokCBVwObC0wJ8k1YQ4XXAA80
+         +ReTAkQREhJLLpKKquQvXk8ddfJitPFLRwVpnK+wqXLwC5RLgMlnZc0eYIMI+YkMrxk3
+         EZSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773044495; x=1773649295;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LYplohEROQ/aWKluUhy32Hw7e1z7Llc/p+3/sITdRrk=;
-        b=gHyAqZcHX58DD2jVijUC6bk0VgJcmh79eQsR0GIEOBCjM84om9nMl3z/N8DDmy3sJ+
-         3aCbcjNPctsYW+puxPtjp6IgpfUdLDVk8AHxwUyNF+K1T2wBrv9A8qYAGgiq29IF4lVD
-         /8c2p6FLbLzkFPy7FLROhojoHMNM+OcftioxEzAbzNALBPaDE3HqAl4U8p/1qX13FaIA
-         KFo3Frt71Tm5WIdi4J4F5RyE22huBaGk2qUgA9JQUIE+Z/djfJ2jmUeItIpd4OCSUqX3
-         NOxEOA+SPWmD+hWSYIC6trcUKEQxsImv0z3g+UVd/fCyp5v9/1IthwI0YfsLk3TXZE+b
-         5gQQ==
-X-Gm-Message-State: AOJu0YzZ5XEm7oYWSULDip1hHZdx6b8V7fsXGxNk9qsVqCMYnvgD79/4
-	BbwW3q+0Tg2pzHD49aP2jYNxH5K8JoHY58RKpw/pZ1xI5BNwFwjzz3XO9KQf83UjRZg=
-X-Gm-Gg: ATEYQzw3siigVCtsYmRubYh3bmmwz0GZBsZtS7TkZYTT6oCuw12Gr48urzjKk6J8mb/
-	l+DWxaM5ODZAqLHttS5WQ0w8vGvQ/9lod8mspXTrq6mhty3LJbwWZS/ndjwTJJbSZE0zGO8FvwH
-	FmrT51szcoomb0CWsS8gEHwPPiYuXYk+dMyNzV+FAb4LZocLzS11zphGtkjV6WEnflIrdjqrf5z
-	vc9BIgvPUElhymT2Owbw77EFeQKYheu6HNltOgLGQ19iz9IyQFaNn0l6u+7qvP5UDJHudk/I/sR
-	bZRQd+M+bRfh22isXj5l+PXJFJa5dMrDcUUkC9BAcQPRiEj0M1sOTEIOFTLrR2NXpfIOCRGtHyi
-	xGNh5ORC3qxe7r+szGMdUg4wwkEUM+X/xBYxhAHteCEwfHkkG12lLp9+t8YwBOl5/Z4i/OnMggB
-	XFGXenf4lAXeueXyxyDriFDaQpjszv8hVglwjSzEQtFzNgBcytRRBGjkl26LYQc+mLNh+gYmPAc
-	KuCLiWC9e70C6oxqvTxjXuOw1aJBp4F/g69tFNfOSJFkBx9
-X-Received: by 2002:a05:6830:d18:b0:7c7:2c3c:690e with SMTP id 46e09a7af769-7d72707f403mr5596943a34.35.1773044495036;
-        Mon, 09 Mar 2026 01:21:35 -0700 (PDT)
-Received: from localhost.localdomain (108-212-132-20.lightspeed.irvnca.sbcglobal.net. [108.212.132.20])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d74a4cdd70sm1709788a34.12.2026.03.09.01.21.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2026 01:21:34 -0700 (PDT)
-From: Wesley Atwell <atwellwea@gmail.com>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	terrelln@fb.com,
-	dsterba@suse.com,
-	giovanni.cabiddu@intel.com,
-	suman.kumar.chakraborty@intel.com
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wesley Atwell <atwellwea@gmail.com>
-Subject: [PATCH] crypto: zstd - fix segmented acomp streaming paths
-Date: Mon,  9 Mar 2026 02:20:51 -0600
-Message-Id: <20260309082051.2087363-1-atwellwea@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1773046914; x=1773651714;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RFQA1zNrgYGwPSpxXXkSccQrNeC8DGePNpNQ4Qq3K74=;
+        b=etmkfox735ym2dY7HudYlkIVVSzLA6sPACLdgQ79zoK/MlCqXxKiG/vUsGBk82jbVb
+         rwGimHWaPLtLp64v4cJB1MssIm6nkS+4HvKYrSb3mvSpcwwVkP7kFISLhRKEemjICMLn
+         SWg48HmK1UXcBYVYRZk1RRhJu4UszRTHU9d61wuD6MomqDPovILWpYBB6Ue/09K1rix7
+         Bpp2ysNbUCegaO54g0H1sQ3RgbbGml0vJhrPwWkjAwpXrajdsnEVFeMW33Kvs/9vUQWW
+         WH8Kjql0KLhkvoeG/MeD1I9x/+h4n9BX4sXueHnG1CvAQFCoRVBuA1j0d+48DHHo1fpj
+         wfEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3WcTDOjl9tYibTPrvQ2Fsjxx8p0djzN9mE9HczrifH5h0ZwMprVs1hBM6JJCA39WgPBRgSH4quHJe9lM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6FbHj08ybcIzbN3ccXqFa/pNhRpcFq+VG7k9Tpx0HKGfCUOju
+	73AAmAbF6HD+byMaw5EFFJigMgaQfc4quTK1Kn7eWl750JogG1E2bzA54HQihwxRUWyqGu8zigd
+	G6veznBHuNRKeZq3HAOCzfXwAUNtk19wZ3n2FwQfF
+X-Gm-Gg: ATEYQzwYU+V7ek8JTv8g44HjPpV0UXmFRvpsFI6kLqTDjAop3m8cRiAU67wwvXZ/lLh
+	Suy72H370lvclbm4O/5K44HVym3ido8RYbhGtKN9AAibiufktuXsvIZ/Wqk9fA0vmM0SHVMKYuo
+	JFCS5SCdqLPRlx8OAW2dw5Q3FqH306dlmVp+p6XhQ/+5wEpezP4jFTmn2+L0F4SfgLxnebozMF6
+	vjU+NOkSYRd68S1mhLVnwtu1gjhu3jcOoJiZG/EhBRuFw7vFCCLyAhsL9mteIeCnqx48uhRIHWn
+	n9EAkLIR3O9Q7bjkSJkHiuhL5cHrYcOXqfC4OjKDh13nFXEzDiwt7TOXDGLZaUllFsaQ5w==
+X-Received: by 2002:a05:6102:3f0b:b0:5ef:a644:ca4 with SMTP id
+ ada2fe7eead31-5ffe6134835mr3557573137.23.1773046913874; Mon, 09 Mar 2026
+ 02:01:53 -0700 (PDT)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 9 Mar 2026 02:01:53 -0700
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 9 Mar 2026 02:01:53 -0700
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <ce99dc548000b5a1f4486cdd3efe510b3874684b.1772486459.git.ashish.kalra@amd.com>
+References: <cover.1772486459.git.ashish.kalra@amd.com> <ce99dc548000b5a1f4486cdd3efe510b3874684b.1772486459.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Date: Mon, 9 Mar 2026 02:01:53 -0700
+X-Gm-Features: AaiRm523pnGIGt0JrK2mF_UJQjN59ASDAQJnNicAgeYGdxK3jDgLfp_34dMqkIY
+Message-ID: <CAEvNRgFCTNr=LUR_RM7+A4z+qHCWBZOYKe_Cbokwx0UsCtzaVw@mail.gmail.com>
+Subject: Re: [PATCH v2 5/7] KVM: guest_memfd: Add cleanup interface for guest teardown
+To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com, 
+	peterz@infradead.org, thomas.lendacky@amd.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, ardb@kernel.org
+Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com, 
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com, 
+	jackyli@google.com, pgonda@google.com, rientjes@google.com, 
+	jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com, 
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com, 
+	darwi@linutronix.de, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-The zstd acomp implementation does not correctly handle segmented
-source and destination walks.
+Ashish Kalra <Ashish.Kalra@amd.com> writes:
 
-The compression path advances the destination walk by the full
-segment length rather than the bytes actually produced, and it only
-calls zstd_end_stream() once even though the streaming API requires it
-to be called until it returns 0.  With segmented destinations this can
-leave buffered output behind and misaccount the walk progress.
+> From: Ashish Kalra <ashish.kalra@amd.com>
+>
+> Introduce kvm_arch_gmem_cleanup() to perform architecture-specific
+> cleanups when the last file descriptor for the guest_memfd inode is
+> closed. This typically occurs during guest shutdown and termination
+> and allows for final resource release.
+>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>
+> [...snip...]
+>
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 017d84a7adf3..2724dd1099f2 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -955,6 +955,14 @@ static void kvm_gmem_destroy_inode(struct inode *inode)
+>
+>  static void kvm_gmem_free_inode(struct inode *inode)
+>  {
+> +#ifdef CONFIG_HAVE_KVM_ARCH_GMEM_CLEANUP
+> +	/*
+> +	 * Finalize cleanup for the inode once the last guest_memfd
+> +	 * reference is released. This usually occurs after guest
+> +	 * termination.
+> +	 */
+> +	kvm_arch_gmem_cleanup();
+> +#endif
 
-The decompression path has the same destination accounting issue, and
-it stops when the source walk is exhausted even if
-zstd_decompress_stream() has not yet reported that the frame is fully
-decoded and flushed.  That can report success too early for segmented
-requests and incomplete frames.
+Folks have already talked about the performance implications of doing
+the scan and rmpopt, I just want to call out that one VM could have more
+than one associated guest_memfd too.
 
-Fix both streaming paths by advancing destination segments by actual
-output bytes, refilling destination segments as needed, draining
-zstd_end_stream() until completion, and continuing to flush buffered
-decompression output after the source walk is exhausted.  Return
--EINVAL if decompression cannot finish once the input has been fully
-consumed.
+I think the cleanup function should be thought of as cleanup for the
+inode (even if it doesn't take an inode pointer since it's not (yet)
+required).
 
-Fixes: f5ad93ffb541 ("crypto: zstd - convert to acomp")
-Assisted-by: Codex:GPT-5
-Signed-off-by: Wesley Atwell <atwellwea@gmail.com>
----
-Local validation:
-- built bzImage with CONFIG_CRYPTO_SELFTESTS=y and CONFIG_CRYPTO_SELFTESTS_FULL=y
-- exercised segmented zstd acomp requests using temporary local testmgr scaffolding
-- booted under virtme and verified zstd-generic selftest passed in /proc/crypto
+So, the gmem cleanup function should not handle deduplicating cleanup
+requests, but the arch function should, if the cleanup needs
+deduplicating.
 
- crypto/zstd.c | 228 ++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 156 insertions(+), 72 deletions(-)
+Also, .free_inode() is called through RCU, so it could be called after
+some delay. Could it be possible that .free_inode() ends up being called
+way after the associated VM gets torn down, or after KVM the module gets
+unloaded?  Does rmpopt still work fine if KVM the module got unloaded?
 
-diff --git a/crypto/zstd.c b/crypto/zstd.c
-index 556f5d2bdd5f..3e19da1fed22 100644
---- a/crypto/zstd.c
-+++ b/crypto/zstd.c
-@@ -94,18 +94,30 @@ static int zstd_compress_one(struct acomp_req *req, struct zstd_ctx *ctx,
- 	return 0;
- }
- 
-+static int zstd_acomp_next_dst(struct acomp_walk *walk, zstd_out_buffer *outbuf)
-+{
-+	unsigned int dcur = acomp_walk_next_dst(walk);
-+
-+	if (!dcur)
-+		return -ENOSPC;
-+
-+	outbuf->pos = 0;
-+	outbuf->dst = walk->dst.virt.addr;
-+	outbuf->size = dcur;
-+
-+	return 0;
-+}
-+
- static int zstd_compress(struct acomp_req *req)
- {
- 	struct crypto_acomp_stream *s;
--	unsigned int pos, scur, dcur;
-+	unsigned int scur;
- 	unsigned int total_out = 0;
--	bool data_available = true;
- 	zstd_out_buffer outbuf;
- 	struct acomp_walk walk;
- 	zstd_in_buffer inbuf;
- 	struct zstd_ctx *ctx;
--	size_t pending_bytes;
--	size_t num_bytes;
-+	size_t remaining;
- 	int ret;
- 
- 	s = crypto_acomp_lock_stream_bh(&zstd_streams);
-@@ -115,66 +127,87 @@ static int zstd_compress(struct acomp_req *req)
- 	if (ret)
- 		goto out;
- 
-+	ret = zstd_acomp_next_dst(&walk, &outbuf);
-+	if (ret)
-+		goto out;
-+
- 	ctx->cctx = zstd_init_cstream(&ctx->params, 0, ctx->wksp, ctx->wksp_size);
- 	if (!ctx->cctx) {
- 		ret = -EINVAL;
- 		goto out;
- 	}
- 
--	do {
--		dcur = acomp_walk_next_dst(&walk);
--		if (!dcur) {
--			ret = -ENOSPC;
-+	for (;;) {
-+		scur = acomp_walk_next_src(&walk);
-+		if (outbuf.size == req->dlen && scur == req->slen) {
-+			ret = zstd_compress_one(req, ctx, walk.src.virt.addr,
-+						walk.dst.virt.addr, &total_out);
-+			if (!ret) {
-+				acomp_walk_done_src(&walk, scur);
-+				acomp_walk_done_dst(&walk, total_out);
-+			}
- 			goto out;
- 		}
- 
--		outbuf.pos = 0;
--		outbuf.dst = (u8 *)walk.dst.virt.addr;
--		outbuf.size = dcur;
-+		if (!scur)
-+			break;
-+
-+		inbuf.pos = 0;
-+		inbuf.src = walk.src.virt.addr;
-+		inbuf.size = scur;
- 
- 		do {
--			scur = acomp_walk_next_src(&walk);
--			if (dcur == req->dlen && scur == req->slen) {
--				ret = zstd_compress_one(req, ctx, walk.src.virt.addr,
--							walk.dst.virt.addr, &total_out);
--				acomp_walk_done_src(&walk, scur);
--				acomp_walk_done_dst(&walk, dcur);
-+			remaining = zstd_compress_stream(ctx->cctx, &outbuf, &inbuf);
-+			if (zstd_is_error(remaining)) {
-+				ret = -EIO;
- 				goto out;
- 			}
- 
--			if (scur) {
--				inbuf.pos = 0;
--				inbuf.src = walk.src.virt.addr;
--				inbuf.size = scur;
--			} else {
--				data_available = false;
--				break;
--			}
-+			if (outbuf.pos != outbuf.size)
-+				continue;
- 
--			num_bytes = zstd_compress_stream(ctx->cctx, &outbuf, &inbuf);
--			if (ZSTD_isError(num_bytes)) {
--				ret = -EIO;
-+			total_out += outbuf.pos;
-+			acomp_walk_done_dst(&walk, outbuf.pos);
-+
-+			ret = zstd_acomp_next_dst(&walk, &outbuf);
-+			if (ret)
- 				goto out;
-+		} while (inbuf.pos != inbuf.size);
-+
-+		acomp_walk_done_src(&walk, inbuf.pos);
-+	}
-+
-+	for (;;) {
-+		remaining = zstd_end_stream(ctx->cctx, &outbuf);
-+		if (zstd_is_error(remaining)) {
-+			ret = -EIO;
-+			goto out;
-+		}
-+
-+		if (outbuf.pos == outbuf.size) {
-+			total_out += outbuf.pos;
-+			acomp_walk_done_dst(&walk, outbuf.pos);
-+
-+			if (!remaining) {
-+				outbuf.pos = 0;
-+				break;
- 			}
- 
--			pending_bytes = zstd_flush_stream(ctx->cctx, &outbuf);
--			if (ZSTD_isError(pending_bytes)) {
--				ret = -EIO;
-+			ret = zstd_acomp_next_dst(&walk, &outbuf);
-+			if (ret)
- 				goto out;
--			}
--			acomp_walk_done_src(&walk, inbuf.pos);
--		} while (dcur != outbuf.pos);
- 
--		total_out += outbuf.pos;
--		acomp_walk_done_dst(&walk, dcur);
--	} while (data_available);
-+			continue;
-+		}
- 
--	pos = outbuf.pos;
--	num_bytes = zstd_end_stream(ctx->cctx, &outbuf);
--	if (ZSTD_isError(num_bytes))
--		ret = -EIO;
--	else
--		total_out += (outbuf.pos - pos);
-+		if (!remaining)
-+			break;
-+	}
-+
-+	if (outbuf.pos) {
-+		total_out += outbuf.pos;
-+		acomp_walk_done_dst(&walk, outbuf.pos);
-+	}
- 
- out:
- 	if (ret)
-@@ -209,12 +242,12 @@ static int zstd_decompress(struct acomp_req *req)
- {
- 	struct crypto_acomp_stream *s;
- 	unsigned int total_out = 0;
--	unsigned int scur, dcur;
-+	unsigned int scur;
- 	zstd_out_buffer outbuf;
- 	struct acomp_walk walk;
- 	zstd_in_buffer inbuf;
- 	struct zstd_ctx *ctx;
--	size_t pending_bytes;
-+	size_t remaining = 1;
- 	int ret;
- 
- 	s = crypto_acomp_lock_stream_bh(&zstd_streams);
-@@ -224,54 +257,105 @@ static int zstd_decompress(struct acomp_req *req)
- 	if (ret)
- 		goto out;
- 
-+	ret = zstd_acomp_next_dst(&walk, &outbuf);
-+	if (ret)
-+		goto out;
-+
- 	ctx->dctx = zstd_init_dstream(ZSTD_MAX_SIZE, ctx->wksp, ctx->wksp_size);
- 	if (!ctx->dctx) {
- 		ret = -EINVAL;
- 		goto out;
- 	}
- 
--	do {
-+	for (;;) {
- 		scur = acomp_walk_next_src(&walk);
--		if (scur) {
--			inbuf.pos = 0;
--			inbuf.size = scur;
--			inbuf.src = walk.src.virt.addr;
--		} else {
--			break;
-+		if (outbuf.size == req->dlen && scur == req->slen) {
-+			ret = zstd_decompress_one(req, ctx, walk.src.virt.addr,
-+						  walk.dst.virt.addr, &total_out);
-+			if (!ret) {
-+				acomp_walk_done_src(&walk, scur);
-+				acomp_walk_done_dst(&walk, total_out);
-+			}
-+			goto out;
- 		}
- 
-+		if (!scur)
-+			break;
-+
-+		inbuf.pos = 0;
-+		inbuf.size = scur;
-+		inbuf.src = walk.src.virt.addr;
-+
- 		do {
--			dcur = acomp_walk_next_dst(&walk);
--			if (dcur == req->dlen && scur == req->slen) {
--				ret = zstd_decompress_one(req, ctx, walk.src.virt.addr,
--							  walk.dst.virt.addr, &total_out);
--				acomp_walk_done_dst(&walk, dcur);
--				acomp_walk_done_src(&walk, scur);
-+			remaining = zstd_decompress_stream(ctx->dctx, &outbuf, &inbuf);
-+			if (zstd_is_error(remaining)) {
-+				ret = -EIO;
- 				goto out;
- 			}
- 
--			if (!dcur) {
--				ret = -ENOSPC;
--				goto out;
-+			if (outbuf.pos != outbuf.size)
-+				continue;
-+
-+			total_out += outbuf.pos;
-+			acomp_walk_done_dst(&walk, outbuf.pos);
-+
-+			if (!remaining) {
-+				outbuf.pos = 0;
-+				break;
- 			}
- 
--			outbuf.pos = 0;
--			outbuf.dst = (u8 *)walk.dst.virt.addr;
--			outbuf.size = dcur;
-+			ret = zstd_acomp_next_dst(&walk, &outbuf);
-+			if (ret)
-+				goto out;
-+		} while (inbuf.pos != scur);
- 
--			pending_bytes = zstd_decompress_stream(ctx->dctx, &outbuf, &inbuf);
--			if (ZSTD_isError(pending_bytes)) {
--				ret = -EIO;
-+		acomp_walk_done_src(&walk, inbuf.pos);
-+	}
-+
-+	inbuf.pos = 0;
-+	inbuf.size = 0;
-+	inbuf.src = NULL;
-+
-+	/* Drain any buffered output after the source walk is exhausted. */
-+	while (remaining) {
-+		size_t pos = outbuf.pos;
-+
-+		remaining = zstd_decompress_stream(ctx->dctx, &outbuf, &inbuf);
-+		if (zstd_is_error(remaining)) {
-+			ret = -EIO;
-+			goto out;
-+		}
-+
-+		if (outbuf.pos == pos) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+
-+		if (outbuf.pos != outbuf.size) {
-+			if (remaining) {
-+				ret = -EINVAL;
- 				goto out;
- 			}
-+			break;
-+		}
- 
--			total_out += outbuf.pos;
-+		total_out += outbuf.pos;
-+		acomp_walk_done_dst(&walk, outbuf.pos);
- 
--			acomp_walk_done_dst(&walk, outbuf.pos);
--		} while (inbuf.pos != scur);
-+		if (!remaining) {
-+			outbuf.pos = 0;
-+			break;
-+		}
- 
--		acomp_walk_done_src(&walk, scur);
--	} while (ret == 0);
-+		ret = zstd_acomp_next_dst(&walk, &outbuf);
-+		if (ret)
-+			goto out;
-+	}
-+
-+	if (outbuf.pos) {
-+		total_out += outbuf.pos;
-+		acomp_walk_done_dst(&walk, outbuf.pos);
-+	}
- 
- out:
- 	if (ret)
+IIUC the current kmem_cache_free(kvm_gmem_inode_cachep, GMEM_I(inode));
+is fine because in kvm_gmem_exit(), there is a rcu_barrier() before
+kmem_cache_destroy(kvm_gmem_inode_cachep);.
 
-base-commit: 1f318b96cc84d7c2ab792fcc0bfd42a7ca890681
--- 
-2.34.1
-
+>  	kmem_cache_free(kvm_gmem_inode_cachep, GMEM_I(inode));
+>  }
+>
+> --
+> 2.43.0
