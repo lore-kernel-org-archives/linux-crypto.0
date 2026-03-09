@@ -1,53 +1,99 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [144.76.133.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA063407599;
-	Mon,  9 Mar 2026 17:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.133.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8AE42C11D1;
+	Mon,  9 Mar 2026 18:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773079198; cv=none; b=AQJjIb2AAH74oGlsM5ppF3e3lb3ZVsru7T5wNMSOFUHFUdTQeDftcKG2maKCmi0b3VY4jD4ICqTx+4YWmpgQZLbwX9Z7NylB5b9RDSMgDu76rTo1YcfeITEcK1aK6gr5ed/Ssyxfxe/0kk0Hp6AG/G02WI0ObtagyuGzzyynHoE=
+	t=1773079272; cv=none; b=azx9p+zie7JZMiqY2wBEBF5wTZvD86sG9+VTB3Ag1vXwo3dvYSZkyVE1CFjQOvxykJ4Z+wBPRojjrwghrMwYbR0VzUVwB9fgEmu0cmZlgHYFAgpXJVy24t2nV4Adme/kp5AhZq+d0siW0yrFjlZASPB9CA+j0/38qR064p9zoSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773079198; c=relaxed/simple;
-	bh=c//TlHLudlYMiJ/hQkbuHxWvTFwDGvZJGJ4BL41BeR4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mh2O0QOQHWw5q3pBtVeC8tpx7gN3mr4QrU6uV+0n3eaTwbF5Rrj6ylx1J2FwYyC7eZ3USfaJpl9E/ghAK+ZD+w6RcjJKgfGwNfBBNbvGaR3uZ3q2tejK88kf1B7VT16ZOO+O9tP4C7Ajdps1d8LSl8bNX5LV+cizv3ciUCy/bMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=144.76.133.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
-	 client-signature ECDSA (secp384r1) client-digest SHA384)
-	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id C0B6C2025727;
-	Mon, 09 Mar 2026 18:59:46 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 8851A4F38C; Mon,  9 Mar 2026 18:59:46 +0100 (CET)
-Date: Mon, 9 Mar 2026 18:59:46 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Ignat Korchagin <ignat@cloudflare.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ignat Korchagin <ignat@linux.win>
-Subject: Re: [PATCH] MAINTAINERS: update email address for Ignat Korchagin
-Message-ID: <aa8KkkKldYOVNg0A@wunner.de>
-References: <20260309173445.71393-1-ignat@cloudflare.com>
+	s=arc-20240116; t=1773079272; c=relaxed/simple;
+	bh=omXIrDpdIqi3o5BW4XsJcO58ut9DRxY4c/VDjtGZInY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GNfZ3VH/wNMaBECYuN+QW2pKYNiJsBmsrfzUn60NNMkhOGgdisAWsEuO9n08salxXNetBaYxBRPqap9CzBJ027hQNMwlwPntWLYdRabY3iu2Vxl6AbvHxy7XePAc7upeLuZhcIVChBwN2T1YmaayrkWO1ippU06RHqNtCBcgotQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LqFC7WcH; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LqFC7WcH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67D44C4CEF7;
+	Mon,  9 Mar 2026 18:01:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773079272;
+	bh=omXIrDpdIqi3o5BW4XsJcO58ut9DRxY4c/VDjtGZInY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=LqFC7WcHTw1Uh7UGLlwKPaxmAlRaezI7Oxm1kRcG0aOArrxLtB8OZq+p2r9+9m3G8
+	 R5kmcNuNlv1UcQfJkL95J1Q/3fTx8lZuw2lLqqkBGMg/Eg/IgbA0wcx23L60DiRmfX
+	 MZb/ZG4yY9lL4mXFiJZtoC03nDGZBYJUqYNZTiIgACxLUysXo0FI846Qncyu7v0lk4
+	 /gCz4WuK1SwdNWfQ6f20dtuYA3tiM+pT3szG44bE/JJMxk9/pTYsuD+u7jDY83H6oZ
+	 4W9npL7U0vPuTkJznU1P+siU1+nlgmgiuDtLC6k8vp5B9LYS+oV98i/WBpFMHkDppo
+	 DdFE6TAV5qVtw==
+From: Tycho Andersen <tycho@kernel.org>
+To: Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>,
+	Kishon Vijay Abraham I <kvijayab@amd.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	Kim Phillips <kim.phillips@amd.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH v2 00/10] Move SNP initialization to the CCP driver
+Date: Mon,  9 Mar 2026 12:00:42 -0600
+Message-ID: <20260309180053.2389118-1-tycho@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260306153846.GKaar1Bg_1EKm17tXJ@fat_crate.local>
+References: <20260306153846.GKaar1Bg_1EKm17tXJ@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260309173445.71393-1-ignat@cloudflare.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 09, 2026 at 05:34:45PM +0000, Ignat Korchagin wrote:
-> Since I'm moving from Cloudflare update my email address in the
-> MAINTAINERS file and add an entry to .mailmap so nothing gets lost.
-> 
-> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-Acked-by: Lukas Wunner <lukas@wunner.de>
+Here's v2 of the series. Changes are:
+
+* squash MFDM helper into snp_x86_shutdown()
+* move MFDM helper to msr_set/clear_bit()
+* move SNP bit test during shutdown from ccp into snp_x86_shutdown()
+* reorder so that the two code deletion patches come first
+* commit message rewrites, carry Tom's reivews as appropriate
+
+Tom Lendacky (3):
+  x86/snp: Keep the RMP table bookkeeping area mapped
+  x86/snp: Create a function to clear/zero the RMP
+  crypto: ccp - Update HV_FIXED page states to allow freeing of memory
+
+Tycho Andersen (AMD) (7):
+  x86/snp: drop support for SNP hotplug
+  x86/snp: drop WBINVD before setting SNPEn
+  x86/snp: create snp_prepare_for_snp_init()
+  x86/snp, crypto: move SNP init to ccp driver
+  x86/snp, crypto: move HSAVE_PA setup to arch/
+  x86/snp: create snp_x86_shutdown()
+  crypto: ccp - implement SNP x86 shutdown
+
+ arch/x86/include/asm/sev.h   |   4 +
+ arch/x86/virt/svm/sev.c      | 161 +++++++++++++++++++----------------
+ drivers/crypto/ccp/sev-dev.c |  62 ++++++++------
+ include/linux/psp-sev.h      |   4 +-
+ 4 files changed, 129 insertions(+), 102 deletions(-)
+
+
+base-commit: 59f9bfe4641c408c08824a9b52e9f7839bde57d8
+-- 
+2.53.0
+
