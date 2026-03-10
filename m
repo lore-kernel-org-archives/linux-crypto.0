@@ -1,246 +1,133 @@
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11023106.outbound.protection.outlook.com [40.107.159.106])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2973027057D;
-	Tue, 10 Mar 2026 08:57:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.106
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773133070; cv=fail; b=bW+qZrL+5x1G5tsBGOBGg6pr4E/31RcHYnfYE5UdlwT2ggiGkuiWJv0q/07zLX6cm8EOvGRGZ3UQTee4dXbLvvX9qCfUW077IADaFM3OoyA52cglCfsY4UNBK+Ghxf5phoEeG7i5etfsj7gQaNPu0ZMwr4WgTbePyf1EuuIT2ro=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773133070; c=relaxed/simple;
-	bh=Fr8vU2qwLt/fEgYQzQS+HWwa2tNnMJZGcoKyWS/OQkg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=G6UBVzXMnM5SNEkQbPnzIhT093NLV5NyHvIScpAY26rDNLEUlpV1IMK/FFrtzXoP0f4gKoyGzI5bSc5OiggzFhvtl0F/IzBdW+z4lEZVfDZ4yJ3zbo4bUkt+pXNyE5Fm6jkrBxNjWDJw5ZG47GPbLNZIcjeSKBperq/+c3cSp0k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ginzinger.com; spf=pass smtp.mailfrom=ginzinger.com; dkim=pass (2048-bit key) header.d=ginzinger.com header.i=@ginzinger.com header.b=Tp8MHkVk; arc=fail smtp.client-ip=40.107.159.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ginzinger.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ginzinger.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC48313E10
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Mar 2026 09:28:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773134923; cv=none; b=FRi7SVHFRbZhieYwe51st46eF5mAeyMoYIVYzdqszFJ3gv0btCHA3wAAylyM70BHxXhPW1naA9PWH+Xdfwm4h/pS2vp7lhbKy+NGfnpQ3sZHlAiGQpG/FeS9EoU5aPXeEziwAOyBRs+uwvscvHAtF3aRf/gCkwUXvhBjc5AIDDU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773134923; c=relaxed/simple;
+	bh=Iq+CMdj5TRyEMGx0pRH7GGi3ap8UCWNG8U4lvHHUY6E=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=OaOPj/ECCm8vJeO4Qd+SqdxxsquNtYRJsFKgWJknfMHSscmv4MEz9sl4uwWLM3MsGU+kI+1VpOC9xsJ/DFnIVGWLo7R9zo249QLXpD0djHrNTSIAfeCsI4Eff+HEwhM1aL+diXjqTChYlgE+hAy17+CSv4U56p4ConRgZwCAYBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=FGH/mSFO; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ginzinger.com header.i=@ginzinger.com header.b="Tp8MHkVk"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pe9tGLybRZIB4Xg4dvPQEalfTHlFDUsSWp23NIAC+oB1plnup9RToO2b2MTpD/yNbprNJg5tNLMZZRsswTmojpmcuwLPLEj4++WWIdE2w5lYsi3N6XlGfrmqQb019BYslYUJszP7UaaoxT+8K44iOwhGOybLhlfvB9pquTE5isq/Fm6fCudgTv/Xh2bNdULb+jnCy0N7pd4Be5BQDxH6BhntmG4sG1KSvbKDMm8OHaAXjvWlGJjlBLmo4xrbNz5USifJFSM0uSTbtBsGArjhPL8Rz5DMe1ERj5cGAsL3dIMZKb2Dm9hW8PXoqeAZbK76vNqeUz7WboO/odqToxU3uQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Fr8vU2qwLt/fEgYQzQS+HWwa2tNnMJZGcoKyWS/OQkg=;
- b=Qnb7ImOPYRWdD6Fm1dauvwYiZ9hcNUrUoenRR1ghXC9mN1h7GCrZ4SGwFny23iAcv82URbNySYHHNuixgpan93LefXghWtiQW6Zyhj3ch4Y0ViTBqw8etVDAV3P4SeBYSl6O+87mI/GCBV8M8AoSUTuFaR5xOOp+U+YdByFA8ysNRBa5Wj025edDRCj3txPnXPZo36v6QO6TciAqSgB9ok+XVbpRc78OtUEbFcKR035WFI/2FKF/yzD+3kHFdaVs+2o0jy88z0gjAa4A5S5eJi8kbMBL02NEfJ+hc3CTUH4rDFT3ttR5Gs+m1Suc4p7A+qhJwMbEsZSAh/aryhBbYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 20.93.157.195) smtp.rcpttodomain=wunner.de smtp.mailfrom=ginzinger.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=ginzinger.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ginzinger.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Fr8vU2qwLt/fEgYQzQS+HWwa2tNnMJZGcoKyWS/OQkg=;
- b=Tp8MHkVkcL+w4LQ02WsdH5zmgH0z9YaR+8XsTuyj+PpYeeA2/pdW5243PZE+hjWGwonE5qgedLoDJxWI7E2Zq4TEr+XdHhGxIXonPW1ARKE2Id3eCaD7IzbkLdeyIcOjEP8qu9QMfpU6sCs6vqfanWuYWPcpV8repWDy4HRr/NnSwjjdPJ9CGlcsnwjAmBHh5yXQHIICApJP8rFkmaPTkjecyz8IMpbhU5lFSEcdvGlKS7xBegfIFw00Vwn17kHbf/ZnFwUFmkqg4GNTGmOlTyvAHLKHs5Tyf4N3BEzRJFCFx+r+yHkKvEvz5yHzqM6hDHa543xk1ILaGpyxc+LWAQ==
-Received: from AS4P189CA0019.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:5db::10)
- by DBAPR06MB6870.eurprd06.prod.outlook.com (2603:10a6:10:1b0::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.25; Tue, 10 Mar
- 2026 08:57:42 +0000
-Received: from AM1PEPF000252DA.eurprd07.prod.outlook.com
- (2603:10a6:20b:5db:cafe::1f) by AS4P189CA0019.outlook.office365.com
- (2603:10a6:20b:5db::10) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.25 via Frontend Transport; Tue,
- 10 Mar 2026 08:57:36 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 20.93.157.195)
- smtp.mailfrom=ginzinger.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=ginzinger.com;
-Received-SPF: Pass (protection.outlook.com: domain of ginzinger.com designates
- 20.93.157.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=20.93.157.195; helo=westeu11-emailsignatures-cloud.codetwo.com;
- pr=C
-Received: from westeu11-emailsignatures-cloud.codetwo.com (20.93.157.195) by
- AM1PEPF000252DA.mail.protection.outlook.com (10.167.16.52) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9678.18 via Frontend Transport; Tue, 10 Mar 2026 08:57:40 +0000
-Received: from DUZPR08CU001.outbound.protection.outlook.com (40.93.64.66) by westeu11-emailsignatures-cloud.codetwo.com with CodeTwo SMTP Server (TLS12) via SMTP; Tue, 10 Mar 2026 08:57:40 +0000
-Received: from VI1PR06MB5549.eurprd06.prod.outlook.com (2603:10a6:803:d6::26)
- by MRWPR06MB10780.eurprd06.prod.outlook.com (2603:10a6:501:91::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.24; Tue, 10 Mar
- 2026 08:57:36 +0000
-Received: from VI1PR06MB5549.eurprd06.prod.outlook.com
- ([fe80::2c95:365d:522:dd25]) by VI1PR06MB5549.eurprd06.prod.outlook.com
- ([fe80::2c95:365d:522:dd25%5]) with mapi id 15.20.9678.024; Tue, 10 Mar 2026
- 08:57:36 +0000
-From: Kepplinger-Novakovic Martin <Martin.Kepplinger-Novakovic@ginzinger.com>
-To: Lukas Wunner <lukas@wunner.de>
-CC: "ebiggers@google.com" <ebiggers@google.com>, "horia.geanta@nxp.com"
-	<horia.geanta@nxp.com>, "pankaj.gupta@nxp.com" <pankaj.gupta@nxp.com>,
-	"gaurav.jain@nxp.com" <gaurav.jain@nxp.com>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
-	"ignat@cloudflare.com" <ignat@cloudflare.com>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [BUG] crypto: caam - RSA encrypt doesn't always complete new
- data in out_buf
-Thread-Index: AQHcpZhLhQf6tsYBZky80qwgD1KH9rWR8nmAgAASVwCAAAjFgIABAUyAgAADGICAAAl5AIABeT4AgABJ74CAAB2dAIASkHOA
-Date: Tue, 10 Mar 2026 08:57:36 +0000
-Message-ID: <c5a24c835d09d759e555070f7a6f6b4f55d2dddc.camel@ginzinger.com>
-References: <6029acc0f0ddfe25e2537c2866d54fd7f54bc182.camel@ginzinger.com>
-	 <aZ296wd7fLE6X3-U@wunner.de>
-	 <e1d7ad1106dbb259f7c61bdd1910ac9f08012725.camel@ginzinger.com>
-	 <aZ3Uqaec79TUrP2I@wunner.de>
-	 <e36dd6fa756015ec1f2a16002fabfa941c33d367.camel@ginzinger.com>
-	 <aZ6vF1CHpcp5d5qk@wunner.de>
-	 <5f9c1e7ec61065a2665a2ec70338e05e551435d4.camel@ginzinger.com>
-	 <aZ_zfnKVnTaG_4bk@wunner.de>
-	 <1a65ac92579fadb4bfc76b32a3a4f1c6df022801.camel@ginzinger.com>
-	 <aaBKWqY57OSxhx7q@wunner.de>
-In-Reply-To: <aaBKWqY57OSxhx7q@wunner.de>
-Accept-Language: de-DE, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=ginzinger.com;
-x-ms-traffictypediagnostic:
-	VI1PR06MB5549:EE_|MRWPR06MB10780:EE_|AM1PEPF000252DA:EE_|DBAPR06MB6870:EE_
-X-MS-Office365-Filtering-Correlation-Id: ac5f3d49-2398-4c12-b1e4-08de7e83160f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700021;
-X-Microsoft-Antispam-Message-Info-Original:
- uwrkK6l9S9xGpWbpjFW5TZOLsrGHx2YjBy+vSUrRxptG6vU/iDMeYFgm6jdAmMKePX42JihN3+allA1YdFUd/c9iR/rQ+xHAyTu8oGDuqYArf0h8YVDMXP78nbpPV4i20R70i9rgp2X8I+8qngNMqosqNwQMvZsv4VqecuhNWQpx0gHiuSg/zIPcgISci+V9DbetSVjOI5YUWR5M5Z7ua4yH1TNS4OjF70qiAhviPkSmQv3KOs51F0FiWzuJA5auB7a5zUVK69uBJ1MECgqGuLanHHM90U2zJLaUjJbEnvogIndUw+hqJZJtTBM9aPmIeJvmySQjDVJSdz7fQZEC/9Q9zQjiaq/sCwJVYB812DyiUHVRMFXcNeSQ+zjImS9/KDiIRbO4Gxl9sScknWqHnGZDfayVKeU9rbeyxDu9LXiRxpUwELNPtWqLI/tKHdIjR+KyHjyw2001QLErqTl7qgvpezrQ218dELfLfSBMrnbIXU74uVnwnpKRXepkN28T2Gv6TiCpqkKkiZwEJYCsT+FhKjkSwBSYkH+IyDHOnXqCIxYyLaaARs9yNKL8SA15eUdVZamQrDZA66ecfi3zrzL/88Jv9vwor0o63HU+UcHMxyntb4+sRRARN9LeT0oQ7dPRClLt1RYYqQMJxE8rcMGFQ2dJJQj62uCJ7MOwFtSmiZrxEz+/Nd37A5tjH0CMI+U9901kmX+DmBNxLIoEdQ4Gv1rTXVtqBuglNANvMWCJErZbqYNGQkfOYq2vXhcG
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR06MB5549.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700021);DIR:OUT;SFP:1102;
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DE962E5AC2E4984C8A9FB63015671EC5@eurprd06.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="FGH/mSFO"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
+	Cc:To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
+	references:reply-to; bh=ngP83g0YvT//3KocYj6ICwrJLalxQCzr+AcdYQR6dMs=; b=FGH/m
+	SFOcWZDbdcebEQ4SI7/UfNqWCde+/nWYSyVeCd5l0YJvs6AL0IplBJCzUn2RzquhxJSRxh675tMKm
+	3jqaueidqcnkNuo+b6K0n1y4R26ZkSZXC+QAWRHtWVx5cM38gzGp61PoYXffOC73RM4SKS9XQdVFD
+	DJYHlJmqildCUrHY2E1C0fxjjc/EDbgoMz4kvDUExqekKjrkjLxdTF+2rRs+p/2T/vWkOBQ7cQbHv
+	yOvEa2m8+GaGWb0Irio7vtntcz/6/BATaMFpoOAjYbug7QSKz0LTU5tmNe348cMF34OEouehYVkxY
+	nTKhb8uoaJzUA4gxtcFEJgNbfIULg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vztO9-00D5wt-2Y;
+	Tue, 10 Mar 2026 17:28:30 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 10 Mar 2026 18:28:29 +0900
+Date: Tue, 10 Mar 2026 18:28:29 +0900
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Akhil R <akhilrajeev@nvidia.com>
+Cc: Guangwu Zhang <guazhang@redhat.com>
+Subject: [PATCH] crypto: tegra - Disable softirqs before finalizing request
+Message-ID: <aa_kPXrFeOmhydP6@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: CHrvjJ2KfnwhOjaynB1kxoaA5NaDyeLhMmsqjynd1At5pZH2m1ZqI5V2dHjinefB1B2qsxbhZxHH1iHs9u9G6QYxOlTXnlnXwowncQFN4NZMyZhm9DkISnF3uhHb9Ti2Jt3XIi3ajepkBmlElxqXG1PeHDU0zqBEODdhbQxS4EqSqjAxyV4pHTBJaIfkTDS86DFX2cwCpIIUeKzmpHHSJ+BOUYzcPV0csaPnu5qF4mtbi3e/0au041J2OUgaQnbtVRluD+z5/SbGQiCioCLLbA/bao46T7R48WIkqaIk1YHdyCgkuMlH2OzwiEaZ4nzym7ycevbU5D1RG1/HWg8HGQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MRWPR06MB10780
-X-CodeTwo-MessageID: b8dc7e46-b4c4-4bbf-bcfd-da7d86841bd7.20260310085740@westeu11-emailsignatures-cloud.codetwo.com
-X-CodeTwoProcessed: true
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM1PEPF000252DA.eurprd07.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	e4b6bea2-557a-436c-6425-08de7e831376
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|82310400026|14060799003|1800799024|36860700016|35042699022|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	XOtz3EpCgyKr0KaIglgXYwziqiu65xp6lietEys9sAwKF8iOVqr4d9f0cQiwjV074XnSLfIWSb3l+4LshMfl9nk716iE4uwjTuayYxOGjFV2u3jvDcqiT1WTRtXeIXYj9LytjD2uM/frIFsSkb0MZ1Qbyl/4qWxz9srq8kiV/DPHPM4HKPzvuiNgZRbHM83EIxVCGk1MEeS5cfdLmb04qAHhGfHi6RBuF2Q1g30hjYXLJMRRVoaAmgUi2iIXRZbvUtXTBtMNsK5OfaTIN1MiaNe9A/RrJhv/Tla8uWlNqAvY8gQoGyC44IL78HTGGxr9mL+dbHiKl6/WhKHSvz+2hH//5KuGqzY/s7gKoYThwfUlmyye67Ny5InRRvOqPYEP0TSbPoCIl0xAD7vfOVB9MuNiOtOaP5JLrJw9bAEjPlLTocWWf6QHveFxRZFrvuL81/pq3KzVw6vkl38wYimuFtHdZhRiC1LVku7Tr6yMVHXsQTWtKd5iRd1cu0TIyBN7yS2pHwsV+RnAoH3AMTUpwq59am1FNTmzyabVhC+qezv3wUwT7hnIFx3Yt5Bhh881G1ZZ9mTmBdAojewKRlNnIbgHjlYJYo4iOH4WDVh9IoKf4/P4q8+395Czj8doETeKxuYHJH2zJJ+Z6WU6V+r4SH8y4KiYP29mRPfHzJzTZhOr/vb8A7MGtk0oR8Nb9GcjdOCrfdvjPDFy4cJjhlfD24YeUhX4QTqJvlx1+766l1Y=
-X-Forefront-Antispam-Report:
-	CIP:20.93.157.195;CTRY:NL;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:westeu11-emailsignatures-cloud.codetwo.com;PTR:westeu11-emailsignatures-cloud.codetwo.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(14060799003)(1800799024)(36860700016)(35042699022)(13003099007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	PfUz0PueT3s8priN/iY6Ql6MfSadcnaPMFH+MN972FX/UeNNDbCU8cWUip7wTj+KUMFO3Iyd/F4A7iiVLqetpBeEd47HgAR+a7DXsY0dR+51QVSYv+B0qwuAbpfeHVG0+7VDVyLZ7FW7iZ+BmYY2LP70Y2lFAdDhhwhYQsHvNW06mVRwLFJb2NRhvcfY2sJm0gd3vsiVS6IGL5Fd9hITn4RA41lIxyHF56drpXv6LTLFP6nvYItqDsMZjVHblEBgaI5d9akWOhnGtXbsUvbLZT7/5acldIlGpHVjnbnB5faohZIKA8gf3U5dsMDAryYdcuD+WVdKY7F0CEds9NK32HVjgDupNOzbUdGcXlasEFQCAjgssjwwQ/gYtEMCKDo2GufrE0OsqCNJb45QZ5shxzb5CQzi7RvrmGR9W8atRKw7j1C6d9DYz+CKk6CdQHpe
-X-OriginatorOrg: ginzinger.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2026 08:57:40.8783
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac5f3d49-2398-4c12-b1e4-08de7e83160f
-X-MS-Exchange-CrossTenant-Id: 198354b3-f56d-4ad5-b1e4-7eb8b115ed44
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=198354b3-f56d-4ad5-b1e4-7eb8b115ed44;Ip=[20.93.157.195];Helo=[westeu11-emailsignatures-cloud.codetwo.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM1PEPF000252DA.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR06MB6870
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-QW0gRG9ubmVyc3RhZywgZGVtIDI2LjAyLjIwMjYgdW0gMTQ6MjcgKzAxMDAgc2NocmllYiBMdWth
-cyBXdW5uZXI6Cj4gT24gVGh1LCBGZWIgMjYsIDIwMjYgYXQgMTE6NDE6NTZBTSArMDAwMCwgS2Vw
-cGxpbmdlci1Ob3Zha292aWMgTWFydGluIHdyb3RlOgo+ID4gW8KgwqDCoCAyLjI3MjEzNV0gUEtF
-WTogPT0+cHVibGljX2tleV92ZXJpZnlfc2lnbmF0dXJlKCkKPiA+IFvCoMKgwqAgMi4yNzIxNjVd
-IENBQU0gcnNhIGluaXQgc3RhcnQKPiA+IFvCoMKgwqAgMi4yNzIxODBdIENBQU0gcnNhIGluaXQg
-ZG9uZQo+ID4gW8KgwqDCoCAyLjI3MjE5MV0gY2FhbV9yc2FfcHViX2tleTogZnJlZSBvbGQga2V5
-IGluIGN0eAo+ID4gW8KgwqDCoCAyLjI3MjIwMV0gY2FhbV9yc2FfcHViX2tleTogd3JpdGUgcnNh
-X2tleS0+ZQo+ID4gW8KgwqDCoCAyLjI3MjIxMF0gY2FhbV9yc2FfcHViX2tleTogd3JpdGUgcnNh
-X2tleS0+bgo+ID4gW8KgwqDCoCAyLjI3MjIyMF0gc3RhcnQgcnNhc3NhX3BrY3MxX3ZlcmlmeQo+
-ID4gW8KgwqDCoCAyLjI3MjIyOF0gc2xlbjogMjU2Cj4gPiBbwqDCoMKgIDIuMjcyMjM4XSBjaGls
-ZF9yZXEgYWRkcmVzczogMWQ2NGI2MmEgZnVsbCBzaXplOiA2NCArIDQ4ICsgMjU2ID0gMzY4Cj4g
-PiBbwqDCoMKgIDIuMjcyMjc0XSBvdXRfYnVmMTowMDAwMDAwMDogMDAwMDAwMDAgMDAwMDAwMDAg
-MDAwMDAwMDAgMDAwMDAwMDDCoCAuLi4uLi4uLi4uLi4uLi4uCj4gPiBbwqDCoMKgIDIuMjcyMjk4
-XSBvdXRfYnVmMTowMDAwMDAxMDogMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDDC
-oCAuLi4uLi4uLi4uLi4uLi4uCj4gPiBbwqDCoMKgIDIuMjcyMzIyXSBTUkMgQlVGIGluIG91dF9i
-dWYxIENSQzogOTY5ZWU4NTgKPiA+IFvCoMKgwqAgMi4yNzIzMzVdIHN0YXJ0IGNhYW1fcnNhX2Vu
-Ywo+ID4gW8KgwqDCoCAyLjI3MjM1Ml0ga2V5OjAwMDAwMDAwOiBjZjYwYTYwMCBjZjRkMTI0MCAw
-MDAwMDAwMCAwMDAwMDAwMMKgIC4uYC5ALk0uLi4uLi4uLi4KPiA+IFvCoMKgwqAgMi4yNzIzNzdd
-IGtleTowMDAwMDAxMDogMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDDCoCAuLi4u
-Li4uLi4uLi4uLi4uCj4gPiBbwqDCoMKgIDIuMjcyNDEzXSBlZGVzYzowMDAwMDAwMDogMDAwMDAw
-MDEgMDAwMDAwMDEgMDAwMDAwMDAgMDAwMDAwMDDCoCAuLi4uLi4uLi4uLi4uLi4uCj4gPiBbwqDC
-oMKgIDIuMjcyNDM4XSBlZGVzYzowMDAwMDAxMDogMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDAg
-Y2Y1MzNkNmPCoCAuLi4uLi4uLi4uLi5sPVMuCj4gPiBbwqDCoMKgIDIuMjcyNDY2XSByZXE6MDAw
-MDAwMDA6IDAwMDAwMDAwIDAwMDAwMDAwIGMwMmUyZjY4IGQwODNkY2I0wqAgLi4uLi4uLi5oLy4u
-Li4uLgo+ID4gW8KgwqDCoCAyLjI3MjQ5MV0gcmVxOjAwMDAwMDEwOiBjZjYwYTU0MCAwMDAwMDIw
-MCBkMDgzZGM5NCBkMDgzZGNhNMKgIEAuYC4uLi4uLi4uLi4uLi4KPiA+IFvCoMKgwqAgMi4yNzI1
-MDldIENBQU06IGNhbGxpbmcgY2FhbV9qcl9lbnF1ZXVlCj4gPiBbwqDCoMKgIDIuMjcyNTI0XSBr
-ZXk6MDAwMDAwMDA6IGNmNjBhNjAwIGNmNGQxMjQwIDAwMDAwMDAwIDAwMDAwMDAwwqAgLi5gLkAu
-TS4uLi4uLi4uLgo+ID4gW8KgwqDCoCAyLjI3MjU0Nl0ga2V5OjAwMDAwMDEwOiAwMDAwMDAwMCAw
-MDAwMDAwMCAwMDAwMDAwMCAwMDAwMDAwMMKgIC4uLi4uLi4uLi4uLi4uLi4KPiA+IFvCoMKgwqAg
-Mi4yNzc0NDRdIENBQU06IGNvbXBsZXRpb24gY2FsbGJhY2sKPiA+IFvCoMKgwqAgMi40MjQ3NjVd
-IE9VVCBCVUYgaW4gb3V0X2J1ZjIgQ1JDOiBmZDBlZWYxMQo+ID4gW8KgwqDCoCAyLjQyNDc5OV0g
-b3V0X2J1ZjI6MDAwMDAwMDA6IDAwMDAwMDAwIDAwMDAwMDAwIDAwMDAwMDAwIDAwMDAwMDAwwqAg
-Li4uLi4uLi4uLi4uLi4uLgo+ID4gW8KgwqDCoCAyLjQyNDgyN10gb3V0X2J1ZjI6MDAwMDAwMTA6
-IGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmwqAgLi4uLi4uLi4uLi4uLi4uLgo+
-ID4gW8KgwqDCoCAyLjQyNDg1M10gb3V0X2J1ZjI6MDAwMDAwMjA6IGZmZmZmZmZmIGZmZmZmZmZm
-IGZmZmZmZmZmIGZmZmZmZmZmwqAgLi4uLi4uLi4uLi4uLi4uLgo+ID4gW8KgwqDCoCAyLjQyNDg3
-OF0gb3V0X2J1ZjI6MDAwMDAwMzA6IGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZm
-wqAgLi4uLi4uLi4uLi4uLi4uLgo+ID4gW8KgwqDCoCAyLjQyNDkwMl0gb3V0X2J1ZjI6MDAwMDAw
-NDA6IGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmwqAgLi4uLi4uLi4uLi4uLi4u
-Lgo+ID4gW8KgwqDCoCAyLjQyNDkyNl0gb3V0X2J1ZjI6MDAwMDAwNTA6IGZmZmZmZmZmIGZmZmZm
-ZmZmIGZmZmZmZmZmIGZmZmZmZmZmwqAgLi4uLi4uLi4uLi4uLi4uLgo+ID4gW8KgwqDCoCAyLjQy
-NDk0OV0gb3V0X2J1ZjI6MDAwMDAwNjA6IGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZm
-ZmZmwqAgLi4uLi4uLi4uLi4uLi4uLgo+ID4gW8KgwqDCoCAyLjQyNDk3M10gb3V0X2J1ZjI6MDAw
-MDAwNzA6IGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmwqAgLi4uLi4uLi4uLi4u
-Li4uLgo+ID4gW8KgwqDCoCAyLjQyNDk5Nl0gb3V0X2J1ZjI6MDAwMDAwODA6IGZmZmZmZmZmIGZm
-ZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmwqAgLi4uLi4uLi4uLi4uLi4uLgo+ID4gW8KgwqDCoCAy
-LjQyNTAyMF0gb3V0X2J1ZjI6MDAwMDAwOTA6IGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmIGZm
-ZmZmZmZmwqAgLi4uLi4uLi4uLi4uLi4uLgo+ID4gW8KgwqDCoCAyLjQyNTA0M10gb3V0X2J1ZjI6
-MDAwMDAwYTA6IGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmwqAgLi4uLi4uLi4u
-Li4uLi4uLgo+ID4gW8KgwqDCoCAyLjQyNTA2OF0gb3V0X2J1ZjI6MDAwMDAwYjA6IGZmZmZmZmZm
-IGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmwqAgLi4uLi4uLi4uLi4uLi4uLgo+ID4gW8KgwqDC
-oCAyLjQyNTA5NV0gb3V0X2J1ZjI6MDAwMDAwYzA6IGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZm
-IDMwMzEzMDAwwqAgLi4uLi4uLi4uLi4uLjAxMAo+ID4gW8KgwqDCoCAyLjQyNTEyM10gb3V0X2J1
-ZjI6MDAwMDAwZDA6IDYwMDkwNjBkIDY1MDE0ODg2IDAxMDIwNDAzIDIwMDQwMDA1wqAgLi4uYC5I
-LmUuLi4uLi4uIAo+ID4gW8KgwqDCoCAyLjQyNTE0OF0gb3V0X2J1ZjI6MDAwMDAwZTA6IDYxNTVh
-ODRlIDdhYTA4OWNiIDc1NDBlNjEzIGYyOGI5YTMwwqAgTi5VYS4uLnouLkB1MC4uLgo+ID4gW8Kg
-wqDCoCAyLjQyNTE3Ml0gb3V0X2J1ZjI6MDAwMDAwZjA6IDFlOThlYzM0IGNlY2IwZTBmIDllZTg5
-NTFhIGFkOGJhZWMzwqAgNC4uLi4uLi4uLi4uLi4uLgo+IAo+IFRoZXJlJ3MgYW4gZW5kaWFubmVz
-cyBpc3N1ZSBoZXJlOsKgIDMwMzEzMDAwIGlzIHRoZSB6ZXJvIGJ5dGUgcHJlc2NyaWJlZAo+IGJ5
-IEVNU0EtUEtDUzEtdjFfNSAoImluX2J1Zltwc19lbmRdID0gMHgwMDsiIGluIHJzYXNzYV9wa2Nz
-MV9zaWduKCkpLAo+IGZvbGxvd2VkIGJ5IHRoZSBmaXJzdCB0aHJlZSBieXRlcyBvZiBoYXNoX3By
-ZWZpeF9zaGEyNTZbXSBpbiByZXZlcnNlIG9yZGVyLgo+IAo+IFRoZW4gNjAwOTA2MGQgYXJlIHRo
-ZSBuZXh0IGZvdXIgYnl0ZXMgb2YgaGFzaF9wcmVmaXhfc2hhMjU2W10sIGFnYWluCj4gaW4gcmV2
-ZXJzZSBvcmRlci7CoCBBbmQgc28gb24gdW50aWwgMjAwNDAwMDUsIHdoaWNoIGFyZSB0aGUgbGFz
-dCBmb3VyCj4gYnl0ZXMgb2YgdGhlIHByZWZpeCBpbiByZXZlcnNlIG9yZGVyLgo+IAo+IEhvdyBh
-cmUgeW91IGdlbmVyYXRpbmcgdGhhdCBoZXhkdW1wP8KgIFdoYXQncyB0aGUgQ1BVJ3MgZW5kaWFu
-bmVzcz8KPiBJcyB0aGUgY2FhbSBSU0EgYWNjZWxlcmF0b3IgdXNpbmcgYSBkaWZmZXJlbnQgZW5k
-aWFubmVzcz8KCgppbXg2dWwgaXMgYXJtdjcsIGxpdHRsZSBlbmRpYW4gYnl0ZSBvcmRlciBhbmQg
-dGhlIGZvbGxvd2luZyByZXR1cm5zIDEgd2hpY2ggc3VwcG9ydHMgdGhhdDoKZWNobyAtbiBJIHwg
-b2QgLW8gfCBoZWFkIC1uMSB8IGN1dCAtZjIgLWQiICIgfCBjdXQgLWM2CgpJIGFsd2F5cyBwcmlu
-dCB0aGUgaGV4IGR1bXAgaW4gdGhlIGZvbGxvd2luZyB3YXkgKGhlcmUgIm91dF9idWYiIGF0IGxp
-bmUKaHR0cHM6Ly9lbGl4aXIuYm9vdGxpbi5jb20vbGludXgvdjYuMTkuNi9zb3VyY2UvY3J5cHRv
-L3JzYXNzYS1wa2NzMS5jI0wyNDcgKQpwcmludF9oZXhfZHVtcChLRVJOX0VSUiwgIm91dF9idWYx
-OiIsIERVTVBfUFJFRklYX09GRlNFVCwgMTYsIDQsIG91dF9idWYsIDMyLCB0cnVlKTsKCkkgZG9u
-J3QgZmluZCBhbnl0aGluZyBhYm91dCBpbXg2dWwncyBDQUFNIGludGVybmFsIGVuZGlhbm5lc3Mg
-aW4gdGhlIHJlZi5tYW4uCmFuZCBjYW4ndCBzYXkgbXVjaCBhYm91dCB0aGF0LgoKSSBzaW1wbHkg
-cnVuIG1haW5saW5lLCBDT05GSUdfQ1JZUFRPX0RFVl9GU0xfQ0FBTV9BSEFTSF9BUEk9biBhbmQg
-ImNyeXB0bzogcnNhc3NhLXBrY3MxIC0gQ29weSBzb3VyY2UgZGF0YSBmb3IgU0cgbGlzdCIKcmV2
-ZXJ0ZWQuIAoKQWdhaW4sIHdpdGggdGhpcyByZXZlcnQsIHRoZSBwcm9ibGVtIHNlZW1zIHRvIGJl
-IHRoZSBzYW1lLCBvbmx5IHRoYXQgdGhlIGRhdGEgdGhhdCByc2Fzc2FfcGtjczFfdmVyaWZ5KCkg
-aXMKc3RhcnRpbmcgdG8gY2hlY2sgaGVyZSBodHRwczovL2VsaXhpci5ib290bGluLmNvbS9saW51
-eC92Ni4xOS42L3NvdXJjZS9jcnlwdG8vcnNhc3NhLXBrY3MxLmMjTDI2NiBpcyBzdGlsbAoib2xk
-IiBidXQgbm93IHplcm9lcywgbm90IHRoZSBpbnB1dC1kYXRhLCB0aHVzIGZhaWxpbmcgd2l0aCAt
-RUJBRE1TRyBpbnN0ZWFkIG9mIC1FSU5WQUwuCgpNeSBmZWVsaW5nIGlzIHRoYXQgZW5kaWFubmVz
-cyBpcyBub3QgdGhlIGlzc3VlIGhlcmUuIEkgc2VlIHdoYXQgeW91IG1lYW4sIGtpbmQgb2YsIGJ1
-dCBsZXQncyBsb29rIGF0IGEgc3VjY2Vzcy1jYXNlLgoib3V0X2J1ZiIgcHJpbnRlZCBoZXJlOiBo
-dHRwczovL2VsaXhpci5ib290bGluLmNvbS9saW51eC92Ni4xOS42L3NvdXJjZS9jcnlwdG8vcnNh
-c3NhLXBrY3MxLmMjTDI2NAoKWyAgICAzLjg2MzQ4NV0gb3V0X2J1ZjI6MDAwMDAwMDA6IGZmZmYw
-MTAwIGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZmICAuLi4uLi4uLi4uLi4uLi4uClsgICAgMy44
-NjM1MTZdIG91dF9idWYyOjAwMDAwMDEwOiBmZmZmZmZmZiBmZmZmZmZmZiBmZmZmZmZmZiBmZmZm
-ZmZmZiAgLi4uLi4uLi4uLi4uLi4uLgpbICAgIDMuODYzNTQyXSBvdXRfYnVmMjowMDAwMDAyMDog
-ZmZmZmZmZmYgZmZmZmZmZmYgZmZmZmZmZmYgZmZmZmZmZmYgIC4uLi4uLi4uLi4uLi4uLi4KWyAg
-ICAzLjg2MzU2N10gb3V0X2J1ZjI6MDAwMDAwMzA6IGZmZmZmZmZmIGZmZmZmZmZmIGZmZmZmZmZm
-IGZmZmZmZmZmICAuLi4uLi4uLi4uLi4uLi4uCgpzbyBvdXRfYnVmWzBdIGlzIDB4MDAsIG91dF9i
-dWZbMV0gaXMgMHgwMSwgInNlZWtpbmciIGZvcndhcmQgdW50aWwgITB4ZmYsIGFsbCBzdWNjZWVk
-cyBpbiB0aGUgbGluZXMgYmVsb3cuCgphbmQgc29ycnkgZm9yIG15IGxhdGUgcmVzcG9uc2UgaGVy
-ZS4gSSdkIGJlICp2ZXJ5KiBoYXBweSB0byB0ZXN0IGFueSBpZGVhcyEKCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBtYXJ0aW4K
+Softirqs must be disabled when calling the finalization fucntion on
+a request.
+
+Reported-by: Guangwu Zhang <guazhang@redhat.com>
+Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/drivers/crypto/tegra/tegra-se-aes.c b/drivers/crypto/tegra/tegra-se-aes.c
+index 0e07d0523291..8b91f00b9c31 100644
+--- a/drivers/crypto/tegra/tegra-se-aes.c
++++ b/drivers/crypto/tegra/tegra-se-aes.c
+@@ -4,6 +4,7 @@
+  * Crypto driver to handle block cipher algorithms using NVIDIA Security Engine.
+  */
+ 
++#include <linux/bottom_half.h>
+ #include <linux/clk.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/module.h>
+@@ -333,7 +334,9 @@ static int tegra_aes_do_one_req(struct crypto_engine *engine, void *areq)
+ 		tegra_key_invalidate_reserved(ctx->se, key2_id, ctx->alg);
+ 
+ out_finalize:
++	local_bh_disable();
+ 	crypto_finalize_skcipher_request(se->engine, req, ret);
++	local_bh_enable();
+ 
+ 	return 0;
+ }
+@@ -1261,7 +1264,9 @@ static int tegra_ccm_do_one_req(struct crypto_engine *engine, void *areq)
+ 		tegra_key_invalidate_reserved(ctx->se, rctx->key_id, ctx->alg);
+ 
+ out_finalize:
++	local_bh_disable();
+ 	crypto_finalize_aead_request(ctx->se->engine, req, ret);
++	local_bh_enable();
+ 
+ 	return 0;
+ }
+@@ -1347,7 +1352,9 @@ static int tegra_gcm_do_one_req(struct crypto_engine *engine, void *areq)
+ 		tegra_key_invalidate_reserved(ctx->se, rctx->key_id, ctx->alg);
+ 
+ out_finalize:
++	local_bh_disable();
+ 	crypto_finalize_aead_request(ctx->se->engine, req, ret);
++	local_bh_enable();
+ 
+ 	return 0;
+ }
+@@ -1745,7 +1752,9 @@ static int tegra_cmac_do_one_req(struct crypto_engine *engine, void *areq)
+ 	if (tegra_key_is_reserved(rctx->key_id))
+ 		tegra_key_invalidate_reserved(ctx->se, rctx->key_id, ctx->alg);
+ 
++	local_bh_disable();
+ 	crypto_finalize_hash_request(se->engine, req, ret);
++	local_bh_enable();
+ 
+ 	return 0;
+ }
+diff --git a/drivers/crypto/tegra/tegra-se-hash.c b/drivers/crypto/tegra/tegra-se-hash.c
+index 4a298ace6e9f..79f1e5c9b729 100644
+--- a/drivers/crypto/tegra/tegra-se-hash.c
++++ b/drivers/crypto/tegra/tegra-se-hash.c
+@@ -4,6 +4,7 @@
+  * Crypto driver to handle HASH algorithms using NVIDIA Security Engine.
+  */
+ 
++#include <linux/bottom_half.h>
+ #include <linux/clk.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/module.h>
+@@ -546,7 +547,9 @@ static int tegra_sha_do_one_req(struct crypto_engine *engine, void *areq)
+ 	}
+ 
+ out:
++	local_bh_disable();
+ 	crypto_finalize_hash_request(se->engine, req, ret);
++	local_bh_enable();
+ 
+ 	return 0;
+ }
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
