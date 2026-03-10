@@ -1,168 +1,150 @@
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011049.outbound.protection.outlook.com [40.107.130.49])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B742FD68B
-	for <linux-crypto@vger.kernel.org>; Tue, 10 Mar 2026 15:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773155536; cv=fail; b=AX+1uNZB0T2phtzTJHLGq38Lcdnb4bQqYTrVDFBjLnA4IvADYbt0iN9PjK9fbtXdOz4Sub1ULPSy5IcrZCtHnletB8PJLuLtSjQETBzTkiEJYLZD61HkDiLjMoMAcqvln2S1Y+Ad0pNbgQukp00zKW0VJGKd1+Ud0P5dPyrnBiw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773155536; c=relaxed/simple;
-	bh=AK+76HnN59iP0lCR3XhKpznZ8lQcA6UOL/ol82cm4Js=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=U7XLzdYZOeuxitRe/LQbqw/Iy/1YZnwg9E+QZ6jqEmY9IuKOi/sVhlNQXA8RjV1lw8jJodwr/eCbIvvRg7HnsuQMdoNtzDvXoXEEh2AyddZKLEXE1tFfVRsxIcDfxmNHZFzMC91WriMRamGMFGwKmxsIOgt/CeBZjsRVbYP2YPw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=nL573yRB; arc=fail smtp.client-ip=40.107.130.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB542D3ECF
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Mar 2026 15:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773155555; cv=none; b=bIeI4Sxc9Yb9CGXzEc4h+soMa8RXGLlCFjfsc7o5I727ezrvpM9QI9iMhaBQidpGqjUesBFWkXJlr7oF25b0TdClrZrL/bTYZX8UZeppK8ggTXiR4Z7Y/JXtL4p/P63fAohMtIgUob314LZfEVMpewwtV3rhsaDhW3htX7CcUGc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773155555; c=relaxed/simple;
+	bh=CPs1c/G5mvCMSxqg0kk/dMapsjGjXKO3sabe7GK1NkQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AtLtvQ2DSAxv9Sav8y7DlrXO4bTjHT9W8PtVQiG94gyLYxkAYKbxb7Qb8Dth8J1+KX7YyNYzwHYsDzYTX4bMf07TT9u9yby4U+foJd0h0GpqHNCbrZSQSUBI5zECLoCWTGdV5UMKSWCT7qRs+k4Jr7nkSxR/q40gB2VuDp22KWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=gyXstwd5; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=AzUl5erD; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="nL573yRB"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vId5D8+vmtNKVCcK38OvCzkArw3vp4Yago+TnZRAu+jpihUobXr1xnw0bWJphcemU5UeUjQkR8cs/UYVGsira7X9iIIhrvVuCI+cZjyF1fhCRc5neN7wSiRnPfx3ymgCZWo/vDgZC/OBC1GpKedEyS5sJwMHyyuoJI0958rae5NKwg+cuTECM3nFoyKmHGYViwZ7+vfOmxqFzk2uKzzDrpN9ya+amMkqbSLcL2OzH4gLQ9nYsRmfh2pG78QXd9Ib7z1IEuwu9msUOeaBQv8wDsJePVbYLeC9ypB0azzVTR22YYV3CLih5Jw32dS+/dsFOcE/kTuM7uGJyiHVwPypJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bunbrMPkdwq9G6FgKxpGNoYCDJ+Cix0lA0/p4vumUsI=;
- b=VrqYCtNTqFo1wiAGHdsmGiD0pZ/785tAD7JSwafXCZQV1pQv5VSe8O1rtN7BlOVnw5sJx+iIE09FCngz5+Wbp5JzIkPfEPBECW74lqctCPqmrFKGWC/ppA1SM6nnm79uxLFPThZ73If6IKz4H16pBr4yt/BbUCUUzBpc8+NYtumEo3cOGgqqv/0ZvuJ/yIii03OZ2UCfay60/uUjYqDIMiAhUsQ32NQbjKg5TudvCUxIbc7RvV6vWssoUY/HwE98TKvN9242aAioEuptKlv6IOuWVtSVQCPZLh7Vo551RyfUHT/yoQeE9CVet7hoM1eCgmgJ45XZINhzk5i+REMDog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bunbrMPkdwq9G6FgKxpGNoYCDJ+Cix0lA0/p4vumUsI=;
- b=nL573yRBiVqXPAOvSvSoyHty4Lkkdd4JN+o7pYPf4r+kQW7dlx0uKB/TP2aVTjyT7fx/UNR3guZkLZnPYUB/TClWC8qd81mndnbRazkUwkchZEKsQAztsssyEaGfVO0VBKd1LooLk/y7/Ko98dIEv/5lMbV9/PID+Jt9/5SgtN5o8rOUqP0m9K4Az/QqnoKMbIWzs4jg3IaB6D1e/kUDOyV+uX5vhTabjcnPG0uBbFnxQGX3wqV1KY5wmycO0ikcfDmMofHiok5r6yGOkWFNCL9Re3ZDvX9y5MgS22IxayA4pO/N1F8WN8lQ7BVKt1P1gtdoTfvDeT6D+rJhMiSv3Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from VI0PR04MB11990.eurprd04.prod.outlook.com
- (2603:10a6:800:31e::10) by DB9PR04MB9704.eurprd04.prod.outlook.com
- (2603:10a6:10:303::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.25; Tue, 10 Mar
- 2026 15:12:12 +0000
-Received: from VI0PR04MB11990.eurprd04.prod.outlook.com
- ([fe80::4e7a:8f03:1bfc:28dd]) by VI0PR04MB11990.eurprd04.prod.outlook.com
- ([fe80::4e7a:8f03:1bfc:28dd%5]) with mapi id 15.20.9678.024; Tue, 10 Mar 2026
- 15:12:12 +0000
-Message-ID: <d1bd8cf9-db43-4e36-869f-ecb953dd82e6@nxp.com>
-Date: Tue, 10 Mar 2026 17:12:10 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: caam - Fix DMA corruption on long hmac keys
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- Pankaj Gupta <pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>
-Cc: Paul Bunyan <pbunyan@redhat.com>
-References: <aa6PaoYiz_BY1eZI@gondor.apana.org.au>
-Content-Language: en-US
-From: =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
-In-Reply-To: <aa6PaoYiz_BY1eZI@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR4P281CA0163.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:ba::8) To VI0PR04MB11990.eurprd04.prod.outlook.com
- (2603:10a6:800:31e::10)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="gyXstwd5";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="AzUl5erD"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62ACaVMW1502945
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Mar 2026 15:12:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=qcppdkim1; bh=ihC7DRtjTPJ
+	USDPh8rumlXblahonstifNwos0OC4Pr4=; b=gyXstwd5LAxtanZgsTyX4QyRsGR
+	CG451z6Jzitlcs7vihFhXTq/g8ArivDy72xnzzypbimXRxEjYkqMfTNjQnzU05Ry
+	n0WFo4Bj7cOQWk+YzVpfu4A9sQwsdSzy9aaP6yN/vyIfnz8g8k484mABN4rL9Fzh
+	PAXK5piaExIeyyzpbKBruu53DEnYBKbxkHvIo8op0FsfwMeq/G1mTt+iZW+wQKzK
+	7cjzwgiz0KSdLO2GvFdhBPww7VrNV6bBVJdLN8byTBEyngKuXoPXscnhueeG66ZV
+	ml7Cl8Y+3StEYWXSEk36bN1TMCtCZiPszU6Ab41x0MDbtKaUznWyqlzRqEQ==
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ctdf8j37r-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Mar 2026 15:12:32 +0000 (GMT)
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8cd7fc27cf7so1506596685a.1
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Mar 2026 08:12:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1773155552; x=1773760352; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ihC7DRtjTPJUSDPh8rumlXblahonstifNwos0OC4Pr4=;
+        b=AzUl5erDJAxTl7kRtF6+L3FL6BV6pAOWaSpSjMELpqU0gRoSYuCxMFBSxTa5Ji2T7/
+         0nDl6XPhCahhEkxpQTAAz03jt12Fc4QI586sFXK/7BeeKHD/xrYVRqytuV5G49uCUqPK
+         4KNsh5BMhtZbOk5XQrXbDkaOvv5g+SHDscj6lxl/eCIvEsEFUIOOK0TuAUZJbrDHsevm
+         bUHEbIGhtp5ASsR4jiSZ/274IByrGAiTe/47JfwvmfjZMLls914tTo25Nd6tlHpamnch
+         t0yITr9D2Iukp6F9vUYuYSTU/yHRQGh1VxNGmwg+lJALMMJl4CxsOZr4sKnxY5/erm0Z
+         xkZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773155552; x=1773760352;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ihC7DRtjTPJUSDPh8rumlXblahonstifNwos0OC4Pr4=;
+        b=NEBJKFnRWgJtNMmzS5CkkEzZyKXlav6d50+UL2CAf3J6F/6bSGmq0HURoZieWVEAYJ
+         DPqnYVTVkg2q/JfpOaUMby67aiiYJol8keoG2h0WoWkm3CULANalHeekrDV/WTCrmaoO
+         AC8FEGPHEFSNTdiCB8VXKawpBtiFXRG3xvV/QOJ5gVWDWaCerA/+GtF0RS6RwfKyDHm0
+         BSYq7QTLVZ4gLmzYOhh30+Lvh6kZdFYezLQdJ1ntzMvu9GomREXUD/cPfwTqgX0qskZN
+         zzG8MLjbmYi+QL83jL2HpXksNz6B4xK95OK2BqB4kAThbEgyaW9VPQlNpXy5iuTCYexx
+         ndpg==
+X-Forwarded-Encrypted: i=1; AJvYcCWbzIcyYkCfRYl/0DD6CZHoo/zrVf75S1UC5XSjh9enRokI/nsX4SJ8+VTx6jXffHB79DVwXu0ApX/bCws=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwK3c9nZsnwx04gYnZfN5wr/Bxay9Pe3TcsrNFeccJFxCVFUEW6
+	rcj4GtwOtolGZpn1TnQ/xI23qPl3hjYquP3esbFxS7ChqNTLrLxTgCps7OOgAREtzKws2KPXEIK
+	TjXrF+B8WfQ4+Sh28rVqH/teC2+ty4hfitcsS4DXCUYORayXg3ofoy1EeyyXp/GpJJHw=
+X-Gm-Gg: ATEYQzwR5Z24G45zEv41gRUt23G3p85SVJGDdBslK4he1ZO+OTGWFFt1K5A0hmrvanH
+	yGSad8ds56kMDFpL6aSQx8ZxviTFAJhHUymRWVRykCH7zsZHzrAzn01Q6I+yNCueFAVMIyeSNak
+	Jl7q0xjOHmaj09e+SoO4sQVu7Ttizl0aGVKXZduASlPUraKE3sZeEuUK/ZJyzSTcmhplBvQw2xJ
+	MKVIhpg1qtah4LSG7HJ9cdG0FzhKgALJ2TsPNsEkhweP/wlkoreP2+Ze83yNXYUG8vPSzlt0c9k
+	C4m3UGNoRtUvyaUTlTd+nYgqfDu/ACRy3idf4HVxWo8JfzcHjKNT/+14ou8dZEZSRrV/UxNsN6L
+	I7G58pWkG2kccWbmzS810TMsHC0QDftFZzwOZ1Eg7oXCzj6oAOn6hjYqtSQHIVA==
+X-Received: by 2002:a05:620a:31aa:b0:8cd:8f04:50f4 with SMTP id af79cd13be357-8cd8f04560cmr686118785a.44.1773155552343;
+        Tue, 10 Mar 2026 08:12:32 -0700 (PDT)
+X-Received: by 2002:a05:620a:31aa:b0:8cd:8f04:50f4 with SMTP id af79cd13be357-8cd8f04560cmr686113485a.44.1773155551871;
+        Tue, 10 Mar 2026 08:12:31 -0700 (PDT)
+Received: from hu-yabdulra-ams.qualcomm.com ([212.136.9.4])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dae45786sm41529852f8f.32.2026.03.10.08.12.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2026 08:12:31 -0700 (PDT)
+From: Youssef Samir <youssef.abdulrahman@oss.qualcomm.com>
+To: ebiggers@kernel.org
+Cc: amadeuszx.slawinski@linux.intel.com, arnd@arndb.de, dakr@kernel.org,
+        gregkh@linuxfoundation.org, jeff.hugo@oss.qualcomm.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mcgrof@kernel.org, rafael@kernel.org, russ.weight@linux.dev,
+        troy.hanson@oss.qualcomm.com
+Subject: Re: [PATCH] firmware_loader: use SHA-256 library API instead of crypto_shash API
+Date: Tue, 10 Mar 2026 16:12:30 +0100
+Message-ID: <20260310151230.3478726-1-youssef.abdulrahman@oss.qualcomm.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260306212052.GA9593@quark>
+References: <20260306212052.GA9593@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI0PR04MB11990:EE_|DB9PR04MB9704:EE_
-X-MS-Office365-Filtering-Correlation-Id: 02892eff-0735-4311-5a08-08de7eb767ac
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|19092799006|366016|1800799024|376014|7053199007|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	mRnDos8CmPixa6JZjb4O8erudEmxd0srUBgMNToL5fHlFM1BYAjvgcgm+CROgKxsklP3ro3U3w+hMf9O4w0p9/qXjS9FJ1XjVpCha8es/XGuXiNaRtHKjNeu5lwGMnN3+EAmemv0AjePwJnnlEoRfHLs7aSNZeiTpzbCIgvz0clrM/dS7B08gXhXBRb3Zlx6MFQ+Vyf+rZVL2I50W4hwIMS06hP+Zu84D8V4nfesBqprVzgbO5Fi9Yoqmt53CEB4QQWpxq7Yj76sDCHff88KS5+V7/qSkxCpEqRdoY13JS7sUerYqGgHvg5XKDStiXXBhl518rnDRQYXPhbL/bmBKBHVt7AimqkNsMOlVsORUjmHZEC29edCpVytvGwJkW2I7QC+nWcDYYDZC2sFXuBxtDHLPcFbbB41PX5DuVXrSWBKfffnShcGBWat+J8qduP7KMUhMJp60r3XKDq70idGZmUu3f6aifD26HuJPRM2Mee+ozl2OQCGHVinS1WOezuxMsZVWm1n6U7Loqet2gSGaUyJ9epu+ft3Lunl+YlpoN6mvjXk5Iwh41dzbC+iipME9CfG06z22WKd1HhzVEArwMqEYjrOC3U7NZ9uWxGjbrfA1xGQ8nrFouv7dHY4wUJBSwyEDya/aqbNFXD9SEOkNxfZD+eIf3hh2DPPrDPmhODacM2Pf1w5uGcra6kTfZEoxzds59O90O3qgbUNKq/mqGZSvo9ZMKwC39B1HGIAsto=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI0PR04MB11990.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(366016)(1800799024)(376014)(7053199007)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NGdRT0VTRDk0YjlMRW1VNnZUc3lwSURHM0V3ZEQxMXgwRkZ5ekRFZUZCOTRO?=
- =?utf-8?B?d2lKVDk0enNFc3d2dDF5WWdoaHg3dFJTT1ZFSlNSbDAxR0UwK3Y5TGN1UExU?=
- =?utf-8?B?ekd6ZjJudmNJTHlxcHNoSXAvRTRXYjIwYy8ySEJqRzNwaHlrMC93KzhRWGNY?=
- =?utf-8?B?VkVVR21UVXUvSWI5cnFQNHIwK1RQNnZzMGIvSjBxeHl1dnl2V0hDcGxjTkNi?=
- =?utf-8?B?M2k1bUU4Z051Rkd3amtvRklhVE9jNWZGWWdnREg3d2pMTGI2K0lnTjlEVzNQ?=
- =?utf-8?B?VUxkZzBrY0k1YjQxY0dEeGlyTXlWSFRscjhZUk1jUVg1aTF1TEdDRGdLc05z?=
- =?utf-8?B?WXc1dlFUOHE4T1ZNaEk4elU0ckYvY3Z6a3VXZXlHK3pyUjUzRUtsTmJJcHpo?=
- =?utf-8?B?RlRTZzQ1c0F6MTBrKzhhcUxnMFR2SXFXV2FHYks5NVMrODJ1Rm9pVUZXTEtV?=
- =?utf-8?B?Q2xCVWgwUERuTWUrQnJnVDZ5R2FTUWl4eEY2dGdXWlRITXd3TW43dWl5TUZn?=
- =?utf-8?B?aHlKVHIrWC9uZWNCMGp6VUozajNIWThyaGNyWEZjZUhYNDhheXI4QXBwa0Rn?=
- =?utf-8?B?am5aSHorSnZmUWViZFZxSkhOTkxHRFRUYzFXTmRMR1BzektySVhsd1BaNVRG?=
- =?utf-8?B?ZG9RSVVTeDFzUTN6ZURMZkZ1bTF1cWsxMmxjOTlJNFVTdGljWWNVRGcwcUlG?=
- =?utf-8?B?Ulducy8wQVcwY21CK1NIenpBbkVnYkdWSVpxc2dOL3V1U2l6YzUxVDh2UG1j?=
- =?utf-8?B?YVZ5NFIyQkdmWlNvN2UwMDZKL21HazltYmhRYXNCSmhJT1JBb1RLaGRIalJn?=
- =?utf-8?B?aGRFZVlhZXpxd1I2SFRzNUg1OHdoY0tyQnBya08rdE5lU2t5TG1sUm82cmFB?=
- =?utf-8?B?Z2VZMFo2UDZCb0VmUW9jVzBmNnNhZGRIRFBieG13bC81MjdUSGxFd29rL29y?=
- =?utf-8?B?YVhZRU5WUEZZSGdNMHVobEoybFRpSysyYmpTQXRQbnkxUTYxWXE2MHlOZHEy?=
- =?utf-8?B?dVhybThJWVZjeTRuNndYMnQvZVdzdXh2Zkx3SnBhR1hrTm1kZlVjNGpLY0I2?=
- =?utf-8?B?bE00bmNIcnpqRjV3WERYd0NUeStTRnZkcVc1YnFRQkhET05rWUxvMldLeFln?=
- =?utf-8?B?NUkzcnZTQllBK00zZDlOcEdHUTBUMURBSzNOYVh3cUhJWERMWFFWSDBhc01o?=
- =?utf-8?B?YjBSemR3VEZHN2xFdzI3Ni92cTZycnJSMncrSTl0NDZBaFJ5UjJ0TkkxOU52?=
- =?utf-8?B?L0VMOUdseFNhazR2dzdBNU1VMlNSakYyVWRhZXpiZ21xRVFrSjl1bnFlbUc0?=
- =?utf-8?B?dk5IVUE1UHh2OWhxa1pMazUvUTF0dWRwbDljU3F0UXZJVTU3NVNuZC9td05S?=
- =?utf-8?B?eE5ZdDZnYzdiQ3l3dkhMVHhTTFR3K2lEeGM4YzUrVGhqaGE0WExybGNoemVI?=
- =?utf-8?B?RlRvN2JQZTBQanBpVTg5K21zNVpEK2xqaUFud1pBNXBpWFhvUEtnL0ovSGpZ?=
- =?utf-8?B?RWF6TEF6aUlNZGFaNDZibzVERm9zZEl1N2xRZytESHBRR29ldEdHdVRySTVj?=
- =?utf-8?B?NCtvWG5KRkU3ZzBVMU9zYTlnSk8way82anloelRkSkppelVTY3lXRGpIaGNi?=
- =?utf-8?B?b0hEQit3UmFTMGNSaHVDL21ydzJMV05VdEVtTndJVkZFTm12MWhXMzArM0F6?=
- =?utf-8?B?R2p6TW1vUUl3clV4MUs3RXd0VURHYlIxRFZwTDFoczd2VXFwSWcxWm42UUw4?=
- =?utf-8?B?WFM5WGJENllud1RQRDRJcEI3dzBhV0pTTWIvcHd1S3hheWx2V1diOFF4d29V?=
- =?utf-8?B?RUozcW4zOXd6VkpubUptajkrK1FWOThtRmtVMVdKTFE3RHlraU0yODJkNW1j?=
- =?utf-8?B?V3RFUC9KTTVnNS9ISG5vS1FvUmJnbUlyNUtlNzVYNEJGVGk0WGV3YzJFTnZs?=
- =?utf-8?B?UkNhODI0bVAwZGY0RFRYR1BoK3lpU0kweWVDQ1AzUkpvQ3pSZTBDdkZMMC91?=
- =?utf-8?B?MnNDVWg2NU12TjJ3TXNVN2o4MVJQOFl3VFBxUGNGZ2kxNzYvR3czOHdMelh6?=
- =?utf-8?B?am93K1FxWnpnWjREVnl0cVMwbXNyVnc1blhxbDRGeEhEVHRWUzVvSzgzSm44?=
- =?utf-8?B?SStxR3pjdVRjSmRuaDJ3ZldlaGlLWHV1RTNXaUVXVVdVZ0xTbjBkUVRkaU5z?=
- =?utf-8?B?NVdrVWlmSHJqVEpRaEl5K3FyYVNSTnRrb1k3NFBydnlXd2E5cU9YUjdYOSsw?=
- =?utf-8?B?SjJzNEFoM3lLWjlGbWZ0cnhGV0VjR0tOdWl4Q1VQcTFjZUZTbmlHd05sSllx?=
- =?utf-8?B?SlVSOUR1V2Vtcld0akFrc3FSbUZ6VUxxQ0VvU0ZZVUdYRnEvbUVFQT09?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02892eff-0735-4311-5a08-08de7eb767ac
-X-MS-Exchange-CrossTenant-AuthSource: VI0PR04MB11990.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2026 15:12:11.9110
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: a+2W10Ias86lJ+17rntwVN6z5NRk8CfRpUOh0L0pXsISbmOD2E9Xh2MGxvxIlzb1QdgGrGMrVVjvdKkXJjxVAQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9704
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEwMDEzMiBTYWx0ZWRfX+mLheOvILUjq
+ JeZg1gUadr21xr3igvvPAAuHdEIP5ppDOHlQDf8UcmVO0ysP6HAhVxL7IZkZu+4YK+5468xjDxo
+ oT2XJsY55Rf79XaYt1FMrVitXrgr4jjtfrnwsEVTgl/IN+6fLXOJFKG0SiSvYKfYG9q89yzq+Ri
+ 63PUpAIu6Ua4vJINp/GoIjamlGiVwFHSmNV1G6IbN9rFpoc0YXhF1PWrer3IdBRBamU+e5Arpi9
+ C5P05X7sSA3/xjg0dKhxcTlW1mskNnd1GSk7z8gJk/fOp9Y/xyLq6UeUU2cVAlebApb5rTmqJTU
+ ZXzQfADCNpt0kxid6hrKsptvBuvY990W9p42P71A/kfCzqzXTih52MVAXILX8XY248dASjGDTRY
+ PSjSbHeExr9CBpGEHfAESvxSAZlosHuasWt0jpnk2qytgdR1NZqJrL3XoTKdFsgw0giw2XwEf0z
+ XX5Okxmdn6aTVykgKFQ==
+X-Proofpoint-ORIG-GUID: 7bTBrmQOz58vqvJ7xo3vOIoee2hA_kcC
+X-Proofpoint-GUID: 7bTBrmQOz58vqvJ7xo3vOIoee2hA_kcC
+X-Authority-Analysis: v=2.4 cv=b+W/I9Gx c=1 sm=1 tr=0 ts=69b034e0 cx=c_pps
+ a=HLyN3IcIa5EE8TELMZ618Q==:117 a=dNlqnMcrdpbb+gQrTujlOQ==:17
+ a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22 a=VwQbUJbxAAAA:8
+ a=B-Biid8fbNSdKZqIvtQA:9 a=bTQJ7kPSJx9SKPbeHEYW:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-10_03,2026-03-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 adultscore=0 suspectscore=0 phishscore=0 priorityscore=1501
+ clxscore=1015 impostorscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603100132
 
-On 3/9/2026 11:14 AM, Herbert Xu wrote:
-> When a key longer than block size is supplied, it is copied and then
-> hashed into the real key.  The memory allocated for the copy needs to
-> be rounded to DMA cache alignment, as otherwise the hashed key may
-> corrupt neighbouring memory.
->
-> The rounding was performed, but never actually used for the allocation.
-Thanks for catching this.
-> Fix this by using the rounded value when calling kmemdup.
-Unfortunately, kmemdup can't be used in this case.
->
-> Fixes: 199354d7fb6e ("crypto: caam - Remove GFP_DMA and add DMA alignment padding")
-> Reported-by: Paul Bunyan <pbunyan@redhat.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-> index e0a23c55c10e..aded03c8601c 100644
-> --- a/drivers/crypto/caam/caamhash.c
-> +++ b/drivers/crypto/caam/caamhash.c
-> @@ -441,7 +441,7 @@ static int ahash_setkey(struct crypto_ahash *ahash,
->   		if (aligned_len < keylen)
->   			return -EOVERFLOW;
->   
-> -		hashed_key = kmemdup(key, keylen, GFP_KERNEL);
-> +		hashed_key = kmemdup(key, aligned_len, GFP_KERNEL);
+On 3/6/2026 9:20 PM, Eric Biggers wrote:
+> 
+> I guess this further shows that the upgrade to size_t lengths was a good
+> idea...
+> 
+> There was recently a similar bug report where on old kernels kexec
+> crashed in crypto_sha256_update when loading a file larger than ~2 GB.
+> It had already been fixed upstream by the upgrade to size_t lengths.
+> However, due to the large number of backports that would have been
+> needed, for the 6.1, 6.6, and 6.12 LTS kernels we just went with the
+> one-line fix "crypto: sha256 - fix crash at kexec"
+> (https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git/commit/?h=linux-6.12.y&id=70165dc3ec8cff702da7b8b122c44575ee3111d6).
+> 
+> That increased the supported length in 6.1, and 6.6, and 6.12 from ~2 GB
+> to ~4 GB.  Your "6.8.0-62-generic" distro kernel must be missing that
+> commit.  You should first ask your distro to cherry-pick that commit
+> from 6.12, and it will fix the problem for sizes < ~4 GB.
+Thanks, that fixes the issue :) I will request from them to cherry-pick it.
+> 
+> Do you need support for sizes > ~4 GB?  If so, then we can come up with
+> a solution for that in the LTS kernels.  (Besides just doing a lot of
+> backports, one option would be to replace the call to
+> crypto_shash_digest() with a multi-step incremental computation.)
+No need, 4GB is way larger than our image size already.
 
-When aligned_len is bigger than keylen, kmemdup would go beyond the end 
-of "key" buffer.
-
-Looks like kzalloc + memcpy should be used instead of kmemdup.
-
-Double checking the faulty commit, I've found the same pattern in 
-ahash_setkey from drivers/crypto/caam/caamalg_qi2.c. Let me know if 
-you'd send a fix for this or I should do it.
-
-Thanks,
-Horia
-
+Thanks
+- Youssef
