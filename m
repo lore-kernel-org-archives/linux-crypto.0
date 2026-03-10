@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C723E9580;
-	Tue, 10 Mar 2026 20:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B8B3E92B0;
+	Tue, 10 Mar 2026 20:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773173828; cv=none; b=hy9J2shTDzwprH33pGp54IUIlBGlLssp6BoThm4IkY6MYkHIZduOHg4QaPs3AgIKvqxysC8PnVuWvtL0tTxmrNRrTjbQKungiHtpdlXQCC4409kDZQVXbP+BerGlIV9WRwLy9+xJAJiulclV4F8EFzG7hV+rKgyU6abTia8auxI=
+	t=1773173831; cv=none; b=FdohHFYRPTsMIkck1hO6tZKK5qIUqG8EO+zyqarrll+U0QHR+7maitLlBruSPoY37bfyn01RRP8I1c+YUOYuNn20Fbw/IcqlfWhNYQN5vuJHbsmeXFw3AL9sDxq/BGv/G9e1b+34TX+iLdMs1KNOMdzuvV5voUU4fHa8lc024Ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773173828; c=relaxed/simple;
-	bh=HP/aRJrj4OXmn7uTB6kAMSFHhhaPUWj6nnwMfzC5T1c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rFzoPiXgFlxJ+snesgHUIhfCwPOj8IlERwQOnKk3LMI9m1QJ01I+cT+2lvh+4u+qRJ/p50R/J14FJ1/neGK5Pnl4UCOQzldvzvarulHTTlQBSAA7rUDpf9jUIziTR4HUpfQ6kwxvSx4YdZtU5OrojD1uOgwMeZKns5CkaDVt7kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CtSAQUdA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773173831; c=relaxed/simple;
+	bh=foU1OAkBdvYLo564dfsPQ/XRQ9g0KRuxk4aQottRw6w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CxVEydc81fcp3J/cvoGwAj6mPG97tOzvFoDGFQbHZq7CgZ0/BRO3pl5LsgyTteAGckfWxk+viFntqNAdH7oGc03i4j0MkMwkLdQMXXCl5w4yDOmCbODL9hhZ9kURf+yp1YRoUE68+sVHw8TjbV2ax0xdFt3emhESQezGfjC3wBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGzsBDFN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CtSAQUdA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20F45C19423;
-	Tue, 10 Mar 2026 20:17:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGzsBDFN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15746C19423;
+	Tue, 10 Mar 2026 20:17:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773173828;
-	bh=HP/aRJrj4OXmn7uTB6kAMSFHhhaPUWj6nnwMfzC5T1c=;
+	s=k20201202; t=1773173831;
+	bh=foU1OAkBdvYLo564dfsPQ/XRQ9g0KRuxk4aQottRw6w=;
 	h=From:To:Cc:Subject:Date:From;
-	b=CtSAQUdAsmTzVWBT/O3Hz6sFKQ43RrFTmpm87I9jV4p5nbwedMMxO45wuiY5I561d
-	 Th7R6Fn37F6+esqBudBL/jSLxRI21iE0lzIkxg4uNYCzRfTcBkH/co+xOxY2fC3iFi
-	 lA+27Pi1EMueklWJOEljIJofSbiP7eSOtXr+C/ErITK6MudGr/iQa9O48Sj7NlrEpW
-	 pC4t6UBx/jvmdJHBRw+ZCQUn8VCah6iqFH+FHGYxKZ8umZHuv3PlTaElKT14610Avu
-	 13mlccMzD4o9y8O3S5N3DuEvj1r4BIr5w1J0pbYVciWQZuL6nNk+9i2Kg7+otS6lVI
-	 f69qYk3GJjiWg==
+	b=DGzsBDFN4oxaDlyrmS739aPfmcC41gN02+eCZSyIR5ctQxAp4q80tTWUx2ol57lDI
+	 eNmJQW+2aEU4CLDFoboqPjojq/fEl0s2COJdapHG+usU95U5cJf7ofpLkwxZu6JIto
+	 Dgcci3/bYLPSr+66hpGZ5Ps0EI6cWK76o+ifmQ6T40JSyf+f65p4vCbVHfopT9tGeI
+	 9m/j0utMGGrLBvj2kPy925+UZdCOZcWbsGwG048GeuDPOCutz+LAopvf1xX8s0CFYl
+	 95TERHODXpemUVYc4tHJrA6sOX2RLFzpzziEWm6RnHzhiox4h2kyj14RxnPsYzGfI9
+	 rV0ny42Wlxk6g==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -32,9 +32,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Dmitry Safonov <0x7f454c46@gmail.com>,
 	Eric Biggers <ebiggers@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH 5.15] net/tcp-md5: Fix MAC comparison to be constant-time
-Date: Tue, 10 Mar 2026 13:17:06 -0700
-Message-ID: <20260310201706.120064-1-ebiggers@kernel.org>
+Subject: [PATCH 5.10] net/tcp-md5: Fix MAC comparison to be constant-time
+Date: Tue, 10 Mar 2026 13:17:08 -0700
+Message-ID: <20260310201708.120088-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -61,7 +61,7 @@ Signed-off-by: Jakub Kicinski <kuba@kernel.org>
  2 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 43415de60d7f0..7e4a9090abd70 100644
+index 3dfa856e99267..855cca214a021 100644
 --- a/net/ipv4/tcp_ipv4.c
 +++ b/net/ipv4/tcp_ipv4.c
 @@ -76,10 +76,11 @@
@@ -76,7 +76,7 @@ index 43415de60d7f0..7e4a9090abd70 100644
  
  #include <trace/events/tcp.h>
  
-@@ -761,11 +762,11 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb)
+@@ -762,11 +763,11 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb)
  		if (!key)
  			goto out;
  
@@ -89,7 +89,7 @@ index 43415de60d7f0..7e4a9090abd70 100644
  	}
  
  	if (key) {
-@@ -1465,11 +1466,11 @@ static bool tcp_v4_inbound_md5_hash(const struct sock *sk,
+@@ -1449,11 +1450,11 @@ static bool tcp_v4_inbound_md5_hash(const struct sock *sk,
  	 */
  	genhash = tcp_v4_md5_hash_skb(newhash,
  				      hash_expected,
@@ -103,7 +103,7 @@ index 43415de60d7f0..7e4a9090abd70 100644
  				     &iph->daddr, ntohs(th->dest),
  				     genhash ? " tcp_v4_calc_md5_hash failed"
 diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index e1ca8b73ec08c..e972bbb754189 100644
+index 8b9709420c052..523aa2efdc499 100644
 --- a/net/ipv6/tcp_ipv6.c
 +++ b/net/ipv6/tcp_ipv6.c
 @@ -61,10 +61,11 @@
@@ -131,7 +131,7 @@ index e1ca8b73ec08c..e972bbb754189 100644
  				     genhash ? "failed" : "mismatch",
  				     &ip6h->saddr, ntohs(th->source),
  				     &ip6h->daddr, ntohs(th->dest), l3index);
-@@ -1086,11 +1087,11 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
+@@ -1069,11 +1070,11 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
  		key = tcp_v6_md5_do_lookup(sk1, &ipv6h->saddr, l3index);
  		if (!key)
  			goto out;
@@ -145,7 +145,7 @@ index e1ca8b73ec08c..e972bbb754189 100644
  
  	if (th->ack)
 
-base-commit: 91d48252ad4b17577cf8cc8d3e1353402e4da8f1
+base-commit: aed5c3b77cd53ba74f66767b03bfb9177662af4b
 -- 
 2.53.0
 
