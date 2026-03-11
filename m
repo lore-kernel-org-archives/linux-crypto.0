@@ -1,78 +1,81 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC4813FEE
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 02:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB57A21D00A
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 04:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773194937; cv=none; b=NMxERebutDp6TWNhdRO4tHXq6wxljk9hNhIzKIGP0xK7r/cD84wHxedmZ+KMwsDumsrGl3tQc1w+A99Cd/RDZoskx++t/UtksCEg6h4pt8H95FIHwb3Y94I6yZPj8U7KEUy4dWpJWaLFw5D87WZDusBzqY3hmEfVDuhMYVTjWhE=
+	t=1773202562; cv=none; b=VipZxCP9+rQGaTMq6HbQeDvhwAmARd7MWsDoCIpKCamtcQ1aqDDCUZn/eYDLHbuGByRiFKzEtF+qWDFAdSlPOsEtcu763aX5D1O5biFWrgkTKK+CPHW0yDAo2DX8zollw0iiCzOwTtGOYrPR67x98Elc0biqNKZI0OnBRSnsnTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773194937; c=relaxed/simple;
-	bh=Q5cFX2k6bHPxzmFwA1jZZP2sbUYKylqyAiNpZjCoMM4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fChp2h0rgwvZj7+Vn5r8r4FV5jqxDMX30VrLTGx4RJlAhRw7f1p3qO59k63cXHxIowTIRo29iM2z/KvpEOc59m7DKP9+9yjQ7WjVGKNUwmprpxM1jVCd0G/bOINUSUcB9s63/KTut32oqVygxVlK8XVXwoKaQjYZmROSWbnm5Tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gUKioZh+; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1773202562; c=relaxed/simple;
+	bh=Xl2MhmDCR5jDpun46TF4Dk23ElfPoPs5ff3UyeIwInQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YMRWX6JTas96fNQCHo8aHDrM9r23spVbMjS5DK4ldfXYUa0XWS0AVUC678GxdfewUyLruh40/8RzwCvdYSz3tf8gezrt9fe79upTXtRGfoVHYpHMFpRGsedpHBY8g2TChB6GndpyRQlIHlBkVQKtZD6yH/IzICGwdMSwunUfcBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=FLa6LP8K; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gUKioZh+"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773194922;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=T9f/NPNUnA8wcieHoMwt6iGWiyD3QsUUnDTus3MDL7Y=;
-	b=gUKioZh+4Jvw0/Iw+sLJF9tyZm+zYGd9qYPoanXP8n7soOYeOBpIhWtADOc2ujewBJurMc
-	2O0tOlqunO3vw6b7VDZpIiRs2v3N5px5LqkaMVpn/XuWJtMEz8olT3J7ykzYCpUv4pMFNE
-	PN9y76lAAm8GUfn0QHKNKBN5JQ54eYs=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	stable@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: atmel-aes - Fix 3-page memory leak in atmel_aes_buff_cleanup
-Date: Wed, 11 Mar 2026 03:07:35 +0100
-Message-ID: <20260311020733.250288-3-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="FLa6LP8K"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=U8K3itJjndALQYsGy55CAFS1GZ92Bgvbl0syJjouOfA=; 
+	b=FLa6LP8KAPfbgOlF7TTF3jNuuK4MONhP9tWsoewFvmS+6FUsEzdB/gbdpkqRg+BMKq7pQiDy04k
+	RnDymeCMY1JI5dZ29h0YD/x94jwdj1XVQZNe2sRFwoo9wLKdVMvMzNeDVXmcCBCgzOXvaidmt4vas
+	uJNVjt06RQdaSVyADaP62mOhUstrsw/fDKwms/JoBFHQXwWMUeqr57RRz+h+rVu45gGN+9OXIaFz/
+	ZBfJehTn5A+U/NyQYKHyJJkkRP7a3DPBmAs4sbIBqMytQhlIEP+GjCST/DqYw7F4Ku0XYIy3J8VZl
+	orwwEUBQp1S369EB+otmTXiFVkmR5Bxx2NvQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1w0AzB-00DNZO-2k;
+	Wed, 11 Mar 2026 12:15:54 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Mar 2026 13:15:53 +0900
+Date: Wed, 11 Mar 2026 13:15:53 +0900
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>, Paul Bunyan <pbunyan@redhat.com>
+Subject: Re: [PATCH] crypto: caam - Fix DMA corruption on long hmac keys
+Message-ID: <abDseUutHQaKsWtQ@gondor.apana.org.au>
+References: <aa6PaoYiz_BY1eZI@gondor.apana.org.au>
+ <d1bd8cf9-db43-4e36-869f-ecb953dd82e6@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1027; i=thorsten.blum@linux.dev; h=from:subject; bh=Q5cFX2k6bHPxzmFwA1jZZP2sbUYKylqyAiNpZjCoMM4=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJkbzqUKhj15ssTH/p5yVPAMFmUvWem/ayZN9d3q6B3YZ uMoec20o5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACZiYcPwh08kfmn/Dd0kES32 PX/LDjYL7ihJ4qxcJyY2e8URS+m/3owM56+nOv77sNJ0/77WGUKnt/Yt+/Di5IGA5S7cHYs2P/7 dww8A
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <d1bd8cf9-db43-4e36-869f-ecb953dd82e6@nxp.com>
 
-atmel_aes_buff_init() allocates 4 pages using __get_free_pages() with
-ATMEL_AES_BUFFER_ORDER, but atmel_aes_buff_cleanup() frees only the
-first page using free_page(), leaking the remaining 3 pages. Use
-free_pages() with ATMEL_AES_BUFFER_ORDER to fix the memory leak.
+On Tue, Mar 10, 2026 at 05:12:10PM +0200, Horia Geantă wrote:
+>
+> > diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+> > index e0a23c55c10e..aded03c8601c 100644
+> > --- a/drivers/crypto/caam/caamhash.c
+> > +++ b/drivers/crypto/caam/caamhash.c
+> > @@ -441,7 +441,7 @@ static int ahash_setkey(struct crypto_ahash *ahash,
+> >   		if (aligned_len < keylen)
+> >   			return -EOVERFLOW;
+> > -		hashed_key = kmemdup(key, keylen, GFP_KERNEL);
+> > +		hashed_key = kmemdup(key, aligned_len, GFP_KERNEL);
+> 
+> When aligned_len is bigger than keylen, kmemdup would go beyond the end of
+> "key" buffer.
+> 
+> Looks like kzalloc + memcpy should be used instead of kmemdup.
+> 
+> Double checking the faulty commit, I've found the same pattern in
+> ahash_setkey from drivers/crypto/caam/caamalg_qi2.c. Let me know if you'd
+> send a fix for this or I should do it.
 
-Fixes: bbe628ed897d ("crypto: atmel-aes - improve performances of data transfer")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/crypto/atmel-aes.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Good catch.  Please feel free to send a patch for both issues.
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index bc0c40f10944..9b0cb97055dc 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -2131,7 +2131,7 @@ static int atmel_aes_buff_init(struct atmel_aes_dev *dd)
- 
- static void atmel_aes_buff_cleanup(struct atmel_aes_dev *dd)
- {
--	free_page((unsigned long)dd->buf);
-+	free_pages((unsigned long)dd->buf, ATMEL_AES_BUFFER_ORDER);
- }
- 
- static int atmel_aes_dma_init(struct atmel_aes_dev *dd)
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
