@@ -1,120 +1,78 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F3F30F812;
-	Wed, 11 Mar 2026 02:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC4813FEE
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 02:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773194812; cv=none; b=QRsUGvvvzyOzOMqI+IwdfrydPnWhZjf/ENY3enDQfsTXwsMFoYk3umy1ju6HjXmlq/9v3u/O4ZDLKioJqB9ZhT7GbunE235wkBibIpnzuIFRZkD4iZO4WwouLd7sqear7zASnzSxwmZBUz8SbhDEdaIBm9xMyzsS2ycyl8Bwa4Q=
+	t=1773194937; cv=none; b=NMxERebutDp6TWNhdRO4tHXq6wxljk9hNhIzKIGP0xK7r/cD84wHxedmZ+KMwsDumsrGl3tQc1w+A99Cd/RDZoskx++t/UtksCEg6h4pt8H95FIHwb3Y94I6yZPj8U7KEUy4dWpJWaLFw5D87WZDusBzqY3hmEfVDuhMYVTjWhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773194812; c=relaxed/simple;
-	bh=UaLVhdvXWetzbH8/UhNuhhsOqPDDmNHqLePyoUgiblA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Om63K0PoeRxImNXyJ+EQNxLV+akkZ3Det92MpsgwHVNi5PN3SYr4gp4z3swTI98AG2eGlW9H/urdnLyziLCF4ao3TdQDwcO0wAPkNq7CY+pXUSQkAM0ZD+5EaZ/KUdXEek/aj7+j6dmTR4RQjWGgqpusmOSaP4NhOY7tpqIClxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=r/xO1K/f; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1773194937; c=relaxed/simple;
+	bh=Q5cFX2k6bHPxzmFwA1jZZP2sbUYKylqyAiNpZjCoMM4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fChp2h0rgwvZj7+Vn5r8r4FV5jqxDMX30VrLTGx4RJlAhRw7f1p3qO59k63cXHxIowTIRo29iM2z/KvpEOc59m7DKP9+9yjQ7WjVGKNUwmprpxM1jVCd0G/bOINUSUcB9s63/KTut32oqVygxVlK8XVXwoKaQjYZmROSWbnm5Tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gUKioZh+; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="r/xO1K/f"
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62AIZD6L2911115;
-	Wed, 11 Mar 2026 02:06:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=pAAxYFFzFfWTOcBLF8XT5Q5KOsRMGDM9wOgpZHoM5vE=; b=
-	r/xO1K/fKQXWxSJL7g5SYOtFMNcbIYoTB5jH8UR+qc+ueOG24a0Ybd9tNh45hLnu
-	AGxoPSYJDDEjOPbstjpVjskGjou+bGQtBRrnE1GElwQdPMp06CZMEQWwyykrl0j0
-	IhPsixhCAcMl+uyYE6gY/IJ8xLWeixEsCXPK0z390blyTJ+qIuPjx5ez943bwnMW
-	lj+APr0sIzyeEFkX1/LRS9bcIO8H5E2zQsNccYmjR4h7PsPsCk9SRitrimVLuqlH
-	10tdYeenRNyE6w5Q7oPDacBACiZU2Pplpf33j2Php+MhIbhns344Yq3KROi9T7F5
-	4+PiAoMY5USWkdkEs3wmzw==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cskua44mn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Mar 2026 02:06:24 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 62B1cDcJ020243;
-	Wed, 11 Mar 2026 02:06:23 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4crafewwjt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Mar 2026 02:06:23 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 62B26M5J002770;
-	Wed, 11 Mar 2026 02:06:22 GMT
-Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4crafewwj6-2;
-	Wed, 11 Mar 2026 02:06:22 +0000
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gUKioZh+"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773194922;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=T9f/NPNUnA8wcieHoMwt6iGWiyD3QsUUnDTus3MDL7Y=;
+	b=gUKioZh+4Jvw0/Iw+sLJF9tyZm+zYGd9qYPoanXP8n7soOYeOBpIhWtADOc2ujewBJurMc
+	2O0tOlqunO3vw6b7VDZpIiRs2v3N5px5LqkaMVpn/XuWJtMEz8olT3J7ykzYCpUv4pMFNE
+	PN9y76lAAm8GUfn0QHKNKBN5JQ54eYs=
+From: Thorsten Blum <thorsten.blum@linux.dev>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>, Vinod Koul <vkoul@kernel.org>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Luca Weiss <luca.weiss@fairphone.com>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-phy@lists.infradead.org,
-        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
-        Abel Vesa <abel.vesa@oss.qualcomm.com>,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Subject: Re: [PATCH v2 0/6] Enable UFS support on Milos
-Date: Tue, 10 Mar 2026 22:06:13 -0400
-Message-ID: <177289787680.2131580.5421474366567386451.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260112-milos-ufs-v2-0-d3ce4f61f030@fairphone.com>
-References: <20260112-milos-ufs-v2-0-d3ce4f61f030@fairphone.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	stable@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: atmel-aes - Fix 3-page memory leak in atmel_aes_buff_cleanup
+Date: Wed, 11 Mar 2026 03:07:35 +0100
+Message-ID: <20260311020733.250288-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1027; i=thorsten.blum@linux.dev; h=from:subject; bh=Q5cFX2k6bHPxzmFwA1jZZP2sbUYKylqyAiNpZjCoMM4=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJkbzqUKhj15ssTH/p5yVPAMFmUvWem/ayZN9d3q6B3YZ uMoec20o5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACZiYcPwh08kfmn/Dd0kES32 PX/LDjYL7ihJ4qxcJyY2e8URS+m/3owM56+nOv77sNJ0/77WGUKnt/Yt+/Di5IGA5S7cHYs2P/7 dww8A
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-10_05,2026-03-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0 mlxscore=0
- mlxlogscore=999 adultscore=0 phishscore=0 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2602130000
- definitions=main-2603110016
-X-Authority-Analysis: v=2.4 cv=Methep/f c=1 sm=1 tr=0 ts=69b0ce20 b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=jiCTI4zE5U7BLdzWsZGv:22 a=3I1J8UUJPc9JN9BFgKH3:22 a=VwQbUJbxAAAA:8
- a=IOu2Ym7NY8O1g5AK-m0A:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:12272
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzExMDAxNiBTYWx0ZWRfX/4B9gGsOR3eQ
- OCrB0qlknbYbxRXzoXDF1gJfzToTWVd5cFSaSLa2lPVx+xHbEINrnjIrob5bSdt58/G/D7Ch6HA
- 1BP3Ip2L1L/WjuA6tHobH94TsTIl2vlBZ6t5VvjeaXlU1nL5dGKx1jY//2c/Xr5ybyM+r5uo/0H
- 0lATTU5XGkKUjD19QeGfiz+FGlp7lp4tyymURdsim0vd4sny5fkCTU/T4v1cxPAbxrbrfHYzLxp
- nd90SQOrBP1xKkpyyeohE+eXnTlvjknN8RBUOMKBu8ji38/s7jHiASjX1jteCbXgttQWD1C9Uhz
- Qxu3xII21Zo1LKv8t1QWf2vEHBM73AqzlPOYzs76aIPEWRIE9SBGREgUBbGTCByBy66Gm2MnFng
- 91i3+J8QJLC5WtD/BoCtq25XJe5BMvf3j4JYSPhzc6wwxOM2/DqNjVz/seXEx5r0ShNi62QH9Lj
- w60Dd4F8ld03FdQC2tMHGPZczfVSFpxNGiSjMvxg=
-X-Proofpoint-ORIG-GUID: 0iVz1MMjg1mg92z-0oju3n36A3WoI9_j
-X-Proofpoint-GUID: 0iVz1MMjg1mg92z-0oju3n36A3WoI9_j
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 12 Jan 2026 14:53:13 +0100, Luca Weiss wrote:
+atmel_aes_buff_init() allocates 4 pages using __get_free_pages() with
+ATMEL_AES_BUFFER_ORDER, but atmel_aes_buff_cleanup() frees only the
+first page using free_page(), leaking the remaining 3 pages. Use
+free_pages() with ATMEL_AES_BUFFER_ORDER to fix the memory leak.
 
-> Add inline-crypto-engine and UFS bindings & driver parts, then add them
-> to milos dtsi and enable the UFS storage on Fairphone (Gen. 6).
-> 
-> 
+Fixes: bbe628ed897d ("crypto: atmel-aes - improve performances of data transfer")
+Cc: stable@vger.kernel.org
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/atmel-aes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied to 7.1/scsi-queue, thanks!
-
-[2/6] scsi: ufs: qcom,sc7180-ufshc: dt-bindings: Document the Milos UFS Controller
-      https://git.kernel.org/mkp/scsi/c/cf44b6369b83
-
--- 
-Martin K. Petersen
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index bc0c40f10944..9b0cb97055dc 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -2131,7 +2131,7 @@ static int atmel_aes_buff_init(struct atmel_aes_dev *dd)
+ 
+ static void atmel_aes_buff_cleanup(struct atmel_aes_dev *dd)
+ {
+-	free_page((unsigned long)dd->buf);
++	free_pages((unsigned long)dd->buf, ATMEL_AES_BUFFER_ORDER);
+ }
+ 
+ static int atmel_aes_dma_init(struct atmel_aes_dev *dd)
