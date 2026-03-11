@@ -1,95 +1,120 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B232368975;
-	Tue, 10 Mar 2026 22:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F3F30F812;
+	Wed, 11 Mar 2026 02:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773183234; cv=none; b=YL1I3i624EJ+Xu0I0ojHIWtff1jdwl9bcppAIRN41/Zo944sZ+1lXtPkcicPtjUgpSlWVRDX23RdOCMXs/9QIjqprzJmWt6Q7kDa0BAvRGH1oRCb2JXQrTNVAkBhInJYGbc3Vc3V7CTG0Bm1nncDBREf0vGF+2RHvgcdFXrE70s=
+	t=1773194812; cv=none; b=QRsUGvvvzyOzOMqI+IwdfrydPnWhZjf/ENY3enDQfsTXwsMFoYk3umy1ju6HjXmlq/9v3u/O4ZDLKioJqB9ZhT7GbunE235wkBibIpnzuIFRZkD4iZO4WwouLd7sqear7zASnzSxwmZBUz8SbhDEdaIBm9xMyzsS2ycyl8Bwa4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773183234; c=relaxed/simple;
-	bh=Bmc8yWEGt25JOsN6jnmCLKvcvOEH6RlcqwZ9eOM8geY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j/1/GWBYZ2a0714GWEocTonXzquPCKIfIJK1pCmPjPykTfZaWhFqk+rNqCjl2fZCgIvIVY0KDdiKd9z6FFqIE5zyJJFgIfQ+EbEkFuiwdhb1cbhH4j7essz+37YT+gu96QcxTaa9J0EDOgjPSmGzLihYi/06M4dxWtZN/AKNY58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ju1/Bf03; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1773194812; c=relaxed/simple;
+	bh=UaLVhdvXWetzbH8/UhNuhhsOqPDDmNHqLePyoUgiblA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Om63K0PoeRxImNXyJ+EQNxLV+akkZ3Det92MpsgwHVNi5PN3SYr4gp4z3swTI98AG2eGlW9H/urdnLyziLCF4ao3TdQDwcO0wAPkNq7CY+pXUSQkAM0ZD+5EaZ/KUdXEek/aj7+j6dmTR4RQjWGgqpusmOSaP4NhOY7tpqIClxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=r/xO1K/f; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ju1/Bf03"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773183232; x=1804719232;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Bmc8yWEGt25JOsN6jnmCLKvcvOEH6RlcqwZ9eOM8geY=;
-  b=ju1/Bf03zgxje5K+97EtKtp41oJHjhg4M45B0DUh73GKG5uyQyvXImXw
-   q0sEKuXRJG2/JITwP5XxU+Fnx4DR5qZEJMXdjqLFVG4BEQm9fEMm7u3M1
-   wGy6pw5/wPBfbyfao0IcKK06EGZOmvIBoAq3SHsX0hqVqRQIQkNos1c7J
-   8/REHIr/IvkqsR3y7Lwz3aYGPofeHEpzoiH44CUbh2OW1+WlAz5UzXOCo
-   fsY83gSFUIWfq6H6sQfxnQem1bLeutD0EJX+nG485zExmLIglkCUXeep1
-   Pl0Jref87EBt4TTsB42YiXLMPmXO7Vskul1zcRu4yed6xUNyk0XQNz7xi
-   Q==;
-X-CSE-ConnectionGUID: 3r9+KmXHRwWtYMjleJMV8A==
-X-CSE-MsgGUID: 5GO2n/j7QIyh81jkLlVG7w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11725"; a="85720738"
-X-IronPort-AV: E=Sophos;i="6.23,113,1770624000"; 
-   d="scan'208";a="85720738"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2026 15:53:52 -0700
-X-CSE-ConnectionGUID: KzFV4T4wRYyj52S0WDozjA==
-X-CSE-MsgGUID: BGZTuQvQSEaSaaDjKl4luQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,113,1770624000"; 
-   d="scan'208";a="215583043"
-Received: from vpanait-mobl.ger.corp.intel.com (HELO localhost) ([10.245.244.54])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2026 15:53:49 -0700
-Date: Wed, 11 Mar 2026 00:53:47 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Yury Norov <ynorov@nvidia.com>
-Cc: Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] lib: crypto: fix comments for count_leading_zeros()
-Message-ID: <abCg-0AGnvyTJqdc@ashevche-desk.local>
-References: <20260310211021.95362-1-ynorov@nvidia.com>
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="r/xO1K/f"
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62AIZD6L2911115;
+	Wed, 11 Mar 2026 02:06:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=pAAxYFFzFfWTOcBLF8XT5Q5KOsRMGDM9wOgpZHoM5vE=; b=
+	r/xO1K/fKQXWxSJL7g5SYOtFMNcbIYoTB5jH8UR+qc+ueOG24a0Ybd9tNh45hLnu
+	AGxoPSYJDDEjOPbstjpVjskGjou+bGQtBRrnE1GElwQdPMp06CZMEQWwyykrl0j0
+	IhPsixhCAcMl+uyYE6gY/IJ8xLWeixEsCXPK0z390blyTJ+qIuPjx5ez943bwnMW
+	lj+APr0sIzyeEFkX1/LRS9bcIO8H5E2zQsNccYmjR4h7PsPsCk9SRitrimVLuqlH
+	10tdYeenRNyE6w5Q7oPDacBACiZU2Pplpf33j2Php+MhIbhns344Yq3KROi9T7F5
+	4+PiAoMY5USWkdkEs3wmzw==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cskua44mn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Mar 2026 02:06:24 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 62B1cDcJ020243;
+	Wed, 11 Mar 2026 02:06:23 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4crafewwjt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Mar 2026 02:06:23 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 62B26M5J002770;
+	Wed, 11 Mar 2026 02:06:22 GMT
+Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4crafewwj6-2;
+	Wed, 11 Mar 2026 02:06:22 +0000
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>, Vinod Koul <vkoul@kernel.org>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Luca Weiss <luca.weiss@fairphone.com>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+        ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-phy@lists.infradead.org,
+        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+        Abel Vesa <abel.vesa@oss.qualcomm.com>,
+        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Subject: Re: [PATCH v2 0/6] Enable UFS support on Milos
+Date: Tue, 10 Mar 2026 22:06:13 -0400
+Message-ID: <177289787680.2131580.5421474366567386451.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260112-milos-ufs-v2-0-d3ce4f61f030@fairphone.com>
+References: <20260112-milos-ufs-v2-0-d3ce4f61f030@fairphone.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260310211021.95362-1-ynorov@nvidia.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-10_05,2026-03-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0 mlxscore=0
+ mlxlogscore=999 adultscore=0 phishscore=0 suspectscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2602130000
+ definitions=main-2603110016
+X-Authority-Analysis: v=2.4 cv=Methep/f c=1 sm=1 tr=0 ts=69b0ce20 b=1 cx=c_pps
+ a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=jiCTI4zE5U7BLdzWsZGv:22 a=3I1J8UUJPc9JN9BFgKH3:22 a=VwQbUJbxAAAA:8
+ a=IOu2Ym7NY8O1g5AK-m0A:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:12272
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzExMDAxNiBTYWx0ZWRfX/4B9gGsOR3eQ
+ OCrB0qlknbYbxRXzoXDF1gJfzToTWVd5cFSaSLa2lPVx+xHbEINrnjIrob5bSdt58/G/D7Ch6HA
+ 1BP3Ip2L1L/WjuA6tHobH94TsTIl2vlBZ6t5VvjeaXlU1nL5dGKx1jY//2c/Xr5ybyM+r5uo/0H
+ 0lATTU5XGkKUjD19QeGfiz+FGlp7lp4tyymURdsim0vd4sny5fkCTU/T4v1cxPAbxrbrfHYzLxp
+ nd90SQOrBP1xKkpyyeohE+eXnTlvjknN8RBUOMKBu8ji38/s7jHiASjX1jteCbXgttQWD1C9Uhz
+ Qxu3xII21Zo1LKv8t1QWf2vEHBM73AqzlPOYzs76aIPEWRIE9SBGREgUBbGTCByBy66Gm2MnFng
+ 91i3+J8QJLC5WtD/BoCtq25XJe5BMvf3j4JYSPhzc6wwxOM2/DqNjVz/seXEx5r0ShNi62QH9Lj
+ w60Dd4F8ld03FdQC2tMHGPZczfVSFpxNGiSjMvxg=
+X-Proofpoint-ORIG-GUID: 0iVz1MMjg1mg92z-0oju3n36A3WoI9_j
+X-Proofpoint-GUID: 0iVz1MMjg1mg92z-0oju3n36A3WoI9_j
 
-On Tue, Mar 10, 2026 at 05:10:20PM -0400, Yury Norov wrote:
-> count_leading_zeros() is based on fls(), which is defined for x == 0,
-> contrary to ffs() family. The comment in crypto/mpi erroneously states
+On Mon, 12 Jan 2026 14:53:13 +0100, Luca Weiss wrote:
 
-> that the function may return undef in such case. 
+> Add inline-crypto-engine and UFS bindings & driver parts, then add them
+> to milos dtsi and enable the UFS storage on Fairphone (Gen. 6).
+> 
+> 
 
-You have a trailing space in this line.
+Applied to 7.1/scsi-queue, thanks!
 
-> Fix the comment together with the outdated function signature, and now
-> that COUNT_LEADING_ZEROS_0 is not referenced in the codebase, get rid of
-> it too.
-
-...
-
-> - * 6) count_trailing_zeros(count, x) like count_leading_zeros, but counts
-> + * 6) count_trailing_zeros() like count_leading_zeros, but counts
-
-While at it,
-
-	count_leading_zeros()
+[2/6] scsi: ufs: qcom,sc7180-ufshc: dt-bindings: Document the Milos UFS Controller
+      https://git.kernel.org/mkp/scsi/c/cf44b6369b83
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
-
+Martin K. Petersen
