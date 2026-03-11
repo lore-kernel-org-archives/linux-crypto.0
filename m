@@ -1,192 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED273E868A;
-	Wed, 11 Mar 2026 18:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0222F371892;
+	Wed, 11 Mar 2026 18:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773253739; cv=none; b=Sf6ievJWxmg/lSzT8SxKeaU+/Dl2G5/k6WV0ZtRuLq4y9dvYX6Xp7hQhpYKljTw6rIShjUG2aSlZNTEbA5spF7Nixo8sjKwAxI5d7Lw1NXn7B4ms7jzK+a0o7YJFtIi/MVZ1yBZvokxgT32Yd1OmvkC4Gcf9rIv5GxUfV9ygpQQ=
+	t=1773255477; cv=none; b=YDNfCOO8wwfIqNvRVTKhCEOFVpNTSJ1FVjMlALgfnKn2U11PHYL3Bu1ytge1j+yRzhSflJzAbKbFa10AbrMRkZfBteDTFuye349I9HFRg1dfRLg9YudK2tS7A5dIevrIxhKtLX596K4j03hyb/C35FpL/AhfJFoCHQ7G06ucjuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773253739; c=relaxed/simple;
-	bh=8hWCZbVEK8xlK8wpuc/+kj79PvyW7MYrIWhZA6Sjxu4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=LATg6aHvRygvHSwHcIhIJwg2ViC0QPIA/gjzzN46v4rikkFyckRsyN4gKP4XgJ4dpkoCxD++79tlte3bcrKsEcPfJWu6woa0ppoMCcq0WwY02EMKStofc46YVS85Z5GyAP1TZdW5dqYqBnozj0RHTSpTFa/wZinI41v/RcqAG/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hhDBhUy1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773255477; c=relaxed/simple;
+	bh=RIP4VTL8ZKfCAED/llWzV24bhb3+EBezOHbYfQlNNVw=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=JXln7/F1KaLkPWddVMdeSqNh5bnrGxSL3R7eaMHnZUe98kJlWVSjIxjcpx+Sox6HmMCYI2d0HDh2VYPo5JTM46F4sPdrxleze6XXsFqnaoIOBT/stK3DAiqpnhCV/bivhhArnLIA3jmpivar0JFeoph+ydYhbx/zip+F9JmKW8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=lwNHqHof; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hhDBhUy1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E866C4CEF7;
-	Wed, 11 Mar 2026 18:28:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773253738;
-	bh=8hWCZbVEK8xlK8wpuc/+kj79PvyW7MYrIWhZA6Sjxu4=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=hhDBhUy1vcetvRNAsdun8HLYL2HcknlKBYzvFaeISFZIV82/NtpdUTLZt5zW2F0Bz
-	 sZbsZIu1y/ZPKopfSL9zJ/ibNfGOwUhLOkKgprdiIiQFTSiviwZSAv80SRtU8tJAN1
-	 bmUdC+RTGQaAgP0aHXLrGY7e6dVCCIKdDaswcdS1LUWawtgFkW4n9L72ARoeZJ7RLd
-	 TJQTWIk9CYuSluzvXAaAsH1aHCOPra7fOKT4QoksV6RvxRYCPrBxQXDNhqmYJOWUYU
-	 z+CswL5ngA7SRVV7yKWBMOdUbmDjwrJO8de4QF8y7UjMufS0zROx1RmXusT760bpiZ
-	 8jAvMZMRWdkOQ==
-Message-ID: <972bd9c8-4671-4151-a3a9-d7eccdf83913@kernel.org>
-Date: Wed, 11 Mar 2026 19:28:46 +0100
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="lwNHqHof"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4B60C4CEF7;
+	Wed, 11 Mar 2026 18:57:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1773255476;
+	bh=RIP4VTL8ZKfCAED/llWzV24bhb3+EBezOHbYfQlNNVw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lwNHqHofCZymV9ZwzL4O4QC3oCCorqSKfgbbui0vSPfhppxGKPRL/IJ69bcF8P337
+	 vhDG95oCrnrO9ZlV2DZHEmUO88ZgVNVnKPQNiPvM1Z9VRi+eMXmLsJiRCJ8qnumnHG
+	 0HNrR7TfydlMZ9E+xCePC4BRnc2O1ZREJXn9QWnU=
+Date: Wed, 11 Mar 2026 11:57:54 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Matt Turner
+ <mattst88@gmail.com>, Magnus Lindholm <linmag7@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will
+ Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui
+ <kernel@xen0n.name>, Madhavan Srinivasan <maddy@linux.ibm.com>, Michael
+ Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, Paul Walmsley
+ <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+ <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
+ "David S. Miller" <davem@davemloft.net>, Andreas Larsson
+ <andreas@gaisler.com>, Richard Weinberger <richard@nod.at>, Anton Ivanov
+ <anton.ivanov@cambridgegreys.com>, Johannes Berg
+ <johannes@sipsolutions.net>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>, Dan Williams
+ <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>, David Sterba
+ <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>, Song Liu
+ <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>, Li Nan
+ <linan122@huawei.com>, "Theodore Ts'o" <tytso@mit.edu>,
+ "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-alpha@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+ linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
+Subject: Re: cleanup the RAID5 XOR library v2
+Message-Id: <20260311115754.ca2206d1428c49c3bd6e93cf@linux-foundation.org>
+In-Reply-To: <20260311070416.972667-1-hch@lst.de>
+References: <20260311070416.972667-1-hch@lst.de>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 01/11] dt-bindings: crypto: qcom,ice: Allow
- power-domain and iface clk
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Harshal Dev <harshal.dev@oss.qualcomm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Abel Vesa <abel.vesa@oss.qualcomm.com>,
- Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
- cros-qcom-dts-watchers@chromium.org, Eric Biggers <ebiggers@google.com>,
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
- Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
- Tengfei Fan <tengfei.fan@oss.qualcomm.com>,
- Bartosz Golaszewski <brgl@kernel.org>,
- Yuvaraj Ranganathan <quic_yrangana@quicinc.com>,
- David Wronek <davidwronek@gmail.com>, Luca Weiss <luca.weiss@fairphone.com>,
- Neil Armstrong <neil.armstrong@linaro.org>,
- Melody Olvera <quic_molvera@quicinc.com>
-Cc: Brian Masney <bmasney@redhat.com>,
- Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
- Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
- linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-References: <20260310-qcom_ice_power_and_clk_vote-v2-0-b9c2a5471d9e@oss.qualcomm.com>
- <20260310-qcom_ice_power_and_clk_vote-v2-1-b9c2a5471d9e@oss.qualcomm.com>
- <2ac2efad-3533-490e-bb42-f21c4e950277@kernel.org>
- <a2d6c630-e4df-4cdf-8b10-64d87d24bf8f@oss.qualcomm.com>
- <b2d852c4-9f52-4ad4-a916-ced19c599938@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
- QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
- +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
- ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
- 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
- hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
- tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
- 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
- naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
- hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
- whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
- qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
- RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
- Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
- H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
- dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
- AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
- jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
- zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
- XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <b2d852c4-9f52-4ad4-a916-ced19c599938@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 11/03/2026 19:25, Krzysztof Kozlowski wrote:
-> On 11/03/2026 10:37, Harshal Dev wrote:
->>
->>
->> On 3/11/2026 1:55 AM, Krzysztof Kozlowski wrote:
->>> On 10/03/2026 09:06, Harshal Dev wrote:
->>>> Update the inline-crypto engine DT binding to allow specifying up to two
->>>> clocks along with their names and associated power-domain. When the
->>>> 'clk_ignore_unused' flag is not passed on the kernel command line
->>>> occasional unclocked ICE hardware register access are observed during ICE
->>>> driver probe based on the relative timing between the probe and the kernel
->>>> disabling the unused clocks. On the other hand, when the 'pd_ignore_unused'
->>>> flag is not passed on the command line, clock 'stuck' issues are
->>>> observed if the power-domain required by ICE hardware is unused and thus
->>>> disabled before ICE probe. To avoid these scenarios, the 'iface' clock and
->>>> the associated power-domain should be specified in the ICE device tree node
->>>> and the 'iface' clock should be voted on by the ICE driver during probe.
->>>>
->>>> Fixes: f6ff91a47ac57 ("dt-bindings: crypto: Add Qualcomm Inline Crypto Engine")
->>>> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
->>>> ---
->>>>  .../bindings/crypto/qcom,inline-crypto-engine.yaml       | 16 +++++++++++++++-
->>>>  1 file changed, 15 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
->>>> index c3408dcf5d20..d9a0a8adf645 100644
->>>> --- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
->>>> +++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
->>>> @@ -28,6 +28,16 @@ properties:
->>>>      maxItems: 1
->>>>  
->>>>    clocks:
->>>> +    minItems: 1
->>>> +    maxItems: 2
->>>> +
->>>> +  clock-names:
->>>> +    minItems: 1
->>>> +    items:
->>>> +      - const: ice_core_clk
->>>
->>> core
->>
->> Ack. I'll introduce a check for this specific name here as well:
->> https://elixir.bootlin.com/linux/v7.0-rc3/source/drivers/soc/qcom/ice.c#L582
->>
->>>
->>>> +      - const: iface_clk
->>>
->>> iface or bus
->>
->> Ack, will call it 'iface'.
->>
->>>
->>> I don't understand why this is flexible and commit msg does not explain
->>> that. Devices do not have one and two clocks at the same time. You miss
->>> proper constraints.
->>>
->>
->> I agree, it might confuse someone reading the commit message the first time.
->> I'll re-write the commit message to make it explicit that even though these
->> two properties are 'required', for the time being we are introducing 'iface'
->> clk and 'power-domain' as an optional property to maintain bisectability,
->> and that the properties would be made 'required' in a subsequent commit once
->> the DTS changes which are part of this patch series have reached the top tree.
->>
->> Let me know if any concerns with this kind of commit message.
+On Wed, 11 Mar 2026 08:03:32 +0100 Christoph Hellwig <hch@lst.de> wrote:
+
+> the XOR library used for the RAID5 parity is a bit of a mess right now.
+> The main file sits in crypto/ despite not being cryptography and not
+> using the crypto API, with the generic implementations sitting in
+> include/asm-generic and the arch implementations sitting in an asm/
+> header in theory.  The latter doesn't work for many cases, so
+> architectures often build the code directly into the core kernel, or
+> create another module for the architecture code.
 > 
-> So you are adding it for backwards compatibility? It's fine then,
-> although I had impression you are fixing something which is not working
-> correctly. New devices will need to constrain this.
+> Changes this to a single module in lib/ that also contains the
+> architecture optimizations, similar to the library work Eric Biggers
+> has done for the CRC and crypto libraries later.  After that it changes
+> to better calling conventions that allow for smarter architecture
+> implementations (although none is contained here yet), and uses
+> static_call to avoid indirection function call overhead.
 
-Except new devices, like Eliza and Milos. And then this should go to
-current fixes.
+Cool, thanks, I updated mm.git's mm-nonmm-unstable branch (and hence
+linux-next) to this version.
 
-Best regards,
-Krzysztof
+I retained Heiko's ack on [17/27].
