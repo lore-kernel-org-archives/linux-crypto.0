@@ -1,80 +1,76 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB57A21D00A
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 04:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345BB4C97;
+	Wed, 11 Mar 2026 04:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773202562; cv=none; b=VipZxCP9+rQGaTMq6HbQeDvhwAmARd7MWsDoCIpKCamtcQ1aqDDCUZn/eYDLHbuGByRiFKzEtF+qWDFAdSlPOsEtcu763aX5D1O5biFWrgkTKK+CPHW0yDAo2DX8zollw0iiCzOwTtGOYrPR67x98Elc0biqNKZI0OnBRSnsnTs=
+	t=1773202629; cv=none; b=ghdeShPujJnGSSybL8e2J7NAmoMKx43NbMGBCrcMg/N3GjDgBn5TBR2zXOk1yc36m859I+iYppbbe82i2ewpKVK5HBLhCEFOJbXqkdNSdi0pYQWzxVeOzgJbc++fAUxig45jc67WMr/YsgZ4MTZG7t9oYvYheVun5/jpFTSdfhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773202562; c=relaxed/simple;
-	bh=Xl2MhmDCR5jDpun46TF4Dk23ElfPoPs5ff3UyeIwInQ=;
+	s=arc-20240116; t=1773202629; c=relaxed/simple;
+	bh=hcIvrRRjQMr2pQlVfFeY6pukhq418SGc7B4G82ZRiJ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YMRWX6JTas96fNQCHo8aHDrM9r23spVbMjS5DK4ldfXYUa0XWS0AVUC678GxdfewUyLruh40/8RzwCvdYSz3tf8gezrt9fe79upTXtRGfoVHYpHMFpRGsedpHBY8g2TChB6GndpyRQlIHlBkVQKtZD6yH/IzICGwdMSwunUfcBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=FLa6LP8K; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=trzKJ0gTAt510Oy80JEjspdAZugb5fr1aTmPsPpz39apP5/bp7PFAssglrrBOu4ROGAhrVclr4iQHk2RoC/hJAgZr3vM6h35piliNvhL4TtpGgDp5T+AGek8eLzOZ37ayJ/Gcvo+T8BYMU8XSqQM4+itAhzQn6GMSAgr7wgQG+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=apuW8wEm; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="FLa6LP8K"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="apuW8wEm"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=U8K3itJjndALQYsGy55CAFS1GZ92Bgvbl0syJjouOfA=; 
-	b=FLa6LP8KAPfbgOlF7TTF3jNuuK4MONhP9tWsoewFvmS+6FUsEzdB/gbdpkqRg+BMKq7pQiDy04k
-	RnDymeCMY1JI5dZ29h0YD/x94jwdj1XVQZNe2sRFwoo9wLKdVMvMzNeDVXmcCBCgzOXvaidmt4vas
-	uJNVjt06RQdaSVyADaP62mOhUstrsw/fDKwms/JoBFHQXwWMUeqr57RRz+h+rVu45gGN+9OXIaFz/
-	ZBfJehTn5A+U/NyQYKHyJJkkRP7a3DPBmAs4sbIBqMytQhlIEP+GjCST/DqYw7F4Ku0XYIy3J8VZl
-	orwwEUBQp1S369EB+otmTXiFVkmR5Bxx2NvQ==;
+	from:content-type:reply-to; bh=FJlZk+spnSjlxBQ0dWw7JnwMaOJul2lb4Y6Xx78u5p0=; 
+	b=apuW8wEmQ8PfKMjTMSZ/lrdjTCZ5CsiTeFduptKW41zqVMtDNlnD3V7J4Sfujpza2nJcEx5v+vL
+	v7kc5En+U1cYM8BIb/sbIMJLB+73SCotu1Pejp6wrPrzZ1xsaXvU8Wu06lxRpndCnJRFlB4J1i6Fi
+	S4qXfaxygNpdVxTjbCesnhNDoIPHu82Z6OMUK48/fcjEfAn89JqRu8Xc8Y2tYN/BcwQSGiCizoT1N
+	WmEWC/HZhq2BVx7nn9qPwC8+d3VeVQRcWNlFnqNacpaXRf4DkQxHgCrCf1/xOqOjobUOIopnIb5ao
+	S+wLWmkvZOez3SDtRn77wGsli4aOs/1+VIAg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w0AzB-00DNZO-2k;
-	Wed, 11 Mar 2026 12:15:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Mar 2026 13:15:53 +0900
-Date: Wed, 11 Mar 2026 13:15:53 +0900
+	id 1w0B0D-00DNaI-1n;
+	Wed, 11 Mar 2026 12:16:58 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Mar 2026 13:16:57 +0900
+Date: Wed, 11 Mar 2026 13:16:57 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>, Paul Bunyan <pbunyan@redhat.com>
-Subject: Re: [PATCH] crypto: caam - Fix DMA corruption on long hmac keys
-Message-ID: <abDseUutHQaKsWtQ@gondor.apana.org.au>
-References: <aa6PaoYiz_BY1eZI@gondor.apana.org.au>
- <d1bd8cf9-db43-4e36-869f-ecb953dd82e6@nxp.com>
+To: T Pratham <t-pratham@ti.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Manorit Chawdhry <m-chawdhry@ti.com>,
+	Kamlesh Gurudasani <kamlesh@ti.com>,
+	Shiva Tripathi <s-tripathi1@ti.com>,
+	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
+	Vishal Mahaveer <vishalm@ti.com>,
+	Praneeth Bajjuri <praneeth@ti.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 2/3] crypto: ti - Add support for AES-GCM in DTHEv2
+ driver
+Message-ID: <abDsufbNKkUa1msb@gondor.apana.org.au>
+References: <20260226125441.3559664-1-t-pratham@ti.com>
+ <20260226125441.3559664-3-t-pratham@ti.com>
+ <aau2bg4gdM0VPcEo@gondor.apana.org.au>
+ <26303ab7-cd14-4560-8872-021229faa137@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d1bd8cf9-db43-4e36-869f-ecb953dd82e6@nxp.com>
+In-Reply-To: <26303ab7-cd14-4560-8872-021229faa137@ti.com>
 
-On Tue, Mar 10, 2026 at 05:12:10PM +0200, Horia Geantă wrote:
+On Tue, Mar 10, 2026 at 10:35:15PM +0530, T Pratham wrote:
 >
-> > diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-> > index e0a23c55c10e..aded03c8601c 100644
-> > --- a/drivers/crypto/caam/caamhash.c
-> > +++ b/drivers/crypto/caam/caamhash.c
-> > @@ -441,7 +441,7 @@ static int ahash_setkey(struct crypto_ahash *ahash,
-> >   		if (aligned_len < keylen)
-> >   			return -EOVERFLOW;
-> > -		hashed_key = kmemdup(key, keylen, GFP_KERNEL);
-> > +		hashed_key = kmemdup(key, aligned_len, GFP_KERNEL);
-> 
-> When aligned_len is bigger than keylen, kmemdup would go beyond the end of
-> "key" buffer.
-> 
-> Looks like kzalloc + memcpy should be used instead of kmemdup.
-> 
-> Double checking the faulty commit, I've found the same pattern in
-> ahash_setkey from drivers/crypto/caam/caamalg_qi2.c. Let me know if you'd
-> send a fix for this or I should do it.
+> What potential issue do you see? Both `dthe_aead_prep_src` and
+> `dthe_prep_aead_dst` functions use `sg_split`, which anyway allocates a
+> new scatterlist. Even if req->src == req->dst, the src and dst from here
+> on will be different.
 
-Good catch.  Please feel free to send a patch for both issues.
+The copied SG list will still point to the original memroy, right?
+In that case you will end up DMA mapping the same region twice, once
+as input and once as output.  I don't think that's guaranteed to
+work, as you're supposed to map it once as BIDIRECTIONAL.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
