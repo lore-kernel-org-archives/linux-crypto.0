@@ -1,86 +1,119 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6E437700D
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 11:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587B11A9FBA;
+	Wed, 11 Mar 2026 12:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773229247; cv=none; b=C+wXkzc5Sn7aoYSVZtyc+Q8ZcPTelqvBZnyc2jP2CoXSkO2Oddgd95OWmz4veB0BNvMrd+VImL5LBwgbi+Z+VpXb4aSV5arbHIY1B4SSfywkAnUXqsQolZjlR2Cf/W8GxoCXwfa/WV9an0qbfqjFHKDwta+h7FQKURuMKY0BDjs=
+	t=1773233074; cv=none; b=ngl/9VFp+vdnWNzQJjr9VVb0/Omrv9cUb5VQwVs4P33KvnxXmYCeT63la2RZqGcGqVw4eMxeBSMkAjqYVgVEiuUahiKSQtdaKB1mjZdgkRyEUE2sHCT8Ob7/RE/OpjjncsUv658XbjpfQwSmmXKJfvUbFQT7/gdBm5eYhvVRBN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773229247; c=relaxed/simple;
-	bh=0W2qDs9Pda2VTMqqyy80DUZU1WSJA8HR8VKSER3/HQU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LHql4giWqlPvAd0nXkLSZvKJIBsQ72fkRw9gwKcjclgWTlxbdK1F8A7Q+445MZZHoW+T1EDZ6vZbF5Ujnw5V8zx/Wz1nROJrVV/YtnJJKdXCG6+Wf+OW7motJ4Ww1Gm6AqGA1L9hx2742sr4NiMW6RKKasXilcsRQ0vL79Rentk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kRXZfNl1; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1773233074; c=relaxed/simple;
+	bh=2TsPW1VUrfzhXFigTHHxqQSuXjl+yKNb6vmNwYfv3Rc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WzEDxEVhsV3XiNUkfdE15XavS16JW8m/L8zwpqdGIErppedgzNYYkhvChIz6OTcwFilLXzLR3JAkK0ctAY2M5z77XyIwrevFhD+6zx0sAEX26RXJEQwB8YlYfL+RFx5iOP6Oj5DREczmceNGPUPk4VmQNXN1iD+F01TxHOAsDDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eDfNntac; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kRXZfNl1"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773229243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=1zXXtJLw22kU7ibsV83dH9zcIzG6mbgyF5sMgd5go/g=;
-	b=kRXZfNl1szwVPMCTGKbs/5CaKEkHTvPoFzmBWlDxaKf7dvja8EpCnYPLVoaj1JQl8l6yU4
-	ZlaDy9YhF10wpDdQW35InXYhp3KewVpodh9t6MTayjwpzjIKRasouEtn5qVCIm9oLEsosi
-	hWdSFIq6mdCoCECNx1KjRM0j/i7s88A=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: atmel-aes - guard unregister on error in atmel_aes_register_algs
-Date: Wed, 11 Mar 2026 12:39:28 +0100
-Message-ID: <20260311113927.305633-3-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eDfNntac"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31755C19425;
+	Wed, 11 Mar 2026 12:43:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773233073;
+	bh=2TsPW1VUrfzhXFigTHHxqQSuXjl+yKNb6vmNwYfv3Rc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eDfNntacup9W7fsFDmo+L2CKzFeNrMPjOh6O+qT6o4uFua9BVen3NR7GjYAh8DNXV
+	 IKXG7cyu8HA6VGzPRI4Js64Zn99OSyFVl3U013MtS5pxv4GLlJpYwI4eQCZmr7mQkC
+	 dMqdNwRivSNHZdXsm2A+h1zID9gclxQ8SwsDB7VEfzDnPD6XroexoVunYvw0p8bpYs
+	 PoGj9h8IDZf4yVljVZcfRMb4hMfmWiCnUX0mH5VnzYDiQWBnt3tpWofjoZsYN+rOD1
+	 3iG2Tn931m0rCJS34Q/AZjsvyMgPo/3xYa+a78Bx0o8y/0PUB9MzPW5/UZRJiqua9H
+	 ZYINWO658BENg==
+Date: Wed, 11 Mar 2026 18:13:09 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
+	Daniel Perez-Zoghbi <dperezzo@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
+	Dmitry Baryshkov <lumag@kernel.org>, Peter Ujfalusi <peter.ujfalusi@gmail.com>, 
+	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>, dmaengine@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, brgl@kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v12 01/12] dmaengine: constify struct
+ dma_descriptor_metadata_ops
+Message-ID: <gtkfzgmtap6536sd5hexkuxrak25qekyrg3zwr2ikg3gnidwww@kq77l6l4kq66>
+References: <20260310-qcom-qce-cmd-descr-v12-0-398f37f26ef0@oss.qualcomm.com>
+ <20260310-qcom-qce-cmd-descr-v12-1-398f37f26ef0@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1367; i=thorsten.blum@linux.dev; h=from:subject; bh=0W2qDs9Pda2VTMqqyy80DUZU1WSJA8HR8VKSER3/HQU=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJkbQ/JrCwuzvH+HfX+2UEixtn8FP9vv89f2pXZcb0q4a 9o+XeJpRykLgxgXg6yYIsuDWT9m+JbWVG4yidgJM4eVCWQIAxenAEzEVYrhr7jYsz1GvwVYLspc 8z4Q7Sb2U+DqzjOHN97ZPnFhh8X1+SoMv5hEyrS0L5qeK/zp/3tyWdHGjRpmMyZ0r9165J4Ox0y /Yj4A
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20260310-qcom-qce-cmd-descr-v12-1-398f37f26ef0@oss.qualcomm.com>
 
-Ensure the device supports XTS and GCM with 'has_xts' and 'has_gcm'
-before unregistering algorithms when XTS or authenc registration fails,
-which would trigger a WARN in crypto_unregister_alg().
+On Tue, Mar 10, 2026 at 04:44:15PM +0100, Bartosz Golaszewski wrote:
+> There's no reason for the instances of this struct to be modifiable.
+> Constify the pointer in struct dma_async_tx_descriptor and all drivers
+> currently using it.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 
-Currently, with the capabilities defined in atmel_aes_get_cap(), this
-bug cannot happen because all devices that support XTS and authenc also
-support GCM, but the error handling should still be correct regardless
-of hardware capabilities.
+Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
 
-Fixes: d52db5188a87 ("crypto: atmel-aes - add support to the XTS mode")
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/crypto/atmel-aes.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+- Mani
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index bc0c40f10944..64960eeeb17b 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -2270,10 +2270,12 @@ static int atmel_aes_register_algs(struct atmel_aes_dev *dd)
- 	/* i = ARRAY_SIZE(aes_authenc_algs); */
- err_aes_authenc_alg:
- 	crypto_unregister_aeads(aes_authenc_algs, i);
--	crypto_unregister_skcipher(&aes_xts_alg);
-+	if (dd->caps.has_xts)
-+		crypto_unregister_skcipher(&aes_xts_alg);
- #endif
- err_aes_xts_alg:
--	crypto_unregister_aead(&aes_gcm_alg);
-+	if (dd->caps.has_gcm)
-+		crypto_unregister_aead(&aes_gcm_alg);
- err_aes_gcm_alg:
- 	i = ARRAY_SIZE(aes_algs);
- err_aes_algs:
+> ---
+>  drivers/dma/ti/k3-udma.c        | 2 +-
+>  drivers/dma/xilinx/xilinx_dma.c | 2 +-
+>  include/linux/dmaengine.h       | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/dma/ti/k3-udma.c b/drivers/dma/ti/k3-udma.c
+> index c964ebfcf3b68d86e4bbc9b62bad2212f0ce3ee9..8a2f235b669aaf084a6f7b3e6b23d06b04768608 100644
+> --- a/drivers/dma/ti/k3-udma.c
+> +++ b/drivers/dma/ti/k3-udma.c
+> @@ -3408,7 +3408,7 @@ static int udma_set_metadata_len(struct dma_async_tx_descriptor *desc,
+>  	return 0;
+>  }
+>  
+> -static struct dma_descriptor_metadata_ops metadata_ops = {
+> +static const struct dma_descriptor_metadata_ops metadata_ops = {
+>  	.attach = udma_attach_metadata,
+>  	.get_ptr = udma_get_metadata_ptr,
+>  	.set_len = udma_set_metadata_len,
+> diff --git a/drivers/dma/xilinx/xilinx_dma.c b/drivers/dma/xilinx/xilinx_dma.c
+> index b53292e02448fe528f1ae9ba33b4bcf408f89fd6..97b934ca54101ea699e3ab28d419bed1b45dee4a 100644
+> --- a/drivers/dma/xilinx/xilinx_dma.c
+> +++ b/drivers/dma/xilinx/xilinx_dma.c
+> @@ -653,7 +653,7 @@ static void *xilinx_dma_get_metadata_ptr(struct dma_async_tx_descriptor *tx,
+>  	return seg->hw.app;
+>  }
+>  
+> -static struct dma_descriptor_metadata_ops xilinx_dma_metadata_ops = {
+> +static const struct dma_descriptor_metadata_ops xilinx_dma_metadata_ops = {
+>  	.get_ptr = xilinx_dma_get_metadata_ptr,
+>  };
+>  
+> diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
+> index 99efe2b9b4ea9844ca6161208362ef18ef111d96..92566c4c100e98f48750de21249ae3b5de06c763 100644
+> --- a/include/linux/dmaengine.h
+> +++ b/include/linux/dmaengine.h
+> @@ -623,7 +623,7 @@ struct dma_async_tx_descriptor {
+>  	void *callback_param;
+>  	struct dmaengine_unmap_data *unmap;
+>  	enum dma_desc_metadata_mode desc_metadata_mode;
+> -	struct dma_descriptor_metadata_ops *metadata_ops;
+> +	const struct dma_descriptor_metadata_ops *metadata_ops;
+>  #ifdef CONFIG_ASYNC_TX_ENABLE_CHANNEL_SWITCH
+>  	struct dma_async_tx_descriptor *next;
+>  	struct dma_async_tx_descriptor *parent;
+> 
+> -- 
+> 2.47.3
+> 
+
+-- 
+மணிவண்ணன் சதாசிவம்
