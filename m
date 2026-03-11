@@ -1,77 +1,74 @@
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011020.outbound.protection.outlook.com [40.93.194.20])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013039.outbound.protection.outlook.com [40.107.201.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B44E34EEF9;
-	Wed, 11 Mar 2026 21:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2C929B200;
+	Wed, 11 Mar 2026 21:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.39
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773264265; cv=fail; b=PvkYqKjN/6rNffu7v43iFx847CFO59h3z4qekJ6tMy59F+bdJXLKt5/SQlznYFCMlXu0nJiwP7/MbP779Ujc8Gh2XKHv5R9ZtBs50GJBqTBpNffW/w3FbeYpX4gSh7Wv/qIbcUrNXHlIMqLyZ2wmMBCgDq0HdRruNi1KdzaHxy0=
+	t=1773265757; cv=fail; b=UtgHnepf03r9J0OELnIytHyZ3l4ejkoQE5RncilYO325KWFfFRyWCqApJYijRRZn6JBhUsf0z4dRUtBxtLyyAVzkOnvv1GP7hEbQKiABOUCM/R2ifexG4i0kA418BlUzvxn5wt+Gg/8Er3jXzNRsYoTGw74dJxub4DMtMIBIRBs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773264265; c=relaxed/simple;
-	bh=YrFPUqez4vVnlGyyBY8PyrcbNOyAMJj/R1xqqvw84E0=;
+	s=arc-20240116; t=1773265757; c=relaxed/simple;
+	bh=7fkyxSAMXK4e1xw7GQTpKPa6zT617z7mdihGUs1XpXw=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=tjbXvyqWjg64+ez3K36lIeB259SOEzYSfBx9uPVYXfFU1AgSOWeujL0onD0L0ZYaMlHr+dZOuJL59wMVOe8Tp3uHr23ovkfM8MLnHmpkX8cz4j5SHseVrRObnWvzcePaiNEQh240g1kBcGfKphN74pQqj8joaXS34bMvYNPGUdE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3O7ad9le; arc=fail smtp.client-ip=40.93.194.20
+	 Content-Type:MIME-Version; b=nRAcWpAKHH9MZXVKMoOM6/cZJ5EDsf3aMfXm5Wcw/rquFJwCRVmS80+fsDL5C44lpLOOzm6t9hS4yS51aYFawmwG7yS8RuElFHlDhYypjuKOX5qfB4/CbpeIiRJqoE66DoiDpO8Kf48IPGwxZmQ3Pl0RCRz5g5S9yjvO/0Y45Is=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=aW4+Z8It; arc=fail smtp.client-ip=40.107.201.39
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3O7ad9le"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="aW4+Z8It"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pilnxI0xyXyBPnj5FlzrO0+EBMyrVTnfvATD1b0cM8wzykjWnXm1zQRWQLbu8Q1kTP4tyNJU5mZcgYUoFZoDv27bqW1gOYxwEOgNNtmXcpzptPE2IgPAluIffLaKKPx6m/vx+XfJmZMa7LOeJ5B28WJTt3hPZuLGu6UIoYADS4EsHtiKrNWgLOsOzzma9kZjYMdXytGp9XyNCgFlOBPjCS08P94BGtrbqetlqhQCOZZDOqnn/8s4NpLkIA+0zr52KU6RgpP5ufdwNu8p70ynTU+Yo9bMwkdbFjQx1qSIpLxdPhhRQpqbw8+cs1H/N77r6w3RmUD/WHjJ8L5S9q3i9Q==
+ b=LtXrnIl1vxCBFm0/fD++YYa7rSZShhUVxaAc6Bh4LBUiDMlbdCSOnv3hzSgOIjXa9b6O6FB7E7SrUJRfV2qqENKpg5/cRsgwCohUOoVP8gQgac2lOAHSBLPgdWOu3B5K0Hh2AeFS+HlSaGFMXPijkO4Ur8gAgaitHgqE+up+4nQP2Bfbz9exJKFgDn7EL0y+Fb2dfp1jOGSBABrxHRmBNG0xcwRFCMxXg3SulrAO4buk1iSpdXsYY7+oFe/Y2rQQ2k6nLv0dcPo+U6qOmuW9Sw/W7sYrfqa3IY+o/zH1SuPPV4Qydk45c4ff73HXuwexsHl50OprerbAjd5oNqfOoA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PoyfhvpDewm16oH7wkr6RpybaiowlW4yLn5feACPwIo=;
- b=w+YGXK1jnXqJBjwx5XXPXcU8NAsLiYCvjnR3AD4vWyvxDI7Z34Gfd0ShK+V2klrBT1i34HPPSijPVdX5rP9XJGnT3n73jO7f44h3VevMjat97zZKff69teinoX1H8TTzFX7BCXyeHG8nUXcTFDIr4gp44jPkNmwT+4exU+CJi/nve56Nb79A08y8bLjPeg2QXZOYyXp/HZ3ILfHvtUaiU4Jt9XfWgVEDasqxUsdC35QscJ3RM+wy/IvCM4SaqzPuwu118USsZ+HonzHglRvvmb+BCDih3HDkTBHx7AF/aaBpDde/XjRdMEO88yDX9PD56+WrquKYAa3QJijVRZe12A==
+ bh=T0E2UwrWQQSaiVtH2GSHWZZoHkEj2b/5HtNo0M/uZps=;
+ b=jI0s9+HM8udkfnr8eJUqgyj0IBuzpIeou80n0OMw/S9nLO9SOwXD+ccMxVaVaopUYAQ2tzqPD3eyV1lZUHltnJT4ka2kPzLHmBreU2p6uJ7c+uNJrjgjzThZJDV0TIDOneXIIBvabuDNlz3eaVBT+SsMI9a/kmQpssmoSfUuaeKvJ5hqPVPsTfFl68kLA1ED6uGA02nCkorKy5wltiVyPRBlrOmTYaDDqkc98XIFC0ev2Kab5RbVtz6kYxwQ3t3KShcZxTceQVBmWZdKO8AuGVycfGNUbF8iCPeFd1OZpMXNamZTVWcPl2qWZ1gPEOH97zICQsq8xWYSBMMYbafB/A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PoyfhvpDewm16oH7wkr6RpybaiowlW4yLn5feACPwIo=;
- b=3O7ad9lehLWGRPfmlKbLBThidHzj/hPPMkb8a7YCC/B6Kx7IGyvZ2w278Vqph2JPRSZXay8LElzW+i/T6VX67Y5FiUyfs4q4dcc92m7YdAG1PPWGZjfiISnEy2jKEdJGth34ZmQHa7+OAzIUk6jC/wOHJuaEYPR+xwmBwH60rMQ=
+ bh=T0E2UwrWQQSaiVtH2GSHWZZoHkEj2b/5HtNo0M/uZps=;
+ b=aW4+Z8It7otDRNspwSv4O6+UswQXqCWw/PEL2DmUm0Qs4FtyWbz5/zZbYwu96jiF8sztVY/JC0VNin2SusaXZEE3jhNmtqAJVIrslcbxOvSfH5dwPcwmCH3i1r1ztfL7Tn/8NDsnGEkhYmZL2iZYSGMcgYsNuFXf6V0lnhQMf54=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by MW4PR12MB7468.namprd12.prod.outlook.com (2603:10b6:303:212::15) with
+ by PH7PR12MB8121.namprd12.prod.outlook.com (2603:10b6:510:2b5::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.11; Wed, 11 Mar
- 2026 21:24:19 +0000
+ 2026 21:49:08 +0000
 Received: from BL3PR12MB9049.namprd12.prod.outlook.com
  ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
  ([fe80::ae6a:9bdd:af5b:e9ad%5]) with mapi id 15.20.9700.010; Wed, 11 Mar 2026
- 21:24:19 +0000
-Message-ID: <cc9bf918-a14b-4619-a084-3f424fa16ea1@amd.com>
-Date: Wed, 11 Mar 2026 16:24:13 -0500
+ 21:49:08 +0000
+Message-ID: <75cd28a5-fb51-47ae-97c7-191fe9a6e045@amd.com>
+Date: Wed, 11 Mar 2026 16:49:03 -0500
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/7] x86/sev: add support for RMPOPT instruction
-To: Dave Hansen <dave.hansen@intel.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: tglx@kernel.org, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- peterz@infradead.org, thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
- davem@davemloft.net, ardb@kernel.org, pbonzini@redhat.com, aik@amd.com,
- Michael.Roth@amd.com, KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
- Nathan.Fontenot@amd.com, jackyli@google.com, pgonda@google.com,
- rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
- pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
- nikunj@amd.com, john.allen@amd.com, darwi@linutronix.de,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Subject: Re: [PATCH v2 5/7] KVM: guest_memfd: Add cleanup interface for guest
+ teardown
+To: Ackerley Tng <ackerleytng@google.com>, tglx@kernel.org, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
+ herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org
+Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+ KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
+ jackyli@google.com, pgonda@google.com, rientjes@google.com,
+ jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+ babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com,
+ darwi@linutronix.de, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
 References: <cover.1772486459.git.ashish.kalra@amd.com>
- <8dc0198f1261f5ae4b16388fc1ffad5ddb3895f9.1772486459.git.ashish.kalra@amd.com>
- <aahH4XARlftClMrQ@google.com>
- <7ab8d3af-b4f5-481c-ab2e-059ddd7e718e@intel.com>
- <0fbb94ad-bfcf-4fbe-bf40-d79051d67ad8@amd.com>
- <6a4f4ecf-ffc0-43a9-98d4-06235b42063e@amd.com>
- <d7ba3790-a959-4150-87e0-c87dea4d09c5@intel.com>
+ <ce99dc548000b5a1f4486cdd3efe510b3874684b.1772486459.git.ashish.kalra@amd.com>
+ <CAEvNRgFCTNr=LUR_RM7+A4z+qHCWBZOYKe_Cbokwx0UsCtzaVw@mail.gmail.com>
+ <98313534-af6a-4c00-a016-9d9010f145da@amd.com>
+ <CAEvNRgGdaA1ynF8jxQDPh9U0U8Q0RkE0=KJx4FNrh_=+dVRaLQ@mail.gmail.com>
 Content-Language: en-US
 From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <d7ba3790-a959-4150-87e0-c87dea4d09c5@intel.com>
+In-Reply-To: <CAEvNRgGdaA1ynF8jxQDPh9U0U8Q0RkE0=KJx4FNrh_=+dVRaLQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR08CA0001.namprd08.prod.outlook.com
- (2603:10b6:610:5a::11) To BL3PR12MB9049.namprd12.prod.outlook.com
+X-ClientProxiedBy: CH3P221CA0019.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:610:1e7::18) To BL3PR12MB9049.namprd12.prod.outlook.com
  (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -80,219 +77,267 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|MW4PR12MB7468:EE_
-X-MS-Office365-Filtering-Correlation-Id: 13f178c4-2102-4363-5eb3-08de7fb48e04
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|PH7PR12MB8121:EE_
+X-MS-Office365-Filtering-Correlation-Id: ddb331d8-134b-4946-8aa5-08de7fb805a6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|366016|1800799024|376014|56012099003|22082099003|18002099003;
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|921020|56012099003|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	JJCwx/HNJCd5NwX6vsE+kxBvS58UK1BaAxXxcqQk3/KbjUJPXaZeBZOgjc1oY+QrAlzwUBrWVFjLgw+SC98UWhS3GYCMaKmW5ePdOSL4pIGUcl4bVNE/ThXvcWIKNi09Bqorn1NWZAsFfetKtGXXju/5YkF7h6fJN0bAxsQ1PVS7YYDdsrcyPluydMjJ0QgZoVGwG1lUijBAmCHVe3qQlfqtGdE3YI4P7Kff8QIenb3MnLSr5C9BHF9ILy5yGdUEg7vSQi7zxN13upkh+ZjE0Z0gY9T/hCSljBON2V63TWoQXOjZjxKwibqyuwLMzpsRQCgO7g4SqULKY4DyMN0YAtvtBsz3v7SrpWDJYntEudjm42z2j91n4EZgNWBDJ3z3Azh76ad+Hja1wOoXq6UsSeXTETGaTdaE46r3/of+4hF7PxwbqcnjSUEi6EvVMF5dKKzEOO0IeFkUm1MWFdk47dWS/FIm4gBggRLKz2I8ol4FzXyC3XJtzrKldie3Am5uncf0fumqcTNG1t3ndlNSLd3o27hk0xZHbKBe5GE1g1gnCZGWWbxGbpAFYJti/OHe18qlHDo3HS5sFrd1huZNVOvQxBpKt3chTrndaVginVQLcZBP575X7z+yhjaLP2EzRMcBdgS9t70YwEoQD85K6309BLazh0u8g7d4VW1dr6J49Uv6f1OoSj7Vs2hDIZPRJHGEO93/QP6rCkVzJB+koiQ10LZrhyKREMkcWhRS4Ng=
+	wmZH/nCazV/l+o62Ic155IJcG1kFo1ej0DPBWjD7zuQsJGkJcImk5OcC7E8Wf8+haajnsyFug0MzXWegA0+65w6Omeo3sPjEy2BH/QfUuKccoweD4J2NLsbtQZbDZJn0wwuCmEGKfSbE0uw2JBEjB12R4AOm2gIAqNbcOMq1xA1HxnGidqdxHIpZpyz/cnBUnL4odakkcwX9g+KXyJukknA+nBYWAULdI5+Ssq5W3jLSGZ7Ai4iLnH4y33RX3AGkRUx4hy8vT1iW/OArK7Mo4z3hri0C50gFafy6jDYt6yXz6AuDFuUqB4jeLfp2z2AnJKgc1FglsgkNkggB0EkMzFU7Fes1NGNq4pHHehMtcdBLicDE70NRnjjsB3kqduTCTYuBSxYQhloB2p5udZcu/akhb4KyRwR+nXwrTYglMh08+DPeb7UY0p/DJSg7XRwKzo6hhwMT9e2O4l9SIszv6/3Yyf5m+ooYzhCOdjf5vVRsDkvRxet5U/ISwgnC39aFtxw33GXEWh66fc/3a+HdHmAIDjpPErp0MsluRUyGnEB/1ML5T6gxg82DhKKmAwM1tsjjNSgvJ7tkfunbfjc53m58ijKRbfhgH/97f32k0BU5tGqt6CKMFWGuDTktT/kG0DifMl0P4ObTqrTaY4d7zS1MUWSa6HkTe9ayEUzZs/bKHgnhFE3vCdRbwEnRq8x1XMp5cpNjE3ff4BDB23XyUlQzayxI1MRy922ccXApRc3BOxDued0G94Px9OW8AtbHhuqypdvSMVNGcXKphJGoTw==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(921020)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZGNlanJZaEU0eEFqZXFCM3RLbUpML1EwYkpwcEQxNTdSSDROejdnOWdFM0pF?=
- =?utf-8?B?WGNldVFCVzczSVNTaTFFM3ZydStLaHVlWVpOZHNscEFLcko0YVVITUlHR3pl?=
- =?utf-8?B?ejNTelV2YWNRRDUrN2VQVGdMN2J0dll1Z0k4eFZLclc2WENBQVgzU1k4eW9M?=
- =?utf-8?B?T29UdW5tdEc4ZFBsWjcvWVpDTVBVSjBINW5hem0xM05jNmZFOUpKZzdCaTBu?=
- =?utf-8?B?WTlxZ0xjSDBJaU1SV0FKVU1nZlNUM3A3TEFRVHpUTFBhM0hBSGJwSEdSMlhp?=
- =?utf-8?B?ZUNPRFpMMXBIWGNHeHY0T0NIVkNsd09xSnF1Sy9oQjhueDluSlNKd0h4eFk1?=
- =?utf-8?B?N2prbi8rNFFmdXlKeFlFRDlrenJlTWhUbHc2RUxZNERhUklzTE5YUzBDaDFt?=
- =?utf-8?B?ckRJOXczK1p6MnpOM3kvd2cvcW56azh0TXZKbnVIb3VRNk9ZdmFobHZrd1Ru?=
- =?utf-8?B?aVhmY1RKa1c3bHlNTUErQ1NubUFiK1QrMUk1RTBsRnpqQjRaUUpVbkRMTkFU?=
- =?utf-8?B?eW1OWC84N2dJRWVMcDhUMHNQM3RtY1hULzZXSzFUSzJ4TmprWFo5dUJHajFW?=
- =?utf-8?B?UDQxUjhwL2lmZ1ZldFNQdjlsaXNCcjhVeThWTE9nYUdBQzhxbUQwc0lTTlY5?=
- =?utf-8?B?VGZrVm1GV04ycVI4cTVlRGdBOEZ0cTZsUE51VHp1QnhrbGloUGRTaFM5QWJl?=
- =?utf-8?B?U1JoMEJpMCsrTFdrZDlDb2xoRC81cm13bXJBcy90dG8rQzZZa1ZQNnF6ZTRx?=
- =?utf-8?B?Sk9KRWFMYnNyZ1dkcEZ2ZTNEaTA4SmhyaC9nS25OZVV4UFRNd0xoa2RlK1FH?=
- =?utf-8?B?NEpaVWZocXd4Nlc4Mnc0M0xtYUlGOVEvZWUwOFdqeXMvYlN0UkJpckY5NGNF?=
- =?utf-8?B?bjJ0c2EyazNOdytlQjhiWklmdUNUaUF2bzBmajMwbWFrNXV1L2JHZVFLWllu?=
- =?utf-8?B?bzhOVVlUWmluM3pjMlBJRkRzSGd2aWVLQXRkZVRRS0FaekF4aGZkalZLTENx?=
- =?utf-8?B?Wno3VTdUZm1hanlERzNXblZnVGNGZ3Y4b0lpZmVEYjRrK1FyOWtuSVNjU3N6?=
- =?utf-8?B?QWx3NDlqWmdibEtPMmxqOHdEa2FNOVFKRGVrVUNHd0RaY0NjeGNZdVJQNWla?=
- =?utf-8?B?WmttYzdqdTZXcDdudndDd2htaGpvQjBaemdpdVJNWHczclk2SWhMN25GUlk3?=
- =?utf-8?B?c2hlNVFXWmZBTFB5MjhnWWhLRmtQWVhLVzZzYU40d283U25NU29QY1hrSzVP?=
- =?utf-8?B?Q1JEdk1OaVFQaDBpRElid0NMMER0VHF3NCtjUklsbTZBUG9QeXBiT2k3UEhK?=
- =?utf-8?B?d25EdjVuVGljTTFITGxRazFUcEFMSXVCK0s4Q2ZLSjdaZTB2UFJIUytTcFg1?=
- =?utf-8?B?OUpFUnBrL2pydmdYQUpKMzBOWkdvcDRGK3RLNVhROXBoRlpBVlA4eFFBalk1?=
- =?utf-8?B?Z1JRUzdIcFppbE9xVVlHRVVHV0l1eFJ1c0M4RGJzNHBFQy9JOS9QNkNHdXlk?=
- =?utf-8?B?ZEwvRFBndG41cXU5V09INVVrdzhJTUZQdVlaQUt1elZreWlDK3ZFbW1ZaXBP?=
- =?utf-8?B?TVFFUjV1Q1Yxajl3RGFJTXlzem9kMmU5WEcwL1hnMHFZRHo3Ni9tTHoxQk5L?=
- =?utf-8?B?RmQrLzdaTHZvejJYeExDSVBKc3VDQ2JYdnp2MklwWDVBWks4OTRSUWxwN3c5?=
- =?utf-8?B?ZDNQZld2Q1c1Vm1ZSmhXNnYvYk9qaGRxZVRDa0pucFcxM2N4MXg2cWNqYmor?=
- =?utf-8?B?N0RTcHh3b2Z4OUxKUlhwWEhTeXF2UlFkcExLWHRhZ0pXYkRVZ0NmMXZlSG9K?=
- =?utf-8?B?bzNjaDVhZ2NsZENra2NrQ1RXTDRONHF3c2ZnbkVsRjk5cFZpOTVHcDlzVjg2?=
- =?utf-8?B?R1o1MTFCN1RYRDVqTVA2Si9hSUU4NzJUSk9IU3ZFRDdTUk82cEtFRVFhMVRw?=
- =?utf-8?B?SGV2VnB4N21lK3djNnBvSDZLbWtVYXlqdUcxekdLWnpXUlBjVzMwVDg2amd4?=
- =?utf-8?B?d0dFMHVpSG1Lby9zSTE2YWJJZFMwbHBWblM1cFlETzhDTTBlYWJQaG5RZk5X?=
- =?utf-8?B?Sk5zaTlOdjBOZXVucVpQamtVZFRPdnMrNjZUZXI4akg1eEYxVXN0cGVSVXB6?=
- =?utf-8?B?ellFemhUU1pTeGdhclEwRm1hZUtBR2J6c2VsZm9sQVlIUnJ6NTRTSXVvejlL?=
- =?utf-8?B?UWZSZ0FUUGFDNkhianRIRkw0cmxKcHNMakh0MkpYNXNRRm1aWFErODM2b0tK?=
- =?utf-8?B?TVdSYjgyUHhRMmxnZjZIUmN0TGZ2UXVVZkgzYjEyMkwxeTgvN29WdGc4Wkkx?=
- =?utf-8?B?VmtxMU1kMXBEclo4aUsrU3BDVDg4Y284SzFhUTBzWHdYOHRUbEZaZz09?=
+	=?utf-8?B?eTYxN1hySmdWbWY4bDcxc3FsTVU3WEZXQVFDZnQxbTQycUhXZTJ2R2tXYU1v?=
+ =?utf-8?B?ZmY1YkJGOVZ5NDluTlN2Z1FrMmVwMy9BMFBFQ3JMWVQ4c0Y0bSticCtJdzdt?=
+ =?utf-8?B?Ymk1bjNHM1A3cDRyK0krMWxDOVJBNWNKdDZtWjUySUJwQWNzeTFlNFRySGh4?=
+ =?utf-8?B?QWNwb1ZaT3JnVXFGelc5cDhob01hcVdQZkVWbVliTmtLTFJTQkxDNThHTGZ6?=
+ =?utf-8?B?bDlqMDN3WkJPUVlKakIwb2pPNlptZjBBSkFhOGhuaUZRbDV4UXBGc1hKbHBm?=
+ =?utf-8?B?VTB6bm0zYXRYWmh0WDlBbnh4TFM2TXZsUHhPbVdqTjBsamliQWdXNTJiWmth?=
+ =?utf-8?B?OE83U0dwclhxUU1tZUpSSmE5dW1reTkvYVkybEhESm5ndURsUkJacG9Zajgv?=
+ =?utf-8?B?WDQydFJRQW9VVk5KeVJScStTcXZTY1YzdjAwR1puRU1lUlNPLzZmb2U2OG82?=
+ =?utf-8?B?VU5mWHVUSUdEd2t1RUdPQmxYM1RGWjd1TmpCaFc3bjR5aTkwNWNUWDgvaWpB?=
+ =?utf-8?B?RmRRRnhQRXJ0a3BNb2xqVUhHRUpFVUZiUjFFZ1JnLzJBS3RvSDhlSjdkTy9I?=
+ =?utf-8?B?SmZleFpSQndlQ3ZvNHRQcGJrWExxNUNrcVBpZXhLUUgwbG5NNDNQOSswTFla?=
+ =?utf-8?B?U1F3NzUwcE9kdE95RndsUC9VdWg5ZUx0UHc2MElXaTVRWjF6dFpMTkNXSysv?=
+ =?utf-8?B?alRURkJzWXg4bElCdmhpaDEzUlBidkQ3OFI1Vmx1bXF0ZWVLRmpTU0M0R2w2?=
+ =?utf-8?B?d21FL1Nzd3l6QWFtMEtUUEFEUkhFNVlBL0RBZklPcG81ZCtXSnJPSU1Idks2?=
+ =?utf-8?B?NytWUmU4ZEJzZmdNc2FOU1hVOThhdmp4dnNGRjRIblJ0VzNzeW5yekZpYlh4?=
+ =?utf-8?B?b2g1bWdqTUQxNVREUGRNNU1qQUxYbWZGWDNJTUZEQm9ZNklxNGNYaXdkWUh2?=
+ =?utf-8?B?cHZYUWs2UXM4Z1g4ajhtakZpVHhmVjdxSHJ1WTVCWDByMW41R1dJcmdDS3Y5?=
+ =?utf-8?B?a2hkc2pKWjFFZTFqWU9HWjdHdE9UUEI1VXo4WHV4SldjeEJPQldmOFM1T2hE?=
+ =?utf-8?B?YW1XUnAwQTExNkV5Sm1iSzd4em5QeFM2c2pmK0x2bnBxNU5TT3JlQ0NYcnUw?=
+ =?utf-8?B?bUhnbmZpODdOR3BXeTBsaU9lR3RiWHh0cnZDL1E1a0JZa2NJNU0rZjV4S3R4?=
+ =?utf-8?B?WmduMlBqdVg0TzZncFlSc2xpVlhVRjIzL0JicjFPVVlmdWNIeThERnU1T0pQ?=
+ =?utf-8?B?d2tWd3o5WHFjTnZQNnpwNUJUWTNJbWsvZWExeXBUVnI2djl6cFR3eUQ5bUIx?=
+ =?utf-8?B?WUw3YzJEblpXZDlsRTVWR1cwYStpSHcxTUhGV2xHZTBPZVIyUDExUzlQSy83?=
+ =?utf-8?B?Y2NwTjFqc0wrRjdXMDFRUFdEeVJISmd5aVdxcTc0bk5TNGthQ1U0THFsdTFz?=
+ =?utf-8?B?Q3B3SjYvZkgxc29YRUcwbS90M0JyYi9jRjVnL3pTVXNJV09TTVZGVUJyVlBm?=
+ =?utf-8?B?Qm9VQTd5bTlUQnplSHJXQ1hjaXpHb3FscGxScHVJYnFlT3ZVczY2NVQwTkF6?=
+ =?utf-8?B?dDc2SDlaSVpJZW5yQWpYYXpwT0RsajVqQzJRUWZZN2F1RlVJcmlNTjlEQlJr?=
+ =?utf-8?B?dCtQcFdIODVqekdhNzR4MjVCSHFVQ0ZrNmI3bWxGM1hwcytGR01wTEo4US9L?=
+ =?utf-8?B?dEV4YzRFVUdXVjRmT0psSVYrNVp2Q1hxcHFFS29nbnFZL3JGV1FuNjNkbUkv?=
+ =?utf-8?B?UlRjZ01uSHlseE4zTjFNSlJ3cm1FZ05zSWUxZHliWE1OeTVjc2xUZC9zNUdy?=
+ =?utf-8?B?TFErNG80VDJaalFBUjEwTjdtcmpPb0hldzhkbzYzQThCd0tMK2ZSQ0JWVGJZ?=
+ =?utf-8?B?aVRUNWJuS2t4UkVvaUptUXcvY3hZdkkzMjBEaUpVWlBSRmZoYVhuZ2NXY001?=
+ =?utf-8?B?NHRIcUVYNkQ3WXUxVUZWanBzRFhZY1ppV3dsM0tvSXlJeTVncXpZR1NaUkty?=
+ =?utf-8?B?cmF0aEd1NWRzSXIzWHVsUGFiMXFIeUNRenJLWWpPa3JSZlZ3amRaaDR0elIx?=
+ =?utf-8?B?S1FaNS9ITkM1b05CU0s0d1FHSU9EaWFIOG1CYUZXekFKZEZ0ZGsxV1YxRmtR?=
+ =?utf-8?B?SDdjYS9GRFNtSU9mZlVJQTVTUEVpYms1VUZLVlgxeFBtWkdvQjJOS1lqY1N6?=
+ =?utf-8?B?SFpJYkVUYlZPQVZ4YnJpa000d1l3UmZkcTgxTGd0UG9Qdisrb1c1eWFCWm5F?=
+ =?utf-8?B?OU15MlVScUI0bU90U3BtYUlnOFRmc2x3Y2VEWmxhKzU4Zzl5ek90VXpnWE9z?=
+ =?utf-8?B?ZUI2QWpxYXA1ZGV3eE12cVc4Q2VhSHoyeFJBVDY5dGVKK0FTWngzQT09?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13f178c4-2102-4363-5eb3-08de7fb48e04
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddb331d8-134b-4946-8aa5-08de7fb805a6
 X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2026 21:24:18.9510
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2026 21:49:08.0741
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: npQMIM05R8WlnYzEZ2asPLrirPpjT+i8rNqPUmO/kj7uUXvoVmF/dio3aZGnUwQxb+nMoap2oRhbbof7tBsqsw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7468
+X-MS-Exchange-CrossTenant-UserPrincipalName: rrzWmzgvv3an99z6itaDkUGBIhotAP04UhtDynMhSaYvJyDJ2v+9KOR9/YXztuot6d2XkjiVNGlx2mUfKsp7Ng==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8121
 
-Hello Dave and Sean,
+Hello Ackerley,
 
-On 3/5/2026 1:40 PM, Dave Hansen wrote:
-> On 3/5/26 11:22, Kalra, Ashish wrote:
->> But, these are the performance numbers you should be considering : 
+On 3/11/2026 1:00 AM, Ackerley Tng wrote:
+> "Kalra, Ashish" <ashish.kalra@amd.com> writes:
+> 
+>> Hello Ackerley,
 >>
->> RMPOPT during boot: 
+>> On 3/9/2026 4:01 AM, Ackerley Tng wrote:
+>>> Ashish Kalra <Ashish.Kalra@amd.com> writes:
+>>>
+>>>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>>>
+>>>> Introduce kvm_arch_gmem_cleanup() to perform architecture-specific
+>>>> cleanups when the last file descriptor for the guest_memfd inode is
+>>>> closed. This typically occurs during guest shutdown and termination
+>>>> and allows for final resource release.
+>>>>
+>>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>>>> ---
+>>>>
+>>>> [...snip...]
+>>>>
+>>>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>>>> index 017d84a7adf3..2724dd1099f2 100644
+>>>> --- a/virt/kvm/guest_memfd.c
+>>>> +++ b/virt/kvm/guest_memfd.c
+>>>> @@ -955,6 +955,14 @@ static void kvm_gmem_destroy_inode(struct inode *inode)
+>>>>
+>>>>  static void kvm_gmem_free_inode(struct inode *inode)
+>>>>  {
+>>>> +#ifdef CONFIG_HAVE_KVM_ARCH_GMEM_CLEANUP
+>>>> +	/*
+>>>> +	 * Finalize cleanup for the inode once the last guest_memfd
+>>>> +	 * reference is released. This usually occurs after guest
+>>>> +	 * termination.
+>>>> +	 */
+>>>> +	kvm_arch_gmem_cleanup();
+>>>> +#endif
+>>>
+>>> Folks have already talked about the performance implications of doing
+>>> the scan and rmpopt, I just want to call out that one VM could have more
+>>> than one associated guest_memfd too.
 >>
->> [   49.913402] SEV-SNP: RMPOPT largest cycles 1143020
->> [   49.913407] SEV-SNP: RMPOPT smallest cycles 60
->> [   49.913408] SEV-SNP: RMPOPT average cycles 5226
+>> Yes, i have observed that kvm_gmem_free_inode() gets invoked multiple times
+>> at SNP guest shutdown.
 >>
->> RMPOPT after SNP guest shutdown: 
+>> And the same is true for kvm_gmem_destroy_inode() too.
 >>
->> [  276.435091] SEV-SNP: RMPOPT largest cycles 83680
->> [  276.435096] SEV-SNP: RMPOPT smallest cycles 60
->> [  276.435097] SEV-SNP: RMPOPT average cycles 5658
+>>>
+>>> I think the cleanup function should be thought of as cleanup for the
+>>> inode (even if it doesn't take an inode pointer since it's not (yet)
+>>> required).
+>>>
+>>> So, the gmem cleanup function should not handle deduplicating cleanup
+>>> requests, but the arch function should, if the cleanup needs
+>>> deduplicating.
+>>
+>> I agree, the arch function will have to handle deduplicating,  and for that
+>> the arch function will probably need to be passed the inode pointer,
+>> to have a parameter to assist with deduplicating.
+>>
 > 
-> First of all, I'd really appreciate wall clock measurements on these.
-> It's just less math and guesswork. Cycles are easy to measure but hard
-> to read. Please make these easier to read. Also, the per-RMPOPT numbers
-> don't mean much. You have to scale it by the number of CPUs and memory
-> (or 2TB) to get to a real, useful number.
+> By the time .free_folio() is called, folio->mapping may no longer exist,
+> so if we definitely want to deduplicate using something in the inode,
+> .free_folio() won't be the right callback to use.
+
+Ok.
+
 > 
-> The thing that matters is how long this loop takes:
-> 
-> 	for (pa = pa_start; pa < pa_end; pa += PUD_SIZE)
-> 
-> and *especially* how long it takes per-cpu and when the system has a
-> full 2TB load of memory.
-> 
-> That will tell us how many resources this RMPOPT thing is going to take,
-> which is the _real_ thing we need to know.
-> 
-> Also, to some degree, the thing we care about here the *most* is the
-> worst case scenario. I think the worst possible case is that there's one
-> 4k private page in each 1GB of memory, and that it's the last 4k page.
-> I'd like to see numbers for something close to *that*, not when there
-> are no private pages.
-> 
-> The two things you measured above are interesting, but they're only part
-> of the story.
+> I was thinking that deduplicating using something in the folio would be
+> better. Can rmpopt take a PFN range? Then there's really no
+> deduplication, the cleanup would be nicely narrowed to whatever was just
+> freed. Perhaps the PFNs could be aligned up to the nearest PMD or PUD
+> size for rmpopt to do the right thing.
 > 
 
-Here is the concerned performance data:
+It will really be ideal if the cleanup can be narrowed down to whatever was just freed.
 
-All these measurements are done with 2TB RAM installed on the server:
+RMPOPT takes a SPA which is GB aligned, so if the PFNs are aligned to the nearest
+PUD, then RMPOPT will be perfectly aligned to optimize the 1G regions that contained
+memory associated with that guest being freed.
 
-$ free -h
-               total        used        free      shared  buff/cache   available
-Mem:           2.0Ti        13Gi       1.9Ti       8.8Mi       1.6Gi       1.9Ti
-Swap:          2.0Gi          0B       2.0Gi
+This will also be the most optimal way to use RMPOPT, as we only optimize the 1G regions
+that contains memory associated with that guest, which should be much smaller than
+optimizing the whole 2TB RAM. 
 
+And that's what the actual plans for RMPOPT are.
 
-For the loop executing RMPOPT on up-to 2TB of RAM on all CPUs: 
+We had planned for a phased RMPOPT implementation. 
 
-                ..
-                start = ktime_get();
-               
-                for (pa = pa_start; pa < pa_end; pa += PUD_SIZE) {
-                        /* Bit zero passes the function to the RMPOPT instruction. */
-                        on_each_cpu_mask(cpu_online_mask, rmpopt,
-                                         (void *)(pa | RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS),
-                                         true);
-                }
-                end = ktime_get();
+In the first phase, we were planning to do RMP re-optimizations for entire 2TB
+RAM. 
 
-                elapsed_ns = ktime_to_ns(ktime_sub(end, start));
-		...
+Once 1GB hugetlb guest_memfd support is merged, we planned to support re-enabling
+RMPOPT optimizations during 1GB page cleanup as a follow-on series.
 
-There are 2 active SNP VMs here, with one SNP VM being terminated, the other SNP VM is still running, both VMs are configured with 100GB guest RAM: 
-
-When this loop is executed when the SNP guest terminates:
-
-[  232.789187] SEV-SNP: RMPOPT execution time 391609638 ns for physical address range 0x0000000000000000 - 0x0000020000000000 on all cpus -> ~391 ms
-
-[  234.647462] SEV-SNP: RMPOPT execution time 457933019 ns for physical address range 0x0000000000000000 - 0x0000020000000000 on all cpus -> ~457 ms
-
-
-Now, there are a couple of additional RMPOPT optimizations which can be applied to this loop : 
-
-1). RMPOPT can skip the bulk of its work if another CPU has already optimized that region.
-The optimal thing may be to optimize all memory on one CPU first, and then let all the others
-run RMPOPT in parallel.
-
-2). The other optimization being applied here is only executing RMPOPT on only thread per
-core.
-
-The code sequence being used here:
-
-	...
-        /* Only one thread per core needs to issue RMPOPT instruction */
-        for_each_online_cpu(cpu) {
-                if (!topology_is_primary_thread(cpu))
-                        continue;
-
-                cpumask_set_cpu(cpu, cpus);
-        }
-
-         while (!kthread_should_stop()) {
-         	...
-                start = ktime_get();
-               
-                /*
-                 * RMPOPT is optimized to skip the bulk of its work if another CPU has already
-                 * optimized that region. Optimize all memory on one CPU first, and then let all
-                 * the others run RMPOPT in parallel.
-                 */
-                cpumask_clear_cpu(smp_processor_id(), cpus);
-
-                /* current CPU */
-                for (pa = pa_start; pa < pa_end; pa += PUD_SIZE)
-                        rmpopt((void *)(pa | RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS));
-
-                for (pa = pa_start; pa < pa_end; pa += PUD_SIZE) {
-                        /* Bit zero passes the function to the RMPOPT instruction. */
-                        on_each_cpu_mask(cpus, rmpopt,
-                                         (void *)(pa | RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS),
-                                         true);                       
-                }
-                end = ktime_get();
-
-                elapsed_ns = ktime_to_ns(ktime_sub(end, start));
-		...
-
-With these optimizations applied:
-
-When this loop is executed when an SNP guest terminates, again with 2 active SNP VMs with 100GB guest RAM:
-
-[  363.926595] SEV-SNP: RMPOPT execution time 317016656 ns for physical address range 0x0000000000000000 - 0x0000020000000000 on all cpus -> ~317 ms
-
-[  365.415243] SEV-SNP: RMPOPT execution time 369659769 ns for physical address range 0x0000000000000000 - 0x0000020000000000 on all cpus -> ~369 ms.
-
-So, with these two optimizations applied, there is like a ~16-20% performance improvement (when SNP guest terminates) in the execution of this loop
-which is executing RMPOPT on upto 2TB of RAM on all CPUs.
-
-Any thoughts, feedback on the performance numbers ? 
-
-Ideally we should be issuing RMPOPTs to only optimize the 1G regions that contained memory associated with that guest and that should be 
-significantly less than the whole 2TB RAM range. 
-
-But that is something we planned for 1GB hugetlb guest_memfd support getting merged and which i believe has dependency on:
+But i believe this support is dependent on:
 1). in-place conversion for guest_memfd, 
-2). 2M hugepage support for guest_memfd and finally 
-3). 1GB hugeTLB support for guest_memfd.
+2). 2M hugepage support for guest_memfd.
 
-The other alternative probably will be to use Dave's suggestions to loosely mirror the RMPOPT bitmap and
-keep our own bitmap of 1GB regions that _need_ RMPOPT run on them and probably this bitmap lives in
-guest_memfd and we track when they are being freed and then issue RMPOPT on those 1GB regions
+Another alternative we are considering is implementing a bitmap of 1GB regions in guest_memfd
+that tracks when they are being freed and then issue RMPOPT on those 1GB regions.
 (and this will be independent of the 1GB hugeTLB support for guest_memfd).
+
+> Or perhaps some more tracking is required to check that the entire
+> aligned range is freed before doing the rmpopt.
+> 
+> I need to implement some of this tracking for guest_memfd HugeTLB
+> support, so if the tracking is useful for you, we should discuss!
+
+Yes, this tracking is going to be useful for RMPOPT. 
+
+Is this going to be implemented as part of the 1GB hugeTLB support for guest_memfd ?
+
+> 
+>>>
+>>> Also, .free_inode() is called through RCU, so it could be called after
+>>> some delay. Could it be possible that .free_inode() ends up being called
+>>> way after the associated VM gets torn down, or after KVM the module gets
+>>> unloaded?  Does rmpopt still work fine if KVM the module got unloaded?
+>>
+>> Yes, .free_inode() can probably get called after the associated VM has
+>> been torn down and which should be fine for issuing RMPOPT to do
+>> RMP re-optimizations.
+>>
+>> As far as about KVM module getting unloaded, then as part of the forthcoming patch-series,
+>> during KVM module unload, X86_SNP_SHUTDOWN would be issued which means SNP would get
+>> disabled and therefore, RMP checks are also disabled.
+>>
+>> And as CC_ATTR_HOST_SEV_SNP would then be cleared, therefore, snp_perform_rmp_optimization()
+>> will simply return.
+>>
+> 
+> I think relying on CC_ATTR_HOST_SEV_SNP to skip optimization should be
+> best as long as there are no races (like the .free_inode() will
+> definitely not try to optimize when SNP is half shut down or something
+> like that.
+
+Yeah, i will have to take a look at such races.
+
+> 
+>> Another option is to add a new guest_memfd superblock operation, and then do the
+>> final guest_memfd cleanup using the .evict_inode() callback. This will then ensure
+>> that the cleanup is not called through RCU and avoids any kind of delays, as following:
+>>
+>> +static void kvm_gmem_evict_inode(struct inode *inode)
+>> +{
+>> +#ifdef CONFIG_HAVE_KVM_ARCH_GMEM_CLEANUP
+>> +        kvm_arch_gmem_cleanup();
+>> +#endif
+>> +       truncate_inode_pages_final(&inode->i_data);
+>> +       clear_inode(inode);
+>> +}
+>> +
+>>
+> 
+> At the point of .evict_inode(), CoCo-shared guest_memfd pages could
+> still be pinned (for DMA or whatever, accidentally or maliciously), can
+> rmpopt work on shared pages that might still be used for DMA?
+> 
+
+Yes, RMPOPT should be safe to work here, as it checks the RMP table for assigned
+or private pages in the 1GB range specified. For a 1GB range full of shared pages,
+it will mark that range to be RMP optimized.
+
+If all RMPUPDATE's for all private->shared pages conversion have been completed at
+the point of .evict_inode(), then RMPOPT re-optimizations will work nicely.
+
+> .invalidate_folio() and .free_folio() both actually happen on removal
+> from guest_memfd ownership, though both are not exactly when the folio
+> is completely not in use.
+> 
+> Is the best time to optimize when the pages are truly freed?
+> 
+
+Yes.
 
 Thanks,
 Ashish
+
+>> @@ -971,6 +979,7 @@ static const struct super_operations kvm_gmem_super_operations = {
+>>         .alloc_inode    = kvm_gmem_alloc_inode,
+>>         .destroy_inode  = kvm_gmem_destroy_inode,
+>>         .free_inode     = kvm_gmem_free_inode,
+>> +       .evict_inode    = kvm_gmem_evict_inode,
+>>  };
+>>
+>>
+>> Thanks,
+>> Ashish
+>>
+>>>
+>>> IIUC the current kmem_cache_free(kvm_gmem_inode_cachep, GMEM_I(inode));
+>>> is fine because in kvm_gmem_exit(), there is a rcu_barrier() before
+>>> kmem_cache_destroy(kvm_gmem_inode_cachep);.
+>>>
+>>>>  	kmem_cache_free(kvm_gmem_inode_cachep, GMEM_I(inode));
+>>>>  }
+>>>>
+>>>> --
+>>>> 2.43.0
