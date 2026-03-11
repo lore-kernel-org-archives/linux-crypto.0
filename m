@@ -1,177 +1,141 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B095D3DCDA3
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 11:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B9D3112C1
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 11:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773228329; cv=none; b=owTunYATvQaApt/HPFHGzq9HnYlej46froR/teJnVvp6vN/gDl1M+6YBCh7jDgYf4ixdrdIyvQwVW8nCMIsPH05X2kokzNd5pEnjLNWoDsuKXoxDbUcxpbXlew6ikDveov+N6qUYtYzLRbUmpNPO02ibvcM/RgcSGTSRyGPKtaA=
+	t=1773229074; cv=none; b=GEh4XHMeFeVJ8nEG4JQ/m1vlaB4NXrvz/DsIzJHwS5++5UO35DQ050erruzdhRUEy5ufvJGZ7KUgKL/N1/IJNXX1k2nZuwshj9WajJ5AC9HrUUkne90M9X37xrl5OXtsa7j7RvKMEHYblgxmBdbmzkF8szB7ScdiHXR9E3T7aHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773228329; c=relaxed/simple;
-	bh=Bz8L6lJ5ljmm0f1bzOA7lmmgPpBjGpva/qWmEvAb8MY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fh7QfNBgflj3wqbEj02QCucNoTqG1w9+Oy40dSjxeabMyhwezYo30p96G9df0gG34wE5A954EuCMSNCCijX21g4ERAMLYCs1TD7c13bhOG3G6r9AYcT5zTP2bHK3eyYY7hRRof6BkaSGZZezZ00hVMHsheLIoeixudSP4C5RNJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gjEi7UaP; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gjEi7UaP"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-439c4bde55cso5615885f8f.1
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 04:25:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1773228324; x=1773833124; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CJze5/pXmPew2sfHMpjfcTTl4xqaN7GKbsQ4t36q17Q=;
-        b=gjEi7UaPHAFk6q2s51w18yNUF03XkuvFUOBRtX4PJxLEfSWhntd03DcwQd5ef/DK6w
-         mgYzuEuj48AU/x0wUIEjswwwUyV+B7krb5hOMHQiJ8UwyyUPQHEDoTjt0SkHOW6R69L4
-         6L9THeytyGz8TFUzCmze6v2IRLNvaQK6qmx72iVPWCOSNhFL2EKpf9clVU+q4M7omaiJ
-         nZw52V/+sPJ1Xmws4PP4tBHosuOj65m8Be07hrsUkAKiw+WEOTcOnONlSuSzeTfRl9vJ
-         k9/OvMzkMYZQxOt3qvOZFEd6Kac7PJaY77UDEFkGn40X4PZZBV+EaC1uX2DUq2LM5YUt
-         4+fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773228324; x=1773833124;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CJze5/pXmPew2sfHMpjfcTTl4xqaN7GKbsQ4t36q17Q=;
-        b=WD8Wz5lFkq6x/FUbeGRGc7nYNCRNtC2oH5cLsV9ldAE8N7j2m9NWk15sPoZHyuzTDA
-         irZr1zB76uzSH05n1WxwWDy4YtR9mN9opBHJGdh0j6EW6FvftS+mBtsIvsUyjg1q11Qr
-         s0POHgnwBkXPJGSpQj6NtfhacEHcwOo4FYUkySyxGz3BCH8Sn6tJu5XTWYjxlLOS0mX8
-         Z3DxdpsxKlmvvFUVWE75kGLJO4gzDO6rzVqFvSC7kvKLC/whmY0bBSQbOlS9hg17AUxp
-         IjPSaVKCSWxvWmaowBF353DnLeq1KvmRDLf8cZAWfLqIvsKdv8zelLj3GqRV/1u2dwMO
-         qpdA==
-X-Forwarded-Encrypted: i=1; AJvYcCWziodRl8D6GZMUz3i1mKM+PfHPTmrBoZIfRaNM8O98jGIIo+8Pliz8di2Hrz81zBzAgprzthy9x9W3ipA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5nUGpdfXjRCpx7d4tZN4kdshi4VmXWeJY64QmRUvWRBaOqxSQ
-	iLAfTidlLQID0fTCITYMczhcB7lYGJVFFdurZZPBoAT1pSDrnrpYF8eKBjn6AcD20Mw=
-X-Gm-Gg: ATEYQzwhTrDl0P0rsCgMQqYQlxp3Zj+Unc6MbMLuo+JU1k2VPNoMhc1VG91b/je9lmT
-	4VCfys1OJj4ktaFyEb0wgd+CFI2XoraoEaGMzfCBk+jMr+VvVsNeZp+MxDcw1+0BcLt6WCWZj2M
-	VfkemO7CSUfdrrUn4wnWEz003Kxyb+izcYF2hybXXiOJm+PE6r1KaK5t/807HBfN75KbgKzItQK
-	CkEheJDpeUDbiRpAA8Rmbr9Z2rf1yZz1QeTgOee0UPF/Fg4yaaOKz6owei0AONmPpScK/55hGKi
-	JbSYIw2AVmQ5KeekZj67sFxQx1GaOZZf61CmL5u4T9iLORcpxp9E7oeTN7YkZMVxces68D6M/BG
-	NgkWiGLoQyrYRAjuNBeaWI0Eqtbqc+y3NOeDYRaAbehdJXefCwdXx+FpsGr87bpPAqAmxPJZvCl
-	3lvFc+UKYbmoX+v6f0TUdqr1SNAGJOPcO6cGq2WPC7EJPisw==
-X-Received: by 2002:a5d:5d0b:0:b0:439:b79d:b9a5 with SMTP id ffacd0b85a97d-439f8431382mr4099695f8f.37.1773228323834;
-        Wed, 11 Mar 2026 04:25:23 -0700 (PDT)
-Received: from linaro.org ([2a02:2454:ff23:4441:1c2c:7aff:fe45:362e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439f81f1318sm6682078f8f.21.2026.03.11.04.25.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 04:25:23 -0700 (PDT)
-Date: Wed, 11 Mar 2026 12:25:07 +0100
-From: Stephan Gerhold <stephan.gerhold@linaro.org>
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Udit Tiwari <quic_utiwari@quicinc.com>,
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>,
-	Md Sadre Alam <mdalam@qti.qualcomm.com>,
-	Dmitry Baryshkov <lumag@kernel.org>,
-	Peter Ujfalusi <peter.ujfalusi@gmail.com>,
-	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>,
-	dmaengine@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Subject: Re: [PATCH v12 05/12] dmaengine: qcom: bam_dma: add support for BAM
- locking
-Message-ID: <abFRE1qHgP-SYWZL@linaro.org>
-References: <20260310-qcom-qce-cmd-descr-v12-0-398f37f26ef0@oss.qualcomm.com>
- <20260310-qcom-qce-cmd-descr-v12-5-398f37f26ef0@oss.qualcomm.com>
- <abE9RQfGN6Ycns1B@linaro.org>
- <CAMRc=MeSfFyVYSJHzHvuynRR3TWRz04tyiOy1JvqyHP0aQKPOA@mail.gmail.com>
+	s=arc-20240116; t=1773229074; c=relaxed/simple;
+	bh=ff+pXBeQYZn8RFe6o+a36HLt3pxRVxLEQHjKOdTQukQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rQJK9XkEoP6J4u+iGj0gGiWYiZELyholfZVZlIxF5YzWgtU8wlD0ZBOmOYSwFUY6mCDcSsuOp1lb7msgV3RYmszR6w0aeFNV0LmpoJpK0sRJkUC5x/xrlVV/xpsnzsmJUfbmMscZHqOp9jXErJgFjTnZoNoZvDj13qqR4nW2SWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1773229062-1eb14e06e90ada0001-Xm9f1P
+Received: from zhaoxin.com (zxmail.zhaoxin.com [10.28.208.166]) by mx2.zhaoxin.com with ESMTP id nGhoytaVE1PTTgm4; Wed, 11 Mar 2026 19:37:42 +0800 (CST)
+X-Barracuda-Envelope-From: AlanSong-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.208.166
+Received: from [10.32.64.33] ([10.32.64.33] [10.32.64.33])
+	by zhaoxin.com (f222c4) with ESMTPd96bc589c732e7081ec6e05da615502b
+	Wed, 11 Mar 2026 19:37:41 +0800
+X-Eyou-Smtpauth: AlanSong-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.32.64.33
+X-Eyou-EnvelopeSender: AlanSong-oc@zhaoxin.com
+Message-ID: <5fe5b47d-5065-4e74-b2b3-4685e74a1130@zhaoxin.com>
+Date: Wed, 11 Mar 2026 19:37:39 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=MeSfFyVYSJHzHvuynRR3TWRz04tyiOy1JvqyHP0aQKPOA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/3] lib/crypto: x86/sha1: PHE Extensions optimized
+ SHA1 transform function
+To: Eric Biggers <ebiggers@kernel.org>
+X-ASG-Orig-Subj: Re: [PATCH v3 2/3] lib/crypto: x86/sha1: PHE Extensions optimized
+ SHA1 transform function
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, Jason@zx2c4.com,
+ ardb@kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ x86@kernel.org, CobeChen@zhaoxin.com, TonyWWang-oc@zhaoxin.com,
+ YunShen@zhaoxin.com, GeorgeXue@zhaoxin.com, LeoLiu@zhaoxin.com,
+ HansHu@zhaoxin.com
+References: <20260116071513.12134-1-AlanSong-oc@zhaoxin.com>
+ <20260116071513.12134-3-AlanSong-oc@zhaoxin.com>
+ <20260118003120.GF74518@quark>
+ <220d9651-3edc-4dc1-9086-e3482d2d5da3@zhaoxin.com>
+ <20260305191848.GE2796@quark>
+Content-Language: en-US
+From: AlanSong-oc <AlanSong-oc@zhaoxin.com>
+In-Reply-To: <20260305191848.GE2796@quark>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Eyou-Sender: <alansong-oc@zhaoxin.com>
+X-Vid: 2fb0dcdb3705844b70fe9b892319803300@zhaoxin.com
+X-Barracuda-Connect: zxmail.zhaoxin.com[10.28.208.166]
+X-Barracuda-Start-Time: 1773229062
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 3268
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.155697
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-On Wed, Mar 11, 2026 at 03:32:38AM -0700, Bartosz Golaszewski wrote:
-> On Wed, Mar 11, 2026 at 11:00 AM Stephan Gerhold
-> <stephan.gerhold@linaro.org> wrote:
-> >
-> > I'm not entirely sure if this actually guarantees waiting with the
-> > unlock until the transaction is "done", for two reasons:
-> >
-> >  1. &bchan->vc.desc_issued looks like a "TODO" list for descriptors we
-> >     haven't fully managed to squeeze into the BAM FIFO yet. It doesn't
-> >     tell you which descriptors have been consumed and finished
-> >     processing inside the FIFO.
-> >
-> >     Consider e.g. the following case: The client has issued a number of
-> >     descriptors, they all fit into the FIFO. The first descriptor has a
-> >     callback assigned, so we ask the BAM to send us an interrupt when it
-> >     has been consumed. We get the interrupt for the first descriptor and
-> >     process_channel_irqs() marks it as completed, the rest of the
-> >     descriptors are still pending. &bchan->vc.desc_issued is empty, so
-> >     you queue the unlock command before the rest of the descriptors have
-> >     finished.
-> >
+On 3/6/26 03:18, Eric Biggers wrote:
+> On Thu, Mar 05, 2026 at 09:37:01AM +0800, AlanSong-oc wrote:
+>>> Also, the spec describes all four registers as both input and output
+>>> registers.  Yet your inline asm marks %rax and %rcx as inputs only.
+>>
+>> Thank you for pointing this question out.
+>>
+>> On the one hand, when the '+' constraint modifier is applied to an
+>> operand, it is treated as both an input and an output operand.
+>> Therefore, %rsi and %rdi are considered input operands as well.
+>>
+>> On the other hand, after the instruction executes, the values in %rax,
+>> %rsi, and %rcx are modified. These registers should therefore use the
+>> '+' constraint modifier to inform the compiler that their values are
+>> updated by the assembly code. We cannot rely on clobbers to indicate
+>> that the values of input operands are modified following the suggestion
+>> by gcc manual. However, since %rax is initialized with a constant value,
+>> it does not need the '+' constraint modifier. It should can simply be
+>> specified as an input operand.
+>>
+>> In addition, although %rdi itself is not modified by the instruction but
+>> the memory it references may be updated, a "memory" clobber should be
+>> added to notify the compiler about possible memory side effects.
+>>
+>> The corrected inline assembly should be written as follows:
+>>
+>>     asm volatile(".byte 0xf3,0x0f,0xa6,0xc8" /* REP XSHA1 */
+>>                 : "+S"(data), "+c"(nblocks)
+>>                 : "a"((long)-1), "D"(dst)
+>>                 : "memory");
 > 
-> Thanks for looking into it. Good catch, I think you're right.
+> If the instruction both reads and writes %rax, then the constraint needs
+> to be "+a", even if the C code doesn't use the updated value.  Otherwise
+> the compiler can assume that the value stored in %rax is unchanged and
+> optimize the code accordingly, for example by not reinitializing %rax if
+> the constant -1 is needed again later on.
 > 
-> >  2. From reading the BAM chapter in the APQ8016E TRM I get the
-> >     impression that by default an interrupt for a descriptor just tells
-> >     you that the descriptor was consumed by the BAM (and forwarded to
-> >     the peripheral). If you want to guarantee that the transaction is
-> >     actually done on the peripheral side before allowing writes into
-> >     config registers, you would need to set the NWD (Notify When Done)
-> >     bit (aka DMA_PREP_FENCE) on the last descriptor before the unlock
-> >     command.
-> >
-> >     NWD seems to stall descriptor processing until the peripheral
-> >     signals completion, so this might allow you to immediately queue the
-> >     unlock command like in v11. The downside is that you would need to
-> >     make assumptions about the set of commands submitted by the client
-> >     again... The downstream driver seems to set NWD on the data
-> >     descriptor immediately before the UNLOCK command [1].
-> >
-> 
-> If what we have in the queue is:
-> 
->   [DATA] [DATA] [DATA] [CMD]
-> 
-> And we want to extend it with LOCK/UNLOCK like so:
-> 
->   [LOCK] [DATA] [DATA] [DATA] [CMD] [UNLOCK]
-> 
-> Should the NWD go with the last DATA descriptor or the last descriptor period
-> whether data or command?
-> 
-> It's, again, not very clear from reading tha part.
-> 
+> Yes, this means you'll need to move the constant -1 to a local variable.
 
-I'm not sure, my impression is that the exact behavior of NWD is quite
-specific to the actual peripheral (i.e. QCE, QPIC NAND, etc). In the
-downstream drivers:
+Indeed, to ensure that the compiler generates correct binary code under
+all optimization levels, the inline assembly should accurately describe
+the behavior of the instruction. I will use a local variable initialized
+to -1 for the instruction reads and writes %rax register in the next
+version of the patch.
 
- - QCE seems to add NWD to the last data descriptor before the UNLOCK
-   (as I wrote, it seems to queue command descriptors before data).
+>>> As before, all these comments apply to the SHA-256 patch too.
+>>
+>> Surely, I will also apply all of the suggestions mentioned above to the
+>> SHA-256 patch.
+> 
+> I also have to ask: are you sure you need SHA-1 to be optimized at all?
+> SHA-1 has been deprecated for a long time.  Most users have moved to
+> SHA-256 and other stronger algorithms, and those that haven't need to
+> move very soon.  There's little value in adding new optimized code for
+> SHA-1.
+> 
+> How about simplifying your patch to just SHA-256?  Then we can focus on
+> the one that's actually important and not on the deprecated SHA-1.
 
- - QPIC NAND has a dedicated "cmd" pipe that doesn't get any data
-   descriptors, it specifies NWD always for the EXEC_CMD register write,
-   which isn't even the last descriptor. This is also done in mainline
-   already (see NAND_BAM_NWD in qcom_write_reg_dma() [1]).
+It is true that SHA-1 is rarely used by most users today. However, it
+may still be needed in certain scenarios. For those cases, we would like
+to add support for the XHSA1 instruction to accelerate SHA-1.
 
-It is possible that NWD works only when attached to certain descriptors
-(when there is an actual operation running that gets completed by a
-certain descriptor), so we might not be able to simply add NWD to the
-last descriptor. :/
+Does the crypto community have any plans to remove SHA-1 support in
+recent kernel versions?
 
-I suppose you could argue that "make sure engine does not get
-re-configured while busy" is a requirement of QCE and not BAM, so
-perhaps it would be easiest and safest if you just add DMA_PREP_FENCE to
-the right descriptor inside the QCE driver. qcom_nandc has that already.
+Best Regards
+AlanSong-oc
 
-Thanks,
-Stephan
 
-[1]: https://elixir.bootlin.com/linux/v7.0-rc3/source/drivers/mtd/nand/qpic_common.c#L484
