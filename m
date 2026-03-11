@@ -1,344 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B491306D26;
-	Wed, 11 Mar 2026 13:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020CB3D1716
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 15:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773235584; cv=none; b=M+jXENKG8JYEK6ldZ+QjnaLSMZoidr5nrdTKLlcyScnfq64MRfMUyJHO8Xol2fTkUWAbvnH2f/EddEw0REBKDnbY1rNm6JdfdkmG+6gQ45uFVE98P7zJ/6TU1sX7ismMdR6JLlUy7FDlWtvuX0ZnLyHX+DCgmmTD8KpGd7NDqVo=
+	t=1773241817; cv=none; b=hecjcB91MHyG03XCMQ044L+kHV+IDcePSo+mIxqYZG9TCyMEsXT1AzUhdbv0dZsIRKp09sBi+B5eYOeMRY4ReIvT4XZXsGFWfcqr+FWgAegEJOoGdeDIJaABNMEAel5AWlwn2OKE5YdTPsYkQpnebf6c4QjsDdA4NVh5qhBRcG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773235584; c=relaxed/simple;
-	bh=W6oCAQ/s8C2Uj48lCZ2DxWtVPPiRrun1JCvwriBxabE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D5O03yd+pGklZhTpZ8JfhoyZhM0ip1oHJg+5PIXjCYONAw767IG99weJ3GWGE0QKxDSM9QxXvFoxM6YJ03e2f+4oR1ke9UU8uupA9/dgurvfVAr81gaGkupsM7sOisn+DwP/pO/JVqOjJ0t+pZSaefULbwi3dP/vRfVEbdp5Fnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DUynWAV1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773241817; c=relaxed/simple;
+	bh=iG015FVCN7oPWGVVn9a39BqVhRv1LNNupCbGtz9cTtI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wtd6Wm+T02Q8WAFyHCCjH8r3qb8hOskbysUvt8pmlzmjCEb40T6yDM/GO1+7t56kFPBhzS4Bi+zNZ6yc4v7YMij/x6RO7ixg6Q3MYKZrBgtGbmJhv66FV8EjPvFj9kW3OntxDTSplsk5zPFF24jNG6HqkPks6kyzu1Ee9xWWaU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GK3fS4w1; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DUynWAV1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76656C19425;
-	Wed, 11 Mar 2026 13:26:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773235583;
-	bh=W6oCAQ/s8C2Uj48lCZ2DxWtVPPiRrun1JCvwriBxabE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DUynWAV1b8Gc0x1sir2egYqoYc/O0i1lGxqk2g7OKX9FVTWDHZz9PK91J+UkSiTF7
-	 2UNaZq0YNOYMWNnFI7/E5obzAvM2nG4YybgJf/ADQRT9naD5Fg5A7un+5yMXZfvcMm
-	 IBs2kZjr+6JXEperRFNucEK+RWjwAUJ8FLA/029zKBd/Cy73loeTiqjpJr4SALTEA9
-	 Y7Eu7jyuT7aoq/GT8/lEa4c+54dzXbSRl4t0sR9S7Un8O27CuDYek6ntMsgSumDWVW
-	 B74As9Iz/BiFW2hupvE8zrvK//L3NO5Rdg1gnKH6qnknXMy52vkLNPOYb/i1i/eaXW
-	 zzp0hOEFaKrdw==
-Date: Wed, 11 Mar 2026 18:56:07 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
-	Daniel Perez-Zoghbi <dperezzo@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
-	Dmitry Baryshkov <lumag@kernel.org>, Peter Ujfalusi <peter.ujfalusi@gmail.com>, 
-	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>, dmaengine@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, brgl@kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v12 05/12] dmaengine: qcom: bam_dma: add support for BAM
- locking
-Message-ID: <s3qjgxji5ykznryf5n53zgvxm2qc5czsamguasdurfsrxbq43o@jpjkw5o7k5fo>
-References: <20260310-qcom-qce-cmd-descr-v12-0-398f37f26ef0@oss.qualcomm.com>
- <20260310-qcom-qce-cmd-descr-v12-5-398f37f26ef0@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GK3fS4w1"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773241810;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Y050AoUlwUvE4JwnOIvUs9WWS/VlkQtCxi3b0zHeXK0=;
+	b=GK3fS4w1p586rGFvb7W0Kx91572o8m6OQ+CSVZnCR9ApTUCQ8yrd77df/GhVoSJ/oFVAyr
+	3cGZFlVwYR8QJLgg66nLiMpi63XJ4jex51Kz/y3Z94JTC3moVU2HrAJ1+rMesFP3VkEbjQ
+	dZYlcJAUool8HeK4P2fdtfVvtzxkdZU=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Haren Myneni <haren@us.ibm.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dan Streetman <ddstreet@ieee.org>,
+	Ard Biesheuvel <ardb@kernel.org>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	stable@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: nx - fix memory leaks in nx842_crypto_{alloc,free}_ctx
+Date: Wed, 11 Mar 2026 16:09:24 +0100
+Message-ID: <20260311150922.382941-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1901; i=thorsten.blum@linux.dev; h=from:subject; bh=iG015FVCN7oPWGVVn9a39BqVhRv1LNNupCbGtz9cTtI=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJkbWxe7bCtbbHHYJ3xFb6NL37Kd5yvdrmtMrL9xvfaGG 1937bHUjlIWBjEuBlkxRZYHs37M8C2tqdxkErETZg4rE8gQBi5OAZjIhRUM/5PqbKvWzPma3PaS 43L5/oz4hYF8y0z2XXKfujJOQ+fF0SeMDC8iZ21rnO+tpM+t9fBq6Z3bLW1/v/DxP+BKWFN4L0G JiwcA
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260310-qcom-qce-cmd-descr-v12-5-398f37f26ef0@oss.qualcomm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Mar 10, 2026 at 04:44:19PM +0100, Bartosz Golaszewski wrote:
-> Add support for BAM pipe locking. To that end: when starting DMA on an RX
-> channel - prepend the existing queue of issued descriptors with an
-> additional "dummy" command descriptor with the LOCK bit set. Once the
-> transaction is done (no more issued descriptors), issue one more dummy
-> descriptor with the UNLOCK bit.
-> 
-> We *must* wait until the transaction is signalled as done because we
-> must not perform any writes into config registers while the engine is
-> busy.
-> 
-> The dummy writes must be issued into a scratchpad register of the client
-> so provide a mechanism to communicate the right address via descriptor
-> metadata.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
->  drivers/dma/qcom/bam_dma.c       | 175 ++++++++++++++++++++++++++++++++++++++-
->  include/linux/dma/qcom_bam_dma.h |   4 +
->  2 files changed, 176 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
-> index 83491e7c2f17d8c9d12a1a055baea7e3a0a75a53..627c85a2df4dcdbac247d831a4aef047c2189456 100644
-> --- a/drivers/dma/qcom/bam_dma.c
-> +++ b/drivers/dma/qcom/bam_dma.c
-> @@ -28,11 +28,13 @@
->  #include <linux/clk.h>
->  #include <linux/device.h>
->  #include <linux/dma-mapping.h>
-> +#include <linux/dma/qcom_bam_dma.h>
->  #include <linux/dmaengine.h>
->  #include <linux/init.h>
->  #include <linux/interrupt.h>
->  #include <linux/io.h>
->  #include <linux/kernel.h>
-> +#include <linux/lockdep.h>
->  #include <linux/module.h>
->  #include <linux/of_address.h>
->  #include <linux/of_dma.h>
-> @@ -60,6 +62,8 @@ struct bam_desc_hw {
->  #define DESC_FLAG_EOB BIT(13)
->  #define DESC_FLAG_NWD BIT(12)
->  #define DESC_FLAG_CMD BIT(11)
-> +#define DESC_FLAG_LOCK BIT(10)
-> +#define DESC_FLAG_UNLOCK BIT(9)
->  
->  struct bam_async_desc {
->  	struct virt_dma_desc vd;
-> @@ -391,6 +395,14 @@ struct bam_chan {
->  	struct list_head desc_list;
->  
->  	struct list_head node;
-> +
-> +	/* BAM locking infrastructure */
-> +	bool locked;
+The bounce buffers are allocated with __get_free_pages() using
+BOUNCE_BUFFER_ORDER (order 2 = 4 pages), but both the allocation error
+path and nx842_crypto_free_ctx() release the buffers with free_page().
+Use free_pages() with the matching order instead.
 
-Nit: Move this boolean at the end to avoid hole in-between.
+Also, since the scomp conversion, nx842_crypto_alloc_ctx() allocates the
+context separately, but nx842_crypto_free_ctx() never releases it. Add
+the missing kfree(ctx) in nx842_crypto_free_ctx(), and reuse
+nx842_crypto_free_ctx() in the allocation error path.
 
-> +	phys_addr_t scratchpad_addr;
-> +	struct scatterlist lock_sg;
-> +	struct scatterlist unlock_sg;
-> +	struct bam_cmd_element lock_ce;
-> +	struct bam_cmd_element unlock_ce;
->  };
->  
->  static inline struct bam_chan *to_bam_chan(struct dma_chan *common)
-> @@ -652,6 +664,27 @@ static int bam_slave_config(struct dma_chan *chan,
->  	return 0;
->  }
->  
-> +static int bam_metadata_attach(struct dma_async_tx_descriptor *desc, void *data, size_t len)
-> +{
-> +	struct bam_chan *bchan = to_bam_chan(desc->chan);
-> +	const struct bam_device_data *bdata = bchan->bdev->dev_data;
-> +	struct bam_desc_metadata *metadata = data;
-> +
-> +	if (!data)
-> +		return -EINVAL;
-> +
-> +	if (!bdata->pipe_lock_supported)
-> +		return -EOPNOTSUPP;
+Fixes: ed70b479c2c0 ("crypto: nx - add hardware 842 crypto comp alg")
+Fixes: 980b5705f4e7 ("crypto: nx - Migrate to scomp API")
+Cc: stable@vger.kernel.org
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/nx/nx-842.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-I don't think you should error out if pipe lock is not supported. You can safely
-return 0 so that the client can continue to do DMA. Otherwise, if the client
-tries to do DMA on a non-pipe lock supported platform (a valid case), DMA will
-fail.
-
-There is also no incentive for the clients to know whether pipe lock is
-supported or not as they can proceed anyway.
-
-> +
-> +	bchan->scratchpad_addr = metadata->scratchpad_addr;
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct dma_descriptor_metadata_ops bam_metadata_ops = {
-> +	.attach = bam_metadata_attach,
-> +};
-> +
->  /**
->   * bam_prep_slave_sg - Prep slave sg transaction
->   *
-> @@ -668,6 +701,7 @@ static struct dma_async_tx_descriptor *bam_prep_slave_sg(struct dma_chan *chan,
->  	void *context)
->  {
->  	struct bam_chan *bchan = to_bam_chan(chan);
-> +	struct dma_async_tx_descriptor *tx_desc;
->  	struct bam_device *bdev = bchan->bdev;
->  	struct bam_async_desc *async_desc;
->  	struct scatterlist *sg;
-> @@ -723,7 +757,12 @@ static struct dma_async_tx_descriptor *bam_prep_slave_sg(struct dma_chan *chan,
->  		} while (remainder > 0);
->  	}
->  
-> -	return vchan_tx_prep(&bchan->vc, &async_desc->vd, flags);
-> +	tx_desc = vchan_tx_prep(&bchan->vc, &async_desc->vd, flags);
-> +	if (!tx_desc)
-> +		return NULL;
-> +
-> +	tx_desc->metadata_ops = &bam_metadata_ops;
-> +	return tx_desc;
->  }
->  
->  /**
-> @@ -1012,6 +1051,112 @@ static void bam_apply_new_config(struct bam_chan *bchan,
->  	bchan->reconfigure = 0;
->  }
->  
-> +static struct bam_async_desc *
-> +bam_make_lock_desc(struct bam_chan *bchan, struct scatterlist *sg,
-> +		   struct bam_cmd_element *ce, unsigned long flag)
-> +{
-> +	struct dma_chan *chan = &bchan->vc.chan;
-> +	struct bam_async_desc *async_desc;
-> +	struct bam_desc_hw *desc;
-> +	struct virt_dma_desc *vd;
-> +	struct virt_dma_chan *vc;
-> +	unsigned int mapped;
-> +	dma_cookie_t cookie;
-> +	int ret;
-> +
-> +	sg_init_table(sg, 1);
-> +
-> +	async_desc = kzalloc_flex(*async_desc, desc, 1, GFP_NOWAIT);
-> +	if (!async_desc) {
-> +		dev_err(bchan->bdev->dev, "failed to allocate the BAM lock descriptor\n");
-> +		return NULL;
-> +	}
-> +
-> +	async_desc->num_desc = 1;
-> +	async_desc->curr_desc = async_desc->desc;
-> +	async_desc->dir = DMA_MEM_TO_DEV;
-> +
-> +	desc = async_desc->desc;
-> +
-> +	bam_prep_ce_le32(ce, bchan->scratchpad_addr, BAM_WRITE_COMMAND, 0);
-> +	sg_set_buf(sg, ce, sizeof(*ce));
-> +
-> +	mapped = dma_map_sg_attrs(chan->slave, sg, 1, DMA_TO_DEVICE, DMA_PREP_CMD);
-> +	if (!mapped) {
-> +		kfree(async_desc);
-> +		return NULL;
-> +	}
-> +
-> +	desc->flags |= cpu_to_le16(DESC_FLAG_CMD | flag);
-> +	desc->addr = sg_dma_address(sg);
-> +	desc->size = sizeof(struct bam_cmd_element);
-> +
-> +	vc = &bchan->vc;
-> +	vd = &async_desc->vd;
-> +
-> +	dma_async_tx_descriptor_init(&vd->tx, &vc->chan);
-> +	vd->tx.flags = DMA_PREP_CMD;
-> +	vd->tx.desc_free = vchan_tx_desc_free;
-> +	vd->tx_result.result = DMA_TRANS_NOERROR;
-> +	vd->tx_result.residue = 0;
-> +
-> +	cookie = dma_cookie_assign(&vd->tx);
-> +	ret = dma_submit_error(cookie);
-> +	if (ret)
-> +		return NULL;
-
-Why can't you pass the actual error pointer to the caller. Right now, caller
-just treats all failures as -ENOMEM.
-
-> +
-> +	return async_desc;
-> +}
-> +
-> +static int bam_do_setup_pipe_lock(struct bam_chan *bchan, bool lock)
-> +{
-> +	struct bam_device *bdev = bchan->bdev;
-> +	const struct bam_device_data *bdata = bdev->dev_data;
-> +	struct bam_async_desc *lock_desc;
-> +	struct bam_cmd_element *ce;
-> +	struct scatterlist *sgl;
-> +	unsigned long flag;
-> +
-> +	lockdep_assert_held(&bchan->vc.lock);
-> +
-> +	if (!bdata->pipe_lock_supported || !bchan->scratchpad_addr ||
-> +	    bchan->slave.direction != DMA_MEM_TO_DEV)
-> +		return 0;
-> +
-> +	if (lock) {
-> +		sgl = &bchan->lock_sg;
-> +		ce = &bchan->lock_ce;
-> +		flag = DESC_FLAG_LOCK;
-> +	} else {
-> +		sgl = &bchan->unlock_sg;
-> +		ce = &bchan->unlock_ce;
-> +		flag = DESC_FLAG_UNLOCK;
-> +	}
-> +
-> +	lock_desc = bam_make_lock_desc(bchan, sgl, ce, flag);
-> +	if (!lock_desc)
-> +		return -ENOMEM;
-> +
-> +	if (lock)
-> +		list_add(&lock_desc->vd.node, &bchan->vc.desc_issued);
-> +	else
-> +		list_add_tail(&lock_desc->vd.node, &bchan->vc.desc_issued);
-> +
-> +	bchan->locked = lock;
-> +
-> +	return 0;
-> +}
-> +
-> +static int bam_setup_pipe_lock(struct bam_chan *bchan)
-> +{
-> +	return bam_do_setup_pipe_lock(bchan, true);
-> +}
-> +
-> +static int bam_setup_pipe_unlock(struct bam_chan *bchan)
-> +{
-> +	return bam_do_setup_pipe_lock(bchan, false);
-> +}
-> +
->  /**
->   * bam_start_dma - start next transaction
->   * @bchan: bam dma channel
-> @@ -1121,6 +1266,7 @@ static void bam_dma_work(struct work_struct *work)
->  	struct bam_device *bdev = from_work(bdev, work, work);
->  	struct bam_chan *bchan;
->  	unsigned int i;
-> +	int ret;
->  
->  	/* go through the channels and kick off transactions */
->  	for (i = 0; i < bdev->num_channels; i++) {
-> @@ -1128,6 +1274,13 @@ static void bam_dma_work(struct work_struct *work)
->  
->  		guard(spinlock_irqsave)(&bchan->vc.lock);
->  
-> +		if (list_empty(&bchan->vc.desc_issued) && bchan->locked) {
-
-I fully agree with Stephan that we cannot rely on this to ensure completion of
-previous commands. But I can't help with the NWD behavior :/
-
-> +			ret = bam_setup_pipe_unlock(bchan);
-
-if (bam_setup_pipe_unlock())?
-
-> +			if (ret)
-> +				dev_err(bchan->vc.chan.slave,
-> +					"Failed to set up the pipe unlock descriptor\n");
-> +		}
-> +
->  		if (!list_empty(&bchan->vc.desc_issued) && !IS_BUSY(bchan))
->  			bam_start_dma(bchan);
->  	}
-> @@ -1142,9 +1295,17 @@ static void bam_dma_work(struct work_struct *work)
->  static void bam_issue_pending(struct dma_chan *chan)
->  {
->  	struct bam_chan *bchan = to_bam_chan(chan);
-> +	int ret;
->  
->  	guard(spinlock_irqsave)(&bchan->vc.lock);
->  
-> +	if (!bchan->locked) {
-> +		ret = bam_setup_pipe_lock(bchan);
-
-if (bam_setup_pipe_lock())?
-
-- Mani
-
--- 
-மணிவண்ணன் சதாசிவம்
+diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
+index b61f2545e165..a61208cbcd27 100644
+--- a/drivers/crypto/nx/nx-842.c
++++ b/drivers/crypto/nx/nx-842.c
+@@ -115,10 +115,7 @@ void *nx842_crypto_alloc_ctx(struct nx842_driver *driver)
+ 	ctx->sbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
+ 	ctx->dbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
+ 	if (!ctx->wmem || !ctx->sbounce || !ctx->dbounce) {
+-		kfree(ctx->wmem);
+-		free_page((unsigned long)ctx->sbounce);
+-		free_page((unsigned long)ctx->dbounce);
+-		kfree(ctx);
++		nx842_crypto_free_ctx(ctx);
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+ 
+@@ -131,8 +128,9 @@ void nx842_crypto_free_ctx(void *p)
+ 	struct nx842_crypto_ctx *ctx = p;
+ 
+ 	kfree(ctx->wmem);
+-	free_page((unsigned long)ctx->sbounce);
+-	free_page((unsigned long)ctx->dbounce);
++	free_pages((unsigned long)ctx->sbounce, BOUNCE_BUFFER_ORDER);
++	free_pages((unsigned long)ctx->dbounce, BOUNCE_BUFFER_ORDER);
++	kfree(ctx);
+ }
+ EXPORT_SYMBOL_GPL(nx842_crypto_free_ctx);
+ 
