@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35383D4133;
-	Wed, 11 Mar 2026 18:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9093E4C9F;
+	Wed, 11 Mar 2026 18:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773253546; cv=none; b=MAmUBNX3GZ2c0EK/5jwjR/iw7PW1ujow6LpInM5vYUUl0xksuBBGFiPNptlMHnHatyhmk5os5R8m5+z9KHkM+j1E5KO8OK6w2Fe72lmMptDD0I6T1+hkBeQ6bqqhOdw1Ms6moWo99hU5vLgywSMYZnNyz4tomj9FVYn7zu2HniY=
+	t=1773253621; cv=none; b=TBdAlqZ0Z7PwloH9qggTwyMIj6an5SnSDvCr6Sy1YgN5yIQ0HGv57h80Jgdc8/SrBJp6Xa2FZCdqrnj/URhKMMo0PjkJRWlRupSBWvRvMXySHaRPIxi8BuMDhGJkwx1Ty72YjukGaL2RgS//kMo7RzhHaeGmcI1EQ+DtkDkvq0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773253546; c=relaxed/simple;
-	bh=JEma55NSkQx0WlZlVa3Ysds8OFhrTBrO4FyokRDe8cw=;
+	s=arc-20240116; t=1773253621; c=relaxed/simple;
+	bh=GYvQRS01mkWWbRN5RQFFIWjtNKp0AgsH7LS9di96fXU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fUvaadcf0Rck+GQcyfg7j3Q/Fc6ZHO0a0dCJ+LBxjefADCYHpdWYsGmZDxGJuFM2umECj93RTYS56rl6F00ylOWZTxTEzbs/dYv7hptCZBlRtQQMgAuNmOf0qoVGfYPpwZtDT6/hWG6lMxCzOEOKpyjoXsBQqFx/mCY4g52Xo04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TJDnxUjV; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=V1zUztSY/dkUtZFFxqPacw1iC58YWxvS/U/edExENrf4Ib+mqCDZVcZPpxwUjrbhFQkmDhUa67O2tP1h7QTPcAjTk9ngEg+lDHOEcjp1oLcgt+jIsoVFKU1bsPC/L52uVdR6n6/Sks4SmFOpbxkK0g55QXzpiDXKPjldymi91G4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VjvaFTCB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TJDnxUjV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0926C19425;
-	Wed, 11 Mar 2026 18:25:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VjvaFTCB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99FA0C19421;
+	Wed, 11 Mar 2026 18:26:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773253546;
-	bh=JEma55NSkQx0WlZlVa3Ysds8OFhrTBrO4FyokRDe8cw=;
+	s=k20201202; t=1773253621;
+	bh=GYvQRS01mkWWbRN5RQFFIWjtNKp0AgsH7LS9di96fXU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TJDnxUjVL92KeVhEgFqay0jep+f5FOTOdSz5Pb5BMOJf+Ct2vNmNbkZevmhCCVqOU
-	 wl7Ev+GkExq9IcHj3mN2FzBWH/GhxLjChSrJFEGmDkrUzKH3hm1bVe39p6ffH1qvDJ
-	 V2BD2NfX5LDffwXWKsyRzFT04oQQr7K9X4DP7JSBYt6X9O9XHWp9J/ujIhCR9eDWAF
-	 yuI5xC6ThTqgBaYwXtPPTrls5QBAj4r4nbMIqnfezkJ87SpTwUN/rJ1+8JY7CCMvKL
-	 pKFNlZkwBh212M9A4Xkrfc1y31YSBdKMBclBwAIyJzJk5dpwdh2R8gAI0TyMjM3H9Q
-	 Bz6VscO1LQ6tA==
-Message-ID: <b2d852c4-9f52-4ad4-a916-ced19c599938@kernel.org>
-Date: Wed, 11 Mar 2026 19:25:36 +0100
+	b=VjvaFTCBbkgi6A69zAJ/S4uZ6AcbHEDB07MLwynIoKxHUwnI6dB8j2Xyf5E+9yyb7
+	 maaARYMFRvnr4QnsuXkquP3wCtZM4YLJqq8bqPLl2AONAAbKGX9usy16hLMZRAGgax
+	 MGt76/u1hcnPO3w/9TP6GTps3ja71zD85ebSXDQWY59vfLGM5zYbqrCSGDp4Kaj7Gq
+	 QDnSZfxPeLQNEnoWX79/gjNIG9dHLYNopi5fhKZiQ82DUQZA4bAwzF3U2tGSUPtVlb
+	 SDr4QIyt5LKcPdQhjnDOEfry9VDRy7bb8EysV8r0EeXsKsDkyExvJZrkQDaVHZbqvB
+	 CDmMVBlcMcLZQ==
+Message-ID: <9e740dae-3197-4cdd-85fd-8a840d2317a3@kernel.org>
+Date: Wed, 11 Mar 2026 19:26:56 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,35 +35,18 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 01/11] dt-bindings: crypto: qcom,ice: Allow
- power-domain and iface clk
-To: Harshal Dev <harshal.dev@oss.qualcomm.com>,
+Subject: Re: [PATCH v3 1/2] dt-bindings: crypto: ice: Document sm8250 inline
+ crypto engine
+To: Alexander Koskovich <akoskovich@pm.me>,
  Herbert Xu <herbert@gondor.apana.org.au>,
  "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
  <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Abel Vesa <abel.vesa@oss.qualcomm.com>,
- Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
- cros-qcom-dts-watchers@chromium.org, Eric Biggers <ebiggers@google.com>,
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
- Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
- Tengfei Fan <tengfei.fan@oss.qualcomm.com>,
- Bartosz Golaszewski <brgl@kernel.org>,
- Yuvaraj Ranganathan <quic_yrangana@quicinc.com>,
- David Wronek <davidwronek@gmail.com>, Luca Weiss <luca.weiss@fairphone.com>,
- Neil Armstrong <neil.armstrong@linaro.org>,
- Melody Olvera <quic_molvera@quicinc.com>
-Cc: Brian Masney <bmasney@redhat.com>,
- Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
- Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
- linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-References: <20260310-qcom_ice_power_and_clk_vote-v2-0-b9c2a5471d9e@oss.qualcomm.com>
- <20260310-qcom_ice_power_and_clk_vote-v2-1-b9c2a5471d9e@oss.qualcomm.com>
- <2ac2efad-3533-490e-bb42-f21c4e950277@kernel.org>
- <a2d6c630-e4df-4cdf-8b10-64d87d24bf8f@oss.qualcomm.com>
+ Konrad Dybcio <konradybcio@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260309-sm8250-ice-v3-0-418bf5c5c042@pm.me>
+ <20260309-sm8250-ice-v3-1-418bf5c5c042@pm.me>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -109,79 +92,32 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <a2d6c630-e4df-4cdf-8b10-64d87d24bf8f@oss.qualcomm.com>
+In-Reply-To: <20260309-sm8250-ice-v3-1-418bf5c5c042@pm.me>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/03/2026 10:37, Harshal Dev wrote:
+On 10/03/2026 04:12, Alexander Koskovich wrote:
+> Document the compatible used for the inline crypto engine found on
+> SM8250.
 > 
+> Signed-off-by: Alexander Koskovich <akoskovich@pm.me>
+> ---
+>  Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> On 3/11/2026 1:55 AM, Krzysztof Kozlowski wrote:
->> On 10/03/2026 09:06, Harshal Dev wrote:
->>> Update the inline-crypto engine DT binding to allow specifying up to two
->>> clocks along with their names and associated power-domain. When the
->>> 'clk_ignore_unused' flag is not passed on the kernel command line
->>> occasional unclocked ICE hardware register access are observed during ICE
->>> driver probe based on the relative timing between the probe and the kernel
->>> disabling the unused clocks. On the other hand, when the 'pd_ignore_unused'
->>> flag is not passed on the command line, clock 'stuck' issues are
->>> observed if the power-domain required by ICE hardware is unused and thus
->>> disabled before ICE probe. To avoid these scenarios, the 'iface' clock and
->>> the associated power-domain should be specified in the ICE device tree node
->>> and the 'iface' clock should be voted on by the ICE driver during probe.
->>>
->>> Fixes: f6ff91a47ac57 ("dt-bindings: crypto: Add Qualcomm Inline Crypto Engine")
->>> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
->>> ---
->>>  .../bindings/crypto/qcom,inline-crypto-engine.yaml       | 16 +++++++++++++++-
->>>  1 file changed, 15 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
->>> index c3408dcf5d20..d9a0a8adf645 100644
->>> --- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
->>> +++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
->>> @@ -28,6 +28,16 @@ properties:
->>>      maxItems: 1
->>>  
->>>    clocks:
->>> +    minItems: 1
->>> +    maxItems: 2
->>> +
->>> +  clock-names:
->>> +    minItems: 1
->>> +    items:
->>> +      - const: ice_core_clk
->>
->> core
-> 
-> Ack. I'll introduce a check for this specific name here as well:
-> https://elixir.bootlin.com/linux/v7.0-rc3/source/drivers/soc/qcom/ice.c#L582
-> 
->>
->>> +      - const: iface_clk
->>
->> iface or bus
-> 
-> Ack, will call it 'iface'.
-> 
->>
->> I don't understand why this is flexible and commit msg does not explain
->> that. Devices do not have one and two clocks at the same time. You miss
->> proper constraints.
->>
-> 
-> I agree, it might confuse someone reading the commit message the first time.
-> I'll re-write the commit message to make it explicit that even though these
-> two properties are 'required', for the time being we are introducing 'iface'
-> clk and 'power-domain' as an optional property to maintain bisectability,
-> and that the properties would be made 'required' in a subsequent commit once
-> the DTS changes which are part of this patch series have reached the top tree.
-> 
-> Let me know if any concerns with this kind of commit message.
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> index 061ff718b23d..ccb74ea14ce8 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> @@ -19,6 +19,7 @@ properties:
+>            - qcom,sa8775p-inline-crypto-engine
+>            - qcom,sc7180-inline-crypto-engine
+>            - qcom,sc7280-inline-crypto-engine
+> +          - qcom,sm8250-inline-crypto-engine
 
-So you are adding it for backwards compatibility? It's fine then,
-although I had impression you are fixing something which is not working
-correctly. New devices will need to constrain this.
+SM8250 does not need two clocks?
+
+https://lore.kernel.org/r/20260310-qcom_ice_power_and_clk_vote-v2-1-b9c2a5471d9e@oss.qualcomm.com/
 
 Best regards,
 Krzysztof
