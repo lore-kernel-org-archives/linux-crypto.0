@@ -1,144 +1,251 @@
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010056.outbound.protection.outlook.com [52.101.201.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA9F1D5ADE;
-	Wed, 11 Mar 2026 05:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD95332612
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 06:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.179
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773207204; cv=fail; b=RT075UVNwToutjPhfccQ3M71drWnjDc+mhpsEEPP94lBkSkhwr0B0s4OGyzshT8zrvrBiNw+ANhj/GA0u9DfzJ3YO5D6Iq3SC3bhl2cF+QXUijAXCEBDA5fdmzwFcNKfxAweWkXbTWD2yCv3kVhpnThYJLLtg7/KJMoASI3ODMI=
+	t=1773208843; cv=pass; b=HCAs2m5+vWF1hnRD+XDVFyiD8zP0Co2980Q98VJvbJC8S+FYm8/bKVjnqy89y/XPSFSY0juwBSMQMBMhW5/d8RFdgykHBXpL4sBHHnkSHnm9vesomfhqPLDlLxqoNxDK8W/MNuMakI3bFxezdPJDAW+Axonr3KViF7FhzFkLSR4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773207204; c=relaxed/simple;
-	bh=6zdjqS7dwWc1wI7+KIfu+0KWdR1TL/gmukDsIhiMSbU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=kuOOuwZc/9u8gfEBMj+15rxdshQk/czkJWvUoNbLW6QBLq4hLwoH3Y3WHZky/7bIwN2Tldj4i/7CVOPWB9mi09UbEzXg7LMlAOc+Dq0IZJPD1ko7qHrpj2fHQCNveID14eMphx0GCW3fVBemZ4wxWXSqKuqZT/WlSTU6/un8COI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=VSEAmqnk; arc=fail smtp.client-ip=52.101.201.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1773208843; c=relaxed/simple;
+	bh=1pU9e1VV6wQdH0AgbRuRINPzSJbE/naiF7g141qXG2U=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SDk/mWnhjSwvSBxa/gIoIUgXqIW0pagVTyYkpGQsh/lLXtrHpgqoaHbRkJZ9D9hush9KH1dlMNroTVWegFo3mdYziW1sf21L7pEXVtqWw/o3NxQiaXFA/46lonjdfeJVhD4wdn4/+6e2KaWq5rgDo/JX83TkbQ5W/w9qTQYjcUM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d7Jq68qz; arc=pass smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="VSEAmqnk"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bwCX7PWtHxhOiWGzw7qs/6/PjOYUqnosskqBstjeDRb5OBDozndHPfhBjOO9J6I3lTyNmFBrHQtXBB1CvVK2m4jE7W4yXP8Zgi3LZf5owD8y4Fbhio3HdLttku+OHD97ShVn96MF9ErbAvSOcWPrviB06PVMiX3oB77pF1eNGovXYEbGK2tIT3C6PBVjuTLTD74STI8ZaejY6xFptVgCCkQn0Heq/jLOJHv0nz+DvJAcq2dzPQBJwr2n00C4YGhhtex8j7fesTN/qYs2W/+6aQibUjwBlpJgZ895GUDcnB3eduw0p2p0PMawswbBSmzn8iz+qc8k6Jo5G0QUhuhnDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uXQ7roPbdAQBYXQOoqv7xPbBiEKlTDB1OJ7MSfqTufQ=;
- b=DGArPdaKPbRZcp/SumN0LdIgylkmtelEWv1TO5HhXLGflNfVkVXPtWkOvFc+XZuJ53V6kOEiEdlfG1A0Ga8Lp8feguEaK80mbHhc2JV9bEtHMDLQw/P0rZ2gtP4i9WUhGwzXRUcBG2LS9xoPrjOG2i6dgshF6fk0gfSFfBhHpK8odLl8GC9ad0EnGjzYMNjs0t86D9X2fTi+7vkXAQqcVuP0o/XzLLadXl2xrQllsZg9LjhPba7TvlsWPTCtRmIB7l6A1FAPrza8LVMbzPgByCeZp8hRsb3EdGz58b4ejJ5Rt1bAMEWprsi2LtSucTu2lvbsFyBqh/R1281f9bkFdg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.195) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uXQ7roPbdAQBYXQOoqv7xPbBiEKlTDB1OJ7MSfqTufQ=;
- b=VSEAmqnkQT0VshDNKTZwia3hTBGTQNOw8NPy1KOlMeYkvkAeU5bDLSFK+4h/MxS05e/6MaS+poK7cIv4l9Lb+HBf0JcOko+c/X3L5CK6M+88ARgzqBSomSSV64jqACv4vhLe71oTvv3Iz2uBq4S3UJL0Onxoi0TP1ZwdbC/v7kc=
-Received: from DS7PR03CA0136.namprd03.prod.outlook.com (2603:10b6:5:3b4::21)
- by SJ5PPFD6523AA75.namprd10.prod.outlook.com (2603:10b6:a0f:fc02::7d2) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.12; Wed, 11 Mar
- 2026 05:33:21 +0000
-Received: from DS2PEPF000061C4.namprd02.prod.outlook.com
- (2603:10b6:5:3b4:cafe::af) by DS7PR03CA0136.outlook.office365.com
- (2603:10b6:5:3b4::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.27 via Frontend Transport; Wed,
- 11 Mar 2026 05:33:09 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.195)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.195; helo=flwvzet201.ext.ti.com; pr=C
-Received: from flwvzet201.ext.ti.com (198.47.21.195) by
- DS2PEPF000061C4.mail.protection.outlook.com (10.167.23.71) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9678.18 via Frontend Transport; Wed, 11 Mar 2026 05:33:19 +0000
-Received: from DFLE210.ent.ti.com (10.64.6.68) by flwvzet201.ext.ti.com
- (10.248.192.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 11 Mar
- 2026 00:32:49 -0500
-Received: from DFLE206.ent.ti.com (10.64.6.64) by DFLE210.ent.ti.com
- (10.64.6.68) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 11 Mar
- 2026 00:32:49 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE206.ent.ti.com
- (10.64.6.64) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Wed, 11 Mar 2026 00:32:49 -0500
-Received: from [10.24.69.191] (pratham-workstation-pc.dhcp.ti.com [10.24.69.191])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62B5WkO8256351;
-	Wed, 11 Mar 2026 00:32:46 -0500
-Message-ID: <5807d226-a5fb-4d36-987f-aa22f06f4788@ti.com>
-Date: Wed, 11 Mar 2026 11:02:45 +0530
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d7Jq68qz"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-38a23cf08e0so83003491fa.3
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Mar 2026 23:00:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773208840; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SIWLUDlhANmBgoIUSEYb/6X+lUKq02mPM3OvRpfK+PDhTtLgtlYUzOULNXG1SQmq3P
+         Per+fQT5DBe0/0AGMoBwHB/uR02qn0qYDn6cQ8Yn9F5cAp2j6rD+8LPosBZYRE4CFPG2
+         tcC1cbwe+yK/TyauMmIrFkvAkXjDwaP1gVk5rbujdlMvRruHK29buSue9Wbrm9992qJh
+         aP+bC9i8s+VSfiJgPsmLtctYVCPVcOcdyUo9YUeJIdH13vFxV7P9JvnI4CyitLjYi4yH
+         PJDDeXY1Tqz7hpe4vgEcBmutSO4DabnfDgqA02TaIM6iv/cHoeYYZ3ZE+u1TkMN8CAqG
+         xxLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=WlV0D1/XllmyoZfK4RxM2lMbSn8Yq7S4U2C5Lb+KdlU=;
+        fh=quGHUkwGzgiRmSiE8uLE6f4vdzhFC5mYI+Tn2zJkn/s=;
+        b=gGQ8fSyoZ1wDWNNMAQ0CG+01/B6Lcf6PzGS6O1IRutVu5HjMbFv3+ZdvLPzVn9DOI7
+         S6h0eUREb0lzoxIou+/Nd9r3s7jHaXnzOtrq5s/T3YjH1imIRtBijgNkeY4BCGrpOTs8
+         M20vvCsrFe18NojJ31H+ZLr1/RfnD0PpJBErPTA2NJmFvXpN+qm77FZMOBhRRE9HVKUZ
+         ZCo89mMaHofiYhULoubDFQSgf8cUJ31VXV/5aCVmPttAs8zMiS3vtY0ipR129zTODXlX
+         uxzFZvNxz259M63C/447/WHqbNBakNpsuJnwSTOJOq4AGTUXecuWs7rbUzkTfCbZuH0T
+         Yh2Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773208840; x=1773813640; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WlV0D1/XllmyoZfK4RxM2lMbSn8Yq7S4U2C5Lb+KdlU=;
+        b=d7Jq68qz9thJ7Mytez4OrrO4Vvw4joGqk4j3kZubk41nsJCxW3p+47FZAmMaYpXRaa
+         VClYoDrKypg4wJ9tDAjUzZkGPVuVbm+YQClA24ce0c1d5UJ0JGk2Zzd37cqmXeKr31vd
+         II1x5VNenuvcO7A5zjSyvmRaMfY+wPSvKfbPfdRuQjvdZtZ8WPxKLNeEo5MUOaRCop+c
+         c1p4CBHKLfzogRIz9rIsWsfJ/4LTg/dszTLvGlGlAKHbW4MPRt88QVRRzwkINSyGS574
+         wkzuBugOFtZ6Nbq281qtIHgMJIWSBdp2Ayhx664EtD0bXYZ2jKi7jXXQORfZzKGZuwVB
+         mTrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773208840; x=1773813640;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WlV0D1/XllmyoZfK4RxM2lMbSn8Yq7S4U2C5Lb+KdlU=;
+        b=YFWIV/TxoTBH580nR3uAHSioTRawoncG53Ozx/MYaTcjgAGTn570pR8niL3fPDg46g
+         XldPFhM4+ubXyC8cJfQQXu+hL8U7DY2sC5qo9sGTxHsMEj8cdXWIz3SMfJaQQs5Nkxaf
+         EIQSUnNsHysEhGA/bSP/43fv9g1TOBO+YCIyR9RKdlA1SGHR6PKrCoVhw1OnbiLbr2pu
+         Zp12soHOItqAF7fvqfp9hWr8UCDHxLjQKKnOE3PXbv8y69LxwHcPkyDc/ziUcGCGyuGC
+         gOt75AKSidHR7YvQ/nKsDUjD42TqwTXH6o13dnQ0gT/aOgOVyD3OjvhXJGYwjl59ZH9t
+         ivbg==
+X-Forwarded-Encrypted: i=1; AJvYcCXeTLmL+aPsG/eaj02tyj4I+R+f0RPs6Qfs2qJuBQC5dwmB20hLFFQgO818xPAO5I5utx+fbOqB0/YQ5Yg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyz9flB/SrB1YsTEieWxndHpZzl9hbZrsP70Nf3Ly+CfJGS2I9y
+	NIH7iWLmH2y3lWDIfZ0P8dM+jQUrKnt4qso7vjYAGwbHoCnLhfHXeH3wWmiXBW/wfOXhawdbUoH
+	XH6apct4yktuMU4NpBIymGXozjXMZgGiDKP0bU3DP
+X-Gm-Gg: ATEYQzwi7mPTbc5UeqITkrmOr8ByLiBjoD47vMo5zBrdGuof06ZvIV7swe9Mpv2EAlb
+	Uq8a1jR8zYMkKZDrM7sklFs8/MOzotthoDCV4vLTKIoXFrs62++bAs29tu1cTMJjiEC6Pn+JON+
+	5905zsJqIPR72f7lOTOnSgbZVsata0mtYhxqSzxrDV7cMQipNhEsQp2whDYouF4Y0nNMXYbKM8o
+	oCg75XaLwn5AmYHZ3rl2nDLNgC5TqdgTtFVklUGi6XbIGDV/ifLlweNws71jcyw7bU5tWslOVA5
+	W137dMEmRJqMR+1LEF2DCzxDtDFGlM2MfjiKcvXfl2stzEr5L/BRpgQQqk2xwMktcjjhcQ==
+X-Received: by 2002:a05:651c:210d:b0:386:ee99:6cb3 with SMTP id
+ 38308e7fff4ca-38a67dd524emr4828161fa.9.1773208838986; Tue, 10 Mar 2026
+ 23:00:38 -0700 (PDT)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 10 Mar 2026 23:00:28 -0700
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 10 Mar 2026 23:00:28 -0700
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <98313534-af6a-4c00-a016-9d9010f145da@amd.com>
+References: <cover.1772486459.git.ashish.kalra@amd.com> <ce99dc548000b5a1f4486cdd3efe510b3874684b.1772486459.git.ashish.kalra@amd.com>
+ <CAEvNRgFCTNr=LUR_RM7+A4z+qHCWBZOYKe_Cbokwx0UsCtzaVw@mail.gmail.com> <98313534-af6a-4c00-a016-9d9010f145da@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 2/3] crypto: ti - Add support for AES-GCM in DTHEv2
- driver
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S. Miller" <davem@davemloft.net>, Manorit Chawdhry
-	<m-chawdhry@ti.com>, Kamlesh Gurudasani <kamlesh@ti.com>, Shiva Tripathi
-	<s-tripathi1@ti.com>, Kavitha Malarvizhi <k-malarvizhi@ti.com>, "Vishal
- Mahaveer" <vishalm@ti.com>, Praneeth Bajjuri <praneeth@ti.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20260226125441.3559664-1-t-pratham@ti.com>
- <20260226125441.3559664-3-t-pratham@ti.com>
- <aau2bg4gdM0VPcEo@gondor.apana.org.au>
- <26303ab7-cd14-4560-8872-021229faa137@ti.com>
- <abDsufbNKkUa1msb@gondor.apana.org.au>
-Content-Language: en-US
-From: T Pratham <t-pratham@ti.com>
-In-Reply-To: <abDsufbNKkUa1msb@gondor.apana.org.au>
+Date: Tue, 10 Mar 2026 23:00:28 -0700
+X-Gm-Features: AaiRm52f972dUARRHKzijDgoVU81dxtGZgEikl-nl7dIcDPZ6xeiqW2WuI2S4xg
+Message-ID: <CAEvNRgGdaA1ynF8jxQDPh9U0U8Q0RkE0=KJx4FNrh_=+dVRaLQ@mail.gmail.com>
+Subject: Re: [PATCH v2 5/7] KVM: guest_memfd: Add cleanup interface for guest teardown
+To: "Kalra, Ashish" <ashish.kalra@amd.com>, tglx@kernel.org, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com, 
+	peterz@infradead.org, thomas.lendacky@amd.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, ardb@kernel.org
+Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com, 
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com, 
+	jackyli@google.com, pgonda@google.com, rientjes@google.com, 
+	jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com, 
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com, 
+	darwi@linutronix.de, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF000061C4:EE_|SJ5PPFD6523AA75:EE_
-X-MS-Office365-Filtering-Correlation-Id: 144b253c-a2d3-4917-b079-08de7f2fb417
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700016|82310400026|22082099003|56012099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	RRXWtENcyjmjC8nk/C9ygz0MES5sM5REECAheWMwB0vk3Cv3EdBiVnuuiX/mJBlj29iLNb8p2I/GVkslNF9zM5kIbDhSqqU/MErYsgmgyabn7gdKg79Q62RPSJdV4p9Fo6cn/TtDIsbTTpBD5dP05GJ33OGsfoBa95hzig+rz1ClrinCc7Pgv64eJlEoqaOVgww4cR9loCmormTDJAr93vmmizAl/dxQg5ssLe3ALEArwEDzr+hny8F35OgdKcvGcMUkHA3V2HEDezd5RTQ6f8EE6yc5pQX78hH5hBDubt/dxWJvTJ88PuonFzxQnATke7uucELTMRpmTG2WdsDg3Gu2arAUOl7IATwW441mqBJYs5MntvDSeXSp2TR1Ij8BLPm/qAez1GG1a4O8rHr7+cBLWUw/b6ohFu8FjQ+8rCEFcks7gBS/0mxbagHSDxfWErS8rv5GDccnnuPSp4Ll/famSrkpGicZWEynJ/3iA3u6jsSPny8Fhdv0pElZqkrXrWtSKaofcxy8n7FBXdZMUXRf5F6CL7LaUACThKL8T/YR/5ohVdsOa0gMH5s5s+WhQpAiiZz5aOMVomkqtK9IsAD57TAVElvtE58WwSByfCsR158Ox4QpjSyAzj4gCp2XMGiOJZ65FzM9+XJe/pb5MdyRT0cOqS5n1zo6dbxacMohbUwKpjtlHAPbr5gvfbgl3qmMgGPRoEzdAz943uwZwaTGNxU6gvTizIIVUtWdtan9yRDv7Dbq/LakA0dqS2LcVna2VOtT/tHc/PwhxeSxyg==
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet201.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700016)(82310400026)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	H9iX4AsdrzM1yvjGDS+GGG71AB25bhls4knRNrvpRQN4udIhWR4Q3F9vUkLasYC0XnJ9WLk3/QZ9vxl1mFoUx+z79OjB+sT1Ni5BKBCpufE4jzssOPospSXMHICcHcp7BmETwG4JE4hfn1DbuWX76HMIY3fGX2uav0a+jfA4i1SKxne+R81cZOoaEHValtULHxrD+76ZXsp5ij2/OsKSE8UIpNK+j69oaZKo+/9OopC+tRpo4Vn3OMqYrUtNVjIJGi2mNuJQsFyhKbxxchm3zIps6OQz9T6Rlu2FNFG2ldIWODm3VerJJbcGzPPOc/GiAngm3AlF2IgapzkQCMvx13iJpVUWDE9T8uThLlNoLQepnePkFIoZBuvqMhCX+OSQULtgzRvZJZVcXwNBEYqfcO5BYTc4xvguwgRV2gYcWU7kMXkfibSd6lzMSdCMSt7F
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2026 05:33:19.3803
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 144b253c-a2d3-4917-b079-08de7f2fb417
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.195];Helo=[flwvzet201.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF000061C4.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFD6523AA75
 
-On 11/03/26 09:46, Herbert Xu wrote:
-> On Tue, Mar 10, 2026 at 10:35:15PM +0530, T Pratham wrote:
+"Kalra, Ashish" <ashish.kalra@amd.com> writes:
+
+> Hello Ackerley,
+>
+> On 3/9/2026 4:01 AM, Ackerley Tng wrote:
+>> Ashish Kalra <Ashish.Kalra@amd.com> writes:
 >>
->> What potential issue do you see? Both `dthe_aead_prep_src` and
->> `dthe_prep_aead_dst` functions use `sg_split`, which anyway allocates a
->> new scatterlist. Even if req->src == req->dst, the src and dst from here
->> on will be different.
-> 
-> The copied SG list will still point to the original memroy, right?
-> In that case you will end up DMA mapping the same region twice, once
-> as input and once as output.  I don't think that's guaranteed to
-> work, as you're supposed to map it once as BIDIRECTIONAL.
-> 
-> Cheers,
+>>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>>
+>>> Introduce kvm_arch_gmem_cleanup() to perform architecture-specific
+>>> cleanups when the last file descriptor for the guest_memfd inode is
+>>> closed. This typically occurs during guest shutdown and termination
+>>> and allows for final resource release.
+>>>
+>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>>> ---
+>>>
+>>> [...snip...]
+>>>
+>>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>>> index 017d84a7adf3..2724dd1099f2 100644
+>>> --- a/virt/kvm/guest_memfd.c
+>>> +++ b/virt/kvm/guest_memfd.c
+>>> @@ -955,6 +955,14 @@ static void kvm_gmem_destroy_inode(struct inode *inode)
+>>>
+>>>  static void kvm_gmem_free_inode(struct inode *inode)
+>>>  {
+>>> +#ifdef CONFIG_HAVE_KVM_ARCH_GMEM_CLEANUP
+>>> +	/*
+>>> +	 * Finalize cleanup for the inode once the last guest_memfd
+>>> +	 * reference is released. This usually occurs after guest
+>>> +	 * termination.
+>>> +	 */
+>>> +	kvm_arch_gmem_cleanup();
+>>> +#endif
+>>
+>> Folks have already talked about the performance implications of doing
+>> the scan and rmpopt, I just want to call out that one VM could have more
+>> than one associated guest_memfd too.
+>
+> Yes, i have observed that kvm_gmem_free_inode() gets invoked multiple times
+> at SNP guest shutdown.
+>
+> And the same is true for kvm_gmem_destroy_inode() too.
+>
+>>
+>> I think the cleanup function should be thought of as cleanup for the
+>> inode (even if it doesn't take an inode pointer since it's not (yet)
+>> required).
+>>
+>> So, the gmem cleanup function should not handle deduplicating cleanup
+>> requests, but the arch function should, if the cleanup needs
+>> deduplicating.
+>
+> I agree, the arch function will have to handle deduplicating,  and for that
+> the arch function will probably need to be passed the inode pointer,
+> to have a parameter to assist with deduplicating.
+>
 
-Oh, my bad. I though mapping only looked at the sg list for direction.
-Will update accordingly.
+By the time .free_folio() is called, folio->mapping may no longer exist,
+so if we definitely want to deduplicate using something in the inode,
+.free_folio() won't be the right callback to use.
 
--- 
-Regards
-T Pratham <t-pratham@ti.com>
+I was thinking that deduplicating using something in the folio would be
+better. Can rmpopt take a PFN range? Then there's really no
+deduplication, the cleanup would be nicely narrowed to whatever was just
+freed. Perhaps the PFNs could be aligned up to the nearest PMD or PUD
+size for rmpopt to do the right thing.
+
+Or perhaps some more tracking is required to check that the entire
+aligned range is freed before doing the rmpopt.
+
+I need to implement some of this tracking for guest_memfd HugeTLB
+support, so if the tracking is useful for you, we should discuss!
+
+>>
+>> Also, .free_inode() is called through RCU, so it could be called after
+>> some delay. Could it be possible that .free_inode() ends up being called
+>> way after the associated VM gets torn down, or after KVM the module gets
+>> unloaded?  Does rmpopt still work fine if KVM the module got unloaded?
+>
+> Yes, .free_inode() can probably get called after the associated VM has
+> been torn down and which should be fine for issuing RMPOPT to do
+> RMP re-optimizations.
+>
+> As far as about KVM module getting unloaded, then as part of the forthcoming patch-series,
+> during KVM module unload, X86_SNP_SHUTDOWN would be issued which means SNP would get
+> disabled and therefore, RMP checks are also disabled.
+>
+> And as CC_ATTR_HOST_SEV_SNP would then be cleared, therefore, snp_perform_rmp_optimization()
+> will simply return.
+>
+
+I think relying on CC_ATTR_HOST_SEV_SNP to skip optimization should be
+best as long as there are no races (like the .free_inode() will
+definitely not try to optimize when SNP is half shut down or something
+like that.
+
+> Another option is to add a new guest_memfd superblock operation, and then do the
+> final guest_memfd cleanup using the .evict_inode() callback. This will then ensure
+> that the cleanup is not called through RCU and avoids any kind of delays, as following:
+>
+> +static void kvm_gmem_evict_inode(struct inode *inode)
+> +{
+> +#ifdef CONFIG_HAVE_KVM_ARCH_GMEM_CLEANUP
+> +        kvm_arch_gmem_cleanup();
+> +#endif
+> +       truncate_inode_pages_final(&inode->i_data);
+> +       clear_inode(inode);
+> +}
+> +
+>
+
+At the point of .evict_inode(), CoCo-shared guest_memfd pages could
+still be pinned (for DMA or whatever, accidentally or maliciously), can
+rmpopt work on shared pages that might still be used for DMA?
+
+.invalidate_folio() and .free_folio() both actually happen on removal
+from guest_memfd ownership, though both are not exactly when the folio
+is completely not in use.
+
+Is the best time to optimize when the pages are truly freed?
+
+> @@ -971,6 +979,7 @@ static const struct super_operations kvm_gmem_super_operations = {
+>         .alloc_inode    = kvm_gmem_alloc_inode,
+>         .destroy_inode  = kvm_gmem_destroy_inode,
+>         .free_inode     = kvm_gmem_free_inode,
+> +       .evict_inode    = kvm_gmem_evict_inode,
+>  };
+>
+>
+> Thanks,
+> Ashish
+>
+>>
+>> IIUC the current kmem_cache_free(kvm_gmem_inode_cachep, GMEM_I(inode));
+>> is fine because in kvm_gmem_exit(), there is a rcu_barrier() before
+>> kmem_cache_destroy(kvm_gmem_inode_cachep);.
+>>
+>>>  	kmem_cache_free(kvm_gmem_inode_cachep, GMEM_I(inode));
+>>>  }
+>>>
+>>> --
+>>> 2.43.0
