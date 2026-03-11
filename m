@@ -1,141 +1,86 @@
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B9D3112C1
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 11:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6E437700D
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2026 11:40:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773229074; cv=none; b=GEh4XHMeFeVJ8nEG4JQ/m1vlaB4NXrvz/DsIzJHwS5++5UO35DQ050erruzdhRUEy5ufvJGZ7KUgKL/N1/IJNXX1k2nZuwshj9WajJ5AC9HrUUkne90M9X37xrl5OXtsa7j7RvKMEHYblgxmBdbmzkF8szB7ScdiHXR9E3T7aHI=
+	t=1773229247; cv=none; b=C+wXkzc5Sn7aoYSVZtyc+Q8ZcPTelqvBZnyc2jP2CoXSkO2Oddgd95OWmz4veB0BNvMrd+VImL5LBwgbi+Z+VpXb4aSV5arbHIY1B4SSfywkAnUXqsQolZjlR2Cf/W8GxoCXwfa/WV9an0qbfqjFHKDwta+h7FQKURuMKY0BDjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773229074; c=relaxed/simple;
-	bh=ff+pXBeQYZn8RFe6o+a36HLt3pxRVxLEQHjKOdTQukQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rQJK9XkEoP6J4u+iGj0gGiWYiZELyholfZVZlIxF5YzWgtU8wlD0ZBOmOYSwFUY6mCDcSsuOp1lb7msgV3RYmszR6w0aeFNV0LmpoJpK0sRJkUC5x/xrlVV/xpsnzsmJUfbmMscZHqOp9jXErJgFjTnZoNoZvDj13qqR4nW2SWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1773229062-1eb14e06e90ada0001-Xm9f1P
-Received: from zhaoxin.com (zxmail.zhaoxin.com [10.28.208.166]) by mx2.zhaoxin.com with ESMTP id nGhoytaVE1PTTgm4; Wed, 11 Mar 2026 19:37:42 +0800 (CST)
-X-Barracuda-Envelope-From: AlanSong-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.208.166
-Received: from [10.32.64.33] ([10.32.64.33] [10.32.64.33])
-	by zhaoxin.com (f222c4) with ESMTPd96bc589c732e7081ec6e05da615502b
-	Wed, 11 Mar 2026 19:37:41 +0800
-X-Eyou-Smtpauth: AlanSong-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.32.64.33
-X-Eyou-EnvelopeSender: AlanSong-oc@zhaoxin.com
-Message-ID: <5fe5b47d-5065-4e74-b2b3-4685e74a1130@zhaoxin.com>
-Date: Wed, 11 Mar 2026 19:37:39 +0800
+	s=arc-20240116; t=1773229247; c=relaxed/simple;
+	bh=0W2qDs9Pda2VTMqqyy80DUZU1WSJA8HR8VKSER3/HQU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LHql4giWqlPvAd0nXkLSZvKJIBsQ72fkRw9gwKcjclgWTlxbdK1F8A7Q+445MZZHoW+T1EDZ6vZbF5Ujnw5V8zx/Wz1nROJrVV/YtnJJKdXCG6+Wf+OW7motJ4Ww1Gm6AqGA1L9hx2742sr4NiMW6RKKasXilcsRQ0vL79Rentk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kRXZfNl1; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kRXZfNl1"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773229243;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1zXXtJLw22kU7ibsV83dH9zcIzG6mbgyF5sMgd5go/g=;
+	b=kRXZfNl1szwVPMCTGKbs/5CaKEkHTvPoFzmBWlDxaKf7dvja8EpCnYPLVoaj1JQl8l6yU4
+	ZlaDy9YhF10wpDdQW35InXYhp3KewVpodh9t6MTayjwpzjIKRasouEtn5qVCIm9oLEsosi
+	hWdSFIq6mdCoCECNx1KjRM0j/i7s88A=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: atmel-aes - guard unregister on error in atmel_aes_register_algs
+Date: Wed, 11 Mar 2026 12:39:28 +0100
+Message-ID: <20260311113927.305633-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/3] lib/crypto: x86/sha1: PHE Extensions optimized
- SHA1 transform function
-To: Eric Biggers <ebiggers@kernel.org>
-X-ASG-Orig-Subj: Re: [PATCH v3 2/3] lib/crypto: x86/sha1: PHE Extensions optimized
- SHA1 transform function
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, Jason@zx2c4.com,
- ardb@kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- x86@kernel.org, CobeChen@zhaoxin.com, TonyWWang-oc@zhaoxin.com,
- YunShen@zhaoxin.com, GeorgeXue@zhaoxin.com, LeoLiu@zhaoxin.com,
- HansHu@zhaoxin.com
-References: <20260116071513.12134-1-AlanSong-oc@zhaoxin.com>
- <20260116071513.12134-3-AlanSong-oc@zhaoxin.com>
- <20260118003120.GF74518@quark>
- <220d9651-3edc-4dc1-9086-e3482d2d5da3@zhaoxin.com>
- <20260305191848.GE2796@quark>
-Content-Language: en-US
-From: AlanSong-oc <AlanSong-oc@zhaoxin.com>
-In-Reply-To: <20260305191848.GE2796@quark>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Eyou-Sender: <alansong-oc@zhaoxin.com>
-X-Vid: 2fb0dcdb3705844b70fe9b892319803300@zhaoxin.com
-X-Barracuda-Connect: zxmail.zhaoxin.com[10.28.208.166]
-X-Barracuda-Start-Time: 1773229062
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 3268
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.155697
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1367; i=thorsten.blum@linux.dev; h=from:subject; bh=0W2qDs9Pda2VTMqqyy80DUZU1WSJA8HR8VKSER3/HQU=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJkbQ/JrCwuzvH+HfX+2UEixtn8FP9vv89f2pXZcb0q4a 9o+XeJpRykLgxgXg6yYIsuDWT9m+JbWVG4yidgJM4eVCWQIAxenAEzEVYrhr7jYsz1GvwVYLspc 8z4Q7Sb2U+DqzjOHN97ZPnFhh8X1+SoMv5hEyrS0L5qeK/zp/3tyWdHGjRpmMyZ0r9165J4Ox0y /Yj4A
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 3/6/26 03:18, Eric Biggers wrote:
-> On Thu, Mar 05, 2026 at 09:37:01AM +0800, AlanSong-oc wrote:
->>> Also, the spec describes all four registers as both input and output
->>> registers.  Yet your inline asm marks %rax and %rcx as inputs only.
->>
->> Thank you for pointing this question out.
->>
->> On the one hand, when the '+' constraint modifier is applied to an
->> operand, it is treated as both an input and an output operand.
->> Therefore, %rsi and %rdi are considered input operands as well.
->>
->> On the other hand, after the instruction executes, the values in %rax,
->> %rsi, and %rcx are modified. These registers should therefore use the
->> '+' constraint modifier to inform the compiler that their values are
->> updated by the assembly code. We cannot rely on clobbers to indicate
->> that the values of input operands are modified following the suggestion
->> by gcc manual. However, since %rax is initialized with a constant value,
->> it does not need the '+' constraint modifier. It should can simply be
->> specified as an input operand.
->>
->> In addition, although %rdi itself is not modified by the instruction but
->> the memory it references may be updated, a "memory" clobber should be
->> added to notify the compiler about possible memory side effects.
->>
->> The corrected inline assembly should be written as follows:
->>
->>     asm volatile(".byte 0xf3,0x0f,0xa6,0xc8" /* REP XSHA1 */
->>                 : "+S"(data), "+c"(nblocks)
->>                 : "a"((long)-1), "D"(dst)
->>                 : "memory");
-> 
-> If the instruction both reads and writes %rax, then the constraint needs
-> to be "+a", even if the C code doesn't use the updated value.  Otherwise
-> the compiler can assume that the value stored in %rax is unchanged and
-> optimize the code accordingly, for example by not reinitializing %rax if
-> the constant -1 is needed again later on.
-> 
-> Yes, this means you'll need to move the constant -1 to a local variable.
+Ensure the device supports XTS and GCM with 'has_xts' and 'has_gcm'
+before unregistering algorithms when XTS or authenc registration fails,
+which would trigger a WARN in crypto_unregister_alg().
 
-Indeed, to ensure that the compiler generates correct binary code under
-all optimization levels, the inline assembly should accurately describe
-the behavior of the instruction. I will use a local variable initialized
-to -1 for the instruction reads and writes %rax register in the next
-version of the patch.
+Currently, with the capabilities defined in atmel_aes_get_cap(), this
+bug cannot happen because all devices that support XTS and authenc also
+support GCM, but the error handling should still be correct regardless
+of hardware capabilities.
 
->>> As before, all these comments apply to the SHA-256 patch too.
->>
->> Surely, I will also apply all of the suggestions mentioned above to the
->> SHA-256 patch.
-> 
-> I also have to ask: are you sure you need SHA-1 to be optimized at all?
-> SHA-1 has been deprecated for a long time.  Most users have moved to
-> SHA-256 and other stronger algorithms, and those that haven't need to
-> move very soon.  There's little value in adding new optimized code for
-> SHA-1.
-> 
-> How about simplifying your patch to just SHA-256?  Then we can focus on
-> the one that's actually important and not on the deprecated SHA-1.
+Fixes: d52db5188a87 ("crypto: atmel-aes - add support to the XTS mode")
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/atmel-aes.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-It is true that SHA-1 is rarely used by most users today. However, it
-may still be needed in certain scenarios. For those cases, we would like
-to add support for the XHSA1 instruction to accelerate SHA-1.
-
-Does the crypto community have any plans to remove SHA-1 support in
-recent kernel versions?
-
-Best Regards
-AlanSong-oc
-
-
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index bc0c40f10944..64960eeeb17b 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -2270,10 +2270,12 @@ static int atmel_aes_register_algs(struct atmel_aes_dev *dd)
+ 	/* i = ARRAY_SIZE(aes_authenc_algs); */
+ err_aes_authenc_alg:
+ 	crypto_unregister_aeads(aes_authenc_algs, i);
+-	crypto_unregister_skcipher(&aes_xts_alg);
++	if (dd->caps.has_xts)
++		crypto_unregister_skcipher(&aes_xts_alg);
+ #endif
+ err_aes_xts_alg:
+-	crypto_unregister_aead(&aes_gcm_alg);
++	if (dd->caps.has_gcm)
++		crypto_unregister_aead(&aes_gcm_alg);
+ err_aes_gcm_alg:
+ 	i = ARRAY_SIZE(aes_algs);
+ err_aes_algs:
