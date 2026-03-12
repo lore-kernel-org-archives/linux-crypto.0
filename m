@@ -1,104 +1,148 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37F93AC0CD
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Mar 2026 20:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773345895; cv=none; b=C2BTrh/LJYyqVCSO6iNLJojaCP2W0Bt+44Epiz/5mfhbmnifH5I9FXmJzIub0kxMu6w3OAEi3KBlZ7L584bw2+wgA2Y6lNyu/ItzxMYXSmTS7dS7MKcmP87w5IoHRtXRZb7xgyXHOIFl9KVS/44ubOy9rLIb1b0ZyWSCTZyip2E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773345895; c=relaxed/simple;
-	bh=Q2Dz5/OEh6DH4pX3NgP0K3CGI0lXwl2eOSeT06eOFH4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ul8T/kkeZ2bBOHeQPNEP69i4P7rCmTGTsGkzlHOEdIpxsIWMvM8HMubv9VNF6wi+d+EHy1hCMfLS5gZs+z0yKmACyzwoFKnfL+exJonkEU672mLCkJDMnxTEmWnb4tmGTPsdQuvUpOeoB0QOF6Hq+8sgdyLl8IqIIlgq3tHJUAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qS4O+BzF; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101CA31A053
+	for <linux-crypto@vger.kernel.org>; Thu, 12 Mar 2026 21:35:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773351303; cv=pass; b=NkUKeD5miTMOdvBg2sH86D8KQkg4Ke2VwTYtErneP7xlX8XKBBly0YU2gwpfWb0fuQo/hGligj3LIxTDCmQH5cswkFMcAo/stZ8IMRHs69khq0hvCusv9Di3mQhbnAqmt4TBfAitk1gSjuFfF5Xq2PaaA271Turgq2DewoW977s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773351303; c=relaxed/simple;
+	bh=gIjUIJ1qavPnJ09f8IJAA3QTQeJp8aH9yAtz2EQNkXQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=h5WIQbz5xjyNK9MMuOaZHw9v1Jk8Y67a01uJk8LeGtsT8x1l+nb3j5dtiO7PGytMEq/H3ayRzps9AaltpORdWuhAQZ/ZpXplRM+vDe053HlQKPqU2ydKxdCGjeAkWG933TGxOivyDHxk8mOQdQvZsjnbRWfcoybeigi5wn/+BNA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BmXuZY58; arc=pass smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qS4O+BzF"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae502a1dd9so20298575ad.3
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Mar 2026 13:04:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BmXuZY58"
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7d4be94eeacso1747424a34.2
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Mar 2026 14:35:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773351301; cv=none;
+        d=google.com; s=arc-20240605;
+        b=hKL5w+x93F44x45uovgIHZ1I71ieUVXRk+ZqEvPexEzZzVJjifuBlh+t1OqBUkpF7/
+         O6qkkX13Q9E4+TyNRUbYCN6D/1UaW/JMsPhInro/RCqA8PQv+EJPCLo7Aiag86IGbX/R
+         x021765g38/+Wu8xuTKkhAsZSNEjaZ2IdRCo/plGuQep1I6HhTF0l69jRhHask9SOqn+
+         54+SKwtAITZHOtUBV29NOkspAz609Jd2aRfqmHnVU6hT0Ajg0lae6YvJ3fQaV6y4piom
+         hQdJos5VdQFZQh15Bmx4lURrKLfFeg84d3u+9qwYk9JJwUA22btL1TTh5ENEgMFqoZq4
+         7gyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=tdgabxvgrR3NH9n6dRdF+gCtINqaBantNHEPEnk5z6I=;
+        fh=mYukIsWbcql1crXa3qAu+y4z81B13a12BT+UnGNeqws=;
+        b=HPKH/0oxuYCe58opOFmKwQDwC/ykppo72RK7GbQduRpdFDAgmV3S7kKsuw7JOXI6Oy
+         eRAZxAXabA8t4vElnAvWyts6lQj4Y7HKNG+rp0Khm8bw327ikI5PM0GqRnmDsDnbTtkA
+         1ZJ9JjAEC6/oIDyN4paTjD6qkhV2nnHzgU35y9xNVhwMfFz+0KNs7Kz5WKoRJH4C0WLf
+         AJy+CEguPfQWOJDe2jGjKgBFf/l60eJyBnPBV3nEg5cEysu0k3C9zvc9hy6WF0DEGt2M
+         llDTKKXBRDaU3UUAbQVzjPHHLwJWea//VGQyeY9CjZb/PYCI1k/idO74xBrnuTiMoE2i
+         9frw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773345893; x=1773950693; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mquuBhH5mEBbGKF1zjKCYUJkvskIC0Bertlw5dm983s=;
-        b=qS4O+BzFHSVoxn0NOz01fRbXJYI8xiDIUFNINNAaLM3JjeDpJPsGPXjDeplIgDkGex
-         SIAiUbrvNFpY83Mi+AUl5xXMS/2pw9nkGE9hnOZavHjtojp3Sj0Pt+YZSWOnpLDaHi8p
-         uQkJT/VU5zJ2+DbN+lMQeQA80bLPvQjoI2x1vPX793FJkJHHzkPG0XadXZzA2KV4TNpL
-         4HqMW3rOfsOGHDbBBEGroMOWa8KZTj/0fnpB8PJia+XzlBs3N2oNns2/TzWqpHxN3MOw
-         5eHUNDQr4rXUByN/naaEKIDBxkG4bxkpp+yiG3OAeR+rV+4+BNsDKl3ylBCnYJDC2KTP
-         XhrQ==
+        d=gmail.com; s=20230601; t=1773351301; x=1773956101; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tdgabxvgrR3NH9n6dRdF+gCtINqaBantNHEPEnk5z6I=;
+        b=BmXuZY58sbCTlclLwTDEIdk3zWUzmRerA2+xA/8xhoajn+RuPUQ7Zf+V/0zcEIqvAq
+         qzN7ai5nt79apoYz6uJGPsCiW7uMWc1H6dZYoeNn6HlXP1paOgK+L+qD5SQmG9uGHdu5
+         HtP0Zckz2RZq4uwUOYQ4bvGPshtM3ymh8j8q93Cp4UguTrcrcUnXCt2X//jDue8hLXRB
+         fCHuB0gq+c3qb0W20OSfbLmHb3C6oFeRDykio8znFsRGeSQslYvhEuKvaRm3LHIQ5I45
+         VZJ2rzOo7EULsK1kPSWMxArS3sVhVejha3+s27ikFniZB8x6luNm38lsDl6xcS0C4S67
+         u88w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773345893; x=1773950693;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mquuBhH5mEBbGKF1zjKCYUJkvskIC0Bertlw5dm983s=;
-        b=FSUhTRN7dzK7D/DfGqFUkwkKNDJua89kUuy7fZpyf7U3R3EPmoKAy0+LvdD10kG4EI
-         vBevzXNTgWHoxSgpGg2FZb9b52QHDC05sj7XrQcb4PTW33kQt0pDoJ5+12OD/nLlc8H7
-         Ax4e+Vj1I3uzeKKs4PHrRa9/YSSKGgFMOS7sKPwmOKsIXOu79p/JLFXhwZ9SzJmqH6eR
-         QmVxXU94qMN0chVrCNPcIZM1JwSsyJS+t/gjSbIlNtRqwLiz+2BkesKxfoic8UFBeD6I
-         OXWzWEbCwqJ/6xC21K5JKoakCczsnV3eBhlfBU2y8Au7UOjc46AcLkauHnfTGtDa9Psv
-         lj9A==
-X-Forwarded-Encrypted: i=1; AJvYcCVTBJD9DOr8v2Sf4ZEzq1ENaXEsR20cmLmxc7L84nexSTWE5JEPziygZ9QrD3BzMY+1XAGEKdzWwrFuL0k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxspMAP/YfJxeFrCAPdMI+319AV4CloZQE1mhwEoGN1mdcD7FBg
-	9jsZYceMNtNk4nfgGe46pSh8Mb6n+0tX2eg9MlPTe8psR/ua7C1xsq1j6m93LQOn7FNQQjzSdWI
-	UUxZQag==
-X-Received: from plcf13.prod.google.com ([2002:a17:903:104d:b0:2ae:c5aa:fcd7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d485:b0:2ae:5228:e0ff
- with SMTP id d9443c01a7336-2aecaacf65cmr5648905ad.29.1773345892982; Thu, 12
- Mar 2026 13:04:52 -0700 (PDT)
-Date: Thu, 12 Mar 2026 13:04:51 -0700
-In-Reply-To: <20260303191509.1565629-1-tycho@kernel.org>
+        d=1e100.net; s=20251104; t=1773351301; x=1773956101;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tdgabxvgrR3NH9n6dRdF+gCtINqaBantNHEPEnk5z6I=;
+        b=SNmb9AwjvfROqGV+M+W8KmFHUPrEvvhsS3s2XHb+ctlHh/7dDB3t1HCHCP6/raNOKT
+         bO7ZGwhqnJj8Mr0B3/S2f5HHkBQe0qSYKVWA3S2eahV9m0WcSnXMG0ZDepQxfITENdKs
+         6e5HKx7u+rhDMfbsB9VRW1a8X7hAnCmFE8SuJhT0oB8DxhR1rLNZjlj101rx1JTiOMTE
+         89qjr5KEpy4myiLjzd1PcprFCRl80M0vtlo4xZ86pcGol3NevhoMkqAlYswF7xy5XmoC
+         781ws0RZdprV1V6PUwnmSs6+PvtQTClouL+NXA8t1i+Kj+dBW+3kQRCPkvueYJCknori
+         PpDw==
+X-Gm-Message-State: AOJu0YxZ712xK26iX82tWXpveA3ml9JiI+HEu+deJZ8DS4FHmUHsFRVz
+	IqFJafu566fT44KJRoFM47+57hFAwLdaQPHW+O0aNl3p3POWtu3UnjoI7k05whu9MpySKipwo9c
+	GLc8OzjTYgtgo3liLhXVc4oFXmL84Ic6hhF6A
+X-Gm-Gg: ATEYQzy6O6LHkRTgc3H3urhKILJTYLfvKBzZYAkyHoYpKhlaC+5VrCJyxozWsTeFXVN
+	b+LPkr5OA+1rWZjdFBqROvfToYeV3hfC3b463mpRDg5g8XYaVIUOwZMjb4idzaKV1z/+Ca5uxsg
+	luqgt+Y71iCDTebynY60img5sH/sJNvxTEplVuwkJYmbntW86IpdK/vd5SbtTzJVwPBgh/OVy3W
+	uXUBmzenP0mAaWC23SLOlFAGwXqHACPBGev0i7p0xOsXNH2DOxHy99RJyJMlam59SXsjqNijDgg
+	q+iFjiKPl3SLjDJIZ90jKucNPU+49e6ep1/KPT6pRAelTg4QBHGm018KaUk7f3FzfNOO8K2/6Oe
+	FNN4i
+X-Received: by 2002:a05:6870:6589:b0:404:15e7:b86c with SMTP id
+ 586e51a60fabf-417b906d0femr494861fac.3.1773351300889; Thu, 12 Mar 2026
+ 14:35:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260303191509.1565629-1-tycho@kernel.org>
-Message-ID: <abMcYw1wMin6cqY8@google.com>
-Subject: Re: [PATCH 0/5] Revoke supported SEV VM types
-From: Sean Christopherson <seanjc@google.com>
-To: Tycho Andersen <tycho@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Ashish Kalra <ashish.kalra@amd.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Shuah Khan <shuah@kernel.org>, Kim Phillips <kim.phillips@amd.com>, 
-	Alexey Kardashevskiy <aik@amd.com>, Nikunj A Dadhania <nikunj@amd.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+From: John S <xaum.io@gmail.com>
+Date: Thu, 12 Mar 2026 22:34:48 +0100
+X-Gm-Features: AaiRm519wtUg4oD9zNSZ11uUpzstseJGm2kD5X_fr26rbOp17N0s2he-FTifDv8
+Message-ID: <CAAZVx98ALZkDnDcGacJLAPag=tFDtScVmR1pMCPnXZpeRzwOQQ@mail.gmail.com>
+Subject: [PATCH] crypto: add missing kernel-doc for anonymous union members
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Mar 03, 2026, Tycho Andersen wrote:
-> From: "Tycho Andersen (AMD)" <tycho@kernel.org>
-> 
-> Recent SEV firmware [1] does not support SEV-ES VMs when SNP is enabled.
-> Sean suggested [2] adding an API so that userspace can check for this
-> condition, so do that. Also introduce and use SNP_VERIFY_MITIGATION to
-> determine whether it is present or not.
-> 
-> [1]: https://www.amd.com/en/resources/product-security/bulletin/amd-sb-3023.html
-> [2]: https://lore.kernel.org/all/aZyLIWtffvEnmtYh@google.com/
-> 
-> Tycho Andersen (AMD) (5):
->   kvm/sev: don't expose unusable VM types
->   crypto/ccp: introduce SNP_VERIFY_MITIGATION
->   crypto/ccp: export firmware supported vm types
->   kvm/sev: mask off firmware unsupported vm types
->   selftests/kvm: teach sev_*_test about revoking VM types
-> 
->  arch/x86/kvm/svm/sev.c                        | 16 +++-
->  drivers/crypto/ccp/sev-dev.c                  | 84 +++++++++++++++++++
->  include/linux/psp-sev.h                       | 56 +++++++++++++
->  .../selftests/kvm/x86/sev_init2_tests.c       | 14 ++--
->  .../selftests/kvm/x86/sev_migrate_tests.c     |  2 +-
->  .../selftests/kvm/x86/sev_smoke_test.c        |  4 +-
->  6 files changed, 162 insertions(+), 14 deletions(-)
+Document the anonymous SKCIPHER_ALG_COMMON and COMP_ALG_COMMON struct
+members in skcipher_alg, scomp_alg, and acomp_alg, following the
+existing pattern used by HASH_ALG_COMMON in shash_alg.
 
-Other than a few nits, this LGTM.  Even though the sev-dev.c changes are far more
-extensive, I would prefer to take the KVM changes through kvm-x86 due to the
-effective change in KVM's ABI.  I'd be happy to carry the whole thing, or use a
-stable topic branch as a base (patch 1 can easily become patch 3). 
+This fixes the following kernel-doc warnings:
+
+  include/crypto/skcipher.h:166: struct member 'SKCIPHER_ALG_COMMON'
+not described in 'skcipher_alg'
+  include/crypto/internal/scompress.h:39: struct member
+'COMP_ALG_COMMON' not described in 'scomp_alg'
+  include/crypto/internal/acompress.h:55: struct member
+'COMP_ALG_COMMON' not described in 'acomp_alg'
+
+Signed-off-by: Kit Dallege <xaum.io@gmail.com>
+---
+ include/crypto/internal/acompress.h | 1 +
+ include/crypto/internal/scompress.h | 1 +
+ include/crypto/skcipher.h           | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/include/crypto/internal/acompress.h
+b/include/crypto/internal/acompress.h
+index 9a3f28baa804..9cd37df32dc4 100644
+--- a/include/crypto/internal/acompress.h
++++ b/include/crypto/internal/acompress.h
+@@ -42,6 +42,7 @@
+  *
+  * @base:      Common crypto API algorithm data structure
+  * @calg:      Cmonn algorithm data structure shared with scomp
++ * @COMP_ALG_COMMON: see struct comp_alg_common
+  */
+ struct acomp_alg {
+        int (*compress)(struct acomp_req *req);
+diff --git a/include/crypto/internal/scompress.h
+b/include/crypto/internal/scompress.h
+index 6a2c5f2e90f9..13a0851a995b 100644
+--- a/include/crypto/internal/scompress.h
++++ b/include/crypto/internal/scompress.h
+@@ -22,6 +22,7 @@ struct crypto_scomp {
+  * @decompress:        Function performs a de-compress operation
+  * @streams:   Per-cpu memory for algorithm
+  * @calg:      Cmonn algorithm data structure shared with acomp
++ * @COMP_ALG_COMMON: see struct comp_alg_common
+  */
+ struct scomp_alg {
+        int (*compress)(struct crypto_scomp *tfm, const u8 *src,
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 9e5853464345..4efe2ca8c4d1 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -145,6 +145,7 @@ struct skcipher_alg_common SKCIPHER_ALG_COMMON;
+  *           considerably more efficient if it can operate on multiple chunks
+  *           in parallel. Should be a multiple of chunksize.
+  * @co: see struct skcipher_alg_common
++ * @SKCIPHER_ALG_COMMON: see struct skcipher_alg_common
+  *
+  * All fields except @ivsize are mandatory and must be filled.
+  */
+--
+2.53.0
