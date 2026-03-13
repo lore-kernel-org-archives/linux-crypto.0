@@ -1,238 +1,155 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513C723BD05
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Mar 2026 12:21:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5553AA4E6
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Mar 2026 14:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773404519; cv=none; b=h3ZjlaIbQ6aMt2NfQnTRwoemG3w/k5NDHKIcT/gyrD70m+X/dblFXVlDilGDGFkqcC0gC3bzRHMu0T9xLDH6gIupEG09567WAZxfDWSOo9xKPxZTbjONw872eJEKjWyC7OqsYQ2C8acm/nj6zzQAkntU5o+KDnzjyNKIpAzyGBY=
+	t=1773413618; cv=none; b=J9XMlI5WePddRHTc7XGeMiCG8I3W2K5vn9/sjpEGmvhpiIDGyheptJrCMbV29dWz4mzxBKzB48SuhrPPFnwiOvS0XKLm5/SqB0PesCvOTA/wI3m/reweS2KvSVX3Y7OC8oXqbNGKku5t0cGM6ZgnyvL/lttMzYftoE1EdixkB70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773404519; c=relaxed/simple;
-	bh=AJGpXmDrUPBdtvW9aSuAbhP6GwiLGVccEpCoB2Y4N/0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XoZ47f2jBihmgADQn/cgyz4hSirdBacPaSlk3rsNow3P4j0MOtmQj2ArlNRE5OYU+Gqo2Kw/8KCbo5Yd31ZbcR6gMjVjHie1EWQhJk1HgoF10E1v8uTTPKXWtrT+OqvI7LSKNP4WZF4PbgUBo8SLpl/qMKUMyv62mYhG19GuOc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=orqwxLlr; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=XgTTd/5S; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1773413618; c=relaxed/simple;
+	bh=mdwBFN8K5RDWuWmVmv54KlMzvSeOOo5UhSbsJBxJ9ZE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y0X0bsqsRxIMbwG9SUIJx2uuQk4MiZa3YTC0EL//2opltJJmOoD87tF+PlPjV3Q5QZpv3RNEnlvcozxRCcceZbBfrV4kt3FVfdQSd+5ktWlII+GSIcou6TNXg5JVFME5Mq0StHkFHeyzi1ns7cqCvkIi1ZmA0mafXH3KsUU0Bgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mxFD9SvI; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="orqwxLlr";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="XgTTd/5S"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62D7JmRR241596
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Mar 2026 12:21:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ncKVZp6XtiWfN25Y+BVjRXsXzdPkB+4zTH8BJYoYgGQ=; b=orqwxLlrS/9Ywxqj
-	Bvz92jzH+oYMtGt20OCM3gr3SDKkoVANZRarBlonAz05FhS2a7MJncV6x5Hxe4ks
-	C6lKsi2wIg1BJLZ90pFDJx1YSXkPECOAkRptqdNcZzdE+3KjVWbyLoPeN5PDR4J/
-	TbLSH8LXLDbqsJIdjJNW68MLNLbe/6y+7Qnfzpxr6NV06To2J1Cvw1VVXxMx61Mx
-	fFUq/WoaoOUGzcuac8Ce+NV3m//8i3NQ3QraRjG03nrwetVQC9B0cCjQFbERToK2
-	T8+GetsECcFtIOqW6YdqJksmJyVkchsw5g97epYEBhi0YeCU768D9OrGq2Crd650
-	ujnVRw==
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cve3d929y-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Mar 2026 12:21:57 +0000 (GMT)
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2ae57228f64so21581555ad.0
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Mar 2026 05:21:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxFD9SvI"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-829759ca646so1352667b3a.2
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Mar 2026 07:53:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1773404516; x=1774009316; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ncKVZp6XtiWfN25Y+BVjRXsXzdPkB+4zTH8BJYoYgGQ=;
-        b=XgTTd/5StA46X8FfLJzZShfVIJ5PS7327rChveMxhOG8rq8+z49wBrSpbybNG9MWXl
-         NsWSCOsapm7YkI93aKeN0Ft+ZZ+2HLdDf/fonKIYp3H0M0IH/i46/ZADa4zON/Acrf51
-         wOOfz8QHVmQgwLPM7pcdZ+6sm90rLpMVgRwWluoKrYBw2IMe1sTh2hB8oCGRQtbzwQTi
-         KsZ3vP4fbM9YhRY88wQWQfQrlZUvoD6YhcyaB09jLtAR+G6vTBNBYg15AED//IZC9C2g
-         GnIDR8FNyUhcDX5olcwVq7eUODEBPNWc9Ohv9vBnzvg7HOa5U5AgkqJBc3hnRp6NJrv6
-         qYFw==
+        d=gmail.com; s=20230601; t=1773413615; x=1774018415; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yhl5+IeUuVzO44nLBI8orasuKnNyReJagrIJl9tDNnw=;
+        b=mxFD9SvIOTPlP0Ll+aTtVOCi4doNUYq2TA+x1MQUiGIJKRKblh4i/EVQLlB08K8fHF
+         ejU2EI9P5+66/dmSqKQmE3+2ELeh/+oZy8Sn7NFL8qRDYtg+awPXgGsD6vcQCHJe4UYD
+         qEfI6znndNj6sVGrUCPOQbSQU1owX/cU7C8gFNHU/SB5A1vVPlVF2I/pKi1FmqAAYY/p
+         j7zlFksAC3aZTF6kzrFzsz2HpCHFh8PvrQkWmhduNuvEMtYhODiwiXUfHMQLN4OmgorK
+         8y82zodbUXwjyFC4TI23etfSazqfFSQmyfr9fn6hjvk+YQfNKH+b6JDexK8PqSftZOzw
+         35wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773404516; x=1774009316;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ncKVZp6XtiWfN25Y+BVjRXsXzdPkB+4zTH8BJYoYgGQ=;
-        b=IaGxthwEeU2wdCHtBtIoL5fgssKBSdckT7E6cx7GGoNXUCsYNm4w47bkz3Cb0pUXbk
-         2XBHc2OtVIvT5fNh+icTkQXUf/TdJ00/t6pRoAd7sbvgqfOx6ASMr5PKVzqfuB9hgQ1I
-         Z3To65vu9+HjF/6GDULIjMFiU2ZgB3miKsTAIt9w9YFJrQJFLUWBFe9KT+HN76Lz/LmC
-         x7sinAdpsivRGZG+3KXi4Foe4PLL4thXyyC8TtLG+fj+IvaNsQhWyV2tDnamyJQWB2vR
-         +SVdkEtUJ4kTBmE+BYjYiKwLydZezWWn+rKXjJMEsl8LgeUmgJEPXA1712rfw9exGf7N
-         +nJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX4ZyLMwYl39tbDB1naZJ+DOXQ0w0UyzQXN7x1EiI0JKGa9k5qjabwiZX16Naq/ml9g2APhbcr1wvWOf7c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTlTRsq97Af8HsfsqZTIjBf6s7vZl5GZ0FcNpI16ZaBs6egbaf
-	juI7pwHeBjinP45cClw3kl0Wia6ejpuR89GMboQYUXrqDrbN+Tsr4hKSHzwG70+HoXRXT81tPxR
-	xklWjvXWXbSJ4MHPiYv4yxJstHK3P3ahA6lfaY8EYxiveVTYYNKyxnX2M69sObM3gpUw=
-X-Gm-Gg: ATEYQzwKR3hc0hKBbN6zXuj/By1YaKuMSQIAWG1ErLv+n/BbwaCG3v8898q3ny+Y6JY
-	MD2FuquLwSGGeOW3rOM6DcLxAfw0PcVHpC95Tf+BSRPtjE/CwTDHYnPVMQKL5HMcuFdviCGa/Zw
-	4kwtcqEyrgrau2IN62IVdIfoqsGROdnAcnxvDvMKSImDFXtfQrOaNmZU/giHIRMc6B73vitp7RV
-	OXh0rXN+eG3oD2WrZnBW5VDW/HWHz7nY1tVd7IUQ6uqmmd7F7mayoif3HVBmOTA/3SEGq9BZUds
-	V02VVmsOZ7D4kxfdn8FY6ZJ9moM4tT5a/SFwrL7TQpjmDWpKzwv5Z21g854F50KbJv3xtCHobqs
-	mF/Xw9HvRLCT0YtO7EDnJgbC/OGdIUslaODF0EBzYq5V/Ht7NrrLOu78qivs=
-X-Received: by 2002:a17:903:1503:b0:2af:c7c:afbc with SMTP id d9443c01a7336-2af0c7cb19amr7817105ad.31.1773404516357;
-        Fri, 13 Mar 2026 05:21:56 -0700 (PDT)
-X-Received: by 2002:a17:903:1503:b0:2af:c7c:afbc with SMTP id d9443c01a7336-2af0c7cb19amr7816555ad.31.1773404515583;
-        Fri, 13 Mar 2026 05:21:55 -0700 (PDT)
-Received: from hu-arakshit-hyd.qualcomm.com ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece7ed9cdsm22318995ad.60.2026.03.13.05.21.50
+        d=1e100.net; s=20251104; t=1773413615; x=1774018415;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yhl5+IeUuVzO44nLBI8orasuKnNyReJagrIJl9tDNnw=;
+        b=MqjFKKrGbeR98q7W+u8i0PkZleWiQRoAUkf79Y68ZZMwjrpsTD13zLd+HggrWxGJPc
+         5MTL+gUd7ZffDYY5vQvgWprFen9PN+8g9GolT0sGGgWGoF+1+pT4+M/9Uu3kOroN+/5g
+         I3xkMJNc7e4KAKNz3BU1F446aJ5HpZk5PIYc0R1XTTFEJxtJdwwjxHSsRbrwEA0vTG8L
+         Xw45Yc/Roprc7QoYZWkPZPCi9r+9n93Y2jj5cvqzgc5FqTe7aCACg+hqwMqCByNv2sLY
+         Jq8z0Y87xbQl2M6ljGNYrSEspHN340cJLJhGCw2JBh5aBjwV3QDimhtUk4sNh3FEbCaC
+         5iuA==
+X-Gm-Message-State: AOJu0Yy2+i4f5f5mGgIL0pdBTn4vreQ5dL+Or6+B4kEVPSE16ve6XcZL
+	7IZfvlkAskIn6iDqc0qAx2kV3sxkuTkGU1fIJ50VPP2PFe8+Lepwa5MJ
+X-Gm-Gg: ATEYQzzuwkJr9SJeHjmlC894/tdFaVazX/ChYaoqJ+cv5JciDGvKAMvl09dfFUlO7G1
+	tlA3QqLn+j26lUhyR8+SSEv0FLv4DZMPdL9cIc8hWX7IjfJixaYdFVv4jZmCvRh/vX4UzsdHXBd
+	prIRZGSzzsNEVfQMzaoWB8SEGbFVl+0cwTfCjoRjNmpKYnUYsT3Chx7SWg08hfRXSvWE8CA9vCU
+	P7vfM+q72oToUljBIyg657UlbO7h1OqzkyyLZ9i/IZhwjARY4mzsoVJYLMjAh3qYzeFT9RfuMoG
+	mO+8CKcF30O9jHrN9s5oaofSse4EhMia+nChMI2+pOULQkpSDtC4prSiS3lzm+UtAoLptYVtSvG
+	UmBiEZo8AAPmjnjC1EgSLpfe55RHRaczmsQF7FmNXevKslTJBjAErCOqmbvwebB9bDdmQutNROc
+	3pnFg0G/AvYWV2nEjpclPNTsctluJ8FE3nITA0LW3D
+X-Received: by 2002:a05:6a00:138e:b0:81f:9b4c:81c0 with SMTP id d2e1a72fcca58-82a198b80e0mr3296300b3a.41.1773413615208;
+        Fri, 13 Mar 2026 07:53:35 -0700 (PDT)
+Received: from x540up.localdomain ([2408:8340:a629:1ce0:feaa:76fa:efb7:a761])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82a0738564csm5352372b3a.58.2026.03.13.07.53.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 05:21:55 -0700 (PDT)
-Date: Fri, 13 Mar 2026 17:51:48 +0530
-From: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Neeraj Soni <neeraj.soni@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: [PATCH v7 0/3] Enable ICE clock scaling
-Message-ID: <abQBXBNcrwgBpQYH@hu-arakshit-hyd.qualcomm.com>
-References: <20260302-enable-ufs-ice-clock-scaling-v7-0-669b96ecadd8@oss.qualcomm.com>
+        Fri, 13 Mar 2026 07:53:34 -0700 (PDT)
+From: Sun Chaobo <suncoding913@gmail.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	suncoding913@gmail.com
+Subject: [PATCH] crypto: Fix several spelling mistakes in comments
+Date: Fri, 13 Mar 2026 22:52:57 +0800
+Message-ID: <20260313145257.41937-1-suncoding913@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260302-enable-ufs-ice-clock-scaling-v7-0-669b96ecadd8@oss.qualcomm.com>
-X-Proofpoint-ORIG-GUID: hmlttcZUwGRFGZQSVjcVmsnQek-VRaND
-X-Authority-Analysis: v=2.4 cv=FLwWBuos c=1 sm=1 tr=0 ts=69b40165 cx=c_pps
- a=JL+w9abYAAE89/QcEU+0QA==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
- a=VwQbUJbxAAAA:8 a=FNyBlpCuAAAA:8 a=EUspDBNiAAAA:8 a=nmp4smzA0mTOGrukFIAA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=324X-CrmTo6CU4MGRt3R:22
- a=RlW-AWeGUCXs_Nkyno-6:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEzMDA5NyBTYWx0ZWRfX944DKxZ6sv4I
- IvKyx9SnUjzSiEqTp9YefbNpDO7btJT4p3Uy8OyXILz3hr61WAFJZ9kZGxqkx3GePIPEAtLtnBe
- s/d4QyJOYkzlr/9bxx732c+PrucsQt6wzdH/XtO31lPMRF31+ZkyVWGdp5rotE02oy+ZxZukrS9
- cheD883K7CFboxidV0liulck500IsykpPFeEGCfV1VI+EFonFHwr0N3IQhtW2RTepux4OTmYWQ7
- p3zmF7LrIy0D2NMbeUISS1hfp8X44Hc1rLvGPyATcTT8nwUKgtY+VikraC3FINJThik8GNRW5F/
- U+cRp3QhvrKQoVOxHTucPyyO6UHbR3hcU6OLpuDt1iGwtzxEoWLZqrgQTza0iK8hQOhZHNfOaxL
- qp1KzmRrhtMLpLwME8tzz9uwecjHgOVvjWLW8eCMo9wQAX7IE7ScVgD46aMEgguXYJW5/0ee898
- IR1L3bBRlQsujAm5WiQ==
-X-Proofpoint-GUID: hmlttcZUwGRFGZQSVjcVmsnQek-VRaND
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-13_02,2026-03-13_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 impostorscore=0 bulkscore=0 malwarescore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 adultscore=0 phishscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603130097
 
-On Mon, Mar 02, 2026 at 04:19:12PM +0530, Abhinaba Rakshit wrote:
-> Introduce support for dynamic clock scaling of the ICE (Inline Crypto Engine)
-> using the OPP framework. During ICE device probe, the driver now attempts to
-> parse an optional OPP table from the ICE-specific device tree node for
-> DVFS-aware operations. API qcom_ice_scale_clk is exposed by ICE driver
-> and is invoked by UFS host controller driver in response to clock scaling
-> requests, ensuring coordination between ICE and host controller.
-> 
-> For MMC controllers that do not support clock scaling, the ICE clock frequency
-> is kept aligned with the MMC controller’s clock rate (TURBO) to ensure
-> consistent operation.
-> 
-> Dynamic clock scaling based on OPP tables enables better power-performance
-> trade-offs. By adjusting ICE clock frequencies according to workload and power
-> constraints, the system can achieve higher throughput when needed and
-> reduce power consumption during idle or low-load conditions.
-> 
-> The OPP table remains optional, absence of the table will not cause
-> probe failure. However, in the absence of an OPP table, ICE clocks will
-> remain at their default rates, which may limit performance under
-> high-load scenarios or prevent performance optimizations during idle periods.
-> 
-> Merge Order and Dependencies
-> ============================
-> 
-> Patch 1/4 (dt-bindings) from the previous series
-> (https://lore.kernel.org/all/aaKt9PET6lVkBcif@gondor.apana.org.au/) has already
-> been applied. This v7 series therefore includes only the ICE driver and
-> UFS driver changes (previously patches 2–4).
-> 
-> Patch 1 is the change which should be merged first.
-> 
-> Patch 2 is dependent on patch 1 for the qcom_ice_scale_clk API to be available.
-> Patch 3 is dependent on patch 1 for opp-table parsing to be enabled in the
-> ICE driver.
-> 
-> Patch 2 and patch 3 are *not* dependent on each other. Once patch 1 is
-> merged, patch (2,3) can be applied independently by their respective
-> maintainers.
-> 
-> Signed-off-by: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
-> ---
-> Changes in v7:
-> - Replace the custom rounding flags with 'bool round_ceil' as suggested.
-> - Update the dev_info log-line.
-> - Dropped dt-bindings patch (already applied by in previous patchseries).
-> - Add merge order and dependencies as suggested.
-> - Link to v6: https://lore.kernel.org/r/20260219-enable-ufs-ice-clock-scaling-v6-0-0c5245117d45@oss.qualcomm.com
-> 
-> Changes in v6:
-> - Remove scale_up parameter from qcom_ice_scale_clk API.
-> - Remove having max_freq and min_freq as the checks for overclocking and underclocking is no-longer needed.
-> - UFS driver passes rounding flags depending on scale_up value.
-> - Ensure UFS driver does not fail devfreq requests if ICE OPP is not supported.
-> - Link to v5: https://lore.kernel.org/r/3ecb8d08-64cb-4fe1-bebd-1532dc5a86af@oss.qualcomm.com
-> 
-> Changes in v5:
-> - Update operating-points-v2 property in dtbindings as suggested.
-> - Fix comment styles.
-> - Add argument in qcom_ice_create to distinguish between legacy bindings and newer bindings.
-> - Ensure to drop votes in suspend and enable the last vote in resume.
-> - Link to v4: https://lore.kernel.org/r/20260128-enable-ufs-ice-clock-scaling-v4-0-260141e8fce6@oss.qualcomm.com
-> 
-> Changes in v4:
-> - Enable multiple frequency scaling based OPP-entries as suggested in v3 patchset.
-> - Include bindings change: https://lore.kernel.org/all/20260123-add-operating-points-v2-property-for-qcom-ice-bindings-v1-1-2155f7aacc28@oss.qualcomm.com/.
-> - Link to v3: https://lore.kernel.org/r/20260123-enable-ufs-ice-clock-scaling-v3-0-d0d8532abd98@oss.qualcomm.com
-> 
-> Changes in v3:
-> - Avoid clock scaling in case of legacy bindings as suggested.
-> - Use of_device_is_compatible to distinguish between legacy and non-legacy bindings.
-> - Link to v2: https://lore.kernel.org/r/20251121-enable-ufs-ice-clock-scaling-v2-0-66cb72998041@oss.qualcomm.com
-> 
-> Changes in v2:
-> - Use OPP-table instead of freq-table-hz for clock scaling.
-> - Enable clock scaling for legacy targets as well, by fetching frequencies from storage opp-table.
-> - Introduce has_opp variable in qcom_ice structure to keep track, if ICE instance has dedicated OPP-table registered.
-> - Combined the changes for patch-series <20251001-set-ice-clock-to-turbo-v1-1-7b802cf61dda@oss.qualcomm.com> as suggested.
-> - Link to v1: https://lore.kernel.org/r/20251001-enable-ufs-ice-clock-scaling-v1-0-ec956160b696@oss.qualcomm.com
-> 
-> ---
-> Abhinaba Rakshit (3):
->       soc: qcom: ice: Add OPP-based clock scaling support for ICE
->       ufs: host: Add ICE clock scaling during UFS clock changes
->       soc: qcom: ice: Set ICE clk to TURBO on probe
-> 
->  drivers/soc/qcom/ice.c      | 89 +++++++++++++++++++++++++++++++++++++++++++--
->  drivers/ufs/host/ufs-qcom.c | 19 +++++++++-
->  include/soc/qcom/ice.h      |  2 +
->  3 files changed, 106 insertions(+), 4 deletions(-)
-> ---
-> base-commit: fe4d0dea039f2befb93f27569593ec209843b0f5
-> change-id: 20251120-enable-ufs-ice-clock-scaling-b063caf3e6f9
-> 
-> Best regards,
-> -- 
-> Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
+Fix several typos in comments and messages.
+No functional change.
 
-Just a gentle reminder regarding this patch series.  
-Whenever any maintainers got a chance, I’d appreciate a review.
-Please let me know, anything pending from myside.
+Signed-off-by: Sun Chaobo <suncoding913@gmail.com>
+---
+ crypto/drbg.c   | 2 +-
+ crypto/lrw.c    | 2 +-
+ crypto/tcrypt.c | 2 +-
+ crypto/tea.c    | 2 +-
+ crypto/xts.c    | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
-Abhinaba Rakshit
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 1ed209e5d..9204e6edb 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1780,7 +1780,7 @@ static inline int __init drbg_healthcheck_sanity(void)
+ 	max_addtllen = drbg_max_addtl(drbg);
+ 	max_request_bytes = drbg_max_request_bytes(drbg);
+ 	drbg_string_fill(&addtl, buf, max_addtllen + 1);
+-	/* overflow addtllen with additonal info string */
++	/* overflow addtllen with additional info string */
+ 	len = drbg_generate(drbg, buf, OUTBUFLEN, &addtl);
+ 	BUG_ON(0 < len);
+ 	/* overflow max_bits */
+diff --git a/crypto/lrw.c b/crypto/lrw.c
+index dd403b800..aa31ab03a 100644
+--- a/crypto/lrw.c
++++ b/crypto/lrw.c
+@@ -134,7 +134,7 @@ static int lrw_next_index(u32 *counter)
+ /*
+  * We compute the tweak masks twice (both before and after the ECB encryption or
+  * decryption) to avoid having to allocate a temporary buffer and/or make
+- * mutliple calls to the 'ecb(..)' instance, which usually would be slower than
++ * multiple calls to the 'ecb(..)' instance, which usually would be slower than
+  * just doing the lrw_next_index() calls again.
+  */
+ static int lrw_xor_tweak(struct skcipher_request *req, bool second_pass)
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index aded37546..6374c86a1 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -2817,7 +2817,7 @@ static int __init tcrypt_mod_init(void)
+ 		pr_debug("all tests passed\n");
+ 	}
+ 
+-	/* We intentionaly return -EAGAIN to prevent keeping the module,
++	/* We intentionally return -EAGAIN to prevent keeping the module,
+ 	 * unless we're running in fips mode. It does all its work from
+ 	 * init() and doesn't offer any runtime functionality, but in
+ 	 * the fips case, checking for a successful load is helpful.
+diff --git a/crypto/tea.c b/crypto/tea.c
+index cb05140e3..7c66efcb5 100644
+--- a/crypto/tea.c
++++ b/crypto/tea.c
+@@ -2,7 +2,7 @@
+ /* 
+  * Cryptographic API.
+  *
+- * TEA, XTEA, and XETA crypto alogrithms
++ * TEA, XTEA, and XETA crypto algorithms
+  *
+  * The TEA and Xtended TEA algorithms were developed by David Wheeler 
+  * and Roger Needham at the Computer Laboratory of Cambridge University.
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 3da8f5e05..ad97c8091 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -76,7 +76,7 @@ static int xts_setkey(struct crypto_skcipher *parent, const u8 *key,
+ /*
+  * We compute the tweak masks twice (both before and after the ECB encryption or
+  * decryption) to avoid having to allocate a temporary buffer and/or make
+- * mutliple calls to the 'ecb(..)' instance, which usually would be slower than
++ * multiple calls to the 'ecb(..)' instance, which usually would be slower than
+  * just doing the gf128mul_x_ble() calls again.
+  */
+ static int xts_xor_tweak(struct skcipher_request *req, bool second_pass,
+-- 
+2.53.0
+
