@@ -1,126 +1,126 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7519381AF0;
-	Thu, 12 Mar 2026 23:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A1C29D267
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Mar 2026 02:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773358162; cv=none; b=Ye+Pdc9jw8JEHGGvWUdYNIwsQyzv+Lb5ff5kjH7avSbba4xR3NPdrJtqeFn3x5ildaARCTZg7lCJ375yJKlQHk8YSdMmlnDKhWRHYZ7Fl4oRsfFMUh30Srn41W54xjTUA5oRLiBxFcndT3rmV3j0OEZ4jiyjFtTpwZ4gjiOF6Qc=
+	t=1773370702; cv=none; b=iSR4xXfEDSeeKsUoB676oj0bOyOSq5aUMtd6fL54XecPVKKq3uZ4Ug/L7gDvVJGtQqwpi5wIAulbuqs0WP+OD/jVAy8psw5xLPirtgc0SixcOLLGkeZiMu7pXEGLG+Blz8s7GaODSpcpQ+UGAQcaalu3ix1BHgUwWzUGMiiQtJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773358162; c=relaxed/simple;
-	bh=HVckZe6uOXFDzy2maMy8UWVoRAnqAMdmbw/yWetzAIA=;
-	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
-	 Date:MIME-Version; b=W7OiI2JdOQJmxh1X/7ToHc2l/Zxdpf/arE2fGs/63A53I8G/Gnmg6MSOuKEmVo6myiZMzVi1TMrtL8PAnYZMTapN7zZnfQujG825i19Ur4Siav43QGOesRK4J7M58i593o5PEXXjDYGBMx4NnEoTmG13ETYZDsU71bJpq4zP9aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ff2LExjI; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ff2LExjI"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62CE4dbr2277871;
-	Thu, 12 Mar 2026 23:29:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=YdGHaX
-	tsaBMc2cJi7xl+DfXdP8fIaVn5mRlM2pdVS1Q=; b=Ff2LExjIZwqY2NYQw3xueC
-	Ew76mBShDoz1f1O9Mw0OX6haiSqeoiAmuU2uWZinKWgilxqZMZlZdb0Vg3eVbdSe
-	orhifVJZpCiOjTVNc8TQ0eRNsudebE2tAlYKdiodE1xqdzQV4J9/PXhxMQhxQoTa
-	YwclPkzT0Aw/aD9BGU4hhHS2RjhiFcgFa0mi1hSz6QIVBkCu3oT0pav2nbYGrlbz
-	JU1qepbj2G7WEmEcw8XXhErcSeJIrQpoibNjSqPwyQxTatgZ9aFfwykC8BobOOKh
-	ihurPfA208TzxmLuoJU/BY/sMN3wDW1f+1JC6veRavwx/lO/S9B5r6HGSuJWoWmA
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cuh91n8mr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Mar 2026 23:29:08 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 62CIU6UJ008855;
-	Thu, 12 Mar 2026 23:29:07 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cuha74f46-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Mar 2026 23:29:07 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 62CNT6QD33882692
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Mar 2026 23:29:06 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 711A358052;
-	Thu, 12 Mar 2026 23:29:06 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AE80D58045;
-	Thu, 12 Mar 2026 23:29:05 +0000 (GMT)
-Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.148.157])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 12 Mar 2026 23:29:05 +0000 (GMT)
-Message-ID: <1c5f16f0913bae48bf2f24feaaaf3525ecdf4c97.camel@linux.ibm.com>
-Subject: Re: [PATCH] ima: remove buggy support for asynchronous hashes
-From: Mimi Zohar <zohar@linux.ibm.com>
-To: Eric Biggers <ebiggers@kernel.org>, linux-integrity@vger.kernel.org,
-        Roberto Sassu <roberto.sassu@huawei.com>,
-        Dmitry Kasatkin
- <dmitry.kasatkin@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20260312053933.53012-1-ebiggers@kernel.org>
-References: <20260312053933.53012-1-ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Mar 2026 19:29:05 -0400
+	s=arc-20240116; t=1773370702; c=relaxed/simple;
+	bh=IR6A1otHvf3tVVQgSCtTc/HEsus/LQOysEV3QirjPrs=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=G84luLxbdurleOT58xN/9iEPu50ptybSOk3upXlCnKIf2pwgtT0SLaEvY1kfnSCclLOHk1oQu2uqvOanALyqJrCFUWg+LlGyjj5umgWFXdEW/2zLy75tJupM60JhZ56AtOcaVOWXY7WKM+KJ75VEmGmhGqrE+p8SsG51msuB1fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1773370690-1eb14e06e90f430001-Xm9f1P
+Received: from zhaoxin.com (zxmail.zhaoxin.com [10.28.208.166]) by mx2.zhaoxin.com with ESMTP id MjeYRtkynTMtLBAv; Fri, 13 Mar 2026 10:58:10 +0800 (CST)
+X-Barracuda-Envelope-From: AlanSong-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.208.166
+Received: from [10.32.65.155] ([10.32.65.155] [10.32.65.155])
+	by zhaoxin.com (f222c4) with ESMTPdae4bc1f931dac3f0c95d5cdb8b4502d
+	Fri, 13 Mar 2026 10:58:08 +0800
+X-Eyou-Smtpauth: AlanSong-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.32.65.155
+X-Eyou-EnvelopeSender: AlanSong-oc@zhaoxin.com
+Message-ID: <4b65047a-2a2f-4fd7-a349-525cf12d85c4@zhaoxin.com>
+Date: Fri, 13 Mar 2026 10:58:07 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: tuFJD93rQt2-ourjkBQZvSV0CRkMpYfG
-X-Authority-Analysis: v=2.4 cv=E6/AZKdl c=1 sm=1 tr=0 ts=69b34c44 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VwQbUJbxAAAA:8
- a=M1lwNKzopv0IjOVRZAQA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEyMDE4NSBTYWx0ZWRfXwv2Jxp38834c
- gOCp/l5g3cTuTyuWT7i8kqx3LQYILKHyFC0PEHvLBGZzJWbmtqrXVqx4gKLvgUmfwb71gO1wfhx
- EnJnbDchfqVPWHxG/Aesx9wZXD1S3LaiBvk6f4xPHWK+2xgJO19J6rxDH6i3FfeULnzzdr8ZzXA
- 88AeuM8Wc36TOfItqmmqf3QxFK9G7X8VS5zaKeMc62CS+onk4MshdYiN9IuxxMXo+jbB9YFguWW
- sXEJaagm/6QOao4Xhh3FugvWpHungCIsFh8wF5I0SZk2t8kt4FTUBVtaWOTgAm1qDq/QaGCCpTw
- +YA89n6RmS5Be+Lz7bprBSj8cq9ZWN/F8iU9OqpbJ4L6HjWKf2SujsYkGWKUzIlR25My9vvWtJO
- 5zX33KmbEvdrdVl6qLSL555KxSJpIihjmWQ9XXudDhVog33bBCW0+7FzS2qETJprOnTxYe6ETRa
- xjChO4FrZj5OXdX5tOg==
-X-Proofpoint-ORIG-GUID: SQaYzt5GqpusUkQQv835gltrlGmbVQDs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-12_03,2026-03-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 impostorscore=0 clxscore=1015 malwarescore=0 phishscore=0
- suspectscore=0 priorityscore=1501 spamscore=0 lowpriorityscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603120185
+User-Agent: Mozilla Thunderbird
+From: AlanSong-oc <AlanSong-oc@zhaoxin.com>
+Subject: Re: [PATCH v3 2/3] lib/crypto: x86/sha1: PHE Extensions optimized
+ SHA1 transform function
+To: Eric Biggers <ebiggers@kernel.org>
+X-ASG-Orig-Subj: Re: [PATCH v3 2/3] lib/crypto: x86/sha1: PHE Extensions optimized
+ SHA1 transform function
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, Jason@zx2c4.com,
+ ardb@kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ x86@kernel.org, CobeChen@zhaoxin.com, TonyWWang-oc@zhaoxin.com,
+ YunShen@zhaoxin.com, GeorgeXue@zhaoxin.com, LeoLiu@zhaoxin.com,
+ HansHu@zhaoxin.com
+References: <20260116071513.12134-1-AlanSong-oc@zhaoxin.com>
+ <20260116071513.12134-3-AlanSong-oc@zhaoxin.com>
+ <20260118003120.GF74518@quark>
+ <220d9651-3edc-4dc1-9086-e3482d2d5da3@zhaoxin.com>
+ <20260305191848.GE2796@quark>
+ <5fe5b47d-5065-4e74-b2b3-4685e74a1130@zhaoxin.com>
+ <20260312040349.GA2359@sol>
+Content-Language: en-US
+In-Reply-To: <20260312040349.GA2359@sol>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Eyou-Sender: <alansong-oc@zhaoxin.com>
+X-Vid: db7c8240c37d388c8148c185a68e628300@zhaoxin.com
+X-Barracuda-Connect: zxmail.zhaoxin.com[10.28.208.166]
+X-Barracuda-Start-Time: 1773370690
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 2664
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.155771
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-On Wed, 2026-03-11 at 22:39 -0700, Eric Biggers wrote:
-> IMA computes hashes using the crypto_shash or crypto_ahash API.=C2=A0 The
-> latter is used only when ima.ahash_minsize is set on the command line,
-> and its purpose is ostensibly to make the hash computation faster.
->=20
-> However, going off the CPU to a crypto engine and back again is actually
-> quite slow, especially compared with the acceleration that is built into
-> modern CPUs and the kernel now enables by default for most algorithms.
-> Typical performance results for SHA-256 on a modern platform can be
-> found at https://lore.kernel.org/linux-crypto/20250615184638.GA1480@sol/
->=20
-> Partly for this reason, several other kernel subsystems have already
-> dropped support for the crypto_ahash API.
+On 3/12/26 12:03, Eric Biggers wrote:
+> On Wed, Mar 11, 2026 at 07:37:39PM +0800, AlanSong-oc wrote:
+>>> I also have to ask: are you sure you need SHA-1 to be optimized at all?
+>>> SHA-1 has been deprecated for a long time.  Most users have moved to
+>>> SHA-256 and other stronger algorithms, and those that haven't need to
+>>> move very soon.  There's little value in adding new optimized code for
+>>> SHA-1.
+>>>
+>>> How about simplifying your patch to just SHA-256?  Then we can focus on
+>>> the one that's actually important and not on the deprecated SHA-1.
+>>
+>> It is true that SHA-1 is rarely used by most users today. However, it
+>> may still be needed in certain scenarios. For those cases, we would like
+>> to add support for the XHSA1 instruction to accelerate SHA-1.
+>>
+>> Does the crypto community have any plans to remove SHA-1 support in
+>> recent kernel versions?
+> 
+> It's already possible to build a kernel without SHA-1 support.  SHA-1
+> has been cryptographically broken and is considered obsolete.
+> Performance-critical hashing in the kernel already tends to use SHA-256.
+> 
+> These patches already feel marginal, as they are being pushed without
+> QEMU support, so the community will be unable to test them.  The only
+> reason I would consider accepting them without QEMU support is because
+> there was already code in drivers/crypto/ that used these instructions.
 
-The performance benefit was the ability of reading and filling a buffer fro=
-m=20
-disk, which was slow, while the other buffer was sent to the crypto engine.
+Sorry for the inconvenience caused by the inability to test provided
+patches, as QEMU currently does not support emulation of the XSHA1 and
+XSHA256 instructions.
 
-I'm all for removing extraneous code.  I'll give it a couple of days, befor=
-e
-queuing the patch in case there are any objections.
+Besides, since the previous patch adding XSHA384 and XSHA512 instruction
+support was not accepted, I would like to ask whether adding emulation
+support for XSHA384 and XSHA512 instructions in QEMU would help the
+crypto community evaluate and accept the corresponding kernel patches.
 
-thanks,
+> It also helps that they are just single instructions.  Though, even with
+> that I still found a bug in the proposed code as well as errors in the
+> CPU documentation, as mentioned.  And the drivers/crypto/ implementation
+> that uses these instructions is broken too, as you're aware of.
+> 
+> Overall, it's clear that platform-specific routines like this are very
+> risky to maintain without adequate testing.  Yet, correctness is the
+> first priority in cryptographic code.
+> 
+> So I would suggest that to reduce the risk, we focus on just one
+> algorithm, SHA-256.  Note that this makes your job easier, as well.
 
-Mimi
+Thanks for your suggestions. I will only add XSHA256 instruction support
+for the SHA-256 algorithm in the next version of the patch.
+
+Best Regards
+AlanSong-oc
