@@ -1,375 +1,253 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E76F1A681C;
-	Fri, 13 Mar 2026 09:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61449217F33
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Mar 2026 11:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773394901; cv=none; b=hc0Fz1tRVzYBFqKZwmSzoWkTALJJSwbHEX0XLa6Sxl5uaZkF5vFDG4xLgDHrYBSe64UN/yXs/GeT4UfUdsd+l+2d4PmaPsu0v2SqQOJBYsaXDswFzqgb6QvJXZMDFK2WFQ34pQpyO2Nz9CrtNUYr7kTkyYFcT+BI0iWyk5O2A8Y=
+	t=1773402368; cv=none; b=jrMQV7V9hGG1gh5eCnhE9v6/EYcdUT6yEoEnmc6i2W9QGj6+ExJ3lKRHNobA6E5tXFTKImchjuaEQ02YLK0kHRK6XZropsVwa11rUD4ydAB5o6btpyNry/5IfkS9lLg26dFg7nLnybt3/80QyEwSQyOIj7eKaYy0DjOkpDRgKxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773394901; c=relaxed/simple;
-	bh=1RBufhyG3lBLpNCUvmo+jrQMYAjCO9A/ClgOzZ+SqlY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KKm7Tpc8IPml8ZMkLU+sxPFV4PIauyCJRG+J84Efj7Qi+7QGxdC+xqPDWEp2Ra9snOEL2QQ0DIBD266v3x6SIDpIuqwdb2p5XsXOuyTxv8CXHsmmHJ8TjzlYJgSl8AUUY9FaPMNvAk0tsTkJ7kH5GQcZR1Z5QnjVWq9DKZ2ESbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=LXKCajaj; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1773402368; c=relaxed/simple;
+	bh=p9gRUw/1sa+IWFsrR/fQYGevFbp+SQEbBTw0TZ645PA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uRz93nku8vzTqCtfTwyWsfdxasGMsD5FrmRetPw8XyABIi7ipngWOKgj5P5Mp/ZX8nnq7DKMZSLgV22GdVKWsRw/pTeCA0XHBd/MnliAaUD9YbRYmUdj2DNpk42DVM6R4aTsW8LVjCOls1zf0HxevGRiqXwDDCbSRVPUwkQnFTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ottyQ+4t; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=ORC3YwAP; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="LXKCajaj"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=DfeESmDtqu7t+0yUbKKfbTdWfljYgVuD+uYyybDydGY=;
-	b=LXKCajajLXp3hdkV7RS4jHkLDKZ20W3rqp/NScXQYywg9elYXCU/2iX4en/oQ+dU57ntxO6qT
-	X2FLBI+WKKFOOYdoUmH5MHryNUSImLnWc6+bj+r9nsb3qD8TMigp1frD8wQ8hIhy/QnD0oo12iL
-	iaNlHw70DwV1KoDQgr1HfQs=
-Received: from mail.maildlp.com (unknown [172.19.162.140])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4fXK9X4Lnjz12LJy;
-	Fri, 13 Mar 2026 17:36:00 +0800 (CST)
-Received: from kwepemr100008.china.huawei.com (unknown [7.202.195.119])
-	by mail.maildlp.com (Postfix) with ESMTPS id DE0E420104;
-	Fri, 13 Mar 2026 17:41:34 +0800 (CST)
-Received: from localhost.localdomain (10.50.163.32) by
- kwepemr100008.china.huawei.com (7.202.195.119) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Fri, 13 Mar 2026 17:41:34 +0800
-From: ZongYu Wu <wuzongyu1@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
-	<wangzhou1@hisilicon.com>
-Subject: [PATCH] crypto:hisilicon - add device load query functionality to debugfs
-Date: Fri, 13 Mar 2026 17:40:39 +0800
-Message-ID: <20260313094039.3390686-1-wuzongyu1@huawei.com>
-X-Mailer: git-send-email 2.33.0
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ottyQ+4t";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="ORC3YwAP"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62D7JUF0240711
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Mar 2026 11:46:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	EQ6rmuUSOwm1bx/rwcwQuU4u+z1BgbLoQv3BSEX4INM=; b=ottyQ+4tYu5wB680
+	A79unT/3TpojUdSQQx0TmsybiGOQF0u+hXII1YgqqR4W4gYA648qRsjgK8QTbyAD
+	YWi4UgXmcwudls01G7GZ1Gk3yvI6SPd21vOF+obIfujNXK4AfpXug8M98uDzS75T
+	AgNfdRCnDrTRCVu2nGj1y5UL+ZDIwc7ipsAMLucDnHgLE4IqZEX1RAxmfUBRYeq3
+	aFmHT8G7T48s102xoNZn6QAkGwjysnky1PannEqIuDYBuxswdXhLzb6PNP9iSu8C
+	bjABis1E1XA6xqIlfFPH2d9cZMtGo7TBVgQ8GsTVxpMO3D0KPyYytSwB+zXQoqed
+	xNepFQ==
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cve3d8wgr-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Mar 2026 11:46:06 +0000 (GMT)
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-35a019abd6aso2160490a91.0
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Mar 2026 04:46:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1773402366; x=1774007166; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EQ6rmuUSOwm1bx/rwcwQuU4u+z1BgbLoQv3BSEX4INM=;
+        b=ORC3YwAPGkmUp3oAt8KixazmJqFOEmCmPgkafFdRCNeONChCq/UQoafYZEhJ8lp4uR
+         a49/hjeBW0weThTL898IunPKmXw/X5GVnuy/ABmhj4E9bEnErfTIQuOVHdxZzXMADtzq
+         DOnPINhFqLugBdmD/kvQUnfShp13qLgmc8QqnDVIJUxUobWGzkqwURjWS0oTibVN1MLR
+         8y7VjTyv3qAEdV5pGU9/0AcFM3DyXIfnTjp0Ymvb0dp2aElD+KlUb1TuW4GJpc3g50i+
+         snlLIZmADIW9CCDAcn7jOmOnjRc0OHqC6j5ripaDtA79H+pEoL24ox7B9MexYroGUVQa
+         09yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773402366; x=1774007166;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EQ6rmuUSOwm1bx/rwcwQuU4u+z1BgbLoQv3BSEX4INM=;
+        b=aeK2eHe0WQrtrkV8RN063/IJ/jC+l8Ifz5mp5UsDJhqqqbkG9MbMWsPwJoWa9q7kYJ
+         XcRvpLb25ej+zleb1RV3eZxdxfjPoSjMnh+kXSv7Z48xAZ9cHXW146Zc8QJdRm6iC1X3
+         f/2eulCkZ+4WtuTvCldwRiqdpbSQKl1AitnlAWd625td13EyXflv+74DhWLm8G06TdZM
+         VHv+4eqlg6U71f4CUcLD/ClSuOL8sfd5ooMdY0DBzbH2FI1jsfATsc6qxcWtSxtQvBNE
+         QdhmdbLv/yF9dehJo/uWWdHY4LCRq/aBzGBgsMTgcxTyBAmq5MbG0QA47JIylb06PFQE
+         dATw==
+X-Forwarded-Encrypted: i=1; AJvYcCXlDO9U4+mlMfJzX3nfuBPc4SIc/SxoRYx07U0EB4lP/PNd72pJ9QR6Xkb1G0P+sqS/cgAb562PMq4ntmo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxyd3zZ66Pzjj92Ua4DO2yoBq1aVT39RLuQX2P50HOGhDaSlHrX
+	F+VbGFDziGIOGi64N6fjeucgh+JegTtlt7+HSACcWT6Z9WNW5Rxi35MLUeF+ZVgPhc60+pufYlN
+	AA3KIOynPYtnbXcWfRiyblzuL708zccWUPbY9S61k4UCIrw1Oz1fX61dyILawpbi7kcU=
+X-Gm-Gg: ATEYQzy1RkxCd/snbkgLK3bN2Hi0b6Zc+HOvYYUsDQMv9amY6YGtvNRUlw4957GSVt5
+	YJvSxwhjBht9ko/k3jNcJEYf3yWcHacMw1BuA7FLUknQof1B4h3stocY2lLxuJqxvGOt6QY3VkU
+	d0kXZCpWpGf/CmRDyA8FaouWLW19GqvSMaZGagtpO3B6c2DLvkJZT2ra/lZMuDC9M9GVM/pyzak
+	cymSX4A7FXTVsmvlaClIyaPOBe4Y9J3Ap0SDSwYqY9LE+1Ss3k5HlyK+oP+2Lcuby53BPBiiupW
+	tbeQ0VXOH1kXQTHyHG8gqN1rO6eqGsGX2no6F0Gn6tWcSVTo2+jP0gOPLz/b2rTuw3HbaeivUnw
+	hg029Y2cXJmz3ttFb8LPNjhwpsQ0V5RrNM7EcTNJxv3ooaCZNm2U=
+X-Received: by 2002:a17:902:f552:b0:2ae:54e3:9299 with SMTP id d9443c01a7336-2aeba51229cmr56438925ad.21.1773402365558;
+        Fri, 13 Mar 2026 04:46:05 -0700 (PDT)
+X-Received: by 2002:a17:902:f552:b0:2ae:54e3:9299 with SMTP id d9443c01a7336-2aeba51229cmr56438565ad.21.1773402364893;
+        Fri, 13 Mar 2026 04:46:04 -0700 (PDT)
+Received: from [10.217.223.121] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece83b35fsm23082215ad.80.2026.03.13.04.45.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Mar 2026 04:46:04 -0700 (PDT)
+Message-ID: <fc3d1ef4-1a0f-41d5-a742-81305ee7f521@oss.qualcomm.com>
+Date: Fri, 13 Mar 2026 17:15:55 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemr100008.china.huawei.com (7.202.195.119)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/11] dt-bindings: crypto: qcom,ice: Allow
+ power-domain and iface clk
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Abel Vesa <abel.vesa@oss.qualcomm.com>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
+        cros-qcom-dts-watchers@chromium.org,
+        Eric Biggers <ebiggers@google.com>,
+        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+        Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
+        Tengfei Fan <tengfei.fan@oss.qualcomm.com>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Yuvaraj Ranganathan <quic_yrangana@quicinc.com>,
+        David Wronek <davidwronek@gmail.com>,
+        Luca Weiss <luca.weiss@fairphone.com>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Melody Olvera <quic_molvera@quicinc.com>
+Cc: Brian Masney <bmasney@redhat.com>,
+        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
+        Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+References: <20260310-qcom_ice_power_and_clk_vote-v2-0-b9c2a5471d9e@oss.qualcomm.com>
+ <20260310-qcom_ice_power_and_clk_vote-v2-1-b9c2a5471d9e@oss.qualcomm.com>
+ <2ac2efad-3533-490e-bb42-f21c4e950277@kernel.org>
+ <a2d6c630-e4df-4cdf-8b10-64d87d24bf8f@oss.qualcomm.com>
+ <b2d852c4-9f52-4ad4-a916-ced19c599938@kernel.org>
+ <972bd9c8-4671-4151-a3a9-d7eccdf83913@kernel.org>
+Content-Language: en-US
+From: Harshal Dev <harshal.dev@oss.qualcomm.com>
+In-Reply-To: <972bd9c8-4671-4151-a3a9-d7eccdf83913@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: rTpdAn72LI7uVsv7l0pNdUod_hsXgRD6
+X-Authority-Analysis: v=2.4 cv=FLwWBuos c=1 sm=1 tr=0 ts=69b3f8fe cx=c_pps
+ a=vVfyC5vLCtgYJKYeQD43oA==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
+ a=P-IC7800AAAA:8 a=EUspDBNiAAAA:8 a=dbIX2S3wHq3ruR6a9lMA:9 a=QEXdDO2ut3YA:10
+ a=rl5im9kqc5Lf4LNbBjHf:22 a=d3PnA9EDa4IxuAV0gXij:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEzMDA5MiBTYWx0ZWRfX5tG7w1zWzVri
+ tj//CG7j6QD2L/4E1UFaYtXuBb7Zby+8w66NmSuuBlkNulfN6g/8Ydwep7I7QxstlxJxqPOA4ob
+ FZSRI+ISih+15YU4NGqCiR2d7cyTxfDsHERCrxC1yci1R4tTFtutz0OTbXdZokDB8EJ2TxVdzsN
+ tqZntwpjWT92QQkSgTrHWtr8XPIV4IKOtsUrHzd65FYWO5+bB6j4CUwh5zyUbxGEhJhgX4DxcQA
+ BZ/T6KjRAxzV8oyKUtzDaL6ULp6sVSDrAHPOGe6Knxz3GVeznqLHLAdoOcpKWghkrN2IQ7ahHv0
+ v+ulByVP73ZSolMwetnbgWV+lpnn8HSq0Ubl5jBiZKCDaOD1puKDa7Hq0y1K3Ncn6wm7OD2I0MQ
+ 6aVMqhnUoLF8nKUeukvXgOFMrmQhZT1RSwzaCYZGUBs59/9nMaikloyUcgWvzLTMZ2duFd61oHm
+ TCIwIxjp0TQmfJV1qEQ==
+X-Proofpoint-GUID: rTpdAn72LI7uVsv7l0pNdUod_hsXgRD6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-13_02,2026-03-13_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 impostorscore=0 bulkscore=0 malwarescore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 adultscore=0 phishscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603130092
 
-From: Zongyu Wu <wuzongyu1@huawei.com>
+Hi Krzysztof,
 
-The accelerator device supports usage statistics. This patch enables
-obtaining the accelerator's usage through the "dev_usage" file.
-The returned number expressed as a percentage as a percentage.
+On 3/11/2026 11:58 PM, Krzysztof Kozlowski wrote:
+> On 11/03/2026 19:25, Krzysztof Kozlowski wrote:
+>> On 11/03/2026 10:37, Harshal Dev wrote:
+>>>
+>>>
+>>> On 3/11/2026 1:55 AM, Krzysztof Kozlowski wrote:
+>>>> On 10/03/2026 09:06, Harshal Dev wrote:
+>>>>> Update the inline-crypto engine DT binding to allow specifying up to two
+>>>>> clocks along with their names and associated power-domain. When the
+>>>>> 'clk_ignore_unused' flag is not passed on the kernel command line
+>>>>> occasional unclocked ICE hardware register access are observed during ICE
+>>>>> driver probe based on the relative timing between the probe and the kernel
+>>>>> disabling the unused clocks. On the other hand, when the 'pd_ignore_unused'
+>>>>> flag is not passed on the command line, clock 'stuck' issues are
+>>>>> observed if the power-domain required by ICE hardware is unused and thus
+>>>>> disabled before ICE probe. To avoid these scenarios, the 'iface' clock and
+>>>>> the associated power-domain should be specified in the ICE device tree node
+>>>>> and the 'iface' clock should be voted on by the ICE driver during probe.
+>>>>>
+>>>>> Fixes: f6ff91a47ac57 ("dt-bindings: crypto: Add Qualcomm Inline Crypto Engine")
+>>>>> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
+>>>>> ---
+>>>>>  .../bindings/crypto/qcom,inline-crypto-engine.yaml       | 16 +++++++++++++++-
+>>>>>  1 file changed, 15 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+>>>>> index c3408dcf5d20..d9a0a8adf645 100644
+>>>>> --- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+>>>>> +++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+>>>>> @@ -28,6 +28,16 @@ properties:
+>>>>>      maxItems: 1
+>>>>>  
+>>>>>    clocks:
+>>>>> +    minItems: 1
+>>>>> +    maxItems: 2
+>>>>> +
+>>>>> +  clock-names:
+>>>>> +    minItems: 1
+>>>>> +    items:
+>>>>> +      - const: ice_core_clk
+>>>>
+>>>> core
+>>>
+>>> Ack. I'll introduce a check for this specific name here as well:
+>>> https://elixir.bootlin.com/linux/v7.0-rc3/source/drivers/soc/qcom/ice.c#L582
+>>>
+>>>>
+>>>>> +      - const: iface_clk
+>>>>
+>>>> iface or bus
+>>>
+>>> Ack, will call it 'iface'.
+>>>
+>>>>
+>>>> I don't understand why this is flexible and commit msg does not explain
+>>>> that. Devices do not have one and two clocks at the same time. You miss
+>>>> proper constraints.
+>>>>
+>>>
+>>> I agree, it might confuse someone reading the commit message the first time.
+>>> I'll re-write the commit message to make it explicit that even though these
+>>> two properties are 'required', for the time being we are introducing 'iface'
+>>> clk and 'power-domain' as an optional property to maintain bisectability,
+>>> and that the properties would be made 'required' in a subsequent commit once
+>>> the DTS changes which are part of this patch series have reached the top tree.
+>>>
+>>> Let me know if any concerns with this kind of commit message.
+>>
+>> So you are adding it for backwards compatibility? It's fine then,
+>> although I had impression you are fixing something which is not working
+>> correctly. New devices will need to constrain this.
+> 
 
-Signed-off-by: Zongyu Wu <wuzongyu1@huawei.com>
----
- Documentation/ABI/testing/debugfs-hisi-hpre |  7 +++
- Documentation/ABI/testing/debugfs-hisi-sec  |  7 +++
- Documentation/ABI/testing/debugfs-hisi-zip  |  7 +++
- drivers/crypto/hisilicon/debugfs.c          | 54 +++++++++++++++++++++
- drivers/crypto/hisilicon/hpre/hpre_main.c   | 18 +++++++
- drivers/crypto/hisilicon/sec2/sec_main.c    | 11 +++++
- drivers/crypto/hisilicon/zip/zip_main.c     | 19 ++++++++
- include/linux/hisi_acc_qm.h                 | 12 +++++
- 8 files changed, 135 insertions(+)
+Yes, this is for backward compatibility.
 
-diff --git a/Documentation/ABI/testing/debugfs-hisi-hpre b/Documentation/ABI/testing/debugfs-hisi-hpre
-index 29fb7d5ffc69..5a137f701eea 100644
---- a/Documentation/ABI/testing/debugfs-hisi-hpre
-+++ b/Documentation/ABI/testing/debugfs-hisi-hpre
-@@ -50,6 +50,13 @@ Description:	Dump debug registers from the QM.
- 		Available for PF and VF in host. VF in guest currently only
- 		has one debug register.
- 
-+What:		/sys/kernel/debug/hisi_hpre/<bdf>/dev_usage
-+Date:		Mar 2026
-+Contact:	linux-crypto@vger.kernel.org
-+Description:	Query the real-time bandwidth usage of device.
-+		Returns the bandwidth usage of each channel on the device.
-+		The returned number is in percentage.
-+
- What:		/sys/kernel/debug/hisi_hpre/<bdf>/qm/current_q
- Date:		Sep 2019
- Contact:	linux-crypto@vger.kernel.org
-diff --git a/Documentation/ABI/testing/debugfs-hisi-sec b/Documentation/ABI/testing/debugfs-hisi-sec
-index 82bf4a0dc7f7..676e2dc2de8d 100644
---- a/Documentation/ABI/testing/debugfs-hisi-sec
-+++ b/Documentation/ABI/testing/debugfs-hisi-sec
-@@ -24,6 +24,13 @@ Description:	The <bdf> is related the function for PF and VF.
- 		1/1000~1000/1000 of total QoS. The driver reading alg_qos to
- 		get related QoS in the host and VM, Such as "cat alg_qos".
- 
-+What:		/sys/kernel/debug/hisi_sec2/<bdf>/dev_usage
-+Date:		Mar 2026
-+Contact:	linux-crypto@vger.kernel.org
-+Description:	Query the real-time bandwidth usage of device.
-+		Returns the bandwidth usage of each channel on the device.
-+		The returned number is in percentage.
-+
- What:		/sys/kernel/debug/hisi_sec2/<bdf>/qm/qm_regs
- Date:		Oct 2019
- Contact:	linux-crypto@vger.kernel.org
-diff --git a/Documentation/ABI/testing/debugfs-hisi-zip b/Documentation/ABI/testing/debugfs-hisi-zip
-index 0abd65d27e9b..46bf47bf6b42 100644
---- a/Documentation/ABI/testing/debugfs-hisi-zip
-+++ b/Documentation/ABI/testing/debugfs-hisi-zip
-@@ -36,6 +36,13 @@ Description:	The <bdf> is related the function for PF and VF.
- 		1/1000~1000/1000 of total QoS. The driver reading alg_qos to
- 		get related QoS in the host and VM, Such as "cat alg_qos".
- 
-+What:		/sys/kernel/debug/hisi_zip/<bdf>/dev_usage
-+Date:		Mar 2026
-+Contact:	linux-crypto@vger.kernel.org
-+Description:	Query the real-time bandwidth usage of device.
-+		Returns the bandwidth usage of each channel on the device.
-+		The returned number is in percentage.
-+
- What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/regs
- Date:		Nov 2018
- Contact:	linux-crypto@vger.kernel.org
-diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
-index 32e9f8350289..5d8b4112c543 100644
---- a/drivers/crypto/hisilicon/debugfs.c
-+++ b/drivers/crypto/hisilicon/debugfs.c
-@@ -1040,6 +1040,57 @@ void hisi_qm_show_last_dfx_regs(struct hisi_qm *qm)
- 	}
- }
- 
-+static int qm_usage_percent(struct hisi_qm *qm, int chan_num)
-+{
-+	u32 val, used_bw, total_bw;
-+
-+	val = readl(qm->io_base + QM_CHANNEL_USAGE_OFFSET +
-+				chan_num * QM_CHANNEL_ADDR_INTRVL);
-+	used_bw = lower_16_bits(val);
-+	total_bw = upper_16_bits(val);
-+	if (!total_bw)
-+		return -EIO;
-+
-+	if (total_bw <= used_bw)
-+		return QM_MAX_DEV_USAGE;
-+
-+	return (used_bw * QM_DEV_USAGE_RATE) / total_bw;
-+}
-+
-+static int qm_usage_show(struct seq_file *s, void *unused)
-+{
-+	struct hisi_qm *qm = s->private;
-+	bool dev_is_active = true;
-+	int i, ret;
-+
-+	/* If device is in suspended, usage is 0. */
-+	ret = hisi_qm_get_dfx_access(qm);
-+	if (ret == -EAGAIN) {
-+		dev_is_active = false;
-+	} else if (ret) {
-+		dev_err(&qm->pdev->dev, "failed to get dfx access for usage_show!\n");
-+		return ret;
-+	}
-+
-+	ret = 0;
-+	for (i = 0; i < qm->channel_data.channel_num; i++) {
-+		if (dev_is_active) {
-+			ret = qm_usage_percent(qm, i);
-+			if (ret < 0) {
-+				hisi_qm_put_dfx_access(qm);
-+				return ret;
-+			}
-+		}
-+		seq_printf(s, "%s: %d\n", qm->channel_data.channel_name[i], ret);
-+	}
-+
-+	if (dev_is_active)
-+		hisi_qm_put_dfx_access(qm);
-+
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(qm_usage);
-+
- static int qm_diff_regs_show(struct seq_file *s, void *unused)
- {
- 	struct hisi_qm *qm = s->private;
-@@ -1159,6 +1210,9 @@ void hisi_qm_debug_init(struct hisi_qm *qm)
- 		debugfs_create_file("diff_regs", 0444, qm->debug.qm_d,
- 					qm, &qm_diff_regs_fops);
- 
-+	if (qm->ver >= QM_HW_V5)
-+		debugfs_create_file("dev_usage", 0444, qm->debug.debug_root, qm, &qm_usage_fops);
-+
- 	debugfs_create_file("regs", 0444, qm->debug.qm_d, qm, &qm_regs_fops);
- 
- 	debugfs_create_file("cmd", 0600, qm->debug.qm_d, qm, &qm_cmd_fops);
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 884d5d0afaf4..357ab5e5887e 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -121,6 +121,8 @@
- #define HPRE_DFX_COMMON2_LEN		0xE
- #define HPRE_DFX_CORE_LEN		0x43
- 
-+#define HPRE_MAX_CHANNEL_NUM		2
-+
- static const char hpre_name[] = "hisi_hpre";
- static struct dentry *hpre_debugfs_root;
- static const struct pci_device_id hpre_dev_ids[] = {
-@@ -370,6 +372,11 @@ static struct dfx_diff_registers hpre_diff_regs[] = {
- 	},
- };
- 
-+static const char *hpre_channel_name[HPRE_MAX_CHANNEL_NUM] = {
-+	"RSA",
-+	"ECC",
-+};
-+
- static const struct hisi_qm_err_ini hpre_err_ini;
- 
- bool hpre_check_alg_support(struct hisi_qm *qm, u32 alg)
-@@ -1234,6 +1241,16 @@ static int hpre_pre_store_cap_reg(struct hisi_qm *qm)
- 	return 0;
- }
- 
-+static void hpre_set_channels(struct hisi_qm *qm)
-+{
-+	struct qm_channel *channel_data = &qm->channel_data;
-+	int i;
-+
-+	channel_data->channel_num = HPRE_MAX_CHANNEL_NUM;
-+	for (i = 0; i < HPRE_MAX_CHANNEL_NUM; i++)
-+		channel_data->channel_name[i] = hpre_channel_name[i];
-+}
-+
- static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- {
- 	u64 alg_msk;
-@@ -1267,6 +1284,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 		return ret;
- 	}
- 
-+	hpre_set_channels(qm);
- 	/* Fetch and save the value of capability registers */
- 	ret = hpre_pre_store_cap_reg(qm);
- 	if (ret) {
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index efda8646fc60..6647b7340827 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -133,6 +133,8 @@
- #define SEC_AEAD_BITMAP			(GENMASK_ULL(7, 6) | GENMASK_ULL(18, 17) | \
- 					GENMASK_ULL(45, 43))
- 
-+#define SEC_MAX_CHANNEL_NUM		1
-+
- struct sec_hw_error {
- 	u32 int_msk;
- 	const char *msg;
-@@ -1288,6 +1290,14 @@ static int sec_pre_store_cap_reg(struct hisi_qm *qm)
- 	return 0;
- }
- 
-+static void sec_set_channels(struct hisi_qm *qm)
-+{
-+	struct qm_channel *channel_data = &qm->channel_data;
-+
-+	channel_data->channel_num = SEC_MAX_CHANNEL_NUM;
-+	channel_data->channel_name[0] = "SEC";
-+}
-+
- static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- {
- 	u64 alg_msk;
-@@ -1325,6 +1335,7 @@ static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 		return ret;
- 	}
- 
-+	sec_set_channels(qm);
- 	/* Fetch and save the value of capability registers */
- 	ret = sec_pre_store_cap_reg(qm);
- 	if (ret) {
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 85b26ef17548..44df9c859bd8 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -122,6 +122,8 @@
- #define HZIP_LIT_LEN_EN_OFFSET		0x301204
- #define HZIP_LIT_LEN_EN_EN		BIT(4)
- 
-+#define HZIP_MAX_CHANNEL_NUM		3
-+
- enum {
- 	HZIP_HIGH_COMP_RATE,
- 	HZIP_HIGH_COMP_PERF,
-@@ -359,6 +361,12 @@ static struct dfx_diff_registers hzip_diff_regs[] = {
- 	},
- };
- 
-+static const char *zip_channel_name[HZIP_MAX_CHANNEL_NUM] = {
-+	"COMPRESS",
-+	"DECOMPRESS",
-+	"DAE"
-+};
-+
- static int hzip_diff_regs_show(struct seq_file *s, void *unused)
- {
- 	struct hisi_qm *qm = s->private;
-@@ -1400,6 +1408,16 @@ static int zip_pre_store_cap_reg(struct hisi_qm *qm)
- 	return 0;
- }
- 
-+static void zip_set_channels(struct hisi_qm *qm)
-+{
-+	struct qm_channel *channel_data = &qm->channel_data;
-+	int i;
-+
-+	channel_data->channel_num = HZIP_MAX_CHANNEL_NUM;
-+	for (i = 0; i < HZIP_MAX_CHANNEL_NUM; i++)
-+		channel_data->channel_name[i] = zip_channel_name[i];
-+}
-+
- static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- {
- 	u64 alg_msk;
-@@ -1438,6 +1456,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 		return ret;
- 	}
- 
-+	zip_set_channels(qm);
- 	/* Fetch and save the value of capability registers */
- 	ret = zip_pre_store_cap_reg(qm);
- 	if (ret) {
-diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-index 51a6dc2b97e9..8a581b5bbbcd 100644
---- a/include/linux/hisi_acc_qm.h
-+++ b/include/linux/hisi_acc_qm.h
-@@ -102,6 +102,12 @@
- #define QM_MIG_REGION_SEL		0x100198
- #define QM_MIG_REGION_EN		BIT(0)
- 
-+#define QM_MAX_CHANNEL_NUM		8
-+#define QM_CHANNEL_USAGE_OFFSET		0x1100
-+#define QM_MAX_DEV_USAGE		100
-+#define QM_DEV_USAGE_RATE		100
-+#define QM_CHANNEL_ADDR_INTRVL		0x4
-+
- /* uacce mode of the driver */
- #define UACCE_MODE_NOUACCE		0 /* don't use uacce */
- #define UACCE_MODE_SVA			1 /* use uacce sva mode */
-@@ -359,6 +365,11 @@ struct qm_rsv_buf {
- 	struct qm_dma qcdma;
- };
- 
-+struct qm_channel {
-+	int channel_num;
-+	const char *channel_name[QM_MAX_CHANNEL_NUM];
-+};
-+
- struct hisi_qm {
- 	enum qm_hw_ver ver;
- 	enum qm_fun_type fun_type;
-@@ -433,6 +444,7 @@ struct hisi_qm {
- 	struct qm_err_isolate isolate_data;
- 
- 	struct hisi_qm_cap_tables cap_tables;
-+	struct qm_channel channel_data;
- };
- 
- struct hisi_qp_status {
--- 
-2.33.0
+> Except new devices, like Eliza and Milos. And then this should go to
+> current fixes.
+
+I'm not sure if I understand correctly, do you mean to say that except for Eliza
+and Milos, new devices need to change their DT binding to 'required' with
+corresponding DTS changes. And then, the patch updating the DT binding also needs
+to be back-ported?
+
+I'm assuming you're leaving out Eliza and Milos because they aren't supported
+on the stable branches yet?
+
+Apologies in advance if you meant something else and I have completely misunderstood
+your comment.
+
+Regards,
+Harshal
+
+> 
+> Best regards,
+> Krzysztof
 
