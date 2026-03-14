@@ -1,46 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BD2270575;
-	Sat, 14 Mar 2026 04:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E4E1FC0FC;
+	Sat, 14 Mar 2026 04:56:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773463680; cv=none; b=W1DyH5h1ipyf15krChqBz+Tkwjgyvm2bvSrQJO2YhHCHxU8NoZ6n/cRwqdAS4emfpsDekKOpT1eFV2KLR2Axgq9fGZXkCpswWk6aibe7IjkRJ5M8O4HvzVKZq9MTxIh+ejpr5HHmBuRmcFcWVUz50CTmkOxfVWANzPFL9zwKcso=
+	t=1773464202; cv=none; b=SG5NUbdmsN0LYsRPvqYnOYAn7DqGp3ZUtvDBkQjKKQIk03Frf1RcsPHlWBriuldzTqTnyYfzLNY2szplVnVyyU5ioi/HV62xp+hILBDEZnQOSE2VI55Mk4wSwcHpTTp4kNfuhRwxhACCvP1Tp1gYgnYvGwZV5QKHcVDmGZqoTwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773463680; c=relaxed/simple;
-	bh=aUsc39vY13fXZOzUH3cZ0ZGmLO9wzXXOtpTB0Q4k/dE=;
+	s=arc-20240116; t=1773464202; c=relaxed/simple;
+	bh=WKzbUM/TetTYKdEGDFZcp+0PPb/Fq2fZOv9jLw8+k6k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JLJVFjopzPv4yo2zvpFetdy6nPMr1gjTK384F+zyV0vuRgNk4ytj0rofjhXzo5RmnwW9Fk3HWbmX5HkKxIhPXbpkjyT0PXGq2uuGxMLAHkmTl5ofiImmhHSeBSpO2tfqEqxAm9wM1wEshAm/aEjuVipOo0shcdSaf8NKn3z26Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=sgGlgfu8; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=Licyp5ouxAzgh8xeBoZ0LFDOn2JViG/EB9dGOhpMBK4MSSl9nsggluatVagjKgZiyRHK28lMVgvJjBB1MeEWSIcTxTskxtQTvJRiTcCFnDf3EWdfYt6vNBaAS8R4wj3tmSynuRiesEVt/S2T1PboqKk+s8NL1QvzNGOXiEyT9b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=n6z5ZCyl; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="sgGlgfu8"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="n6z5ZCyl"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=eoJtzYYgY9ROmVqLSa14oImeMikAFUZjBqozvLekkp4=; 
-	b=sgGlgfu80E9Jj7lsC4CJQDWV6R+z7gOOFt15wVRHjbzGaPlWhhOJhflKvyPIFnondLh9UNaR7np
-	E33oUujwnMIohz/fPKoozRCkUq/XcNGyEtacrTL/+f0GC2QFh1xw3rUgogEzzp4ytCJ5sMjzwGips
-	0cJif27HDNgPcts+JxUfUNCvYGiUI9+GgDOYwo2MxZXyDnJzdkqSlM6Z1gV3DF4694lGrdESNnfTi
-	kRkfabbiq5azJEY1qYRF9FElPAmcZtnz+v3O/4da7rLAf2wy9fewTu59Mo032BvJ3DRa289dExIgt
-	BRO8QT+nRFuJInRKtMav/8KDR80An4M7RazQ==;
+	from:content-type:reply-to; bh=BtaFN/3OIDRUzNsp9pMbMb+hL6db+m54rOKvY8r2Las=; 
+	b=n6z5ZCylKhckSVcPe2kcXMYHV769xnrGXH0np7daM/iNFGyMZfBs/no21dBkIqmxniYt+uMnUGo
+	7asnP4JtVbIY9c9Fi8XGB5cqv5Rl8qHp2WXRBOHFFPZkuTDCdvQ0fnyP+VXUBKvkUBWUdUBnsiqTr
+	8um9E02KFn6Gj7VLA7pNcG3rnPAcqRBDwbw1sz5/O+6kDNc0Qh5PokIrgywrN/ojwZ3++FdMykK/2
+	nXJnH7auKwt4yyXodN4Nc6SX1skQXbqV9QYQnPCmobnstVk/eEL3Jt/Gs+aGOreT8TGnv2R0/ZInP
+	Naa5gzkyxznZ1TFmiOgZJzZy/cxGbwvpoLKg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w1GuY-00EKsT-1L;
-	Sat, 14 Mar 2026 12:47:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Mar 2026 13:47:38 +0900
-Date: Sat, 14 Mar 2026 13:47:38 +0900
+	id 1w1H33-00EKwY-10;
+	Sat, 14 Mar 2026 12:56:26 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Mar 2026 13:56:25 +0900
+Date: Sat, 14 Mar 2026 13:56:25 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, linux-crypto@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] crypto: testmgr - Add test vectors for
- authenc(hmac(md5),cbc(aes))
-Message-ID: <abToanZh-mkEjmJ-@gondor.apana.org.au>
-References: <20260303184916.69132-1-olek2@wp.pl>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>,
+	Yuan Kang <Yuan.Kang@freescale.com>, stable@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: caam - remove HMAC key hex dumps from
+ hash_digest_key
+Message-ID: <abTqefme_iApfHZi@gondor.apana.org.au>
+References: <20260306111204.302544-1-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,31 +52,29 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260303184916.69132-1-olek2@wp.pl>
+In-Reply-To: <20260306111204.302544-1-thorsten.blum@linux.dev>
 
-On Tue, Mar 03, 2026 at 07:48:44PM +0100, Aleksander Jan Bajkowski wrote:
-> Test vectors were generated starting from existing CBC(AES) test vectors
-> (RFC3602, NIST SP800-38A) and adding HMAC(MD5) computed with Python
-> script. Then, the results were double-checked on Mediatek MT7981 (safexcel)
-> and NXP P2020 (talitos). Both platforms pass self-tests.
+On Fri, Mar 06, 2026 at 12:12:03PM +0100, Thorsten Blum wrote:
+> Stop dumping sensitive HMAC key bytes (original and reduced keys) in
+> hash_digest_key() to avoid leaking secrets when debug logging is
+> enabled.
 > 
-> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+> Fixes: 045e36780f11 ("crypto: caam - ahash hmac support")
+> Fixes: 3f16f6c9d632 ("crypto: caam/qi2 - add support for ahash algorithms")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 > ---
-> v4:
-> - rename aes-generic -> aes-lib
-> v3:
-> - correct sha384 -> md5 in description
-> v2:
-> - rebase and resolve conflicts
-> ---
->  crypto/testmgr.c |   7 ++
->  crypto/testmgr.h | 255 +++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 262 insertions(+)
+>  drivers/crypto/caam/caamalg_qi2.c | 5 -----
+>  drivers/crypto/caam/caamhash.c    | 6 ------
+>  2 files changed, 11 deletions(-)
 
-The previous patch has already been applied.  Please redo this
-as an incremental patch.
+What is the rationale for this? When debugging is enabled, all
+sorts of things could be dumped, e.g., passwords.
 
-Thanks,
+Is there a scenario where production systems will run with debugging
+enabled in caam?
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
