@@ -1,72 +1,39 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2555B1F8AC5
-	for <linux-crypto@vger.kernel.org>; Sat, 14 Mar 2026 20:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDFB330328;
+	Sat, 14 Mar 2026 21:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773519385; cv=none; b=ByscV9rq50fALV/jxAP9rKpzYd14SO6gbtM6pw/NPEkw9ntWrrCqwie54Zi5x8zLmZzPvOInUqiqYCRhtUStXjUgUbefNFoesjULiLaI7bzGGU6IFTSLLofjElSBf8NIsg8Kr5V2rioCHh7XbV5FIETRgS0q1jbYwD4F4fK3oCE=
+	t=1773524324; cv=none; b=nLx/NhvlbKwhT0YJ1OxfsPDDxFWHBmPM2W3bh/DqEK53cPDYUtaIgKrIPfj0LLph2ul6I6Ae5aBqAIQLRPciphJbfnGR8i8zA3ieSGh5H85cDWqTK/RVsbyZ9ChoXL2e+xvuTsCKyOWIpRCsqWPGDc0R1Bbua8Pca7AnhQ8xEAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773519385; c=relaxed/simple;
-	bh=nwd9TGE0ArumQDMwtlbSIeCeLPeEL2dHq0lKDmi8GKk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R5qwB310X/Qc+8qeF4y8D6nLotMtLiGaGZbH/+1W40sY8/cnPC6z8WVr8rP1SiGH0xO+srOSEpElkT4QDbq0GIRzuh4R8nm0fLpIRk/JTBhsnElmXPeyp/3JRlGpch9up2+a1DkSXHlVto9do2J3x8/OcKgesAHFHMcrREv8eHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hXnwPXFr; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773524324; c=relaxed/simple;
+	bh=f/UzhbLMWmIT+jvQzwOqvUeSfnVCrAz9+d4N0vjRNHE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MfmxgrRjXux4VmwyFGjrZhYiAnpSNHmxyFIkJEzuaU5HC60kQXZFoz6514arqocgJmjPl+q680Bbq2yyJ26mig1DSmzLaKcMx3bzAgsYIsijhOUpOeBRhc8m9L3Tuk/KngigKfZ639HAhYG0oySNKAw9tGLwaoB/wc06JMtp+Qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j+ydxqrb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hXnwPXFr"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4852a9c6309so26351155e9.0
-        for <linux-crypto@vger.kernel.org>; Sat, 14 Mar 2026 13:16:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773519382; x=1774124182; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GypZEyYWo72t7EHxUAotFf93/MQFLWWHVdEAGChBSyM=;
-        b=hXnwPXFrwHFsooSWlU3QjvwQLm4Z+XOHEcV5BKVX8kfXILsUu1Ia7HMemHD9mSzyRI
-         c26m4QmwN+U4dwVoBUCyjm2DlWJ8NMFcSPm46tZNe63DGXqH1M3d1jrPe8CVi5fOn1kh
-         F9CtcLdTNH+JDXici+GAjgzHj4KAy90Ot5b9XEaEzyahkBDxjoD2sagdvohsJwgMbb22
-         rVLVB0t81hgUw5wyL2D0WrEPXgTpDvk4S4083TOgVDrukM9xG3eSPSY88Y3nkARbbdKS
-         36xTSORJlTd4noshPEeWm8zxa7QSZO1koSJqPAMUnDFPt5eSmo8XktN/SK9T685/GZL3
-         vCDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773519382; x=1774124182;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GypZEyYWo72t7EHxUAotFf93/MQFLWWHVdEAGChBSyM=;
-        b=RySpdtFulP4qhPQaejOIS0BCbIRPZW9aKDa5LaHLgZwnocX0oL6phgSx0eQqXb27Ds
-         3UcyFNwrhwUqsLKACUOimgoVkgvDZ68g77Hi1tl+haRCCa1U2nrZ1PKTEdNFCaHlImGl
-         jtKZliMm7xQvufzK+iyAbFe9ft4vSwySLhAdbVclpaUvVRlcKL48pYnDU91nKCeiILuZ
-         oNPUNkmqApceGmwnEB5tViK7QdDSialGF+5G6pbCFL44/ItNhNFXQ0JagOsySg12HqGe
-         IFwvapsih8SQ8W/hdK45HOJCB+GjOp5Iuu4qGVZpj4u4ZlG9R4tFPIyfMi6KxiMXEB/o
-         7duw==
-X-Gm-Message-State: AOJu0Yx0JapQJ14QPThQd/JxsCpmHlDN+32w74h7/m1PBh83ulEdCydP
-	ayPEjSNtDiEFQTO47YFLm6PnDK2u0FdMKe7CtVsS7gD6TnVDjsqdHYBDfL8E0c4TtH8=
-X-Gm-Gg: ATEYQzyWgVIoCj/ABLtrrgl8/VXm+5myV6UGOvBvhXB5w9XcOxKZ74LlKCY+bJEbEeF
-	9GWIVfB7zEodnXLypCw0X1+UzVHjYDKKZRtSkf++O0zlsvt2j7OITKydD/NDqPNEGySNCjxHQ4Y
-	S4EO7+gvjafzbvAdIqx80tD+5WZ9VIL86q+c69rVuJ3y7Udg+32FfdOQYQSDF4XELD4cbpu28GL
-	um9nkDvQ7JRwB2dEEZ3++wriFsnvmjTgOGhg/px4/u21s1a2nSwbD3u63kDX06heJIDipXJ4Qll
-	/NwbqRCFrAdDwmMiqhEuy1ok/xjY4xUcFXPhuRkZTB9TqDyPhZEx31EaiyQt6ow80DfzJNDFzjy
-	jdv5LYqSUbc00r+8ep2mBvIDXfO7F07sYTAaWw9tGymtpTIiBIjRo0EplRR/NbJ3kVNbqgwI9lK
-	XtDGQlBMetOxqOVP6W
-X-Received: by 2002:a05:600c:8b6f:b0:485:3dfc:57c with SMTP id 5b1f17b1804b1-48556700bcemr125344845e9.21.1773519382333;
-        Sat, 14 Mar 2026 13:16:22 -0700 (PDT)
-Received: from kali ([196.65.190.215])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4854b5e912fsm803219945e9.2.2026.03.14.13.16.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Mar 2026 13:16:21 -0700 (PDT)
-From: Abdellah Ouhbi <abdououhbi1@gmail.com>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	me@brighamcampbell.com,
-	Abdellah Ouhbi <abdououhbi1@gmail.com>
-Subject: [PATCH] crypto:scompress: fix kernel-doc warning and spelling error
-Date: Sat, 14 Mar 2026 20:16:08 +0000
-Message-ID: <20260314201610.212712-1-abdououhbi1@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j+ydxqrb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C10CC116C6;
+	Sat, 14 Mar 2026 21:38:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773524324;
+	bh=f/UzhbLMWmIT+jvQzwOqvUeSfnVCrAz9+d4N0vjRNHE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=j+ydxqrb50vIfMk289r8NAPgRxpwrA5TkaO3G7rmRjcKxfkkzlWTlTLvlSiBXNoeM
+	 SH99MNj1awacKEfqfxHX/igZAIrVJBz4NPSwefUsgUSMo+bcy2AV8FFFpUZ3tlowfC
+	 EfLTb+sfS5Yx/kGHrnPerM75Yy5AhhpbQFBVzP6oAlyAfWTAMeZ9o28sZCMsm5EsEo
+	 5u0PRWGR9M4nxJCK/2g0oRfkrQxMyegtM+F4+vRPCLEk163AnzV7/TC7LaQsMnMAoa
+	 nFKng6N91wOVzGBQRBlqv5q8Jc56Z2/0wotZ10JAQ9dHu3e7yAa3Kf/pXzUtgtn54Z
+	 ZvlmvLjVNTFRg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] crypto: simd - Remove unused skcipher support
+Date: Sat, 14 Mar 2026 14:37:20 -0700
+Message-ID: <20260314213720.91525-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -75,36 +42,317 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix htmldocs build warning:
-./include/crypto/internal/scompress.h:39 struct member
-'COMP_ALG_COMMON' not described in 'scomp_alg'
+Remove the skcipher algorithm support from crypto/simd.c.  It is no
+longer used, and it is unlikely to gain any new user in the future,
+given the performance issues with this code.
 
-The struct scomp_alg contains an anonymous union member defined by
-macro COMP_ALG_COMMON that was not documented. Add documentation
-following the pattern used in other crypto headers for similar
-anonymous members.
-
-Also fix spelling error in existing comment: "Cmonn" to "Common".
-
-Signed-off-by: Abdellah Ouhbi <abdououhbi1@gmail.com>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- include/crypto/internal/scompress.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
-index 6a2c5f2e90f9..f91a2c3487ef 100644
---- a/include/crypto/internal/scompress.h
-+++ b/include/crypto/internal/scompress.h
-@@ -21,7 +21,8 @@ struct crypto_scomp {
-  * @compress:	Function performs a compress operation
-  * @decompress:	Function performs a de-compress operation
-  * @streams:	Per-cpu memory for algorithm
-- * @calg:	Cmonn algorithm data structure shared with acomp
-+ * @calg:	Common algorithm data structure shared with acomp
-+ * @COMP_ALG_COMMON: see struct comp_alg_common in crypto/acompress.h
+This patch is targeting cryptodev/master
+
+ crypto/simd.c                  | 231 +--------------------------------
+ include/crypto/internal/simd.h |  19 ---
+ 2 files changed, 5 insertions(+), 245 deletions(-)
+
+diff --git a/crypto/simd.c b/crypto/simd.c
+index f71c4a334c7d0..7cb3333e1763d 100644
+--- a/crypto/simd.c
++++ b/crypto/simd.c
+@@ -11,15 +11,15 @@
+  *    Author: Huang Ying <ying.huang@intel.com>
   */
- struct scomp_alg {
- 	int (*compress)(struct crypto_scomp *tfm, const u8 *src,
+ 
+ /*
+  * Shared crypto SIMD helpers.  These functions dynamically create and register
+- * an skcipher or AEAD algorithm that wraps another, internal algorithm.  The
+- * wrapper ensures that the internal algorithm is only executed in a context
+- * where SIMD instructions are usable, i.e. where may_use_simd() returns true.
+- * If SIMD is already usable, the wrapper directly calls the internal algorithm.
+- * Otherwise it defers execution to a workqueue via cryptd.
++ * an AEAD algorithm that wraps another, internal algorithm.  The wrapper
++ * ensures that the internal algorithm is only executed in a context where SIMD
++ * instructions are usable, i.e. where may_use_simd() returns true.  If SIMD is
++ * already usable, the wrapper directly calls the internal algorithm.  Otherwise
++ * it defers execution to a workqueue via cryptd.
+  *
+  * This is an alternative to the internal algorithm implementing a fallback for
+  * the !may_use_simd() case itself.
+  *
+  * Note that the wrapper algorithm is asynchronous, i.e. it has the
+@@ -28,236 +28,15 @@
+  */
+ 
+ #include <crypto/cryptd.h>
+ #include <crypto/internal/aead.h>
+ #include <crypto/internal/simd.h>
+-#include <crypto/internal/skcipher.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/preempt.h>
+ #include <asm/simd.h>
+ 
+-/* skcipher support */
+-
+-struct simd_skcipher_alg {
+-	const char *ialg_name;
+-	struct skcipher_alg alg;
+-};
+-
+-struct simd_skcipher_ctx {
+-	struct cryptd_skcipher *cryptd_tfm;
+-};
+-
+-static int simd_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+-				unsigned int key_len)
+-{
+-	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct crypto_skcipher *child = &ctx->cryptd_tfm->base;
+-
+-	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
+-	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(tfm) &
+-					 CRYPTO_TFM_REQ_MASK);
+-	return crypto_skcipher_setkey(child, key, key_len);
+-}
+-
+-static int simd_skcipher_encrypt(struct skcipher_request *req)
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct skcipher_request *subreq;
+-	struct crypto_skcipher *child;
+-
+-	subreq = skcipher_request_ctx(req);
+-	*subreq = *req;
+-
+-	if (!crypto_simd_usable() ||
+-	    (in_atomic() && cryptd_skcipher_queued(ctx->cryptd_tfm)))
+-		child = &ctx->cryptd_tfm->base;
+-	else
+-		child = cryptd_skcipher_child(ctx->cryptd_tfm);
+-
+-	skcipher_request_set_tfm(subreq, child);
+-
+-	return crypto_skcipher_encrypt(subreq);
+-}
+-
+-static int simd_skcipher_decrypt(struct skcipher_request *req)
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct skcipher_request *subreq;
+-	struct crypto_skcipher *child;
+-
+-	subreq = skcipher_request_ctx(req);
+-	*subreq = *req;
+-
+-	if (!crypto_simd_usable() ||
+-	    (in_atomic() && cryptd_skcipher_queued(ctx->cryptd_tfm)))
+-		child = &ctx->cryptd_tfm->base;
+-	else
+-		child = cryptd_skcipher_child(ctx->cryptd_tfm);
+-
+-	skcipher_request_set_tfm(subreq, child);
+-
+-	return crypto_skcipher_decrypt(subreq);
+-}
+-
+-static void simd_skcipher_exit(struct crypto_skcipher *tfm)
+-{
+-	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+-
+-	cryptd_free_skcipher(ctx->cryptd_tfm);
+-}
+-
+-static int simd_skcipher_init(struct crypto_skcipher *tfm)
+-{
+-	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct cryptd_skcipher *cryptd_tfm;
+-	struct simd_skcipher_alg *salg;
+-	struct skcipher_alg *alg;
+-	unsigned reqsize;
+-
+-	alg = crypto_skcipher_alg(tfm);
+-	salg = container_of(alg, struct simd_skcipher_alg, alg);
+-
+-	cryptd_tfm = cryptd_alloc_skcipher(salg->ialg_name,
+-					   CRYPTO_ALG_INTERNAL,
+-					   CRYPTO_ALG_INTERNAL);
+-	if (IS_ERR(cryptd_tfm))
+-		return PTR_ERR(cryptd_tfm);
+-
+-	ctx->cryptd_tfm = cryptd_tfm;
+-
+-	reqsize = crypto_skcipher_reqsize(cryptd_skcipher_child(cryptd_tfm));
+-	reqsize = max(reqsize, crypto_skcipher_reqsize(&cryptd_tfm->base));
+-	reqsize += sizeof(struct skcipher_request);
+-
+-	crypto_skcipher_set_reqsize(tfm, reqsize);
+-
+-	return 0;
+-}
+-
+-struct simd_skcipher_alg *simd_skcipher_create_compat(struct skcipher_alg *ialg,
+-						      const char *algname,
+-						      const char *drvname,
+-						      const char *basename)
+-{
+-	struct simd_skcipher_alg *salg;
+-	struct skcipher_alg *alg;
+-	int err;
+-
+-	salg = kzalloc_obj(*salg);
+-	if (!salg) {
+-		salg = ERR_PTR(-ENOMEM);
+-		goto out;
+-	}
+-
+-	salg->ialg_name = basename;
+-	alg = &salg->alg;
+-
+-	err = -ENAMETOOLONG;
+-	if (snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", algname) >=
+-	    CRYPTO_MAX_ALG_NAME)
+-		goto out_free_salg;
+-
+-	if (snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
+-		     drvname) >= CRYPTO_MAX_ALG_NAME)
+-		goto out_free_salg;
+-
+-	alg->base.cra_flags = CRYPTO_ALG_ASYNC |
+-		(ialg->base.cra_flags & CRYPTO_ALG_INHERITED_FLAGS);
+-	alg->base.cra_priority = ialg->base.cra_priority;
+-	alg->base.cra_blocksize = ialg->base.cra_blocksize;
+-	alg->base.cra_alignmask = ialg->base.cra_alignmask;
+-	alg->base.cra_module = ialg->base.cra_module;
+-	alg->base.cra_ctxsize = sizeof(struct simd_skcipher_ctx);
+-
+-	alg->ivsize = ialg->ivsize;
+-	alg->chunksize = ialg->chunksize;
+-	alg->min_keysize = ialg->min_keysize;
+-	alg->max_keysize = ialg->max_keysize;
+-
+-	alg->init = simd_skcipher_init;
+-	alg->exit = simd_skcipher_exit;
+-
+-	alg->setkey = simd_skcipher_setkey;
+-	alg->encrypt = simd_skcipher_encrypt;
+-	alg->decrypt = simd_skcipher_decrypt;
+-
+-	err = crypto_register_skcipher(alg);
+-	if (err)
+-		goto out_free_salg;
+-
+-out:
+-	return salg;
+-
+-out_free_salg:
+-	kfree(salg);
+-	salg = ERR_PTR(err);
+-	goto out;
+-}
+-EXPORT_SYMBOL_GPL(simd_skcipher_create_compat);
+-
+-void simd_skcipher_free(struct simd_skcipher_alg *salg)
+-{
+-	crypto_unregister_skcipher(&salg->alg);
+-	kfree(salg);
+-}
+-EXPORT_SYMBOL_GPL(simd_skcipher_free);
+-
+-int simd_register_skciphers_compat(struct skcipher_alg *algs, int count,
+-				   struct simd_skcipher_alg **simd_algs)
+-{
+-	int err;
+-	int i;
+-	const char *algname;
+-	const char *drvname;
+-	const char *basename;
+-	struct simd_skcipher_alg *simd;
+-
+-	err = crypto_register_skciphers(algs, count);
+-	if (err)
+-		return err;
+-
+-	for (i = 0; i < count; i++) {
+-		WARN_ON(strncmp(algs[i].base.cra_name, "__", 2));
+-		WARN_ON(strncmp(algs[i].base.cra_driver_name, "__", 2));
+-		algname = algs[i].base.cra_name + 2;
+-		drvname = algs[i].base.cra_driver_name + 2;
+-		basename = algs[i].base.cra_driver_name;
+-		simd = simd_skcipher_create_compat(algs + i, algname, drvname, basename);
+-		err = PTR_ERR(simd);
+-		if (IS_ERR(simd))
+-			goto err_unregister;
+-		simd_algs[i] = simd;
+-	}
+-	return 0;
+-
+-err_unregister:
+-	simd_unregister_skciphers(algs, count, simd_algs);
+-	return err;
+-}
+-EXPORT_SYMBOL_GPL(simd_register_skciphers_compat);
+-
+-void simd_unregister_skciphers(struct skcipher_alg *algs, int count,
+-			       struct simd_skcipher_alg **simd_algs)
+-{
+-	int i;
+-
+-	crypto_unregister_skciphers(algs, count);
+-
+-	for (i = 0; i < count; i++) {
+-		if (simd_algs[i]) {
+-			simd_skcipher_free(simd_algs[i]);
+-			simd_algs[i] = NULL;
+-		}
+-	}
+-}
+-EXPORT_SYMBOL_GPL(simd_unregister_skciphers);
+-
+-/* AEAD support */
+-
+ struct simd_aead_alg {
+ 	const char *ialg_name;
+ 	struct aead_alg alg;
+ };
+ 
+diff --git a/include/crypto/internal/simd.h b/include/crypto/internal/simd.h
+index 9e338e7aafbd9..f5e5d7b639519 100644
+--- a/include/crypto/internal/simd.h
++++ b/include/crypto/internal/simd.h
+@@ -8,29 +8,10 @@
+ 
+ #include <asm/simd.h>
+ #include <linux/percpu.h>
+ #include <linux/types.h>
+ 
+-/* skcipher support */
+-
+-struct simd_skcipher_alg;
+-struct skcipher_alg;
+-
+-struct simd_skcipher_alg *simd_skcipher_create_compat(struct skcipher_alg *ialg,
+-						      const char *algname,
+-						      const char *drvname,
+-						      const char *basename);
+-void simd_skcipher_free(struct simd_skcipher_alg *alg);
+-
+-int simd_register_skciphers_compat(struct skcipher_alg *algs, int count,
+-				   struct simd_skcipher_alg **simd_algs);
+-
+-void simd_unregister_skciphers(struct skcipher_alg *algs, int count,
+-			       struct simd_skcipher_alg **simd_algs);
+-
+-/* AEAD support */
+-
+ struct simd_aead_alg;
+ struct aead_alg;
+ 
+ int simd_register_aeads_compat(struct aead_alg *algs, int count,
+ 			       struct simd_aead_alg **simd_algs);
+
+base-commit: 2c8669bbb7c783dce2541ecb4f24489b2d2175f5
 -- 
-2.51.0
+2.53.0
 
