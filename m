@@ -1,44 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA87F507;
-	Sat, 14 Mar 2026 16:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430BB225416;
+	Sat, 14 Mar 2026 17:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773507358; cv=none; b=LERT/5f1k4wrjD0Ep3PnuKdioYfqj13hhCFiydn8w6KLjkAf+ncj/B9q07cmRuQw0bg/z/W7oqxs/e6geDSFHX1+PtwMbZadiID4W0P8IHyxlQY+FWMHIjoMaWpbM3QrTQLZJzsAQApqLHbkToF33CCK6rqQ8CN8uZN/HEn0tKw=
+	t=1773508990; cv=none; b=PjC+N6ThqRJxqIfKbJg1/gA0vZ2g2xA2GKbFXYKtspeSeEsNQUKOsr//ftk7SlQ9w8B6TCky6aSYyOBY5MP2b5XrcCCPSOuY/vjYGs2mG362qNi+KMtE/oxbMs7amoeXWXpuuZ6d8gBSuFGnDvmx5eEjG0Ds5hdhRRrJ3W2T2Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773507358; c=relaxed/simple;
-	bh=OU2kqLqL46R/whoj7/DBKG1N2KxHrjeHH683kSBKUxc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I3DusJEh5h9Mbll00Kz7CgBl+L71wrSujgytCHgU7eB/bL6fe1FfnwUkevMZIeF5lu969N0aSv0Mc1qUSvV4xXKkdPjCMhgQJ3CxvwPHfMjRWKJKJ6FF3l5Kwtw/azvABAIMoTTOtmHWoRjL4xgiC1kbjUK8ny/LWqyAlDDJWeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ANCrx5T8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773508990; c=relaxed/simple;
+	bh=4cOsk2lY3LTa99G3MdQoK8BC43EoIInJQtYTcXWnq14=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u9xVX3APZ/J0XMutxu/WbqMK+DLGQNZ6xcgebpEzRdN2Jx3THG/GpOHTw5LDSbzgN6YiVAhHZMtVuyivMXCJ4jitYoElVCfP0FHdwerkVJ8XySHcVaOIVZ5tzU2yijJ6YwGOVP+xcIpD5ynEEO3qLKbI9LWcIib8uYOmy7sAjVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h1hWt8o2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ANCrx5T8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B3DEC116C6;
-	Sat, 14 Mar 2026 16:55:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h1hWt8o2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C13FC116C6;
+	Sat, 14 Mar 2026 17:23:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773507358;
-	bh=OU2kqLqL46R/whoj7/DBKG1N2KxHrjeHH683kSBKUxc=;
+	s=k20201202; t=1773508989;
+	bh=4cOsk2lY3LTa99G3MdQoK8BC43EoIInJQtYTcXWnq14=;
 	h=From:To:Cc:Subject:Date:From;
-	b=ANCrx5T8MufQXBY2woTDqlBfXgvZxyD4i8MsnPhrQbASPKjywtvZZf1V5ypMLAUea
-	 QqGV/V6TLoGZOg/ggr12tsQHYqT3cdG/qtNVoMAMO50rs6sGQmhFdiNyGv6an86Nyt
-	 rvkFyrExlBnH3DEuZ3vXdIjuAV5sDKeiLoj7gqJi/Txj41xD7vfsu98iL0JphdxzGD
-	 ncLLym8LTgk4r3SGHofa7hi+JIsn8/MXvda4liTXY4bAG2/FdLQQQxrBHmNjz4rfDq
-	 cMamCoInZHj1hlRnHB7JFJjDhIzaERoweMZJC2ENy4aHn6jYGAwjHekHI8x1lUWue8
-	 h973Gw5UNoImA==
+	b=h1hWt8o25JhTlc9+iQlsh4UHlNfkHPNACt8lVPimCq+SxVVQieQ82KUyd1o3Z0OkZ
+	 UPrKKJ+uqM/dwCZuYKkHBioH8wTEW6OKFRs+VzoM3xMvKvCrjFjkaLtGE/BkjHrSNt
+	 6u9vrwyGPIEyzMIZJVHNKOWv27GpMaedY1oJL7yepGYDj/CFkAceiCilOnng6Oh8y1
+	 U7Tp338idhWi4gi1ESgnDAQzXTahh+pxOjJZXRZCv49jMp2hf9PoubieApBPRwA61E
+	 cJXlXuz9hbNF9Gci05Gmch2ZrLBnUlK0Nivf5Vs44VDMtNFmZI7wz7Bzqgs7vlV9e4
+	 72ArQjSpTKz/Q==
 From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-Cc: linux-ext4@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org,
-	Thierry Reding <thierry.reding@gmail.com>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Zorro Lang <zlang@redhat.com>,
-	stable@vger.kernel.org,
-	Akhil R <akhilrajeev@nvidia.com>
-Subject: [PATCH] crypto: tegra - Add missing CRYPTO_ALG_ASYNC
-Date: Sat, 14 Mar 2026 09:55:15 -0700
-Message-ID: <20260314165515.9678-1-ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	kunit-dev@googlegroups.com,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <david@davidgow.net>,
+	Rae Moar <raemoar63@gmail.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] kunit: configs: Enable all CRC tests in all_tests.config
+Date: Sat, 14 Mar 2026 10:22:24 -0700
+Message-ID: <20260314172224.15152-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -48,79 +46,44 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The tegra crypto driver failed to set the CRYPTO_ALG_ASYNC on its
-asynchronous algorithms, causing the crypto API to select them for users
-that request only synchronous algorithms.  This causes crashes (at
-least).  Fix this by adding the flag like what the other drivers do.
+The new option CONFIG_CRC_ENABLE_ALL_FOR_KUNIT enables all the CRC code
+that has KUnit tests, causing CONFIG_KUNIT_ALL_TESTS to enable all these
+tests.  Add this option to all_tests.config so that kunit.py will run
+them when passed the --alltests option.
 
-Reported-by: Zorro Lang <zlang@redhat.com>
-Closes: https://lore.kernel.org/r/20260314080937.pghb4aa7d4je3mhh@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com
-Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
-Cc: stable@vger.kernel.org
-Cc: Akhil R <akhilrajeev@nvidia.com>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
 
-This patch is targeting crypto/master
+This patch is targeting crc-next
+(https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next)
+which has the commit adding CONFIG_CRC_ENABLE_ALL_FOR_KUNIT.
 
- drivers/crypto/tegra/tegra-se-aes.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Note that patch also mirrors
+https://lore.kernel.org/linux-crypto/20260314035927.51351-3-ebiggers@kernel.org/
+which does the same for the crypto library tests.
 
-diff --git a/drivers/crypto/tegra/tegra-se-aes.c b/drivers/crypto/tegra/tegra-se-aes.c
-index 0e07d0523291a..cb97a59084519 100644
---- a/drivers/crypto/tegra/tegra-se-aes.c
-+++ b/drivers/crypto/tegra/tegra-se-aes.c
-@@ -592,10 +592,11 @@ static struct tegra_se_alg tegra_aes_algs[] = {
- 			.ivsize	= AES_BLOCK_SIZE,
- 			.base = {
- 				.cra_name = "xts(aes)",
- 				.cra_driver_name = "xts-aes-tegra",
- 				.cra_priority = 500,
-+				.cra_flags = CRYPTO_ALG_ASYNC,
- 				.cra_blocksize = AES_BLOCK_SIZE,
- 				.cra_ctxsize	   = sizeof(struct tegra_aes_ctx),
- 				.cra_alignmask	   = (__alignof__(u64) - 1),
- 				.cra_module	   = THIS_MODULE,
- 			},
-@@ -1920,10 +1921,11 @@ static struct tegra_se_alg tegra_aead_algs[] = {
- 			.ivsize	= GCM_AES_IV_SIZE,
- 			.base = {
- 				.cra_name = "gcm(aes)",
- 				.cra_driver_name = "gcm-aes-tegra",
- 				.cra_priority = 500,
-+				.cra_flags = CRYPTO_ALG_ASYNC,
- 				.cra_blocksize = 1,
- 				.cra_ctxsize = sizeof(struct tegra_aead_ctx),
- 				.cra_alignmask = 0xf,
- 				.cra_module = THIS_MODULE,
- 			},
-@@ -1942,10 +1944,11 @@ static struct tegra_se_alg tegra_aead_algs[] = {
- 			.chunksize = AES_BLOCK_SIZE,
- 			.base = {
- 				.cra_name = "ccm(aes)",
- 				.cra_driver_name = "ccm-aes-tegra",
- 				.cra_priority = 500,
-+				.cra_flags = CRYPTO_ALG_ASYNC,
- 				.cra_blocksize = 1,
- 				.cra_ctxsize = sizeof(struct tegra_aead_ctx),
- 				.cra_alignmask = 0xf,
- 				.cra_module = THIS_MODULE,
- 			},
-@@ -1969,11 +1972,11 @@ static struct tegra_se_alg tegra_cmac_algs[] = {
- 			.halg.statesize = sizeof(struct tegra_cmac_reqctx),
- 			.halg.base = {
- 				.cra_name = "cmac(aes)",
- 				.cra_driver_name = "tegra-se-cmac",
- 				.cra_priority = 300,
--				.cra_flags = CRYPTO_ALG_TYPE_AHASH,
-+				.cra_flags = CRYPTO_ALG_TYPE_AHASH | CRYPTO_ALG_ASYNC,
- 				.cra_blocksize = AES_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct tegra_cmac_ctx),
- 				.cra_alignmask = 0,
- 				.cra_module = THIS_MODULE,
- 				.cra_init = tegra_cmac_cra_init,
+ tools/testing/kunit/configs/all_tests.config | 2 ++
+ 1 file changed, 2 insertions(+)
 
-base-commit: 1c9982b4961334c1edb0745a04cabd34bc2de675
+diff --git a/tools/testing/kunit/configs/all_tests.config b/tools/testing/kunit/configs/all_tests.config
+index 422e186cf3cf1..c1d3659a41cf0 100644
+--- a/tools/testing/kunit/configs/all_tests.config
++++ b/tools/testing/kunit/configs/all_tests.config
+@@ -44,10 +44,12 @@ CONFIG_REGMAP_BUILD=y
+ 
+ CONFIG_AUDIT=y
+ 
+ CONFIG_PRIME_NUMBERS=y
+ 
++CONFIG_CRC_ENABLE_ALL_FOR_KUNIT=y
++
+ CONFIG_SECURITY=y
+ CONFIG_SECURITY_APPARMOR=y
+ CONFIG_SECURITY_LANDLOCK=y
+ 
+ CONFIG_SOUND=y
+
+base-commit: c13cee2fc7f137dd25ed50c63eddcc578624f204
 -- 
 2.53.0
 
