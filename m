@@ -1,124 +1,126 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9772628D
-	for <linux-crypto@vger.kernel.org>; Sat, 14 Mar 2026 10:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA87F507;
+	Sat, 14 Mar 2026 16:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773485089; cv=none; b=nUzQuNah+FYK1myDUQZ8e+FRwa8mGusgdBIO6kf7kmtwyOlxKMTCHBCosvLe6YlUdfKUiLXOpsUTBIjZCbWwuYGe7SQf7p3L3r7tDDagi3EJvNzSmkvdQQ+Z34xFacbEwdY9O4ymTSyDECuHh8ttGp/uem2qRXvgvO1o+6+hVWc=
+	t=1773507358; cv=none; b=LERT/5f1k4wrjD0Ep3PnuKdioYfqj13hhCFiydn8w6KLjkAf+ncj/B9q07cmRuQw0bg/z/W7oqxs/e6geDSFHX1+PtwMbZadiID4W0P8IHyxlQY+FWMHIjoMaWpbM3QrTQLZJzsAQApqLHbkToF33CCK6rqQ8CN8uZN/HEn0tKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773485089; c=relaxed/simple;
-	bh=JRTrpJicVZv9hm9N78kmTjwXo8LD4y4qDOoJuGvR+Gs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EcARnTvAUbv+RZ3Z1uj5DItbSOc+HIYz5VSoqBJ7diug5N4KBcKgeyHJOHb4IsW4TDmFsveNKtVZknhe83no/mWFy0v7ENGEMqaAwp26l+y8EqQS8pOI5/t8msCVMZTU2XzR6zMz0aLs0BXIGK6PFhOjauk12suQUUmDUaoL9k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=zTyuSPUi; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1773507358; c=relaxed/simple;
+	bh=OU2kqLqL46R/whoj7/DBKG1N2KxHrjeHH683kSBKUxc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I3DusJEh5h9Mbll00Kz7CgBl+L71wrSujgytCHgU7eB/bL6fe1FfnwUkevMZIeF5lu969N0aSv0Mc1qUSvV4xXKkdPjCMhgQJ3CxvwPHfMjRWKJKJ6FF3l5Kwtw/azvABAIMoTTOtmHWoRjL4xgiC1kbjUK8ny/LWqyAlDDJWeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ANCrx5T8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="zTyuSPUi"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 4CE8D1A2E36;
-	Sat, 14 Mar 2026 10:44:44 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 21DC56003C;
-	Sat, 14 Mar 2026 10:44:44 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 87C2C10369E03;
-	Sat, 14 Mar 2026 11:44:36 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773485083; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=dTC/sqBnMIFHHDI7XhSbSaOIZ7PKMXbJl4q3w7ZEZGk=;
-	b=zTyuSPUioyoc4Qg94QN8MG4zUoQeCxhRes+PPku5Vd9ogHnHsM/jycywwSkkXe/q7aM62W
-	UjmdJgm+wVWABp7kNw9WSCqSPg84U6axxpZ7ySdPsKEhrImSHhWnXjpATZR8rRbcKPJnJI
-	COrmUpRtFc5MBWpBYW26NqpqlC6EheRVfh6B7qNSO5WGDUYC+zNhjoD6W1fg3OOjqQwAPd
-	obll7UwONi2qa6289K655FH9YkATW7dBkV/Ljie1g/CBB/BEin0yFlgb4O+yKhLjyQfO8U
-	X6f07ajCtt0T1Fye079B0iSMmWt5JXLqaFeOIUwgx8k24DB7Gr2GQivLzv28mw==
-Message-ID: <25a017e8-37f3-45ea-8849-8bad894111da@bootlin.com>
-Date: Sat, 14 Mar 2026 11:44:36 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ANCrx5T8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B3DEC116C6;
+	Sat, 14 Mar 2026 16:55:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773507358;
+	bh=OU2kqLqL46R/whoj7/DBKG1N2KxHrjeHH683kSBKUxc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ANCrx5T8MufQXBY2woTDqlBfXgvZxyD4i8MsnPhrQbASPKjywtvZZf1V5ypMLAUea
+	 QqGV/V6TLoGZOg/ggr12tsQHYqT3cdG/qtNVoMAMO50rs6sGQmhFdiNyGv6an86Nyt
+	 rvkFyrExlBnH3DEuZ3vXdIjuAV5sDKeiLoj7gqJi/Txj41xD7vfsu98iL0JphdxzGD
+	 ncLLym8LTgk4r3SGHofa7hi+JIsn8/MXvda4liTXY4bAG2/FdLQQQxrBHmNjz4rfDq
+	 cMamCoInZHj1hlRnHB7JFJjDhIzaERoweMZJC2ENy4aHn6jYGAwjHekHI8x1lUWue8
+	 h973Gw5UNoImA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+Cc: linux-ext4@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Zorro Lang <zlang@redhat.com>,
+	stable@vger.kernel.org,
+	Akhil R <akhilrajeev@nvidia.com>
+Subject: [PATCH] crypto: tegra - Add missing CRYPTO_ALG_ASYNC
+Date: Sat, 14 Mar 2026 09:55:15 -0700
+Message-ID: <20260314165515.9678-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: replace broken libkcapi link in Crypto API
- documentation
-To: Randy Dunlap <rdunlap@infradead.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260313-crypto-api-libkcapi-broken-link-v1-1-a218033d7f05@bootlin.com>
- <91914036-071a-4503-8fe3-9c69cd1f8a41@infradead.org>
-Content-Language: en-US
-From: Paul Louvel <paul.louvel@bootlin.com>
-In-Reply-To: <91914036-071a-4503-8fe3-9c69cd1f8a41@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 
-Hi,
+The tegra crypto driver failed to set the CRYPTO_ALG_ASYNC on its
+asynchronous algorithms, causing the crypto API to select them for users
+that request only synchronous algorithms.  This causes crashes (at
+least).  Fix this by adding the flag like what the other drivers do.
 
-I have just checked this morning on the same browser, and indeed, it works.
-It was broken for the past few days.
-Please ignore this patch then.
+Reported-by: Zorro Lang <zlang@redhat.com>
+Closes: https://lore.kernel.org/r/20260314080937.pghb4aa7d4je3mhh@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com
+Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
+Cc: stable@vger.kernel.org
+Cc: Akhil R <akhilrajeev@nvidia.com>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
 
-Regards,
-Paul.
+This patch is targeting crypto/master
 
-On 3/14/26 12:46 AM, Randy Dunlap wrote:
->
-> On 3/13/26 3:00 PM, Paul Louvel via B4 Relay wrote:
->> From: Paul Louvel <paul.louvel@bootlin.com>
->>
->> The "User Space Interface" section of the Crypto API documentation
->> contains a link to the libkcapi project that no longer works.
->>
->> Update the link to point to the correct upstream location so that
->> users can access the library documentation.
->>
->> Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
->> ---
->> The "User Space Interface" of the Crypto API documentation has a broken
->> link to libkcapi. Replacing it with a working one.
->> ---
->>   Documentation/crypto/userspace-if.rst | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/Documentation/crypto/userspace-if.rst b/Documentation/crypto/userspace-if.rst
->> index 021759198fe7..79e41845f611 100644
->> --- a/Documentation/crypto/userspace-if.rst
->> +++ b/Documentation/crypto/userspace-if.rst
->> @@ -23,7 +23,7 @@ user space, however. This includes the difference between synchronous
->>   and asynchronous invocations. The user space API call is fully
->>   synchronous.
->>   
->> -[1] https://www.chronox.de/libkcapi/index.html
->> +[1] https://www.chronox.de/libkcapi/
->>   
->>   User Space API General Remarks
->>   ------------------------------
->> @@ -406,4 +406,4 @@ Please see [1] for libkcapi which provides an easy-to-use wrapper around
->>   the aforementioned Netlink kernel interface. [1] also contains a test
->>   application that invokes all libkcapi API calls.
->>   
->> -[1] https://www.chronox.de/libkcapi/index.html
->> +[1] https://www.chronox.de/libkcapi/
->>
->> ---
->> base-commit: b84a0ebe421ca56995ff78b66307667b62b3a900
->> change-id: 20260313-crypto-api-libkcapi-broken-link-65069e8ce688
->>
->> Best regards,
-> Hi,
-> Either link works for me (with the same content).
-> Could it be browser-dependent?
->
->
+ drivers/crypto/tegra/tegra-se-aes.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/tegra/tegra-se-aes.c b/drivers/crypto/tegra/tegra-se-aes.c
+index 0e07d0523291a..cb97a59084519 100644
+--- a/drivers/crypto/tegra/tegra-se-aes.c
++++ b/drivers/crypto/tegra/tegra-se-aes.c
+@@ -592,10 +592,11 @@ static struct tegra_se_alg tegra_aes_algs[] = {
+ 			.ivsize	= AES_BLOCK_SIZE,
+ 			.base = {
+ 				.cra_name = "xts(aes)",
+ 				.cra_driver_name = "xts-aes-tegra",
+ 				.cra_priority = 500,
++				.cra_flags = CRYPTO_ALG_ASYNC,
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+ 				.cra_ctxsize	   = sizeof(struct tegra_aes_ctx),
+ 				.cra_alignmask	   = (__alignof__(u64) - 1),
+ 				.cra_module	   = THIS_MODULE,
+ 			},
+@@ -1920,10 +1921,11 @@ static struct tegra_se_alg tegra_aead_algs[] = {
+ 			.ivsize	= GCM_AES_IV_SIZE,
+ 			.base = {
+ 				.cra_name = "gcm(aes)",
+ 				.cra_driver_name = "gcm-aes-tegra",
+ 				.cra_priority = 500,
++				.cra_flags = CRYPTO_ALG_ASYNC,
+ 				.cra_blocksize = 1,
+ 				.cra_ctxsize = sizeof(struct tegra_aead_ctx),
+ 				.cra_alignmask = 0xf,
+ 				.cra_module = THIS_MODULE,
+ 			},
+@@ -1942,10 +1944,11 @@ static struct tegra_se_alg tegra_aead_algs[] = {
+ 			.chunksize = AES_BLOCK_SIZE,
+ 			.base = {
+ 				.cra_name = "ccm(aes)",
+ 				.cra_driver_name = "ccm-aes-tegra",
+ 				.cra_priority = 500,
++				.cra_flags = CRYPTO_ALG_ASYNC,
+ 				.cra_blocksize = 1,
+ 				.cra_ctxsize = sizeof(struct tegra_aead_ctx),
+ 				.cra_alignmask = 0xf,
+ 				.cra_module = THIS_MODULE,
+ 			},
+@@ -1969,11 +1972,11 @@ static struct tegra_se_alg tegra_cmac_algs[] = {
+ 			.halg.statesize = sizeof(struct tegra_cmac_reqctx),
+ 			.halg.base = {
+ 				.cra_name = "cmac(aes)",
+ 				.cra_driver_name = "tegra-se-cmac",
+ 				.cra_priority = 300,
+-				.cra_flags = CRYPTO_ALG_TYPE_AHASH,
++				.cra_flags = CRYPTO_ALG_TYPE_AHASH | CRYPTO_ALG_ASYNC,
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct tegra_cmac_ctx),
+ 				.cra_alignmask = 0,
+ 				.cra_module = THIS_MODULE,
+ 				.cra_init = tegra_cmac_cra_init,
+
+base-commit: 1c9982b4961334c1edb0745a04cabd34bc2de675
 -- 
-Paul Louvel, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.53.0
 
