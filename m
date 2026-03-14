@@ -1,88 +1,75 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCEB23A562;
-	Sat, 14 Mar 2026 03:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4BF32E137;
+	Sat, 14 Mar 2026 04:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773460795; cv=none; b=MnoZ55My/9zNyR8K0ZRRhpIgnUoAod63CcIYxcSaQgVdBJIxEmbzSym/lq5Rg7okbbP5DGLKQ+Quq+tYk/hJiKJcdlYtRZWjvGFMuhXIlbXRmQdJpSawcWRWgZcAyzsPpoL9IwbjYY4CezEkqfQoJibFT4+gIdLeJYFaVEHXLjM=
+	t=1773460852; cv=none; b=FLkwhPvrYkXaDx/GY6Lr4NVm9b6o2v+knsZkUaBCDNY/DlPFGV8laNENxcu1VEds8EEqQo8Gji6jo8KIOsHVjv3vfGnsYJsJ/i9INY4vefJlwtzo5iS5ZS4t4N63CZvdyFHTmr+roZLbrffUbzlGpZocESmmhFKjDZcmt1I94Ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773460795; c=relaxed/simple;
-	bh=LNFPZFCsJ9qnXTSR0XPC9X3Z+OPlOB7Jsfoc3tz5qi8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ESTB7bVeUjEY5IYHnmZiWLCUCsfzwfdpjx2rrRJywNbNZvQv6AQdvzpLU5kqdQUJwWJIA43qkoki463nZv75P27fipGeS4y/y1UMsfENZqNXutD73Ja1UafVBHQNH7QmdMhgzny8CJlXdfBTwwUzI+W8m8e/bNpeonGS8BqR2PU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Fcn+p5E+; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1773460852; c=relaxed/simple;
+	bh=OzwIUsmn7tIpMA2qVnLTpeuoM9drGQlSPkWx/dqKUWg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VSIS53PSb3LOHxdBJxHI15rOtS+doTO/3SrHZPtAOBI1a9rAvarCoN/MPPKumv0JzHjJ8Nu5HIE2z+qS6zvCRLjn8RlrFNqqcbW+wHAAOt+KX4qcKzAvpYBzlegs59p/waIA2U2bvSXv07IqmI4rigd3AiclP7Ywmn6ir+PAzsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O3GROioR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Fcn+p5E+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=FfxZ+pbix1CPfROYdCwHKZBewzv/U0sU5yp1lK36dek=; 
-	b=Fcn+p5E+qXNkKeiPWI1OX7uyHLEJY8c1K1D4qPOPJUiIr6oRXQ6LH1NSm1bBFmOsMRTYsW9jvTe
-	H1Q6bGKYpaXygFgc7HGSg9ZGOcW6rNCTQQVKsZLUwWtzwUONw5WfjVrpHPW/5P++Kd0WuL0Rb7nJd
-	bNtml9xOb5aQMbmFh3N0PPFaDW7hLXai978bZj+vCkFmGvYw2o0ND5iUipd2zT8F2uaGviyb3LglZ
-	mmw5tiuaIODaOlGfsri/qyF1B6l7XpQcAqhWeQ/e4sxbN+vwYoYC5ljdbEWGfAWZ98fVsbktppS9m
-	Z2mELhWDtuw/7j4vZJ/o9Ltr2amnvZZS4BeA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w1GA1-00EKWg-1P;
-	Sat, 14 Mar 2026 11:59:34 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Mar 2026 12:59:33 +0900
-Date: Sat, 14 Mar 2026 12:59:33 +0900
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Shiva Tripathi <s-tripathi1@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 1/3] crypto: ti - Add support for SHA224/256/384/512
- in DTHEv2 driver
-Message-ID: <abTdJSPtLYN0VJWm@gondor.apana.org.au>
-References: <20260226131103.3560884-1-t-pratham@ti.com>
- <20260226131103.3560884-2-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O3GROioR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BE0BC116C6;
+	Sat, 14 Mar 2026 04:00:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773460852;
+	bh=OzwIUsmn7tIpMA2qVnLTpeuoM9drGQlSPkWx/dqKUWg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=O3GROioR1iy+10GCL7MYJf0CROtpYbOynpv9/et78MvCDHyPrT+vMMwUo+yX35MCY
+	 /9k6mNsI99zDBtykxb0aB/g2rT3Nswr1yjxTW67VrRjaX8NdMhL1PmsDj6XWNp9JoO
+	 OegQaznlPlxd/XtagFhiJfH1iLf+P7+NSlUA7PvVnDe8S0gSHFpPd8GM8MekXEFQIY
+	 HpE+jc+PRUMa87fBc5eLA+u4TABvVuohTvn5jAH5MAuN1OsTM4A3T5wVVJH/lPKuxe
+	 i3It5By1oNnCZcl3sZL4y2uf8OSDytok3VBdglA3IKQV0XUdJZhxp5YSOOPIRFxjrS
+	 VbwiWpHK9RhTA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	kunit-dev@googlegroups.com,
+	Brendan Higgins Brendan Higgins <brendan.higgins@linux.devbrendan.higgins@linux.dev>,
+	David Gow <david@davidgow.net>,
+	Rae Moar <raemoar63@gmail.comRaeMoarraemoar63@gmail.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 0/2] Make 'kunit.py run --alltests' run all crypto library tests
+Date: Fri, 13 Mar 2026 20:59:25 -0700
+Message-ID: <20260314035927.51351-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260226131103.3560884-2-t-pratham@ti.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 26, 2026 at 06:41:01PM +0530, T Pratham wrote:
->
-> +static int dthe_hash_export(struct ahash_request *req, void *out)
-> +{
-> +	struct dthe_hash_req_ctx *rctx = ahash_request_ctx(req);
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-> +	struct dthe_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
-> +	union {
-> +		u8 *u8;
-> +		u64 *u64;
-> +	} p = { .u8 = out };
-> +
-> +	memcpy(out, rctx->phash, ctx->phash_size);
-> +	p.u8 += ctx->phash_size;
-> +	put_unaligned(rctx->digestcnt[0], p.u64++);
-> +	if (ctx->phash_size >= SHA512_DIGEST_SIZE)
-> +		put_unaligned(rctx->digestcnt[1], p.u64++);
-> +
-> +	return 0;
-> +}
+This series makes the KUnit all_tests.config enable all the crypto
+library options that have KUnit tests, so that all these tests will be
+run in testing systems use 'kunit.py run --alltests'.  (For example,
+KernelCI is planned to start doing that [1].)  To do this easily in both
+that file and in lib/crypto/.kunitconfig, introduce a kconfig option
+CRYPTO_LIB_ENABLE_ALL_FOR_KUNIT for this purpose.
 
-The hash state must always be exported, even right after initialisation.
-So you need to export the initial SHA stats if phash_available is
-false.
+This series is targeting libcrypto-next.
 
-Cheers,
+[1] https://lore.kernel.org/kernelci/4fd302e0-ffa7-4bbf-a94a-c8879fde32f4@sirena.org.uk
+
+Eric Biggers (2):
+  lib/crypto: tests: Introduce CRYPTO_LIB_ENABLE_ALL_FOR_KUNIT
+  kunit: configs: Enable all crypto library tests in all_tests.config
+
+ lib/crypto/.kunitconfig                      | 22 +-----------------
+ lib/crypto/tests/Kconfig                     | 24 ++++++++++++++++++++
+ tools/testing/kunit/configs/all_tests.config |  2 ++
+ 3 files changed, 27 insertions(+), 21 deletions(-)
+
+
+base-commit: ce260754bb435aea18e6a1a1ce3759249013f5a4
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.53.0
+
