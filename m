@@ -1,108 +1,72 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F50E2BF3F3;
-	Fri, 13 Mar 2026 23:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A764EEB3;
+	Sat, 14 Mar 2026 00:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773445607; cv=none; b=EplJ1sXa8xhSHyUs+pHVS7KgBhRhIf9SS0AGb46/BPOki5YEn9Dh2uOmObJK1tQvSoSHP9ZvlSzSJe2pnYUCTvTlmaZrS5Sf/zAtgiY4sXE3FnjlMw+a4c9Eq6XhL8xAMdN+puvk8ICZgjVPAgQNhToHCJSb74uepxBVzasgubk=
+	t=1773446611; cv=none; b=r+JD4ZUZQNr50tVimB6eqa8lTjlhDDAr2xZKtM/z7ePJThUOBbGj6wxNLdX2bwP5+rqIvxGvD42gHlB+Mj+RpBH6cAFjsh+o/2FNWuKPv3sKRFJcQ79WUM+7qJa7bHT8ZtithXyRVkCleOcsVoflXqHzHOwAOD/1OXTc4u4z1ME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773445607; c=relaxed/simple;
-	bh=4u62yTewF4Ria02l+r2EiWYExHlsZaHkcvllXs7rLWs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iq52/fM4sxg9Dj9sRpzLe08sXijci6AgMWC3KnVNG1W0DlJSPNFCD4SSiQvK3PG2FGL7lyM5tUG2paUPLQ+IUg189+Sfli0h5V8ipwBITWKiWseuck73uXnSBh+XtpOK/fku2vbFdxex8en3DLSrd80zNrIrioBiDWnBFnk7P1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ase/MnIe; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1773446611; c=relaxed/simple;
+	bh=UxoF3WL4ZHyLRICrjyRI6WOcSEigs+JBBqDcJb43mRs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ksiKLYR84xiZoVCwijEFs0s2ooRuvGYfQgDyjLsuHxFCpRApAcVNBHPOBnxymP12jTVXmiXwK1PN0XXaEBJGK7Gtz7NeUeEfIGKpoJ+8GIO8KFn8e1WZPS3l5CUXBgfeeB1gzAa1kSqeqMSZZmb7GgeokKcbEB1pcNv7dxqFgN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y4cpKWz3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ase/MnIe"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=wGYcxW8yVTFkNY9kQvbfYKPjoAkfGv57TJ3BTio0e/8=; b=Ase/MnIeIH3wrLd0jlh0iWwbJX
-	ZEwcR63YdNB8FZQ5lqIzbygu0luhRxphxLg4l0I9qoQOh6Xjkx9dLs/uJGuvPacnOU9L6ayCyDDAJ
-	bF4Xve45wwCMbZZNpTo3dFAPPlpcuZ1UDC8Satna4+rocBvqzf57DrvIMA6QcJHKQvAZ61NnozdNr
-	l73HEEW1BpDRXy9L4ugCZjr6nXWL6B9fa5/fImx/5Z4QffujH2TRXTx+KHzS5X/52taWUEBFahfjo
-	nBlYjwpkXdf3T3wg2FHU5xG+RqfBcj6vYsHPRL0CxJkntgYKoOnEHTG3h1YVOy8bL8RecDGBMkJqJ
-	nwScA6xQ==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w1CDK-00000001KXh-00QJ;
-	Fri, 13 Mar 2026 23:46:42 +0000
-Message-ID: <91914036-071a-4503-8fe3-9c69cd1f8a41@infradead.org>
-Date: Fri, 13 Mar 2026 16:46:40 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y4cpKWz3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C2EC19421;
+	Sat, 14 Mar 2026 00:03:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773446611;
+	bh=UxoF3WL4ZHyLRICrjyRI6WOcSEigs+JBBqDcJb43mRs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Y4cpKWz3lyhdNmia9AQ5Hgw9Yah5d0pkAZHCwganyarZDx2tkoJIQh5v9zUJ6ORrU
+	 gDjoONDCCEyxgxT2QgIuIcvulcs8LExtR1eA/4e5BuKqROBhi5nYbhSXd5+bdvkZIf
+	 p537U3/Sr8eLm/AOschRK7z/816RTtgmqBNVvRgxDvsqsGLInNfdlJzY21nQU2MlYV
+	 HF/jR7+veDQHBOtm1i/Dl+ZmFohTA6Erhz7joC69lB01tjeaMavNBY4gxfciRXWXvC
+	 YHK0aT0nvrHx1fuCxe+Agn7hmDCDRMZHkFXhzvUivd4UzmFUlRwHC2v0QiQ6AA3LZC
+	 ZZN2ELxwx4z5A==
+Date: Fri, 13 Mar 2026 17:03:25 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	kunit-dev@googlegroups.com
+Subject: Re: [PATCH 0/3] lib/crc: Fix crc_kunit dependency and add kunitconfig
+Message-ID: <20260314000325.GA6574@quark>
+References: <20260306033557.250499-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: replace broken libkcapi link in Crypto API
- documentation
-To: paul.louvel@bootlin.com, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260313-crypto-api-libkcapi-broken-link-v1-1-a218033d7f05@bootlin.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20260313-crypto-api-libkcapi-broken-link-v1-1-a218033d7f05@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260306033557.250499-1-ebiggers@kernel.org>
 
-
-
-On 3/13/26 3:00 PM, Paul Louvel via B4 Relay wrote:
-> From: Paul Louvel <paul.louvel@bootlin.com>
+On Thu, Mar 05, 2026 at 07:35:54PM -0800, Eric Biggers wrote:
+> This series fixes crc_kunit to follow the standard KUnit convention of
+> depending on the code it tests rather than selecting it, adds a kconfig
+> option that enables all the CRC variants for KUnit testing, and adds a
+> kunitconfig file for lib/crc/.
 > 
-> The "User Space Interface" section of the Crypto API documentation
-> contains a link to the libkcapi project that no longer works.
+> This follows similar changes to lib/crypto/ (except lib/crypto/ doesn't
+> have an equivalent to CRC_ENABLE_ALL_FOR_KUNIT yet, but we could
+> consider adding one).
 > 
-> Update the link to point to the correct upstream location so that
-> users can access the library documentation.
+> This series applies to v7.0-rc2 and is targeting crc-next.
 > 
-> Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
-> ---
-> The "User Space Interface" of the Crypto API documentation has a broken
-> link to libkcapi. Replacing it with a working one.
-> ---
->  Documentation/crypto/userspace-if.rst | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Eric Biggers (3):
+>   lib/crc: tests: Make crc_kunit test only the enabled CRC variants
+>   lib/crc: tests: Add CRC_ENABLE_ALL_FOR_KUNIT
+>   lib/crc: tests: Add a .kunitconfig file
 > 
-> diff --git a/Documentation/crypto/userspace-if.rst b/Documentation/crypto/userspace-if.rst
-> index 021759198fe7..79e41845f611 100644
-> --- a/Documentation/crypto/userspace-if.rst
-> +++ b/Documentation/crypto/userspace-if.rst
-> @@ -23,7 +23,7 @@ user space, however. This includes the difference between synchronous
->  and asynchronous invocations. The user space API call is fully
->  synchronous.
->  
-> -[1] https://www.chronox.de/libkcapi/index.html
-> +[1] https://www.chronox.de/libkcapi/
->  
->  User Space API General Remarks
->  ------------------------------
-> @@ -406,4 +406,4 @@ Please see [1] for libkcapi which provides an easy-to-use wrapper around
->  the aforementioned Netlink kernel interface. [1] also contains a test
->  application that invokes all libkcapi API calls.
->  
-> -[1] https://www.chronox.de/libkcapi/index.html
-> +[1] https://www.chronox.de/libkcapi/
-> 
-> ---
-> base-commit: b84a0ebe421ca56995ff78b66307667b62b3a900
-> change-id: 20260313-crypto-api-libkcapi-broken-link-65069e8ce688
-> 
-> Best regards,
+>  lib/crc/.kunitconfig      |  3 +++
+>  lib/crc/Kconfig           | 17 +++++++++++++----
+>  lib/crc/tests/crc_kunit.c | 28 ++++++++++++++++++++++------
+>  3 files changed, 38 insertions(+), 10 deletions(-)
+>  create mode 100644 lib/crc/.kunitconfig
 
-Hi,
-Either link works for me (with the same content).
-Could it be browser-dependent?
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
 
-
--- 
-~Randy
-
+- Eric
