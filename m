@@ -1,39 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7DEBA21;
-	Sat, 14 Mar 2026 17:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6970F239E76;
+	Sat, 14 Mar 2026 17:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773509516; cv=none; b=AlaVxQSUkquRSpgK9J3TZNoV6JgpG+DmUEejY5Af/F5YahnkLyOQIH8DQQKvlokQZTgiLNIVaEPIZQG4Yn05EIubElQstSHFdlBN8PwhNWi+S6iksN6FUVrQH/QNs98XfoUc3EYguK8aIjo460wyTF093gZvE4jdShc29INVCJY=
+	t=1773509756; cv=none; b=iEtt3gW0hFu/MrHUs5LwrV+4ssfUd4rC4jjsQdWhD+5VCI/vGIes+3Y87md0J5f2Oj/zKkM54YoGy/c56n62bch3x2yziFC6uXFTP4/+qu4Mjt/9Vzm3qzUUK0gb+2ozPZrs6aq/L4haouANfDq7M1TzmyQMKamJZ3oxV52J4ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773509516; c=relaxed/simple;
-	bh=IAXLSHLD6HNyjuhhwieO2BteA4MYMrah3sfxcnvOzkE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iwP6DeAcxMnV2rscQxPcl/4n8c/YuCLPFnarZfjUK0EbWktrFFCb0AIqqA8xqVh5w1xNcvwzeF0zxKdwcW4Xtmh5UyJXCaj2l0q6K5U4IJMYw0GIps4YP8k2iRMjlSWjPsfbqVGw0rcGPZ5RguE7Jrdc5zef+6EJ+X1Lq9VRPXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R4PwKIXh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773509756; c=relaxed/simple;
+	bh=+e71JxLMdeYDcE8yIAsCr0/P60ySLNS2qVdjZT/waCQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JnKNZyxmkmlitaQypMcU3f1VLkH2/plfjcv8MwVMKPTnqa0E3jMaczeVYa6FsTipxPeDdPu/tc9oZL8/EuA+Z4s4qfAgn1As6V8FtWmET1zRUAVLBPnaEnPI+pyumU+dLTGcXoKJlguL5hwiOk2wNK4ltdSX/kqqOcTE6vkHhm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PPBuDH+v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R4PwKIXh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F8A0C116C6;
-	Sat, 14 Mar 2026 17:31:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PPBuDH+v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A65CDC116C6;
+	Sat, 14 Mar 2026 17:35:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773509515;
-	bh=IAXLSHLD6HNyjuhhwieO2BteA4MYMrah3sfxcnvOzkE=;
+	s=k20201202; t=1773509756;
+	bh=+e71JxLMdeYDcE8yIAsCr0/P60ySLNS2qVdjZT/waCQ=;
 	h=From:To:Cc:Subject:Date:From;
-	b=R4PwKIXh4wvTWlYTnIfuPq+qwZLyoZfebuO9LruzDhQLQlFVmtdEhPmFmCAn7hWfy
-	 mU3mHJxhsAsFaLNy6j4gUM/Leqy+mocb3vmFdrNpWXwQhdw5k3LgNYK2uPxg/uAvhw
-	 s1S7ovj7PmxggyOlLn2AXRXpcZaDs2vtEmlrVSkfqG/ThDAMGNGsaC7Ol+icxQ7d6u
-	 wPmfPivrHdSSBln6J6KE2kElz+jCG8cCqUAYy1UhWOY6u4s0ThI5hsjGtJVHOQB1+G
-	 r8PZlfPfg0jhySdGR3FQ/Vq/NAldlFZP9+f+ZMgTsLx8Ywd37Hyu6VPD3YAQYxbWX8
-	 LfPbv+jwEHMAg==
+	b=PPBuDH+vb1X8oIE7pdpT8Gc3OUUI7O9daa7DkFAGYgJyZvQ9/90VMQDW5PbB1FFAR
+	 +mMCQhFpy7NWdmX66c0mxas/rsiPkAlEMFsSeSdwlrMtrV9o8NIfeYM/b11lEHc6/o
+	 iSlhW0/m4ijkmhFCajhzb4s6pX/0ZTQIRn1628AF1UK+Bb6liHdEyB7lVbKhlklSai
+	 XAtCtJ00VENUQDDLV48RtGn1t0cyojWrH2xp7QBhwFxKz/V8/Nwm04mWdiUc5A/6jy
+	 R1c9os9n0ZZRk6hzvE8RQzbjHrxaAMZnL8/8jBfPm24UBl0rk+/GODj4b1FGnAdimN
+	 HVSRa7fAI1QmA==
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] crypto: crc32c - Remove more outdated usage information
-Date: Sat, 14 Mar 2026 10:31:30 -0700
-Message-ID: <20260314173130.16683-1-ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: Remove unused file blockhash.h
+Date: Sat, 14 Mar 2026 10:35:26 -0700
+Message-ID: <20260314173526.17349-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -43,58 +44,78 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Remove information from the crypto/crc32c.c file comment that is no
-longer applicable now that nearly all users of CRC-32C are simply using
-the crc32c() library function instead.  This continues the cleanup from
-commit 0ef6eb10f2e0 ("crypto: Clean up help text for CRYPTO_CRC32C").
+For a short time this file was used by the SHA-256 and Poly1305 library
+code, but they are no longer using it.  Remove this unused file.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
 
-This patch is targeting crc-next.
+This patch is targeting libcrypto-next
 
- crypto/crc32c.c | 14 +-------------
- 1 file changed, 1 insertion(+), 13 deletions(-)
+ include/crypto/internal/blockhash.h | 52 -----------------------------
+ 1 file changed, 52 deletions(-)
+ delete mode 100644 include/crypto/internal/blockhash.h
 
-diff --git a/crypto/crc32c.c b/crypto/crc32c.c
-index 1eff54dde2f74..c6c9c727b25b4 100644
---- a/crypto/crc32c.c
-+++ b/crypto/crc32c.c
-@@ -1,10 +1,8 @@
- // SPDX-License-Identifier: GPL-2.0-or-later
- /*
-- * Cryptographic API.
+diff --git a/include/crypto/internal/blockhash.h b/include/crypto/internal/blockhash.h
+deleted file mode 100644
+index 52d9d4c82493d..0000000000000
+--- a/include/crypto/internal/blockhash.h
++++ /dev/null
+@@ -1,52 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- * Handle partial blocks for block hash.
 - *
-- * CRC32C chksum
-+ * crypto_shash support for CRC-32C
-  *
-  *@Article{castagnoli-crc,
-  * author =       { Guy Castagnoli and Stefan Braeuer and Martin Herrman},
-  * title =        {{Optimization of Cyclic Redundancy-Check Codes with 24
-  *                 and 32 Parity Bits}},
-@@ -13,20 +11,10 @@
-  * volume =       {41},
-  * number =       {6},
-  * pages =        {},
-  * month =        {June},
-  *}
-- * Used by the iSCSI driver, possibly others, and derived from
-- * the iscsi-crc.c module of the linux-iscsi driver at
-- * http://linux-iscsi.sourceforge.net.
-- *
-- * Following the example of lib/crc32, this function is intended to be
-- * flexible and useful for all users.  Modules that currently have their
-- * own crc32c, but hopefully may be able to use this one are:
-- *  net/sctp (please add all your doco to here if you change to
-- *            use this one!)
-- *  <endoflist>
-  *
-  * Copyright (c) 2004 Cisco Systems, Inc.
-  * Copyright (c) 2008 Herbert Xu <herbert@gondor.apana.org.au>
-  */
- 
+- * Copyright (c) 2015 Linaro Ltd <ard.biesheuvel@linaro.org>
+- * Copyright (c) 2025 Herbert Xu <herbert@gondor.apana.org.au>
+- */
+-
+-#ifndef _CRYPTO_INTERNAL_BLOCKHASH_H
+-#define _CRYPTO_INTERNAL_BLOCKHASH_H
+-
+-#include <linux/string.h>
+-#include <linux/types.h>
+-
+-#define BLOCK_HASH_UPDATE_BASE(block_fn, state, src, nbytes, bs, dv,	\
+-			       buf, buflen)				\
+-	({								\
+-		typeof(block_fn) *_block_fn = &(block_fn);		\
+-		typeof(state + 0) _state = (state);			\
+-		unsigned int _buflen = (buflen);			\
+-		size_t _nbytes = (nbytes);				\
+-		unsigned int _bs = (bs);				\
+-		const u8 *_src = (src);					\
+-		u8 *_buf = (buf);					\
+-		while ((_buflen + _nbytes) >= _bs) {			\
+-			const u8 *data = _src;				\
+-			size_t len = _nbytes;				\
+-			size_t blocks;					\
+-			int remain;					\
+-			if (_buflen) {					\
+-				remain = _bs - _buflen;			\
+-				memcpy(_buf + _buflen, _src, remain);	\
+-				data = _buf;				\
+-				len = _bs;				\
+-			}						\
+-			remain = len % bs;				\
+-			blocks = (len - remain) / (dv);			\
+-			(*_block_fn)(_state, data, blocks);		\
+-			_src += len - remain - _buflen;			\
+-			_nbytes -= len - remain - _buflen;		\
+-			_buflen = 0;					\
+-		}							\
+-		memcpy(_buf + _buflen, _src, _nbytes);			\
+-		_buflen += _nbytes;					\
+-	})
+-
+-#define BLOCK_HASH_UPDATE(block, state, src, nbytes, bs, buf, buflen) \
+-	BLOCK_HASH_UPDATE_BASE(block, state, src, nbytes, bs, 1, buf, buflen)
+-#define BLOCK_HASH_UPDATE_BLOCKS(block, state, src, nbytes, bs, buf, buflen) \
+-	BLOCK_HASH_UPDATE_BASE(block, state, src, nbytes, bs, bs, buf, buflen)
+-
+-#endif	/* _CRYPTO_INTERNAL_BLOCKHASH_H */
 
-base-commit: c13cee2fc7f137dd25ed50c63eddcc578624f204
+base-commit: ce260754bb435aea18e6a1a1ce3759249013f5a4
 -- 
 2.53.0
 
