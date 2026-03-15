@@ -1,63 +1,62 @@
 Received: from sonic315-20.consmr.mail.ne1.yahoo.com (sonic315-20.consmr.mail.ne1.yahoo.com [66.163.190.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF75226AF4
-	for <linux-crypto@vger.kernel.org>; Sun, 15 Mar 2026 11:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F07F267B05
+	for <linux-crypto@vger.kernel.org>; Sun, 15 Mar 2026 11:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.190.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773573030; cv=none; b=WaIFfJDjWAkjOonJDAMWqFUs0q8jKKAHIgNwffZUfBiGw0OqFa920RkMD/B+Pl5Pyp0gwtvSk3d663905wBbiIhh/VczXUaSF8AVfO2chyOtMk8xrm0+ixBX8isvpDoEFJjKCpN0en+L6FJS0cUUVDrH9F+GkEpj1fuQPyB9H/Y=
+	t=1773573923; cv=none; b=gKgQVcBnRnKxzXLg0d2V8Lo8fsJwTmQ7XEJiUtGxndc+GdnyU59nOnxTFkVPKDZ9Oxb1dI6gTqd2iOfRxy6UxfGh8ZXACmDHh0YJseGWtXaohm11hohTutAcOJNc4n7pQu+I+dyMiOjj7teQjbHOQ4jKmLO0EiB6TqqLOdwE/5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773573030; c=relaxed/simple;
-	bh=aS5GbBubfBbaLNAGmU1VoEPSoZlYPwm+SYGygT6aMf8=;
+	s=arc-20240116; t=1773573923; c=relaxed/simple;
+	bh=gduYucxqjBqP1TTNLTHUwfPheFvJi4MdSJt5Me7waws=;
 	h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type:
-	 References; b=QU9ygFltsNGbpVTlNianqZ+fChHFiDjGRW5KEwGUc5Da173MbF2K6jt8eiaPz8L1BE0RvnoEdKwClzGq11Dz8BtWyLngds3j6STPbQ3Yc26dTNKCpsiCHDWg9CVJ3r0sToytrL8W1CAivXQXA5i8hOVqn8GijNaE9sZozo/CgNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=XWE0hjwv; arc=none smtp.client-ip=66.163.190.146
+	 References; b=EPRicv9hszZVP1gdtBTX7zwcaqLIQegjNOGPoj27yZQYAchqIKnZJ5qUBMTFNw+XOFB09N7QbS9Bu3KZY2Z49i/Sql2ESAKFfTYF9y64OWh9aPoesuSG90C+yuOkXH8ZnnJxXPBq7juwV79hsnqGTKKZaJXwlJLjyV1HemWh4gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=kTC7E3Tr; arc=none smtp.client-ip=66.163.190.146
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="XWE0hjwv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1773573022; bh=LTSXTfrERU3WJVqfFtHSwcgMwzHuTkBQ/QAiTrx3kPI=; h=Date:From:To:Subject:References:From:Subject:Reply-To; b=XWE0hjwv7eSFxjLEzq4lRaHy868Io0jW/66cNtX6C6pSAScgB2SBlODmZ3B3ZVyMoqE2CEQX8nHnjORogRQeuBSIR0neAlz7gCh6JnopbdFqVuzlgu8E1QxIk1h+FWLQN1DsUPw5JQQCoB6Fn5iVfp4/FKmf0jGAXl9kKif8CYwAKteVoBHmTuUowbIgflIikl58q90ZT+v5HMnSm2jNoWLajP1UrlbKqHFWwZF4jGPDkVZ4nJL8lysNix31th8DmV+okeM9j9ADx8+JoM0Q3qf60cectEjRJQImX8TOTl2XmQ8ENICFf+ZXgZnK1k3eL7OLJc2JwNUD6Q+ANaGAtg==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1773573022; bh=N0oBY2STmz6zXQIdi/gk9j2LnhXZs5FeDU4vahdPxRF=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=sb4E+r7APN/l/uZweBipgRQIobNbJGbvc0MrWnW/Nrmj4Sgitn6ro9a+w1bp5zEDqv7dowSupTynEGqqzXg04KwrJiBr0ScYY/7UvqcAOJXYOlQtnp3n1PqGskIwTqNxgIRo6nlQh3CUdxP4y0mzuUljVvhiH5fMtsrEER/1w0jLlyw+or2uci473ZZm5qYERDqSqeHCmAhfmb313esb3/aAZqcSgS8ptx43zVJQQ012x4OTpR4xNQFOWCFG6wbv/OjOfbQFMETtiSD1eaLkTWSBCEEhbw9a0sCwq+JGcu57JNtS47y508sKrlP3Vw9aBzZc87Ci44Xn8OXJPUUihA==
-X-YMail-OSG: 6hgG0QEVM1lJ2t04QPGWaxZ_vKYgITmm3PN8HusEfCi.1JMYGZbE8ew78._USTn
- bNgs1rK8CE0HEPriy_OWI0FEW_d21R5zANGn4lgOb1FuijqgmrUraK2zdPVGewFYho0IQhTExyL.
- f81AFwpYZMhE6ZhQbjUA5XVdTFlZr11bnnknQTN1xEWxjZEdLU0RPYdcIaqVRu7Fdy6FzqtZnFPU
- xDFrudPTt66XhR05mx3klmHo_6.CdGDqeWeYlcrIdth5iYHIqPLm8.MRhOiDo8C93TrApl3PVbKb
- s5uJezYUW4m3Eu3_QpSsbPZrbPUmG9v3wwjE_G84r2k35B5syuadPiSu99S1wGwEQt1OprfzHw.J
- GYQzWyJHykeiH5RZDbh_INh1dmFnUAv4pLTp0W9IZMS4PMmAizFDUA63xNhZGnRvaGNTqcfLaNGW
- vqIN7ntQ082gKRgyFLHxkim7ZO6ccchoFdxtjmobuxSjQRZIiNjgGEojeuxq5OMneqsN3YYXEU3i
- xZSFBPJZcZFd7XTd_cuVzq_ZEwYsTePRC3IXPAmsFsS_aVJc4VI1mmp25n7CxX_1wrUObM.AdAxD
- 8v_qqvlqlOSZKWhMd1YCMnP6uimLHkf.kvyyauftKga72fSpdpg72kTZGIfb95tKs1Ho_1AfN3i6
- vcvRavtv_6yE42soDNG_ICn0q4r87P0UahM6AQPe24t5Snhl1rLUpaRg01.2MFBjmNeNtkPzLpD1
- KbsdPoKyghxXkPOkiIkTGjNXt_7TBIfFE3ASDIIuc5T8Tlw4KAiSkSF3SK5A70.5DF8Na2Ud_L.P
- kPvEb9KtBDEIp0wTGvn0yURpbQYxm0wyaDsoJ3vQK53OihniBKGC2Jwy2KaZIVPlmxCIAy16kOL1
- yiu3C3v7hmT4yUFjK6IGwVbQtWbuiWFlUg1GjKqNVEtENhq35W769wQ5jMOLi7BhEuzpc51STGDf
- 1JzNnCoW_0U6d9KWoNsYB6rlv8cf529PGv_EWexao45LDR0iUdRZ6dTZm.K1MU04qGt2w7SxAl67
- JiAiHhTGsbIpoIsaW0zvMhq5Zuq7uw5sNKo20VFWFi5qX.BJkwQ0n9d9jYa1_NOe2DXPlU0_ipuQ
- VCQIXeDnExkncLYqnKsZeE7Ou47nTo5Hctwt3Fuc8uIXlZ.xkO_tzdN.41iCTyzDmuh1I.YALiG2
- kqljrYW8tysas2k41vUFmRdu05.UkbQhqsldcl8pUzQQHH1VIexQmR9LrUs02YJVE9Vf9a6Ur1q0
- L7_NZPuiHB97IjRVhugbCfAJYk8y5ixi6gYFRG45opQJHypGjI4RtaVlqNRfAYaOhwdYPoCM_jNu
- GK_eeyqHL_UgxrMOyGIOjWTRlvNCMq7IsMWuXRS.rlSreqe9Tt1U5OzwcdnEg2JLfge9xluPP8fs
- N8r83bqRp7NHiTtgAgwGYDALu_Do2owcY2Fyp6TTkTXl8wXapnkrysZogxGJMwOp758ruF5hm.lG
- E6NDxL4Quzl6vklsJ1wy59EzVPpCUm3V6mZKsxDCu_RoVuZUNeHS6ew9w.Lx9lp5DtxOri4LCA7E
- XDLA0NcpufEtETWZw.2uyoPXoAAvv0v3clDdgiFu4kqHjP7i.xU1PrW_wyGHkjZdFXojQmZMsE3R
- CH8M0r6mD5YdO0OBMnpDPTh5FrI6rhdLDhNK_j73aAvSMRB65fqB_FroMpEDJ8NPCaZ9SHdUJ.mf
- 6N_pmZ3XRgaAd4krvDSvlaH00HYRXT_3oA0ixhhXMOdRg2IZp_ZDacKwlTTO0D7CVVMD56PIwFtp
- 1Wo.rfCY8OgJJb_u.z9q4xaUFyI8Uosn.Eop7IjDUYItb57IsEnqThFAS4aR0LCb6cJKO4C9c0q3
- _HIpZte8qnILVchjraNBpEoHT_H9t_fczFu1Ij_1THe9_.7FL_SiC8g0S6RlbJGnINeZmJ74WrcI
- y.zdIW0Z3kAfpoFC2qAbI7WzkU4QT5DTkYqtDWk8Y6To6dkdXJJgP9xwxBNm8Irzeb0V4RxJAVKj
- LvrEUOCw3.OIAYflALQTsXXCjGc1ZiLulKI24CunmRwBi.gsdcQ93ETSFQWAOhNJCWIAPDC.Yeqc
- 2kcafaWF6t5eyX0oHJsri2s8ZNvJjEnErkOzTOpXLm7tF6pJAfCfQTuKDplbUV29GVmw1Q4dbca3
- WH67T41HVoKdmZEefp24vzecCl1WPpfqgFnFcV6.ZH05GEpslQiBd0YaoTdTAMbypW9te_PhW2db
- ndgaa5oobBXp4VY9EvfEQIzeIu2tGI1_V6Pwn
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="kTC7E3Tr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1773573921; bh=yNpoaDhO5vLhq04P1glUl4rxzl5iJBWKKO4rkVZh9Ek=; h=Date:From:To:Subject:References:From:Subject:Reply-To; b=kTC7E3TrG2Q9VrH+0LrVfu33/OQAxFzQwY6ZFTlAIAuFneKXQweR2H5AIaqCLrHfmaoYQGYSnS+7SSs2BgnURvJ0wlGA4ivZzIlzMCvcRA0kKYera3eZ9okJnBsVdQLHZvDCM7Tgs/xrM+i+/T7EcQ2OeWi94KBZVPRG55Pc8nLMZ/axkTJr0NjoknmVeIBbHMm+EKkTzYWt0sgOxUdnZIAmhOMu0GJK3z8Q3vSSDvGwB/NtSfqB6DtJ38iQuAEdjXXmtXVF/kPZbL05laM+SJL9oBNyyJ6SLNtb8gWI7mWV7eLyFa0nyYY5GzbVZF7BGrRt12HXwKyiMSw0Criivg==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1773573921; bh=uqWtBdstOYudK1cde5cCtKCBWgVo46yCa2sxkiUJ9JS=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=e9At2xIJK6kLox5jYIWJx/pzR+TyDNmykyteDpAqjQGqmP10d5akX1TttkhVuiIhnyeTmslu1UvIiqPu7fqol2BJcmeSTN9kMOQ0ZdF9Cd6D3zduZ+iu+CwCIs9RK4+vgNN3MrgGbIHLeMIqqghFxDmo9v/JtrFA13B+qv0rinHsLpME9ebMNR5QXauwy0hN6qyFbg7jkwBkvJd/WdrXEo6He8CcCrwx2vjtgEBZU8PXSKPIo1bU6hkNQwLOtVkeg6KvaO1ToHh53diDSHE+OcDAby6BteVOrDXeXz7br6gVA+6CUdRrqYMP3xoRC9+adLEsfIoYS4bV/QRrdQvNwQ==
+X-YMail-OSG: 1jic.LgVM1n1QXilnu6neFG.fcmlabRszLK7_c2Y2h1IJevASJlhUoY1Uy6c9WD
+ 6fUNBAjL_O4RBdQUlQnMbmWZs5Dfx83nHNZHq1onlGRYlJSrgV7xZBsQ80QR8GwbzqTTpm6JEYZn
+ MLg1YSxcxo3f4TXXNqaw_Jy_WjN.mJLb0qQbFyhr5lY.nPaBC5sxzUjhylBJD7F7lrFyUwof7Lkw
+ b9X0WzF869L3b4UkiIgitLfP76SM9YRHYLtsimR2FZO.BnSkL1xz9Blb4oST2JzMHcHuzhxqAGi0
+ 40a0ZWOVBLjyZlYc5NKP.m0vtxbluNdnaRcJaAgsK4a485QlBWuUTzd1kpz3Y1d8r1BGvPtF1R4i
+ 3g2RgxXIOKMVOT68ntZdraL96aY9yQ8NNdEhyqWDymCEaVJ1pUIczZFnV.T1l7Pwuxk67I43_t75
+ WGaCAYzUOu_i3vzogHh3LnCV7yfM3yQQFOD._ltMRven0W_VGHrn2NN9su6kU3fl75Eq8vBReeZE
+ Xr1.nQohuWHjz42Cjh36kNOzHXfqGgW_ewVQHCYGB_oAd2OKTI1yZvs9f3Oqf5lcFZb9JogyypWy
+ PQuPzoKveYwMd_QEZca.LBqTZCtSEGGGDCWJVYqRxSMEYjRE9Y9eyTjXper7J.K7w5IOTZl2XUL7
+ b5eKb4d00I4lyyFGdRVa._RPirUBPLruRYUxpu6JUjUxZJq51v4GOkAl2vQeLhu7k8nUZuQw4PGx
+ U4OkdN0qhxBb8lAHKnur3vI1BGF4GT7ddQEV5cfnyHUGZnm4KuHbYKz6e4TyrCwnWHElUKMsvdNd
+ yX1wayt8seQeiKSrVz4J_2MMFxprwY893jeHEi8uUPi9HHaCLjlsrM7LHZpgwMVKzxOed7YQ4YF5
+ Z1Ow6N9uQxWrAq5SVddBHMIc0CL9Cl2G3BBRDhAroR_LSZL2bRYMIQ6vQG94cs4Ak38jWNs5QrZQ
+ A7JMgpuRZ0TUdPonMoVHX8J33_SZXP3.KxolU1e2A_yLLHovtnqu3hsJswrk_xDxeyZ.J7tJSfH3
+ vkKQ1X9WCEuUyat_3kbQ74qs_mV3UXRecf7gCnNxESKI8fsft8K0VhWuu6WIlCZzU.M1xN9XUGsI
+ _1G.BYh7HwRe9tZptM4Ou27Ghhla9DSLPfKAqxz1j15QnzMaTc7yIxqRHQaSYgZbSPOqUyt.ydcz
+ lm8cNCy3DW723wlsv3IKp3ht0p98F0r1fiGBbE1SLB5QrYWrm8cePZ3vknAl2QaWAH.1ExNnAvYD
+ bV9cDSNBBZlhopWv72xraAkVJpjjj3Ae_3dwKReqM7ZW1uKuafJdzUZBbLjaEC5M0Kw3IHALFtco
+ KDAdvZpfnpU4S98xAG3pZ7Kh1ckXr.CnilvSsnxyaxArCxPlBV0v9xytx2HATxNLNpUPrOTewPhm
+ SvhBGhjOyxU9oMIQGngcCOB0_gzgcq5NTE_timSCMqJo1ybICM5J.e2QsIf9vU1vac.qNWl640uV
+ 0xl587SWItcwsrX5y8mQf5vvpB5PmsknvuMTLMInqENo3jzBJIIc1yHOPJhcS4RMoiRJZO5ACOo0
+ Iu1gM880f0uU5qDu5iT60iEAcMOAf7iBKJZYxMesTaR9UmgicVpmxjX4TaLmnsuKM52QDD8LJZU1
+ 8VvnkIAPjRi9uaBKOEo1G_d1qAw8rEJNmnnrnE5cuXMOCo6rzdROyxW0k9m3qVw5wdsTWBRdjo8L
+ T2Akoz3qTyPQnpkLcdw63J91gt75012R5vOiFMf.oymcOjj10PSYsnhaqezZiDpdF2z8LZzh287a
+ aCgDjhHSB86hU2ZJovzs7GgAVyseM9hGmAU772vfK8Dgq0bQSWhGGcMuk0gqFNCXM.eIqdS6HTy.
+ htsCMd3h2vBnJHRdwEI4cyqmtKmxmegbnI.0bpCscSGlrP3_PgTJhnaAbivJrhRdihwH7bR8ENve
+ sg4hnf5zJqu8TlP4Fg1ycJY5gQbzZipGYqr7zjaY.S2VaEkulzYQpsizvNJpZlMgaxS0K957V_3p
+ PiNBTI__Gcp2_SOMjUnvdwOSW_F.w7f1gv5hh_FXsXYnLM.D_mZM2AoDDgT_pxp64AFD7O6MCekH
+ n50AQBvWCRohXhXzCSckLfXrWzteq_uTB.eTk3Xb7BdJgIkQcsDmg8T2KmYys459gq3D1QoO_hld
+ wyq0O7VNcn8e3zMbu6QoZ.gVZhVqWifpX2_RmsEz0K9Axn1TDIdfTBQ8sGH0iX6f_W9b6IKaQ4wV
+ L7SZV3FK9xEVnR4Sz4aeDwPVorFKUj7lp5zFpO94-
 X-Sonic-MF: <namiltd@yahoo.com>
-X-Sonic-ID: bf211b43-56e0-4624-afec-9a53e36fbfd4
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.ne1.yahoo.com with HTTP; Sun, 15 Mar 2026 11:10:22 +0000
-Date: Sun, 15 Mar 2026 11:00:14 +0000 (UTC)
+X-Sonic-ID: 83b4b31f-08d5-457b-8fd8-c724d411738a
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.ne1.yahoo.com with HTTP; Sun, 15 Mar 2026 11:25:21 +0000
+Date: Sun, 15 Mar 2026 11:05:03 +0000 (UTC)
 From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
 To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Message-ID: <952138005.1301417.1773572414707@mail.yahoo.com>
-Subject: [PATCH] crypto: inside-secure/eip93 - add missing address
- terminator character
+Message-ID: <1003432575.1235274.1773572703895@mail.yahoo.com>
+Subject: [PATCH] crypto: inside-secure/eip93 - correct ecb(des-eip93) typo
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -66,196 +65,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-References: <952138005.1301417.1773572414707.ref@mail.yahoo.com>
+References: <1003432575.1235274.1773572703895.ref@mail.yahoo.com>
 X-Mailer: WebService/1.1.25297 YMailNovation
 
-Add the missing > characters to the end of the email address
+Correct the typo in the name "ecb(des-eip93)".
 
 Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
 ---
-drivers/crypto/inside-secure/eip93/eip93-aead.c | 2 +-
-drivers/crypto/inside-secure/eip93/eip93-aead.h | 2 +-
-drivers/crypto/inside-secure/eip93/eip93-aes.h | 2 +-
 drivers/crypto/inside-secure/eip93/eip93-cipher.c | 2 +-
-drivers/crypto/inside-secure/eip93/eip93-cipher.h | 2 +-
-drivers/crypto/inside-secure/eip93/eip93-common.c | 2 +-
-drivers/crypto/inside-secure/eip93/eip93-common.h | 2 +-
-drivers/crypto/inside-secure/eip93/eip93-des.h | 2 +-
-drivers/crypto/inside-secure/eip93/eip93-hash.c | 2 +-
-drivers/crypto/inside-secure/eip93/eip93-hash.h | 2 +-
-drivers/crypto/inside-secure/eip93/eip93-main.c | 2 +-
-drivers/crypto/inside-secure/eip93/eip93-main.h | 2 +-
-drivers/crypto/inside-secure/eip93/eip93-regs.h | 2 +-
-13 files changed, 13 insertions(+), 13 deletions(-)
+1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-aead.c b/drivers/crypto/inside-secure/eip93/eip93-aead.c
-index 1a08aed..2bbd0af 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-aead.c
-+++ b/drivers/crypto/inside-secure/eip93/eip93-aead.c
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-
-#include <crypto/aead.h>
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-aead.h b/drivers/crypto/inside-secure/eip93/eip93-aead.h
-index e2fa8fd..d933a8f 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-aead.h
-+++ b/drivers/crypto/inside-secure/eip93/eip93-aead.h
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-#ifndef _EIP93_AEAD_H_
-#define _EIP93_AEAD_H_
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-aes.h b/drivers/crypto/inside-secure/eip93/eip93-aes.h
-index 1d83d39..82064cc 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-aes.h
-+++ b/drivers/crypto/inside-secure/eip93/eip93-aes.h
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-#ifndef _EIP93_AES_H_
-#define _EIP93_AES_H_
 diff --git a/drivers/crypto/inside-secure/eip93/eip93-cipher.c b/drivers/crypto/inside-secure/eip93/eip93-cipher.c
-index 0713c71..7893c15 100644
+index 7893c15..4dd7ab7 100644
 --- a/drivers/crypto/inside-secure/eip93/eip93-cipher.c
 +++ b/drivers/crypto/inside-secure/eip93/eip93-cipher.c
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-
-#include <crypto/aes.h>
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-cipher.h b/drivers/crypto/inside-secure/eip93/eip93-cipher.h
-index 6e2545e..47e4e84 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-cipher.h
-+++ b/drivers/crypto/inside-secure/eip93/eip93-cipher.h
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-#ifndef _EIP93_CIPHER_H_
-#define _EIP93_CIPHER_H_
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-common.c b/drivers/crypto/inside-secure/eip93/eip93-common.c
-index f4ad6be..6f14701 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-common.c
-+++ b/drivers/crypto/inside-secure/eip93/eip93-common.c
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-
-#include <crypto/aes.h>
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-common.h b/drivers/crypto/inside-secure/eip93/eip93-common.h
-index 80964cf..41c4378 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-common.h
-+++ b/drivers/crypto/inside-secure/eip93/eip93-common.h
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-
-#ifndef _EIP93_COMMON_H_
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-des.h b/drivers/crypto/inside-secure/eip93/eip93-des.h
-index 74748df..53ffe0f 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-des.h
-+++ b/drivers/crypto/inside-secure/eip93/eip93-des.h
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-#ifndef _EIP93_DES_H_
-#define _EIP93_DES_H_
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-hash.c b/drivers/crypto/inside-secure/eip93/eip93-hash.c
-index 2705855..84d3ff2 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-hash.c
-+++ b/drivers/crypto/inside-secure/eip93/eip93-hash.c
-@@ -2,7 +2,7 @@
-/*
-* Copyright (C) 2024
-*
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-
-#include <crypto/sha1.h>
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-hash.h b/drivers/crypto/inside-secure/eip93/eip93-hash.h
-index 556f22f..29da18d 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-hash.h
-+++ b/drivers/crypto/inside-secure/eip93/eip93-hash.h
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-#ifndef _EIP93_HASH_H_
-#define _EIP93_HASH_H_
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/drivers/crypto/inside-secure/eip93/eip93-main.c
-index b7fd979..743861d 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-main.c
-+++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-
-#include <linux/atomic.h>
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.h b/drivers/crypto/inside-secure/eip93/eip93-main.h
-index 79b078f..990c240 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-main.h
-+++ b/drivers/crypto/inside-secure/eip93/eip93-main.h
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-#ifndef _EIP93_MAIN_H_
-#define _EIP93_MAIN_H_
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-regs.h b/drivers/crypto/inside-secure/eip93/eip93-regs.h
-index 0490b8d..21556df 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-regs.h
-+++ b/drivers/crypto/inside-secure/eip93/eip93-regs.h
-@@ -3,7 +3,7 @@
-* Copyright (C) 2019 - 2021
-*
-* Richard van Schagen <vschagen@icloud.com>
-- * Christian Marangi <ansuelsmth@gmail.com
-+ * Christian Marangi <ansuelsmth@gmail.com>
-*/
-#ifndef REG_EIP93_H
-#define REG_EIP93_H
+@@ -320,7 +320,7 @@ struct eip93_alg_template eip93_alg_ecb_des = {
+.ivsize = 0,
+.base = {
+.cra_name = "ecb(des)",
+- .cra_driver_name = "ebc(des-eip93)",
++ .cra_driver_name = "ecb(des-eip93)",
+.cra_priority = EIP93_CRA_PRIORITY,
+.cra_flags = CRYPTO_ALG_ASYNC |
+CRYPTO_ALG_KERN_DRIVER_ONLY,
 -- 
 2.47.3
