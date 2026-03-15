@@ -1,132 +1,183 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA5435F610
-	for <linux-crypto@vger.kernel.org>; Sun, 15 Mar 2026 14:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D6D371867
+	for <linux-crypto@vger.kernel.org>; Sun, 15 Mar 2026 15:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773586656; cv=none; b=tK9ZBAB8E7t87gMkTVAiQIQVhbAzKGOuPT0LLZDracseGxZbm80YZPjRBLmLmCwdGEnnqQuJr1f3uXVwOoVwBTFdYkfTta3TUuHYbQa5HOjoRzxqeQtwNoM0T3lpj/kqx8AfENwxCtd7EUVU5PLpqwESC+GAau1U9aFsLci4UPU=
+	t=1773590121; cv=none; b=XN3Uoj2VJkO+9u5fxiNVrnxFCMUTq6JeRIRpbV3mKjfGFtu6Hqn0+hMsdSO4cVG8pcthSV+jDfJlCMDtztrXOaEAEjil70Qii8aRvMPRWuzXsj3KtKDYYJzv9h4Y/D1WWHE7RH0+Rb9sMPp7brObcINSVPlfouUapXHyQR239HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773586656; c=relaxed/simple;
-	bh=bdzgUYp9Hfk5Jhb55dw+Ajj+qPfsDMuNmgtx+Zl5MR8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UEQ3x5booMOxk8JG6VqAD6kr5nPeuARmU3Pn1ngAQWOz/I5OF+842YvaoMdfIZ7/zycxxlNIll6Lg/Jy678dUHNnJIL6eLpaY1dFC47oF+PVOszEd/+caChpFoifwoDJhTLFVUYjoxseG3BOfVtGkowFbmJKvtsHL+cFU9mehmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z0CbEB5e; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773590121; c=relaxed/simple;
+	bh=2qTLxckE9oMDjwMxGCBaza0lbBYLuX0cOOAxPmFeG0w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=To1xSh3kFwgNvvuuQ9rpKt0kIe3uJfI6kQFNrO8298tmkRggr8d+Rdj4bY19W4w2EsVdpnLBOruJ9sOng2FkDMobOA4SZJUpnCHHhvCT6ZAFr3A3M6ttOkEjbBeu5WYupD2zbIK28fx6pC5f+laphuBmW1HylnLN/9Z2Jo+cUBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KGkfcsd/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=F+2ZAl0y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z0CbEB5e"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43a03cb1df9so3643654f8f.1
-        for <linux-crypto@vger.kernel.org>; Sun, 15 Mar 2026 07:57:35 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KGkfcsd/";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+2ZAl0y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773590119;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xQ3rAvJPMukjRlEJsiY79XXn5O5j6UdqZxcxui6ZZRY=;
+	b=KGkfcsd/xLDztUSyaML8zaQLFMYhRRGWYT5cL4pCuxiGAQyWiFQMK/xF41XglfYTV69H91
+	jpwYziov3CZsKHowhUO2NKt/6M3DaN+4xU6Av42sqqgmR/OSwv1zCqzmCbLRa2+/0gkALn
+	3S/ZokidttAMS75T+y3fqSQpjXJLgYk=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-145-agnFnaPbOFKy6Jf8o-foSg-1; Sun, 15 Mar 2026 11:55:17 -0400
+X-MC-Unique: agnFnaPbOFKy6Jf8o-foSg-1
+X-Mimecast-MFC-AGG-ID: agnFnaPbOFKy6Jf8o-foSg_1773590116
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2b059511554so2661705ad.0
+        for <linux-crypto@vger.kernel.org>; Sun, 15 Mar 2026 08:55:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773586653; x=1774191453; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ctMsamV79lnDxH1eZ0yPc5TbWrVVMUxp8VuhiBWLzMA=;
-        b=Z0CbEB5eIytM5T8sRDOHZzuRT9JztpbGP4iRh4HICIRnUNYOeiAxjjf8PFd2VCIG+W
-         tv3mOX6gD37vpC/V0i5ftpETZIbmwfp6EYN4W0d0Vda+RmVIq2Eawe1MzPOiWm2LP+l5
-         tIk2fUGWWtf6jk/dWLO4ONItdg4o65g5FDZpNFoQ7eVnvKppf8NK4now4fYISiVate0h
-         WlBXw6PSEL0qL4Wvm6e1MBCh6eGHV5jmIV0g+Hf77Q4OJkcBtYOob9gF1a9soLjuOuOv
-         xLHZzT1ACM/LgpeFUYI8JZDvZtOyWEzRtSLfSrtQoFFJ33evEuI//LketYATncSGL5Z1
-         Q9Ug==
+        d=redhat.com; s=google; t=1773590116; x=1774194916; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xQ3rAvJPMukjRlEJsiY79XXn5O5j6UdqZxcxui6ZZRY=;
+        b=F+2ZAl0yeFz29YJNQWKx8AbT6mMBx/3iserbsufjJib9A5R0ZiGwyfe/0Y1T4x6Afe
+         v94+LclcBsr+V85l0yfk7jswguN//VMErIiTu55GvEWSdWSd8W8FqH1PteOm52euJt8K
+         5u8koHdOUZ1pthQguz9N/95OOVqhzrFEH/Y3NXmpU3v1Wrv0sPzw2WkSoI5L/WVVIcyP
+         q1zIkDyadboWs/gSLaFwX68fXVTfY2d5MOOIA4oBl1J0UCG+dRABUNaVGgvG8CdmWk7H
+         rRwu+T3DMYYR4+qMPfHIFtwo/21IkZiouqgEylXFjq76Tqz0XtikKIau5md9+Yssmar2
+         cRkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773586653; x=1774191453;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ctMsamV79lnDxH1eZ0yPc5TbWrVVMUxp8VuhiBWLzMA=;
-        b=ZOFnnSq/vjFTitRCb76f62UI2o7OgO9yLiN8HYglIIWbxhI8R5OZMtenKOZTjf8r4p
-         dzku6s8ESps1WAYoEsA1LBxJY6QutiY3nxshvEs+CPF6AvZXc14Ll9YWa0K7N4H7vgQv
-         nr/JEQFaKygU77gKZStStncQCYq5Ap36sLGpZ6Mt23GY33BpA12G4mCZq0a3PeXqrSP0
-         s5vDC1rMtMJpOeSAxgJVhKaL81iCwcgIL7dRFf7yuPhT8HCWYvbiL6LB+52+TsfzCaEf
-         umMKI8axtaN0GDWQSYbdaLTttm+I6z02dco5WLVRJDyo6IQWjrthw2UmbleamMldkOY6
-         ddkQ==
-X-Gm-Message-State: AOJu0Yycd2rgXTEVLAok37Wn6a/mpkuvZG0qIBDmS3mdAnpOJjtNAzO7
-	oBVayfxE/vuYArasM6bVS8RfGUi7SGYrftDe9VR5UD3mQozxkgJ8pvqO
-X-Gm-Gg: ATEYQzwzZ2zuUWUeuwPxUqyAjfAqhxeRdle59BjymovyarhM0MD/JD9d50LqIkWx7NF
-	npNp2p/Vv4ygMG3WyfPJFhDf0iKlMzC91RhQNPzbPh9nXIA4OCIGBsr6WbJDczvyEZ12mmTpL1E
-	5LB2A+mRZCD6DD6vF/+GpIlOtPq8a4395iUjcdJHAr/J0zTI780BFOcVQXPDuz1xz4lDQj/vuvD
-	yPLJVnAd6G9WqzrRvvL+i6Vx4ioVWQrK75HKHAu1NcmGZCojPksc5zgNCvAqb4tPtLjOcve8GZE
-	zcw/+Cjs26xX9VYzWodfyRXH1C9S6CS229bOJi6tumD1US/VZl9h7VhkZlxKjiwOqC5VUcyYj+Z
-	Um/V/FTZTD2VLd8YESodfpMDNGX307vBhafpA/LYgof19ly+8nbgoFOISdRYzhbSc346N3wqVD3
-	bPoEXxnNw1X9jpy+xgBu2S7Dtiu8lOPKqa0+z48IRdnozyHVpFulbji96XzEuvLLkLPYonaWQ41
-	RBWs6HIbHDbfRfXWiFlVeK3WzfZ4A==
-X-Received: by 2002:a5d:5e01:0:b0:439:befa:91cb with SMTP id ffacd0b85a97d-43a04dc0958mr17059954f8f.45.1773586653358;
-        Sun, 15 Mar 2026 07:57:33 -0700 (PDT)
-Received: from DESKTOP-TILNSD1.localdomain ([139.47.104.103])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe1a72cdsm36221172f8f.9.2026.03.15.07.57.32
+        d=1e100.net; s=20251104; t=1773590116; x=1774194916;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xQ3rAvJPMukjRlEJsiY79XXn5O5j6UdqZxcxui6ZZRY=;
+        b=sjGEkXuIylB0kVDynErhduxvALuAPzOYGtOW1dlw/qX+2GWLfHOG0XwHSrcwucu3j8
+         s3q+2HWV+GGa7JVtUgOckpAxyh26TvWr+xGaBkpoRgK+5q4UdeRIOo3UpI6/gZSRJF/f
+         cfl8ncIr5uLz9Nyh2G/ynvgZclTajNQudDi9JcSEw7ovd/qj4NS3gcXet64uKuIbdb0P
+         QN7jtw4VeIxpR9gsIOU4PpVkeW0Vtr+c8O0+2U9wJpbYl2DKxO2xg27rx6uwL4IQmJMU
+         djzcBguilw8de6yaSOdeCoCR0WoU25N0JyCGXVbq023Je2PMyqFV+XI3L3BDop75zUTg
+         2X4g==
+X-Forwarded-Encrypted: i=1; AJvYcCVEjkJNQv7UuYMiz5/Uj4KVfpE6N3/gWOij/AYpBsMx+kh6d6dqdomQ9uUVQjvG4G4y6OhbTPysmZZ5zk4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yws11dGnlPXZ90TAiCyXacScpSKlT7JBTx6lcoCFezNUVWcfoEA
+	f3En5+uCOUBvBJdvdET3tBNagW4CqOJ0+9LaKRs7fp+KMzLbbcyBHWMvSVME9HEI+gNRMtBARnu
+	C2aoRrgquzCpn+4cnujQztOM5Lv16VH9ScuO/6MKzAnF5EKaUJ6mU7bN32YaZ914jHA==
+X-Gm-Gg: ATEYQzyFXPXd7/uNnPWuY1S3upsgopiDV9hoGgQi25s0lweaUk4crAn/z+FhPtkXPFb
+	wwLalFvprulDb4MmBuolddT5z0QHWPTgo8v8woRC/SOh0QTfh/zDqKsN8h2ncQ/tSmhM/glf7a3
+	Z9iAnWdJxdp+cnK00WwJCF4KBwxIqFnTAgIqrb51wwT4LNZXlGDPLceqjVOyMAz0oH2yRAsrCny
+	k6H4DAC8BUz7fa3GOJfdxk09LYAeC/2EkkxI3MtIn1g3Ygv+qaJG4rRmt3HYtM7gPFENQ+MNT1T
+	mBQA/B6LpwVLSEzKC/2mJUh58pthUjCOv4ALgnCF74Uw2ZG11P6P5d7zrbob+PeSE8Ll6Olp4Ka
+	ytvjYzjBGXzFepjgmAw==
+X-Received: by 2002:a17:902:ea06:b0:2ae:4b91:8407 with SMTP id d9443c01a7336-2aecaaa861amr105927325ad.34.1773590116464;
+        Sun, 15 Mar 2026 08:55:16 -0700 (PDT)
+X-Received: by 2002:a17:902:ea06:b0:2ae:4b91:8407 with SMTP id d9443c01a7336-2aecaaa861amr105927135ad.34.1773590116029;
+        Sun, 15 Mar 2026 08:55:16 -0700 (PDT)
+Received: from doltdoltdolt ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece62c701sm106718375ad.37.2026.03.15.08.55.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Mar 2026 07:57:32 -0700 (PDT)
-From: Kit Dallege <xaum.io@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kit Dallege <xaum.io@gmail.com>
-Subject: [PATCH 1/5] crypto: add missing kernel-doc for anonymous union members
-Date: Sun, 15 Mar 2026 15:57:22 +0100
-Message-ID: <20260315145722.24081-1-xaum.io@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        Sun, 15 Mar 2026 08:55:15 -0700 (PDT)
+Date: Sun, 15 Mar 2026 23:55:10 +0800
+From: Zorro Lang <zlang@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>, stable@vger.kernel.org,
+	Akhil R <akhilrajeev@nvidia.com>
+Subject: Re: [PATCH] crypto: tegra - Add missing CRYPTO_ALG_ASYNC
+Message-ID: <20260315155510.myp3i7jhzs654zr2@doltdoltdolt>
+References: <20260314165515.9678-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260314165515.9678-1-ebiggers@kernel.org>
 
-Document the anonymous SKCIPHER_ALG_COMMON and COMP_ALG_COMMON struct
-members in skcipher_alg, scomp_alg, and acomp_alg, following the
-existing pattern used by HASH_ALG_COMMON in shash_alg.
+On Sat, Mar 14, 2026 at 09:55:15AM -0700, Eric Biggers wrote:
+> The tegra crypto driver failed to set the CRYPTO_ALG_ASYNC on its
+> asynchronous algorithms, causing the crypto API to select them for users
+> that request only synchronous algorithms.  This causes crashes (at
+> least).  Fix this by adding the flag like what the other drivers do.
+> 
+> Reported-by: Zorro Lang <zlang@redhat.com>
+> Closes: https://lore.kernel.org/r/20260314080937.pghb4aa7d4je3mhh@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com
+> Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
+> Cc: stable@vger.kernel.org
+> Cc: Akhil R <akhilrajeev@nvidia.com>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
 
-This fixes the following kernel-doc warnings:
+Thanks for you quick response, Eric. This fix works on my side. With this patch,
+same reproducer can't trigger that bug anymore.
 
-  include/crypto/skcipher.h:166: struct member 'SKCIPHER_ALG_COMMON' not described in 'skcipher_alg'
-  include/crypto/internal/scompress.h:39: struct member 'COMP_ALG_COMMON' not described in 'scomp_alg'
-  include/crypto/internal/acompress.h:55: struct member 'COMP_ALG_COMMON' not described in 'acomp_alg'
+Thanks,
+Zorro
 
-Signed-off-by: Kit Dallege <xaum.io@gmail.com>
----
- include/crypto/internal/acompress.h | 1 +
- include/crypto/internal/scompress.h | 1 +
- include/crypto/skcipher.h           | 1 +
- 3 files changed, 3 insertions(+)
-
-diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
-index 9a3f28baa804..9cd37df32dc4 100644
---- a/include/crypto/internal/acompress.h
-+++ b/include/crypto/internal/acompress.h
-@@ -42,6 +42,7 @@
-  *
-  * @base:	Common crypto API algorithm data structure
-  * @calg:	Cmonn algorithm data structure shared with scomp
-+ * @COMP_ALG_COMMON: see struct comp_alg_common
-  */
- struct acomp_alg {
- 	int (*compress)(struct acomp_req *req);
-diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
-index 6a2c5f2e90f9..13a0851a995b 100644
---- a/include/crypto/internal/scompress.h
-+++ b/include/crypto/internal/scompress.h
-@@ -22,6 +22,7 @@ struct crypto_scomp {
-  * @decompress:	Function performs a de-compress operation
-  * @streams:	Per-cpu memory for algorithm
-  * @calg:	Cmonn algorithm data structure shared with acomp
-+ * @COMP_ALG_COMMON: see struct comp_alg_common
-  */
- struct scomp_alg {
- 	int (*compress)(struct crypto_scomp *tfm, const u8 *src,
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 9e5853464345..4efe2ca8c4d1 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -145,6 +145,7 @@ struct skcipher_alg_common SKCIPHER_ALG_COMMON;
-  * 	      considerably more efficient if it can operate on multiple chunks
-  * 	      in parallel. Should be a multiple of chunksize.
-  * @co: see struct skcipher_alg_common
-+ * @SKCIPHER_ALG_COMMON: see struct skcipher_alg_common
-  *
-  * All fields except @ivsize are mandatory and must be filled.
-  */
--- 
-2.53.0
+> 
+> This patch is targeting crypto/master
+> 
+>  drivers/crypto/tegra/tegra-se-aes.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/tegra/tegra-se-aes.c b/drivers/crypto/tegra/tegra-se-aes.c
+> index 0e07d0523291a..cb97a59084519 100644
+> --- a/drivers/crypto/tegra/tegra-se-aes.c
+> +++ b/drivers/crypto/tegra/tegra-se-aes.c
+> @@ -592,10 +592,11 @@ static struct tegra_se_alg tegra_aes_algs[] = {
+>  			.ivsize	= AES_BLOCK_SIZE,
+>  			.base = {
+>  				.cra_name = "xts(aes)",
+>  				.cra_driver_name = "xts-aes-tegra",
+>  				.cra_priority = 500,
+> +				.cra_flags = CRYPTO_ALG_ASYNC,
+>  				.cra_blocksize = AES_BLOCK_SIZE,
+>  				.cra_ctxsize	   = sizeof(struct tegra_aes_ctx),
+>  				.cra_alignmask	   = (__alignof__(u64) - 1),
+>  				.cra_module	   = THIS_MODULE,
+>  			},
+> @@ -1920,10 +1921,11 @@ static struct tegra_se_alg tegra_aead_algs[] = {
+>  			.ivsize	= GCM_AES_IV_SIZE,
+>  			.base = {
+>  				.cra_name = "gcm(aes)",
+>  				.cra_driver_name = "gcm-aes-tegra",
+>  				.cra_priority = 500,
+> +				.cra_flags = CRYPTO_ALG_ASYNC,
+>  				.cra_blocksize = 1,
+>  				.cra_ctxsize = sizeof(struct tegra_aead_ctx),
+>  				.cra_alignmask = 0xf,
+>  				.cra_module = THIS_MODULE,
+>  			},
+> @@ -1942,10 +1944,11 @@ static struct tegra_se_alg tegra_aead_algs[] = {
+>  			.chunksize = AES_BLOCK_SIZE,
+>  			.base = {
+>  				.cra_name = "ccm(aes)",
+>  				.cra_driver_name = "ccm-aes-tegra",
+>  				.cra_priority = 500,
+> +				.cra_flags = CRYPTO_ALG_ASYNC,
+>  				.cra_blocksize = 1,
+>  				.cra_ctxsize = sizeof(struct tegra_aead_ctx),
+>  				.cra_alignmask = 0xf,
+>  				.cra_module = THIS_MODULE,
+>  			},
+> @@ -1969,11 +1972,11 @@ static struct tegra_se_alg tegra_cmac_algs[] = {
+>  			.halg.statesize = sizeof(struct tegra_cmac_reqctx),
+>  			.halg.base = {
+>  				.cra_name = "cmac(aes)",
+>  				.cra_driver_name = "tegra-se-cmac",
+>  				.cra_priority = 300,
+> -				.cra_flags = CRYPTO_ALG_TYPE_AHASH,
+> +				.cra_flags = CRYPTO_ALG_TYPE_AHASH | CRYPTO_ALG_ASYNC,
+>  				.cra_blocksize = AES_BLOCK_SIZE,
+>  				.cra_ctxsize = sizeof(struct tegra_cmac_ctx),
+>  				.cra_alignmask = 0,
+>  				.cra_module = THIS_MODULE,
+>  				.cra_init = tegra_cmac_cra_init,
+> 
+> base-commit: 1c9982b4961334c1edb0745a04cabd34bc2de675
+> -- 
+> 2.53.0
+> 
 
