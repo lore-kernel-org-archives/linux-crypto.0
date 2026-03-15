@@ -1,92 +1,132 @@
-Received: from sonic315-20.consmr.mail.ne1.yahoo.com (sonic315-20.consmr.mail.ne1.yahoo.com [66.163.190.146])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F07F267B05
-	for <linux-crypto@vger.kernel.org>; Sun, 15 Mar 2026 11:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.190.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA5435F610
+	for <linux-crypto@vger.kernel.org>; Sun, 15 Mar 2026 14:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773573923; cv=none; b=gKgQVcBnRnKxzXLg0d2V8Lo8fsJwTmQ7XEJiUtGxndc+GdnyU59nOnxTFkVPKDZ9Oxb1dI6gTqd2iOfRxy6UxfGh8ZXACmDHh0YJseGWtXaohm11hohTutAcOJNc4n7pQu+I+dyMiOjj7teQjbHOQ4jKmLO0EiB6TqqLOdwE/5E=
+	t=1773586656; cv=none; b=tK9ZBAB8E7t87gMkTVAiQIQVhbAzKGOuPT0LLZDracseGxZbm80YZPjRBLmLmCwdGEnnqQuJr1f3uXVwOoVwBTFdYkfTta3TUuHYbQa5HOjoRzxqeQtwNoM0T3lpj/kqx8AfENwxCtd7EUVU5PLpqwESC+GAau1U9aFsLci4UPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773573923; c=relaxed/simple;
-	bh=gduYucxqjBqP1TTNLTHUwfPheFvJi4MdSJt5Me7waws=;
-	h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type:
-	 References; b=EPRicv9hszZVP1gdtBTX7zwcaqLIQegjNOGPoj27yZQYAchqIKnZJ5qUBMTFNw+XOFB09N7QbS9Bu3KZY2Z49i/Sql2ESAKFfTYF9y64OWh9aPoesuSG90C+yuOkXH8ZnnJxXPBq7juwV79hsnqGTKKZaJXwlJLjyV1HemWh4gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=kTC7E3Tr; arc=none smtp.client-ip=66.163.190.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+	s=arc-20240116; t=1773586656; c=relaxed/simple;
+	bh=bdzgUYp9Hfk5Jhb55dw+Ajj+qPfsDMuNmgtx+Zl5MR8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UEQ3x5booMOxk8JG6VqAD6kr5nPeuARmU3Pn1ngAQWOz/I5OF+842YvaoMdfIZ7/zycxxlNIll6Lg/Jy678dUHNnJIL6eLpaY1dFC47oF+PVOszEd/+caChpFoifwoDJhTLFVUYjoxseG3BOfVtGkowFbmJKvtsHL+cFU9mehmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z0CbEB5e; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="kTC7E3Tr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1773573921; bh=yNpoaDhO5vLhq04P1glUl4rxzl5iJBWKKO4rkVZh9Ek=; h=Date:From:To:Subject:References:From:Subject:Reply-To; b=kTC7E3TrG2Q9VrH+0LrVfu33/OQAxFzQwY6ZFTlAIAuFneKXQweR2H5AIaqCLrHfmaoYQGYSnS+7SSs2BgnURvJ0wlGA4ivZzIlzMCvcRA0kKYera3eZ9okJnBsVdQLHZvDCM7Tgs/xrM+i+/T7EcQ2OeWi94KBZVPRG55Pc8nLMZ/axkTJr0NjoknmVeIBbHMm+EKkTzYWt0sgOxUdnZIAmhOMu0GJK3z8Q3vSSDvGwB/NtSfqB6DtJ38iQuAEdjXXmtXVF/kPZbL05laM+SJL9oBNyyJ6SLNtb8gWI7mWV7eLyFa0nyYY5GzbVZF7BGrRt12HXwKyiMSw0Criivg==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1773573921; bh=uqWtBdstOYudK1cde5cCtKCBWgVo46yCa2sxkiUJ9JS=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=e9At2xIJK6kLox5jYIWJx/pzR+TyDNmykyteDpAqjQGqmP10d5akX1TttkhVuiIhnyeTmslu1UvIiqPu7fqol2BJcmeSTN9kMOQ0ZdF9Cd6D3zduZ+iu+CwCIs9RK4+vgNN3MrgGbIHLeMIqqghFxDmo9v/JtrFA13B+qv0rinHsLpME9ebMNR5QXauwy0hN6qyFbg7jkwBkvJd/WdrXEo6He8CcCrwx2vjtgEBZU8PXSKPIo1bU6hkNQwLOtVkeg6KvaO1ToHh53diDSHE+OcDAby6BteVOrDXeXz7br6gVA+6CUdRrqYMP3xoRC9+adLEsfIoYS4bV/QRrdQvNwQ==
-X-YMail-OSG: 1jic.LgVM1n1QXilnu6neFG.fcmlabRszLK7_c2Y2h1IJevASJlhUoY1Uy6c9WD
- 6fUNBAjL_O4RBdQUlQnMbmWZs5Dfx83nHNZHq1onlGRYlJSrgV7xZBsQ80QR8GwbzqTTpm6JEYZn
- MLg1YSxcxo3f4TXXNqaw_Jy_WjN.mJLb0qQbFyhr5lY.nPaBC5sxzUjhylBJD7F7lrFyUwof7Lkw
- b9X0WzF869L3b4UkiIgitLfP76SM9YRHYLtsimR2FZO.BnSkL1xz9Blb4oST2JzMHcHuzhxqAGi0
- 40a0ZWOVBLjyZlYc5NKP.m0vtxbluNdnaRcJaAgsK4a485QlBWuUTzd1kpz3Y1d8r1BGvPtF1R4i
- 3g2RgxXIOKMVOT68ntZdraL96aY9yQ8NNdEhyqWDymCEaVJ1pUIczZFnV.T1l7Pwuxk67I43_t75
- WGaCAYzUOu_i3vzogHh3LnCV7yfM3yQQFOD._ltMRven0W_VGHrn2NN9su6kU3fl75Eq8vBReeZE
- Xr1.nQohuWHjz42Cjh36kNOzHXfqGgW_ewVQHCYGB_oAd2OKTI1yZvs9f3Oqf5lcFZb9JogyypWy
- PQuPzoKveYwMd_QEZca.LBqTZCtSEGGGDCWJVYqRxSMEYjRE9Y9eyTjXper7J.K7w5IOTZl2XUL7
- b5eKb4d00I4lyyFGdRVa._RPirUBPLruRYUxpu6JUjUxZJq51v4GOkAl2vQeLhu7k8nUZuQw4PGx
- U4OkdN0qhxBb8lAHKnur3vI1BGF4GT7ddQEV5cfnyHUGZnm4KuHbYKz6e4TyrCwnWHElUKMsvdNd
- yX1wayt8seQeiKSrVz4J_2MMFxprwY893jeHEi8uUPi9HHaCLjlsrM7LHZpgwMVKzxOed7YQ4YF5
- Z1Ow6N9uQxWrAq5SVddBHMIc0CL9Cl2G3BBRDhAroR_LSZL2bRYMIQ6vQG94cs4Ak38jWNs5QrZQ
- A7JMgpuRZ0TUdPonMoVHX8J33_SZXP3.KxolU1e2A_yLLHovtnqu3hsJswrk_xDxeyZ.J7tJSfH3
- vkKQ1X9WCEuUyat_3kbQ74qs_mV3UXRecf7gCnNxESKI8fsft8K0VhWuu6WIlCZzU.M1xN9XUGsI
- _1G.BYh7HwRe9tZptM4Ou27Ghhla9DSLPfKAqxz1j15QnzMaTc7yIxqRHQaSYgZbSPOqUyt.ydcz
- lm8cNCy3DW723wlsv3IKp3ht0p98F0r1fiGBbE1SLB5QrYWrm8cePZ3vknAl2QaWAH.1ExNnAvYD
- bV9cDSNBBZlhopWv72xraAkVJpjjj3Ae_3dwKReqM7ZW1uKuafJdzUZBbLjaEC5M0Kw3IHALFtco
- KDAdvZpfnpU4S98xAG3pZ7Kh1ckXr.CnilvSsnxyaxArCxPlBV0v9xytx2HATxNLNpUPrOTewPhm
- SvhBGhjOyxU9oMIQGngcCOB0_gzgcq5NTE_timSCMqJo1ybICM5J.e2QsIf9vU1vac.qNWl640uV
- 0xl587SWItcwsrX5y8mQf5vvpB5PmsknvuMTLMInqENo3jzBJIIc1yHOPJhcS4RMoiRJZO5ACOo0
- Iu1gM880f0uU5qDu5iT60iEAcMOAf7iBKJZYxMesTaR9UmgicVpmxjX4TaLmnsuKM52QDD8LJZU1
- 8VvnkIAPjRi9uaBKOEo1G_d1qAw8rEJNmnnrnE5cuXMOCo6rzdROyxW0k9m3qVw5wdsTWBRdjo8L
- T2Akoz3qTyPQnpkLcdw63J91gt75012R5vOiFMf.oymcOjj10PSYsnhaqezZiDpdF2z8LZzh287a
- aCgDjhHSB86hU2ZJovzs7GgAVyseM9hGmAU772vfK8Dgq0bQSWhGGcMuk0gqFNCXM.eIqdS6HTy.
- htsCMd3h2vBnJHRdwEI4cyqmtKmxmegbnI.0bpCscSGlrP3_PgTJhnaAbivJrhRdihwH7bR8ENve
- sg4hnf5zJqu8TlP4Fg1ycJY5gQbzZipGYqr7zjaY.S2VaEkulzYQpsizvNJpZlMgaxS0K957V_3p
- PiNBTI__Gcp2_SOMjUnvdwOSW_F.w7f1gv5hh_FXsXYnLM.D_mZM2AoDDgT_pxp64AFD7O6MCekH
- n50AQBvWCRohXhXzCSckLfXrWzteq_uTB.eTk3Xb7BdJgIkQcsDmg8T2KmYys459gq3D1QoO_hld
- wyq0O7VNcn8e3zMbu6QoZ.gVZhVqWifpX2_RmsEz0K9Axn1TDIdfTBQ8sGH0iX6f_W9b6IKaQ4wV
- L7SZV3FK9xEVnR4Sz4aeDwPVorFKUj7lp5zFpO94-
-X-Sonic-MF: <namiltd@yahoo.com>
-X-Sonic-ID: 83b4b31f-08d5-457b-8fd8-c724d411738a
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.ne1.yahoo.com with HTTP; Sun, 15 Mar 2026 11:25:21 +0000
-Date: Sun, 15 Mar 2026 11:05:03 +0000 (UTC)
-From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Message-ID: <1003432575.1235274.1773572703895@mail.yahoo.com>
-Subject: [PATCH] crypto: inside-secure/eip93 - correct ecb(des-eip93) typo
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z0CbEB5e"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43a03cb1df9so3643654f8f.1
+        for <linux-crypto@vger.kernel.org>; Sun, 15 Mar 2026 07:57:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773586653; x=1774191453; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ctMsamV79lnDxH1eZ0yPc5TbWrVVMUxp8VuhiBWLzMA=;
+        b=Z0CbEB5eIytM5T8sRDOHZzuRT9JztpbGP4iRh4HICIRnUNYOeiAxjjf8PFd2VCIG+W
+         tv3mOX6gD37vpC/V0i5ftpETZIbmwfp6EYN4W0d0Vda+RmVIq2Eawe1MzPOiWm2LP+l5
+         tIk2fUGWWtf6jk/dWLO4ONItdg4o65g5FDZpNFoQ7eVnvKppf8NK4now4fYISiVate0h
+         WlBXw6PSEL0qL4Wvm6e1MBCh6eGHV5jmIV0g+Hf77Q4OJkcBtYOob9gF1a9soLjuOuOv
+         xLHZzT1ACM/LgpeFUYI8JZDvZtOyWEzRtSLfSrtQoFFJ33evEuI//LketYATncSGL5Z1
+         Q9Ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773586653; x=1774191453;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ctMsamV79lnDxH1eZ0yPc5TbWrVVMUxp8VuhiBWLzMA=;
+        b=ZOFnnSq/vjFTitRCb76f62UI2o7OgO9yLiN8HYglIIWbxhI8R5OZMtenKOZTjf8r4p
+         dzku6s8ESps1WAYoEsA1LBxJY6QutiY3nxshvEs+CPF6AvZXc14Ll9YWa0K7N4H7vgQv
+         nr/JEQFaKygU77gKZStStncQCYq5Ap36sLGpZ6Mt23GY33BpA12G4mCZq0a3PeXqrSP0
+         s5vDC1rMtMJpOeSAxgJVhKaL81iCwcgIL7dRFf7yuPhT8HCWYvbiL6LB+52+TsfzCaEf
+         umMKI8axtaN0GDWQSYbdaLTttm+I6z02dco5WLVRJDyo6IQWjrthw2UmbleamMldkOY6
+         ddkQ==
+X-Gm-Message-State: AOJu0Yycd2rgXTEVLAok37Wn6a/mpkuvZG0qIBDmS3mdAnpOJjtNAzO7
+	oBVayfxE/vuYArasM6bVS8RfGUi7SGYrftDe9VR5UD3mQozxkgJ8pvqO
+X-Gm-Gg: ATEYQzwzZ2zuUWUeuwPxUqyAjfAqhxeRdle59BjymovyarhM0MD/JD9d50LqIkWx7NF
+	npNp2p/Vv4ygMG3WyfPJFhDf0iKlMzC91RhQNPzbPh9nXIA4OCIGBsr6WbJDczvyEZ12mmTpL1E
+	5LB2A+mRZCD6DD6vF/+GpIlOtPq8a4395iUjcdJHAr/J0zTI780BFOcVQXPDuz1xz4lDQj/vuvD
+	yPLJVnAd6G9WqzrRvvL+i6Vx4ioVWQrK75HKHAu1NcmGZCojPksc5zgNCvAqb4tPtLjOcve8GZE
+	zcw/+Cjs26xX9VYzWodfyRXH1C9S6CS229bOJi6tumD1US/VZl9h7VhkZlxKjiwOqC5VUcyYj+Z
+	Um/V/FTZTD2VLd8YESodfpMDNGX307vBhafpA/LYgof19ly+8nbgoFOISdRYzhbSc346N3wqVD3
+	bPoEXxnNw1X9jpy+xgBu2S7Dtiu8lOPKqa0+z48IRdnozyHVpFulbji96XzEuvLLkLPYonaWQ41
+	RBWs6HIbHDbfRfXWiFlVeK3WzfZ4A==
+X-Received: by 2002:a5d:5e01:0:b0:439:befa:91cb with SMTP id ffacd0b85a97d-43a04dc0958mr17059954f8f.45.1773586653358;
+        Sun, 15 Mar 2026 07:57:33 -0700 (PDT)
+Received: from DESKTOP-TILNSD1.localdomain ([139.47.104.103])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe1a72cdsm36221172f8f.9.2026.03.15.07.57.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Mar 2026 07:57:32 -0700 (PDT)
+From: Kit Dallege <xaum.io@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kit Dallege <xaum.io@gmail.com>
+Subject: [PATCH 1/5] crypto: add missing kernel-doc for anonymous union members
+Date: Sun, 15 Mar 2026 15:57:22 +0100
+Message-ID: <20260315145722.24081-1-xaum.io@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-References: <1003432575.1235274.1773572703895.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.25297 YMailNovation
+Content-Transfer-Encoding: 8bit
 
-Correct the typo in the name "ecb(des-eip93)".
+Document the anonymous SKCIPHER_ALG_COMMON and COMP_ALG_COMMON struct
+members in skcipher_alg, scomp_alg, and acomp_alg, following the
+existing pattern used by HASH_ALG_COMMON in shash_alg.
 
-Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+This fixes the following kernel-doc warnings:
+
+  include/crypto/skcipher.h:166: struct member 'SKCIPHER_ALG_COMMON' not described in 'skcipher_alg'
+  include/crypto/internal/scompress.h:39: struct member 'COMP_ALG_COMMON' not described in 'scomp_alg'
+  include/crypto/internal/acompress.h:55: struct member 'COMP_ALG_COMMON' not described in 'acomp_alg'
+
+Signed-off-by: Kit Dallege <xaum.io@gmail.com>
 ---
-drivers/crypto/inside-secure/eip93/eip93-cipher.c | 2 +-
-1 file changed, 1 insertion(+), 1 deletion(-)
+ include/crypto/internal/acompress.h | 1 +
+ include/crypto/internal/scompress.h | 1 +
+ include/crypto/skcipher.h           | 1 +
+ 3 files changed, 3 insertions(+)
 
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-cipher.c b/drivers/crypto/inside-secure/eip93/eip93-cipher.c
-index 7893c15..4dd7ab7 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-cipher.c
-+++ b/drivers/crypto/inside-secure/eip93/eip93-cipher.c
-@@ -320,7 +320,7 @@ struct eip93_alg_template eip93_alg_ecb_des = {
-.ivsize = 0,
-.base = {
-.cra_name = "ecb(des)",
-- .cra_driver_name = "ebc(des-eip93)",
-+ .cra_driver_name = "ecb(des-eip93)",
-.cra_priority = EIP93_CRA_PRIORITY,
-.cra_flags = CRYPTO_ALG_ASYNC |
-CRYPTO_ALG_KERN_DRIVER_ONLY,
+diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
+index 9a3f28baa804..9cd37df32dc4 100644
+--- a/include/crypto/internal/acompress.h
++++ b/include/crypto/internal/acompress.h
+@@ -42,6 +42,7 @@
+  *
+  * @base:	Common crypto API algorithm data structure
+  * @calg:	Cmonn algorithm data structure shared with scomp
++ * @COMP_ALG_COMMON: see struct comp_alg_common
+  */
+ struct acomp_alg {
+ 	int (*compress)(struct acomp_req *req);
+diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
+index 6a2c5f2e90f9..13a0851a995b 100644
+--- a/include/crypto/internal/scompress.h
++++ b/include/crypto/internal/scompress.h
+@@ -22,6 +22,7 @@ struct crypto_scomp {
+  * @decompress:	Function performs a de-compress operation
+  * @streams:	Per-cpu memory for algorithm
+  * @calg:	Cmonn algorithm data structure shared with acomp
++ * @COMP_ALG_COMMON: see struct comp_alg_common
+  */
+ struct scomp_alg {
+ 	int (*compress)(struct crypto_scomp *tfm, const u8 *src,
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 9e5853464345..4efe2ca8c4d1 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -145,6 +145,7 @@ struct skcipher_alg_common SKCIPHER_ALG_COMMON;
+  * 	      considerably more efficient if it can operate on multiple chunks
+  * 	      in parallel. Should be a multiple of chunksize.
+  * @co: see struct skcipher_alg_common
++ * @SKCIPHER_ALG_COMMON: see struct skcipher_alg_common
+  *
+  * All fields except @ivsize are mandatory and must be filled.
+  */
 -- 
-2.47.3
+2.53.0
+
