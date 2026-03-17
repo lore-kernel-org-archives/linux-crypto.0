@@ -1,154 +1,112 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from arcturus.nroach44.id.au (arcturus.nroach44.id.au [45.32.188.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD50370D55
-	for <linux-crypto@vger.kernel.org>; Mon, 16 Mar 2026 22:12:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773699175; cv=pass; b=GPrex7LXLWzftS3fhseFuuEOZu4qkZSguMEYTwpIlgoaLyErOg5QRAK+dE61MQ/Kmeqh/0aerBSKeU7GvvWoDY1z6pMtZOOl5DhvQXvBLwUZnjSRKEUoZdmC64Ul3qEv7YN4BpaQlAETWgxTR1OZxMumxJS58U8bG1vvTiD1Mhg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773699175; c=relaxed/simple;
-	bh=rsp7Ihi8TSAj7hc2vakkxGqqL2oEkNH6XMA5zjqI1qA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VjIQRX6zwnaaPjKPTGcMi0eiX984D4r104AXT5pZ+XC+AKdlWeCloGvHbSvedEvBE5SK/SwDX8lwwigxqO8euraPtnNpq6Xn2zKruaXBh2D6pwnbRa2TjQQ7o8yNHI9rHrxOIQf7wu4X+UDCMssFvTFCMXhPG7uKR0Sj66t26hs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nXFirVf+; arc=pass smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CB2199949;
+	Tue, 17 Mar 2026 02:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.32.188.33
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773716118; cv=none; b=OH3H9tDBRJmvV2M+MtselNM6iUBUgZ9E2oM/xhex+NDSnU+y4wWKy4Xk6XU/nEASOimvnp+EplQPcsvXijDjXrOVI1PwmmmoJdj+hvZGjUUQFEhF7ncbIREeFf05mu4uoUc6ueemq6//jYmZFmgeQrKTv+4CcMpvmEoR13E+Npo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773716118; c=relaxed/simple;
+	bh=WBxbirtXgTFP2VO7Ap9qDqDninnQarfWnxFphtwYMok=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JcnshG55nSK8mBLOFce/4trbXhImhzSfXo+ew+AdChTqG1VAx1hraZfoNxdSnqjGs4kEn676Kgz4Jd5VvRIfeDC2HeyTVjktEa8TAlspYX58Rf44EhWCu4WJ8uRG7CqsTGVieBM0kgoWfxZR7Z76qEkUHn7+mMKOwailHCVqL0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nroach44.id.au; spf=pass smtp.mailfrom=nroach44.id.au; dkim=pass (2048-bit key) header.d=nroach44.id.au header.i=@nroach44.id.au header.b=g1xk3dJM; dkim=pass (2048-bit key) header.d=nroach44.id.au header.i=@nroach44.id.au header.b=g1xk3dJM; dkim=pass (2048-bit key) header.d=nroach44.id.au header.i=@nroach44.id.au header.b=JP2J5s6l; arc=none smtp.client-ip=45.32.188.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nroach44.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nroach44.id.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nXFirVf+"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-662b5bf4b10so9129252a12.1
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Mar 2026 15:12:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773699172; cv=none;
-        d=google.com; s=arc-20240605;
-        b=j9bYa2apyObnVtJVpYw6XCv/993BaZcXTyQmrs7GNUu+DlqvaC6YP1rR5NwDNdWgxz
-         PXu4IT98Vjxw7zxgcsPuS4LW0/+PxtSHYOagAp5Y14yQpbjeKS9DK6EVvm9ebQRTZGn4
-         3ei2r+I0wPY8RWsF77unNOYbRQn3JWKaC5yJMOm3ewCrzzhyhiwWgc3Dqm7qF8bE+vvk
-         H0mnjpocz+4HEDxQg+HOJICY6GKf+tMQRch81KpsKP80Sd5ehRUYTk2vO+rPvOaPPPr+
-         cbbTjPyqR5Dx2pdX4RhdAN4xwJ9IHD5ASHKrNHZyTsQwA/zlDWMmvwr4qxg/o9Rwce1/
-         YrUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=pAPcwDRyDaYRxv6m5ec0p6vencyIfyK+pU3obaup7wA=;
-        fh=geuDEB/rchboLPNXx2lBVl2P4kFfpGhSygeixELIIIo=;
-        b=DQmzoUrlkmTHEdJ/x5zB1SMokVQou78PuASm/Z4VPv+d4oiNtRDGS0UUFOskVTMYeg
-         QI3EBzeRvb4XsawMaUvorXooB/lRHfi3PGwiUaK8NkjuMeacTMVT/92CyaLJqroS1W3Z
-         7agfQ58FCd729kRB34QtMHnwLgYqbFlw5De5tP7/xiVx5HGFyJpGUZ5DWNqDm0/MzCUg
-         3rIYYiWCeGi0nYjSnOa/HaMGXmdA3zXFL8cqDZjPUUO/wOQAjt11EdqdU4rFkpPiSUBD
-         mdubml6WJaX8tq767Wkt0pCh+B5og4jxg3wniWAS4LXjAKsT26ieawEZg/DPXa5F7SRb
-         OXRA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773699172; x=1774303972; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pAPcwDRyDaYRxv6m5ec0p6vencyIfyK+pU3obaup7wA=;
-        b=nXFirVf+3TZ7nayCWf+YAe8f5IxUtczrfP1EXNbBIrmwKiqwYyLnNpAauLND8FQtug
-         qyiFy+esPMVr68OOOX82lIQLtv4g9BlFNZaBwo4KsXwCVqnfA/cnHzxN3Su9BCI72YRq
-         auyRj61mHF94yEemJmjWC/U+E7H+3VcjkmPSPrWbYeT/sNINXe1KOC5DtsQxJjPZdVBP
-         hNMRzTNBiyInnITmm9ONHtYXDRin1mMnPr1z331IK2KJiXXPmzS1yp1rdXfeMlAWA2Ci
-         qg4RD1I8Hp+NegL76P7aa4Y8Cgz6Ykhx1YR2At11/HUaYDUKWkEbjQlI4WP+iffGCmKo
-         wGjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773699172; x=1774303972;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pAPcwDRyDaYRxv6m5ec0p6vencyIfyK+pU3obaup7wA=;
-        b=kORQ6cGbMYNXO0jpSl/3uqk1B5wyUoJjf2eLIH/zbGqrsAy09VjY/wfYThSh2n/xjE
-         pH0+MR77EA1xglsMNmbVjB77kg1F7UVrYtErWuD+KHQuEXdRJpWVs8vODdVNhpzjXFrv
-         j1wOeWXAa9k7BKOkpZOILDpFMC/Cx/DbNZmkHJNRpUoULYHnAdtM1JI2udCEFJpf6fgD
-         GTDSgcXO44YNy3vvoNNIUCY8lICFnfLiE740K+J9BVHS+AAMfdCMFYYa7RSyeQUQ7cs+
-         Dm242X+fYT9lWf9+E8v/87TiWUnlmnXyN9g2OuoKz9jxrNac0vR3BWoTQVQ1T+xQzg4B
-         hP+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUFGQ1EgLit4oHL/lWcoUqDNxfs0OA9VN1CXU/aKnUxfh+C0cpIG/odjfgNigPzi0qMvum7B+T03kAfFsE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtnZwJvc+tOxh1wkDYtHUFmuSrbkNXwcIamg7pkMpyRQp2oO17
-	TLjsOhjc204eK+OF9Uy796Qh0u6w0oU3SvAgu7DYVgs7AjffQLKHycCUR8pDDk9G57SQhXlR94d
-	4Ky/EIghhfi5zBiMI0RFEVPSup5sYo54=
-X-Gm-Gg: ATEYQzwmj6NzVgQU6cK0ieEidfjnW5aGcdnv0MzZX9cpwQERwSVeEfdUufTImn/8sx3
-	40QvPMzFzHbjg97BQWvo2C4ySJ28HifuVUOwawBqjyOXdrk6E76zqlkHh7C8/KEFzYUcHm4/4lZ
-	gZV+PaVcfhLesco/8WgIKi7LZjVVldVacLAO6N+wc6ahqZLRY8mW6atY04/Wbwq0q4ncXNGFkK7
-	TUsHlI/ghLEodKqs8WKc7nHiFFixSiu07vWrrdb9z0S1qVG8tWv4FuIzfShJBVVgNOn8PbouEXU
-	EPD+aNdL15ANiVAG3dWtbxqcUrdnqG5Gy0kkVUGb
-X-Received: by 2002:a17:907:1c0b:b0:b97:b515:31e with SMTP id
- a640c23a62f3a-b97b51509acmr346111966b.50.1773699172087; Mon, 16 Mar 2026
- 15:12:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=nroach44.id.au header.i=@nroach44.id.au header.b="g1xk3dJM";
+	dkim=pass (2048-bit key) header.d=nroach44.id.au header.i=@nroach44.id.au header.b="g1xk3dJM";
+	dkim=pass (2048-bit key) header.d=nroach44.id.au header.i=@nroach44.id.au header.b="JP2J5s6l"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nroach44.id.au;
+	s=dYX2HNEqNNRL; t=1773715741;
+	bh=WBxbirtXgTFP2VO7Ap9qDqDninnQarfWnxFphtwYMok=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=g1xk3dJMeyU11DO8+6BWu1PkqqcelwnS6VNs/CWcHSvLNr4AC02beHmLxDSx7WptI
+	 zf1BMr5YW9Ctz3dLqzBnaX0rzs3r3xknUxUYUttWkoNq/+UYcJ6mJD2wIH8gwIaIpu
+	 lZkYm6irFP75/vu26zC4fdR2UDlgh47+PkndZFxha/qJtOSq9x7NCYI+OxinKH4ctr
+	 4JrlA7mq0Kik12iycHmNWZPIQefdgBajUX0ZJoeEzgnipgqgVTr9POTDBrtuZOqiJQ
+	 GCbrIY3O7Gwj4F1RNsEbFf7s25YJE3LvW/GAkYR9bMmiKRLxeFD0Mkti0lQmPDExnS
+	 5sx7dZavDD5/w==
+Received: from arcturus.nroach44.id.au (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by arcturus.nroach44.id.au (Postfix) with ESMTPS id 91D0430E95;
+	Tue, 17 Mar 2026 10:49:01 +0800 (AWST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nroach44.id.au;
+	s=dYX2HNEqNNRL; t=1773715741;
+	bh=WBxbirtXgTFP2VO7Ap9qDqDninnQarfWnxFphtwYMok=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=g1xk3dJMeyU11DO8+6BWu1PkqqcelwnS6VNs/CWcHSvLNr4AC02beHmLxDSx7WptI
+	 zf1BMr5YW9Ctz3dLqzBnaX0rzs3r3xknUxUYUttWkoNq/+UYcJ6mJD2wIH8gwIaIpu
+	 lZkYm6irFP75/vu26zC4fdR2UDlgh47+PkndZFxha/qJtOSq9x7NCYI+OxinKH4ctr
+	 4JrlA7mq0Kik12iycHmNWZPIQefdgBajUX0ZJoeEzgnipgqgVTr9POTDBrtuZOqiJQ
+	 GCbrIY3O7Gwj4F1RNsEbFf7s25YJE3LvW/GAkYR9bMmiKRLxeFD0Mkti0lQmPDExnS
+	 5sx7dZavDD5/w==
+Received: by arcturus.nroach44.id.au (Postfix, from userid 5555)
+	id 723EB3168E; Tue, 17 Mar 2026 10:49:01 +0800 (AWST)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nroach44.id.au;
+	s=dYX2HNEqNNRL; t=1773715734;
+	bh=WBxbirtXgTFP2VO7Ap9qDqDninnQarfWnxFphtwYMok=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JP2J5s6l142aPSILmiqSHKSx7HuUp4QaBlVsjeo3KUFows0BEHG/VwVWMaZ3iQVeB
+	 uZHdZV3G9DgW0gjbGjeffNmp0WJ4qA3cIsP6U6A0PN+tI6wv/oi6WfAL7jiMAVuQDh
+	 D7jzoGXGViLc6HZ1cq6d8DO3CzQhakGt8W6cLJ+gLcNZUvkEIKgnfnYWQY9KdY9/1G
+	 HaFAqsII7TecAkVjwsamy2NJMUvZrq9TqJRYAnzA5t/1apLZHUbhgG1C1Rey7pwhIg
+	 92MfTKQJaVxwJvLiQPnsiUILspdpTYvBRTPZoyQ+UHJYoKE3P08eU5gXR9v8YqXHV+
+	 G/Hx1JHQfJBYQ==
+Received: from [IPV6:2403:5814:4228:10:3a62:38:7f97:4cc] (unknown [IPv6:2403:5814:4228:10:3a62:38:7f97:4cc])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by arcturus.nroach44.id.au (Postfix) with ESMTPSA id C88F030E95;
+	Tue, 17 Mar 2026 10:48:53 +0800 (AWST)
+Message-ID: <ca9ba2ec-849c-4f86-8ac9-274ac4b5f885@nroach44.id.au>
+Date: Tue, 17 Mar 2026 10:48:52 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260311070416.972667-1-hch@lst.de> <20260311070416.972667-11-hch@lst.de>
-In-Reply-To: <20260311070416.972667-11-hch@lst.de>
-From: Magnus Lindholm <linmag7@gmail.com>
-Date: Mon, 16 Mar 2026 23:12:39 +0100
-X-Gm-Features: AaiRm53MOL-S4iIRiZrnVZNNZCm-cfe6kMQGe2L4WL9TC_xpq_akeJ994p2lXMA
-Message-ID: <CA+=Fv5QkJm8+ysx8W=ypr84oSR=rrikfk-iMMU6_xrtS1PsWvg@mail.gmail.com>
-Subject: Re: [PATCH 10/27] alpha: move the XOR code to lib/raid/
-To: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Richard Henderson <richard.henderson@linaro.org>, Matt Turner <mattst88@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>, 
-	Li Nan <linan122@huawei.com>, "Theodore Ts'o" <tytso@mit.edu>, 
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-crypto@vger.kernel.org, 
-	linux-btrfs@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-raid@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Does the SPARC optimized crypto and CRC code actually work?
+To: Eric Biggers <ebiggers@kernel.org>, Andreas Larsson
+ <andreas@gaisler.com>, "David S. Miller" <davem@davemloft.net>,
+ sparclinux@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+References: <20260316204211.GA2661@quark>
+Content-Language: en-US
+From: Nathaniel Roach <nroach44@nroach44.id.au>
+In-Reply-To: <20260316204211.GA2661@quark>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 11, 2026 at 8:06=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
-e:
+On 17/3/26 04:42, Eric Biggers wrote:
+> Hi,
 >
-> Move the optimized XOR code out of line into lib/raid.
+> The Linux kernel contains various SPARC crypto opcodes optimized
+> functions in lib/crypto/sparc/, lib/crc/sparc/, and arch/sparc/crypto/.
 >
-> Note that the giant inline assembly block might be better off as a
-> separate assembly source file now, but I'll leave that to the alpha
-> maintainers.
+> As the kernel's crypto and CRC code has been refactored over time, we've
+> been updating how the SPARC optimized code is integrated accordingly.
+> However, QEMU doesn't support the SPARC crypto opcodes, which means that
+> even though I (and maybe others) been running the tests on SPARC kernels
+> in QEMU, this doesn't actually execute the SPARC optimized code.
 >
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  arch/alpha/include/asm/xor.h | 853 +----------------------------------
->  lib/raid/xor/Makefile        |   2 +
->  lib/raid/xor/alpha/xor.c     | 849 ++++++++++++++++++++++++++++++++++
->  3 files changed, 855 insertions(+), 849 deletions(-)
->  create mode 100644 lib/raid/xor/alpha/xor.c
+> So I have to ask: is someone in the SPARC community actually testing
+> this code regularly?  That includes running all the KUnit tests for
+> crypto and CRC as well as the traditional crypto self-tests.
 >
-
-Hi,
-
-I applied this patch and ran it on my UP2000+
-
-The kernel builds and boots, and I verified the new lib/raid/xor/alpha
-implementation using the XOR KUnit test, the test passed, see below:
-
-[   25.705064]     KTAP version 1
-[   25.705064]     # Subtest: xor
-[   25.705064]     # module: xor_kunit
-[   25.705064]     1..1
-[   28.957992]     # xor_test: Test should be marked slow (runtime:
-3.253413330s)
-[   28.958969]     ok 1 xor_test
-
-Acked-by: Magnus Lindholm <linmag7@gmail.com>
-Tested-by: Magnus Lindholm <linmag7@gmail.com>
+> If not, then unless QEMU support is forthcoming I'd suggest we drop this
+> code to avoid issues on SPARC systems.  The generic code is much better
+> tested and we know that it works on any architecture, including SPARC.
+> Correctness is the first priority, especially for cryptography.
+>
+> - Eric
+>
+I've been testing some of the PCI changes that have come through on my 
+T5-2. I'll happily add some tests for the crypto functions, I've just 
+got no idea how to do so.
