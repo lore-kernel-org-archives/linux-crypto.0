@@ -1,63 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3193D338936
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Mar 2026 11:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F5235DA6B
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Mar 2026 11:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773745827; cv=none; b=cnNPDJTgLvMWZmF5lwMBpu0B3Lpwk3OuS4Mie3tWOtDqYssxk9lu7UF4Mpo8UqCj9BVa2jS9d6t1Uw4SoSsgh56dIe5WIM+BgNPDZq/R03Agg8nfHWnRClNTPAZwrKYW20pKyo1yIl4IfjOCYMvotMwGdCICvJBySwdn+mQXNuw=
+	t=1773745841; cv=none; b=Y7YmmxV7UbNPFczaXN1/zJ5N+Qq4jW6Bqra7VVB4XWP2eUjf3GOcG29a/T6jWgJgMZoEgxHYuRbyIPVwLFpz6tqbQQwRJEH0MHkbZiS2j5SsOMm+mN3B7nv0PPOVAg4Arw/NoH7idq/zHy/o3iIjPZGeGzMbCK0lYGIGO+om2dM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773745827; c=relaxed/simple;
-	bh=0Lr6Nt9XErThwDSfrPsQ/yXnKWCRtxxMB/fbTlmjbzI=;
+	s=arc-20240116; t=1773745841; c=relaxed/simple;
+	bh=3bEvfE0pUL8utFtiZuNftijKZptJwtJvC/QbKkBlwXs=;
 	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=QLMqNJgpxthqetMtcKWxte2iYyHrQm+FLVYNuXuCsh7PSH4x/v3XBWDnWUiYNccNXeMn1yCjG7DlBDNUdaD0GhI3kYdB5xky2ZaX64cZPtjWdERNvs8xiPlCoN8hFq2gkNCpm3Emw1cwOX+03WZZbr4GNR2Eou+DJAcHU9fYxCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OUuLDKn6; arc=none smtp.client-ip=10.30.226.201
+	 Subject:Content-Type; b=AvGNgnfaY9Ad/2HOaonb5eMWESUTEU0N2xk37q9GOkdvk/5RD1qkcPQbLsTD8NfpDZWIVjaqsMlJGJq8YITUV4akxDUK8Z1RfIU+djWIMVwc3fkc3lTOnsJY8p/U1BwQH9oSWuz4qKV24uFkqfQ1nXSERpgn+3phkbULYoEZGiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sv0yuRI4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OUuLDKn6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7497C4CEF7;
-	Tue, 17 Mar 2026 11:10:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sv0yuRI4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECE52C4CEF7;
+	Tue, 17 Mar 2026 11:10:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773745826;
-	bh=0Lr6Nt9XErThwDSfrPsQ/yXnKWCRtxxMB/fbTlmjbzI=;
+	s=k20201202; t=1773745841;
+	bh=3bEvfE0pUL8utFtiZuNftijKZptJwtJvC/QbKkBlwXs=;
 	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=OUuLDKn67fqwOKo9XbkXtvzSCSCO970Esvu4h7rT+g8QFFbo4raQ7E3NYBmrfuRE6
-	 WBCshlWiPD+WOfbWl8IbS7nHo9NF5P8sc5iznuWIiS7wLN1F1obat2SfPrblHQoddU
-	 z6cf2ld91MLnXykXWtxMLZGqLdEYo/eFjLQ4T8wg3VvD+ZMi6i3ueNAbI2aGxAAOS1
-	 DLlb+HniLl4HgOTdzUyBsa4qc66k3TwmTvKfETUGW8yC/vSi3FYiR5QeP9CI7csSBd
-	 uiYhNDDLQ21U3Ouvek4giWABCNqf6jq/wAadx2yi090S74ZAD+V4D7xlA9xf0Xsjec
-	 n0Q/dif3UiNTQ==
+	b=sv0yuRI4zbij3xC7pH9F700V4EzPolTrOdP6boH6srOxTnx81+HGEIPpHELXp2WXn
+	 q4W0kZpwopsA+enyjWji1lneiDmCpeq+EyGfbRI5xQDJlO4kb8Sm24DBqpjZ4xc2qe
+	 YVx+TIrlTNFzUYCeJBhQNWH0YdwzX7l63xvNp6LO2mZntjFkdU675VibLdNEDkg7I3
+	 m2TuRZ0BrDsQ7BRETH9Yb0Mnez1hUNHkAVtXYtSSNoFOwVpzOGZLnoBhstXs/4wwyK
+	 dOzpA5rK356/bjXoKWH1S6L9Njb1zQFrhR/+2jXkzE5J/EcOYOlQU2rfgaJFMqIGEu
+	 sAMkcUtGrshhg==
 Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id B540AF4006A;
-	Tue, 17 Mar 2026 07:10:25 -0400 (EDT)
+	by mailfauth.phl.internal (Postfix) with ESMTP id 0508DF40069;
+	Tue, 17 Mar 2026 07:10:40 -0400 (EDT)
 Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-01.internal (MEProxy); Tue, 17 Mar 2026 07:10:25 -0400
-X-ME-Sender: <xms:oTa5aRREPaI867nWqvmwmQzNVPWfAO19S9WOLX43q-vLAfnbG4Hj-g>
-    <xme:oTa5aVnIPhW8hE6bShS99kVBUO8dGX3eWwiJwWxxUD4tzcCJMdPBOX863NjMtT6mk
-    PJyu8ieBmFf6r6hukm1r-ra806hy3zd2_ANkYUgo69utQUn2MX2s2g>
+  by phl-compute-01.internal (MEProxy); Tue, 17 Mar 2026 07:10:40 -0400
+X-ME-Sender: <xms:rza5aU7vWiy4SKtw3-K_dcso1cFwCUJoRnGyxh7Nx5y6MD7aV0n0xQ>
+    <xme:rza5aQvMLrHjqSBB8heGziWd1KEYaLb5NfXFQO9LG8JmEGiEQo1lhWEqsB5fCXUqO
+    BIq4cmYofaJnwzC5G38GFHJVirffXSUm_oSphEV7ZLKc243mYxjzAU>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdduuddtucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
     gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcu
     uehivghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrg
     htthgvrhhnpedvueehiedtvedtleekuddutefgffdtleetfeetveejveejieehfefhjeei
-    jeefudenucevlhhushhtvghrufhiiigvpedvnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    jeefudenucevlhhushhtvghrufhiiigvpeefnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
     grrhguodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeel
     qdeffedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrh
     gurdgtohhmpdhnsggprhgtphhtthhopeeipdhmohguvgepshhmthhpohhuthdprhgtphht
     thhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpth
-    htohepkhhunhhithdquggvvhesghhoohhglhgvghhrohhuphhsrdgtohhmpdhrtghpthht
-    ohepvggsihhgghgvrhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqd
-    gtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhig
-    qdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehjrghsoh
-    hnseiigidvtgegrdgtohhm
-X-ME-Proxy: <xmx:oTa5aYKiVM5uRXw9i1M2uA6ryiD8ffQdA_xLzdTN0BMXnL43jbR3iw>
-    <xmx:oTa5aY1rkf4dOUn6MQfETUTTCfYAEfAq0FAJ0NqoX1g4QXSxNMjIdg>
-    <xmx:oTa5aW5NPL6TcPSqdEPEP887UhTgTr4d7mYvLEg3xBAS8DGGfkHycA>
-    <xmx:oTa5aZ8r80SXEnbuBop9UqQKZkIJwlzNhCE5Sm4aloBMtQ8fjxYcig>
-    <xmx:oTa5aVXIKGGd3eW5RmebAMNwuKsjh_rCbfANCN9eU7IpAgcKrUDGwRRi>
+    htohepvggsihhgghgvrhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhig
+    phhptgdquggvvheslhhishhtshdrohiilhgrsghsrdhorhhgpdhrtghpthhtoheplhhinh
+    hugidqtghrhihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhi
+    nhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjh
+    grshhonhesiiigvdgtgedrtghomh
+X-ME-Proxy: <xmx:rza5aSignthvd7zBT0pYbkHlMT2EeXrTF_RFOpYEIrG_Na8x7gtMFA>
+    <xmx:rza5adGAm2YbVeb_z-iCEYhdalcRo2ABxseXOUUgfP0_PNzHdOl_Ow>
+    <xmx:rza5aZ_6d9gVCwDSZX4u3e8S9SWimrwKVrarpZGIS5rBfvw2LoDmKw>
+    <xmx:rza5acyKPXFPLlCSAJfAl1oJb0BP8V9O_Ja4kuGyf59d-Blqe72Fnw>
+    <xmx:sDa5adMehPG5DebFbi0PmTR7LtoWV7MQSSibmr7I7GIXzdq_SR6E74tx>
 Feedback-ID: ice86485a:Fastmail
 Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 95C42700069; Tue, 17 Mar 2026 07:10:25 -0400 (EDT)
+	id D8E01700065; Tue, 17 Mar 2026 07:10:39 -0400 (EDT)
 X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -65,41 +65,54 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A18XS3shSXrs
-Date: Tue, 17 Mar 2026 12:10:05 +0100
+X-ThreadId: Ao4qWWs5d1pR
+Date: Tue, 17 Mar 2026 12:10:19 +0100
 From: "Ard Biesheuvel" <ardb@kernel.org>
 To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>, kunit-dev@googlegroups.com
-Message-Id: <4b141383-9bb5-4396-8d4d-479e177bc698@app.fastmail.com>
-In-Reply-To: <20260317040626.5697-1-ebiggers@kernel.org>
-References: <20260317040626.5697-1-ebiggers@kernel.org>
-Subject: Re: [PATCH] lib/crypto: tests: Drop the default to CRYPTO_SELFTESTS
+ "Herbert Xu" <herbert@gondor.apana.org.au>, linuxppc-dev@lists.ozlabs.org
+Message-Id: <6956f2d9-dd9a-404a-a6e6-1d5478a1410a@app.fastmail.com>
+In-Reply-To: <20260317044925.104184-1-ebiggers@kernel.org>
+References: <20260317044925.104184-1-ebiggers@kernel.org>
+Subject: Re: [PATCH] lib/crypto: powerpc: Add powerpc/aesp8-ppc.S to clean-files
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 
 
-On Tue, 17 Mar 2026, at 05:06, Eric Biggers wrote:
-> Defaulting the crypto KUnit tests to KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
-> instead of simply KUNIT_ALL_TESTS was originally intended to make it
-> easy to enable all the crypto KUnit tests.  This additional default is
-> nonstandard for KUnit tests, though, and it can cause all the KUnit
-> tests to be built-in unexpectedly if CRYPTO_SELFTESTS is set.  It also
-> constitutes a back-reference to crypto/ from lib/crypto/, which is
-> something that we should be avoiding in order to get clean layering.
+On Tue, 17 Mar 2026, at 05:49, Eric Biggers wrote:
+> Make the generated file powerpc/aesp8-ppc.S be removed by 'make clean'.
 >
-> Now that we provide a lib/crypto/.kunitconfig file that enables all
-> crypto KUnit tests, let's consider that to be the supported way to
-> enable all these tests, and drop the default of CRYPTO_SELFTESTS.
->
+> Fixes: 7cf2082e74ce ("lib/crypto: powerpc/aes: Migrate POWER8 optimized 
+> code into library")
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
->
-> This patch is targeting libcrypto-next
->
->  lib/crypto/tests/Kconfig | 26 +++++++++++++-------------
->  1 file changed, 13 insertions(+), 13 deletions(-)
+>  lib/crypto/Makefile | 3 +++
+>  1 file changed, 3 insertions(+)
 >
 
 Acked-by: Ard Biesheuvel <ardb@kernel.org>
+
+> diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+> index 725eef05b758..dc7a56f7287d 100644
+> --- a/lib/crypto/Makefile
+> +++ b/lib/crypto/Makefile
+> @@ -53,10 +53,13 @@ endif # CONFIG_PPC
+>  libaes-$(CONFIG_RISCV) += riscv/aes-riscv64-zvkned.o
+>  libaes-$(CONFIG_SPARC) += sparc/aes_asm.o
+>  libaes-$(CONFIG_X86) += x86/aes-aesni.o
+>  endif # CONFIG_CRYPTO_LIB_AES_ARCH
+> 
+> +# clean-files must be defined unconditionally
+> +clean-files += powerpc/aesp8-ppc.S
+> +
+>  
+> ################################################################################
+> 
+>  obj-$(CONFIG_CRYPTO_LIB_AESCFB)			+= libaescfb.o
+>  libaescfb-y					:= aescfb.o
+> 
+>
+> base-commit: ebba09f198078b7a2565004104ef762d1148e7f0
+> -- 
+> 2.53.0
