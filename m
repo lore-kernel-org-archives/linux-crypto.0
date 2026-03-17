@@ -1,89 +1,100 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DCE3DCD9B;
-	Tue, 17 Mar 2026 15:23:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458C830FC26;
+	Tue, 17 Mar 2026 16:23:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773760985; cv=none; b=f52DKhKts1xLrn7ySlK4OsH0OJrIvNPGuvcyGADhKdH5j+fbmGjMoSp3NRnh0kb36YoEUL9pqquiCTAVdqyqc+zBg5HO0knsaWR2I65BMeATweRPsT+Sax3Ikmpkp6BSI/YaQMYDDeU2hByN4gI0SehKC4x5DFWH0hPKy/TdOOo=
+	t=1773764595; cv=none; b=pJZ5suGQzrkhIAvH3B2l+pp5LsV48r8rYkRWl9SuAIwPyP0J0wA1A4DoQPZ/Sp3fd+f44lBej1hCTfzEZ+fOZqq8RLOv9Zw0ECHceHQVAr72byeOoT7cXny2hcU8TounYDLERmuiHY81Sxw7oaIt4MAUA7J+c2kXU84I6XDzodA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773760985; c=relaxed/simple;
-	bh=Fy1htI4UODIx2yytutlDuDgTWi+tpbxGjfBCNjXDPiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u70L1WrXrof8crHAXjUejVnCQQ26v6+Zn5eU8qzNIYYHAbW5pnsvl0t620IL8jVOdueFjtGLdR6KNCHNfTH5SfCcgS8OkyNM5Lno4OqkrKWCcGla97D1q6EmEoZ/88p0Hn+V6Rhwny3SxZ+3m/WATtiNvj2WGWzBhsJIlAuRzhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=xqcwabCE; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1773764595; c=relaxed/simple;
+	bh=jz7KIRTPzk3fLbrESkoyqHwAq01VsJjWNGycMnURNgM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fTgiBHE2IlMRmrjnM1T/op9IHAxpgfOr64X0LHwqjwzvyPdKvmI8ENEupccj0X2kjLY3hNcqQ3YxzEIHDd7LCFhGTXoSy/3O2bcRSc3w0KnKQC6ahx3xm5X1Wa3uFHGA/ANa68LprP6rrVvwD1ZPgyjogldumsQMN1E31N3opSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dgKvP+46; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="xqcwabCE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=hxZfwk4j7fdh1lLHSbjgNk4ZAr0h0feEpqn4ubU4naE=; b=xqcwabCE69yEIxL7BCd8Kp9Ca9
-	w/aDIbFY2rENA6SoyzZMufk7C0Q1f8AxmWO6/ho14KS3q+HoEqkIiKiCSbUu/i4gnB4l08quPbxH3
-	VA9aUlbGdDsSSkA5vtxWYuP7WAHtHZjGCF/GQwzPvaYRwf/nR+bwN/IaBVdLvVe6PtdhYNLVrB2hG
-	9Sfk3IZHT7j7bNEGL15AgTgNEemlEVgczkPFeshusCZIlHcd+urBs7Mm/9jMRyM5mfIIvrOMAWZXG
-	40oEm9sAdyIS9NXc+2mWNJNsDcMDwGmOS1yfLnVyDeghJW37cCvmhDXp8vaRMWsiit87dJEPAap1Z
-	ZE+w8ibQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w2WG7-00000006jSt-0tEp;
-	Tue, 17 Mar 2026 15:23:03 +0000
-Date: Tue, 17 Mar 2026 08:23:03 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dgKvP+46"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A31E8C4CEF7;
+	Tue, 17 Mar 2026 16:23:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773764594;
+	bh=jz7KIRTPzk3fLbrESkoyqHwAq01VsJjWNGycMnURNgM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dgKvP+46Is8WU5cD8w93g7oPHP/M3Kr69lWwVcKVodq0sJ2NIeZhpkNgQxIjXwjjP
+	 3sUe5Rx/jQ0Re/f1dZ4T+7BtcpvpSofeM7OQXq9GizMfPYT5zQYSpqxJt/ggk+LFyn
+	 hq4VyqMT26rr0vcroMCxy3fz8pd9bMqKnvgIycKHueiZj307KGuGuUqjpxqvoFmH2W
+	 VgzIGsH2xaQfJ2DcWCHpvbLT6goaIMW7+gYrGV4mFfyCdHuHbFGlDNwbs+ndAAttlw
+	 OgOJhWhdL2EggPW8cP13CD6Lz6hBBLLfvSUEJov8SV/jVbxr75Xz/oT8g4H5P1Xijv
+	 FnVwU9VIwIpaw==
+From: Tycho Andersen <tycho@kernel.org>
+To: Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] lib/crypto: arm64: Drop checks for
- CONFIG_KERNEL_MODE_NEON
-Message-ID: <ablx17_Fw_CzCqSu@infradead.org>
-References: <20260314175049.26931-1-ebiggers@kernel.org>
- <38a37b02-602a-42a4-8974-b8a6cd750c3e@app.fastmail.com>
- <ablpCtKCV5goM_AD@infradead.org>
- <ef71c58d-3950-474e-bddb-fc95f8d18b07@app.fastmail.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>,
+	Kishon Vijay Abraham I <kvijayab@amd.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	Kim Phillips <kim.phillips@amd.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	"Tycho Andersen (AMD)" <tycho@kernel.org>
+Subject: [PATCH v3 0/7] Move SNP initialization to the CCP driver
+Date: Tue, 17 Mar 2026 10:21:50 -0600
+Message-ID: <20260317162157.150842-1-tycho@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ef71c58d-3950-474e-bddb-fc95f8d18b07@app.fastmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 17, 2026 at 04:08:24PM +0100, Ard Biesheuvel wrote:
-> 
-> On Tue, 17 Mar 2026, at 15:45, Christoph Hellwig wrote:
-> > On Tue, Mar 17, 2026 at 12:09:34PM +0100, Ard Biesheuvel wrote:
-> >> Acked-by: Ard Biesheuvel <ardb@kernel.org>
-> >> 
-> >> Actually, we should just get rid of CONFIG_KERNEL_MODE_NEON entirely on arm64, although there is some code shared with ARM that would still need some checks. But anything that is arm64-only should never look at this at all.
-> >
-> > I'll also drop it from the XOR series.
-> >
-> 
-> Ack - mind cc'ing me on the next revision?
+From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-Sure.
+Here's v3 of the series. Changes are:
+* rebase on tip/master and drop the three patches that are already there
+* prep -> preparation in one more place that I missed
+* snp_clear_rmp() -> clear_rmp()
+* move the create snp_x86_shutdown() patch earlier, so the order is now: x86
+  only stuff, x86 + crypto stuff, crypto only stuff. Hopefully that makes it
+  easier to apply in the event of patch tetris.
 
-> 
-> > Talking about which (sorry for highjacking this thread), arm32 and arm64
-> > have completely different neon XOR implementations, where arm32 uses
-> > #pragma GCC optimize "tree-vectorize" or clang auto-vectorization of
-> > the generic C implementation, and arm64 uses intrinsics.  Is there any
-> > chance those could share a single implementation?
-> 
-> If we're migrating the XOR arch code to live under lib (if that is what
-> you are proposing),
+v2 is here: https://lore.kernel.org/all/20260309180053.2389118-1-tycho@kernel.org/
 
-That's what is happening right now:
+Thanks,
 
-https://lore.kernel.org/linux-raid/20260311115754.ca2206d1428c49c3bd6e93cf@linux-foundation.org/T/#t
+Tycho
+
+Tom Lendacky (2):
+  x86/snp: Create a function to clear/zero the RMP
+  crypto: ccp - Update HV_FIXED page states to allow freeing of memory
+
+Tycho Andersen (AMD) (5):
+  x86/snp: create snp_prepare_for_snp_init()
+  x86/snp: create snp_x86_shutdown()
+  x86/snp, crypto: move SNP init to ccp driver
+  x86/snp, crypto: move HSAVE_PA setup to arch/
+  crypto: ccp - implement SNP x86 shutdown
+
+ arch/x86/include/asm/sev.h   |   4 ++
+ arch/x86/virt/svm/sev.c      | 112 ++++++++++++++++++++++++-----------
+ drivers/crypto/ccp/sev-dev.c |  62 ++++++++++---------
+ include/linux/psp-sev.h      |   4 +-
+ 4 files changed, 120 insertions(+), 62 deletions(-)
+
+
+base-commit: 270b06a2452b0a20b149591ee90e22e3d8d55358
+-- 
+2.53.0
 
