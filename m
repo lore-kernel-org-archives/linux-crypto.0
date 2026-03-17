@@ -1,139 +1,129 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98243A63F8;
-	Tue, 17 Mar 2026 10:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E51F3AA1B0
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Mar 2026 11:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773743865; cv=none; b=DyjMhiTD1qbNZiR/wln+Qku1VqAruXwLvxFBSWbD5G0InGiQWE5RfnDp+GVgSpczpUUZRKf+sZY4Qo/38VNyHqZQGGPBdP4VpTWkoyoRNaDO3a+KYVorChYRbe1wHVN/7Ql7YCKPK3sB+Nj1qtIjOiPbDwMSkzFAeS8zfysSi1A=
+	t=1773745664; cv=none; b=NtPRt5Nh5eGNKXRpgPb7lgs0sG4mdJb9SK5PFaLe1mv/v+MPgzkoWDBCCBVr5uX2/15AvEcmcIOke4tR7yygS8C6a5qiL8ykulBZ9DgmmmECNazA8R4m3WDQwcTzsZaKfXshrjxlovJN2JNrbpHpEe7Cq5wqmftvEv9zF08OLXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773743865; c=relaxed/simple;
-	bh=bVEWdLxO6ioCtZnPQrdXen+JMCFn/KT/7+euMbV69tM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c0Qcjha6B+lmO1sD3axjOkAJYG+KIfEO5DiIqfq3TupFFdswYcpXCMqbHu8hwAOnYnmYir6Kzg4TT1x0ji1XlOZqwp8D1jyNTePQH9MRQArBMXST9LDY2fx4bL3XLMj9bzeK/jfh/6TxJHkb9ajslaM/UZaTb/2tlroN8a+eUHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bOUr0clK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773745664; c=relaxed/simple;
+	bh=0np/N4FQH3vTQB1I+tW3xs1OgIIr4cdI8M6uWyZkiOE=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=csHANhZguJeaFzT/sOIgDT62u67UUwQBL1zGo9MLPbRrdk0Y7COh09RiOaKmEyzdzu/BLs0X0hW0HVXOFxbMIEPIXdkWY0c9/G/VTuz0EsIsggcN8HbD5Bhu+IcdXYL7hwNy/X6JiSd1ByW0mSjLR/A5tD8duO2O7jy0vkbzj2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lbLzKbyZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bOUr0clK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7BA2C2BC9E;
-	Tue, 17 Mar 2026 10:37:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lbLzKbyZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C29DC19425;
+	Tue, 17 Mar 2026 11:07:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773743865;
-	bh=bVEWdLxO6ioCtZnPQrdXen+JMCFn/KT/7+euMbV69tM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bOUr0clKofRpKlPQbpoGfbgW9oToJQusdYtrjFwC+xX+oDNSZytwUiA4CRIDQXhMT
-	 xdfBatwQU3l+u8MhtrvnIpgsESwkSLOQjt3qB/Xc59eOYZt41K7Yt5IQ6r+3wsvTNk
-	 RYvRm7XfIZmvxULvrr+bHWanoNOdZIoHkimQjH7QoO1I5DRxl+ZJOSbOWf2CfvfYxw
-	 o4Mt2aeShixX/CrnBsDtw+1tkhO2TN36FEwVR+VGjLGHhhYcVsFwy4vZ2PfCApJoEK
-	 k1zTCdZbe2/7yoHhavk0gUqPVYdHLfuZGEAMSXZvoUuG9ZVbrIy4t6izS5WAXy2E+p
-	 LE2sQDdblsyOg==
-Date: Tue, 17 Mar 2026 16:07:41 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: Frank Li <Frank.li@nxp.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Koichiro Den <den@valinux.co.jp>, Niklas Cassel <cassel@kernel.org>,
-	dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
-	mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	imx@lists.linux.dev
-Subject: Re: [PATCH v2 1/8] dmaengine: Add API to combine configuration and
- preparation (sg and single)
-Message-ID: <abku9bXxkZWUwOhE@vaman>
-References: <20251218-dma_prep_config-v2-0-c07079836128@nxp.com>
- <20251218-dma_prep_config-v2-1-c07079836128@nxp.com>
- <aa6pW-zpxnrZnfPn@vaman>
- <aa7cbL-B5sbjZr_l@lizhi-Precision-Tower-5810>
+	s=k20201202; t=1773745663;
+	bh=0np/N4FQH3vTQB1I+tW3xs1OgIIr4cdI8M6uWyZkiOE=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=lbLzKbyZPGfIJwAbjPAn9GHNlp/IexHmDRfYObMhySyIOuSTyXLN1VFHTxw1748wv
+	 0Ji8KOCkFAmhB/PsbZMm5v5YcUt/tbo/46mmeIQ0IW7Dkv4ku9a2sE7y1P+21c2ki+
+	 uGNi0Hmemgid8y83hIYOnTc0w1TCLUm9SWRz8uF2kUTBSFhIFWRLF2AuSYfsYsqcCJ
+	 Fr/KkMfAa1YxvqjhCD9B24w60uUjLxD7Z54gxWVmXJoB2bYZ0A/GvqZevMcZyXEre/
+	 63SLjUkWOdPUr4YOoPgakzXhv6I9DZKOGfQNvFJg3eS4CDRA0daaAGm5PjE4s+IXNS
+	 s6bGbdzuaebDg==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 80063F40079;
+	Tue, 17 Mar 2026 07:07:42 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-01.internal (MEProxy); Tue, 17 Mar 2026 07:07:42 -0400
+X-ME-Sender: <xms:_jW5aQxMlv83GHkFjb-GyQy5q48WC30MWdDweTt3JnrOUv_Z4m7B4w>
+    <xme:_jW5afH87znyURYjsPHaLJWFM2NdPLLgp0auRsFXGHD1M9s2W3O5wVVnH2YukO_aQ
+    2vrod3sUBFGPWeIQHkiHwysJu4dEsG65rfA-KZjUQqMML3WfCKmvr8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdduuddtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcu
+    uehivghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrg
+    htthgvrhhnpeegtdevuedttedtudehkeethfeludeutddvgeelgeejudetteduledthedv
+    ledujeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdhtvghsthhsrdhtohholhhsne
+    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrugdo
+    mhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeijedthedttdejledqfeefvd
+    duieegudehqdgrrhgusgeppehkvghrnhgvlhdrohhrghesfihorhhkohhfrghrugdrtgho
+    mhdpnhgspghrtghpthhtohepjedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepug
+    grvhhiugesuggrvhhiughgohifrdhnvghtpdhrtghpthhtoheprhgrvghmohgrrheifees
+    ghhmrghilhdrtghomhdprhgtphhtthhopehkuhhnihhtqdguvghvsehgohhoghhlvghgrh
+    houhhpshdrtghomhdprhgtphhtthhopegvsghighhgvghrsheskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepsghrvghnuggrnhdrhhhighhgihhnsheslhhinhhugidruggvvhdprh
+    gtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrghdp
+    rhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:_jW5aWafkQemQyY65g_098pPkJLSrZpwk6z9IgCdL5UBwqkZb7O96A>
+    <xmx:_jW5aTfii8Z5O3oft2KaNrzPT_EwW1XCByt60I23_bJ7zQ5kMb5uFQ>
+    <xmx:_jW5aQ0XW-eU345byBNjAZgzgltu6yxSmuKeCvs3Er-inl21PTQrbg>
+    <xmx:_jW5aaJ542yBjRuCwaqPvKyFLQw2FfaHMNSlMhM5xT_v7KVLy7xBrg>
+    <xmx:_jW5afETB-3DNPSMyy5iRK4Ee38Zkfpa8lzjGaCGrqB1U_l0ROf6gYlv>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 5B740700065; Tue, 17 Mar 2026 07:07:42 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aa7cbL-B5sbjZr_l@lizhi-Precision-Tower-5810>
+X-ThreadId: A1ayJ0gWTsgB
+Date: Tue, 17 Mar 2026 12:07:22 +0100
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>, linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, kunit-dev@googlegroups.com,
+ "Brendan Higgins" <brendan.higgins@linux.dev>,
+ "David Gow" <david@davidgow.net>, "Rae Moar" <raemoar63@gmail.com>
+Message-Id: <33f5b17a-6983-42d8-99e0-b5b80639d2b6@app.fastmail.com>
+In-Reply-To: <20260314172224.15152-1-ebiggers@kernel.org>
+References: <20260314172224.15152-1-ebiggers@kernel.org>
+Subject: Re: [PATCH] kunit: configs: Enable all CRC tests in all_tests.config
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On 09-03-26, 10:42, Frank Li wrote:
-> On Mon, Mar 09, 2026 at 12:04:59PM +0100, Vinod Koul wrote:
-> > On 18-12-25, 10:56, Frank Li wrote:
-> > > Previously, configuration and preparation required two separate calls. This
-> > > works well when configuration is done only once during initialization.
-> > >
-> > > However, in cases where the burst length or source/destination address must
-> > > be adjusted for each transfer, calling two functions is verbose and
-> > > requires additional locking to ensure both steps complete atomically.
-> > >
-> > > Add a new API dmaengine_prep_config_single() and dmaengine_prep_config_sg()
-> > > and callback device_prep_config_sg() that combines configuration and
-> > > preparation into a single operation. If the configuration argument is
-> > > passed as NULL, fall back to the existing implementation.
-> > >
-> > > Add a new API dmaengine_prep_config_single_safe() and
-> > > dmaengine_prep_config_sg_safe() for re-entrancy, which require driver
-> > > implement callback device_prep_config_sg().
-> >
-> > Okay to add API
-> >
-> > > +	struct dma_async_tx_descriptor *(*device_prep_config_sg)(
-> > > +		struct dma_chan *chan, struct scatterlist *sgl,
-> > > +		unsigned int sg_len, enum dma_transfer_direction direction,
-> > > +		unsigned long flags, struct dma_slave_config *config,
-> > > +		void *context);
-> >
-> > Do we want to have drivers implement one more callback. It does not make
-> > sense to me. Why not handle this in framework and have it call the
-> > respective lower level APIs.
-> 
-> To avoid use addtional lock! suppose each API is re-entriable.
-> 
-> thread 1:  call dmaengine_prep_config_sg_safe()
-> thread 2:  call dmaengine_prep_config_sg_safe()
-> 
-> If DMA engine driver implement device_prep_config_sg, thread 1 and thread 2
-> can run parallel.
-> 
-> If driver have not implement this callback, it have to use mutex make sure
-> config and prep atomic.
-> 
-> https://lore.kernel.org/dmaengine/20260109-edma_dymatic-v1-0-9a98c9c98536@nxp.com/
-> show finial opitimziation result, which depend on this. If can't call
-> prep() function parallel, which will kill performace.
 
-Which seems to be 10% in your case.
 
-> > Drivers should implement simple apis and collectively the functionality
-> > can come from the framework.
-> >
-> > Would you consider revising as such. Bonus all existing drivers can
-> > start using this API, no change required for drivers in that case'
-> 
-> Not that simple, some devices just call config at probe, especial fix
-> FIFO address and burst length.
-> 
-> Call config and prep only need for the case, which need adjust src/dst
-> address, burst length or other parameter for each transfer.
+On Sat, 14 Mar 2026, at 18:22, Eric Biggers wrote:
+> The new option CONFIG_CRC_ENABLE_ALL_FOR_KUNIT enables all the CRC code
+> that has KUnit tests, causing CONFIG_KUNIT_ALL_TESTS to enable all these
+> tests.  Add this option to all_tests.config so that kunit.py will run
+> them when passed the --alltests option.
+>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>
+> This patch is targeting crc-next
+> (https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next)
+> which has the commit adding CONFIG_CRC_ENABLE_ALL_FOR_KUNIT.
+>
+> Note that patch also mirrors
+> https://lore.kernel.org/linux-crypto/20260314035927.51351-3-ebiggers@kernel.org/
+> which does the same for the crypto library tests.
+>
+>  tools/testing/kunit/configs/all_tests.config | 2 ++
+>  1 file changed, 2 insertions(+)
+>
 
-Correct. In the cases where config is done once they can invoke with
-NULL config. I would like the middle layer to handle complexities and
-drivers should be simpler
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
+> diff --git a/tools/testing/kunit/configs/all_tests.config 
+> b/tools/testing/kunit/configs/all_tests.config
+> index 422e186cf3cf1..c1d3659a41cf0 100644
+> --- a/tools/testing/kunit/configs/all_tests.config
+> +++ b/tools/testing/kunit/configs/all_tests.config
+> @@ -44,10 +44,12 @@ CONFIG_REGMAP_BUILD=y
 > 
-> Frank
+>  CONFIG_AUDIT=y
 > 
-> >
-> >
-> > --
-> > ~Vinod
-
--- 
-~Vinod
+>  CONFIG_PRIME_NUMBERS=y
+> 
+> +CONFIG_CRC_ENABLE_ALL_FOR_KUNIT=y
+> +
+>  CONFIG_SECURITY=y
+>  CONFIG_SECURITY_APPARMOR=y
+>  CONFIG_SECURITY_LANDLOCK=y
+> 
+>  CONFIG_SOUND=y
+>
+> base-commit: c13cee2fc7f137dd25ed50c63eddcc578624f204
+> -- 
+> 2.53.0
