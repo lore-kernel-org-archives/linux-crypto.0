@@ -1,68 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF703ED11B;
-	Tue, 17 Mar 2026 16:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D47D3EF641
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Mar 2026 16:53:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773765673; cv=none; b=RlakZF+qX+KXlnHAZjR8m6FhFo0c9dTTaNbid4YpTD5zPb31EflT5oYOsQ6IEsT4aLHrMl1gcnEBSDsFRUW57CQW2SrBq/n5S4URf5oG1Wfkyo+hAl9pg/xw+NqQxwEWrIP1X7YiIO3/VAMdnTXK6T32Kd2g3+ADk2HQtCd/Gc4=
+	t=1773766436; cv=none; b=UEbnW8Y0Ejvyiu5qGgWtOFGq0qSyqXqmpvsF7fDALUuCEJ1FRvQllXQmacmC23NASCdwRALgUxOo0FlPARN6HGXsUdlVh+LnWY0GlDPBTSIbjMFCB5NGlS/jRNx0NCpwIBf5HKoawOSWObmLHlrQFukenPD5q5OJNaLGz0+2FdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773765673; c=relaxed/simple;
-	bh=UXz9k9VacabS+9Bo/BKg4HLMwnU4iYW2qe69lmOgkWA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L19r0IpJ81S+a4rOesgboXLR+73Poc6SkD6MXFpbujHFWN/ok7PMyNdTbn7CwhxeBM7T+ly37XzVCc7dIFbJeGFjG14hJy5I1GBpLLgx/SP7TZT1Vf67klxZOwIr4bUS0CGb46iBy+TWC9KwANCtgBCv0Tvtwy2cjq+zMYHqGTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vFYKatUq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773766436; c=relaxed/simple;
+	bh=uUZqgp56tETGHnqGOVMnhu/DmaoMiy26Kaph7kGSWAU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gX8r1EpOs3bTvYGgAvfDJaE5YO7x9upSm7CCmBCaaO5OMR/se3bNN8WKjPtMHOGKFApNQ2W3P+rnpdPdo+7crpXsTeM/NFWhZ/IvysiCKV13jrwdK8xVzUa6Axx/IcoePhm3eyD0Ov8xWsWem809x3l5rrFknE5NsMyvgVwaxsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EpzFASh2; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vFYKatUq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C4EFC2BC86;
-	Tue, 17 Mar 2026 16:41:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773765672;
-	bh=UXz9k9VacabS+9Bo/BKg4HLMwnU4iYW2qe69lmOgkWA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vFYKatUqNCjLiyvVwY3IdzCctHgHNpYSdIRzHjHzhN2vmsk/hsUbBAfmxQdocVw5s
-	 vK08CW78J4QahmBUwMmSW4SHBrphHksMkFc37FJQkQ9YIKdxSseEQQ7eLJ0YKZW3NG
-	 XZPmRcTQgp6c/3A/Mmj6NCY91TpxCgIDO1BJ7J7QsdSItIO8Tcp3hS5yJGKUiUALta
-	 cUXM01vwgklwbRzLTl3fz+m7P7TZ2pSYqHVLe8ntdXBNakl5ZnynpRJqFoAkQKPkSU
-	 CXZl0ZuO35BaPpRuNvwWbVTNtI6GDVU7m+nFd/kseWtCaPu00KeminWOaqhRF7tlwF
-	 Yumy2M2vy3SlQ==
-Date: Tue, 17 Mar 2026 09:40:12 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EpzFASh2"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773766423;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AB4PjFxa6AWYuYKRdmkExBbCIEkIbBbhTthhg8WwMeA=;
+	b=EpzFASh2ZKCjNH2eBsBSN4FxoAHY49Z+Dn2wROKsqo2nMJC6GGQC1KyRmWVaNcdLm4Pkik
+	r92aJAJU2TEL8B1rmpSNKUEzWBvuEqK9Ks+bF7gxdyqvwIWKiZTcYxUIiglHpY1OfQlUqN
+	+wSC74kkBsxrwTh3Kre8yDEl0v9XKNU=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] lib/crypto: arm64: Drop checks for
- CONFIG_KERNEL_MODE_NEON
-Message-ID: <20260317164012.GD6226@sol>
-References: <20260314175049.26931-1-ebiggers@kernel.org>
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: marvell/cesa - use memcpy_and_pad in mv_cesa_ahash_export
+Date: Tue, 17 Mar 2026 17:52:57 +0100
+Message-ID: <20260317165258.1304521-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260314175049.26931-1-ebiggers@kernel.org>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=813; i=thorsten.blum@linux.dev; h=from:subject; bh=uUZqgp56tETGHnqGOVMnhu/DmaoMiy26Kaph7kGSWAU=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJk72145zatvuDyh+emKhBNnWht4dhvIaYmGlM3OnZimd kOgOzizo5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACbi7MnIcHDFmRXufxm2pdVE Lf+c8p/T8riSbuPqRSlcFlN1rkgXdDMyTBNMTv2ed3S34N/QCo3A2k/WeZ8+VpvWVtl7tZ6/cZW RDwA=
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, Mar 14, 2026 at 10:50:49AM -0700, Eric Biggers wrote:
-> CONFIG_KERNEL_MODE_NEON is always enabled on arm64, and it always has
-> been since its introduction in 2013.  Given that and the fact that the
-> usefulness of kernel-mode NEON has only been increasing over time,
-> checking for this option in arm64-specific code is unnecessary.  Remove
-> these checks from lib/crypto/ to simplify the code and prevent any
-> future bugs where e.g. code gets disabled due to a typo in this logic.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
-> 
-> This patch is targeting libcrypto-next
-> (https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next)
+Replace memset() followed by memcpy() with memcpy_and_pad() to simplify
+the code and to write to 'cache' only once.
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/marvell/cesa/hash.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-- Eric
+diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
+index 5103d36cdfdb..2f203042d9bd 100644
+--- a/drivers/crypto/marvell/cesa/hash.c
++++ b/drivers/crypto/marvell/cesa/hash.c
+@@ -847,8 +847,7 @@ static int mv_cesa_ahash_export(struct ahash_request *req, void *hash,
+ 
+ 	*len = creq->len;
+ 	memcpy(hash, creq->state, digsize);
+-	memset(cache, 0, blocksize);
+-	memcpy(cache, creq->cache, creq->cache_ptr);
++	memcpy_and_pad(cache, blocksize, creq->cache, creq->cache_ptr, 0);
+ 
+ 	return 0;
+ }
