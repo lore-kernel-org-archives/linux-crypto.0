@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF1B315D49;
-	Tue, 17 Mar 2026 16:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E307931985D;
+	Tue, 17 Mar 2026 16:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773764605; cv=none; b=s3BnRCUoKYCy3aG5nB4MWKR42ae2nnO6CYOzTijZFu2WllojW55qovlWBOvtXpqwfgM9lFYwUqHRHhyQfrZ1eNOOfuKQJcrhqysscNQoxjIo7krzF+rsk+UjU5CNhzIS1vTB5rZT69UELc+8+nfGSmf1ps8IgT2Ll32t8XcEnSc=
+	t=1773764608; cv=none; b=hiZ9Det66m7ADxBFa6z4XyKGIrSgTWoHvhqVvQXFi1bqH2oL5lSdVVqG0CvysreRDC/WxLfH8JrhQWyyurqwjXvDoOJwnG1UrutazJbccEYNSPhuyZh3pmUQXizNmeM20T8M7OWQlai1HgUGsmmEdS/qMzmgUKdjZG14bIj3mXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773764605; c=relaxed/simple;
-	bh=LTvMOHz8M1itT3zsBfeKdK/QodsxREQ0/QYy8N4j50o=;
+	s=arc-20240116; t=1773764608; c=relaxed/simple;
+	bh=3cJD+C7Lp8IgqeilNWaoB/WV+RuJtFKWuxAfDC1i3Ls=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oisF4VyTtZ4JvJoQ7kqW3LUUr+82uUupUk2O+mWu5OhRnsK1XAtPNSJCyMaffpEy8TGBGSV1dTEYNlUTjm+1CImf2rb+N4eesrwMc76JL6qvlebpXu/kt8IPFA9aun5oejXlSD/IXJBI7ZQkBjwtKEEVBXgEq4yGrzcN28GmsKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LQJFcbKp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=LWgeOOY9Ywv3B5J5zKbabiEXmYyShLS6OSO9hKEZNdtRzldg/JGdmd6Dg15z2h7I1YA73/Rqs3tmJo4W+/1T3Qrb61fNsoTB7zEGaR2CRA6EM51TrhZ2cuoHKeyew2/Tlka1ar/Zeao4JLgymhSFd2pjwFerriV8IKZ8Zh99iXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFEGU5v7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LQJFcbKp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B012FC2BCAF;
-	Tue, 17 Mar 2026 16:23:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFEGU5v7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 393F6C19424;
+	Tue, 17 Mar 2026 16:23:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773764604;
-	bh=LTvMOHz8M1itT3zsBfeKdK/QodsxREQ0/QYy8N4j50o=;
+	s=k20201202; t=1773764607;
+	bh=3cJD+C7Lp8IgqeilNWaoB/WV+RuJtFKWuxAfDC1i3Ls=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LQJFcbKpxev2YH/BRuscFtU9+wN90LoTng7ZXqILsW2wT9lC+oUMTbSb+Jan2yP8f
-	 0jqI6DGBCcklfz8S9oxjWs9ZzjUYf7T6g4xjM+xa69Rnyg1r07mV2phrxTczui5pB0
-	 IM8KERoxUxe01nh+3R7C6FWi6yzoWTj3uU2ZhkeAzAnWROgRj7vIrTJuHjJ/c+fnUQ
-	 7E17No9AY3DFqu0eV+D0SWHWx+oPUiuVL7rad7jon9km5hCT7q85E/SWxxt4PJALr7
-	 qx0EfJN5Uai3lTllMKUWtyrANXpiqSF9uFsjvmw6KtLxri9DK9VGqH3qQw66HbALIw
-	 Mi0AMt52WdyZA==
+	b=UFEGU5v7VwloOgSdjLZ6ck7xY0EntsVmMaE93bOxGhGNyhusuAr1jiJCKHhixdT/o
+	 wUhZKbUgaOuHWiSpETxih2Z/WVtSH7wdPbT7m074lwyXF47LjwONhmFyqWpeK1BwSU
+	 TyxEbz8EALTu36dx/5LYSfANllFqgW16y+QmDpMgBsu4t0OGaQdy0jg73J5xtaTQNV
+	 hNGD6SGUfcCj00ZKf+YAzSoXJC9Wx+hbf7Vpg0+5AO4d4CX6Yll/Q3C7qT7xxDTsDg
+	 A64/pOWDige99ambQevkVlhBtFxWlbwF0FlBxbhnjXatBrhJd1FJhAq4ynC26KrTEz
+	 0hEyWnppIR8yQ==
 From: Tycho Andersen <tycho@kernel.org>
 To: Thomas Gleixner <tglx@kernel.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -49,9 +49,9 @@ To: Thomas Gleixner <tglx@kernel.org>,
 Cc: linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
 	"Tycho Andersen (AMD)" <tycho@kernel.org>
-Subject: [PATCH v3 4/7] x86/snp, crypto: move SNP init to ccp driver
-Date: Tue, 17 Mar 2026 10:21:54 -0600
-Message-ID: <20260317162157.150842-5-tycho@kernel.org>
+Subject: [PATCH v3 5/7] x86/snp, crypto: move HSAVE_PA setup to arch/
+Date: Tue, 17 Mar 2026 10:21:55 -0600
+Message-ID: <20260317162157.150842-6-tycho@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260317162157.150842-1-tycho@kernel.org>
 References: <20260317162157.150842-1-tycho@kernel.org>
@@ -65,44 +65,69 @@ Content-Transfer-Encoding: 8bit
 
 From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-Use the new snp_prepare_for_snp_init() to initialize SNP from the ccp
-driver instead of at boot time. This means that SNP is not enabled unless
-it is really going to be used (i.e. kvm_amd loads the ccp driver
-automatically).
+Now that there is snp_prepare_for_snp_init() that indicates when the CCP
+driver wants to prepare the architecture for SNP_INIT(_EX), move this
+architecture-specific bit of code to a more sensible place.
 
 Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/virt/svm/sev.c      | 2 --
- drivers/crypto/ccp/sev-dev.c | 2 ++
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/virt/svm/sev.c      | 8 ++++++++
+ drivers/crypto/ccp/sev-dev.c | 8 --------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 85091d663f18..b73ea987c69c 100644
+index b73ea987c69c..e856c13cfdaa 100644
 --- a/arch/x86/virt/svm/sev.c
 +++ b/arch/x86/virt/svm/sev.c
-@@ -560,8 +560,6 @@ int __init snp_rmptable_init(void)
- 	if (!setup_rmptable())
- 		return -ENOSYS;
+@@ -506,6 +506,11 @@ static bool __init setup_rmptable(void)
+ 	return true;
+ }
  
--	snp_prepare_for_snp_init();
--
- 	/*
- 	 * Setting crash_kexec_post_notifiers to 'true' to ensure that SNP panic
- 	 * notifier is invoked to do SNP IOMMU shutdown before kdump.
++static void snp_set_hsave_pa(void *arg)
++{
++	wrmsrq(MSR_VM_HSAVE_PA, 0);
++}
++
+ void snp_prepare_for_snp_init(void)
+ {
+ 	u64 val;
+@@ -527,6 +532,9 @@ void snp_prepare_for_snp_init(void)
+ 	on_each_cpu(mfd_reconfigure, (void *)1, 1);
+ 
+ 	on_each_cpu(snp_enable, NULL, 1);
++
++	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
++	on_each_cpu(snp_set_hsave_pa, NULL, 1);
+ }
+ EXPORT_SYMBOL_FOR_MODULES(snp_prepare_for_snp_init, "ccp");
+ 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 8b2dfc11289b..07c4736a1f0a 100644
+index 07c4736a1f0a..b10104f243b9 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1373,6 +1373,8 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
- 		return -EOPNOTSUPP;
- 	}
+@@ -1076,11 +1076,6 @@ static inline int __sev_do_init_locked(int *psp_ret)
+ 		return __sev_init_locked(psp_ret);
+ }
  
-+	snp_prepare_for_snp_init();
-+
- 	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
- 	on_each_cpu(snp_set_hsave_pa, NULL, 1);
+-static void snp_set_hsave_pa(void *arg)
+-{
+-	wrmsrq(MSR_VM_HSAVE_PA, 0);
+-}
+-
+ /* Hypervisor Fixed pages API interface */
+ static void snp_hv_fixed_pages_state_update(struct sev_device *sev,
+ 					    enum snp_hv_fixed_pages_state page_state)
+@@ -1375,9 +1370,6 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
  
+ 	snp_prepare_for_snp_init();
+ 
+-	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
+-	on_each_cpu(snp_set_hsave_pa, NULL, 1);
+-
+ 	/*
+ 	 * Starting in SNP firmware v1.52, the SNP_INIT_EX command takes a list
+ 	 * of system physical address ranges to convert into HV-fixed page
 -- 
 2.53.0
 
