@@ -1,41 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE08313272;
-	Tue, 17 Mar 2026 16:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C62C3ED5AD;
+	Tue, 17 Mar 2026 16:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773765626; cv=none; b=hb7Tpns7gwuBdOup2AZueqUVUETh9zAxyVTDQzCEucUH5ILuCw+3xNY6HapPQVHDnwEloEOSLUeDlkscJvvB8ZtLxPlOcz54Yvdeu3KH0xoYRvHhbXUTHQ9GutDFNDABl7tb31jsKqRWO8RfYJgN6fPIS5Tlkx9s8pDQSCc8Lik=
+	t=1773765645; cv=none; b=iq5vMoe7JAIj2jUGb+9KQQGH/92MFJGHSoLMK/FizF2nv4Lygh2a5qUiywEPaqY4D841jPj5Fntsp2cKGoEs2/MTJRFzsA4r+t/+wRafxEzAaQhTRpTyhDC2t4yudUbohfMj7Wu8EfoHpXOSsHKlI6R8mkPYZAEuJ3hhO92enUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773765626; c=relaxed/simple;
-	bh=6jdBVv2fFJXhOemZwP4Vsk/ocl2vrrXIK5eLHZJz560=;
+	s=arc-20240116; t=1773765645; c=relaxed/simple;
+	bh=oGmrY+PmqBfflbdhmIoYB56APfW8yTiCKtXMx4pMBnc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dgek94ja9bNbMt4gw0JR0YBnXReyJzuWe7wnZAvTDFdRbRyV/oUJNpuvqVtwaZzgRFau8PgXw2qnqxRCcnmALJ821iBwnklASB7BaL8yLY0/xw6V5dbcOi3LZrnhoYr8oGsDDBS4nNrUtIaEyDUNjrmnqyPDdnuu8EmX4rcm/BI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=II5lqHNM; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=baGa/TwBfayWHSvLA6gY40S9YiMnBYHk3B6/9GxlHAQ8tIfmtB9pfenmk9zD69MJ4Z5Lt2/0ELFt0lbMOQsg3bo+0O7mvYKfS+c2de//FsD8Vzw4CkOOZawlXhUnwnaTEeZYe9/1gyRKWOkkDDXo/9BXNi7VG1XyLekW6gqlhqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYWR2goX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="II5lqHNM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 592C8C4CEF7;
-	Tue, 17 Mar 2026 16:40:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYWR2goX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A407FC2BCB1;
+	Tue, 17 Mar 2026 16:40:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773765626;
-	bh=6jdBVv2fFJXhOemZwP4Vsk/ocl2vrrXIK5eLHZJz560=;
+	s=k20201202; t=1773765644;
+	bh=oGmrY+PmqBfflbdhmIoYB56APfW8yTiCKtXMx4pMBnc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=II5lqHNMJLa+aO52etk/FuWHq96J7HMuJMSKwMgdYoLiuxRi21ujZgSAKinbuamI6
-	 NqWMeSHEuyzmmz4qjx7Npje2DqVVkTQsP9posKwkLwx54bkaWcaaEXRjKKNjrmHi6l
-	 uc7H6LOYsgrxqvzavTQ4VMolJrcLatNCqtVLOWD4RzfnqXRNPG75UJGCRqL+gCgcs7
-	 oViIpnT055owNB9CvRa1uGvZkDV+symUeZIz661nNVTLGZe8DQnT/Lzcn1kUqt3ABn
-	 OhdKS7cHIq2X/9s3qSmN8uPzsi7uplfd8KEsHKreVc5fakrs1URco02TpiglX5BQPL
-	 fvIZxKm4Xa+Xg==
-Date: Tue, 17 Mar 2026 09:39:26 -0700
+	b=DYWR2goXGTel+rSJVHS3SC1OkpBsOslVuIZw+AsKQIgG5R7MDXdee12y2Sbs6tC9D
+	 /LI2X4lVy/wmX1hGqZqUWNZztoqx7XLICsmTxhfpE+zVejdMHzOTjfhQsTp1CzzgCX
+	 3UwnUvPtmKYRoiy/p9M+jIqIeDNLEOr5bYLMNfo84hWvaQyV+sKlUjTKWIyjnjK2ik
+	 Q7tOS1ND3cCYchDEzv171T6xKi7JVQcm5bBFWDI5rIK4FW3OCZg79gtqrmUhmaEcqm
+	 +LKh+RO6OJ7/YhFQsexfSrfqK9v5RYdBMTGlap3g4MNcrhKoWbWVD84ox7+LYnQzRV
+	 SkT1rAHPt8C+A==
+Date: Tue, 17 Mar 2026 09:39:45 -0700
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	kunit-dev@googlegroups.com
-Subject: Re: [PATCH] lib/crypto: tests: Drop the default to CRYPTO_SELFTESTS
-Message-ID: <20260317163926.GB6226@sol>
-References: <20260317040626.5697-1-ebiggers@kernel.org>
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] lib/crypto: Remove unused file blockhash.h
+Message-ID: <20260317163945.GC6226@sol>
+References: <20260314173526.17349-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,20 +43,11 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260317040626.5697-1-ebiggers@kernel.org>
+In-Reply-To: <20260314173526.17349-1-ebiggers@kernel.org>
 
-On Mon, Mar 16, 2026 at 09:06:26PM -0700, Eric Biggers wrote:
-> Defaulting the crypto KUnit tests to KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
-> instead of simply KUNIT_ALL_TESTS was originally intended to make it
-> easy to enable all the crypto KUnit tests.  This additional default is
-> nonstandard for KUnit tests, though, and it can cause all the KUnit
-> tests to be built-in unexpectedly if CRYPTO_SELFTESTS is set.  It also
-> constitutes a back-reference to crypto/ from lib/crypto/, which is
-> something that we should be avoiding in order to get clean layering.
-> 
-> Now that we provide a lib/crypto/.kunitconfig file that enables all
-> crypto KUnit tests, let's consider that to be the supported way to
-> enable all these tests, and drop the default of CRYPTO_SELFTESTS.
+On Sat, Mar 14, 2026 at 10:35:26AM -0700, Eric Biggers wrote:
+> For a short time this file was used by the SHA-256 and Poly1305 library
+> code, but they are no longer using it.  Remove this unused file.
 > 
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
