@@ -1,126 +1,127 @@
-Received: from omta34.uswest2.a.cloudfilter.net (omta34.uswest2.a.cloudfilter.net [35.89.44.33])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EDB13A6EE5
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Mar 2026 23:38:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04D2371D06;
+	Tue, 17 Mar 2026 23:41:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773790722; cv=none; b=Lm5LxwQ5+CYY63O0oNDUO5jfufhiJC9uCgDxezMboziLUfojFYV6YRbqQE6/2HnSiVmNVtR5N+4KNVCVpL9lFK42N7vZXCfQqpwQpxnn5f3cwKTAxcKWPc0VSENdxTHqct8M1OocG3vBAJ6l/wmTJXXAdl2U0beaLm6ATMpS/ZA=
+	t=1773790872; cv=none; b=nDnWQYfXz+N4XtLp/a2PJzqJSSZx+PqXh76uuhxJODsbegTRidGbITjtKz+g4xugOfxUW41gEogiNceEHJEL4NGP3ndtIX/flPeM6d7rR/xFgTiAWzKFCqi9U3sH782ypOrL+pV9KYHjKfkGhdoD3N3F8Mn0RXE/q/QHydu8HzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773790722; c=relaxed/simple;
-	bh=4N87Bkgtb0/aGn4yfIfymyt96koi5R0U5OOrJR6hay8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qjv5ajwkpclBaQlkHRaW5IcrMmE/9JhjtqUUWH6+6+vNa1P+HqYo8lOzlyhZ169ykIRVbY4tR7Mzz8D9dT0Bbd5xziwL9BTpeOLgXZI6HySer5thqRzpjbEVfjnvGLZDt+ViTKokTem4s6OKxi4bXHWgYxAppMSxE/WC2UE6G1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=LUyho57F; arc=none smtp.client-ip=35.89.44.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+	s=arc-20240116; t=1773790872; c=relaxed/simple;
+	bh=CxvuzhT7yn1bxb43FXgVqaOVcDutqMVbXzRdDRs1+yE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=UNevcRsmHuAce57kEH200RPapoyZLbHemKFAflgQ1vj8CbxuG/MRrJTvvmYwfMk7X01RXXPaeGzGWP9dg10Z9A9PbGFQXHzRRgT1Ek6i+MZE2g3xTLbuaBGde9T7E/A9qdNpMoIXNdvNbNlIlwhFm+TPk7Q0gc+4rU5reqLIt1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIo25Pjl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="LUyho57F"
-Received: from eig-obgw-5006b.ext.cloudfilter.net ([10.0.29.217])
-	by cmsmtp with ESMTPS
-	id 2RDXwMEn9Kjfo2dyDwcF95; Tue, 17 Mar 2026 23:37:05 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id 2dyCwVKLjOs9R2dyCwiR25; Tue, 17 Mar 2026 23:37:04 +0000
-X-Authority-Analysis: v=2.4 cv=HPPDFptv c=1 sm=1 tr=0 ts=69b9e5a1
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=k5Y5iPg+dmTXVWgYE/XtfQ==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=7T7KSl7uo7wA:10 a=VwQbUJbxAAAA:8
- a=5vZi_tIctBNeQFYZvx8A:9 a=QEXdDO2ut3YA:10 a=2aFnImwKRvkU0tJ3nQRT:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=sDIz43D4MTuOarQG71u0YgFU0v977L2RxVybNkE8u+4=; b=LUyho57FaqByRfJY7uhMTFmu2S
-	JtvA8JfGgXdiudXrchA0Ne/x/yclFIlMivpsXOevHirW5mjG/icJGiTomPM944RHVFmL96nWTmfbf
-	0OHakIJxjnSoVrU4ROHvZ6m6HnQGzW17aca0t5fDloRsihkysr7Gh1NC13gYw5ykkbNKanAPYAwX3
-	ZOl6Fnzyv+XdMK8DiJpToUkVbAaVXuNLyL90Cnml9v2GZJ+wQyyhgc3WQAUWQQT4YWd9f7CZoNVUx
-	IbnseujQlUkv6pZY5YwQvJt7q72HYKUyhCFr0WLWS+v0YgGP388H1jJ7N+E3jkXuLlpo6PdDlVIkD
-	xU9H6wJw==;
-Received: from [177.238.16.13] (port=58304 helo=[192.168.0.104])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.99.1)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1w2dy9-00000004JzL-3q9f;
-	Tue, 17 Mar 2026 18:37:02 -0500
-Message-ID: <bde61932-9c7e-4139-8d6a-8059c205a217@embeddedor.com>
-Date: Tue, 17 Mar 2026 17:35:39 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIo25Pjl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C2B0C4CEF7;
+	Tue, 17 Mar 2026 23:41:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773790871;
+	bh=CxvuzhT7yn1bxb43FXgVqaOVcDutqMVbXzRdDRs1+yE=;
+	h=Date:From:To:Cc:Subject:From;
+	b=QIo25PjlVhaTmhb36pwX1wX2Km+DffM55wYycacRAohJFZCYGrNhfiQfnjOJsbSKt
+	 4texU/iWZwdc1Du8sscHMydOh+5PxvlkOyPr2hpsrW+fWwFcw2Q7hZe3bKMcxypqb4
+	 1+x/jrtkZ/c8N1vkWqdtbykWDMVM5EmOnvcCfy5gYrZmSmcff5kSv/fufq2sgoqlQ+
+	 7fEGBrxW2YdSJ07XhzCsyk4TGxOiprkbrK0BGbJ/5XM1FpwbtzC4PhuOD6g6sIwsZd
+	 2a02DddgX7mQynN6C+72Nayvxs8PaPpGxMHc6IdVY55ebdONnszvbCeW7UpT/DPQoz
+	 FEE9jcZanG5jQ==
+Date: Tue, 17 Mar 2026 17:40:02 -0600
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Haren Myneni <haren@us.ibm.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH] crypto: nx - Fix packed layout in struct nx842_crypto_header
+Message-ID: <abnmUvHzhgS9xA-m@kspp>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: nx - annotate struct nx842_crypto_header with
- __counted_by
-To: Thorsten Blum <thorsten.blum@linux.dev>, Haren Myneni <haren@us.ibm.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Kees Cook <kees@kernel.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20260317201804.1393389-3-thorsten.blum@linux.dev>
-Content-Language: en-US
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20260317201804.1393389-3-thorsten.blum@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 177.238.16.13
-X-Source-L: No
-X-Exim-ID: 1w2dy9-00000004JzL-3q9f
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.0.104]) [177.238.16.13]:58304
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 3
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfCa3XOhlUjk5RyFP9hHREO6R9C3EHOcica9DGMyp5b4a8HPdkYWRSJzj/8FRAj7kG8bNhwaviDilrm8DRb7GsfUuOWwN994DJCQPmDwbr/nnEG8c01j1
- JAuPBRam6Na89UoA36dcITBsbaBxx3FFo9bMcNJnfinv20qxbkkCcC7DvoM0A9UNOMIt9jJD+sDhUuZqQFO8JZDcK3LdiSzJMLc7MaV4AZY/IG/R/PKi847T
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+struct nx842_crypto_header is declared with the __packed attribute,
+however	the fields grouped with struct_group_tagged() were not packed.
+This caused the grouped header portion of the structure to lose the
+packed layout guarantees of the containing structure.
 
+Fix this by replacing struct_group_tagged() with __struct_group(...,
+..., __packed, ...) so the grouped fields are packed, and the original
+layout is preserved, restoring the intended packed layout of the
+structure.
 
-On 3/17/26 14:18, Thorsten Blum wrote:
-> Add the __counted_by() compiler attribute to the flexible array member
-> 'group' to improve access bounds-checking via CONFIG_UBSAN_BOUNDS and
-> CONFIG_FORTIFY_SOURCE.
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+Before changes:
+struct nx842_crypto_header {
+	union {
+		struct {
+			__be16     magic;                /*     0     2 */
+			__be16     ignore;               /*     2     2 */
+			u8         groups;               /*     4     1 */
+		};                                       /*     0     6 */
+		struct nx842_crypto_header_hdr hdr;      /*     0     6 */
+	};                                               /*     0     6 */
+	struct nx842_crypto_header_group group[];        /*     6     0 */
 
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+	/* size: 6, cachelines: 1, members: 2 */
+	/* last cacheline: 6 bytes */
+} __attribute__((__packed__));
 
-Thanks
--Gustavo
+After changes:
+struct nx842_crypto_header {
+	union {
+		struct {
+			__be16     magic;                /*     0     2 */
+			__be16     ignore;               /*     2     2 */
+			u8         groups;               /*     4     1 */
+		} __attribute__((__packed__));           /*     0     5 */
+		struct nx842_crypto_header_hdr hdr;      /*     0     5 */
+	};                                               /*     0     5 */
+	struct nx842_crypto_header_group group[];        /*     5     0 */
 
-> ---
->   drivers/crypto/nx/nx-842.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
-> index f5e2c82ba876..a04e85e9f78e 100644
-> --- a/drivers/crypto/nx/nx-842.h
-> +++ b/drivers/crypto/nx/nx-842.h
-> @@ -164,7 +164,7 @@ struct nx842_crypto_header {
->   		__be16 ignore;		/* decompressed end bytes to ignore */
->   		u8 groups;		/* total groups in this header */
->   	);
-> -	struct nx842_crypto_header_group group[];
-> +	struct nx842_crypto_header_group group[] __counted_by(groups);
->   } __packed;
->   static_assert(offsetof(struct nx842_crypto_header, group) == sizeof(struct nx842_crypto_header_hdr),
->   	      "struct member likely outside of struct_group_tagged()");
-> 
+	/* size: 5, cachelines: 1, members: 2 */
+	/* last cacheline: 5 bytes */
+} __attribute__((__packed__));
+
+Fixes: 1e6b251ce175 ("crypto: nx - Avoid -Wflex-array-member-not-at-end warning")
+Cc: stable@vger.kernel.org
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ drivers/crypto/nx/nx-842.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
+index f5e2c82ba876..cd3c1a433e8c 100644
+--- a/drivers/crypto/nx/nx-842.h
++++ b/drivers/crypto/nx/nx-842.h
+@@ -159,7 +159,7 @@ struct nx842_crypto_header_group {
+ 
+ struct nx842_crypto_header {
+ 	/* New members MUST be added within the struct_group() macro below. */
+-	struct_group_tagged(nx842_crypto_header_hdr, hdr,
++	__struct_group(nx842_crypto_header_hdr, hdr, __packed,
+ 		__be16 magic;		/* NX842_CRYPTO_MAGIC */
+ 		__be16 ignore;		/* decompressed end bytes to ignore */
+ 		u8 groups;		/* total groups in this header */
+@@ -167,7 +167,7 @@ struct nx842_crypto_header {
+ 	struct nx842_crypto_header_group group[];
+ } __packed;
+ static_assert(offsetof(struct nx842_crypto_header, group) == sizeof(struct nx842_crypto_header_hdr),
+-	      "struct member likely outside of struct_group_tagged()");
++	      "struct member likely outside of __struct_group()");
+ 
+ #define NX842_CRYPTO_GROUP_MAX	(0x20)
+ 
+-- 
+2.43.0
 
