@@ -1,84 +1,139 @@
-Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9433A6B7E
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Mar 2026 10:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98243A63F8;
+	Tue, 17 Mar 2026 10:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773743160; cv=none; b=dIgt4vNDwIC3MHV8z/MRwKNP6es+vwrOyWTHcEMj+AAp0ZzQo+1ydOKJXREfwbOvhJUSowx/LxrhYsaHCcJN8bERT6EJog0GbGvXh1DaY38wpfIFUtuw6s13dOAZCIAQWNWGoV2yMrE0MWi2l+aZ3O+6MQAqqvJwZJ84T8+9C0Q=
+	t=1773743865; cv=none; b=DyjMhiTD1qbNZiR/wln+Qku1VqAruXwLvxFBSWbD5G0InGiQWE5RfnDp+GVgSpczpUUZRKf+sZY4Qo/38VNyHqZQGGPBdP4VpTWkoyoRNaDO3a+KYVorChYRbe1wHVN/7Ql7YCKPK3sB+Nj1qtIjOiPbDwMSkzFAeS8zfysSi1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773743160; c=relaxed/simple;
-	bh=hjoBpHPC9Y8AEx3vQdQfREpdCz3NGob+FEFJLvpmPAs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qmt0Lvn0xuf08sUSpbvJLMxj/XEsdSboquZ99MFkfgQPN4n+VPTxfs3wffHzVe2U1raA2gBdBbI875gIL0TsaZi93uFDpUp8I4VMWJr9kG4ovJu+vPZxxHzBTfuULxugtptSS1EcOztIPhtIUEXS2iC5CbOPnBx4EFOAn+x+dzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 35B972000CA;
-	Tue, 17 Mar 2026 11:25:57 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 2591820014B;
-	Tue, 17 Mar 2026 11:25:57 +0100 (CET)
-Received: from lsv15509.swis.ro-buh01.nxp.com (lsv15509.swis.ro-buh01.nxp.com [10.172.0.253])
-	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 9020220354;
-	Tue, 17 Mar 2026 11:25:55 +0100 (CET)
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Paul Bunyan <pbunyan@redhat.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	linux-crypto@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>,
+	s=arc-20240116; t=1773743865; c=relaxed/simple;
+	bh=bVEWdLxO6ioCtZnPQrdXen+JMCFn/KT/7+euMbV69tM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c0Qcjha6B+lmO1sD3axjOkAJYG+KIfEO5DiIqfq3TupFFdswYcpXCMqbHu8hwAOnYnmYir6Kzg4TT1x0ji1XlOZqwp8D1jyNTePQH9MRQArBMXST9LDY2fx4bL3XLMj9bzeK/jfh/6TxJHkb9ajslaM/UZaTb/2tlroN8a+eUHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bOUr0clK; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bOUr0clK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7BA2C2BC9E;
+	Tue, 17 Mar 2026 10:37:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773743865;
+	bh=bVEWdLxO6ioCtZnPQrdXen+JMCFn/KT/7+euMbV69tM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bOUr0clKofRpKlPQbpoGfbgW9oToJQusdYtrjFwC+xX+oDNSZytwUiA4CRIDQXhMT
+	 xdfBatwQU3l+u8MhtrvnIpgsESwkSLOQjt3qB/Xc59eOYZt41K7Yt5IQ6r+3wsvTNk
+	 RYvRm7XfIZmvxULvrr+bHWanoNOdZIoHkimQjH7QoO1I5DRxl+ZJOSbOWf2CfvfYxw
+	 o4Mt2aeShixX/CrnBsDtw+1tkhO2TN36FEwVR+VGjLGHhhYcVsFwy4vZ2PfCApJoEK
+	 k1zTCdZbe2/7yoHhavk0gUqPVYdHLfuZGEAMSXZvoUuG9ZVbrIy4t6izS5WAXy2E+p
+	 LE2sQDdblsyOg==
+Date: Tue, 17 Mar 2026 16:07:41 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Frank Li <Frank.li@nxp.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Koichiro Den <den@valinux.co.jp>, Niklas Cassel <cassel@kernel.org>,
+	dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+	mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	imx@lists.linux.dev
-Subject: [PATCH] crypto: caam - fix overflow on long hmac keys
-Date: Tue, 17 Mar 2026 12:25:14 +0200
-Message-Id: <20260317102514.3882809-2-horia.geanta@nxp.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260317102514.3882809-1-horia.geanta@nxp.com>
-References: <20260317102514.3882809-1-horia.geanta@nxp.com>
+Subject: Re: [PATCH v2 1/8] dmaengine: Add API to combine configuration and
+ preparation (sg and single)
+Message-ID: <abku9bXxkZWUwOhE@vaman>
+References: <20251218-dma_prep_config-v2-0-c07079836128@nxp.com>
+ <20251218-dma_prep_config-v2-1-c07079836128@nxp.com>
+ <aa6pW-zpxnrZnfPn@vaman>
+ <aa7cbL-B5sbjZr_l@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aa7cbL-B5sbjZr_l@lizhi-Precision-Tower-5810>
 
-When a key longer than block size is supplied, it is copied and then
-hashed into the real key.  The memory allocated for the copy needs to
-be rounded to DMA cache alignment, as otherwise the hashed key may
-corrupt neighbouring memory.
+On 09-03-26, 10:42, Frank Li wrote:
+> On Mon, Mar 09, 2026 at 12:04:59PM +0100, Vinod Koul wrote:
+> > On 18-12-25, 10:56, Frank Li wrote:
+> > > Previously, configuration and preparation required two separate calls. This
+> > > works well when configuration is done only once during initialization.
+> > >
+> > > However, in cases where the burst length or source/destination address must
+> > > be adjusted for each transfer, calling two functions is verbose and
+> > > requires additional locking to ensure both steps complete atomically.
+> > >
+> > > Add a new API dmaengine_prep_config_single() and dmaengine_prep_config_sg()
+> > > and callback device_prep_config_sg() that combines configuration and
+> > > preparation into a single operation. If the configuration argument is
+> > > passed as NULL, fall back to the existing implementation.
+> > >
+> > > Add a new API dmaengine_prep_config_single_safe() and
+> > > dmaengine_prep_config_sg_safe() for re-entrancy, which require driver
+> > > implement callback device_prep_config_sg().
+> >
+> > Okay to add API
+> >
+> > > +	struct dma_async_tx_descriptor *(*device_prep_config_sg)(
+> > > +		struct dma_chan *chan, struct scatterlist *sgl,
+> > > +		unsigned int sg_len, enum dma_transfer_direction direction,
+> > > +		unsigned long flags, struct dma_slave_config *config,
+> > > +		void *context);
+> >
+> > Do we want to have drivers implement one more callback. It does not make
+> > sense to me. Why not handle this in framework and have it call the
+> > respective lower level APIs.
+> 
+> To avoid use addtional lock! suppose each API is re-entriable.
+> 
+> thread 1:  call dmaengine_prep_config_sg_safe()
+> thread 2:  call dmaengine_prep_config_sg_safe()
+> 
+> If DMA engine driver implement device_prep_config_sg, thread 1 and thread 2
+> can run parallel.
+> 
+> If driver have not implement this callback, it have to use mutex make sure
+> config and prep atomic.
+> 
+> https://lore.kernel.org/dmaengine/20260109-edma_dymatic-v1-0-9a98c9c98536@nxp.com/
+> show finial opitimziation result, which depend on this. If can't call
+> prep() function parallel, which will kill performace.
 
-The copying is performed using kmemdup, however this leads to an overflow:
-reading more bytes (aligned_len - keylen) from the keylen source buffer.
-Fix this by replacing kmemdup with kmalloc, followed by memcpy.
+Which seems to be 10% in your case.
 
-Fixes: 199354d7fb6e ("crypto: caam - Remove GFP_DMA and add DMA alignment padding")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/crypto/caam/caamalg_qi2.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> > Drivers should implement simple apis and collectively the functionality
+> > can come from the framework.
+> >
+> > Would you consider revising as such. Bonus all existing drivers can
+> > start using this API, no change required for drivers in that case'
+> 
+> Not that simple, some devices just call config at probe, especial fix
+> FIFO address and burst length.
+> 
+> Call config and prep only need for the case, which need adjust src/dst
+> address, burst length or other parameter for each transfer.
 
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 167372936ca7..78964e1712e5 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -3326,9 +3326,10 @@ static int ahash_setkey(struct crypto_ahash *ahash, const u8 *key,
- 		if (aligned_len < keylen)
- 			return -EOVERFLOW;
- 
--		hashed_key = kmemdup(key, aligned_len, GFP_KERNEL);
-+		hashed_key = kmalloc(aligned_len, GFP_KERNEL);
- 		if (!hashed_key)
- 			return -ENOMEM;
-+		memcpy(hashed_key, key, keylen);
- 		ret = hash_digest_key(ctx, &keylen, hashed_key, digestsize);
- 		if (ret)
- 			goto bad_free_key;
+Correct. In the cases where config is done once they can invoke with
+NULL config. I would like the middle layer to handle complexities and
+drivers should be simpler
+
+> 
+> Frank
+> 
+> >
+> >
+> > --
+> > ~Vinod
+
 -- 
-2.25.1
-
+~Vinod
