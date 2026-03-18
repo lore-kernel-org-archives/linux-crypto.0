@@ -1,79 +1,133 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B366356A37;
-	Wed, 18 Mar 2026 17:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD93B2C028B
+	for <linux-crypto@vger.kernel.org>; Wed, 18 Mar 2026 19:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773856290; cv=none; b=s9Mmv3+KoLLzTnc4/J8kj1OfmEJsehHFwtHV5TwJKWWR87Y6UXBCibpj++OogIx6pflwV2Kg9oVcotLuPasDRC8tV0l02HouyDNPtOa2t1aHRvgxs1oM9JbJb/uIphniiRMZswBpnPp09a3DuRS6BYxIVPUPZvUnEF+I4pjfsIs=
+	t=1773863302; cv=none; b=WtqQ1kI3lto6E/4tLbnIipDVbjVSS6Yu/V12SeJp62qUrkx8X4grGWari1g5/+Fa035U6IR+72nNhyFrOHiKaeA5EKFL54pubH3FeubzCPOy5sXU4QPA6BW4+CbeWuvxAFpRf1ouErVApfL6eHAlkvvSBAydN2L10uMqpbEvPAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773856290; c=relaxed/simple;
-	bh=EDBlyoiXkGjVuAtMcXzb2GV3zjSDR/jqOI6A7Tor6XU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ChWiA3rf2QcbkZLCNJ0lN1BNDQq4FAXlAED1nE7mx61umRWFBKcI1B2x5R5RNGYX8sjAKShVSdS9vwK6yifxz4JbFKlSrUNgLSwH5LHtXZzk5i8jAl/KCLBE7rCaEH1EBsZSrCnB8qdcfR+Z5uv5x0ICsxhnFX9B/WjOJl6mGs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=QcFw9CJV; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+	s=arc-20240116; t=1773863302; c=relaxed/simple;
+	bh=6lCQA5irQLf8r61E6iXlBTcgGWfBeo+sVIzGWD73WiQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h43H7+RAaCm9ldBiKJZ8iKoKp0/9ggjIHYuNniW5oz+JCjXN5d5TgALXUctnSywiHX5507HlEd59HZVlXu1Q5HcBhS2cVaTpj/4USwxvtZPdFttevcNnkV1xqm+RVytKd7+yiG7aPM72Ph1JqWraahEuwGN7ImLU4VNyvQnsDj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HJBwj2OT; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="QcFw9CJV"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Reply-To:Content-ID:Content-Description;
-	bh=EDBlyoiXkGjVuAtMcXzb2GV3zjSDR/jqOI6A7Tor6XU=; b=QcFw9CJVBL6yssnKmxjONDY8GT
-	TnExAMBio7BoAKwzlOeeFZT5m0ky9C001Nz83bRqK+srspqtao9/Y+i8mMIl8FMjsxkwPru9HL4jz
-	wR+pTmvS8KrhpqvJEBvvhGWtESUQnvxi/EJTg7Rtr+eH989lwNvJRSEOBF+cB/8T76q/YyDwMYL2k
-	+agw7FtPxcy2Air2RTt1LD7ydjwkDxmRU31hfPoZhKLDpl7ovK/oXx0RSTyQq5+L9+SAH2tfOj6b9
-	U6oL4ZFPssGJgPIFA/TlM23AW3+jzslv64z0PgyQB5vWJoGOLx5Bfh1+SPvD4KGcPg/T9eahPig/c
-	uVtdMhuA==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1w2v3B-003pWI-JT; Wed, 18 Mar 2026 17:51:20 +0000
-Date: Wed, 18 Mar 2026 10:51:15 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Chuck Lever <chuck.lever@oracle.com>
-Cc: Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, puranjay@kernel.org, 
-	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	Michael van der Westhuizen <rmikey@meta.com>, kernel-team@meta.com
-Subject: Re: [PATCH RFC 0/5] workqueue: add WQ_AFFN_CACHE_SHARD affinity scope
-Message-ID: <abrkrZc52h0vcTTj@gmail.com>
-References: <20260312-workqueue_sharded-v1-0-2c43a7b861d0@debian.org>
- <6b952e7087c5fd8f040b692a92374871@kernel.org>
- <abk6PMrSDcb-yXZ9@gmail.com>
- <30adaf6c-657c-41f1-9234-79d807d74f02@oracle.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HJBwj2OT"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773863288;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nd7XU4yzoE7nXwDpfxkU3SS6EVX91OWvcehWjZ0TpgE=;
+	b=HJBwj2OTjNpmPQU32j4b1zwGR3WwWD2nkhAUvufC2y+fP8+f6+/zQLPjPrqR+smMvPqgav
+	rjJXjqsiJKuKotsQgHAjAKtOJMNLTpgOkGB2nahKAWB7/+mx8ffUOJMvCYX1ixmrQ8iHlq
+	ab0x3+wGMd4HfJW7r5P+M0MpYAIMcFc=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>,
+	Yuan Kang <Yuan.Kang@freescale.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	stable@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] crypto: caam - guard HMAC key hex dumps in hash_digest_key
+Date: Wed, 18 Mar 2026 20:46:50 +0100
+Message-ID: <20260318194649.137257-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3516; i=thorsten.blum@linux.dev; h=from:subject; bh=6lCQA5irQLf8r61E6iXlBTcgGWfBeo+sVIzGWD73WiQ=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJm7GTU/V7/7nf/p8nfvj3vnXddX6Nq1puXtsfkPPwTyv p8+aataTUcpC4MYF4OsmCLLg1k/ZviW1lRuMonYCTOHlQlkCAMXpwBMRPE5wx+Ok1PqH1yz4Du8 lGV3InfshIArt5MCXWI5mOoPOYV8/CTI8D+/xs7hEJeW5OLi2auXz268k1ZTUlDZybJGdxlDaKz MWx4A
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <30adaf6c-657c-41f1-9234-79d807d74f02@oracle.com>
-X-Debian-User: leitao
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Mar 17, 2026 at 09:58:54AM -0400, Chuck Lever wrote:
-> On 3/17/26 7:32 AM, Breno Leitao wrote:
-> >> - How was the default shard size of 8 picked? There's a tradeoff
-> >> between the number of kworkers created and locality. Can you also
-> >> report the number of kworkers for each configuration? And is there
-> >> data on different shard sizes? It'd be useful to see how the numbers
-> >> change across e.g. 4, 8, 16, 32.
-> >
-> > The choice of 8 as the default shard size was somewhat arbitrary – it was
-> > selected primarily to generate initial data points.
->
-> Perhaps instead of basing the sharding on a particular number of CPUs
-> per shard, why not cap the total number of shards? IIUC that is the main
-> concern about ballooning the number of kworker threads.
+Guard sensitive HMAC key hex dumps with DEBUG in hash_digest_key() to
+avoid leaking secrets at runtime when CONFIG_DYNAMIC_DEBUG is enabled.
 
-That's a great suggestion. I'll send a v2 that implements this approach,
-where the parameter specifies the number of shards rather than the number
-of CPUs per shard.
+Fixes: 045e36780f11 ("crypto: caam - ahash hmac support")
+Fixes: 3f16f6c9d632 ("crypto: caam/qi2 - add support for ahash algorithms")
+Cc: stable@vger.kernel.org
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+Changes in v2:
+- Debug-guard key hex dumps instead of removing them entirely (Herbert)
+- Use print_hex_dump() instead of print_hex_dump_debug() since the dumps
+  are already guarded by DEBUG
+- Link to v1: https://lore.kernel.org/lkml/20260306111204.302544-1-thorsten.blum@linux.dev/
+---
+ drivers/crypto/caam/caamalg_qi2.c | 13 ++++++++-----
+ drivers/crypto/caam/caamhash.c    | 13 ++++++++-----
+ 2 files changed, 16 insertions(+), 10 deletions(-)
 
-Thanks for the feedback,
---breno
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 167372936ca7..3392070942ab 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -3269,8 +3269,10 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
+ 	dpaa2_fl_set_addr(out_fle, key_dma);
+ 	dpaa2_fl_set_len(out_fle, digestsize);
+ 
+-	print_hex_dump_debug("key_in@" __stringify(__LINE__)": ",
+-			     DUMP_PREFIX_ADDRESS, 16, 4, key, *keylen, 1);
++#ifdef DEBUG
++	print_hex_dump(KERN_DEBUG, "key_in@" __stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, key, *keylen, 1);
++#endif
+ 	print_hex_dump_debug("shdesc@" __stringify(__LINE__)": ",
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
+ 			     1);
+@@ -3289,9 +3291,10 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
+ 		/* in progress */
+ 		wait_for_completion(&result.completion);
+ 		ret = result.err;
+-		print_hex_dump_debug("digested key@" __stringify(__LINE__)": ",
+-				     DUMP_PREFIX_ADDRESS, 16, 4, key,
+-				     digestsize, 1);
++#ifdef DEBUG
++		print_hex_dump(KERN_DEBUG, "digested key@" __stringify(__LINE__)": ",
++			       DUMP_PREFIX_ADDRESS, 16, 4, key, digestsize, 1);
++#endif
+ 	}
+ 
+ 	dma_unmap_single(ctx->dev, flc_dma, sizeof(flc->flc) + desc_bytes(desc),
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 628c43a7efc4..0dad6fb6caeb 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -393,8 +393,10 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
+ 	append_seq_store(desc, digestsize, LDST_CLASS_2_CCB |
+ 			 LDST_SRCDST_BYTE_CONTEXT);
+ 
+-	print_hex_dump_debug("key_in@"__stringify(__LINE__)": ",
+-			     DUMP_PREFIX_ADDRESS, 16, 4, key, *keylen, 1);
++#ifdef DEBUG
++	print_hex_dump(KERN_DEBUG, "key_in@"__stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, key, *keylen, 1);
++#endif
+ 	print_hex_dump_debug("jobdesc@"__stringify(__LINE__)": ",
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
+ 			     1);
+@@ -408,9 +410,10 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
+ 		wait_for_completion(&result.completion);
+ 		ret = result.err;
+ 
+-		print_hex_dump_debug("digested key@"__stringify(__LINE__)": ",
+-				     DUMP_PREFIX_ADDRESS, 16, 4, key,
+-				     digestsize, 1);
++#ifdef DEBUG
++		print_hex_dump(KERN_DEBUG, "digested key@"__stringify(__LINE__)": ",
++			       DUMP_PREFIX_ADDRESS, 16, 4, key, digestsize, 1);
++#endif
+ 	}
+ 	dma_unmap_single(jrdev, key_dma, *keylen, DMA_BIDIRECTIONAL);
+ 
