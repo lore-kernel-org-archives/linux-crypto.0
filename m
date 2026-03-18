@@ -1,141 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2051A073F;
-	Wed, 18 Mar 2026 07:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE6F36C0BC;
+	Wed, 18 Mar 2026 07:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773819217; cv=none; b=sbbDyCy1gMF8BWrs8gm3YU2ezz908l1+cRT+HmvxAFbAyv35dV7sB9hs7e2jIm4X7Jq7wzd9HLocbM2/gJtenZXA214Sh5/iLiDLidbwTL5XQRu7X/Y/Gohgzxp38YCzEvf+tMQuH4n+yshKtU7yuOpF5OZcsGxazQF8FJKXhPs=
+	t=1773820032; cv=none; b=ox30qGxLDmuWRCbUeoY43gpOr98qgBQlTq5Vy46wShWwzWS+eyfUXRvnDv+kPMhqhlyHd+rhy0pOy1aa6y8vFdz9wUhNl0VwX73hrSQD2Ut6T5GWUN0ESZeO19kaPg5SXVdeUVF6KdMBqi0k8/IRHVgniHZ9msLEkLXImaTljqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773819217; c=relaxed/simple;
-	bh=ScRK7G/j4sFH55VvieNmUsTongM7CZ2Vp3tQOPnFgyU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IPt+e1QA45+zr+UjAWPVqJHIubDR7P4n+gg1kg313iLGCVZdD/j92DmR7FBka1cDKByVMnYvGyIpfUCnl/VZoH2AEL4vd3oai22QME05wZyJSkZK02v3gCcSrddDx8dKcO7LbAomiVzBLuxAXA7BzImL3vI3VKM+oMgir6g/qao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RDKfKavl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773820032; c=relaxed/simple;
+	bh=T3QbSpCvAmJuC6q7XUzs1vLPmnaFL51lUVEUyf/YqHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NQs0nP83Fanp9HvUGsClowIjG1CcvfuKUGRFIF4rmtqNjRVtGFZXlj/3bfPXUcKscFGv1TlqBiBovpRNuApJ7Td3lGmEFw8RyjyR0t6Fc8Da8MLS4PmZ2rg+207pTHkRyr/WazuIGBECREv6WSNaiKEki5BoEF2HZNpEh8XkJkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=b73Y5B1H; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RDKfKavl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3696FC19421;
-	Wed, 18 Mar 2026 07:33:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773819217;
-	bh=ScRK7G/j4sFH55VvieNmUsTongM7CZ2Vp3tQOPnFgyU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RDKfKavl5jjxOQf/aX7HLjw7nFcZ9BADqXsmLSW17v1RxUDoNS3TuHso+2HwuXGTP
-	 Tky49iLy1yxiP21gv230KhRj+CiTqCEfixn/PTeXtudlmOmzqLzmJhLm1RN4XuDXrf
-	 ZIta7e7cV9izJWFTa/qRG8JAbDsAdDsXn3YHMOkeZUnLMdnIVoh5GFZaznmS0c3JgU
-	 WvBMIN13VRfNmYqdHJLyhXSNvhphB6kv1MEK/IrSowRd7zt0sBrqQkqaOB2bGq6XPz
-	 KsiuMCOH3q3/pVcia7EuSigfGfAaKnRnJgtZggTGniJITV2BVOeT+xZVbc3/8mjdbs
-	 mCNcV1bk+xHUQ==
-Message-ID: <8863f38b-51df-43ea-995c-08b9fb04f4dc@kernel.org>
-Date: Wed, 18 Mar 2026 08:33:29 +0100
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="b73Y5B1H"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=/sSz2iuMzmeiie9cePxSe9KQ1urOHv0hHVTFDqxwKEI=; 
+	b=b73Y5B1Hn56XgUxEorg1OPus1w/ERpvthYvI6fD7Bev6bm8Nm8Q//el7Z+qP5pok8xDmHNY1fLF
+	Mhkt2lBbnZlwDC0lXvNzDlp7M8L5vo5q/Zay/1gQjJ5ngmgYs4lyhyEwGCQ1ancQIaiWCzKy5G+qu
+	YPMeMrNc7pb97DvF2tzMtS+Fby4rHxoJGiRTgXivD7MdCXWoJ4gm1FKFrbfKJPuChET8wUww+K4iu
+	XSGOF2eNgXT8BxAxaY3IY6NPxnKoi7SO+FWBv1jkdPahoTZ9B7faGF4QuouayhqDcxzAkXtlMSnEv
+	0l2pOrXSH1FyIM9oAxtoKDsee0FwJYdu19pQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1w2lbu-00FMVe-0V;
+	Wed, 18 Mar 2026 15:46:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 18 Mar 2026 16:46:34 +0900
+Date: Wed, 18 Mar 2026 16:46:34 +0900
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>,
+	Yuan Kang <Yuan.Kang@freescale.com>, stable@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: caam - remove HMAC key hex dumps from
+ hash_digest_key
+Message-ID: <abpYWkDzofozlOWp@gondor.apana.org.au>
+References: <20260306111204.302544-1-thorsten.blum@linux.dev>
+ <abTqefme_iApfHZi@gondor.apana.org.au>
+ <abk4_r-KUYIhvyNL@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 12/12] soc: qcom: ice: Allow explicit votes on 'iface'
- clock for ICE
-To: Harshal Dev <harshal.dev@oss.qualcomm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Abel Vesa <abel.vesa@oss.qualcomm.com>,
- Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
- cros-qcom-dts-watchers@chromium.org, Eric Biggers <ebiggers@google.com>,
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
- Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
- Tengfei Fan <tengfei.fan@oss.qualcomm.com>,
- Bartosz Golaszewski <brgl@kernel.org>, David Wronek <davidwronek@gmail.com>,
- Luca Weiss <luca.weiss@fairphone.com>,
- Neil Armstrong <neil.armstrong@linaro.org>,
- Melody Olvera <quic_molvera@quicinc.com>,
- Alexander Koskovich <akoskovich@pm.me>
-Cc: Brian Masney <bmasney@redhat.com>,
- Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
- Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
- linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-References: <20260317-qcom_ice_power_and_clk_vote-v3-0-53371dbabd6a@oss.qualcomm.com>
- <20260317-qcom_ice_power_and_clk_vote-v3-12-53371dbabd6a@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260317-qcom_ice_power_and_clk_vote-v3-12-53371dbabd6a@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abk4_r-KUYIhvyNL@linux.dev>
 
-On 17/03/2026 10:20, Harshal Dev wrote:
-> Since Qualcomm inline-crypto engine (ICE) is now a dedicated driver
-> de-coupled from the QCOM UFS driver, it explicitly votes for its required
-> clocks during probe. For scenarios where the 'clk_ignore_unused' flag is
-> not passed on the kernel command line, to avoid potential unclocked ICE
-> hardware register access during probe the ICE driver should additionally
-> vote on the 'iface' clock.
-> Also update the suspend and resume callbacks to handle un-voting and voting
-> on the 'iface' clock.
+On Tue, Mar 17, 2026 at 12:20:30PM +0100, Thorsten Blum wrote:
+>
+> This is not specifically about caam, but (debug) logging of potentially
+> sensitive key material should generally be avoided, imho. Some other
+> recent examples:
 > 
-> Fixes: 2afbf43a4aec6 ("soc: qcom: Make the Qualcomm UFS/SDCC ICE a dedicated driver")
-> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
-> ---
->  drivers/soc/qcom/ice.c | 17 +++++++++++++++--
+> https://lore.kernel.org/lkml/20260227230008.858641-2-thorsten.blum@linux.dev/
+> https://lore.kernel.org/lkml/20260303132552.65235-2-thorsten.blum@linux.dev/
+> https://lore.kernel.org/lkml/20260303190350.78705-2-thorsten.blum@linux.dev/
+> 
+> > Is there a scenario where production systems will run with debugging
+> > enabled in caam?
+> 
+> I don't know - possibly.
 
-Why the driver patch is after the DTS patches? It is explicitly
-documented as no-go.
+I think a better solution is to turn these sensitive printk's to
+pr_devel.  That way you can still get them by recompiling the kernel
+but they won't be enabled in any distro kernels.
 
-You do not understand how patches are being applied and you think you
-can fix inherent problems in bisectability by creating incorrect order
-of patches. No, you cannot. Read maintainer soc profile and entire
-development-process document, so you understand how patches are applied,
-what are branches, what is current RC and how kernel is effectively
-released.
+What do you think?
 
-Best regards,
-Krzysztof
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
